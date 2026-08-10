@@ -52,19 +52,31 @@ function errMsg(e: any): string {
 export default function StoreRequestReviewModal({ requestId, request, open, onClose, onProcessed }: Props) {
   const [dups, setDups] = useState<StoreRequestDuplicate[]>([]);
   const [dupsLoading, setDupsLoading] = useState(false);
+  // WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1: 중복 조회 실패 ≠ 중복 없음
+  const [dupsError, setDupsError] = useState<string | null>(null);
   const [busy, setBusy] = useState<Busy>(null);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState('');
 
   const reviewable = request?.reviewable ?? false;
 
+  /**
+   * 중복 후보 조회.
+   *
+   * WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1
+   *   종전에는 실패 시 `setDups([])` 로 비워, 화면이 "기존 상품이 없습니다. 신규 승인 가능합니다."
+   *   를 그대로 보여줬다. 조회조차 못 한 상태를 "중복 없음" 으로 위장해 **중복 마스터 신규 생성**
+   *   을 권하는 결과가 된다. 실패는 실패로 표시하고 재시도를 제공한다.
+   */
   const loadDups = useCallback(async () => {
     if (!requestId) return;
     setDupsLoading(true);
+    setDupsError(null);
     try {
       setDups(await getStoreRequestDuplicates(requestId));
-    } catch {
-      setDups([]);
+    } catch (e) {
+      setDupsError(errMsg(e));
+      // 목록은 비우지 않는다 — 비우면 "중복 없음" 과 구분되지 않는다.
     } finally {
       setDupsLoading(false);
     }
@@ -75,6 +87,7 @@ export default function StoreRequestReviewModal({ requestId, request, open, onCl
       setError(null);
       setNote('');
       setDups([]);
+      setDupsError(null);
       if (reviewable) loadDups();
     }
   }, [open, requestId, reviewable, loadDups]);
@@ -177,7 +190,30 @@ export default function StoreRequestReviewModal({ requestId, request, open, onCl
                   중복 후보 (기존 O4O 표준 상품)
                   {dupsLoading && <Loader2 size={13} className="animate-spin text-gray-400" />}
                 </div>
-                {dups.length === 0 ? (
+                {dupsError ? (
+                  /* WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1:
+                     조회 실패를 "중복 없음" 으로 표시하지 않는다. */
+                  <div
+                    role="alert"
+                    className="flex items-start justify-between gap-3 text-sm bg-red-50 border border-red-200 rounded p-3 text-red-800"
+                  >
+                    <div>
+                      <p className="font-semibold">중복 후보를 확인하지 못했습니다.</p>
+                      <p className="mt-1 break-all">{dupsError}</p>
+                      <p className="mt-1 text-xs text-red-700">
+                        중복이 없다는 뜻이 아닙니다. 확인 전에 신규 승인하면 중복 표준 상품이 생길 수 있습니다.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={loadDups}
+                      disabled={dupsLoading}
+                      className="shrink-0 rounded bg-red-100 px-3 py-1 text-xs font-medium text-red-800 hover:bg-red-200 disabled:opacity-50"
+                    >
+                      다시 확인
+                    </button>
+                  </div>
+                ) : dups.length === 0 ? (
                   <div className="text-sm text-gray-400 bg-gray-50 border border-gray-100 rounded p-3">
                     {dupsLoading ? '확인 중…' : '동일 바코드/상품명+제조사의 기존 상품이 없습니다. 신규 승인 가능합니다.'}
                   </div>

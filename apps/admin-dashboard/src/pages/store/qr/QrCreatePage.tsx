@@ -111,14 +111,30 @@ function StepSourceSelect({
   const [products, setProducts] = useState<QrSourceProduct[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
+  // WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1: 조회 실패 ≠ 등록 상품 0건
+  const [loadError, setLoadError] = useState<string | null>(null);
 
+  /**
+   * QR 랜딩 대상 상품 조회.
+   *
+   * WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1
+   *   종전에는 실패 시 `setProducts([])` 로 비워 "등록된 공급자 상품이 없습니다." 를 보여줬다.
+   *   실제로는 조회에 실패한 것이라 담당자가 "연결할 상품이 없다"고 오인할 수 있었다.
+   */
   const loadProducts = useCallback(async (q: string) => {
     setLoading(true);
     try {
       const res = await qrApi.listSourceProducts({ limit: 30, search: q || undefined });
+      if (!Array.isArray(res?.items)) {
+        throw new Error('상품 목록 응답 형식이 올바르지 않습니다.');
+      }
       setProducts(res.items);
-    } catch {
-      setProducts([]);
+      setLoadError(null);
+    } catch (err: any) {
+      setLoadError(
+        err?.response?.data?.error || err?.response?.data?.message || err?.message || '상품 목록을 불러오지 못했습니다.',
+      );
+      // 기존 목록은 유지한다 — 비우면 "상품 0건" 과 구분되지 않는다.
     } finally {
       setLoading(false);
     }
@@ -171,10 +187,56 @@ function StepSourceSelect({
         <button type="submit" style={s.searchBtn}>검색</button>
       </form>
 
+      {/* WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1:
+          조회 실패를 "상품 없음" 과 구분해 표시한다. */}
+      {loadError && (
+        <div
+          role="alert"
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 12,
+            border: '1px solid #fecaca',
+            background: '#fef2f2',
+            color: '#991b1b',
+            borderRadius: 8,
+            padding: 12,
+            marginBottom: 12,
+            fontSize: 13,
+          }}
+        >
+          <div>
+            <strong>상품 목록을 불러오지 못했습니다.</strong>
+            <div style={{ marginTop: 4, wordBreak: 'break-all' }}>{loadError}</div>
+            <div style={{ marginTop: 4, fontSize: 12 }}>연결할 상품이 없다는 뜻이 아닙니다.</div>
+          </div>
+          <button
+            type="button"
+            onClick={() => loadProducts(search)}
+            disabled={loading}
+            style={{
+              flexShrink: 0,
+              background: '#fee2e2',
+              color: '#991b1b',
+              border: 'none',
+              borderRadius: 6,
+              padding: '4px 12px',
+              fontWeight: 500,
+              cursor: 'pointer',
+            }}
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
+
       {loading ? (
         <p style={s.loadingText}>불러오는 중...</p>
       ) : products.length === 0 ? (
-        <p style={s.emptyText}>등록된 공급자 상품이 없습니다.</p>
+        <p style={s.emptyText}>
+          {loadError ? '목록을 불러오지 못해 표시할 수 없습니다.' : '등록된 공급자 상품이 없습니다.'}
+        </p>
       ) : (
         <div style={s.productList}>
           {products.map((p) => (

@@ -250,16 +250,40 @@ const MetadataEditModal: React.FC<{
   const [tab, setTab] = useState<'meta' | 'usage'>('meta');
   const [usages, setUsages] = useState<MediaAssetUsageItem[] | null>(null);
   const [usageLoading, setUsageLoading] = useState(false);
+  // WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1: 사용처 조회 실패 ≠ 사용처 0건
+  const [usageError, setUsageError] = useState<string | null>(null);
+
+  /**
+   * 사용처 조회.
+   *
+   * WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1
+   *   종전에는 실패 시 `setUsages([])` 로 비워 "사용하는 매장 실행 자산이 없습니다." 를 보여줬다.
+   *   이 문구는 **삭제해도 안전하다**는 판단 근거로 읽히므로, 조회 실패를 0건으로 위장하면
+   *   사용 중인 Resource 를 지우려 할 수 있다(백엔드 usage guard 가 409 로 막더라도 오도는 남는다).
+   */
+  const loadUsage = useCallback(() => {
+    setUsageLoading(true);
+    setUsageError(null);
+    getMediaAssetUsage(asset.id)
+      .then((r) => {
+        if (!Array.isArray(r?.usages)) {
+          throw new Error('사용처 응답 형식이 올바르지 않습니다.');
+        }
+        setUsages(r.usages);
+      })
+      .catch((err: any) => {
+        setUsageError(
+          err?.response?.data?.error || err?.response?.data?.message || err?.message || '사용처를 불러오지 못했습니다.',
+        );
+      })
+      .finally(() => setUsageLoading(false));
+  }, [asset.id]);
 
   useEffect(() => {
-    if (tab === 'usage' && usages === null && !usageLoading) {
-      setUsageLoading(true);
-      getMediaAssetUsage(asset.id)
-        .then((r) => setUsages(r.usages))
-        .catch(() => setUsages([]))
-        .finally(() => setUsageLoading(false));
+    if (tab === 'usage' && usages === null && !usageLoading && !usageError) {
+      loadUsage();
     }
-  }, [tab, usages, usageLoading, asset.id]);
+  }, [tab, usages, usageLoading, usageError, loadUsage]);
 
   const field = 'w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200';
   const label = 'block text-xs font-medium text-gray-600 mb-1';
@@ -288,7 +312,25 @@ const MetadataEditModal: React.FC<{
           {tab === 'usage' ? (
             <div className="space-y-2">
               {usageLoading && <div className="text-sm text-gray-500 py-6 text-center">사용처 조회 중…</div>}
-              {!usageLoading && usages && usages.length === 0 && (
+              {/* WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1:
+                  조회 실패를 "사용처 없음" 으로 표시하지 않는다 — 삭제 판단을 오도한다. */}
+              {!usageLoading && usageError && (
+                <div role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                  <p className="font-semibold">사용처를 확인하지 못했습니다.</p>
+                  <p className="mt-1 break-all">{usageError}</p>
+                  <p className="mt-1 text-xs text-red-700">
+                    사용처가 없다는 뜻이 아닙니다. 확인 전에는 삭제 판단을 하지 마세요.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={loadUsage}
+                    className="mt-2 rounded bg-red-100 px-3 py-1 text-xs font-medium text-red-800 hover:bg-red-200"
+                  >
+                    다시 확인
+                  </button>
+                </div>
+              )}
+              {!usageLoading && !usageError && usages && usages.length === 0 && (
                 <div className="text-sm text-gray-400 py-6 text-center">
                   이 Resource를 실제로 사용(img/video/source 삽입)하는 매장 실행 자산이 없습니다.
                   <div className="text-xs text-gray-300 mt-1">(store_execution_assets 기준 · 본문 텍스트 언급·YouTube iframe 제외)</div>

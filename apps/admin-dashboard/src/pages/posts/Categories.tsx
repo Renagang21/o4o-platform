@@ -27,6 +27,8 @@ const Categories = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const [categories, setCategories] = useState<Category[]>([]);
+  // WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1: 조회 실패 ≠ 카테고리 0건
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const [showBulkActions, setShowBulkActions] = useState(false);
@@ -62,13 +64,28 @@ const Categories = () => {
   }, [visibleColumns]);
 
   // Load categories from API
-  useEffect(() => {
-    const loadCategories = async () => {
+  //
+  // WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1
+  //   종전에는 실패 시 아무 표시 없이 `setCategories([])` 만 했다. 화면에는 "0 items" 인 빈 표만
+  //   남아 카테고리가 하나도 없는 것처럼 보였다 — 실패를 0건으로 위장한 것이다.
+  const loadCategories = async () => {
       try {
+        setLoadError(null);
         const response = await authClient.api.get('/content/categories');
 
         const result = response.data;
+
+        // 200 인데 실패를 실은 응답을 성공으로 오인하지 않는다.
+        if (result?.success === false) {
+          throw new Error(result?.error || result?.message || '카테고리 조회에 실패했습니다.');
+        }
+
         const categoriesData = result.data || result.categories || [];
+
+        // 예상과 다른 응답 형태를 "0건" 으로 흘려보내지 않는다.
+        if (!Array.isArray(categoriesData)) {
+          throw new Error('카테고리 목록 응답 형식이 올바르지 않습니다.');
+        }
 
         // Transform API data to match our Category interface
         const transformedCategories = categoriesData.map((cat: any) => ({
@@ -81,12 +98,18 @@ const Categories = () => {
         })).filter((cat: any) => cat.id); // Filter out items without ID
 
         setCategories(transformedCategories);
-      } catch (error) {
-        // Fallback to empty array on error
-        setCategories([]);
+      } catch (error: any) {
+        // 기존 목록은 유지한다 — 비우면 "카테고리 0건" 과 구분되지 않는다.
+        setLoadError(
+          error?.response?.data?.error ||
+            error?.response?.data?.message ||
+            error?.message ||
+            '카테고리 목록을 불러오지 못했습니다.',
+        );
       }
-    };
+  };
 
+  useEffect(() => {
     loadCategories();
   }, []);
   
@@ -264,6 +287,31 @@ const Categories = () => {
           <h1 className="text-2xl font-bold text-gray-900">카테고리</h1>
           <p className="text-gray-600 mt-1">컨텐츠를 체계적으로 분류하고 관리합니다</p>
         </div>
+
+        {/* WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1:
+            조회 실패를 지속 배너로 드러낸다. 종전에는 빈 표("0 items")만 남아 0건과 구분되지 않았다. */}
+        {loadError && (
+          <div
+            role="alert"
+            className="mb-4 flex items-start justify-between gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800"
+          >
+            <div>
+              <p className="font-semibold">카테고리 목록을 불러오지 못했습니다.</p>
+              <p className="mt-1 break-all">{loadError}</p>
+              <p className="mt-1 text-xs text-red-700">
+                아래 목록은 마지막으로 조회에 성공한 내용이거나 비어 있을 수 있습니다. 카테고리가 0건이라는 뜻이
+                아닙니다.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={loadCategories}
+              className="shrink-0 rounded-md bg-red-100 px-3 py-1 font-medium text-red-800 hover:bg-red-200"
+            >
+              다시 시도
+            </button>
+          </div>
+        )}
 
         {/* Action Bar */}
         <div className="flex items-center justify-between mb-4">

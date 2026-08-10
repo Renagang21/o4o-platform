@@ -33,6 +33,8 @@ export default function InstructorDashboard() {
   const [selectedCourse, setSelectedCourse] = useState<InstructorCourse | null>(null);
   const [enrollments, setEnrollments] = useState<EnrollmentItem[]>([]);
   const [enrollmentsLoading, setEnrollmentsLoading] = useState(false);
+  // WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1: 조회 실패 ≠ 대기 0건
+  const [enrollmentsError, setEnrollmentsError] = useState<string | null>(null);
 
   // Confirm
   const [confirmAction, setConfirmAction] = useState<{
@@ -63,13 +65,27 @@ export default function InstructorDashboard() {
     fetchCourses();
   }, [fetchCourses]);
 
+  /**
+   * 대기 중인 수강 신청 조회.
+   *
+   * WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1
+   *   종전에는 실패 시 `setEnrollments([])` 로 비워, 모달이 "현재 대기 중인 수강 신청이 없습니다."
+   *   를 그대로 보여줬다. 실제로는 조회조차 못 한 것이라 승인 대기자가 방치될 수 있었다.
+   */
   const fetchEnrollments = useCallback(async (courseId: string) => {
     try {
       setEnrollmentsLoading(true);
+      setEnrollmentsError(null);
       const res = await instructorApi.getPendingEnrollments(courseId);
-      setEnrollments(res.data || []);
-    } catch {
+      if (!Array.isArray(res.data)) {
+        throw new Error('수강 신청 목록 응답 형식이 올바르지 않습니다.');
+      }
+      setEnrollments(res.data);
+    } catch (err: any) {
       setEnrollments([]);
+      setEnrollmentsError(
+        err?.response?.data?.error || err?.response?.data?.message || err?.message || '수강 신청 목록을 불러오지 못했습니다.',
+      );
     } finally {
       setEnrollmentsLoading(false);
     }
@@ -256,6 +272,21 @@ export default function InstructorDashboard() {
         {enrollmentsLoading ? (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+          </div>
+        ) : enrollmentsError ? (
+          /* WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1:
+             조회 실패를 "신청 없음" 으로 표시하지 않는다. */
+          <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+            <p className="font-semibold text-red-800">수강 신청 목록을 불러오지 못했습니다.</p>
+            <p className="mt-1 break-all text-sm text-red-700">{enrollmentsError}</p>
+            <p className="mt-1 text-xs text-red-700">대기 중인 신청이 없다는 뜻이 아닙니다.</p>
+            <Button
+              variant="outline"
+              className="mt-4"
+              onClick={() => selectedCourse && fetchEnrollments(selectedCourse.id)}
+            >
+              다시 시도
+            </Button>
           </div>
         ) : enrollments.length === 0 ? (
           <div className="py-8 text-center">

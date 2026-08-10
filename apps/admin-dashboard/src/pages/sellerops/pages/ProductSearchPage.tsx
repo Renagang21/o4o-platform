@@ -22,6 +22,11 @@ const ProductSearchPage: React.FC = () => {
   const [results, setResults] = useState<ProductMasterSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  // WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1:
+  //   검색 실패를 "검색 결과가 없습니다" 로 위장하면 이미 있는 ProductMaster 를 못 찾은 채
+  //   [직접 입력] 으로 유도되어 중복 마스터가 생긴다. 실패는 실패로 표시한다.
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [retryToken, setRetryToken] = useState(0);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -30,6 +35,7 @@ const ProductSearchPage: React.FC = () => {
     if (!query.trim()) {
       setResults([]);
       setSearched(false);
+      setSearchError(null);
       setLoading(false);
       return;
     }
@@ -38,11 +44,19 @@ const ProductSearchPage: React.FC = () => {
     debounceRef.current = setTimeout(async () => {
       try {
         const data = await searchProductMaster(query, 5);
+        if (!Array.isArray(data)) {
+          throw new Error('검색 응답 형식이 올바르지 않습니다.');
+        }
         setResults(data);
         setSearched(true);
-      } catch {
+        setSearchError(null);
+      } catch (err: any) {
+        // 결과를 비우되 "0건" 이 아니라 "실패" 로 표시한다.
         setResults([]);
         setSearched(true);
+        setSearchError(
+          err?.response?.data?.error || err?.response?.data?.message || err?.message || '상품 검색에 실패했습니다.',
+        );
       } finally {
         setLoading(false);
       }
@@ -51,7 +65,7 @@ const ProductSearchPage: React.FC = () => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query]);
+  }, [query, retryToken]);
 
   const handleSelect = (master: ProductMasterSearchResult) => {
     navigate('/sellerops/listings/create', { state: { master } });
@@ -105,7 +119,31 @@ const ProductSearchPage: React.FC = () => {
         </div>
       )}
 
-      {!loading && searched && results.length > 0 && (
+      {/* WO-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1:
+          검색 실패는 "결과 없음" 과 구분해서 표시한다. */}
+      {!loading && searchError && (
+        <div
+          role="alert"
+          className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 flex items-start justify-between gap-3 text-sm text-red-800"
+        >
+          <div>
+            <p className="font-semibold">검색하지 못했습니다.</p>
+            <p className="mt-1 break-all">{searchError}</p>
+            <p className="mt-1 text-xs text-red-700">
+              결과가 없다는 뜻이 아닙니다. 다시 시도한 뒤에도 실패하면 직접 입력 대신 관리자에게 문의하세요.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setRetryToken((t) => t + 1)}
+            className="shrink-0 rounded-md bg-red-100 px-3 py-1 font-medium text-red-800 hover:bg-red-200"
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
+
+      {!loading && !searchError && searched && results.length > 0 && (
         <div className="bg-white rounded-lg shadow overflow-hidden mb-4">
           <div className="px-4 py-2 bg-gray-50 border-b text-xs font-medium text-gray-500 uppercase tracking-wide">
             검색 결과 ({results.length}건)
@@ -152,7 +190,7 @@ const ProductSearchPage: React.FC = () => {
         </div>
       )}
 
-      {!loading && searched && results.length === 0 && (
+      {!loading && !searchError && searched && results.length === 0 && (
         <div className="bg-white rounded-lg shadow p-6 text-center mb-4">
           <Package className="w-10 h-10 text-gray-300 mx-auto mb-3" />
           <p className="text-sm font-medium text-gray-700">검색 결과가 없습니다</p>
