@@ -30,9 +30,50 @@ describe('OperatorsPage — 비밀번호 write 계약', () => {
       expect(SRC).toMatch(/비밀번호는 여기서 변경하지 않습니다/);
     });
 
-    it('신규 생성 경로의 password 는 유지한다 (P2 미변경)', () => {
-      expect(SRC).toMatch(/password: formData\.password/);
-      expect(SRC).toMatch(/Password is required for new operator/);
+    // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
+    //   등록 payload 가 조건부로 바뀌었다(기존 사용자 경로에서는 비밀번호를 보내지 않는다).
+    //   계약의 본질 — "등록 경로는 여전히 입력 비밀번호를 서버로 보낸다" — 은 그대로 고정한다.
+    it('신규 등록 경로는 입력 비밀번호를 서버로 보낸다', () => {
+      expect(SRC).toMatch(/payload\.password = formData\.password/);
+      expect(SRC).toMatch(/신규 등록에는 최초 서비스 비밀번호가 필요합니다/);
+    });
+  });
+
+  // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1
+  describe('서비스 운영자 등록 계약', () => {
+    it('Pharmacy-Hub 운영자를 등록 카탈로그에서 선택할 수 있다', () => {
+      expect(SRC).toMatch(/'pharmacy-hub:operator'/);
+    });
+
+    it('platform:super_admin 은 등록 카탈로그에 없다', () => {
+      const catalog = SRC.slice(
+        SRC.indexOf('const ASSIGNABLE_ROLES'),
+        SRC.indexOf('CATALOG_ROLE_VALUES'),
+      );
+      expect(catalog).not.toMatch(/platform:super_admin/);
+    });
+
+    it('대상 서비스를 하나만 보낸다 (roles = [targetRole] + canonical serviceKey)', () => {
+      expect(SRC).toMatch(/roles: \[targetRole\]/);
+      expect(SRC).toMatch(/const canonicalServiceKey = resolveCanonicalServiceKey\(targetServiceKey\)/);
+      expect(SRC).toMatch(/serviceKey: canonicalServiceKey/);
+    });
+
+    it('신규 사용자와 기존 사용자 권한 추가를 구분한다', () => {
+      expect(SRC).toMatch(/registerMode/);
+      expect(SRC).toMatch(/const isNewUser = registerMode === 'new'/);
+      // 기존 사용자 경로에서는 비밀번호가 있을 때만 보낸다(없는 credential 초기화 전용).
+      expect(SRC).toMatch(/if \(formData\.password\) payload\.password = formData\.password/);
+    });
+
+    it('기존 credential 유지 응답을 관리자에게 그대로 알린다', () => {
+      expect(SRC).toMatch(/KEEP_EXISTING_CREDENTIAL/);
+      expect(SRC).toMatch(/기존 비밀번호는 그대로 유지됩니다/);
+    });
+
+    it('편집 화면은 카탈로그 밖 역할을 읽기 전용으로 보존한다', () => {
+      expect(SRC).toMatch(/CATALOG_ROLE_VALUES\.has\(r\)/);
+      expect(SRC).toMatch(/이 화면에서 변경하지 않는 권한/);
     });
   });
 

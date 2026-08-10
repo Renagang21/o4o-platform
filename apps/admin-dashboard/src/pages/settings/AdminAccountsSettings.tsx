@@ -20,7 +20,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
-import { Loader2, KeyRound, ShieldCheck, RefreshCw, Pencil } from 'lucide-react';
+import { Loader2, KeyRound, ShieldCheck, RefreshCw, Pencil, Users } from 'lucide-react';
 import { BaseTable, RowActionMenu, FilterBar } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 
@@ -357,10 +357,26 @@ export default function AdminAccountsSettings() {
             기존 비밀번호는 조회·표시되지 않습니다. <span className="font-medium">역할 변경은 좌측 메뉴의 RBAC Role Assignment에서 관리합니다.</span>
           </p>
         </div>
-        <button type="button" onClick={load} disabled={loading}
-          className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50">
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> 새로고침
-        </button>
+        <div className="shrink-0 flex items-center gap-2">
+          {/* WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
+              이 화면은 **플랫폼 관리자 계정** 전용이다. 서비스 운영자(KPA·Neture·Pharmacy-Hub 등) 등록은
+              `/operators` 가 canonical 이므로 생성 기능을 여기에 복제하지 않고 진입점만 둔다
+              (중복 구현 시 등록 계약이 두 곳으로 갈라진다). */}
+          <button type="button" onClick={() => navigate('/operators')}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-blue-700 border border-blue-200 bg-blue-50 rounded-lg hover:bg-blue-100">
+            <Users className="w-4 h-4" /> 서비스 운영자 관리
+          </button>
+          <button type="button" onClick={load} disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> 새로고침
+          </button>
+        </div>
+      </div>
+
+      {/* 두 화면의 역할 경계를 화면에서 분명히 한다 — 어디서 무엇을 만드는지 헷갈리지 않게. */}
+      <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+        서비스 운영자(KPA · Neture · GlycoPharm · K-Cosmetics · Pharmacy-Hub) 계정 등록과 서비스별 로그인
+        비밀번호는 이 화면이 아니라 <b>서비스 운영자 관리</b> 화면에서 처리합니다.
       </div>
 
       {error ? (

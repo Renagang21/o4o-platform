@@ -14,6 +14,7 @@
  */
 
 import { Repository, In } from 'typeorm';
+import type { EntityManager } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
 import { UserRole } from '../../../types/auth.js';
@@ -124,12 +125,19 @@ export class RoleAssignmentService {
 
   /**
    * Assign a role to a user
+   *
+   * WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
+   *   선택적 `manager` 를 받는다. 호출자가 트랜잭션 안에서 User·Membership·credential 을
+   *   함께 만들 때 role_assignments 만 트랜잭션 밖에 남아 부분 생성이 되는 것을 막기 위함이다.
+   *   **write 경로는 그대로 하나다**(F9 RBAC SSOT) — 저장소만 트랜잭션 manager 것으로 바꾼다.
+   *   인자를 생략하면 기존 동작과 완전히 동일하다.
    */
-  async assignRole(input: AssignRoleInput): Promise<RoleAssignment> {
+  async assignRole(input: AssignRoleInput, manager?: EntityManager): Promise<RoleAssignment> {
     const { userId, role, assignedBy, validFrom, validUntil } = input;
+    const repository = manager ? manager.getRepository(RoleAssignment) : this.repository;
 
     // Check if assignment already exists
-    let assignment = await this.repository.findOne({
+    let assignment = await repository.findOne({
       where: { userId, role },
     });
 
@@ -146,7 +154,7 @@ export class RoleAssignmentService {
       );
     } else {
       // Create new assignment
-      assignment = this.repository.create({
+      assignment = repository.create({
         userId,
         role,
         isActive: true,
@@ -160,7 +168,7 @@ export class RoleAssignmentService {
       );
     }
 
-    const saved = await this.repository.save(assignment);
+    const saved = await repository.save(assignment);
     invalidateRoles(userId); // WO-O4O-AUTH-ROLE-FRESHEN-V1
     return saved;
   }

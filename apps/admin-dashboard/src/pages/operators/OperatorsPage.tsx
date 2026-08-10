@@ -43,14 +43,19 @@ import {
 //   security-core 는 전 파일이 `import type` 뿐이라 런타임 의존이 없다(브라우저 안전).
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 
-// ─── Create/Edit 모달용 — 운영 역할 카탈로그 ───
-// 정책: WO-OPERATOR-ROLE-CLEANUP-V1 — Super Admin = 전체 접근, 각 서비스 = Admin + Operator만
+// ─── 서비스 운영자 등록 카탈로그 ───
+// 정책: WO-OPERATOR-ROLE-CLEANUP-V1 — 각 서비스 = Admin + Operator만
 //       WO-O4O-KPA-CODE-CLEANUP-V1 — kpa-b/kpa-c 제거
 // (운영 외 role 은 본 페이지에서 부여하지 않음 — `/users` 페이지에서 관리)
+//
+// WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
+//   - `platform:super_admin` 은 **서비스 운영자 등록 대상이 아니다**(서비스 credential 개념이 없다).
+//     플랫폼 계정은 `/settings/admin-accounts` 소관이므로 이 카탈로그에서 제외한다.
+//     다만 편집 화면에서는 사용자가 이미 가진 비카탈로그 role 을 **읽기 전용으로 보존**한다
+//     (여기서 체크가 풀려 role 이 조용히 사라지는 것을 막는다).
+//   - `pharmacy-hub` 는 backend 에 role·scope guard·Membership 이 이미 있었고 이 카탈로그만 비어 있었다.
+//     backend 역할은 operator / store_owner / supplier 이며 admin 은 없다.
 const ASSIGNABLE_ROLES: Record<string, { value: string; label: string; description: string }[]> = {
-  platform: [
-    { value: 'platform:super_admin', label: 'Super Admin', description: '모든 서비스 접근 가능' },
-  ],
   kpa: [
     { value: 'kpa:admin', label: 'Admin', description: 'KPA 커뮤니티 관리자' },
     { value: 'kpa:operator', label: 'Operator', description: 'KPA 커뮤니티 운영자' },
@@ -67,8 +72,20 @@ const ASSIGNABLE_ROLES: Record<string, { value: string; label: string; descripti
     { value: 'cosmetics:admin', label: 'Admin', description: 'K-Cosmetics 관리자' },
     { value: 'cosmetics:operator', label: 'Operator', description: 'K-Cosmetics 운영자' },
   ],
-  // platform 은 super_admin role 할당을 위해 잔존.
+  'pharmacy-hub': [
+    { value: 'pharmacy-hub:operator', label: 'Operator', description: 'Pharmacy-Hub 운영자' },
+  ],
 };
+
+/** 등록 카탈로그에 존재하는 role 전체 (편집 시 비카탈로그 role 보존 판정용) */
+const CATALOG_ROLE_VALUES: ReadonlySet<string> = new Set(
+  Object.values(ASSIGNABLE_ROLES).flatMap((rs) => rs.map((r) => r.value)),
+);
+
+const REGISTRABLE_SERVICE_KEYS = Object.keys(ASSIGNABLE_ROLES);
+
+/** 등록 대상: 신규 사용자 / 기존 사용자 권한 추가 — 계약이 다르므로 화면에서 먼저 가른다. */
+type RegisterMode = 'new' | 'existing';
 
 interface Facets {
   service: string;
@@ -102,6 +119,10 @@ export default function OperatorsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [formData, setFormData] = useState<UserFormState>({ email: '', password: '', lastName: '', firstName: '', roles: [] });
+  // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1 — 등록 모달 상태
+  const [registerMode, setRegisterMode] = useState<RegisterMode>('new');
+  const [targetServiceKey, setTargetServiceKey] = useState<string>(REGISTRABLE_SERVICE_KEYS[0]);
+  const [targetRole, setTargetRole] = useState<string>(ASSIGNABLE_ROLES[REGISTRABLE_SERVICE_KEYS[0]][0].value);
   // 서비스 비밀번호 변경 모달 — 대상 행(서비스 고정)
   const [pwTarget, setPwTarget] = useState<AssignmentRow | null>(null);
   const [pwValue, setPwValue] = useState('');
@@ -204,8 +225,17 @@ export default function OperatorsPage() {
   const openCreateModal = () => {
     setEditingUserId(null);
     setFormData({ email: '', password: '', lastName: '', firstName: '', roles: [] });
+    setRegisterMode('new');
+    setTargetServiceKey(REGISTRABLE_SERVICE_KEYS[0]);
+    setTargetRole(ASSIGNABLE_ROLES[REGISTRABLE_SERVICE_KEYS[0]][0].value);
     setFormErrors({});
     setShowModal(true);
+  };
+
+  /** 대상 서비스를 바꾸면 역할도 그 서비스의 첫 역할로 맞춘다(다른 서비스 role 이 남는 것을 막는다). */
+  const changeTargetService = (svc: string) => {
+    setTargetServiceKey(svc);
+    setTargetRole(ASSIGNABLE_ROLES[svc][0].value);
   };
 
   const openEditModal = (row: AssignmentRow) => {
@@ -275,17 +305,28 @@ export default function OperatorsPage() {
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
-    if (!formData.email) errors.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = 'Invalid email format';
-    // WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
-    //   비밀번호는 신규 생성에서만 입력받는다(편집 경로에서 제거).
-    if (!editingUserId) {
-      if (!formData.password) errors.password = 'Password is required for new operator';
-      else if (formData.password.length < 8) errors.password = 'Password must be at least 8 characters';
+    if (!formData.email) errors.email = '이메일을 입력하세요.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = '이메일 형식이 올바르지 않습니다.';
+
+    if (editingUserId) {
+      // 편집: 비밀번호는 여기서 다루지 않는다(행별 "서비스 비밀번호 변경" 담당).
+      if (!formData.lastName) errors.lastName = '성을 입력하세요.';
+      if (!formData.firstName) errors.firstName = '이름을 입력하세요.';
+      if (formData.roles.length === 0) errors.roles = '역할을 최소 1개 선택하세요.';
+    } else if (registerMode === 'new') {
+      // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
+      //   신규 등록의 최초 비밀번호는 **선택한 서비스 credential** 로 저장된다.
+      if (!formData.password) errors.password = '신규 등록에는 최초 서비스 비밀번호가 필요합니다.';
+      else if (formData.password.length < 8) errors.password = '비밀번호는 최소 8자 이상이어야 합니다.';
+      if (!formData.lastName) errors.lastName = '성을 입력하세요.';
+      if (!formData.firstName) errors.firstName = '이름을 입력하세요.';
+    } else {
+      // 기존 사용자 권한 추가: 비밀번호는 **선택** — 해당 서비스 credential 이 없을 때만 쓰인다.
+      // 이미 있으면 서버가 KEEP_EXISTING_CREDENTIAL 로 유지하고 덮어쓰지 않는다.
+      if (formData.password && formData.password.length < 8) {
+        errors.password = '초기 서비스 비밀번호는 최소 8자 이상이어야 합니다.';
+      }
     }
-    if (!formData.lastName) errors.lastName = 'Last name is required';
-    if (!formData.firstName) errors.firstName = 'First name is required';
-    if (formData.roles.length === 0) errors.roles = 'At least one role is required';
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -306,25 +347,52 @@ export default function OperatorsPage() {
         //   password 를 보내지 않는다. 서버도 400(PASSWORD_NOT_ALLOWED_HERE)으로 거부한다.
         //   서비스 비밀번호는 행별 "서비스 비밀번호 변경" 액션이 담당한다.
         await authClient.api.put(`/admin/users/${editingUserId}`, data);
-        toast.success('Operator updated successfully');
+        toast.success('운영자 정보가 수정되었습니다.');
       } else {
-        await authClient.api.post('/admin/users', {
+        // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1
+        //   대상 서비스는 **하나**다. canonical serviceKey 변환은 security-core SSOT 에 위임한다.
+        //   서버는 role 에서 파생한 키와 이 serviceKey 가 다르면 SERVICE_KEY_MISMATCH 로 거부한다.
+        const canonicalServiceKey = resolveCanonicalServiceKey(targetServiceKey);
+        const isNewUser = registerMode === 'new';
+        const payload: Record<string, unknown> = {
           email: formData.email,
-          password: formData.password,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          name: `${formData.lastName} ${formData.firstName}`.trim(),
-          roles: formData.roles,
-          role: formData.roles[0]?.split(':')[1] || 'operator',
+          roles: [targetRole],
+          role: targetRole.split(':')[1] || 'operator',
+          serviceKey: canonicalServiceKey,
           isEmailVerified: true,
           isActive: true,
-        });
-        toast.success('Operator created successfully');
+        };
+        if (isNewUser) {
+          payload.firstName = formData.firstName;
+          payload.lastName = formData.lastName;
+          payload.name = `${formData.lastName} ${formData.firstName}`.trim();
+        }
+        // 기존 사용자 경로에서는 비밀번호가 **있을 때만** 보낸다(없는 credential 초기화 용도).
+        if (formData.password) payload.password = formData.password;
+
+        const res = await authClient.api.post('/admin/users', payload);
+        const credentialPolicy = res?.data?.credentialPolicy;
+        const serviceLabel = SERVICES[targetServiceKey as keyof typeof SERVICES]?.label ?? targetServiceKey;
+        if (!isNewUser && credentialPolicy === 'KEEP_EXISTING_CREDENTIAL') {
+          toast.success(`권한을 추가했습니다. ${serviceLabel} 기존 비밀번호는 그대로 유지됩니다.`);
+        } else if (credentialPolicy === 'CREATED') {
+          toast.success(`등록 완료 — ${serviceLabel} 로그인 비밀번호가 생성되었습니다.`);
+        } else {
+          toast.success('등록이 완료되었습니다.');
+        }
       }
       closeModal();
       fetchUsers();
     } catch (err: any) {
-      toast.error(err.response?.data?.message || err.response?.data?.error || 'Failed to save operator');
+      const code = err?.response?.data?.code;
+      const msg = err?.response?.data?.error || err?.response?.data?.message || '저장에 실패했습니다.';
+      // 서버 계약 위반은 원인 필드에 직접 붙여 관리자가 무엇을 고쳐야 하는지 남긴다.
+      if (code === 'SERVICE_PASSWORD_REQUIRED' || code === 'SERVICE_PASSWORD_TOO_SHORT') {
+        setFormErrors((prev) => ({ ...prev, password: msg }));
+      } else if (code === 'MULTI_SERVICE_NOT_ALLOWED' || code === 'SERVICE_KEY_MISMATCH') {
+        setFormErrors((prev) => ({ ...prev, roles: msg }));
+      }
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -758,13 +826,52 @@ export default function OperatorsPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-lg font-semibold">{editingUserId ? 'Edit Operator' : 'Add New Operator'}</h2>
+              <h2 className="text-lg font-semibold">
+                {editingUserId ? '운영자 편집' : '서비스 운영자 등록'}
+              </h2>
               <button onClick={closeModal} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 space-y-4">
+              {/* 등록 유형 — WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1
+                  두 경로는 계약이 다르다(신규=계정+credential 생성 / 기존=권한 추가, 기존 credential 유지).
+                  화면에서 먼저 갈라 관리자가 무엇이 일어나는지 알고 진행하게 한다. */}
+              {!editingUserId && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">등록 유형</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {([
+                      { key: 'new' as const, title: '신규 사용자 등록', desc: '계정을 새로 만들고 선택한 서비스의 로그인 비밀번호를 생성합니다.' },
+                      { key: 'existing' as const, title: '기존 사용자에게 권한 추가', desc: '계정은 그대로 두고 선택한 서비스 운영 권한만 추가합니다.' },
+                    ]).map((opt) => (
+                      <label
+                        key={opt.key}
+                        className={`flex items-start gap-2 p-2 rounded border cursor-pointer transition-colors ${
+                          registerMode === opt.key ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="register-mode"
+                          checked={registerMode === opt.key}
+                          onChange={() => {
+                            setRegisterMode(opt.key);
+                            setFormErrors({});
+                          }}
+                          className="mt-0.5 text-blue-600"
+                        />
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{opt.title}</div>
+                          <div className="text-xs text-gray-500">{opt.desc}</div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -796,7 +903,8 @@ export default function OperatorsPage() {
               {!editingUserId ? (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Password <span className="text-red-500">*</span>
+                    {registerMode === 'new' ? '최초 서비스 비밀번호' : '초기 서비스 비밀번호 (선택)'}{' '}
+                    {registerMode === 'new' && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type="password"
@@ -805,8 +913,13 @@ export default function OperatorsPage() {
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
                       formErrors.password ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    placeholder="••••••••"
+                    placeholder="8자 이상"
                   />
+                  <p className="mt-1 text-xs text-slate-500">
+                    {registerMode === 'new'
+                      ? '선택한 서비스의 로그인 비밀번호로 저장됩니다. 다른 서비스 로그인에는 사용되지 않습니다.'
+                      : '해당 서비스 비밀번호가 아직 없을 때만 사용됩니다. 이미 있으면 기존 비밀번호를 그대로 유지하며 덮어쓰지 않습니다.'}
+                  </p>
                   {formErrors.password && (
                     <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
                       <AlertCircle className="w-4 h-4" />
@@ -821,8 +934,8 @@ export default function OperatorsPage() {
                 </div>
               )}
 
-              {/* Name */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* Name — 신규 계정 생성에서만 쓰인다(기존 사용자 권한 추가는 이름을 바꾸지 않는다). */}
+              <div className={`grid grid-cols-2 gap-3 ${!editingUserId && registerMode === 'existing' ? 'hidden' : ''}`}>
                 {(['lastName', 'firstName'] as const).map((field) => (
                   <div key={field}>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -848,7 +961,65 @@ export default function OperatorsPage() {
                 ))}
               </div>
 
-              {/* Roles */}
+              {/* Roles — 등록: 대상 서비스 1개 + 역할 1개
+                  WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
+                    credential 은 서비스 단위이므로 등록도 서비스 하나로 고정한다.
+                    여러 서비스를 한 번에 고르면 어느 credential 을 만드는지 정의되지 않는다
+                    (서버도 MULTI_SERVICE_NOT_ALLOWED 로 거부한다). */}
+              {!editingUserId ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    대상 서비스 · 역할 <span className="text-red-500">*</span>
+                  </label>
+                  {formErrors.roles && (
+                    <p className="mb-2 text-sm text-red-500 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {formErrors.roles}
+                    </p>
+                  )}
+                  <select
+                    value={targetServiceKey}
+                    onChange={(e) => changeTargetService(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    {REGISTRABLE_SERVICE_KEYS.map((key) => (
+                      <option key={key} value={key}>
+                        {SERVICES[key as keyof typeof SERVICES]?.label ?? key}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="mt-1 text-xs text-slate-500">
+                    canonical service key: <code>{resolveCanonicalServiceKey(targetServiceKey)}</code>
+                  </div>
+                  <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {ASSIGNABLE_ROLES[targetServiceKey].map((role) => (
+                      <label
+                        key={role.value}
+                        className={`flex items-start gap-2 p-2 rounded border cursor-pointer transition-colors ${
+                          targetRole === role.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="target-role"
+                          checked={targetRole === role.value}
+                          onChange={() => setTargetRole(role.value)}
+                          className="mt-0.5 text-blue-600"
+                        />
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{role.label}</div>
+                          <div className="text-xs text-gray-500">{role.description}</div>
+                          <div className="text-[10px] text-gray-400 mt-0.5 font-mono">{role.value}</div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-xs text-slate-500">
+                    플랫폼 계정(<code>platform:super_admin</code>)은 서비스 운영자 등록 대상이 아닙니다 —
+                    <b> 설정 &gt; 관리자 계정</b> 화면에서 관리합니다.
+                  </p>
+                </div>
+              ) : (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Roles <span className="text-red-500">*</span>
@@ -858,6 +1029,22 @@ export default function OperatorsPage() {
                     <AlertCircle className="w-4 h-4" />
                     {formErrors.roles}
                   </p>
+                )}
+                {/* 카탈로그 밖 role(예: platform:super_admin, user)은 이 화면이 다루지 않는다.
+                    체크박스에 없다고 해서 저장 시 사라지면 안 되므로 읽기 전용으로 보존·표시한다. */}
+                {formData.roles.filter((r) => !CATALOG_ROLE_VALUES.has(r)).length > 0 && (
+                  <div className="mb-3 rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">
+                    <div className="text-xs font-semibold text-slate-500 mb-1">이 화면에서 변경하지 않는 권한 (유지됨)</div>
+                    <div className="flex flex-wrap gap-1">
+                      {formData.roles
+                        .filter((r) => !CATALOG_ROLE_VALUES.has(r))
+                        .map((r) => (
+                          <span key={r} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono bg-gray-100 text-gray-700">
+                            {r}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
                 )}
                 <div className="space-y-4 max-h-80 overflow-y-auto border rounded-lg p-3">
                   {Object.entries(ASSIGNABLE_ROLES).map(([serviceKey, roles]) => {
@@ -898,6 +1085,7 @@ export default function OperatorsPage() {
                   })}
                 </div>
               </div>
+              )}
 
               {/* Actions */}
               <div className="flex items-center justify-end gap-3 pt-4 border-t">
@@ -917,12 +1105,12 @@ export default function OperatorsPage() {
                   {submitting ? (
                     <>
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      Saving...
+                      저장 중...
                     </>
                   ) : (
                     <>
                       <Check className="w-4 h-4" />
-                      {editingUserId ? 'Update Operator' : 'Create Operator'}
+                      {editingUserId ? '운영자 수정' : registerMode === 'new' ? '신규 운영자 등록' : '권한 추가'}
                     </>
                   )}
                 </button>

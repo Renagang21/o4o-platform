@@ -41,12 +41,23 @@ router.post('/',
   requireRole(ADMIN_ROLES),
   [
     body('email').isEmail().withMessage('Valid email is required'),
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-    body('firstName').notEmpty().withMessage('First name is required'),
-    body('lastName').notEmpty().withMessage('Last name is required'),
+    // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
+    //   password 는 optional 이 된다 — **기존 사용자에게 권한만 추가**하고 그 서비스 credential 이
+    //   이미 있으면 비밀번호를 받을 이유가 없기 때문이다(기존 credential 은 덮어쓰지 않는다).
+    //   신규 사용자 필수 여부와 최소 길이(8자)는 controller 가 계약으로 강제한다
+    //   (SERVICE_PASSWORD_REQUIRED / SERVICE_PASSWORD_TOO_SHORT).
+    body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
+    //   이름도 optional 이 된다 — **기존 사용자 권한 추가** 경로는 이름을 쓰지 않으며(무시된다),
+    //   관리자가 알지도 못하는 이름을 형식 통과 목적으로 입력하게 만들 이유가 없다.
+    //   신규 사용자 필수 여부는 controller 가 계약으로 강제한다(NAME_REQUIRED).
+    body('firstName').optional().notEmpty().withMessage('First name cannot be empty'),
+    body('lastName').optional().notEmpty().withMessage('Last name cannot be empty'),
     body('role').optional().custom(isValidRole),
     body('roles').optional().isArray().withMessage('roles must be an array'),
     body('roles.*').optional().custom(isValidRole),
+    // 대상 서비스 canonical key (선택) — role 에서 파생한 키와 일치해야 한다.
+    body('serviceKey').optional().isString().withMessage('serviceKey must be a string'),
     body('status').optional().isIn(['approved', 'pending', 'rejected', 'suspended']).withMessage('Invalid status')
   ],
   adminUserController.createUser

@@ -14,6 +14,10 @@ export const SERVICE_KEYS = [
   'neture',
   'glycopharm',
   'cosmetics',
+  // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
+  //   role prefix 이자 canonical service_key 가 동일한 서비스('pharmacy-hub').
+  //   backend 는 이미 role·scope guard·Membership 을 갖추고 있었고 이 카탈로그만 비어 있었다.
+  'pharmacy-hub',
 ] as const;
 
 export type ServiceKey = (typeof SERVICE_KEYS)[number];
@@ -30,6 +34,7 @@ export const SERVICES: Record<ServiceKey, ServiceMeta> = {
   neture: { key: 'neture', label: 'Neture', badgeClass: 'text-orange-700 bg-orange-50' },
   glycopharm: { key: 'glycopharm', label: 'GlycoPharm', badgeClass: 'text-green-700 bg-green-50' },
   cosmetics: { key: 'cosmetics', label: 'K-Cosmetics', badgeClass: 'text-pink-700 bg-pink-50' },
+  'pharmacy-hub': { key: 'pharmacy-hub', label: 'Pharmacy-Hub', badgeClass: 'text-teal-700 bg-teal-50' },
 };
 
 export interface RoleMeta {
