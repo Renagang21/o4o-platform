@@ -36,6 +36,23 @@
 | `glycopharm:` | 글라이코팜 | `glycopharm:admin`, `glycopharm:operator`, `glycopharm:pharmacist`, `glycopharm:store_owner` |
 | `glucoseview:` | 글루코스뷰 | `glucoseview:admin`, `glucoseview:operator` |
 | `cosmetics:` | K-화장품 | `cosmetics:admin`, `cosmetics:operator` |
+| `pharmacy-hub:` | 파머시 허브 | `pharmacy-hub:admin`, `pharmacy-hub:operator`, `pharmacy-hub:store_owner`, `pharmacy-hub:supplier` |
+
+#### Admin ⊃ Operator 계층
+
+KPA · Neture · K-Cosmetics · Pharmacy-Hub 는 동일 계층을 `scopeRoleMapping` 으로 **명시**한다.
+
+```text
+{service}:admin    요구 → admin 만 허용
+{service}:operator 요구 → operator 또는 admin 허용
+```
+
+- Pharmacy-Hub 의 `store_owner` · `supplier` 는 **사업자 신분** 역할이므로 admin 이 대신하지 않는다
+  (`pharmacy-hub:admin` 은 운영 권한만 포괄).
+- Pharmacy-Hub scope config 위치는 `apps/api-server/src/middleware/pharmacy-hub-scope.middleware.ts` 다.
+  `security-core` 가 F1 Freeze 대상이라 의도적으로 로컬에 둔 것이며, 아래 §5 절차 2번의 예외다.
+- **GlycoPharm 은 `scopeRoleMapping` 이 없어** 두 역할이 fallback(allowedRoles 전체 허용) 으로 평가된다.
+  별도 정비 대상 (WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1 §4 제외 범위).
 
 ---
 

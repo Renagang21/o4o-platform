@@ -54,7 +54,10 @@ import { resolveCanonicalServiceKey } from '@o4o/security-core';
 //     다만 편집 화면에서는 사용자가 이미 가진 비카탈로그 role 을 **읽기 전용으로 보존**한다
 //     (여기서 체크가 풀려 role 이 조용히 사라지는 것을 막는다).
 //   - `pharmacy-hub` 는 backend 에 role·scope guard·Membership 이 이미 있었고 이 카탈로그만 비어 있었다.
-//     backend 역할은 operator / store_owner / supplier 이며 admin 은 없다.
+//
+// WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1:
+//   - `pharmacy-hub:admin` 을 정식 도입했다 (admin ⊃ operator — KPA/Neture/K-Cosmetics 와 동일 계층).
+//     store_owner / supplier 는 사업자 신분 역할이라 이 등록 화면(운영 역할 부여)의 대상이 아니다.
 const ASSIGNABLE_ROLES: Record<string, { value: string; label: string; description: string }[]> = {
   kpa: [
     { value: 'kpa:admin', label: 'Admin', description: 'KPA 커뮤니티 관리자' },
@@ -65,6 +68,7 @@ const ASSIGNABLE_ROLES: Record<string, { value: string; label: string; descripti
     { value: 'neture:operator', label: 'Operator', description: 'Neture 운영자' },
   ],
   'pharmacy-hub': [
+    { value: 'pharmacy-hub:admin', label: 'Admin', description: 'Pharmacy-Hub 관리자 (운영 권한 포함)' },
     { value: 'pharmacy-hub:operator', label: 'Operator', description: 'Pharmacy-Hub 운영자' },
   ],
   glycopharm: [

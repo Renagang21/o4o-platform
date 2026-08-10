@@ -13,7 +13,7 @@
 
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { ROLE_LABELS } from '../config/service';
+import { ROLE_LABELS, satisfiesRole } from '../config/service';
 
 interface Props {
   role: string;
@@ -29,7 +29,10 @@ interface Props {
 export default function RoleEntryPage({ role, plannedFeatures, links = [] }: Props) {
   const { user } = useAuth();
   const roles: string[] = Array.isArray(user?.roles) ? (user!.roles as string[]) : [];
-  const hasRole = roles.includes(role);
+  // WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1:
+  //   정확히 같은 역할이 아니라 **계층**으로 판정한다 (admin 은 operator 진입점을 통과).
+  //   판정표는 config/service.ts 하나뿐이며 backend scopeRoleMapping 과 같은 표다.
+  const hasRole = satisfiesRole(roles, role);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">

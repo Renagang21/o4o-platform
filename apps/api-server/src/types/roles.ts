@@ -101,14 +101,19 @@ export type LmsRole =
  *
  * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
  *
- * Foundation 단계 3 역할 진입점만 정의한다.
+ * - admin       : 서비스 관리 책임자 (WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1)
  * - operator    : 서비스 운영자 (가입 승인 · 회원 관리 · 커뮤니티 · 공지/운영자 콘텐츠)
  * - store_owner : 약국 경영자 (기존 store_owner 계열과 동일 의미, 서비스 경계만 분리)
  * - supplier    : 공급자 (기존 공통 공급자 원장을 재사용, Pharmacy-Hub 노출 경계만 분리)
  *
- * admin 은 정의하지 않는다 — 구조·정책·거버넌스는 platform:super_admin / platform 축이 담당.
+ * 역할 계층 (WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1):
+ *   admin ⊃ operator — KPA/Neture/K-Cosmetics 와 동일한 표준 계층.
+ *   admin 은 운영 권한만 포괄하며 store_owner/supplier 의 **사업자 신분 권한은 포함하지 않는다.**
+ *   (Foundation 단계에서는 admin 을 두지 않고 platform 축에 맡겼으나, 서비스 관리 책임자와
+ *    일상 운영 담당자를 구분할 수 없어 표준 계층으로 정렬했다.)
  */
 export type PharmacyHubRole =
+  | 'pharmacy-hub:admin'
   | 'pharmacy-hub:operator'
   | 'pharmacy-hub:store_owner'
   | 'pharmacy-hub:supplier';
@@ -504,6 +509,15 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
   },
 
   // Pharmacy-Hub roles (WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1)
+  // admin: WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1 (admin ⊃ operator)
+  'pharmacy-hub:admin': {
+    role: 'pharmacy-hub:admin',
+    label: 'Pharmacy-Hub Admin',
+    description: '파머시 허브 서비스 관리 책임자 (운영 권한 포괄, 약국·공급자 사업자 권한은 제외)',
+    service: 'pharmacy-hub',
+    category: 'service',
+    deprecated: false
+  },
   'pharmacy-hub:operator': {
     role: 'pharmacy-hub:operator',
     label: 'Pharmacy-Hub Operator',

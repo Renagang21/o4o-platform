@@ -29,13 +29,22 @@ import { createMembershipScopeGuard } from '../common/middleware/membership-guar
  * platformBypass: true — 조직 격리(KPA 스타일)가 아닌 서비스이므로
  *   platform:super_admin 은 접근 가능하다.
  *
- * scopeRoleMapping: operator 는 store_owner/supplier scope 를 대신 통과하지 않는다.
- *   운영자는 가입 승인·회원 관리·커뮤니티·공지 담당이며, 공급자 ↔ 약국 간
- *   일반 상품 거래에 개입하지 않는다 (WO §3 구조 원칙).
+ * scopeRoleMapping (WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1):
+ *   admin ⊃ operator — KPA / Neture / K-Cosmetics 와 동일한 표준 계층이다
+ *   (`packages/security-core/src/service-configs.ts` 의 KPA_SCOPE_CONFIG 등 참조).
+ *
+ *   admin 은 **운영 권한만** 포괄한다. store_owner / supplier 는 약국·공급자라는
+ *   사업자 신분이므로 admin 이 대신하지 않는다 (Neture 가 admin 에게 supplier/partner
+ *   scope 까지 준 것과 의도적으로 다르다 — Pharmacy-Hub 는 거래 당사자 축을 분리한다).
+ *
+ *   operator 는 store_owner/supplier scope 를 대신 통과하지 않는다. 운영자는 가입
+ *   승인·회원 관리·커뮤니티·공지 담당이며, 공급자 ↔ 약국 간 일반 상품 거래에
+ *   개입하지 않는다 (Foundation WO §3 구조 원칙 — 그대로 유지).
  */
 export const PHARMACY_HUB_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   serviceKey: 'pharmacy-hub',
   allowedRoles: [
+    'pharmacy-hub:admin',
     'pharmacy-hub:operator',
     'pharmacy-hub:store_owner',
     'pharmacy-hub:supplier',
@@ -44,7 +53,8 @@ export const PHARMACY_HUB_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   legacyRoles: [],
   blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'cosmetics'],
   scopeRoleMapping: {
-    'pharmacy-hub:operator': ['pharmacy-hub:operator'],
+    'pharmacy-hub:admin': ['pharmacy-hub:admin'],
+    'pharmacy-hub:operator': ['pharmacy-hub:operator', 'pharmacy-hub:admin'],
     'pharmacy-hub:store_owner': ['pharmacy-hub:store_owner'],
     'pharmacy-hub:supplier': ['pharmacy-hub:supplier'],
   },

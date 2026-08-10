@@ -81,9 +81,21 @@ describe('OperatorsPage — 비밀번호 write 계약', () => {
       for (const key of ['kpa', 'neture', 'pharmacy-hub', 'glycopharm', 'cosmetics']) {
         expect(catalog).toMatch(new RegExp(`${key}:`));
       }
-      // Pharmacy-Hub 는 operator 만 — admin 역할이 backend 에 없다.
+    });
+
+    // WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1:
+    //   Pharmacy-Hub 에 admin 이 생겼다. 이전 계약("operator 만")을 대체한다.
+    it('Pharmacy-Hub 는 Admin·Operator 두 역할을 제공한다', () => {
+      const catalog = SRC.slice(
+        SRC.indexOf('const ASSIGNABLE_ROLES'),
+        SRC.indexOf('CATALOG_ROLE_VALUES'),
+      );
       const phBlock = catalog.slice(catalog.indexOf("'pharmacy-hub': ["));
-      expect(phBlock.slice(0, phBlock.indexOf('],'))).not.toMatch(/pharmacy-hub:admin/);
+      const roles = phBlock.slice(0, phBlock.indexOf('],'));
+      expect(roles).toMatch(/'pharmacy-hub:admin'/);
+      expect(roles).toMatch(/'pharmacy-hub:operator'/);
+      // 사업자 신분 역할은 이 화면(서비스 운영자 등록)의 대상이 아니다.
+      expect(roles).not.toMatch(/pharmacy-hub:store_owner|pharmacy-hub:supplier/);
     });
 
     it('대상 서비스에 기본값(KPA 고정)을 두지 않는다', () => {

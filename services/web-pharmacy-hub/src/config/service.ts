@@ -25,15 +25,39 @@ export const BRAND = {
   tagline: '공급자와 약국 경영자를 직접 연결하는 약국 전문 서비스',
 } as const;
 
-/** 역할 진입점 (Foundation 3 역할) */
+/** 역할 진입점 (Foundation 3 역할 + admin — WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1) */
 export const ROLES = {
+  admin: `${SERVICE_KEY}:admin`,
   storeOwner: `${SERVICE_KEY}:store_owner`,
   supplier: `${SERVICE_KEY}:supplier`,
   operator: `${SERVICE_KEY}:operator`,
 } as const;
 
 export const ROLE_LABELS: Record<string, string> = {
+  [ROLES.admin]: '서비스 관리자',
   [ROLES.storeOwner]: '약국 경영자',
   [ROLES.supplier]: '공급자',
   [ROLES.operator]: '서비스 운영자',
 };
+
+/**
+ * 역할 계층 (WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1)
+ *
+ * backend `PHARMACY_HUB_SCOPE_CONFIG.scopeRoleMapping`
+ * (`apps/api-server/src/middleware/pharmacy-hub-scope.middleware.ts`) 와 **같은 표**여야 한다.
+ * 프론트가 더 넓으면 화면은 열리고 API 는 403 이 되며, 더 좁으면 권한이 있는데도 막힌다.
+ *
+ * admin ⊃ operator. store_owner / supplier 는 사업자 신분이라 admin 이 대신하지 않는다.
+ */
+export const ROLE_SCOPE_MAPPING: Record<string, readonly string[]> = {
+  [ROLES.admin]: [ROLES.admin],
+  [ROLES.operator]: [ROLES.operator, ROLES.admin],
+  [ROLES.storeOwner]: [ROLES.storeOwner],
+  [ROLES.supplier]: [ROLES.supplier],
+};
+
+/** 보유 역할이 요구 역할을 만족하는가 (계층 포함) */
+export function satisfiesRole(userRoles: readonly string[], requiredRole: string): boolean {
+  const accepted = ROLE_SCOPE_MAPPING[requiredRole] ?? [requiredRole];
+  return userRoles.some((r) => accepted.includes(r));
+}
