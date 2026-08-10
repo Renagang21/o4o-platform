@@ -1,7 +1,7 @@
 # CHECK — Pharmacy-Hub Admin 역할 계층 도입
 
 > WO: [`WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1`](../work-orders/WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1.md)
-> 작성일: 2026-08-10 · 상태: 코드·테스트 완료 / 브라우저 smoke 진행
+> 작성일: 2026-08-10 · 상태: 코드·테스트·배포 완료 / smoke 6항목 PASS · 3항목 자격증명 부재로 차단(§6-2)
 
 ---
 
@@ -104,16 +104,51 @@ backend 는 여전히 `store_owner` scope 를 요구하므로 admin 이 매장 A
 > 자격증명은 `docs/local/TEST-ACCOUNTS.local.md` (gitignored) 가 SSOT 다.
 > **본 문서에 아이디·비밀번호를 기록하지 않는다.**
 
-| # | 항목 | 결과 |
+배포: `Deploy API Server` · `Deploy Admin Dashboard` · `Deploy Web Services` 3종 모두 **success** (commit `c0de0d814`).
+
+### 6-1. 실측 결과
+
+| # | 항목 | 방식 | 결과 |
+|---|---|---|---|
+| 1 | `/operators` 등록 모달 — Pharmacy-Hub 선택 시 Admin · Operator 두 역할 노출 | 실브라우저 | **PASS** — `Admin / Pharmacy-Hub 관리자 (운영 권한 포함) / pharmacy-hub:admin` + `Operator / pharmacy-hub:operator`, 하단 `service key: pharmacy-hub` |
+| 5 | Operator 계정 → `GET /pharmacy-hub/admin/ping` | 프로덕션 API | **PASS 403** `Required scope: pharmacy-hub:admin` |
+| 5-b | Operator 계정 → `GET /pharmacy-hub/operator/ping` | 프로덕션 API | **PASS 200** `{scope:"pharmacy-hub:operator"}` (회귀 없음) |
+| 6 | `pharmacy-hub:store_owner` 계정 → operator · admin route | 프로덕션 API | **PASS 403 / 403** |
+| 7 | 타 서비스 역할만 보유(`kpa:store_owner`·`glycopharm:store_owner`·`cosmetics:store_owner`) → pharmacy-hub scope | 프로덕션 API | **PASS 403** |
+| 9 | Operator 계정 → `pharmacyhub.co.kr/operator` 진입 (`satisfiesRole` 교체 후 회귀) | 실브라우저 | **PASS** — "이 역할 진입 권한이 확인되었습니다", console error **0건** |
+| 9-b | `/admin` 프런트 route | 실브라우저 | **없음 → 홈 리다이렉트** (의도대로 — 새 관리 화면을 만들지 않았다) |
+| 8 | 타 서비스 membership · credential 불변 | — | **PASS (자명)** — 이번 smoke 에서 프로덕션 write 를 한 건도 수행하지 않았다 |
+
+### 6-2. 미완료 — 자격증명 부재로 차단 (승인·자료 필요)
+
+| # | 항목 | 상태 |
 |---|---|---|
-| 1 | `/operators` 에서 Pharmacy-Hub 선택 시 Admin · Operator 두 역할 노출 | (배포 후 기록) |
-| 2 | Admin 등록 → role assignment + pharmacy-hub membership + service credential 원자 생성 | (배포 후 기록) |
-| 3 | Admin 계정 `serviceKey='pharmacy-hub'` 로그인 | (배포 후 기록) |
-| 4 | Admin → operator 보호 route 접근 성공 | (배포 후 기록) |
-| 5 | Operator → `/admin/ping` 403 | (배포 후 기록) |
-| 6 | store_owner · supplier → operator route 403 | (배포 후 기록) |
-| 7 | 타 서비스 역할 → pharmacy-hub scope 거부 | (배포 후 기록) |
-| 8 | 타 서비스 membership · credential 불변 | (배포 후 기록) |
+| 2 | Admin 등록 (role assignment + membership + credential 원자 생성) | **BLOCKED** |
+| 3 | Admin 로그인 | 2번 선행 필요 |
+| 4 | Admin → operator 보호 route 접근 성공 | 2번 선행 필요 |
+
+**차단 사유**: `/operators` 목록·등록 API 는 `platform:super_admin` 을 요구한다.
+`docs/local/TEST-ACCOUNTS.local.md` 의 모든 계정에는 이 권한이 없다
+(실측: `sohae2100@gmail.com` 로 `/operators` 진입 시 목록 API **403 `Active platform:super_admin role required`**).
+프로덕션 `role_assignments` 조회 결과 `platform:super_admin` 보유 계정은 2건이며 **비밀번호가 테스트 계정 문서에 없다.**
+
+DB 에 직접 role assignment 를 넣는 것은 **프로덕션 write** 이므로 승인 없이 수행하지 않았다.
+
+해소 방법은 둘 중 하나다.
+1. `platform:super_admin` 계정 자격증명을 테스트 계정 문서에 등록 → 화면으로 정상 등록 (권장 · 등록 경로까지 함께 검증됨)
+2. 프로덕션 DB 직접 부여를 승인 (등록 화면 경로는 검증되지 않음)
+
+### 6-3. 현재 프로덕션 상태 (read-only 조회)
+
+| 축 | 값 |
+|---|---|
+| `role_assignments` (active, `pharmacy-hub:%`) | operator 1 · store_owner 2 · **admin 0** |
+| `service_memberships` (`pharmacy-hub`) | 3 |
+| `service_credentials` (`pharmacy-hub`) | 10 |
+| `roles` 카탈로그 | operator · store_owner · supplier 3행 (**admin 없음** — §2 승인 요청 항목) |
+
+> 테스트 계정 문서 정정 2건을 반영했다(gitignored, 커밋 대상 아님):
+> `renagang21@gmail.com` 의 Pharmacy-Hub 비밀번호 실제 값 · admin 행 "미부여" 표기.
 
 ---
 
