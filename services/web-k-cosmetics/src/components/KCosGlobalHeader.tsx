@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
 import { LayoutDashboard, UserCircle, Settings, GraduationCap, Shield, Sparkles } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
-import { NotificationBell, useNotifications } from '@o4o/account-ui';
+import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { isStoreOwnerDual } from '@o4o/auth-utils';
 import { useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
@@ -26,20 +26,6 @@ import {
   filterContextualNav,
 } from '@/config/navigation';
 import { notificationsApi } from '@/lib/api/notifications';
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function getUserDisplayName(user: any): string {
-  if (!user) return '사용자';
-  if (user.displayName) return user.displayName;
-  if (user.lastName || user.firstName) {
-    const full = `${user.lastName || ''}${user.firstName || ''}`.trim();
-    if (full) return full;
-  }
-  if (user.name && user.name !== user.email) return user.name;
-  if (user.email) return user.email.split('@')[0];
-  return '사용자';
-}
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export function KCosGlobalHeader() {

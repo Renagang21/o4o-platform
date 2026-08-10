@@ -12,6 +12,7 @@
 
 import { GraduationCap, LayoutDashboard, Settings, Shield, Store, UserRound } from 'lucide-react';
 import { GlobalHeaderMenuItem } from '@o4o/ui';
+import { getUserDisplayName } from '@o4o/account-ui';
 import { isOperatorOrAbove, isAdminOrAbove, isStoreOwnerDual } from '@o4o/auth-utils';
 import type { User as UserType } from '../contexts';
 
@@ -32,18 +33,16 @@ export function useKpaUserRoles(user: UserType | null): KpaUserRoles {
   };
 }
 
-/** 사용자 표시 이름 — displayName > 성+이름 > name > email prefix > '사용자' */
+/**
+ * 사용자 표시 이름 — displayName > 성+이름 > name > email prefix > '사용자'
+ *
+ * WO-O4O-SERVICE-USER-DISPLAY-NAME-COMMONIZATION-G1-V1:
+ *   계산 본체는 `@o4o/account-ui` 의 `getUserDisplayName` 정본 하나뿐이다.
+ *   이 export 는 소비처(`KpaGlobalHeader` · `MobileBottomNav`)의 기존 import 경로를
+ *   유지하기 위한 얇은 위임이며, 우선순위·fallback 은 정본과 동일하다.
+ */
 export function getKpaUserDisplayName(user: UserType | null): string {
-  if (!user) return '사용자';
-  const ext = user as any;
-  if (ext.displayName) return ext.displayName;
-  if (ext.lastName || ext.firstName) {
-    const full = `${ext.lastName || ''}${ext.firstName || ''}`.trim();
-    if (full) return full;
-  }
-  if (user.name && user.name !== user.email) return user.name;
-  if (user.email) return user.email.split('@')[0];
-  return '사용자';
+  return getUserDisplayName(user);
 }
 
 /** 현재 로그인 사용자의 KPA 서비스 내 최고 유효 역할을 명시한다. */

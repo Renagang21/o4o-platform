@@ -14,12 +14,12 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 import { GlobalHeader } from '@o4o/ui';
-import { NotificationBell, useNotifications } from '@o4o/account-ui';
+import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { isStoreOwnerDual } from '@o4o/auth-utils';
 import { getKpaServiceRoleLabel, KpaUserMenuItems } from './KpaUserMenu';
 import { resolveNotificationTarget } from '../lib/notificationRouting';
-import { useAuth, type User as UserType } from '../contexts';
+import { useAuth } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import {
   KPA_BASE_NAV,
@@ -31,25 +31,6 @@ import {
 } from '../config/navigation';
 import { creditApi } from '../api/credit';
 import { notificationsApi } from '../api/notifications';
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-/**
- * WO-O4O-NAME-NORMALIZATION-V1: 사용자 표시 이름
- * 우선순위: displayName > lastName+firstName > name > email prefix > '사용자'
- */
-function getUserDisplayName(user: UserType | null): string {
-  if (!user) return '사용자';
-  const ext = user as any;
-  if (ext.displayName) return ext.displayName;
-  if (ext.lastName || ext.firstName) {
-    const full = `${ext.lastName || ''}${ext.firstName || ''}`.trim();
-    if (full) return full;
-  }
-  if (user.name && user.name !== user.email) return user.name;
-  if (user.email) return user.email.split('@')[0];
-  return '사용자';
-}
 
 // ─── Component ───────────────────────────────────────────────────────────────
 

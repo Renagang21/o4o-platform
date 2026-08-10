@@ -9,6 +9,7 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { Home, User, Settings, LogOut, Shield } from 'lucide-react';
+import { getUserDisplayName } from '@o4o/account-ui';
 import { useAuth, type User as UserType } from '../../contexts';
 import { SUPER_OPERATOR_ROLES, hasAnyRole } from '../../lib/role-constants';
 
@@ -16,19 +17,6 @@ function isSuperOperator(user: UserType | null): boolean {
   if (!user) return false;
   if ((user as any).isSuperOperator) return true;
   return hasAnyRole(user.roles, SUPER_OPERATOR_ROLES);
-}
-
-function getUserDisplayName(user: UserType | null): string {
-  if (!user) return '사용자';
-  const ext = user as any;
-  if (ext.displayName) return ext.displayName;
-  if (ext.lastName || ext.firstName) {
-    const full = `${ext.lastName || ''}${ext.firstName || ''}`.trim();
-    if (full) return full;
-  }
-  if (user.name && user.name !== user.email) return user.name;
-  if (user.email) return user.email.split('@')[0];
-  return '사용자';
 }
 
 interface StoreUserDropdownProps {
