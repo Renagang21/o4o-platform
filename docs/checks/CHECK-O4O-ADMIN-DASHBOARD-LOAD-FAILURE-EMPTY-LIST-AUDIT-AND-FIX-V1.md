@@ -110,6 +110,7 @@ toast-only + wipe 패턴 보유) · `partner/PartnerDashboard` · `categories/Ta
 | dead 화면 은퇴 | `vendors/*` · `partner/PartnerDashboard` · `categories/TagList` · `categories/CategoryList` · `menus/AdminMenuList` 라우팅 부재 확인 → 은퇴 또는 라우트 복구 판단 |
 | 공통 picker 실패 UX | REVIEW 판정 선택기 6종. Shared Module Change Protocol 대상 |
 | 중복 확인 실패 시 신규 승인 차단 여부 | `StoreRequestReviewModal` 에서 경고만 하고 버튼은 유지했다. 차단은 승인 정책 변경이라 별도 판단 |
+| **백엔드 404 3건 조사** | §9-3 — `/content/categories` · `/pharmacy/qr/source/products` 404, LMS instructor client 의 `/api/api` 이중 접두 |
 
 ## 7. 다른 세션과의 관계 (중요)
 
@@ -138,13 +139,56 @@ docs/checks/CHECK-O4O-ADMIN-DASHBOARD-LOAD-FAILURE-EMPTY-LIST-AUDIT-AND-FIX-V1.m
 
 ## 9. 배포 · smoke
 
-> 이 절은 배포 후 채운다. 미기재 항목은 **미수행**을 뜻한다.
+| 항목 | 결과 |
+|---|---|
+| commit SHA | `7b48b8987` |
+| push | `01fb9123f..7b48b8987 main -> main` |
+| Deploy Admin Dashboard (Cloud Run) | run `31358740808` **success** (전 단계 ✓, Verify deployment 포함) |
+| 검증 URL | `https://admin.neture.co.kr` |
+| 검증 계정 | `sohae2100@gmail.com` (roles: kpa/neture/glycopharm/cosmetics admin·operator, `platform:super_admin` **없음**) |
+
+### 9-1. 실패 주입 방법
+
+`XMLHttpRequest.prototype.open` / `window.fetch` 를 감싸 특정 URL 조각만 도달 불가 주소로
+바꾸는 인터셉터를 브라우저 콘솔에 주입했다 (백엔드·코드 변경 없음). 실패 후 인터셉터를 해제하고
+[다시 시도] 를 눌러 복구까지 확인했다.
+
+### 9-2. 화면별 결과
+
+| # | 화면 | 실패 주입 | 정상 조회 | 결과 |
+|---|---|---|---|---|
+| 8 | content-resource 사용처 탭 | `/usage` 차단 → "사용처를 확인하지 못했습니다. / Network Error / **사용처가 없다는 뜻이 아닙니다. 확인 전에는 삭제 판단을 하지 마세요.**" + [다시 확인] | 목록 35건 정상, [다시 확인] 후 "사용처 (0)" 정상 표시 | **PASS** |
+| 6 | posts/Categories | `/categories` 차단 → "카테고리 목록을 불러오지 못했습니다. / Network Error / **카테고리가 0건이라는 뜻이 아닙니다.**" + [다시 시도] | — (§9-3 참조) | **PASS** (배너·재시도 동작) |
+| 7 | store/qr QrCreatePage | `/qr/source/products` 차단 → "상품 목록을 불러오지 못했습니다. / Network Error / **연결할 상품이 없다는 뜻이 아닙니다.**" + [다시 시도], 빈 문구도 "목록을 불러오지 못해 표시할 수 없습니다." 로 전환 | — (§9-3 참조) | **PASS** (배너·재시도 동작) |
+| 2 | StoreRequestReviewModal | **미수행** — 중복 조회는 `reviewable` 요청에서만 실행되는데 프로덕션에 검토 중 요청 **0건** | 비검토 요청 모달 정상 렌더(회귀 없음) | **미검증** |
+| 1 | UsersListClean | **미수행** — `/users` 라우트가 `platform:super_admin` 요구, 보유 테스트 계정 전부 접근 불가 | 동일 | **미검증** (§9-4 간접 확인) |
+| 3·4 | sellerops / supplierops ProductSearchPage | **미수행** — 두 앱 모두 `/error/app-disabled` (AppRouteGuard 비활성) | 동일 | **미검증** |
+| 5 | lms-instructor 수강신청 모달 | **미수행** — 선행 강좌 목록 조회가 실패해 모달 진입 불가 (§9-3) | 동일 | **미검증** |
+
+> 콘솔 에러는 주입한 실패 요청과 아래 §9-3 의 기존 결함 외에 없었다.
+
+### 9-3. smoke 중 드러난 **기존 백엔드 결함 3건** (본 WO 수정 대상 아님 · 백엔드 변경 금지)
+
+이번 수정이 없었다면 전부 "0건" 으로 보였을 실패들이다. 수정의 효과를 그대로 증명한다.
+
+| 엔드포인트 | 증상 | 종전 화면 표시 | 현재 화면 표시 |
+|---|---|---|---|
+| `GET /api/v1/content/categories` | **404** | 무성 실패 · "0 items" | "카테고리 목록을 불러오지 못했습니다 / Request failed with status code 404" |
+| `GET /api/v1/pharmacy/qr/source/products` | **404** | "등록된 공급자 상품이 없습니다." | "상품 목록을 불러오지 못했습니다 / status code 404" |
+| `GET .../api/api/v1/lms/instructor/courses` | **경로 이중 `/api` 접두** | (기존에도 배너 있었음 — PASS 판정 화면) | "강좌 목록을 불러오지 못했습니다" + 다시 시도 |
+
+→ 별도 WO 후보. 본 WO 는 프런트 표시만 다루므로 수정하지 않았다.
+
+### 9-4. 회귀
 
 | 항목 | 결과 |
 |---|---|
-| commit SHA | (§ 커밋 후 기재) |
-| push | (기재) |
-| Deploy Admin Dashboard | (기재) |
-| 실패 주입 smoke | (기재) |
-| 정상 조회 smoke | (기재) |
-| 회귀 (로그인 · OperatorsPage · 검색/필터) | (기재) |
+| admin-dashboard 로그인 | **PASS** |
+| OperatorsPage (`a20415e7b` 수정 유지) | **PASS** — `/admin/users` 403 을 "운영자 목록을 불러오지 못했습니다 / Active platform:super_admin role required" + [다시 시도] 로 표시. 빈 표 문구도 "목록을 불러오지 못해 표시할 수 없습니다." |
+| o4o-product-db 상품 등록 요청 목록 | **PASS** — 검토 중 0건은 "표시할 요청이 없습니다"(진짜 0건), 전체 4건 정상 |
+| content-resource 목록·필터 | **PASS** — 35건, 검색·필터 UI 정상 |
+| 다른 세션 파일(OperatorsPage/test) | 미커밋·미수정 유지 (§7) |
+
+> UsersListClean 은 OperatorsPage 와 **동일 엔드포인트(`/admin/users`)·동일 패턴**이며, OperatorsPage 에서
+> 403 이 실패로 정확히 표시되는 것을 확인했다. 다만 UsersListClean 화면 자체의 실브라우저 확인은
+> 권한 부족으로 **하지 못했다**(권한 정책 변경은 본 WO 금지사항).
