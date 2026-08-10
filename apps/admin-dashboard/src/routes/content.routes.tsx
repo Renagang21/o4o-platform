@@ -1,12 +1,24 @@
-import { Route } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
 
-// 글 관리
-const Posts = lazy(() => import('@/pages/posts/Posts'));
-const Categories = lazy(() => import('@/pages/posts/Categories'));
-const CategoryEdit = lazy(() => import('@/pages/posts/CategoryEdit'));
-const Tags = lazy(() => import('@/pages/posts/Tags'));
+/**
+ * WO-O4O-ADMIN-POSTS-CATEGORIES-TAGS-LEGACY-REDIRECT-V1
+ *
+ * WordPress 계열 legacy 화면(/posts · /categories · /posts/tags)의 백엔드 route 는
+ * 2025-12-11 `6354e8755` (Phase 8-3 Legacy Entity Removal) 에서 Post/Page 엔티티와 함께
+ * 의도적으로 제거되었다. 화면만 남아 직접 URL 로 접근하면 조작 가능한 관리 화면처럼 보이지만
+ * 조회·저장 모두 404 로 실패한다.
+ *
+ * 판정 근거: docs/investigations/IR-O4O-ADMIN-CONTENT-CATEGORIES-LEGACY-ROUTE-AUDIT-V1.md (REMOVE)
+ *
+ * 외부 bookmark 사용을 코드로 배제할 수 없으므로 hard delete 가 아니라 redirect 로 둔다.
+ * 컴포넌트 파일과 backend route 복구는 이번 범위 밖이다.
+ * 대상 화면은 카테고리 기능의 등가물이 아니라 현재 살아 있는 CMS 콘텐츠 화면이다.
+ */
+const LEGACY_CONTENT_REDIRECT = '/admin/cms/contents';
+
+// 글 관리 — Posts/Categories/CategoryEdit/Tags 는 위 legacy redirect 로 대체되어 참조하지 않는다.
 const PagesRouter = lazy(() => import('@/pages/pages/PagesRouter'));
 
 // Content Core Shell Pages (WO-O4O-OPERATOR-NAV-CONTENT-SHELL-V1)
@@ -73,50 +85,26 @@ const PageLoader = () => (
  */
 export function ContentRoutes() {
   return [
-    // 글 관리
+    // 글 관리 · 카테고리 & 태그 — legacy redirect (WO-O4O-ADMIN-POSTS-CATEGORIES-TAGS-LEGACY-REDIRECT-V1)
+    //   guard 를 두지 않는다. 이동 대상 /admin/cms/contents 가 자체 guard 를 갖고 있고,
+    //   dead 화면 접근을 권한 오류로 막는 것보다 현재 화면으로 보내는 편이 목적에 맞다.
     <Route key="/posts" path="/posts" element={
-      <AdminProtectedRoute requiredPermissions={['content:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <Posts />
-        </Suspense>
-      </AdminProtectedRoute>
+      <Navigate to={LEGACY_CONTENT_REDIRECT} replace />
     } />,
-
-    // 카테고리 & 태그
     <Route key="/posts/categories" path="/posts/categories" element={
-      <AdminProtectedRoute requiredPermissions={['categories:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <Categories />
-        </Suspense>
-      </AdminProtectedRoute>
+      <Navigate to={LEGACY_CONTENT_REDIRECT} replace />
     } />,
     <Route key="/categories" path="/categories" element={
-      <AdminProtectedRoute requiredPermissions={['categories:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <Categories />
-        </Suspense>
-      </AdminProtectedRoute>
+      <Navigate to={LEGACY_CONTENT_REDIRECT} replace />
     } />,
     <Route key="/categories/new" path="/categories/new" element={
-      <AdminProtectedRoute requiredPermissions={['categories:write']}>
-        <Suspense fallback={<PageLoader />}>
-          <CategoryEdit />
-        </Suspense>
-      </AdminProtectedRoute>
+      <Navigate to={LEGACY_CONTENT_REDIRECT} replace />
     } />,
     <Route key="/categories/edit/:id" path="/categories/edit/:id" element={
-      <AdminProtectedRoute requiredPermissions={['categories:write']}>
-        <Suspense fallback={<PageLoader />}>
-          <CategoryEdit />
-        </Suspense>
-      </AdminProtectedRoute>
+      <Navigate to={LEGACY_CONTENT_REDIRECT} replace />
     } />,
     <Route key="/posts/tags" path="/posts/tags" element={
-      <AdminProtectedRoute requiredPermissions={['categories:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <Tags />
-        </Suspense>
-      </AdminProtectedRoute>
+      <Navigate to={LEGACY_CONTENT_REDIRECT} replace />
     } />,
 
     // 페이지 관리
