@@ -110,9 +110,26 @@ select 가 입력창처럼 보여 다른 서비스를 고를 수 있다는 사�
 
 | 시나리오 | 결과 | 의미 |
 |---|---|---|
-| 동일 계정·동일 비밀번호로 `serviceKey='kpa-society'` 로그인 | **200** | 그 서비스 credential 로 인증 |
-| 동일 계정·**같은** 비밀번호로 Pharmacy-Hub 로그인 | **401** | pharmacy-hub credential 은 **독립**. `users.password` 로 fallback 했다면 통과했을 것 → **fallback 아님** ✅ |
-| 잘못된 비밀번호 | **401** + "비밀번호가 올바르지 않습니다." | 실패 표면화 정상 ✅ |
+| 등록 시 설정한 Pharmacy-Hub 비밀번호로 `serviceKey='pharmacy-hub'` 로그인 | **200** `success:true` | 등록 화면이 만든 credential 로 로그인 성립 ✅ |
+| 동일 계정·**다른 서비스(kpa-society) 비밀번호**로 Pharmacy-Hub 로그인 | **401** | pharmacy-hub credential 은 **독립**. `users.password` 로 fallback 했다면 통과했을 것 → **fallback 아님** ✅ |
+| 그 비밀번호로 `serviceKey='kpa-society'` 로그인 | **200** | 서비스별 credential 이 각각 유효 — 상호 오염 없음 |
+
+응답의 `roles` 에 `pharmacy-hub:operator` 포함 확인. 토큰은 응답 body 가 아니라
+localStorage(`o4o_accessToken`) 경로로 전달된다(공통 auth 클라이언트 계약).
+
+### 4-2-1. 브라우저 실동선 (`https://pharmacyhub.co.kr`)
+
+| 단계 | 결과 |
+|---|---|
+| `/login` 이메일·비밀번호 입력 → 로그인 | **성공** → `/` 이동, "로그인 상태 · 서비스 가입 상태: **active**" ✅ |
+| 로그인 후 기본 화면 | 역할별 진입점 3개 표시(약국 경영자 / 공급자 / **서비스 운영자**) ✅ |
+| `/operator` 진입 | "서비스 운영자 · `pharmacy-hub:operator` · 이 역할 진입 권한이 확인되었습니다." ✅ |
+| `/operator/memberships` | 가입 신청 관리 콘솔 렌더(탭·검색·표 정상, 데이터 0건) ✅ |
+| 로그아웃(`POST /auth/logout` 200) 후 `/operator`·`/operator/memberships` | **"로그인이 필요합니다" 재차단** ✅ |
+| 콘솔 | 오류 **0건** (로그아웃 후 재차단 화면 포함) ✅ |
+
+관측(결함 아님): Pharmacy-Hub 프론트에 아직 로그아웃 버튼 UI 가 없어 로그아웃은 API 호출로 수행했다.
+현재 서비스가 진입점 골격 단계라 후속 UI WO 범위다.
 
 ### 4-3. 보호 route
 
@@ -128,11 +145,9 @@ select 가 입력창처럼 보여 다른 서비스를 고를 수 있다는 사�
 
 ## 5. 미검증 · 제한 사항
 
-- **로그인 성공 케이스(§4-2 첫 줄)는 미수행.** 등록 시 관리자가 입력한 초기 서비스 비밀번호는
-  `docs/local/TEST-ACCOUNTS.local.md` 에 Pharmacy-Hub 항목이 없어 검증자가 알 수 없다.
-  값을 그 문서(git 추적 제외)에 추가하면 즉시 수행한다:
-  로그인 성공 → 운영자 기본 화면 진입 → `/operator/memberships` 콘솔 표시 → 로그아웃 후 재차단.
-  (실패 케이스·미인증 차단·scope 거부는 §4-2 / §4-3 에서 이미 실측 완료)
+- WO 검증 항목은 **전부 실측 완료**했다(§4-2·§4-2-1·§4-3).
+  Pharmacy-Hub 테스트 계정은 `docs/local/TEST-ACCOUNTS.local.md`(git 추적 제외)에 등록되어 있으며
+  **자격증명 값은 본 문서·커밋에 기록하지 않는다.**
 - 실패 주입에 의한 부분 생성 0 은 **트랜잭션 stub 단위 테스트**로 검증했다(실 DB 롤백 관측 아님).
   프로덕션에서는 §4-1 의 "최근 24h write = credential 1건" 으로 잔여물 없음만 확인했다.
 
