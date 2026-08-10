@@ -1344,7 +1344,8 @@ export default function SupplierProductsPage() {
               <strong>이벤트 오퍼 연결 / 유통참여형 펀딩 연결</strong> — 각 제품 행의 <span className="font-medium">[후속 작업]</span> 에서 연결합니다.
             </li>
             <li>
-              <strong>판매자 모집 연결</strong> — <span className="text-slate-400">준비 중</span> (제품을 취급할 약국/매장 판매자를 모집하는 기능)
+              <strong>판매자 모집 연결</strong> — 각 제품 행의 <span className="font-medium">[후속 작업]</span> 에서 모집을 생성합니다 (제품을 취급할 약국/매장 판매자를 모집하는 기능).
+              <button type="button" onClick={() => navigate('/supplier/recruitments')} className="ml-1 text-blue-600 hover:text-blue-800 underline">모집 현황으로 이동</button>
             </li>
           </ul>
         </div>

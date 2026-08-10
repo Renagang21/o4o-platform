@@ -367,8 +367,10 @@ export default function SupplierSpaceLayout() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
             <p>&copy; 2026 Neture. 공급자 &middot; 파트너 협업 플랫폼</p>
             <div className="flex items-center gap-4 text-xs text-gray-400">
+              {/* WO-O4O-NETURE-SUPPLIER-CANONICAL-WORKSPACE-SMOKE-CLOSEOUT-V1:
+                  `/about` 은 App.tsx 에 route 가 없고 catch-all 도 없어 클릭 시 빈 화면이 됐다.
+                  대체 화면을 임의로 지정하지 않고 죽은 링크만 제거한다. */}
               <Link to="/contact" className="hover:text-primary-600 transition-colors">Contact Us</Link>
-              <Link to="/about" className="hover:text-primary-600 transition-colors">About</Link>
             </div>
           </div>
         </div>
