@@ -19,6 +19,14 @@ import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { sanitizeAdminUser } from './admin-user-sanitizer.js';
 // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 정본
 import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE, isPasswordPolicyCompliant } from '../../utils/password-policy.js';
+// WO-O4O-CENTRAL-OPERATOR-ROLE-REVOKE-SAFETY-GUARDS-V1
+import {
+  getServiceAdminRoleServiceKey,
+  LAST_ADMIN_PROTECTED_CODE,
+  lastAdminProtectedMessage,
+  SELF_ROLE_REVOKE_FORBIDDEN_CODE,
+  SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE,
+} from '../../utils/role-revoke-safety.js';
 // WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1: 재설정 적용 범위 안내(read-only)
 // WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
 //   updateUser 가 더 이상 비밀번호를 받지 않으므로 적용범위 안내가 불필요해졌다.
@@ -738,6 +746,20 @@ export class AdminUserController {
         return;
       }
 
+      // WO-O4O-CENTRAL-OPERATOR-ROLE-REVOKE-SAFETY-GUARDS-V1 (2):
+      //   요청자가 자기 자신의 역할을 해제하는 행위 차단.
+      //   requireAuth 를 통과한 요청자 ID 와 경로의 대상 ID 를 직접 비교한다.
+      //   (대상 존재 확인보다 앞에 둔다 — 계정 조회 없이 판정이 끝나는 조건이다.)
+      const requesterId = (req as any).user?.id;
+      if (requesterId && requesterId === userId) {
+        res.status(403).json({
+          success: false,
+          error: SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE,
+          code: SELF_ROLE_REVOKE_FORBIDDEN_CODE,
+        });
+        return;
+      }
+
       const userRepo = AppDataSource.getRepository(User);
       const user = await userRepo.findOne({ where: { id: userId } });
       if (!user) {
@@ -745,14 +767,74 @@ export class AdminUserController {
         return;
       }
 
-      // role_assignments에서 해당 userId + role만 비활성화 (soft revoke)
-      const result = await AppDataSource.query(
-        `UPDATE role_assignments SET is_active = false, updated_at = NOW()
-         WHERE user_id = $1 AND role = $2 AND is_active = true`,
-        [userId, role]
-      );
+      // WO-O4O-CENTRAL-OPERATOR-ROLE-REVOKE-SAFETY-GUARDS-V1 (1):
+      //   마지막 활성 서비스 admin 해제 차단.
+      //   동시 해제로 보호가 우회되지 않도록, 같은 role 의 활성 assignment 전체를
+      //   FOR UPDATE 로 잠근 뒤 보유자 집합을 판정하고 같은 트랜잭션에서 UPDATE 한다.
+      //   (READ COMMITTED 에서 후행 트랜잭션은 선행 커밋 후 잠금을 얻으며,
+      //    이미 is_active=false 로 바뀐 행은 WHERE 재평가에서 탈락한다.)
+      const adminServiceKey = getServiceAdminRoleServiceKey(role);
 
-      const affected = result?.[1] ?? 0;
+      let affected = 0;
+      if (adminServiceKey) {
+        let notHolder = false;
+        let lastAdmin = false;
+
+        await AppDataSource.transaction(async (manager) => {
+          const holders: Array<{ user_id: string }> = await manager.query(
+            `SELECT user_id FROM role_assignments
+             WHERE role = $1 AND is_active = true
+             FOR UPDATE`,
+            [role]
+          );
+          const holderIds = holders.map((h) => h.user_id);
+
+          if (!holderIds.includes(userId)) {
+            notHolder = true;
+            return;
+          }
+          // 비활성 assignment 는 is_active = true 필터로 이미 제외된다.
+          // 다른 서비스의 admin 은 role 문자열이 다르므로 애초에 집합에 들어오지 않는다.
+          if (holderIds.filter((id) => id !== userId).length === 0) {
+            lastAdmin = true;
+            return;
+          }
+
+          const txResult = await manager.query(
+            `UPDATE role_assignments SET is_active = false, updated_at = NOW()
+             WHERE user_id = $1 AND role = $2 AND is_active = true`,
+            [userId, role]
+          );
+          affected = txResult?.[1] ?? 0;
+        });
+
+        if (notHolder) {
+          res.status(404).json({
+            success: false,
+            error: `Active role assignment '${role}' not found for this user`,
+            code: 'ROLE_ASSIGNMENT_NOT_FOUND',
+          });
+          return;
+        }
+        if (lastAdmin) {
+          res.status(403).json({
+            success: false,
+            error: lastAdminProtectedMessage(role),
+            code: LAST_ADMIN_PROTECTED_CODE,
+          });
+          return;
+        }
+      } else {
+        // 서비스 admin 이 아닌 역할은 기존 경로를 그대로 유지한다(동작 변경 없음).
+        // role_assignments에서 해당 userId + role만 비활성화 (soft revoke)
+        const result = await AppDataSource.query(
+          `UPDATE role_assignments SET is_active = false, updated_at = NOW()
+           WHERE user_id = $1 AND role = $2 AND is_active = true`,
+          [userId, role]
+        );
+        affected = result?.[1] ?? 0;
+      }
+
       if (affected === 0) {
         res.status(404).json({
           success: false,
