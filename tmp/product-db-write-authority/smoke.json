@@ -1,0 +1,24 @@
+{
+  "api": "https://api.neture.co.kr",
+  "masterId": "ac7d99c6-c04b-4630-81d7-7dce9fe61d9c",
+  "dbWrites": 0,
+  "results": [
+    {
+      "email": "sohae2100@gmail.com",
+      "note": "neture:admin+operator (O4O 전체 관리자)",
+      "get": {
+        "status": 200,
+        "code": null
+      },
+      "write": {
+        "status": 400,
+        "code": "CONTENT_EMPTY"
+      }
+    },
+    {
+      "email": "renagang21@gmail.com",
+      "note": "store_owner/supplier (비관리자)",
+      "error": "로그인 실패 (문서 기재 비밀번호 불일치 — 비밀번호 변경 금지)"
+    }
+  ]
+}

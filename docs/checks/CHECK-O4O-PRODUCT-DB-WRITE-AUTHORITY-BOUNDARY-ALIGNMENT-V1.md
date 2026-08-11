@@ -149,3 +149,26 @@ PRODUCT_DB_WRITE_ROLES = ['platform:super_admin', 'neture:admin', 'neture:operat
 ## 9. 문서 정합
 
 발견 1건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 3건 (§8)
+
+---
+
+## 부록 A. 배포 후 프로덕션 smoke (2026-08-11)
+
+- 배포: `Deploy API Server (Cloud Run)` success — revision `o4o-core-api-03287-vfp` (2026-08-11T05:53Z).
+  이 revision 은 `ced98c58c`(본 WO) 이후 커밋 `7f03c03b6` 빌드이므로 `requireProductDbWrite` 를 포함한다.
+- 대상: `GET|POST /api/v1/admin/o4o-product-db/masters/{id}/store-descriptions` (api.neture.co.kr)
+- write 호출은 **빈 본문**으로 보냈다 — guard 통과 시 검증 오류로 끝난다. **DB write 0.**
+
+| 계정 | 역할 | GET | write |
+|---|---|---|---|
+| `sohae2100@gmail.com` | `neture:admin` + `neture:operator` (O4O 전체 관리자) | **200** | **400 `CONTENT_EMPTY`** — guard 통과(=쓰기 권한 유지) |
+| `renagang21@gmail.com` | store_owner / supplier | 로그인 실패 | 로그인 실패 |
+
+**한계 (숨기지 않고 기록)**: 프로덕션에 **서비스 운영자 전용 계정이 없다.**
+유일하게 로그인되는 관리 계정 `sohae2100@gmail.com` 은 `cosmetics:admin/operator`·`kpa:*`·`pharmacy-hub:*` 와 함께
+`neture:admin`·`neture:operator` 를 동시에 보유하므로 **정의상 writer** 이고, 이 계정으로는 403 을 관측할 수 없다.
+`renagang21@gmail.com` 은 TEST-ACCOUNTS 문서에 기재된 비밀번호가 현재 프로덕션과 불일치한다(문서 §store-hub 표에도 동일 기재).
+WO 규칙상 **계정 생성·비밀번호 변경을 하지 않았으므로**, 서비스 운영자 write 403 은 프로덕션에서 관측하지 못했다.
+해당 계약은 `product-db-write-authority.test.ts` 의 33 tests (서비스 admin/operator 5역할 × GET 비403 / write 403) 로 고정돼 있다.
+
+산출물: `tmp/product-db-write-authority/{smoke.mjs,smoke.json,smoke-roles.mjs}`
