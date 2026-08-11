@@ -56,3 +56,67 @@ export const LAST_ADMIN_PROTECTED_CODE = 'LAST_ADMIN_PROTECTED';
 export function lastAdminProtectedMessage(role: string): string {
   return `마지막 활성 '${role}' 관리자는 해제할 수 없습니다. 다른 관리자를 먼저 지정하세요.`;
 }
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * 서비스 admin 해제 — 잠금 기반 실행부
+ * WO-O4O-MEMBERSHIP-CONSOLE-ROLE-REVOKE-SAFETY-GUARDS-V1
+ *
+ * 판정과 실행을 **한 트랜잭션 안에서** 수행한다. 같은 role 의 활성 assignment 전체를
+ * `FOR UPDATE` 로 잠근 뒤 보유자 집합을 평가하므로, 두 요청이 동시에 마지막 두 admin 을
+ * 해제하려 해도 뒤의 요청은 선행 커밋 이후 잠금을 얻고 WHERE 재평가에서 대상이 탈락한다
+ * (READ COMMITTED).
+ *
+ * 두 해제 경로(중앙 `AdminUserController.revokeRoleAssignment` ·
+ * `MembershipConsoleController.removeMemberRole`)가 같은 구현을 쓰도록 여기에 둔다.
+ * 판정 규칙이 한쪽만 바뀌는 drift 를 막는 것이 목적이다.
+ *
+ * 이 함수는 **서비스 admin 역할에만** 쓴다(`getServiceAdminRoleServiceKey` 로 먼저 판정).
+ * 캐시 무효화·응답 생성·감사 로그는 호출부 책임이다 — 경로마다 계약이 다르기 때문이다.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+/** 최소 계약만 요구한다(테스트 주입 가능) */
+export interface RoleRevokeTxRunner {
+  transaction<T>(runInTransaction: (manager: { query: (sql: string, params?: unknown[]) => Promise<any> }) => Promise<T>): Promise<T>;
+}
+
+export type ServiceAdminRevokeOutcome =
+  /** 대상 사용자가 해당 role 의 활성 보유자가 아니다 */
+  | { status: 'not_holder' }
+  /** 대상 사용자가 마지막 활성 admin 이다 — 해제하지 않았다 */
+  | { status: 'last_admin' }
+  /** 해제했다 */
+  | { status: 'revoked'; affected: number };
+
+export async function revokeServiceAdminRoleWithLock(
+  runner: RoleRevokeTxRunner,
+  userId: string,
+  role: string
+): Promise<ServiceAdminRevokeOutcome> {
+  return runner.transaction(async (manager) => {
+    const holders: Array<{ user_id: string }> = await manager.query(
+      `SELECT user_id FROM role_assignments
+             WHERE role = $1 AND is_active = true
+             FOR UPDATE`,
+      [role]
+    );
+    const holderIds = holders.map((h) => h.user_id);
+
+    if (!holderIds.includes(userId)) {
+      return { status: 'not_holder' as const };
+    }
+    // 비활성 assignment 는 is_active = true 필터로 이미 제외된다.
+    // 다른 서비스의 admin 은 role 문자열이 다르므로 애초에 집합에 들어오지 않는다.
+    if (holderIds.filter((id) => id !== userId).length === 0) {
+      return { status: 'last_admin' as const };
+    }
+
+    const txResult = await manager.query(
+      `UPDATE role_assignments SET is_active = false, updated_at = NOW()
+             WHERE user_id = $1 AND role = $2 AND is_active = true`,
+      [userId, role]
+    );
+    return { status: 'revoked' as const, affected: txResult?.[1] ?? 0 };
+  });
+}

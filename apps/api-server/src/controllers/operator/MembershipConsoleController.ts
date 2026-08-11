@@ -24,6 +24,19 @@ import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 // WO-O4O-OPERATOR-MEMBER-PASSWORD-MIN-LENGTH-UNIFY-V1 / -COMPLEXITY-POLICY-UNIFY-V1:
 //   비밀번호 정책(8자 + 영문 + 숫자) 정본을 재사용한다. 로컬 상수·정규식 신설 금지.
 import { isPasswordPolicyCompliant, PASSWORD_POLICY_MESSAGE } from '../../utils/password-policy.js';
+// WO-O4O-MEMBERSHIP-CONSOLE-ROLE-REVOKE-SAFETY-GUARDS-V1:
+//   중앙 `AdminUserController.revokeRoleAssignment` 와 **같은** 안전 계약을 쓴다.
+//   이 경로는 platform admin 일 때 tier 제한을 건너뛰므로, 가드가 없으면
+//   마지막 서비스 admin 해제와 자기 역할 해제가 여기로 우회된다.
+import {
+  getServiceAdminRoleServiceKey,
+  LAST_ADMIN_PROTECTED_CODE,
+  lastAdminProtectedMessage,
+  revokeServiceAdminRoleWithLock,
+  SELF_ROLE_REVOKE_FORBIDDEN_CODE,
+  SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE,
+} from '../../utils/role-revoke-safety.js';
+import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
 
 const approvalService = new MembershipApprovalService();
 
@@ -1423,6 +1436,21 @@ export class MembershipConsoleController {
         return;
       }
 
+      // WO-O4O-MEMBERSHIP-CONSOLE-ROLE-REVOKE-SAFETY-GUARDS-V1 (2):
+      //   요청자가 자기 자신의 역할을 해제하는 행위 차단.
+      //   중앙 경로와 동일한 코드·문구를 쓴다(SELF_ROLE_REVOKE_FORBIDDEN).
+      //   platform admin 여부와 무관하게 적용한다 — 자기 권한을 스스로 떨어뜨려
+      //   복구 불가 상태를 만드는 것은 어느 경로에서도 막아야 한다.
+      const requesterId = (req as any).user?.id;
+      if (requesterId && requesterId === userId) {
+        res.status(403).json({
+          success: false,
+          error: SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE,
+          code: SELF_ROLE_REVOKE_FORBIDDEN_CODE,
+        });
+        return;
+      }
+
       // DB-based role validation (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
       // WO-NETURE-ROLE-NORMALIZATION-V1: cross-service collision 해결
       let roleEntity = await roleService.getRoleByName(role);
@@ -1499,6 +1527,33 @@ export class MembershipConsoleController {
           });
           return;
         }
+      }
+
+      // WO-O4O-MEMBERSHIP-CONSOLE-ROLE-REVOKE-SAFETY-GUARDS-V1 (1):
+      //   마지막 활성 서비스 admin 해제 차단.
+      //   비플랫폼 요청자는 위 tier 가드에서 이미 걸리지만, platform admin 은 tier 가드를
+      //   건너뛰므로 여기가 유일한 방어선이다. 판정·잠금·UPDATE 는 중앙 경로와 같은
+      //   `revokeServiceAdminRoleWithLock` 정본을 사용해 동시 해제 우회까지 막는다.
+      const adminServiceKey = getServiceAdminRoleServiceKey(role);
+      if (adminServiceKey) {
+        const outcome = await revokeServiceAdminRoleWithLock(AppDataSource, userId, role);
+        if (outcome.status === 'not_holder') {
+          res.status(404).json({ success: false, error: 'Role not found or already inactive' });
+          return;
+        }
+        if (outcome.status === 'last_admin') {
+          res.status(403).json({
+            success: false,
+            error: lastAdminProtectedMessage(role),
+            code: LAST_ADMIN_PROTECTED_CODE,
+          });
+          return;
+        }
+        // removeRole 을 우회했으므로 역할 캐시 무효화를 직접 수행한다
+        // (WO-O4O-AUTH-ROLE-FRESHEN-V1 — 기존 경로가 하던 일을 빠뜨리지 않는다).
+        invalidateRoles(userId);
+        res.json({ success: true, message: `Role ${role} removed` });
+        return;
       }
 
       const removed = await roleAssignmentService.removeRole(userId, role);

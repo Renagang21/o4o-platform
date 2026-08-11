@@ -24,6 +24,7 @@ import {
   getServiceAdminRoleServiceKey,
   LAST_ADMIN_PROTECTED_CODE,
   lastAdminProtectedMessage,
+  revokeServiceAdminRoleWithLock,
   SELF_ROLE_REVOKE_FORBIDDEN_CODE,
   SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE,
 } from '../../utils/role-revoke-safety.js';
@@ -777,36 +778,14 @@ export class AdminUserController {
 
       let affected = 0;
       if (adminServiceKey) {
-        let notHolder = false;
-        let lastAdmin = false;
-
-        await AppDataSource.transaction(async (manager) => {
-          const holders: Array<{ user_id: string }> = await manager.query(
-            `SELECT user_id FROM role_assignments
-             WHERE role = $1 AND is_active = true
-             FOR UPDATE`,
-            [role]
-          );
-          const holderIds = holders.map((h) => h.user_id);
-
-          if (!holderIds.includes(userId)) {
-            notHolder = true;
-            return;
-          }
-          // 비활성 assignment 는 is_active = true 필터로 이미 제외된다.
-          // 다른 서비스의 admin 은 role 문자열이 다르므로 애초에 집합에 들어오지 않는다.
-          if (holderIds.filter((id) => id !== userId).length === 0) {
-            lastAdmin = true;
-            return;
-          }
-
-          const txResult = await manager.query(
-            `UPDATE role_assignments SET is_active = false, updated_at = NOW()
-             WHERE user_id = $1 AND role = $2 AND is_active = true`,
-            [userId, role]
-          );
-          affected = txResult?.[1] ?? 0;
-        });
+        // WO-O4O-MEMBERSHIP-CONSOLE-ROLE-REVOKE-SAFETY-GUARDS-V1:
+        //   잠금·판정·UPDATE 는 `revokeServiceAdminRoleWithLock` 정본을 사용한다.
+        //   같은 계약을 쓰는 다른 해제 경로(MembershipConsoleController.removeMemberRole)와
+        //   판정이 갈리지 않게 하기 위해서다(동작 동일, SQL 동일).
+        const outcome = await revokeServiceAdminRoleWithLock(AppDataSource, userId, role);
+        const notHolder = outcome.status === 'not_holder';
+        const lastAdmin = outcome.status === 'last_admin';
+        if (outcome.status === 'revoked') affected = outcome.affected;
 
         if (notHolder) {
           res.status(404).json({
