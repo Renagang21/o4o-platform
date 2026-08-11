@@ -9,6 +9,8 @@ import { AdminUserController } from '../../controllers/admin/AdminUserController
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireRole } from '../../middleware/auth.middleware.js';
 import { body } from 'express-validator';
+// WO-O4O-CENTRAL-OPERATORS-PASSWORD-POLICY-UX-ALIGNMENT-V1: 비밀번호 정책 정본
+import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE, PASSWORD_POLICY_REGEX } from '../../utils/password-policy.js';
 
 const router: Router = Router();
 const adminUserController = new AdminUserController();
@@ -46,7 +48,15 @@ router.post('/',
     //   이미 있으면 비밀번호를 받을 이유가 없기 때문이다(기존 credential 은 덮어쓰지 않는다).
     //   신규 사용자 필수 여부와 최소 길이(8자)는 controller 가 계약으로 강제한다
     //   (SERVICE_PASSWORD_REQUIRED / SERVICE_PASSWORD_TOO_SHORT).
-    body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    //   WO-O4O-CENTRAL-OPERATORS-PASSWORD-POLICY-UX-ALIGNMENT-V1:
+    //     기존 `min: 6` 은 controller 계약(8자 + 영문 + 숫자)보다 느슨해 6~7자를 통과시킨 뒤
+    //     controller 에서 다시 거절하는 이중 문구를 만들었다. 정책 정본으로 맞춘다.
+    body('password')
+      .optional()
+      .isLength({ min: PASSWORD_MIN_LENGTH })
+      .withMessage(PASSWORD_POLICY_MESSAGE)
+      .matches(PASSWORD_POLICY_REGEX)
+      .withMessage(PASSWORD_POLICY_MESSAGE),
     // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
     //   이름도 optional 이 된다 — **기존 사용자 권한 추가** 경로는 이름을 쓰지 않으며(무시된다),
     //   관리자가 알지도 못하는 이름을 형식 통과 목적으로 입력하게 만들 이유가 없다.
@@ -68,7 +78,12 @@ router.put('/:id',
   requireRole(ADMIN_ROLES),
   [
     body('email').optional().isEmail().withMessage('Valid email is required'),
-    body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    // WO-O4O-CENTRAL-OPERATORS-PASSWORD-POLICY-UX-ALIGNMENT-V1:
+    //   password 검증 선언을 제거한다 — 이 경로의 controller 는 password 가 오면
+    //   항상 400 `PASSWORD_NOT_ALLOWED_HERE` 로 거절하므로(AdminUserController.updateUser)
+    //   검증 규칙이 통과해도 의미가 없고, "여기서 비밀번호를 바꿀 수 있다" 는 오해만 만든다.
+    //   서비스 비밀번호는 `PUT /api/v1/operator/members/:userId { password, serviceKey }`,
+    //   플랫폼 계정 비밀번호는 `PATCH /api/v1/admin/platform-accounts/:id/password` 가 담당한다.
     body('firstName').optional().notEmpty().withMessage('First name cannot be empty'),
     body('lastName').optional().notEmpty().withMessage('Last name cannot be empty'),
     body('role').optional().custom(isValidRole),

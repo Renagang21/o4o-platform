@@ -42,6 +42,14 @@ import {
 //   role prefix → canonical service_key 변환 SSOT. 로컬 매핑 상수를 만들지 않는다.
 //   security-core 는 전 파일이 `import type` 뿐이라 런타임 의존이 없다(브라우저 안전).
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
+// WO-O4O-CENTRAL-OPERATORS-PASSWORD-POLICY-UX-ALIGNMENT-V1:
+//   비밀번호 3경로(신규 최초 / 기존 초기 / 서비스 비밀번호 변경)의 검증·안내 문구를
+//   백엔드 정본과 같은 규칙으로 통일한다.
+import {
+  isPasswordPolicyCompliant,
+  PASSWORD_POLICY_HINT,
+  PASSWORD_POLICY_MESSAGE,
+} from '@/lib/password-policy';
 
 // ─── 서비스 운영자 등록 카탈로그 ───
 // 정책: WO-OPERATOR-ROLE-CLEANUP-V1 — 각 서비스 = Admin + Operator만
@@ -286,8 +294,10 @@ export default function OperatorsPage() {
   const submitServicePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pwTarget) return;
-    if (pwValue.length < 8) {
-      setPwError('비밀번호는 최소 8자 이상이어야 합니다.');
+    // WO-O4O-CENTRAL-OPERATORS-PASSWORD-POLICY-UX-ALIGNMENT-V1:
+    //   길이만이 아니라 영문·숫자 포함까지 검사한다(백엔드 WEAK_PASSWORD 와 동일 규칙).
+    if (!isPasswordPolicyCompliant(pwValue)) {
+      setPwError(PASSWORD_POLICY_MESSAGE);
       return;
     }
     // role prefix('kpa','cosmetics') ≠ canonical service_key('kpa-society','k-cosmetics').
@@ -338,14 +348,17 @@ export default function OperatorsPage() {
       // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
       //   신규 등록의 최초 비밀번호는 **선택한 서비스 credential** 로 저장된다.
       if (!formData.password) errors.password = '신규 등록에는 최초 서비스 비밀번호가 필요합니다.';
-      else if (formData.password.length < 8) errors.password = '비밀번호는 최소 8자 이상이어야 합니다.';
+      // WO-O4O-CENTRAL-OPERATORS-PASSWORD-POLICY-UX-ALIGNMENT-V1: 길이 + 영문 + 숫자
+      else if (!isPasswordPolicyCompliant(formData.password)) errors.password = PASSWORD_POLICY_MESSAGE;
       if (!formData.lastName) errors.lastName = '성을 입력하세요.';
       if (!formData.firstName) errors.firstName = '이름을 입력하세요.';
     } else {
       // 기존 사용자 권한 추가: 비밀번호는 **선택** — 해당 서비스 credential 이 없을 때만 쓰인다.
       // 이미 있으면 서버가 KEEP_EXISTING_CREDENTIAL 로 유지하고 덮어쓰지 않는다.
-      if (formData.password && formData.password.length < 8) {
-        errors.password = '초기 서비스 비밀번호는 최소 8자 이상이어야 합니다.';
+      // WO-O4O-CENTRAL-OPERATORS-PASSWORD-POLICY-UX-ALIGNMENT-V1:
+      //   입력했다면 신규 등록과 같은 정책을 적용한다(입력하지 않으면 검사하지 않는다).
+      if (formData.password && !isPasswordPolicyCompliant(formData.password)) {
+        errors.password = PASSWORD_POLICY_MESSAGE;
       }
     }
     setFormErrors(errors);
@@ -819,11 +832,11 @@ export default function OperatorsPage() {
                   value={pwValue}
                   onChange={(e) => setPwValue(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="8자 이상"
-                  minLength={8}
+                  placeholder={PASSWORD_POLICY_HINT}
                   required
                   autoFocus
                 />
+                <p className="mt-1 text-xs text-slate-500">{PASSWORD_POLICY_HINT}</p>
               </div>
 
               <div className="flex gap-2 pt-2">
@@ -836,7 +849,7 @@ export default function OperatorsPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={pwSubmitting || pwValue.length < 8}
+                  disabled={pwSubmitting || !isPasswordPolicyCompliant(pwValue)}
                   className="flex-1 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                 >
                   {pwSubmitting ? '변경 중...' : '변경'}
@@ -939,10 +952,10 @@ export default function OperatorsPage() {
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
                       formErrors.password ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    placeholder="8자 이상"
+                    placeholder={PASSWORD_POLICY_HINT}
                   />
                   <p className="mt-1 text-xs text-slate-500">
-                    {registerMode === 'new'
+                    {PASSWORD_POLICY_HINT} · {registerMode === 'new'
                       ? '선택한 서비스의 로그인 비밀번호로 저장됩니다. 다른 서비스 로그인에는 사용되지 않습니다.'
                       : '해당 서비스 비밀번호가 아직 없을 때만 사용됩니다. 이미 있으면 기존 비밀번호를 그대로 유지하며 덮어쓰지 않습니다.'}
                   </p>
