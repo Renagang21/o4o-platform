@@ -187,7 +187,8 @@ export default function ForumPage() {
             <h1 className="text-2xl font-bold text-slate-900 mb-2 mt-0">K-Cosmetics 커뮤니티</h1>
             <p className="text-sm text-slate-500 m-0">K-Cosmetics에 대한 질문과 의견을 나누는 공간입니다.</p>
           </div>
-          <Link to="/forum" className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-primary rounded-lg no-underline whitespace-nowrap shrink-0">글쓰기</Link>
+          {/* WO-O4O-WEB-UX-STANDARDIZATION-BATCH-V1: 글쓰기 버튼이 목록(/forum)으로 되돌아가고 있었다 → 작성 화면(/forum/write) */}
+          <Link to="/forum/write" className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-primary rounded-lg no-underline whitespace-nowrap shrink-0">글쓰기</Link>
         </div>
       </header>
 
@@ -273,7 +274,7 @@ export default function ForumPage() {
         ) : (
           <>
             <p className="text-sm text-slate-500 mb-3 mt-0">아직 등록된 글이 없습니다</p>
-            <Link to="/forum" className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md no-underline border-none">글쓰기</Link>
+            <Link to="/forum/write" className="inline-flex items-center px-4 py-2 text-xs font-semibold text-white bg-primary rounded-md no-underline border-none">글쓰기</Link>
           </>
         ))}
       />

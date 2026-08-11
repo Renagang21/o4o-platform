@@ -133,7 +133,8 @@ export default function ForumPage() {
             <h1 className="text-2xl font-bold text-slate-900 mb-2">GlycoPharm 포럼</h1>
             <p className="text-sm text-slate-500">약사들의 지식과 경험을 나눠보세요</p>
           </div>
-          <Link to="/forum" className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors whitespace-nowrap shrink-0">
+          {/* WO-O4O-WEB-UX-STANDARDIZATION-BATCH-V1: 글쓰기 버튼이 목록(/forum)으로 되돌아가고 있었다 → 작성 화면(/forum/write) */}
+          <Link to="/forum/write" className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors whitespace-nowrap shrink-0">
             글쓰기
           </Link>
         </div>
