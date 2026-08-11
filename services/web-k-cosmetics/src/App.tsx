@@ -118,7 +118,8 @@ const ResourcesPage = lazy(() => import('@/pages/resources/ResourcesPage').then(
 
 
 // Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
-// WO-O4O-CONTENT-BROWSE-ROUTE-CLEANUP-V1: /library/content 리스트 → /store-hub/content redirect 로 ContentLibraryPage 미사용(상세만 유지)
+// WO-O4O-CONTENT-BROWSE-ROUTE-CLEANUP-V1: /library/content 리스트 → /store-hub/content redirect (상세만 유지)
+// WO-O4O-WEB-ORPHAN-PAGE-COMPONENT-CLEANUP-V1: 미사용 ContentLibraryPage.tsx 삭제
 const ContentLibraryDetailPage = lazy(() => import('@/pages/library/ContentDetailPage'));
 
 // Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1)
