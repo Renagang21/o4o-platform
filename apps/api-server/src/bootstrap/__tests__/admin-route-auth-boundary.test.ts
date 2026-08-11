@@ -184,3 +184,35 @@ describe('가드 배선 회귀 (source scan)', () => {
     },
   );
 });
+
+/**
+ * WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1 (회귀 복구)
+ *
+ * blanket 을 자기 prefix 로 한정한 뒤, 인증을 blanket 에 의존하던 admin router 들이
+ * `requireAdmin` 만 남았다. `requireAdmin` 은 req.user 가 없으면 `requireAuth` 에 위임하고
+ * 인증이 성공하면 그대로 next() 하므로 **역할 검사가 건너뛰어진다** (프로덕션 실측: 403 → 500/통과).
+ * 각 router 가 자기 인증을 명시해야 한다.
+ */
+describe('blanket 에 인증을 의존하던 admin router 회귀', () => {
+  const BLANKET_DEPENDENT_ROUTERS = [
+    'ops-metrics',
+    'channel-playback-logs',
+    'channel-heartbeat',
+    'channel-ops',
+  ];
+
+  it.each(BLANKET_DEPENDENT_ROUTERS)('%s router 는 자기 인증을 명시한다', (name) => {
+    const s = readFileSync(resolve(__dirname, `../../routes/admin/${name}.routes.ts`), 'utf8');
+    expect(s).toMatch(/router\.use\(\s*authenticate\s*\)/);
+  });
+
+  it('requireAdmin 단독 사용 시 인증 위임이 역할 검사를 건너뛴다는 사실을 고정한다', () => {
+    const s = readFileSync(
+      resolve(__dirname, '../../common/middleware/auth/authorization.middleware.ts'),
+      'utf8',
+    );
+    // 이 구조가 유지되는 한 requireAdmin 단독 사용은 안전하지 않다.
+    // (별도 WO 로 guard 자체를 고치면 이 테스트를 함께 갱신한다)
+    expect(s).toMatch(/if \(!req\.user\) \{\s*return requireAuth\(req, res, next\);/);
+  });
+});

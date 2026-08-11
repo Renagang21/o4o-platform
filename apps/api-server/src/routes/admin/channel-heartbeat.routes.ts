@@ -12,7 +12,7 @@
 import { Router, Request, Response } from 'express';
 import { DataSource, Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { Channel, ChannelHeartbeat } from '@o4o-apps/cms-core';
-import { requireAdmin } from '../../middleware/auth.middleware.js';
+import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js';
 
 // Default heartbeat threshold in seconds (2 minutes)
 const DEFAULT_HEARTBEAT_THRESHOLD_SEC = 120;
@@ -22,6 +22,13 @@ const DEFAULT_HEARTBEAT_THRESHOLD_SEC = 120;
  */
 export function createAdminHeartbeatRoutes(dataSource: DataSource): Router {
   const router = Router();
+
+  // WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1 (회귀 복구)
+  //   이 router 는 인증을 상위 `/api/v1/admin` blanket 에 의존하고 있었다.
+  //   blanket 이 자기 prefix 로 한정된 뒤로는 req.user 가 비어 requireAdmin 이
+  //   requireAuth 로 위임 → 인증만 하고 next() 하면서 역할 검사가 건너뛰어졌다.
+  //   자기 router 에서 인증을 명시해 requireAdmin 이 실제로 역할을 검사하게 한다.
+  router.use(authenticate);
 
   /**
    * GET /admin/channels/heartbeat
