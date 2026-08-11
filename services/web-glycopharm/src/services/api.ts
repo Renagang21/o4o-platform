@@ -29,6 +29,18 @@ function stripPrefix(path: string): string {
   return path.startsWith('/api/v1') ? path.slice('/api/v1'.length) : path;
 }
 
+/**
+ * GlycoPharm API wrapper.
+ *
+ * WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1 — 실패 전달 계약:
+ *   `request` 는 **throw 하지 않는다.** HTTP/API 실패는 `{ error: { code, message } }` 로 반환한다
+ *   (mutation 소비처가 `error.code` 로 분기하고 있어 throw 전환은 회귀 위험이 크다).
+ *   따라서 **호출부는 반드시 `res.error` 를 먼저 확인**해야 하며,
+ *   `res.data` 만 보고 `?? []` / `|| []` 로 넘어가면 API 실패가 "정상 0건"으로 위장된다.
+ *   - 조회 실패 → 화면 error 상태
+ *   - 정상 0건 → 화면 empty 상태
+ *   wrapper 안에서 error 를 기본값으로 삼켜서는 안 된다.
+ */
 class ApiClient {
   private async request<T>(
     method: string,
@@ -185,11 +197,9 @@ export const forumRequestApi = {
       serviceCode: 'glycopharm',
     }),
 
-  getMyRequests: async () => {
-    const res = await apiClient.get<unknown[]>('/api/v1/forum/category-requests/my?serviceCode=glycopharm');
-    if (res.error?.code === 'API_ERROR') return { data: [] as unknown[], total: 0 };
-    return res;
-  },
+  // 실패를 빈 목록으로 삼키지 않는다 — 호출부가 res.error 로 error 상태를 만든다.
+  getMyRequests: () =>
+    apiClient.get<unknown[]>('/api/v1/forum/category-requests/my?serviceCode=glycopharm'),
 
   // Operator APIs — /api/v1/glycopharm/operator/forum-requests/*
   getAllRequests: async (params?: { status?: string; page?: number; limit?: number }) => {
@@ -197,16 +207,11 @@ export const forumRequestApi = {
     if (params?.status) query.set('status', params.status);
     if (params?.page) query.set('page', params.page.toString());
     if (params?.limit) query.set('limit', params.limit.toString());
-    const res = await apiClient.get<unknown[]>(`/api/v1/glycopharm/operator/forum-requests?${query}`);
-    if (res.error?.code === 'API_ERROR') return { data: [] as unknown[], total: 0 };
-    return res;
+    return apiClient.get<unknown[]>(`/api/v1/glycopharm/operator/forum-requests?${query}`);
   },
 
-  getPendingCount: async () => {
-    const res = await apiClient.get<{ count: number }>('/api/v1/glycopharm/operator/forum-requests/pending-count');
-    if (res.error?.code === 'API_ERROR') return { data: { count: 0 } };
-    return res;
-  },
+  getPendingCount: () =>
+    apiClient.get<{ count: number }>('/api/v1/glycopharm/operator/forum-requests/pending-count'),
 
   review: (id: string, data: { action: 'approve' | 'reject' | 'revision'; reviewComment?: string }) =>
     apiClient.patch<unknown>(`/api/v1/glycopharm/operator/forum-requests/${id}/review`, data),
@@ -255,6 +260,12 @@ export const forumDeleteRequestApi = {
 
 // Forum Analytics API — WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
 // Common /api/v1/forum/operator/analytics/* endpoints (serviceCode=glycopharm)
+//
+// WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1 — HOLD:
+//   소비처인 @o4o/operator-core-ui/modules/forum-analytics 의 OperatorForumAnalyticsPage 에
+//   error 상태가 없다(loading → 데이터 렌더). 여기서 throw 로 승격하면 loadAll 에 catch 가 없어
+//   무한 loading 이 된다. 실패 표면화는 공통 패키지 변경이 필요하므로 다음 batch 로 넘긴다.
+//   (아래 try/catch 는 wrapper 가 throw 하지 않아 실제로는 도달하지 않는다 — 구조 유지)
 export const forumAnalyticsApi = {
   getSummary: async () => {
     try {

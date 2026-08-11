@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { apiClient } from '@/services/api';
 import { glycopharmConfig } from '@o4o/operator-ux-core';
 import { useAuth } from '@/contexts/AuthContext';
+import { ErrorState } from '@/components/common';
 import {
   MessageSquare,
   BookOpen,
@@ -124,18 +125,28 @@ const COURSE_TYPE_ICON: Record<string, typeof Play> = {
 function ForumFeed() {
   const [posts, setPosts] = useState<DisplayPost[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1:
+  //   wrapper 는 실패를 throw 하지 않으므로 기존 .catch(() => {}) 는 도달하지 않았고,
+  //   조회 실패가 "아직 게시글이 없습니다"(empty) 로 위장됐다.
+  const [loadError, setLoadError] = useState(false);
   const { isAuthenticated } = useAuth();
 
   const fetchPosts = () => {
     setLoading(true);
+    setLoadError(false);
     apiClient
       .get<ForumPostRaw[]>('/api/v1/glycopharm/forum/posts?limit=15')
       .then((res) => {
+        if (res.error) {
+          setLoadError(true);
+          setPosts([]);
+          return;
+        }
         if (Array.isArray(res.data)) {
           setPosts(res.data.map(normalizePost));
         }
       })
-      .catch(() => {})
+      .catch(() => setLoadError(true))
       .finally(() => setLoading(false));
   };
 
@@ -167,6 +178,8 @@ function ForumFeed() {
             <div className="w-8 h-8 border-2 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto" />
             <p className="mt-3 text-sm text-slate-400">포럼 글을 불러오는 중...</p>
           </div>
+        ) : loadError ? (
+          <ErrorState onRetry={fetchPosts} />
         ) : posts.length === 0 ? (
           <div className="py-12 text-center">
             <div className="text-4xl mb-3">💬</div>

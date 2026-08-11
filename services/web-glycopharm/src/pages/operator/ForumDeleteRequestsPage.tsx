@@ -21,6 +21,9 @@ import { fetchGuidePageContent } from '@/api/guideContent';
 const client: ForumDeleteRequestsConsoleClient = {
   async list({ status }) {
     const res = await forumDeleteRequestApi.getAll({ status });
+    // WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1:
+    //   실패를 빈 목록으로 넘기면 "신청 없음"(empty) 과 구분되지 않는다.
+    if (res.error) throw new Error(res.error.message);
     return (res.data || []) as ForumDeleteRequest[];
   },
   async approve(id, data) {

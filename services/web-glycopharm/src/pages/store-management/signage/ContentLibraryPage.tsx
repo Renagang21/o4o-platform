@@ -72,6 +72,9 @@ export default function ContentLibraryPage() {
     ],
     fetchItems: async (params) => {
       const response = await apiClient.get<ContentItem[]>('/api/v1/glycopharm/signage/contents');
+      // WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1:
+      //   SignageHubTemplate 은 throw 를 error 상태로 렌더한다 — 실패를 빈 목록으로 넘기지 않는다.
+      if (response.error) throw new Error(response.error.message || '콘텐츠를 불러오지 못했습니다.');
       let data: ContentItem[] = (response.data as any) ?? [];
       if (!Array.isArray(data)) data = [];
 
@@ -102,7 +105,10 @@ export default function ContentLibraryPage() {
     },
     onCopy: async (item) => {
       try {
-        await apiClient.post('/api/v1/glycopharm/signage/my-signage', { contentId: item.id });
+        // WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1:
+        //   wrapper 가 throw 하지 않으므로 실패해도 성공 토스트가 뜨던 경로.
+        const res = await apiClient.post('/api/v1/glycopharm/signage/my-signage', { contentId: item.id });
+        if (res.error) throw new Error(res.error.code || res.error.message || '');
         toast.success('내 콘텐츠에 추가되었습니다.');
       } catch (e: any) {
         const msg = e?.message || '';

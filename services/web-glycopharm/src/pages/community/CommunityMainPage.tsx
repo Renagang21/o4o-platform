@@ -233,7 +233,16 @@ export default function CommunityMainPage() {
     setLatestLoading(true);
     setLatestError(false);
     homeApi.getLatest({ type: latestTab, limit: LATEST_SUMMARY_LIMIT })
-      .then((res) => setLatestItems(res.data ?? []))
+      // WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1:
+      //   wrapper 는 실패를 throw 하지 않고 { error } 로 반환한다 → catch 만으로는 error 상태에 못 닿는다.
+      .then((res) => {
+        if (res.error) {
+          setLatestError(true);
+          setLatestItems([]);
+          return;
+        }
+        setLatestItems(res.data ?? []);
+      })
       .catch(() => setLatestError(true))
       .finally(() => setLatestLoading(false));
   }, [latestTab, latestReloadKey]);
