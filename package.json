@@ -181,10 +181,19 @@
   "pnpm": {
     "//onlyBuiltDependencies": "pnpm v10 은 의존성 build script 를 기본 차단한다. sqlite3/better-sqlite3 는 네이티브 바인딩이 실제로 필요하고(미실행 시 require 실패), msw 는 테스트 전용 no-op 스크립트라 허용해 install 경고를 없앤다. Docker(apps/api-server/Dockerfile)는 package.production.json + npm install --ignore-scripts 를 쓰므로 이 설정의 영향을 받지 않는다. bcrypt 는 소스가 bcryptjs(순수 JS)만 사용하므로 제외한다.",
     "//onlyBuiltDependencies-esbuild": "esbuild 는 기능상 불필요하지만(@esbuild/<platform> optional 패키지가 바이너리를 제공 — 실측: 0.25.12 bin 존재 + transformSync 정상) install 마다 'Ignored build scripts' 경고가 떠서 허용 목록에 넣었다. pnpm 10.25 에서는 ignoredBuiltDependencies 로 이 경고를 억제할 수 없다(.modules.yaml 에 ignoredBuilds 로 기록되지만 경고는 계속 출력). 머신 전역 설정(AppData/Local/pnpm/config/rc)도 이미 esbuild 를 허용하고 있어, 프로젝트 설정만 제외하던 상태가 경고의 원인이었다.",
+    "//onlyBuiltDependencies-residual-warning": "WO-O4O-PNPM-IGNORED-BUILD-SCRIPTS-WARNING-CLEANUP-V1: 남아 있던 7개(@nestjs/core·@scarf/scarf·@swc/core·bcrypt·msgpackr-extract·protobufjs·sharp) 경고를 정리했다. 실측 근거: (1) 7개 모두 build script 미실행 상태에서 require 정상(sharp 포함) — 기능상 빌드가 필요해서 넣은 것이 아니다. (2) pnpm 10.25 에서 ignoredBuiltDependencies 는 package.json·pnpm-workspace.yaml 어느 쪽에 넣어도 경고를 억제하지 못한다(양쪽 실측, .modules.yaml 의 ignoredBuilds 는 비어 있고 경고는 그대로 출력). (3) 머신 전역 rc(AppData/Local/pnpm/config/rc)는 이미 11개를 모두 허용하는데 프로젝트 설정이 이를 덮어써서 경고가 났다 — esbuild 때와 동일한 원인. 따라서 전역 rc 와 목록을 일치시키는 것이 유일한 해법이다. Docker(apps/api-server/Dockerfile)는 package.production.json + npm install --ignore-scripts 라 이 설정의 영향을 받지 않는다. bcrypt 는 위 주석대로 소스가 bcryptjs 만 쓰지만, 경고 억제 수단이 이 목록뿐이라 esbuild 와 같은 사유로 포함했다(기능 요구 아님).",
+    "//onlyBuiltDependencies-existing-install-repair": "이미 install 된 환경에서는 이 목록을 늘린 직후 첫 install 이 ERR_PNPM_MISSING_HOISTED_LOCATIONS(@nestjs/core)로 exit 1 이 될 수 있다. node-linker=hoisted 인데 기존 node_modules/.modules.yaml 의 hoistedLocations 가 변경 전 기준으로 굳어 있어서다. `rm node_modules/.modules.yaml && pnpm install --frozen-lockfile` 한 번이면 해소되고 이후 재실행은 exit 0 · 경고 0 이다. CI 는 node_modules 를 캐시하지 않고 pnpm store 만 캐시하므로(.github/actions/setup-build-env: cache: 'pnpm') 영향을 받지 않는다. pnpm-lock.yaml 은 변경되지 않는다(실측).",
     "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@scarf/scarf",
+      "@swc/core",
+      "bcrypt",
       "better-sqlite3",
       "esbuild",
+      "msgpackr-extract",
       "msw",
+      "protobufjs",
+      "sharp",
       "sqlite3"
     ],
     "overrides": {
