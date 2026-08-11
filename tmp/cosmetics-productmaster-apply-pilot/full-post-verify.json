@@ -1,0 +1,60 @@
+{
+  "wo": "WO-O4O-COSMETICS-PRODUCTMASTER-STORE-DESCRIPTION-FULL-APPLY-V1",
+  "batchTag": "cosmetics-full-apply-v1",
+  "expected": {
+    "master": 32174,
+    "canonical": 32174
+  },
+  "baseline": {
+    "일반": 15,
+    "건강기능식품": 40948,
+    "COSMETIC": 500,
+    "DRUG": 177413,
+    "GENERAL": 11,
+    "MEDICAL_DEVICE": 3826,
+    "QUASI_DRUG": 17148
+  },
+  "actualMaster": 32174,
+  "actualMasterCosmetic": 32174,
+  "actualCanonical": 32174,
+  "masterDuplicateGroupCount": 0,
+  "masterDuplicateSample": [],
+  "canonicalDuplicateGroupCount": 0,
+  "orphanDescriptions": 0,
+  "mastersWithoutDescription": 0,
+  "nonCosmeticMisregistered": 0,
+  "batchKeyDuplicates": 0,
+  "pilotKeyOverlap": 0,
+  "regulatoryTypeCounts": {
+    "일반": 15,
+    "건강기능식품": 40948,
+    "COSMETIC": 32674,
+    "DRUG": 177413,
+    "GENERAL": 11,
+    "MEDICAL_DEVICE": 3826,
+    "QUASI_DRUG": 17148
+  },
+  "regulatoryTypeDrift": {
+    "DRUG": 0,
+    "건강기능식품": 0,
+    "QUASI_DRUG": 0,
+    "MEDICAL_DEVICE": 0
+  },
+  "descriptionsWithoutRollbackTag": 0,
+  "searchSmoke": {
+    "probe": {
+      "name": "×무민] 리틀 미이 - 솝/비누",
+      "brand_name": "러쉬"
+    },
+    "byBrandAndName": 1,
+    "byNameOnly": 1,
+    "cosmeticMasterTotal": 32674,
+    "koStoreDescription": {
+      "id": "ce29879d-93ec-4a8e-a7d1-b6bee35144ad",
+      "len": 247,
+      "summary": "디오디너리 글리코릭 애시드 7％ 엑스폴리에이팅 토너 — 토너 제품입니다."
+    },
+    "emptyContentDescriptions": 0
+  },
+  "pass": true
+}

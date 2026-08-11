@@ -1,0 +1,21 @@
+{
+  "wo": "WO-O4O-COSMETICS-PRODUCTMASTER-STORE-DESCRIPTION-FULL-APPLY-V1",
+  "batchTag": "cosmetics-full-apply-v1",
+  "sourceType": "o4o_cosmetics_retail",
+  "cleansedPopulation": 32674,
+  "blockers": [],
+  "alreadyAppliedPilot": 500,
+  "alreadyAppliedThisBatch": 0,
+  "missingGuideBody": 0,
+  "target": 32174,
+  "baselineRegulatoryTypeCounts": {
+    "일반": 15,
+    "건강기능식품": 40948,
+    "COSMETIC": 500,
+    "DRUG": 177413,
+    "GENERAL": 11,
+    "MEDICAL_DEVICE": 3826,
+    "QUASI_DRUG": 17148
+  },
+  "willApply": 32174
+}

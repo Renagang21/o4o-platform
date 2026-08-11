@@ -15,39 +15,11 @@
  */
 import { withDb } from './db.mjs';
 import { readGuide, readOut, writeOut } from './lib.mjs';
+import { renderHtml } from './render.mjs';
 
 const BATCH_TAG = 'cosmetics-pilot-500-v2';
 const SOURCE_TYPE = 'o4o_cosmetics_retail';
 const COSMETICS_CATEGORY_SLUG = 'cosmetics';
-
-const esc = (s) =>
-  String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-/** 설명서 본문 HTML — 있는 항목만 렌더한다. 빈 정보를 추론해 채우지 않는다. */
-function renderHtml(g) {
-  const out = [];
-  const sec = (title, body) => out.push(`<h3>${esc(title)}</h3>${body}`);
-  if (g.oneLineDescription) out.push(`<p>${esc(g.oneLineDescription)}</p>`);
-  if (g.mainFeatures?.length) {
-    sec('주요 특징', `<ul>${g.mainFeatures.map((f) => `<li>${esc(f.text)}</li>`).join('')}</ul>`);
-  }
-  if (g.productHighlights?.length) {
-    sec('제품 포인트', `<ul>${g.productHighlights.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>`);
-  }
-  if (g.mainIngredients) sec('주요 성분', `<p>${esc(g.mainIngredients)}</p>`);
-  if (g.texture) sec('사용감', `<p>${esc(g.texture)}</p>`);
-  if (g.usage) sec('사용 방법', `<p>${esc(g.usage)}</p>`);
-  if (g.useContext) sec('사용 상황', `<p>${esc(g.useContext)}</p>`);
-  if (g.cautions) sec('주의사항', `<p>${esc(g.cautions)}</p>`);
-  if (g.variants?.length) {
-    sec('구성', `<ul>${g.variants.map((v) => `<li>${esc(typeof v === 'string' ? v : v.text ?? JSON.stringify(v))}</li>`).join('')}</ul>`);
-  }
-  if (g.classification) out.push(`<p><small>분류: ${esc(g.classification)}</small></p>`);
-  if (g.distributionSources?.length) {
-    out.push(`<p><small>유통 확인: ${esc(g.distributionSources.join(', '))}</small></p>`);
-  }
-  return out.join('\n');
-}
 
 async function main() {
   const dry = readOut('dry-run.json');
