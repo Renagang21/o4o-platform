@@ -21,7 +21,7 @@ const client: ForumHubClient = {
   getSummary: async () => {
     const res = await forumAnalyticsApi.getSummary();
     if ((res as { error?: { message?: string } })?.error) {
-      throw new Error((res as { error?: { message?: string } }).error?.message || '포럼 요약을 불러오지 못했습니다.');
+      throw new Error('포럼 요약을 불러오지 못했습니다.');
     }
     return res;
   },

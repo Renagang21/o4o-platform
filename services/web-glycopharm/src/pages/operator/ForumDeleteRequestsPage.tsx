@@ -22,8 +22,11 @@ const client: ForumDeleteRequestsConsoleClient = {
   async list({ status }) {
     const res = await forumDeleteRequestApi.getAll({ status });
     // WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1:
-    //   실패를 빈 목록으로 넘기면 "신청 없음"(empty) 과 구분되지 않는다.
-    if (res.error) throw new Error(res.error.message);
+    //   실패를 빈 목록으로 넘기면 "신청 없음"(empty) 과 구분되지 않는다 → adapter 는 throw 한다.
+    //   HOLD: 공통 @o4o/operator-core-ui/modules/forum-delete-requests 의 loadRequests 가
+    //   `catch { setRequests([]) }` 로 삼키고 error 상태가 없어 아직 화면에 뜨지 않는다.
+    //   공통 패키지에 error 상태를 추가하는 다음 batch 에서 표면화된다.
+    if (res.error) throw new Error('삭제 요청 목록을 불러오지 못했습니다.');
     return (res.data || []) as ForumDeleteRequest[];
   },
   async approve(id, data) {

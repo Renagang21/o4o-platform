@@ -74,7 +74,7 @@ export default function ContentLibraryPage() {
       const response = await apiClient.get<ContentItem[]>('/api/v1/glycopharm/signage/contents');
       // WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1:
       //   SignageHubTemplate 은 throw 를 error 상태로 렌더한다 — 실패를 빈 목록으로 넘기지 않는다.
-      if (response.error) throw new Error(response.error.message || '콘텐츠를 불러오지 못했습니다.');
+      if (response.error) throw new Error('콘텐츠를 불러오지 못했습니다.');
       let data: ContentItem[] = (response.data as any) ?? [];
       if (!Array.isArray(data)) data = [];
 
