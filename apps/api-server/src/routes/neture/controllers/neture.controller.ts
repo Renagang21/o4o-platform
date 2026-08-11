@@ -24,6 +24,8 @@ import { SupplierStatus, PartnershipStatus } from '../../../modules/neture/entit
 import { requireAuth, optionalAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 import { hashPassword } from '../../../utils/auth.utils.js';
+// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 정본
+import { isPasswordPolicyCompliant, PASSWORD_POLICY_MESSAGE } from '../../../utils/password-policy.js';
 import logger from '../../../utils/logger.js';
 
 // WO-O4O-ADMIN-OPERATOR-SINGLE-FORM-AUTO-RESOLVE-REGISTRATION-FLOW-V1
@@ -543,10 +545,11 @@ export function createNetureController(dataSource: DataSource): Router {
 
       if (!existingUser) {
         // Require password for new user creation
-        if (!password || String(password).trim().length < 8) {
+        // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 신규 계정 비밀번호도 동일 정책
+        if (!isPasswordPolicyCompliant(password == null ? '' : String(password).trim())) {
           return res.status(400).json({
             success: false,
-            error: '해당 이메일로 가입된 계정이 없습니다. 신규 계정 생성을 위해 비밀번호(8자 이상)를 입력해주세요.',
+            error: `해당 이메일로 가입된 계정이 없습니다. 신규 계정 생성을 위해 비밀번호를 입력해주세요. ${PASSWORD_POLICY_MESSAGE}`,
             code: 'PASSWORD_REQUIRED',
           });
         }

@@ -327,7 +327,7 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
   });
 
   // WO-O4O-OPERATOR-MEMBER-PASSWORD-MIN-LENGTH-UNIFY-V1
-  describe('최소 길이(8자) 서버 강제', () => {
+  describe('비밀번호 정책(8자 + 영문 + 숫자) 서버 강제', () => {
     it('8자 미만이면 hash · credential write 이전에 400 WEAK_PASSWORD 로 거절한다', async () => {
       primeQuery();
       const res = makeRes();
@@ -349,6 +349,31 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
 
       expect(credentialWrites()).toHaveLength(1);
       expect(credentialWrites()[0].params[2]).toBe('hashed:Pw123456');
+    });
+
+    it('영문만 / 숫자만은 길이가 충분해도 거절한다 (WO-...-COMPLEXITY-POLICY-UNIFY-V1)', async () => {
+      for (const pw of ['abcdefghij', '1234567890']) {
+        jest.clearAllMocks();
+        primeQuery();
+        const res = makeRes();
+
+        await controller.updateMember(makeReq({ password: pw }), res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'WEAK_PASSWORD' }));
+        expect(hashPassword).not.toHaveBeenCalled();
+        expect(credentialWrites()).toEqual([]);
+      }
+    });
+
+    it('특수문자 없이 영문+숫자 8자면 통과한다 (특수문자는 필수 아님)', async () => {
+      primeQuery();
+      const res = makeRes();
+
+      await controller.updateMember(makeReq({ password: 'abcd1234' }), res);
+
+      expect(credentialWrites()).toHaveLength(1);
+      expect(credentialWrites()[0].params[2]).toBe('hashed:abcd1234');
     });
 
     it('serviceKey 를 명시해도 8자 미만이면 서비스 판정 이전에 거절한다', async () => {

@@ -13,6 +13,8 @@
  */
 
 import { useState, useEffect } from 'react';
+// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 공용 검증
+import { checkPasswordPolicy } from '@o4o/auth-utils';
 import { useNavigate } from 'react-router-dom';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import { useRegisterModal } from '@/contexts/RegisterModalContext';
@@ -132,13 +134,14 @@ export function RegisterFlowModal({ open, onClose }: Props) {
     }));
   };
 
+  // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 정책 = 8자 이상 + 영문 + 숫자 (특수문자 선택)
+  const passwordPolicy = checkPasswordPolicy(formData.password);
   const passwordChecks = {
-    length: formData.password.length >= 8,
-    letter: /[a-zA-Z]/.test(formData.password),
-    number: /\d/.test(formData.password),
-    special: /[^A-Za-z\d\s]/.test(formData.password),
+    length: passwordPolicy.minLength,
+    letter: passwordPolicy.letter,
+    number: passwordPolicy.number,
   };
-  const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+  const isPasswordStrong = passwordPolicy.valid;
 
   const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
 
@@ -300,7 +303,6 @@ export function RegisterFlowModal({ open, onClose }: Props) {
     { key: 'length' as const, label: '8자 이상' },
     { key: 'letter' as const, label: '영문 포함' },
     { key: 'number' as const, label: '숫자 포함' },
-    { key: 'special' as const, label: '특수문자 포함' },
   ];
 
   const stepLabel = ['공통 정보', '참여 유형', '추가 정보'];
@@ -451,7 +453,7 @@ export function RegisterFlowModal({ open, onClose }: Props) {
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleInputChange}
                     className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                    placeholder="영문, 숫자, 특수문자 포함 8자 이상" required />
+                    placeholder="영문, 숫자 포함 8자 이상" required />
                   <button type="button" onClick={() => setShowPassword(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2">
                     {showPassword ? <EyeOff className="w-4 h-4 text-slate-400" /> : <Eye className="w-4 h-4 text-slate-400" />}
                   </button>

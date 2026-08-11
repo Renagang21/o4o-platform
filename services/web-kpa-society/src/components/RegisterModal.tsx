@@ -16,6 +16,8 @@
  */
 
 import { useState, useEffect } from 'react';
+// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 공용 검증
+import { checkPasswordPolicy } from '@o4o/auth-utils';
 import { X, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { AddressSearch } from '@o4o/ui';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
@@ -326,13 +328,14 @@ export default function RegisterModal() {
     }
   };
 
+  // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 정책 = 8자 이상 + 영문 + 숫자 (특수문자 선택)
+  const passwordPolicy = checkPasswordPolicy(formData.password);
   const passwordChecks = {
-    length: formData.password.length >= 8,
-    lowercase: /[a-z]/.test(formData.password),
-    number: /\d/.test(formData.password),
-    special: /[^A-Za-z0-9\s]/.test(formData.password),
+    length: passwordPolicy.minLength,
+    letter: passwordPolicy.letter,
+    number: passwordPolicy.number,
   };
-  const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+  const isPasswordStrong = passwordPolicy.valid;
 
   // WO-O4O-KPA-REGISTRATION-UX-ALIGN-WITH-GLYCOPHARM-V1:
   //   GlycoPharm 의 명시적 format validation 패턴을 도입.
@@ -393,7 +396,7 @@ export default function RegisterModal() {
     if (!formData.email) missing.push('이메일');
     else if (!isEmailFormatValid) missing.push('이메일(형식)');
     if (!formData.password) missing.push('비밀번호');
-    else if (!isPasswordStrong) missing.push('비밀번호(영문 소문자·숫자·특수문자 포함 8자 이상)');
+    else if (!isPasswordStrong) missing.push('비밀번호(영문·숫자 포함 8자 이상)');
     if (formData.password && formData.passwordConfirm && formData.password !== formData.passwordConfirm) {
       missing.push('비밀번호 확인(일치)');
     } else if (!formData.passwordConfirm) {
@@ -527,7 +530,7 @@ export default function RegisterModal() {
                       <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호 <span className="text-red-500">*</span></label>
                       <div className="relative">
                         <input type={showPassword ? 'text' : 'password'} name="password" autoComplete="new-password"
-                          value={formData.password} onChange={handleInputChange} placeholder="영문·숫자·특수문자 포함" required
+                          value={formData.password} onChange={handleInputChange} placeholder="영문·숫자 포함 8자 이상" required
                           className="w-full px-4 py-3 pr-10 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         <button type="button" onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600">
@@ -537,9 +540,8 @@ export default function RegisterModal() {
                       {formData.password.length > 0 && !isPasswordStrong && (
                         <div style={{ fontSize: '12px', margin: '4px 0 0 0', lineHeight: '1.6' }}>
                           <span style={{ color: passwordChecks.length ? '#16a34a' : '#dc2626' }}>{passwordChecks.length ? '✓' : '✗'} 8자 이상</span><br />
-                          <span style={{ color: passwordChecks.lowercase ? '#16a34a' : '#dc2626' }}>{passwordChecks.lowercase ? '✓' : '✗'} 영문 소문자</span><br />
-                          <span style={{ color: passwordChecks.number ? '#16a34a' : '#dc2626' }}>{passwordChecks.number ? '✓' : '✗'} 숫자</span><br />
-                          <span style={{ color: passwordChecks.special ? '#16a34a' : '#dc2626' }}>{passwordChecks.special ? '✓' : '✗'} 특수문자</span>
+                          <span style={{ color: passwordChecks.letter ? '#16a34a' : '#dc2626' }}>{passwordChecks.letter ? '✓' : '✗'} 영문</span><br />
+                          <span style={{ color: passwordChecks.number ? '#16a34a' : '#dc2626' }}>{passwordChecks.number ? '✓' : '✗'} 숫자</span>
                         </div>
                       )}
                     </div>

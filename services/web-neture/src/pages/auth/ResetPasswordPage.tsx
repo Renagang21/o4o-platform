@@ -7,15 +7,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 공용 검증
+import { PASSWORD_POLICY_RULES, checkPasswordPolicy } from '@o4o/auth-utils';
 import { api } from '../../lib/apiClient';
 
-const PASSWORD_RULES = [
-  { key: 'length', label: '8자 이상', test: (p: string) => p.length >= 8 },
-  { key: 'upper', label: '대문자 포함', test: (p: string) => /[A-Z]/.test(p) },
-  { key: 'lower', label: '소문자 포함', test: (p: string) => /[a-z]/.test(p) },
-  { key: 'digit', label: '숫자 포함', test: (p: string) => /\d/.test(p) },
-  { key: 'special', label: '특수문자 포함', test: (p: string) => /[!@#$%^&*]/.test(p) },
-];
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -30,7 +25,8 @@ export default function ResetPasswordPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
 
-  const allRulesPassed = PASSWORD_RULES.every((r) => r.test(password));
+  const passwordPolicy = checkPasswordPolicy(password);
+  const allRulesPassed = passwordPolicy.valid;
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
   const canSubmit = allRulesPassed && passwordsMatch && !isLoading;
 
@@ -167,14 +163,14 @@ export default function ResetPasswordPage() {
 
           {/* Password requirements checklist */}
           <div className="rounded-lg bg-slate-50 p-3 space-y-1.5">
-            {PASSWORD_RULES.map((rule) => (
+            {PASSWORD_POLICY_RULES.map((rule) => (
               <div key={rule.key} className="flex items-center gap-2 text-xs">
                 <CheckCircle
                   className={`w-3.5 h-3.5 ${
-                    rule.test(password) ? 'text-green-500' : 'text-slate-300'
+                    passwordPolicy[rule.key] ? 'text-green-500' : 'text-slate-300'
                   }`}
                 />
-                <span className={rule.test(password) ? 'text-green-700' : 'text-slate-500'}>
+                <span className={passwordPolicy[rule.key] ? 'text-green-700' : 'text-slate-500'}>
                   {rule.label}
                 </span>
               </div>

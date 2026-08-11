@@ -128,14 +128,14 @@ describe('PasswordModal — 대상 서비스 확정', () => {
 });
 
 // WO-O4O-OPERATOR-MEMBER-PASSWORD-MIN-LENGTH-UNIFY-V1
-describe('PasswordModal — 최소 길이 8자', () => {
+describe('PasswordModal — 비밀번호 정책(8자 + 영문 + 숫자)', () => {
   it('8자 미만이면 안내 문구를 띄우고 전송하지 않는다', async () => {
     const { put } = await openPasswordModal([membership('glycopharm')]);
 
     fireEvent.change(screen.getByPlaceholderText(/새 비밀번호/), { target: { value: 'pass123' } }); // 7자
     fireEvent.click(submitButton());
 
-    await screen.findByText('비밀번호는 최소 8자 이상이어야 합니다.');
+    await screen.findByText('비밀번호는 8자 이상이며 영문과 숫자를 각각 1자 이상 포함해야 합니다.');
     expect(put).not.toHaveBeenCalled();
   });
 
@@ -147,6 +147,28 @@ describe('PasswordModal — 최소 길이 8자', () => {
 
     await waitFor(() => expect(put).toHaveBeenCalledTimes(1));
     expect(put).toHaveBeenCalledWith('/operator/members/u-1', { password: 'pass1234', serviceKey: 'glycopharm' });
+  });
+
+  it('영문만 / 숫자만은 길이가 충분해도 거절한다 (WO-...-COMPLEXITY-POLICY-UNIFY-V1)', async () => {
+    for (const pw of ['abcdefghij', '1234567890']) {
+      cleanup();
+      const { put } = await openPasswordModal([membership('glycopharm')]);
+      fireEvent.change(screen.getByPlaceholderText(/새 비밀번호/), { target: { value: pw } });
+      fireEvent.click(submitButton());
+
+      await screen.findByText('비밀번호는 8자 이상이며 영문과 숫자를 각각 1자 이상 포함해야 합니다.');
+      expect(put).not.toHaveBeenCalled();
+    }
+  });
+
+  it('특수문자 없이 영문+숫자 8자면 전송한다 (특수문자는 필수 아님)', async () => {
+    const { put } = await openPasswordModal([membership('glycopharm')]);
+
+    fireEvent.change(screen.getByPlaceholderText(/새 비밀번호/), { target: { value: 'abcd1234' } });
+    fireEvent.click(submitButton());
+
+    await waitFor(() => expect(put).toHaveBeenCalledTimes(1));
+    expect(put).toHaveBeenCalledWith('/operator/members/u-1', { password: 'abcd1234', serviceKey: 'glycopharm' });
   });
 
   it('입력 필드가 8자 이상을 안내한다', async () => {

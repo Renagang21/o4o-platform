@@ -35,6 +35,20 @@ import type {
 import { getServiceDisplayName } from '@o4o/types';
 import EditUserModal from './EditUserModal';
 
+/**
+ * 비밀번호 정책 — WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1
+ *
+ * 8자 이상 + 영문 1자 + 숫자 1자 (특수문자는 허용하되 필수 아님).
+ * 이 패키지는 `@o4o/auth-utils` 에 의존하지 않으므로(새 의존 구조를 만들지 않는다는 조건)
+ * 동일 규칙을 로컬로 둔다. 최종 강제는 백엔드가 하며 계약은 양쪽 테스트로 고정한다.
+ */
+const PASSWORD_MIN_LENGTH = 8;
+const PASSWORD_POLICY_MESSAGE = '비밀번호는 8자 이상이며 영문과 숫자를 각각 1자 이상 포함해야 합니다.';
+function isPasswordPolicyCompliant(pw: string): boolean {
+  return pw.length >= PASSWORD_MIN_LENGTH && /[a-zA-Z]/.test(pw) && /\d/.test(pw);
+}
+
+
 // ─── Status Config ───────────────────────────────────────────
 
 const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> = {
@@ -121,7 +135,7 @@ function PasswordModal({ userId, userName, memberships, apiAdapter, theme, onClo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!serviceKey) { setError('비밀번호를 변경할 서비스를 선택해주세요.'); return; }
-    if (password.length < 8) { setError('비밀번호는 최소 8자 이상이어야 합니다.'); return; }
+    if (!isPasswordPolicyCompliant(password)) { setError(PASSWORD_POLICY_MESSAGE); return; }
     setLoading(true);
     setError('');
     try {
@@ -193,7 +207,7 @@ function PasswordModal({ userId, userName, memberships, apiAdapter, theme, onClo
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="새 비밀번호 (8자 이상)"
+            placeholder="새 비밀번호 (영문·숫자 포함 8자 이상)"
             className={`w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 ${tc.ringClass}`}
             required
             minLength={8}

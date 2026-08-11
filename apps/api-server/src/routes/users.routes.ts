@@ -6,6 +6,8 @@ import { UserRole } from '../types/auth.js';
 import { asyncHandler } from '../middleware/error-handler.js';
 import { validationResult } from 'express-validator';
 import { body, param, query } from 'express-validator';
+// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 정본
+import { passwordPolicyBodyValidator } from '../utils/password-policy.js';
 
 const router: Router = Router();
 const userController = new UserManagementController();
@@ -13,7 +15,8 @@ const userController = new UserManagementController();
 // Validation rules
 const createUserValidation = [
   body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 6 }),
+  // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 새로 설정되는 비밀번호는 동일 정책 적용
+  passwordPolicyBodyValidator('password'),
   body('firstName').optional().trim().notEmpty(),
   body('lastName').optional().trim().notEmpty(),
   body('role').optional().isIn(Object.values(UserRole)),
@@ -75,7 +78,8 @@ router.put(
   '/password',
   [
     body('currentPassword').isString().isLength({ min: 6 }),
-    body('newPassword').isString().isLength({ min: 8 }),
+    // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 최소 길이 + 영문·숫자 필수 (특수문자 선택)
+    passwordPolicyBodyValidator('newPassword'),
     body('newPasswordConfirm').isString(),
     body('serviceKey').optional().isString(),
   ],

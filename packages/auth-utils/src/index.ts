@@ -15,3 +15,13 @@ export { getServiceMembershipStatus, isPlatformSuperAdmin, isServiceAccessAllowe
 export type { PlatformUser } from './buildPlatformUser.js';
 export { buildPlatformUser } from './buildPlatformUser.js';
 export { AUTH_TOKEN_CLEARED_EVENT } from './authEvents.js';
+// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1
+export type { PasswordPolicyResult } from './passwordPolicy.js';
+export {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_POLICY_RULES,
+  PASSWORD_POLICY_HINT,
+  PASSWORD_POLICY_MESSAGE,
+  checkPasswordPolicy,
+  isPasswordPolicyCompliant,
+} from './passwordPolicy.js';

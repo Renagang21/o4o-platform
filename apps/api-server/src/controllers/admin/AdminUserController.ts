@@ -17,6 +17,8 @@ import type { ServiceCredential } from '../../modules/auth/entities/ServiceCrede
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 // WO-O4O-ADMIN-USER-LIST-SENSITIVE-FIELD-EXPOSURE-FIX-V1
 import { sanitizeAdminUser } from './admin-user-sanitizer.js';
+// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 정본
+import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE, isPasswordPolicyCompliant } from '../../utils/password-policy.js';
 // WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1: 재설정 적용 범위 안내(read-only)
 // WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
 //   updateUser 가 더 이상 비밀번호를 받지 않으므로 적용범위 안내가 불필요해졌다.
@@ -46,8 +48,11 @@ export class OperatorRegistrationContractError extends Error {
   }
 }
 
-/** 서비스 credential 최소 길이 — 등록 UI(8자)와 동일하게 서버에서도 강제한다. */
-export const SERVICE_PASSWORD_MIN_LENGTH = 8;
+/**
+ * 서비스 credential 최소 길이 — 등록 UI(8자)와 동일하게 서버에서도 강제한다.
+ * WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 값은 정책 정본에서 파생한다(중복 정의 금지).
+ */
+export const SERVICE_PASSWORD_MIN_LENGTH = PASSWORD_MIN_LENGTH;
 
 /**
  * 등록 대상 서비스(canonical service_key) 확정.
@@ -345,7 +350,8 @@ export class AdminUserController {
       const existingUser = await userRepo.findOne({ where: { email } });
 
       const hasPassword = typeof password === 'string' && password.length > 0;
-      const passwordTooShort = hasPassword && password.length < SERVICE_PASSWORD_MIN_LENGTH;
+      // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 길이뿐 아니라 영문·숫자 포함까지 검사한다.
+      const passwordTooShort = hasPassword && !isPasswordPolicyCompliant(password);
 
       // ── 기존 사용자: 권한·Membership 추가 + credential 은 **없을 때만** 생성 ──
       // WO-OPERATOR-MULTI-SERVICE-V1: 한 사용자가 여러 서비스 운영자일 수 있다.
@@ -356,7 +362,7 @@ export class AdminUserController {
         if (passwordTooShort) {
           res.status(400).json({
             success: false,
-            error: `서비스 초기 비밀번호는 최소 ${SERVICE_PASSWORD_MIN_LENGTH}자 이상이어야 합니다.`,
+            error: `서비스 초기 ${PASSWORD_POLICY_MESSAGE}`,
             code: 'SERVICE_PASSWORD_TOO_SHORT',
           });
           return;
@@ -427,7 +433,7 @@ export class AdminUserController {
       if (!hasPassword || passwordTooShort) {
         res.status(400).json({
           success: false,
-          error: `신규 운영자 등록에는 최소 ${SERVICE_PASSWORD_MIN_LENGTH}자 이상의 비밀번호가 필요합니다.`,
+          error: `신규 운영자 등록에는 비밀번호가 필요합니다. ${PASSWORD_POLICY_MESSAGE}`,
           code: 'SERVICE_PASSWORD_REQUIRED',
         });
         return;

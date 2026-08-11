@@ -1,4 +1,6 @@
 import { IsEmail, IsString, MinLength, IsOptional, IsBoolean, IsIn, IsInt, Min, Max, Matches } from 'class-validator';
+// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 정본
+import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_REGEX, PASSWORD_POLICY_MESSAGE_EN } from '../../../utils/password-policy.js';
 
 /**
  * Register Request DTO
@@ -13,10 +15,8 @@ export class RegisterRequestDto {
   email: string;
 
   @IsString()
-  @MinLength(8, { message: 'Password must be at least 8 characters' })
-  @Matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^A-Za-z\d\s]).+$/, {
-    message: 'Password must contain letter, number and special character',
-  })
+  @MinLength(PASSWORD_MIN_LENGTH, { message: PASSWORD_POLICY_MESSAGE_EN })
+  @Matches(PASSWORD_POLICY_REGEX, { message: PASSWORD_POLICY_MESSAGE_EN })
   password: string;
 
   @IsOptional()
@@ -39,10 +39,8 @@ export class RegisterRequestDto {
    */
   @IsOptional()
   @IsString()
-  @MinLength(8, { message: 'Service password must be at least 8 characters' })
-  @Matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^A-Za-z\d\s]).+$/, {
-    message: 'Service password must contain letter, number and special character',
-  })
+  @MinLength(PASSWORD_MIN_LENGTH, { message: PASSWORD_POLICY_MESSAGE_EN })
+  @Matches(PASSWORD_POLICY_REGEX, { message: PASSWORD_POLICY_MESSAGE_EN })
   servicePassword?: string;
 
   // --- 이름 필드 (서비스별 택일) ---

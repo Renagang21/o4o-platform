@@ -4,6 +4,8 @@
  */
 
 import { useState } from 'react';
+// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 공용 검증
+import { checkPasswordPolicy } from '@o4o/auth-utils';
 import { Link } from 'react-router-dom';
 import { Sparkles, Eye, EyeOff, ShoppingBag, Store, type LucideIcon } from 'lucide-react';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
@@ -147,13 +149,14 @@ export default function RegisterPage() {
     }
   };
 
+  // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 정책 = 8자 이상 + 영문 + 숫자 (특수문자 선택)
+  const passwordPolicy = checkPasswordPolicy(formData.password);
   const passwordChecks = {
-    length: formData.password.length >= 8,
-    letter: /[a-zA-Z]/.test(formData.password),
-    number: /\d/.test(formData.password),
-    special: /[^A-Za-z\d\s]/.test(formData.password),
+    length: passwordPolicy.minLength,
+    letter: passwordPolicy.letter,
+    number: passwordPolicy.number,
   };
-  const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+  const isPasswordStrong = passwordPolicy.valid;
 
   const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
 
@@ -269,7 +272,7 @@ export default function RegisterPage() {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+                    placeholder="영문, 숫자 포함 8자 이상"
                     style={styles.input}
                     required
                   />
@@ -291,7 +294,6 @@ export default function RegisterPage() {
                     <li style={passwordChecks.length ? styles.checkPass : styles.checkFail}>8자 이상</li>
                     <li style={passwordChecks.letter ? styles.checkPass : styles.checkFail}>영문 포함</li>
                     <li style={passwordChecks.number ? styles.checkPass : styles.checkFail}>숫자 포함</li>
-                    <li style={passwordChecks.special ? styles.checkPass : styles.checkFail}>특수문자 포함</li>
                   </ul>
                 )}
               </div>

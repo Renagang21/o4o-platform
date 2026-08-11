@@ -12,6 +12,8 @@
  */
 
 import { useState, useEffect } from 'react';
+// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 공용 검증
+import { checkPasswordPolicy } from '@o4o/auth-utils';
 import { X, Eye, EyeOff, CheckCircle, ArrowLeft, Factory, Handshake, type LucideIcon } from 'lucide-react';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
 import { AddressSearch } from '@o4o/ui';
@@ -296,13 +298,14 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     }
   };
 
+  // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 정책 = 8자 이상 + 영문 + 숫자 (특수문자 선택)
+  const passwordPolicy = checkPasswordPolicy(formData.password);
   const passwordChecks = {
-    length: formData.password.length >= 8,
-    letter: /[a-zA-Z]/.test(formData.password),
-    number: /\d/.test(formData.password),
-    special: /[^A-Za-z\d\s]/.test(formData.password),
+    length: passwordPolicy.minLength,
+    letter: passwordPolicy.letter,
+    number: passwordPolicy.number,
   };
-  const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+  const isPasswordStrong = passwordPolicy.valid;
 
   const isStep1Valid = () => {
     if (emailAlreadyJoined) return false;
@@ -464,9 +467,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                       </p>
                       <p className={passwordChecks.number ? 'text-green-600' : 'text-red-500'}>
                         {passwordChecks.number ? '✓' : '✗'} 숫자 포함
-                      </p>
-                      <p className={passwordChecks.special ? 'text-green-600' : 'text-red-500'}>
-                        {passwordChecks.special ? '✓' : '✗'} 특수문자 포함
                       </p>
                     </div>
                   )}

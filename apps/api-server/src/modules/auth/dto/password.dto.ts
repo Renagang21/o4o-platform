@@ -1,4 +1,6 @@
-import { IsEmail, IsString, MinLength, IsNotEmpty, IsOptional, IsUrl } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsNotEmpty, IsOptional, IsUrl, Matches } from 'class-validator';
+// WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 정본
+import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_REGEX, PASSWORD_POLICY_MESSAGE_EN } from '../../../utils/password-policy.js';
 
 /**
  * Password Reset Request DTO
@@ -34,7 +36,9 @@ export class PasswordResetDto {
   token: string;
 
   @IsString()
-  @MinLength(8, { message: 'Password must be at least 8 characters' })
+  @MinLength(PASSWORD_MIN_LENGTH, { message: PASSWORD_POLICY_MESSAGE_EN })
+  // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 영문 + 숫자 필수 (특수문자 선택)
+  @Matches(PASSWORD_POLICY_REGEX, { message: PASSWORD_POLICY_MESSAGE_EN })
   password: string;
 
   /**
