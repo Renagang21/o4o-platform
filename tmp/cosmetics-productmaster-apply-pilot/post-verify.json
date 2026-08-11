@@ -1,0 +1,47 @@
+{
+  "wo": "WO-O4O-COSMETICS-DESCRIPTION-AUTHORING-POLICY-AND-PRODUCTMASTER-PILOT-V2",
+  "batchTag": "cosmetics-pilot-500-v2",
+  "expected": {
+    "master": 500,
+    "canonical": 500
+  },
+  "actualMaster": 500,
+  "actualMasterCosmetic": 500,
+  "actualCanonical": 500,
+  "masterDuplicateGroups": [],
+  "canonicalDuplicateGroups": [],
+  "orphanDescriptions": 0,
+  "mastersWithoutDescription": 0,
+  "descriptionsOnForeignMaster": 0,
+  "nonCosmeticMisregistered": [],
+  "regulatoryTypeCounts": {
+    "DRUG": 177413,
+    "건강기능식품": 40948,
+    "QUASI_DRUG": 17148,
+    "MEDICAL_DEVICE": 3826,
+    "COSMETIC": 500,
+    "일반": 15,
+    "GENERAL": 11
+  },
+  "regulatoryTypeDrift": {
+    "DRUG": 0,
+    "건강기능식품": 0,
+    "QUASI_DRUG": 0,
+    "MEDICAL_DEVICE": 0
+  },
+  "searchSmoke": {
+    "probe": {
+      "name": "밸런스풀 포맨 시카 프레쉬 올인원",
+      "brand_name": "토리든"
+    },
+    "byBrandAndName": 1,
+    "byNameOnly": 1,
+    "cosmeticMasterLookup": 500,
+    "koStoreDescription": {
+      "id": "f4bdaa54-7bd3-4ee1-aa11-08733dca84fa",
+      "len": 220,
+      "summary": "토리든 밸런스풀 포맨 시카 프레쉬 올인원"
+    }
+  },
+  "pass": true
+}

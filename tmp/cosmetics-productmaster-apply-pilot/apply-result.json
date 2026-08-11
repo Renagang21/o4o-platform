@@ -1,0 +1,15 @@
+{
+  "wo": "WO-O4O-COSMETICS-DESCRIPTION-AUTHORING-POLICY-AND-PRODUCTMASTER-PILOT-V2",
+  "batchTag": "cosmetics-pilot-500-v2",
+  "sourceType": "o4o_cosmetics_retail",
+  "planned": 500,
+  "createdMaster": 500,
+  "reusedMaster": 0,
+  "createdCanonical": 500,
+  "canonicalConflict": 0,
+  "skippedAlreadyApplied": 0,
+  "failed": 0,
+  "conflicts": [],
+  "failures": [],
+  "rollback": "DELETE FROM shared_product_descriptions WHERE master_id IN (SELECT id FROM product_masters WHERE tags->>'woBatch' = 'cosmetics-pilot-500-v2'); DELETE FROM product_masters WHERE tags->>'woBatch' = 'cosmetics-pilot-500-v2';"
+}

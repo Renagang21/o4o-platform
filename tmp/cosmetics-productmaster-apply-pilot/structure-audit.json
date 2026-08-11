@@ -1,0 +1,703 @@
+{
+  "wo": "WO-O4O-COSMETICS-PRODUCTMASTER-APPLY-PILOT-V1",
+  "access": "read-only SELECT only",
+  "productMasterColumns": [
+    {
+      "column_name": "id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "column_name": "barcode",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "regulatory_name",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "name",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "brand_name",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "manufacturer_name",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "mfds_product_id",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "is_mfds_verified",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "is_nullable": "NO",
+      "column_default": "true"
+    },
+    {
+      "column_name": "mfds_synced_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "column_name": "regulatory_type",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": "'UNKNOWN'::character varying"
+    },
+    {
+      "column_name": "mfds_permit_number",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "category_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "brand_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "specification",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "origin_country",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "tags",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "YES",
+      "column_default": "'[]'::jsonb"
+    },
+    {
+      "column_name": "barcode_source",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "drug_category",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "representative_product_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "medical_device_grade",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "product_data_status",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "product_data_curation_reason",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "product_data_curated_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "status",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": "'ACTIVE'::character varying"
+    }
+  ],
+  "spdColumns": [
+    {
+      "column_name": "id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "column_name": "master_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "content",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "summary",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "source_type",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "source_ref_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "status",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": "'candidate'::character varying"
+    },
+    {
+      "column_name": "language",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "YES",
+      "column_default": "'ko'::character varying"
+    },
+    {
+      "column_name": "quality_score",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "curated_by",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "curated_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "created_by",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "updated_by",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "column_name": "deleted_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "description_type",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": "'STORE'::character varying"
+    },
+    {
+      "column_name": "created_by_supplier_id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "submitted_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "review_note",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "revision_requested_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "revision_due_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    }
+  ],
+  "indexes": [
+    {
+      "tablename": "product_identifiers",
+      "indexname": "idx_product_identifiers_identifier_type",
+      "indexdef": "CREATE INDEX idx_product_identifiers_identifier_type ON public.product_identifiers USING btree (identifier_type)"
+    },
+    {
+      "tablename": "product_identifiers",
+      "indexname": "idx_product_identifiers_normalized_value",
+      "indexdef": "CREATE INDEX idx_product_identifiers_normalized_value ON public.product_identifiers USING btree (normalized_value)"
+    },
+    {
+      "tablename": "product_identifiers",
+      "indexname": "idx_product_identifiers_primary",
+      "indexdef": "CREATE INDEX idx_product_identifiers_primary ON public.product_identifiers USING btree (product_master_id, is_primary)"
+    },
+    {
+      "tablename": "product_identifiers",
+      "indexname": "idx_product_identifiers_product_master_id",
+      "indexdef": "CREATE INDEX idx_product_identifiers_product_master_id ON public.product_identifiers USING btree (product_master_id)"
+    },
+    {
+      "tablename": "product_identifiers",
+      "indexname": "idx_product_identifiers_type_normalized",
+      "indexdef": "CREATE INDEX idx_product_identifiers_type_normalized ON public.product_identifiers USING btree (identifier_type, normalized_value)"
+    },
+    {
+      "tablename": "product_identifiers",
+      "indexname": "product_identifiers_pkey",
+      "indexdef": "CREATE UNIQUE INDEX product_identifiers_pkey ON public.product_identifiers USING btree (id)"
+    },
+    {
+      "tablename": "product_identifiers",
+      "indexname": "uq_product_identifiers_master_type_normalized",
+      "indexdef": "CREATE UNIQUE INDEX uq_product_identifiers_master_type_normalized ON public.product_identifiers USING btree (product_master_id, identifier_type, normalized_value) WHERE (deleted_at IS NULL)"
+    },
+    {
+      "tablename": "product_images",
+      "indexname": "idx_product_images_master_id",
+      "indexdef": "CREATE INDEX idx_product_images_master_id ON public.product_images USING btree (master_id)"
+    },
+    {
+      "tablename": "product_images",
+      "indexname": "idx_product_images_thumbnail_unique",
+      "indexdef": "CREATE UNIQUE INDEX idx_product_images_thumbnail_unique ON public.product_images USING btree (master_id) WHERE ((type)::text = 'thumbnail'::text)"
+    },
+    {
+      "tablename": "product_images",
+      "indexname": "idx_product_images_type",
+      "indexdef": "CREATE INDEX idx_product_images_type ON public.product_images USING btree (master_id, type)"
+    },
+    {
+      "tablename": "product_images",
+      "indexname": "product_images_pkey",
+      "indexdef": "CREATE UNIQUE INDEX product_images_pkey ON public.product_images USING btree (id)"
+    },
+    {
+      "tablename": "product_images",
+      "indexname": "uq_product_images_active_primary",
+      "indexdef": "CREATE UNIQUE INDEX uq_product_images_active_primary ON public.product_images USING btree (master_id) WHERE ((is_primary = true) AND (deleted_at IS NULL))"
+    },
+    {
+      "tablename": "product_masters",
+      "indexname": "idx_product_masters_barcode",
+      "indexdef": "CREATE INDEX idx_product_masters_barcode ON public.product_masters USING btree (barcode)"
+    },
+    {
+      "tablename": "product_masters",
+      "indexname": "idx_product_masters_brand",
+      "indexdef": "CREATE INDEX idx_product_masters_brand ON public.product_masters USING btree (brand_id)"
+    },
+    {
+      "tablename": "product_masters",
+      "indexname": "idx_product_masters_category",
+      "indexdef": "CREATE INDEX idx_product_masters_category ON public.product_masters USING btree (category_id)"
+    },
+    {
+      "tablename": "product_masters",
+      "indexname": "idx_product_masters_drug_category",
+      "indexdef": "CREATE INDEX idx_product_masters_drug_category ON public.product_masters USING btree (drug_category)"
+    },
+    {
+      "tablename": "product_masters",
+      "indexname": "idx_product_masters_manufacturer",
+      "indexdef": "CREATE INDEX idx_product_masters_manufacturer ON public.product_masters USING btree (manufacturer_name)"
+    },
+    {
+      "tablename": "product_masters",
+      "indexname": "idx_product_masters_name",
+      "indexdef": "CREATE INDEX idx_product_masters_name ON public.product_masters USING btree (name)"
+    },
+    {
+      "tablename": "product_masters",
+      "indexname": "idx_product_masters_representative_product_id",
+      "indexdef": "CREATE INDEX idx_product_masters_representative_product_id ON public.product_masters USING btree (representative_product_id)"
+    },
+    {
+      "tablename": "product_masters",
+      "indexname": "idx_product_masters_tags",
+      "indexdef": "CREATE INDEX idx_product_masters_tags ON public.product_masters USING gin (tags)"
+    },
+    {
+      "tablename": "product_masters",
+      "indexname": "product_masters_pkey",
+      "indexdef": "CREATE UNIQUE INDEX product_masters_pkey ON public.product_masters USING btree (id)"
+    },
+    {
+      "tablename": "product_masters",
+      "indexname": "uq_product_masters_barcode",
+      "indexdef": "CREATE UNIQUE INDEX uq_product_masters_barcode ON public.product_masters USING btree (barcode) WHERE (barcode IS NOT NULL)"
+    },
+    {
+      "tablename": "product_masters",
+      "indexname": "uq_product_masters_mfds_product_id",
+      "indexdef": "CREATE UNIQUE INDEX uq_product_masters_mfds_product_id ON public.product_masters USING btree (mfds_product_id)"
+    },
+    {
+      "tablename": "shared_product_descriptions",
+      "indexname": "idx_shared_product_descriptions_created_by_supplier",
+      "indexdef": "CREATE INDEX idx_shared_product_descriptions_created_by_supplier ON public.shared_product_descriptions USING btree (created_by_supplier_id) WHERE (created_by_supplier_id IS NOT NULL)"
+    },
+    {
+      "tablename": "shared_product_descriptions",
+      "indexname": "idx_shared_product_descriptions_master",
+      "indexdef": "CREATE INDEX idx_shared_product_descriptions_master ON public.shared_product_descriptions USING btree (master_id)"
+    },
+    {
+      "tablename": "shared_product_descriptions",
+      "indexname": "idx_shared_product_descriptions_master_desctype",
+      "indexdef": "CREATE INDEX idx_shared_product_descriptions_master_desctype ON public.shared_product_descriptions USING btree (master_id, description_type)"
+    },
+    {
+      "tablename": "shared_product_descriptions",
+      "indexname": "idx_shared_product_descriptions_master_status",
+      "indexdef": "CREATE INDEX idx_shared_product_descriptions_master_status ON public.shared_product_descriptions USING btree (master_id, status)"
+    },
+    {
+      "tablename": "shared_product_descriptions",
+      "indexname": "idx_shared_product_descriptions_revision_due",
+      "indexdef": "CREATE INDEX idx_shared_product_descriptions_revision_due ON public.shared_product_descriptions USING btree (revision_due_at) WHERE (((status)::text = 'revision_requested'::text) AND (revision_due_at IS NOT NULL))"
+    },
+    {
+      "tablename": "shared_product_descriptions",
+      "indexname": "idx_shared_product_descriptions_source_type",
+      "indexdef": "CREATE INDEX idx_shared_product_descriptions_source_type ON public.shared_product_descriptions USING btree (source_type)"
+    },
+    {
+      "tablename": "shared_product_descriptions",
+      "indexname": "shared_product_descriptions_pkey",
+      "indexdef": "CREATE UNIQUE INDEX shared_product_descriptions_pkey ON public.shared_product_descriptions USING btree (id)"
+    },
+    {
+      "tablename": "shared_product_descriptions",
+      "indexname": "uniq_shared_product_descriptions_canonical_per_master_type_lang",
+      "indexdef": "CREATE UNIQUE INDEX uniq_shared_product_descriptions_canonical_per_master_type_lang ON public.shared_product_descriptions USING btree (master_id, description_type, COALESCE(language, 'ko'::character varying)) WHERE (((status)::text = 'canonical'::text) AND (deleted_at IS NULL))"
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "product_identifiers",
+      "conname": "product_identifiers_product_master_id_fkey",
+      "def": "FOREIGN KEY (product_master_id) REFERENCES product_masters(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "product_images",
+      "conname": "product_images_master_id_fkey",
+      "def": "FOREIGN KEY (master_id) REFERENCES product_masters(id) ON DELETE CASCADE"
+    },
+    {
+      "table_name": "product_masters",
+      "conname": "fk_product_masters_representative_product",
+      "def": "FOREIGN KEY (representative_product_id) REFERENCES representative_products(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "product_masters",
+      "conname": "product_masters_brand_id_fkey",
+      "def": "FOREIGN KEY (brand_id) REFERENCES brands(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "product_masters",
+      "conname": "product_masters_category_id_fkey",
+      "def": "FOREIGN KEY (category_id) REFERENCES product_categories(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "product_masters",
+      "conname": "uq_product_masters_mfds_product_id",
+      "def": "UNIQUE (mfds_product_id)"
+    },
+    {
+      "table_name": "shared_product_descriptions",
+      "conname": "shared_product_descriptions_created_by_supplier_id_fkey",
+      "def": "FOREIGN KEY (created_by_supplier_id) REFERENCES neture_suppliers(id) ON DELETE SET NULL"
+    },
+    {
+      "table_name": "shared_product_descriptions",
+      "conname": "shared_product_descriptions_master_id_fkey",
+      "def": "FOREIGN KEY (master_id) REFERENCES product_masters(id) ON DELETE CASCADE"
+    }
+  ],
+  "regulatoryTypes": [
+    {
+      "value": "DRUG",
+      "count": 177413
+    },
+    {
+      "value": "건강기능식품",
+      "count": 40948
+    },
+    {
+      "value": "QUASI_DRUG",
+      "count": 17148
+    },
+    {
+      "value": "MEDICAL_DEVICE",
+      "count": 3826
+    },
+    {
+      "value": "일반",
+      "count": 15
+    },
+    {
+      "value": "GENERAL",
+      "count": 11
+    }
+  ],
+  "masterStatus": [
+    {
+      "status": "ACTIVE",
+      "count": 239361
+    }
+  ],
+  "spdTypes": [
+    {
+      "value": "STORE",
+      "count": 241203
+    },
+    {
+      "value": "B2B",
+      "count": 56
+    }
+  ],
+  "spdStatus": [
+    {
+      "status": "canonical",
+      "count": 200260
+    },
+    {
+      "status": "deprecated",
+      "count": 39686
+    },
+    {
+      "status": "hidden",
+      "count": 1023
+    },
+    {
+      "status": "candidate",
+      "count": 286
+    },
+    {
+      "status": "draft",
+      "count": 2
+    },
+    {
+      "status": "needs_review",
+      "count": 2
+    }
+  ],
+  "spdLanguages": [
+    {
+      "value": "ko",
+      "count": 103359
+    },
+    {
+      "value": "en",
+      "count": 63368
+    },
+    {
+      "value": "zh",
+      "count": 42262
+    },
+    {
+      "value": "ja",
+      "count": 32270
+    }
+  ],
+  "spdResourceTypes": {
+    "error": "column \"resource_type\" does not exist"
+  },
+  "cosmeticTables": [
+    {
+      "table_name": "cosmetics_brands"
+    },
+    {
+      "table_name": "cosmetics_contents"
+    },
+    {
+      "table_name": "cosmetics_lines"
+    },
+    {
+      "table_name": "cosmetics_members"
+    },
+    {
+      "table_name": "cosmetics_price_logs"
+    },
+    {
+      "table_name": "cosmetics_price_policies"
+    },
+    {
+      "table_name": "cosmetics_product_logs"
+    },
+    {
+      "table_name": "cosmetics_products"
+    },
+    {
+      "table_name": "cosmetics_store_applications"
+    },
+    {
+      "table_name": "cosmetics_store_listings"
+    },
+    {
+      "table_name": "cosmetics_store_members"
+    },
+    {
+      "table_name": "cosmetics_store_playlist_items"
+    },
+    {
+      "table_name": "cosmetics_store_playlists"
+    },
+    {
+      "table_name": "cosmetics_stores"
+    }
+  ],
+  "identifierExists": [
+    {
+      "table_name": "shared_product_descriptions"
+    },
+    {
+      "table_name": "product_masters"
+    },
+    {
+      "table_name": "product_identifiers"
+    },
+    {
+      "table_name": "product_images"
+    }
+  ],
+  "mastersWithoutIdentifier": [
+    {
+      "count": 40974
+    }
+  ],
+  "mastersWithoutBarcode": [
+    {
+      "count": 58117
+    }
+  ],
+  "mastersWithoutImage": {
+    "error": "column i.product_master_id does not exist"
+  }
+}

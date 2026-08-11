@@ -41,6 +41,7 @@ export type SharedProductDescriptionSourceType =
   | 'mfds_drug_otc_nutrition_combo' // 영양제류 복합제 canonical 승격(O4O 가공) — WO-...-NUTRITION-COMBO-CANONICAL-PROMOTION-APPLY-V1
   | 'mfds_drug_otc' // OTC single 그룹(성분·함량·제형) canonical 승격 — WO-O4O-OTC-SINGLE-GROUP-EXPANSION-APPLY-PATH-V1
   | 'o4o_hff_generated' // 건강기능식품 매장 설명서 — O4O 작성·검수(grounding=MFDS HFF candidate). 본문 제작주체=O4O, source_ref_id=candidate
+  | 'o4o_cosmetics_retail' // 화장품 매장 설명서 — O4O 작성(grounding=소매 유통 census). WO-O4O-COSMETICS-DESCRIPTION-AUTHORING-POLICY-AND-PRODUCTMASTER-PILOT-V2
   | 'migration'
   | 'manual';
 
@@ -54,6 +55,7 @@ export const SHARED_PRODUCT_DESCRIPTION_SOURCE_TYPES: SharedProductDescriptionSo
   'mfds_drug_otc_nutrition_combo',
   'mfds_drug_otc',
   'o4o_hff_generated',
+  'o4o_cosmetics_retail',
   'migration',
   'manual',
 ];

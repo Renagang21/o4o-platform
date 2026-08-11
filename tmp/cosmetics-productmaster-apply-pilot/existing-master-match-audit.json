@@ -1,0 +1,4849 @@
+{
+  "wo": "WO-O4O-COSMETICS-DESCRIPTION-AUTHORING-POLICY-AND-PRODUCTMASTER-PILOT-V2",
+  "note": "이름 일치만으로 자동 연결하지 않는다(WO §8). SAME_PRODUCT_REUSE 만 재사용 후보다.",
+  "matchedKeys": 188,
+  "matchedMasterRows": 328,
+  "byVerdict": {
+    "DIFFERENT_PRODUCT_SAME_NAME": 1,
+    "CHECK": 1,
+    "NOT_COSMETIC": 186
+  },
+  "items": [
+    {
+      "key": "몽뜨허브|보습케어",
+      "brandName": "몽뜨허브",
+      "canonicalProductName": "보습케어",
+      "candidateCategory": "뷰티|스킨케어|스킨케어 세트",
+      "candidateSources": [
+        "MUSINSA_BEAUTY"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "c10d2ad7-e9e2-4d49-9d33-6d75125d74c5",
+          "name": "보습케어",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "DIFFERENT_PRODUCT_SAME_NAME",
+      "reason": "기존 master 규제유형이 비화장품(건강기능식품) — 이름만 같다"
+    },
+    {
+      "key": "메디필|레드케어패치",
+      "brandName": "메디필",
+      "canonicalProductName": "레드 케어 패치",
+      "candidateCategory": "뷰티|마스크팩|부분마스크/코팩/패치",
+      "candidateSources": [
+        "MUSINSA_BEAUTY"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "QUASI_DRUG"
+      ],
+      "masters": [
+        {
+          "id": "6056c92e-9f04-4189-b9d3-8b8e5319d21c",
+          "name": "메디필레드케어패치",
+          "regulatoryType": "QUASI_DRUG"
+        }
+      ],
+      "verdict": "CHECK",
+      "reason": "판단 불가(규제유형 QUASI_DRUG) — 자동 연결하지 않는다"
+    },
+    {
+      "key": "바이오코어|피부면역유산균캡슐",
+      "brandName": "바이오코어",
+      "canonicalProductName": "피부면역 유산균 캡슐",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "4c35b852-31b7-43a5-9f53-f7224d8119e0",
+          "name": "피부면역 유산균 캡슐",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "정원삼|6년근고려홍삼정365필름",
+      "brandName": "정원삼",
+      "canonicalProductName": "6년근고려홍삼정 365필름",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "d76e925c-162f-4d01-b398-c14747392860",
+          "name": "6년근고려홍삼정365필름",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "스키니랩|모로실다이어트c3g테이스티컷",
+      "brandName": "스키니랩",
+      "canonicalProductName": "모로실 다이어트 C3G 테이스티컷",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "9b292667-f83f-42a8-9a2c-fcc1d312a6ee",
+          "name": "스키니랩 모로실 다이어트 C3G 테이스티 컷",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "정원삼|홍삼이뮨부스터",
+      "brandName": "정원삼",
+      "canonicalProductName": "홍삼 이뮨부스터",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "fdfa16c9-3181-4b79-abae-c541bbc992a9",
+          "name": "홍삼이뮨부스터",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴트리가든|멜팅업리포좀비타민c",
+      "brandName": "뉴트리가든",
+      "canonicalProductName": "멜팅업 리포좀 비타민C",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "56714b67-d9b4-485f-940c-c99023df2d95",
+          "name": "멜팅업 리포좀 비타민C",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|비타민c1000",
+      "brandName": "고려은단",
+      "canonicalProductName": "비타민C 1000",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "721673e4-2208-405d-89bf-a8a8557751e3",
+          "name": "비타민C1000",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "91ca3fa8-13e0-46f4-9a23-11670db9f824",
+          "name": "비타민C1000",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "a1e5319a-185a-46f0-ab4c-53d66f78cb06",
+          "name": "비타민C1000",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "바이오코어|이너케어유산균",
+      "brandName": "바이오코어",
+      "canonicalProductName": "이너케어 유산균",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "e1229463-803c-474c-9948-5f879b717412",
+          "name": "이너케어 유산균",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "417665dd-804e-4d48-9401-347fdbd9a1e6",
+          "name": "이너케어 유산균",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "에버콜라겐|뷰티앰플",
+      "brandName": "에버콜라겐",
+      "canonicalProductName": "뷰티 앰플",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "2aaec6e6-17f8-484a-8b0f-efb15179e8bb",
+          "name": "에버콜라겐 뷰티 앰플",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "에버콜라겐|타임비오틴",
+      "brandName": "에버콜라겐",
+      "canonicalProductName": "타임 비오틴",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "ed789cb0-c8d8-4b47-81c1-8c8298f7aace",
+          "name": "에버콜라겐 타임 비오틴",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "바이오코어|피부면역유산균100억",
+      "brandName": "바이오코어",
+      "canonicalProductName": "피부면역 유산균 100억",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "8881b0af-88fe-4931-acba-293619ea8b1a",
+          "name": "피부면역유산균 100억",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "솔가|비오틴5000",
+      "brandName": "솔가",
+      "canonicalProductName": "비오틴 5000",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "b046af4e-5a81-4cf8-b772-35d364c2b88a",
+          "name": "비오틴 5000",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "77b90591-013a-440d-b1ab-518d9187be0b",
+          "name": "비오틴5000",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "85479f2b-5921-42b7-90b4-b6a727be33e7",
+          "name": "비오틴5000",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "닥터아돌|b발라민비오틴",
+      "brandName": "닥터아돌",
+      "canonicalProductName": "B발라민 비오틴",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "ff015aeb-424b-4f4e-a3a2-cb1cfa89f937",
+          "name": "B발라민 비오틴",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "랩트리션|비오틴플러스",
+      "brandName": "랩트리션",
+      "canonicalProductName": "비오틴 플러스",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "2cb40277-6161-4c57-9b39-111980b8f405",
+          "name": "비오틴 플러스",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "0dd6c6f1-07c1-421a-aecd-154de185307a",
+          "name": "비오틴플러스",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "8ea629c8-7e9f-43ee-b309-a5d420a5157e",
+          "name": "비오틴 플러스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴트리코어|유기농비오틴",
+      "brandName": "뉴트리코어",
+      "canonicalProductName": "유기농 비오틴",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "df5ce6ea-109f-4d3c-9700-370f450c34a6",
+          "name": "유기농 비오틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "5b273468-5bbe-4881-9ced-4ed248738443",
+          "name": "유기농 비오틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "19259e72-f4f9-418b-b306-60bda19274e4",
+          "name": "유기농 비오틴",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "스키니랩|비오틴",
+      "brandName": "스키니랩",
+      "canonicalProductName": "비오틴",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "457d053c-ae3b-4ab8-a1a3-f06ea233d66f",
+          "name": "비오틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "dd759725-38f3-4534-92ea-1b5a39452baf",
+          "name": "비오틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "42f7d424-3ce4-489d-b986-b0c283197d35",
+          "name": "비오틴",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "에버콜라겐|타임비오틴셀",
+      "brandName": "에버콜라겐",
+      "canonicalProductName": "타임비오틴 셀",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "f0ccf982-568e-41a8-957b-5329f24eef74",
+          "name": "에버콜라겐 타임비오틴 셀",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "락토핏|골드",
+      "brandName": "락토핏",
+      "canonicalProductName": "골드",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "5ed614d7-5546-4dae-b2e8-cd53987be450",
+          "name": "락토핏 골드",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "5bd59c61-ea73-4e37-9053-b06a3be2af2c",
+          "name": "락토핏 골드 80포",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "유한양행|엘레나",
+      "brandName": "유한양행",
+      "canonicalProductName": "엘레나",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "9ccdf608-dc2f-41ea-bdc8-c4d3cd2923c6",
+          "name": "엘레나",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "락토핏|코어",
+      "brandName": "락토핏",
+      "canonicalProductName": "코어",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "bb4e3a9f-d927-4889-ac66-2a482fc3e2a1",
+          "name": "락토핏 코어",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "그린몬스터|다이어트스페셜2가르시니아900",
+      "brandName": "그린몬스터",
+      "canonicalProductName": "다이어트 스페셜2 가르시니아 900",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "ab295e2d-e37c-4ef8-bb06-91d22a6859c1",
+          "name": "다이어트 스페셜 2 가르시니아 900",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "스키니랩|애플페논풋사과다이어트",
+      "brandName": "스키니랩",
+      "canonicalProductName": "애플페논 풋사과 다이어트",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "27975ce4-0e92-49e1-94f6-ac1d1e0962e8",
+          "name": "애플페논 풋사과 다이어트",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "바이탈뷰티|메타그린슬림업",
+      "brandName": "바이탈뷰티",
+      "canonicalProductName": "메타그린 슬림업",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "cac1f162-9c2d-4a24-85b6-4968549c74d0",
+          "name": "메타그린 슬림업",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "비에날씬|플러스",
+      "brandName": "비에날씬",
+      "canonicalProductName": "플러스",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "f1d46087-8745-4956-93d6-24e7a87bca96",
+          "name": "플러스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "푸드올로지|콜레올로지컷pro",
+      "brandName": "푸드올로지",
+      "canonicalProductName": "콜레올로지 컷 PRO",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "ebad248a-9cd3-4aab-bf91-e51746a4da86",
+          "name": "콜레올로지 컷 PRO",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "ca85c7e9-749b-4f7d-aabf-d0c0eb0e043d",
+          "name": "콜레올로지 컷 PRO",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "안국건강|시서스간다나이트컷",
+      "brandName": "안국건강",
+      "canonicalProductName": "시서스간다 나이트컷",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "0bdff287-9224-4cfb-bf6f-431148e117c3",
+          "name": "시서스간다 나이트컷",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "네이처메이드|칼슘,마그네슘,아연,비타민d",
+      "brandName": "네이처메이드",
+      "canonicalProductName": "칼슘, 마그네슘, 아연, 비타민 D",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "6b07aa47-f3b3-425d-9d40-a18f71183a6b",
+          "name": "칼슘, 마그네슘, 아연, 비타민D",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|메가도스b비타민b군",
+      "brandName": "고려은단",
+      "canonicalProductName": "메가도스B 비타민B군",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "e476134e-3e63-410f-8bef-f4e5ea5a9a95",
+          "name": "메가도스B 비타민B군",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴트리디데이|프리미엄비타민b컴플렉스골드",
+      "brandName": "뉴트리디데이",
+      "canonicalProductName": "프리미엄 비타민B 컴플렉스 골드",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "eeb5d706-fbe9-40fe-bdde-4581b392deee",
+          "name": "프리미엄 비타민B컴플렉스 골드",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "bb09bd17-d760-4f14-b7b2-2196a7fc5be3",
+          "name": "프리미엄 비타민B컴플렉스 골드",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "세노비스|마그네슘",
+      "brandName": "세노비스",
+      "canonicalProductName": "마그네슘",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "fd7e3036-b922-4ab1-ba8e-1576b650d9f3",
+          "name": "마그네슘",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "aaaef54f-f571-4943-b4f1-fd5ebbf5c863",
+          "name": "마그네슘",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "1598ccca-be1c-4e6f-965d-2343b8b01a99",
+          "name": "마그네슘",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|비타민c1000이지+비타민d",
+      "brandName": "고려은단",
+      "canonicalProductName": "비타민C 1000 이지+비타민D",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "f6e4ce43-90d2-477c-ab0d-7ba964108bff",
+          "name": "고려은단 비타민C1000 이지+비타민D",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "fa926f75-ff24-46c8-a541-d2c864265fe7",
+          "name": "고려은단 비타민C1000 이지+비타민D",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|메가도스c비타민c3000mg",
+      "brandName": "고려은단",
+      "canonicalProductName": "메가도스C 비타민C 3000mg",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "edad6bb5-5aab-4674-b65d-1f83033d6769",
+          "name": "메가도스C 비타민C 3000mg",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "15ca8a2a-3522-4122-8500-43b5ec33e92c",
+          "name": "메가도스C 비타민C 3000mg",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴트리가든|눈건강루테인지아잔틴",
+      "brandName": "뉴트리가든",
+      "canonicalProductName": "눈건강 루테인지아잔틴",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "82662b7b-c09c-4130-8892-c851fff5a4d0",
+          "name": "눈건강 루테인 지아잔틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "100bd3c4-43ef-43db-9969-16c87b6f949a",
+          "name": "눈건강 루테인지아잔틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "d9b64444-f108-44b4-8aea-b9d106647a7b",
+          "name": "눈건강 루테인지아잔틴",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "종근당건강|비타민c1000mg",
+      "brandName": "종근당건강",
+      "canonicalProductName": "비타민C 1000mg",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "bcbfe81f-86be-4b74-aaed-143713e0f498",
+          "name": "비타민C 1000mg",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "3d088778-2730-4e4f-a71b-9c7dfdbdf27c",
+          "name": "비타민 C 1000mg",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "94386fb2-d606-4ca6-95f5-b371bb40b547",
+          "name": "비타민C1000mg",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "라이필|더마콜라겐시그니처",
+      "brandName": "라이필",
+      "canonicalProductName": "더마콜라겐 시그니처",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "2767bf41-1296-4248-a9a4-0879d23eba16",
+          "name": "더마콜라겐 시그니처",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "아임비타|면역비타민c1000",
+      "brandName": "아임비타",
+      "canonicalProductName": "면역비타민C 1000",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "6394edb0-a749-433e-90ce-41170cdd4b5f",
+          "name": "면역비타민C 1000",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "c12094e1-a670-4b5a-9d3b-d1a0e925200c",
+          "name": "면역비타민C 1000",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "893d89bb-640d-4a03-987c-24c9d51808be",
+          "name": "면역비타민C 1000",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|속편한고려은단비타민c1000중성비타민c",
+      "brandName": "고려은단",
+      "canonicalProductName": "속편한 고려은단 비타민C 1000 중성비타민C",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "a9fcf1d5-d663-4f2f-89ae-f4bafc5608ef",
+          "name": "속편한 고려은단 비타민C 1000 중성비타민C",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "06662756-97de-4a9e-873f-b64c74360587",
+          "name": "속편한 고려은단 비타민C 1000 중성비타민C",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "gnm|코큐텐11",
+      "brandName": "GNM",
+      "canonicalProductName": "코큐텐11",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "d7a9cad4-f07f-480b-9dc6-e4d89a9d1d0e",
+          "name": "코큐텐11",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "나우푸드|코큐텐100mg",
+      "brandName": "나우푸드",
+      "canonicalProductName": "코큐텐 100mg",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "234e1fb5-0f39-4b44-81d4-d8a46de39804",
+          "name": "코큐텐100mg",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "2b9fb20e-f866-4b6d-b408-cc7fce8dd846",
+          "name": "코큐텐100mg",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "e4fbc9c7-47b8-4397-86f6-9776aa0581fa",
+          "name": "코큐텐100mg",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "해비추얼|항산화·면역프로폴리스",
+      "brandName": "해비추얼",
+      "canonicalProductName": "항산화·면역 프로폴리스",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "18189d0b-eda5-4e41-97e7-d9edd8792f20",
+          "name": "항산화·면역 프로폴리스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "정원삼|6년근고려홍삼정365스틱",
+      "brandName": "정원삼",
+      "canonicalProductName": "6년근 고려홍삼정 365스틱",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "8af1407a-a23e-4d9c-9553-2adb35099a38",
+          "name": "6년근고려홍삼정365스틱",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "94ebce5d-ee81-44de-8aac-7b5ac9ab4783",
+          "name": "6년근고려홍삼정365스틱",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "a6c6a8d6-3209-4b7d-bc9e-09a1cfd8928c",
+          "name": "6년근고려홍삼정365스틱",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "gnm|건강한간밀크씨슬",
+      "brandName": "GNM",
+      "canonicalProductName": "건강한 간 밀크씨슬",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "3b03391f-579a-4c54-8da7-faee4d21eac9",
+          "name": "건강한 간 밀크씨슬",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "401515a0-e232-4e9f-8e65-9817506a10ce",
+          "name": "건강한 간 밀크씨슬",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "2a4575f2-be8c-4da8-964e-09cd8d9696dc",
+          "name": "건강한 간 밀크씨슬",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "정관장|홍삼정",
+      "brandName": "정관장",
+      "canonicalProductName": "홍삼정",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "17f0742d-1224-426e-8c4b-1d5a0ef5a409",
+          "name": "홍삼정",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "1d1d80db-fc6f-4f2e-a04b-f653f1608a5f",
+          "name": "홍삼정",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "4552bf7d-7561-4078-b7b7-ac619b4dae55",
+          "name": "홍삼정",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "종근당건강|비타민d2000iu",
+      "brandName": "종근당건강",
+      "canonicalProductName": "비타민D 2000IU",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "a79169df-d9f2-4985-aa6a-1050b6290f34",
+          "name": "비타민D 2000 IU",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "205351d3-7b1e-4401-b262-d8fbc39cef0f",
+          "name": "비타민D 2000 IU",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "41ce5a33-8245-4270-aba7-cd2b791bac04",
+          "name": "비타민D 2000IU",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|퓨어밀크씨슬",
+      "brandName": "고려은단",
+      "canonicalProductName": "퓨어 밀크씨슬",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "c6d2c9cf-bd3b-49b4-9330-895513c7da94",
+          "name": "퓨어 밀크씨슬",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "01d76d48-0f00-4f8a-9111-6d69ba2f4f0a",
+          "name": "퓨어 밀크씨슬",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "그린몬스터|맥스비타민d4000iu",
+      "brandName": "그린몬스터",
+      "canonicalProductName": "맥스 비타민D 4000IU",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "195a0f4c-b550-47d1-8369-5bb1911a2520",
+          "name": "맥스 비타민D 4000IU",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "a0f2104f-1880-4e6d-90ee-bdc3cabe2f3d",
+          "name": "맥스 비타민D 4000IU",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "정관장|홍삼정환",
+      "brandName": "정관장",
+      "canonicalProductName": "홍삼정환",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "2645b513-dea0-4428-b731-1d5cf3138f67",
+          "name": "홍삼정환",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "세노비스|밀크씨슬",
+      "brandName": "세노비스",
+      "canonicalProductName": "밀크씨슬",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "b752f74b-ed6a-4943-bea7-9c2c8fabcb9b",
+          "name": "밀크씨슬",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "a8eacb3f-22c1-4941-a931-e5eb4ca30f50",
+          "name": "밀크씨슬",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "143cfccd-e4e1-47f3-8465-93f1accabd24",
+          "name": "밀크씨슬",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "제노포커스|면역가득유산균",
+      "brandName": "제노포커스",
+      "canonicalProductName": "면역 가득 유산균",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "90dcc521-382d-436e-9481-e2ace650fc6c",
+          "name": "면역 가득 유산균",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "줄리스초이스|에버비타민이너부스터샷",
+      "brandName": "줄리스초이스",
+      "canonicalProductName": "에버비타민 이너부스터샷",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "45008ac9-90c7-4c23-a76c-1b969b610d1f",
+          "name": "에버비타민 이너부스터샷",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "종근당건강|이뮨멀티비타맥스",
+      "brandName": "종근당건강",
+      "canonicalProductName": "이뮨 멀티비타맥스",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "52a05e51-c601-4ae8-ace1-ed1d388dc87c",
+          "name": "이뮨 듀오 멀티비타맥스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "덴프스|트루바이타민i",
+      "brandName": "덴프스",
+      "canonicalProductName": "트루바이타민 I",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "d620732e-47e0-45e8-a828-3ec0ff29d32c",
+          "name": "트루바이타민 I",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "아임비타|멀티비타민이뮨샷",
+      "brandName": "아임비타",
+      "canonicalProductName": "멀티비타민 이뮨샷",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "8c0e5e2f-c693-42c2-94b1-51e0a8983400",
+          "name": "멀티비타민 이뮨샷",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "152253b7-2b1d-487b-b0df-03f6c63737de",
+          "name": "멀티비타민 이뮨샷",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "세노비스|트리플러스우먼",
+      "brandName": "세노비스",
+      "canonicalProductName": "트리플러스우먼",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "c134ee3f-894d-494a-ad43-5eb176779da5",
+          "name": "트리플러스 우먼",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "순수식품|종합비타민미네랄20",
+      "brandName": "순수식품",
+      "canonicalProductName": "종합비타민 미네랄 20",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "4218d9b0-074f-4949-a241-186061663d05",
+          "name": "종합비타민 미네랄 20",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "cfe4e46b-5b46-4e1f-b854-875bf25ca55c",
+          "name": "종합비타민미네랄20",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "48b6af4c-8f27-417e-b890-6e6508867c47",
+          "name": "종합비타민 미네랄 20",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "gnm|올인원이뮨액상종합비타민",
+      "brandName": "GNM",
+      "canonicalProductName": "올인원 이뮨 액상 종합비타민",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "804a549b-dbec-4310-b8b2-6a1eb15112cd",
+          "name": "올인원 이뮨 액상 종합비타민",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "위블리즈|옵티마이뮨멀티비타민&미네랄",
+      "brandName": "위블리즈",
+      "canonicalProductName": "옵티마 이뮨 멀티비타민&미네랄",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "671f4ca2-95e3-4c40-8d49-bd3013abcfc3",
+          "name": "옵티마 이뮨 멀티비타민&미네랄",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "659509f6-1f27-4f9f-83ac-62f04e98a5a8",
+          "name": "옵티마 이뮨 멀티비타민&미네랄",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "락토핏|키즈",
+      "brandName": "락토핏",
+      "canonicalProductName": "키즈",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "a9d12be0-24cb-4924-8ea1-d1a03546d0d3",
+          "name": "락토핏 키즈",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "나우푸드|알티지오메가3",
+      "brandName": "나우푸드",
+      "canonicalProductName": "알티지 오메가3",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "88cb313d-50b9-488e-a010-bf97a4db497c",
+          "name": "알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "a9becc1c-1465-4b4d-946a-1dd281cbb5f2",
+          "name": "알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "64fdaf57-e879-4d34-92a2-6ef7ebedcfcd",
+          "name": "알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "프로메가|알티지오메가3듀얼",
+      "brandName": "프로메가",
+      "canonicalProductName": "알티지 오메가3 듀얼",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "0fb4bde8-f6bf-4138-938d-7a8d59791c85",
+          "name": "알티지 오메가3 듀얼",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "3e78139a-fbda-4496-aaff-7468f11a2568",
+          "name": "알티지 오메가3 듀얼",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "아이원|루테인지아잔틴미니",
+      "brandName": "아이원",
+      "canonicalProductName": "루테인 지아잔틴 미니",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "0e3a9372-0334-4488-86ab-1cfb35be833e",
+          "name": "루테인지아잔틴 미니",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "ac8cd56d-aa60-4eb3-847a-d2d2c711645f",
+          "name": "루테인지아잔틴 미니",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "c3e49af8-4d65-4393-8dc1-490bbbc6d2ae",
+          "name": "루테인지아잔틴 미니",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "프로메가|오메가3트리플",
+      "brandName": "프로메가",
+      "canonicalProductName": "오메가3 트리플",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "12c67c2d-73e1-4591-b038-b407c1bbec3e",
+          "name": "프로메가 오메가3 트리플",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "3ea2bc56-286d-4cc0-bcec-d1af0a8445ae",
+          "name": "프로메가 오메가3 트리플",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|퓨어알티지오메가3",
+      "brandName": "고려은단",
+      "canonicalProductName": "퓨어 알티지 오메가3",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "39869a13-1ee0-49a1-ba7d-6c7fdd4088fc",
+          "name": "퓨어 알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "7f7cd2e1-51ff-4dc1-b0e7-75f90f276f0c",
+          "name": "퓨어 알티지오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "91b329ee-1af2-4856-b780-2f5985c0b7ac",
+          "name": "퓨어 알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "프로메가|알티지오메가3듀얼비타민d",
+      "brandName": "프로메가",
+      "canonicalProductName": "알티지오메가3 듀얼 비타민D",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "734477ac-21f1-4660-9496-733ec68c15b8",
+          "name": "프로메가 알티지 오메가3 듀얼 비타민D",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "1105bc2f-6b25-4cdb-a535-ba016d260fa4",
+          "name": "프로메가 알티지 오메가3 듀얼 비타민D",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|루테인지아잔틴아스타잔틴",
+      "brandName": "고려은단",
+      "canonicalProductName": "루테인 지아잔틴 아스타잔틴",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "d26c3d7f-a4a6-42cb-9988-a139d4928e02",
+          "name": "루테인 지아잔틴 아스타잔틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "c14fdc1f-d9e6-4200-b6b8-280b7b067b34",
+          "name": "루테인 지아잔틴 아스타잔틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "5171e92a-8859-4b2a-a741-5ee1398c2539",
+          "name": "루테인지아잔틴 아스타잔틴",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|퓨어알티지오메가3이지",
+      "brandName": "고려은단",
+      "canonicalProductName": "퓨어 알티지 오메가3 이지",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "91fe16ce-de12-4c1e-8d04-0ff5f4537cb9",
+          "name": "퓨어알티지오메가3 이지",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "217a5d82-d465-41ed-9114-f5b778697251",
+          "name": "퓨어 알티지 오메가3 이지",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴트리코어|알티지오메가3",
+      "brandName": "뉴트리코어",
+      "canonicalProductName": "알티지 오메가3",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "88cb313d-50b9-488e-a010-bf97a4db497c",
+          "name": "알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "a9becc1c-1465-4b4d-946a-1dd281cbb5f2",
+          "name": "알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "64fdaf57-e879-4d34-92a2-6ef7ebedcfcd",
+          "name": "알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "아이클리어|루테인지아잔틴",
+      "brandName": "아이클리어",
+      "canonicalProductName": "루테인지아잔틴",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "e97d3149-c592-46d5-8af0-b99095b05901",
+          "name": "루테인지아잔틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "b85ebf90-005f-455a-872d-fe448b7b8f9e",
+          "name": "루테인지아잔틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "d6e8fe11-4108-4d98-bc5f-7630cc05165f",
+          "name": "루테인지아잔틴",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "트루엔|알티지오메가3",
+      "brandName": "트루엔",
+      "canonicalProductName": "알티지오메가3",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "88cb313d-50b9-488e-a010-bf97a4db497c",
+          "name": "알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "a9becc1c-1465-4b4d-946a-1dd281cbb5f2",
+          "name": "알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "64fdaf57-e879-4d34-92a2-6ef7ebedcfcd",
+          "name": "알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "gnm|루테인지아잔틴아스타잔틴",
+      "brandName": "GNM",
+      "canonicalProductName": "루테인 지아잔틴 아스타잔틴",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "d26c3d7f-a4a6-42cb-9988-a139d4928e02",
+          "name": "루테인 지아잔틴 아스타잔틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "c14fdc1f-d9e6-4200-b6b8-280b7b067b34",
+          "name": "루테인 지아잔틴 아스타잔틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "5171e92a-8859-4b2a-a741-5ee1398c2539",
+          "name": "루테인지아잔틴 아스타잔틴",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "쁘띠앤|국민오메가3",
+      "brandName": "쁘띠앤",
+      "canonicalProductName": "국민 오메가3",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "ff13adcb-8eb9-45a8-9c1f-30a702f5d54a",
+          "name": "쁘띠앤 국민 오메가3",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "세노비스|오메가-3",
+      "brandName": "세노비스",
+      "canonicalProductName": "오메가-3",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "e1f540d1-694c-4820-9bec-db6fdfb3ad06",
+          "name": "오메가-3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "8a49bbe4-5dd7-41a8-b10a-cc4b3aa8e87f",
+          "name": "오메가-3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "74e935e7-38e2-43bc-98e2-805c456a7d44",
+          "name": "오메가-3",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "더리틀스|알티지부스터오메가3",
+      "brandName": "더리틀스",
+      "canonicalProductName": "알티지부스터오메가3",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "ac32d250-f1fb-42b3-a220-b25d9f56918f",
+          "name": "알티지부스터오메가3",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "gnm|칼슘마그네슘아연비타민d",
+      "brandName": "GNM",
+      "canonicalProductName": "칼슘 마그네슘 아연 비타민D",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "cf5e3331-1f16-40f0-b3c2-5f5bb0edb6b1",
+          "name": "칼슘 마그네슘 아연 비타민D",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "6c2b9c81-80ce-4195-ba9c-5add82000655",
+          "name": "칼슘 마그네슘 아연 비타민D",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "40ce9a83-3bfd-4cbe-a9b8-fd6dea1012de",
+          "name": "칼슘 마그네슘 아연 비타민D",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "종근당건강|칼슘앤마그네슘비타민d아연",
+      "brandName": "종근당건강",
+      "canonicalProductName": "칼슘 앤 마그네슘 비타민D 아연",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "b6da7c5d-b118-4f66-beab-e116f883e686",
+          "name": "칼슘앤마그네슘비타민D아연",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "트루알엑스|리치비타민d",
+      "brandName": "트루알엑스",
+      "canonicalProductName": "리치비타민D",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "8002e2f4-d537-4d66-9371-2061ded38433",
+          "name": "리치비타민D",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|메가도스d비타민d32000iu",
+      "brandName": "고려은단",
+      "canonicalProductName": "메가도스D 비타민D3 2000IU",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "5db976cd-ef9c-488c-8486-b3ada00b13d5",
+          "name": "메가도스D 비타민D3 2000IU",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "822d04ab-6575-419a-9bf0-a33f49bd3533",
+          "name": "메가도스D 비타민D3 2000IU",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|메가도스d비타민d34000iu",
+      "brandName": "고려은단",
+      "canonicalProductName": "메가도스D 비타민D3 4000IU",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "0dd4b7f9-87e3-4e30-8b3c-adeced4ef0a4",
+          "name": "메가도스D 비타민D3 4000IU",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴트리디데이|프리미엄칼슘마그네슘아연비타민d",
+      "brandName": "뉴트리디데이",
+      "canonicalProductName": "프리미엄 칼슘 마그네슘 아연 비타민D",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "c885f5a5-0dc0-49c8-a890-7ce503f40d2b",
+          "name": "프리미엄 칼슘마그네슘아연비타민D",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "d76e204e-4d2d-4e90-91cc-ef68aae4e447",
+          "name": "프리미엄 칼슘 마그네슘 아연 비타민D",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "43b86f57-826a-48e8-b7ff-959c242196c6",
+          "name": "프리미엄 칼슘 마그네슘 아연 비타민D",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "솔가|비타민d31000iu",
+      "brandName": "솔가",
+      "canonicalProductName": "비타민 D3 1000IU",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "3fcc8319-e545-4b47-835b-7a513108c778",
+          "name": "비타민D3 1000IU",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "49e6b5fa-3ec0-4dde-8c31-9ea37a8d5569",
+          "name": "비타민D3 1000IU",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "아임비타|비타민구미젤리",
+      "brandName": "아임비타",
+      "canonicalProductName": "비타민 구미젤리",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "c20e12d8-6919-4175-9ec6-d5fad6b1ef56",
+          "name": "비타민 구미젤리",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "닥터린|초임계알티지오메가3",
+      "brandName": "닥터린",
+      "canonicalProductName": "초임계 알티지 오메가3",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "274df4f5-074c-41a2-a237-9f10417e0655",
+          "name": "초임계 알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "389154a4-8337-4f30-bf41-c969c05c54aa",
+          "name": "초임계알티지오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "32bd8762-1534-436b-b99a-4842725235a0",
+          "name": "초임계 알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "담백하루|초임계알티지오메가31000",
+      "brandName": "담백하루",
+      "canonicalProductName": "초임계 알티지 오메가3 1000",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "89eaab02-eb7e-4048-ab20-6e387ee30aef",
+          "name": "초임계 알티지 오메가3 1000",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "0a00b5c1-ae13-4a85-8a7f-0400f429d65d",
+          "name": "초임계 알티지 오메가3 1000",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|알티지오메가3",
+      "brandName": "고려은단",
+      "canonicalProductName": "알티지 오메가3",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "88cb313d-50b9-488e-a010-bf97a4db497c",
+          "name": "알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "a9becc1c-1465-4b4d-946a-1dd281cbb5f2",
+          "name": "알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "64fdaf57-e879-4d34-92a2-6ef7ebedcfcd",
+          "name": "알티지 오메가3",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "솔가|철분25",
+      "brandName": "솔가",
+      "canonicalProductName": "철분 25",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "cfcb1125-0325-4259-a55a-68b49323d7b3",
+          "name": "철분 25",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "락피도|철분액상",
+      "brandName": "락피도",
+      "canonicalProductName": "철분액상",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "7d09adb9-1564-4bf1-9ef5-9db98f119f8d",
+          "name": "락피도철분액상",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "b8f6ce2e-5c3c-4b9e-b208-42d8b3c5e6b9",
+          "name": "락피도 철분 액상",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "녹트리서치|슬립케어",
+      "brandName": "녹트리서치",
+      "canonicalProductName": "슬립케어",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "7f32b392-6b3c-479e-89b5-8cdccec03247",
+          "name": "슬립케어",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "바이탈뷰티|굿슬립가바365",
+      "brandName": "바이탈뷰티",
+      "canonicalProductName": "굿슬립 가바 365",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "d90a9aaa-20d1-4bf6-9ace-b1c23fe98705",
+          "name": "굿슬립가바365",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴오리진|이너플로라",
+      "brandName": "뉴오리진",
+      "canonicalProductName": "이너플로라",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "38a257e1-b2c4-4687-a612-a6ecf9d394f5",
+          "name": "이너플로라",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "라엘밸런스|질건강리스펙타프로바이오틱스",
+      "brandName": "라엘밸런스",
+      "canonicalProductName": "질건강 리스펙타 프로바이오틱스",
+      "candidateCategory": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "956dc94d-edbc-4ea2-810e-1646d0409d95",
+          "name": "질 건강 리스펙타 프로바이오틱스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "줄리스초이스|에버글로우피에스트로",
+      "brandName": "줄리스초이스",
+      "canonicalProductName": "에버글로우 피에스트로",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 피부 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "51ad03dd-700b-4c5f-ac1f-c12878bb25bf",
+          "name": "에버글로우 피에스트로",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "티르티르|퍼펙트제로파우더",
+      "brandName": "티르티르",
+      "canonicalProductName": "퍼펙트 제로 파우더",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 소화/위장 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "390c36e0-0405-4c63-a70d-23eed39ebe1a",
+          "name": "퍼펙트 제로파우더",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "락토핏|생유산균슬림",
+      "brandName": "락토핏",
+      "canonicalProductName": "생유산균 슬림",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 소화/위장 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "c510ff86-475a-4b56-b9b8-794d0ec03919",
+          "name": "생유산균슬림",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "스키니랩|애플페논풋사과다이어트젤리",
+      "brandName": "스키니랩",
+      "canonicalProductName": "애플페논 풋사과 다이어트 젤리",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 체지방 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "89fa0b90-a712-4b4c-85aa-41a91b484eb2",
+          "name": "애플페논 풋사과 다이어트 젤리",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "gnm|마그네슘05",
+      "brandName": "GNM",
+      "canonicalProductName": "마그네슘05",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 근육량 증가",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "56d3f335-cc09-4a4f-b4d1-ac1b844b84c5",
+          "name": "마그네슘05",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "이너랩|액티브비타민b",
+      "brandName": "이너랩",
+      "canonicalProductName": "액티브 비타민B",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 근육량 증가",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "2d60b8b3-61ab-450b-ac83-978b376a0e6f",
+          "name": "액티브 비타민B",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "진약사몰|진정주비타c1000",
+      "brandName": "진약사몰",
+      "canonicalProductName": "진정주 비타C 1000",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 항산화 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "537dbff3-8cee-49f2-9a85-c5b95a000530",
+          "name": "진정주 비타C1000",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "그린몬스터|맥스그린프로폴리스",
+      "brandName": "그린몬스터",
+      "canonicalProductName": "맥스 그린프로폴리스",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 항산화 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "ad56a497-4096-4fd4-bfc8-7aa8ec581e97",
+          "name": "맥스그린프로폴리스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "닥터엘리자베스|테아닌과밀크씨슬활력솔루션",
+      "brandName": "닥터엘리자베스",
+      "canonicalProductName": "테아닌과 밀크씨슬 활력 솔루션",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 면역/피로 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "cb7e3fd9-f498-4463-b3f9-eed2c0194461",
+          "name": "테아닌과 밀크씨슬 활력솔루션",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "56c65f62-2ba8-4c5c-8f61-3fe590c722ce",
+          "name": "테아닌과 밀크씨슬 활력솔루션",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "세노비스|코엔자임큐텐",
+      "brandName": "세노비스",
+      "canonicalProductName": "코엔자임큐텐",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 면역/피로 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "e4051a7e-96ec-4815-8a2d-5f09cf486945",
+          "name": "코엔자임큐텐",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "2178b1c9-bdd9-4e04-997c-e069f111a418",
+          "name": "코엔자임큐텐",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "ed70fc57-0620-4d47-a237-1e353519a7b3",
+          "name": "코엔자임큐텐",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "퓨어햅|덴마크프로x",
+      "brandName": "퓨어햅",
+      "canonicalProductName": "덴마크프로X",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 면역/피로 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "fbd9047a-b291-41d3-8b56-2df7fb56e32c",
+          "name": "덴마크 프로X",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|멀티비타민올인원이지",
+      "brandName": "고려은단",
+      "canonicalProductName": "멀티비타민 올인원 이지",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "2997c4b6-7f99-464f-b9c1-ad6001635b1b",
+          "name": "고려은단 멀티비타민 올인원 이지",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "종근당건강|활력비타민b플러스",
+      "brandName": "종근당건강",
+      "canonicalProductName": "활력비타민B 플러스",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "684ef9f9-b972-4eac-9333-4157dce41ec2",
+          "name": "활력비타민B플러스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "센트룸|실버우먼",
+      "brandName": "센트룸",
+      "canonicalProductName": "실버 우먼",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "365129f2-d1ba-4b66-a7d8-c9df84c5780e",
+          "name": "센트룸 실버 우먼",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "네이처메이드|액티브데일리멀티포올",
+      "brandName": "네이처메이드",
+      "canonicalProductName": "액티브 데일리 멀티 포 올",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "b758576f-1d9d-4437-93f1-e4f4138ae06c",
+          "name": "액티브 데일리 멀티 포 올",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "gnm|rtg알티지오메가3",
+      "brandName": "GNM",
+      "canonicalProductName": "rTG알티지오메가3",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "d3cf6bc6-ea24-467a-870c-fa698765b911",
+          "name": "rTG알티지오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "76a87fd7-5a4d-4727-824c-e763be8f0d00",
+          "name": "rTG알티지오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "3a4b62d9-fb68-4757-81ad-e0a94f224e5a",
+          "name": "rTG 알티지 오메가3+",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "세노비스|빌베리+오메가3",
+      "brandName": "세노비스",
+      "canonicalProductName": "빌베리+오메가3",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "d6f19802-fe0f-44e9-9b85-86b29d150992",
+          "name": "빌베리+오메가3",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "gnm|건조한눈엔루테인오메가3",
+      "brandName": "GNM",
+      "canonicalProductName": "건조한 눈엔 루테인오메가3",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "e9bf045e-fe2e-4bc7-acf4-9b59e13ba3c8",
+          "name": "건조한 눈엔 루테인오메가3",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "프로메가|알티지오메가3듀얼플러스",
+      "brandName": "프로메가",
+      "canonicalProductName": "알티지 오메가3 듀얼 플러스",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "8d054cfc-5689-4f62-a17f-59bc94dc7267",
+          "name": "프로메가 알티지 오메가3 듀얼 플러스",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "c8a93cfb-7500-4a15-830d-fd5c64010566",
+          "name": "프로메가 알티지 오메가3 듀얼 플러스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "나우푸드|루테인지아잔틴맥스",
+      "brandName": "나우푸드",
+      "canonicalProductName": "루테인 지아잔틴 맥스",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "87924728-9e66-4503-b5cf-5f65ac2f8334",
+          "name": "루테인지아잔틴 맥스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "애플트리김약사네|눈건강비타민a",
+      "brandName": "애플트리김약사네",
+      "canonicalProductName": "눈건강 비타민A",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "d728b3d6-1a30-4465-aba4-1238e4d1c68b",
+          "name": "눈건강 비타민A",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "88dd7a14-5da1-4e1a-bcde-1a59b3e1d986",
+          "name": "눈건강비타민A",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "69f42f43-a15a-460e-acea-655527aec566",
+          "name": "눈건강비타민A",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "프로메가|오메가3",
+      "brandName": "프로메가",
+      "canonicalProductName": "오메가3",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 혈행 개선",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "8e0723f4-e75c-4141-b3bc-37d4507f3e17",
+          "name": "오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "26ff408c-7c8d-4115-89f0-fefab5cad594",
+          "name": "오메가3",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "bf9421bd-de0b-4da2-be8e-4c0f3610eb4f",
+          "name": "오메가3",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "블랙모어스|칼슘마그네슘플러스비타민d",
+      "brandName": "블랙모어스",
+      "canonicalProductName": "칼슘 마그네슘 플러스 비타민 D",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "cfb99e67-21d2-4feb-9702-7f97a3f5769d",
+          "name": "칼슘 마그네슘 플러스 비타민 D",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "얼라이브|칼슘",
+      "brandName": "얼라이브",
+      "canonicalProductName": "칼슘",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "baeadf07-3d03-4156-a934-c88b7b42aa8e",
+          "name": "칼슘",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "1320ee55-b8df-45c9-b82c-00d73fe60077",
+          "name": "칼슘",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "e1238750-dce7-4b09-8f4d-448712dee118",
+          "name": "칼슘",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "아임비타|비타민d2000iu",
+      "brandName": "아임비타",
+      "canonicalProductName": "비타민D2000IU",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "a79169df-d9f2-4985-aa6a-1050b6290f34",
+          "name": "비타민D 2000 IU",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "205351d3-7b1e-4401-b262-d8fbc39cef0f",
+          "name": "비타민D 2000 IU",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "41ce5a33-8245-4270-aba7-cd2b791bac04",
+          "name": "비타민D 2000IU",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "종근당건강|비타민d4000iu츄어블",
+      "brandName": "종근당건강",
+      "canonicalProductName": "비타민D 4000IU 츄어블",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "f6163398-19f8-42ea-9352-69976eef2a75",
+          "name": "비타민D 4000IU 츄어블",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "20502c73-e5d6-4d66-9d49-8017e764e7c2",
+          "name": "비타민D4000IU츄어블",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "60b20bfa-c821-4e0b-a864-b1b99c1ce7cd",
+          "name": "비타민D4000IU츄어블",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "트루알엑스|그날편한보라지유",
+      "brandName": "트루알엑스",
+      "canonicalProductName": "그날 편한 보라지유",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 기타 식품",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "eef7d76b-3303-475b-bdde-d499886992c2",
+          "name": "트루알엑스 그날 편한 보라지유",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "742ed9b4-a986-4a35-8ceb-94a5acd9e5f9",
+          "name": "트루알엑스 그날 편한 보라지유",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴트라라이프|감마리놀렌산보라지유",
+      "brandName": "뉴트라라이프",
+      "canonicalProductName": "감마리놀렌산 보라지유",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 기타 식품",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "466ce359-4957-4d33-b1fa-269dfb8d85a8",
+          "name": "감마리놀렌산 보라지유",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "53ed84ea-1205-4707-9229-a705ad4ad841",
+          "name": "감마리놀렌산 보라지유",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "라엘밸런스|요로건강크랜베리",
+      "brandName": "라엘밸런스",
+      "canonicalProductName": "요로건강 크랜베리",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 기타 식품",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "dc57be8f-d0a1-43f5-b69a-d4cbb628123d",
+          "name": "요로건강 크랜베리",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "67564cad-611d-4660-afd5-bf9dd10d3738",
+          "name": "요로건강 크랜베리",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "정관장|수면건강",
+      "brandName": "정관장",
+      "canonicalProductName": "수면건강",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 기타 식품",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "21fb8c40-2d41-4695-a6fc-9d34d0ca3981",
+          "name": "수면건강",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "b843421b-481b-4f05-84dd-0a8058093133",
+          "name": "수면건강",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "브레인웨이브|베타포커스",
+      "brandName": "브레인웨이브",
+      "canonicalProductName": "베타포커스",
+      "candidateCategory": "피부별 랭킹 > 건성 > 이너뷰티 > 기타 식품",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "93dd3d0f-2ec6-428a-be52-1c1c87755c40",
+          "name": "베타 포커스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "그린몬스터|다이어트스페셜3키토산3200",
+      "brandName": "그린몬스터",
+      "canonicalProductName": "다이어트 스페셜3 키토산3200",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 체지방 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "f6b07b19-7ba5-4bfa-9f68-c93d46c76da4",
+          "name": "다이어트 스페셜 3 키토산 3200",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "스키니랩|가르시니아다이어트",
+      "brandName": "스키니랩",
+      "canonicalProductName": "가르시니아 다이어트",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 체지방 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "32e27588-ee4c-460a-8141-a2318b0614ee",
+          "name": "가르시니아다이어트",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "102545ed-c2e9-4e60-a699-6c2640f2ddb6",
+          "name": "가르시니아 다이어트",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "cf9537f6-b3a0-440b-b44a-cc50356b9e4b",
+          "name": "가르시니아 다이어트",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "네츄럴굿띵스|속편한다이어트",
+      "brandName": "네츄럴굿띵스",
+      "canonicalProductName": "속편한 다이어트",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 체지방 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "90abc6db-1166-44dd-bc1a-667f5eed6971",
+          "name": "속편한 다이어트",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴트리디데이|다이어트스페셜올뉴",
+      "brandName": "뉴트리디데이",
+      "canonicalProductName": "다이어트 스페셜 올뉴",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 체지방 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "c2e60be7-91ce-4fef-a2df-9119d7fd7b3e",
+          "name": "뉴트리디데이다이어트스페셜올뉴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "c247d923-ddcd-49cb-83c6-4bc1a52ea69d",
+          "name": "뉴트리디데이 다이어트 스페셜 올뉴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "f889ad72-4ca7-4ae1-8354-60187bc8dd74",
+          "name": "뉴트리디데이다이어트스페셜올뉴",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "덴프스|비타민b츄어블",
+      "brandName": "덴프스",
+      "canonicalProductName": "비타민B 츄어블",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 근육량 증가",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "92bbb682-9ae0-4b3f-b3a3-f3974a9ce79f",
+          "name": "비타민B 츄어블",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "하루틴|리포좀비타민c",
+      "brandName": "하루틴",
+      "canonicalProductName": "리포좀 비타민C",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 항산화 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "322c979b-191c-45d0-b8ba-03976865b14a",
+          "name": "리포좀 비타민C",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "1c9bfe41-8178-4a1f-8957-1c89a6104374",
+          "name": "리포좀 비타민C",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "6987dae1-d75e-4853-9053-ad3994e0611e",
+          "name": "리포좀 비타민C",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "안국건강|코엔자임q10미니",
+      "brandName": "안국건강",
+      "canonicalProductName": "코엔자임Q10 미니",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 항산화 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "0bb9c32c-b60d-4464-a8f7-934d7506f609",
+          "name": "코엔자임 Q10 미니",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "86085ad1-47c6-4f0e-a951-2ad8abf1c3c5",
+          "name": "코엔자임Q10 미니",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "비타그란|비타민c",
+      "brandName": "비타그란",
+      "canonicalProductName": "비타민C",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 항산화 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "a8706415-2f57-4f1f-b9f8-41f77e1e20cb",
+          "name": "비타민C",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "77e75102-d7a2-4e3f-8ccb-df355a645946",
+          "name": "비타민C",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "c52782e6-d3ad-4c6c-860f-4a9b2a46bee2",
+          "name": "비타민C",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "세노비스|여성을위한멀티비타민미네랄",
+      "brandName": "세노비스",
+      "canonicalProductName": "여성을 위한 멀티비타민미네랄",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "3d747f67-f5c4-42ea-89e1-5f8ae13d3075",
+          "name": "여성을 위한 멀티비타민 미네랄",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "종근당건강|원데이21",
+      "brandName": "종근당건강",
+      "canonicalProductName": "원데이21",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "9c106667-f58b-4642-b2bc-2dd9c08c87be",
+          "name": "원데이21",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "f2398bac-d91e-4575-ab55-1c86b39147cb",
+          "name": "원데이21",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "세노비스|키즈멀티비타민",
+      "brandName": "세노비스",
+      "canonicalProductName": "키즈멀티비타민",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "4f1521d6-5b6e-4605-82da-f584064039b9",
+          "name": "키즈멀티비타민",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "45023fea-87c8-40fd-84eb-aed7e25e9ae8",
+          "name": "키즈멀티비타민19종",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "솔가|남성용멀티비타민&미네랄",
+      "brandName": "솔가",
+      "canonicalProductName": "남성용 멀티비타민&미네랄",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "91016d33-7d02-474a-9ea2-75030be91334",
+          "name": "남성용 멀티비타민&미네랄",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "셀파렉스|에센셜포우먼",
+      "brandName": "셀파렉스",
+      "canonicalProductName": "에센셜 포 우먼",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "42be5f17-5e8e-48c3-bf18-41a65ed84f18",
+          "name": "에센셜포우먼",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "35f3f595-a4ff-4249-9d9b-65f155d17927",
+          "name": "에센셜 포 우먼",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "함소아|프로폴리스",
+      "brandName": "함소아",
+      "canonicalProductName": "프로폴리스",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 면역/피로 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "de1c9476-0c45-4ecd-9164-4292122145df",
+          "name": "프로폴리스",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "15480e24-f26a-4afa-a44a-a2edff643a5b",
+          "name": "프로폴리스",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "32dd6b09-daf9-4545-bd91-63b90fe56268",
+          "name": "프로폴리스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "종근당건강|알로에이뮨스틱",
+      "brandName": "종근당건강",
+      "canonicalProductName": "알로에 이뮨 스틱",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 면역/피로 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "58f4d4af-cac4-482f-96a3-4226be8a08c0",
+          "name": "알로에 이뮨 스틱",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "gnm|50억보장장건강해질유산균",
+      "brandName": "GNM",
+      "canonicalProductName": "50억보장 장 건강해질 유산균",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 면역/피로 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "285e49bd-92bc-42a6-9319-645a6212188e",
+          "name": "50억보장 장 건강해질 유산균",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "겟비너스|씨커트",
+      "brandName": "겟비너스",
+      "canonicalProductName": "씨커트",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 혈행 개선",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "6c6c10ba-57af-48fc-bc66-35f4d1f4ccd2",
+          "name": "씨커트",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "나우푸드|비타민d33000iu",
+      "brandName": "나우푸드",
+      "canonicalProductName": "비타민D3 3000IU",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "b355726f-3276-4e35-931f-3d2ead0f80b9",
+          "name": "비타민D3 3000 IU",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "69d47703-7d7c-45b0-9105-c14a56b3f991",
+          "name": "비타민D3 3000IU",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "덴프스|비타민d츄어블",
+      "brandName": "덴프스",
+      "canonicalProductName": "비타민D 츄어블",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "e839f1b9-5030-46d2-a86f-bdfb2a4b2850",
+          "name": "비타민D츄어블",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "다나음|비타민d5000iu",
+      "brandName": "다나음",
+      "canonicalProductName": "비타민D 5000IU",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "74b06376-d9eb-4983-8002-1091e76e0b30",
+          "name": "비타민D 5000 IU",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "26b90ca4-67ec-4e6c-80a8-bdbae8ddfa04",
+          "name": "비타민D 5000IU",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "10cfd537-04ee-431e-8bbc-3c4d36b3ce67",
+          "name": "비타민D 5000IU",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "라이브포레스트|와이이뮤",
+      "brandName": "라이브포레스트",
+      "canonicalProductName": "와이이뮤",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 기타 식품",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "c3dff086-32c4-4dae-9dee-392a08c9facf",
+          "name": "와이이뮤",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "데이즈온|릴리브피엠",
+      "brandName": "데이즈온",
+      "canonicalProductName": "릴리브피엠",
+      "candidateCategory": "피부별 랭킹 > 지성 > 이너뷰티 > 기타 식품",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "39ecd8e8-02de-4042-82cd-226de34fbc60",
+          "name": "릴리브피엠",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "세노비스|피부촉촉히알루론산",
+      "brandName": "세노비스",
+      "canonicalProductName": "피부촉촉 히알루론산",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 피부 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "529076aa-0e24-4d55-84f5-b83296c49892",
+          "name": "피부촉촉 히알루론산",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "푸드올로지|콜레올로지컷팅젤리",
+      "brandName": "푸드올로지",
+      "canonicalProductName": "콜레올로지 컷팅 젤리",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 체지방 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "cb584f44-471a-4d7f-b133-da3758f832f1",
+          "name": "콜레올로지 컷팅젤리",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "푸드올로지|버닝올로지디데이",
+      "brandName": "푸드올로지",
+      "canonicalProductName": "버닝올로지 디데이",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 체지방 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "f4a60845-ef80-459a-a708-6237140ab321",
+          "name": "버닝올로지 디데이",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "스키니랩|이지슬리밍잔티젠다이어트",
+      "brandName": "스키니랩",
+      "canonicalProductName": "이지슬리밍 잔티젠 다이어트",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 체지방 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "dfec53c6-0cc6-43f6-b480-b4e92e4faacb",
+          "name": "이지슬리밍 잔티젠 다이어트",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "바이오코어|데일리유산균",
+      "brandName": "바이오코어",
+      "canonicalProductName": "데일리 유산균",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 소화/위장 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "bee59b3e-dd82-4bb9-8576-96cac98ab66f",
+          "name": "데일리 유산균",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "종근당건강|프로폴리스플러스",
+      "brandName": "종근당건강",
+      "canonicalProductName": "프로폴리스 플러스",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 항산화 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "8ed1ca04-f3cd-429f-a2cf-9f4f60fa414a",
+          "name": "프로폴리스 플러스",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "dee8f9f3-d513-43e9-afa1-97f61a878123",
+          "name": "프로폴리스플러스",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "a3badf1e-054a-432d-8b43-267be7f498ab",
+          "name": "프로폴리스 플러스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "아임비타|멀티비타민데일리",
+      "brandName": "아임비타",
+      "canonicalProductName": "멀티비타민 데일리",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "32c120c0-f879-4eb7-9108-7a41271edb10",
+          "name": "멀티비타민 데일리",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "gnm|종합비타민미네랄15",
+      "brandName": "GNM",
+      "canonicalProductName": "종합비타민 미네랄15",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "205f91f0-f72d-4c9d-8f59-c48bd1f972f4",
+          "name": "종합비타민미네랄15",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "판토모나|비오틴하이퍼포머",
+      "brandName": "판토모나",
+      "canonicalProductName": "비오틴 하이퍼포머",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "eaaafd51-2712-4962-aca9-58ad088ac26c",
+          "name": "판토모나 비오틴 하이퍼포머",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "이너비|아이시안루테인지아잔틴플러스케어",
+      "brandName": "이너비",
+      "canonicalProductName": "아이시안 루테인지아잔틴 플러스케어",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "505e958d-afc0-44a8-89e9-4e31b7ce0816",
+          "name": "아이시안 루테인 지아잔틴 플러스 케어",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴트리원라이프|루테인지아잔틴164",
+      "brandName": "뉴트리원라이프",
+      "canonicalProductName": "루테인 지아잔틴 164",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "2e99d870-cf09-401a-a611-2e6202a67b3d",
+          "name": "루테인지아잔틴 164",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "순수식품|rtg알티지오메가3복합기능성",
+      "brandName": "순수식품",
+      "canonicalProductName": "rTG 알티지 오메가3 복합 기능성",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "dd4a1f9b-7f41-485e-b411-4294b55df16e",
+          "name": "rTG 알티지 오메가3 4종 복합 기능성",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "쁘띠앤|국민칼마디",
+      "brandName": "쁘띠앤",
+      "canonicalProductName": "국민 칼마디",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "16b35620-e62b-4843-8f47-7e1baf26228b",
+          "name": "쁘띠앤 국민 칼마디",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "0be3c264-9197-4ea4-9ccc-c746e949460d",
+          "name": "쁘띠앤 국민 칼마디",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "ec775cea-a816-4c3d-897d-76117ab3e092",
+          "name": "쁘띠앤 국민 칼마디",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "세노비스|달맞이꽃종자유",
+      "brandName": "세노비스",
+      "canonicalProductName": "달맞이꽃종자유",
+      "candidateCategory": "피부별 랭킹 > 중성 > 이너뷰티 > 기타 식품",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "420660fc-d721-41fe-96de-80dc3c0e079b",
+          "name": "달맞이꽃종자유",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "9d54644e-8d38-4c44-9714-e9f31eea1908",
+          "name": "달맞이꽃종자유",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "0da6fa98-b68e-4868-ad4f-e1ecaf144320",
+          "name": "달맞이꽃종자유",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "필리브|면역비타민c",
+      "brandName": "필리브",
+      "canonicalProductName": "면역비타민C",
+      "candidateCategory": "피부별 랭킹 > 복합성 > 이너뷰티 > 항산화 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "dcea46f0-2a6a-447d-af1f-fa9f48583678",
+          "name": "면역비타민C",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "대웅제약|에너씨슬베이직",
+      "brandName": "대웅제약",
+      "canonicalProductName": "에너씨슬 베이직",
+      "candidateCategory": "피부별 랭킹 > 복합성 > 이너뷰티 > 면역/피로 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "7f3733b2-cfa1-402e-8875-fb064e820703",
+          "name": "에너씨슬 베이직",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴트리디데이|프리미엄루테인골드",
+      "brandName": "뉴트리디데이",
+      "canonicalProductName": "프리미엄 루테인 골드",
+      "candidateCategory": "피부별 랭킹 > 복합성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "00d3d0ea-9a1f-4e11-936c-777213a8b75e",
+          "name": "프리미엄 루테인 골드",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "33031799-28a5-414c-bbdb-58e6c862e70b",
+          "name": "프리미엄루테인골드",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "a00f5607-6892-40ce-927b-3ded09158617",
+          "name": "프리미엄루테인골드",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "마인트리|루테인지아잔틴",
+      "brandName": "마인트리",
+      "canonicalProductName": "루테인 지아잔틴",
+      "candidateCategory": "피부별 랭킹 > 복합성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "e97d3149-c592-46d5-8af0-b99095b05901",
+          "name": "루테인지아잔틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "b85ebf90-005f-455a-872d-fe448b7b8f9e",
+          "name": "루테인지아잔틴",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "d6e8fe11-4108-4d98-bc5f-7630cc05165f",
+          "name": "루테인지아잔틴",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "데일리케어|유한루테인지아잔틴",
+      "brandName": "데일리케어",
+      "canonicalProductName": "유한 루테인지아잔틴",
+      "candidateCategory": "피부별 랭킹 > 복합성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "c5a88421-ec6b-4ad6-8180-f22c7d91af89",
+          "name": "유한 루테인지아잔틴",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "경남제약|스트레스케어",
+      "brandName": "경남제약",
+      "canonicalProductName": "스트레스케어",
+      "candidateCategory": "피부별 랭킹 > 복합성 > 이너뷰티 > 기타 식품",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "e3a7af8c-e895-4ee4-8e44-15cb951d666a",
+          "name": "스트레스 케어",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "1a3ae79c-85fd-4a55-ae33-f6ea48005899",
+          "name": "스트레스케어",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "c73f0029-4ddc-4d33-a0ac-0a86f06789cb",
+          "name": "스트레스 케어",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "그린몬스터|혈당관리다이어트하루컷",
+      "brandName": "그린몬스터",
+      "canonicalProductName": "혈당관리 다이어트 하루 컷",
+      "candidateCategory": "피부별 랭킹 > 민감성 > 이너뷰티 > 체지방 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "fb9ecedc-6c98-499f-996a-4bdc423502fd",
+          "name": "혈당관리 다이어트 하루 컷",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴트리디데이|rtg알티지오메가3골드",
+      "brandName": "뉴트리디데이",
+      "canonicalProductName": "rTG 알티지 오메가3 골드",
+      "candidateCategory": "피부별 랭킹 > 민감성 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "a7003d17-a86e-4525-b52b-f37381bdf6f1",
+          "name": "rTG 알티지 오메가3 골드",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "5a6b9933-8443-452e-8a08-795b720cf4f7",
+          "name": "rTG 알티지 오메가3 골드",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "c66f4050-91c0-43aa-8dc7-3e5152fb3950",
+          "name": "rTG 알티지 오메가3 골드",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "바이너랩|글로이",
+      "brandName": "바이너랩",
+      "canonicalProductName": "글로이",
+      "candidateCategory": "피부별 랭킹 > 아토피 > 이너뷰티 > 피부 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "89dfdab5-99de-449f-891f-407ef03ac4a8",
+          "name": "글로이",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "피토틱스|옐로우",
+      "brandName": "피토틱스",
+      "canonicalProductName": "옐로우",
+      "candidateCategory": "피부별 랭킹 > 아토피 > 이너뷰티 > 소화/위장 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "69ce5195-5cd1-477a-aebc-c60ee13e7702",
+          "name": "피토틱스 옐로우",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "락토핏|플러스듀얼바이오틱스",
+      "brandName": "락토핏",
+      "canonicalProductName": "플러스 듀얼바이오틱스",
+      "candidateCategory": "피부별 랭킹 > 아토피 > 이너뷰티 > 소화/위장 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "6d40c4f9-54b4-4c9e-85f8-1b4f41637d4d",
+          "name": "락토핏 플러스 듀얼바이오틱스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "스키니랩|가벼워지는시서스다이어트",
+      "brandName": "스키니랩",
+      "canonicalProductName": "가벼워지는 시서스 다이어트",
+      "candidateCategory": "피부별 랭킹 > 아토피 > 이너뷰티 > 체지방 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "9658b97c-8a2e-4742-b46b-10ae32b0789d",
+          "name": "가벼워지는시서스다이어트",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "네이처메이드|액티브데일리멀티포우먼",
+      "brandName": "네이처메이드",
+      "canonicalProductName": "액티브 데일리 멀티 포 우먼",
+      "candidateCategory": "피부별 랭킹 > 아토피 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "133cdef0-31a1-4e82-aab1-e55fd370f60c",
+          "name": "액티브 데일리 멀티 포 우먼",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "프롬바이오|관절연골엔보스웰리아",
+      "brandName": "프롬바이오",
+      "canonicalProductName": "관절연골엔 보스웰리아",
+      "candidateCategory": "피부별 랭킹 > 아토피 > 이너뷰티 > 뼈/관절/치아 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "1e00e31d-9ab2-43ba-ac9c-35052efebe2b",
+          "name": "관절연골엔 보스웰리아+",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "4c09140d-c695-475f-92b7-5618dc9d6781",
+          "name": "관절연골엔 보스웰리아",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "8907f010-e1ea-4db5-9e66-b649519a1e3a",
+          "name": "관절연골엔 보스웰리아",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "니몸내몸|뻔뜩젤리루테인",
+      "brandName": "니몸내몸",
+      "canonicalProductName": "뻔뜩 젤리 루테인",
+      "candidateCategory": "피부별 랭킹 > 아토피 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "86a88187-4282-4baa-a2cd-907a8bbab8df",
+          "name": "뻔뜩 젤리 루테인",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "닥터린|인케어",
+      "brandName": "닥터린",
+      "canonicalProductName": "인케어",
+      "candidateCategory": "피부별 랭킹 > 아토피 > 이너뷰티 > 기타 식품",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "6c7568ff-b7d0-4f75-9649-0f26574dea89",
+          "name": "인 케어",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "비비랩|히알루론산",
+      "brandName": "비비랩",
+      "canonicalProductName": "히알루론산",
+      "candidateCategory": "연령대별 랭킹 > 10대 > 이너뷰티 > 피부 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "86dc4e73-09a3-4f60-a9c9-e39c7d32355f",
+          "name": "히알루론산+",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "19ecd631-8ab6-40a0-a4b5-256cc5de2d57",
+          "name": "히알루론산",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "9b470db7-4451-4e22-9191-ccfe81894f4c",
+          "name": "히알루론산",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "에버콜라겐|인앤업플러스",
+      "brandName": "에버콜라겐",
+      "canonicalProductName": "인앤업 플러스",
+      "candidateCategory": "연령대별 랭킹 > 10대 > 이너뷰티 > 피부 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "71fce03e-f22d-495d-aff2-88bd93f72008",
+          "name": "에버콜라겐 인앤업 플러스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "라이필|더마콜라겐",
+      "brandName": "라이필",
+      "canonicalProductName": "더마 콜라겐",
+      "candidateCategory": "연령대별 랭킹 > 10대 > 이너뷰티 > 피부 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "ac6ecaa3-b1c1-4444-aae6-dbf22337a450",
+          "name": "라이필 더마 콜라겐",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "아임비타|멀티비타민바이탈",
+      "brandName": "아임비타",
+      "canonicalProductName": "멀티비타민 바이탈",
+      "candidateCategory": "연령대별 랭킹 > 10대 > 이너뷰티 > 종합 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "035c2b2b-6a51-49a6-8e33-16e91a08450e",
+          "name": "멀티비타민 바이탈",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "6d6e24a3-6239-4dfc-8fc2-cbfd564aadaa",
+          "name": "멀티비타민 바이탈 50포",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "고려은단|비타민c1000구미",
+      "brandName": "고려은단",
+      "canonicalProductName": "비타민C 1000 구미",
+      "candidateCategory": "연령대별 랭킹 > 10대 > 이너뷰티 > 항산화 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "7064eaaa-838d-4270-9aab-929ca88cbfe5",
+          "name": "고려은단 비타민C 1000 구미",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "니몸내몸|튼튼젤리비타민c",
+      "brandName": "니몸내몸",
+      "canonicalProductName": "튼튼 젤리 비타민C",
+      "candidateCategory": "연령대별 랭킹 > 10대 > 이너뷰티 > 항산화 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "f2f9dbb6-575e-444e-8e24-260e3337aa6a",
+          "name": "튼튼 젤리 비타민C",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "뉴트리디데이|플러스비타민d1000iu",
+      "brandName": "뉴트리디데이",
+      "canonicalProductName": "플러스 비타민D 1000 IU",
+      "candidateCategory": "연령대별 랭킹 > 10대 > 이너뷰티 > 뼈/관절/치아 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "233fb2f5-9210-4f87-aab6-2cfd8e5bc82e",
+          "name": "뉴트리디데이 플러스 비타민D 1000IU",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "씨스팡|관절팔팔",
+      "brandName": "씨스팡",
+      "canonicalProductName": "관절팔팔",
+      "candidateCategory": "연령대별 랭킹 > 10대 > 이너뷰티 > 뼈/관절/치아 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "86e7da36-67f8-4549-bbbf-363b0e437c52",
+          "name": "관절팔팔",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "프로메가|식물성오메가3듀얼",
+      "brandName": "프로메가",
+      "canonicalProductName": "식물성 오메가3 듀얼",
+      "candidateCategory": "연령대별 랭킹 > 10대 > 이너뷰티 > 혈행 개선",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 2,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "d54fd9f9-dc96-4001-87ce-23bb2e609c9f",
+          "name": "프로메가 식물성 오메가3 듀얼",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "84d2e3d0-ccd6-4bbe-8f20-2f7924afed74",
+          "name": "프로메가 식물성오메가3 듀얼",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "세노비스|프로폴리스",
+      "brandName": "세노비스",
+      "canonicalProductName": "프로폴리스",
+      "candidateCategory": "연령대별 랭킹 > 20대 > 이너뷰티 > 면역/피로 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "de1c9476-0c45-4ecd-9164-4292122145df",
+          "name": "프로폴리스",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "15480e24-f26a-4afa-a44a-a2edff643a5b",
+          "name": "프로폴리스",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "32dd6b09-daf9-4545-bd91-63b90fe56268",
+          "name": "프로폴리스",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "정관장|홍삼톤",
+      "brandName": "정관장",
+      "canonicalProductName": "홍삼톤",
+      "candidateCategory": "연령대별 랭킹 > 30대 > 이너뷰티 > 면역/피로 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "cb30d8b9-71c9-4453-ab11-515f809dd2ae",
+          "name": "홍삼톤",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "gnm|메가비타민c3000",
+      "brandName": "GNM",
+      "canonicalProductName": "메가 비타민C 3000",
+      "candidateCategory": "연령대별 랭킹 > 30대 > 이너뷰티 > 항산화 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "8908a958-fee8-4354-bd27-8bac7e7fe523",
+          "name": "메가 비타민C 3000",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "49ad4f62-bb75-45f8-8471-65b923535c2b",
+          "name": "메가 비타민C 3000",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "c6936fb7-2318-44aa-9966-4a63ac4f7018",
+          "name": "메가 비타민C 3000",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "아이클리어|루테인",
+      "brandName": "아이클리어",
+      "canonicalProductName": "루테인",
+      "candidateCategory": "연령대별 랭킹 > 30대 > 이너뷰티 > 눈 건강",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 3,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "86af14ec-749b-4826-b6eb-c2c40159206f",
+          "name": "루테인",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "bafd4306-8c1f-4ea1-945f-364cfd935d0d",
+          "name": "루테인",
+          "regulatoryType": "건강기능식품"
+        },
+        {
+          "id": "a035c762-6aa0-46a8-b4c2-9628e58416c2",
+          "name": "루테인",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    },
+    {
+      "key": "세리박스|세리컷스타터샤이닝",
+      "brandName": "세리박스",
+      "canonicalProductName": "세리컷 스타터 샤이닝",
+      "candidateCategory": "연령대별 랭킹 > 40대 이상 > 이너뷰티 > 면역/피로 관리",
+      "candidateSources": [
+        "HWAHAE_RANKING"
+      ],
+      "masterCount": 1,
+      "masterRegulatoryTypes": [
+        "건강기능식품"
+      ],
+      "masters": [
+        {
+          "id": "4b0e02fe-33b2-485c-b631-9bdbdf687379",
+          "name": "세리컷 스타터 샤이닝",
+          "regulatoryType": "건강기능식품"
+        }
+      ],
+      "verdict": "NOT_COSMETIC",
+      "reason": "후보가 이너뷰티(건강기능식품)이고 기존 master 도 비화장품"
+    }
+  ]
+}

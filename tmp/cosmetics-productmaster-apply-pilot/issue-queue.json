@@ -1,0 +1,2804 @@
+{
+  "wo": "WO-O4O-COSMETICS-DESCRIPTION-AUTHORING-POLICY-AND-PRODUCTMASTER-PILOT-V2",
+  "note": "자동 보정 대상이 아니다. 설명서 feature 결손은 WO §14 상 중지 사유가 아니며 후속 보완 대상이다.",
+  "A_pendingJudgement": {
+    "count": 2,
+    "items": [
+      {
+        "key": "몽뜨허브|보습케어",
+        "brandName": "몽뜨허브",
+        "canonicalProductName": "보습케어",
+        "candidateCategory": "뷰티|스킨케어|스킨케어 세트",
+        "candidateSources": [
+          "MUSINSA_BEAUTY"
+        ],
+        "masterCount": 1,
+        "masterRegulatoryTypes": [
+          "건강기능식품"
+        ],
+        "masters": [
+          {
+            "id": "c10d2ad7-e9e2-4d49-9d33-6d75125d74c5",
+            "name": "보습케어",
+            "regulatoryType": "건강기능식품"
+          }
+        ],
+        "verdict": "DIFFERENT_PRODUCT_SAME_NAME",
+        "reason": "기존 master 규제유형이 비화장품(건강기능식품) — 이름만 같다"
+      },
+      {
+        "key": "메디필|레드케어패치",
+        "brandName": "메디필",
+        "canonicalProductName": "레드 케어 패치",
+        "candidateCategory": "뷰티|마스크팩|부분마스크/코팩/패치",
+        "candidateSources": [
+          "MUSINSA_BEAUTY"
+        ],
+        "masterCount": 1,
+        "masterRegulatoryTypes": [
+          "QUASI_DRUG"
+        ],
+        "masters": [
+          {
+            "id": "6056c92e-9f04-4189-b9d3-8b8e5319d21c",
+            "name": "메디필레드케어패치",
+            "regulatoryType": "QUASI_DRUG"
+          }
+        ],
+        "verdict": "CHECK",
+        "reason": "판단 불가(규제유형 QUASI_DRUG) — 자동 연결하지 않는다"
+      }
+    ]
+  },
+  "B_dryRunCheck": {
+    "count": 0,
+    "items": []
+  },
+  "C_applyConflictOrFailure": {
+    "conflicts": 0,
+    "failures": 0,
+    "items": []
+  },
+  "D_contentGaps": {
+    "count": 287,
+    "byIssueType": {
+      "PRODUCT_TYPE_UNDETERMINED": 3,
+      "TYPE_NAME_MISMATCH": 154,
+      "PRODUCT_TYPE_AXIS_NOT_FORM": 1,
+      "TYPE_NAME_CONTRADICTION": 1,
+      "NO_OBSERVED_FEATURE": 181,
+      "NAME_TOO_SHORT": 1
+    },
+    "byMissingField": {
+      "productType": 4,
+      "usage": 5,
+      "mainFeatures": 181
+    },
+    "items": [
+      {
+        "key": "토리든|밸런스풀포맨시카프레쉬올인원",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "productType",
+          "usage"
+        ],
+        "issueTypes": [
+          "PRODUCT_TYPE_UNDETERMINED"
+        ]
+      },
+      {
+        "key": "더페이스샵|더블랙밤크림플루이드",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "미구하라|라이트벨벳비피크림오리진",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "시드물|메가펩타이드에코하이드로수딩비비크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "체이싱래빗|올어바웃글로우커버크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "듀이트리|더클린랩더마나이아신아마이드오일세럼",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "가히|아쿠아쉴드선로션",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "더페이스샵|파워롱래스팅선스틱",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "라비오뜨|콜라겐피디알엔마일드선크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "마녀공장|로터스프라이머프리선크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "몰바니|트리플디펜스데일리선크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "부쉬맨|스포츠톤업선쿠션spf50",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "셀리맥스|듀얼배리어워터리선크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "싸이닉|엔조이세이프티마일드선크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "엘리샤코이|올데이모이스처선에센스",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "유이크|바이옴레미디톤업선크림보라",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "케이시크릿|서울1988소나무선크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "톤핏선|비건노세범선스틱",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "프레티|데일리톤업시카선크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "ahc|마스터즈아이시젤리선스틱",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "미샤|비타씨플러스잡티씨탄력앰플밤스틱",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "편강율|디어맘토탈케어수분크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "usage"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "PRODUCT_TYPE_AXIS_NOT_FORM"
+        ]
+      },
+      {
+        "key": "엘리샤코이|테트라포스시카스팟젤",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "유이크|바이옴레미디아크네클렌징폼",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "케어놀로지|리블루인텐시브솔루션오일겔마스크",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "한율|보들은행잎모공핏마스크",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "그라펜|오리지널다운펌",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "productType",
+          "usage"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_CONTRADICTION"
+        ]
+      },
+      {
+        "key": "데싱디바|매직프레스스타룬(숏스퀘어)네일팁",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "데싱디바|조앤프렌즈매직프레스페디큐어스타프렌즈",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "오피아이|[네일락커]e74-youresuchatbudapest",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "오피아이|[네일락커]t65-putitinneutral",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "오피아이|[프로스파]풋파일",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "웨이크메이크|퍼펙트네일리무버",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "블랙몬스터|5in1올데이보습올인원+나이트케어크림set",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "네이밍|블러리하트립틴트",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "디어에이|하이드로듀이틴트5colors",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "롬앤|제로벨벳틴트",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "무지개맨션|오브제리퀴드",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "비바이바닐라|스머징립펜슬[be03살몬누드]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "아이레시피|바이브업프리즘립밤",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "오프라코스메틱|립글로즈-러브",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "쿠다라|로지핑크밤",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "포렌코즈|mini타투끌레르벨벳틴트",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "글로우풀|멀티비타래디언스시트마스크x(투명파우치)",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "러븀|[대용량]애프터글로우유자겔마스크",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "벤튼|알로에수딩마스크팩",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "아로셀|슈퍼콜라겐마스크2.0ecmactive",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "코엘프|루비&불가리안로즈하이드로겔아이패치",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "나스|라이트리플렉팅루미나이징블러쉬",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "더샘|젤리블러셔14colors",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "딘토|래쉬디파이너",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "루나|수분광팩트클리어",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "머지|뉴무드핏섀도우팔레트",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "미샤|오버렝스닝마스카라",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "블랑디바|비글로이틴트",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "스와니코코|펩타인바이옴bb크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "언리시아|새틴웨어헬시-그린쿠션",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "에이지투웨니스|뉴오리지널에센스팩트샤이닝드롭에디션퍼플",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "입큰&|퍼스널톤코렉팅블러팩트[라벤더]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "케이트|버추얼스킨메이커파운데이션",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "클리오|프로싱글섀도우",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "투쿨포스쿨|아트클래스벨루어펜슬",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "퓌|쿠션에그핏커버5colors",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "홀리카홀리카|앳퍼스트아이그립팟",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "에이피엘비|콜라겐egf펩타이드미스트에센스",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "린든리브즈|아로마테라피시너지바디오일앱솔루트드림즈",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "에스더블유나인틴|sw19midnighthand&bodylotion",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "히든|퍼퓸스프레이바디로션[스포틸그린]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "더바디샵|브리티쉬로즈선물(888250)",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "러쉬|x산리오캐릭터즈]우사하나-배쓰밤/입욕제",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "비욘드|딥모이스처크리미슈가바디스크럽",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "온더바디|플라워바디워시x(체리블라썸/다마스크로즈/아이리스)",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "블리블리|워터물광밤",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "무코타|[두피라인]그린펌프노말샴푸",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "허브스서울|노세범샴푸바오일프리브릭바(약산성무자극)지성헤어&2pack듀얼",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "데이셀코스메틱|메디랩블랙로즈블로썸데일리수분광채선크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "바노바기|[안소희pick]4디펜스매트핏선스틱spf50",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "아떼|비건릴리프라이팅톤업선쿠션폼폼푸린spf50",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "이니스프리|데일리uv톤업노세범선크림핑크",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "프롬리에|5gf톤업선앰플비비",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "마리엔메이|이데베논+블랙베리콤플렉스세럼",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "아비브|pdrn레티날아이패치글로우젤리",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "퓨리펙트|내추럴100%클리어티트리세럼",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "구달|청귤비타c토닝클렌징밤트래블키트",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "리본셀|로지글로우올데이스킨핏톤업선+솝베리트리플시너지클렌징젤",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "스노우투플러스|멜라스노우마그네슘기미패치(주름미백마그네슘케어)",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "카이네|홀리데이에디션:allyouloved",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "빈스캐빈|발효미백잡티앰플단품",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "무코타|트리트먼트이지컬러염색약시즌2옐로우브라운",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "지저쓰|마일드허니소프트왁싱키트",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "닥터비타|실리포스+레티놀프리미엄비타민a크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "바이오더마|아토덤인텐시브밤",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "에오포리파잉(샴푸&트리트먼트)|루미너스톤업크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "토코보|[트래블4종미니키트]시카선세럼",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "가히|클렌징밤",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "스킨시그널|효소클렌징밀크(자외선차단제완벽세정)+효소클렌저+효소클렌저샤쉐",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "꼬네|부아뒤레퍼퓸드솝",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "바닐라코|클린잇제로오리지널클렌징밤",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "에뛰드|베이킹파우더b.b딥클렌징폼",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "피캄|터메릭커큐민버블딥마스크",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "빌리프|맨올로지히알루론리차저",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "하다라보|고쿠쥰프리미엄로션",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "파티온|노스카나인트러블패드7일키트",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "아크네스|퍼펙트솔루션스팟패치",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "밀크바오밥|오리지널트리트먼트[화이트머스크]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "나이팅게일|3단계빅사이즈문어코팩타코팩노즈(5)",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "데이셀코스메틱|고은딜발효탄력케어문제성피부개선저자극워시오프크림마스크",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "비밸런스|스노우마스크",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "초린|모델링팩파우더&앰플",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "어스|풋마스크리프레쉬",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "러퓸|베리베이오핸드케어",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "오데일리|라라센트비건퍼퓸거품형핸드워시손세정제집들이선물2p",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "더블유드레스룸|[2개선택]드레스퍼퓸&핸드크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "바울|오드퍼퓸진저벨",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "블랙하비|124.모닝고농축드레스퍼퓸",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "블랙하비|293.엘더플라워고농축드레스퍼퓸",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "블랙하비|465.핑크플라워고농축드레스퍼퓸",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "아노에틱뷰티|anoeticperfumebalm01우디향",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "엔트런스|오드퍼퓸[오리엔탈템플]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "지땅느|로사센티폴리아[싱글플로랄/장미꽃잎과레더리의조화edp]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "페브리즈|화장실용비치형상쾌한비누향",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "려|헤어쿠션(짙은갈색/자연갈색)",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "더샘|실크헤어리페어컬세럼",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "아르가니케어|알로에베라&아르간오일건조모발용헤어오일세럼",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "다슈|데일리웨트컬크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "아르투아|퍼퓸탈모기능성샴푸",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "데싱디바|매직프레스나이스웨이네일팁(코핀)",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "데싱디바|매직프레스토브(레귤러라운드)네일팁",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "데싱디바|원젤컬러키트클라우디",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "엣지유|프리즘아이스화이트붙이는젤페디",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "오피아이|[네일락커]h025-kissmyaries",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "오피아이|[네일락커]sh02-throwmeakiss",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "오피아이|[인피니트샤인]m23-strawberrymargarita",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "오피아이|[mymeera][인피니트샤인]148-oncloudfine",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "위드샨|커스텀마그네틱네일폴리쉬",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "더후|천기단화현로션",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "까탈릭|나르시스무드레이어108.파리지앵퍼플",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "닥터포포|틴티드미니컬러밤1",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "디올|어딕트립맥시마이저[001핑크]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "레터리뷰티|피디알엔립",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "립힙|롱래스팅립매트벨벳틴트10color",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "무운|[lip&cheek]pinkpeachpower",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "베라모어|글로우베일플럼핑립밤-로즈",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "비온타임|비건올데이립밤",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "써니콘|립케어(립밤&립마스크)",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "언레이어|멘솔애월립밤5g_듀이",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "엘렌실라|버터멜로우립밤(색상중옵션선택)",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "이니스프리|듀이글로이립스틱(옵션선택)",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "코시에로|젤러시글로우틴트플럼퍼",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "포렌코즈|올라이트무드쉬폰립스틱",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "헤라|센슈얼틴티드샤인스틱",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "기어바이가쉬|[수분고속충전/밀착수분]노워시10초마이크로버블팩울트라아쿠아브이",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "달바|클린티트리리포좀시카카밍마스크2box",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "바노바기|프로그램마스크골드프로폴리스",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "어니시|퀵앤캄에센스마스크팩쑥",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "프리메이|옐로우비타민앰플마스크10p",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "글로우|브리비비크림[1]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "더페이스샵|맥스아이비건래쉬앰플",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "듀엠|글리밍베일커버쿠션",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "라라츄|슬릭웨어파운데이션",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "롬앤|베러댄컨투어[01뉴트럴웜]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "르누베르|아줄렌페이스커버픽싱파우더",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "마르시끄|인리치드pdrn메이크업비건픽싱실러",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "메이크업포에버|hdskin파우더파운데이션",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "미샤|글로우톤업로즈팩트spf50",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "바닐라코|올데이프렙톤업베이스크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "보나메두사|오렌지스킨딜리트소프트그린미니",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "샬랑드파리|모공블러롱웨어쿠션엑셀랑스",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "스킨푸드|연어pdrn아이래쉬세럼",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "에뛰드|래스팅커버톡컨실팟",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "엠도씨|맨즈비비크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "웨이크메이크|소프트블러링아이팔레트[10레이지핑크블러링]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "입큰|[3set]플랩원젤리싱글하이라이터",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "정샘물|프로래스팅피니쉬파우더",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "컬러그램|올인원애교살메이커[07웜피치]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "클라뷰|블루펄세이션하이커버리지마린콜라겐아쿠아쿠션",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "투쿨포스쿨|블리치브로우카라",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "페리페라|하트포켓빔+시럽피톡치크미니하트퍼프",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "헤이미쉬|데일리즘펩타이드인헨싱래쉬세럼",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "힌스|트루디멘션래디언스밤[글리밍]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "셀비엔|호호바오일페이스오일",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "오그램코스메틱스|고리멀티워터오일",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "글로이스트|에폴리스글로우카멜리아프리미엄바디케어",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "바디홀릭|스테이누디바디버터크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "어스|아로마롤온사운드슬립",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "와이트리|유니슬림쿨겔",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "쿤달|소이밀크고보습바디크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "더바디샵|핑크그레이프후룻샤워젤&진저샴푸선물(888158)",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "라부르켓|바디로션",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "러쉬|포용성-배쓰밤/입욕제",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "르버브|파인가든+바디워시+바디로션",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "비욘드|바이탈글로우바디워시스페셜",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "우르오스|스킨워시",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "쿤달|퍼퓸바디케어+바디워시",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "시드물|어성초수제비누",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "무백|[두피/탈모케어]아바하하밤부민트두피스케일러",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "어노브|딥데미지리페어단백질샴푸",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "케라시스|케라틴본드실키모이스춰샴푸/트리트먼트골라담기",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "구달|선크림미니골라담기(수분/톤업/무기자차/선비비)",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "닥터멜락신|아스타잔틴기미미백캡슐크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "더페이스샵|더테라피비건선스틱",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "라타플랑|미나리진정선크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "맥|라이트풀c3올데이톤업밤[웜]",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "미샤|올어라운드세이프블록코튼선스틱",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "블리블리|비타민기미톤업선세럼",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "솔리데이|스킨디펜스톤쉴드선cc",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "아가31도|이뮤니티제로디-스티키선스틱",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "앰플엔|솔라샷피치톤업선크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "엘로엘|팡팡선쿠션미니",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "클라랩|판테카인텐시브선크림",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "파파레서피|라이스블레미쉬딥모이스트선크림spf50",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "브이티코스메틱|vt콜라겐리들샷100",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "아넷사|데이세럼n",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "토르홉|사우난지앙솔트마스크",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "닥터지|레드블레미쉬클리어수딩크림50mlx선물하기",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "마리엔메이|시카수딩젤크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "브이티코스메틱|vt리들샷300+700",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "에비딘|까멜리아화잘먹",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "클레어스|김도영pick언센티드토너",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "데이셀코스메틱|데이셀스페셜프로그램닥터이오닉&닥터비타비타민앰플",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "브래비티|모이스처라이징앰플[대용량]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "쿠피|피디알엔연어앰플",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "가히|스킨핏블렌딩에센스",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "미쟝센|8주지속헬로크림더블커버2입",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "에뜨와|오가닉오일",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "보타닉센스|카르본기미잡티피부톤개선저자극멜라닌크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "비포앤애프터|슬로우에이징모이스처크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "시드물|마다가스카르피지수분크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "아비노|더멕사아토패스트릴리프밤",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "알펜무어1618|슈퍼볼륨크림보르피린넥크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "에이피엘비|스피큘비타민c샷220크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "잇퓨|[피부진정시카엑소좀]리바이탈테라피시카윤크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "퓨어케이|레티날0.1%안티링클lnp크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "바닐라코|클린잇제로포어클래리파잉클렌징밤트래블키트",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "아리얼|스트레스릴리빙립앤아이리무버패드",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "클라뷰|대용량각질제거클렌징패드",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "더마토리|살리시닉포어클렌징클레이폼살리시닉겔마스크",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "라씨엘르|엔자임오트스크럽파우더워시_미니클렌징오일증정",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "메디필|레드락토콜라겐",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "샬랑드파리|모공축소클렌저엑셀랑스",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "아임프롬|애프리콧셔벗팩클렌저",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "일리윤|젠틀딥페이셜클렌저+클렌징오일",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "피캄|홀리바질그린캡슐팩투폼클렌저",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "아비브|콜라겐아이패치부활초젤리",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "토니모리|[디즈니마리콜라보]원더세라마이드모찌팩투폼",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "샬랑드파리|트러블회복진정패드엑셀랑스",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "닥터멜락신|엑소좀흔적리페어토너",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "비레디|시카페인트러블리셋크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "토니모리|토니랩에이씨컨트롤에멀전",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "시드물|아크바이트러블마이크로니들패치",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "네시픽|하프앤하프클레이마스크",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "러쉬|파워마스크[마스크오브매그너민티]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "메노킨|30초퀵버블마스크(x)",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "볼라욘|톤업팩피부톤케어라티닉스마스크",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "원씽|[수분진정/]히알루론산모델링팩1",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "프레티|리얼하이드로겔아이패치[비타]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "데페이즈모|[depaysmo]리바이탈라이징핸드크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "밀크바오밥|블루밍퍼퓸핸드워시(4종향)",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "소프리스|허니파라핀핸드마스크5p매",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "카밀|핸드크림미니골라담기",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "폴라탐|시카말라카밍핸드크림",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "그린버터|signatureeaudeperfume(funkycookie)",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "니치크|엑스뜨레드퍼퓸넘버3-샌들우드&파피루스/니치향수",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "디아르망|루이마르코딥우디남자우드시가향니치향수",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "라온하제|멜루지네이너퍼퓸",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "보아디시아더빅토리어스|하수",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "NAME_TOO_SHORT"
+        ]
+      },
+      {
+        "key": "블랙하비|080.로얄퓨어고농축드레스퍼퓸",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "블랙하비|197.뿌르팜므고농축드레스퍼퓸",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "블랙하비|311.오스만투스고농축드레스퍼퓸",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "블랙하비|429.프랑지파니고농축드레스퍼퓸",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "블랙하비|545.그랜드메모리고농축드레스퍼퓸",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "썽봉|모망프레장",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "엘리자베스|고체향수머스크",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "입생로랑뷰티|몽파리오드빠르펭",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "지땅느|술타나누가[프루티플로랄/크리미하고쫀쫀한과일비누향edp]",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "푸푸리|토일렛퍼퓸onthegoset(3입)",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "갸스비|무빙러버브라더스_쿨웨트",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "달리프|글램노세범헤어팩트",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "엠도씨|스타일헤어픽싱스프레이",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "달바|프로페셔널리페어링헤어퍼퓸세럼",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "아노에틱뷰티|아노에틱실크퍼퓸헤어세럼",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "카디뷰|글래머헤어세럼",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "리즈케이|프리미엄알블랙탈모증상완화두피케어샴푸",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "심플리오|(대용량)비오틴탈모샴푸볼륨탈모완화두피관리",
+        "status": "COMPLETE",
+        "missingRequired": [],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH"
+        ]
+      },
+      {
+        "key": "올라플렉스|고보습윤기케어샴푸&헤어마스크",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "mainFeatures"
+        ],
+        "issueTypes": [
+          "TYPE_NAME_MISMATCH",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "넘버즈인|numbuzinno.3skinsofteningset",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "productType",
+          "mainFeatures",
+          "usage"
+        ],
+        "issueTypes": [
+          "PRODUCT_TYPE_UNDETERMINED",
+          "NO_OBSERVED_FEATURE"
+        ]
+      },
+      {
+        "key": "넘버즈인|numbuzinno.5vitaminconcentratedset",
+        "status": "PARTIAL",
+        "missingRequired": [
+          "productType",
+          "mainFeatures",
+          "usage"
+        ],
+        "issueTypes": [
+          "PRODUCT_TYPE_UNDETERMINED",
+          "NO_OBSERVED_FEATURE"
+        ]
+      }
+    ]
+  }
+}

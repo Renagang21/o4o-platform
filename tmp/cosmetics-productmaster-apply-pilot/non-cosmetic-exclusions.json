@@ -1,0 +1,4452 @@
+{
+  "wo": "WO-O4O-COSMETICS-DESCRIPTION-AUTHORING-POLICY-AND-PRODUCTMASTER-PILOT-V2",
+  "rules": {
+    "X1_INNER_BEAUTY": "카테고리 경로에 이너뷰티/건강기능식품/영양제",
+    "X2_NON_COSMETIC_SUSPECT": "생산 단계 문제 큐 NON_COSMETIC_SUSPECT",
+    "X3_EXISTING_NON_COSMETIC_MASTER": "기존 이름 일치 master 가 비화장품 — 동명이제품 위험"
+  },
+  "inputGuides": 33106,
+  "excluded": 432,
+  "kept": 32674,
+  "ruleCounts": {
+    "X3_EXISTING_NON_COSMETIC_MASTER": 188,
+    "X1_INNER_BEAUTY": 380,
+    "X2_NON_COSMETIC_SUSPECT": 410
+  },
+  "items": [
+    {
+      "key": "몽뜨허브|보습케어",
+      "brandName": "몽뜨허브",
+      "productName": "보습케어",
+      "classification": "뷰티 > 스킨케어 > 스킨케어 세트",
+      "rules": [
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "메디필|레드케어패치",
+      "brandName": "메디필",
+      "productName": "레드 케어 패치",
+      "classification": "뷰티 > 마스크팩 > 부분마스크/코팩/패치",
+      "rules": [
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "코스노리|아이래쉬틴팅세럼01딥블랙",
+      "brandName": "코스노리",
+      "productName": "아이래쉬 틴팅 세럼 01 딥블랙",
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 속눈썹영양제 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "에뛰드|파워래쉬속눈썹영양제",
+      "brandName": "에뛰드",
+      "productName": "파워 래쉬 속눈썹 영양제",
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 속눈썹영양제 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "마르시끄|인리치드속눈썹눈썹영양제",
+      "brandName": "마르시끄",
+      "productName": "인리치드 속눈썹 눈썹 영양제",
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 속눈썹영양제 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "바이브랩|4주솔루션헤어브로우래쉬세럼",
+      "brandName": "바이브랩",
+      "productName": "4주 솔루션 헤어 브로우 래쉬 세럼",
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 속눈썹영양제 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "에뛰드|마이래쉬세럼",
+      "brandName": "에뛰드",
+      "productName": "마이 래쉬 세럼",
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 속눈썹영양제 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "밀바랩|제주프루넬라비건콜라겐속눈썹영양제",
+      "brandName": "밀바랩",
+      "productName": "제주 프루넬라 비건 콜라겐 속눈썹 영양제",
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 속눈썹영양제 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "젬소|gemsho미국산젬소속눈썹영양제",
+      "brandName": "젬소",
+      "productName": "GEMSHO 미국산 젬소 속눈썹 영양제",
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 속눈썹영양제 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "트윌링|속눈썹영양제아이세럼단백질에센스",
+      "brandName": "트윌링",
+      "productName": "속눈썹 영양제 아이세럼 단백질 에센스",
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 속눈썹영양제 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "웨이크메이크|스트롱볼륨래쉬앰플",
+      "brandName": "웨이크메이크",
+      "productName": "스트롱 볼륨 래쉬 앰플",
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 속눈썹영양제 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "바이브랩|바이탈리치에센스",
+      "brandName": "바이브랩",
+      "productName": "바이탈 리치 에센스",
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 속눈썹영양제 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "브릭커|루트풀나이트연어단백질속눈썹영양제",
+      "brandName": "브릭커",
+      "productName": "루트풀 나이트 연어단백질 속눈썹영양제",
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 속눈썹영양제 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "홀리카홀리카|래쉬코렉팅케어[02블랙세럼]",
+      "brandName": "홀리카홀리카",
+      "productName": "래쉬 코렉팅 케어 [02 블랙세럼]",
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 속눈썹영양제 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "다이소|에끌라깨끗한물티슈",
+      "brandName": "다이소",
+      "productName": "에끌라 깨끗한 물티슈",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "하늘수|프리미엄물티슈",
+      "brandName": "하늘수",
+      "productName": "프리미엄 물티슈",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "물따로|신생아물티슈[오리지날]",
+      "brandName": "물따로",
+      "productName": "신생아 물티슈 [오리지날]",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "순둥이|베이직물티슈",
+      "brandName": "순둥이",
+      "productName": "베이직 물티슈",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "다이소|참깨끗한물티슈",
+      "brandName": "다이소",
+      "productName": "참 깨끗한 물티슈",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "달곰이|아기물티슈저자극데일리캡형",
+      "brandName": "달곰이",
+      "productName": "아기물티슈 저자극 데일리 캡형",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "하늘수|물티슈[퓨어]",
+      "brandName": "하늘수",
+      "productName": "물티슈 [퓨어]",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "달곰이|저자극두꺼운아기물티슈패밀리",
+      "brandName": "달곰이",
+      "productName": "저자극 두꺼운 아기물티슈 패밀리",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "드라마|시그니처아기물티슈",
+      "brandName": "드라마",
+      "productName": "시그니처 아기 물티슈",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "삼무|오리지널물티슈",
+      "brandName": "삼무",
+      "productName": "오리지널 물티슈",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "베베숲|제로플레인",
+      "brandName": "베베숲",
+      "productName": "제로 플레인",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "아티슈|프리미엄물티슈",
+      "brandName": "아티슈",
+      "productName": "프리미엄 물티슈",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "브라운|프리미엄아기물티슈[카키]",
+      "brandName": "브라운",
+      "productName": "프리미엄 아기물티슈 [카키]",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "수누|프리미엄물티슈[올록볼록]",
+      "brandName": "수누",
+      "productName": "프리미엄 물티슈 [올록볼록]",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "크리넥스|에코그린100%생분해물티슈",
+      "brandName": "크리넥스",
+      "productName": "에코그린 100% 생분해 물티슈",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "올프리|물티슈65",
+      "brandName": "올프리",
+      "productName": "물티슈 65",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "아토마일드|물티슈[베이직]",
+      "brandName": "아토마일드",
+      "productName": "물티슈 [베이직]",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "순둥이|프리미엄엠보싱",
+      "brandName": "순둥이",
+      "productName": "프리미엄 엠보싱",
+      "classification": "카테고리별 랭킹 > 기타 > 물티슈 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "올록담|올리브3",
+      "brandName": "올록담",
+      "productName": "올리브3",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "미즈온|이너스빗프리미엄식물성비건먹는콜라겐젤리스틱3300mg",
+      "brandName": "미즈온",
+      "productName": "이너스빗 프리미엄 식물성 비건 먹는 콜라겐 젤리스틱 3300mg",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이오코어|피부면역유산균캡슐",
+      "brandName": "바이오코어",
+      "productName": "피부면역 유산균 캡슐",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "정원삼|6년근고려홍삼정365필름",
+      "brandName": "정원삼",
+      "productName": "6년근고려홍삼정 365필름",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리가든|크런치애사비1000(xx)",
+      "brandName": "뉴트리가든",
+      "productName": "크런치 애사비 1000 ( x x )",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "뉴트리가든|칼슘&마그네슘비타민d아연(6개월분)",
+      "brandName": "뉴트리가든",
+      "productName": "칼슘&마그네슘 비타민D 아연 (6개월분)",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "닥터리코스|닥터모랩아나게인쥐눈이콩바이옴비오틴",
+      "brandName": "닥터리코스",
+      "productName": "닥터모랩 아나게인 쥐눈이콩 바이옴 비오틴",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "스키니랩|모로실다이어트c3g테이스티컷",
+      "brandName": "스키니랩",
+      "productName": "모로실 다이어트 C3G 테이스티컷",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리가든|비타민d35000iu(6개월분)",
+      "brandName": "뉴트리가든",
+      "productName": "비타민D3 5000IU (6개월분)",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "와모야|리얼고구마파로효소",
+      "brandName": "와모야",
+      "productName": "리얼 고구마 파로효소",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "뉴트리가든|프로바이오틱스혈당컷유산균",
+      "brandName": "뉴트리가든",
+      "productName": "프로바이오틱스 혈당컷 유산균",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "정원삼|홍삼이뮨부스터",
+      "brandName": "정원삼",
+      "productName": "홍삼 이뮨부스터",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "서울약사신협|초임계알티지오메가3식물성캡슐(30일분)",
+      "brandName": "서울약사신협",
+      "productName": "초임계 알티지 오메가3 식물성 캡슐 (30일분 )",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "데일리유|[6개월분]링클프리저분자피쉬콜라겐비오틴부스터",
+      "brandName": "데일리유",
+      "productName": "[6개월분] 링클프리 저분자 피쉬 콜라겐 비오틴 부스터",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "뉴트리가든|멜팅업리포좀비타민c",
+      "brandName": "뉴트리가든",
+      "productName": "멜팅업 리포좀 비타민C",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "고려은단|비타민c1000",
+      "brandName": "고려은단",
+      "productName": "비타민C 1000",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "마그랩|포스트레스글루콘산마그네슘",
+      "brandName": "마그랩",
+      "productName": "포 스트레스 글루콘산 마그네슘",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "락토온|프로바이오틱스생유산균골드(100일분)",
+      "brandName": "락토온",
+      "productName": "프로바이오틱스 생유산균 골드 (100일분)",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "뉴트리가든|마그네슘맥스400(4개월분)",
+      "brandName": "뉴트리가든",
+      "productName": "마그네슘맥스400 (4개월분)",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이오코어|이너케어유산균",
+      "brandName": "바이오코어",
+      "productName": "이너케어 유산균",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "플랜트|식물성콜라겐비오틴젤리",
+      "brandName": "플랜트",
+      "productName": "식물성 콜라겐 비오틴 젤리",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "비거너리|샤인머스캣맛식물성콜라겐젤리3270mg1box(맛보기2주용/)",
+      "brandName": "비거너리",
+      "productName": "샤인머스캣맛 식물성 콜라겐 젤리 3270mg 1BOX (맛보기 2주용/ )",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이너랩|글로시글루타치온(리포솜)",
+      "brandName": "바이너랩",
+      "productName": "글로시 글루타치온(리포솜)",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "스키니랩|먹는레티놀c부스터",
+      "brandName": "스키니랩",
+      "productName": "먹는 레티놀C 부스터",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이탈뷰티|슈퍼레티놀",
+      "brandName": "바이탈뷰티",
+      "productName": "슈퍼레티놀",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "에버콜라겐|뷰티앰플",
+      "brandName": "에버콜라겐",
+      "productName": "뷰티 앰플",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "링티|수분콜라겐블러드오렌지맛",
+      "brandName": "링티",
+      "productName": "수분콜라겐 블러드오렌지맛",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "유잇유이크|토닝글루타치온",
+      "brandName": "유잇유이크",
+      "productName": "토닝 글루타치온",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "에버콜라겐|타임비오틴",
+      "brandName": "에버콜라겐",
+      "productName": "타임 비오틴",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "비비랩|저분자콜라겐s",
+      "brandName": "비비랩",
+      "productName": "저분자 콜라겐 S",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "오니스트|트리플콜라겐오렌지6box/3개월분",
+      "brandName": "오니스트",
+      "productName": "트리플콜라겐 오렌지 6box /3개월분",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이탈뷰티|슈퍼콜라겐올인원부스터",
+      "brandName": "바이탈뷰티",
+      "productName": "슈퍼콜라겐 올인원 부스터",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "그린몬스터|프리미엄콜라겐5000",
+      "brandName": "그린몬스터",
+      "productName": "프리미엄 콜라겐5000",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "이너비|글로우앰플",
+      "brandName": "이너비",
+      "productName": "글로우앰플",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이오코어|피부면역유산균100억",
+      "brandName": "바이오코어",
+      "productName": "피부면역 유산균 100억",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "리프비기닝|포레티판토엔",
+      "brandName": "리프비기닝",
+      "productName": "포레티 판토엔",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "나우푸드|비오틴5000mcg",
+      "brandName": "나우푸드",
+      "productName": "비오틴 5000mcg",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이너랩|겟마이비오틴",
+      "brandName": "바이너랩",
+      "productName": "겟마이비오틴",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "솔가|비오틴5000",
+      "brandName": "솔가",
+      "productName": "비오틴 5000",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "나트롤|비오틴10,000",
+      "brandName": "나트롤",
+      "productName": "비오틴 10,000",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "닥터아돌|b발라민비오틴",
+      "brandName": "닥터아돌",
+      "productName": "B발라민 비오틴",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "줄리스초이스|더마뷰티콜라겐앰플",
+      "brandName": "줄리스초이스",
+      "productName": "더마 뷰티 콜라겐 앰플",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "랩트리션|비오틴플러스",
+      "brandName": "랩트리션",
+      "productName": "비오틴 플러스",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "비비랩|저분자콜라겐[비오틴플러스]",
+      "brandName": "비비랩",
+      "productName": "저분자 콜라겐 [비오틴플러스]",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "솔가|비오틴1000",
+      "brandName": "솔가",
+      "productName": "비오틴 1000",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "뉴트리코어|유기농비오틴",
+      "brandName": "뉴트리코어",
+      "productName": "유기농 비오틴",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "덴프스|이너씰샷피쉬콜라겐액상콜라겐",
+      "brandName": "덴프스",
+      "productName": "이너씰 샷 피쉬콜라겐 액상콜라겐",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "스키니랩|비오틴",
+      "brandName": "스키니랩",
+      "productName": "비오틴",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "에버콜라겐|타임비오틴셀",
+      "brandName": "에버콜라겐",
+      "productName": "타임비오틴 셀",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "웰리카|비오틴콜라겐",
+      "brandName": "웰리카",
+      "productName": "비오틴 콜라겐",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "지노마스터|질유산균",
+      "brandName": "지노마스터",
+      "productName": "질유산균",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "허브이오|파로효소",
+      "brandName": "허브이오",
+      "productName": "파로 효소",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "티퍼런스|히알루론콤부차[블루베리]",
+      "brandName": "티퍼런스",
+      "productName": "히알루론 콤부차 [블루베리]",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "비로소|쥬시자임마시는파인애플효소",
+      "brandName": "비로소",
+      "productName": "쥬시자임 마시는 파인애플 효소",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "락토핏|골드",
+      "brandName": "락토핏",
+      "productName": "골드",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "덴프스|덴마크유산균이야기",
+      "brandName": "덴프스",
+      "productName": "덴마크 유산균이야기",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "생활약속|기분전환[알파플러스]",
+      "brandName": "생활약속",
+      "productName": "기분전환 [알파플러스]",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "그린몬스터|이너블라썸30억여성유산균(30일분)",
+      "brandName": "그린몬스터",
+      "productName": "이너블라썸 30억 여성유산균 (30일분 )",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "락토온|프로바이오틱스생유산균(100일분)",
+      "brandName": "락토온",
+      "productName": "프로바이오틱스 생유산균 (100일분)",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "오벤트|루나베라질유래유산균500mg30캡슙(1개월분)",
+      "brandName": "오벤트",
+      "productName": "루나베라 질유래유산균 500mg 30캡슙 (1개월분)",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "유한양행|엘레나",
+      "brandName": "유한양행",
+      "productName": "엘레나",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "락토핏|코어",
+      "brandName": "락토핏",
+      "productName": "코어",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "바이탈뷰티|녹차에서온유산균",
+      "brandName": "바이탈뷰티",
+      "productName": "녹차에서 온 유산균",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "비거너리|샤인머스캣맛다이어트젤리4200mg1box(붓기관리7일용/)",
+      "brandName": "비거너리",
+      "productName": "샤인머스캣맛 다이어트 젤리 4200mg 1BOX (붓기관리 7일용/ )",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "그린몬스터|다이어트스페셜2가르시니아900",
+      "brandName": "그린몬스터",
+      "productName": "다이어트 스페셜2 가르시니아 900",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "솔루티오|더슬림다이어트단백질쉐이크초코",
+      "brandName": "솔루티오",
+      "productName": "더 슬림 다이어트 단백질 쉐이크 초코",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "글로우밍글|애프터버닝",
+      "brandName": "글로우밍글",
+      "productName": "애프터 버닝",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "스키니랩|애플페논풋사과다이어트",
+      "brandName": "스키니랩",
+      "productName": "애플페논 풋사과 다이어트",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "바이탈뷰티|포차코콜라보메타그린슬림업",
+      "brandName": "바이탈뷰티",
+      "productName": "포차코 콜라보 메타그린 슬림업",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이탈뷰티|메타그린슬림업",
+      "brandName": "바이탈뷰티",
+      "productName": "메타그린 슬림업",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "글로우밍글|비포버닝",
+      "brandName": "글로우밍글",
+      "productName": "비포 버닝",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "그린몬스터|다이어트14in1녹차카테킨+(14일분)",
+      "brandName": "그린몬스터",
+      "productName": "다이어트14in1 녹차카테킨+ (14일분)",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "비에날씬|플러스",
+      "brandName": "비에날씬",
+      "productName": "플러스",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "비브리브|꼬박꼬밥[미숫가루]",
+      "brandName": "비브리브",
+      "productName": "꼬박꼬밥 [미숫가루]",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "그린몬스터|디톡콤부차[허니자몽]",
+      "brandName": "그린몬스터",
+      "productName": "디톡 콤부차 [허니자몽]",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "푸드올로지|콜레올로지컷pro",
+      "brandName": "푸드올로지",
+      "productName": "콜레올로지 컷 PRO",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "솔루티오|더슬림다이어트단백질쉐이크곡물",
+      "brandName": "솔루티오",
+      "productName": "더 슬림 다이어트 단백질 쉐이크 곡물",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "그린몬스터|디톡콤부차[레몬홍차]",
+      "brandName": "그린몬스터",
+      "productName": "디톡 콤부차 [레몬홍차]",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "그린몬스터|디톡콤부차[납작복숭아]",
+      "brandName": "그린몬스터",
+      "productName": "디톡 콤부차 [납작복숭아]",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "안국건강|시서스간다나이트컷",
+      "brandName": "안국건강",
+      "productName": "시서스간다 나이트컷",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "그린몬스터|맥스콜레우스포스콜리",
+      "brandName": "그린몬스터",
+      "productName": "맥스 콜레우스포스콜리",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "네이처메이드|칼슘,마그네슘,아연,비타민d",
+      "brandName": "네이처메이드",
+      "productName": "칼슘, 마그네슘, 아연, 비타민 D",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "자로우포뮬러스|판토텐산비타민b5",
+      "brandName": "자로우포뮬러스",
+      "productName": "판토텐산 비타민 B5",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "마그랩|포에너지글루콘산마그네슘비타민b",
+      "brandName": "마그랩",
+      "productName": "포 에너지 글루콘산 마그네슘 비타민B",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "고려은단|메가도스b비타민b군",
+      "brandName": "고려은단",
+      "productName": "메가도스B 비타민B군",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "유나엔|원데이비씨알",
+      "brandName": "유나엔",
+      "productName": "원데이비씨알",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이탈뷰티|워터플러스에너지자몽망고",
+      "brandName": "바이탈뷰티",
+      "productName": "워터플러스 에너지 자몽망고",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "솔가|마그네슘위드비타민b6",
+      "brandName": "솔가",
+      "productName": "마그네슘 위드 비타민 B6",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "빙그레건강tft|더단백드링크[초코]",
+      "brandName": "빙그레건강tft",
+      "productName": "더단백 드링크 [초코]",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "셀렉스|코어프로틴락토프리",
+      "brandName": "셀렉스",
+      "productName": "코어프로틴 락토프리",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "내츄럴플러스|코랄칼슘앤마그네슘2:1플러스",
+      "brandName": "내츄럴플러스",
+      "productName": "코랄칼슘 앤 마그네슘 2:1 플러스",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "뉴트리디데이|프리미엄비타민b컴플렉스골드",
+      "brandName": "뉴트리디데이",
+      "productName": "프리미엄 비타민B 컴플렉스 골드",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "휴온스|메리트c&d",
+      "brandName": "휴온스",
+      "productName": "메리트C&D",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "세노비스|마그네슘",
+      "brandName": "세노비스",
+      "productName": "마그네슘",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "랩트리션|마린마그네슘플러스",
+      "brandName": "랩트리션",
+      "productName": "마린 마그네슘 플러스",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "고려은단|비타민c1000이지+비타민d",
+      "brandName": "고려은단",
+      "productName": "비타민C 1000 이지+비타민D",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "고려은단|메가도스c비타민c3000mg",
+      "brandName": "고려은단",
+      "productName": "메가도스C 비타민C 3000mg",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리가든|눈건강루테인지아잔틴",
+      "brandName": "뉴트리가든",
+      "productName": "눈건강 루테인지아잔틴",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "닥터브라이언|비타민c&d3000복숭아맛",
+      "brandName": "닥터브라이언",
+      "productName": "비타민C&D3000 복숭아맛",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "종근당건강|비타민c1000mg",
+      "brandName": "종근당건강",
+      "productName": "비타민C 1000mg",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "닥터오라클|비타민c파우더1000mg",
+      "brandName": "닥터오라클",
+      "productName": "비타민C 파우더 1000mg",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "라이필|더마콜라겐시그니처",
+      "brandName": "라이필",
+      "productName": "더마콜라겐 시그니처",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "아임비타|면역비타민c1000",
+      "brandName": "아임비타",
+      "productName": "면역비타민C 1000",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "고려은단|면역케어고려은단비타민c",
+      "brandName": "고려은단",
+      "productName": "면역케어 고려은단 비타민C",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "엔젯오리진|비타프레쉬비타민c&d3000꾸미",
+      "brandName": "엔젯오리진",
+      "productName": "비타프레쉬 비타민 C&D 3000 꾸미",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "고려은단|속편한고려은단비타민c1000중성비타민c",
+      "brandName": "고려은단",
+      "productName": "속편한 고려은단 비타민C 1000 중성비타민C",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "gnm|코큐텐11",
+      "brandName": "GNM",
+      "productName": "코큐텐11",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "나우푸드|항산화비타민c1000",
+      "brandName": "나우푸드",
+      "productName": "항산화 비타민C 1000",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "나우푸드|코큐텐100mg",
+      "brandName": "나우푸드",
+      "productName": "코큐텐 100mg",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "해비추얼|항산화·면역프로폴리스",
+      "brandName": "해비추얼",
+      "productName": "항산화·면역 프로폴리스",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "닥터뉴트리|멜라메이트구미",
+      "brandName": "닥터뉴트리",
+      "productName": "멜라메이트 구미",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "정원삼|6년근고려홍삼정365스틱",
+      "brandName": "정원삼",
+      "productName": "6년근 고려홍삼정 365스틱",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "gnm|건강한간밀크씨슬",
+      "brandName": "GNM",
+      "productName": "건강한 간 밀크씨슬",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "정관장|홍삼정에브리타임",
+      "brandName": "정관장",
+      "productName": "홍삼정 에브리타임",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "정관장|홍삼정",
+      "brandName": "정관장",
+      "productName": "홍삼정",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "종근당건강|비타민d2000iu",
+      "brandName": "종근당건강",
+      "productName": "비타민D 2000IU",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "나우푸드|실리마린",
+      "brandName": "나우푸드",
+      "productName": "실리마린",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "고려은단|퓨어밀크씨슬",
+      "brandName": "고려은단",
+      "productName": "퓨어 밀크씨슬",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "그린몬스터|맥스비타민d4000iu",
+      "brandName": "그린몬스터",
+      "productName": "맥스 비타민D 4000IU",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "정관장|홍삼정환",
+      "brandName": "정관장",
+      "productName": "홍삼정환",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "초엘|아답토젠감초도라지",
+      "brandName": "초엘",
+      "productName": "아답토젠 감초도라지",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "세노비스|밀크씨슬",
+      "brandName": "세노비스",
+      "productName": "밀크씨슬",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "제노포커스|면역가득유산균",
+      "brandName": "제노포커스",
+      "productName": "면역 가득 유산균",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "줄리스초이스|에버비타민이너부스터샷",
+      "brandName": "줄리스초이스",
+      "productName": "에버비타민 이너부스터샷",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "오쏘몰|이뮨",
+      "brandName": "오쏘몰",
+      "productName": "이뮨",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "종근당건강|이뮨멀티비타맥스",
+      "brandName": "종근당건강",
+      "productName": "이뮨 멀티비타맥스",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "센트룸|멀티구미",
+      "brandName": "센트룸",
+      "productName": "멀티 구미",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "광동생활건강|광동비타500데일리스틱(70일분)",
+      "brandName": "광동생활건강",
+      "productName": "광동 비타500데일리스틱 (70일분)",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "솔가|여성용멀티비타민미네랄",
+      "brandName": "솔가",
+      "productName": "여성용 멀티비타민 미네랄",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "덴프스|트루바이타민i",
+      "brandName": "덴프스",
+      "productName": "트루바이타민 I",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "아임비타|멀티비타민이뮨샷",
+      "brandName": "아임비타",
+      "productName": "멀티비타민 이뮨샷",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "센트룸|우먼멀티비타민미네랄",
+      "brandName": "센트룸",
+      "productName": "우먼 멀티 비타민 미네랄",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "커클랜드|데일리멀티비타민&미네랄",
+      "brandName": "커클랜드",
+      "productName": "데일리 멀티 비타민&미네랄",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "세노비스|트리플러스우먼",
+      "brandName": "세노비스",
+      "productName": "트리플러스우먼",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "순수식품|종합비타민미네랄20",
+      "brandName": "순수식품",
+      "productName": "종합비타민 미네랄 20",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "gnm|올인원이뮨액상종합비타민",
+      "brandName": "GNM",
+      "productName": "올인원 이뮨 액상 종합비타민",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "얼라이브|원스데일리포맨",
+      "brandName": "얼라이브",
+      "productName": "원스데일리 포 맨",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "위블리즈|옵티마이뮨멀티비타민&미네랄",
+      "brandName": "위블리즈",
+      "productName": "옵티마 이뮨 멀티비타민&미네랄",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "네이처메이드|슈퍼b에너지콤플렉스",
+      "brandName": "네이처메이드",
+      "productName": "슈퍼B 에너지 콤플렉스",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "고려은단|비타민c골드플러스",
+      "brandName": "고려은단",
+      "productName": "비타민C 골드플러스",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "락토핏|키즈",
+      "brandName": "락토핏",
+      "productName": "키즈",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "서울약사신협|멀티비타민앤미네랄1,500mg",
+      "brandName": "서울약사신협",
+      "productName": "멀티비타민앤미네랄 1,500mg",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "나우푸드|알티지오메가3",
+      "brandName": "나우푸드",
+      "productName": "알티지 오메가3",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "프로메가|알티지오메가3듀얼",
+      "brandName": "프로메가",
+      "productName": "알티지 오메가3 듀얼",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "아이원|루테인지아잔틴미니",
+      "brandName": "아이원",
+      "productName": "루테인 지아잔틴 미니",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "프로메가|오메가3트리플",
+      "brandName": "프로메가",
+      "productName": "오메가3 트리플",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "고려은단|퓨어알티지오메가3",
+      "brandName": "고려은단",
+      "productName": "퓨어 알티지 오메가3",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "프로메가|알티지오메가3듀얼비타민d",
+      "brandName": "프로메가",
+      "productName": "알티지오메가3 듀얼 비타민D",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "고려은단|루테인지아잔틴아스타잔틴",
+      "brandName": "고려은단",
+      "productName": "루테인 지아잔틴 아스타잔틴",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "세노비스|루테인+오메가3",
+      "brandName": "세노비스",
+      "productName": "루테인+오메가3",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "고려은단|퓨어알티지오메가3이지",
+      "brandName": "고려은단",
+      "productName": "퓨어 알티지 오메가3 이지",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "서울약사신협|아이케어루테인지아잔틴500mg30일분",
+      "brandName": "서울약사신협",
+      "productName": "아이케어 루테인 지아잔틴 500mg 30일분",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "뉴트리코어|알티지오메가3",
+      "brandName": "뉴트리코어",
+      "productName": "알티지 오메가3",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "아이클리어|루테인지아잔틴",
+      "brandName": "아이클리어",
+      "productName": "루테인지아잔틴",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "트루엔|알티지오메가3",
+      "brandName": "트루엔",
+      "productName": "알티지오메가3",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "gnm|루테인지아잔틴아스타잔틴",
+      "brandName": "GNM",
+      "productName": "루테인 지아잔틴 아스타잔틴",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "쁘띠앤|국민오메가3",
+      "brandName": "쁘띠앤",
+      "productName": "국민 오메가3",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "세노비스|오메가-3",
+      "brandName": "세노비스",
+      "productName": "오메가-3",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "그린몬스터|맥스rtg오메가3(30일분)",
+      "brandName": "그린몬스터",
+      "productName": "맥스 rTG 오메가3 (30일분 )",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "더리틀스|알티지부스터오메가3",
+      "brandName": "더리틀스",
+      "productName": "알티지부스터오메가3",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리원라이프|164루테인지아잔틴164ax",
+      "brandName": "뉴트리원라이프",
+      "productName": "164 루테인 지아잔틴 164 AX",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "gnm|칼슘마그네슘아연비타민d",
+      "brandName": "GNM",
+      "productName": "칼슘 마그네슘 아연 비타민D",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "베러웨러|망고맛츄어블본질비타민d₃",
+      "brandName": "베러웨러",
+      "productName": "망고맛 츄어블 본질 비타민D₃",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "종근당건강|칼슘앤마그네슘비타민d아연",
+      "brandName": "종근당건강",
+      "productName": "칼슘 앤 마그네슘 비타민D 아연",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "트루알엑스|리치비타민d",
+      "brandName": "트루알엑스",
+      "productName": "리치비타민D",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "고려은단|메가도스d비타민d32000iu",
+      "brandName": "고려은단",
+      "productName": "메가도스D 비타민D3 2000IU",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리라이트|칼맥디",
+      "brandName": "뉴트리라이트",
+      "productName": "칼맥 디",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "고려은단|메가도스d비타민d34000iu",
+      "brandName": "고려은단",
+      "productName": "메가도스D 비타민D3 4000IU",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리디데이|프리미엄칼슘마그네슘아연비타민d",
+      "brandName": "뉴트리디데이",
+      "productName": "프리미엄 칼슘 마그네슘 아연 비타민D",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "솔가|비타민d31000iu",
+      "brandName": "솔가",
+      "productName": "비타민 D3 1000IU",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "아임비타|비타민구미젤리",
+      "brandName": "아임비타",
+      "productName": "비타민 구미젤리",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리가든|혈당·혈행·혈압트리플케어코큐텐블러드q650mgxx(2개월분)",
+      "brandName": "뉴트리가든",
+      "productName": "혈당·혈행·혈압 트리플 케어 코큐텐 블러드Q 650mg x x (2개월분)",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "닥터린|초임계알티지오메가3",
+      "brandName": "닥터린",
+      "productName": "초임계 알티지 오메가3",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "담백하루|초임계알티지오메가31000",
+      "brandName": "담백하루",
+      "productName": "초임계 알티지 오메가3 1000",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "고려은단|알티지오메가3",
+      "brandName": "고려은단",
+      "productName": "알티지 오메가3",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "솔가|철분25",
+      "brandName": "솔가",
+      "productName": "철분 25",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "락피도|철분액상",
+      "brandName": "락피도",
+      "productName": "철분액상",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "네추럴라이즈|감마리놀렌산달맞이꽃종자유",
+      "brandName": "네추럴라이즈",
+      "productName": "감마리놀렌산 달맞이꽃종자유",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "내츄럴플러스|저온초임계알티지오메가3비타민d",
+      "brandName": "내츄럴플러스",
+      "productName": "저온 초임계 알티지 오메가3 비타민D",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 혈행 개선 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "뉴트리가든|멜라토닌큐골드",
+      "brandName": "뉴트리가든",
+      "productName": "멜라토닌큐골드",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "이너시아|업-솔션이너시톨2.0",
+      "brandName": "이너시아",
+      "productName": "업-솔션 이너시톨 2.0",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "피토틱스|콜린이노시톨",
+      "brandName": "피토틱스",
+      "productName": "콜린 이노시톨",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "니아르|브이케어파인애플맛",
+      "brandName": "니아르",
+      "productName": "브이케어 파인애플맛",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "녹트리서치|슬립케어",
+      "brandName": "녹트리서치",
+      "productName": "슬립케어",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "지노프레쉬|건강해질여성유산균",
+      "brandName": "지노프레쉬",
+      "productName": "건강해질 여성유산균",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "덴프스|덴마크유산균이야기[우먼]",
+      "brandName": "덴프스",
+      "productName": "덴마크 유산균이야기 [우먼]",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "애콜|애사비콜라겐캔디",
+      "brandName": "애콜",
+      "productName": "애사비 콜라겐 캔디",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "유한양행|엘레나퀸",
+      "brandName": "유한양행",
+      "productName": "엘레나 퀸",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이탈뷰티|굿슬립가바365",
+      "brandName": "바이탈뷰티",
+      "productName": "굿슬립 가바 365",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴오리진|이너플로라",
+      "brandName": "뉴오리진",
+      "productName": "이너플로라",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "라엘밸런스|질건강리스펙타프로바이오틱스",
+      "brandName": "라엘밸런스",
+      "productName": "질건강 리스펙타 프로바이오틱스",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "트루알엑스|프로바이오틱스[지노]",
+      "brandName": "트루알엑스",
+      "productName": "프로바이오틱스 [지노]",
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "후시다인|후시드부스터",
+      "brandName": "후시다인",
+      "productName": "후시드 부스터",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "메디큐브|에이지알부스터프로",
+      "brandName": "메디큐브",
+      "productName": "에이지알 부스터 프로",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "메디큐브|울트라튠40.68",
+      "brandName": "메디큐브",
+      "productName": "울트라튠 40.68",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "메디큐브|에이지알부스터프로미니",
+      "brandName": "메디큐브",
+      "productName": "에이지알 부스터 프로 미니",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "메디큐브|하이포커스샷",
+      "brandName": "메디큐브",
+      "productName": "하이포커스 샷",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "메디큐브|에이지알부스터프로미니플러스",
+      "brandName": "메디큐브",
+      "productName": "에이지알 부스터 프로 미니 플러스",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "알록|울트라올라",
+      "brandName": "알록",
+      "productName": "울트라올라",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "메디큐브|핑크에디션에이지알부스터프로",
+      "brandName": "메디큐브",
+      "productName": "핑크 에디션 에이지알 부스터 프로",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "마미케어|ems브이쎄라",
+      "brandName": "마미케어",
+      "productName": "EMS 브이쎄라",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "메디큐브|부스터진동클렌저[핑크]",
+      "brandName": "메디큐브",
+      "productName": "부스터 진동 클렌저 [핑크]",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "센텔리안24|마데카프라임",
+      "brandName": "센텔리안24",
+      "productName": "마데카 프라임",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "페이스팩토리|워터필링기",
+      "brandName": "페이스팩토리",
+      "productName": "워터 필링기",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "멜리언스|진동클렌저[베이비핑크]",
+      "brandName": "멜리언스",
+      "productName": "진동클렌저 [베이비핑크]",
+      "classification": "카테고리별 랭킹 > 뷰티디바이스 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "토미울프|딥클렌징두피브러쉬",
+      "brandName": "토미울프",
+      "productName": "딥클렌징 두피 브러쉬",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "일소|딥클린마스터피지블랙헤드제거기",
+      "brandName": "일소",
+      "productName": "딥 클린 마스터 피지 블랙헤드 제거기",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "에끌라두|골든샌달우드괄사(빗모양)",
+      "brandName": "에끌라두",
+      "productName": "골든 샌달우드 괄사(빗모양)",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "일소|모공클렌징마스터",
+      "brandName": "일소",
+      "productName": "모공 클렌징 마스터",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "갸스비|파우더오일클리어페이퍼",
+      "brandName": "갸스비",
+      "productName": "파우더 오일 클리어 페이퍼",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "크리스마|1페이스타올",
+      "brandName": "크리스마",
+      "productName": "1 페이스타올",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "시루콧토|우루우루화장솜",
+      "brandName": "시루콧토",
+      "productName": "우루우루 화장솜",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "닥터지|레드블레미쉬오일컨트롤페이퍼",
+      "brandName": "닥터지",
+      "productName": "레드 블레미쉬 오일 컨트롤 페이퍼",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "필리밀리|비건페이스타월",
+      "brandName": "필리밀리",
+      "productName": "비건페이스타월",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "필리밀리|히팅뷰러충전타입",
+      "brandName": "필리밀리",
+      "productName": "히팅뷰러 충전타입",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "브링그린|쑥한지기름종이",
+      "brandName": "브링그린",
+      "productName": "쑥한지 기름종이",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "투쿨포스쿨|피니쉬세팅오일페이퍼",
+      "brandName": "투쿨포스쿨",
+      "productName": "피니쉬 세팅 오일 페이퍼",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "다이소|고급파우더브러시(대)",
+      "brandName": "다이소",
+      "productName": "고급파우더브러시(대)",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "다이소|핑거에어퍼프",
+      "brandName": "다이소",
+      "productName": "핑거 에어 퍼프",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "아베다|우든패들브러쉬",
+      "brandName": "아베다",
+      "productName": "우든 패들 브러쉬",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "다이소|녹차기름종이(티슈형)",
+      "brandName": "다이소",
+      "productName": "녹차 기름종이 (티슈형)",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "다이소|퍼피광채쿠션워터퍼프",
+      "brandName": "다이소",
+      "productName": "퍼피 광채쿠션 워터퍼프",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "필리밀리|미니스파츌라브러시828",
+      "brandName": "필리밀리",
+      "productName": "미니 스파츌라브러시 828",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "피카소|함경식메이크업스파츌라",
+      "brandName": "피카소",
+      "productName": "함경식 메이크업 스파츌라",
+      "classification": "카테고리별 랭킹 > 뷰티소품 > 전체",
+      "rules": [
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "손앤박|리얼아이래쉬세럼속눈썹영양제[블랙]",
+      "brandName": "손앤박",
+      "productName": "리얼 아이래쉬 세럼 속눈썹영양제 [블랙]",
+      "classification": "피부별 랭킹 > 건성 > 아이메이크업 > 속눈썹영양제",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "제이숲|딥그린제이검은콩속눈썹영양제",
+      "brandName": "제이숲",
+      "productName": "딥그린제이 검은콩 속눈썹영양제",
+      "classification": "피부별 랭킹 > 건성 > 아이메이크업 > 속눈썹영양제",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "그린몬스터|이너뷰티이너콜라겐",
+      "brandName": "그린몬스터",
+      "productName": "이너뷰티 이너콜라겐",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "이너비|아쿠아리치더블업",
+      "brandName": "이너비",
+      "productName": "아쿠아리치더블업",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "에스더포뮬러|여에스더글루타치온다이렉트필름[5x]",
+      "brandName": "에스더포뮬러",
+      "productName": "여에스더 글루타치온 다이렉트 필름 [5X]",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "트루알엑스|리치글루타치온포텐원샷",
+      "brandName": "트루알엑스",
+      "productName": "리치 글루타치온 포텐원샷",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "이너비|글로우샷콜라겐",
+      "brandName": "이너비",
+      "productName": "글로우샷 콜라겐",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "줄리스초이스|에버글로우피에스트로",
+      "brandName": "줄리스초이스",
+      "productName": "에버글로우 피에스트로",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "컬처렐|다이제스티브헬스유산균(1개월분)",
+      "brandName": "컬처렐",
+      "productName": "다이제스티브 헬스 유산균 (1개월분)",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "티르티르|퍼펙트제로파우더",
+      "brandName": "티르티르",
+      "productName": "퍼펙트 제로 파우더",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "프로핏|유산균프로핏2000",
+      "brandName": "프로핏",
+      "productName": "유산균 프로핏 2000",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "락토핏|생유산균슬림",
+      "brandName": "락토핏",
+      "productName": "생유산균 슬림",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "스키니랩|애플페논풋사과다이어트젤리",
+      "brandName": "스키니랩",
+      "productName": "애플페논 풋사과 다이어트 젤리",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "티르티르|퍼펙트시크릿컷",
+      "brandName": "티르티르",
+      "productName": "퍼펙트 시크릿 컷",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "티르티르|빼르빼르[초코맛]",
+      "brandName": "티르티르",
+      "productName": "빼르빼르 [초코맛]",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "칼로|스탑plus",
+      "brandName": "칼로",
+      "productName": "스탑 PLUS",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "지알앤플러스|편안한밤하늘이",
+      "brandName": "지알앤플러스",
+      "productName": "편안한 밤 하늘이",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "나우푸드|실리마린스트렝스",
+      "brandName": "나우푸드",
+      "productName": "실리마린 스트렝스",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 근육량 증가",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "gnm|마그네슘05",
+      "brandName": "GNM",
+      "productName": "마그네슘05",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 근육량 증가",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "이너랩|액티브비타민b",
+      "brandName": "이너랩",
+      "productName": "액티브 비타민B",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 근육량 증가",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "진약사몰|진정주비타c1000",
+      "brandName": "진약사몰",
+      "productName": "진정주 비타C 1000",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 항산화 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "그린몬스터|맥스그린프로폴리스",
+      "brandName": "그린몬스터",
+      "productName": "맥스 그린프로폴리스",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 항산화 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "닥터엘리자베스|테아닌과밀크씨슬활력솔루션",
+      "brandName": "닥터엘리자베스",
+      "productName": "테아닌과 밀크씨슬 활력 솔루션",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "세노비스|코엔자임큐텐",
+      "brandName": "세노비스",
+      "productName": "코엔자임큐텐",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "퓨어햅|덴마크프로x",
+      "brandName": "퓨어햅",
+      "productName": "덴마크프로X",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "센트룸|맨멀티비타민미네랄",
+      "brandName": "센트룸",
+      "productName": "맨 멀티 비타민 미네랄",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "고려은단|멀티비타민올인원이지",
+      "brandName": "고려은단",
+      "productName": "멀티비타민 올인원 이지",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "종근당건강|활력비타민b플러스",
+      "brandName": "종근당건강",
+      "productName": "활력비타민B 플러스",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "센트룸|실버우먼",
+      "brandName": "센트룸",
+      "productName": "실버 우먼",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "네이처메이드|액티브데일리멀티포올",
+      "brandName": "네이처메이드",
+      "productName": "액티브 데일리 멀티 포 올",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "그린몬스터|눈건강루테인지아잔틴(30일분)",
+      "brandName": "그린몬스터",
+      "productName": "눈건강 루테인지아잔틴 (30일분 )",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "gnm|rtg알티지오메가3",
+      "brandName": "GNM",
+      "productName": "rTG알티지오메가3",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "프로메가|오메가3듀얼장용성",
+      "brandName": "프로메가",
+      "productName": "오메가3 듀얼 장용성",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "세노비스|빌베리+오메가3",
+      "brandName": "세노비스",
+      "productName": "빌베리+오메가3",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "gnm|건조한눈엔루테인오메가3",
+      "brandName": "GNM",
+      "productName": "건조한 눈엔 루테인오메가3",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리디데이|프리미엄오메가3골드1100",
+      "brandName": "뉴트리디데이",
+      "productName": "프리미엄 오메가3 골드 1100",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "프로메가|알티지오메가3듀얼플러스",
+      "brandName": "프로메가",
+      "productName": "알티지 오메가3 듀얼 플러스",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "나우푸드|루테인지아잔틴맥스",
+      "brandName": "나우푸드",
+      "productName": "루테인 지아잔틴 맥스",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "애플트리김약사네|눈건강비타민a",
+      "brandName": "애플트리김약사네",
+      "productName": "눈건강 비타민A",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "프로메가|오메가3",
+      "brandName": "프로메가",
+      "productName": "오메가3",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 혈행 개선",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "블랙모어스|칼슘마그네슘플러스비타민d",
+      "brandName": "블랙모어스",
+      "productName": "칼슘 마그네슘 플러스 비타민 D",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "얼라이브|칼슘",
+      "brandName": "얼라이브",
+      "productName": "칼슘",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "아임비타|비타민d2000iu",
+      "brandName": "아임비타",
+      "productName": "비타민D2000IU",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "종근당건강|비타민d4000iu츄어블",
+      "brandName": "종근당건강",
+      "productName": "비타민D 4000IU 츄어블",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "닥터브라이언|써니업비타민d파인애플플레이버",
+      "brandName": "닥터브라이언",
+      "productName": "써니업 비타민D 파인애플 플레이버",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "트루알엑스|그날편한보라지유",
+      "brandName": "트루알엑스",
+      "productName": "그날 편한 보라지유",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 기타 식품",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트라라이프|감마리놀렌산보라지유",
+      "brandName": "뉴트라라이프",
+      "productName": "감마리놀렌산 보라지유",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 기타 식품",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "라엘밸런스|요로건강크랜베리",
+      "brandName": "라엘밸런스",
+      "productName": "요로건강 크랜베리",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 기타 식품",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "정관장|수면건강",
+      "brandName": "정관장",
+      "productName": "수면건강",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 기타 식품",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "브레인웨이브|베타포커스",
+      "brandName": "브레인웨이브",
+      "productName": "베타포커스",
+      "classification": "피부별 랭킹 > 건성 > 이너뷰티 > 기타 식품",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "디오디너리|멀티-펩타이드래쉬앤브로우세럼",
+      "brandName": "디오디너리",
+      "productName": "멀티-펩타이드 래쉬 앤 브로우 세럼",
+      "classification": "피부별 랭킹 > 지성 > 아이메이크업 > 속눈썹영양제",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "웨이크메이크|스트롱블랙틴팅래쉬앰플",
+      "brandName": "웨이크메이크",
+      "productName": "스트롱 블랙 틴팅 래쉬 앰플",
+      "classification": "피부별 랭킹 > 지성 > 아이메이크업 > 속눈썹영양제",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "바이옴액티베이트|아이래쉬세럼",
+      "brandName": "바이옴액티베이트",
+      "productName": "아이래쉬 세럼",
+      "classification": "피부별 랭킹 > 지성 > 아이메이크업 > 속눈썹영양제",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "비비랩|더콜라겐파우더s",
+      "brandName": "비비랩",
+      "productName": "더 콜라겐 파우더S",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "에스더포뮬러|여에스더글루타치온다이렉트필름[3x]",
+      "brandName": "에스더포뮬러",
+      "productName": "여에스더 글루타치온 다이렉트 필름 [3X]",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "아일로|타입1콜라겐비오틴앰플",
+      "brandName": "아일로",
+      "productName": "타입1 콜라겐 비오틴 앰플",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "이너비|콜렉티브콜라겐",
+      "brandName": "이너비",
+      "productName": "콜렉티브 콜라겐",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "그린몬스터|다이어트스페셜3키토산3200",
+      "brandName": "그린몬스터",
+      "productName": "다이어트 스페셜3 키토산3200",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "나우푸드|녹차추출물egcg",
+      "brandName": "나우푸드",
+      "productName": "녹차 추출물 EGCG",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "지알앤플러스|벨리곰에디션초록이슬림밸런스&쾌변",
+      "brandName": "지알앤플러스",
+      "productName": "벨리곰 에디션 초록이 슬림밸런스&쾌변",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "비에날씬|프로",
+      "brandName": "비에날씬",
+      "productName": "프로",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "스키니랩|가르시니아다이어트",
+      "brandName": "스키니랩",
+      "productName": "가르시니아 다이어트",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "네츄럴굿띵스|속편한다이어트",
+      "brandName": "네츄럴굿띵스",
+      "productName": "속편한 다이어트",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리디데이|다이어트스페셜올뉴",
+      "brandName": "뉴트리디데이",
+      "productName": "다이어트 스페셜 올뉴",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "그린몬스터|맥스밀크씨슬10(30일분)",
+      "brandName": "그린몬스터",
+      "productName": "맥스 밀크씨슬10 (30일분 )",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 근육량 증가",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "덴프스|비타민b츄어블",
+      "brandName": "덴프스",
+      "productName": "비타민B 츄어블",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 근육량 증가",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "코스모스피플|피코타민액티브™",
+      "brandName": "코스모스피플",
+      "productName": "피코타민 액티브™",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 근육량 증가",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "솔가|비타민b-콤플렉스100",
+      "brandName": "솔가",
+      "productName": "비타민 B-콤플렉스 100",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 근육량 증가",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "셀렉스|코어프로틴프로스틱",
+      "brandName": "셀렉스",
+      "productName": "코어프로틴 프로 스틱",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 근육량 증가",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이오코어|건강한생유산균100억",
+      "brandName": "바이오코어",
+      "productName": "건강한 생유산균 100억",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "락토핏|솔루션2예민한장",
+      "brandName": "락토핏",
+      "productName": "솔루션2 예민한 장",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "커클랜드|시그니춰비타민c",
+      "brandName": "커클랜드",
+      "productName": "시그니춰 비타민C",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 항산화 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "하루틴|리포좀비타민c",
+      "brandName": "하루틴",
+      "productName": "리포좀 비타민C",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 항산화 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "안국건강|코엔자임q10미니",
+      "brandName": "안국건강",
+      "productName": "코엔자임Q10 미니",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 항산화 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "비타그란|비타민c",
+      "brandName": "비타그란",
+      "productName": "비타민C",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 항산화 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "세노비스|여성을위한멀티비타민미네랄",
+      "brandName": "세노비스",
+      "productName": "여성을 위한 멀티비타민미네랄",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "얼라이브|원스데일리+밀크씨슬",
+      "brandName": "얼라이브",
+      "productName": "원스데일리 + 밀크씨슬",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "종근당건강|원데이21",
+      "brandName": "종근당건강",
+      "productName": "원데이21",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "비타바움|비타민b12_브이컴플렉스8",
+      "brandName": "비타바움",
+      "productName": "비타민 B12_브이 컴플렉스8",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "세노비스|키즈멀티비타민",
+      "brandName": "세노비스",
+      "productName": "키즈멀티비타민",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "솔가|남성용멀티비타민&미네랄",
+      "brandName": "솔가",
+      "productName": "남성용 멀티비타민&미네랄",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "셀파렉스|에센셜포우먼",
+      "brandName": "셀파렉스",
+      "productName": "에센셜 포 우먼",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "함소아|프로폴리스",
+      "brandName": "함소아",
+      "productName": "프로폴리스",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "종근당건강|알로에이뮨스틱",
+      "brandName": "종근당건강",
+      "productName": "알로에 이뮨 스틱",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "gnm|50억보장장건강해질유산균",
+      "brandName": "GNM",
+      "productName": "50억보장 장 건강해질 유산균",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "솔가|아연50",
+      "brandName": "솔가",
+      "productName": "아연 50",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "겟비너스|씨커트",
+      "brandName": "겟비너스",
+      "productName": "씨커트",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 혈행 개선",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "나우푸드|비타민d33000iu",
+      "brandName": "나우푸드",
+      "productName": "비타민D3 3000IU",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리디데이|플러스칼슘앤비타민d",
+      "brandName": "뉴트리디데이",
+      "productName": "플러스 칼슘 앤 비타민D",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "덴프스|비타민d츄어블",
+      "brandName": "덴프스",
+      "productName": "비타민D 츄어블",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "다나음|비타민d5000iu",
+      "brandName": "다나음",
+      "productName": "비타민D 5000IU",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "라이프허브|이노시톨2000",
+      "brandName": "라이프허브",
+      "productName": "이노시톨 2000",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 기타 식품",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "라이브포레스트|와이이뮤",
+      "brandName": "라이브포레스트",
+      "productName": "와이이뮤",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 기타 식품",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "데이즈온|릴리브피엠",
+      "brandName": "데이즈온",
+      "productName": "릴리브피엠",
+      "classification": "피부별 랭킹 > 지성 > 이너뷰티 > 기타 식품",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "리오프|2주속눈썹영양제아이래쉬세럼",
+      "brandName": "리오프",
+      "productName": "2주 속눈썹영양제 아이래쉬 세럼",
+      "classification": "피부별 랭킹 > 중성 > 아이메이크업 > 속눈썹영양제",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "리르|룩스아이래쉬에센스",
+      "brandName": "리르",
+      "productName": "룩스 아이래쉬 에센스",
+      "classification": "피부별 랭킹 > 중성 > 아이메이크업 > 속눈썹영양제",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "오니스트|트리플샤인포도6box/3개월분",
+      "brandName": "오니스트",
+      "productName": "트리플샤인 포도 6box /3개월분",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "세노비스|피부촉촉히알루론산",
+      "brandName": "세노비스",
+      "productName": "피부촉촉 히알루론산",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "셀렉스|코어프로틴프로식이섬유",
+      "brandName": "셀렉스",
+      "productName": "코어프로틴 프로 식이섬유",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 근육량 증가",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "홀블렌딩|식물단백[그레인]",
+      "brandName": "홀블렌딩",
+      "productName": "식물단백 [그레인]",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 근육량 증가",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "엔젯오리진|에너지비타민b-콤플렉스구미",
+      "brandName": "엔젯오리진",
+      "productName": "에너지 비타민B-콤플렉스 구미",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 근육량 증가",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "푸드올로지|콜레올로지컷팅젤리",
+      "brandName": "푸드올로지",
+      "productName": "콜레올로지 컷팅 젤리",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "푸드올로지|버닝올로지디데이",
+      "brandName": "푸드올로지",
+      "productName": "버닝올로지 디데이",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "그린몬스터|다이어트스페셜1콜레우스포스콜리500",
+      "brandName": "그린몬스터",
+      "productName": "다이어트 스페셜1 콜레우스포스콜리500",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "스키니랩|이지슬리밍잔티젠다이어트",
+      "brandName": "스키니랩",
+      "productName": "이지슬리밍 잔티젠 다이어트",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "그린몬스터|디톡콤부차[석류히비스커스]",
+      "brandName": "그린몬스터",
+      "productName": "디톡 콤부차 [석류히비스커스]",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "푸드올로지|톡스올로지클렌즈비움",
+      "brandName": "푸드올로지",
+      "productName": "톡스올로지 클렌즈 비움",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "푸드올로지|맨올로지컷",
+      "brandName": "푸드올로지",
+      "productName": "맨올로지 컷",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이오코어|데일리유산균",
+      "brandName": "바이오코어",
+      "productName": "데일리 유산균",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "종근당건강|프로폴리스플러스",
+      "brandName": "종근당건강",
+      "productName": "프로폴리스 플러스",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 항산화 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "초엘|아답토젠감초갈릭",
+      "brandName": "초엘",
+      "productName": "아답토젠 감초갈릭",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "아임비타|멀티비타민데일리",
+      "brandName": "아임비타",
+      "productName": "멀티비타민 데일리",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "얼라이브|원스데일리포우먼",
+      "brandName": "얼라이브",
+      "productName": "원스데일리 포우먼",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "gnm|종합비타민미네랄15",
+      "brandName": "GNM",
+      "productName": "종합비타민 미네랄15",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "판토모나|비오틴하이퍼포머",
+      "brandName": "판토모나",
+      "productName": "비오틴 하이퍼포머",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "비타하임|발포비타민[멀티비타민]",
+      "brandName": "비타하임",
+      "productName": "발포비타민 [멀티비타민]",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "이너비|아이시안루테인지아잔틴플러스케어",
+      "brandName": "이너비",
+      "productName": "아이시안 루테인지아잔틴 플러스케어",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리원라이프|루테인지아잔틴164",
+      "brandName": "뉴트리원라이프",
+      "productName": "루테인 지아잔틴 164",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "순수식품|rtg알티지오메가3복합기능성",
+      "brandName": "순수식품",
+      "productName": "rTG 알티지 오메가3 복합 기능성",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "솔가|비타민d32200iu",
+      "brandName": "솔가",
+      "productName": "비타민 D3 2200IU",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "쁘띠앤|국민칼마디",
+      "brandName": "쁘띠앤",
+      "productName": "국민 칼마디",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "세노비스|달맞이꽃종자유",
+      "brandName": "세노비스",
+      "productName": "달맞이꽃종자유",
+      "classification": "피부별 랭킹 > 중성 > 이너뷰티 > 기타 식품",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "키스미|히로인메이크워터링아이래쉬세럼",
+      "brandName": "키스미",
+      "productName": "히로인메이크 워터링 아이래쉬 세럼",
+      "classification": "피부별 랭킹 > 복합성 > 아이메이크업 > 속눈썹영양제",
+      "rules": [
+        "X1_INNER_BEAUTY"
+      ]
+    },
+    {
+      "key": "바디프로젝트|카무트®브랜드밀함유효소골드프리미엄",
+      "brandName": "바디프로젝트",
+      "productName": "카무트®브랜드밀 함유 효소 골드 프리미엄",
+      "classification": "피부별 랭킹 > 복합성 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "티젠|콤부차[레몬]",
+      "brandName": "티젠",
+      "productName": "콤부차 [레몬]",
+      "classification": "피부별 랭킹 > 복합성 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이탈뷰티|메타그린골드",
+      "brandName": "바이탈뷰티",
+      "productName": "메타그린 골드",
+      "classification": "피부별 랭킹 > 복합성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "필리브|면역비타민c",
+      "brandName": "필리브",
+      "productName": "면역비타민C",
+      "classification": "피부별 랭킹 > 복합성 > 이너뷰티 > 항산화 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "대웅제약|에너씨슬베이직",
+      "brandName": "대웅제약",
+      "productName": "에너씨슬 베이직",
+      "classification": "피부별 랭킹 > 복합성 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리디데이|프리미엄루테인골드",
+      "brandName": "뉴트리디데이",
+      "productName": "프리미엄 루테인 골드",
+      "classification": "피부별 랭킹 > 복합성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "마인트리|루테인지아잔틴",
+      "brandName": "마인트리",
+      "productName": "루테인 지아잔틴",
+      "classification": "피부별 랭킹 > 복합성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "데일리케어|유한루테인지아잔틴",
+      "brandName": "데일리케어",
+      "productName": "유한 루테인지아잔틴",
+      "classification": "피부별 랭킹 > 복합성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "세노비스|칼슘&비타민d",
+      "brandName": "세노비스",
+      "productName": "칼슘&비타민D",
+      "classification": "피부별 랭킹 > 복합성 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "발란스핏|라인큐",
+      "brandName": "발란스핏",
+      "productName": "라인큐",
+      "classification": "피부별 랭킹 > 복합성 > 이너뷰티 > 혈행 개선",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "경남제약|스트레스케어",
+      "brandName": "경남제약",
+      "productName": "스트레스케어",
+      "classification": "피부별 랭킹 > 복합성 > 이너뷰티 > 기타 식품",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "그린몬스터|혈당관리다이어트하루컷",
+      "brandName": "그린몬스터",
+      "productName": "혈당관리 다이어트 하루 컷",
+      "classification": "피부별 랭킹 > 민감성 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "초엘|아답토젠감초홍삼",
+      "brandName": "초엘",
+      "productName": "아답토젠 감초홍삼",
+      "classification": "피부별 랭킹 > 민감성 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "세노비스|키즈프로폴리스",
+      "brandName": "세노비스",
+      "productName": "키즈 프로폴리스",
+      "classification": "피부별 랭킹 > 민감성 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "블랙모어스|오더리스피쉬오일미니캡슐",
+      "brandName": "블랙모어스",
+      "productName": "오더리스 피쉬오일 미니 캡슐",
+      "classification": "피부별 랭킹 > 민감성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "뉴트리디데이|rtg알티지오메가3골드",
+      "brandName": "뉴트리디데이",
+      "productName": "rTG 알티지 오메가3 골드",
+      "classification": "피부별 랭킹 > 민감성 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "자로우포뮬러스|우먼즈펨도피러스",
+      "brandName": "자로우포뮬러스",
+      "productName": "우먼즈 펨 도피러스",
+      "classification": "피부별 랭킹 > 여드름 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이너랩|글로이",
+      "brandName": "바이너랩",
+      "productName": "글로이",
+      "classification": "피부별 랭킹 > 아토피 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "피토틱스|옐로우",
+      "brandName": "피토틱스",
+      "productName": "옐로우",
+      "classification": "피부별 랭킹 > 아토피 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "락토핏|플러스듀얼바이오틱스",
+      "brandName": "락토핏",
+      "productName": "플러스 듀얼바이오틱스",
+      "classification": "피부별 랭킹 > 아토피 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "스키니랩|가벼워지는시서스다이어트",
+      "brandName": "스키니랩",
+      "productName": "가벼워지는 시서스 다이어트",
+      "classification": "피부별 랭킹 > 아토피 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "뉴트리디데이|고함량가르시니아1000",
+      "brandName": "뉴트리디데이",
+      "productName": "고함량 가르시니아 1000",
+      "classification": "피부별 랭킹 > 아토피 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "비브리브|꼬박꼬밥[초코]",
+      "brandName": "비브리브",
+      "productName": "꼬박꼬밥 [초코]",
+      "classification": "피부별 랭킹 > 아토피 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "비타하임|발포비타민[비타민c500]",
+      "brandName": "비타하임",
+      "productName": "발포비타민 [비타민C500]",
+      "classification": "피부별 랭킹 > 아토피 > 이너뷰티 > 항산화 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "네이처메이드|액티브데일리멀티포우먼",
+      "brandName": "네이처메이드",
+      "productName": "액티브 데일리 멀티 포 우먼",
+      "classification": "피부별 랭킹 > 아토피 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "프롬바이오|관절연골엔보스웰리아",
+      "brandName": "프롬바이오",
+      "productName": "관절연골엔 보스웰리아",
+      "classification": "피부별 랭킹 > 아토피 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "니몸내몸|뻔뜩젤리루테인",
+      "brandName": "니몸내몸",
+      "productName": "뻔뜩 젤리 루테인",
+      "classification": "피부별 랭킹 > 아토피 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "닥터린|인케어",
+      "brandName": "닥터린",
+      "productName": "인케어",
+      "classification": "피부별 랭킹 > 아토피 > 이너뷰티 > 기타 식품",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "트루알엑스|리치화이트글루타치온",
+      "brandName": "트루알엑스",
+      "productName": "리치 화이트 글루타치온",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "비비랩|히알루론산",
+      "brandName": "비비랩",
+      "productName": "히알루론산",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "에버콜라겐|인앤업플러스",
+      "brandName": "에버콜라겐",
+      "productName": "인앤업 플러스",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "헬시플레이스|토닝화이트리포좀글루타치온",
+      "brandName": "헬시플레이스",
+      "productName": "토닝 화이트 리포좀 글루타치온",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "라이필|더마콜라겐",
+      "brandName": "라이필",
+      "productName": "더마 콜라겐",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 피부 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "에스더포뮬러|여에스더유산균클래식",
+      "brandName": "에스더포뮬러",
+      "productName": "여에스더 유산균 클래식",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 소화/위장 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "비타하임|발포비타민",
+      "brandName": "비타하임",
+      "productName": "발포비타민",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "바이탈뷰티|데일리비타민츄어블",
+      "brandName": "바이탈뷰티",
+      "productName": "데일리 비타민 츄어블",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "아임비타|멀티비타민바이탈",
+      "brandName": "아임비타",
+      "productName": "멀티비타민 바이탈",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "해비추얼|활력충전멀티비타민",
+      "brandName": "해비추얼",
+      "productName": "활력충전 멀티비타민",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 종합 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "고려은단|비타민c1000구미",
+      "brandName": "고려은단",
+      "productName": "비타민C 1000 구미",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 항산화 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "니몸내몸|튼튼젤리비타민c",
+      "brandName": "니몸내몸",
+      "productName": "튼튼 젤리 비타민C",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 항산화 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "솔가|오메가-3700epa&dha",
+      "brandName": "솔가",
+      "productName": "오메가-3 700 EPA&DHA",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "뉴트리디데이|플러스비타민d1000iu",
+      "brandName": "뉴트리디데이",
+      "productName": "플러스 비타민D 1000 IU",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "씨스팡|관절팔팔",
+      "brandName": "씨스팡",
+      "productName": "관절팔팔",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 뼈/관절/치아 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "프로메가|식물성오메가3듀얼",
+      "brandName": "프로메가",
+      "productName": "식물성 오메가3 듀얼",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 혈행 개선",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "정관장|알파프로젝트혈행건강",
+      "brandName": "정관장",
+      "productName": "알파프로젝트 혈행건강",
+      "classification": "연령대별 랭킹 > 10대 > 이너뷰티 > 혈행 개선",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "세노비스|프로폴리스",
+      "brandName": "세노비스",
+      "productName": "프로폴리스",
+      "classification": "연령대별 랭킹 > 20대 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "락토핏|베베",
+      "brandName": "락토핏",
+      "productName": "베베",
+      "classification": "연령대별 랭킹 > 30대 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "정관장|홍삼톤",
+      "brandName": "정관장",
+      "productName": "홍삼톤",
+      "classification": "연령대별 랭킹 > 30대 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "gnm|메가비타민c3000",
+      "brandName": "GNM",
+      "productName": "메가 비타민C 3000",
+      "classification": "연령대별 랭킹 > 30대 > 이너뷰티 > 항산화 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "아이클리어|루테인",
+      "brandName": "아이클리어",
+      "productName": "루테인",
+      "classification": "연령대별 랭킹 > 30대 > 이너뷰티 > 눈 건강",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    },
+    {
+      "key": "그린몬스터|바로마시는헐리우드48시간",
+      "brandName": "그린몬스터",
+      "productName": "바로 마시는 헐리우드48시간",
+      "classification": "연령대별 랭킹 > 40대 이상 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "딥트3일|스트롱업",
+      "brandName": "딥트3일",
+      "productName": "스트롱업",
+      "classification": "연령대별 랭킹 > 40대 이상 > 이너뷰티 > 체지방 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT"
+      ]
+    },
+    {
+      "key": "세리박스|세리컷스타터샤이닝",
+      "brandName": "세리박스",
+      "productName": "세리컷 스타터 샤이닝",
+      "classification": "연령대별 랭킹 > 40대 이상 > 이너뷰티 > 면역/피로 관리",
+      "rules": [
+        "X1_INNER_BEAUTY",
+        "X2_NON_COSMETIC_SUSPECT",
+        "X3_EXISTING_NON_COSMETIC_MASTER"
+      ]
+    }
+  ]
+}
