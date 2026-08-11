@@ -233,8 +233,9 @@ export default function PartnerSpaceLayout() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
             <p>&copy; 2026 Neture. 공급자 &middot; 파트너 협업 플랫폼</p>
             <div className="flex items-center gap-4 text-xs text-gray-400">
+              {/* WO-O4O-NETURE-ABOUT-LINK-AND-CATCH-ALL-ROUTE-V1: dead link /about 제거
+                  (route 부재 — NetureLayout · SupplierSpaceLayout 과 동일 처리) */}
               <Link to="/contact" className="hover:text-primary-600 transition-colors">Contact Us</Link>
-              <Link to="/about" className="hover:text-primary-600 transition-colors">About</Link>
             </div>
           </div>
         </div>

@@ -54,6 +54,7 @@ import {
   CommunityAnnouncementDetailPage,
 } from './pages/community';
 import ContactPage from './pages/ContactPage';
+import NotFoundPage from './pages/NotFoundPage';
 import SupplierLandingPage from './pages/SupplierLandingPage';
 import PartnerLandingPage from './pages/PartnerLandingPage';
 
@@ -1239,6 +1240,15 @@ function App() {
                 동일 path 가 위 SupplierSpaceLayout 블록에 SupplierDashboardPage 로 이미 선언돼 있어
                 랭킹 동점 시 선언 순서상 항상 그쪽이 승리했다(실행된 적 없는 정의).
                 제거 후 `/supplier/dashboard` 실행 route 는 1개다. */}
+
+            {/* ================================================================
+                catch-all — 반드시 마지막
+                WO-O4O-NETURE-ABOUT-LINK-AND-CATCH-ALL-ROUTE-V1:
+                  선언되지 않은 경로는 지금까지 아무 route 도 매치하지 못해 빈 화면이 됐다.
+                  redirect 로 흡수하지 않고 404 안내 화면을 렌더한다(주소는 그대로 유지).
+                  위에 선언된 route·redirect 는 전부 이 route 보다 구체적이므로 영향을 받지 않는다.
+            ================================================================ */}
+            <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>
         </BrowserRouter>

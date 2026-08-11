@@ -369,7 +369,9 @@ export default function SupplierSpaceLayout() {
             <div className="flex items-center gap-4 text-xs text-gray-400">
               {/* WO-O4O-NETURE-SUPPLIER-CANONICAL-WORKSPACE-SMOKE-CLOSEOUT-V1:
                   `/about` 은 App.tsx 에 route 가 없고 catch-all 도 없어 클릭 시 빈 화면이 됐다.
-                  대체 화면을 임의로 지정하지 않고 죽은 링크만 제거한다. */}
+                  대체 화면을 임의로 지정하지 않고 죽은 링크만 제거한다.
+                  (WO-O4O-NETURE-ABOUT-LINK-AND-CATCH-ALL-ROUTE-V1 이후 catch-all 은 존재한다 —
+                   `/about` 은 이제 빈 화면이 아니라 404 안내로 떨어진다. 링크는 여전히 두지 않는다.) */}
               <Link to="/contact" className="hover:text-primary-600 transition-colors">Contact Us</Link>
             </div>
           </div>
