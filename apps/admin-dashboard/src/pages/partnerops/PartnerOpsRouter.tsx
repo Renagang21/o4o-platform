@@ -1,58 +1,29 @@
 /**
  * PartnerOps Router
  *
- * Main router for PartnerOps app pages
- * Manages partners, affiliate links, conversions, and commissions
+ * WO-O4O-PARTNEROPS-AFFILIATE-SURFACE-RETIRE-OR-GUIDE-V1:
+ *   `/partnerops/*` 전 경로를 단일 안내 화면(`PartnerOpsGuidePage`)으로 통합했다.
+ *   backend route 가 마운트돼 있지 않아 기존 화면 6개는 조회 실패 카드만 노출했고,
+ *   전통 affiliate 수익·전환·자동 정산은 현재 O4O 방향과 맞지 않는다.
+ *   판정 근거: docs/checks/CHECK-O4O-PARTNEROPS-ACTIVE-DEMO-FALLBACK-AUDIT-AND-GUIDE-V1.md
  *
- * WO-MENU-ROUTE-WIRING: Added AI Builder routes
+ *   기존 페이지(Dashboard · Profile · Routines · Links · Conversions · Settlement)와
+ *   `components/PartnerOpsLoadError` 는 참조 0건이 되어 제거했다.
+ *   route 자체(app manifest · AppRouteGuard · AdminProtectedRoute)는 그대로 유지한다 —
+ *   경로를 없애면 기존 링크가 404 가 되어 "왜 사라졌는지" 를 알 수 없다.
+ *
+ *   이 라우터가 연결하는 화면은 API 를 호출하지 않는다.
  */
 
-import React, { Suspense, lazy } from 'react';
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import PartnerOpsGuidePage from './PartnerOpsGuidePage';
 
-// Lazy load pages
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Profile = lazy(() => import('./pages/Profile'));
-const Routines = lazy(() => import('./pages/Routines'));
-const Links = lazy(() => import('./pages/Links'));
-const Conversions = lazy(() => import('./pages/Conversions'));
-const Settlement = lazy(() => import('./pages/Settlement'));
-
-// Partner AI Builder - Placeholder (package not yet ready for production build)
-const AiBuilderPage: React.FC = () => (
-  <div className="p-4 text-center text-gray-500">AI Builder is coming soon...</div>
-);
-
-// Loading component
-const PageLoader: React.FC = () => (
-  <div className="flex items-center justify-center h-64">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-  </div>
-);
-
-/**
- * PartnerOps Router Component
- */
 const PartnerOpsRouter: React.FC = () => {
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="routines" element={<Routines />} />
-        <Route path="routines/new" element={<Routines />} />
-        <Route path="routines/:id" element={<Routines />} />
-        <Route path="links" element={<Links />} />
-        <Route path="links/new" element={<Links />} />
-        <Route path="conversions" element={<Conversions />} />
-        <Route path="settlement" element={<Settlement />} />
-        {/* AI Builder Routes (WO-MENU-ROUTE-WIRING) */}
-        <Route path="ai-builder" element={<AiBuilderPage />} />
-        <Route path="ai-builder/routine" element={<AiBuilderPage />} />
-        <Route path="ai-builder/recommend" element={<AiBuilderPage />} />
-        <Route path="*" element={<Dashboard />} />
-      </Routes>
-    </Suspense>
+    <Routes>
+      <Route path="*" element={<PartnerOpsGuidePage />} />
+    </Routes>
   );
 };
 
