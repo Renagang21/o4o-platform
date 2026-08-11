@@ -45,7 +45,9 @@
  * 프론트 라우트는 UX 안내이며 권한 판정 근거가 아니다.
  */
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+// WO-O4O-WEB-CATCH-ALL-ROUTE-CROSS-SERVICE-V1: catch-all 이 Navigate → NotFoundPage 로 바뀌면서
+// 이 파일에서 Navigate 사용처가 0 이 됐다 (다른 redirect 는 없다).
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { AuthProvider } from './contexts/AuthContext';
 import { MembershipGate } from './components/MembershipGate';
@@ -88,6 +90,8 @@ import SignagePage from './pages/store-owner/SignagePage';
 import ManualsPage from './pages/store-owner/ManualsPage';
 import ManualDetailPage from './pages/store-owner/ManualDetailPage';
 import QrLandingPage from './pages/QrLandingPage';
+// WO-O4O-WEB-CATCH-ALL-ROUTE-CROSS-SERVICE-V1 — 없는 경로 404 안내 (redirect 아님)
+import NotFoundPage from './pages/NotFoundPage';
 // WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1 — 태블릿 · 화면 세트
 import TabletsPage from './pages/store-owner/TabletsPage';
 import { ROLES } from './config/service';
@@ -218,7 +222,14 @@ export default function App() {
           */}
           <Route path="/qr/:slug" element={<QrLandingPage />} />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/*
+            catch-all — 반드시 마지막
+            WO-O4O-WEB-CATCH-ALL-ROUTE-CROSS-SERVICE-V1:
+              기존에는 `<Navigate to="/" replace />` 로 홈에 흡수했다. 없는 주소를 입력하면
+              안내 없이 홈으로 튕겨 요청 URL 이 사라졌다. redirect 대신 404 안내를 그 자리에
+              render 하여 주소를 보존한다. 위 route 는 전부 이보다 구체적이라 영향이 없다.
+          */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
         </BrowserRouter>
       </AuthProvider>
