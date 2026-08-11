@@ -157,5 +157,5 @@ UPDATE product_masters
 
 | 항목 | 값 |
 |---|---|
-| commit | (아래 커밋 SHA) |
-| push | `origin/main` |
+| commit | `986e41948` |
+| push | `origin/main` 반영 완료 (`54a13bcca..986e41948`) |
