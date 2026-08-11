@@ -168,13 +168,36 @@ membership 실측과 카탈로그가 서로 다른 서비스를 가리키거나,
 
 ## 9. 배포 후 실제 변경량 대조
 
-*(배포 완료 후 read-only 재집계로 채운다 — 최종 보고 참조)*
+적용 경로: commit `efbaa7a70` push → `Deploy API Server (Cloud Run)` **success** → 마이그레이션 자동 실행.
+`typeorm_migrations` 에 `ReplaceRoleAssignmentsActiveUniqueConstraint20270301000000` ·
+`NormalizeNetureOperatorMembershipRole20270302000000` 2건 기록 확인.
 
-| 항목 | dry-run 예상 | 실제 |
-|---|---|---|
-| `role_assignments` 데이터 | 0행 | — |
-| `service_memberships` | 1행 | — |
-| 제약 → 부분 인덱스 | 교체 1건 | — |
+| 항목 | dry-run 예상 | **실제** | 일치 |
+|---|---|---|:--:|
+| `role_assignments` 데이터 변경 | 0행 | **0행** (43 / 활성 38 / 비활성 5 — 착수 시점과 동일) | ✅ |
+| `service_memberships` 변경 | 1행 | **1행** (`neture/operator` 0건 · `neture/neture:operator` 1건) | ✅ |
+| 제약 → 부분 인덱스 교체 | 1건 | **1건** | ✅ |
+
+교체 결과 실측:
+
+```text
+ux_role_assignments_user_role_active
+  CREATE UNIQUE INDEX ... ON public.role_assignments USING btree (user_id, role) WHERE is_active
+role_assignments 잔여 제약: PK · chk_org_scope · FK 2개  (unique_active_role_per_user 제거됨)
+```
+
+**이력 보존 확인** — 쌍둥이 쌍(`platform:super_admin`, 활성 1 + 비활성 1)이 **그대로 공존**한다.
+새 구조에서 합법이며 삭제된 행은 0개다. 역할 분포도 불변(접두 24행/16종 · 무접두 19행/6종).
+
+### 9-1. 프로덕션 기능 회귀 (배포 후)
+
+| 항목 | 결과 |
+|---|---|
+| `GET /health` | ✅ 200 |
+| 정식 폼 로그인 (`platform:super_admin` 계정) | ✅ `success=true` · `roles=["platform:super_admin"]` · memberships active |
+| `GET /api/v1/auth/status` | ✅ 200 |
+| `GET /api/v1/admin/users?limit=1` (역할 기반 인가) | ✅ 200 |
+| `GET /api/v1/admin/platform-accounts` (ADMIN_ACCESS_ROLES) | ✅ 200 |
 
 ---
 
