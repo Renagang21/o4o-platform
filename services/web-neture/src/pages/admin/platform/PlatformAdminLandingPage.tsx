@@ -28,10 +28,12 @@ const TIER1_CARDS: Tier1Card[] = [
   {
     icon: UserCog,
     title: '운영자 관리',
-    desc: 'Neture 서비스 운영자/관리자를 부여·회수하는 기능(neture 전용 범위). 현재 위치를 유지합니다.',
+    // WO-O4O-NETURE-ADMIN-OPERATORS-GUIDE-REPLACE-V1: Neture 자체 관리 UI 는 제거되었고,
+    //   해당 경로는 중앙 관리자 `/operators` 로 이동을 안내하는 화면이다.
+    desc: '운영자/관리자 부여·회수는 중앙 관리자에서 수행합니다. 이 항목은 중앙 화면으로 이동을 안내합니다.',
     to: '/admin/operators',
-    badge: '현 위치 유지',
-    badgeTone: 'keep',
+    badge: '중앙 관리 안내',
+    badgeTone: 'move',
   },
   {
     icon: ShieldCheck,

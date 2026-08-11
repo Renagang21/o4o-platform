@@ -158,8 +158,10 @@ export default function AdminMemberManagementPage() {
     // Block delete if member has active operator role
     const blockingRole = target.roles.find((r) => OPERATOR_ROLES_SET.has(r));
     if (blockingRole) {
+      // WO-O4O-NETURE-ADMIN-OPERATORS-GUIDE-REPLACE-V1: /admin/operators 는 더 이상 해제 화면이 아니다.
+      //   권한 해제 위치를 중앙 관리자로 정정한다(안내 문구만 변경, 차단 조건은 그대로).
       // toast import is not in this file — use window alert as fallback
-      alert(`이 계정은 '${blockingRole}' 운영자 권한을 보유하고 있습니다.\n운영자 관리(/admin/operators)에서 권한을 해제한 후 삭제해주세요.`);
+      alert(`이 계정은 '${blockingRole}' 운영자 권한을 보유하고 있습니다.\n중앙 관리자(admin.neture.co.kr)의 운영자 관리에서 권한을 해제한 후 삭제해주세요.`);
       return;
     }
     setDeleteTarget({ id: onlyId, name: getDisplayName(target) });
