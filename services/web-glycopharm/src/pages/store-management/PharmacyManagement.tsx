@@ -244,7 +244,7 @@ function CourseSection() {
           <h3 className="text-sm font-bold text-slate-800">강좌</h3>
         </div>
         <Link
-          to="/education"
+          to="/lms"
           className="text-xs text-slate-400 hover:text-primary-600 transition-colors"
         >
           더보기 →
@@ -256,7 +256,7 @@ function CourseSection() {
           return (
             <Link
               key={course.id}
-              to="/education"
+              to="/lms"
               className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
             >
               <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0 mt-0.5">

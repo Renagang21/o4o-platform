@@ -227,7 +227,7 @@ export function HomePage() {
           <Card style={placeholderStyles.card}>
             <TrendIcon />
             <p style={placeholderStyles.text}>이 영역은 K-Beauty 트렌드 소식이 표시될 예정입니다.</p>
-            <a href="/community" style={placeholderStyles.link}>
+            <a href="/forum" style={placeholderStyles.link}>
               커뮤니티 바로가기 →
             </a>
           </Card>

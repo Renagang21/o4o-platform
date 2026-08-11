@@ -148,10 +148,10 @@ export function PartnerInfoPage() {
           <br />
           파트너로서 어떤 역할을 수행하게 되는지 명확해집니다.
         </p>
+        {/* WO-O4O-WEB-DEAD-LINK-SWEEP-CROSS-SERVICE-V1:
+            `/channel/structure` 는 선언된 route 가 없어 클릭 시 404 였다. 링크만 제거한다.
+            (대상 컴포넌트 ChannelSalesStructurePage 는 참조 0건 orphan — 별도 정리 후보) */}
         <div style={styles.channelLinks}>
-          <Link to="/channel/structure" style={styles.channelLinkPrimary}>
-            채널·판매 구조 상세 보기 →
-          </Link>
           <Link to="/seller/overview" style={styles.channelLinkSecondary}>
             매장(판매자) 안내 보기 →
           </Link>
@@ -166,9 +166,9 @@ export function PartnerInfoPage() {
           <br />
           플랫폼의 역할과 책임 범위를 안내합니다.
         </p>
-        <Link to="/platform/principles" style={styles.principlesLink}>
-          운영 원칙 자세히 보기 →
-        </Link>
+        {/* WO-O4O-WEB-DEAD-LINK-SWEEP-CROSS-SERVICE-V1:
+            `/platform/principles` 는 선언된 route 가 없어 클릭 시 404 였다.
+            (PlatformPrinciplesPage 는 참조 0건 orphan — 별도 정리 후보) 안내 문구만 남긴다. */}
       </section>
 
       {/* 하단 */}
