@@ -17,6 +17,7 @@ export async function fetchOperatorDashboard(): Promise<OperatorDashboardConfig 
     return response.data?.data ?? null;
   } catch (error) {
     console.warn('[Neture Operator Dashboard] Fetch failed:', error);
-    return null;
+    if ((error as any)?.response?.status === 404) return null;
+    throw error;
   }
 }

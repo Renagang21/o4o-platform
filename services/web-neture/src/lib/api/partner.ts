@@ -31,7 +31,7 @@ export const recruitingApi = {
       return result.data || [];
     } catch (error) {
       console.warn('[Neture API] Failed to fetch recruiting products:', error);
-      return [];
+      throw error;
     }
   },
 };
@@ -91,9 +91,9 @@ export const partnerDashboardApi = {
       const response = await api.get('/neture/partner/dashboard/items');
       const result = response.data;
       return result.data || [];
-    } catch {
+    } catch (error) {
       console.warn('[Neture API] Dashboard items API not available');
-      return [];
+      throw error;
     }
   },
 
@@ -109,9 +109,9 @@ export const partnerDashboardApi = {
       const response = await api.get(`/neture/partner/contents${params}`);
       const result = response.data;
       return result.data || [];
-    } catch {
+    } catch (error) {
       console.warn('[Neture API] Browse contents API not available');
-      return [];
+      throw error;
     }
   },
 
@@ -129,9 +129,9 @@ export const partnerDashboardApi = {
       const response = await api.get(`/neture/partner/dashboard/items/${itemId}/contents`);
       const result = response.data;
       return result.data || [];
-    } catch {
+    } catch (error) {
       console.warn('[Neture API] Linked contents API not available');
-      return [];
+      throw error;
     }
   },
 
@@ -302,8 +302,8 @@ export const partnerCommissionApi = {
       const response = await api.get(`/neture/partner/commissions${qs}`);
       const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
-    } catch {
-      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch (error) {
+      throw error;
     }
   },
 
@@ -313,7 +313,10 @@ export const partnerCommissionApi = {
       const response = await api.get(`/neture/partner/commissions/${id}`);
       const result = response.data;
       return result.data || null;
-    } catch { return null; }
+    } catch (error) {
+      if ((error as any)?.response?.status === 404) return null;
+      throw error;
+    }
   },
 };
 
@@ -417,8 +420,8 @@ export const partnerSettlementApi = {
       const response = await api.get(`/neture/partner/settlements${qs}`);
       const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
-    } catch {
-      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch (error) {
+      throw error;
     }
   },
 

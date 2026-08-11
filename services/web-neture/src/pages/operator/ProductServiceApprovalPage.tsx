@@ -201,12 +201,18 @@ export default function ProductServiceApprovalPage() {
 
   // Fetch analytics (re-fetch on period change)
   useEffect(() => {
-    operatorServiceApprovalApi.analytics(analyticsPeriod).then((data) => {
-      if (data) {
-        setAnalytics(data);
-        setShowAnalytics(true);
-      }
-    });
+    operatorServiceApprovalApi
+      .analytics(analyticsPeriod)
+      .then((data) => {
+        if (data) {
+          setAnalytics(data);
+          setShowAnalytics(true);
+        }
+      })
+      .catch(() => {
+        // 분석 패널은 보조 정보 — 조회 실패 시 패널만 숨긴다(목록 화면 상태에는 영향 없음).
+        setShowAnalytics(false);
+      });
   }, [analyticsPeriod]);
 
   // Search debounce

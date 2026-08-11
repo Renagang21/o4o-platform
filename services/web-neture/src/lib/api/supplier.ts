@@ -392,7 +392,7 @@ export const supplierCopilotApi = {
       return result.data || [];
     } catch (error) {
       console.warn('[Supplier Copilot] Performance fetch failed:', error);
-      return [];
+      throw error;
     }
   },
 
@@ -403,7 +403,7 @@ export const supplierCopilotApi = {
       return result.data || [];
     } catch (error) {
       console.warn('[Supplier Copilot] Distribution fetch failed:', error);
-      return [];
+      throw error;
     }
   },
 
@@ -414,7 +414,7 @@ export const supplierCopilotApi = {
       return result.data || [];
     } catch (error) {
       console.warn('[Supplier Copilot] Trending fetch failed:', error);
-      return [];
+      throw error;
     }
   },
 
@@ -425,7 +425,8 @@ export const supplierCopilotApi = {
       return result.data || null;
     } catch (error) {
       console.warn('[Supplier Copilot] AI insight fetch failed:', error);
-      return null;
+      if ((error as any)?.response?.status === 404) return null;
+      throw error;
     }
   },
 };

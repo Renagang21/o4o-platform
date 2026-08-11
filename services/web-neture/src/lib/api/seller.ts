@@ -57,7 +57,7 @@ export const sellerApi = {
       return result.data || [];
     } catch (error) {
       console.warn('[Seller API] Failed to fetch available supply products:', error);
-      return [];
+      throw error;
     }
   },
 };

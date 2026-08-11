@@ -91,7 +91,8 @@ export async function fetchAdminDashboard() {
     return response.data?.data ?? null;
   } catch (error) {
     console.warn('[Admin Dashboard] Fetch failed:', error);
-    return null;
+    if ((error as any)?.response?.status === 404) return null;
+    throw error;
   }
 }
 
@@ -104,7 +105,8 @@ export const dashboardApi = {
       return response.data?.data ?? null;
     } catch (error) {
       console.warn('[Dashboard API] Failed to fetch supplier dashboard summary:', error);
-      return null;
+      if ((error as any)?.response?.status === 404) return null;
+      throw error;
     }
   },
 
@@ -114,7 +116,8 @@ export const dashboardApi = {
       return response.data?.data ?? null;
     } catch (error) {
       console.warn('[Dashboard API] Failed to fetch operator dashboard:', error);
-      return null;
+      if ((error as any)?.response?.status === 404) return null;
+      throw error;
     }
   },
 
@@ -133,7 +136,8 @@ export const dashboardApi = {
       return response.data?.data ?? null;
     } catch (error) {
       console.warn('[Dashboard API] Failed to fetch partner dashboard summary:', error);
-      return null;
+      if ((error as any)?.response?.status === 404) return null;
+      throw error;
     }
   },
 };

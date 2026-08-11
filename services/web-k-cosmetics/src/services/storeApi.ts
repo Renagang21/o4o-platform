@@ -180,8 +180,9 @@ export const storeApi = {
         listings: json.data || [],
         meta: json.meta || { total: 0 },
       };
-    } catch {
-      return null;
+    } catch (error) {
+      if ((error as any)?.response?.status === 404) return null;
+      throw error;
     }
   },
 

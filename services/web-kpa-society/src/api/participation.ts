@@ -328,8 +328,9 @@ export const participationApi = {
         submittedAt: r.completedAt ? new Date(r.completedAt) : undefined,
         createdAt: new Date(r.createdAt),
       };
-    } catch {
-      return null;
+    } catch (error) {
+      if ((error as any)?.response?.status === 404) return null;
+      throw error;
     }
   },
 

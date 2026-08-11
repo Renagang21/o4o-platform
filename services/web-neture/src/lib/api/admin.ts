@@ -187,7 +187,7 @@ export const adminSupplierApi = {
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Failed to fetch pending suppliers:', error);
-      return [];
+      throw error;
     }
   },
 
@@ -270,8 +270,8 @@ export const adminSupplierApi = {
     try {
       const response = await api.get(`/neture/admin/suppliers/${id}/regulated-categories`);
       return response.data?.data ?? [];
-    } catch {
-      return [];
+    } catch (error) {
+      throw error;
     }
   },
 
@@ -344,7 +344,7 @@ export const operatorSupplierApi = {
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Operator API] Failed to fetch suppliers:', error);
-      return [];
+      throw error;
     }
   },
 
@@ -387,7 +387,7 @@ export const operatorSupplierApi = {
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Operator API] Failed to fetch pending suppliers:', error);
-      return [];
+      throw error;
     }
   },
 
@@ -445,8 +445,8 @@ export const operatorSupplierApi = {
     try {
       const response = await api.get(`/neture/operator/suppliers/${id}/regulated-categories`);
       return response.data?.data ?? [];
-    } catch {
-      return [];
+    } catch (error) {
+      throw error;
     }
   },
 
@@ -499,7 +499,7 @@ export const adminSettlementApi = {
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
     } catch (error) {
       console.warn('[Admin Settlement API] Failed to fetch settlements:', error);
-      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      throw error;
     }
   },
 
@@ -611,7 +611,7 @@ export const adminProductApi = {
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Failed to fetch products:', error);
-      return [];
+      throw error;
     }
   },
 
@@ -677,7 +677,7 @@ export const adminProductApi = {
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Failed to fetch pending products:', error);
-      return [];
+      throw error;
     }
   },
 
@@ -848,8 +848,8 @@ export const adminCommissionApi = {
       const response = await api.get(`/neture/admin/commissions${qs}`);
       const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
-    } catch {
-      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch (error) {
+      throw error;
     }
   },
 
@@ -1075,7 +1075,7 @@ export const adminRegistrationApi = {
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Failed to fetch registration requests:', error);
-      return [];
+      throw error;
     }
   },
 };
@@ -1203,7 +1203,8 @@ export const operatorContactApi = {
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Operator Contact API] Failed to list:', error);
-      return null;
+      if ((error as any)?.response?.status === 404) return null;
+      throw error;
     }
   },
 
@@ -1215,7 +1216,8 @@ export const operatorContactApi = {
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Operator Contact API] Failed to mark-read:', error);
-      return null;
+      if ((error as any)?.response?.status === 404) return null;
+      throw error;
     }
   },
 };
@@ -1241,7 +1243,7 @@ export const serviceAudiencePolicyApi = {
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Service Audience API] Failed to list:', error);
-      return [];
+      throw error;
     }
   },
 

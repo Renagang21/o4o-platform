@@ -330,7 +330,8 @@ export async function fetchForumPostBySlug(slug: string): Promise<PostResponse |
     return data;
   } catch (error) {
     console.error('Error fetching forum post:', error);
-    return null;
+    if ((error as any)?.response?.status === 404) return null;
+    throw error;
   }
 }
 
@@ -361,12 +362,7 @@ export async function fetchForumComments(postId: string): Promise<CommentsRespon
     return response.data;
   } catch (error) {
     console.error('Error fetching forum comments:', error);
-    return {
-      success: false,
-      data: [],
-      pagination: { page: 1, limit: 20, totalPages: 0 },
-      totalCount: 0,
-    };
+    throw error;
   }
 }
 
@@ -478,7 +474,8 @@ export async function fetchUserContactSettings(): Promise<UserContactSettings | 
     return data.data || data;
   } catch (error) {
     console.error('Error fetching user contact settings:', error);
-    return null;
+    if ((error as any)?.response?.status === 404) return null;
+    throw error;
   }
 }
 

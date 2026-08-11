@@ -106,7 +106,7 @@ export const operatorServiceApprovalApi = {
       if (err?.response?.status === 403) {
         throw new Error('접근 권한이 없습니다');
       }
-      return { data: [], pagination: { page: 1, limit: 50, total: 0, totalPages: 0 } };
+      throw err;
     }
   },
 
@@ -175,8 +175,9 @@ export const operatorServiceApprovalApi = {
       const qs = period && period !== 'all' ? `?period=${period}` : '';
       const response = await api.get(`/neture/operator/approval-analytics${qs}`);
       return response.data?.data || null;
-    } catch {
-      return null;
+    } catch (error) {
+      if ((error as any)?.response?.status === 404) return null;
+      throw error;
     }
   },
 };

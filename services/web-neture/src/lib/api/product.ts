@@ -87,7 +87,8 @@ export const productApi = {
       return response.data.data || null;
     } catch (error) {
       console.warn('[Product API] Failed to fetch master by barcode:', error);
-      return null;
+      if ((error as any)?.response?.status === 404) return null;
+      throw error;
     }
   },
 
@@ -178,7 +179,7 @@ export const productApi = {
       };
     } catch (error) {
       console.warn('[Product API] Failed to search masters:', error);
-      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      throw error;
     }
   },
 
