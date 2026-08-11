@@ -12,7 +12,10 @@
 export type {
   OperatorMenuItem,
   OperatorGroupKey,
+  UnifiedMenuItem,
 } from './types';
+// WO-O4O-OPERATOR-MENU-ROLE-FILTER-COMMONIZATION-G3A-V1: 4 서비스 공통 adminOnly 필터
+export { filterMenuByRole } from './filterMenuByRole';
 export { STANDARD_GROUPS } from './constants';
 export type { StandardGroup } from './constants';
 

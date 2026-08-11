@@ -11,10 +11,11 @@
 
 import { useMemo } from 'react';
 import { isAdminOrAbove } from '@o4o/auth-utils';
+import { filterMenuByRole } from '@o4o/ui';
 import { OperatorAreaShell } from '@o4o/operator-ux-core';
 import { useAuth } from '../../contexts/AuthContext';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
-import { UNIFIED_MENU, filterMenuByRole } from '../../config/operatorMenuGroups';
+import { UNIFIED_MENU } from '../../config/operatorMenuGroups';
 import { KpaGlobalHeader } from '../KpaGlobalHeader';
 import { MobileBottomNav } from '../MobileBottomNav';
 

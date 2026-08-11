@@ -12,13 +12,9 @@
  * 표준 11-그룹 키에 대한 라우트 매핑.
  */
 
-import type { OperatorGroupKey, OperatorMenuItem } from '@o4o/ui';
+import type { OperatorGroupKey, UnifiedMenuItem } from '@o4o/ui';
 
 // ─── Unified Menu Item (adminOnly 지원) ───────────────────────
-
-export interface UnifiedMenuItem extends OperatorMenuItem {
-  adminOnly?: boolean;
-}
 
 export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> = {
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
@@ -106,19 +102,9 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
 
 // ─── Role-based Filter ────────────────────────────────────────
 
-export function filterMenuByRole(
-  menu: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>>,
-  isAdmin: boolean,
-): Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> {
-  const result: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {};
-  for (const [key, items] of Object.entries(menu)) {
-    const filtered = (items as UnifiedMenuItem[]).filter(i => !i.adminOnly || isAdmin);
-    if (filtered.length > 0) {
-      result[key as OperatorGroupKey] = filtered;
-    }
-  }
-  return result;
-}
+// WO-O4O-OPERATOR-MENU-ROLE-FILTER-COMMONIZATION-G3A-V1: filterMenuByRole / UnifiedMenuItem 은 @o4o/ui (operator-shell) 공통 구현 사용.
+//   소비처(LayoutWrapper) 가 @o4o/ui 에서 직접 import 한다 — 위임 재수출을 두지 않는다.
+//   서비스별 메뉴 정의(UNIFIED_MENU) 와 isAdmin 산출은 각 서비스에 유지.
 
 // ─── Domain IA mapping ───
 // WO-O4O-CROSSSERVICE-OPERATOR-SIDEBAR-COMMON-COMPONENT-V1:

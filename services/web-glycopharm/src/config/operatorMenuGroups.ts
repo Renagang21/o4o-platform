@@ -14,16 +14,7 @@
  * adminOnly 항목은 admin 역할만 표시.
  */
 
-import type { OperatorGroupKey, OperatorMenuItem } from '@o4o/ui';
-
-/** 통합 메뉴 항목 — adminOnly 플래그 포함 */
-interface UnifiedMenuItem {
-  label: string;
-  path: string;
-  exact?: boolean;
-  /** true = admin 역할에게만 표시 */
-  adminOnly?: boolean;
-}
+import type { OperatorGroupKey, OperatorMenuItem, UnifiedMenuItem } from '@o4o/ui';
 
 /**
  * 통합 메뉴 구성
@@ -117,24 +108,9 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
 };
 
-/**
- * 역할 기반 메뉴 필터
- * adminOnly 항목을 admin이 아닌 사용자에게 숨기고,
- * OperatorMenuItem 타입으로 변환 (adminOnly 필드 제거)
- */
-export function filterMenuByRole(
-  menu: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>>,
-  isAdmin: boolean,
-): Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> {
-  const filtered: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {};
-  for (const [key, items] of Object.entries(menu) as [OperatorGroupKey, UnifiedMenuItem[]][]) {
-    const visible = items
-      .filter(item => !item.adminOnly || isAdmin)
-      .map(({ adminOnly: _, ...rest }) => rest);
-    if (visible.length > 0) filtered[key] = visible;
-  }
-  return filtered;
-}
+// WO-O4O-OPERATOR-MENU-ROLE-FILTER-COMMONIZATION-G3A-V1: filterMenuByRole / UnifiedMenuItem 은 @o4o/ui (operator-shell) 공통 구현 사용.
+//   소비처(LayoutWrapper) 가 @o4o/ui 에서 직접 import 한다 — 위임 재수출을 두지 않는다.
+//   서비스별 메뉴 정의(UNIFIED_MENU) 와 isAdmin 산출은 각 서비스에 유지.
 
 // ─── Domain IA mapping ───
 // WO-O4O-CROSSSERVICE-OPERATOR-SIDEBAR-COMMON-COMPONENT-V1:

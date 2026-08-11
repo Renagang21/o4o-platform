@@ -10,11 +10,11 @@
  *   filterMenuByRole(UNIFIED_MENU, false). footer 는 제거 (KPA/GlycoPharm/K-Cosmetics operator 정합).
  */
 
+import { filterMenuByRole } from '@o4o/ui';
 import { OperatorAreaShell } from '@o4o/operator-ux-core';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
 import {
   UNIFIED_MENU,
-  filterMenuByRole,
   NETURE_OPERATOR_DOMAIN_IA,
 } from '../../config/operatorMenuGroups';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';

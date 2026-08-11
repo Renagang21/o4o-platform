@@ -27,6 +27,18 @@ export interface OperatorMenuItem {
 }
 
 /**
+ * 통합 메뉴 항목 — adminOnly 플래그 포함.
+ *
+ * WO-O4O-OPERATOR-MENU-ROLE-FILTER-COMMONIZATION-G3A-V1:
+ *   4 서비스(KPA-Society / GlycoPharm / K-Cosmetics / Neture) 의 config 에 각각
+ *   중복 선언돼 있던 동일 타입. filterMenuByRole 의 입력 타입이다.
+ */
+export interface UnifiedMenuItem extends OperatorMenuItem {
+  /** true = admin 역할에게만 표시 */
+  adminOnly?: boolean;
+}
+
+/**
  * Capability Group 키.
  * CLAUDE.md Section 11 표준 순서.
  * resources, lms — WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1 추가
