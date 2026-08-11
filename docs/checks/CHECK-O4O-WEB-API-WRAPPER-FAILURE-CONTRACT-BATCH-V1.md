@@ -142,25 +142,30 @@ KEEP_INTENTIONAL_OPTIONAL 14건 (의도된 fail-open — 수정하지 않음):
 
 ## 7. 실제 실패 UI smoke 결과
 
-§8 (배포) 이후 실측. 인위적으로 API 를 깨는 변경은 하지 않았고, **운영에서 이미 실패하는 read endpoint** 를 이용했다.
+배포 후 실브라우저(Playwright)로 실측. **인위적으로 API 를 깨는 변경은 하지 않았고**, 운영에서 이미 404/실패가 나는 read 경로를 이용했다.
 
 | # | 축 | 대상 | 결과 |
 |---|---|---|---|
-| S1 | 정상 데이터 | (§9 이후 기재) | |
-| S2 | API 실패 → error 상태 | (§9 이후 기재) | |
-| S3 | empty 상태 | (§9 이후 기재) | |
-| S4 | 로그인 필요 | (§9 이후 기재) | |
-| S5 | 없는 route 404 | (§9 이후 기재) | |
+| S1 | 정상 데이터 | `neture.co.kr/forum` (포럼 목록·인기글·최근글) | **PASS** — 목록 정상 렌더 |
+| S1 | 정상 데이터 | `neture.co.kr/forum/post/ai-관련-개선-mpev9i3t` (`fetchForumPostBySlug` + `fetchForumComments` 둘 다 변경 대상) | **PASS** — 본문 + 댓글 2개 정상 |
+| S1 | 정상 데이터 | `neture.co.kr/supplier/dashboard` (`dashboardApi.getSupplierDashboardSummary` + `supplierCopilotApi.*` 변경 대상) | **PASS** — KPI/카드 정상, 무한 스피너 없음 |
+| S2 | API 404 → error 상태 | `neture.co.kr/forum/post/this-post-does-not-exist-wo-smoke` | **PASS** — R2 규칙대로 404 만 `null` → "게시글을 찾을 수 없습니다" 안내. 스피너 잔류 없음 |
+| S2 | API 실패 → error 상태 | `k-cosmetics.site/forum/post/00000000-…-000000000000` | **PASS (핵심 실측)** — `fetchForumComments` 가 이전에는 `{success:false, data:[]}` 로 실패를 삼켜 "댓글 0개" 로 보였으나, 이제 throw → 화면 catch → **"게시글을 불러오지 못했습니다."** error 상태 렌더 |
+| S3 | empty 상태 | `neture.co.kr/forum` 카테고리 "글 0개" | **PASS** — 실패가 아닌 정상 0건은 그대로 empty 표기 |
+| S4 | 로그인/권한 필요 | `neture.co.kr/operator/product-service-approvals` (공급자 세션) | 홈 redirect — **기존 guard 동작**(변경 아님). 화면 깨짐·무한 스피너 없음. 문구·redirect 정책은 다음 Auth-Login batch 대상(H3) |
+| S5 | 없는 route 404 | `neture.co.kr/forum/posts/…`, `k-cosmetics.site/no-such-route-wo-smoke` | **PASS** — 404 안내 화면 |
 
----
+미실측(정직 기록):
+- `web-kpa-society` `participationApi.getMyResponse` — 로그인 + 설문 참여 컨텍스트가 필요해 실브라우저 실측하지 못했다. typecheck/build/deploy 만 PASS. 변환은 R2(404 만 null)이며 소비처 2곳 모두 try/catch guarded 임을 정적 확인했다.
+- 비-404 서버 오류(5xx) 경로는 인위적 파괴 없이 재현할 수 없어 미실측.
 
 ## 8. typecheck · build · deploy 결과
 
 | 서비스 | typecheck | vite build | deploy |
 |---|:---:|:---:|:---:|
-| web-neture | PASS | PASS | (§9 이후) |
-| web-k-cosmetics | PASS | PASS | (§9 이후) |
-| web-kpa-society | PASS | PASS | (§9 이후) |
+| web-neture | PASS | PASS | PASS (run 31459781698) |
+| web-k-cosmetics | PASS | PASS | PASS (run 31459781698) |
+| web-kpa-society | PASS | PASS | PASS (run 31459781698) |
 | web-glycopharm | 변경 없음 | — | 배포 대상 아님 |
 | web-pharmacy-hub | 변경 없음 | — | 배포 대상 아님 |
 
@@ -170,13 +175,18 @@ API 서버 변경 0 · 배포 0.
 
 ## 9. commit SHA
 
-(커밋 후 기재)
+| commit | 내용 |
+|---|---|
+| `278eadf0f` | wrapper 실패 삼킴 제거 44건 + 소비처 가드 1건 + 본 CHECK 문서 |
+| (후속) | CHECK §7~§10 실측 결과 기재 |
 
 ---
 
 ## 10. push 결과
 
-(push 후 기재)
+- `c2be1f693..278eadf0f  main -> main` push 완료
+- GitHub Actions `Deploy Web Services (Cloud Run)` run **31459781698** — `detect-changes` / `deploy-neture` / `deploy-k-cosmetics` / `deploy-kpa-society` **success**, `deploy-glycopharm` · `deploy-pharmacy-hub` **skipped**(변경 없음)
+- API 서버 배포 없음
 
 ---
 
