@@ -1,0 +1,22 @@
+{
+  "wo": "WO-O4O-PRODUCT-AI-TAGS-SUPPLIER-OWNERSHIP-GUARD-V1",
+  "step": "postVerify",
+  "readOnly": true,
+  "dbWrites": 0,
+  "pass": true,
+  "failures": [],
+  "productMasterTotal": 272035,
+  "canonicalStore": 232860,
+  "supplierOfferRows": 2,
+  "productAiTagsRows": 0,
+  "metaObjectTagsMasters": 32674,
+  "byRegulatoryType": {
+    "일반": 15,
+    "건강기능식품": 40948,
+    "COSMETIC": 32674,
+    "DRUG": 177413,
+    "GENERAL": 11,
+    "MEDICAL_DEVICE": 3826,
+    "QUASI_DRUG": 17148
+  }
+}

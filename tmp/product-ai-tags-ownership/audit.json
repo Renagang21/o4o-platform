@@ -1,0 +1,14 @@
+{
+  "wo": "WO-O4O-PRODUCT-AI-TAGS-SUPPLIER-OWNERSHIP-GUARD-V1",
+  "step": "09-readonly-audit",
+  "readOnly": true,
+  "dbWrites": 0,
+  "productAiTagsRows": 0,
+  "distinctTaggedProducts": 0,
+  "tagsBySource": {},
+  "mastersWithTagsColumn": 268182,
+  "supplierOfferRows": 2,
+  "mastersWithOffer": 2,
+  "taggedProductsWithoutOffer": 0,
+  "orphanTagProducts": 0
+}

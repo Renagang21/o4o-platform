@@ -261,6 +261,22 @@ export class ProductAiTaggingService {
 
       const merged = [...new Set([...aiTags, ...manualTags])];
 
+      // WO-O4O-PRODUCT-AI-TAGS-SUPPLIER-OWNERSHIP-GUARD-V1 §6 (ProductMaster 비파괴)
+      //   product_masters.tags 는 jsonb 이고 실제 운영 데이터에 두 가지 형태가 공존한다.
+      //     - array  (239,361건) — 검색용 태그 목록. 동기화 대상.
+      //     - object ( 32,674건) — 배치/rollback 메타(nameCleanupV1.before · woBatch · censusKey).
+      //   후자를 배열로 덮어쓰면 선행 WO 의 rollback 키가 소실된다. AI 태그는
+      //   product_ai_tags 에 이미 저장돼 있으므로, object 형태인 master 는 동기화를 건너뛴다.
+      const current = await this.masterRepo.findOne({ where: { id: productId } });
+      const currentTags = current?.tags as unknown;
+      if (currentTags && !Array.isArray(currentTags) && typeof currentTags === 'object') {
+        console.warn(
+          '[ProductAiTag] master tags 가 메타 object 형태라 동기화를 건너뜁니다 (비파괴):',
+          productId,
+        );
+        return;
+      }
+
       await this.masterRepo.update(productId, { tags: merged });
     } catch (err) {
       console.error('[ProductAiTag] Failed to sync master tags:', err);
