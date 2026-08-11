@@ -35,11 +35,14 @@ interface Props {
 }
 
 // 지원 언어 = 백엔드 계약(ALLOWED_LANG)과 동일. 확대 시 백엔드 계약 변경 필요(본 WO 범위 밖).
-const SUPPORTED_LANGS = ['ko', 'en', 'zh', 'ja'] as const;
-type SupportedLang = (typeof SUPPORTED_LANGS)[number];
-const LANG_LABELS: Record<SupportedLang, string> = { ko: '한국어', en: 'English', zh: '中文', ja: '日本語' };
+// WO-O4O-NETURE-SUPPLIER-MATERIALS-STATUS-AND-REALDATA-CLOSEOUT-BATCH-V1:
+//   목록 화면이 언어별 상태를 표기하려면 같은 언어 계약을 써야 한다 — 중복 정의 대신 export 한다.
+export const SUPPORTED_LANGS = ['ko', 'en', 'zh', 'ja'] as const;
+export type SupportedLang = (typeof SUPPORTED_LANGS)[number];
+export const LANG_LABELS: Record<SupportedLang, string> = { ko: '한국어', en: 'English', zh: '中文', ja: '日本語' };
+export const LANG_SHORT: Record<SupportedLang, string> = { ko: 'KO', en: 'EN', zh: 'ZH', ja: 'JA' };
 const DEFAULT_LANG: SupportedLang = 'ko';
-const normLang = (v: string | null | undefined): SupportedLang => {
+export const normLang = (v: string | null | undefined): SupportedLang => {
   const l = (v ?? DEFAULT_LANG) as SupportedLang;
   return SUPPORTED_LANGS.includes(l) ? l : DEFAULT_LANG;
 };

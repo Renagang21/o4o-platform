@@ -26,7 +26,13 @@ import {
   type SupplierStoreDescriptionDraft,
 } from '../../lib/api';
 import { PROFILE_FIELD_LABELS } from '../../lib/api';
-import SupplierStoreDescriptionEditorDrawer from './SupplierStoreDescriptionEditorDrawer';
+import SupplierStoreDescriptionEditorDrawer, {
+  SUPPORTED_LANGS,
+  LANG_SHORT,
+  LANG_LABELS,
+  normLang,
+  type SupportedLang,
+} from './SupplierStoreDescriptionEditorDrawer';
 import StoreMaterialUsageNote from '../../components/supplier/StoreMaterialUsageNote';
 
 const PROFILE_PATH = '/mypage/business-profile';
@@ -137,14 +143,31 @@ export default function SupplierStoreDescriptionsPage() {
     setSearchParams(next, { replace: true });
   }, [deepLinkConsumed, productsLoading, products, searchParams, setSearchParams]);
 
-  const draftByMaster = useMemo(() => {
-    const m = new Map<string, SupplierStoreDescriptionDraft>();
+  // 우선순위: revision_requested(조치 필요) > canonical > needs_review > draft > 기타
+  const rank = (s: string) =>
+    s === 'revision_requested' ? 4 : s === 'canonical' ? 3 : s === 'needs_review' ? 2 : s === 'draft' ? 1 : 0;
+
+  /**
+   * WO-O4O-NETURE-SUPPLIER-MATERIALS-STATUS-AND-REALDATA-CLOSEOUT-BATCH-V1:
+   *   기존에는 master 당 1건으로 접어 **언어를 잃었다**. 각 언어는 독립 작업행인데
+   *   (에디터가 ko/en/zh/ja 탭으로 따로 저장한다) 목록이 최고 순위 1건만 보여줘,
+   *   예컨대 KO=매장 노출 · EN=수정 요청 인 상품이 "수정 요청" 하나로만 보이고
+   *   어느 언어가 조치 대상인지 알 수 없었다.
+   *   → (master, language) 단위로 접고 언어 칩과 함께 표기한다.
+   *   같은 (master, language) 에 행이 여러 개인 경우(운영자 교체로 hidden 강등된 과거 행 등)는
+   *   기존과 동일하게 최고 순위 1건만 남긴다 — 실데이터에서 확인된 중복이다.
+   */
+  const draftsByMasterLang = useMemo(() => {
+    const m = new Map<string, Map<SupportedLang, SupplierStoreDescriptionDraft>>();
     for (const d of drafts) {
-      const prev = m.get(d.masterId);
-      // 우선순위: revision_requested(조치 필요) > canonical > needs_review > draft > 기타
-      const rank = (s: string) =>
-        s === 'revision_requested' ? 4 : s === 'canonical' ? 3 : s === 'needs_review' ? 2 : s === 'draft' ? 1 : 0;
-      if (!prev || rank(d.status) > rank(prev.status)) m.set(d.masterId, d);
+      const lang = normLang(d.language);
+      let byLang = m.get(d.masterId);
+      if (!byLang) {
+        byLang = new Map();
+        m.set(d.masterId, byLang);
+      }
+      const prev = byLang.get(lang);
+      if (!prev || rank(d.status) > rank(prev.status)) byLang.set(lang, d);
     }
     return m;
   }, [drafts]);
@@ -248,8 +271,14 @@ export default function SupplierStoreDescriptionsPage() {
               </div>
             ) : (
               filteredProducts.slice(0, 100).map((p) => {
-                const d = draftByMaster.get(p.masterId);
-                const badge = d ? DRAFT_STATUS_BADGE[d.status] : null;
+                const byLang = draftsByMasterLang.get(p.masterId);
+                // 지원 언어 순서로 고정 — 작업행이 있는 언어만 칩으로 노출한다.
+                const langRows = byLang
+                  ? SUPPORTED_LANGS.map((l) => ({ lang: l, row: byLang.get(l) })).filter(
+                      (x): x is { lang: SupportedLang; row: SupplierStoreDescriptionDraft } => !!x.row,
+                    )
+                  : [];
+                const hasAny = langRows.length > 0;
                 return (
                   <div key={p.id} className="flex items-center gap-3 px-3 py-2.5">
                     <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-slate-100">
@@ -261,15 +290,32 @@ export default function SupplierStoreDescriptionsPage() {
                       <p className="truncate text-sm font-medium text-slate-800">{p.name || p.masterName || '(이름 없음)'}</p>
                       <p className="truncate font-mono text-xs text-slate-400">{p.barcode}</p>
                     </div>
-                    {badge && (
-                      <span className={`shrink-0 rounded px-2 py-0.5 text-xs font-medium ${badge.cls}`}>{badge.label}</span>
+                    {hasAny && (
+                      <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                        {langRows.map(({ lang, row }) => {
+                          const badge = DRAFT_STATUS_BADGE[row.status] ?? {
+                            label: row.status,
+                            cls: 'bg-slate-100 text-slate-600',
+                          };
+                          return (
+                            <span
+                              key={lang}
+                              title={`${LANG_LABELS[lang]} — ${badge.label}`}
+                              className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium ${badge.cls}`}
+                            >
+                              <span className="font-mono text-[10px] opacity-70">{LANG_SHORT[lang]}</span>
+                              {badge.label}
+                            </span>
+                          );
+                        })}
+                      </div>
                     )}
                     <button
                       type="button"
                       onClick={() => setSelected(p)}
                       className="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
                     >
-                      {d ? '설명서 편집' : '설명서 작성'}
+                      {hasAny ? '설명서 편집' : '설명서 작성'}
                     </button>
                   </div>
                 );

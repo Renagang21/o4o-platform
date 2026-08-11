@@ -281,7 +281,10 @@ export default function SupplierStoreMaterialsStatusPage() {
           { label: '수정 요청', value: summary.action, cls: 'text-orange-700' },
           { label: '검수 대기', value: summary.waiting, cls: 'text-amber-700' },
           { label: '매장 노출·게시 중', value: summary.live, cls: 'text-emerald-700' },
-          { label: '작성 중', value: summary.working, cls: 'text-slate-600' },
+          // WO-O4O-NETURE-SUPPLIER-MATERIALS-STATUS-AND-REALDATA-CLOSEOUT-BATCH-V1:
+          //   'live' 는 이미 '매장 노출·게시 중' 으로 두 어휘를 병기하는데 'working' 만 '작성 중' 이라
+          //   설명서 행의 '임시저장' 배지와 어긋났다(같은 집계에 들어가는데 라벨이 다름). 동일 패턴으로 병기한다.
+          { label: '작성 중·임시저장', value: summary.working, cls: 'text-slate-600' },
         ].map((c) => (
           <div key={c.label} className="rounded-xl border border-slate-200 bg-white p-3">
             <div className="text-xs text-slate-500">{c.label}</div>
