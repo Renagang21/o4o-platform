@@ -37,6 +37,10 @@ export interface ProductFormProps {
   /** WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1:
    *  공급 방식(전체 공개/서비스 공급) UI 숨김 — drawer 편집에서 상품 정보와 분리(공급 방식은 별도 모달). */
   hideDistribution?: boolean;
+  /** WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1:
+   *  상품명은 ProductMaster 기준정보다. 공급자 편집 화면에서는 읽기 전용으로 표시한다
+   *  (연결 ≠ master 편집). 기준정보 수정은 운영자/관리자 경로가 담당한다. */
+  masterNameReadOnly?: boolean;
 }
 
 // ─── Validation (exported) ───
@@ -143,7 +147,7 @@ const DEFAULT_DATA: ProductFormData = {
 
 // ─── Component ───
 
-export default function ProductForm({ mode, initialData, onChange, disabled = false, hideDistribution = false }: ProductFormProps) {
+export default function ProductForm({ mode, initialData, onChange, disabled = false, hideDistribution = false, masterNameReadOnly = false }: ProductFormProps) {
   const [data, setData] = useState<ProductFormData>(() => ({
     ...DEFAULT_DATA,
     ...initialData,
@@ -221,17 +225,24 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
       {/* ── Edit mode: 상품명 ── */}
       {mode === 'edit' && (
         <div>
-          <FieldLabel required>상품명</FieldLabel>
+          <FieldLabel required={!masterNameReadOnly}>상품명</FieldLabel>
           <input
             type="text"
             value={data.marketingName}
             onChange={(e) => updateField('marketingName', e.target.value)}
             onBlur={handleBlur}
-            disabled={disabled}
+            disabled={disabled || masterNameReadOnly}
+            readOnly={masterNameReadOnly}
             className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50 disabled:text-slate-400"
             placeholder="상품명 (마케팅명)"
           />
-          <FieldError error={errors.marketingName} />
+          {masterNameReadOnly ? (
+            <p className="mt-1 text-xs text-slate-500">
+              O4O 기준 상품정보입니다. 공급자 화면에서는 수정되지 않습니다 (수정이 필요하면 운영자에게 요청하세요).
+            </p>
+          ) : (
+            <FieldError error={errors.marketingName} />
+          )}
         </div>
       )}
 

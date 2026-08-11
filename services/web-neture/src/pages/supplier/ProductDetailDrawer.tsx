@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus, ChevronDown, ChevronRight } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem, type SpotPricePolicy } from '../../lib/api';
 import { SUPPLIER_SPOT_POLICIES_FORBIDDEN } from '../../lib/api/supplier';
-import { ProductForm, type ProductFormData, CategorySelect } from '../../components/product';
+import { ProductForm, type ProductFormData } from '../../components/product';
 import { RichTextEditor, ContentRenderer, type MediaInsert } from '@o4o/content-editor';
 // WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: O4O Form Standard primitives
 import { Section, InfoRow, FormField } from '@o4o/operator-ux-core';
@@ -329,8 +329,11 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
 
     try {
       // 1. 기본 필드 + isPublic + Master 필드 업데이트
+      // WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1:
+      //   상품명·카테고리·브랜드·사양·원산지는 ProductMaster 기준정보다.
+      //   공급자 offer 수정은 공급 조건 수정이지 master 편집이 아니므로 전송하지 않는다
+      //   (서버도 무시한다 — offer.service resolveMasterWriteFields).
       const payload = {
-        name: form.marketingName || undefined,
         priceGeneral: form.priceGeneral ?? undefined,
         priceGold: form.priceGold,
         consumerReferencePrice: form.consumerReferencePrice,
@@ -340,12 +343,6 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         isPublic: form.isPublic,
         // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
         isFeatured: form.isFeatured,
-        // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
-        // WO-NETURE-SUPPLIER-PRODUCT-SAVE-ERROR-RESOLUTION-V1: empty string → null (UUID 컬럼 보호)
-        categoryId: editCategory || null,
-        brandId: editBrand || null,
-        specification: editSpec || null,
-        originCountry: editOrigin || null,
         // WO-NETURE-PRODUCT-DRAWER-B2C-EDIT-RESTORE-V1: B2C 설명 저장 복구
         consumerShortDescription: editConsumerShort.trim() || null,
         consumerDetailDescription: editConsumerDetail.trim() || null,
@@ -967,55 +964,44 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           {/* ── 수정 모드: 공통 기본 정보 (WO-NETURE-SUPPLIER-PRODUCT-DRAWER-EDIT-ORDER-V1) ── */}
           {isEditing && (editMode === 'b2c' || showSecondaryEdit) && (
             <div className="mb-5 p-4 bg-slate-50/60 border border-slate-200 rounded-xl space-y-4">
-              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">기본 정보</h4>
+              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">기본 정보 (O4O 기준정보 · 읽기 전용)</h4>
 
-              {/* 카테고리 — WO-NETURE-CATEGORY-SELECT-TWO-LEVEL-AND-SEARCH-REFINE-V1 */}
+              {/*
+                WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1
+                카테고리·브랜드·사양·원산지는 ProductMaster 기준정보다. 같은 master 에 연결된
+                다른 공급자·다른 서비스가 함께 쓰는 값이라 공급자 화면에서 덮어쓰지 않는다.
+                입력을 남겨두면 저장된 것처럼 보이므로 읽기 전용으로 표시한다.
+              */}
+              <p className="text-xs text-slate-500">
+                O4O 기준 상품정보입니다. 공급자 화면에서는 수정되지 않습니다 — 수정이 필요하면 운영자에게 요청하세요.
+              </p>
+
               <FormField label="카테고리">
-                <CategorySelect
-                  categories={categories}
-                  value={editCategory}
-                  onChange={setEditCategory}
-                  disabled={saving}
+                <input
+                  type="text"
+                  value={categories.find((c) => c.id === editCategory)?.name || '미지정'}
+                  disabled
+                  readOnly
+                  className={INPUT_CLASS}
                 />
               </FormField>
 
-              {/* 브랜드 */}
               <FormField label="브랜드">
-                <select
-                  value={editBrand || ''}
-                  onChange={(e) => setEditBrand(e.target.value || null)}
-                  disabled={saving}
+                <input
+                  type="text"
+                  value={brands.find((b) => b.id === editBrand)?.name || '미지정'}
+                  disabled
+                  readOnly
                   className={INPUT_CLASS}
-                >
-                  <option value="">선택 안함</option>
-                  {brands.map((b) => (
-                    <option key={b.id} value={b.id}>{b.name}</option>
-                  ))}
-                </select>
+                />
               </FormField>
 
-              {/* 사양 */}
               <FormField label="사양">
-                <input
-                  type="text"
-                  value={editSpec}
-                  onChange={(e) => setEditSpec(e.target.value)}
-                  disabled={saving}
-                  placeholder="예: 500mg × 60정"
-                  className={INPUT_CLASS}
-                />
+                <input type="text" value={editSpec || '미지정'} disabled readOnly className={INPUT_CLASS} />
               </FormField>
 
-              {/* 원산지 */}
               <FormField label="원산지">
-                <input
-                  type="text"
-                  value={editOrigin}
-                  onChange={(e) => setEditOrigin(e.target.value)}
-                  disabled={saving}
-                  placeholder="예: 대한민국"
-                  className={INPUT_CLASS}
-                />
+                <input type="text" value={editOrigin || '미지정'} disabled readOnly className={INPUT_CLASS} />
               </FormField>
             </div>
           )}
@@ -1030,6 +1016,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                 onChange={handleFormChange}
                 disabled={saving}
                 hideDistribution
+                masterNameReadOnly
               />
             </div>
           )}

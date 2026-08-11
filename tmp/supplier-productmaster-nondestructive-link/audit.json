@@ -1,0 +1,25 @@
+{
+  "wo": "WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1",
+  "readOnly": true,
+  "regulatoryTypeCounts": {
+    "DRUG": 177413,
+    "건강기능식품": 40948,
+    "COSMETIC": 32674,
+    "QUASI_DRUG": 17148,
+    "MEDICAL_DEVICE": 3826,
+    "일반": 15,
+    "GENERAL": 11
+  },
+  "offerTotal": 2,
+  "offerAlive": 2,
+  "mastersWithOffer": 2,
+  "orphanOffers": 0,
+  "suspectMasters": 0,
+  "suspectByRegulatoryType": {},
+  "suspectRelatedOffers": 0,
+  "suspectNameDivergedFromRegulatory": 0,
+  "suspectSample": [],
+  "cosmeticTotal": 32674,
+  "cosmeticWithOffer": 0,
+  "masterDuplicateGroups": 0
+}

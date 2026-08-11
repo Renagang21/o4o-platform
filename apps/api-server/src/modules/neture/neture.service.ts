@@ -18,6 +18,7 @@
 
 import { AppDataSource } from '../../database/connection.js';
 import { NetureCatalogService } from './services/catalog.service.js';
+import type { MasterResolveResult } from './services/catalog.service.js';
 import { NetureOfferService } from './services/offer.service.js';
 import { OfferServicePriceService, type ServicePriceInput } from './services/offer-service-price.service.js';
 import { NetureSupplierService } from './services/supplier.service.js';
@@ -482,7 +483,9 @@ export class NetureService {
       mfdsPermitNumber?: string | null;
       drugCategory?: string | null;
     }
-  ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
+    // WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1:
+    //   `created` 로 신규 생성 / 기존 master 연결을 구분할 수 있다.
+  ): Promise<MasterResolveResult> {
     return this.catalogService.resolveOrCreateMaster(barcode, manualData);
   }
 

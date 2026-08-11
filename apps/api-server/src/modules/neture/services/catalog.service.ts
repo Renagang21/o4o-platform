@@ -32,6 +32,23 @@ function normalizeDrugCategory(raw?: string | null): ProductDrugCategory | null 
  * ProductMaster, Category, Brand, ProductImage CRUD.
  * Extracted from NetureService (WO-O4O-NETURE-SERVICE-SPLIT-V1 Phase 1).
  */
+/**
+ * Master 해석 결과.
+ *
+ * WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1
+ *   `created` 는 **이 요청이 master 를 실제로 INSERT 했는지** 를 말한다.
+ *   기존 master 를 찾아 반환한 경우(바코드 일치 / 이름+제조사 dedup / 동시등록 경합)는 false 다.
+ *   호출자는 이 값으로 "신규 등록" 과 "기존 master 연결" 을 구분해야 한다 —
+ *   기존 master 에는 호출자 입력으로 기준정보를 덮어쓰지 않는다.
+ */
+export interface MasterResolveResult {
+  success: boolean;
+  data?: ProductMaster;
+  /** 이 요청에서 새로 생성했으면 true, 기존 master 를 찾았으면 false (실패 시 undefined) */
+  created?: boolean;
+  error?: string;
+}
+
 export class NetureCatalogService {
   // Lazy repositories
   private _masterRepo?: Repository<ProductMaster>;
@@ -127,7 +144,7 @@ export class NetureCatalogService {
       // WO-O4O-PRODUCT-DRUG-CATEGORY-ACTIVE-MODEL-F1-V1: OTC/Rx/QUASI active 분류 (optional)
       drugCategory?: string | null;
     }
-  ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
+  ): Promise<MasterResolveResult> {
     const trimmed = (barcode ?? '').trim();
 
     // 바코드 미제공 → barcode=NULL 로 생성 (합성 내부코드 생성 안 함)
@@ -145,7 +162,7 @@ export class NetureCatalogService {
     // 2. 내부 조회 — 이미 존재하면 반환
     const existing = await this.masterRepo.findOne({ where: { barcode: trimmed } });
     if (existing) {
-      return { success: true, data: existing };
+      return { success: true, data: existing, created: false };
     }
 
     // 3. MFDS 조회 (stub)
@@ -168,7 +185,7 @@ export class NetureCatalogService {
 
       const saved = await this.masterRepo.save(master);
       logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} for barcode ${trimmed} (MFDS verified)`);
-      return { success: true, data: saved };
+      return { success: true, data: saved, created: true };
     }
 
     // 4b. MFDS 미연동 + manualData 제공 → 수동 생성
@@ -191,7 +208,7 @@ export class NetureCatalogService {
 
       const saved = await this.masterRepo.save(master);
       logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} for barcode ${trimmed} (manual, MFDS unverified)`);
-      return { success: true, data: saved };
+      return { success: true, data: saved, created: true };
     }
 
     // 4c. 둘 다 없음 → 에러
@@ -216,7 +233,7 @@ export class NetureCatalogService {
       mfdsPermitNumber?: string | null;
       drugCategory?: string | null;
     }
-  ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
+  ): Promise<MasterResolveResult> {
     const name = (manualData?.name || manualData?.regulatoryName || '').trim();
     if (!name) {
       // 바코드도 MFDS도 없으므로 최소 식별 정보(상품명)는 필요
@@ -227,7 +244,7 @@ export class NetureCatalogService {
     // 중복 방지: 이름+제조사 정확 일치로 기존 Master 조회
     const existing = await this.findMasterByNameAndManufacturer(name, manufacturerName);
     if (existing) {
-      return { success: true, data: existing };
+      return { success: true, data: existing, created: false };
     }
 
     const effectiveRegName = (manualData?.regulatoryName || name).trim();
@@ -247,12 +264,13 @@ export class NetureCatalogService {
     try {
       const saved = await this.masterRepo.save(master);
       logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} (barcode=NULL, no synthetic code)`);
-      return { success: true, data: saved };
+      return { success: true, data: saved, created: true };
     } catch (e: any) {
       // 동시 등록으로 방금 같은 이름+제조사가 생겼을 수 있음 → 재조회
       const raced = await this.findMasterByNameAndManufacturer(name, manufacturerName);
       if (raced) {
-        return { success: true, data: raced };
+        // 경합으로 다른 요청이 먼저 만들었다 — 이 요청 기준으로는 "기존 master" 다.
+        return { success: true, data: raced, created: false };
       }
       logger.error('[NetureCatalogService] Failed to create master without barcode:', e);
       return { success: false, error: 'MASTER_CREATE_FAILED' };

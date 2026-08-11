@@ -13,6 +13,8 @@ import { ProductCategory } from '../entities/index.js';
 import { ProductImportCommonService } from './product-import-common.service.js';
 import { OfferServiceApprovalService } from './offer-service-approval.service.js';
 import type { NetureCatalogService } from './catalog.service.js';
+// WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1: 기존 master 비파괴 연결 계약
+import { resolveMasterWriteFields } from './master-link-policy.js';
 import { OfferErrorCode } from '../constants/offer-error-code.js';
 import { filterApprovalEligibleServiceKeys, isApprovalEligibleServiceKey } from '../constants/approval-service-keys.js';
 // WO-O4O-SUPPLIER-PRODUCT-REGISTER-BY-CATEGORY-STATUS-V1: 품목군 등록 가능 상태 gate
@@ -845,7 +847,7 @@ export class NetureOfferService {
     name: string,
     categoryId: string | null,
     brandName: string | undefined,
-  ): Promise<{ success: false; error: string; message?: string } | { success: true; data: { masterId: string; masterBarcode: string; manualData: Record<string, any>; isRegulated: boolean } }> {
+  ): Promise<{ success: false; error: string; message?: string } | { success: true; data: { masterId: string; masterBarcode: string; manualData: Record<string, any>; isRegulated: boolean; masterCreated: boolean } }> {
     const resolvedCategoryId: string | null = categoryId || rawManualData?.categoryId || null;
     let isRegulated = false;
     if (resolvedCategoryId) {
@@ -898,19 +900,30 @@ export class NetureOfferService {
       return { success: false, error: registrationPermitError, message: '규제 상품은 MFDS 검증이 없는 경우 허가번호가 필수입니다.' };
     }
 
-    const extFields: Record<string, unknown> = {};
-    if (manualData.categoryId !== undefined) extFields.categoryId = manualData.categoryId;
-    if (manualData.brandId !== undefined) extFields.brandId = manualData.brandId;
-    if (manualData.specification !== undefined) extFields.specification = manualData.specification;
-    if (manualData.originCountry !== undefined) extFields.originCountry = manualData.originCountry;
-    if (manualData.tags !== undefined) extFields.tags = manualData.tags;
-    if (manualData.name !== undefined) extFields.name = manualData.name;
-
-    if (Object.keys(extFields).length > 0) {
-      await this.catalogService.updateProductMaster(masterResult.data.id, extFields);
+    // WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1
+    //   기존 ProductMaster 에 연결하는 경우 공급자 입력으로 기준정보를 덮어쓰지 않는다.
+    //   확장 필드는 이번 요청이 master 를 실제로 생성한 경우(신규 등록)에만 적용한다.
+    //   제품군 예외 없음 — DRUG / HEALTH_FUNCTIONAL / QUASI_DRUG / MEDICAL_DEVICE / COSMETIC / GENERAL 동일.
+    const linkDecision = resolveMasterWriteFields(masterResult.created, manualData);
+    if (Object.keys(linkDecision.masterFieldUpdates).length > 0) {
+      await this.catalogService.updateProductMaster(masterResult.data.id, linkDecision.masterFieldUpdates);
+    } else if (linkDecision.ignoredFields.length > 0) {
+      logger.info(
+        `[NetureOfferService] Existing master ${masterResult.data.id} linked without modification ` +
+          `(ignored supplier fields: ${linkDecision.ignoredFields.join(', ')})`,
+      );
     }
 
-    return { success: true, data: { masterId: masterResult.data.id, masterBarcode: masterResult.data.barcode || masterResult.data.id, manualData, isRegulated } };
+    return {
+      success: true,
+      data: {
+        masterId: masterResult.data.id,
+        masterBarcode: masterResult.data.barcode || masterResult.data.id,
+        manualData,
+        isRegulated,
+        masterCreated: linkDecision.mode === 'new',
+      },
+    };
   }
 
   // ==================== createSupplierOffer (orchestrator) ====================
@@ -1255,25 +1268,16 @@ export class NetureOfferService {
       }
 
       // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level field updates (consolidated)
-      const masterUpdates: Record<string, unknown> = {};
-      if (updates.name !== undefined) masterUpdates.name = updates.name;
-      if (updates.categoryId !== undefined) masterUpdates.categoryId = updates.categoryId;
-      if (updates.brandId !== undefined) masterUpdates.brandId = updates.brandId;
-      if (updates.specification !== undefined) masterUpdates.specification = updates.specification;
-      if (updates.originCountry !== undefined) masterUpdates.originCountry = updates.originCountry;
-      if (updates.tags !== undefined) masterUpdates.tags = updates.tags;
-
-      if (Object.keys(masterUpdates).length > 0) {
-        // WO-NETURE-SUPPLIER-PRODUCT-SAVE-ERROR-RESOLUTION-V1: empty string → null for UUID fields
-        for (const key of ['categoryId', 'brandId'] as const) {
-          if (key in masterUpdates && masterUpdates[key] === '') {
-            masterUpdates[key] = null;
-          }
-        }
-        const masterResult = await this.catalogService.updateProductMaster(offer.masterId, masterUpdates);
-        if (!masterResult.success) {
-          return { success: false, error: masterResult.error || 'MASTER_UPDATE_FAILED' };
-        }
+      // WO-O4O-SUPPLIER-EXISTING-PRODUCTMASTER-NON-DESTRUCTIVE-LINK-V1:
+      //   offer 수정 시점의 master 는 **항상 기존 master** 다(이 요청이 만들지 않았다).
+      //   공급자 offer 수정은 공급 조건 수정이지 master 편집이 아니므로 기준정보를 쓰지 않는다.
+      //   ProductMaster 기준정보 수정은 운영자/관리자 경로(/api/v1/admin/o4o-product-db/*)가 담당한다.
+      const updateDecision = resolveMasterWriteFields(false, updates as Record<string, unknown>);
+      if (updateDecision.ignoredFields.length > 0) {
+        logger.info(
+          `[NetureOfferService] Offer ${offerId} update did not modify master ${offer.masterId} ` +
+            `(ignored supplier fields: ${updateDecision.ignoredFields.join(', ')})`,
+        );
       }
 
       // Validation: PRIVATE requires at least one seller ID
