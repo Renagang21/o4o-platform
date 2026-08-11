@@ -12,6 +12,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Package, Search, RefreshCw, Users, ChevronLeft, ChevronRight, X, Star, ToggleLeft, ToggleRight } from 'lucide-react';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { api } from '../../lib/api';
+import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
 
 const PAGE_SIZE = 20;
 
@@ -47,17 +48,25 @@ export default function RecruitingProductsOverviewPage() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [page, setPage] = useState(1);
   const [detailProduct, setDetailProduct] = useState<RecruitingProduct | null>(null);
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 조회 실패를 setProducts([]) 로 삼켜 "모집 중인 상품이 없습니다" 로 위장했다.
+  const [loadError, setLoadError] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const apiBase = import.meta.env.VITE_API_BASE_URL || '';
       const base = apiBase.replace(/\/api\/v1\/neture\/?$/, '');
       const res = await fetch(`${base}/api/v1/neture/partner/recruiting-products`);
       const json = await res.json();
+      if (!res.ok) {
+        setLoadError(true);
+        return;
+      }
       setProducts(Array.isArray(json.data) ? json.data : json || []);
     } catch {
-      setProducts([]);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -255,6 +264,8 @@ export default function RecruitingProductsOverviewPage() {
       {/* Table */}
       {loading ? (
         <div className="bg-white rounded-lg border border-slate-200 px-4 py-12 text-center text-slate-400">불러오는 중...</div>
+      ) : loadError ? (
+        <LoadErrorNotice onRetry={() => void fetchProducts()} />
       ) : (
         <>
           <DataTable<RecruitingProduct>

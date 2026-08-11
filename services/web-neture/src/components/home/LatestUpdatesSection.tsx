@@ -10,9 +10,10 @@
  * 데이터: netureApi.getSuppliers() + netureApi.getPartnershipRequests() 조합
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Activity, Building2, Handshake } from 'lucide-react';
 import { netureApi, type Supplier, type PartnershipRequest } from '../../lib/api';
+import { LoadErrorNotice } from '../common/LoadErrorNotice';
 
 interface UpdateItem {
   id: string;
@@ -24,45 +25,64 @@ interface UpdateItem {
 export function LatestUpdatesSection() {
   const [items, setItems] = useState<UpdateItem[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 두 호출 모두 실패해도 setItems([]) → `items.length === 0` 분기로 섹션이 통째로
+  // 사라져서 사용자에게 "실패" 가 전혀 전달되지 않았다.
+  const [loadError, setLoadError] = useState(false);
+
+  const loadUpdates = useCallback(async () => {
+    setLoading(true);
+    setLoadError(false);
+    try {
+      const [suppliersRes, requestsRes] = await Promise.allSettled([
+        netureApi.getSuppliers(),
+        netureApi.getPartnershipRequests('OPEN'),
+      ]);
+
+      if (suppliersRes.status === 'rejected' && requestsRes.status === 'rejected') {
+        setLoadError(true);
+        return;
+      }
+
+      const suppliers: Supplier[] = suppliersRes.status === 'fulfilled' ? suppliersRes.value : [];
+      const requests: PartnershipRequest[] =
+        requestsRes.status === 'fulfilled' ? requestsRes.value : [];
+
+      const updates: UpdateItem[] = [];
+
+      suppliers.slice(0, 3).forEach((s) => {
+        updates.push({
+          id: `s-${s.id}`,
+          name: s.name,
+          role: '새 공급자 참여',
+          icon: 'supplier',
+        });
+      });
+
+      requests.slice(0, 2).forEach((r) => {
+        updates.push({
+          id: `p-${r.id}`,
+          name: r.seller.name,
+          role: '새 파트너 참여',
+          icon: 'partner',
+        });
+      });
+
+      setItems(updates.slice(0, 5));
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const timeoutId = setTimeout(async () => {
-      try {
-        const [suppliers, requests] = await Promise.all([
-          netureApi.getSuppliers().catch(() => [] as Supplier[]),
-          netureApi.getPartnershipRequests('OPEN').catch(() => [] as PartnershipRequest[]),
-        ]);
-
-        const updates: UpdateItem[] = [];
-
-        suppliers.slice(0, 3).forEach((s) => {
-          updates.push({
-            id: `s-${s.id}`,
-            name: s.name,
-            role: '새 공급자 참여',
-            icon: 'supplier',
-          });
-        });
-
-        requests.slice(0, 2).forEach((r) => {
-          updates.push({
-            id: `p-${r.id}`,
-            name: r.seller.name,
-            role: '새 파트너 참여',
-            icon: 'partner',
-          });
-        });
-
-        setItems(updates.slice(0, 5));
-      } catch {
-        setItems([]);
-      } finally {
-        setLoading(false);
-      }
+    const timeoutId = setTimeout(() => {
+      void loadUpdates();
     }, 800);
 
     return () => clearTimeout(timeoutId);
-  }, []);
+  }, [loadUpdates]);
 
   if (loading) {
     return (
@@ -82,6 +102,18 @@ export function LatestUpdatesSection() {
             </div>
           ))}
         </div>
+      </section>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <section className="py-16 bg-white">
+        <div className="text-center mb-8">
+          <Activity className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Latest Updates</h2>
+        </div>
+        <LoadErrorNotice compact onRetry={() => void loadUpdates()} />
       </section>
     );
   }

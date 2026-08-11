@@ -50,6 +50,7 @@ export default function StoreSignagePage() {
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
   const [playlistItems, setPlaylistItems] = useState<StorePlaylistItem[]>([]);
   const [playlistItemsLoading, setPlaylistItemsLoading] = useState(false);
+  const [playlistItemsError, setPlaylistItemsError] = useState<string | null>(null);
 
   // ── Pending media from Community "매장에 적용" ──
   const [pendingBusy, setPendingBusy] = useState(false);
@@ -62,7 +63,7 @@ export default function StoreSignagePage() {
       const data = await fetchStorePlaylists();
       setPlaylists(data);
     } catch {
-      setPlaylists([]);
+      setPlaylistError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setPlaylistLoading(false);
     }
@@ -70,11 +71,12 @@ export default function StoreSignagePage() {
 
   const loadPlaylistItems = useCallback(async (playlistId: string) => {
     setPlaylistItemsLoading(true);
+    setPlaylistItemsError(null);
     try {
       const data = await fetchPlaylistItems(playlistId);
       setPlaylistItems(data);
     } catch {
-      setPlaylistItems([]);
+      setPlaylistItemsError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setPlaylistItemsLoading(false);
     }
@@ -244,6 +246,9 @@ export default function StoreSignagePage() {
         <div className="text-center py-12 text-red-500 text-sm">
           <AlertCircle className="w-5 h-5 mx-auto mb-2" />
           {playlistError}
+          <div>
+            <button onClick={() => void loadPlaylists()} className="mt-3 text-sm text-blue-600 hover:underline">다시 시도</button>
+          </div>
         </div>
       ) : playlists.length === 0 ? (
         <div className="text-center py-12 text-slate-400">
@@ -321,6 +326,19 @@ export default function StoreSignagePage() {
           {playlistItemsLoading ? (
             <div className="py-8 text-center text-slate-400 text-sm">
               <Loader2 className="w-4 h-4 animate-spin mx-auto mb-2" /> 로딩 중...
+            </div>
+          ) : playlistItemsError ? (
+            <div className="py-8 text-center text-red-500 text-sm">
+              <AlertCircle className="w-4 h-4 mx-auto mb-2" />
+              {playlistItemsError}
+              <div>
+                <button
+                  onClick={() => { if (selectedPlaylistId) void loadPlaylistItems(selectedPlaylistId); }}
+                  className="mt-3 text-sm text-blue-600 hover:underline"
+                >
+                  다시 시도
+                </button>
+              </div>
             </div>
           ) : playlistItems.length === 0 ? (
             <div className="py-8 text-center text-slate-400 text-sm">

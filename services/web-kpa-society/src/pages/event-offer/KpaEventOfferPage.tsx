@@ -15,7 +15,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { PageHeader, LoadingSpinner, EmptyState, Pagination } from '../../components/common';
+import { PageHeader, LoadingSpinner, EmptyState, LoadErrorState, Pagination } from '../../components/common';
 import { eventOfferApi, storeCartApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
@@ -59,6 +59,9 @@ export function KpaEventOfferPage() {
 
   // Ordering
   const [orderPanelOpen, setOrderPanelOpen] = useState(false);
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 조회 실패를 setItems([]) 로 삼켜 "진행중인 이벤트가 없습니다" 로 위장했다.
+  const [loadError, setLoadError] = useState(false);
   const [orderQuantities, setOrderQuantities] = useState<Record<string, number>>({});
   const [ordering, setOrdering] = useState(false);
 
@@ -69,6 +72,7 @@ export function KpaEventOfferPage() {
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
+      setLoadError(false);
       const res = await eventOfferApi.getEnrichedOffers({
         page: currentPage,
         limit: 20,
@@ -78,7 +82,7 @@ export function KpaEventOfferPage() {
       setTotalPages(res.pagination?.totalPages || 1);
     } catch (err) {
       console.warn('Enriched event offer API not available:', err);
-      setItems([]);
+      setLoadError(true);
       setTotalPages(1);
     } finally {
       setLoading(false);
@@ -374,7 +378,9 @@ export function KpaEventOfferPage() {
         )}
       </div>
 
-      {items.length === 0 && !searchQuery && !supplierFilter ? (
+      {loadError ? (
+        <LoadErrorState onRetry={() => void loadData()} />
+      ) : items.length === 0 && !searchQuery && !supplierFilter ? (
         <EmptyState
           icon="🛒"
           title={statusFilter === 'active' ? '진행중인 이벤트가 없습니다' : '이벤트 상품이 없습니다'}

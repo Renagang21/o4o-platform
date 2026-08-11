@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react';
 import { MessageSquare, Plus, ThumbsUp, Eye } from 'lucide-react';
 import { apiClient } from '@/services/api';
-import { LoadingState, EmptyState } from '@/components/common';
+import { LoadingState, EmptyState, ErrorState } from '@/components/common';
 
 interface FeedbackPost {
   id: string;
@@ -31,24 +31,27 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 export default function ForumFeedbackPage() {
   const [posts, setPosts] = useState<FeedbackPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  // 조회 실패를 "아직 등록된 의견이 없습니다" 로 위장하지 않는다(4상태 계약: loading/error/empty/ready).
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const fetchPosts = async () => {
       setIsLoading(true);
+      setLoadError(false);
       try {
         const response = await apiClient.get<FeedbackPost[]>('/api/v1/glycopharm/forum/feedback');
         if (response.data) {
           setPosts(response.data);
         }
       } catch {
-        // API가 없거나 에러 시 빈 배열 유지
-        setPosts([]);
+        setLoadError(true);
       } finally {
         setIsLoading(false);
       }
     };
     fetchPosts();
-  }, []);
+  }, [reloadKey]);
 
   if (isLoading) {
     return <LoadingState message="피드백을 불러오는 중..." />;
@@ -77,7 +80,11 @@ export default function ForumFeedbackPage() {
 
       {/* Posts List */}
       <div className="space-y-4">
-        {posts.length === 0 ? (
+        {loadError ? (
+          <div className="bg-white rounded-2xl shadow-sm">
+            <ErrorState onRetry={() => setReloadKey((k) => k + 1)} />
+          </div>
+        ) : posts.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm">
             <EmptyState
               icon={MessageSquare}

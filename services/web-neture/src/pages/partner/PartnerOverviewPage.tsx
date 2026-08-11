@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom';
 import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, AlertCircle, RefreshCw, ChevronDown, ChevronRight, Paperclip, X, ArrowUp, ArrowDown, Star } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
 import { dashboardApi, partnerDashboardApi, type PartnerDashboardSummary, type PartnerDashboardItem, type BrowsableContent, type LinkedContent } from '../../lib/api';
+import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
 
 // 서비스 URL 설정
 const SERVICE_URLS: Record<string, string> = {
@@ -73,6 +74,9 @@ export function PartnerOverviewPage() {
   const [linkedContents, setLinkedContents] = useState<LinkedContent[]>([]);
   const [contentSourceFilter, setContentSourceFilter] = useState<'all' | 'cms' | 'supplier'>('all');
   const [contentLoading, setContentLoading] = useState(false);
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 자료 목록 조회 실패를 빈 배열로 삼켜 "사용 가능한 콘텐츠가 없습니다" 로 위장했다.
+  const [contentLoadError, setContentLoadError] = useState(false);
   const [linkingContentId, setLinkingContentId] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
@@ -158,6 +162,7 @@ export function PartnerOverviewPage() {
     setContentModalItemId(itemId);
     setContentLoading(true);
     setContentSourceFilter('all');
+    setContentLoadError(false);
     try {
       const [allContents, linked] = await Promise.all([
         partnerDashboardApi.browseContents(),
@@ -168,6 +173,7 @@ export function PartnerOverviewPage() {
     } catch {
       setBrowsableContents([]);
       setLinkedContents([]);
+      setContentLoadError(true);
     }
     setContentLoading(false);
   };
@@ -790,6 +796,13 @@ export function PartnerOverviewPage() {
             <div style={{ flex: 1, overflowY: 'auto', padding: '12px 24px' }}>
               {contentLoading ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>로딩 중...</div>
+              ) : contentLoadError ? (
+                <LoadErrorNotice
+                  compact
+                  onRetry={() => {
+                    if (contentModalItemId) void openContentModal(contentModalItemId);
+                  }}
+                />
               ) : filteredBrowsableContents.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>사용 가능한 콘텐츠가 없습니다</div>
               ) : (

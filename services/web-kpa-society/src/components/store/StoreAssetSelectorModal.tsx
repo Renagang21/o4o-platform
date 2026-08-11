@@ -37,6 +37,7 @@ import type { StoreMlcGroup, StoreMlcLocale } from '../../api/multilingualProduc
 //   '내 매장 자료' 탭에 매장 직접 작성 콘텐츠(kpa_store_contents direct)도 포함(opt-in).
 //   /store/library/contents 통합 feed 의 origin='direct' 항목 — 콘텐츠 목록과 동일 소스 정합.
 import { storeLibraryApi } from '../../api/assetSnapshot';
+import { LoadErrorState } from '../common';
 
 // ── 선택 결과 타입 ──
 
@@ -136,6 +137,7 @@ export function StoreAssetSelectorModal({
 }: StoreAssetSelectorModalProps) {
   const [items, setItems] = useState<StoreExecutionAsset[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [search, setSearch] = useState('');
   const [assetTypeFilter, setAssetTypeFilter] = useState('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -191,7 +193,11 @@ export function StoreAssetSelectorModal({
     };
   }, [search]);
 
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 모든 소스(자료/콘텐츠/블로그/다국어)의 조회 실패를 silent 로 삼켜
+  // "사용 가능한 콘텐츠가 없습니다" 로 위장했다. 실패는 목록 위에 별도로 알린다.
   const loadItems = async (p: number, q: string) => {
+    setLoadError(false);
     try {
       setLoading(true);
       // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
@@ -259,7 +265,7 @@ export function StoreAssetSelectorModal({
         setTotal(res.data.total);
       }
     } catch {
-      // silent — 빈 목록 표시
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -492,6 +498,9 @@ export function StoreAssetSelectorModal({
 
         {/* Card Grid */}
         <div style={styles.body}>
+          {loadError && (
+            <LoadErrorState compact onRetry={() => void loadItems(page, search)} />
+          )}
           {source === 'mlc' ? (
             loading ? (
               <div style={styles.emptyState}>

@@ -79,9 +79,8 @@ export default function B2BOrderPage() {
           setGeneralProducts(generalResponse.data);
         }
       } catch {
-        // API가 없거나 에러 시 빈 배열 유지 (에러 표시 안함)
-        setFranchiseProducts([]);
-        setGeneralProducts([]);
+        // 조회 실패를 "상품 없음"(empty) 으로 위장하지 않는다(4상태 계약).
+        setError('잠시 후 다시 시도해 주세요.');
       } finally {
         setIsLoading(false);
       }

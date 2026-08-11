@@ -7,29 +7,39 @@
  * 현재는 API에서 상위 공급자를 가져와 표시.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Users } from 'lucide-react';
 import { netureApi, type Supplier } from '../../lib/api';
+import { LoadErrorNotice } from '../common/LoadErrorNotice';
 
 export function FeaturedSection() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 조회 실패를 setSuppliers([]) 로 삼켜 "등록된 공급자가 없습니다" 로 위장하고 있었다.
+  const [loadError, setLoadError] = useState(false);
+
+  const loadSuppliers = useCallback(async () => {
+    setLoading(true);
+    setLoadError(false);
+    try {
+      const data = await netureApi.getSuppliers();
+      setSuppliers(data.slice(0, 3));
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const timeoutId = setTimeout(async () => {
-      try {
-        const data = await netureApi.getSuppliers();
-        setSuppliers(data.slice(0, 3));
-      } catch {
-        setSuppliers([]);
-      } finally {
-        setLoading(false);
-      }
+    const timeoutId = setTimeout(() => {
+      void loadSuppliers();
     }, 600);
 
     return () => clearTimeout(timeoutId);
-  }, []);
+  }, [loadSuppliers]);
 
   return (
     <section className="py-16 bg-white">
@@ -55,6 +65,8 @@ export function FeaturedSection() {
                 </div>
               ))}
             </div>
+          ) : loadError ? (
+            <LoadErrorNotice compact onRetry={() => void loadSuppliers()} />
           ) : suppliers.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {suppliers.map((supplier) => (

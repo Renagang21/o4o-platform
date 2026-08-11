@@ -7,7 +7,7 @@
  * Knowledge Preview: 자료실 최신 항목 (정적)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageSquare, BookOpen, ArrowRight } from 'lucide-react';
 import {
@@ -15,6 +15,7 @@ import {
   getAuthorName,
   type ForumPost,
 } from '../../services/forumApi';
+import { LoadErrorNotice } from '../common/LoadErrorNotice';
 
 interface PreviewPost {
   id: string;
@@ -45,29 +46,38 @@ function formatDate(dateString: string): string {
 export function CommunityPreviewSection() {
   const [posts, setPosts] = useState<PreviewPost[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 조회 실패를 setPosts([]) 로 삼켜 "아직 포럼 글이 없습니다" 로 위장하고 있었다.
+  const [loadError, setLoadError] = useState(false);
+
+  const loadPosts = useCallback(async () => {
+    setLoading(true);
+    setLoadError(false);
+    try {
+      const data = await fetchForumPosts({ page: 1, limit: 5 });
+      setPosts(
+        data.data.slice(0, 5).map((p: ForumPost) => ({
+          id: p.id,
+          title: p.title,
+          slug: p.slug,
+          authorName: getAuthorName(p),
+          createdAt: p.publishedAt || p.createdAt,
+        }))
+      );
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const timeoutId = setTimeout(async () => {
-      try {
-        const data = await fetchForumPosts({ page: 1, limit: 5 });
-        setPosts(
-          data.data.slice(0, 5).map((p: ForumPost) => ({
-            id: p.id,
-            title: p.title,
-            slug: p.slug,
-            authorName: getAuthorName(p),
-            createdAt: p.publishedAt || p.createdAt,
-          }))
-        );
-      } catch {
-        setPosts([]);
-      } finally {
-        setLoading(false);
-      }
+    const timeoutId = setTimeout(() => {
+      void loadPosts();
     }, 1200);
 
     return () => clearTimeout(timeoutId);
-  }, []);
+  }, [loadPosts]);
 
   return (
     <section className="py-16 bg-gray-50">
@@ -93,6 +103,8 @@ export function CommunityPreviewSection() {
                   </div>
                 ))}
               </div>
+            ) : loadError ? (
+              <LoadErrorNotice compact onRetry={() => void loadPosts()} />
             ) : posts.length > 0 ? (
               <div className="space-y-3">
                 {posts.map((post) => (

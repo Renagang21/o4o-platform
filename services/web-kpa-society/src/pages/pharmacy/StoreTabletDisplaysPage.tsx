@@ -262,6 +262,8 @@ export default function StoreTabletDisplaysPage() {
   const [ocModalOpen, setOcModalOpen] = useState(false);
   const [ocCandidates, setOcCandidates] = useState<OperatorCommonIdleCandidate[]>([]);
   const [ocLoading, setOcLoading] = useState(false);
+  // 조회 실패를 "사용 가능한 영상 없음" 으로 위장하지 않는다(4상태 계약: loading/error/empty/ready).
+  const [ocLoadError, setOcLoadError] = useState(false);
   const [ocBusy, setOcBusy] = useState(false);
 
   useEffect(() => {
@@ -276,10 +278,11 @@ export default function StoreTabletDisplaysPage() {
   const openOcModal = useCallback(async () => {
     setOcModalOpen(true);
     setOcLoading(true);
+    setOcLoadError(false);
     try {
       setOcCandidates(await fetchOperatorCommonIdleCandidates());
     } catch {
-      setOcCandidates([]);
+      setOcLoadError(true);
     } finally {
       setOcLoading(false);
     }
@@ -1807,6 +1810,18 @@ export default function StoreTabletDisplaysPage() {
             <div className="p-4 overflow-y-auto">
               {ocLoading ? (
                 <div className="text-center py-8 text-sm text-slate-400">불러오는 중…</div>
+              ) : ocLoadError ? (
+                <div className="text-center py-8">
+                  <p className="text-sm font-medium text-slate-900">데이터를 불러오지 못했습니다.</p>
+                  <p className="mt-1 text-sm text-slate-500">잠시 후 다시 시도해 주세요.</p>
+                  <button
+                    type="button"
+                    onClick={() => void openOcModal()}
+                    className="mt-3 px-3 py-1.5 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50"
+                  >
+                    다시 시도
+                  </button>
+                </div>
               ) : ocCandidates.filter(c => c.status !== 'expired').length === 0 ? (
                 <div className="text-center py-8 text-sm text-slate-400">현재 사용 가능한 서비스 공통 영상이 없습니다.</div>
               ) : (

@@ -23,6 +23,7 @@ import {
   type ProductionSource,
 } from '@o4o/store-ui-core';
 import { getTemplatesForTarget } from '../../config/productionTemplates';
+import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
 
 const COSMETICS_PRODUCTION_TARGETS: StartProductionTargetConfig[] = [
   {
@@ -48,15 +49,18 @@ const COSMETICS_PRODUCTION_TARGETS: StartProductionTargetConfig[] = [
 export default function StoreLibraryContentsPage() {
   const [items, setItems] = useState<AssetSnapshotItem[]>([]);
   const [loading, setLoading] = useState(true);
+  // 조회 실패를 "보관된 콘텐츠가 없습니다"(empty) 로 위장하지 않는다(4상태 계약).
+  const [loadError, setLoadError] = useState(false);
   const [productionSource, setProductionSource] = useState<ProductionSource | null>(null);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await assetSnapshotApi.list({ type: 'content', limit: 100 });
       setItems(res.data?.items ?? []);
     } catch {
-      setItems([]);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -103,6 +107,8 @@ export default function StoreLibraryContentsPage() {
         <div style={styles.empty}>
           <p style={{ color: '#64748b', fontSize: 14 }}>불러오는 중...</p>
         </div>
+      ) : loadError ? (
+        <LoadErrorNotice onRetry={() => void fetchItems()} />
       ) : items.length === 0 ? (
         <div style={styles.empty}>
           <BookOpen size={32} style={{ color: '#cbd5e1', marginBottom: 12 }} />

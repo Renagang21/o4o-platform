@@ -275,6 +275,8 @@ export function StoreSignagePage() {
   // ── Schedule state ──
   const [schedules, setSchedules] = useState<SignageScheduleItem[]>([]);
   const [scheduleLoading, setScheduleLoading] = useState(false);
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1: 스케줄 조회 실패 표시용
+  const [scheduleError, setScheduleError] = useState<string | null>(null);
   const [signagePlaylists, setSignagePlaylists] = useState<SignagePlaylistOption[]>([]);
   const [showScheduleForm, setShowScheduleForm] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<SignageScheduleItem | null>(null);
@@ -350,7 +352,9 @@ export function StoreSignagePage() {
       const loadedItems = res.data.items || [];
       setItems(loadedItems);
     } catch {
-      setItems([]);
+      // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+      // error state 는 이미 있는데 catch 가 채우지 않아 실패가 "동영상이 없습니다" 로 위장됐다.
+      setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setLoading(false);
     }
@@ -363,7 +367,7 @@ export function StoreSignagePage() {
       const data = await fetchStorePlaylists();
       setPlaylists(data);
     } catch {
-      setPlaylists([]);
+      setPlaylistError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setPlaylistLoading(false);
     }
@@ -376,6 +380,7 @@ export function StoreSignagePage() {
       setPlaylistItems(data);
     } catch {
       setPlaylistItems([]);
+      setPlaylistError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setPlaylistItemsLoading(false);
     }
@@ -385,11 +390,12 @@ export function StoreSignagePage() {
   const loadSchedules = useCallback(async () => {
     if (!organizationId) return;
     setScheduleLoading(true);
+    setScheduleError(null);
     try {
       const res = await fetchSchedules(organizationId);
       setSchedules(Array.isArray(res.items) ? res.items : Array.isArray(res) ? res as unknown as SignageScheduleItem[] : []);
     } catch {
-      setSchedules([]);
+      setScheduleError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setScheduleLoading(false);
     }
@@ -401,7 +407,7 @@ export function StoreSignagePage() {
       const data = await fetchSignagePlaylists(organizationId);
       setSignagePlaylists(data);
     } catch {
-      setSignagePlaylists([]);
+      setScheduleError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     }
   }, [organizationId]);
 
@@ -410,7 +416,9 @@ export function StoreSignagePage() {
     try {
       const data = await fetchSignageMedia(organizationId);
       setSignageMediaItems(data);
-    } catch { setSignageMediaItems([]); }
+    } catch {
+      setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    }
   }, [organizationId]);
 
   // 마운트 시 콘텐츠·플레이리스트·스케줄 병렬 로드 (상단 요약 패널에 필요)
@@ -998,6 +1006,9 @@ export function StoreSignagePage() {
             <div className="text-center py-12 text-red-500 text-sm">
               <AlertCircle className="w-5 h-5 mx-auto mb-2" />
               {playlistError}
+              <div>
+                <button onClick={() => void loadPlaylists()} className="mt-3 text-sm text-blue-600 hover:underline">다시 시도</button>
+              </div>
             </div>
           ) : playlists.length === 0 && !playlistLoading ? (
             <div className="text-center py-12 text-slate-400">
@@ -1431,6 +1442,14 @@ export function StoreSignagePage() {
           {scheduleLoading ? (
             <div className="flex items-center justify-center py-12 text-slate-400">
               <Loader2 className="w-5 h-5 animate-spin mr-2" /> 스케줄 로딩 중...
+            </div>
+          ) : scheduleError ? (
+            <div className="text-center py-12 text-red-500 text-sm">
+              <AlertCircle className="w-5 h-5 mx-auto mb-2" />
+              {scheduleError}
+              <div>
+                <button onClick={() => void loadSchedules()} className="mt-3 text-sm text-blue-600 hover:underline">다시 시도</button>
+              </div>
             </div>
           ) : schedules.length === 0 ? (
             <div className="text-center py-12 text-slate-400">

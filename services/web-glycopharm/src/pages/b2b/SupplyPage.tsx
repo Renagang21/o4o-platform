@@ -62,8 +62,8 @@ export default function SupplyPage() {
           setProducts(response.data);
         }
       } catch {
-        // API가 없거나 에러 시 빈 배열 유지 (에러 표시 안함)
-        setProducts([]);
+        // 조회 실패를 "등록된 공급 상품이 없습니다" 로 위장하지 않는다(4상태 계약: loading/error/empty/ready).
+        setError('잠시 후 다시 시도해 주세요.');
       } finally {
         setIsLoading(false);
       }

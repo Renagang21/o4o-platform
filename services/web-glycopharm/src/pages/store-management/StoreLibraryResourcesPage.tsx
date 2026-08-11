@@ -12,6 +12,7 @@
 import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { Library, RefreshCw, ExternalLink, FileText, FileDown, Link as LinkIcon } from 'lucide-react';
 import { getStoreLibraryItems, type StoreLibraryItem } from '@/api/storeLibrary';
+import { ErrorState } from '@/components/common';
 
 function getItemIcon(mimeType: string | null, fileName: string | null) {
   const mime = mimeType?.toLowerCase() ?? '';
@@ -24,14 +25,17 @@ function getItemIcon(mimeType: string | null, fileName: string | null) {
 export default function StoreLibraryResourcesPage() {
   const [items, setItems] = useState<StoreLibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  // 조회 실패를 "등록된 자료가 없습니다"(empty) 로 위장하지 않는다(4상태 계약).
+  const [loadError, setLoadError] = useState(false);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await getStoreLibraryItems({ limit: 100 });
       setItems((res.data?.items ?? []).filter((it) => it.isActive));
     } catch {
-      setItems([]);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -68,6 +72,8 @@ export default function StoreLibraryResourcesPage() {
         <div style={styles.empty}>
           <p style={{ color: '#64748b', fontSize: 14 }}>불러오는 중...</p>
         </div>
+      ) : loadError ? (
+        <ErrorState onRetry={() => void fetchItems()} />
       ) : items.length === 0 ? (
         <div style={styles.empty}>
           <Library size={32} style={{ color: '#cbd5e1', marginBottom: 12 }} />

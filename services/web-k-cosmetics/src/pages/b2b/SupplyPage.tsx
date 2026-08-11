@@ -24,6 +24,7 @@ import {
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
 import { api } from '../../lib/apiClient';
+import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
 
 interface Supplier {
   id: string;
@@ -57,11 +58,15 @@ export default function SupplyPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [products, setProducts] = useState<SupplyProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  // 조회 실패를 "자료가 없습니다"(empty) 로 위장하지 않는다(4상태 계약: loading/error/empty/ready).
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      setLoadError(false);
       try {
         if (activeTab === 'suppliers') {
           const response = await api.get('/cosmetics/suppliers');
@@ -71,14 +76,13 @@ export default function SupplyPage() {
           setProducts(response.data?.data || []);
         }
       } catch {
-        setSuppliers([]);
-        setProducts([]);
+        setLoadError(true);
       } finally {
         setIsLoading(false);
       }
     };
     fetchData();
-  }, [activeTab]);
+  }, [activeTab, reloadKey]);
 
   const filteredSuppliers = suppliers.filter(s =>
     s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -171,6 +175,8 @@ export default function SupplyPage() {
           <div className="flex items-center justify-center h-64">
             <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
           </div>
+        ) : loadError ? (
+          <LoadErrorNotice onRetry={() => setReloadKey((k) => k + 1)} />
         ) : activeTab === 'suppliers' ? (
           /* Suppliers List */
           filteredSuppliers.length === 0 ? (

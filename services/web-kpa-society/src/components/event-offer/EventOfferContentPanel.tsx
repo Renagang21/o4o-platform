@@ -23,7 +23,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { LoadingSpinner, EmptyState, Pagination } from '../common';
+import { LoadingSpinner, EmptyState, LoadErrorState, Pagination } from '../common';
 import { eventOfferApi, storeCartApi } from '../../api';
 import { CART_SERVICE_KEY, buildEventOfferCartPayload } from '../../utils/eventOfferCart';
 import { useAuth } from '../../contexts';
@@ -69,6 +69,9 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
 
   // Ordering
   const [orderPanelOpen, setOrderPanelOpen] = useState(false);
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 조회 실패를 setItems([]) 로 삼켜 "진행중인 이벤트가 없습니다" 로 위장했다.
+  const [loadError, setLoadError] = useState(false);
   const [orderQuantities, setOrderQuantities] = useState<Record<string, number>>({});
   const [ordering, setOrdering] = useState(false);
 
@@ -77,6 +80,7 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
+      setLoadError(false);
       const res = await eventOfferApi.getEnrichedOffers({
         page: currentPage,
         limit: 20,
@@ -86,7 +90,7 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
       setTotalPages(res.pagination?.totalPages || 1);
     } catch (err) {
       console.warn('Enriched event offer API not available:', err);
-      setItems([]);
+      setLoadError(true);
       setTotalPages(1);
     } finally {
       setLoading(false);
@@ -294,7 +298,9 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
         </select>
       </div>
 
-      {items.length === 0 && !searchQuery && !supplierFilter ? (
+      {loadError ? (
+        <LoadErrorState onRetry={() => void loadData()} />
+      ) : items.length === 0 && !searchQuery && !supplierFilter ? (
         <EmptyState
           icon="🛒"
           title={statusFilter === 'active' ? '진행중인 이벤트가 없습니다' : '이벤트 상품이 없습니다'}

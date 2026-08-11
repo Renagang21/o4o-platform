@@ -26,6 +26,7 @@ import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
 import { api } from '../../lib/apiClient';
 import { kcosmeticsConfig } from '@o4o/operator-ux-core';
+import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
 
 interface DashboardStats {
   todaySales: number;
@@ -103,15 +104,19 @@ export default function StoresPage() {
   const { user, isAuthenticated } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // 조회 실패를 지표 "-"(빈 값) 으로 위장하지 않는다(4상태 계약: loading/error/empty/ready).
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
       setIsLoading(true);
+      setLoadError(false);
       try {
         const response = await api.get('/cosmetics/stores/dashboard');
         setStats(response.data?.data || null);
       } catch {
-        setStats(null);
+        setLoadError(true);
       } finally {
         setIsLoading(false);
       }
@@ -121,7 +126,7 @@ export default function StoresPage() {
     } else {
       setIsLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, reloadKey]);
 
   if (!isAuthenticated) {
     return (
@@ -171,6 +176,15 @@ export default function StoresPage() {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
+        {loadError && (
+          <LoadErrorNotice
+            compact
+            className="mb-6"
+            onRetry={() => setReloadKey((k) => k + 1)}
+            detail="GET /cosmetics/stores/dashboard"
+          />
+        )}
+
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl border border-slate-200 p-4">

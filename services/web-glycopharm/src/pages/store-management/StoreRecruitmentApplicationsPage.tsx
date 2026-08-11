@@ -8,19 +8,23 @@
 import { useCallback, useEffect, useState } from 'react';
 import { StoreRecruitmentApplicationsView, type StoreRecruitmentApplicationRow } from '@o4o/store-ui-core';
 import { api } from '../../lib/apiClient';
+import { ErrorState } from '../../components/common';
 
 export default function StoreRecruitmentApplicationsPage() {
   const [rows, setRows] = useState<StoreRecruitmentApplicationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  // 조회 실패를 0건으로 위장하지 않는다(4상태 계약: loading/error/empty/ready).
+  const [loadError, setLoadError] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await api.get('/neture/partner/applications/mine');
       setRows(res.data?.data ?? []);
     } catch {
-      setRows([]);
+      setLoadError(true);
     }
     setLoading(false);
   }, []);
@@ -43,6 +47,10 @@ export default function StoreRecruitmentApplicationsPage() {
     },
     [load],
   );
+
+  if (loadError && !loading) {
+    return <ErrorState onRetry={() => void load()} />;
+  }
 
   return (
     <StoreRecruitmentApplicationsView

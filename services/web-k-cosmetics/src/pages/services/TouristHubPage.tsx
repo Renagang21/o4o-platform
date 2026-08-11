@@ -25,6 +25,7 @@ import {
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
 import { api } from '../../lib/apiClient';
+import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
 
 interface ConnectedStore {
   id: string;
@@ -48,27 +49,36 @@ export default function TouristHubPage() {
   const [stores, setStores] = useState<ConnectedStore[]>([]);
   const [stats, setStats] = useState<TouristStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // 조회 실패를 "자료가 없습니다"(empty) 로 위장하지 않는다(4상태 계약: loading/error/empty/ready).
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      setLoadError(false);
       try {
         const [storesRes, statsRes] = await Promise.allSettled([
           api.get('/cosmetics/tourist-hub/stores'),
           api.get('/cosmetics/tourist-hub/stats'),
         ]);
 
+        // 둘 다 실패했으면 화면 전체가 실패다. 하나만 실패하면 남은 영역은 정상 표시한다.
+        if (storesRes.status === 'rejected' && statsRes.status === 'rejected') {
+          setLoadError(true);
+          return;
+        }
+        if (storesRes.status === 'rejected' || statsRes.status === 'rejected') setLoadError(true);
         setStores(storesRes.status === 'fulfilled' ? (storesRes.value.data?.data || []) : []);
         setStats(statsRes.status === 'fulfilled' ? (statsRes.value.data?.data || null) : null);
       } catch {
-        setStores([]);
-        setStats(null);
+        setLoadError(true);
       } finally {
         setIsLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [reloadKey]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -97,8 +107,18 @@ export default function TouristHubPage() {
           <div className="flex items-center justify-center h-64">
             <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
           </div>
+        ) : loadError && !stats && stores.length === 0 ? (
+          <LoadErrorNotice onRetry={() => setReloadKey((k) => k + 1)} />
         ) : (
           <>
+            {loadError && (
+              <LoadErrorNotice
+                compact
+                className="mb-6"
+                onRetry={() => setReloadKey((k) => k + 1)}
+              />
+            )}
+
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
               <div className="bg-white rounded-xl border border-slate-200 p-5">

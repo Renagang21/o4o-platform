@@ -7,8 +7,9 @@
  * Phase 1: 읽기 전용 (소개하기 버튼은 비활성)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { recruitingApi, partnerDashboardApi, type RecruitingProduct } from '../../lib/api';
+import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
 
 const CATEGORY_LABELS: Record<string, string> = {
   cgm_device: 'CGM 기기',
@@ -24,19 +25,26 @@ export default function RecruitingProductsPage() {
   const [loading, setLoading] = useState(true);
   const [addingIds, setAddingIds] = useState<Set<string>>(new Set());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 조회 실패를 setProducts([]) 로 삼켜 "자료가 없습니다" 로 위장했다.
+  const [loadError, setLoadError] = useState(false);
+
+  const loadProducts = useCallback(async () => {
+    setLoading(true);
+    setLoadError(false);
+    try {
+      const data = await recruitingApi.getRecruitingProducts();
+      setProducts(data);
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const data = await recruitingApi.getRecruitingProducts();
-        setProducts(data);
-      } catch {
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    void loadProducts();
+  }, [loadProducts]);
 
   const handleAddItem = async (productId: string) => {
     setAddingIds((prev) => new Set(prev).add(productId));
@@ -90,7 +98,9 @@ export default function RecruitingProductsPage() {
         <p className="text-gray-500">공급자가 파트너를 모집 중인 제품 목록입니다.</p>
       </div>
 
-      {products.length === 0 ? (
+      {loadError ? (
+        <LoadErrorNotice onRetry={() => void loadProducts()} />
+      ) : products.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-lg border border-gray-200">
           <p className="text-gray-500 text-lg">자료가 없습니다</p>
         </div>

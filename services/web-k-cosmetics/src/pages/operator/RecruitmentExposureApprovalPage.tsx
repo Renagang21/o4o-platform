@@ -13,6 +13,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { RecruitmentExposureConsole, type RecruitmentExposureItem } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
+import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
 
 const BASE = '/cosmetics/operator/recruitment-exposure';
 const URL_KEY = 'recruitmentExposure_status';
@@ -26,15 +27,18 @@ export default function RecruitmentExposureApprovalPage() {
   const [items, setItems] = useState<RecruitmentExposureItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
+  // 조회 실패를 0건으로 위장하지 않는다(4상태 계약: loading/error/empty/ready).
+  const [loadError, setLoadError] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const qs = filterStatus && filterStatus !== 'all' ? `?exposureStatus=${filterStatus}` : '';
       const res = await api.get(`${BASE}${qs}`);
       setItems(res.data?.data ?? []);
     } catch {
-      setItems([]);
+      setLoadError(true);
     }
     setLoading(false);
   }, [filterStatus]);
@@ -67,6 +71,10 @@ export default function RecruitmentExposureApprovalPage() {
     },
     [load],
   );
+
+  if (loadError && !loading) {
+    return <LoadErrorNotice onRetry={() => void load()} />;
+  }
 
   return (
     <RecruitmentExposureConsole

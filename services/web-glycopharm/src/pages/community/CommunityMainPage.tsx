@@ -97,9 +97,12 @@ interface LatestSectionProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   loading: boolean;
+  /** 조회 실패 — "등록된 글이 없습니다"(empty) 와 구분한다(4상태 계약). */
+  loadError?: boolean;
+  onRetry?: () => void;
 }
 
-function LatestActivitySection({ items, activeTab, onTabChange, loading }: LatestSectionProps) {
+function LatestActivitySection({ items, activeTab, onTabChange, loading, loadError, onRetry }: LatestSectionProps) {
   const currentTab = LATEST_TABS.find((t) => t.key === activeTab);
   const hasTabShortcut = !loading && items.length > 0 && currentTab?.shortcutHref;
 
@@ -130,6 +133,20 @@ function LatestActivitySection({ items, activeTab, onTabChange, loading }: Lates
       {loading ? (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+        </div>
+      ) : loadError ? (
+        <div className="text-center py-8">
+          <p className="text-sm font-medium text-slate-800">데이터를 불러오지 못했습니다.</p>
+          <p className="mt-1 text-sm text-slate-500">잠시 후 다시 시도해 주세요.</p>
+          {onRetry && (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="mt-3 px-3 py-1.5 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50"
+            >
+              다시 시도
+            </button>
+          )}
         </div>
       ) : items.length === 0 ? (
         <div className="text-center py-8 text-slate-400 text-sm">등록된 글이 없습니다</div>
@@ -186,6 +203,8 @@ export default function CommunityMainPage() {
   const [latestItems, setLatestItems] = useState<LatestItem[]>([]);
   const [latestTab, setLatestTab] = useState('all');
   const [latestLoading, setLatestLoading] = useState(true);
+  const [latestError, setLatestError] = useState(false);
+  const [latestReloadKey, setLatestReloadKey] = useState(0);
 
   const loadNotices = useCallback(async () => {
     setLoading(true);
@@ -212,11 +231,12 @@ export default function CommunityMainPage() {
   // WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1
   useEffect(() => {
     setLatestLoading(true);
+    setLatestError(false);
     homeApi.getLatest({ type: latestTab, limit: LATEST_SUMMARY_LIMIT })
       .then((res) => setLatestItems(res.data ?? []))
-      .catch(() => setLatestItems([]))
+      .catch(() => setLatestError(true))
       .finally(() => setLatestLoading(false));
-  }, [latestTab]);
+  }, [latestTab, latestReloadKey]);
 
   const iconCls = `flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`;
 
@@ -299,6 +319,8 @@ export default function CommunityMainPage() {
           activeTab={latestTab}
           onTabChange={setLatestTab}
           loading={latestLoading}
+          loadError={latestError}
+          onRetry={() => setLatestReloadKey((k) => k + 1)}
         />
       }
       appEntryCards={[

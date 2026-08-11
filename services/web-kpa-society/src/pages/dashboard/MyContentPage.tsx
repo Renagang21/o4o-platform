@@ -19,7 +19,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { PageHeader, LoadingSpinner, EmptyState, LoadErrorState, Card } from '../../components/common';
 import { dashboardApi, type DashboardAsset, type DashboardSortType, type DashboardKpi } from '../../api';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors, typography } from '../../styles/theme';
@@ -91,6 +91,7 @@ export function MyContentPage() {
   const { user } = useAuth();
   const [assets, setAssets] = useState<DashboardAsset[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [sort, setSort] = useState<DashboardSortType>('recent');
   const [kpi, setKpi] = useState<DashboardKpi | null>(null);
@@ -132,11 +133,14 @@ export function MyContentPage() {
     if (!dashboardId) return;
     try {
       setLoading(true);
+      setLoadError(false);
       const res = await dashboardApi.listAssets(dashboardId, { sort });
       setAssets(res.data || []);
     } catch (err) {
+      // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+      // 조회 실패를 setAssets([]) 로 삼켜 "아직 가져온 콘텐츠가 없습니다" 로 위장했다.
       console.warn('Failed to load dashboard assets:', err);
-      setAssets([]);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -459,7 +463,9 @@ export function MyContentPage() {
         </div>
       </div>
 
-      {filteredAssets.length === 0 ? (
+      {loadError ? (
+        <LoadErrorState onRetry={() => void loadAssets()} />
+      ) : filteredAssets.length === 0 ? (
         <div>
           <EmptyState
             icon="📦"

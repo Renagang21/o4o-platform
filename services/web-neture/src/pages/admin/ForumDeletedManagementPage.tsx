@@ -19,6 +19,7 @@ import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
 import { forumAdminApi } from '../../services/forumApi';
+import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -114,14 +115,21 @@ export default function ForumDeletedManagementPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
 
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 목록/이력 조회 실패를 빈 배열로 삼켜 "삭제된 포럼이 없습니다" · "삭제 이력이 없습니다"
+  // 로 위장하고 있었다 — 관리 화면에서 실패와 0건이 구분되지 않으면 오판을 만든다.
+  const [loadError, setLoadError] = useState(false);
+  const [logsError, setLogsError] = useState(false);
+
   // ── Fetch ──────────────────────────────────────────────────────────────────
   const fetchDeleted = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await forumAdminApi.getDeletedForums();
       setForums(res?.data || []);
     } catch {
-      setForums([]);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -129,11 +137,12 @@ export default function ForumDeletedManagementPage() {
 
   const fetchLogs = useCallback(async () => {
     setLogsLoading(true);
+    setLogsError(false);
     try {
       const res = await forumAdminApi.getAuditLogs(100);
       setLogs(res?.data || []);
     } catch {
-      setLogs([]);
+      setLogsError(true);
     } finally {
       setLogsLoading(false);
     }
@@ -367,16 +376,22 @@ export default function ForumDeletedManagementPage() {
             </button>
           </div>
 
-          <DataTable<DeletedForum>
-            columns={columns}
-            data={filtered}
-            rowKey="id"
-            loading={loading}
-            emptyMessage="삭제된 포럼이 없습니다."
-            tableId="neture-admin-deleted-forums"
-          />
+          {loadError ? (
+            <LoadErrorNotice onRetry={() => void fetchDeleted()} />
+          ) : (
+            <>
+              <DataTable<DeletedForum>
+                columns={columns}
+                data={filtered}
+                rowKey="id"
+                loading={loading}
+                emptyMessage="삭제된 포럼이 없습니다."
+                tableId="neture-admin-deleted-forums"
+              />
 
-          <div className="mt-3 text-sm text-slate-500">총 {filtered.length}개</div>
+              <div className="mt-3 text-sm text-slate-500">총 {filtered.length}개</div>
+            </>
+          )}
         </>
       ) : (
         <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
@@ -384,6 +399,8 @@ export default function ForumDeletedManagementPage() {
             <div className="flex items-center justify-center py-10 gap-2 text-slate-400">
               <Loader2 className="w-5 h-5 animate-spin" /> 이력 불러오는 중...
             </div>
+          ) : logsError ? (
+            <LoadErrorNotice compact onRetry={() => void fetchLogs()} />
           ) : logs.length === 0 ? (
             <div className="py-10 text-center text-slate-400 text-sm">삭제 이력이 없습니다.</div>
           ) : (

@@ -13,7 +13,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PageSection, PageContainer } from '@o4o/ui';
-import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
+import { PageHeader, LoadingSpinner, EmptyState, LoadErrorState, Pagination, Card } from '../../components/common';
 import { lmsApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { useAuthModal } from '../../contexts/LoginModalContext';
@@ -29,6 +29,7 @@ export function CourseHubPage() {
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
   const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
 
@@ -47,6 +48,7 @@ export function CourseHubPage() {
   const loadData = async () => {
     try {
       setLoading(true);
+      setLoadError(false);
       const res = await lmsApi.getCourses({
         search: currentSearch || undefined,
         page: currentPage,
@@ -56,7 +58,9 @@ export function CourseHubPage() {
       const pag = (res as any).pagination;
       setTotalPages(pag?.totalPages || res.totalPages || 1);
     } catch {
-      setCourses([]);
+      // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+      // 조회 실패를 setCourses([]) 로 삼켜 "등록된 강좌가 없습니다" 로 위장했다.
+      setLoadError(true);
       setTotalPages(1);
     } finally {
       setLoading(false);
@@ -172,7 +176,9 @@ export function CourseHubPage() {
       </div>
 
       {/* Course Grid */}
-      {filteredCourses.length === 0 ? (
+      {loadError ? (
+        <LoadErrorState onRetry={() => void loadData()} />
+      ) : filteredCourses.length === 0 ? (
         <EmptyState
           icon="📋"
           title={currentSearch ? '검색 결과가 없습니다' : '등록된 강좌가 없습니다'}

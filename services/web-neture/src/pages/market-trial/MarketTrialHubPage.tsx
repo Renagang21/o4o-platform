@@ -22,6 +22,7 @@ import {
   type MyParticipationSummary,
 } from '../../api/trial';
 import { useAuth } from '../../contexts/AuthContext';
+import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
 
 type DisplayGroup = 'recruiting' | 'active' | 'ended';
 
@@ -50,10 +51,15 @@ export function MarketTrialHubPage() {
   const [trials, setTrials] = useState<Trial[]>([]);
   const [participationMap, setParticipationMap] = useState<Map<string, MyParticipationSummary>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 조회 실패를 setTrials([]) 로 삼켜 "현재 모집 중인 유통참여형 펀딩이 없습니다" 로 위장했다.
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let active = true;
     const fetchData = async () => {
+      setLoadError(false);
       try {
         const [trialsData, partData] = await Promise.all([
           getTrials(),
@@ -69,7 +75,7 @@ export function MarketTrialHubPage() {
           setParticipationMap(map);
         }
       } catch {
-        if (active) setTrials([]);
+        if (active) setLoadError(true);
       } finally {
         if (active) setIsLoading(false);
       }
@@ -78,7 +84,7 @@ export function MarketTrialHubPage() {
     return () => {
       active = false;
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, reloadKey]);
 
   const recruiting = trials.filter((t) => getDisplayGroup(t.status) === 'recruiting');
   const activeTrials = trials.filter((t) => getDisplayGroup(t.status) === 'active');
@@ -132,7 +138,9 @@ export function MarketTrialHubPage() {
 
       {/* 4. 모집 중 */}
       <Section title="모집 중" count={recruiting.length} accentColor="#059669" isLoading={isLoading}>
-        {recruiting.length > 0 ? (
+        {loadError ? (
+          <LoadErrorNotice compact onRetry={() => setReloadKey((k) => k + 1)} />
+        ) : recruiting.length > 0 ? (
           recruiting.map((trial) => (
             <TrialCard
               key={trial.id}

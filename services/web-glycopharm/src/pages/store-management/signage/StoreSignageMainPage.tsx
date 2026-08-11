@@ -281,6 +281,7 @@ export default function StoreSignageMainPage() {
   // ── Schedule state ──
   const [schedules, setSchedules] = useState<SignageScheduleItem[]>([]);
   const [scheduleLoading, setScheduleLoading] = useState(false);
+  const [scheduleError, setScheduleError] = useState<string | null>(null);
   const [signagePlaylists, setSignagePlaylists] = useState<SignagePlaylistOption[]>([]);
   const [showScheduleForm, setShowScheduleForm] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<SignageScheduleItem | null>(null);
@@ -327,6 +328,7 @@ export default function StoreSignageMainPage() {
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
   const [playlistItems, setPlaylistItems] = useState<StorePlaylistItem[]>([]);
   const [playlistItemsLoading, setPlaylistItemsLoading] = useState(false);
+  const [playlistItemsError, setPlaylistItemsError] = useState<string | null>(null);
   const [playlistKeyword, setPlaylistKeyword] = useState('');
 
   // ── Signage snapshot list for "add to playlist" ──
@@ -343,8 +345,8 @@ export default function StoreSignageMainPage() {
       setItems(loadedItems);
       setSignageSnapshots(loadedItems);
     } catch {
-      setItems([]);
-      setSignageSnapshots([]);
+      // 조회 실패를 "사이니지 자산이 없습니다"(empty) 로 위장하지 않는다(4상태 계약).
+      setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setLoading(false);
     }
@@ -357,7 +359,7 @@ export default function StoreSignageMainPage() {
       const data = await fetchStorePlaylists();
       setPlaylists(data);
     } catch {
-      setPlaylists([]);
+      setPlaylistError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setPlaylistLoading(false);
     }
@@ -365,11 +367,12 @@ export default function StoreSignageMainPage() {
 
   const loadPlaylistItems = useCallback(async (playlistId: string) => {
     setPlaylistItemsLoading(true);
+    setPlaylistItemsError(null);
     try {
       const data = await fetchPlaylistItems(playlistId);
       setPlaylistItems(data);
     } catch {
-      setPlaylistItems([]);
+      setPlaylistItemsError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setPlaylistItemsLoading(false);
     }
@@ -379,11 +382,12 @@ export default function StoreSignageMainPage() {
   const loadSchedules = useCallback(async () => {
     if (!organizationId) return;
     setScheduleLoading(true);
+    setScheduleError(null);
     try {
       const res = await fetchSchedules(organizationId);
       setSchedules(Array.isArray(res.items) ? res.items : []);
     } catch {
-      setSchedules([]);
+      setScheduleError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setScheduleLoading(false);
     }
@@ -395,7 +399,8 @@ export default function StoreSignageMainPage() {
       const data = await fetchSignagePlaylists(organizationId);
       setSignagePlaylists(data);
     } catch {
-      setSignagePlaylists([]);
+      // 스케줄 탭의 플레이리스트 선택 목록 — 실패를 0건으로 위장하지 않는다.
+      setScheduleError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     }
   }, [organizationId]);
 
@@ -405,7 +410,8 @@ export default function StoreSignageMainPage() {
     try {
       setRegisteredMedia(await fetchSignageMedia(organizationId));
     } catch {
-      setRegisteredMedia([]);
+      // 등록 동영상은 통합 목록(unifiedVideos)의 일부 — 실패를 목록 상단 error 로 알린다.
+      setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     }
   }, [organizationId]);
 
@@ -847,6 +853,9 @@ export default function StoreSignageMainPage() {
             <div className="text-center py-12 text-red-500 text-sm">
               <AlertCircle className="w-5 h-5 mx-auto mb-2" />
               {playlistError}
+              <div>
+                <button onClick={() => void loadPlaylists()} className="mt-3 text-sm text-blue-600 hover:underline">다시 시도</button>
+              </div>
             </div>
           ) : playlists.length === 0 && !playlistLoading ? (
             <div className="text-center py-12 text-slate-400">
@@ -1027,6 +1036,19 @@ export default function StoreSignageMainPage() {
               {playlistItemsLoading ? (
                 <div className="py-8 text-center text-slate-400 text-sm">
                   <Loader2 className="w-4 h-4 animate-spin mx-auto mb-2" /> 로딩 중...
+                </div>
+              ) : playlistItemsError ? (
+                <div className="py-8 text-center text-red-500 text-sm">
+                  <AlertCircle className="w-4 h-4 mx-auto mb-2" />
+                  {playlistItemsError}
+                  <div>
+                    <button
+                      onClick={() => { if (selectedPlaylistId) void loadPlaylistItems(selectedPlaylistId); }}
+                      className="mt-3 text-sm text-blue-600 hover:underline"
+                    >
+                      다시 시도
+                    </button>
+                  </div>
                 </div>
               ) : playlistItems.length === 0 ? (
                 <div className="py-8 text-center text-slate-400 text-sm">
@@ -1230,6 +1252,14 @@ export default function StoreSignageMainPage() {
               {scheduleLoading ? (
                 <div className="flex items-center justify-center py-12 text-slate-400">
                   <Loader2 className="w-5 h-5 animate-spin mr-2" /> 스케줄 로딩 중...
+                </div>
+              ) : scheduleError ? (
+                <div className="text-center py-12 text-red-500 text-sm">
+                  <AlertCircle className="w-5 h-5 mx-auto mb-2" />
+                  {scheduleError}
+                  <div>
+                    <button onClick={() => void loadSchedules()} className="mt-3 text-sm text-blue-600 hover:underline">다시 시도</button>
+                  </div>
                 </div>
               ) : schedules.length === 0 ? (
                 <div className="text-center py-12 text-slate-400">

@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { catalogImportApi } from '../../../lib/api';
+import { LoadErrorNotice } from '../../../components/common/LoadErrorNotice';
 
 interface ImportJob {
   id: string;
@@ -38,16 +39,25 @@ export default function ImportHistoryPage() {
   const [loading, setLoading] = useState(true);
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   const [expandedJobData, setExpandedJobData] = useState<ImportJob | null>(null);
+  const [loadError, setLoadError] = useState(false);
 
+  // WO-O4O-WEB-LOAD-ERROR-CONTRACT-STANDARDIZATION-BATCH-V1:
+  // 조회 실패(예외 + success:false)를 빈 배열로 삼켜 "Import 이력이 없습니다" 로 위장했다.
   const loadJobs = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const result = await catalogImportApi.listJobs();
-      setJobs(result.success ? result.data || [] : []);
+      if (!result.success) {
+        setLoadError(true);
+        return;
+      }
+      setJobs(result.data || []);
     } catch {
-      setJobs([]);
+      setLoadError(true);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -112,7 +122,9 @@ export default function ImportHistoryPage() {
         </button>
       </div>
 
-      {jobs.length === 0 ? (
+      {loadError ? (
+        <LoadErrorNotice onRetry={() => void loadJobs()} />
+      ) : jobs.length === 0 ? (
         <div className="text-center py-12 text-gray-400">
           Import 이력이 없습니다.
         </div>
