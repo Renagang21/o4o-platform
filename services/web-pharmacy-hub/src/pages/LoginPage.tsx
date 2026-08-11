@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { BRAND } from '../config/service';
 
@@ -19,6 +19,10 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-WEB-AUTH-LOGIN-ACCESS-UX-STANDARDIZATION-BATCH-V1:
+  //   guard 가 `state.from` 에 원래 가려던 경로를 담아 보낸다(4개 서비스 공통 계약).
+  //   Pharmacy-Hub 만 이를 버리고 항상 '/' 로 보내고 있었다 → 복원 경로를 사용한다.
+  const returnUrl = (useLocation().state as { from?: string } | null)?.from;
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -40,7 +44,11 @@ export default function LoginPage() {
       //   제한 로그인 계정(users.status=pending)은 가입 상태 확인 화면으로만 보낸다.
       //   상품·주문·콘텐츠 진입점은 노출하지 않는다.
       const accountAccess = (result.user as { accountAccess?: string } | undefined)?.accountAccess;
-      navigate(accountAccess === 'restricted' ? '/join/status' : '/');
+      if (accountAccess === 'restricted') {
+        navigate('/join/status');
+      } else {
+        navigate(returnUrl || '/');
+      }
     } catch (err) {
       console.error('[Login] Post-login error:', err);
       setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');

@@ -15,6 +15,7 @@ import { isStoreOwnerDual, isOperatorOrAbove } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { isPharmacistRole } from '../../lib/role-constants';
 import { MembershipGate } from './MembershipGate';
+import { AccessDenied } from './AccessDenied';
 
 interface GlycoHubGuardProps {
   children: React.ReactNode;
@@ -50,5 +51,7 @@ export function GlycoHubGuard({ children }: GlycoHubGuardProps) {
     return <Navigate to="/operator" replace />;
   }
 
-  return <Navigate to="/" replace />;
+  // WO-O4O-WEB-AUTH-LOGIN-ACCESS-UX-STANDARDIZATION-BATCH-V1:
+  //   매장 역할도 operator 도 아닌 사용자는 기존에 무안내로 홈에 튕겼다 → 안내 화면.
+  return <AccessDenied message="매장 HUB 는 매장 경영자 계정만 이용할 수 있습니다." />;
 }

@@ -28,13 +28,18 @@ export const RoleGuard = createRouteGuard({
       <p style={{ color: '#64748B' }}>권한을 확인하는 중...</p>
     </div>
   ),
-  // message 가 없으면 null 을 돌려 Core 가 deniedRedirect('/') 로 보내게 한다 — 기존 하위호환 동작.
-  renderDenied: ({ message }) => (message ? <AccessDeniedCard message={message} /> : null),
+  // WO-O4O-WEB-AUTH-LOGIN-ACCESS-UX-STANDARDIZATION-BATCH-V1:
+  //   기존에는 message 가 없으면 null 을 돌려 Core 가 무안내 deniedRedirect('/') 로 보냈다.
+  //   accessDeniedMessage 미지정 route(법무/감사로그/역할관리 등)도 안내 화면을 받도록
+  //   기본 문구로 대체한다. 판정 순서·권한 계약은 변경하지 않는다.
+  renderDenied: ({ message }) => <AccessDeniedCard message={message || ACCESS_DENIED_MESSAGE} />,
   deniedRedirect: '/',
   MembershipGate,
 });
 
 // ─── Access Denied Card (AdminAuthGuard 패턴 차용) ───
+
+export const ACCESS_DENIED_MESSAGE = '현재 계정으로는 이 기능을 사용할 수 없습니다.';
 
 function AccessDeniedCard({ message }: { message: string }) {
   const navigate = useNavigate();

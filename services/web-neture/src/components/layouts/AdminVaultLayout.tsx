@@ -17,6 +17,7 @@ import { Link, Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts';
 import { hasAnyRole } from '@o4o/auth-utils';
 import { ADMIN_ROLES } from '../../lib/role-constants';
+import { AccessDenied } from '../auth/AccessDenied';
 import { Shield, FileText, Box, StickyNote, Home, MessageSquare } from 'lucide-react';
 
 export default function AdminVaultLayout() {
@@ -32,9 +33,14 @@ export default function AdminVaultLayout() {
     );
   }
 
-  // 인증되지 않았거나 권한 없음
-  if (!isAuthenticated || !hasAnyRole(user?.roles ?? [], ADMIN_ROLES)) {
-    return <Navigate to="/" replace />;
+  // WO-O4O-WEB-AUTH-LOGIN-ACCESS-UX-STANDARDIZATION-BATCH-V1:
+  //   기존에는 미인증·권한없음을 모두 무안내 '/' redirect 로 처리했다.
+  //   미인증은 로그인 경로로, 권한 없음은 안내 화면으로 분리한다(접근 판정 무변경).
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
+  }
+  if (!hasAnyRole(user?.roles ?? [], ADMIN_ROLES)) {
+    return <AccessDenied />;
   }
 
   const isActive = (path: string) => {

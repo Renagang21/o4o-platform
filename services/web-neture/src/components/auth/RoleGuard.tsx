@@ -14,6 +14,7 @@ import type { ReactNode } from 'react';
 import { createRouteGuard } from '@o4o/auth-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { MembershipGate } from './MembershipGate';
+import { AccessDenied } from './AccessDenied';
 import {
   NETURE_ROLES,
   ADMIN_ROLES,
@@ -39,6 +40,9 @@ const BaseGuard = createRouteGuard({
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
     </div>
   ),
+  // WO-O4O-WEB-AUTH-LOGIN-ACCESS-UX-STANDARDIZATION-BATCH-V1:
+  //   role 불충족 시 무안내 '/' redirect 대신 안내 화면. 판정 순서는 그대로다.
+  renderDenied: ({ message }) => <AccessDenied message={message} />,
   deniedRedirect: '/',
   MembershipGate,
 });

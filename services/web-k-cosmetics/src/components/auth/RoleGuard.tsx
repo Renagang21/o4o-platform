@@ -18,6 +18,7 @@ import { isAdminOrAbove } from '@o4o/auth-utils';
 import { createRouteGuard } from '@o4o/auth-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { MembershipGate } from './MembershipGate';
+import { AccessDenied } from './AccessDenied';
 
 const LoadingSpinner = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -51,7 +52,9 @@ function useGuardAuth() {
 export const RoleGuard = createRouteGuard({
   useAuth: useGuardAuth,
   renderLoading: () => <LoadingSpinner />,
-  // K-Cosmetics 는 접근 거부 시 항상 홈으로 — 안내 카드 계약이 없다(기존 동작 유지).
+  // WO-O4O-WEB-AUTH-LOGIN-ACCESS-UX-STANDARDIZATION-BATCH-V1:
+  //   기존 무안내 '/' redirect 를 안내 화면으로 교체(판정 무변경).
+  renderDenied: ({ message }) => <AccessDenied message={message} />,
   deniedRedirect: '/',
   MembershipGate,
 });

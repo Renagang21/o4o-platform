@@ -75,6 +75,10 @@ export default function ContentHubPage() {
   const [createModal, setCreateModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string; type: 'video' | 'playlist'; operatorDelete: boolean } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  // WO-O4O-WEB-AUTH-LOGIN-ACCESS-UX-STANDARDIZATION-BATCH-V1 (직전 batch HOLD_POLICY 해소):
+  //   삭제 실패를 catch 가 삼키고 모달만 닫아 "삭제된 것처럼" 보였다. 수정(editError) 과 동일하게
+  //   실패 사유를 모달에 남기고 모달을 닫지 않는다.
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Create form
   const [createForm, setCreateForm] = useState({ name: '', description: '', sourceUrl: '', durationInput: '' });
@@ -272,6 +276,7 @@ export default function ContentHubPage() {
   const handleDeleteConfirmed = async () => {
     if (!deleteConfirm) return;
     setIsDeleting(true);
+    setDeleteError(null);
     try {
       // 운영자: 일반 소프트 삭제 엔드포인트 (모든 source 항목 처리 가능)
       // 본인(커뮤니티): 커뮤니티 전용 엔드포인트
@@ -285,8 +290,8 @@ export default function ContentHubPage() {
       await apiFetch(path, { method: 'DELETE' });
       setDeleteConfirm(null);
       setReloadKey(k => k + 1);
-    } catch {
-      setDeleteConfirm(null);
+    } catch (err: any) {
+      setDeleteError(err?.message || '삭제에 실패했습니다');
     } finally {
       setIsDeleting(false);
     }
@@ -552,8 +557,9 @@ export default function ContentHubPage() {
             <div style={{ backgroundColor: '#f8fafc', borderRadius: 8, padding: 12, marginBottom: 4 }}>
               <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{deleteConfirm.name}</p>
             </div>
+            {deleteError && <p style={errorTextStyle}>{deleteError}</p>}
             <div style={dialogFooterStyle}>
-              <button onClick={() => setDeleteConfirm(null)} disabled={isDeleting} style={cancelBtnStyle}>취소</button>
+              <button onClick={() => { setDeleteConfirm(null); setDeleteError(null); }} disabled={isDeleting} style={cancelBtnStyle}>취소</button>
               <button onClick={handleDeleteConfirmed} disabled={isDeleting} style={deleteBtnStyle}>{isDeleting ? '삭제 중...' : '삭제'}</button>
             </div>
           </div>

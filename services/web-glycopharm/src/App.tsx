@@ -26,6 +26,7 @@ import StoreLayout from '@/components/layouts/StoreLayout';
 import KioskLayout from '@/components/layouts/KioskLayout';
 import TabletLayout from '@/components/layouts/TabletLayout';
 import { RoleGuard, OperatorRoute } from '@/components/auth/RoleGuard';
+import { AccessDenied } from './components/auth/AccessDenied';
 // WO-O4O-GLYCOPHARM-MY-STORE-MENU-MEMBERSHIP-GUARD-V1
 import { PharmacyStoreGuard } from '@/components/auth/PharmacyStoreGuard';
 
@@ -436,8 +437,9 @@ function SoftGuard({ feature, allowedRoles, children }: {
 
   if (isLoading) return <PageLoading />;
   if (!isAuthenticated) return <FeatureIntroPage feature={feature} />;
+  // WO-O4O-WEB-AUTH-LOGIN-ACCESS-UX-STANDARDIZATION-BATCH-V1: 무안내 홈 redirect → 안내 화면.
   if (allowedRoles && user && !user.roles.some(r => allowedRoles.includes(r))) {
-    return <Navigate to="/" replace />;
+    return <AccessDenied />;
   }
   return <>{children}</>;
 }
