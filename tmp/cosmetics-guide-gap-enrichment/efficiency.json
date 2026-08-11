@@ -1,0 +1,57 @@
+{
+  "wo": "WO-O4O-COSMETICS-GUIDE-GAP-ENRICHMENT-FULL-V1",
+  "population": {
+    "cosmeticMasters": 32674,
+    "gapDocs": 17157
+  },
+  "rates": {
+    "AUTO_ENRICH": {
+      "n": 3297,
+      "pct": 19.2
+    },
+    "CHECK": {
+      "n": 4471,
+      "pct": 26.1
+    },
+    "NO_SOURCE": {
+      "n": 8128,
+      "pct": 47.4
+    },
+    "NO_CHANGE": {
+      "n": 1261,
+      "pct": 7.3
+    }
+  },
+  "sourceAcquisition": {
+    "externalSourcesTried": 7,
+    "externalSourcesUsable": 1,
+    "mfdsMatchRate": {
+      "matched": 1317,
+      "of": 17157,
+      "pct": 7.7
+    },
+    "mfdsDetailFetched": 1289,
+    "mfdsDetailFailed": 0,
+    "mfdsWithEfficacy": 1287,
+    "mfdsWithUsage": 1282
+  },
+  "cost": {
+    "externalLlmCalls": 0,
+    "externalPaidApiCalls": 0,
+    "krw": 0,
+    "note": "보완은 공식 원천 파싱과 결정적 규칙으로만 한다. 외부 LLM 을 쓰지 않았다."
+  },
+  "time": {
+    "deterministicPipelineSec": 9,
+    "mfdsDetailFetchSec": 221,
+    "applySec": 45,
+    "totalSec": 275,
+    "externalRequests": 1499,
+    "per1000GapDocs": {
+      "sec": 16,
+      "externalRequests": 87.4,
+      "krw": 0
+    }
+  },
+  "judgement": "결손 1,000건당 약 16초 · 외부 요청 87회 · 실비 0원. 병목은 처리 속도가 아니라 **원천 부재**다. 남은 NO_SOURCE 8,128건은 같은 방법을 반복해도 줄지 않는다 — 브랜드 공식 자료 수급 경로가 있어야 움직인다."
+}

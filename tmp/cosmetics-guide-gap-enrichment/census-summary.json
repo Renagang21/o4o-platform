@@ -1,0 +1,51 @@
+{
+  "dbRows": 32674,
+  "matchedGuide": 32674,
+  "matchedCandidate": 32674,
+  "noGuide": [],
+  "noCandidate": [],
+  "missing": {
+    "mainFeatures": 11681,
+    "usage": 109,
+    "productType": 42
+  },
+  "gapDocs": 17157,
+  "issueCounts": {
+    "TYPE_NAME_MISMATCH": 8233,
+    "NO_OBSERVED_FEATURE": 11681,
+    "NAME_TOO_SHORT": 174,
+    "NAME_EQUALS_TYPE": 57,
+    "PRODUCT_TYPE_UNDETERMINED": 26,
+    "PRODUCT_TYPE_AXIS_NOT_FORM": 67,
+    "TYPE_NAME_CONTRADICTION": 16
+  },
+  "bySourceMix": {
+    "MUSINSA_BEAUTY": 27879,
+    "HWAHAE_RANKING+MUSINSA_BEAUTY": 1061,
+    "MUSINSA_BEAUTY+OLIVEYOUNG_GLOBAL_BEST": 14,
+    "HWAHAE_RANKING": 3636,
+    "OLIVEYOUNG_GLOBAL_BEST": 69,
+    "HWAHAE_RANKING+MUSINSA_BEAUTY+OLIVEYOUNG_GLOBAL_BEST": 11,
+    "HWAHAE_RANKING+OLIVEYOUNG_GLOBAL_BEST": 4
+  },
+  "featureEvidenceCounts": {
+    "RETAIL_LISTING": 20315,
+    "MFDS_REPORT_OFFICIAL": 4259
+  },
+  "issueTotal": 20254,
+  "byMissingCombo": {
+    "ISSUE_ONLY": 5425,
+    "mainFeatures": 11623,
+    "usage+productType": 23,
+    "usage": 28,
+    "mainFeatures+usage+productType": 19,
+    "mainFeatures+usage": 39
+  },
+  "gapDetailSourceAvailability": {
+    "withMusinsa": 14473,
+    "withHwahae": 3022,
+    "withOliveyoung": 38,
+    "withNoDetailSource": 0
+  },
+  "elapsedMs": 1301
+}

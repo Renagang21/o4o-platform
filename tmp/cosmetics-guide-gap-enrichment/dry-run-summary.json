@@ -1,0 +1,37 @@
+{
+  "wo": "WO-O4O-COSMETICS-GUIDE-GAP-ENRICHMENT-FULL-V1",
+  "gapPopulation": 17157,
+  "counts": {
+    "AUTO_ENRICH": 3297,
+    "CHECK": 4471,
+    "NO_SOURCE": 8128,
+    "NO_CHANGE": 1261
+  },
+  "autoEnrichFieldCounts": {
+    "mainFeatures": 3145,
+    "usage": 13,
+    "productType": 155
+  },
+  "featureEvidenceCounts": {
+    "RETAIL_LISTING": 1879,
+    "MFDS_REPORT_OFFICIAL": 1529
+  },
+  "featureSourceCounts": {
+    "NAME_OUTSIDE_BRACKET": 320,
+    "NAME_PURE_CAPACITY_BRACKET": 610,
+    "NAME_COMPOSITION": 949,
+    "MFDS_EFFICACY": 1315
+  },
+  "mfdsMatch": {
+    "MATCH": 1317,
+    "CHECK": 0,
+    "NO_SOURCE": 15840
+  },
+  "typeTriage": {
+    "DIFFERENT_AXIS": 5325,
+    "SYNONYM_FP": 612,
+    "PARTIAL_TOKEN_FP": 1398,
+    "SET_OR_KIT": 743,
+    "FAMILY_CORRECTION": 155
+  }
+}

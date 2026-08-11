@@ -1,0 +1,24 @@
+{
+  "beforeRows": 32674,
+  "afterRows": 32674,
+  "plannedApplied": 3297,
+  "plannedMismatch": [],
+  "untouchedOk": 29377,
+  "unplannedChanged": [],
+  "enrichTagged": 3297,
+  "typeChangeApplied": 155,
+  "typeChangeMismatch": [],
+  "missingRow": [],
+  "gapBefore": {
+    "mainFeatures": 11681,
+    "usage": 109,
+    "productType": 42
+  },
+  "gapAfter": {
+    "mainFeatures": 9747,
+    "usage": 96,
+    "productType": 42
+  },
+  "plannedTotal": 3297,
+  "pass": true
+}
