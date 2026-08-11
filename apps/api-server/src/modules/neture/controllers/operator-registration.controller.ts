@@ -85,6 +85,18 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
         }).catch(() => {});
         res.json({ success: true, data: result });
       } catch (error: any) {
+        // WO-O4O-ROLE-ASSIGNMENT-CONTRACT-CONSISTENCY-AUDIT-AND-HARDENING-V1 (1):
+        //   가입 승인 경로에서 admin/operator 승격이 시도된 경우. 승인 트랜잭션은
+        //   롤백되며(회원 상태 변경 없음), 운영자·관리자 부여는 중앙 `/operators` 전용이다.
+        if (error?.message === 'ROLE_PROMOTION_NOT_ALLOWED') {
+          res.status(403).json({
+            success: false,
+            error: 'ROLE_PROMOTION_NOT_ALLOWED',
+            message:
+              '운영자·관리자 역할은 가입 승인으로 부여할 수 없습니다. 중앙 관리자(admin.neture.co.kr)의 운영자 관리를 사용하세요.',
+          });
+          return;
+        }
         if (error?.message === 'REGISTRATION_NOT_FOUND') {
           res.status(404).json({
             success: false,

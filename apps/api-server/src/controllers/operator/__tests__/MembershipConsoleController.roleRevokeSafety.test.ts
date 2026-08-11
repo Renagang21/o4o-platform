@@ -386,3 +386,72 @@ describe('기존 계약 유지', () => {
     expect(mockRemoveRole).toHaveBeenCalledWith(TARGET_ID, 'platform:super_admin');
   });
 });
+
+/**
+ * WO-O4O-ROLE-ASSIGNMENT-CONTRACT-CONSISTENCY-AUDIT-AND-HARDENING-V1 (2)
+ *
+ * tier 제한(운영자·관리자 부여·회수는 플랫폼 관리자 전용)은 `roles` 카탈로그 플래그에만
+ * 의존하지 않는다. 카탈로그 조회 결과의 플래그가 잘못되어 있어도 이름 규칙이 함께 막는다.
+ * write 대상 문자열은 바꾸지 않는다(원문 그대로).
+ */
+describe('tier 제한 — 카탈로그 플래그 + 이름 규칙 이중 판정', () => {
+  /** 플래그가 잘못 들어간(모두 false) 카탈로그 응답 */
+  function primeRoleWithBadFlags(name: string) {
+    const [serviceKey, roleKey] = name.includes(':') ? name.split(':') : ['neture', name];
+    mockGetRoleByName.mockImplementation((requested: string) =>
+      Promise.resolve(
+        requested === name
+          ? { name, serviceKey, roleKey: `${roleKey}_x`, isAdminRole: false, isAssignable: true }
+          : null,
+      ),
+    );
+  }
+
+  it.each(['neture:admin', 'neture:operator'])(
+    '카탈로그 플래그가 잘못돼도 서비스 운영자는 %s 를 회수할 수 없다',
+    async (role) => {
+      primeRoleWithBadFlags(role);
+      const res = makeRes();
+
+      await controller.removeMemberRole(makeReq(TARGET_ID, role, NETURE_OPERATOR_SCOPE), res);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ code: 'ROLE_ASSIGNMENT_PLATFORM_ADMIN_ONLY' }),
+      );
+      expect(mockRemoveRole).not.toHaveBeenCalled();
+      expect(txQueries).toHaveLength(0);
+    },
+  );
+
+  it('접두 없는 admin 입력도 서비스 운영자에게는 차단된다', async () => {
+    // 카탈로그에는 접두 없는 'admin' 이 없어 prefix fallback 으로 neture:admin 이 해석된다.
+    primeRoleWithBadFlags('neture:admin');
+    const res = makeRes();
+
+    await controller.removeMemberRole(makeReq(TARGET_ID, 'admin', NETURE_OPERATOR_SCOPE), res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(mockRemoveRole).not.toHaveBeenCalled();
+  });
+
+  it('tier 가 아닌 역할은 기존대로 회수할 수 있고, write 대상은 원문 문자열이다', async () => {
+    primeRole('neture:supplier');
+    const res = makeRes();
+
+    await controller.removeMemberRole(makeReq(TARGET_ID, 'neture:supplier', NETURE_OPERATOR_SCOPE), res);
+
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    expect(mockRemoveRole).toHaveBeenCalledWith(TARGET_ID, 'neture:supplier');
+  });
+
+  it('플랫폼 관리자는 기존대로 tier 역할을 회수할 수 있다(강화가 상위 권한을 막지 않는다)', async () => {
+    primeRole('neture:operator');
+    const res = makeRes();
+
+    await controller.removeMemberRole(makeReq(TARGET_ID, 'neture:operator', PLATFORM_SCOPE), res);
+
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    expect(mockRemoveRole).toHaveBeenCalledWith(TARGET_ID, 'neture:operator');
+  });
+});

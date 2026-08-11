@@ -30,6 +30,7 @@ import { isPasswordPolicyCompliant, PASSWORD_POLICY_MESSAGE } from '../../utils/
 //   마지막 서비스 admin 해제와 자기 역할 해제가 여기로 우회된다.
 import {
   getServiceAdminRoleServiceKey,
+  isAdminTierRoleName,
   LAST_ADMIN_PROTECTED_CODE,
   lastAdminProtectedMessage,
   revokeServiceAdminRoleWithLock,
@@ -1389,7 +1390,17 @@ export class MembershipConsoleController {
         //    운영자·관리자 권한 부여(role_assignments write)는 platform admin (admin.neture.co.kr) 전용이다.
         //    서비스 operator/admin 은 operator/admin tier 역할을 부여할 수 없다(F9 RBAC SSOT / F11 거버넌스 경계).
         //    부여·회수는 admin-dashboard 의 POST/PUT /admin/users 경로에서만 수행한다.
-        if (roleEntity.isAdminRole || roleEntity.roleKey === 'operator') {
+        //    WO-O4O-ROLE-ASSIGNMENT-CONTRACT-CONSISTENCY-AUDIT-AND-HARDENING-V1 (2):
+        //      판정은 해석된 카탈로그 항목(roleEntity)으로 하는데 실제 write 는 원문 문자열(role)을
+        //      쓴다. 두 문자열이 갈릴 수 있으므로 tier 판정은 **둘 다** 본다(이름 규칙 보강).
+        //      write 대상 문자열은 바꾸지 않는다 — 저장된 role 정본이 prefixed/unprefixed 혼재라
+        //      임의 정규화는 다른 서비스 계약을 바꾼다.
+        if (
+          roleEntity.isAdminRole ||
+          roleEntity.roleKey === 'operator' ||
+          isAdminTierRoleName(role) ||
+          isAdminTierRoleName(roleEntity.name)
+        ) {
           res.status(403).json({
             success: false,
             error: '운영자·관리자 권한 부여는 플랫폼 관리자(admin)에서만 가능합니다.',
@@ -1493,7 +1504,14 @@ export class MembershipConsoleController {
         //    운영자·관리자 권한 회수(role_assignments write)는 platform admin (admin.neture.co.kr) 전용이다.
         //    서비스 operator/admin 은 operator/admin tier 역할을 회수할 수 없다(F9 RBAC SSOT / F11 거버넌스 경계).
         //    부여·회수는 admin-dashboard 의 DELETE /admin/users/:id/role-assignments/:role 경로에서만 수행한다.
-        if (roleEntity.isAdminRole || roleEntity.roleKey === 'operator') {
+        //    WO-O4O-ROLE-ASSIGNMENT-CONTRACT-CONSISTENCY-AUDIT-AND-HARDENING-V1 (2):
+        //      부여 경로와 같은 이유로 원문 문자열과 해석된 이름을 모두 tier 판정한다.
+        if (
+          roleEntity.isAdminRole ||
+          roleEntity.roleKey === 'operator' ||
+          isAdminTierRoleName(role) ||
+          isAdminTierRoleName(roleEntity.name)
+        ) {
           res.status(403).json({
             success: false,
             error: '운영자·관리자 권한 회수는 플랫폼 관리자(admin)에서만 가능합니다.',

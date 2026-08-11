@@ -48,6 +48,31 @@ export function isServiceAdminRole(role: unknown): boolean {
   return getServiceAdminRoleServiceKey(role) !== null;
 }
 
+/**
+ * operator/admin tier 역할 판정 (WO-O4O-ROLE-ASSIGNMENT-CONTRACT-CONSISTENCY-AUDIT-AND-HARDENING-V1)
+ *
+ * `roles` 카탈로그의 `is_admin_role` / `role_key` 판정을 **대체하지 않고 보강**한다.
+ * 카탈로그 조회가 실패하거나 플래그가 잘못 들어간 경우에도 tier 보호가 조용히 열리지
+ * 않도록, 이름 문자열만으로 같은 판정을 한 번 더 수행하는 용도다.
+ *
+ *   - 포함: admin · operator · super_admin, 그리고 그 prefixed 형태
+ *           (neture:admin · kpa:operator · platform:super_admin ...)
+ *   - 제외: kpa:district_admin · kpa:branch_admin — role_key 가 `admin` 이 아니다.
+ *           (기존 카탈로그 판정 `isAdminRole` 이 그대로 담당한다.)
+ *
+ * 부여·회수 대상 문자열을 바꾸지 않는다. 저장된 role 정본(prefixed/unprefixed 혼재)에는
+ * 손대지 않고 **판정만** 강화한다.
+ */
+const ADMIN_TIER_ROLE_KEYS = new Set(['admin', 'operator', 'super_admin']);
+
+export function isAdminTierRoleName(role: unknown): boolean {
+  if (typeof role !== 'string') return false;
+  const name = role.trim().toLowerCase();
+  if (!name) return false;
+  const key = name.includes(':') ? name.slice(name.indexOf(':') + 1) : name;
+  return ADMIN_TIER_ROLE_KEYS.has(key);
+}
+
 export const SELF_ROLE_REVOKE_FORBIDDEN_CODE = 'SELF_ROLE_REVOKE_FORBIDDEN';
 export const SELF_ROLE_REVOKE_FORBIDDEN_MESSAGE =
   '자기 자신의 역할은 해제할 수 없습니다. 다른 관리자에게 요청하세요.';

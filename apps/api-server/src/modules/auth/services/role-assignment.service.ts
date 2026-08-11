@@ -137,9 +137,22 @@ export class RoleAssignmentService {
     const repository = manager ? manager.getRepository(RoleAssignment) : this.repository;
 
     // Check if assignment already exists
+    //
+    // WO-O4O-ROLE-ASSIGNMENT-CONTRACT-CONSISTENCY-AUDIT-AND-HARDENING-V1 (3):
+    //   `unique_active_role_per_user` 는 UNIQUE(user_id, role, **is_active**) 이므로
+    //   같은 (user, role) 에 활성 1행 + 비활성 1행이 공존할 수 있다(비활성 '유령' 행).
+    //   조건 없는 findOne 은 그 중 어느 행을 집을지 비결정적이고, 비활성 행을 집어
+    //   is_active=true 로 되살리면 이미 존재하는 활성 행과 충돌해 23505 로 실패한다.
+    //   활성 행을 먼저 찾고, 없을 때만 비활성 행을 **복원**한다.
+    //   (삭제·migration 없이 기존 행 복원 방식으로 해결 — 데이터는 그대로 둔다.)
     let assignment = await repository.findOne({
-      where: { userId, role },
+      where: { userId, role, isActive: true },
     });
+    if (!assignment) {
+      assignment = await repository.findOne({
+        where: { userId, role, isActive: false },
+      });
+    }
 
     if (assignment) {
       // Reactivate existing assignment

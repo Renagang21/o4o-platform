@@ -14,6 +14,7 @@
  */
 import type { DataSource } from 'typeorm';
 import logger from '../../../utils/logger.js';
+import { isAdminTierRoleName } from '../../../utils/role-revoke-safety.js';
 
 export class OperatorRegistrationService {
   constructor(private dataSource: DataSource) {}
@@ -134,11 +135,20 @@ export class OperatorRegistrationService {
 
       // 4. role_assignment 생성
       // WO-NETURE-ROLE-NORMALIZATION-V1: admin/operator만 prefixed, 나머지는 unprefixed
+      //
+      // WO-O4O-ROLE-ASSIGNMENT-CONTRACT-CONSISTENCY-AUDIT-AND-HARDENING-V1 (1):
+      //   가입 승인은 **신청 가능한 역할(supplier · partner 등)만** 확정한다.
+      //   운영자·관리자 부여는 중앙 `/operators`(플랫폼 관리자) 전용이므로
+      //   (WO-O4O-NETURE-LEGACY-ADMIN-OPERATOR-API-RETIREMENT-V1 로 Neture 전용 경로는 은퇴),
+      //   이 경로에서 admin/operator 로 승격되는 분기 자체를 제거하고 명시적으로 거부한다.
+      //   현재 Neture 신청 허용 role 은 supplier/partner 뿐이라 정상 흐름에는 영향이 없다.
+      //   (다만 service_memberships 에 과거 API 가 남긴 role='operator' 행이 실재하므로
+      //    그 행이 pending/rejected 로 되돌아가는 경우를 대비한 방어다.)
       const rawRole = smRow.role || 'member';
-      const ADMIN_ROLES = ['admin', 'operator'];
-      const finalRole = ADMIN_ROLES.includes(rawRole)
-        ? (rawRole.includes(':') ? rawRole : `neture:${rawRole}`)
-        : rawRole;
+      if (isAdminTierRoleName(rawRole)) {
+        throw new Error('ROLE_PROMOTION_NOT_ALLOWED');
+      }
+      const finalRole = rawRole;
       await queryRunner.query(
         `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
          VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
