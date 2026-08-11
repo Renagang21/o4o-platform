@@ -1,0 +1,166 @@
+{
+  "wo": "WO-O4O-COSMETICS-PRODUCT-NAME-NORMALIZATION-CLEANUP-V1",
+  "step": "03-consumer-audit",
+  "readOnly": true,
+  "targets": 339,
+  "foreignKeys": [
+    {
+      "table_name": "catalog_products",
+      "column_name": "product_master_id"
+    },
+    {
+      "table_name": "organization_product_listings",
+      "column_name": "master_id"
+    },
+    {
+      "table_name": "product_ai_contents",
+      "column_name": "product_id"
+    },
+    {
+      "table_name": "product_ai_tags",
+      "column_name": "product_id"
+    },
+    {
+      "table_name": "product_aliases",
+      "column_name": "product_master_id"
+    },
+    {
+      "table_name": "product_candidates",
+      "column_name": "matched_product_master_id"
+    },
+    {
+      "table_name": "product_drug_extensions",
+      "column_name": "product_master_id"
+    },
+    {
+      "table_name": "product_identifiers",
+      "column_name": "product_master_id"
+    },
+    {
+      "table_name": "product_images",
+      "column_name": "master_id"
+    },
+    {
+      "table_name": "product_master_notes",
+      "column_name": "product_master_id"
+    },
+    {
+      "table_name": "service_products",
+      "column_name": "master_id"
+    },
+    {
+      "table_name": "shared_product_description_audit_logs",
+      "column_name": "master_id"
+    },
+    {
+      "table_name": "shared_product_descriptions",
+      "column_name": "master_id"
+    },
+    {
+      "table_name": "store_product_profiles",
+      "column_name": "master_id"
+    },
+    {
+      "table_name": "store_products",
+      "column_name": "product_master_id"
+    },
+    {
+      "table_name": "supplier_product_offers",
+      "column_name": "master_id"
+    },
+    {
+      "table_name": "tablet_interest_requests",
+      "column_name": "master_id"
+    }
+  ],
+  "referencingRows": [
+    {
+      "table_name": "catalog_products",
+      "column_name": "product_master_id",
+      "count": 0
+    },
+    {
+      "table_name": "organization_product_listings",
+      "column_name": "master_id",
+      "count": 0
+    },
+    {
+      "table_name": "product_ai_contents",
+      "column_name": "product_id",
+      "count": 0
+    },
+    {
+      "table_name": "product_ai_tags",
+      "column_name": "product_id",
+      "count": 0
+    },
+    {
+      "table_name": "product_aliases",
+      "column_name": "product_master_id",
+      "count": 0
+    },
+    {
+      "table_name": "product_candidates",
+      "column_name": "matched_product_master_id",
+      "count": 0
+    },
+    {
+      "table_name": "product_drug_extensions",
+      "column_name": "product_master_id",
+      "count": 0
+    },
+    {
+      "table_name": "product_identifiers",
+      "column_name": "product_master_id",
+      "count": 0
+    },
+    {
+      "table_name": "product_images",
+      "column_name": "master_id",
+      "count": 0
+    },
+    {
+      "table_name": "product_master_notes",
+      "column_name": "product_master_id",
+      "count": 0
+    },
+    {
+      "table_name": "service_products",
+      "column_name": "master_id",
+      "count": 0
+    },
+    {
+      "table_name": "shared_product_description_audit_logs",
+      "column_name": "master_id",
+      "count": 0
+    },
+    {
+      "table_name": "shared_product_descriptions",
+      "column_name": "master_id",
+      "count": 339
+    },
+    {
+      "table_name": "store_product_profiles",
+      "column_name": "master_id",
+      "count": 0
+    },
+    {
+      "table_name": "store_products",
+      "column_name": "product_master_id",
+      "count": 0
+    },
+    {
+      "table_name": "supplier_product_offers",
+      "column_name": "master_id",
+      "count": 0
+    },
+    {
+      "table_name": "tablet_interest_requests",
+      "column_name": "master_id",
+      "count": 0
+    }
+  ],
+  "nameSnapshotColumnsScanned": 86,
+  "nameSnapshotHits": [],
+  "descriptionRowsForTargets": 339
+}

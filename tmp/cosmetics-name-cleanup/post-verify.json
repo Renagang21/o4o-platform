@@ -1,0 +1,100 @@
+{
+  "wo": "WO-O4O-COSMETICS-PRODUCT-NAME-NORMALIZATION-CLEANUP-V1",
+  "step": "05-post-verify",
+  "readOnly": true,
+  "baseline": {
+    "cosmeticTotal": 32674,
+    "regulatoryTypeCounts": {
+      "일반": 15,
+      "건강기능식품": 40948,
+      "COSMETIC": 32674,
+      "DRUG": 177413,
+      "GENERAL": 11,
+      "MEDICAL_DEVICE": 3826,
+      "QUASI_DRUG": 17148
+    },
+    "nonWordLeading": 2521,
+    "bracketImbalanced": 58
+  },
+  "expected": {
+    "modified": 339
+  },
+  "pass": true,
+  "failures": [],
+  "cosmeticTotal": 32674,
+  "regulatoryTypeCounts": {
+    "일반": 15,
+    "건강기능식품": 40948,
+    "COSMETIC": 32674,
+    "DRUG": 177413,
+    "GENERAL": 11,
+    "MEDICAL_DEVICE": 3826,
+    "QUASI_DRUG": 17148
+  },
+  "regulatoryTypeDrift": [],
+  "taggedCount": 339,
+  "emptyNames": 0,
+  "masterDuplicateGroups": 0,
+  "canonicalDuplicateGroups": 0,
+  "orphanDescriptions": 0,
+  "cosmeticWithoutCanonical": 0,
+  "taggedNonCosmetic": 0,
+  "summaryStillHasOldName": 0,
+  "summaryMissingNewName": 0,
+  "emptyContent": 0,
+  "residual": {
+    "total": 32674,
+    "nonWordLeading": 2266,
+    "bracketImbalanced": 50,
+    "stillAutoFixable": 0,
+    "checkQueue": 165,
+    "checkQueueDemotedByCollision": 106
+  },
+  "searchSmoke": [
+    {
+      "before": "[선물포장] 노스탤직 퍼퓸 핸드크림 100024 네롤리",
+      "after": "노스탤직 퍼퓸 핸드크림 100024 네롤리",
+      "exactBrandName": 1,
+      "nameLike": 1,
+      "oldNameStillPresent": 0,
+      "contentLen": 183,
+      "summary": "노스탤직 노스탤직 퍼퓸 핸드크림 100024 네롤리 — 핸드크림 제품입니다."
+    },
+    {
+      "before": "[무신사 단독] 라이스 세럼",
+      "after": "라이스 세럼",
+      "exactBrandName": 1,
+      "nameLike": 3,
+      "oldNameStillPresent": 0,
+      "contentLen": 230,
+      "summary": "아임프롬 라이스 세럼 — 세럼 제품입니다."
+    },
+    {
+      "before": "[20개부터 구매가능] 세븐 데이즈 마스크 녹차 S",
+      "after": "세븐 데이즈 마스크 녹차 S",
+      "exactBrandName": 1,
+      "nameLike": 1,
+      "oldNameStillPresent": 0,
+      "contentLen": 242,
+      "summary": "아리얼 세븐 데이즈 마스크 녹차 S — 마스크 제품입니다."
+    },
+    {
+      "before": "글루타치온 히알 아쿠아 포밍 젤 클렌저 (소비기한 2027-03-06)",
+      "after": "글루타치온 히알 아쿠아 포밍 젤 클렌저",
+      "exactBrandName": 1,
+      "nameLike": 1,
+      "oldNameStillPresent": 0,
+      "contentLen": 232,
+      "summary": "메디필 글루타치온 히알 아쿠아 포밍 젤 클렌저 — 선케어 제품입니다."
+    },
+    {
+      "before": "[옵션선택] 46cm 두취케어 약산성 데오드란트 샴푸",
+      "after": "46cm 두취케어 약산성 데오드란트 샴푸",
+      "exactBrandName": 1,
+      "nameLike": 3,
+      "oldNameStillPresent": 0,
+      "contentLen": 245,
+      "summary": "엘라스틴 46cm 두취케어 약산성 데오드란트 샴푸 — 샴푸 제품입니다."
+    }
+  ]
+}

@@ -1,0 +1,4995 @@
+{
+  "wo": "WO-O4O-COSMETICS-PRODUCT-NAME-NORMALIZATION-CLEANUP-V1",
+  "step": "02-dry-run",
+  "readOnly": true,
+  "total": 32674,
+  "autoFixable": 339,
+  "checkQueue": 165,
+  "noChange": 32170,
+  "demotedByCollision": 106,
+  "byRule": {
+    "PROMO_EXACT": 147,
+    "PROMO_QTY_CONDITION": 54,
+    "EXPIRY_TRAILING_PAREN": 43,
+    "PROMO_EXPIRY": 4,
+    "PROMO_ENDORSEMENT": 68,
+    "STRAY_LEADING_PUNCT": 2,
+    "PROMO_TRAILING_EVENT": 1,
+    "PROMO_DISCOUNT": 2,
+    "GIFT_TRAILING_DELIM": 3,
+    "PROMO_ORPHAN_LEADING": 1,
+    "ZERO_WIDTH": 7,
+    "STRAY_TRAILING_CLOSE": 5,
+    "WHITESPACE": 6,
+    "GIFT_LEADING": 2,
+    "STRAY_TRAILING_OPEN": 1,
+    "GIFT_TRAILING_PAREN": 1
+  },
+  "byCheckReason": {
+    "AMBIGUOUS_PROMO_TOKEN": 8,
+    "BRACKET_IMBALANCE_UNRESOLVED": 45,
+    "GIFT_PHRASE_NO_SAFE_BOUNDARY": 6,
+    "LEADING_OPEN_BRACKET_DIGIT": 1,
+    "NAME_COLLISION_EXISTING": 102,
+    "NAME_COLLISION_CANDIDATE": 12
+  },
+  "afterNameEmpty": 0,
+  "sample": [
+    {
+      "before": "[선물포장] 노스탤직 퍼퓸 핸드크림 100024 네롤리",
+      "after": "노스탤직 퍼퓸 핸드크림 100024 네롤리",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[무신사 단독] 라이스 세럼",
+      "after": "라이스 세럼",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[20개부터 구매가능] 세븐 데이즈 마스크 녹차 S",
+      "after": "세븐 데이즈 마스크 녹차 S",
+      "rule": "PROMO_QTY_CONDITION"
+    },
+    {
+      "before": "글루타치온 히알 아쿠아 포밍 젤 클렌저 (소비기한 2027-03-06)",
+      "after": "글루타치온 히알 아쿠아 포밍 젤 클렌저",
+      "rule": "EXPIRY_TRAILING_PAREN"
+    },
+    {
+      "before": "[옵션선택] 46cm 두취케어 약산성 데오드란트 샴푸",
+      "after": "46cm 두취케어 약산성 데오드란트 샴푸",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[2개부터 구매가능] 퍼펙트 클리어 올인원 워시",
+      "after": "퍼펙트 클리어 올인원 워시",
+      "rule": "PROMO_QTY_CONDITION"
+    },
+    {
+      "before": "[27.09.04 까지] 석류 모이스처라이징 토너",
+      "after": "석류 모이스처라이징 토너",
+      "rule": "PROMO_EXPIRY"
+    },
+    {
+      "before": "[오직무신사뷰티] [쿨링수분 SET] 마데카크림 하이드라 카밍",
+      "after": "[쿨링수분 SET] 마데카크림 하이드라 카밍",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "허브 노세범 파우더 (사용기한 2027/03/14까지)",
+      "after": "허브 노세범 파우더",
+      "rule": "EXPIRY_TRAILING_PAREN"
+    },
+    {
+      "before": "[보이넥스트도어 PICK] 니치퍼퓸 핸드크림 로스트우드",
+      "after": "니치퍼퓸 핸드크림 로스트우드",
+      "rule": "PROMO_ENDORSEMENT"
+    },
+    {
+      "before": "[태산 PICK] 오드퍼퓸 월넛크릭그린 EDP",
+      "after": "오드퍼퓸 월넛크릭그린 EDP",
+      "rule": "PROMO_ENDORSEMENT"
+    },
+    {
+      "before": "[옵션선택] 살롱드컬러 염색약",
+      "after": "살롱드컬러 염색약",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "피토 시카놀 B5 아하바하 비타민 카밍 필링 젤 (소비기한 2026-10-24)",
+      "after": "피토 시카놀 B5 아하바하 비타민 카밍 필링 젤",
+      "rule": "EXPIRY_TRAILING_PAREN"
+    },
+    {
+      "before": "[옵션선택] 마스크팩 x (워터/뉴트리션/수딩/브라이트)",
+      "after": "마스크팩 x (워터/뉴트리션/수딩/브라이트)",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[선물포장] 시트러스 헤이즈 센티드 핸드크림",
+      "after": "시트러스 헤이즈 센티드 핸드크림",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[2개선택] 퍼퓸 (향 선택)",
+      "after": "퍼퓸 (향 선택)",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[AD] 프라임 프라이머 루스 세팅 파우더",
+      "after": "프라임 프라이머 루스 세팅 파우더",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[오직무신사뷰티] 360도샷 PDRN 액티브 세럼",
+      "after": "360도샷 PDRN 액티브 세럼",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "(2개선택) 아이 메탈 글리터",
+      "after": "아이 메탈 글리터",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[오직무신사뷰티] [턱드름완화] 마데카 분말 티트리 에이씨 + 겔 세럼 히알론 듀",
+      "after": "[턱드름완화] 마데카 분말 티트리 에이씨 + 겔 세럼 히알론 듀",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[무신사 단독] 하이베리어 히알루로닉 에센스",
+      "after": "하이베리어 히알루로닉 에센스",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[보이넥스트도어 PICK] 니치퍼퓸 핸드크림 론도24",
+      "after": "니치퍼퓸 핸드크림 론도24",
+      "rule": "PROMO_ENDORSEMENT"
+    },
+    {
+      "before": "[오직무신사뷰티] 마데카 멜라캡처 앰플 패드 1통",
+      "after": "마데카 멜라캡처 앰플 패드 1통",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[사용기한] 블레미쉬 케어 업 세럼(잡티로즈세럼) (사용기한 27년 3월 20일까지)",
+      "after": "블레미쉬 케어 업 세럼(잡티로즈세럼)",
+      "rule": "PROMO_EXACT+EXPIRY_TRAILING_PAREN"
+    },
+    {
+      "before": "[옵션선택] 샴푸하듯 간편염색",
+      "after": "샴푸하듯 간편염색",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[단독구성]세라마이드 약산성 폼클렌저 + 판테놀 약알칼리성 폼클렌저",
+      "after": "세라마이드 약산성 폼클렌저 + 판테놀 약알칼리성 폼클렌저",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[오픈프로모션] 포어엑스좀 비펩톡스 젤리토너",
+      "after": "포어엑스좀 비펩톡스 젤리토너",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[선물포장] 우디 페탈 센티드 핸드크림",
+      "after": "우디 페탈 센티드 핸드크림",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[옵션선택] 수퍼보타닉 바디워시",
+      "after": "수퍼보타닉 바디워시",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "바닐라부티크 허그 퍼퓸 바디로션 (사용기한 2027/03/14 까지)",
+      "after": "바닐라부티크 허그 퍼퓸 바디로션",
+      "rule": "EXPIRY_TRAILING_PAREN"
+    },
+    {
+      "before": "[2개부터 구매가능] 라인프렌즈 미니하트 틴트",
+      "after": "라인프렌즈 미니하트 틴트",
+      "rule": "PROMO_QTY_CONDITION"
+    },
+    {
+      "before": "_올어바웃글로우톤업크림",
+      "after": "올어바웃글로우톤업크림",
+      "rule": "STRAY_LEADING_PUNCT"
+    },
+    {
+      "before": "[단독구성] 미나리 모공해방 SET 젤 세럼",
+      "after": "미나리 모공해방 SET 젤 세럼",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[옵션선택]리얼모이스처 바디워시 (웜코튼/피오니/아몬드)",
+      "after": "리얼모이스처 바디워시 (웜코튼/피오니/아몬드)",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[2개선택] 호호바오일 퍼퓸 바디워시 & 로션",
+      "after": "호호바오일 퍼퓸 바디워시 & 로션",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "[라뮤끄 픽] 이너라이트 쿠션 퍼프",
+      "after": "이너라이트 쿠션 퍼프",
+      "rule": "PROMO_ENDORSEMENT"
+    },
+    {
+      "before": "[5개부터 구매가능] 스무스 앤 퓨어 풋 모이스처라이징 마스크 – 알로에 수딩",
+      "after": "스무스 앤 퓨어 풋 모이스처라이징 마스크 – 알로에 수딩",
+      "rule": "PROMO_QTY_CONDITION"
+    },
+    {
+      "before": "[오직무신사뷰티] [진정쿨링케어/2Pack] 마데카 병풀 수딩 미스트",
+      "after": "[진정쿨링케어/2Pack] 마데카 병풀 수딩 미스트",
+      "rule": "PROMO_EXACT"
+    },
+    {
+      "before": "바세린 로션 기획전",
+      "after": "바세린 로션",
+      "rule": "PROMO_TRAILING_EVENT"
+    },
+    {
+      "before": "[8개부터 구매가능] 시카 플라스트 B5하이드로겔 마스크",
+      "after": "시카 플라스트 B5하이드로겔 마스크",
+      "rule": "PROMO_QTY_CONDITION"
+    }
+  ],
+  "items": [
+    {
+      "masterId": "00c4665b-2c89-488b-b08e-dd4675566708",
+      "descId": "646298dd-39db-48dc-961b-fa276f9b2ca8",
+      "beforeName": "[선물포장] 노스탤직 퍼퓸 핸드크림 100024 네롤리",
+      "afterName": "노스탤직 퍼퓸 핸드크림 100024 네롤리",
+      "brand": "노스탤직",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "노스탤직|[선물포장]노스탤직퍼퓸핸드크림100024네롤리",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "00f50d5d-e8c8-4279-81ff-777f3357545c",
+      "descId": "bf3515b4-3244-417e-a61c-61289909f5d8",
+      "beforeName": "[무신사 단독] 라이스 세럼",
+      "afterName": "라이스 세럼",
+      "brand": "아임프롬",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아임프롬|[무신사단독]라이스세럼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "010652b7-13e8-48a7-898b-821770394290",
+      "descId": "e2a8d7a5-9a65-4cba-8d7e-0c8cf3d490fc",
+      "beforeName": "[20개부터 구매가능] 세븐 데이즈 마스크 녹차 S",
+      "afterName": "세븐 데이즈 마스크 녹차 S",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[20개부터구매가능]세븐데이즈마스크녹차s",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0184c9d2-ae22-4438-b0bc-7616ff7abd2c",
+      "descId": "308344f6-5f78-44a2-b527-9e48917559c0",
+      "beforeName": "글루타치온 히알 아쿠아 포밍 젤 클렌저 (소비기한 2027-03-06)",
+      "afterName": "글루타치온 히알 아쿠아 포밍 젤 클렌저",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|글루타치온히알아쿠아포밍젤클렌저(소비기한2027-03-06)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "019a07af-f9ac-4b73-be9d-8336f751baf5",
+      "descId": "380b94e3-d4d7-4ff0-87d0-afa5c424ffe3",
+      "beforeName": "[옵션선택] 46cm 두취케어 약산성 데오드란트 샴푸",
+      "afterName": "46cm 두취케어 약산성 데오드란트 샴푸",
+      "brand": "엘라스틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "엘라스틴|[옵션선택]46cm두취케어약산성데오드란트샴푸",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "01f77b60-1c65-46c5-aac4-a16589be2876",
+      "descId": "4cecfd9f-2803-495c-b5f0-f560a12819de",
+      "beforeName": "[2개부터 구매가능] 퍼펙트 클리어 올인원 워시",
+      "afterName": "퍼펙트 클리어 올인원 워시",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[2개부터구매가능]퍼펙트클리어올인원워시",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "027c67d0-054d-48b6-86dd-0fe9395464d7",
+      "descId": "041bc049-8aef-4226-a962-e0783f1507d9",
+      "beforeName": "[27.09.04 까지] 석류 모이스처라이징 토너",
+      "afterName": "석류 모이스처라이징 토너",
+      "brand": "후르디아",
+      "rule": "PROMO_EXPIRY",
+      "rules": [
+        "PROMO_EXPIRY"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "후르디아|[27.09.04까지]석류모이스처라이징토너",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "035bbd85-4eb7-458d-9bb6-5d32f6c7b3ec",
+      "descId": "a2e3713f-cb4d-427e-b65b-f78d4b856121",
+      "beforeName": "[오직무신사뷰티] [쿨링수분 SET] 마데카크림 하이드라 카밍",
+      "afterName": "[쿨링수분 SET] 마데카크림 하이드라 카밍",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][쿨링수분set]마데카크림하이드라카밍",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "041e66a4-2abc-451f-a4ca-f0f79c485379",
+      "descId": "6d992d53-8c0b-461d-ab4a-eda4329865ea",
+      "beforeName": "허브 노세범 파우더 (사용기한 2027/03/14까지)",
+      "afterName": "허브 노세범 파우더",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|허브노세범파우더(사용기한2027/03/14까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "049af10b-2468-4e80-9abb-c399c3d9e61f",
+      "descId": "ebb11dd8-7cdf-4157-8fb9-be59396157b7",
+      "beforeName": "[보이넥스트도어 PICK] 니치퍼퓸 핸드크림 로스트우드",
+      "afterName": "니치퍼퓸 핸드크림 로스트우드",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치퍼퓸핸드크림로스트우드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "049b9515-3987-41b5-b3fb-e5181676e1c8",
+      "descId": "f4cdd99c-d73e-47cf-8c4c-f7a8c31ce6c0",
+      "beforeName": "[태산 PICK] 오드퍼퓸 월넛크릭그린 EDP",
+      "afterName": "오드퍼퓸 월넛크릭그린 EDP",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[태산pick]오드퍼퓸월넛크릭그린edp",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "07e94ac3-7ca0-438b-a0bc-ab70c271791f",
+      "descId": "912e26b4-8d20-4a74-b98f-7d4d2bf97433",
+      "beforeName": "[옵션선택] 살롱드컬러 염색약",
+      "afterName": "살롱드컬러 염색약",
+      "brand": "엘라스틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "엘라스틴|[옵션선택]살롱드컬러염색약",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0907fbb1-5c4d-4bf8-bcfd-046e29c74cab",
+      "descId": "17267625-deb5-49ab-94b6-d10f555000dd",
+      "beforeName": "피토 시카놀 B5 아하바하 비타민 카밍 필링 젤 (소비기한 2026-10-24)",
+      "afterName": "피토 시카놀 B5 아하바하 비타민 카밍 필링 젤",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|피토시카놀b5아하바하비타민카밍필링젤(소비기한2026-10-24)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0a59e9d6-6ca7-45c8-a300-da46025725f5",
+      "descId": "038412cb-6b0f-46a9-a979-d92ede80b113",
+      "beforeName": "[옵션선택] 마스크팩 x (워터/뉴트리션/수딩/브라이트)",
+      "afterName": "마스크팩 x (워터/뉴트리션/수딩/브라이트)",
+      "brand": "시루콧토",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "시루콧토|[옵션선택]마스크팩x(워터/뉴트리션/수딩/브라이트)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0a647ac3-b1f6-4142-a98f-76fbba7ffa73",
+      "descId": "f6f9d403-3117-45d2-b724-59bd028eb661",
+      "beforeName": "[선물포장] 시트러스 헤이즈 센티드 핸드크림",
+      "afterName": "시트러스 헤이즈 센티드 핸드크림",
+      "brand": "써티파이브모먼트",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "써티파이브모먼트|[선물포장]시트러스헤이즈센티드핸드크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0aa50000-a48d-4a06-b21c-6201c3b60a48",
+      "descId": "cb06882a-b4b7-42a9-a7cc-3724337a52c4",
+      "beforeName": "[2개선택] 퍼퓸 (향 선택)",
+      "afterName": "퍼퓸 (향 선택)",
+      "brand": "더블유드레스룸",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "더블유드레스룸|[2개선택]퍼퓸(향선택)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0bc6258d-ba6b-469a-99fe-526408b782f4",
+      "descId": "6e685a04-f01c-438b-a2b2-8c786eed5387",
+      "beforeName": "[AD] 프라임 프라이머 루스 세팅 파우더",
+      "afterName": "프라임 프라이머 루스 세팅 파우더",
+      "brand": "바닐라코",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "바닐라코|[ad]프라임프라이머루스세팅파우더",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0bd13d64-9ad5-475c-903a-b7997e6a9fbc",
+      "descId": "ae4a0a4a-b38f-4db4-8c31-5c87ee318c2a",
+      "beforeName": "[오직무신사뷰티] 360도샷 PDRN 액티브 세럼",
+      "afterName": "360도샷 PDRN 액티브 세럼",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티]360도샷pdrn액티브세럼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0c4be29a-0285-41c7-a1e5-23e6eeabab5d",
+      "descId": "6dee92fd-dc32-40de-a6f4-66b11dcc5777",
+      "beforeName": "(2개선택) 아이 메탈 글리터",
+      "afterName": "아이 메탈 글리터",
+      "brand": "홀리카홀리카",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "홀리카홀리카|(2개선택)아이메탈글리터",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0c74e617-a9a1-47e7-bb6e-3c393bb2a5b3",
+      "descId": "33b14826-abea-4f24-993e-4c8cc20e8113",
+      "beforeName": "[오직무신사뷰티] [턱드름완화] 마데카 분말 티트리 에이씨 + 겔 세럼 히알론 듀",
+      "afterName": "[턱드름완화] 마데카 분말 티트리 에이씨 + 겔 세럼 히알론 듀",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][턱드름완화]마데카분말티트리에이씨+겔세럼히알론듀",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0cac96f3-b6d2-4fe6-ab0d-60c28b9c8675",
+      "descId": "edca3715-3874-4ccc-9f16-28629d3a3c00",
+      "beforeName": "[무신사 단독] 하이베리어 히알루로닉 에센스",
+      "afterName": "하이베리어 히알루로닉 에센스",
+      "brand": "스킨앤랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "스킨앤랩|[무신사단독]하이베리어히알루로닉에센스",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0e2a87eb-71c2-4006-b203-454b85dfb10a",
+      "descId": "7701c756-0e87-4272-8114-5e2a3c2289df",
+      "beforeName": "[보이넥스트도어 PICK] 니치퍼퓸 핸드크림 론도24",
+      "afterName": "니치퍼퓸 핸드크림 론도24",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치퍼퓸핸드크림론도24",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0ea9ce3e-35bb-45da-a07b-272ce7851271",
+      "descId": "e3ba164a-14f7-4802-b18e-839b731b60a6",
+      "beforeName": "[오직무신사뷰티] 마데카 멜라캡처 앰플 패드 1통",
+      "afterName": "마데카 멜라캡처 앰플 패드 1통",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티]마데카멜라캡처앰플패드1통",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "0f157393-da69-4612-9734-d4e02bebe9c0",
+      "descId": "6faa9be1-d064-4f4a-b4a3-f86d109b0c71",
+      "beforeName": "[사용기한] 블레미쉬 케어 업 세럼(잡티로즈세럼) (사용기한 27년 3월 20일까지)",
+      "afterName": "블레미쉬 케어 업 세럼(잡티로즈세럼)",
+      "brand": "아이소이",
+      "rule": "PROMO_EXACT+EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "PROMO_EXACT",
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아이소이|[사용기한]블레미쉬케어업세럼(잡티로즈세럼)(사용기한27년3월20일까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "10974255-6f04-4304-840d-b95293b209e6",
+      "descId": "4058a63b-2e78-4e9b-ad17-5ee401b0d2c1",
+      "beforeName": "[옵션선택] 샴푸하듯 간편염색",
+      "afterName": "샴푸하듯 간편염색",
+      "brand": "엘라스틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "엘라스틴|[옵션선택]샴푸하듯간편염색",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "115f5185-6260-4bc4-9aa3-02e9b82edd90",
+      "descId": "668f662f-4b14-41ac-ac9b-5bc916e54de2",
+      "beforeName": "[단독구성]세라마이드 약산성 폼클렌저 + 판테놀 약알칼리성 폼클렌저",
+      "afterName": "세라마이드 약산성 폼클렌저 + 판테놀 약알칼리성 폼클렌저",
+      "brand": "레이어랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "레이어랩|[단독구성]세라마이드약산성폼클렌저+판테놀약알칼리성폼클렌저",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "1229302a-32be-4ad9-97d2-0e4df5bea9a4",
+      "descId": "dbde7e0b-e581-4b35-bcb0-8971e5e9418a",
+      "beforeName": "[오픈프로모션] 포어엑스좀 비펩톡스 젤리토너",
+      "afterName": "포어엑스좀 비펩톡스 젤리토너",
+      "brand": "닥터나인틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "닥터나인틴|[오픈프로모션]포어엑스좀비펩톡스젤리토너",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "125ba8a7-e126-4ca3-9ea8-565d3d37e84b",
+      "descId": "f343bcb2-499a-4153-9035-c4946798c94b",
+      "beforeName": "[선물포장] 우디 페탈 센티드 핸드크림",
+      "afterName": "우디 페탈 센티드 핸드크림",
+      "brand": "써티파이브모먼트",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "써티파이브모먼트|[선물포장]우디페탈센티드핸드크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "12edf70f-5acf-4636-aacb-883d63b53365",
+      "descId": "39396007-c349-475e-8656-84f16d23f1c5",
+      "beforeName": "[옵션선택] 수퍼보타닉 바디워시",
+      "afterName": "수퍼보타닉 바디워시",
+      "brand": "온더바디",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "온더바디|[옵션선택]수퍼보타닉바디워시",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "130b7761-4f62-4bab-a0d9-5d17c7601340",
+      "descId": "cce6cdcc-41c0-4f74-ab39-0e2ecd1e672f",
+      "beforeName": "바닐라부티크 허그 퍼퓸 바디로션 (사용기한 2027/03/14 까지)",
+      "afterName": "바닐라부티크 허그 퍼퓸 바디로션",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|바닐라부티크허그퍼퓸바디로션(사용기한2027/03/14까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "14630a66-2743-4444-80f9-de7eba0e0fdf",
+      "descId": "0bd9d3bc-d96b-4722-9fe4-e991613a94f5",
+      "beforeName": "[2개부터 구매가능] 라인프렌즈 미니하트 틴트",
+      "afterName": "라인프렌즈 미니하트 틴트",
+      "brand": "메리몽드",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메리몽드|[2개부터구매가능]라인프렌즈미니하트틴트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "152ebb8a-6455-4725-a48e-b6379d86483b",
+      "descId": "b146f862-4599-4eab-8b50-9d2122890768",
+      "beforeName": "_올어바웃글로우톤업크림",
+      "afterName": "올어바웃글로우톤업크림",
+      "brand": "체이싱래빗",
+      "rule": "STRAY_LEADING_PUNCT",
+      "rules": [
+        "STRAY_LEADING_PUNCT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "체이싱래빗|_올어바웃글로우톤업크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "1539c54c-981a-48a5-bf23-311395649e53",
+      "descId": "051a31e8-c3d4-4ea9-87f9-a17e2aafd95a",
+      "beforeName": "[단독구성] 미나리 모공해방 SET 젤 세럼",
+      "afterName": "미나리 모공해방 SET 젤 세럼",
+      "brand": "클리어디어",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "클리어디어|[단독구성]미나리모공해방set젤세럼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "15df36d8-1b7d-4f32-b7d4-b5646f4256a5",
+      "descId": "5398de7b-38e4-431e-953f-5ef9f6272ee9",
+      "beforeName": "[옵션선택]리얼모이스처 바디워시 (웜코튼/피오니/아몬드)",
+      "afterName": "리얼모이스처 바디워시 (웜코튼/피오니/아몬드)",
+      "brand": "온더바디",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "온더바디|[옵션선택]리얼모이스처바디워시(웜코튼/피오니/아몬드)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "15df508d-16d2-4e84-95b6-4169993c779c",
+      "descId": "ecca5423-6622-4b21-b34e-fb6ebae92967",
+      "beforeName": "[2개선택] 호호바오일 퍼퓸 바디워시 & 로션",
+      "afterName": "호호바오일 퍼퓸 바디워시 & 로션",
+      "brand": "더블유드레스룸",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "더블유드레스룸|[2개선택]호호바오일퍼퓸바디워시&로션",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "15f6196c-aa5b-465c-a322-3bfc6a9be2c4",
+      "descId": "b67af755-b094-49c5-ac3c-2a17b224ac09",
+      "beforeName": "[라뮤끄 픽] 이너라이트 쿠션 퍼프",
+      "afterName": "이너라이트 쿠션 퍼프",
+      "brand": "에크멀",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "에크멀|[라뮤끄픽]이너라이트쿠션퍼프",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "16059baf-0a15-43e9-b9f8-8d9c3e515cf1",
+      "descId": "74b38b42-4651-44d8-b1d0-d4d0ed71e294",
+      "beforeName": "[5개부터 구매가능] 스무스 앤 퓨어 풋 모이스처라이징 마스크 – 알로에 수딩",
+      "afterName": "스무스 앤 퓨어 풋 모이스처라이징 마스크 – 알로에 수딩",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[5개부터구매가능]스무스앤퓨어풋모이스처라이징마스크–알로에수딩",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "16628ee7-1221-47d4-87cb-4be1ece9f77d",
+      "descId": "4bf684f7-21ae-4b4a-a91d-33193f9433be",
+      "beforeName": "[오직무신사뷰티] [진정쿨링케어/2Pack] 마데카 병풀 수딩 미스트",
+      "afterName": "[진정쿨링케어/2Pack] 마데카 병풀 수딩 미스트",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][진정쿨링케어/2pack]마데카병풀수딩미스트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "16d48d10-f2b4-49ad-a811-4d997bcc33b8",
+      "descId": "e3c3b716-ce35-420e-9e5d-698f7307cb32",
+      "beforeName": "바세린 로션 기획전",
+      "afterName": "바세린 로션",
+      "brand": "애경 바세린",
+      "rule": "PROMO_TRAILING_EVENT",
+      "rules": [
+        "PROMO_TRAILING_EVENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "애경바세린|바세린로션기획전",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "17319cdd-b043-4184-8f1d-5dfe6bda9fdc",
+      "descId": "1c8f6a8f-1a66-46be-9779-0bd1db6da2f0",
+      "beforeName": "[8개부터 구매가능] 시카 플라스트 B5하이드로겔 마스크",
+      "afterName": "시카 플라스트 B5하이드로겔 마스크",
+      "brand": "글로우풀",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "글로우풀|[8개부터구매가능]시카플라스트b5하이드로겔마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "18784f79-e37d-44a9-8413-4ea98812cd2b",
+      "descId": "68f51ed3-4a56-4bcf-accd-f2762bc7a7b8",
+      "beforeName": "[선런칭] PDRN 10% 초고함량 리포좀 앰플",
+      "afterName": "PDRN 10% 초고함량 리포좀 앰플",
+      "brand": "에센시엘",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "에센시엘|[선런칭]pdrn10%초고함량리포좀앰플",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "1934288b-b062-44d8-911d-70e6589968a3",
+      "descId": "3fc3fecf-a8cb-4027-9c2c-6addbd4af517",
+      "beforeName": "[15개부터 구매가능] 스무스 앤 퓨어 데일리 픽 아쿠아 토닝 마스크",
+      "afterName": "스무스 앤 퓨어 데일리 픽 아쿠아 토닝 마스크",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[15개부터구매가능]스무스앤퓨어데일리픽아쿠아토닝마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "199e8443-b0bb-40d7-b46a-fcf90f359cfb",
+      "descId": "0412b108-4a1a-43f8-8852-ba02ab99eeec",
+      "beforeName": "[안소희 PICK] 피디알엔 리프팅 앰플",
+      "afterName": "피디알엔 리프팅 앰플",
+      "brand": "바노바기",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "바노바기|[안소희pick]피디알엔리프팅앰플",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "19ae4108-4ce5-4042-8e4f-1ef1b89144a3",
+      "descId": "3820740b-97f2-4d1d-9266-60fd04b6b393",
+      "beforeName": "(2개선택) 워터 바이브 틴트",
+      "afterName": "워터 바이브 틴트",
+      "brand": "홀리카홀리카",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "홀리카홀리카|(2개선택)워터바이브틴트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "1ac1bbb8-2e80-4718-ab4e-b52752d40990",
+      "descId": "33453472-4225-4f41-8f0d-3a90a224e551",
+      "beforeName": "[오직무신사뷰티] [모공장벽케어 SET] 마데카크림 타임리버스 제로",
+      "afterName": "[모공장벽케어 SET] 마데카크림 타임리버스 제로",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][모공장벽케어set]마데카크림타임리버스제로",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "1b7027fe-1099-4de0-98eb-2d6bb14c9e25",
+      "descId": "e60a03bc-deed-42ac-968f-6cb232c11e62",
+      "beforeName": "[오직무신사뷰티] 1025 독도 촉촉 결케어",
+      "afterName": "1025 독도 촉촉 결케어",
+      "brand": "라운드랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "라운드랩|[오직무신사뷰티]1025독도촉촉결케어",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "1c6564a3-2289-4a3f-9ada-af94bac1fce6",
+      "descId": "4fadef84-6e27-4a7a-949f-4e973b6bd608",
+      "beforeName": "[옵션선택] 드봉 비누 100G 4입",
+      "afterName": "드봉 비누 100G 4입",
+      "brand": "온더바디",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "온더바디|[옵션선택]드봉비누100g4입",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "1caa4bcc-3fb4-4125-8064-549f170f30c9",
+      "descId": "cf6d35bd-b791-4124-993b-3a8b1a8ac6f4",
+      "beforeName": "[사용기한] 비건 세범 컨트롤 팩트 (사용기한 2026-12-18)",
+      "afterName": "비건 세범 컨트롤 팩트",
+      "brand": "아이소이",
+      "rule": "PROMO_EXACT+EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "PROMO_EXACT",
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아이소이|[사용기한]비건세범컨트롤팩트(사용기한2026-12-18)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "1d384732-1888-477b-bf1f-2e9458e8b754",
+      "descId": "e9013863-aceb-4165-a2e8-2da1a9c7215c",
+      "beforeName": "[옵션선택] 비오틴클리닉 맥주효모 샴푸/컨디셔너",
+      "afterName": "비오틴클리닉 맥주효모 샴푸/컨디셔너",
+      "brand": "엘라스틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "엘라스틴|[옵션선택]비오틴클리닉맥주효모샴푸/컨디셔너",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "1deb24d0-ab11-4231-8fd3-32a353596df2",
+      "descId": "8a80597f-eb83-4d37-bb10-2dbc0f5b8ac1",
+      "beforeName": "[공식몰] 크리스탈 데오드란트 무향 대용량 스틱",
+      "afterName": "크리스탈 데오드란트 무향 대용량 스틱",
+      "brand": "크리스탈",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "크리스탈|[공식몰]크리스탈데오드란트무향대용량스틱",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "1df4d698-e563-4b92-9713-a4ac34343db7",
+      "descId": "706857d9-d5b8-4884-b758-16c9b4d0709d",
+      "beforeName": "[보이넥스트도어 PICK] 헤어 바디 퍼퓸 미스트 월넛크릭그린",
+      "afterName": "헤어 바디 퍼퓸 미스트 월넛크릭그린",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]헤어바디퍼퓸미스트월넛크릭그린",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "1f917e61-0864-4fee-845a-4f36ce3b5d7e",
+      "descId": "e3646973-8059-4a36-a862-fbfbccd23751",
+      "beforeName": "[50% OFF] 마이 글로우 하이라이터",
+      "afterName": "마이 글로우 하이라이터",
+      "brand": "티르티르",
+      "rule": "PROMO_DISCOUNT",
+      "rules": [
+        "PROMO_DISCOUNT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "티르티르|[50%off]마이글로우하이라이터",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "1f9312f1-4f1e-4879-aef5-1f88737715cb",
+      "descId": "52af1eac-2737-49d9-9758-d2af970f9ec6",
+      "beforeName": "[보이넥스트도어 PICK] 헤어 바디 퍼퓸 미스트 엠버 바닐라 앤 데이지",
+      "afterName": "헤어 바디 퍼퓸 미스트 엠버 바닐라 앤 데이지",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]헤어바디퍼퓸미스트엠버바닐라앤데이지",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "207fa8c1-4651-4a4b-a4f3-b2bd0a2b3ef0",
+      "descId": "98ee11f6-8b50-4146-bb03-087fe65ce5e9",
+      "beforeName": "엔자임 오트 스크럽 파우더 워시 _미니 클렌징오일 증정",
+      "afterName": "엔자임 오트 스크럽 파우더 워시",
+      "brand": "라씨엘르",
+      "rule": "GIFT_TRAILING_DELIM",
+      "rules": [
+        "GIFT_TRAILING_DELIM"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "라씨엘르|엔자임오트스크럽파우더워시_미니클렌징오일증정",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "217a1d15-6fd5-4ec9-845e-7f9e8f6d1ed7",
+      "descId": "12f28bd2-1da1-41d7-b298-a311368cae89",
+      "beforeName": "[조슈아 PICK] 익스트림 크림 마스크",
+      "afterName": "익스트림 크림 마스크",
+      "brand": "리얼베리어",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "리얼베리어|[조슈아pick]익스트림크림마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "218cb4a0-a554-4e3f-a338-f473c4fcdbbf",
+      "descId": "662e8a44-34c4-469e-a222-ef5db754aa3a",
+      "beforeName": "[라뮤끄 픽] 이너라이트 PDRN 쿠션",
+      "afterName": "이너라이트 PDRN 쿠션",
+      "brand": "에크멀",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "에크멀|[라뮤끄픽]이너라이트pdrn쿠션",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "22d196e1-488c-4a99-a9ef-d5a796ed4f70",
+      "descId": "7dcd981c-ad08-4d5d-8cbd-c032c89a880e",
+      "beforeName": "[안소희 PICK] 4디펜스 워터 배리어 선스크린 SPF 50",
+      "afterName": "4디펜스 워터 배리어 선스크린 SPF 50",
+      "brand": "바노바기",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "바노바기|[안소희pick]4디펜스워터배리어선스크린spf50",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "22e1026d-9037-4460-8cd1-1de59946e907",
+      "descId": "84a69fad-2044-4080-adf2-d2dccbf89839",
+      "beforeName": "피토 시카놀 B5 6,000 샷 세럼 (소비기한 2027-01-29)",
+      "afterName": "피토 시카놀 B5 6,000 샷 세럼",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|피토시카놀b56,000샷세럼(소비기한2027-01-29)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "22fad760-01a5-43fb-baf3-88f74517dc4c",
+      "descId": "f8af9b1f-85ab-4808-98cf-3b6d0dab2c2f",
+      "beforeName": "[무신사단독] 피토버 플러스 빛나 선스크린",
+      "afterName": "피토버 플러스 빛나 선스크린",
+      "brand": "피토버플러스",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "피토버플러스|[무신사단독]피토버플러스빛나선스크린",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "240b94c5-9a3a-4344-9be8-7b5903873f6c",
+      "descId": "8f504fd7-8423-4946-87e4-22bb7da3f352",
+      "beforeName": "[단독구성] 어린쑥 속수분 쑥히알 세럼 2입",
+      "afterName": "어린쑥 속수분 쑥히알 세럼 2입",
+      "brand": "한율",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "한율|[단독구성]어린쑥속수분쑥히알세럼2입",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "2530f27c-e3a4-454a-8233-fde19adb2f1c",
+      "descId": "736d64a2-ee26-43fe-903d-0935da99785d",
+      "beforeName": "[무신사 단독] 애프리콧 클리어 선 세럼",
+      "afterName": "애프리콧 클리어 선 세럼",
+      "brand": "아임프롬",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아임프롬|[무신사단독]애프리콧클리어선세럼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "266009f5-f08e-4379-a606-fe09c609b26d",
+      "descId": "06292a16-eb37-4767-afc2-b687172f281c",
+      "beforeName": "[2개부터 구매가능] 퍼펙트 실드 라이트 선스틱",
+      "afterName": "퍼펙트 실드 라이트 선스틱",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[2개부터구매가능]퍼펙트실드라이트선스틱",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "26f2d66d-462b-4aff-83d3-35e330087feb",
+      "descId": "193bb4be-cf25-4ea5-a7d2-203c36ef181d",
+      "beforeName": "[사용기한] 블레미쉬 케어 스팟 사용기한2026-11-08",
+      "afterName": "블레미쉬 케어 스팟 사용기한2026-11-08",
+      "brand": "아이소이",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아이소이|[사용기한]블레미쉬케어스팟사용기한2026-11-08",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "271b95b0-93b0-4639-9f85-0da0cb8a2a68",
+      "descId": "1e87976c-67b9-4ffc-bb64-824446c97752",
+      "beforeName": "레드 락토 클리어 2.0 , 그린 시카 클리어 2.0 (소비기한 2027-05-28)",
+      "afterName": "레드 락토 클리어 2.0 , 그린 시카 클리어 2.0",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|레드락토클리어2.0,그린시카클리어2.0(소비기한2027-05-28)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "295ce8c9-5331-4186-b07d-885810297d56",
+      "descId": "b0c869d9-075a-47a1-99b5-ac139db2f197",
+      "beforeName": "에이지 리턴 크림 (사용기한 2027/03/28까지)",
+      "afterName": "에이지 리턴 크림",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|에이지리턴크림(사용기한2027/03/28까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "29754e97-e8b2-4436-8d2d-ae6a89579117",
+      "descId": "1820d68d-b116-4bbd-a28e-d405fe514a95",
+      "beforeName": "[무신사단독] 소나무 진정 시카 바디워시",
+      "afterName": "소나무 진정 시카 바디워시",
+      "brand": "라운드랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "라운드랩|[무신사단독]소나무진정시카바디워시",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "299c5279-ea93-47b8-a424-a62bccf35a68",
+      "descId": "f6b15497-113e-49df-be4a-0049d83589f8",
+      "beforeName": "인 마이 포켓 랩핑 마스크 X (소비기한 2027-04-21)",
+      "afterName": "인 마이 포켓 랩핑 마스크 X",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|인마이포켓랩핑마스크x(소비기한2027-04-21)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "29a3d391-d648-4826-ac57-1ba0c933e2c9",
+      "descId": "6bc65c34-7996-482b-8cdd-262c130478fc",
+      "beforeName": "[보이넥스트도어 PICK] 릿체21 오 드 퍼퓸 EDP",
+      "afterName": "릿체21 오 드 퍼퓸 EDP",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]릿체21오드퍼퓸edp",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "29b3aa17-cca6-4921-ad9d-510c0c4896ad",
+      "descId": "8fb2511d-ab48-491a-a101-e1970ce3e8cb",
+      "beforeName": "[선물포장] 소나무 안심 진정",
+      "afterName": "소나무 안심 진정",
+      "brand": "라운드랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "라운드랩|[선물포장]소나무안심진정",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "2a741133-8637-4a05-b295-63444382a277",
+      "descId": "1f0fb8bd-2bbb-40d8-8c70-a48ab9b3d8bb",
+      "beforeName": "[3개부터 구매가능] 퍼퓸드 핸드크림 미스틱 우드",
+      "afterName": "퍼퓸드 핸드크림 미스틱 우드",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[3개부터구매가능]퍼퓸드핸드크림미스틱우드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "2b4486a2-3121-42ca-894b-52f509e0beae",
+      "descId": "16098724-0adc-44c0-8820-25a8e82ef0ce",
+      "beforeName": "[5개부터 구매가능] 스무스 앤 퓨어 풋 모이스처라이징 마스크 – 라이스 너리싱",
+      "afterName": "스무스 앤 퓨어 풋 모이스처라이징 마스크 – 라이스 너리싱",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[5개부터구매가능]스무스앤퓨어풋모이스처라이징마스크–라이스너리싱",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "2d07ed91-a39c-4998-8560-07563613f6c6",
+      "descId": "7d9e75c9-69ca-42b2-bfc5-d61ea716f3c4",
+      "beforeName": "[선물포장] 노스탤직 퍼퓸 핸드크림",
+      "afterName": "노스탤직 퍼퓸 핸드크림",
+      "brand": "노스탤직",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "노스탤직|[선물포장]노스탤직퍼퓸핸드크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "2e6b92cc-c664-4ae6-9d97-eb5cf4a06ee2",
+      "descId": "321bb48a-ef12-41fb-8ba7-b7df59f6d31a",
+      "beforeName": "(5pack) 수퍼 판테놀 리페어 마스크 (소비기한2027-07-01까지)",
+      "afterName": "(5pack) 수퍼 판테놀 리페어 마스크",
+      "brand": "미샤",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "미샤|(5pack)수퍼판테놀리페어마스크(소비기한2027-07-01까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "310cd08b-9718-4580-854f-da7d138217c8",
+      "descId": "5ea8c4f6-52db-47a5-8a68-25cd3fb04384",
+      "beforeName": "[보이넥스트도어 PICK] 니치퍼퓸 핸드크림 도쿄레이",
+      "afterName": "니치퍼퓸 핸드크림 도쿄레이",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치퍼퓸핸드크림도쿄레이",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "314929de-eb8f-4d96-88d3-f53b4acbd406",
+      "descId": "0b505214-e308-472f-a0bf-326100fa0e3a",
+      "beforeName": "[2개부터 구매가능] 애플 사이다 피에이치 밸런싱 클렌징 폼",
+      "afterName": "애플 사이다 피에이치 밸런싱 클렌징 폼",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[2개부터구매가능]애플사이다피에이치밸런싱클렌징폼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "319308b6-da57-4976-8683-674a0ada6cc0",
+      "descId": "74072bf0-09c1-4a82-9927-0a00e40d9554",
+      "beforeName": "[오직무신사뷰티] [모공토닝 SET] 마데카 말차 포어 클렌징 오일",
+      "afterName": "[모공토닝 SET] 마데카 말차 포어 클렌징 오일",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][모공토닝set]마데카말차포어클렌징오일",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "32300e72-d5b3-44eb-b622-fd29561562f9",
+      "descId": "be361e08-2201-4fe6-8ab6-f199b04238bb",
+      "beforeName": "[이한 PICK] 뉴욕인틸리 오 드 퍼퓸 EDP",
+      "afterName": "뉴욕인틸리 오 드 퍼퓸 EDP",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[이한pick]뉴욕인틸리오드퍼퓸edp",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "33c69f02-9fc7-4462-86fe-272c0477b97e",
+      "descId": "c85f33b3-105e-4685-84a9-4c62533d12c6",
+      "beforeName": "[선물포장] 센티드 핸드크림",
+      "afterName": "센티드 핸드크림",
+      "brand": "써티파이브모먼트",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "써티파이브모먼트|[선물포장]센티드핸드크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "35989115-eb72-42e4-8ad1-79b36d2a7058",
+      "descId": "4b8c52d9-f3cd-473a-b367-52ee283aa6c0",
+      "beforeName": "[보이넥스트도어 PICK] 휘아모17 오 드 퍼퓸 EDP",
+      "afterName": "휘아모17 오 드 퍼퓸 EDP",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]휘아모17오드퍼퓸edp",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "36d71388-acc4-4272-aea1-9560600557e3",
+      "descId": "83fc4800-e0f5-40f4-919a-d5136caf15af",
+      "beforeName": "[오픈프로모션] 센시니컬 D-판테놀 무기자차 선크림",
+      "afterName": "센시니컬 D-판테놀 무기자차 선크림",
+      "brand": "닥터나인틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "닥터나인틴|[오픈프로모션]센시니컬d-판테놀무기자차선크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "385fe0a5-9021-4b5c-a223-ecac82c834a5",
+      "descId": "17b15aa0-66dd-4e02-8fbf-71617d78e05f",
+      "beforeName": "[오직 무신사 뷰티] 샴푸",
+      "afterName": "샴푸",
+      "brand": "아로마티카",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아로마티카|[오직무신사뷰티]샴푸",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "39cc8a2f-09b5-4902-a829-07c193b996ef",
+      "descId": "213cdbdc-a0a3-4be9-bef8-379931fb8cf3",
+      "beforeName": "[5개부터 구매가능] 엑스퍼트 나이아신 비타 5 필름 겔 마스크",
+      "afterName": "엑스퍼트 나이아신 비타 5 필름 겔 마스크",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[5개부터구매가능]엑스퍼트나이아신비타5필름겔마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "3a3fd5b2-e091-48c0-a4a4-9e4574e1da57",
+      "descId": "27a09e8a-8550-4b25-a6bc-abadd8ff6aaf",
+      "beforeName": "[에이미 PICK] 펩타이드 인스턴트 플럼핑 마스크",
+      "afterName": "펩타이드 인스턴트 플럼핑 마스크",
+      "brand": "시그닉",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "시그닉|[에이미pick]펩타이드인스턴트플럼핑마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "3ad81099-e777-40c9-9c05-c73a0c1dc93e",
+      "descId": "52832cb7-dca5-4500-b538-e7f8da661be8",
+      "beforeName": "BEST ] 판테놀 폼클렌저 + 판테놀 세럼 + 기미색소 클리어 세럼",
+      "afterName": "판테놀 폼클렌저 + 판테놀 세럼 + 기미색소 클리어 세럼",
+      "brand": "레이어랩",
+      "rule": "PROMO_ORPHAN_LEADING",
+      "rules": [
+        "PROMO_ORPHAN_LEADING"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "레이어랩|best]판테놀폼클렌저+판테놀세럼+기미색소클리어세럼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "3b43d40b-f5aa-4e47-ac59-71556bd1c9e6",
+      "descId": "146eb0dd-f28f-4cc6-9772-8bd293a82cc8",
+      "beforeName": "[2개부터 구매가능] 퍼펙트 실드 마일드 선크림",
+      "afterName": "퍼펙트 실드 마일드 선크림",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[2개부터구매가능]퍼펙트실드마일드선크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "3c2080b9-9239-434c-9e1a-551f6ea619db",
+      "descId": "afdc5a96-080b-49a7-9a91-0306d0b06444",
+      "beforeName": "[오직무신사뷰티] 마데카크림 타임리버스 제로",
+      "afterName": "마데카크림 타임리버스 제로",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티]마데카크림타임리버스제로",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "3c3cc954-b468-4bb1-8f4a-62a39f4365e0",
+      "descId": "b2f9c7c9-4a57-4243-b4dd-569b603ffa82",
+      "beforeName": "[27.07.29 까지] 미백기능성 감귤 브라이트닝 세럼",
+      "afterName": "미백기능성 감귤 브라이트닝 세럼",
+      "brand": "후르디아",
+      "rule": "PROMO_EXPIRY",
+      "rules": [
+        "PROMO_EXPIRY"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "후르디아|[27.07.29까지]미백기능성감귤브라이트닝세럼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "3ca1c37b-2f75-4c4c-aea8-b2d4620795fc",
+      "descId": "cf828244-c263-46cf-bea7-d101b82ced3c",
+      "beforeName": "떼르말(온천수) 워터 모이스처라이징 크림 x (사용기한 2027/04/07까지)",
+      "afterName": "떼르말(온천수) 워터 모이스처라이징 크림 x",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|떼르말(온천수)워터모이스처라이징크림x(사용기한2027/04/07까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "3cc804c4-66e3-4552-97c4-42dbf2313635",
+      "descId": "8aacd532-f73c-4751-83c0-94403fbb36a9",
+      "beforeName": "스피디 스키니 브로우카라 [005 피오니애쉬]",
+      "afterName": "스피디 스키니 브로우카라 [005 피오니애쉬]",
+      "brand": "페리페라",
+      "rule": "ZERO_WIDTH",
+      "rules": [
+        "ZERO_WIDTH"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "페리페라|스피디스키니브로우카라[005피오니애쉬]",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "3d1c58ec-4abc-4bf5-b2b7-3978f958dba2",
+      "descId": "1485b45e-dc51-4635-8bce-37c65b57b83c",
+      "beforeName": "시멀 실키 매트​ 바스키아 립스틱",
+      "afterName": "시멀 실키 매트 바스키아 립스틱",
+      "brand": "맥",
+      "rule": "ZERO_WIDTH",
+      "rules": [
+        "ZERO_WIDTH"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "맥|시멀실키매트​바스키아립스틱",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "3dedce92-43d9-4ac2-a847-0db77426e4b4",
+      "descId": "260a610f-eb06-4fb0-a23d-d3eff672dfa8",
+      "beforeName": "[선물포장] 노스탤직 퍼퓸 핸드크림 522 오렌지블라썸",
+      "afterName": "노스탤직 퍼퓸 핸드크림 522 오렌지블라썸",
+      "brand": "노스탤직",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "노스탤직|[선물포장]노스탤직퍼퓸핸드크림522오렌지블라썸",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "3f6d0d5a-4c0f-44e9-adfd-37ed71d16adf",
+      "descId": "31b98081-8f0a-4f51-a86c-4939b81b5290",
+      "beforeName": "[보이넥스트도어 PICK] 에끌로에 오 드 퍼퓸 EDP",
+      "afterName": "에끌로에 오 드 퍼퓸 EDP",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]에끌로에오드퍼퓸edp",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "3fccdc65-d8a6-473c-b584-e55f2f65f715",
+      "descId": "fa8e447c-09ec-4345-9d0a-f767b454e35e",
+      "beforeName": "[무신사단독] 원데이뷰티 리젠크림 2PACK 붉은기진정 줄기세포 피부장벽개선",
+      "afterName": "원데이뷰티 리젠크림 2PACK 붉은기진정 줄기세포 피부장벽개선",
+      "brand": "더티 런드리",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "더티런드리|[무신사단독]원데이뷰티리젠크림2pack붉은기진정줄기세포피부장벽개선",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "40e625ee-fe8c-48cb-baa5-f79d5ec10c3a",
+      "descId": "5039069c-d7bf-4bc0-a20d-b5af70646362",
+      "beforeName": "[선물 포장] PDRN 바이탈-에프 립 밤 & 볼륨 키링",
+      "afterName": "PDRN 바이탈-에프 립 밤 & 볼륨 키링",
+      "brand": "플로위",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "플로위|[선물포장]pdrn바이탈-에프립밤&볼륨키링",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "41330225-22e5-4d91-a907-5d0753e3ac3f",
+      "descId": "cfee0e52-edae-4f2f-b606-f7fe7696072f",
+      "beforeName": "[~27.05.20] 후르디아 석류 허니 립밤",
+      "afterName": "후르디아 석류 허니 립밤",
+      "brand": "후르디아",
+      "rule": "PROMO_EXPIRY",
+      "rules": [
+        "PROMO_EXPIRY"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "후르디아|[~27.05.20]후르디아석류허니립밤",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "413c12f0-54d4-4cbd-9982-bec28af3a833",
+      "descId": "f4856210-6f88-43f3-9702-e2b6dfea91a6",
+      "beforeName": "[양의지PICK] 히알샷 베리어 앰플 B5",
+      "afterName": "히알샷 베리어 앰플 B5",
+      "brand": "더마토리",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "더마토리|[양의지pick]히알샷베리어앰플b5",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "41b027ee-e704-4e99-a527-31b573bb5e17",
+      "descId": "989fd3f1-1b72-46d5-8fb2-d6b173c32ee2",
+      "beforeName": "히더 카밍 에센스 (사용기한 27.03.28까지)",
+      "afterName": "히더 카밍 에센스",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|히더카밍에센스(사용기한27.03.28까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "42315d43-3424-4223-b232-c7edbf628fb9",
+      "descId": "fcdb1887-b9a0-457a-8b4f-fad34b5c13d7",
+      "beforeName": "[8개부터 구매가능] 8 히알루론산 하이드레이팅 하이드로겔 마스크",
+      "afterName": "8 히알루론산 하이드레이팅 하이드로겔 마스크",
+      "brand": "글로우풀",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "글로우풀|[8개부터구매가능]8히알루론산하이드레이팅하이드로겔마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "42801086-a0c3-490b-ad12-381844741d1f",
+      "descId": "49030c96-18dd-456d-b222-965b699c20ec",
+      "beforeName": "(2개선택) 마이페이브 피스 아이섀도우",
+      "afterName": "마이페이브 피스 아이섀도우",
+      "brand": "홀리카홀리카",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "홀리카홀리카|(2개선택)마이페이브피스아이섀도우",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "4317cf03-90ce-461f-9690-5b3805bc2e5b",
+      "descId": "89d833bd-1174-4d20-849a-7a3e9fc1dcfb",
+      "beforeName": "[임수빈 PICK] 트루 톤 커버로션 (옵션)",
+      "afterName": "트루 톤 커버로션 (옵션)",
+      "brand": "비레디",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비레디|[임수빈pick]트루톤커버로션(옵션)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "475d0325-8e80-492a-81e2-1af39beb2d95",
+      "descId": "0b0f608e-3e4d-4bce-80e1-beeb624a165a",
+      "beforeName": "브라이트 크리스탈 EDT + 베르사체 향수샘플 ]",
+      "afterName": "브라이트 크리스탈 EDT + 베르사체 향수샘플",
+      "brand": "베르사체 퍼퓸",
+      "rule": "STRAY_TRAILING_CLOSE+WHITESPACE",
+      "rules": [
+        "STRAY_TRAILING_CLOSE",
+        "WHITESPACE"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "베르사체퍼퓸|브라이트크리스탈edt+베르사체향수샘플]",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "4775d338-a985-4491-bd8f-a19a0802becc",
+      "descId": "33b465b3-9f8a-4ac5-ad20-1bfc6b360609",
+      "beforeName": "[무신사단독] 딥콜라겐 레티날 캡슐 크림",
+      "afterName": "딥콜라겐 레티날 캡슐 크림",
+      "brand": "성분에디터",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "성분에디터|[무신사단독]딥콜라겐레티날캡슐크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "4a37ff5a-1387-44b4-bba0-a9a5a299ed6a",
+      "descId": "c69515b6-04b6-4303-8426-83c83d2c6dbc",
+      "beforeName": "[오직무신사뷰티] [보습탄력 SET] 더 마데카크림",
+      "afterName": "[보습탄력 SET] 더 마데카크림",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][보습탄력set]더마데카크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "4a4626ce-81a0-499a-a669-05687e808f47",
+      "descId": "baf82f1b-f411-4728-80b9-988e569fa6ff",
+      "beforeName": "[강경민 PICK] 소프트 하드 메이크업 펜슬",
+      "afterName": "소프트 하드 메이크업 펜슬",
+      "brand": "파이브바이브",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "파이브바이브|[강경민pick]소프트하드메이크업펜슬",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "4be17efb-0bc9-4978-8638-7494af54baa6",
+      "descId": "d11a04ba-c213-4113-90fd-79a99e3e7cb5",
+      "beforeName": "[2개부터 구매가능] 슈퍼트임 펜 아이라이너",
+      "afterName": "슈퍼트임 펜 아이라이너",
+      "brand": "메리몽드",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메리몽드|[2개부터구매가능]슈퍼트임펜아이라이너",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "4c162042-119f-4a83-b326-99cfdad0dd14",
+      "descId": "373ab41e-79ce-412d-9d5c-d31fdac2177b",
+      "beforeName": "[선물포장] 노스탤직 퍼퓸 핸드크림 001 베르가못",
+      "afterName": "노스탤직 퍼퓸 핸드크림 001 베르가못",
+      "brand": "노스탤직",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "노스탤직|[선물포장]노스탤직퍼퓸핸드크림001베르가못",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "4de65083-1997-4bee-92dd-f09db7cad503",
+      "descId": "51f096cf-3994-4a9b-a1ae-0fc2f422b344",
+      "beforeName": "[5개부터 구매가능] 엑스퍼트 히알 PDRN 콜라겐 하이드로겔 마스크",
+      "afterName": "엑스퍼트 히알 PDRN 콜라겐 하이드로겔 마스크",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[5개부터구매가능]엑스퍼트히알pdrn콜라겐하이드로겔마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "4eecd91b-7c04-448c-bb0a-e654c6b92abb",
+      "descId": "90e44060-9fff-4e19-9f29-965003c42fed",
+      "beforeName": "[AD] 프라임 프라이머 피니쉬 팩트",
+      "afterName": "프라임 프라이머 피니쉬 팩트",
+      "brand": "바닐라코",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "바닐라코|[ad]프라임프라이머피니쉬팩트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "4fc5f76b-7a4f-4114-901d-e66abde420a0",
+      "descId": "d95af0c9-b09c-40bb-954f-214831b52e6c",
+      "beforeName": "[선물포장] NO.1 립밤",
+      "afterName": "NO.1 립밤",
+      "brand": "블코",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "블코|[선물포장]no.1립밤",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "4fd3ccc7-5856-4817-a141-ba2871701407",
+      "descId": "551d1d43-b2b4-428b-bc85-df01aae737a1",
+      "beforeName": "[무신사 단독] 애프리콧 다크 스팟 드롭 앰플",
+      "afterName": "애프리콧 다크 스팟 드롭 앰플",
+      "brand": "아임프롬",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아임프롬|[무신사단독]애프리콧다크스팟드롭앰플",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "5036e164-8fb5-41be-8eca-451b386aa71b",
+      "descId": "2016d832-124f-4eb4-b64b-7b7e1ff173c1",
+      "beforeName": "[보이넥스트도어 PICK] 헤어 바디 퍼퓸 미스트 일랑일랑 무드",
+      "afterName": "헤어 바디 퍼퓸 미스트 일랑일랑 무드",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]헤어바디퍼퓸미스트일랑일랑무드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "530072b2-4912-40e4-9f39-eeeb05c215a1",
+      "descId": "54377b7d-95e5-4aba-a41a-4813ca2f53f5",
+      "beforeName": "[보이넥스트도어 PICK] 니치 룸스프레이 섬유향수 월넛크릭 그린",
+      "afterName": "니치 룸스프레이 섬유향수 월넛크릭 그린",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치룸스프레이섬유향수월넛크릭그린",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "59b9eec7-36da-4413-b480-025b18b3e5d2",
+      "descId": "a414e329-a1ed-41f3-80f3-44600092d5ca",
+      "beforeName": "[옵션선택] 더내추럴 바디워시",
+      "afterName": "더내추럴 바디워시",
+      "brand": "온더바디",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "온더바디|[옵션선택]더내추럴바디워시",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "5a4f8e8b-611f-4e4d-aae0-0a63e47fbcd5",
+      "descId": "ffbdbf63-fe6e-47f8-8c07-c4f95a99b041",
+      "beforeName": "[5개부터 구매가능] 스트레스 릴리빙 데일리 픽 필링 패드",
+      "afterName": "스트레스 릴리빙 데일리 픽 필링 패드",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[5개부터구매가능]스트레스릴리빙데일리픽필링패드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "5a9f5768-3efd-4fc9-9cfd-4e32b8c9a780",
+      "descId": "e81f6088-00b4-48a1-814a-5f13d53633fb",
+      "beforeName": "[2개부터 구매가능] 폼 핸드워시 미스틱 우드",
+      "afterName": "폼 핸드워시 미스틱 우드",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[2개부터구매가능]폼핸드워시미스틱우드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "5aec5364-5bf5-4b7d-957d-4b36110a7fbe",
+      "descId": "693f0717-a651-4344-b53d-3a9154fdfd84",
+      "beforeName": "빨강머리앤에디션 크레마카발로 핸드크림 ​ (30ml ) 허브 플로랄 & 프레쉬 티(엄숙한 맹세)",
+      "afterName": "빨강머리앤에디션 크레마카발로 핸드크림 (30ml ) 허브 플로랄 & 프레쉬 티(엄숙한 맹세)",
+      "brand": "자민경",
+      "rule": "ZERO_WIDTH+WHITESPACE",
+      "rules": [
+        "ZERO_WIDTH",
+        "WHITESPACE"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "자민경|빨강머리앤에디션크레마카발로핸드크림​(30ml)허브플로랄&프레쉬티(엄숙한맹세)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "5c4f4fc1-997a-4d80-bf36-b95862d65d67",
+      "descId": "b807f0d0-102d-4b63-a531-b584f5553ec5",
+      "beforeName": "[보이넥스트도어 PICK] 디아브14 오 드 퍼퓸 EDP",
+      "afterName": "디아브14 오 드 퍼퓸 EDP",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]디아브14오드퍼퓸edp",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "5c5cc2d2-1060-4fda-b266-2c75fe4ddd6f",
+      "descId": "c4cfef17-1606-47f1-b67c-c2eeb10b1ae4",
+      "beforeName": "(2개선택) 멜로우 글라이딩 펜슬 라이너",
+      "afterName": "멜로우 글라이딩 펜슬 라이너",
+      "brand": "홀리카홀리카",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "홀리카홀리카|(2개선택)멜로우글라이딩펜슬라이너",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "5d8af4c8-d286-4b70-ab4c-13c01c8d256e",
+      "descId": "71e08f71-c080-41ab-b9a0-841f6e32045b",
+      "beforeName": "[보이넥스트도어 PICK] 니치 룸스프레이 섬유향수 아리츠",
+      "afterName": "니치 룸스프레이 섬유향수 아리츠",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치룸스프레이섬유향수아리츠",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "5d8e7f6d-fc30-42be-94cd-b21c178fdfa5",
+      "descId": "0a9f8c09-4d33-4a08-87d7-d5a3677e5877",
+      "beforeName": "[GS25 전용] 리틀리 위찌 바운시 글로스 5 colors",
+      "afterName": "리틀리 위찌 바운시 글로스 5 colors",
+      "brand": "위찌",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "위찌|[gs25전용]리틀리위찌바운시글로스5colors",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "5e5e356d-33ac-4bfa-ae68-c52527954940",
+      "descId": "83d14618-0ac9-4dfa-bf0e-c4fceb5e3f89",
+      "beforeName": "[조슈아 PICK] 익스트림 에센스 토너",
+      "afterName": "익스트림 에센스 토너",
+      "brand": "리얼베리어",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "리얼베리어|[조슈아pick]익스트림에센스토너",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "5e602949-9d1f-431d-ae04-3c495a505bfb",
+      "descId": "0903f29b-790e-4f81-851e-449ac10a601e",
+      "beforeName": "[2개부터 구매가능] 히알루론산 밸런싱 크림",
+      "afterName": "히알루론산 밸런싱 크림",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[2개부터구매가능]히알루론산밸런싱크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "61fea5fa-9c22-4f7c-b61e-ab9546b4b884",
+      "descId": "ef535c17-1eeb-4df1-b2a4-4dabf7dfa43b",
+      "beforeName": "[오직무신사뷰티] [장벽강화 SET] 마데카크림 타임리버스 제로",
+      "afterName": "[장벽강화 SET] 마데카크림 타임리버스 제로",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][장벽강화set]마데카크림타임리버스제로",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "621a8940-14a0-4c01-97b9-b46ede5135ad",
+      "descId": "87f7663a-4802-4a63-8ca2-f4b584cb8150",
+      "beforeName": "[2개부터 구매가능] 펜타 세라마이드 모이스처라이징 세럼",
+      "afterName": "펜타 세라마이드 모이스처라이징 세럼",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[2개부터구매가능]펜타세라마이드모이스처라이징세럼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "641f9fc7-0aac-4b28-8a9a-814d43538a80",
+      "descId": "b8f0e0b7-3347-4434-9223-7ce81cd2ffa0",
+      "beforeName": "[오직무신사뷰티] 마데카 랩 마스크 포어",
+      "afterName": "마데카 랩 마스크 포어",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티]마데카랩마스크포어",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "644f67c6-d66e-48d4-98f2-6bddcedbddb1",
+      "descId": "a3d1180f-b0b8-4866-831c-d18b17a8f2c8",
+      "beforeName": "[보이넥스트도어 PICK] 헤어 바디 퍼퓸 미스트 오디너리",
+      "afterName": "헤어 바디 퍼퓸 미스트 오디너리",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]헤어바디퍼퓸미스트오디너리",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "65c3d6dd-b8f9-4b6a-acb2-c2b59cbc861a",
+      "descId": "4d4dbdd9-5cc9-44a1-85d6-a7fd469cfb11",
+      "beforeName": "[3개부터 구매가능] 퍼펙트 클리어 클렌징 폼",
+      "afterName": "퍼펙트 클리어 클렌징 폼",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[3개부터구매가능]퍼펙트클리어클렌징폼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "66c17509-6493-400c-8541-d5b7792f79f4",
+      "descId": "f59a4644-9f85-4718-8aec-9a534e01b7c8",
+      "beforeName": "​​​​세컨 스킨 파운데이션",
+      "afterName": "세컨 스킨 파운데이션",
+      "brand": "힌스",
+      "rule": "ZERO_WIDTH",
+      "rules": [
+        "ZERO_WIDTH"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "힌스|​​​​세컨스킨파운데이션",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "67e21adb-72ec-4a74-84a5-ef15faca3481",
+      "descId": "fc8845b8-fcac-4f4d-af77-f0387a600999",
+      "beforeName": "레드 락토 콜라겐 랩핑 마스크&모공 베리어 크림 (소비기한 2026-11-19)",
+      "afterName": "레드 락토 콜라겐 랩핑 마스크&모공 베리어 크림",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|레드락토콜라겐랩핑마스크&모공베리어크림(소비기한2026-11-19)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "68fd2c01-6b94-4985-b9b5-bfe0ac5e6e52",
+      "descId": "bf46b86f-e72b-4a57-9b01-18f4c13d497a",
+      "beforeName": "폴리쉬 오일 애프리콧)",
+      "afterName": "폴리쉬 오일 애프리콧",
+      "brand": "아도르",
+      "rule": "STRAY_TRAILING_CLOSE",
+      "rules": [
+        "STRAY_TRAILING_CLOSE"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아도르|폴리쉬오일애프리콧)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "690ddb2c-8137-44d2-bdd9-1e8d5e518b34",
+      "descId": "36c7b407-3c4d-4f8f-b10c-47e006c89e8d",
+      "beforeName": "[2개부터 구매가능] 워터프루프 타투 펜 아이라이너",
+      "afterName": "워터프루프 타투 펜 아이라이너",
+      "brand": "맥퀸뉴욕",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "맥퀸뉴욕|[2개부터구매가능]워터프루프타투펜아이라이너",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "697def16-6c77-49f5-8735-b4a400a28a4c",
+      "descId": "6d8f81a4-3a91-40a0-a73e-3788202e133d",
+      "beforeName": "[보이넥스트도어 PICK] 오 드 퍼퓸 디스커버리 ( 종)",
+      "afterName": "오 드 퍼퓸 디스커버리 ( 종)",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]오드퍼퓸디스커버리(종)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "6a0d0ea6-006c-4ee0-884a-f0898e86bc62",
+      "descId": "1a210081-4550-467f-980c-7c1024b9575d",
+      "beforeName": "[선물포장] 비건 에센셜 롤온&에센셜 괄사",
+      "afterName": "비건 에센셜 롤온&에센셜 괄사",
+      "brand": "리베르",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "리베르|[선물포장]비건에센셜롤온&에센셜괄사",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "6ca8c522-5eb6-4b82-a812-ef417eaed24d",
+      "descId": "2d88d900-fae1-41de-be44-9265c5de50ba",
+      "beforeName": "[20개부터 구매가능] 세븐 데이즈 마스크 레몬 C",
+      "afterName": "세븐 데이즈 마스크 레몬 C",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[20개부터구매가능]세븐데이즈마스크레몬c",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "6d834a0a-193b-4a2a-8bd1-2d9fa2358209",
+      "descId": "0d1e4b47-23ef-4daf-b202-e67fab942cb0",
+      "beforeName": "[조슈아 PICK] 익스트림 에센스 토너 오리지널",
+      "afterName": "익스트림 에센스 토너 오리지널",
+      "brand": "리얼베리어",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "리얼베리어|[조슈아pick]익스트림에센스토너오리지널",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "6eb9cb8e-aa4d-47f0-b13d-e9305dde1dff",
+      "descId": "2da6f286-caec-4602-b8f5-d61d17a9ca2d",
+      "beforeName": "[최미나수 Pick] 시그니처 에센스 팩트 인텐스 커버",
+      "afterName": "시그니처 에센스 팩트 인텐스 커버",
+      "brand": "에이지투웨니스",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "에이지투웨니스|[최미나수pick]시그니처에센스팩트인텐스커버",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "6ecd13bf-bdc9-4f55-bd95-41c61831baf6",
+      "descId": "a6184e7a-0d80-4ef0-afc7-6121774c3e8a",
+      "beforeName": "피토 시카놀 B5 모이스처 샴푸 (소비기한 2027-05-26)",
+      "afterName": "피토 시카놀 B5 모이스처 샴푸",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|피토시카놀b5모이스처샴푸(소비기한2027-05-26)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "6f259fdc-1beb-4d32-992e-e91b57679c8c",
+      "descId": "6f82a1c4-4f32-453a-ab57-30e8db9ca54b",
+      "beforeName": "[옵션선택] 밀도케어 탈모기능성 샴푸",
+      "afterName": "밀도케어 탈모기능성 샴푸",
+      "brand": "닥터그루트",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "닥터그루트|[옵션선택]밀도케어탈모기능성샴푸",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "6fe0fae1-0469-48a5-b786-f166eea303ec",
+      "descId": "b866b24a-b0e9-4e41-8ee7-f440fd2fb5e9",
+      "beforeName": "[GS25 전용] 리틀리 위찌 아이섀도우 2 colors",
+      "afterName": "리틀리 위찌 아이섀도우 2 colors",
+      "brand": "위찌",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "위찌|[gs25전용]리틀리위찌아이섀도우2colors",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7097b33b-aead-4981-8feb-033c9b27b770",
+      "descId": "74939bdd-91f1-4fde-bed2-78376464f31c",
+      "beforeName": "[오직무신사뷰티] [모공탄력] 타이트닝 앰플패드",
+      "afterName": "[모공탄력] 타이트닝 앰플패드",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][모공탄력]타이트닝앰플패드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "70aeddbb-937c-452c-9476-5761bfaebd3b",
+      "descId": "33c17145-22e9-4e82-b149-8776dea866c8",
+      "beforeName": "[20개부터 구매가능] 세븐 데이즈 마스크 알로에 H",
+      "afterName": "세븐 데이즈 마스크 알로에 H",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[20개부터구매가능]세븐데이즈마스크알로에h",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7130975c-ed8b-4d1d-bbef-f1e67d5544f2",
+      "descId": "c4bb65db-4df1-4624-97fa-4cc8a0ac3875",
+      "beforeName": "[5개부터 구매가능] 엑스퍼트 핑크 비타 콜라겐 겔 마스크",
+      "afterName": "엑스퍼트 핑크 비타 콜라겐 겔 마스크",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[5개부터구매가능]엑스퍼트핑크비타콜라겐겔마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "71f58beb-8fae-487d-841d-b8a7e67a7087",
+      "descId": "e748fc94-ef39-49e4-a46e-b984479e649c",
+      "beforeName": "[엔믹스 지우 PICK] 아이레시피 바이브 업 틴티드 선비비",
+      "afterName": "아이레시피 바이브 업 틴티드 선비비",
+      "brand": "아이레시피",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아이레시피|[엔믹스지우pick]아이레시피바이브업틴티드선비비",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "726e3ae8-1a4d-4df4-a17d-729da324bbd0",
+      "descId": "70a396ed-50da-48d9-95e7-99a848bb0f73",
+      "beforeName": "일렉트릭 우드 엑스뜨레 드 퍼퓸",
+      "afterName": "일렉트릭 우드 엑스뜨레 드 퍼퓸",
+      "brand": "룸 1015",
+      "rule": "ZERO_WIDTH",
+      "rules": [
+        "ZERO_WIDTH"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "룸1015|일렉트릭우드엑스뜨레드퍼퓸",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "727d2859-7a18-4123-bc33-94fbd08fa82c",
+      "descId": "114236cb-d383-434c-a823-3003bfe5a3e0",
+      "beforeName": "테카테카 카밍 순 트러블 진정 바디미스트 (사용기한2027-01-17)",
+      "afterName": "테카테카 카밍 순 트러블 진정 바디미스트",
+      "brand": "엠디스픽",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "엠디스픽|테카테카카밍순트러블진정바디미스트(사용기한2027-01-17)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "72ba38fb-8a1b-4cab-a531-1fd59980c01a",
+      "descId": "c91919af-c5e2-42cb-b0dd-098b204a0c3d",
+      "beforeName": "[2개부터 구매가능] 더 퍼펙트 레몬진저 버블 클렌저",
+      "afterName": "더 퍼펙트 레몬진저 버블 클렌저",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[2개부터구매가능]더퍼펙트레몬진저버블클렌저",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "73827b86-798c-4911-9f5f-dd406849573f",
+      "descId": "2914d3fe-e073-4765-858c-31775eb09fb6",
+      "beforeName": "[오직무신사뷰티] 1025 독도 결케어 클렌징",
+      "afterName": "1025 독도 결케어 클렌징",
+      "brand": "라운드랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "라운드랩|[오직무신사뷰티]1025독도결케어클렌징",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "74a775b8-fd7c-4257-b7a3-6b76134cd36b",
+      "descId": "2d5e6306-1bea-402c-8fe1-e919864cbcd2",
+      "beforeName": "[명재현 PICK] 로스트우드 오 드 퍼퓸 EDP",
+      "afterName": "로스트우드 오 드 퍼퓸 EDP",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[명재현pick]로스트우드오드퍼퓸edp",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7661cb26-01ea-47c4-a945-4c51e856406c",
+      "descId": "62c2e760-a28b-4ffb-927f-5954207a51cc",
+      "beforeName": "[옵션선택] 리엔 꾸지뽕 볼륨부스터 탈모 샴푸/트리트먼트/두피앰플",
+      "afterName": "리엔 꾸지뽕 볼륨부스터 탈모 샴푸/트리트먼트/두피앰플",
+      "brand": "엘라스틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "엘라스틴|[옵션선택]리엔꾸지뽕볼륨부스터탈모샴푸/트리트먼트/두피앰플",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "76b9dc23-dd1f-47aa-8630-f04bd8916d07",
+      "descId": "a069307d-9a39-415c-b8aa-9214cfa404a7",
+      "beforeName": "[2개선택] 대용량 퍼퓸 핸드로션",
+      "afterName": "대용량 퍼퓸 핸드로션",
+      "brand": "더블유드레스룸",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "더블유드레스룸|[2개선택]대용량퍼퓸핸드로션",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "76bd95dc-7813-4e65-a685-b22e8dd0b57a",
+      "descId": "b130b967-3808-4847-938e-6d8630a10cae",
+      "beforeName": "[15개부터 구매가능] 스무스 앤 퓨어 데일리 픽 에센셜 카밍 마스크",
+      "afterName": "스무스 앤 퓨어 데일리 픽 에센셜 카밍 마스크",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[15개부터구매가능]스무스앤퓨어데일리픽에센셜카밍마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "788b2b12-7ef7-47c0-9d7d-f712a02837c1",
+      "descId": "a350a66a-2fb5-4e94-a8f5-d1e60025d929",
+      "beforeName": "시카 쑥 하이드로 딥 카밍 겔 마스크 (사용기한 2026/11/17까지)",
+      "afterName": "시카 쑥 하이드로 딥 카밍 겔 마스크",
+      "brand": "엔디피",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "엔디피|시카쑥하이드로딥카밍겔마스크(사용기한2026/11/17까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "78cf933d-0ea4-426e-ba4d-1df639682c29",
+      "descId": "2739487c-e7e9-4f2e-9563-8297eb647420",
+      "beforeName": "(2개선택) 마이페이브 피스 빔",
+      "afterName": "마이페이브 피스 빔",
+      "brand": "홀리카홀리카",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "홀리카홀리카|(2개선택)마이페이브피스빔",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7990ffab-fdc8-45b4-b53a-85efe347867f",
+      "descId": "35b9d49c-c4c3-4132-aed0-672789401efe",
+      "beforeName": "[단독구성] 비건라이스 밀크 팩 클렌저",
+      "afterName": "비건라이스 밀크 팩 클렌저",
+      "brand": "구달",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "구달|[단독구성]비건라이스밀크팩클렌저",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "79ead353-8d91-4a70-b756-690b7dcc7ef4",
+      "descId": "08f63c00-d762-40a1-9738-598b2659a438",
+      "beforeName": "라하 순수 필 세럼 (소비기한 2027-03-17)",
+      "afterName": "라하 순수 필 세럼",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|라하순수필세럼(소비기한2027-03-17)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7ac7a893-5b38-49ec-afcd-c72714bb7e49",
+      "descId": "8ca55b18-7cee-4acc-8a3d-6d7100ea5965",
+      "beforeName": "(3 pack) 수퍼 판테놀 리페어 마스크 (소비기한2027-07-01까지)",
+      "afterName": "(3 pack) 수퍼 판테놀 리페어 마스크",
+      "brand": "미샤",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "미샤|(3pack)수퍼판테놀리페어마스크(소비기한2027-07-01까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7ad0e77b-2b9d-4070-9a7f-1d5bf4a3eaeb",
+      "descId": "92292f8a-0c6f-40b7-8a6c-b6fda5e2d790",
+      "beforeName": "[성한빈 PICK] 레몬청 클렌저",
+      "afterName": "레몬청 클렌저",
+      "brand": "원더바스",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "원더바스|[성한빈pick]레몬청클렌저",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7aee2e31-7e0e-4e6e-94a5-7b3cded047dd",
+      "descId": "15d99bed-9d9d-4ace-9559-d8b0d83b1c92",
+      "beforeName": "[보이넥스트도어 PICK] 니치 룸스프레이 섬유향수 아티카",
+      "afterName": "니치 룸스프레이 섬유향수 아티카",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치룸스프레이섬유향수아티카",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7b910ab9-da64-4852-a914-8155e6c4b693",
+      "descId": "601c584d-89a7-46d1-ac56-90dda698d188",
+      "beforeName": "[안소희 PICK] 피디알엔 안티에이징 크림",
+      "afterName": "피디알엔 안티에이징 크림",
+      "brand": "바노바기",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "바노바기|[안소희pick]피디알엔안티에이징크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7bb78d89-2c63-4088-8744-7d3f9bc1210e",
+      "descId": "dacd830d-7a63-4efb-92e5-5348c38daa52",
+      "beforeName": "맥주효모샴푸 / 샘플 증정",
+      "afterName": "맥주효모샴푸",
+      "brand": "미친스킨",
+      "rule": "GIFT_TRAILING_DELIM",
+      "rules": [
+        "GIFT_TRAILING_DELIM"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "미친스킨|맥주효모샴푸/샘플증정",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7bfc9ae8-2cc6-48bb-8ab4-dde8c5e02e05",
+      "descId": "7a5b038e-8240-4f06-a4d6-4fb2008981dd",
+      "beforeName": "[공식몰] 크리스탈 데오드란트 라벤더 롤온",
+      "afterName": "크리스탈 데오드란트 라벤더 롤온",
+      "brand": "크리스탈",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "크리스탈|[공식몰]크리스탈데오드란트라벤더롤온",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7c0bc7dc-67dc-4c15-8533-5bf2099d3714",
+      "descId": "16d755ba-3eb0-48ca-b0aa-064a117ef217",
+      "beforeName": "[엔믹스 지우 PICK] 안개분사 아쿠아피토플렉스 크림 인 토너 무향 오일 미스트",
+      "afterName": "안개분사 아쿠아피토플렉스 크림 인 토너 무향 오일 미스트",
+      "brand": "아이레시피",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아이레시피|[엔믹스지우pick]안개분사아쿠아피토플렉스크림인토너무향오일미스트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7c43e985-dcc6-439a-b23a-cde298c37bc4",
+      "descId": "987963e2-4c7b-4172-bb55-b70ef4fda654",
+      "beforeName": "리더스 네이처 이펙트 마스크 (각 ) / 카밍 바이오틱스 앰플 증정",
+      "afterName": "리더스 네이처 이펙트 마스크 (각 )",
+      "brand": "리더스코스메틱",
+      "rule": "GIFT_TRAILING_DELIM",
+      "rules": [
+        "GIFT_TRAILING_DELIM"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "리더스코스메틱|리더스네이처이펙트마스크(각)/카밍바이오틱스앰플증정",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7c9a4c6c-d3d7-4229-81bb-9bff97e2e464",
+      "descId": "3c540d45-1756-426b-b36d-3ffcc02ec017",
+      "beforeName": "[오직무신사뷰티] [탄력 SET] 마데카크림 타이트리프팅",
+      "afterName": "[탄력 SET] 마데카크림 타이트리프팅",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][탄력set]마데카크림타이트리프팅",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7d1fe8a0-4ed0-44dd-88f3-e86d8a82340d",
+      "descId": "73251254-8790-4d58-8705-525bc126df57",
+      "beforeName": "[오직무신사뷰티] [만능세럼키트] 마데카 분말 티트리AC/콜라겐UP/비타글루C",
+      "afterName": "[만능세럼키트] 마데카 분말 티트리AC/콜라겐UP/비타글루C",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][만능세럼키트]마데카분말티트리ac/콜라겐up/비타글루c",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7d454b2c-4e92-4764-8660-81c0a5337e39",
+      "descId": "5d2c4034-3644-4683-8fdf-3a11320ade0c",
+      "beforeName": "[20개부터 구매가능] 세븐 데이즈 마스크 카렌듈라 P",
+      "afterName": "세븐 데이즈 마스크 카렌듈라 P",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[20개부터구매가능]세븐데이즈마스크카렌듈라p",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7d742bc4-655b-41b6-8bfd-75d4b2bcdc95",
+      "descId": "6118618f-2be2-47fe-971f-76704fdc4d02",
+      "beforeName": "갈락토미 멜라코어 에센스 (사용기한2027/03/11까지)",
+      "afterName": "갈락토미 멜라코어 에센스",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|갈락토미멜라코어에센스(사용기한2027/03/11까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7d9a623b-1c7e-4141-90b8-91fa46b70e67",
+      "descId": "8e36aa49-9bad-4df2-9486-6fc7d556bfed",
+      "beforeName": "히알 콤부차 티톡스 앰플 (소비기한 2027-04-07)",
+      "afterName": "히알 콤부차 티톡스 앰플",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|히알콤부차티톡스앰플(소비기한2027-04-07)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7dcbbdb1-2e86-4e01-8b46-0f1758019570",
+      "descId": "64e98136-0453-4bd3-a29d-5224417bace7",
+      "beforeName": "[2개부터 구매가능] 퍼펙트 실드 톤업 선크림",
+      "afterName": "퍼펙트 실드 톤업 선크림",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[2개부터구매가능]퍼펙트실드톤업선크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7efe0ce0-5f57-4503-9605-30dd6e94245f",
+      "descId": "01b16044-a060-452d-91d4-c704aa8ce4e9",
+      "beforeName": "[포맨]얼티밋 올인원 워터 젤 (사용기한 2027/05/16까지)",
+      "afterName": "[포맨]얼티밋 올인원 워터 젤",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|[포맨]얼티밋올인원워터젤(사용기한2027/05/16까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "7f2d7f63-1fee-4820-8bab-c362ba3730ee",
+      "descId": "f0e2bb70-120a-464d-ac40-36dcda3f034b",
+      "beforeName": "[오직무신사뷰티] [수분장벽더마 SET] 마데카크림 타임리버스 제로",
+      "afterName": "[수분장벽더마 SET] 마데카크림 타임리버스 제로",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][수분장벽더마set]마데카크림타임리버스제로",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "810ac223-2936-4235-9851-9ab2ae4b6939",
+      "descId": "e629b2cd-5408-47ea-b530-b247acc512ff",
+      "beforeName": "[오픈프로모션] 하이드로 B5 스킨 마그넷 마스크",
+      "afterName": "하이드로 B5 스킨 마그넷 마스크",
+      "brand": "닥터나인틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "닥터나인틴|[오픈프로모션]하이드로b5스킨마그넷마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "81f59eb2-3018-41ac-8a97-d58d9a68fe52",
+      "descId": "e1aa89c9-691e-4995-a4bb-5c38ab04e339",
+      "beforeName": "[오직 무신사 뷰티] 두피/바디 쿨링",
+      "afterName": "두피/바디 쿨링",
+      "brand": "아로마티카",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아로마티카|[오직무신사뷰티]두피/바디쿨링",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "8205250e-d434-466d-ab4e-b746056047ab",
+      "descId": "6f6d467b-068c-4cad-acf2-fa456759b204",
+      "beforeName": "[성한빈 PICK] 슈퍼 베지톡스 클렌저 그린",
+      "afterName": "슈퍼 베지톡스 클렌저 그린",
+      "brand": "원더바스",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "원더바스|[성한빈pick]슈퍼베지톡스클렌저그린",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "840006f8-6520-46d9-be71-35764ecbcaf1",
+      "descId": "6652a031-d794-41ca-85e9-72a1002b79da",
+      "beforeName": "딥 포어 소다팩 (사용기한 2027/02/04 까지)",
+      "afterName": "딥 포어 소다팩",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|딥포어소다팩(사용기한2027/02/04까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "841ab58d-47b5-4b1d-8a94-ab78c02097a3",
+      "descId": "76761f68-b8bc-4341-be87-af83cf160a2a",
+      "beforeName": "[단독 구성] 트루톤 로션 2 SET",
+      "afterName": "트루톤 로션 2 SET",
+      "brand": "비레디",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비레디|[단독구성]트루톤로션2set",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "85d3aad1-b8aa-4e36-8c66-e0a1fb15c7c3",
+      "descId": "c840b838-3ea2-460c-91c6-001e86f7c55a",
+      "beforeName": "[옵션선택] 밀도케어 트리트먼트",
+      "afterName": "밀도케어 트리트먼트",
+      "brand": "닥터그루트",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "닥터그루트|[옵션선택]밀도케어트리트먼트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "86e6df80-6398-4113-ae87-c109946af0ab",
+      "descId": "e851c8d6-a501-4e76-ab29-7eaab88fd2f7",
+      "beforeName": "[2개부터 구매가능] 마이결핏 틴트 아이브로우",
+      "afterName": "마이결핏 틴트 아이브로우",
+      "brand": "맥퀸뉴욕",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "맥퀸뉴욕|[2개부터구매가능]마이결핏틴트아이브로우",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "8792c176-033f-47b8-a26a-bce324d1977b",
+      "descId": "888ba8ca-585e-48d4-b074-09d856845425",
+      "beforeName": "[오무뷰] 맨즈뷰티 )",
+      "afterName": "[오무뷰] 맨즈뷰티",
+      "brand": "그라펜",
+      "rule": "STRAY_TRAILING_CLOSE+WHITESPACE",
+      "rules": [
+        "STRAY_TRAILING_CLOSE",
+        "WHITESPACE"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "그라펜|[오무뷰]맨즈뷰티)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "880a08d9-ee1f-44f2-91f8-c3188f5bd826",
+      "descId": "d1486e64-a222-4a28-ac92-b44b77f0454a",
+      "beforeName": "비피다 바이옴 컨센트레이트 세럼 (사용기한 27.03.28까지)",
+      "afterName": "비피다 바이옴 컨센트레이트 세럼",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|비피다바이옴컨센트레이트세럼(사용기한27.03.28까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "8975b0ec-2e19-4e45-95d1-4b53076c7bde",
+      "descId": "381a092e-19af-4ce2-bf94-21780ea489fd",
+      "beforeName": "[오픈프로모션] 레디알엔 스킨 마그넷 마스크",
+      "afterName": "레디알엔 스킨 마그넷 마스크",
+      "brand": "닥터나인틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "닥터나인틴|[오픈프로모션]레디알엔스킨마그넷마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "8a3eac54-7d3a-4c77-8957-9c38ba6c1da6",
+      "descId": "7083c0db-c38d-4a0c-9822-13f883337db0",
+      "beforeName": "[2개선택] 서울야경 도깨비불",
+      "afterName": "서울야경 도깨비불",
+      "brand": "태오앤더",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "태오앤더|[2개선택]서울야경도깨비불",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "8bef43ba-ced9-477c-a995-d473c3ff1ee2",
+      "descId": "4541f50d-f873-4a5b-95bc-8fa745377ced",
+      "beforeName": "[희재 PICK] [ 구성] 타임 블러쉬",
+      "afterName": "[ 구성] 타임 블러쉬",
+      "brand": "센슬",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센슬|[희재pick][구성]타임블러쉬",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "8c311d99-ab69-49a8-a51e-1ce403cd58ce",
+      "descId": "43c43a91-dd30-4694-84c0-de9978e516c1",
+      "beforeName": "체리 펑크 엑스뜨레 드 퍼퓸",
+      "afterName": "체리 펑크 엑스뜨레 드 퍼퓸",
+      "brand": "룸 1015",
+      "rule": "ZERO_WIDTH",
+      "rules": [
+        "ZERO_WIDTH"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "룸1015|체리펑크엑스뜨레드퍼퓸",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "8cbc976b-e1ee-4081-9506-b611bafc800f",
+      "descId": "636b7432-c398-4c33-a082-8f06c89ae8c3",
+      "beforeName": "히알루론산 물톡스 물빛 광채 선 세럼 (소비기한 2026-11-19)",
+      "afterName": "히알루론산 물톡스 물빛 광채 선 세럼",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|히알루론산물톡스물빛광채선세럼(소비기한2026-11-19)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "8f32e06b-7542-4226-8943-d56e4fa3f43b",
+      "descId": "28792b96-c4a4-4d9c-b6dc-329f130a3cc0",
+      "beforeName": "[보이넥스트도어 PICK] 아티카 오 드 퍼퓸 EDP",
+      "afterName": "아티카 오 드 퍼퓸 EDP",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]아티카오드퍼퓸edp",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "8f5ce768-91eb-4784-92ff-3a2f7fd22884",
+      "descId": "fe7aa931-fd34-44c7-ae86-64d539110e42",
+      "beforeName": "[RIIZE 원빈 PICK] 블러 픽셀 쿠션",
+      "afterName": "블러 픽셀 쿠션",
+      "brand": "이더앤",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "이더앤|[riize원빈pick]블러픽셀쿠션",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "8fe9b3e6-3fde-428f-8752-90615632c759",
+      "descId": "30ae268e-988a-44b4-ada7-5156a04d23b3",
+      "beforeName": "[운학 PICK] 콜린 오 드 퍼퓸 EDP",
+      "afterName": "콜린 오 드 퍼퓸 EDP",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[운학pick]콜린오드퍼퓸edp",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "8ff74a82-f2f6-4745-915f-d3b624802f83",
+      "descId": "8a808dae-e20b-40c1-9da1-8c082054b20d",
+      "beforeName": "[변우석 PICK] 데일리 슬림 퀵 헤어라인 쿠션",
+      "afterName": "데일리 슬림 퀵 헤어라인 쿠션",
+      "brand": "다슈",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "다슈|[변우석pick]데일리슬림퀵헤어라인쿠션",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "91e532db-142f-4d6b-95c6-fc7f3c78b2bf",
+      "descId": "eab44704-78ea-402c-9fc8-4f53ba72f7c2",
+      "beforeName": "컨실러펜슬 미니 증정 에코 소울 파워프루프 초슬림 아이라이너",
+      "afterName": "에코 소울 파워프루프 초슬림 아이라이너",
+      "brand": "더샘",
+      "rule": "GIFT_LEADING",
+      "rules": [
+        "GIFT_LEADING"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "더샘|컨실러펜슬미니증정에코소울파워프루프초슬림아이라이너",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "9280a63c-6f5c-4c4b-9cc6-220d8a46b905",
+      "descId": "a5219e74-615c-415f-9f63-8a91462bb9be",
+      "beforeName": "[오픈프로모션 ]멜라타티온 스킨 마그넷 마스크",
+      "afterName": "멜라타티온 스킨 마그넷 마스크",
+      "brand": "닥터나인틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "닥터나인틴|[오픈프로모션]멜라타티온스킨마그넷마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "92dfddd5-5481-4820-8e9f-f09cf394728e",
+      "descId": "a090e43c-15c1-4a98-b255-8396e012ca6b",
+      "beforeName": "[무신사단독] 시그니처 매트쿠션&스파츌라",
+      "afterName": "시그니처 매트쿠션&스파츌라",
+      "brand": "브루케시아",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "브루케시아|[무신사단독]시그니처매트쿠션&스파츌라",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "93596d54-99f8-446d-b703-0d003e0be94d",
+      "descId": "f3339cce-a651-4082-9808-da69a486b521",
+      "beforeName": "[옵션선택] 샴푸하듯 10분 간편염색 80G",
+      "afterName": "샴푸하듯 10분 간편염색 80G",
+      "brand": "엘라스틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "엘라스틴|[옵션선택]샴푸하듯10분간편염색80g",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "93cf8472-d8cf-475a-9cc7-1308a128bbd1",
+      "descId": "c9104615-999f-44b5-9734-c5f77fa8c0e0",
+      "beforeName": "[화지 PICK] 포켓 블러쉬",
+      "afterName": "포켓 블러쉬",
+      "brand": "블룸타이드",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "블룸타이드|[화지pick]포켓블러쉬",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "96865651-5c5a-4f55-9596-22e1eb5cf396",
+      "descId": "b3fb6691-5f72-4000-8ac0-0511f02d7784",
+      "beforeName": "[무신사 단독] 라이스 토너 패드",
+      "afterName": "라이스 토너 패드",
+      "brand": "아임프롬",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아임프롬|[무신사단독]라이스토너패드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "969c2e3a-5e8a-4968-9e9d-93a02442499e",
+      "descId": "6015289f-d90c-43ae-b690-27f12518a5a6",
+      "beforeName": "어성초 클리어 스팟 젤 (소비기한 2027-03-07)",
+      "afterName": "어성초 클리어 스팟 젤",
+      "brand": "원씽",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "원씽|어성초클리어스팟젤(소비기한2027-03-07)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "98a26bfe-d43d-4953-97b2-cbbcd083166e",
+      "descId": "ae33b35f-5a0a-4f39-a86d-d4e1d4913c32",
+      "beforeName": "[2개부터 구매가능] 트리플 시카 카밍 패드 65pads",
+      "afterName": "트리플 시카 카밍 패드 65pads",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[2개부터구매가능]트리플시카카밍패드65pads",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "98ddeb19-7e1d-42f8-a09b-f6c4c617f7af",
+      "descId": "05f0face-c666-4797-99d6-22908af4dafb",
+      "beforeName": "[5개부터 구매가능] 엑스퍼트 비타 엑소좀 콜라겐 하이드로 겔 마스크",
+      "afterName": "엑스퍼트 비타 엑소좀 콜라겐 하이드로 겔 마스크",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[5개부터구매가능]엑스퍼트비타엑소좀콜라겐하이드로겔마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "99cb7acd-c2ca-4d78-a66f-4be54c6694bb",
+      "descId": "6032e9a3-5da0-4c76-8a5c-66b724f7ad4e",
+      "beforeName": "더모 PDRN 스킨케어 (",
+      "afterName": "더모 PDRN 스킨케어",
+      "brand": "아이스트",
+      "rule": "STRAY_TRAILING_OPEN",
+      "rules": [
+        "STRAY_TRAILING_OPEN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아이스트|더모pdrn스킨케어(",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "9af13fef-e0fc-4c79-8842-3a5c7b5ce5ea",
+      "descId": "7e4b4d68-d6ff-426a-a0fc-d6097b4ccb70",
+      "beforeName": "마이크로 히알루로닉 에센스 마스크 (사용기한 2027/03/28까지)",
+      "afterName": "마이크로 히알루로닉 에센스 마스크",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|마이크로히알루로닉에센스마스크(사용기한2027/03/28까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "9bf0fc01-1f8d-4d7d-9384-414c2c0b3f3a",
+      "descId": "a00af54a-4884-470d-b6cf-b0c383e10291",
+      "beforeName": "[단독구성]2%판테놀 약알칼리성 폼클렌저 + 세라마이드 약산성 폼클렌저",
+      "afterName": "2%판테놀 약알칼리성 폼클렌저 + 세라마이드 약산성 폼클렌저",
+      "brand": "레이어랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "레이어랩|[단독구성]2%판테놀약알칼리성폼클렌저+세라마이드약산성폼클렌저",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "9cbb9e80-3f69-49e4-9976-00473b61b6df",
+      "descId": "6f50a251-e4bb-4b13-b606-cc4a6812d3fe",
+      "beforeName": "[오직무신사뷰티] [흔적토닝] 멜라캡처 앰플패드",
+      "afterName": "[흔적토닝] 멜라캡처 앰플패드",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][흔적토닝]멜라캡처앰플패드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "9e30e349-84c2-4146-9f66-dd7059590233",
+      "descId": "672ec435-250e-4804-a985-57e2d6bf9d4b",
+      "beforeName": "[단독 구성] 블루쿠션 2 SET",
+      "afterName": "블루쿠션 2 SET",
+      "brand": "비레디",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비레디|[단독구성]블루쿠션2set",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "9e58c315-7d0d-4a3f-97b3-19b7b0be08f3",
+      "descId": "50a33455-8a1a-44e2-8da4-0c6afc82f44e",
+      "beforeName": "(2개선택) 마이페이브 피스 아이섀도우/피스 밤",
+      "afterName": "마이페이브 피스 아이섀도우/피스 밤",
+      "brand": "홀리카홀리카",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "홀리카홀리카|(2개선택)마이페이브피스아이섀도우/피스밤",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "9f7c2440-9bef-44f6-b9cb-d70588612a9d",
+      "descId": "9d73384a-2c36-4f69-b2ae-238001e95617",
+      "beforeName": "[2개선택] 리빙 디퓨저 탈취제(겔타입)",
+      "afterName": "리빙 디퓨저 탈취제(겔타입)",
+      "brand": "더블유드레스룸",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "더블유드레스룸|[2개선택]리빙디퓨저탈취제(겔타입)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "9fdee9a5-3fb8-4c05-91c3-1152cb4efea6",
+      "descId": "7fb8004c-f82f-4958-a084-1aa820422181",
+      "beforeName": "[오직무신사뷰티] 스킨발란싱",
+      "afterName": "스킨발란싱",
+      "brand": "폴라초이스",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "폴라초이스|[오직무신사뷰티]스킨발란싱",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "a0b615f0-c7f9-446c-862e-cd58b9799591",
+      "descId": "ecc854a2-9be3-4e58-b613-85ff661f00cb",
+      "beforeName": "[2개부터 구매가능] 히알루론산 밸런싱 세럼",
+      "afterName": "히알루론산 밸런싱 세럼",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[2개부터구매가능]히알루론산밸런싱세럼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "a1d17908-9bc3-4fe1-9044-d0ae20674641",
+      "descId": "4728f6e4-6aa8-4e27-8f1a-2525767970b6",
+      "beforeName": "[지요미 PICK] [17cm] 뮤신 콜라겐 PDRN 텐션 핏 패드",
+      "afterName": "[17cm] 뮤신 콜라겐 PDRN 텐션 핏 패드",
+      "brand": "클리어디어",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "클리어디어|[지요미pick][17cm]뮤신콜라겐pdrn텐션핏패드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "a3ccbfef-cfbf-4763-a814-d39a29dbc8ad",
+      "descId": "8b3819aa-9c45-4557-8fb5-6f07ac61996e",
+      "beforeName": "[2개부터 구매가능] 세븐데이즈 비타민 미스트",
+      "afterName": "세븐데이즈 비타민 미스트",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[2개부터구매가능]세븐데이즈비타민미스트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "a46c5fc5-4aa7-4d6c-b270-6c940738d02e",
+      "descId": "7609b01c-84d2-4e14-8542-f20474a547f4",
+      "beforeName": "[3개부터 구매가능] 스무스 앤 퓨어 딥 클린 클렌징 폼",
+      "afterName": "스무스 앤 퓨어 딥 클린 클렌징 폼",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[3개부터구매가능]스무스앤퓨어딥클린클렌징폼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "a4989392-b9b2-45bb-bb31-985883dcded8",
+      "descId": "2aec78b1-9a9a-4970-87f7-2ef0d6d0046d",
+      "beforeName": "(10 pack) 수퍼 판테놀 리페어 마스크 (소비기한2027-07-01까지)",
+      "afterName": "(10 pack) 수퍼 판테놀 리페어 마스크",
+      "brand": "미샤",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "미샤|(10pack)수퍼판테놀리페어마스크(소비기한2027-07-01까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "a4d4ce93-b16f-46cd-8223-f94bf1a215b4",
+      "descId": "f2ec6fcf-7aaf-4a5b-848f-14ac691f5bf3",
+      "beforeName": "[김재원 PICK] 아티초크 카밍케어 수딩크림",
+      "afterName": "아티초크 카밍케어 수딩크림",
+      "brand": "몰바니",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "몰바니|[김재원pick]아티초크카밍케어수딩크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "a55cdf7b-0423-4b24-9b97-07121f0a014d",
+      "descId": "b9075bfd-2ecd-425d-a2c2-0e2b5724582c",
+      "beforeName": "[엔믹스 지우 PICK] 아쿠아피토플렉스 크림 인 토너 안개분사 오일 미스트",
+      "afterName": "아쿠아피토플렉스 크림 인 토너 안개분사 오일 미스트",
+      "brand": "아이레시피",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아이레시피|[엔믹스지우pick]아쿠아피토플렉스크림인토너안개분사오일미스트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "a57aa56a-c676-4c3b-be44-ffdd74b28bb1",
+      "descId": "d3a389a9-1ae7-48b5-8795-13fd5bbd3015",
+      "beforeName": "[보이넥스트도어 PICK] 니치 룸스프레이 섬유향수 에끌로에",
+      "afterName": "니치 룸스프레이 섬유향수 에끌로에",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치룸스프레이섬유향수에끌로에",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "a57c0ef3-434c-4bd5-82fb-7e5cc9b1193d",
+      "descId": "585fa88c-0ead-4ab3-9e6a-e0bc34b4e6ce",
+      "beforeName": "플로럴&프룻 글로우 오일 미스트 (사용기한 2027/03/19까지)",
+      "afterName": "플로럴&프룻 글로우 오일 미스트",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|플로럴&프룻글로우오일미스트(사용기한2027/03/19까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "a99caa40-7b5f-46fb-a7d6-56c52d4dd9d9",
+      "descId": "fd1bd5f4-3c28-408f-ba25-b36c18ae8c1d",
+      "beforeName": "[무신사 단독 선론칭] 에어버블 올케어 세럼 마스크 MARK5",
+      "afterName": "에어버블 올케어 세럼 마스크 MARK5",
+      "brand": "기어 바이 가쉬",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "기어바이가쉬|[무신사단독선론칭]에어버블올케어세럼마스크mark5",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "aa753732-4f3b-4659-906a-acf2bc96eda1",
+      "descId": "234c1468-dd0a-4fda-b236-9b27d3cd182f",
+      "beforeName": "[무신사 단독] 라이스 휩 페이셜 클렌저",
+      "afterName": "라이스 휩 페이셜 클렌저",
+      "brand": "아임프롬",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아임프롬|[무신사단독]라이스휩페이셜클렌저",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ac358a90-0c33-4cef-b5a2-b19d6dac9bbe",
+      "descId": "b6c3a5a1-13e0-4163-87fc-0913b30c14ff",
+      "beforeName": "[옵션선택] 퓨어더마 마일드 바디로션",
+      "afterName": "퓨어더마 마일드 바디로션",
+      "brand": "온더바디",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "온더바디|[옵션선택]퓨어더마마일드바디로션",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ad11ee39-f138-4e8d-ba53-53751b63b193",
+      "descId": "4c988a6c-7ce9-44a3-801b-8a2296124937",
+      "beforeName": "[5개부터 구매가능] 엑스퍼트 그린 세라 콜라겐 겔 마스크",
+      "afterName": "엑스퍼트 그린 세라 콜라겐 겔 마스크",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[5개부터구매가능]엑스퍼트그린세라콜라겐겔마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ad9bbae8-a3c0-4426-8ac9-448d999c66ac",
+      "descId": "6aa8a1f5-a063-4d80-b06f-3e1538e71697",
+      "beforeName": "[3개부터 구매가능] 히알루론산 밸런싱 토너",
+      "afterName": "히알루론산 밸런싱 토너",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[3개부터구매가능]히알루론산밸런싱토너",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "af04399a-128b-4a25-a22e-1f34d19d1954",
+      "descId": "cb0f2a83-ad8e-424d-89b8-cdb396c9cb3a",
+      "beforeName": "[3개부터 구매가능] 너리싱 립 에센스",
+      "afterName": "너리싱 립 에센스",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[3개부터구매가능]너리싱립에센스",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "af6d3ef1-0e91-4217-baef-3d013c3ffdad",
+      "descId": "cc92ef3c-ca26-4d5f-9b97-bc15744fc16e",
+      "beforeName": "[안소희 PICK] 4디펜스 매트핏 선스틱 SPF 50",
+      "afterName": "4디펜스 매트핏 선스틱 SPF 50",
+      "brand": "바노바기",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "바노바기|[안소희pick]4디펜스매트핏선스틱spf50",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "afa844ae-d5ae-48b1-a50b-3a620a24d4fc",
+      "descId": "ac7b6e3e-7de2-4d7a-8641-2615a0b2f5f1",
+      "beforeName": "[5개부터 구매가능] 스트레스 릴리빙 데일리 픽 토닝 패드",
+      "afterName": "스트레스 릴리빙 데일리 픽 토닝 패드",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[5개부터구매가능]스트레스릴리빙데일리픽토닝패드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b04f93af-f78e-42b1-b5d3-68e79cac701e",
+      "descId": "63718fed-9526-4a10-9920-422b5bad82ea",
+      "beforeName": "[2개부터 구매가능] 마이스트롱 오토 아이브로우",
+      "afterName": "마이스트롱 오토 아이브로우",
+      "brand": "맥퀸뉴욕",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "맥퀸뉴욕|[2개부터구매가능]마이스트롱오토아이브로우",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b051650a-a67e-46f5-af19-42d1cda9d104",
+      "descId": "ff71603f-a2e9-4f62-abed-d0f2f37bc812",
+      "beforeName": "비피다 바이옴 앰플 토너 x (사용기한 27.06.20까지)",
+      "afterName": "비피다 바이옴 앰플 토너 x",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|비피다바이옴앰플토너x(사용기한27.06.20까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b0bc0851-43ee-4354-8456-06cfdf9bb98b",
+      "descId": "75743780-c52f-4fae-b06e-9131e3ed845a",
+      "beforeName": "[화지 PICK] 막걸리 팔레트",
+      "afterName": "막걸리 팔레트",
+      "brand": "블룸타이드",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "블룸타이드|[화지pick]막걸리팔레트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b11959d4-643d-4a9b-b9de-6d477d9a29c3",
+      "descId": "eb50aa7e-ca45-437f-8e7f-3bf6402e2ee0",
+      "beforeName": "[보이넥스트도어 PICK] 니치퍼퓸 핸드크림 콜린",
+      "afterName": "니치퍼퓸 핸드크림 콜린",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치퍼퓸핸드크림콜린",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b21b9e10-1bd6-44ac-b890-8f6dc49e4a00",
+      "descId": "1b629f32-cce7-47e4-bad8-fbf0e72f21cf",
+      "beforeName": "[BEST] 브라이트닝 그루밍",
+      "afterName": "브라이트닝 그루밍",
+      "brand": "브리올옴므",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "브리올옴므|[best]브라이트닝그루밍",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b2d39b64-c111-423d-84a3-f3fef9570eb8",
+      "descId": "a348f2b6-4191-4ca3-809a-b751819d89bd",
+      "beforeName": "[화지 PICK] 플레쉬 립 글로스",
+      "afterName": "플레쉬 립 글로스",
+      "brand": "블룸타이드",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "블룸타이드|[화지pick]플레쉬립글로스",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b2f24fee-19b6-4897-add0-77a25c7db34f",
+      "descId": "5ee4b572-90de-4499-ae89-cc3abf11fa41",
+      "beforeName": "비피다 바이옴 앰플 패드 x (사용기한 2027.07.16까지)",
+      "afterName": "비피다 바이옴 앰플 패드 x",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|비피다바이옴앰플패드x(사용기한2027.07.16까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b37296d7-ce3b-44b8-ad44-d3f76b86b1ae",
+      "descId": "f9e5c844-e9c5-497e-b6b6-384c1b88dbe6",
+      "beforeName": "[오직무신사뷰티] [보습탄력SET] 마데카 더마마스크 인텐시브리프팅 포뮬러",
+      "afterName": "[보습탄력SET] 마데카 더마마스크 인텐시브리프팅 포뮬러",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][보습탄력set]마데카더마마스크인텐시브리프팅포뮬러",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b40fec12-38c9-4142-bdb1-c94c1d5f3e6a",
+      "descId": "33805a6a-f637-44a7-bfb1-b129935699c5",
+      "beforeName": "[2개부터 구매가능] 트리플 시카 카밍 세럼",
+      "afterName": "트리플 시카 카밍 세럼",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[2개부터구매가능]트리플시카카밍세럼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b45162fd-c13c-4e91-81ed-2d757fee42c9",
+      "descId": "26020ad9-b717-44b1-8b3c-219e5853b34c",
+      "beforeName": "[오직무신사뷰티] [잡티토닝 SET] 마데카크림 파워부스팅 포물러 AD",
+      "afterName": "[잡티토닝 SET] 마데카크림 파워부스팅 포물러 AD",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][잡티토닝set]마데카크림파워부스팅포물러ad",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b5393dc4-d7a6-42fd-9aea-1a4c48e49b4e",
+      "descId": "228d7a00-429b-4f52-95a8-e418127eda14",
+      "beforeName": "(2개선택) 마이페이브 피스 아이섀도우/젤테일",
+      "afterName": "마이페이브 피스 아이섀도우/젤테일",
+      "brand": "홀리카홀리카",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "홀리카홀리카|(2개선택)마이페이브피스아이섀도우/젤테일",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b61701c2-11e6-4034-bdb5-84b55040f171",
+      "descId": "f46ea21a-ac88-4b70-9609-18cae5ae159f",
+      "beforeName": "[사용기한] 블레미쉬 케어 업 세럼 스페셜키트 / 사용기한 2026-09-11",
+      "afterName": "블레미쉬 케어 업 세럼 스페셜키트 / 사용기한 2026-09-11",
+      "brand": "아이소이",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아이소이|[사용기한]블레미쉬케어업세럼스페셜키트/사용기한2026-09-11",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b646a466-5a36-41e8-b192-db6ca1a3466f",
+      "descId": "1a9a80de-cb49-4d6c-a6d1-1e5188b02935",
+      "beforeName": "[리우 PICK] 도쿄레이 오 드 퍼퓸 EDP",
+      "afterName": "도쿄레이 오 드 퍼퓸 EDP",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[리우pick]도쿄레이오드퍼퓸edp",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b6567223-f783-467b-9b8f-ea404f02abd6",
+      "descId": "419da1bb-1cdb-40da-aa78-c4889f9c6850",
+      "beforeName": "[5개부터 구매가능] 에어리 밀착 시트마스크",
+      "afterName": "에어리 밀착 시트마스크",
+      "brand": "미샤",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "미샤|[5개부터구매가능]에어리밀착시트마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b659f335-c9a4-4d9f-9b7a-dad01299d02c",
+      "descId": "1c2939cf-5a32-4255-9e0b-31079510544c",
+      "beforeName": "[선런칭] PDRN 세라마이드 스쿠알란 캡슐 젤 크림",
+      "afterName": "PDRN 세라마이드 스쿠알란 캡슐 젤 크림",
+      "brand": "에센시엘",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "에센시엘|[선런칭]pdrn세라마이드스쿠알란캡슐젤크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b67102fb-a2d5-44d2-b143-0fa4ba4392da",
+      "descId": "217295be-635e-4ac2-92a9-44ee2e38dc3b",
+      "beforeName": "[옵션선택] 아이스 쿨링 빙하수 바디워시 x (레몬민트향/페퍼민트향)",
+      "afterName": "아이스 쿨링 빙하수 바디워시 x (레몬민트향/페퍼민트향)",
+      "brand": "온더바디",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "온더바디|[옵션선택]아이스쿨링빙하수바디워시x(레몬민트향/페퍼민트향)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b7d6063b-4c02-441e-915a-899c9e48725f",
+      "descId": "2a90155a-ead5-4679-bd0c-54148cf98bd8",
+      "beforeName": "[2개부터 구매가능] 퍼펙트 실드 밸런싱 선크림",
+      "afterName": "퍼펙트 실드 밸런싱 선크림",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[2개부터구매가능]퍼펙트실드밸런싱선크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b804d786-5d11-4f2b-b84c-ac3b859da8d7",
+      "descId": "acb269be-084d-4f47-a660-7808536d1a14",
+      "beforeName": "[선물포장] 니어바이 바디 케어",
+      "afterName": "니어바이 바디 케어",
+      "brand": "허스텔러",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "허스텔러|[선물포장]니어바이바디케어",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b8c629fc-b823-4ac3-8e42-b5becda7bedd",
+      "descId": "0695ca1a-d0eb-4203-8950-973a6854737a",
+      "beforeName": "[8개부터 구매가능] 스무스 앤 퓨어 코튼 쿨링 데오 티슈",
+      "afterName": "스무스 앤 퓨어 코튼 쿨링 데오 티슈",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[8개부터구매가능]스무스앤퓨어코튼쿨링데오티슈",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "b96a6785-319c-40eb-a35c-fb32bd98b7bd",
+      "descId": "4e72d396-2283-40d1-be63-0811e005418a",
+      "beforeName": "[오직무신사뷰티] [고강도탄력 SET] 마데카크림 에이징 포커스",
+      "afterName": "[고강도탄력 SET] 마데카크림 에이징 포커스",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][고강도탄력set]마데카크림에이징포커스",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ba5da21c-b6a7-48b0-ab12-781f82380444",
+      "descId": "7ad35caf-9d47-4f9d-8e02-1dd9c5776917",
+      "beforeName": "[오픈프로모션] 포어엑스좀 비타아하 듀얼 이펙트 클렌저 + 하이드로 마스크팩",
+      "afterName": "포어엑스좀 비타아하 듀얼 이펙트 클렌저 + 하이드로 마스크팩",
+      "brand": "닥터나인틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "닥터나인틴|[오픈프로모션]포어엑스좀비타아하듀얼이펙트클렌저+하이드로마스크팩",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "bbfa7808-cc2a-4ed6-8858-0feb11f0eabb",
+      "descId": "5bdc4f04-2f7c-40ab-9067-7dd74d78a7d6",
+      "beforeName": "[8개부터 구매가능] 콜라겐 피디알엔 래디언스 하이드로겔 마스크",
+      "afterName": "콜라겐 피디알엔 래디언스 하이드로겔 마스크",
+      "brand": "글로우풀",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "글로우풀|[8개부터구매가능]콜라겐피디알엔래디언스하이드로겔마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "bce15561-f1ad-4abc-b4b2-472558684c38",
+      "descId": "fb81dda4-2638-4f38-8b91-59673e2e96ab",
+      "beforeName": "[옵션선택] 46cm 체취솔루션 데오드란트 스프레이",
+      "afterName": "46cm 체취솔루션 데오드란트 스프레이",
+      "brand": "온더바디",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "온더바디|[옵션선택]46cm체취솔루션데오드란트스프레이",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "bd175a89-f7a2-4275-b310-93cd1586c83f",
+      "descId": "b8025e91-3c89-4378-a1b0-c1092c445216",
+      "beforeName": "떼르말(온천수) 워터 모이스처라이징 크림 (사용기한 2027/04/07까지)",
+      "afterName": "떼르말(온천수) 워터 모이스처라이징 크림",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|떼르말(온천수)워터모이스처라이징크림(사용기한2027/04/07까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "bd2aaa9c-5c08-433b-aba1-b01a6a72832f",
+      "descId": "8d55f86d-11d0-4754-8080-6e821fd2b475",
+      "beforeName": "[보이넥스트도어 PICK] 니치 룸스프레이 섬유향수 콜린",
+      "afterName": "니치 룸스프레이 섬유향수 콜린",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치룸스프레이섬유향수콜린",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "bd5c3c99-18fe-4563-9e5a-68a971f5a7a2",
+      "descId": "e946967d-b088-4c96-af45-5147e436a39c",
+      "beforeName": "[AD] 커버리셔스 얼티밋 화이트 쿠션 퍼프 (5P)",
+      "afterName": "커버리셔스 얼티밋 화이트 쿠션 퍼프 (5P)",
+      "brand": "바닐라코",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "바닐라코|[ad]커버리셔스얼티밋화이트쿠션퍼프(5p)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "bd79b02a-46f2-4120-8fb7-5c9daea808d4",
+      "descId": "654e1444-de55-4cb8-9886-842f8fb1144c",
+      "beforeName": "[선물포장] 1025 독도 데일리 저자극",
+      "afterName": "1025 독도 데일리 저자극",
+      "brand": "라운드랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "라운드랩|[선물포장]1025독도데일리저자극",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "bf101f6d-09b8-4f03-8bae-3932e4d628e8",
+      "descId": "70264fc1-892d-46db-a68a-cb2c5b036482",
+      "beforeName": "[단독런칭]레디톡스 젤 투 워터 클렌저 & 마이크로 폼 클렌저",
+      "afterName": "레디톡스 젤 투 워터 클렌저 & 마이크로 폼 클렌저",
+      "brand": "라곰",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "라곰|[단독런칭]레디톡스젤투워터클렌저&마이크로폼클렌저",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "bf7590ce-7756-488d-a19b-81b40971314d",
+      "descId": "410c5367-8907-4bdf-8e4a-27c7f37a3976",
+      "beforeName": "[단독구성] BEST",
+      "afterName": "BEST",
+      "brand": "레이어랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "레이어랩|[단독구성]best",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c0027ffe-b755-4508-87df-e4db613266fb",
+      "descId": "7aec774f-93f2-4116-8c1a-cd4aa4f3b022",
+      "beforeName": "[노윤서 Pick]스킨 퍼펙팅 글로우 프렙 패드3pads",
+      "afterName": "스킨 퍼펙팅 글로우 프렙 패드3pads",
+      "brand": "연작",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "연작|[노윤서pick]스킨퍼펙팅글로우프렙패드3pads",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c08eaec8-9370-4ce4-8ef9-017f5dcd85f7",
+      "descId": "520d9d2c-9360-4448-8dce-5b9acea928d7",
+      "beforeName": "[보이넥스트도어 PICK] 니치 룸스프레이 섬유향수 오디너리",
+      "afterName": "니치 룸스프레이 섬유향수 오디너리",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치룸스프레이섬유향수오디너리",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c0ea1a59-ffb6-4dc6-bab1-e54628126b89",
+      "descId": "a758b0a3-7476-4036-8d7a-e6b617535307",
+      "beforeName": "(2개선택) 꿀피부 슬리핑팩",
+      "afterName": "꿀피부 슬리핑팩",
+      "brand": "홀리카홀리카",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "홀리카홀리카|(2개선택)꿀피부슬리핑팩",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c0ebcda2-ae90-4129-a7fc-92e20cb9e6a6",
+      "descId": "070a2d85-c181-4e92-86b6-322513f5d53c",
+      "beforeName": "[엔믹스 지우 PICK] 아이레시피 X 리틀트윈스타 글로이 스킨 레시피 북",
+      "afterName": "아이레시피 X 리틀트윈스타 글로이 스킨 레시피 북",
+      "brand": "아이레시피",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아이레시피|[엔믹스지우pick]아이레시피x리틀트윈스타글로이스킨레시피북",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c16f2258-82be-45fd-aa22-773519f492a0",
+      "descId": "ca6390bb-f564-4e48-82fb-2628151e76aa",
+      "beforeName": "스페셜 케어 )",
+      "afterName": "스페셜 케어",
+      "brand": "아토팜",
+      "rule": "STRAY_TRAILING_CLOSE+WHITESPACE",
+      "rules": [
+        "STRAY_TRAILING_CLOSE",
+        "WHITESPACE"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아토팜|스페셜케어)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c2130ed7-665c-40c9-a745-580ac63e3a7a",
+      "descId": "360241a0-1fae-4317-9760-4c0b3d90b907",
+      "beforeName": "[보이넥스트도어 PICK] 니치퍼퓸 핸드크림 월넛크릭그린",
+      "afterName": "니치퍼퓸 핸드크림 월넛크릭그린",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치퍼퓸핸드크림월넛크릭그린",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c245b2b7-2140-4268-9e31-429edbcdfce1",
+      "descId": "0c85754d-9527-43b6-b796-6da655ab8276",
+      "beforeName": "떼르말(온천수) 워터 모이스처라이징 스킨 (사용기한 2027/03/28까지)",
+      "afterName": "떼르말(온천수) 워터 모이스처라이징 스킨",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|떼르말(온천수)워터모이스처라이징스킨(사용기한2027/03/28까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c2a1a007-a90e-4e62-9804-ae8db930e2fe",
+      "descId": "ce35f53a-7336-4611-9f96-7f83251ef3ed",
+      "beforeName": "[보이넥스트도어 PICK] 헤어 바디 퍼퓸 미스트 러비앙",
+      "afterName": "헤어 바디 퍼퓸 미스트 러비앙",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]헤어바디퍼퓸미스트러비앙",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c2a56dc2-288c-48a1-91d9-4e84798a9fdf",
+      "descId": "8d4740b3-aa91-4b92-9cf4-acc8c661b8c3",
+      "beforeName": "[소량 재입고] 프로 아이팔레트 26AD",
+      "afterName": "프로 아이팔레트 26AD",
+      "brand": "클리오",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "클리오|[소량재입고]프로아이팔레트26ad",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c2be58d4-236b-4aeb-8d63-f2e241e7a2df",
+      "descId": "f22d3122-c5b2-491a-ad39-ea331228bf2e",
+      "beforeName": "[보이넥스트도어 PICK] 니치퍼퓸 핸드크림 뉴욕인틸리",
+      "afterName": "니치퍼퓸 핸드크림 뉴욕인틸리",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치퍼퓸핸드크림뉴욕인틸리",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c354d61e-acf1-45d9-8479-2f80d532aa96",
+      "descId": "402355a7-6a1d-42b4-82ba-24c40efd54c0",
+      "beforeName": "[2개부터 구매가능] 헤드스파 두피 팅처",
+      "afterName": "헤드스파 두피 팅처",
+      "brand": "씨피원",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "씨피원|[2개부터구매가능]헤드스파두피팅처",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c473a336-5fda-4cc3-9f26-ed8ed0fd6c56",
+      "descId": "9266eb6c-3080-44cc-aa3d-64683ea92fcd",
+      "beforeName": "[오직무신사뷰티] 마데카 크림 인 버블세럼",
+      "afterName": "마데카 크림 인 버블세럼",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티]마데카크림인버블세럼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c4b12102-1d58-4e63-8a1a-791707a29743",
+      "descId": "14815d82-d59b-484e-88a7-a6428b210b69",
+      "beforeName": "[김재원 PICK] 아티시카 리프레쉬 카밍 세럼",
+      "afterName": "아티시카 리프레쉬 카밍 세럼",
+      "brand": "몰바니",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "몰바니|[김재원pick]아티시카리프레쉬카밍세럼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c59292b7-89ff-406e-91db-cbdbfb8e10a6",
+      "descId": "c112b061-e0fa-4dee-849f-9289d73c6aba",
+      "beforeName": "[2개선택] 912 퍼퓸 핸드크림",
+      "afterName": "912 퍼퓸 핸드크림",
+      "brand": "912",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "912|[2개선택]912퍼퓸핸드크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c68c807c-9ca4-4bc5-a40b-adf731bd6e6b",
+      "descId": "8813ba9e-86d8-4965-b232-3a09b38f2150",
+      "beforeName": "[석매튜 PICK] 밀착 톤업 베이스",
+      "afterName": "밀착 톤업 베이스",
+      "brand": "지베르니",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "지베르니|[석매튜pick]밀착톤업베이스",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c8eed6a2-93e7-43d8-bbc1-e96bfdaf90ce",
+      "descId": "3703ab9b-6ac9-4803-a5ea-d756981f9af7",
+      "beforeName": "[오직무신사뷰티] [강력차단SET] 선마데카 크림",
+      "afterName": "[강력차단SET] 선마데카 크림",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][강력차단set]선마데카크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c9086a03-7b48-4b83-acd9-4a8dceca2d33",
+      "descId": "c6448a9a-5ef8-454e-95b6-f17720c31058",
+      "beforeName": "[~27.07.12] 코코넛 허니 살브 립크림",
+      "afterName": "코코넛 허니 살브 립크림",
+      "brand": "후르디아",
+      "rule": "PROMO_EXPIRY",
+      "rules": [
+        "PROMO_EXPIRY"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "후르디아|[~27.07.12]코코넛허니살브립크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c94d5ff9-2ea1-4546-bcb2-2660ad7eb1d5",
+      "descId": "f68e59d1-0a9f-4ed5-8bfb-8281f1382ca9",
+      "beforeName": "레드 락토 콜라겐 클렌징 오일 (소비기한 2027-01-04)",
+      "afterName": "레드 락토 콜라겐 클렌징 오일",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|레드락토콜라겐클렌징오일(소비기한2027-01-04)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c9b5c4df-cb9f-43d7-9e65-e0fbf0a5538f",
+      "descId": "3181ac2f-635c-4e5b-b8c8-e12203b5769e",
+      "beforeName": "[오직무신사뷰티] [트러블진정] 마데카 분말 티트리 에이씨 + 겔 세럼 히알론 듀",
+      "afterName": "[트러블진정] 마데카 분말 티트리 에이씨 + 겔 세럼 히알론 듀",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][트러블진정]마데카분말티트리에이씨+겔세럼히알론듀",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "c9f05b2b-9cbd-4342-9988-cb4ac1e191d1",
+      "descId": "b1c72cc8-c2d2-41cc-9a83-9295f751be51",
+      "beforeName": "[임수빈PICK] 오일캡처 올인원 로션",
+      "afterName": "오일캡처 올인원 로션",
+      "brand": "비레디",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비레디|[임수빈pick]오일캡처올인원로션",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ca9d9c75-454a-4fe9-823f-f793415204ef",
+      "descId": "00346f21-05f7-4182-9979-91658021af6c",
+      "beforeName": "[20개부터 구매가능] 세븐 데이즈 마스크 로터스 N",
+      "afterName": "세븐 데이즈 마스크 로터스 N",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[20개부터구매가능]세븐데이즈마스크로터스n",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "cb660f1a-b6d0-4129-92b4-0df0400d7dcf",
+      "descId": "e54071c2-5ed9-4d9a-baee-c2a92c425ae0",
+      "beforeName": "플로우 퀵틴트 )",
+      "afterName": "플로우 퀵틴트",
+      "brand": "센슬",
+      "rule": "STRAY_TRAILING_CLOSE+WHITESPACE",
+      "rules": [
+        "STRAY_TRAILING_CLOSE",
+        "WHITESPACE"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센슬|플로우퀵틴트)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "cc39e236-12ad-4c48-82c6-f10da4ba8022",
+      "descId": "fa817c0d-8cd8-4054-8775-ac769b96ac4c",
+      "beforeName": "[오직무신사뷰티] 소나무 진정 시카 앰플 대용량",
+      "afterName": "소나무 진정 시카 앰플 대용량",
+      "brand": "라운드랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "라운드랩|[오직무신사뷰티]소나무진정시카앰플대용량",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "cd6051f3-f1b5-49e8-8401-67d32fbdf035",
+      "descId": "e4fba804-ed4e-459d-a6ad-e1d36e828597",
+      "beforeName": "[오직무신사뷰티] 마데카 타이트닝 앰플 패드 1통",
+      "afterName": "마데카 타이트닝 앰플 패드 1통",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티]마데카타이트닝앰플패드1통",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "cd87ad26-3a57-4336-8143-2bcde9b4013f",
+      "descId": "e13c0d91-1854-48df-a9d9-ebb10690b470",
+      "beforeName": "[2개부터 구매가능] 펜타 세라마이드 모이스처라이징 크림",
+      "afterName": "펜타 세라마이드 모이스처라이징 크림",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[2개부터구매가능]펜타세라마이드모이스처라이징크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "cf4fd44c-6077-47eb-8d19-1c703dae87b1",
+      "descId": "a65389af-4f88-4851-b6be-e9a22c015351",
+      "beforeName": "[무신사 단독] 하이베리어 프레쉬 선 로션",
+      "afterName": "하이베리어 프레쉬 선 로션",
+      "brand": "스킨앤랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "스킨앤랩|[무신사단독]하이베리어프레쉬선로션",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d02fcb81-ecff-43d8-95d7-dadda715b6a0",
+      "descId": "a1f61907-3da7-4658-b70b-0734267a1590",
+      "beforeName": "[보이넥스트도어 PICK] 니치 룸스프레이 섬유향수 엠버 바닐라 앤 데이지",
+      "afterName": "니치 룸스프레이 섬유향수 엠버 바닐라 앤 데이지",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치룸스프레이섬유향수엠버바닐라앤데이지",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d03e157e-cba1-4dc5-b301-d888f2988ad8",
+      "descId": "cecc9ee1-fe7b-47bb-8924-4f241772149a",
+      "beforeName": "[오직무신사뷰티] [데일리장벽크림] 마데카크림 타임리버스 제로",
+      "afterName": "[데일리장벽크림] 마데카크림 타임리버스 제로",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][데일리장벽크림]마데카크림타임리버스제로",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d041bea4-939b-4a1c-854c-7b79e68a0510",
+      "descId": "7a14c3f4-02a6-49b8-a590-97e97e8eceae",
+      "beforeName": "[오직무신사뷰티] [잡티톤업SET] 마데카 더마마스크 톤브라이트닝 포뮬러",
+      "afterName": "[잡티톤업SET] 마데카 더마마스크 톤브라이트닝 포뮬러",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][잡티톤업set]마데카더마마스크톤브라이트닝포뮬러",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d1564809-5d2e-4ab1-9b36-b360b49a0330",
+      "descId": "19a9aa05-04a6-4e91-96cd-3c9b32872674",
+      "beforeName": "[희재 PICK] 센슬 타임 블러쉬",
+      "afterName": "센슬 타임 블러쉬",
+      "brand": "센슬",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센슬|[희재pick]센슬타임블러쉬",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d167c38e-dba0-4b7e-a22e-6d940d71e80f",
+      "descId": "52dfccb3-3b4e-41e8-bf04-73a5d367cfa5",
+      "beforeName": "[오직무신사뷰티] [보습장벽강화] 마데카 크림 미스트",
+      "afterName": "[보습장벽강화] 마데카 크림 미스트",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][보습장벽강화]마데카크림미스트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d181c69c-77b6-444a-a00c-f4776f2b282c",
+      "descId": "cd04db95-3c20-42c6-bb7d-975d1d4e290e",
+      "beforeName": "[선물포장] NO.2 립밤",
+      "afterName": "NO.2 립밤",
+      "brand": "블코",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "블코|[선물포장]no.2립밤",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d21bd217-3f0a-486a-a67a-b7d72691321f",
+      "descId": "b77b6167-3ef8-4a05-886e-1a25e7272da9",
+      "beforeName": "빨강머리앤에디션 크레마카발로 핸드크림 ​ (30ml ) 파우더리 머스크 & 시트러스 플로랄​(다이애나와의 티타임)​",
+      "afterName": "빨강머리앤에디션 크레마카발로 핸드크림 (30ml ) 파우더리 머스크 & 시트러스 플로랄(다이애나와의 티타임)",
+      "brand": "자민경",
+      "rule": "ZERO_WIDTH+WHITESPACE",
+      "rules": [
+        "ZERO_WIDTH",
+        "WHITESPACE"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "자민경|빨강머리앤에디션크레마카발로핸드크림​(30ml)파우더리머스크&시트러스플로랄​(다이애나와의티타임)​",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d3ba6985-7322-4d41-b94f-67122808f9f1",
+      "descId": "e0b5901b-6e56-42e2-8241-dec2b4b2ab4e",
+      "beforeName": "히알루론산 레이어 물톡스 랩핑 마스크 (소비기한 2027-01-14)",
+      "afterName": "히알루론산 레이어 물톡스 랩핑 마스크",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|히알루론산레이어물톡스랩핑마스크(소비기한2027-01-14)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d4216e4c-6b9d-48dc-89df-38bacdb319f3",
+      "descId": "60955b88-9ab0-4a31-94f5-49093caf2f5c",
+      "beforeName": "[5개부터 구매가능] 엑스퍼트 펩타이드 콜라겐 겔 마스크",
+      "afterName": "엑스퍼트 펩타이드 콜라겐 겔 마스크",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[5개부터구매가능]엑스퍼트펩타이드콜라겐겔마스크",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d53d3146-5ea4-457d-b65b-71cf0e8befd9",
+      "descId": "ddec62aa-47a4-4477-bf27-1ee1aca50710",
+      "beforeName": "[공식몰] 크리스탈 데오드란트 무향 스프레이",
+      "afterName": "크리스탈 데오드란트 무향 스프레이",
+      "brand": "크리스탈",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "크리스탈|[공식몰]크리스탈데오드란트무향스프레이",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d6862d2b-7ab3-4a81-9f38-7243e5a5b4a3",
+      "descId": "1b4779e6-5ac7-4ea2-bc9e-5ee314459954",
+      "beforeName": "[단독런칭]레디톡스 젤 투 워터 클렌저",
+      "afterName": "레디톡스 젤 투 워터 클렌저",
+      "brand": "라곰",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "라곰|[단독런칭]레디톡스젤투워터클렌저",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d9010e1d-56c6-4f7f-8c1a-e151ebcce121",
+      "descId": "5c1a8349-1db7-4e1b-a3fd-78c19b53a69a",
+      "beforeName": "[옵션선택] 스파 수분광채 스크럽 바디워시",
+      "afterName": "스파 수분광채 스크럽 바디워시",
+      "brand": "벨먼",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "벨먼|[옵션선택]스파수분광채스크럽바디워시",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "d9debae1-db23-45ab-be8f-c71e422e82fb",
+      "descId": "d3be5b50-6e44-4dae-9081-d6ccd2a858e8",
+      "beforeName": "[태산 PICK] 월넛크릭그린 오 드 퍼퓸 EDP",
+      "afterName": "월넛크릭그린 오 드 퍼퓸 EDP",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[태산pick]월넛크릭그린오드퍼퓸edp",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "da268315-6cc8-41e1-a346-b5d11998c348",
+      "descId": "d66e2fd8-5ae3-4c96-8e2f-7aed8dde5a3d",
+      "beforeName": "[단독구성] 글레이즈 락커+미니 리퀴드 블러셔",
+      "afterName": "글레이즈 락커+미니 리퀴드 블러셔",
+      "brand": "머지",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "머지|[단독구성]글레이즈락커+미니리퀴드블러셔",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "da7ef7c0-a569-4ae3-89bd-b64d13b1f4b3",
+      "descId": "2382ec28-5334-47ad-86d0-e64342a4795e",
+      "beforeName": "히알루론산 물톡스 마일드 톤 보정 선크림 (소비기한 2027-02-05)",
+      "afterName": "히알루론산 물톡스 마일드 톤 보정 선크림",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|히알루론산물톡스마일드톤보정선크림(소비기한2027-02-05)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "dbb89c39-a39f-47cb-8cb6-0e2fac7c3a5a",
+      "descId": "eaadf345-7ecd-4e67-aded-1807a0b2eff1",
+      "beforeName": ": 이엑스 시그널 패드 프로",
+      "afterName": "이엑스 시그널 패드 프로",
+      "brand": "에이에스씨이플러스",
+      "rule": "STRAY_LEADING_PUNCT",
+      "rules": [
+        "STRAY_LEADING_PUNCT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "에이에스씨이플러스|:이엑스시그널패드프로",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "dd04c538-e522-4613-9279-275badbfd15c",
+      "descId": "33b153b2-90e8-4e6e-8c83-57189cc8b44a",
+      "beforeName": "[2개선택] 페브클린 포맨 아쿠아 섬유탈취제",
+      "afterName": "페브클린 포맨 아쿠아 섬유탈취제",
+      "brand": "더블유드레스룸",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "더블유드레스룸|[2개선택]페브클린포맨아쿠아섬유탈취제",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ddc32e88-a574-4063-9ae7-b268ca8758f7",
+      "descId": "05e7454d-f654-418c-9e2d-2dead5a27056",
+      "beforeName": "[오직무신사뷰티] 마데카 멜라캡처 토닝 에이징 커버 쿠션",
+      "afterName": "마데카 멜라캡처 토닝 에이징 커버 쿠션",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티]마데카멜라캡처토닝에이징커버쿠션",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "dec44f32-02a2-426f-817a-d3a3cba07a97",
+      "descId": "ef11d7c8-af63-418c-9c46-2b822ec12498",
+      "beforeName": "펩타이드9 멜라 스틱 (소비기한 2026-11-22)",
+      "afterName": "펩타이드9 멜라 스틱",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|펩타이드9멜라스틱(소비기한2026-11-22)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "dfbb4e3e-cc85-4794-9f15-f65a5a223df4",
+      "descId": "743f5420-4f78-4aac-b6c0-a082d5c73d76",
+      "beforeName": "[50% OFF] 마이 글로우 립 오일",
+      "afterName": "마이 글로우 립 오일",
+      "brand": "티르티르",
+      "rule": "PROMO_DISCOUNT",
+      "rules": [
+        "PROMO_DISCOUNT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "티르티르|[50%off]마이글로우립오일",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "e0eb0ade-300b-4337-b7d4-42da2611e6d3",
+      "descId": "5f62782b-d2ad-4590-a4a3-7052095c5b50",
+      "beforeName": "(2개선택) 마이페이브 피스 컨실러",
+      "afterName": "마이페이브 피스 컨실러",
+      "brand": "홀리카홀리카",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "홀리카홀리카|(2개선택)마이페이브피스컨실러",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "e1a88fd5-cbdc-4728-a43d-a60104b4f178",
+      "descId": "63782ee5-4d1a-4a31-9748-758eaf0ac4e2",
+      "beforeName": "[예보링 PICK] 시카히알 딥 수딩 크림 RE",
+      "afterName": "시카히알 딥 수딩 크림 RE",
+      "brand": "믹순",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "믹순|[예보링pick]시카히알딥수딩크림re",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "e1f401b1-679c-4eda-82a2-1330084d53a8",
+      "descId": "78e7133a-b5d6-4437-837c-84aed7fd67f5",
+      "beforeName": "[오직무신사뷰티] [화잘먹 SET] 마데카 말차 토닝 필링젤",
+      "afterName": "[화잘먹 SET] 마데카 말차 토닝 필링젤",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티][화잘먹set]마데카말차토닝필링젤",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "e3e08eb9-a761-4a34-bfba-a465a6be359c",
+      "descId": "3d799af5-3041-414f-9dad-7e15425e98b3",
+      "beforeName": "[오직무신사뷰티] 마데카크림 하이드라 카밍",
+      "afterName": "마데카크림 하이드라 카밍",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티]마데카크림하이드라카밍",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "e49a19f9-9c0d-4e23-8f2b-90231be4bcd1",
+      "descId": "a84ac600-320c-4535-989b-dbe8004e524f",
+      "beforeName": "[옵션선택] 스칼프솔루션 쿨링 샴푸",
+      "afterName": "스칼프솔루션 쿨링 샴푸",
+      "brand": "닥터그루트",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "닥터그루트|[옵션선택]스칼프솔루션쿨링샴푸",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "e5ef678b-adfe-4f4a-a859-9826f763b2c1",
+      "descId": "d381b7de-d7ec-4e72-949a-9467369d7e56",
+      "beforeName": "[보이넥스트도어 PICK] 니치퍼퓸 핸드크림",
+      "afterName": "니치퍼퓸 핸드크림",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치퍼퓸핸드크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "e5f529ed-32e6-4c15-9da6-ff66799d67cf",
+      "descId": "f53d8e4b-2b40-4568-b46a-c399a96d70e0",
+      "beforeName": "립펜슬 증정 커버 퍼펙션 올프루프 팁 컨실러",
+      "afterName": "커버 퍼펙션 올프루프 팁 컨실러",
+      "brand": "더샘",
+      "rule": "GIFT_LEADING",
+      "rules": [
+        "GIFT_LEADING"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "더샘|립펜슬증정커버퍼펙션올프루프팁컨실러",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "e683b645-c217-4ca8-bfa0-c9439dcb29b5",
+      "descId": "3500540c-c17d-44ee-9362-8ab02e63f754",
+      "beforeName": "[선물포장] 노스탤직 퍼퓸 핸드크림 튜브형",
+      "afterName": "노스탤직 퍼퓸 핸드크림 튜브형",
+      "brand": "노스탤직",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "노스탤직|[선물포장]노스탤직퍼퓸핸드크림튜브형",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "e6dd204d-ce36-4353-97b6-849ff908cfcd",
+      "descId": "ff4ffe17-da7c-4c82-ab13-724aa1db00b1",
+      "beforeName": "[오픈프로모션] 센시니컬 데이&나이트 앰플 세트구성",
+      "afterName": "센시니컬 데이&나이트 앰플 세트구성",
+      "brand": "닥터나인틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "닥터나인틴|[오픈프로모션]센시니컬데이&나이트앰플세트구성",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "e7a1aaad-ce1e-452c-8502-af477037d64b",
+      "descId": "3bdc5292-fec6-444b-8168-0d5d51ee3abf",
+      "beforeName": "[선물포장] 섬유향수&핸드크림",
+      "afterName": "섬유향수&핸드크림",
+      "brand": "리베르",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "리베르|[선물포장]섬유향수&핸드크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "e7ef2e53-27f4-43d0-bcaa-bc7022a3304e",
+      "descId": "4307228c-3526-4c55-9ab7-a9e59d22967c",
+      "beforeName": "바이오 인텐스 글루타치온 멜라 토닝 선크림 ((소비기한 2026-12-17)",
+      "afterName": "바이오 인텐스 글루타치온 멜라 토닝 선크림",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|바이오인텐스글루타치온멜라토닝선크림((소비기한2026-12-17)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "e99e1e48-818b-4d37-b426-f670070760fd",
+      "descId": "553442c9-a943-4322-bb5e-75e991446fa1",
+      "beforeName": "[화지 PICK] 모찌 틴트",
+      "afterName": "모찌 틴트",
+      "brand": "블룸타이드",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "블룸타이드|[화지pick]모찌틴트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ea56d6ba-95bc-46fb-bc4b-164ed876e292",
+      "descId": "77e08a88-4f14-4636-86f6-aca63d3911d5",
+      "beforeName": "영국 로얄 블렌드 홍차 볼륨 크림 (소비기한 2027-05-01)",
+      "afterName": "영국 로얄 블렌드 홍차 볼륨 크림",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|영국로얄블렌드홍차볼륨크림(소비기한2027-05-01)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "eb0ada41-676b-4a69-bbc3-8c81abfa8b27",
+      "descId": "a53a6b49-93b3-41af-a8b8-a158c9f94f2b",
+      "beforeName": "[무신사 단독] 머그워트 젤클렌저",
+      "afterName": "머그워트 젤클렌저",
+      "brand": "아임프롬",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아임프롬|[무신사단독]머그워트젤클렌저",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ec627383-97bd-44f3-b9af-fe7f006d7e6c",
+      "descId": "f7455401-1986-46ae-b60c-e8c55c53e0fa",
+      "beforeName": "[옵션선택] 46cm 바디 데오미스트",
+      "afterName": "46cm 바디 데오미스트",
+      "brand": "온더바디",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "온더바디|[옵션선택]46cm바디데오미스트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ed1f2046-74ae-4eee-9c97-481f19e937ea",
+      "descId": "8908f710-5394-4126-beb6-e43cc204ebc8",
+      "beforeName": "(2개선택) 마이페이브 피스 글리츠",
+      "afterName": "마이페이브 피스 글리츠",
+      "brand": "홀리카홀리카",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "홀리카홀리카|(2개선택)마이페이브피스글리츠",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ed4da6e0-8adc-492f-b8e8-7bd77df4d61e",
+      "descId": "7d6c0321-b4b4-4cec-8995-e2daf3ea85e8",
+      "beforeName": "[AD] 프라임 프라이머 파우더",
+      "afterName": "프라임 프라이머 파우더",
+      "brand": "바닐라코",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "바닐라코|[ad]프라임프라이머파우더",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ed79a1c0-0f6d-4b28-aaef-779fbc13cf3c",
+      "descId": "cd519845-bb58-43d0-81c2-ab40265f3eef",
+      "beforeName": "[선물포장] 약콩 판테놀 보습 장벽",
+      "afterName": "약콩 판테놀 보습 장벽",
+      "brand": "라운드랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "라운드랩|[선물포장]약콩판테놀보습장벽",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "eee324c2-0d3d-4560-aa30-f6e5e75e8f1a",
+      "descId": "de6dc3c4-f126-408c-996c-037fccbe893e",
+      "beforeName": "[오직무신사뷰티] 멜라캡처 앰플 패드",
+      "afterName": "멜라캡처 앰플 패드",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티]멜라캡처앰플패드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "eee3e825-e159-494a-bf1b-759eec33a5a1",
+      "descId": "3af84fdb-3195-435a-b666-a335d9a09caa",
+      "beforeName": "[2개부터 구매가능] 더 퍼펙트 오일 밤 투 폼",
+      "afterName": "더 퍼펙트 오일 밤 투 폼",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[2개부터구매가능]더퍼펙트오일밤투폼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ef9ea774-953e-46cd-b83a-0b993231a821",
+      "descId": "cf1a7042-afd5-4142-9178-c864d91895b7",
+      "beforeName": "[20개부터 구매가능] 세븐 데이즈 마스크 어성초 P",
+      "afterName": "세븐 데이즈 마스크 어성초 P",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[20개부터구매가능]세븐데이즈마스크어성초p",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "eff8ae86-0bd9-4bd0-962e-0a06c3db40cb",
+      "descId": "cef8d46d-e910-46b0-aba5-185ea691cbaf",
+      "beforeName": "( 선택) 멜팅피 X 먼지나방 멀티퍼퓸",
+      "afterName": "멜팅피 X 먼지나방 멀티퍼퓸",
+      "brand": "멜팅피",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "멜팅피|(선택)멜팅피x먼지나방멀티퍼퓸",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f01ba4b0-5e62-4941-97ba-1b092fd52541",
+      "descId": "86541ce9-89b2-4ea8-aa97-cc427d752bed",
+      "beforeName": "[2개선택] 드레스퍼퓸 & 핸드크림",
+      "afterName": "드레스퍼퓸 & 핸드크림",
+      "brand": "더블유드레스룸",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "더블유드레스룸|[2개선택]드레스퍼퓸&핸드크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f0ef68ac-3410-490f-b001-ef5c36adfa0c",
+      "descId": "2743060f-f2a9-470f-8614-1042ad7cbf7d",
+      "beforeName": "[단독구성] 버터 베이스 바 + 미니 리퀴드 블러셔",
+      "afterName": "버터 베이스 바 + 미니 리퀴드 블러셔",
+      "brand": "머지",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "머지|[단독구성]버터베이스바+미니리퀴드블러셔",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f12b2271-0173-495c-8ad7-ae75620bc531",
+      "descId": "619529ad-1ecc-4ae6-b028-666ecac35051",
+      "beforeName": "[20개부터 구매가능] 세븐 데이즈 마스크 티트리 M",
+      "afterName": "세븐 데이즈 마스크 티트리 M",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[20개부터구매가능]세븐데이즈마스크티트리m",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f35847ae-7388-47ad-88de-272e3df0e066",
+      "descId": "b3aace33-468f-4c59-addc-7c8cf79ed6f2",
+      "beforeName": "[2개부터 구매가능] 애플 사이다 젤리 팩 투 폼",
+      "afterName": "애플 사이다 젤리 팩 투 폼",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[2개부터구매가능]애플사이다젤리팩투폼",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f38c301d-2457-4e6f-92d1-da543cd7ccdd",
+      "descId": "39735d50-f5fd-4c47-864d-5a37adf25555",
+      "beforeName": "타임레볼루션 더 퍼스트 에센스 패드 (소비기한2027-06-27까지)",
+      "afterName": "타임레볼루션 더 퍼스트 에센스 패드",
+      "brand": "미샤",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "미샤|타임레볼루션더퍼스트에센스패드(소비기한2027-06-27까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f3934e83-4c45-4d19-b403-7aba6866280b",
+      "descId": "38eb9871-e8c1-4fd1-8204-481eab305a72",
+      "beforeName": "(단품, 선택)아토815 스킨케어 미스트&크림",
+      "afterName": "아토815 스킨케어 미스트&크림",
+      "brand": "아토815",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아토815|(단품,선택)아토815스킨케어미스트&크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f39e2c4d-7c17-46f1-ab5e-927dec9465d9",
+      "descId": "33176c01-24c8-4f35-9282-bc2d8e34fa61",
+      "beforeName": "[단독구성]고기능 장벽 밸런스",
+      "afterName": "고기능 장벽 밸런스",
+      "brand": "레이어랩",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "레이어랩|[단독구성]고기능장벽밸런스",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f455d8cd-7eb5-473f-a71c-edb7a05db64e",
+      "descId": "676e6dc2-f11c-454b-88d4-803a742ba57e",
+      "beforeName": "[8개부터 구매가능] 스무스 앤 퓨어 프레쉬 쿨링 데오 티슈",
+      "afterName": "스무스 앤 퓨어 프레쉬 쿨링 데오 티슈",
+      "brand": "아리얼",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "아리얼|[8개부터구매가능]스무스앤퓨어프레쉬쿨링데오티슈",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f4c731f8-b649-4ef3-86f4-bd0a6012f42f",
+      "descId": "e982f5f9-c1a4-415b-8d54-a7d5650cd0c8",
+      "beforeName": "[오직무신사뷰티] 더블타이트닝 모공 패드",
+      "afterName": "더블타이트닝 모공 패드",
+      "brand": "센텔리안24",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "센텔리안24|[오직무신사뷰티]더블타이트닝모공패드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f4cfd653-9068-4ba4-a200-cb9cd0dd3444",
+      "descId": "ff06b864-186e-4871-ba9c-f0811558b519",
+      "beforeName": "셀 톡싱 더마쥬르 토너 (소비기한 2026-12-05)",
+      "afterName": "셀 톡싱 더마쥬르 토너",
+      "brand": "메디필",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "메디필|셀톡싱더마쥬르토너(소비기한2026-12-05)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f56167d1-b652-4fde-91db-52eafb5f913c",
+      "descId": "efcf0ea4-5d2d-4df5-865a-a66895d52387",
+      "beforeName": "알로에 수딩 로션 (사용기한 2027/03/18까지)",
+      "afterName": "알로에 수딩 로션",
+      "brand": "마녀공장",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "마녀공장|알로에수딩로션(사용기한2027/03/18까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f5aadb80-5482-4240-bbf4-77479cc5a58b",
+      "descId": "d68e9a9e-0dc4-48ff-9c2c-b751a1581e6e",
+      "beforeName": "프로래스팅 결핏 메쉬 쿠션 ( or 리필포함)(결핏퍼프 [5,000원 ] 증정)",
+      "afterName": "프로래스팅 결핏 메쉬 쿠션 ( or 리필포함)",
+      "brand": "정샘물",
+      "rule": "GIFT_TRAILING_PAREN",
+      "rules": [
+        "GIFT_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "정샘물|프로래스팅결핏메쉬쿠션(or리필포함)(결핏퍼프[5,000원]증정)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f72ab479-224d-46c7-8b6d-ac09e5411197",
+      "descId": "59388cfe-0e26-414b-9cf8-16a9cad131b7",
+      "beforeName": "[옵션선택] 쿨링 헤드 스파 샴푸 x (쿨멘솔/플로럴민트)",
+      "afterName": "쿨링 헤드 스파 샴푸 x (쿨멘솔/플로럴민트)",
+      "brand": "엘라스틴",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "엘라스틴|[옵션선택]쿨링헤드스파샴푸x(쿨멘솔/플로럴민트)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "f7a23f6a-6f5e-4799-b8fc-b72f29346682",
+      "descId": "f5240087-54c2-4e45-aedf-77ba06594364",
+      "beforeName": "[무신사단독] 피토버 플러스 매끈 모공 패드 키트",
+      "afterName": "피토버 플러스 매끈 모공 패드 키트",
+      "brand": "피토버플러스",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "피토버플러스|[무신사단독]피토버플러스매끈모공패드키트",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "fad41004-14f2-4343-b9a7-8faeb8d8bfc2",
+      "descId": "55056d96-e0a2-4aed-be6b-a755b405cf1a",
+      "beforeName": "[보이넥스트도어 PICK] 니치 룸스프레이 섬유향수 일랑일랑 무드",
+      "afterName": "니치 룸스프레이 섬유향수 일랑일랑 무드",
+      "brand": "비비앙",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "비비앙|[보이넥스트도어pick]니치룸스프레이섬유향수일랑일랑무드",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "fdd41bdf-81d1-4d19-804a-c1f2e56a57e7",
+      "descId": "b0038f14-d7f1-4291-87a6-8f82179de820",
+      "beforeName": "[RIIZE 쇼타로 PICK] 글로우 픽셀 쿠션",
+      "afterName": "글로우 픽셀 쿠션",
+      "brand": "이더앤",
+      "rule": "PROMO_ENDORSEMENT",
+      "rules": [
+        "PROMO_ENDORSEMENT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "이더앤|[riize쇼타로pick]글로우픽셀쿠션",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "fdfb340e-ca7b-4de3-a99a-ea34f0d60191",
+      "descId": "7aa027bc-6dbf-4c9f-a2f5-8328110d9b3c",
+      "beforeName": "[선물포장] 디퓨저 & 핸드크림",
+      "afterName": "디퓨저 & 핸드크림",
+      "brand": "리베르",
+      "rule": "PROMO_EXACT",
+      "rules": [
+        "PROMO_EXACT"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "리베르|[선물포장]디퓨저&핸드크림",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "fe6a5b88-adee-4fb0-a4db-29393ce73414",
+      "descId": "0d707bc0-95e3-49fa-be8d-38c6ca848c27",
+      "beforeName": "[제주블라썸 웜톤추천] 소프트 글로우 파우더 블러셔 (소비기한 2027-07-29까지)",
+      "afterName": "[제주블라썸 웜톤추천] 소프트 글로우 파우더 블러셔",
+      "brand": "스틸라",
+      "rule": "EXPIRY_TRAILING_PAREN",
+      "rules": [
+        "EXPIRY_TRAILING_PAREN"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "스틸라|[제주블라썸웜톤추천]소프트글로우파우더블러셔(소비기한2027-07-29까지)",
+      "regulatoryNameMatchesName": true
+    },
+    {
+      "masterId": "ff16d997-e9cb-4a03-859f-bda96a9e67f9",
+      "descId": "69ca74c0-7f78-412d-8386-7a6804175ec8",
+      "beforeName": "[3개부터 구매가능] 펜타 세라마이드 모이스처라이징 토너",
+      "afterName": "펜타 세라마이드 모이스처라이징 토너",
+      "brand": "무신사 스탠다드 뷰티",
+      "rule": "PROMO_QTY_CONDITION",
+      "rules": [
+        "PROMO_QTY_CONDITION"
+      ],
+      "source": "db:product_masters.name",
+      "censusKey": "무신사스탠다드뷰티|[3개부터구매가능]펜타세라마이드모이스처라이징토너",
+      "regulatoryNameMatchesName": true
+    }
+  ]
+}
