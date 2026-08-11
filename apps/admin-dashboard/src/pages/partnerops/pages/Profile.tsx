@@ -8,7 +8,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useAuthStore } from '@/stores/authStore';
 import { authClient } from '@o4o/auth-client';
 import {
   User,
@@ -21,6 +20,13 @@ import {
   Youtube,
   Link as LinkIcon,
 } from 'lucide-react';
+import {
+  PartnerOpsLoadError,
+  PartnerOpsMutationNotice,
+  PARTNEROPS_MUTATION_DISABLED_REASON,
+  toLoadError,
+  type PartnerOpsLoadErrorInfo,
+} from '../components/PartnerOpsLoadError';
 
 /**
  * Partner Profile (Partner-Core aligned)
@@ -47,12 +53,17 @@ interface PartnerProfile {
   updatedAt: string;
 }
 
+const PROFILE_ENDPOINT = '/partnerops/profile';
+
 const Profile: React.FC = () => {
-  const { user } = useAuthStore();
   const [profile, setProfile] = useState<PartnerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  // WO-O4O-PARTNEROPS-ACTIVE-DEMO-FALLBACK-AUDIT-AND-GUIDE-V1:
+  //   조회 실패 시 데모 파트너 프로필을 주입하지 않는다.
+  //   (기존에는 실패해도 항상 프로필이 채워져 "파트너 등록" 화면이 도달 불가였다)
+  const [loadError, setLoadError] = useState<PartnerOpsLoadErrorInfo | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -63,48 +74,22 @@ const Profile: React.FC = () => {
 
   const fetchProfile = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
-      const response = await authClient.api.get('/partnerops/profile');
-      if (response.data?.data) {
-        const p = response.data.data;
-        setProfile(p);
-        setFormData({
-          name: p.name || '',
-          description: '',
-          instagram: p.socialLinks?.instagram || '',
-          youtube: p.socialLinks?.youtube || '',
-          blog: p.socialLinks?.blog || '',
-        });
-      }
+      const response = await authClient.api.get(PROFILE_ENDPOINT);
+      const p = response.data?.data ?? null;
+      setProfile(p);
+      setFormData({
+        name: p?.name || '',
+        description: '',
+        instagram: p?.socialLinks?.instagram || '',
+        youtube: p?.socialLinks?.youtube || '',
+        blog: p?.socialLinks?.blog || '',
+      });
     } catch (err: any) {
       console.error('Failed to fetch profile:', err);
-      // Demo data
-      const demo: PartnerProfile = {
-        id: 'demo-partner',
-        userId: user?.id || 'demo-user',
-        name: user?.name || '파트너',
-        level: 'standard',
-        status: 'active',
-        commissionRate: 5,
-        clickCount: 15420,
-        socialLinks: {
-          instagram: '@beauty_partner',
-          youtube: 'BeautyPartnerChannel',
-          blog: 'https://blog.example.com',
-        },
-        conversionCount: 342,
-        totalCommission: 1542000,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      setProfile(demo);
-      setFormData({
-        name: demo.name,
-        description: '',
-        instagram: demo.socialLinks?.instagram || '',
-        youtube: demo.socialLinks?.youtube || '',
-        blog: demo.socialLinks?.blog || '',
-      });
+      setProfile(null);
+      setLoadError(toLoadError(err, PROFILE_ENDPOINT));
     } finally {
       setLoading(false);
     }
@@ -215,6 +200,18 @@ const Profile: React.FC = () => {
     );
   }
 
+  // WO-O4O-PARTNEROPS-ACTIVE-DEMO-FALLBACK-AUDIT-AND-GUIDE-V1:
+  //   조회 실패는 "미등록 파트너" 와 구분해 표시한다.
+  if (loadError) {
+    return (
+      <div className="p-6">
+        <div className="max-w-2xl mx-auto">
+          <PartnerOpsLoadError error={loadError} onRetry={fetchProfile} retrying={loading} />
+        </div>
+      </div>
+    );
+  }
+
   // Not registered as partner yet
   if (!profile) {
     return (
@@ -288,10 +285,12 @@ const Profile: React.FC = () => {
                 />
               </div>
 
+              <PartnerOpsMutationNotice reason={`파트너 신청 — ${PARTNEROPS_MUTATION_DISABLED_REASON}`} />
+
               <button
                 onClick={handleApply}
-                disabled={saving || !formData.name}
-                className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                disabled
+                className="w-full py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? '신청 중...' : '파트너 신청하기'}
               </button>
@@ -305,6 +304,9 @@ const Profile: React.FC = () => {
   return (
     <div className="p-6">
       <div className="max-w-2xl mx-auto">
+        <div className="mb-4">
+          <PartnerOpsMutationNotice reason={`프로필 저장 — ${PARTNEROPS_MUTATION_DISABLED_REASON}`} />
+        </div>
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
@@ -323,7 +325,9 @@ const Profile: React.FC = () => {
             {!editing && profile.status === 'active' && (
               <button
                 onClick={() => setEditing(true)}
-                className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50"
+                disabled
+                title={`프로필 수정 — ${PARTNEROPS_MUTATION_DISABLED_REASON}`}
+                className="flex items-center gap-2 px-4 py-2 border rounded-lg opacity-50 cursor-not-allowed"
               >
                 <Edit className="w-4 h-4" />
                 수정
@@ -386,8 +390,8 @@ const Profile: React.FC = () => {
               <div className="flex gap-2">
                 <button
                   onClick={handleSave}
-                  disabled={saving}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  disabled
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save className="w-4 h-4" />
                   {saving ? '저장 중...' : '저장'}

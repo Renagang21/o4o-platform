@@ -8,6 +8,13 @@ import React, { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
 import { DollarSign, Calendar, Download, CheckCircle, Clock, FileText, CreditCard } from 'lucide-react';
 import PageHeader from '../../../components/common/PageHeader';
+import {
+  PartnerOpsLoadError,
+  PartnerOpsMutationNotice,
+  PARTNEROPS_MUTATION_DISABLED_REASON,
+  toLoadError,
+  type PartnerOpsLoadErrorInfo,
+} from '../components/PartnerOpsLoadError';
 import { BaseTable } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 
@@ -38,31 +45,32 @@ interface SettlementSummary {
   paidBatches: number;
 }
 
+const SETTLEMENT_ENDPOINT = '/partnerops/settlement/batches';
+
 const Settlement: React.FC = () => {
   const [batches, setBatches] = useState<SettlementBatch[]>([]);
   const [summary, setSummary] = useState<SettlementSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-PARTNEROPS-ACTIVE-DEMO-FALLBACK-AUDIT-AND-GUIDE-V1:
+  //   조회 실패 시 데모 정산 batch·요약을 주입하지 않는다.
+  const [loadError, setLoadError] = useState<PartnerOpsLoadErrorInfo | null>(null);
 
   const fetchSettlements = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const [batchesResponse, summaryResponse] = await Promise.all([
-        authClient.api.get('/partnerops/settlement/batches'),
+        authClient.api.get(SETTLEMENT_ENDPOINT),
         authClient.api.get('/partnerops/settlement/summary'),
       ]);
 
-      if (batchesResponse.data?.data) setBatches(batchesResponse.data.data);
-      if (summaryResponse.data?.data) setSummary(summaryResponse.data.data);
+      setBatches(Array.isArray(batchesResponse.data?.data) ? batchesResponse.data.data : []);
+      setSummary(summaryResponse.data?.data ?? null);
     } catch (err) {
       console.error('Failed to fetch settlements:', err);
-      // Demo data
-      setBatches([
-        { id: '1', batchNumber: 'SET-2024-001', periodStart: '2024-01-01', periodEnd: '2024-01-31', conversionCount: 45, totalCommissionAmount: 250000, deductionAmount: 16000, netAmount: 234000, status: 'paid', paidAt: '2024-02-15', createdAt: '2024-02-01' },
-        { id: '2', batchNumber: 'SET-2024-002', periodStart: '2024-02-01', periodEnd: '2024-02-29', conversionCount: 52, totalCommissionAmount: 330000, deductionAmount: 18000, netAmount: 312000, status: 'paid', paidAt: '2024-03-15', createdAt: '2024-03-01' },
-        { id: '3', batchNumber: 'SET-2024-003', periodStart: '2024-03-01', periodEnd: '2024-03-31', conversionCount: 48, totalCommissionAmount: 295000, deductionAmount: 17000, netAmount: 278000, status: 'processing', paymentDueDate: '2024-04-15', createdAt: '2024-04-01' },
-        { id: '4', batchNumber: 'SET-2024-004', periodStart: '2024-04-01', periodEnd: '2024-04-30', conversionCount: 23, totalCommissionAmount: 170000, deductionAmount: 14000, netAmount: 156000, status: 'open', createdAt: '2024-05-01' },
-      ]);
-      setSummary({ totalEarnings: 1742000, settledEarnings: 546000, pendingEarnings: 434000, processingAmount: 278000, lastPaymentDate: '2024-03-15', nextPaymentDate: '2024-05-15', totalBatches: 4, openBatches: 1, paidBatches: 2 });
+      setBatches([]);
+      setSummary(null);
+      setLoadError(toLoadError(err, SETTLEMENT_ENDPOINT));
     } finally {
       setLoading(false);
     }
@@ -139,8 +147,9 @@ const Settlement: React.FC = () => {
       render: (_, row) => row.status === 'paid' ? (
         <button
           onClick={() => {}}
-          className="p-2 text-gray-600 hover:bg-gray-100 rounded"
-          title="영수증 다운로드"
+          disabled
+          className="p-2 text-gray-400 rounded cursor-not-allowed"
+          title={`영수증 다운로드 — ${PARTNEROPS_MUTATION_DISABLED_REASON}`}
         >
           <Download className="w-4 h-4" />
         </button>
@@ -154,10 +163,22 @@ const Settlement: React.FC = () => {
         title="정산 관리"
         subtitle="커미션 정산 내역을 확인합니다"
         actions={[
-          { id: 'download-all', label: '전체 다운로드', icon: <Download className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const },
+          { id: 'download-all', label: '전체 다운로드', icon: <Download className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const, disabled: true },
         ]}
       />
 
+      <div className="mb-6">
+        <PartnerOpsMutationNotice reason={`정산 다운로드 — ${PARTNEROPS_MUTATION_DISABLED_REASON}`} />
+      </div>
+
+      {loadError && (
+        <div className="mb-6">
+          <PartnerOpsLoadError error={loadError} onRetry={fetchSettlements} retrying={loading} />
+        </div>
+      )}
+
+      {!loadError && (
+      <>
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg shadow p-4">
@@ -227,14 +248,16 @@ const Settlement: React.FC = () => {
           정산 계좌 정보
         </h3>
         <div className="text-sm text-gray-600">
-          <p>정산금은 매월 15일 등록된 계좌로 입금됩니다.</p>
+          <p>정산 지급 일정·계좌 처리는 운영 API 검증 전이므로 이 화면에서 확정 안내를 제공하지 않습니다.</p>
           <p className="mt-2">
-            계좌 정보 변경은{' '}
+            계좌 정보는{' '}
             <a href="/partnerops/profile" className="text-blue-600 hover:underline">프로필 설정</a>
-            에서 가능합니다.
+            에서 확인할 수 있습니다.
           </p>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 };

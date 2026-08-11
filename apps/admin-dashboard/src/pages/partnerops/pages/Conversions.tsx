@@ -17,6 +17,13 @@ import {
   XCircle,
 } from 'lucide-react';
 import PageHeader from '../../../components/common/PageHeader';
+import {
+  PartnerOpsLoadError,
+  PartnerOpsMutationNotice,
+  PARTNEROPS_MUTATION_DISABLED_REASON,
+  toLoadError,
+  type PartnerOpsLoadErrorInfo,
+} from '../components/PartnerOpsLoadError';
 import { BaseTable } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 
@@ -44,15 +51,21 @@ interface ConversionSummary {
   refundedCount: number;
 }
 
+const CONVERSIONS_ENDPOINT = '/partnerops/conversions';
+
 const Conversions: React.FC = () => {
   const [conversions, setConversions] = useState<Conversion[]>([]);
   const [summary, setSummary] = useState<ConversionSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-PARTNEROPS-ACTIVE-DEMO-FALLBACK-AUDIT-AND-GUIDE-V1:
+  //   조회 실패 시 데모 전환 내역·요약을 주입하지 않는다.
+  const [loadError, setLoadError] = useState<PartnerOpsLoadErrorInfo | null>(null);
   const [filter, setFilter] = useState<string>('all');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
 
   const fetchConversions = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const params: Record<string, string> = {};
       if (filter !== 'all') params.status = filter;
@@ -60,23 +73,17 @@ const Conversions: React.FC = () => {
       if (dateRange.end) params.endDate = dateRange.end;
 
       const [convResponse, summaryResponse] = await Promise.all([
-        authClient.api.get('/partnerops/conversions', { params }),
-        authClient.api.get('/partnerops/conversions/summary'),
+        authClient.api.get(CONVERSIONS_ENDPOINT, { params }),
+        authClient.api.get(`${CONVERSIONS_ENDPOINT}/summary`),
       ]);
 
-      if (convResponse.data?.data) setConversions(convResponse.data.data);
-      if (summaryResponse.data?.data) setSummary(summaryResponse.data.data);
+      setConversions(Array.isArray(convResponse.data?.data) ? convResponse.data.data : []);
+      setSummary(summaryResponse.data?.data ?? null);
     } catch (err) {
       console.error('Failed to fetch conversions:', err);
-      // Demo data
-      setConversions([
-        { id: '1', partnerId: 'demo-partner', orderId: 'ORD-2024-001', orderNumber: 'ORD-2024-001', orderAmount: 89000, commissionAmount: 4450, status: 'confirmed', attributionDays: 7, createdAt: new Date().toISOString(), confirmedAt: new Date().toISOString() },
-        { id: '2', partnerId: 'demo-partner', orderId: 'ORD-2024-002', orderNumber: 'ORD-2024-002', orderAmount: 156000, commissionAmount: 7800, status: 'confirmed', attributionDays: 7, createdAt: new Date().toISOString(), confirmedAt: new Date().toISOString() },
-        { id: '3', partnerId: 'demo-partner', orderId: 'ORD-2024-003', orderNumber: 'ORD-2024-003', orderAmount: 45000, commissionAmount: 2250, status: 'pending', attributionDays: 7, createdAt: new Date().toISOString() },
-        { id: '4', partnerId: 'demo-partner', orderId: 'ORD-2024-004', orderNumber: 'ORD-2024-004', orderAmount: 234000, commissionAmount: 11700, status: 'confirmed', attributionDays: 7, createdAt: new Date().toISOString(), confirmedAt: new Date().toISOString() },
-        { id: '5', partnerId: 'demo-partner', orderId: 'ORD-2024-005', orderNumber: 'ORD-2024-005', orderAmount: 67000, commissionAmount: 3350, status: 'cancelled', attributionDays: 7, createdAt: new Date().toISOString() },
-      ]);
-      setSummary({ totalConversions: 342, totalAmount: 15420000, totalCommission: 771000, pendingCount: 23, confirmedCount: 312, cancelledCount: 5, refundedCount: 2 });
+      setConversions([]);
+      setSummary(null);
+      setLoadError(toLoadError(err, CONVERSIONS_ENDPOINT));
     } finally {
       setLoading(false);
     }
@@ -147,10 +154,22 @@ const Conversions: React.FC = () => {
         title="전환 분석"
         subtitle="파트너 링크를 통한 전환 내역을 확인합니다"
         actions={[
-          { id: 'export', label: '내보내기', icon: <Download className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const },
+          { id: 'export', label: '내보내기', icon: <Download className="w-4 h-4" />, onClick: () => {}, variant: 'secondary' as const, disabled: true },
         ]}
       />
 
+      <div className="mb-6">
+        <PartnerOpsMutationNotice reason={`전환 내보내기 — ${PARTNEROPS_MUTATION_DISABLED_REASON}`} />
+      </div>
+
+      {loadError && (
+        <div className="mb-6">
+          <PartnerOpsLoadError error={loadError} onRetry={fetchConversions} retrying={loading} />
+        </div>
+      )}
+
+      {!loadError && (
+      <>
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg shadow p-4">
@@ -221,6 +240,8 @@ const Conversions: React.FC = () => {
           />
         )}
       </div>
+      </>
+      )}
     </div>
   );
 };

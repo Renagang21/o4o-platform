@@ -10,7 +10,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import {
   Plus,
@@ -23,6 +22,13 @@ import {
   Link as LinkIcon,
 } from 'lucide-react';
 import PageHeader from '../../../components/common/PageHeader';
+import {
+  PartnerOpsLoadError,
+  PartnerOpsMutationNotice,
+  PARTNEROPS_MUTATION_DISABLED_REASON,
+  toLoadError,
+  type PartnerOpsLoadErrorInfo,
+} from '../components/PartnerOpsLoadError';
 
 /**
  * Partner Routine (Partner-Core aligned)
@@ -43,70 +49,25 @@ interface Routine {
   updatedAt: string;
 }
 
+const ROUTINES_ENDPOINT = '/partnerops/routines';
+
 const Routines: React.FC = () => {
-  const navigate = useNavigate();
-  const { id } = useParams();
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    productIds: '',
-  });
+  // WO-O4O-PARTNEROPS-ACTIVE-DEMO-FALLBACK-AUDIT-AND-GUIDE-V1:
+  //   조회 실패 시 데모 루틴을 주입하지 않는다.
+  const [loadError, setLoadError] = useState<PartnerOpsLoadErrorInfo | null>(null);
 
   const fetchRoutines = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
-      const response = await authClient.api.get('/partnerops/routines');
-      if (response.data?.data) {
-        setRoutines(response.data.data);
-      }
+      const response = await authClient.api.get(ROUTINES_ENDPOINT);
+      setRoutines(Array.isArray(response.data?.data) ? response.data.data : []);
     } catch (err) {
       console.error('Failed to fetch routines:', err);
-      // Demo data
-      setRoutines([
-        {
-          id: '1',
-          partnerId: 'demo-partner',
-          title: '겨울철 보습 루틴',
-          description: '건조한 겨울철을 위한 보습 스킨케어 루틴입니다.',
-          status: 'published',
-          productIds: ['product-1', 'product-2', 'product-3'],
-          viewCount: 1234,
-          clickCount: 234,
-          conversionCount: 12,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          partnerId: 'demo-partner',
-          title: '민감 피부 진정 루틴',
-          description: '민감한 피부를 위한 진정 케어 루틴입니다.',
-          status: 'published',
-          productIds: ['product-4', 'product-5'],
-          viewCount: 892,
-          clickCount: 156,
-          conversionCount: 8,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        {
-          id: '3',
-          partnerId: 'demo-partner',
-          title: '여드름 관리 루틴',
-          description: '트러블 피부를 위한 관리 루틴입니다.',
-          status: 'draft',
-          productIds: ['product-6'],
-          viewCount: 456,
-          clickCount: 78,
-          conversionCount: 3,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      ]);
+      setRoutines([]);
+      setLoadError(toLoadError(err, ROUTINES_ENDPOINT));
     } finally {
       setLoading(false);
     }
@@ -116,73 +77,10 @@ const Routines: React.FC = () => {
     fetchRoutines();
   }, []);
 
-  useEffect(() => {
-    if (id && id !== 'new') {
-      const routine = routines.find((r) => r.id === id);
-      if (routine) {
-        setFormData({
-          title: routine.title,
-          description: routine.description || '',
-          productIds: routine.productIds.join(', '),
-        });
-        setEditingId(id);
-        setShowForm(true);
-      }
-    } else if (id === 'new' || window.location.pathname.includes('/new')) {
-      setShowForm(true);
-      setEditingId(null);
-      setFormData({ title: '', description: '', productIds: '' });
-    }
-  }, [id, routines]);
-
-  const handleSubmit = async () => {
-    try {
-      const data = {
-        title: formData.title,
-        description: formData.description,
-        productIds: formData.productIds.split(',').map((p) => p.trim()).filter(Boolean),
-      };
-
-      if (editingId) {
-        await authClient.api.put(`/partnerops/routines/${editingId}`, data);
-      } else {
-        await authClient.api.post('/partnerops/routines', data);
-      }
-
-      setShowForm(false);
-      setEditingId(null);
-      setFormData({ title: '', description: '', productIds: '' });
-      fetchRoutines();
-      navigate('/partnerops/routines');
-    } catch (err) {
-      console.error('Failed to save routine:', err);
-      alert('루틴 저장에 실패했습니다.');
-    }
-  };
-
-  const handleDelete = async (routineId: string) => {
-    if (!confirm('이 루틴을 삭제하시겠습니까?')) return;
-
-    try {
-      await authClient.api.delete(`/partnerops/routines/${routineId}`);
-      fetchRoutines();
-    } catch (err) {
-      console.error('Failed to delete routine:', err);
-      alert('루틴 삭제에 실패했습니다.');
-    }
-  };
-
-  const toggleStatus = async (routine: Routine) => {
-    try {
-      const newStatus = routine.status === 'published' ? 'draft' : 'published';
-      await authClient.api.put(`/partnerops/routines/${routine.id}`, {
-        status: newStatus,
-      });
-      fetchRoutines();
-    } catch (err) {
-      console.error('Failed to toggle routine:', err);
-    }
-  };
+  // WO-O4O-PARTNEROPS-ACTIVE-DEMO-FALLBACK-AUDIT-AND-GUIDE-V1:
+  //   루틴 생성(POST) · 수정(PUT) · 삭제(DELETE) · publish/draft 토글(PUT) 은
+  //   운영 API 검증 전이므로 실행 경로를 제거하고 CTA 를 비활성 처리했다.
+  //   /partnerops/routines/new · /partnerops/routines/:id 라우트는 유지되며 목록을 표시한다.
 
   if (loading) {
     return (
@@ -198,12 +96,9 @@ const Routines: React.FC = () => {
       id: 'new-routine',
       label: '새 루틴',
       icon: <Plus className="w-4 h-4" />,
-      onClick: () => {
-        setShowForm(true);
-        setEditingId(null);
-        setFormData({ title: '', description: '', productIds: '' });
-      },
+      onClick: () => {},
       variant: 'primary' as const,
+      disabled: true,
     },
   ];
 
@@ -216,76 +111,22 @@ const Routines: React.FC = () => {
         actions={headerActions}
       />
 
-      {/* Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg mx-4">
-            <h2 className="text-xl font-bold mb-4">
-              {editingId ? '루틴 수정' : '새 루틴 만들기'}
-            </h2>
+      <div className="mb-6">
+        <PartnerOpsMutationNotice reason={`루틴 생성·수정·삭제·게시 — ${PARTNEROPS_MUTATION_DISABLED_REASON}`} />
+      </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">제목</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  placeholder="루틴 제목"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">설명</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  rows={3}
-                  placeholder="루틴 설명"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">상품 ID (쉼표로 구분)</label>
-                <input
-                  type="text"
-                  value={formData.productIds}
-                  onChange={(e) => setFormData({ ...formData, productIds: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  placeholder="product-1, product-2, product-3"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-2 mt-6">
-              <button
-                onClick={handleSubmit}
-                className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                {editingId ? '수정' : '생성'}
-              </button>
-              <button
-                onClick={() => {
-                  setShowForm(false);
-                  setEditingId(null);
-                  navigate('/partnerops/routines');
-                }}
-                className="flex-1 py-2 border rounded-lg hover:bg-gray-50"
-              >
-                취소
-              </button>
-            </div>
-          </div>
+      {loadError && (
+        <div className="mb-6">
+          <PartnerOpsLoadError error={loadError} onRetry={fetchRoutines} retrying={loading} />
         </div>
       )}
 
       {/* Routines List */}
+      {!loadError && (
       <div className="space-y-4">
         {routines.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
-            아직 생성된 루틴이 없습니다. 첫 번째 루틴을 만들어보세요.
+            등록된 루틴이 없습니다.
           </div>
         ) : (
           routines.map((routine) => (
@@ -332,9 +173,10 @@ const Routines: React.FC = () => {
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => toggleStatus(routine)}
-                    className="p-2 text-gray-600 hover:bg-gray-100 rounded"
-                    title={routine.status === 'published' ? '비게시' : '게시'}
+                    onClick={() => {}}
+                    disabled
+                    className="p-2 text-gray-400 rounded cursor-not-allowed"
+                    title={`${routine.status === 'published' ? '비게시' : '게시'} — ${PARTNEROPS_MUTATION_DISABLED_REASON}`}
                   >
                     {routine.status === 'published' ? (
                       <EyeOff className="w-4 h-4" />
@@ -343,24 +185,18 @@ const Routines: React.FC = () => {
                     )}
                   </button>
                   <button
-                    onClick={() => {
-                      setFormData({
-                        title: routine.title,
-                        description: routine.description || '',
-                        productIds: routine.productIds.join(', '),
-                      });
-                      setEditingId(routine.id);
-                      setShowForm(true);
-                    }}
-                    className="p-2 text-gray-600 hover:bg-gray-100 rounded"
-                    title="수정"
+                    onClick={() => {}}
+                    disabled
+                    className="p-2 text-gray-400 rounded cursor-not-allowed"
+                    title={`수정 — ${PARTNEROPS_MUTATION_DISABLED_REASON}`}
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(routine.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded"
-                    title="삭제"
+                    onClick={() => {}}
+                    disabled
+                    className="p-2 text-gray-400 rounded cursor-not-allowed"
+                    title={`삭제 — ${PARTNEROPS_MUTATION_DISABLED_REASON}`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -370,6 +206,7 @@ const Routines: React.FC = () => {
           ))
         )}
       </div>
+      )}
     </div>
   );
 };

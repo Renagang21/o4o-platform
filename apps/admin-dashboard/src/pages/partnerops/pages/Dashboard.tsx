@@ -14,6 +14,11 @@ import { useAuthStore } from '@/stores/authStore';
 import { authClient } from '@o4o/auth-client';
 import { AppGuard } from '@/components/common/AppGuard';
 import {
+  PartnerOpsLoadError,
+  toLoadError,
+  type PartnerOpsLoadErrorInfo,
+} from '../components/PartnerOpsLoadError';
+import {
   TrendingUp,
   DollarSign,
   Link2,
@@ -54,41 +59,26 @@ interface DashboardSummary {
   }>;
 }
 
+const SUMMARY_ENDPOINT = '/partnerops/dashboard/summary';
+
 const DashboardContent: React.FC = () => {
   const { user } = useAuthStore();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // WO-O4O-PARTNEROPS-ACTIVE-DEMO-FALLBACK-AUDIT-AND-GUIDE-V1:
+  //   조회 실패 시 데모 데이터를 주입하지 않는다. 실패는 실패로 표시한다.
+  const [loadError, setLoadError] = useState<PartnerOpsLoadErrorInfo | null>(null);
 
   const fetchSummary = async () => {
     setLoading(true);
-    setError(null);
+    setLoadError(null);
     try {
-      const response = await authClient.api.get('/partnerops/dashboard/summary');
-      if (response.data?.data) {
-        setSummary(response.data.data);
-      }
+      const response = await authClient.api.get(SUMMARY_ENDPOINT);
+      setSummary(response.data?.data ?? null);
     } catch (err: any) {
       console.error('Failed to fetch dashboard summary:', err);
-      // Show demo data when API is not available
-      setSummary({
-        partnerId: 'demo-partner',
-        partnerLevel: 'standard',
-        partnerStatus: 'active',
-        totalClicks: 15420,
-        totalConversions: 342,
-        conversionRate: 2.22,
-        totalEarnings: 1542000,
-        pendingEarnings: 234000,
-        settledEarnings: 1308000,
-        todayClicks: 234,
-        todayConversions: 5,
-        todayEarnings: 31200,
-        recentActivity: [
-          { type: 'conversion', description: '주문 전환', amount: 4500, timestamp: new Date().toISOString() },
-          { type: 'click', description: '링크 클릭', timestamp: new Date().toISOString() },
-        ],
-      });
+      setSummary(null);
+      setLoadError(toLoadError(err, SUMMARY_ENDPOINT));
     } finally {
       setLoading(false);
     }
@@ -122,12 +112,18 @@ const DashboardContent: React.FC = () => {
         </button>
       </div>
 
-      {error && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800">
-          {error}
+      {loadError && (
+        <PartnerOpsLoadError error={loadError} onRetry={fetchSummary} retrying={loading} />
+      )}
+
+      {!loadError && !summary && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6 text-gray-600">
+          표시할 파트너 실적 데이터가 없습니다.
         </div>
       )}
 
+      {!loadError && summary && (
+      <>
       {/* Main Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg shadow p-4">
@@ -274,6 +270,8 @@ const DashboardContent: React.FC = () => {
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 };

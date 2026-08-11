@@ -6,9 +6,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { authClient } from '@o4o/auth-client';
-import { Plus, Copy, Trash2, ExternalLink, MousePointer, TrendingUp, Check } from 'lucide-react';
+import { Plus, Copy, ExternalLink, MousePointer, TrendingUp, Check } from 'lucide-react';
 import PageHeader from '../../../components/common/PageHeader';
-import { BaseTable, RowActionMenu } from '@o4o/ui';
+import {
+  PartnerOpsLoadError,
+  PartnerOpsMutationNotice,
+  PARTNEROPS_MUTATION_DISABLED_REASON,
+  toLoadError,
+  type PartnerOpsLoadErrorInfo,
+} from '../components/PartnerOpsLoadError';
+import { BaseTable } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 
 interface TrackingLink {
@@ -26,30 +33,26 @@ interface TrackingLink {
   createdAt: string;
 }
 
+const LINKS_ENDPOINT = '/partnerops/links';
+
 const Links: React.FC = () => {
   const [links, setLinks] = useState<TrackingLink[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
+  // WO-O4O-PARTNEROPS-ACTIVE-DEMO-FALLBACK-AUDIT-AND-GUIDE-V1:
+  //   조회 실패 시 데모 링크를 주입하지 않는다. 실패는 실패로 표시한다.
+  const [loadError, setLoadError] = useState<PartnerOpsLoadErrorInfo | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    originalUrl: '',
-    targetType: 'custom' as 'product' | 'routine' | 'category' | 'custom',
-    targetId: '',
-  });
 
   const fetchLinks = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
-      const response = await authClient.api.get('/partnerops/links');
-      if (response.data?.data) setLinks(response.data.data);
+      const response = await authClient.api.get(LINKS_ENDPOINT);
+      setLinks(Array.isArray(response.data?.data) ? response.data.data : []);
     } catch (err) {
       console.error('Failed to fetch links:', err);
-      // Demo data
-      setLinks([
-        { id: '1', shortUrl: 'https://link.neture.co.kr/abc123', originalUrl: 'https://neture.co.kr/products/skincare-set', targetType: 'product', targetId: 'product-1', totalClicks: 1234, uniqueClicks: 980, conversions: 45, conversionRate: 3.65, totalCommission: 225000, createdAt: new Date().toISOString() },
-        { id: '2', shortUrl: 'https://link.neture.co.kr/xyz789', originalUrl: 'https://neture.co.kr/routines/winter-care', targetType: 'routine', targetId: 'routine-1', totalClicks: 567, uniqueClicks: 450, conversions: 23, conversionRate: 4.06, totalCommission: 115000, createdAt: new Date().toISOString() },
-        { id: '3', shortUrl: 'https://link.neture.co.kr/promo01', originalUrl: 'https://neture.co.kr/sale', targetType: 'custom', targetId: '', totalClicks: 2340, uniqueClicks: 1890, conversions: 67, conversionRate: 2.86, totalCommission: 335000, createdAt: new Date().toISOString() },
-      ]);
+      setLinks([]);
+      setLoadError(toLoadError(err, LINKS_ENDPOINT));
     } finally {
       setLoading(false);
     }
@@ -57,27 +60,9 @@ const Links: React.FC = () => {
 
   useEffect(() => { fetchLinks(); }, []);
 
-  const handleCreate = async () => {
-    try {
-      await authClient.api.post('/partnerops/links', formData);
-      setShowForm(false);
-      setFormData({ originalUrl: '', targetType: 'custom', targetId: '' });
-      fetchLinks();
-    } catch (err) {
-      console.error('Failed to create link:', err);
-      alert('링크 생성에 실패했습니다.');
-    }
-  };
-
-  const handleDelete = async (linkId: string) => {
-    try {
-      await authClient.api.delete(`/partnerops/links/${linkId}`);
-      fetchLinks();
-    } catch (err) {
-      console.error('Failed to delete link:', err);
-      alert('링크 삭제에 실패했습니다.');
-    }
-  };
+  // WO-O4O-PARTNEROPS-ACTIVE-DEMO-FALLBACK-AUDIT-AND-GUIDE-V1:
+  //   링크 생성(POST /partnerops/links) · 삭제(DELETE /partnerops/links/:id) 는
+  //   운영 API 검증 전이므로 CTA 를 비활성 처리했다. 실행 경로를 남겨두지 않는다.
 
   const copyLink = (link: TrackingLink) => {
     navigator.clipboard.writeText(link.shortUrl);
@@ -165,11 +150,6 @@ const Links: React.FC = () => {
           >
             <ExternalLink className="w-4 h-4" />
           </button>
-          <RowActionMenu
-            actions={[
-              { key: 'delete', label: '삭제', icon: <Trash2 size={14} />, variant: 'danger', confirm: '이 링크를 삭제하시겠습니까?', onClick: () => handleDelete(row.id) },
-            ]}
-          />
         </div>
       ),
     },
@@ -181,10 +161,22 @@ const Links: React.FC = () => {
         title="추적 링크 관리"
         subtitle="파트너 링크를 생성하고 성과를 추적합니다"
         actions={[
-          { id: 'new-link', label: '새 링크', icon: <Plus className="w-4 h-4" />, onClick: () => setShowForm(true), variant: 'primary' as const },
+          { id: 'new-link', label: '새 링크', icon: <Plus className="w-4 h-4" />, onClick: () => {}, variant: 'primary' as const, disabled: true },
         ]}
       />
 
+      <div className="mb-6">
+        <PartnerOpsMutationNotice reason={`링크 생성·삭제 — ${PARTNEROPS_MUTATION_DISABLED_REASON}`} />
+      </div>
+
+      {loadError && (
+        <div className="mb-6">
+          <PartnerOpsLoadError error={loadError} onRetry={fetchLinks} retrying={loading} />
+        </div>
+      )}
+
+      {!loadError && (
+      <>
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-lg shadow p-4">
@@ -213,56 +205,6 @@ const Links: React.FC = () => {
         </div>
       </div>
 
-      {/* Create Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg mx-4">
-            <h2 className="text-xl font-bold mb-4">새 링크 만들기</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">링크 유형</label>
-                <select
-                  value={formData.targetType}
-                  onChange={(e) => setFormData({ ...formData, targetType: e.target.value as 'product' | 'routine' | 'category' | 'custom' })}
-                  className="w-full border rounded-lg px-3 py-2"
-                >
-                  <option value="custom">커스텀 URL</option>
-                  <option value="product">상품</option>
-                  <option value="routine">루틴</option>
-                  <option value="category">카테고리</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">대상 URL</label>
-                <input
-                  type="text"
-                  value={formData.originalUrl}
-                  onChange={(e) => setFormData({ ...formData, originalUrl: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
-                  placeholder="https://neture.co.kr/product/..."
-                />
-              </div>
-              {formData.targetType !== 'custom' && (
-                <div>
-                  <label className="block text-sm font-medium mb-1">대상 ID</label>
-                  <input
-                    type="text"
-                    value={formData.targetId}
-                    onChange={(e) => setFormData({ ...formData, targetId: e.target.value })}
-                    className="w-full border rounded-lg px-3 py-2"
-                    placeholder="상품 또는 루틴 ID"
-                  />
-                </div>
-              )}
-            </div>
-            <div className="flex gap-2 mt-6">
-              <button onClick={handleCreate} className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">생성</button>
-              <button onClick={() => { setShowForm(false); setFormData({ originalUrl: '', targetType: 'custom', targetId: '' }); }} className="flex-1 py-2 border rounded-lg hover:bg-gray-50">취소</button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Links Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
@@ -281,6 +223,8 @@ const Links: React.FC = () => {
           />
         )}
       </div>
+      </>
+      )}
     </div>
   );
 };
