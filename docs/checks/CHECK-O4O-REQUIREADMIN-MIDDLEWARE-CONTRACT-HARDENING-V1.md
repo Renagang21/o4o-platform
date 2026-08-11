@@ -110,3 +110,19 @@ schema 0 / migration 0 / DB write 0 / 새 테스트 계정 0.
 
 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건
 — `modules/cms/routes/cms.routes.ts` 는 어디에도 mount 되지 않는 dead router(23 route)다. 이번 범위 밖이라 손대지 않았고, 은퇴 여부는 별도 WO 판단이 필요하다.
+
+---
+
+## 부록 A. 배포 후 프로덕션 smoke (§9, read-only)
+
+리비전 `o4o-core-api-03290-p9x` 기준. GET 만 호출했다 — **DB write 0.**
+
+| 경로 | 계정 | 배포 전 | 배포 후 |
+|---|---|---|---|
+| `GET /api/v1/content/assets` | 비인증 | 401 `AUTH_REQUIRED` | 401 `AUTH_REQUIRED` (유지) |
+| `GET /api/v1/content/assets` | `sohae2100@gmail.com` (super_admin 아님) | **500** — 가드를 통과해 핸들러까지 도달 | **403 `FORBIDDEN`** |
+
+배포 전 500 은 "권한 검사를 건너뛰고 핸들러에 들어가 DB 조회에서 실패한" 결과로, **우회가 실제로 성립했다는 직접 증거**다.
+배포 후 같은 계정이 403 으로 차단된다.
+
+`GET /api/v1/channels` 는 `optionalAuth` 라 이번 가드 대상이 아니며, 배포 전후 모두 500 이다(별개 원인 — 이번 범위 밖).
