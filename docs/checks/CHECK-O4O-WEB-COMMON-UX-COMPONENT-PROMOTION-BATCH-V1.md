@@ -70,7 +70,32 @@ soft-result wrapper(`{ data, error }`) 특성상 `catch` 만으로는 error 상�
 | API 서버 변경·배포 | 없음 (WO §9) |
 | DB write · migration | 없음 |
 
-브라우저 smoke 는 web 서비스 배포 완료 후 수행한다 (본 커밋 push → CI detect-changes 로 변경 서비스만 배포).
+### 배포
+
+`Deploy Web Services (Cloud Run)` run **31465412776 = success** (detect-changes / k-cosmetics / kpa-society / pharmacy-hub / glycopharm / neture / summary 전 job success).
+
+> `Deploy API Server` 워크플로는 `paths: packages/**` 트리거 때문에 자동 기동됐다 (본 커밋이 `packages/ui` 등을 건드림).
+> `apps/api-server` 변경은 0건이며 동일 소스 재빌드다 — WO §9 의 "API 배포를 **수행하지 않는다**" 는 별도 배포를 하지 않는다는 뜻으로 지켰고,
+> 저장소 표준 트리거에 의한 자동 기동은 취소하지 않았다(진행 중 취소가 더 위험).
+
+### 브라우저 smoke (프로덕션, 배포 후)
+
+| # | 항목 | 대상 | 결과 |
+|---|---|---|---|
+| 1 | 404 | neture / glycopharm / kpa-society / k-cosmetics / pharmacy-hub 전 5종 `/this-route-does-not-exist-wo-smoke` | PASS — 표준 문구 + 요청 경로 + 홈/뒤로. glyco·kcos 는 커뮤니티·문의하기, kpa 는 커뮤니티·이용 가이드 children 유지 |
+| 2 | 로그인 필요 | neture `/workspace/hub` (비로그인) | PASS — "로그인이 필요합니다 / 허브에 접근하려면 로그인이 필요합니다." + [로그인하기] |
+| 3 | 권한 없음 | glycopharm `/operator/forum` (매장 계정) | PASS — "접근 권한이 없습니다 / 현재 계정으로는 이 기능을 사용할 수 없습니다." + [홈으로 돌아가기] |
+| 4 | LoadError (error→retry→ready) | glycopharm `/operator/forum-analytics` | PASS — 실패 시 LoadError, [다시 시도] 후 정상 렌더 (**기존에는 catch 부재로 무한 로딩**) |
+| 5 | LoadError (error→retry→empty) | glycopharm `/operator/forum-delete-requests` | PASS — 실패 시 LoadError, retry 후 "해당 상태의 삭제 요청이 없습니다"(empty) 로 복귀 → error/empty 구분 확인 |
+| 6 | noticesError | glycopharm 홈 `/` | PASS — "공지를 불러오지 못했습니다." + [다시 시도] → retry 후 "등록된 공지가 없습니다"(empty). 최신글 등 나머지 블록은 정상 렌더 |
+| 7 | LoadError 스타일 | k-cosmetics `/store/library/contents` | PASS — amber 카드·lucide 아이콘·[다시 시도] 정상 (서비스별 tailwind 빌드에 공통 클래스 포함 확인), retry 후 목록 복구 |
+| 8 | 정상 / empty | 위 4·5·6·7 의 복구 경로에서 함께 확인 | PASS |
+
+실패 주입은 브라우저에서 해당 XHR만 network error 로 만드는 방식이며 **서버·DB 는 건드리지 않았다** (비파괴).
+
+**미재현 1건 — StoreOwnerGuard 거부 화면**: 사용 가능한 테스트 계정(glycopharm / k-cosmetics / pharmacy-hub)이 모두 매장 스코프를 통과해
+거부 분기를 실브라우저에서 재현하지 못했다. 렌더 대상 컴포넌트 자체는 위 3번에서 동일 화면으로 확인됐고,
+`renderDenied` 미주입 시 기존 `Navigate` 동작 보존은 코드로 확인했다. 계정 준비 시 후속 확인 대상.
 
 ---
 
