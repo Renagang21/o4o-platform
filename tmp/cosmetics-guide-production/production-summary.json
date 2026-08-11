@@ -1,0 +1,79 @@
+{
+  "wo": "WO-O4O-COSMETICS-KO-GUIDE-FULL-PRODUCTION-V1",
+  "population": 33106,
+  "koGenerated": 33106,
+  "notGenerated": 0,
+  "complete": 20949,
+  "partial": 12157,
+  "missingBreakdown": {
+    "mainFeatures": 12076,
+    "productType": 42,
+    "usage": 519
+  },
+  "issueQueue": {
+    "total": 21115,
+    "byType": {
+      "NAME_TOO_SHORT": 193,
+      "TYPE_NAME_MISMATCH": 8270,
+      "NO_OBSERVED_FEATURE": 12076,
+      "NAME_EQUALS_TYPE": 57,
+      "TYPE_NAME_CONTRADICTION": 16,
+      "PRODUCT_TYPE_UNDETERMINED": 26,
+      "PRODUCT_TYPE_AXIS_NOT_FORM": 67,
+      "NON_COSMETIC_SUSPECT": 410
+    },
+    "byAxis": {
+      "identity": 250,
+      "productType": 8379,
+      "source": 12076,
+      "merge/bundle": 410
+    }
+  },
+  "functionalUsed": 4259,
+  "perBatch": [
+    {
+      "batch": "batch-01",
+      "input": 10000,
+      "generated": 10000,
+      "complete": 6982,
+      "partial": 3018,
+      "issues": 4765,
+      "systemFailures": 0,
+      "validationViolations": 0
+    },
+    {
+      "batch": "batch-02",
+      "input": 10000,
+      "generated": 10000,
+      "complete": 6328,
+      "partial": 3672,
+      "issues": 7371,
+      "systemFailures": 0,
+      "validationViolations": 0
+    },
+    {
+      "batch": "batch-03",
+      "input": 10000,
+      "generated": 10000,
+      "complete": 6492,
+      "partial": 3508,
+      "issues": 5541,
+      "systemFailures": 0,
+      "validationViolations": 0
+    },
+    {
+      "batch": "batch-04",
+      "input": 3106,
+      "generated": 3106,
+      "complete": 1147,
+      "partial": 1959,
+      "issues": 3438,
+      "systemFailures": 0,
+      "validationViolations": 0
+    }
+  ],
+  "validationTotalViolations": 0,
+  "censusIssueQueueCarriedOver": 872,
+  "dbWrites": 0,
+  "englishGuides": 0
+}

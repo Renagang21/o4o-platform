@@ -1,0 +1,4008 @@
+{
+  "meta": {
+    "method": "계통표본 index = floor(k × N / 100)",
+    "population": 33106,
+    "sample": 100
+  },
+  "sample": [
+    {
+      "key": "디오디너리|글리코릭애시드7％엑스폴리에이팅토너",
+      "brandName": "디오디너리",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "글리코릭 애시드 7％ 엑스폴리에이팅 토너",
+      "productType": "토너",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "디오디너리 글리코릭 애시드 7％ 엑스폴리에이팅 토너 — 토너 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 100ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 스킨/토너/패드",
+      "usage": "세안 후 적당량을 화장솜 또는 손에 덜어 피부결을 따라 부드럽게 정돈해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5166166"
+      ],
+      "rawProductNames": [
+        "글리코릭 애시드 7％ 엑스폴리에이팅 토너 100ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "그라펜|포어올킬™미스트토너",
+      "brandName": "그라펜",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "포어 올킬™ 미스트 토너",
+      "productType": "토너",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "그라펜 포어 올킬™ 미스트 토너 — 토너 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 120ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 스킨/토너/패드",
+      "usage": "세안 후 적당량을 화장솜 또는 손에 덜어 피부결을 따라 부드럽게 정돈해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6525645"
+      ],
+      "rawProductNames": [
+        "포어 올킬™ 미스트 토너 120ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "키위글로우|비건제주연꽃마일드각질케어70송이토너패드",
+      "brandName": "키위글로우",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "비건 제주 연꽃 마일드 각질케어 70송이 토너패드",
+      "productType": "토너패드",
+      "productTypeSource": "RETAIL_CATEGORY+NAME_KEYWORD",
+      "oneLineDescription": "키위글로우 비건 제주 연꽃 마일드 각질케어 70송이 토너패드 — 토너패드 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 스킨케어 > 스킨/토너/패드",
+      "usage": "세안 후 패드를 꺼내 피부결을 따라 부드럽게 닦아내듯 사용해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5138957"
+      ],
+      "rawProductNames": [
+        "키위글로우 비건  제주 연꽃 마일드 각질케어 70송이 토너패드"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "어퓨|난코티트리에멀젼",
+      "brandName": "어퓨",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "난코 티트리 에멀젼",
+      "productType": "토너",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "어퓨 난코 티트리 에멀젼 — 토너 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 210ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 스킨/토너/패드",
+      "usage": "세안 후 적당량을 화장솜 또는 손에 덜어 피부결을 따라 부드럽게 정돈해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4185448"
+      ],
+      "rawProductNames": [
+        "난코 티트리 에멀젼 210ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "토니모리|스네일pdrn리커버리토너",
+      "brandName": "토니모리",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "스네일 PDRN 리커버리 토너",
+      "productType": "토너",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "토니모리 스네일 PDRN 리커버리 토너 — 토너 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 120ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 스킨/토너/패드",
+      "usage": "세안 후 적당량을 화장솜 또는 손에 덜어 피부결을 따라 부드럽게 정돈해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5251228"
+      ],
+      "rawProductNames": [
+        "스네일 PDRN 리커버리 토너 120ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "엔디피|초저분자히알루로닉수분미스트",
+      "brandName": "엔디피",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "초저분자 히알루로닉 수분 미스트",
+      "productType": "미스트",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "엔디피 초저분자 히알루로닉 수분 미스트 — 미스트 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 100ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 미스트/페이셜오일",
+      "usage": "필요할 때 얼굴에서 적당히 거리를 두고 가볍게 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4598887",
+        "https://www.musinsa.com/products/3704026",
+        "https://www.musinsa.com/products/3704087"
+      ],
+      "rawProductNames": [
+        "초저분자 히알루로닉 수분 미스트 100ml 2개",
+        "초저분자 히알루로닉 수분 미스트 100ml",
+        "초저분자 히알루로닉 수분 미스트100ml + 세럼 30ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "라운드랩|[오직무신사뷰티]소나무진정시카앰플대용량",
+      "brandName": "라운드랩",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "[오직무신사뷰티] 소나무 진정 시카 앰플 대용량",
+      "productType": "앰플",
+      "productTypeSource": "RETAIL_CATEGORY+NAME_KEYWORD",
+      "oneLineDescription": "라운드랩 [오직무신사뷰티] 소나무 진정 시카 앰플 대용량 — 앰플 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 50ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 에센스/세럼/앰플",
+      "usage": "토너로 피부결을 정돈한 뒤 적당량을 덜어 집중이 필요한 부위에 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3748858"
+      ],
+      "rawProductNames": [
+        "[오직무신사뷰티] [2pack] 소나무 진정 시카 앰플 대용량 50ml (+동백 선세럼 7ml + 소나무 마스크 1매)"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "진저6|비건라이크화이트스노우세럼",
+      "brandName": "진저6",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "비건 라이크 화이트 스노우 세럼",
+      "productType": "세럼",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "진저6 비건 라이크 화이트 스노우 세럼 — 세럼 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 30ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 에센스/세럼/앰플",
+      "usage": "토너로 피부결을 정돈한 뒤 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/2785772"
+      ],
+      "rawProductNames": [
+        "비건 라이크 화이트 스노우 세럼  30ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "마녀공장|비피다바이옴컨센트레이트세럼(사용기한27.03.28까지)",
+      "brandName": "마녀공장",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "비피다 바이옴 컨센트레이트 세럼 (사용기한 27.03.28까지)",
+      "productType": "세럼",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "마녀공장 비피다 바이옴 컨센트레이트 세럼 (사용기한 27.03.28까지) — 세럼 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 35ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 에센스/세럼/앰플",
+      "usage": "토너로 피부결을 정돈한 뒤 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6816030",
+        "https://www.musinsa.com/products/3508776"
+      ],
+      "rawProductNames": [
+        "[2PACK] 비피다 바이옴 컨센트레이트 세럼 35ml (사용기한 27.03.28까지)",
+        "비피다 바이옴 컨센트레이트 세럼 35ml (사용기한 27.03.28까지)"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "더마젼시|비타민씨콜라겐글로우트리플캡슐앰플",
+      "brandName": "더마젼시",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "비타민씨 콜라겐 글로우 트리플 캡슐 앰플",
+      "productType": "앰플",
+      "productTypeSource": "RETAIL_CATEGORY+NAME_KEYWORD",
+      "oneLineDescription": "더마젼시 비타민씨 콜라겐 글로우 트리플 캡슐 앰플 — 앰플 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 40ml",
+          "evidence": "RETAIL_LISTING"
+        },
+        {
+          "text": "식약처 기능성화장품 보고 제품 (보고번호 2026011061 · 책임판매업자 주식회사뉴아이피아)",
+          "evidence": "MFDS_REPORT_OFFICIAL"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 에센스/세럼/앰플",
+      "usage": "토너로 피부결을 정돈한 뒤 적당량을 덜어 집중이 필요한 부위에 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_FUNCTIONAL_MATCHED",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6481835"
+      ],
+      "rawProductNames": [
+        "비타민씨 콜라겐 글로우 트리플 캡슐 앰플 40ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "셀올로지|필업아이세럼&패치/눈가탄력눈밑리프팅",
+      "brandName": "셀올로지",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "필업 아이 세럼 & 패치 / 눈가 탄력 눈밑 리프팅",
+      "productType": "세럼",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "셀올로지 필업 아이 세럼 & 패치 / 눈가 탄력 눈밑 리프팅 — 세럼 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 20ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 에센스/세럼/앰플",
+      "usage": "토너로 피부결을 정돈한 뒤 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4548222"
+      ],
+      "rawProductNames": [
+        "필업 아이 세럼 20ml & 패치 16매 / 눈가 탄력 눈밑 리프팅"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '세럼' 과 상품명 핵심어 '패치' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "루미덤|[나이아신아마이드체험set]나이아신아마이드20%세럼",
+      "brandName": "루미덤",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "[나이아신아마이드 체험 SET] 나이아신아마이드 20%세럼",
+      "productType": "세럼",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "루미덤 [나이아신아마이드 체험 SET] 나이아신아마이드 20%세럼 — 세럼 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 스킨케어 > 에센스/세럼/앰플",
+      "usage": "토너로 피부결을 정돈한 뒤 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5321889"
+      ],
+      "rawProductNames": [
+        "[나이아신아마이드 체험 SET] 나이아신아마이드 20%세럼 + 나이아신아마이드 크림 5ml"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "아이다코스메틱|프로이지에프진정앰플",
+      "brandName": "아이다 코스메틱",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "프로 이지에프 진정 앰플",
+      "productType": "앰플",
+      "productTypeSource": "RETAIL_CATEGORY+NAME_KEYWORD",
+      "oneLineDescription": "아이다 코스메틱 프로 이지에프 진정 앰플 — 앰플 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 20ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 에센스/세럼/앰플",
+      "usage": "토너로 피부결을 정돈한 뒤 적당량을 덜어 집중이 필요한 부위에 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6033934"
+      ],
+      "rawProductNames": [
+        "프로 이지에프 진정  앰플 20ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "엘렌실라|cpp프로폴리스골드에센스2",
+      "brandName": "엘렌실라",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "CPP 프로폴리스 골드 에센스2",
+      "productType": "에센스",
+      "productTypeSource": "RETAIL_CATEGORY+NAME_KEYWORD",
+      "oneLineDescription": "엘렌실라 CPP 프로폴리스 골드 에센스2 — 에센스 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 스킨케어 > 에센스/세럼/앰플",
+      "usage": "토너 사용 후 적당량을 덜어 얼굴 전체에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5092651",
+        "https://www.musinsa.com/products/5092645"
+      ],
+      "rawProductNames": [
+        "CPP 프로폴리스 골드 에센스2+에멀전2",
+        "CPP 프로폴리스 골드 에센스2+에멀전1"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "베비언스|카카오키즈바디로션어피치",
+      "brandName": "베비언스",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "카카오 키즈 바디로션 어피치",
+      "productType": "로션",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "베비언스 카카오 키즈 바디로션 어피치 — 로션 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 스킨케어 > 로션/에멀젼/올인원",
+      "usage": "토너 사용 후 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4758087"
+      ],
+      "rawProductNames": [
+        "카카오 키즈 바디로션 어피치(390ml)"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "바이오더마|아토덤울트라크림(저자극보습크림)",
+      "brandName": "바이오더마",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "아토덤 울트라 크림 (저자극 보습크림)",
+      "productType": "크림",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "바이오더마 아토덤 울트라 크림 (저자극 보습크림) — 크림 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 500ml · 200ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 크림/아이크림",
+      "usage": "기초 단계 마지막에 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6851306",
+        "https://www.musinsa.com/products/6851304",
+        "https://www.musinsa.com/products/6851308"
+      ],
+      "rawProductNames": [
+        "아토덤 울트라 크림 500ml (저자극 보습크림)",
+        "아토덤 울트라 크림 200ml (저자극 보습크림)",
+        "[2개] 아토덤 울트라 크림 500ml (저자극 보습크림) x2"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "쉬린|[진정/보습set]트리트먼트에센스미스트",
+      "brandName": "쉬린",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "[진정/보습SET] 트리트먼트 에센스 미스트",
+      "productType": "크림",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "쉬린 [진정/보습SET] 트리트먼트 에센스 미스트 — 크림 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 스킨케어 > 크림/아이크림",
+      "usage": "기초 단계 마지막에 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4659525"
+      ],
+      "rawProductNames": [
+        "[진정/보습SET] 트리트먼트 에센스 미스트 + 리페어 크림"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '크림' 과 상품명 핵심어 '미스트' 이 어긋난다 — census 유형을 유지했다"
+        },
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "피캄|pdrn카페인블루캡슐60크림",
+      "brandName": "피캄",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "PDRN 카페인 블루캡슐 60 크림",
+      "productType": "크림",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "피캄 PDRN 카페인 블루캡슐 60 크림 — 크림 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 50ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 크림/아이크림",
+      "usage": "기초 단계 마지막에 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5778455"
+      ],
+      "rawProductNames": [
+        "PDRN 카페인 블루캡슐 60 크림 50ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "오오티디뷰티|스네일뮤신리프팅광채보습크림",
+      "brandName": "오오티디 뷰티",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "스네일 뮤신 리프팅 광채 보습 크림",
+      "productType": "크림",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "오오티디 뷰티 스네일 뮤신 리프팅 광채 보습 크림 — 크림 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 100ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 크림/아이크림",
+      "usage": "기초 단계 마지막에 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5934633"
+      ],
+      "rawProductNames": [
+        "스네일 뮤신 리프팅 광채 보습 크림 100ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "센텔리안24|[오직무신사뷰티][고강도탄력set]마데카크림에이징포커스",
+      "brandName": "센텔리안24",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "[오직무신사뷰티] [고강도탄력 SET] 마데카크림 에이징 포커스",
+      "productType": "크림",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "센텔리안24 [오직무신사뷰티] [고강도탄력 SET] 마데카크림 에이징 포커스 — 크림 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 50ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 크림/아이크림",
+      "usage": "기초 단계 마지막에 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5931845"
+      ],
+      "rawProductNames": [
+        "[오직무신사뷰티] [고강도탄력 SET] 마데카크림 에이징 포커스 50ml 3개 + 더마 마스크 10매 (택1)"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "토니모리|기미야미백크림",
+      "brandName": "토니모리",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "기미야 미백 크림",
+      "productType": "크림",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "토니모리 기미야 미백 크림 — 크림 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 50ml",
+          "evidence": "RETAIL_LISTING"
+        },
+        {
+          "text": "식약처 기능성화장품 보고 제품 (보고번호 2020021094 · 책임판매업자 (주)토니모리)",
+          "evidence": "MFDS_REPORT_OFFICIAL"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 크림/아이크림",
+      "usage": "기초 단계 마지막에 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_FUNCTIONAL_MATCHED",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4147781"
+      ],
+      "rawProductNames": [
+        "기미야 미백 크림 50ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "아이소이|브라이트닝아이컨센트레이트(민감다크아이크림)",
+      "brandName": "아이소이",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "브라이트닝 아이 컨센트레이트(민감다크 아이크림)",
+      "productType": "크림",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "아이소이 브라이트닝 아이 컨센트레이트(민감다크 아이크림) — 크림 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 17ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 크림/아이크림",
+      "usage": "기초 단계 마지막에 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/2503663"
+      ],
+      "rawProductNames": [
+        "브라이트닝 아이 컨센트레이트(민감다크 아이크림) 17ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "스킨1004|마다가스카르센텔라티트리카스팟크림",
+      "brandName": "스킨1004",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "마다가스카르 센텔라 티트리카 스팟 크림",
+      "productType": "트러블케어",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "스킨1004 마다가스카르 센텔라 티트리카 스팟 크림 — 트러블케어 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 20ml",
+          "evidence": "RETAIL_LISTING"
+        },
+        {
+          "text": "식약처 기능성화장품 보고 제품 (보고번호 2025072117 · 책임판매업자 주식회사크레이버코퍼레이션)",
+          "evidence": "MFDS_REPORT_OFFICIAL"
+        }
+      ],
+      "classification": "뷰티 > 스킨케어 > 스팟케어",
+      "usage": "기초 단계 후 적당량을 덜어 고민 부위에 얇게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_FUNCTIONAL_MATCHED",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3835502"
+      ],
+      "rawProductNames": [
+        "마다가스카르 센텔라 티트리카 스팟 크림 20ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '트러블케어' 과 상품명 핵심어 '크림' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "시바산|바로코빈씨퍼스널",
+      "brandName": "시바산",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "바로코빈 씨 퍼스널",
+      "productType": "스킨케어세트",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "시바산 바로코빈 씨 퍼스널 — 스킨케어세트 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 스킨케어 > 스킨케어 세트",
+      "usage": "세트 구성품을 각 제품의 사용 단계(토너 → 에센스 → 로션/크림) 순서에 따라 사용해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/2081438"
+      ],
+      "rawProductNames": [
+        "바로코빈 씨 퍼스널"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "엘렌실라|오리지날달팽이기초케어기프트+쇼핑백",
+      "brandName": "엘렌실라",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "오리지날 달팽이 기초케어 기프트 + 쇼핑백",
+      "productType": "스킨케어세트",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "엘렌실라 오리지날 달팽이 기초케어 기프트 + 쇼핑백 — 스킨케어세트 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 스킨케어 > 스킨케어 세트",
+      "usage": "세트 구성품을 각 제품의 사용 단계(토너 → 에센스 → 로션/크림) 순서에 따라 사용해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6354702"
+      ],
+      "rawProductNames": [
+        "오리지날 달팽이 기초케어 기프트 세트 + 쇼핑백"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "홀리카홀리카|루미너스밀크핏블러쉬",
+      "brandName": "홀리카홀리카",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "루미너스 밀크핏 블러쉬",
+      "productType": "메이크업",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "홀리카홀리카 루미너스 밀크핏 블러쉬 — 메이크업 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 베이스메이크업 > 블러셔",
+      "usage": "기초 단계 후 적당량을 덜어 원하는 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4878104"
+      ],
+      "rawProductNames": [
+        "루미너스 밀크핏 블러쉬"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "오프라코스메틱|블러쉬-핑크레이디",
+      "brandName": "오프라 코스메틱",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "블러쉬 - 핑크 레이디",
+      "productType": "메이크업",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "오프라 코스메틱 블러쉬 - 핑크 레이디 — 메이크업 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 베이스메이크업 > 하이라이터",
+      "usage": "기초 단계 후 적당량을 덜어 원하는 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4985705"
+      ],
+      "rawProductNames": [
+        "블러쉬 - 핑크 레이디"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "23이얼즈올드|하트리프씬어성초쿠션팩트spf50",
+      "brandName": "23이얼즈올드",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "하트리프 씬 어성초 쿠션 팩트 SPF50",
+      "productType": "메이크업",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "23이얼즈올드 하트리프 씬 어성초 쿠션 팩트 SPF50 — 메이크업 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "색상/호수 선택: [5 COLORS]",
+          "evidence": "RETAIL_LISTING"
+        },
+        {
+          "text": "자외선 차단 지수 표기: SPF50+",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 베이스메이크업 > 쿠션",
+      "usage": "기초 단계 후 적당량을 덜어 원하는 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [
+        "[5 COLORS]"
+      ],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4286402"
+      ],
+      "rawProductNames": [
+        "[5 COLORS] 하트리프 씬 어성초 쿠션 팩트 SPF50+"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '메이크업' 과 상품명 핵심어 '팩' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "아이레시피|[엔믹스지우pick]아이레시피바이브업틴티드선비비",
+      "brandName": "아이레시피",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "[엔믹스 지우 PICK] 아이레시피 바이브 업 틴티드 선비비",
+      "productType": "메이크업",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "아이레시피 [엔믹스 지우 PICK] 아이레시피 바이브 업 틴티드 선비비 — 메이크업 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 40ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 베이스메이크업 > 메이크업베이스/프라이머",
+      "usage": "기초 단계 후 적당량을 덜어 원하는 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5734984",
+        "https://www.musinsa.com/products/5672202"
+      ],
+      "rawProductNames": [
+        "[엔믹스 지우 PICK] [2 Pack] 아이레시피 바이브 업 틴티드 선비비 40ml + 40ml",
+        "[엔믹스 지우 PICK] 아이레시피 바이브 업 틴티드 선비비 40ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "포트레|쉐이드앤샤인",
+      "brandName": "포트레",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "쉐이드 앤 샤인",
+      "productType": "메이크업",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "포트레 쉐이드 앤 샤인 — 메이크업 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "색상/호수 선택: (2colors)",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 베이스메이크업 > 셰이딩/컨투어링",
+      "usage": "기초 단계 후 적당량을 덜어 원하는 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [
+        "(2colors)"
+      ],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6815977"
+      ],
+      "rawProductNames": [
+        "쉐이드 앤 샤인 듀오 (2colors)"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "메이크업헬퍼|아트팩트오리지널프로피니쉬스위트소피아브러쉬",
+      "brandName": "메이크업헬퍼",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "아트 팩트 오리지널 프로 피니쉬 스위트 소피아 브러쉬",
+      "productType": "메이크업",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "메이크업헬퍼 아트 팩트 오리지널 프로 피니쉬 스위트 소피아 브러쉬 — 메이크업 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 25g",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 베이스메이크업 > 파우더/팩트",
+      "usage": "기초 단계 후 적당량을 덜어 원하는 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4466182"
+      ],
+      "rawProductNames": [
+        "아트 팩트 오리지널 프로 피니쉬 25g 스위트 소피아 브러쉬 세트"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '메이크업' 과 상품명 핵심어 '팩' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "더페이스샵|아이모먼트팔레트",
+      "brandName": "더페이스샵",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "아이모먼트 팔레트",
+      "productType": "메이크업",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "더페이스샵 아이모먼트 팔레트 — 메이크업 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "색상/호수 선택: (6 Colors)",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 아이메이크업 > 아이섀도우",
+      "usage": "기초 단계 후 적당량을 덜어 원하는 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [
+        "(6 Colors)"
+      ],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3699922"
+      ],
+      "rawProductNames": [
+        "아이모먼트 팔레트 (6 Colors)"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "패션캣|릴레이파인아이브로우펜슬",
+      "brandName": "패션캣",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "릴레이 파인 아이브로우 펜슬",
+      "productType": "메이크업",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "패션캣 릴레이 파인 아이브로우 펜슬 — 메이크업 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 0.09g",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 아이메이크업 > 아이브로우",
+      "usage": "기초 단계 후 적당량을 덜어 원하는 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6309831",
+        "https://www.musinsa.com/products/5836526"
+      ],
+      "rawProductNames": [
+        "릴레이 파인 아이브로우 펜슬 0.09g (본품+리필)",
+        "릴레이 파인 아이브로우 펜슬 0.09g (본품+리필) 2개"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "에뛰드|컬러래스팅글로우스틱",
+      "brandName": "에뛰드",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "컬러 래스팅 글로우 스틱",
+      "productType": "립",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "에뛰드 컬러 래스팅 글로우 스틱 — 립 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 립메이크업 > 립스틱",
+      "usage": "적당량을 입술에 고르게 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4313691"
+      ],
+      "rawProductNames": [
+        "컬러 래스팅 글로우 스틱"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '립' 과 상품명 핵심어 '스틱' 이 어긋난다 — census 유형을 유지했다"
+        },
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "폰들리|글로우젤틴트",
+      "brandName": "폰들리",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "글로우 젤 틴트",
+      "productType": "립",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "폰들리 글로우 젤 틴트 — 립 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "색상/호수 선택: (5colors)",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 립메이크업 > 립틴트",
+      "usage": "적당량을 입술에 고르게 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [
+        "(5colors)"
+      ],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6333334",
+        "https://www.musinsa.com/products/4699569"
+      ],
+      "rawProductNames": [
+        "글로우 젤 틴트",
+        "글로우 젤 틴트 (5colors)"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "헤비메이크업|블러링슬립핏립치크6colors+언더톤플럼핏립펜슬4colors",
+      "brandName": "헤비메이크업",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "블러링 슬립핏 립치크 6colors + 언더톤 플럼핏 립펜슬 4colors",
+      "productType": "립",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "헤비메이크업 블러링 슬립핏 립치크 6colors + 언더톤 플럼핏 립펜슬 4colors — 립 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 립메이크업 > 립틴트",
+      "usage": "적당량을 입술에 고르게 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6370660"
+      ],
+      "rawProductNames": [
+        "[SET] 블러링 슬립핏 립치크 6colors + 언더톤 플럼핏 립펜슬 4colors (+ 미니퍼프)"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "다슈|맨즈컬러체인지모이스처립밤",
+      "brandName": "다슈",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "맨즈 컬러 체인지 모이스처 립밤",
+      "productType": "립",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "다슈 맨즈 컬러 체인지 모이스처 립밤 — 립 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 3.9g",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 립메이크업 > 립밤",
+      "usage": "적당량을 입술에 고르게 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/2597142",
+        "https://www.hwahae.co.kr/products/%EB%A7%A8%EC%A6%88%20%EC%BB%AC%EB%9F%AC%20%EC%B2%B4%EC%9D%B8%EC%A7%80%20%EB%AA%A8%EC%9D%B4%EC%8A%A4%EC%B2%98%20%EB%A6%BD%EB%B0%A4/2003769"
+      ],
+      "rawProductNames": [
+        "맨즈 컬러 체인지 모이스처 립밤 3.9g",
+        "맨즈 컬러 체인지 모이스처 립밤 3.9g"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '립' 과 상품명 핵심어 '밤' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "블코|[에디션]라뉘x테디베어립컨디셔너103",
+      "brandName": "블코",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "[에디션]라뉘 x 테디베어 립 컨디셔너 103",
+      "productType": "립",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "블코 [에디션]라뉘 x 테디베어 립 컨디셔너 103 — 립 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 12ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 립메이크업 > 립밤",
+      "usage": "적당량을 입술에 고르게 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5864869"
+      ],
+      "rawProductNames": [
+        "[에디션]라뉘 x 테디베어 립 컨디셔너 103 / 12ML"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '립' 과 상품명 핵심어 '컨디셔너' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "센카|퍼펙트휩페이셜워시",
+      "brandName": "센카",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "퍼펙트 휩 페이셜 워시",
+      "productType": "클렌징폼",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "센카 퍼펙트 휩 페이셜 워시 — 클렌징폼 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 120g",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 클렌징/필링 > 클렌징폼/젤/비누",
+      "usage": "물과 함께 충분히 거품을 낸 뒤 얼굴을 부드럽게 마사지하고 물로 깨끗이 씻어내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3169435",
+        "https://www.musinsa.com/products/3169436"
+      ],
+      "rawProductNames": [
+        "퍼펙트 휩 페이셜 워시 120g x 2개",
+        "퍼펙트 휩 페이셜 워시 120g x 3개"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "클리어디어|미나리모공앰플클렌저",
+      "brandName": "클리어디어",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "미나리 모공 앰플 클렌저",
+      "productType": "클렌징폼",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "클리어디어 미나리 모공 앰플 클렌저 — 클렌징폼 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 80ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 클렌징/필링 > 클렌징폼/젤/비누",
+      "usage": "물과 함께 충분히 거품을 낸 뒤 얼굴을 부드럽게 마사지하고 물로 깨끗이 씻어내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4053313",
+        "https://www.musinsa.com/products/3790509"
+      ],
+      "rawProductNames": [
+        "미나리 모공 앰플 클렌저 80ml",
+        "[2개입] 미나리 모공 앰플 클렌저 80ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '클렌징폼' 과 상품명 핵심어 '앰플' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "더블유랩|더블유워터핏스파클링버블메이크업클렌져",
+      "brandName": "더블유랩",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "더블유 워터핏 스파클링 버블 메이크업 클렌져",
+      "productType": "클렌징폼",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "더블유랩 더블유 워터핏 스파클링 버블 메이크업 클렌져 — 클렌징폼 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 200g",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 클렌징/필링 > 클렌징폼/젤/비누",
+      "usage": "물과 함께 충분히 거품을 낸 뒤 얼굴을 부드럽게 마사지하고 물로 깨끗이 씻어내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5332375"
+      ],
+      "rawProductNames": [
+        "더블유 워터핏 스파클링 버블 메이크업 클렌져 200g"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "오하브|리프레싱페이셜바포모닝+이브닝",
+      "brandName": "오하브",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "리프레싱 페이셜 바 포 모닝+이브닝",
+      "productType": "클렌징폼",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "오하브 리프레싱 페이셜 바 포 모닝+이브닝 — 클렌징폼 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 클렌징/필링 > 클렌징폼/젤/비누",
+      "usage": "물과 함께 충분히 거품을 낸 뒤 얼굴을 부드럽게 마사지하고 물로 깨끗이 씻어내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/2644520"
+      ],
+      "rawProductNames": [
+        "리프레싱 페이셜 바 포 모닝+이브닝 세트"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "미샤|수퍼아쿠아울트라히알론필링젤",
+      "brandName": "미샤",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "수퍼아쿠아울트라 히알론필링젤",
+      "productType": "스크럽",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "미샤 수퍼아쿠아울트라 히알론필링젤 — 스크럽 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 100ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 클렌징/필링 > 필링/스크럽",
+      "usage": "젖은 피부에 적당량을 덜어 부드럽게 문지른 뒤 물로 깨끗이 씻어내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4817911",
+        "https://www.musinsa.com/products/4044833"
+      ],
+      "rawProductNames": [
+        "[2개] 수퍼아쿠아울트라 히알론필링젤",
+        "수퍼 아쿠아 울트라 히알론 필링젤 100ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '스크럽' 과 상품명 핵심어 '젤' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "원데이즈유|피지쓱싹딥클렌징오일",
+      "brandName": "원데이즈유",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "피지쓱싹 딥 클렌징 오일",
+      "productType": "클렌징오일",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "원데이즈유 피지쓱싹 딥 클렌징 오일 — 클렌징오일 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 200ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 클렌징/필링 > 클렌징오일/워터",
+      "usage": "건조한 얼굴에 적당량을 펴 발라 메이크업을 녹인 뒤 물로 충분히 헹궈내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4532590"
+      ],
+      "rawProductNames": [
+        "피지쓱싹 딥 클렌징 오일 200ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "일리윤|젠틀딥립앤아이리무버2입",
+      "brandName": "일리윤",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "젠틀 딥 립앤아이리무버 2입",
+      "productType": "클렌징워터",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "일리윤 젠틀 딥 립앤아이리무버 2입 — 클렌징워터 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 140ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 클렌징/필링 > 립/아이 리무버",
+      "usage": "화장솜에 적당량을 덜어 메이크업 부위를 부드럽게 닦아내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4860696"
+      ],
+      "rawProductNames": [
+        "젠틀 딥 립앤아이리무버 140ml 2입+클렌저 30ml 증정"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "더페이스샵|닥터벨머더마콜라겐넥패치",
+      "brandName": "더페이스샵",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "닥터벨머 더마 콜라겐 넥 패치",
+      "productType": "패치",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "더페이스샵 닥터벨머 더마 콜라겐 넥 패치 — 패치 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "식약처 기능성화장품 보고 제품 (보고번호 2021016013 · 책임판매업자 (주)엘지생활건강)",
+          "evidence": "MFDS_REPORT_OFFICIAL"
+        }
+      ],
+      "classification": "뷰티 > 마스크팩 > 부분마스크/코팩/패치",
+      "usage": "깨끗이 세안한 뒤 필요한 부위에 붙이고 일정 시간 후 떼어내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_FUNCTIONAL_MATCHED",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3851054"
+      ],
+      "rawProductNames": [
+        "닥터벨머 더마 콜라겐 넥 패치"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "이니스프리|비타c그린티엔자임잡티토닝세럼겔마스크",
+      "brandName": "이니스프리",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "비타C 그린티 엔자임 잡티 토닝 세럼 겔 마스크",
+      "productType": "마스크",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "이니스프리 비타C 그린티 엔자임 잡티 토닝 세럼 겔 마스크 — 마스크 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 5매",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 마스크팩 > 시트마스크(시트팩)",
+      "usage": "세안 후 토너로 피부결을 정돈한 뒤 시트를 밀착시키고 일정 시간 후 떼어내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4873829"
+      ],
+      "rawProductNames": [
+        "비타C 그린티 엔자임 잡티 토닝 세럼 겔 마스크 5매 + 1매"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "올로아|쉼과회복페이셜마스크",
+      "brandName": "올로아",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "쉼과 회복 페이셜 마스크",
+      "productType": "마스크",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "올로아 쉼과 회복 페이셜 마스크 — 마스크 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "식약처 기능성화장품 보고 제품 (보고번호 2026002379 · 책임판매업자 주식회사알지프로나)",
+          "evidence": "MFDS_REPORT_OFFICIAL"
+        }
+      ],
+      "classification": "뷰티 > 마스크팩 > 시트마스크(시트팩)",
+      "usage": "세안 후 토너로 피부결을 정돈한 뒤 시트를 밀착시키고 일정 시간 후 떼어내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_FUNCTIONAL_MATCHED",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4679422"
+      ],
+      "rawProductNames": [
+        "쉼과 회복 페이셜 마스크 세트 (5매)"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "글로이스트|pdrn저분자콜라겐하이드로겔마스크팩7sheets",
+      "brandName": "글로이스트",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "PDRN 저분자 콜라겐 하이드로겔 마스크 팩 7 Sheets",
+      "productType": "마스크",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "글로이스트 PDRN 저분자 콜라겐 하이드로겔 마스크 팩 7 Sheets — 마스크 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 마스크팩 > 시트마스크(시트팩)",
+      "usage": "세안 후 토너로 피부결을 정돈한 뒤 시트를 밀착시키고 일정 시간 후 떼어내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6605889"
+      ],
+      "rawProductNames": [
+        "PDRN 저분자 콜라겐 하이드로겔 마스크 팩 7 Sheets"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '마스크' 과 상품명 핵심어 '팩' 이 어긋난다 — census 유형을 유지했다"
+        },
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "성분에디터|레드어성초트러블진정앰플마스크",
+      "brandName": "성분에디터",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "레드어성초 트러블 진정 앰플 마스크",
+      "productType": "마스크",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "성분에디터 레드어성초 트러블 진정 앰플 마스크 — 마스크 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 마스크팩 > 시트마스크(시트팩)",
+      "usage": "세안 후 토너로 피부결을 정돈한 뒤 시트를 밀착시키고 일정 시간 후 떼어내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6852588"
+      ],
+      "rawProductNames": [
+        "[10매] 레드어성초 트러블 진정 앰플 마스크"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "엘리자베스아덴|에잇아워썬스틱spf50",
+      "brandName": "엘리자베스아덴",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "에잇아워 썬스틱 SPF50",
+      "productType": "선케어",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "엘리자베스아덴 에잇아워 썬스틱 SPF50 — 선케어 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 6.8g",
+          "evidence": "RETAIL_LISTING"
+        },
+        {
+          "text": "자외선 차단 지수 표기: SPF50",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 선케어 > 선스틱/선스프레이",
+      "usage": "외출 전 적당량을 덜어 얼굴과 노출 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "CHECK",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6888927",
+        "https://www.musinsa.com/products/6888923"
+      ],
+      "rawProductNames": [
+        "에잇아워 썬스틱 SPF50 6.8g 2개",
+        "에잇아워 썬스틱 SPF50 6.8g 3개"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '선케어' 과 상품명 핵심어 '스틱' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "메디힐|pdrn톤업선세럼",
+      "brandName": "메디힐",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "PDRN 톤업 선 세럼",
+      "productType": "선케어",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "메디힐 PDRN 톤업 선 세럼 — 선케어 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 50g",
+          "evidence": "RETAIL_LISTING"
+        },
+        {
+          "text": "자외선 차단 지수 표기: SPF50+",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 선케어 > 선크림",
+      "usage": "외출 전 적당량을 덜어 얼굴과 노출 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "CHECK",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6573699",
+        "https://www.musinsa.com/products/6573523"
+      ],
+      "rawProductNames": [
+        "[2개] PDRN 톤업 선 세럼 (SPF 50+) 50g 2개",
+        "PDRN 톤업 선 세럼 (SPF 50+) 50g"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '선케어' 과 상품명 핵심어 '세럼' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "네오젠|잡티미백선케어동시비타워터리선세럼",
+      "brandName": "네오젠",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "잡티 미백 선케어 동시 비타 워터리 선세럼",
+      "productType": "선케어",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "네오젠 잡티 미백 선케어 동시 비타 워터리 선세럼 — 선케어 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 50ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 선케어 > 선크림",
+      "usage": "외출 전 적당량을 덜어 얼굴과 노출 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "CHECK",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4299040"
+      ],
+      "rawProductNames": [
+        "잡티 미백 선케어 동시 더블 비타 워터리 선세럼 50ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '선케어' 과 상품명 핵심어 '세럼' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "더샘|에코어스워터프루프선크림",
+      "brandName": "더샘",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "에코 어스 워터프루프 선 크림",
+      "productType": "선케어",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "더샘 에코 어스 워터프루프 선 크림 — 선케어 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "식약처 기능성화장품 보고 제품 (보고번호 2020001822 · 책임판매업자 (주)더샘인터내셔날)",
+          "evidence": "MFDS_REPORT_OFFICIAL"
+        }
+      ],
+      "classification": "뷰티 > 선케어 > 선크림",
+      "usage": "외출 전 적당량을 덜어 얼굴과 노출 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_FUNCTIONAL_MATCHED",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5196104"
+      ],
+      "rawProductNames": [
+        "에코 어스 워터프루프 선 크림"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '선케어' 과 상품명 핵심어 '크림' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "아브카|홀인원자외선차단골프패치",
+      "brandName": "아브카",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "홀인원 자외선 차단 골프패치",
+      "productType": "선케어",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "아브카 홀인원 자외선 차단 골프패치 — 선케어 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 선케어 > 선크림",
+      "usage": "외출 전 적당량을 덜어 얼굴과 노출 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "CHECK",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4656851"
+      ],
+      "rawProductNames": [
+        "홀인원 자외선 차단 골프패치 5매입"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '선케어' 과 상품명 핵심어 '패치' 이 어긋난다 — census 유형을 유지했다"
+        },
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "유아른|비건시어버터인텐시브핸드크림",
+      "brandName": "유아른",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "비건 시어버터 인텐시브 핸드크림",
+      "productType": "핸드크림",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "유아른 비건 시어버터 인텐시브 핸드크림 — 핸드크림 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 100ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 바디케어 > 핸드케어",
+      "usage": "적당량을 덜어 손 전체에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4710699"
+      ],
+      "rawProductNames": [
+        "비건 시어버터 인텐시브 핸드크림 100ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "딥퍼랑스|퍼퓸핸드크림",
+      "brandName": "딥퍼랑스",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "퍼퓸 핸드크림",
+      "productType": "핸드크림",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "딥퍼랑스 퍼퓸 핸드크림 — 핸드크림 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 50ml",
+          "evidence": "RETAIL_LISTING"
+        },
+        {
+          "text": "식약처 기능성화장품 보고 제품 (보고번호 2017025430 · 책임판매업자 (주)엘지생활건강)",
+          "evidence": "MFDS_REPORT_OFFICIAL"
+        }
+      ],
+      "classification": "뷰티 > 바디케어 > 핸드케어",
+      "usage": "적당량을 덜어 손 전체에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_FUNCTIONAL_MATCHED",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4998580"
+      ],
+      "rawProductNames": [
+        "퍼퓸 핸드크림 50ml 9종 택1 + 진주키링"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "아로마티카|[쿨링바디워시]어웨이크닝바디워시페퍼민트&유칼립투스",
+      "brandName": "아로마티카",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "[쿨링바디워시] 어웨이크닝 바디워시 페퍼민트 &유칼립투스",
+      "productType": "바디워시",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "아로마티카 [쿨링바디워시] 어웨이크닝 바디워시 페퍼민트 &유칼립투스 — 바디워시 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 300ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 바디케어 > 샤워/입욕",
+      "usage": "물과 함께 거품을 내어 몸 전체를 부드럽게 씻어낸 뒤 헹궈 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5004003"
+      ],
+      "rawProductNames": [
+        "[쿨링바디워시] 어웨이크닝 바디워시 페퍼민트 &유칼립투스 300ML"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "하우스오브밸런스|바디워시",
+      "brandName": "하우스오브밸런스",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "바디워시",
+      "productType": "바디워시",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "하우스오브밸런스 바디워시 — 바디워시 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 바디케어 > 샤워/입욕",
+      "usage": "물과 함께 거품을 내어 몸 전체를 부드럽게 씻어낸 뒤 헹궈 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6272780"
+      ],
+      "rawProductNames": [
+        "바디워시 듀오 세트 (4PM + 10PM)"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        },
+        {
+          "type": "NAME_EQUALS_TYPE",
+          "detail": "상품명이 유형명 '바디워시' 과 같다 — 제품 특정 불가"
+        }
+      ]
+    },
+    {
+      "key": "비욘드|토탈리커버리바디프리미엄",
+      "brandName": "비욘드",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "토탈리커버리 바디 프리미엄",
+      "productType": "바디워시",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "비욘드 토탈리커버리 바디 프리미엄 — 바디워시 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 바디케어 > 샤워/입욕",
+      "usage": "물과 함께 거품을 내어 몸 전체를 부드럽게 씻어낸 뒤 헹궈 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3297532"
+      ],
+      "rawProductNames": [
+        "토탈리커버리 바디 프리미엄 세트"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "베일리스앤하딩|굿니스맨즈파출리시더앤사이프러스샤워젤",
+      "brandName": "베일리스앤하딩",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "굿니스 맨즈 파출리 시더 앤 사이프러스 샤워젤",
+      "productType": "바디워시",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "베일리스앤하딩 굿니스 맨즈 파출리 시더 앤 사이프러스 샤워젤 — 바디워시 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 500ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 바디케어 > 샤워/입욕",
+      "usage": "물과 함께 거품을 내어 몸 전체를 부드럽게 씻어낸 뒤 헹궈 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5271650"
+      ],
+      "rawProductNames": [
+        "굿니스 맨즈 파출리 시더 앤 사이프러스 샤워젤 500ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '바디워시' 과 상품명 핵심어 '젤' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "에스까다코스메틱|에숑essong퍼퓸바디미스트",
+      "brandName": "에스까다 코스메틱",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "에숑 ESSONG 퍼퓸 바디 미스트",
+      "productType": "바디미스트",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "에스까다 코스메틱 에숑 ESSONG 퍼퓸 바디 미스트 — 바디미스트 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 바디케어 > 바디미스트",
+      "usage": "몸에서 적당히 거리를 두고 원하는 만큼 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5403428"
+      ],
+      "rawProductNames": [
+        "에숑 ESSONG 퍼퓸 바디 미스트"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "레피소드|인더엘리베이터바디로션",
+      "brandName": "레피소드",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "인더엘리베이터 바디로션",
+      "productType": "바디로션",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "레피소드 인더엘리베이터 바디로션 — 바디로션 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 300ml",
+          "evidence": "RETAIL_LISTING"
+        },
+        {
+          "text": "식약처 기능성화장품 보고 제품 (보고번호 2018005252 · 책임판매업자 에이앤씨)",
+          "evidence": "MFDS_REPORT_OFFICIAL"
+        }
+      ],
+      "classification": "뷰티 > 바디케어 > 바디로션/크림/오일",
+      "usage": "샤워 후 적당량을 덜어 몸 전체에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_FUNCTIONAL_MATCHED",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6328970"
+      ],
+      "rawProductNames": [
+        "인더엘리베이터 바디로션 300ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "불가리안로즈|로즈오리지날바디로션",
+      "brandName": "불가리안로즈",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "로즈 오리지날 바디로션",
+      "productType": "바디로션",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "불가리안로즈 로즈 오리지날 바디로션 — 바디로션 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 200ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 바디케어 > 바디로션/크림/오일",
+      "usage": "샤워 후 적당량을 덜어 몸 전체에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3853396"
+      ],
+      "rawProductNames": [
+        "로즈 오리지날 바디로션 200ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "갸스비|데오도란트바디페이퍼쿨시트러스+휴대용",
+      "brandName": "갸스비",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "데오도란트 바디페이퍼 쿨시트러스 +휴대용",
+      "productType": "데오드란트",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "갸스비 데오도란트 바디페이퍼 쿨시트러스 +휴대용 — 데오드란트 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 30매",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 바디케어 > 데오드란트",
+      "usage": "깨끗이 씻고 물기를 제거한 부위에 적당량을 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3341301"
+      ],
+      "rawProductNames": [
+        "데오도란트 바디페이퍼 쿨시트러스 30매 3개+휴대용 10매"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "아로마티카|[탈모샴푸]레몬그라스샴푸",
+      "brandName": "아로마티카",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "[탈모샴푸] 레몬그라스 샴푸",
+      "productType": "샴푸",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "아로마티카 [탈모샴푸] 레몬그라스 샴푸 — 샴푸 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 500ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 헤어케어 > 샴푸",
+      "usage": "모발을 적신 뒤 적당량을 덜어 거품을 내어 두피와 모발을 마사지하고 깨끗이 헹궈 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5513262"
+      ],
+      "rawProductNames": [
+        "[탈모샴푸] 레몬그라스 샴푸 리필 500ML"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "케라시스|닥터루티어자스민향탈모샴푸",
+      "brandName": "케라시스",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "닥터루티어 자스민향 탈모 샴푸",
+      "productType": "샴푸",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "케라시스 닥터루티어 자스민향 탈모 샴푸 — 샴푸 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 800ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 헤어케어 > 샴푸",
+      "usage": "모발을 적신 뒤 적당량을 덜어 거품을 내어 두피와 모발을 마사지하고 깨끗이 헹궈 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3971824"
+      ],
+      "rawProductNames": [
+        "닥터루티어 자스민향 탈모 샴푸 800ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "엘라스틴|오가니스트익스트림쿨링샴푸",
+      "brandName": "엘라스틴",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "오가니스트 익스트림 쿨링 샴푸",
+      "productType": "샴푸",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "엘라스틴 오가니스트 익스트림 쿨링 샴푸 — 샴푸 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 750ml · 1100ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 헤어케어 > 샴푸",
+      "usage": "모발을 적신 뒤 적당량을 덜어 거품을 내어 두피와 모발을 마사지하고 깨끗이 헹궈 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4137920",
+        "https://www.musinsa.com/products/5156508"
+      ],
+      "rawProductNames": [
+        "오가니스트 익스트림 쿨링 샴푸 750ml x 2개",
+        "오가니스트 익스트림 쿨링 샴푸 1100ml x 2개"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "포도클로스|탈모증상완화두피케어리밸런싱스칼프솔루션샴푸",
+      "brandName": "포도클로스",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "탈모증상 완화 두피케어 리밸런싱 스칼프 솔루션 샴푸",
+      "productType": "헤어케어",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "포도클로스 탈모증상 완화 두피케어 리밸런싱 스칼프 솔루션 샴푸 — 헤어케어 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 500ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 헤어케어 > 헤어케어 세트",
+      "usage": "적당량을 덜어 모발에 고르게 사용해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4697985"
+      ],
+      "rawProductNames": [
+        "탈모증상 완화 두피케어 리밸런싱 스칼프 솔루션 샴푸 500ML"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '헤어케어' 과 상품명 핵심어 '샴푸' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "라피타|5초새치커버라피타타투헤어틴트no염색약",
+      "brandName": "라피타",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "5초 새치커버 라피타 타투 헤어틴트 NO염색약",
+      "productType": "염모제",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "라피타 5초 새치커버 라피타 타투 헤어틴트 NO염색약 — 염모제 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 헤어케어 > 헤어컬러/펌",
+      "usage": "제품 설명서에 따라 준비한 뒤 모발에 도포하고 정해진 시간이 지나면 깨끗이 헹궈 주세요. 사용 전 피부 반응 시험(패치 테스트)을 해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "CHECK",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/2657394"
+      ],
+      "rawProductNames": [
+        "5초 새치커버 라피타 타투 헤어틴트 NO염색약"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '염모제' 과 상품명 핵심어 '립' 이 어긋난다 — census 유형을 유지했다"
+        },
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "라페름|에스디파이닝컬크림",
+      "brandName": "라페름",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "에스 디파이닝 컬 크림",
+      "productType": "헤어스타일링",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "라페름 에스 디파이닝 컬 크림 — 헤어스타일링 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 120ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 헤어케어 > 헤어스타일링",
+      "usage": "적당량을 덜어 원하는 모양으로 모발을 정돈해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5403996"
+      ],
+      "rawProductNames": [
+        "에스 디파이닝 컬 크림 120ml (+샴푸, 컨디셔너 샘플키트 증정)"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '헤어스타일링' 과 상품명 핵심어 '크림' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "무백|자몽리브인트리트먼트",
+      "brandName": "무백",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "자몽 리브인 트리트먼트",
+      "productType": "헤어에센스",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "무백 자몽 리브인 트리트먼트 — 헤어에센스 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 150ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 헤어케어 > 헤어오일/에센스",
+      "usage": "모발을 말린 뒤 적당량을 덜어 모발 중간부터 끝까지 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6915001"
+      ],
+      "rawProductNames": [
+        "자몽 리브인 트리트먼트 150ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '헤어에센스' 과 상품명 핵심어 '트리트먼트' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "퍼리키|실크실드글로우트리트먼트르le",
+      "brandName": "퍼리키",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "실크실드 글로우 트리트먼트 르 LE",
+      "productType": "트리트먼트",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "퍼리키 실크실드 글로우 트리트먼트 르 LE — 트리트먼트 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 헤어케어 > 트리트먼트/팩",
+      "usage": "샴푸 후 물기를 제거하고 모발에 고르게 발라 일정 시간 후 헹궈 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5629845"
+      ],
+      "rawProductNames": [
+        "실크실드 글로우 트리트먼트 르 LE"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "메디올|두피청정크림트리트먼트힐링부케향",
+      "brandName": "메디올",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "두피청정 크림 트리트먼트 힐링부케향",
+      "productType": "트리트먼트",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "메디올 두피청정 크림 트리트먼트 힐링부케향 — 트리트먼트 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 200ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 헤어케어 > 트리트먼트/팩",
+      "usage": "샴푸 후 물기를 제거하고 모발에 고르게 발라 일정 시간 후 헹궈 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3217136"
+      ],
+      "rawProductNames": [
+        "두피청정 크림 트리트먼트 힐링부케향 200ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "데싱디바|매직프레스에메랄드스카이(코핀)네일팁",
+      "brandName": "데싱디바",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "매직프레스 에메랄드 스카이 (코핀) 네일팁",
+      "productType": "네일",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "데싱디바 매직프레스 에메랄드 스카이 (코핀) 네일팁 — 네일 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 네일 > 일반 네일 폴리시",
+      "usage": "손톱 표면을 정돈한 뒤 얇게 펴 발라 충분히 건조시켜 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6014721"
+      ],
+      "rawProductNames": [
+        "매직프레스 에메랄드 스카이 (코핀) 네일팁"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "오피아이|[네일락커]n53-suzinailsneworleans",
+      "brandName": "오피아이",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "[네일락커] N53 - SUZI NAILS NEW ORLEANS",
+      "productType": "네일",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "오피아이 [네일락커] N53 - SUZI NAILS NEW ORLEANS — 네일 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 네일 > 일반 네일 폴리시",
+      "usage": "손톱 표면을 정돈한 뒤 얇게 펴 발라 충분히 건조시켜 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4770217"
+      ],
+      "rawProductNames": [
+        "[네일락커] N53 - SUZI NAILS NEW ORLEANS"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "위드샨|멀티네일리무버(일반매니큐어/젤네일쏙오프)x",
+      "brandName": "위드샨",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "멀티 네일 리무버 (일반 매니큐어/젤네일 쏙오프)X",
+      "productType": "네일",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "위드샨 멀티 네일 리무버 (일반 매니큐어/젤네일 쏙오프)X — 네일 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 네일 > 네일케어",
+      "usage": "손톱 표면을 정돈한 뒤 얇게 펴 발라 충분히 건조시켜 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/2653159"
+      ],
+      "rawProductNames": [
+        "멀티 네일 리무버 (일반 매니큐어/젤네일 쏙오프)X3개"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '네일' 과 상품명 핵심어 '젤' 이 어긋난다 — census 유형을 유지했다"
+        },
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "본투윈|afterbluesweatperfume",
+      "brandName": "본투윈",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "AFTER BLUE SWEAT PERFUME",
+      "productType": "향수",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "본투윈 AFTER BLUE SWEAT PERFUME — 향수 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 프레그런스 > 향수",
+      "usage": "원하는 부위에 적당히 거리를 두고 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/4921101"
+      ],
+      "rawProductNames": [
+        "AFTER BLUE SWEAT PERFUME"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "오브제|스모키레더퍼퓸",
+      "brandName": "오브제",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "스모키 레더 퍼퓸",
+      "productType": "향수",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "오브제 스모키 레더 퍼퓸 — 향수 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 50ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 프레그런스 > 향수",
+      "usage": "원하는 부위에 적당히 거리를 두고 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3662690"
+      ],
+      "rawProductNames": [
+        "스모키 레더 퍼퓸 50ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "디에스앤더가|블랙마젠타오드퍼퓸",
+      "brandName": "디에스앤더가",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "블랙 마젠타 오 드 퍼퓸",
+      "productType": "향수",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "디에스앤더가 블랙 마젠타 오 드 퍼퓸 — 향수 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 50ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 프레그런스 > 향수",
+      "usage": "원하는 부위에 적당히 거리를 두고 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5165188"
+      ],
+      "rawProductNames": [
+        "블랙 마젠타 오 드 퍼퓸 50ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "리솔츠|선셋브리즈프래그런스",
+      "brandName": "리솔츠",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "선셋브리즈 프래그런스",
+      "productType": "향수",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "리솔츠 선셋브리즈 프래그런스 — 향수 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 프레그런스 > 향수",
+      "usage": "원하는 부위에 적당히 거리를 두고 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/6047703"
+      ],
+      "rawProductNames": [
+        "선셋브리즈 프래그런스 세트"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "메종마르지엘라퍼퓸|레플리카언더더스타즈edt",
+      "brandName": "메종 마르지엘라 퍼퓸",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "레플리카 언더 더 스타즈 EDT",
+      "productType": "향수",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "메종 마르지엘라 퍼퓸 레플리카 언더 더 스타즈 EDT — 향수 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 100ml · 30ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 프레그런스 > 향수",
+      "usage": "원하는 부위에 적당히 거리를 두고 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3716618",
+        "https://www.musinsa.com/products/3716622"
+      ],
+      "rawProductNames": [
+        "레플리카 언더 더 스타즈 EDT 100ML",
+        "레플리카 언더 더 스타즈 EDT 30ML"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "데메테르|베이비파우더edc",
+      "brandName": "데메테르",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "베이비파우더 EDC",
+      "productType": "향수",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "데메테르 베이비파우더 EDC — 향수 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 30ml · 15ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 프레그런스 > 향수",
+      "usage": "원하는 부위에 적당히 거리를 두고 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티",
+        "무신사 뷰티",
+        "무신사 뷰티",
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3820533",
+        "https://www.musinsa.com/products/5056432",
+        "https://www.musinsa.com/products/3820460",
+        "https://www.musinsa.com/products/5056414"
+      ],
+      "rawProductNames": [
+        "베이비파우더 EDC 30ml",
+        "베이비파우더 EDC 30ml + 15ml",
+        "베이비파우더 EDC 15ml",
+        "베이비파우더 EDC 15ml 2개"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "세이리|[지중해백합향]블루쇼어엑스트레드퍼퓸",
+      "brandName": "세이리",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "[지중해 백합향] 블루쇼어 엑스트레 드 퍼퓸",
+      "productType": "향수",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "세이리 [지중해 백합향] 블루쇼어 엑스트레 드 퍼퓸 — 향수 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 50ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 프레그런스 > 향수",
+      "usage": "원하는 부위에 적당히 거리를 두고 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5789822"
+      ],
+      "rawProductNames": [
+        "[지중해 백합향] 블루쇼어 엑스트레 드 퍼퓸 50mL + 향수샘플 2mL 증정"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "아뜰리에페이|퀸스&블랙커런트",
+      "brandName": "아뜰리에페이",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "퀸스&블랙커런트",
+      "productType": "향수",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "아뜰리에페이 퀸스&블랙커런트 — 향수 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 30ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 프레그런스 > 향수",
+      "usage": "원하는 부위에 적당히 거리를 두고 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3251612"
+      ],
+      "rawProductNames": [
+        "아뜰리에페이 퀸스&블랙커런트 30ml"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "팩토리노멀|드레스퍼퓸섬유향수룸스프레이",
+      "brandName": "팩토리 노멀",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "드레스퍼퓸 섬유향수 룸스프레이",
+      "productType": "향수",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "팩토리 노멀 드레스퍼퓸 섬유향수 룸스프레이 — 향수 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 100ml",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "뷰티 > 프레그런스 > 드레스퍼퓸",
+      "usage": "원하는 부위에 적당히 거리를 두고 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/3792204"
+      ],
+      "rawProductNames": [
+        "드레스퍼퓸 100ml 5종 섬유향수 룸스프레이"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "블랙하비|354.제라늄닥터고농축드레스퍼퓸",
+      "brandName": "블랙하비",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "354. 제라늄닥터 고농축 드레스퍼퓸",
+      "productType": "향수",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "블랙하비 354. 제라늄닥터 고농축 드레스퍼퓸 — 향수 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 프레그런스 > 드레스퍼퓸",
+      "usage": "원하는 부위에 적당히 거리를 두고 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5280815"
+      ],
+      "rawProductNames": [
+        "354. 제라늄닥터 고농축 드레스퍼퓸"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "블랙하비|017.네롤리고농축드레스퍼퓸",
+      "brandName": "블랙하비",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "017. 네롤리 고농축 드레스퍼퓸",
+      "productType": "향수",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "블랙하비 017. 네롤리 고농축 드레스퍼퓸 — 향수 제품입니다.",
+      "mainFeatures": [],
+      "classification": "뷰티 > 프레그런스 > 드레스퍼퓸",
+      "usage": "원하는 부위에 적당히 거리를 두고 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "무신사 뷰티"
+      ],
+      "sourceUrls": [
+        "https://www.musinsa.com/products/5209049"
+      ],
+      "rawProductNames": [
+        "017. 네롤리 고농축 드레스퍼퓸"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "탑클래스|리프팅에멀젼",
+      "brandName": "탑클래스",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "리프팅 에멀젼",
+      "productType": "로션",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "탑클래스 리프팅 에멀젼 — 로션 제품입니다.",
+      "mainFeatures": [],
+      "classification": "카테고리별 랭킹 > 스킨케어 > 로션/에멀젼 > 안티에이징",
+      "usage": "토너 사용 후 적당량을 덜어 얼굴 전체에 부드럽게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.hwahae.co.kr/products/%EB%A6%AC%ED%94%84%ED%8C%85%20%EC%97%90%EB%A9%80%EC%A0%BC/2109105"
+      ],
+      "rawProductNames": [
+        "리프팅 에멀젼"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "셀퓨전씨|모공톡스패드",
+      "brandName": "셀퓨전씨",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "모공 톡스 패드",
+      "productType": "토너패드",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "셀퓨전씨 모공 톡스 패드 — 토너패드 제품입니다.",
+      "mainFeatures": [],
+      "classification": "카테고리별 랭킹 > 스킨케어 > 스킨/토너 패드 > 모공",
+      "usage": "세안 후 패드를 꺼내 피부결을 따라 부드럽게 닦아내듯 사용해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.hwahae.co.kr/products/%EB%AA%A8%EA%B3%B5%20%ED%86%A1%EC%8A%A4%20%ED%8C%A8%EB%93%9C/1899623"
+      ],
+      "rawProductNames": [
+        "모공 톡스 패드"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "닥터트웬티프로젝트|나인마스크1box(x)",
+      "brandName": "닥터트웬티프로젝트",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "나인 마스크 1Box ( x )",
+      "productType": "마스크",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "닥터트웬티프로젝트 나인 마스크 1Box ( x ) — 마스크 제품입니다.",
+      "mainFeatures": [],
+      "classification": "카테고리별 랭킹 > 마스크/팩 > 시트마스크 > 진정",
+      "usage": "세안 후 토너로 피부결을 정돈한 뒤 시트를 밀착시키고 일정 시간 후 떼어내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.hwahae.co.kr/products/%EB%82%98%EC%9D%B8%20%EB%A7%88%EC%8A%A4%ED%81%AC/2140773"
+      ],
+      "rawProductNames": [
+        "나인 마스크 1Box (27ml x 5매) (1+1)"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "포에이엠|게솔자여드름수면크림팩",
+      "brandName": "포에이엠",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "게솔자 여드름 수면 크림 팩",
+      "productType": "트러블케어",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "포에이엠 게솔자 여드름 수면 크림 팩 — 트러블케어 제품입니다.",
+      "mainFeatures": [],
+      "classification": "카테고리별 랭킹 > 마스크/팩 > 슬리핑팩 > 트러블",
+      "usage": "기초 단계 후 적당량을 덜어 고민 부위에 얇게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.hwahae.co.kr/products/%EA%B2%8C%EC%86%94%EC%9E%90%20%EC%97%AC%EB%93%9C%EB%A6%84%20%EC%88%98%EB%A9%B4%20%ED%81%AC%EB%A6%BC%20%ED%8C%A9/2105160"
+      ],
+      "rawProductNames": [
+        "게솔자 여드름 수면 크림 팩"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '트러블케어' 과 상품명 핵심어 '팩' 이 어긋난다 — census 유형을 유지했다"
+        },
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "유리피부|셀룸아마이드bb크림spf[브라이트플러스]",
+      "brandName": "유리피부",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "셀룸 아마이드 BB 크림 SPF [브라이트플러스]",
+      "productType": "메이크업",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "유리피부 셀룸 아마이드 BB 크림 SPF [브라이트플러스] — 메이크업 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 40g",
+          "evidence": "RETAIL_LISTING"
+        },
+        {
+          "text": "자외선 차단 지수 표기: SPF50+",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "카테고리별 랭킹 > 베이스메이크업 > BB/CC크림 > 새틴",
+      "usage": "기초 단계 후 적당량을 덜어 원하는 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.hwahae.co.kr/products/%EC%85%80%EB%A3%B8%20%EC%95%84%EB%A7%88%EC%9D%B4%EB%93%9C%20BB%20%ED%81%AC%EB%A6%BC%20%5BSPF50%2B%2FPA%2B%2B%2B%2B%5D%20%5B%EB%B8%8C%EB%9D%BC%EC%9D%B4%ED%8A%B8%ED%94%8C%EB%9F%AC%EC%8A%A4%5D/2142659"
+      ],
+      "rawProductNames": [
+        "셀룸 아마이드 BB 크림 SPF50+ 40g [브라이트플러스]"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '메이크업' 과 상품명 핵심어 '크림' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    },
+    {
+      "key": "홀리카홀리카|마이페이브무드아이팔레트[13얼모스트그레이프]",
+      "brandName": "홀리카홀리카",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "마이페이브 무드 아이팔레트 [13 얼모스트그레이프]",
+      "productType": "메이크업",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "홀리카홀리카 마이페이브 무드 아이팔레트 [13 얼모스트그레이프] — 메이크업 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 7.9g",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "카테고리별 랭킹 > 아이메이크업 > 아이섀도 > 전체",
+      "usage": "기초 단계 후 적당량을 덜어 원하는 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.hwahae.co.kr/products/%EB%A7%88%EC%9D%B4%ED%8E%98%EC%9D%B4%EB%B8%8C%20%EB%AC%B4%EB%93%9C%20%EC%95%84%EC%9D%B4%ED%8C%94%EB%A0%88%ED%8A%B8%20%5B13%20%EC%96%BC%EB%AA%A8%EC%8A%A4%ED%8A%B8%EA%B7%B8%EB%A0%88%EC%9D%B4%ED%94%84%5D/2133792"
+      ],
+      "rawProductNames": [
+        "마이페이브 무드 아이팔레트 [13 얼모스트그레이프] 7.9g"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "롬앤|글래스팅컬러글로스[02너티베이그]",
+      "brandName": "롬앤",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "글래스팅 컬러 글로스 [02 너티베이그]",
+      "productType": "립",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "롬앤 글래스팅 컬러 글로스 [02 너티베이그] — 립 제품입니다.",
+      "mainFeatures": [],
+      "classification": "카테고리별 랭킹 > 립메이크업 > 립글로스 > 전체",
+      "usage": "적당량을 입술에 고르게 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.hwahae.co.kr/products/%EA%B8%80%EB%9E%98%EC%8A%A4%ED%8C%85%20%EC%BB%AC%EB%9F%AC%20%EA%B8%80%EB%A1%9C%EC%8A%A4%20%5B02%20%EB%84%88%ED%8B%B0%EB%B2%A0%EC%9D%B4%EA%B7%B8%5D/2082588"
+      ],
+      "rawProductNames": [
+        "글래스팅 컬러 글로스 [02 너티베이그]"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "더마팩토리|안티헤어로스스칼프토닉",
+      "brandName": "더마팩토리",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "안티헤어로스 스칼프 토닉",
+      "productType": "헤어미스트",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "더마팩토리 안티헤어로스 스칼프 토닉 — 헤어미스트 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "식약처 기능성화장품 보고 제품 (보고번호 2026002182 · 책임판매업자 (주)제이엘벤처스)",
+          "evidence": "MFDS_REPORT_OFFICIAL"
+        }
+      ],
+      "classification": "카테고리별 랭킹 > 헤어 > 헤어미스트 > 전체",
+      "usage": "모발에서 적당히 거리를 두고 가볍게 분사해 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_FUNCTIONAL_MATCHED",
+      "distributionSources": [
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.hwahae.co.kr/products/%EC%95%88%ED%8B%B0%ED%97%A4%EC%96%B4%EB%A1%9C%EC%8A%A4%20%EC%8A%A4%EC%B9%BC%ED%94%84%20%ED%86%A0%EB%8B%89/2150150"
+      ],
+      "rawProductNames": [
+        "안티헤어로스 스칼프 토닉"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "고려은단|비타민c골드플러스",
+      "brandName": "고려은단",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "비타민C 골드플러스",
+      "productType": "종합 건강",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "고려은단 비타민C 골드플러스 — 종합 건강 제품입니다.",
+      "mainFeatures": [],
+      "classification": "카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체",
+      "usage": null,
+      "usageSource": null,
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.hwahae.co.kr/products/%EB%B9%84%ED%83%80%EB%AF%BCC%20%EA%B3%A8%EB%93%9C%ED%94%8C%EB%9F%AC%EC%8A%A4/2028578"
+      ],
+      "rawProductNames": [
+        "비타민C 골드플러스"
+      ],
+      "missingRequired": [
+        "mainFeatures",
+        "usage"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NON_COSMETIC_SUSPECT",
+          "detail": "유형 '종합 건강' 은 화장품 마디가 아니다 — 사람 확인 필요"
+        },
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "놀라아워|스팟이레이저블루패치",
+      "brandName": "놀라아워",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "스팟 이레이저 블루 패치",
+      "productType": "패치",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "놀라아워 스팟 이레이저 블루 패치 — 패치 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "용량/구성: 63매",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "피부별 랭킹 > 건성 > 마스크/팩 > 패치",
+      "usage": "깨끗이 세안한 뒤 필요한 부위에 붙이고 일정 시간 후 떼어내 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.hwahae.co.kr/products/%EC%8A%A4%ED%8C%9F%20%EC%9D%B4%EB%A0%88%EC%9D%B4%EC%A0%80%20%5B%EB%B8%94%EB%A3%A8%5D/2039086"
+      ],
+      "rawProductNames": [
+        "스팟 이레이저 블루 패치 63매"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": []
+    },
+    {
+      "key": "온더바디|퓨어더마마일드모이스처여성청결제",
+      "brandName": "온더바디",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "퓨어더마 마일드 모이스처 여성 청결제",
+      "productType": "여성청결제",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "온더바디 퓨어더마 마일드 모이스처 여성 청결제 — 여성청결제 제품입니다.",
+      "mainFeatures": [],
+      "classification": "피부별 랭킹 > 지성 > 바디 > 여성청결제",
+      "usage": "적당량을 덜어 외음부를 부드럽게 세정한 뒤 물로 깨끗이 헹궈 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.hwahae.co.kr/products/%ED%93%A8%EC%96%B4%EB%8D%94%EB%A7%88%20%EB%A7%88%EC%9D%BC%EB%93%9C%20%EB%AA%A8%EC%9D%B4%EC%8A%A4%EC%B2%98%20%EC%97%AC%EC%84%B1%20%EC%B2%AD%EA%B2%B0%EC%A0%9C/2104014"
+      ],
+      "rawProductNames": [
+        "퓨어더마 마일드 모이스처 여성 청결제"
+      ],
+      "missingRequired": [
+        "mainFeatures"
+      ],
+      "status": "PARTIAL",
+      "issues": [
+        {
+          "type": "NO_OBSERVED_FEATURE",
+          "detail": "용량·색상·자외선 지수·기능성 어느 것도 판매 데이터에서 관측되지 않았다"
+        }
+      ]
+    },
+    {
+      "key": "닥터헤디슨|egf블레미쉬밤",
+      "brandName": "닥터헤디슨",
+      "brandNameSource": "SOURCE_DATA",
+      "productName": "EGF 블레미쉬 밤",
+      "productType": "메이크업",
+      "productTypeSource": "RETAIL_CATEGORY",
+      "oneLineDescription": "닥터헤디슨 EGF 블레미쉬 밤 — 메이크업 제품입니다.",
+      "mainFeatures": [
+        {
+          "text": "자외선 차단 지수 표기: SPF37/PA++",
+          "evidence": "RETAIL_LISTING"
+        }
+      ],
+      "classification": "피부별 랭킹 > 민감성 > 베이스메이크업 > BB/CC크림",
+      "usage": "기초 단계 후 적당량을 덜어 원하는 부위에 고르게 펴 발라 주세요.",
+      "usageSource": "CATEGORY_GENERIC",
+      "productHighlights": [],
+      "mainIngredients": null,
+      "texture": null,
+      "useContext": null,
+      "cautions": null,
+      "variants": [],
+      "functionalStatus": "RETAIL_NO_FUNCTIONAL_MATCH",
+      "distributionSources": [
+        "화해"
+      ],
+      "sourceUrls": [
+        "https://www.hwahae.co.kr/products/EGF%20%EB%B8%94%EB%A0%88%EB%AF%B8%EC%89%AC%20%EB%B0%A4%20%5BSPF37%2FPA%2B%2B%5D/2042783"
+      ],
+      "rawProductNames": [
+        "EGF 블레미쉬 밤 [SPF37/PA++]"
+      ],
+      "missingRequired": [],
+      "status": "COMPLETE",
+      "issues": [
+        {
+          "type": "TYPE_NAME_MISMATCH",
+          "detail": "카테고리 유형 '메이크업' 과 상품명 핵심어 '밤' 이 어긋난다 — census 유형을 유지했다"
+        }
+      ]
+    }
+  ]
+}

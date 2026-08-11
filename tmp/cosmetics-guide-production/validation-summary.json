@@ -1,0 +1,32 @@
+{
+  "meta": {
+    "totalViolations": 0,
+    "tally": {}
+  },
+  "batches": [
+    {
+      "batch": "batch-01",
+      "guides": 10000,
+      "violations": 0,
+      "tally": {}
+    },
+    {
+      "batch": "batch-02",
+      "guides": 10000,
+      "violations": 0,
+      "tally": {}
+    },
+    {
+      "batch": "batch-03",
+      "guides": 10000,
+      "violations": 0,
+      "tally": {}
+    },
+    {
+      "batch": "batch-04",
+      "guides": 3106,
+      "violations": 0,
+      "tally": {}
+    }
+  ]
+}
