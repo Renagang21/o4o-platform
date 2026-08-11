@@ -190,7 +190,8 @@ export default function LmsCoursesPage() {
                 <p className="text-slate-500">등록된 강의가 없습니다.</p>
               </div>
             }
-            onRowClick={(row) => navigate(`/education/${row.id}`)}
+            // WO-O4O-WEB-UX-STANDARDIZATION-BATCH-V1: `/education/:id` 는 존재하지 않는 경로였다 (강의 상세 canonical = `/lms/:id`)
+            onRowClick={(row) => navigate(`/lms/${row.id}`)}
             tableId="glycopharm-operator-lms-courses"
           />
         )}

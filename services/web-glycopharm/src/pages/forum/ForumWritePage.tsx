@@ -41,10 +41,12 @@ export default function ForumWritePage() {
         content: payload.editorHtml,
       });
 
+      // WO-O4O-WEB-UX-STANDARDIZATION-BATCH-V1: 작성 직후 이동 경로가 `/forum/post/:id` 였으나
+      // glycopharm 의 게시글 상세 route 는 `/forum/posts/:id` 라 글을 쓰자마자 404 로 떨어졌다.
       if (data.success && data.data?.id) {
-        navigate(`/forum/post/${data.data.id}`);
+        navigate(`/forum/posts/${data.data.id}`);
       } else if (data.id) {
-        navigate(`/forum/post/${data.id}`);
+        navigate(`/forum/posts/${data.id}`);
       } else {
         toast.error(data.error || '게시글 작성에 실패했습니다.');
       }

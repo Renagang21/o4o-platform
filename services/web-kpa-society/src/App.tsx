@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, Link, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useEffect, useState, useRef, lazy, Suspense, type ReactNode } from 'react';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -1146,58 +1146,94 @@ function App() {
 
 /**
  * 404 페이지 (플랫폼 전체)
+ *
+ * WO-O4O-WEB-UX-STANDARDIZATION-BATCH-V1
+ *   5개 web 서비스의 404 문구·버튼이 서로 달랐다. 여기서는 요청 주소도, 직전 화면으로
+ *   돌아갈 수단도 없었고 복귀 링크가 `<a href>` 라 SPA 라우팅이 아닌 전체 새로고침이었다.
+ *   canonical(Neture / Pharmacy-Hub) 형태로 맞춘다 — 404 코드 · 표준 문구 · 요청 경로 표시 ·
+ *   [홈으로 이동] + [이전 화면으로 돌아가기]. 서비스 고유 보조 링크(커뮤니티 · 이용 가이드)는 유지한다.
+ *
+ * 선행: WO-O4O-SERVICE-PAGE-FOOTER-COVERAGE-AUDIT-AND-FIX-V1 (404 = minimal nav)
  */
 function NotFoundPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const subLinkStyle: React.CSSProperties = {
+    fontSize: '14px',
+    color: '#64748B',
+    textDecoration: 'none',
+  };
+
   return (
     <div style={{ padding: '60px 20px', textAlign: 'center', maxWidth: '600px', margin: '0 auto' }}>
-      <h1 style={{ fontSize: '4rem', margin: 0, color: '#2563EB' }}>404</h1>
-      <h2 style={{ fontSize: '1.5rem', marginTop: '16px', color: '#0F172A' }}>
-        페이지를 찾을 수 없습니다
-      </h2>
-      <p style={{ color: '#64748B', marginTop: '8px' }}>
-        요청하신 페이지가 존재하지 않거나 이동되었습니다.
+      <p style={{ fontSize: '4rem', fontWeight: 700, margin: 0, color: '#E2E8F0' }}>404</p>
+      <h1 style={{ fontSize: '1.5rem', marginTop: '12px', marginBottom: '8px', color: '#0F172A' }}>
+        요청하신 페이지를 찾을 수 없습니다.
+      </h1>
+      <p style={{ color: '#64748B', margin: 0 }}>
+        주소가 바뀌었거나 더 이상 제공되지 않는 페이지입니다.
       </p>
-      {/* WO-O4O-SERVICE-PAGE-FOOTER-COVERAGE-AUDIT-AND-FIX-V1: 404 minimal 복귀 네비 */}
+      <p
+        style={{
+          fontSize: '12px',
+          fontFamily: 'monospace',
+          color: '#94A3B8',
+          background: '#fff',
+          border: '1px solid #E2E8F0',
+          borderRadius: '8px',
+          padding: '8px 12px',
+          margin: '16px auto 0',
+          maxWidth: '420px',
+          wordBreak: 'break-all',
+        }}
+      >
+        {location.pathname}
+      </p>
+
       <div style={{ marginTop: '24px', display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <a
-          href="/"
+        <Link
+          to="/"
           style={{
             display: 'inline-block',
             padding: '12px 24px',
             backgroundColor: '#2563EB',
             color: '#fff',
+            fontSize: '14px',
+            fontWeight: 500,
             textDecoration: 'none',
-            borderRadius: '6px',
+            borderRadius: '12px',
           }}
         >
-          홈으로 돌아가기
-        </a>
-        <a
-          href="/forum"
+          홈으로 이동
+        </Link>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
           style={{
             display: 'inline-block',
             padding: '12px 24px',
             border: '1px solid #CBD5E1',
+            background: '#fff',
             color: '#334155',
-            textDecoration: 'none',
-            borderRadius: '6px',
+            fontSize: '14px',
+            fontWeight: 500,
+            borderRadius: '12px',
+            cursor: 'pointer',
           }}
         >
+          이전 화면으로 돌아가기
+        </button>
+      </div>
+
+      {/* 서비스 고유 보조 링크 (기존 유지) */}
+      <div style={{ marginTop: '16px', display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <Link to="/forum" style={subLinkStyle}>
           커뮤니티
-        </a>
-        <a
-          href="/guide/intro"
-          style={{
-            display: 'inline-block',
-            padding: '12px 24px',
-            border: '1px solid #CBD5E1',
-            color: '#334155',
-            textDecoration: 'none',
-            borderRadius: '6px',
-          }}
-        >
+        </Link>
+        <Link to="/guide/intro" style={subLinkStyle}>
           이용 가이드
-        </a>
+        </Link>
       </div>
     </div>
   );
