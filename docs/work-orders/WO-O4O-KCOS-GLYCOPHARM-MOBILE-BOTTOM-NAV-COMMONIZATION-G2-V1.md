@@ -112,7 +112,8 @@ Core 가 책임지는 것:
 - Core 계약을 만족시키려면 `@o4o/ui` 안에 **서비스 이름 분기**가 필요해질 때 → 공통화 중단, Local 유지
 - `@o4o/ui` 의 기존 export 나 다른 소비처에 **breaking change** 가 필요할 때
 - `package.json` · lockfile · Dockerfile · CI 변경이 필요해질 때
-- 두 서비스 외 파일 수정이 필요해질 때 / 다른 세션의 dirty·미추적 파일을 건드려야 할 때
+- **승인 경로 밖의** 다른 서비스·기능 파일 수정이 필요해질 때 / 다른 세션의 dirty·미추적 파일을 건드려야 할 때
+  (`packages/ui/src/layout/**` 와 CHECK 문서는 §6 의 승인된 대상 경로이므로 중지 조건이 아니다.)
 - 현재 변경과 무관한 build · test 실패
 
 ---
