@@ -58,6 +58,11 @@ export default function SupplyPage() {
       try {
         // Neture 공급자 제품 조회
         const response = await apiClient.get<B2BProduct[]>('/api/v1/glycopharm/supply/products');
+        // apiClient 는 실패를 throw 하지 않고 { error } 로 돌려준다 — error 를 명시적으로 판정해야 한다.
+        if (response.error) {
+          setError('잠시 후 다시 시도해 주세요.');
+          return;
+        }
         if (response.data) {
           setProducts(response.data);
         }

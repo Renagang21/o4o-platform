@@ -41,6 +41,11 @@ export default function ForumFeedbackPage() {
       setLoadError(false);
       try {
         const response = await apiClient.get<FeedbackPost[]>('/api/v1/glycopharm/forum/feedback');
+        // apiClient 는 실패를 throw 하지 않고 { error } 로 돌려준다 — error 를 명시적으로 판정해야 한다.
+        if (response.error) {
+          setLoadError(true);
+          return;
+        }
         if (response.data) {
           setPosts(response.data);
         }

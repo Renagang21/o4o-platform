@@ -132,8 +132,9 @@ export const netureApi = {
       const data = response.data;
       return data.requests || [];
     } catch (error) {
+      // 조회 실패를 빈 목록으로 위장하지 않는다(4상태 계약) — 호출층이 error 를 판정한다.
       console.warn('[Neture API] Failed to fetch partnership requests:', error);
-      return [];
+      throw error;
     }
   },
 

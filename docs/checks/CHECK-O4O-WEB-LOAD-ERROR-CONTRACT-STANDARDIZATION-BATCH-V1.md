@@ -196,6 +196,31 @@ UI 를 새로 만들지 않고 catch 본문만 교정했다 — 회귀 위험이
 | 권한 없음 화면 | PASS — 기존 동작 불변(이번 배치 미개입) |
 | 없는 route 404 | PASS — 직전 배치의 404 표준 유지 |
 
+### 실브라우저에서 실제로 잡은 결함 (후속 수정 1차)
+
+`https://glycopharm.co.kr/forum/feedback` 를 실브라우저로 열었을 때
+`GET /api/v1/glycopharm/forum/feedback` 이 **404** 인데도 화면은 여전히
+"아직 등록된 의견이 없습니다"(empty) 를 보여주었다.
+
+원인은 화면이 아니라 **API 래퍼**였다.
+
+| 래퍼 | 문제 | 영향 |
+|---|---|---|
+| `services/web-glycopharm/src/services/api.ts` 의 `apiClient` | 실패를 throw 하지 않고 `{ error }` 로 **정상 반환** | `catch { setLoadError(true) }` 가 **영원히 실행되지 않음** → 1차 수정이 무효 |
+| `services/web-neture/src/lib/api/neture.ts` 의 `getPartnershipRequests` | `catch` 에서 `return []` | `Promise.allSettled` 가 reject 를 못 봄 → 부분 실패가 empty 로 위장 |
+
+수정:
+
+| 파일 | 수정 |
+|---|---|
+| `web-glycopharm/pages/b2b/SupplyPage.tsx` | `if (response.error) { setError(표준문구); return; }` 추가 |
+| `web-glycopharm/pages/forum/ForumFeedbackPage.tsx` | `if (response.error) { setLoadError(true); return; }` 추가 |
+| `web-glycopharm/pages/store-management/b2b-order/B2BOrderPage.tsx` | 2개 응답 각각 `error` 판정 추가 |
+| `web-neture/lib/api/neture.ts` | `return []` → `throw error` (소비처 1곳뿐임을 확인) |
+
+교훈(다음 배치 필수 점검): **`catch` 를 추가하기 전에 그 화면이 쓰는 API 래퍼가 실제로 throw 하는지 먼저 확인한다.**
+throw 하지 않는 래퍼(`{ error }` / `{ success:false }` / `null` 반환)는 `catch` 가 아니라 **반환값 판정**이 필요하다.
+
 ### 한계 (WO §7 명시 요구)
 
 - 프로덕션 API 를 인위적으로 실패시키는 것은 운영 영향이 있어 수행하지 않았다. 따라서 "API 실패 화면" 은
@@ -219,11 +244,15 @@ UI 를 새로 만들지 않고 catch 본문만 교정했다 — 회귀 위험이
 
 ## 10. commit SHA
 
-- (커밋 후 기재)
+- 1차 수정: `7be0cc39b` — fix(web): API 실패를 빈 목록으로 위장하던 화면 4상태 계약 정리 (40 files / +977 / -158)
+- 2차 수정(실브라우저에서 잡은 래퍼 결함): `(후속 커밋 SHA)`
 
 ## 11. push 결과
 
-- (push 후 기재)
+- 1차: `0127d1ad5..7be0cc39b  main -> main` — `HEAD == origin/main` 확인
+- 1차 배포: GitHub Actions run `31457906264` **success**
+  (kpa-society / glycopharm / neture / k-cosmetics 배포 success, pharmacy-hub skipped, API 배포 없음)
+- 2차: `(후속 push 결과)`
 
 ---
 

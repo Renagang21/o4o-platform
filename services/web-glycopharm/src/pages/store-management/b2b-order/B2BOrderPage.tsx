@@ -69,12 +69,21 @@ export default function B2BOrderPage() {
       try {
         // 프랜차이즈 상품 조회
         const franchiseResponse = await apiClient.get<B2BProduct[]>('/api/v1/glycopharm/b2b/products?type=franchise');
+        // apiClient 는 실패를 throw 하지 않고 { error } 로 돌려준다 — error 를 명시적으로 판정해야 한다.
+        if (franchiseResponse.error) {
+          setError('잠시 후 다시 시도해 주세요.');
+          return;
+        }
         if (franchiseResponse.data) {
           setFranchiseProducts(franchiseResponse.data);
         }
 
         // 일반 B2B 상품 조회
         const generalResponse = await apiClient.get<B2BProduct[]>('/api/v1/glycopharm/b2b/products?type=general');
+        if (generalResponse.error) {
+          setError('잠시 후 다시 시도해 주세요.');
+          return;
+        }
         if (generalResponse.data) {
           setGeneralProducts(generalResponse.data);
         }
