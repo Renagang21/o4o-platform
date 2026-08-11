@@ -1,0 +1,34 @@
+{
+  "detailCensus": {
+    "rows": 1289,
+    "parsed": 1289,
+    "missing": 0,
+    "failed": 0,
+    "withEfficacy": 1287,
+    "withUsage": 1282,
+    "withCautions": 1282
+  },
+  "matchCensus": {
+    "MATCH": 1317,
+    "CHECK": 0,
+    "NO_SOURCE": 15840
+  },
+  "state": {
+    "dbCosmeticDocs": 32674,
+    "matchInDb": 1317,
+    "matchNotInDb": 0,
+    "detailUsable": 1317,
+    "detailUnusable": 0,
+    "currentUsage": {
+      "absent": 0,
+      "categoryGeneric": 1304,
+      "productSpecific": 13
+    },
+    "currentCaution": {
+      "absent": 1317,
+      "present": 0
+    },
+    "dbUsageSectionTotal": 32578,
+    "dbCautionSectionTotal": 0
+  }
+}
