@@ -37,7 +37,7 @@ import type { StoreMlcGroup, StoreMlcLocale } from '../../api/multilingualProduc
 //   '내 매장 자료' 탭에 매장 직접 작성 콘텐츠(kpa_store_contents direct)도 포함(opt-in).
 //   /store/library/contents 통합 feed 의 origin='direct' 항목 — 콘텐츠 목록과 동일 소스 정합.
 import { storeLibraryApi } from '../../api/assetSnapshot';
-import { LoadErrorState } from '../common';
+import { LoadError } from '@o4o/ui';
 
 // ── 선택 결과 타입 ──
 
@@ -499,7 +499,7 @@ export function StoreAssetSelectorModal({
         {/* Card Grid */}
         <div style={styles.body}>
           {loadError && (
-            <LoadErrorState compact onRetry={() => void loadItems(page, search)} />
+            <LoadError compact onRetry={() => void loadItems(page, search)} />
           )}
           {source === 'mlc' ? (
             loading ? (

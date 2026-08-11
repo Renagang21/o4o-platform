@@ -17,7 +17,7 @@ import { Link, Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts';
 import { hasAnyRole } from '@o4o/auth-utils';
 import { ADMIN_ROLES } from '../../lib/role-constants';
-import { AccessDenied } from '../auth/AccessDenied';
+import { AccessDenied } from '@o4o/ui';
 import { Shield, FileText, Box, StickyNote, Home, MessageSquare } from 'lucide-react';
 
 export default function AdminVaultLayout() {

@@ -19,7 +19,7 @@ import { Link } from 'react-router-dom';
 import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, AlertCircle, RefreshCw, ChevronDown, ChevronRight, Paperclip, X, ArrowUp, ArrowDown, Star } from 'lucide-react';
 import { AiSummaryButton } from '../../components/ai';
 import { dashboardApi, partnerDashboardApi, type PartnerDashboardSummary, type PartnerDashboardItem, type BrowsableContent, type LinkedContent } from '../../lib/api';
-import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 // 서비스 URL 설정
 const SERVICE_URLS: Record<string, string> = {
@@ -797,7 +797,7 @@ export function PartnerOverviewPage() {
               {contentLoading ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>로딩 중...</div>
               ) : contentLoadError ? (
-                <LoadErrorNotice
+                <LoadError
                   compact
                   onRetry={() => {
                     if (contentModalItemId) void openContentModal(contentModalItemId);

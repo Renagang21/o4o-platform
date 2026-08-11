@@ -23,7 +23,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { LoadingSpinner, EmptyState, LoadErrorState, Pagination } from '../common';
+import { LoadError } from '@o4o/ui';
+import { LoadingSpinner, EmptyState, Pagination } from '../common';
 import { eventOfferApi, storeCartApi } from '../../api';
 import { CART_SERVICE_KEY, buildEventOfferCartPayload } from '../../utils/eventOfferCart';
 import { useAuth } from '../../contexts';
@@ -299,7 +300,7 @@ export function EventOfferContentPanel({ compact = false }: EventOfferContentPan
       </div>
 
       {loadError ? (
-        <LoadErrorState onRetry={() => void loadData()} />
+        <LoadError onRetry={() => void loadData()} />
       ) : items.length === 0 && !searchQuery && !supplierFilter ? (
         <EmptyState
           icon="🛒"

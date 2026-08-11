@@ -13,7 +13,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Activity, Building2, Handshake } from 'lucide-react';
 import { netureApi, type Supplier, type PartnershipRequest } from '../../lib/api';
-import { LoadErrorNotice } from '../common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 interface UpdateItem {
   id: string;
@@ -113,7 +113,7 @@ export function LatestUpdatesSection() {
           <Activity className="w-8 h-8 text-gray-400 mx-auto mb-3" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">Latest Updates</h2>
         </div>
-        <LoadErrorNotice compact onRetry={() => void loadUpdates()} />
+        <LoadError compact onRetry={() => void loadUpdates()} />
       </section>
     );
   }

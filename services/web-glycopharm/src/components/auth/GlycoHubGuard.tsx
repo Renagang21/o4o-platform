@@ -15,7 +15,7 @@ import { isStoreOwnerDual, isOperatorOrAbove } from '@o4o/auth-utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { isPharmacistRole } from '../../lib/role-constants';
 import { MembershipGate } from './MembershipGate';
-import { AccessDenied } from './AccessDenied';
+import { AccessDenied } from '@o4o/ui';
 
 interface GlycoHubGuardProps {
   children: React.ReactNode;

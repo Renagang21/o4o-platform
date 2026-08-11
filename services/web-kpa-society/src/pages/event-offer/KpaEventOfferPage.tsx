@@ -15,7 +15,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { PageHeader, LoadingSpinner, EmptyState, LoadErrorState, Pagination } from '../../components/common';
+import { LoadError } from '@o4o/ui';
+import { PageHeader, LoadingSpinner, EmptyState, Pagination } from '../../components/common';
 import { eventOfferApi, storeCartApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
@@ -379,7 +380,7 @@ export function KpaEventOfferPage() {
       </div>
 
       {loadError ? (
-        <LoadErrorState onRetry={() => void loadData()} />
+        <LoadError onRetry={() => void loadData()} />
       ) : items.length === 0 && !searchQuery && !supplierFilter ? (
         <EmptyState
           icon="🛒"

@@ -19,7 +19,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { PageHeader, LoadingSpinner, EmptyState, LoadErrorState, Card } from '../../components/common';
+import { LoadError } from '@o4o/ui';
+import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { dashboardApi, type DashboardAsset, type DashboardSortType, type DashboardKpi } from '../../api';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors, typography } from '../../styles/theme';
@@ -464,7 +465,7 @@ export function MyContentPage() {
       </div>
 
       {loadError ? (
-        <LoadErrorState onRetry={() => void loadAssets()} />
+        <LoadError onRetry={() => void loadAssets()} />
       ) : filteredAssets.length === 0 ? (
         <div>
           <EmptyState

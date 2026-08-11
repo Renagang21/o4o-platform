@@ -13,6 +13,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { LoadError } from '@o4o/ui';
 import {
   BarChart3,
   MessageSquare,
@@ -55,6 +56,9 @@ export function OperatorForumAnalyticsPage({
   const [trend, setTrend] = useState<ForumAnalyticsTrendDay[]>([]);
   const [activity, setActivity] = useState<ForumAnalyticsActivityItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1:
+  //   loadAll 에 catch 가 없어 client 가 throw 하면 무한 로딩이었다 → error 상태 추가.
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     loadAll();
@@ -63,16 +67,25 @@ export function OperatorForumAnalyticsPage({
 
   const loadAll = async () => {
     setIsLoading(true);
-    const [s, t, a] = await Promise.all([
-      client.getSummary(),
-      client.getTrend(30),
-      client.getActivity(15),
-    ]);
-    if (s?.data) setSummary(s.data as ForumAnalyticsSummary);
-    const tData = t?.data as { daily?: ForumAnalyticsTrendDay[] } | null | undefined;
-    if (tData?.daily) setTrend(tData.daily);
-    if (Array.isArray(a?.data)) setActivity(a.data as ForumAnalyticsActivityItem[]);
-    setIsLoading(false);
+    setLoadError(false);
+    try {
+      const [s, t, a] = await Promise.all([
+        client.getSummary(),
+        client.getTrend(30),
+        client.getActivity(15),
+      ]);
+      if (s?.data) setSummary(s.data as ForumAnalyticsSummary);
+      const tData = t?.data as { daily?: ForumAnalyticsTrendDay[] } | null | undefined;
+      if (tData?.daily) setTrend(tData.daily);
+      if (Array.isArray(a?.data)) setActivity(a.data as ForumAnalyticsActivityItem[]);
+    } catch {
+      setSummary(null);
+      setTrend([]);
+      setActivity([]);
+      setLoadError(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isLoading) {
@@ -80,6 +93,14 @@ export function OperatorForumAnalyticsPage({
       <div className="flex items-center justify-center py-12">
         <Loader2 className={`w-8 h-8 ${accent.iconText} animate-spin`} />
         <span className="ml-2 text-slate-600">로딩 중...</span>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadError onRetry={() => void loadAll()} />
       </div>
     );
   }

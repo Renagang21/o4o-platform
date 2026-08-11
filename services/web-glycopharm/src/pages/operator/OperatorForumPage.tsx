@@ -16,15 +16,10 @@ import { fetchForumPosts } from '@/services/forumApi';
 
 const client: ForumHubClient = {
   // WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1:
-  //   wrapper 는 실패를 { error } 로 반환하므로 adapter 에서 throw 로 승격해야
-  //   OperatorForumHubPage 의 error 상태가 동작한다 (조회 실패 ≠ 데이터 0건).
-  getSummary: async () => {
-    const res = await forumAnalyticsApi.getSummary();
-    if ((res as { error?: { message?: string } })?.error) {
-      throw new Error('포럼 요약을 불러오지 못했습니다.');
-    }
-    return res;
-  },
+  //   조회 실패 ≠ 데이터 0건 — 실패는 throw 로 승격돼야 error 상태가 동작한다.
+  // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1:
+  //   승격 지점을 forumAnalyticsApi 로 옮겨 3개 소비처가 같은 계약을 공유한다.
+  getSummary: () => forumAnalyticsApi.getSummary(),
   getPosts: (params) => fetchForumPosts({ limit: params?.limit }).then((r) => ({ data: r.data })),
 };
 

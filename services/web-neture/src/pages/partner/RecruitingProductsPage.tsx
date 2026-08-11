@@ -9,7 +9,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { recruitingApi, partnerDashboardApi, type RecruitingProduct } from '../../lib/api';
-import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 const CATEGORY_LABELS: Record<string, string> = {
   cgm_device: 'CGM 기기',
@@ -99,7 +99,7 @@ export default function RecruitingProductsPage() {
       </div>
 
       {loadError ? (
-        <LoadErrorNotice onRetry={() => void loadProducts()} />
+        <LoadError onRetry={() => void loadProducts()} />
       ) : products.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-lg border border-gray-200">
           <p className="text-gray-500 text-lg">자료가 없습니다</p>

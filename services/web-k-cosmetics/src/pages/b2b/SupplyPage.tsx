@@ -24,7 +24,7 @@ import {
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
 import { api } from '../../lib/apiClient';
-import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 interface Supplier {
   id: string;
@@ -176,7 +176,7 @@ export default function SupplyPage() {
             <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
           </div>
         ) : loadError ? (
-          <LoadErrorNotice onRetry={() => setReloadKey((k) => k + 1)} />
+          <LoadError onRetry={() => setReloadKey((k) => k + 1)} />
         ) : activeTab === 'suppliers' ? (
           /* Suppliers List */
           filteredSuppliers.length === 0 ? (

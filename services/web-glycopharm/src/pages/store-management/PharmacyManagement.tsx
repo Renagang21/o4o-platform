@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { apiClient } from '@/services/api';
 import { glycopharmConfig } from '@o4o/operator-ux-core';
 import { useAuth } from '@/contexts/AuthContext';
-import { ErrorState } from '@/components/common';
+import { LoadError } from '@o4o/ui';
 import {
   MessageSquare,
   BookOpen,
@@ -179,7 +179,7 @@ function ForumFeed() {
             <p className="mt-3 text-sm text-slate-400">포럼 글을 불러오는 중...</p>
           </div>
         ) : loadError ? (
-          <ErrorState onRetry={fetchPosts} />
+          <LoadError onRetry={fetchPosts} />
         ) : posts.length === 0 ? (
           <div className="py-12 text-center">
             <div className="text-4xl mb-3">💬</div>

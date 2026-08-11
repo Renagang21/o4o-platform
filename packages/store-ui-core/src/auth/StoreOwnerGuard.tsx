@@ -23,7 +23,13 @@
  *        - membership-aware (Glyco — service_memberships role='pharmacy' active/approved)
  *      → membershipGate(children) 또는 children 직접 반환
  *   4. staleRecovery 가 제공된 경우 → 한 번만 check() → true 면 refreshSession() 후 통과
- *   5. 그 외                                → Navigate(denialFallback, default '/')
+ *   5. 그 외                                → renderDenied 가 있으면 그 노드, 없으면
+ *                                              Navigate(denialFallback, default '/')
+ *
+ * WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1:
+ *   거부 시 무안내 redirect 만 가능했다 → optional `renderDenied` 주입점을 추가한다.
+ *   호출 측이 공통 @o4o/ui AccessDenied 등을 주입한다. **판정 로직은 변경하지 않는다** —
+ *   미주입 서비스는 기존 Navigate(denialFallback) 동작 그대로다.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -131,6 +137,12 @@ export interface StoreOwnerGuardProps {
   loginFallback?: string;
   /** default '/' — 매장 경영자 아님이 최종 확정될 때 navigate 대상. */
   denialFallback?: string;
+  /**
+   * 매장 경영자 아님이 최종 확정될 때 redirect 대신 렌더할 안내 노드.
+   * 제공되면 denialFallback / staleRecovery.fallback redirect 를 대체한다.
+   * 표시 계약만 담당 — 접근 판정에는 영향이 없다.
+   */
+  renderDenied?: ReactNode | (() => ReactNode);
   /** default 최소 텍스트. */
   loadingNode?: ReactNode;
   /**
@@ -162,6 +174,7 @@ export function StoreOwnerGuard(props: StoreOwnerGuardProps) {
     extraRoleMatcher,
     loginFallback = '/login',
     denialFallback = '/',
+    renderDenied,
     loadingNode = DefaultLoading,
     staleRecovery,
     membershipGate: MembershipGate,
@@ -248,6 +261,10 @@ export function StoreOwnerGuard(props: StoreOwnerGuardProps) {
 
   // ─── Render ───────────────────────────────────────────────────────────
 
+  const deniedNode = renderDenied
+    ? <>{typeof renderDenied === 'function' ? renderDenied() : renderDenied}</>
+    : null;
+
   if (isLoading) {
     return <>{loadingNode}</>;
   }
@@ -276,8 +293,8 @@ export function StoreOwnerGuard(props: StoreOwnerGuardProps) {
       // (avoids briefly showing children with stale user state).
       return <>{staleRecovery.loadingNode ?? DefaultLoading}</>;
     }
-    return <Navigate to={staleRecovery.fallback ?? denialFallback} replace />;
+    return deniedNode ?? <Navigate to={staleRecovery.fallback ?? denialFallback} replace />;
   }
 
-  return <Navigate to={denialFallback} replace />;
+  return deniedNode ?? <Navigate to={denialFallback} replace />;
 }

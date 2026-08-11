@@ -26,6 +26,7 @@
 import { useNavigate } from 'react-router-dom';
 import { StoreDashboardLayout, StoreOwnerGuard, PHARMACY_HUB_STORE_CONFIG } from '@o4o/store-ui-core';
 import type { StoreOwnerGuardUser } from '@o4o/store-ui-core';
+import { AccessDenied } from '@o4o/ui';
 import { useAuth } from '../contexts/AuthContext';
 import { MembershipGate } from '../components/MembershipGate';
 import { BRAND } from '../config/service';
@@ -76,6 +77,8 @@ export function StoreOwnerShell({
       user={guardUser}
       isAuthenticated={isAuthenticated}
       isLoading={isLoading}
+      // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1: 무안내 redirect 대신 공통 안내 화면
+      renderDenied={<AccessDenied message="약국 경영 화면은 약국 경영자 계정만 이용할 수 있습니다." />}
       membershipGate={MembershipGate}
     >
       <ShellLayout />

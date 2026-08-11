@@ -21,7 +21,7 @@
 
 import { useState, useEffect } from 'react';
 import { Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { BaseDetailDrawer, ActionBar, BulkResultModal } from '@o4o/ui';
+import { BaseDetailDrawer, ActionBar, BulkResultModal, LoadError } from '@o4o/ui';
 import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
@@ -88,6 +88,9 @@ export function OperatorForumDeleteRequestsConsolePage({
 }: OperatorForumDeleteRequestsConsolePageProps) {
   const [requests, setRequests] = useState<ForumDeleteRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1:
+  //   조회 실패를 빈 목록으로 삼켜 "신청 없음"(empty) 과 구분되지 않았다 → error 상태 추가.
+  const [loadError, setLoadError] = useState(false);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('pending');
   const [selectedRequest, setSelectedRequest] = useState<ForumDeleteRequest | null>(null);
   const [reviewComment, setReviewComment] = useState('');
@@ -129,12 +132,14 @@ export function OperatorForumDeleteRequestsConsolePage({
 
   const loadRequests = async () => {
     setIsLoading(true);
+    setLoadError(false);
     try {
       const status = statusFilter === 'all' ? undefined : statusFilter;
       const items = await client.list({ status });
       setRequests(items || []);
     } catch {
       setRequests([]);
+      setLoadError(true);
     } finally {
       setIsLoading(false);
     }
@@ -261,6 +266,14 @@ export function OperatorForumDeleteRequestsConsolePage({
   ];
 
   // ─── Render ─────────────────────────────────────────────────
+  if (loadError && !isLoading) {
+    return (
+      <div className="space-y-6">
+        <LoadError onRetry={() => void loadRequests()} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}

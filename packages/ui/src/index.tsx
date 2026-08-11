@@ -664,6 +664,9 @@ export * from './content-discovery';
 export * from './store-blocks';
 
 // Shared Operator Pages (WO-O4O-ROLE-MANAGEMENT-PAGE-COMMONIZATION-V1)
+// WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1: 공통 UX 상태 컴포넌트
+export * from './feedback';
+
 export * from './pages/operator';
 
 // Operator User Detail (WO-O4O-USER-DETAIL-PAGE-COMMONIZATION-V1)

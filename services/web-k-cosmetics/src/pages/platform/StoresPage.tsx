@@ -26,7 +26,7 @@ import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
 import { api } from '../../lib/apiClient';
 import { kcosmeticsConfig } from '@o4o/operator-ux-core';
-import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 interface DashboardStats {
   todaySales: number;
@@ -177,7 +177,7 @@ export default function StoresPage() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
         {loadError && (
-          <LoadErrorNotice
+          <LoadError
             compact
             className="mb-6"
             onRetry={() => setReloadKey((k) => k + 1)}

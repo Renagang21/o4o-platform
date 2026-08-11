@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { catalogImportApi } from '../../../lib/api';
-import { LoadErrorNotice } from '../../../components/common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 interface ImportJob {
   id: string;
@@ -123,7 +123,7 @@ export default function ImportHistoryPage() {
       </div>
 
       {loadError ? (
-        <LoadErrorNotice onRetry={() => void loadJobs()} />
+        <LoadError onRetry={() => void loadJobs()} />
       ) : jobs.length === 0 ? (
         <div className="text-center py-12 text-gray-400">
           Import 이력이 없습니다.

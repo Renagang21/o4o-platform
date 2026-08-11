@@ -22,7 +22,8 @@ import {
   X,
   Building2,
 } from 'lucide-react';
-import { EmptyState, LoadingState, ErrorState } from '@/components/common';
+import { LoadError } from '@o4o/ui';
+import { EmptyState, LoadingState } from '@/components/common';
 import { apiClient } from '@/services/api';
 import { toast } from '@o4o/error-handling';
 import type { B2BProduct, CartItem, CartItemWarning } from '@/types';
@@ -200,7 +201,7 @@ export default function SupplyPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <ErrorState message={error} onRetry={() => window.location.reload()} />
+        <LoadError description={error} onRetry={() => window.location.reload()} />
       </div>
     );
   }

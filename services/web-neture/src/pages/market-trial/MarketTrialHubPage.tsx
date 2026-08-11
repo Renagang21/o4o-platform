@@ -22,7 +22,7 @@ import {
   type MyParticipationSummary,
 } from '../../api/trial';
 import { useAuth } from '../../contexts/AuthContext';
-import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 type DisplayGroup = 'recruiting' | 'active' | 'ended';
 
@@ -139,7 +139,7 @@ export function MarketTrialHubPage() {
       {/* 4. 모집 중 */}
       <Section title="모집 중" count={recruiting.length} accentColor="#059669" isLoading={isLoading}>
         {loadError ? (
-          <LoadErrorNotice compact onRetry={() => setReloadKey((k) => k + 1)} />
+          <LoadError compact onRetry={() => setReloadKey((k) => k + 1)} />
         ) : recruiting.length > 0 ? (
           recruiting.map((trial) => (
             <TrialCard

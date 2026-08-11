@@ -15,7 +15,7 @@ const queryClient = new QueryClient({
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
-import { TemplateProvider } from '@o4o/ui';
+import { TemplateProvider, AccessDenied } from '@o4o/ui';
 import { templates } from '@o4o/shared-space-ui';
 import { kcosmeticsConfig } from '@o4o/operator-ux-core';
 import { KCosGlobalHeader } from '@/components/KCosGlobalHeader';
@@ -341,6 +341,8 @@ function StoreOwnerRoute({ children }: { children: React.ReactNode }) {
       user={user}
       isAuthenticated={isAuthenticated}
       isLoading={isLoading}
+      // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1: 무안내 redirect 대신 공통 안내 화면
+      renderDenied={<AccessDenied message="내 매장은 매장 경영자 계정만 이용할 수 있습니다." />}
     >
       {children}
     </StoreOwnerGuard>

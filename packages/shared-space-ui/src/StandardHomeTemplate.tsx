@@ -16,7 +16,7 @@
  */
 
 import { type ReactNode, type CSSProperties } from 'react';
-import { PageSection, PageContainer } from '@o4o/ui';
+import { PageSection, PageContainer, LoadError } from '@o4o/ui';
 import { NewsNoticesSection } from './NewsNoticesSection';
 import { AppEntrySection } from './AppEntrySection';
 import { CtaGuidanceSection } from './CtaGuidanceSection';
@@ -41,6 +41,18 @@ export interface StandardHomeTemplateProps {
   noticesAccentColor?: string;
   noticesAccentBg?: string;
   noticesViewAllHref?: string;
+
+  /**
+   * 공지 조회 실패 여부.
+   *
+   * WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1:
+   * true 이면 공지 목록 대신 공통 LoadError(다시 시도) 를 표시한다.
+   * 실패를 빈 목록으로 넘기면 "등록된 공지가 없습니다"(empty) 와 구분되지 않는다.
+   * 미전달 서비스는 기존 동작 유지 (영향 0).
+   */
+  noticesError?: boolean;
+  /** noticesError 상태에서 [다시 시도] 클릭 시 호출 */
+  onNoticesRetry?: () => void;
 
   /** 공지 우측 컬럼 — 서비스별 외부 뉴스 placeholder */
   noticesRightSlot: ReactNode;
@@ -91,6 +103,8 @@ export function StandardHomeTemplate({
   noticesAccentColor = 'var(--color-primary)',
   noticesAccentBg,
   noticesViewAllHref,
+  noticesError,
+  onNoticesRetry,
   noticesRightSlot,
   noticesGap = 'gap-4',
   latestSlot,
@@ -122,6 +136,12 @@ export function StandardHomeTemplate({
         <PageContainer>
           <div className={`flex flex-col md:flex-row ${noticesGap}`}>
             <div className="flex-1 min-w-0">
+              {noticesError ? (
+                <LoadError
+                  title="공지를 불러오지 못했습니다."
+                  onRetry={onNoticesRetry}
+                />
+              ) : (
               <NewsNoticesSection
                 title={noticesTitle}
                 items={notices}
@@ -130,6 +150,7 @@ export function StandardHomeTemplate({
                 accentBg={noticesAccentBg}
                 viewAllHref={noticesViewAllHref}
               />
+              )}
             </div>
             <div className="flex-1 min-w-0">
               {noticesRightSlot}

@@ -261,38 +261,31 @@ export const forumDeleteRequestApi = {
 // Forum Analytics API — WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
 // Common /api/v1/forum/operator/analytics/* endpoints (serviceCode=glycopharm)
 //
-// WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1 — HOLD:
-//   소비처인 @o4o/operator-core-ui/modules/forum-analytics 의 OperatorForumAnalyticsPage 에
-//   error 상태가 없다(loading → 데이터 렌더). 여기서 throw 로 승격하면 loadAll 에 catch 가 없어
-//   무한 loading 이 된다. 실패 표면화는 공통 패키지 변경이 필요하므로 다음 batch 로 넘긴다.
-//   (아래 try/catch 는 wrapper 가 throw 하지 않아 실제로는 도달하지 않는다 — 구조 유지)
+// WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1 (직전 batch 의 HOLD 해소):
+//   소비처인 @o4o/operator-core-ui/modules/forum-analytics 에 error 상태를 추가했으므로
+//   실패를 0/빈 배열로 위장하지 않고 throw 한다. 소비처가 재시도 UI 를 표시한다.
+//   wrapper 는 throw 하지 않고 `{ error }` 를 돌려주므로 error 를 직접 검사한다.
 export const forumAnalyticsApi = {
   getSummary: async () => {
-    try {
-      return await apiClient.get<unknown>('/api/v1/forum/operator/analytics/summary?serviceCode=glycopharm');
-    } catch {
-      return { data: null };
-    }
+    const res = await apiClient.get<unknown>('/api/v1/forum/operator/analytics/summary?serviceCode=glycopharm');
+    if (res.error) throw new Error('포럼 분석 요약을 불러오지 못했습니다.');
+    return res;
   },
 
   getTrend: async (days?: number) => {
     const query = new URLSearchParams({ serviceCode: 'glycopharm' });
     if (days) query.set('days', days.toString());
-    try {
-      return await apiClient.get<unknown>(`/api/v1/forum/operator/analytics/trend?${query}`);
-    } catch {
-      return { data: { daily: [] } };
-    }
+    const res = await apiClient.get<unknown>(`/api/v1/forum/operator/analytics/trend?${query}`);
+    if (res.error) throw new Error('포럼 분석 추이를 불러오지 못했습니다.');
+    return res;
   },
 
   getActivity: async (limit?: number) => {
     const query = new URLSearchParams({ serviceCode: 'glycopharm' });
     if (limit) query.set('limit', limit.toString());
-    try {
-      return await apiClient.get<unknown>(`/api/v1/forum/operator/analytics/activity?${query}`);
-    } catch {
-      return { data: [] };
-    }
+    const res = await apiClient.get<unknown>(`/api/v1/forum/operator/analytics/activity?${query}`);
+    if (res.error) throw new Error('포럼 분석 활동 내역을 불러오지 못했습니다.');
+    return res;
   },
 };
 

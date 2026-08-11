@@ -14,13 +14,14 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
 import { useAuth } from '../../contexts/AuthContext';
 import { contentAssetApi, dashboardApi } from '../../lib/api';
 import { HubLayout, createSignal, createActionSignal } from '@o4o/hub-core';
 import type { HubSectionDefinition, HubSignal, HubActionResult } from '@o4o/hub-core';
 import { api } from '../../lib/apiClient';
+import { AccessDenied } from '@o4o/ui';
 
 // Action key constants (mirrors @o4o/ai-core ACTION_KEYS — frontend uses inline to avoid heavy dep)
 const NETURE_KEYS = {
@@ -545,14 +546,13 @@ export default function HubPage() {
 
   if (!isAuthenticated || !user) {
     return (
-      <div style={styles.guardContainer}>
-        <div style={styles.guardBox}>
-          <span style={{ fontSize: '2rem' }}>🔒</span>
-          <h2 style={styles.guardTitle}>로그인이 필요합니다</h2>
-          <p style={styles.guardMessage}>허브에 접근하려면 로그인이 필요합니다.</p>
-          <Link to="/login" style={styles.loginButton}>로그인하기</Link>
-        </div>
-      </div>
+      // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1: 공통 AccessDenied 로 교체
+      <AccessDenied
+        title="로그인이 필요합니다"
+        message="허브에 접근하려면 로그인이 필요합니다."
+        showLogin
+        showHome={false}
+      />
     );
   }
 
@@ -562,14 +562,8 @@ export default function HubPage() {
   // user 역할은 허브 접근 불가
   if (!['neture:admin', 'platform:super_admin', 'neture:supplier', 'supplier', 'neture:partner', 'partner'].includes(role)) {
     return (
-      <div style={styles.guardContainer}>
-        <div style={styles.guardBox}>
-          <span style={{ fontSize: '2rem' }}>🚫</span>
-          <h2 style={styles.guardTitle}>접근 권한이 없습니다</h2>
-          <p style={styles.guardMessage}>공급자, 파트너 또는 관리자 권한이 필요합니다.</p>
-          <Link to="/" style={styles.backButton}>홈으로 돌아가기</Link>
-        </div>
-      </div>
+      // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1: 공통 AccessDenied 로 교체
+      <AccessDenied message="공급자, 파트너 또는 관리자 권한이 필요합니다." />
     );
   }
 
@@ -600,43 +594,5 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#64748b',
     textAlign: 'center' as const,
     padding: '48px 0',
-  },
-  guardBox: {
-    textAlign: 'center' as const,
-    padding: '48px 24px',
-    background: '#f8fafc',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-  },
-  guardTitle: {
-    fontSize: '1.25rem',
-    fontWeight: 600,
-    color: '#1e293b',
-    margin: '16px 0 8px',
-  },
-  guardMessage: {
-    fontSize: '0.875rem',
-    color: '#64748b',
-    margin: '0 0 24px',
-  },
-  loginButton: {
-    display: 'inline-block',
-    padding: '10px 24px',
-    backgroundColor: '#3b82f6',
-    color: '#ffffff',
-    borderRadius: '8px',
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    textDecoration: 'none',
-  },
-  backButton: {
-    display: 'inline-block',
-    padding: '10px 24px',
-    backgroundColor: '#e2e8f0',
-    color: '#475569',
-    borderRadius: '8px',
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    textDecoration: 'none',
   },
 };

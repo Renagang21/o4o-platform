@@ -25,7 +25,7 @@ import {
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
 import { api } from '../../lib/apiClient';
-import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 interface ConnectedStore {
   id: string;
@@ -108,11 +108,11 @@ export default function TouristHubPage() {
             <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
           </div>
         ) : loadError && !stats && stores.length === 0 ? (
-          <LoadErrorNotice onRetry={() => setReloadKey((k) => k + 1)} />
+          <LoadError onRetry={() => setReloadKey((k) => k + 1)} />
         ) : (
           <>
             {loadError && (
-              <LoadErrorNotice
+              <LoadError
                 compact
                 className="mb-6"
                 onRetry={() => setReloadKey((k) => k + 1)}

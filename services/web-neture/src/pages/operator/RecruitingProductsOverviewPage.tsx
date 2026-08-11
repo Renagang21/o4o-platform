@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Package, Search, RefreshCw, Users, ChevronLeft, ChevronRight, X, Star, ToggleLeft, ToggleRight } from 'lucide-react';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { api } from '../../lib/api';
-import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 const PAGE_SIZE = 20;
 
@@ -265,7 +265,7 @@ export default function RecruitingProductsOverviewPage() {
       {loading ? (
         <div className="bg-white rounded-lg border border-slate-200 px-4 py-12 text-center text-slate-400">불러오는 중...</div>
       ) : loadError ? (
-        <LoadErrorNotice onRetry={() => void fetchProducts()} />
+        <LoadError onRetry={() => void fetchProducts()} />
       ) : (
         <>
           <DataTable<RecruitingProduct>

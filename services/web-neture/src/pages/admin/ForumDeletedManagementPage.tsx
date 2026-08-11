@@ -19,7 +19,7 @@ import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
 import { forumAdminApi } from '../../services/forumApi';
-import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -377,7 +377,7 @@ export default function ForumDeletedManagementPage() {
           </div>
 
           {loadError ? (
-            <LoadErrorNotice onRetry={() => void fetchDeleted()} />
+            <LoadError onRetry={() => void fetchDeleted()} />
           ) : (
             <>
               <DataTable<DeletedForum>
@@ -400,7 +400,7 @@ export default function ForumDeletedManagementPage() {
               <Loader2 className="w-5 h-5 animate-spin" /> 이력 불러오는 중...
             </div>
           ) : logsError ? (
-            <LoadErrorNotice compact onRetry={() => void fetchLogs()} />
+            <LoadError compact onRetry={() => void fetchLogs()} />
           ) : logs.length === 0 ? (
             <div className="py-10 text-center text-slate-400 text-sm">삭제 이력이 없습니다.</div>
           ) : (

@@ -199,6 +199,9 @@ export default function CommunityMainPage() {
   const tpl = useTemplate();
   const [noticeItems, setNoticeItems] = useState<NoticeItem[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1:
+  //   apiClient wrapper 는 실패를 throw 하지 않고 { error } 로 반환한다 → catch 만으로는 닿지 않는다.
+  const [noticesError, setNoticesError] = useState(false);
   // WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1
   const [latestItems, setLatestItems] = useState<LatestItem[]>([]);
   const [latestTab, setLatestTab] = useState('all');
@@ -208,9 +211,13 @@ export default function CommunityMainPage() {
 
   const loadNotices = useCallback(async () => {
     setLoading(true);
+    setNoticesError(false);
     try {
       const res = await apiClient.get<ForumPostRaw[]>('/api/v1/glycopharm/forum/posts?limit=30');
-      if (Array.isArray(res.data)) {
+      if (res.error || !Array.isArray(res.data)) {
+        setNoticeItems([]);
+        setNoticesError(true);
+      } else {
         const items: NoticeItem[] = res.data
           .filter((p) => p.category?.name === '공지')
           .slice(0, 5)
@@ -219,6 +226,7 @@ export default function CommunityMainPage() {
       }
     } catch {
       setNoticeItems([]);
+      setNoticesError(true);
     } finally {
       setLoading(false);
     }
@@ -301,6 +309,8 @@ export default function CommunityMainPage() {
       }
       notices={noticeItems}
       noticesLoading={loading}
+      noticesError={noticesError}
+      onNoticesRetry={() => void loadNotices()}
       noticesViewAllHref="/forum"
       noticesAccentBg="var(--color-primary-light, #f0fdf4)"
       noticesRightSlot={

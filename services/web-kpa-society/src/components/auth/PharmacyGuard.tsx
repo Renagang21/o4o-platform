@@ -19,6 +19,7 @@
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { StoreOwnerGuard } from '@o4o/store-ui-core';
+import { AccessDenied } from '@o4o/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES, STORE_OWNER_ROLES } from '../../lib/role-constants';
 import { MembershipGate } from './MembershipGate';
@@ -75,6 +76,14 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
       isLoading={isLoading}
       loadingNode={Loading}
       denialFallback="/pharmacy"
+      // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1: 무안내 redirect 대신 공통 안내 화면
+      renderDenied={
+        <AccessDenied
+          message="내 매장은 약국 개설자 계정만 이용할 수 있습니다."
+          homeTo="/pharmacy"
+          homeLabel="약국 서비스 홈으로 이동"
+        />
+      }
       membershipGate={MembershipGate}
     >
       {children}

@@ -8,7 +8,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { StoreRecruitmentApplicationsView, type StoreRecruitmentApplicationRow } from '@o4o/store-ui-core';
 import { api } from '../../lib/apiClient';
-import { ErrorState } from '../../components/common';
+import { LoadError } from '@o4o/ui';
 
 export default function StoreRecruitmentApplicationsPage() {
   const [rows, setRows] = useState<StoreRecruitmentApplicationRow[]>([]);
@@ -49,7 +49,7 @@ export default function StoreRecruitmentApplicationsPage() {
   );
 
   if (loadError && !loading) {
-    return <ErrorState onRetry={() => void load()} />;
+    return <LoadError onRetry={() => void load()} />;
   }
 
   return (

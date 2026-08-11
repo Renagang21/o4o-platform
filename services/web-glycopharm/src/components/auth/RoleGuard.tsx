@@ -15,7 +15,7 @@ import { isOperatorOrAbove } from '@o4o/auth-utils';
 import { createRouteGuard } from '@o4o/auth-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { MembershipGate } from './MembershipGate';
-import { AccessDenied } from './AccessDenied';
+import { AccessDenied } from '@o4o/ui';
 
 const LoadingSpinner = () => (
   <div className="min-h-screen flex items-center justify-center">

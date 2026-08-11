@@ -7,7 +7,8 @@
 import { useState, useEffect } from 'react';
 import { MessageSquare, Plus, ThumbsUp, Eye } from 'lucide-react';
 import { apiClient } from '@/services/api';
-import { LoadingState, EmptyState, ErrorState } from '@/components/common';
+import { LoadError } from '@o4o/ui';
+import { LoadingState, EmptyState } from '@/components/common';
 
 interface FeedbackPost {
   id: string;
@@ -87,7 +88,7 @@ export default function ForumFeedbackPage() {
       <div className="space-y-4">
         {loadError ? (
           <div className="bg-white rounded-2xl shadow-sm">
-            <ErrorState onRetry={() => setReloadKey((k) => k + 1)} />
+            <LoadError onRetry={() => setReloadKey((k) => k + 1)} />
           </div>
         ) : posts.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm">

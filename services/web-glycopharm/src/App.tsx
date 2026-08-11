@@ -26,7 +26,7 @@ import StoreLayout from '@/components/layouts/StoreLayout';
 import KioskLayout from '@/components/layouts/KioskLayout';
 import TabletLayout from '@/components/layouts/TabletLayout';
 import { RoleGuard, OperatorRoute } from '@/components/auth/RoleGuard';
-import { AccessDenied } from './components/auth/AccessDenied';
+import { AccessDenied } from '@o4o/ui';
 // WO-O4O-GLYCOPHARM-MY-STORE-MENU-MEMBERSHIP-GUARD-V1
 import { PharmacyStoreGuard } from '@/components/auth/PharmacyStoreGuard';
 

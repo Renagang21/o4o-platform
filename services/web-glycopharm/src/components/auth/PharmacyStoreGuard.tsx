@@ -17,6 +17,7 @@
  */
 
 import { StoreOwnerGuard } from '@o4o/store-ui-core';
+import { AccessDenied } from '@o4o/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { isPharmacistRole } from '../../lib/role-constants';
 import { MembershipGate } from './MembershipGate';
@@ -44,6 +45,8 @@ export function PharmacyStoreGuard({ children, fallback = '/login' }: PharmacySt
       loadingNode={Loading}
       loginFallback={fallback}
       denialFallback="/"
+      // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1: 무안내 redirect 대신 공통 안내 화면
+      renderDenied={<AccessDenied message="내 매장은 매장 경영자 계정만 이용할 수 있습니다." />}
       extraRoleMatcher={isPharmacistRole}
       membershipGate={MembershipGate}
     >

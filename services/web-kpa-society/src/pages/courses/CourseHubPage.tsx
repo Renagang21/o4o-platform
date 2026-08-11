@@ -13,7 +13,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PageSection, PageContainer } from '@o4o/ui';
-import { PageHeader, LoadingSpinner, EmptyState, LoadErrorState, Pagination, Card } from '../../components/common';
+import { LoadError } from '@o4o/ui';
+import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
 import { lmsApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { useAuthModal } from '../../contexts/LoginModalContext';
@@ -177,7 +178,7 @@ export function CourseHubPage() {
 
       {/* Course Grid */}
       {loadError ? (
-        <LoadErrorState onRetry={() => void loadData()} />
+        <LoadError onRetry={() => void loadData()} />
       ) : filteredCourses.length === 0 ? (
         <EmptyState
           icon="📋"

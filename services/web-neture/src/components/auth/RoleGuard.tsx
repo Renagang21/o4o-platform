@@ -14,7 +14,7 @@ import type { ReactNode } from 'react';
 import { createRouteGuard } from '@o4o/auth-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { MembershipGate } from './MembershipGate';
-import { AccessDenied } from './AccessDenied';
+import { AccessDenied } from '@o4o/ui';
 import {
   NETURE_ROLES,
   ADMIN_ROLES,

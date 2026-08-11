@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Users } from 'lucide-react';
 import { netureApi, type Supplier } from '../../lib/api';
-import { LoadErrorNotice } from '../common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 export function FeaturedSection() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -66,7 +66,7 @@ export function FeaturedSection() {
               ))}
             </div>
           ) : loadError ? (
-            <LoadErrorNotice compact onRetry={() => void loadSuppliers()} />
+            <LoadError compact onRetry={() => void loadSuppliers()} />
           ) : suppliers.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {suppliers.map((supplier) => (

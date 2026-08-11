@@ -23,7 +23,7 @@ import {
   type ProductionSource,
 } from '@o4o/store-ui-core';
 import { getTemplatesForTarget } from '@/config/productionTemplates';
-import { ErrorState } from '@/components/common';
+import { LoadError } from '@o4o/ui';
 
 const GLYCOPHARM_PRODUCTION_TARGETS: StartProductionTargetConfig[] = [
   {
@@ -108,7 +108,7 @@ export default function StoreLibraryContentsPage() {
           <p style={{ color: '#64748b', fontSize: 14 }}>불러오는 중...</p>
         </div>
       ) : loadError ? (
-        <ErrorState onRetry={() => void fetchItems()} />
+        <LoadError onRetry={() => void fetchItems()} />
       ) : items.length === 0 ? (
         <div style={styles.empty}>
           <BookOpen size={32} style={{ color: '#cbd5e1', marginBottom: 12 }} />

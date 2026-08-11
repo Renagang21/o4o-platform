@@ -15,7 +15,7 @@ import {
   getAuthorName,
   type ForumPost,
 } from '../../services/forumApi';
-import { LoadErrorNotice } from '../common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 interface PreviewPost {
   id: string;
@@ -104,7 +104,7 @@ export function CommunityPreviewSection() {
                 ))}
               </div>
             ) : loadError ? (
-              <LoadErrorNotice compact onRetry={() => void loadPosts()} />
+              <LoadError compact onRetry={() => void loadPosts()} />
             ) : posts.length > 0 ? (
               <div className="space-y-3">
                 {posts.map((post) => (

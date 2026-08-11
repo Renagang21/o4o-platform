@@ -13,7 +13,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { RecruitmentExposureConsole, type RecruitmentExposureItem } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
-import { LoadErrorNotice } from '../../components/common/LoadErrorNotice';
+import { LoadError } from '@o4o/ui';
 
 const BASE = '/cosmetics/operator/recruitment-exposure';
 const URL_KEY = 'recruitmentExposure_status';
@@ -73,7 +73,7 @@ export default function RecruitmentExposureApprovalPage() {
   );
 
   if (loadError && !loading) {
-    return <LoadErrorNotice onRetry={() => void load()} />;
+    return <LoadError onRetry={() => void load()} />;
   }
 
   return (
