@@ -20,6 +20,7 @@ import type { Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
 import { injectServiceScope } from '../../../utils/serviceScope.js';
+import { requireProductDbWrite } from '../../../modules/neture/controllers/product-db-write-authority.js';
 import type { ServiceScope } from '../../../utils/serviceScope.js';
 import { StoreProductRequestAdminService, type StoreRequestDuplicate, type StoreRequestActionResult } from '../../../modules/neture/services/store-product-request-admin.service.js';
 import { notifySubmitterOfStoreProductRequestDecision } from '../../../modules/neture/services/store-product-request-notify.js';
@@ -259,7 +260,10 @@ export function createStoreProductRequestAdminController(dataSource: DataSource)
   }) as RequestHandler);
 
   // POST /:id/approve-new — 신규 ProductMaster 승인 (A안)
-  router.post('/:id/approve-new', (async (req: Request, res: Response) => {
+  //   WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1 §4
+  //   이 액션만 공통 product_masters/product_identifiers 에 INSERT 한다.
+  //   link/request-revision/reject 는 요청 레코드만 바꾸므로 서비스 운영자에게 유지한다.
+  router.post('/:id/approve-new', requireProductDbWrite, (async (req: Request, res: Response) => {
     try {
       const note = typeof req.body?.note === 'string' ? req.body.note : null;
       const result = await service.approveAsNewMaster(req.params.id, {

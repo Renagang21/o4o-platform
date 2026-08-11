@@ -25,6 +25,7 @@ import {
   getProductLandingQr, ProductLandingQr,
   listProductMasterStoreDescriptions, saveProductMasterStoreDescription, ProductMasterStoreDescription,
 } from '@/api/o4o-product-db.api';
+import { useProductDbWriteAccess, ProductDbReadOnlyNotice } from './useProductDbWriteAccess';
 import {
   ProductMasterStatusBadge,
   ProductMasterStatusModal,
@@ -53,6 +54,8 @@ export default function ProductMasterDetailPage() {
   const [images, setImages] = useState<ProductMasterImageAdminRow[]>([]);
   // WO-...-STATUS-ACTIONS-V1: 상태 변경 모달 대상 (null=닫힘)
   const [statusTarget, setStatusTarget] = useState<StatusModalTarget | null>(null);
+  // WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1 §5 — 서비스 운영자는 조회만
+  const canWrite = useProductDbWriteAccess();
 
   const reloadImages = async () => {
     if (!id) return;
@@ -219,7 +222,7 @@ export default function ProductMasterDetailPage() {
             )}
             {/* 상태 변경 액션 — 현재 상태에 따라 이용 중단/보관 또는 정상 복원 */}
             <div className="ml-auto flex items-center gap-2">
-              {statusActionsFor(row.status ?? 'ACTIVE').map((a) => (
+              {canWrite && statusActionsFor(row.status ?? 'ACTIVE').map((a) => (
                 <button
                   key={a.targetStatus}
                   onClick={() =>
@@ -307,8 +310,8 @@ export default function ProductMasterDetailPage() {
                     key={img.id}
                     img={img}
                     busy={imageBusy}
-                    onSetPrimary={() => onSetPrimary(img.id)}
-                    onHide={() => onHideImage(img.id)}
+                    onSetPrimary={canWrite ? () => onSetPrimary(img.id) : undefined}
+                    onHide={canWrite ? () => onHideImage(img.id) : undefined}
                   />
                 ))}
               </div>
@@ -326,14 +329,14 @@ export default function ProductMasterDetailPage() {
                       img={img}
                       hidden
                       busy={imageBusy}
-                      onRestore={() => onRestoreImage(img.id)}
+                      onRestore={canWrite ? () => onRestoreImage(img.id) : undefined}
                     />
                   ))}
                 </div>
               </div>
             )}
 
-            <div className="mt-3 flex flex-wrap items-center gap-3">
+            {canWrite && <div className="mt-3 flex flex-wrap items-center gap-3">
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onFileSelected} />
               <button
                 onClick={onPickImage}
@@ -343,7 +346,8 @@ export default function ProductMasterDetailPage() {
                 <ImagePlus className="w-4 h-4" /> {imageBusy ? '처리 중…' : '이미지 추가'}
               </button>
               <span className="text-xs text-gray-400">첫 이미지는 자동으로 대표가 됩니다. 숨김은 삭제가 아니며(원본 보존) 복원할 수 있습니다.</span>
-            </div>
+            </div>}
+            {!canWrite && <div className="mt-3"><ProductDbReadOnlyNotice what="이미지 관리" /></div>}
             {imageError && <div className="mt-2 text-sm text-red-600">{imageError}</div>}
 
             <div className="text-xs text-gray-400 mt-3">
@@ -379,7 +383,7 @@ export default function ProductMasterDetailPage() {
           </PanelSection>
 
           {/* 매장용(STORE) 상세설명서 저작 — 관리자 직접 등록 (IR-O4O-PRODUCT-REGISTRATION-MODULE-UNIFIED-V1 §5) */}
-          {id && <StoreDescriptionPanel masterId={id} />}
+          {id && <StoreDescriptionPanel masterId={id} canWrite={canWrite} />}
 
           {/* 설명 후보 — SharedProductDescription 요약 (read-only preview) */}
           <PanelSection title={`설명 후보 (${row.descriptions?.length ?? 0})`}>
@@ -647,7 +651,7 @@ function MasterThumb({ img, busy, hidden, onSetPrimary, onHide, onRestore }: {
       {hidden && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-gray-700/80 text-white text-[10px]">숨김</span>}
 
       {hidden ? (
-        <button
+        onRestore && <button
           onClick={onRestore}
           disabled={busy}
           className="absolute bottom-1 left-1 right-1 px-1 py-0.5 rounded bg-white/90 border border-gray-200 text-[10px] text-gray-700 hover:bg-green-600 hover:text-white disabled:opacity-50"
@@ -735,7 +739,7 @@ const STORE_DESC_LANGS: Array<{ value: string; label: string }> = [
   { value: 'en', label: '영어' },
   { value: 'ja', label: '일본어' },
 ];
-function StoreDescriptionPanel({ masterId }: { masterId: string }) {
+function StoreDescriptionPanel({ masterId, canWrite }: { masterId: string; canWrite: boolean }) {
   const [items, setItems] = useState<ProductMasterStoreDescription[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -794,7 +798,9 @@ function StoreDescriptionPanel({ masterId }: { masterId: string }) {
         </div>
       )}
 
-      {!open ? (
+      {!canWrite ? (
+        <div className="mt-3"><ProductDbReadOnlyNotice what="매장용 상세설명서" /></div>
+      ) : !open ? (
         <button
           onClick={() => setOpen(true)}
           className="mt-3 flex items-center gap-1.5 bg-admin-blue text-white px-3 py-2 rounded text-sm"

@@ -13,11 +13,14 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { createProductMaster, CreateProductMasterInput } from '@/api/o4o-product-db.api';
+import { useProductDbWriteAccess, ProductDbReadOnlyNotice } from './useProductDbWriteAccess';
 
 const REGULATORY_TYPES = ['일반', '건강기능식품', '의약품', '의료기기', '의약외품', '화장품'];
 
 export default function ProductMasterCreatePage() {
   const navigate = useNavigate();
+  // WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1 §5
+  const canWrite = useProductDbWriteAccess();
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: '',
@@ -77,12 +80,13 @@ export default function ProductMasterCreatePage() {
       </button>
 
       <h1 className="text-xl font-semibold text-gray-900 mb-1">새 상품 등록</h1>
+      {!canWrite && <div className="mb-4"><ProductDbReadOnlyNotice what="상품 등록" /></div>}
       <p className="text-sm text-gray-500 mb-6">
         공식 상품(ProductMaster)을 등록합니다. 바코드는 선택 항목이며, 비우면 바코드 없이(NULL) 등록됩니다.
         카테고리 · 브랜드 · 이미지는 등록 후 상세 화면에서 이어서 설정할 수 있습니다.
       </p>
 
-      <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-lg p-6 space-y-5">
+      {canWrite && <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-lg p-6 space-y-5">
         <div>
           <label className={label} htmlFor="name">
             상품명 <span className="text-red-500">*</span>
@@ -154,7 +158,7 @@ export default function ProductMasterCreatePage() {
             취소
           </button>
         </div>
-      </form>
+      </form>}
     </div>
   );
 }

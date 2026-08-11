@@ -15,6 +15,7 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { Eye, CheckCircle2, MessageSquareWarning, Loader2, Trash2, XCircle, AlertTriangle, Replace } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
+import { useProductDbWriteAccess, ProductDbReadOnlyNotice } from './useProductDbWriteAccess';
 import {
   listSupplierStoreReview,
   getSupplierStoreReviewDetail,
@@ -71,6 +72,8 @@ export default function SupplierStoreDescriptionReviewPage() {
   // 수정 요청 사유 모달 (사유 필수)
   const [revisionTarget, setRevisionTarget] = useState<{ id: string; masterName: string | null } | null>(null);
   const [revisionReason, setRevisionReason] = useState('');
+  // WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1 §5 — 검수 결정(승인·교체·수정요청·만료삭제)은 O4O 전체 관리자만
+  const canWrite = useProductDbWriteAccess();
   // 만료 정리
   const [expiryInfo, setExpiryInfo] = useState<{ count: number; sampleIds: string[] } | null>(null);
   const [expiryBusy, setExpiryBusy] = useState(false);
@@ -260,8 +263,10 @@ export default function SupplierStoreDescriptionReviewPage() {
         </form>
       </div>
 
+      {!canWrite && <div className="mb-4"><ProductDbReadOnlyNotice what="공급자 설명서 검수" /></div>}
+
       {/* 만료 정리 (수정 요청 후 30일 경과 자동 삭제) */}
-      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-sm">
+      {canWrite && <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-sm">
         <Trash2 size={15} className="text-gray-400" />
         <span className="text-gray-600">수정 요청 후 기한(30일) 경과 설명서 정리</span>
         <button
@@ -288,7 +293,7 @@ export default function SupplierStoreDescriptionReviewPage() {
             )}
           </>
         )}
-      </div>
+      </div>}
 
       {/* 목록 */}
       <div className="overflow-x-auto rounded-lg border border-gray-200">
@@ -360,7 +365,7 @@ export default function SupplierStoreDescriptionReviewPage() {
                         >
                           <Eye size={16} />
                         </button>
-                        {r.status !== 'canonical' && (
+                        {canWrite && r.status !== 'canonical' && (
                           <button
                             onClick={() => doApprove(r.id)}
                             disabled={acting || r.hasCanonicalConflict}
@@ -370,7 +375,7 @@ export default function SupplierStoreDescriptionReviewPage() {
                             <CheckCircle2 size={16} />
                           </button>
                         )}
-                        {r.status !== 'canonical' && r.hasCanonicalConflict && (
+                        {canWrite && r.status !== 'canonical' && r.hasCanonicalConflict && (
                           <button
                             onClick={() =>
                               setReplaceTarget({
@@ -388,7 +393,7 @@ export default function SupplierStoreDescriptionReviewPage() {
                             <Replace size={16} />
                           </button>
                         )}
-                        {r.status !== 'revision_requested' && r.status !== 'hidden' && (
+                        {canWrite && r.status !== 'revision_requested' && r.status !== 'hidden' && (
                           <button
                             onClick={() => setRevisionTarget({ id: r.id, masterName: r.masterName })}
                             disabled={acting}

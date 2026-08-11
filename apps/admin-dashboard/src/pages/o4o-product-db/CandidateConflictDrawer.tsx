@@ -14,6 +14,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { BaseDetailDrawer, ConfirmActionDialog } from '@o4o/ui';
 import { PackagePlus } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useProductDbWriteAccess } from './useProductDbWriteAccess';
 import {
   getCandidateConflictInfo,
   bulkCandidateAction,
@@ -100,6 +101,7 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
   };
 
   const c = info?.candidate;
+  const canWrite = useProductDbWriteAccess();
 
   return (
     <>
@@ -143,8 +145,15 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
             </Section>
 
             {/* 신규 기본상품 등록 (drug 소스만 — 등록 시점 내부 dedup) */}
+            {/* WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1 §5
+                후보 큐레이션(archive/제외/보류)은 서비스 경계 안이라 유지하고,
+                공통 ProductMaster 를 만드는 승격만 O4O 전체 관리자로 닫는다. */}
             <Section title="신규 기본상품 등록">
-              {info.promotable?.eligible ? (
+              {!canWrite ? (
+                <div className="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded p-2.5">
+                  신규 기본상품 등록(승격)은 O4O 전체 관리자가 수행합니다. 후보 검토·보류·제외는 계속 가능합니다.
+                </div>
+              ) : info.promotable?.eligible ? (
                 <button onClick={askPromote} className="flex items-center gap-1.5 text-sm px-3 py-2 rounded bg-admin-blue text-white">
                   <PackagePlus size={14} /> 신규 기본상품으로 등록
                 </button>

@@ -11,6 +11,7 @@
 import { useState, type ReactNode } from 'react';
 import { Settings, AlertTriangle, PlayCircle, Loader2, ShieldAlert } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useProductDbWriteAccess, ProductDbReadOnlyNotice } from './useProductDbWriteAccess';
 import {
   dryRunOrphanRegisteredCandidates,
   applyOrphanRegisteredCandidates,
@@ -223,6 +224,8 @@ function ApplyPanel({
   const [applying, setApplying] = useState(false);
   const [applyMsg, setApplyMsg] = useState<string | null>(null);
   const [applyErr, setApplyErr] = useState<string | null>(null);
+  // WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1 §5 — dry-run(read-only)은 유지, apply 만 닫는다
+  const canWrite = useProductDbWriteAccess();
 
   const phrase = result.confirmationPhrase ?? '';
   const canApply = result.applyEligible && phrase.length > 0 && confirmText === phrase && !applying;
@@ -247,6 +250,14 @@ function ApplyPanel({
       setApplying(false);
     }
   };
+
+  if (!canWrite) {
+    return (
+      <div className="border-t border-gray-200 pt-5">
+        <ProductDbReadOnlyNotice what="정비 job 실행(apply)" />
+      </div>
+    );
+  }
 
   return (
     <div className="border-t border-gray-200 pt-5">

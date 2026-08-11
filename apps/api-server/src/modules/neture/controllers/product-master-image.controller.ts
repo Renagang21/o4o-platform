@@ -31,6 +31,7 @@ import { ImageStorageService } from '../services/image-storage.service.js';
 import { ProductImage } from '../entities/ProductImage.entity.js';
 import { AuditLog } from '../../../entities/AuditLog.js';
 import logger from '../../../utils/logger.js';
+import { requireProductDbWrite } from './product-db-write-authority.js';
 
 const ADMIN_ROLES = [
   'platform:super_admin',
@@ -129,7 +130,7 @@ export function createProductMasterImageController(dataSource: DataSource): Rout
   });
 
   // POST /:id/images — 이미지 추가
-  router.post('/:id/images', uploadSingleMiddleware('image'), async (req: Request, res: Response) => {
+  router.post('/:id/images', requireProductDbWrite, uploadSingleMiddleware('image'), async (req: Request, res: Response) => {
     try {
       const masterId = req.params.id;
       const file = req.file as Express.Multer.File | undefined;
@@ -199,7 +200,7 @@ export function createProductMasterImageController(dataSource: DataSource): Rout
   });
 
   // POST /:id/images/:imageId/set-primary — 대표 이미지 지정
-  router.post('/:id/images/:imageId/set-primary', async (req: Request, res: Response) => {
+  router.post('/:id/images/:imageId/set-primary', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const masterId = req.params.id;
       const imageId = req.params.imageId;
@@ -250,7 +251,7 @@ export function createProductMasterImageController(dataSource: DataSource): Rout
 
   // DELETE /:id/images/:imageId — 이미지 숨김 (soft delete, GCS 원본 보존)
   //   대표였으면 남은 active 중 sortOrder 다음을 대표로 자동 승계(WO §7). 없으면 대표 0.
-  router.delete('/:id/images/:imageId', async (req: Request, res: Response) => {
+  router.delete('/:id/images/:imageId', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const masterId = req.params.id;
       const imageId = req.params.imageId;
@@ -307,7 +308,7 @@ export function createProductMasterImageController(dataSource: DataSource): Rout
 
   // POST /:id/images/:imageId/restore — 숨김 이미지 복원
   //   active 대표가 없으면 복원 이미지를 대표로 자동 지정(WO §7). 있으면 비대표로 복원.
-  router.post('/:id/images/:imageId/restore', async (req: Request, res: Response) => {
+  router.post('/:id/images/:imageId/restore', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const masterId = req.params.id;
       const imageId = req.params.imageId;

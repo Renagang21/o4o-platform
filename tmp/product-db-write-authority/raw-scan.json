@@ -1,0 +1,1643 @@
+[
+  {
+    "file": "src/modules/neture/controllers/admin.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/suppliers/:id/approve",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/suppliers/:id/reject",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/suppliers/:id/deactivate",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/suppliers/:id/reactivate",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "PATCH",
+        "path": "/suppliers/:id/regulated-categories/:category",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/products/:id/approve",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/offers/bulk-approve",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/products/:id/reject",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/products/batch-approve",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/products/batch-reject",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/masters/resolve",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "PATCH",
+        "path": "/masters/:id",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/categories",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "PATCH",
+        "path": "/categories/:id",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "DELETE",
+        "path": "/categories/:id",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/brands",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "PATCH",
+        "path": "/brands/:id",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "DELETE",
+        "path": "/brands/:id",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/products/:masterId/images",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/service-approvals/:id/approve",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/service-approvals/:id/reject",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/service-approvals/:id/revoke",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/sync-offer-approvals",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "POST",
+        "path": "/products/:masterId/images",
+        "inline": ", requireAuth, requireActiveSupplier as unknown as RequestHandler, uploadSingleMiddleware('image'"
+      },
+      {
+        "method": "POST",
+        "path": "/products/:masterId/images/from-url",
+        "inline": ", requireAuth, requireActiveSupplier as unknown as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/products/images/:imageId/primary",
+        "inline": ", requireAuth, requireActiveSupplier as unknown as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/products/images/:imageId",
+        "inline": ", requireAuth, requireActiveSupplier as unknown as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/mobile-product-draft.controller.ts",
+    "mutates": false,
+    "routerGuards": [
+      "requireAuth as RequestHandler"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:id",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/submit",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/convert-to-candidate",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/archive",
+        "inline": ", (async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/operator-product-cleanup.controller.ts",
+    "mutates": true,
+    "routerGuards": [
+      "requireAuth",
+      "requireNetureScope('neture:operator'"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/merge-masters",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/fix-category",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/fix-brand",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/pending-offers/:offerId",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/soft-delete/:offerId",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/restore/:offerId",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/hard-delete/:offerId",
+        "inline": ", async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/operator-supplier-store-description-review.controller.ts",
+    "mutates": false,
+    "routerGuards": [
+      "authenticate",
+      "requireRole(ADMIN_ROLES"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/expiry/apply",
+        "inline": ", async (_req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/approve",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/request-revision",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/reject",
+        "inline": ", async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/product-candidate.controller.ts",
+    "mutates": false,
+    "routerGuards": [
+      "authenticate",
+      "requireRole(OPERATOR_ROLES",
+      "injectServiceScope"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/bulk-action",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/promote-master",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/reject",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/archive",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/refine-drug-category",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/link-to-listing",
+        "inline": ", (async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/product-db-maintenance.controller.ts",
+    "mutates": true,
+    "routerGuards": [
+      "authenticate",
+      "requireRole(ADMIN_ROLES"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/jobs/orphan-registered-candidates/dry-run",
+        "inline": ", async (_req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/jobs/orphan-registered-candidates/apply",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/jobs/cancelled-drug-pending-candidates/dry-run",
+        "inline": ", async (_req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/jobs/cancelled-drug-pending-candidates/apply",
+        "inline": ", async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/product-landing.controller.ts",
+    "mutates": false,
+    "routerGuards": [
+      "authenticate",
+      "requireRole(ADMIN_ROLES"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/",
+        "inline": ", async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/product-library.controller.ts",
+    "mutates": false,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/products/bulk-match",
+        "inline": ", requireAuth, uploadSingleMiddleware('file'"
+      },
+      {
+        "method": "POST",
+        "path": "/products/library/select",
+        "inline": ", requireAuth, async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/product-master-create.controller.ts",
+    "mutates": false,
+    "routerGuards": [
+      "authenticate",
+      "requireRole(ADMIN_ROLES"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/",
+        "inline": ", async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/product-master-description.controller.ts",
+    "mutates": false,
+    "routerGuards": [
+      "authenticate",
+      "requireRole(ADMIN_ROLES"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/:id/store-descriptions",
+        "inline": ", async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/product-master-image.controller.ts",
+    "mutates": true,
+    "routerGuards": [
+      "authenticate",
+      "requireRole(ADMIN_ROLES"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/:id/images",
+        "inline": ", uploadSingleMiddleware('image'"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/images/:imageId/set-primary",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id/images/:imageId",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/images/:imageId/restore",
+        "inline": ", async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/product-master-note.controller.ts",
+    "mutates": true,
+    "routerGuards": [
+      "authenticate",
+      "requireRole(ADMIN_ROLES"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/:id/notes",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id/notes/:noteId",
+        "inline": ", async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/product-master-status.controller.ts",
+    "mutates": false,
+    "routerGuards": [
+      "authenticate",
+      "requireRole(ADMIN_ROLES"
+    ],
+    "writeRoutes": [
+      {
+        "method": "PATCH",
+        "path": "/:id/status",
+        "inline": ", async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/supplier-product.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/products",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/products/submit-approval",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/products/bulk",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/products/batch",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/products/:id/business-content",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/products/:id",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/products/:id/distribution",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "PUT",
+        "path": "/products/:id/service-prices",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/csv-import/upload",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, uploadSingleMiddleware('file'"
+      },
+      {
+        "method": "PATCH",
+        "path": "/csv-import/batches/:batchId/rows/:rowId",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/csv-import/batches/:id/apply",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/csv-import/batches/:id/retry",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/csv-import/batches/:id",
+        "inline": ", requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/csv-import/batches/:id/full-delete",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/products/bulk-candidates",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/supplier-settlement.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/partner-commissions",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "PUT",
+        "path": "/partner-commissions/:id",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/partner-commissions/:id",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/controllers/supplier-store-description.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/store-descriptions",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/store-descriptions/:id",
+        "inline": ", requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/neture/neture.routes.ts",
+    "mutates": true,
+    "routerGuards": [
+      "'/supplier', createSupplierManagementController(dataSource",
+      "'/supplier', createSupplierProductController(dataSource",
+      "'/supplier', createSupplierStoreDescriptionController(dataSource",
+      "'/supplier', createSupplierOrderController(dataSource",
+      "'/supplier', createShipmentController(dataSource",
+      "'/supplier', createInventoryController(dataSource",
+      "'/supplier', createSupplierSettlementController(dataSource",
+      "'/supplier', createSupplierContractController(dataSource",
+      "'/supplier', createSupplierImportController(dataSource",
+      "'/admin', createAdminController(dataSource",
+      "'/admin', createAdminSettlementController(dataSource",
+      "'/admin/service-audience-policies', createAdminServiceAudienceController(dataSource",
+      "'/admin', createAdminDashboardController(dataSource",
+      "'/operator', createOperatorDashboardController(dataSource",
+      "'/operator', createOperatorRegistrationController(dataSource, netureActionLogService",
+      "'/operator', createOperatorCategoryController(",
+      "'/operator', createOperatorBrandController(",
+      "'/operator/product-cleanup', createOperatorProductCleanupController(dataSource",
+      "'/operator', createOperatorServiceApprovalController(dataSource",
+      "'/operator', createOperatorProductApprovalController(dataSource",
+      "'/operator', createOperatorActionQueueController(dataSource",
+      "'/operator', createOperatorCategoryMappingController(",
+      "'/operator', createOperatorRecruitingController(dataSource",
+      "'/operator', createOperatorRecruitmentExposureController(dataSource",
+      "'/operator', createOperatorSupplierController(dataSource",
+      "'/operator', createOperatorContactController(dataSource",
+      "'/', createPartnerController(dataSource",
+      "'/partner', createPartnerContractController(dataSource",
+      "'/seller', createSellerController(dataSource",
+      "'/', createContactController(dataSource",
+      "'/', createProductImageController(dataSource",
+      "'/hub/trigger', hubTriggerController",
+      "'/assets', createNetureAssetSnapshotController(dataSource, requireAuth as RequestHandler"
+    ],
+    "writeRoutes": [
+      {
+        "method": "PATCH",
+        "path": "/operator/all-offers/batch-active",
+        "inline": ", requireAuth, requireNetureScope('neture:operator'"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/homepage-contents",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "PUT",
+        "path": "/admin/homepage-contents/:id",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "DELETE",
+        "path": "/admin/homepage-contents/:id",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      },
+      {
+        "method": "PATCH",
+        "path": "/admin/homepage-contents/:id/status",
+        "inline": ", requireAuth, requireNetureScope('neture:admin'"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/store-ai/controllers/product-ai-content.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/:productId/ai-contents/generate",
+        "inline": ", authenticate, async (req, res"
+      },
+      {
+        "method": "POST",
+        "path": "/:productId/ai-contents/generate/:type",
+        "inline": ", authenticate, async (req, res"
+      },
+      {
+        "method": "PUT",
+        "path": "/:productId/ai-contents/:type",
+        "inline": ", authenticate, async (req, res"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:productId/ai-contents/:contentId",
+        "inline": ", authenticate, async (req, res"
+      }
+    ]
+  },
+  {
+    "file": "src/modules/store-ai/controllers/product-ai-tag.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/:productId/ai-tags/regenerate",
+        "inline": ", authenticate, async (req, res"
+      },
+      {
+        "method": "POST",
+        "path": "/:productId/ai-tags/suggest",
+        "inline": ", authenticate, async (req, res"
+      },
+      {
+        "method": "POST",
+        "path": "/:productId/ai-tags/manual",
+        "inline": ", authenticate, async (req, res"
+      },
+      {
+        "method": "POST",
+        "path": "/:productId/ai-tags/manual/batch",
+        "inline": ", authenticate, async (req, res"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:productId/ai-tags/:tagId",
+        "inline": ", authenticate, async (req, res"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/glycopharm/controllers/store.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "PUT",
+        "path": "/:slug/storefront-config",
+        "inline": ", authenticate, async (req: Request, res: Response"
+      },
+      {
+        "method": "PUT",
+        "path": "/:slug/hero",
+        "inline": ", authenticate, async (req: Request, res: Response"
+      },
+      {
+        "method": "PUT",
+        "path": "/:slug/template",
+        "inline": ", authenticate, async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/kpa/controllers/event-offer-operator.controller.ts",
+    "mutates": true,
+    "routerGuards": [
+      "requireAuth",
+      "requireKpaScope('kpa:operator'"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/products/:id/visibility",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/products/:id/order",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/products",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/products/:id/approve",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/products/:id/reject",
+        "inline": ", async (req: Request, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/products/:id",
+        "inline": ", async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/kpa/controllers/kpa-checkout.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/",
+        "inline": ", requireAuth, [ body('organizationId'"
+      },
+      {
+        "method": "PATCH",
+        "path": "/store-orders/:orderId/status",
+        "inline": ", requireAuth, requireStoreOwner, body('action'"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/kpa/controllers/operator-product-applications.controller.ts",
+    "mutates": true,
+    "routerGuards": [
+      "requireAuth, requireScope(scope"
+    ],
+    "writeRoutes": [
+      {
+        "method": "PATCH",
+        "path": "/:id/approve",
+        "inline": ", asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:id/reject",
+        "inline": ", asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/batch-approve",
+        "inline": ", asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "inline": ", asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/batch-delete",
+        "inline": ", asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/batch-reject",
+        "inline": ", asyncHandler(async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/kpa/controllers/supplier-offers.controller.ts",
+    "mutates": false,
+    "routerGuards": [
+      "requireAuth"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/event-offers",
+        "inline": ", async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/market-trial-operator.routes.ts",
+    "mutates": false,
+    "routerGuards": [
+      "requireAuth as any",
+      "requireNetureScope('neture:operator'",
+      "requireAuth"
+    ],
+    "writeRoutes": [
+      {
+        "method": "PATCH",
+        "path": "/forum-sync-failures/:failureId/resolve",
+        "inline": ", MarketTrialOperatorController.resolveForumSyncFailure"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:id/participants/:participantId/reward-status",
+        "inline": ", MarketTrialOperatorController.updateParticipantRewardStatus"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:id/participants/:participantId/settlement-status",
+        "inline": ", MarketTrialOperatorController.updateParticipantSettlementStatus"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:id/participants/:participantId/payment-status",
+        "inline": ", MarketTrialOperatorController.updateParticipantPaymentStatus"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:id/status",
+        "inline": ", MarketTrialOperatorController.updateTrialStatus"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:id/approve",
+        "inline": ", MarketTrialOperatorController.approve1st"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/forum-sync/retry",
+        "inline": ", MarketTrialOperatorController.retryForumSync"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:id/reject",
+        "inline": ", MarketTrialOperatorController.reject1st"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/neture/controllers/supplier-event-offer-proposals.controller.ts",
+    "mutates": false,
+    "routerGuards": [
+      "requireAuth"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/event-offer-proposals",
+        "inline": ", asyncHandler(async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/o4o-store/controllers/operator-screen-set.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/preview",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:id",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "PUT",
+        "path": "/:id/blocks",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "inline": ", requireAuth, async (req, res"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/o4o-store/controllers/pharmacy-products.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/apply",
+        "inline": ", requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "PUT",
+        "path": "/listings/:id",
+        "inline": ", requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "PUT",
+        "path": "/listings/:id/channels",
+        "inline": ", requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/by-offer/:offerId",
+        "inline": ", requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/o4o-store/controllers/store-channel-products.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/:channelId",
+        "inline": ", requireAuth, requirePharmacyOwner, async (req: Request, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:channelId/reorder",
+        "inline": ", requireAuth, requirePharmacyOwner, async (req: Request, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:channelId/:productChannelId/deactivate",
+        "inline": ", requireAuth, requirePharmacyOwner, async (req: Request, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:channelId/:productChannelId/activate",
+        "inline": ", requireAuth, requirePharmacyOwner, async (req: Request, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:channelId/:productChannelId",
+        "inline": ", requireAuth, requirePharmacyOwner, async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:channelId/bulk-action",
+        "inline": ", requireAuth, requirePharmacyOwner, async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/o4o-store/controllers/store-content.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/",
+        "inline": ", requireAuth, async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/import-b2c-description",
+        "inline": ", requireAuth, async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/reimport-source",
+        "inline": ", requireAuth, async (req: Request, res: Response"
+      },
+      {
+        "method": "PUT",
+        "path": "/direct/:id",
+        "inline": ", requireAuth, async (req: Request, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/direct/:id",
+        "inline": ", requireAuth, async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/direct/:id/translate",
+        "inline": ", requireAuth, async (req: Request, res: Response"
+      },
+      {
+        "method": "PUT",
+        "path": "/direct/:id/translations/:locale",
+        "inline": ", requireAuth, async (req: Request, res: Response"
+      },
+      {
+        "method": "PUT",
+        "path": "/:snapshotId",
+        "inline": ", requireAuth, async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/o4o-store/controllers/store-pop.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/pharmacy/pop/generate",
+        "inline": ", requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/o4o-store/controllers/store-product-library.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/list",
+        "inline": ", requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:id",
+        "inline": ", requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/master/:masterId/images/from-url",
+        "inline": ", requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/images/reorder",
+        "inline": ", requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/images/:imageId/primary",
+        "inline": ", requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/images/:imageId",
+        "inline": ", requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:id/description",
+        "inline": ", requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/o4o-store/controllers/store-product-request-admin.controller.ts",
+    "mutates": false,
+    "routerGuards": [
+      "authenticate",
+      "requireRole(OPERATOR_ROLES",
+      "injectServiceScope"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/:id/link",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/approve-new",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/request-revision",
+        "inline": ", (async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/reject",
+        "inline": ", (async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/o4o-store/controllers/store-product-request.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/",
+        "inline": ", requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "inline": ", requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/o4o-store/controllers/store-qr-landing.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/pharmacy/qr/print",
+        "inline": ", requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "POST",
+        "path": "/pharmacy/qr",
+        "inline": ", requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "PUT",
+        "path": "/pharmacy/qr/:id",
+        "inline": ", requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response"
+      },
+      {
+        "method": "DELETE",
+        "path": "/pharmacy/qr/:id",
+        "inline": ", requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/o4o-store/controllers/supplier-screen-set.controller.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/preview",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:id",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "PUT",
+        "path": "/:id/blocks",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/duplicate",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/publish",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/unpublish",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/archive",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "POST",
+        "path": "/:id/unarchive",
+        "inline": ", requireAuth, async (req, res"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "inline": ", requireAuth, async (req, res"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/pharmacy-hub/pharmacy-hub.routes.ts",
+    "mutates": true,
+    "routerGuards": [
+      " '/store-owner', ...storeOwnerGuards, createStoreTabletRoutes(AppDataSource, { resolveOrganizationId: resolvePharmacyHubOrganizationForRoute, qrServiceKey: SERV"
+    ],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/join",
+        "inline": ", PharmacyHubJoinController.apply"
+      },
+      {
+        "method": "PATCH",
+        "path": "/operator/memberships/:membershipId/approve",
+        "inline": ", ...operatorGuards, PharmacyHubMembershipConsoleController.approve, "
+      },
+      {
+        "method": "PATCH",
+        "path": "/operator/memberships/:membershipId/reject",
+        "inline": ", ...operatorGuards, PharmacyHubMembershipConsoleController.reject, "
+      },
+      {
+        "method": "PATCH",
+        "path": "/supplier/products/:offerId/delivery",
+        "inline": ", ...supplierProductGuards, PharmacyHubSupplierProductController.setDelivery, "
+      },
+      {
+        "method": "PATCH",
+        "path": "/store-owner/info",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreInfoController.update"
+      },
+      {
+        "method": "PATCH",
+        "path": "/store-owner/account/profile",
+        "inline": ", ...storeOwnerGuards, PharmacyHubAccountController.updateProfile"
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/handled-products",
+        "inline": ", ...storeOwnerGuards, PharmacyHubHandledProductController.apply"
+      },
+      {
+        "method": "PATCH",
+        "path": "/store-owner/handled-products/active",
+        "inline": ", ...storeOwnerGuards, PharmacyHubHandledProductController.setActive, "
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/handled-products/remove",
+        "inline": ", ...storeOwnerGuards, PharmacyHubHandledProductController.remove, "
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/local-products",
+        "inline": ", ...storeOwnerGuards, PharmacyHubLocalProductController.create"
+      },
+      {
+        "method": "PUT",
+        "path": "/store-owner/local-products/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubLocalProductController.update"
+      },
+      {
+        "method": "DELETE",
+        "path": "/store-owner/local-products/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubLocalProductController.deactivate, "
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/content",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreContentController.create"
+      },
+      {
+        "method": "PUT",
+        "path": "/store-owner/content/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreContentController.update"
+      },
+      {
+        "method": "DELETE",
+        "path": "/store-owner/content/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreContentController.remove"
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/library",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreLibraryController.create"
+      },
+      {
+        "method": "PUT",
+        "path": "/store-owner/library/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreLibraryController.update"
+      },
+      {
+        "method": "DELETE",
+        "path": "/store-owner/library/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreLibraryController.deactivate"
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/blog",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreBlogController.create"
+      },
+      {
+        "method": "PUT",
+        "path": "/store-owner/blog/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreBlogController.update"
+      },
+      {
+        "method": "PATCH",
+        "path": "/store-owner/blog/:id/publish",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreBlogController.publish"
+      },
+      {
+        "method": "PATCH",
+        "path": "/store-owner/blog/:id/archive",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreBlogController.archive"
+      },
+      {
+        "method": "DELETE",
+        "path": "/store-owner/blog/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreBlogController.remove"
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/qr",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreQrController.create"
+      },
+      {
+        "method": "PUT",
+        "path": "/store-owner/qr/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreQrController.update"
+      },
+      {
+        "method": "DELETE",
+        "path": "/store-owner/qr/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreQrController.deactivate"
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/pop",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStorePopController.create"
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/pop/import",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStorePopController.importFromHub"
+      },
+      {
+        "method": "PUT",
+        "path": "/store-owner/pop/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStorePopController.update"
+      },
+      {
+        "method": "PATCH",
+        "path": "/store-owner/pop/:id/publish",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStorePopController.publish"
+      },
+      {
+        "method": "PATCH",
+        "path": "/store-owner/pop/:id/archive",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStorePopController.archive"
+      },
+      {
+        "method": "DELETE",
+        "path": "/store-owner/pop/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStorePopController.remove"
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/signage/playlists",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreSignageController.createPlaylist"
+      },
+      {
+        "method": "PATCH",
+        "path": "/store-owner/signage/playlists/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreSignageController.updatePlaylist"
+      },
+      {
+        "method": "DELETE",
+        "path": "/store-owner/signage/playlists/:id",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreSignageController.archivePlaylist"
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/signage/playlists/:id/items/from-library",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreSignageController.addItemFromLibrary, "
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/signage/playlists/:id/items/from-media",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreSignageController.addItemFromMedia, "
+      },
+      {
+        "method": "PATCH",
+        "path": "/store-owner/signage/playlists/:id/items/reorder",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreSignageController.reorderItems, "
+      },
+      {
+        "method": "DELETE",
+        "path": "/store-owner/signage/playlists/:id/items/:itemId",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreSignageController.deleteItem, "
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/manuals/:listingId/qr",
+        "inline": ", ...storeOwnerGuards, PharmacyHubStoreManualController.issueProductQr, "
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/cart/items",
+        "inline": ", ...storeOwnerGuards, PharmacyHubCartController.add"
+      },
+      {
+        "method": "PATCH",
+        "path": "/store-owner/cart/items/:itemId",
+        "inline": ", ...storeOwnerGuards, PharmacyHubCartController.update"
+      },
+      {
+        "method": "DELETE",
+        "path": "/store-owner/cart/items/:itemId",
+        "inline": ", ...storeOwnerGuards, PharmacyHubCartController.remove"
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/orders",
+        "inline": ", ...storeOwnerGuards, PharmacyHubOrderController.create"
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/payments/prepare",
+        "inline": ", ...storeOwnerGuards, PharmacyHubPaymentController.prepare"
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/payments/confirm",
+        "inline": ", ...storeOwnerGuards, PharmacyHubPaymentController.confirm"
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/orders/:orderId/cancel",
+        "inline": ", ...storeOwnerGuards, PharmacyHubPaymentController.cancelBeforePayment, "
+      },
+      {
+        "method": "POST",
+        "path": "/store-owner/payments/:paymentGroupId/cancel",
+        "inline": ", ...storeOwnerGuards, PharmacyHubPaymentController.cancelAfterPayment, "
+      },
+      {
+        "method": "POST",
+        "path": "/supplier/orders/:orderId/accept",
+        "inline": ", ...supplierProductGuards, PharmacyHubSupplierOrderController.accept"
+      },
+      {
+        "method": "POST",
+        "path": "/supplier/orders/:orderId/ship",
+        "inline": ", ...supplierProductGuards, PharmacyHubSupplierOrderController.ship"
+      },
+      {
+        "method": "POST",
+        "path": "/operator/fulfillment/:orderId/recover",
+        "inline": ", ...operatorGuards, PharmacyHubOperatorFulfillmentController.recover, "
+      }
+    ]
+  },
+  {
+    "file": "src/routes/platform/store-handled-products.routes.ts",
+    "mutates": false,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/handled-products/remove",
+        "inline": ", async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/platform/store-public/store-public-tablet.handler.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/:slug/tablet/interest",
+        "inline": ", tabletRequestLimiter as any, async (req: Request, res: Response"
+      }
+    ]
+  },
+  {
+    "file": "src/routes/platform/store-tablet.routes.ts",
+    "mutates": true,
+    "routerGuards": [],
+    "writeRoutes": [
+      {
+        "method": "POST",
+        "path": "/tablets",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "PUT",
+        "path": "/tablets/:id",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "DELETE",
+        "path": "/tablets/:id",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "PUT",
+        "path": "/tablets/:id/displays",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "PUT",
+        "path": "/tablets/:id/idle-playlist",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "POST",
+        "path": "/tablets/:id/operator-common-idle-selection",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "DELETE",
+        "path": "/tablets/:id/operator-common-idle-selection",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "PUT",
+        "path": "/tablet-display-settings",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "POST",
+        "path": "/products/register-by-barcode",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "PATCH",
+        "path": "/interest/:id/acknowledge",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "PATCH",
+        "path": "/interest/:id/complete",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "PATCH",
+        "path": "/interest/:id/cancel",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "POST",
+        "path": "/screen-sets",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "PATCH",
+        "path": "/screen-sets/:id",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "DELETE",
+        "path": "/screen-sets/:id",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "PUT",
+        "path": "/screen-sets/:id/blocks",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "POST",
+        "path": "/screen-sets/preview",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "POST",
+        "path": "/screen-set-hub/templates/:id/import",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "POST",
+        "path": "/screen-set-hub/supplier-templates/:id/import",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "POST",
+        "path": "/tablets/:id/current-screen-set",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "DELETE",
+        "path": "/tablets/:id/current-screen-set",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "POST",
+        "path": "/tablets/:id/screen-sets/:screenSetId",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "DELETE",
+        "path": "/tablets/:id/screen-sets/:screenSetId",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      },
+      {
+        "method": "PATCH",
+        "path": "/tablets/:id/screen-sets/order",
+        "inline": ", withStoreAuth(async (req, res, organizationId"
+      }
+    ]
+  }
+]

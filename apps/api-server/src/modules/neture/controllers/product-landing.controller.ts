@@ -19,6 +19,7 @@ import { authenticate, requireRole, optionalAuth } from '../../../middleware/aut
 import type { AuthRequest } from '../../../middleware/auth.middleware.js';
 import { ProductLandingService } from '../services/product-landing.service.js';
 import logger from '../../../utils/logger.js';
+import { requireProductDbWrite } from './product-db-write-authority.js';
 
 const ADMIN_ROLES = [
   'platform:super_admin',
@@ -98,7 +99,7 @@ export function createAdminProductLandingController(dataSource: DataSource): Rou
     }
   });
 
-  router.post('/', async (req: Request, res: Response) => {
+  router.post('/', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const masterId = (req.body?.masterId ?? '').trim();
       if (!masterId) {

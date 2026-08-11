@@ -45,12 +45,11 @@ if (!token) {
 const body = globalThis.__loginBody;
 
 const PATHS = [
-  ['제품설명서 목록 (B)', '/api/v1/admin/o4o-product-db/masters/description-qr-summary?limit=1'],
-  ['제품 콘텐츠 browse (B)', '/api/v1/admin/o4o-product-db/product-contents?limit=1'],
-  ['이미지 품질 (B)', '/api/v1/admin/o4o-product-db/image-quality?limit=1'],
-  ['공급자 설명서 검수큐 (B)', '/api/v1/admin/o4o-product-db/supplier-store-descriptions?limit=1'],
-  ['admin dashboard (A · super_admin 전용)', '/api/v1/admin/dashboard/sales-summary'],
-  ['admin ops metrics (A · super_admin 전용)', '/api/v1/admin/ops/metrics'],
+  ['A: channel-playback-logs', '/api/v1/admin/channel-playback-logs?limit=1'],
+  ['A: channels/heartbeat/status', '/api/v1/admin/channels/heartbeat/status'],
+  ['A: channels/ops', '/api/v1/admin/channels/ops'],
+  ['A: ops/metrics', '/api/v1/admin/ops/metrics'],
+  ['A: dashboard (정상 대조군)', '/api/v1/admin/dashboard/sales-summary'],
 ];
 
 const out = { api: API, actor: email, user: { id: body?.data?.user?.id, roles: body?.data?.user?.roles ?? body?.data?.user?.role ?? null }, results: [] };

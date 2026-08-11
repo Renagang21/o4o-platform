@@ -12,6 +12,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { X, Loader2, Package, AlertTriangle, Link2, PlusCircle, MessageSquareWarning, Ban } from 'lucide-react';
+import { useProductDbWriteAccess } from './useProductDbWriteAccess';
 import {
   getStoreRequestDuplicates,
   linkStoreRequestToMaster,
@@ -57,6 +58,9 @@ export default function StoreRequestReviewModal({ requestId, request, open, onCl
   const [busy, setBusy] = useState<Busy>(null);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState('');
+  // WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1 §5
+  //   신규 승인만 공통 ProductMaster 를 만든다. 연결·보완요청·등록불가는 서비스 운영자에게 유지.
+  const canWrite = useProductDbWriteAccess();
 
   const reviewable = request?.reviewable ?? false;
 
@@ -256,13 +260,18 @@ export default function StoreRequestReviewModal({ requestId, request, open, onCl
 
               {/* 액션 */}
               <div className="flex flex-wrap gap-2 pt-1">
-                <button
+                {canWrite && <button
                   onClick={doApproveNew}
                   disabled={!!busy}
                   className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
                 >
                   {busy === 'approve' ? <Loader2 size={14} className="animate-spin" /> : <PlusCircle size={14} />} 신규 상품 승인
-                </button>
+                </button>}
+                {!canWrite && (
+                  <span className="self-center text-xs text-gray-500">
+                    신규 상품 승인(공통 ProductMaster 생성)은 O4O 전체 관리자가 수행합니다. 기존 상품 연결·보완 요청·등록 불가는 가능합니다.
+                  </span>
+                )}
                 <button
                   onClick={doRevision}
                   disabled={!!busy}

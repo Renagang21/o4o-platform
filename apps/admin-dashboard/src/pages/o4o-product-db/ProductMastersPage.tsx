@@ -19,6 +19,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, Eye, Plus } from 'lucide-react';
+import { useProductDbWriteAccess } from './useProductDbWriteAccess';
 import { BaseTable, RowActionMenu } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 import {
@@ -83,6 +84,8 @@ export default function ProductMastersPage() {
   const [descQrMap, setDescQrMap] = useState<Record<string, ProductDescriptionQrSummary>>({});
   // WO-...-STATUS-ACTIONS-V1: 상태 변경 모달 대상 (null=닫힘) + 변경 후 강제 새로고침 nonce
   const [statusTarget, setStatusTarget] = useState<StatusModalTarget | null>(null);
+  // WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1 §5
+  const canWrite = useProductDbWriteAccess();
   const [reloadNonce, setReloadNonce] = useState(0);
 
   // 페이지 캐시 (key=`${q}|${limit}|${page}`). q/limit 변경 시 초기화.
@@ -287,7 +290,7 @@ export default function ProductMastersPage() {
               // 설명은 상세 화면에서 확인한다(설명서 검토 워크플로우 제거, WO-...-DESCRIPTION-REVIEW-REMOVE-V1).
               { key: 'view', label: '상세 보기', icon: <Eye size={14} />, onClick: () => navigate(r.id) },
               // WO-...-STATUS-ACTIONS-V1: 현재 상태에 따른 상태 변경 액션
-              ...statusActionsFor(current).map((a) => ({
+              ...(canWrite ? statusActionsFor(current) : []).map((a) => ({
                 key: `status:${a.targetStatus}`,
                 label: a.label,
                 onClick: () =>
@@ -353,13 +356,13 @@ export default function ProductMastersPage() {
         <div className="ml-auto flex items-center gap-3">
           <span className="text-sm text-gray-500">총 {total.toLocaleString()}건</span>
           {/* WO-O4O-ADMIN-PRODUCT-MASTER-MANUAL-REGISTRATION-UI-V1 */}
-          <button
+          {canWrite && <button
             type="button"
             onClick={() => navigate('/admin/o4o-product-db/masters/new')}
             className="flex items-center gap-1 bg-admin-blue text-white px-3 py-2 rounded text-sm"
           >
             <Plus className="w-4 h-4" /> 새 상품 등록
-          </button>
+          </button>}
         </div>
       </div>
 

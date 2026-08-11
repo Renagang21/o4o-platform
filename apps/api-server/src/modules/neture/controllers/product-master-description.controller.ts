@@ -29,6 +29,7 @@ import { SharedProductDescriptionService } from '../services/shared-product-desc
 import { ProductMaster } from '../entities/ProductMaster.entity.js';
 import type { SharedProductDescriptionType } from '../entities/SharedProductDescription.entity.js';
 import logger from '../../../utils/logger.js';
+import { requireProductDbWrite } from './product-db-write-authority.js';
 
 const ADMIN_ROLES = [
   'platform:super_admin',
@@ -93,7 +94,7 @@ export function createProductMasterDescriptionController(dataSource: DataSource)
 
   // 설명서 저장 (=canonical upsert). createCandidate → setCanonical.
   // body.descriptionType = STORE|B2B|B2C|SUPPLIER_STORE (기본 STORE). canonical 은 (master, type, language)당 1개.
-  router.post('/:id/store-descriptions', async (req: Request, res: Response) => {
+  router.post('/:id/store-descriptions', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const actor = actorId(req);
       if (!actor) {

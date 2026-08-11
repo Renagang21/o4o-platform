@@ -1,0 +1,61 @@
+{
+  "wo": "WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1",
+  "step": "postVerify",
+  "readOnly": true,
+  "dbWrites": 0,
+  "pass": true,
+  "failures": [],
+  "productMasterTotal": 272035,
+  "byRegulatoryType": {
+    "DRUG": 177413,
+    "건강기능식품": 40948,
+    "COSMETIC": 32674,
+    "QUASI_DRUG": 17148,
+    "MEDICAL_DEVICE": 3826,
+    "일반": 15,
+    "GENERAL": 11
+  },
+  "sharedProductDescriptions": [
+    {
+      "type": "STORE",
+      "status": "canonical",
+      "count": 232860
+    },
+    {
+      "type": "STORE",
+      "status": "deprecated",
+      "count": 39686
+    },
+    {
+      "type": "STORE",
+      "status": "hidden",
+      "count": 1023
+    },
+    {
+      "type": "STORE",
+      "status": "candidate",
+      "count": 286
+    },
+    {
+      "type": "B2B",
+      "status": "canonical",
+      "count": 56
+    }
+  ],
+  "canonicalStoreByLanguage": {
+    "ko": 96059,
+    "en": 63207,
+    "zh": 41324,
+    "ja": 32270
+  },
+  "canonicalDuplicateGroups": 0,
+  "orphanDescriptions": 0,
+  "identifierDuplicateGroups": 66085,
+  "candidateByStatus": {
+    "approved_new_master": 238526,
+    "archived": 143888,
+    "pending": 11298,
+    "matched": 781,
+    "rejected": 2
+  }
+}

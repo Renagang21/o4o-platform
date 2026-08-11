@@ -21,6 +21,7 @@ import { NetureService } from '../neture.service.js';
 import { PRODUCT_MASTER_STATUSES } from '../services/catalog.service.js';
 import type { ProductMasterStatus } from '../services/catalog.service.js';
 import logger from '../../../utils/logger.js';
+import { requireProductDbWrite } from './product-db-write-authority.js';
 
 const ADMIN_ROLES = [
   'platform:super_admin',
@@ -51,7 +52,7 @@ export function createProductMasterStatusController(_dataSource: DataSource): Ro
   router.use(authenticate);
   router.use(requireRole(ADMIN_ROLES));
 
-  router.patch('/:id/status', async (req: Request, res: Response) => {
+  router.patch('/:id/status', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const actor = actorId(req);
       if (!actor) {

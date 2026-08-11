@@ -21,6 +21,7 @@ import type {
 } from '../entities/ProductCandidate.entity.js';
 import type { ProductIdentifierType } from '../entities/ProductIdentifier.entity.js';
 import logger from '../../../utils/logger.js';
+import { requireProductDbWrite } from './product-db-write-authority.js';
 
 /**
  * WO-O4O-ADMIN-PRODUCT-CANDIDATE-STATUS-SIMPLIFY-V2
@@ -179,7 +180,7 @@ export function createProductCandidateController(dataSource: DataSource): Router
 
   // POST /:id/promote-master — 후보를 신규 ProductMaster 로 승격 (drug 소스만, 1건씩)
   // WO-O4O-ADMIN-PRODUCT-CANDIDATE-UNMATCHED-ACTIONS-V1. approveAsNewProductMaster(TX+dedup) 재사용.
-  router.post('/:id/promote-master', (async (req: Request, res: Response) => {
+  router.post('/:id/promote-master', requireProductDbWrite, (async (req: Request, res: Response) => {
     try {
       const result = await service.promoteMasterFromCandidate(req.params.id);
       return res.json({ success: true, data: result });

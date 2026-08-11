@@ -22,6 +22,7 @@ import type { DataSource } from 'typeorm';
 import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
 import { SharedProductDescriptionService } from '../services/shared-product-description.service.js';
 import logger from '../../../utils/logger.js';
+import { requireProductDbWrite } from './product-db-write-authority.js';
 
 const ADMIN_ROLES = [
   'platform:super_admin',
@@ -58,7 +59,7 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
     }
   });
 
-  router.post('/expiry/apply', async (_req: Request, res: Response) => {
+  router.post('/expiry/apply', requireProductDbWrite, async (_req: Request, res: Response) => {
     try {
       const result = await service.expireRevisionRequested({ apply: true });
       res.json({ success: true, data: result });
@@ -116,7 +117,7 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
   });
 
   // canonical 승격 (운영자만)
-  router.post('/:id/approve', async (req: Request, res: Response) => {
+  router.post('/:id/approve', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const actor = actorId(req);
       // supplier/STORE 대상만 승격 허용 — 다른 경로 SPD 오승격 방지.
@@ -181,7 +182,7 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
 
   // 수정 요청 (status=revision_requested, 사유 필수, revision_due_at = now + 30일)
   //   WO-O4O-OPERATOR-SUPPLIER-STORE-DESCRIPTION-REVISION-REQUEST-AND-AUTO-DELETE-V1.
-  router.post('/:id/request-revision', async (req: Request, res: Response) => {
+  router.post('/:id/request-revision', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const actor = actorId(req);
       const reason = typeof req.body?.reason === 'string' ? req.body.reason.trim() : '';
@@ -206,7 +207,7 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
   });
 
   // 관리자 숨김 (status=hidden) — 노출 중단 전용. 공급자 수정 요청 기본 경로 아님.
-  router.post('/:id/reject', async (req: Request, res: Response) => {
+  router.post('/:id/reject', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const actor = actorId(req);
       const detail = await service.getSupplierStoreReviewDetail(req.params.id);

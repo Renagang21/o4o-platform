@@ -24,6 +24,7 @@ import type { DataSource } from 'typeorm';
 import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
 import { ProductCandidate } from '../entities/ProductCandidate.entity.js';
 import logger from '../../../utils/logger.js';
+import { requireProductDbWrite } from './product-db-write-authority.js';
 
 const ADMIN_ROLES = [
   'platform:super_admin',
@@ -206,7 +207,7 @@ export function createProductDbMaintenanceController(dataSource: DataSource): Ro
    * migration 아님 — 청크 update(APPLY_CHUNK_SIZE/txn). archived 로 바뀐 행은 대상 필터에서
    * 자동 제외되어 idempotent(중단 후 재실행 시 남은 대상만 처리).
    */
-  router.post('/jobs/orphan-registered-candidates/apply', async (req: Request, res: Response) => {
+  router.post('/jobs/orphan-registered-candidates/apply', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const body = (req.body ?? {}) as Record<string, unknown>;
       const confirmation = typeof body.confirmation === 'string' ? body.confirmation : '';
@@ -418,7 +419,7 @@ export function createProductDbMaintenanceController(dataSource: DataSource): Ro
   });
 
   /** POST /jobs/cancelled-drug-pending-candidates/apply — candidate_status pending→archived (청크) */
-  router.post('/jobs/cancelled-drug-pending-candidates/apply', async (req: Request, res: Response) => {
+  router.post('/jobs/cancelled-drug-pending-candidates/apply', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const body = (req.body ?? {}) as Record<string, unknown>;
       const confirmation = typeof body.confirmation === 'string' ? body.confirmation : '';

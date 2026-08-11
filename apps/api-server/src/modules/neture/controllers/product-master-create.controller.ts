@@ -18,6 +18,7 @@ import type { DataSource } from 'typeorm';
 import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
 import { NetureService } from '../neture.service.js';
 import logger from '../../../utils/logger.js';
+import { requireProductDbWrite } from './product-db-write-authority.js';
 
 const ADMIN_ROLES = [
   'platform:super_admin',
@@ -44,7 +45,7 @@ export function createProductMasterCreateController(_dataSource: DataSource): Ro
   router.use(requireRole(ADMIN_ROLES));
 
   // POST / — 신규 상품 등록 (barcode 선택)
-  router.post('/', async (req: Request, res: Response) => {
+  router.post('/', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const b = (req.body ?? {}) as Record<string, unknown>;
       const name = str(b.name);

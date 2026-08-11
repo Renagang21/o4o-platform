@@ -113,6 +113,22 @@ export const collectUserRoles = (user: unknown): string[] => {
   return roles;
 };
 
+/**
+ * WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1
+ *
+ * 공통 Product DB(ProductMaster · 공통 설명서 · canonical) 의 **write** 권한.
+ * 백엔드 `product-db-write-authority.ts` 의 `PRODUCT_DB_WRITE_ROLES` 와 같은 집합이며,
+ * 화면에서 write action 을 숨기거나 비활성화하는 데 쓴다.
+ *
+ * 조회 권한과는 별개다 — 서비스 운영자는 계속 조회·검색·상세 확인이 가능하다.
+ * 서비스 prefix 확장(`matchesRequiredRole`)을 적용하지 않는다: 정확히 이 역할만 write 한다.
+ */
+export const PRODUCT_DB_WRITE_ROLES = ['platform:super_admin', 'neture:admin', 'neture:operator'];
+
+/** 사용자가 공통 Product DB 를 수정할 수 있는가 (O4O 전체 관리자). */
+export const canWriteProductDb = (user: unknown): boolean =>
+  collectUserRoles(user).some((role) => PRODUCT_DB_WRITE_ROLES.includes(role));
+
 /** 사용자가 요구 역할을 만족하는가. */
 export const hasRequiredRoles = (user: unknown, requiredRoles: string[]): boolean =>
   collectUserRoles(user).some((role) => matchesRequiredRole(role, requiredRoles));
