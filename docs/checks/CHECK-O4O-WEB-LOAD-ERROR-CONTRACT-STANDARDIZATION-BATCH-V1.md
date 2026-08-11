@@ -191,7 +191,7 @@ UI 를 새로 만들지 않고 catch 본문만 교정했다 — 회귀 위험이
 |---|---|
 | 정상 데이터 화면 | PASS — 기존 목록 렌더 동일(회귀 없음) |
 | 빈 데이터 화면 | PASS — 기존 empty 문구 그대로 유지 |
-| API 실패 화면 | **부분 검증** — 아래 한계 참조 |
+| API 실패 화면 | **PASS (실측)** — `glycopharm.co.kr/forum/feedback` 의 실제 404 상황에서 error 상태 + `다시 시도` 버튼 렌더 확인. 그 외 화면은 정적 검증(아래 한계 참조) |
 | 로그인 필요 화면 | PASS — 기존 guard 동작 불변(이번 배치 미개입) |
 | 권한 없음 화면 | PASS — 기존 동작 불변(이번 배치 미개입) |
 | 없는 route 404 | PASS — 직전 배치의 404 표준 유지 |
@@ -245,14 +245,17 @@ throw 하지 않는 래퍼(`{ error }` / `{ success:false }` / `null` 반환)는
 ## 10. commit SHA
 
 - 1차 수정: `7be0cc39b` — fix(web): API 실패를 빈 목록으로 위장하던 화면 4상태 계약 정리 (40 files / +977 / -158)
-- 2차 수정(실브라우저에서 잡은 래퍼 결함): `(후속 커밋 SHA)`
+- 2차 수정(실브라우저에서 잡은 래퍼 결함): `9788092f8` — fix(web): throw 하지 않는 API 래퍼로 error 분기가 도달하지 못하던 4곳 보정 (5 files / +52 / -3)
 
 ## 11. push 결과
 
 - 1차: `0127d1ad5..7be0cc39b  main -> main` — `HEAD == origin/main` 확인
 - 1차 배포: GitHub Actions run `31457906264` **success**
   (kpa-society / glycopharm / neture / k-cosmetics 배포 success, pharmacy-hub skipped, API 배포 없음)
-- 2차: `(후속 push 결과)`
+- 2차: `05aca0bd6..9788092f8  main -> main`
+- 2차 배포: GitHub Actions run `31458498755` **success** (neture / glycopharm success, 나머지 skipped, API 배포 없음)
+- 배포 후 재확인: `https://glycopharm.co.kr/forum/feedback` — API 404 상태에서
+  "데이터를 불러오지 못했습니다." / "잠시 후 다시 시도해 주세요." / `다시 시도` 버튼 렌더 확인 (empty 문구 사라짐)
 
 ---
 
