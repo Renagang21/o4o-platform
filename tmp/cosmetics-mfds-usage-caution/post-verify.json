@@ -1,0 +1,23 @@
+{
+  "beforeRows": 32674,
+  "afterRows": 32674,
+  "plannedTotal": 1309,
+  "plannedApplied": 1309,
+  "plannedMismatch": [],
+  "untouchedOk": 31365,
+  "unplannedChanged": [],
+  "batchTagged": 1309,
+  "missingRow": [],
+  "statBefore": {
+    "usageSection": 32578,
+    "cautionSection": 0,
+    "emptyContent": 0
+  },
+  "statAfter": {
+    "usageSection": 32578,
+    "cautionSection": 1309,
+    "emptyContent": 0
+  },
+  "usageTextChanged": 179,
+  "pass": true
+}

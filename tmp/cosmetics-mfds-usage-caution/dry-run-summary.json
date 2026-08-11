@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-COSMETICS-MFDS-USAGE-CAUTION-ENRICHMENT-V1",
+  "population": 1317,
+  "counts": {
+    "AUTO_ENRICH": 1309,
+    "NO_CHANGE": 8,
+    "CHECK": 0
+  },
+  "fieldCounts": {
+    "usage": 179,
+    "cautions": 1309
+  },
+  "usageVerdicts": {
+    "REPLACE": 179,
+    "KEEP_GENERIC": 1117,
+    "KEEP_SPECIFIC": 13,
+    "NO_SOURCE": 8
+  },
+  "cautionVerdicts": {
+    "ADD": 1309,
+    "NO_SOURCE": 8
+  }
+}
