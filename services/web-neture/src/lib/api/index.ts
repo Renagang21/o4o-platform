@@ -119,7 +119,6 @@ export {
 
 // Admin APIs
 export {
-  adminOperatorApi,
   adminSupplierApi,
   // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier API
   operatorSupplierApi,
@@ -137,7 +136,6 @@ export {
   operatorRegistrationApi,
   type RegistrationRecord,
   adminPartnerSettlementApi,
-  type NetureOperatorInfo,
   type AdminSupplier,
   // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1
   PROFILE_FIELD_LABELS,

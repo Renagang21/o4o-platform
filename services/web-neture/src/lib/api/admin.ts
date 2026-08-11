@@ -21,71 +21,11 @@ import type {
   RegulatedCategoryStatus,
 } from './supplier.js';
 
-// ==================== Admin Operator ====================
-
-export interface NetureOperatorInfo {
-  id: string;
-  name: string;
-  email: string;
-  roles: string[];
-  isActive: boolean;
-  createdAt: string;
-}
-
-export interface OperatorActionResult {
-  success: boolean;
-  error?: string;
-  code?: string;
-}
-
-export const adminOperatorApi = {
-  async getOperators(includeInactive = false): Promise<NetureOperatorInfo[]> {
-    try {
-      const qs = includeInactive ? '?includeInactive=true' : '';
-      const response = await api.get(`/neture/admin/operators${qs}`);
-      return response.data.data || [];
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Admin API] Operators API not available');
-      return [];
-    }
-  },
-
-  async deactivateOperator(userId: string): Promise<OperatorActionResult> {
-    try {
-      await api.patch(`/neture/admin/operators/${userId}/deactivate`);
-      return { success: true };
-    } catch (error: any) {
-      const data = error?.response?.data;
-      return { success: false, error: data?.error || '권한 해제에 실패했습니다', code: data?.code };
-    }
-  },
-
-  async reactivateOperator(userId: string): Promise<OperatorActionResult> {
-    try {
-      await api.patch(`/neture/admin/operators/${userId}/reactivate`);
-      return { success: true };
-    } catch (error: any) {
-      const data = error?.response?.data;
-      return { success: false, error: data?.error || '권한 복원에 실패했습니다', code: data?.code };
-    }
-  },
-
-  async createOperator(
-    email: string,
-    role: 'neture:admin' | 'neture:operator',
-    name?: string,
-    password?: string,
-  ): Promise<OperatorActionResult & { data?: { userId: string; name: string; email: string; role: string; isNewUser: boolean; restored: boolean } }> {
-    try {
-      const response = await api.post('/neture/admin/operators', { email, role, name, password });
-      return { success: true, data: response.data.data };
-    } catch (error: any) {
-      const data = error?.response?.data;
-      return { success: false, error: data?.error || '운영자 추가에 실패했습니다', code: data?.code };
-    }
-  },
-};
+// WO-O4O-NETURE-LEGACY-ADMIN-OPERATOR-API-RETIREMENT-V1:
+//   Neture 전용 운영자 관리 API(`adminOperatorApi` 4개 함수 · `NetureOperatorInfo` ·
+//   `OperatorActionResult`)는 은퇴했다. 운영자/관리자 부여·해제는 중앙 관리자
+//   `admin.neture.co.kr/operators` 가 정본이며, Neture `/admin/operators` 는 안내 화면이다.
+//   백엔드 `/api/v1/neture/admin/operators*` 4개 route 도 함께 제거됐다.
 
 // ==================== Admin Supplier ====================
 

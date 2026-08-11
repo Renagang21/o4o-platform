@@ -10,7 +10,8 @@
  *   4) 해제는 계속 assignment row 의 is_active=false (soft revoke) 이며
  *      users.isActive · membership · credential 은 건드리지 않는다
  *
- * 이식 원본: Neture 전용 `PATCH /neture/admin/operators/:id/deactivate`
+ * 이식 원본: Neture 전용 `PATCH /neture/admin/operators/:id/deactivate` (은퇴됨 —
+ *   WO-O4O-NETURE-LEGACY-ADMIN-OPERATOR-API-RETIREMENT-V1)
  *   (`routes/neture/controllers/neture.controller.ts` — LAST_ADMIN_PROTECTED / self-deactivation)
  */
 

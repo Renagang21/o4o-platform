@@ -6,7 +6,7 @@
  *   1) 마지막 활성 서비스 admin 해제 차단
  *   2) 요청자가 자기 자신의 역할을 해제하는 행위 차단
  *
- * 배경: Neture 전용 `/admin/operators` 백엔드에만 있던 보호를
+ * 배경: Neture 전용 `/admin/operators` 백엔드(WO-O4O-NETURE-LEGACY-ADMIN-OPERATOR-API-RETIREMENT-V1 로 은퇴됨)에만 있던 보호를
  *   (`neture.controller.ts` LAST_ADMIN_PROTECTED / self-deactivation)
  *   중앙 경로로 이식하면서, Neture 고정 문자열 대신 서비스 공통 규칙으로 일반화했다.
  *
