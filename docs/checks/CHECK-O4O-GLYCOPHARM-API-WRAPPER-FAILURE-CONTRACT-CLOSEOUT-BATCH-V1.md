@@ -47,7 +47,7 @@ wrapper 안에서 error 를 기본값으로 삼키지 않는다
 | 6 | `pages/forum/MyRequestsPage.tsx` | `forumRequestApi.getMyRequests` | 페이지는 `res.error` 확인하나 **wrapper 가 `API_ERROR` 를 빈 목록으로 삼킴** | `FIX_THROW_AND_CATCH`(wrapper 측) |
 | 7 | `pages/forum/RequestCategoryPage.tsx` | `forumRequestApi.create` | `res.error` 확인 (mutation) | `VALID` |
 | 8 | `pages/operator/ForumRequestsPage.tsx` | `forumRequestApi.getAllRequests` | 페이지는 `if (res.error) throw` 하나 **wrapper 가 `API_ERROR` 삼킴** → throw 도달 불가 | `FIX_THROW_AND_CATCH`(wrapper 측) |
-| 9 | `pages/operator/ForumDeleteRequestsPage.tsx` | `forumDeleteRequestApi.getAll` | `res.data \|\| []` — error 미확인 → 실패가 "신청 없음" | `FIX_CALLER_CHECKS_ERROR` |
+| 9 | `pages/operator/ForumDeleteRequestsPage.tsx` | `forumDeleteRequestApi.getAll` | `res.data \|\| []` — error 미확인 → 실패가 "신청 없음" | `FIX_CALLER_CHECKS_ERROR` + `HOLD_COMMON_PACKAGE`(표면화) |
 | 10 | `pages/operator/OperatorForumPage.tsx` | `forumAnalyticsApi.getSummary` | 공통 `forum-hub` 는 error 상태가 있으나 throw 가 없어 미도달 | `FIX_THROW_AND_CATCH`(adapter 경계) |
 | 11 | `pages/operator/ForumAnalyticsPage.tsx` | `forumAnalyticsApi.*` | 공통 `forum-analytics` 페이지에 **error 상태 자체가 없음** | `HOLD_COMMON_PACKAGE` |
 | 12 | `pages/store-management/b2b-order/B2BOrderPage.tsx` | `apiClient.get` / `supplierRequestApi` | `error` 확인 + `error.code` 분기 | `VALID` / `KEEP_SOFT_RESULT_CONTRACT` |
@@ -77,6 +77,7 @@ wrapper 안에서 error 를 기본값으로 삼키지 않는다
 |---|---|---|---|---|
 | H1 | `ForumAnalyticsPage` (공통 `@o4o/operator-core-ui/modules/forum-analytics`) | `HOLD_COMMON_PACKAGE` | `OperatorForumAnalyticsPage.loadAll` 에 error 상태도 catch 도 없다. 여기서 throw 로 승격하면 **무한 loading** 이 된다 | 공통 UI 승격 batch 에서 `loadError` state + `ErrorState` 를 모듈에 추가하고 3서비스 adapter 를 throw 로 통일 |
 | H2 | `CommunityMainPage` 공지 섹션 (`@o4o/shared-space-ui` `StandardHomeTemplate`) | `HOLD_COMMON_PACKAGE` | `notices` / `noticesLoading` 만 있고 error 를 받을 prop 이 없다 | 공통 UI 승격 batch 에서 `noticesError` + retry prop 추가 (KPA / K-Cosmetics 홈 동시 적용) |
+| H3 | `ForumDeleteRequestsPage` (공통 `@o4o/operator-core-ui/modules/forum-delete-requests`) | `HOLD_COMMON_PACKAGE` | adapter 는 throw 로 정리했으나 콘솔의 `loadRequests` 가 `catch { setRequests([]) }` 로 삼킨다 — 아직 화면에 error 로 뜨지 않는다 | 공통 UI 승격 batch 에서 `loadError` state + `ErrorState` 추가 (forum-requests 콘솔은 이미 `setError` 보유 → 동일 패턴 이식) |
 | K1 | `api/home.ts` | `KEEP_SOFT_RESULT_CONTRACT` | wrapper 결과 중계 계층. 판정은 소비처가 한다 | — |
 | K2 | `B2BOrderPage` `supplierRequestApi` / delete-request·review mutation adapter | `KEEP_SOFT_RESULT_CONTRACT` | `error.code` 분기(`DUPLICATE_REQUEST`) 와 `{ ok:false, error }` 계약이 업무상 필요 | — |
 
@@ -94,22 +95,43 @@ wrapper 안에서 error 를 기본값으로 삼키지 않는다
 
 ## 7. 실제 실패 smoke
 
-§9 실측 참조. backend/API 를 인위적으로 깨지 않고, 권한이 없어 실제 실패(4xx)가 나는 read endpoint 로 error 상태를 실측한다.
+프로덕션(`https://glycopharm.co.kr`) 실브라우저. backend/API 를 인위적으로 깨지 않았다.
+
+실패 채널: `GET /api/v1/glycopharm/signage/contents` 가 프로덕션에서 **실제로 404** 를 반환한다(운영 현황). 이 read endpoint 로 error 상태를 실측했다.
+
+| 축 | route | 결과 |
+|---|---|---|
+| 정상 데이터 | `/` 최신글 · `/store/management` 포럼 피드 | 목록 3건 정상 렌더 (회귀 없음) |
+| 정상 empty | `/forum/my-requests` | "신청 내역이 없습니다" (API 200 · 0건) |
+| 정상 empty | `/` 공지 | "등록된 공지가 없습니다" |
+| **실제 실패** | `/store/marketing/signage/library` | **"콘텐츠를 불러오지 못했습니다." + 다시 시도** (착수 전에는 빈 목록으로 위장) |
+| 로그인 필요 | 로그아웃 상태 `/store/marketing/signage/library` | 로그인 모달 (직전 batch 표준 유지) |
+| 권한 없음 | 매장 계정 `/operator/forum` | "접근 권한이 없습니다" 안내 카드 |
+| 없는 route | `/community` | 404 안내 화면 |
+
+실측 중 발견·보정 1건: 최초 배포본에서 error 문구가 wrapper 원문 **"API request failed"**(영문) 로 노출됐다 → 고정 한국어 문구로 교체 후 재배포·재실측 PASS.
 
 ## 8. typecheck / build / deploy 결과
 
 | 항목 | 결과 |
 |---|---|
-| `npx tsc -b` (web-glycopharm) | PASS |
-| `npx vite build` (web-glycopharm) | PASS |
-| deploy | §9 |
+| `npx tsc -b` (web-glycopharm) | PASS (2회 — 문구 보정 후 재실행 포함) |
+| `npx vite build` (web-glycopharm) | PASS (기존 chunk size 경고만) |
+| deploy run `31462594856` (`5301f5013` 포함) | success — `deploy-glycopharm` success |
+| deploy run `31463064725` (`b6fa8345d`) | success — `deploy-glycopharm` success, 그 외 skipped |
 
 API 서버 배포 없음. backend / endpoint / 응답 스키마 / 권한 / route / DB 변경 0.
 
-## 9. commit SHA · smoke · deploy 실측
+## 9. commit SHA
 
-(배포·smoke 후 기재)
+| SHA | 내용 |
+|---|---|
+| `5301f5013` | wrapper 실패 계약 마감 · 소비처 error 연결 (7 files) |
+| `b6fa8345d` | 실측 반영 — 한국어 문구 고정 + 삭제요청 콘솔 HOLD 주석 (3 files) |
+| (본 문서 갱신 commit) | smoke/deploy 실측 기재 |
 
 ## 10. push 결과
 
-(기재)
+- `5301f5013` → `origin/main` 반영 확인 (동시 세션 push 에 포함)
+- `b6fa8345d` → `7f03c03b6..b6fa8345d  main -> main`
+- 다른 세션의 `apps/api-server/**` dirty 파일은 stage 하지 않았다 (path-specific stage).
