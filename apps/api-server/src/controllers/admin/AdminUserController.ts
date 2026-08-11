@@ -20,6 +20,7 @@ import { sanitizeAdminUser } from './admin-user-sanitizer.js';
 // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 정본
 import { PASSWORD_MIN_LENGTH, PASSWORD_POLICY_MESSAGE, isPasswordPolicyCompliant } from '../../utils/password-policy.js';
 // WO-O4O-CENTRAL-OPERATOR-ROLE-REVOKE-SAFETY-GUARDS-V1
+import { invalidateRoles } from '../../modules/auth/utils/role-cache.js';
 import {
   getServiceAdminRoleServiceKey,
   LAST_ADMIN_PROTECTED_CODE,
@@ -822,6 +823,16 @@ export class AdminUserController {
         });
         return;
       }
+
+      // WO-O4O-CENTRAL-OPERATOR-ROLE-REVOKE-CACHE-INVALIDATION-V1:
+      //   DB 해제가 실제로 성공한(affected > 0) 뒤에만, 그리고 응답 전에 캐시를 지운다.
+      //   무효화 대상은 요청자가 아니라 **역할을 잃은 대상 사용자**다.
+      //   두 해제 분기(일반 UPDATE · revokeServiceAdminRoleWithLock) 모두 이 지점을 지난다.
+      //   `roleAssignmentService.assignRole/removeRole/removeAllRoles` 와 동일한 관례이며
+      //   (WO-O4O-AUTH-ROLE-FRESHEN-V1), 저장소 전체에서 캐시 무효화 실패를 이유로
+      //   DB 작업을 되돌리는 경로는 없다. `invalidateRoles` 는 동기 `Map.delete` 라
+      //   보상 트랜잭션 대상이 아니므로 같은 실패 계약(호출 후 즉시 응답)을 따른다.
+      invalidateRoles(userId);
 
       logger.info(`[revokeRoleAssignment] role=${role} revoked from userId=${userId}`);
       res.json({

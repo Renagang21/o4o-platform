@@ -77,6 +77,11 @@ jest.mock('../../../modules/auth/services/role-assignment.service.js', () => ({
   },
 }));
 
+const mockInvalidateRoles = jest.fn();
+jest.mock('../../../modules/auth/utils/role-cache.js', () => ({
+  invalidateRoles: (...args: any[]) => mockInvalidateRoles(...args),
+}));
+
 jest.mock('../../../utils/auth.utils.js', () => ({
   hashPassword: jest.fn(async (pw: string) => `hashed:${pw}`),
   comparePassword: jest.fn(async () => true),
@@ -321,5 +326,128 @@ describe('기존 계약 회귀', () => {
     expect(allSql).not.toMatch(/service_credentials/i);
     expect(allSql).not.toMatch(/UPDATE\s+users/i);
     expect(mockUserRepo.save).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * WO-O4O-CENTRAL-OPERATOR-ROLE-REVOKE-CACHE-INVALIDATION-V1
+ *
+ * 역할 해제가 실제로 성공한 경우에만 대상 사용자의 권한 캐시를 무효화한다.
+ * (`role-cache` 는 60s TTL per-process 캐시 — WO-O4O-AUTH-ROLE-FRESHEN-V1)
+ */
+describe('역할 해제 후 권한 캐시 무효화', () => {
+  it('일반 역할 해제 성공 시 대상 사용자 캐시를 무효화한다', async () => {
+    activeHolders['neture:operator'] = [TARGET_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(makeReq(TARGET_ID, 'neture:operator'), res);
+
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    expect(mockInvalidateRoles).toHaveBeenCalledTimes(1);
+    expect(mockInvalidateRoles).toHaveBeenCalledWith(TARGET_ID);
+  });
+
+  it('서비스 admin 해제 성공 시에도 캐시를 무효화한다', async () => {
+    activeHolders['neture:admin'] = [TARGET_ID, OTHER_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(makeReq(TARGET_ID, 'neture:admin'), res);
+
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    expect(mockInvalidateRoles).toHaveBeenCalledWith(TARGET_ID);
+  });
+
+  it('요청자가 아니라 역할을 잃은 대상 사용자를 무효화한다', async () => {
+    activeHolders['neture:admin'] = [TARGET_ID, OTHER_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(makeReq(TARGET_ID, 'neture:admin'), res);
+
+    expect(mockInvalidateRoles).not.toHaveBeenCalledWith(REQUESTER_ID);
+    expect(mockInvalidateRoles.mock.calls).toEqual([[TARGET_ID]]);
+  });
+
+  it('자기 역할 해제 거절(403)에서는 호출하지 않는다', async () => {
+    activeHolders['neture:admin'] = [REQUESTER_ID, OTHER_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(makeReq(REQUESTER_ID, 'neture:admin'), res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(mockInvalidateRoles).not.toHaveBeenCalled();
+  });
+
+  it('마지막 서비스 admin 거절(403)에서는 호출하지 않는다', async () => {
+    activeHolders['neture:admin'] = [TARGET_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(makeReq(TARGET_ID, 'neture:admin'), res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(mockInvalidateRoles).not.toHaveBeenCalled();
+  });
+
+  it('platform:super_admin 보호(403)에서는 호출하지 않는다', async () => {
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(makeReq(TARGET_ID, 'platform:super_admin'), res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(mockInvalidateRoles).not.toHaveBeenCalled();
+  });
+
+  it('미보유 서비스 admin 역할 거절(404)에서는 호출하지 않는다', async () => {
+    activeHolders['neture:admin'] = [OTHER_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(makeReq(TARGET_ID, 'neture:admin'), res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(mockInvalidateRoles).not.toHaveBeenCalled();
+  });
+
+  it('미보유 일반 역할 거절(404 · affected 0)에서는 호출하지 않는다', async () => {
+    activeHolders['neture:operator'] = [];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(makeReq(TARGET_ID, 'neture:operator'), res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(mockInvalidateRoles).not.toHaveBeenCalled();
+  });
+
+  it('대상 계정이 없으면(404) 호출하지 않는다', async () => {
+    mockUserRepo.findOne.mockResolvedValue(null);
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(makeReq(TARGET_ID, 'neture:admin'), res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(mockInvalidateRoles).not.toHaveBeenCalled();
+  });
+
+  it('DB 해제가 실패하면(500) 호출하지 않는다', async () => {
+    mockManager.query.mockRejectedValueOnce(new Error('deadlock detected'));
+    activeHolders['neture:admin'] = [TARGET_ID, OTHER_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(makeReq(TARGET_ID, 'neture:admin'), res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(mockInvalidateRoles).not.toHaveBeenCalled();
+  });
+
+  it('무효화는 soft revoke 계약을 바꾸지 않는다(추가 SQL 없음)', async () => {
+    activeHolders['neture:admin'] = [TARGET_ID, OTHER_ID];
+    const res = makeRes();
+
+    await controller.revokeRoleAssignment(makeReq(TARGET_ID, 'neture:admin'), res);
+
+    const select = selectQuery();
+    expect(select!.sql).toMatch(/FOR UPDATE/);
+    expect(hasTxUpdate()).toBe(true);
+    // 캐시 무효화는 DB 왕복을 추가하지 않는다.
+    expect(plainQueries).toHaveLength(0);
+    expect(txQueries).toHaveLength(2);
   });
 });
