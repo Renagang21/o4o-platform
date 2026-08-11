@@ -89,7 +89,11 @@ async function createManagerUser(options: CreateManagerOptions = {}) {
     await AppDataSource.query(
       `INSERT INTO role_assignments (id, user_id, role, is_active, valid_from, assigned_at, scope_type)
        VALUES (gen_random_uuid(), $1, $2, true, NOW(), NOW(), 'global')
-       ON CONFLICT ON CONSTRAINT "unique_active_role_per_user" DO NOTHING`,
+       ON CONFLICT (user_id, role) WHERE is_active DO NOTHING`,
+      // WO-O4O-ROLE-DATA-CANONICALIZATION-AND-LEGACY-CLEANUP-V1:
+      //   ⚠️ 접두 없는 'admin' 은 정본이 아니다. 다만 어느 서비스의 admin 인지 코드·카탈로그
+      //   어디서도 결정되지 않는다(`roles` 카탈로그에 접두 없는 'admin' 없음, `platform:admin` 은
+      //   is_assignable=false). **의미를 추정해 바꾸지 않고** 문자열을 보존한다 — CHECK 문제 큐 참조.
       [newUser.id, 'admin']
     );
     logger.info('✅ Role assigned successfully!');

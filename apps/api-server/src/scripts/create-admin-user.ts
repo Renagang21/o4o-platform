@@ -8,7 +8,7 @@
 
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
-import { UserStatus } from '../types/auth.js';
+import { UserRole, UserStatus } from '../types/auth.js';
 import { hashPassword } from '../utils/auth.utils.js';
 import logger from '../utils/logger.js';
 
@@ -102,8 +102,13 @@ async function createAdminUser(options: CreateAdminOptions = {}) {
     await AppDataSource.query(
       `INSERT INTO role_assignments (id, user_id, role, is_active, valid_from, assigned_at, scope_type)
        VALUES (gen_random_uuid(), $1, $2, true, NOW(), NOW(), 'global')
-       ON CONFLICT ON CONSTRAINT "unique_active_role_per_user" DO NOTHING`,
-      [newUser.id, 'super_admin']
+       ON CONFLICT (user_id, role) WHERE is_active DO NOTHING`,
+      // WO-O4O-ROLE-DATA-CANONICALIZATION-AND-LEGACY-CLEANUP-V1:
+      //   접두 없는 'super_admin' 을 넣고 있었다. `UserRole.SUPER_ADMIN` 은 'platform:super_admin' 이라
+      //   `User.hasRole()` 의 어떤 분기(정확 일치 / `platform:` 접두 / `:` 접미)에도 걸리지 않아
+      //   **isAdmin() 을 통과하지 못하는 관리자 계정**이 만들어졌다. 카탈로그에도 접두 없는
+      //   'super_admin' 은 없다(유일 정본 = platform:super_admin) → 정본 이름으로 고정한다.
+      [newUser.id, UserRole.SUPER_ADMIN]
     );
     logger.info('✅ Role assigned successfully!');
 

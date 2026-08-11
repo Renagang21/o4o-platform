@@ -480,7 +480,7 @@ export class PharmacyHubStoreProvisioningService {
     await runner.query(
       `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
        VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
-       ON CONFLICT ON CONSTRAINT "unique_active_role_per_user"
+       ON CONFLICT (user_id, role) WHERE is_active
        DO UPDATE SET updated_at = NOW(), is_active = true`,
       [userId, STORE_OWNER_ROLE, assignedBy],
     );

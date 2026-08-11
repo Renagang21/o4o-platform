@@ -149,8 +149,12 @@ export class RoleAssignmentService {
       where: { userId, role, isActive: true },
     });
     if (!assignment) {
+      // WO-O4O-ROLE-DATA-CANONICALIZATION-AND-LEGACY-CLEANUP-V1:
+      //   제약이 `UNIQUE (user_id, role) WHERE is_active` 로 바뀌어 **비활성 이력 행이 여러 개**
+      //   존재할 수 있다. 어느 행을 복원할지 비결정적이면 안 되므로 가장 최근 행으로 고정한다.
       assignment = await repository.findOne({
         where: { userId, role, isActive: false },
+        order: { assignedAt: 'DESC', id: 'DESC' },
       });
     }
 
@@ -213,6 +217,13 @@ export class RoleAssignmentService {
 
   /**
    * Remove (deactivate) a role from a user
+   *
+   * WO-O4O-ROLE-DATA-CANONICALIZATION-AND-LEGACY-CLEANUP-V1:
+   *   과거에는 같은 (user, role) 에 비활성 '쌍둥이' 행이 있으면 이 UPDATE 가
+   *   `unique_active_role_per_user (user_id, role, is_active)` 와 충돌해 **23505 로 실패**했다.
+   *   제약을 `UNIQUE (user_id, role) WHERE is_active` 부분 인덱스로 교체(migration 20270301000000)해
+   *   비활성 행은 몇 개든 공존할 수 있으므로, 활성 행을 내리는 이 경로는 구조적으로 충돌하지 않는다.
+   *   행을 지우지 않고 이력을 남긴다.
    */
   async removeRole(userId: string, role: string): Promise<boolean> {
     const assignment = await this.repository.findOne({

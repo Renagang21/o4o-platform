@@ -190,7 +190,7 @@ export class MembershipApprovalService {
     await queryRunner.query(
       `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
        VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
-       ON CONFLICT ON CONSTRAINT "unique_active_role_per_user"
+       ON CONFLICT (user_id, role) WHERE is_active
        DO UPDATE SET updated_at = NOW(), is_active = true`,
       [userId, role, assignedBy]
     );
@@ -200,11 +200,17 @@ export class MembershipApprovalService {
   /**
    * role_assignments 비활성화 (반려·정지 공통). row 는 보존하고 is_active 만 false 로 내린다.
    *
-   * WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1 §4.2:
-   *   `unique_active_role_per_user UNIQUE (user_id, role, is_active)` 때문에, 과거 upsert 로
-   *   `(u, r, true)` 와 `(u, r, false)` 가 동시에 존재하는 legacy row 쌍이 있으면 단순 UPDATE 가
-   *   23505 로 실패한다. 이 경우에만 중복된 비활성 row 를 정리해 단일 row 로 합치고 (역할 자체는
-   *   `(u, r, false)` 로 계속 남는다) 경고 로그를 남긴다.
+   * WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1 §4.2 (당시):
+   *   `unique_active_role_per_user UNIQUE (user_id, role, is_active)` 때문에 `(u, r, true)` 와
+   *   `(u, r, false)` 가 동시에 존재하면 단순 UPDATE 가 23505 로 실패했다. 그래서 중복 비활성 row 를
+   *   **DELETE 해서 합치는** 우회가 들어가 있었다.
+   *
+   * WO-O4O-ROLE-DATA-CANONICALIZATION-AND-LEGACY-CLEANUP-V1:
+   *   제약을 `UNIQUE (user_id, role) WHERE is_active` 부분 인덱스로 교체해
+   *   비활성 이력 row 가 여러 개 공존할 수 있게 됐다(migration 20270301000000).
+   *   활성 row 를 내리는 UPDATE 는 활성 유일성을 **줄이는** 방향이라 이제 어떤 경우에도
+   *   충돌하지 않는다 → **이력을 지우던 DELETE 를 제거**한다.
+   *   회수 이력(누가 언제 무슨 역할을 잃었는지)이 보존된다.
    *
    * @returns 비활성화된 row 수
    */
@@ -213,30 +219,6 @@ export class MembershipApprovalService {
     userId: string,
     role: string
   ): Promise<number> {
-    const activeRows = normalizeReturningRows<{ id: string }>(
-      await queryRunner.query(
-        `SELECT id FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = true`,
-        [userId, role]
-      )
-    );
-    if (activeRows.length === 0) return 0;
-
-    const inactiveRows = normalizeReturningRows<{ id: string }>(
-      await queryRunner.query(
-        `SELECT id FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = false`,
-        [userId, role]
-      )
-    );
-    if (inactiveRows.length > 0) {
-      logger.warn('[ROLE] duplicate active/inactive assignment pair consolidated', {
-        userId, role, activeRows: activeRows.length, inactiveRows: inactiveRows.length,
-      });
-      await queryRunner.query(
-        `DELETE FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = false`,
-        [userId, role]
-      );
-    }
-
     const updated = normalizeReturningRows(
       await queryRunner.query(
         `UPDATE role_assignments SET is_active = false, updated_at = NOW()

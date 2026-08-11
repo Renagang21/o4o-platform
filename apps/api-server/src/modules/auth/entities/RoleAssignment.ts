@@ -14,7 +14,6 @@ import {
   ManyToOne,
   JoinColumn,
   Index,
-  Unique,
 } from 'typeorm';
 import type { User } from './User.js';
 
@@ -35,7 +34,18 @@ import type { User } from './User.js';
 @Index(['isActive'])
 @Index(['userId', 'isActive'])
 @Index(['userId', 'role'])
-@Unique('unique_active_role_per_user', ['userId', 'role', 'isActive'])
+/**
+ * WO-O4O-ROLE-DATA-CANONICALIZATION-AND-LEGACY-CLEANUP-V1
+ *   기존 `@Unique('unique_active_role_per_user', ['userId','role','isActive'])` 를
+ *   **부분 유니크 인덱스**로 교체했다 (migration 20270301000000).
+ *   업무 규칙은 "같은 (user, role) 의 **활성** 행은 1개" 뿐이고, 비활성 이력은 여러 개
+ *   남을 수 있어야 한다. 3 컬럼 제약은 비활성 행에도 유일성을 강제해 비활성화 시
+ *   23505 를 유발했다.
+ */
+@Index('ux_role_assignments_user_role_active', ['userId', 'role'], {
+  unique: true,
+  where: 'is_active',
+})
 export class RoleAssignment {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

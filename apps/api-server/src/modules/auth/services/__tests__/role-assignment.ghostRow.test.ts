@@ -62,8 +62,12 @@ describe('assignRole — 비활성 유령 행이 있어도 안전하게 재부�
     const service = new RoleAssignmentService();
     const saved = await service.assignRole({ userId: USER, role: ROLE });
 
+    // WO-O4O-ROLE-DATA-CANONICALIZATION-AND-LEGACY-CLEANUP-V1:
+    //   제약이 부분 유니크 인덱스로 바뀌어 비활성 이력 행이 여러 개일 수 있다.
+    //   복원 대상은 '가장 최근' 한 행으로 결정적이어야 한다.
     expect(mockRepository.findOne).toHaveBeenNthCalledWith(2, {
       where: { userId: USER, role: ROLE, isActive: false },
+      order: { assignedAt: 'DESC', id: 'DESC' },
     });
     expect(saved).toBe(inactiveRow);
     expect(saved.isActive).toBe(true);
