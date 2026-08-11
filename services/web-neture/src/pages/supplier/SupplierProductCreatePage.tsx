@@ -85,7 +85,7 @@ export default function SupplierProductCreatePage() {
   // 의약품류(약국 대상) 또는 미분류 → 검토 중심(자동 공급오퍼/이벤트/펀딩 연결 제외)
   const isReviewOriented = !!productType && (productType.pharmacyTarget === true || productType.key === 'unclassified');
   // 등록 완료 상태 (성공 시 유형별 다음-작업 패널 표시)
-  const [registered, setRegistered] = useState<{ name: string } | null>(null);
+  const [registered, setRegistered] = useState<{ name: string; masterId?: string | null } | null>(null);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [form, setForm] = useState<FormData>({
@@ -374,7 +374,7 @@ export default function SupplierProductCreatePage() {
       if (thumbnailSource?.kind === 'file') URL.revokeObjectURL(thumbnailSource.preview);
       contentItems.forEach((item) => { if (item.kind === 'file') URL.revokeObjectURL(item.preview); });
       // WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-WIZARD-V2: 유형별 다음-작업 패널로 전환
-      setRegistered({ name: form.marketingName.trim() });
+      setRegistered({ name: form.marketingName.trim(), masterId: result.data?.masterId ?? null });
     } else {
       setSubmitError(result.error || '상품 등록에 실패했습니다.');
     }
@@ -484,11 +484,18 @@ export default function SupplierProductCreatePage() {
                 <button onClick={() => navigate('/supplier/market-trial/new')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
                   유통참여형 펀딩 후보로 사용
                 </button>
+                {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-AND-STORE-DESCRIPTION-WORKFLOW-SMOKE-BATCH-V1:
+                    등록 직후 매장용 설명서 작성으로 가는 이동선. 공급 활동(오퍼·펀딩)과 축이 다르므로
+                    안내 문구로 구분한다. 운영자 검토 대상(의약품)은 노출 범위가 미확정이라 제외. */}
+                <button onClick={() => navigate(registered.masterId ? `/supplier/store-descriptions?masterId=${encodeURIComponent(registered.masterId)}` : '/supplier/store-descriptions')} className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-800 hover:border-blue-400 hover:bg-blue-50">
+                  매장용 상품 설명서 작성
+                </button>
               </>
             )}
           </div>
           <p className="mt-3 text-xs text-slate-400">
             공급 오퍼·이벤트 오퍼·유통참여형 펀딩은 등록된 제품을 활용하는 별도 활동입니다.
+            매장용 상품 설명서는 운영자 검수를 거쳐 매장에 노출되는 자료로, 공급 활동과는 별개입니다.
           </p>
         </div>
       </div>

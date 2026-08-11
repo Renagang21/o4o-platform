@@ -1576,6 +1576,26 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             </Section>
           )}
 
+          {/* ── 매장용 상품 설명서 ──
+              WO-O4O-NETURE-SUPPLIER-PRODUCT-AND-STORE-DESCRIPTION-WORKFLOW-SMOKE-BATCH-V1:
+                상품 → 매장용 설명서 작성 이동선이 없어 사이드바 경유로만 닿았다.
+                이동만 보완한다 — 권한·정책·API 변경 0 (대상 화면은 이미 전 상품을 나열한다). */}
+          {!isEditing && (
+            <Section title="매장용 상품 설명서">
+              <p className="text-[11px] text-slate-500 mb-2">
+                위 B2C·B2B 설명과는 다른 축입니다. 매장 경영자가 고객 응대·QR·태블릿에 활용하는
+                매장용(STORE) 설명서는 운영자 검수를 거쳐 매장에 노출됩니다.
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate(`/supplier/store-descriptions?masterId=${encodeURIComponent(product.masterId || '')}`)}
+                className="w-full py-2 text-sm font-medium text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg border border-sky-200"
+              >
+                이 상품의 매장용 설명서 작성
+              </button>
+            </Section>
+          )}
+
           {/* ── 태그 관리 (V2: 편집/읽기 모드 모두 표시, 후편집 4단계) ── */}
           <Section title="태그 관리">
             {/* WO-NETURE-BULK-PRODUCT-POST-IMPORT-CURATION-FLOW-V1: 태그 추천 안내 */}

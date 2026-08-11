@@ -1,10 +1,13 @@
 /**
- * SupplierStoreDescriptionsPage — "매장용 상품 설명서" 서비스 진입점 (1차: 안내만)
+ * SupplierStoreDescriptionsPage — "매장용 상품 설명서" 진입점 + 상품별 작성/검수요청
  *
  * WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1
  * 근거: IR-O4O-NETURE-SUPPLIER-STORE-CONTENT-QR-TABLET-FLOW-AUDIT-V1 / DECISION-...-D1-D4-V1
  *
- * 범위(1차): 진입점 + 온보딩 안내만. 실제 STORE 설명서 작성·저장·QR·태블릿은 하지 않는다.
+ * 범위: 진입점 + 온보딩 안내 + 상품별 STORE 설명서 작성/임시저장/검수요청/철회(Drawer).
+ *   QR·태블릿 적용은 공급자가 하지 않는다(매장이 사본으로 가져가 활용).
+ * WO-O4O-NETURE-SUPPLIER-PRODUCT-AND-STORE-DESCRIPTION-WORKFLOW-SMOKE-BATCH-V1:
+ *   `?masterId=` deep link 수용(상품 목록·상세·등록 완료에서 진입). 권한·API 변경 없음.
  * 정책(DECISION):
  *   - 설명서 타입은 STORE (SUPPLIER_STORE 아님). 작성 주체는 metadata로 구분.
  *   - 공급자는 직접 게시하지 않는다. 운영자 검수 후 canonical 로 매장에 노출된다.
@@ -12,7 +15,7 @@
  * 상태는 backend(supplierProfileApi.getProfile → status/activationReady)를 단일 권위로 사용(재계산 없음).
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import {
   supplierProfileApi,
@@ -58,6 +61,9 @@ export default function SupplierStoreDescriptionsPage() {
   const [activeReloadKey, setActiveReloadKey] = useState(0);
   const [keyword, setKeyword] = useState('');
   const [selected, setSelected] = useState<SupplierProduct | null>(null);
+  // WO-...-SMOKE-BATCH-V1: 상품 화면에서 넘어온 masterId 를 1회 소비해 해당 상품 편집기를 연다.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [deepLinkConsumed, setDeepLinkConsumed] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -116,6 +122,20 @@ export default function SupplierStoreDescriptionsPage() {
       mounted = false;
     };
   }, [active, activeReloadKey]);
+
+  // masterId deep link: 상품 목록 로드 후 1회만 소비한다(못 찾으면 목록만 보여주고 조용히 무시).
+  useEffect(() => {
+    if (deepLinkConsumed || productsLoading || products.length === 0) return;
+    const masterId = searchParams.get('masterId');
+    if (!masterId) return;
+    setDeepLinkConsumed(true);
+    const target = products.find((p) => p.masterId === masterId);
+    if (target) setSelected(target);
+    // query 를 지워 새로고침·뒤로가기 시 편집기가 다시 열리지 않게 한다.
+    const next = new URLSearchParams(searchParams);
+    next.delete('masterId');
+    setSearchParams(next, { replace: true });
+  }, [deepLinkConsumed, productsLoading, products, searchParams, setSearchParams]);
 
   const draftByMaster = useMemo(() => {
     const m = new Map<string, SupplierStoreDescriptionDraft>();
@@ -342,7 +362,8 @@ export default function SupplierStoreDescriptionsPage() {
         <ul className="list-disc space-y-1 pl-4">
           <li>매장용 설명서는 공급자가 <strong>직접 게시하지 않으며</strong>, 운영자 검수를 거쳐 매장에 노출됩니다.</li>
           <li>매장 경영자는 설명서를 <strong>복사</strong>하여 자기 매장에 맞게 활용합니다.</li>
-          <li>이 화면은 서비스 <strong>진입점</strong>입니다. 실제 작성·저장·QR·태블릿 기능은 후속 단계에서 제공됩니다.</li>
+          <li>작성·임시저장·검수요청·철회는 이 화면에서 상품별로 진행합니다. 언어(한국어·English·中文·日本語)별로 따로 검수받습니다.</li>
+          <li>QR 생성·태블릿 코너 적용은 <strong>매장이 수행</strong>합니다. 공급자는 특정 매장·QR·태블릿에 직접 배포하지 않습니다.</li>
         </ul>
       </div>
     </div>

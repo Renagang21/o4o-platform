@@ -58,6 +58,8 @@ export default function SupplierSignagePage() {
   //   목록 조회 실패를 "정상 0건"(빈 상태) 과 구분되는 지속 오류 상태로 분리한다.
   //   기존 목록은 비우지 않고(재조회 실패 시), 오류 패널 + 재시도로 표면화한다.
   const [loadError, setLoadError] = useState(false);
+  // 연결 상품 목록(선택 입력) 조회 실패 — 사이니지 목록과 독립. 실패를 '상품 0건'으로 위장하지 않는다.
+  const [productsError, setProductsError] = useState(false);
 
   const reload = useCallback(() => {
     setLoading(true);
@@ -70,7 +72,10 @@ export default function SupplierSignagePage() {
 
   useEffect(() => {
     reload();
-    supplierApi.getProducts().then(setProducts).catch(() => {});
+    // WO-O4O-NETURE-SUPPLIER-PRODUCT-AND-STORE-DESCRIPTION-WORKFLOW-SMOKE-BATCH-V1:
+    //   조회 실패를 삼키면 '연결 상품' 선택지가 비어 "등록 상품 없음"으로 오인된다.
+    setProductsError(false);
+    supplierApi.getProducts().then(setProducts).catch(() => setProductsError(true));
   }, [reload]);
 
   const formVideoId = useMemo(() => extractYouTubeVideoId(form.sourceUrl), [form.sourceUrl]);
@@ -320,6 +325,11 @@ export default function SupplierSignagePage() {
                     <option key={p.id} value={p.id}>{p.name || p.masterName || p.id.slice(0, 8)}</option>
                   ))}
                 </select>
+                {productsError && (
+                  <p className="mt-1 text-[11px] text-red-600">
+                    상품 목록을 불러오지 못했습니다. 등록된 상품이 없는 것이 아니라 조회에 실패한 상태입니다.
+                  </p>
+                )}
               </div>
             </div>
             <div className="mt-5 flex justify-end gap-2">
