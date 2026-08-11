@@ -22,6 +22,7 @@ on:
       # Auth 공통 패키지 (src만 — dist는 자동 생성이므로 제외)
       - 'packages/auth-utils/src/**'
       - 'packages/auth-client/src/**'
+      - 'packages/auth-react/src/**'
       - 'packages/security-core/src/**'
       # 서비스별 AuthContext (login/token 흐름 직접 제어)
       - 'services/web-kpa-society/src/contexts/AuthContext.tsx'
