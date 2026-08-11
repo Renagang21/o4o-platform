@@ -1,0 +1,443 @@
+{
+  "wo": "WO-O4O-ADMIN-PRODUCT-DESCRIPTION-ROUTE-AUTH-BOUNDARY-ALIGNMENT-V1",
+  "readOnly": true,
+  "blanketMountLine": 418,
+  "total": 31,
+  "shadowedByBlanket": 17,
+  "byClass": {
+    "A": 12,
+    "C": 6,
+    "B": 13
+  },
+  "unguardedAfterBlanket": [],
+  "mounts": [
+    {
+      "line": 174,
+      "path": "/api/v1/admin/apps",
+      "factory": "adminAppsRoutes",
+      "module": "../routes/admin/apps.routes.js",
+      "afterBlanket": false,
+      "kind": "A",
+      "detail": "requireAdmin (platform:super_admin)"
+    },
+    {
+      "line": 175,
+      "path": "/api/v1/admin/users",
+      "factory": "adminUsersRoutes",
+      "module": "../routes/admin/users.routes.js",
+      "afterBlanket": false,
+      "kind": "A",
+      "detail": "requireRole([1 roles])",
+      "roles": [
+        "platform:super_admin"
+      ]
+    },
+    {
+      "line": 176,
+      "path": "/api/v1/admin/platform-accounts",
+      "factory": "adminPlatformAccountsRoutes",
+      "module": "../routes/admin/platform-accounts.routes.js",
+      "afterBlanket": false,
+      "kind": "C",
+      "detail": "requireRole 은 있으나 역할 목록을 정적으로 못 읽음"
+    },
+    {
+      "line": 177,
+      "path": "/api/v1/admin/platform-users",
+      "factory": "adminPlatformUsersRoutes",
+      "module": "../routes/admin/platform-users.routes.js",
+      "afterBlanket": false,
+      "kind": "C",
+      "detail": "requireRole 은 있으나 역할 목록을 정적으로 못 읽음"
+    },
+    {
+      "line": 178,
+      "path": "/api/v1/admin/security",
+      "factory": "adminSecurityBlockedIpsRoutes",
+      "module": "../routes/admin/security-blocked-ips.routes.js",
+      "afterBlanket": false,
+      "kind": "A",
+      "detail": "requireRole([1 roles])",
+      "roles": [
+        "platform:super_admin"
+      ]
+    },
+    {
+      "line": 279,
+      "path": "/api/v1/admin/services",
+      "factory": "createAdminServiceLegalController",
+      "module": "../modules/service-legal/admin-service-legal.controller.js",
+      "afterBlanket": false,
+      "kind": "C",
+      "detail": "가드 형태 불명확"
+    },
+    {
+      "line": 290,
+      "path": "/api/v1/admin/services",
+      "factory": "createAdminContactInquiryController",
+      "module": "../modules/contact-inquiry/admin-contact-inquiry.controller.js",
+      "afterBlanket": false,
+      "kind": "C",
+      "detail": "가드 형태 불명확"
+    },
+    {
+      "line": 295,
+      "path": "/api/v1/admin/services",
+      "factory": "createAdminServiceContactSettingsController",
+      "module": "../modules/contact-inquiry/admin-service-contact-settings.controller.js",
+      "afterBlanket": false,
+      "kind": "C",
+      "detail": "가드 형태 불명확"
+    },
+    {
+      "line": 300,
+      "path": "/api/v1/admin/platform",
+      "factory": "platformInquiryAdminRoutes",
+      "module": null,
+      "afterBlanket": false,
+      "kind": "C",
+      "detail": "모듈 경로 해석 실패"
+    },
+    {
+      "line": 305,
+      "path": "/api/v1/admin/platform-services",
+      "factory": "createAdminPlatformServicesRoutes",
+      "module": "../routes/platform-services/admin-platform-services.routes.js",
+      "afterBlanket": false,
+      "kind": "A",
+      "detail": "requireAdmin (platform:super_admin)"
+    },
+    {
+      "line": 309,
+      "path": "/api/v1/admin/store-network",
+      "factory": "createStoreNetworkRoutes",
+      "module": "../routes/platform/store-network.routes.js",
+      "afterBlanket": false,
+      "kind": "A",
+      "detail": "requireAdmin (platform:super_admin)"
+    },
+    {
+      "line": 313,
+      "path": "/api/v1/admin/physical-stores",
+      "factory": "createPhysicalStoreRoutes",
+      "module": "../routes/platform/physical-store.routes.js",
+      "afterBlanket": false,
+      "kind": "A",
+      "detail": "requireAdmin (platform:super_admin)"
+    },
+    {
+      "line": 353,
+      "path": "/api/v1/admin/apps",
+      "factory": "adminAppsRoutes",
+      "module": "../routes/admin/apps.routes.js",
+      "afterBlanket": false,
+      "kind": "A",
+      "detail": "requireAdmin (platform:super_admin)"
+    },
+    {
+      "line": 418,
+      "path": "/api/v1/admin",
+      "factory": "adminDashboardRoutes",
+      "module": "../routes/admin/dashboard.routes.js",
+      "afterBlanket": false,
+      "kind": "A",
+      "detail": "requireAdmin (platform:super_admin)"
+    },
+    {
+      "line": 466,
+      "path": "/api/v1/admin/o4o-product-db/product-landings",
+      "factory": "createAdminProductLandingController",
+      "module": "../modules/neture/controllers/product-landing.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 476,
+      "path": "/api/v1/admin/o4o-product-db/masters",
+      "factory": "createProductUsageLinksController",
+      "module": "../modules/neture/controllers/product-usage-links.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 486,
+      "path": "/api/v1/admin/o4o-product-db/image-quality",
+      "factory": "createProductImageQualityController",
+      "module": "../modules/neture/controllers/product-image-quality.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 496,
+      "path": "/api/v1/admin/o4o-product-db/masters",
+      "factory": "createProductMasterNoteController",
+      "module": "../modules/neture/controllers/product-master-note.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 506,
+      "path": "/api/v1/admin/o4o-product-db/masters",
+      "factory": "createProductMasterDescriptionController",
+      "module": "../modules/neture/controllers/product-master-description.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 516,
+      "path": "/api/v1/admin/o4o-product-db/supplier-store-descriptions",
+      "factory": "createOperatorSupplierStoreDescriptionReviewController",
+      "module": "../modules/neture/controllers/operator-supplier-store-description-review.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 526,
+      "path": "/api/v1/admin/o4o-product-db/masters",
+      "factory": "createProductMasterCreateController",
+      "module": "../modules/neture/controllers/product-master-create.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 536,
+      "path": "/api/v1/admin/o4o-product-db/maintenance",
+      "factory": "createProductDbMaintenanceController",
+      "module": "../modules/neture/controllers/product-db-maintenance.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 546,
+      "path": "/api/v1/admin/o4o-product-db/masters",
+      "factory": "createProductMasterAuditLogController",
+      "module": "../modules/neture/controllers/product-master-audit-log.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 556,
+      "path": "/api/v1/admin/o4o-product-db/masters",
+      "factory": "createProductMasterStatusController",
+      "module": "../modules/neture/controllers/product-master-status.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 566,
+      "path": "/api/v1/admin/o4o-product-db/product-contents",
+      "factory": "createProductContentBrowseController",
+      "module": "../modules/neture/controllers/product-content-browse.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 576,
+      "path": "/api/v1/admin/o4o-product-db/masters",
+      "factory": "createProductDescriptionQrSummaryController",
+      "module": "../modules/neture/controllers/product-description-qr-summary.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 586,
+      "path": "/api/v1/admin/o4o-product-db/masters",
+      "factory": "createProductMasterImageController",
+      "module": "../modules/neture/controllers/product-master-image.controller.js",
+      "afterBlanket": true,
+      "kind": "B",
+      "detail": "requireRole([9 roles])",
+      "roles": [
+        "platform:super_admin",
+        "neture:admin",
+        "neture:operator",
+        "glycopharm:admin",
+        "glycopharm:operator",
+        "cosmetics:admin",
+        "cosmetics:operator",
+        "kpa-society:admin",
+        "kpa-society:operator"
+      ]
+    },
+    {
+      "line": 1008,
+      "path": "/api/v1/admin/channel-playback-logs",
+      "factory": "adminPlaybackLogRoutes",
+      "module": "../routes/admin/channel-playback-logs.routes.js",
+      "afterBlanket": true,
+      "kind": "A",
+      "detail": "requireAdmin (platform:super_admin)"
+    },
+    {
+      "line": 1017,
+      "path": "/api/v1/admin/channels/heartbeat",
+      "factory": "adminHeartbeatRoutes",
+      "module": "../routes/admin/channel-heartbeat.routes.js",
+      "afterBlanket": true,
+      "kind": "A",
+      "detail": "requireAdmin (platform:super_admin)"
+    },
+    {
+      "line": 1026,
+      "path": "/api/v1/admin/channels/ops",
+      "factory": "adminChannelOpsRoutes",
+      "module": "../routes/admin/channel-ops.routes.js",
+      "afterBlanket": true,
+      "kind": "A",
+      "detail": "requireAdmin (platform:super_admin)"
+    },
+    {
+      "line": 1035,
+      "path": "/api/v1/admin/ops",
+      "factory": "adminOpsMetricsRoutes",
+      "module": "../routes/admin/ops-metrics.routes.js",
+      "afterBlanket": true,
+      "kind": "A",
+      "detail": "requireAdmin (platform:super_admin)"
+    }
+  ]
+}

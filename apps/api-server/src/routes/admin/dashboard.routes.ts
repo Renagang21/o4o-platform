@@ -13,9 +13,22 @@ import type { AuthRequest } from '../../types/auth.js';
 
 const router: Router = Router();
 
-// All routes require authentication and admin access
-router.use(authenticate);
-router.use(requireAdmin);
+/**
+ * WO-O4O-ADMIN-PRODUCT-DESCRIPTION-ROUTE-AUTH-BOUNDARY-ALIGNMENT-V1
+ *
+ * 이 router 는 `/api/v1/admin` 에 mount 된다. path 없는 `router.use(...)` 로 가드를 걸면
+ * **이 파일이 정의하지 않은 경로까지** 가드가 먼저 실행돼, 뒤에 mount 되는
+ * `/api/v1/admin/o4o-product-db/*` 등 하위 라우터의 자체 권한 계약
+ * (`requireRole(ADMIN_ROLES)` — service admin/operator 허용)이 무효화된다.
+ *
+ * 그래서 가드를 **이 router 가 실제로 소유한 prefix 로만** 한정한다.
+ * 여기 걸린 API 의 super_admin 전용 경계(`requireAdmin` = `platform:super_admin`)는 그대로다.
+ * 새 최상위 prefix 를 추가하면 이 배열에도 같이 추가해야 한다.
+ */
+const OWNED_PREFIXES = ['/dashboard', '/system', '/partners', '/cosmetics'];
+
+router.use(OWNED_PREFIXES, authenticate);
+router.use(OWNED_PREFIXES, requireAdmin);
 
 /**
  * Dashboard APIs
