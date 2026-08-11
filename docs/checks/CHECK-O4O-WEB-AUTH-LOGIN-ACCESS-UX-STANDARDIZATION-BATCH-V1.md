@@ -83,48 +83,61 @@
 
 ## 5. 로그인 필요 smoke
 
+실브라우저(Playwright) · 프로덕션 도메인 · 비파괴 GET 만.
+
 | # | 대상 | 기대 | 결과 |
 |---|---|---|---|
-| L1 | neture 비로그인 `/supplier/dashboard` | 로그인 모달(returnUrl 보존) | (§10 실측 참조) |
-| L2 | kpa 비로그인 `/mypage` | `/login` + `state.from` | (§10) |
-| L3 | pharmacy-hub 비로그인 `/store-owner` | `/login` 이동, 로그인 후 원래 경로 복귀 | (§10) |
-| L4 | k-cosmetics 비로그인 보호 route | `/login` 이동 | (§10) |
+| L1 | neture 비로그인 `/operator/product-service-approvals` | 로그인 안내(모달) | **PASS** — 홈 위에 로그인 모달. console 은 예상된 `auth/me` 401 + `auth/refresh` 401 + "Authentication failed. Tokens cleared." 만 |
+| L2 | kpa 비로그인 `/mypage` | `/login` + 복귀 경로 보존 | **PASS** — URL `kpa-society.co.kr/login`, 로그인 모달 렌더(`LoginRoute` 가 `state.from` → `onLoginSuccess` 로 보존) |
+| L3 | pharmacy-hub 비로그인 `/store-owner` | `/login` 이동, 로그인 후 원래 경로 복귀 | **PASS** — 로그인 후 URL 이 `/`(기존 동작) 이 아니라 **`/store-owner`** 로 복귀, 매장 경영 홈 렌더 |
+| L4 | k-cosmetics 비로그인 `/operator` | `/login` 이동 | **PASS** — 전용 `/login` 페이지 렌더 |
+| L5 | glycopharm 비로그인 `/operator` | 로그인 안내(모달) | **PASS** — 홈 위에 로그인 모달 (glycopharm 의 기존 `LoginRedirect` 패턴) |
 
 ## 6. 권한 없음 smoke
 
 | # | 대상 | 기대 | 결과 |
 |---|---|---|---|
-| D1 | neture 공급자 세션 → `/operator/product-service-approvals` | **무안내 홈 redirect 대신 "접근 권한이 없습니다" 안내** | (§10) |
-| D2 | glycopharm 권한 없는 세션 → `/operator` | 안내 화면 | (§10) |
-| D3 | k-cosmetics 권한 없는 세션 → `/operator` | 안내 화면 | (§10) |
+| D1 | neture 공급자 세션 → `/operator/product-service-approvals` | **무안내 홈 redirect 대신 안내 화면** | **PASS** — URL 유지 + `🔒 / 접근 권한이 없습니다 / 현재 계정으로는 이 기능을 사용할 수 없습니다. / 홈으로 돌아가기`. 직전 batch smoke 에서 무안내 홈 redirect 로 기록된 바로 그 경로 |
+| D2 | glycopharm 매장 경영자 세션 → `/operator` | 안내 화면 | **PASS** — 동일 안내 카드, URL `glycopharm.co.kr/operator` 유지 |
+| D3 | k-cosmetics 권한 없는 세션 → `/operator` | 안내 화면 | **PASS** — 로그인 후 `/operator` 복귀 → 동일 안내 카드 |
+| D4 | pharmacy-hub `/operator` (role 없음) | 안내 화면 | **PASS(기존 정합)** — "이 역할이 부여되지 않았습니다. 역할 부여는 서비스 운영자의 승인 절차를 통해 진행됩니다." 이미 안내 화면이라 미수정 |
+
+무안내 홈 redirect **0** / blank **0** / redirect loop **0**.
 
 ## 7. 정상 route 회귀
 
 | # | 대상 | 기대 | 결과 |
 |---|---|---|---|
-| R1 | neture 공급자 `/supplier/dashboard` | 정상 렌더 | (§10) |
-| R2 | 5개 서비스 홈 | 정상 렌더 | (§10) |
-| R3 | 없는 route | 404 안내 | (§10) |
+| R1 | neture 공급자 `/supplier/dashboard` | 정상 렌더 | **PASS** |
+| R2 | 5개 서비스 홈 | 정상 렌더 | **PASS** — neture / kpa-society / glycopharm / k-cosmetics / pharmacy-hub 전부 정상 |
+| R3 | 없는 route (`glycopharm.co.kr/no-such-page-xyz`) | 404 안내 | **PASS** — `404 / 요청하신 페이지를 찾을 수 없습니다.` (직전 catch-all WO 회귀 유지) |
+| R4 | glycopharm 매장 경영자 로그인 → `/store` | 역할 분기 정상 | **PASS** — 내 약국 홈 정상 렌더 (역할 분기 redirect 는 거부가 아니므로 미변경) |
+
+console error: 비로그인 상태의 `auth/me` · `auth/refresh` 401 외 신규 error 없음 (인증 부트스트랩의 기존 정상 동작).
 
 ## 8. typecheck / build / deploy 결과
 
 | 서비스 | typecheck | build | deploy |
 |---|---|---|---|
-| web-neture | PASS | PASS | (§10) |
-| web-kpa-society | PASS | PASS | (§10) |
-| web-glycopharm | PASS | PASS | (§10) |
-| web-k-cosmetics | PASS | PASS | (§10) |
-| web-pharmacy-hub | PASS | PASS | (§10) |
+| web-neture | PASS | PASS | success |
+| web-kpa-society | PASS | PASS | success |
+| web-glycopharm | PASS | PASS | success |
+| web-k-cosmetics | PASS | PASS | success |
+| web-pharmacy-hub | PASS | PASS | success |
 
+deploy: GitHub Actions `deploy-web-services.yml` run **31460862120** — `detect-changes` 포함 전 job success.
 API 서버 배포 없음.
 
 ## 9. commit SHA
 
-(§10 에서 기재)
+| commit | 내용 |
+|---|---|
+| `3f0edb3a8` | fix(web): 로그인 필요/권한 없음 UX 표준화 — 무안내 홈 redirect 제거 (13 files, +304/-14) |
+| (본 문서 실측 반영) | docs(check): smoke·deploy·commit 실측 기재 |
 
 ## 10. push 결과
 
-(§10 에서 기재)
+`447f486ca..3f0edb3a8` → `origin/main` push 완료. 본 문서 실측 반영분은 후속 commit 으로 push.
 
 ## 11. 변경하지 않은 것
 
