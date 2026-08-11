@@ -12,6 +12,29 @@ import { AuthRequest } from './auth-context.helpers.js';
 import { requireAuth } from './authentication.middleware.js';
 
 /**
+ * 인증 보장 헬퍼 — WO-O4O-REQUIREADMIN-MIDDLEWARE-CONTRACT-HARDENING-V1
+ *
+ * 기존 구현은 `req.user` 가 없을 때 `return requireAuth(req, res, next)` 로 위임했다.
+ * 그러면 인증에 성공한 순간 requireAuth 가 **직접 next() 를 호출**해 컨트롤러로 넘어가고,
+ * 위임한 쪽(requireAdmin/requireRole/...)의 **역할 검사는 영원히 실행되지 않는다.**
+ * 즉 단독 사용 시 "로그인만 하면 통과" 가 된다.
+ *
+ * 이 헬퍼는 requireAuth 를 호출하되 next 를 가로채서, 인증이 끝난 뒤 **호출자에게 제어를 돌려준다.**
+ * - true  → 인증 완료(req.user 확보). 호출자가 역할 검사를 계속한다.
+ * - false → requireAuth 가 이미 401 응답을 보냈다. 호출자는 아무것도 하지 않고 종료한다.
+ */
+async function ensureAuthenticated(req: AuthRequest, res: Response): Promise<boolean> {
+  if (req.user) return true;
+
+  let authenticated = false;
+  await requireAuth(req, res, ((err?: unknown) => {
+    if (!err) authenticated = true;
+  }) as NextFunction);
+
+  return authenticated && !!req.user;
+}
+
+/**
  * Require Admin Role Middleware
  *
  * WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1
@@ -37,10 +60,8 @@ export const requireAdmin = async (
   res: Response,
   next: NextFunction
 ): Promise<void | Response> => {
-  // First ensure user is authenticated
-  if (!req.user) {
-    return requireAuth(req, res, next);
-  }
+  // 인증 확인 → 역할 확인까지 이 미들웨어 안에서 완결한다 (단독 사용 안전).
+  if (!(await ensureAuthenticated(req, res))) return;
 
   const user = req.user as User;
 
@@ -100,10 +121,8 @@ export const requireRole = (roles: string | string[]) => {
     res: Response,
     next: NextFunction
   ): Promise<void | Response> => {
-    // First ensure user is authenticated
-    if (!req.user) {
-      return requireAuth(req, res, next);
-    }
+    // 인증 확인 → 역할/권한 확인까지 이 미들웨어 안에서 완결한다 (단독 사용 안전).
+    if (!(await ensureAuthenticated(req, res))) return;
 
     const user = req.user as User;
     const roleList = Array.isArray(roles) ? roles : [roles];
@@ -177,10 +196,8 @@ export const requirePermission = (permission: string) => {
     res: Response,
     next: NextFunction
   ): Promise<void | Response> => {
-    // First ensure user is authenticated
-    if (!req.user) {
-      return requireAuth(req, res, next);
-    }
+    // 인증 확인 → 역할/권한 확인까지 이 미들웨어 안에서 완결한다 (단독 사용 안전).
+    if (!(await ensureAuthenticated(req, res))) return;
 
     const user = req.user as User;
 
@@ -249,9 +266,8 @@ export const requireAnyPermission = (permissions: string[]) => {
     res: Response,
     next: NextFunction
   ): Promise<void | Response> => {
-    if (!req.user) {
-      return requireAuth(req, res, next);
-    }
+    // 인증 확인 → 권한 확인까지 이 미들웨어 안에서 완결한다 (단독 사용 안전).
+    if (!(await ensureAuthenticated(req, res))) return;
 
     const user = req.user as User;
 

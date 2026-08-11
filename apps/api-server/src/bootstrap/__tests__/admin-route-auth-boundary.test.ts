@@ -206,13 +206,16 @@ describe('blanket 에 인증을 의존하던 admin router 회귀', () => {
     expect(s).toMatch(/router\.use\(\s*authenticate\s*\)/);
   });
 
-  it('requireAdmin 단독 사용 시 인증 위임이 역할 검사를 건너뛴다는 사실을 고정한다', () => {
+  // WO-O4O-REQUIREADMIN-MIDDLEWARE-CONTRACT-HARDENING-V1 로 guard 자체를 고쳤으므로
+  // 위 회귀 테스트가 고정하던 "인증 위임 = 역할 검사 생략" 구조는 더 이상 존재하지 않는다.
+  // 동작 계약은 __tests__/security/require-admin-contract.spec.ts 가 검증한다.
+  it('requireAdmin/requireRole 은 인증을 requireAuth 에 위임하고 끝내지 않는다', () => {
     const s = readFileSync(
       resolve(__dirname, '../../common/middleware/auth/authorization.middleware.ts'),
       'utf8',
     );
-    // 이 구조가 유지되는 한 requireAdmin 단독 사용은 안전하지 않다.
-    // (별도 WO 로 guard 자체를 고치면 이 테스트를 함께 갱신한다)
-    expect(s).toMatch(/if \(!req\.user\) \{\s*return requireAuth\(req, res, next\);/);
+    expect(s).not.toMatch(/if \(!req\.user\) \{\s*return requireAuth\(req, res, next\);/);
+    // 인증 후 제어를 호출자에게 돌려주는 헬퍼로 완결한다.
+    expect(s).toMatch(/if \(!\(await ensureAuthenticated\(req, res\)\)\) return;/);
   });
 });
