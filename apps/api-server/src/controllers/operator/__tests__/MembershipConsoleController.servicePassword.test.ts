@@ -47,6 +47,7 @@ jest.mock('../../../utils/auth.utils.js', () => ({
 }));
 
 import { MembershipConsoleController } from '../MembershipConsoleController.js';
+import { hashPassword } from '../../../utils/auth.utils.js';
 
 const TARGET = '11111111-2222-4333-8444-555555555555';
 const CALLER = '99999999-8888-4777-8666-555555555555';
@@ -321,6 +322,48 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
       );
 
       expect(res.status).toHaveBeenCalledWith(403);
+      expect(credentialWrites()).toEqual([]);
+    });
+  });
+
+  // WO-O4O-OPERATOR-MEMBER-PASSWORD-MIN-LENGTH-UNIFY-V1
+  describe('최소 길이(8자) 서버 강제', () => {
+    it('8자 미만이면 hash · credential write 이전에 400 WEAK_PASSWORD 로 거절한다', async () => {
+      primeQuery();
+      const res = makeRes();
+
+      await controller.updateMember(makeReq({ password: 'Pw12345' }), res); // 7자
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'WEAK_PASSWORD' }));
+      expect(hashPassword).not.toHaveBeenCalled();
+      expect(credentialWrites()).toEqual([]);
+      expect(usersPasswordWrites()).toEqual([]);
+    });
+
+    it('정확히 8자는 통과한다 (경계값)', async () => {
+      primeQuery();
+      const res = makeRes();
+
+      await controller.updateMember(makeReq({ password: 'Pw123456' }), res);
+
+      expect(credentialWrites()).toHaveLength(1);
+      expect(credentialWrites()[0].params[2]).toBe('hashed:Pw123456');
+    });
+
+    it('serviceKey 를 명시해도 8자 미만이면 서비스 판정 이전에 거절한다', async () => {
+      // 후보가 복수여도 SERVICE_KEY_REQUIRED 가 아니라 WEAK_PASSWORD 가 먼저다.
+      primeQuery({ memberOf: ['glycopharm', 'kpa-society'] });
+      const res = makeRes();
+
+      await controller.updateMember(
+        makeReq({ password: 'short' }, { serviceKeys: ['glycopharm', 'kpa-society'] }),
+        res,
+      );
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'WEAK_PASSWORD' }));
+      expect(hashPassword).not.toHaveBeenCalled();
       expect(credentialWrites()).toEqual([]);
     });
   });

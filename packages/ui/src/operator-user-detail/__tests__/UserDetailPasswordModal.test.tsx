@@ -126,3 +126,33 @@ describe('PasswordModal — 대상 서비스 확정', () => {
     expect(options.filter(Boolean).sort()).toEqual(['kpa-society', 'neture']);
   });
 });
+
+// WO-O4O-OPERATOR-MEMBER-PASSWORD-MIN-LENGTH-UNIFY-V1
+describe('PasswordModal — 최소 길이 8자', () => {
+  it('8자 미만이면 안내 문구를 띄우고 전송하지 않는다', async () => {
+    const { put } = await openPasswordModal([membership('glycopharm')]);
+
+    fireEvent.change(screen.getByPlaceholderText(/새 비밀번호/), { target: { value: 'pass123' } }); // 7자
+    fireEvent.click(submitButton());
+
+    await screen.findByText('비밀번호는 최소 8자 이상이어야 합니다.');
+    expect(put).not.toHaveBeenCalled();
+  });
+
+  it('정확히 8자는 전송한다 (경계값)', async () => {
+    const { put } = await openPasswordModal([membership('glycopharm')]);
+
+    fireEvent.change(screen.getByPlaceholderText(/새 비밀번호/), { target: { value: 'pass1234' } });
+    fireEvent.click(submitButton());
+
+    await waitFor(() => expect(put).toHaveBeenCalledTimes(1));
+    expect(put).toHaveBeenCalledWith('/operator/members/u-1', { password: 'pass1234', serviceKey: 'glycopharm' });
+  });
+
+  it('입력 필드가 8자 이상을 안내한다', async () => {
+    await openPasswordModal([membership('glycopharm')]);
+    const input = screen.getByPlaceholderText(/새 비밀번호/) as HTMLInputElement;
+    expect(input.placeholder).toContain('8자 이상');
+    expect(input.minLength).toBe(8);
+  });
+});

@@ -121,7 +121,7 @@ function PasswordModal({ userId, userName, memberships, apiAdapter, theme, onClo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!serviceKey) { setError('비밀번호를 변경할 서비스를 선택해주세요.'); return; }
-    if (password.length < 6) { setError('비밀번호는 최소 6자 이상이어야 합니다.'); return; }
+    if (password.length < 8) { setError('비밀번호는 최소 8자 이상이어야 합니다.'); return; }
     setLoading(true);
     setError('');
     try {
@@ -193,10 +193,10 @@ function PasswordModal({ userId, userName, memberships, apiAdapter, theme, onClo
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="새 비밀번호 (6자 이상)"
+            placeholder="새 비밀번호 (8자 이상)"
             className={`w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 ${tc.ringClass}`}
             required
-            minLength={6}
+            minLength={8}
           />
           <div className="flex gap-2">
             <button type="button" onClick={onClose} className="flex-1 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">취소</button>

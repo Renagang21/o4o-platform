@@ -21,6 +21,9 @@ import { ActionLogService } from '@o4o/action-log-core';
 // WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1:
 //   canonical service_key → role prefix 는 @o4o/security-core SSOT 위임 (로컬 매핑 금지).
 import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
+// WO-O4O-OPERATOR-MEMBER-PASSWORD-MIN-LENGTH-UNIFY-V1:
+//   서비스 credential 최소 길이 정본(8자)을 재사용한다. 로컬 상수 신설 금지.
+import { SERVICE_PASSWORD_MIN_LENGTH } from '../admin/AdminUserController.js';
 
 const approvalService = new MembershipApprovalService();
 
@@ -110,6 +113,18 @@ export class MembershipConsoleController {
     newPassword: string;
   }): Promise<PasswordChangeFailure | null> {
     const { req, scope, targetUserId, newPassword } = params;
+
+    // (0) 최소 길이 검증 — hash · credential write 이전에 거절한다.
+    //     WO-O4O-OPERATOR-MEMBER-PASSWORD-MIN-LENGTH-UNIFY-V1:
+    //       프런트(목록/상세 모달)만 8자를 강제하면 API 직접 호출로 정책을 우회할 수 있다.
+    //       복잡성 규칙은 이 WO 범위 밖이며 최소 길이만 서버에서 강제한다.
+    if (typeof newPassword !== 'string' || newPassword.length < SERVICE_PASSWORD_MIN_LENGTH) {
+      return {
+        status: 400,
+        error: `비밀번호는 최소 ${SERVICE_PASSWORD_MIN_LENGTH}자 이상이어야 합니다.`,
+        code: 'WEAK_PASSWORD',
+      };
+    }
 
     // (1) 후보 서비스 산출 = **호출자 관리 범위 ∩ 대상자 Membership**
     //     WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2:
