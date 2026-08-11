@@ -106,5 +106,5 @@ DELETE FROM product_masters WHERE tags->>'woBatch' = 'cosmetics-full-apply-v1';
 
 | 항목 | 값 |
 |---|---|
-| commit | `1f95c7c9d` |
+| commit | `75108bbc8` |
 | push | `origin/main` 반영 완료 |
