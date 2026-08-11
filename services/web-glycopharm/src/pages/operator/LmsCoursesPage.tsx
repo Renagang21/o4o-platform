@@ -190,8 +190,9 @@ export default function LmsCoursesPage() {
                 <p className="text-slate-500">등록된 강의가 없습니다.</p>
               </div>
             }
-            // WO-O4O-WEB-UX-STANDARDIZATION-BATCH-V1: `/education/:id` 는 존재하지 않는 경로였다 (강의 상세 canonical = `/lms/:id`)
-            onRowClick={(row) => navigate(`/lms/${row.id}`)}
+            // WO-O4O-WEB-UX-STANDARDIZATION-BATCH-V1: `/education/:id` 는 존재하지 않는 경로였다.
+            // canonical = `/lms/course/:id` (WO-O4O-LMS-ROUTING-UNIFICATION-V1). `/lms/:id` 는 legacy redirect 라 사용하지 않는다.
+            onRowClick={(row) => navigate(`/lms/course/${row.id}`)}
             tableId="glycopharm-operator-lms-courses"
           />
         )}
