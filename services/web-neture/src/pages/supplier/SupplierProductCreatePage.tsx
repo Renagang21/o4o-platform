@@ -91,11 +91,14 @@ export default function SupplierProductCreatePage() {
   const [form, setForm] = useState<FormData>({
     barcode: '',
     packagingName: '',
-    marketingName: importDraft?.marketingName ?? '',
+    // WO-O4O-COSMETICS-SUPPLIER-PRODUCT-REGISTER-AND-EDIT-BROWSER-SMOKE-V1:
+    //   상품 라이브러리에서 바코드 없는 기존 master 를 선택하면 이름/브랜드/제조사/카테고리로 넘어온다.
+    //   같은 값으로 제출해야 서버가 (이름, 제조사) 로 기존 master 를 찾아 연결한다(신규 생성 아님).
+    marketingName: importDraft?.marketingName ?? searchParams.get('name') ?? '',
     // WO-O4O-SUPPLIER-IMPORT-O4O-SETTINGS-STEP-V1: O4O 등록 설정 pre-fill
-    categoryId: importDraft?.categoryId ?? '',
-    brandName: importDraft?.brandName ?? '',
-    manufacturerName: importDraft?.manufacturerName ?? '',
+    categoryId: importDraft?.categoryId ?? searchParams.get('categoryId') ?? '',
+    brandName: importDraft?.brandName ?? searchParams.get('brandName') ?? '',
+    manufacturerName: importDraft?.manufacturerName ?? searchParams.get('manufacturerName') ?? '',
     distributionType: importDraft?.isPublic
       ? 'PUBLIC'
       : (importDraft?.serviceKeys?.length ? 'SERVICE' : 'PRIVATE'),
@@ -206,7 +209,9 @@ export default function SupplierProductCreatePage() {
 
   // Auto-search from URL barcode param
   useEffect(() => {
-    const barcodeParam = searchParams.get('barcode');
+    const raw = searchParams.get('barcode');
+    // 'null'/'undefined' 는 링크 생성 실수로 들어온 값이다 — 바코드로 조회하지 않는다.
+    const barcodeParam = raw && raw !== 'null' && raw !== 'undefined' ? raw : null;
     if (barcodeParam && !autoSearchDone.current) {
       autoSearchDone.current = true;
       setForm((prev) => ({ ...prev, barcode: barcodeParam }));

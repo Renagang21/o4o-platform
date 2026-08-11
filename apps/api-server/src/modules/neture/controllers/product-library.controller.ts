@@ -104,6 +104,9 @@ export function createProductLibraryController(dataSource: DataSource): Router {
         primaryImageUrl: imageMap.get(m.id) || null,
         // WO-...-STATUS-ACTIONS-V1: 관리자 목록 상태 배지용 (참여자 응답에도 포함되나 항상 ACTIVE)
         status: m.status,
+        // WO-O4O-COSMETICS-SUPPLIER-PRODUCT-REGISTER-AND-EDIT-BROWSER-SMOKE-V1 (additive):
+        //   바코드 없는 master 를 공급자 등록 화면으로 넘길 때 유형을 prefill 하기 위해 노출한다.
+        regulatoryType: m.regulatoryType ?? null,
       }));
 
       res.json({

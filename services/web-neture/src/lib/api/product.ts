@@ -9,9 +9,16 @@ import type { AdminMaster } from './admin.js';
 // WO-O4O-GLOBAL-PRODUCT-LIBRARY-SEARCH-V1
 export interface MasterSearchResult {
   id: string;
-  barcode: string;
-  marketingName: string;
+  /**
+   * WO-O4O-COSMETICS-SUPPLIER-PRODUCT-REGISTER-AND-EDIT-BROWSER-SMOKE-V1:
+   * 서버는 barcode 가 없는 master(화장품 32,674 전량 포함)를 null 로 반환한다. 타입을 실제 응답에 맞춘다.
+   */
+  barcode: string | null;
+  /** 서버 응답 필드명은 `name` 이다(marketingName 은 응답에 없다). */
+  name: string;
   regulatoryName: string;
+  /** 등록 화면 유형 prefill 용 — 서버 additive 필드 */
+  regulatoryType?: string | null;
   manufacturerName: string;
   specification: string | null;
   category: { id: string; name: string } | null;
