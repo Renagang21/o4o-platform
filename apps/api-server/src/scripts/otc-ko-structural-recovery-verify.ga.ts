@@ -58,8 +58,8 @@ async function main(): Promise<void> {
 
   /* ── 적용분 전건 재검증 ────────────────────────────────────────────────── */
   const ids = rows.map((r) => r.koId);
-  let checked = 0, hashOk = 0, residual = 0, numLost = 0, ageLost = 0, freqLost = 0, doseLost = 0,
-    prohLost = 0, labelBleed = 0, notInOfficial = 0, canonicalBad = 0;
+  let checked = 0, hashOk = 0, residual = 0, ageLost = 0, labelBleed = 0, notInOfficial = 0, canonicalBad = 0;
+  const numLost = 0, freqLost = 0, doseLost = 0, prohLost = 0;
   const fails: any[] = [];
   for (let i = 0; i < ids.length; i += 300) {
     const chunk = ids.slice(i, i + 300);

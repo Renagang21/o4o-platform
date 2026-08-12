@@ -336,7 +336,7 @@ export function ContentItemRenderer({
 
 // Helper functions
 function getYouTubeEmbedUrl(url: string): string {
-  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const regex = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
   const match = url.match(regex);
   if (match) {
     return `https://www.youtube.com/embed/${match[1]}`;

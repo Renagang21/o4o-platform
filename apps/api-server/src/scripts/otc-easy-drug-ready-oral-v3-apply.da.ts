@@ -251,7 +251,7 @@ async function main(): Promise<void> {
     masterCount: subs.reduce((t, s) => t + s.T, 0), results: [] as any[] };
   try {
     if (mode === 'dry-run') {
-      let koPlan = 0, enPlan = 0, ko0 = 0, enHeld = 0, anomaly = 0;
+      let koPlan = 0, enPlan = 0, enHeld = 0, anomaly = 0;
       for (const sg of subs) {
         const ko = await koBefore(ds, sg); const en = await enBefore(ds, sg);
         koPlan += ko.writePlanThisRun; enPlan += en.writePlanThisRun;

@@ -37,7 +37,7 @@ import { mapFunctionEnC } from './hff-sf-c-en-overlay.js';
 
 function stableHash(s: string): number { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
 const esc = (s: string): string => (s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const cmp = (s: string): string => s.replace(/[\s.,。、·:：;()\[\]/]/g, '');
+const cmp = (s: string): string => s.replace(/[\s.,。、·:：;()[\]/]/g, '');
 
 // ── A 전용 additive mapping: registry 미등록 **실재** 기능성 원료만 ──────────────────
 // 원료로 특정되지 않는 조각(추출물·유지·내용·제품·B1 등)은 의도적으로 넣지 않는다(오귀속 방지).

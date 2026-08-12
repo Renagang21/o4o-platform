@@ -256,7 +256,7 @@ function reducer(state: RuntimeState, action: Action): RuntimeState {
 //   숫자/숫자문자열이면 천단위 + '원', 숫자로 못 읽으면 '' 반환(호출부에서 원문/‘가격 문의’ 폴백).
 function formatPrice(price: number | string | null | undefined): string {
   if (price == null) return '';
-  const n = typeof price === 'string' ? Number(price.replace(/[^0-9.\-]/g, '')) : price;
+  const n = typeof price === 'string' ? Number(price.replace(/[^0-9.-]/g, '')) : price;
   if (!Number.isFinite(n)) return '';
   return Math.round(n).toLocaleString('ko-KR') + '원';
 }

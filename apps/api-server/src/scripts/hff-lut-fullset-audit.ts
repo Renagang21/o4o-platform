@@ -30,7 +30,7 @@ const CLS: Array<{ k: string; re: RegExp }> = [
 const classify = (label: string): string | null => { for (const c of CLS) if (c.re.test(label)) return c.k; return null; };
 
 // 생산 파이프라인(hff-combo-select) 과 동일한 SPEC 정규식
-const SPEC_STD = /([가-힣A-Za-z0-9()\-·]{2,22}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU)\s*(?:RE|α-?TE|NE|DFE)?\s*\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*(?:의\s*[\d.]+\s*[~∼\-]\s*[\d.]+\s*%|이상)/gi;
+const SPEC_STD = /([가-힣A-Za-z0-9()\-·]{2,22}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU)\s*(?:RE|α-?TE|NE|DFE)?\s*\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*(?:의\s*[\d.]+\s*[~∼-]\s*[\d.]+\s*%|이상)/gi;
 // 관대 스캔: 값-단위 뒤 임의 수식어(a-TE, α-TE, RAE, RE …) 허용
 const SPEC_ROBUST = /([가-힣A-Za-z0-9()\-·\s]{2,25}?)\s*[:：]\s*표시량\s*\(?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU)[^/)]{0,12}\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?/gi;
 

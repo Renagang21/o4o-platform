@@ -116,7 +116,8 @@ async function main(): Promise<void> {
   G('G6', '적용 창 이후 EN canonical 갱신', 0, enTouched);
 
   /* G7 — 역패치 복원 → 적용 전 해시 일치 (핵심 증명) */
-  let reverseOk = 0, reverseFail: string[] = [];
+  let reverseOk = 0;
+  const reverseFail: string[] = [];
   for (const r of rows) {
     const l = live.get(r.masterId); if (!l) continue;
     const heroNew = `<span class="sd-badge">${esc(r.newSummary)}</span>`;

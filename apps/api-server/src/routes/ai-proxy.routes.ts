@@ -941,7 +941,7 @@ function stripHtml(html: string): string {
     /^(login|sign\s*up|register|contact|menu|quick\s*menu|subscribe|newsletter)$/i,
     /^(정보|보도자료|저작권|광고|개발자|약관|크리에이터|채널|구독|좋아요|댓글|공유)$/,
     /^(home|about|services|products|blog|news|events|careers|faq|sitemap)$/i,
-    /^[\s\|·•\-–—]+$/,  // 구분자만 있는 라인
+    /^[\s|·•\-–—]+$/,  // 구분자만 있는 라인
     // CCL / 저작권 정책 문구 (부분 포함 매칭 — 어디 있든 제거)
     /저작자\s*명시/,
     /영리적?\s*사용\s*불가/,
@@ -1278,7 +1278,7 @@ router.post('/url-to-blocks', authenticate, async (req, res: Response) => {
      *  임계값 4→6: 한국어 4-단어 문장("비타민 D 결핍 주의")이 오탐되던 문제 방지
      */
     const isMenuLike = (text: string): boolean => {
-      const tokens = text.split(/[\s|,·\-–—\/]/).filter(Boolean);
+      const tokens = text.split(/[\s|,·\-–—/]/).filter(Boolean);
       return tokens.length >= 6 && tokens.every(t => t.length <= 6);
     };
 

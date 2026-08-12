@@ -54,7 +54,7 @@ const FUNC: Array<{ key: string; re: RegExp }> = [
 function classify(label: string): string | null { for (const f of FUNC) if (f.re.test(label)) return f.key; return null; }
 
 // 기능성 스펙 추출: "라벨 : N unit/basis 의 N~M%" (표시량 유무 무관, ratio 있는 것)
-const SPEC = /([가-힣A-Za-z0-9()\-·]{2,20}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU|억|CFU)\s*\)?\s*\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*(?:의|이상)?\s*(?:[\d.]+\s*[~∼\-]\s*[\d.]+\s*%|이상)/gi;
+const SPEC = /([가-힣A-Za-z0-9()\-·]{2,20}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU|억|CFU)\s*\)?\s*\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*(?:의|이상)?\s*(?:[\d.]+\s*[~∼-]\s*[\d.]+\s*%|이상)/gi;
 
 interface RawItem { PRDUCT?: string; STTEMNT_NO?: string; SUNGSANG?: string; SRV_USE?: string; MAIN_FNCTN?: string; BASE_STANDARD?: string; item?: RawItem }
 interface Stat { single: number; multi: number; vmMixed: number; liquid: number; stmts: string[] }

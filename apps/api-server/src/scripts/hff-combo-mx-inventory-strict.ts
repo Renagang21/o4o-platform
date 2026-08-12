@@ -35,7 +35,7 @@ const CLS: Array<{ k: string; re: RegExp }> = [
 ];
 const classify = (label: string): string | null => { for (const c of CLS) if (c.re.test(label)) return c.k; return null; };
 // select 의 엄격 SPEC: 반드시 "value unit / basis unit" + (의 X~Y% | 이상)
-const SPEC = /([가-힣A-Za-z0-9()\-·]{2,22}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU)\s*(?:RE|α-?TE|NE|DFE)?\s*\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*(?:의\s*[\d.]+\s*[~∼\-]\s*[\d.]+\s*%|이상)/gi;
+const SPEC = /([가-힣A-Za-z0-9()\-·]{2,22}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU)\s*(?:RE|α-?TE|NE|DFE)?\s*\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*(?:의\s*[\d.]+\s*[~∼-]\s*[\d.]+\s*%|이상)/gi;
 
 function isLiquidDrop(name: string, sungsang: string, srv: string): boolean {
   const t = `${name} ${sungsang}`;
@@ -67,7 +67,7 @@ for await (const it of src.gen as AsyncGenerator<HffRawItem>) {
     const lbl = m[1].trim();
     if (NONFUNC.test(lbl)) continue;
     const k = classify(lbl);
-    if (k) { if (!set.has(k)) { set.add(k); if (!/의\s*[\d.]+\s*[~∼\-]\s*[\d.]+\s*%/.test(m[0])) realBasis = false; } }
+    if (k) { if (!set.has(k)) { set.add(k); if (!/의\s*[\d.]+\s*[~∼-]\s*[\d.]+\s*%/.test(m[0])) realBasis = false; } }
     else unknown++;
   }
   if (set.size < LO || set.size > HI) continue;

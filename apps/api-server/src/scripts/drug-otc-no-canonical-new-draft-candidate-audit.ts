@@ -21,7 +21,7 @@ import { createHash } from 'node:crypto';
 const OUT_DIR = path.resolve(process.cwd(), 'src/scripts/data');
 const sha = (s: string) => createHash('md5').update(s).digest('hex').slice(0, 12);
 const NON_ORAL_RE = /질정|질용|질좌|질내|좌제|좌약|점안|안연고|점이|점비|비강|외용|크림|연고|로션|겔|젤|패치|첩부|카타플|파스|스프레이|에어로솔|가글|함수|트로키|질캡슐|vaginal/i;
-const COMBO_RE = /[\/+]|,|·(?=.*[가-힣])/; // 성분 suffix 복합 신호(보수적: / + ,)
+const COMBO_RE = /[/+]|,|·(?=.*[가-힣])/; // 성분 suffix 복합 신호(보수적: / + ,)
 
 const ingredientOf = (name: string): string | null => { const m = name.match(/\(([^)]+)\)\s*$/); return m ? m[1].trim() : null; };
 const doseOf = (spec: string | null): string => (spec || '').split(' / ')[0].trim();

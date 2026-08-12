@@ -32,7 +32,7 @@ const FUNC: Array<{ key: string; re: RegExp }> = [
 ];
 function classify(label: string): string | null { for (const f of FUNC) if (f.re.test(label)) return f.key; return null; }
 
-const SPEC = /([가-힣A-Za-z0-9()\-·]{2,22}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU)\s*\)?\s*\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*(?:의\s*[\d.]+\s*[~∼\-]\s*[\d.]+\s*%|이상)/gi;
+const SPEC = /([가-힣A-Za-z0-9()\-·]{2,22}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU)\s*\)?\s*\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*(?:의\s*[\d.]+\s*[~∼-]\s*[\d.]+\s*%|이상)/gi;
 
 function extractFuncSpec(base: string): { funcs: Set<string>; vm: number; unknown: number; declared: { value: number; unit: string; basisAmount: number; basisUnit: string; ratio: string } | null } {
   const b = normalizeSource(base); const funcs = new Set<string>(); let vm = 0, unknown = 0;
@@ -48,8 +48,8 @@ function extractFuncSpec(base: string): { funcs: Set<string>; vm: number; unknow
     if (!k) { unknown++; continue; }
     funcs.add(k);
     if (k === NUTRIENT) {
-      const ratioM = m[0].match(/([\d.]+\s*[~∼\-]\s*[\d.]+)\s*%/);
-      declared = { value: numOf(m[2]), unit: uNorm(m[3]), basisAmount: numOf(m[4]), basisUnit: uNorm(m[5]), ratio: ratioM ? `${ratioM[1].replace(/\s/g, '').replace(/[∼\-]/g, '~')}%` : '표시량 이상' };
+      const ratioM = m[0].match(/([\d.]+\s*[~∼-]\s*[\d.]+)\s*%/);
+      declared = { value: numOf(m[2]), unit: uNorm(m[3]), basisAmount: numOf(m[4]), basisUnit: uNorm(m[5]), ratio: ratioM ? `${ratioM[1].replace(/\s/g, '').replace(/[∼-]/g, '~')}%` : '표시량 이상' };
     }
   }
   return { funcs, vm, unknown, declared };
@@ -61,7 +61,7 @@ function extractFunctions(mainFn: string): string[] {
   const parts = t.split(/[①②③④⑤⑥⑦⑧⑨⑩⑪⑫]|\((?:가|나|다|라|마|바|사|\d+)\)|(?:^|\s)\d+[).]|(?<=필요|있음|줌|도움|보호|유지|생성|합성|발달|개선|억제|완화|증진)\s*[.,。、/]?\s+(?=[가-힣])/)
     .map((x) => x.trim().replace(/^[-•*\s:：·]+/, '').replace(/[.。]+$/, '').trim())
     // "라벨 : " 접두 제거(도움/개선/필요 앞) — 밀크씨슬추출물 : 간 건강에 도움
-    .map((x) => x.replace(/^[가-힣A-Za-z0-9()\-]{2,25}\s*[:：]\s*(?=.*(도움|개선|필요|유지|억제|완화|증진|보호))/, '').trim())
+    .map((x) => x.replace(/^[가-힣A-Za-z0-9()-]{2,25}\s*[:：]\s*(?=.*(도움|개선|필요|유지|억제|완화|증진|보호))/, '').trim())
     .filter((x) => x.length >= 5 && /도움|개선|필요|유지|억제|완화|증진|보호|생성/.test(x));
   return [...new Set(parts)];
 }

@@ -30,10 +30,11 @@ const CLS: Array<{ k: string; re: RegExp }> = [
   { k: '테아닌', re: /테아닌/i }, { k: '녹차', re: /녹차|카테킨|EGCG/i }, { k: '옥타코사놀', re: /옥타코사놀/i }, { k: '베타글루칸', re: /베타글루칸/i }, { k: '홍국', re: /홍국|모나콜린/i },
 ];
 const classify = (l: string): string | null => { for (const c of CLS) if (c.re.test(l)) return c.k; return null; };
-const SPEC = /([가-힣A-Za-z0-9()\-·]{2,22}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU|억|CFU)\s*\)?\s*(?:\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*)?(?:의\s*[\d.]+\s*[~∼\-]\s*[\d.]+\s*%|이상|표시량)/gi;
+const SPEC = /([가-힣A-Za-z0-9()\-·]{2,22}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU|억|CFU)\s*\)?\s*(?:\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*)?(?:의\s*[\d.]+\s*[~∼-]\s*[\d.]+\s*%|이상|표시량)/gi;
 
 const combos: Record<string, number> = {};
-let total = 0, byN: Record<number, number> = {};
+let total = 0;
+const byN: Record<number, number> = {};
 const src = resolveSource(process.argv, process.env, undefined); // 전량 fetch (prefilter 없음)
 for await (const it of src.gen as AsyncGenerator<HffRawItem>) {
   total++;

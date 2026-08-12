@@ -704,8 +704,8 @@ export class FormsController {
         break;
 
       case 'tel': {
-        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-        if (!phoneRegex.test(value.replace(/[\s\-\(\)]/g, ''))) {
+        const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
+        if (!phoneRegex.test(value.replace(/[\s\-()]/g, ''))) {
           return { valid: false, error: 'Invalid phone number format' };
         }
         break;

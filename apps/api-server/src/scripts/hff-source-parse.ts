@@ -102,7 +102,7 @@ export function parseSpecs(base: string): SpecParse {
     const label = m[1].trim(); if (NONFUNC.test(label)) continue;
     const k = classify(label); if (!k) { unknownLabels.push(label); continue; }
     if (byKey.has(k)) continue;
-    const ratio = m[6] ? `${m[6].replace(/\s/g, '').replace(/[∼\-]/g, '~')}%` : m[7] ? `${m[7].replace(/\s/g, '')}% 이상` : '표시량 이상';
+    const ratio = m[6] ? `${m[6].replace(/\s/g, '').replace(/[∼-]/g, '~')}%` : m[7] ? `${m[7].replace(/\s/g, '')}% 이상` : '표시량 이상';
     byKey.set(k, { value: numOf(m[2]), unit: uNorm(m[3]), basisAmount: numOf(m[4]), basisUnit: uNorm(m[5]), ratio, evidence: m[0].trim() });
   }
   // 안전망: 값/기준 규격을 가졌으나 SPEC_RE 가 캡처하지 못한 라인은 소실시키지 않고 unknownLabels 로 강제 편입한다.
@@ -127,7 +127,7 @@ export function splitFunctions(mainFn: string): string[] {
   return [...new Set(t.split(new RegExp(
     SENT + '|[①②③④⑤⑥⑦⑧⑨⑩⑪⑫]|\\((?:가|나|다|라|마|바|사|\\d+)\\)|(?:^|\\s)\\d+[).]|' +
     '(?<=필요|있음|줌|도움|보호|유지|생성|합성|발달|개선|억제|완화|증진)\\s*[.,。、/]?\\s+(?=[가-힣])'))
-    .map((x) => x.trim().replace(/^[-•*\s:：·,，]+/, '').replace(/[.。,，、·\s]+$/, '').replace(/^[가-힣A-Za-z0-9()\-]{2,25}\s*[:：]\s*(?=.*(도움|개선|필요|유지|억제|완화|증진|보호))/, '').trim())
+    .map((x) => x.trim().replace(/^[-•*\s:：·,，]+/, '').replace(/[.。,，、·\s]+$/, '').replace(/^[가-힣A-Za-z0-9()-]{2,25}\s*[:：]\s*(?=.*(도움|개선|필요|유지|억제|완화|증진|보호))/, '').trim())
     .filter((x) => x.length >= 5 && /도움|개선|필요|유지|억제|완화|증진|보호|생성|합성/.test(x)))];
 }
 
@@ -286,7 +286,7 @@ export function parseFiberSources(base: string, fn = ''): FiberParse {
   while ((m = FIBER_SPEC_RE.exec(b)) !== null) {
     const label = m[1].trim();
     if (NONFUNC.test(label) || !FIBER_ANY.test(label)) continue; // 식이섬유 라인만
-    const ratio = m[6] ? `${m[6].replace(/\s/g, '').replace(/[∼\-]/g, '~')}%`
+    const ratio = m[6] ? `${m[6].replace(/\s/g, '').replace(/[∼-]/g, '~')}%`
       : m[7] ? `${m[7].replace(/\s/g, '')}% 이상` : '표시량 이상';
     const spec: FiberSpec = {
       value: numOf(m[2]), unit: uNorm(m[3]), basisAmount: numOf(m[4]), basisUnit: bunitNorm(m[5]),

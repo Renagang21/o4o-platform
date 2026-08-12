@@ -35,7 +35,7 @@ import { mapFunctionEnC } from './hff-sf-c-en-overlay.js';
 function stableHash(s: string): number { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; }
 const esc = (s: string): string => (s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 /** 비교용 정규화(문장부호·공백 제거) — 렌더 누락 판정에만 사용. */
-const cmp = (s: string): string => s.replace(/[\s.,。、·:：;()\[\]/]/g, '');
+const cmp = (s: string): string => s.replace(/[\s.,。、·:：;()[\]/]/g, '');
 
 // ── 로컬 라벨 블록 파서(공용 parseFnAttribution 무수정 · 블록 보존) ────────────────
 type MiMode = 'bracket' | 'numbered' | 'colon' | 'none';

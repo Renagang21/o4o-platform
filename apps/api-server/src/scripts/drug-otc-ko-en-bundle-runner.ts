@@ -143,7 +143,7 @@ function extractJson(text: string): any | null {
 
 /** 실패 경로에서 runner 가 남긴 진단 JSON 파일명을 회수. */
 function extractRunFile(text: string): string | null {
-  const m = text.match(/([\w.\-]+\.run\.json)/);
+  const m = text.match(/([\w.-]+\.run\.json)/);
   return m ? m[1] : null;
 }
 

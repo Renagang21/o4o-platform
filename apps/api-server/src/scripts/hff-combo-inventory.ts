@@ -32,7 +32,7 @@ const CLS: Array<{ k: string; re: RegExp }> = [
 function classify(label: string): string | null { for (const c of CLS) if (c.re.test(label)) return c.k; return null; }
 
 // 스펙(비타민 표시량 or 기능성 지표성분 ratio) 라벨 집합
-const SPEC = /([가-힣A-Za-z0-9()\-·]{2,22}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU|억|CFU)\s*\)?\s*(?:\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*)?(?:의\s*[\d.]+\s*[~∼\-]\s*[\d.]+\s*%|이상|표시량)/gi;
+const SPEC = /([가-힣A-Za-z0-9()\-·]{2,22}?)\s*[:：]\s*(?:표시량\s*\(?)?\s*([\d][\d,.]*)\s*(mg|g|㎍|μg|mcg|IU|억|CFU)\s*\)?\s*(?:\/\s*([\d][\d,.]*)\s*(mg|g)\s*\)?\s*)?(?:의\s*[\d.]+\s*[~∼-]\s*[\d.]+\s*%|이상|표시량)/gi;
 
 interface RawItem { PRDUCT?: string; STTEMNT_NO?: string; SUNGSANG?: string; SRV_USE?: string; MAIN_FNCTN?: string; BASE_STANDARD?: string; item?: RawItem }
 const combos: Record<string, { count: number; stmts: string[] }> = {};

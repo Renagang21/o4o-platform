@@ -137,7 +137,7 @@ for await (const line of rl) {
   const nb = normalizeSource(base);
   const RATIO_N = String.raw`[\d]+(?:\.[\d]+)?\s*[~\-∼]\s*[\d]+(?:\.[\d]+)?`;
   const ratioM = nb.match(new RegExp(String.raw`표시량[^)]*\)\s*의?\s*(${RATIO_N})\s*%`)) ?? nb.match(new RegExp(String.raw`(${RATIO_N})\s*%`));
-  const ratio = ratioM ? `${ratioM[1].replace(/\s/g, '').replace(/[∼\-]/g, '~').replace(/\.0+(?=~|$)/g, '')}%` : '80~180%';
+  const ratio = ratioM ? `${ratioM[1].replace(/\s/g, '').replace(/[∼-]/g, '~').replace(/\.0+(?=~|$)/g, '')}%` : '80~180%';
   const waterInSource = /물|음용수/.test(normalizeSource(srv)) && !/물\s*없이/.test(normalizeSource(srv));
 
   eligible.push({

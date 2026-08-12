@@ -60,7 +60,7 @@ function vdResidual(mainFn: string): string {
   // VD 라벨/마커 제거
   t = t.replace(/비타민\s?D3?/g, ' ').replace(/vitamin\s?d3?/gi, ' ');
   t = t.replace(/\[[^\]]*\]/g, ' ');
-  t = t.replace(/[*·・ㆍ①②③④⑤⑥⑦⑧⑨⑩⑪⑫㉠㉡\-()（）:：,.\/0-9%~＊「」『』]/g, ' ');
+  t = t.replace(/[*·・ㆍ①②③④⑤⑥⑦⑧⑨⑩⑪⑫㉠㉡\-()（）:：,./0-9%~＊「」『』]/g, ' ');
   t = t.replace(/[a-zA-Z]/g, ' '); // 잔여 영문(vitamin d 등) 제거
   return t.replace(/\s+/g, '').trim();
 }
@@ -234,7 +234,7 @@ for await (const line of rl) {
   const nb = normalizeSource(base);
   const RATIO_N = String.raw`[\d]+(?:\.[\d]+)?\s*[~\-∼]\s*[\d]+(?:\.[\d]+)?`;
   const ratioM = nb.match(new RegExp(String.raw`표시량[^)]*\)\s*의\s*(${RATIO_N})\s*%`)) ?? nb.match(new RegExp(String.raw`(${RATIO_N})\s*%`));
-  const ratio = ratioM ? `${ratioM[1].replace(/\s/g, '').replace(/[∼\-]/g, '~').replace(/\.0+(?=~|$)/g, '')}%` : '80~180%';
+  const ratio = ratioM ? `${ratioM[1].replace(/\s/g, '').replace(/[∼-]/g, '~').replace(/\.0+(?=~|$)/g, '')}%` : '80~180%';
   const hasColiform = /대장균군\s*[:：]?\s*음성/.test(nb);
   const directGrounded = /그대로|직접|털어서/.test(normalizeSource(srv)) && !waterInSource;
 

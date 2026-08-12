@@ -967,7 +967,7 @@ export function ruleQ(input: GuardProductInput): GuardFinding[] {
   {
     const cells = [...input.drafts.ko.matchAll(/<div class="sd-item"[^>]*>([\s\S]*?)<\/div>|<li[^>]*>([\s\S]*?)<\/li>/g)]
       .map((m) => stripHtml(m[1] ?? m[2] ?? ''));
-    const dangling = new RegExp(`${MID_DOT_CLASS}\s*$`);
+    const dangling = new RegExp(String.raw`${MID_DOT_CLASS}\s*$`);
     for (const c of cells) {
       if (dangling.test(c)) {
         out.push({

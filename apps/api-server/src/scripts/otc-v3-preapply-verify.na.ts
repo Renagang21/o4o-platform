@@ -42,7 +42,8 @@ async function main(): Promise<void> {
       const allIds = ko.fingerprints.flatMap((f: any) => f.masterIds);
       masterByUnit[unit] = allIds;
       const fpItems: any[] = [];
-      let srcRefMismatch = 0, koGate = 0, enGate = 0, presenceMismatch = 0;
+      let srcRefMismatch = 0, koGate = 0, enGate = 0;
+      const presenceMismatch = 0;
 
       for (const f of ko.fingerprints) {
         const e = enByFp[f.fp];

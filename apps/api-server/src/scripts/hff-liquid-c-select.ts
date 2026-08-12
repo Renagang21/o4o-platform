@@ -112,7 +112,7 @@ for await (const line of rl) {
   const nb = normalizeSource(base);
   const RATIO_N = String.raw`[\d]+(?:\.[\d]+)?\s*[~\-∼]\s*[\d]+(?:\.[\d]+)?`;
   const ratioM = nb.match(new RegExp(String.raw`표시량[^)]*\)\s*의?\s*(${RATIO_N})\s*%`)) ?? nb.match(new RegExp(String.raw`(${RATIO_N})\s*%`)) ?? nb.match(/(\d+)\s*%\s*이상/);
-  const ratio = ratioM ? (ratioM[0].includes('이상') ? `${ratioM[1]}% 이상` : `${ratioM[1].replace(/\s/g, '').replace(/[∼\-]/g, '~')}%`) : '80~120%';
+  const ratio = ratioM ? (ratioM[0].includes('이상') ? `${ratioM[1]}% 이상` : `${ratioM[1].replace(/\s/g, '').replace(/[∼-]/g, '~')}%`) : '80~120%';
   const uType = /젤리|구미/.test(`${sungsang} ${srv}`) ? 'gummy' : 'liquid';
   const servingUnitKo = myUnit.unit ?? (hasContainerServe ? (normalizeSource(srv).match(new RegExp(SERVE_CONTAINER))?.[0] ?? '병') : '병');
   formHist[servingUnitKo] = (formHist[servingUnitKo] ?? 0) + 1;
