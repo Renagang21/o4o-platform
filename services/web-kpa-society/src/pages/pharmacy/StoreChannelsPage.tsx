@@ -88,6 +88,10 @@ import { GuideEditableSection } from '../../components/guide';
 import { GuideBlock } from '@o4o/shared-space-ui';
 import { fetchGuidePageContent } from '../../api/guideContent';
 import { kpaConfig } from '@o4o/operator-ux-core';
+// WO-O4O-KPA-NAVER-ONLINE-SALES-CONNECTION-AND-PILOT-CLOSEOUT-V1:
+//   자체 storefront 은퇴 후 온라인 판매는 외부 채널(네이버·쿠팡)이 담당한다.
+//   판매 설정 화면에 외부 채널 연동·판매 조건 입력 패널을 붙인다 (신규 메뉴·라우트 없음).
+import { ExternalSalesPanel } from './sections/ExternalSalesPanel';
 
 /* ─── Constants ──────────────────────────────── */
 
@@ -843,11 +847,16 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
           <Link to="/store" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
         </div>
         <h1 className="text-2xl font-bold text-slate-900 mb-8">{pageTitle}</h1>
-        <div className="text-center py-16 bg-white rounded-lg border border-slate-200">
+        <div className="text-center py-10 bg-white rounded-lg border border-slate-200 mb-8">
           <Package className="w-10 h-10 mx-auto mb-3 text-slate-300" />
           <p className="text-sm text-slate-500">자체 온라인 스토어는 운영을 종료했습니다.</p>
           <p className="text-xs text-slate-400 mt-1">온라인 판매는 네이버·쿠팡 등 외부 판매 채널로 대체됩니다.</p>
         </div>
+        {/* WO-O4O-KPA-NAVER-ONLINE-SALES-CONNECTION-AND-PILOT-CLOSEOUT-V1:
+            legacy B2C 채널 row 가 없는 매장(신규 매장)이 다수다. 이 경우에도 외부 판매
+            채널 연동은 가능해야 하므로 빈 상태에서도 패널을 노출한다.
+            (여기서 빠지면 신규 매장은 외부 판매 진입로가 아예 없다) */}
+        {showSettings && <ExternalSalesPanel showToast={showToast} />}
       </div>
     );
   }

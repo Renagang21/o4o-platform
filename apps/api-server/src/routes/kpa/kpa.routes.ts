@@ -92,6 +92,7 @@ import { createProductMarketingController } from '../o4o-store/controllers/produ
 import { createMultilingualProductContentController } from '../o4o-store/controllers/multilingual-product-content.controller.js'; // WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1
 import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
 import { createStoreChannelProductsController } from '../o4o-store/controllers/store-channel-products.controller.js';
+import { createStoreExternalSalesController } from '../o4o-store/controllers/store-external-sales.controller.js'; // WO-O4O-KPA-NAVER-ONLINE-SALES-CONNECTION-AND-PILOT-CLOSEOUT-V1
 import { createKpaStoreTemplateController } from '../o4o-store/controllers/kpa-store-template.controller.js';
 import { createKpaCheckoutController } from './controllers/kpa-checkout.controller.js'; // WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
 import { createKpaPaymentController } from './controllers/kpa-payment.controller.js'; // WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
@@ -397,6 +398,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Channel Product Management (WO-CHANNEL-EXECUTION-CONSOLE-V1)
   // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='kpa' 전달.
   router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any, 'kpa'));
+
+  // External Sales — 외부 판매 채널(네이버·쿠팡) 연동 상태 · 판매 조건 입력
+  // WO-O4O-KPA-NAVER-ONLINE-SALES-CONNECTION-AND-PILOT-CLOSEOUT-V1
+  //   KPA 한정 mount. GP/K-Cosmetics 는 자체 storefront 정비 상태가 달라 이번 범위 밖.
+  router.use('/store-hub/external-sales', createStoreExternalSalesController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Pharmacy Store Config routes (WO-PHARMACY-HUB-REALIGN-PHASEH2-V1)
   // WO-O4O-STORE-GUARD-PHASE2C-CONFIG-AND-HUB-V1: serviceKey='kpa' 전달.

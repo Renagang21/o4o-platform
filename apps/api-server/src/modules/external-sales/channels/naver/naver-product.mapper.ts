@@ -168,6 +168,31 @@ export function collectMissingRequired(
   return missing;
 }
 
+/**
+ * 판매 조건(추가 입력) 축만 실측한다.
+ *
+ * 목록 화면처럼 상품 축(이미지·상세 HTML)을 매번 조회하기엔 비싼 경로에서 쓴다.
+ * 상품 축까지 함께 봐야 하면 `collectMissingRequired()` 를 쓴다.
+ */
+export function collectMissingChannelInput(input: NaverChannelInput): MissingRequiredField[] {
+  return collectMissingRequired(
+    {
+      masterId: '',
+      name: 'x',
+      regulatoryType: null,
+      brandName: null,
+      manufacturerName: null,
+      originCountry: null,
+      specification: null,
+      salePrice: 1,
+      representativeImageUrl: 'x',
+      optionalImageUrls: [],
+      detailContentHtml: 'x',
+    },
+    input,
+  ).filter((m) => m.origin === 'CHANNEL_INPUT');
+}
+
 /** 상품 상태 — 파일럿은 판매중지(SUSPENSION)로 올려 노출 없이 검증한다 */
 export type NaverProductStatusType = 'SALE' | 'SUSPENSION' | 'OUTOFSTOCK' | 'WAIT';
 

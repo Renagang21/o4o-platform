@@ -287,6 +287,12 @@ import {
 } from '../modules/store-core/entities/index.js';
 
 // ============================================================================
+// EXTERNAL SALES ENTITIES (WO-O4O-KPA-NAVER-ONLINE-SALES-CONNECTION-AND-PILOT-CLOSEOUT-V1)
+// 외부 판매 채널(네이버·쿠팡) 연동 상태. 상품 원장 복제 아님 — 상태만 저장한다.
+// ============================================================================
+import { ExternalChannelProductLink } from '../modules/external-sales/entities/external-channel-product-link.entity.js';
+
+// ============================================================================
 // KPA ENTITIES (Pharmacist Association SaaS)
 // ============================================================================
 import {
@@ -325,6 +331,8 @@ import {
   BranchSite,
   BranchDomain,
   BranchPost,
+  // WO-O4O-KPA-BRANCH-ANNUAL-REPORT-TEMPLATE-SCHEMA-V1
+  AnnualReportTemplate,
 } from '../routes/kpa-branch/entities/index.js';
 
 // ============================================================================
@@ -762,6 +770,10 @@ export const entities = [
   StoreProductProfile,
   StoreCapability,
   // ============================================================================
+  // EXTERNAL SALES ENTITIES (WO-O4O-KPA-NAVER-ONLINE-SALES-CONNECTION-AND-PILOT-CLOSEOUT-V1)
+  // ============================================================================
+  ExternalChannelProductLink,
+  // ============================================================================
   // KPA ENTITIES (Pharmacist Association SaaS)
   // ============================================================================
   KpaMember,
@@ -803,6 +815,8 @@ export const entities = [
   BranchSite,
   BranchDomain,
   BranchPost,
+  // WO-O4O-KPA-BRANCH-ANNUAL-REPORT-TEMPLATE-SCHEMA-V1
+  AnnualReportTemplate,
   // ============================================================================
   // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
   // ============================================================================
