@@ -10,6 +10,9 @@ import type { AuthRequest } from '../../../common/middleware/auth.middleware.js'
 import { AppDataSource } from '../../../database/connection.js';
 import logger from '../../../utils/logger.js';
 import { deriveUserScopes } from '../../../utils/scope-assignment.utils.js';
+// WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1: businessInfo 부분 갱신 (스냅샷 되쓰기 제거)
+import type { BusinessInfoPatch } from '../../../utils/business-info-write.js';
+import { buildBusinessInfoUpdateStatement } from '../../../utils/business-info-write.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
 import { getCachedRoles, setCachedRoles } from '../utils/role-cache.js';
 import { derivePharmacistQualification } from './auth-helpers.js';
@@ -203,15 +206,25 @@ export class AuthAccountController extends BaseController {
           for (const key of allowedFields) {
             if (businessInfo[key] !== undefined) sanitized[key] = businessInfo[key];
           }
-          if (Object.keys(sanitized).length > 0) {
-            const [existingUser] = await manager.query(
-              `SELECT "businessInfo" FROM users WHERE id = $1`, [userId]
-            );
-            const merged = { ...(existingUser?.businessInfo || {}), ...sanitized };
-            await manager.query(
-              `UPDATE users SET "businessInfo" = $1 WHERE id = $2`,
-              [JSON.stringify(merged), userId]
-            );
+
+          // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1:
+          //   기존 구현은 SELECT 로 읽은 스냅샷에 patch 를 합쳐 통째로 되썼다.
+          //   그 사이 다른 경로가 commit 한 키는 이번 요청이 손대지 않았는데도 사라졌다.
+          //   교정: 명시된 키만 patch 로 넘기고 병합은 DB 가 단일 statement 안에서 수행한다.
+          //   storeAddress 는 중첩 객체이므로 통째로 교체하지 않고 하위 키만 병합한다
+          //   (요청에 없는 하위 키 보존). 객체가 아닌 값(null 등)은 기존 계약대로
+          //   최상위 값 그대로 저장한다.
+          const { storeAddress, ...rootFields } = sanitized;
+          const storeAddressIsObject = storeAddress && typeof storeAddress === 'object' && !Array.isArray(storeAddress);
+          const patch: BusinessInfoPatch = {
+            root: storeAddressIsObject ? rootFields : sanitized,
+            ...(storeAddressIsObject && Object.keys(storeAddress).length > 0
+              ? { nested: { storeAddress: storeAddress as Record<string, unknown> } }
+              : {}),
+          };
+          const bizUpdate = buildBusinessInfoUpdateStatement(patch, userId);
+          if (bizUpdate) {
+            await manager.query(bizUpdate.sql, bizUpdate.params);
           }
         }
 

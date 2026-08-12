@@ -22,6 +22,9 @@ import { organizationOpsService } from '../../../modules/organization/services/o
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 // WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1: businessInfo 주소·약국 전화 read 정렬 (read-only)
 import { resolveKpaBusinessContact } from '../shared/businessInfoRead.js';
+// WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1: businessInfo 부분 갱신 (스냅샷 되쓰기 제거)
+import type { BusinessInfoPatch } from '../../../utils/business-info-write.js';
+import { applyBusinessInfoPatch, buildBusinessInfoUpdateStatement } from '../../../utils/business-info-write.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -1298,46 +1301,59 @@ export function createMemberController(
           //   WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1:
           //   zipCode / address1→address / address2 → users.businessInfo canonical address fields.
           //   pharmacy_address 미전송 시 분리 필드로 합성 → kpa_members.pharmacy_address 동기화.
-          let nextBiz: Record<string, any> | null = null;
+          // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1:
+          //   기존 구현은 prevBiz 스냅샷을 통째로 되썼다(`SET "businessInfo" = $1::jsonb`).
+          //   그 사이 다른 경로(본인 마이페이지의 metadata.workplace 등)가 commit 한 키는
+          //   이번 요청이 손대지 않았는데도 스냅샷 값으로 덮여 사라졌다.
+          //   교정: 이번 요청이 **명시한 키만** patch 로 모아 DB 부분 갱신에 맡긴다.
+          const bizRoot: Record<string, any> = {};
+          const bizMetadata: Record<string, any> = {};
           const hasBizUpdate = business_number !== undefined || pharmacy_phone !== undefined
             || contactName !== undefined
             || zipCode !== undefined || address1 !== undefined || address2 !== undefined
             // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1: 3개 필드 추가
             || ownerPhone !== undefined || ceoName !== undefined || taxInvoiceEmail !== undefined;
           if (hasBizUpdate) {
-            nextBiz = { ...prevBiz };
             if (business_number !== undefined) {
-              nextBiz.businessNumber = business_number;
+              bizRoot.businessNumber = business_number;
               changes.business_number = business_number;
             }
             if (pharmacy_phone !== undefined) {
-              nextBiz.metadata = { ...((prevBiz.metadata as Record<string, any>) || {}), pharmacy_phone };
+              // metadata 는 중첩 부분 갱신 — 형제 키(workplace 등)를 보존한다.
+              bizMetadata.pharmacy_phone = pharmacy_phone;
               changes.pharmacy_phone = pharmacy_phone;
             }
-            if (contactName !== undefined) { nextBiz.contactName = contactName || null; changes.contactName = contactName; }
-            if (zipCode !== undefined) { nextBiz.zipCode = zipCode || null; changes.zipCode = zipCode; }
-            if (address1 !== undefined) { nextBiz.address = address1 || null; changes.address1 = address1; }
-            if (address2 !== undefined) { nextBiz.address2 = address2 || null; changes.address2 = address2; }
+            if (contactName !== undefined) { bizRoot.contactName = contactName || null; changes.contactName = contactName; }
+            if (zipCode !== undefined) { bizRoot.zipCode = zipCode || null; changes.zipCode = zipCode; }
+            if (address1 !== undefined) { bizRoot.address = address1 || null; changes.address1 = address1; }
+            if (address2 !== undefined) { bizRoot.address2 = address2 || null; changes.address2 = address2; }
             // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
             //   정책 B (canonical-only write): ownerPhone / ceoName / taxInvoiceEmail 만 저장.
-            //   representativeName / taxEmail 등 legacy alias 는 재저장하지 않음 (prevBiz spread 로
-            //   그대로 보존됨 — 신규 write 에서 절대 touch 금지).
+            //   representativeName / taxEmail 등 legacy alias 는 재저장하지 않음
+            //   (patch 에 포함하지 않으므로 DB 에 저장된 값이 그대로 보존됨 — 신규 write 에서 절대 touch 금지).
             //   정책 A (빈 문자열 = 변경 없음): frontend 변경 감지가 빈 값 skip 을 보장하므로
             //   payload 에 키 자체가 없으면 분기 미진입 (기존 패턴과 동일).
-            if (ownerPhone !== undefined) { nextBiz.ownerPhone = ownerPhone || null; changes.ownerPhone = ownerPhone; }
-            if (ceoName !== undefined) { nextBiz.ceoName = ceoName || null; changes.ceoName = ceoName; }
-            if (taxInvoiceEmail !== undefined) { nextBiz.taxInvoiceEmail = taxInvoiceEmail || null; changes.taxInvoiceEmail = taxInvoiceEmail; }
-            await manager.query(
-              `UPDATE users SET "businessInfo" = $1::jsonb, "updatedAt" = NOW() WHERE id = $2`,
-              [JSON.stringify(nextBiz), member.user_id]
-            );
-            // 갱신값을 prevBiz 에 반영 — 이후 부여 분기에서 사용
-            Object.assign(prevBiz, nextBiz);
+            if (ownerPhone !== undefined) { bizRoot.ownerPhone = ownerPhone || null; changes.ownerPhone = ownerPhone; }
+            if (ceoName !== undefined) { bizRoot.ceoName = ceoName || null; changes.ceoName = ceoName; }
+            if (taxInvoiceEmail !== undefined) { bizRoot.taxInvoiceEmail = taxInvoiceEmail || null; changes.taxInvoiceEmail = taxInvoiceEmail; }
+
+            const bizPatch: BusinessInfoPatch = {
+              root: bizRoot,
+              ...(Object.keys(bizMetadata).length > 0 ? { nested: { metadata: bizMetadata } } : {}),
+            };
+            const bizUpdate = buildBusinessInfoUpdateStatement(bizPatch, member.user_id);
+            if (bizUpdate) {
+              await manager.query(bizUpdate.sql, bizUpdate.params);
+            }
+            // 갱신값을 prevBiz 에 반영 — 이후 부여 분기 / 주소 합성에서 사용.
+            //   DB 가 수행한 부분 병합과 동일한 결과를 메모리에서 재현한다.
+            Object.assign(prevBiz, applyBusinessInfoPatch(prevBiz, bizPatch));
 
             // kpa_members.pharmacy_address 동기화:
             //   pharmacy_address 가 명시 전송되지 않은 경우, 분리 필드로 합성하여 덮어씀.
             if (pharmacy_address === undefined && (address1 !== undefined || zipCode !== undefined)) {
-              const bz = nextBiz as Record<string, any>;
+              // prevBiz 는 바로 위에서 patch 반영이 끝난 "갱신 후" 값이다.
+              const bz = prevBiz;
               const composed = [bz.zipCode, bz.address, bz.address2].filter(Boolean).join(' ').trim();
               if (composed) {
                 changes.pharmacy_address = composed;

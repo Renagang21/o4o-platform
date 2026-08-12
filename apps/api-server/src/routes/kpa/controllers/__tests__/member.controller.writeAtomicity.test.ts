@@ -255,11 +255,17 @@ describe('PATCH /kpa/members/:id/info — write atomicity', () => {
     const handler = getHandler(h.dataSource, '/:id/info', 'patch');
     await handler(req({ business_number: '999-88-77777' }), makeRes());
 
-    const bizWrite = h.calls.find((c) => /UPDATE users SET "businessInfo"/i.test(c.sql));
+    const bizWrite = h.calls.find((c) => /UPDATE users\s+SET "businessInfo"/i.test(c.sql));
     expect(bizWrite).toBeDefined();
     const payload = JSON.parse(bizWrite!.params[0]);
     expect(payload.businessNumber).toBe('999-88-77777');
-    expect(payload.legacyKeep).toBe('keep-me');
+
+    // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1:
+    //   보존 방식이 바뀌었다. 이전에는 애플리케이션이 legacy 키까지 payload 에 담아
+    //   통째로 되썼다(그래서 그 사이 다른 경로가 저장한 값이 사라졌다).
+    //   이제는 **patch 에 담지 않는 것** 이 곧 보존이며, 병합은 DB 가 수행한다.
+    expect(payload).not.toHaveProperty('legacyKeep');
+    expect(bizWrite!.sql).toContain('"businessInfo"::jsonb');
   });
 });
 

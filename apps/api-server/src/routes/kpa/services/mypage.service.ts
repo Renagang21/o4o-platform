@@ -14,6 +14,8 @@
 import type { DataSource } from 'typeorm';
 // WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1: businessInfo 주소·약국 전화 read 정렬 (read-only)
 import { resolveKpaBusinessContact } from '../shared/businessInfoRead.js';
+// WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1: businessInfo 부분 갱신 (스냅샷 되쓰기 제거)
+import { buildBusinessInfoUpdateStatement } from '../../../utils/business-info-write.js';
 
 export class MypageService {
   constructor(private dataSource: DataSource) {}
@@ -147,16 +149,15 @@ export class MypageService {
     if (data.nickname !== undefined) updateData.nickname = data.nickname;
     if (data.phone !== undefined) updateData.phone = data.phone ? data.phone.replace(/\D/g, '') : data.phone;
 
-    // workplace → businessInfo.metadata.workplace (JSONB). 기존 businessInfo 와 병합.
-    if (data.workplace !== undefined) {
-      const existing = await userRepository.findOne({ where: { id: userId } }) as any;
-      const bi = (existing?.businessInfo as any) || {};
-      const meta = (bi.metadata as Record<string, any> | undefined) || {};
-      updateData.businessInfo = {
-        ...bi,
-        metadata: { ...meta, workplace: data.workplace || null },
-      };
-    }
+    // workplace → businessInfo.metadata.workplace (JSONB).
+    // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1:
+    //   기존 구현은 businessInfo 전체를 읽어 통째로 되썼다. 같은 metadata 객체에
+    //   KPA 운영자 경로가 `pharmacy_phone` 을 쓰므로, 이 경로가 workplace 를 저장하는
+    //   순간 그 사이 저장된 pharmacy_phone 이 옛 스냅샷 값으로 덮일 수 있었다.
+    //   교정: workplace 하위 키만 patch 로 넘기고 병합은 DB 가 수행한다.
+    const bizPatch = data.workplace !== undefined
+      ? { nested: { metadata: { workplace: data.workplace || null } } }
+      : null;
 
     // lastName/firstName 둘 중 하나만 와도 name 자동 생성
     if (data.lastName !== undefined || data.firstName !== undefined) {
@@ -165,8 +166,21 @@ export class MypageService {
       updateData.name = `${newLastName}${newFirstName}`.trim() || updateData.name;
     }
 
-    if (Object.keys(updateData).length > 0) {
-      await userRepository.update(userId, updateData);
+    // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1:
+    //   scalar 컬럼 update 와 businessInfo 부분 갱신은 서로 다른 statement 이므로
+    //   단일 transaction 으로 묶는다 (중간 실패 시 둘 다 반영되지 않는다).
+    //   university → kpa_members 는 기존 계약대로 best-effort 이므로 이 경계 밖에 둔다
+    //   (실패를 삼키는 write 를 같은 transaction 에 넣으면 transaction 전체가 오염된다).
+    if (Object.keys(updateData).length > 0 || bizPatch) {
+      await this.dataSource.transaction(async (manager) => {
+        if (Object.keys(updateData).length > 0) {
+          await manager.getRepository('User').update(userId, updateData);
+        }
+        if (bizPatch) {
+          const bizUpdate = buildBusinessInfoUpdateStatement(bizPatch, userId);
+          if (bizUpdate) await manager.query(bizUpdate.sql, bizUpdate.params);
+        }
+      });
     }
 
     // 2) university → kpa_members.university_name (KpaMember 존재 시에만)

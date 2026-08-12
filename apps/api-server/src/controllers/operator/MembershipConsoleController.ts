@@ -13,6 +13,8 @@ import type { ServiceScope } from '../../utils/serviceScope.js';
 import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../utils/serviceScope.js';
 import { hashPassword } from '../../utils/auth.utils.js';
 import logger from '../../utils/logger.js';
+// WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1: businessInfo 부분 갱신 (스냅샷 되쓰기 제거)
+import { buildBusinessInfoUpdate } from '../../utils/business-info-write.js';
 import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import { roleService } from '../../modules/auth/services/role.service.js';
@@ -1164,21 +1166,34 @@ export class MembershipConsoleController {
       if (address1 !== undefined) bizFields.address = address1;
       if (address2 !== undefined) bizFields.address2 = address2;
       // WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 동기화
-      if (address1 !== undefined || address2 !== undefined || zipCode !== undefined) {
-        (bizFields as any).storeAddress = {
-          ...(zipCode ? { zipCode } : {}),
-          baseAddress: address1 || '',
-          ...(address2 ? { detailAddress: address2 } : {}),
-        };
-      }
+      // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1:
+      //   기존 구현은 storeAddress 를 **통째로 새로 만들어** 넣었다. 그래서
+      //   상세주소만 수정해도 `baseAddress` 가 '' 로 덮이고 `zipCode` 키가 사라졌다
+      //   (실측: 프로덕션 storeAddress 보유 11명 중 zipCode 보유 6 / detailAddress 보유 9).
+      //   교정: 요청이 보낸 하위 키만 담아 중첩 부분 병합에 맡긴다 — 형제 키는 보존된다.
+      //   빈 문자열은 최상위 키(address/address2)와 동일하게 "그 값으로 수정" 으로 다룬다
+      //   (그래야 상세주소 지우기가 계속 동작한다).
+      const storeAddressFields: Record<string, any> = {};
+      if (zipCode !== undefined) storeAddressFields.zipCode = zipCode;
+      if (address1 !== undefined) storeAddressFields.baseAddress = address1;
+      if (address2 !== undefined) storeAddressFields.detailAddress = address2;
 
-      if (Object.keys(bizFields).length > 0) {
-        const [existing] = await AppDataSource.query(
-          `SELECT "businessInfo" FROM users WHERE id = $1`, [userId]
-        );
-        const merged = { ...(existing?.businessInfo || {}), ...bizFields };
-        sets.push(`"businessInfo" = $${idx++}`);
-        params.push(JSON.stringify(merged));
+      // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1:
+      //   read → 병합 → 전체 재저장 제거. 부분 갱신 표현식을 같은 UPDATE 문에 합쳐
+      //   scalar 컬럼과 businessInfo 가 단일 statement 로 원자적으로 반영되게 한다.
+      const bizFragment = buildBusinessInfoUpdate(
+        {
+          root: bizFields,
+          ...(Object.keys(storeAddressFields).length > 0
+            ? { nested: { storeAddress: storeAddressFields } }
+            : {}),
+        },
+        idx,
+      );
+      if (bizFragment) {
+        sets.push(`"businessInfo" = ${bizFragment.expression}`);
+        params.push(...bizFragment.params);
+        idx = bizFragment.nextIndex;
       }
 
       if (sets.length > 0) {
