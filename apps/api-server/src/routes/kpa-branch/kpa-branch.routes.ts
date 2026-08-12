@@ -8,11 +8,14 @@
  *   GET    /api/v1/kpa-branch/branches/:branchSlug                           (public)  분회 단건
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/site                      (public)  게시된 홈페이지
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/posts                     (public)  공지/자료실
+ *   POST   /api/v1/kpa-branch/join                                           (public)  서비스 가입 신청
+ *   GET    /api/v1/kpa-branch/join/status                                    (auth)    내 가입 상태
  *   GET    /api/v1/kpa-branch/me/access                                      (auth)
  *   GET    /api/v1/kpa-branch/me/branch                                      (auth)    내 현재 분회
  *   GET    /api/v1/kpa-branch/me/branch/history                              (auth)    전입·전출 이력
  *   *      /api/v1/kpa-branch/branches/:branchSlug/operator/**               (operator scope + 분회 경계)
  *   *      /api/v1/kpa-branch/admin/domains/**                               (admin scope)
+ *   *      /api/v1/kpa-branch/admin/service-members/**                        (admin scope)  가입 승인
  *
  * 가드 2겹 (합치지 않는다):
  *   requireAuth → requireKpaBranchScope(서비스 축) → resolveBranch → requireBranchScope(분회 축)
@@ -35,6 +38,8 @@ import { BranchDirectoryController } from '../../controllers/kpa-branch/BranchDi
 import { BranchMemberController } from '../../controllers/kpa-branch/BranchMemberController.js';
 import { BranchSiteController } from '../../controllers/kpa-branch/BranchSiteController.js';
 import { BranchDomainController } from '../../controllers/kpa-branch/BranchDomainController.js';
+import { BranchJoinController } from '../../controllers/kpa-branch/BranchJoinController.js';
+import { BranchServiceMembershipController } from '../../controllers/kpa-branch/BranchServiceMembershipController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
@@ -89,6 +94,17 @@ export function createKpaBranchRoutes(): Router {
   router.get('/branches/:branchSlug', resolveBranch, wrap(BranchDirectoryController.detail));
   router.get('/branches/:branchSlug/site', resolveBranch, wrap(BranchSiteController.publicSite));
   router.get('/branches/:branchSlug/posts', resolveBranch, wrap(BranchSiteController.publicPosts));
+
+  // ── 서비스 가입 (Identity V2 canonical write-path 위임) ───────────────────
+  //
+  // 가입 신청은 공통 register 경로로 위임되어 service_memberships(pending) 와
+  // service_credentials(kpa-branch 전용 비밀번호)를 한 트랜잭션에서 만든다.
+  // 분회 소속(branch_memberships)은 여기서 만들지 않는다 — 축을 합치지 않는다.
+  //
+  // service-catalog 의 joinEnabled 는 false 로 유지한다. 공통 handoff join 은
+  // credential 없이 membership 만 만들기 때문에 이 서비스에서는 사용하지 않는다.
+  router.post('/join', wrap(BranchJoinController.apply));
+  router.get('/join/status', requireAuth as any, wrap(BranchJoinController.myStatus));
 
   // ── auth (본인 축) ────────────────────────────────────────────────────────
 
@@ -179,6 +195,20 @@ export function createKpaBranchRoutes(): Router {
 
   router.get('/admin/domains', ...adminGuards, wrap(BranchDomainController.adminList));
   router.patch('/admin/domains/:domainId/status', ...adminGuards, wrap(BranchDomainController.adminSetStatus));
+
+  // 서비스 가입 승인 — 서비스 축(service_memberships)이므로 분회 경계 가드를 붙이지 않는다.
+  // 분회 운영자는 분회 소속(branch_memberships)만 다루고 서비스 접근 승인은 서비스 관리자 몫이다.
+  router.get('/admin/service-members', ...adminGuards, wrap(BranchServiceMembershipController.list));
+  router.patch(
+    '/admin/service-members/:membershipId/approve',
+    ...adminGuards,
+    wrap(BranchServiceMembershipController.approve),
+  );
+  router.patch(
+    '/admin/service-members/:membershipId/reject',
+    ...adminGuards,
+    wrap(BranchServiceMembershipController.reject),
+  );
 
   return router;
 }

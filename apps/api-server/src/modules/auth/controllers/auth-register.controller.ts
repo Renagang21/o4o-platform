@@ -124,6 +124,18 @@ export class AuthRegisterController extends BaseController {
         }
       }
 
+      // WO-O4O-KPA-BRANCH-SERVICE-CREDENTIAL-ONBOARDING-V1:
+      //   kpa-branch 가입 신청 역할은 회원(member) 하나뿐이다. 운영자/관리자는 자가 신청 경로가 없고
+      //   기존 role grant flow 로만 부여된다. (pharmacy-hub / neture 와 동일 패턴 — serviceKey 한정)
+      if (serviceKey === 'kpa-branch' && data.role && data.role !== 'member') {
+        return BaseController.error(
+          res,
+          '분회 서비스 가입 신청 역할은 회원(member) 뿐입니다.',
+          400,
+          'KPA_BRANCH_SIGNUP_ROLE_INVALID',
+        );
+      }
+
       const rawRole = data.membershipType === 'student'
         ? 'user'
         : (data.role || 'customer');
@@ -141,11 +153,17 @@ export class AuthRegisterController extends BaseController {
       //   승인 시 MembershipApprovalService 가 이 값을 그대로 role_assignments 에 부여하므로
       //   (k-cosmetics 선례와 동일 메커니즘) 별도 매핑 코드를 만들지 않는다.
       //   여기 저장되는 값은 위 §5.2 게이트를 통과한 store_owner / supplier 뿐이다.
-      const membershipRole = serviceKey === 'pharmacy-hub'
-        ? `pharmacy-hub:${effectiveRole}`
-        : serviceKey === 'k-cosmetics' && SELLER_LEGACY_ROLES.includes(effectiveRole)
-          ? 'cosmetics:store_owner'
-          : effectiveRole;
+      // WO-O4O-KPA-BRANCH-SERVICE-CREDENTIAL-ONBOARDING-V1:
+      //   kpa-branch 는 prefixed role 을 그대로 저장한다. 승인 시 MembershipApprovalService 가
+      //   이 값을 role_assignments 에 부여하므로 별도 매핑 코드를 만들지 않는다 (pharmacy-hub 선례).
+      //   분회 소속(branch_memberships)은 여기서 다루지 않는다 — 4축 분리.
+      const membershipRole = serviceKey === 'kpa-branch'
+        ? 'kpa-branch:member'
+        : serviceKey === 'pharmacy-hub'
+          ? `pharmacy-hub:${effectiveRole}`
+          : serviceKey === 'k-cosmetics' && SELLER_LEGACY_ROLES.includes(effectiveRole)
+            ? 'cosmetics:store_owner'
+            : effectiveRole;
 
       // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Name normalization
       let resolvedName: string;
