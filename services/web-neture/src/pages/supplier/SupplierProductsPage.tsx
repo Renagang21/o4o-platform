@@ -102,8 +102,15 @@ function ImageUploadModal({
   const handleUpload = async () => {
     if (!file) return;
     setUploading(true);
+    // WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
+    //   productApi 는 실패해도 예외를 던지지 않고 { success:false } 를 돌려준다.
+    //   catch 가 절대 실행되지 않아 업로드 실패가 성공으로 보였다.
     try {
-      await productApi.uploadProductImage(masterId, file, imageType);
+      const res = await productApi.uploadProductImage(masterId, file, imageType);
+      if (!res.success) {
+        alert(`이미지 업로드에 실패했습니다. (${res.error ?? 'UNKNOWN'})`);
+        return;
+      }
       onUploaded();
     } catch {
       alert('이미지 업로드 실패');
@@ -117,7 +124,11 @@ function ImageUploadModal({
     setShowLibrary(false);
     setUploading(true);
     try {
-      await productApi.registerImageFromUrl(masterId, asset.url, imageType);
+      const res = await productApi.registerImageFromUrl(masterId, asset.url, imageType);
+      if (!res.success) {
+        alert(`이미지 등록에 실패했습니다. (${res.error ?? 'UNKNOWN'})`);
+        return;
+      }
       onUploaded();
     } catch {
       alert('이미지 등록 실패');
@@ -610,6 +621,29 @@ const BULK_DELETE_FAILURE_LABEL: Record<string, string> = {
   NOT_FOUND_OR_NOT_OWNED: '이미 삭제됐거나 권한 없음',
   NETWORK_ERROR: '통신 오류',
 };
+
+/**
+ * WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
+ * 인라인 저장(batch update) 실패 사유 요약. 매핑에 없는 코드는 원문 유지.
+ */
+const SAVE_FAILURE_LABEL: Record<string, string> = {
+  PRODUCT_NOT_FOUND: '상품을 찾을 수 없음',
+  NOT_OWNED: '권한 없음',
+  PRIVATE_REQUIRES_SELLER_IDS: '판매자 미지정으로 활성화 불가',
+  SERVICE_REQUIRES_KEYS: '대상 서비스 미선택',
+  PUBLIC_REQUIRES_DESCRIPTION: '상품 설명 필요',
+  NETWORK_ERROR: '통신 오류',
+  INTERNAL_ERROR: '서버 오류',
+};
+
+function saveFailureSummary(failed: Array<{ id: string; error: string }>): string {
+  const counts = new Map<string, number>();
+  for (const f of failed) {
+    const label = SAVE_FAILURE_LABEL[f.error] ?? f.error;
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+  return `저장 실패 ${failed.length}건 (${Array.from(counts.entries()).map(([label, n]) => `${label} ${n}건`).join(' · ')})`;
+}
 
 function bulkDeleteFailureSummary(failed: Array<{ id: string; error: string }>): string {
   const counts = new Map<string, number>();
@@ -1206,7 +1240,13 @@ export default function SupplierProductsPage() {
       consumerReferencePrice: r.consumerReferencePrice != null ? Number(r.consumerReferencePrice) : null,
       stockQuantity: (r as any).stockQuantity != null ? Number((r as any).stockQuantity) : undefined,
     }));
-    await supplierApi.batchUpdateProducts(updates);
+    // WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
+    //   batchUpdateProducts 는 실패를 예외로 던지지 않고 failed[] 로 돌려준다.
+    //   이전 구현은 결과를 버려서 저장 실패가 화면에서 성공처럼 보였다.
+    const saveResult = await supplierApi.batchUpdateProducts(updates);
+    if (saveResult.failed.length > 0) {
+      showToast(`${saveResult.updated.length}건 저장 · ${saveFailureSummary(saveResult.failed)}`);
+    }
     if (autoNext && changedRows.length === 1) {
       lastEditedRef.current = { id: changedRows[0].id, type: 'save' };
     }

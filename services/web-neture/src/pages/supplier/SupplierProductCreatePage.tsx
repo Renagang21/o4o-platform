@@ -72,6 +72,28 @@ function flattenCategories(
   return result;
 }
 
+/**
+ * WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
+ * 등록 실패 시 백엔드 error code 를 그대로 노출하던 것을 조치 가능한 한국어 안내로 바꾼다.
+ * 매핑에 없는 코드는 코드 원문을 유지한다(진단 가능성 보존).
+ */
+const CREATE_ERROR_MESSAGE: Record<string, string> = {
+  OFFER_ALREADY_EXISTS: '이미 등록한 상품입니다. 제품 목록에서 해당 상품을 수정해 주세요.',
+  OFFER_IN_RECYCLE_BIN: '같은 상품이 삭제 대기(휴지통) 상태입니다. 운영자에게 복원 또는 완전 삭제를 요청한 뒤 다시 등록해 주세요.',
+  SUPPLIER_NOT_ACTIVE: '공급자 계정이 아직 활성화되지 않았습니다. 승인 완료 후 등록할 수 있습니다.',
+  INVALID_CATEGORY: '카테고리를 다시 선택해 주세요.',
+  REGULATED_FIELDS_REQUIRED: '규제 상품은 규제 유형·인허가 번호 등 필수 항목을 모두 입력해야 합니다.',
+  INVALID_REGULATORY_TYPE: '선택한 규제 유형이 올바르지 않습니다.',
+  PUBLIC_REQUIRES_DESCRIPTION: '공개 공급으로 등록하려면 소비자용 설명이 필요합니다.',
+  MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED: '허용되지 않은 요청입니다. 화면을 새로고침한 뒤 다시 시도해 주세요.',
+  INTERNAL_ERROR: '서버 오류로 등록하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+};
+
+function createErrorMessage(code: string | null | undefined): string {
+  if (!code) return '상품 등록에 실패했습니다.';
+  return CREATE_ERROR_MESSAGE[code] ?? `상품 등록에 실패했습니다. (${code})`;
+}
+
 export default function SupplierProductCreatePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -355,28 +377,36 @@ export default function SupplierProductCreatePage() {
 
     if (result.success) {
       const masterId = result.data?.masterId;
+      // WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
+      //   이미지 API 는 실패해도 예외를 던지지 않고 { success:false } 를 돌려준다.
+      //   이전 구현은 결과를 확인하지 않아 이미지가 하나도 안 올라가도 '등록 완료'로 보였다.
+      let imageFailures = 0;
       if (masterId) {
         // 대표 이미지: 파일 업로드 또는 라이브러리 URL 등록
         if (thumbnailSource?.kind === 'file') {
-          await productApi.uploadProductImage(masterId, thumbnailSource.file, 'thumbnail');
+          const r = await productApi.uploadProductImage(masterId, thumbnailSource.file, 'thumbnail');
+          if (!r.success) imageFailures += 1;
         } else if (thumbnailSource?.kind === 'library') {
-          await productApi.registerImageFromUrl(masterId, thumbnailSource.url, 'thumbnail');
+          const r = await productApi.registerImageFromUrl(masterId, thumbnailSource.url, 'thumbnail');
+          if (!r.success) imageFailures += 1;
         }
         // WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: file/library 분기
         for (const item of contentItems) {
-          if (item.kind === 'file') {
-            await productApi.uploadProductImage(masterId, item.file, 'content');
-          } else {
-            await productApi.registerImageFromUrl(masterId, item.url, 'content');
-          }
+          const r = item.kind === 'file'
+            ? await productApi.uploadProductImage(masterId, item.file, 'content')
+            : await productApi.registerImageFromUrl(masterId, item.url, 'content');
+          if (!r.success) imageFailures += 1;
         }
+      }
+      if (imageFailures > 0) {
+        toast.error(`상품은 등록됐지만 이미지 ${imageFailures}건이 등록되지 않았습니다. 제품 목록에서 이미지를 다시 등록해 주세요.`);
       }
       if (thumbnailSource?.kind === 'file') URL.revokeObjectURL(thumbnailSource.preview);
       contentItems.forEach((item) => { if (item.kind === 'file') URL.revokeObjectURL(item.preview); });
       // WO-O4O-NETURE-SUPPLIER-PRODUCT-REGISTRATION-WIZARD-V2: 유형별 다음-작업 패널로 전환
       setRegistered({ name: form.marketingName.trim(), masterId: result.data?.masterId ?? null });
     } else {
-      setSubmitError(result.error || '상품 등록에 실패했습니다.');
+      setSubmitError(createErrorMessage(result.error));
     }
   };
 
@@ -707,6 +737,11 @@ export default function SupplierProductCreatePage() {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
+                {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
+                    의약품 진입(regulatoryType=DRUG)은 이 select 에 값이 없어 화면에는 '건강기능식품'이,
+                    저장에는 DRUG 이 들어갔다. 진입 유형이 의약품일 때만 DRUG 항목을 노출해 표시-저장을 일치시킨다.
+                    (비의약품 진입에서는 여전히 선택할 수 없다 — 등록 정책 불변) */}
+                {form.regulatoryType === 'DRUG' && <option value="DRUG">의약품</option>}
                 <option value="HEALTH_FUNCTIONAL">건강기능식품</option>
                 <option value="MEDICAL_DEVICE">의료기기</option>
                 <option value="QUASI_DRUG">의약외품</option>
@@ -801,6 +836,7 @@ export default function SupplierProductCreatePage() {
                   >
                     <option value="HEALTH_FUNCTIONAL">건강기능식품</option>
                     <option value="DRUG">의약품</option>
+                    <option value="MEDICAL_DEVICE">의료기기</option>
                     <option value="QUASI_DRUG">의약외품</option>
                     <option value="COSMETIC">화장품</option>
                     <option value="GENERAL">일반</option>

@@ -1241,6 +1241,42 @@ export function createProductImageController(dataSource: DataSource): Router {
   }
 
   /**
+   * 공급자 소유 master 인지 확인한다 — WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1
+   *
+   * 이미지 write 경로는 masterId 를 클라이언트에서 받는다. ACTIVE 공급자라는 것만 확인하면
+   * 남의 master(대표 이미지 교체·삭제 포함)까지 건드릴 수 있어 소유 확인을 추가한다.
+   * 소유 기준 = 해당 master 에 대한 자기 offer 보유(삭제되지 않은 offer).
+   */
+  async function ownsMaster(supplierId: string, masterId: string): Promise<boolean> {
+    if (!masterId) return false;
+    const rows = await dataSource.query(
+      `SELECT 1 FROM supplier_product_offers
+        WHERE supplier_id = $1 AND master_id = $2 AND deleted_at IS NULL
+        LIMIT 1`,
+      [supplierId, masterId],
+    );
+    return rows.length > 0;
+  }
+
+  /** imageId 로부터 master 를 찾아 소유 확인 (primary/delete 경로용) */
+  async function ownsImageMaster(supplierId: string, imageId: string, masterId: string): Promise<boolean> {
+    const rows = await dataSource.query(
+      `SELECT master_id FROM product_images WHERE id = $1 LIMIT 1`,
+      [imageId],
+    );
+    const actualMasterId = rows[0]?.master_id;
+    // 요청 body 의 masterId 와 실제 이미지의 master 가 다르면 거부(경로 스푸핑 방지)
+    if (!actualMasterId || actualMasterId !== masterId) return false;
+    return ownsMaster(supplierId, actualMasterId);
+  }
+
+  const NOT_OWNED = {
+    success: false,
+    error: 'MASTER_NOT_OWNED',
+    message: '이 상품에 대한 권한이 없습니다.',
+  };
+
+  /**
    * GET /products/:masterId/images
    * 상품 이미지 목록 조회
    */
@@ -1262,6 +1298,9 @@ export function createProductImageController(dataSource: DataSource): Router {
   router.post('/products/:masterId/images', requireAuth, requireActiveSupplier as unknown as RequestHandler, uploadSingleMiddleware('image'), async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { masterId } = req.params;
+      if (!(await ownsMaster((req as SupplierRequest).supplierId, masterId))) {
+        return res.status(403).json(NOT_OWNED);
+      }
       const file = req.file as Express.Multer.File;
       const imageType = (['thumbnail', 'detail', 'content'].includes(req.body?.type) ? req.body.type : 'detail') as 'thumbnail' | 'detail' | 'content';
 
@@ -1314,6 +1353,9 @@ export function createProductImageController(dataSource: DataSource): Router {
       if (!imageUrl || typeof imageUrl !== 'string') {
         return res.status(400).json({ success: false, error: 'MISSING_IMAGE_URL' });
       }
+      if (!(await ownsMaster((req as SupplierRequest).supplierId, masterId))) {
+        return res.status(403).json(NOT_OWNED);
+      }
 
       const imageType = (['thumbnail', 'detail', 'content'].includes(type) ? type : 'detail') as 'thumbnail' | 'detail' | 'content';
 
@@ -1344,6 +1386,9 @@ export function createProductImageController(dataSource: DataSource): Router {
       if (!masterId) {
         return res.status(400).json({ success: false, error: 'MISSING_MASTER_ID' });
       }
+      if (!(await ownsImageMaster((req as SupplierRequest).supplierId, imageId, masterId))) {
+        return res.status(403).json(NOT_OWNED);
+      }
 
       await netureService.setPrimaryImage(imageId, masterId);
       res.json({ success: true });
@@ -1364,6 +1409,9 @@ export function createProductImageController(dataSource: DataSource): Router {
 
       if (!masterId) {
         return res.status(400).json({ success: false, error: 'MISSING_MASTER_ID' });
+      }
+      if (!(await ownsImageMaster((req as SupplierRequest).supplierId, imageId, masterId))) {
+        return res.status(403).json(NOT_OWNED);
       }
 
       const { gcsPath } = await netureService.deleteProductImage(imageId, masterId);

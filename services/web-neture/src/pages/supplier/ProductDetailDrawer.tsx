@@ -79,6 +79,22 @@ const OFFER_SAVE_ERROR_MESSAGE: Record<string, string> = {
   PRODUCT_NOT_FOUND: '상품을 찾을 수 없습니다. 목록을 새로고침한 뒤 다시 시도해 주세요.',
 };
 
+/**
+ * WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
+ * 이미지 API 실패 코드 → 공급자 안내. 매핑에 없는 코드는 원문 유지.
+ */
+const IMAGE_ERROR_MESSAGE: Record<string, string> = {
+  MASTER_NOT_OWNED: '이 상품에 대한 권한이 없습니다.',
+  NETWORK_ERROR: '통신 오류로 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+  MISSING_MASTER_ID: '상품 정보가 없어 처리할 수 없습니다. 화면을 새로고침해 주세요.',
+  MISSING_IMAGE_URL: '이미지 주소가 올바르지 않습니다.',
+};
+
+function imageErrorMessage(code: string | null | undefined): string {
+  if (!code) return '알 수 없는 오류';
+  return IMAGE_ERROR_MESSAGE[code] ?? code;
+}
+
 function offerSaveErrorMessage(code: string | null | undefined): string {
   if (!code) return '알 수 없는 오류';
   return OFFER_SAVE_ERROR_MESSAGE[code] ?? code;
@@ -367,10 +383,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         // WO-O4O-NETURE-SUPPLIER-PRODUCT-DISTRIBUTION-MANAGEMENT-FLOW-V1:
         // serviceKeys 는 상품 정보 저장에서 제외 — 공급 방식 변경은 [공급 방식 변경] 모달(distribution API)로만 처리.
       };
-      console.log('[ProductDetailDrawer] save payload:', payload);
-
-      const result = await supplierApi.updateProduct(product.id, payload);
-      console.log('[ProductDetailDrawer] save result:', result);
+            const result = await supplierApi.updateProduct(product.id, payload);
 
       if (!result.success) {
         toast.error(`저장 실패: ${offerSaveErrorMessage(result.error)}`);
@@ -387,7 +400,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           businessDetailDescription: bizDetail,
         });
         if (!bizResult.success) {
-          console.warn('[ProductDetailDrawer] B2B content save failed:', bizResult.error);
+          // WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
+          //   console.warn 만 남기면 공급자는 B2B 설명이 저장된 줄 안다.
+          toast.error(`B2B 설명 저장 실패: ${offerSaveErrorMessage(bizResult.error)}`);
         }
       }
 
@@ -593,6 +608,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       const updated = await productApi.getProductImages(product.masterId);
       setImages(updated);
       onSaved?.();
+    } else {
+      // WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1: 이미지 실패 무음 금지
+      toast.error(`이미지 업로드 실패: ${imageErrorMessage(res.error)}`);
     }
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -617,6 +635,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     if (ok) {
       setImages((prev) => prev.filter((i) => i.id !== imageId));
       onSaved?.();
+    } else {
+      toast.error('이미지를 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.');
     }
   };
 
@@ -630,6 +650,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       const updated = await productApi.getProductImages(product.masterId);
       setImages(updated);
       onSaved?.();
+    } else {
+      toast.error(`이미지 등록 실패: ${imageErrorMessage(res.error)}`);
     }
     setUploading(false);
   };
