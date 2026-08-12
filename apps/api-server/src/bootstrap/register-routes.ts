@@ -108,6 +108,8 @@ import { createCosmeticsRoutes } from '../routes/cosmetics/cosmetics.routes.js';
 import { createGlycopharmRoutes } from '../routes/glycopharm/glycopharm.routes.js';
 // WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
 import { createPharmacyHubRoutes } from '../routes/pharmacy-hub/pharmacy-hub.routes.js';
+// WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
+import { createKpaBranchRoutes } from '../routes/kpa-branch/kpa-branch.routes.js';
 import { createKpaRoutes, createKpaJoinPublicRoutes } from '../routes/kpa/kpa.routes.js';
 import { createNetureRoutes } from '../routes/neture/neture.routes.js';
 import createNetureModuleRoutes from '../modules/neture/neture.routes.js';
@@ -668,6 +670,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.info('✅ PharmacyHubPaymentEventHandler initialized');
     } catch (pharmacyHubError) {
       logger.error('Failed to register Pharmacy-Hub routes:', pharmacyHubError);
+    }
+
+    // 27c. Register KPA Branch routes
+    //      WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
+    //      분회 209개를 동급 tenant 로 두는 단일 라우터. 분회별 백엔드를 만들지 않는다.
+    try {
+      app.use('/api/v1/kpa-branch', createKpaBranchRoutes());
+      logger.info('✅ KPA Branch routes registered at /api/v1/kpa-branch');
+    } catch (kpaBranchError) {
+      logger.error('Failed to register KPA Branch routes:', kpaBranchError);
     }
 
     // 28g. Register Store AI routes (WO-O4O-STORE-HUB-AI-SUMMARY-V1)

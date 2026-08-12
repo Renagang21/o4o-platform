@@ -15,7 +15,12 @@ export type ServiceKey =
   //   type-only 확장(union 확대). 기존 5 키의 동작·설정은 변경하지 않는다.
   //   role prefix === service_memberships.service_key (self-map) 이므로
   //   ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY 항목 추가는 불필요하다.
-  | 'pharmacy-hub';
+  | 'pharmacy-hub'
+  // WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1: 약사회 분회 서비스.
+  //   type-only 확장(union 확대). 기존 키의 동작·설정은 변경하지 않는다.
+  //   role prefix === service_memberships.service_key (self-map) 이므로
+  //   ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY 항목 추가는 불필요하다.
+  | 'kpa-branch';
 
 /** Service-prefixed role format: "service:role" */
 export type PrefixedRole = `${ServiceKey}:${string}`;

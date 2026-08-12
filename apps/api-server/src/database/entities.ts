@@ -316,6 +316,18 @@ import { QualificationRequest } from '../routes/kpa/entities/qualification-reque
 import { InstructorProfile } from '../routes/kpa/entities/instructor-profile.entity.js';
 
 // ============================================================================
+// KPA BRANCH ENTITIES (WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1)
+// 분회 tenant registry(read) + 분회 소속 이력 + 분회 홈페이지/도메인
+// ============================================================================
+import {
+  KpaOrganization,
+  BranchMembership,
+  BranchSite,
+  BranchDomain,
+  BranchPost,
+} from '../routes/kpa-branch/entities/index.js';
+
+// ============================================================================
 // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
 // ============================================================================
 import {
@@ -785,6 +797,12 @@ export const entities = [
   KpaContent,
   // KpaWorkingContent: WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1 은퇴
   KpaLegalDocument,
+  // WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
+  KpaOrganization,
+  BranchMembership,
+  BranchSite,
+  BranchDomain,
+  BranchPost,
   // ============================================================================
   // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
   // ============================================================================

@@ -77,6 +77,23 @@ export const O4O_SERVICES: O4OService[] = [
     description: '약국 경영자·공급자 직접 연결 약국 전문 서비스',
     joinEnabled: true,
   },
+  /**
+   * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
+   *
+   * KPA Branch (약사회 분회) — 209개 분회를 동급 tenant 로 두는 분회 홈페이지 SaaS.
+   * domain 은 플랫폼 기본 호스트다. 분회 자체 도메인은 branch_domains 로 연결하며
+   * 분회별 별도 배포·별도 백엔드는 만들지 않는다.
+   * platform_services row 는 20270305000000-SeedKpaBranchServiceAndRoles 에서 seed 한다.
+   * joinEnabled=false — 분회 소속은 자가 신청이 아니라 분회 운영자 승인 경로로만 생성된다.
+   */
+  {
+    key: 'kpa-branch',
+    name: 'KPA Branch',
+    nameKo: '약사회 분회',
+    domain: 'branch.kpa-society.co.kr',
+    description: '약사회 분회 홈페이지 및 분회 회원 관리 서비스',
+    joinEnabled: false,
+  },
 ];
 
 /** 서비스 키 → O4OService 조회 */

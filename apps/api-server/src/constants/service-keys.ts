@@ -30,6 +30,8 @@ export const SERVICE_KEYS = {
   NETURE: 'neture',
   // WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1: 약국 전문 서비스 (공급자 ↔ 약국 경영자 직접 연결)
   PHARMACY_HUB: 'pharmacy-hub',
+  /** WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1: 약사회 분회 서비스 */
+  KPA_BRANCH: 'kpa-branch',
 } as const;
 
 export type ServiceKey = typeof SERVICE_KEYS[keyof typeof SERVICE_KEYS];
