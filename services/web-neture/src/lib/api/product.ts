@@ -113,6 +113,11 @@ export const productApi = {
       formData.append('type', type);
       const response = await api.post(`/neture/products/${masterId}/images`, formData, {
         timeout: 30000,
+        // WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1:
+        //   axios 인스턴스 기본 헤더가 'application/json' 이라 FormData 에도 그대로 실려
+        //   서버가 multipart 본문을 JSON 으로 파싱해 400 이 났다.
+        //   undefined 로 지우면 브라우저가 boundary 를 포함한 multipart 헤더를 만든다.
+        headers: { 'Content-Type': undefined },
       });
       return response.data;
     } catch (error) {
