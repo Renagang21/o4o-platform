@@ -9,6 +9,7 @@
  *   /:branchSlug                      분회 홈 (고정 템플릿)
  *   /:branchSlug/notices              공지
  *   /:branchSlug/resources            자료실
+ *   /:branchSlug/mypage/annual-report 신상신고 작성·제출 (회원)
  *   /:branchSlug/operator/site        홈페이지 설정 (운영자)
  *   /:branchSlug/operator/posts       글쓰기·글 관리 (운영자)
  *   /:branchSlug/operator/domains     자체 도메인 연결 (운영자)
@@ -31,6 +32,7 @@ import BranchPostsPage from './pages/BranchPostsPage';
 import SiteSettingsPage from './pages/operator/SiteSettingsPage';
 import PostsAdminPage from './pages/operator/PostsAdminPage';
 import DomainsPage from './pages/operator/DomainsPage';
+import AnnualReportPage from './pages/annual-report/AnnualReportPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 /** 분회 하위 화면 — slug 는 상위(URL 또는 Host)에서 결정되어 내려온다. */
@@ -41,6 +43,7 @@ function BranchSection({ slug, basePath }: { slug: string; basePath: string }) {
         <Route index element={<BranchHomePage slug={slug} basePath={basePath} />} />
         <Route path="notices" element={<BranchPostsPage slug={slug} category="notice" />} />
         <Route path="resources" element={<BranchPostsPage slug={slug} category="resource" />} />
+        <Route path="mypage/annual-report" element={<AnnualReportPage slug={slug} />} />
         <Route path="operator/site" element={<SiteSettingsPage slug={slug} />} />
         <Route path="operator/posts" element={<PostsAdminPage slug={slug} />} />
         <Route path="operator/domains" element={<DomainsPage slug={slug} />} />

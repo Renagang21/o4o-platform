@@ -43,6 +43,11 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
     { to: basePath || '/', label: '홈', end: true },
     { to: `${basePath}/notices`, label: '공지', end: false },
     { to: `${basePath}/resources`, label: '자료실', end: false },
+    // 신상신고는 로그인 회원만 쓸 수 있다. 메뉴 노출은 UX 안내일 뿐이고
+    // 실제 경계는 backend 의 member 스코프 + 분회 축 가드가 판정한다.
+    ...(isAuthenticated
+      ? [{ to: `${basePath}/mypage/annual-report`, label: '신상신고', end: false }]
+      : []),
   ];
 
   const operatorNav = [

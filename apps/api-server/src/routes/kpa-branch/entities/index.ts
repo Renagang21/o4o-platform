@@ -28,3 +28,6 @@ export type {
   AnnualReportRule,
   AnnualReportTemplateSchema,
 } from './annual-report-template.entity.js';
+// WO-O4O-KPA-BRANCH-ANNUAL-REPORT-SUBMISSION-V1
+export { AnnualReport } from './annual-report.entity.js';
+export type { AnnualReportStatus, AnnualReportValues } from './annual-report.entity.js';

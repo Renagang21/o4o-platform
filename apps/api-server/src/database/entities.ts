@@ -333,6 +333,8 @@ import {
   BranchPost,
   // WO-O4O-KPA-BRANCH-ANNUAL-REPORT-TEMPLATE-SCHEMA-V1
   AnnualReportTemplate,
+  // WO-O4O-KPA-BRANCH-ANNUAL-REPORT-SUBMISSION-V1
+  AnnualReport,
 } from '../routes/kpa-branch/entities/index.js';
 
 // ============================================================================
@@ -817,6 +819,8 @@ export const entities = [
   BranchPost,
   // WO-O4O-KPA-BRANCH-ANNUAL-REPORT-TEMPLATE-SCHEMA-V1
   AnnualReportTemplate,
+  // WO-O4O-KPA-BRANCH-ANNUAL-REPORT-SUBMISSION-V1
+  AnnualReport,
   // ============================================================================
   // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
   // ============================================================================

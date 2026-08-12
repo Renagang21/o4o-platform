@@ -43,6 +43,7 @@ import { BranchDomainController } from '../../controllers/kpa-branch/BranchDomai
 import { BranchJoinController } from '../../controllers/kpa-branch/BranchJoinController.js';
 import { BranchServiceMembershipController } from '../../controllers/kpa-branch/BranchServiceMembershipController.js';
 import { AnnualReportTemplateController } from '../../controllers/kpa-branch/AnnualReportTemplateController.js';
+import { MemberAnnualReportController } from '../../controllers/kpa-branch/MemberAnnualReportController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
@@ -145,6 +146,35 @@ export function createKpaBranchRoutes(): Router {
 
   router.get('/me/branch', requireAuth as any, wrap(BranchMemberController.myCurrent));
   router.get('/me/branch/history', requireAuth as any, wrap(BranchMemberController.myHistory));
+
+  // ── 회원 신상신고 (본인 축 + 분회 축) ────────────────────────────────────
+  //
+  // WO-O4O-KPA-BRANCH-ANNUAL-REPORT-SUBMISSION-V1
+  // member 스코프이지만 operator/admin 도 계층상 통과한다(scopeRoleMapping).
+  // requireBranchScope 가 "요청 분회 == 내 active 분회" 를 강제하므로
+  // 다른 분회 경로로 자기 신고서를 만들 수 없다.
+  const memberReportGuards = [
+    requireAuth as any,
+    requireKpaBranchScope(`${SERVICE_KEY}:member`),
+    resolveBranch,
+    requireBranchScope,
+  ];
+
+  router.get(
+    '/branches/:branchSlug/me/annual-report',
+    ...memberReportGuards,
+    wrap(MemberAnnualReportController.get),
+  );
+  router.post(
+    '/branches/:branchSlug/me/annual-report/draft',
+    ...memberReportGuards,
+    wrap(MemberAnnualReportController.saveDraft),
+  );
+  router.post(
+    '/branches/:branchSlug/me/annual-report/submit',
+    ...memberReportGuards,
+    wrap(MemberAnnualReportController.submit),
+  );
 
   // ── operator (서비스 축 + 분회 축 이중 가드) ──────────────────────────────
 
