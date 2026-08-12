@@ -11,7 +11,7 @@
 | 항목 | 값 |
 |---|---|
 | 작업 시작 HEAD | `fdc4551c3` (== origin/main, worktree clean) |
-| 커밋 시점 HEAD | 아래 §13 |
+| 커밋 | `1e69be4de` (push 완료, HEAD == origin/main) |
 
 ## 2. 사용한 공급자 계정
 
