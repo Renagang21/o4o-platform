@@ -17,6 +17,17 @@ import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
 import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 
+/**
+ * WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1
+ *
+ * 호출자가 이미 transaction 을 소유한 경우, 그 실행 컨텍스트를 주입받기 위한 최소 계약.
+ * TypeORM 의 `QueryRunner` 와 transaction `EntityManager` 가 모두 구조적으로 이를 만족한다.
+ * 주입 시 이 서비스는 begin / commit / rollback 을 수행하지 않는다 (호출자 소유).
+ */
+export type MembershipTxExecutor = {
+  query(sql: string, parameters?: any[]): Promise<any>;
+};
+
 export interface ApproveParams {
   membershipId: string;
   approvedBy: string | null;
@@ -83,6 +94,11 @@ export interface WithdrawMemberParams {
   withdrawnBy: string | null;
   isPlatformAdmin: boolean;
   serviceKeys: string[];
+  /**
+   * WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1: 호출자 transaction 참여용. 주입 시 이 서비스는 자체 transaction 을 열지 않는다.
+   * 미주입 시 기존 동작(자체 queryRunner transaction) 을 그대로 유지한다.
+   */
+  manager?: MembershipTxExecutor;
 }
 
 export interface WithdrawResult {
@@ -97,6 +113,11 @@ export interface SuspendParams {
   suspendedBy: string | null;
   isPlatformAdmin: boolean;
   serviceKeys: string[];
+  /**
+   * WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1: 호출자 transaction 참여용. 주입 시 이 서비스는 자체 transaction 을 열지 않는다.
+   * 미주입 시 기존 동작(자체 queryRunner transaction) 을 그대로 유지한다.
+   */
+  manager?: MembershipTxExecutor;
 }
 
 export interface SuspendResult {
@@ -110,6 +131,11 @@ export interface ReactivateParams {
   reactivatedBy: string | null;
   isPlatformAdmin: boolean;
   serviceKeys: string[];
+  /**
+   * WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1: 호출자 transaction 참여용. 주입 시 이 서비스는 자체 transaction 을 열지 않는다.
+   * 미주입 시 기존 동작(자체 queryRunner transaction) 을 그대로 유지한다.
+   */
+  manager?: MembershipTxExecutor;
 }
 
 export interface ReactivateResult {
@@ -158,7 +184,7 @@ export class MembershipApprovalService {
    *   → 활성 row 확인 → 비활성 row 재활성화 → 없을 때만 INSERT 순서로 교체한다 (migration 불필요).
    */
   private async activateRoleAssignment(
-    queryRunner: import('typeorm').QueryRunner,
+    queryRunner: MembershipTxExecutor,
     userId: string,
     role: string,
     assignedBy: string | null
@@ -215,7 +241,7 @@ export class MembershipApprovalService {
    * @returns 비활성화된 row 수
    */
   private async deactivateRoleAssignment(
-    queryRunner: import('typeorm').QueryRunner,
+    queryRunner: MembershipTxExecutor,
     userId: string,
     role: string
   ): Promise<number> {
@@ -548,10 +574,40 @@ export class MembershipApprovalService {
    * Returns result with counts, or null if no active memberships found in scope.
    */
   async suspendMembership(params: SuspendParams): Promise<SuspendResult | null> {
-    const { userId, suspendedBy, isPlatformAdmin, serviceKeys } = params;
+    // WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1
+    //   호출자가 transaction 을 소유하면(manager 주입) 자체 transaction 을 열지 않고
+    //   같은 transaction 에서 실행한다. 중첩 transaction · 별도 connection · 미커밋 행에 대한
+    //   교차 connection lock 대기를 만들지 않기 위함이다.
+    //   manager 미주입 기존 소비처는 아래 자체 transaction 경로로 기존 동작을 그대로 유지한다.
+    if (params.manager) {
+      return this.suspendMembershipCore(params.manager, params);
+    }
+
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+
+    try {
+      const result = await this.suspendMembershipCore(queryRunner, params);
+      if (result === null) {
+        await queryRunner.rollbackTransaction();
+        return null;
+      }
+      await queryRunner.commitTransaction();
+      return result;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  private async suspendMembershipCore(
+    queryRunner: MembershipTxExecutor,
+    params: SuspendParams
+  ): Promise<SuspendResult | null> {
+    const { userId, suspendedBy, isPlatformAdmin, serviceKeys } = params;
 
     try {
       // STEP0: SELECT active memberships FOR UPDATE
@@ -579,7 +635,6 @@ export class MembershipApprovalService {
         logger.warn('[SUSPEND][STEP0] no active memberships found', {
           userId, isPlatformAdmin, serviceKeys,
         });
-        await queryRunner.rollbackTransaction();
         return null;
       }
 
@@ -652,7 +707,6 @@ export class MembershipApprovalService {
       }
 
       // NOTE: users.status is NOT changed — service-level suspension only
-      await queryRunner.commitTransaction();
 
       logger.info('[SUSPEND][SUCCESS]', {
         userId, suspendedMemberships: selectResult.length, deactivatedRoles, suspendedBy,
@@ -664,7 +718,6 @@ export class MembershipApprovalService {
         userId,
       };
     } catch (error) {
-      await queryRunner.rollbackTransaction();
       const err = error instanceof Error ? error : new Error(String(error));
       logger.error('[SUSPEND][FAILED]', {
         userId, suspendedBy,
@@ -674,8 +727,6 @@ export class MembershipApprovalService {
         stack: err.stack,
       });
       throw error;
-    } finally {
-      await queryRunner.release();
     }
   }
 
@@ -685,10 +736,40 @@ export class MembershipApprovalService {
    * Returns result with counts, or null if no suspended memberships found.
    */
   async reactivateMembership(params: ReactivateParams): Promise<ReactivateResult | null> {
-    const { userId, reactivatedBy, isPlatformAdmin, serviceKeys } = params;
+    // WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1
+    //   호출자가 transaction 을 소유하면(manager 주입) 자체 transaction 을 열지 않고
+    //   같은 transaction 에서 실행한다. 중첩 transaction · 별도 connection · 미커밋 행에 대한
+    //   교차 connection lock 대기를 만들지 않기 위함이다.
+    //   manager 미주입 기존 소비처는 아래 자체 transaction 경로로 기존 동작을 그대로 유지한다.
+    if (params.manager) {
+      return this.reactivateMembershipCore(params.manager, params);
+    }
+
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+
+    try {
+      const result = await this.reactivateMembershipCore(queryRunner, params);
+      if (result === null) {
+        await queryRunner.rollbackTransaction();
+        return null;
+      }
+      await queryRunner.commitTransaction();
+      return result;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  private async reactivateMembershipCore(
+    queryRunner: MembershipTxExecutor,
+    params: ReactivateParams
+  ): Promise<ReactivateResult | null> {
+    const { userId, reactivatedBy, isPlatformAdmin, serviceKeys } = params;
 
     try {
       // STEP0: SELECT reactivatable memberships FOR UPDATE
@@ -719,7 +800,6 @@ export class MembershipApprovalService {
         logger.warn('[REACTIVATE][STEP0] no reactivatable memberships found', {
           userId, isPlatformAdmin, serviceKeys,
         });
-        await queryRunner.rollbackTransaction();
         return null;
       }
 
@@ -831,7 +911,6 @@ export class MembershipApprovalService {
         );
       }
 
-      await queryRunner.commitTransaction();
 
       logger.info('[REACTIVATE][SUCCESS]', {
         userId, reactivatedMemberships: selectResult.length, reactivatedRoles, reactivatedBy,
@@ -843,7 +922,6 @@ export class MembershipApprovalService {
         userId,
       };
     } catch (error) {
-      await queryRunner.rollbackTransaction();
       const err = error instanceof Error ? error : new Error(String(error));
       logger.error('[REACTIVATE][FAILED]', {
         userId, reactivatedBy,
@@ -853,8 +931,6 @@ export class MembershipApprovalService {
         stack: err.stack,
       });
       throw error;
-    } finally {
-      await queryRunner.release();
     }
   }
 
@@ -874,10 +950,40 @@ export class MembershipApprovalService {
    * Returns result with counts, or null if no eligible memberships found.
    */
   async withdrawMembership(params: WithdrawMemberParams): Promise<WithdrawResult | null> {
-    const { userId, withdrawnBy, isPlatformAdmin, serviceKeys } = params;
+    // WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1
+    //   호출자가 transaction 을 소유하면(manager 주입) 자체 transaction 을 열지 않고
+    //   같은 transaction 에서 실행한다. 중첩 transaction · 별도 connection · 미커밋 행에 대한
+    //   교차 connection lock 대기를 만들지 않기 위함이다.
+    //   manager 미주입 기존 소비처는 아래 자체 transaction 경로로 기존 동작을 그대로 유지한다.
+    if (params.manager) {
+      return this.withdrawMembershipCore(params.manager, params);
+    }
+
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+
+    try {
+      const result = await this.withdrawMembershipCore(queryRunner, params);
+      if (result === null) {
+        await queryRunner.rollbackTransaction();
+        return null;
+      }
+      await queryRunner.commitTransaction();
+      return result;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  private async withdrawMembershipCore(
+    queryRunner: MembershipTxExecutor,
+    params: WithdrawMemberParams
+  ): Promise<WithdrawResult | null> {
+    const { userId, withdrawnBy, isPlatformAdmin, serviceKeys } = params;
 
     try {
       // STEP0: SELECT eligible memberships FOR UPDATE
@@ -906,7 +1012,6 @@ export class MembershipApprovalService {
         logger.warn('[WITHDRAW][STEP0] no eligible memberships found', {
           userId, isPlatformAdmin, serviceKeys,
         });
-        await queryRunner.rollbackTransaction();
         return null;
       }
 
@@ -1047,7 +1152,6 @@ export class MembershipApprovalService {
       }
 
       // NOTE: users.status 변경하지 않음 — 로그인 유지, MembershipGate가 접근 차단
-      await queryRunner.commitTransaction();
 
       logger.info('[WITHDRAW][SUCCESS]', {
         userId,
@@ -1063,7 +1167,6 @@ export class MembershipApprovalService {
         userId,
       };
     } catch (error) {
-      await queryRunner.rollbackTransaction();
       const err = error instanceof Error ? error : new Error(String(error));
       logger.error('[WITHDRAW][FAILED]', {
         userId,
@@ -1074,8 +1177,6 @@ export class MembershipApprovalService {
         stack: err.stack,
       });
       throw error;
-    } finally {
-      await queryRunner.release();
     }
   }
 

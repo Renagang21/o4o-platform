@@ -72,10 +72,18 @@ function normalize(sql: string): string {
 }
 
 /** 테스트용 DataSource 더블 — transaction 경계와 SQL 흐름을 기록한다. */
-function makeDataSource(options: { member?: any; failOn?: RegExp } = {}) {
+function makeDataSource(options: { member?: any; failOn?: RegExp; failOnSaveEntity?: string } = {}) {
   const calls: Call[] = [];
   const saves: Array<{ entity: string; scope: 'tx' | 'global'; value: any }> = [];
-  const state = { txStarted: 0, txCommitted: 0, txRolledBack: 0 };
+  const state: any = {
+    txStarted: 0,
+    txCommitted: 0,
+    txRolledBack: 0,
+    // WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1
+    txManager: null as any,
+    txOpen: false,
+    delegateCalledInsideTx: {} as Record<string, boolean>,
+  };
 
   const member = options.member ?? {
     id: MEMBER_ID,
@@ -110,7 +118,11 @@ function makeDataSource(options: { member?: any; failOn?: RegExp } = {}) {
     query: (sql: string, params?: any[]) => runQuery(scope, sql, params ?? []),
     findOne: async (entity: any, _opts: any) => (entityName(entity) === 'KpaMember' ? member : null),
     save: async (entity: any, value: any) => {
-      saves.push({ entity: entityName(entity), scope, value });
+      const name = entityName(entity);
+      saves.push({ entity: name, scope, value });
+      if (options.failOnSaveEntity && name === options.failOnSaveEntity) {
+        throw new Error('INJECTED_FAILURE');
+      }
       return value;
     },
     create: (_entity: any, value: any) => value,
@@ -130,13 +142,18 @@ function makeDataSource(options: { member?: any; failOn?: RegExp } = {}) {
     query: (sql: string, params?: any[]) => runQuery('global', sql, params ?? []),
     transaction: async (cb: any) => {
       state.txStarted += 1;
+      state.txOpen = true;
+      const manager = makeManager('tx');
+      state.txManager = manager;
       try {
-        const result = await cb(makeManager('tx'));
+        const result = await cb(manager);
         state.txCommitted += 1;
         return result;
       } catch (e) {
         state.txRolledBack += 1;
         throw e;
+      } finally {
+        state.txOpen = false;
       }
     },
   };
@@ -341,7 +358,65 @@ describe('PATCH /kpa/members/:id/status — approval atomicity', () => {
     await handler(req({ status: 'suspended' }), res);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(h.state.txStarted).toBe(0);
+    // WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1:
+    //   위임이 같은 transaction 안에서 실행되므로 실패 시 transaction 전체가 rollback 된다.
+    expect(h.state.txStarted).toBe(1);
+    expect(h.state.txCommitted).toBe(0);
+    expect(h.state.txRolledBack).toBe(1);
     expect(h.saves.filter((s) => s.entity === 'KpaMember')).toEqual([]);
+  });
+
+  // ============================================================
+  // WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1
+  // ============================================================
+
+  it.each([
+    ['suspended', 'suspendMembership'],
+    ['rejected', 'suspendMembership'],
+    ['withdrawn', 'withdrawMembership'],
+  ])('%s: 위임이 호출자 transaction manager 를 주입받아 같은 transaction 에서 실행된다', async (status, method) => {
+    const h = makeDataSource();
+    const handler = getHandler(h.dataSource, '/:id/status', 'patch');
+    const res = makeRes();
+
+    await handler(req({ status }), res);
+
+    const arg = (mockApprovalService as any)[method].mock.calls[0][0];
+    expect(arg.manager).toBe(h.state.txManager);
+    // manager 는 transaction 이 열린 뒤에만 생성되므로, 동일 참조 = transaction 내부 실행
+    expect(h.state.txCommitted).toBe(1);
+    expect(h.calls.filter((c) => c.scope === 'global' && WRITE_RE.test(c.sql))).toEqual([]);
+  });
+
+  it('재승인: reactivateMembership 도 동일 transaction manager 를 주입받는다', async () => {
+    const h = makeDataSource({
+      member: {
+        id: MEMBER_ID, user_id: USER_ID, status: 'suspended', identity_status: 'suspended',
+        membership_type: 'pharmacist', activity_type: 'pharmacy_employee',
+        license_number: 'L-1', pharmacy_name: null, pharmacy_address: null,
+        university_name: null, student_year: null,
+      },
+    });
+    const handler = getHandler(h.dataSource, '/:id/status', 'patch');
+    const res = makeRes();
+
+    await handler(req({ status: 'active' }), res);
+
+    const arg = mockApprovalService.reactivateMembership.mock.calls[0][0];
+    expect(arg.manager).toBe(h.state.txManager);
+    expect(h.state.txCommitted).toBe(1);
+  });
+
+  it('위임 성공 후 kpa_members 저장이 실패하면 위임분까지 전체 rollback 된다', async () => {
+    const h = makeDataSource({ failOnSaveEntity: 'KpaMember' });
+    const handler = getHandler(h.dataSource, '/:id/status', 'patch');
+    const res = makeRes();
+
+    await handler(req({ status: 'suspended' }), res);
+
+    expect(mockApprovalService.suspendMembership).toHaveBeenCalledTimes(1);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(h.state.txCommitted).toBe(0);
+    expect(h.state.txRolledBack).toBe(1);
   });
 });

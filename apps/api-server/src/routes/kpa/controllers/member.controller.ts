@@ -567,48 +567,57 @@ export function createMemberController(
         //   묶고, 실패 시 전체 rollback + 오류 응답을 반환한다.
         //   상태 의미 · role 부여 규칙 · 서비스 경계 · 응답 계약은 변경하지 않는다.
         //
-        //   suspended / rejected / withdrawn / 재승인 경로는
-        //   MembershipApprovalService 가 자체 queryRunner transaction 을 소유한다
-        //   (별도 connection). 중첩하면 FOR UPDATE lock 교착 위험이 있으므로
-        //   delegate 를 먼저 수행하고 성공한 경우에만 kpa_members 를 저장한다
-        //   — delegate 실패 시 kpa_members write 자체가 발생하지 않는다.
-        //   기존과 달리 실패를 삼키지 않고 그대로 throw 한다 (500).
+        // ============================================================
+        // WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1
+        //   이전에는 suspended / rejected / withdrawn / 재승인 경로에서
+        //   MembershipApprovalService 가 자체 queryRunner transaction 을 소유했기 때문에
+        //   (delegate commit) → (kpa_members 저장 실패) 시 service_memberships 만 반영된
+        //   부분 성공이 남을 수 있었다.
+        //
+        //   교정: MembershipApprovalService 가 호출자 transaction manager 를 받도록 하고
+        //   (manager 미주입 소비처는 기존 자체 transaction 동작 유지),
+        //   delegate + kpa_members + kpa_member_services write 를 단일 transaction 으로 묶는다.
+        //   중첩 transaction · 별도 connection · 교차 connection lock 대기는 만들지 않는다
+        //   (동일 manager 이므로 FOR UPDATE 행 잠금도 같은 transaction 안에서 성립).
+        //   상태 의미 · 권한 규칙 · 응답 계약은 변경하지 않는다.
         // ============================================================
         const isApprovalTransition = oldStatus === 'pending' && newStatus === 'active';
 
-        if (!isApprovalTransition) {
-          if (newStatus === 'suspended' || newStatus === 'rejected') {
-            // WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected도 suspended와 동일하게 membership 중지
-            const approvalService = new MembershipApprovalService();
-            await approvalService.suspendMembership({
-              userId: member.user_id,
-              suspendedBy: req.user!.id,
-              isPlatformAdmin: false,
-              serviceKeys: ['kpa-society'],
-            });
-          } else if (newStatus === 'withdrawn') {
-            // WO-O4O-USER-WITHDRAW-LIFECYCLE-V1: canonical withdraw lifecycle
-            // service_memberships inactive + role deactivate + kpa_members sync
-            const approvalService = new MembershipApprovalService();
-            await approvalService.withdrawMembership({
-              userId: member.user_id,
-              withdrawnBy: req.user!.id,
-              isPlatformAdmin: false,
-              serviceKeys: ['kpa-society'],
-            });
-          } else if (oldStatus === 'suspended' && newStatus === 'active') {
-            // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: delegate to MembershipApprovalService
-            const approvalService = new MembershipApprovalService();
-            await approvalService.reactivateMembership({
-              userId: member.user_id,
-              reactivatedBy: req.user!.id,
-              isPlatformAdmin: false,
-              serviceKeys: ['kpa-society'],
-            });
-          }
-        }
-
         const saved = await dataSource.transaction(async (manager) => {
+          if (!isApprovalTransition) {
+            const approvalService = new MembershipApprovalService();
+            if (newStatus === 'suspended' || newStatus === 'rejected') {
+              // WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected도 suspended와 동일하게 membership 중지
+              await approvalService.suspendMembership({
+                userId: member.user_id,
+                suspendedBy: req.user!.id,
+                isPlatformAdmin: false,
+                serviceKeys: ['kpa-society'],
+                manager,
+              });
+            } else if (newStatus === 'withdrawn') {
+              // WO-O4O-USER-WITHDRAW-LIFECYCLE-V1: canonical withdraw lifecycle
+              // service_memberships inactive + role deactivate + kpa_members sync
+              await approvalService.withdrawMembership({
+                userId: member.user_id,
+                withdrawnBy: req.user!.id,
+                isPlatformAdmin: false,
+                serviceKeys: ['kpa-society'],
+                manager,
+              });
+            } else if (oldStatus === 'suspended' && newStatus === 'active') {
+              // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: delegate to MembershipApprovalService
+              await approvalService.reactivateMembership({
+                userId: member.user_id,
+                reactivatedBy: req.user!.id,
+                isPlatformAdmin: false,
+                serviceKeys: ['kpa-society'],
+                manager,
+              });
+            }
+          }
+
+          // delegate 의 kpa_members projection sync 이후에 저장해 기존 순서·최종 상태를 유지한다.
           const savedMember = await manager.save(KpaMember, member);
 
           if (isApprovalTransition) {
