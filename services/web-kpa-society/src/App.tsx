@@ -272,6 +272,7 @@ import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
+import { getUserDisplayName } from '@o4o/account-ui';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 공통 footer 법정정보 loader
 import { loadFooterLegal } from './lib/footerLegal';
@@ -519,7 +520,7 @@ function KpaStoreLayoutWrapper() {
       <KpaGlobalHeader />
       <StoreDashboardLayout
         config={resolvedConfig}
-        userName={user?.name || user?.email || ''}
+        userName={user ? getUserDisplayName(user) : ''}
         homeLink="/"
         orgName={pharmacyName}
         onLogout={() => { logout(); navigate('/'); }}

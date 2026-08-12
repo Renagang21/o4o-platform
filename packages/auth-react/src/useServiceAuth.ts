@@ -37,6 +37,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     getAccessToken,
     onAuthenticated,
     logoutAllEndpoint = '/auth/logout-all',
+    clearSessionOnLogoutAll = true,
   } = config;
 
   const [user, setUser] = useState<TUser | null>(null);
@@ -139,9 +140,10 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     try {
       await authClient.api.post(logoutAllEndpoint);
     } finally {
-      setUser(null);
+      // 서비스별 차이: 서버 호출만 하고 로컬 세션은 유지하는 서비스가 있다(설정으로 분리).
+      if (clearSessionOnLogoutAll) setUser(null);
     }
-  }, [authClient, logoutAllEndpoint]);
+  }, [authClient, logoutAllEndpoint, clearSessionOnLogoutAll]);
 
   return {
     user,

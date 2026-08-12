@@ -27,6 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import { StoreDashboardLayout, StoreOwnerGuard, PHARMACY_HUB_STORE_CONFIG } from '@o4o/store-ui-core';
 import type { StoreOwnerGuardUser } from '@o4o/store-ui-core';
 import { AccessDenied } from '@o4o/ui';
+import { getUserDisplayName } from '@o4o/account-ui';
 import { useAuth } from '../contexts/AuthContext';
 import { MembershipGate } from '../components/MembershipGate';
 import { BRAND } from '../config/service';
@@ -38,7 +39,7 @@ function ShellLayout() {
   return (
     <StoreDashboardLayout
       config={PHARMACY_HUB_STORE_CONFIG}
-      userName={user?.name || user?.email || ''}
+      userName={user ? getUserDisplayName(user) : ''}
       homeLink="/"
       serviceLabel={BRAND.name}
       serviceBadge="약국 경영자"

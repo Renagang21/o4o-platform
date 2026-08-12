@@ -26,6 +26,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, ShoppingCart, Receipt, Store, AlertTriangle } from 'lucide-react';
+import { getUserDisplayName } from '@o4o/account-ui';
 import {
   fetchStoreDashboard,
   errorMessage,
@@ -177,7 +178,7 @@ export default function StoreOwnerHomePage() {
                 {loading ? '불러오는 중…' : error ? '매장 정보 확인 불가' : storeName}
               </p>
             </div>
-            <p className="mt-1 text-sm text-slate-500">{user?.name || user?.email}</p>
+            <p className="mt-1 text-sm text-slate-500">{user ? getUserDisplayName(user) : ''}</p>
           </div>
           {loading ? (
             <span className="text-sm text-slate-500">확인 중…</span>

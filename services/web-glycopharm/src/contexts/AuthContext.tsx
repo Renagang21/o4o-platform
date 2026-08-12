@@ -11,7 +11,7 @@ import type { User, UserRole } from '@/types';
 import { normalizeUser, extractRoles, normalizeMemberships, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1
-import { useServiceAuth, type AuthLoginResult } from '@o4o/auth-react';
+import { useServiceAuth, useRoleSelection, type AuthLoginResult } from '@o4o/auth-react';
 import { authClient, api } from '../lib/apiClient';
 // Re-export for backward compatibility (API files, pages 등에서 import)
 export { getAccessToken } from '@o4o/auth-client';
@@ -114,12 +114,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             status: (apiUser.status as string) || 'approved',
           }) as User,
         onAuthenticated: (u) => setAvailableRoles(u.roles as UserRole[]),
+        // 기존 동작 보존: 서버 호출만 하고 로컬 user 는 비우지 않는다.
+        clearSessionOnLogoutAll: false,
       }),
       [],
     ),
   );
 
   const { user, setUser } = core;
+  // 역할 전환·부분 갱신은 3서비스 동일 구현이었다 → 공통 Core(useRoleSelection).
+  // GlycoPharm 만 인증 시점 스냅샷(availableRoles)을 허용 축으로 쓰므로 그 축을 명시 주입한다.
+  const { switchRole: selectRole, updateUser, hasMultipleRoles } = useRoleSelection(core, {
+    availableRoles,
+  });
 
   /**
    * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
@@ -134,24 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAvailableRoles([]);
   };
 
-  const logoutAll = async () => {
-    // 기존 동작 보존: 서버 호출만 하고 로컬 user 는 비우지 않는다.
-    await api.post('/auth/logout-all');
-  };
-
-  const selectRole = (role: UserRole) => {
-    setUser((prev) => {
-      if (!prev || !availableRoles.includes(role)) return prev;
-      return { ...prev, roles: [role, ...prev.roles.filter((r) => r !== role)] };
-    });
-  };
-
-  const updateUser = (updates: Partial<User>) => {
-    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
-  };
-
   const switchRole = selectRole;
-  const hasMultipleRoles = availableRoles.length > 1;
 
   // WO-O4O-AUTH-TOKEN-CLEARED-UNIFICATION-V1: 토큰 갱신 실패 시 stale auth 정리
   useEffect(() => {
@@ -211,7 +201,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading: core.isLoading,
         login,
         logout,
-        logoutAll,
+        logoutAll: core.logoutAll,
         selectRole,
         switchRole,
         hasMultipleRoles,

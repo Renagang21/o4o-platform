@@ -13,8 +13,8 @@
 import { createContext, useContext, useMemo, ReactNode } from 'react';
 import { buildPlatformUser } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
-import { useServiceAuth, type AuthLoginResult } from '@o4o/auth-react';
-import { authClient, api } from '../lib/apiClient';
+import { useServiceAuth, useRoleSelection, type AuthLoginResult } from '@o4o/auth-react';
+import { authClient } from '../lib/apiClient';
 
 // Re-export for consumers that import getAccessToken from AuthContext
 export { getAccessToken };
@@ -63,12 +63,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         authClient,
         getAccessToken,
         toUser: (apiUser) => buildPlatformUser(apiUser as never) as User,
+        // 기존 동작 보존: 서버 호출만 하고 로컬 user 는 비우지 않는다.
+        clearSessionOnLogoutAll: false,
       }),
       [],
     ),
   );
 
-  const { user, setUser } = core;
+  const { user } = core;
+  // 역할 전환·부분 갱신은 3서비스 동일 구현이었다 → 공통 Core(useRoleSelection).
+  const { switchRole, updateUser, hasMultipleRoles } = useRoleSelection(core);
 
   const login = async (email: string, password: string): Promise<NetureLoginResult> => {
     const result = await core.login(email, password);
@@ -78,23 +82,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return result;
   };
 
-  const logoutAll = async () => {
-    // Neture 는 기존에 로컬 user 를 비우지 않고 서버 호출만 했다 — 동작 보존.
-    await api.post('/auth/logout-all');
-  };
-
-  const switchRole = (role: UserRole) => {
-    setUser((prev) => {
-      if (!prev || !prev.roles.includes(role)) return prev;
-      return { ...prev, roles: [role, ...prev.roles.filter((r) => r !== role)] };
-    });
-  };
-
-  const updateUser = (updates: Partial<User>) => {
-    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
-  };
-
-  const hasMultipleRoles = user ? user.roles.length > 1 : false;
 
   return (
     <AuthContext.Provider
@@ -104,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading: core.isLoading,
         login,
         logout: core.logout,
-        logoutAll,
+        logoutAll: core.logoutAll,
         switchRole,
         hasMultipleRoles,
         updateUser,

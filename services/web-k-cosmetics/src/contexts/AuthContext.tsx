@@ -13,8 +13,8 @@
 import { createContext, useContext, useState, useRef, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { buildPlatformUser } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
-import { useServiceAuth, type AuthLoginResult } from '@o4o/auth-react';
-import { authClient, api } from '../lib/apiClient';
+import { useServiceAuth, useRoleSelection, type AuthLoginResult } from '@o4o/auth-react';
+import { authClient } from '../lib/apiClient';
 
 // Re-export for backward compatibility
 export { getAccessToken };
@@ -67,12 +67,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         authClient,
         getAccessToken,
         toUser: (apiUser) => buildPlatformUser(apiUser as never) as User,
+        // 기존 동작 보존: 서버 호출만 하고 로컬 user 는 비우지 않는다.
+        clearSessionOnLogoutAll: false,
       }),
       [],
     ),
   );
 
-  const { user, setUser } = core;
+  const { user } = core;
+  // 역할 전환·부분 갱신은 3서비스 동일 구현이었다 → 공통 Core(useRoleSelection).
+  const { switchRole, updateUser, hasMultipleRoles } = useRoleSelection(core);
 
   // WO-O4O-STORE-OWNER-GUARD-CHECKSESSION-FIX-V1 계약 보존:
   //   RoleGuard 가 lazy 로 checkSession() 을 부르되 중복 호출은 하지 않는다.
@@ -101,23 +105,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return result;
   };
 
-  const logoutAll = async () => {
-    // 기존 동작 보존: 서버 호출만 하고 로컬 user 는 비우지 않는다.
-    await api.post('/auth/logout-all');
-  };
-
-  const switchRole = (role: UserRole) => {
-    setUser((prev) => {
-      if (!prev || !prev.roles.includes(role)) return prev;
-      return { ...prev, roles: [role, ...prev.roles.filter((r) => r !== role)] };
-    });
-  };
-
-  const updateUser = (updates: Partial<User>) => {
-    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
-  };
-
-  const hasMultipleRoles = user ? user.roles.length > 1 : false;
 
   return (
     <AuthContext.Provider
@@ -128,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isSessionChecked,
         login,
         logout: core.logout,
-        logoutAll,
+        logoutAll: core.logoutAll,
         switchRole,
         hasMultipleRoles,
         checkSession,

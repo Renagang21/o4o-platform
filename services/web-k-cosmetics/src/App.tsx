@@ -140,6 +140,7 @@ const ForcedContentPage = lazy(() => import('@/pages/operator/signage/ForcedCont
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, COSMETICS_STORE_CONFIG, resolveStoreMenu, StoreOwnerGuard } from '@o4o/store-ui-core';
+import { getUserDisplayName } from '@o4o/account-ui';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 공통 footer 법정정보 loader
 import { loadFooterLegal } from './lib/footerLegal';
@@ -365,7 +366,7 @@ function StoreLayoutWrapper() {
       <KCosGlobalHeader />
       <StoreDashboardLayout
         config={resolvedConfig}
-        userName={user?.name || user?.email || ''}
+        userName={user ? getUserDisplayName(user) : ''}
         homeLink="/"
         onLogout={() => { logout(); navigate('/'); }}
         hideTopBar

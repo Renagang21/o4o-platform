@@ -11,6 +11,9 @@ export default {
     './src/**/*.{js,ts,jsx,tsx}',
     '../../packages/store-ui-core/src/**/*.{ts,tsx}',
     '../../packages/ui/src/**/*.{ts,tsx}',
+    // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1:
+    //   공통 계정 UI(@o4o/account-ui) 소비분의 클래스 누락 방지 (다른 4개 서비스와 동일 항목).
+    '../../packages/account-ui/src/**/*.{ts,tsx}',
     // WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1:
     //   태블릿 Screen Set 편집기·kiosk 미리보기를 공유 패키지에서 그대로 쓴다.
     '../../packages/tablet-screen-set-editor/src/**/*.{ts,tsx}',

@@ -241,6 +241,7 @@ import {
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
+import { getUserDisplayName } from '@o4o/account-ui';
 import { GlycoGlobalHeader } from './components/GlycoGlobalHeader';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 공통 footer 법정정보 loader
@@ -456,7 +457,7 @@ function StoreLayoutWrapper() {
       <GlycoGlobalHeader />
       <StoreDashboardLayout
         config={resolvedConfig}
-        userName={user?.name || user?.email || ''}
+        userName={user ? getUserDisplayName(user) : ''}
         homeLink="/"
         onLogout={() => { logout(); navigate('/'); }}
         banner={<RedirectNoticeBanner />}

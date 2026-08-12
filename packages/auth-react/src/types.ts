@@ -61,6 +61,13 @@ export interface ServiceAuthConfig<TUser> {
   meEndpoint?: string;
   /** 전체 로그아웃 엔드포인트. 기본 `/auth/logout-all`. */
   logoutAllEndpoint?: string;
+  /**
+   * `logoutAll()` 이 로컬 세션(user)까지 비울지 여부. 기본 `true`.
+   *
+   * Neture / K-Cosmetics / GlycoPharm 은 기존에 서버 호출만 하고 로컬 user 는 유지했다.
+   * 그 차이를 서비스별 중복 구현으로 두지 않고 **명시적 설정 1개**로 표현한다.
+   */
+  clearSessionOnLogoutAll?: boolean;
 }
 
 /** Core 가 제공하는 상태·행동(모든 서비스 공통). */

@@ -296,3 +296,49 @@ describe('useServiceAuth — 토큰 정리 · 로그아웃', () => {
     expect(client.api.post).toHaveBeenCalledWith('/auth/logout-all');
   });
 });
+
+/**
+ * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1
+ * Neture / K-Cosmetics / GlycoPharm 이 각자 들고 있던 "서버 호출만 하고 로컬 세션은 유지"
+ * 구현을 설정 1개로 흡수했다. 두 방향 모두 고정한다.
+ */
+describe('useServiceAuth — clearSessionOnLogoutAll', () => {
+  function setupWithFlag(clearSessionOnLogoutAll?: boolean) {
+    const client = makeClient();
+    const hook = renderHook(() =>
+      useServiceAuth<TestUser>({
+        serviceKey: 'neture',
+        authClient: client,
+        toUser,
+        getAccessToken: () => 'valid-token',
+        clearSessionOnLogoutAll,
+      }),
+    );
+    return { hook, client };
+  }
+
+  it('기본값(true)은 로컬 세션까지 비운다', async () => {
+    const { hook } = setupWithFlag();
+    await waitFor(() => expect(hook.result.current.isAuthenticated).toBe(true));
+
+    await act(async () => {
+      await hook.result.current.logoutAll();
+    });
+
+    expect(hook.result.current.user).toBeNull();
+  });
+
+  it('false 면 서버 호출만 하고 로컬 세션은 유지한다', async () => {
+    const { hook, client } = setupWithFlag(false);
+    await waitFor(() => expect(hook.result.current.isAuthenticated).toBe(true));
+
+    await act(async () => {
+      await hook.result.current.logoutAll();
+    });
+
+    expect(client.api.post).toHaveBeenCalledWith('/auth/logout-all');
+    expect(hook.result.current.user).not.toBeNull();
+    expect(hook.result.current.isAuthenticated).toBe(true);
+  });
+});
+

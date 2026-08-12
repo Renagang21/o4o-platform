@@ -148,31 +148,13 @@ export interface User {
 }
 
 /**
- * WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정 정의
- *
- * WO-O4O-KPA-BRANCH-DISTRICT-LEGACY-CLEANUP-V1:
- *   district_admin / branch_admin / district_officer / branch_officer 제거.
- *   KPA에는 kpa-society 운영자(kpa:operator)와 일반 회원(pharmacist)만 존재.
- *
- * 권한 계층 (Role):
- * - 약사: pharmacist (일반 회원 권한)
+ * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1:
+ *   테스트 계정 상수(TEST_ACCOUNTS)와 loginAsTestAccount 는 소비처 0 이라 제거했다.
+ *   `TestUser` 는 일부 화면이 표시용 `position` 필드를 읽을 때 쓰고 있어 타입만 남긴다.
  */
-export type TestAccountType = 'pharmacist';
-
 export interface TestUser extends User {
   position?: string;  // 직책 (표시용)
 }
-
-export const TEST_ACCOUNTS: Record<TestAccountType, TestUser> = {
-  pharmacist: {
-    id: 'test-pharmacist-001',
-    email: 'pharmacist@kpa-test.kr',
-    name: '홍길동 (약사)',
-    role: 'pharmacist',
-    roles: ['pharmacist'],
-    isStoreOwner: false,
-  },
-};
 
 interface AuthContextType {
   // Platform User
@@ -187,7 +169,6 @@ interface AuthContextType {
    *   서버 `code`(SERVICE_NOT_MEMBER 등)를 호출부가 그대로 분기할 수 있다.
    */
   login: (email: string, password: string) => Promise<AuthLoginResult<User>>;
-  loginAsTestAccount: (accountType: TestAccountType) => void;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -359,16 +340,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   /**
-   * WO-KPA-OPERATION-TEST-ENV-V1: 테스트 계정으로 즉시 로그인
-   * - 실제 API 호출 없이 로컬 상태만 변경
-   * - 테스트 환경 전용
-   */
-  const loginAsTestAccount = (accountType: TestAccountType) => {
-    const testUser = TEST_ACCOUNTS[accountType];
-    setUser(testUser);
-  };
-
-  /**
    * WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1:
    * activityType + optional businessInfo 저장
    * - API PATCH로 서버 저장 → 서버가 isStoreOwner 재계산
@@ -447,7 +418,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading: core.isLoading,
         isKpaContextLoaded,
         login,
-        loginAsTestAccount,
         logout,
         logoutAll,
         checkAuth,

@@ -15,6 +15,7 @@
 
 export { useServiceAuth } from './useServiceAuth';
 export { createRouteGuard } from './createRouteGuard';
+export { useRoleSelection } from './useRoleSelection';
 export type {
   AuthLoginResult,
   AuthClientLike,
@@ -22,3 +23,4 @@ export type {
   ServiceAuthCore,
 } from './types';
 export type { RouteGuardDeps, RouteGuardProps, GuardAuthState } from './createRouteGuard';
+export type { RoleSelection } from './useRoleSelection';
