@@ -68,6 +68,14 @@ export const getAllowedOrigins = (): string[] => {
     "https://kpa-society-web-3e3aws7zqa-du.a.run.app",
     "https://k-cosmetics-web-3e3aws7zqa-du.a.run.app",
     "https://pharmacy-hub-web-3e3aws7zqa-du.a.run.app",
+    // WO-O4O-KPA-BRANCH-DEPLOY-AND-RUNTIME-SMOKE-V1:
+    //   분회 서비스의 공용 플랫폼 호스트 + Cloud Run URL.
+    //   분회 자체 도메인(branch_domains)은 여기 정적 목록으로 관리하지 않는다 —
+    //   209개 분회가 각자 도메인을 붙이면 정적 allowlist 로는 확장되지 않으므로,
+    //   custom-domain onboarding 시 branch_domains(status='active') 기반 동적 origin
+    //   판정을 별도 WO 로 도입한다.
+    "https://branch.kpa-society.co.kr",
+    "https://kpa-branch-web-3e3aws7zqa-du.a.run.app",
   ];
 
   return [...devOrigins, ...ipOrigins, ...prodOrigins, ...envOrigins];
