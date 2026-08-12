@@ -1,0 +1,11 @@
+{
+  "targetMasters": 32674,
+  "storeCanonical": 32674,
+  "existingB2b": 0,
+  "plannedCopy": 32674,
+  "check": 0,
+  "blocker": 0,
+  "cosmeticMasters": 32674,
+  "storeCanonicalWithExistingB2b": 0,
+  "checkQueueSize": 0
+}

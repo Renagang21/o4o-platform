@@ -1,0 +1,40 @@
+{
+  "expected": {
+    "cosmeticMasters": 32674,
+    "koStoreCanonical": 32674
+  },
+  "readOnly": true,
+  "cosmeticMasters": 32674,
+  "koStoreCanonical": 32674,
+  "koStoreCanonicalMasters": 32674,
+  "existingKoB2bCosmetic": 0,
+  "existingKoB2bAll": 28,
+  "cosmeticMastersWithoutStore": 0,
+  "duplicateStoreCanonical": 0,
+  "orphanDescriptions": 0,
+  "emptyStoreContent": 0,
+  "copyTargets": 32674,
+  "skipExistingB2b": 0,
+  "storeSourceTypes": {
+    "o4o_cosmetics_retail": 32674
+  },
+  "storeAttribution": [
+    {
+      "has_user": false,
+      "has_supplier": false,
+      "has_summary": true,
+      "has_quality": false,
+      "c": 32674
+    }
+  ],
+  "masterByRegulatoryType": {
+    "DRUG": 177413,
+    "건강기능식품": 40948,
+    "COSMETIC": 32674,
+    "QUASI_DRUG": 17148,
+    "MEDICAL_DEVICE": 3826,
+    "일반": 15,
+    "GENERAL": 11
+  },
+  "matchesExpected": true
+}

@@ -1,0 +1,15 @@
+{
+  "plannedCopy": 32674,
+  "violations": [],
+  "pass": true,
+  "planStoreIdUnique": true,
+  "planMasterUnique": true,
+  "planRowsStillValid": 32674,
+  "contentHashDrift": 0,
+  "storeCanonicalDuplicate": 0,
+  "b2bCollision": 0,
+  "emptyContent": 0,
+  "masterOrphan": 0,
+  "canonicalUniqueIndex": true,
+  "rollbackKeyCollision": 0
+}

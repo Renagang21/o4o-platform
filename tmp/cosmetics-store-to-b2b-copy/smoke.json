@@ -1,0 +1,66 @@
+{
+  "api": "https://api.neture.co.kr",
+  "actor": "sohae2100@gmail.com",
+  "method": "GET only",
+  "dbWrites": 0,
+  "results": [
+    {
+      "masterId": "00043f5d-2859-48c9-8fa8-34d0397e9cb4",
+      "store": {
+        "status": 200,
+        "koCanonicalId": "4039cbfb-bb8a-4c7f-8ca7-fdb0d8aebfaf",
+        "contentLen": 265
+      },
+      "b2b": {
+        "status": 200,
+        "koCanonicalId": "9c1709e5-0736-48e9-a13a-60fce8881e3f",
+        "contentLen": 265
+      },
+      "bothReadable": true,
+      "idDiffers": true,
+      "sameLength": true,
+      "expectedStoreId": "4039cbfb-bb8a-4c7f-8ca7-fdb0d8aebfaf",
+      "expectedB2bId": "9c1709e5-0736-48e9-a13a-60fce8881e3f",
+      "idsMatchDb": true
+    },
+    {
+      "masterId": "0008f09f-7e62-4243-828f-7cb1ace3cfb4",
+      "store": {
+        "status": 200,
+        "koCanonicalId": "04d5bc16-f010-4e1f-ad23-916e08cf7f3d",
+        "contentLen": 238
+      },
+      "b2b": {
+        "status": 200,
+        "koCanonicalId": "cac9d239-58a6-4de2-b4c9-dd434b9bd0de",
+        "contentLen": 238
+      },
+      "bothReadable": true,
+      "idDiffers": true,
+      "sameLength": true,
+      "expectedStoreId": "04d5bc16-f010-4e1f-ad23-916e08cf7f3d",
+      "expectedB2bId": "cac9d239-58a6-4de2-b4c9-dd434b9bd0de",
+      "idsMatchDb": true
+    },
+    {
+      "masterId": "00093df8-818e-4dfd-a0bf-771ff4eaac55",
+      "store": {
+        "status": 200,
+        "koCanonicalId": "9530eb32-9412-4e3f-bf2f-0bd885ce0274",
+        "contentLen": 193
+      },
+      "b2b": {
+        "status": 200,
+        "koCanonicalId": "ec661ea6-6a16-478d-88ed-bd069e70ed22",
+        "contentLen": 193
+      },
+      "bothReadable": true,
+      "idDiffers": true,
+      "sameLength": true,
+      "expectedStoreId": "9530eb32-9412-4e3f-bf2f-0bd885ce0274",
+      "expectedB2bId": "ec661ea6-6a16-478d-88ed-bd069e70ed22",
+      "idsMatchDb": true
+    }
+  ],
+  "pass": true
+}

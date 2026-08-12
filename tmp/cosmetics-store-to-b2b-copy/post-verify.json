@@ -1,0 +1,88 @@
+{
+  "plannedCopy": 32674,
+  "insertedReported": 32674,
+  "violations": [],
+  "samples": [
+    {
+      "masterId": "00043f5d-2859-48c9-8fa8-34d0397e9cb4",
+      "storeId": "4039cbfb-bb8a-4c7f-8ca7-fdb0d8aebfaf",
+      "b2bId": "9c1709e5-0736-48e9-a13a-60fce8881e3f",
+      "idDiffers": true,
+      "typeDiffers": true,
+      "sameContent": true,
+      "head": "<p>비플레인 [유기자차]선뮤즈 모이스처 선크림 — 선케어 제품입니다.</p>\n<h3>주요"
+    },
+    {
+      "masterId": "0008f09f-7e62-4243-828f-7cb1ace3cfb4",
+      "storeId": "04d5bc16-f010-4e1f-ad23-916e08cf7f3d",
+      "b2bId": "cac9d239-58a6-4de2-b4c9-dd434b9bd0de",
+      "idDiffers": true,
+      "typeDiffers": true,
+      "sameContent": true,
+      "head": "<p>블루반 히알루론산 수분 마스크 — 마스크 제품입니다.</p>\n<h3>주요 특징</h3"
+    },
+    {
+      "masterId": "00093df8-818e-4dfd-a0bf-771ff4eaac55",
+      "storeId": "9530eb32-9412-4e3f-bf2f-0bd885ce0274",
+      "b2bId": "ec661ea6-6a16-478d-88ed-bd069e70ed22",
+      "idDiffers": true,
+      "typeDiffers": true,
+      "sameContent": true,
+      "head": "<p>타입넘버 TYPE.No 바디스크럽 09/60/91 — 바디워시 제품입니다.</p>\n<"
+    },
+    {
+      "masterId": "0014e16f-e3b4-4847-9d69-80b256d7a7c2",
+      "storeId": "eceb4cae-a64d-49eb-9df9-a80ba93ed49f",
+      "b2bId": "b0a2aa48-cba6-472c-91e6-913bf02b4258",
+      "idDiffers": true,
+      "typeDiffers": true,
+      "sameContent": true,
+      "head": "<p>스킨푸드 마스크 워시오프 [라이스] — 팩 제품입니다.</p>\n<h3>사용 방법</h"
+    },
+    {
+      "masterId": "001587f2-0830-4161-b0ff-9bbb99c21e72",
+      "storeId": "bc33bf84-3eec-446f-9105-3d7f3298e107",
+      "b2bId": "541b363f-06d6-4485-82a5-0b70ba18091f",
+      "idDiffers": true,
+      "typeDiffers": true,
+      "sameContent": true,
+      "head": "<p>닥터방기원 슈퍼 랩 탈모 트리트먼트 /최다임상/모발빠짐개선 — 샴푸 제품입니다.</p"
+    }
+  ],
+  "newB2bRowsFound": 32674,
+  "koB2bCanonicalCosmetic": 32674,
+  "koB2bCanonicalAll": 32702,
+  "koB2bCanonicalCosmeticBefore": 0,
+  "koB2bCanonicalAllBefore": 28,
+  "existingB2bPreserved": 28,
+  "contentMatch": 32674,
+  "summaryMatch": 32674,
+  "badPairs": [],
+  "storeRowsChecked": 32674,
+  "storeUnchanged": 32674,
+  "storeChanged": [],
+  "koStoreCanonicalBefore": 32674,
+  "koStoreCanonicalAfter": 32674,
+  "cosmeticMastersBefore": 32674,
+  "cosmeticMastersAfter": 32674,
+  "masterByRegulatoryTypeAfter": {
+    "일반": 15,
+    "건강기능식품": 40948,
+    "COSMETIC": 32674,
+    "DRUG": 177413,
+    "GENERAL": 11,
+    "MEDICAL_DEVICE": 3826,
+    "QUASI_DRUG": 17148
+  },
+  "newRowsOutsideCosmetic": 0,
+  "newRowsOtherLanguage": 0,
+  "b2bDescriptionsByRegulatoryType": {
+    "일반": 12,
+    "건강기능식품": 44,
+    "COSMETIC": 32674
+  },
+  "canonicalDup": 0,
+  "orphan": 0,
+  "emptyContentB2b": 0,
+  "pass": true
+}
