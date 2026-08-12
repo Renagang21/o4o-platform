@@ -963,11 +963,15 @@ const QUICK_LINKS = [
   { label: '사업자 정보', path: '/mypage/business-profile' },
 ];
 
+// WO-O4O-NETURE-SUPPLIER-OPERATING-READINESS-CLOSEOUT-BATCH-V1:
+//   라벨은 SupplierSpaceLayout 사이드바(canonical)와 동일 어휘를 사용한다.
+//   검수·게시 현황(/supplier/store-materials-status) 진입점 누락도 함께 해소한다.
 const CONTENT_LINKS = [
   { label: '제품 콘텐츠', path: '/supplier/b2b-content' },
-  { label: '매장용 설명서', path: '/supplier/store-descriptions' },
-  { label: '태블릿', path: '/supplier/tablet-screen-sets' },
+  { label: '매장용 상품 설명서', path: '/supplier/store-descriptions' },
+  { label: '태블릿 화면 자료', path: '/supplier/tablet-screen-sets' },
   { label: '디지털 사이니지', path: '/supplier/signage' },
+  { label: '검수·게시 현황', path: '/supplier/store-materials-status' },
 ];
 
 function inferActionPath(action: string, navigate: (path: string) => void) {

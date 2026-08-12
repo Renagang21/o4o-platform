@@ -1528,7 +1528,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                         <p className="text-[11px] text-slate-500">공급 방식이 설정되지 않아 HUB에 노출되지 않습니다.</p>
                       </div>
                       <p className="text-[11px] text-slate-400 pt-1 border-t border-slate-100">
-                        공급 방식은 상품 편집에서 전체 공개 여부와 서비스 공급 대상을 조정할 수 있습니다. 전용 공급 방식 관리 화면은 준비 중입니다.
+                        공급 방식은 상품 편집에서 전체 공개 여부와 서비스 공급 대상을 조정합니다. 공급 방식별 안내는 공급 오퍼 화면에서 확인할 수 있습니다.
                       </p>
                     </div>
                   )}

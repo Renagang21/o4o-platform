@@ -36,6 +36,10 @@ export default function SupplierRecruitmentsPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [closingId, setClosingId] = useState<string | null>(null);
+  // WO-O4O-NETURE-SUPPLIER-OPERATING-READINESS-CLOSEOUT-BATCH-V1:
+  //   close()/reopen() 은 실패 시 throw 하지 않고 { success:false } 를 돌려준다.
+  //   결과를 무시하면 마감·재개 실패가 무음이 되므로 상세 화면과 동일하게 표시한다.
+  const [actionError, setActionError] = useState<string | null>(null);
 
   // WO-O4O-NETURE-SUPPLIER-CONTENT-DISTRIBUTION-LOAD-ERROR-CONTRACT-V1:
   //   listMine() 이 throw 하도록 바뀌었다. 조회 실패를 "모집 0건" 으로 표시하지 않는다.
@@ -58,8 +62,13 @@ export default function SupplierRecruitmentsPage() {
   const handleClose = async (id: string) => {
     if (!window.confirm('이 모집을 마감하면 신규 신청을 받을 수 없습니다.\n기존 신청 및 승인된 판매자의 주문 가능 상태는 유지됩니다.\n마감하시겠습니까?')) return;
     setClosingId(id);
-    await supplierRecruitmentApi.close(id);
+    setActionError(null);
+    const result = await supplierRecruitmentApi.close(id);
     setClosingId(null);
+    if (!result.success) {
+      setActionError(result.message || '모집을 마감하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      return;
+    }
     await load();
   };
 
@@ -67,8 +76,13 @@ export default function SupplierRecruitmentsPage() {
   const handleReopen = async (id: string) => {
     if (!window.confirm('이 모집을 다시 재개하면 신규 신청을 받을 수 있습니다.\n재개하시겠습니까?')) return;
     setClosingId(id);
-    await supplierRecruitmentApi.reopen(id);
+    setActionError(null);
+    const result = await supplierRecruitmentApi.reopen(id);
     setClosingId(null);
+    if (!result.success) {
+      setActionError(result.message || '모집을 재개하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      return;
+    }
     await load();
   };
 
@@ -195,6 +209,12 @@ export default function SupplierRecruitmentsPage() {
         <span className="text-blue-700"> 노출 대기·노출 반려</span> 상태의 모집은 아직(또는 더 이상) 매장/약국 사용자에게 노출되지 않습니다.
         노출 승인은 서비스 운영자가 결정하며, 공급자가 직접 변경할 수 없습니다.
       </div>
+
+      {actionError && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {actionError}
+        </div>
+      )}
 
       {loading ? (
         <div className="py-16 text-center text-slate-400 text-sm">불러오는 중...</div>

@@ -296,7 +296,7 @@ export default function SupplierLibraryPage() {
         color: '#1e40af',
       }}>
         <AlertCircle size={16} />
-        파일 URL을 직접 입력하여 자료를 등록합니다. 파일 업로드 기능은 추후 제공됩니다.
+        자료는 이미 게시된 파일의 URL 을 입력해 등록합니다. 이 화면에서 파일을 직접 업로드하지는 않습니다.
       </div>
 
       {/* WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1:

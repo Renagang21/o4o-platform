@@ -251,7 +251,7 @@ export default function SupplierTabletScreenSetsPage() {
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div>
           <h1 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <Layers className="w-5 h-5 text-indigo-600" /> 매장용 태블릿 콘텐츠
+            <Layers className="w-5 h-5 text-indigo-600" /> 태블릿 화면 자료
           </h1>
           <p className="text-[12px] text-slate-500 mt-0.5 leading-relaxed">
             매장에 제공할 태블릿 화면 세트 원본을 제작하고, 대상 매장 유형을 지정해 매장 HUB 에 게시합니다.
