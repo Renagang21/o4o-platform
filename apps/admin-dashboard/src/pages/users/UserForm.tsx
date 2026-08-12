@@ -14,12 +14,15 @@ import BusinessInfoSection from './components/BusinessInfoSection';
 import toast from 'react-hot-toast';
 import { UserApi } from '@/api/userApi';
 import { ROLES } from '@/lib/rbac-catalog';
+// IR-O4O-SERVICE-MEMBER-PASSWORD-AND-ROLE-CONSUMER-INTEGRITY-AUDIT-V1 (FIX-2)
+//   비밀번호 정책 정본은 백엔드 passwordPolicyBodyValidator 와 동일한 이 헬퍼다.
+import { isPasswordPolicyCompliant, PASSWORD_POLICY_MESSAGE } from '@/lib/password-policy';
 
 const ROLE_OPTIONS = Object.values(ROLES).map((r) => ({ value: r.key, label: r.label }));
 
 const userSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters').optional().or(z.literal('')),
+  password: z.string().refine(isPasswordPolicyCompliant, PASSWORD_POLICY_MESSAGE).optional().or(z.literal('')),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   roles: z.array(z.string()).min(1, 'At least one role is required'),
@@ -108,11 +111,10 @@ export default function UserForm() {
       };
 
       if (isEdit) {
-        // Don't send password if it's empty
-        if (data.password && data.password.trim()) {
-          payload.password = data.password;
-        }
-
+        // IR-O4O-SERVICE-MEMBER-PASSWORD-AND-ROLE-CONSUMER-INTEGRITY-AUDIT-V1 (FIX-2)
+        //   PUT /api/v1/users/:id 는 비밀번호를 쓰지 않는다(400 PASSWORD_NOT_ALLOWED_HERE).
+        //   서비스 비밀번호는 운영자 회원 관리(서비스 선택 후 변경),
+        //   플랫폼 계정 비밀번호는 플랫폼 계정 관리가 정본 경로다.
         await UserApi.updateUser(id, payload);
 
         toast.success('User updated successfully');
@@ -211,21 +213,30 @@ export default function UserForm() {
                   )}
                 </div>
 
-                <div>
-                  <Label htmlFor="password">
-                    Password {isEdit && '(leave blank to keep current)'}
-                  </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    autoComplete={isEdit ? 'new-password' : 'new-password'}
-                    {...register('password')}
-                    placeholder={isEdit ? 'Leave blank to keep current' : 'Enter password'}
-                  />
-                  {errors.password && (
-                    <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
-                  )}
-                </div>
+                {isEdit ? (
+                  <div>
+                    <Label>비밀번호</Label>
+                    <p className="text-sm text-slate-500 mt-1">
+                      이 화면에서는 비밀번호를 변경하지 않습니다. 서비스 비밀번호는 운영자 회원 관리(서비스 선택 후 변경),
+                      플랫폼 계정 비밀번호는 플랫폼 계정 관리에서 변경하세요.
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      autoComplete="new-password"
+                      {...register('password')}
+                      placeholder="Enter password"
+                    />
+                    <p className="text-sm text-slate-500 mt-1">{PASSWORD_POLICY_MESSAGE}</p>
+                    {errors.password && (
+                      <p className="text-sm text-red-500 mt-1">{errors.password.message}</p>
+                    )}
+                  </div>
+                )}
 
                 <div>
                   <Label htmlFor="status">Status</Label>

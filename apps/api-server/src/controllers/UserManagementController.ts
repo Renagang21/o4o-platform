@@ -187,7 +187,24 @@ export class UserManagementController {
   updateUser = async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      const { email, firstName, lastName, status, roles } = req.body;
+      const { email, firstName, lastName, status, roles, password } = req.body;
+
+      // IR-O4O-SERVICE-MEMBER-PASSWORD-AND-ROLE-CONSUMER-INTEGRITY-AUDIT-V1 (FIX-1)
+      //   이 엔드포인트(PUT /api/v1/users/:id)는 비밀번호를 쓰지 않는다.
+      //   그런데 admin-dashboard 의 사용자 편집 화면이 password 를 함께 보내고 있었고,
+      //   여기서 destructure 하지 않아 **조용히 무시**됐다 — 화면에는 성공으로 보이지만
+      //   users.password 도 service_credentials 도 바뀌지 않는 "성공했는데 안 바뀜" 상태다.
+      //   AdminUserController.updateUser 와 동일한 계약으로 **명시적으로 거부**한다.
+      if (password !== undefined) {
+        res.status(400).json({
+          success: false,
+          error:
+            '이 API 는 비밀번호를 변경하지 않습니다. 서비스 비밀번호는 운영자 회원 관리(서비스 선택 후 변경), ' +
+            '플랫폼 계정 비밀번호는 플랫폼 계정 관리에서 변경하세요.',
+          code: 'PASSWORD_NOT_ALLOWED_HERE',
+        });
+        return;
+      }
 
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
