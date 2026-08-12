@@ -170,7 +170,34 @@ F2·F3 는 원래 삼키지 않았다(500 반환) — **오류 처리 구조를 
 
 ## 8. 배포 revision · 배포 후 로그 · runtime smoke
 
-(아래는 push 후 실측 결과로 갱신)
+### 배포
+
+- commit `7278e5206` → `Deploy API Server (Cloud Run)` **success**
+- 서비스 `o4o-core-api` / region `asia-northeast3`
+- 트래픽 revision: **`o4o-core-api-03314-rf4`** (latestReady == traffic)
+- push 가 표준 파이프라인을 자동 기동한 것이며 수동 배포는 하지 않았다.
+
+### 배포 후 로그
+
+```
+revision_name = "o4o-core-api-03314-rf4" AND textPayload:"could not convert type jsonb to json"
+→ 0건 (재발 없음)
+```
+
+해당 revision 이 실제 트래픽을 받고 있음을 요청 로그로 확인 (2026-08-12T12:57~12:58Z).
+
+### API runtime smoke — 동일 계정 · 동일 엔드포인트 BEFORE / AFTER
+
+테스트 계정 `renagang21@gmail.com` (약국/매장 경영자), `PATCH /api/v1/glycopharm/mypage/business-info`.
+
+| 시점 | 결과 |
+|---|---|
+| **BEFORE** (수정 전 revision) | **HTTP 500** `{"success":false,"error":"사업자 정보 수정 중 오류가 발생했습니다."}` |
+| **AFTER** ① 새 값 저장 | **HTTP 200** — 응답에 새 값 반영 |
+| **AFTER** ② 재조회 | 새 값 **영속 확인**, 그 외 필드(사업자번호·상호·대표자·주소·종목·사업자유형·개업일) **전부 보존** |
+| **AFTER** ③ 원복 | 원래 값으로 재저장 후 전체 필드 **byte-exact 일치 확인** (`RESTORED_EXACTLY = True`) |
+
+→ 운영 데이터는 검증 전 상태로 되돌아갔다. 다른 계정·다른 서비스 데이터는 손대지 않았다.
 
 ---
 
