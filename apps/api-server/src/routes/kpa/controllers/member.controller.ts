@@ -24,6 +24,22 @@ import { StoreSlugService } from '@o4o/platform-core/store-identity';
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
 
+/**
+ * WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1
+ * transaction 내부에서 기존 응답 계약(404 / 500)을 유지한 채 rollback 하기 위한 sentinel.
+ * transaction callback 은 res 를 직접 다루지 않고 이 오류를 throw 한다.
+ */
+class MemberInfoAbort extends Error {
+  constructor(
+    public readonly status: number,
+    public readonly code: string,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'MemberInfoAbort';
+  }
+}
+
 const handleValidationErrors = (req: Request, res: Response, next: any): void => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -540,56 +556,28 @@ export function createMemberController(
           member.joined_at = new Date();
         }
 
-        const saved = await memberRepo.save(member);
+        // ============================================================
+        // WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1
+        //   (기존 D-2) kpa_members 를 먼저 commit 한 뒤 users / profile /
+        //   service_memberships 동기화를 별도 try 에서 수행하고 실패를
+        //   console.error 로 삼켜 200 을 반환했다 →
+        //   kpa_members=active / service_memberships=pending 부분 성공이 가능했다.
+        //
+        //   교정: 승인(pending→active) 경로의 관련 write 를 단일 transaction 으로
+        //   묶고, 실패 시 전체 rollback + 오류 응답을 반환한다.
+        //   상태 의미 · role 부여 규칙 · 서비스 경계 · 응답 계약은 변경하지 않는다.
+        //
+        //   suspended / rejected / withdrawn / 재승인 경로는
+        //   MembershipApprovalService 가 자체 queryRunner transaction 을 소유한다
+        //   (별도 connection). 중첩하면 FOR UPDATE lock 교착 위험이 있으므로
+        //   delegate 를 먼저 수행하고 성공한 경우에만 kpa_members 를 저장한다
+        //   — delegate 실패 시 kpa_members write 자체가 발생하지 않는다.
+        //   기존과 달리 실패를 삼키지 않고 그대로 throw 한다 (500).
+        // ============================================================
+        const isApprovalTransition = oldStatus === 'pending' && newStatus === 'active';
 
-        // ============================================================
-        // WO-KPA-A-APPROVAL-RBAC-ALIGNMENT-V1 + WO-KPA-A-ROLE-CLEANUP-V1
-        // users.status/isActive via raw SQL (ESM rule compliance)
-        // kpa:pharmacist / kpa:student role 할당 제거 — profile 기반 전환
-        // ============================================================
-        try {
-          if (oldStatus === 'pending' && newStatus === 'active') {
-            // APPROVAL: Activate user
-            await dataSource.query(
-              `UPDATE users
-               SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $2
-               WHERE id = $1`,
-              [member.user_id, req.user!.id]
-            );
-            // WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1: 약사/약대생만 처리
-            const mType = member.membership_type;
-            if (mType === 'student' || mType === 'pharmacy_student_member') {
-              await dataSource.query(
-                `INSERT INTO kpa_student_profiles (user_id, university_name, student_year)
-                 VALUES ($1, $2, $3)
-                 ON CONFLICT (user_id) DO NOTHING`,
-                [member.user_id, member.university_name, member.student_year]
-              );
-            } else {
-              // pharmacist / pharmacist_member
-              await dataSource.query(
-                `INSERT INTO kpa_pharmacist_profiles (user_id, license_number, activity_type)
-                 VALUES ($1, $2, $3)
-                 ON CONFLICT (user_id) DO NOTHING`,
-                [member.user_id, member.license_number, member.activity_type]
-              );
-            }
-            // WO-O4O-KPA-MEMBER-APPROVAL-SM-SYNC-FIX-V1:
-            //   canonical service_memberships 동기화 — 누락 시 GET /kpa/members 의
-            //   sm.status 기반 필터/카운트가 승인 후에도 'pending' 으로 남아
-            //   승인대기 탭에 계속 표시되는 정합성 문제 해소.
-            //   WHERE status='pending' 가드로 멱등성 보장 (중복 호출 안전).
-            //   approveMembership() 전체 호출 대신 inline UPDATE 만 추가 —
-            //   STEP3 role_assignments 부여가 KPA 'profile 기반 RBAC role 최소화'
-            //   정책 (WO-KPA-A-ROLE-CLEANUP-V1) 과 충돌하지 않게 분리.
-            //   근거: IR-O4O-KPA-OPERATOR-MEMBER-APPROVAL-STALE-PENDING-AUDIT-V1
-            await dataSource.query(
-              `UPDATE service_memberships
-               SET status = 'active', approved_by = $2, approved_at = NOW(), updated_at = NOW()
-               WHERE user_id = $1 AND service_key = 'kpa-society' AND status = 'pending'`,
-              [member.user_id, req.user!.id]
-            );
-          } else if (newStatus === 'suspended' || newStatus === 'rejected') {
+        if (!isApprovalTransition) {
+          if (newStatus === 'suspended' || newStatus === 'rejected') {
             // WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected도 suspended와 동일하게 membership 중지
             const approvalService = new MembershipApprovalService();
             await approvalService.suspendMembership({
@@ -618,9 +606,92 @@ export function createMemberController(
               serviceKeys: ['kpa-society'],
             });
           }
-        } catch (syncError) {
-          console.error('[WO-KPA-A-APPROVAL-RBAC-ALIGNMENT-V1] User/profile sync failed:', syncError);
         }
+
+        const saved = await dataSource.transaction(async (manager) => {
+          const savedMember = await manager.save(KpaMember, member);
+
+          if (isApprovalTransition) {
+            // ============================================================
+            // WO-KPA-A-APPROVAL-RBAC-ALIGNMENT-V1 + WO-KPA-A-ROLE-CLEANUP-V1
+            // users.status/isActive via raw SQL (ESM rule compliance)
+            // kpa:pharmacist / kpa:student role 할당 제거 — profile 기반 전환
+            // ============================================================
+            await manager.query(
+              `UPDATE users
+               SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $2
+               WHERE id = $1`,
+              [member.user_id, req.user!.id]
+            );
+            // WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1: 약사/약대생만 처리
+            const mType = member.membership_type;
+            if (mType === 'student' || mType === 'pharmacy_student_member') {
+              await manager.query(
+                `INSERT INTO kpa_student_profiles (user_id, university_name, student_year)
+                 VALUES ($1, $2, $3)
+                 ON CONFLICT (user_id) DO NOTHING`,
+                [member.user_id, member.university_name, member.student_year]
+              );
+            } else {
+              // pharmacist / pharmacist_member
+              await manager.query(
+                `INSERT INTO kpa_pharmacist_profiles (user_id, license_number, activity_type)
+                 VALUES ($1, $2, $3)
+                 ON CONFLICT (user_id) DO NOTHING`,
+                [member.user_id, member.license_number, member.activity_type]
+              );
+            }
+            // WO-O4O-KPA-MEMBER-APPROVAL-SM-SYNC-FIX-V1:
+            //   canonical service_memberships 동기화 — 누락 시 GET /kpa/members 의
+            //   sm.status 기반 필터/카운트가 승인 후에도 'pending' 으로 남아
+            //   승인대기 탭에 계속 표시되는 정합성 문제 해소.
+            //   WHERE status='pending' 가드로 멱등성 보장 (중복 호출 안전).
+            //   approveMembership() 전체 호출 대신 inline UPDATE 만 추가 —
+            //   STEP3 role_assignments 부여가 KPA 'profile 기반 RBAC role 최소화'
+            //   정책 (WO-KPA-A-ROLE-CLEANUP-V1) 과 충돌하지 않게 분리.
+            //   근거: IR-O4O-KPA-OPERATOR-MEMBER-APPROVAL-STALE-PENDING-AUDIT-V1
+            await manager.query(
+              `UPDATE service_memberships
+               SET status = 'active', approved_by = $2, approved_at = NOW(), updated_at = NOW()
+               WHERE user_id = $1 AND service_key = 'kpa-society' AND status = 'pending'`,
+              [member.user_id, req.user!.id]
+            );
+          }
+
+          // 서비스 레코드 동기화 (kpa-a) — 동일 transaction manager 사용
+          const svcRecord = await manager.findOne(KpaMemberService, {
+            where: { member_id: member.id, service_key: 'kpa-a' },
+          });
+          if (svcRecord) {
+            if (newStatus === 'active') {
+              svcRecord.status = 'approved';
+              svcRecord.approved_by = req.user!.id;
+              svcRecord.approved_at = new Date();
+            } else if (newStatus === 'suspended') {
+              svcRecord.status = 'suspended';
+            } else if (newStatus === 'rejected') {
+              svcRecord.status = 'rejected';
+            } else if (newStatus === 'pending') {
+              svcRecord.status = 'pending';
+            }
+            // withdrawn: 서비스 레코드 유지하되 상태 변경하지 않음
+            if (newStatus !== 'withdrawn') {
+              await manager.save(KpaMemberService, svcRecord);
+            }
+          } else if (newStatus !== 'withdrawn') {
+            // 서비스 레코드가 없으면 생성 (마이그레이션 이전 회원 대응)
+            const newSvc = manager.create(KpaMemberService, {
+              member_id: member.id,
+              service_key: 'kpa-a',
+              status: newStatus === 'active' ? 'approved' : 'pending',
+              approved_by: newStatus === 'active' ? req.user!.id : null,
+              approved_at: newStatus === 'active' ? new Date() : null,
+            });
+            await manager.save(KpaMemberService, newSvc);
+          }
+
+          return savedMember;
+        });
 
         // ============================================================
         // WO-O4O-KPA-MEMBER-APPROVAL-STORE-OWNER-AUTO-ACTIVATION-V1
@@ -781,38 +852,6 @@ export function createMemberController(
               `매장 운영 권한(store_owner) 자동 부여 실패: ${errMsg.slice(0, 200)} (운영자 수동 확인 필요)`,
             );
           }
-        }
-
-        // 서비스 레코드 동기화 (kpa-a)
-        const svcRecord = await serviceRepo.findOne({
-          where: { member_id: member.id, service_key: 'kpa-a' },
-        });
-        if (svcRecord) {
-          if (newStatus === 'active') {
-            svcRecord.status = 'approved';
-            svcRecord.approved_by = req.user!.id;
-            svcRecord.approved_at = new Date();
-          } else if (newStatus === 'suspended') {
-            svcRecord.status = 'suspended';
-          } else if (newStatus === 'rejected') {
-            svcRecord.status = 'rejected';
-          } else if (newStatus === 'pending') {
-            svcRecord.status = 'pending';
-          }
-          // withdrawn: 서비스 레코드 유지하되 상태 변경하지 않음
-          if (newStatus !== 'withdrawn') {
-            await serviceRepo.save(svcRecord);
-          }
-        } else if (newStatus !== 'withdrawn') {
-          // 서비스 레코드가 없으면 생성 (마이그레이션 이전 회원 대응)
-          const newSvc = serviceRepo.create({
-            member_id: member.id,
-            service_key: 'kpa-a',
-            status: newStatus === 'active' ? 'approved' : 'pending',
-            approved_by: newStatus === 'active' ? req.user!.id : null,
-            approved_at: newStatus === 'active' ? new Date() : null,
-          });
-          await serviceRepo.save(newSvc);
         }
 
         // WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1: Record audit log
@@ -1099,218 +1138,247 @@ export function createMemberController(
     body('nickname').optional({ nullable: true }).isString().isLength({ max: 50 }),
     handleValidationErrors,
     async (req: Request, res: Response): Promise<void> => {
+      // WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1:
+      //   payload 해석과 응답 누적 상태는 transaction 밖에서 선언 —
+      //   commit 이후의 non-blocking 후속 단계(store_owner 부여 / audit log)에서도 사용한다.
+      const {
+        name, membership_type, license_number, pharmacy_name, pharmacy_address,
+        activity_type, business_number, pharmacy_phone, nickname,
+        // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
+        contactName,
+        // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical split address fields
+        zipCode, address1, address2,
+        // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
+        //   canonical 3개 필드 추가 (정책 B: canonical key 만 destructure).
+        ownerPhone, ceoName, taxInvoiceEmail,
+      } = req.body;
+      const changes: Record<string, any> = {};
+      const warnings: string[] = [];
+
       try {
-        // ─── WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1 ───
-        //   km.id 또는 sm.id 양쪽 허용 + km 누락 시 skeleton ensure.
-        //   GET /kpa/members 가 m.id = km_id ?? sm_id 로 반환하므로 양쪽 모두 도달 가능.
-        let member = await memberRepo.findOne({ where: { id: req.params.id } });
-        let memberWasEnsured = false;
+        // ============================================================
+        // WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1
+        //   (기존 D-5) kpa_members skeleton ensure / memberRepo.save /
+        //   users.name / users.nickname / users.businessInfo /
+        //   kpa_pharmacist_profiles / role_assignments write 가
+        //   각각 독립 실행되어 중간 실패 시 부분 성공이 남았다.
+        //   (기존 D-1) users.name write 가 존재하지 않는 updated_at 컬럼을 참조해
+        //   이름 수정이 항상 실패했고, 그 시점에 kpa_members 는 이미 commit 되어 있었다.
+        //
+        //   교정: 위 write 전부를 단일 transaction manager 로 묶는다.
+        //   중간 실패 시 전체 rollback + 오류 응답.
+        //   store_owner 자동 부여 / audit log 는 기존 계약대로 non-blocking 유지
+        //   (실패 시 warnings 동봉, 회원정보 수정 자체는 성공) — commit 이후 수행.
+        // ============================================================
+        const txResult = await dataSource.transaction(async (manager) => {
+          // ─── WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1 ───
+          //   km.id 또는 sm.id 양쪽 허용 + km 누락 시 skeleton ensure.
+          //   GET /kpa/members 가 m.id = km_id ?? sm_id 로 반환하므로 양쪽 모두 도달 가능.
+          let member = await manager.findOne(KpaMember, { where: { id: req.params.id } });
+          let memberWasEnsured = false;
 
-        if (!member) {
-          // req.params.id 가 service_memberships.id 일 수 있음 — fallback 시도
-          const smRows = await dataSource.query(
-            `SELECT user_id, status, role, created_at
-             FROM service_memberships
-             WHERE id = $1 AND service_key IN ('kpa-society', 'kpa')
-             LIMIT 1`,
-            [req.params.id]
-          );
-          if (smRows.length === 0) {
-            res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Member not found' } });
-            return;
-          }
-          const sm = smRows[0];
-
-          // 동일 user 의 km 존재 여부 재확인 (sm.id 와 km.id 가 다른 경우)
-          const existingKm = await memberRepo.findOne({ where: { user_id: sm.user_id } });
-          if (existingKm) {
-            member = existingKm;
-          } else {
-            // skeleton 생성 — backfill migration 과 동일 derive 정책
-            const profilePresence = await dataSource.query(
-              `SELECT
-                 EXISTS(SELECT 1 FROM kpa_pharmacist_profiles WHERE user_id = $1) AS has_pp,
-                 EXISTS(SELECT 1 FROM kpa_student_profiles WHERE user_id = $1) AS has_sp`,
-              [sm.user_id]
+          if (!member) {
+            // req.params.id 가 service_memberships.id 일 수 있음 — fallback 시도
+            const smRows = await manager.query(
+              `SELECT user_id, status, role, created_at
+               FROM service_memberships
+               WHERE id = $1 AND service_key IN ('kpa-society', 'kpa')
+               LIMIT 1`,
+              [req.params.id]
             );
-            const hasPp = !!profilePresence[0]?.has_pp;
-            const hasSp = !!profilePresence[0]?.has_sp;
-            const derivedType = hasPp ? 'pharmacist' : hasSp ? 'pharmacy_student_member' : 'pharmacist';
-            const safeRole = ['member', 'operator', 'admin'].includes(sm.role) ? sm.role : 'member';
-            const safeStatus = sm.status === 'active' ? 'active' : 'pending';
-            const joinedAt = sm.status === 'active' ? new Date(sm.created_at) : null;
-
-            // raw SQL INSERT — TypeORM Repository.create 오버로드 타입 회피 + 결과 row 즉시 반환.
-            const insertResult = await dataSource.query(
-              `INSERT INTO kpa_members
-                 (user_id, role, status, identity_status, membership_type, joined_at, created_at, updated_at)
-               VALUES ($1, $2, $3, 'active', $4, $5, NOW(), NOW())
-               RETURNING id`,
-              [sm.user_id, safeRole, safeStatus, derivedType, joinedAt]
-            );
-            const insertedId: string | undefined = insertResult?.[0]?.id;
-            const ensured = insertedId
-              ? await memberRepo.findOne({ where: { id: insertedId } })
-              : null;
-            if (!ensured) {
-              res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Failed to ensure kpa_members skeleton' } });
-              return;
+            if (smRows.length === 0) {
+              throw new MemberInfoAbort(404, 'NOT_FOUND', 'Member not found');
             }
-            member = ensured;
-            memberWasEnsured = true;
-          }
-        }
+            const sm = smRows[0];
 
-        const {
-          name, membership_type, license_number, pharmacy_name, pharmacy_address,
-          activity_type, business_number, pharmacy_phone, nickname,
-          // WO-O4O-KPA-PHARMACY-CONTACT-NAME-FIELD-V1
-          contactName,
-          // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1: canonical split address fields
-          zipCode, address1, address2,
-          // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
-          //   canonical 3개 필드 추가 (정책 B: canonical key 만 destructure).
-          ownerPhone, ceoName, taxInvoiceEmail,
-        } = req.body;
-        const changes: Record<string, any> = {};
-        const warnings: string[] = [];
-        if (memberWasEnsured) {
-          changes._kpa_member_ensured = true;
-          warnings.push('KPA 회원 정보(kpa_members)가 누락되어 있어 기본 정보로 자동 생성했습니다.');
-        }
+            // 동일 user 의 km 존재 여부 재확인 (sm.id 와 km.id 가 다른 경우)
+            const existingKm = await manager.findOne(KpaMember, { where: { user_id: sm.user_id } });
+            if (existingKm) {
+              member = existingKm;
+            } else {
+              // skeleton 생성 — backfill migration 과 동일 derive 정책
+              const profilePresence = await manager.query(
+                `SELECT
+                   EXISTS(SELECT 1 FROM kpa_pharmacist_profiles WHERE user_id = $1) AS has_pp,
+                   EXISTS(SELECT 1 FROM kpa_student_profiles WHERE user_id = $1) AS has_sp`,
+                [sm.user_id]
+              );
+              const hasPp = !!profilePresence[0]?.has_pp;
+              const hasSp = !!profilePresence[0]?.has_sp;
+              const derivedType = hasPp ? 'pharmacist' : hasSp ? 'pharmacy_student_member' : 'pharmacist';
+              const safeRole = ['member', 'operator', 'admin'].includes(sm.role) ? sm.role : 'member';
+              const safeStatus = sm.status === 'active' ? 'active' : 'pending';
+              const joinedAt = sm.status === 'active' ? new Date(sm.created_at) : null;
 
-        // 변경 전 activity_type 보관 — pharmacy_owner 부여/회수 판정용
-        const prevActivityType = member.activity_type ?? null;
-
-        // users.businessInfo 사전 조회 — validation + merge + pharmacy_owner 부여 판정에 모두 사용
-        const [userRow] = await dataSource.query(
-          `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
-          [member.user_id]
-        );
-        const prevBiz: Record<string, any> = (userRow?.businessInfo && typeof userRow.businessInfo === 'object')
-          ? { ...(userRow.businessInfo as Record<string, any>) }
-          : {};
-
-        // kpa_members 필드 업데이트
-        const validMembershipTypes = ['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member'];
-        if (membership_type && validMembershipTypes.includes(membership_type)) {
-          changes.membership_type = membership_type;
-          member.membership_type = membership_type;
-        }
-        if (license_number !== undefined) { changes.license_number = license_number; member.license_number = license_number; }
-        if (pharmacy_name !== undefined) { changes.pharmacy_name = pharmacy_name; member.pharmacy_name = pharmacy_name; }
-        if (pharmacy_address !== undefined) { changes.pharmacy_address = pharmacy_address; member.pharmacy_address = pharmacy_address; }
-        if (activity_type !== undefined) { changes.activity_type = activity_type; member.activity_type = activity_type; }
-
-        await memberRepo.save(member);
-
-        // users.name 업데이트 (별도)
-        if (name && typeof name === 'string' && name.trim()) {
-          changes.name = name.trim();
-          await dataSource.query(`UPDATE users SET name = $1, updated_at = NOW() WHERE id = $2`, [name.trim(), member.user_id]);
-        }
-
-        // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
-        //   users.nickname canonical write. '' 입력은 NULL 로 저장 (닉네임 해제).
-        if (nickname !== undefined) {
-          const next = typeof nickname === 'string' && nickname.trim() ? nickname.trim() : null;
-          changes.nickname = next;
-          await dataSource.query(
-            `UPDATE users SET nickname = $1, "updatedAt" = NOW() WHERE id = $2`,
-            [next, member.user_id]
-          );
-        }
-
-        // ─── WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1 ───
-        //   business_number / pharmacy_phone → users.businessInfo JSONB merge (별도 컬럼 없음).
-        //   WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1:
-        //   zipCode / address1→address / address2 → users.businessInfo canonical address fields.
-        //   pharmacy_address 미전송 시 분리 필드로 합성 → kpa_members.pharmacy_address 동기화.
-        let nextBiz: Record<string, any> | null = null;
-        const hasBizUpdate = business_number !== undefined || pharmacy_phone !== undefined
-          || contactName !== undefined
-          || zipCode !== undefined || address1 !== undefined || address2 !== undefined
-          // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1: 3개 필드 추가
-          || ownerPhone !== undefined || ceoName !== undefined || taxInvoiceEmail !== undefined;
-        if (hasBizUpdate) {
-          nextBiz = { ...prevBiz };
-          if (business_number !== undefined) {
-            nextBiz.businessNumber = business_number;
-            changes.business_number = business_number;
-          }
-          if (pharmacy_phone !== undefined) {
-            nextBiz.metadata = { ...((prevBiz.metadata as Record<string, any>) || {}), pharmacy_phone };
-            changes.pharmacy_phone = pharmacy_phone;
-          }
-          if (contactName !== undefined) { nextBiz.contactName = contactName || null; changes.contactName = contactName; }
-          if (zipCode !== undefined) { nextBiz.zipCode = zipCode || null; changes.zipCode = zipCode; }
-          if (address1 !== undefined) { nextBiz.address = address1 || null; changes.address1 = address1; }
-          if (address2 !== undefined) { nextBiz.address2 = address2 || null; changes.address2 = address2; }
-          // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
-          //   정책 B (canonical-only write): ownerPhone / ceoName / taxInvoiceEmail 만 저장.
-          //   representativeName / taxEmail 등 legacy alias 는 재저장하지 않음 (prevBiz spread 로
-          //   그대로 보존됨 — 신규 write 에서 절대 touch 금지).
-          //   정책 A (빈 문자열 = 변경 없음): frontend 변경 감지가 빈 값 skip 을 보장하므로
-          //   payload 에 키 자체가 없으면 분기 미진입 (기존 패턴과 동일).
-          if (ownerPhone !== undefined) { nextBiz.ownerPhone = ownerPhone || null; changes.ownerPhone = ownerPhone; }
-          if (ceoName !== undefined) { nextBiz.ceoName = ceoName || null; changes.ceoName = ceoName; }
-          if (taxInvoiceEmail !== undefined) { nextBiz.taxInvoiceEmail = taxInvoiceEmail || null; changes.taxInvoiceEmail = taxInvoiceEmail; }
-          await dataSource.query(
-            `UPDATE users SET "businessInfo" = $1::jsonb, "updatedAt" = NOW() WHERE id = $2`,
-            [JSON.stringify(nextBiz), member.user_id]
-          );
-          // 갱신값을 prevBiz 에 반영 — 이후 부여 분기에서 사용
-          Object.assign(prevBiz, nextBiz);
-
-          // kpa_members.pharmacy_address 동기화:
-          //   pharmacy_address 가 명시 전송되지 않은 경우, 분리 필드로 합성하여 덮어씀.
-          if (pharmacy_address === undefined && (address1 !== undefined || zipCode !== undefined)) {
-            const bz = nextBiz as Record<string, any>;
-            const composed = [bz.zipCode, bz.address, bz.address2].filter(Boolean).join(' ').trim();
-            if (composed) {
-              changes.pharmacy_address = composed;
-              member.pharmacy_address = composed;
+              // raw SQL INSERT — TypeORM Repository.create 오버로드 타입 회피 + 결과 row 즉시 반환.
+              const insertResult = await manager.query(
+                `INSERT INTO kpa_members
+                   (user_id, role, status, identity_status, membership_type, joined_at, created_at, updated_at)
+                 VALUES ($1, $2, $3, 'active', $4, $5, NOW(), NOW())
+                 RETURNING id`,
+                [sm.user_id, safeRole, safeStatus, derivedType, joinedAt]
+              );
+              const insertedId: string | undefined = insertResult?.[0]?.id;
+              const ensured = insertedId
+                ? await manager.findOne(KpaMember, { where: { id: insertedId } })
+                : null;
+              if (!ensured) {
+                throw new MemberInfoAbort(500, 'INTERNAL_ERROR', 'Failed to ensure kpa_members skeleton');
+              }
+              member = ensured;
+              memberWasEnsured = true;
             }
           }
-        }
 
-        // 1) kpa_pharmacist_profiles SSOT sync (activity_type SSOT)
-        if (activity_type !== undefined) {
-          try {
-            await dataSource.query(
+          if (memberWasEnsured) {
+            changes._kpa_member_ensured = true;
+            warnings.push('KPA 회원 정보(kpa_members)가 누락되어 있어 기본 정보로 자동 생성했습니다.');
+          }
+
+          // 변경 전 activity_type 보관 — pharmacy_owner 부여/회수 판정용
+          const prevActivityType = member.activity_type ?? null;
+
+          // users.businessInfo 사전 조회 — validation + merge + pharmacy_owner 부여 판정에 모두 사용
+          const [userRow] = await manager.query(
+            `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
+            [member.user_id]
+          );
+          const prevBiz: Record<string, any> = (userRow?.businessInfo && typeof userRow.businessInfo === 'object')
+            ? { ...(userRow.businessInfo as Record<string, any>) }
+            : {};
+
+          // kpa_members 필드 업데이트
+          const validMembershipTypes = ['pharmacist', 'student', 'pharmacist_member', 'pharmacy_student_member'];
+          if (membership_type && validMembershipTypes.includes(membership_type)) {
+            changes.membership_type = membership_type;
+            member.membership_type = membership_type;
+          }
+          if (license_number !== undefined) { changes.license_number = license_number; member.license_number = license_number; }
+          if (pharmacy_name !== undefined) { changes.pharmacy_name = pharmacy_name; member.pharmacy_name = pharmacy_name; }
+          if (pharmacy_address !== undefined) { changes.pharmacy_address = pharmacy_address; member.pharmacy_address = pharmacy_address; }
+          if (activity_type !== undefined) { changes.activity_type = activity_type; member.activity_type = activity_type; }
+
+          // users.name 업데이트
+          // WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1:
+          //   users 테이블의 갱신 시각 컬럼은 quoted camelCase "updatedAt" 이다.
+          //   기존 updated_at 참조는 존재하지 않는 컬럼이라 이름 수정이 항상 실패했다.
+          if (name && typeof name === 'string' && name.trim()) {
+            changes.name = name.trim();
+            await manager.query(
+              `UPDATE users SET name = $1, "updatedAt" = NOW() WHERE id = $2`,
+              [name.trim(), member.user_id]
+            );
+          }
+
+          // WO-O4O-KPA-MEMBER-CAPABILITY-NICKNAME-UI-CANONICAL-CLEANUP-V1:
+          //   users.nickname canonical write. '' 입력은 NULL 로 저장 (닉네임 해제).
+          if (nickname !== undefined) {
+            const next = typeof nickname === 'string' && nickname.trim() ? nickname.trim() : null;
+            changes.nickname = next;
+            await manager.query(
+              `UPDATE users SET nickname = $1, "updatedAt" = NOW() WHERE id = $2`,
+              [next, member.user_id]
+            );
+          }
+
+          // ─── WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1 ───
+          //   business_number / pharmacy_phone → users.businessInfo JSONB merge (별도 컬럼 없음).
+          //   WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1:
+          //   zipCode / address1→address / address2 → users.businessInfo canonical address fields.
+          //   pharmacy_address 미전송 시 분리 필드로 합성 → kpa_members.pharmacy_address 동기화.
+          let nextBiz: Record<string, any> | null = null;
+          const hasBizUpdate = business_number !== undefined || pharmacy_phone !== undefined
+            || contactName !== undefined
+            || zipCode !== undefined || address1 !== undefined || address2 !== undefined
+            // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1: 3개 필드 추가
+            || ownerPhone !== undefined || ceoName !== undefined || taxInvoiceEmail !== undefined;
+          if (hasBizUpdate) {
+            nextBiz = { ...prevBiz };
+            if (business_number !== undefined) {
+              nextBiz.businessNumber = business_number;
+              changes.business_number = business_number;
+            }
+            if (pharmacy_phone !== undefined) {
+              nextBiz.metadata = { ...((prevBiz.metadata as Record<string, any>) || {}), pharmacy_phone };
+              changes.pharmacy_phone = pharmacy_phone;
+            }
+            if (contactName !== undefined) { nextBiz.contactName = contactName || null; changes.contactName = contactName; }
+            if (zipCode !== undefined) { nextBiz.zipCode = zipCode || null; changes.zipCode = zipCode; }
+            if (address1 !== undefined) { nextBiz.address = address1 || null; changes.address1 = address1; }
+            if (address2 !== undefined) { nextBiz.address2 = address2 || null; changes.address2 = address2; }
+            // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-EDIT-PAYLOAD-ALIGNMENT-V1:
+            //   정책 B (canonical-only write): ownerPhone / ceoName / taxInvoiceEmail 만 저장.
+            //   representativeName / taxEmail 등 legacy alias 는 재저장하지 않음 (prevBiz spread 로
+            //   그대로 보존됨 — 신규 write 에서 절대 touch 금지).
+            //   정책 A (빈 문자열 = 변경 없음): frontend 변경 감지가 빈 값 skip 을 보장하므로
+            //   payload 에 키 자체가 없으면 분기 미진입 (기존 패턴과 동일).
+            if (ownerPhone !== undefined) { nextBiz.ownerPhone = ownerPhone || null; changes.ownerPhone = ownerPhone; }
+            if (ceoName !== undefined) { nextBiz.ceoName = ceoName || null; changes.ceoName = ceoName; }
+            if (taxInvoiceEmail !== undefined) { nextBiz.taxInvoiceEmail = taxInvoiceEmail || null; changes.taxInvoiceEmail = taxInvoiceEmail; }
+            await manager.query(
+              `UPDATE users SET "businessInfo" = $1::jsonb, "updatedAt" = NOW() WHERE id = $2`,
+              [JSON.stringify(nextBiz), member.user_id]
+            );
+            // 갱신값을 prevBiz 에 반영 — 이후 부여 분기에서 사용
+            Object.assign(prevBiz, nextBiz);
+
+            // kpa_members.pharmacy_address 동기화:
+            //   pharmacy_address 가 명시 전송되지 않은 경우, 분리 필드로 합성하여 덮어씀.
+            if (pharmacy_address === undefined && (address1 !== undefined || zipCode !== undefined)) {
+              const bz = nextBiz as Record<string, any>;
+              const composed = [bz.zipCode, bz.address, bz.address2].filter(Boolean).join(' ').trim();
+              if (composed) {
+                changes.pharmacy_address = composed;
+                member.pharmacy_address = composed;
+              }
+            }
+          }
+
+          // WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1:
+          //   kpa_members save 는 pharmacy_address 합성까지 반영한 뒤 동일 transaction 에서 1회 수행.
+          const savedMember = await manager.save(KpaMember, member);
+
+          // 1) kpa_pharmacist_profiles SSOT sync (activity_type SSOT)
+          //   WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1:
+          //   개별 swallow catch 제거 — 실패 시 전체 rollback.
+          if (activity_type !== undefined) {
+            await manager.query(
               `INSERT INTO kpa_pharmacist_profiles (user_id, activity_type)
                VALUES ($1, $2)
                ON CONFLICT (user_id) DO UPDATE SET activity_type = $2, updated_at = NOW()`,
               [member.user_id, activity_type]
             );
-          } catch (syncErr) {
-            console.error('[SSOT-SYNC] kpa_pharmacist_profiles sync failed:', syncErr);
           }
-        }
 
-        // 2) pharmacy_owner 회수 — 이전 = pharmacy_owner, 새 != pharmacy_owner
-        if (
-          activity_type !== undefined
-          && prevActivityType === 'pharmacy_owner'
-          && activity_type !== 'pharmacy_owner'
-        ) {
-          try {
-            await dataSource.query(
+          // 2) pharmacy_owner 회수 — 이전 = pharmacy_owner, 새 != pharmacy_owner
+          //   WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1:
+          //   role_assignments 회수도 동일 transaction 에 포함 (실패 시 전체 rollback).
+          if (
+            activity_type !== undefined
+            && prevActivityType === 'pharmacy_owner'
+            && activity_type !== 'pharmacy_owner'
+          ) {
+            await manager.query(
               `UPDATE role_assignments
                SET is_active = false, updated_at = NOW()
                WHERE user_id = $1 AND role = 'kpa:store_owner' AND is_active = true`,
               [member.user_id]
             );
             changes._store_owner_revoked = true;
-          } catch (revokeErr) {
-            console.error('[KPA Operator] kpa:store_owner revoke failed:', revokeErr);
-            warnings.push('매장 운영 권한(store_owner) 회수 중 오류가 발생했습니다. 수동 확인이 필요합니다.');
           }
-        }
+
+          return { member: savedMember, prevBiz, prevActivityType };
+        });
+
+        const { member, prevBiz, prevActivityType } = txResult;
 
         // 3) pharmacy_owner 부여 — 이전 != pharmacy_owner, 새 = pharmacy_owner
         //   WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1:
         //     silent skip 제거 — 누락 항목을 warnings 로 명시하여 운영자에게 노출.
+        //   WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1:
+        //     organizationOpsService / roleAssignmentService 는 자체 connection 을 사용하는
+        //     외부 서비스이므로 transaction 에 포함하지 않는다. 기존 계약대로 non-blocking
+        //     (실패해도 회원정보 수정은 성공, warnings 로 노출) 을 유지한다.
         if (
           activity_type === 'pharmacy_owner'
           && prevActivityType !== 'pharmacy_owner'
@@ -1380,6 +1448,13 @@ export function createMemberController(
           ...(warnings.length > 0 ? { warnings } : {}),
         });
       } catch (error: any) {
+        // WO-O4O-KPA-OPERATOR-MEMBER-WRITE-ATOMICITY-AND-COLUMN-FIX-V1:
+        //   transaction 내부에서 던진 응답 계약 오류(404 / skeleton ensure 실패)는
+        //   기존 status code 를 그대로 유지한다.
+        if (error instanceof MemberInfoAbort) {
+          res.status(error.status).json({ error: { code: error.code, message: error.message } });
+          return;
+        }
         console.error('Failed to update member info:', error);
         res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
