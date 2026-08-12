@@ -310,25 +310,45 @@ export async function clickLogoutViaUI(
  * 로딩 스피너가 사라질 때까지 대기 (loading freeze 탐지용)
  * auth용 전체화면 스피너만 대상 — 콘텐츠 스피너(소형)는 제외
  */
-export async function waitForLoadingComplete(page: Page, maxMs = 8000): Promise<void> {
-  // full-page auth spinner: min-h-screen 컨테이너 내부의 스피너만 탐지
-  // 소형 콘텐츠 스피너(대시보드 위젯 등)는 제외
-  const spinnerSelectors = [
-    '.min-h-screen [class*="animate-spin"]',
-    '.min-h-screen [class*="spinner"]',
-    'div:has(> [class*="animate-spin"]):has(> :only-child)',
-  ];
+/**
+ * full-page auth spinner 셀렉터 — min-h-screen 컨테이너 내부의 스피너만 대상.
+ * 소형 콘텐츠 스피너(공지/포럼 위젯 등)는 auth freeze 가 아니므로 제외한다.
+ */
+const FULL_PAGE_SPINNER_SELECTORS = [
+  '.min-h-screen [class*="animate-spin"]',
+  '.min-h-screen [class*="spinner"]',
+  'div:has(> [class*="animate-spin"]):has(> :only-child)',
+];
 
-  const deadline = Date.now() + maxMs;
-  while (Date.now() < deadline) {
-    let anyVisible = false;
-    for (const sel of spinnerSelectors) {
-      if (await page.locator(sel).first().isVisible({ timeout: 200 }).catch(() => false)) {
-        anyVisible = true;
-        break;
-      }
+/** 현재 full-page auth 스피너가 보이는지 */
+export async function isFullPageSpinnerVisible(page: Page): Promise<boolean> {
+  for (const sel of FULL_PAGE_SPINNER_SELECTORS) {
+    if (await page.locator(sel).first().isVisible({ timeout: 200 }).catch(() => false)) {
+      return true;
     }
-    if (!anyVisible) return;
+  }
+  return false;
+}
+
+export async function waitForLoadingComplete(page: Page, maxMs = 8000): Promise<void> {
+  const deadline = Date.now() + maxMs;
+
+  // SPA 마운트 전(#root 비어 있음)에는 스피너도 없다. 그 상태를 "로딩 완료"로 보면
+  // 마운트 직후 뜨는 auth 스피너를 freeze 로 오판하므로 마운트를 먼저 기다린다.
+  await page
+    .waitForFunction(() => (document.querySelector('#root')?.childElementCount ?? 0) > 0, null, {
+      timeout: Math.max(1000, maxMs),
+    })
+    .catch(() => undefined);
+
+  // 렌더 사이 깜빡임을 완료로 오판하지 않도록 연속 2회 비어 있을 때만 완료 처리
+  let clearStreak = 0;
+  while (Date.now() < deadline) {
+    if (await isFullPageSpinnerVisible(page)) {
+      clearStreak = 0;
+    } else if (++clearStreak >= 2) {
+      return;
+    }
     await page.waitForTimeout(300);
   }
   // 타임아웃이 나도 테스트는 계속 — 호출부에서 별도 assertion

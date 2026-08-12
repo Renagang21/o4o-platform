@@ -17,6 +17,7 @@ import {
   trackAuthMeRequests,
   clearAuthTokens,
   waitForLoadingComplete,
+  isFullPageSpinnerVisible,
 } from './helpers/auth.helpers';
 
 for (const svc of ALL_SERVICES) {
@@ -86,12 +87,10 @@ for (const svc of ALL_SERVICES) {
       await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
       await waitForLoadingComplete(page, 5000);
 
-      // 5초 후 스피너가 남아 있으면 freeze
-      const spinnerVisible = await page
-        .locator('[class*="animate-spin"], [class*="spinner"]')
-        .first()
-        .isVisible({ timeout: 500 })
-        .catch(() => false);
+      // 5초 후에도 full-page auth 스피너가 남아 있으면 freeze.
+      // 판정 기준은 waitForLoadingComplete 와 동일해야 한다 — 여기서만 넓은 셀렉터를 쓰면
+      // 리다이렉트 후 홈에서 잠깐 도는 콘텐츠 위젯 스피너를 auth freeze 로 오판한다.
+      const spinnerVisible = await isFullPageSpinnerVisible(page);
 
       expect(spinnerVisible, `[${svc.name}] 5초 후에도 스피너 표시 중 — loading freeze`).toBe(false);
     });

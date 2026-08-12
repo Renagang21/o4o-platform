@@ -83,6 +83,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   //   Core 가 mount 시 1회 세션 복구를 수행하므로, 그 완료를 isSessionChecked 로 노출한다.
   const [isSessionChecked, setIsSessionChecked] = useState(false);
   const isSessionCheckedRef = useRef(false);
+  // Core 의 mount 세션 복구가 진행 중인지 — 자식(RoleGuard) effect 는 부모 effect 보다 먼저 돈다.
+  // isSessionCheckedRef 는 복구가 "끝난 뒤"에야 true 가 되므로, 진행 중 여부는 별도로 본다.
+  const coreIsLoadingRef = useRef(core.isLoading);
+  coreIsLoadingRef.current = core.isLoading;
   useEffect(() => {
     if (!core.isLoading && !isSessionCheckedRef.current) {
       isSessionCheckedRef.current = true;
@@ -92,6 +96,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkSession = useCallback(async () => {
     if (isSessionCheckedRef.current) return; // 기존 dedup 계약
+    // mount 세션 복구가 in-flight → 같은 mount 에서 /auth/me 가 2회 나가지 않게 한다.
+    // 복구가 끝나면 isSessionChecked 가 true 로 바뀌고 RoleGuard effect 가 재실행되어 정상 skip 된다.
+    if (coreIsLoadingRef.current) return;
     await core.refresh();
   }, [core.refresh]);
 

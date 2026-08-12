@@ -23,7 +23,9 @@ export default defineConfig({
   workers: 1,
   reporter: [
     ['list'],
-    ['html', { outputFolder: '../../test-results/auth-runtime', open: 'never' }],
+    // HTML 리포트는 test artifacts 출력 폴더(test-results) 밖에 둔다.
+    // 안쪽에 두면 리포트 생성 시 폴더를 비우면서 trace/screenshot 이 사라진다 (Playwright Configuration Error).
+    ['html', { outputFolder: '../../playwright-report/auth-runtime', open: 'never' }],
   ],
   use: {
     trace: 'on-first-retry',
