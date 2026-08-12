@@ -600,6 +600,26 @@ const APPROVAL_GATE_FALLBACK: GateReasonDisplay = {
 type ApprovalSkippedItem = { id: string; reason: string; name: string; category: string; display: GateReasonDisplay };
 type ApprovalResultView = { submitted: number; total: number; errorCount: number; skipped: ApprovalSkippedItem[] };
 
+/**
+ * WO-O4O-NETURE-SUPPLIER-DELETE-POLICY-AND-REVIEW-ROUNDTRIP-BATCH-V1:
+ * 삭제 실패 사유를 사람 말로 요약한다. 서버 코드는 운영자 hard-delete 가드와 같은 계약이다.
+ */
+const BULK_DELETE_FAILURE_LABEL: Record<string, string> = {
+  HAS_ACTIVE_LISTINGS: '매장 진열 중이라 삭제 불가',
+  HAS_SERVICE_PRODUCTS: '서비스에 연결돼 삭제 불가',
+  NOT_FOUND_OR_NOT_OWNED: '이미 삭제됐거나 권한 없음',
+  NETWORK_ERROR: '통신 오류',
+};
+
+function bulkDeleteFailureSummary(failed: Array<{ id: string; error: string }>): string {
+  const counts = new Map<string, number>();
+  for (const f of failed) {
+    const label = BULK_DELETE_FAILURE_LABEL[f.error] ?? f.error;
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+  return Array.from(counts.entries()).map(([label, n]) => `${label} ${n}건`).join(' · ');
+}
+
 export default function SupplierProductsPage() {
   const navigate = useNavigate();
   // WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1
@@ -681,12 +701,15 @@ export default function SupplierProductsPage() {
   };
 
   // Bulk delete (WO-O4O-NETURE-SUPPLIER-PRODUCTS-UX-REFORM-V1)
+  // WO-O4O-NETURE-SUPPLIER-DELETE-POLICY-AND-REVIEW-ROUNDTRIP-BATCH-V1:
+  // 서버가 hard delete → soft delete 로 바뀌었고, 매장 진열/서비스 상품이 남아 있으면 건별로 거부한다.
+  // "N건 실패" 로 뭉뚱그리지 않고 사유를 그대로 보여준다.
   const handleBulkDelete = async () => {
     setBulkDeleting(true);
     const result = await supplierApi.bulkDelete(Array.from(selectedIds));
     setBulkDeleting(false);
     setShowDeleteConfirm(false);
-    showToast(`${result.deleted}건 삭제 완료${result.failed.length > 0 ? ` (${result.failed.length}건 실패)` : ''}`);
+    showToast(`${result.deleted}건 삭제 완료${result.failed.length > 0 ? ` · ${bulkDeleteFailureSummary(result.failed)}` : ''}`);
     setSelectedIds(new Set());
     await fetchProducts(pagination.page);
     fetchTabCounts();
@@ -1567,7 +1590,13 @@ export default function SupplierProductsPage() {
             <p className="text-sm text-slate-600 mb-1">
               선택한 <strong>{selectedIds.size}개</strong> 상품을 삭제합니다.
             </p>
-            <p className="text-xs text-red-600 mb-4">이 작업은 되돌릴 수 없습니다.</p>
+            {/* WO-O4O-NETURE-SUPPLIER-DELETE-POLICY-AND-REVIEW-ROUNDTRIP-BATCH-V1: soft delete 로 정합화 */}
+            <p className="text-xs text-slate-500 mb-1">
+              삭제하면 목록에서 사라지고 판매가 중지됩니다. 기록은 남으므로 복구가 필요하면 운영자에게 요청하세요.
+            </p>
+            <p className="text-xs text-amber-600 mb-4">
+              매장에 진열 중이거나 서비스에 연결된 상품은 삭제되지 않습니다.
+            </p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowDeleteConfirm(false)}

@@ -2022,10 +2022,29 @@ export class NetureOfferService {
 
   // ==================== Bulk Delete (WO-O4O-NETURE-SUPPLIER-PRODUCTS-UX-REFORM-V1) ====================
 
+  /**
+   * WO-O4O-NETURE-SUPPLIER-DELETE-POLICY-AND-REVIEW-ROUNDTRIP-BATCH-V1:
+   * 공급자 삭제를 **soft delete** 로 정합화한다.
+   *
+   * 이전 계약(hard delete)의 문제:
+   *   - `supplier_product_offers` 를 참조하는 FK 5개가 전부 ON DELETE CASCADE 다
+   *     (organization_product_listings / service_products / offer_service_approvals /
+   *      product_approvals / offer_service_prices).
+   *     즉 공급자의 일괄 삭제 한 번이 **매장 진열과 운영자 승인 이력까지** 함께 지웠고 복구가 불가능했다.
+   *   - 운영자 정책은 이미 soft delete + 휴지통 + 복원이며(operator-product-cleanup.controller),
+   *     hard delete 는 "휴지통에 있고 활성 listing/service_products 가 없는 건"만 허용한다.
+   *   - 공급자 목록 조회(buildPaginatedWhereClause)는 이미 `spo.deleted_at IS NULL` 을 전제하고 있었다.
+   *     삭제 동작만 계약에서 벗어나 있었다.
+   *
+   * 새 계약: 운영자 hard-delete 와 **같은 가드**를 적용하고, 통과분은 soft delete 한다.
+   *   → 운영자 휴지통에 나타나고 복원 가능하며, `is_active=false` + `deleted_at` 로 노출도 끊긴다.
+   */
   async bulkDeleteOffers(
     supplierId: string,
     offerIds: string[],
+    deletedBy?: string,
   ): Promise<{ deleted: number; failed: Array<{ id: string; error: string }> }> {
+    // findBy 는 @DeleteDateColumn 덕분에 이미 철회된 행을 제외한다 → 재삭제는 NOT_FOUND_OR_NOT_OWNED.
     const offers = await this.offerRepo.find({
       where: { id: In(offerIds), supplierId },
     });
@@ -2042,14 +2061,42 @@ export class NetureOfferService {
     let deleted = 0;
     for (const offer of offers) {
       try {
-        await this.offerRepo.remove(offer);
+        // 가드: 매장에 살아있는 진열/서비스 상품이 있으면 지우지 않는다.
+        // soft delete 라도 `opl.is_active` 만 보고 `spo.deleted_at` 은 안 보는 소비 경로가 있어
+        // 유령 상품이 남는다. 운영자 hard-delete 가드와 동일한 조건이다.
+        const [listings, serviceProducts] = await Promise.all([
+          AppDataSource.query(
+            `SELECT COUNT(*)::int AS cnt FROM organization_product_listings WHERE offer_id = $1 AND is_active = true`,
+            [offer.id],
+          ),
+          AppDataSource.query(
+            `SELECT COUNT(*)::int AS cnt FROM service_products WHERE offer_id = $1`,
+            [offer.id],
+          ),
+        ]);
+        if (listings[0]?.cnt > 0) {
+          failed.push({ id: offer.id, error: OfferErrorCode.HAS_ACTIVE_LISTINGS });
+          continue;
+        }
+        if (serviceProducts[0]?.cnt > 0) {
+          failed.push({ id: offer.id, error: OfferErrorCode.HAS_SERVICE_PRODUCTS });
+          continue;
+        }
+
+        // 운영자 휴지통이 읽는 컬럼(deleted_by / delete_reason)까지 함께 채운다.
+        await this.offerRepo.update(offer.id, {
+          isActive: false,
+          deletedBy: deletedBy ?? null,
+          deleteReason: 'SUPPLIER_DELETE',
+        });
+        await this.offerRepo.softDelete(offer.id);
         deleted++;
       } catch (err) {
         failed.push({ id: offer.id, error: (err as Error).message });
       }
     }
 
-    logger.info(`[OfferService] bulkDeleteOffers: supplier=${supplierId}, requested=${offerIds.length}, deleted=${deleted}, failed=${failed.length}`);
+    logger.info(`[OfferService] bulkDeleteOffers(soft): supplier=${supplierId}, requested=${offerIds.length}, deleted=${deleted}, failed=${failed.length}`);
     return { deleted, failed };
   }
 

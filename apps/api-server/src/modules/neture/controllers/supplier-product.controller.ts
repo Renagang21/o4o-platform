@@ -203,7 +203,9 @@ export function createSupplierProductController(dataSource: DataSource): Router 
         return res.status(400).json({ success: false, error: OfferErrorCode.VALIDATION_ERROR, message: 'Max 100 offers per request' });
       }
 
-      const result = await netureService.bulkDeleteOffers(supplierId, offerIds);
+      // WO-O4O-NETURE-SUPPLIER-DELETE-POLICY-AND-REVIEW-ROUNDTRIP-BATCH-V1:
+      // soft delete 로 정합화 — 운영자 휴지통이 읽는 deleted_by 를 채우기 위해 요청자 id 를 넘긴다.
+      const result = await netureService.bulkDeleteOffers(supplierId, offerIds, req.user?.id);
       const allSucceeded = !result.failed || result.failed.length === 0;
       res.json({ success: allSucceeded, data: result });
     } catch (error) {
