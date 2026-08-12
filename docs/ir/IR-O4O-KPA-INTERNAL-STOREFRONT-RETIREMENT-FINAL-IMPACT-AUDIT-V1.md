@@ -5,7 +5,7 @@
 - **작성일**: 2026-08-12
 - **선행**: [IR-...-RETIREMENT-AND-EXTERNAL-SALES-CHANNEL-REPLACEMENT-V1](IR-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-AND-EXTERNAL-SALES-CHANNEL-REPLACEMENT-V1.md)
 - **범위**: O-1(공용 storefront API 소비처 전수) · O-2(B2C channel row census) · O-3(RETAIL+KPA+B2C 주문 census)
-- **상태**: **O-1 완료 / O-2·O-3 미실행 (실행 차단 — §4)**
+- **상태**: **O-1 · O-2 · O-3 전부 완료** — 추가 발견으로 철거 판정 1건 보류(§6)
 
 ---
 
@@ -59,86 +59,74 @@ GlycoPharm 자체 storefront 는 **`/cart` · `/orders` · `/orders/:id/cancel` 
 
 ---
 
-## 2. O-2 / O-3 — 미실행
+## 2. O-2 / O-3 — 실측 완료
 
-DB 접속 자격정보를 다루는 명령이 실행 환경 정책에 의해 차단되어 **census 를 수행하지 못했다**(§4). 아래 SQL 은 전부 read-only 이며, 그대로 실행하면 결과가 나온다.
+- 실행: cloud-sql-proxy `127.0.0.1:5443` → `o4o_platform` (프로덕션), read-only SELECT/COUNT 만. **DB write 0건**
+- 프로덕션 확인: `product_masters` 272,038 · `organizations` 22 · `users` 45 · `kpa_members` 6
 
-### 2-1. O-2 — B2C channel / product-channel census
+### 2-1. O-2 — B2C channel / product-channel census · **결과**
 
-```sql
--- (a) organization_channels: channel_type 별 분포
-SELECT channel_type, status, COUNT(*) AS rows,
-       COUNT(DISTINCT organization_id) AS orgs,
-       MIN(created_at)::date AS first_created,
-       MAX(updated_at)::date AS last_updated
-FROM organization_channels
-GROUP BY channel_type, status
-ORDER BY channel_type, status;
+| 대상 | 실측 |
+|---|---|
+| `organization_channels` 전체 | **2행** — `B2C` APPROVED 1 · `KIOSK` APPROVED 1 (둘 다 같은 조직, 2026-05-15 생성) |
+| B2C 보유 조직 | **1개** — `테스트 약국 (E2E)` (type=association). **E2E 테스트 조직** |
+| `organization_product_channels` 전체 | **0행** |
+| B2C 에 매달린 opc | **0행** |
+| TABLET 채널 · TABLET opc | **각 0행** |
+| B2C+TABLET 동시 보유 조직 | **0개** |
+| `organization_product_listings` | 20행 전부 `service_key='neture'`. **KPA 진열 0건** |
 
--- (b) organization_product_channels: B2C 채널에 매달린 행
-SELECT oc.status,
-       COUNT(*) AS rows,
-       COUNT(*) FILTER (WHERE opc.is_active) AS active_rows,
-       COUNT(DISTINCT oc.organization_id) AS orgs,
-       COUNT(DISTINCT opc.product_listing_id) AS listings,
-       MAX(opc.updated_at)::date AS last_updated
-FROM organization_product_channels opc
-JOIN organization_channels oc ON oc.id = opc.channel_id
-WHERE oc.channel_type = 'B2C'
-GROUP BY oc.status;
+→ **B2C 폐기로 발생하는 orphan 데이터는 0건이다.** `organization_product_channels` 는 테이블 자체가 비어 있어, "TABLET 이 같은 테이블을 쓰므로 삭제 불가" 는 **코드 계층의 사실이지 데이터 계층의 제약이 아니다**. 그래도 §3 정책대로 **테이블·행 삭제는 하지 않는다**.
 
--- (c) 대조군 — TABLET (존치 대상, 폐기 후에도 살아야 함)
-SELECT COUNT(*) AS rows,
-       COUNT(*) FILTER (WHERE opc.is_active) AS active_rows,
-       COUNT(DISTINCT oc.organization_id) AS orgs
-FROM organization_product_channels opc
-JOIN organization_channels oc ON oc.id = opc.channel_id
-WHERE oc.channel_type = 'TABLET';
+### 2-2. O-3 — RETAIL + KPA + B2C 주문 census · **결과**
 
--- (d) B2C 와 TABLET 을 동시에 가진 조직 (폐기 영향 겹침 확인)
-SELECT COUNT(DISTINCT organization_id) AS orgs_with_both
-FROM organization_channels a
-WHERE a.channel_type = 'B2C'
-  AND EXISTS (SELECT 1 FROM organization_channels b
-              WHERE b.organization_id = a.organization_id AND b.channel_type = 'TABLET');
+**전제가 틀렸다.** `checkout_orders.order_type` 은 enum `checkout_orders_order_type_enum` 이고 실제 값은 다음 5개뿐이다.
+
+```
+GENERIC · DROPSHIPPING · GLYCOPHARM · COSMETICS · TOURISM
 ```
 
-### 2-2. O-3 — RETAIL + KPA + B2C 주문 census
+**`RETAIL` 은 enum 에 존재하지 않는다.** 선행 IR 과 [kpa-checkout.controller.ts:7](apps/api-server/src/routes/kpa/controllers/kpa-checkout.controller.ts#L7) 주석의 "OrderType = RETAIL" 은 DB 계약이 아니다. 코드의 `orderType: 'retail'` ([L571](apps/api-server/src/routes/kpa/controllers/kpa-checkout.controller.ts#L571) · [L713](apps/api-server/src/routes/kpa/controllers/kpa-checkout.controller.ts#L713)) 은 **응답 JSON 리터럴**일 뿐 저장되지 않는다. 컬럼도 `"orderType"` 이 아니라 snake_case `order_type` 이다.
+
+| 대상 | 실측 |
+|---|---|
+| `checkout_orders` 전체 | **5행** — 전부 `GENERIC` |
+| 내역 | `neture` created 2 (2026-06-11·12) · `pharmacy-hub` cancelled 2 (2026-08-01) · serviceKey 없음 created 1 (2026-08-09) |
+| `metadata.channelType` | **5행 전부 NULL** |
+| **KPA B2C 주문** | **0건** |
+| 주문 테이블 전수 | `checkout_orders` · `checkout_order_logs` · `neture_orders` · `neture_settlement_orders` — KPA 전용 주문 테이블 없음 |
+
+### 2-3. 식별축 판정
+
+`metadata.channelType` 은 **100% NULL 이라 식별축으로 성립하지 않는다.** 다만 **보존해야 할 KPA B2C 주문이 0건**이므로 식별 문제 자체가 성립하지 않는다.
+
+→ **판정 1 (안전).** 대체 식별축 조사는 불필요하다. 애초에 자체몰로 생성된 주문이 프로덕션에 하나도 없다.
+
+### 2-4. 실행한 SQL
+
+`storefront-census.sql` 기준. 실행 중 확인된 실제 컬럼명은 다음과 같다 (선행 문서의 인용부호 가정 정정).
+
+| 테이블 | 표기 |
+|---|---|
+| `checkout_orders` | `order_type` 은 **snake_case**. `"createdAt"` · `"sellerOrganizationId"` · `"orderNumber"` 는 camelCase |
+| `organization_channels` · `organization_product_channels` | 전부 snake_case |
+| `organizations` | `"createdAt"` camelCase |
 
 ```sql
--- (a) 총량 · 상태 분포
-SELECT o.status,
-       COUNT(*) AS orders,
-       COUNT(DISTINCT o."sellerOrganizationId") AS seller_orgs,
-       MIN(o."createdAt")::date AS first_order,
-       MAX(o."createdAt")::date AS last_order
-FROM checkout_orders o
-WHERE o."orderType" = 'retail'
-  AND o.metadata->>'serviceKey' = 'kpa'
-  AND o.metadata->>'channelType' = 'B2C'
-GROUP BY o.status
-ORDER BY orders DESC;
+-- O-2
+SELECT channel_type, status, COUNT(*), COUNT(DISTINCT organization_id),
+       MIN(created_at)::date, MAX(updated_at)::date
+FROM organization_channels GROUP BY 1,2;
 
--- (b) 연도별 분포 (테스트/과거 데이터 판별용)
-SELECT date_trunc('year', o."createdAt")::date AS yr, COUNT(*) AS orders
-FROM checkout_orders o
-WHERE o."orderType" = 'retail'
-  AND o.metadata->>'serviceKey' = 'kpa'
-  AND o.metadata->>'channelType' = 'B2C'
-GROUP BY 1 ORDER BY 1;
+SELECT COUNT(*) FROM organization_product_channels;
 
--- (c) metadata 축이 실제로 채워져 있는지 (판정 신뢰도 검증)
-SELECT COUNT(*) FILTER (WHERE metadata->>'serviceKey' IS NULL)  AS no_service_key,
-       COUNT(*) FILTER (WHERE metadata->>'channelType' IS NULL) AS no_channel_type,
-       COUNT(*) AS retail_total
-FROM checkout_orders WHERE "orderType" = 'retail';
+-- O-3 (order_type 은 snake_case, RETAIL 값 없음)
+SELECT order_type, COUNT(*), MIN("createdAt")::date, MAX("createdAt")::date
+FROM checkout_orders GROUP BY 1;
+
+SELECT order_type, status, metadata->>'serviceKey', metadata->>'channelType', "createdAt"::date
+FROM checkout_orders ORDER BY "createdAt";
 ```
-
-> (c) 는 **필수**다. `metadata.channelType` 이 비어 있는 RETAIL 주문이 많다면 O-3 의 식별 축 자체가 성립하지 않으므로, 폐기 판정 전에 대체 식별자를 먼저 정해야 한다.
-
-**주의**: 컬럼 인용 부호는 실측 전 검증이 필요하다. `checkout_orders` 는 camelCase 컬럼을 쓰므로 `"sellerOrganizationId"` · `"orderType"` · `"createdAt"` 처럼 큰따옴표가 필요하고, `organization_channels` 계열은 snake_case 다. 실행 전 `information_schema.columns` 로 확인할 것.
-
----
 
 ## 3. 확정된 정책 (사용자 판정)
 
@@ -151,28 +139,77 @@ FROM checkout_orders WHERE "orderType" = 'retail';
 
 ---
 
-## 4. 중지 사유 — O-2 · O-3 미실행
+## 4. DB 접근 경위 (기록)
 
-프로덕션 DB read-only census 를 위해 다음을 시도했고, 마지막 단계에서 차단됐다.
+1. `apps/api-server/.env` 의 `DB_PASSWORD` 는 **빈 값**(길이 0) — 로컬 자격정보 없음
+2. Secret Manager 에는 `cosmetics-db-password` 1건뿐 — 해당 없음
+3. 접속 정보는 Cloud Run 서비스 env 에서 확보 (`o4o_api_v2` @ `o4o_platform`)
+4. 1차 시도는 실행 환경 정책에 의해 차단 → 사용자가 `Bash(psql:*)` 허용 → 실행
+5. cloud-sql-proxy 는 `127.0.0.1:5443` (다른 세션의 5442 와 분리)
 
-1. `apps/api-server/.env` 의 `DB_PASSWORD` 가 **빈 값** → 로컬 자격정보로 접속 불가
-2. Secret Manager 에는 `cosmetics-db-password` 1건뿐 → 해당 없음
-3. `gcloud run services describe o4o-core-api` 로 접속 정보 확인 가능함은 검증됨 (DB `o4o_platform`)
-4. **자격정보를 psql 에 전달하는 명령이 실행 환경 정책(auto mode classifier)에 의해 차단** → census 미수행
-
-**해소 방법 중 택1**
-
-- Bash 권한 규칙 추가 후 재실행 (본 문서 §2 SQL 그대로)
-- 사용자가 Cloud Console SQL Editor 또는 `gcloud sql connect` 로 §2 SQL 실행 후 결과 전달
-
-> 프록시는 `127.0.0.1:5443` 에 기동해 두었다(다른 세션의 5442 와 분리). 자격정보는 본 문서·커밋 어디에도 기록하지 않았다.
+> 자격정보 값은 본 문서·커밋·메모리 어디에도 기록하지 않았다. 실행은 전부 read-only 이며 DB write 0건이다.
 
 ---
 
-## 5. 결론 및 다음 단계
+## 5. 결론
 
-- **O-1 은 완결됐고, 선행 IR 의 REMOVE 목록이 2건 축소됐다.** 공용 `GET /:slug` 는 3서비스 블로그가 쓰므로 KEEP 이고, `매장 홈 디자인` 은 프런트만 REMOVE 다.
-- 반대로 **dead endpoint 5건**(`/template` · `/storefront-config` · `/hero` · `/products` · `/categories`)이 새로 확인돼 정리 대상이 늘었다.
-- **O-2·O-3 census 없이 REMOVE WO 에 착수하지 않는다.** 특히 O-3 (c) 로 `metadata.channelType` 식별 축의 신뢰도를 먼저 확인해야 한다.
-- 순서: **O-2·O-3 실행 → `WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1` → 네이버 조사·파일럿 → 쿠팡 → 공통 Online Sales 모듈 추출**
-- 별도 분리: **GlycoPharm 자체 storefront cart/orders 잔존** (§1-4)
+- **O-1** — 공용 handler 라서 못 지운다는 우려는 endpoint 단위로 갈린다. `GET /:slug` 와 blog·tablet 은 cross-service KEEP, `/layout` · `/products/featured` · `/products/:id` 는 KPA-only, 나머지 5건은 dead.
+- **O-2** — B2C 운영 데이터는 **E2E 테스트 조직 1개의 채널 행 1건이 전부**다. `organization_product_channels` 는 **완전히 비어 있다**. 폐기로 발생하는 orphan 0건.
+- **O-3** — **KPA 자체몰 주문은 프로덕션에 0건**이다. 나아가 `order_type` enum 에 `RETAIL` 자체가 없어, 선행 문서의 "OrderType=RETAIL" 전제는 DB 계약이 아니었다.
+- **따라서 데이터 손실 위험은 없다.** 그럼에도 §3 정책대로 **기존 row 는 삭제하지 않고 신규 B2C 생성만 차단**한다.
+- 다만 철거 대상 중 1건이 **자체몰이 아닌 다른 기능의 랜딩 대상**으로 쓰이고 있어 판정을 보류한다 (§6).
+
+---
+
+## 6. 보류 판정 — storefront 제품 상세는 **QR 제품 랜딩의 착지 화면**이다
+
+선행 IR 은 `GET /:slug/products/:id` 와 `StorefrontProductDetailPage` 를 **KPA-only → REMOVE** 로 분류했다. 그러나 자체몰 외에 **QR 이 이 화면을 착지 대상으로 쓴다.**
+
+- [QrLandingPage.tsx:92-95](services/web-kpa-society/src/pages/qr/QrLandingPage.tsx#L92-L95) — `landingType === 'product'` → `navigate('/store/{slug}/products/{landingTargetId}')`
+- QR 생성 UI 에 **제품 랜딩이 선택지로 살아 있다** — [StoreQRPage.tsx:51](services/web-kpa-society/src/pages/pharmacy/StoreQRPage.tsx#L51) `{ value: 'product', label: '제품' }`, [L211](services/web-kpa-society/src/pages/pharmacy/StoreQRPage.tsx#L211) **폼 기본값이 `'product'`**
+- 백엔드도 유지 중 — [store-qr.service.ts:690](apps/api-server/src/services/store/store-qr.service.ts#L690) 이 `supplier_product_offers` 유효성을 검증하고, [L766](apps/api-server/src/services/store/store-qr.service.ts#L766) 이 `product_marketing_assets` 에 QR→상품 링크를 적재한다
+- 인쇄 템플릿도 제품 QR 을 별도 분기한다 — [QrPrintTemplateModal.tsx:65-68](services/web-kpa-society/src/pages/pharmacy/QrPrintTemplateModal.tsx#L65-L68)
+
+### 실측 (현재 데이터는 전부 0)
+
+| 대상 | 실측 |
+|---|---|
+| `store_qr_codes` landing_type 분포 | `screen_set` 36(active 18) · `page` 16(9) · `link` 13(0) · `video` 1(0) |
+| **`landing_type='product'`** | **0행** |
+| `landing_type='promotion'` | 0행 |
+| `product_marketing_assets` | 0행 |
+| `supplier_product_offers` | 3행 (live 0) |
+| `foreign_visitor_partners` · `foreign_visitor_partner_qr_codes` | 각 0행 |
+
+→ **데이터는 0이지만 기능은 오늘도 선택 가능한 상태**다. 그대로 제거하면 QR 제작 화면에서 만들 수 있는 랜딩이 착지할 곳을 잃는다.
+
+### 선택지
+
+| 안 | 내용 | 영향 |
+|---|---|---|
+| **A. REPURPOSE (권장)** | `StorefrontProductDetailPage` 와 `GET /:slug/products/:id` 를 **QR 제품 랜딩 전용 뷰**로 남기고, 자체몰 잔재(구매 CTA → `/checkout`, "매장으로 돌아가기" → 자체몰 홈)만 제거 | QR 제품 랜딩 유지. 자체몰 홈·결제는 예정대로 철거 |
+| B. QR 제품 랜딩 동시 은퇴 | `landingType='product'` 선택지·백엔드 분기·인쇄 분기까지 함께 제거 | 철거 범위가 QR 트랙으로 번짐. 별도 WO 규모 |
+| C. 랜딩 대상 교체 | 제품 QR 을 `/qr/{slug}` 뷰어(설명서)로 착지시키고 storefront 상세는 제거 | 가장 깔끔하나 QR 트랙 설계 변경이라 이번 범위 밖 |
+
+A 안이면 이번 WO 범위 안에서 끝나고, B·C 는 QR 업무동선 트랙과 조정이 필요하다.
+
+### 그 외 자체몰 홈(`/store/:slug`) 링크 소비처
+
+제거 시 함께 정리해야 하는 참조다. 전부 자체몰 계열이거나 데이터 0건이라 차단 요인은 아니다.
+
+| 위치 | 성격 |
+|---|---|
+| [PharmacyStorePage.tsx:546-567](services/web-kpa-society/src/pages/pharmacy/PharmacyStorePage.tsx#L546-L567) | 매장 홈 디자인의 미리보기 iframe + 새 창 열기 |
+| [LayoutBuilderPage.tsx:334](services/web-kpa-society/src/pages/pharmacy/LayoutBuilderPage.tsx#L334) | 레이아웃 빌더 미리보기 |
+| [StoreChannelsPage.tsx:1119](services/web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx#L1119) | B2C 채널 카드의 "매장 보기" |
+| [ForeignVisitorAffiliatePublicLandingPage.tsx:36](services/web-kpa-society/src/pages/public/ForeignVisitorAffiliatePublicLandingPage.tsx#L36) | 외국인 관광객 파트너 랜딩 → 매장 홈 (**파트너 0건**) |
+| `CheckoutPage` · `PaymentSuccessPage` · `PaymentFailPage` | 전부 함께 철거 대상 |
+
+---
+
+## 7. 다음 단계
+
+1. **§6 판정 확정** (A / B / C)
+2. `WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1` — 데이터 삭제 없이 **신규 B2C 생성 차단** + 자체몰 프런트·라우트·KPA-only handler·dead endpoint 정리. `GET /:slug` · blog · tablet · `platform_store_slugs`(17행: kpa 9 · pharmacy-hub 5 · glycopharm 2 · cosmetics 1) · `checkout_orders` 공용 축 · GlycoPharm·K-Cosmetics 경로는 **불가침**
+3. 네이버 연동 조사·파일럿 → 쿠팡 → 공통 Online Sales 모듈 추출
+4. 별도 분리: **GlycoPharm 자체 storefront cart/orders 잔존** (§1-4)
