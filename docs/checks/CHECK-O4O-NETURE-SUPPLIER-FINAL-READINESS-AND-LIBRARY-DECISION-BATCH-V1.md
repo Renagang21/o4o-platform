@@ -117,8 +117,8 @@
 
 ## 12. commit SHA
 
-- (커밋 후 기재)
+- `dca00a532` — fix(neture): 공급자 자료실 KEEP_HIDDEN 판정 반영 + 상태 어휘 canonical 정렬
 
 ## 13. push 결과
 
-- (push 후 기재)
+- `origin/main` push 완료 (`177d3fb1f..dca00a532`) · `HEAD == origin/main`
