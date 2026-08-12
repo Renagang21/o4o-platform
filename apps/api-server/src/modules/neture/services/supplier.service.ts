@@ -15,6 +15,8 @@ import { roleAssignmentService } from '../../auth/services/role-assignment.servi
 import { ServiceMembership } from '../../auth/entities/ServiceMembership.js';
 import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
 import { notificationService } from '../../../services/NotificationService.js';
+// WO-O4O-BUSINESSINFO-JSON-COLUMN-CONCAT-RUNTIME-FAILURE-FIX-V1: json 컬럼 안전 부분 갱신
+import { buildBusinessInfoUpdateStatement } from '../../../utils/business-info-write.js';
 
 /**
  * NetureSupplierService
@@ -1151,18 +1153,17 @@ export class NetureSupplierService {
       const bizPatch: Record<string, unknown> = {};
       if (data.businessEntityType !== undefined) bizPatch.businessEntityType = data.businessEntityType || null;
       if (data.businessStartDate !== undefined) bizPatch.businessStartDate = data.businessStartDate || null;
+      // WO-O4O-BUSINESSINFO-JSON-COLUMN-CONCAT-RUNTIME-FAILURE-FIX-V1:
+      //   기존 SQL 의 `COALESCE("businessInfo", '{}'::jsonb)` 는 컬럼 실제 타입이 **json** 이라
+      //   프로덕션에서 항상 실패했고(`COALESCE could not convert type jsonb to json`),
+      //   catch 가 그것을 삼킨 뒤 아래에서 저장 전 값을 다시 읽어 성공 응답에 실었다.
+      //   교정: 검증된 공통 표현식을 쓰고 삼킴을 제거해 실패가 관측되게 한다
+      //   (바로 위 `supplierRepo.save(supplier)` 와 동일한 오류 전파 방식).
       let savedBiz: Record<string, unknown> = {};
-      if (supplier.userId && Object.keys(bizPatch).length > 0) {
-        try {
-          await AppDataSource.query(
-            `UPDATE users
-               SET "businessInfo" = COALESCE("businessInfo", '{}'::jsonb) || $2::jsonb,
-                   "updatedAt" = NOW()
-             WHERE id = $1`,
-            [supplier.userId, JSON.stringify(bizPatch)],
-          );
-        } catch (e) {
-          logger.error('[NetureSupplierService] Failed to update users.businessInfo P4 fields:', e);
+      if (supplier.userId) {
+        const bizUpdate = buildBusinessInfoUpdateStatement({ root: bizPatch }, supplier.userId);
+        if (bizUpdate) {
+          await AppDataSource.query(bizUpdate.sql, bizUpdate.params);
         }
       }
       if (supplier.userId) {

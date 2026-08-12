@@ -18,6 +18,8 @@ import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 import type { StoreAddress } from '../../../types/store-address.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
+// WO-O4O-BUSINESSINFO-JSON-COLUMN-CONCAT-RUNTIME-FAILURE-FIX-V1: json 컬럼 안전 부분 갱신
+import { buildBusinessInfoUpdateStatement } from '../../../utils/business-info-write.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -341,19 +343,18 @@ export function createPharmacyInfoController(
     if (body.businessEntityType !== undefined) bizPatch.businessEntityType = body.businessEntityType || null;
     if (body.businessStartDate !== undefined) bizPatch.businessStartDate = body.businessStartDate || null;
 
+    // WO-O4O-BUSINESSINFO-JSON-COLUMN-CONCAT-RUNTIME-FAILURE-FIX-V1:
+    //   기존 SQL 은 `COALESCE("businessInfo", '{}'::jsonb)` 였다. 그런데 이 컬럼의 실제 타입은
+    //   **json** 이라 COALESCE 가 두 타입을 합치지 못하고 프로덕션에서 항상 실패했다
+    //   (`COALESCE could not convert type jsonb to json`).
+    //   게다가 실패를 catch 로 삼킨 뒤 아래에서 저장 전 값을 다시 읽어 200 으로 반환했기 때문에,
+    //   사용자는 업태·종목·사업자유형·개업일이 저장된 줄 알지만 값은 그대로였다.
+    //   교정: 검증된 공통 표현식(`::jsonb` 읽기 → `::json` 복귀)을 쓰고, 삼킴을 제거해
+    //   실패가 관측되게 한다 (바로 위 `orgRepo.save(org)` 와 동일한 오류 전파 방식).
     let savedBiz: Record<string, any> = {};
-    if (Object.keys(bizPatch).length > 0) {
-      try {
-        await dataSource.query(
-          `UPDATE users
-             SET "businessInfo" = COALESCE("businessInfo", '{}'::jsonb) || $2::jsonb,
-                 "updatedAt" = NOW()
-           WHERE id = $1`,
-          [user.id, JSON.stringify(bizPatch)]
-        );
-      } catch (e) {
-        console.error('[Pharmacy Info] Failed to update users.businessInfo P2/P4 fields:', e);
-      }
+    const bizUpdate = buildBusinessInfoUpdateStatement({ root: bizPatch }, user.id);
+    if (bizUpdate) {
+      await dataSource.query(bizUpdate.sql, bizUpdate.params);
     }
     try {
       const [row] = await dataSource.query(`SELECT "businessInfo" FROM users WHERE id = $1`, [user.id]);

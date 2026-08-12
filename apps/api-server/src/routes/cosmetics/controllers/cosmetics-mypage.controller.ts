@@ -18,6 +18,8 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 // WO-O4O-STORE-INFO-OWNER-GATE-CANONICAL-ROLE-ALIGN-BACKEND-V1: canonical role(role_assignments) 기반 인가
 import { isStoreOwner as isCanonicalStoreOwner } from '../../../utils/store-owner.utils.js';
+// WO-O4O-BUSINESSINFO-JSON-COLUMN-CONCAT-RUNTIME-FAILURE-FIX-V1: json 컬럼 안전 부분 갱신
+import { buildBusinessInfoUpdateStatement } from '../../../utils/business-info-write.js';
 
 interface AuthRequest extends Request {
   user?: { userId?: string; id?: string };
@@ -197,13 +199,15 @@ export function createCosmeticsMypageController(
         return;
       }
 
-      await dataSource.query(
-        `UPDATE users
-           SET "businessInfo" = COALESCE("businessInfo", '{}'::jsonb) || $2::jsonb,
-               "updatedAt" = NOW()
-         WHERE id = $1`,
-        [userId, JSON.stringify(patch)],
-      );
+      // WO-O4O-BUSINESSINFO-JSON-COLUMN-CONCAT-RUNTIME-FAILURE-FIX-V1:
+      //   기존 `COALESCE("businessInfo", '{}'::jsonb)` 는 컬럼 실제 타입이 **json** 이라
+      //   프로덕션에서 항상 실패했다(`COALESCE could not convert type jsonb to json`)
+      //   → 사업자 정보 수정이 늘 500 이었다. 검증된 공통 표현식으로 교체한다.
+      //   저장 키 집합과 응답 계약은 그대로다.
+      const bizUpdate = buildBusinessInfoUpdateStatement({ root: patch }, userId);
+      if (bizUpdate) {
+        await dataSource.query(bizUpdate.sql, bizUpdate.params);
+      }
 
       const rows = await dataSource.query(
         `SELECT "businessInfo" FROM users WHERE id = $1`,
