@@ -66,6 +66,24 @@ const COMPLETENESS_BADGE: Record<string, { label: string; cls: string }> = {
   DRAFT: { label: '초안', cls: 'bg-slate-100 text-slate-600' },
 };
 
+/**
+ * WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATION-AND-DESCRIPTION-WRITE-SMOKE-BATCH-V1:
+ * offer 저장 실패 시 백엔드 error code 를 그대로 노출하던 것을 공급자가 읽고 조치할 수 있는
+ * 한국어 안내로 바꾼다. 매핑에 없는 코드는 코드 원문을 유지한다(진단 가능성 보존).
+ */
+const OFFER_SAVE_ERROR_MESSAGE: Record<string, string> = {
+  PRIVATE_REQUIRES_SELLER_IDS:
+    '비공개(내부 상품) 상태에서는 저장할 수 없습니다. [공급 방식 변경]에서 공급 방식을 먼저 설정해 주세요.',
+  SERVICE_REQUIRES_KEYS: '서비스 공급으로 설정하려면 대상 서비스를 1개 이상 선택해야 합니다.',
+  PUBLIC_REQUIRES_DESCRIPTION: '공개 공급으로 전환하려면 상품 설명을 먼저 입력해야 합니다.',
+  PRODUCT_NOT_FOUND: '상품을 찾을 수 없습니다. 목록을 새로고침한 뒤 다시 시도해 주세요.',
+};
+
+function offerSaveErrorMessage(code: string | null | undefined): string {
+  if (!code) return '알 수 없는 오류';
+  return OFFER_SAVE_ERROR_MESSAGE[code] ?? code;
+}
+
 function formatPrice(v: number | null | undefined): string {
   if (v == null) return '-';
   return `${Number(v).toLocaleString()}원`;
@@ -305,7 +323,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           businessDetailDescription: bizDetail,
         });
         if (!bizResult.success) {
-          toast.error(`저장 실패: ${bizResult.error || '알 수 없는 오류'}`);
+          toast.error(`저장 실패: ${offerSaveErrorMessage(bizResult.error)}`);
         } else {
           setEditMode(null);
           setShowSecondaryEdit(false);
@@ -355,7 +373,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       console.log('[ProductDetailDrawer] save result:', result);
 
       if (!result.success) {
-        toast.error(`저장 실패: ${result.error || '알 수 없는 오류'}`);
+        toast.error(`저장 실패: ${offerSaveErrorMessage(result.error)}`);
         setSaving(false);
         return;
       }
