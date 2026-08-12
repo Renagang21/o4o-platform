@@ -236,13 +236,31 @@ export default function SupplierLibraryPage() {
         </button>
       </div>
 
+      {/* WO-O4O-NETURE-SUPPLIER-FINAL-READINESS-AND-LIBRARY-DECISION-BATCH-V1:
+          판정 KEEP_HIDDEN. 메뉴에 노출하지 않는 보관용 화면이며 매장 제공 canonical 경로가 아니다.
+          진입점을 추가하지 않는다. */}
+      <div style={{
+        padding: '12px 16px',
+        marginBottom: '16px',
+        borderRadius: '8px',
+        border: '1px solid #fcd34d',
+        backgroundColor: '#fffbeb',
+        fontSize: '13px',
+        color: '#92400e',
+        lineHeight: 1.6,
+      }}>
+        이 화면은 공급자 본인이 참고용 자료를 보관하는 <b>개인 보관함</b>입니다.
+        여기에 등록한 자료는 매장 화면·태블릿·QR 어디에도 자동으로 노출되지 않습니다.
+        매장에 제공할 자료는 <b>매장용 상품 설명서 · 태블릿 화면 자료 · 디지털 사이니지</b> 세 경로에서 등록하고,
+        진행 상태는 <b>검수·게시 현황</b>에서 확인합니다.
+      </div>
       <GuideBlock
         variant="info"
         title={guideTitle ?? '자료실 이용 안내'}
-        description={guideDesc ?? '파일과 문서 자료를 등록하고 공개 범위를 설정합니다.'}
+        description={guideDesc ?? '공급자 본인이 참고용 파일과 문서를 보관합니다. 매장 제공 경로가 아닙니다.'}
         steps={guideSteps ?? [
           '자료 등록 버튼으로 파일 또는 문서를 추가합니다.',
-          '공개 범위를 \'서비스 공개\'로 설정하면 매장 운영자에게 노출됩니다.',
+          '공개 범위는 보관 분류 값입니다. 서비스 공개로 두어도 매장에 자동 노출되지 않습니다.',
           '수정·삭제는 목록에서 직접 수행합니다.',
         ]}
         compact
@@ -273,7 +291,7 @@ export default function SupplierLibraryPage() {
                 : '#e2e8f0',
             }}
           >
-            {{ all: '전체', service: '서비스 공개', personal: '비공개(개인)' }[v]}
+            {{ all: '전체', service: '서비스 공개(보관 분류)', personal: '비공개(개인)' }[v]}
           </button>
         ))}
         {visibilityFilter !== 'all' && (

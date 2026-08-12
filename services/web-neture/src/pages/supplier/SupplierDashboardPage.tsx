@@ -124,12 +124,12 @@ const SUPPLIER_STATUS_LABELS: Record<string, string> = {
 /** 매장용 설명서 상태 라벨 — supplierStoreDescription 의 실제 status 모델 그대로 사용 */
 const STORE_DESC_STATUS_LABELS: Record<string, string> = {
   draft: '임시저장',
-  needs_review: '검수 요청',
+  needs_review: '검수 대기',
   revision_requested: '수정 요청',
-  canonical: '게시됨',
+  canonical: '매장 노출',
   hidden: '숨김',
   candidate: '후보',
-  deprecated: '보관',
+  deprecated: '만료',
 };
 
 /** 유통참여형 펀딩 상태 라벨 — api/trial 의 TrialStatus 그대로 사용 */
@@ -579,7 +579,7 @@ export default function SupplierDashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-slate-800">매장용 콘텐츠</h2>
             <Link to="/supplier/store-descriptions" className="text-xs font-medium text-blue-600 hover:text-blue-700">
-              매장용 설명서 →
+              매장용 상품 설명서 →
             </Link>
           </div>
           {cdFailed.storeDescriptions ? (
@@ -595,7 +595,7 @@ export default function SupplierDashboardPage() {
               ))}
             </dl>
           ) : (
-            <p className="text-sm text-slate-400 py-2">작성한 매장용 설명서가 없습니다.</p>
+            <p className="text-sm text-slate-400 py-2">작성한 매장용 상품 설명서가 없습니다.</p>
           )}
           {/* 제품 콘텐츠·태블릿·사이니지는 공통 count API 가 없어 진입점만 제공한다. */}
           <div className="mt-4 flex flex-wrap gap-2">

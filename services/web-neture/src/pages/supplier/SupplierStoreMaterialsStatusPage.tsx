@@ -226,6 +226,9 @@ export default function SupplierStoreMaterialsStatusPage() {
       waiting: count('waiting'),
       live: count('live'),
       working: count('working'),
+      // WO-O4O-NETURE-SUPPLIER-FINAL-READINESS-AND-LIBRARY-DECISION-BATCH-V1:
+      //   'closed'(숨김·보관·만료) 가 요약에서 빠져 있어 4카드가 모두 0 인데 표에는 행이 남는 혼선이 있었다.
+      closed: count('closed'),
     };
   }, [rows]);
 
@@ -276,7 +279,7 @@ export default function SupplierStoreMaterialsStatusPage() {
       )}
 
       {/* 요약 — 조치 필요 우선 */}
-      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
         {[
           { label: '수정 요청', value: summary.action, cls: 'text-orange-700' },
           { label: '검수 대기', value: summary.waiting, cls: 'text-amber-700' },
@@ -285,6 +288,7 @@ export default function SupplierStoreMaterialsStatusPage() {
           //   'live' 는 이미 '매장 노출·게시 중' 으로 두 어휘를 병기하는데 'working' 만 '작성 중' 이라
           //   설명서 행의 '임시저장' 배지와 어긋났다(같은 집계에 들어가는데 라벨이 다름). 동일 패턴으로 병기한다.
           { label: '작성 중·임시저장', value: summary.working, cls: 'text-slate-600' },
+          { label: '숨김·보관·만료', value: summary.closed, cls: 'text-slate-400' },
         ].map((c) => (
           <div key={c.label} className="rounded-xl border border-slate-200 bg-white p-3">
             <div className="text-xs text-slate-500">{c.label}</div>

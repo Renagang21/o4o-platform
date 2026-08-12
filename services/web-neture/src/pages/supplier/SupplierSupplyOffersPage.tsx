@@ -5,7 +5,7 @@
  *
  * 공급 오퍼(일반 공급/판매자 모집/서비스별 공급 상태)는 제품 등록과 분리된 별도 활동이다.
  * 1차 범위: 안내 허브 — 이미 등록된 제품을 활용해 공급 활동으로 연결하는 진입점.
- * (전용 오퍼 모드 선택 화면은 후속: WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1)
+ * (오퍼 모드 선택은 WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1 에서 구현 완료 — 상품 등록·수정 화면에서 선택한다)
  */
 import { Link } from 'react-router-dom';
 import { Boxes, Users, Network, ArrowRight } from 'lucide-react';
