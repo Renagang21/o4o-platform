@@ -19,12 +19,13 @@ on:
       - 'services/web-kpa-society/**'
       - 'services/web-glycopharm/**'
       - 'services/web-pharmacy-hub/**'
+      - 'services/web-kpa-branch/**'
       - 'packages/**'
       - '.github/workflows/deploy-web-services.yml'
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, glycopharm, pharmacy-hub)'
+        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, glycopharm, pharmacy-hub, kpa-branch)'
         required: false
         default: 'all'
 
@@ -47,6 +48,10 @@ env:
   # WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1
   VITE_API_URL_PHARMACY_HUB: https://api.neture.co.kr
   VITE_SERVICE_URL_PHARMACY_HUB: https://pharmacyhub.co.kr
+  # WO-O4O-KPA-BRANCH-DEPLOY-AND-RUNTIME-SMOKE-V1
+  # 분회 서비스는 단일 web service 하나만 운영한다 (분회별 Cloud Run 서비스 생성 금지).
+  # 분회 tenant 는 URL segment(/{slug}) 또는 Host(branch_domains) 로만 해석된다.
+  VITE_API_URL_KPA_BRANCH: https://api.neture.co.kr
 
 jobs:
   detect-changes:
@@ -57,6 +62,7 @@ jobs:
       kpa-society: ${{ steps.changes.outputs.kpa-society }}
       glycopharm: ${{ steps.changes.outputs.glycopharm }}
       pharmacy-hub: ${{ steps.changes.outputs.pharmacy-hub }}
+      kpa-branch: ${{ steps.changes.outputs.kpa-branch }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -77,12 +83,14 @@ jobs:
               echo "kpa-society=true" >> $GITHUB_OUTPUT
               echo "glycopharm=true" >> $GITHUB_OUTPUT
               echo "pharmacy-hub=true" >> $GITHUB_OUTPUT
+              echo "kpa-branch=true" >> $GITHUB_OUTPUT
             else
               echo "neture=$( [ "$SERVICE" = 'neture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "k-cosmetics=$( [ "$SERVICE" = 'k-cosmetics' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "kpa-society=$( [ "$SERVICE" = 'kpa-society' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "glycopharm=$( [ "$SERVICE" = 'glycopharm' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "pharmacy-hub=$( [ "$SERVICE" = 'pharmacy-hub' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+              echo "kpa-branch=$( [ "$SERVICE" = 'kpa-branch' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
             fi
             exit 0
           fi
@@ -124,6 +132,7 @@ jobs:
             echo "kpa-society=true" >> $GITHUB_OUTPUT
             echo "glycopharm=true" >> $GITHUB_OUTPUT
             echo "pharmacy-hub=true" >> $GITHUB_OUTPUT
+            echo "kpa-branch=true" >> $GITHUB_OUTPUT
             exit 0
           fi
 
@@ -143,6 +152,7 @@ jobs:
           decide "kpa-society" "services/web-kpa-society/"
           decide "glycopharm" "services/web-glycopharm/"
           decide "pharmacy-hub" "services/web-pharmacy-hub/"
+          decide "kpa-branch" "services/web-kpa-branch/"
 
   deploy-neture:
     needs: detect-changes
@@ -498,8 +508,57 @@ jobs:
 
           echo "Service URL: ${SERVICE_URL}"
 
+  deploy-kpa-branch:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.kpa-branch == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io --quiet
+
+      - name: Build and push Docker image
+        run: |
+          echo "Building kpa-branch-web Docker image..."
+          IMAGE_TAG="${{ github.sha }}"
+
+          # Build from repo root with Dockerfile path (for workspace packages)
+          docker build             --platform linux/amd64             --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_KPA_BRANCH }}             -f services/web-kpa-branch/Dockerfile             -t gcr.io/${{ env.PROJECT_ID }}/kpa-branch-web:${IMAGE_TAG}             -t gcr.io/${{ env.PROJECT_ID }}/kpa-branch-web:latest             .
+
+          docker push gcr.io/${{ env.PROJECT_ID }}/kpa-branch-web:${IMAGE_TAG}
+          docker push gcr.io/${{ env.PROJECT_ID }}/kpa-branch-web:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          echo "Deploying kpa-branch-web to Cloud Run..."
+
+          gcloud run deploy kpa-branch-web             --image=gcr.io/${{ env.PROJECT_ID }}/kpa-branch-web:${{ github.sha }}             --region=${{ env.REGION }}             --project=${{ env.PROJECT_ID }}             --platform=managed             --allow-unauthenticated             --port=8080             --memory=256Mi             --cpu=1             --min-instances=0             --max-instances=5
+
+          echo "kpa-branch-web deployed successfully!"
+
+      - name: Verify deployment
+        run: |
+          SERVICE_URL=$(gcloud run services describe kpa-branch-web             --region=${{ env.REGION }}             --project=${{ env.PROJECT_ID }}             --format="value(status.url)")
+
+          echo "Service URL: ${SERVICE_URL}"
+
   summary:
-    needs: [detect-changes, deploy-neture, deploy-k-cosmetics, deploy-kpa-society, deploy-glycopharm, deploy-pharmacy-hub]
+    needs: [detect-changes, deploy-neture, deploy-k-cosmetics, deploy-kpa-society, deploy-glycopharm, deploy-pharmacy-hub, deploy-kpa-branch]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -515,6 +574,7 @@ jobs:
           echo "  - kpa-society-web: ${{ needs.detect-changes.outputs.kpa-society }}"
           echo "  - glycopharm-web: ${{ needs.detect-changes.outputs.glycopharm }}"
           echo "  - pharmacy-hub-web: ${{ needs.detect-changes.outputs.pharmacy-hub }}"
+          echo "  - kpa-branch-web: ${{ needs.detect-changes.outputs.kpa-branch }}"
           echo ""
           echo "Time: $(date)"
           echo "Commit: ${{ github.sha }}"
