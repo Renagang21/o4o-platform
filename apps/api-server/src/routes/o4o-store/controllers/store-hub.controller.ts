@@ -332,6 +332,21 @@ export function createStoreHubController(
           return;
         }
 
+        // WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
+        //   KPA 자체 storefront(B2C) 은퇴 — 신규 B2C 채널 생성을 차단한다.
+        //   기존 B2C row 는 역사 데이터로 보존하며 조회·진열 경로는 그대로 동작한다.
+        //   서비스 한정 차단: GlycoPharm / K-Cosmetics 의 B2C 는 영향받지 않는다.
+        if (serviceKey === 'kpa' && channelType === 'B2C') {
+          res.status(410).json({
+            success: false,
+            error: {
+              code: 'STORE_B2C_CHANNEL_RETIRED',
+              message: 'KPA self-operated storefront is retired. Online sales move to external channels.',
+            },
+          });
+          return;
+        }
+
         // WO-O4O-STORE-CAPABILITY-SYSTEM-V1:
         // Channel 생성 전 해당 capability 활성 여부 확인
         const CHANNEL_CAPABILITY_MAP: Record<string, string> = {

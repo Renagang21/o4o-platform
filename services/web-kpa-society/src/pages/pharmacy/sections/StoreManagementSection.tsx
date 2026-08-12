@@ -9,10 +9,11 @@
 import { useNavigate } from 'react-router-dom';
 
 const items = [
-  { icon: '🏪', label: '매장 관리', desc: '테마·템플릿·컴포넌트 설정', path: '/store/settings' },
+  // WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1: 자체몰 홈 디자인(/store/settings) 은퇴 →
+  //   매장 기본정보 정본인 /store/info(약국 정보)로 정렬한다.
+  { icon: '🏪', label: '약국 정보', desc: '매장 기본정보·공개 주소', path: '/store/info' },
   // WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1: legacy `/store/products`(redirect) → canonical
   { icon: '🤝', label: 'B2B 구매', desc: '공급자·도매 거래', path: '/store/commerce/products' },
-  { icon: '🔗', label: '연결 서비스', desc: 'LMS·사이니지·커뮤니티', path: '/store/settings' },
 ];
 
 export function StoreManagementSection() {

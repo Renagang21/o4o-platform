@@ -74,7 +74,7 @@ export function StoreBlogPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
-      <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} blogSettings={blogSettings} />
+      <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} blogSettings={blogSettings} storeHomePath={null} />
 
       <main style={{ maxWidth: '760px', margin: '0 auto', padding: '0 16px 64px' }}>
         {error && (

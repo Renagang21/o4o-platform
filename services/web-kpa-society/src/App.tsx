@@ -182,7 +182,6 @@ const PharmacyJoinPage = lazy(() => import('./pages/join/PharmacyJoinPage').then
 // Pharmacy Management — Phase 2 lazy (barrel unwound; 20 named + 4 default-as-named)
 const PharmacyPage = lazy(() => import('./pages/pharmacy/PharmacyPage').then(m => ({ default: m.PharmacyPage })));
 const PharmacyB2BPage = lazy(() => import('./pages/pharmacy/PharmacyB2BPage').then(m => ({ default: m.PharmacyB2BPage })));
-const PharmacyStorePage = lazy(() => import('./pages/pharmacy/PharmacyStorePage').then(m => ({ default: m.PharmacyStorePage })));
 const PharmacyApprovalGatePage = lazy(() => import('./pages/pharmacy/PharmacyApprovalGatePage').then(m => ({ default: m.PharmacyApprovalGatePage })));
 const HubContentLibraryPage = lazy(() => import('./pages/pharmacy/HubContentLibraryPage').then(m => ({ default: m.HubContentLibraryPage })));
 const HubB2BCatalogPage = lazy(() => import('./pages/pharmacy/HubB2BCatalogPage').then(m => ({ default: m.HubB2BCatalogPage })));
@@ -312,14 +311,9 @@ const TabletStorePage = lazy(() => import('./pages/tablet/TabletStorePage').then
 const StoreBlogPage = lazy(() => import('./pages/store/StoreBlogPage').then(m => ({ default: m.StoreBlogPage })));
 const StoreBlogPostPage = lazy(() => import('./pages/store/StoreBlogPostPage').then(m => ({ default: m.StoreBlogPostPage })));
 
-// Storefront Home — Phase 2 lazy
-const StorefrontHomePage = lazy(() => import('./pages/store/StorefrontHomePage').then(m => ({ default: m.StorefrontHomePage })));
-
-// Storefront Commerce — Phase 2 lazy
+// WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1: 자체몰 홈/checkout/payment 은퇴.
+//   StorefrontProductDetailPage 만 QR 제품 랜딩(landingType='product') 전용으로 존치한다.
 const StorefrontProductDetailPage = lazy(() => import('./pages/storefront/StorefrontProductDetailPage').then(m => ({ default: m.StorefrontProductDetailPage })));
-const CheckoutPage = lazy(() => import('./pages/storefront/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
-const PaymentSuccessPage = lazy(() => import('./pages/storefront/PaymentSuccessPage').then(m => ({ default: m.PaymentSuccessPage })));
-const PaymentFailPage = lazy(() => import('./pages/storefront/PaymentFailPage').then(m => ({ default: m.PaymentFailPage })));
 
 // Public Content View — Phase 2 lazy (default-as-named, wrapper 불필요)
 const PublicContentViewPage = lazy(() => import('./pages/content/PublicContentViewPage'));
@@ -1082,23 +1076,18 @@ function App() {
             <Route path="content/direct/:id" element={<StoreDirectContentPage />} />
             <Route path="content/:snapshotId/edit" element={<StoreContentEditPage />} />
             {/* WO-O4O-STORE-HUB-LEGACY-LIST-CLEANUP-V1: billing 라우트 제거 (사이드바 미노출, API 미연결 placeholder) */}
-            <Route path="settings" element={<PharmacyStorePage />} />
-            {/* WO-STORE-COMMON-SETTINGS-KPA-MIGRATION-V1: layout integrated into /store/settings */}
-            <Route path="settings/layout" element={<Navigate to="/store/settings" replace />} />
-            {/* WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-PAGE-RETIREMENT-V1: PharmacyTemplatePage 은퇴.
-                템플릿 선택은 /store/settings 에 통합됨(APPLY-FIX-V1 로 실제 적용까지 정합).
-                과거 북마크 보호를 위해 route 는 유지하고 canonical 화면으로 1홉 redirect 한다. */}
-            <Route path="settings/template" element={<Navigate to="/store/settings" replace />} />
+            {/* WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1: 자체몰 홈 디자인(PharmacyStorePage) 은퇴.
+                레이아웃/템플릿/테마는 자체 storefront 전용 설정이므로 함께 종료한다.
+                매장 기본정보는 /store/info(약국 정보) 가 정본 → 과거 북마크는 그리로 1홉 redirect. */}
+            <Route path="settings" element={<Navigate to="/store/info" replace />} />
+            <Route path="settings/layout" element={<Navigate to="/store/info" replace />} />
+            <Route path="settings/template" element={<Navigate to="/store/info" replace />} />
           </Route>
 
-          {/* Store Home (WO-STORE-TEMPLATE-PROFILE-V1) — public, block-based storefront */}
-          <Route path="/store/:slug" element={<StorefrontHomePage />} />
-
-          {/* WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1: Product Detail + Checkout + Payment */}
+          {/* WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
+              자체몰 홈(/store/:slug) · checkout · payment 결과 route 제거.
+              제품 상세는 QR 제품 랜딩(landingType='product') 착지점으로만 존치한다. */}
           <Route path="/store/:slug/products/:id" element={<StorefrontProductDetailPage />} />
-          <Route path="/store/:slug/checkout" element={<CheckoutPage />} />
-          <Route path="/store/:slug/payment/success" element={<PaymentSuccessPage />} />
-          <Route path="/store/:slug/payment/fail" element={<PaymentFailPage />} />
 
           {/* Store Blog (WO-STORE-BLOG-CHANNEL-V1) — public, no auth */}
           <Route path="/store/:slug/blog" element={<Layout serviceName={SERVICE_NAME}><StoreBlogPage /></Layout>} />
@@ -1108,7 +1097,6 @@ function App() {
           <Route path="/kpa/tablet/:slug" element={<KpaRedirect to="/tablet" />} />
           <Route path="/kpa/store/:slug/blog/:postSlug" element={<KpaRedirect to="/store" suffix="/blog/:postSlug" />} />
           <Route path="/kpa/store/:slug/blog" element={<KpaRedirect to="/store" suffix="/blog" />} />
-          <Route path="/kpa/store/:slug" element={<KpaRedirect to="/store" />} />
 
           {/* Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1) — public, no auth */}
           <Route path="/view/:snapshotId/print" element={<PrintContentPage />} />

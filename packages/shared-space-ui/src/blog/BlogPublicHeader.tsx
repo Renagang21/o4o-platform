@@ -22,9 +22,22 @@ interface BlogPublicHeaderProps {
   blogSettings?: PublicBlogSettings | null;
   /** 상세 페이지에서 호출 시 true — 헤더를 더 컴팩트하게 표시 */
   compact?: boolean;
+  /**
+   * WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
+   *   "매장 메인으로" 링크 경로. 기본값은 기존 동작(`/store/{slug}`) 유지.
+   *   자체 storefront 를 은퇴한 서비스(KPA)는 `null` 을 넘겨 링크를 감춘다.
+   */
+  storeHomePath?: string | null;
 }
 
-export function BlogPublicHeader({ storeSlug, storeInfo, blogSettings, compact = false }: BlogPublicHeaderProps) {
+export function BlogPublicHeader({
+  storeSlug,
+  storeInfo,
+  blogSettings,
+  compact = false,
+  storeHomePath,
+}: BlogPublicHeaderProps) {
+  const homePath = storeHomePath === undefined ? `/store/${storeSlug}` : storeHomePath;
   // 우선순위: blog settings → store info → fallback
   const name = (blogSettings?.blogName?.trim() || storeInfo?.name?.trim() || '매장');
   const description = (blogSettings?.description?.trim() || storeInfo?.description?.trim() || null);
@@ -67,18 +80,20 @@ export function BlogPublicHeader({ storeSlug, storeInfo, blogSettings, compact =
       )}
 
       <div style={{ maxWidth: '760px', margin: '0 auto', padding: '0 16px', paddingTop: !compact && !heroImage ? 32 : 0 }}>
-        {/* 매장 사이트 진입 — 작고 절제된 링크 */}
-        <Link
-          to={`/store/${storeSlug}`}
-          style={{
-            fontSize: '12px',
-            color: '#64748b',
-            textDecoration: 'none',
-            letterSpacing: '0.02em',
-          }}
-        >
-          ← 매장 메인으로
-        </Link>
+        {/* 매장 사이트 진입 — 작고 절제된 링크 (storeHomePath === null 이면 미표시) */}
+        {homePath && (
+          <Link
+            to={homePath}
+            style={{
+              fontSize: '12px',
+              color: '#64748b',
+              textDecoration: 'none',
+              letterSpacing: '0.02em',
+            }}
+          >
+            ← 매장 메인으로
+          </Link>
+        )}
 
         <div
           style={{

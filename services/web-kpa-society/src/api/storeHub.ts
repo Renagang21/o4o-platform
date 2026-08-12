@@ -87,16 +87,11 @@ export async function fetchChannelOverviewWithCode(): Promise<ChannelOverviewWit
 }
 
 // ─────────────────────────────────────────────────────
-// Channel Creation (WO-CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1)
+// Channel Creation — WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1 로 제거
+//   KPA 자체 storefront(B2C) 은퇴 → 프런트의 채널 활성화 진입점 소멸.
+//   백엔드 `POST /store-hub/channels` 는 3서비스 공용이라 유지되며,
+//   kpa serviceKey + B2C 조합만 410 STORE_B2C_CHANNEL_RETIRED 로 차단된다.
 // ─────────────────────────────────────────────────────
-
-export async function createChannel(channelType: ChannelType): Promise<ChannelOverview> {
-  const response = await apiClient.post<{ success: boolean; data: ChannelOverview }>(
-    '/store-hub/channels',
-    { channelType }
-  );
-  return response.data;
-}
 
 // ─────────────────────────────────────────────────────
 // Store KPI Summary (WO-O4O-STORE-KPI-REALDATA-V1)

@@ -58,7 +58,6 @@ import {
 } from 'lucide-react';
 import {
   fetchChannelOverviewWithCode,
-  createChannel,
   // WO-O4O-STORE-SLUG-EDITABLE-V1
   fetchStoreSlugStatus,
   updateStoreSlug,
@@ -337,8 +336,12 @@ function ChannelPublicUrlCard({
   // Determine URL and guidance per channel type
   const getChannelUrl = (): { url: string | null; label: string; guidance: string | null; guidanceLink: string | null } => {
     if (channelType === 'B2C') {
-      if (!orgCode) return { url: null, label: '온라인 스토어', guidance: null, guidanceLink: null };
-      return { url: `${origin}/store/${orgCode}`, label: '온라인 스토어', guidance: null, guidanceLink: null };
+      // WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
+      //   자체몰 홈(/store/:slug) route 는 은퇴했다. 다만 slug 자체는 QR(/qr/:slug) ·
+      //   태블릿(/tablet/:slug) · 매장 블로그(/store/:slug/blog) 공용 식별자이므로
+      //   주소 표시·변경 UI 는 유지하고, 열기/복사 대상만 살아 있는 매장 블로그로 옮긴다.
+      if (!orgCode) return { url: null, label: '매장 공개', guidance: null, guidanceLink: null };
+      return { url: `${origin}/store/${orgCode}/blog`, label: '매장 공개', guidance: null, guidanceLink: null };
     }
     if (channelType === 'TABLET') {
       if (!orgCode) return { url: null, label: '태블릿', guidance: null, guidanceLink: null };
@@ -372,10 +375,10 @@ function ChannelPublicUrlCard({
         <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-amber-800">공개 주소가 아직 설정되지 않았습니다</p>
-          <p className="text-xs text-amber-600 mt-0.5">매장 설정에서 약국 코드를 등록하면 공개 URL이 생성됩니다.</p>
+          <p className="text-xs text-amber-600 mt-0.5">약국 정보에서 약국 코드를 등록하면 공개 URL이 생성됩니다.</p>
         </div>
         <Link
-          to="/store/settings"
+          to="/store/info"
           className="flex-shrink-0 px-3 py-1.5 text-xs font-medium text-amber-700 bg-white border border-amber-300 rounded-lg hover:bg-amber-100"
         >
           설정으로 이동
@@ -440,7 +443,7 @@ function ChannelPublicUrlCard({
         <div className="text-xs text-slate-400 mt-1">
           {editing
             ? '저장 후 기존 주소는 자동으로 새 주소로 이동합니다 (1회 변경 가능)'
-            : '이 주소로 고객이 매장 화면에 접속합니다'}
+            : '이 주소(약국 코드)는 QR·태블릿·매장 블로그가 함께 사용합니다'}
         </div>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -557,7 +560,6 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   // deactivatingId removed — replaced by actionLoading + confirmModal (WO-KPA-STORE-CHANNEL-PRODUCT-LIST-SELECTION-ACTIONS-V1)
   const [reordering, setReordering] = useState(false);
   const [orgCode, setOrgCode] = useState<string | null>(null);
-  const [creating, setCreating] = useState(false);
 
   // WO-KPA-STORE-CHANNEL-PRODUCT-LIST-SELECTION-ACTIONS-V1
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -822,22 +824,9 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
     }
   };
 
-  // Channel creation handler (WO-CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1)
-  const handleCreateChannel = async () => {
-    // WO-O4O-KPA-STORE-CHANNEL-MENU-COPY-AND-TABLET-DEDUP-V1: "채널 생성" 기술 용어 → "시작/활성화".
-    //   온라인 스토어는 매장당 1개(unique 제약). 내부 channel_type 은 불변, 사용자 문구만 정비.
-    const label = CHANNEL_TABS.find((t) => t.type === activeTab)?.label ?? activeTab;
-    setCreating(true);
-    try {
-      await createChannel(activeTab);
-      await fetchData();
-      showToast('success', `${label}을(를) 시작했습니다.`);
-    } catch {
-      showToast('error', `${label} 시작에 실패했습니다.`);
-    } finally {
-      setCreating(false);
-    }
-  };
+  // WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
+  //   KPA 자체몰(B2C) 종료 — 신규 채널 활성화 UI 제거. 백엔드도 kpa serviceKey 에서 B2C 생성을 차단한다.
+  //   기존 B2C row 는 역사 데이터로 보존하며, 진열/노출 관리 화면은 그대로 동작한다.
 
   if (loading) {
     return (
@@ -856,16 +845,8 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
         <h1 className="text-2xl font-bold text-slate-900 mb-8">{pageTitle}</h1>
         <div className="text-center py-16 bg-white rounded-lg border border-slate-200">
           <Package className="w-10 h-10 mx-auto mb-3 text-slate-300" />
-          <p className="text-sm text-slate-500">아직 온라인 스토어가 시작되지 않았습니다.</p>
-          <p className="text-xs text-slate-400 mt-1">아래 버튼으로 온라인 스토어를 시작하세요.</p>
-          <button
-            onClick={handleCreateChannel}
-            disabled={creating}
-            className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-          >
-            {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-            온라인 스토어 시작
-          </button>
+          <p className="text-sm text-slate-500">자체 온라인 스토어는 운영을 종료했습니다.</p>
+          <p className="text-xs text-slate-400 mt-1">온라인 판매는 네이버·쿠팡 등 외부 판매 채널로 대체됩니다.</p>
         </div>
       </div>
     );
@@ -987,20 +968,10 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
             )}
           </div>
           <p className="text-sm text-slate-500 mt-0.5">
-            {activeTab === 'B2C' && '고객이 온라인으로 상품을 확인하고 구매할 수 있는 스토어프론트'}
+            {activeTab === 'B2C' && '자체 스토어프론트는 운영을 종료했습니다. 온라인 판매는 외부 판매 채널로 대체됩니다.'}
             {activeTab === 'KIOSK' && '매장 내 키오스크 (업체 협의 후 제공 예정 — 보류 상태)'}
           </p>
         </div>
-        {!currentChannel && (
-          <button
-            onClick={handleCreateChannel}
-            disabled={creating}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-          >
-            {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-            {activeTab === 'B2C' ? '온라인 스토어 시작' : '키오스크 등록'}
-          </button>
-        )}
       </div>
       )}
 
@@ -1114,16 +1085,6 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
       {/* ─── [C] Quick Actions (settings 전용) ───────────────────── */}
       {showSettings && currentChannel && (
         <div className="flex flex-wrap gap-2 mb-6">
-          {activeTab === 'B2C' && orgCode && (
-            <a
-              href={`/store/${orgCode}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
-            >
-              <ExternalLink className="w-3.5 h-3.5" /> 스토어 보기
-            </a>
-          )}
           <button
             onClick={() => navigate('/store-hub')}
             className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100"
@@ -1165,18 +1126,6 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
           ) : !currentChannel ? (
             <div className="text-center py-8 bg-white rounded-lg border border-slate-200">
               <p className="text-sm text-slate-400">이 채널이 아직 등록되지 않았습니다.</p>
-              <button
-                onClick={handleCreateChannel}
-                disabled={creating}
-                className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-              >
-                {creating ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <Plus className="w-3.5 h-3.5" />
-                )}
-                {activeTab === 'B2C' ? '온라인 스토어 시작' : '키오스크 등록'}
-              </button>
             </div>
           ) : currentChannel.status === 'PENDING' ? (
             <div className="text-center py-8 bg-white rounded-lg border border-amber-200 bg-amber-50/50">

@@ -85,7 +85,7 @@ export function StoreBlogPostPage() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
-        <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} blogSettings={blogSettings} compact />
+        <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} blogSettings={blogSettings} storeHomePath={null} compact />
         <div style={{ textAlign: 'center', padding: '48px 0', color: '#94a3b8' }}>
           불러오는 중...
         </div>
@@ -96,7 +96,7 @@ export function StoreBlogPostPage() {
   if (error || !post) {
     return (
       <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
-        <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} blogSettings={blogSettings} compact />
+        <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} blogSettings={blogSettings} storeHomePath={null} compact />
         <div style={{ maxWidth: 600, margin: '0 auto', padding: '48px 16px', textAlign: 'center' }}>
           <h2 style={{ fontSize: 20, color: '#1e293b', marginBottom: 8 }}>
             게시글을 찾을 수 없습니다
@@ -115,7 +115,7 @@ export function StoreBlogPostPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#fafbfc' }}>
-      <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} blogSettings={blogSettings} compact />
+      <BlogPublicHeader storeSlug={slug || ''} storeInfo={storeInfo} blogSettings={blogSettings} storeHomePath={null} compact />
 
       <main style={{ maxWidth: '720px', margin: '0 auto', padding: '0 16px 64px' }}>
         {/* Back link */}

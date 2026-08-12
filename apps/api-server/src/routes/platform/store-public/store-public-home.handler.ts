@@ -4,20 +4,20 @@
  * WO-O4O-UNIFIED-STORE-PUBLIC-ROUTES-SPLIT-V1
  * Extracted from unified-store-public.routes.ts
  *
+ * WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
+ *   KPA 자체 storefront 종료 — 자체몰 렌더링 전용 endpoint 4건 제거.
+ *   `/layout`(KPA-only) · `/template` · `/storefront-config` · `/hero`(3건 소비처 0)
+ *   GlycoPharm 은 `/api/v1/glycopharm/stores/*` 자체 controller 를 쓰므로 영향 없다.
+ *
  * Endpoints:
- *   GET /:slug                   — Store info
- *   GET /:slug/layout            — Block layout + channels
- *   GET /:slug/template          — Template profile
- *   GET /:slug/storefront-config — Storefront config
- *   GET /:slug/hero              — Hero contents
+ *   GET /:slug — Store info (CROSS-SERVICE: KPA·GlycoPharm·K-Cosmetics 블로그 공개층 공통)
  */
 
 import { Router, Request, Response } from 'express';
 import type { DataSource, Repository } from 'typeorm';
 import { GlycopharmPharmacyExtension } from '../../glycopharm/entities/glycopharm-pharmacy-extension.entity.js';
 import { GlycopharmProduct } from '../../glycopharm/entities/glycopharm-product.entity.js';
-import type { TemplateProfile } from '../../glycopharm/entities/glycopharm-pharmacy.entity.js';
-import { resolvePublicStore, generateDefaultBlocks, deriveChannels } from './store-public-utils.js';
+import { resolvePublicStore } from './store-public-utils.js';
 
 export function createStorePublicHomeRoutes(deps: {
   dataSource: DataSource;
@@ -66,97 +66,6 @@ export function createStorePublicHomeRoutes(deps: {
     }
   });
 
-  // GET /:slug/layout — Block layout + channels
-  router.get('/:slug/layout', async (req: Request, res: Response): Promise<void> => {
-    try {
-      const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
-      if (!resolved) return;
-
-      const { pharmacy } = resolved;
-      const hasCustomBlocks = pharmacy.storefront_blocks && pharmacy.storefront_blocks.length > 0;
-      const blocks = hasCustomBlocks
-        ? pharmacy.storefront_blocks!
-        : generateDefaultBlocks((pharmacy.template_profile || 'BASIC') as TemplateProfile);
-      const channels = await deriveChannels(dataSource, pharmacy.id);
-
-      // WO-O4O-STORE-THEME-PIPELINE-FOUNDATION-V1: include theme in layout response
-      const storefrontConfig = pharmacy.storefront_config as Record<string, any> | null;
-      const theme = storefrontConfig?.theme || 'professional';
-
-      res.json({
-        success: true,
-        data: {
-          storeId: pharmacy.id,
-          templateProfile: pharmacy.template_profile || 'BASIC',
-          theme,
-          blocks,
-          isDefault: !hasCustomBlocks,
-          channels,
-        },
-      });
-    } catch (error: any) {
-      console.error('[UnifiedStore] GET /:slug/layout error:', error);
-      res.status(500).json({
-        success: false,
-        error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch layout' },
-      });
-    }
-  });
-
-  // GET /:slug/template — Template profile
-  router.get('/:slug/template', async (req: Request, res: Response): Promise<void> => {
-    try {
-      const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
-      if (!resolved) return;
-
-      res.json({
-        success: true,
-        data: {
-          templateProfile: resolved.pharmacy.template_profile || 'BASIC',
-          theme: resolved.pharmacy.storefront_config?.theme || null,
-        },
-      });
-    } catch (error: any) {
-      console.error('[UnifiedStore] GET /:slug/template error:', error);
-      res.status(500).json({
-        success: false,
-        error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch template profile' },
-      });
-    }
-  });
-
-  // GET /:slug/storefront-config — Storefront config
-  router.get('/:slug/storefront-config', async (req: Request, res: Response): Promise<void> => {
-    try {
-      const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
-      if (!resolved) return;
-
-      res.json({ success: true, data: resolved.pharmacy.storefront_config || {} });
-    } catch (error: any) {
-      console.error('[UnifiedStore] GET /:slug/storefront-config error:', error);
-      res.status(500).json({
-        success: false,
-        error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch storefront config' },
-      });
-    }
-  });
-
-  // GET /:slug/hero — Hero contents
-  router.get('/:slug/hero', async (req: Request, res: Response): Promise<void> => {
-    try {
-      const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
-      if (!resolved) return;
-
-      const heroContents = resolved.pharmacy.storefront_config?.heroContents || [];
-      res.json({ success: true, data: heroContents });
-    } catch (error: any) {
-      console.error('[UnifiedStore] GET /:slug/hero error:', error);
-      res.status(500).json({
-        success: false,
-        error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch hero contents' },
-      });
-    }
-  });
 
   return router;
 }

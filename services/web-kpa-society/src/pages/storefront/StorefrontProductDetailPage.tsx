@@ -1,22 +1,26 @@
 /**
- * StorefrontProductDetailPage — Public Product Detail
+ * StorefrontProductDetailPage — QR 제품 랜딩 (공개 제품 정보)
  *
- * WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
+ * WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1 (원본)
  * WO-STORE-PRODUCT-DESCRIPTION-OVERRIDE-V1 (설명 수정 기능)
+ * WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
+ *   KPA 자체몰 종료에 따라 **QR 제품 랜딩 전용**으로 의미를 축소한다.
+ *   제거: 장바구니 담기 · 수량 선택 · checkout 이동 · 자체몰 홈으로 돌아가기.
+ *   유지: 제품 정보 표시 + 매장 owner 설명 수정.
+ *   착지 경로: /qr/{slug} → QrLandingPage(landingType='product') → 이 화면.
  *
  * 경로: /store/:slug/products/:id
  * 공개 페이지 — 인증 불필요 (매장 owner 인증 시 설명 수정 가능)
  *
- * API: GET /api/v1/stores/:slug/products/:id (이미 구현됨)
+ * API: GET /api/v1/stores/:slug/products/:id
  * API: PATCH /api/v1/store/products/:id/description (매장 owner용)
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, Plus, Minus, Edit3, X, Save } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Edit3, X, Save } from 'lucide-react';
 import { ContentRenderer, RichTextEditor } from '@o4o/content-editor';
 import { getAccessToken } from '../../contexts/AuthContext';
-import * as cartService from '../../services/cartService';
 import { extractReferralFromUrl, saveReferralCookie } from '../../utils/referral';
 
 // ============================================================================
@@ -100,13 +104,9 @@ async function updateProductDescription(
 
 export function StorefrontProductDetailPage() {
   const { slug, id } = useParams<{ slug: string; id: string }>();
-  const navigate = useNavigate();
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [quantity, setQuantity] = useState(1);
-  const [addedToCart, setAddedToCart] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
 
   // Description editing state (store owner only)
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -138,23 +138,6 @@ export function StorefrontProductDetailPage() {
       .catch(() => setError('상품 정보를 불러오는 데 실패했습니다.'))
       .finally(() => setLoading(false));
   }, [slug, id]);
-
-  useEffect(() => {
-    if (slug) setCartCount(cartService.getCartItemCount(slug));
-  }, [slug, addedToCart]);
-
-  const handleAddToCart = () => {
-    if (!slug || !product) return;
-    const price = product.salePrice ?? product.price ?? 0;
-    cartService.addItem(slug, {
-      productId: product.id,
-      productName: product.name,
-      unitPrice: price,
-      imageUrl: product.imageUrl,
-    }, quantity);
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
-  };
 
   const handleEditDescription = useCallback(() => {
     if (!product) return;
@@ -196,8 +179,7 @@ export function StorefrontProductDetailPage() {
       <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
         <div style={{ textAlign: 'center' }}>
           <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#1e293b', marginBottom: '8px' }}>상품을 찾을 수 없습니다</h2>
-          <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '16px' }}>{error || '존재하지 않는 상품입니다.'}</p>
-          <Link to={`/store/${slug}`} style={{ color: '#2563eb', fontSize: '14px', textDecoration: 'none' }}>매장으로 돌아가기</Link>
+          <p style={{ color: '#64748b', fontSize: '14px' }}>{error || '존재하지 않는 상품입니다.'}</p>
         </div>
       </div>
     );
@@ -205,32 +187,10 @@ export function StorefrontProductDetailPage() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
-      {/* Header */}
+      {/* Header — WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1: 자체몰 홈/장바구니 이동 제거 */}
       <header style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: '#fff', borderBottom: '1px solid #e2e8f0' }}>
-        <div style={{ maxWidth: '640px', margin: '0 auto', padding: '0 16px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <button
-            onClick={() => navigate(`/store/${slug}`)}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', color: '#1e293b', fontSize: '15px', fontWeight: 600, padding: 0 }}
-          >
-            <ArrowLeft size={20} />
-            매장으로
-          </button>
-          <button
-            onClick={() => navigate(`/store/${slug}/checkout`)}
-            style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: '8px' }}
-          >
-            <ShoppingCart size={22} color="#1e293b" />
-            {cartCount > 0 && (
-              <span style={{
-                position: 'absolute', top: '2px', right: '2px',
-                backgroundColor: '#2563eb', color: '#fff', fontSize: '11px', fontWeight: 700,
-                width: '18px', height: '18px', borderRadius: '50%',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                {cartCount > 99 ? '99+' : cartCount}
-              </span>
-            )}
-          </button>
+        <div style={{ maxWidth: '640px', margin: '0 auto', padding: '0 16px', height: '56px', display: 'flex', alignItems: 'center' }}>
+          <span style={{ color: '#1e293b', fontSize: '15px', fontWeight: 600 }}>제품 정보</span>
         </div>
       </header>
 
@@ -402,48 +362,6 @@ export function StorefrontProductDetailPage() {
         </div>
       )}
 
-      {/* Bottom Bar — Add to Cart */}
-      <div style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
-        backgroundColor: '#fff', borderTop: '1px solid #e2e8f0', padding: '12px 16px',
-      }}>
-        <div style={{ maxWidth: '640px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Quantity */}
-          <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
-            <button
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', background: '#f8fafc', cursor: 'pointer' }}
-            >
-              <Minus size={16} color="#64748b" />
-            </button>
-            <span style={{ width: '40px', textAlign: 'center', fontSize: '15px', fontWeight: 600, color: '#0f172a' }}>
-              {quantity}
-            </span>
-            <button
-              onClick={() => setQuantity(quantity + 1)}
-              style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', background: '#f8fafc', cursor: 'pointer' }}
-            >
-              <Plus size={16} color="#64748b" />
-            </button>
-          </div>
-
-          {/* Add to Cart Button */}
-          <button
-            onClick={handleAddToCart}
-            style={{
-              flex: 1, height: '44px', borderRadius: '10px', border: 'none', cursor: 'pointer',
-              fontSize: '15px', fontWeight: 600, color: '#fff',
-              backgroundColor: addedToCart ? '#059669' : '#2563eb',
-              transition: 'background-color 0.2s',
-            }}
-          >
-            {addedToCart ? '담았습니다!' : `장바구니 담기${displayPrice != null ? ` · ${(displayPrice * quantity).toLocaleString()}원` : ''}`}
-          </button>
-        </div>
-      </div>
-
-      {/* Spacer for bottom bar */}
-      <div style={{ height: '68px' }} />
     </div>
   );
 }

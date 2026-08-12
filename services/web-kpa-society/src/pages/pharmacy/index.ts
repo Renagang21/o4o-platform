@@ -7,7 +7,6 @@
 
 export { PharmacyPage } from './PharmacyPage';
 export { PharmacyB2BPage } from './PharmacyB2BPage';
-export { PharmacyStorePage } from './PharmacyStorePage';
 
 // WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1: 약국 서비스 신청 게이트
 export { PharmacyApprovalGatePage } from './PharmacyApprovalGatePage';
@@ -37,11 +36,10 @@ export { TabletRequestsPage } from './TabletRequestsPage';
 // WO-STORE-BLOG-CHANNEL-V1: 매장 블로그 관리
 export { PharmacyBlogPage } from './PharmacyBlogPage';
 
-// WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-PAGE-RETIREMENT-V1:
-//   PharmacyTemplatePage(WO-STORE-TEMPLATE-PROFILE-V1) 은퇴 — 템플릿 선택은 PharmacyStorePage(/store/settings)로 통합.
-
-// WO-STORE-BLOCK-ENGINE-V1: 스토어 블록 레이아웃 빌더
-export { LayoutBuilderPage } from './LayoutBuilderPage';
+// WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
+//   PharmacyStorePage(자체몰 홈 디자인) · LayoutBuilderPage(블록 빌더) 은퇴.
+//   자체 storefront 종료로 레이아웃/템플릿/테마 편집 화면은 소비처가 없다.
+//   (선행 은퇴: PharmacyTemplatePage — WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-PAGE-RETIREMENT-V1)
 
 // WO-STORE-ADMIN-CONSOLIDATION-V1: 매장 관리 통합
 export { StoreChannelsPage } from './StoreChannelsPage';
