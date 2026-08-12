@@ -114,6 +114,13 @@
 - `pnpm build` (web-neture) — ✓ built in 15.93s
 - api-server 변경 없음 → **API 배포하지 않음** (§11 준수)
 - web-neture 만 배포 대상
+- GitHub Actions `Deploy Web Services (Cloud Run)` — **success** (`dca00a532`)
+
+### 배포 후 재검증 (프로덕션)
+
+- `/supplier/library` — KEEP_HIDDEN 배너 노출 확인, GuideBlock 문구·`서비스 공개(보관 분류)` 라벨 반영 확인, 목록 0건.
+- `/supplier/store-materials-status` — `숨김·보관·만료 12` 카드 반영 확인(이전 4카드 전부 0 + 표 12행 혼선 해소).
+- console error 0건.
 
 ## 12. commit SHA
 
