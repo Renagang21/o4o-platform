@@ -14,6 +14,8 @@
  *   GET    /api/v1/kpa-branch/me/branch                                      (auth)    내 현재 분회
  *   GET    /api/v1/kpa-branch/me/branch/history                              (auth)    전입·전출 이력
  *   *      /api/v1/kpa-branch/branches/:branchSlug/operator/**               (operator scope + 분회 경계)
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/annual-report-templates       신상신고 양식 목록
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/annual-report-templates/:year 연도별 양식 (schema 전문)
  *   *      /api/v1/kpa-branch/admin/domains/**                               (admin scope)
  *   *      /api/v1/kpa-branch/admin/service-members/**                        (admin scope)  가입 승인
  *
@@ -40,6 +42,7 @@ import { BranchSiteController } from '../../controllers/kpa-branch/BranchSiteCon
 import { BranchDomainController } from '../../controllers/kpa-branch/BranchDomainController.js';
 import { BranchJoinController } from '../../controllers/kpa-branch/BranchJoinController.js';
 import { BranchServiceMembershipController } from '../../controllers/kpa-branch/BranchServiceMembershipController.js';
+import { AnnualReportTemplateController } from '../../controllers/kpa-branch/AnnualReportTemplateController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
@@ -174,6 +177,23 @@ export function createKpaBranchRoutes(): Router {
     '/branches/:branchSlug/operator/posts/:postId',
     ...operatorGuards,
     wrap(BranchSiteController.deletePost),
+  );
+
+  // 신상신고 양식 조회 (WO-O4O-KPA-BRANCH-ANNUAL-REPORT-TEMPLATE-SCHEMA-V1)
+  //
+  // 양식 자체는 service_key 축의 서비스 공통 자원이라 분회마다 다르지 않다.
+  // 그래도 :branchSlug 아래에 둔다 — WO 요구대로 기존 operator guard 2겹
+  // (서비스 축 + 분회 축)을 그대로 재사용하기 위해서다. 분회 축 가드를 빼면
+  // 이 모듈에서 유일하게 tenant 경계 없는 operator 경로가 생긴다.
+  router.get(
+    '/branches/:branchSlug/operator/annual-report-templates',
+    ...operatorGuards,
+    wrap(AnnualReportTemplateController.list),
+  );
+  router.get(
+    '/branches/:branchSlug/operator/annual-report-templates/:year',
+    ...operatorGuards,
+    wrap(AnnualReportTemplateController.byYear),
   );
 
   router.get('/branches/:branchSlug/operator/domains', ...operatorGuards, wrap(BranchDomainController.list));

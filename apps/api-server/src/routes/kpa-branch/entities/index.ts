@@ -12,3 +12,19 @@ export { BranchDomain } from './branch-domain.entity.js';
 export type { BranchDomainStatus } from './branch-domain.entity.js';
 export { BranchPost } from './branch-post.entity.js';
 export type { BranchPostCategory, BranchPostStatus, BranchPostAttachment } from './branch-post.entity.js';
+// WO-O4O-KPA-BRANCH-ANNUAL-REPORT-TEMPLATE-SCHEMA-V1
+export { AnnualReportTemplate } from './annual-report-template.entity.js';
+export type {
+  AnnualReportTemplateStatus,
+  AnnualReportFieldOwnership,
+  AnnualReportFieldType,
+  AnnualReportTemplateStep,
+  AnnualReportFieldOption,
+  AnnualReportFieldSource,
+  AnnualReportFieldValidation,
+  AnnualReportFieldDefinition,
+  AnnualReportRuleKind,
+  AnnualReportRuleOp,
+  AnnualReportRule,
+  AnnualReportTemplateSchema,
+} from './annual-report-template.entity.js';
