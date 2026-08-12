@@ -1,0 +1,26 @@
+{
+  "wo": "WO-O4O-COSMETICS-MFDS-USAGE-CAUTION-ENRICHMENT-V1",
+  "step": "main-merge-closeout",
+  "readOnly": true,
+  "dbWrites": 0,
+  "pass": true,
+  "failures": [],
+  "cosmeticMasters": 32674,
+  "koStoreCanonical": 32674,
+  "cautionSection": 1309,
+  "usageSection": 32578,
+  "batchTaggedMasters": 1309,
+  "emptyContent": 0,
+  "canonicalDuplicateGroups": 0,
+  "orphanDescriptions": 0,
+  "byRegulatoryType": {
+    "일반": 15,
+    "건강기능식품": 40948,
+    "COSMETIC": 32674,
+    "DRUG": 177413,
+    "GENERAL": 11,
+    "MEDICAL_DEVICE": 3826,
+    "QUASI_DRUG": 17148
+  },
+  "nonCosmeticBatchTag": 0
+}

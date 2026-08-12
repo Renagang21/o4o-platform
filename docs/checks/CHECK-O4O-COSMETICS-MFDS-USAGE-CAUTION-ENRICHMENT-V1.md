@@ -198,8 +198,46 @@ ProductMaster 는 `tags.mfdsUsageBatch` 표식만 붙였다. 다른 컬럼·다�
 | §5 충돌은 CHECK | 준수 — 충돌 판정 경로 구현, 실제 발생 0 |
 | §7 ProductMaster 변경 금지 | 준수 — 배치 표식 외 변경 0 |
 | §7 다른 canonical·다른 제품군 변경 금지 | 준수 — 31,365건 바이트 동일, drift 0 |
-| §11 main 직접 작업 금지 | 준수 — 브랜치 push, main 미병합 |
+| §11 main 직접 작업 금지 | 준수 — worktree 브랜치에서 작업·push. main 반영은 별도 마감 단계(아래 §10)에서 merge 로 수행 |
 
 ## 9. 문서 정합
 
 문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건
+
+---
+
+## 10. 마감 (MAIN MERGE CLOSEOUT · 2026-08-12)
+
+DB 에는 이미 적용됐는데 근거가 브랜치에만 있으면 운영 상태와 저장소 기준이 갈라지므로, **저장소 상태만 운영 DB 에 맞춰 닫았다.** 재생산·재적용·rollback 재생성은 하지 않았다.
+
+| 항목 | 값 |
+|------|------|
+| merge 방식 | merge commit (no-ff) — `work/cosmetics-mfds-usage-caution-v1` (`48c9c24bc`) → `main` |
+| main 최종 SHA | `fdc4551c3f7746bead5636ed01b5935db6cc3cfb` |
+| origin/main push | 완료 (`HEAD == origin/main`) |
+| DB write | **0건** — read-only SELECT 만 수행 |
+
+### 10-1. 마감 재검증 (read-only, `tmp/cosmetics-mfds-usage-caution/closeout-verify.mjs`)
+
+적용 당시 산출물(`post-verify.json`)이 아니라 **현재 운영 DB 를 다시 읽어** 대조했다.
+
+| 확인 | 기대 | 실측 | 판정 |
+|------|:---:|:---:|:---:|
+| COSMETIC master | 32,674 | 32,674 | PASS |
+| KO STORE canonical | 32,674 | 32,674 | PASS |
+| 주의사항 절 보유 | 1,309 | 1,309 | PASS |
+| 사용 방법 절 보유 | 32,578 | 32,578 | PASS |
+| 배치 표식 `tags.mfdsUsageBatch` (rollback 근거) | 1,309 | 1,309 | PASS |
+| 빈 본문 | 0 | 0 | PASS |
+| canonical 중복 그룹 | 0 | 0 | PASS |
+| orphan 설명서 | 0 | 0 | PASS |
+| 다른 제품군 master drift (DRUG 177,413 / 건기식 40,948 / QUASI_DRUG 17,148 / MEDICAL_DEVICE 3,826 / GENERAL 11 / 일반 15) | 0 | 0 | PASS |
+| 비 COSMETIC 에 배치 표식 오염 | 0 | 0 | PASS |
+
+- **사용 방법 교체 179건**은 before/after 차분 지표라 현재 DB 단독으로는 재도출되지 않는다. 적용 시점 스냅샷 대조 결과(`post-verify.json.usageTextChanged = 179`)가 근거이며, 위 절 보유 수(32,578 불변 = 교체이지 신설 아님)와 정합한다.
+- 스크립트 구문 검증: 생산 5단계 + 코어 3개 + 검증 스크립트 `node --check` 전부 통과.
+
+### 10-2. worktree
+
+`C:\tmp\o4o-cosmetics-mfds-usage-caution` 은 병합 완료로 역할이 끝났고, 확인 시점에 이미 제거되어 있었다(`git worktree list` 미등록 · 디렉터리 없음). 산출물은 전부 `main` 에 있다.
+
