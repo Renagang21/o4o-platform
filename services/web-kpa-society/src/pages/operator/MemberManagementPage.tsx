@@ -51,6 +51,11 @@ interface KpaMemberRaw {
   has_kpa_member: boolean;
   user_id: string;
   status: MemberStatus;
+  // IR-O4O-SERVICE-MEMBER-PASSWORD-AND-ROLE-CONSUMER-INTEGRITY-AUDIT-V1 (FIX-3):
+  //   목록 row 는 service_memberships row 그 자체다 (GET /kpa/members 는 sm 을 FROM 으로 한다).
+  //   service_key / role 은 이미 응답에 있으나 매핑에서 누락돼 있었다.
+  service_key?: string;
+  role?: string | null;
   membership_type: string | null;
   license_number: string | null;
   pharmacy_name: string | null;
@@ -126,6 +131,20 @@ function kpaMemberToUserData(m: KpaMemberRaw): KpaUserData {
     status: m.status,
     role: m.membership_type ?? '',
     roles: m.capabilities ?? [],
+    // IR-O4O-SERVICE-MEMBER-PASSWORD-AND-ROLE-CONSUMER-INTEGRITY-AUDIT-V1 (FIX-3):
+    //   공통 PasswordModal 은 후보 서비스를 user.memberships 에서만 도출한다.
+    //   KPA 는 이 필드를 채우지 않아 후보 0 → "변경 가능한 서비스가 없습니다" 로
+    //   비밀번호 변경이 항상 도달 불가였다. row 가 곧 service_memberships 이므로
+    //   같은 row 값으로 정확히 채운다 (임의 주입 아님).
+    memberships: [
+      {
+        id: m.sm_id,
+        serviceKey: m.service_key ?? 'kpa-society',
+        status: m.status,
+        role: m.role ?? m.membership_type ?? 'member',
+        createdAt: m.created_at,
+      },
+    ],
     createdAt: m.joined_at || m.created_at,
     updatedAt: m.updated_at,
     has_kpa_member: m.has_kpa_member,
