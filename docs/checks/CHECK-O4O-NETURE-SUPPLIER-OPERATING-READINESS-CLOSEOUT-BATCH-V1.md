@@ -160,13 +160,22 @@
 
 ## 11. commit SHA
 
-`(커밋 후 기재)`
+| 항목 | 값 |
+|---|---|
+| 작업 커밋 | `683679a6f` — fix(neture): 공급자 운영 마감 점검 — 모집 액션 무음 제거·용어 통일·부정확 문구 정리 |
+| 변경 파일 | 7 files changed, 208 insertions(+), 8 deletions(-) |
+| stage 방식 | path-specific (`git add <7개 경로>`). 다른 세션의 dirty 파일(`services/web-kpa-society/.../MemberManagementPage.tsx`) 및 미추적 문서 1건 **미접촉** |
 
 ---
 
 ## 12. push 결과
 
-`(push 후 기재)`
+| 항목 | 값 |
+|---|---|
+| push | `eca78a961..587c51472  main -> main` **성공** |
+| 최종 HEAD | `587c51472` |
+| `HEAD == origin/main` | **YES** (`## main...origin/main`, ahead/behind 0) |
+| 비고 | origin/main 이 1커밋 앞서 있었고 다른 세션의 unstaged 변경이 있어 `rebase`(clean 요구·autostash 위험) 대신 **merge** 로 통합했다. 병합 대상은 문서 1건이며 충돌 0 |
 
 ---
 
