@@ -124,11 +124,11 @@ DB 직접 update · 비밀번호 재설정 · 관리 스크립트 실행 모두 
 
 ## 9. commit SHA
 
-(본 문서 커밋 SHA — 아래 push 참조)
+`5c4501f177a4a92b61979eceac42f19267a21b71`
 
 ## 10. push 결과
 
-`main` push 완료, `HEAD == origin/main`.
+`47f82a141..5c4501f17  main -> main` — push 완료, `HEAD == origin/main` 확인.
 
 ## 11. 문서 정합
 
