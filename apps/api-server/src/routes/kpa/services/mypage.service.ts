@@ -12,6 +12,8 @@
  */
 
 import type { DataSource } from 'typeorm';
+// WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1: businessInfo 주소·약국 전화 read 정렬 (read-only)
+import { resolveKpaBusinessContact } from '../shared/businessInfoRead.js';
 
 export class MypageService {
   constructor(private dataSource: DataSource) {}
@@ -102,6 +104,12 @@ export class MypageService {
 
       // Business info (사업장/근무지 정보) — users.businessInfo JSONB
       businessInfo: fullUser?.businessInfo || null,
+
+      // WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1:
+      //   주소·약국 전화는 write 경로마다 키가 달라(가입=businessAddress, 운영자/본인=address,
+      //   약국 전화=metadata.pharmacy_phone | pharmacyPhone) 프런트가 한쪽 키만 읽으면 빈칸이 된다.
+      //   raw businessInfo 는 그대로 두고(계약 불변), 해소된 값을 additive 로 함께 내려준다.
+      businessContact: resolveKpaBusinessContact(fullUser?.businessInfo ?? null),
 
       // Organization/Officer info (조직/임원 정보)
       organizations: organizationMemberships.map((m: any) => ({

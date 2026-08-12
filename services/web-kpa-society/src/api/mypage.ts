@@ -102,6 +102,16 @@ export interface ProfileResponse {
     taxEmail?: string;
   } | null;
 
+  // WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1:
+  //   주소·약국 전화의 canonical/legacy 키 해소 결과 (서버가 계산해 내려주는 read-only 값).
+  //   businessInfo 원본은 그대로 유지되므로 기존 소비 지점은 영향받지 않는다.
+  businessContact?: {
+    zipCode: string | null;
+    address: string | null;
+    address2: string | null;
+    pharmacyPhone: string | null;
+  } | null;
+
   // 조직/임원 정보
   organizations: Array<{
     id: string;

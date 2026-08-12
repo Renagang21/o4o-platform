@@ -179,6 +179,8 @@ export function MyProfilePage() {
   const resetRoleForm = (data: ProfileResponse) => {
     const biz = data.businessInfo || {};
     const storeAddr = biz.storeAddress || null;
+    // WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1: 서버가 해소한 주소·약국 전화
+    const contact = data.businessContact || null;
     setRoleForm({
       activityType: user?.activityType || '',
       university: data.pharmacist?.university || '',
@@ -190,9 +192,12 @@ export function MyProfilePage() {
       contactName: biz.contactName || '',
       taxInvoiceEmail: biz.taxInvoiceEmail || biz.taxEmail || '',
       businessPhone: biz.phone || '',
-      storeZipCode: storeAddr?.zipCode || biz.zipCode || '',
-      storeBaseAddress: storeAddr?.baseAddress || biz.address || '',
-      storeDetailAddress: storeAddr?.detailAddress || biz.address2 || '',
+      // WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1:
+      //   서버가 canonical/legacy 를 해소한 businessContact 우선. 구버전 응답 호환을 위해
+      //   기존 storeAddress / businessInfo 직접 읽기를 fallback 으로 남긴다.
+      storeZipCode: contact?.zipCode || storeAddr?.zipCode || biz.zipCode || '',
+      storeBaseAddress: contact?.address || storeAddr?.baseAddress || biz.address || '',
+      storeDetailAddress: contact?.address2 || storeAddr?.detailAddress || biz.address2 || '',
     });
   };
 
@@ -347,6 +352,8 @@ export function MyProfilePage() {
   const activityType = user?.activityType || '';
   const isPharmacyOwner = activityType === 'pharmacy_owner';
   const biz = profile?.businessInfo;
+  // WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1: 서버가 해소한 주소·약국 전화
+  const contact = profile?.businessContact || null;
 
   // WO-O4O-KPA-ACTIVITY-TYPE-SSOT-ROLE-CANONICAL-ALIGN-V1 (Phase 3):
   //   자동 활성화 prerequisite (사업자번호, 약국명) 부족으로 store_owner role 부여가 보류된
@@ -369,8 +376,13 @@ export function MyProfilePage() {
   const pharmacyAddressDetail = biz?.storeAddress && biz.storeAddress.baseAddress
     ? biz.storeAddress
     : null;
-  const pharmacyAddressFallback = profile?.pharmacy?.address || biz?.address || null;
-  const pharmacyPhone = biz?.phone || null;
+  // WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1:
+  //   주소는 해소된 businessContact 를 fallback 사슬 맨 앞에 둔다 (가입 시 businessAddress 로만
+  //   저장된 회원이 빈칸으로 보이던 문제). 약국 전화도 businessInfo.phone 만 읽던 것을
+  //   metadata.pharmacy_phone | pharmacyPhone 해소값 우선으로 정렬한다.
+  const pharmacyAddressFallback =
+    profile?.pharmacy?.address || contact?.address || biz?.address || null;
+  const pharmacyPhone = contact?.pharmacyPhone || biz?.phone || null;
   // WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1:
   //   display 블록에 canonical 10 필드 모두 노출 위해 추가 derived 값.
   //   businessInfo cache 가 보유한 값을 read-only 로 표시. write 는 /store/info canonical.

@@ -20,6 +20,8 @@ import { notificationService } from '../../../services/NotificationService.js';
 import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
 // WO-O4O-KPA-STORE-SLUG-MEMBER-APPROVAL-PATH-FIX-V1: slug 생성 (pharmacy-request 경로와 동일)
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
+// WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1: businessInfo 주소·약국 전화 read 정렬 (read-only)
+import { resolveKpaBusinessContact } from '../shared/businessInfoRead.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -390,9 +392,10 @@ export function createMemberController(
           //   pharmacy_phone 노출 — write path 가 users.businessInfo.metadata.pharmacy_phone
           //   JSONB 이므로 read path 도 동일 위치에서 추출. operator 편집 폼이 현재값을
           //   prefill 할 수 있도록 응답에 포함.
-          const metadata = (businessInfo && typeof businessInfo.metadata === 'object' && businessInfo.metadata !== null)
-            ? businessInfo.metadata as Record<string, any>
-            : null;
+          // WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1:
+          //   주소·약국 전화는 write 경로마다 키가 달라 한쪽만 읽으면 저장된 값이 빈칸으로 보인다.
+          //   canonical 우선 + legacy fallback 은 resolveKpaBusinessContact 단일 규칙으로 처리한다.
+          const contact = resolveKpaBusinessContact(businessInfo);
           // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-STRUCTURED-PROJECTION-V1:
           //   storeAddress (canonical structured) — users.businessInfo.storeAddress JSONB 에서 직접 projection.
           //   운영자 Drawer view 가 heuristic 분리 없이 zipCode/baseAddress/detailAddress 를 정확히 표시.
@@ -408,12 +411,12 @@ export function createMemberController(
                 contactName: businessInfo.contactName ?? null,
                 taxInvoiceEmail: businessInfo.taxInvoiceEmail ?? businessInfo.taxEmail ?? businessInfo.email ?? null,
                 managerPhone: businessInfo.managerPhone ?? null,
-                pharmacy_phone: (metadata?.pharmacy_phone as string | undefined) ?? null,
+                pharmacy_phone: contact.pharmacyPhone,
                 // WO-O4O-KPA-PHARMACY-OWNER-ADDRESS-CANONICALIZE-V1:
                 //   canonical address fields from users.businessInfo — used by MemberManagementPage AddressSearch.
-                zipCode: businessInfo.zipCode ?? null,
-                address: businessInfo.address ?? null,
-                address2: businessInfo.address2 ?? null,
+                zipCode: contact.zipCode,
+                address: contact.address,
+                address2: contact.address2,
                 // WO-O4O-KPA-OPERATOR-MEMBER-BUSINESS-INFO-STRUCTURED-PROJECTION-V1:
                 //   additive 확장 — legacy 필드 (zipCode/address/address2) 는 그대로 유지.
                 //   ownerPhone: 개설자 본인 연락처 (canonical pos 3).
