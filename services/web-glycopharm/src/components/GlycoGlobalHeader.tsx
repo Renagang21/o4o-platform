@@ -14,7 +14,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
 import { GraduationCap, LayoutDashboard, Settings, Shield } from 'lucide-react';
-import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
+import { GlobalHeader, GlobalHeaderMenuItem, filterContextualNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { isStoreOwnerDual } from '@o4o/auth-utils';
@@ -26,7 +26,6 @@ import { useRegisterModal } from '@/contexts/RegisterModalContext';
 import {
   GLYCO_PUBLIC_NAV,
   GLYCO_CONTEXTUAL_NAV,
-  filterContextualNav,
 } from '@/config/navigation';
 import { notificationsApi } from '@/lib/api/notifications';
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -64,11 +63,11 @@ export function GlycoGlobalHeader() {
 
   // contextualNav 필터링
   // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
-  const contextualNav = filterContextualNav(GLYCO_CONTEXTUAL_NAV, {
-    isAdminOrOperator: !!(isAdmin || isOperator),
-    isStoreOwner: !!isStoreOwner,
-    isPharmacyRelated: !!isStoreOwner,
-  });
+  const contextualNav = filterContextualNav(
+    GLYCO_CONTEXTUAL_NAV,
+    { storeOwner: !!isStoreOwner, pharmacyRelated: !!isStoreOwner },
+    { showAll: !!(isAdmin || isOperator) },
+  );
 
   // WO-O4O-GLYCOPHARM-MENU-CANONICAL-ALIGN-V1: 비로그인 시 Contact 헤더 노출
   const publicNav = isAuthenticated

@@ -112,6 +112,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
 //   DOMAIN_GROUP_ORDER / DOMAIN_DISPLAY_ORDER / TOP_PINNED_GROUPS) 는 3개 서비스 공통
 //   @o4o/operator-ux-core 의 sidebar/operatorDomainIA 로 이동. (중복 제거 — 노출 결과 불변)
 
-// ─── Legacy Export (deprecated — use UNIFIED_MENU) ────────────
-
-export const OPERATOR_MENU_ITEMS = UNIFIED_MENU;
+// WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1:
+//   deprecated OPERATOR_MENU_ITEMS (하위호환 사본) 제거 — 저장소 전체 runtime consumer 0.
+//   운영자 메뉴 정본은 UNIFIED_MENU + @o4o/ui 의 filterMenuByRole 이다.

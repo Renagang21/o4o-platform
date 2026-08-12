@@ -8,7 +8,7 @@
  * Header 내부 하드코딩 금지.
  */
 
-import type { GlobalHeaderNavItem } from '@o4o/ui';
+import type { ContextualNavItem, GlobalHeaderNavItem } from '@o4o/ui';
 import { kcosmeticsConfig } from '@o4o/operator-ux-core';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
@@ -22,37 +22,12 @@ export const KCOS_PUBLIC_NAV: GlobalHeaderNavItem[] = [
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
 
-export interface KCosContextualNavItem extends GlobalHeaderNavItem {
-  visibleWhen: 'storeManager' | 'operator' | 'admin';
-}
+// WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1:
+//   필터 구조는 @o4o/ui 의 공통 filterContextualNav 로 승격. 노출 조건 키는 서비스별로 유지.
+export type KCosContextualNavItem = ContextualNavItem<'storeManager' | 'operator' | 'admin'>;
 
 // HUB 우선 — 비KPA 서비스는 매장 HUB가 먼저 노출
 export const KCOS_CONTEXTUAL_NAV: KCosContextualNavItem[] = [
   { label: kcosmeticsConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'storeManager' },
   { label: kcosmeticsConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeManager' },
 ];
-
-// ─── Filter Helper ───────────────────────────────────────────────────────────
-
-export interface KCosNavVisibility {
-  isAdminOrOperator: boolean;
-  isStoreManager: boolean;
-}
-
-// WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1
-// operator/admin은 모든 contextual nav를 본다.
-export function filterContextualNav(
-  items: KCosContextualNavItem[],
-  vis: KCosNavVisibility,
-): GlobalHeaderNavItem[] {
-  if (vis.isAdminOrOperator) {
-    return items.map(({ label, href }) => ({ label, href }));
-  }
-  return items
-    .filter((item) => {
-      const cond = item.visibleWhen;
-      if (cond === 'storeManager') return vis.isStoreManager;
-      return false;
-    })
-    .map(({ label, href }) => ({ label, href }));
-}

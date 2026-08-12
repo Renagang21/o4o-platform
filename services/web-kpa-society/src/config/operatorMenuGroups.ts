@@ -11,7 +11,7 @@
  * adminOnly 항목은 admin 역할만 표시.
  */
 
-import type { OperatorGroupKey, OperatorMenuItem, UnifiedMenuItem } from '@o4o/ui';
+import type { OperatorGroupKey, UnifiedMenuItem } from '@o4o/ui';
 
 /**
  * 통합 메뉴 구성
@@ -133,57 +133,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
 //   DOMAIN_GROUP_ORDER / DOMAIN_DISPLAY_ORDER / TOP_PINNED_GROUPS) 는 3개 서비스 공통
 //   @o4o/operator-ux-core 의 sidebar/operatorDomainIA 로 이동. (중복 제거 — 노출 결과 불변)
 
-// ─── Legacy export (하위호환, deprecated) ───
-/** @deprecated Use UNIFIED_MENU + filterMenuByRole instead */
-export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {
-  dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
-  users: [
-    { label: '회원 관리', path: '/operator/members' },
-    // WO-KPA-OPERATOR-STORE-RELATED-MENU-HIDE-V1: 약국 서비스 신청 메뉴 제거 (라우트/API/DB 유지)
-  ],
-  approvals: [
-    // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자격 신청 관리 → lms 그룹으로 이동
-    // WO-O4O-KPA-PRODUCT-APPLICATIONS-MENU-EXPOSURE-V1: GP/KCos 와 메뉴명 정렬
-    { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
-    // WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1
-    { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
-    // WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1: '협업 문의' 제거 + 노출 승인
-    { label: '판매자 모집 노출 승인', path: '/operator/recruitment-exposure' },
-  ],
-  // WO-KPA-OPERATOR-STORES-MENU-HIDE-V1: stores 메뉴 노출 제거
-  // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실/강의 독립 그룹 분리
-  content: [
-    { label: '공지사항/뉴스', path: '/operator/content' },
-    { label: 'Home 편집', path: '/operator/community' },
-    { label: '콘텐츠 허브 관리', path: '/operator/docs' },
-    // WO-O4O-CROSSSERVICE-OPERATOR-CONTENT-MENU-PARITY-V1
-    { label: '설문조사 관리', path: '/operator/surveys' },
-  ],
-  resources: [
-    { label: '자료실 관리', path: '/operator/resources' },
-  ],
-  lms: [
-    { label: '강의 관리', path: '/operator/lms' },
-    { label: '강사 승인', path: '/operator/qualification-requests' },
-  ],
-  signage: [
-
-    { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
-    { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
-    { label: '템플릿', path: '/operator/signage/templates' },
-    { label: '강제 콘텐츠', path: '/operator/signage/forced-content' },
-  ],
-  // WO-KPA-OPERATOR-FORUM-MENU-ORDER-V1: 포럼 운영(허브)을 최상단으로 이동
-  forum: [
-    { label: '포럼 운영', path: '/operator/forum' },
-    { label: '포럼 신청 관리', path: '/operator/forum-requests' },
-    { label: '포럼 목록 관리', path: '/operator/forum-categories' },
-    { label: '삭제 요청', path: '/operator/forum-delete-requests' },
-    { label: '포럼 분석', path: '/operator/forum-analytics' },
-  ],
-  analytics: [
-    { label: 'AI 리포트', path: '/operator/ai-report' },
-    { label: '운영 분석', path: '/operator/analytics' },
-  ],
-  system: [],
-};
+// WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1:
+//   deprecated OPERATOR_MENU_ITEMS (하위호환 사본) 제거 — 저장소 전체 runtime consumer 0.
+//   운영자 메뉴 정본은 UNIFIED_MENU + @o4o/ui 의 filterMenuByRole 이다.

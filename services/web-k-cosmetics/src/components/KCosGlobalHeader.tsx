@@ -14,7 +14,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
 import { LayoutDashboard, UserCircle, Settings, GraduationCap, Shield, Sparkles } from 'lucide-react';
-import { GlobalHeader, GlobalHeaderMenuItem } from '@o4o/ui';
+import { GlobalHeader, GlobalHeaderMenuItem, filterContextualNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { isStoreOwnerDual } from '@o4o/auth-utils';
@@ -23,7 +23,6 @@ import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
   KCOS_PUBLIC_NAV,
   KCOS_CONTEXTUAL_NAV,
-  filterContextualNav,
 } from '@/config/navigation';
 import { notificationsApi } from '@/lib/api/notifications';
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -62,10 +61,11 @@ export function KCosGlobalHeader() {
 
   // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
   // WO-KCOS-HEADER-ROLE-NAV-FIX-V1: storeManager는 역할 기반 판정 (cosmetics:store_owner 이상)
-  const contextualNav = filterContextualNav(KCOS_CONTEXTUAL_NAV, {
-    isAdminOrOperator: !!(isAdmin || isOperator),
-    isStoreManager: !!isStoreManager,
-  });
+  const contextualNav = filterContextualNav(
+    KCOS_CONTEXTUAL_NAV,
+    { storeManager: !!isStoreManager },
+    { showAll: !!(isAdmin || isOperator) },
+  );
 
   // WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 비로그인 시 Contact 헤더 노출
   const publicNav = isAuthenticated

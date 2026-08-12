@@ -8,7 +8,7 @@
  * Header 내부 하드코딩 금지.
  */
 
-import type { GlobalHeaderNavItem } from '@o4o/ui';
+import type { ContextualNavItem, GlobalHeaderNavItem } from '@o4o/ui';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 // 모든 사용자에게 노출
@@ -25,9 +25,9 @@ export const NETURE_PUBLIC_NAV: GlobalHeaderNavItem[] = [
 // ─── Contextual Nav ──────────────────────────────────────���───────────────────
 // 역할 조건에 따라 노출
 
-export interface NetureContextualNavItem extends GlobalHeaderNavItem {
-  visibleWhen: 'supplier' | 'partner' | 'operator' | 'admin';
-}
+// WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1:
+//   필터 구조는 @o4o/ui 의 공통 filterContextualNav 로 승격. 노출 조건 키는 서비스별로 유지.
+export type NetureContextualNavItem = ContextualNavItem<'supplier' | 'partner' | 'operator' | 'admin'>;
 
 // WO-O4O-NETURE-CONTEXTUAL-NAV-SUPPLIER-PARTNER-INTEGRATION-V1
 // supplier/partner 역할 사용자가 상단 nav 에서 자신의 워크스페이스(대시보드)로 바로 진입.
@@ -37,30 +37,3 @@ export const NETURE_CONTEXTUAL_NAV: NetureContextualNavItem[] = [
   { label: '공급자 대시보드', href: '/supplier/dashboard', visibleWhen: 'supplier' },
   { label: '파트너 대시보드', href: '/partner/dashboard', visibleWhen: 'partner' },
 ];
-
-// ─── Filter Helper ───────────────────────────────────────────────────────────
-
-export interface NetureNavVisibility {
-  isAdminOrOperator: boolean;
-  isSupplier: boolean;
-  isPartner: boolean;
-}
-
-// WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1
-// operator/admin은 모든 contextual nav를 본다.
-export function filterContextualNav(
-  items: NetureContextualNavItem[],
-  vis: NetureNavVisibility,
-): GlobalHeaderNavItem[] {
-  if (vis.isAdminOrOperator) {
-    return items.map(({ label, href }) => ({ label, href }));
-  }
-  return items
-    .filter((item) => {
-      const cond = item.visibleWhen;
-      if (cond === 'supplier') return vis.isSupplier;
-      if (cond === 'partner') return vis.isPartner;
-      return false;
-    })
-    .map(({ label, href }) => ({ label, href }));
-}

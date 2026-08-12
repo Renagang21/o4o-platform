@@ -8,7 +8,7 @@
  * Header 내부 하드코딩 금지.
  */
 
-import type { GlobalHeaderNavItem } from '@o4o/ui';
+import type { ContextualNavItem, GlobalHeaderNavItem } from '@o4o/ui';
 import { kpaConfig } from '@o4o/operator-ux-core';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
@@ -28,10 +28,9 @@ export const KPA_CONTACT_NAV_ITEM: GlobalHeaderNavItem = { label: 'Contact', hre
 // 역할 조건에 따라 노출 (서비스에서 필터링 후 전달)
 // KPA: 내 약국 우선 — 매장 경영자에게 내 매장이 먼저 보임
 
-export interface KpaContextualNavItem extends GlobalHeaderNavItem {
-  /** 노출 조건 키 */
-  visibleWhen: 'storeOwner' | 'operator' | 'admin';
-}
+// WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1:
+//   필터 구조는 @o4o/ui 의 공통 filterContextualNav 로 승격. 노출 조건 키는 서비스별로 유지.
+export type KpaContextualNavItem = ContextualNavItem<'storeOwner' | 'operator' | 'admin'>;
 
 // WO-O4O-KPA-HEADER-MENU-CANONICAL-ALIGNMENT-V1:
 //   두 메뉴 모두 store_owner role 기준으로 통일.
@@ -43,22 +42,3 @@ export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
   { label: kpaConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
   { label: kpaConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'storeOwner' },
 ];
-
-// ─── Filter Helper ───────────────────────────────────────────────────────────
-
-export interface KpaNavVisibility {
-  isStoreOwner: boolean;
-}
-
-export function filterContextualNav(
-  items: KpaContextualNavItem[],
-  vis: KpaNavVisibility,
-): GlobalHeaderNavItem[] {
-  return items
-    .filter((item) => {
-      const cond = item.visibleWhen;
-      if (cond === 'storeOwner') return vis.isStoreOwner;
-      return false;
-    })
-    .map(({ label, href }) => ({ label, href }));
-}

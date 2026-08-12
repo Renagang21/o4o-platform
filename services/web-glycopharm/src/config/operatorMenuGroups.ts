@@ -14,7 +14,7 @@
  * adminOnly 항목은 admin 역할만 표시.
  */
 
-import type { OperatorGroupKey, OperatorMenuItem, UnifiedMenuItem } from '@o4o/ui';
+import type { OperatorGroupKey, UnifiedMenuItem } from '@o4o/ui';
 
 /**
  * 통합 메뉴 구성
@@ -118,65 +118,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
 //   DOMAIN_GROUP_ORDER / DOMAIN_DISPLAY_ORDER / TOP_PINNED_GROUPS) 는 3개 서비스 공통
 //   @o4o/operator-ux-core 의 sidebar/operatorDomainIA 로 이동. (중복 제거 — 노출 결과 불변)
 
-// ─── Legacy export (하위호환, deprecated) ───
-/** @deprecated Use UNIFIED_MENU + filterMenuByRole instead */
-export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {
-  dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
-  users: [{ label: '회원 관리', path: '/operator/members' }],
-  approvals: [
-    // WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1:
-    //   '매장 승인'(매장 온보딩) / '약사 회원 관리' 메뉴 제거(route/page 보존) + 노출 승인 추가.
-    { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
-    { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
-    { label: '판매자 모집 노출 승인', path: '/operator/recruitment-exposure' },
-  ],
-  // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only 콘솔 → '상품 현황'
-  products: [{ label: '상품 현황', path: '/operator/products' }],
-  stores: [
-    // WO-O4O-GLYCOPHARM-OPERATOR-PHARMACIES-LEGACY-REMOVAL-V1: legacy '약국 관리' 제거
-    { label: '매장 관리', path: '/operator/stores' },
-    { label: '채널 관리', path: '/operator/store-channels' },
-    { label: '약국 HUB 블로그', path: '/operator/blog' },
-    { label: '약국 HUB POP', path: '/operator/pop' },
-    { label: '약국 HUB QR', path: '/operator/qr' },
-  ],
-  // WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-LABEL-CLARIFY-GP-KCOS-V1: view-only(조회 전용) → '주문 현황'
-  orders: [{ label: '주문 현황', path: '/operator/orders' }],
-  content: [
-    { label: '공지사항/뉴스', path: '/operator/content' },
-    { label: 'Home 편집', path: '/operator/community' },
-  ],
-  lms: [
-    { label: '강의 관리', path: '/operator/lms' },
-    { label: '강사 승인', path: '/operator/qualification-requests' },
-    { label: '안내 문구 관리', path: '/operator/guide-contents' },
-  ],
-  // WO-O4O-CROSSSERVICE-OPERATOR-SIGNAGE-MENU-PARITY-V1: 콘텐츠 허브/라이브러리 제거 (UNIFIED_MENU 와 동일)
-  signage: [
-    { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
-    { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
-    { label: '템플릿', path: '/operator/signage/templates' },
-    { label: '강제 콘텐츠', path: '/operator/signage/forced-content' },
-  ],
-  forum: [
-    // WO-O4O-GLYCOPHARM-FORUM-MANAGEMENT-ORPHAN-REMOVAL-V1: mock-only '포럼 관리'(forum-management) 제거 — canonical 신청/삭제요청/분석만 유지
-    // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-MENU-LABEL-ORDER-PARITY-V1: KPA canonical 라벨 정합 (신청 관리 / 삭제 요청)
-    // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-HUB-READONLY-INTRODUCE-V1: read-only 운영 허브 도입
-    { label: '포럼 운영', path: '/operator/forum' },
-    { label: '포럼 신청 관리', path: '/operator/forum-requests' },
-    // WO-O4O-CROSSSERVICE-OPERATOR-FORUM-CATEGORIES-GP-KCOS-INTRODUCE-V1
-    { label: '포럼 목록 관리', path: '/operator/forum-categories' },
-    { label: '삭제 요청', path: '/operator/forum-delete-requests' },
-    { label: '포럼 분석', path: '/operator/forum-analytics' },
-  ],
-  analytics: [
-    { label: 'AI 리포트', path: '/operator/ai-report' },
-    { label: 'AI 사용량', path: '/operator/ai-usage' },
-    { label: 'AI 정산', path: '/operator/ai-billing' },
-    { label: '운영 분석', path: '/operator/analytics' },
-  ],
-  resources: [{ label: '자료실 관리', path: '/operator/resources' }],
-  system: [
-    { label: '서비스 설정', path: '/operator/settings' },
-  ],
-};
+// WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1:
+//   deprecated OPERATOR_MENU_ITEMS (하위호환 사본) 제거 — 저장소 전체 runtime consumer 0.
+//   운영자 메뉴 정본은 UNIFIED_MENU + @o4o/ui 의 filterMenuByRole 이다.

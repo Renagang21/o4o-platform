@@ -8,7 +8,7 @@
  * Header 내부 하드코딩 금지.
  */
 
-import type { GlobalHeaderNavItem } from '@o4o/ui';
+import type { ContextualNavItem, GlobalHeaderNavItem } from '@o4o/ui';
 import { glycopharmConfig } from '@o4o/operator-ux-core';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
@@ -24,40 +24,12 @@ export const GLYCO_PUBLIC_NAV: GlobalHeaderNavItem[] = [
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
 // 역할 조건에 따라 노출 (서비스에서 필터링 후 전달)
 
-export interface GlycoContextualNavItem extends GlobalHeaderNavItem {
-  /** 노출 조건 키 */
-  visibleWhen: 'pharmacyRelated' | 'storeOwner' | 'operator' | 'admin';
-}
+// WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1:
+//   필터 구조는 @o4o/ui 의 공통 filterContextualNav 로 승격. 노출 조건 키는 서비스별로 유지.
+export type GlycoContextualNavItem = ContextualNavItem<'pharmacyRelated' | 'storeOwner' | 'operator' | 'admin'>;
 
 // HUB 우선 — 비KPA 서비스는 매장 HUB가 먼저 노출
 export const GLYCO_CONTEXTUAL_NAV: GlycoContextualNavItem[] = [
   { label: glycopharmConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'pharmacyRelated' },
   { label: glycopharmConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
 ];
-
-// ─── Filter Helper ───────────────────────────────────────────────────────────
-
-export interface GlycoNavVisibility {
-  isAdminOrOperator: boolean;
-  isStoreOwner: boolean;
-  isPharmacyRelated: boolean;
-}
-
-// WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1
-// operator/admin은 모든 contextual nav를 본다.
-export function filterContextualNav(
-  items: GlycoContextualNavItem[],
-  vis: GlycoNavVisibility,
-): GlobalHeaderNavItem[] {
-  if (vis.isAdminOrOperator) {
-    return items.map(({ label, href }) => ({ label, href }));
-  }
-  return items
-    .filter((item) => {
-      const cond = item.visibleWhen;
-      if (cond === 'storeOwner') return vis.isStoreOwner;
-      if (cond === 'pharmacyRelated') return vis.isPharmacyRelated;
-      return false;
-    })
-    .map(({ label, href }) => ({ label, href }));
-}

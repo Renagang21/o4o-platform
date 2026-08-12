@@ -13,7 +13,7 @@
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GlobalHeader } from '@o4o/ui';
+import { GlobalHeader, filterContextualNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
@@ -28,7 +28,6 @@ import { useLoginModal } from '../contexts/LoginModalContext';
 import {
   NETURE_PUBLIC_NAV,
   NETURE_CONTEXTUAL_NAV,
-  filterContextualNav,
 } from '../config/navigation';
 import { NetureUserMenuItems } from './NetureUserMenu';
 import { resolveNetureNotificationTarget } from '../lib/notificationRouting';
@@ -64,11 +63,11 @@ export function NetureGlobalHeader() {
   const isPartner = isAuthenticated && user?.roles?.some((r: string) => PARTNER_ONLY_ROLES.includes(r));
 
   // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
-  const contextualNav = filterContextualNav(NETURE_CONTEXTUAL_NAV, {
-    isAdminOrOperator: !!(isAdmin || isOperator),
-    isSupplier: !!isSupplier,
-    isPartner: !!isPartner,
-  });
+  const contextualNav = filterContextualNav(
+    NETURE_CONTEXTUAL_NAV,
+    { supplier: !!isSupplier, partner: !!isPartner },
+    { showAll: !!(isAdmin || isOperator) },
+  );
 
   const headerUser = user
     ? { displayName: getUserDisplayName(user), email: user.email }
