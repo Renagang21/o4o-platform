@@ -103,6 +103,10 @@
 |---|---|
 | `services/web-kpa-society/src/pages/operator/MemberManagementPage.tsx` | `KpaMemberRaw` 에 `service_key` · `role` 선언 추가, `kpaMemberToUserData()` 가 같은 row 값으로 `memberships: [{ id: sm_id, serviceKey: service_key, status, role, createdAt }]` 를 채운다. 임의 주입이 아니라 응답에 이미 있는 값의 매핑 누락 복구다. |
 
+같은 KPA 안에서도 **회원 상세**(`services/web-kpa-society/src/pages/operator/UserDetailPage.tsx`
+→ 공통 `@o4o/ui` `UserDetailPage`, P1)는 `GET /operator/members/:id` 응답의 `memberships` 를 그대로
+쓰므로 영향이 없었다. 결함은 **목록 화면의 KPA 전용 매퍼 한 곳**에 한정된다.
+
 백엔드 계약은 불변이다. 후보 확정 뒤에도 서버가 `service_memberships` 교집합 · 관리 범위 · tier 를
 다시 판정하므로(§1), FE 매핑만으로 격리가 약해질 수 없다. 레거시 `service_key = 'kpa'` 행이 있으면
 서버 후보에는 들어가나 KPA 운영자 scope 는 `kpa-society` 단독이라 403 `SERVICE_SCOPE_FORBIDDEN` 이
@@ -143,7 +147,9 @@
 
 | 항목 | 결과 |
 |---|---|
-| commit | (push 후 기입) |
-| admin 배포 | (기입) |
-| `/users/:id/edit` 비밀번호 입력란 제거 확인 | (기입) |
-| 운영자 회원 관리 비밀번호 변경(정본 경로) 회귀 | (기입) |
+| commit | `ea1f501e6` (FIX-1/FIX-2 + 테스트) · `4ab837016` (FIX-3) — 둘 다 push 완료 |
+| 배포 | admin run 31565195772 success · api run 31565195766 success · web(kpa-society) run 31566282532 **success** |
+| KPA `/operator/members` → 더보기 → 비밀번호 변경 (`pradix@naver.com`) | **PASS** — "대상 서비스 **KPA-Society** / 이 서비스의 로그인 비밀번호만 변경됩니다" 표시. 수정 전에는 후보 0 안내였다. |
+| 동상 (`renagang21@gmail.com`) | **PASS** — 동일하게 KPA-Society 자동 확정 |
+| 실제 비밀번호 제출 | **수행하지 않음.** 후보 확정까지만 확인했고 `변경` 은 누르지 않았다(운영 데이터 write 회피). |
+| `/users/:id/edit` 비밀번호 입력란 제거 확인 | **미실시.** 이 화면은 `platform:super_admin` 전용인데 `docs/local/TEST-ACCOUNTS.local.md` 에 해당 계정의 비밀번호가 없어 로그인할 수 없다. 코드·타입체크·jest 3케이스로만 검증했다. |
