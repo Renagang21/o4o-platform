@@ -73,7 +73,7 @@ const COMPLETENESS_BADGE: Record<string, { label: string; cls: string }> = {
  */
 const OFFER_SAVE_ERROR_MESSAGE: Record<string, string> = {
   PRIVATE_REQUIRES_SELLER_IDS:
-    '비공개(내부 상품) 상태에서는 저장할 수 없습니다. [공급 방식 변경]에서 공급 방식을 먼저 설정해 주세요.',
+    '판매자가 지정되지 않은 내부 상품은 활성화하거나 유통 범위를 바꿀 수 없습니다. [공급 방식 변경]에서 공급 방식을 먼저 설정해 주세요. (가격·설명 등 정보 수정은 그대로 저장됩니다)',
   SERVICE_REQUIRES_KEYS: '서비스 공급으로 설정하려면 대상 서비스를 1개 이상 선택해야 합니다.',
   PUBLIC_REQUIRES_DESCRIPTION: '공개 공급으로 전환하려면 상품 설명을 먼저 입력해야 합니다.',
   PRODUCT_NOT_FOUND: '상품을 찾을 수 없습니다. 목록을 새로고침한 뒤 다시 시도해 주세요.',

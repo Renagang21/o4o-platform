@@ -1201,6 +1201,13 @@ export class NetureOfferService {
         return { success: false, error: 'PRODUCT_NOT_FOUND' };
       }
 
+      // WO-O4O-NETURE-SUPPLIER-OFFER-UPDATE-PRIVATE-GATE-FIX-V1:
+      //   PRIVATE + allowedSellerIds:[] 게이트를 "요청이 실제로 유통 축을 건드렸는가" 로 좁히기 위해
+      //   변경 전 상태를 캡처한다. 아래 §PRIVATE 게이트 참조.
+      const prevIsPublic = offer.isPublic;
+      const prevIsActive = offer.isActive;
+      const prevSellerIdCount = offer.allowedSellerIds?.length ?? 0;
+
       if (updates.isActive !== undefined) {
         offer.isActive = updates.isActive;
       }
@@ -1280,8 +1287,28 @@ export class NetureOfferService {
         );
       }
 
-      // Validation: PRIVATE requires at least one seller ID
-      if (offer.distributionType === OfferDistributionType.PRIVATE &&
+      // §PRIVATE 게이트 — WO-O4O-NETURE-SUPPLIER-OFFER-UPDATE-PRIVATE-GATE-FIX-V1
+      //
+      // 이전 구현은 "PRIVATE + sellerIds 비어있음" 이면 **모든** 수정을 거부했다.
+      // 그런데 createSupplierOffer 는 신규 등록을 항상 isPublic:false + serviceKeys:[] +
+      // allowedSellerIds:[] (= PRIVATE, UI 의 "내부 상품") 로 만든다. 결과적으로 신규 등록 상품은
+      // 공급 방식을 설정하기 전까지 가격·설명·재고 등 어떤 정보도 저장할 수 없었다 (실사용 차단).
+      //
+      // 노출·거래 안전성은 이 게이트가 아니라 소비 경로가 이미 보장한다 —
+      // 매장 HUB(pharmacy-products.controller) · 매장 checkout(kpa/glycopharm) ·
+      // 파트너 조달(seller.service · neture-b2b-cart-checkout) 이 모두
+      // `distribution_type <> 'PRIVATE' OR $x = ANY(allowed_seller_ids)` 로 필터하므로
+      // allowedSellerIds 가 비어 있는 PRIVATE offer 는 어디에도 노출되지 않고 주문도 되지 않는다.
+      //
+      // 따라서 게이트는 **유통 축을 실제로 바꾸거나 상품을 활성화하는 요청**에만 적용한다.
+      // 순수 정보 수정(가격·설명·재고·대표 노출)은 통과시킨다.
+      const distributionChanged =
+        offer.isPublic !== prevIsPublic ||
+        (offer.allowedSellerIds?.length ?? 0) !== prevSellerIdCount;
+      const activating = offer.isActive === true && prevIsActive === false;
+
+      if ((distributionChanged || activating) &&
+          offer.distributionType === OfferDistributionType.PRIVATE &&
           (!offer.allowedSellerIds || offer.allowedSellerIds.length === 0)) {
         return { success: false, error: 'PRIVATE_REQUIRES_SELLER_IDS' };
       }
