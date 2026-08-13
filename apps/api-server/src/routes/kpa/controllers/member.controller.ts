@@ -1455,6 +1455,35 @@ export function createMemberController(
                 role: 'kpa:store_owner',
                 assignedBy: (req as any).user?.id,
               });
+
+              // WO-O4O-KPA-ACTIVITY-TYPE-PHARMACY-OWNER-ORGANIZATION-CONTACT-ALIGNMENT-V1
+              //   승인 경로(PATCH /:id/status) 와 동일한 주소·약국 전화 초기화 계약을 적용한다.
+              //   - 신규 organization: resolver 결과로 초기화.
+              //   - 기존 organization: 유효한 값은 덮어쓰지 않고 비어 있는 항목만 보완.
+              //   - 대표 전화(businessInfo.phone) 는 약국 전화로 승격하지 않는다.
+              //   prevBiz 는 이 요청의 businessInfo patch 가 반영된 "갱신 후" 값이다.
+              //   권한 부여와 독립된 try/catch — 연락처 동기화 실패가 store_owner 부여 결과를
+              //   'error' 로 바꾸지 않는다 (기존 후처리 계약 유지).
+              try {
+                const [orgRow] = await dataSource.query(
+                  `SELECT address, address_detail, phone FROM organizations WHERE id = $1 LIMIT 1`,
+                  [orgResult.id],
+                );
+                const contactPlan = planKpaOrganizationContactSync(prevBiz, orgRow ?? null);
+                if (contactPlan.hasChanges) {
+                  await dataSource.query(
+                    `UPDATE organizations SET
+                       address = COALESCE(NULLIF(address, ''), $1),
+                       address_detail = $2::jsonb || COALESCE(address_detail, '{}'::jsonb),
+                       phone = COALESCE(NULLIF(phone, ''), $3)
+                     WHERE id = $4`,
+                    [contactPlan.address, JSON.stringify(contactPlan.addressDetail ?? {}), contactPlan.phone, orgResult.id],
+                  );
+                }
+              } catch (orgContactErr) {
+                console.error('[KPA Operator] Organization contact sync failed (non-blocking):', orgContactErr);
+              }
+
               changes._store_owner_activated = true;
             }
           } catch (activateErr) {
