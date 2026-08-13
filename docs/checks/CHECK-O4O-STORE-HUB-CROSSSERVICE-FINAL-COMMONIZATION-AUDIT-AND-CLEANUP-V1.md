@@ -1,3 +1,14 @@
+> **정정 (2026-08-13 · `CHECK-O4O-STORE-HUB-FULL-FEATURE-INVENTORY-AND-COMMONIZATION-GAP-AUDIT-V1` 전수조사 결과)**
+>
+> 본 문서의 **"매장허브 공통화 트랙 종료" 판정을 철회한다.** 아래 문장은 조사 시점의 모집단 기준이며 전체 모집단 기준으로는 사실과 다르다.
+>
+> 1. **모집단 과소 설정** — 본 문서 매트릭스는 KPA / K-Cosmetics / PharmacyHub 3 서비스만 열로 두었다. **GlycoPharm 은 구조상 K-Cosmetics 와 동일한 `/store-hub` 9 route 를 가진 참여 서비스**이며, blog/pop/qr 3 페이지(975L)가 공통 Core 를 소비하지 않는 사본으로 남아 있다.
+> 2. **소비처 수치 오류** — 본문의 `useHubImportLibrary` · `buildEventOfferCartPayload` "소비처 18건" 은 `grep -rn` 라인 히트 수다. 실제 **페이지 소비처는 각각 6 · 3** 이다.
+> 3. **이벤트 오퍼 COMMONIZED 판정 정정** — KPA `KpaEventOfferPage`(969L)는 공통 `EventOffersHubList` 를 쓰지 않고 `resolveEventOfferStatusLabel` 하나만 소비한다. 공통화된 것은 K-Cosmetics · GlycoPharm 2 서비스뿐이다.
+> 4. **미착수 축 누락** — 사이니지 라이브러리(3 사본 1,811L · Core 0) · 주문 내역(4 사본) · 매장허브 API client(9종 × 3 서비스) · 허브 레이아웃(3 사본) 은 본 문서 매트릭스에 행 자체가 없었다.
+>
+> 실제 공통화 수준은 **32 기능 중 FULLY_COMMON 7 (22%)** 이다. 본 문서에 기록된 개별 작업(장바구니 endpoint 수렴 · PharmacyHub 진입점 연결)의 결과 자체는 유효하며, 판정 범위만 정정한다.
+
 # CHECK — WO-O4O-STORE-HUB-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1
 
 - **작업일**: 2026-08-13
