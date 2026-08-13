@@ -35,14 +35,25 @@ import type { ProductionTemplate } from './productionTemplates';
 import { DataTable, type Column, ActionBar, BulkResultModal } from '@o4o/ui';
 import { useBatchAction } from '@o4o/operator-ux-core';
 import { Send, Archive as ArchiveIcon, Trash2 } from 'lucide-react';
-import { GuideBackLink } from '@o4o/store-ui-core';
+// WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
+//   editor / settings 화면 본체는 3서비스 공통 Core 를 소비한다(목록은 KPA 전용 DataTable + 일괄 실행 모델 유지).
+import {
+  GuideBackLink,
+  StoreBlogEditorPanel,
+  StoreBlogSettingsPanel,
+  storeBlogBtnStyle,
+  storeBlogSmallBtnStyle,
+} from '@o4o/store-ui-core';
 
 // WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1: HTML 첫 heading 추출 (AI title fallback)
 type ViewMode = 'list' | 'editor' | 'settings';
 type StatusFilter = 'all' | 'draft' | 'published' | 'archived';
 
+// WO-O4O-KPA-OPERATOR-STORE-CONTENT-MENU-TERMINOLOGY-ALIGNMENT-V1: 상태 라벨 통일(초안/발행/보관)
+// WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
+//   ⚠️ 공통화 대상이 아니다. KCos/GP 는 '임시저장/발행됨' 을 쓰므로 공통 상수로 치환하면
+//   KPA 또는 KCos/GP 중 한쪽 문구가 조용히 바뀐다. 색상만 동일하고 라벨은 서비스 계약이 다르다.
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  // WO-O4O-KPA-OPERATOR-STORE-CONTENT-MENU-TERMINOLOGY-ALIGNMENT-V1: 상태 라벨 통일(초안/발행/보관)
   draft: { label: '초안', color: '#64748b', bg: '#f1f5f9' },
   published: { label: '발행', color: '#16a34a', bg: '#f0fdf4' },
   archived: { label: '보관', color: '#d97706', bg: '#fefce8' },
@@ -405,247 +416,97 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   // WO-O4O-KPA-BLOG-AI-STEP-REMOVE-V1: AI 초안 생성 결과 주입(handleAiInsert) 제거.
 
   // Editor view
+  // WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
+  //   editor 화면 본체를 공통 StoreBlogEditorPanel 로 이관(KCos/GP 와 동일 Core).
+  //   KPA 고유 요소(템플릿 배지 · 외부 AI 안내 · 이미지 업로드)는 slot 으로 그대로 보존한다.
   if (mode === 'editor') {
     return (
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '24px' }}>
-          <div>
-            <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>
-              {editingPost ? '게시글 수정' : '새 게시글'}
-            </h1>
-            {/* WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1: 제작 흐름 진입 시 선택된 템플릿 배지 */}
-            {selectedTemplate && (
-              <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 11, fontWeight: 600, color: '#4f46e5', backgroundColor: '#eef2ff', padding: '2px 8px', borderRadius: 4 }}>
-                  {selectedTemplate.style ?? selectedTemplate.name}
-                </span>
-                <span style={{ fontSize: 11, color: '#94a3b8' }}>{selectedTemplate.name} 템플릿 적용 중</span>
-              </div>
-            )}
+      <StoreBlogEditorPanel
+        isEditing={!!editingPost}
+        title={editorTitle}
+        onTitleChange={setEditorTitle}
+        slug={editorSlug}
+        onSlugChange={setEditorSlug}
+        excerpt={editorExcerpt}
+        onExcerptChange={setEditorExcerpt}
+        saving={saving}
+        canSave={!!editorTitle.trim() && !!editorContent.trim()}
+        onSave={handleSave}
+        onCancel={() => setMode('list')}
+        /* WO-O4O-BLOG-TEMPLATE-WORKFLOW-V1: 제작 흐름 진입 시 선택된 템플릿 배지 */
+        headerBadge={selectedTemplate ? (
+          <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#4f46e5', backgroundColor: '#eef2ff', padding: '2px 8px', borderRadius: 4 }}>
+              {selectedTemplate.style ?? selectedTemplate.name}
+            </span>
+            <span style={{ fontSize: 11, color: '#94a3b8' }}>{selectedTemplate.name} 템플릿 적용 중</span>
           </div>
-          <button onClick={() => setMode('list')} style={{ ...btnStyle, backgroundColor: '#f1f5f9', color: '#475569' }}>
-            취소
-          </button>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div>
-            <label style={labelStyle}>제목</label>
-            <input
-              type="text"
-              value={editorTitle}
-              onChange={(e) => setEditorTitle(e.target.value)}
-              placeholder="게시글 제목"
-              style={inputStyle}
-            />
-          </div>
-          <div>
-            <label style={labelStyle}>슬러그 (URL)</label>
-            <input
-              type="text"
-              value={editorSlug}
-              onChange={(e) => setEditorSlug(e.target.value)}
-              placeholder="자동 생성됨 (선택 입력)"
-              style={inputStyle}
-            />
-          </div>
-          <div>
-            <label style={labelStyle}>요약 (excerpt)</label>
-            <input
-              type="text"
-              value={editorExcerpt}
-              onChange={(e) => setEditorExcerpt(e.target.value)}
-              placeholder="목록에 표시될 요약 (선택)"
-              style={inputStyle}
-            />
-          </div>
-          {/* WO-O4O-KPA-BLOG-AI-STEP-REMOVE-V1: 블로그 초안 AI 생성 진입점 제거(초안 생성 AI 제거 정책).
-              외부 AI 도구에서 작성한 글을 본문에 붙여넣어 편집한다. (본문 편집기 Toolbar "AI 정리"는 유지.) */}
+        ) : undefined}
+        /* WO-O4O-KPA-BLOG-AI-STEP-REMOVE-V1: 블로그 초안 AI 생성 진입점 제거(초안 생성 AI 제거 정책).
+           외부 AI 도구에서 작성한 글을 본문에 붙여넣어 편집한다. (본문 편집기 Toolbar "AI 정리"는 유지.) */
+        beforeEditor={(
           <p style={blogGuideHint}>
             외부 AI 도구(ChatGPT·Claude·Gemini 등)나 문서에서 작성한 글을 아래 본문에 붙여넣고 편집하세요.
           </p>
-
-          <div>
-            <label style={labelStyle}>본문</label>
-            {/* WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: textarea → canonical RichTextEditor (preset=full).
-                기존 plain-text 게시글은 RichTextEditor 가 setContent 시 자동으로 paragraph 로 감싸서 호환. */}
-            <RichTextEditor
-              value={editorContent}
-              onChange={(c) => setEditorContent(c.html)}
-              onImageUpload={handleImageUpload}
-              placeholder="전문 칼럼을 작성하세요"
-              minHeight="360px"
-              preset="full"
-              aiRequestHeaders={(() => {
-                const token = getAccessToken();
-                return token ? { Authorization: `Bearer ${token}` } : undefined;
-              })()}
-            />
-          </div>
-
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-            <button
-              onClick={handleSave}
-              disabled={saving || !editorTitle.trim() || !editorContent.trim()}
-              style={{ ...btnStyle, backgroundColor: '#3b82f6', color: '#fff', opacity: saving ? 0.6 : 1 }}
-            >
-              {saving ? '저장 중...' : editingPost ? '수정 저장' : '임시 저장'}
-            </button>
-          </div>
-        </div>
-
-        {/* WO-O4O-KPA-BLOG-AI-STEP-REMOVE-V1: 블로그 AI 초안 생성 모달 진입점 제거 (AiContentModal 컴포넌트는 유지) */}
-      </div>
+        )}
+        /* WO-O4O-KPA-STORE-BLOG-CONTENT-RICHTEXT-V1: canonical RichTextEditor (preset=full).
+           기존 plain-text 게시글은 RichTextEditor 가 setContent 시 자동으로 paragraph 로 감싸서 호환. */
+        renderEditor={() => (
+          <RichTextEditor
+            value={editorContent}
+            onChange={(c) => setEditorContent(c.html)}
+            onImageUpload={handleImageUpload}
+            placeholder="전문 칼럼을 작성하세요"
+            minHeight="360px"
+            preset="full"
+            aiRequestHeaders={(() => {
+              const token = getAccessToken();
+              return token ? { Authorization: `Bearer ${token}` } : undefined;
+            })()}
+          />
+        )}
+      />
     );
   }
 
   // Settings view (WO-O4O-KPA-STORE-BLOG-META-V1)
+  // WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
+  //   settings 화면 본체를 공통 StoreBlogSettingsPanel 로 이관(KCos/GP 와 동일 Core).
+  //   KPA 고유 요소(대표 이미지 업로드 버튼)는 slot 으로 그대로 보존한다.
   if (mode === 'settings') {
     return (
-      <div style={{ maxWidth: '720px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
-          <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>블로그 설정</h1>
-          <button onClick={() => setMode('list')} style={{ ...btnStyle, backgroundColor: '#f1f5f9', color: '#475569' }}>
-            돌아가기
-          </button>
-        </div>
-
-        <p style={{ fontSize: 13, color: '#64748b', marginBottom: 24, lineHeight: 1.6 }}>
-          블로그 자체의 identity (이름·소개·대표 이미지·기본 템플릿) 를 설정합니다. 미입력 항목은 매장 정보로 대체됩니다.
-        </p>
-
-        {settingsLoading ? (
-          <div style={{ textAlign: 'center', padding: '48px 0', color: '#94a3b8' }}>
-            불러오는 중...
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div>
-              <label style={labelStyle}>블로그 이름</label>
-              <input
-                type="text"
-                value={settingsForm.blogName}
-                onChange={(e) => setSettingsForm((f) => ({ ...f, blogName: e.target.value }))}
-                placeholder="예: 우리약국 칼럼 (미입력 시 매장명 표시)"
-                style={inputStyle}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>소개</label>
-              <textarea
-                value={settingsForm.description}
-                onChange={(e) => setSettingsForm((f) => ({ ...f, description: e.target.value }))}
-                placeholder="블로그 채널의 짧은 소개 (전문 분야, 주요 주제 등)"
-                rows={3}
-                style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>대표 이미지</label>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                <input
-                  type="text"
-                  value={settingsForm.heroImage}
-                  onChange={(e) => setSettingsForm((f) => ({ ...f, heroImage: e.target.value }))}
-                  placeholder="https:// 이미지 URL 또는 아래 [업로드] 사용"
-                  style={{ ...inputStyle, flex: 1 }}
-                />
-                <label style={{ ...btnStyle, backgroundColor: '#f1f5f9', color: '#475569', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                  업로드
-                  <input
-                    type="file"
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleHeroUpload(file);
-                      e.target.value = '';
-                    }}
-                  />
-                </label>
-              </div>
-              {settingsForm.heroImage && (
-                <div style={{ marginTop: 8 }}>
-                  <img
-                    src={settingsForm.heroImage}
-                    alt="대표 이미지 미리보기"
-                    style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8, border: '1px solid #e2e8f0' }}
-                  />
-                </div>
-              )}
-              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>
-                공개 블로그 목록 페이지 상단에 column masthead 로 표시됩니다.
-              </p>
-            </div>
-            <div>
-              <label style={labelStyle}>기본 템플릿</label>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {(['professional', 'modern'] as const).map((t) => (
-                  <label
-                    key={t}
-                    style={{
-                      flex: 1,
-                      padding: '10px 12px',
-                      border: `1px solid ${settingsForm.defaultTemplate === t ? '#3b82f6' : '#e2e8f0'}`,
-                      backgroundColor: settingsForm.defaultTemplate === t ? '#eff6ff' : '#fff',
-                      borderRadius: 8,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                    }}
-                  >
-                    <input
-                      type="radio"
-                      name="defaultTemplate"
-                      value={t}
-                      checked={settingsForm.defaultTemplate === t}
-                      onChange={() => setSettingsForm((f) => ({ ...f, defaultTemplate: t }))}
-                    />
-                    <span style={{ fontSize: 14, fontWeight: 600, color: '#1e293b' }}>
-                      {t === 'professional' ? 'Professional' : 'Modern'}
-                    </span>
-                  </label>
-                ))}
-              </div>
-              <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 6 }}>
-                URL ?template=modern 으로 임시 미리보기 가능. 향후 유료 템플릿 추가 예정.
-              </p>
-            </div>
-
-            {settingsMessage && (
-              <div
-                style={{
-                  padding: '10px 14px',
-                  borderRadius: 8,
-                  fontSize: 13,
-                  color: settingsMessage.kind === 'success' ? '#15803d' : '#dc2626',
-                  background: settingsMessage.kind === 'success' ? '#f0fdf4' : '#fef2f2',
-                  border: `1px solid ${settingsMessage.kind === 'success' ? '#86efac' : '#fecaca'}`,
-                }}
-              >
-                {settingsMessage.text}
-              </div>
-            )}
-
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
-              <button
-                onClick={handleSaveSettings}
-                disabled={settingsSaving}
-                style={{ ...btnStyle, backgroundColor: '#3b82f6', color: '#fff', opacity: settingsSaving ? 0.6 : 1 }}
-              >
-                {settingsSaving ? '저장 중...' : '저장'}
-              </button>
-            </div>
-
-            {settings && (
-              <p style={{ fontSize: 11, color: '#94a3b8', textAlign: 'right' }}>
-                마지막 수정: {new Date(settings.updatedAt).toLocaleString('ko-KR')}
-              </p>
-            )}
-          </div>
+      <StoreBlogSettingsPanel
+        form={settingsForm}
+        onFormChange={setSettingsForm}
+        settings={settings}
+        loading={settingsLoading}
+        saving={settingsSaving}
+        message={settingsMessage}
+        labels={{
+          subtitle: '블로그 자체의 identity (이름·소개·대표 이미지·기본 템플릿) 를 설정합니다. 미입력 항목은 매장 정보로 대체됩니다.',
+          blogNamePlaceholder: '예: 우리약국 칼럼 (미입력 시 매장명 표시)',
+          descriptionPlaceholder: '블로그 채널의 짧은 소개 (전문 분야, 주요 주제 등)',
+          heroImagePlaceholder: 'https:// 이미지 URL 또는 아래 [업로드] 사용',
+          heroImageHint: '공개 블로그 목록 페이지 상단에 column masthead 로 표시됩니다.',
+        }}
+        onSave={handleSaveSettings}
+        onBack={() => setMode('list')}
+        heroUploadSlot={(
+          <label style={{ ...storeBlogBtnStyle, backgroundColor: '#f1f5f9', color: '#475569', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            업로드
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleHeroUpload(file);
+                e.target.value = '';
+              }}
+            />
+          </label>
         )}
-      </div>
+      />
     );
   }
 
@@ -874,43 +735,14 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   );
 }
 
-const btnStyle: React.CSSProperties = {
-  padding: '8px 16px',
-  borderRadius: '8px',
-  border: 'none',
-  fontSize: '14px',
-  fontWeight: 600,
-  cursor: 'pointer',
-};
+// WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
+//   btnStyle / smallBtn 은 KCos·GP 사본과 값이 동일했다 → 공통 style 을 소비한다(로컬 사본 제거).
+const btnStyle = storeBlogBtnStyle;
+const smallBtn = storeBlogSmallBtnStyle;
 
-const smallBtn: React.CSSProperties = {
-  padding: '4px 10px',
-  borderRadius: '6px',
-  border: '1px solid #e2e8f0',
-  backgroundColor: '#fff',
-  fontSize: '12px',
-  fontWeight: 500,
-  cursor: 'pointer',
-};
-
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontSize: '13px',
-  fontWeight: 600,
-  color: '#475569',
-  marginBottom: '6px',
-};
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '10px 12px',
-  borderRadius: '8px',
-  border: '1px solid #e2e8f0',
-  fontSize: '14px',
-  color: '#1e293b',
-  outline: 'none',
-  boxSizing: 'border-box',
-};
+// WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
+//   labelStyle / inputStyle 은 editor·settings 이관으로 사용처가 사라져 제거했다.
+//   동일 값은 @o4o/store-ui-core 의 storeBlogLabelStyle / storeBlogInputStyle 이 보유한다.
 
 // WO-O4O-KPA-STORE-BLOG-AI-WIRING-V1
 // WO-O4O-KPA-BLOG-AI-STEP-REMOVE-V1: 외부 LLM 붙여넣기 안내(짧은 hint)

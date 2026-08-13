@@ -49,10 +49,78 @@ export interface StoreProductDescriptionsApi {
   ) => Promise<StoreDescriptionProduct>;
 }
 
+/**
+ * 사용자-facing 문구.
+ * WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:
+ *   KPA 채택 시 기존 KPA 문구가 조용히 바뀌지 않도록 **원문 그대로** adapter 에서 주입한다.
+ *   미지정 항목은 storeNoun 기반 기존 기본값(KCos/GP 현행)이 유지된다.
+ */
+export interface StoreProductDescriptionsLabels {
+  breadcrumbRoot: string;
+  breadcrumbCurrent: string;
+  title: string;
+  subtitle: ReactNode;
+  /** 공용 상품 DB 정책 안내 본문 */
+  notice: ReactNode;
+  sidebarTitle: (count: number) => string;
+  listErrorFallback: string;
+  listErrorText: string;
+  emptyText: string;
+  emptyLinkText: string;
+  saveSuccessToast: string;
+  placeholderExisting: string;
+  /** template 미선택 + 저장본 없음일 때 */
+  placeholderFallback: string;
+}
+
+/**
+ * 서비스 palette.
+ * KPA 는 slate 계열(`styles/theme` colors) + primary `#2563EB`,
+ * KCos/GP 는 gray 계열 + accent `#0EA5E9` 를 쓴다. 원본 값을 그대로 주입한다.
+ */
+export interface StoreProductDescriptionsTheme {
+  /** 제목 아이콘 · 저장 버튼 · 자료함 링크 · 선택 항목 아이콘 */
+  accent: string;
+  /** 저장 버튼 글자 */
+  accentText: string;
+  textStrong: string;
+  textBody: string;
+  textMuted: string;
+  textSubtle: string;
+  sidebarTitleColor: string;
+  breadcrumbSeparator: string;
+  divider: string;
+  inputBorder: string;
+  surface: string;
+  templateBadgeBg: string;
+  templateBadgeColor: string;
+}
+
+/** KCos/GP 현행 palette (기본값 — 변경 금지) */
+const DEFAULT_THEME: StoreProductDescriptionsTheme = {
+  accent: '#0EA5E9',
+  accentText: '#fff',
+  textStrong: '#1F2937',
+  textBody: '#374151',
+  textMuted: '#6B7280',
+  textSubtle: '#9CA3AF',
+  sidebarTitleColor: '#4B5563',
+  breadcrumbSeparator: '#9CA3AF',
+  divider: '#E5E7EB',
+  inputBorder: '#D1D5DB',
+  surface: '#fff',
+  templateBadgeBg: '#EFF6FF',
+  templateBadgeColor: '#2563EB',
+};
+
 export interface StoreProductDescriptionsViewProps {
   api: StoreProductDescriptionsApi;
-  /** 사용자-facing 명사 — GlycoPharm 은 '약국', 그 외는 '매장' */
+  /** 사용자-facing 명사 — GlycoPharm 은 '약국', 그 외는 '매장'. labels 미지정 항목의 기본값을 만든다. */
   storeNoun?: string;
+  /** 서비스별 문구 override (미지정 시 storeNoun 기반 기본값) */
+  labels?: Partial<StoreProductDescriptionsLabels>;
+  /** 서비스별 palette override (미지정 시 KCos/GP 현행 값) */
+  theme?: Partial<StoreProductDescriptionsTheme>;
   /** 제작 시작에서 넘어온 templateId 해석 (서비스별 registry) */
   findTemplate?: (templateId: string) => StoreDescriptionTemplate | null | undefined;
   /** 본문 편집기 slot (RichTextEditor 주입) */
@@ -67,9 +135,43 @@ export interface StoreProductDescriptionsViewProps {
 export function StoreProductDescriptionsView({
   api,
   storeNoun = '매장',
+  labels: labelOverrides,
+  theme: themeOverrides,
   findTemplate,
   renderEditor,
 }: StoreProductDescriptionsViewProps) {
+  const t: StoreProductDescriptionsTheme = { ...DEFAULT_THEME, ...themeOverrides };
+  const styles = buildStyles(t);
+
+  // KCos/GP 현행 문구 = storeNoun 기반 기본값. 서비스가 준 원문이 있으면 그것을 그대로 쓴다.
+  const labels: StoreProductDescriptionsLabels = {
+    breadcrumbRoot: `내 ${storeNoun}`,
+    breadcrumbCurrent: `${storeNoun} 상품 설명`,
+    title: `${storeNoun} 상품 설명 관리`,
+    subtitle: (
+      <>
+        저장된 {storeNoun} 상품 상세설명을 조회·재편집합니다.
+        신규 생성은 "내 자료함 → 제작 시작 → {storeNoun} 상품 설명"에서 진입하세요.
+      </>
+    ),
+    notice: (
+      <>
+        이 화면의 상세설명은 <strong>{storeNoun} 자체 상품에 저장</strong>되며, 해당 {storeNoun}에서만 조회·수정됩니다.
+        O4O 공용 상품 DB(표준 상품)의 대표 설명은 O4O 관리자가 관리하며 이 화면에서 수정되지 않습니다.
+        {storeNoun} 특화 홍보문·이벤트 문구·POP/블로그용 문구가 필요하면 <strong>콘텐츠 만들기</strong>에서 별도 콘텐츠로 제작하세요.
+      </>
+    ),
+    sidebarTitle: (count) => `내 ${storeNoun} 상품 (${count})`,
+    listErrorFallback: `내 ${storeNoun} 자체 상품을 불러오지 못했습니다.`,
+    listErrorText: `내 ${storeNoun} 자체 상품을 불러오지 못했습니다.`,
+    emptyText: '등록된 자체 상품이 없습니다.',
+    emptyLinkText: '상품 등록하기',
+    saveSuccessToast: `내 ${storeNoun} 상품 설명이 저장되었습니다`,
+    placeholderExisting: `저장된 ${storeNoun} 상품 설명을 수정하세요.`,
+    placeholderFallback: `신규 생성은 "내 자료함 → 제작 시작 → ${storeNoun} 상품 설명"에서 시작하세요.`,
+    ...labelOverrides,
+  };
+
   const { fetchLocalProducts, updateLocalProduct } = api;
   const location = useLocation();
   const [products, setProducts] = useState<StoreDescriptionProduct[]>([]);
@@ -100,7 +202,7 @@ export function StoreProductDescriptionsView({
       }
     } catch (e: any) {
       // 실패를 "0건" 으로 위장하지 않는다 — 목록 상태를 건드리지 않고 오류를 노출한다.
-      setListError(e?.message || `내 ${storeNoun} 자체 상품을 불러오지 못했습니다.`);
+      setListError(e?.message || labels.listErrorFallback);
     } finally {
       setLoading(false);
     }
@@ -203,7 +305,7 @@ export function StoreProductDescriptionsView({
             : p,
         ),
       );
-      toast.success(`내 ${storeNoun} 상품 설명이 저장되었습니다`);
+      toast.success(labels.saveSuccessToast);
     } catch (e: any) {
       // 작성 내용을 초기화하지 않는다.
       setSaveError(e?.message || '상품 설명을 저장하지 못했습니다. 작성한 내용은 유지됩니다.');
@@ -222,14 +324,14 @@ export function StoreProductDescriptionsView({
       <div style={styles.header}>
         <div>
           <div style={styles.breadcrumb}>
-            <span>내 {storeNoun}</span>
-            <span style={{ color: '#9CA3AF' }}>/</span>
-            <span style={{ color: '#374151' }}>{storeNoun} 상품 설명</span>
+            <span>{labels.breadcrumbRoot}</span>
+            <span style={{ color: t.breadcrumbSeparator }}>/</span>
+            <span style={{ color: t.textBody }}>{labels.breadcrumbCurrent}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' as const }}>
             <h1 style={styles.title}>
-              <FileText size={20} style={{ color: '#0EA5E9' }} />
-              {storeNoun} 상품 설명 관리
+              <FileText size={20} style={{ color: t.accent }} />
+              {labels.title}
             </h1>
             {selectedTemplate && (
               <span style={styles.templateBadge}>
@@ -239,10 +341,7 @@ export function StoreProductDescriptionsView({
               </span>
             )}
           </div>
-          <p style={styles.subtitle}>
-            저장된 {storeNoun} 상품 상세설명을 조회·재편집합니다.
-            신규 생성은 "내 자료함 → 제작 시작 → {storeNoun} 상품 설명"에서 진입하세요.
-          </p>
+          <p style={styles.subtitle}>{labels.subtitle}</p>
         </div>
         <button onClick={fetchProducts} style={styles.refreshBtn} disabled={loading}>
           <RefreshCw size={14} />
@@ -265,15 +364,13 @@ export function StoreProductDescriptionsView({
       >
         {/* WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1:
             소유 계약 정정 — 이 화면에서 저장하는 설명은 매장(약국) 자체 상품에 귀속된다. */}
-        이 화면의 상세설명은 <strong>{storeNoun} 자체 상품에 저장</strong>되며, 해당 {storeNoun}에서만 조회·수정됩니다.
-        O4O 공용 상품 DB(표준 상품)의 대표 설명은 O4O 관리자가 관리하며 이 화면에서 수정되지 않습니다.
-        {storeNoun} 특화 홍보문·이벤트 문구·POP/블로그용 문구가 필요하면 <strong>콘텐츠 만들기</strong>에서 별도 콘텐츠로 제작하세요.
+        {labels.notice}
       </div>
 
       <div style={styles.layout}>
         {/* 상품 목록 */}
         <aside style={styles.sidebar}>
-          <h2 style={styles.sidebarTitle}>내 {storeNoun} 상품 ({products.length})</h2>
+          <h2 style={styles.sidebarTitle}>{labels.sidebarTitle(products.length)}</h2>
           {loading ? (
             <p style={styles.sidebarEmpty}>불러오는 중...</p>
           ) : listError ? (
@@ -281,7 +378,7 @@ export function StoreProductDescriptionsView({
                조회 실패는 "0건" 과 구분해 표시하고 재시도를 제공한다. */
             <div style={{ padding: '12px 4px' }}>
               <p style={{ ...styles.sidebarEmpty, color: '#B91C1C' }}>
-                내 {storeNoun} 자체 상품을 불러오지 못했습니다.
+                {labels.listErrorText}
               </p>
               <button type="button" onClick={fetchProducts} style={styles.retryBtn}>
                 <RefreshCw size={13} />
@@ -290,10 +387,10 @@ export function StoreProductDescriptionsView({
             </div>
           ) : products.length === 0 ? (
             <div style={{ padding: '12px 4px' }}>
-              <p style={styles.sidebarEmpty}>등록된 자체 상품이 없습니다.</p>
+              <p style={styles.sidebarEmpty}>{labels.emptyText}</p>
               <Link to="/store/commerce/local-products" style={styles.sidebarLink}>
                 <Package size={13} />
-                상품 등록하기
+                {labels.emptyLinkText}
               </Link>
             </div>
           ) : (
@@ -310,7 +407,7 @@ export function StoreProductDescriptionsView({
                         ...(active ? styles.productItemActive : {}),
                       }}
                     >
-                      <Package size={14} style={{ color: active ? '#0EA5E9' : '#9CA3AF', flexShrink: 0 }} />
+                      <Package size={14} style={{ color: active ? t.accent : t.textSubtle, flexShrink: 0 }} />
                       <span style={styles.productName}>{p.name}</span>
                     </button>
                   </li>
@@ -343,7 +440,7 @@ export function StoreProductDescriptionsView({
                       <span style={styles.typeLabel}>
                         {selectedTemplate.style ?? selectedTemplate.name}
                       </span>
-                      <span style={{ fontSize: '11px', color: '#9CA3AF' }}>
+                      <span style={{ fontSize: '11px', color: t.textSubtle }}>
                         {selectedTemplate.description}
                       </span>
                     </div>
@@ -387,10 +484,10 @@ export function StoreProductDescriptionsView({
                 value: content,
                 onChange: setContent,
                 placeholder: hasExisting
-                  ? `저장된 ${storeNoun} 상품 설명을 수정하세요.`
+                  ? labels.placeholderExisting
                   : selectedTemplate
                     ? `${selectedTemplate.name} 템플릿 구조로 작성하세요.`
-                    : `신규 생성은 "내 자료함 → 제작 시작 → ${storeNoun} 상품 설명"에서 시작하세요.`,
+                    : labels.placeholderFallback,
               })}
 
               <div style={styles.actions}>
@@ -412,38 +509,45 @@ export function StoreProductDescriptionsView({
   );
 }
 
-const styles: Record<string, CSSProperties> = {
-  container: { padding: '24px', maxWidth: '1100px', margin: '0 auto' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '24px' },
-  breadcrumb: { display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#9CA3AF', marginBottom: '6px' },
-  title: { display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '20px', fontWeight: 600, color: '#1F2937', margin: 0 },
-  templateBadge: { display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '3px 8px', background: '#EFF6FF', color: '#2563EB', borderRadius: '5px', fontSize: '12px', fontWeight: 600 },
-  subtitle: { fontSize: '13px', color: '#6B7280', margin: '6px 0 0', lineHeight: 1.5 },
-  refreshBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#fff', border: '1px solid #D1D5DB', borderRadius: '6px', fontSize: '13px', color: '#374151', cursor: 'pointer' },
-  layout: { display: 'grid', gridTemplateColumns: '280px 1fr', gap: '16px', alignItems: 'flex-start' },
-  sidebar: { background: '#fff', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '12px', maxHeight: '600px', overflowY: 'auto' as const },
-  sidebarTitle: { fontSize: '13px', fontWeight: 600, color: '#4B5563', margin: '0 0 8px', padding: '0 4px' },
-  sidebarEmpty: { fontSize: '13px', color: '#6B7280', padding: '12px 4px', margin: 0 },
-  productList: { listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column' as const, gap: '2px' },
-  productItem: { display: 'flex', alignItems: 'center', gap: '8px', width: '100%', padding: '8px 10px', background: 'transparent', border: '1px solid transparent', borderRadius: '6px', fontSize: '13px', color: '#374151', cursor: 'pointer', textAlign: 'left' as const },
-  productItemActive: { background: '#EFF6FF', borderColor: '#BFDBFE', color: '#2563EB', fontWeight: 500 },
-  productName: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const },
-  editor: { background: '#fff', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '20px', display: 'flex', flexDirection: 'column' as const, gap: '12px', minHeight: '400px' },
-  editorEmpty: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF', fontSize: '14px', minHeight: '300px' },
-  editorHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', paddingBottom: '12px', borderBottom: '1px solid #E5E7EB' },
-  editorProductName: { fontSize: '15px', fontWeight: 600, color: '#1F2937' },
-  editorProductSummary: { fontSize: '12px', color: '#6B7280', marginTop: '4px' },
-  typeLabel: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', background: '#F0FDF4', color: '#15803D', borderRadius: '4px', fontSize: '11px', fontWeight: 600 },
-  editorMeta: { display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-end', gap: '4px', flexShrink: 0 },
-  // WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1 §6.5
-  retryBtn: { display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '6px 10px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '6px', fontSize: '12px', color: '#B91C1C', fontWeight: 500, cursor: 'pointer', marginTop: '4px' },
-  saveErrorBanner: { margin: '0 0 12px', padding: '10px 14px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', fontSize: '13px', color: '#B91C1C', lineHeight: 1.5 },
-  metaText: { fontSize: '11px', color: '#9CA3AF' },
-  metaTextMuted: { fontSize: '11px', color: '#9CA3AF', fontStyle: 'italic' },
-  prefillBanner: { display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '6px' },
-  prefillBtn: { padding: '6px 12px', background: '#fff', border: '1px solid #FDE68A', borderRadius: '6px', fontSize: '12px', color: '#92400E', fontWeight: 500, cursor: 'pointer', flexShrink: 0 },
-  actions: { display: 'flex', justifyContent: 'flex-end', gap: '8px' },
-  saveBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#0EA5E9', border: 'none', borderRadius: '6px', fontSize: '13px', color: '#fff', fontWeight: 500, cursor: 'pointer' },
-  sidebarLink: { display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '6px 10px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '6px', fontSize: '12px', color: '#2563EB', fontWeight: 500, textDecoration: 'none', marginTop: '4px' },
-  libraryLink: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 14px', border: '1px solid #0EA5E9', backgroundColor: '#fff', color: '#0EA5E9', borderRadius: '8px', fontSize: '13px', fontWeight: 500, textDecoration: 'none' },
-};
+/**
+ * 서비스 palette 를 적용한 style map.
+ * 값은 KCos/GP 현행과 동일하며, theme 미주입 시 DEFAULT_THEME 로 기존과 완전히 같은 결과가 된다.
+ * 서비스 간 차이가 없는 값(경고/성공 색 등)은 토큰화하지 않고 그대로 둔다.
+ */
+function buildStyles(t: StoreProductDescriptionsTheme): Record<string, CSSProperties> {
+  return {
+    container: { padding: '24px', maxWidth: '1100px', margin: '0 auto' },
+    header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '24px' },
+    breadcrumb: { display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: t.textSubtle, marginBottom: '6px' },
+    title: { display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '20px', fontWeight: 600, color: t.textStrong, margin: 0 },
+    templateBadge: { display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '3px 8px', background: t.templateBadgeBg, color: t.templateBadgeColor, borderRadius: '5px', fontSize: '12px', fontWeight: 600 },
+    subtitle: { fontSize: '13px', color: t.textMuted, margin: '6px 0 0', lineHeight: 1.5 },
+    refreshBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: t.surface, border: `1px solid ${t.inputBorder}`, borderRadius: '6px', fontSize: '13px', color: t.textBody, cursor: 'pointer' },
+    layout: { display: 'grid', gridTemplateColumns: '280px 1fr', gap: '16px', alignItems: 'flex-start' },
+    sidebar: { background: t.surface, border: `1px solid ${t.divider}`, borderRadius: '8px', padding: '12px', maxHeight: '600px', overflowY: 'auto' as const },
+    sidebarTitle: { fontSize: '13px', fontWeight: 600, color: t.sidebarTitleColor, margin: '0 0 8px', padding: '0 4px' },
+    sidebarEmpty: { fontSize: '13px', color: t.textMuted, padding: '12px 4px', margin: 0 },
+    productList: { listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column' as const, gap: '2px' },
+    productItem: { display: 'flex', alignItems: 'center', gap: '8px', width: '100%', padding: '8px 10px', background: 'transparent', border: '1px solid transparent', borderRadius: '6px', fontSize: '13px', color: t.textBody, cursor: 'pointer', textAlign: 'left' as const },
+    productItemActive: { background: '#EFF6FF', borderColor: '#BFDBFE', color: '#2563EB', fontWeight: 500 },
+    productName: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const },
+    editor: { background: t.surface, border: `1px solid ${t.divider}`, borderRadius: '8px', padding: '20px', display: 'flex', flexDirection: 'column' as const, gap: '12px', minHeight: '400px' },
+    editorEmpty: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textSubtle, fontSize: '14px', minHeight: '300px' },
+    editorHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', paddingBottom: '12px', borderBottom: `1px solid ${t.divider}` },
+    editorProductName: { fontSize: '15px', fontWeight: 600, color: t.textStrong },
+    editorProductSummary: { fontSize: '12px', color: t.textMuted, marginTop: '4px' },
+    typeLabel: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', background: '#F0FDF4', color: '#15803D', borderRadius: '4px', fontSize: '11px', fontWeight: 600 },
+    editorMeta: { display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-end', gap: '4px', flexShrink: 0 },
+    // WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1 §6.5
+    retryBtn: { display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '6px 10px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '6px', fontSize: '12px', color: '#B91C1C', fontWeight: 500, cursor: 'pointer', marginTop: '4px' },
+    saveErrorBanner: { margin: '0 0 12px', padding: '10px 14px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', fontSize: '13px', color: '#B91C1C', lineHeight: 1.5 },
+    metaText: { fontSize: '11px', color: t.textSubtle },
+    metaTextMuted: { fontSize: '11px', color: t.textSubtle, fontStyle: 'italic' },
+    prefillBanner: { display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '6px' },
+    prefillBtn: { padding: '6px 12px', background: t.surface, border: '1px solid #FDE68A', borderRadius: '6px', fontSize: '12px', color: '#92400E', fontWeight: 500, cursor: 'pointer', flexShrink: 0 },
+    actions: { display: 'flex', justifyContent: 'flex-end', gap: '8px' },
+    saveBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: t.accent, border: 'none', borderRadius: '6px', fontSize: '13px', color: t.accentText, fontWeight: 500, cursor: 'pointer' },
+    sidebarLink: { display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '6px 10px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '6px', fontSize: '12px', color: '#2563EB', fontWeight: 500, textDecoration: 'none', marginTop: '4px' },
+    libraryLink: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 14px', border: `1px solid ${t.accent}`, backgroundColor: '#fff', color: t.accent, borderRadius: '8px', fontSize: '13px', fontWeight: 500, textDecoration: 'none' },
+  };
+}

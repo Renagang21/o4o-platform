@@ -247,3 +247,9 @@ export * from './components/product-marketing';
 export * from './components/pop-staff';
 export * from './components/product-descriptions';
 export * from './components/signage';
+
+// 채널 콘솔 · QR 콘솔 · 블로그 관리
+// (WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1)
+export * from './components/channels';
+export * from './components/qr';
+export * from './components/blog';
