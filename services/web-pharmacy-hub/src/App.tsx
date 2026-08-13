@@ -4,6 +4,7 @@
  * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
  * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1
  * WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1 — /store-owner 하위를 공통 매장 셸로 편입
+ * WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1 — /operator 하위를 공통 운영자 셸로 편입
  *
  * 라우트:
  *   /                            홈 (브랜드 표시 + 역할별 진입점)
@@ -12,9 +13,10 @@
  *   /join/status                 내 가입 상태
  *   /supplier                    공급자 진입점        (MembershipGate)
  *   /supplier/products           내 상품 Pharmacy-Hub 제공 설정 (WO-...-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1)
- *   /operator                    서비스 운영자 진입점 (MembershipGate)
- *   /operator/memberships        가입 신청 관리 목록  (MembershipGate + operator role)
- *   /operator/memberships/:id    가입 신청 상세
+ *   /operator                    운영자 셸 (OperatorLayoutWrapper — 공통 OperatorAreaShell)
+ *     ├ (index)                  서비스 운영자 진입점
+ *     ├ /memberships             가입 신청 관리 목록
+ *     └ /memberships/:id         가입 신청 상세
  *
  *   /store-owner                 매장 경영 셸 (StoreDashboardLayout — 공통)
  *     ├ (index)                  매장 경영 홈
@@ -52,6 +54,8 @@ import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { AuthProvider } from './contexts/AuthContext';
 import { MembershipGate } from './components/MembershipGate';
 import { StoreOwnerShell } from './layouts/StoreOwnerShell';
+// WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1
+import { OperatorLayoutWrapper } from './layouts/OperatorLayoutWrapper';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RoleEntryPage from './pages/RoleEntryPage';
@@ -124,10 +128,17 @@ export default function App() {
             }
           />
 
-          <Route
-            path="/operator"
-            element={
-              <MembershipGate>
+          {/*
+            운영자 영역 셸 (WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1)
+            OperatorLayoutWrapper = MembershipGate + 공통 OperatorAreaShell(@o4o/operator-ux-core)
+              + DomainIASidebar. KPA / K-Cosmetics / GlycoPharm 와 같은 구조다.
+            URL 3개(/operator · /operator/memberships · /operator/memberships/:membershipId) 는
+            그대로 두고 nested route 로만 정리한다 — 하위 화면 컴포넌트도 무변경.
+          */}
+          <Route path="/operator" element={<OperatorLayoutWrapper />}>
+            <Route
+              index
+              element={
                 <RoleEntryPage
                   role={ROLES.operator}
                   plannedFeatures={[
@@ -136,27 +147,11 @@ export default function App() {
                   ]}
                   links={[{ to: '/operator/memberships', label: '가입 신청 관리' }]}
                 />
-              </MembershipGate>
-            }
-          />
-
-          <Route
-            path="/operator/memberships"
-            element={
-              <MembershipGate>
-                <MembershipsPage />
-              </MembershipGate>
-            }
-          />
-
-          <Route
-            path="/operator/memberships/:membershipId"
-            element={
-              <MembershipGate>
-                <MembershipDetailPage />
-              </MembershipGate>
-            }
-          />
+              }
+            />
+            <Route path="memberships" element={<MembershipsPage />} />
+            <Route path="memberships/:membershipId" element={<MembershipDetailPage />} />
+          </Route>
 
           {/* WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1 — 권한 경계는 backend guard 가 강제 */}
           <Route

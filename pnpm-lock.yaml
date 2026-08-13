@@ -3376,6 +3376,9 @@ importers:
       '@o4o/error-handling':
         specifier: workspace:*
         version: link:../../packages/error-handling
+      '@o4o/operator-ux-core':
+        specifier: workspace:*
+        version: link:../../packages/operator-ux-core
       '@o4o/screen-content-core':
         specifier: workspace:*
         version: link:../../packages/screen-content-core
@@ -3388,6 +3391,9 @@ importers:
       '@o4o/tablet-screen-set-editor':
         specifier: workspace:*
         version: link:../../packages/tablet-screen-set-editor
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@o4o/ui':
         specifier: workspace:*
         version: link:../../packages/ui
