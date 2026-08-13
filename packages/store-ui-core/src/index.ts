@@ -139,6 +139,9 @@ export type {
   StoreLocalProductsApi,
   StoreLocalProduct,
   StoreLocalProductInput,
+  // WO-O4O-MY-STORE-LOCAL-PRODUCTS-CROSSSERVICE-COMMONIZATION-V1: KPA 수렴용 슬롯
+  StoreLocalProductsExtraColumn,
+  StoreLocalProductsFormModalContext,
 } from './components/local-products/StoreLocalProductsManager';
 
 // Store Hub 이벤트 오퍼 단순 목록 공통 (WO-O4O-STORE-HUB-EVENT-OFFER-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1)
