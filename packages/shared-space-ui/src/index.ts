@@ -120,6 +120,11 @@ export type {
 export { ForumCommentList } from './ForumCommentList';
 export type { ForumCommentListItem, ForumCommentListProps } from './ForumCommentList';
 
+/* WO-O4O-COMMUNITY-FORUM-OWNER-AREA-COMMONIZATION-V1:
+ * 포럼 소유자 영역 (내 포럼 대시보드 · 폐쇄형 회원 관리) 공통 View + adapter 계약.
+ * 서비스는 API adapter · links · theme · slot 만 주입한다 (서비스 분기 없음). */
+export * from './forum-owner';
+
 /* WO-O4O-CONTENT-STANDARD-MODULE-EXTRACT-V1: O4O 표준 커뮤니티 콘텐츠 작성 form shell (KPA canonical 추출) */
 export { CommunityContentWriteShell } from './community/CommunityContentWriteShell';
 export type {
