@@ -1,0 +1,34 @@
+import { ForumHubTemplate, type ForumHubConfig } from '@o4o/shared-space-ui';
+import { useAuth } from '../../contexts/AuthContext';
+import { fetchPharmacyHubForumCategories } from '../../services/forumApi';
+
+const pharmacyHubForumConfig: ForumHubConfig = {
+  serviceKey: 'pharmacy-hub',
+  heroTitle: 'PharmacyHub 커뮤니티',
+  heroDesc: '약국과 공급자가 PharmacyHub 안에서 정보를 나누는 커뮤니티입니다.',
+  categoryPath: (forumId) => `/forum?forum=${encodeURIComponent(forumId)}`,
+  listPath: '/forum',
+  fetchCategories: fetchPharmacyHubForumCategories,
+  // 게시글 활동은 다음 단계(게시글 목록 공통화)에서 service scope를 닫은 뒤 연결한다.
+  fetchRecentPosts: async () => [],
+  writePrompt: {
+    authTitle: '커뮤니티에 참여해 보세요',
+    authDesc: '포럼을 선택해 정보를 확인할 수 있습니다. 글쓰기는 다음 단계에서 연결됩니다.',
+    ctaPath: '/forum',
+  },
+  infoLinks: [
+    { label: 'PharmacyHub 홈', href: '/' },
+    { label: '가입 상태', href: '/join/status' },
+  ],
+};
+
+export default function ForumHubPage() {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <ForumHubTemplate
+      config={pharmacyHubForumConfig}
+      isAuthenticated={isAuthenticated}
+    />
+  );
+}
