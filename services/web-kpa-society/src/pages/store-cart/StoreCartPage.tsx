@@ -10,12 +10,10 @@
  *   priceSnapshot 은 표시용 임시값이며 checkout 확정 시 재검증된다.
  */
 
-import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@o4o/error-handling';
+import { useStoreCart } from '@o4o/store-ui-core';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
-import { storeCartApi, type SupplierGroup } from '../../api';
-import type { CheckoutConfirmResult } from '../../api/storeCart';
+import { storeCartApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
 
 const CART_SERVICE_KEY = 'kpa-society';
@@ -25,98 +23,30 @@ const formatWon = (n: number | null | undefined) =>
 
 export function StoreCartPage() {
   const navigate = useNavigate();
-  const [groups, setGroups] = useState<SupplierGroup[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
-  // WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1 (Phase 1b)
-  const [confirming, setConfirming] = useState(false);
-  const [confirmResult, setConfirmResult] = useState<CheckoutConfirmResult | null>(null);
 
-  const load = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await storeCartApi.groupBySupplier(CART_SERVICE_KEY);
-      setGroups(res.data.groups);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : '장바구니를 불러오지 못했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  const changeQty = async (id: string, quantity: number) => {
-    if (quantity < 1 || busy) return;
-    setBusy(true);
-    try {
-      await storeCartApi.updateQuantity(CART_SERVICE_KEY, id, quantity);
-      await load();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : '수량 변경에 실패했습니다.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const remove = async (id: string) => {
-    if (busy) return;
-    setBusy(true);
-    try {
-      await storeCartApi.removeItem(CART_SERVICE_KEY, id);
-      await load();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : '삭제에 실패했습니다.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const clearAll = async () => {
-    if (busy || groups.length === 0) return;
-    setBusy(true);
-    try {
-      await storeCartApi.clear(CART_SERVICE_KEY);
-      await load();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : '비우기에 실패했습니다.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const confirmCheckout = async () => {
-    if (confirming || busy || groups.length === 0) return;
-    setConfirming(true);
-    setConfirmResult(null);
-    try {
-      const res = await storeCartApi.checkoutConfirm(CART_SERVICE_KEY);
-      setConfirmResult(res.data);
-      if (res.data.createdOrders.length > 0) {
-        toast.success(`${res.data.createdOrders.length}개 공급자 주문이 생성되었습니다.`);
-      }
-      if (res.data.failedItems.length > 0) {
-        toast.error(`${res.data.failedItems.length}개 항목은 주문하지 못했습니다.`);
-      }
-      await load(); // 성공 항목 제거 반영
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : '주문 확정에 실패했습니다.');
-    } finally {
-      setConfirming(false);
-    }
-  };
+  // WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1:
+  //   조회/수량변경/삭제/비우기/주문확정 상태 기계는 3 서비스가 동일해 공통 Core 로 이관했다.
+  //   화면은 KPA 자체 디자인 시스템(PageHeader/Card/EmptyState)을 그대로 유지한다.
+  const {
+    groups,
+    loading,
+    busy,
+    confirming,
+    confirmResult,
+    changeQty,
+    remove,
+    clearAll,
+    confirmCheckout,
+    itemsSubtotal,
+    shippingTotal,
+    grandTotal,
+    itemCount,
+  } = useStoreCart({ api: storeCartApi, serviceKey: CART_SERVICE_KEY });
 
   if (loading) {
     return <LoadingSpinner message="장바구니를 불러오는 중..." />;
   }
 
-  // WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1: 상품/배송비/총액 분리
-  const itemsSubtotal = groups.reduce((sum, g) => sum + g.displaySubtotal, 0);
-  const shippingTotal = groups.reduce((sum, g) => sum + (g.shipping?.shippingFee ?? 0), 0);
-  const grandTotal = itemsSubtotal + shippingTotal;
-  const itemCount = groups.reduce((sum, g) => sum + g.itemCount, 0);
 
   return (
     <div style={styles.container}>

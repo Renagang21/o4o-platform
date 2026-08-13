@@ -202,3 +202,37 @@ export type {
   UseHubImportLibraryOptions,
   UseHubImportLibraryResult,
 } from './components/hub-import/useHubImportLibrary';
+
+// 매장 장바구니 공통 (WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1)
+//   storeCartTypes = canonical Store Cart API 계약 타입 (3 서비스 중복 제거 — 계약 자체는 무변경)
+//   useStoreCart   = 조회/수량/삭제/비우기/주문확정 상태 Core (headless)
+//   StoreCartView  = KCos·GP near-identical 화면 공통 View (accent 주입)
+//   Pharmacy-Hub 는 결제 그룹 기반 다른 주문 계약이므로 대상 아님.
+export type {
+  CartSourceType,
+  CartPricingSource,
+  StoreCartItem,
+  AddCartItemInput,
+  SupplierGroupShipping,
+  SupplierGroup,
+  CreatedOrderSummary,
+  FailedCartItem,
+  CheckoutConfirmResult,
+  StoreCartApiOk,
+  StoreCartApi,
+} from './components/store-cart/storeCartTypes';
+export { useStoreCart } from './components/store-cart/useStoreCart';
+export type { UseStoreCartOptions, UseStoreCartResult } from './components/store-cart/useStoreCart';
+export { StoreCartView } from './components/store-cart/StoreCartView';
+export type { StoreCartViewProps, StoreCartAccent } from './components/store-cart/StoreCartView';
+
+// 공급 상품 신청/제외 액션 Core (WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1)
+//   "내 매장에 추가" = ProductApproval 신청. 신청 ≠ 장바구니 ≠ 주문 (의미 변경 없음).
+export { useSupplyProductApplication } from './components/supply-catalog/useSupplyProductApplication';
+export type {
+  SupplyApplicationItem,
+  SupplyProductApplicationApi,
+  SupplyProductApplicationLabels,
+  UseSupplyProductApplicationOptions,
+  UseSupplyProductApplicationResult,
+} from './components/supply-catalog/useSupplyProductApplication';

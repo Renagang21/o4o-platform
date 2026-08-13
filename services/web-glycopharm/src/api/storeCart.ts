@@ -11,98 +11,28 @@
  *   메서드는 응답 body(ApiOk<T>)를 반환하도록 .data 를 언랩한다(KPA storeCart 와 동일 형상).
  */
 import { api } from '../lib/apiClient';
+import type { StoreCartApiOk as ApiOk } from '@o4o/store-ui-core';
 
-export type CartSourceType =
-  | 'regular'
-  | 'operator_approved'
-  | 'b2b'
-  | 'event_offer'
-  // 'seller_recruitment': legacy/internal — 매장 취급 신청/공급 승인 전 상태. 주문 경로 아님.
-  // Neture 제휴(파트너 모집)와 무관. 근거: WO-O4O-SELLER-RECRUITMENT-TERMINOLOGY-BOUNDARY-FIX-V1.
-  | 'seller_recruitment';
+// WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1:
+//   3 서비스 중복 타입 정의를 @o4o/store-ui-core 로 이관하고 re-export 한다. API 계약 무변경.
+export type {
+  CartSourceType,
+  CartPricingSource,
+  StoreCartItem,
+  AddCartItemInput,
+  SupplierGroupShipping,
+  SupplierGroup,
+  CreatedOrderSummary,
+  FailedCartItem,
+  CheckoutConfirmResult,
+} from '@o4o/store-ui-core';
 
-export type CartPricingSource = 'regular' | 'event_offer';
-
-export interface StoreCartItem {
-  id: string;
-  buyerId: string;
-  organizationId: string | null;
-  serviceKey: string;
-  sourceType: CartSourceType;
-  supplierId: string | null;
-  supplierProductOfferId: string | null;
-  organizationProductListingId: string | null;
-  eventOfferId: string | null;
-  productMasterId: string | null;
-  productName: string;
-  quantity: number;
-  pricingSource: CartPricingSource;
-  priceSnapshot: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface AddCartItemInput {
-  sourceType?: CartSourceType;
-  supplierId?: string | null;
-  supplierProductOfferId?: string | null;
-  organizationProductListingId?: string | null;
-  eventOfferId?: string | null;
-  productMasterId?: string | null;
-  productName: string;
-  quantity?: number;
-  pricingSource?: CartPricingSource;
-  priceSnapshot?: number;
-}
-
-// WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1
-export interface SupplierGroupShipping {
-  shippingFee: number;
-  freeShippingApplied: boolean;
-  freeShippingThreshold: number | null;
-  remainingForFreeShipping: number | null;
-  policyConfigured: boolean;
-}
-
-export interface SupplierGroup {
-  supplierId: string | null;
-  items: StoreCartItem[];
-  itemCount: number;
-  totalQuantity: number;
-  displaySubtotal: number;
-  shipping: SupplierGroupShipping;
-  displayTotal: number;
-}
-
-export interface CreatedOrderSummary {
-  orderId: string;
-  orderNumber: string;
-  supplierId: string;
-  sellerOrganizationId: string;
-  subtotal: number;
-  shippingFee: number;
-  totalAmount: number;
-  itemCount: number;
-  cartItemIds: string[];
-}
-
-export interface FailedCartItem {
-  itemId: string;
-  reason: string;
-  message: string;
-}
-
-export interface CheckoutConfirmResult {
-  serviceKey: string;
-  createdOrders: CreatedOrderSummary[];
-  failedItems: FailedCartItem[];
-  removedCartItemIds: string[];
-}
-
-interface ApiOk<T> {
-  success: true;
-  data: T;
-}
+import type {
+  AddCartItemInput,
+  CheckoutConfirmResult,
+  StoreCartItem,
+  SupplierGroup,
+} from '@o4o/store-ui-core';
 
 export const storeCartApi = {
   addItem: (serviceKey: string, input: AddCartItemInput) =>

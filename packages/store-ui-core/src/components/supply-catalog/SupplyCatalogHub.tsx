@@ -22,12 +22,12 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { Plus, Check, Trash2, X, Loader2 } from 'lucide-react';
-import { toast } from '@o4o/error-handling';
 import { ActionBar } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { useSupplyProductList } from './useSupplyProductList';
 import type { SupplyProductListQuery } from './useSupplyProductList';
+import { useSupplyProductApplication } from './useSupplyProductApplication';
 
 // ─── 공통 타입 ────────────────────────────────────────────────────────────────
 export interface SupplyCatalogProduct {
@@ -145,10 +145,7 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
   const headingDescription =
     heading?.description ?? '현재 활성 공급자가 제공 중인 상품을 탐색하고 내 매장에 추가할 수 있습니다.';
 
-  const [applyingId, setApplyingId] = useState<string | null>(null);
-  const [removingId, setRemovingId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [bulkAdding, setBulkAdding] = useState(false);
 
   // WO-O4O-STORE-HUB-SUPPLY-PRODUCT-EXPLORER-COMMONIZATION-V1:
   //   목록 조회 · 페이지네이션 · 탭 · loading/empty/error 상태를 공통 Core(useSupplyProductList)로 위임.
@@ -187,66 +184,31 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
     list.setTab(safeKey);
   };
 
-  // ─── 단건 추가 (= 공급 상품 신청, ProductApproval PENDING) ─────────────────
-  const handleApply = async (product: T) => {
-    if (applyingId) return;
-    setApplyingId(product.id);
-    try {
-      await api.applyBySupplyProductId(product.id);
-      toast.success(`"${product.name}" 내 매장에 추가되었습니다.`);
-      setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isAdded: true } : p));
-    } catch (e: any) {
-      const code = e?.response?.data?.error?.code || e?.code;
-      if (code === 'DUPLICATE_APPLICATION') toast.error('이미 내 매장에 추가된 상품입니다.');
-      else toast.error(e?.message || '상품 추가에 실패했습니다.');
-    } finally {
-      setApplyingId(null);
-    }
-  };
+  // ─── 신청/제외 액션 (WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1) ────
+  //   단건 추가(= 공급 상품 신청, ProductApproval PENDING) · 단건 제외 · 일괄 신청 상태 기계를
+  //   공통 Core 로 위임한다. 의미(신청 ≠ 주문)와 API 계약은 그대로다.
+  const application = useSupplyProductApplication<T>({
+    api,
+    setItems: setProducts,
+    labels: { storeNoun: '내 매장' },
+  });
+  const { applyingId, removingId, bulkAdding } = application;
 
-  // ─── 단건 제외 ───────────────────────────────────────────────────────────
-  const handleRemove = async (product: T) => {
+  const handleApply = (product: T) => application.apply(product);
+
+  const handleRemove = (product: T) => {
     if (removingId) return;
     if (!window.confirm(`"${product.name}"을(를) 내 매장에서 제외하시겠습니까?`)) return;
-    setRemovingId(product.id);
-    try {
-      await api.cancelProductByOfferId(product.id);
-      toast.success(`"${product.name}"을(를) 내 매장에서 제외했습니다.`);
-      setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isAdded: false } : p));
-    } catch (e: any) {
-      toast.error(e?.message || '상품 제외에 실패했습니다.');
-    } finally {
-      setRemovingId(null);
-    }
+    return application.remove(product);
   };
 
-  // ─── Bulk 추가 (단건 API fan-out) ─────────────────────────────────────────
   const handleBulkAdd = useCallback(async () => {
     const targets = products.filter(p => selectedIds.has(p.id) && !p.isAdded);
-    if (targets.length === 0) {
-      toast.error('추가할 상품을 선택해주세요.');
-      return;
-    }
-    setBulkAdding(true);
-    const results = await Promise.allSettled(
-      targets.map(p => api.applyBySupplyProductId(p.id).then(() => p.id)),
-    );
-    let successCount = 0;
-    let failCount = 0;
-    const successIds = new Set<string>();
-    for (const r of results) {
-      if (r.status === 'fulfilled') { successCount++; successIds.add(r.value); }
-      else failCount++;
-    }
-    if (successIds.size > 0) {
-      setProducts(prev => prev.map(p => successIds.has(p.id) ? { ...p, isAdded: true } : p));
-    }
-    if (successCount > 0 && failCount === 0) toast.success(`${successCount}개 상품을 내 매장에 추가했습니다.`);
-    else if (successCount > 0) toast.success(`${successCount}개 추가 완료. ${failCount}개 실패.`);
-    else toast.error('상품 추가에 실패했습니다. 다시 시도해주세요.');
-    setSelectedIds(new Set());
-    setBulkAdding(false);
-  }, [api, products, selectedIds]);
+    const allAlreadyAdded =
+      selectedIds.size > 0 && [...selectedIds].every(k => products.find(p => p.id === k)?.isAdded);
+    const { successCount } = await application.bulkApply(targets, { allAlreadyAdded });
+    if (successCount > 0 || targets.length > 0) setSelectedIds(new Set());
+  }, [application, products, selectedIds]);
 
   const notAddedSelectedCount = useMemo(
     () => [...selectedIds].filter(k => !products.find(p => p.id === k)?.isAdded).length,

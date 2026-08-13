@@ -24,7 +24,7 @@ import type { ListColumnDef } from '@o4o/operator-ux-core';
 // WO-O4O-KPA-STORE-HUB-STANDARD-TABLE-AND-SIGNAGE-MENU-IA-V1:
 //   수제 인라인 선택 바 → O4O 표준 ActionBar(@o4o/ui). 동작·API 무변경.
 import { ActionBar } from '@o4o/ui';
-import { toast } from '@o4o/error-handling';
+import { useSupplyProductApplication } from '@o4o/store-ui-core';
 import {
   getCatalog,
   applyBySupplyProductId,
@@ -72,13 +72,21 @@ export function HubB2BCatalogPage() {
   const [distributionFilter, setDistributionFilter] = useState('all');
   const [offset, setOffset] = useState(0);
   const [total, setTotal] = useState(0);
-  const [applyingId, setApplyingId] = useState<string | null>(null);
-  const [removingId, setRemovingId] = useState<string | null>(null);
   const [removeConfirmId, setRemoveConfirmId] = useState<string | null>(null);
 
   // WO-O4O-STORE-HUB-B2B-CANONICAL-DATATABLE-V1: bulk selection state
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
-  const [bulkAdding, setBulkAdding] = useState(false);
+
+  // WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1:
+  //   단건 신청 · 제외 · 일괄 신청 상태 기계를 공통 Core(@o4o/store-ui-core)로 위임.
+  //   "내 약국에 추가" = 공급 상품 신청(ProductApproval PENDING) — 의미·API 계약 무변경.
+  //   제외 확인은 이 화면 고유의 커스텀 다이얼로그를 그대로 쓴다(Core 는 확인 UX 를 갖지 않는다).
+  const application = useSupplyProductApplication<CatalogProduct>({
+    api: { applyBySupplyProductId, cancelProductByOfferId },
+    setItems: setProducts,
+    labels: { storeNoun: '내 약국' },
+  });
+  const { applyingId, removingId, bulkAdding } = application;
 
   const fetchCatalog = useCallback(async (distType: string, pageOffset: number) => {
     setLoading(true);
@@ -112,100 +120,22 @@ export function HubB2BCatalogPage() {
     setOffset(0);
   };
 
-  // ─── 단건 추가 ─────────────────────────────────────────────────────────────
+  // ─── 단건 추가 / 제외 / Bulk 추가 (공통 Core 위임) ─────────────────────────
 
-  const handleApply = async (product: CatalogProduct) => {
-    if (applyingId) return;
-    setApplyingId(product.id);
-    try {
-      await applyBySupplyProductId(product.id);
-      toast.success(`"${product.name}" 내 약국에 추가되었습니다.`);
-      setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isAdded: true } : p));
-    } catch (e: any) {
-      const code = e?.response?.data?.error?.code || e?.code;
-      if (code === 'DUPLICATE_APPLICATION') {
-        toast.error('이미 내 약국에 추가된 상품입니다.');
-      } else {
-        toast.error(e.message || '상품 추가에 실패했습니다.');
-      }
-    } finally {
-      setApplyingId(null);
-    }
-  };
+  const handleApply = (product: CatalogProduct) => application.apply(product);
 
-  // ─── 단건 제외 ─────────────────────────────────────────────────────────────
-
-  const handleRemove = async (product: CatalogProduct) => {
-    if (removingId) return;
-    setRemovingId(product.id);
+  const handleRemove = (product: CatalogProduct) => {
     setRemoveConfirmId(null);
-    try {
-      await cancelProductByOfferId(product.id);
-      toast.success(`"${product.name}"을(를) 내 약국에서 제외했습니다.`);
-      setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isAdded: false } : p));
-    } catch (e: any) {
-      toast.error(e.message || '상품 제외에 실패했습니다.');
-    } finally {
-      setRemovingId(null);
-    }
+    return application.remove(product);
   };
 
-  // ─── Bulk 추가 ─────────────────────────────────────────────────────────────
-  // WO-O4O-STORE-HUB-B2B-CANONICAL-DATATABLE-V1:
-  // 단건 API(applyBySupplyProductId)를 Promise.all 병렬로 호출.
-  // 이미 추가된 항목(isAdded=true) 는 건너뛰고 신규만 처리.
   const handleBulkAdd = useCallback(async () => {
     const targets = products.filter(p => selectedKeys.has(p.id) && !p.isAdded);
-    if (targets.length === 0) {
-      const alreadyAll = [...selectedKeys].every(k => products.find(p => p.id === k)?.isAdded);
-      if (alreadyAll) {
-        toast.error('선택한 상품이 이미 모두 내 약국에 추가되어 있습니다.');
-      } else {
-        toast.error('추가할 상품을 선택해주세요.');
-      }
-      return;
-    }
-
-    setBulkAdding(true);
-    const results = await Promise.allSettled(
-      targets.map(p => applyBySupplyProductId(p.id).then(() => p.id)),
-    );
-
-    let successCount = 0;
-    let duplicateCount = 0;
-    let failCount = 0;
-
-    const successIds = new Set<string>();
-    for (const r of results) {
-      if (r.status === 'fulfilled') {
-        successCount++;
-        successIds.add(r.value);
-      } else {
-        const code = (r.reason as any)?.response?.data?.error?.code || (r.reason as any)?.code;
-        if (code === 'DUPLICATE_APPLICATION') duplicateCount++;
-        else failCount++;
-      }
-    }
-
-    // 성공한 항목 로컬 즉시 반영
-    if (successIds.size > 0) {
-      setProducts(prev => prev.map(p => successIds.has(p.id) ? { ...p, isAdded: true } : p));
-    }
-
-    // 토스트
-    if (successCount > 0 && failCount === 0) {
-      toast.success(`${successCount}개 상품을 내 약국에 추가했습니다.`);
-    } else if (successCount > 0) {
-      toast.success(`${successCount}개 추가 완료. ${failCount}개 실패.`);
-    } else if (duplicateCount > 0) {
-      toast.error('선택한 상품이 이미 내 약국에 추가되어 있습니다.');
-    } else {
-      toast.error('상품 추가에 실패했습니다. 다시 시도해주세요.');
-    }
-
-    setSelectedKeys(new Set());
-    setBulkAdding(false);
-  }, [products, selectedKeys]);
+    const allAlreadyAdded =
+      selectedKeys.size > 0 && [...selectedKeys].every(k => products.find(p => p.id === k)?.isAdded);
+    const { successCount } = await application.bulkApply(targets, { allAlreadyAdded });
+    if (successCount > 0 || targets.length > 0) setSelectedKeys(new Set());
+  }, [application, products, selectedKeys]);
 
   // ─── 컬럼 정의 ─────────────────────────────────────────────────────────────
 
