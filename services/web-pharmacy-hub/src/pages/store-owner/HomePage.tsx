@@ -37,6 +37,7 @@ import {
   StoreHomeSignalList,
   StoreHomeActivityPanel,
   StoreHomeShortcutGrid,
+  StoreHomeStatusCard,
 } from '@o4o/store-ui-core';
 import type {
   StoreHomeMetricItem,
@@ -195,21 +196,17 @@ export default function StoreOwnerHomePage() {
         }
         statusSlot={
           <div className="mb-6">
-          {/* 매장 · 가입 상태 */}
-          <section className="rounded-xl border border-slate-200 bg-white p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-700">
-                    <Store className="h-4 w-4" />
-                  </span>
-                  <p className="truncate text-base font-semibold text-slate-900">
-                    {loading ? '불러오는 중…' : error ? '매장 정보 확인 불가' : storeName}
-                  </p>
-                </div>
-                <p className="mt-1 text-sm text-slate-500">{user ? getUserDisplayName(user) : ''}</p>
-              </div>
-              {loading ? (
+          {/* 매장 · 가입 상태
+              WO-O4O-MY-STORE-HOME-STORE-STATUS-CARD-CROSSSERVICE-COMMONIZATION-V1:
+              배치만 공통 StoreHomeStatusCard 로 위임한다. 상태 값·라벨·tone·경고 노출 조건은
+              PharmacyHub 소유(가입/연결 상태 축) — 판정 로직을 공통 Core 로 옮기지 않는다. */}
+          <StoreHomeStatusCard
+            icon={<Store className="h-4 w-4" />}
+            iconWrapClassName="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-700"
+            title={loading ? '불러오는 중…' : error ? '매장 정보 확인 불가' : storeName}
+            subtitle={user ? getUserDisplayName(user) : ''}
+            badgeSlot={
+              loading ? (
                 <span className="text-sm text-slate-500">확인 중…</span>
               ) : error ? (
                 <span className="rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-700">
@@ -223,51 +220,52 @@ export default function StoreOwnerHomePage() {
                 >
                   {STATUS_LABEL[status] ?? status}
                 </span>
-              )}
-            </div>
-
-            {!loading && !error && store?.status === 'not_connected' && (
-              <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
-                {BRAND.name} 매장 조직이 아직 연결되지 않았습니다. 상품 조회·장바구니·주문은 그대로
-                이용할 수 있으며, 매장 정보 연결은 운영자 확인 후 반영됩니다.
-              </p>
-            )}
-            {!loading && !error && store?.status === 'ambiguous' && (
-              <p
-                className="mt-3 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800"
-                role="alert"
+              )
+            }
+            notices={
+              <>
+                {!loading && !error && store?.status === 'not_connected' && (
+                  <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
+                    {BRAND.name} 매장 조직이 아직 연결되지 않았습니다. 상품 조회·장바구니·주문은 그대로
+                    이용할 수 있으며, 매장 정보 연결은 운영자 확인 후 반영됩니다.
+                  </p>
+                )}
+                {!loading && !error && store?.status === 'ambiguous' && (
+                  <p
+                    className="mt-3 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800"
+                    role="alert"
+                  >
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>
+                      연결된 {BRAND.name} 매장 조직이 {store.candidateCount}개입니다. 표시할 매장을 임의로
+                      선택하지 않습니다. 운영자에게 매장 연결 정리를 요청해 주세요.
+                      <span className="ml-1 font-mono text-xs">({store.errorCode})</span>
+                    </span>
+                  </p>
+                )}
+              </>
+            }
+            meta={
+              error
+                ? undefined
+                : [
+                    { key: 'role', label: '역할', value: roleLabel },
+                    {
+                      key: 'approvedAt',
+                      label: '승인 일시',
+                      value: loading ? '…' : fmtDate(membership?.approvedAt),
+                    },
+                  ]
+            }
+            footerSlot={
+              <Link
+                to="/join/status"
+                className="mt-4 inline-block text-sm font-medium text-teal-700 hover:underline"
               >
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-                <span>
-                  연결된 {BRAND.name} 매장 조직이 {store.candidateCount}개입니다. 표시할 매장을 임의로
-                  선택하지 않습니다. 운영자에게 매장 연결 정리를 요청해 주세요.
-                  <span className="ml-1 font-mono text-xs">({store.errorCode})</span>
-                </span>
-              </p>
-            )}
-
-            {!error && (
-              <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-                <div className="flex gap-2">
-                  <dt className="w-20 shrink-0 text-slate-500">역할</dt>
-                  <dd className="text-slate-800">{roleLabel}</dd>
-                </div>
-                <div className="flex gap-2">
-                  <dt className="w-20 shrink-0 text-slate-500">승인 일시</dt>
-                  <dd className="text-slate-800">
-                    {loading ? '…' : fmtDate(membership?.approvedAt)}
-                  </dd>
-                </div>
-              </dl>
-            )}
-
-            <Link
-              to="/join/status"
-              className="mt-4 inline-block text-sm font-medium text-teal-700 hover:underline"
-            >
-              가입 상태 상세 보기
-            </Link>
-          </section>
+                가입 상태 상세 보기
+              </Link>
+            }
+          />
           </div>
         }
         signalsSlot={<StoreHomeSignalList items={signalItems} />}

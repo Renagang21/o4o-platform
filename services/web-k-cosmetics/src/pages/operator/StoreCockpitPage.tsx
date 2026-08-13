@@ -23,6 +23,7 @@ import { Card, useTemplate } from '@o4o/ui';
 // 5-block 운영 대시보드의 나머지 블록(상품/사이니지/AI/최근주문)은 K-Cosmetics 고유 — children 으로 유지.
 import {
   StoreHomeShell,
+  StoreHomeStatusCard,
   StoreHomeMetricGrid,
   StoreHomeStateView,
   StoreHomeActivityPanel,
@@ -362,36 +363,39 @@ export default function StoreCockpitPage() {
         }
         statusSlot={
           <div className="mb-6">
-          <Card className="p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex items-center gap-4">
-                {/* Store icon */}
-                <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" />
-                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                    <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
-                    <path d="M2 7h20" />
-                  </svg>
-                </div>
-
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-xl font-bold text-slate-800">
-                      {selectedStore?.name}
-                    </h1>
-                    {selectedStore && <StatusBadge status={selectedStore.status} />}
-                  </div>
-                  <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
-                    <span>코드: {selectedStore?.code}</span>
-                    <span>멤버 {selectedStore?.memberCount || 0}명</span>
-                    <span>역할: {selectedStore?.myRole === 'owner' ? '소유자' : selectedStore?.myRole === 'manager' ? '관리자' : '스태프'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick action buttons */}
-              {/* 매장 선택 select 는 StoreHomeShell.storeSelectorSlot 로 이동 (WO-O4O-STORE-HOME-KCOSMETICS-ADOPT-V1) */}
+          {/* WO-O4O-MY-STORE-HOME-STORE-STATUS-CARD-CROSSSERVICE-COMMONIZATION-V1:
+              배치만 공통 StoreHomeStatusCard 로 위임. 매장 운영 승인 상태(STATUS_CONFIG)·역할 표기는
+              K-Cosmetics 소유 — 판정/의미를 공통 Core 로 옮기지 않는다. */}
+          <StoreHomeStatusCard
+            variant="inline"
+            wrapper={(content) => <Card className="p-6">{content}</Card>}
+            icon={
+              <svg className="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" />
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
+                <path d="M2 7h20" />
+              </svg>
+            }
+            iconWrapClassName="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center flex-shrink-0"
+            title={selectedStore?.name}
+            badgeSlot={selectedStore ? <StatusBadge status={selectedStore.status} /> : null}
+            meta={[
+              { key: 'code', label: '코드', value: selectedStore?.code },
+              { key: 'members', value: `멤버 ${selectedStore?.memberCount || 0}명` },
+              {
+                key: 'role',
+                label: '역할',
+                value:
+                  selectedStore?.myRole === 'owner'
+                    ? '소유자'
+                    : selectedStore?.myRole === 'manager'
+                      ? '관리자'
+                      : '스태프',
+              },
+            ]}
+            actionsSlot={
+              /* 매장 선택 select 는 StoreHomeShell.storeSelectorSlot 로 이동 (WO-O4O-STORE-HOME-KCOSMETICS-ADOPT-V1) */
               <div className="flex items-center gap-3">
                 <NavLink
                   to="/operator/products"
@@ -406,8 +410,8 @@ export default function StoreCockpitPage() {
                   주문 관리
                 </NavLink>
               </div>
-            </div>
-          </Card>
+            }
+          />
           </div>
         }
         metricsSlot={

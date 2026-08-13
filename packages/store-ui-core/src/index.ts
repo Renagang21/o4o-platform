@@ -112,6 +112,13 @@ export type {
   StoreHomeShortcutItem,
   StoreHomeShortcutVariant,
 } from './components/home/StoreHomeShortcutGrid';
+// WO-O4O-MY-STORE-HOME-STORE-STATUS-CARD-CROSSSERVICE-COMMONIZATION-V1
+export { StoreHomeStatusCard } from './components/home/StoreHomeStatusCard';
+export type {
+  StoreHomeStatusCardProps,
+  StoreHomeStatusMetaItem,
+  StoreHomeStatusVariant,
+} from './components/home/StoreHomeStatusCard';
 
 // Production Router Utils (WO-O4O-STORE-PRODUCTION-ROUTER-UTILS-COMMONIZATION-PHASE2-G-V1)
 export type { ProductionTarget, ProductionSourceItem, ProductionSource, ProductionRouterState } from './utils/productionUtils';
