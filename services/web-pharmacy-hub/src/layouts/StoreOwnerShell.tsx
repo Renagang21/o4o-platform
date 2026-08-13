@@ -43,6 +43,10 @@ function ShellLayout() {
       homeLink="/"
       serviceLabel={BRAND.name}
       serviceBadge="약국 경영자"
+      // WO-O4O-STORE-HUB-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1:
+      //   `/store-hub`(자원 탐색) 라우트가 직접 URL 로만 접근 가능했다. 공통 셸이 이미 제공하는
+      //   navItems 슬롯만 채워 진입점을 연결한다 — 메뉴 계약(StoreDashboardConfig) 은 확장하지 않는다.
+      navItems={[{ label: '매장 허브', href: '/store-hub' }]}
       onLogout={() => {
         logout();
         navigate('/');

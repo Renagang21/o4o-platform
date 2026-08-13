@@ -13,14 +13,13 @@
  *
  * WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1:
  *   3 서비스에 중복돼 있던 타입 정의를 @o4o/store-ui-core 로 이관하고 여기서 re-export 한다.
- *   endpoint · payload · 응답 계약은 변경하지 않는다(아래 client 구현이 정본 그대로).
- *
- * Phase 1a 범위: 담기/조회/수량변경/삭제/비우기 + 공급자별 묶음 + checkout preview.
- *   주문/결제/정산/수량차감은 후속 Phase. priceSnapshot 은 표시용 임시값이다.
+ * WO-O4O-STORE-HUB-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1:
+ *   endpoint 목록 복제도 제거. 이 파일은 이제 **전송 계층 주입**만 소유한다.
+ *   coreApiClient 는 이미 응답 body 를 반환하므로 언랩이 필요 없다. API 계약 무변경.
  */
 
+import { createStoreCartApi } from '@o4o/store-ui-core';
 import { coreApiClient } from './client';
-import type { StoreCartApiOk as ApiOk } from '@o4o/store-ui-core';
 
 export type {
   CartSourceType,
@@ -34,48 +33,4 @@ export type {
   CheckoutConfirmResult,
 } from '@o4o/store-ui-core';
 
-import type {
-  AddCartItemInput,
-  CheckoutConfirmResult,
-  StoreCartItem,
-  SupplierGroup,
-} from '@o4o/store-ui-core';
-
-export const storeCartApi = {
-  /** 장바구니 담기 */
-  addItem: (serviceKey: string, input: AddCartItemInput) =>
-    coreApiClient.post<ApiOk<StoreCartItem>>(`/store/cart/${serviceKey}/items`, input),
-
-  /** 장바구니 목록 */
-  list: (serviceKey: string) =>
-    coreApiClient.get<ApiOk<{ items: StoreCartItem[]; total: number }>>(
-      `/store/cart/${serviceKey}/items`,
-    ),
-
-  /** 공급자별 묶음 (배송비/주문 분할 단위) */
-  groupBySupplier: (serviceKey: string) =>
-    coreApiClient.get<ApiOk<{ groups: SupplierGroup[]; supplierCount: number }>>(
-      `/store/cart/${serviceKey}/groups`,
-    ),
-
-  /** 수량 변경 */
-  updateQuantity: (serviceKey: string, id: string, quantity: number) =>
-    coreApiClient.patch<ApiOk<StoreCartItem>>(`/store/cart/${serviceKey}/items/${id}`, {
-      quantity,
-    }),
-
-  /** 항목 삭제 */
-  removeItem: (serviceKey: string, id: string) =>
-    coreApiClient.delete<ApiOk<{ removed: boolean }>>(`/store/cart/${serviceKey}/items/${id}`),
-
-  /** 비우기 */
-  clear: (serviceKey: string) =>
-    coreApiClient.delete<ApiOk<{ removed: number }>>(`/store/cart/${serviceKey}`),
-
-  /** 주문 확정 — 공급자별 주문 생성 (Phase 1b). itemIds 미지정 시 전체. */
-  checkoutConfirm: (serviceKey: string, input?: { itemIds?: string[]; note?: string }) =>
-    coreApiClient.post<ApiOk<CheckoutConfirmResult>>(
-      `/store/cart/${serviceKey}/checkout-confirm`,
-      input ?? {},
-    ),
-};
+export const storeCartApi = createStoreCartApi(coreApiClient);

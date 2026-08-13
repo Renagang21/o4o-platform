@@ -131,10 +131,10 @@ export type {
   EventOfferCartSource,
   EventOfferCartPayload,
 } from './components/event-offers/eventOfferCart';
-export {
-  EVENT_OFFER_STATUS_LABEL,
-  resolveEventOfferStatusLabel,
-} from './components/event-offers/eventOfferStatus';
+// WO-O4O-STORE-HUB-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1:
+//   raw 매핑(EVENT_OFFER_STATUS_LABEL) 은 외부 소비처가 없고, 직접 조회하면 미지 status 를
+//   보수적으로 처리하는 resolver 를 우회하게 된다. 공개 표면은 resolver 하나로 유지한다.
+export { resolveEventOfferStatusLabel } from './components/event-offers/eventOfferStatus';
 export type { EventOfferStatusKey } from './components/event-offers/eventOfferStatus';
 
 // Store Hub 공급 상품 카탈로그 공통 (WO-O4O-STORE-HUB-SUPPLY-CATALOG-NAMING-ALIGNMENT-V1)
@@ -221,6 +221,8 @@ export type {
   StoreCartApiOk,
   StoreCartApi,
 } from './components/store-cart/storeCartTypes';
+export { createStoreCartApi } from './components/store-cart/createStoreCartApi';
+export type { StoreCartHttp, StoreCartApiClient } from './components/store-cart/createStoreCartApi';
 export { useStoreCart } from './components/store-cart/useStoreCart';
 export type { UseStoreCartOptions, UseStoreCartResult } from './components/store-cart/useStoreCart';
 export { StoreCartView } from './components/store-cart/StoreCartView';
