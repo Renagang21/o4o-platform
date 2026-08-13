@@ -13,13 +13,17 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader2, Tag, ShoppingCart } from 'lucide-react';
+import { resolveEventOfferStatusLabel } from './eventOfferStatus';
 
-const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
-  active:   { label: '진행중', cls: 'bg-green-100 text-green-700' },
-  approved: { label: '승인됨', cls: 'bg-blue-100 text-blue-700' },
-  pending:  { label: '대기중', cls: 'bg-yellow-100 text-yellow-700' },
-  ended:    { label: '종료',   cls: 'bg-slate-100 text-slate-500' },
-  canceled: { label: '취소',   cls: 'bg-red-100 text-red-500' },
+/** 배지 스타일만 화면이 소유하고, 라벨은 공통 매핑(EVENT_OFFER_STATUS_LABEL)을 쓴다. */
+const STATUS_BADGE_CLASS: Record<string, string> = {
+  active:   'bg-green-100 text-green-700',
+  approved: 'bg-blue-100 text-blue-700',
+  pending:  'bg-yellow-100 text-yellow-700',
+  upcoming: 'bg-blue-100 text-blue-700',
+  sold_out: 'bg-slate-100 text-slate-500',
+  ended:    'bg-slate-100 text-slate-500',
+  canceled: 'bg-red-100 text-red-500',
 };
 
 /** accent 별 정적 Tailwind class (동적 class 생성 금지) */
@@ -175,7 +179,8 @@ export function EventOffersHubList<T extends EventOfferHubItem>({
             </div>
 
             {offers.map((offer) => {
-              const badge = STATUS_BADGE[offer.status] ?? STATUS_BADGE.approved;
+              const badgeCls = STATUS_BADGE_CLASS[offer.status] ?? STATUS_BADGE_CLASS.approved;
+              const badgeLabel = resolveEventOfferStatusLabel(offer.status);
               const displayPrice = offer.price ?? offer.unitPrice;
               return (
                 <div
@@ -196,8 +201,8 @@ export function EventOffersHubList<T extends EventOfferHubItem>({
                   <span className="text-sm text-slate-600 truncate">{offer.supplierName}</span>
                   <span className="text-sm font-semibold text-slate-700">{formatPrice(displayPrice)}</span>
                   <span className="text-xs text-slate-500">{formatDate(offer.createdAt)}</span>
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium inline-block w-fit ${badge.cls}`}>
-                    {badge.label}
+                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium inline-block w-fit ${badgeCls}`}>
+                    {badgeLabel}
                   </span>
                   <div className="flex justify-end">
                     <button

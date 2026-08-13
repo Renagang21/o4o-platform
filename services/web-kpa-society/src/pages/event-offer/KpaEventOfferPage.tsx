@@ -21,6 +21,7 @@ import { eventOfferApi, storeCartApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
 import { CART_SERVICE_KEY, buildEventOfferCartPayload } from '../../utils/eventOfferCart';
+import { resolveEventOfferStatusLabel } from '@o4o/store-ui-core';
 import { PLATFORM_ROLES, hasAnyRole } from '../../lib/role-constants';
 import { kpaConfig } from '@o4o/operator-ux-core';
 import type { EventOfferItem, EventOfferStatus, EventOfferStats } from '../../types';
@@ -250,16 +251,13 @@ export function KpaEventOfferPage() {
   };
 
   // WO-O4O-EVENT-OFFER-DATA-LIFECYCLE-COMPLETION-V1: 4-상태 + sold_out/rejected/canceled 배지
+  // WO-O4O-STORE-HUB-EVENT-OFFER-COMMONIZATION-V1: 라벨은 공통 매핑, 배지 스타일만 KPA 가 소유.
   const getStatusBadge = (item: EventOfferItem): { style: React.CSSProperties; label: string } => {
+    const label = resolveEventOfferStatusLabel(item.status);
     switch (item.status) {
-      case 'upcoming':  return { style: styles.badgeSoon, label: '곧 시작' };
-      case 'active':    return { style: styles.badgeActive, label: '진행중' };
-      case 'sold_out':  return { style: styles.badgeEnded, label: '매진' };
-      case 'pending':   return { style: styles.badgeEnded, label: '대기' };
-      case 'rejected':  return { style: styles.badgeEnded, label: '반려' };
-      case 'canceled':  return { style: styles.badgeEnded, label: '취소' };
-      case 'ended':
-      default:          return { style: styles.badgeEnded, label: '종료' };
+      case 'upcoming': return { style: styles.badgeSoon, label };
+      case 'active':   return { style: styles.badgeActive, label };
+      default:         return { style: styles.badgeEnded, label };
     }
   };
 

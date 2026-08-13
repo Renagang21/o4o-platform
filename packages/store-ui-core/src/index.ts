@@ -125,6 +125,18 @@ export type {
 export { EventOffersHubList } from './components/event-offers/EventOffersHubList';
 export type { EventOffersHubListProps, EventOfferHubItem, EventOffersHubAccent } from './components/event-offers/EventOffersHubList';
 
+// 이벤트 오퍼 공통 helper (WO-O4O-STORE-HUB-EVENT-OFFER-COMMONIZATION-V1)
+export { asUuid, buildEventOfferCartPayload } from './components/event-offers/eventOfferCart';
+export type {
+  EventOfferCartSource,
+  EventOfferCartPayload,
+} from './components/event-offers/eventOfferCart';
+export {
+  EVENT_OFFER_STATUS_LABEL,
+  resolveEventOfferStatusLabel,
+} from './components/event-offers/eventOfferStatus';
+export type { EventOfferStatusKey } from './components/event-offers/eventOfferStatus';
+
 // Store Hub 공급 상품 카탈로그 공통 (WO-O4O-STORE-HUB-SUPPLY-CATALOG-NAMING-ALIGNMENT-V1)
 // 구 B2BCatalogHub → SupplyCatalogHub. extraction 원본: WO-O4O-STORE-HUB-B2B-CATALOG-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1.
 export { SupplyCatalogHub } from './components/supply-catalog/SupplyCatalogHub';
