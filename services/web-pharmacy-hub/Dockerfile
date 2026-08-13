@@ -34,6 +34,8 @@ COPY packages/auth-react/package.json ./packages/auth-react/
 #   store-ui-core → { error-handling, operator-ux-core, ui } → types
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
+COPY packages/operator-core-ui/package.json ./packages/operator-core-ui/
+COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 COPY packages/error-handling/package.json ./packages/error-handling/
 COPY packages/ui/package.json ./packages/ui/
 # WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1: 공통 계정 UI (프로필·비밀번호·알림)
@@ -61,6 +63,8 @@ COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/auth-react/ ./packages/auth-react/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
+COPY packages/operator-core-ui/ ./packages/operator-core-ui/
+COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/ui/ ./packages/ui/
 COPY packages/account-ui/ ./packages/account-ui/

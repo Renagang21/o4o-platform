@@ -1,268 +1,62 @@
 /**
- * MembershipsPage — Pharmacy-Hub 운영자 회원 승인 콘솔 (목록)
+ * MembershipsPage — Pharmacy-Hub 운영자 가입 신청 콘솔 (목록)
  *
- * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §6-D
+ * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §6-D (업무 규칙)
+ * WO-O4O-PHARMACY-HUB-OPERATOR-MEMBERSHIP-CONSOLE-COMMON-CORE-ADOPTION-V1 (공통화)
  *
- * 범위 (§5.5): 회원 가입 신청 목록 / 승인 / 반려. 상품·주문·콘텐츠 승인 없음.
- * 조회·처리 모두 backend 에서 service_key='pharmacy-hub' 로 고정된다.
+ * 목록 · 검색 · 상태 필터 · 상세(Drawer) · 승인 · 반려 UI 는
+ * `@o4o/operator-core-ui` 의 OperatorMembersConsolePage(`consoleMode='approval'`) 가 담당한다.
+ * 이 파일에는 **Pharmacy-Hub 고유 정책만** 남는다:
+ *   - 가입 승인 축 (service_memberships) — 회원 일반 관리가 아니다
+ *   - 상태 어휘 pending / active / rejected (+ suspended / withdrawn 표시)
+ *   - 반려 사유 필수
+ *   - 상세 deep link = /operator/memberships/:membershipId
+ *
+ * 권한 경계는 프론트가 아니라 backend `pharmacy-hub:operator` scope guard 가 강제한다.
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { api } from '../../lib/apiClient';
-import { BRAND, ROLE_LABELS, SERVICE_KEY } from '../../config/service';
+import { OperatorMembersConsolePage } from '@o4o/operator-core-ui/modules/members';
+import { membershipConsoleClient } from '../../lib/membershipConsoleClient';
+import { BRAND, ROLE_LABELS, ROLES, SERVICE_KEY } from '../../config/service';
 
-interface MembershipRow {
-  id: string;
-  email: string;
-  name: string | null;
-  phone: string | null;
-  company: string | null;
-  status: string;
-  roleType: string | null;
-  rejectionReason: string | null;
-  appliedAt: string | null;
-}
-
-interface Pagination {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
-
-const STATUS_TABS = [
-  { value: 'pending', label: '승인 대기' },
-  { value: 'active', label: '승인 완료' },
-  { value: 'rejected', label: '반려' },
-  { value: 'all', label: '전체' },
-];
-
-const STATUS_LABEL: Record<string, string> = {
-  pending: '승인 대기',
-  active: '승인 완료',
-  rejected: '반려',
-  suspended: '정지',
-  withdrawn: '탈퇴',
+/** 신청 역할 표시 — service.ts 의 ROLE_LABELS 를 그대로 쓴다(라벨 사본 금지). */
+const ROLE_DISPLAY: Record<string, string> = {
+  [ROLES.storeOwner]: ROLE_LABELS[ROLES.storeOwner],
+  [ROLES.supplier]: ROLE_LABELS[ROLES.supplier],
+  [ROLES.operator]: ROLE_LABELS[ROLES.operator],
+  [ROLES.admin]: ROLE_LABELS[ROLES.admin],
 };
 
-const fmt = (v?: string | null) => (v ? new Date(v).toLocaleString('ko-KR') : '-');
-
-const roleLabel = (roleType: string | null) =>
-  roleType ? ROLE_LABELS[`${SERVICE_KEY}:${roleType}`] ?? roleType : '-';
-
 export default function MembershipsPage() {
-  const [status, setStatus] = useState('pending');
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [items, setItems] = useState<MembershipRow[]>([]);
-  const [pagination, setPagination] = useState<Pagination | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [busyId, setBusyId] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.get('/pharmacy-hub/operator/memberships', {
-        params: { status, search: search || undefined, page, limit: 20 },
-      });
-      setItems(res.data?.data?.items ?? []);
-      setPagination(res.data?.data?.pagination ?? null);
-    } catch {
-      setError('가입 신청 목록을 불러오지 못했습니다.');
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [status, search, page]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  const approve = async (row: MembershipRow) => {
-    if (!window.confirm(`${row.email} 님의 가입을 승인하시겠습니까?`)) return;
-    setBusyId(row.id);
-    try {
-      await api.patch(`/pharmacy-hub/operator/memberships/${row.id}/approve`);
-      await load();
-    } catch {
-      setError('가입 승인에 실패했습니다.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  const reject = async (row: MembershipRow) => {
-    const reason = window.prompt('반려 사유를 입력해 주세요.');
-    if (reason === null) return;
-    if (!reason.trim()) {
-      setError('반려 사유를 입력해 주세요.');
-      return;
-    }
-    setBusyId(row.id);
-    try {
-      await api.patch(`/pharmacy-hub/operator/memberships/${row.id}/reject`, { reason: reason.trim() });
-      await load();
-    } catch {
-      setError('가입 반려에 실패했습니다.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="mb-1 text-xl font-bold">{BRAND.name} 가입 신청 관리</h1>
-      <p className="mb-6 text-sm text-gray-500">
-        회원 가입 신청의 승인·반려만 처리합니다. 상품·주문·콘텐츠 승인은 이 콘솔의 범위가 아닙니다.
-      </p>
-
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab.value}
-            type="button"
-            onClick={() => {
-              setStatus(tab.value);
-              setPage(1);
-            }}
-            className={`rounded border px-3 py-1.5 text-sm ${
-              status === tab.value
-                ? 'border-primary-600 bg-primary-50 text-primary-600'
-                : 'border-gray-300 bg-white text-gray-600'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-        <form
-          className="ml-auto flex gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setPage(1);
-            void load();
-          }}
-        >
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="이메일 · 이름 검색"
-            className="rounded border border-gray-300 px-3 py-1.5 text-sm"
-          />
-          <button type="submit" className="rounded border border-gray-300 px-3 py-1.5 text-sm">
-            검색
-          </button>
-        </form>
-      </div>
-
-      {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
-
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs text-gray-500">
-            <tr>
-              <th className="px-3 py-2">신청자</th>
-              <th className="px-3 py-2">신청 역할</th>
-              <th className="px-3 py-2">약국/회사</th>
-              <th className="px-3 py-2">신청 일시</th>
-              <th className="px-3 py-2">상태</th>
-              <th className="px-3 py-2 text-right">처리</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={6} className="px-3 py-6 text-center text-gray-500">
-                  불러오는 중…
-                </td>
-              </tr>
-            ) : items.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-3 py-6 text-center text-gray-500">
-                  해당 조건의 가입 신청이 없습니다.
-                </td>
-              </tr>
-            ) : (
-              items.map((row) => (
-                <tr key={row.id} className="border-t border-gray-100">
-                  <td className="px-3 py-2">
-                    <Link to={`/operator/memberships/${row.id}`} className="text-primary-600 underline">
-                      {row.name || row.email}
-                    </Link>
-                    <span className="block text-xs text-gray-400">{row.email}</span>
-                  </td>
-                  <td className="px-3 py-2">{roleLabel(row.roleType)}</td>
-                  <td className="px-3 py-2">{row.company || '-'}</td>
-                  <td className="px-3 py-2">{fmt(row.appliedAt)}</td>
-                  <td className="px-3 py-2">
-                    {STATUS_LABEL[row.status] ?? row.status}
-                    {row.status === 'rejected' && row.rejectionReason && (
-                      <span className="block text-xs text-gray-400">{row.rejectionReason}</span>
-                    )}
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    {row.status === 'pending' ? (
-                      <span className="inline-flex gap-2">
-                        <button
-                          type="button"
-                          disabled={busyId === row.id}
-                          onClick={() => void approve(row)}
-                          className="rounded bg-primary-600 px-2 py-1 text-xs text-white disabled:opacity-50"
-                        >
-                          승인
-                        </button>
-                        <button
-                          type="button"
-                          disabled={busyId === row.id}
-                          onClick={() => void reject(row)}
-                          className="rounded border border-gray-300 px-2 py-1 text-xs disabled:opacity-50"
-                        >
-                          반려
-                        </button>
-                      </span>
-                    ) : (
-                      <span className="text-xs text-gray-400">-</span>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {pagination && pagination.totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-          <button
-            type="button"
-            disabled={page <= 1}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
-          >
-            이전
-          </button>
-          <span className="text-gray-500">
-            {pagination.page} / {pagination.totalPages} (총 {pagination.total}건)
-          </span>
-          <button
-            type="button"
-            disabled={page >= pagination.totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            className="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
-          >
-            다음
-          </button>
-        </div>
-      )}
-
-      <p className="mt-6 text-sm">
-        <Link to="/operator" className="text-gray-500 underline">
-          운영자 홈
-        </Link>
-      </p>
-    </div>
+    <OperatorMembersConsolePage
+      serviceKey={SERVICE_KEY}
+      client={membershipConsoleClient}
+      consoleMode="approval"
+      title={`${BRAND.name} 가입 신청 관리`}
+      description="회원 가입 신청의 승인·반려만 처리합니다. 상품·주문·콘텐츠 승인은 이 콘솔의 범위가 아닙니다."
+      searchPlaceholder="이메일 · 이름 검색"
+      // 신청 역할은 컬럼으로 보여주고 탭으로 나누지 않는다
+      // (역할 탭은 현재 페이지 안의 client-side 필터라 신청 큐 운영과 맞지 않는다).
+      roleTabs={[]}
+      roleColumnHeader="신청 역할"
+      roleDisplayMap={ROLE_DISPLAY}
+      statusTabs={[
+        { key: 'status-active', label: '승인 완료', status: 'active' },
+        { key: 'status-rejected', label: '반려', status: 'rejected' },
+      ]}
+      rejectReason={{ required: true, label: '반려 사유', placeholder: '반려 사유를 입력해 주세요.' }}
+      // UserData.id = membership id (membershipConsoleClient 식별자 계약)
+      fullDetailHref={(u) => `/operator/memberships/${u.id}`}
+      extraColumns={[
+        {
+          key: 'company',
+          header: '약국/회사',
+          width: '160px',
+          render: (v: any) => <span className="text-sm text-slate-600">{v || '-'}</span>,
+        },
+      ]}
+      tableId="pharmacy-hub-operator-memberships"
+    />
   );
 }

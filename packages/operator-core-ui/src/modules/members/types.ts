@@ -7,6 +7,13 @@
  * IR: docs/investigations/IR-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-DESIGN-V1.md (Option C).
  *
  * KPA 는 KpaMember entity 기반으로 별도 페이지 유지 — 본 wrapper 범위 외.
+ *
+ * WO-O4O-PHARMACY-HUB-OPERATOR-MEMBERSHIP-CONSOLE-COMMON-CORE-ADOPTION-V1:
+ *   Pharmacy-Hub 는 **가입 승인 전용 콘솔**(service_memberships 승인/반려만, 회원 수정·
+ *   비밀번호·삭제·정지·일괄처리 endpoint 자체가 없음 — 백엔드가 의도적으로 공통
+ *   /api/v1/operator/members 라우터에 포함되지 않음)이다. 이를 흡수하기 위해
+ *   `consoleMode: 'approval'` 과 client 선택 메서드를 추가한다.
+ *   기본값은 모두 기존 동작이며 Neture/GP/K-Cos/KPA 는 무변경이다.
  */
 
 import type { ReactNode } from 'react';
@@ -79,18 +86,29 @@ export interface MembersConsoleStatsResponse {
  */
 export interface MembersConsoleClient {
   list(params: MembersConsoleListParams): Promise<MembersConsoleListResponse>;
-  /** Used for client-side role tab count calculation (limit=1000). */
-  listAll(): Promise<{ users: UserData[] }>;
-  stats(): Promise<MembersConsoleStatsResponse>;
+  /** Used for client-side role tab count calculation (limit=1000).
+   *  선택 — 미제공 시 role tab count 를 계산하지 않는다(탭은 count 없이 표시). */
+  listAll?(): Promise<{ users: UserData[] }>;
+  /** 선택 — 미제공 시 통계 카드/탭 count 를 생략한다. */
+  stats?(): Promise<MembersConsoleStatsResponse>;
   /**
    * Update user status. Pass currentStatus when calling from drawer so adapter
    * can detect pending→approved (registration endpoint vs membership endpoint).
    * `user` 는 Neture 처럼 status 변경 endpoint 에서 membership.id 가 필요한 경우
    * adapter 가 사용할 수 있도록 wrapper 가 전달 (User 외 service 는 무시 가능).
    */
-  updateStatus(userId: string, status: string, currentStatus?: string, user?: UserData): Promise<void>;
-  /** Batch status change. Backend supports approved/rejected/suspended. */
-  batchUpdateStatus(ids: string[], status: 'approved' | 'rejected' | 'suspended'): Promise<any>;
+  updateStatus(
+    userId: string,
+    status: string,
+    currentStatus?: string,
+    user?: UserData,
+    /** `rejectReason` prop 이 설정된 경우 drawer 에서 입력된 사유가 전달된다.
+     *  (Pharmacy-Hub 반려는 사유가 백엔드 필수값이다.) */
+    options?: { reason?: string },
+  ): Promise<void>;
+  /** Batch status change. Backend supports approved/rejected/suspended.
+   *  선택 — 미제공 시 행 선택/일괄 액션 UI 를 노출하지 않는다. */
+  batchUpdateStatus?(ids: string[], status: 'approved' | 'rejected' | 'suspended'): Promise<any>;
   /** Update password (operator-as-user). */
   /**
    * 회원 비밀번호 변경.
@@ -101,7 +119,8 @@ export interface MembersConsoleClient {
    *   서버는 이 값으로 정확히 한 건의 credential 만 갱신하며,
    *   미지정·모호한 요청은 400(`SERVICE_KEY_REQUIRED`)으로 거절한다.
    */
-  updatePassword(userId: string, password: string, serviceKey: string): Promise<void>;
+  /** 선택 — 미제공 시 '비밀번호 변경' 행 액션을 노출하지 않는다. */
+  updatePassword?(userId: string, password: string, serviceKey: string): Promise<void>;
 }
 
 // ─── Tabs ────────────────────────────────────────────────────
@@ -247,9 +266,10 @@ export interface OperatorMembersConsolePageProps {
 
   /**
    * Render the EditUserModal. Service brings its own modal until P3 commonization WO.
-   * Required because every service has an edit flow.
+   * 회원 수정 flow 가 있는 서비스는 반드시 제공한다.
+   * 미제공 시 '정보 수정' 행 액션을 노출하지 않는다(가입 승인 전용 콘솔).
    */
-  renderEditModal: (props: EditModalRenderProps) => ReactNode;
+  renderEditModal?: (props: EditModalRenderProps) => ReactNode;
 
   /**
    * Optional delete UX. If undefined, delete action is hidden.
@@ -280,4 +300,36 @@ export interface OperatorMembersConsolePageProps {
   serverSort?: boolean;
   /** true 면 tab/search/page/sort 를 URL query(`members_*`)와 동기화하고 새로고침 시 복원. 기본 false. */
   syncUrl?: boolean;
+
+  // ── WO-O4O-PHARMACY-HUB-OPERATOR-MEMBERSHIP-CONSOLE-COMMON-CORE-ADOPTION-V1 ──
+
+  /**
+   * 콘솔 모드. 기본 'members' = 기존 동작(회원 일반 관리).
+   *
+   * 'approval' = **가입 승인 전용**. 목록·검색·상태 필터·상세·승인·반려만 제공하고
+   * 회원 일반 관리 affordance(통계 카드 · 행 선택/일괄 처리 · 정지/활성화)를 제거한다.
+   * 승인 대상이 아닌 행에는 처리 버튼을 노출하지 않는다.
+   *
+   * 승인 전용 서비스에서 회원 조작 UI 를 노출하면 백엔드에 없는 기능을 화면이 약속하게 된다.
+   */
+  consoleMode?: 'members' | 'approval';
+
+  /**
+   * 반려 사유 정책. 설정 시 drawer 반려 버튼이 사유 입력을 요구하고
+   * `client.updateStatus(..., { reason })` 로 전달한다.
+   * 미설정 시 기존 동작(사유 없이 즉시 반려).
+   */
+  rejectReason?: {
+    /** true 면 사유가 비어 있는 동안 반려 버튼을 비활성화한다. */
+    required?: boolean;
+    label?: string;
+    placeholder?: string;
+  };
+
+  /**
+   * drawer 하단 '전체 상세 페이지 →' 링크 주소.
+   * 기본 `/operator/users/{id}`. null 반환 시 링크를 노출하지 않는다
+   * (해당 route 가 없는 서비스에서 데드링크가 되는 것을 막는다 — CLAUDE.md §1).
+   */
+  fullDetailHref?: (user: UserData) => string | null;
 }
