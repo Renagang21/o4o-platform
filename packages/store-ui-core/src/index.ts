@@ -236,3 +236,6 @@ export * from './components/pop';
 
 // Store Library (WO-O4O-MY-STORE-LIBRARY-RESOURCES-CONTENTS-KCOS-GP-COMMONIZATION-V1)
 export * from './components/library';
+
+// Store Tablet Displays (WO-O4O-MY-STORE-TABLET-DISPLAYS-KCOS-GP-COMMONIZATION-V1)
+export * from './components/tablet';
