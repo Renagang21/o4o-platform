@@ -9,13 +9,13 @@
  * 권한: store_owner (RoleGuard + verifyOwner backend 검증).
  */
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Copy, X, ExternalLink, Megaphone } from 'lucide-react';
-import { toast } from '@o4o/error-handling';
 import { ActionBar, BaseDetailDrawer, BulkResultModal } from '@o4o/ui';
-import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
+import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { useHubImportLibrary } from '@o4o/store-ui-core';
 import { hubContentApi } from '@/lib/api/hubContent';
 import type { HubContentItemResponse } from '@o4o/types/hub-content';
 import { getStoreSlug } from '@/api/storeHub';
@@ -25,96 +25,55 @@ const PAGE_LIMIT = 20;
 
 export function HubPopLibraryPage() {
   const navigate = useNavigate();
-  const [items, setItems] = useState<HubContentItemResponse[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [slug, setSlug] = useState<string | null>(null);
-  const [slugResolved, setSlugResolved] = useState(false);
-
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [selectedItem, setSelectedItem] = useState<HubContentItemResponse | null>(null);
-  const [singleImporting, setSingleImporting] = useState(false);
-
-  const batch = useBatchAction();
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
-
-  useEffect(() => {
-    let canceled = false;
-    (async () => {
-      try {
-        const resolved = await getStoreSlug();
-        if (!canceled) { setSlug(resolved); setSlugResolved(true); }
-      } catch {
-        if (!canceled) { setSlug(null); setSlugResolved(true); }
-      }
-    })();
-    return () => { canceled = true; };
-  }, []);
-
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const res = await hubContentApi.list({
-        sourceDomain: 'pop',
-        page,
-        limit: PAGE_LIMIT,
-      });
-      setItems(res.data ?? []);
-      setTotal(res.pagination?.total ?? 0);
-    } catch (e: any) {
-      setError(e?.message || 'HUB POP 을 불러올 수 없습니다');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [page]);
-
-  useEffect(() => { loadData(); }, [loadData]);
-  useEffect(() => { setSelectedIds(new Set()); }, [page]);
-
-  const handleSingleImport = useCallback(async (item: HubContentItemResponse) => {
-    if (!slug) { toast.error('매장 정보를 확인할 수 없습니다'); return; }
-    setSingleImporting(true);
-    try {
-      const result = await importOperatorPop(slug, item.id);
-      toast.success(`"${result.title}" 가져오기 완료 — 내 매장 POP(초안)에 추가되었습니다`);
-      setSelectedItem(null);
-    } catch (e: any) {
-      toast.error(e?.message || '가져오기에 실패했습니다');
-    } finally {
-      setSingleImporting(false);
-    }
-  }, [slug]);
-
-  const batchImportItems = useCallback(
-    async (ids: string[]): Promise<{ data: { results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> } }> => {
-      if (!slug) {
-        return { data: { results: ids.map((id) => ({ id, status: 'failed' as const, error: '매장 정보 미연결' })) } };
-      }
-      const settled = await Promise.allSettled(ids.map((id) => importOperatorPop(slug, id)));
-      const results = settled.map((r, i) => {
-        const id = ids[i];
-        if (r.status === 'fulfilled') return { id, status: 'success' as const };
-        const err = r.reason as { message?: string } | null;
-        return { id, status: 'failed' as const, error: err?.message || 'Network error' };
-      });
-      const successCount = results.filter((r) => r.status === 'success').length;
-      const failCount = results.filter((r) => r.status === 'failed').length;
-      if (successCount > 0) toast.success(`${successCount}개 POP 이 내 매장에 추가되었습니다`);
-      if (failCount > 0) toast.error(`${failCount}개 POP 가져오기에 실패했습니다`);
-      return { data: { results } };
-    },
-    [slug],
+  // WO-O4O-STORE-HUB-SUPPLIER-CONTENT-EXPLORER-COMMONIZATION-V1:
+  //   목록 · 페이지네이션 · loading/error · 매장 slug · 선택 · 단건/일괄 가져오기 상태를
+  //   공통 Core(@o4o/store-ui-core `useHubImportLibrary`) 로 이관.
+  //   HUB 조회와 가져오기 API(importOperatorPop) 는 adapter 로 그대로 주입한다 — backend · 계약 무변경.
+  //   HUB 목록은 운영자 **원본**의 읽기 전용 진열이고, 가져오기가 만드는 것은 매장 소유 **사본**이다.
+  const fetchPage = useCallback(
+    ({ page: nextPage, limit }: { page: number; limit: number }) =>
+      hubContentApi
+        .list({ sourceDomain: 'pop', page: nextPage, limit })
+        .then((res) => ({ items: res.data ?? [], total: res.pagination?.total ?? 0 })),
+    [],
   );
 
-  const handleBulkImport = useCallback(async () => {
-    if (selectedIds.size === 0) return;
-    if (!slug) { toast.error('매장 정보를 확인할 수 없습니다'); return; }
-    const result = await batch.executeBatch(batchImportItems, Array.from(selectedIds));
-    if (result.successCount > 0) setSelectedIds(new Set());
-  }, [selectedIds, slug, batch, batchImportItems]);
+  const hub = useHubImportLibrary<HubContentItemResponse>({
+    fetchPage,
+    limit: PAGE_LIMIT,
+    resolveStoreSlug: getStoreSlug,
+    importOne: (storeSlug, id) => importOperatorPop(storeSlug, id),
+    messages: {
+      loadError: 'HUB POP 을 불러올 수 없습니다',
+      storeMissing: '매장 정보를 확인할 수 없습니다',
+      storeMissingBatchError: '매장 정보 미연결',
+      importSuccess: (result) =>
+        `"${(result as { title: string }).title}" 가져오기 완료 — 내 매장 POP(초안)에 추가되었습니다`,
+      importError: '가져오기에 실패했습니다',
+      bulkSuccess: (n) => `${n}개 POP 이 내 매장에 추가되었습니다`,
+      bulkError: (n) => `${n}개 POP 가져오기에 실패했습니다`,
+    },
+  });
+
+  const {
+    items,
+    page,
+    totalPages,
+    isLoading,
+    error,
+    slug,
+    slugResolved,
+    selectedIds,
+    setSelectedIds,
+    selectedItem,
+    setSelectedItem,
+    singleImporting,
+    batch,
+  } = hub;
+  const setPage = hub.setPage;
+  const loadData = hub.reload;
+  const handleSingleImport = hub.importSingle;
+  const handleBulkImport = hub.importSelected;
 
   const columns: ListColumnDef<HubContentItemResponse>[] = useMemo(() => [
     {
@@ -249,7 +208,7 @@ export function HubPopLibraryPage() {
             <div className="flex items-center justify-center gap-4 mt-4">
               <button
                 disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                onClick={() => setPage(page - 1)}
                 className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
               >
                 이전
@@ -257,7 +216,7 @@ export function HubPopLibraryPage() {
               <span className="text-sm text-slate-500">{page} / {totalPages}</span>
               <button
                 disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
+                onClick={() => setPage(page + 1)}
                 className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
               >
                 다음

@@ -179,3 +179,14 @@ export type {
   StoreOwnerServiceKey,
   StoreOwnerStaleRecovery,
 } from './auth/StoreOwnerGuard';
+
+// 매장 HUB 콘텐츠 탐색 + 가져오기 공통 Core (WO-O4O-STORE-HUB-SUPPLIER-CONTENT-EXPLORER-COMMONIZATION-V1)
+//   useHubImportLibrary = 목록/페이지/loading/error + 매장 slug + 선택 + 단건·일괄 가져오기 상태 Core.
+//   가져오기 API(importOne) 와 화면(컬럼·안내문·accent)은 서비스 페이지가 주입·소유한다.
+export { useHubImportLibrary } from './components/hub-import/useHubImportLibrary';
+export type {
+  HubImportLibraryItem,
+  HubImportLibraryMessages,
+  UseHubImportLibraryOptions,
+  UseHubImportLibraryResult,
+} from './components/hub-import/useHubImportLibrary';

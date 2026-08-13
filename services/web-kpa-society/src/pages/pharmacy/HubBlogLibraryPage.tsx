@@ -24,13 +24,13 @@
  * 권한: store_owner (HubGuard + verifyOwner backend 검증).
  */
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Download, X, ExternalLink, FileText, Plus } from 'lucide-react';
-import { toast } from '@o4o/error-handling';
 import { ActionBar, BaseDetailDrawer, BulkResultModal } from '@o4o/ui';
-import { DataTable, Pagination, useBatchAction } from '@o4o/operator-ux-core';
+import { DataTable, Pagination } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { useHubImportLibrary } from '@o4o/store-ui-core';
 import { hubContentApi } from '../../api/hubContent';
 import type { HubContentItemResponse } from '@o4o/types/hub-content';
 import { getStoreSlug } from '../../api/pharmacyInfo';
@@ -41,139 +41,56 @@ const PAGE_LIMIT = 20;
 
 export function HubBlogLibraryPage() {
   const navigate = useNavigate();
-  const [items, setItems] = useState<HubContentItemResponse[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [slug, setSlug] = useState<string | null>(null);
-  const [slugResolved, setSlugResolved] = useState(false);
-
-  // Selection (canonical Set<string> pattern)
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-
-  // Drawer for row click detail
-  const [selectedItem, setSelectedItem] = useState<HubContentItemResponse | null>(null);
-  const [singleImporting, setSingleImporting] = useState(false);
-
-  // Batch hook
-  const batch = useBatchAction();
-
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
-
-  // Resolve store slug
-  useEffect(() => {
-    let canceled = false;
-    (async () => {
-      try {
-        const resolved = await getStoreSlug();
-        if (!canceled) {
-          setSlug(resolved);
-          setSlugResolved(true);
-        }
-      } catch {
-        if (!canceled) {
-          setSlug(null);
-          setSlugResolved(true);
-        }
-      }
-    })();
-    return () => {
-      canceled = true;
-    };
-  }, []);
-
-  // Fetch HUB blog list
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const res = await hubContentApi.list({
-        serviceKey: SERVICE_KEY,
-        sourceDomain: 'blog',
-        page,
-        limit: PAGE_LIMIT,
-      });
-      setItems(res.data ?? []);
-      setTotal(res.pagination?.total ?? 0);
-    } catch (e: any) {
-      setError(e?.message || 'HUB 블로그를 불러올 수 없습니다');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [page]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  // 페이지 변경 시 선택 초기화
-  useEffect(() => {
-    setSelectedIds(new Set());
-  }, [page]);
-
-  // Single import — 행 클릭 drawer 또는 row action 경로
-  const handleSingleImport = useCallback(
-    async (item: HubContentItemResponse) => {
-      if (!slug) {
-        toast.error('매장 정보를 확인할 수 없습니다');
-        return;
-      }
-      setSingleImporting(true);
-      try {
-        const result = await importOperatorBlog(slug, item.id);
-        toast.success(`"${result.title}" 가져오기 완료 — 내 약국 블로그(초안)에 추가되었습니다`);
-        setSelectedItem(null);
-      } catch (e: any) {
-        toast.error(e?.message || '가져오기에 실패했습니다');
-      } finally {
-        setSingleImporting(false);
-      }
-    },
-    [slug],
+  // WO-O4O-STORE-HUB-SUPPLIER-CONTENT-EXPLORER-COMMONIZATION-V1:
+  //   목록 · 페이지네이션 · loading/error · 매장 slug · 선택 · 단건/일괄 가져오기 상태를
+  //   공통 Core(@o4o/store-ui-core `useHubImportLibrary`) 로 이관.
+  //   HUB 조회와 가져오기 API(importOperatorBlog) 는 adapter 로 그대로 주입한다 — backend · 계약 무변경.
+  //   HUB 목록은 운영자 **원본**의 읽기 전용 진열이고, 가져오기가 만드는 것은 매장 소유 **사본**이다.
+  const fetchPage = useCallback(
+    ({ page: nextPage, limit }: { page: number; limit: number }) =>
+      hubContentApi
+        .list({ serviceKey: SERVICE_KEY, sourceDomain: 'blog', page: nextPage, limit })
+        .then((res) => ({ items: res.data ?? [], total: res.pagination?.total ?? 0 })),
+    [],
   );
 
-  // Bulk import — Promise.allSettled fan-out (HubSignageLibrary 패턴 mirror)
-  const batchImportItems = useCallback(
-    async (
-      ids: string[],
-    ): Promise<{ data: { results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> } }> => {
-      if (!slug) {
-        return {
-          data: {
-            results: ids.map((id) => ({ id, status: 'failed' as const, error: '매장 정보 미연결' })),
-          },
-        };
-      }
-      const settled = await Promise.allSettled(ids.map((id) => importOperatorBlog(slug, id)));
-      const results = settled.map((r, i) => {
-        const id = ids[i];
-        if (r.status === 'fulfilled') return { id, status: 'success' as const };
-        const err = r.reason as { message?: string } | null;
-        const msg = err?.message || 'Network error';
-        return { id, status: 'failed' as const, error: msg };
-      });
-      const successCount = results.filter((r) => r.status === 'success').length;
-      const failCount = results.filter((r) => r.status === 'failed').length;
-      if (successCount > 0) toast.success(`${successCount}개 블로그가 내 약국에 추가되었습니다`);
-      if (failCount > 0) toast.error(`${failCount}개 블로그 가져오기에 실패했습니다`);
-      return { data: { results } };
+  const hub = useHubImportLibrary<HubContentItemResponse>({
+    fetchPage,
+    limit: PAGE_LIMIT,
+    resolveStoreSlug: getStoreSlug,
+    importOne: (storeSlug, id) => importOperatorBlog(storeSlug, id),
+    messages: {
+      loadError: 'HUB 블로그를 불러올 수 없습니다',
+      storeMissing: '매장 정보를 확인할 수 없습니다',
+      storeMissingBatchError: '매장 정보 미연결',
+      importSuccess: (result) =>
+        `"${(result as { title: string }).title}" 가져오기 완료 — 내 약국 블로그(초안)에 추가되었습니다`,
+      importError: '가져오기에 실패했습니다',
+      bulkSuccess: (n) => `${n}개 블로그가 내 약국에 추가되었습니다`,
+      bulkError: (n) => `${n}개 블로그 가져오기에 실패했습니다`,
     },
-    [slug],
-  );
+  });
 
-  const handleBulkImport = useCallback(async () => {
-    if (selectedIds.size === 0) return;
-    if (!slug) {
-      toast.error('매장 정보를 확인할 수 없습니다');
-      return;
-    }
-    const ids = Array.from(selectedIds);
-    const result = await batch.executeBatch(batchImportItems, ids);
-    if (result.successCount > 0) {
-      setSelectedIds(new Set());
-    }
-  }, [selectedIds, slug, batch, batchImportItems]);
+  const {
+    items,
+    total,
+    page,
+    totalPages,
+    isLoading,
+    error,
+    slug,
+    slugResolved,
+    selectedIds,
+    setSelectedIds,
+    selectedItem,
+    setSelectedItem,
+    singleImporting,
+    batch,
+  } = hub;
+  const setPage = hub.setPage;
+  const loadData = hub.reload;
+  const handleSingleImport = hub.importSingle;
+  const handleBulkImport = hub.importSelected;
 
   // ── Columns ───────────────────────────────────────────────────────
   const columns: ListColumnDef<HubContentItemResponse>[] = useMemo(
