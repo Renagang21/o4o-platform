@@ -16,6 +16,8 @@ export interface StoreHomeShellProps {
   loading?: boolean;
   onRefresh?: () => void;
   refreshLabel?: string;
+  /** 서비스가 기존 블록 간격/레이아웃을 보존해야 할 때만 사용한다. */
+  contentClassName?: string;
 
   /** 서비스 고유 홈 제목/설명. HubLayout이 제목을 소유하면 생략한다. */
   headerSlot?: ReactNode;
@@ -93,6 +95,7 @@ export function StoreHomeShell({
   loading = false,
   onRefresh,
   refreshLabel = '새로고침',
+  contentClassName,
   headerSlot,
   storeSelectorSlot,
   bannerSlot,
@@ -107,6 +110,26 @@ export function StoreHomeShell({
   quickActionsSlot,
   beforeSections,
 }: StoreHomeShellProps) {
+  const content = (
+    <>
+      {headerSlot}
+      {storeSelectorSlot}
+      {bannerSlot}
+      {statusSlot}
+      {summarySlot}
+      {aiSummarySlot}
+
+      {!loading && insights && (
+        <ShellInsightBlock insights={insights} title={insightsTitle} onAction={onInsightAction} />
+      )}
+
+      {activitySlot}
+      {onboardingSlot}
+      {quickActionsSlot}
+      {beforeSections}
+    </>
+  );
+
   return (
     <>
       {onRefresh && (
@@ -123,21 +146,7 @@ export function StoreHomeShell({
         </div>
       )}
 
-      {headerSlot}
-      {storeSelectorSlot}
-      {bannerSlot}
-      {statusSlot}
-      {summarySlot}
-      {aiSummarySlot}
-
-      {!loading && insights && (
-        <ShellInsightBlock insights={insights} title={insightsTitle} onAction={onInsightAction} />
-      )}
-
-      {activitySlot}
-      {onboardingSlot}
-      {quickActionsSlot}
-      {beforeSections}
+      {contentClassName ? <div className={contentClassName}>{content}</div> : content}
     </>
   );
 }
