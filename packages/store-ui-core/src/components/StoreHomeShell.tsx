@@ -59,6 +59,11 @@ export interface StoreHomeShellProps {
   onRefresh?: () => void;
   /** 새로고침 버튼 라벨 (기본 '새로고침') */
   refreshLabel?: string;
+  /**
+   * 헤더 아래 본문 전체를 감싸는 클래스 (예: `space-y-6`).
+   * 서비스가 기존 블록 간격을 보존해야 할 때만 사용한다.
+   */
+  contentClassName?: string;
 
   /** 다중 매장 선택 슬롯 (K-Cosmetics). 단일 매장이면 미주입. */
   storeSelectorSlot?: ReactNode;
@@ -164,6 +169,7 @@ export function StoreHomeShell({
   loading = false,
   onRefresh,
   refreshLabel = '새로고침',
+  contentClassName,
   storeSelectorSlot,
   bannerSlot,
   statusSlot,
@@ -190,6 +196,32 @@ export function StoreHomeShell({
     </button>
   ) : null;
 
+  // 헤더 아래 canonical 본문. contentClassName 이 주어지면 이 묶음만 감싼다
+  // (서비스가 쓰던 space-y-* 간격 보존용 — WO 통합 시 반영).
+  const body = (
+    <>
+      {storeSelectorSlot}
+
+      {bannerSlot}
+
+      {statusSlot}
+
+      {signalsSlot}
+
+      {metricsSlot}
+
+      {aiSummarySlot}
+
+      {!loading && insights && (
+        <ShellInsightBlock insights={insights} title={insightsTitle} onAction={onInsightAction} />
+      )}
+
+      {children}
+
+      {onboardingSlot}
+    </>
+  );
+
   return (
     <>
       {title ? (
@@ -214,25 +246,7 @@ export function StoreHomeShell({
         )
       )}
 
-      {storeSelectorSlot}
-
-      {bannerSlot}
-
-      {statusSlot}
-
-      {signalsSlot}
-
-      {metricsSlot}
-
-      {aiSummarySlot}
-
-      {!loading && insights && (
-        <ShellInsightBlock insights={insights} title={insightsTitle} onAction={onInsightAction} />
-      )}
-
-      {children}
-
-      {onboardingSlot}
+      {contentClassName ? <div className={contentClassName}>{body}</div> : body}
 
       {beforeSections}
     </>

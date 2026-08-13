@@ -87,4 +87,16 @@ branch `work/commonization-my-store` push. **main 직접 병합 없음.**
 
 ---
 
+## 7. 병행 작업 통합 (2026-08-13 추가)
+
+같은 WO 를 다른 에이전트가 `work/commonization-my-store` 에 먼저 구현·push 한 것을 발견해 **force-push 없이 merge** 로 통합했다.
+
+| 대상 | 처리 |
+|---|---|
+| `StoreHomeShell` | 본 브랜치 판(title/subtitle + status/signals/metrics + children)을 채택. 상대 판의 순수 slot API(`headerSlot`/`summarySlot`/`activitySlot`/`quickActionsSlot`)는 동일 목적이라 중복 축을 만들지 않고 대체 |
+| 상대 판의 `contentClassName`(간격 보존 wrapper) | **유지** — 본 셸에 반영 |
+| `services/web-pharmacy-hub/.../HomePage.tsx` | 본 브랜치 판 채택(공통 파트 4종까지 사용하는 상위 집합) |
+| handled-products 공통 계약 (`packages/store-ui-core/src/types/handledProducts.ts`, package.json `./handled-products` export, KPA/PH API 타입) | **전량 보존** — 후속 WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1 의 기반 |
+| `CHECK-O4O-MY-STORE-HANDLED-PRODUCTS-CROSSSERVICE-COMMONIZATION-V1.md` | 보존 |
+
 **문서 정합**: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건
