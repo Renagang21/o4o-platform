@@ -16,6 +16,8 @@
  *   /operator/memberships        가입 신청 관리 목록  (MembershipGate + operator role)
  *   /operator/memberships/:id    가입 신청 상세
  *
+ *   /store-hub                   매장허브 홈 — 자원 탐색 진입점 (공통 StoreHubTemplate)
+ *
  *   /store-owner                 매장 경영 셸 (StoreDashboardLayout — 공통)
  *     ├ (index)                  매장 경영 홈
  *     ├ /products                공급 상품 목록
@@ -61,6 +63,8 @@ import MembershipsPage from './pages/operator/MembershipsPage';
 import MembershipDetailPage from './pages/operator/MembershipDetailPage';
 // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
 import SupplierProductsPage from './pages/supplier/ProductsPage';
+// WO-O4O-PHARMACY-HUB-STORE-HUB-HOME-INTRODUCTION-V1 — 매장허브 홈 (공통 StoreHubTemplate)
+import StoreHubPage from './pages/store-hub/StoreHubPage';
 import StoreOwnerHomePage from './pages/store-owner/HomePage';
 import StoreOwnerProductsPage from './pages/store-owner/ProductsPage';
 import StoreOwnerProductDetailPage from './pages/store-owner/ProductDetailPage';
@@ -167,6 +171,17 @@ export default function App() {
               </MembershipGate>
             }
           />
+
+          {/*
+            매장허브 홈 (WO-O4O-PHARMACY-HUB-STORE-HUB-HOME-INTRODUCTION-V1)
+            `/store-hub` = 공급자·플랫폼 자원 **탐색** 진입점 / `/store-owner` = 매장 **운영·주문·관리**.
+            셸은 StoreOwnerShell 을 그대로 재사용한다 — Pharmacy-Hub 전용 Hub 레이아웃 사본을 만들지 않으며
+            가드(StoreOwnerGuard + MembershipGate)도 매장 화면과 동일 기준을 쓴다.
+            기존 `/store-owner/*` URL 은 이동·redirect 없이 그대로 유지한다.
+          */}
+          <Route path="/store-hub" element={<StoreOwnerShell />}>
+            <Route index element={<StoreHubPage />} />
+          </Route>
 
           {/*
             매장 경영 셸 (WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1)

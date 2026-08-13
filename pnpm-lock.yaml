@@ -3379,6 +3379,9 @@ importers:
       '@o4o/screen-content-core':
         specifier: workspace:*
         version: link:../../packages/screen-content-core
+      '@o4o/shared-space-ui':
+        specifier: workspace:*
+        version: link:../../packages/shared-space-ui
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core
