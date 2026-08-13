@@ -59,7 +59,17 @@ import { Card } from '@o4o/ui';
 // canonical StoreHomeShell 3번째 소비처. "실행 흐름 3단계"(기능 안내/온보딩 성격)를
 // onboardingSlot 으로 이동·하단 강등. 운영 블록(Live Signals/KPI/홍보성과/최근활동)은
 // 위치·의미 유지. KPA 전용 fetch/adapter 는 service-local 유지 — 셸은 API 를 알지 않음.
-import { StoreHomeShell } from '@o4o/store-ui-core';
+// WO-O4O-MY-STORE-HOME-CROSSSERVICE-COMMONIZATION-V1:
+// 헤더·Live Signals·KPI·패널 chrome·로딩/빈 상태를 store-ui-core canonical 파트로 수렴.
+// KPA 는 본 공통화의 기준 서비스 — 항목/문구/목적지는 그대로 유지하고 구조만 공통으로 옮긴다.
+import {
+  StoreHomeShell,
+  StoreHomeMetricGrid,
+  StoreHomeSignalList,
+  StoreHomeActivityPanel,
+  StoreHomeStateView,
+} from '@o4o/store-ui-core';
+import type { StoreHomeMetricItem, StoreHomeSignalItem } from '@o4o/store-ui-core';
 import { kpaConfig } from '@o4o/operator-ux-core';
 import { getMarketingAnalytics, getRecentScans } from '../../api/storeAnalytics';
 import type { MarketingAnalyticsData, RecentScanItem } from '../../api/storeAnalytics';
@@ -123,11 +133,12 @@ export function StoreHomePage() {
   if (noStore) {
     return (
       <div className="max-w-[960px]">
-        <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <AlertCircle size={32} className="text-slate-400" />
-          <p className="text-base font-medium text-slate-700">약국 매장이 아직 연결되지 않았습니다</p>
-          <p className="text-sm text-slate-500">약국 경영지원 서비스 신청 후 매장이 활성화됩니다.</p>
-        </div>
+        <StoreHomeStateView
+          state="empty"
+          icon={<AlertCircle size={32} className="text-slate-400" />}
+          title="약국 매장이 아직 연결되지 않았습니다"
+          description="약국 경영지원 서비스 신청 후 매장이 활성화됩니다."
+        />
       </div>
     );
   }
@@ -135,10 +146,7 @@ export function StoreHomePage() {
   if (loading) {
     return (
       <div className="max-w-[960px]">
-        <div className="flex flex-col items-center justify-center py-20">
-          <RefreshCw size={24} className="text-slate-300" />
-          <p className="text-sm text-slate-500 mt-3">불러오는 중...</p>
-        </div>
+        <StoreHomeStateView state="loading" icon={<RefreshCw size={24} className="text-slate-300" />} />
       </div>
     );
   }
@@ -150,158 +158,81 @@ export function StoreHomePage() {
   };
   const deviceLabel: Record<string, string> = { mobile: '모바일', tablet: '태블릿', desktop: '데스크톱' };
 
+  // 처리 필요 신호 (Live Signals) — 항목/문구/목적지는 KPA 고유, 렌더는 공통 StoreHomeSignalList
+  const signalItems: StoreHomeSignalItem[] = [];
+  if (liveSignals) {
+    if (liveSignals.newOrders > 0) {
+      signalItems.push({
+        key: 'new-orders',
+        tone: 'amber',
+        message: `신규 주문 ${liveSignals.newOrders}건 대기`,
+        to: '/store/commerce/orders',
+      });
+    }
+    if (liveSignals.pendingTabletRequests > 0) {
+      signalItems.push({
+        key: 'tablet-requests',
+        tone: 'blue',
+        message: `상담 요청 ${liveSignals.pendingTabletRequests}건 대기`,
+        to: '/store/requests',
+      });
+    }
+    if (liveSignals.pendingSalesRequests > 0) {
+      signalItems.push({
+        key: 'sales-requests',
+        tone: 'violet',
+        message: `판매 요청 ${liveSignals.pendingSalesRequests}건 대기`,
+        to: '/store/commerce/products',
+      });
+    }
+  }
+
+  // 운영 현황 KPI — 4칸 구성·라벨·링크는 기존 그대로, 그리드/스켈레톤/placeholder 는 공통
+  const metricItems: StoreHomeMetricItem[] = [
+    {
+      key: 'library',
+      label: '자료실 파일',
+      value: libraryCount ?? undefined,
+      icon: <BookOpen size={20} className="text-emerald-600 mx-auto" />,
+      to: '/store/library/contents',
+    },
+    {
+      key: 'active-qr',
+      label: '활성 QR',
+      value: analytics?.activeQrCount ?? undefined,
+      icon: <QrCode size={20} className="text-primary mx-auto" />,
+      to: '/store/marketing/qr',
+    },
+    {
+      key: 'listed-products',
+      label: '진열 상품',
+      value: productCount ?? undefined,
+      icon: <Package size={20} className="text-violet-600 mx-auto" />,
+    },
+    {
+      key: 'weekly-scans',
+      label: '이번주 스캔',
+      value: analytics?.weeklyScans?.toLocaleString() ?? undefined,
+      icon: <BarChart3 size={20} className="text-primary mx-auto" />,
+    },
+  ];
+
   return (
     <div className="max-w-[960px]">
-      {/* Header (WO-O4O-KPA-STORE-RESPONSIVE-AND-HAMBURGER-MENU-SIMPLIFY-V1:
-          좁은 화면에서 제목·버튼이 한 행을 유지하되 매우 좁으면 자연 줄바꿈, 버튼 padding 축소, aria-label 추가) */}
-      <div className="flex flex-wrap justify-between items-start gap-2 mb-4 sm:mb-6">
-        <div className="min-w-0">
-          <h1 className="text-lg sm:text-xl font-bold text-slate-800 m-0">{kpaConfig.uiText.storeHomeTitle}</h1>
-          <p className="text-xs sm:text-[13px] text-slate-500 mt-1">{kpaConfig.uiText.storeHomeSubtitle}</p>
-        </div>
-        <button onClick={fetchData} aria-label="새로고침" className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 border border-slate-200 rounded-lg bg-white text-[13px] text-slate-600 cursor-pointer whitespace-nowrap shrink-0">
-          <RefreshCw size={14} />
-          새로고침
-        </button>
-      </div>
-
-      {/* ── Live Signals — 미처리 운영 신호 (WO-O4O-KPA-STORE-HOME-LIVE-SIGNALS-V1) ── */}
-      {liveSignals && (liveSignals.newOrders > 0 || liveSignals.pendingTabletRequests > 0 || liveSignals.pendingSalesRequests > 0) && (
-        <div className="mb-4 flex flex-col gap-2">
-          {liveSignals.newOrders > 0 && (
-            <Link to="/store/commerce/orders" className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-[13px] font-medium text-amber-800 no-underline hover:bg-amber-100">
-              <AlertCircle size={15} className="flex-shrink-0 text-amber-500" />
-              신규 주문 {liveSignals.newOrders}건 대기
-              <ArrowRight size={13} className="ml-auto" />
-            </Link>
-          )}
-          {liveSignals.pendingTabletRequests > 0 && (
-            <Link to="/store/requests" className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-[13px] font-medium text-blue-800 no-underline hover:bg-blue-100">
-              <AlertCircle size={15} className="flex-shrink-0 text-blue-500" />
-              상담 요청 {liveSignals.pendingTabletRequests}건 대기
-              <ArrowRight size={13} className="ml-auto" />
-            </Link>
-          )}
-          {liveSignals.pendingSalesRequests > 0 && (
-            <Link to="/store/commerce/products" className="flex items-center gap-2 rounded-lg border border-violet-200 bg-violet-50 px-4 py-2.5 text-[13px] font-medium text-violet-800 no-underline hover:bg-violet-100">
-              <AlertCircle size={15} className="flex-shrink-0 text-violet-500" />
-              판매 요청 {liveSignals.pendingSalesRequests}건 대기
-              <ArrowRight size={13} className="ml-auto" />
-            </Link>
-          )}
-        </div>
-      )}
-
-      {/* ── 운영 현황 KPI (WO-O4O-KPA-STORE-RESPONSIVE-AND-HAMBURGER-MENU-SIMPLIFY-V1) ──
-          좁은 화면에서도 2열×2행으로 조밀하게(360px 이상 기본 2열), 데스크톱은 기존 4열 유지.
-          template grid(kpa=grid-cols-1 sm:grid-cols-2 …)는 모바일 1열 원인이므로 service-local 명시 grid로 대체.
-          카드 padding/숫자 크기는 좁은 화면에서 compact 처리(데스크톱 값 유지). */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 mb-5 sm:mb-6">
-        {/* WO-O4O-KPA-STORE-HOME-KPI-LABEL-FIX-V1: 레이블 "매장 자산 관리" → "자료실 파일", 클릭 링크 추가 */}
-        <Link to="/store/library/contents" className="no-underline">
-          <Card className="p-3 sm:p-5 text-center h-full hover:border-emerald-300 transition-colors cursor-pointer">
-            <BookOpen size={20} className="text-emerald-600 mx-auto" />
-            <p className="text-xl sm:text-2xl font-bold text-primary m-0 mt-1.5 sm:mt-2">{libraryCount ?? '–'}</p>
-            <p className="text-[11px] sm:text-xs text-slate-500 mt-1 m-0">자료실 파일</p>
-          </Card>
-        </Link>
-        {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §6:
-            활성 QR KPI 는 유일하게 링크가 없는 카드였다 → QR 목록으로 연결해 숫자와 실제 목록을 바로 대조할 수 있게 한다.
-            (숫자 자체는 §2 에서 공개 랜딩 가능 QR 기준으로 정정 — 목록의 활성 항목 수와 일치한다.) */}
-        <Link to="/store/marketing/qr" className="no-underline">
-          <Card className="p-3 sm:p-5 text-center h-full hover:border-primary transition-colors cursor-pointer">
-            <QrCode size={20} className="text-primary mx-auto" />
-            <p className="text-xl sm:text-2xl font-bold text-primary m-0 mt-1.5 sm:mt-2">{analytics?.activeQrCount ?? '–'}</p>
-            <p className="text-[11px] sm:text-xs text-slate-500 mt-1 m-0">활성 QR</p>
-          </Card>
-        </Link>
-        <Card className="p-3 sm:p-5 text-center h-full">
-          <Package size={20} className="text-violet-600 mx-auto" />
-          <p className="text-xl sm:text-2xl font-bold text-primary m-0 mt-1.5 sm:mt-2">{productCount ?? '–'}</p>
-          <p className="text-[11px] sm:text-xs text-slate-500 mt-1 m-0">진열 상품</p>
-        </Card>
-        <Card className="p-3 sm:p-5 text-center h-full">
-          <BarChart3 size={20} className="text-primary mx-auto" />
-          <p className="text-xl sm:text-2xl font-bold text-primary m-0 mt-1.5 sm:mt-2">{analytics?.weeklyScans?.toLocaleString() ?? '–'}</p>
-          <p className="text-[11px] sm:text-xs text-slate-500 mt-1 m-0">이번주 스캔</p>
-        </Card>
-      </div>
-
-      {/* ── 하단 2열: 홍보 성과 요약 + 최근 활동 ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        {/* 홍보 성과 요약 */}
-        <Card className="p-5">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-[15px] font-semibold text-slate-800 m-0">홍보 성과 요약</h2>
-            <Link to="/store/analytics/marketing" className="flex items-center gap-1 text-xs text-primary no-underline">
-              상세 분석 <ArrowRight size={12} />
-            </Link>
-          </div>
-          {!analytics || analytics.topQrCodes.length === 0 ? (
-            <p className="text-[13px] text-slate-400 text-center py-5 m-0">
-              <GuideEditableSection
-                pageKey="store"
-                sectionKey="empty-marketing"
-                defaultContent="아직 홍보 성과 데이터가 없습니다"
-              />
-            </p>
-          ) : (
-            <div className="flex flex-col gap-1.5">
-              {analytics.topQrCodes.slice(0, 3).map((qr, idx) => (
-                <div key={qr.id} className="flex items-center gap-3 px-2.5 py-2 rounded-lg bg-slate-50">
-                  <span className="w-[22px] h-[22px] flex items-center justify-center rounded-full bg-slate-200 text-[11px] font-bold text-slate-600 flex-shrink-0">{idx + 1}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium text-slate-800 m-0 overflow-hidden text-ellipsis whitespace-nowrap">{qr.title}</p>
-                    <span className="text-[11px] text-slate-400">{qr.scanCount}회 스캔</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-
-        {/* 최근 활동 */}
-        <Card className="p-5">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-[15px] font-semibold text-slate-800 m-0">최근 활동</h2>
-          </div>
-          {recentScans.length === 0 ? (
-            <p className="text-[13px] text-slate-400 text-center py-5 m-0">
-              <GuideEditableSection
-                pageKey="store"
-                sectionKey="empty-activity"
-                defaultContent="최근 활동 기록이 없습니다"
-              />
-            </p>
-          ) : (
-            <div className="flex flex-col gap-1">
-              {recentScans.slice(0, 6).map((scan, idx) => (
-                <div key={idx} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-slate-50">
-                  <div className="flex items-center justify-center w-7 h-7 rounded-full bg-white border border-slate-200 flex-shrink-0">
-                    {deviceIcon[scan.deviceType] || <Smartphone size={13} className="text-slate-400" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium text-slate-800 m-0 overflow-hidden text-ellipsis whitespace-nowrap">
-                      {scan.qrTitle || '(삭제된 QR)'}
-                    </p>
-                    <span className="inline-flex items-center text-[11px] text-slate-400 mt-0.5">
-                      <Clock size={10} className="mr-0.5" />
-                      {formatRelativeTime(scan.createdAt)}
-                      {' · '}
-                      {deviceLabel[scan.deviceType] || scan.deviceType}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-      </div>
-
-      {/* ── 실행 흐름 → StoreHomeShell.onboardingSlot 으로 이동·하단 강등 ── */}
-      {/* WO-O4O-STORE-HOME-KPA-ADOPT-V1: 기능 안내/온보딩 성격이므로 운영 블록 */}
-      {/* (Live Signals / KPI / 홍보성과 / 최근활동) 아래로 내림. 내용 삭제 아님. */}
+      {/* WO-O4O-MY-STORE-HOME-CROSSSERVICE-COMMONIZATION-V1:
+          헤더(제목·부제·새로고침) → 처리필요신호 → KPI → 본문 → 온보딩 순서를
+          canonical StoreHomeShell 이 담당한다. 데이터 fetch/문구는 KPA service-local 유지. */}
       <StoreHomeShell
+        title={kpaConfig.uiText.storeHomeTitle}
+        subtitle={kpaConfig.uiText.storeHomeSubtitle}
+        loading={loading}
+        onRefresh={fetchData}
+        signalsSlot={<StoreHomeSignalList items={signalItems} />}
+        metricsSlot={
+          <div className="mb-5 sm:mb-6">
+            <StoreHomeMetricGrid items={metricItems} variant="icon-centered" />
+          </div>
+        }
         onboardingSlot={
           <Card className="p-5 mb-4">
             <h2 className="text-[15px] font-semibold text-slate-800 m-0 mb-3">실행 흐름</h2>
@@ -381,7 +312,74 @@ export function StoreHomePage() {
             </div>
           </Card>
         }
-      />
+      >
+        {/* ── 하단 2열: 홍보 성과 요약 + 최근 활동 ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          {/* 홍보 성과 요약 — chrome(제목/상세링크/빈 상태)은 StoreHomeActivityPanel 공통 */}
+          <StoreHomeActivityPanel
+            title="홍보 성과 요약"
+            moreLabel="상세 분석"
+            moreTo="/store/analytics/marketing"
+            moreIcon={<ArrowRight size={12} />}
+            isEmpty={!analytics || analytics.topQrCodes.length === 0}
+            emptyContent={
+              <GuideEditableSection
+                pageKey="store"
+                sectionKey="empty-marketing"
+                defaultContent="아직 홍보 성과 데이터가 없습니다"
+              />
+            }
+          >
+            {analytics && (
+              <div className="flex flex-col gap-1.5">
+                {analytics.topQrCodes.slice(0, 3).map((qr, idx) => (
+                  <div key={qr.id} className="flex items-center gap-3 px-2.5 py-2 rounded-lg bg-slate-50">
+                    <span className="w-[22px] h-[22px] flex items-center justify-center rounded-full bg-slate-200 text-[11px] font-bold text-slate-600 flex-shrink-0">{idx + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-medium text-slate-800 m-0 overflow-hidden text-ellipsis whitespace-nowrap">{qr.title}</p>
+                      <span className="text-[11px] text-slate-400">{qr.scanCount}회 스캔</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </StoreHomeActivityPanel>
+
+          {/* 최근 활동 */}
+          <StoreHomeActivityPanel
+            title="최근 활동"
+            isEmpty={recentScans.length === 0}
+            emptyContent={
+              <GuideEditableSection
+                pageKey="store"
+                sectionKey="empty-activity"
+                defaultContent="최근 활동 기록이 없습니다"
+              />
+            }
+          >
+            <div className="flex flex-col gap-1">
+                {recentScans.slice(0, 6).map((scan, idx) => (
+                  <div key={idx} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-slate-50">
+                    <div className="flex items-center justify-center w-7 h-7 rounded-full bg-white border border-slate-200 flex-shrink-0">
+                      {deviceIcon[scan.deviceType] || <Smartphone size={13} className="text-slate-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-medium text-slate-800 m-0 overflow-hidden text-ellipsis whitespace-nowrap">
+                        {scan.qrTitle || '(삭제된 QR)'}
+                      </p>
+                      <span className="inline-flex items-center text-[11px] text-slate-400 mt-0.5">
+                        <Clock size={10} className="mr-0.5" />
+                        {formatRelativeTime(scan.createdAt)}
+                        {' · '}
+                        {deviceLabel[scan.deviceType] || scan.deviceType}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </StoreHomeActivityPanel>
+        </div>
+      </StoreHomeShell>
     </div>
   );
 }
