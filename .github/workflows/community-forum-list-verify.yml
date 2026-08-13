@@ -24,6 +24,8 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Build common package prerequisites
         run: pnpm run build:packages
+      - name: Build api-server workspace dependencies
+        run: pnpm --filter '@o4o/api-server^...' run build
       - name: Static contract assertions
         run: |
           grep -q "const serviceCode = (req.query.serviceCode" apps/api-server/src/controllers/forum/ForumPostController.ts
@@ -128,6 +130,7 @@ jobs:
           ```text
           pnpm install --frozen-lockfile --ignore-scripts
           pnpm run build:packages
+          pnpm --filter '@o4o/api-server^...' run build
           @o4o/api-server type-check
           pharmacy-hub-web type-check
           pharmacy-hub-web build
