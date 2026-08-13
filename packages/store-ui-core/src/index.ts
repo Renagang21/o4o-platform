@@ -161,10 +161,35 @@ export type {
 // Store Hub 이벤트 오퍼 단순 목록 공통 (WO-O4O-STORE-HUB-EVENT-OFFER-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1)
 export { EventOffersHubList } from './components/event-offers/EventOffersHubList';
 export type { EventOffersHubListProps, EventOfferHubItem, EventOffersHubAccent } from './components/event-offers/EventOffersHubList';
+export { EventOfferHubView } from './components/event-offers/EventOfferHubView';
+export type {
+  EventOfferHubViewProps,
+  EventOfferHubRow,
+  EventOfferHubSelection,
+} from './components/event-offers/EventOfferHubView';
+
+// 이벤트 오퍼 공통 helper (WO-O4O-STORE-HUB-EVENT-OFFER-COMMONIZATION-V1)
+export { asUuid, buildEventOfferCartPayload } from './components/event-offers/eventOfferCart';
+export type {
+  EventOfferCartSource,
+  EventOfferCartPayload,
+} from './components/event-offers/eventOfferCart';
+// WO-O4O-STORE-HUB-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1:
+//   raw 매핑(EVENT_OFFER_STATUS_LABEL) 은 외부 소비처가 없고, 직접 조회하면 미지 status 를
+//   보수적으로 처리하는 resolver 를 우회하게 된다. 공개 표면은 resolver 하나로 유지한다.
+export { resolveEventOfferStatusLabel } from './components/event-offers/eventOfferStatus';
+export type { EventOfferStatusKey } from './components/event-offers/eventOfferStatus';
 
 // Store Hub 공급 상품 카탈로그 공통 (WO-O4O-STORE-HUB-SUPPLY-CATALOG-NAMING-ALIGNMENT-V1)
 // 구 B2BCatalogHub → SupplyCatalogHub. extraction 원본: WO-O4O-STORE-HUB-B2B-CATALOG-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1.
 export { SupplyCatalogHub } from './components/supply-catalog/SupplyCatalogHub';
+// WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1 (census F1): 카탈로그 client factory
+export { createSupplyCatalogApi } from './components/supply-catalog/createSupplyCatalogApi';
+export type {
+  SupplyCatalogHttp,
+  SupplyCatalogQueryParams,
+  SupplyCatalogApiClient,
+} from './components/supply-catalog/createSupplyCatalogApi';
 export type {
   SupplyCatalogHubProps,
   SupplyCatalogHubLabels,
@@ -174,6 +199,26 @@ export type {
   SupplyCatalogListResponse,
   SupplyCatalogAccent,
 } from './components/supply-catalog/SupplyCatalogHub';
+
+// 공급 상품 탐색 공통 Core (WO-O4O-STORE-HUB-SUPPLY-PRODUCT-EXPLORER-COMMONIZATION-V1)
+//   useSupplyProductList = 조회/페이지/필터/검색/loading/empty/error 상태 Core (headless)
+//   SupplyProductExplorer = 위 상태를 쓰는 목록 View (DataTable + Pagination + 필터 바)
+//   신청 · 제외 · 장바구니 · 주문은 담지 않는다 (서비스 액션).
+export { useSupplyProductList } from './components/supply-catalog/useSupplyProductList';
+export type {
+  SupplyProductListQuery,
+  SupplyProductListPage,
+  UseSupplyProductListOptions,
+  UseSupplyProductListResult,
+} from './components/supply-catalog/useSupplyProductList';
+export { SupplyProductExplorer } from './components/supply-catalog/SupplyProductExplorer';
+export type {
+  SupplyProductExplorerProps,
+  SupplyProductExplorerTab,
+  SupplyProductExplorerOption,
+  SupplyProductExplorerSelectFilter,
+  SupplyProductExplorerColumn,
+} from './components/supply-catalog/SupplyProductExplorer';
 
 // Shared Production Modal (WO-O4O-START-PRODUCTION-MODAL-SHARED-COMPONENT-PHASE2-H-V1)
 export { StartProductionModal } from './components/StartProductionModal';
@@ -196,6 +241,157 @@ export type {
   StoreOwnerServiceKey,
   StoreOwnerStaleRecovery,
 } from './auth/StoreOwnerGuard';
+
+// 매장 HUB 콘텐츠 탐색 + 가져오기 공통 Core (WO-O4O-STORE-HUB-SUPPLIER-CONTENT-EXPLORER-COMMONIZATION-V1)
+//   useHubImportLibrary = 목록/페이지/loading/error + 매장 slug + 선택 + 단건·일괄 가져오기 상태 Core.
+//   가져오기 API(importOne) 와 화면(컬럼·안내문·accent)은 서비스 페이지가 주입·소유한다.
+export { useHubImportLibrary } from './components/hub-import/useHubImportLibrary';
+export type {
+  HubImportLibraryItem,
+  HubImportLibraryMessages,
+  UseHubImportLibraryOptions,
+  UseHubImportLibraryResult,
+} from './components/hub-import/useHubImportLibrary';
+
+// 매장 장바구니 공통 (WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1)
+//   storeCartTypes = canonical Store Cart API 계약 타입 (3 서비스 중복 제거 — 계약 자체는 무변경)
+//   useStoreCart   = 조회/수량/삭제/비우기/주문확정 상태 Core (headless)
+//   StoreCartView  = KCos·GP near-identical 화면 공통 View (accent 주입)
+//   Pharmacy-Hub 는 결제 그룹 기반 다른 주문 계약이므로 대상 아님.
+export type {
+  CartSourceType,
+  CartPricingSource,
+  StoreCartItem,
+  AddCartItemInput,
+  SupplierGroupShipping,
+  SupplierGroup,
+  CreatedOrderSummary,
+  FailedCartItem,
+  CheckoutConfirmResult,
+  StoreCartApiOk,
+  StoreCartApi,
+} from './components/store-cart/storeCartTypes';
+export { createStoreCartApi } from './components/store-cart/createStoreCartApi';
+export type { StoreCartHttp, StoreCartApiClient } from './components/store-cart/createStoreCartApi';
+export { useStoreCart } from './components/store-cart/useStoreCart';
+export type { UseStoreCartOptions, UseStoreCartResult } from './components/store-cart/useStoreCart';
+export { StoreCartView } from './components/store-cart/StoreCartView';
+export type { StoreCartViewProps, StoreCartAccent } from './components/store-cart/StoreCartView';
+
+// 공급 상품 신청/제외 액션 Core (WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1)
+//   "내 매장에 추가" = ProductApproval 신청. 신청 ≠ 장바구니 ≠ 주문 (의미 변경 없음).
+export { useSupplyProductApplication } from './components/supply-catalog/useSupplyProductApplication';
+export type {
+  SupplyApplicationItem,
+  SupplyProductApplicationApi,
+  SupplyProductApplicationLabels,
+  UseSupplyProductApplicationOptions,
+  UseSupplyProductApplicationResult,
+} from './components/supply-catalog/useSupplyProductApplication';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1
+// ─────────────────────────────────────────────────────────────────────────────
+
+// 서비스 accent 토큰 단일 출처. 공통 View 는 서비스 이름이 아니라 accent 이름만 받는다.
+export { STORE_ACCENT_CLASSES, storeAccentTokens } from './theme/storeAccent';
+export type { StoreAccent, StoreAccentTokens } from './theme/storeAccent';
+
+// Store HUB 사이니지 라이브러리 (KPA 652L · KCos 579L · GP 580L 사본 3벌 대체)
+//   useSignageLibrary  = 2탭 · producer 필터 · 페이지네이션 · 선택 · 단건/일괄 복사 상태 Core
+//   SignageLibraryView = 공통 화면. accent · ownerLabel · sortable · headerAction ·
+//                        importedTargets · guide 를 config 로 받는다.
+export { useSignageLibrary } from './components/signage-library/useSignageLibrary';
+export type {
+  SignageLibraryItem,
+  SignageViewTab,
+  SignageLibraryMessages,
+  UseSignageLibraryOptions,
+  UseSignageLibraryResult,
+  SignageImportedNotice,
+} from './components/signage-library/useSignageLibrary';
+export { SignageLibraryView } from './components/signage-library/SignageLibraryView';
+export type {
+  SignageLibraryViewProps,
+  SignageProducerTab,
+  SignageLibraryGuide,
+  SignageImportedTargets,
+} from './components/signage-library/SignageLibraryView';
+export { HubImportLibraryView } from './components/hub-import/HubImportLibraryView';
+export type {
+  HubImportLibraryRow,
+  HubImportLibraryLabels,
+  HubImportLibraryViewProps,
+} from './components/hub-import/HubImportLibraryView';
+
+// ── Store HUB Shell (WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1) ──
+export { StoreHubShell } from './components/hub-shell/StoreHubShell';
+export type {
+  StoreHubShellProps,
+  StoreHubNavGroup,
+  StoreHubNavItem,
+} from './components/hub-shell/StoreHubShell';
+
+// WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1: 매장 HUB 콘텐츠 상세 공통 View
+export { HubContentDetailView } from './components/hub-content/HubContentDetailView';
+export type {
+  HubContentDetailViewProps,
+  HubContentDetailItem,
+  HubContentDetailAccent,
+} from './components/hub-content/HubContentDetailView';
+
+// ─── Store HUB API 클라이언트 팩토리 (WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1, census F1) ───
+export { createStoreHubApi } from './api/createStoreHubApi';
+export type {
+  StoreHubHttp,
+  StoreHubApiClient,
+  StoreHubOverview,
+  ChannelType,
+  ChannelStatus,
+  ChannelOverview,
+  ChannelOverviewWithCode,
+  StoreKpiSummary,
+  LiveSignals,
+  StoreCapabilityOverview,
+  StoreSlugStatus,
+  StoreSlugChangeResult,
+  StoreSlugErrorCode,
+} from './api/createStoreHubApi';
+
+// ─── 매장측 이벤트 오퍼 / HUB 콘텐츠 API 팩토리 ───
+// WO-O4O-STORE-HUB-API-CLIENT-AND-SERVICE-SCOPE-ALIGNMENT-V1
+//   createEventOfferApi : KCos·GP 사본(주석·export명·prefix만 달랐다) 통합. KPA legacy `/groupbuy*` 는 제외.
+//   createHubContentApi : `/hub/contents` 단일 계약. serviceKey 는 config 값.
+//                         응답 타입은 `@o4o/types` 의존을 Core 로 끌어오지 않기 위해 제네릭 주입.
+export { createEventOfferApi } from './api/createEventOfferApi';
+export type {
+  EventOfferHttp,
+  CreateEventOfferApiConfig,
+  EventOfferApiClient,
+  EnrichedEventOffer,
+  EnrichedEventOffersResponse,
+  EventOfferOrderResult,
+  EventOfferOrderResponse,
+} from './api/createEventOfferApi';
+export { createHubContentApi } from './api/createHubContentApi';
+export type {
+  HubContentHttp,
+  CreateHubContentApiConfig,
+  HubContentApiClient,
+  HubContentListParams,
+} from './api/createHubContentApi';
+
+// ─── buyer 주문(구매/발주) 내역 공통 View ───
+// WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1 §8
+//   buyer checkout ledger 계약(KPA·GlycoPharm)만 대상. K-Cosmetics 소비자 storefront 주문과
+//   PharmacyHub paymentGroup 결제 우선 주문은 업무 계약이 달라 합치지 않는다.
+export { BuyerOrderLedgerView } from './components/order-ledger/BuyerOrderLedgerView';
+export type {
+  BuyerLedgerOrder,
+  BuyerLedgerStatusTab,
+  BuyerOrderLedgerEmptyConfig,
+  BuyerOrderLedgerViewProps,
+} from './components/order-ledger/BuyerOrderLedgerView';
 
 // 매장 경영활용 제품 — 교차 서비스 데이터 계약 + 목록 UI 파트
 // (WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1)

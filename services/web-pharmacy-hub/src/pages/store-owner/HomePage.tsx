@@ -74,6 +74,14 @@ const STATUS_TONE: Record<string, string> = {
 //   항목·문구·경로는 종전 그대로, 렌더만 공통 StoreHomeShortcutGrid 로 위임한다.
 const SHORTCUTS: StoreHomeShortcutItem[] = [
   {
+    // WO-O4O-STORE-HUB-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1:
+    //   `/store-hub` 진입점 연결(상단바 navItems 와 함께 모바일까지 커버). 기존 URL 변경 없음.
+    to: '/store-hub',
+    label: '매장 허브',
+    description: '공급자·플랫폼 자원을 탐색하는 진입점입니다.',
+    icon: <Store className="h-5 w-5" />,
+  },
+  {
     to: '/store-owner/products',
     label: '공급 상품',
     description: '공급자가 제공하는 상품을 살펴보고 장바구니에 담습니다.',

@@ -17,15 +17,22 @@
  *     신청 ≠ 주문. 주문/장바구니/발주 버튼 미혼입.
  *   - 유통유형 탭 PRIVATE = "공급 승인 대상" (구 '판매자 모집' 은 Neture 파트너 모집과 혼동되어 정정됨,
  *     WO-O4O-SELLER-RECRUITMENT-TERMINOLOGY-BOUNDARY-FIX-V1). 되돌리지 않는다.
- *   - KPA fuller `HubB2BCatalogPage`(796줄)는 본 컴포넌트 범위 외(무변경).
+ * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
+ *   범위 외로 남겨 두었던 KPA `HubB2BCatalogPage`(728줄) 까지 편입한다. KPA 차이는 config 로만 표현:
+ *   accent(blue) · storeNoun('내 약국') · 공급자 로고 · 권장 소비자가 컬럼(additionalColumns) ·
+ *   공급가 보조 라벨(서비스가/일반가) · 진열 링크 라벨. 신청 의미(ProductApproval PENDING)·API 무변경.
+ *   정규화(3 서비스 공통 적용): 제외 확인 window.confirm → 인라인 확인 다이얼로그,
+ *   수제 이전/다음 → 표준 `Pagination`, 결과 건수 표시, ActionBar '미추가 N개', 운영자 탭 빈 문구.
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Plus, Check, Trash2, X, Loader2 } from 'lucide-react';
-import { toast } from '@o4o/error-handling';
 import { ActionBar } from '@o4o/ui';
-import { DataTable } from '@o4o/operator-ux-core';
+import { DataTable, Pagination } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { useSupplyProductList } from './useSupplyProductList';
+import type { SupplyProductListQuery } from './useSupplyProductList';
+import { useSupplyProductApplication } from './useSupplyProductApplication';
 
 // ─── 공통 타입 ────────────────────────────────────────────────────────────────
 export interface SupplyCatalogProduct {
@@ -36,6 +43,8 @@ export interface SupplyCatalogProduct {
   priceGeneral?: number | null;
   priceGold?: number | null;
   isAdded?: boolean;
+  /** 공급자 로고 (labels.showSupplierLogo 일 때만 사용) */
+  supplierLogoUrl?: string | null;
 }
 
 export interface SupplyCatalogListResponse<T extends SupplyCatalogProduct> {
@@ -57,13 +66,19 @@ export interface SupplyCatalogApi<T extends SupplyCatalogProduct> {
   cancelProductByOfferId(productId: string): Promise<unknown>;
 }
 
-export type SupplyCatalogAccent = 'teal' | 'pink';
+export type SupplyCatalogAccent = 'teal' | 'pink' | 'blue';
 
 export interface SupplyCatalogHubLabels {
   /** 공급자 컬럼 헤더. GP '공급자' · KCos '공급사'. 기본 '공급자'. */
   supplierLabel?: string;
   /** 채널 관리 링크 href. 있으면 안내문에 링크 렌더, 없으면 plain text. GP '/store/channels' · KCos 미지정. */
   channelManageHref?: string;
+  /** 채널 관리 링크 라벨. 기본 '채널 관리' · KPA '판매 설정'. */
+  channelManageLabel?: string;
+  /** 매장 지칭 명사. 기본 '내 매장' · KPA '내 약국'. */
+  storeNoun?: string;
+  /** 공급자 컬럼에 로고를 함께 표시 (KPA). */
+  showSupplierLogo?: boolean;
 }
 
 export interface SupplyCatalogHubProps<T extends SupplyCatalogProduct> {
@@ -76,6 +91,10 @@ export interface SupplyCatalogHubProps<T extends SupplyCatalogProduct> {
    * 동일 카탈로그를 다른 IA 위치(예: 내 매장 상품·거래)에서 재사용할 때 제목/설명만 맥락에 맞게 주입.
    */
   heading?: { title?: string; description?: string };
+  /** 공급가와 액션 사이에 끼워 넣을 추가 컬럼 (KPA 권장 소비자가 등). */
+  additionalColumns?: ListColumnDef<T>[];
+  /** 공급가 아래 보조 라벨 (KPA '서비스가' / '일반가'). null 이면 미표시. */
+  renderPriceSublabel?: (item: T) => string | null;
 }
 
 // ─── 탭 (유통유형 — KPA canonical 정합) ───────────────────────────────────────
@@ -121,6 +140,16 @@ const ACCENT_CLASSES: Record<SupplyCatalogAccent, {
     link: 'text-pink-700 underline underline-offset-2 hover:text-pink-800',
     linkBold: 'text-pink-700 font-semibold underline underline-offset-2 hover:text-pink-800',
   },
+  blue: {
+    tabActive: 'bg-blue-600 text-white',
+    badge: 'bg-blue-50 text-blue-700',
+    checkBox: 'bg-blue-50 text-blue-600',
+    applyBtn: 'text-blue-600 hover:bg-blue-50',
+    retryBtn: 'text-blue-600 border-blue-300 hover:bg-blue-50',
+    noticeBox: 'bg-blue-50/60 border-blue-100',
+    link: 'text-blue-700 underline underline-offset-2 hover:text-blue-800',
+    linkBold: 'text-blue-700 font-semibold underline underline-offset-2 hover:text-blue-800',
+  },
 };
 
 function formatPrice(item: SupplyCatalogProduct): string {
@@ -135,116 +164,86 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
   tableId,
   labels,
   heading,
+  additionalColumns,
+  renderPriceSublabel,
 }: SupplyCatalogHubProps<T>) {
   const ac = ACCENT_CLASSES[accent];
   const supplierLabel = labels?.supplierLabel ?? '공급자';
   const channelHref = labels?.channelManageHref;
+  const channelLabel = labels?.channelManageLabel ?? '채널 관리';
+  const storeNoun = labels?.storeNoun ?? '내 매장';
+  const showSupplierLogo = labels?.showSupplierLogo ?? false;
   const headingTitle = heading?.title ?? '상품 카탈로그';
   const headingDescription =
-    heading?.description ?? '현재 활성 공급자가 제공 중인 상품을 탐색하고 내 매장에 추가할 수 있습니다.';
+    heading?.description ??
+    `현재 활성 공급자가 제공 중인 상품을 탐색하고 ${storeNoun}에 추가할 수 있습니다.`;
 
-  const [products, setProducts] = useState<T[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [distributionFilter, setDistributionFilter] = useState('all');
-  const [offset, setOffset] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [applyingId, setApplyingId] = useState<string | null>(null);
-  const [removingId, setRemovingId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [bulkAdding, setBulkAdding] = useState(false);
+  /** 제외 확인 대상 — window.confirm 대신 인라인 다이얼로그(3 서비스 공통). */
+  const [removeConfirmId, setRemoveConfirmId] = useState<string | null>(null);
 
-  const fetchCatalog = useCallback(async (distType: string, pageOffset: number) => {
-    setLoading(true);
-    setError(null);
-    setSelectedIds(new Set());
-    try {
-      const isOperator = distType === 'operator';
+  // WO-O4O-STORE-HUB-SUPPLY-PRODUCT-EXPLORER-COMMONIZATION-V1:
+  //   목록 조회 · 페이지네이션 · 탭 · loading/empty/error 상태를 공통 Core(useSupplyProductList)로 위임.
+  //   화면 구조(accent 탭 · 안내 박스 · 액션 컬럼 · ActionBar)와 API 계약은 그대로 둔다.
+  //   Core 는 1-indexed page 축이므로 offset 기반 getCatalog 는 여기 adapter 에서 환산한다.
+  const fetchPage = useCallback(
+    async ({ page, limit, tab }: SupplyProductListQuery) => {
+      const isOperator = tab === 'operator';
       const res = await api.getCatalog({
-        distributionType: distType === 'all' || isOperator ? undefined : distType,
+        distributionType: tab === 'all' || isOperator ? undefined : tab,
         operatorView: isOperator ? true : undefined,
-        limit: PAGE_LIMIT,
-        offset: pageOffset,
+        limit,
+        offset: (page - 1) * limit,
       });
-      setProducts(res.data);
-      setTotal(res.pagination.total);
-    } catch (e: any) {
-      setError(e?.message || '상품 카탈로그를 불러오지 못했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, [api]);
+      return { items: res.data, total: res.pagination.total };
+    },
+    [api],
+  );
 
-  useEffect(() => {
-    fetchCatalog(distributionFilter, offset);
-  }, [fetchCatalog, distributionFilter, offset]);
+  const list = useSupplyProductList<T>({
+    fetchPage,
+    limit: PAGE_LIMIT,
+    initialTab: 'all',
+    resolveErrorMessage: (e) =>
+      (e as { message?: string })?.message || '상품 카탈로그를 불러오지 못했습니다.',
+    onBeforeLoad: () => setSelectedIds(new Set()),
+  });
+
+  const products = list.items;
+  const setProducts = list.setItems;
+  const { loading, error, total } = list;
+  const distributionFilter = list.tab;
 
   const handleDistributionChange = (key: string) => {
     const safeKey = DISTRIBUTION_TABS.some(t => t.key === key) ? key : 'all';
-    setDistributionFilter(safeKey);
-    setOffset(0);
+    list.setTab(safeKey);
   };
 
-  // ─── 단건 추가 (= 공급 상품 신청, ProductApproval PENDING) ─────────────────
-  const handleApply = async (product: T) => {
-    if (applyingId) return;
-    setApplyingId(product.id);
-    try {
-      await api.applyBySupplyProductId(product.id);
-      toast.success(`"${product.name}" 내 매장에 추가되었습니다.`);
-      setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isAdded: true } : p));
-    } catch (e: any) {
-      const code = e?.response?.data?.error?.code || e?.code;
-      if (code === 'DUPLICATE_APPLICATION') toast.error('이미 내 매장에 추가된 상품입니다.');
-      else toast.error(e?.message || '상품 추가에 실패했습니다.');
-    } finally {
-      setApplyingId(null);
-    }
-  };
+  // ─── 신청/제외 액션 (WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1) ────
+  //   단건 추가(= 공급 상품 신청, ProductApproval PENDING) · 단건 제외 · 일괄 신청 상태 기계를
+  //   공통 Core 로 위임한다. 의미(신청 ≠ 주문)와 API 계약은 그대로다.
+  const application = useSupplyProductApplication<T>({
+    api,
+    setItems: setProducts,
+    labels: { storeNoun },
+  });
+  const { applyingId, removingId, bulkAdding } = application;
 
-  // ─── 단건 제외 ───────────────────────────────────────────────────────────
-  const handleRemove = async (product: T) => {
+  const handleApply = (product: T) => application.apply(product);
+
+  const handleRemove = (product: T) => {
     if (removingId) return;
-    if (!window.confirm(`"${product.name}"을(를) 내 매장에서 제외하시겠습니까?`)) return;
-    setRemovingId(product.id);
-    try {
-      await api.cancelProductByOfferId(product.id);
-      toast.success(`"${product.name}"을(를) 내 매장에서 제외했습니다.`);
-      setProducts(prev => prev.map(p => p.id === product.id ? { ...p, isAdded: false } : p));
-    } catch (e: any) {
-      toast.error(e?.message || '상품 제외에 실패했습니다.');
-    } finally {
-      setRemovingId(null);
-    }
+    setRemoveConfirmId(null);
+    return application.remove(product);
   };
 
-  // ─── Bulk 추가 (단건 API fan-out) ─────────────────────────────────────────
   const handleBulkAdd = useCallback(async () => {
     const targets = products.filter(p => selectedIds.has(p.id) && !p.isAdded);
-    if (targets.length === 0) {
-      toast.error('추가할 상품을 선택해주세요.');
-      return;
-    }
-    setBulkAdding(true);
-    const results = await Promise.allSettled(
-      targets.map(p => api.applyBySupplyProductId(p.id).then(() => p.id)),
-    );
-    let successCount = 0;
-    let failCount = 0;
-    const successIds = new Set<string>();
-    for (const r of results) {
-      if (r.status === 'fulfilled') { successCount++; successIds.add(r.value); }
-      else failCount++;
-    }
-    if (successIds.size > 0) {
-      setProducts(prev => prev.map(p => successIds.has(p.id) ? { ...p, isAdded: true } : p));
-    }
-    if (successCount > 0 && failCount === 0) toast.success(`${successCount}개 상품을 내 매장에 추가했습니다.`);
-    else if (successCount > 0) toast.success(`${successCount}개 추가 완료. ${failCount}개 실패.`);
-    else toast.error('상품 추가에 실패했습니다. 다시 시도해주세요.');
-    setSelectedIds(new Set());
-    setBulkAdding(false);
-  }, [api, products, selectedIds]);
+    const allAlreadyAdded =
+      selectedIds.size > 0 && [...selectedIds].every(k => products.find(p => p.id === k)?.isAdded);
+    const { successCount } = await application.bulkApply(targets, { allAlreadyAdded });
+    if (successCount > 0 || targets.length > 0) setSelectedIds(new Set());
+  }, [application, products, selectedIds]);
 
   const notAddedSelectedCount = useMemo(
     () => [...selectedIds].filter(k => !products.find(p => p.id === k)?.isAdded).length,
@@ -261,7 +260,9 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
           <div className="flex items-center gap-1.5">
             <span className="text-sm font-semibold text-slate-900">{row.name}</span>
             {row.isAdded && (
-              <span className={`inline-block px-1.5 py-0.5 text-[10px] font-semibold rounded ${ac.badge}`}>내 매장</span>
+              <span className={`inline-block px-1.5 py-0.5 text-[10px] font-semibold rounded ${ac.badge}`}>
+                {storeNoun}
+              </span>
             )}
           </div>
           {row.description && (
@@ -275,7 +276,23 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
       header: supplierLabel,
       width: '150px',
       render: (_v, row) => (
-        <span className="text-[0.8125rem] text-slate-600 font-medium">{row.supplierName || '-'}</span>
+        <div className="flex items-center gap-2 min-w-0">
+          {showSupplierLogo &&
+            (row.supplierLogoUrl ? (
+              <img
+                src={row.supplierLogoUrl}
+                alt={row.supplierName ?? ''}
+                className="w-6 h-6 rounded object-cover bg-slate-100 shrink-0"
+              />
+            ) : (
+              <span className="w-6 h-6 rounded bg-slate-100 text-slate-500 text-[11px] font-semibold flex items-center justify-center shrink-0">
+                {row.supplierName?.charAt(0) ?? '-'}
+              </span>
+            ))}
+          <span className="text-[0.8125rem] text-slate-600 font-medium truncate">
+            {row.supplierName || '-'}
+          </span>
+        </div>
       ),
     },
     {
@@ -283,10 +300,17 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
       header: '공급가',
       width: '120px',
       align: 'right',
-      render: (_v, row) => (
-        <span className="text-[0.8125rem] font-semibold text-slate-900">{formatPrice(row)}</span>
-      ),
+      render: (_v, row) => {
+        const sub = renderPriceSublabel?.(row) ?? null;
+        return (
+          <div className="flex flex-col items-end gap-0.5">
+            <span className="text-[0.8125rem] font-semibold text-slate-900">{formatPrice(row)}</span>
+            {sub && <span className="text-[10px] text-slate-400">{sub}</span>}
+          </div>
+        );
+      },
     },
+    ...(additionalColumns ?? []),
     {
       key: '_actions',
       header: '액션',
@@ -300,14 +324,17 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
         if (row.isAdded) {
           return (
             <div className="flex items-center justify-center gap-1">
-              <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full ${ac.checkBox}`} title="이미 내 매장에 추가됨">
+              <span
+                className={`inline-flex items-center justify-center w-7 h-7 rounded-full ${ac.checkBox}`}
+                title={`이미 ${storeNoun}에 추가됨`}
+              >
                 <Check className="w-4 h-4" />
               </span>
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); handleRemove(row); }}
+                onClick={(e) => { e.stopPropagation(); setRemoveConfirmId(row.id); }}
                 disabled={isRemoving}
-                title="내 매장에서 제외"
+                title={`${storeNoun}에서 제외`}
                 className="inline-flex items-center justify-center w-7 h-7 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 disabled:opacity-50"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -321,7 +348,7 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
               type="button"
               onClick={(e) => { e.stopPropagation(); handleApply(row); }}
               disabled={isApplying}
-              title={isApplying ? '추가 중...' : '내 매장에 추가'}
+              title={isApplying ? '추가 중...' : `${storeNoun}에 추가`}
               className={`inline-flex items-center justify-center w-7 h-7 rounded-full disabled:opacity-60 ${ac.applyBtn}`}
             >
               {isApplying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
@@ -330,13 +357,42 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
         );
       },
     },
-  ], [applyingId, removingId, ac, supplierLabel]); // eslint-disable-line react-hooks/exhaustive-deps
+  ], [applyingId, removingId, ac, supplierLabel, storeNoun, showSupplierLogo, additionalColumns, renderPriceSublabel]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
-  const currentPage = Math.floor(offset / PAGE_LIMIT) + 1;
+  const totalPages = list.totalPages;
+  const currentPage = list.page;
+
+  const removeTarget = removeConfirmId ? products.find(p => p.id === removeConfirmId) ?? null : null;
 
   return (
     <div className="px-1 py-2">
+      {/* 제외 확인 — window.confirm 대체 (3 서비스 공통) */}
+      {removeTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-sm bg-white rounded-xl p-5 shadow-lg">
+            <p className="text-sm text-slate-700">이 상품을 {storeNoun}에서 제외하시겠습니까?</p>
+            <p className="mt-2 text-sm font-semibold text-slate-900">{removeTarget.name}</p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setRemoveConfirmId(null)}
+                className="px-3.5 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                disabled={!!removingId}
+                onClick={() => handleRemove(removeTarget)}
+                className="px-3.5 py-2 text-sm font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
+              >
+                {removingId === removeTarget.id ? '처리 중...' : '제외'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 페이지 헤더 */}
       <div className="mb-5 pb-4 border-b border-slate-200">
         <h1 className="text-xl font-bold text-slate-900">{headingTitle}</h1>
@@ -371,7 +427,7 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
         <div className="text-center py-16">
           <p className="text-sm text-red-500 mb-3">{error}</p>
           <button
-            onClick={() => fetchCatalog(distributionFilter, offset)}
+            onClick={list.reload}
             className={`px-4 py-2 text-sm border rounded-lg transition-colors ${ac.retryBtn}`}
           >
             다시 시도
@@ -384,16 +440,21 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
             <ActionBar
               selectedCount={selectedIds.size}
               onClearSelection={() => setSelectedIds(new Set())}
+              statusInfo={
+                notAddedSelectedCount > 0 && notAddedSelectedCount < selectedIds.size
+                  ? `미추가 ${notAddedSelectedCount}개`
+                  : undefined
+              }
               actions={[
                 {
                   key: 'bulk-add',
-                  label: `내 매장에 추가 (${notAddedSelectedCount || selectedIds.size})`,
+                  label: `${storeNoun}에 추가 (${notAddedSelectedCount || selectedIds.size})`,
                   onClick: handleBulkAdd,
                   variant: 'primary' as const,
                   icon: <Plus className="w-3.5 h-3.5" />,
                   loading: bulkAdding,
                   group: 'actions',
-                  tooltip: '선택한 상품을 내 매장에 일괄 추가합니다',
+                  tooltip: `선택한 상품을 ${storeNoun}에 일괄 추가합니다`,
                   visible: selectedIds.size > 0,
                 },
                 {
@@ -409,15 +470,21 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
             />
           </div>
 
+          {!loading && products.length > 0 && (
+            <p className="mb-2 text-xs text-slate-400">공급 가능 상품 {total}건</p>
+          )}
+
           <DataTable<T>
             columns={columns}
             data={products}
             rowKey="id"
             loading={loading}
             emptyMessage={
-              distributionFilter === 'all'
-                ? '현재 공급 가능한 상품이 없습니다.'
-                : `"${DISTRIBUTION_TABS.find(t => t.key === distributionFilter)?.label}" 유형의 상품이 없습니다.`
+              distributionFilter === 'operator'
+                ? '운영자 승인 흐름에 참여 중인 상품이 없습니다.'
+                : distributionFilter === 'all'
+                  ? '현재 공급 가능한 상품이 없습니다.'
+                  : `"${DISTRIBUTION_TABS.find(t => t.key === distributionFilter)?.label}" 유형의 상품이 없습니다.`
             }
             tableId={tableId}
             selectable
@@ -425,23 +492,15 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
             onSelectionChange={setSelectedIds}
           />
 
+          {/* WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1: 수제 이전/다음 → 표준 Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4 mt-4">
-              <button
-                disabled={currentPage <= 1}
-                onClick={() => setOffset(o => Math.max(0, o - PAGE_LIMIT))}
-                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-              >
-                이전
-              </button>
-              <span className="text-sm text-slate-500">{currentPage} / {totalPages} · 전체 {total}건</span>
-              <button
-                disabled={currentPage >= totalPages}
-                onClick={() => setOffset(o => o + PAGE_LIMIT)}
-                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-              >
-                다음
-              </button>
+            <div className="mt-4">
+              <Pagination
+                page={currentPage}
+                totalPages={totalPages}
+                total={total}
+                onPageChange={(p: number) => list.setPage(p)}
+              />
             </div>
           )}
         </>
@@ -451,10 +510,10 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
       <div className={`flex items-start gap-3 px-5 py-4 border rounded-xl mt-6 text-sm text-slate-600 leading-relaxed ${ac.noticeBox}`}>
         <span className="text-lg shrink-0">💡</span>
         <span>
-          상품을 선택한 뒤 <strong>내 매장에 추가</strong>로 한 번에 추가하거나, 각 행의 + 버튼으로 단건 추가할 수 있습니다.
+          상품을 선택한 뒤 <strong>{storeNoun}에 추가</strong>로 한 번에 추가하거나, 각 행의 + 버튼으로 단건 추가할 수 있습니다.
           {channelHref ? (
             <>
-              {' '}추가된 상품은 <a href={channelHref} className={ac.link}>채널 관리</a>에서 진열하면 고객에게 보여집니다.
+              {' '}추가된 상품은 <a href={channelHref} className={ac.link}>{channelLabel}</a>에서 진열하면 고객에게 보여집니다.
             </>
           ) : (
             <>{' '}추가된 상품은 채널에 진열하면 고객에게 보여집니다.</>
@@ -469,7 +528,7 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
             추가된 상품은 <strong>채널에서 진열</strong>하면 고객에게 보여집니다.
             {channelHref && (
               <>
-                {' '}<a href={channelHref} className={ac.linkBold}>채널 관리로 이동 →</a>
+                {' '}<a href={channelHref} className={ac.linkBold}>{channelLabel}로 이동 →</a>
               </>
             )}
           </span>

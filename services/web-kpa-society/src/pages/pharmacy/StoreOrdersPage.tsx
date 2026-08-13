@@ -4,27 +4,27 @@
  * IR-O4O-STORE-ORDER-DIRECTION-SEMANTICS-CROSSSERVICE-V1 / WO-...-BUYER-LEDGER-ALIGNMENT-V1:
  *   "내 매장 주문 내역" canonical = buyer(구매/발주 내역). buyerId 기준 checkout_orders(/checkout/orders).
  *   (기존 "판매자 관점" /checkout/store-orders + StoreOrderDetailDrawer(상태변경) 제거.
- *    seller "받은 주문/판매 이행" 은 별도 화면으로 분리 — 본 화면 범위 외. client 의 store-orders* 함수는 보존.)
+ *    seller "받은 주문/판매 이행" 은 별도 화면으로 분리 — 본 화면 범위 외.)
  *
- * [1] KPI 3블록 (총 주문 / 결제완료 / 이번 달 주문액)
- * [2] 상태 필터 바
- * [3] 주문 테이블 (DataTable + 페이지네이션)
+ * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1 §8:
+ *   헤더 / KPI 3블록 / 상태 필터 바 / loading·error·empty / pagination 뼈대를 GlycoPharm
+ *   `PharmacyOrders` 와 공유하는 `BuyerOrderLedgerView` 로 이관했다. 여기 남는 것은
+ *   KPA 고유 config 뿐이다 — 상태 탭(3서비스 공통 매핑) · 결제 판정 · 주문 작업대 링크 ·
+ *   DataTable 컬럼 정의. 데이터 소스(getBuyerOrders)·문구·집계 정책 무변경.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { DataTable } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
-import { RefreshCw, AlertCircle } from 'lucide-react';
 import { getBuyerOrders } from '../../api/checkout';
 import type { BuyerOrder } from '../../api/checkout';
-import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 // 3서비스 공통 buyer checkout 상태 표시 매핑 (WO-O4O-STORE-CHECKOUT-STATUS-LABEL-ALIGNMENT-V1)
-import { BUYER_CHECKOUT_STATUS_TABS, BuyerOrderStatusBadge } from '@o4o/store-ui-core';
-
-// ── 상태 정의 (3서비스 공통 매핑) ──
-
-const STATUS_TABS = BUYER_CHECKOUT_STATUS_TABS;
+import {
+  BUYER_CHECKOUT_STATUS_TABS,
+  BuyerOrderStatusBadge,
+  BuyerOrderLedgerView,
+} from '@o4o/store-ui-core';
 
 const PAGE_SIZE = 20;
 
@@ -34,12 +34,67 @@ function isPaid(o: BuyerOrder): boolean {
   return p === 'paid' || s === 'paid' || s === 'completed' || s === 'fulfilled';
 }
 
+function isCancelled(o: BuyerOrder): boolean {
+  return (o.status || '').toLowerCase() === 'cancelled';
+}
+
+/** KPA 는 checkout status 원값으로 탭을 매칭한다(파생 상태 collapse 없음). */
+function matchStatus(o: BuyerOrder, tabKey: string): boolean {
+  return tabKey === 'all' ? true : (o.status || '').toLowerCase() === tabKey;
+}
+
+const columns: Column<BuyerOrder>[] = [
+  {
+    key: 'orderNumber',
+    title: '주문번호',
+    render: (_v: unknown, row: BuyerOrder) => (
+      <span className="text-[13px] font-medium text-slate-800">{row.orderNumber}</span>
+    ),
+  },
+  {
+    key: 'itemCount',
+    title: '상품',
+    render: (_v: unknown, row: BuyerOrder) =>
+      row.itemCount > 0 ? (
+        <span className="text-[13px]">상품 {row.itemCount}개</span>
+      ) : (
+        <span className="text-slate-400">—</span>
+      ),
+  },
+  {
+    key: 'totalAmount',
+    title: '금액',
+    width: '120px',
+    align: 'right' as const,
+    render: (_v: unknown, row: BuyerOrder) => (
+      <span className="text-[13px] font-semibold">
+        {Number(row.totalAmount).toLocaleString('ko-KR')}원
+      </span>
+    ),
+  },
+  {
+    key: 'status',
+    title: '상태',
+    width: '100px',
+    align: 'center' as const,
+    render: (_v: unknown, row: BuyerOrder) => <BuyerOrderStatusBadge status={row.status} />,
+  },
+  {
+    key: 'createdAt',
+    title: '주문일',
+    width: '140px',
+    render: (_v: unknown, row: BuyerOrder) => (
+      <span className="text-xs text-slate-500">
+        {new Date(row.createdAt).toLocaleDateString('ko-KR')}
+      </span>
+    ),
+  },
+];
+
 export function StoreOrdersPage() {
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [allOrders, setAllOrders] = useState<BuyerOrder[]>([]);
+  const [orders, setOrders] = useState<BuyerOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -47,7 +102,7 @@ export function StoreOrdersPage() {
     try {
       // buyer endpoint 는 status 필터 미지원 → 전체 조회 후 client-side 필터/집계
       const res = await getBuyerOrders({ limit: 100 });
-      setAllOrders(res.success ? res.data ?? [] : []);
+      setOrders(res.success ? res.data ?? [] : []);
     } catch {
       setError('주문 내역을 불러오는 데 실패했습니다.');
     } finally {
@@ -59,301 +114,58 @@ export function StoreOrdersPage() {
     loadData();
   }, [loadData]);
 
-  // Reset page when filter changes
-  useEffect(() => { setPage(1); }, [selectedStatus]);
-
-  // client-side 필터 + 집계
-  const filtered = allOrders.filter((o) =>
-    selectedStatus === 'all' ? true : (o.status || '').toLowerCase() === selectedStatus
+  const renderList = useMemo(
+    () => (rows: BuyerOrder[]) => (
+      /* WO-O4O-STORE-LAYOUT-WIDTH-OVERFLOW-FIX-V1: table overflow → horizontal scroll */
+      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+        <DataTable<BuyerOrder>
+          columns={columns}
+          dataSource={rows}
+          rowKey="id"
+          emptyText="주문이 없습니다"
+        />
+      </div>
+    ),
+    [],
   );
-  const total = filtered.length;
-  const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const paidCount = allOrders.filter(isPaid).length;
-  const monthlyAmount = allOrders
-    .filter((o) => new Date(o.createdAt) >= monthStart && (o.status || '').toLowerCase() !== 'cancelled')
-    .reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0);
-
-  const kpiBlocks = [
-    { label: '총 주문', value: String(allOrders.length), color: colors.neutral900 },
-    { label: '결제완료', value: String(paidCount), color: colors.accentGreen },
-    {
-      label: '이번 달 주문액',
-      value: monthlyAmount > 0 ? `${monthlyAmount.toLocaleString('ko-KR')}원` : '—',
-      color: colors.primary,
-    },
-  ];
-
-  const columns: Column<BuyerOrder>[] = [
-    {
-      key: 'orderNumber',
-      title: '주문번호',
-      render: (_v: unknown, row: BuyerOrder) => (
-        <span style={{ fontWeight: 500, fontSize: '13px', color: colors.neutral800 }}>
-          {row.orderNumber}
-        </span>
-      ),
-    },
-    {
-      key: 'itemCount',
-      title: '상품',
-      render: (_v: unknown, row: BuyerOrder) =>
-        row.itemCount > 0 ? (
-          <span style={{ fontSize: '13px' }}>상품 {row.itemCount}개</span>
-        ) : (
-          <span style={{ color: colors.neutral400 }}>—</span>
-        ),
-    },
-    {
-      key: 'totalAmount',
-      title: '금액',
-      width: '120px',
-      align: 'right' as const,
-      render: (_v: unknown, row: BuyerOrder) => (
-        <span style={{ fontWeight: 600, fontSize: '13px' }}>
-          {Number(row.totalAmount).toLocaleString('ko-KR')}원
-        </span>
-      ),
-    },
-    {
-      key: 'status',
-      title: '상태',
-      width: '100px',
-      align: 'center' as const,
-      render: (_v: unknown, row: BuyerOrder) => <BuyerOrderStatusBadge status={row.status} />,
-    },
-    {
-      key: 'createdAt',
-      title: '주문일',
-      width: '140px',
-      render: (_v: unknown, row: BuyerOrder) => (
-        <span style={{ fontSize: '12px', color: colors.neutral500 }}>
-          {new Date(row.createdAt).toLocaleDateString('ko-KR')}
-        </span>
-      ),
-    },
-  ];
 
   return (
-    <div style={S.container}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <h1 style={S.title}>발주 내역</h1>
-          <p style={S.subtitle}>공급자에게 주문한 상품의 발주·결제·배송 진행 상태를 확인합니다 (온라인 판매 고객 주문은 ‘온라인 판매 &gt; 주문 관리’)</p>
-        </div>
-        <Link to="/store/commerce/order-worktable" style={S.worktableLink}>
+    <BuyerOrderLedgerView<BuyerOrder>
+      orders={orders}
+      loading={loading}
+      error={error}
+      onRetry={loadData}
+      accent="blue"
+      title="발주 내역"
+      description="공급자에게 주문한 상품의 발주·결제·배송 진행 상태를 확인합니다 (온라인 판매 고객 주문은 ‘온라인 판매 > 주문 관리’)"
+      headerAction={
+        <Link
+          to="/store/commerce/order-worktable"
+          className="whitespace-nowrap rounded-md bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600"
+        >
           주문 작업대 →
         </Link>
-      </div>
-
-      {/* [1] KPI */}
-      <div style={S.kpiGrid}>
-        {kpiBlocks.map((item) => (
-          <div key={item.label} style={S.kpiCard}>
-            <p style={S.kpiLabel}>{item.label}</p>
-            <p style={{ ...S.kpiValue, color: item.color }}>{item.value}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* [2] 상태 필터 바 */}
-      <div style={S.filterBar}>
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setSelectedStatus(tab.key)}
-            style={
-              selectedStatus === tab.key
-                ? { ...S.filterBtn, ...S.filterBtnActive }
-                : S.filterBtn
-            }
+      }
+      statusTabs={BUYER_CHECKOUT_STATUS_TABS}
+      matchStatus={matchStatus}
+      isPaid={isPaid}
+      isCancelled={isCancelled}
+      pageSize={PAGE_SIZE}
+      renderList={renderList}
+      empty={{
+        title: '주문 내역이 없습니다',
+        description:
+          '매장 허브에서 O4O 주문 가능 상품이나 이벤트 오퍼를 주문하면 이곳에서 확인할 수 있습니다.',
+        filteredDescription: '검색 조건에 맞는 주문이 없습니다.',
+        action: (
+          <Link
+            to="/store/commerce/order-worktable"
+            className="mt-4 inline-block text-sm font-medium text-blue-600"
           >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* [3] 주문 테이블 */}
-      {loading ? (
-        <div style={S.stateCenter}>
-          <RefreshCw size={24} style={{ color: colors.neutral300 }} />
-          <p style={{ color: colors.neutral500, fontSize: '14px', marginTop: '12px' }}>
-            주문 내역을 불러오는 중...
-          </p>
-        </div>
-      ) : error ? (
-        <div style={S.stateCenter}>
-          <AlertCircle size={28} style={{ color: '#ef4444' }} />
-          <p style={{ color: colors.neutral700, fontSize: '14px', marginTop: '12px' }}>{error}</p>
-          <button onClick={loadData} style={S.retryBtn}>다시 시도</button>
-        </div>
-      ) : filtered.length === 0 ? (
-        <div style={S.tableCard}>
-          <div style={S.emptyState}>
-            <div style={S.emptyIcon}>📦</div>
-            <p style={S.emptyTitle}>주문 내역이 없습니다</p>
-            <p style={S.emptyDesc}>
-              매장 허브에서 O4O 주문 가능 상품이나 이벤트 오퍼를 주문하면 이곳에서 확인할 수 있습니다.
-            </p>
-            <Link to="/store/commerce/order-worktable" style={S.worktableLinkSmall}>
-              주문 작업대 바로가기 →
-            </Link>
-          </div>
-        </div>
-      ) : (
-        /* WO-O4O-STORE-LAYOUT-WIDTH-OVERFLOW-FIX-V1: table overflow → horizontal scroll */
-        <div style={{ overflowX: 'auto' }}>
-          <DataTable<BuyerOrder>
-            columns={columns}
-            dataSource={pageRows}
-            rowKey="id"
-            pagination={{
-              current: page,
-              pageSize: PAGE_SIZE,
-              total,
-              onChange: (p: number) => setPage(p),
-            }}
-            emptyText="주문이 없습니다"
-          />
-        </div>
-      )}
-    </div>
+            주문 작업대 바로가기 →
+          </Link>
+        ),
+      }}
+    />
   );
 }
-
-/* ── Styles ── */
-const S: Record<string, React.CSSProperties> = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: spacing.lg,
-  },
-  title: {
-    ...typography.headingL,
-    margin: 0,
-    color: colors.neutral900,
-  },
-  subtitle: {
-    margin: `${spacing.xs} 0 0`,
-    fontSize: '0.875rem',
-    color: colors.neutral500,
-  },
-  worktableLink: {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: colors.primary,
-    textDecoration: 'none',
-    padding: '8px 16px',
-    borderRadius: borderRadius.md,
-    backgroundColor: '#EFF6FF',
-    whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  worktableLinkSmall: {
-    marginTop: '16px',
-    display: 'inline-block',
-    fontSize: '14px',
-    color: colors.primary,
-    textDecoration: 'none',
-    fontWeight: 500,
-  },
-
-  /* KPI */
-  kpiGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: spacing.md,
-  },
-  kpiCard: {
-    padding: spacing.lg,
-    backgroundColor: colors.white,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-  },
-  kpiLabel: {
-    margin: 0,
-    fontSize: '0.8rem',
-    fontWeight: 500,
-    color: colors.neutral500,
-  },
-  kpiValue: {
-    margin: `${spacing.xs} 0 0`,
-    fontSize: '1.5rem',
-    fontWeight: 700,
-  },
-
-  /* Filter */
-  filterBar: {
-    display: 'flex',
-    gap: spacing.sm,
-    overflowX: 'auto',
-  },
-  filterBtn: {
-    padding: `${spacing.sm} ${spacing.md}`,
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    color: colors.neutral600,
-    backgroundColor: colors.neutral100,
-    border: 'none',
-    borderRadius: borderRadius.md,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  filterBtnActive: {
-    backgroundColor: '#DBEAFE',
-    color: colors.primary,
-  },
-
-  /* Table card */
-  tableCard: {
-    backgroundColor: colors.white,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-    overflow: 'hidden',
-  },
-
-  /* States */
-  stateCenter: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '80px 20px',
-  } as React.CSSProperties,
-  retryBtn: {
-    marginTop: '16px',
-    padding: '8px 20px',
-    fontSize: '14px',
-    fontWeight: 500,
-    color: '#fff',
-    backgroundColor: colors.primary,
-    border: 'none',
-    borderRadius: borderRadius.md,
-    cursor: 'pointer',
-  },
-
-  /* Empty */
-  emptyState: {
-    textAlign: 'center',
-    padding: `${spacing.xxxl} ${spacing.lg}`,
-  } as React.CSSProperties,
-  emptyIcon: {
-    fontSize: '2.5rem',
-    marginBottom: spacing.md,
-  },
-  emptyTitle: {
-    margin: 0,
-    fontSize: '1.125rem',
-    fontWeight: 600,
-    color: colors.neutral800,
-  },
-  emptyDesc: {
-    margin: `${spacing.sm} 0 0`,
-    fontSize: '0.875rem',
-    color: colors.neutral500,
-  },
-};

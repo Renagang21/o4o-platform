@@ -49,6 +49,9 @@ COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 COPY packages/tablet-screen-set-editor/package.json ./packages/tablet-screen-set-editor/
 COPY packages/screen-content-core/package.json ./packages/screen-content-core/
 COPY packages/tablet-kiosk-core/package.json ./packages/tablet-kiosk-core/
+# WO-O4O-PHARMACY-HUB-STORE-HUB-HOME-INTRODUCTION-V1: 공통 StoreHubTemplate (/store-hub 홈)
+#   source-mode 패키지라 별도 build 단계는 필요 없다. 의존(@o4o/ui · @o4o/content-editor)은 위에 이미 있다.
+COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 
 # Copy service package.json
 COPY services/web-pharmacy-hub/package.json ./services/web-pharmacy-hub/
@@ -71,6 +74,7 @@ COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 COPY packages/tablet-screen-set-editor/ ./packages/tablet-screen-set-editor/
 COPY packages/screen-content-core/ ./packages/screen-content-core/
 COPY packages/tablet-kiosk-core/ ./packages/tablet-kiosk-core/
+COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 
 # Copy service source
 COPY services/web-pharmacy-hub/ ./services/web-pharmacy-hub/

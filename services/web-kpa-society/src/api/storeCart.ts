@@ -11,143 +11,26 @@
  *   - core 네임스페이스(/api/v1)이므로 /kpa 접두사가 없는 coreApiClient 사용.
  *   - serviceKey 는 호출부에서 'kpa-society' 로 전달한다.
  *
- * Phase 1a 범위: 담기/조회/수량변경/삭제/비우기 + 공급자별 묶음 + checkout preview.
- *   주문/결제/정산/수량차감은 후속 Phase. priceSnapshot 은 표시용 임시값이다.
+ * WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1:
+ *   3 서비스에 중복돼 있던 타입 정의를 @o4o/store-ui-core 로 이관하고 여기서 re-export 한다.
+ * WO-O4O-STORE-HUB-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1:
+ *   endpoint 목록 복제도 제거. 이 파일은 이제 **전송 계층 주입**만 소유한다.
+ *   coreApiClient 는 이미 응답 body 를 반환하므로 언랩이 필요 없다. API 계약 무변경.
  */
 
+import { createStoreCartApi } from '@o4o/store-ui-core';
 import { coreApiClient } from './client';
 
-export type CartSourceType =
-  | 'regular'
-  | 'operator_approved'
-  | 'b2b'
-  | 'event_offer'
-  // 'seller_recruitment': legacy/internal — 매장 취급 신청/공급 승인 전 상태. 주문 경로 아님.
-  // Neture 제휴(파트너 모집)와 무관. 근거: WO-O4O-SELLER-RECRUITMENT-TERMINOLOGY-BOUNDARY-FIX-V1.
-  | 'seller_recruitment';
+export type {
+  CartSourceType,
+  CartPricingSource,
+  StoreCartItem,
+  AddCartItemInput,
+  SupplierGroupShipping,
+  SupplierGroup,
+  CreatedOrderSummary,
+  FailedCartItem,
+  CheckoutConfirmResult,
+} from '@o4o/store-ui-core';
 
-export type CartPricingSource = 'regular' | 'event_offer';
-
-export interface StoreCartItem {
-  id: string;
-  buyerId: string;
-  organizationId: string | null;
-  serviceKey: string;
-  sourceType: CartSourceType;
-  supplierId: string | null;
-  supplierProductOfferId: string | null;
-  organizationProductListingId: string | null;
-  eventOfferId: string | null;
-  productMasterId: string | null;
-  productName: string;
-  quantity: number;
-  pricingSource: CartPricingSource;
-  priceSnapshot: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface AddCartItemInput {
-  sourceType?: CartSourceType;
-  supplierId?: string | null;
-  supplierProductOfferId?: string | null;
-  organizationProductListingId?: string | null;
-  eventOfferId?: string | null;
-  productMasterId?: string | null;
-  productName: string;
-  quantity?: number;
-  pricingSource?: CartPricingSource;
-  priceSnapshot?: number;
-}
-
-// WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1
-export interface SupplierGroupShipping {
-  shippingFee: number;
-  freeShippingApplied: boolean;
-  freeShippingThreshold: number | null;
-  remainingForFreeShipping: number | null;
-  policyConfigured: boolean;
-}
-
-export interface SupplierGroup {
-  supplierId: string | null;
-  items: StoreCartItem[];
-  itemCount: number;
-  totalQuantity: number;
-  /** priceSnapshot 기준 표시용 소계(원). 신뢰 금액 아님. */
-  displaySubtotal: number;
-  /** 공급자별 배송비 미리보기 (표시용 — 확정 시 재계산) */
-  shipping: SupplierGroupShipping;
-  /** displaySubtotal + shipping.shippingFee */
-  displayTotal: number;
-}
-
-interface ApiOk<T> {
-  success: true;
-  data: T;
-}
-
-// WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1 (Phase 1b)
-export interface CreatedOrderSummary {
-  orderId: string;
-  orderNumber: string;
-  supplierId: string;
-  sellerOrganizationId: string;
-  subtotal: number;
-  shippingFee: number;
-  totalAmount: number;
-  itemCount: number;
-  cartItemIds: string[];
-}
-
-export interface FailedCartItem {
-  itemId: string;
-  reason: string;
-  message: string;
-}
-
-export interface CheckoutConfirmResult {
-  serviceKey: string;
-  createdOrders: CreatedOrderSummary[];
-  failedItems: FailedCartItem[];
-  removedCartItemIds: string[];
-}
-
-export const storeCartApi = {
-  /** 장바구니 담기 */
-  addItem: (serviceKey: string, input: AddCartItemInput) =>
-    coreApiClient.post<ApiOk<StoreCartItem>>(`/store/cart/${serviceKey}/items`, input),
-
-  /** 장바구니 목록 */
-  list: (serviceKey: string) =>
-    coreApiClient.get<ApiOk<{ items: StoreCartItem[]; total: number }>>(
-      `/store/cart/${serviceKey}/items`,
-    ),
-
-  /** 공급자별 묶음 (배송비/주문 분할 단위) */
-  groupBySupplier: (serviceKey: string) =>
-    coreApiClient.get<ApiOk<{ groups: SupplierGroup[]; supplierCount: number }>>(
-      `/store/cart/${serviceKey}/groups`,
-    ),
-
-  /** 수량 변경 */
-  updateQuantity: (serviceKey: string, id: string, quantity: number) =>
-    coreApiClient.patch<ApiOk<StoreCartItem>>(`/store/cart/${serviceKey}/items/${id}`, {
-      quantity,
-    }),
-
-  /** 항목 삭제 */
-  removeItem: (serviceKey: string, id: string) =>
-    coreApiClient.delete<ApiOk<{ removed: boolean }>>(`/store/cart/${serviceKey}/items/${id}`),
-
-  /** 비우기 */
-  clear: (serviceKey: string) =>
-    coreApiClient.delete<ApiOk<{ removed: number }>>(`/store/cart/${serviceKey}`),
-
-  /** 주문 확정 — 공급자별 주문 생성 (Phase 1b). itemIds 미지정 시 전체. */
-  checkoutConfirm: (serviceKey: string, input?: { itemIds?: string[]; note?: string }) =>
-    coreApiClient.post<ApiOk<CheckoutConfirmResult>>(
-      `/store/cart/${serviceKey}/checkout-confirm`,
-      input ?? {},
-    ),
-};
+export const storeCartApi = createStoreCartApi(coreApiClient);

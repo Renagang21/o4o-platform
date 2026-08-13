@@ -63,8 +63,11 @@ export function StoreOverviewSection() {
     );
   }
 
-  const productCount = overview.products.glycopharm.totalCount + overview.products.cosmetics.listedCount;
-  const contentCount = overview.contents.totalSlotCount;
+  // WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1(F1): 공통 StoreHubOverview 타입에서
+  // cosmetics / totalSlotCount 는 KPA overview 에만 있는 optional 필드다. 값은 그대로, 방어만 추가.
+  const productCount =
+    overview.products.glycopharm.totalCount + (overview.products.cosmetics?.listedCount ?? 0);
+  const contentCount = overview.contents.totalSlotCount ?? 0;
   const signageCount = overview.signage.pharmacy.contentCount;
 
   return (
