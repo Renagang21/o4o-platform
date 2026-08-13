@@ -29,7 +29,6 @@ export class ForumPostController extends ForumControllerBase {
         (req.query.forumId as string) ||
         (req.query.categoryId as string) ||
         (req.query.category as string);
-      const serviceCode = (req.query.serviceCode as string | undefined)?.trim();
       const query = req.query.search as string || req.query.query as string;
       const tag = req.query.tag as string;
       const status = req.query.status as PostStatus;
@@ -82,22 +81,10 @@ export class ForumPostController extends ForumControllerBase {
         }
       }
 
-      // WO-O4O-COMMUNITY-FORUM-LIST-COMMONIZATION-V1:
-      // Service-scoped callers must pass serviceCode. The EXISTS join binds posts to
-      // forum_category_requests.service_code for both forumId and forumId-less reads.
-      // Missing serviceCode intentionally keeps the legacy generic/admin contract so
-      // existing non-service consumers are not broken; service frontends must opt in.
-      if (serviceCode) {
-        queryBuilder.andWhere(
-          `EXISTS (
-            SELECT 1 FROM forum_category_requests _svc
-            WHERE _svc.id = post.forum_id
-              AND _svc.service_code = :forumServiceCode
-              AND _svc.status = 'completed'
-          )`,
-          { forumServiceCode: serviceCode },
-        );
-      }
+      // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1:
+      //   임시 계약이던 req.query.serviceCode EXISTS 필터를 제거했다.
+      //   서비스 격리는 이제 route 의 forumContext → applyContextFilter 가 전담한다
+      //   (클라이언트가 보내는 값은 스푸핑 가능 — Boundary Policy Guard Rule 4).
 
       // Forum context filter (organization/community visibility)
       this.applyContextFilter(queryBuilder, 'post', this.getForumContext(req));
@@ -291,15 +278,35 @@ export class ForumPostController extends ForumControllerBase {
       // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1: forum_id resolution
       // 1) request body forumId 직접 지정 우선
       // 2) 없으면 forumSlug → forum_category_requests.id 조회
+      // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1:
+      //   forumId / forumSlug 는 모두 클라이언트 입력이므로 현재 서비스 컨텍스트의
+      //   forum 인지 확인한다. 컨텍스트가 없는 generic/admin 경로는 현행 유지.
+      const canonicalServiceKey = this.getCanonicalServiceKey(ctx);
       let resolvedForumId: string | null = null;
       if (forumIdFromBody && typeof forumIdFromBody === 'string') {
         resolvedForumId = forumIdFromBody;
       } else if (forumSlug && typeof forumSlug === 'string') {
         const rows = await this.postRepository.manager.query(
-          `SELECT id FROM forum_category_requests WHERE slug = $1 AND status = 'completed' LIMIT 1`,
-          [forumSlug],
+          canonicalServiceKey
+            ? `SELECT id FROM forum_category_requests WHERE slug = $1 AND status = 'completed' AND service_code = $2 LIMIT 1`
+            : `SELECT id FROM forum_category_requests WHERE slug = $1 AND status = 'completed' LIMIT 1`,
+          canonicalServiceKey ? [forumSlug, canonicalServiceKey] : [forumSlug],
         );
         resolvedForumId = rows[0]?.id ?? null;
+      }
+
+      if (canonicalServiceKey && (forumIdFromBody || forumSlug)) {
+        // 대상 forum 을 지정한 작성은 반드시 현재 서비스의 forum 이어야 한다.
+        const inScope =
+          !!resolvedForumId && (await this.isForumInServiceScope(resolvedForumId, ctx));
+        if (!inScope) {
+          res.status(403).json({
+            success: false,
+            error: 'This forum does not belong to the current service.',
+            code: 'FORUM_SERVICE_SCOPE_DENIED',
+          });
+          return;
+        }
       }
 
       const post = this.postRepository.create({
@@ -355,6 +362,16 @@ export class ForumPostController extends ForumControllerBase {
 
       const post = await this.postRepository.findOne({ where: { id } });
       if (!post) {
+        res.status(404).json({
+          success: false,
+          error: 'Post not found',
+        });
+        return;
+      }
+
+      // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1:
+      //   다른 서비스의 게시글은 존재 자체를 노출하지 않는다 (404, 403 아님).
+      if (!(await this.isForumInServiceScope(post.forumId, this.getForumContext(req)))) {
         res.status(404).json({
           success: false,
           error: 'Post not found',
@@ -453,6 +470,16 @@ export class ForumPostController extends ForumControllerBase {
 
       const post = await this.postRepository.findOne({ where: { id } });
       if (!post) {
+        res.status(404).json({
+          success: false,
+          error: 'Post not found',
+        });
+        return;
+      }
+
+      // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1:
+      //   다른 서비스의 게시글은 존재 자체를 노출하지 않는다 (404, 403 아님).
+      if (!(await this.isForumInServiceScope(post.forumId, this.getForumContext(req)))) {
         res.status(404).json({
           success: false,
           error: 'Post not found',
@@ -659,6 +686,17 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
+      // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1: 서비스 격리
+      let serviceCondition = '';
+      const canonicalServiceKey = this.getCanonicalServiceKey(ctx);
+      if (canonicalServiceKey) {
+        params.push(canonicalServiceKey);
+        serviceCondition = `AND EXISTS (
+             SELECT 1 FROM forum_category_requests _svc
+             WHERE _svc.id = p.forum_id AND _svc.service_code = $${params.length}
+           )`;
+      }
+
       params.push(limit);
       const limitIdx = params.length;
 
@@ -669,6 +707,7 @@ export class ForumPostController extends ForumControllerBase {
            AND p.tags IS NOT NULL
            AND array_length(p.tags, 1) > 0
            ${scopeCondition}
+           ${serviceCondition}
          GROUP BY tag
          ORDER BY count DESC
          LIMIT $${limitIdx}`,
