@@ -96,7 +96,7 @@ export async function fetchPharmacyHubForumPosts(params: {
   const total = body.total ?? body.totalCount ?? 0;
 
   return {
-    posts: (body.data ?? []).map((post): ForumListItem => ({
+    posts: (body.data ?? []).map((post: ForumPostRow): ForumListItem => ({
       id: post.id,
       title: post.title,
       authorName: post.authorName || '익명',
