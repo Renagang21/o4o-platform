@@ -230,3 +230,6 @@ export type {
   HandledProductsTableProps,
   HandledProductBadgeTone,
 } from './components/handled-products/HandledProductsListParts';
+
+// POP Composer (WO-O4O-MY-STORE-POP-COMPOSER-KCOS-GP-COMMONIZATION-V1)
+export * from './components/pop';
