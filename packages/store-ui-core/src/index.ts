@@ -86,6 +86,26 @@ export { computeStoreInsights } from './engine/storeInsightEngine';
 export { StoreHomeShell } from './components/StoreHomeShell';
 export type { StoreHomeShellProps } from './components/StoreHomeShell';
 
+// Store Home 공통 본문 파트 (WO-O4O-MY-STORE-HOME-CROSSSERVICE-COMMONIZATION-V1)
+// KPA / GlycoPharm / K-Cosmetics / Pharmacy-Hub 4서비스 "내 매장(약국) 홈" 공통 구조·동작.
+// 지표 항목·문구·목적지·행 표현은 서비스가 주입한다 (화면을 강제로 동일하게 만들지 않는다).
+export { StoreHomeMetricGrid } from './components/home/StoreHomeMetricGrid';
+export type {
+  StoreHomeMetricGridProps,
+  StoreHomeMetricItem,
+  StoreHomeMetricVariant,
+} from './components/home/StoreHomeMetricGrid';
+export { StoreHomeSignalList } from './components/home/StoreHomeSignalList';
+export type {
+  StoreHomeSignalListProps,
+  StoreHomeSignalItem,
+  StoreHomeSignalTone,
+} from './components/home/StoreHomeSignalList';
+export { StoreHomeActivityPanel } from './components/home/StoreHomeActivityPanel';
+export type { StoreHomeActivityPanelProps } from './components/home/StoreHomeActivityPanel';
+export { StoreHomeStateView } from './components/home/StoreHomeStateView';
+export type { StoreHomeStateViewProps, StoreHomeViewState } from './components/home/StoreHomeStateView';
+
 // Production Router Utils (WO-O4O-STORE-PRODUCTION-ROUTER-UTILS-COMMONIZATION-PHASE2-G-V1)
 export type { ProductionTarget, ProductionSourceItem, ProductionSource, ProductionRouterState } from './utils/productionUtils';
 export { buildProductionState, composeSourceTextFromItems, parseProductionRouterState, useProductionRouterState } from './utils/productionUtils';
