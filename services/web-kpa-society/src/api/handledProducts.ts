@@ -22,7 +22,11 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const BASE = `${API_BASE}/api/v1/store`;
 
 // Cross-service base shape comes from store-ui-core. KPA adds no service-only fields.
-export interface HandledProduct extends HandledProductListItem {}
+// WO-O4O-CI-LINT-RATCHET-MAIN-RED-RECOVERY-V1:
+//   빈 본문 `interface X extends Y {}` 는 `@typescript-eslint/no-empty-object-type` 위반이라
+//   main 의 ESLint ratchet 을 70(>69)으로 올려 전 PR 의 CI 를 막고 있었다.
+//   타입 별칭으로 바꾼다 — 타입 의미는 완전히 동일하다(구조·소비처 무변경).
+export type HandledProduct = HandledProductListItem;
 
 export interface HandledProductsResponse {
   success: boolean;
