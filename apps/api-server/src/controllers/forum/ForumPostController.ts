@@ -29,6 +29,7 @@ export class ForumPostController extends ForumControllerBase {
         (req.query.forumId as string) ||
         (req.query.categoryId as string) ||
         (req.query.category as string);
+      const serviceCode = (req.query.serviceCode as string | undefined)?.trim();
       const query = req.query.search as string || req.query.query as string;
       const tag = req.query.tag as string;
       const status = req.query.status as PostStatus;
@@ -81,7 +82,24 @@ export class ForumPostController extends ForumControllerBase {
         }
       }
 
-      // Forum context filter (service-bound visibility)
+      // WO-O4O-COMMUNITY-FORUM-LIST-COMMONIZATION-V1:
+      // Service-scoped callers must pass serviceCode. The EXISTS join binds posts to
+      // forum_category_requests.service_code for both forumId and forumId-less reads.
+      // Missing serviceCode intentionally keeps the legacy generic/admin contract so
+      // existing non-service consumers are not broken; service frontends must opt in.
+      if (serviceCode) {
+        queryBuilder.andWhere(
+          `EXISTS (
+            SELECT 1 FROM forum_category_requests _svc
+            WHERE _svc.id = post.forum_id
+              AND _svc.service_code = :forumServiceCode
+              AND _svc.status = 'completed'
+          )`,
+          { forumServiceCode: serviceCode },
+        );
+      }
+
+      // Forum context filter (organization/community visibility)
       this.applyContextFilter(queryBuilder, 'post', this.getForumContext(req));
 
       // Tag filter (exact match against tags array)
