@@ -5,14 +5,16 @@
  * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1
  * WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1 — /store-owner 하위를 공통 매장 셸로 편입
  * WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1 — /operator 하위를 공통 운영자 셸로 편입
+ * WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1 — /supplier 하위를 공급자 셸로 편입
  *
  * 라우트:
  *   /                            홈 (브랜드 표시 + 역할별 진입점)
  *   /login                       로그인 (serviceKey='pharmacy-hub')
  *   /join                        가입 신청 (public)
  *   /join/status                 내 가입 상태
- *   /supplier                    공급자 진입점        (MembershipGate)
- *   /supplier/products           내 상품 Pharmacy-Hub 제공 설정 (WO-...-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1)
+ *   /supplier                    공급자 셸 (SupplierShell)
+ *     ├ (index)                  공급자 진입점
+ *     └ /products                내 상품 Pharmacy-Hub 제공 설정 (WO-...-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1)
  *   /operator                    운영자 셸 (OperatorLayoutWrapper — 공통 OperatorAreaShell)
  *     ├ (index)                  서비스 운영자 진입점
  *     ├ /memberships             가입 신청 관리 목록
@@ -52,10 +54,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { AuthProvider } from './contexts/AuthContext';
-import { MembershipGate } from './components/MembershipGate';
 import { StoreOwnerShell } from './layouts/StoreOwnerShell';
 // WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1
 import { OperatorLayoutWrapper } from './layouts/OperatorLayoutWrapper';
+// WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1
+import { SupplierShell } from './layouts/SupplierShell';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RoleEntryPage from './pages/RoleEntryPage';
@@ -112,10 +115,17 @@ export default function App() {
           <Route path="/join" element={<JoinPage />} />
           <Route path="/join/status" element={<JoinStatusPage />} />
 
-          <Route
-            path="/supplier"
-            element={
-              <MembershipGate>
+          {/*
+            공급자 영역 셸 (WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1)
+            SupplierShell = MembershipGate + 공급자 헤더/사이드바 + <Outlet/>.
+            공통 Supplier Shell 은 아직 존재하지 않아(조사 결과 — CHECK §2) 최소 thin wrapper 로 둔다.
+            URL 2개(/supplier · /supplier/products) 는 그대로 두고 nested route 로만 정리한다 —
+            하위 화면 컴포넌트·상품 업무 로직 무변경.
+          */}
+          <Route path="/supplier" element={<SupplierShell />}>
+            <Route
+              index
+              element={
                 <RoleEntryPage
                   role={ROLES.supplier}
                   plannedFeatures={[
@@ -124,9 +134,10 @@ export default function App() {
                   ]}
                   links={[{ to: '/supplier/products', label: '상품 제공 설정' }]}
                 />
-              </MembershipGate>
-            }
-          />
+              }
+            />
+            <Route path="products" element={<SupplierProductsPage />} />
+          </Route>
 
           {/*
             운영자 영역 셸 (WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1)
@@ -152,16 +163,6 @@ export default function App() {
             <Route path="memberships" element={<MembershipsPage />} />
             <Route path="memberships/:membershipId" element={<MembershipDetailPage />} />
           </Route>
-
-          {/* WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1 — 권한 경계는 backend guard 가 강제 */}
-          <Route
-            path="/supplier/products"
-            element={
-              <MembershipGate>
-                <SupplierProductsPage />
-              </MembershipGate>
-            }
-          />
 
           {/*
             매장 경영 셸 (WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1)
