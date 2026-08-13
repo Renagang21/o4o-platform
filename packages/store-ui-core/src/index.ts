@@ -358,6 +358,29 @@ export type {
   StoreSlugErrorCode,
 } from './api/createStoreHubApi';
 
+// ─── 매장측 이벤트 오퍼 / HUB 콘텐츠 API 팩토리 ───
+// WO-O4O-STORE-HUB-API-CLIENT-AND-SERVICE-SCOPE-ALIGNMENT-V1
+//   createEventOfferApi : KCos·GP 사본(주석·export명·prefix만 달랐다) 통합. KPA legacy `/groupbuy*` 는 제외.
+//   createHubContentApi : `/hub/contents` 단일 계약. serviceKey 는 config 값.
+//                         응답 타입은 `@o4o/types` 의존을 Core 로 끌어오지 않기 위해 제네릭 주입.
+export { createEventOfferApi } from './api/createEventOfferApi';
+export type {
+  EventOfferHttp,
+  CreateEventOfferApiConfig,
+  EventOfferApiClient,
+  EnrichedEventOffer,
+  EnrichedEventOffersResponse,
+  EventOfferOrderResult,
+  EventOfferOrderResponse,
+} from './api/createEventOfferApi';
+export { createHubContentApi } from './api/createHubContentApi';
+export type {
+  HubContentHttp,
+  CreateHubContentApiConfig,
+  HubContentApiClient,
+  HubContentListParams,
+} from './api/createHubContentApi';
+
 // ─── buyer 주문(구매/발주) 내역 공통 View ───
 // WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1 §8
 //   buyer checkout ledger 계약(KPA·GlycoPharm)만 대상. K-Cosmetics 소비자 storefront 주문과
