@@ -64,6 +64,7 @@ import LoginPage from './pages/LoginPage';
 import RoleEntryPage from './pages/RoleEntryPage';
 import JoinPage from './pages/JoinPage';
 import JoinStatusPage from './pages/JoinStatusPage';
+import OperatorDashboardPage from './pages/operator/OperatorDashboardPage';
 import MembershipsPage from './pages/operator/MembershipsPage';
 import MembershipDetailPage from './pages/operator/MembershipDetailPage';
 // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
@@ -147,19 +148,12 @@ export default function App() {
             그대로 두고 nested route 로만 정리한다 — 하위 화면 컴포넌트도 무변경.
           */}
           <Route path="/operator" element={<OperatorLayoutWrapper />}>
-            <Route
-              index
-              element={
-                <RoleEntryPage
-                  role={ROLES.operator}
-                  plannedFeatures={[
-                    '커뮤니티 운영 · 신고 처리',
-                    '공지 · 운영자 콘텐츠',
-                  ]}
-                  links={[{ to: '/operator/memberships', label: '가입 신청 관리' }]}
-                />
-              }
-            />
+            {/*
+              WO-O4O-OPERATOR-CROSSSERVICE-SCREEN-CENSUS-AND-PHARMACYHUB-UX-COMMONIZATION-V1:
+                RoleEntryPage placeholder(후속 예정 기능 안내) 제거 →
+                실제 구현된 기능(가입 신청 승인)만으로 구성한 공통 5-Block 운영자 홈.
+            */}
+            <Route index element={<OperatorDashboardPage />} />
             <Route path="memberships" element={<MembershipsPage />} />
             <Route path="memberships/:membershipId" element={<MembershipDetailPage />} />
           </Route>

@@ -90,6 +90,23 @@ export async function fetchMembership(membershipId: string): Promise<MembershipD
   return res.data?.data ?? null;
 }
 
+/**
+ * 상태별 가입 신청 건수.
+ *
+ * WO-O4O-OPERATOR-CROSSSERVICE-SCREEN-CENSUS-AND-PHARMACYHUB-UX-COMMONIZATION-V1
+ * 운영자 홈 KPI 용. 전용 stats endpoint 는 백엔드에 없으므로 기존 목록 endpoint 의
+ * `pagination.total` 을 쓴다 (limit=1 로 행은 받지 않는다). 신규 API 를 만들지 않는다.
+ * 실패는 throw 한다 — 0 으로 삼키면 "신청 없음"과 구분되지 않는다.
+ */
+export async function fetchMembershipStatusCount(status: string): Promise<number> {
+  const res = await api.get('/pharmacy-hub/operator/memberships', {
+    params: { status, page: 1, limit: 1 },
+  });
+  const total = res.data?.data?.pagination?.total;
+  if (typeof total !== 'number') throw new Error('가입 신청 현황 응답 형식이 올바르지 않습니다.');
+  return total;
+}
+
 export async function approveMembership(membershipId: string): Promise<void> {
   await api.patch(`/pharmacy-hub/operator/memberships/${membershipId}/approve`);
 }

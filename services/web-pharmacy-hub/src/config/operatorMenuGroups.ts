@@ -19,6 +19,10 @@ import type { OperatorDomainIAConfig } from '@o4o/operator-ux-core';
 // ─── Unified Menu ─────────────────────────────────────────────
 
 export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> = {
+  // WO-O4O-OPERATOR-CROSSSERVICE-SCREEN-CENSUS-AND-PHARMACYHUB-UX-COMMONIZATION-V1:
+  //   /operator 가 RoleEntryPage placeholder 에서 실제 대시보드(OperatorDashboardPage)로
+  //   교체되어 데드링크가 아니게 되었으므로 KPA/KCos/Neture 와 동일하게 대시보드 항목을 노출한다.
+  dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   // 가입 신청 관리 = service_memberships 승인/반려 (MEMBERSHIP_APPROVAL capability).
   // 실제 권한 경계는 backend pharmacy-hub:operator scope guard 가 강제한다.
   approvals: [{ label: '가입 신청 관리', path: '/operator/memberships' }],
