@@ -239,3 +239,11 @@ export * from './components/library';
 
 // Store Tablet Displays (WO-O4O-MY-STORE-TABLET-DISPLAYS-KCOS-GP-COMMONIZATION-V1)
 export * from './components/tablet';
+
+// 매장 실행 분석 · 제품 마케팅 · POP 사본 · 상품 설명 · 사이니지 재생
+// (WO-O4O-MY-STORE-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1)
+export * from './components/analytics';
+export * from './components/product-marketing';
+export * from './components/pop-staff';
+export * from './components/product-descriptions';
+export * from './components/signage';
