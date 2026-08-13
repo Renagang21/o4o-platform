@@ -138,6 +138,26 @@ export type {
   SupplyCatalogAccent,
 } from './components/supply-catalog/SupplyCatalogHub';
 
+// 공급 상품 탐색 공통 Core (WO-O4O-STORE-HUB-SUPPLY-PRODUCT-EXPLORER-COMMONIZATION-V1)
+//   useSupplyProductList = 조회/페이지/필터/검색/loading/empty/error 상태 Core (headless)
+//   SupplyProductExplorer = 위 상태를 쓰는 목록 View (DataTable + Pagination + 필터 바)
+//   신청 · 제외 · 장바구니 · 주문은 담지 않는다 (서비스 액션).
+export { useSupplyProductList } from './components/supply-catalog/useSupplyProductList';
+export type {
+  SupplyProductListQuery,
+  SupplyProductListPage,
+  UseSupplyProductListOptions,
+  UseSupplyProductListResult,
+} from './components/supply-catalog/useSupplyProductList';
+export { SupplyProductExplorer } from './components/supply-catalog/SupplyProductExplorer';
+export type {
+  SupplyProductExplorerProps,
+  SupplyProductExplorerTab,
+  SupplyProductExplorerOption,
+  SupplyProductExplorerSelectFilter,
+  SupplyProductExplorerColumn,
+} from './components/supply-catalog/SupplyProductExplorer';
+
 // Shared Production Modal (WO-O4O-START-PRODUCTION-MODAL-SHARED-COMPONENT-PHASE2-H-V1)
 export { StartProductionModal } from './components/StartProductionModal';
 export type { StartProductionModalProps, StartProductionTargetConfig, StartProductionTemplateItem } from './components/StartProductionModal';

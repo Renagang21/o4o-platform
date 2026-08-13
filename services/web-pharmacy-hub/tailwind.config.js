@@ -11,6 +11,9 @@ export default {
     './src/**/*.{js,ts,jsx,tsx}',
     '../../packages/store-ui-core/src/**/*.{ts,tsx}',
     '../../packages/ui/src/**/*.{ts,tsx}',
+    // WO-O4O-STORE-HUB-SUPPLY-PRODUCT-EXPLORER-COMMONIZATION-V1:
+    //   공통 공급 상품 탐색 View 가 DataTable/Pagination(@o4o/operator-ux-core)을 사용한다.
+    '../../packages/operator-ux-core/src/**/*.{ts,tsx}',
     // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1:
     //   공통 계정 UI(@o4o/account-ui) 소비분의 클래스 누락 방지 (다른 4개 서비스와 동일 항목).
     '../../packages/account-ui/src/**/*.{ts,tsx}',

@@ -20,12 +20,14 @@
  *   - KPA fuller `HubB2BCatalogPage`(796줄)는 본 컴포넌트 범위 외(무변경).
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Plus, Check, Trash2, X, Loader2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ActionBar } from '@o4o/ui';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { useSupplyProductList } from './useSupplyProductList';
+import type { SupplyProductListQuery } from './useSupplyProductList';
 
 // ─── 공통 타입 ────────────────────────────────────────────────────────────────
 export interface SupplyCatalogProduct {
@@ -143,46 +145,46 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
   const headingDescription =
     heading?.description ?? '현재 활성 공급자가 제공 중인 상품을 탐색하고 내 매장에 추가할 수 있습니다.';
 
-  const [products, setProducts] = useState<T[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [distributionFilter, setDistributionFilter] = useState('all');
-  const [offset, setOffset] = useState(0);
-  const [total, setTotal] = useState(0);
   const [applyingId, setApplyingId] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkAdding, setBulkAdding] = useState(false);
 
-  const fetchCatalog = useCallback(async (distType: string, pageOffset: number) => {
-    setLoading(true);
-    setError(null);
-    setSelectedIds(new Set());
-    try {
-      const isOperator = distType === 'operator';
+  // WO-O4O-STORE-HUB-SUPPLY-PRODUCT-EXPLORER-COMMONIZATION-V1:
+  //   목록 조회 · 페이지네이션 · 탭 · loading/empty/error 상태를 공통 Core(useSupplyProductList)로 위임.
+  //   화면 구조(accent 탭 · 안내 박스 · 액션 컬럼 · ActionBar)와 API 계약은 그대로 둔다.
+  //   Core 는 1-indexed page 축이므로 offset 기반 getCatalog 는 여기 adapter 에서 환산한다.
+  const fetchPage = useCallback(
+    async ({ page, limit, tab }: SupplyProductListQuery) => {
+      const isOperator = tab === 'operator';
       const res = await api.getCatalog({
-        distributionType: distType === 'all' || isOperator ? undefined : distType,
+        distributionType: tab === 'all' || isOperator ? undefined : tab,
         operatorView: isOperator ? true : undefined,
-        limit: PAGE_LIMIT,
-        offset: pageOffset,
+        limit,
+        offset: (page - 1) * limit,
       });
-      setProducts(res.data);
-      setTotal(res.pagination.total);
-    } catch (e: any) {
-      setError(e?.message || '상품 카탈로그를 불러오지 못했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, [api]);
+      return { items: res.data, total: res.pagination.total };
+    },
+    [api],
+  );
 
-  useEffect(() => {
-    fetchCatalog(distributionFilter, offset);
-  }, [fetchCatalog, distributionFilter, offset]);
+  const list = useSupplyProductList<T>({
+    fetchPage,
+    limit: PAGE_LIMIT,
+    initialTab: 'all',
+    resolveErrorMessage: (e) =>
+      (e as { message?: string })?.message || '상품 카탈로그를 불러오지 못했습니다.',
+    onBeforeLoad: () => setSelectedIds(new Set()),
+  });
+
+  const products = list.items;
+  const setProducts = list.setItems;
+  const { loading, error, total } = list;
+  const distributionFilter = list.tab;
 
   const handleDistributionChange = (key: string) => {
     const safeKey = DISTRIBUTION_TABS.some(t => t.key === key) ? key : 'all';
-    setDistributionFilter(safeKey);
-    setOffset(0);
+    list.setTab(safeKey);
   };
 
   // ─── 단건 추가 (= 공급 상품 신청, ProductApproval PENDING) ─────────────────
@@ -332,8 +334,8 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
     },
   ], [applyingId, removingId, ac, supplierLabel]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
-  const currentPage = Math.floor(offset / PAGE_LIMIT) + 1;
+  const totalPages = list.totalPages;
+  const currentPage = list.page;
 
   return (
     <div className="px-1 py-2">
@@ -371,7 +373,7 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
         <div className="text-center py-16">
           <p className="text-sm text-red-500 mb-3">{error}</p>
           <button
-            onClick={() => fetchCatalog(distributionFilter, offset)}
+            onClick={list.reload}
             className={`px-4 py-2 text-sm border rounded-lg transition-colors ${ac.retryBtn}`}
           >
             다시 시도
@@ -429,7 +431,7 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
             <div className="flex items-center justify-center gap-4 mt-4">
               <button
                 disabled={currentPage <= 1}
-                onClick={() => setOffset(o => Math.max(0, o - PAGE_LIMIT))}
+                onClick={() => list.setPage(currentPage - 1)}
                 className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
               >
                 이전
@@ -437,7 +439,7 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
               <span className="text-sm text-slate-500">{currentPage} / {totalPages} · 전체 {total}건</span>
               <button
                 disabled={currentPage >= totalPages}
-                onClick={() => setOffset(o => o + PAGE_LIMIT)}
+                onClick={() => list.setPage(currentPage + 1)}
                 className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
               >
                 다음
