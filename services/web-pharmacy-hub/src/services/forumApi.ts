@@ -1,7 +1,13 @@
 import { api } from '../lib/apiClient';
 import type { ForumHubCategory, ForumHubPost, ForumListItem } from '@o4o/shared-space-ui';
 
-const SERVICE_CODE = 'pharmacy-hub';
+/**
+ * WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+ *
+ * 서비스 격리는 서버(route → forumContext → applyContextFilter)가 전담한다.
+ * 클라이언트는 서비스 전용 base 만 사용하고 serviceCode 질의 파라미터를 보내지 않는다.
+ */
+const FORUM_BASE = '/pharmacy-hub/forum';
 
 interface ForumDirectoryRow {
   id: string;
@@ -53,11 +59,10 @@ export interface PharmacyHubForumPostListResult {
 
 /** PharmacyHub forum directory adapter — shared SSOT, service-local rows only. */
 export async function fetchPharmacyHubForumCategories(): Promise<ForumHubCategory[]> {
-  const response = await api.get<ForumDirectoryResponse>('/forum/categories');
+  const response = await api.get<ForumDirectoryResponse>(`${FORUM_BASE}/categories`);
   const rows: ForumDirectoryRow[] = response.data?.data ?? [];
 
   return rows
-    .filter((forum) => forum.serviceCode === SERVICE_CODE)
     .map((forum) => ({
       id: forum.id,
       name: forum.name,
@@ -68,10 +73,7 @@ export async function fetchPharmacyHubForumCategories(): Promise<ForumHubCategor
     }));
 }
 
-/**
- * Service-scoped list adapter. serviceCode is always sent, including forumId-less reads,
- * so PharmacyHub never falls back to the generic cross-service list contract.
- */
+/** Service-scoped list adapter — base 자체가 PharmacyHub 컨텍스트다. */
 export async function fetchPharmacyHubForumPosts(params: {
   forumId?: string;
   page?: number;
@@ -79,14 +81,14 @@ export async function fetchPharmacyHubForumPosts(params: {
   search?: string;
   sortBy?: 'latest' | 'oldest' | 'popular';
 }): Promise<PharmacyHubForumPostListResult> {
-  const query = new URLSearchParams({ serviceCode: SERVICE_CODE });
+  const query = new URLSearchParams();
   if (params.forumId) query.set('forumId', params.forumId);
   if (params.page) query.set('page', String(params.page));
   if (params.limit) query.set('limit', String(params.limit));
   if (params.search) query.set('search', params.search);
   if (params.sortBy) query.set('sortBy', params.sortBy);
 
-  const response = await api.get<ForumPostListResponse>(`/forum/posts?${query.toString()}`);
+  const response = await api.get<ForumPostListResponse>(`${FORUM_BASE}/posts?${query.toString()}`);
   const body = response.data;
   if (!body.success) throw new Error(body.error || '게시글을 불러오지 못했습니다.');
 
@@ -127,4 +129,87 @@ export async function fetchPharmacyHubRecentPosts(limit = 10): Promise<ForumHubP
     createdAt: post.createdAt,
     isPinned: post.isPinned,
   }));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 상세 · 작성 — WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface PharmacyHubForumPostDetail {
+  id: string;
+  title: string;
+  content: unknown;
+  authorName: string;
+  authorId?: string | null;
+  createdAt: string;
+  updatedAt?: string | null;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+  isPinned: boolean;
+  type?: ForumListItem['postType'];
+  tags?: string[] | null;
+  forumId?: string | null;
+}
+
+interface ForumPostDetailResponse {
+  success: boolean;
+  data?: Record<string, any>;
+  error?: string;
+  code?: string;
+}
+
+/** 상세 조회 — postId(UUID) 또는 slug 모두 서버가 동일 endpoint 로 처리한다. */
+export async function fetchPharmacyHubForumPost(
+  postIdOrSlug: string,
+): Promise<PharmacyHubForumPostDetail> {
+  const response = await api.get<ForumPostDetailResponse>(
+    `${FORUM_BASE}/posts/${encodeURIComponent(postIdOrSlug)}`,
+  );
+  const body = response.data;
+  if (!body?.success || !body.data) {
+    throw new Error(body?.error || '게시글을 불러오지 못했습니다.');
+  }
+
+  const row = body.data;
+  return {
+    id: row.id,
+    title: row.title,
+    content: row.content,
+    authorName: row.authorName || '익명',
+    authorId: row.authorId ?? null,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt ?? null,
+    viewCount: row.viewCount ?? 0,
+    likeCount: row.likeCount ?? 0,
+    commentCount: row.commentCount ?? 0,
+    isPinned: Boolean(row.isPinned),
+    type: row.type,
+    tags: row.tags ?? null,
+    forumId: row.forumId ?? null,
+  };
+}
+
+export interface PharmacyHubForumCreatePayload {
+  forumId: string;
+  title: string;
+  content: string;
+  type?: string;
+}
+
+/** 작성 — 게시판(forumId)은 PharmacyHub 소속만 서버가 허용한다(403 FORUM_SERVICE_SCOPE_DENIED). */
+export async function createPharmacyHubForumPost(
+  payload: PharmacyHubForumCreatePayload,
+): Promise<{ id: string }> {
+  const response = await api.post<ForumPostDetailResponse>(`${FORUM_BASE}/posts`, {
+    forumId: payload.forumId,
+    title: payload.title,
+    content: payload.content,
+    ...(payload.type ? { type: payload.type } : {}),
+  });
+  const body = response.data;
+  if (!body?.success || !body.data?.id) {
+    throw new Error(body?.error || '게시글을 등록하지 못했습니다.');
+  }
+  return { id: body.data.id };
 }

@@ -12,8 +12,8 @@ const pharmacyHubForumConfig: ForumHubConfig = {
   fetchRecentPosts: fetchPharmacyHubRecentPosts,
   writePrompt: {
     authTitle: '커뮤니티에 참여해 보세요',
-    authDesc: '포럼을 선택해 정보를 확인할 수 있습니다. 글쓰기는 다음 단계에서 연결됩니다.',
-    ctaPath: '/forum/posts',
+    authDesc: '포럼을 선택해 정보를 확인하고, 바로 글을 작성할 수 있습니다.',
+    ctaPath: '/forum/write',
   },
   infoLinks: [
     { label: 'PharmacyHub 홈', href: '/' },

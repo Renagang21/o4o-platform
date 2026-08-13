@@ -76,6 +76,14 @@ export default function ForumListPage() {
   <h1 className="m-0 text-2xl font-bold text-slate-900">게시글 목록</h1>
   <p className="mt-1 text-sm text-slate-500">PharmacyHub 커뮤니티 · 총 {total}개</p>
 </div>
+<div className="flex items-center gap-2">
+<button
+  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white"
+  onClick={() => navigate(forumId ? `/forum/write?forum=${encodeURIComponent(forumId)}` : '/forum/write')}
+  type="button"
+>
+  글쓰기
+</button>
 <select
   value={sortBy}
   onChange={(event) => updateParams({ sort: event.target.value, page: undefined })}
@@ -85,6 +93,7 @@ export default function ForumListPage() {
   <option value="popular">인기순</option>
   <option value="oldest">오래된순</option>
 </select>
+</div>
         </div>
 
         <form
@@ -117,7 +126,7 @@ pinnedPosts={pinnedPosts}
 currentPage={page}
 totalPages={totalPages}
 onPageChange={(nextPage) => updateParams({ page: String(nextPage) })}
-onPostClick={() => undefined}
+onPostClick={(post) => navigate(`/forum/posts/${post.id}`)}
 loading={loading}
 error={error}
 onRetry={() => { void load(); }}
@@ -133,7 +142,7 @@ renderEmpty={() => (
         />
 
         <p className="mt-3 text-center text-xs text-slate-400">
-게시글 상세·작성·댓글은 다음 커뮤니티 공통화 단계에서 연결됩니다.
+댓글·좋아요는 다음 커뮤니티 공통화 단계에서 연결됩니다.
         </p>
       </div>
     </main>
