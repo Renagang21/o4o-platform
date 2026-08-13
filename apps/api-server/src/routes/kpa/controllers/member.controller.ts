@@ -22,6 +22,7 @@ import { organizationOpsService } from '../../../modules/organization/services/o
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 // WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1: businessInfo 주소·약국 전화 read 정렬 (read-only)
 import { resolveKpaBusinessContact } from '../shared/businessInfoRead.js';
+import { planKpaOrganizationContactSync } from '../shared/organizationContactSync.js';
 // WO-O4O-KPA-PROFILE-WRITE-JSONB-CONCAT-CONVERGENCE-V1: businessInfo 부분 갱신 (스냅샷 되쓰기 제거)
 import type { BusinessInfoPatch } from '../../../utils/business-info-write.js';
 import { applyBusinessInfoPatch, buildBusinessInfoUpdateStatement } from '../../../utils/business-info-write.js';
@@ -770,47 +771,52 @@ export function createMemberController(
               // 1-b. WO-O4O-KPA-STORE-INFO-PHARMACY-OWNER-DATA-FIX-V1:
               //   organizations 테이블에 약국 정보 동기화 (NULL 또는 빈 값만 채움, 기존 값 보존)
               //   소스: users.businessInfo (경로 B 사용자는 kpa_pharmacy_requests 없음)
+              //
+              // WO-O4O-KPA-APPROVAL-ORGANIZATION-CONTACT-WRITE-ALIGNMENT-V1:
+              //   주소·약국 전화의 원천 키 선택을 공통 resolver 로 수렴.
+              //   기존 구현의 3가지 불일치를 교정한다.
+              //     ① 주소가 `storeAddress` 우선이라 운영자가 고친 최신 `address` 가 밀렸다.
+              //     ② `businessAddress` / `businessAddressDetail` (가입 경로 키) fallback 이 없어
+              //        가입 시 입력한 주소가 organization 에 전혀 반영되지 않았다.
+              //     ③ 약국 전화가 `pharmacyPhone` (공통 운영자 콘솔 키) 을 못 보고,
+              //        대신 대표 전화 `biz.phone` 로 fallback 해 두 의미를 합쳤다.
+              //   우편번호는 지금까지 어디에도 기록되지 않아 address_detail.zipCode 로 채운다.
               try {
                 const orgMeta: Record<string, string | null> = {};
                 if (biz.taxInvoiceEmail) orgMeta.taxInvoiceEmail = biz.taxInvoiceEmail;
                 if (biz.ceoName) orgMeta.ceoName = biz.ceoName;
                 if (biz.contactName) orgMeta.contactName = biz.contactName;
                 if (biz.managerPhone) orgMeta.managerPhone = biz.managerPhone;
-                // pharmacy_phone 우선, 없으면 대표 phone
-                const phoneValue = (biz.metadata?.pharmacy_phone as string | undefined) || biz.phone || null;
                 await dataSource.query(
                   `UPDATE organizations SET
-                     phone = COALESCE(NULLIF(phone, ''), $1),
-                     business_number = COALESCE(NULLIF(business_number, ''), $2),
-                     metadata = COALESCE(metadata, '{}'::jsonb) || $3::jsonb
-                   WHERE id = $4`,
+                     business_number = COALESCE(NULLIF(business_number, ''), $1),
+                     metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb
+                   WHERE id = $3`,
                   [
-                    phoneValue,
                     biz.businessNumber || null,
                     JSON.stringify(orgMeta),
                     orgResult.id,
                   ],
                 );
-                // 구조화 주소 (storeAddress 우선, 없으면 레거시 address)
-                if (biz.storeAddress?.baseAddress) {
+
+                // 주소·약국 전화: 현재 organization 값을 먼저 읽어 "빈 칸만" 채운다.
+                //   기존 유효 값 보존이 계약이므로 SQL 의 COALESCE 가드도 함께 유지한다 (이중 방어).
+                const [orgRow] = await dataSource.query(
+                  `SELECT address, address_detail, phone FROM organizations WHERE id = $1 LIMIT 1`,
+                  [orgResult.id],
+                );
+                const contactPlan = planKpaOrganizationContactSync(biz, orgRow ?? null);
+                if (contactPlan.hasChanges) {
                   await dataSource.query(
                     `UPDATE organizations SET
                        address = COALESCE(NULLIF(address, ''), $1),
-                       address_detail = COALESCE(address_detail, $2::jsonb)
-                     WHERE id = $3`,
+                       address_detail = $2::jsonb || COALESCE(address_detail, '{}'::jsonb),
+                       phone = COALESCE(NULLIF(phone, ''), $3)
+                     WHERE id = $4`,
                     [
-                      [biz.storeAddress.baseAddress, biz.storeAddress.detailAddress].filter(Boolean).join(' '),
-                      JSON.stringify(biz.storeAddress),
-                      orgResult.id,
-                    ],
-                  );
-                } else if (biz.address) {
-                  await dataSource.query(
-                    `UPDATE organizations SET
-                       address = COALESCE(NULLIF(address, ''), $1)
-                     WHERE id = $2`,
-                    [
-                      [biz.address, biz.address2].filter(Boolean).join(' ').trim(),
+                      contactPlan.address,
+                      JSON.stringify(contactPlan.addressDetail ?? {}),
+                      contactPlan.phone,
                       orgResult.id,
                     ],
                   );
