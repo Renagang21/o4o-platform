@@ -77,6 +77,10 @@ import { cosmeticsActionConfig } from './action-definitions.js';
 /**
  * Create cosmetics routes
  */
+
+// WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+import { createServiceForumRouter } from '../forum/service-forum.routes.js';
+
 export function createCosmeticsRoutes(dataSource: DataSource): Router {
   const router = Router();
 
@@ -429,6 +433,20 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
     'k-cosmetics',
     'cosmetics:operator',
   ));
+
+
+  // ===========================================================================
+  // Forum Routes - /api/v1/cosmetics/forum/*
+  // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+  //   serviceCode 는 RBAC prefix(cosmetics) → canonical k-cosmetics.
+  //   `/operator/*` · `/admin/*` · `/category-requests/*` 는 기존 공통 경로 유지.
+  // ===========================================================================
+  router.use(
+    '/forum',
+    createServiceForumRouter({
+      context: { serviceCode: 'cosmetics', scope: 'community' },
+    }),
+  );
 
   return router;
 }

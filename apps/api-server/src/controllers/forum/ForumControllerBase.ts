@@ -8,7 +8,10 @@ import { User } from '../../modules/auth/entities/User.js';
 import type { SelectQueryBuilder } from 'typeorm';
 import type { ForumContext } from '../../middleware/forum-context.middleware.js';
 // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1: service-aware closed-forum bypass
-import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
+import {
+  resolveCanonicalServiceKey,
+  resolveRolePrefixFromCanonicalServiceKey,
+} from '@o4o/security-core';
 import { isPlatformAdmin, isServiceOperator } from '../../utils/role.utils.js';
 import type { ServiceKey } from '../../types/roles.js';
 
@@ -53,6 +56,14 @@ export class ForumControllerBase {
    *
    * WO-FORUM-SCOPE-SEPARATION-V1: scope-based filtering
    * WO-FORUM-DEMO-SCOPE-ISOLATION-V1: demo scope returns empty results
+   * WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1: service boundary
+   *
+   * Service boundary (applied FIRST, before every scope branch):
+   *   ctx.serviceCode (RBAC role prefix, e.g. 'kpa')
+   *     → resolveCanonicalServiceKey()  ('kpa-society')
+   *     → forum_category_requests.service_code
+   *   Each scope branch below returns early, so the service condition must be
+   *   ANDed before them or it would be skipped for community/organization/demo.
    *
    * Rules:
    * - No context (admin-dashboard /api/v1/forum): no filter → see everything
@@ -68,6 +79,13 @@ export class ForumControllerBase {
     ctx: ForumContext | undefined,
   ): void {
     if (!ctx) return; // admin/generic route — no filter
+
+    // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+    // Service isolation. MUST stay above the scope branches — each of them returns.
+    // ctx.serviceCode is the RBAC role prefix; the ledger column is the canonical
+    // service key, so the conversion SSOT (@o4o/security-core) is used here.
+    // No forum-local mapping table is introduced.
+    this.applyServiceScope(qb, alias, ctx);
 
     // WO-FORUM-DEMO-SCOPE-ISOLATION-V1: demo scope returns empty results
     // /demo/forum should not show community content
@@ -96,6 +114,66 @@ export class ForumControllerBase {
     } else {
       qb.andWhere(`${alias}.isOrganizationExclusive = false`);
     }
+  }
+
+  /**
+   * WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+   *
+   * AND the service boundary onto a post QueryBuilder.
+   *
+   * Canonical contract:
+   *   서비스 route → forumContextMiddleware → ForumContext.serviceCode (RBAC prefix)
+   *   → resolveCanonicalServiceKey() → forum_category_requests.service_code
+   *
+   * Deliberately does NOT filter on forum status — status는 별도 정책이며 여기서
+   * 함께 걸면 기존 서비스(KPA 등)의 노출 범위를 이 WO 밖에서 축소한다.
+   */
+  protected applyServiceScope<T>(
+    qb: SelectQueryBuilder<T>,
+    alias: string,
+    ctx: ForumContext | undefined,
+  ): void {
+    const canonical = this.getCanonicalServiceKey(ctx);
+    if (!canonical) return; // generic/admin route — 무필터 현행 유지
+
+    qb.andWhere(
+      `EXISTS (
+        SELECT 1 FROM forum_category_requests _svc
+        WHERE _svc.id = ${alias}.forum_id
+          AND _svc.service_code = :ctxServiceKey
+      )`,
+      { ctxServiceKey: canonical },
+    );
+  }
+
+  /**
+   * WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+   * ForumContext.serviceCode(RBAC prefix) → canonical service key. undefined = 무경계.
+   */
+  protected getCanonicalServiceKey(ctx: ForumContext | undefined): string | undefined {
+    const prefix = ctx?.serviceCode?.trim();
+    if (!prefix) return undefined;
+    return resolveCanonicalServiceKey(prefix);
+  }
+
+  /**
+   * WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+   * Write boundary: 대상 forum 이 현재 서비스 컨텍스트에 속하는지 확인한다.
+   * 컨텍스트가 없으면(generic/admin) 현행대로 통과시킨다.
+   */
+  protected async isForumInServiceScope(
+    forumId: string | null | undefined,
+    ctx: ForumContext | undefined,
+  ): Promise<boolean> {
+    const canonical = this.getCanonicalServiceKey(ctx);
+    if (!canonical) return true;
+    if (!forumId) return false;
+
+    const rows = await AppDataSource.query(
+      `SELECT 1 FROM forum_category_requests WHERE id = $1 AND service_code = $2 LIMIT 1`,
+      [forumId, canonical],
+    );
+    return rows.length > 0;
   }
 
   // ---------------------------------------------------------------------------
