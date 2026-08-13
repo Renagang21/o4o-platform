@@ -1,0 +1,339 @@
+name: Community forum list C apply
+on:
+  push:
+    branches: [work/commonization-community]
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.actor == 'Renagang21'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: work/commonization-community
+      - name: Apply PharmacyHub forum list adoption
+        run: |
+          cat > /tmp/forumApi.ts <<'EOF'
+          import { api } from '../lib/apiClient';
+          import type { ForumHubCategory, ForumHubPost, ForumListItem } from '@o4o/shared-space-ui';
+
+          const SERVICE_CODE = 'pharmacy-hub';
+
+          interface ForumDirectoryRow {
+            id: string;
+            name: string;
+            description?: string | null;
+            iconEmoji?: string | null;
+            iconUrl?: string | null;
+            serviceCode: string;
+            metadata?: Record<string, unknown> | null;
+          }
+
+          interface ForumDirectoryResponse {
+            success: boolean;
+            data?: ForumDirectoryRow[];
+          }
+
+          interface ForumPostRow {
+            id: string;
+            title: string;
+            authorName?: string | null;
+            createdAt: string;
+            commentCount?: number | null;
+            likeCount?: number | null;
+            viewCount?: number | null;
+            isPinned?: boolean | null;
+            type?: ForumListItem['postType'];
+            excerpt?: string | null;
+          }
+
+          interface ForumPostListResponse {
+            success: boolean;
+            data?: ForumPostRow[];
+            total?: number;
+            totalCount?: number;
+            page?: number;
+            limit?: number;
+            totalPages?: number;
+            pagination?: { page: number; limit: number; totalPages: number };
+            error?: string;
+          }
+
+          export interface PharmacyHubForumPostListResult {
+            posts: ForumListItem[];
+            page: number;
+            limit: number;
+            total: number;
+            totalPages: number;
+          }
+
+          /** PharmacyHub forum directory adapter — shared SSOT, service-local rows only. */
+          export async function fetchPharmacyHubForumCategories(): Promise<ForumHubCategory[]> {
+            const response = await api.get<ForumDirectoryResponse>('/forum/categories');
+            const rows: ForumDirectoryRow[] = response.data?.data ?? [];
+
+            return rows
+              .filter((forum) => forum.serviceCode === SERVICE_CODE)
+              .map((forum) => ({
+                id: forum.id,
+                name: forum.name,
+                description: forum.description ?? null,
+                iconEmoji: forum.iconEmoji ?? null,
+                iconUrl: forum.iconUrl ?? null,
+                postCount: 0,
+              }));
+          }
+
+          /**
+           * Service-scoped list adapter. serviceCode is always sent, including forumId-less reads,
+           * so PharmacyHub never falls back to the generic cross-service list contract.
+           */
+          export async function fetchPharmacyHubForumPosts(params: {
+            forumId?: string;
+            page?: number;
+            limit?: number;
+            search?: string;
+            sortBy?: 'latest' | 'oldest' | 'popular';
+          }): Promise<PharmacyHubForumPostListResult> {
+            const query = new URLSearchParams({ serviceCode: SERVICE_CODE });
+            if (params.forumId) query.set('forumId', params.forumId);
+            if (params.page) query.set('page', String(params.page));
+            if (params.limit) query.set('limit', String(params.limit));
+            if (params.search) query.set('search', params.search);
+            if (params.sortBy) query.set('sortBy', params.sortBy);
+
+            const response = await api.get<ForumPostListResponse>(`/forum/posts?${query.toString()}`);
+            const body = response.data;
+            if (!body.success) throw new Error(body.error || '게시글을 불러오지 못했습니다.');
+
+            const page = body.page ?? body.pagination?.page ?? params.page ?? 1;
+            const limit = body.limit ?? body.pagination?.limit ?? params.limit ?? 20;
+            const totalPages = body.totalPages ?? body.pagination?.totalPages ?? 0;
+            const total = body.total ?? body.totalCount ?? 0;
+
+            return {
+              posts: (body.data ?? []).map((post): ForumListItem => ({
+                id: post.id,
+                title: post.title,
+                authorName: post.authorName || '익명',
+                createdAt: post.createdAt,
+                commentCount: post.commentCount ?? 0,
+                likeCount: post.likeCount ?? 0,
+                viewCount: post.viewCount ?? 0,
+                isPinned: Boolean(post.isPinned),
+                postType: post.type,
+                excerpt: post.excerpt ?? undefined,
+                routeTo: '',
+              })),
+              page,
+              limit,
+              total,
+              totalPages,
+            };
+          }
+
+          export async function fetchPharmacyHubRecentPosts(limit = 10): Promise<ForumHubPost[]> {
+            const result = await fetchPharmacyHubForumPosts({ limit, sortBy: 'latest' });
+            return result.posts.map((post) => ({
+              id: post.id,
+              title: post.title,
+              authorName: post.authorName,
+              viewCount: post.viewCount ?? 0,
+              commentCount: post.commentCount,
+              createdAt: post.createdAt,
+              isPinned: post.isPinned,
+            }));
+          }
+          EOF
+          sed 's/^          //' /tmp/forumApi.ts > services/web-pharmacy-hub/src/services/forumApi.ts
+
+          mkdir -p services/web-pharmacy-hub/src/pages/forum
+          cat > /tmp/ForumListPage.tsx <<'EOF'
+          import { useCallback, useEffect, useMemo, useState } from 'react';
+          import { useNavigate, useSearchParams } from 'react-router-dom';
+          import { ForumListTemplate, type ForumListItem } from '@o4o/shared-space-ui';
+          import { fetchPharmacyHubForumPosts } from '../../services/forumApi';
+
+          const PAGE_SIZE = 20;
+
+          export default function ForumListPage() {
+            const navigate = useNavigate();
+            const [searchParams, setSearchParams] = useSearchParams();
+            const forumId = searchParams.get('forum') || undefined;
+            const page = Math.max(1, Number(searchParams.get('page') || 1));
+            const search = searchParams.get('q') || '';
+            const sortBy = (searchParams.get('sort') || 'latest') as 'latest' | 'oldest' | 'popular';
+
+            const [posts, setPosts] = useState<ForumListItem[]>([]);
+            const [totalPages, setTotalPages] = useState(0);
+            const [total, setTotal] = useState(0);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState<string | null>(null);
+            const [searchInput, setSearchInput] = useState(search);
+
+            useEffect(() => setSearchInput(search), [search]);
+
+            const load = useCallback(async () => {
+              setLoading(true);
+              setError(null);
+              try {
+                const result = await fetchPharmacyHubForumPosts({
+                  forumId,
+                  page,
+                  limit: PAGE_SIZE,
+                  search: search || undefined,
+                  sortBy,
+                });
+                setPosts(result.posts);
+                setTotalPages(result.totalPages);
+                setTotal(result.total);
+              } catch (err) {
+                setPosts([]);
+                setTotalPages(0);
+                setTotal(0);
+                setError(err instanceof Error ? err.message : '게시글을 불러오지 못했습니다.');
+              } finally {
+                setLoading(false);
+              }
+            }, [forumId, page, search, sortBy]);
+
+            useEffect(() => { void load(); }, [load]);
+
+            const pinnedPosts = useMemo(
+              () => (page === 1 && !search ? posts.filter((post) => post.isPinned) : []),
+              [page, posts, search],
+            );
+            const listPosts = useMemo(
+              () => (pinnedPosts.length ? posts.filter((post) => !post.isPinned) : posts),
+              [pinnedPosts, posts],
+            );
+
+            const updateParams = (patch: Record<string, string | undefined>) => {
+              const next = new URLSearchParams(searchParams);
+              Object.entries(patch).forEach(([key, value]) => {
+                if (value) next.set(key, value); else next.delete(key);
+              });
+              setSearchParams(next);
+            };
+
+            return (
+              <main className="min-h-screen bg-slate-50 py-8">
+                <div className="mx-auto max-w-5xl px-4">
+                  <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+                    <div>
+                      <button className="mb-2 text-sm text-blue-600" onClick={() => navigate('/forum')}>
+                        ← 커뮤니티 홈
+                      </button>
+                      <h1 className="m-0 text-2xl font-bold text-slate-900">게시글 목록</h1>
+                      <p className="mt-1 text-sm text-slate-500">PharmacyHub 커뮤니티 · 총 {total}개</p>
+                    </div>
+                    <select
+                      value={sortBy}
+                      onChange={(event) => updateParams({ sort: event.target.value, page: undefined })}
+                      className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+                    >
+                      <option value="latest">최신순</option>
+                      <option value="popular">인기순</option>
+                      <option value="oldest">오래된순</option>
+                    </select>
+                  </div>
+
+                  <form
+                    className="mb-4 flex gap-2"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      updateParams({ q: searchInput.trim() || undefined, page: undefined });
+                    }}
+                  >
+                    <input
+                      value={searchInput}
+                      onChange={(event) => setSearchInput(event.target.value)}
+                      placeholder="제목·내용 검색"
+                      className="min-w-0 flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+                    />
+                    <button className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white" type="submit">
+                      검색
+                    </button>
+                  </form>
+
+                  {!forumId && (
+                    <div className="mb-4 rounded-md border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                      전체 PharmacyHub 게시글을 표시합니다. 특정 게시판만 보려면 커뮤니티 홈에서 게시판을 선택하세요.
+                    </div>
+                  )}
+
+                  <ForumListTemplate
+                    posts={listPosts}
+                    pinnedPosts={pinnedPosts}
+                    currentPage={page}
+                    totalPages={totalPages}
+                    onPageChange={(nextPage) => updateParams({ page: String(nextPage) })}
+                    onPostClick={() => undefined}
+                    loading={loading}
+                    error={error}
+                    onRetry={() => { void load(); }}
+                    showPostType
+                    showLikeCount
+                    showCommentCount
+                    accentColor="#2563EB"
+                    renderEmpty={() => (
+                      <p className="m-0 text-sm text-slate-500">
+                        {search ? '검색 결과가 없습니다.' : '아직 등록된 글이 없습니다.'}
+                      </p>
+                    )}
+                  />
+
+                  <p className="mt-3 text-center text-xs text-slate-400">
+                    게시글 상세·작성·댓글은 다음 커뮤니티 공통화 단계에서 연결됩니다.
+                  </p>
+                </div>
+              </main>
+            );
+          }
+          EOF
+          sed 's/^          //' /tmp/ForumListPage.tsx > services/web-pharmacy-hub/src/pages/forum/ForumListPage.tsx
+
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('services/web-pharmacy-hub/src/pages/forum/ForumHubPage.tsx')
+          s = p.read_text()
+          s = s.replace(
+              "import { fetchPharmacyHubForumCategories } from '../../services/forumApi';",
+              "import { fetchPharmacyHubForumCategories, fetchPharmacyHubRecentPosts } from '../../services/forumApi';",
+          )
+          s = s.replace(
+              "categoryPath: (forumId) => `/forum?forum=${encodeURIComponent(forumId)}`,\n  listPath: '/forum',",
+              "categoryPath: (forumId) => `/forum/posts?forum=${encodeURIComponent(forumId)}`,\n  listPath: '/forum/posts',",
+          )
+          s = s.replace(
+              "  // 게시글 활동은 다음 단계(게시글 목록 공통화)에서 service scope를 닫은 뒤 연결한다.\n  fetchRecentPosts: async () => [],",
+              "  fetchRecentPosts: fetchPharmacyHubRecentPosts,",
+          )
+          s = s.replace("ctaPath: '/forum',", "ctaPath: '/forum/posts',")
+          p.write_text(s)
+
+          p = Path('services/web-pharmacy-hub/src/App.tsx')
+          s = p.read_text()
+          s = s.replace(
+              "import ForumHubPage from './pages/forum/ForumHubPage';",
+              "import ForumHubPage from './pages/forum/ForumHubPage';\nimport ForumListPage from './pages/forum/ForumListPage';",
+          )
+          anchor = """          <Route\n            path=\"/forum\"\n            element={\n              <MembershipGate>\n                <ForumHubPage />\n              </MembershipGate>\n            }\n          />\n"""
+          replacement = anchor + """          <Route\n            path=\"/forum/posts\"\n            element={\n              <MembershipGate>\n                <ForumListPage />\n              </MembershipGate>\n            }\n          />\n"""
+          assert anchor in s, 'App forum route anchor missing'
+          p.write_text(s.replace(anchor, replacement, 1))
+          PY
+      - name: Commit PharmacyHub list adoption
+        run: |
+          rm .github/workflows/community-forum-list-c-apply.yml
+          git config user.name "Rena"
+          git config user.email "sohae2100@gmail.com"
+          git add services/web-pharmacy-hub/src/services/forumApi.ts \
+                  services/web-pharmacy-hub/src/pages/forum/ForumHubPage.tsx \
+                  services/web-pharmacy-hub/src/pages/forum/ForumListPage.tsx \
+                  services/web-pharmacy-hub/src/App.tsx \
+                  .github/workflows/community-forum-list-c-apply.yml
+          git commit -m "feat(pharmacy-hub): adopt common forum list"
+          git push origin HEAD:work/commonization-community
