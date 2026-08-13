@@ -40,6 +40,8 @@ COPY packages/ui/package.json ./packages/ui/
 COPY packages/account-ui/package.json ./packages/account-ui/
 # WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1: 표준 편집기 (@o4o/* 의존 없음 — tiptap only)
 COPY packages/content-editor/package.json ./packages/content-editor/
+# WO-O4O-PHARMACY-HUB-COMMUNITY-HOME-COMMON-CORE-V1: 공통 Forum HUB template
+COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 # WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1:
 #   태블릿 Screen Set 편집기·kiosk 미리보기를 공유 패키지로 재사용한다.
 #   package.json 블록과 source 블록 **양쪽** 에 넣어야 한다 — 한쪽만 넣으면
@@ -65,6 +67,7 @@ COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/ui/ ./packages/ui/
 COPY packages/account-ui/ ./packages/account-ui/
 COPY packages/content-editor/ ./packages/content-editor/
+COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 COPY packages/tablet-screen-set-editor/ ./packages/tablet-screen-set-editor/
 COPY packages/screen-content-core/ ./packages/screen-content-core/
 COPY packages/tablet-kiosk-core/ ./packages/tablet-kiosk-core/

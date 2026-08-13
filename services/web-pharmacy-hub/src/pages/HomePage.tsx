@@ -59,6 +59,23 @@ export default function HomePage() {
         )}
       </section>
 
+      <section className="mb-8 rounded-lg border border-primary-100 bg-white p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="font-semibold text-gray-900">커뮤니티</h2>
+            <p className="mt-1 text-sm text-gray-600">
+              PharmacyHub 회원끼리 정보를 나누는 공간입니다.
+            </p>
+          </div>
+          <Link
+            to="/forum"
+            className="shrink-0 rounded bg-primary-600 px-4 py-2 text-sm font-medium text-white"
+          >
+            커뮤니티 보기
+          </Link>
+        </div>
+      </section>
+
       <section>
         <h2 className="mb-3 text-sm font-semibold text-gray-700">역할별 진입점</h2>
         <ul className="grid gap-3 sm:grid-cols-3">

@@ -25,6 +25,10 @@ import { createNetureB2bPaymentController } from './controllers/neture-b2b-payme
 // Neture 는 Blog 를 운영 대상으로 두지 않으며 canonical 콘텐츠 채널은 Forum + Content + AI editor.
 // store_blog_posts / store_blog_settings entity 와 KPA Blog 흐름 자체는 영향 없음.
 
+
+// WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+import { createServiceForumRouter } from '../forum/service-forum.routes.js';
+
 export function createNetureRoutes(dataSource: DataSource): Router {
   const router = Router();
 
@@ -76,6 +80,20 @@ export function createNetureRoutes(dataSource: DataSource): Router {
   // WO-O4O-NETURE-BLOG-RETIRE-V1: Blog 라우트 미등록.
   // Neture 는 Blog 를 운영 대상으로 두지 않음. /api/v1/neture/stores/:slug/blog/* endpoint 미노출.
   // KPA blog.controller / store_blog_posts / store_blog_settings entity 는 그대로 활성 (KPA 영향 없음).
+
+
+  // ===========================================================================
+  // Forum Routes - /api/v1/neture/forum/*
+  // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+  //   serviceCode 는 RBAC prefix(neture). 기존 쓰기 권한은 변경하지 않는다.
+  //   `/operator/*` · `/admin/*` · `/category-requests/*` 는 기존 공통 경로 유지.
+  // ===========================================================================
+  router.use(
+    '/forum',
+    createServiceForumRouter({
+      context: { serviceCode: 'neture', scope: 'community' },
+    }),
+  );
 
   return router;
 }

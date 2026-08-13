@@ -61,6 +61,11 @@ import { PharmacyHubStorePopController } from '../../controllers/pharmacy-hub/Ph
 import { PharmacyHubStoreSignageController } from '../../controllers/pharmacy-hub/PharmacyHubStoreSignageController.js';
 // WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1 (태블릿 · Screen Set)
 import { createStoreTabletRoutes } from '../platform/store-tablet.routes.js';
+// WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+import {
+  createServiceForumRouter,
+  requireActiveServiceMembership,
+} from '../forum/service-forum.routes.js';
 import { resolvePharmacyHubOrganizationForRoute } from '../../controllers/pharmacy-hub/pharmacy-hub-store-org.seam.js';
 // WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1
 import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/PharmacyHubCartController.js';
@@ -560,6 +565,20 @@ export function createPharmacyHubRoutes(): Router {
       resolveOrganizationId: resolvePharmacyHubOrganizationForRoute,
       qrServiceKey: SERVICE_KEY,
       operatorTemplateServiceKey: SERVICE_KEY,
+    }),
+  );
+
+  // ===========================================================================
+  // Forum Routes - /api/v1/pharmacy-hub/forum/*
+  // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+  //   serviceCode 는 RBAC prefix('pharmacy-hub'), scope 는 커뮤니티(조직 비귀속).
+  //   쓰기는 Pharmacy-Hub 활성 멤버십 보유자만 — mount 단계에서 차단한다.
+  // ===========================================================================
+  router.use(
+    '/forum',
+    createServiceForumRouter({
+      context: { serviceCode: SERVICE_KEY, scope: 'community' },
+      writeGuards: [requireActiveServiceMembership(SERVICE_KEY)],
     }),
   );
 
