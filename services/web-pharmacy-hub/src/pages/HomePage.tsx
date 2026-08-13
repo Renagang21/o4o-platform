@@ -2,6 +2,9 @@
  * HomePage — Pharmacy-Hub Foundation
  *
  * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
+ *
+ * 역할별 진입점 3개(약국 경영자 / 공급자 / 서비스 운영자)와 로그인 진입점만 노출한다.
+ * 실제 기능(카탈로그·주문·콘텐츠·커뮤니티)은 후속 WO.
  */
 
 import { Link } from 'react-router-dom';
@@ -10,9 +13,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { getServiceMembershipStatus } from '../lib/membershipGate';
 
 const ENTRIES = [
-  { to: '/store-owner', role: ROLES.storeOwner, desc: '매장 운영·공급 상품 확인' },
-  { to: '/supplier', role: ROLES.supplier, desc: '공급 상품·자료 제공' },
-  { to: '/operator', role: ROLES.operator, desc: '가입 신청 승인·회원 관리' },
+  { to: '/store-owner', role: ROLES.storeOwner, desc: '매장 운영·공급 상품 확인 (준비 중)' },
+  { to: '/supplier', role: ROLES.supplier, desc: '공급 상품·자료 제공 (준비 중)' },
+  { to: '/operator', role: ROLES.operator, desc: '가입 신청 승인·회원 관리 (커뮤니티는 준비 중)' },
 ];
 
 export default function HomePage() {
