@@ -4,9 +4,10 @@
 - **branch**: `work/commonization-store-hub` (worktree `C:\tmp\o4o-common-store-hub`)
 - **시작 상태**: clean · `HEAD` 12 ahead / **0 behind** `origin/main` → main 반영 불필요(선행 WO 에서 재기준 완료)
 - **성격**: 구현(데이터 계층 factory 화) + 전수 census
-- **핵심 결론**: Store Hub API client **기능군 19** 전수 확인. 실제 **문자 단위 사본**이던 2 기능군
+- **핵심 결론**: Store Hub API client **기능군 22** 전수 확인. 실제 **문자 단위 사본**이던 2 기능군
   (`eventOffer` · `hubContent`)을 공통 factory 로 통합했다. 서비스 화면 코드 **−176L / +93L**,
   공통 factory **+2 파일**. **정리 가능한 중복 client 사본 잔존 0.** backend · DB · migration 변경 **0**.
+- **종료 판정**: `MUST_FIX_BEFORE_CLOSE` **0** · `OPTIONAL_CLEANUP` 9 → §15 참조.
 
 ---
 
@@ -40,7 +41,7 @@ Neture: lib/api/* 중 store/hub/event-offer 계약 (§8 대조용)
 | **HUB Content** | `/hub/contents` **공용 네임스페이스** (prefix 조차 없음) | **SAME_CONTRACT** |
 | Event Offer (KPA) | legacy `/groupbuy*` (stats · my-participations 별도 집합) | **DIFFERENT_CONTRACT** |
 | HUB Content (KPA) | 같은 `/hub` 축이나 **비인증 raw `fetch`** + `producer` 필터 | **DIFFERENT_CONTRACT** |
-| buyer 주문 원장 | `/checkout/orders` (서비스 네임스페이스 하위) | **SAME_CONTRACT_DIFFERENT_PREFIX** |
+| buyer 주문 원장 | 경로는 `/checkout/orders` 로 같으나 **controller 가 서로 다른 order metadata 에서 다른 응답 key 생성**(KPA `organization` ↔ GP `pharmacy`) | **DIFFERENT_CONTRACT** ‡ |
 | PharmacyHub store-owner | 전용 `/pharmacy-hub/store-owner/*` controller 군 | **DIFFERENT_CONTRACT** |
 
 † 두 controller 의 **mount endpoint 집합**은 다르다(KCos 는 operator 승인·생성 surface 를 더 가진다).
@@ -48,8 +49,14 @@ Neture: lib/api/* 중 store/hub/event-offer 계약 (§8 대조용)
 `/enriched` 의 auth 가 KCos `optionalAuth` · GP `authenticate` 로 다르지만 **client 가 보내는 요청은 동일**하므로
 client factory 화에 영향이 없다(서비스 정책 차이는 backend 에 그대로 남는다).
 
-> **backend 가 같다는 이유만으로 client 를 합치지 않았다**(WO §2). 아래 §6 의 buyer 주문 원장이 그 사례다 —
-> backend 계약은 같지만 client 는 사본이 아니어서 합치지 않았다.
+‡ **경로가 같다는 이유만으로 SAME_CONTRACT 로 판정하지 않았다.** 응답 본문을 실제로 읽어 확인한 결과
+KPA `kpa-checkout.controller.ts:651` 은 `organization: { id: KpaOrderMetadata.organizationId, … }` 를,
+GP `glycopharm/checkout.controller.ts:648` 은 `pharmacy: { id: GlycopharmOrderMetadata.pharmacyId, … }` 를
+내려준다. 두 client 의 타입 차이(`BuyerOrder.organization?` ↔ `CheckoutOrderSummary.pharmacy?`)는
+**이름 drift 가 아니라 backend 계약의 정확한 반영**이다. 상세는 §9-1 #3.
+
+> **backend 가 같다는 이유만으로 client 를 합치지 않는다**(WO §2). 반대로 **경로가 같다고 계약이 같다고
+> 단정하지도 않았다** — buyer 주문 원장이 그 사례이며, 응답 본문 실측으로 계약 차이를 확인했다.
 
 ---
 
@@ -192,14 +199,17 @@ OrganizationProductListing · EventOffer)의 의미는 건드리지 않았다.**
 |---|---|---|---|
 | 1 | KPA `eventOffer.ts` (90L) | **DIFFERENT_CONTRACT** | legacy `/groupbuy*` 네임스페이스. endpoint 집합 자체가 다르다(stats · my-participations). 공통 factory 에 넣으면 서비스 분기가 factory 안으로 들어온다. |
 | 2 | KPA `hubContent.ts` (48L) | **DIFFERENT_CONTRACT** | **비인증 raw `fetch`** + `producer` 필터. 인증 자세가 다르다 — 전송 계층을 공유할 수 없다. |
-| 3 | buyer 주문 원장 (KPA `checkout.ts` / GP `pharmacy.ts`) | **SAME_CONTRACT_DIFFERENT_PREFIX · 사본 아님** | endpoint(`/checkout/orders`)는 같지만 **client 가 사본이 아니다**: KPA=독립 함수+`apiClient`(body 반환), GP=class 메서드+자체 `request` 래퍼+`StoreApiResponse` 타입. 공유 코드 0. 게다가 GP 는 `limit` 기본값 100 을 항상 전송하고 KPA 는 전송하지 않는다 → 합치면 **둘 중 하나의 전송이 바뀐다**(계약 변경 = §12 위반). GP 쪽은 597L class client 로 Store Hub 밖 화면이 다수 소비한다. **중복 "사본" 이 아니므로 §14 의 잔존 사본 집계에 넣지 않는다.** |
+| 3 | buyer 주문 원장 (KPA `checkout.ts` / GP `pharmacy.ts`) | **DIFFERENT_CONTRACT** | **backend 응답 계약 자체가 다르다**(실측). 같은 `/checkout/orders` 경로지만 서로 다른 controller 가 서로 다른 order metadata 모델에서 **다른 key** 를 만든다:<br>· KPA `kpa-checkout.controller.ts:651` → `organization: { id: KpaOrderMetadata.organizationId, name: …organizationName }`<br>· GP `glycopharm/checkout.controller.ts:648` → `pharmacy: { id: GlycopharmOrderMetadata.pharmacyId, name: …pharmacyName }`<br>client 타입 차이(`BuyerOrder.organization?` ↔ `CheckoutOrderSummary.pharmacy?`)는 **이름 drift 가 아니라 backend 계약의 반영**이다. 합치려면 backend 응답 key 를 바꿔야 하고 이는 §11 `backend 업무 의미 변경 금지` 에 저촉된다.<br>보조 사유: client 가 사본도 아니다(KPA=독립 함수+`apiClient`, GP=class 메서드+자체 `request` 래퍼, 공유 코드 0). |
 | 4 | `assetSnapshot.ts` (KPA 485 / KCos 103 / GP 105) | **SAME_CORE_WITH_SERVICE_POLICY · 범위 밖** | 실제 drift 존재(GP `list` 는 `type` 파라미터 지원, KCos 는 미지원). 소비처가 `/store*` 자산 복사(Agent C) 축이고 asset-copy-core Freeze(F3) 인접. §11 `Agent C /store* 관리 기능 변경` 금지. |
 | 5 | `blogStaff` · `popStaff` · `qrStaff` | **OUT_OF_SCOPE-BY-WO-§11** | 주 소비처가 Agent C `/store*` 실행 자산 관리 화면. Store Hub hub-import 화면은 "가져오기 대상 조회"로만 부수 소비한다. §11 명시 금지. |
 | 6 | `storeExecutionAssets` · `storeLibrary` | **OUT_OF_SCOPE-BY-WO-§11** | 동일 사유. |
 | 7 | `appreciation.ts` (KPA 74 / KCos 78 / GP 78) | **SAME_CONTRACT · 축 밖** | KCos↔GP 는 **주석 1줄 차이**의 완전 사본이고 prefix 조차 없다(`/appreciation/*`). 그러나 소비처가 forum · LMS · mypage · content 상세로 **Store Hub 축을 크게 벗어난다**(13 소비 파일 중 hub 는 2). Store Hub client factory 에 넣을 대상이 아니다 → **커뮤니티 축 후속 WO** 제안. |
-| 8 | KPA 단독 4종 (`videoStaff` 123 · `storeScreenSetHub` 212 · `multilingualProductContentStore` 321 · `contentHub` 78) | **SERVICE_SPECIFIC** | 다른 서비스에 **대응 파일 0건**(실측). 사본이 아니므로 공통화 대상 자체가 없다. 가짜 소비처를 만들지 않는다. |
-| 9 | PharmacyHub 14 파일 | **SERVICE_SPECIFIC (DIFFERENT_CONTRACT)** | §7. |
-| 10 | Neture `storeCart` · `eventOffer` · `hubContent` | **SERVICE_SPECIFIC-BY-WO-§8** | §8. 계약 동일성은 기록했고 편입은 WO 지침에 따라 보류. |
+| 8 | KPA 단독 5종 (`videoStaff` 123 · `storeScreenSetHub` 212 · `multilingualProductContentStore` 321 · `contentHub` 78 · `pharmacyInfo` 85) | **SERVICE_SPECIFIC** | 다른 서비스에 **대응 파일 0건**(실측). 사본이 아니므로 공통화 대상 자체가 없다. 가짜 소비처를 만들지 않는다. |
+| 9 | `cms.ts` (KPA 170 / KCos 104 / GP 160) | **DIFFERENT_CONTRACT · 축 밖** | endpoint 집합이 다르다 — KCos 2개(읽기 전용), GP 5개(`status` 변경·삭제 등 운영자 write 포함), KPA 는 base 자체가 `/api/v1/cms` 이고 `/stats` 보유. KCos↔GP diff 78 라인. 콘텐츠·운영자 축이며 Store Hub 화면은 목록 조회로만 부수 소비한다. |
+| 10 | `tabletDisplays.ts` (KPA 479 / GP 99) | **SERVICE_SPECIFIC · 축 밖** | diff 410 라인 — 사본이 아니라 서로 다른 구현이다(KPA 는 Screen Set 전체 기능, GP 는 최소 집합). Agent C 태블릿 축. |
+| 11 | `localProducts.ts` (KPA 167 / GP 116) | **OUT_OF_SCOPE-BY-WO-§11** | 소비처가 `/store/commerce/local-products`(내 매장 축). StoreLocalProduct 경계는 §11 이 보호 대상으로 명시. |
+| 12 | PharmacyHub 14 파일 | **SERVICE_SPECIFIC (DIFFERENT_CONTRACT)** | §7. |
+| 13 | Neture `storeCart` · `eventOffer` · `hubContent` | **SERVICE_SPECIFIC-BY-WO-§8** | §8. 계약 동일성은 기록했고 편입은 WO 지침에 따라 보류. |
 
 ### 9-2. 제거한 중복 (§10)
 
@@ -282,18 +292,25 @@ chunk size 경고는 기존과 동일한 사전 존재 경고다.
 
 **기능군 = "하나의 업무 계약 단위"** 로 센다(파일 수가 아니라).
 
-```
-전체 Store Hub API client 기능군: 19
+> **정정**: 초판에서 기능군을 19 로 집계했으나 KPA Store Hub 축 화면이 import 하는
+> `pharmacyInfo` · `cms` · `tabletDisplays` · `localProducts` **4 기능군의 판정이 누락**돼 있었다.
+> 재확인해 §9-1 #8~#11 에 판정을 채우고 아래 숫자를 **22 로 정정**한다. (미조사 0 조건 충족)
 
-공통 factory 소비:            5   (storeHub · supplyCatalog · storeCart · eventOffer★ · hubContent★)
-서비스별 thin adapter:       13   (위 5 factory 의 서비스 wrapper 파일: 3+3+3+2+2)
-SERVICE_SPECIFIC client:      9   (KPA legacy eventOffer · KPA hubContent · KPA 단독 4종 ·
-                                   PH 14파일 1군 · Neture 3계약 1군 · buyer 주문 원장)
-OUT_OF_SCOPE (WO §11 · 축 밖): 5   (blog/pop/qrStaff · storeExecutionAssets+storeLibrary ·
-                                   assetSnapshot · appreciation)
-중복 client 사본 잔존:         0
-미조사:                       0
 ```
+전체 Store Hub API client 기능군: 22
+
+공통 factory 소비:             5   (storeHub · supplyCatalog · storeCart · eventOffer★ · hubContent★)
+서비스별 thin adapter:        13   (위 5 factory 의 서비스 wrapper 파일: 3+3+3+2+2)
+SERVICE_SPECIFIC client:      10   (buyer 주문 원장 · KPA legacy eventOffer · KPA hubContent ·
+                                    KPA 단독 5종 · cms · tabletDisplays ·
+                                    PH 14파일 1군 · Neture 3계약 1군)
+OUT_OF_SCOPE (WO §11 · 축 밖):  7   (blog/pop/qrStaff · storeExecutionAssets+storeLibrary ·
+                                    assetSnapshot · appreciation · localProducts)
+중복 client 사본 잔존:          0
+미조사:                        0
+```
+
+합계 검산: 5 + 10 + 7 = **22** ✓
 
 ★ = 이번 WO 신규.
 
@@ -351,7 +368,62 @@ OUT_OF_SCOPE:       2
 
 ---
 
-## 15. 후속 제안 (이번 범위 밖)
+## 15. 종료 판정 — `MUST_FIX_BEFORE_CLOSE` / `OPTIONAL_CLEANUP`
+
+사용자 확정 기준(2026-08-13)에 따라 잔존 항목을 두 갈래로만 분류한다.
+
+**`MUST_FIX_BEFORE_CLOSE` 편입 조건 (이것만)**
+1. 동일 업무인데 서비스별 **중복 Core/View/API client** 가 남아 있음
+2. 한 곳 수정 시 다른 서비스에 반영되지 않아 **공통화 목표를 실제로 깨는 구조**
+3. route/menu/API scope drift 로 **실제 유지보수 위험**
+4. 공통화 대상인데 **미조사 또는 판정 누락**
+
+**완료를 막지 않는 것**: 업무 계약이 달라 의도적으로 분리한 것 · 단순 디자인 차이 ·
+선택적 개선 · 향후 확장 제안 · Agent C 등 다른 트랙 범위 · PharmacyHub 처럼 업무 모델이 다른 것.
+
+### 15-1. `MUST_FIX_BEFORE_CLOSE`
+
+| # | 항목 | 해당 조건 | 상태 |
+|---|---|---|---|
+| 1 | `eventOffer` KCos↔GP 문자 단위 사본 | 1 · 2 | **이번 WO 에서 해소** (`createEventOfferApi`) |
+| 2 | `hubContent` KCos↔GP 문자 단위 사본 | 1 · 2 | **이번 WO 에서 해소** (`createHubContentApi`) |
+| 3 | API client 기능군 4건 판정 누락(`pharmacyInfo`·`cms`·`tabletDisplays`·`localProducts`) | 4 | **이번 CHECK 에서 해소** (§9-1 #8~#11, 기능군 19→22 정정) |
+
+```
+MUST_FIX_BEFORE_CLOSE 잔존: 0
+```
+
+### 15-2. `OPTIONAL_CLEANUP` (완료를 막지 않음)
+
+| # | 항목 | 제외 사유 (기준 대조) |
+|---|---|---|
+| 1 | buyer 주문 원장 client 2벌 | **업무 계약이 다름** — backend 가 서로 다른 metadata 모델에서 다른 응답 key(`organization` ↔ `pharmacy`)를 만든다(§9-1 #3 실측). 합치려면 backend 응답 변경 필요 = §11 금지. |
+| 2 | KPA legacy `/groupbuy` eventOffer | **업무 계약이 다름** — endpoint 집합 자체가 다름. |
+| 3 | KPA `hubContent` 비인증 raw fetch | **업무 계약이 다름** — 인증 자세가 다름(공개 탐색). 전송 계층 공유 불가. |
+| 4 | Neture `storeCart` (canonical cart base 재구현, 6/7 메서드 동일) | **다른 트랙 범위** — Neture 공급자/B2B 축. WO §8 이 편입 보류를 명시. ※ 잠재 drift 로는 가장 값이 큼 → 후속 1순위. |
+| 5 | Neture `eventOffer` · `hubContent` | **다른 트랙 범위** — 동일 사유. |
+| 6 | `blogStaff`·`popStaff`·`qrStaff`·`storeExecutionAssets`·`storeLibrary`·`assetSnapshot` | **Agent C 트랙 범위** — §11 명시 금지. |
+| 7 | `appreciation` (KCos↔GP 주석 1줄 차이 사본) | **다른 트랙 범위** — 소비처 13개 중 11개가 forum·LMS·mypage. |
+| 8 | `cms` · `tabletDisplays` · `localProducts` | **업무 계약이 다름 / 다른 트랙** — §9-1 #9~#11. |
+| 9 | browser smoke · 실사용 write smoke | **선택적 검증** — 구조 갭 아님. write 는 사용자 승인 필요. |
+
+`OPTIONAL_CLEANUP` 잔존 9건은 위 기준에 따라 **완료를 막지 않는다.**
+
+### 15-3. Store Hub 공통화 종료 조건 대조
+
+| 조건 | 값 | 충족 |
+|---|---:|:---:|
+| 전체 모집단 확정 | 화면 32기능 · API client 22기능군 | ✅ |
+| 미조사 | **0** | ✅ |
+| VIEW_DUPLICATED | **0** | ✅ |
+| 정리 가능한 Core/API 중복 | **0** | ✅ |
+| `MUST_FIX_BEFORE_CLOSE` | **0** | ✅ |
+
+→ **Store Hub 공통화 완료** 선언 조건을 모두 만족한다.
+
+---
+
+## 16. 후속 제안 (이번 범위 밖)
 
 | # | 제안 | 사유 |
 |---|---|---|
