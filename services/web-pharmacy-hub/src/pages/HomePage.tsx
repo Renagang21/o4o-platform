@@ -2,9 +2,6 @@
  * HomePage — Pharmacy-Hub Foundation
  *
  * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
- *
- * 역할별 진입점 3개(약국 경영자 / 공급자 / 서비스 운영자)와 로그인 진입점만 노출한다.
- * 실제 기능(카탈로그·주문·콘텐츠·커뮤니티)은 후속 WO.
  */
 
 import { Link } from 'react-router-dom';
@@ -13,9 +10,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { getServiceMembershipStatus } from '../lib/membershipGate';
 
 const ENTRIES = [
-  { to: '/store-owner', role: ROLES.storeOwner, desc: '매장 운영·공급 상품 확인 (준비 중)' },
-  { to: '/supplier', role: ROLES.supplier, desc: '공급 상품·자료 제공 (준비 중)' },
-  { to: '/operator', role: ROLES.operator, desc: '가입 신청 승인·회원 관리 (커뮤니티는 준비 중)' },
+  { to: '/store-owner', role: ROLES.storeOwner, desc: '매장 운영·공급 상품 확인' },
+  { to: '/supplier', role: ROLES.supplier, desc: '공급 상품·자료 제공' },
+  { to: '/operator', role: ROLES.operator, desc: '가입 신청 승인·회원 관리' },
 ];
 
 export default function HomePage() {
@@ -57,6 +54,23 @@ export default function HomePage() {
             을 진행해 주세요.
           </p>
         )}
+      </section>
+
+      <section className="mb-8 rounded-lg border border-primary-100 bg-white p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="font-semibold text-gray-900">커뮤니티</h2>
+            <p className="mt-1 text-sm text-gray-600">
+              PharmacyHub 회원끼리 정보를 나누는 공간입니다.
+            </p>
+          </div>
+          <Link
+            to="/forum"
+            className="shrink-0 rounded bg-primary-600 px-4 py-2 text-sm font-medium text-white"
+          >
+            커뮤니티 보기
+          </Link>
+        </div>
       </section>
 
       <section>
