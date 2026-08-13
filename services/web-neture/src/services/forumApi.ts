@@ -14,6 +14,15 @@
 const USE_REAL_API = import.meta.env.VITE_USE_REAL_FORUM_API === 'true';
 
 import { api } from '../lib/apiClient';
+/**
+ * WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+ *
+ * 커뮤니티 읽기·쓰기는 서비스 컨텍스트 경로를 사용한다 (서버가 service scope 격리).
+ * `/forum/category-requests` · `/forum/operator` · `/forum/admin` 은 자체 serviceCode
+ * 권한 계약을 이미 갖고 있어 공통 경로를 그대로 유지한다.
+ */
+const FORUM_BASE = '/neture/forum';
+
 
 // ============================================================================
 // Types — imported from @o4o/types/forum (Single Source of Truth)
@@ -266,7 +275,7 @@ export async function fetchForumPosts(params: {
     if (params.search) queryParams.append('search', params.search);
     if (params.sortBy) queryParams.append('sortBy', params.sortBy);
 
-    const response = await api.get(`/forum/posts?${queryParams}`);
+    const response = await api.get(`${FORUM_BASE}/posts?${queryParams}`);
     const data = response.data;
 
     if (!data.success) {
@@ -320,7 +329,7 @@ export async function fetchForumPostBySlug(slug: string): Promise<PostResponse |
 
   // Real API call - get post by slug directly
   try {
-    const response = await api.get(`/forum/posts/${encodeURIComponent(slug)}`);
+    const response = await api.get(`${FORUM_BASE}/posts/${encodeURIComponent(slug)}`);
     const data = response.data;
 
     if (!data.success) {
@@ -358,7 +367,7 @@ export async function fetchForumComments(postId: string): Promise<CommentsRespon
 
   // Real API call
   try {
-    const response = await api.get(`/forum/posts/${postId}/comments`);
+    const response = await api.get(`${FORUM_BASE}/posts/${postId}/comments`);
     return response.data;
   } catch (error) {
     console.error('Error fetching forum comments:', error);
@@ -379,7 +388,7 @@ export async function fetchForumCategories(): Promise<ForumCategoryListResponse>
   }
 
   try {
-    const response = await api.get('/forum/categories');
+    const response = await api.get(`${FORUM_BASE}/categories`);
     return response.data;
   } catch (error) {
     console.error('Error fetching forum categories:', error);
@@ -414,7 +423,7 @@ export async function fetchPopularForums(limit: number = 6): Promise<{ success: 
   }
 
   try {
-    const response = await api.get(`/forum/categories/popular?limit=${limit}`);
+    const response = await api.get(`${FORUM_BASE}/categories/popular?limit=${limit}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching popular forums:', error);
@@ -603,7 +612,7 @@ export async function createForumPost(
 
   // Real API call
   try {
-    const response = await api.post('/forum/posts', {
+    const response = await api.post(`${FORUM_BASE}/posts`, {
       title: payload.title,
       content: payload.content,
       categorySlug: payload.categorySlug,
@@ -636,7 +645,7 @@ export async function createForumComment(
   parentId?: string
 ): Promise<{ success: boolean; data?: ForumComment; error?: string }> {
   try {
-    const response = await api.post('/forum/comments', { postId, content, parentId });
+    const response = await api.post(`${FORUM_BASE}/comments`, { postId, content, parentId });
     const data = response.data;
     return { success: true, data: data.data };
   } catch (error: any) {
@@ -657,7 +666,7 @@ export async function updateForumPost(
   payload: { title?: string; content?: any; categorySlug?: string }
 ): Promise<{ success: boolean; data?: ForumPost; error?: string }> {
   try {
-    const response = await api.put(`/forum/posts/${postId}`, payload);
+    const response = await api.put(`${FORUM_BASE}/posts/${postId}`, payload);
     const data = response.data;
     return { success: true, data: data.data };
   } catch (error: any) {
@@ -674,7 +683,7 @@ export async function toggleForumPostLike(
   postId: string
 ): Promise<{ success: boolean; data?: { likeCount: number; isLiked: boolean }; error?: string }> {
   try {
-    const response = await api.post(`/forum/posts/${postId}/like`, {});
+    const response = await api.post(`${FORUM_BASE}/posts/${postId}/like`, {});
     const data = response.data;
     return { success: true, data: data.data };
   } catch (error: any) {
@@ -688,7 +697,7 @@ export async function deleteForumPost(
   postId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    await api.delete(`/forum/posts/${postId}`);
+    await api.delete(`${FORUM_BASE}/posts/${postId}`);
     return { success: true };
   } catch (error: any) {
     const responseData = error?.response?.data;
@@ -705,7 +714,7 @@ export async function updateForumComment(
   content: string
 ): Promise<{ success: boolean; data?: ForumComment; error?: string }> {
   try {
-    const response = await api.put(`/forum/comments/${commentId}`, { content });
+    const response = await api.put(`${FORUM_BASE}/comments/${commentId}`, { content });
     const data = response.data;
     return { success: true, data: data.data };
   } catch (error: any) {
@@ -722,7 +731,7 @@ export async function deleteForumComment(
   commentId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    await api.delete(`/forum/comments/${commentId}`);
+    await api.delete(`${FORUM_BASE}/comments/${commentId}`);
     return { success: true };
   } catch (error: any) {
     const responseData = error?.response?.data;
@@ -737,7 +746,7 @@ export async function deleteForumComment(
 
 export async function fetchMyCategories(): Promise<{ success: boolean; data: any[] }> {
   try {
-    const response = await api.get('/forum/categories/mine');
+    const response = await api.get(`${FORUM_BASE}/categories/mine`);
     return response.data;
   } catch (error) {
     console.error('Error fetching my categories:', error);
@@ -750,7 +759,7 @@ export async function updateMyCategory(
   data: { name?: string; description?: string; iconEmoji?: string | null; iconUrl?: string | null },
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await api.patch(`/forum/categories/${id}/owner`, data);
+    const response = await api.patch(`${FORUM_BASE}/categories/${id}/owner`, data);
     return response.data;
   } catch (error: any) {
     const msg = error?.response?.data?.message || error?.response?.data?.error || '저장에 실패했습니다.';
@@ -763,7 +772,7 @@ export async function requestDeleteCategory(
   data: { reason?: string },
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await api.post(`/forum/categories/${id}/delete-request`, data);
+    const response = await api.post(`${FORUM_BASE}/categories/${id}/delete-request`, data);
     return response.data;
   } catch (error: any) {
     const msg = error?.response?.data?.message || error?.response?.data?.error || '삭제 요청에 실패했습니다.';

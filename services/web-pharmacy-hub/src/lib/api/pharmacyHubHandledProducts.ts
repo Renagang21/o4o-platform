@@ -15,7 +15,14 @@
  * 조회다. `/store-owner/products` 의 **공급 상품 목록(B2B 구매 대상)과는 다른 축**이며,
  * 주문 완료 상품이 자동으로 여기에 들어오지 않는다.
  */
+import type {
+  HandledProductListItem,
+  HandledProductsPagination,
+  HandledProductSource,
+} from '@o4o/store-ui-core/handled-products';
 import { api } from '../apiClient';
+
+export type { HandledProductSource } from '@o4o/store-ui-core/handled-products';
 
 const BASE = '/pharmacy-hub/store-owner/handled-products';
 
@@ -26,21 +33,8 @@ function unwrap<T>(body: any, fallbackMessage: string): T {
   return body.data as T;
 }
 
-export type HandledProductSource = 'listing' | 'local';
-
-export interface HandledProduct {
-  sourceType: HandledProductSource;
-  sourceId: string;
-  name: string;
-  imageUrl: string | null;
-  originLabel: string;
-  ownerLabel: string;
-  price: number | null;
-  isActive: boolean;
-  classificationCode: string;
-  classificationLabel: string;
-  updatedAt: string;
-  managePath: string;
+// Pharmacy-Hub keeps masterId as its service-local extension.
+export interface HandledProduct extends HandledProductListItem {
   masterId: string | null;
 }
 
@@ -54,7 +48,7 @@ export interface HandledStoreConnection {
 export interface HandledProductsPage {
   storeConnection: HandledStoreConnection;
   items: HandledProduct[];
-  pagination: { page: number; limit: number; total: number };
+  pagination: HandledProductsPagination;
 }
 
 export async function fetchHandledProducts(params?: {

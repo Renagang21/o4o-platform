@@ -17,7 +17,16 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 export interface ForumContext {
   /** Organization UUID — null means global (admin-dashboard) */
   organizationId?: string | null;
-  /** Service code for logging/debugging */
+  /**
+   * Service boundary key — NOT a logging label.
+   *
+   * WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+   *
+   * RBAC role prefix ('kpa' | 'cosmetics' | 'pharmacy-hub' | 'neture' | 'glycopharm').
+   * ForumControllerBase converts it with resolveCanonicalServiceKey() and matches
+   * forum_category_requests.service_code, so this value decides which service's
+   * forums/posts are readable and writable. 값이 없으면 격리가 적용되지 않는다.
+   */
   serviceCode?: string;
   /**
    * Forum scope — determines query filtering strategy

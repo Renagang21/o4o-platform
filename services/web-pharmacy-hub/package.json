@@ -19,6 +19,7 @@
     "@o4o/operator-core-ui": "workspace:*",
     "@o4o/operator-ux-core": "workspace:*",
     "@o4o/screen-content-core": "workspace:*",
+    "@o4o/shared-space-ui": "workspace:*",
     "@o4o/store-ui-core": "workspace:*",
     "@o4o/tablet-kiosk-core": "workspace:*",
     "@o4o/tablet-screen-set-editor": "workspace:*",

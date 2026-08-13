@@ -12,6 +12,10 @@
  *   /login                       로그인 (serviceKey='pharmacy-hub')
  *   /join                        가입 신청 (public)
  *   /join/status                 내 가입 상태
+ *   /forum                       커뮤니티 홈 (MembershipGate + 공통 ForumHubTemplate)
+ *   /forum/posts                 게시글 목록
+ *   /forum/posts/:postId         게시글 상세 (WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1)
+ *   /forum/write                 글쓰기      (동일 WO · write 권한은 backend guard 가 강제)
  *   /supplier                    공급자 셸 (SupplierShell)
  *     ├ (index)                  공급자 진입점
  *     └ /products                내 상품 Pharmacy-Hub 제공 설정 (WO-...-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1)
@@ -59,12 +63,18 @@ import { StoreOwnerShell } from './layouts/StoreOwnerShell';
 import { OperatorLayoutWrapper } from './layouts/OperatorLayoutWrapper';
 // WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1
 import { SupplierShell } from './layouts/SupplierShell';
+import { MembershipGate } from './components/MembershipGate';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RoleEntryPage from './pages/RoleEntryPage';
 import JoinPage from './pages/JoinPage';
 import JoinStatusPage from './pages/JoinStatusPage';
 import OperatorDashboardPage from './pages/operator/OperatorDashboardPage';
+import ForumHubPage from './pages/forum/ForumHubPage';
+import ForumListPage from './pages/forum/ForumListPage';
+// WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1 — 상세 · 작성
+import ForumDetailPage from './pages/forum/ForumDetailPage';
+import ForumWritePage from './pages/forum/ForumWritePage';
 import MembershipsPage from './pages/operator/MembershipsPage';
 import MembershipDetailPage from './pages/operator/MembershipDetailPage';
 // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
@@ -115,6 +125,42 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/join" element={<JoinPage />} />
           <Route path="/join/status" element={<JoinStatusPage />} />
+
+          {/* WO-O4O-PHARMACY-HUB-COMMUNITY-HOME-COMMON-CORE-V1 — active PharmacyHub 회원만 */}
+          <Route
+            path="/forum"
+            element={
+              <MembershipGate>
+                <ForumHubPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/forum/posts"
+            element={
+              <MembershipGate>
+                <ForumListPage />
+              </MembershipGate>
+            }
+          />
+
+          {/* WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1 */}
+          <Route
+            path="/forum/write"
+            element={
+              <MembershipGate>
+                <ForumWritePage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/forum/posts/:postId"
+            element={
+              <MembershipGate>
+                <ForumDetailPage />
+              </MembershipGate>
+            }
+          />
 
           {/*
             공급자 영역 셸 (WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1)

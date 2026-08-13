@@ -86,6 +86,40 @@ export { computeStoreInsights } from './engine/storeInsightEngine';
 export { StoreHomeShell } from './components/StoreHomeShell';
 export type { StoreHomeShellProps } from './components/StoreHomeShell';
 
+// Store Home 공통 본문 파트 (WO-O4O-MY-STORE-HOME-CROSSSERVICE-COMMONIZATION-V1)
+// KPA / GlycoPharm / K-Cosmetics / Pharmacy-Hub 4서비스 "내 매장(약국) 홈" 공통 구조·동작.
+// 지표 항목·문구·목적지·행 표현은 서비스가 주입한다 (화면을 강제로 동일하게 만들지 않는다).
+export { StoreHomeMetricGrid } from './components/home/StoreHomeMetricGrid';
+export type {
+  StoreHomeMetricGridProps,
+  StoreHomeMetricItem,
+  StoreHomeMetricVariant,
+} from './components/home/StoreHomeMetricGrid';
+export { StoreHomeSignalList } from './components/home/StoreHomeSignalList';
+export type {
+  StoreHomeSignalListProps,
+  StoreHomeSignalItem,
+  StoreHomeSignalTone,
+} from './components/home/StoreHomeSignalList';
+export { StoreHomeActivityPanel } from './components/home/StoreHomeActivityPanel';
+export type { StoreHomeActivityPanelProps } from './components/home/StoreHomeActivityPanel';
+export { StoreHomeStateView } from './components/home/StoreHomeStateView';
+export type { StoreHomeStateViewProps, StoreHomeViewState } from './components/home/StoreHomeStateView';
+// WO-O4O-MY-STORE-HOME-SHORTCUT-GRID-CROSSSERVICE-COMMONIZATION-V1
+export { StoreHomeShortcutGrid } from './components/home/StoreHomeShortcutGrid';
+export type {
+  StoreHomeShortcutGridProps,
+  StoreHomeShortcutItem,
+  StoreHomeShortcutVariant,
+} from './components/home/StoreHomeShortcutGrid';
+// WO-O4O-MY-STORE-HOME-STORE-STATUS-CARD-CROSSSERVICE-COMMONIZATION-V1
+export { StoreHomeStatusCard } from './components/home/StoreHomeStatusCard';
+export type {
+  StoreHomeStatusCardProps,
+  StoreHomeStatusMetaItem,
+  StoreHomeStatusVariant,
+} from './components/home/StoreHomeStatusCard';
+
 // Production Router Utils (WO-O4O-STORE-PRODUCTION-ROUTER-UTILS-COMMONIZATION-PHASE2-G-V1)
 export type { ProductionTarget, ProductionSourceItem, ProductionSource, ProductionRouterState } from './utils/productionUtils';
 export { buildProductionState, composeSourceTextFromItems, parseProductionRouterState, useProductionRouterState } from './utils/productionUtils';
@@ -119,6 +153,9 @@ export type {
   StoreLocalProductsApi,
   StoreLocalProduct,
   StoreLocalProductInput,
+  // WO-O4O-MY-STORE-LOCAL-PRODUCTS-CROSSSERVICE-COMMONIZATION-V1: KPA 수렴용 슬롯
+  StoreLocalProductsExtraColumn,
+  StoreLocalProductsFormModalContext,
 } from './components/local-products/StoreLocalProductsManager';
 
 // Store Hub 이벤트 오퍼 단순 목록 공통 (WO-O4O-STORE-HUB-EVENT-OFFER-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1)
@@ -159,3 +196,54 @@ export type {
   StoreOwnerServiceKey,
   StoreOwnerStaleRecovery,
 } from './auth/StoreOwnerGuard';
+
+// 매장 경영활용 제품 — 교차 서비스 데이터 계약 + 목록 UI 파트
+// (WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1)
+// 타입은 `@o4o/store-ui-core/handled-products` subpath 로도 노출된다(기존 소비처 유지).
+export {
+  handledProductKey,
+} from './types/handledProducts';
+export type {
+  HandledProductSource,
+  HandledProductListItem,
+  HandledProductsPagination as HandledProductsPaginationMeta,
+  HandledProductRef,
+} from './types/handledProducts';
+
+export {
+  HandledProductsPageHeader,
+  HandledProductsToolbar,
+  HandledProductsCountRow,
+  HandledProductsTable,
+  HandledProductsPagination,
+  HandledProductNameCell,
+  HandledProductBadge,
+  formatHandledProductPrice,
+  formatHandledProductDate,
+  handledProductClassificationLabel,
+} from './components/handled-products/HandledProductsListParts';
+export type {
+  HandledProductsPageHeaderProps,
+  HandledProductsToolbarProps,
+  HandledProductsColumn,
+  HandledProductsSelection,
+  HandledProductsTableProps,
+  HandledProductBadgeTone,
+} from './components/handled-products/HandledProductsListParts';
+
+// POP Composer (WO-O4O-MY-STORE-POP-COMPOSER-KCOS-GP-COMMONIZATION-V1)
+export * from './components/pop';
+
+// Store Library (WO-O4O-MY-STORE-LIBRARY-RESOURCES-CONTENTS-KCOS-GP-COMMONIZATION-V1)
+export * from './components/library';
+
+// Store Tablet Displays (WO-O4O-MY-STORE-TABLET-DISPLAYS-KCOS-GP-COMMONIZATION-V1)
+export * from './components/tablet';
+
+// 매장 실행 분석 · 제품 마케팅 · POP 사본 · 상품 설명 · 사이니지 재생
+// (WO-O4O-MY-STORE-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1)
+export * from './components/analytics';
+export * from './components/product-marketing';
+export * from './components/pop-staff';
+export * from './components/product-descriptions';
+export * from './components/signage';

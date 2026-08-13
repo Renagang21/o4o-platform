@@ -10,10 +10,29 @@
  *
  * 주문 완료 상품이 자동으로 이 목록에 들어오지 않는다. 등록은 이 화면의 명시적 행위다.
  * 조직은 서버가 결정한다 — 화면은 organizationId 를 보내지 않는다.
+ *
+ * WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1:
+ *   header/설명 · 검색 · 총 건수 · loading/error/empty · table 기본 구조 ·
+ *   제품명/분류/가격/수정일 표시 · pagination · row key 를 @o4o/store-ui-core 로 위임.
+ *   매장 연결 상태 · 공급상품 추가 · 활성/비활성 · 제거 정책 · API 는 이 서비스가 그대로 소유한다.
  */
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  HandledProductsPageHeader,
+  HandledProductsToolbar,
+  HandledProductsCountRow,
+  HandledProductsTable,
+  HandledProductsPagination,
+  HandledProductNameCell,
+  HandledProductBadge,
+  formatHandledProductPrice,
+  formatHandledProductDate,
+  handledProductClassificationLabel,
+  handledProductKey,
+  type HandledProductsColumn,
+} from '@o4o/store-ui-core';
 import { api } from '../../lib/apiClient';
 import {
   fetchHandledProducts,
@@ -35,13 +54,8 @@ const SOURCE_TABS: Array<{ value: 'all' | HandledProductSource; label: string }>
 ];
 
 const won = (v: number | null) => (typeof v === 'number' ? `${v.toLocaleString('ko-KR')}원` : '-');
-const day = (iso: string) => {
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
-};
-
-/** 행 식별 키 — sourceType + sourceId 조합(교차 소스 유일). */
-const rowKey = (it: Pick<HandledProduct, 'sourceType' | 'sourceId'>) => `${it.sourceType}:${it.sourceId}`;
+// 표시 포맷·행 키는 공통 계약(@o4o/store-ui-core)을 쓴다.
+const rowKey = handledProductKey;
 
 export default function StoreOwnerHandledProductsPage() {
   const [source, setSource] = useState<'all' | HandledProductSource>('all');
@@ -122,182 +136,157 @@ export default function StoreOwnerHandledProductsPage() {
 
   const notConnected = connection != null && connection.status !== 'connected';
 
+  // 공통 table 컬럼 정의 — 표시 규칙은 공통 헬퍼, 액션 컬럼은 서비스 소유.
+  const columns: Array<HandledProductsColumn<HandledProduct>> = [
+    {
+      key: 'product',
+      header: '제품',
+      align: 'left',
+      className: 'min-w-[240px]',
+      render: (it) => (
+        <HandledProductNameCell name={it.name} imageUrl={it.imageUrl} secondaryLabel={it.ownerLabel} />
+      ),
+    },
+    { key: 'origin', header: '구분', render: (it) => <HandledProductBadge text={it.originLabel} tone="blue" /> },
+    {
+      key: 'classification',
+      header: '분류',
+      render: (it) => {
+        const label = handledProductClassificationLabel(it);
+        return label === '미분류' ? (
+          <span className="text-slate-400">미분류</span>
+        ) : (
+          <HandledProductBadge text={label} tone="gray" />
+        );
+      },
+    },
+    { key: 'price', header: '매장 표시 가격', render: (it) => formatHandledProductPrice(it.price) },
+    {
+      key: 'active',
+      header: '상태',
+      render: (it) => (
+        <HandledProductBadge text={it.isActive ? '활성' : '비활성'} tone={it.isActive ? 'green' : 'muted'} />
+      ),
+    },
+    { key: 'updatedAt', header: '최근 수정', render: (it) => formatHandledProductDate(it.updatedAt) },
+    {
+      key: 'actions',
+      header: '관리',
+      align: 'right',
+      // PharmacyHub 전용 액션 — 활성/비활성 · 제거 · 자체 상품 정보 진입
+      render: (it) => {
+        const busy = busyKey === rowKey(it);
+        return (
+          <div className="flex justify-end gap-2 text-xs">
+            {it.sourceType === 'local' ? (
+              <Link to="/store-owner/local-products" className="text-primary-600 underline">
+                상품 정보
+              </Link>
+            ) : null}
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void toggleActive(it)}
+              className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40"
+            >
+              {it.isActive ? '비활성화' : '활성화'}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void remove(it)}
+              className="rounded border border-red-300 px-2 py-1 text-red-600 disabled:opacity-40"
+            >
+              제거
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const emptyContent = notConnected
+    ? '매장이 연결되면 취급 제품을 등록할 수 있습니다.'
+    : search
+      ? '조건에 맞는 제품이 없습니다.'
+      : '아직 취급 제품이 없습니다. ‘공급 상품에서 추가’로 등록해 주세요.';
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="mb-1 text-xl font-bold">매장 경영활용 제품</h1>
-      <p className="mb-6 text-sm text-gray-500">
-        약국에서 취급하기로 한 제품 목록입니다. 공급 상품 목록(B2B 구매 대상)과는 다른 축이며,
-        주문한 상품이 자동으로 등록되지는 않습니다.
-      </p>
+      <HandledProductsPageHeader
+        title="매장 경영활용 제품"
+        description={
+          <>
+            약국에서 취급하기로 한 제품 목록입니다. 공급 상품 목록(B2B 구매 대상)과는 다른 축이며,
+            주문한 상품이 자동으로 등록되지는 않습니다.
+          </>
+        }
+      />
 
+      {/* PharmacyHub 고유 — 매장 연결 상태 */}
       {notConnected && (
         <div className="mb-6">
           <StoreConnectionNotice connection={connection!} />
         </div>
       )}
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        {SOURCE_TABS.map((tab) => (
-          <button
-            key={tab.value}
-            type="button"
-            onClick={() => {
-              setSource(tab.value);
-              setPage(1);
-            }}
-            className={`rounded border px-3 py-1.5 text-sm ${
-              source === tab.value
-                ? 'border-primary-600 bg-primary-50 text-primary-600'
-                : 'border-gray-300 bg-white text-gray-600'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-        <form
-          className="ml-auto flex gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setPage(1);
-            setSearch(searchInput.trim());
-          }}
-        >
-          <input
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="제품명"
-            className="rounded border border-gray-300 px-3 py-1.5 text-sm"
-          />
-          <button type="submit" className="rounded border border-gray-300 px-3 py-1.5 text-sm">
-            검색
-          </button>
+      <HandledProductsToolbar
+        searchValue={searchInput}
+        onSearchChange={setSearchInput}
+        searchPlaceholder="제품명"
+        onSearchSubmit={() => {
+          setPage(1);
+          setSearch(searchInput.trim());
+        }}
+        leadingSlot={
+          <div className="flex flex-wrap items-center gap-2">
+            {SOURCE_TABS.map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => {
+                  setSource(tab.value);
+                  setPage(1);
+                }}
+                className={`rounded border px-3 py-1.5 text-sm ${
+                  source === tab.value
+                    ? 'border-primary-600 bg-primary-50 text-primary-600'
+                    : 'border-gray-300 bg-white text-gray-600'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        }
+        trailingSlot={
           <button
             type="button"
             disabled={notConnected}
             onClick={() => setShowAdd(true)}
-            className="rounded border border-primary-600 bg-primary-600 px-3 py-1.5 text-sm text-white disabled:opacity-40"
+            className="whitespace-nowrap rounded border border-primary-600 bg-primary-600 px-3 py-1.5 text-sm text-white disabled:opacity-40"
           >
             공급 상품에서 추가
           </button>
-        </form>
-      </div>
+        }
+      />
 
-      {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
+      <HandledProductsCountRow total={total} />
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs text-gray-500">
-            <tr>
-              <th className="px-3 py-2">제품</th>
-              <th className="px-3 py-2">구분</th>
-              <th className="px-3 py-2">분류</th>
-              <th className="px-3 py-2 text-right">매장 표시 가격</th>
-              <th className="px-3 py-2">상태</th>
-              <th className="px-3 py-2">최근 수정</th>
-              <th className="px-3 py-2 text-right">관리</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={7} className="px-3 py-6 text-center text-gray-500">
-                  불러오는 중…
-                </td>
-              </tr>
-            ) : items.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-3 py-6 text-center text-gray-500">
-                  {notConnected
-                    ? '매장이 연결되면 취급 제품을 등록할 수 있습니다.'
-                    : search
-                      ? '조건에 맞는 제품이 없습니다.'
-                      : '아직 취급 제품이 없습니다. ‘공급 상품에서 추가’로 등록해 주세요.'}
-                </td>
-              </tr>
-            ) : (
-              items.map((it) => {
-                const key = rowKey(it);
-                const busy = busyKey === key;
-                return (
-                  <tr key={key} className="border-t border-gray-100">
-                    <td className="px-3 py-2">
-                      <span className="font-medium">{it.name}</span>
-                      <span className="block text-xs text-gray-400">{it.ownerLabel}</span>
-                    </td>
-                    <td className="px-3 py-2 text-xs">{it.originLabel}</td>
-                    <td className="px-3 py-2 text-xs">
-                      {it.classificationCode && it.classificationCode !== 'unknown'
-                        ? it.classificationLabel
-                        : '미분류'}
-                    </td>
-                    <td className="px-3 py-2 text-right">{won(it.price)}</td>
-                    <td className="px-3 py-2 text-xs">
-                      <span
-                        className={`rounded px-1.5 py-0.5 ${
-                          it.isActive ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'
-                        }`}
-                      >
-                        {it.isActive ? '활성' : '비활성'}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 text-xs text-gray-500">{day(it.updatedAt)}</td>
-                    <td className="px-3 py-2 text-right">
-                      <div className="flex justify-end gap-2 text-xs">
-                        {/* O4O 상품 정보 진입 — listing 은 공급 상품 상세, local 은 자체 상품 화면 */}
-                        {it.sourceType === 'local' ? (
-                          <Link to="/store-owner/local-products" className="text-primary-600 underline">
-                            상품 정보
-                          </Link>
-                        ) : null}
-                        <button
-                          type="button"
-                          disabled={busy}
-                          onClick={() => void toggleActive(it)}
-                          className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40"
-                        >
-                          {it.isActive ? '비활성화' : '활성화'}
-                        </button>
-                        <button
-                          type="button"
-                          disabled={busy}
-                          onClick={() => void remove(it)}
-                          className="rounded border border-red-300 px-2 py-1 text-red-600 disabled:opacity-40"
-                        >
-                          제거
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+      <HandledProductsTable
+        items={items}
+        columns={columns}
+        loading={loading}
+        error={error}
+        emptyContent={emptyContent}
+      />
 
-      {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-          <button
-            type="button"
-            disabled={page <= 1}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
-          >
-            이전
-          </button>
-          <span className="text-gray-500">
-            {page} / {totalPages} (총 {total}건)
-          </span>
-          <button
-            type="button"
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            className="rounded border border-gray-300 px-3 py-1 disabled:opacity-40"
-          >
-            다음
-          </button>
-        </div>
-      )}
+      <HandledProductsPagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        onPageChange={(next) => setPage(Math.min(Math.max(1, next), totalPages))}
+      />
 
       <p className="mt-6 text-sm">
         <Link to="/store-owner" className="text-gray-500 underline">

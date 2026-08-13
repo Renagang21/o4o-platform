@@ -8,38 +8,27 @@
  *   매장 경영활용 제품의 온라인몰/상품설명은 구조적으로 'not_supported'.
  */
 
+import type {
+  HandledProductListItem,
+  HandledProductsPagination,
+  HandledProductSource,
+} from '@o4o/store-ui-core/handled-products';
 import { getAccessToken } from '../contexts/AuthContext';
 import { tryRefreshToken } from './token-refresh';
+
+export type { HandledProductSource } from '@o4o/store-ui-core/handled-products';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const BASE = `${API_BASE}/api/v1/store`;
 
-export type HandledProductSource = 'listing' | 'local';
-
-// WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1:
-//   제품 풀 화면에서 채널 상태(타블렛/온라인몰/상품설명) 컬럼을 제거 → 해당 필드도 응답/타입에서 제거.
-//   채널 노출은 각 채널 메뉴에서 관리한다.
-export interface HandledProduct {
-  sourceType: HandledProductSource;
-  sourceId: string;
-  name: string;
-  imageUrl: string | null;
-  originLabel: string;
-  ownerLabel: string;
-  price: number | null;
-  isActive: boolean;
-  // WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: O4O 표준 분류(코드+표시 라벨). 분류 없으면 '미분류'.
-  classificationCode: string;
-  classificationLabel: string;
-  updatedAt: string;
-  managePath: string;
-}
+// Cross-service base shape comes from store-ui-core. KPA adds no service-only fields.
+export type HandledProduct = HandledProductListItem;
 
 export interface HandledProductsResponse {
   success: boolean;
   data: {
     items: HandledProduct[];
-    pagination: { page: number; limit: number; total: number };
+    pagination: HandledProductsPagination;
   };
 }
 
@@ -167,4 +156,3 @@ export async function fetchHandledProductQrFile(
   }
   return response.blob();
 }
-
