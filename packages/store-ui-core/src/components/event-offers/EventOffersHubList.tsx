@@ -1,30 +1,20 @@
 /**
- * EventOffersHubList — Store Hub 이벤트 오퍼 단순 목록 공통 컴포넌트.
+ * EventOffersHubList — Store Hub 이벤트 오퍼 단순 목록 (GP/KCos 진입점).
  *
- * WO-O4O-STORE-HUB-EVENT-OFFER-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1:
- *   GP/KCos `HubEventOffersPage`(209/212줄 near-identical, diff=api client+테마색)를 통합.
- *   service 별 listActive + addToCart(장바구니 담기) + accent 색만 props 로 주입.
+ * WO-O4O-STORE-HUB-EVENT-OFFER-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1: GP/KCos 통합
+ * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
+ *   테이블 마크업을 공통 `EventOfferHubView` 로 이관하고, 이 컴포넌트는
+ *   **조회 상태 + 장바구니 담기 + 단순 목록 config** 만 소유한다.
+ *   서비스 wrapper(props: listActive / addToCart / accent) 계약은 그대로다.
  *
  * 도메인: 이벤트 오퍼 = 이벤트형 O4O 주문 가능 상품. 진행 중(active/approved+isActive)만 노출.
  *   장바구니 담기 → /store-hub/cart → checkout-confirm → checkout_orders(buyer).
- *   (KPA KpaEventOfferPage(enriched/탭/stats/인라인 bulk) 는 본 컴포넌트 대상 아님 — 별도 유지.)
  */
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2, Tag, ShoppingCart } from 'lucide-react';
-import { resolveEventOfferStatusLabel } from './eventOfferStatus';
-
-/** 배지 스타일만 화면이 소유하고, 라벨은 공통 매핑(EVENT_OFFER_STATUS_LABEL)을 쓴다. */
-const STATUS_BADGE_CLASS: Record<string, string> = {
-  active:   'bg-green-100 text-green-700',
-  approved: 'bg-blue-100 text-blue-700',
-  pending:  'bg-yellow-100 text-yellow-700',
-  upcoming: 'bg-blue-100 text-blue-700',
-  sold_out: 'bg-slate-100 text-slate-500',
-  ended:    'bg-slate-100 text-slate-500',
-  canceled: 'bg-red-100 text-red-500',
-};
+import { Loader2, ShoppingCart } from 'lucide-react';
+import { EventOfferHubView } from './EventOfferHubView';
 
 /** accent 별 정적 Tailwind class (동적 class 생성 금지) */
 const ACCENT_CLASSES = {
@@ -64,12 +54,7 @@ export interface EventOffersHubListProps<T extends EventOfferHubItem> {
   accent?: EventOffersHubAccent;
 }
 
-function formatPrice(value: number | null): string {
-  if (value == null) return '-';
-  return '₩' + value.toLocaleString('ko-KR');
-}
-
-function formatDate(iso: string | null): string {
+function formatCreatedAt(iso: string | null): string {
   if (!iso) return '-';
   try {
     return new Date(iso).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
@@ -101,7 +86,11 @@ export function EventOffersHubList<T extends EventOfferHubItem>({
       setOffers(data);
     } catch (err: any) {
       const status = err?.response?.status;
-      setError(status === 401 || status === 403 ? '접근 권한이 없습니다.' : '이벤트 오퍼를 불러오지 못했습니다.');
+      setError(
+        status === 401 || status === 403
+          ? '접근 권한이 없습니다.'
+          : '이벤트 오퍼를 불러오지 못했습니다.',
+      );
       setOffers([]);
     } finally {
       setLoading(false);
@@ -130,102 +119,51 @@ export function EventOffersHubList<T extends EventOfferHubItem>({
   );
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">이벤트 오퍼</h1>
-          <p className="text-slate-500 mt-1 text-sm">
-            승인된 이벤트 오퍼를 장바구니에 담아 내 장바구니에서 주문 확정합니다.
-          </p>
-        </div>
-        <Link
-          to="/store-hub/cart"
-          className={`shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold rounded-lg border bg-white transition-colors ${a.link}`}
-        >
-          <ShoppingCart size={15} /> 내 장바구니
-        </Link>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-          {error}
-        </div>
-      )}
-
-      <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
-        {loading ? (
-          <div className="flex justify-center items-center py-16">
-            <Loader2 size={28} className={`animate-spin ${a.spinner}`} />
-          </div>
-        ) : offers.length === 0 ? (
-          <div className="text-center py-16 text-slate-500">
-            <Tag size={36} className="mx-auto mb-3 text-slate-300" />
-            <p className="font-medium text-sm">진행 중인 이벤트 오퍼가 없습니다.</p>
-            <p className="text-xs mt-1 text-slate-400">
-              운영자가 승인한 이벤트가 여기에 표시됩니다.
+    <EventOfferHubView<T>
+      items={offers}
+      loading={loading}
+      spinnerClassName={a.spinner}
+      header={
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800">이벤트 오퍼</h1>
+            <p className="text-slate-500 mt-1 text-sm">
+              승인된 이벤트 오퍼를 장바구니에 담아 내 장바구니에서 주문 확정합니다.
             </p>
           </div>
-        ) : (
-          <div>
-            {/* Table Header */}
-            <div className="grid grid-cols-[2fr_1.2fr_1fr_1fr_1fr_140px] gap-4 px-5 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-              <span>상품명</span>
-              <span>공급사</span>
-              <span>가격</span>
-              <span>승인일</span>
-              <span>상태</span>
-              <span className="text-right">작업</span>
-            </div>
-
-            {offers.map((offer) => {
-              const badgeCls = STATUS_BADGE_CLASS[offer.status] ?? STATUS_BADGE_CLASS.approved;
-              const badgeLabel = resolveEventOfferStatusLabel(offer.status);
-              const displayPrice = offer.price ?? offer.unitPrice;
-              return (
-                <div
-                  key={offer.id}
-                  className="grid grid-cols-[2fr_1.2fr_1fr_1fr_1fr_140px] gap-4 px-5 py-4 border-b border-slate-100 last:border-0 items-center hover:bg-slate-50/60 transition-colors"
-                >
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-800 truncate">
-                      {offer.productName}
-                    </p>
-                    {offer.totalQuantity !== null && (
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        잔여 {offer.totalQuantity.toLocaleString()}개
-                        {offer.perOrderLimit !== null ? ` · 1회 최대 ${offer.perOrderLimit}개` : ''}
-                      </p>
-                    )}
-                  </div>
-                  <span className="text-sm text-slate-600 truncate">{offer.supplierName}</span>
-                  <span className="text-sm font-semibold text-slate-700">{formatPrice(displayPrice)}</span>
-                  <span className="text-xs text-slate-500">{formatDate(offer.createdAt)}</span>
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium inline-block w-fit ${badgeCls}`}>
-                    {badgeLabel}
-                  </span>
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => handleAddToCart(offer)}
-                      disabled={orderingId === offer.id}
-                      title="이벤트 오퍼를 장바구니에 담습니다."
-                      className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md border disabled:opacity-60 disabled:cursor-not-allowed transition-colors ${a.btn}`}
-                    >
-                      {orderingId === offer.id ? (
-                        <Loader2 size={12} className="animate-spin" />
-                      ) : (
-                        <ShoppingCart size={12} />
-                      )}
-                      {orderingId === offer.id ? '담는 중...' : '장바구니 담기'}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+          <Link
+            to="/store-hub/cart"
+            className={`shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold rounded-lg border bg-white transition-colors ${a.link}`}
+          >
+            <ShoppingCart size={15} /> 내 장바구니
+          </Link>
+        </div>
+      }
+      errorSlot={
+        error ? (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            {error}
           </div>
-        )}
-      </div>
-    </div>
+        ) : null
+      }
+      dateHeader="승인일"
+      formatDate={(item) => formatCreatedAt(item.createdAt)}
+      renderAction={(offer) => (
+        <button
+          type="button"
+          onClick={() => handleAddToCart(offer)}
+          disabled={orderingId === offer.id}
+          title="이벤트 오퍼를 장바구니에 담습니다."
+          className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md border disabled:opacity-60 disabled:cursor-not-allowed transition-colors ${a.btn}`}
+        >
+          {orderingId === offer.id ? (
+            <Loader2 size={12} className="animate-spin" />
+          ) : (
+            <ShoppingCart size={12} />
+          )}
+          {orderingId === offer.id ? '담는 중...' : '장바구니 담기'}
+        </button>
+      )}
+    />
   );
 }

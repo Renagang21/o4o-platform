@@ -1,207 +1,51 @@
 /**
- * Store Hub API — 통합 매장 허브
+ * Store Hub API — 통합 매장 허브 (KPA)
  *
  * WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1
+ * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1 (census F1):
+ *   3 서비스가 동일한 `/store-hub/*` endpoint 목록·응답 형상·fallback 을 각각 복제하고 있었다
+ *   (backend 는 이미 `createStoreHubController` factory 로 공용). endpoint 계약을
+ *   `@o4o/store-ui-core` 의 `createStoreHubApi` 로 모으고, 이 파일은 **전송 계층 주입 +
+ *   기존 함수명 유지**만 소유한다. 경로·응답·호출부 무변경.
+ *   `apiClient` 는 base `/api/v1/kpa` 이며 이미 body 를 반환하므로 언랩이 필요 없다.
+ *
+ * 채널 활성화(`createChannel`)는 KPA 자체 storefront(B2C) 은퇴로 프런트 진입점이 없다
+ * (WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1). backend 는 3 서비스 공용이라 유지되며
+ * kpa + B2C 조합만 410 STORE_B2C_CHANNEL_RETIRED 로 차단된다 → 여기서 re-export 하지 않는다.
  */
 
+import { createStoreHubApi } from '@o4o/store-ui-core';
 import { apiClient } from './client';
 
-// ─────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────
+export type {
+  StoreHubOverview,
+  ChannelType,
+  ChannelStatus,
+  ChannelOverview,
+  ChannelOverviewWithCode,
+  StoreKpiSummary,
+  LiveSignals,
+  StoreCapabilityOverview,
+  StoreSlugStatus,
+  StoreSlugChangeResult,
+  StoreSlugErrorCode,
+} from '@o4o/store-ui-core';
 
-export interface StoreHubOverview {
-  organizationId: string;
-  organizationName: string | null;
-  products: {
-    glycopharm: { totalCount: number; link: string };
-    cosmetics: { listedCount: number; link: string };
-  };
-  contents: {
-    slots: Array<{
-      serviceKey: string;
-      slotKey: string;
-      count: number;
-      link: string;
-    }>;
-    totalSlotCount: number;
-  };
-  signage: {
-    pharmacy: { contentCount: number; activeCount: number; link: string };
-  };
-}
+const storeHubApi = createStoreHubApi({
+  get: (url) => apiClient.get(url),
+  post: (url, body) => apiClient.post(url, body),
+  patch: (url, body) => apiClient.patch(url, body),
+});
 
-// ─────────────────────────────────────────────────────
-// API calls
-// ─────────────────────────────────────────────────────
-
-export async function fetchStoreHubOverview(): Promise<StoreHubOverview | null> {
-  const response = await apiClient.get<{ success: boolean; data: StoreHubOverview | null }>(
-    '/store-hub/overview'
-  );
-  return response.data;
-}
-
-// ─────────────────────────────────────────────────────
-// Channel Layer (WO-PHARMACY-HUB-CHANNEL-LAYER-UI-V1)
-// ─────────────────────────────────────────────────────
-
-export type ChannelType = 'B2C' | 'KIOSK' | 'TABLET' | 'SIGNAGE';
-export type ChannelStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED' | 'EXPIRED' | 'TERMINATED';
-
-export interface ChannelOverview {
-  id: string;
-  channelType: ChannelType;
-  status: ChannelStatus;
-  approvedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-  visibleProductCount: number;
-  totalProductCount: number;
-  salesLimitConfiguredCount: number;
-}
-
-export async function fetchChannelOverview(): Promise<ChannelOverview[]> {
-  const response = await apiClient.get<{ success: boolean; data: ChannelOverview[] }>(
-    '/store-hub/channels'
-  );
-  return response.data ?? [];
-}
-
-/** WO-CHANNEL-EXECUTION-CONSOLE-V1: includes organizationCode for storefront preview */
-export interface ChannelOverviewWithCode {
-  channels: ChannelOverview[];
-  organizationCode: string | null;
-}
-
-export async function fetchChannelOverviewWithCode(): Promise<ChannelOverviewWithCode> {
-  const response = await apiClient.get<{
-    success: boolean;
-    data: ChannelOverview[];
-    organizationCode?: string | null;
-  }>('/store-hub/channels');
-  return {
-    channels: response.data ?? [],
-    organizationCode: response.organizationCode ?? null,
-  };
-}
-
-// ─────────────────────────────────────────────────────
-// Channel Creation — WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1 로 제거
-//   KPA 자체 storefront(B2C) 은퇴 → 프런트의 채널 활성화 진입점 소멸.
-//   백엔드 `POST /store-hub/channels` 는 3서비스 공용이라 유지되며,
-//   kpa serviceKey + B2C 조합만 410 STORE_B2C_CHANNEL_RETIRED 로 차단된다.
-// ─────────────────────────────────────────────────────
-
-// ─────────────────────────────────────────────────────
-// Store KPI Summary (WO-O4O-STORE-KPI-REALDATA-V1)
-// ─────────────────────────────────────────────────────
-
-export interface StoreKpiSummary {
-  todayOrders: number;
-  weekOrders: number;
-  monthOrders: number;
-  monthRevenue: number;
-  avgOrderValue: number;
-  lastMonthRevenue: number;
-}
-
-export async function fetchStoreKpiSummary(): Promise<StoreKpiSummary> {
-  const response = await apiClient.get<{ success: boolean; data: StoreKpiSummary }>(
-    '/store-hub/kpi-summary'
-  );
-  return response.data ?? {
-    todayOrders: 0, weekOrders: 0, monthOrders: 0,
-    monthRevenue: 0, avgOrderValue: 0, lastMonthRevenue: 0,
-  };
-}
-
-// ─────────────────────────────────────────────────────
-// Live Signals (WO-O4O-STORE-LIVE-SIGNAL-LAYER-V1)
-// ─────────────────────────────────────────────────────
-
-export interface LiveSignals {
-  newOrders: number;
-  pendingTabletRequests: number;
-  pendingSalesRequests: number;
-  surveyRequests: number;
-}
-
-const EMPTY_SIGNALS: LiveSignals = {
-  newOrders: 0,
-  pendingTabletRequests: 0,
-  pendingSalesRequests: 0,
-  surveyRequests: 0,
-};
-
-export async function fetchLiveSignals(): Promise<LiveSignals> {
-  const response = await apiClient.get<{ success: boolean; data: LiveSignals }>(
-    '/store-hub/live-signals'
-  );
-  return response.data ?? EMPTY_SIGNALS;
-}
-
-// ─────────────────────────────────────────────────────
-// Store Capabilities (WO-O4O-STORE-CAPABILITY-SYSTEM-V1)
-// ─────────────────────────────────────────────────────
-
-export interface StoreCapabilityOverview {
-  key: string;
-  label: string;
-  category: string;
-  enabled: boolean;
-  source: string;
-}
-
-export async function fetchStoreCapabilities(): Promise<StoreCapabilityOverview[]> {
-  const response = await apiClient.get<{ success: boolean; data: StoreCapabilityOverview[] }>(
-    '/store-hub/capabilities'
-  );
-  return response.data ?? [];
-}
-
-// ─────────────────────────────────────────────────────
-// Store Slug (WO-O4O-STORE-SLUG-EDITABLE-V1)
-// ─────────────────────────────────────────────────────
-
-export interface StoreSlugStatus {
-  slug: string | null;
-  isActive: boolean;
-  canChange: boolean;
-}
-
-export interface StoreSlugChangeResult {
-  slug: string;
-  unchanged: boolean;
-}
+export const fetchStoreHubOverview = storeHubApi.fetchOverview;
+export const fetchChannelOverview = storeHubApi.fetchChannels;
+export const fetchChannelOverviewWithCode = storeHubApi.fetchChannelsWithCode;
+export const fetchStoreKpiSummary = storeHubApi.fetchKpiSummary;
+export const fetchLiveSignals = storeHubApi.fetchLiveSignals;
+export const fetchStoreCapabilities = storeHubApi.fetchCapabilities;
+export const fetchStoreSlugStatus = storeHubApi.fetchSlugStatus;
 
 /**
- * Backend slug error codes — apiClient 가 4xx 응답을 throw 할 때
- * `(err as Error & { code?: string }).code` 로 식별 가능.
+ * 매장 slug 변경. 전송 계층이 4xx/5xx 응답을 throw — 호출처는 try/catch 로 `.code` 분기.
  */
-export type StoreSlugErrorCode =
-  | 'SLUG_RESERVED'
-  | 'SLUG_DUPLICATE'
-  | 'SLUG_INVALID'
-  | 'SLUG_ALREADY_CHANGED'
-  | 'INVALID_INPUT'
-  | 'SERVICE_KEY_REQUIRED'
-  | 'INTERNAL_ERROR';
-
-export async function fetchStoreSlugStatus(): Promise<StoreSlugStatus> {
-  const response = await apiClient.get<{ success: boolean; data: StoreSlugStatus }>(
-    '/store-hub/slug'
-  );
-  return response.data ?? { slug: null, isActive: false, canChange: false };
-}
-
-/**
- * 매장 slug 변경. apiClient 가 4xx/5xx 응답을 throw — 호출처는 try/catch 로 (err as any).code 분기.
- */
-export async function updateStoreSlug(newSlug: string): Promise<StoreSlugChangeResult> {
-  const response = await apiClient.patch<{ success: boolean; data: StoreSlugChangeResult }>(
-    '/store-hub/slug',
-    { newSlug },
-  );
-  return response.data;
-}
+export const updateStoreSlug = storeHubApi.updateSlug;

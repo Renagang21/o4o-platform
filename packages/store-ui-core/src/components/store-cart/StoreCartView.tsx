@@ -1,5 +1,5 @@
 /**
- * StoreCartView — 매장 장바구니 공통 View (K-Cosmetics · GlycoPharm)
+ * StoreCartView — 매장 장바구니 공통 View (K-Cosmetics · GlycoPharm · KPA-Society)
  *
  * WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1
  *
@@ -7,22 +7,32 @@
  * 결과 헤더 아이콘(lucide vs emoji)만 다른 near-identical 화면이었다. 그 구조를 그대로 옮기고
  * 서비스 차이는 props 로 주입한다.
  *
+ * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
+ *   남아 있던 KPA-Society 사본(423줄, inline style)까지 편입한다. KPA 차이는
+ *   accent(violet) · header slot(PageHeader breadcrumb) · empty slot(EmptyState) ·
+ *   containerClassName(880px) 로만 표현한다. API · 주문 확정 계약 무변경.
+ *
  * 범위 밖(의도적):
- *   - KPA-Society 는 자체 디자인 시스템(PageHeader/Card/EmptyState + inline style)을 쓰므로
- *     이 View 로 합치지 않는다. 상태 기계만 `useStoreCart` 로 공유한다.
  *   - Pharmacy-Hub 는 결제 그룹 기반의 다른 주문 계약이므로 대상이 아니다.
  */
 
+import type { ReactNode } from 'react';
 import { Loader2, ShoppingCart, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import type { UseStoreCartResult } from './useStoreCart';
 
-export type StoreCartAccent = 'pink' | 'teal';
+export type StoreCartAccent = 'pink' | 'teal' | 'violet';
 
 export interface StoreCartViewProps {
   cart: UseStoreCartResult;
   accent: StoreCartAccent;
   /** 빈 장바구니 CTA — 라벨과 클릭 동작(라우팅)은 서비스가 소유한다. */
   emptyAction: { label: string; onClick: () => void };
+  /** 화면 상단 — 서비스 자체 PageHeader(breadcrumb) 를 쓰면 주입한다. */
+  header?: ReactNode;
+  /** 빈 상태 표시 — 서비스 EmptyState 를 쓰면 주입한다(emptyAction 대신). */
+  empty?: ReactNode;
+  /** 최외곽 container class (폭·여백 차이) */
+  containerClassName?: string;
 }
 
 // accent 별 정적 Tailwind class 맵 (동적 class 구성 금지).
@@ -37,11 +47,23 @@ const ACCENT_CLASSES: Record<StoreCartAccent, { spinner: string; solidBtn: strin
     solidBtn: 'bg-teal-600 text-white hover:bg-teal-700',
     hint: 'text-teal-600',
   },
+  violet: {
+    spinner: 'text-violet-600',
+    solidBtn: 'bg-violet-600 text-white hover:bg-violet-700',
+    hint: 'text-violet-600',
+  },
 };
 
 const won = (n: number | null | undefined) => '₩' + Number(n ?? 0).toLocaleString('ko-KR');
 
-export function StoreCartView({ cart, accent, emptyAction }: StoreCartViewProps) {
+export function StoreCartView({
+  cart,
+  accent,
+  emptyAction,
+  header,
+  empty,
+  containerClassName = 'space-y-6',
+}: StoreCartViewProps) {
   const ac = ACCENT_CLASSES[accent];
   const {
     groups,
@@ -60,11 +82,15 @@ export function StoreCartView({ cart, accent, emptyAction }: StoreCartViewProps)
   } = cart;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">내 장바구니</h1>
-        <p className="text-slate-500 mt-1 text-sm">담은 상품을 확인하고 공급자별로 주문을 확정합니다.</p>
-      </div>
+    <div className={containerClassName}>
+      {header ?? (
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">내 장바구니</h1>
+          <p className="text-slate-500 mt-1 text-sm">
+            담은 상품을 확인하고 공급자별로 주문을 확정합니다.
+          </p>
+        </div>
+      )}
 
       {/* 주문 확정 결과 */}
       {confirmResult && (
@@ -107,6 +133,7 @@ export function StoreCartView({ cart, accent, emptyAction }: StoreCartViewProps)
           <Loader2 size={28} className={'animate-spin ' + ac.spinner} />
         </div>
       ) : itemCount === 0 ? (
+        empty ?? (
         <div className="bg-white rounded-xl border border-slate-100 text-center py-16 text-slate-500">
           <ShoppingCart size={36} className="mx-auto mb-3 text-slate-300" />
           <p className="font-medium text-sm">장바구니가 비어 있습니다.</p>
@@ -118,6 +145,7 @@ export function StoreCartView({ cart, accent, emptyAction }: StoreCartViewProps)
             {emptyAction.label}
           </button>
         </div>
+        )
       ) : (
         <>
           {groups.map((group) => (

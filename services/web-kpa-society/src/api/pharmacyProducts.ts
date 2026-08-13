@@ -12,6 +12,7 @@
  * PUT  /pharmacy/products/listings/:id   — 진열 상품 수정
  */
 
+import { createSupplyCatalogApi } from '@o4o/store-ui-core';
 import { apiClient } from './client';
 
 export interface ProductApplication {
@@ -97,6 +98,22 @@ export interface CatalogResponse {
 }
 
 /**
+ * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1 (census F1):
+ *   카탈로그 3 endpoint 의 경로·query·payload 구성을 공통 `createSupplyCatalogApi` 로 이관.
+ *   KPA `apiClient` 는 base 가 `/api/v1/kpa` 이고 이미 body 를 반환하므로 언랩이 없다.
+ *   service_key 는 전송하지 않는다(경로 기반 도출) — 종전과 동일.
+ */
+const catalogApi = createSupplyCatalogApi<
+  CatalogResponse,
+  { success: boolean; data: ProductApplication },
+  { success: boolean }
+>({
+  get: (url) => apiClient.get(url),
+  post: (url, body) => apiClient.post(url, body),
+  delete: (url) => apiClient.delete(url),
+});
+
+/**
  * 플랫폼 B2B 상품 카탈로그 조회
  */
 export async function getCatalog(params?: {
@@ -107,7 +124,7 @@ export async function getCatalog(params?: {
   limit?: number;
   offset?: number;
 }): Promise<CatalogResponse> {
-  return apiClient.get('/pharmacy/products/catalog', params);
+  return catalogApi.getCatalog(params);
 }
 
 // ─────────────────────────────────────────────────────
@@ -163,7 +180,7 @@ export async function getOrderable(params?: {
  * 상품 판매 신청 (카탈로그 기반 — supplyProductId)
  */
 export async function applyBySupplyProductId(supplyProductId: string): Promise<{ success: boolean; data: ProductApplication }> {
-  return apiClient.post('/pharmacy/products/apply', { supplyProductId });
+  return catalogApi.applyBySupplyProductId(supplyProductId);
 }
 
 /**
@@ -171,7 +188,7 @@ export async function applyBySupplyProductId(supplyProductId: string): Promise<{
  * WO-O4O-STORE-HUB-B2B-UI-REFINEMENT-V1
  */
 export async function cancelProductByOfferId(offerId: string): Promise<{ success: boolean }> {
-  return apiClient.delete(`/pharmacy/products/by-offer/${offerId}`);
+  return catalogApi.cancelProductByOfferId(offerId);
 }
 
 // WO-O4O-KPA-LEGACY-MANUAL-PRODUCT-APPLICATION-REMOVE-AND-LISTING-MANAGEMENT-PRESERVE-V1:

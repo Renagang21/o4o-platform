@@ -1,21 +1,24 @@
 /**
- * HubBlogLibraryPage — K-Cosmetics 매장 HUB 블로그 진열 + 가져오기
+ * HubBlogLibraryPage — K-Cosmetics 매장 HUB 블로그 진열 + 매장으로 가져오기
  *
- * WO-O4O-STORE-HUB-CROSS-SERVICE-COMMONIZATION-PHASE1-V1
+ * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
+ *   KPA·K-Cosmetics·GlycoPharm 의 블로그/POP/QR 진열 화면 9개가 문구·아이콘·경로·accent 를 빼면
+ *   동일한 마크업이었다. 화면은 공통 `HubImportLibraryView`, 상태는 공통 `useHubImportLibrary`
+ *   (@o4o/store-ui-core) 로 이관하고 이 파일은 **API adapter + 서비스 config** 만 소유한다.
+ *   backend · API 계약 무변경.
  *
- * KPA HubBlogLibraryPage 패턴 동일. SERVICE_KEY='k-cosmetics'.
- * - HUB 목록: hubContentApi.list({ serviceKey='k-cosmetics', sourceDomain='blog' })
- * - 단건 가져가기: importOperatorBlog(slug, sourceBlogId)
- * - 일괄 가져가기: Promise.allSettled fan-out
+ * 데이터 흐름 (변경 없음):
+ *   - HUB 목록: hubContentApi.list({ sourceDomain: 'blog' })
+ *   - 단건 가져가기: importOperatorBlog(slug, sourceId)
+ *   - 일괄 가져가기: 단건 endpoint fan-out (신규 backend 없음)
+ *
+ * HUB 목록은 운영자 **원본**의 읽기 전용 진열이고, 가져오기가 만드는 것은 매장 소유 **사본**이다.
  */
 
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Copy, X, ExternalLink, FileText } from 'lucide-react';
-import { ActionBar, BaseDetailDrawer, BulkResultModal } from '@o4o/ui';
-import { DataTable } from '@o4o/operator-ux-core';
-import type { ListColumnDef } from '@o4o/operator-ux-core';
-import { useHubImportLibrary } from '@o4o/store-ui-core';
+import { FileText } from 'lucide-react';
+import { HubImportLibraryView, useHubImportLibrary } from '@o4o/store-ui-core';
 import { hubContentApi } from '@/lib/api/hubContent';
 import type { HubContentItemResponse } from '@o4o/types/hub-content';
 import { getStoreSlug } from '@/api/storeHub';
@@ -25,15 +28,11 @@ const PAGE_LIMIT = 20;
 
 export function HubBlogLibraryPage() {
   const navigate = useNavigate();
-  // WO-O4O-STORE-HUB-SUPPLIER-CONTENT-EXPLORER-COMMONIZATION-V1:
-  //   목록 · 페이지네이션 · loading/error · 매장 slug · 선택 · 단건/일괄 가져오기 상태를
-  //   공통 Core(@o4o/store-ui-core `useHubImportLibrary`) 로 이관.
-  //   HUB 조회와 가져오기 API(importOperatorBlog) 는 adapter 로 그대로 주입한다 — backend · 계약 무변경.
-  //   HUB 목록은 운영자 **원본**의 읽기 전용 진열이고, 가져오기가 만드는 것은 매장 소유 **사본**이다.
+
   const fetchPage = useCallback(
-    ({ page: nextPage, limit }: { page: number; limit: number }) =>
+    ({ page, limit }: { page: number; limit: number }) =>
       hubContentApi
-        .list({ sourceDomain: 'blog', page: nextPage, limit })
+        .list({ sourceDomain: 'blog', page, limit })
         .then((res) => ({ items: res.data ?? [], total: res.pagination?.total ?? 0 })),
     [],
   );
@@ -55,224 +54,33 @@ export function HubBlogLibraryPage() {
     },
   });
 
-  const {
-    items,
-    page,
-    totalPages,
-    isLoading,
-    error,
-    slug,
-    slugResolved,
-    selectedIds,
-    setSelectedIds,
-    selectedItem,
-    setSelectedItem,
-    singleImporting,
-    batch,
-  } = hub;
-  const setPage = hub.setPage;
-  const loadData = hub.reload;
-  const handleSingleImport = hub.importSingle;
-  const handleBulkImport = hub.importSelected;
-
-  const columns: ListColumnDef<HubContentItemResponse>[] = useMemo(() => [
-    {
-      key: 'title',
-      header: '제목',
-      sortable: true,
-      sortAccessor: (item) => item.title,
-      render: (_v, item) => (
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="w-7 h-7 rounded flex items-center justify-center bg-slate-100 shrink-0 text-slate-400">
-            <FileText className="w-3.5 h-3.5" />
-          </div>
-          <span className="font-medium text-slate-800 text-sm truncate">{item.title}</span>
-        </div>
-      ),
-    },
-    {
-      key: 'producer',
-      header: '출처',
-      width: '100px',
-      render: () => (
-        <span className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border bg-pink-50 border-pink-200 text-pink-700">
-          운영자 자료
-        </span>
-      ),
-    },
-    {
-      key: 'description',
-      header: '요약',
-      render: (_v, item) => <span className="text-xs text-slate-500 line-clamp-1">{item.description || '-'}</span>,
-    },
-    {
-      key: 'createdAt',
-      header: '게시일',
-      width: '110px',
-      sortable: true,
-      sortAccessor: (item) => new Date(item.createdAt).getTime(),
-      render: (_v, item) => (
-        <span className="text-xs text-slate-500">{new Date(item.createdAt).toLocaleDateString('ko-KR')}</span>
-      ),
-    },
-  ], []);
-
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      <header className="mb-6 pb-5 border-b-2 border-slate-200">
-        <h1 className="text-2xl font-bold text-slate-900">매장 HUB 블로그</h1>
-        <p className="mt-1.5 text-sm text-slate-500">
-          K-Cosmetics 운영자가 발행한 블로그 콘텐츠입니다. 선택해 일괄 가져가기 또는 행 클릭으로 단건 가져가기를 할 수 있습니다.
-          가져온 블로그는 매장 소유이며, 초안 상태로 복사되어 자유롭게 수정·발행할 수 있습니다.
-        </p>
-      </header>
-
-      {slugResolved && !slug && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800 mb-4">
-          매장 정보가 연결되지 않아 가져가기 기능을 사용할 수 없습니다. 매장 등록 후 다시 시도해 주세요.
-        </div>
-      )}
-
-      {error && (
-        <div className="text-center py-16 text-red-600 text-sm">
-          <p>{error}</p>
-          <button
-            onClick={() => loadData()}
-            className="mt-3 px-4 py-1.5 text-xs text-blue-600 border border-blue-400 rounded-lg hover:bg-blue-50"
-          >
-            다시 시도
-          </button>
-        </div>
-      )}
-
-      {!error && (
+    <HubImportLibraryView
+      core={hub}
+      accent="pink"
+      title="매장 HUB 블로그"
+      description="K-Cosmetics 운영자가 발행한 블로그 콘텐츠입니다. 선택해 일괄 가져가기 또는 행 클릭으로 단건 가져가기를 할 수 있습니다. 가져온 블로그는 매장 소유이며, 초안 상태로 복사되어 자유롭게 수정·발행할 수 있습니다."
+      tableId="kcos-store-hub-blog"
+      titleIcon={<FileText className="w-3.5 h-3.5" />}
+      labels={{
+        ownerLabel: '내 매장',
+        producerBadge: '운영자 자료',
+        bulkTooltip: '선택한 블로그를 내 매장 블로그(초안)로 일괄 가져갑니다',
+        emptyMessage: '아직 운영자 게시 블로그가 없습니다',
+      }}
+      footerNote={
         <>
-          <div className="mb-3">
-            <ActionBar
-              selectedCount={selectedIds.size}
-              onClearSelection={() => setSelectedIds(new Set())}
-              actions={[
-                {
-                  key: 'bulk-import',
-                  label: `내 매장에 가져가기 (${selectedIds.size})`,
-                  onClick: handleBulkImport,
-                  variant: 'primary' as const,
-                  icon: <Copy className="w-3.5 h-3.5" />,
-                  loading: batch.loading,
-                  group: 'actions',
-                  tooltip: '선택한 블로그를 내 매장 블로그(초안)로 일괄 가져갑니다',
-                  visible: selectedIds.size > 0,
-                  disabled: !slug,
-                },
-                {
-                  key: 'clear',
-                  label: '선택 해제',
-                  onClick: () => setSelectedIds(new Set()),
-                  variant: 'default' as const,
-                  icon: <X className="w-3.5 h-3.5" />,
-                  group: 'meta',
-                  visible: selectedIds.size > 0,
-                },
-              ]}
-            />
-          </div>
-
-          <BulkResultModal
-            open={batch.showResult}
-            onClose={() => batch.clearResult()}
-            result={batch.result}
-            onRetry={() => batch.retryFailed()}
-          />
-
-          <DataTable<HubContentItemResponse>
-            columns={columns}
-            data={items}
-            rowKey="id"
-            loading={isLoading}
-            emptyMessage="아직 운영자 게시 블로그가 없습니다"
-            tableId="kcos-store-hub-blog"
-            selectable
-            selectedKeys={selectedIds}
-            onSelectionChange={setSelectedIds}
-            onRowClick={(row) => setSelectedItem(row)}
-          />
-
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4 mt-4">
-              <button
-                disabled={page <= 1}
-                onClick={() => setPage(page - 1)}
-                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-              >
-                이전
-              </button>
-              <span className="text-sm text-slate-500">{page} / {totalPages}</span>
-              <button
-                disabled={page >= totalPages}
-                onClick={() => setPage(page + 1)}
-                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-              >
-                다음
-              </button>
-            </div>
-          )}
+          가져온 블로그는{' '}
+          <button
+            onClick={() => navigate('/store/content/blog')}
+            className="text-pink-600 hover:underline font-medium"
+          >
+            내 매장 블로그
+          </button>{' '}
+          에서 수정·발행할 수 있습니다.
         </>
-      )}
-
-      {slug && items.length > 0 && (
-        <div className="flex items-start gap-3 mt-8 p-5 bg-pink-50/60 border border-pink-100 rounded-xl text-sm text-slate-600 leading-relaxed">
-          <ExternalLink className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-          <span>
-            가져온 블로그는{' '}
-            <button
-              onClick={() => navigate('/store/content/blog')}
-              className="text-pink-600 hover:underline font-medium"
-            >
-              내 매장 블로그
-            </button>{' '}
-            에서 수정·발행할 수 있습니다.
-          </span>
-        </div>
-      )}
-
-      <BaseDetailDrawer
-        open={!!selectedItem}
-        onClose={() => setSelectedItem(null)}
-        title={selectedItem?.title ?? ''}
-        width={480}
-        actions={
-          selectedItem
-            ? [
-                {
-                  label: singleImporting ? '가져오는 중...' : '내 매장에 가져가기',
-                  onClick: () => handleSingleImport(selectedItem),
-                  variant: 'primary' as const,
-                  disabled: !slug || singleImporting,
-                },
-              ]
-            : []
-        }
-      >
-        {selectedItem && (
-          <div className="space-y-4 p-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border bg-pink-50 border-pink-200 text-pink-700">
-                운영자 자료
-              </span>
-            </div>
-            {selectedItem.description && (
-              <p className="text-sm text-slate-600 leading-relaxed">{selectedItem.description}</p>
-            )}
-            <dl className="space-y-2 text-sm">
-              <div className="flex gap-3">
-                <dt className="w-20 text-slate-400 shrink-0">게시일</dt>
-                <dd className="text-slate-700">{new Date(selectedItem.createdAt).toLocaleDateString('ko-KR')}</dd>
-              </div>
-            </dl>
-          </div>
-        )}
-      </BaseDetailDrawer>
-    </div>
+      }
+    />
   );
 }
 
