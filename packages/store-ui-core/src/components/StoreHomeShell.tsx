@@ -16,10 +16,19 @@
  *    (store-ui-core 는 hub-core 를 dependency 로 갖지 않으며, 본 WO 는 package.json 변경 금지.)
  *  - 소비처는 본 셸을 HubLayout 의 `beforeSections` 로 주입한다 (카드 섹션 위에 렌더).
  *
+ * WO-O4O-MY-STORE-HOME-CROSSSERVICE-COMMONIZATION-V1 (확장):
+ *  - 홈 헤더(제목/부제 + 새로고침·추가 액션)를 셸로 흡수 — 4서비스가 각자 렌더하던 영역.
+ *  - 매장 상태 헤더(statusSlot) · 처리 필요 신호(signalsSlot) · KPI(metricsSlot) 슬롯 추가.
+ *  - children 으로 서비스 본문 블록을 받아 canonical 순서 안에 배치.
+ *  - PharmacyHub 를 4번째 소비처로 포함.
+ *  모든 신규 prop 은 선택 — 기존 소비처 동작은 그대로다.
+ *
  * 공통화된 것:
- *  - 새로고침 버튼 (표준 마크업)
+ *  - 홈 헤더 + 새로고침 버튼 (표준 마크업)
  *  - 경영 인사이트 블록 (store-ui-core computeStoreInsights 산출 StoreInsight[] 렌더)
- *  - canonical 슬롯 순서: 새로고침 → 매장선택 → 배너 → AI요약 → 인사이트 → 온보딩 → 추가
+ *  - canonical 슬롯 순서:
+ *      헤더(제목·새로고침) → 매장선택 → 배너 → 매장상태 → 처리필요신호 → KPI
+ *      → AI요약 → 인사이트 → children(서비스 본문) → 온보딩 → 추가
  *
  * 서비스별 주입 (slot):
  *  - storeSelectorSlot : 다중 매장 선택 (K-Cosmetics). 단일 매장이면 미주입.
@@ -34,17 +43,38 @@ import { Card } from '@o4o/ui';
 import type { StoreInsight } from '../engine/storeInsightEngine';
 
 export interface StoreHomeShellProps {
+  /**
+   * 홈 제목 — 주입 시 canonical 헤더(제목/부제 + 우측 액션)를 렌더한다.
+   * 미주입 시 기존 동작(새로고침 버튼만 우측 정렬) 유지.
+   * 문구는 서비스 config 가 SSOT (약국/매장 용어를 셸이 고정하지 않는다).
+   */
+  title?: string;
+  subtitle?: string;
+  /** 헤더 우측 추가 액션 (새로고침 버튼 왼쪽에 렌더) */
+  headerActions?: ReactNode;
+
   /** 로딩 중 — 새로고침 버튼 disable/spin, 인사이트 숨김 */
   loading?: boolean;
   /** 새로고침 핸들러. 미주입 시 새로고침 버튼 미표시. */
   onRefresh?: () => void;
   /** 새로고침 버튼 라벨 (기본 '새로고침') */
   refreshLabel?: string;
+  /**
+   * 헤더 아래 본문 전체를 감싸는 클래스 (예: `space-y-6`).
+   * 서비스가 기존 블록 간격을 보존해야 할 때만 사용한다.
+   */
+  contentClassName?: string;
 
   /** 다중 매장 선택 슬롯 (K-Cosmetics). 단일 매장이면 미주입. */
   storeSelectorSlot?: ReactNode;
   /** 서비스 배너 슬롯 (예: 주문/매출 준비 중). 표시 조건은 서비스가 결정. */
   bannerSlot?: ReactNode;
+  /** 매장 상태 헤더 슬롯 (매장명·상태배지·가입상태 등). */
+  statusSlot?: ReactNode;
+  /** 처리 필요 신호 슬롯 — StoreHomeSignalList 주입 위치 (KPI 위). */
+  signalsSlot?: ReactNode;
+  /** KPI/요약 지표 슬롯 — StoreHomeMetricGrid 주입 위치. */
+  metricsSlot?: ReactNode;
   /** AI 운영 요약 슬롯 (서비스별 카드/로딩/에러 포함). */
   aiSummarySlot?: ReactNode;
 
@@ -63,6 +93,9 @@ export interface StoreHomeShellProps {
 
   /** canonical 슬롯 외 추가 렌더 (escape hatch) */
   beforeSections?: ReactNode;
+
+  /** 서비스 본문 블록 (인사이트 아래 · 온보딩 위). */
+  children?: ReactNode;
 }
 
 const levelIcon = (l: StoreInsight['level']) =>
@@ -130,37 +163,52 @@ function ShellInsightBlock({
  *   />
  */
 export function StoreHomeShell({
+  title,
+  subtitle,
+  headerActions,
   loading = false,
   onRefresh,
   refreshLabel = '새로고침',
+  contentClassName,
   storeSelectorSlot,
   bannerSlot,
+  statusSlot,
+  signalsSlot,
+  metricsSlot,
   aiSummarySlot,
   insights,
   insightsTitle = '경영 인사이트',
   onInsightAction,
   onboardingSlot,
   beforeSections,
+  children,
 }: StoreHomeShellProps) {
-  return (
-    <>
-      {onRefresh && (
-        <div className="flex justify-end mb-4 -mt-4">
-          <button
-            type="button"
-            className="flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-600 cursor-pointer"
-            onClick={onRefresh}
-            disabled={loading}
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            {refreshLabel}
-          </button>
-        </div>
-      )}
+  const refreshButton = onRefresh ? (
+    <button
+      type="button"
+      aria-label={refreshLabel}
+      className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 bg-white border border-slate-300 rounded-lg text-[13px] text-slate-600 cursor-pointer whitespace-nowrap shrink-0"
+      onClick={onRefresh}
+      disabled={loading}
+    >
+      <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+      {refreshLabel}
+    </button>
+  ) : null;
 
+  // 헤더 아래 canonical 본문. contentClassName 이 주어지면 이 묶음만 감싼다
+  // (서비스가 쓰던 space-y-* 간격 보존용 — WO 통합 시 반영).
+  const body = (
+    <>
       {storeSelectorSlot}
 
       {bannerSlot}
+
+      {statusSlot}
+
+      {signalsSlot}
+
+      {metricsSlot}
 
       {aiSummarySlot}
 
@@ -168,7 +216,37 @@ export function StoreHomeShell({
         <ShellInsightBlock insights={insights} title={insightsTitle} onAction={onInsightAction} />
       )}
 
+      {children}
+
       {onboardingSlot}
+    </>
+  );
+
+  return (
+    <>
+      {title ? (
+        <div className="flex flex-wrap justify-between items-start gap-2 mb-4 sm:mb-6">
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl font-bold text-slate-800 m-0">{title}</h1>
+            {subtitle && <p className="text-xs sm:text-[13px] text-slate-500 mt-1">{subtitle}</p>}
+          </div>
+          {(headerActions || refreshButton) && (
+            <div className="flex items-center gap-2">
+              {headerActions}
+              {refreshButton}
+            </div>
+          )}
+        </div>
+      ) : (
+        (headerActions || refreshButton) && (
+          <div className="flex justify-end items-center gap-2 mb-4 -mt-4">
+            {headerActions}
+            {refreshButton}
+          </div>
+        )
+      )}
+
+      {contentClassName ? <div className={contentClassName}>{body}</div> : body}
 
       {beforeSections}
     </>

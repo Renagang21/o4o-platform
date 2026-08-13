@@ -4,7 +4,11 @@
  * WO-O4O-MY-STORE-LOCAL-PRODUCTS-COMMON-COMPONENT-EXTRACTION-V2:
  *   GlycoPharm / K-Cosmetics 의 99% 동일한 StoreLocalProductsPage 를 통합.
  *   service 별 api client + 문맥 라벨만 props 로 주입, UI/CRUD/모달 동작은 보존.
- *   (KPA 는 BaseTable 기반 구조라 본 manager 대상 아님 — 별도 유지.)
+ *
+ * WO-O4O-MY-STORE-LOCAL-PRODUCTS-CROSSSERVICE-COMMONIZATION-V1:
+ *   KPA 도 본 manager 로 수렴. KPA 고유(BaseTable 렌더 · 다국어 컬럼 · 리치 등록 폼)는
+ *   `tableVariant='base'` / `extraColumns` / `renderFormModal` 슬롯으로 유지한다.
+ *   기존 소비처(GlycoPharm · K-Cosmetics · Pharmacy-Hub)는 prop 미지정 시 동작 불변.
  *
  * 도메인 주의: Local Products 는 Commerce Object 가 아니다 — Checkout/Order/Cart 연결 금지.
  */
@@ -16,6 +20,7 @@ import {
   Plus, Search, X, Loader2, ShoppingBag, AlertTriangle,
   Edit2, Trash2, ChevronLeft, ChevronRight, Tablet, BarChart3, FileText,
 } from 'lucide-react';
+import { BaseTable, type O4OColumn } from '@o4o/ui';
 import { LocalProductBadge, LOCAL_PRODUCT_BADGE_OPTIONS, type LocalProductBadgeType } from './LocalProductBadge';
 // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: POP 진입 canonical 정렬
 import { CANONICAL_STORE_POP_ROUTE, buildLocalProductPopState } from '../../utils/productionUtils';
@@ -56,15 +61,21 @@ export interface StoreLocalProductInput {
   sortOrder?: number;
 }
 
-/** service 별 local-products API client (GP/KCos 동일 시그니처) */
-export interface StoreLocalProductsApi {
+/**
+ * service 별 local-products API client (GP/KCos/PH 동일 시그니처).
+ * 서비스가 필드를 더 갖는 경우(KPA: barcode·detail_html)는 T/I 로 확장한다 — API 계약 변경 아님.
+ */
+export interface StoreLocalProductsApi<
+  T extends StoreLocalProduct = StoreLocalProduct,
+  I = StoreLocalProductInput,
+> {
   fetchLocalProducts: (params?: {
     page?: number;
     limit?: number;
     activeOnly?: string;
-  }) => Promise<{ items: StoreLocalProduct[]; total: number }>;
-  createLocalProduct: (input: StoreLocalProductInput) => Promise<StoreLocalProduct>;
-  updateLocalProduct: (id: string, input: StoreLocalProductInput) => Promise<StoreLocalProduct>;
+  }) => Promise<{ items: T[]; total: number }>;
+  createLocalProduct: (input: I) => Promise<T>;
+  updateLocalProduct: (id: string, input: I) => Promise<T>;
   deleteLocalProduct: (id: string) => Promise<void>;
 }
 
@@ -75,6 +86,10 @@ export interface StoreLocalProductsManagerLabels {
   title?: string;
   /** 제목 아래 설명 문구 */
   description?: string;
+  /** empty state 제목 (기본: '등록된 매장 취급 상품이 없습니다') */
+  emptyTitle?: string;
+  /** empty state 설명 (기본: '매장에서 자체적으로 취급하는 상품을 등록해 보세요.') */
+  emptyDescription?: string;
 }
 
 /**
@@ -86,29 +101,93 @@ export interface StoreLocalProductsManagerLabels {
  *
  *   undefined = 기본 동작 유지 · null = 버튼 숨김 · 함수 = 해당 동작으로 교체
  */
-export interface StoreLocalProductsManagerActions {
+export interface StoreLocalProductsManagerActions<T extends StoreLocalProduct = StoreLocalProduct> {
   onTabletDisplays?: (() => void) | null;
-  onMarketingAssets?: ((product: StoreLocalProduct) => void) | null;
-  onCreatePop?: ((product: StoreLocalProduct) => void) | null;
+  onMarketingAssets?: ((product: T) => void) | null;
+  onCreatePop?: ((product: T) => void) | null;
 }
 
-export interface StoreLocalProductsManagerProps {
-  api: StoreLocalProductsApi;
+/**
+ * 서비스 고유 추가 컬럼 (WO-...-CROSSSERVICE-COMMONIZATION-V1).
+ * Badge 컬럼 뒤 · 활성 컬럼 앞에 삽입된다. (KPA 다국어 컬럼)
+ */
+export interface StoreLocalProductsExtraColumn<T extends StoreLocalProduct = StoreLocalProduct> {
+  key: string;
+  header: ReactNode;
+  width?: number;
+  align?: 'left' | 'center' | 'right';
+  render: (product: T) => ReactNode;
+}
+
+/** 등록/수정 모달 슬롯 컨텍스트 — 저장 상태·에러는 manager 가 소유한다. */
+export interface StoreLocalProductsFormModalContext<
+  T extends StoreLocalProduct = StoreLocalProduct,
+  I = StoreLocalProductInput,
+> {
+  product: T | null;
+  saving: boolean;
+  error: string | null;
+  onSave: (data: I) => void;
+  onClose: () => void;
+}
+
+export interface StoreLocalProductsManagerProps<
+  T extends StoreLocalProduct = StoreLocalProduct,
+  I = StoreLocalProductInput,
+> {
+  api: StoreLocalProductsApi<T, I>;
   labels?: StoreLocalProductsManagerLabels;
-  actions?: StoreLocalProductsManagerActions;
+  actions?: StoreLocalProductsManagerActions<T>;
+  /** Badge 뒤에 삽입할 서비스 고유 컬럼 */
+  extraColumns?: Array<StoreLocalProductsExtraColumn<T>>;
+  /**
+   * 목록 렌더 엔진.
+   *   'plain'(기본) = 종전 raw table — 기존 소비처 동작 불변
+   *   'base'        = @o4o/ui BaseTable (KPA canonical 정렬 유지)
+   */
+  tableVariant?: 'plain' | 'base';
+  /** 등록/수정 폼 교체 (KPA: 이미지 라이브러리 · RichTextEditor · 콘텐츠 가져오기 · 바코드) */
+  renderFormModal?: (ctx: StoreLocalProductsFormModalContext<T, I>) => ReactNode;
+  /** toast 앞 아이콘 표기 (KPA 기존 표기 유지) */
+  toastIcon?: boolean;
 }
 
 const PAGE_SIZE = 20;
 
+/** 내부 컬럼 모델 — plain table 과 BaseTable 양쪽 렌더러가 공유한다. */
+interface ManagerColumn<T extends StoreLocalProduct> {
+  key: string;
+  header: ReactNode;
+  width?: number;
+  align?: 'left' | 'center' | 'right';
+  system?: 'last';
+  thClassName?: string;
+  tdClassName?: string;
+  render: (product: T) => ReactNode;
+}
+
 // ==================== Component ====================
 
-export function StoreLocalProductsManager({ api, labels, actions }: StoreLocalProductsManagerProps) {
+export function StoreLocalProductsManager<
+  T extends StoreLocalProduct = StoreLocalProduct,
+  I = StoreLocalProductInput,
+>({
+  api,
+  labels,
+  actions,
+  extraColumns,
+  tableVariant = 'plain',
+  renderFormModal,
+  toastIcon = false,
+}: StoreLocalProductsManagerProps<T, I>) {
   const navigate = useNavigate();
   const categoryPlaceholder = labels?.categoryPlaceholder ?? '예: 건강기능식품, 의약외품';
   const title = labels?.title ?? '매장 취급 상품';
   const description =
     labels?.description ??
     'O4O 주문과 무관하게 매장에서 자체적으로 취급·진열하는 상품입니다. 결제/주문 시스템과 연결되지 않습니다.';
+  const emptyTitle = labels?.emptyTitle ?? '등록된 매장 취급 상품이 없습니다';
+  const emptyDescription = labels?.emptyDescription ?? '매장에서 자체적으로 취급하는 상품을 등록해 보세요.';
 
   // undefined = 기존 `/store/*` 기본 동작 · null = 숨김 · 함수 = 교체
   const onTabletDisplays =
@@ -117,19 +196,19 @@ export function StoreLocalProductsManager({ api, labels, actions }: StoreLocalPr
       : actions.onTabletDisplays;
   const onMarketingAssets =
     actions?.onMarketingAssets === undefined
-      ? (product: StoreLocalProduct) => navigate(`/store/commerce/products/${product.id}/marketing`)
+      ? (product: T) => navigate(`/store/commerce/products/${product.id}/marketing`)
       : actions.onMarketingAssets;
   // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
   //   legacy `/store/commerce/products/:id/pop` (local UUID 를 ProductMaster 처럼 사용)
   //   경유를 제거하고 canonical POP 화면으로 직접 진입한다.
   const onCreatePop =
     actions?.onCreatePop === undefined
-      ? (product: StoreLocalProduct) =>
+      ? (product: T) =>
           navigate(CANONICAL_STORE_POP_ROUTE, { state: buildLocalProductPopState(product) })
       : actions.onCreatePop;
 
   // Data state
-  const [products, setProducts] = useState<StoreLocalProduct[]>([]);
+  const [products, setProducts] = useState<T[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -142,7 +221,7 @@ export function StoreLocalProductsManager({ api, labels, actions }: StoreLocalPr
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<StoreLocalProduct | null>(null);
+  const [editingProduct, setEditingProduct] = useState<T | null>(null);
   const [saving, setSaving] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
 
@@ -201,13 +280,13 @@ export function StoreLocalProductsManager({ api, labels, actions }: StoreLocalPr
     setShowModal(true);
   };
 
-  const handleEdit = (product: StoreLocalProduct) => {
+  const handleEdit = (product: T) => {
     setEditingProduct(product);
     setModalError(null);
     setShowModal(true);
   };
 
-  const handleDelete = async (product: StoreLocalProduct) => {
+  const handleDelete = async (product: T) => {
     if (!confirm(`"${product.name}" 상품을 비활성화하시겠습니까?`)) return;
     try {
       await api.deleteLocalProduct(product.id);
@@ -218,7 +297,7 @@ export function StoreLocalProductsManager({ api, labels, actions }: StoreLocalPr
     }
   };
 
-  const handleSave = async (data: StoreLocalProductInput) => {
+  const handleSave = async (data: I) => {
     setSaving(true);
     setModalError(null);
     try {
@@ -239,6 +318,158 @@ export function StoreLocalProductsManager({ api, labels, actions }: StoreLocalPr
   };
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
+
+  // ── 컬럼 모델 (WO-O4O-MY-STORE-LOCAL-PRODUCTS-CROSSSERVICE-COMMONIZATION-V1) ──
+  //    plain 렌더러의 class 문자열은 종전 마크업을 그대로 보존한다.
+  const THC = 'px-4 py-3 font-medium text-slate-500';
+  const tableColumns: Array<ManagerColumn<T>> = [
+    {
+      key: 'thumbnail',
+      header: '이미지',
+      width: 64,
+      thClassName: `text-left ${THC} w-16`,
+      tdClassName: 'px-4 py-3',
+      render: (product) =>
+        product.thumbnail_url ? (
+          <img src={product.thumbnail_url} alt={product.name} className="w-10 h-10 rounded-lg object-cover" />
+        ) : (
+          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+            <ShoppingBag className="w-5 h-5 text-slate-300" />
+          </div>
+        ),
+    },
+    {
+      key: 'name',
+      header: '상품명',
+      thClassName: `text-left ${THC}`,
+      tdClassName: 'px-4 py-3',
+      render: (product) => (
+        <div>
+          <div className="font-medium text-slate-900">{product.name}</div>
+          {product.summary && (
+            <div className="text-xs text-slate-400 mt-0.5 line-clamp-1">{product.summary}</div>
+          )}
+          {product.highlight_flag && (
+            <span className="inline-block mt-1 px-1.5 py-0.5 text-[10px] font-medium bg-amber-100 text-amber-700 rounded">
+              강조
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'category',
+      header: '카테고리',
+      width: 112,
+      thClassName: `text-left ${THC} w-28`,
+      tdClassName: 'px-4 py-3 text-slate-600',
+      render: (product) => <span className="text-slate-600">{product.category || '-'}</span>,
+    },
+    {
+      key: 'price_display',
+      header: '표시 가격',
+      width: 112,
+      align: 'right',
+      thClassName: `text-right ${THC} w-28`,
+      tdClassName: 'px-4 py-3 text-right text-slate-900 font-medium',
+      render: (product) => (
+        <span className="text-slate-900 font-medium">
+          {product.price_display ? `₩${Number(product.price_display).toLocaleString()}` : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'badge',
+      header: 'Badge',
+      width: 80,
+      align: 'center',
+      thClassName: `text-center ${THC} w-20`,
+      tdClassName: 'px-4 py-3 text-center',
+      render: (product) => <LocalProductBadge badgeType={product.badge_type} />,
+    },
+    // 서비스 고유 컬럼(KPA 다국어)
+    ...(extraColumns ?? []).map<ManagerColumn<T>>((col) => ({
+      key: col.key,
+      header: col.header,
+      width: col.width,
+      align: col.align,
+      thClassName: `${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'} ${THC}`,
+      tdClassName: `px-4 py-3${col.align === 'center' ? ' text-center' : col.align === 'right' ? ' text-right' : ''}`,
+      render: col.render,
+    })),
+    {
+      key: 'is_active',
+      header: '활성',
+      width: 64,
+      align: 'center',
+      thClassName: `text-center ${THC} w-16`,
+      tdClassName: 'px-4 py-3 text-center',
+      render: (product) => (
+        <span
+          className={`inline-block w-2.5 h-2.5 rounded-full ${
+            product.is_active ? 'bg-green-500' : 'bg-slate-300'
+          }`}
+        />
+      ),
+    },
+    {
+      key: 'actions',
+      header: '액션',
+      width: 96,
+      align: 'center',
+      system: 'last',
+      thClassName: `text-center ${THC} w-24`,
+      tdClassName: 'px-4 py-3 text-center',
+      render: (product) => (
+        <div className="flex items-center justify-center gap-1">
+          <button
+            onClick={() => handleEdit(product)}
+            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-700"
+            title="수정"
+          >
+            <Edit2 className="w-4 h-4" />
+          </button>
+          {onMarketingAssets && (
+            <button
+              onClick={() => onMarketingAssets(product)}
+              className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600"
+              title="마케팅 자산"
+            >
+              <BarChart3 className="w-4 h-4" />
+            </button>
+          )}
+          {onCreatePop && (
+            <button
+              onClick={() => onCreatePop(product)}
+              className="p-1.5 rounded-lg hover:bg-purple-50 text-slate-500 hover:text-purple-600"
+              title="POP 만들기"
+            >
+              <FileText className="w-4 h-4" />
+            </button>
+          )}
+          {product.is_active && (
+            <button
+              onClick={() => handleDelete(product)}
+              className="p-1.5 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-600"
+              title="비활성화"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
+  const baseTableColumns: Array<O4OColumn<T>> = tableColumns.map((col) => ({
+    key: col.key,
+    header: col.header,
+    width: col.width,
+    align: col.align,
+    system: col.system,
+    render: (_value: unknown, product: T) => col.render(product),
+  }));
+
 
   return (
     <div className="space-y-6">
@@ -327,12 +558,12 @@ export function StoreLocalProductsManager({ api, labels, actions }: StoreLocalPr
         <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
           <ShoppingBag className="w-16 h-16 text-slate-200 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-slate-800 mb-2">
-            {debouncedSearch ? '검색 결과가 없습니다' : '등록된 매장 취급 상품이 없습니다'}
+            {debouncedSearch ? '검색 결과가 없습니다' : emptyTitle}
           </h3>
           <p className="text-slate-500 mb-6">
             {debouncedSearch
               ? '다른 검색어로 시도해 보세요.'
-              : '매장에서 자체적으로 취급하는 상품을 등록해 보세요.'}
+              : emptyDescription}
           </p>
           {!debouncedSearch && (
             <button
@@ -348,106 +579,43 @@ export function StoreLocalProductsManager({ api, labels, actions }: StoreLocalPr
       {/* Table */}
       {!loading && !error && filteredProducts.length > 0 && (
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-slate-50">
-                <th className="text-left px-4 py-3 font-medium text-slate-500 w-16">이미지</th>
-                <th className="text-left px-4 py-3 font-medium text-slate-500">상품명</th>
-                <th className="text-left px-4 py-3 font-medium text-slate-500 w-28">카테고리</th>
-                <th className="text-right px-4 py-3 font-medium text-slate-500 w-28">표시 가격</th>
-                <th className="text-center px-4 py-3 font-medium text-slate-500 w-20">Badge</th>
-                <th className="text-center px-4 py-3 font-medium text-slate-500 w-16">활성</th>
-                <th className="text-center px-4 py-3 font-medium text-slate-500 w-24">액션</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts.map((product) => (
-                <tr
-                  key={product.id}
-                  className={`border-b last:border-0 hover:bg-slate-50 transition-colors ${
-                    !product.is_active ? 'opacity-50' : ''
-                  }`}
-                >
-                  <td className="px-4 py-3">
-                    {product.thumbnail_url ? (
-                      <img
-                        src={product.thumbnail_url}
-                        alt={product.name}
-                        className="w-10 h-10 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                        <ShoppingBag className="w-5 h-5 text-slate-300" />
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-slate-900">{product.name}</div>
-                    {product.summary && (
-                      <div className="text-xs text-slate-400 mt-0.5 line-clamp-1">{product.summary}</div>
-                    )}
-                    {product.highlight_flag && (
-                      <span className="inline-block mt-1 px-1.5 py-0.5 text-[10px] font-medium bg-amber-100 text-amber-700 rounded">
-                        강조
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{product.category || '-'}</td>
-                  <td className="px-4 py-3 text-right text-slate-900 font-medium">
-                    {product.price_display ? `₩${Number(product.price_display).toLocaleString()}` : '-'}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <LocalProductBadge badgeType={product.badge_type} />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span
-                      className={`inline-block w-2.5 h-2.5 rounded-full ${
-                        product.is_active ? 'bg-green-500' : 'bg-slate-300'
-                      }`}
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <button
-                        onClick={() => handleEdit(product)}
-                        className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-700"
-                        title="수정"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      {onMarketingAssets && (
-                        <button
-                          onClick={() => onMarketingAssets(product)}
-                          className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600"
-                          title="마케팅 자산"
-                        >
-                          <BarChart3 className="w-4 h-4" />
-                        </button>
-                      )}
-                      {onCreatePop && (
-                        <button
-                          onClick={() => onCreatePop(product)}
-                          className="p-1.5 rounded-lg hover:bg-purple-50 text-slate-500 hover:text-purple-600"
-                          title="POP 만들기"
-                        >
-                          <FileText className="w-4 h-4" />
-                        </button>
-                      )}
-                      {product.is_active && (
-                        <button
-                          onClick={() => handleDelete(product)}
-                          className="p-1.5 rounded-lg hover:bg-red-50 text-slate-500 hover:text-red-600"
-                          title="비활성화"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
+          {/* WO-...-CROSSSERVICE-COMMONIZATION-V1: 컬럼 모델 1개 → plain / BaseTable 두 렌더러 */}
+          {tableVariant === 'base' ? (
+            <BaseTable<T>
+              columns={baseTableColumns}
+              data={filteredProducts}
+              rowKey={(product) => product.id}
+              rowClassName={(product) => (!product.is_active ? 'opacity-50' : '')}
+            />
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-slate-50">
+                  {tableColumns.map((col) => (
+                    <th key={col.key} className={col.thClassName}>
+                      {col.header}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredProducts.map((product) => (
+                  <tr
+                    key={product.id}
+                    className={`border-b last:border-0 hover:bg-slate-50 transition-colors ${
+                      !product.is_active ? 'opacity-50' : ''
+                    }`}
+                  >
+                    {tableColumns.map((col) => (
+                      <td key={col.key} className={col.tdClassName}>
+                        {col.render(product)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
 
           {/* Pagination */}
           {totalPages > 1 && (
@@ -489,21 +657,30 @@ export function StoreLocalProductsManager({ api, labels, actions }: StoreLocalPr
             color: toast.type === 'success' ? '#166534' : '#991b1b',
           }}
         >
-          {toast.message}
+          {toastIcon ? `${toast.type === 'success' ? '✅' : '❌'} ${toast.message}` : toast.message}
         </div>
       )}
 
       {/* Create/Edit Modal */}
-      {showModal && (
-        <ProductFormModal
-          product={editingProduct}
-          saving={saving}
-          error={modalError}
-          categoryPlaceholder={categoryPlaceholder}
-          onSave={handleSave}
-          onClose={() => setShowModal(false)}
-        />
-      )}
+      {showModal &&
+        (renderFormModal ? (
+          renderFormModal({
+            product: editingProduct,
+            saving,
+            error: modalError,
+            onSave: handleSave,
+            onClose: () => setShowModal(false),
+          })
+        ) : (
+          <ProductFormModal
+            product={editingProduct}
+            saving={saving}
+            error={modalError}
+            categoryPlaceholder={categoryPlaceholder}
+            onSave={handleSave as unknown as (data: StoreLocalProductInput) => void}
+            onClose={() => setShowModal(false)}
+          />
+        ))}
     </div>
   );
 }

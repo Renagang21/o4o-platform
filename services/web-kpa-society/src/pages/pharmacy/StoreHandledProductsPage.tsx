@@ -18,13 +18,32 @@
  *   진열(product_type='local') / QR / 다국어(targetKind='local') / handled-products UNION 소스.
  *   등록·수정 canonical 진입점 = 사이드바 '약국 상품·거래 > 매장 자체 상품'(/store/commerce/local-products).
  *   IR: docs/investigations/IR-O4O-KPA-STORE-HIDDEN-MANAGEMENT-ENTRY-POLICY-AUDIT-V1.md
+ *
+ * WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1:
+ *   header/설명 · 검색 · 총 건수 · loading/error/empty · table 기본 구조 ·
+ *   제품명/분류/가격/수정일 표시 · pagination · row key 를 @o4o/store-ui-core 로 위임.
+ *   KPA 고유(표준상품 추가 · 신규상품 요청 · 상세설명서 · 다국어 · QR · 다중선택 ActionBar)는
+ *   slot/columns 로 그대로 유지한다. API·권한·route·제거 정책 변경 없음.
  */
 
 import { useEffect, useMemo, useState, useCallback, type CSSProperties } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Package, RefreshCw, Search, Boxes, X, Trash2, FileText, Loader2, QrCode, PlusCircle, ClipboardList, Languages } from 'lucide-react';
+import { RefreshCw, Boxes, X, Trash2, FileText, Loader2, QrCode, PlusCircle, ClipboardList, Languages } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { Pagination } from '@o4o/operator-ux-core';
+import {
+  HandledProductsPageHeader,
+  HandledProductsToolbar,
+  HandledProductsCountRow,
+  HandledProductsTable,
+  HandledProductsPagination,
+  HandledProductNameCell,
+  HandledProductBadge,
+  formatHandledProductPrice,
+  formatHandledProductDate,
+  handledProductClassificationLabel,
+  handledProductKey,
+  type HandledProductsColumn,
+} from '@o4o/store-ui-core';
 import { fetchHandledProducts, removeHandledProducts, type HandledProduct } from '../../api/handledProducts';
 import { colors } from '../../styles/theme';
 // WO-...-DESCRIPTION-USAGE-POLICY-FIX-V1: 매장용(STORE) 상세설명서 읽기 전용 조회
@@ -46,30 +65,9 @@ const SEARCH_DEBOUNCE_MS = 300;
 const EMPTY_MESSAGE =
   '아직 취급 중인 O4O 제품이 없습니다. ‘O4O 표준 상품에서 추가’로 제품을 선택해 매장 경영활용 제품으로 등록할 수 있습니다.';
 
-/** 선택 식별 키 — sourceType + sourceId 조합(교차 소스 유일). */
-function rowKey(it: Pick<HandledProduct, 'sourceType' | 'sourceId'>): string {
-  return `${it.sourceType}:${it.sourceId}`;
-}
-
-function Badge({ text, tone }: { text: string; tone: 'green' | 'gray' | 'amber' | 'blue' | 'muted' }) {
-  const palette: Record<string, CSSProperties> = {
-    green: { background: '#DCFCE7', color: '#16A34A' },
-    blue: { background: '#DBEAFE', color: '#1D4ED8' },
-    amber: { background: '#FEF3C7', color: '#D97706' },
-    gray: { background: colors.neutral100, color: colors.neutral600 },
-    muted: { background: '#F1F5F9', color: '#94A3B8' },
-  };
-  return <span style={{ ...styles.badge, ...palette[tone] }}>{text}</span>;
-}
-
-function formatPrice(p: number | null): string {
-  if (p == null) return '—';
-  return `${p.toLocaleString('ko-KR')}원`;
-}
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
-}
+// 행 키·배지·표시 포맷은 공통 계약(@o4o/store-ui-core)을 쓴다.
+// WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1
+const rowKey = handledProductKey;
 
 function parsePageSize(v: string | null): number {
   const n = Number(v);
@@ -210,7 +208,7 @@ export default function StoreHandledProductsPage() {
   );
 
   // ─── 선택 ─────────────────────────────────────────────────────────────────
-  const allSelected = items.length > 0 && items.every((it) => selected.has(rowKey(it)));
+  // 전체 선택 상태 계산은 공통 테이블(HandledProductsTable)이 담당한다.
   const toggleAll = useCallback(() => {
     setSelected((prev) => (prev.size >= items.length && items.length > 0 ? new Set() : new Set(items.map(rowKey))));
   }, [items]);
@@ -250,25 +248,56 @@ export default function StoreHandledProductsPage() {
     }
   }, [selectedItems, removing, clearSelection, reload]);
 
+  // WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1:
+  //   컬럼 구성은 KPA 그대로(제품/구분/분류/가격/최근 수정일), 렌더만 공통 파트로 위임.
+  const columns: Array<HandledProductsColumn<HandledProduct>> = [
+    {
+      key: 'product',
+      header: '제품',
+      align: 'left',
+      className: 'min-w-[240px]',
+      render: (it) => <HandledProductNameCell name={it.name} imageUrl={it.imageUrl} />,
+    },
+    { key: 'origin', header: '구분', render: () => <HandledProductBadge text="O4O 기반 제품" tone="blue" /> },
+    {
+      key: 'classification',
+      header: '분류',
+      render: (it) => {
+        const label = handledProductClassificationLabel(it);
+        return label === '미분류' ? (
+          <span style={{ color: colors.neutral400 }}>미분류</span>
+        ) : (
+          <HandledProductBadge text={label} tone="gray" />
+        );
+      },
+    },
+    { key: 'price', header: '매장 표시 가격', render: (it) => formatHandledProductPrice(it.price) },
+    { key: 'updatedAt', header: '최근 수정일', render: (it) => formatHandledProductDate(it.updatedAt) },
+    // '상태'(승인 대기) 컬럼은 WO-...-REMOVE-AND-STATUS-AUDIT-V1 로 제거됨 — 재추가 금지.
+  ];
+
   return (
     <div style={styles.container}>
-      <div style={styles.header}>
-        <div>
-          <div style={styles.breadcrumb}>
+      {/* WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1: header/설명은 공통 파트,
+          breadcrumb·아이콘·액션 버튼은 KPA 문구/동작 그대로 slot 주입. */}
+      <HandledProductsPageHeader
+        breadcrumb={
+          <>
             <span>약국 상품·거래</span>
             <span style={{ color: colors.neutral300 }}>/</span>
             <span style={{ color: colors.neutral700 }}>매장 경영활용 제품</span>
-          </div>
-          <h1 style={styles.title}>
-            <Boxes size={20} style={{ color: colors.primary }} />
-            매장 경영활용 제품
-          </h1>
-          <p style={styles.subtitle}>
+          </>
+        }
+        icon={<Boxes size={20} style={{ color: colors.primary }} />}
+        title="매장 경영활용 제품"
+        description={
+          <>
             약국 경영에 활용할 O4O 제품을 확인·정리합니다.
             실제 작업(매장용 상세설명 보기 / 콘텐츠 만들기 / 다국어 QR)은 제품을 선택한 뒤 수행합니다.
-          </p>
-        </div>
-        <div style={styles.headerActions}>
+          </>
+        }
+        actions={
+          <>
           {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1:
               O4O 표준 상품 DB(ProductMaster)를 검색·선택하여 매장 경영활용 제품으로 등록. */}
           <button onClick={() => setShowAddO4oModal(true)} style={styles.primaryBtn}>
@@ -292,42 +321,37 @@ export default function StoreHandledProductsPage() {
             <RefreshCw size={14} />
             새로고침
           </button>
-        </div>
-      </div>
+          </>
+        }
+      />
 
-      <div style={styles.toolbar}>
-        <div style={{ flex: 1 }} />
-        <div style={styles.searchWrap}>
-          <Search size={14} style={styles.searchIcon} />
-          <input
-            type="search"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="제품명 검색"
-            style={styles.searchInput}
-          />
-        </div>
-      </div>
+      {/* 검색: 입력 즉시 반영 + 서비스 소유 디바운스/URL 동기화 유지 */}
+      <HandledProductsToolbar
+        searchValue={searchInput}
+        onSearchChange={setSearchInput}
+        searchPlaceholder="제품명 검색"
+      />
 
-      <div style={styles.countRow}>
-        <span style={styles.countBadge}>{total}건</span>
-        <div style={{ flex: 1 }} />
-        <label style={styles.pageSizeLabel}>
-          페이지당
-          <select
-            value={limit}
-            onChange={(e) => changePageSize(Number(e.target.value))}
-            style={styles.pageSizeSelect}
-            aria-label="페이지당 건수"
-          >
-            {PAGE_SIZE_OPTIONS.map((n) => (
-              <option key={n} value={n}>
-                {n}건
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      <HandledProductsCountRow
+        total={total}
+        rightSlot={
+          <label style={styles.pageSizeLabel}>
+            페이지당
+            <select
+              value={limit}
+              onChange={(e) => changePageSize(Number(e.target.value))}
+              style={styles.pageSizeSelect}
+              aria-label="페이지당 건수"
+            >
+              {PAGE_SIZE_OPTIONS.map((n) => (
+                <option key={n} value={n}>
+                  {n}건
+                </option>
+              ))}
+            </select>
+          </label>
+        }
+      />
 
       {/* WO-...-STANDARD-TABLE-V1 / REMOVE-AND-STATUS-AUDIT-V1: Selection ActionBar.
           1건 선택 시 컨텍스트 작업 + 제거, 여러 건 선택 시 제거 + 선택 해제. */}
@@ -379,91 +403,16 @@ export default function StoreHandledProductsPage() {
         </div>
       )}
 
-      <div style={styles.tableWrap}>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={{ ...styles.th, width: 40 }}>
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  onChange={toggleAll}
-                  style={styles.checkbox}
-                  aria-label="전체 선택"
-                  disabled={items.length === 0}
-                />
-              </th>
-              <th style={{ ...styles.th, textAlign: 'left' }}>제품</th>
-              <th style={styles.th}>구분</th>
-              {/* WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: '연결 콘텐츠' 제거 → O4O 표준 '분류' */}
-              <th style={styles.th}>분류</th>
-              <th style={styles.th}>매장 표시 가격</th>
-              <th style={styles.th}>최근 수정일</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={6} style={styles.empty}>불러오는 중…</td>
-              </tr>
-            ) : error ? (
-              <tr>
-                <td colSpan={6} style={{ ...styles.empty, color: '#DC2626' }}>{error}</td>
-              </tr>
-            ) : items.length === 0 ? (
-              <tr>
-                <td colSpan={6} style={styles.empty}>{searchQuery ? '검색 결과가 없습니다' : EMPTY_MESSAGE}</td>
-              </tr>
-            ) : (
-              items.map((it) => {
-                const key = rowKey(it);
-                const isSelected = selected.has(key);
-                return (
-                  <tr key={key} style={{ ...styles.row, ...(isSelected ? styles.rowSelected : null) }}>
-                    <td style={styles.tdCheckbox}>
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleOne(key)}
-                        style={styles.checkbox}
-                        aria-label={`${it.name} 선택`}
-                      />
-                    </td>
-                    <td style={styles.tdProduct}>
-                      <div style={styles.productCell}>
-                        {it.imageUrl ? (
-                          <img src={it.imageUrl} alt="" style={styles.thumb} />
-                        ) : (
-                          <div style={styles.thumbPlaceholder}>
-                            <Package size={16} style={{ color: colors.neutral400 }} />
-                          </div>
-                        )}
-                        <span style={styles.productName} title={it.name}>{it.name}</span>
-                      </div>
-                    </td>
-                    <td style={styles.td}>
-                      <Badge text="O4O 기반 제품" tone="blue" />
-                    </td>
-                    {/* WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: O4O 표준 분류(미분류 안전 표시) */}
-                    <td style={styles.td}>
-                      {it.classificationCode && it.classificationCode !== 'unknown' ? (
-                        <Badge text={it.classificationLabel} tone="gray" />
-                      ) : (
-                        <span style={{ color: colors.neutral400 }}>미분류</span>
-                      )}
-                    </td>
-                    <td style={styles.td}>{formatPrice(it.price)}</td>
-                    <td style={styles.td}>{formatDate(it.updatedAt)}</td>
-                    {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: '상태'(승인 대기) 컬럼 제거 — 이 화면엔 승인 절차 없음. */}
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+      <HandledProductsTable
+        items={items}
+        columns={columns}
+        loading={loading}
+        error={error}
+        emptyContent={searchQuery ? '검색 결과가 없습니다' : EMPTY_MESSAGE}
+        selection={{ selectedKeys: selected, onToggle: toggleOne, onToggleAll: toggleAll }}
+      />
 
-      <Pagination page={page} totalPages={totalPages} onPageChange={changePage} total={total} />
+      <HandledProductsPagination page={page} totalPages={totalPages} total={total} onPageChange={changePage} />
 
       {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달 */}
       <AddO4oStandardProductModal
@@ -515,21 +464,10 @@ export default function StoreHandledProductsPage() {
 
 const styles: Record<string, CSSProperties> = {
   container: { padding: '24px', maxWidth: '1180px', margin: '0 auto' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '18px', flexWrap: 'wrap' },
-  breadcrumb: { display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: colors.neutral400, marginBottom: '6px' },
-  title: { display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '20px', fontWeight: 600, color: colors.neutral800, margin: 0 },
-  subtitle: { fontSize: '13px', color: colors.neutral500, margin: '6px 0 0', maxWidth: '720px', lineHeight: 1.6 },
-  headerActions: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
   refreshBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '13px', color: colors.neutral700, cursor: 'pointer' },
   primaryBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: colors.primary, border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.white, cursor: 'pointer' },
   // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-V1: 신규 요청 버튼(보조 강조 톤)
   requestBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#EFF6FF', border: `1px solid ${colors.primary}`, borderRadius: '6px', fontSize: '13px', color: colors.primary, cursor: 'pointer', fontWeight: 500 },
-  toolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' },
-  searchWrap: { position: 'relative', minWidth: '220px' },
-  searchIcon: { position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: colors.neutral400, pointerEvents: 'none' },
-  searchInput: { width: '100%', padding: '8px 12px 8px 30px', border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '13px', outline: 'none', background: colors.white, boxSizing: 'border-box' },
-  countRow: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' },
-  countBadge: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', fontSize: '12px', fontWeight: 500, color: colors.neutral600, background: colors.neutral100, borderRadius: '999px' },
   pageSizeLabel: { display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: colors.neutral500 },
   pageSizeSelect: { padding: '5px 8px', border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '12px', color: colors.neutral700, background: colors.white, cursor: 'pointer' },
   // WO-...-STANDARD-TABLE-V1: Selection ActionBar
@@ -538,24 +476,9 @@ const styles: Record<string, CSSProperties> = {
   clearBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: colors.white, border: `1px solid ${colors.neutral300}`, borderRadius: '6px', fontSize: '12px', color: colors.neutral700, cursor: 'pointer' },
   // WO-...-REMOVE-AND-STATUS-AUDIT-V1: 제거 버튼(위험 액션 톤)
   removeBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: '6px', fontSize: '12px', color: '#DC2626', cursor: 'pointer', whiteSpace: 'nowrap' },
-  tableWrap: { overflowX: 'auto', border: `1px solid ${colors.neutral200}`, borderRadius: '8px', background: colors.white },
-  table: { width: '100%', borderCollapse: 'collapse', fontSize: '13px' },
-  th: { padding: '10px 12px', textAlign: 'center', fontSize: '12px', fontWeight: 600, color: colors.neutral500, background: '#F8FAFC', borderBottom: `1px solid ${colors.neutral200}`, whiteSpace: 'nowrap' },
-  row: { borderBottom: `1px solid ${colors.neutral100}` },
-  rowSelected: { background: '#EFF6FF' },
-  td: { padding: '10px 12px', textAlign: 'center', color: colors.neutral700, whiteSpace: 'nowrap' },
-  tdCheckbox: { padding: '10px 12px', textAlign: 'center', width: 40 },
-  tdProduct: { padding: '10px 12px', textAlign: 'left', minWidth: '240px' },
-  productCell: { display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 },
-  thumb: { width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover', border: `1px solid ${colors.neutral200}`, flexShrink: 0 },
-  thumbPlaceholder: { width: '36px', height: '36px', borderRadius: '6px', background: colors.neutral100, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  productName: { fontSize: '14px', fontWeight: 500, color: colors.neutral800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
-  badge: { display: 'inline-flex', alignItems: 'center', padding: '2px 8px', fontSize: '11px', fontWeight: 500, borderRadius: '999px', whiteSpace: 'nowrap' },
-  checkbox: { width: 15, height: 15, cursor: 'pointer', accentColor: colors.primary },
   // WO-...-STANDARD-TABLE-V1: Selection ActionBar 액션 버튼
   importBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },
   mlcBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F5F3FF', border: '1px solid #C4B5FD', borderRadius: '6px', fontSize: '12px', color: '#6D28D9', cursor: 'pointer', whiteSpace: 'nowrap' },
   langBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#EEF2FF', border: '1px solid #A5B4FC', borderRadius: '6px', fontSize: '12px', color: '#4338CA', cursor: 'pointer', whiteSpace: 'nowrap' },
-  empty: { padding: '40px 12px', textAlign: 'center', color: colors.neutral400, fontSize: '13px' },
   footnote: { marginTop: '14px', fontSize: '12px', color: colors.neutral500, lineHeight: 1.7, padding: '10px 12px', background: colors.neutral100, borderRadius: '6px' },
 };
