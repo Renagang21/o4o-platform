@@ -361,4 +361,96 @@ chunk size 경고는 기존과 동일한 사전 존재 경고이며 이번 변�
 
 ---
 
+## 18. 최신 origin/main 재기준 + 독립 재검증 (2026-08-13, 후속 세션)
+
+§16 push 이후 `origin/main` 이 **54 커밋** 진행했다. WO 의 "기준: 작업 시작 시 최신 origin/main" 을 만족시키기 위해
+브랜치를 최신 main 에 재기준하고, 선행 세션의 판정을 **문서 신뢰가 아니라 코드 실측으로** 다시 확인했다.
+
+### 18-1. 병합 — 충돌 1건
+
+`origin/main` 의 54 커밋은 대부분 **내 매장(`/store/*`) 공통화 트랙**(`WO-O4O-MY-STORE-*`)이며 `packages/store-ui-core` 를 크게 확장했다.
+
+| 항목 | 결과 |
+|---|---|
+| 충돌 파일 | `packages/store-ui-core/src/index.ts` **1건** |
+| 성격 | barrel export 의 **additive vs additive** — store-hub 블록과 my-store 블록이 서로 겹치지 않는 별개 추가 |
+| 해결 | **양쪽 블록 모두 보존.** 어느 쪽 export 도 삭제하지 않았다. 이름 충돌 여부는 typecheck 로 검증(§18-3) |
+
+### 18-2. 병합으로 드러난 실제 결함 1건 (수정함)
+
+`services/web-pharmacy-hub/src/pages/store-owner/HomePage.tsx` 는 git 이 **텍스트로는 자동 병합했으나 타입이 깨졌다.**
+
+- 브랜치(`3c2c73598`)가 `/store-hub` 바로가기를 **구 shape** (`desc` · `Icon`) 로 추가
+- main(`f0f8ce3d2`)이 같은 배열을 공통 `StoreHomeShortcutItem` 계약(`description` · `icon: ReactNode`)으로 전환
+- 자동 병합 결과 = 신 shape 3개 + 구 shape 1개 → `TS2353: 'desc' does not exist in type 'StoreHomeShortcutItem'`
+
+→ `/store-hub` 항목을 canonical shape 으로 정렬했다. **route(`/store-hub`) · 라벨 · 문구는 그대로다.** 업무 변경 0.
+
+> 이 결함은 `tsc --noEmit -p tsconfig.json` 에서는 드러나지 않고 **`tsc -b`(project references) 를 쓰는 실제 build 에서만** 드러났다.
+> PharmacyHub · GlycoPharm 의 build script 는 `tsc -b` 다 — 이 두 서비스는 `-p` 단독 typecheck 로 검증했다고 판단하면 안 된다.
+
+### 18-3. 재검증 (병합 후 상태 기준, 전부 재실행)
+
+| 대상 | typecheck | build |
+|---|---|---|
+| `packages/store-ui-core` | **PASS** | — |
+| `web-kpa-society` | PASS | **PASS** (45.6s) |
+| `web-k-cosmetics` | PASS | **PASS** (19.0s) |
+| `web-glycopharm` | PASS | **PASS** (37.2s) |
+| `web-pharmacy-hub` | PASS | **PASS** (17.9s) — §18-2 수정 후 |
+| `web-neture` | PASS | — |
+
+4 서비스 build script 는 모두 `tsc` 를 포함하므로(`tsc && vite build` 또는 `tsc -b && vite build`) build PASS = 타입 검증 포함이다.
+barrel 양쪽 보존 해결에 **export 이름 충돌 0** 임이 이로써 실증됐다.
+
+### 18-4. census 모집단 재확인 — N=32 유지
+
+main 의 54 커밋이 Store Hub 축에 기능을 추가했는지 실측했다.
+
+| 확인 | 방법 | 결과 |
+|---|---|---|
+| Store Hub 축 파일 변경 | `git diff --stat 05488cc42 origin/main -- */pages/hub */pages/pharmacy */pages/event-offer */pages/store-hub */components/layouts */components/pharmacy */pages/library` | **변경 0** |
+| Store Hub 축 route 증감 | 4 서비스 `App.tsx` 의 `path=` 중 hub·pharmacy·event-offer·cart·orders 추출 후 base vs main diff | **4/4 identical** |
+
+→ main 의 진행분은 전부 `/store*` 내 매장 축(WO §12 OUT_OF_SCOPE)과 forum 축이다. **신규 Store Hub 기능 0 · 삭제 0 → N=32 그대로.**
+
+### 18-5. 선행 판정 독립 실측 (문서 수치를 믿지 않고 재측정)
+
+| 검증 항목 | 방법 | 결과 |
+|---|---|---|
+| §10 공통 View 내 서비스명 조건문 | 신규 공통 디렉터리 9곳 grep (`=== 'kpa'` 등) | **0건** (유일 매치는 규칙을 설명하는 주석 1줄) |
+| 사이니지 3 서비스 Core 소비 | `SignageLibraryView` 소비처 | KPA·KCos·GP **3/3** (141 · 108 · 108L) |
+| GP hub-import 편입 | `HubImportLibraryView` 소비처 | **9 페이지** = 3 서비스 × blog·pop·qr |
+| Shell 편입 | `StoreHubShell` 소비처 | **3/3** (131 · 117 · 117L) |
+| cart 편입 | `StoreCartView` 소비처 | **3/3** |
+| 콘텐츠 상세 | `HubContentDetailView` 소비처 | KCos·GP **2/2** (KPA 는 해당 화면 없음) |
+| buyer 주문 원장 | `BuyerOrderLedgerView` 소비처 | KPA·GP **2/2** (171 · 255L) — 설계대로 KCos·PH 제외 |
+| 이벤트 오퍼 | KPA `EventOfferHubView` / KCos·GP `EventOffersHubList` | **3/3 Core 소비** |
+| F1 API client | `createStoreHubApi` · `createSupplyCatalogApi` 소비처 | 각 **3/3** (`storeHub.ts` 51 · 52 · 51L) |
+
+선행 CHECK 가 적은 라인 수는 실측과 **±1L 이내로 일치**했다(병합 전 계수 차이).
+
+### 18-6. 추가 탐색 — census 누락 후보 재판정
+
+Store Hub 축에서 150L 초과 잔존 파일을 전수 나열해 census 밖 중복이 있는지 확인했다.
+
+| 후보 | 판정 | 근거 |
+|---|---|---|
+| KPA `PharmacyB2BPage` 680L | **OUT_OF_SCOPE-BY-WO-§12** | route 가 `/store/commerce/products` — Store Hub 축이 아니라 내 매장 축 |
+| KPA `EventOfferDetailPage` 522L | **SERVICE_SPECIFIC-BY-DESIGN** | route `/event-offers/:id` KPA 단독. KCos·GP 에 오퍼 상세 화면 자체가 없다(사본 0) |
+| KCos `HubContentPage` 124L | **FULLY_COMMON (E1 판정 유지)** | store-ui-core 가 아니라 `@o4o/shared-space-ui` 의 `ContentHubTemplate` 소비 — KPA·KCos·GP **3/3** 동일 템플릿. config adapter 뿐 |
+| KPA/PH `Store*` · `store-owner/*` 대형 화면군 | **OUT_OF_SCOPE-BY-WO-§12** | 실행 자산 관리(Agent C 축). census G1·G2 로 이미 계상 |
+
+→ **census 밖 정리 가능 중복 신규 발견 0.**
+
+### 18-7. §18 결론
+
+최신 origin/main 기준에서도 **`VIEW_DUPLICATED` 0 · 정리 가능한 `CORE_ONLY` 0** 이 유지된다.
+§14 의 32기능 숫자 블록은 재기준 후에도 그대로 유효하다(FULLY_COMMON 15 · CORE_ONLY 4 · VIEW_DUPLICATED 0 · SERVICE_SPECIFIC 11 · OUT_OF_SCOPE 2 · 미조사 0).
+
+병합 커밋: `7dfd8e641` (`origin/main` → `work/commonization-store-hub`). backend · DB · migration 변경 **0**.
+`main` 직접 병합 없음 — 브랜치 유지(WO §16).
+
+---
+
 문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 3건
