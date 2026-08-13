@@ -179,3 +179,37 @@ export type {
   StoreOwnerServiceKey,
   StoreOwnerStaleRecovery,
 } from './auth/StoreOwnerGuard';
+
+// 매장 경영활용 제품 — 교차 서비스 데이터 계약 + 목록 UI 파트
+// (WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1)
+// 타입은 `@o4o/store-ui-core/handled-products` subpath 로도 노출된다(기존 소비처 유지).
+export {
+  handledProductKey,
+} from './types/handledProducts';
+export type {
+  HandledProductSource,
+  HandledProductListItem,
+  HandledProductsPagination as HandledProductsPaginationMeta,
+  HandledProductRef,
+} from './types/handledProducts';
+
+export {
+  HandledProductsPageHeader,
+  HandledProductsToolbar,
+  HandledProductsCountRow,
+  HandledProductsTable,
+  HandledProductsPagination,
+  HandledProductNameCell,
+  HandledProductBadge,
+  formatHandledProductPrice,
+  formatHandledProductDate,
+  handledProductClassificationLabel,
+} from './components/handled-products/HandledProductsListParts';
+export type {
+  HandledProductsPageHeaderProps,
+  HandledProductsToolbarProps,
+  HandledProductsColumn,
+  HandledProductsSelection,
+  HandledProductsTableProps,
+  HandledProductBadgeTone,
+} from './components/handled-products/HandledProductsListParts';
