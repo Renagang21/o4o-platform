@@ -233,3 +233,6 @@ export type {
 
 // POP Composer (WO-O4O-MY-STORE-POP-COMPOSER-KCOS-GP-COMMONIZATION-V1)
 export * from './components/pop';
+
+// Store Library (WO-O4O-MY-STORE-LIBRARY-RESOURCES-CONTENTS-KCOS-GP-COMMONIZATION-V1)
+export * from './components/library';
