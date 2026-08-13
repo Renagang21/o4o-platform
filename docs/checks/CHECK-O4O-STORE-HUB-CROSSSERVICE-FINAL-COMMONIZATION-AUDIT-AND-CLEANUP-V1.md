@@ -150,8 +150,25 @@
 | build `web-pharmacy-hub` | PASS (16.00s) |
 
 - **1차 실패 내용(숨기지 않고 기록)**: KCos·GP 의 `StoreCartHttp` 어댑터를 화살표 함수로 작성하자 대상 시그니처의 제네릭 `T` 가 추론되지 않아 `TS2322: Type 'Promise<unknown>' is not assignable to type 'Promise<T>'` 4건씩 발생. 각 메서드에 제네릭을 명시(`get: <T,>(url: string) => axiosApi.get<T>(url)…`)하여 해소.
-- **browser smoke: 미수행.** 사유 — (1) 변경이 `work/commonization-store-hub` branch 에 있고 배포본(production)은 `main` 기준이라 이번 변경을 반영하지 않는다. (2) 신청·가져오기·장바구니 변경·주문 경로는 production write 이므로 승인 없이 실행하지 않는다(CLAUDE.md §0). 대신 route↔menu 정적 대조(§8), typecheck, 4 서비스 production build 로 회귀를 확인했다.
-- 남은 검증 권장: branch 배포 또는 로컬 dev 기동 후 KPA `/store-hub`·`/store-hub/b2b`·`/store-hub/event-offers`, KCos `/store-hub`·`/store-hub/b2b`, PharmacyHub `/store-owner`(상단 "매장 허브" 링크)·`/store-hub`·`/store-owner/products`·`/store-owner/cart` read-only 진입 확인.
+- **browser smoke: 수행 (read-only).** 로컬 `vite preview` 로 이번 branch 산출물을 띄우고 프로덕션 API(`api.neture.co.kr`)에 붙여 확인했다.
+
+| 서비스 | 경로 | 결과 |
+|---|---|---|
+| PharmacyHub (5177) | `/store-owner` | PASS — 상단바 "매장 허브" nav 링크 + 홈 바로가기 카드 노출 |
+| PharmacyHub | `/store-hub` | PASS — 링크 클릭으로 진입(직접 URL 아님) |
+| PharmacyHub | `/store-owner/products` · `/store-owner/cart` | PASS — 필터 렌더 · 빈 장바구니 정상 |
+| KPA (5174) | `/store-hub` | PASS — 좌측 4 그룹 메뉴 + 홈 3 블록 |
+| KPA | `/store-hub/b2b` | PASS — 탭 4 · 테이블 렌더(현재 공급 가능 상품 0건) |
+| KPA | `/store-hub/event-offers` | PASS — 상태 탭 4 · 검색 · 공급업체 필터 · 내 장바구니 링크 |
+| KPA | `/store-hub/cart` | PASS — `GET /api/v1/store/cart/kpa-society/groups` **200** |
+| KCos (5175) | `/store-hub` | PASS — `StoreHubTemplate` 홈 렌더 |
+| KCos | `/store-hub/b2b` | PASS — 탭 4 · 테이블 렌더 |
+| KCos | `/store-hub/cart` | PASS — `GET /api/v1/store/cart/k-cosmetics/groups` **200** |
+
+  이번 리팩터링의 실제 대상인 cart client(`createStoreCartApi`)가 **KPA·KCos 두 전송 계층(직접 body 반환 / axios `.data` 언랩) 모두에서 canonical endpoint 로 200** 을 받는 것을 실측했다.
+
+- **write 는 수행하지 않았다.** 신청·가져오기·장바구니 담기/수정·주문 확정은 production write 이므로 승인 없이 실행하지 않았다(WO §12 · CLAUDE.md §0). 진입 · 목록 · route 만 확인했다.
+- 검증 중 관측한 환경 아티팩트(코드 결함 아님): `vite preview` 는 dev proxy 가 없어 상대 경로 `/api/v1` 이 preview 서버의 index.html 로 응답한다 → 최초 KPA 진입 시 JSON 파싱 토스트가 떴다. `VITE_API_BASE_URL=https://api.neture.co.kr` 로 재빌드하니 사라졌고, 위 표는 재빌드본 기준이다. 또한 API CORS devOrigins 는 `localhost:5173~5177` 만 허용하므로 5178 은 사용할 수 없다.
 
 ---
 
