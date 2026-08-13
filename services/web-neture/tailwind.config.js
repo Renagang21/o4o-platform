@@ -7,6 +7,12 @@ export default {
     "../../packages/operator-ux-core/src/**/*.{ts,tsx}",
     "../../packages/ui/src/**/*.{ts,tsx}",
     "../../packages/account-ui/src/**/*.{ts,tsx}",
+    // WO-O4O-COMMUNITY-FORUM-OWNER-AREA-COMMONIZATION-V1:
+    //   Neture 는 이미 shared-space-ui 컴포넌트(ForumHubTemplate · ForumListTemplate ·
+    //   ForumRequestForm · ResourcesHubTemplate · StandardHomeTemplate 등)를 쓰는데 content 에
+    //   경로가 없어 그 안의 Tailwind 클래스가 purge 되고 있었다. 소유자 영역 공통화로
+    //   ForumOwnerDashboard 가 추가되면서 필수가 되어 함께 채운다 (기존 누락도 같이 해소).
+    "../../packages/shared-space-ui/src/**/*.{ts,tsx}",
   ],
   theme: {
     extend: {
