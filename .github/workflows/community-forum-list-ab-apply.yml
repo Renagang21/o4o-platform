@@ -1,0 +1,53 @@
+name: Community forum list A-B apply
+on:
+  push:
+    branches: [work/commonization-community]
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.actor == 'Renagang21'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: work/commonization-community
+      - name: Apply scoped list contract and PharmacyHub RBAC mapping
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('apps/api-server/src/controllers/forum/ForumPostController.ts')
+          s = p.read_text()
+          old = """      const query = req.query.search as string || req.query.query as string;\n      const tag = req.query.tag as string;\n"""
+          new = """      const serviceCode = (req.query.serviceCode as string | undefined)?.trim();\n      const query = req.query.search as string || req.query.query as string;\n      const tag = req.query.tag as string;\n"""
+          assert old in s, 'controller query anchor missing'
+          s = s.replace(old, new, 1)
+
+          old = """      // Forum context filter (service-bound visibility)\n      this.applyContextFilter(queryBuilder, 'post', this.getForumContext(req));\n"""
+          new = """      // WO-O4O-COMMUNITY-FORUM-LIST-COMMONIZATION-V1:\n      // Service-scoped callers must pass serviceCode. The EXISTS join binds posts to\n      // forum_category_requests.service_code for both forumId and forumId-less reads.\n      // Missing serviceCode intentionally keeps the legacy generic/admin contract so\n      // existing non-service consumers are not broken; service frontends must opt in.\n      if (serviceCode) {\n        queryBuilder.andWhere(\n          `EXISTS (\n            SELECT 1 FROM forum_category_requests _svc\n            WHERE _svc.id = post.forum_id\n              AND _svc.service_code = :forumServiceCode\n              AND _svc.status = 'completed'\n          )`,\n          { forumServiceCode: serviceCode },\n        );\n      }\n\n      // Forum context filter (organization/community visibility)\n      this.applyContextFilter(queryBuilder, 'post', this.getForumContext(req));\n"""
+          assert old in s, 'controller context anchor missing'
+          p.write_text(s.replace(old, new, 1))
+
+          for path in [
+              'apps/api-server/src/routes/forum/admin-forum.routes.ts',
+              'apps/api-server/src/routes/forum/operator-forum.routes.ts',
+          ]:
+              p = Path(path)
+              s = p.read_text()
+              old = """  'k-cosmetics': 'cosmetics',\n  'kpa-society': 'kpa',\n};\n"""
+              new = """  'k-cosmetics': 'cosmetics',\n  'kpa-society': 'kpa',\n  'pharmacy-hub': 'pharmacy-hub',\n};\n"""
+              assert old in s, f'map anchor missing: {path}'
+              p.write_text(s.replace(old, new, 1))
+          PY
+      - name: Commit A-B contract
+        run: |
+          rm .github/workflows/community-forum-list-ab-apply.yml
+          git config user.name "Rena"
+          git config user.email "sohae2100@gmail.com"
+          git add apps/api-server/src/controllers/forum/ForumPostController.ts \
+                  apps/api-server/src/routes/forum/admin-forum.routes.ts \
+                  apps/api-server/src/routes/forum/operator-forum.routes.ts \
+                  .github/workflows/community-forum-list-ab-apply.yml
+          git commit -m "fix(forum): scope post lists by service code"
+          git push origin HEAD:work/commonization-community
