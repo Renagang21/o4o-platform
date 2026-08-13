@@ -423,6 +423,61 @@ MUST_FIX_BEFORE_CLOSE 잔존: 0
 
 ---
 
+## 15-4. SonarCloud `new_duplicated_lines_density` — 근거 있는 예외 (판단 기록)
+
+> **다음 작업자에게**: PR #182 의 SonarCloud 실패는 **무시한 것이 아니라 판단한 것**이다.
+> 이 7.1% 를 낮추려고 thin adapter 를 다시 합치는 리팩터를 시작하지 말 것. 아래가 그 이유다.
+
+### 사실
+
+Quality Gate 5개 조건 중 **1개만** 실패했다.
+
+| 조건 | 값 | 판정 |
+|---|---|---|
+| `new_reliability_rating` | 1 | OK |
+| `new_security_rating` | 1 | OK |
+| `new_maintainability_rating` | 1 | OK |
+| `new_security_hotspots_reviewed` | 100% | OK |
+| **`new_duplicated_lines_density`** | **7.1%** (임계 3%) | **ERROR** |
+
+### 원인 — 전부 thin service adapter
+
+중복으로 계산된 파일 상위권은 예외 없이 **공통화가 남긴 의도된 잔여물**이다.
+
+| 중복률 | new_lines | 파일 |
+|---:|---:|---|
+| 85.7% | 35 | `web-k-cosmetics/src/api/storeHub.ts` · `web-glycopharm/src/api/storeHub.ts` |
+| 81.8% / 77.8% | 33 / 27 | `web-glycopharm` · `web-k-cosmetics` `/api/storeCart.ts` |
+| 65.2% / 59.7% | 66 / 67 | GP · KCos 사이니지 라이브러리 페이지 |
+| 44% 대 | 51~55 | KCos · GP blog/pop/qr 라이브러리 페이지 6개 |
+| 31.6% | 38 | `KCosmeticsHubLayout` · `GlycoPharmHubLayout` |
+
+### 판단
+
+1. **구조적 중복이 아니라 패턴 유사성이다.** 이 파일들은 `createXApi(transport, { config })` 또는
+   `<CommonView config={…} />` 형태다. §12 가 정상이라고 규정한 "단순 factory 호출 10~30줄" 그 자체다.
+2. **합칠 수 없다.** 각 서비스는 자기 transport(apiClient 인스턴스) · endpoint prefix · accent · route 를
+   가져야 한다. 3벌을 1벌로 만들면 서비스 경계가 흐려지고 config 가 비대해진다 — WO §3 의
+   "config 가 너무 커져 거대한 만능 View 가 되면 분리 유지한다" 에 정면으로 어긋난다.
+3. **Sonar 는 new code 만 본다.** 이 PR 은 전체적으로 **−9,944 줄**을 지웠고 총 중복은 크게 줄었는데,
+   지표는 새로 추가된 서로 닮은 어댑터만 분모/분자로 삼는다. 지표가 방향을 거꾸로 읽는 구간이다.
+4. **나머지 4개 조건이 모두 통과**했다 — 신뢰성 · 보안 · 유지보수성 · 보안 핫스팟 100%.
+
+→ **전체 구조 중복 감소와 서비스 경계 보존을 이 지표보다 우선한다.** 이번 PR 한정 예외로 수용하고 병합한다.
+
+### 하지 않은 것 (의도)
+
+- **이번 PR 을 통과시키려고 임계값을 즉석에서 낮추지 않았다.** Quality Gate 설정 무변경.
+- adapter 통합 리팩터를 하지 않았다(위 2번).
+
+### 후속 (별도 검토 대상, 이번 범위 아님)
+
+이 패턴이 반복되면 그때 **Sonar Quality Gate 정책 자체를** 검토한다 — thin adapter 디렉터리를
+duplication 계산에서 제외할지, 또는 new code duplication threshold 를 프로젝트 특성에 맞게
+조정할지. **개별 PR 을 통과시키기 위한 조정이 아니라 정책 결정으로 다룬다.**
+
+---
+
 ## 16. 후속 제안 (이번 범위 밖)
 
 | # | 제안 | 사유 |
