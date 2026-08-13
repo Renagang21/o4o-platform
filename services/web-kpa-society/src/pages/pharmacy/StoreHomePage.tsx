@@ -53,7 +53,6 @@ import {
   Store,
   Settings,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { Card } from '@o4o/ui';
 // WO-O4O-STORE-HOME-KPA-ADOPT-V1:
 // canonical StoreHomeShell 3번째 소비처. "실행 흐름 3단계"(기능 안내/온보딩 성격)를
@@ -68,6 +67,8 @@ import {
   StoreHomeSignalList,
   StoreHomeActivityPanel,
   StoreHomeStateView,
+  // WO-O4O-MY-STORE-HOME-SHORTCUT-GRID-CROSSSERVICE-COMMONIZATION-V1: 실행 흐름 단계별 진입점 칩
+  StoreHomeShortcutGrid,
 } from '@o4o/store-ui-core';
 import type { StoreHomeMetricItem, StoreHomeSignalItem } from '@o4o/store-ui-core';
 import { kpaConfig } from '@o4o/operator-ux-core';
@@ -246,16 +247,14 @@ export function StoreHomePage() {
                   <span className="text-[13px] font-semibold text-primary tracking-wide">상품 선택</span>
                 </div>
                 <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">판매할 O4O 제품을 찾거나, 매장에서 경영에 활용할 제품을 등록·관리합니다.</p>
-                <div className="flex flex-wrap gap-2 pl-[30px]">
-                  <Link to="/store/commerce/products" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
-                    <Package size={16} className="text-violet-600" />
-                    <span>O4O 제품</span>
-                  </Link>
-                  <Link to="/store/handled-products" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
-                    <Store size={16} className="text-emerald-600" />
-                    <span>매장 경영활용 제품</span>
-                  </Link>
-                </div>
+                <StoreHomeShortcutGrid
+                  variant="chip"
+                  className="flex flex-wrap gap-2 pl-[30px]"
+                  items={[
+                    { to: '/store/commerce/products', label: 'O4O 제품', icon: <Package size={16} className="text-violet-600" /> },
+                    { to: '/store/handled-products', label: '매장 경영활용 제품', icon: <Store size={16} className="text-emerald-600" /> },
+                  ]}
+                />
               </div>
 
               <div className="h-px bg-slate-100" />
@@ -268,12 +267,13 @@ export function StoreHomePage() {
                   <span className="text-[13px] font-semibold text-emerald-600 tracking-wide">콘텐츠에서 만들기</span>
                 </div>
                 <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">콘텐츠를 선택해 QR-code · POP을 바로 만듭니다.</p>
-                <div className="flex flex-wrap gap-2 pl-[30px]">
-                  <Link to="/store/library/contents" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
-                    <FileEdit size={16} className="text-emerald-600" />
-                    <span>콘텐츠 자료함</span>
-                  </Link>
-                </div>
+                <StoreHomeShortcutGrid
+                  variant="chip"
+                  className="flex flex-wrap gap-2 pl-[30px]"
+                  items={[
+                    { to: '/store/library/contents', label: '콘텐츠 자료함', icon: <FileEdit size={16} className="text-emerald-600" /> },
+                  ]}
+                />
               </div>
 
               <div className="h-px bg-slate-100" />
@@ -285,28 +285,20 @@ export function StoreHomePage() {
                   <span className="text-[13px] font-semibold text-violet-600 tracking-wide">매장에 적용하기</span>
                 </div>
                 <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">제작한 자료를 사이니지·태블릿·온라인 판매 등 매장 채널에 배포·운영합니다.</p>
-                <div className="flex flex-wrap gap-2 pl-[30px]">
-                  {/* WO-O4O-KPA-STORE-HOME-CTA-AND-MENU-ALIGNMENT-V1 §6.2: legacy redirect 경유 제거 —
-                      최종 canonical route(/marketing/signage/playlist, /online-sales/settings)로 직접 이동. */}
-                  <Link to="/store/marketing/signage/playlist" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
-                    <Monitor size={16} className="text-primary" />
-                    <span>사이니지</span>
-                  </Link>
-                  <Link to="/store/commerce/tablet-displays" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
-                    <TabletIcon size={16} className="text-violet-600" />
-                    <span>태블릿 화면 제작</span>
-                  </Link>
-                  {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §6:
-                      QR 은 실제 매장 배포 채널(부착물·안내물·코너 QR)인데 실행 흐름에 진입점이 없었다 → 추가. */}
-                  <Link to="/store/marketing/qr" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
-                    <QrCode size={16} className="text-primary" />
-                    <span>QR 코드</span>
-                  </Link>
-                  <Link to="/store/online-sales/settings" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
-                    <Settings size={16} className="text-emerald-600" />
-                    <span>판매 설정</span>
-                  </Link>
-                </div>
+                {/* WO-O4O-KPA-STORE-HOME-CTA-AND-MENU-ALIGNMENT-V1 §6.2: legacy redirect 경유 제거 —
+                  최종 canonical route(/marketing/signage/playlist, /online-sales/settings)로 직접 이동. */}
+                {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §6:
+                  QR 은 실제 매장 배포 채널(부착물·안내물·코너 QR)인데 실행 흐름에 진입점이 없었다 → 추가. */}
+                <StoreHomeShortcutGrid
+                  variant="chip"
+                  className="flex flex-wrap gap-2 pl-[30px]"
+                  items={[
+                    { to: '/store/marketing/signage/playlist', label: '사이니지', icon: <Monitor size={16} className="text-primary" /> },
+                    { to: '/store/commerce/tablet-displays', label: '태블릿 화면 제작', icon: <TabletIcon size={16} className="text-violet-600" /> },
+                    { to: '/store/marketing/qr', label: 'QR 코드', icon: <QrCode size={16} className="text-primary" /> },
+                    { to: '/store/online-sales/settings', label: '판매 설정', icon: <Settings size={16} className="text-emerald-600" /> },
+                  ]}
+                />
               </div>
 
             </div>

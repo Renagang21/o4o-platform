@@ -36,8 +36,13 @@ import {
   StoreHomeMetricGrid,
   StoreHomeSignalList,
   StoreHomeActivityPanel,
+  StoreHomeShortcutGrid,
 } from '@o4o/store-ui-core';
-import type { StoreHomeMetricItem, StoreHomeSignalItem } from '@o4o/store-ui-core';
+import type {
+  StoreHomeMetricItem,
+  StoreHomeSignalItem,
+  StoreHomeShortcutItem,
+} from '@o4o/store-ui-core';
 import { getUserDisplayName } from '@o4o/account-ui';
 import {
   fetchStoreDashboard,
@@ -64,24 +69,26 @@ const STATUS_TONE: Record<string, string> = {
   rejected: 'bg-red-50 text-red-700 border-red-200',
 };
 
-const SHORTCUTS = [
+// WO-O4O-MY-STORE-HOME-SHORTCUT-GRID-CROSSSERVICE-COMMONIZATION-V1:
+//   항목·문구·경로는 종전 그대로, 렌더만 공통 StoreHomeShortcutGrid 로 위임한다.
+const SHORTCUTS: StoreHomeShortcutItem[] = [
   {
     to: '/store-owner/products',
     label: '공급 상품',
-    desc: '공급자가 제공하는 상품을 살펴보고 장바구니에 담습니다.',
-    Icon: Package,
+    description: '공급자가 제공하는 상품을 살펴보고 장바구니에 담습니다.',
+    icon: <Package className="h-5 w-5" />,
   },
   {
     to: '/store-owner/cart',
     label: '장바구니',
-    desc: '담아 둔 상품을 확인하고 주문을 생성합니다.',
-    Icon: ShoppingCart,
+    description: '담아 둔 상품을 확인하고 주문을 생성합니다.',
+    icon: <ShoppingCart className="h-5 w-5" />,
   },
   {
     to: '/store-owner/orders',
     label: '주문 내역',
-    desc: '주문 상태와 결제 진행 상황을 확인합니다.',
-    Icon: Receipt,
+    description: '주문 상태와 결제 진행 상황을 확인합니다.',
+    icon: <Receipt className="h-5 w-5" />,
   },
 ];
 
@@ -337,21 +344,7 @@ export default function StoreOwnerHomePage() {
         )}
 
         {/* 바로가기 */}
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SHORTCUTS.map(({ to, label, desc, Icon }) => (
-            <Link
-              key={to}
-              to={to}
-              className="group rounded-xl border border-slate-200 bg-white p-5 transition-colors hover:border-teal-300 hover:bg-teal-50/40"
-            >
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-teal-50 text-teal-700">
-                <Icon className="h-5 w-5" />
-              </span>
-              <p className="mt-3 font-semibold text-slate-900 group-hover:text-teal-800">{label}</p>
-              <p className="mt-1 text-sm text-slate-600">{desc}</p>
-            </Link>
-          ))}
-        </section>
+        <StoreHomeShortcutGrid items={SHORTCUTS} aria-label="바로가기" />
         </div>
       </StoreHomeShell>
     </div>

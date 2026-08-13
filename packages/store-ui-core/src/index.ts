@@ -105,6 +105,13 @@ export { StoreHomeActivityPanel } from './components/home/StoreHomeActivityPanel
 export type { StoreHomeActivityPanelProps } from './components/home/StoreHomeActivityPanel';
 export { StoreHomeStateView } from './components/home/StoreHomeStateView';
 export type { StoreHomeStateViewProps, StoreHomeViewState } from './components/home/StoreHomeStateView';
+// WO-O4O-MY-STORE-HOME-SHORTCUT-GRID-CROSSSERVICE-COMMONIZATION-V1
+export { StoreHomeShortcutGrid } from './components/home/StoreHomeShortcutGrid';
+export type {
+  StoreHomeShortcutGridProps,
+  StoreHomeShortcutItem,
+  StoreHomeShortcutVariant,
+} from './components/home/StoreHomeShortcutGrid';
 
 // Production Router Utils (WO-O4O-STORE-PRODUCTION-ROUTER-UTILS-COMMONIZATION-PHASE2-G-V1)
 export type { ProductionTarget, ProductionSourceItem, ProductionSource, ProductionRouterState } from './utils/productionUtils';
