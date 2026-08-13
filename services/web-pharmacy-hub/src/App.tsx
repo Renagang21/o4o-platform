@@ -59,6 +59,7 @@ import RoleEntryPage from './pages/RoleEntryPage';
 import JoinPage from './pages/JoinPage';
 import JoinStatusPage from './pages/JoinStatusPage';
 import ForumHubPage from './pages/forum/ForumHubPage';
+import ForumListPage from './pages/forum/ForumListPage';
 import MembershipsPage from './pages/operator/MembershipsPage';
 import MembershipDetailPage from './pages/operator/MembershipDetailPage';
 // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
@@ -116,6 +117,14 @@ export default function App() {
             element={
               <MembershipGate>
                 <ForumHubPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/forum/posts"
+            element={
+              <MembershipGate>
+                <ForumListPage />
               </MembershipGate>
             }
           />
