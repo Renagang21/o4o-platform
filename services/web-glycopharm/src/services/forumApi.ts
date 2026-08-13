@@ -3,11 +3,37 @@
  *
  * WO-O4O-GLYCOPHARM-FORUM-API-CANONICAL-V1
  * WO-O4O-FORUM-CANONICAL-SPRINT2-CLEANUP-V1 — @o4o/types/forum SSOT 정렬
+ * WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1
  *
- * Canonical endpoint: /api/v1/forum/* (common forum API)
+ * Canonical endpoint: `/api/v1/glycopharm/forum/*` (service-scoped forum API)
+ *
+ * 이전에는 generic `/api/v1/forum/*` 을 직접 호출했다. generic route 에는
+ * forumContextMiddleware 가 없어 ForumControllerBase.applyContextFilter 가 무필터로
+ * 통과하므로(`if (!ctx) return;`) 타 서비스(kpa-society / neture / k-cosmetics /
+ * pharmacy-hub) 의 포럼·게시글이 GlycoPharm 화면에 섞이고, 작성도 서비스 경계 밖
+ * forumId 로 가능했다.
+ *
+ * 격리는 신규 로직 없이 기존 서비스 mount 계약에 위임한다:
+ *   /api/v1/glycopharm/forum/*
+ *     → forumContextMiddleware({ serviceCode: 'glycopharm', organizationId: FORUM_ORGS.GLYCOPHARM })
+ *     → resolveCanonicalServiceKey('glycopharm') = 'glycopharm'
+ *     → forum_category_requests.service_code 일치 EXISTS 필터
+ *
+ * ⚠️ 이 파일이 GlycoPharm forum API base 의 단일 소유자다. 페이지에서 forum 경로
+ *    문자열을 직접 만들지 말고 여기의 함수나 {@link FORUM_BASE} 를 쓴다.
+ *
+ * 예외 — `/forum/category-requests/*` 는 여기로 옮기지 않는다.
+ *   포럼 개설 신청 계약은 자체 `serviceCode` 쿼리 파라미터로 이미 서비스가 지정되며
+ *   operator 승인 흐름과 계약을 공유한다. 본 WO 제외 범위(§3 operator/admin 계약 무변경).
  */
 
 import { api } from '@/lib/apiClient';
+
+/**
+ * GlycoPharm forum API base (service-scoped).
+ * `api` 의 baseURL 이 이미 `/api/v1` 로 끝나므로 여기서는 그 뒤만 적는다.
+ */
+export const FORUM_BASE = '/glycopharm/forum';
 
 // ─── Types — @o4o/types/forum SSOT ─────────────────────────────────────────────
 
@@ -71,7 +97,7 @@ export async function fetchForumPosts(params: {
   if (params.category) query.set('category', params.category);
   if (params.sort) query.set('sort', params.sort);
   if (params.isPinned !== undefined) query.set('isPinned', String(params.isPinned));
-  const response = await api.get(`/forum/posts?${query}`);
+  const response = await api.get(`${FORUM_BASE}/posts?${query}`);
   const data = response.data;
   if (Array.isArray(data)) return { success: true, data };
   if (data?.data && Array.isArray(data.data)) return { success: true, data: data.data };
@@ -79,7 +105,7 @@ export async function fetchForumPosts(params: {
 }
 
 export async function fetchPopularForums(limit: number = 6): Promise<{ success: boolean; data: ForumCategory[] }> {
-  const response = await api.get(`/forum/categories/popular?limit=${limit}`);
+  const response = await api.get(`${FORUM_BASE}/categories/popular?limit=${limit}`);
   const data = response.data;
   if (Array.isArray(data)) return { success: true, data };
   if (data?.data && Array.isArray(data.data)) return { success: true, data: data.data };
@@ -87,14 +113,14 @@ export async function fetchPopularForums(limit: number = 6): Promise<{ success: 
 }
 
 export async function fetchForumPost(id: string): Promise<{ success: boolean; data: ForumPostDetail | null }> {
-  const response = await api.get(`/forum/posts/${id}`);
+  const response = await api.get(`${FORUM_BASE}/posts/${id}`);
   const data = response.data;
   if (data?.data) return { success: true, data: data.data };
   return { success: true, data: data || null };
 }
 
 export async function fetchPostComments(postId: string): Promise<{ success: boolean; data: ForumComment[] }> {
-  const response = await api.get(`/forum/posts/${postId}/comments`);
+  const response = await api.get(`${FORUM_BASE}/posts/${postId}/comments`);
   const data = response.data;
   if (Array.isArray(data)) return { success: true, data };
   if (data?.data && Array.isArray(data.data)) return { success: true, data: data.data };
@@ -108,17 +134,17 @@ export async function createForumPost(payload: {
   // WO-O4O-FORUM-WRITE-EDITOR-CONTENT-PARITY-V1: blocks(Block[]) 정렬 — string 호환 유지
   content: unknown[] | string;
 }): Promise<{ success: boolean; data?: { id: string }; id?: string; error?: string }> {
-  const response = await api.post('/forum/posts', payload);
+  const response = await api.post(`${FORUM_BASE}/posts`, payload);
   return response.data;
 }
 
 // ─── Owner Category Management ─────────────────────────────────────────────────
 // WO-O4O-GLYCOPHARM-FORUM-DASHBOARD-V1
-// Canonical endpoints: /api/v1/forum/categories/{mine,/owner,/delete-request}
+// Canonical endpoints: /api/v1/glycopharm/forum/categories/{mine,/owner,/delete-request}
 
 export async function fetchMyCategories(): Promise<{ success: boolean; data: any[] }> {
   try {
-    const response = await api.get('/forum/categories/mine');
+    const response = await api.get(`${FORUM_BASE}/categories/mine`);
     return response.data;
   } catch (error) {
     console.error('Error fetching my categories:', error);
@@ -131,7 +157,7 @@ export async function updateMyCategory(
   data: { name?: string; description?: string; iconEmoji?: string | null; iconUrl?: string | null },
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await api.patch(`/forum/categories/${id}/owner`, data);
+    const response = await api.patch(`${FORUM_BASE}/categories/${id}/owner`, data);
     return response.data;
   } catch (error: any) {
     const msg = error?.response?.data?.message || error?.response?.data?.error || '저장에 실패했습니다.';
@@ -144,7 +170,7 @@ export async function requestDeleteCategory(
   data: { reason?: string },
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await api.post(`/forum/categories/${id}/delete-request`, data);
+    const response = await api.post(`${FORUM_BASE}/categories/${id}/delete-request`, data);
     return response.data;
   } catch (error: any) {
     const msg = error?.response?.data?.message || error?.response?.data?.error || '삭제 요청에 실패했습니다.';
@@ -152,6 +178,15 @@ export async function requestDeleteCategory(
   }
 }
 
+/**
+ * 포럼 개설 신청 내역.
+ *
+ * WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1:
+ *   의도적으로 generic `/api/v1/forum/category-requests/*` 를 유지한다. 이 계약은
+ *   `serviceCode` 쿼리 파라미터로 서비스를 명시하며 operator 승인 흐름과 계약을 공유한다
+ *   (service-forum.routes.ts 도 같은 이유로 `/category-requests/*` 를 마운트하지 않는다).
+ *   본 WO 제외 범위 — operator/admin forum 계약 무변경.
+ */
 export async function fetchMyForumRequests(): Promise<{ success: boolean; data: any[] }> {
   try {
     const response = await api.get('/forum/category-requests/my?serviceCode=glycopharm');
@@ -164,7 +199,10 @@ export async function fetchMyForumRequests(): Promise<{ success: boolean; data: 
 
 // ============================================================================
 // Forum Membership API — WO-O4O-FORUM-MEMBER-MANAGEMENT-EXPANSION-FRONTEND-V1
-// Common endpoint: /api/v1/forum/categories/:id/...
+// WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1:
+//   generic `/api/v1/forum/categories/:id/...` → service-scoped
+//   `/api/v1/glycopharm/forum/categories/:id/...`.
+//   백엔드 핸들러는 공통 ForumMembershipController 그대로이며 소유자 검증 계약도 무변경이다.
 // ============================================================================
 
 export interface ForumJoinRequest {
@@ -193,37 +231,37 @@ export interface ForumMember {
 export const forumMembershipApi = {
   getJoinRequests: (forumId: string) =>
     api.get<{ success: boolean; data: ForumJoinRequest[] }>(
-      `/forum/categories/${forumId}/join-requests`,
+      `${FORUM_BASE}/categories/${forumId}/join-requests`,
     ),
 
   approveJoin: (forumId: string, requestId: string) =>
     api.post<{ success: boolean; data: any }>(
-      `/forum/categories/${forumId}/join-requests/${requestId}/approve`,
+      `${FORUM_BASE}/categories/${forumId}/join-requests/${requestId}/approve`,
     ),
 
   rejectJoin: (forumId: string, requestId: string, reviewComment?: string) =>
     api.post<{ success: boolean; data: any }>(
-      `/forum/categories/${forumId}/join-requests/${requestId}/reject`,
+      `${FORUM_BASE}/categories/${forumId}/join-requests/${requestId}/reject`,
       { reviewComment },
     ),
 
   getMembers: (forumId: string) =>
     api.get<{ success: boolean; data: ForumMember[] }>(
-      `/forum/categories/${forumId}/members`,
+      `${FORUM_BASE}/categories/${forumId}/members`,
     ),
 
   removeMember: (forumId: string, userId: string) =>
     api.delete<{ success: boolean; data: any }>(
-      `/forum/categories/${forumId}/members/${userId}`,
+      `${FORUM_BASE}/categories/${forumId}/members/${userId}`,
     ),
 
   requestJoin: (forumId: string) =>
     api.post<{ success: boolean; data: any }>(
-      `/forum/categories/${forumId}/join-requests`,
+      `${FORUM_BASE}/categories/${forumId}/join-requests`,
     ),
 
   getMembershipStatus: (forumId: string) =>
     api.get<{ success: boolean; data: { isMember: boolean; role: string | null; pendingRequest: boolean } }>(
-      `/forum/categories/${forumId}/membership-status`,
+      `${FORUM_BASE}/categories/${forumId}/membership-status`,
     ),
 };

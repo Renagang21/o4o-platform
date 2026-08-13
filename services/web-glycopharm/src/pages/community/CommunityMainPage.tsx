@@ -17,6 +17,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { apiClient } from '@/services/api';
+// WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1
+import { FORUM_BASE } from '@/services/forumApi';
 import {
   StandardHomeTemplate,
   templates,
@@ -213,7 +215,11 @@ export default function CommunityMainPage() {
     setLoading(true);
     setNoticesError(false);
     try {
-      const res = await apiClient.get<ForumPostRaw[]>('/api/v1/glycopharm/forum/posts?limit=30');
+      // WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1:
+      //   forum base 는 services/forumApi.ts 가 단일 소유한다. 여기서 경로 문자열을 직접
+      //   조립하면 generic/scoped 가 다시 갈라진다(본 WO 가 닫은 결함). 실패 전달 계약
+      //   (apiClient 는 throw 하지 않고 { error } 반환)은 그대로 유지한다.
+      const res = await apiClient.get<ForumPostRaw[]>(`${FORUM_BASE}/posts?limit=30`);
       if (res.error || !Array.isArray(res.data)) {
         setNoticeItems([]);
         setNoticesError(true);

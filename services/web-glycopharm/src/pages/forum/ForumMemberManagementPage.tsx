@@ -2,8 +2,10 @@
  * ForumMemberManagementPage - 포럼 회원 관리 (GlycoPharm)
  *
  * WO-O4O-FORUM-MEMBER-MANAGEMENT-EXPANSION-FRONTEND-V1
+ * WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1
  *
- * 공통 /api/v1/forum/categories/:id/... endpoint 사용.
+ * service-scoped /api/v1/glycopharm/forum/categories/:id/... endpoint 사용
+ * (핸들러는 공통 ForumMembershipController 그대로).
  * 폐쇄형 포럼 개설자(owner)가 가입 신청 승인/거절, 회원 목록 조회, 회원 삭제.
  */
 

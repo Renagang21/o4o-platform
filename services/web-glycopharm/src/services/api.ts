@@ -228,16 +228,14 @@ export const forumRequestApi = {
       reviewComment: data.review_comment,
     }),
 
-  // Owner category management — WO-MY-CATEGORIES-API-V1 / WO-FORUM-OWNER-BASIC-EDIT-V1
-  getMyCategories: () =>
-    apiClient.get<unknown[]>('/api/v1/glycopharm/forum/categories/mine'),
-
-  updateMyCategory: (id: string, data: { name?: string; description?: string; iconEmoji?: string; iconUrl?: string }) =>
-    apiClient.patch<unknown>(`/api/v1/glycopharm/forum/categories/${id}/owner`, data),
-
-  // Delete request — WO-O4O-FORUM-DELETE-REQUEST-V1
-  requestDeleteCategory: (id: string, data: { reason?: string }) =>
-    apiClient.post<unknown>(`/api/v1/glycopharm/forum/categories/${id}/delete-request`, data),
+  // Owner category management / Delete request —
+  //   WO-MY-CATEGORIES-API-V1 / WO-FORUM-OWNER-BASIC-EDIT-V1 / WO-O4O-FORUM-DELETE-REQUEST-V1
+  // WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1:
+  //   getMyCategories / updateMyCategory / requestDeleteCategory 3개를 여기서 제거했다.
+  //   활성 소비처가 0 이었고(실제 화면은 services/forumApi.ts 의 fetchMyCategories /
+  //   updateMyCategory / requestDeleteCategory 를 쓴다), forum base 문자열을 두 파일이
+  //   각각 소유하는 상태가 본 WO 가 닫은 generic/scoped 혼재를 다시 만든다.
+  //   forum base 의 단일 소유자는 services/forumApi.ts (FORUM_BASE) 다.
 };
 
 // Forum Delete Request Operator API — WO-O4O-FORUM-DELETE-REQUEST-V1

@@ -7,6 +7,8 @@
 import { useState, useEffect } from 'react';
 import { MessageSquare, Plus, ThumbsUp, Eye } from 'lucide-react';
 import { apiClient } from '@/services/api';
+// WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1
+import { FORUM_BASE } from '@/services/forumApi';
 import { LoadError } from '@o4o/ui';
 import { LoadingState, EmptyState } from '@/components/common';
 
@@ -41,7 +43,7 @@ export default function ForumFeedbackPage() {
       setIsLoading(true);
       setLoadError(false);
       try {
-        const response = await apiClient.get<FeedbackPost[]>('/api/v1/glycopharm/forum/feedback');
+        const response = await apiClient.get<FeedbackPost[]>(`${FORUM_BASE}/feedback`);
         // apiClient 는 실패를 throw 하지 않고 { error } 로 돌려준다 — error 를 명시적으로 판정해야 한다.
         if (response.error) {
           setLoadError(true);
