@@ -28,7 +28,7 @@ interface ForumDirectoryResponse {
  */
 export async function fetchPharmacyHubForumCategories(): Promise<ForumHubCategory[]> {
   const response = await api.get<ForumDirectoryResponse>('/forum/categories');
-  const rows = response.data?.data ?? [];
+  const rows: ForumDirectoryRow[] = response.data?.data ?? [];
 
   return rows
     .filter((forum) => forum.serviceCode === SERVICE_CODE)
