@@ -56,6 +56,24 @@ function buildDefaultColumns<T extends OperatorStoreBase>(
   config: StoresConfig,
 ): ListColumnDef<T>[] {
   const typeLabels = config.typeLabels ?? {};
+  // WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1:
+  //   slug 컬럼 / 상품 배지 톤을 config 로 흡수 (KCos·Neture 의 컬럼 전체 복제 제거).
+  const slugTextClass = config.slugTextClass ?? 'text-slate-600';
+  const productCountBadge = config.productCountTone === 'pink'
+    ? 'bg-pink-100 text-pink-700'
+    : 'bg-purple-100 text-purple-700';
+  const slugColumn: ListColumnDef<T>[] = config.showSlugColumn
+    ? [
+        {
+          key: 'slug',
+          header: 'Slug',
+          width: '130px',
+          render: (v) => v
+            ? <span className={`font-mono text-xs ${slugTextClass}`}>{v}</span>
+            : <span className="text-slate-300">-</span>,
+        },
+      ]
+    : [];
   return [
     {
       key: 'name',
@@ -80,6 +98,7 @@ function buildDefaultColumns<T extends OperatorStoreBase>(
         </span>
       ),
     },
+    ...slugColumn,
     {
       key: 'ownerName',
       header: '운영자',
@@ -114,7 +133,7 @@ function buildDefaultColumns<T extends OperatorStoreBase>(
       sortable: true,
       render: (v) => (
         <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${
-          v > 0 ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-400'
+          v > 0 ? productCountBadge : 'bg-slate-100 text-slate-400'
         }`}>
           {v}
         </span>

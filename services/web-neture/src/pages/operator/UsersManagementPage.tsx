@@ -21,11 +21,11 @@ import { Link } from 'react-router-dom';
 import { UserCheck, UserMinus, UserX, Info, ArrowRight } from 'lucide-react';
 import {
   OperatorMembersConsolePage,
+  OperatorMemberSoftDeleteFlow,
   type MembersConsoleClient,
   type MembersConsoleListParams,
   type UserData,
 } from '@o4o/operator-core-ui/modules/members';
-import { toast } from '@o4o/error-handling';
 import { api } from '@/lib/apiClient';
 import { operatorSupplierApi } from '@/lib/api/admin';
 import EditUserModal from './EditUserModal';
@@ -170,76 +170,9 @@ const netureMembersClient: MembersConsoleClient = {
 // ─── Delete Flow (Neture: soft only for operator) ────────────
 // WO-O4O-OPERATOR-MEMBERS-DELETE-ACTION-POLICY-FIX-V1:
 // 완전삭제(hard delete)는 admin 전용. operator 화면에서 제거.
-
-function NetureDeleteFlow({
-  user,
-  onClose,
-  onDeleted,
-}: {
-  user: UserData;
-  onClose: () => void;
-  onDeleted: () => void;
-}) {
-  const [busy, setBusy] = useState(false);
-
-  const displayName = useMemo(() => {
-    const full = `${user.lastName || ''}${user.firstName || ''}`.trim();
-    if (full) return full;
-    if (user.name && user.name !== user.email) return user.name;
-    return user.email?.split('@')[0] || '사용자';
-  }, [user]);
-
-  const handle = async () => {
-    setBusy(true);
-    try {
-      await api.delete(`/operator/members/${user.id}?mode=soft`);
-      toast.success('사용자가 비활성화되었습니다.');
-      onDeleted();
-    } catch (err: any) {
-      toast.error(err?.message || '비활성화에 실패했습니다.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
-        <h3 className="text-lg font-bold text-amber-600 mb-2">회원 비활성화 확인</h3>
-        <div className="space-y-3 mb-4">
-          <div className="bg-slate-50 rounded-lg p-3">
-            <p className="text-sm text-slate-500">대상 사용자</p>
-            <p className="font-medium text-slate-900">
-              {displayName} ({user.email})
-            </p>
-            <p className="text-xs text-slate-400 mt-0.5">상태: {user.status}</p>
-          </div>
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-            <p className="text-sm text-amber-800">
-              비활성화하면 로그인이 차단되고 목록에서 제외됩니다. 필요 시 관리자를 통해 재활성화할 수 있습니다.
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={onClose}
-            disabled={busy}
-            className="flex-1 px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50"
-          >
-            취소
-          </button>
-          <button
-            onClick={handle}
-            disabled={busy}
-            className="flex-1 px-4 py-2 text-sm bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50"
-          >
-            {busy ? '처리 중...' : '비활성화'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+// WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1:
+// 직접 마크업한 확인 모달(69L) 제거 → 공통 OperatorMemberSoftDeleteFlow(ConfirmActionDialog).
+// K-Cosmetics 와 동일 업무·동일 endpoint 이며 문구만 서비스별로 주입한다.
 
 // ─── 공급자 승인 안내 + 공급 승인 대기 CTA ────────────────────
 // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
@@ -392,7 +325,19 @@ export default function UsersManagementPage() {
         <EditUserModal userId={user.id} onClose={onClose} onSuccess={onSuccess} />
       )}
       renderDeleteFlow={({ user, onClose, onDeleted }) => (
-        <NetureDeleteFlow user={user} onClose={onClose} onDeleted={onDeleted} />
+        <OperatorMemberSoftDeleteFlow
+          user={user}
+          onClose={onClose}
+          onDeleted={onDeleted}
+          execute={(userId) => api.delete(`/operator/members/${userId}?mode=soft`).then(() => undefined)}
+          title="회원 비활성화 확인"
+          confirmText="비활성화"
+          buildMessage={(displayName, u) =>
+            `${displayName} (${u.email})\n상태: ${u.status}\n\n비활성화하면 로그인이 차단되고 목록에서 제외됩니다.\n필요 시 관리자를 통해 재활성화할 수 있습니다.`
+          }
+          successMessage="사용자가 비활성화되었습니다."
+          errorMessage="비활성화에 실패했습니다."
+        />
       )}
       /* WO-O4O-NETURE-MEMBER-MANAGEMENT-BULK-AND-ROUTE-ALIGNMENT-V1:
          정지/복원/탈퇴 처리 bulk 작업. 승인/거절은 별도 RegistrationRequestsPage 트랙이므로 제외.

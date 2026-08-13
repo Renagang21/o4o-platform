@@ -16,15 +16,14 @@
  *   - WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1 (Hybrid Canonical)
  */
 
-import { useState } from 'react';
 import { UserX, UserCheck, UserMinus } from 'lucide-react';
 import {
   OperatorMembersConsolePage,
+  OperatorMemberSoftDeleteFlow,
   type MembersConsoleClient,
   type MembersConsoleListParams,
   type UserData,
 } from '@o4o/operator-core-ui/modules/members';
-import { ConfirmActionDialog } from '@o4o/ui';
 import { toast } from '@o4o/error-handling';
 import { api } from '../../lib/apiClient';
 import EditUserModal from './EditUserModal';
@@ -124,51 +123,6 @@ const kcosMembersClient: MembersConsoleClient = {
   },
 };
 
-// ─── Delete Flow — simple confirm ────────────────────────────
-
-function KcosDeleteFlow({
-  user,
-  onClose,
-  onDeleted,
-}: {
-  user: UserData;
-  onClose: () => void;
-  onDeleted: () => void;
-}) {
-  const [loading, setLoading] = useState(false);
-  const displayName =
-    user.name || `${user.lastName || ''}${user.firstName || ''}`.trim() || user.email.split('@')[0];
-
-  // WO-O4O-OPERATOR-MEMBERS-DELETE-ACTION-POLICY-FIX-V1:
-  // mode 파라미터 없음 → 백엔드 default soft delete.
-  // 문구를 실제 동작(비활성화)에 맞게 수정.
-  const handle = async () => {
-    setLoading(true);
-    try {
-      await api.delete(`/operator/members/${user.id}?mode=soft`);
-      toast.success('탈퇴 처리 완료. 필요 시 관리자를 통해 재활성화할 수 있습니다.');
-      onDeleted();
-    } catch (err: any) {
-      toast.error(err?.message || '탈퇴 처리에 실패했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <ConfirmActionDialog
-      open
-      onClose={onClose}
-      onConfirm={handle}
-      title="탈퇴 처리 확인"
-      message={`${displayName} (${user.email})\n\n이 회원을 탈퇴(비활성화) 처리하시겠습니까?\n탈퇴 처리 후 로그인이 차단되며, 필요 시 관리자를 통해 재활성화할 수 있습니다.`}
-      confirmText="탈퇴 처리"
-      variant="warning"
-      loading={loading}
-    />
-  );
-}
-
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UsersPage() {
@@ -216,8 +170,23 @@ export default function UsersPage() {
       renderEditModal={({ user, onClose, onSuccess }) => (
         <EditUserModal userId={user.id} onClose={onClose} onSuccess={onSuccess} />
       )}
+      /* WO-O4O-OPERATOR-MEMBERS-DELETE-ACTION-POLICY-FIX-V1: mode=soft (백엔드 default 와 동일).
+         WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1:
+         Neture 와 중복이던 확인 플로우를 공통 OperatorMemberSoftDeleteFlow 로 수렴 (문구만 주입). */
       renderDeleteFlow={({ user, onClose, onDeleted }) => (
-        <KcosDeleteFlow user={user} onClose={onClose} onDeleted={onDeleted} />
+        <OperatorMemberSoftDeleteFlow
+          user={user}
+          onClose={onClose}
+          onDeleted={onDeleted}
+          execute={(userId) => api.delete(`/operator/members/${userId}?mode=soft`).then(() => undefined)}
+          title="탈퇴 처리 확인"
+          confirmText="탈퇴 처리"
+          buildMessage={(displayName, u) =>
+            `${displayName} (${u.email})\n\n이 회원을 탈퇴(비활성화) 처리하시겠습니까?\n탈퇴 처리 후 로그인이 차단되며, 필요 시 관리자를 통해 재활성화할 수 있습니다.`
+          }
+          successMessage="탈퇴 처리 완료. 필요 시 관리자를 통해 재활성화할 수 있습니다."
+          errorMessage="탈퇴 처리에 실패했습니다."
+        />
       )}
       extraRowActions={[
         {

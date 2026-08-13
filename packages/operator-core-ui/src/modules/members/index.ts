@@ -44,3 +44,7 @@ export type {
   NormalizedDeleteRisk,
   DeleteFlowRiskItem,
 } from './OperatorMemberDeleteFlow';
+
+// WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1
+export { OperatorMemberSoftDeleteFlow } from './OperatorMemberSoftDeleteFlow';
+export type { OperatorMemberSoftDeleteFlowProps } from './OperatorMemberSoftDeleteFlow';
