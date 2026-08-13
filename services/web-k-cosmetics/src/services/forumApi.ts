@@ -6,6 +6,15 @@
  */
 
 import { api } from '../lib/apiClient';
+/**
+ * WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
+ *
+ * 커뮤니티 읽기·쓰기는 서비스 컨텍스트 경로를 사용한다 (서버가 service scope 격리).
+ * `/forum/category-requests` · `/forum/operator` · `/forum/admin` 은 자체 serviceCode
+ * 권한 계약을 이미 갖고 있어 공통 경로를 그대로 유지한다.
+ */
+const FORUM_BASE = '/cosmetics/forum';
+
 
 // ============================================================================
 // Types — imported from @o4o/types/forum (Single Source of Truth)
@@ -53,7 +62,7 @@ export async function fetchForumPosts(params: {
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.limit) queryParams.append('limit', params.limit.toString());
 
-    const response = await api.get(`/forum/posts?${queryParams}`);
+    const response = await api.get(`${FORUM_BASE}/posts?${queryParams}`);
     const data = response.data;
 
     if (!data.success) {
@@ -90,7 +99,7 @@ export async function fetchPinnedPosts(limit: number = 2): Promise<ForumPost[]> 
  */
 export async function fetchForumPostById(postId: string): Promise<PostResponse | null> {
   try {
-    const response = await api.get(`/forum/posts/${postId}`);
+    const response = await api.get(`${FORUM_BASE}/posts/${postId}`);
     const data = response.data;
 
     if (!data.success) {
@@ -110,7 +119,7 @@ export async function fetchForumPostById(postId: string): Promise<PostResponse |
  */
 export async function fetchForumComments(postId: string): Promise<CommentsResponse> {
   try {
-    const response = await api.get(`/forum/posts/${postId}/comments`);
+    const response = await api.get(`${FORUM_BASE}/posts/${postId}/comments`);
     return response.data;
   } catch (error) {
     console.error('Error fetching forum comments:', error);
@@ -138,7 +147,7 @@ export interface PopularForum {
 
 export async function fetchPopularForums(limit: number = 6): Promise<{ success: boolean; data: PopularForum[] }> {
   try {
-    const response = await api.get(`/forum/categories/popular?limit=${limit}`);
+    const response = await api.get(`${FORUM_BASE}/categories/popular?limit=${limit}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching popular forums:', error);
@@ -206,13 +215,13 @@ export async function createForumPost(payload: {
   // WO-O4O-FORUM-WRITE-EDITOR-CONTENT-PARITY-V1: htmlToBlocks Block[] 수용 — string 호환 유지
   content: unknown[] | string;
 }): Promise<{ success: boolean; data?: { id: string }; error?: string }> {
-  const response = await api.post('/forum/posts', payload);
+  const response = await api.post(`${FORUM_BASE}/posts`, payload);
   return response.data;
 }
 
 export async function fetchMyCategories(): Promise<{ success: boolean; data: any[] }> {
   try {
-    const response = await api.get('/forum/categories/mine');
+    const response = await api.get(`${FORUM_BASE}/categories/mine`);
     return response.data;
   } catch (error) {
     console.error('Error fetching my categories:', error);
@@ -225,7 +234,7 @@ export async function updateMyCategory(
   data: { name?: string; description?: string; iconEmoji?: string | null; iconUrl?: string | null },
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await api.patch(`/forum/categories/${id}/owner`, data);
+    const response = await api.patch(`${FORUM_BASE}/categories/${id}/owner`, data);
     return response.data;
   } catch (error: any) {
     const msg = error?.response?.data?.message || error?.response?.data?.error || '저장에 실패했습니다.';
@@ -238,7 +247,7 @@ export async function requestDeleteCategory(
   data: { reason?: string },
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await api.post(`/forum/categories/${id}/delete-request`, data);
+    const response = await api.post(`${FORUM_BASE}/categories/${id}/delete-request`, data);
     return response.data;
   } catch (error: any) {
     const msg = error?.response?.data?.message || error?.response?.data?.error || '삭제 요청에 실패했습니다.';
@@ -415,37 +424,37 @@ export interface ForumMember {
 export const forumMembershipApi = {
   getJoinRequests: (forumId: string) =>
     api.get<{ success: boolean; data: ForumJoinRequest[] }>(
-      `/forum/categories/${forumId}/join-requests`,
+      `${FORUM_BASE}/categories/${forumId}/join-requests`,
     ),
 
   approveJoin: (forumId: string, requestId: string) =>
     api.post<{ success: boolean; data: any }>(
-      `/forum/categories/${forumId}/join-requests/${requestId}/approve`,
+      `${FORUM_BASE}/categories/${forumId}/join-requests/${requestId}/approve`,
     ),
 
   rejectJoin: (forumId: string, requestId: string, reviewComment?: string) =>
     api.post<{ success: boolean; data: any }>(
-      `/forum/categories/${forumId}/join-requests/${requestId}/reject`,
+      `${FORUM_BASE}/categories/${forumId}/join-requests/${requestId}/reject`,
       { reviewComment },
     ),
 
   getMembers: (forumId: string) =>
     api.get<{ success: boolean; data: ForumMember[] }>(
-      `/forum/categories/${forumId}/members`,
+      `${FORUM_BASE}/categories/${forumId}/members`,
     ),
 
   removeMember: (forumId: string, userId: string) =>
     api.delete<{ success: boolean; data: any }>(
-      `/forum/categories/${forumId}/members/${userId}`,
+      `${FORUM_BASE}/categories/${forumId}/members/${userId}`,
     ),
 
   requestJoin: (forumId: string) =>
     api.post<{ success: boolean; data: any }>(
-      `/forum/categories/${forumId}/join-requests`,
+      `${FORUM_BASE}/categories/${forumId}/join-requests`,
     ),
 
   getMembershipStatus: (forumId: string) =>
     api.get<{ success: boolean; data: { isMember: boolean; role: string | null; pendingRequest: boolean } }>(
-      `/forum/categories/${forumId}/membership-status`,
+      `${FORUM_BASE}/categories/${forumId}/membership-status`,
     ),
 };
