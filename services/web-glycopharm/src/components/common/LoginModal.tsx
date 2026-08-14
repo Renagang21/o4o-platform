@@ -27,6 +27,10 @@ import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 const REMEMBER_EMAIL_KEY = 'glycopharm_remember_email';
 const LOGIN_RETURN_URL_KEY = 'glycopharm_login_return_url';
+// WO-O4O-CROSSSERVICE-AUTH-PRODUCTION-E2E-FINAL-CLOSURE-V1:
+//   App.tsx 의 동명 상수와 같은 값. App 이 LoginModal 을 import 하므로 역방향 import 는
+//   순환이 된다 — 기존 LOGIN_RETURN_URL_KEY 와 동일한 로컬 상수 패턴을 따른다.
+const LOGIN_EXPLICIT_NAV_KEY = 'glycopharm_login_explicit_nav';
 
 export default function LoginModal() {
   const navigate = useNavigate();
@@ -85,6 +89,9 @@ export default function LoginModal() {
       const returnUrl = sessionStorage.getItem(LOGIN_RETURN_URL_KEY);
       if (returnUrl) {
         sessionStorage.removeItem(LOGIN_RETURN_URL_KEY);
+        // WO-O4O-CROSSSERVICE-AUTH-PRODUCTION-E2E-FINAL-CLOSURE-V1:
+        //   PostLoginRedirect 가 같은 auth 변화에 반응해 역할 대시보드로 덮어쓰지 않도록 표시한다.
+        sessionStorage.setItem(LOGIN_EXPLICIT_NAV_KEY, '1');
         navigate(returnUrl);
       } else if (location.pathname === '/login') {
         // legacy: LoginPage 가 직접 렌더된 경우 대비 (admin/login 등)

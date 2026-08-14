@@ -515,6 +515,16 @@ function PostLoginRedirect() {
     if (!user) return;
     if (didRedirectRef.current) return;
 
+    // WO-O4O-CROSSSERVICE-AUTH-PRODUCTION-E2E-FINAL-CLOSURE-V1:
+    //   LoginModal 이 returnUrl 로 이미 이동시켰으면 여기서 다시 보내지 않는다.
+    //   아래 pathname 가드만으로는 부족하다 — 이 effect 가 modal 의 navigate 보다 먼저 돌면
+    //   pathname 이 아직 '/' 라 통과해 버린다(레이스).
+    if (sessionStorage.getItem(LOGIN_EXPLICIT_NAV_KEY)) {
+      sessionStorage.removeItem(LOGIN_EXPLICIT_NAV_KEY);
+      didRedirectRef.current = true;
+      return;
+    }
+
     // '/' 또는 '/login'에서만 redirect — 기존 LoginModal 가드 정책 유지
     // (loginType/returnUrl로 LoginPage가 먼저 navigate했으면 path가 이미 변경됨)
     if (location.pathname !== '/' && location.pathname !== '/login') {
@@ -546,6 +556,11 @@ function LmsCourseRedirect() {
 //   RoleGuard 가 state.from 으로 보내는 returnUrl 은 sessionStorage 에 보존 →
 //   LoginModal 로그인 성공 시 해당 경로로 복귀.
 const LOGIN_RETURN_URL_KEY = 'glycopharm_login_return_url';
+// WO-O4O-CROSSSERVICE-AUTH-PRODUCTION-E2E-FINAL-CLOSURE-V1:
+//   LoginModal 이 returnUrl 로 명시 이동했음을 PostLoginRedirect 에 알리는 1회성 플래그.
+//   두 네비게이터가 같은 auth 상태 변화에 함께 반응해 PostLoginRedirect 가 나중에 실행되면
+//   pathname 이 아직 '/' 라 역할 대시보드로 덮어써 버렸다(production 실측: /store-hub → /store).
+export const LOGIN_EXPLICIT_NAV_KEY = 'glycopharm_login_explicit_nav';
 function LoginGate() {
   const navigate = useNavigate();
   const location = useLocation();
