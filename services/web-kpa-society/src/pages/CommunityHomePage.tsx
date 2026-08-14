@@ -21,11 +21,15 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Loader2, Store, Network, Users, BookOpen } from 'lucide-react';
+import { Store, Network, Users, BookOpen } from 'lucide-react';
 import { PageHero, Card, useTemplate } from '@o4o/ui';
 import {
   HeroBannerSection,
   StandardHomeTemplate,
+  LatestActivitySection,
+  LATEST_ACTIVITY_ACCENTS,
+  LATEST_ACTIVITY_SUMMARY_LIMIT,
+  buildLatestActivityTabs,
   AppEntrySection,
   O4OHelpSection,
   ForumIcon,
@@ -41,125 +45,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
 
 // ─── 최신 활동 섹션 (WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1) ──────────
-// WO-O4O-KPA-HOME-LATEST-SUMMARY-LIMIT-AND-TAB-SHORTCUT-V1: 메인 화면 요약 성격에 맞춰
-//   탭별 표시 개수 제한 + 탭별 해당 공간 바로가기 추가.
+// WO-O4O-COMMUNITY-HOME-LATEST-ACTIVITY-SECTION-COMMONIZATION-V1:
+//   3서비스에 인라인 복제돼 있던 구현을 공통 View(@o4o/shared-space-ui `LatestActivitySection`) 로
+//   이관했다. 여기에는 KPA 정책(탭 바로가기 경로 · accent)만 남는다.
 
-const LATEST_SUMMARY_LIMIT = 6;
+const LATEST_TABS = buildLatestActivityTabs();
 
-const LATEST_TABS = [
-  { key: 'all',      label: '전체',     shortcutHref: null,         shortcutLabel: null },
-  { key: 'forum',    label: '포럼',     shortcutHref: '/forum',     shortcutLabel: '포럼 바로가기' },
-  { key: 'course',   label: '강의',     shortcutHref: '/lms',       shortcutLabel: '강의 바로가기' },
-  { key: 'content',  label: '콘텐츠',   shortcutHref: '/content',   shortcutLabel: '콘텐츠 바로가기' },
-  { key: 'signage',  label: '사이니지', shortcutHref: '/signage',   shortcutLabel: '사이니지 바로가기' },
-  { key: 'resource', label: '자료실',   shortcutHref: '/resources', shortcutLabel: '자료실 바로가기' },
-] as const;
-
-const LATEST_BADGE: Record<string, { label: string; cls: string }> = {
-  forum:    { label: '포럼',     cls: 'bg-blue-100 text-blue-700' },
-  course:   { label: '강의',     cls: 'bg-purple-100 text-purple-700' },
-  content:  { label: '콘텐츠',   cls: 'bg-emerald-100 text-emerald-700' },
-  resource: { label: '자료실',   cls: 'bg-amber-100 text-amber-700' },
-  signage:  { label: '사이니지', cls: 'bg-rose-100 text-rose-700' },
-};
-
-interface LatestSectionProps {
-  items: LatestItem[];
-  activeTab: string;
-  onTabChange: (tab: string) => void;
-  loading: boolean;
-  /** WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1: API 실패와 실제 0건 구분 */
-  error: boolean;
-  onRetry: () => void;
-}
-
-function LatestActivitySection({ items, activeTab, onTabChange, loading, error, onRetry }: LatestSectionProps) {
-  const currentTab = LATEST_TABS.find((t) => t.key === activeTab);
-  const hasTabShortcut = !loading && items.length > 0 && currentTab?.shortcutHref;
-
-  return (
-    <div>
-      <div className="mb-4">
-        <h2 className="text-lg font-bold text-slate-800 m-0">최신글</h2>
-      </div>
-
-      {/* 탭 필터 */}
-      <div className="flex gap-2 flex-wrap mb-4">
-        {LATEST_TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => onTabChange(t.key)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              activeTab === t.key
-                ? 'bg-blue-600 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* 목록 */}
-      {loading ? (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
-        </div>
-      ) : error ? (
-        /* WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1:
-           API 실패를 "등록된 글이 없습니다" 로 위장하지 않는다. 기존 컴포넌트 범위 내 최소 구분. */
-        <div className="text-center py-8">
-          <p className="text-sm text-slate-500 m-0">최신글을 불러오지 못했습니다</p>
-          <button
-            onClick={onRetry}
-            className="mt-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50"
-          >
-            다시 시도
-          </button>
-        </div>
-      ) : items.length === 0 ? (
-        <div className="text-center py-8 text-slate-400 text-sm">등록된 글이 없습니다</div>
-      ) : (
-        <div className="divide-y divide-slate-100 bg-white rounded-lg border border-slate-200 overflow-hidden">
-          {items.map((item) => {
-            const badge = LATEST_BADGE[item.type];
-            const date = new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
-            return (
-              <Link
-                key={`${item.type}-${item.id}`}
-                to={item.href}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors no-underline group"
-              >
-                <span className={`shrink-0 inline-block px-2 py-0.5 text-xs font-semibold rounded ${badge?.cls ?? 'bg-slate-100 text-slate-600'}`}>
-                  {badge?.label ?? item.type}
-                </span>
-                <span className="flex-1 min-w-0 font-medium text-slate-800 truncate group-hover:text-blue-600 transition-colors">
-                  {item.title}
-                </span>
-                {item.authorName && (
-                  <span className="shrink-0 text-xs text-slate-400 hidden sm:block">{item.authorName}</span>
-                )}
-                <span className="shrink-0 text-xs text-slate-400">{date}</span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
-
-      {/* 탭별 바로가기 — 전체 탭은 요약 성격이므로 skip, 카테고리 탭만 해당 공간 바로가기 표시 */}
-      {hasTabShortcut && (
-        <div className="mt-3 flex justify-end">
-          <Link
-            to={currentTab.shortcutHref!}
-            className="text-sm font-semibold text-blue-600 hover:text-blue-700 no-underline whitespace-nowrap"
-          >
-            {currentTab.shortcutLabel} →
-          </Link>
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ─── 서비스 전용 아이콘 ─────────────────────────────────────
 // ForumIcon, EducationIcon, ContentIcon, SignageIcon, ResourcesIcon → @o4o/shared-space-ui
@@ -206,7 +97,7 @@ export function CommunityHomePage() {
   useEffect(() => {
     setLatestLoading(true);
     setLatestError(false);
-    homeApi.getLatest({ type: latestTab, limit: LATEST_SUMMARY_LIMIT })
+    homeApi.getLatest({ type: latestTab, limit: LATEST_ACTIVITY_SUMMARY_LIMIT })
       .then((res) => {
         // 계약 위반(비배열)도 실패로 간주 — 빈 목록으로 위장하지 않는다
         if (!Array.isArray(res?.data)) { setLatestItems([]); setLatestError(true); return; }
@@ -290,12 +181,15 @@ export function CommunityHomePage() {
       }
       latestSlot={
         <LatestActivitySection
+          tabs={LATEST_TABS}
           items={latestItems}
           activeTab={latestTab}
           onTabChange={setLatestTab}
           loading={latestLoading}
-          error={latestError}
+          loadError={latestError}
           onRetry={() => setLatestReloadKey((k) => k + 1)}
+          navigate={(path) => navigate(path)}
+          accent={LATEST_ACTIVITY_ACCENTS.blue}
         />
       }
       // WO-O4O-KPA-HOME-ROLE-USAGE-MANUAL-RECLASSIFY-V1:

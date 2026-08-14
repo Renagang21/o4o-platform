@@ -14,14 +14,17 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { apiClient } from '@/services/api';
 // WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1
 import { FORUM_BASE } from '@/services/forumApi';
 import {
   StandardHomeTemplate,
   templates,
+  LatestActivitySection,
+  LATEST_ACTIVITY_ACCENTS,
+  LATEST_ACTIVITY_SUMMARY_LIMIT,
+  buildLatestActivityTabs,
   ForumIcon,
   EducationIcon,
   ContentIcon,
@@ -73,130 +76,20 @@ interface ForumPostRaw {
 }
 
 // ─── 최신 활동 섹션 (WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-UI-ALIGNMENT-V1) ──
-// KPA CommunityHomePage LatestActivitySection 패턴 mirror. emerald 테마.
+// WO-O4O-COMMUNITY-HOME-LATEST-ACTIVITY-SECTION-COMMONIZATION-V1:
+//   3서비스 인라인 복제를 공통 View(@o4o/shared-space-ui `LatestActivitySection`) 로 이관.
+//   GlycoPharm 정책(콘텐츠/사이니지 공간 경로 · emerald accent)만 여기에 남는다.
 
-const LATEST_SUMMARY_LIMIT = 6;
+const LATEST_TABS = buildLatestActivityTabs({
+  content: '/store-hub/content',
+  signage: '/store/marketing/signage/library',
+});
 
-const LATEST_TABS = [
-  { key: 'all',      label: '전체',     shortcutHref: null,                       shortcutLabel: null },
-  { key: 'forum',    label: '포럼',     shortcutHref: '/forum',                   shortcutLabel: '포럼 바로가기' },
-  { key: 'course',   label: '강의',     shortcutHref: '/lms',                     shortcutLabel: '강의 바로가기' },
-  { key: 'content',  label: '콘텐츠',   shortcutHref: '/store-hub/content',        shortcutLabel: '콘텐츠 바로가기' },
-  { key: 'signage',  label: '사이니지', shortcutHref: '/store/marketing/signage/library',   shortcutLabel: '사이니지 바로가기' },
-  { key: 'resource', label: '자료실',   shortcutHref: '/resources',               shortcutLabel: '자료실 바로가기' },
-] as const;
-
-const LATEST_BADGE: Record<string, { label: string; cls: string }> = {
-  forum:    { label: '포럼',     cls: 'bg-blue-100 text-blue-700' },
-  course:   { label: '강의',     cls: 'bg-purple-100 text-purple-700' },
-  content:  { label: '콘텐츠',   cls: 'bg-emerald-100 text-emerald-700' },
-  resource: { label: '자료실',   cls: 'bg-amber-100 text-amber-700' },
-  signage:  { label: '사이니지', cls: 'bg-rose-100 text-rose-700' },
-};
-
-interface LatestSectionProps {
-  items: LatestItem[];
-  activeTab: string;
-  onTabChange: (tab: string) => void;
-  loading: boolean;
-  /** 조회 실패 — "등록된 글이 없습니다"(empty) 와 구분한다(4상태 계약). */
-  loadError?: boolean;
-  onRetry?: () => void;
-}
-
-function LatestActivitySection({ items, activeTab, onTabChange, loading, loadError, onRetry }: LatestSectionProps) {
-  const currentTab = LATEST_TABS.find((t) => t.key === activeTab);
-  const hasTabShortcut = !loading && items.length > 0 && currentTab?.shortcutHref;
-
-  return (
-    <div>
-      <div className="mb-4">
-        <h2 className="text-lg font-bold text-slate-800 m-0">최신글</h2>
-      </div>
-
-      {/* 탭 필터 */}
-      <div className="flex gap-2 flex-wrap mb-4">
-        {LATEST_TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => onTabChange(t.key)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              activeTab === t.key
-                ? 'bg-emerald-600 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* 목록 */}
-      {loading ? (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
-        </div>
-      ) : loadError ? (
-        <div className="text-center py-8">
-          <p className="text-sm font-medium text-slate-800">데이터를 불러오지 못했습니다.</p>
-          <p className="mt-1 text-sm text-slate-500">잠시 후 다시 시도해 주세요.</p>
-          {onRetry && (
-            <button
-              type="button"
-              onClick={onRetry}
-              className="mt-3 px-3 py-1.5 rounded-md border border-slate-300 text-sm text-slate-700 hover:bg-slate-50"
-            >
-              다시 시도
-            </button>
-          )}
-        </div>
-      ) : items.length === 0 ? (
-        <div className="text-center py-8 text-slate-400 text-sm">등록된 글이 없습니다</div>
-      ) : (
-        <div className="divide-y divide-slate-100 bg-white rounded-lg border border-slate-200 overflow-hidden">
-          {items.map((item) => {
-            const badge = LATEST_BADGE[item.type];
-            const date = new Date(item.createdAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
-            return (
-              <Link
-                key={`${item.type}-${item.id}`}
-                to={item.href}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors no-underline group"
-              >
-                <span className={`shrink-0 inline-block px-2 py-0.5 text-xs font-semibold rounded ${badge?.cls ?? 'bg-slate-100 text-slate-600'}`}>
-                  {badge?.label ?? item.type}
-                </span>
-                <span className="flex-1 min-w-0 font-medium text-slate-800 truncate group-hover:text-emerald-700 transition-colors">
-                  {item.title}
-                </span>
-                {item.authorName && (
-                  <span className="shrink-0 text-xs text-slate-400 hidden sm:block">{item.authorName}</span>
-                )}
-                <span className="shrink-0 text-xs text-slate-400">{date}</span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
-
-      {/* 탭별 바로가기 — 전체 탭은 요약 성격이므로 skip */}
-      {hasTabShortcut && (
-        <div className="mt-3 flex justify-end">
-          <Link
-            to={currentTab.shortcutHref!}
-            className="text-sm font-semibold text-emerald-700 hover:text-emerald-800 no-underline whitespace-nowrap"
-          >
-            {currentTab.shortcutLabel} →
-          </Link>
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ─── Main Component ─────────────────────────────────────────
 
 export default function CommunityMainPage() {
+  const navigate = useNavigate();
   const t = templates.glycopharm;
   const tpl = useTemplate();
   const [noticeItems, setNoticeItems] = useState<NoticeItem[]>([]);
@@ -246,7 +139,7 @@ export default function CommunityMainPage() {
   useEffect(() => {
     setLatestLoading(true);
     setLatestError(false);
-    homeApi.getLatest({ type: latestTab, limit: LATEST_SUMMARY_LIMIT })
+    homeApi.getLatest({ type: latestTab, limit: LATEST_ACTIVITY_SUMMARY_LIMIT })
       // WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1:
       //   wrapper 는 실패를 throw 하지 않고 { error } 로 반환한다 → catch 만으로는 error 상태에 못 닿는다.
       .then((res) => {
@@ -340,12 +233,15 @@ export default function CommunityMainPage() {
       }
       latestSlot={
         <LatestActivitySection
+          tabs={LATEST_TABS}
           items={latestItems}
           activeTab={latestTab}
           onTabChange={setLatestTab}
           loading={latestLoading}
           loadError={latestError}
           onRetry={() => setLatestReloadKey((k) => k + 1)}
+          navigate={(path) => navigate(path)}
+          accent={LATEST_ACTIVITY_ACCENTS.emerald}
         />
       }
       appEntryCards={[

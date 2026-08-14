@@ -82,7 +82,12 @@ export const homeApi = {
     const qs = query.toString();
     const path = `/cosmetics/home/latest${qs ? `?${qs}` : ''}`;
     const response = await api.get<{ success: boolean; data: LatestItem[] }>(path);
-    return response.data?.data || [];
+    // WO-O4O-COMMUNITY-HOME-LATEST-ACTIVITY-SECTION-COMMONIZATION-V1:
+    //   계약 위반(비배열)을 빈 목록으로 위장하지 않는다 — 호출부가 조회 실패로 처리한다.
+    if (!Array.isArray(response.data?.data)) {
+      throw new Error('LATEST_ACTIVITY_CONTRACT_VIOLATION');
+    }
+    return response.data.data;
   },
 
   /**

@@ -145,6 +145,21 @@ export type {
 export { CommunityContentSearchBar } from './community/CommunityContentSearchBar';
 export type { CommunityContentSearchBarProps } from './community/CommunityContentSearchBar';
 
+/* WO-O4O-COMMUNITY-HOME-LATEST-ACTIVITY-SECTION-COMMONIZATION-V1: 홈 최신 활동 공통 View */
+export {
+  LatestActivitySection,
+  LATEST_ACTIVITY_ACCENTS,
+  LATEST_ACTIVITY_BADGES,
+  LATEST_ACTIVITY_SUMMARY_LIMIT,
+  buildLatestActivityTabs,
+} from './community/LatestActivitySection';
+export type {
+  LatestActivitySectionProps,
+  LatestActivityItem,
+  LatestActivityTab,
+  LatestActivityAccent,
+} from './community/LatestActivitySection';
+
 export { StoreHubTemplate } from './StoreHubTemplate';
 export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTemplateProps } from './StoreHubTemplate';
 
