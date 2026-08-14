@@ -16,6 +16,7 @@
 
 import type { DataSource, Repository, FindOptionsWhere } from 'typeorm';
 import { IsNull, In } from 'typeorm';
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { ProductCandidate } from '../entities/ProductCandidate.entity.js';
 import type {
   ProductCandidateSourceType,
@@ -481,6 +482,10 @@ export class ProductCandidateService {
     }
 
     // ── OrganizationProductListing upsert (master-only, offer_id NULL) ──
+    // WO-O4O-KPA-STORE-SERVICE-KEY-AND-PRODUCT-POLICY-CANONICALIZATION-V1
+    //   요청 serviceKey 는 role-prefix('kpa')로 올 수 있다. OPL.service_key 는 canonical 축이므로
+    //   여기(경계)에서 SSOT resolver 로 한 번만 변환한다. canonical 입력에는 항등이다.
+    const listingServiceKey = resolveCanonicalServiceKey(input.serviceKey);
     let listingCreated = true;
     let listingRows: Record<string, unknown>[] = await this.dataSource.query(
       `INSERT INTO organization_product_listings
@@ -488,7 +493,7 @@ export class ProductCandidateService {
        VALUES (gen_random_uuid(), $1, $3, $2, NULL, true, NULL, NOW(), NOW())
        ON CONFLICT (organization_id, service_key, master_id) WHERE offer_id IS NULL DO NOTHING
        RETURNING *`,
-      [input.organizationId, masterId, input.serviceKey],
+      [input.organizationId, masterId, listingServiceKey],
     );
     if (listingRows.length === 0) {
       listingCreated = false;
@@ -496,7 +501,7 @@ export class ProductCandidateService {
         `SELECT * FROM organization_product_listings
          WHERE organization_id = $1 AND service_key = $3 AND master_id = $2 AND offer_id IS NULL
          LIMIT 1`,
-        [input.organizationId, masterId, input.serviceKey],
+        [input.organizationId, masterId, listingServiceKey],
       );
     }
 

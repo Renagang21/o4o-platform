@@ -26,6 +26,7 @@ import {
 } from '../utils/product-identifier.util.js';
 import type { ProductClassification } from '../utils/product-type.util.js';
 import logger from '../../../utils/logger.js';
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
 
 const STORE_REQUEST_SOURCE_LABEL = 'kpa-store-product-request';
 
@@ -129,6 +130,12 @@ export class StoreProductRequestAdminService {
     m: EntityManager,
     input: { organizationId: string; serviceKey: string; masterId: string; displayName: string | null },
   ): Promise<{ listingId: string | null }> {
+    // WO-O4O-KPA-STORE-SERVICE-KEY-AND-PRODUCT-POLICY-CANONICALIZATION-V1
+    //   candidate.service_key 는 **role-prefix 축**이다('kpa' / 'cosmetics' —
+    //   운영자 스코프 `${sk}:operator` 구성에 쓰인다). 반면 OPL.service_key 는 canonical 축이다.
+    //   여기가 두 축이 만나는 경계이므로 SSOT resolver 로 한 번만 변환한다.
+    //   (로컬 매핑 테이블을 새로 만들지 않는다)
+    const listingServiceKey = resolveCanonicalServiceKey(input.serviceKey);
     // store_product_profiles (UNIQUE org+master)
     await m.query(
       `INSERT INTO store_product_profiles
@@ -144,13 +151,13 @@ export class StoreProductRequestAdminService {
        VALUES (gen_random_uuid(), $1, $3, $2, NULL, true, NULL, NOW(), NOW())
        ON CONFLICT (organization_id, service_key, master_id) WHERE offer_id IS NULL DO NOTHING
        RETURNING id`,
-      [input.organizationId, input.masterId, input.serviceKey],
+      [input.organizationId, input.masterId, listingServiceKey],
     );
     if (inserted.length > 0) return { listingId: inserted[0].id };
     const existing: Array<{ id: string }> = await m.query(
       `SELECT id FROM organization_product_listings
        WHERE organization_id = $1 AND service_key = $3 AND master_id = $2 AND offer_id IS NULL LIMIT 1`,
-      [input.organizationId, input.masterId, input.serviceKey],
+      [input.organizationId, input.masterId, listingServiceKey],
     );
     return { listingId: existing[0]?.id ?? null };
   }

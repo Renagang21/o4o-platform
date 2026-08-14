@@ -39,52 +39,20 @@ import { ImageStorageService } from '../../../modules/neture/services/image-stor
 import { deriveProductClassification, classificationToFilter } from '../../../modules/neture/utils/product-type.util.js';
 import { assertDrugActionAllowed } from '../../../modules/neture/guards/drug-access.guard.js';
 import logger from '../../../utils/logger.js';
+import { deriveListingServiceKeyFromMemberships } from '../../../utils/listing-service-key.js';
 
 // ─────────────────────────────────────────────────────
 // WO-O4O-STORE-PRODUCT-LIBRARY-SERVICE-KEY-DERIVATION-V1
+// WO-O4O-KPA-STORE-SERVICE-KEY-AND-PRODUCT-POLICY-CANONICALIZATION-V1
 //
-// 사용자의 active service_membership 을 organization_product_listings.service_key
-// 컬럼 값으로 매핑한다 (entity 의 role-prefix 형식 — default 'kpa').
-//
-// 매핑:
-//   service_memberships.service_key → organization_product_listings.service_key
-//     'kpa-society'  → 'kpa'
-//     'glycopharm'   → 'glycopharm'
-//     'neture'       → 'neture'
-//     'k-cosmetics'  → 'cosmetics'
-//   (common/middleware/membership-guard.middleware.ts 의 SCOPE_TO_MEMBERSHIP_KEY 역방향)
-//
-// Multi-membership 정책 (deterministic priority, 본 WO 범위 밖의 design 결정 임시 대체):
-//   기존 하드코딩이 'neture' 였으므로 마이그레이션 안전을 위해 neture 우선 유지.
-//   추후 multi-membership full design 시 user context (URL/header) 기반 도출로 교체.
+// 종전 이 파일은 canonical → role-prefix 로 되돌리는 로컬 맵을 두어
+// 'kpa-society'→'kpa', 'k-cosmetics'→'cosmetics' 로 OPL 에 기록했다.
+// OPL.service_key 는 canonical 축이므로(근거는 utils/listing-service-key.ts 주석) drift 였다.
+// 로컬 맵을 제거하고 공용 도출기 하나로 수렴한다.
+// (role-prefix 축이 필요한 곳은 product_candidates.service_key 처럼 별도로 존재한다 — 그쪽은 불변)
 // ─────────────────────────────────────────────────────
-
-const MEMBERSHIP_KEY_TO_LISTING_SERVICE_KEY: Record<string, string> = {
-  'kpa-society': 'kpa',
-  'glycopharm': 'glycopharm',
-  'neture': 'neture',
-  'k-cosmetics': 'cosmetics',
-};
-
-const MULTI_MEMBERSHIP_PRIORITY = ['neture', 'kpa-society', 'glycopharm', 'k-cosmetics'];
-
-interface MembershipLike { serviceKey: string; status: string }
-
-function deriveListingServiceKey(req: Request): string | null {
-  const memberships: MembershipLike[] = (req as any).user?.memberships ?? [];
-  const active = memberships.filter((m) => m?.status === 'active');
-  if (active.length === 0) return null;
-  // single-membership 의 일반 경로
-  if (active.length === 1) {
-    return MEMBERSHIP_KEY_TO_LISTING_SERVICE_KEY[active[0].serviceKey] ?? null;
-  }
-  // multi-membership: deterministic priority. 본 WO 범위 밖의 정책 결정을 임시 대체.
-  for (const key of MULTI_MEMBERSHIP_PRIORITY) {
-    if (active.some((m) => m.serviceKey === key)) {
-      return MEMBERSHIP_KEY_TO_LISTING_SERVICE_KEY[key] ?? null;
-    }
-  }
-  return MEMBERSHIP_KEY_TO_LISTING_SERVICE_KEY[active[0].serviceKey] ?? null;
+export function deriveListingServiceKey(req: Request): string | null {
+  return deriveListingServiceKeyFromMemberships((req as any).user?.memberships);
 }
 
 // ── 허용 MIME 타입 (URL 임포트) ───────────────────────────────────────────────

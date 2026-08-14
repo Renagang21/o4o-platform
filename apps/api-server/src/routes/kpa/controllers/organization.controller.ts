@@ -200,11 +200,14 @@ export function createOrganizationController(
         }
 
         // WO-NETURE-TIER1-AUTO-EXPANSION-BETA-V1: Tier 1 자동 확산
-        autoListPublicProductsForOrg(dataSource, saved.id, 'kpa')
+        // WO-O4O-KPA-STORE-SERVICE-KEY-AND-PRODUCT-POLICY-CANONICALIZATION-V1:
+        //   PUBLIC/SERVICE 두 auto-listing 이 같은 조직에 서로 다른 service_key 로 기록하던
+        //   drift 제거. OPL service_key 는 canonical key('kpa-society') 축이다.
+        autoListPublicProductsForOrg(dataSource, saved.id, KPA_CANONICAL_SERVICE_CODE)
           .then((count) => { if (count > 0) console.warn(`[OrgCreate] Auto-listed ${count} PUBLIC products for org ${saved.id}`); })
           .catch((err) => console.warn('[OrgCreate] Auto-listing failed:', err));
         // WO-NETURE-SERVICE-OFFER-AUTO-LIST-ON-NEW-ORG-ENROLLMENT-V1: SERVICE 상품 자동 진열
-        autoListServiceProductsForOrg(dataSource, saved.id, 'kpa-society')
+        autoListServiceProductsForOrg(dataSource, saved.id, KPA_CANONICAL_SERVICE_CODE)
           .then((count) => { if (count > 0) console.warn(`[OrgCreate] Auto-listed ${count} SERVICE products for org ${saved.id}`); })
           .catch((err) => console.warn('[OrgCreate] SERVICE auto-listing failed:', err));
 
