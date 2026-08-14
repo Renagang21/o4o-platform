@@ -228,18 +228,24 @@ function ServiceSummaryCard({ service }: { service: ServiceQualitySummary }) {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+      {/*
+        WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1:
+        390px 에서 서비스 카드 헤더(좌: 서비스명 / 우: 배지 묶음)가 한 줄에 들어가지 않아
+        문서 가로 스크롤을 만들었다(실측 414 > 390). 헤더를 줄바꿈 허용으로 바꾸고
+        배지 묶음도 wrap 시킨다.
+      */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+        className="w-full p-4 flex flex-wrap items-center justify-between gap-y-2 hover:bg-gray-50 transition-colors"
       >
-        <div className="flex items-center gap-3">
-          <Building2 className="w-5 h-5 text-gray-400" />
-          <div className="text-left">
-            <div className="font-medium text-gray-900">{service.serviceName}</div>
-            <div className="text-xs text-gray-500">마지막 업데이트: {formatDate(service.lastUpdated)}</div>
+        <div className="flex min-w-0 items-center gap-3">
+          <Building2 className="w-5 h-5 flex-shrink-0 text-gray-400" />
+          <div className="min-w-0 text-left">
+            <div className="truncate font-medium text-gray-900">{service.serviceName}</div>
+            <div className="truncate text-xs text-gray-500">마지막 업데이트: {formatDate(service.lastUpdated)}</div>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4">
           {/* Package Compliance */}
           {compliance && (
             <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
