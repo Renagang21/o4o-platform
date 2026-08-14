@@ -85,8 +85,12 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   analytics: [
     { label: 'AI 리포트', path: '/operator/ai-report' },
-    { label: 'AI 카드 리포트', path: '/operator/ai-card-report' },
-    { label: 'AI 운영', path: '/operator/ai-operations' },
+    // WO-O4O-NETURE-OPERATOR-PRODUCTION-DEFECT-CLOSURE-V1 (A안 동일 계열):
+    // 두 화면의 데이터 API(/api/ai/card-report, /api/ai/operations)는 requireAdmin
+    // (= platform:super_admin 전용) 이라 neture:operator 로는 403 이고, 화면은 0 값으로만 렌더된다.
+    // 플랫폼 공통 AI 운영 계약이므로 guard 는 유지하고 admin 메뉴로만 노출한다.
+    { label: 'AI 카드 리포트', path: '/operator/ai-card-report', adminOnly: true },
+    { label: 'AI 운영', path: '/operator/ai-operations', adminOnly: true },
     { label: 'Asset Quality', path: '/operator/ai/asset-quality' },
     { label: '운영 분석', path: '/operator/analytics' },
     // WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: '공급자 품질'(/operator/supplier-quality) 은퇴 — CSV batch 품질 전용, 데이터 0
