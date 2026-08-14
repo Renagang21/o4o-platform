@@ -12,7 +12,6 @@
  */
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   AlertTriangle,
   CheckCircle,
@@ -341,14 +340,12 @@ function ServiceSummaryCard({ service }: { service: ServiceQualitySummary }) {
               <div className="text-xs text-gray-500">양호 비율</div>
             </div>
           </div>
-          <div className="mt-3 text-right">
-            <Link
-              to={`/operator/ai-admin/asset-quality/${service.serviceId}`}
-              className="text-sm text-primary-600 hover:text-primary-700 font-medium"
-            >
-              상세 보기 →
-            </Link>
-          </div>
+          {/*
+            WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1:
+            '상세 보기' 링크 제거. 대상 `/operator/ai-admin/asset-quality/:serviceId` 는
+            `/admin`·`/operator` 어느 쪽에도 route 가 없다(App.tsx 에 asset-quality route 는
+            `/admin/ai/asset-quality` · `/operator/ai/asset-quality` 2개뿐). dead link 였다.
+          */}
         </div>
       )}
     </div>
@@ -500,74 +497,17 @@ export default function AssetQualityPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-4">
-              <Link to="/" className="text-xl font-bold text-primary-600">
-                Neture
-              </Link>
-              <span className="text-gray-300">|</span>
-              <span className="text-sm font-medium text-gray-600">AI 관리</span>
-            </div>
-            <Link to="/admin" className="text-sm text-gray-500 hover:text-gray-700">
-              대시보드
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Sub Navigation */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex gap-6">
-            <Link
-              to="/operator/ai-admin"
-              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
-            >
-              대시보드
-            </Link>
-            <Link
-              to="/operator/ai-admin/engines"
-              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
-            >
-              엔진 설정
-            </Link>
-            <Link
-              to="/operator/ai-admin/policy"
-              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
-            >
-              사용 기준 설정
-            </Link>
-            <Link
-              to="/operator/ai-admin/asset-quality"
-              className="py-4 px-1 border-b-2 border-primary-600 text-primary-600 font-medium text-sm"
-            >
-              품질 관리
-            </Link>
-            <Link
-              to="/operator/ai-admin/cost"
-              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
-            >
-              비용 현황
-            </Link>
-            <Link
-              to="/operator/ai-admin/context-assets"
-              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
-            >
-              Context Asset
-            </Link>
-            <Link
-              to="/operator/ai-admin/composition-rules"
-              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
-            >
-              응답 규칙
-            </Link>
-          </nav>
-        </div>
-      </div>
-
+      {/*
+        WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1:
+        페이지 자체 <header> 와 AI 관리 서브내비를 제거한다.
+        - 이 컴포넌트는 /admin/ai/asset-quality · /operator/ai/asset-quality 두 route 모두
+          레이아웃 셸(헤더 + 사이드바) 안에서 렌더된다. 자체 헤더는 셸 헤더와 중복이었고,
+          390px 에서 문서 가로 스크롤(414 > 390)을 유발했다.
+        - 서브내비 7개 링크는 전부 `/operator/ai-admin/*` 를 가리켰으나 실제 route 는
+          `/admin/ai-admin/*` 뿐이다(`0e36444cd` /workspace/operator → /operator 일괄 치환의
+          잔재). 프로덕션 실측에서 7건 모두 404 로 확인 — dead link 였다.
+          내비게이션은 셸 사이드바가 제공하므로 링크를 재지정하지 않고 블록을 제거한다.
+      */}
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}

@@ -130,7 +130,12 @@ export function createCosmeticsOperatorDashboardController(dataSource: DataSourc
         { id: 'manage-stores', label: '매장 관리', link: '/operator/stores', icon: 'store' },
         { id: 'manage-products', label: '상품 관리', link: '/operator/products', icon: 'package' },
         { id: 'manage-orders', label: '주문 관리', link: '/operator/orders', icon: 'shopping-cart' },
-        { id: 'manage-content', label: '콘텐츠 관리', link: '/operator/content', icon: 'file-text' },
+        // WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1:
+        //   link 가 '/operator/content' 였으나 K-Cosmetics frontend 의 실제 route 는
+        //   '/operator/content-management' 다(operatorMenuGroups.ts '공지사항/뉴스',
+        //   KCosmeticsOperatorDashboard 의 자체 바로가기도 동일). 프로덕션 실측에서
+        //   운영자 대시보드 Quick Actions → 404 dead link 로 확인돼 경로만 정렬한다.
+        { id: 'manage-content', label: '콘텐츠 관리', link: '/operator/content-management', icon: 'file-text' },
       ];
 
       const response: OperatorDashboardConfig = {

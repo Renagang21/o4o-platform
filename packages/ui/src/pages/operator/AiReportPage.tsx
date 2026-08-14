@@ -398,9 +398,19 @@ export function AiReportPage({ config }: AiReportPageProps) {
     const bannerTheme = THEME_MAP[config.theme] || THEME_MAP.green;
     return (
       <div className="space-y-6 p-6 max-w-7xl mx-auto">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">AI/Context Asset 리포트</h1>
-          <p className="text-slate-500 mt-1">AI 응답에서 노출된 Context Asset 현황을 분석합니다</p>
+        {/*
+          WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1:
+          empty mode 도 headerActions 를 렌더한다. K-Cosmetics 가 주입하는
+          AiSummaryButton 은 리포트 데이터와 무관하게 동작하는 실기능이며,
+          empty mode 전환으로 사라지면 기능 회귀가 된다.
+          headerActions 를 주입하지 않는 서비스(KPA · Neture)는 undefined → 렌더 없음.
+        */}
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800">AI/Context Asset 리포트</h1>
+            <p className="text-slate-500 mt-1">AI 응답에서 노출된 Context Asset 현황을 분석합니다</p>
+          </div>
+          {config.headerActions}
         </div>
         <div className={`${bannerTheme.infoBanner.bg} border ${bannerTheme.infoBanner.border} rounded-xl p-4 flex items-start gap-3`}>
           <Info className={`w-5 h-5 ${bannerTheme.infoBanner.icon} flex-shrink-0 mt-0.5`} />

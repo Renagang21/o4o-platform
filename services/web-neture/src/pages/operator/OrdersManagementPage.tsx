@@ -338,13 +338,19 @@ export default function OrdersManagementPage() {
       {/* Tabs & Table */}
       <div className="bg-white rounded-xl shadow-sm">
         {/* Tabs */}
+        {/*
+          WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1:
+          390px 에서 탭 줄(전체/대기 중/처리중/발송/완료)이 문서를 밀어내 페이지 가로
+          스크롤이 생겼다(실측 document.scrollWidth 479 > 390). 탭 줄만 가로 스크롤시키고
+          탭은 줄바꿈하지 않도록 고정한다 — MemberListLayout 과 동일 처리.
+        */}
         <div className="border-b border-slate-200">
-          <nav className="flex -mb-px">
+          <nav className="flex -mb-px overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => { setActiveTab(tab.id); setCurrentPage(1); }}
-                className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                className={`flex flex-shrink-0 items-center gap-2 whitespace-nowrap px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === tab.id
                     ? 'border-primary-500 text-primary-600'
                     : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
