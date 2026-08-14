@@ -31,6 +31,18 @@ import { OrderLog, OrderAction } from '../../../entities/checkout/OrderLog.entit
 import { checkoutService } from '../../../services/checkout.service.js';
 // WO-O4O-KPA-ONLINE-SALES-ORDER-NOTIFICATION-V1: 주문 생성 시 매장 경영자 in-app 알림
 import { notificationService } from '../../../services/NotificationService.js';
+// WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
+//   이벤트 오퍼 주문(metadata.serviceKey='kpa-groupbuy')이 구매자 주문 목록/상세에서 누락되던 결함.
+//   기록(쓰기)은 그대로 두고 조회 범위만 canonical 집합으로 넓힌다.
+import { getBuyerOrderServiceKeys } from '../../../constants/buyer-order-service-scope.js';
+import {
+  cancelStoreOrderBeforePayment,
+  isCancelStoreOrderFailure,
+} from '../../../services/checkout/store-order-cancel.service.js';
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
+
+/** 'kpa-society' + 레거시 'kpa' + 이벤트 오퍼 'kpa-groupbuy' */
+const KPA_BUYER_ORDER_SERVICE_KEYS = getBuyerOrderServiceKeys(SERVICE_KEYS.KPA_SOCIETY);
 
 // ============================================================================
 // Type Definitions
@@ -634,7 +646,7 @@ export function createKpaCheckoutController(
           .where('co.buyerId = :buyerId', { buyerId })
           .andWhere(
             "co.metadata->>'serviceKey' IN (:...serviceKeys)",
-            { serviceKeys: ['kpa-society', 'kpa'] }
+            { serviceKeys: KPA_BUYER_ORDER_SERVICE_KEYS }
           )
           .orderBy('co.createdAt', 'DESC')
           .take(limit)
@@ -695,7 +707,7 @@ export function createKpaCheckoutController(
           .andWhere('co.buyerId = :buyerId', { buyerId })
           .andWhere(
             "co.metadata->>'serviceKey' IN (:...serviceKeys)",
-            { serviceKeys: ['kpa-society', 'kpa'] }
+            { serviceKeys: KPA_BUYER_ORDER_SERVICE_KEYS }
           )
           .getOne();
 
@@ -740,6 +752,46 @@ export function createKpaCheckoutController(
         const err = error as Error;
         logger.error('[KPA Checkout] Get order error:', err);
         errorResponse(res, 500, 'ORDER_GET_ERROR', 'Failed to get order');
+      }
+    }
+  );
+
+  /**
+   * POST /checkout/orders/:orderId/cancel
+   * 결제 전 구매자 주문 취소
+   *
+   * WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
+   *   이벤트 오퍼 주문에 매장측 취소 경로가 없어 생성 후 되돌릴 수 없었다.
+   *   Pharmacy-Hub `cancelBeforePayment` 와 동일 계약이며,
+   *   이벤트 오퍼 주문이면 예약 차감된 재고를 canonical 보상 경로로 복원한다.
+   */
+  router.post(
+    '/orders/:orderId/cancel',
+    requireAuth,
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthRequest;
+        const buyerId = authReq.user?.id || authReq.authUser?.id;
+        if (!buyerId) {
+          return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
+        }
+
+        const result = await cancelStoreOrderBeforePayment(dataSource, {
+          orderId: String(req.params.orderId ?? ''),
+          buyerId,
+          serviceKeys: KPA_BUYER_ORDER_SERVICE_KEYS,
+          reason: typeof req.body?.reason === 'string' ? req.body.reason : undefined,
+        });
+
+        // strictNullChecks:false 환경이라 자동 narrowing 이 없다 → 명시적 predicate 사용.
+        if (isCancelStoreOrderFailure(result)) {
+          return errorResponse(res, result.httpStatus, result.code, result.message, result.details);
+        }
+        res.json({ success: true, data: result });
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error('[KPA Checkout] Cancel order error:', err);
+        errorResponse(res, 500, 'ORDER_CANCEL_ERROR', 'Failed to cancel order');
       }
     }
   );
@@ -1087,7 +1139,7 @@ export function createKpaCheckoutController(
           .where('co.sellerOrganizationId = :organizationId', { organizationId })
           .andWhere(
             "co.metadata->>'serviceKey' IN (:...serviceKeys)",
-            { serviceKeys: ['kpa-society', 'kpa'] }
+            { serviceKeys: KPA_BUYER_ORDER_SERVICE_KEYS }
           );
 
         if (status && status !== 'all') {

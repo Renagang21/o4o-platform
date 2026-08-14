@@ -23,7 +23,15 @@ import logger from '../../../utils/logger.js';
 import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
 import { validateSupplierSellerRelation } from '../../../core/checkout/checkout-guard.service.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
-import { GLYCOPHARM_OPL_SERVICE_KEYS } from '../../../constants/service-keys.js';
+import { GLYCOPHARM_OPL_SERVICE_KEYS, SERVICE_KEYS } from '../../../constants/service-keys.js';
+// WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
+//   이벤트 오퍼 주문(metadata.serviceKey='glycopharm-event-offer')이 구매자 주문 목록/상세에서
+//   누락되던 결함. 기록(쓰기)은 그대로 두고 조회 범위만 canonical 집합으로 넓힌다.
+import { getBuyerOrderServiceKeys } from '../../../constants/buyer-order-service-scope.js';
+import {
+  cancelStoreOrderBeforePayment,
+  isCancelStoreOrderFailure,
+} from '../../../services/checkout/store-order-cancel.service.js';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: 프로덕션 canonical 주문 원장 = checkout_orders
 // (ecommerce_orders 미존재 — IR-O4O-ORDER-CANONICAL-TABLE-CONFIRM-V1 / CHECK-...-DIAGNOSTIC-RESULT-V1 H1 확정).
@@ -34,6 +42,9 @@ import {
   CheckoutPaymentStatus,
   type ShippingAddress,
 } from '../../../entities/checkout/CheckoutOrder.entity.js';
+
+/** 'glycopharm' + 이벤트 오퍼 'glycopharm-event-offer' */
+const GP_BUYER_ORDER_SERVICE_KEYS = getBuyerOrderServiceKeys(SERVICE_KEYS.GLYCOPHARM);
 
 // ============================================================================
 // Type Definitions
@@ -634,7 +645,7 @@ export function createCheckoutController(
         const [orders, total] = await orderRepo
           .createQueryBuilder('co')
           .where('co.buyerId = :buyerId', { buyerId })
-          .andWhere("co.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'glycopharm' })
+          .andWhere("co.metadata->>'serviceKey' IN (:...serviceKeys)", { serviceKeys: GP_BUYER_ORDER_SERVICE_KEYS })
           .orderBy('co.createdAt', 'DESC')
           .take(limit)
           .skip(offset)
@@ -696,7 +707,7 @@ export function createCheckoutController(
           .createQueryBuilder('co')
           .where('co.id = :orderId', { orderId })
           .andWhere('co.buyerId = :buyerId', { buyerId })
-          .andWhere("co.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'glycopharm' })
+          .andWhere("co.metadata->>'serviceKey' IN (:...serviceKeys)", { serviceKeys: GP_BUYER_ORDER_SERVICE_KEYS })
           .getOne();
 
         if (!order) {
@@ -741,6 +752,46 @@ export function createCheckoutController(
         const err = error as Error;
         logger.error('[GlycoPharm Checkout] Get order error:', err);
         errorResponse(res, 500, 'ORDER_GET_ERROR', 'Failed to get order');
+      }
+    }
+  );
+
+  /**
+   * POST /checkout/orders/:orderId/cancel
+   * 결제 전 구매자 주문 취소
+   *
+   * WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
+   *   이벤트 오퍼 주문에 매장측 취소 경로가 없어 생성 후 되돌릴 수 없었다.
+   *   Pharmacy-Hub `cancelBeforePayment` 와 동일 계약이며,
+   *   이벤트 오퍼 주문이면 예약 차감된 재고를 canonical 보상 경로로 복원한다.
+   */
+  router.post(
+    '/orders/:orderId/cancel',
+    requireAuth,
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthRequest;
+        const buyerId = authReq.user?.id || authReq.authUser?.id;
+        if (!buyerId) {
+          return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
+        }
+
+        const result = await cancelStoreOrderBeforePayment(dataSource, {
+          orderId: String(req.params.orderId ?? ''),
+          buyerId,
+          serviceKeys: GP_BUYER_ORDER_SERVICE_KEYS,
+          reason: typeof req.body?.reason === 'string' ? req.body.reason : undefined,
+        });
+
+        // strictNullChecks:false 환경이라 자동 narrowing 이 없다 → 명시적 predicate 사용.
+        if (isCancelStoreOrderFailure(result)) {
+          return errorResponse(res, result.httpStatus, result.code, result.message, result.details);
+        }
+        res.json({ success: true, data: result });
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error('[GlycoPharm Checkout] Cancel order error:', err);
+        errorResponse(res, 500, 'ORDER_CANCEL_ERROR', 'Failed to cancel order');
       }
     }
   );

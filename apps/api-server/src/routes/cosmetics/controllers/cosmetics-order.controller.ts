@@ -29,6 +29,18 @@ import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
 import { validateSupplierSellerRelation } from '../../../core/checkout/checkout-guard.service.js';
+// WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
+//   이벤트 오퍼 주문(metadata.serviceKey='k-cosmetics-event-offer')이 구매자 주문 목록/상세에서
+//   누락되던 결함. 기록(쓰기)은 그대로 두고 조회 범위만 canonical 집합으로 넓힌다.
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
+import { getBuyerOrderServiceKeys } from '../../../constants/buyer-order-service-scope.js';
+import {
+  cancelStoreOrderBeforePayment,
+  isCancelStoreOrderFailure,
+} from '../../../services/checkout/store-order-cancel.service.js';
+
+/** 'cosmetics'(주문 metadata 축) + 이벤트 오퍼 'k-cosmetics-event-offer' */
+const KCOS_BUYER_ORDER_SERVICE_KEYS = getBuyerOrderServiceKeys(SERVICE_KEYS.K_COSMETICS);
 
 // ============================================================================
 // Type Definitions
@@ -633,11 +645,14 @@ export function createCosmeticsOrderController(
         //   checkout_orders 기준으로 정렬한다. 서비스 격리 metadata->>'serviceKey'='cosmetics' 유지,
         //   기존 buyerId 스코프 보존(의미 변경 없음). 응답 shape(StoreOrder)는 불변.
         //   Boundary Guard: raw SQL 은 parameter binding 만 사용(string interpolation 금지).
+        // WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
+        //   이벤트 오퍼 주문('k-cosmetics-event-offer')이 누락되던 결함 — 조회 범위만 확장.
+        //   Boundary Guard 유지: 키 집합도 parameter binding 으로 전달한다.
         const whereClauses: string[] = [
           'co."buyerId" = $1',
-          "co.metadata->>'serviceKey' = 'cosmetics'",
+          "co.metadata->>'serviceKey' = ANY($2::text[])",
         ];
-        const params: any[] = [buyerId];
+        const params: any[] = [buyerId, KCOS_BUYER_ORDER_SERVICE_KEYS];
 
         if (filters.channel) {
           params.push(filters.channel);
@@ -753,9 +768,9 @@ export function createCosmeticsOrderController(
                   co."paidAt", co."createdAt", co."updatedAt"
            FROM checkout_orders co
            WHERE co.id = $1 AND co."buyerId" = $2
-             AND co.metadata->>'serviceKey' = 'cosmetics'
+             AND co.metadata->>'serviceKey' = ANY($3::text[])
            LIMIT 1`,
-          [req.params.id, buyerId],
+          [req.params.id, buyerId, KCOS_BUYER_ORDER_SERVICE_KEYS],
         );
 
         const order = detailRows[0];
@@ -807,6 +822,46 @@ export function createCosmeticsOrderController(
         const err = error as Error;
         logger.error('[Cosmetics Order] Get order error:', err);
         errorResponse(res, 500, 'ORDER_GET_ERROR', 'Failed to get order');
+      }
+    }
+  );
+
+  /**
+   * POST /orders/:id/cancel
+   * 결제 전 구매자 주문 취소
+   *
+   * WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
+   *   이벤트 오퍼 주문에 매장측 취소 경로가 없어 생성 후 되돌릴 수 없었다.
+   *   Pharmacy-Hub `cancelBeforePayment` 와 동일 계약이며,
+   *   이벤트 오퍼 주문이면 예약 차감된 재고를 canonical 보상 경로로 복원한다.
+   */
+  router.post(
+    '/orders/:id/cancel',
+    requireAuth,
+    async (req: Request, res: Response) => {
+      try {
+        const authReq = req as AuthRequest;
+        const buyerId = authReq.user?.id || authReq.authUser?.id;
+        if (!buyerId) {
+          return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
+        }
+
+        const result = await cancelStoreOrderBeforePayment(dataSource, {
+          orderId: String(req.params.id ?? ''),
+          buyerId,
+          serviceKeys: KCOS_BUYER_ORDER_SERVICE_KEYS,
+          reason: typeof req.body?.reason === 'string' ? req.body.reason : undefined,
+        });
+
+        // strictNullChecks:false 환경이라 자동 narrowing 이 없다 → 명시적 predicate 사용.
+        if (isCancelStoreOrderFailure(result)) {
+          return errorResponse(res, result.httpStatus, result.code, result.message, result.details);
+        }
+        res.json({ success: true, data: result });
+      } catch (error: unknown) {
+        const err = error as Error;
+        logger.error('[Cosmetics Order] Cancel order error:', err);
+        errorResponse(res, 500, 'ORDER_CANCEL_ERROR', 'Failed to cancel order');
       }
     }
   );
