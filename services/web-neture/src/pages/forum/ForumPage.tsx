@@ -11,7 +11,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { PageSection, PageContainer } from '@o4o/ui';
 // WO-O4O-FORUM-LIST-PAGE-TEMPLATE-V1: 공통 목록 컴포넌트
-import { ForumListTemplate } from '@o4o/shared-space-ui';
+// WO-O4O-COMMUNITY-FORUM-KPA-NETURE-VIEW-CONVERGENCE-V1: 목록 상단 toolbar/info bar 공통 부품
+import { ForumListTemplate, ForumListToolbar, ForumListInfoBar } from '@o4o/shared-space-ui';
+import type { ForumListFilterChip } from '@o4o/shared-space-ui';
 import {
   fetchForumPosts,
   fetchPinnedPosts,
@@ -187,8 +189,7 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearchSubmit = () => {
     updateParam('q', searchInput.trim());
   };
 
@@ -196,6 +197,28 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
     setSearchInput('');
     setSearchParams({});
   };
+
+  // WO-O4O-COMMUNITY-FORUM-KPA-NETURE-VIEW-CONVERGENCE-V1:
+  // 활성 필터 표시를 KPA 와 동일한 chip 표현으로 수렴한다.
+  const activeChips: ForumListFilterChip[] = [];
+  if (searchQuery) {
+    activeChips.push({
+      label: `"${searchQuery}"`,
+      onRemove: () => { setSearchInput(''); updateParam('q', ''); },
+    });
+  }
+  const activeCategory = categoryFilter ? categories.find((c) => c.id === categoryFilter) : undefined;
+  if (activeCategory) {
+    activeChips.push({ label: activeCategory.name, onRemove: () => updateParam('category', '') });
+  }
+  const activeType = typeFilter ? TYPE_FILTERS.find((t) => t.value === typeFilter) : undefined;
+  if (activeType) {
+    activeChips.push({ label: activeType.label, onRemove: () => updateParam('type', '') });
+  }
+  if (sortBy !== 'latest') {
+    const sortLabel = SORT_OPTIONS.find((o) => o.value === sortBy)?.label;
+    if (sortLabel) activeChips.push({ label: sortLabel, onRemove: () => updateParam('sort', '') });
+  }
 
   // Pagination range
 
@@ -223,20 +246,16 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
         </div>
       )}
 
-      {/* Search + Filters */}
-      <div style={s.toolbar}>
-        <form style={s.searchForm} onSubmit={handleSearchSubmit}>
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="검색어를 입력하세요"
-            style={s.searchInput}
-          />
-          <button type="submit" style={s.searchBtn}>검색</button>
-        </form>
-        <div style={s.filterRow}>
-          <div style={s.filterGroup}>
+      {/* Search + Filters — WO-O4O-COMMUNITY-FORUM-KPA-NETURE-VIEW-CONVERGENCE-V1: 공통 ForumListToolbar
+          카테고리/유형/정렬은 Neture 고유 필터이므로 slot 으로 주입한다. */}
+      <ForumListToolbar
+        searchValue={searchInput}
+        onSearchChange={setSearchInput}
+        onSearchSubmit={handleSearchSubmit}
+        searchPlaceholder="검색어를 입력하세요"
+        accentColor={PRIMARY}
+        filterSlot={
+          <>
             {categories.length > 0 && (
               <select value={categoryFilter} onChange={(e) => updateParam('category', e.target.value)} style={s.select}>
                 <option value="">카테고리 전체</option>
@@ -254,36 +273,26 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
                 </button>
               ))}
             </div>
-          </div>
+          </>
+        }
+        filterRightSlot={
           <select value={sortBy} onChange={(e) => updateParam('sort', e.target.value === 'latest' ? '' : e.target.value)} style={s.select}>
             {SORT_OPTIONS.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
           </select>
-        </div>
-        {hasFilters && (
-          <div style={s.activeFilters}>
-            <span style={s.activeLabel}>
-              {searchQuery && `"${searchQuery}" `}
-              {categoryFilter && categories.find(c => c.id === categoryFilter)?.name
-                ? `${categories.find(c => c.id === categoryFilter)!.name} ` : ''}
-              {typeFilter && TYPE_FILTERS.find(t => t.value === typeFilter)?.label
-                ? `${TYPE_FILTERS.find(t => t.value === typeFilter)!.label} ` : ''}
-              {sortBy !== 'latest' && SORT_OPTIONS.find(o => o.value === sortBy)?.label || ''}
-            </span>
-            <button onClick={handleClearAll} style={s.clearBtn}>초기화</button>
-          </div>
-        )}
-      </div>
+        }
+        chips={activeChips}
+        onClearAll={handleClearAll}
+        clearAllLabel="초기화"
+      />
 
       {/* Info bar */}
       {!isLoading && !error && (
-        <div style={s.infoBar}>
-          <span style={s.totalCount}>
-            {hasFilters ? `검색 결과 ${totalCount}건` : `총 ${totalCount}개의 게시글`}
-          </span>
-          {totalPages > 1 && (
-            <span style={s.pageInfo}>{currentPage} / {totalPages} 페이지</span>
-          )}
-        </div>
+        <ForumListInfoBar
+          totalCount={totalCount}
+          filtered={hasFilters}
+          currentPage={currentPage}
+          totalPages={totalPages}
+        />
       )}
 
       {/* WO-O4O-FORUM-LIST-PAGE-TEMPLATE-V1: 공통 목록 컴포넌트 */}
@@ -349,21 +358,6 @@ const s: Record<string, React.CSSProperties> = {
     backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '16px',
   },
   noticeText: { fontSize: '13px', color: '#475569', lineHeight: 1.5, margin: 0 },
-  toolbar: { marginBottom: '16px' },
-  searchForm: { display: 'flex', gap: '8px', marginBottom: '12px' },
-  searchInput: {
-    flex: 1, padding: '8px 14px', fontSize: '14px', border: '1px solid #e2e8f0',
-    borderRadius: '6px', outline: 'none', backgroundColor: '#fff', boxSizing: 'border-box',
-  } as React.CSSProperties,
-  searchBtn: {
-    padding: '8px 18px', fontSize: '14px', fontWeight: 500, color: '#fff',
-    backgroundColor: PRIMARY, border: 'none', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  filterRow: {
-    display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px',
-    flexWrap: 'wrap', marginBottom: '8px',
-  } as React.CSSProperties,
-  filterGroup: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' } as React.CSSProperties,
   select: {
     padding: '6px 10px', fontSize: '13px', border: '1px solid #e2e8f0', borderRadius: '6px',
     backgroundColor: '#fff', color: '#334155', cursor: 'pointer', outline: 'none',
@@ -374,15 +368,6 @@ const s: Record<string, React.CSSProperties> = {
     borderRadius: '16px', backgroundColor: '#fff', color: '#64748b', cursor: 'pointer',
   } as React.CSSProperties,
   pillActive: { backgroundColor: PRIMARY, color: '#fff', borderColor: PRIMARY } as React.CSSProperties,
-  activeFilters: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '6px 12px', backgroundColor: '#f0f9ff', borderRadius: '6px', border: '1px solid #bae6fd',
-  },
-  activeLabel: { fontSize: '13px', color: '#0369a1' },
-  clearBtn: {
-    fontSize: '12px', color: '#0369a1', background: 'none', border: 'none',
-    cursor: 'pointer', textDecoration: 'underline', padding: '2px 4px',
-  } as React.CSSProperties,
 
   // Table
   tableWrapper: {
@@ -415,12 +400,6 @@ const s: Record<string, React.CSSProperties> = {
   commentBadge: { marginLeft: '6px', fontSize: '13px', color: PRIMARY, fontWeight: 500 },
 
   // Info bar
-  infoBar: {
-    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    padding: '8px 0', marginBottom: '4px',
-  },
-  totalCount: { fontSize: '13px', color: '#64748b' },
-  pageInfo: { fontSize: '13px', color: '#94a3b8' },
 
   // Pagination
   pagination: {

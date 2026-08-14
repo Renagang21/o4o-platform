@@ -14,6 +14,8 @@ import {
   ForumDetailLoadingState,
   ForumDetailNotFoundState,
   ForumCommentList,
+  ForumCommentForm,
+  ForumLikeButton,
 } from '@o4o/shared-space-ui';
 import { ClosedForumAccessBlocker } from '../../components/forum/ClosedForumAccessBlocker';
 import { forumApi } from '../../api';
@@ -114,8 +116,7 @@ export function ForumDetailPage() {
     else toast.error('감사 포인트 전송에 실패했습니다');
   };
 
-  const handleCommentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCommentSubmit = async () => {
     if (!newComment.trim() || !post) return;
 
     try {
@@ -245,13 +246,12 @@ export function ForumDetailPage() {
         </div>
 
         <div style={styles.actions}>
-          <button
-            style={{ ...styles.likeButton, ...(isLiked ? styles.likeButtonActive : {}) }}
-            onClick={handleLike}
+          <ForumLikeButton
+            liked={isLiked}
+            count={post.likeCount ?? 0}
             disabled={isLiking || !user}
-          >
-            {isLiked ? '❤️' : '🤍'} 좋아요{post.likeCount > 0 ? ` ${post.likeCount}` : ''}
-          </button>
+            onClick={handleLike}
+          />
 
           <div style={styles.authorActions}>
             {isForumOwner && (
@@ -306,29 +306,21 @@ export function ForumDetailPage() {
       <div style={styles.commentsSection}>
         <h2 style={styles.commentsTitle}>댓글 {comments.length}개</h2>
 
-        {user ? (
-          <form onSubmit={handleCommentSubmit} style={styles.commentForm}>
-            <textarea
-              style={styles.commentInput}
-              value={newComment}
-              onChange={e => setNewComment(e.target.value)}
-              placeholder="댓글을 입력하세요"
-              rows={3}
-            />
-            <button
-              type="submit"
-              style={styles.commentSubmit}
-              disabled={submitting || !newComment.trim()}
-            >
-              {submitting ? '등록 중...' : '댓글 등록'}
-            </button>
-          </form>
-        ) : (
-          <div style={styles.loginPrompt}>
-            <p style={styles.loginPromptText}>로그인하고 대화에 참여하세요</p>
-            <Link to="/login" style={styles.loginButton}>로그인 →</Link>
-          </div>
-        )}
+        <ForumCommentForm
+          value={newComment}
+          onChange={setNewComment}
+          onSubmit={handleCommentSubmit}
+          submitting={submitting}
+          authenticated={!!user}
+          accentColor={colors.primary}
+          style={styles.commentForm}
+          loginPrompt={
+            <div style={styles.loginPrompt}>
+              <p style={styles.loginPromptText}>로그인하고 대화에 참여하세요</p>
+              <Link to="/login" style={styles.loginButton}>로그인 →</Link>
+            </div>
+          }
+        />
 
         <ForumCommentList
           comments={comments.map((comment) => ({
@@ -421,20 +413,6 @@ const styles: Record<string, React.CSSProperties> = {
     paddingTop: '20px',
     borderTop: `1px solid ${colors.neutral200}`,
   },
-  likeButton: {
-    padding: '10px 20px',
-    backgroundColor: colors.neutral50,
-    border: `1px solid ${colors.neutral200}`,
-    borderRadius: '24px',
-    fontSize: '14px',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-  },
-  likeButtonActive: {
-    borderColor: '#fecaca',
-    backgroundColor: '#fef2f2',
-    color: '#ef4444',
-  },
   authorActions: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -486,25 +464,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   commentForm: {
     marginBottom: '24px',
-  },
-  commentInput: {
-    width: '100%',
-    padding: '12px',
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '8px',
-    fontSize: '14px',
-    resize: 'vertical',
-    marginBottom: '12px',
-    boxSizing: 'border-box',
-  },
-  commentSubmit: {
-    padding: '10px 20px',
-    backgroundColor: colors.primary,
-    color: colors.white,
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '14px',
-    cursor: 'pointer',
   },
   tagRow: {
     display: 'flex',

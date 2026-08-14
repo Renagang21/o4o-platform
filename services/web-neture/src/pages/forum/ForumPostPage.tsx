@@ -4,6 +4,11 @@
  * Work Order: WO-NETURE-HOME-HUB-FORUM-V0.1
  * Phase B-2: forum-core API 연동
  *
+ * WO-O4O-COMMUNITY-FORUM-KPA-NETURE-VIEW-CONVERGENCE-V1:
+ *   자체 구현하던 스켈레톤 / 헤더 / 좋아요 버튼 / 댓글 폼 / 댓글 목록(인라인 수정) /
+ *   content→html 변환을 `@o4o/shared-space-ui` 공통 부품으로 수렴한다.
+ *   Neture 고유(작성자 연락 섹션 · basePath · 모바일 ⋮ 액션 메뉴 · 로그인 모달)는 그대로 유지한다.
+ *
  * 역할: 의견을 읽고, 맥락을 이해하고, 답할 수 있는 공간
  * - 광고/추천 ❌
  * - 사이드바 ❌
@@ -47,27 +52,17 @@ import {
   type ForumComment as ApiForumComment,
   type PostType,
 } from '../../services/forumApi';
-import { blocksToHtml } from '@o4o/forum-core/utils';
-// WO-O4O-FORUM-DETAIL-PRIMITIVES-EXTRACTION-V1: 본문 공통 부품(Neture 고유 contentToHtml 변환은 html prop 으로 보존)
-// WO-O4O-FORUM-DETAIL-STATES-HEADER-EXTRACTION-V1: not-found state 공통화(header/skeleton 은 반응형·액션 복잡으로 보류)
-import { ForumPostContent, ForumDetailNotFoundState } from '@o4o/shared-space-ui';
-
-/** Convert post content (Block[] or string) to safe HTML */
-function contentToHtml(content: string | object[] | undefined): string {
-  if (!content) return '';
-  if (typeof content === 'string') {
-    // Legacy plain text: escape HTML and convert newlines to <br>
-    return content
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\n/g, '<br />');
-  }
-  if (Array.isArray(content)) {
-    return blocksToHtml(content as any);
-  }
-  return '';
-}
+// WO-O4O-FORUM-DETAIL-PRIMITIVES-EXTRACTION-V1 / WO-O4O-COMMUNITY-FORUM-KPA-NETURE-VIEW-CONVERGENCE-V1
+import {
+  ForumPostContent,
+  ForumPostHeader,
+  ForumDetailNotFoundState,
+  ForumDetailSkeletonState,
+  ForumCommentList,
+  ForumCommentForm,
+  ForumLikeButton,
+  formatForumDate,
+} from '@o4o/shared-space-ui';
 
 interface DisplayComment {
   id: string;
@@ -87,26 +82,6 @@ function formatDate(dateString: string): string {
     hour: '2-digit',
     minute: '2-digit',
   });
-}
-
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-  if (days > 7) {
-    return date.toLocaleDateString('ko-KR');
-  } else if (days > 0) {
-    return `${days}일 전`;
-  } else {
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    if (hours > 0) {
-      return `${hours}시간 전`;
-    }
-    const minutes = Math.floor(diff / (1000 * 60));
-    return minutes > 0 ? `${minutes}분 전` : '방금 전';
-  }
 }
 
 function getTypeBadge(type: PostType): { label: string; bgColor: string; textColor: string } {
@@ -134,74 +109,6 @@ function toDisplayComment(comment: ApiForumComment): DisplayComment {
     isEdited: comment.isEdited,
     createdAt: comment.createdAt,
   };
-}
-
-function CommentItem({ comment, currentUserId, isAdmin, onUpdate, onDelete, compact }: {
-  comment: DisplayComment;
-  currentUserId?: string;
-  isAdmin?: boolean;
-  onUpdate: (id: string, content: string) => Promise<void>;
-  onDelete: (id: string) => Promise<void>;
-  compact?: boolean;
-}) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(comment.content);
-  const [isSaving, setIsSaving] = useState(false);
-
-  const isOwner = (currentUserId && comment.authorId === currentUserId) || isAdmin;
-
-  const handleSave = async () => {
-    if (!editContent.trim() || isSaving) return;
-    setIsSaving(true);
-    await onUpdate(comment.id, editContent.trim());
-    setIsEditing(false);
-    setIsSaving(false);
-  };
-
-  const handleDelete = async () => {
-    if (!confirm('댓글을 삭제하시겠습니까?')) return;
-    await onDelete(comment.id);
-  };
-
-  return (
-    <div style={compact ? styles.commentCompact : styles.comment}>
-      <div style={styles.commentHeader}>
-        <span style={styles.commentAuthor}>{comment.authorName}</span>
-        <span style={styles.commentDate}>
-          {formatRelativeTime(comment.createdAt)}
-          {comment.isEdited && ' (수정됨)'}
-        </span>
-        {isOwner && !isEditing && (
-          <div style={styles.commentActions}>
-            <button style={compact ? styles.actionBtnMobile : styles.actionBtn} onClick={() => { setIsEditing(true); setEditContent(comment.content); }}>수정</button>
-            <button style={compact ? { ...styles.actionBtnMobile, color: '#dc2626' } : { ...styles.actionBtn, color: '#dc2626' }} onClick={handleDelete}>삭제</button>
-          </div>
-        )}
-      </div>
-      {isEditing ? (
-        <div style={{ marginTop: '8px' }}>
-          <textarea
-            style={styles.commentTextarea}
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            rows={3}
-          />
-          <div style={{ display: 'flex', gap: '8px', marginTop: '8px', justifyContent: 'flex-end' }}>
-            <button style={compact ? styles.cancelBtnMobile : styles.cancelBtn} onClick={() => setIsEditing(false)}>취소</button>
-            <button
-              style={{ ...styles.submitButton, padding: compact ? '10px 18px' : '6px 14px', fontSize: '13px', opacity: isSaving ? 0.5 : 1, minHeight: compact ? '44px' : undefined }}
-              onClick={handleSave}
-              disabled={isSaving}
-            >
-              {isSaving ? '저장 중...' : '저장'}
-            </button>
-          </div>
-        </div>
-      ) : (
-        <p style={styles.commentContent}>{comment.content}</p>
-      )}
-    </div>
-  );
 }
 
 export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {}) {
@@ -298,6 +205,7 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
   };
 
   const handleDeleteComment = async (commentId: string) => {
+    if (!confirm('댓글을 삭제하시겠습니까?')) return;
     const result = await deleteForumComment(commentId);
     if (result.success) {
       setComments(prev => prev.filter(c => c.id !== commentId));
@@ -341,36 +249,7 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
   if (isLoading) {
     return (
       <div style={styles.container}>
-        {/* Breadcrumb skeleton */}
-        <div style={{ ...styles.breadcrumb, marginBottom: '24px' }}>
-          <span style={{ ...styles.skeletonBar, width: '40px' }} />
-          <span style={styles.breadcrumbDivider}>/</span>
-          <span style={{ ...styles.skeletonBar, width: '40px' }} />
-          <span style={styles.breadcrumbDivider}>/</span>
-          <span style={{ ...styles.skeletonBar, width: '50px' }} />
-        </div>
-        {/* Title skeleton */}
-        <div style={{ marginBottom: '32px', paddingBottom: '24px', borderBottom: '1px solid #e2e8f0' }}>
-          <div style={{ ...styles.skeletonBar, width: '80px', height: '20px', marginBottom: '16px' }} />
-          <div style={{ ...styles.skeletonBar, width: '70%', height: '28px', marginBottom: '16px' }} />
-          <div style={{ ...styles.skeletonBar, width: '180px', height: '14px' }} />
-        </div>
-        {/* Content skeleton */}
-        <div style={{ marginBottom: '32px' }}>
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} style={{ ...styles.skeletonBar, width: `${90 - (i * 10)}%`, height: '16px', marginBottom: '12px' }} />
-          ))}
-        </div>
-        {/* Comments skeleton */}
-        <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '32px' }}>
-          <div style={{ ...styles.skeletonBar, width: '100px', height: '18px', marginBottom: '24px' }} />
-          {[1, 2].map((i) => (
-            <div key={i} style={{ padding: '20px 0', borderBottom: '1px solid #f1f5f9' }}>
-              <div style={{ ...styles.skeletonBar, width: '120px', height: '14px', marginBottom: '8px' }} />
-              <div style={{ ...styles.skeletonBar, width: '80%', height: '14px' }} />
-            </div>
-          ))}
-        </div>
+        <ForumDetailSkeletonState />
       </div>
     );
   }
@@ -395,7 +274,7 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
   const postType = normalizePostType(post.type);
   const badge = getTypeBadge(postType);
   const authorName = getAuthorName(post);
-
+  const canManagePost = isAdmin || (!!currentUserId && post.authorId === currentUserId);
 
   return (
     <div style={isMobile ? styles.containerMobile : styles.container}>
@@ -408,63 +287,63 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
         <span style={styles.breadcrumbCurrent}>게시글</span>
       </nav>
 
-      {/* Post Header */}
-      <header style={styles.postHeader}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div style={styles.badgeRow}>
-            {post.isPinned && (
-              <span style={styles.pinnedBadge}>고정</span>
-            )}
+      {/* Post Header — 공통 ForumPostHeader + Neture 고유 badge/action slot */}
+      <ForumPostHeader
+        title={post.title}
+        authorName={authorName}
+        createdAt={formatDate(post.publishedAt || post.createdAt)}
+        style={styles.postHeader}
+        titleStyle={isMobile ? styles.postTitleMobile : styles.postTitle}
+        badgeSlot={
+          <>
+            {post.isPinned && <span style={styles.pinnedBadge}>고정</span>}
             <span style={{ ...styles.typeBadge, backgroundColor: badge.bgColor, color: badge.textColor }}>
               {badge.label}
             </span>
-          </div>
-          {/* Mobile: ⋮ action menu */}
-          {isMobile && (isAdmin || (currentUserId && post.authorId === currentUserId)) && (
-            <div ref={actionMenuRef} style={styles.moreMenuWrapper}>
-              <button
-                style={styles.moreMenuButton}
-                onClick={() => setShowActionMenu(!showActionMenu)}
-                aria-label="게시글 메뉴"
-              >
-                ⋮
-              </button>
-              {showActionMenu && (
-                <div style={styles.moreMenuDropdown}>
-                  <button
-                    style={styles.moreMenuItem}
-                    onClick={() => { setShowActionMenu(false); navigate(`${basePath}/write?edit=${post.id}`); }}
-                  >
-                    수정
-                  </button>
-                  <button
-                    style={{ ...styles.moreMenuItem, color: '#dc2626' }}
-                    onClick={() => { setShowActionMenu(false); handleDeletePost(); }}
-                  >
-                    삭제
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        <h1 style={isMobile ? styles.postTitleMobile : styles.postTitle}>{post.title}</h1>
-        <div style={styles.postMeta}>
-          <span style={styles.authorName}>{authorName}</span>
-          <span style={styles.metaDivider}>·</span>
-          <span>{formatDate(post.publishedAt || post.createdAt)}</span>
-        </div>
-        {/* Desktop: inline actions */}
-        {!isMobile && (isAdmin || (currentUserId && post.authorId === currentUserId)) && (
-          <div style={styles.postActions}>
-            <button style={styles.actionBtn} onClick={() => navigate(`${basePath}/write?edit=${post.id}`)}>수정</button>
-            <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDeletePost}>삭제</button>
-          </div>
-        )}
-      </header>
+          </>
+        }
+        actionSlot={
+          canManagePost ? (
+            isMobile ? (
+              /* Mobile: ⋮ action menu */
+              <div ref={actionMenuRef} style={styles.moreMenuWrapper}>
+                <button
+                  style={styles.moreMenuButton}
+                  onClick={() => setShowActionMenu(!showActionMenu)}
+                  aria-label="게시글 메뉴"
+                >
+                  ⋮
+                </button>
+                {showActionMenu && (
+                  <div style={styles.moreMenuDropdown}>
+                    <button
+                      style={styles.moreMenuItem}
+                      onClick={() => { setShowActionMenu(false); navigate(`${basePath}/write?edit=${post.id}`); }}
+                    >
+                      수정
+                    </button>
+                    <button
+                      style={{ ...styles.moreMenuItem, color: '#dc2626' }}
+                      onClick={() => { setShowActionMenu(false); handleDeletePost(); }}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Desktop: inline actions */
+              <>
+                <button style={styles.actionBtn} onClick={() => navigate(`${basePath}/write?edit=${post.id}`)}>수정</button>
+                <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDeletePost}>삭제</button>
+              </>
+            )
+          ) : null
+        }
+      />
 
-      {/* Post Content */}
-      <ForumPostContent html={contentToHtml(post.content)} style={styles.postContent} />
+      {/* Post Content — legacy plain-text 는 escape 후 개행 변환(공통 변환기 옵션) */}
+      <ForumPostContent content={post.content} escapePlainText style={styles.postContent} />
 
       {/* WO-NETURE-EXTERNAL-CONTACT-V1: Author Contact Section */}
       {shouldShowAuthorContact(post) && (
@@ -508,17 +387,13 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
 
       {/* Like Button */}
       <div style={styles.likeBar}>
-        <button
-          style={{
-            ...styles.likeButton,
-            ...(isLiked ? styles.likeButtonActive : {}),
-          }}
-          onClick={handleLike}
+        <ForumLikeButton
+          liked={isLiked}
+          count={likeCount}
           disabled={isLiking}
-        >
-          <span>{isLiked ? '❤️' : '🤍'}</span>
-          <span>좋아요{likeCount > 0 ? ` ${likeCount}` : ''}</span>
-        </button>
+          onClick={handleLike}
+          compact={isMobile}
+        />
       </div>
 
       {/* Comments Section */}
@@ -528,54 +403,43 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
         </h3>
 
         {/* Comment Form */}
-        {isAuthenticated ? (
-          <div style={styles.commentForm}>
-            {commentError && (
-              <div style={styles.commentErrorBanner}>
-                <p style={styles.commentErrorText}>{commentError}</p>
-              </div>
-            )}
-            <textarea
-              style={styles.commentTextarea}
-              placeholder="댓글을 입력하세요..."
-              rows={4}
-              value={commentText}
-              onChange={(e) => { setCommentText(e.target.value); setCommentError(null); }}
-            />
-            <div style={styles.commentFormActions}>
-              <button
-                style={{
-                  ...styles.submitButton,
-                  ...(isMobile ? { minHeight: '44px', padding: '10px 18px' } : {}),
-                  opacity: !commentText.trim() || isSubmitting ? 0.5 : 1,
-                  cursor: !commentText.trim() || isSubmitting ? 'not-allowed' : 'pointer',
-                }}
-                onClick={handleSubmitComment}
-                disabled={!commentText.trim() || isSubmitting}
-              >
-                {isSubmitting ? '작성 중...' : '댓글 작성'}
-              </button>
+        <ForumCommentForm
+          value={commentText}
+          onChange={(v) => { setCommentText(v); setCommentError(null); }}
+          onSubmit={handleSubmitComment}
+          submitting={isSubmitting}
+          authenticated={isAuthenticated}
+          error={commentError}
+          placeholder="댓글을 입력하세요..."
+          rows={4}
+          submitLabel="댓글 작성"
+          submittingLabel="작성 중..."
+          compact={isMobile}
+          accentColor={PRIMARY_COLOR}
+          style={styles.commentForm}
+          loginPrompt={
+            <div style={styles.loginPrompt}>
+              <p>댓글을 작성하려면 <button onClick={() => openLoginModal()} style={styles.loginLink}>로그인</button>이 필요합니다.</p>
             </div>
-          </div>
-        ) : (
-          <div style={styles.loginPrompt}>
-            <p>댓글을 작성하려면 <button onClick={() => openLoginModal()} style={styles.loginLink}>로그인</button>이 필요합니다.</p>
-          </div>
-        )}
+          }
+        />
 
-        {/* Comments List */}
-        <div style={styles.commentsList}>
-          {comments.length > 0 ? (
-            comments.map((comment) => (
-              <CommentItem key={comment.id} comment={comment} currentUserId={currentUserId} isAdmin={isAdmin} onUpdate={handleUpdateComment} onDelete={handleDeleteComment} compact={isMobile} />
-            ))
-          ) : (
-            <div style={styles.noComments}>
-              <p>아직 댓글이 없습니다.</p>
-              <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '4px' }}>의견을 나누면 더 깊은 대화가 시작됩니다.</p>
-            </div>
-          )}
-        </div>
+        {/* Comments List — 인라인 수정/삭제는 공통 부품이 제공, mutation 은 서비스 adapter 소유 */}
+        <ForumCommentList
+          comments={comments.map((c) => ({
+            id: c.id,
+            authorName: c.authorName,
+            content: c.content,
+            createdAt: `${formatForumDate(c.createdAt)}${c.isEdited ? ' (수정됨)' : ''}`,
+            isAuthor: (!!currentUserId && c.authorId === currentUserId) || isAdmin,
+          }))}
+          onEditComment={handleUpdateComment}
+          onDeleteComment={handleDeleteComment}
+          compact={isMobile}
+          accentColor={PRIMARY_COLOR}
+          emptyMessage="아직 댓글이 없습니다."
+          emptyDescription="의견을 나누면 더 깊은 대화가 시작됩니다."
+        />
       </section>
 
       {/* Footer */}
@@ -601,13 +465,6 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '0 auto',
     padding: '16px 12px',
   },
-  skeletonBar: {
-    display: 'block',
-    height: '14px',
-    backgroundColor: '#e2e8f0',
-    borderRadius: '4px',
-    animation: 'skeleton-pulse 1.5s ease-in-out infinite',
-  } as React.CSSProperties,
   breadcrumb: {
     display: 'flex',
     alignItems: 'center',
@@ -630,12 +487,6 @@ const styles: Record<string, React.CSSProperties> = {
     paddingBottom: '24px',
     borderBottom: '1px solid #e2e8f0',
   },
-  badgeRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginBottom: '12px',
-  },
   pinnedBadge: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -656,17 +507,13 @@ const styles: Record<string, React.CSSProperties> = {
   },
   postTitle: {
     fontSize: '28px',
-    fontWeight: 700,
-    color: '#0f172a',
-    margin: '0 0 16px 0',
     lineHeight: 1.4,
+    margin: '0 0 16px 0',
   },
   postTitleMobile: {
     fontSize: '20px',
-    fontWeight: 700,
-    color: '#0f172a',
-    margin: '0 0 12px 0',
     lineHeight: 1.4,
+    margin: '0 0 12px 0',
   },
   // ⋮ action menu (mobile)
   moreMenuWrapper: {
@@ -713,31 +560,11 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     textAlign: 'left',
   } as React.CSSProperties,
-  postMeta: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '14px',
-    color: '#64748b',
-  },
-  authorName: {
-    fontWeight: 500,
-    color: '#1e293b',
-  },
-  metaDivider: {
-    color: '#cbd5e1',
-  },
   postContent: {
     marginBottom: '32px',
     fontSize: '16px',
     lineHeight: 1.8,
     color: '#334155',
-  },
-  paragraph: {
-    fontSize: '16px',
-    lineHeight: 1.8,
-    color: '#334155',
-    margin: '0 0 16px 0',
   },
 
   // WO-NETURE-EXTERNAL-CONTACT-V1: Contact Section
@@ -819,25 +646,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderTop: '1px solid #e2e8f0',
     marginTop: '32px',
   },
-  likeButton: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '10px 24px',
-    fontSize: '14px',
-    fontWeight: 500,
-    border: '1px solid #e2e8f0',
-    borderRadius: '24px',
-    backgroundColor: '#fff',
-    color: '#64748b',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-  },
-  likeButtonActive: {
-    borderColor: '#fecaca',
-    backgroundColor: '#fef2f2',
-    color: '#ef4444',
-  },
   commentsSection: {
     borderTop: '1px solid #e2e8f0',
     paddingTop: '32px',
@@ -850,42 +658,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
   commentForm: {
     marginBottom: '32px',
-  },
-  commentErrorBanner: {
-    padding: '10px 14px',
-    backgroundColor: '#fef2f2',
-    border: '1px solid #fecaca',
-    borderRadius: '6px',
-    marginBottom: '12px',
-  },
-  commentErrorText: {
-    fontSize: '13px',
-    color: '#dc2626',
-    margin: 0,
-  },
-  commentTextarea: {
-    width: '100%',
-    padding: '12px 16px',
-    fontSize: '14px',
-    border: '1px solid #e2e8f0',
-    borderRadius: '8px',
-    resize: 'vertical',
-    fontFamily: 'inherit',
-  },
-  commentFormActions: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    marginTop: '12px',
-  },
-  submitButton: {
-    padding: '10px 20px',
-    fontSize: '14px',
-    fontWeight: 600,
-    backgroundColor: PRIMARY_COLOR,
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
   },
   loginPrompt: {
     padding: '20px',
@@ -906,34 +678,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 'inherit',
     padding: 0,
   },
-  commentsList: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  comment: {
-    padding: '20px 0',
-    borderBottom: '1px solid #f1f5f9',
-  },
-  commentHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    marginBottom: '8px',
-  },
-  commentAuthor: {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: '#1e293b',
-  },
-  commentDate: {
-    fontSize: '13px',
-    color: '#94a3b8',
-  },
-  commentActions: {
-    display: 'flex',
-    gap: '8px',
-    marginLeft: 'auto',
-  },
   actionBtn: {
     background: 'none',
     border: 'none',
@@ -941,56 +685,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#64748b',
     cursor: 'pointer',
     padding: '2px 6px',
-  },
-  actionBtnMobile: {
-    background: 'none',
-    border: '1px solid #e2e8f0',
-    fontSize: '13px',
-    color: '#64748b',
-    cursor: 'pointer',
-    padding: '8px 12px',
-    minHeight: '36px',
-    borderRadius: '6px',
-  } as React.CSSProperties,
-  cancelBtn: {
-    background: 'none',
-    border: '1px solid #e2e8f0',
-    fontSize: '13px',
-    color: '#64748b',
-    cursor: 'pointer',
-    padding: '6px 14px',
-    borderRadius: '6px',
-  },
-  cancelBtnMobile: {
-    background: 'none',
-    border: '1px solid #e2e8f0',
-    fontSize: '13px',
-    color: '#64748b',
-    cursor: 'pointer',
-    padding: '10px 18px',
-    minHeight: '44px',
-    borderRadius: '6px',
-  } as React.CSSProperties,
-  commentCompact: {
-    padding: '16px 0',
-    borderBottom: '1px solid #f1f5f9',
-  },
-  postActions: {
-    display: 'flex',
-    gap: '8px',
-    marginTop: '12px',
-  },
-  commentContent: {
-    fontSize: '14px',
-    lineHeight: 1.7,
-    color: '#475569',
-    margin: 0,
-  },
-  noComments: {
-    padding: '40px 20px',
-    textAlign: 'center',
-    color: '#94a3b8',
-    fontSize: '14px',
   },
   footer: {
     marginTop: '40px',
@@ -1001,32 +695,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     color: '#64748b',
     textDecoration: 'none',
-  },
-  notFound: {
-    textAlign: 'center',
-    padding: '80px 20px',
-  },
-  notFoundTitle: {
-    fontSize: '24px',
-    fontWeight: 600,
-    color: '#0f172a',
-    margin: '0 0 12px 0',
-  },
-  notFoundText: {
-    fontSize: '15px',
-    color: '#64748b',
-    margin: '0 0 24px 0',
-  },
-  notFoundButton: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    padding: '10px 20px',
-    fontSize: '14px',
-    fontWeight: 500,
-    color: '#fff',
-    backgroundColor: '#2563eb',
-    textDecoration: 'none',
-    borderRadius: '8px',
   },
 };
 
