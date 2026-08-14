@@ -628,11 +628,14 @@ export function createCheckoutController(
         // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: checkout_orders + metadata.serviceKey 기준.
         // legacy OrderType.GLYCOPHARM 분기 제거 — ecommerce_orders 미존재(H1)이므로 해당 row 없음.
         const orderRepo = dataSource.getRepository(CheckoutOrder);
+        // WO-O4O-STORE-HUB-PRODUCTION-E2E-DATA-ENROLLMENT-AND-CLOSURE-V1:
+        //   alias 'order' 는 SQL 예약어라 생성 쿼리가 `syntax error at or near "order"` 로 실패했다
+        //   (프로덕션 500 / ORDER_LIST_ERROR). KPA·Cosmetics 와 동일하게 'co' 를 쓴다.
         const [orders, total] = await orderRepo
-          .createQueryBuilder('order')
-          .where('order.buyerId = :buyerId', { buyerId })
-          .andWhere("order.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'glycopharm' })
-          .orderBy('order.createdAt', 'DESC')
+          .createQueryBuilder('co')
+          .where('co.buyerId = :buyerId', { buyerId })
+          .andWhere("co.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'glycopharm' })
+          .orderBy('co.createdAt', 'DESC')
           .take(limit)
           .skip(offset)
           .getManyAndCount();
@@ -688,11 +691,12 @@ export function createCheckoutController(
 
         // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: checkout_orders + metadata.serviceKey 기준.
         const orderRepoForGet = dataSource.getRepository(CheckoutOrder);
+        // alias 'order' = SQL 예약어 (위 목록 조회와 동일 사유)
         const order = await orderRepoForGet
-          .createQueryBuilder('order')
-          .where('order.id = :orderId', { orderId })
-          .andWhere('order.buyerId = :buyerId', { buyerId })
-          .andWhere("order.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'glycopharm' })
+          .createQueryBuilder('co')
+          .where('co.id = :orderId', { orderId })
+          .andWhere('co.buyerId = :buyerId', { buyerId })
+          .andWhere("co.metadata->>'serviceKey' = :serviceKey", { serviceKey: 'glycopharm' })
           .getOne();
 
         if (!order) {
