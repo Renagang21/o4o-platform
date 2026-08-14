@@ -151,19 +151,52 @@ export function buildUserSearchWhere(alias: string): string {
   return `(${ADMIN_USER_SEARCH_FIELDS.map((f) => `${alias}.${f} ILIKE :search`).join(' OR ')})`;
 }
 
+/**
+ * WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1:
+ *   membership 처리 결과를 응답에 명시한다(조용한 동작 금지).
+ *   - `CREATED`              : membership 이 없어 새로 만들었다 (status='active')
+ *   - `KEEP_EXISTING_STATUS` : 기존 membership 을 그대로 두었다 (status·role 무변경)
+ *   - `MIXED`                : 여러 서비스가 섞였다 (일부 생성 · 일부 보존)
+ *   - `NOT_APPLICABLE`       : prefixed role 이 없어 membership 대상이 아니다
+ */
+export type MembershipPolicy = 'CREATED' | 'KEEP_EXISTING_STATUS' | 'MIXED' | 'NOT_APPLICABLE';
+
+export interface MembershipEnsureResult {
+  created: number;
+  kept: number;
+  policy: MembershipPolicy;
+}
+
+export function resolveMembershipPolicy(created: number, kept: number): MembershipPolicy {
+  if (created > 0 && kept > 0) return 'MIXED';
+  if (created > 0) return 'CREATED';
+  if (kept > 0) return 'KEEP_EXISTING_STATUS';
+  return 'NOT_APPLICABLE';
+}
+
 export class AdminUserController {
 
   // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Ensure service_memberships exist for each role's service
   // WO-O4O-ADMIN-OPERATOR-MEMBERSHIP-CANONICAL-KEY-FIX-V1: role prefix를 canonical service_key로 매핑
   // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
   //   선택적 `manager` — 등록 트랜잭션 안에서 호출되면 같은 트랜잭션으로 쓴다.
+  //
+  // WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1:
+  //   **ensure membership existence ≠ approve / reactivate membership.**
+  //   이전 구현은 기존 membership 의 status 가 'active' 가 아니면 status 를 'active' 로,
+  //   role 을 새 role 로 덮어썼다. 그 결과 pending·suspended·rejected·withdrawn 회원이
+  //   **역할 추가만으로 서비스 접근 권한을 되찾았다** (승인 이력 approved_by/approved_at 도 없이).
+  //   membership 상태 변경은 canonical 경로(MembershipApprovalService 의
+  //   approve/reject/suspend/reactivate)만 담당한다. 여기서는 **없을 때만 생성**한다.
   private ensureServiceMemberships = async (
     userId: string,
     roles: string[],
     manager?: EntityManager,
-  ): Promise<void> => {
+  ): Promise<MembershipEnsureResult> => {
     const smRepo = (manager ?? AppDataSource).getRepository<ServiceMembership>('ServiceMembership');
     const processedServices = new Set<string>();
+    let created = 0;
+    let kept = 0;
 
     for (const r of roles) {
       const parts = r.split(':');
@@ -181,14 +214,17 @@ export class AdminUserController {
               role: roleName,
             } as any);
             await smRepo.save(membership);
-          } else if ((existing as any).status !== 'active') {
-            (existing as any).status = 'active';
-            (existing as any).role = roleName;
-            await smRepo.save(existing);
+            created += 1;
+          } else {
+            // 기존 membership 은 status·role 모두 건드리지 않는다.
+            // 재활성화가 필요하면 명시적 승인/reactivate 경로를 쓴다.
+            kept += 1;
           }
         }
       }
     }
+
+    return { created, kept, policy: resolveMembershipPolicy(created, kept) };
   };
   
   // Get all users with pagination and filters
@@ -382,13 +418,17 @@ export class AdminUserController {
 
         let credentialPolicy: 'CREATED' | 'KEEP_EXISTING_CREDENTIAL' | 'NOT_APPLICABLE' =
           'NOT_APPLICABLE';
+        // WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1
+        let membershipPolicy: MembershipPolicy = 'NOT_APPLICABLE';
 
         await AppDataSource.transaction(async (manager) => {
           for (const r of rolesToAssign) {
             await roleAssignmentService.assignRole({ userId: existingUser.id, role: r }, manager);
           }
           // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Create service_memberships from roles
-          await this.ensureServiceMemberships(existingUser.id, rolesToAssign, manager);
+          membershipPolicy = (
+            await this.ensureServiceMemberships(existingUser.id, rolesToAssign, manager)
+          ).policy;
 
           if (targetServiceKey) {
             const credRepo = manager.getRepository<ServiceCredential>('ServiceCredential');
@@ -426,6 +466,9 @@ export class AdminUserController {
           passwordPolicy: 'KEEP_EXISTING_PASSWORD',
           // 실제 서비스 로그인 비밀번호(L2)에 무슨 일이 있었는지는 별도로 알린다.
           credentialPolicy,
+          // WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1:
+          //   기존 membership 은 승격되지 않는다 — 관리자가 그 사실을 알 수 있게 명시한다.
+          membershipPolicy,
         });
         return;
       }
@@ -461,6 +504,8 @@ export class AdminUserController {
       //   같은 트랜잭션에서 만든다. 즉 **서비스 로그인 원본은 credential** 이며 users.password 는
       //   스키마 제약을 만족시키는 초기값일 뿐이다. 이는 일반 가입 경로
       //   (auth-register.controller.ts: 동일 hash 로 users.password + credential 동시 기록)와 같은 계약이다.
+      // WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1
+      let newUserMembershipPolicy: MembershipPolicy = 'NOT_APPLICABLE';
       const savedUser = await AppDataSource.transaction(async (manager) => {
         const txUserRepo = manager.getRepository(User);
         const created = txUserRepo.create({
@@ -481,7 +526,9 @@ export class AdminUserController {
         }
 
         // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Create service_memberships from roles
-        await this.ensureServiceMemberships(saved.id, rolesToAssign, manager);
+        newUserMembershipPolicy = (
+          await this.ensureServiceMemberships(saved.id, rolesToAssign, manager)
+        ).policy;
 
         // Identity V2 L2 — 선택한 서비스 credential 하나만 만든다(다른 서비스 무변경).
         if (targetServiceKey) {
@@ -501,6 +548,7 @@ export class AdminUserController {
         message: 'User created successfully',
         serviceKey: targetServiceKey,
         credentialPolicy: targetServiceKey ? 'CREATED' : 'NOT_APPLICABLE',
+        membershipPolicy: newUserMembershipPolicy,
       });
     } catch (error) {
       // 계약 위반은 500 으로 뭉개지 않는다 — 트랜잭션은 이미 롤백됐고(부분 생성 0), 원인을 그대로 알린다.
