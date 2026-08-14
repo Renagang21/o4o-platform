@@ -1,6 +1,13 @@
 /**
  * Store Owner Utilities
  *
+ * WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+ *   조직 선택을 `utils/store-organization.resolver.ts` 로 위임한다.
+ *   serviceKey 가 주어지면 **그 서비스에 등록된 organization 만 후보**가 되고,
+ *   2개 이상이면 임의 선택 대신 ambiguous 로 차단한다 (role 판정 ≠ organization 판정).
+ *   serviceKey → service_memberships.service_key 매핑은 @o4o/security-core SSOT 위임
+ *   (로컬 상수 제거 — membership-guard / serviceScope 와 3-way drift 방지).
+ *
  * WO-O4O-STORE-OWNER-LEGACY-CLEANUP-V1:
  *   role_assignments는 store_owner 판단의 단일 소스다.
  *   organization_members는 조직 정보 조회용으로만 사용한다.
@@ -21,6 +28,14 @@
 import type { DataSource } from 'typeorm';
 import type { Request, Response, NextFunction } from 'express';
 import type { AuthContext } from '../auth/auth-context.js';
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
+import {
+  resolveStoreOrganization,
+  type StoreOrganizationResolution,
+  type StoreOwnerServiceKey,
+} from './store-organization.resolver.js';
+
+export type { StoreOwnerServiceKey } from './store-organization.resolver.js';
 
 /**
  * 서비스별 store_owner 권한을 가지는 role 목록.
@@ -47,26 +62,13 @@ const STORE_OWNER_ROLES_BY_SERVICE = {
   'pharmacy-hub': ['pharmacy-hub:store_owner'],
 } as const;
 
-export type StoreOwnerServiceKey = keyof typeof STORE_OWNER_ROLES_BY_SERVICE;
-
 /**
- * WO-O4O-STORE-OWNER-MEMBERSHIP-CANONICALIZATION-V1:
- *   StoreOwnerServiceKey(role-prefix) → service_memberships.service_key 매핑.
- *   common/middleware/membership-guard.middleware.ts 의 SCOPE_TO_MEMBERSHIP_KEY,
- *   utils/serviceScope.ts 의 ROLE_PREFIX_TO_SERVICE_KEY 와 동일 의미 (follow-up
- *   으로 단일 상수 통합 권장).
- *
- * `pharmacy-hub` 는 role prefix 와 service_memberships.service_key 가 동일하다
- * (middleware/pharmacy-hub-scope.middleware.ts `PHARMACY_HUB_SCOPE_CONFIG.serviceKey`).
- * kpa 만 prefix('kpa') ≠ membership key('kpa-society') 인 예외다.
+ * WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+ *   StoreOwnerServiceKey(role prefix) → service_memberships.service_key 매핑은
+ *   @o4o/security-core 의 resolveCanonicalServiceKey() 가 SSOT 다
+ *   (kpa→kpa-society, cosmetics→k-cosmetics, glycopharm/pharmacy-hub self-map).
+ *   membership-guard.middleware / utils/serviceScope 와 같은 함수를 쓴다 — 로컬 맵 금지.
  */
-const STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY: Record<StoreOwnerServiceKey, string> = {
-  kpa: 'kpa-society',
-  glycopharm: 'glycopharm',
-  cosmetics: 'k-cosmetics',
-  'pharmacy-hub': 'pharmacy-hub',
-};
-
 /**
  * 모든 서비스의 store_owner role 합집합 (back-compat 경로용).
  * 신규 호출은 가급적 serviceKey 를 지정하여 cross-service 침투를 차단한다.
@@ -81,11 +83,19 @@ const ALL_STORE_OWNER_ROLES: readonly string[] = Object.values(
  * @param serviceKey  지정 시 해당 서비스 role 만 허용 (예: 'glycopharm' → glycopharm:store_owner / glycopharm:pharmacist).
  *                    미지정 시 모든 서비스 role 허용 (back-compat).
  */
+export interface StoreOwnerCheckResult {
+  isOwner: boolean;
+  organizationId: string | null;
+  memberRole: string;
+  /** 조직 해석 상세 — 'ambiguous' 를 403 과 구분해 응답하려는 호출 측이 사용 */
+  resolution: StoreOrganizationResolution;
+}
+
 export async function isStoreOwner(
   dataSource: DataSource,
   userId: string,
   serviceKey?: StoreOwnerServiceKey,
-): Promise<{ isOwner: boolean; organizationId: string | null; memberRole: string }> {
+): Promise<StoreOwnerCheckResult> {
   const allowedRoles: readonly string[] = serviceKey
     ? STORE_OWNER_ROLES_BY_SERVICE[serviceKey]
     : ALL_STORE_OWNER_ROLES;
@@ -97,18 +107,24 @@ export async function isStoreOwner(
     [userId, allowedRoles]
   );
   if (!raRecord) {
-    return { isOwner: false, organizationId: null, memberRole: '' };
+    return {
+      isOwner: false,
+      organizationId: null,
+      memberRole: '',
+      resolution: { status: 'none', organizationId: null, memberRole: '', candidateCount: 0 },
+    };
   }
 
-  const rows = await dataSource.query(
-    `SELECT organization_id, role FROM organization_members
-     WHERE user_id = $1 AND role IN ('owner', 'admin', 'manager') AND left_at IS NULL LIMIT 1`,
-    [userId]
-  );
-  if (rows.length > 0) {
-    return { isOwner: true, organizationId: rows[0].organization_id, memberRole: rows[0].role };
-  }
-  return { isOwner: true, organizationId: null, memberRole: '' };
+  // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+  //   조직 선택은 공통 해석기가 담당한다. serviceKey 가 있으면 그 서비스에 등록된
+  //   조직만 후보이며, 2개 이상이면 organizationId 를 주지 않는다(임의 선택 금지).
+  const resolution = await resolveStoreOrganization(dataSource, userId, serviceKey);
+  return {
+    isOwner: true,
+    organizationId: resolution.organizationId,
+    memberRole: resolution.memberRole,
+    resolution,
+  };
 }
 
 /**
@@ -137,7 +153,7 @@ export function createRequireStoreOwner(
     // back-compat 경로(serviceKey 미지정)는 본 WO 에서 변경 없음 — 점진 마이그레이션.
     // JWT memberships 직접 사용 — request 당 추가 DB query 없음.
     if (serviceKey) {
-      const membershipKey = STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY[serviceKey];
+      const membershipKey = resolveCanonicalServiceKey(serviceKey);
       const memberships: { serviceKey: string; status: string }[] =
         (user as any).memberships || [];
       const membership = memberships.find((m) => m.serviceKey === membershipKey);
@@ -159,11 +175,22 @@ export function createRequireStoreOwner(
       }
     }
 
-    const { isOwner, organizationId, memberRole } = await isStoreOwner(
+    const { isOwner, organizationId, memberRole, resolution } = await isStoreOwner(
       dataSource,
       user.id,
       serviceKey,
     );
+    // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+    //   같은 서비스 후보가 2개 이상이면 하나를 골라 통과시키지 않는다.
+    //   Pharmacy-Hub 전용 seam 과 같은 코드·같은 상태코드(409)로 응답한다.
+    if (isOwner && resolution.status === 'ambiguous') {
+      res.status(409).json({
+        success: false,
+        error: '연결된 매장이 여러 개입니다. 운영자에게 문의해 주세요.',
+        code: 'AMBIGUOUS_STORE_CONNECTION',
+      });
+      return;
+    }
     // WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1:
     //   organizationId 미해석(= 매장 조직 미연결) 사용자를 통과시키지 않는다.
     //   기존에는 role 만 있으면 통과 후 req.organizationId = null 이 되어 하위 핸들러가
@@ -203,6 +230,7 @@ export async function resolveStoreAccess(
   _userRoles: string[],
   serviceKey?: StoreOwnerServiceKey,
 ): Promise<string | null> {
+  // ambiguous 는 organizationId 가 null 이므로 자연히 차단된다(임의 선택 없음).
   const { isOwner, organizationId } = await isStoreOwner(dataSource, userId, serviceKey);
   if (isOwner) return organizationId;
   return null;

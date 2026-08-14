@@ -887,7 +887,7 @@ export class EventOfferService {
 
     let organizationId: string | null = null;
     try {
-      organizationId = await resolveStoreAccess(this.dataSource, params.userId, []);
+      organizationId = await resolveStoreAccess(this.dataSource, params.userId, [], 'kpa');
     } catch (resolveErr) {
       console.warn(
         '[EventOfferService] tryLinkStoreProduct: resolveStoreAccess failed (non-blocking)',

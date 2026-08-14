@@ -32,18 +32,18 @@
  *   조직은 항상 인증 사용자 + 위 enrollment 로 서버가 다시 결정한다.
  *
  *   왜 공통 resolveStoreAccess()/isStoreOwner() 를 쓰지 않는가:
- *     utils/store-owner.utils.ts 는 organization_members 를 ORDER BY 없이 LIMIT 1
- *     로 읽어 다중 조직 계정에서 비결정적이며 서비스 스코프도 걸지 않는다.
- *     공통 해석기 정비는 KPA/GlycoPharm/K-Cosmetics 까지 영향을 주는 별도 작업이므로
- *     본 WO 는 공통 해석기를 변경하지 않고 Pharmacy-Hub 전용 경로에만 적용한다.
+ *     (해소됨) WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1 에서
+ *     공통 해석기도 같은 규칙(서비스 스코프 + ambiguous 차단)으로 정비했다.
+ *     이 파일은 매장 정보 화면이 필요로 하는 organizations 원본 행까지 함께 반환하므로
+ *     계속 유지한다 — 규칙은 공통 해석기와 동일하고, 매장 역할 집합은 공통 SSOT 를 쓴다.
  */
 import { AppDataSource } from '../../database/connection.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
+import { STORE_MEMBER_ROLES } from '../../utils/store-organization.resolver.js';
+
+export { STORE_MEMBER_ROLES };
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
-
-/** organization_members 중 매장 접근으로 인정되는 role (provisioning·공통 정의와 동일 집합) */
-export const STORE_MEMBER_ROLES = ['owner', 'admin', 'manager'];
 
 /** 구조화 주소 (organizations.address_detail) */
 export interface StoreAddressDetail {

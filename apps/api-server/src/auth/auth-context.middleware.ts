@@ -11,6 +11,10 @@
  * WO-O4O-STORE-HUB-OPTIONAL-AUTH-MIGRATION-V1:
  *   service-aware guard 도입 — serviceKey 지정 시 해당 서비스 store_owner role 만 인정.
  *   미지정 시 ALL_STORE_OWNER_ROLES fallback (back-compat).
+ *
+ * WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+ *   serviceKey 지정 시 조직도 그 서비스 등록 조직으로 한정된다. 후보가 2개 이상이면
+ *   409 AMBIGUOUS_STORE_CONNECTION (임의 선택 금지).
  */
 
 import type { Request, Response, NextFunction } from 'express';
@@ -35,7 +39,17 @@ export function requireStoreAuth(dataSource: DataSource, serviceKey?: StoreOwner
       return;
     }
 
-    const { isOwner, organizationId, memberRole } = await isStoreOwner(dataSource, user.id, serviceKey);
+    const { isOwner, organizationId, memberRole, resolution } = await isStoreOwner(dataSource, user.id, serviceKey);
+    // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+    //   같은 서비스 매장 후보가 2개 이상이면 임의 선택하지 않고 명시적으로 차단한다.
+    if (isOwner && resolution.status === 'ambiguous') {
+      res.status(409).json({
+        success: false,
+        error: '연결된 매장이 여러 개입니다. 운영자에게 문의해 주세요.',
+        code: 'AMBIGUOUS_STORE_CONNECTION',
+      });
+      return;
+    }
     if (!isOwner || !organizationId) {
       res.status(403).json({
         success: false,

@@ -143,8 +143,11 @@ export async function deriveKpaMembershipContext(userId: string): Promise<KpaMem
   let orgMember = null;
   try {
     const [row] = await AppDataSource.query(
+      // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+      // organizationRole 표시값이 요청마다 달라지지 않도록 선택을 결정적으로 고정한다.
       `SELECT role FROM organization_members
        WHERE user_id = $1 AND left_at IS NULL
+       ORDER BY is_primary DESC NULLS LAST, joined_at ASC, organization_id ASC
        LIMIT 1`,
       [userId]
     );

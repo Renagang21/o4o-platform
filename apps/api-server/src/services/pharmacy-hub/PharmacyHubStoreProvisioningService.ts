@@ -44,14 +44,15 @@ import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { organizationOpsService } from '../../modules/organization/services/organization-ops.service.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import logger from '../../utils/logger.js';
+// WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+//   organization_members 매장 역할 집합은 공통 SSOT 재사용 (로컬 정의 제거)
+import { STORE_MEMBER_ROLES } from '../../utils/store-organization.resolver.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 /** 매장 주체를 갖는 유일한 Pharmacy-Hub 역할. supplier/operator 는 매장이 없다. */
 const STORE_OWNER_ROLE = `${SERVICE_KEY}:store_owner`;
 /** organizations.type — KPA/GlycoPharm 약국 조직과 동일 값 */
 const ORG_TYPE = 'pharmacy';
-/** organization_members 중 매장 접근으로 인정되는 role (resolveStoreAccess 와 동일 집합) */
-const STORE_MEMBER_ROLES = ['owner', 'admin', 'manager'];
 
 export type ProvisionOutcome =
   | 'created'   // 조직을 새로 만들었다
@@ -523,7 +524,7 @@ export class PharmacyHubStoreProvisioningService {
         detail:
           `소속 매장 조직이 ${memberOrgs.length}개입니다 ` +
           `(${memberOrgs.map((o: any) => o.code || o.id).join(', ')}). ` +
-          `resolveStoreAccess() 가 LIMIT 1 로 비결정적이 되므로 자동 선택하지 않습니다.`,
+          `매장 조직은 자동 선택하지 않습니다(임의 선택 금지).`,
       };
     }
     if (memberOrgs.length === 1) {

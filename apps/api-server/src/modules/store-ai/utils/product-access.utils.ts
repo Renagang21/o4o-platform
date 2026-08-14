@@ -202,8 +202,12 @@ export async function resolveGlobalProductResourceAccess(
   }
 
   const orgRows = await dataSource.query(
+    // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+    // 허용 집합은 그대로 두고 선택만 결정적으로 만든다 (정렬 없는 LIMIT 1 금지).
     `SELECT organization_id FROM organization_members
-     WHERE user_id = $1 AND left_at IS NULL LIMIT 1`,
+     WHERE user_id = $1 AND left_at IS NULL
+     ORDER BY is_primary DESC NULLS LAST, joined_at ASC, organization_id ASC
+     LIMIT 1`,
     [userId],
   );
   if (orgRows.length === 0) {
@@ -247,8 +251,12 @@ export async function resolveCallerOrg(
   userId: string,
 ): Promise<string | null> {
   const rows = await dataSource.query(
+    // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+    // 허용 집합은 그대로 두고 선택만 결정적으로 만든다 (정렬 없는 LIMIT 1 금지).
     `SELECT organization_id FROM organization_members
-     WHERE user_id = $1 AND left_at IS NULL LIMIT 1`,
+     WHERE user_id = $1 AND left_at IS NULL
+     ORDER BY is_primary DESC NULLS LAST, joined_at ASC, organization_id ASC
+     LIMIT 1`,
     [userId],
   );
   return rows.length > 0 ? rows[0].organization_id : null;

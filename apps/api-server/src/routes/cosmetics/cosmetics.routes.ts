@@ -168,7 +168,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   router.use('/store-contents', createStoreContentController(dataSource, coreRequireAuth as any));
 
   // Store Playlist — 사이니지 플레이리스트
-  router.use('/store-playlists', createStorePlaylistController(dataSource, coreRequireAuth as any));
+  router.use('/store-playlists', createStorePlaylistController(dataSource, coreRequireAuth as any, undefined, 'cosmetics'));
 
   // Store Library (internal: /pharmacy/library/*)
   // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='cosmetics' 전달.

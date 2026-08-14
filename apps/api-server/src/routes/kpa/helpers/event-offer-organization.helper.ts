@@ -74,6 +74,9 @@ export async function resolveOrganizationForEventOffer(
          WHERE om.user_id = $1
            AND om.role IN ('owner','admin','manager')
            AND om.left_at IS NULL
+         -- WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+         -- 허용 집합(서비스 enroll 조건)은 그대로, 선택만 결정적으로 만든다.
+         ORDER BY om.is_primary DESC NULLS LAST, om.joined_at ASC, om.organization_id ASC
          LIMIT 1`,
         [userId, SERVICE_KEYS.COSMETICS],
       );
@@ -113,6 +116,9 @@ export async function resolveOrganizationForEventOffer(
          WHERE om.user_id = $1
            AND om.role IN ('owner','admin','manager')
            AND om.left_at IS NULL
+         -- WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+         -- 허용 집합(서비스 enroll 조건)은 그대로, 선택만 결정적으로 만든다.
+         ORDER BY om.is_primary DESC NULLS LAST, om.joined_at ASC, om.organization_id ASC
          LIMIT 1`,
         [userId, SERVICE_KEYS.GLYCOPHARM],
       );
