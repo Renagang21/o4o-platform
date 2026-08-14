@@ -277,7 +277,7 @@ DELETE FROM organization_service_enrollments
 | # | 내용 | 성격 |
 |---|---|---|
 | 1 | **orphan `platform_store_slugs` 2건** — `store_id` 가 존재하지 않는 organization 을 가리킨다(`neture-3lifezone`, `phase0-테스트약국`). enrollment 생성 불가 | 데이터 정합 |
-| 2 | `POST /api/v1/admin/users` 를 **기존 사용자**에게 호출하면 `status` 가 `approved` 로 되돌아간다 → suspended 계정이 조용히 재활성화된다. 본 WO 중 실제로 발생했고 최종 재-suspend 로 복구했다(§10-2) | 잠재 결함 |
+| 2 | ~~`POST /api/v1/admin/users` 를 **기존 사용자**에게 호출하면 `status` 가 `approved` 로 되돌아간다~~ → **정정: 사실이 아님.** 재현되지 않았고 해당 코드 경로도 없다. 실제 원인은 (a) `users.updated_at` / `updatedAt` 컬럼 오독 (b) 본 세션에서 직접 호출한 `PATCH /admin/users/:id/status`. 상세: [`CHECK-O4O-ADMIN-USER-UPSERT-STATUS-PRESERVATION-V1`](CHECK-O4O-ADMIN-USER-UPSERT-STATUS-PRESERVATION-V1.md) | ~~잠재 결함~~ → **오귀속(정정됨)** |
 | 3 | 선행 CHECK 의 drug-gate 예측이 42분 뒤 커밋으로 무효화됐다 — **영향 예측을 담은 CHECK 는 실행 직전 재검증**이 필요하다 | 프로세스 |
 
 > WO §9 변경 금지 준수: schema/migration · service key 추가 변경 · OPL bulk update · audience policy 변경 ·
