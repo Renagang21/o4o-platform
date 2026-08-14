@@ -302,8 +302,16 @@ export async function loadTossWidget(clientKey: string): Promise<any> {
 
 /** axios 오류에서 서버 메시지를 꺼낸다 (없으면 기본 문구). */
 export function errorMessage(err: unknown, fallback: string): string {
-  const res = (err as { response?: { data?: { error?: string; code?: string } } }).response;
-  if (res?.data?.error) return res.data.error;
+  // WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1:
+  //   백엔드 오류 body 는 두 형태가 모두 존재한다 — `error: '문자열'` 과 `error: { code, message }`.
+  //   객체를 그대로 반환하면 화면에서 React child 로 렌더돼 ErrorBoundary 화이트 스크린이 된다.
+  const res = (err as {
+    response?: { data?: { error?: string | { code?: string; message?: string }; message?: string } };
+  }).response;
+  const raw = res?.data?.error;
+  if (typeof raw === 'string' && raw) return raw;
+  if (raw && typeof raw === 'object' && typeof raw.message === 'string' && raw.message) return raw.message;
+  if (typeof res?.data?.message === 'string' && res.data.message) return res.data.message;
   if (err instanceof Error && err.message) return err.message;
   return fallback;
 }

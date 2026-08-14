@@ -65,6 +65,8 @@ import { StoreOwnerShell } from './layouts/StoreOwnerShell';
 import { OperatorLayoutWrapper } from './layouts/OperatorLayoutWrapper';
 // WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1
 import { SupplierShell } from './layouts/SupplierShell';
+// WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1 — 공개 영역 공통 셸(헤더·푸터)
+import { PublicLayout } from './layouts/PublicLayout';
 import { MembershipGate } from './components/MembershipGate';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -125,6 +127,14 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
         <Routes>
+          {/*
+            공개 영역 셸 (WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1)
+            PublicLayout = 공통 GlobalHeader(브릿지) + <Outlet/> + 공개 푸터.
+            URL 은 하나도 바뀌지 않는다 — pathless layout route 로 감싸기만 한다.
+            역할 업무 셸(/store-owner · /store-hub · /operator · /supplier)과
+            공개 QR 랜딩(/qr/:slug)은 자체 상단 계약이 있어 여기 포함하지 않는다.
+          */}
+          <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/join" element={<JoinPage />} />
@@ -165,6 +175,7 @@ export default function App() {
               </MembershipGate>
             }
           />
+          </Route>
 
           {/*
             공급자 영역 셸 (WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1)
@@ -177,12 +188,13 @@ export default function App() {
             <Route
               index
               element={
+                /*
+                  WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1:
+                    plannedFeatures(미구현 로드맵) 화면 노출 제거 — 실제 진입 가능한
+                    기능만 안내한다. 로드맵은 WO 문서가 보유한다.
+                */
                 <RoleEntryPage
                   role={ROLES.supplier}
-                  plannedFeatures={[
-                    '공급자 콘텐츠 제공 (운영자 개입 없음) — 후속',
-                    '이벤트 오퍼 (pharmacy-hub-event-offer) — 후속',
-                  ]}
                   links={[{ to: '/supplier/products', label: '상품 제공 설정' }]}
                 />
               }
@@ -280,7 +292,14 @@ export default function App() {
               안내 없이 홈으로 튕겨 요청 URL 이 사라졌다. redirect 대신 404 안내를 그 자리에
               render 하여 주소를 보존한다. 위 route 는 전부 이보다 구체적이라 영향이 없다.
           */}
-          <Route path="*" element={<NotFoundPage />} />
+          {/*
+            WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1:
+              404 도 공개 셸 안에서 렌더한다 — 없는 주소에 도착한 사용자가 헤더/푸터로
+              바로 복귀할 수 있어야 한다. 주소 보존 계약(redirect 아님)은 그대로다.
+          */}
+          <Route element={<PublicLayout />}>
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
         </Routes>
         </BrowserRouter>
       </AuthProvider>

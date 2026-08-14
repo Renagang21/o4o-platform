@@ -9,6 +9,10 @@
  *   진입점 설명이 "(준비 중)" 으로 남아 있었으나 세 영역 모두 실제 화면이 있다
  *   (매장 경영 셸 20+ 화면 · 공급자 상품 제공 설정 · 운영자 대시보드/가입 승인).
  *   커뮤니티도 /forum 으로 구현되어 별도 섹션에 있다. 설명을 실제 기능으로 정정한다.
+ *
+ * WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1:
+ *   PublicLayout(공통 GlobalHeader + 푸터) 안에서 렌더된다. 헤더가 이미 브랜드명·서비스명을
+ *   표시하므로 페이지 상단의 중복 브랜드 블록을 히어로(가치 제안)로 정리한다.
  */
 
 import { Link } from 'react-router-dom';
@@ -28,13 +32,14 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <header className="mb-8">
-        <h1 className="text-2xl font-bold">
-          {BRAND.name} <span className="text-gray-500">{BRAND.nameKo}</span>
-        </h1>
-        <p className="mt-1 text-sm text-gray-600">{BRAND.tagline}</p>
-        <p className="mt-1 text-xs text-gray-400">{BRAND.domain}</p>
-      </header>
+      {/* 페이지 히어로 — banner landmark 는 공통 GlobalHeader 하나뿐이어야 하므로 section 을 쓴다 */}
+      <section className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">{BRAND.tagline}</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          공급자가 올린 상품·자료를 약국이 바로 주문하고, 매장 콘텐츠와 실행 자산
+          (QR · POP · 사이니지)까지 한 곳에서 운영합니다.
+        </p>
+      </section>
 
       <section className="mb-8 rounded-lg border border-gray-200 bg-white p-4 text-sm">
         {isAuthenticated ? (

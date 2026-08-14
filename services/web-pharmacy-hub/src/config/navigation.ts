@@ -1,0 +1,80 @@
+/**
+ * Pharmacy-Hub — Navigation 중앙 설정
+ *
+ * WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1
+ * 표준: docs/architecture/ui/GLOBAL-HEADER-STANDARD-V1.md §6
+ *
+ * KPA / K-Cosmetics / Neture 와 동일하게 **모든 Header 메뉴 정의를 이 파일에서** 관리한다.
+ * Header 컴포넌트 내부 하드코딩 금지.
+ *
+ * 데드링크 0 원칙:
+ *   여기 등재하는 href 는 전부 App.tsx 에 실제 route 가 있는 경로여야 한다.
+ *   "후속 WO 예정" 경로는 메뉴에 올리지 않는다.
+ */
+
+import type { ContextualNavItem, GlobalHeaderNavItem } from '@o4o/ui';
+import { ROLE_LABELS, ROLES } from './service';
+
+// ─── Public Nav ──────────────────────────────────────────────────────────────
+
+/**
+ * 비로그인 포함 전체 노출.
+ * `/forum` 은 MembershipGate 뒤에 있지만 게이트가 "가입 신청" 안내를 렌더하므로
+ * 미가입자에게도 의미 있는 진입점이다(데드링크 아님).
+ */
+export const PH_PUBLIC_NAV: GlobalHeaderNavItem[] = [
+  { label: '홈', href: '/' },
+  { label: '커뮤니티', href: '/forum' },
+];
+
+// ─── Contextual Nav ──────────────────────────────────────────────────────────
+
+export type PhContextualNavItem = ContextualNavItem<
+  'storeManager' | 'storeOwner' | 'supplier' | 'operator'
+>;
+
+/**
+ * 역할별 업무 진입점.
+ *
+ * 노출 조건은 각 영역 **가드의 통과 조건과 같은 표**를 쓴다 — 메뉴가 보이는데 막히거나,
+ * 권한이 있는데 메뉴가 없는 상태를 만들지 않는다.
+ *   - storeManager : StoreOwnerGuard('pharmacy-hub') 통과 조건 (store_owner / operator / admin)
+ *   - storeOwner   : satisfiesRole(ROLES.storeOwner) — 매장 본인 데이터 화면 전용.
+ *                    운영자도 매장 셸 자체에는 들어가지만 `/pharmacy-hub/store-owner/*` API 는
+ *                    본인 매장 레코드 기준이라 403 이다. 메뉴는 실제로 열리는 것만 노출한다.
+ *   - supplier     : satisfiesRole(ROLES.supplier)
+ *   - operator     : satisfiesRole(ROLES.operator) — admin 포함(ROLE_SCOPE_MAPPING)
+ *
+ * HUB 우선 — 비KPA 서비스는 매장 HUB 가 먼저 노출된다(K-Cosmetics canonical 정합).
+ */
+export const PH_CONTEXTUAL_NAV: PhContextualNavItem[] = [
+  { label: '매장 허브', href: '/store-hub', visibleWhen: 'storeManager' },
+  { label: '내 약국', href: '/store-owner', visibleWhen: 'storeOwner' },
+  { label: ROLE_LABELS[ROLES.supplier], href: '/supplier', visibleWhen: 'supplier' },
+  { label: ROLE_LABELS[ROLES.operator], href: '/operator', visibleWhen: 'operator' },
+];
+
+// ─── Footer Nav ──────────────────────────────────────────────────────────────
+
+/**
+ * 공개 푸터 링크 — **실제 route 가 있는 경로만**.
+ * Pharmacy-Hub 에는 아직 /terms · /privacy · /contact · /service-guide route 가 없다.
+ * 다른 서비스 푸터를 그대로 복사하면 전부 404 가 되므로 옮기지 않는다.
+ * 법정정보는 하드코딩하지 않고 PublicLegalFooterInfo(API) 가 값이 있을 때만 렌더한다.
+ */
+export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }[] = [
+  {
+    title: '서비스',
+    links: [
+      { label: '홈', href: '/' },
+      { label: '커뮤니티', href: '/forum' },
+    ],
+  },
+  {
+    title: '참여하기',
+    links: [
+      { label: '가입 신청', href: '/join' },
+      { label: '가입 상태 확인', href: '/join/status' },
+    ],
+  },
+];
