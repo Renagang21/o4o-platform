@@ -114,7 +114,11 @@ export function StoreOrderWorktablePage() {
           supplierId: c.supplierId,
           supplierName: c.supplierName,
           category: c.category,
-          basePrice: priceMap.get(nameKey) ?? null,
+          // WO-O4O-STORE-HUB-PRODUCTION-E2E-DATA-ENROLLMENT-AND-CLOSURE-V1:
+          //   진열 판매가(retail_price)가 아직 없는 신규 취급 상품은 주문 확인 화면 금액이
+          //   전부 0원으로 표시됐다. 작업대는 B2B 발주 화면이므로 공급가로 fallback 한다
+          //   (확정 금액은 backend 가 공급가 기준으로 재산정 — 모달 안내문과 동일 기준).
+          basePrice: priceMap.get(nameKey) ?? c.priceGold ?? c.priceGeneral ?? null,
         };
       });
 
