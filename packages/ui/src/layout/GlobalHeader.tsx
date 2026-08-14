@@ -59,7 +59,10 @@ export interface GlobalHeaderProps {
   isAuthenticated?: boolean;
   /** 로그인 버튼 클릭 */
   onLogin?: () => void;
-  /** 회원가입 버튼 클릭 */
+  /**
+   * 회원가입 버튼 클릭. 주입하지 않으면 버튼 자체가 렌더되지 않는다.
+   * 가입 진입 방식(모달 / 라우팅)과 경로는 전적으로 서비스가 결정한다 — 공통 헤더는 경로를 모른다.
+   */
   onRegister?: () => void;
   /** 로그아웃 클릭 */
   onLogout?: () => void;
@@ -308,18 +311,26 @@ export function GlobalHeader({
                     로그인
                   </button>
                 )}
+                {/*
+                  WO-O4O-GLOBAL-HEADER-REGISTER-CONTRACT-AND-PRODUCTION-VALIDATION-V1:
+                    이전에는 <Link to="/register"> 로 경로가 고정돼 있어 onRegister 콜백을 주입해도
+                    Link 이동이 이겼다. 가입 경로가 /register 가 아닌 서비스(Pharmacy-Hub = /join)에서
+                    데드링크가 되고, 모달로 가입받는 서비스에서는 불필요한 URL 왕복이 생긴다.
+                    모바일 블록은 이미 button + onRegister 였으므로 desktop 을 같은 계약으로 맞춘다.
+                    가입 경로 결정은 전적으로 서비스(onRegister)의 책임이다.
+                */}
                 {onRegister && (
-                  <Link
-                    to="/register"
-                    className="px-4 py-2 text-sm font-medium text-white rounded-xl no-underline shadow-sm hover:opacity-90 transition-opacity"
+                  <button
+                    type="button"
+                    onClick={() => onRegister()}
+                    className="px-4 py-2 text-sm font-medium text-white rounded-xl border-none shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
                     style={{
                       backgroundColor: primaryColor,
                       boxShadow: `0 4px 12px ${primaryColor}40`,
                     }}
-                    onClick={() => onRegister()}
                   >
                     회원가입
-                  </Link>
+                  </button>
                 )}
               </div>
             )}

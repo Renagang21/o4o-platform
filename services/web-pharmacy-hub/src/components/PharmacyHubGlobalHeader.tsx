@@ -56,17 +56,12 @@ export function PharmacyHubGlobalHeader() {
   });
 
   /**
-   * 가입 진입점 (WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1 — 브라우저 검증에서 확정)
+   * 가입 진입점 (WO-O4O-GLOBAL-HEADER-REGISTER-CONTRACT-AND-PRODUCTION-VALIDATION-V1)
    *
-   * 공통 GlobalHeader 의 "회원가입" 버튼은 `<Link to="/register">` 로 **경로가 고정**돼 있다
-   * (onRegister 는 함께 호출되지만 Link 의 이동이 이긴다). Pharmacy-Hub 에는 `/register` route 가
-   * 없어 그 버튼을 켜면 404 로 가는 데드링크가 된다. 공통 Core 를 고치는 것은 본 WO 범위 밖이므로
-   * onRegister 를 주입하지 않고, 가입 진입점을 실제 경로(`/join`)를 가진 nav 항목으로 제공한다.
-   * 이미 가입한 사용자에게는 노출하지 않는다.
+   * 공통 GlobalHeader 의 회원가입 버튼이 `/register` 하드코딩에서 onRegister 콜백 계약으로
+   * 바로잡혔다. Pharmacy-Hub 의 가입 경로는 `/join` 이므로 표준 회원가입 버튼을 그대로 쓰고,
+   * 이전에 우회로 넣었던 public nav 의 `가입 신청` 항목은 제거한다(중복 진입점 방지).
    */
-  const publicNav = isAuthenticated
-    ? PH_PUBLIC_NAV
-    : [...PH_PUBLIC_NAV, { label: '가입 신청', href: '/join' }];
 
   const headerUser = user
     ? { displayName: getUserDisplayName(user), email: user.email ?? '' }
@@ -98,12 +93,12 @@ export function PharmacyHubGlobalHeader() {
         subtitle: BRAND.nameKo,
         primaryColor: PH_PRIMARY,
       }}
-      publicNav={publicNav}
+      publicNav={PH_PUBLIC_NAV}
       contextualNav={contextualNav}
       user={headerUser}
       /** Pharmacy-Hub 는 로그인 모달이 없다(전용 /login 화면 계약). 모달 대신 라우팅한다. */
       onLogin={() => navigate('/login')}
-      /* onRegister 미주입 — 위 publicNav 주석 참조(공통 헤더의 /register 고정 경로 = PH 데드링크) */
+      onRegister={() => navigate('/join')}
       onLogout={handleLogout}
       utilitySlot={user ? (
         <NotificationBell
