@@ -101,6 +101,7 @@ export type {
 export { ForumPostContent } from './ForumPostContent';
 export type { ForumPostContentProps } from './ForumPostContent';
 export { forumContentToHtml } from './forumContentToHtml';
+export type { ForumContentToHtmlOptions } from './forumContentToHtml';
 
 /* WO-O4O-FORUM-DETAIL-STATES-HEADER-EXTRACTION-V1: forum detail header + loading/error/not-found 공통 부품 */
 export { ForumPostHeader } from './ForumPostHeader';
@@ -109,16 +110,30 @@ export {
   ForumDetailLoadingState,
   ForumDetailErrorState,
   ForumDetailNotFoundState,
+  ForumDetailSkeletonState,
 } from './ForumDetailStates';
 export type {
   ForumDetailLoadingStateProps,
   ForumDetailErrorStateProps,
   ForumDetailNotFoundStateProps,
+  ForumDetailSkeletonStateProps,
 } from './ForumDetailStates';
 
 /* WO-O4O-FORUM-DETAIL-COMMENT-LIST-COMMONIZATION-V1: forum 댓글 목록 표시 공통 부품 */
 export { ForumCommentList } from './ForumCommentList';
 export type { ForumCommentListItem, ForumCommentListProps } from './ForumCommentList';
+
+/* WO-O4O-COMMUNITY-FORUM-KPA-NETURE-VIEW-CONVERGENCE-V1: KPA/Neture 포럼 목록·상세 수렴 부품 */
+export { ForumLikeButton } from './ForumLikeButton';
+export type { ForumLikeButtonProps } from './ForumLikeButton';
+export { ForumCommentForm } from './ForumCommentForm';
+export type { ForumCommentFormProps } from './ForumCommentForm';
+export { ForumListToolbar, ForumListInfoBar } from './ForumListToolbar';
+export type {
+  ForumListToolbarProps,
+  ForumListInfoBarProps,
+  ForumListFilterChip,
+} from './ForumListToolbar';
 
 /* WO-O4O-COMMUNITY-FORUM-OWNER-AREA-COMMONIZATION-V1:
  * 포럼 소유자 영역 (내 포럼 대시보드 · 폐쇄형 회원 관리) 공통 View + adapter 계약.

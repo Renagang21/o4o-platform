@@ -27,6 +27,10 @@ export interface ForumPostHeaderProps {
   actionSlot?: ReactNode;
   className?: string;
   style?: CSSProperties;
+  /** 제목 크기 등 서비스별 반응형 조정 (WO-O4O-COMMUNITY-FORUM-KPA-NETURE-VIEW-CONVERGENCE-V1) */
+  titleStyle?: CSSProperties;
+  /** meta 행 앞에 붙는 서비스 고유 요소 */
+  metaLeadingSlot?: ReactNode;
 }
 
 export function ForumPostHeader({
@@ -39,13 +43,16 @@ export function ForumPostHeader({
   actionSlot,
   className,
   style,
+  titleStyle,
+  metaLeadingSlot,
 }: ForumPostHeaderProps) {
   return (
     <header className={className} style={{ ...styles.header, ...style }}>
       <div style={styles.body}>
         {badgeSlot && <div style={styles.badgeRow}>{badgeSlot}</div>}
-        <h1 style={styles.title}>{title}</h1>
+        <h1 style={{ ...styles.title, ...titleStyle }}>{title}</h1>
         <div style={styles.metaRow}>
+          {metaLeadingSlot}
           {authorName && <span style={styles.author}>{authorName}</span>}
           {createdAt && (
             <>
