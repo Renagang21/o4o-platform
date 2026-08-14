@@ -114,7 +114,7 @@ QueryFailedError: column "created_at" does not exist
 | `pnpm --filter @o4o/web-neture build` | PASS |
 | API 배포 | `o4o-core-api-03326-qlk` 100% 서빙 |
 | Web 배포 | `Deploy Web Services (Cloud Run)` completed/success (양 커밋) |
-| `CI Pipeline` | `0738a2916` · `187504cd7` 모두 **cancelled** — GitHub Actions concurrency 로 타 세션의 후속 push(`95e579448` 등)가 선행 run 을 취소. 실패 아님. 동일 트리를 포함한 후속 main 커밋의 CI 로 대체 확인 |
+| `CI Pipeline` | `0738a2916` · `187504cd7` · CHECK 커밋 `4c7a3efc2` **모두 cancelled** — GitHub Actions concurrency 로 타 세션의 연속 push(`95e579448` · `c6dcc16ec` · `d51342e83` · `4a38c9cb0`)가 선행 run 을 계속 취소. **실패 아님이며 green run 을 확보하지 못했다.** 대체 검증으로 로컬 `pnpm --filter @o4o/api-server type-check` PASS · `pnpm --filter @o4o/web-neture build` PASS (현재 main 기준) |
 | production DB write | **0건** |
 
 **커밋**
