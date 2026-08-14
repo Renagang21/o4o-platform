@@ -303,7 +303,9 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         { id: 'go-service-approvals', label: '서비스 승인', link: '/operator/product-service-approvals', icon: '✅' },
         { id: 'go-market-trial', label: 'Market Trial', link: '/operator/market-trial', icon: '🧪' },
         { id: 'go-content', label: '콘텐츠 관리', link: '/operator/homepage-cms', icon: '📰' },
-        { id: 'go-signage', label: '사이니지', link: '/operator/signage/hq-media', icon: '🖥️' },
+        // WO-O4O-NETURE-OPERATOR-PRODUCTION-DEFECT-CLOSURE-V1:
+        //   go-signage(/operator/signage/hq-media) 제거 — WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1 로
+        //   Neture frontend 의 /operator/signage/* route 가 제거되어 dead link 였다.
         { id: 'go-analytics', label: '분석', link: '/operator/analytics', icon: '📊' },
       ];
 

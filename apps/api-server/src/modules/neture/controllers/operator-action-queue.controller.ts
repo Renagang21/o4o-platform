@@ -78,7 +78,10 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
            WHERE status = 'PENDING'`,
         ),
         dataSource.query(
-          `SELECT COUNT(*)::int AS cnt, MIN(created_at) AS oldest
+          // WO-O4O-NETURE-OPERATOR-PRODUCTION-DEFECT-CLOSURE-V1:
+          // neture_contact_messages 는 SnakeNamingStrategy 미적용(connection.ts) 시점에 생성되어
+          // 물리 컬럼이 quoted camelCase("createdAt") 이다. created_at 참조 시 500.
+          `SELECT COUNT(*)::int AS cnt, MIN("createdAt") AS oldest
            FROM neture_contact_messages
            WHERE status != 'resolved'`,
         ),

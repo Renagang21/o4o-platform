@@ -95,7 +95,9 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: 'AI 비즈팩', path: '/admin/ai-business-pack', adminOnly: true },
   ],
   system: [
-    { label: '알림 설정', path: '/operator/settings/notifications' },
+    // WO-O4O-NETURE-OPERATOR-PRODUCTION-DEFECT-CLOSURE-V1 (A안):
+    // /operator/settings/notifications 는 플랫폼 관리자 전용 API 계약(operator-notification.routes.ts)
+    // 이라 neture:operator 로는 403. route/guard 는 유지하고 운영자 메뉴에서만 제외한다.
     // WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리 성격 표면화(라벨).
     { label: '역할 관리 (플랫폼)', path: '/admin/roles', adminOnly: true },
     { label: '이메일 설정', path: '/admin/settings/email', adminOnly: true },
