@@ -21,7 +21,15 @@
     "./modules/service-legal": "./src/modules/service-legal/index.ts",
     "./modules/contact-inquiry": "./src/modules/contact-inquiry/index.ts",
     "./modules/service-contact-settings": "./src/modules/service-contact-settings/index.ts",
-    "./modules/product-applications": "./src/modules/product-applications/index.ts"
+    "./modules/product-applications": "./src/modules/product-applications/index.ts",
+    "./modules/recruitment-exposure": "./src/modules/recruitment-exposure/index.ts",
+    "./modules/store-channels": "./src/modules/store-channels/index.ts",
+    "./modules/store-detail": "./src/modules/store-detail/index.ts",
+    "./modules/hub-content-write": "./src/modules/hub-content-write/index.ts",
+    "./modules/hub-content-list": "./src/modules/hub-content-list/index.ts",
+    "./modules/signage-hq": "./src/modules/signage-hq/index.ts",
+    "./modules/qr-template-write": "./src/modules/qr-template-write/index.ts",
+    "./modules/operator-analytics": "./src/modules/operator-analytics/index.ts"
   },
   "dependencies": {
     "@o4o/content-editor": "workspace:*",

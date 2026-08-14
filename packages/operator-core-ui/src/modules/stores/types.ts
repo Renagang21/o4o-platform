@@ -108,6 +108,25 @@ export interface StoresConfig {
   statsLabels?: Partial<Record<keyof StoresListStats, string>>;
   /** type → 표시 라벨 매핑 (예: { pharmacy: '약국', store: '매장' }) */
   typeLabels?: Record<string, string>;
+
+  /**
+   * Slug 컬럼 노출 여부 (기본 false).
+   *
+   * WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1:
+   *   K-Cosmetics / Neture 는 slug 컬럼 하나 때문에 기본 컬럼 전체(~100 LOC)를
+   *   서비스 파일에 복제하고 있었다. 컬럼 정의를 core 로 되돌리고 노출만 config 로 제어한다.
+   */
+  showSlugColumn?: boolean;
+
+  /**
+   * Slug 값 텍스트 className (기본 'text-slate-600').
+   * 서비스 accent(예: 'text-pink-600' / 'text-primary-600')를 리터럴로 주입한다
+   * — 값이 서비스 소스에 존재해야 Tailwind content 스캔에 포함된다.
+   */
+  slugTextClass?: string;
+
+  /** '상품' 카운트 배지 톤 (기본 'purple'). K-Cosmetics 는 'pink'. */
+  productCountTone?: 'purple' | 'pink';
 }
 
 // ─── Slot Action ────────────────────────────────────────────────────────────

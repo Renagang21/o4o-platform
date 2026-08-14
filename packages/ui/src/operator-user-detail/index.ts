@@ -5,6 +5,8 @@
 
 export { default as UserDetailPage } from './UserDetailPage';
 export { default as EditUserModal } from './EditUserModal';
+export { createUserDetailApiAdapter } from './createUserDetailApiAdapter';
+export type { UserDetailAxiosLike } from './createUserDetailApiAdapter';
 export type {
   UserDetailPageProps,
   UserDetailConfig,

@@ -2,35 +2,27 @@
  * MembershipDetailPage — Pharmacy-Hub 운영자 회원 승인 콘솔 (상세)
  *
  * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §6-D
+ * WO-O4O-PHARMACY-HUB-OPERATOR-MEMBERSHIP-CONSOLE-COMMON-CORE-ADOPTION-V1
  *
  * 신청자 / 신청 역할 / 신청 일시 / 현재 상태 / 최소 프로필 을 확인하고
  * 승인 · 반려(사유 필수) 를 처리한다. 그 외 회원 조작(삭제·역할 직접 부여)은 제공하지 않는다.
+ *
+ * 목록의 Drawer 로 흡수되지 않고 별도 페이지로 남는 이유(정책):
+ *   - deep link `/operator/memberships/:membershipId` 를 유지해야 한다.
+ *   - 상세 endpoint 만 사업자 프로필(사업자번호 · 사업장 주소 · 담당자 연락처)을 반환한다.
+ *     목록 응답에는 없는 값이라 Drawer 로는 승인 판단 근거가 부족하다.
+ *   API 호출은 목록 콘솔과 동일한 어댑터(`membershipConsoleClient`)를 공유한다.
  */
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { api } from '../../lib/apiClient';
+import {
+  approveMembership,
+  fetchMembership,
+  rejectMembership,
+  type MembershipDetail,
+} from '../../lib/membershipConsoleClient';
 import { ROLE_LABELS, SERVICE_KEY } from '../../config/service';
-
-interface MembershipDetail {
-  id: string;
-  email: string;
-  name: string | null;
-  phone: string | null;
-  status: string;
-  roleType: string | null;
-  rejectionReason: string | null;
-  approvedAt: string | null;
-  appliedAt: string | null;
-  updatedAt: string | null;
-  profile: {
-    businessName: string | null;
-    contactName: string | null;
-    managerPhone: string | null;
-    businessNumber: string | null;
-    businessAddress: string | null;
-  };
-}
 
 const STATUS_LABEL: Record<string, string> = {
   pending: '승인 대기',
@@ -66,8 +58,7 @@ export default function MembershipDetailPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await api.get(`/pharmacy-hub/operator/memberships/${membershipId}`);
-      setData(res.data?.data ?? null);
+      setData(await fetchMembership(membershipId));
     } catch {
       setError('가입 신청 상세를 불러오지 못했습니다.');
     } finally {
@@ -84,7 +75,7 @@ export default function MembershipDetailPage() {
     setBusy(true);
     setError(null);
     try {
-      await api.patch(`/pharmacy-hub/operator/memberships/${membershipId}/approve`);
+      await approveMembership(membershipId);
       navigate('/operator/memberships');
     } catch {
       setError('가입 승인에 실패했습니다.');
@@ -102,9 +93,7 @@ export default function MembershipDetailPage() {
     setBusy(true);
     setError(null);
     try {
-      await api.patch(`/pharmacy-hub/operator/memberships/${membershipId}/reject`, {
-        reason: reason.trim(),
-      });
+      await rejectMembership(membershipId, reason.trim());
       navigate('/operator/memberships');
     } catch {
       setError('가입 반려에 실패했습니다.');

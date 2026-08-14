@@ -4,6 +4,8 @@
  * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
  * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1
  * WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1 — /store-owner 하위를 공통 매장 셸로 편입
+ * WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1 — /operator 하위를 공통 운영자 셸로 편입
+ * WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1 — /supplier 하위를 공급자 셸로 편입
  *
  * 라우트:
  *   /                            홈 (브랜드 표시 + 역할별 진입점)
@@ -14,11 +16,13 @@
  *   /forum/posts                 게시글 목록
  *   /forum/posts/:postId         게시글 상세 (WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1)
  *   /forum/write                 글쓰기      (동일 WO · write 권한은 backend guard 가 강제)
- *   /supplier                    공급자 진입점        (MembershipGate)
- *   /supplier/products           내 상품 Pharmacy-Hub 제공 설정 (WO-...-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1)
- *   /operator                    서비스 운영자 진입점 (MembershipGate)
- *   /operator/memberships        가입 신청 관리 목록  (MembershipGate + operator role)
- *   /operator/memberships/:id    가입 신청 상세
+ *   /supplier                    공급자 셸 (SupplierShell)
+ *     ├ (index)                  공급자 진입점
+ *     └ /products                내 상품 Pharmacy-Hub 제공 설정 (WO-...-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1)
+ *   /operator                    운영자 셸 (OperatorLayoutWrapper — 공통 OperatorAreaShell)
+ *     ├ (index)                  서비스 운영자 진입점
+ *     ├ /memberships             가입 신청 관리 목록
+ *     └ /memberships/:id         가입 신청 상세
  *
  *   /store-hub                   매장허브 홈 — 자원 탐색 진입점 (공통 StoreHubTemplate)
  *
@@ -56,13 +60,18 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { AuthProvider } from './contexts/AuthContext';
-import { MembershipGate } from './components/MembershipGate';
 import { StoreOwnerShell } from './layouts/StoreOwnerShell';
+// WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1
+import { OperatorLayoutWrapper } from './layouts/OperatorLayoutWrapper';
+// WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1
+import { SupplierShell } from './layouts/SupplierShell';
+import { MembershipGate } from './components/MembershipGate';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RoleEntryPage from './pages/RoleEntryPage';
 import JoinPage from './pages/JoinPage';
 import JoinStatusPage from './pages/JoinStatusPage';
+import OperatorDashboardPage from './pages/operator/OperatorDashboardPage';
 import ForumHubPage from './pages/forum/ForumHubPage';
 import ForumListPage from './pages/forum/ForumListPage';
 // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1 — 상세 · 작성
@@ -157,10 +166,17 @@ export default function App() {
             }
           />
 
-          <Route
-            path="/supplier"
-            element={
-              <MembershipGate>
+          {/*
+            공급자 영역 셸 (WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1)
+            SupplierShell = MembershipGate + 공급자 헤더/사이드바 + <Outlet/>.
+            공통 Supplier Shell 은 아직 존재하지 않아(조사 결과 — CHECK §2) 최소 thin wrapper 로 둔다.
+            URL 2개(/supplier · /supplier/products) 는 그대로 두고 nested route 로만 정리한다 —
+            하위 화면 컴포넌트·상품 업무 로직 무변경.
+          */}
+          <Route path="/supplier" element={<SupplierShell />}>
+            <Route
+              index
+              element={
                 <RoleEntryPage
                   role={ROLES.supplier}
                   plannedFeatures={[
@@ -169,53 +185,28 @@ export default function App() {
                   ]}
                   links={[{ to: '/supplier/products', label: '상품 제공 설정' }]}
                 />
-              </MembershipGate>
-            }
-          />
+              }
+            />
+            <Route path="products" element={<SupplierProductsPage />} />
+          </Route>
 
-          <Route
-            path="/operator"
-            element={
-              <MembershipGate>
-                <RoleEntryPage
-                  role={ROLES.operator}
-                  plannedFeatures={[
-                    '커뮤니티 운영 · 신고 처리',
-                    '공지 · 운영자 콘텐츠',
-                  ]}
-                  links={[{ to: '/operator/memberships', label: '가입 신청 관리' }]}
-                />
-              </MembershipGate>
-            }
-          />
-
-          <Route
-            path="/operator/memberships"
-            element={
-              <MembershipGate>
-                <MembershipsPage />
-              </MembershipGate>
-            }
-          />
-
-          <Route
-            path="/operator/memberships/:membershipId"
-            element={
-              <MembershipGate>
-                <MembershipDetailPage />
-              </MembershipGate>
-            }
-          />
-
-          {/* WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1 — 권한 경계는 backend guard 가 강제 */}
-          <Route
-            path="/supplier/products"
-            element={
-              <MembershipGate>
-                <SupplierProductsPage />
-              </MembershipGate>
-            }
-          />
+          {/*
+            운영자 영역 셸 (WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1)
+            OperatorLayoutWrapper = MembershipGate + 공통 OperatorAreaShell(@o4o/operator-ux-core)
+              + DomainIASidebar. KPA / K-Cosmetics / GlycoPharm 와 같은 구조다.
+            URL 3개(/operator · /operator/memberships · /operator/memberships/:membershipId) 는
+            그대로 두고 nested route 로만 정리한다 — 하위 화면 컴포넌트도 무변경.
+          */}
+          <Route path="/operator" element={<OperatorLayoutWrapper />}>
+            {/*
+              WO-O4O-OPERATOR-CROSSSERVICE-SCREEN-CENSUS-AND-PHARMACYHUB-UX-COMMONIZATION-V1:
+                RoleEntryPage placeholder(후속 예정 기능 안내) 제거 →
+                실제 구현된 기능(가입 신청 승인)만으로 구성한 공통 5-Block 운영자 홈.
+            */}
+            <Route index element={<OperatorDashboardPage />} />
+            <Route path="memberships" element={<MembershipsPage />} />
+            <Route path="memberships/:membershipId" element={<MembershipDetailPage />} />
+          </Route>
 
           {/*
             매장허브 홈 (WO-O4O-PHARMACY-HUB-STORE-HUB-HOME-INTRODUCTION-V1)

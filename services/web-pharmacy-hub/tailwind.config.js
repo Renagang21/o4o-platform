@@ -13,7 +13,14 @@ export default {
     '../../packages/ui/src/**/*.{ts,tsx}',
     // WO-O4O-STORE-HUB-SUPPLY-PRODUCT-EXPLORER-COMMONIZATION-V1:
     //   공통 공급 상품 탐색 View 가 DataTable/Pagination(@o4o/operator-ux-core)을 사용한다.
+    // WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1:
+    //   공통 운영자 셸(@o4o/operator-ux-core)도 source-mode 소비 — content 누락 시
+    //   OperatorAreaShell/DomainIASidebar 의 lg: 반응형 클래스가 생성되지 않아
+    //   사이드바가 좌측 컬럼으로 서지 않는다 (K-Cosmetics 와 동일 항목).
     '../../packages/operator-ux-core/src/**/*.{ts,tsx}',
+    // WO-O4O-PHARMACY-HUB-OPERATOR-MEMBERSHIP-CONSOLE-COMMON-CORE-ADOPTION-V1
+    '../../packages/operator-core-ui/src/**/*.{ts,tsx}',
+    '../../packages/shared-space-ui/src/**/*.{ts,tsx}',
     // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1:
     //   공통 계정 UI(@o4o/account-ui) 소비분의 클래스 누락 방지 (다른 4개 서비스와 동일 항목).
     '../../packages/account-ui/src/**/*.{ts,tsx}',

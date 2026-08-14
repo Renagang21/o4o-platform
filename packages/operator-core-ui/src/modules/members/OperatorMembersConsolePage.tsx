@@ -15,6 +15,12 @@
  *   - ActionBar = bulk approve/reject
  *   - RowActionMenu = utility (edit / password / delete) — status 는 drawer 로 통일
  *   - Drawer body footer = "전체 상세 페이지 →" (CommonUserDetailPage 진입)
+ *
+ * WO-O4O-PHARMACY-HUB-OPERATOR-MEMBERSHIP-CONSOLE-COMMON-CORE-ADOPTION-V1:
+ *   `consoleMode='approval'` (가입 승인 전용) 추가. 회원 일반 관리 endpoint 가 없는
+ *   서비스(Pharmacy-Hub)를 위해 통계 카드 · 행 선택/일괄 처리 · 정지/활성화 · 수정/
+ *   비밀번호/삭제 액션을 제거하고 승인/반려만 남긴다. 각 affordance 는 client 메서드
+ *   또는 render slot 의 **존재 여부**로도 개별 판단하므로 기존 서비스는 무변경이다.
  */
 
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
@@ -135,6 +141,10 @@ function PasswordModal({ user, client, onClose, onSuccess }: PasswordModalProps)
     }
     if (!isPasswordPolicyCompliant(password)) {
       setError(PASSWORD_POLICY_MESSAGE);
+      return;
+    }
+    if (!client.updatePassword) {
+      setError('이 서비스는 비밀번호 변경을 지원하지 않습니다.');
       return;
     }
     setLoading(true);
@@ -258,13 +268,19 @@ function PasswordModal({ user, client, onClose, onSuccess }: PasswordModalProps)
 interface BuildActionPolicyOptions {
   serviceKey: string;
   hasDelete: boolean;
+  hasEdit: boolean;
+  hasPassword: boolean;
 }
 
-function buildUserActionPolicy({ serviceKey, hasDelete }: BuildActionPolicyOptions) {
-  const rules: Array<any> = [
-    { key: 'edit', label: '정보 수정' },
-    { key: 'password', label: '비밀번호 변경' },
-  ];
+function buildUserActionPolicy({
+  serviceKey,
+  hasDelete,
+  hasEdit,
+  hasPassword,
+}: BuildActionPolicyOptions) {
+  const rules: Array<any> = [];
+  if (hasEdit) rules.push({ key: 'edit', label: '정보 수정' });
+  if (hasPassword) rules.push({ key: 'password', label: '비밀번호 변경' });
   if (hasDelete) {
     rules.push({
       key: 'delete',
@@ -309,7 +325,20 @@ export function OperatorMembersConsolePage({
   // WO-O4O-OPERATOR-MEMBERS-STANDARD-LIST-ADOPTION-V1 (opt-in)
   serverSort = false,
   syncUrl = false,
+  // WO-O4O-PHARMACY-HUB-OPERATOR-MEMBERSHIP-CONSOLE-COMMON-CORE-ADOPTION-V1
+  consoleMode = 'members',
+  rejectReason,
+  fullDetailHref,
 }: OperatorMembersConsolePageProps) {
+  /** 가입 승인 전용 콘솔 — 회원 일반 관리 affordance 를 노출하지 않는다. */
+  const isApprovalOnly = consoleMode === 'approval';
+
+  /** 각 affordance 는 승인 전용 모드 + client/slot 존재 여부로 함께 결정한다. */
+  const canEdit = !isApprovalOnly && !!renderEditModal;
+  const canChangePassword = !isApprovalOnly && !!client.updatePassword;
+  const canDelete = !isApprovalOnly && !!renderDeleteFlow;
+  const canBulk = !isApprovalOnly && !!client.batchUpdateStatus;
+  const showStats = !isApprovalOnly && !!client.stats;
   const getPrimaryRole = useMemo(
     () => getPrimaryRoleProp ?? defaultGetPrimaryRole(serviceKey),
     [getPrimaryRoleProp, serviceKey],
@@ -348,6 +377,7 @@ export function OperatorMembersConsolePage({
   const [deleteTarget, setDeleteTarget] = useState<UserData | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+  const [rejectReasonText, setRejectReasonText] = useState('');
   const batch = useBatchAction();
 
   const [stats, setStats] = useState({
@@ -389,12 +419,15 @@ export function OperatorMembersConsolePage({
   );
 
   const fetchStats = useCallback(async () => {
+    // client.stats / listAll 은 선택 계약이다. 미제공 서비스(가입 승인 전용 콘솔)는
+    // 통계·탭 count 없이 동작한다 — 없는 endpoint 를 호출하지 않는다.
+    if (!client.stats) return;
     try {
       const statsRes = await client.stats();
       const byStatus = statsRes.statistics?.byStatus || [];
       const getCount = (s: string) => byStatus.find((b) => b.status === s)?.count || 0;
 
-      const allData = await client.listAll();
+      const allData = client.listAll ? await client.listAll() : { users: [] as UserData[] };
       const allUsers: UserData[] = allData.users || [];
       const roleCounts: Record<string, number> = {};
       roleTabs.forEach((tab) => {
@@ -454,6 +487,11 @@ export function OperatorMembersConsolePage({
     setSelectedUser(null);
   }, [activeTab, searchQuery, page, sortBy, sortOrder]);
 
+  // 다른 건을 열면 이전 반려 사유가 남지 않도록 초기화한다.
+  useEffect(() => {
+    setRejectReasonText('');
+  }, [selectedUser?.id]);
+
   // 서버 정렬 변경 — page=1 reset
   const handleSort = useCallback((key: string, order: 'asc' | 'desc') => {
     setSortBy(key);
@@ -468,11 +506,13 @@ export function OperatorMembersConsolePage({
     status: string,
     currentStatus?: string,
     user?: UserData,
+    options?: { reason?: string },
   ) => {
     setActionLoading(userId);
     try {
-      await client.updateStatus(userId, status, currentStatus, user);
+      await client.updateStatus(userId, status, currentStatus, user, options);
       setSelectedUser(null);
+      setRejectReasonText('');
       fetchUsers();
       fetchStats();
     } catch (err: any) {
@@ -504,9 +544,9 @@ export function OperatorMembersConsolePage({
   );
 
   const handleBulkApprove = async () => {
-    if (selectedApprovableIds.length === 0) return;
+    if (selectedApprovableIds.length === 0 || !client.batchUpdateStatus) return;
     const result = await batch.executeBatch(
-      (batchIds: string[]) => client.batchUpdateStatus(batchIds, 'approved'),
+      (batchIds: string[]) => client.batchUpdateStatus!(batchIds, 'approved'),
       selectedApprovableIds,
     );
     if (result.successCount > 0) {
@@ -517,9 +557,9 @@ export function OperatorMembersConsolePage({
   };
 
   const handleBulkReject = async () => {
-    if (selectedPendingIds.length === 0) return;
+    if (selectedPendingIds.length === 0 || !client.batchUpdateStatus) return;
     const result = await batch.executeBatch(
-      (batchIds: string[]) => client.batchUpdateStatus(batchIds, 'rejected'),
+      (batchIds: string[]) => client.batchUpdateStatus!(batchIds, 'rejected'),
       selectedPendingIds,
     );
     if (result.successCount > 0) {
@@ -542,21 +582,24 @@ export function OperatorMembersConsolePage({
   // ─── Tabs ───────────────────────────────────────────────────
 
   const tabs: MemberTab[] = useMemo(() => {
+    // stats 를 제공하지 않는 서비스(client.stats 미구현)는 집계를 알 수 없다.
+    // 이때 0 을 그리면 "전체 0" 처럼 실제 목록과 모순되는 표시가 되므로 count 를 생략한다.
+    const c = (v: number | undefined) => (showStats ? v : undefined);
     return [
-      { key: 'all', label: '전체', count: stats.total },
+      { key: 'all', label: '전체', count: c(stats.total) },
       ...roleTabs.map((rt) => ({
         key: rt.key,
         label: rt.label,
-        count: stats.roleCounts[rt.key] ?? 0,
+        count: c(stats.roleCounts[rt.key] ?? 0),
       })),
       ...(statusTabs ?? []).map((st: MembersStatusTab) => ({
         key: st.key,
         label: st.label,
-        count: stats.statusCounts[st.key],
+        count: c(stats.statusCounts[st.key]),
       })),
-      { key: 'pending', label: '가입 신청', count: stats.pending },
+      { key: 'pending', label: '가입 신청', count: c(stats.pending) },
     ];
-  }, [roleTabs, statusTabs, stats]);
+  }, [roleTabs, statusTabs, stats, showStats]);
 
   // ─── Bulk Action Bar ────────────────────────────────────────
 
@@ -675,8 +718,14 @@ export function OperatorMembersConsolePage({
   ];
 
   const userActionPolicy = useMemo(
-    () => buildUserActionPolicy({ serviceKey, hasDelete: !!renderDeleteFlow }),
-    [serviceKey, renderDeleteFlow],
+    () =>
+      buildUserActionPolicy({
+        serviceKey,
+        hasDelete: canDelete,
+        hasEdit: canEdit,
+        hasPassword: canChangePassword,
+      }),
+    [serviceKey, canDelete, canEdit, canChangePassword],
   );
 
   const actionsColumn: ListColumnDef<UserData> = {
@@ -727,7 +776,12 @@ export function OperatorMembersConsolePage({
     },
   };
 
-  const columns: ListColumnDef<UserData>[] = [...baseColumns, actionsColumn];
+  /** 액션이 하나도 없으면 빈 overflow 메뉴 컬럼을 만들지 않는다. */
+  const hasRowActions =
+    canEdit || canChangePassword || canDelete || (extraRowActions ?? []).length > 0;
+  const columns: ListColumnDef<UserData>[] = hasRowActions
+    ? [...baseColumns, actionsColumn]
+    : baseColumns;
 
   // ─── Drawer: status-aware footer actions ────────────────────
 
@@ -743,6 +797,32 @@ export function OperatorMembersConsolePage({
       disabled: boolean;
     }> = [];
 
+    // 반려 사유 정책이 설정된 경우 사유 없이는 반려를 실행하지 않는다(백엔드 필수값).
+    const reasonBlocked = !!rejectReason?.required && !rejectReasonText.trim();
+    const reasonOptions = rejectReason ? { reason: rejectReasonText.trim() } : undefined;
+
+    // 가입 승인 전용 콘솔: 승인 대기 건의 승인/반려만 제공한다.
+    // 재승인 · 정지 · 활성화는 해당 서비스에 endpoint 가 없으므로 노출하지 않는다.
+    if (isApprovalOnly) {
+      if (u.status === 'pending') {
+        actions.push({
+          label: '승인',
+          onClick: () => handleStatusChange(u.id, 'approved', u.status, u),
+          variant: 'primary',
+          loading: isLoading,
+          disabled: isLoading,
+        });
+        actions.push({
+          label: '반려',
+          onClick: () => handleStatusChange(u.id, 'rejected', u.status, u, reasonOptions),
+          variant: 'danger',
+          loading: isLoading,
+          disabled: isLoading || reasonBlocked,
+        });
+      }
+      return actions;
+    }
+
     if (u.status === 'pending' || u.status === 'rejected') {
       actions.push({
         label: '승인',
@@ -755,7 +835,7 @@ export function OperatorMembersConsolePage({
     if (u.status === 'pending') {
       actions.push({
         label: '반려',
-        onClick: () => handleStatusChange(u.id, 'rejected', u.status, u),
+        onClick: () => handleStatusChange(u.id, 'rejected', u.status, u, reasonOptions),
         variant: 'danger',
         loading: isLoading,
         disabled: isLoading,
@@ -781,13 +861,14 @@ export function OperatorMembersConsolePage({
     }
     return actions;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedUser, actionLoading]);
+  }, [selectedUser, actionLoading, isApprovalOnly, rejectReason, rejectReasonText]);
 
   // ─── Render ─────────────────────────────────────────────────
 
   return (
     <div className="p-6">
-      {/* Stats */}
+      {/* Stats — client.stats() 를 제공하는 서비스에서만 표시 */}
+      {showStats && (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
           { label: '전체', value: stats.total, icon: Users, color: 'slate' },
@@ -810,6 +891,7 @@ export function OperatorMembersConsolePage({
           </div>
         ))}
       </div>
+      )}
 
       {/* Member List Layout: Search + Tabs + Table */}
       <MemberListLayout
@@ -848,7 +930,8 @@ export function OperatorMembersConsolePage({
           </div>
         )}
 
-        {/* ActionBar — 선택 시 표시 */}
+        {/* ActionBar — 선택 시 표시. 일괄 처리 endpoint 가 있는 서비스에서만 노출 */}
+        {canBulk && (
         <div className="mb-3">
           <ActionBar
             selectedCount={selectedIds.size}
@@ -856,8 +939,10 @@ export function OperatorMembersConsolePage({
             actions={bulkActions}
           />
         </div>
+        )}
 
         {/* BulkResultModal */}
+        {canBulk && (
         <BulkResultModal
           open={batch.showResult}
           onClose={() => {
@@ -870,6 +955,7 @@ export function OperatorMembersConsolePage({
             batch.retryFailed();
           }}
         />
+        )}
 
         {/* DataTable */}
         <DataTable<UserData>
@@ -877,19 +963,30 @@ export function OperatorMembersConsolePage({
           data={filteredUsers}
           rowKey="id"
           loading={loading}
-          emptyMessage={activeTab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}
+          emptyMessage={
+            activeTab === 'pending'
+              ? '가입 신청이 없습니다.'
+              : isApprovalOnly
+                ? '해당 상태의 가입 신청이 없습니다.'
+                : '등록된 사용자가 없습니다.'
+          }
           onRowClick={(user) => setSelectedUser(user)}
           tableId={tableId ?? `${serviceKey}-operator-members`}
-          selectable
-          selectedKeys={selectedIds}
-          onSelectionChange={setSelectedIds}
+          {...(canBulk
+            ? { selectable: true, selectedKeys: selectedIds, onSelectionChange: setSelectedIds }
+            : {})}
           {...(serverSort
             ? { manualSort: true, sortBy, sortOrder, onSort: handleSort }
             : {})}
         />
 
         {/* Pagination */}
-        {(activeTab === 'all' || activeTab === 'pending') && pagination.totalPages > 1 && (
+        {/* 서버에서 필터된 탭(all / pending / statusTabs)만 페이지네이션이 유효하다.
+            role 탭은 현재 페이지 안에서 client-side 필터이므로 제외한다. */}
+        {(activeTab === 'all' ||
+          activeTab === 'pending' ||
+          (statusTabs ?? []).some((t) => t.key === activeTab)) &&
+          pagination.totalPages > 1 && (
           <div className="flex items-center justify-center gap-3 mt-4">
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
@@ -1031,23 +1128,54 @@ export function OperatorMembersConsolePage({
                 }}
               >
                 <p style={{ fontSize: 12, color: '#991b1b', fontWeight: 500 }}>
-                  거부 처리된 신청입니다. 재승인이 가능합니다.
+                  {isApprovalOnly ? '반려 처리된 신청입니다.' : '거부 처리된 신청입니다. 재승인이 가능합니다.'}
                 </p>
+              </div>
+            )}
+
+            {/* 반려 사유 입력 — rejectReason 정책이 설정된 서비스의 대기 건에만 노출 */}
+            {rejectReason && selectedUser.status === 'pending' && (
+              <div style={{ marginTop: 12 }}>
+                <label
+                  style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 6 }}
+                >
+                  {rejectReason.label ?? '반려 사유'}
+                  {rejectReason.required && <span style={{ color: '#dc2626' }}> *</span>}
+                </label>
+                <textarea
+                  value={rejectReasonText}
+                  onChange={(e) => setRejectReasonText(e.target.value)}
+                  rows={3}
+                  placeholder={rejectReason.placeholder ?? '반려 시 신청자에게 전달됩니다.'}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    fontSize: 13,
+                    border: '1px solid #cbd5e1',
+                    borderRadius: 8,
+                    resize: 'vertical',
+                  }}
+                />
               </div>
             )}
 
             {/* Service-specific 확장 영역 */}
             {drawerExtraSections && drawerExtraSections(selectedUser)}
 
-            {/* 전체 상세 링크 */}
-            <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9' }}>
-              <a
-                href={`/operator/users/${selectedUser.id}`}
-                style={{ fontSize: 13, color: '#2563eb', textDecoration: 'none' }}
-              >
-                전체 상세 페이지 →
-              </a>
-            </div>
+            {/* 전체 상세 링크 — fullDetailHref 가 null 이면 노출하지 않는다(데드링크 방지) */}
+            {(() => {
+              const href = fullDetailHref
+                ? fullDetailHref(selectedUser)
+                : `/operator/users/${selectedUser.id}`;
+              if (!href) return null;
+              return (
+                <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid #f1f5f9' }}>
+                  <a href={href} style={{ fontSize: 13, color: '#2563eb', textDecoration: 'none' }}>
+                    전체 상세 페이지 →
+                  </a>
+                </div>
+              );
+            })()}
           </div>
         )}
       </BaseDetailDrawer>
@@ -1066,6 +1194,7 @@ export function OperatorMembersConsolePage({
 
       {/* Edit User Modal — service-provided slot */}
       {editUser &&
+        renderEditModal &&
         renderEditModal({
           user: editUser,
           onClose: () => setEditUser(null),

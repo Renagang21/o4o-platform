@@ -10,6 +10,10 @@
  *
  * 매장 플레이리스트 전용 운영자 화면은 존재하지 않으므로, 매장 사용처는
  * 매장명·플레이리스트명 텍스트로만 표기한다(존재하지 않는 route 를 만들지 않는다).
+ *
+ * WO-O4O-OPERATOR-CROSSSERVICE-REMAINING-VIEW-DUPLICATION-FINAL-CLEANUP-V1:
+ *   KPA 전용 파일이던 것을 @o4o/operator-core-ui 로 이관해 K-Cosmetics 도 동일한
+ *   삭제 안전 게이트를 갖게 한다. 하드코딩돼 있던 HQ 플레이리스트 경로만 routeBase 로 뺐다.
  */
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -37,11 +41,15 @@ interface Props {
   /** 인증 포함 fetch 헬퍼 — { success, data } 또는 raw JSON 을 반환. */
   apiFetch: (path: string, options?: RequestInit) => Promise<any>;
   serviceKey: string;
+  /** 운영자 사이니지 route base (예: '/operator/signage'). HQ 플레이리스트 이동 링크에 쓴다. */
+  routeBase: string;
+  /** accent — HQ 플레이리스트 링크 텍스트 색 (예: 'text-blue-600') */
+  linkTextClass: string;
   onDeleted: () => void;
   onClose: () => void;
 }
 
-export default function MediaDeleteDialog({ media, apiFetch, serviceKey, onDeleted, onClose }: Props) {
+export function MediaDeleteDialog({ media, apiFetch, serviceKey, routeBase, linkTextClass, onDeleted, onClose }: Props) {
   const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>('checking');
   const [usage, setUsage] = useState<MediaUsageData | null>(null);
@@ -133,11 +141,11 @@ export default function MediaDeleteDialog({ media, apiFetch, serviceKey, onDelet
                     {usage.usages.hqPlaylists.map((p) => (
                       <li key={p.playlistId}>
                         <button
-                          onClick={() => navigate(`/operator/signage/hq-playlists/${p.playlistId}`)}
+                          onClick={() => navigate(`${routeBase}/hq-playlists/${p.playlistId}`)}
                           className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-sm text-left"
                         >
                           <span className="truncate text-slate-700">{p.playlistName || p.playlistId}</span>
-                          <span className="flex items-center gap-1 text-xs text-blue-600 shrink-0">
+                          <span className={`flex items-center gap-1 text-xs ${linkTextClass} shrink-0`}>
                             {p.itemCount}개 항목 <ExternalLink className="w-3.5 h-3.5" />
                           </span>
                         </button>

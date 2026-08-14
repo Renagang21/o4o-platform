@@ -152,3 +152,22 @@ export type {
   OperatorOrderStatusConfig,
   OperatorOrderStatusPageProps,
 } from './modules/product-order-view';
+
+// Surveys Module (WO-O4O-OPERATOR-CROSSSERVICE-SCREEN-CENSUS-AND-PHARMACYHUB-UX-COMMONIZATION-V1)
+export {
+  OperatorSurveyListPage,
+  OperatorSurveyCreatePage,
+} from './modules/surveys';
+export type {
+  SurveyStatus,
+  SurveyQuestionType,
+  OperatorSurveyItem,
+  OperatorSurveyListParams,
+  OperatorSurveyListResult,
+  OperatorSurveyCreatePayload,
+  OperatorSurveysClient,
+  OperatorSurveysAccent,
+  OperatorSurveysConfig,
+  OperatorSurveyListPageProps,
+  OperatorSurveyCreatePageProps,
+} from './modules/surveys';

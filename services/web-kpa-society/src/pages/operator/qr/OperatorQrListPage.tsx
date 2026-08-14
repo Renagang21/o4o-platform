@@ -1,12 +1,11 @@
 /**
- * OperatorQrListPage — 운영자 매장 HUB QR 템플릿 목록 (표준 테이블)
+ * OperatorQrListPage — 운영자 매장 HUB QR 템플릿 목록 (KPA)
  *
  * WO-O4O-KPA-OPERATOR-QR-WRITE-PAGE-V1 (초기 카드형)
- * WO-O4O-KPA-OPERATOR-PUBLISHING-PAGES-STANDARD-TABLE-V1 (2026-05-24):
- *   카드형 items.map → O4O 표준 테이블 (DataTable + ActionBar + useBatchAction +
- *   BulkResultModal + RowActionMenu + defineActionPolicy). OperatorBlog/Pop 패턴 mirror.
- *
- * 운영자가 KPA 매장 HUB 에 게시한 QR 템플릿 목록.
+ * WO-O4O-KPA-OPERATOR-PUBLISHING-PAGES-STANDARD-TABLE-V1 (2026-05-24): O4O 표준 테이블 전환
+ * WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1:
+ *   KPA·K-Cosmetics 중복을 @o4o/operator-core-ui 의 OperatorHubContentListPage 로 수렴.
+ *   QR 신원 컬럼은 공통 buildQrLeadColumns() 를 사용한다.
  *
  * QR 도메인 차이 (Blog/POP 와):
  *   - slug 컬럼 부재 (운영자 단계 미발급 — 매장 가져가기 시 store_qr_codes 가 발급)
@@ -15,20 +14,17 @@
  *
  * Backend: WO-O4O-KPA-OPERATOR-QR-PUBLISHING-PHASE2-BACKEND-V1 (변경 없음)
  *   GET /api/v1/kpa/operator/qr/templates
- *   PATCH /...:id/publish — fan-out 일괄 발행
- *   PATCH /...:id/archive — fan-out 일괄 보관
- *   DELETE /...:id        — fan-out 일괄 삭제
+ *   PATCH /...:id/publish · /...:id/archive · DELETE /...:id
  *
  * 권한 검증은 backend + RoleGuard 가 처리.
  */
 
-import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit3, Trash2, Send, Archive, Plus, Link as LinkIcon, FileText } from 'lucide-react';
-import { toast } from '@o4o/error-handling';
-import { ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
-import { DataTable, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
-import type { ListColumnDef } from '@o4o/operator-ux-core';
+import {
+  OperatorHubContentListPage,
+  buildQrLeadColumns,
+} from '@o4o/operator-core-ui/modules/hub-content-list';
+import type { HubContentListClient } from '@o4o/operator-core-ui/modules/hub-content-list';
 import {
   listOperatorQrTemplates,
   publishOperatorQrTemplate,
@@ -37,501 +33,40 @@ import {
   type OperatorQrTemplate,
 } from '../../../api/operatorQr';
 
-type StatusFilter = '' | 'draft' | 'published' | 'archived';
-
-const STATUS_LABEL: Record<OperatorQrTemplate['status'], string> = {
-  draft: '초안',
-  published: '발행',
-  archived: '보관',
+const client: HubContentListClient<OperatorQrTemplate> = {
+  list: listOperatorQrTemplates,
+  publish: publishOperatorQrTemplate,
+  archive: archiveOperatorQrTemplate,
+  remove: deleteOperatorQrTemplate,
 };
 
-const STATUS_BADGE_CLASS: Record<OperatorQrTemplate['status'], string> = {
-  draft: 'bg-slate-100 text-slate-600',
-  published: 'bg-emerald-50 text-emerald-700',
-  archived: 'bg-amber-50 text-amber-700',
-};
-
-const CONTENT_KIND_LABEL: Record<string, string> = {
-  blog: '블로그',
-  cms: 'CMS',
-  pop: 'POP',
-};
-
-function formatTarget(item: OperatorQrTemplate): string {
-  if (item.targetType === 'url') {
-    return item.targetUrl ? `URL · ${item.targetUrl}` : 'URL';
-  }
-  const kind = item.targetContentKind
-    ? CONTENT_KIND_LABEL[item.targetContentKind] || item.targetContentKind
-    : '';
-  const ref = item.targetContentRef ? ` · ${item.targetContentRef}` : '';
-  return `콘텐츠${kind ? ` · ${kind}` : ''}${ref}`;
-}
-
-// ─── Action Policy ─────────────────────
-const qrActionPolicy = defineActionPolicy<OperatorQrTemplate>('kpa:operator-qr', {
-  inlineMax: 2,
-  rules: [
-    { key: 'edit', label: '수정' },
-    {
-      key: 'publish',
-      label: '발행',
-      variant: 'primary',
-      visible: (q) => q.status !== 'published',
-      confirm: {
-        title: 'QR 템플릿 발행',
-        message: '이 QR 템플릿을 발행하시겠습니까? 발행 즉시 매장 HUB 에 노출됩니다.',
-        confirmText: '발행',
-      },
-    },
-    {
-      key: 'archive',
-      label: '보관',
-      visible: (q) => q.status !== 'archived',
-      confirm: {
-        title: 'QR 템플릿 보관',
-        message: '이 QR 템플릿을 보관하시겠습니까? HUB 노출이 중단됩니다.',
-        confirmText: '보관',
-      },
-    },
-    {
-      key: 'delete',
-      label: '삭제',
-      variant: 'danger',
-      confirm: {
-        title: 'QR 템플릿 삭제',
-        message: '이 QR 템플릿을 삭제하시겠습니까? 되돌릴 수 없습니다.',
-        variant: 'danger',
-        confirmText: '삭제',
-      },
-    },
-  ],
-});
-
-const QR_ACTION_ICONS: Record<string, ReactNode> = {
-  edit: <Edit3 className="w-4 h-4" />,
-  publish: <Send className="w-4 h-4" />,
-  archive: <Archive className="w-4 h-4" />,
-  delete: <Trash2 className="w-4 h-4" />,
-};
-
-const PAGE_LIMIT = 20;
+const leadColumns = buildQrLeadColumns<OperatorQrTemplate>();
 
 export default function OperatorQrListPage() {
   const navigate = useNavigate();
-  const [items, setItems] = useState<OperatorQrTemplate[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const batch = useBatchAction();
-
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
-
-  const loadData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const res = await listOperatorQrTemplates({
-        page,
-        limit: PAGE_LIMIT,
-        status: statusFilter || undefined,
-      });
-      setItems(res.data);
-      setTotal(res.meta.total);
-    } catch (e: any) {
-      setError(e?.message || '목록을 불러올 수 없습니다');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [page, statusFilter]);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  useEffect(() => {
-    setSelectedIds(new Set());
-  }, [page, statusFilter]);
-
-  // ── Single row actions ──
-  // 확인은 qrActionPolicy.publish.confirm (RowActionMenu → ConfirmActionDialog) 가 담당.
-  const handlePublish = useCallback(async (q: OperatorQrTemplate) => {
-    setActionLoading(q.id);
-    try {
-      await publishOperatorQrTemplate(q.id);
-      toast.success('QR 템플릿이 발행되었습니다');
-      loadData();
-    } catch (e: any) {
-      toast.error(e?.message || '발행에 실패했습니다');
-    } finally {
-      setActionLoading(null);
-    }
-  }, [loadData]);
-
-  const handleArchive = useCallback(async (q: OperatorQrTemplate) => {
-    setActionLoading(q.id);
-    try {
-      await archiveOperatorQrTemplate(q.id);
-      toast.success('QR 템플릿이 보관되었습니다');
-      loadData();
-    } catch (e: any) {
-      toast.error(e?.message || '보관에 실패했습니다');
-    } finally {
-      setActionLoading(null);
-    }
-  }, [loadData]);
-
-  const handleDelete = useCallback(async (q: OperatorQrTemplate) => {
-    setActionLoading(q.id);
-    try {
-      await deleteOperatorQrTemplate(q.id);
-      toast.success('QR 템플릿이 삭제되었습니다');
-      loadData();
-    } catch (e: any) {
-      toast.error(e?.message || '삭제에 실패했습니다');
-    } finally {
-      setActionLoading(null);
-    }
-  }, [loadData]);
-
-  // ── Bulk action ──
-  const selectedDraftOrArchivedIds = useMemo(
-    () => items.filter((q) => selectedIds.has(q.id) && q.status !== 'published').map((q) => q.id),
-    [items, selectedIds],
-  );
-  const selectedNotArchivedIds = useMemo(
-    () => items.filter((q) => selectedIds.has(q.id) && q.status !== 'archived').map((q) => q.id),
-    [items, selectedIds],
-  );
-
-  type BulkOp = 'publish' | 'archive' | 'delete';
-  // WO-O4O-KPA-OPERATOR-RUNBULK-CONFIRM-FLOW-STANDARDIZATION-V1:
-  //   확인 UI 를 runBulk 에서 분리. dialog open 시점의 target IDs 를 고정(pendingBulk.ids)해
-  //   selection 이 바뀌어도 저장된 대상으로만 실행한다.
-  type BulkConfirmState = { op: BulkOp; ids: string[]; title: string; message: string; variant?: 'default' | 'danger' | 'warning'; confirmText: string };
-  const [pendingBulk, setPendingBulk] = useState<BulkConfirmState | null>(null);
-  const batchQrOp = useCallback(
-    async (
-      ids: string[],
-      options?: Record<string, unknown>,
-    ): Promise<{ data: { results: Array<{ id: string; status: 'success' | 'failed'; error?: string }> } }> => {
-      const op = options?.op as BulkOp | undefined;
-      if (!op) {
-        return { data: { results: ids.map((id) => ({ id, status: 'failed' as const, error: 'op missing' })) } };
-      }
-      const fn =
-        op === 'publish' ? publishOperatorQrTemplate
-        : op === 'archive' ? archiveOperatorQrTemplate
-        : deleteOperatorQrTemplate;
-      const settled = await Promise.allSettled(ids.map((id) => fn(id)));
-      const results = settled.map((r, i) => {
-        const id = ids[i];
-        if (r.status === 'fulfilled') return { id, status: 'success' as const };
-        const err = r.reason as { message?: string } | null;
-        return { id, status: 'failed' as const, error: err?.message || 'Network error' };
-      });
-      return { data: { results } };
-    },
-    [],
-  );
-
-  // runBulk 은 이미 확인된 작업만 실행한다 (확인 UI/window.confirm 미포함).
-  const runBulk = useCallback(
-    async (ids: string[], op: BulkOp) => {
-      if (ids.length === 0) return;
-      const result = await batch.executeBatch(batchQrOp, ids, { op });
-      if (result.successCount > 0) {
-        setSelectedIds(new Set());
-        await loadData();
-      }
-    },
-    [batch, batchQrOp, loadData],
-  );
-
-  // 확인 대상 IDs 를 dialog open 시점에 고정 → 이후 selection 변경과 무관하게 실행.
-  const handleBulkPublish = useCallback(() => {
-    const ids = selectedDraftOrArchivedIds;
-    if (ids.length === 0) return;
-    setPendingBulk({
-      op: 'publish', ids,
-      title: '일괄 발행',
-      message: `선택한 ${ids.length}개 QR 템플릿을 발행하시겠습니까? 발행 즉시 매장 HUB 에 노출됩니다.`,
-      confirmText: '발행',
-    });
-  }, [selectedDraftOrArchivedIds]);
-  const handleBulkArchive = useCallback(() => {
-    const ids = selectedNotArchivedIds;
-    if (ids.length === 0) return;
-    setPendingBulk({
-      op: 'archive', ids,
-      title: '일괄 보관',
-      message: `선택한 ${ids.length}개 QR 템플릿을 보관하시겠습니까?`,
-      confirmText: '보관',
-    });
-  }, [selectedNotArchivedIds]);
-  const handleBulkDelete = useCallback(() => {
-    const ids = items.filter((q) => selectedIds.has(q.id)).map((q) => q.id);
-    if (ids.length === 0) return;
-    setPendingBulk({
-      op: 'delete', ids,
-      title: '일괄 삭제',
-      message: `선택한 ${ids.length}개 QR 템플릿을 삭제하시겠습니까? 되돌릴 수 없습니다.`,
-      variant: 'danger',
-      confirmText: '삭제',
-    });
-  }, [items, selectedIds]);
-  const handleConfirmBulk = useCallback(async () => {
-    const pending = pendingBulk;
-    if (!pending) return;
-    await runBulk(pending.ids, pending.op);
-    setPendingBulk(null);
-  }, [pendingBulk, runBulk]);
-
-  // ── Columns ──
-  const columns: ListColumnDef<OperatorQrTemplate>[] = useMemo(() => [
-    {
-      key: 'title',
-      header: '제목',
-      sortable: true,
-      sortAccessor: (q) => q.title,
-      render: (_v, q) => (
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="w-7 h-7 rounded flex items-center justify-center bg-slate-100 shrink-0 text-slate-400">
-            {q.targetType === 'url' ? <LinkIcon className="w-3.5 h-3.5" /> : <FileText className="w-3.5 h-3.5" />}
-          </div>
-          <span className="font-medium text-slate-800 text-sm truncate">{q.title}</span>
-        </div>
-      ),
-    },
-    {
-      key: 'targetType',
-      header: '대상 종류',
-      width: '90px',
-      render: (_v, q) => (
-        <span className="inline-flex items-center px-2 py-0.5 text-xs rounded-full border bg-slate-50 border-slate-200 text-slate-600">
-          {q.targetType === 'url' ? 'URL' : '콘텐츠'}
-        </span>
-      ),
-    },
-    {
-      key: 'target',
-      header: '대상',
-      render: (_v, q) => (
-        <span className="text-xs text-slate-500 truncate">{formatTarget(q)}</span>
-      ),
-    },
-    {
-      key: 'status',
-      header: '상태',
-      width: '80px',
-      render: (_v, q) => (
-        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs ${STATUS_BADGE_CLASS[q.status]}`}>
-          {STATUS_LABEL[q.status]}
-        </span>
-      ),
-    },
-    {
-      key: 'updatedAt',
-      header: '수정일',
-      width: '100px',
-      sortable: true,
-      sortAccessor: (q) => new Date(q.updatedAt).getTime(),
-      render: (_v, q) => (
-        <span className="text-xs text-slate-500">
-          {new Date(q.updatedAt).toLocaleDateString('ko-KR')}
-        </span>
-      ),
-    },
-    {
-      key: 'publishedAt',
-      header: '발행일',
-      width: '100px',
-      sortable: true,
-      sortAccessor: (q) => (q.publishedAt ? new Date(q.publishedAt).getTime() : 0),
-      render: (_v, q) => (
-        <span className="text-xs text-slate-500">
-          {q.publishedAt ? new Date(q.publishedAt).toLocaleDateString('ko-KR') : '-'}
-        </span>
-      ),
-    },
-    {
-      key: '_actions',
-      header: '액션',
-      width: '60px',
-      align: 'center',
-      system: true,
-      render: (_v, q) => (
-        <RowActionMenu
-          actions={buildRowActions(qrActionPolicy, q, {
-            edit: () => navigate(`/operator/qr/${q.id}/edit`),
-            publish: () => handlePublish(q),
-            archive: () => handleArchive(q),
-            delete: () => handleDelete(q),
-          }, {
-            icons: QR_ACTION_ICONS,
-            loading: actionLoading === q.id
-              ? { edit: true, publish: true, archive: true, delete: true }
-              : undefined,
-          })}
-          inlineMax={qrActionPolicy.inlineMax}
-        />
-      ),
-    },
-  ], [navigate, handlePublish, handleArchive, handleDelete, actionLoading]);
-
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
-      <header className="mb-6 pb-5 border-b-2 border-slate-200 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">매장 HUB QR-code</h1>
-          <p className="mt-1.5 text-sm text-slate-500">
-            운영자가 KPA 매장 HUB 에 게시할 QR "템플릿" 을 작성·관리합니다.
-            실제 QR-code 는 매장 경영자가 가져갈 때 매장별로 발급됩니다.
-            본 화면에서는 슬러그·통계가 없으며, 발행 후 매장 HUB 에 노출되어 매장이 자기 매장으로 가져갈 수 있습니다.
-          </p>
-        </div>
-        <button
-          onClick={() => navigate('/operator/qr/new')}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shrink-0"
-        >
-          <Plus className="w-4 h-4" />QR 템플릿 만들기
-        </button>
-      </header>
-
-      <div className="flex gap-2 mb-4">
-        {(['', 'draft', 'published', 'archived'] as StatusFilter[]).map((s) => (
-          <button
-            key={s || 'all'}
-            onClick={() => { setStatusFilter(s); setPage(1); }}
-            className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-              statusFilter === s
-                ? 'bg-blue-600 text-white'
-                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-            }`}
-          >
-            {s === '' ? '전체' : STATUS_LABEL[s as OperatorQrTemplate['status']]}
-          </button>
-        ))}
-      </div>
-
-      {error && (
-        <div className="text-center py-16 text-red-600 text-sm">
-          <p>{error}</p>
-          <button
-            onClick={() => loadData()}
-            className="mt-3 px-4 py-1.5 text-xs text-blue-600 border border-blue-400 rounded-lg hover:bg-blue-50"
-          >
-            다시 시도
-          </button>
-        </div>
-      )}
-
-      {!error && (
-        <>
-          <div className="mb-3">
-            <ActionBar
-              selectedCount={selectedIds.size}
-              onClearSelection={() => setSelectedIds(new Set())}
-              actions={[
-                {
-                  key: 'bulk-publish',
-                  label: `일괄 발행 (${selectedDraftOrArchivedIds.length})`,
-                  onClick: handleBulkPublish,
-                  variant: 'primary' as const,
-                  icon: <Send className="w-3.5 h-3.5" />,
-                  loading: batch.loading,
-                  group: 'actions',
-                  visible: selectedDraftOrArchivedIds.length > 0,
-                  tooltip: '선택한 초안/보관 QR 템플릿을 일괄 발행합니다',
-                },
-                {
-                  key: 'bulk-archive',
-                  label: `일괄 보관 (${selectedNotArchivedIds.length})`,
-                  onClick: handleBulkArchive,
-                  variant: 'default' as const,
-                  icon: <Archive className="w-3.5 h-3.5" />,
-                  loading: batch.loading,
-                  group: 'actions',
-                  visible: selectedNotArchivedIds.length > 0,
-                  tooltip: '선택한 QR 템플릿을 일괄 보관',
-                },
-                {
-                  key: 'bulk-delete',
-                  label: `일괄 삭제 (${selectedIds.size})`,
-                  onClick: handleBulkDelete,
-                  variant: 'danger' as const,
-                  icon: <Trash2 className="w-3.5 h-3.5" />,
-                  loading: batch.loading,
-                  group: 'actions',
-                  visible: selectedIds.size > 0,
-                  tooltip: '선택한 QR 템플릿을 일괄 삭제 (되돌릴 수 없음)',
-                },
-              ]}
-            />
-          </div>
-
-          <BulkResultModal
-            open={batch.showResult}
-            onClose={() => batch.clearResult()}
-            result={batch.result}
-            onRetry={() => batch.retryFailed()}
-          />
-
-          {/* WO-O4O-KPA-OPERATOR-RUNBULK-CONFIRM-FLOW-STANDARDIZATION-V1:
-              일괄 확인 → 고정된 target IDs 로 runBulk 실행. 실행 중(batch.loading) 재확인/닫힘 방지. */}
-          <ConfirmActionDialog
-            open={!!pendingBulk}
-            title={pendingBulk?.title ?? ''}
-            message={pendingBulk?.message ?? ''}
-            variant={pendingBulk?.variant}
-            confirmText={pendingBulk?.confirmText}
-            loading={batch.loading}
-            onConfirm={handleConfirmBulk}
-            onClose={() => { if (!batch.loading) setPendingBulk(null); }}
-          />
-
-          <DataTable<OperatorQrTemplate>
-            columns={columns}
-            data={items}
-            rowKey="id"
-            loading={isLoading}
-            emptyMessage={
-              statusFilter
-                ? '해당 상태의 QR 템플릿이 없습니다'
-                : '아직 작성한 QR 템플릿이 없습니다'
-            }
-            tableId="operator-qr-list"
-            selectable
-            selectedKeys={selectedIds}
-            onSelectionChange={setSelectedIds}
-          />
-
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4 mt-4">
-              <button
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-              >
-                이전
-              </button>
-              <span className="text-sm text-slate-500">{page} / {totalPages}</span>
-              <button
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-              >
-                다음
-              </button>
-            </div>
-          )}
-        </>
-      )}
-    </div>
+    <OperatorHubContentListPage<OperatorQrTemplate>
+      client={client}
+      leadColumns={leadColumns}
+      actionPolicyKey="kpa:operator-qr"
+      tableId="operator-qr-list"
+      onCreate={() => navigate('/operator/qr/new')}
+      onEdit={(id) => navigate(`/operator/qr/${id}/edit`)}
+      copy={{
+        kindLabel: 'QR 템플릿',
+        pageTitle: '매장 HUB QR-code',
+        pageDescription:
+          '운영자가 KPA 매장 HUB 에 게시할 QR "템플릿" 을 작성·관리합니다. 실제 QR-code 는 매장 경영자가 가져갈 때 매장별로 발급됩니다. 본 화면에서는 슬러그·통계가 없으며, 발행 후 매장 HUB 에 노출되어 매장이 자기 매장으로 가져갈 수 있습니다.',
+        createButtonLabel: 'QR 템플릿 만들기',
+        emptyMessage: '아직 작성한 QR 템플릿이 없습니다',
+        emptyFilteredMessage: '해당 상태의 QR 템플릿이 없습니다',
+      }}
+      accent={{
+        createButton: 'bg-blue-600 hover:bg-blue-700',
+        activePill: 'bg-blue-600 text-white',
+        retryButton: 'text-blue-600 border-blue-400 hover:bg-blue-50',
+        publishedBadge: 'bg-emerald-50 text-emerald-700',
+      }}
+    />
   );
 }

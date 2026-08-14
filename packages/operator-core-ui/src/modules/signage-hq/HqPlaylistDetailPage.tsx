@@ -1,0 +1,578 @@
+/**
+ * HqPlaylistDetailPage — 운영자 사이니지 HQ 플레이리스트 상세 (공통 콘솔)
+ *
+ * WO-O4O-SIGNAGE-CONSOLE-V1 (원본)
+ * WO-KPA-OPERATOR-HQ-PLAYLIST-CREATE-FLOW-REFINE-V1: 항목 구성 UI
+ *   - PRIMARY  : URL 입력 → HQ Media 자동 생성 → Playlist Item 추가
+ *   - SECONDARY: HQ 미디어 목록에서 선택 → Playlist Item 추가
+ *   - 항목 제거
+ * WO-O4O-OPERATOR-CROSSSERVICE-REMAINING-VIEW-DUPLICATION-FINAL-CLEANUP-V1:
+ *   KPA/K-Cosmetics 중복을 단일 콘솔로 수렴.
+ *   원본 KPA 소스의 깨진 문자열("HQ 미��어에서 선택")도 이관하면서 정상 복구했다.
+ *
+ * API: GET   /api/signage/:serviceKey/playlists/:id
+ *      GET   /api/signage/:serviceKey/playlists/:id/items
+ *      POST  /api/signage/:serviceKey/playlists/:id/items
+ *      DEL   /api/signage/:serviceKey/playlists/:id/items/:itemId
+ *      PATCH /api/signage/:serviceKey/hq/playlists/:id/status
+ *      DEL   /api/signage/:serviceKey/hq/playlists/:id
+ */
+
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { ArrowLeft, ListMusic, Play, Trash2, Link as LinkIcon, Plus, X, Search, Film, Loader2 } from 'lucide-react';
+import {
+  SIGNAGE_STATUS_CONFIG,
+  type SignageMediaItem,
+  type SignageHqDetailPageProps,
+} from './types';
+
+interface PlaylistDetail {
+  id: string;
+  name: string;
+  description: string | null;
+  status: string;
+  loopEnabled: boolean;
+  defaultItemDuration: number;
+  transitionType: string;
+  transitionDuration: number;
+  totalDuration: number;
+  itemCount: number;
+  source?: string;
+  scope?: string;
+  isPublic?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface PlaylistItemData {
+  id: string;
+  sortOrder: number;
+  duration: number | null;
+  isActive: boolean;
+  isForced: boolean;
+  sourceType: string;
+  media?: {
+    id: string;
+    name: string;
+    mediaType: string;
+    sourceType: string;
+    sourceUrl: string;
+    thumbnailUrl: string | null;
+  };
+}
+
+const statusOptions = [
+  { value: 'draft', label: '초안' },
+  { value: 'pending', label: '대기' },
+  { value: 'active', label: '활성' },
+  { value: 'archived', label: '아카이브' },
+];
+
+const mediaTypeLabel: Record<string, string> = {
+  video: '동영상', image: '이미지', html: 'HTML', text: '텍스트',
+};
+
+function extractNameFromUrl(url: string): string {
+  const today = new Date().toLocaleDateString('ko-KR');
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('youtube') || u.hostname.includes('youtu.be')) return `YouTube 동영상 (${today})`;
+    if (u.hostname.includes('vimeo')) return `Vimeo 동영상 (${today})`;
+    return `동영상 (${today})`;
+  } catch {
+    return `동영상 (${today})`;
+  }
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs text-slate-400">{label}</p>
+      <p className="text-sm text-slate-800">{value}</p>
+    </div>
+  );
+}
+
+export function HqPlaylistDetailPage({ id: playlistId, apiFetch, config, navigate }: SignageHqDetailPageProps) {
+  const { serviceKey, accent, routeBase, playlistLabel } = config;
+  const listPath = `${routeBase}/hq-playlists`;
+
+  const [playlist, setPlaylist] = useState<PlaylistDetail | null>(null);
+  const [items, setItems] = useState<PlaylistItemData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // URL input (primary flow)
+  const [urlInput, setUrlInput] = useState('');
+  const [urlName, setUrlName] = useState('');
+  const [isAddingUrl, setIsAddingUrl] = useState(false);
+
+  // HQ media picker (secondary flow)
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [hqMediaList, setHqMediaList] = useState<SignageMediaItem[]>([]);
+  const [isLoadingMedia, setIsLoadingMedia] = useState(false);
+  const [hqMediaError, setHqMediaError] = useState<string | null>(null);
+  const [mediaSearch, setMediaSearch] = useState('');
+  const [addingMediaId, setAddingMediaId] = useState<string | null>(null);
+
+  const [removingItemId, setRemovingItemId] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    if (!playlistId) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const [plData, itemsData] = await Promise.all([
+        apiFetch(`/api/signage/${serviceKey}/playlists/${playlistId}`),
+        apiFetch(`/api/signage/${serviceKey}/playlists/${playlistId}/items`),
+      ]);
+      setPlaylist(plData.data || plData.playlist || plData);
+      setItems(itemsData.data || itemsData.items || []);
+    } catch (err: any) {
+      setError(err?.message || `${playlistLabel}를 불러올 수 없습니다`);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [playlistId, apiFetch, serviceKey, playlistLabel]);
+
+  useEffect(() => { void fetchData(); }, [fetchData]);
+
+  const handleStatusChange = async (newStatus: string) => {
+    if (!playlist || playlist.status === newStatus) return;
+    setIsUpdating(true);
+    try {
+      await apiFetch(`/api/signage/${serviceKey}/hq/playlists/${playlist.id}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: newStatus }),
+      });
+      setPlaylist((prev) => (prev ? { ...prev, status: newStatus } : null));
+    } catch (err: any) {
+      setError(err?.message || '상태 변경에 실패했습니다');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!playlist) return;
+    setIsDeleting(true);
+    try {
+      await apiFetch(`/api/signage/${serviceKey}/hq/playlists/${playlist.id}`, { method: 'DELETE' });
+      navigate(listPath);
+    } catch (err: any) {
+      setError(err?.message || '삭제에 실패했습니다');
+      setShowDeleteConfirm(false);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleAddByUrl = async () => {
+    if (!urlInput.trim() || !playlistId) return;
+    setIsAddingUrl(true);
+    setError(null);
+    try {
+      // Step 1: Create HQ media from URL
+      const mediaResult = await apiFetch(`/api/signage/${serviceKey}/hq/media`, {
+        method: 'POST',
+        body: JSON.stringify({
+          name: urlName.trim() || extractNameFromUrl(urlInput),
+          mediaType: 'video',
+          sourceUrl: urlInput.trim(),
+          tags: ['HQ'],
+        }),
+      });
+      const media = mediaResult.data || mediaResult;
+
+      // Step 2: Add media as playlist item
+      await apiFetch(`/api/signage/${serviceKey}/playlists/${playlistId}/items`, {
+        method: 'POST',
+        body: JSON.stringify({ mediaId: media.id, sourceType: 'hq' }),
+      });
+
+      setUrlInput('');
+      setUrlName('');
+      void fetchData();
+    } catch (err: any) {
+      setError(err?.message || '항목 추가에 실패했습니다');
+    } finally {
+      setIsAddingUrl(false);
+    }
+  };
+
+  const fetchHqMedia = useCallback(async () => {
+    setIsLoadingMedia(true);
+    setHqMediaError(null);
+    try {
+      const data = await apiFetch(`/api/signage/${serviceKey}/media?source=hq&limit=200`);
+      setHqMediaList(data.data || data.media || []);
+    } catch {
+      // 조회 실패를 'HQ 미디어 없음'으로 위장하지 않는다 — 피커에 오류 + 재시도 표시
+      setHqMediaList([]);
+      setHqMediaError('HQ 미디어를 불러오지 못했습니다.');
+    } finally {
+      setIsLoadingMedia(false);
+    }
+  }, [apiFetch, serviceKey]);
+
+  const openMediaPicker = () => {
+    setShowMediaPicker(true);
+    setMediaSearch('');
+    void fetchHqMedia();
+  };
+
+  const handleAddFromMedia = async (mediaId: string) => {
+    if (!playlistId) return;
+    setAddingMediaId(mediaId);
+    try {
+      await apiFetch(`/api/signage/${serviceKey}/playlists/${playlistId}/items`, {
+        method: 'POST',
+        body: JSON.stringify({ mediaId, sourceType: 'hq' }),
+      });
+      setShowMediaPicker(false);
+      void fetchData();
+    } catch (err: any) {
+      setError(err?.message || '항목 추가에 실패했습니다');
+    } finally {
+      setAddingMediaId(null);
+    }
+  };
+
+  const filteredHqMedia = useMemo(() => {
+    if (!mediaSearch.trim()) return hqMediaList;
+    const kw = mediaSearch.toLowerCase();
+    return hqMediaList.filter(
+      (m) => m.name.toLowerCase().includes(kw) || (m.sourceUrl || '').toLowerCase().includes(kw),
+    );
+  }, [hqMediaList, mediaSearch]);
+
+  const addedMediaIds = useMemo(
+    () => new Set(items.map((i) => i.media?.id).filter(Boolean)),
+    [items],
+  );
+
+  const handleRemoveItem = async (itemId: string) => {
+    if (!playlistId) return;
+    setRemovingItemId(itemId);
+    try {
+      await apiFetch(`/api/signage/${serviceKey}/playlists/${playlistId}/items/${itemId}`, { method: 'DELETE' });
+      void fetchData();
+    } catch (err: any) {
+      setError(err?.message || '항목 제거에 실패했습니다');
+    } finally {
+      setRemovingItemId(null);
+    }
+  };
+
+  const formatDate = (d: string) => {
+    try { return new Date(d).toLocaleString('ko-KR'); } catch { return '-'; }
+  };
+
+  const formatDuration = (seconds: number) => {
+    if (!seconds) return '-';
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return m > 0 ? `${m}분 ${s}초` : `${s}초`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center" style={{ minHeight: 400 }}>
+        <div className={`w-8 h-8 border-2 ${accent.spinnerBorder} border-t-transparent rounded-full animate-spin`} />
+      </div>
+    );
+  }
+
+  if (error && !playlist) {
+    return (
+      <div className="space-y-4">
+        <button onClick={() => navigate(listPath)} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
+          <ArrowLeft className="w-4 h-4" /> HQ {playlistLabel} 목록
+        </button>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <p className="text-red-700">{error || `${playlistLabel}를 찾을 수 없습니다`}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!playlist) return null;
+
+  const sc = SIGNAGE_STATUS_CONFIG[playlist.status] || { text: playlist.status, cls: 'bg-slate-100 text-slate-600' };
+
+  return (
+    <div className="space-y-6 max-w-4xl">
+      <button onClick={() => navigate(listPath)} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
+        <ArrowLeft className="w-4 h-4" /> HQ {playlistLabel} 목록
+      </button>
+
+      <div className="flex items-center gap-3">
+        <ListMusic className={`w-6 h-6 ${accent.icon}`} />
+        <h1 className="text-2xl font-bold text-slate-800">{playlist.name}</h1>
+        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>
+        <div className="ml-auto">
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="flex items-center gap-2 px-3 py-1.5 text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors text-sm"
+          >
+            <Trash2 className="w-4 h-4" /> 완전 삭제
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800 flex items-center justify-between">
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="text-amber-600 hover:text-amber-800"><X className="w-4 h-4" /></button>
+        </div>
+      )}
+
+      {/* Status Control */}
+      <div className={`bg-white rounded-xl border ${accent.cardBorder} p-6`}>
+        <h2 className="text-lg font-semibold text-slate-800 mb-4">상태 관리</h2>
+        <div className="flex items-center gap-2 flex-wrap">
+          {statusOptions.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => handleStatusChange(opt.value)}
+              disabled={isUpdating || playlist.status === opt.value}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                playlist.status === opt.value
+                  ? `${accent.primaryButton} text-white`
+                  : 'border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Playlist Info */}
+      <div className={`bg-white rounded-xl border ${accent.cardBorder} p-6`}>
+        <h2 className="text-lg font-semibold text-slate-800 mb-4">{playlistLabel} 정보</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8">
+          <InfoRow label="이름" value={playlist.name} />
+          <InfoRow label="항목 수" value={String(playlist.itemCount)} />
+          <InfoRow label="총 재생 시간" value={formatDuration(playlist.totalDuration)} />
+          <InfoRow label="기본 항목 시간" value={`${playlist.defaultItemDuration}초`} />
+          <InfoRow label="전환 효과" value={playlist.transitionType} />
+          <InfoRow label="전환 시간" value={`${playlist.transitionDuration}ms`} />
+          <InfoRow label="반복 재생" value={playlist.loopEnabled ? '예' : '아니오'} />
+          <InfoRow label="공개 여부" value={playlist.isPublic ? '공개' : '비공개'} />
+          <InfoRow label="생성일" value={formatDate(playlist.createdAt)} />
+          <InfoRow label="수정일" value={formatDate(playlist.updatedAt)} />
+        </div>
+        {playlist.description && (
+          <div className="mt-4 pt-4 border-t border-slate-100">
+            <p className="text-xs text-slate-400 mb-1">설명</p>
+            <p className="text-sm text-slate-700">{playlist.description}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Items Section */}
+      <div className={`bg-white rounded-xl border ${accent.cardBorder} p-6`}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-slate-800">
+            재생 항목 <span className="text-sm font-normal text-slate-400">({items.length})</span>
+          </h2>
+          <button
+            onClick={openMediaPicker}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg transition-colors ${accent.softButton}`}
+          >
+            <Film className="w-4 h-4" /> HQ 미디어에서 선택
+          </button>
+        </div>
+
+        {/* URL Input — Primary Flow */}
+        <div className={`mb-5 rounded-lg border p-4 ${accent.panelBg}`}>
+          <div className="flex items-center gap-2 mb-3">
+            <LinkIcon className={`w-4 h-4 ${accent.icon}`} />
+            <span className="text-sm font-medium text-slate-700">동영상 URL로 추가</span>
+          </div>
+          <div className="space-y-2">
+            <input
+              type="url"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && urlInput.trim()) void handleAddByUrl(); }}
+              placeholder="YouTube 또는 Vimeo URL을 입력하세요"
+              className={`w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 ${accent.focusRing} bg-white`}
+            />
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={urlName}
+                onChange={(e) => setUrlName(e.target.value)}
+                placeholder="동영상 이름 (선택, 미입력 시 자동 생성)"
+                className={`flex-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 ${accent.focusRing} bg-white`}
+              />
+              <button
+                onClick={handleAddByUrl}
+                disabled={!urlInput.trim() || isAddingUrl}
+                className={`flex items-center gap-1.5 px-4 py-2 ${accent.primaryButton} text-white rounded-lg text-sm font-medium disabled:opacity-50 transition-colors flex-shrink-0`}
+              >
+                {isAddingUrl ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                추가
+              </button>
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-slate-400">
+            YouTube 또는 Vimeo URL을 입력하면 HQ 미디어로 자동 등록 후 {playlistLabel}에 추가됩니다.
+          </p>
+        </div>
+
+        {/* Item List */}
+        {items.length === 0 ? (
+          <p className="py-8 text-center text-sm text-slate-400">
+            등록된 항목이 없습니다. URL을 입력하거나 HQ 미디어에서 선택하여 추가하세요.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {items.map((item, idx) => (
+              <div
+                key={item.id}
+                className={`flex items-center gap-4 p-3 rounded-lg border ${item.isForced ? 'border-red-200 bg-red-50' : 'border-slate-100 bg-slate-50'}`}
+              >
+                <span className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-medium text-slate-600">{idx + 1}</span>
+                {item.media?.thumbnailUrl ? (
+                  <img src={item.media.thumbnailUrl} alt="" className="w-12 h-8 rounded object-cover border border-slate-200" />
+                ) : (
+                  <div className="w-12 h-8 rounded bg-slate-200 flex items-center justify-center"><Play className="w-3 h-3 text-slate-400" /></div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-800 truncate">{item.media?.name || 'Unknown media'}</p>
+                  <p className="text-xs text-slate-400">
+                    {mediaTypeLabel[item.media?.mediaType || ''] || item.media?.mediaType} · {item.duration ? `${item.duration}초` : '기본'}
+                  </p>
+                </div>
+                {item.isForced && <span className="px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">강제</span>}
+                <span className={`px-2 py-0.5 rounded text-xs ${item.isActive ? 'text-green-600' : 'text-slate-400'}`}>
+                  {item.isActive ? '활성' : '비활성'}
+                </span>
+                {!item.isForced && (
+                  <button
+                    onClick={() => handleRemoveItem(item.id)}
+                    disabled={removingItemId === item.id}
+                    className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                    title="항목 제거"
+                  >
+                    {removingItemId === item.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-slate-800 mb-1">{playlistLabel} 완전 삭제</h3>
+            <p className="text-sm text-slate-500 mb-4">이 작업은 되돌릴 수 없습니다.</p>
+            <div className="bg-slate-50 rounded-lg p-3 mb-4 text-sm">
+              <p className="font-medium text-slate-700">{playlist.name}</p>
+              <p className="text-slate-400 text-xs mt-1">
+                타입: HQ {playlistLabel} · 삭제 시 모든 재생 항목도 함께 제거됩니다
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setShowDeleteConfirm(false)} disabled={isDeleting} className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50">취소</button>
+              <button onClick={handleDelete} disabled={isDeleting} className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50">
+                {isDeleting ? '삭제 중...' : '완전 삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* HQ Media Picker Modal */}
+      {showMediaPicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 flex flex-col" style={{ maxHeight: '80vh' }}>
+            <div className="p-5 border-b border-slate-100">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold text-slate-800">HQ 미디어에서 선택</h3>
+                <button onClick={() => setShowMediaPicker(false)} className="p-1 text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
+              </div>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  value={mediaSearch}
+                  onChange={(e) => setMediaSearch(e.target.value)}
+                  placeholder="미디어 이름 또는 URL로 검색..."
+                  className={`w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 ${accent.focusRing}`}
+                />
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-5">
+              {isLoadingMedia ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className={`w-6 h-6 ${accent.icon} animate-spin`} />
+                </div>
+              ) : hqMediaError ? (
+                <div className="text-center py-12 text-red-600">
+                  <p className="text-sm">{hqMediaError}</p>
+                  <button
+                    onClick={() => void fetchHqMedia()}
+                    className="mt-3 px-4 py-1.5 text-xs text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
+                  >
+                    다시 시도
+                  </button>
+                </div>
+              ) : filteredHqMedia.length === 0 ? (
+                <p className="text-center py-12 text-sm text-slate-400">
+                  {mediaSearch ? '검색 결과가 없습니다' : 'HQ 미디어가 없습니다. URL 입력으로 먼저 미디어를 등록하세요.'}
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {filteredHqMedia.map((media) => {
+                    const alreadyAdded = addedMediaIds.has(media.id);
+                    return (
+                      <div
+                        key={media.id}
+                        className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${alreadyAdded ? 'border-green-200 bg-green-50/50' : 'border-slate-100 hover:border-slate-300 hover:bg-slate-50'}`}
+                      >
+                        {media.thumbnailUrl ? (
+                          <img src={media.thumbnailUrl} alt="" className="w-14 h-10 rounded object-cover border border-slate-200 flex-shrink-0" />
+                        ) : (
+                          <div className="w-14 h-10 rounded bg-slate-200 flex items-center justify-center flex-shrink-0"><Play className="w-4 h-4 text-slate-400" /></div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-800 truncate">{media.name}</p>
+                          <p className="text-xs text-slate-400 truncate">{media.sourceType} · {media.sourceUrl}</p>
+                        </div>
+                        {alreadyAdded ? (
+                          <span className="px-3 py-1.5 text-xs text-green-600 bg-green-100 rounded-lg font-medium flex-shrink-0">추가됨</span>
+                        ) : (
+                          <button
+                            onClick={() => handleAddFromMedia(media.id)}
+                            disabled={addingMediaId === media.id}
+                            className={`flex items-center gap-1 px-3 py-1.5 text-sm border rounded-lg transition-colors disabled:opacity-50 flex-shrink-0 ${accent.softButton}`}
+                          >
+                            {addingMediaId === media.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
+                            추가
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            <div className="p-4 border-t border-slate-100 flex justify-end">
+              <button onClick={() => setShowMediaPicker(false)} className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50">닫기</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

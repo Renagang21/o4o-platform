@@ -4,88 +4,29 @@
  * WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1
  *
  * k-cosmetics serviceKey 로 고정된 per-service proxy(/api/v1/cosmetics/operator/recruitment-exposure)를
- * 자기 서비스 operator scope(cosmetics:operator)로 호출. 공통 RecruitmentExposureConsole 렌더.
+ * 자기 서비스 operator scope(cosmetics:operator)로 호출.
  *
- * WO-O4O-OPERATOR-RECRUITMENT-EXPOSURE-STANDARD-LIST-ADOPTION-V1 (최소 개선):
- *   카드 승인 큐 유지. exposureStatus 필터 + URL sync(recruitmentExposure_status) + 기본 pending.
+ * WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1:
+ *   조회 · 필터 · URL sync · 승인/반려 셸을 @o4o/operator-core-ui 공통 페이지로 수렴.
+ *   서비스는 HTTP client adapter + audienceLabel 만 주입한다 (endpoint·payload 불변).
  */
-import { useCallback, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { RecruitmentExposureConsole, type RecruitmentExposureItem } from '@o4o/operator-ux-core';
+import { OperatorRecruitmentExposurePage } from '@o4o/operator-core-ui/modules/recruitment-exposure';
+import type { RecruitmentExposureClient } from '@o4o/operator-core-ui/modules/recruitment-exposure';
 import { api } from '../../lib/apiClient';
-import { LoadError } from '@o4o/ui';
 
 const BASE = '/cosmetics/operator/recruitment-exposure';
-const URL_KEY = 'recruitmentExposure_status';
-const DEFAULT_STATUS = 'pending';
+
+const client: RecruitmentExposureClient = {
+  list: async (exposureStatus) => {
+    const qs = exposureStatus ? `?exposureStatus=${exposureStatus}` : '';
+    const res = await api.get(`${BASE}${qs}`);
+    return res.data?.data ?? [];
+  },
+  decide: async (id, action, note) => {
+    await api.patch(`${BASE}/${id}/${action}`, { note });
+  },
+};
 
 export default function RecruitmentExposureApprovalPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [filterStatus, setFilterStatus] = useState<string>(
-    () => searchParams.get(URL_KEY) || DEFAULT_STATUS,
-  );
-  const [items, setItems] = useState<RecruitmentExposureItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [busyId, setBusyId] = useState<string | null>(null);
-  // 조회 실패를 0건으로 위장하지 않는다(4상태 계약: loading/error/empty/ready).
-  const [loadError, setLoadError] = useState(false);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setLoadError(false);
-    try {
-      const qs = filterStatus && filterStatus !== 'all' ? `?exposureStatus=${filterStatus}` : '';
-      const res = await api.get(`${BASE}${qs}`);
-      setItems(res.data?.data ?? []);
-    } catch {
-      setLoadError(true);
-    }
-    setLoading(false);
-  }, [filterStatus]);
-
-  useEffect(() => { void load(); }, [load]);
-
-  // URL query sync (default pending 은 param 생략)
-  useEffect(() => {
-    setSearchParams(
-      (prev) => {
-        const sp = new URLSearchParams(prev);
-        if (filterStatus === DEFAULT_STATUS) sp.delete(URL_KEY);
-        else sp.set(URL_KEY, filterStatus);
-        return sp;
-      },
-      { replace: true },
-    );
-  }, [filterStatus, setSearchParams]);
-
-  const decide = useCallback(
-    async (id: string, action: 'approve' | 'reject', note?: string) => {
-      setBusyId(id);
-      try {
-        await api.patch(`${BASE}/${id}/${action}`, { note });
-        await load();
-      } catch {
-        window.alert('처리에 실패했습니다. 잠시 후 다시 시도해 주세요.');
-      }
-      setBusyId(null);
-    },
-    [load],
-  );
-
-  if (loadError && !loading) {
-    return <LoadError onRetry={() => void load()} />;
-  }
-
-  return (
-    <RecruitmentExposureConsole
-      items={items}
-      loading={loading}
-      busyId={busyId}
-      audienceLabel="매장 사용자"
-      filterStatus={filterStatus}
-      onFilterChange={setFilterStatus}
-      onApprove={(id, note) => decide(id, 'approve', note)}
-      onReject={(id, note) => decide(id, 'reject', note)}
-    />
-  );
+  return <OperatorRecruitmentExposurePage client={client} audienceLabel="매장 사용자" />;
 }

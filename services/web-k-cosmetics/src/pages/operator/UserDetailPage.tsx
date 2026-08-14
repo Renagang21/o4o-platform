@@ -8,36 +8,17 @@ import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../lib/apiClient';
 import {
   UserDetailPage as CommonUserDetailPage,
+  createUserDetailApiAdapter,
 } from '@o4o/ui';
 import type {
-  UserDetailApiAdapter,
   UserDetailConfig,
 } from '@o4o/ui';
 
 // ─── API Adapter ─────────────────────────────────────────────
+// WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1:
+//   3서비스에 복제돼 있던 언랩 어댑터를 @o4o/ui 공통 팩토리로 대체 (동작 동일).
 
-const apiAdapter: UserDetailApiAdapter = {
-  get: async (path: string) => {
-    const { data } = await api.get(path);
-    return data;
-  },
-  put: async (path: string, body?: any) => {
-    const { data } = await api.put(path, body);
-    return data;
-  },
-  post: async (path: string, body?: any) => {
-    const { data } = await api.post(path, body);
-    return data;
-  },
-  patch: async (path: string, body?: any) => {
-    const { data } = await api.patch(path, body);
-    return data;
-  },
-  delete: async (path: string) => {
-    const { data } = await api.delete(path);
-    return data;
-  },
-};
+const apiAdapter = createUserDetailApiAdapter(api);
 
 // ─── Config ──────────────────────────────────────────────────
 
