@@ -184,7 +184,13 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
 
   // Store Blog (internal: /stores/:slug/blog/*)
   // WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: serviceKey='cosmetics' 전달.
-  router.use('/', createBlogController(dataSource, coreRequireAuth as any, 'cosmetics'));
+  // WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1 (프로덕션 실측):
+  //   mount 경로가 '/' 였다. blog.controller 의 내부 경로는 '/:slug/blog/*' 이므로
+  //   (1) 프론트가 호출하는 /api/v1/cosmetics/stores/:slug/blog/staff 가 아예 라우팅되지 않고(404),
+  //   (2) 아래 /operator/blog 보다 먼저 등록돼 /operator/blog/posts 가 slug='operator' 로 잡혀
+  //       404 STORE_NOT_FOUND 를 반환했다(운영자 블로그 화면 전체 오류).
+  //   KPA(kpa.routes.ts) · GlycoPharm(glycopharm.routes.ts) 와 동일하게 '/stores' 로 정렬한다.
+  router.use('/stores', createBlogController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
   // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
   // /api/v1/cosmetics/operator/blog/posts (운영자가 매장 HUB 에 게시하는 블로그)

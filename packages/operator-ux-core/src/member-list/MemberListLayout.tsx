@@ -100,12 +100,16 @@ export function MemberListLayout({
       </div>
 
       {/* Role Tabs */}
-      <div className="flex gap-1 border-b border-slate-200">
+      {/* WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1:
+          탭 수가 많은 서비스(KPA/K-Cosmetics/GlycoPharm)에서 390px 뷰포트 기준
+          탭 줄이 문서 전체를 가로로 밀어냈다(document.scrollWidth 547 > 390).
+          탭 줄 자체만 가로 스크롤시켜 페이지 가로 스크롤을 제거한다. */}
+      <div className="flex gap-1 border-b border-slate-200 overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+            className={`shrink-0 whitespace-nowrap px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
               activeTab === tab.key
                 ? 'border-blue-600 text-blue-600'
                 : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'

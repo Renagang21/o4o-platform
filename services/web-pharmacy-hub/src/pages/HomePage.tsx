@@ -3,8 +3,12 @@
  *
  * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
  *
- * 역할별 진입점 3개(약국 경영자 / 공급자 / 서비스 운영자)와 로그인 진입점만 노출한다.
- * 실제 기능(카탈로그·주문·콘텐츠·커뮤니티)은 후속 WO.
+ * 역할별 진입점 3개(약국 경영자 / 공급자 / 서비스 운영자)와 로그인·커뮤니티 진입점을 노출한다.
+ *
+ * WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1:
+ *   진입점 설명이 "(준비 중)" 으로 남아 있었으나 세 영역 모두 실제 화면이 있다
+ *   (매장 경영 셸 20+ 화면 · 공급자 상품 제공 설정 · 운영자 대시보드/가입 승인).
+ *   커뮤니티도 /forum 으로 구현되어 별도 섹션에 있다. 설명을 실제 기능으로 정정한다.
  */
 
 import { Link } from 'react-router-dom';
@@ -13,9 +17,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { getServiceMembershipStatus } from '../lib/membershipGate';
 
 const ENTRIES = [
-  { to: '/store-owner', role: ROLES.storeOwner, desc: '매장 운영·공급 상품 확인 (준비 중)' },
-  { to: '/supplier', role: ROLES.supplier, desc: '공급 상품·자료 제공 (준비 중)' },
-  { to: '/operator', role: ROLES.operator, desc: '가입 신청 승인·회원 관리 (커뮤니티는 준비 중)' },
+  { to: '/store-owner', role: ROLES.storeOwner, desc: '공급 상품 주문 · 매장 콘텐츠 · 실행 자산(QR·POP·사이니지)' },
+  { to: '/supplier', role: ROLES.supplier, desc: '내 상품 Pharmacy-Hub 제공 설정' },
+  { to: '/operator', role: ROLES.operator, desc: '가입 신청 승인·반려' },
 ];
 
 export default function HomePage() {

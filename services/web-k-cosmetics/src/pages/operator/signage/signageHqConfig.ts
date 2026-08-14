@@ -29,7 +29,13 @@ export const kcosSignageApiFetch: SignageApiFetch = async (path, options = {}) =
 };
 
 export const kcosSignageHqConfig: SignageHqConfig = {
-  serviceKey: 'k-cosmetics',
+  // WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1 (프로덕션 실측)
+  //   signage backend(signage-role.middleware validServiceKeys)의 표준 키는 'cosmetics' 다.
+  //   'k-cosmetics' 로 호출하면 HQ 미디어·재생목록·템플릿·강제 콘텐츠 4 화면이 전부
+  //   INVALID_SERVICE_KEY(400) 로 거부된다. 5728ec160 에서 forced-content 만 'cosmetics' 로
+  //   고쳤던 것을 공통화(1446396d3) 때 다시 'k-cosmetics' 로 되돌렸다 — 여기서 표준으로 정렬한다.
+  //   (KPA 는 같은 이유로 'kpa-society' 를 쓴다. 서비스 식별자 ≠ signage serviceKey)
+  serviceKey: 'cosmetics',
   tableIdPrefix: 'kcos',
   actionPolicyPrefix: 'cosmetics:signage',
   routeBase: '/operator/signage',
