@@ -22,7 +22,7 @@ jest.mock('../../../../services/NotificationService.js', () => ({
   notificationService: { createNotification: jest.fn() },
 }));
 jest.mock('../../../../modules/organization/services/organization-ops.service.js', () => ({
-  organizationOpsService: { ensureOrganization: jest.fn(), addMember: jest.fn() },
+  organizationOpsService: { ensureOrganization: jest.fn(), addMember: jest.fn(), enrollService: jest.fn() },
 }));
 jest.mock('@o4o/platform-core/store-identity', () => ({
   StoreSlugService: jest.fn().mockImplementation(() => ({})),

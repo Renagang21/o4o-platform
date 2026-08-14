@@ -40,6 +40,9 @@ jest.mock('../../../../modules/organization/services/organization-ops.service.js
   organizationOpsService: {
     ensureOrganization: jest.fn().mockResolvedValue({ id: 'org-1' }),
     addMember: jest.fn().mockResolvedValue(undefined),
+    // WO-O4O-KPA-STORE-ORGANIZATION-ENROLLMENT-CANONICALIZATION-V1:
+    //   canonical provisioning helper 가 service enrollment 까지 수행한다.
+    enrollService: jest.fn().mockResolvedValue(undefined),
   },
 }));
 jest.mock('@o4o/platform-core/store-identity', () => ({

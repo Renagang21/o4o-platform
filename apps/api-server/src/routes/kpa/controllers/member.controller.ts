@@ -9,6 +9,7 @@ import { DataSource } from 'typeorm';
 import { KpaMember, OrganizationStore, KpaMemberService, KpaAuditLog } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
+import { ensureKpaStoreOrganization } from '../services/kpa-store-organization.provisioning.js';
 import { MembershipApprovalService } from '../../../services/approval/MembershipApprovalService.js';
 import { emailService } from '../../../services/email.service.js';
 // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1:
@@ -17,9 +18,7 @@ import { notificationService } from '../../../services/NotificationService.js';
 // WO-O4O-KPA-MEMBER-APPROVAL-STORE-OWNER-AUTO-ACTIVATION-V1:
 //   pharmacy_owner 회원 승인 시 자동 매장/owner/role_assignment 생성.
 //   pharmacy-request.controller.ts (WO-KPA-PHARMACY-APPROVAL-ENSURE-STORE-LINK-V1) 패턴 재사용.
-import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
 // WO-O4O-KPA-STORE-SLUG-MEMBER-APPROVAL-PATH-FIX-V1: slug 생성 (pharmacy-request 경로와 동일)
-import { StoreSlugService } from '@o4o/platform-core/store-identity';
 // WO-O4O-KPA-BUSINESSINFO-KEY-READ-ALIGNMENT-V1: businessInfo 주소·약국 전화 read 정렬 (read-only)
 import { resolveKpaBusinessContact } from '../shared/businessInfoRead.js';
 import { planKpaOrganizationContactSync } from '../shared/organizationContactSync.js';
@@ -759,14 +758,22 @@ export function createMemberController(
               );
               warnings.push(reason);
             } else {
-              // 1) organizations ensure (멱등 — code 충돌 시 동일 row 반환)
-              const orgCode = `kpa-pharm-${businessNumberDigits}`;
-              const orgResult = await organizationOpsService.ensureOrganization({
-                name: pharmacyName,
-                code: orgCode,
-                type: 'pharmacy',
-                createdByUserId: member.user_id,
+              // 1~4) + service enrollment + slug — canonical helper 로 수렴
+              //   WO-O4O-KPA-STORE-ORGANIZATION-ENROLLMENT-CANONICALIZATION-V1:
+              //   기존에는 organization / member / role / slug 만 기록하고
+              //   organization_service_enrollments 를 만들지 않아 KPA 조직에
+              //   canonical service 연결 근거가 없었다. helper 가 전 단계를 멱등 수행한다.
+              const provisioned = await ensureKpaStoreOrganization({
+                dataSource,
+                pharmacyName,
+                businessNumberDigits,
+                userId: member.user_id,
+                assignedBy: req.user!.id,
               });
+              const orgResult = { id: provisioned.organizationId, created: provisioned.created };
+              if (provisioned.slugError) {
+                console.error('[KPA Approval] Slug generation failed (non-blocking):', provisioned.slugError);
+              }
 
               // 1-b. WO-O4O-KPA-STORE-INFO-PHARMACY-OWNER-DATA-FIX-V1:
               //   organizations 테이블에 약국 정보 동기화 (NULL 또는 빈 값만 채움, 기존 값 보존)
@@ -825,40 +832,6 @@ export function createMemberController(
                 console.error('[KPA Approval] Organization sync failed (non-blocking):', orgSyncError);
               }
 
-              // 2) kpa_members.organization_id — null 인 경우에만 (분회 연결 보호)
-              await dataSource.query(
-                `UPDATE kpa_members SET organization_id = $1, updated_at = NOW()
-                 WHERE user_id = $2 AND organization_id IS NULL`,
-                [orgResult.id, member.user_id]
-              );
-
-              // 3) organization_members(owner) — 멱등 (organization_id, user_id) UNIQUE
-              await organizationOpsService.addMember({
-                organizationId: orgResult.id,
-                userId: member.user_id,
-                role: 'owner',
-                isPrimary: false,
-              });
-
-              // 4) role_assignments(kpa:store_owner) — SSOT (role-assignment.service 멱등 upsert)
-              await roleAssignmentService.assignRole({
-                userId: member.user_id,
-                role: 'kpa:store_owner',
-                assignedBy: req.user!.id,
-              });
-
-              // 5) platform_store_slugs — WO-O4O-KPA-STORE-SLUG-MEMBER-APPROVAL-PATH-FIX-V1
-              // pharmacy-request.controller.ts Step 6 패턴과 동일 (비차단, 멱등)
-              try {
-                const slugService = new StoreSlugService(dataSource);
-                const existing = await slugService.findByStoreId(orgResult.id, 'kpa');
-                if (!existing) {
-                  const slug = await slugService.generateUniqueSlug(pharmacyName);
-                  await slugService.reserveSlug({ storeId: orgResult.id, serviceKey: 'kpa', slug });
-                }
-              } catch (slugError) {
-                console.error('[KPA Approval] Slug generation failed (non-blocking):', slugError);
-              }
             }
           } catch (autoActivationError) {
             // 회원 승인 자체는 성공시킴 — 운영자가 legacy pharmacy_request 흐름으로 복구 가능
@@ -1432,29 +1405,21 @@ export function createMemberController(
               changes._store_owner_activation = `skipped:missing:${missing.join(',')}`;
               warnings.push(reason);
             } else {
-              const orgCode = `kpa-pharm-${businessNumberDigits}`;
-              const orgResult = await organizationOpsService.ensureOrganization({
-                name: pName,
-                code: orgCode,
-                type: 'pharmacy',
-                createdByUserId: member.user_id,
-              });
-              await dataSource.query(
-                `UPDATE kpa_members SET organization_id = $1, updated_at = NOW()
-                 WHERE user_id = $2 AND organization_id IS NULL`,
-                [orgResult.id, member.user_id]
-              );
-              await organizationOpsService.addMember({
-                organizationId: orgResult.id,
+              // WO-O4O-KPA-STORE-ORGANIZATION-ENROLLMENT-CANONICALIZATION-V1:
+              //   승인 경로(PATCH /:id/status)와 **같은 canonical helper** 를 사용한다.
+              //   이 경로에는 기존에 service enrollment 도 slug 도 없어 승인 경로와
+              //   결과가 갈렸다 (같은 store_owner 인데 매장 URL 없음).
+              const provisioned = await ensureKpaStoreOrganization({
+                dataSource,
+                pharmacyName: pName,
+                businessNumberDigits,
                 userId: member.user_id,
-                role: 'owner',
-                isPrimary: false,
-              });
-              await roleAssignmentService.assignRole({
-                userId: member.user_id,
-                role: 'kpa:store_owner',
                 assignedBy: (req as any).user?.id,
               });
+              const orgResult = { id: provisioned.organizationId, created: provisioned.created };
+              if (provisioned.slugError) {
+                console.error('[KPA Operator] Slug generation failed (non-blocking):', provisioned.slugError);
+              }
 
               // WO-O4O-KPA-ACTIVITY-TYPE-PHARMACY-OWNER-ORGANIZATION-CONTACT-ALIGNMENT-V1
               //   승인 경로(PATCH /:id/status) 와 동일한 주소·약국 전화 초기화 계약을 적용한다.

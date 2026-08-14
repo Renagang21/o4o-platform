@@ -10,6 +10,8 @@ import { OrganizationStore, OrganizationChannel } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { autoListPublicProductsForOrg, autoListServiceProductsForOrg } from '../../../utils/auto-listing.utils.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
+import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
+import { KPA_CANONICAL_SERVICE_CODE } from '../services/kpa-store-organization.provisioning.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -182,6 +184,19 @@ export function createOrganizationController(
           });
         } catch (slugErr: any) {
           console.warn('[OrgCreate] Failed to register slug:', slugErr.message);
+        }
+
+        // WO-O4O-KPA-STORE-ORGANIZATION-ENROLLMENT-CANONICALIZATION-V1:
+        //   slug(매장 URL 식별) 와 별개로 **canonical service 연결**을 기록한다.
+        //   이 경로는 이미 모든 신규 조직에 KPA slug 를 예약하므로 서비스 스코프 집합은
+        //   넓어지지 않는다 — 근거만 canonical 테이블로 옮겨진다. 멱등(ON CONFLICT DO NOTHING).
+        try {
+          await organizationOpsService.enrollService({
+            organizationId: saved.id,
+            serviceCode: KPA_CANONICAL_SERVICE_CODE,
+          });
+        } catch (enrollErr: any) {
+          console.warn('[OrgCreate] Failed to enroll KPA service:', enrollErr.message);
         }
 
         // WO-NETURE-TIER1-AUTO-EXPANSION-BETA-V1: Tier 1 자동 확산
