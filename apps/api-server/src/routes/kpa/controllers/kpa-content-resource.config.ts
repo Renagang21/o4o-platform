@@ -28,10 +28,15 @@ export const KPA_CONTENT_LIST_COLUMNS = `c.id, c.title, c.summary, c.category, c
                   c.content_type, c.sub_type, c.like_count, c.view_count, c.author_name,
                   c.reusable_policy, c.source_url, c.source_file_name`;
 
+/**
+ * 운영자 자료 목록 select — **기존 KPA 응답 필드 그대로**.
+ * GP/KCos 와 달리 `reusable_policy` 를 포함하지 않는다. 추가하면 응답 DTO 가 바뀌므로
+ * 계약 보존을 위해 원본과 1:1 로 맞춘다 (필드 순서까지 동일).
+ */
 export const KPA_OPERATOR_RESOURCE_COLUMNS = `c.id, c.title, c.summary, c.tags, c.category, c.status,
-                  c.source_type, c.usage_type, c.source_url, c.source_file_name,
-                  c.thumbnail_url, c.created_by, c.author_name,
-                  c.like_count, c.view_count, c.reusable_policy, c.created_at, c.updated_at`;
+                    c.source_type, c.usage_type, c.source_url, c.source_file_name,
+                    c.thumbnail_url, c.created_by, c.author_name,
+                    c.view_count, c.like_count, c.created_at, c.updated_at`;
 
 /** kpa:operator 이상 판정 — 기존 `isKpaOperatorOrAdmin` 와 동일 */
 export const KPA_OPERATOR_ROLES = ['kpa:operator', 'kpa:admin', 'platform:super_admin'];
