@@ -10,7 +10,7 @@
 
 import { StoreHubTemplate, type StoreHubConfig } from '@o4o/shared-space-ui';
 import { glycopharmConfig } from '@o4o/operator-ux-core';
-import { PackageSearch, MonitorPlay, Files, BadgePercent, Store, Sparkles } from 'lucide-react';
+import { PackageSearch, MonitorPlay, Files, BadgePercent, Store } from 'lucide-react';
 import { GuideEditableSection } from '../../components/guide';
 
 const { terminology, uiText } = glycopharmConfig;
@@ -75,17 +75,10 @@ const glycoStoreHubConfig: StoreHubConfig = {
     },
   ],
 
-  aiBlock: {
-    icon: <Sparkles size={28} color={ICON_COLOR} />,
-    title: 'AI 맞춤 추천',
-    badge: '준비 중',
-    desc: '매장 운영 데이터를 기반으로 지금 필요한 상품·콘텐츠·사이니지를 자동으로 추천하는 기능을 준비 중입니다.',
-    features: [
-      '취급 신청 후 오래된 혈당 관련 상품 상태 안내',
-      '미복사 콘텐츠 중 현재 시즌 혈당관리 관련 항목 제안',
-      '사이니지 업데이트 주기 기반 교체 제안',
-    ],
-  },
+
+  // AI 맞춤 추천 블록은 실제 기능이 없어 "준비 중" 안내만 노출됐다.
+  // KPA · Pharmacy-Hub 와 동일하게 숨긴다 (준비 중 표면 0 — WO §6).
+  showAiBlock: false,
 
   storeCtaBlock: {
     icon: <Store size={CTA_ICON_SIZE} color={ICON_COLOR} />,
