@@ -827,7 +827,7 @@ export function createCosmeticsOrderController(
   );
 
   /**
-   * POST /orders/:id/cancel
+   * POST /:id/cancel  (router 는 `/api/v1/cosmetics/orders` 에 mount — 최종 경로 /orders/:id/cancel)
    * 결제 전 구매자 주문 취소
    *
    * WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
@@ -836,7 +836,7 @@ export function createCosmeticsOrderController(
    *   이벤트 오퍼 주문이면 예약 차감된 재고를 canonical 보상 경로로 복원한다.
    */
   router.post(
-    '/orders/:id/cancel',
+    '/:id/cancel',
     requireAuth,
     async (req: Request, res: Response) => {
       try {
