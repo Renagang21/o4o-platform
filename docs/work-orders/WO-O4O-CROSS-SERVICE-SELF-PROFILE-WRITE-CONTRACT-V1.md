@@ -527,6 +527,58 @@ operator 대리 수정 API 변경
 
 ---
 
+## 15-A. 사전 승인 (본 WO 범위 내)
+
+아래 2건은 **사전 승인**이므로 별도 중간 승인 없이 진행한다.
+
+### 1. Production 배포 — 승인
+
+기존에 확립된 production 배포 workflow 범위에서 **직접 배포까지 수행**한다.
+
+```text
+1. main push 후 자동 배포 여부 확인
+2. 자동 배포면 완료 대기 → deployed revision 확인
+3. 자동 배포가 아니면 기존 표준 workflow 를 수동 trigger
+4. 배포 성공 확인 후 browser smoke
+```
+
+허용: 기존 GitHub Actions / Cloud Run 배포 workflow 실행 · 기존 service/revision 배포 · 배포 결과와 commit/revision 확인
+
+금지: 새 deployment workflow 작성 · Cloud Run 설정 변경 · 환경변수 변경 · secret 변경 · service account/IAM 변경 · DB migration · 인프라 구조 변경
+
+> 배포 자체를 다시 승인받기 위해 중지하지 않는다. **기존 표준 배포 경로가 없거나, 배포하려면 위 금지 항목 중 하나를 바꿔야 할 때만** 중지한다.
+
+### 2. Production 테스트 계정 ACCOUNT_CORE write — 승인
+
+허용 범위:
+
+```text
+docs/local/TEST-ACCOUNTS.local.md 에 정의된 테스트 계정
++ 본인 ACCOUNT_CORE 필드 (canonical allowlist 로 확정된 필드만)
++ 기능 검증에 필요한 최소 변경
++ 검증 직후 원복
+```
+
+허용 필드 예: `name` / `firstName` / `lastName` / `nickname` / `phone`
+
+금지: 실사용자 계정 수정 · `roles` · `status`/`isActive` · membership · `service_credentials` · `businessInfo` · `organizations` · 직역/면허 · 사업자정보 · 타 사용자 데이터
+
+검증 절차는 반드시 아래를 전부 수행한다.
+
+```text
+변경 전 값 기록
+→ 테스트 값으로 수정
+→ 저장 200 확인
+→ 새로고침/재조회
+→ DB/API persistence 확인
+→ 원래 값으로 복원
+→ 다시 재조회하여 원복 확인
+```
+
+**원복 실패 시 그냥 종료하지 않고 MUST_FIX 로 보고한다.**
+
+---
+
 ## 16. 중지 조건
 
 다음이면 무리하게 확대하지 않는다.
