@@ -13,6 +13,7 @@
  *   POST /:serviceKey/policies                 — 등록 draft (admin)
  *   PUT  /:serviceKey/policies/:id             — 수정 (admin)
  *   PATCH /:serviceKey/policies/:id/publish    — 게시/해제 (admin)
+ *   PATCH /:serviceKey/policies/:id/lifecycle  — 보관/복원 (admin)
  *
  * 핵심:
  *   - 권한: requireServiceLegalScope — serviceKey 별 security-core config 적용
@@ -34,6 +35,11 @@ import {
   isSupportedPolicyDocumentType,
 } from './service-legal-scope.js';
 import logger from '../../utils/logger.js';
+import {
+  ServicePolicyLifecycleError,
+  resolveServicePolicyLifecycle,
+  type ServicePolicyLifecycleAction,
+} from './service-policy-lifecycle.js';
 
 /** camelCase 입력 → ServiceLegalProfile 컬럼 매핑 (mass-assignment 방지 화이트리스트). */
 const PROFILE_FIELD_MAP: Record<string, keyof ServiceLegalProfile> = {
@@ -244,6 +250,9 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
         if (!doc) {
           return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문서를 찾을 수 없습니다.' } });
         }
+        if (doc.status === 'archived') {
+          return res.status(409).json({ success: false, error: { code: 'POLICY_ARCHIVED', message: '보관된 문서는 복원 후 수정할 수 있습니다.' } });
+        }
         const before = toAdminPolicyDocument(doc);
         const { title, slug, content, version, effectiveDate, changeReason } = req.body;
         if (title !== undefined) {
@@ -297,6 +306,9 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
         if (!doc) {
           return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문서를 찾을 수 없습니다.' } });
         }
+        if (doc.status === 'archived') {
+          return res.status(409).json({ success: false, error: { code: 'POLICY_ARCHIVED', message: '보관된 문서는 복원 후 게시할 수 있습니다.' } });
+        }
         const before = toAdminPolicyDocument(doc);
 
         if (action === 'publish') {
@@ -335,6 +347,51 @@ export function createAdminServiceLegalController(dataSource: DataSource): Route
       } catch (error) {
         logger.error('[ServiceLegal Admin] publish policy error:', error);
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '정책 문서 게시 처리 실패' } });
+      }
+    },
+  );
+
+  /**
+   * PATCH /:serviceKey/policies/:id/lifecycle — { action: 'archive' | 'restore' }
+   * 법적 문서 이력 보존을 위해 물리 DELETE를 제공하지 않는다.
+   */
+  router.patch(
+    '/:serviceKey/policies/:id/lifecycle',
+    authenticate,
+    requireServiceLegalScope('admin'),
+    async (req: Request, res: Response) => {
+      const serviceKey = req.params.serviceKey;
+      const userId = (req as any).user?.id ?? null;
+      const action = req.body?.action as ServicePolicyLifecycleAction | undefined;
+      if (!action || !['archive', 'restore'].includes(action)) {
+        return res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: "action 은 archive 또는 restore 여야 합니다." } });
+      }
+
+      try {
+        const doc = await policyRepo.findOne({ where: { id: req.params.id, service_key: serviceKey } });
+        if (!doc) {
+          return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '문서를 찾을 수 없습니다.' } });
+        }
+
+        const before = toAdminPolicyDocument(doc);
+        doc.status = resolveServicePolicyLifecycle(doc.status, action);
+        doc.updated_by = userId;
+        const saved = await policyRepo.save(doc);
+        const after = toAdminPolicyDocument(saved);
+        await audit(serviceKey, userId, `service_legal:policy_${action}`, {
+          entityType: 'service_policy_document',
+          entityId: saved.id,
+          documentType: saved.document_type,
+          before,
+          after,
+        });
+        return res.json({ success: true, data: after });
+      } catch (error) {
+        if (error instanceof ServicePolicyLifecycleError) {
+          return res.status(error.httpStatus).json({ success: false, error: { code: error.code, message: error.message } });
+        }
+        logger.error('[ServiceLegal Admin] lifecycle policy error:', error);
+        return res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '정책 문서 보관 처리 실패' } });
       }
     },
   );

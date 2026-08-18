@@ -3,7 +3,7 @@
  *
  * WO-O4O-ADMIN-SERVICE-LEGAL-POLICY-SETTINGS-UI-V1
  *
- * 4 service 공통 컴포넌트. serviceKey + api 어댑터 주입으로 동작.
+ * 5 service 공통 컴포넌트. serviceKey + api 어댑터 주입으로 동작.
  * 3 탭: 법정정보 / 정책 문서 / 공개 상태 확인.
  *
  * 원칙:
@@ -65,7 +65,11 @@ const C = {
 
 /** 상태 배지 — O4O 표준 Tailwind 배지 패턴 */
 function policyStatusBadge(status: string) {
-  const cls = status === 'published' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-100 text-amber-800';
+  const cls = status === 'published'
+    ? 'bg-emerald-50 text-emerald-700'
+    : status === 'archived'
+      ? 'bg-slate-100 text-slate-600'
+      : 'bg-amber-100 text-amber-800';
   return <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${cls}`}>{status}</span>;
 }
 
@@ -242,6 +246,18 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }
     }
   };
 
+  const handleLifecycle = async (d: ServicePolicyDocumentDto, action: 'archive' | 'restore') => {
+    setMessage(null);
+    try {
+      await api.changePolicyLifecycle(serviceKey, d.id, action);
+      setMessage({ type: 'success', text: action === 'archive' ? '문서가 보관되었습니다.' : '문서가 초안으로 복원되었습니다.' });
+      if (editing !== 'new' && editing?.id === d.id) setEditing(null);
+      await loadPolicies();
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err?.message || '문서 보관 처리에 실패했습니다.' });
+    }
+  };
+
   const publishedByType = useMemo(() => {
     const m: Record<string, ServicePolicyDocumentDto> = {};
     for (const p of policies) if (p.status === 'published') m[p.documentType] = p;
@@ -271,10 +287,22 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }
       render: (_v, d) => (
         <RowActionMenu
           actions={[
-            { key: 'edit', label: '편집', onClick: () => openEditDoc(d) },
-            d.status === 'published'
-              ? { key: 'unpublish', label: '게시해제', onClick: () => handlePublish(d, 'unpublish') }
-              : { key: 'publish', label: '게시', onClick: () => handlePublish(d, 'publish') },
+            ...(d.status === 'archived'
+              ? [{ key: 'restore', label: '초안으로 복원', onClick: () => handleLifecycle(d, 'restore') }]
+              : [
+                  { key: 'edit', label: '편집', onClick: () => openEditDoc(d) },
+                  d.status === 'published'
+                    ? { key: 'unpublish', label: '게시해제', onClick: () => handlePublish(d, 'unpublish') }
+                    : { key: 'publish', label: '게시', onClick: () => handlePublish(d, 'publish') },
+                  ...(d.status === 'draft'
+                    ? [{
+                        key: 'archive',
+                        label: '보관',
+                        onClick: () => handleLifecycle(d, 'archive'),
+                        confirm: { title: '정책 문서 보관', message: `“${d.title}” 문서를 보관하시겠습니까?` },
+                      }]
+                    : []),
+                ]),
           ]}
         />
       ),
