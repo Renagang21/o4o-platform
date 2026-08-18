@@ -172,12 +172,20 @@ export abstract class BaseController {
   protected static forbidden(
     res: Response,
     message: string = 'Forbidden',
-    code: ErrorCode = 'FORBIDDEN'
+    code: ErrorCode = 'FORBIDDEN',
+    /**
+     * WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1
+     * 표준 본문(`success`/`error`/`code`)에 **추가**로 실어 보낼 안정 필드.
+     * 기존 소비처는 모르는 필드를 무시하므로 계약 호환이 유지된다.
+     * 호출부가 내려보낼 값을 명시적으로 선별해 넘긴다(내부 상태 통째 전달 금지).
+     */
+    extra?: Record<string, unknown>
   ): Response {
     return res.status(403).json({
       success: false,
       error: message,
       code,
+      ...(extra ?? {}),
     });
   }
 

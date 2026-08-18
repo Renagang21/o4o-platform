@@ -22,6 +22,17 @@ export interface AuthLoginResult<TUser> {
    * 기존 서비스들이 catch 블록에서 `err.response.status` 로 하던 분기를 보존하기 위한 필드다.
    */
   status?: number;
+  /**
+   * WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1
+   *
+   * 차단 응답(403 `ACCOUNT_NOT_ACTIVE`)이 함께 내려준 계정 상태 라벨
+   * (`rejected` / `suspended` / `inactive`). 서버가 화이트리스트한 값만 오며
+   * 알 수 없는 상태에서는 undefined 다.
+   *
+   * 문구는 이미 Core 가 `error` 에 넣어 주므로 **서비스가 이 값으로 문자열 분기를
+   * 만들 필요는 없다.** 상태에 따라 UI 강조·행동 버튼을 달리해야 할 때만 쓴다.
+   */
+  accountStatus?: string;
   /** 성공 시 변환된 사용자. 실패 시 undefined. */
   user?: TUser;
 }

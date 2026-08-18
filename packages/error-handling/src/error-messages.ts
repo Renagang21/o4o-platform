@@ -31,7 +31,9 @@ export const ERROR_MESSAGES: Record<string, string> = {
   SERVICE_TOKEN_NOT_ALLOWED: '해당 서비스 토큰으로는 접근할 수 없습니다.',
   PLATFORM_TOKEN_NOT_ALLOWED: '플랫폼 토큰으로는 접근할 수 없습니다.',
   GUEST_TOKEN_REQUIRED: '게스트 토큰이 필요합니다.',
-  ACCOUNT_NOT_ACTIVE: '가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다.',
+  // WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1:
+  //   pending 은 제한 로그인으로 성공하므로 이 코드는 '승인 대기' 를 뜻하지 않는다.
+  ACCOUNT_NOT_ACTIVE: '현재 로그인할 수 없는 계정 상태입니다. 운영자에게 문의해 주세요.',
   ACCOUNT_LOCKED: '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.',
   ACCOUNT_SUSPENDED: '계정이 정지되었습니다. 관리자에게 문의하세요.',
   EMAIL_NOT_VERIFIED: '이메일 인증이 필요합니다.',

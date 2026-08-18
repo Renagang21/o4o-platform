@@ -55,6 +55,35 @@ export function resolveAccountAccess(status: unknown): AccountAccessDecision {
 }
 
 /**
+ * WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1
+ *
+ * 로그인 차단(403 `ACCOUNT_NOT_ACTIVE`) 응답에 **실어도 되는 계정 상태**만 선별한다.
+ *
+ * 왜 안전한가: 로그인 상태 게이트는 **비밀번호 검증 이후**에 동작한다
+ * (`auth-login.service.ts` — credential 검증 → status 게이트). 따라서 이 값은
+ * 자기 비밀번호를 아는 사람에게만 도달하며 계정 열거(enumeration) 경로가 되지 않는다.
+ *
+ * 원칙:
+ *   - 화이트리스트만 노출한다. `deleted` 같은 legacy·미지 값은 **내려보내지 않는다**.
+ *   - 사유·운영 메모 등 내부 정보는 포함하지 않는다(상태 라벨 1개뿐).
+ *   - 에러 `code` 는 `ACCOUNT_NOT_ACTIVE` 그대로 유지한다(기존 소비처 호환).
+ */
+export type ExposableAccountStatus = 'rejected' | 'suspended' | 'inactive';
+
+const EXPOSABLE_ACCOUNT_STATUSES: ReadonlySet<string> = new Set<string>([
+  UserStatus.REJECTED,
+  UserStatus.SUSPENDED,
+  UserStatus.INACTIVE,
+]);
+
+export function resolveExposableAccountStatus(status: unknown): ExposableAccountStatus | undefined {
+  if (typeof status !== 'string') return undefined;
+  return EXPOSABLE_ACCOUNT_STATUSES.has(status)
+    ? (status as ExposableAccountStatus)
+    : undefined;
+}
+
+/**
  * restricted 계정에게 허용되는 최소 경로.
  *
  * 원칙 (§5-C):

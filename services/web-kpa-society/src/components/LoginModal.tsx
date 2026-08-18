@@ -35,14 +35,17 @@ const REMEMBER_EMAIL_KEY = 'kpasociety_remember_email';
  */
 function resolveLoginErrorMessage(
   result: { error?: string; code?: string; status?: number },
-  flags: { setIsPendingError: (v: boolean) => void; setIsNotMember: (v: boolean) => void },
+  flags: { setIsNotMember: (v: boolean) => void },
 ): string {
   const { code, status } = result;
   if (code === 'INVALID_USER') return '등록되지 않은 이메일입니다.';
   if (code === 'INVALID_CREDENTIALS') return '비밀번호가 올바르지 않습니다.';
+  // WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1:
+  //   `pending` 은 제한 로그인으로 성공하므로 이 코드는 더 이상 "승인 대기" 가 아니다.
+  //   rejected / suspended / inactive 구분 문구는 공통 계층(resolveAuthError)이 만든다 →
+  //   여기서 문자열을 다시 분기하지 않고 Core 메시지를 그대로 쓴다.
   if (code === 'ACCOUNT_NOT_ACTIVE') {
-    flags.setIsPendingError(true);
-    return '가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다.';
+    return result.error || '현재 로그인할 수 없는 계정 상태입니다. 운영자에게 문의해 주세요.';
   }
   if (code === 'ACCOUNT_LOCKED') return '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.';
   if (code === 'SERVICE_NOT_MEMBER') {
@@ -64,7 +67,6 @@ export default function LoginModal() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isPendingError, setIsPendingError] = useState(false);
   // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 차단을 비밀번호 오류와 분리 표시
   const [isNotMember, setIsNotMember] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -110,7 +112,6 @@ export default function LoginModal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIsPendingError(false);
     setIsNotMember(false);
     setLoading(true);
 
@@ -121,7 +122,7 @@ export default function LoginModal() {
       const result = await login(email, password);
 
       if (!result.success) {
-        setError(resolveLoginErrorMessage(result, { setIsPendingError, setIsNotMember }));
+        setError(resolveLoginErrorMessage(result, { setIsNotMember }));
         return;
       }
       const loggedInUser = result.user!;
@@ -213,8 +214,8 @@ export default function LoginModal() {
           {/* 로그인 폼 */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && !isNotMember && (
-              <div className={`p-3 rounded-lg border ${isPendingError ? 'bg-amber-50 border-amber-200' : 'bg-red-50 border-red-200'}`}>
-                <p className={`text-sm ${isPendingError ? 'text-amber-700' : 'text-red-600'}`}>{error}</p>
+              <div className="p-3 rounded-lg border bg-red-50 border-red-200">
+                <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
             {/* WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 안내 + 회원가입 모달 전환 */}

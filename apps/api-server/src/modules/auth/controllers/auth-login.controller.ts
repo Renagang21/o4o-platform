@@ -13,6 +13,7 @@ import type { LoginRequestDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
 import { isCrossOriginRequest } from './auth-helpers.js';
+import { resolveExposableAccountStatus } from '../../../common/auth/account-access.policy.js';
 
 // Phase 5-B: Auth ↔ Infra Separation
 // Auth 계층은 DB 상태 검사를 수행하지 않음.
@@ -124,7 +125,19 @@ export class AuthLoginController extends BaseController {
         return BaseController.unauthorized(res, error.message, error.code);
       }
       if (error.code === 'ACCOUNT_NOT_ACTIVE' || error.code === 'ACCOUNT_LOCKED') {
-        return BaseController.forbidden(res, error.message, error.code);
+        // WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1
+        //   code 는 그대로 두고(기존 소비처 호환) 화이트리스트된 상태 라벨만 덧붙인다.
+        //   프런트가 rejected / suspended 를 기계적으로 구분해 정확한 안내를 낼 수 있다.
+        const accountStatus =
+          error.code === 'ACCOUNT_NOT_ACTIVE'
+            ? resolveExposableAccountStatus(error.details?.status)
+            : undefined;
+        return BaseController.forbidden(
+          res,
+          error.message,
+          error.code,
+          accountStatus ? { accountStatus } : undefined
+        );
       }
       if (error.code === 'TOO_MANY_ATTEMPTS') {
         return BaseController.error(res, error.message, 429);

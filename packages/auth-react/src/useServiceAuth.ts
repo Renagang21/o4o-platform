@@ -110,6 +110,9 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
             success: false,
             error: resolveAuthError(data as never, status ?? 0),
             code: typeof data.code === 'string' ? data.code : undefined,
+            // WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1
+            accountStatus:
+              typeof data.accountStatus === 'string' ? data.accountStatus : undefined,
             status,
           };
         }
