@@ -47,7 +47,7 @@ import { ADMIN_ROLES } from './lib/role-constants';
 // ============================================================================
 // NetureHomePage removed — Community promoted to Home (WO-NETURE-HOME-COMMUNITY-PROMOTION-V1)
 import HandoffPage from './pages/HandoffPage';
-import LegalPage from './pages/LegalPage';
+import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
 import CommunityPage from './pages/CommunityPage';
 import {
   CommunityAnnouncementsPage,
@@ -722,8 +722,12 @@ function App() {
               <Route path="/supplier" element={<SupplierLandingPage />} />
               <Route path="/partner" element={<PartnerLandingPage />} />
               <Route path="/contact" element={<ContactPage />} />
-              <Route path="/terms" element={<LegalPage slug="terms-of-service" title="이용약관" />} />
-              <Route path="/privacy" element={<LegalPage slug="privacy-policy" title="개인정보처리방침" />} />
+              {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
+                  CMS(cms/public/page) 라우터가 프로덕션에 마운트되어 있지 않아 항상 404 →
+                  "준비 중" 만 노출되던 경로. 다른 4서비스와 같은 service_policy_documents
+                  public API + 공통 PolicyDocumentViewer 로 정렬한다. */}
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
 
               {/* Forum — O4O 공통 구조 (WO-NETURE-HOME-COMMUNITY-PROMOTION-V1) */}
               <Route path="/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/forum" />} />

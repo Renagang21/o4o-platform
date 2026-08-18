@@ -5,7 +5,8 @@
  *
  * K-Cosmetics / Neture 푸터와 같은 구조(브랜드 + 섹션 링크 + 법정정보 bottom bar)지만
  * **링크는 Pharmacy-Hub 에 실제로 존재하는 route 만** 담는다(config/navigation.ts 의 SSOT).
- * 다른 서비스 푸터의 /terms · /privacy · /contact 를 복사하면 전부 404 가 된다 — 옮기지 않는다.
+ * /terms · /privacy 는 WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1 에서 route 가
+ * 생겨 등재됐다. route 없는 /contact 등은 여전히 옮기지 않는다(데드링크 0).
  *
  * 법정정보는 하드코딩 금지 — ServiceLegalProfile public API 값이 있을 때만 표시하며
  * 미설정/비활성/오류 시 해당 영역만 비표시된다(PublicLegalFooterInfo 계약).

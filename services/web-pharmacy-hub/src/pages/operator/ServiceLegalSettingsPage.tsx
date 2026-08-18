@@ -13,10 +13,10 @@
  *   조회 = pharmacy-hub:operator 이상 / 저장 = pharmacy-hub:admin
  *   (WO-O4O-PHARMACY-HUB-LEGAL-SERVICE-SCOPE-AND-FOOTER-404-FIX-V1 에서 legal scope 연결 완료)
  *
- * 탭 범위: ['profile', 'status'] 만 노출한다.
- *   Pharmacy-Hub 에는 정책문서 공개 route(/terms · /privacy)가 없어, 정책문서를 게시해도
- *   공개 화면이 존재하지 않는다. route 없는 기능은 노출하지 않는다(CLAUDE.md §1 · 데드링크 0).
- *   공개 페이지가 생기는 시점의 WO 에서 'policies' 탭을 함께 연다.
+ * 탭 범위: 전체(profile · policies · status).
+ *   WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1 에서 공개 route
+ *   `/terms` · `/privacy` (공통 PolicyDocumentViewer) 가 생겨 게시 문서가 도달 가능해졌으므로,
+ *   보류했던 'policies' 탭을 다른 4서비스와 동일하게 연다(enabledTabs 미지정 = 전체).
  */
 
 import {
@@ -94,8 +94,7 @@ export default function ServiceLegalSettingsPage() {
     <SharedServiceLegalSettingsPage
       serviceKey={SERVICE_KEY}
       api={legalApi}
-      title="서비스 설정 — 법정정보"
-      enabledTabs={['profile', 'status']}
+      title="서비스 설정 — 법정정보·약관"
     />
   );
 }

@@ -40,6 +40,15 @@ export default function NetureLayout() {
               <Link to="/contact" className="hover:text-primary-600 transition-colors">
                 Contact Us
               </Link>
+              {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
+                  /terms · /privacy 는 route 가 존재한다(공통 PolicyDocumentViewer). 다른 서비스
+                  푸터와 같은 축으로 노출한다 — route 있는 실기능을 숨기지 않는다. */}
+              <Link to="/terms" className="hover:text-primary-600 transition-colors">
+                이용약관
+              </Link>
+              <Link to="/privacy" className="hover:text-primary-600 transition-colors">
+                개인정보처리방침
+              </Link>
             </div>
           </div>
         </div>

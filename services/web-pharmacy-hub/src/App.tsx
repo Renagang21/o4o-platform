@@ -68,6 +68,7 @@ import { OperatorLayoutWrapper } from './layouts/OperatorLayoutWrapper';
 import { SupplierShell } from './layouts/SupplierShell';
 // WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1 — 공개 영역 공통 셸(헤더·푸터)
 import { PublicLayout } from './layouts/PublicLayout';
+import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
 import { MembershipGate } from './components/MembershipGate';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -142,6 +143,13 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/join" element={<JoinPage />} />
           <Route path="/join/status" element={<JoinStatusPage />} />
+
+          {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
+              공개 정책 문서. 다른 4서비스와 같은 공통 PolicyDocumentViewer 소비(게시 문서만 표시,
+              미게시 시 중립 empty). 이 route 가 있어야 운영자 설정의 policies 탭이 데드링크를
+              만들지 않는다. */}
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
 
           {/* WO-O4O-PHARMACY-HUB-COMMUNITY-HOME-COMMON-CORE-V1 — active PharmacyHub 회원만 */}
           <Route

@@ -58,8 +58,8 @@ export const PH_CONTEXTUAL_NAV: PhContextualNavItem[] = [
 
 /**
  * 공개 푸터 링크 — **실제 route 가 있는 경로만**.
- * Pharmacy-Hub 에는 아직 /terms · /privacy · /contact · /service-guide route 가 없다.
- * 다른 서비스 푸터를 그대로 복사하면 전부 404 가 되므로 옮기지 않는다.
+ * WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1 에서 /terms · /privacy route 가
+ * 생겼으므로 '약관' 섹션을 추가한다. /contact · /service-guide 는 여전히 route 가 없어 넣지 않는다.
  * 법정정보는 하드코딩하지 않고 PublicLegalFooterInfo(API) 가 값이 있을 때만 렌더한다.
  */
 export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }[] = [
@@ -75,6 +75,13 @@ export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }
     links: [
       { label: '가입 신청', href: '/join' },
       { label: '가입 상태 확인', href: '/join/status' },
+    ],
+  },
+  {
+    title: '약관',
+    links: [
+      { label: '이용약관', href: '/terms' },
+      { label: '개인정보처리방침', href: '/privacy' },
     ],
   },
 ];

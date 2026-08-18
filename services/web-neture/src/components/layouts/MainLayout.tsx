@@ -36,9 +36,18 @@ export default function MainLayout() {
                 <PublicLegalFooterInfo serviceKey="neture" loadProfile={loadFooterLegal} />
               </div>
             </div>
-            <Link to="/forum" className="text-xs text-green-600 hover:text-green-700 transition-colors">
-              포럼
-            </Link>
+            <div className="flex items-center gap-4 text-xs">
+              <Link to="/forum" className="text-green-600 hover:text-green-700 transition-colors">
+                포럼
+              </Link>
+              {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1: 공개 정책 route 노출 */}
+              <Link to="/terms" className="text-gray-400 hover:text-primary-600 transition-colors">
+                이용약관
+              </Link>
+              <Link to="/privacy" className="text-gray-400 hover:text-primary-600 transition-colors">
+                개인정보처리방침
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
