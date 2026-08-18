@@ -63,7 +63,6 @@ export class StartupService {
     await this.initializeWebhooksAndBatchJobs();
     await this.initializeUploadDirectories();
     await this.initializeEmailService();
-    await this.initializeWorkers();
     await this.initializeImageProcessing();
 
     logger.info('✅ Initialization sequence completed');
@@ -363,19 +362,6 @@ export class StartupService {
         hint: 'Email functionality will be disabled. Set EMAIL_SERVICE_ENABLED=false to suppress this error.'
       });
       // Don't throw - let the app continue without email
-    }
-  }
-
-  /**
-   * Initialize AI job worker (BullMQ)
-   */
-  private async initializeWorkers(): Promise<void> {
-    try {
-      await import('../workers/ai-job.worker.js');
-      logger.info('✅ AI job worker started (BullMQ)');
-    } catch (workerError) {
-      logger.error('Failed to start AI job worker:', workerError);
-      // Non-critical: server can still start without worker
     }
   }
 

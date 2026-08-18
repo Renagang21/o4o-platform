@@ -75,20 +75,6 @@ export interface PerformanceAlertData {
 
 export type CompressionLevel = 'none' | 'fast' | 'default' | 'best' | 'low' | 'medium' | 'high';
 
-export interface RedisInfo {
-  version: string;
-  connectedClients: number;
-  usedMemory: number;
-  maxMemory: number;
-  evictedKeys: number;
-  hitRate: number;
-  commandsProcessed: number;
-  server?: any;
-  stats?: any;
-  memory?: any;
-  keyspace?: any;
-}
-
 export interface QueryPerformanceMetrics {
   totalQueries: number;
   slowQueries: number;

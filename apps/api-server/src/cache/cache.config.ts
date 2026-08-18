@@ -7,16 +7,9 @@
 
 export interface CacheConfig {
   // Cache implementation type
-  type: 'memory' | 'redis';
-
-  // Redis configuration (when type is 'redis')
-  redis?: {
-    host: string;
-    port: number;
-    password?: string;
-    db?: number;
-    keyPrefix?: string;
-  };
+  // WO-O4O-IOREDIS-BULLMQ-RESIDUE-CENSUS-REMOVAL-V1:
+  //   WO-O4O-REDIS-REMOVAL-V1 로 Redis 백엔드가 폐기되어 'memory' 만 남는다.
+  type: 'memory';
 
   // Memory cache configuration
   memory?: {
@@ -37,10 +30,8 @@ export interface CacheConfig {
  * Get cache configuration from environment variables
  */
 export function getCacheConfig(): CacheConfig {
-  const cacheType = (process.env.CACHE_TYPE || 'memory') as 'memory' | 'redis';
-
   const config: CacheConfig = {
-    type: cacheType,
+    type: 'memory',
     ttl: {
       short: parseInt(process.env.CACHE_TTL_SHORT || '60'), // 1 minute
       medium: parseInt(process.env.CACHE_TTL_MEDIUM || '300'), // 5 minutes
@@ -49,20 +40,10 @@ export function getCacheConfig(): CacheConfig {
     }
   };
 
-  if (cacheType === 'redis') {
-    config.redis = {
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
-      db: parseInt(process.env.REDIS_DB || '0'),
-      keyPrefix: process.env.REDIS_KEY_PREFIX || 'o4o:'
-    };
-  } else {
-    config.memory = {
-      max: parseInt(process.env.MEMORY_CACHE_MAX || '1000'),
-      checkPeriod: parseInt(process.env.MEMORY_CACHE_CHECK_PERIOD || '600') // 10 minutes
-    };
-  }
+  config.memory = {
+    max: parseInt(process.env.MEMORY_CACHE_MAX || '1000'),
+    checkPeriod: parseInt(process.env.MEMORY_CACHE_CHECK_PERIOD || '600') // 10 minutes
+  };
 
   return config;
 }

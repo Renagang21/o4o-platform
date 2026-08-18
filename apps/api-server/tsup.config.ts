@@ -94,8 +94,6 @@ export default defineConfig({
     'sqlite3',
 
     // Redis
-    'ioredis',
-    'bullmq',
 
     // WebSocket
     'socket.io',

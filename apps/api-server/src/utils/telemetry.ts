@@ -2,9 +2,8 @@
  * OpenTelemetry Tracing Configuration
  * Sprint 3: Distributed tracing for AI request pipeline
  *
- * Traces the complete AI generation flow:
- * - HTTP request → AI proxy → BullMQ enqueue
- * - BullMQ worker → LLM provider API call
+ * Traces the AI generation flow:
+ * - HTTP request → AI proxy → LLM provider API call
  * - Response → Validation → Result storage
  *
  * Each span includes:
@@ -111,31 +110,6 @@ export function startAIProxySpan(
       'ai.provider': provider,
       'ai.model': model,
       'service.name': SERVICE_NAME,
-    },
-  });
-
-  return span;
-}
-
-/**
- * Create a span for BullMQ job processing
- */
-export function startJobWorkerSpan(
-  jobId: string,
-  requestId: string,
-  userId: string,
-  provider: string,
-  model: string
-): Span {
-  const tracer = getTracer();
-
-  const span = tracer.startSpan('ai.worker.process', {
-    attributes: {
-      'job.id': jobId,
-      'request.id': requestId,
-      'user.id': userId,
-      'ai.provider': provider,
-      'ai.model': model,
     },
   });
 

@@ -1,26 +1,22 @@
 /**
- * Advanced Multi-Layer Caching Service
- * 고급 다층 캐싱 전략 구현
- * 
+ * In-Process Caching Service
+ * L1(메모리) 단일 계층 캐싱
+ *
+ * WO-O4O-IOREDIS-BULLMQ-RESIDUE-CENSUS-REMOVAL-V1:
+ *   WO-O4O-REDIS-REMOVAL-V1 로 Memorystore(Redis) 가 폐기되면서 L2 계층은
+ *   `redisClient = null` 로 고정되어 도달 불가능한 코드가 되어 있었다.
+ *   본 서비스에서 L2(Redis) 경로 · circuit breaker · 압축 · rate limit 을 제거하고
+ *   L1 LRU 캐시만 남긴다. 공개 API(get/set/delete/clear/getStats 등)는 유지한다.
+ *
  * Features:
- * - L1 Cache: In-memory LRU cache for ultra-fast access
- * - L2 Cache: Redis distributed cache for shared data
- * - TTL-based invalidation with stale-while-revalidate
+ * - L1 Cache: In-memory LRU cache
  * - Cache warming and preloading
- * - Compression for large values
- * - Circuit breaker for Redis failures
  * - Metrics and monitoring
  */
 
-import type Redis from 'ioredis';
 import { LRUCache } from 'lru-cache';
-import zlib from 'zlib';
-import { promisify } from 'util';
 import crypto from 'crypto';
 import logger from '../utils/logger.js';
-
-const gzip = promisify(zlib.gzip);
-const gunzip = promisify(zlib.gunzip);
 
 // Cache configuration types
 interface CacheConfig {
@@ -30,15 +26,8 @@ interface CacheConfig {
     updateAgeOnGet: boolean;
     updateAgeOnHas: boolean;
   };
-  redis: {
-    ttl: number;          // TTL in seconds
-    compressionThreshold: number; // Bytes
+  entry: {
     keyPrefix: string;
-  };
-  circuitBreaker: {
-    threshold: number;    // Error threshold
-    timeout: number;      // Recovery timeout
-    halfOpenRequests: number;
   };
 }
 
@@ -47,10 +36,8 @@ interface CacheStats {
   hits: number;
   misses: number;
   l1Hits: number;
-  l2Hits: number;
   errors: number;
   evictions: number;
-  compressionSaved: number;
 }
 
 // Cache options
@@ -62,27 +49,13 @@ interface CacheOptions {
   preload?: boolean;
 }
 
-// Circuit breaker states
-enum CircuitState {
-  CLOSED = 'CLOSED',
-  OPEN = 'OPEN',
-  HALF_OPEN = 'HALF_OPEN'
-}
-
 export class CacheService {
   private static instance: CacheService;
-  
+
   private memoryCache: LRUCache<string, any>;
-  private redisClient: Redis | null = null;
   private config: CacheConfig;
   private stats: CacheStats;
-  private circuitBreaker: {
-    state: CircuitState;
-    failures: number;
-    lastFailTime: number;
-    halfOpenRequests: number;
-  };
-  
+
   private constructor() {
     // Initialize configuration
     this.config = {
@@ -92,18 +65,11 @@ export class CacheService {
         updateAgeOnGet: true,
         updateAgeOnHas: false
       },
-      redis: {
-        ttl: parseInt(process.env.CACHE_REDIS_TTL || '3600'), // 1 hour
-        compressionThreshold: parseInt(process.env.CACHE_COMPRESSION_THRESHOLD || '1024'), // 1KB
+      entry: {
         keyPrefix: process.env.CACHE_KEY_PREFIX || 'o4o:cache:'
-      },
-      circuitBreaker: {
-        threshold: 5,
-        timeout: 60000, // 1 minute
-        halfOpenRequests: 3
       }
     };
-    
+
     // Initialize L1 memory cache
     this.memoryCache = new LRUCache({
       max: this.config.memory.max,
@@ -114,30 +80,17 @@ export class CacheService {
         this.stats.evictions++;
       }
     });
-    
+
     // Initialize statistics
     this.stats = {
       hits: 0,
       misses: 0,
       l1Hits: 0,
-      l2Hits: 0,
       errors: 0,
-      evictions: 0,
-      compressionSaved: 0
+      evictions: 0
     };
-    
-    // Initialize circuit breaker
-    this.circuitBreaker = {
-      state: CircuitState.CLOSED,
-      failures: 0,
-      lastFailTime: 0,
-      halfOpenRequests: 0
-    };
-    
-    // Connect to Redis if available
-    this.connectRedis();
   }
-  
+
   /**
    * Get singleton instance
    */
@@ -147,109 +100,15 @@ export class CacheService {
     }
     return CacheService.instance;
   }
-  
-  /**
-   * Connect to Redis
-   */
-  private async connectRedis(): Promise<void> {
-    // WO-O4O-REDIS-REMOVAL-V1: Memorystore 폐기로 L2(Redis) 계층을 사용하지 않는다.
-    // redisClient 는 항상 null 이며 아래 L2 경로는 모두 우회된다 (L1 in-process 캐시만 동작).
-    this.redisClient = null;
-  }
-  
-  /**
-   * Handle Redis errors with circuit breaker
-   */
-  private handleRedisError(): void {
-    this.stats.errors++;
-    this.circuitBreaker.failures++;
-    this.circuitBreaker.lastFailTime = Date.now();
-    
-    if (this.circuitBreaker.failures >= this.config.circuitBreaker.threshold) {
-      this.circuitBreaker.state = CircuitState.OPEN;
-      
-      // Schedule circuit breaker recovery
-      setTimeout(() => {
-        this.circuitBreaker.state = CircuitState.HALF_OPEN;
-        this.circuitBreaker.halfOpenRequests = 0;
-      }, this.config.circuitBreaker.timeout);
-    }
-  }
-  
-  /**
-   * Check if Redis is available
-   */
-  private isRedisAvailable(): boolean {
-    if (!this.redisClient) return false;
-    
-    switch (this.circuitBreaker.state) {
-      case CircuitState.OPEN:
-        return false;
-        
-      case CircuitState.HALF_OPEN:
-        if (this.circuitBreaker.halfOpenRequests >= this.config.circuitBreaker.halfOpenRequests) {
-          return false;
-        }
-        this.circuitBreaker.halfOpenRequests++;
-        return true;
-        
-      case CircuitState.CLOSED:
-        return true;
-        
-      default:
-        return false;
-    }
-  }
-  
+
   /**
    * Generate cache key
    */
   private generateKey(key: string, namespace?: string): string {
     const prefix = namespace ? `${namespace}:` : '';
-    return `${this.config.redis.keyPrefix}${prefix}${key}`;
+    return `${this.config.entry.keyPrefix}${prefix}${key}`;
   }
-  
-  /**
-   * Compress data if needed
-   */
-  private async compress(data: any): Promise<{ data: string; compressed: boolean }> {
-    const json = JSON.stringify(data);
-    
-    if (json.length > this.config.redis.compressionThreshold) {
-      try {
-        const compressed = await gzip(json);
-        const base64 = compressed.toString('base64');
-        
-        // Only use compression if it actually saves space
-        if (base64.length < json.length) {
-          this.stats.compressionSaved += json.length - base64.length;
-          return { data: base64, compressed: true };
-        }
-      } catch (error) {
-        logger.error('Compression error:', error);
-      }
-    }
-    
-    return { data: json, compressed: false };
-  }
-  
-  /**
-   * Decompress data if needed
-   */
-  private async decompress(data: string, compressed: boolean): Promise<any> {
-    try {
-      if (compressed) {
-        const buffer = Buffer.from(data, 'base64');
-        const decompressed = await gunzip(buffer);
-        return JSON.parse(decompressed.toString());
-      }
-      return JSON.parse(data);
-    } catch (error) {
-      logger.error('Decompression error:', error);
-      throw error;
-    }
-  }
-  
+
   /**
    * Get value from cache
    */
@@ -259,51 +118,24 @@ export class CacheService {
     options?: CacheOptions
   ): Promise<T | null> {
     const fullKey = this.generateKey(key, namespace);
-    
-    // Try L1 memory cache first
+
     const memoryValue = this.memoryCache.get(fullKey);
     if (memoryValue !== undefined) {
       this.stats.hits++;
       this.stats.l1Hits++;
       return memoryValue;
     }
-    
-    // Try L2 Redis cache if available
-    if (this.isRedisAvailable() && this.redisClient) {
-      try {
-        const redisData = await this.redisClient.get(fullKey + ':data');
-        const redisMeta = await this.redisClient.get(fullKey + ':meta');
-        
-        if (redisData && redisMeta) {
-          const meta = JSON.parse(redisMeta);
-          const value = await this.decompress(redisData, meta.compressed);
-          
-          // Update L1 cache
-          this.memoryCache.set(fullKey, value);
-          
-          this.stats.hits++;
-          this.stats.l2Hits++;
-          
-          // Handle stale-while-revalidate
-          if (options?.staleWhileRevalidate && meta.staleAt && Date.now() > meta.staleAt) {
-            // Return stale value and trigger background revalidation
-            this.revalidate(key, namespace, options);
-          }
-          
-          return value;
-        }
-      } catch (error) {
-        logger.error('Redis get error:', error);
-        this.handleRedisError();
-      }
-    }
-    
+
     this.stats.misses++;
     return null;
   }
-  
+
   /**
    * Set value in cache
+   *
+   * NOTE: L1 LRU 는 인스턴스 공통 TTL(config.memory.ttl)을 사용한다.
+   *       options.ttl 은 이전에도 L2(Redis) 전용이었고 L1 에는 적용되지 않았다.
+   *       동작 변경을 피하기 위해 기존과 동일하게 유지한다.
    */
   public async set<T>(
     key: string,
@@ -312,50 +144,9 @@ export class CacheService {
     options?: CacheOptions
   ): Promise<void> {
     const fullKey = this.generateKey(key, namespace);
-    const ttl = options?.ttl || this.config.redis.ttl;
-    
-    // Set in L1 memory cache
     this.memoryCache.set(fullKey, value);
-    
-    // Set in L2 Redis cache if available
-    if (this.isRedisAvailable() && this.redisClient) {
-      try {
-        const { data, compressed } = await this.compress(value);
-        const meta = {
-          compressed,
-          createdAt: Date.now(),
-          staleAt: options?.staleWhileRevalidate 
-            ? Date.now() + (ttl * 1000 * 0.8) // 80% of TTL
-            : null,
-          tags: options?.tags || []
-        };
-        
-        const pipeline = this.redisClient.pipeline();
-        pipeline.set(fullKey + ':data', data, 'EX', ttl);
-        pipeline.set(fullKey + ':meta', JSON.stringify(meta), 'EX', ttl);
-        
-        // Add to tag sets if provided
-        if (options?.tags) {
-          for (const tag of options.tags) {
-            pipeline.sadd(`${this.config.redis.keyPrefix}tag:${tag}`, fullKey);
-            pipeline.expire(`${this.config.redis.keyPrefix}tag:${tag}`, ttl);
-          }
-        }
-        
-        await pipeline.exec();
-        
-        // Reset circuit breaker on success
-        if (this.circuitBreaker.state === CircuitState.HALF_OPEN) {
-          this.circuitBreaker.state = CircuitState.CLOSED;
-          this.circuitBreaker.failures = 0;
-        }
-      } catch (error) {
-        logger.error('Redis set error:', error);
-        this.handleRedisError();
-      }
-    }
   }
-  
+
   /**
    * Get multiple values from cache
    */
@@ -377,20 +168,7 @@ export class CacheService {
     const keys = Array.isArray(key) ? key : [key];
 
     for (const k of keys) {
-      const fullKey = this.generateKey(k, namespace);
-
-      // Delete from L1 memory cache
-      this.memoryCache.delete(fullKey);
-
-      // Delete from L2 Redis cache if available
-      if (this.isRedisAvailable() && this.redisClient) {
-        try {
-          await this.redisClient.del([fullKey + ':data', fullKey + ':meta']);
-        } catch (error) {
-          logger.error('Redis delete error:', error);
-          this.handleRedisError();
-        }
-      }
+      this.memoryCache.delete(this.generateKey(k, namespace));
     }
   }
 
@@ -402,104 +180,22 @@ export class CacheService {
   }
 
   /**
-   * Check rate limit using Redis
-   * Returns true if limit exceeded
-   */
-  public async checkRateLimit(
-    id: string,
-    limit: number,
-    windowSec: number
-  ): Promise<boolean> {
-    if (!this.isRedisAvailable() || !this.redisClient) {
-      // If Redis unavailable, allow the request (fail open)
-      return false;
-    }
-
-    try {
-      const key = `${this.config.redis.keyPrefix}ratelimit:${id}`;
-      const current = await this.redisClient.incr(key);
-
-      if (current === 1) {
-        // First request in window, set expiration
-        await this.redisClient.expire(key, windowSec);
-      }
-
-      return current > limit;
-    } catch (error) {
-      logger.error('Rate limit check error:', error);
-      this.handleRedisError();
-      // Fail open on error
-      return false;
-    }
-  }
-  
-  /**
-   * Clear cache by pattern or tags
+   * Clear cache by pattern
    */
   public async clear(pattern?: string, tags?: string[]): Promise<void> {
-    // Clear L1 memory cache
-    if (!pattern && !tags) {
+    if (!pattern) {
       this.memoryCache.clear();
-    } else if (pattern) {
-      const regex = new RegExp(pattern);
-      for (const key of this.memoryCache.keys()) {
-        if (regex.test(key)) {
-          this.memoryCache.delete(key);
-        }
-      }
+      return;
     }
-    
-    // Clear L2 Redis cache if available
-    if (this.isRedisAvailable() && this.redisClient) {
-      try {
-        if (tags) {
-          // Clear by tags
-          for (const tag of tags) {
-            const tagKey = `${this.config.redis.keyPrefix}tag:${tag}`;
-            const members = await this.redisClient.smembers(tagKey);
-            
-            if (members.length > 0) {
-              const keysToDelete = [];
-              for (const member of members) {
-                keysToDelete.push(member + ':data', member + ':meta');
-              }
-              await this.redisClient.del(keysToDelete);
-              await this.redisClient.del(tagKey);
-            }
-          }
-        } else if (pattern) {
-          // Clear by pattern
-          const keys = await this.redisClient.keys(`${this.config.redis.keyPrefix}${pattern}*`);
-          if (keys.length > 0) {
-            await this.redisClient.del(keys);
-          }
-        } else {
-          // Clear all cache
-          const keys = await this.redisClient.keys(`${this.config.redis.keyPrefix}*`);
-          if (keys.length > 0) {
-            await this.redisClient.del(keys);
-          }
-        }
-      } catch (error) {
-        logger.error('Redis clear error:', error);
-        this.handleRedisError();
+
+    const regex = new RegExp(pattern);
+    for (const key of this.memoryCache.keys()) {
+      if (regex.test(key)) {
+        this.memoryCache.delete(key);
       }
     }
   }
-  
-  /**
-   * Revalidate stale cache in background
-   */
-  private async revalidate(
-    key: string,
-    namespace?: string,
-    options?: CacheOptions
-  ): Promise<void> {
-    // This would trigger a background job to refresh the cache
-    // Implementation depends on the specific use case
-    logger.info(`Revalidating cache for key: ${key}`);
-  }
-  
+
   /**
    * Warm cache with preloaded data
    */
@@ -507,33 +203,29 @@ export class CacheService {
     data: Array<{ key: string; value: any; namespace?: string; options?: CacheOptions }>
   ): Promise<void> {
     logger.info(`Warming cache with ${data.length} items`);
-    
+
     for (const item of data) {
       await this.set(item.key, item.value, item.namespace, item.options);
     }
-    
+
     logger.info('Cache warming completed');
   }
-  
+
   /**
    * Get cache statistics
    */
   public getStats(): CacheStats & {
     hitRate: number;
     l1HitRate: number;
-    l2HitRate: number;
     memorySize: number;
-    circuitBreakerState: CircuitState;
   } {
     const totalRequests = this.stats.hits + this.stats.misses;
-    
+
     return {
       ...this.stats,
       hitRate: totalRequests > 0 ? this.stats.hits / totalRequests : 0,
       l1HitRate: this.stats.hits > 0 ? this.stats.l1Hits / this.stats.hits : 0,
-      l2HitRate: this.stats.hits > 0 ? this.stats.l2Hits / this.stats.hits : 0,
-      memorySize: this.memoryCache.size,
-      circuitBreakerState: this.circuitBreaker.state
+      memorySize: this.memoryCache.size
     };
   }
 
@@ -564,11 +256,11 @@ export class CacheService {
   }
 
   public async invalidateProductPricing(productId: number): Promise<void> {
-    return this.clear(`pricing:${productId}*`);
+    return this.clear(`pricing:${productId}`);
   }
 
   public async invalidateUserPricing(userId: number): Promise<void> {
-    return this.clear(`pricing:*:${userId}`);
+    return this.clear(`pricing:.*:${userId}$`);
   }
 
   // Inventory cache methods
@@ -595,15 +287,6 @@ export class CacheService {
     }
   }
 
-  // Redis availability properties for backward compatibility
-  public get redis(): Redis | null {
-    return this.redisClient;
-  }
-
-  public get isEnabled(): boolean {
-    return this.isRedisAvailable();
-  }
-  
   /**
    * Reset statistics
    */
@@ -612,13 +295,11 @@ export class CacheService {
       hits: 0,
       misses: 0,
       l1Hits: 0,
-      l2Hits: 0,
       errors: 0,
-      evictions: 0,
-      compressionSaved: 0
+      evictions: 0
     };
   }
-  
+
   /**
    * Decorator for method caching
    */
@@ -632,29 +313,29 @@ export class CacheService {
       descriptor: PropertyDescriptor
     ) {
       const originalMethod = descriptor.value;
-      
+
       descriptor.value = async function (...args: any[]) {
         const cache = CacheService.getInstance();
-        const key = keyGenerator 
+        const key = keyGenerator
           ? keyGenerator(args)
           : `${target.constructor.name}:${propertyKey}:${crypto
               .createHash('md5')
               .update(JSON.stringify(args))
               .digest('hex')}`;
-        
+
         // Try to get from cache
         const cached = await cache.get(key, 'method', options);
         if (cached !== null) {
           return cached;
         }
-        
+
         // Execute method and cache result
         const result = await originalMethod.apply(this, args);
         await cache.set(key, result, 'method', options);
-        
+
         return result;
       };
-      
+
       return descriptor;
     };
   }

@@ -38,7 +38,6 @@ export interface ConfigStatus {
       naver: FeatureStatus;
     };
     payment: FeatureStatus;
-    queue: FeatureStatus;
     monitoring: FeatureStatus;
   };
   missingConfigs: string[];
@@ -292,17 +291,11 @@ export const operationalConfig = {
 };
 
 /**
- * B) Queue Configuration
- * WO-O4O-REDIS-REMOVAL-V1: Memorystore 폐기. BullMQ 는 런타임에 기동되지 않는다.
+ * B) Queue Configuration — 제거됨
+ * WO-O4O-IOREDIS-BULLMQ-RESIDUE-CENSUS-REMOVAL-V1:
+ *   WO-O4O-REDIS-REMOVAL-V1 로 Memorystore 가 폐기된 뒤 BullMQ 큐/워커가 모두 제거되어
+ *   queue feature status 자체가 사라졌다. 재도입 시 새 WO 로 설계한다.
  */
-export const queueConfig = {
-  isConfigured: () => false,
-
-  getStatus: (): FeatureStatus => ({
-    enabled: false,
-    reason: 'Queue disabled (Redis removed)'
-  })
-};
 
 /**
  * C) Monitoring Configuration
@@ -360,7 +353,6 @@ export function getConfigStatus(): ConfigStatus {
         naver: socialAuthConfig.naver.getStatus()
       },
       payment: paymentConfig.getStatus(),
-      queue: queueConfig.getStatus(),
       monitoring: monitoringConfig.getStatus()
     },
     missingConfigs,
@@ -387,7 +379,6 @@ export function logConfigStatus(): void {
   logger.info(`  Auth:        ${status.features.auth.enabled ? '✅ Enabled' : '❌ Disabled'} - ${status.features.auth.reason}`);
   logger.info(`  Email:       ${status.features.email.enabled ? '✅ Enabled' : '❌ Disabled'} - ${status.features.email.reason}`);
   logger.info(`  Payment:     ${status.features.payment.enabled ? '✅ Enabled' : '❌ Disabled'} - ${status.features.payment.reason}`);
-  logger.info(`  Queue:       ${status.features.queue.enabled ? '✅ Enabled' : '❌ Disabled'} - ${status.features.queue.reason}`);
   logger.info('');
 
   // Social Auth
@@ -427,7 +418,6 @@ export function getEnabledFeatures(): string[] {
   if (status.features.auth.enabled) enabled.push('auth');
   if (status.features.email.enabled) enabled.push('email');
   if (status.features.payment.enabled) enabled.push('payment');
-  if (status.features.queue.enabled) enabled.push('queue');
   if (status.features.socialAuth.google.enabled) enabled.push('oauth:google');
   if (status.features.socialAuth.kakao.enabled) enabled.push('oauth:kakao');
   if (status.features.socialAuth.naver.enabled) enabled.push('oauth:naver');
@@ -444,7 +434,6 @@ export default {
   email: emailConfig,
   socialAuth: socialAuthConfig,
   payment: paymentConfig,
-  queue: queueConfig,
   monitoring: monitoringConfig,
   operational: operationalConfig,
   beta: betaConfig,

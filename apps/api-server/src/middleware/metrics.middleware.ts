@@ -27,12 +27,10 @@ class HttpMetricsService {
   private cacheHitsTotal: promClient.Counter;
   private cacheMissesTotal: promClient.Counter;
   private cacheHitRate: promClient.Gauge;
-  private redisErrorsTotal: promClient.Counter;
 
   // Webhook Metrics
   private webhookDeliveriesTotal: promClient.Counter;
   private webhookDeliveryDuration: promClient.Histogram;
-  private webhookQueueSize: promClient.Gauge;
   private webhookFailuresTotal: promClient.Counter;
 
   // Batch Job Metrics
@@ -120,13 +118,6 @@ class HttpMetricsService {
       registers: [registry],
     });
 
-    this.redisErrorsTotal = getOrCreateMetric<promClient.Counter>(promClient.Counter, {
-      name: 'redis_errors_total',
-      help: 'Total number of Redis errors',
-      labelNames: ['op'],
-      registers: [registry],
-    });
-
     // Webhook metrics
     this.webhookDeliveriesTotal = getOrCreateMetric<promClient.Counter>(promClient.Counter, {
       name: 'webhook_deliveries_total',
@@ -140,13 +131,6 @@ class HttpMetricsService {
       help: 'Webhook delivery duration in seconds',
       labelNames: ['event', 'status'],
       buckets: [0.1, 0.5, 1, 2, 5, 10, 30],
-      registers: [registry],
-    });
-
-    this.webhookQueueSize = getOrCreateMetric<promClient.Gauge>(promClient.Gauge, {
-      name: 'webhook_queue_size',
-      help: 'Number of webhooks in queue by status',
-      labelNames: ['status'],
       registers: [registry],
     });
 
@@ -279,13 +263,6 @@ class HttpMetricsService {
   }
 
   /**
-   * Record Redis error
-   */
-  recordRedisError(op: string): void {
-    this.redisErrorsTotal.inc({ op });
-  }
-
-  /**
    * Update cache hit rate from CacheService stats
    */
   async updateCacheMetrics(): Promise<void> {
@@ -317,24 +294,6 @@ class HttpMetricsService {
    */
   recordWebhookFailure(event: string, reason: string): void {
     this.webhookFailuresTotal.inc({ event, reason });
-  }
-
-  /**
-   * Update webhook queue size metrics
-   */
-  async updateWebhookQueueMetrics(): Promise<void> {
-    try {
-      const { getWebhookQueueStats } = await import('../queues/webhook.queue.js');
-      const stats = await getWebhookQueueStats();
-
-      this.webhookQueueSize.set({ status: 'waiting' }, stats.waiting);
-      this.webhookQueueSize.set({ status: 'active' }, stats.active);
-      this.webhookQueueSize.set({ status: 'completed' }, stats.completed);
-      this.webhookQueueSize.set({ status: 'failed' }, stats.failed);
-      this.webhookQueueSize.set({ status: 'delayed' }, stats.delayed);
-    } catch (error: any) {
-      logger.error('Failed to update webhook queue metrics', { error: error.message });
-    }
   }
 
   /**

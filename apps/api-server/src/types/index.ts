@@ -149,6 +149,6 @@ export * from './graceful-degradation-types.js';
 export { 
   QueryBuilderWithExecute, QueryType, OptimizedResponse, CacheHeaders,
   PerformanceReport, SlowQueryInfo, PerformanceAlert, PerformanceAlertData,
-  CompressionLevel, RedisInfo, CacheMetrics, SystemMetrics, QueryPerformanceMetrics
+  CompressionLevel, CacheMetrics, SystemMetrics, QueryPerformanceMetrics
 } from './performance-types.js';
 export * from './operator-dashboard.types.js';
