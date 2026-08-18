@@ -4,8 +4,8 @@
 - **일자**: 2026-08-18
 - **선행**: `CHECK-O4O-CROSSSERVICE-AUTH-PRODUCTION-E2E-FINAL-CLOSURE-V1` (구현 `4e62945ad` · CHECK `ea38d2eb3`)
 - **커밋**: `70697c11f` (구현) · `2b04e424d` (계약 회귀 테스트)
-- **판정**: **PASS_WITH_UNVERIFIED** — 코드·계약·배포·5서비스 회귀·PH 모바일 로그아웃 전부 PASS.
-  `rejected` / `suspended` **실계정 production 실증만 미검증** (§7 중지조건 5 — `platform:super_admin` 자격 부재).
+- **판정**: **PASS** — 코드·계약·배포·5서비스 회귀·PH 모바일 로그아웃 + `rejected` / `suspended`
+  **실계정 production 실증**까지 전부 PASS (2026-08-18 보완 검증, §8).
 
 ---
 
@@ -97,20 +97,52 @@
 | `o4o-e2e-auth-pending@neture.co.kr` | **suspended** |
 | `o4o-e2e-auth-rejected@neture.co.kr` | **suspended** |
 
-이번 WO 에서 계정 상태를 **변경하지 않았다** (production DB write 0건). 위는 종료 시점 재조회 결과다.
+보완 검증(§8)에서 `o4o-e2e-auth-rejected` 1개만 `rejected` → `suspended` 로 전환했고, **최종 상태는 4개 전부 `suspended` 로 복원**했다. 위는 종료 시점 재조회 결과다. 실사용자 계정 변경 0건.
 
-## 8. 잔여 미검증 — §7 중지조건 5
+## 8. 보완 검증 — `rejected` / `suspended` 실계정 production 실증 (2026-08-18)
 
-**`rejected` / `suspended` 실계정 production 로그인 실증**만 수행하지 못했다.
+`platform:super_admin` 자격이 로컬 자격 파일에 등록되어, 미검증으로 남았던 1건을 **동일 WO 의 최종 보완 검증**으로 마감했다.
+대상은 전용 fixture **`o4o-e2e-auth-rejected@neture.co.kr` 1개로 한정**했고 실사용자·다른 테스트 계정은 접촉하지 않았다.
 
-- 사유: `users.status` 쓰기는 **`platform:super_admin` 전용**이고(`ADMIN_ROLES = ['platform:super_admin']`),
-  작업 계정(`sohae2100`)은 이 role 이 없다(403 `ROLE_REQUIRED`). WO 는 임의 관리자 권한 부여를 금지한다.
-- 전용 fixture 4개는 현재 `suspended` 지만 **비밀번호가 남아 있지 않다**(직전 WO 의 임시 자격 저장소 소멸,
-  `AdminUserController` 는 `KEEP_EXISTING_CREDENTIAL` 로 기존 자격을 덮어쓰지 않아 복구 경로도 없다).
-- 대체 확보한 증거: ① 컨트롤러 계약 회귀 테스트 9건(상태별 노출/미노출) ② 배포된 5서비스 프런트 번들의
-  상태별 문구 실렌더 ③ production 실측 `SERVICE_NOT_MEMBER` · `INVALID_CREDENTIALS` · 교차 서비스 자격 독립.
-- 권고: `platform:super_admin`(`renariver21@gmail.com` 또는 `super-admin@o4o.com`) 자격으로
-  전용 fixture 1개의 비밀번호 재발급 + `rejected`→검증→`suspended` 복원 1회를 수행하면 즉시 마감 가능하다.
+### 8-1. 절차 (정본 관리자 API 경로만 사용)
+
+| 단계 | 경로 | 결과 |
+|---|---|---|
+| 서비스 L2 비밀번호 설정 | `PUT /api/v1/operator/members/:userId { password, serviceKey: 'neture' }` | 200 |
+| `rejected` 전환 | `PATCH /api/v1/admin/users/:id/status { status: 'rejected' }` | 200 · 재조회 `rejected` |
+| `suspended` 전환 | `PATCH /api/v1/admin/users/:id/status { status: 'suspended' }` | 200 · 재조회 `suspended` |
+
+임시 비밀번호는 gitignore 된 로컬 자격 파일에만 저장했고 출력·로그·CHECK·커밋 메시지에 남기지 않았다.
+다른 서비스의 L2 credential 은 변경하지 않았다.
+
+### 8-2. API 계약 실측 (`POST /api/v1/auth/login`, serviceKey `neture`)
+
+| users.status | HTTP | code | accountStatus | 토큰·쿠키 |
+|---|:---:|---|---|---|
+| `rejected` | **403** | `ACCOUNT_NOT_ACTIVE` | **`rejected`** | 발급 0 |
+| `suspended` | **403** | `ACCOUNT_NOT_ACTIVE` | **`suspended`** | 발급 0 (`set-cookie` 0건) |
+| `deleted`(별도 계정) | 403 | `ACCOUNT_NOT_ACTIVE` | **없음** | 발급 0 — 화이트리스트 밖 상태는 노출하지 않는다 |
+
+### 8-3. 실 UI 실증 (`https://neture.co.kr/login`, 실제 사용자 경로)
+
+우회 조작(응답 스텁 · `localStorage` 조작 · API 직접 호출 대체) 없이 브라우저에서 입력·제출했다.
+
+| 상태 | viewport | 노출 문구 | "가입 승인 대기" | 토큰/쿠키 | JS 오류 |
+|---|---|---|:---:|:---:|:---:|
+| `rejected` | 1440×900 | "가입 신청이 반려된 계정입니다. 사유 확인과 재신청 가능 여부는 운영자에게 문의해 주세요." | 0건 | 0 | 0 |
+| `rejected` | 390×844 | 동일 | 0건 | 0 | 0 |
+| `suspended` | 1440×900 | "이용이 정지된 계정입니다. 운영자에게 문의해 주세요." | 0건 | 0 | 0 |
+| `suspended` | 390×844 | 동일 | 0건 | 0 | 0 |
+
+§2A 목표(반려 계정에 "가입 승인 대기 중" 표기 금지)가 production 실계정에서 충족됨을 확인했다.
+존재하지 않는 재신청 버튼·링크는 노출되지 않고 운영자 문의 안내만 제공된다.
+
+### 8-4. 원상 복구
+
+최종 상태를 `suspended` 로 복원하고 재조회했다 (§7 표 갱신). canonical credential 제거 경로가 없어
+계정은 `suspended` 로 유지하고 그 외 직접 DB 조작은 하지 않았다.
+
+**잔여 미검증: 0건.**
 
 ## 9. 문서 정합
 
