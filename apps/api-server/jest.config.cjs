@@ -30,6 +30,9 @@ module.exports = {
     // dist 는 ESM 이라 ts-jest 가 변환하지 못한다. 위 두 패키지와 동일하게 src 로 매핑한다.
     '^@o4o/market-trial$': '<rootDir>/../../packages/market-trial/src/index.ts',
     '^@o4o/action-log-core$': '<rootDir>/../../packages/action-log-core/src/index.ts',
+    // WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1:
+    // BaseController 가 에러코드 SSOT 를 @o4o/types 에서 가져오므로 컨트롤러 단위 테스트에 필요하다.
+    '^@o4o/types$': '<rootDir>/../../packages/types/src/index.ts',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
