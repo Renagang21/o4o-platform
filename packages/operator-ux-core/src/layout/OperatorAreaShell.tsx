@@ -46,6 +46,8 @@ export interface OperatorAreaShellProps {
   /** 서비스별 domain IA. 미주입 시 DomainIASidebar 의 default(KPA 계열) — 기존 3 서비스 무변화.
    *  WO-O4O-OPERATOR-UX-CORE-DOMAINIASIDEBAR-IA-CONFIG-PARAM-V1 */
   domainIAConfig?: OperatorDomainIAConfig;
+  /** 모바일 드로어 라벨 (default: '운영자 메뉴'). 관리자 영역 재사용 시 영역 이름만 바꾼다. */
+  menuLabel?: string;
 }
 
 export function OperatorAreaShell({
@@ -55,6 +57,7 @@ export function OperatorAreaShell({
   sidebarTopOffset = 'top-20',
   children,
   domainIAConfig,
+  menuLabel,
 }: OperatorAreaShellProps) {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -69,6 +72,7 @@ export function OperatorAreaShell({
             capabilities={capabilities}
             sidebarTopOffset={sidebarTopOffset}
             domainIAConfig={domainIAConfig}
+            menuLabel={menuLabel}
           />
           <main className="flex-1 min-w-0">{children ?? <Outlet />}</main>
         </div>

@@ -53,6 +53,7 @@ export function AdminLayoutWrapper() {
           menuItems={ADMIN_UNIFIED_MENU}
           capabilities={ADMIN_ENABLED_CAPABILITIES}
           domainIAConfig={PHARMACY_HUB_ADMIN_DOMAIN_IA}
+          menuLabel="관리자 메뉴"
         />
       ) : (
         <NoAdminAccess />

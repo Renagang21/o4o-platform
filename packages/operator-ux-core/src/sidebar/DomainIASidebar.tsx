@@ -83,6 +83,12 @@ export interface DomainIASidebarProps {
   /** 서비스별 domain IA. 미주입 시 DEFAULT_OPERATOR_DOMAIN_IA (KPA 계열) 사용 — 기존 3 서비스 무변화.
    *  WO-O4O-OPERATOR-UX-CORE-DOMAINIASIDEBAR-IA-CONFIG-PARAM-V1 */
   domainIAConfig?: OperatorDomainIAConfig;
+  /**
+   * 모바일 드로어 라벨 (default: '운영자 메뉴').
+   * WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1 —
+   * 같은 셸을 관리자 영역에서도 재사용하므로 영역 이름만 주입한다(기본값 유지 = 기존 4서비스 무변화).
+   */
+  menuLabel?: string;
 }
 
 // ─── Group-internal section label (WO-O4O-KPA-OPERATOR-STORES-MENU-VISUAL-SECTION-V1) ──
@@ -103,6 +109,7 @@ export function DomainIASidebar({
   capabilities,
   sidebarTopOffset = 'top-6',
   domainIAConfig = DEFAULT_OPERATOR_DOMAIN_IA,
+  menuLabel = '운영자 메뉴',
 }: DomainIASidebarProps) {
   const { pathname } = useLocation();
 
@@ -399,13 +406,13 @@ export function DomainIASidebar({
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
-          aria-label="운영자 메뉴 열기"
+          aria-label={`${menuLabel} 열기`}
           aria-expanded={mobileOpen}
           aria-controls="operator-mobile-drawer"
           className="w-full flex items-center gap-2 px-4 py-3 bg-white rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
         >
           <Menu className="w-5 h-5" />
-          운영자 메뉴
+          {menuLabel}
         </button>
       </div>
 
@@ -427,7 +434,7 @@ export function DomainIASidebar({
         aria-hidden={!mobileOpen}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
-          <span className="text-sm font-semibold text-gray-700">운영자 메뉴</span>
+          <span className="text-sm font-semibold text-gray-700">{menuLabel}</span>
           <button
             type="button"
             onClick={closeMobile}
