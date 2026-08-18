@@ -14,7 +14,14 @@ import { toast } from '@o4o/error-handling';
 import { AddressSearch } from '@o4o/ui';
 import { Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
-import { MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
+import {
+  MyPageLoadingState,
+  MyPageEmptyState,
+  // WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1:
+  //   KPA 자체 인라인 비밀번호 변경 폼 → 공통 SecuritySection + PasswordChangeModal 로 수렴.
+  SecuritySection,
+  PasswordChangeModal,
+} from '@o4o/account-ui';
 import { mypageApi, type ProfileResponse } from '../../api';
 // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
 //   약국 서비스 별도 신청(pharmacyRequestApi) 흐름 폐지 → import 제거.
@@ -113,15 +120,8 @@ export function MyProfilePage() {
     storeDetailAddress: '',
   });
 
-  // Password
-  const [isPasswordMode, setIsPasswordMode] = useState(false);
-  const [passwordSaving, setPasswordSaving] = useState(false);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    newPasswordConfirm: '',
-  });
+  // Password — 입력값은 공통 PasswordChangeModal 안에서만 유지된다 (이 화면에 저장하지 않는다).
+  const [passwordOpen, setPasswordOpen] = useState(false);
 
   // WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1: 매장 운영 권한 capability 상태
 
@@ -278,44 +278,24 @@ export function MyProfilePage() {
     setIsRoleEdit(false);
   };
 
-  // ─── Password handlers ───
-  const handlePasswordChange = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPasswordError(null);
-    if (passwordData.newPassword.length < 8) {
-      setPasswordError('새 비밀번호는 8자 이상이어야 합니다.');
-      return;
-    }
-    if (passwordData.newPassword !== passwordData.newPasswordConfirm) {
-      setPasswordError('새 비밀번호가 일치하지 않습니다.');
-      return;
-    }
+  // ─── Password handler ───
+  //   검증(일치 / 8자 이상) · 성공 피드백 · 실패 메시지는 공통 모달이 담당한다.
+  //   여기서는 KPA credential API 호출과 오역 메시지 정정만 수행한다.
+  const handlePasswordChange = async (
+    currentPassword: string,
+    newPassword: string,
+    newPasswordConfirm: string,
+  ) => {
     try {
-      setPasswordSaving(true);
-      await mypageApi.changePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword,
-        newPasswordConfirm: passwordData.newPasswordConfirm,
-      });
+      await mypageApi.changePassword({ currentPassword, newPassword, newPasswordConfirm });
       toast.success('비밀번호가 변경되었습니다.');
-      setIsPasswordMode(false);
-      setPasswordData({ currentPassword: '', newPassword: '', newPasswordConfirm: '' });
     } catch (err: any) {
       const message = err?.message || '비밀번호 변경에 실패했습니다.';
       if (message.includes('incorrect') || message.includes('Current password')) {
-        setPasswordError('현재 비밀번호가 올바르지 않습니다.');
-      } else {
-        setPasswordError(message);
+        throw new Error('현재 비밀번호가 올바르지 않습니다.');
       }
-    } finally {
-      setPasswordSaving(false);
+      throw err;
     }
-  };
-
-  const handlePasswordCancel = () => {
-    setIsPasswordMode(false);
-    setPasswordError(null);
-    setPasswordData({ currentPassword: '', newPassword: '', newPasswordConfirm: '' });
   };
 
   // ─── Tab switch ───
@@ -491,41 +471,18 @@ export function MyProfilePage() {
             )}
           </Card>
 
-          {/* 비밀번호 변경 */}
-          <Card padding="large" style={{ marginTop: '24px' }}>
-            <h3 style={styles.sectionTitle}>비밀번호 변경</h3>
-            {isPasswordMode ? (
-              <form onSubmit={handlePasswordChange}>
-                {passwordError && (
-                  <div style={styles.errorBox}><p style={styles.errorText}>{passwordError}</p></div>
-                )}
-                <div style={styles.field}>
-                  <label style={styles.label}>현재 비밀번호</label>
-                  <input type="password" style={styles.input} value={passwordData.currentPassword}
-                    onChange={e => setPasswordData({ ...passwordData, currentPassword: e.target.value })} placeholder="현재 비밀번호를 입력하세요" required />
-                </div>
-                <div style={styles.field}>
-                  <label style={styles.label}>새 비밀번호</label>
-                  <input type="password" style={styles.input} value={passwordData.newPassword}
-                    onChange={e => setPasswordData({ ...passwordData, newPassword: e.target.value })} placeholder="새 비밀번호를 입력하세요 (8자 이상)" required minLength={8} />
-                </div>
-                <div style={styles.field}>
-                  <label style={styles.label}>새 비밀번호 확인</label>
-                  <input type="password" style={styles.input} value={passwordData.newPasswordConfirm}
-                    onChange={e => setPasswordData({ ...passwordData, newPasswordConfirm: e.target.value })} placeholder="새 비밀번호를 다시 입력하세요" required />
-                </div>
-                <div style={styles.actions}>
-                  <button type="button" style={styles.cancelButton} onClick={handlePasswordCancel} disabled={passwordSaving}>취소</button>
-                  <button type="submit" style={styles.submitButton} disabled={passwordSaving}>{passwordSaving ? '변경 중...' : '변경하기'}</button>
-                </div>
-              </form>
-            ) : (
-              <>
-                <p style={styles.sectionDesc}>비밀번호를 변경하려면 아래 버튼을 클릭하세요.</p>
-                <button type="button" style={styles.secondaryButton} onClick={() => setIsPasswordMode(true)}>비밀번호 변경</button>
-              </>
-            )}
-          </Card>
+          {/* 비밀번호 변경 — 공통 계층 (WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1) */}
+          <div style={{ marginTop: '24px' }}>
+            <SecuritySection
+              onPasswordChange={() => setPasswordOpen(true)}
+              description="KPA 로그인 비밀번호"
+            />
+          </div>
+          <PasswordChangeModal
+            open={passwordOpen}
+            onClose={() => setPasswordOpen(false)}
+            onSubmit={handlePasswordChange}
+          />
         </>
       )}
 

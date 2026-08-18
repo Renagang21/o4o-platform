@@ -37,7 +37,11 @@ export function PasswordChangeModal({ open, onClose, onSubmit, submitting = fals
         handleClose();
       }, 1500);
     } catch (err: any) {
-      const message = err.response?.data?.message || err.response?.data?.error || '비밀번호 변경에 실패했습니다.';
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        (err instanceof Error ? err.message : '') ||
+        '비밀번호 변경에 실패했습니다.';
       setFeedback({ type: 'error', message });
     }
   };

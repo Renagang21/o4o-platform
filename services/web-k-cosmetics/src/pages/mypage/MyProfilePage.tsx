@@ -2,11 +2,12 @@
  * MyProfilePage - 프로필 편집
  *
  * WO-O4O-KCOSMETICS-MYPAGE-SPLIT-V1
+ * WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1:
+ *   `@o4o/account-ui` 의 `AccountProfileSection` / `MyPageAuthRequired` 채택.
  *
  * /mypage/profile — 이름 수정. PUT /api/v1/users/profile
  */
 
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth, ROLE_LABELS } from '@/contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
@@ -14,57 +15,72 @@ import { api } from '@/lib/apiClient';
 import { User, Mail, Phone, Shield } from 'lucide-react';
 import {
   MyPageLayout,
-  ProfileCard,
-  ProfileInfoField,
+  MyPageAuthRequired,
+  AccountProfileSection,
+  type AccountProfileFieldSpec,
 } from '@o4o/account-ui';
 import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
 
 export default function MyProfilePage() {
   const { user, isAuthenticated, updateUser } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [editData, setEditData] = useState({
-    name: user?.name || '',
-    nickname: user?.nickname || '',
-    phone: user?.phone || '',
-  });
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-sm p-8 text-center max-w-sm w-full">
-          <h1 className="text-lg font-semibold text-gray-900 mb-4">로그인이 필요합니다</h1>
-          <Link
-            to="/login"
-            className="block w-full py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-center"
-          >
-            로그인
+      <MyPageAuthRequired
+        href="/login"
+        renderLink={(href, className, label) => (
+          <Link to={href} className={className}>
+            {label}
           </Link>
-        </div>
-      </div>
+        )}
+      />
     );
   }
 
   const roleLabel = ROLE_LABELS[user.roles[0]];
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      await api.put('/users/profile', { name: editData.name, nickname: editData.nickname, phone: editData.phone });
-      updateUser({ name: editData.name, nickname: editData.nickname, phone: editData.phone });
-      setIsEditing(false);
-      toast.success('프로필이 수정되었습니다.');
-    } catch (err: any) {
-      const message = err.response?.data?.message || err.response?.data?.error || '프로필 수정에 실패했습니다.';
-      toast.error(message);
-    } finally {
-      setSaving(false);
-    }
+  const fields: AccountProfileFieldSpec[] = [
+    { key: 'name', label: '이름', icon: <User className="w-5 h-5 text-gray-400" /> },
+    {
+      key: 'nickname',
+      label: '닉네임',
+      icon: <User className="w-5 h-5 text-gray-400" />,
+      hint: '포럼, 댓글 등 공개 화면에 표시됩니다.',
+    },
+    {
+      key: 'phone',
+      label: '연락처',
+      type: 'tel',
+      emptyText: '등록된 연락처가 없습니다',
+      icon: <Phone className="w-5 h-5 text-gray-400" />,
+    },
+    {
+      key: 'email',
+      label: '이메일',
+      editable: false,
+      icon: <Mail className="w-5 h-5 text-gray-400" />,
+    },
+    {
+      key: 'role',
+      label: '역할',
+      editable: false,
+      icon: <Shield className="w-5 h-5 text-gray-400" />,
+    },
+  ];
+
+  const values: Record<string, string> = {
+    name: user.name || '',
+    nickname: user.nickname || '',
+    phone: user.phone || '',
+    email: user.email,
+    role: roleLabel,
   };
 
-  const handleCancel = () => {
-    setEditData({ name: user.name || '', nickname: user.nickname || '', phone: user.phone || '' });
-    setIsEditing(false);
+  const handleSave = async (draft: Record<string, string>) => {
+    const patch = { name: draft.name, nickname: draft.nickname, phone: draft.phone };
+    await api.put('/users/profile', patch);
+    updateUser(patch);
+    toast.success('프로필이 수정되었습니다.');
   };
 
   return (
@@ -74,58 +90,16 @@ export default function MyProfilePage() {
       width="form"
       navItems={KCOS_MYPAGE_NAV_ITEMS}
     >
-      <ProfileCard
+      <AccountProfileSection
         initial={user.name?.charAt(0) || '?'}
         name={user.name}
         email={user.email}
         roleLabel={roleLabel}
-        isEditing={isEditing}
-        saving={saving}
-        onEdit={() => setIsEditing(true)}
+        fields={fields}
+        values={values}
         onSave={handleSave}
-        onCancel={handleCancel}
-      >
-        <ProfileInfoField
-          label="이름"
-          value={user.name}
-          editValue={editData.name}
-          isEditing={isEditing}
-          onChange={(v: string) => setEditData(prev => ({ ...prev, name: v }))}
-          icon={<User className="w-5 h-5 text-gray-400" />}
-        />
-        <ProfileInfoField
-          label="닉네임"
-          value={user.nickname || '-'}
-          editValue={editData.nickname}
-          isEditing={isEditing}
-          onChange={(v: string) => setEditData(prev => ({ ...prev, nickname: v }))}
-          icon={<User className="w-5 h-5 text-gray-400" />}
-        />
-        {!isEditing && user.nickname && (
-          <p className="text-xs text-gray-400 -mt-2 ml-10 mb-2">포럼, 댓글 등 공개 화면에 표시됩니다.</p>
-        )}
-        <ProfileInfoField
-          label="연락처"
-          value={user.phone || '등록된 연락처가 없습니다'}
-          editValue={editData.phone}
-          isEditing={isEditing}
-          onChange={(v: string) => setEditData(prev => ({ ...prev, phone: v }))}
-          type="tel"
-          icon={<Phone className="w-5 h-5 text-gray-400" />}
-        />
-        <ProfileInfoField
-          label="이메일"
-          value={user.email}
-          editable={false}
-          icon={<Mail className="w-5 h-5 text-gray-400" />}
-        />
-        <ProfileInfoField
-          label="역할"
-          value={roleLabel}
-          editable={false}
-          icon={<Shield className="w-5 h-5 text-gray-400" />}
-        />
-      </ProfileCard>
+        onError={(message) => toast.error(message)}
+      />
     </MyPageLayout>
   );
 }

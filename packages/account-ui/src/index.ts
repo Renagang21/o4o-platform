@@ -79,3 +79,30 @@ export type {
   BusinessRegistrationFieldsProps,
   BusinessRegistrationFieldsValue,
 } from './components/BusinessRegistrationFields.js';
+
+// ---------------------------------------------------------------------------
+// Profile Core — WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1
+// 5 서비스(KPA / GlycoPharm / K-Cosmetics / Neture / Pharmacy-Hub) 프로필 화면 공통 계층.
+// ---------------------------------------------------------------------------
+export { MyPageAuthRequired } from './components/MyPageAuthRequired.js';
+export type { MyPageAuthRequiredProps } from './components/MyPageAuthRequired.js';
+
+export { AccountProfileSection } from './components/AccountProfileSection.js';
+export type {
+  AccountProfileSectionProps,
+  AccountProfileFieldSpec,
+} from './components/AccountProfileSection.js';
+
+export { BusinessProfileSection } from './components/BusinessProfileSection.js';
+export type {
+  BusinessProfileSectionProps,
+  BusinessProfileData,
+  BusinessProfilePatch,
+  BusinessProfileAccent,
+} from './components/BusinessProfileSection.js';
+
+export { AccountSecuritySettings } from './components/AccountSecuritySettings.js';
+export type {
+  AccountSecuritySettingsProps,
+  AccountSecurityNotify,
+} from './components/AccountSecuritySettings.js';

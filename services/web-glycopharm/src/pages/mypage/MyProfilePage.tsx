@@ -2,26 +2,23 @@
  * MyProfilePage - 프로필 편집
  *
  * WO-O4O-GLYCOPHARM-MYPAGE-SPLIT-V1
+ * WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1:
+ *   ProfileCard + ProfileInfoField 목록 + 편집/저장 상태기계 4중 복제를
+ *   `@o4o/account-ui` 의 `AccountProfileSection` 으로 수렴.
+ *   이 화면은 field 구성 + `PUT /users/profile` adapter 만 담당한다.
  *
  * /mypage/profile — 이름, 연락처 등 개인정보 편집 전용 페이지.
- * 기존 MyPage.tsx에서 프로필 편집 로직을 분리.
  */
 
-import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/apiClient';
 import { toast } from '@o4o/error-handling';
-import {
-  User,
-  Mail,
-  Phone,
-  Building2,
-  Shield,
-} from 'lucide-react';
+import { User, Mail, Phone, Building2, Shield } from 'lucide-react';
 import {
   MyPageLayout,
-  ProfileCard,
-  ProfileInfoField,
+  MyPageAuthRequired,
+  AccountProfileSection,
+  type AccountProfileFieldSpec,
 } from '@o4o/account-ui';
 
 const roleLabels: Record<string, string> = {
@@ -44,136 +41,96 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 
 export default function MyProfilePage() {
   const { user, updateUser } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({
-    lastName: user?.lastName || '',
-    firstName: user?.firstName || '',
-    nickname: user?.nickname || '',
-    phone: user?.phone || '',
-  });
-  const [saving, setSaving] = useState(false);
 
   if (!user) {
-    return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <p className="text-slate-500">로그인이 필요합니다.</p>
-      </div>
-    );
+    return <MyPageAuthRequired />;
   }
 
   const status = statusLabels[user.status] || statusLabels.pending;
-  const displayName = (user.lastName && user.firstName) ? `${user.lastName}${user.firstName}` : user.name;
-  const roleLabel = roleLabels[user.memberships?.find(m => m.serviceKey === 'glycopharm')?.role || ''] || roleLabels[user.roles[0]] || user.roles[0];
+  const displayName =
+    user.lastName && user.firstName ? `${user.lastName}${user.firstName}` : user.name;
+  const roleLabel =
+    roleLabels[user.memberships?.find((m) => m.serviceKey === 'glycopharm')?.role || ''] ||
+    roleLabels[user.roles[0]] ||
+    user.roles[0];
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      const fullName = (editData.lastName && editData.firstName)
-        ? `${editData.lastName}${editData.firstName}`
-        : editData.lastName || editData.firstName || user.name;
-      await api.put('/users/profile', {
-        name: fullName,
-        lastName: editData.lastName,
-        firstName: editData.firstName,
-        nickname: editData.nickname,
-        phone: editData.phone,
-      });
+  const fields: AccountProfileFieldSpec[] = [
+    {
+      key: 'email',
+      label: '이메일',
+      editable: false,
+      icon: <Mail className="w-5 h-5 text-gray-400" />,
+    },
+    { key: 'lastName', label: '성', icon: <User className="w-5 h-5 text-gray-400" /> },
+    { key: 'firstName', label: '이름', icon: <User className="w-5 h-5 text-gray-400" /> },
+    {
+      key: 'nickname',
+      label: '닉네임',
+      icon: <User className="w-5 h-5 text-gray-400" />,
+      hint: '포럼, 댓글 등 공개 화면에 표시됩니다.',
+    },
+    {
+      key: 'phone',
+      label: '연락처',
+      type: 'tel',
+      emptyText: '등록된 연락처가 없습니다',
+      icon: <Phone className="w-5 h-5 text-gray-400" />,
+    },
+    {
+      key: 'role',
+      label: '역할',
+      editable: false,
+      icon: <Building2 className="w-5 h-5 text-gray-400" />,
+    },
+    {
+      key: 'status',
+      label: '상태',
+      editable: false,
+      icon: <Shield className="w-5 h-5 text-gray-400" />,
+    },
+  ];
 
-      updateUser({
-        name: fullName,
-        lastName: editData.lastName,
-        firstName: editData.firstName,
-        nickname: editData.nickname,
-        phone: editData.phone,
-      });
-      setIsEditing(false);
-      toast.success('프로필이 수정되었습니다.');
-    } catch (err: any) {
-      const message = err.response?.data?.message || err.response?.data?.error || (err instanceof Error ? err.message : '프로필 수정에 실패했습니다.');
-      toast.error(message);
-    } finally {
-      setSaving(false);
-    }
+  const values: Record<string, string> = {
+    email: user.email,
+    lastName: user.lastName || '',
+    firstName: user.firstName || '',
+    nickname: user.nickname || '',
+    phone: user.phone || '',
+    role: roleLabel,
+    status: status.label,
   };
 
-  const handleCancel = () => {
-    setIsEditing(false);
-    setEditData({ lastName: user.lastName || '', firstName: user.firstName || '', nickname: user.nickname || '', phone: user.phone || '' });
+  const handleSave = async (draft: Record<string, string>) => {
+    const fullName =
+      draft.lastName && draft.firstName
+        ? `${draft.lastName}${draft.firstName}`
+        : draft.lastName || draft.firstName || user.name;
+    const patch = {
+      name: fullName,
+      lastName: draft.lastName,
+      firstName: draft.firstName,
+      nickname: draft.nickname,
+      phone: draft.phone,
+    };
+    await api.put('/users/profile', patch);
+    updateUser(patch);
+    toast.success('프로필이 수정되었습니다.');
   };
 
   return (
     <MyPageLayout title="마이페이지" width="form">
-      <ProfileCard
+      <AccountProfileSection
         initial={user.lastName?.charAt(0) || user.name?.charAt(0) || '?'}
         name={displayName}
         email={user.email}
         roleLabel={roleLabel}
         statusLabel={status.label}
         statusColor={status.color}
-        isEditing={isEditing}
-        saving={saving}
-        onEdit={() => {
-          setEditData({ lastName: user.lastName || '', firstName: user.firstName || '', nickname: user.nickname || '', phone: user.phone || '' });
-          setIsEditing(true);
-        }}
+        fields={fields}
+        values={values}
         onSave={handleSave}
-        onCancel={handleCancel}
-      >
-        <ProfileInfoField
-          label="이메일"
-          value={user.email}
-          editable={false}
-          icon={<Mail className="w-5 h-5 text-gray-400" />}
-        />
-        <ProfileInfoField
-          label="성"
-          value={user.lastName || '-'}
-          editValue={editData.lastName}
-          isEditing={isEditing}
-          onChange={(v) => setEditData(prev => ({ ...prev, lastName: v }))}
-          icon={<User className="w-5 h-5 text-gray-400" />}
-        />
-        <ProfileInfoField
-          label="이름"
-          value={user.firstName || '-'}
-          editValue={editData.firstName}
-          isEditing={isEditing}
-          onChange={(v) => setEditData(prev => ({ ...prev, firstName: v }))}
-          icon={<User className="w-5 h-5 text-gray-400" />}
-        />
-        <ProfileInfoField
-          label="닉네임"
-          value={user.nickname || '-'}
-          editValue={editData.nickname}
-          isEditing={isEditing}
-          onChange={(v) => setEditData(prev => ({ ...prev, nickname: v }))}
-          icon={<User className="w-5 h-5 text-gray-400" />}
-        />
-        {!isEditing && user.nickname && (
-          <p className="text-xs text-gray-400 -mt-2 ml-10 mb-2">포럼, 댓글 등 공개 화면에 표시됩니다.</p>
-        )}
-        <ProfileInfoField
-          label="연락처"
-          value={user.phone || '등록된 연락처가 없습니다'}
-          editValue={editData.phone}
-          isEditing={isEditing}
-          onChange={(v) => setEditData(prev => ({ ...prev, phone: v }))}
-          type="tel"
-          icon={<Phone className="w-5 h-5 text-gray-400" />}
-        />
-        <ProfileInfoField
-          label="역할"
-          value={roleLabel}
-          editable={false}
-          icon={<Building2 className="w-5 h-5 text-gray-400" />}
-        />
-        <ProfileInfoField
-          label="상태"
-          value={status.label}
-          editable={false}
-          icon={<Shield className="w-5 h-5 text-gray-400" />}
-        />
-      </ProfileCard>
+        onError={(message) => toast.error(message)}
+      />
     </MyPageLayout>
   );
 }
