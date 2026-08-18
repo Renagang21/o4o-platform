@@ -6,9 +6,13 @@ import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
 import {
   guardCourseScope,
-  guardLoadedCourseScope,
   resolveScopeOrRespond,
 } from '../utils/lms-scope-guard.js';
+// WO-O4O-LMS-ENROLLMENT-OWNERSHIP-AND-AUTHORIZATION-BOUNDARY-FIX-V1
+import {
+  resolveOwnedEnrollmentOrRespond,
+  isLmsElevatedManager,
+} from '../utils/lms-enrollment-owner-guard.js';
 
 /**
  * EnrollmentController
@@ -18,20 +22,14 @@ import {
 export class EnrollmentController extends BaseController {
   /**
    * WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §6
-   * enrollment id 기반 mutation 이 요청 scope 안의 course 를 대상으로 하는지 확인한다.
-   * 무경계(legacy/admin) 요청에서는 추가 쿼리 0 으로 통과한다.
+   * WO-O4O-LMS-ENROLLMENT-OWNERSHIP-AND-AUTHORIZATION-BOUNDARY-FIX-V1 §3/§4
+   *
+   * enrollment id 기반 user-facing mutation 의 공통 authorization.
+   * scope(타 서비스) → ownership(같은 서비스 타인) 순으로 판정하고, 어느 쪽이든
+   * non-disclosure 계약대로 404 로 응답한다. 경로별로 중복 구현하지 않는다.
    */
-  private static async ensureEnrollmentInScope(req: Request, res: Response, id: string): Promise<boolean> {
-    const scope = resolveScopeOrRespond(req, res);
-    if (!scope.ok) return false;
-    if (!scope.scope) return true;
-
-    const enrollment = await EnrollmentService.getInstance().getEnrollment(id);
-    if (!enrollment) {
-      BaseController.notFound(res, 'Enrollment not found');
-      return false;
-    }
-    return guardLoadedCourseScope(req, res, enrollment.course?.serviceKey, 'Enrollment not found');
+  private static async ensureOwnEnrollment(req: Request, res: Response, id: string): Promise<boolean> {
+    return (await resolveOwnedEnrollmentOrRespond(req, res, id)) !== null;
   }
 
   static async enrollCourse(req: Request, res: Response): Promise<any> {
@@ -72,16 +70,12 @@ export class EnrollmentController extends BaseController {
   static async getEnrollment(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
-      const service = EnrollmentService.getInstance();
 
-      const enrollment = await service.getEnrollment(id);
-
-      if (!enrollment) {
-        return BaseController.notFound(res, 'Enrollment not found');
-      }
-
-      // 이미 로드된 course relation 으로 service boundary 판정 (추가 쿼리 0)
-      if (!guardLoadedCourseScope(req, res, enrollment.course?.serviceKey, 'Enrollment not found')) return;
+      // WO-O4O-LMS-ENROLLMENT-OWNERSHIP-AND-AUTHORIZATION-BOUNDARY-FIX-V1 §6:
+      // scope → ownership 순 판정. 타인 enrollment 상세는 id 만으로 읽을 수 없다.
+      // 강사/관리자용 조회는 `/lms/instructor/*` 계약을 사용한다.
+      const enrollment = await resolveOwnedEnrollmentOrRespond(req, res, id);
+      if (!enrollment) return;
 
       return BaseController.ok(res, { enrollment });
     } catch (error: any) {
@@ -97,6 +91,14 @@ export class EnrollmentController extends BaseController {
 
       // client 가 보낸 raw serviceKey 를 신뢰하지 않고 canonical 해석값으로 덮어쓴다.
       const filters: any = { ...req.query, serviceKey: scope.scope };
+
+      // WO-O4O-LMS-ENROLLMENT-OWNERSHIP-AND-AUTHORIZATION-BOUNDARY-FIX-V1 §6:
+      // 일반 사용자는 타인 수강 목록을 볼 수 없다. 기존 관리 정책(lms:instructor / kpa:admin)
+      // 보유자에게만 전체 목록을 유지하고, 그 외에는 본인 것으로 강제 축소한다.
+      if (!(await isLmsElevatedManager(req))) {
+        filters.userId = (req as any).user?.id;
+      }
+
       const service = EnrollmentService.getInstance();
 
       const { enrollments, total } = await service.listEnrollments(filters);
@@ -146,7 +148,7 @@ export class EnrollmentController extends BaseController {
       const { id } = req.params;
       const data = req.body;
 
-      if (!(await EnrollmentController.ensureEnrollmentInScope(req, res, id))) return;
+      if (!(await EnrollmentController.ensureOwnEnrollment(req, res, id))) return;
 
       const service = EnrollmentService.getInstance();
 
@@ -168,7 +170,7 @@ export class EnrollmentController extends BaseController {
     try {
       const { id } = req.params;
 
-      if (!(await EnrollmentController.ensureEnrollmentInScope(req, res, id))) return;
+      if (!(await EnrollmentController.ensureOwnEnrollment(req, res, id))) return;
 
       const service = EnrollmentService.getInstance();
 
@@ -191,7 +193,7 @@ export class EnrollmentController extends BaseController {
       const { id } = req.params;
       const { finalScore } = req.body;
 
-      if (!(await EnrollmentController.ensureEnrollmentInScope(req, res, id))) return;
+      if (!(await EnrollmentController.ensureOwnEnrollment(req, res, id))) return;
 
       const service = EnrollmentService.getInstance();
 
@@ -213,7 +215,7 @@ export class EnrollmentController extends BaseController {
     try {
       const { id } = req.params;
 
-      if (!(await EnrollmentController.ensureEnrollmentInScope(req, res, id))) return;
+      if (!(await EnrollmentController.ensureOwnEnrollment(req, res, id))) return;
 
       const service = EnrollmentService.getInstance();
 

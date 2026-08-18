@@ -226,7 +226,11 @@ describe('정적 회귀 — write 경로 guard 배선', () => {
   });
 
   it('enrollment 단건/상태 변경은 scope 확인을 거친다', () => {
-    expect(enrollment).toContain('ensureEnrollmentInScope');
+    // WO-O4O-LMS-ENROLLMENT-OWNERSHIP-AND-AUTHORIZATION-BOUNDARY-FIX-V1 에서
+    // 동일 helper 가 scope → ownership 순으로 확장되며 ensureOwnEnrollment 로 개명됐다.
+    expect(enrollment).toContain('ensureOwnEnrollment');
+    expect(read('apps/api-server/src/modules/lms/utils/lms-enrollment-owner-guard.ts'))
+      .toContain('guardLoadedCourseScope');
   });
 
   it('목록 필터의 client serviceKey 는 canonical 해석값으로 덮어쓴다', () => {
