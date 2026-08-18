@@ -11,7 +11,9 @@
  * GlycoPharm / KPA 는 서비스별 User 구조가 달라 normalizeMemberships 만 사용.
  *
  * 미포함:
- *   - 서비스별 추가 필드 (nickname, isStoreOwner, activityType 등)
+ *   - 서비스별 추가 필드 (isStoreOwner, activityType 등)
+ *     nickname 은 ACCOUNT_CORE 공통 필드라 normalizeUser 가 포함한다
+ *     (WO-O4O-CROSS-SERVICE-PROFILE-FINAL-BROWSER-CLOSURE-V1).
  *   - KPA kpaMembership 필드
  *   - redirect/login UI 로직
  */
@@ -29,6 +31,8 @@ export interface PlatformUser {
   name: string;
   status: string;
   phone?: string;
+  /** WO-O4O-CROSS-SERVICE-PROFILE-FINAL-BROWSER-CLOSURE-V1: ACCOUNT_CORE 공통 필드 */
+  nickname?: string;
   createdAt?: string;
   updatedAt?: string;
   roles: string[];
