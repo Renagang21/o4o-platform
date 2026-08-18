@@ -181,6 +181,14 @@ export interface CheckoutOrderItemDetail {
   subtotal: number;
 }
 
+export interface CheckoutOrderCancelResult {
+  ok?: boolean;
+  orderId: string;
+  status: string;
+  alreadyCancelled: boolean;
+  releasedListings?: Array<{ listingId: string; quantity: number }>;
+}
+
 export interface CheckoutOrderDetail extends CheckoutOrderSummary {
   subtotal: number;
   shippingFee: number;
@@ -553,6 +561,22 @@ class PharmacyApiClient {
    */
   async getCheckoutOrderDetail(orderId: string): Promise<StoreApiResponse<CheckoutOrderDetail>> {
     return this.request(`/glycopharm/checkout/orders/${orderId}`);
+  }
+
+  /**
+   * 결제 전 주문 취소 — WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1 §9
+   * 백엔드 `POST /glycopharm/checkout/orders/:orderId/cancel`
+   * (3서비스 공통 `cancelStoreOrderBeforePayment`). created / pending_payment 만 취소 가능하며,
+   * 이미 취소된 주문은 멱등 성공이다. 이벤트 오퍼 주문이면 예약 재고가 복원된다.
+   */
+  async cancelCheckoutOrder(
+    orderId: string,
+    reason?: string,
+  ): Promise<StoreApiResponse<CheckoutOrderCancelResult>> {
+    return this.request(`/glycopharm/checkout/orders/${orderId}/cancel`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    });
   }
 
   // ============================================================================

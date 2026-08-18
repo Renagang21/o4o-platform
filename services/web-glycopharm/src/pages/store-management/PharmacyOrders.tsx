@@ -15,12 +15,28 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Clock, CheckCircle2, XCircle, ChevronDown, Loader2 } from 'lucide-react';
-import { BuyerOrderLedgerView } from '@o4o/store-ui-core';
+import { toast } from '@o4o/error-handling';
+import {
+  BuyerOrderLedgerView,
+  BuyerOrderCancelButton,
+  useBuyerOrderCancel,
+  isBuyerOrderCancellable,
+} from '@o4o/store-ui-core';
 import {
   pharmacyApi,
   type CheckoutOrderSummary,
   type CheckoutOrderDetail,
 } from '@/api/pharmacy';
+
+/**
+ * 금액 표기 — WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1 §9
+ * checkout_orders 금액은 numeric 이라 API 가 문자열(`"11900.00"`)로 내려준다.
+ * 문자열에 `.toLocaleString()` 을 걸면 그대로 `11900.00원` 이 나와 production 에서
+ * 소수점 표기가 노출됐다. 숫자로 정규화한 뒤 ko-KR 로 포맷한다.
+ */
+function won(v: number | string | null | undefined): string {
+  return `${Number(v ?? 0).toLocaleString('ko-KR')}원`;
+}
 
 /** buyer 관점 파생 상태 (결제 중심) */
 type DerivedKey = 'paid' | 'pending' | 'cancelled';
@@ -124,6 +140,24 @@ export default function PharmacyOrders() {
     [expandedOrder, detailMap],
   );
 
+  /**
+   * 결제 전 취소 — WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1 §9
+   * 백엔드 계약(`POST /glycopharm/checkout/orders/:id/cancel`)은 이미 있었으나
+   * 매장 화면에 진입점이 없어 매장이 스스로 되돌릴 수 없었다.
+   */
+  const { cancel, cancelingId } = useBuyerOrderCancel({
+    cancelOrder: async (orderId, reason) => {
+      const res = await pharmacyApi.cancelCheckoutOrder(orderId, reason);
+      if (!res.success || !res.data) throw new Error('주문 취소에 실패했습니다.');
+      return res.data;
+    },
+    onCancelled: async () => {
+      setDetailMap({});
+      await loadOrders();
+    },
+    notify: (message, kind) => (kind === 'success' ? toast.success(message) : toast.error(message)),
+  });
+
   const renderList = useMemo(
     () => (rows: CheckoutOrderSummary[]) => (
       <div className="space-y-4">
@@ -157,8 +191,15 @@ export default function PharmacyOrders() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <p className="font-bold text-slate-800">{(order.totalAmount || 0).toLocaleString()}원</p>
+                <div className="flex items-center gap-3">
+                  <p className="font-bold text-slate-800">{won(order.totalAmount)}</p>
+                  {isBuyerOrderCancellable(order) && (
+                    <BuyerOrderCancelButton
+                      orderId={order.id}
+                      onCancel={cancel}
+                      cancelingId={cancelingId}
+                    />
+                  )}
                   <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                 </div>
               </div>
@@ -180,7 +221,7 @@ export default function PharmacyOrders() {
                             <div key={idx} className="flex items-center justify-between rounded-lg bg-white p-2">
                               <span className="text-sm text-slate-700">{item.productName}</span>
                               <span className="text-sm text-slate-500">
-                                {item.quantity}개 × {(item.unitPrice || 0).toLocaleString()}원
+                                {item.quantity}개 × {won(item.unitPrice)}
                               </span>
                             </div>
                           ))}
@@ -194,18 +235,18 @@ export default function PharmacyOrders() {
                         <h4 className="mb-2 text-sm font-medium text-slate-700">결제 요약</h4>
                         <div className="space-y-1 rounded-lg bg-white p-3 text-sm">
                           <div className="flex justify-between text-slate-600">
-                            <span>상품 금액</span><span>{(detail.subtotal || 0).toLocaleString()}원</span>
+                            <span>상품 금액</span><span>{won(detail.subtotal)}</span>
                           </div>
                           <div className="flex justify-between text-slate-600">
-                            <span>배송비</span><span>{(detail.shippingFee || 0).toLocaleString()}원</span>
+                            <span>배송비</span><span>{won(detail.shippingFee)}</span>
                           </div>
                           {(detail.discount || 0) > 0 && (
                             <div className="flex justify-between text-slate-600">
-                              <span>할인</span><span>-{(detail.discount || 0).toLocaleString()}원</span>
+                              <span>할인</span><span>-{won(detail.discount)}</span>
                             </div>
                           )}
                           <div className="mt-1 flex justify-between border-t pt-1 font-semibold text-slate-800">
-                            <span>총 결제금액</span><span>{(detail.totalAmount || 0).toLocaleString()}원</span>
+                            <span>총 결제금액</span><span>{won(detail.totalAmount)}</span>
                           </div>
                           <div className="flex justify-between pt-1 text-slate-500">
                             <span>결제 상태</span><span>{deriveState(detail).label}</span>
@@ -221,7 +262,7 @@ export default function PharmacyOrders() {
         })}
       </div>
     ),
-    [expandedOrder, detailMap, toggleExpand],
+    [expandedOrder, detailMap, toggleExpand, cancel, cancelingId],
   );
 
   return (

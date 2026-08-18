@@ -24,7 +24,11 @@
  *   - 목록 본문 = `renderList` slot (KPA DataTable / GP 확장 카드 — 업무상 다른 표현)
  *   - 헤더 우측 액션 = `headerAction` slot (KPA 주문 작업대 링크)
  *
- * 상태 변경 기능은 없다. buyer ledger 는 **읽기 전용**이다(seller 이행 화면은 별도).
+ * 상태 변경은 **결제 전 취소 하나뿐**이다(seller 이행 화면은 별도).
+ * WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1 §9:
+ *   백엔드 취소 계약이 3 서비스에 있는데 UI 가 없어 매장이 되돌릴 수 없었다.
+ *   취소 실행은 `useBuyerOrderCancel` + `BuyerOrderCancelButton` 공통 조각을 쓰고,
+ *   버튼 배치는 목록 본문을 소유한 서비스(`renderList`)가 정한다.
  */
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';

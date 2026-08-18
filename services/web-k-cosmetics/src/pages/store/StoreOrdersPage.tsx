@@ -17,9 +17,11 @@
 
 import { useState, useEffect, useCallback, useMemo, type CSSProperties } from 'react';
 import { AlertTriangle, Loader2, X } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import {
   getStoreOrders,
   getStoreOrder,
+  cancelStoreOrder,
   type StoreOrder,
   type StoreOrderDetail,
 } from '@/api/storeOrders';
@@ -31,6 +33,9 @@ import {
   getBuyerPaymentStatusLabel,
   BuyerOrderStatusBadge,
   BuyerOrderLedgerView,
+  BuyerOrderCancelButton,
+  useBuyerOrderCancel,
+  isBuyerOrderCancellable,
 } from '@o4o/store-ui-core';
 
 const PAGE_SIZE = 20;
@@ -114,6 +119,30 @@ export default function StoreOrdersPage() {
     }
   }, []);
 
+  /**
+   * 결제 전 취소 — WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1 §9
+   * 백엔드 계약은 이미 있었으나 매장 화면에 진입점이 없었다. 확인·멱등·재조회는 공통 훅이 가진다.
+   */
+  const { cancel, cancelingId } = useBuyerOrderCancel({
+    cancelOrder: async (orderId, reason) => {
+      const res = await cancelStoreOrder(orderId, reason);
+      if (!res.success) throw new Error('주문 취소에 실패했습니다.');
+      return res.data;
+    },
+    onCancelled: async () => {
+      await loadOrders();
+      if (selectedId) {
+        try {
+          const res = await getStoreOrder(selectedId);
+          setDetail(res.data);
+        } catch {
+          /* 상세 갱신 실패는 목록 갱신을 막지 않는다 */
+        }
+      }
+    },
+    notify: (message, kind) => (kind === 'success' ? toast.success(message) : toast.error(message)),
+  });
+
   const renderList = useMemo(
     () => (rows: StoreOrder[]) => (
       <div style={s.tableWrap}>
@@ -127,6 +156,7 @@ export default function StoreOrdersPage() {
               <th style={{ ...s.th, textAlign: 'right' }}>주문 금액</th>
               <th style={{ ...s.th, textAlign: 'center' }}>주문 상태</th>
               <th style={{ ...s.th, textAlign: 'center' }}>결제 상태</th>
+              <th style={{ ...s.th, textAlign: 'right' }}>관리</th>
             </tr>
           </thead>
           <tbody>
@@ -165,13 +195,24 @@ export default function StoreOrdersPage() {
                     {getBuyerPaymentStatusLabel(order.paymentStatus)}
                   </span>
                 </td>
+                <td style={{ ...s.td, textAlign: 'right' }}>
+                  {isBuyerOrderCancellable(order) ? (
+                    <BuyerOrderCancelButton
+                      orderId={order.id}
+                      onCancel={cancel}
+                      cancelingId={cancelingId}
+                    />
+                  ) : (
+                    <span style={{ fontSize: 12, color: '#D1D5DB' }}>—</span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
     ),
-    [handleRowClick, selectedId],
+    [handleRowClick, selectedId, cancel, cancelingId],
   );
 
   return (

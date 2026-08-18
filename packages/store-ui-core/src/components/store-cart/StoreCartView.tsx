@@ -155,7 +155,9 @@ export function StoreCartView({
             >
               <div className="flex justify-between items-center pb-3 mb-3 border-b border-slate-100">
                 <span className="text-sm font-semibold text-slate-700">
-                  공급자 {group.supplierId ? '#' + group.supplierId : '미지정'}
+                  {/* WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1 §9:
+                      공급자 UUID 노출 제거. 표시명(organizations.name)이 없으면 중립 문구. */}
+                  {group.supplierName || (group.supplierId ? '공급자' : '공급자 미지정')}
                 </span>
                 <span className="text-sm font-semibold text-slate-900">{won(group.displaySubtotal)}</span>
               </div>

@@ -393,6 +393,16 @@ export type {
   BuyerOrderLedgerViewProps,
 } from './components/order-ledger/BuyerOrderLedgerView';
 
+// 결제 전 주문 취소 — 백엔드 계약(WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1)의
+// 매장측 UI 노출. KPA · GlycoPharm · K-Cosmetics 공통(Pharmacy-Hub 는 자체 결제 우선 화면 유지).
+export { useBuyerOrderCancel, isBuyerOrderCancellable } from './components/order-ledger/useBuyerOrderCancel';
+export type {
+  BuyerOrderCancelResult,
+  UseBuyerOrderCancelOptions,
+} from './components/order-ledger/useBuyerOrderCancel';
+export { BuyerOrderCancelButton } from './components/order-ledger/BuyerOrderCancelButton';
+export type { BuyerOrderCancelButtonProps } from './components/order-ledger/BuyerOrderCancelButton';
+
 // 매장 경영활용 제품 — 교차 서비스 데이터 계약 + 목록 UI 파트
 // (WO-O4O-MY-STORE-HANDLED-PRODUCTS-VIEW-COMMONIZATION-V1)
 // 타입은 `@o4o/store-ui-core/handled-products` subpath 로도 노출된다(기존 소비처 유지).

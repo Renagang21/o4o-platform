@@ -204,3 +204,49 @@ export async function getBuyerOrders(params?: {
 }> {
   return apiClient.get('/checkout/orders', params);
 }
+
+/** buyer 주문 상세 — GET /kpa/checkout/orders/:orderId (buyerId 스코프) */
+export interface BuyerOrderDetail extends BuyerOrder {
+  subtotal: number;
+  shippingFee: number;
+  discount: number;
+  deliveryMethod?: string | null;
+  shippingAddress?: Record<string, unknown> | null;
+  items?: Array<{
+    productId: string;
+    productName: string;
+    quantity: number;
+    unitPrice: number;
+    subtotal: number;
+  }>;
+  paidAt?: string | null;
+  updatedAt?: string;
+}
+
+export async function getBuyerOrderDetail(orderId: string): Promise<{
+  success: boolean;
+  data: BuyerOrderDetail;
+}> {
+  return apiClient.get(`/checkout/orders/${orderId}`);
+}
+
+/**
+ * 결제 전 주문 취소 — POST /kpa/checkout/orders/:orderId/cancel
+ * WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1 계약.
+ * 이미 취소된 주문은 멱등 성공(alreadyCancelled=true).
+ */
+export async function cancelBuyerOrder(
+  orderId: string,
+  reason?: string,
+): Promise<{
+  success: boolean;
+  data: {
+    ok: boolean;
+    orderId: string;
+    status: string;
+    alreadyCancelled: boolean;
+    releasedListings: Array<{ listingId: string; quantity: number }>;
+  };
+}> {
+  return apiClient.post(`/checkout/orders/${orderId}/cancel`, { reason });
+}

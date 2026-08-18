@@ -93,6 +93,12 @@ export interface SupplierGroupShipping {
 /** 공급자별 묶음 — 배송비/무료배송/주문 분할의 단위 */
 export interface SupplierGroup {
   supplierId: string | null;
+  /**
+   * 공급자 표시명. SSOT = `organizations.name`(neture_suppliers 에 상호 컬럼이 없다).
+   * 조직 bridge 미설정이면 null — 화면은 UUID 대신 중립 문구를 쓴다.
+   * WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1 §9
+   */
+  supplierName: string | null;
   items: StoreCartItem[];
   itemCount: number;
   totalQuantity: number;
@@ -283,6 +289,34 @@ export class StoreCartService {
   }
 
   /**
+   * 공급자 표시명 batch 조회 (supplierId = NetureSupplier.id).
+   * 표시명 SSOT = organizations.name — neture_suppliers 에 상호 컬럼이 없다.
+   * 조회 실패/미연결이면 이름 없음(null)으로 두고 화면이 중립 문구를 쓴다.
+   */
+  private async loadSupplierNames(
+    supplierIds: Array<string | null>,
+  ): Promise<Map<string, string>> {
+    const ids = [...new Set(supplierIds.filter((s): s is string => !!s && UUID_RE.test(s)))];
+    const map = new Map<string, string>();
+    if (!ids.length) return map;
+    try {
+      const rows: Array<{ id: string; name: string | null }> = await this.dataSource.query(
+        `SELECT ns.id::text AS id, o.name AS name
+           FROM neture_suppliers ns
+           LEFT JOIN organizations o ON o.id = ns.organization_id
+          WHERE ns.id::text = ANY($1)`,
+        [ids],
+      );
+      for (const r of rows) {
+        if (r.name) map.set(r.id, r.name);
+      }
+    } catch (e) {
+      console.warn('[StoreCart] loadSupplierNames failed, 표시명 생략:', e);
+    }
+    return map;
+  }
+
+  /**
    * 공급자 배송 정책 batch 조회 (supplierId = NetureSupplier.id).
    * WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1.
    * cart.supplierId 는 varchar 이므로 uuid 형태만 조회. 조회 실패/미설정 → 정책 없음(0원 fallback).
@@ -345,9 +379,11 @@ export class StoreCartService {
       else buckets.set(key, [item]);
     }
 
-    const policies = await this.loadShippingPolicies(
-      Array.from(buckets.values()).map((g) => g[0].supplierId ?? null),
-    );
+    const groupSupplierIds = Array.from(buckets.values()).map((g) => g[0].supplierId ?? null);
+    const [policies, supplierNames] = await Promise.all([
+      this.loadShippingPolicies(groupSupplierIds),
+      this.loadSupplierNames(groupSupplierIds),
+    ]);
 
     return Array.from(buckets.values()).map((groupItems) => {
       const supplierId = groupItems[0].supplierId ?? null;
@@ -362,6 +398,7 @@ export class StoreCartService {
       );
       return {
         supplierId,
+        supplierName: supplierId ? supplierNames.get(supplierId) ?? null : null,
         items: groupItems,
         itemCount: groupItems.length,
         totalQuantity,

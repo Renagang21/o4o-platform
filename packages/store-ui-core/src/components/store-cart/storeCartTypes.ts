@@ -69,6 +69,8 @@ export interface SupplierGroupShipping {
 
 export interface SupplierGroup {
   supplierId: string | null;
+  /** 공급자 표시명(SSOT = organizations.name). 미연결이면 null — 화면은 UUID 를 노출하지 않는다. */
+  supplierName?: string | null;
   items: StoreCartItem[];
   itemCount: number;
   totalQuantity: number;

@@ -348,7 +348,11 @@ const st: Record<string, React.CSSProperties> = {
   /* Resource cards */
   cardGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
+    // WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1 §7:
+    // `1fr` 은 min-content 바닥을 가져 카드 문구가 길면 트랙이 컨테이너를 넘는다.
+    // mobile 390px 에서 K-Cosmetics 68px · GlycoPharm 57px 가로 스크롤이 실측됐다.
+    // minmax(0, 1fr) 로 바닥을 풀어 2열 데스크톱 레이아웃은 그대로 두고 넘침만 없앤다.
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
     gap: 12,
   },
   resourceCard: {
