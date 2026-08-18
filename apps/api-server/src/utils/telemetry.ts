@@ -54,10 +54,9 @@ export function initTelemetry(): NodeSDK | null {
         : undefined,
       instrumentations: [
         getNodeAutoInstrumentations({
-          // Auto-instrument HTTP, Express, Redis, etc.
+          // Auto-instrument HTTP, Express, etc.
           '@opentelemetry/instrumentation-http': { enabled: true },
           '@opentelemetry/instrumentation-express': { enabled: true },
-          '@opentelemetry/instrumentation-ioredis': { enabled: true },
         }),
       ],
     });

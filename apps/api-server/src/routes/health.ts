@@ -1,6 +1,5 @@
 import { Router, Request, Response } from 'express';
 import { AppDataSource } from '../database/connection.js';
-import { getRedisClient } from '../infrastructure/redis.guard.js';
 import { opsMetrics } from '../services/ops-metrics.service.js';
 import * as os from 'os';
 
@@ -150,21 +149,6 @@ router.get('/system', async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(503).json({
       component: 'system',
-      status: 'unhealthy',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
-// Redis health check endpoint
-router.get('/redis', async (req: Request, res: Response) => {
-  try {
-    const redisHealth = await checkRedisHealth();
-    res.status(redisHealth.status === 'healthy' ? 200 : 503).json(redisHealth);
-  } catch (error: any) {
-    res.status(503).json({
-      component: 'redis',
       status: 'unhealthy',
       error: error instanceof Error ? error.message : 'Unknown error',
       timestamp: new Date().toISOString()
@@ -455,62 +439,5 @@ async function checkDiskHealth(): Promise<HealthComponent> {
   }
 }
 
-async function checkRedisHealth(): Promise<HealthComponent> {
-  const start = Date.now();
-
-  try {
-    const client = getRedisClient();
-
-    if (!client) {
-      return {
-        component: 'redis',
-        status: 'not_configured',
-        responseTime: Date.now() - start,
-        details: {
-          message: 'Redis not configured or not connected',
-        },
-        timestamp: new Date().toISOString(),
-      };
-    }
-
-    // PING to measure actual latency
-    await client.ping();
-    const latencyMs = Date.now() - start;
-
-    // Cache hit ratio from OpsMetrics snapshot
-    const snapshot = opsMetrics.snapshot();
-    const hits = snapshot['cache.hit'] || 0;
-    const misses = snapshot['cache.miss'] || 0;
-    const errors = snapshot['cache.error'] || 0;
-    const total = hits + misses;
-    const hitRate = total > 0 ? Math.round((hits / total) * 10000) / 100 : null;
-
-    return {
-      component: 'redis',
-      status: latencyMs > 200 ? 'degraded' : 'healthy',
-      responseTime: latencyMs,
-      details: {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
-        pingMs: latencyMs,
-        cache: {
-          hits,
-          misses,
-          errors,
-          hitRate,
-        },
-      },
-      timestamp: new Date().toISOString(),
-    };
-  } catch (error: any) {
-    return {
-      component: 'redis',
-      status: 'unhealthy',
-      responseTime: Date.now() - start,
-      error: error instanceof Error ? error.message : 'Redis check failed',
-      timestamp: new Date().toISOString(),
-    };
-  }
-}
 
 export default router;

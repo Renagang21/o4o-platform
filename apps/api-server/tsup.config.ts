@@ -80,8 +80,6 @@ export default defineConfig({
     'express-session',
     'express-rate-limit',
     'express-validator',
-    'connect-redis',
-    'rate-limit-redis',
     'multer',
     'passport',
     'passport-google-oauth20',
@@ -97,8 +95,6 @@ export default defineConfig({
 
     // Redis
     'ioredis',
-    'redis',
-    'redis-cache-express',
     'bullmq',
 
     // WebSocket

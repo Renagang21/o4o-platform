@@ -51,7 +51,6 @@ export * from './email.service.js';
 // export * from './inventoryService.js';
 export * from './passwordResetService.js';
 // export * from './pricingService.js';
-export * from './sessionSyncService.js';
 export * from './settingsService.js';
 export * from './socialAuthService.js';
 // export * from './webhookService.js';

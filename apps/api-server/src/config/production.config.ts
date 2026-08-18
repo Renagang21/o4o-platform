@@ -5,7 +5,6 @@ import { Express } from 'express';
 import { specs, swaggerUi } from '../swagger/swagger.config.js';
 import { performanceMiddleware } from '../middleware/performance.middleware.js';
 import errorHandler from '../middleware/errorHandler.middleware.js';
-import { cacheService } from '../services/cache.service.js';
 import logger from '../utils/logger.js';
 
 // Rate limiting configurations
@@ -195,7 +194,6 @@ export const setupProductionMiddleware = (app: Express) => {
       timestamp: new Date().toISOString(),
       services: {
         database: { status: 'unknown' },
-        redis: { status: 'unknown' },
         memory: { status: 'healthy' },
         disk: { status: 'healthy' },
       },
@@ -210,10 +208,6 @@ export const setupProductionMiddleware = (app: Express) => {
       // Check database connection
       const dbCheck = await checkDatabaseHealth();
       health.services.database = dbCheck;
-      
-      // Check Redis connection
-      const redisCheck = await checkRedisHealth();
-      health.services.redis = redisCheck;
 
       // Check memory usage
       const memCheck = checkMemoryHealth();
@@ -251,24 +245,6 @@ async function checkDatabaseHealth() {
     // Simple query to check connection
     await AppDataSource.query('SELECT 1');
     return { status: 'healthy', message: 'Database connected' };
-  } catch (error) {
-    return { status: 'unhealthy', message: error.message };
-  }
-}
-
-async function checkRedisHealth() {
-  try {
-    const stats = await cacheService.getCacheStats();
-    if (!stats.connected) {
-      return { status: 'unhealthy', message: 'Redis disconnected' };
-    }
-
-    return { 
-      status: 'healthy', 
-      message: 'Redis connected',
-      keyCount: stats.keyCount,
-      memoryUsed: stats.memoryUsed,
-    };
   } catch (error) {
     return { status: 'unhealthy', message: error.message };
   }
@@ -321,8 +297,6 @@ export const setupGracefulShutdown = (server: any) => {
           logger.info('Database connection closed');
         }
 
-        // Stop cache service
-        // cacheService.disconnect(); // Implement this method
 
         logger.info('Graceful shutdown completed');
         process.exit(0);

@@ -8,12 +8,12 @@
  * - Read-only: never touches write paths
  * - Graceful: cache miss falls back to DB with zero disruption
  * - TTL-only: no active invalidation
- * - Uses redis.guard.ts (single source of truth for Redis connections)
+ * - In-process TTL cache (WO-O4O-REDIS-SESSIONSYNC-REMOVAL-...-V1 에서 Redis 제거)
  * - All consumers use dataSource.query() (raw SQL) → plain objects only
  */
 
 import { createHash } from 'crypto';
-import { getRedisClient } from '../infrastructure/redis.guard.js';
+import { memoryCacheGet, memoryCacheSet } from '../infrastructure/memory-ttl-cache.js';
 import logger from '../utils/logger.js';
 import { opsMetrics, OPS } from '../services/ops-metrics.service.js';
 
@@ -49,11 +49,11 @@ export function hashCacheKey(
 /**
  * Cache-aside wrapper.
  *
- * 1. Try Redis GET
+ * 1. Try in-process cache
  * 2. If miss or error → execute fetchFn
- * 3. Write result to Redis (fire-and-forget, non-blocking)
+ * 3. Store result in the in-process TTL cache
  *
- * If Redis is not configured/available, fetchFn runs directly.
+ * On any cache error, fetchFn runs directly.
  *
  * Safety: fetchFn must return JSON-serializable plain objects.
  * All current consumers use dataSource.query() (raw SQL) which
@@ -65,42 +65,37 @@ export async function cacheAside<T>(
   fetchFn: () => Promise<T>,
 ): Promise<T> {
   const fullKey = `${RC_PREFIX}:${key}`;
-  const client = getRedisClient();
 
   // 1. Try cache
-  if (client) {
-    try {
-      const cached = await client.get(fullKey);
-      if (cached !== null) {
-        opsMetrics.inc(OPS.CACHE_HIT);
-        logger.debug(`[ReadCache] HIT ${key}`);
-        return JSON.parse(cached) as T;
-      }
-      opsMetrics.inc(OPS.CACHE_MISS);
-      logger.debug(`[ReadCache] MISS ${key}`);
-    } catch (err) {
-      opsMetrics.inc(OPS.CACHE_ERROR);
-      logger.warn('[ReadCache] GET error, falling back to DB', {
-        key,
-        error: err instanceof Error ? err.message : String(err),
-      });
+  try {
+    const cached = memoryCacheGet(fullKey);
+    if (cached !== null) {
+      opsMetrics.inc(OPS.CACHE_HIT);
+      logger.debug(`[ReadCache] HIT ${key}`);
+      return JSON.parse(cached) as T;
     }
+    opsMetrics.inc(OPS.CACHE_MISS);
+    logger.debug(`[ReadCache] MISS ${key}`);
+  } catch (err) {
+    opsMetrics.inc(OPS.CACHE_ERROR);
+    logger.warn('[ReadCache] GET error, falling back to DB', {
+      key,
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 
   // 2. Fetch from DB
   const data = await fetchFn();
 
-  // 3. Write-behind (fire-and-forget)
-  if (client) {
-    client
-      .setex(fullKey, ttlSeconds, JSON.stringify(data))
-      .catch((err) => {
-        opsMetrics.inc(OPS.CACHE_ERROR);
-        logger.warn('[ReadCache] SET error', {
-          key,
-          error: err instanceof Error ? err.message : String(err),
-        });
-      });
+  // 3. Store (best-effort)
+  try {
+    memoryCacheSet(fullKey, JSON.stringify(data), ttlSeconds);
+  } catch (err) {
+    opsMetrics.inc(OPS.CACHE_ERROR);
+    logger.warn('[ReadCache] SET error', {
+      key,
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 
   return data;

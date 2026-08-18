@@ -96,16 +96,16 @@ export class AuthenticationService {
     return this.tokenSessionService.verifyAccessToken(token);
   }
 
-  async logout(userId: string, sessionId?: string): Promise<void> {
-    return this.tokenSessionService.logout(userId, sessionId);
+  async logout(userId: string): Promise<void> {
+    return this.tokenSessionService.logout(userId);
   }
 
   async logoutAll(userId: string): Promise<void> {
     return this.tokenSessionService.logoutAll(userId);
   }
 
-  setAuthCookies(req: Request, res: Response, tokens: AuthTokens, sessionId?: string): void {
-    this.tokenSessionService.setAuthCookies(req, res, tokens, sessionId);
+  setAuthCookies(req: Request, res: Response, tokens: AuthTokens): void {
+    this.tokenSessionService.setAuthCookies(req, res, tokens);
   }
 
   clearAuthCookies(req: Request, res: Response): void {

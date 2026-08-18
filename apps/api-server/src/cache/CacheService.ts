@@ -7,7 +7,6 @@
 
 import { ICacheService } from './ICacheService.js';
 import { MemoryCacheService } from './MemoryCacheService.js';
-import { RedisCacheService } from './RedisCacheService.js';
 import { getCacheConfig } from './cache.config.js';
 import logger from '../utils/logger.js';
 
@@ -29,13 +28,9 @@ export function initializeCacheService(): ICacheService {
   });
 
   try {
-    if (config.type === 'redis') {
-      cacheServiceInstance = new RedisCacheService(config);
-      logger.info('[CacheService] Redis cache service initialized');
-    } else {
-      cacheServiceInstance = new MemoryCacheService(config);
-      logger.info('[CacheService] Memory cache service initialized');
-    }
+    // WO-O4O-REDIS-REMOVAL-V1: Redis 백엔드 제거. in-process memory cache 만 사용한다.
+    cacheServiceInstance = new MemoryCacheService(config);
+    logger.info('[CacheService] Memory cache service initialized');
   } catch (error) {
     logger.error('[CacheService] Failed to initialize cache service, falling back to memory cache', error);
     cacheServiceInstance = new MemoryCacheService(config);

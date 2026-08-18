@@ -19,11 +19,10 @@ export class AuthSessionController extends BaseController {
    */
   static async logout(req: AuthRequest, res: Response): Promise<any> {
     const userId = req.user?.id;
-    const sessionId = req.cookies?.sessionId;
 
     try {
       if (userId) {
-        await authenticationService.logout(userId, sessionId);
+        await authenticationService.logout(userId);
       }
 
       authenticationService.clearAuthCookies(req, res);

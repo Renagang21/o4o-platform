@@ -12,7 +12,7 @@
  * - Metrics and monitoring
  */
 
-import Redis from 'ioredis';
+import type Redis from 'ioredis';
 import { LRUCache } from 'lru-cache';
 import zlib from 'zlib';
 import { promisify } from 'util';
@@ -152,32 +152,9 @@ export class CacheService {
    * Connect to Redis
    */
   private async connectRedis(): Promise<void> {
-    try {
-      if (process.env.REDIS_HOST) {
-        this.redisClient = new Redis({
-          host: process.env.REDIS_HOST,
-          port: parseInt(process.env.REDIS_PORT || '6379'),
-          password: process.env.REDIS_PASSWORD,
-          retryStrategy: (times) => {
-            const delay = Math.min(times * 50, 2000);
-            return delay;
-          }
-        });
-        
-        this.redisClient.on('error', (err) => {
-          logger.error('Redis cache error:', err);
-          this.handleRedisError();
-        });
-        
-        this.redisClient.on('connect', () => {
-          logger.info('Redis cache connected');
-          this.circuitBreaker.state = CircuitState.CLOSED;
-          this.circuitBreaker.failures = 0;
-        });
-      }
-    } catch (error) {
-      logger.error('Failed to connect to Redis cache:', error);
-    }
+    // WO-O4O-REDIS-REMOVAL-V1: Memorystore 폐기로 L2(Redis) 계층을 사용하지 않는다.
+    // redisClient 는 항상 null 이며 아래 L2 경로는 모두 우회된다 (L1 in-process 캐시만 동작).
+    this.redisClient = null;
   }
   
   /**

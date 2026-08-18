@@ -5,7 +5,6 @@ import { User } from '../../entities/User.js';
 import { AuthTokens, AccessTokenPayload } from '../../types/auth.js';
 import * as tokenUtils from '../../utils/token.utils.js';
 import * as cookieUtils from '../../utils/cookie.utils.js';
-import { SessionSyncService } from '../sessionSyncService.js';
 import { freshenUserContext } from './auth-context.helper.js';
 import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
 import logger from '../../utils/logger.js';
@@ -133,7 +132,7 @@ export class AuthTokenSessionService {
   /**
    * Logout user
    */
-  async logout(userId: string, sessionId?: string): Promise<void> {
+  async logout(userId: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (user) {
@@ -141,30 +140,21 @@ export class AuthTokenSessionService {
       user.refreshTokenFamily = null;
       await this.userRepository.save(user);
     }
-
-    // Remove SSO session
-    if (sessionId) {
-      await SessionSyncService.removeSession(sessionId, userId);
-    }
   }
 
   /**
    * Logout from all devices
    */
   async logoutAll(userId: string): Promise<void> {
+    // refreshTokenFamily 를 null 로 만드는 것이 전 기기 무효화의 실효 수단이다.
     await this.logout(userId);
-    await SessionSyncService.removeAllUserSessions(userId);
   }
 
   /**
    * Set authentication cookies
    */
-  setAuthCookies(req: Request, res: Response, tokens: AuthTokens, sessionId?: string): void {
+  setAuthCookies(req: Request, res: Response, tokens: AuthTokens): void {
     cookieUtils.setAuthCookies(req, res, tokens);
-
-    if (sessionId) {
-      cookieUtils.setSessionCookie(req, res, sessionId);
-    }
   }
 
   /**

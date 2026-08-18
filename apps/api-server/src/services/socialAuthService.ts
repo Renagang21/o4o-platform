@@ -1,6 +1,5 @@
 import { AppDataSource } from '../database/connection.js';
 import { User, UserRole, UserStatus } from '../entities/User.js';
-import { SessionSyncService } from './sessionSyncService.js';
 import { emailService } from './email.service.js';
 import { Request, Response } from 'express';
 import logger from '../utils/logger.js';
@@ -114,7 +113,6 @@ export class SocialAuthService {
    */
   static async completeSocialLogin(req: Request, user: User, res: Response): Promise<{
     user: User;
-    sessionId: string;
   }> {
     // Generate tokens using tokenUtils (SSOT for token generation)
     const roles = await roleAssignmentService.getRoleNames(user.id);
@@ -125,16 +123,11 @@ export class SocialAuthService {
     ).catch(() => []);
     const tokens = tokenUtils.generateTokens(user, roles, 'neture.co.kr', memberships);
 
-    // Create SSO session
-    const sessionId = SessionSyncService.generateSessionId();
-    await SessionSyncService.createSession(user, sessionId);
-
     // Set cookies using cookieUtils (SSOT for cookie management)
     // Uses request origin for multi-domain cookie support
     cookieUtils.setAuthCookies(req, res, tokens);
-    cookieUtils.setSessionCookie(req, res, sessionId);
 
-    return { user, sessionId };
+    return { user };
   }
 
   /**

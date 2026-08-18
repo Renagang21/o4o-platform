@@ -21,15 +21,12 @@ import 'reflect-metadata';
 import express, { Application } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import Redis from 'ioredis';
 
 import { env } from './utils/env-validator.js';
 import logger from './utils/logger.js';
 
 // Services
 import { startupService } from './services/startup.service.js';
-import { SessionSyncService } from './services/sessionSyncService.js';
-import { WebSocketSessionSync } from './websocket/sessionSync.js';
 
 // Configuration
 import { initializePassport } from './config/passportDynamic.js';
@@ -60,8 +57,6 @@ const httpServer = createServer(app);
 const port = Number(process.env.PORT) || 8080;
 logger.info(`[STARTUP] PORT configuration: process.env.PORT=${process.env.PORT}, resolved port=${port}`);
 
-// Redis enabled flag (used for session store + session sync)
-const redisEnabled = env.getString('REDIS_ENABLED', 'false') !== 'false' && env.isProduction();
 
 // ============================================================================
 // SOCKET.IO CONFIGURATION
@@ -125,7 +120,7 @@ logger.info(`[STARTUP] Immediate health endpoint registered on port ${port}`);
 // ============================================================================
 // MIDDLEWARE SETUP
 // ============================================================================
-setupMiddlewares(app, { redisEnabled });
+setupMiddlewares(app);
 
 // ============================================================================
 // CORE ROUTES (before server listen)
@@ -206,44 +201,6 @@ const startServer = async () => {
   });
 
   // ── Phase 5: Post-listen (non-critical services) ──
-
-  let webSocketSessionSync: WebSocketSessionSync | null = null;
-
-  if (redisEnabled) {
-    try {
-      logger.info('Initializing Redis connection...');
-
-      const redisClient = new Redis({
-        host: env.getString('REDIS_HOST', 'localhost'),
-        port: env.getNumber('REDIS_PORT', 6379),
-        password: env.getString('REDIS_PASSWORD', undefined),
-        lazyConnect: true,
-        maxRetriesPerRequest: 3,
-        connectTimeout: 5000
-      });
-
-      redisClient.on('connect', () => {
-        logger.info('Redis connected successfully');
-      });
-
-      redisClient.on('error', (err) => {
-        logger.warn('Redis connection error (non-critical):', err);
-      });
-
-      SessionSyncService.initialize(redisClient);
-
-      if (env.getString('SESSION_SYNC_ENABLED', 'false') === 'true') {
-        webSocketSessionSync = new WebSocketSessionSync(io);
-        logger.info('WebSocket session sync initialized');
-      }
-
-      logger.info('Redis initialization completed');
-    } catch (redisError) {
-      logger.warn('Redis initialization failed (non-critical), continuing without Redis:', redisError);
-    }
-  } else {
-    logger.info('Redis disabled, skipping Redis initialization');
-  }
 
   logger.info('✅ Server fully initialized — all routes active');
 };

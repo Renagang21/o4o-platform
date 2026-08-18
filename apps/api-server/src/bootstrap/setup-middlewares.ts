@@ -14,9 +14,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-import { RedisStore } from 'connect-redis';
 import passport from '../config/passportDynamic.js';
-import Redis from 'ioredis';
 
 import { env } from '../utils/env-validator.js';
 import logger from '../utils/logger.js';
@@ -93,11 +91,11 @@ export const getAllowedOrigins = (): string[] => {
  *   6. Security middleware + SQL injection detection
  *   7. Tenant context
  *   8. Cookie parser + body parsing
- *   9. Session (with optional Redis store)
+ *   9. Session (memory store — passport OAuth 전용)
  *  10. Passport initialization
  *  11. HTTP metrics + slow request threshold
  */
-export function setupMiddlewares(app: Application, options: { redisEnabled: boolean }): void {
+export function setupMiddlewares(app: Application): void {
   // 1. Security headers
   app.use(helmet({
     contentSecurityPolicy: {
@@ -232,31 +230,6 @@ export function setupMiddlewares(app: Application, options: { redisEnabled: bool
       sameSite: 'lax'
     }
   };
-
-  // Use Redis store conditionally (production + REDIS_ENABLED)
-  if (options.redisEnabled) {
-    try {
-      const sessionRedisClient = new Redis({
-        host: env.getString('REDIS_HOST', 'localhost'),
-        port: env.getNumber('REDIS_PORT', 6379),
-        password: env.getString('REDIS_PASSWORD', undefined),
-        lazyConnect: true,
-        maxRetriesPerRequest: 3,
-        connectTimeout: 5000
-      });
-
-      sessionConfig.store = new RedisStore({
-        client: sessionRedisClient,
-        prefix: 'sess:'
-      });
-
-      logger.info('Redis session store configured');
-    } catch (redisError) {
-      logger.warn('Redis session store configuration failed, using memory store:', redisError);
-    }
-  } else {
-    logger.info('Redis disabled, using memory session store');
-  }
 
   // Session middleware for passport (required for OAuth)
   app.use(session(sessionConfig) as any);

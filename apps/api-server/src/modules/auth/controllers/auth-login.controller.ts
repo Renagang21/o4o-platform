@@ -73,7 +73,7 @@ export class AuthLoginController extends BaseController {
       // Phase 6-7: Cookie Auth Primary
       // Set httpOnly cookies as primary authentication method
       // Uses request origin for multi-domain cookie support
-      authenticationService.setAuthCookies(req, res, result.tokens, result.sessionId);
+      authenticationService.setAuthCookies(req, res, result.tokens);
 
       // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA enrichment 제거
       // pharmacistQualification, activityType, kpaMembership는

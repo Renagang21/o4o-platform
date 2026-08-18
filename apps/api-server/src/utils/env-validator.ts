@@ -38,11 +38,6 @@ class EnvironmentValidator {
     'HOST',
     'SESSION_SECRET',
     'COOKIE_DOMAIN',
-    'REDIS_HOST',
-    'REDIS_PORT',
-    'REDIS_PASSWORD',
-    'REDIS_ENABLED',
-    'SESSION_SYNC_ENABLED',
     'EMAIL_SERVICE_ENABLED',
     'BCRYPT_ROUNDS',
     'JWT_REFRESH_SECRET',
@@ -103,12 +98,6 @@ class EnvironmentValidator {
     logger.info(`  - Server Port: ${this.env.PORT || '8080'}`);
     
     // Optional services
-    if (this.env.REDIS_HOST) {
-      logger.info(`  - Redis: ${this.env.REDIS_HOST}:${this.env.REDIS_PORT || '6379'}`);
-    } else {
-      logger.info('  - Redis: Not configured');
-    }
-    
     if (this.env.EMAIL_SERVICE_ENABLED === 'true') {
       logger.info('  - Email Service: Enabled');
     } else {

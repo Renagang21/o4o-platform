@@ -23,7 +23,6 @@ import {
   UserNotFoundError,
   SocialLoginRequiredError,
 } from '../../errors/AuthErrors.js';
-import { SessionSyncService } from '../sessionSyncService.js';
 import { LoginSecurityService } from '../LoginSecurityService.js';
 import { AccountLinkingService } from '../account-linking.service.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
@@ -252,9 +251,6 @@ export class AuthLoginService {
     // Phase3-E: Query RoleAssignment + memberships, generate tokens
     const { tokens, roles, memberships } = await generateTokensWithContext(user);
 
-    // Generate session ID
-    const sessionId = SessionSyncService.generateSessionId();
-
     // Prepare user updates
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
     user.loginAttempts = 0;
@@ -270,27 +266,12 @@ export class AuthLoginService {
       emailAccount.lastUsedAt = new Date();
     }
 
-    // Run all DB saves and Redis operations in parallel
+    // Run all DB saves in parallel
     const parallelTasks: Promise<any>[] = [this.userRepository.save(user)];
 
     if (emailAccount) {
       parallelTasks.push(this.linkedAccountRepository.save(emailAccount));
     }
-
-    // Session operations (non-critical, don't block login)
-    SessionSyncService.checkConcurrentSessions(user.id)
-      .then((sessionCheck) => {
-        if (!sessionCheck.allowed) {
-          SessionSyncService.enforceSessionLimit(user.id).catch((err) =>
-            logger.warn('Failed to enforce session limit (non-critical):', err),
-          );
-        }
-      })
-      .catch((err) => logger.warn('Failed to check concurrent sessions (non-critical):', err));
-
-    SessionSyncService.createSession(user, sessionId, { userAgent, ipAddress }).catch((err) =>
-      logger.warn('Failed to create session in Redis (non-critical):', err),
-    );
 
     // Wait for critical DB saves
     await Promise.all(parallelTasks);
@@ -310,7 +291,6 @@ export class AuthLoginService {
         refreshToken: tokens.refreshToken,
         expiresIn: tokens.expiresIn || 900, // 15 minutes
       },
-      sessionId,
       linkedAccounts: mergedProfile?.linkedAccounts || [],
       isNewUser: false,
     };
@@ -384,7 +364,6 @@ export class AuthLoginService {
           refreshToken: tokens.refreshToken,
           expiresIn: tokens.expiresIn || 900, // 15 minutes
         },
-        sessionId: `oauth-${Date.now()}`,
         linkedAccounts: mergedProfile?.linkedAccounts || [],
         isNewUser: false,
       };
@@ -442,7 +421,6 @@ export class AuthLoginService {
           refreshToken: tokens.refreshToken,
           expiresIn: tokens.expiresIn || 900, // 15 minutes
         },
-        sessionId: `oauth-${Date.now()}`,
         linkedAccounts: mergedProfile?.linkedAccounts || [],
         isNewUser: false,
         autoLinked: true,
@@ -514,7 +492,6 @@ export class AuthLoginService {
         refreshToken: tokens.refreshToken,
         expiresIn: tokens.expiresIn || 900, // 15 minutes
       },
-      sessionId: `oauth-${Date.now()}`,
       linkedAccounts: [linkedAccount],
       isNewUser: true,
     };

@@ -1,55 +1,16 @@
 /**
  * Rate Limiter Middleware
  *
- * Phase 2.5: GRACEFUL_STARTUP 호환
- * - Import 시점에 Redis 연결하지 않음
- * - Redis 없으면 메모리 기반 rate limiting 사용
+ * WO-O4O-REDIS-SESSIONSYNC-REMOVAL-AND-MEMORYSTORE-DECOMMISSION-V1
+ * - Redis store 제거. 메모리 기반 rate limiting 만 사용한다.
+ *   (Redis store 는 6주간 incr/eval 명령 0건으로 실사용이 없었다.)
  */
 
 // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
 import { getTrustedClientIp } from '../utils/trusted-client-ip.js';
 import rateLimit, { Store, MemoryStore } from 'express-rate-limit';
 import { Request, Response, NextFunction } from 'express';
-import { getRedisClient, isRedisAvailable } from '../infrastructure/redis.guard.js';
 import logger from '../utils/logger.js';
-
-// Lazy RedisStore 생성
-const _redisStore: Store | null = null;
-
-function getRedisStore(prefix: string): Store | undefined {
-  // Redis가 사용 불가능하면 undefined 반환 (memory store 사용)
-  if (!isRedisAvailable()) {
-    return undefined;
-  }
-
-  const client = getRedisClient();
-  if (!client) {
-    return undefined;
-  }
-
-  // Dynamic import to avoid loading RedisStore when Redis is not available
-  try {
-    const RedisStore = require('rate-limit-redis').default;
-    return new RedisStore({
-      sendCommand: async (...args: string[]) => {
-        // `call` 의 첫 인자는 rest 가 아닌 고정 파라미터라 배열 전체를 spread 할 수 없다.
-        // 명령어와 나머지 인자를 분리해서 넘긴다(이전 `.apply` 와 동작 동일).
-        const [command, ...rest] = args;
-        try {
-          const result = await client.call(command, ...rest);
-          return result as boolean | number | string | (boolean | number | string)[];
-        } catch (error) {
-          logger.warn('[RateLimiter] Redis command failed, fallback to memory store');
-          return null;
-        }
-      },
-      prefix,
-    }) as unknown as Store;
-  } catch (error) {
-    logger.warn('[RateLimiter] RedisStore not available, using memory store');
-    return undefined;
-  }
-}
 
 // 기본 레이트 리밋 설정
 export const defaultLimiter = rateLimit({
@@ -58,7 +19,6 @@ export const defaultLimiter = rateLimit({
   message: '너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요.',
   standardHeaders: true,
   legacyHeaders: false,
-  store: getRedisStore('rl:default:'),
 });
 
 // 엄격한 레이트 리밋 (로그인, 회원가입 등)
@@ -69,7 +29,6 @@ export const strictLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,
-  store: getRedisStore('rl:strict:'),
 });
 
 // API 엔드포인트별 레이트 리밋
@@ -82,7 +41,6 @@ export const apiLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  store: getRedisStore('rl:api:'),
   keyGenerator: (req: Request) => {
     const userId = (req as any).user?.id || 'anonymous';
     return `${getTrustedClientIp(req)}:${userId}`;
@@ -94,7 +52,6 @@ export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1시간
   max: 100, // 시간당 100개 파일
   message: '파일 업로드 한도를 초과했습니다. 1시간 후 다시 시도해주세요.',
-  store: getRedisStore('rl:upload:'),
 });
 
 // 동적 레이트 리밋 (사용자 티어별)
@@ -111,7 +68,6 @@ export const dynamicLimiter = (tier: 'free' | 'basic' | 'premium' = 'free') => {
     windowMs: config.windowMs,
     max: config.max,
     message: `요청 한도를 초과했습니다. (${tier} 플랜: 분당 ${config.max}개)`,
-    store: getRedisStore(`rl:${tier}:`),
     keyGenerator: (req: Request) => {
       const userId = (req as any).user?.id || getTrustedClientIp(req);
       return `${userId}`;

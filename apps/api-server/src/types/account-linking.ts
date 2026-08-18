@@ -187,7 +187,6 @@ export interface UnifiedLoginResponse {
     refreshToken: string;
     expiresIn: number;
   };
-  sessionId: string;
   linkedAccounts: LinkedAccount[];
   isNewUser: boolean;
   autoLinked?: boolean;

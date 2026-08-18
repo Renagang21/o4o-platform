@@ -79,7 +79,6 @@ import { createStoreCartRoutes } from '../routes/cart/store-cart.routes.js';
 import userRoleRoutes from '../routes/user-role.routes.js';
 import { createRoleApplicationController } from '../routes/v2/role-application.controller.js';
 import organizationRoutes from '../routes/organization.routes.js';
-import linkedAccountsRoutes from '../routes/linked-accounts.js';
 // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
 //   `/api/v1/membership` (@o4o/membership-yaksa) mount 와 그 관리자 guard 제거.
 //   약사회 전용 회원 자격 도메인이며 다른 운영 서비스 소비처가 없다.
@@ -358,9 +357,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 12. Forum routes - REMOVED (Phase R1: Domain separation)
     // app.use('/api/v1/forum', forumRoutes);
 
-    // 13. Register Linked Accounts routes (SSO check, sessions)
-    app.use('/api/accounts', linkedAccountsRoutes);
-    logger.info('✅ Linked Accounts routes registered at /api/accounts');
+    // 13. Linked Accounts routes - REMOVED
+    //     (WO-O4O-REDIS-SESSIONSYNC-REMOVAL-AND-MEMORYSTORE-DECOMMISSION-V1)
+    //     /api/accounts/* 는 Redis SessionSync 전용 dead route 였다 (6주 요청 0건).
+    //     실사용 연결계정 UI 는 /auth/accounts/* 를 쓴다.
 
     // ========================================================================
     // DOMAIN ROUTES PARTIALLY RESTORED

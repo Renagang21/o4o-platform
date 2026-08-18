@@ -11,7 +11,7 @@
  *
  * Classification:
  * A) Core: Required for server to start (PORT, NODE_ENV) - always have defaults
- * B) Feature: Required for functionality (DB, Auth, Redis, Email) - features disabled if missing
+ * B) Feature: Required for functionality (DB, Auth, Email) - features disabled if missing
  * C) Operational: Nice-to-have (logging, cache TTLs) - defaults applied
  */
 
@@ -31,7 +31,6 @@ export interface ConfigStatus {
   features: {
     database: FeatureStatus;
     auth: FeatureStatus;
-    redis: FeatureStatus;
     email: FeatureStatus;
     socialAuth: {
       google: FeatureStatus;
@@ -148,35 +147,6 @@ export const authConfig = {
       reason: !configured
         ? 'JWT_SECRET or JWT_REFRESH_SECRET not set in production'
         : (usingDevSecrets ? 'Using development secrets (NOT SAFE FOR PRODUCTION)' : 'Auth properly configured'),
-    };
-  }
-};
-
-/**
- * B) Redis Configuration - Redis features disabled if not configured
- */
-export const redisConfig = {
-  host: getEnv('REDIS_HOST', 'localhost'),
-  port: getEnvNumber('REDIS_PORT', 6379),
-  password: getEnv('REDIS_PASSWORD', ''),
-  db: getEnvNumber('REDIS_DB', 0),
-  keyPrefix: getEnv('REDIS_KEY_PREFIX', 'o4o:'),
-  enabled: getEnvBoolean('REDIS_ENABLED', false),
-
-  isConfigured: () => {
-    return !!process.env.REDIS_HOST;
-  },
-
-  getStatus: (): FeatureStatus => {
-    const configured = redisConfig.isConfigured();
-    return {
-      enabled: configured,
-      reason: configured ? 'Redis configured' : 'REDIS_HOST not set - using in-memory cache',
-      config: configured ? {
-        host: redisConfig.host,
-        port: redisConfig.port,
-        db: redisConfig.db
-      } : undefined
     };
   }
 };
@@ -322,18 +292,16 @@ export const operationalConfig = {
 };
 
 /**
- * B) Queue Configuration - Queue features disabled if Redis not configured
+ * B) Queue Configuration
+ * WO-O4O-REDIS-REMOVAL-V1: Memorystore 폐기. BullMQ 는 런타임에 기동되지 않는다.
  */
 export const queueConfig = {
-  isConfigured: () => redisConfig.isConfigured(),
+  isConfigured: () => false,
 
-  getStatus: (): FeatureStatus => {
-    const configured = queueConfig.isConfigured();
-    return {
-      enabled: configured,
-      reason: configured ? 'BullMQ queue ready' : 'Queue disabled (Redis not configured)'
-    };
-  }
+  getStatus: (): FeatureStatus => ({
+    enabled: false,
+    reason: 'Queue disabled (Redis removed)'
+  })
 };
 
 /**
@@ -377,10 +345,6 @@ export function getConfigStatus(): ConfigStatus {
     warnings.push('Using development JWT secrets - OK for development');
   }
 
-  if (!redisConfig.isConfigured()) {
-    warnings.push('Redis not configured - using in-memory cache');
-  }
-
   if (!emailConfig.isConfigured() && emailConfig.enabled) {
     warnings.push('Email enabled but SMTP not configured');
   }
@@ -389,7 +353,6 @@ export function getConfigStatus(): ConfigStatus {
     features: {
       database: databaseConfig.getStatus(),
       auth: authConfig.getStatus(),
-      redis: redisConfig.getStatus(),
       email: emailConfig.getStatus(),
       socialAuth: {
         google: socialAuthConfig.google.getStatus(),
@@ -422,7 +385,6 @@ export function logConfigStatus(): void {
   logger.info('Feature Status:');
   logger.info(`  Database:    ${status.features.database.enabled ? '✅ Enabled' : '❌ Disabled'} - ${status.features.database.reason}`);
   logger.info(`  Auth:        ${status.features.auth.enabled ? '✅ Enabled' : '❌ Disabled'} - ${status.features.auth.reason}`);
-  logger.info(`  Redis:       ${status.features.redis.enabled ? '✅ Enabled' : '⚠️ Fallback'} - ${status.features.redis.reason}`);
   logger.info(`  Email:       ${status.features.email.enabled ? '✅ Enabled' : '❌ Disabled'} - ${status.features.email.reason}`);
   logger.info(`  Payment:     ${status.features.payment.enabled ? '✅ Enabled' : '❌ Disabled'} - ${status.features.payment.reason}`);
   logger.info(`  Queue:       ${status.features.queue.enabled ? '✅ Enabled' : '❌ Disabled'} - ${status.features.queue.reason}`);
@@ -463,7 +425,6 @@ export function getEnabledFeatures(): string[] {
 
   if (status.features.database.enabled) enabled.push('database');
   if (status.features.auth.enabled) enabled.push('auth');
-  if (status.features.redis.enabled) enabled.push('redis');
   if (status.features.email.enabled) enabled.push('email');
   if (status.features.payment.enabled) enabled.push('payment');
   if (status.features.queue.enabled) enabled.push('queue');
@@ -480,7 +441,6 @@ export default {
   core: coreConfig,
   database: databaseConfig,
   auth: authConfig,
-  redis: redisConfig,
   email: emailConfig,
   socialAuth: socialAuthConfig,
   payment: paymentConfig,

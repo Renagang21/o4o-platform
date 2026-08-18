@@ -5,7 +5,6 @@
 
 export { ICacheService } from './ICacheService.js';
 export { MemoryCacheService } from './MemoryCacheService.js';
-export { RedisCacheService } from './RedisCacheService.js';
 export {
   initializeCacheService,
   getCacheService,
