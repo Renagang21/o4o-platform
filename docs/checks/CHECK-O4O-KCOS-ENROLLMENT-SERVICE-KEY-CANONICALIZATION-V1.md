@@ -213,3 +213,34 @@ dual-key 조직에서 canonical 결정적 선택 / PUBLIC 자동확산의 legacy
 ## 11. 문서 정합
 
 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건 (§10-1 · §10-2).
+
+---
+
+## 12. production smoke (배포 후 실측, 2026-08-18)
+
+배포: `Deploy API Server (Cloud Run)` run `32110523343` = **success** (commit `0beb2bb18`).
+계정은 `docs/local/TEST-ACCOUNTS.local.md` 참조 (값 미기록).
+
+### K-Cosmetics store-owner
+
+| 항목 | 결과 |
+|---|---|
+| login `serviceKey='k-cosmetics'` | **200** — canonical 축 확인 |
+| login `serviceKey='cosmetics'` | 401 `SERVICE_NOT_MEMBER` (별칭은 로그인 축이 아님 — 판정 재확인) |
+| `GET /api/v1/cosmetics/store-hub/overview` | 200 · org `83ff96c7…` (테스트 뷰티샵) 정상 해석 |
+| `GET /api/v1/cosmetics/store-hub/capabilities` | 200 |
+| `GET /api/v1/store/handled-products` | 200 (items 1) |
+| `GET /api/v1/store/local-products` | 200 (0건) |
+| `GET /api/v1/stores/test-kcos-store-owner/policies` | 200 |
+| `GET /api/v1/stores/resolve/test-kcos-store-owner` (공개 slug) | 200 · `serviceKey='cosmetics'` (slug 축 불변 — 의도대로) |
+| `GET /api/v1/cosmetics/event-offers` (수정 helper 경로) | 200 · dual-key 조직 `31e926a0…` 오퍼 정상 반환 |
+
+### 타 서비스 read-only 회귀
+
+| 서비스 | 결과 |
+|---|---|
+| KPA (`kpa-society`) | `/kpa/store-hub/overview` 200 (테스트 약국) · `/store/handled-products` 200 |
+| GlycoPharm | `/glycopharm/store-hub/overview` 200 (E2E 검증 약국) |
+| Pharmacy-Hub | `/pharmacy-hub/store-owner/{dashboard,info,handled-products}` 200 (`status='not_connected'` — 해당 계정의 기존 데이터 상태이며 본 WO 와 무관) |
+
+회귀 0건. production write 0.
