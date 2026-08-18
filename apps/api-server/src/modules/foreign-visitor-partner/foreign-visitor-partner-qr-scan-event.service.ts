@@ -13,8 +13,16 @@ import type { DataSource, Repository } from 'typeorm';
 import { ForeignVisitorPartnerQrScanEvent } from './foreign-visitor-partner-qr-scan-event.entity.js';
 
 const DEDUPE_WINDOW_MINUTES = 5;
-// salt: 운영 비밀(ENCRYPTION_KEY) 재사용 — IP/UA 역추적 방지. 신규 env 미추가.
-const HASH_SALT = process.env.ENCRYPTION_KEY || 'fv-qr-scan-default-salt';
+/**
+ * salt: IP/UA 역추적 방지용. 원래 `ENCRYPTION_KEY` 를 재사용했으나
+ * WO-O4O-ENCRYPTION-KEY-CANONICAL-ROLLOUT-V1 §2 census 에서 **암호화 키와 축을 분리**했다.
+ * 이유: 이 값은 단방향 hash 의 salt 라 키를 교체해도 **재암호화가 불가능**하다
+ * (기존 hash 와 연속성이 끊긴다). 암호화 키 rotation 이 hash 축을 건드리지 않도록 전용 env 를 둔다.
+ * 전용 env 미설정 시에만 기존 동작(ENCRYPTION_KEY)을 유지한다.
+ * 2026-08-18 프로덕션 `foreign_visitor_partner_qr_scan_events` = 0행 → 전환 시점의 연속성 위험 없음.
+ */
+const HASH_SALT =
+  process.env.FV_QR_SCAN_HASH_SALT || process.env.ENCRYPTION_KEY || 'fv-qr-scan-default-salt';
 
 /** sha256(salt + value) hex. value 없으면 null. */
 export function hashWithSalt(value: string | null | undefined): string | null {

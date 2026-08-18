@@ -29,7 +29,7 @@ import { StoreSlugService, normalizeSlug } from '@o4o/platform-core/store-identi
 import { StorePolicyService, PaymentConfigService } from '@o4o/platform-core/store-policy';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../types/auth.js';
-import { encrypt, decrypt } from '../../utils/crypto.js';
+import { encrypt, decrypt, isEncryptionKeyConfigured } from '../../utils/crypto.js';
 import { isStoreOwner } from './store-policy.ownership.js';
 
 /**
@@ -292,6 +292,17 @@ export function createStorePolicyRoutes(dataSource: DataSource): Router {
       }
 
       // Encrypt sensitive fields
+      // WO-O4O-ENCRYPTION-KEY-CANONICAL-ROLLOUT-V1 §5 — 키 미설정 시 약한 키로 저장하지 않고 거부한다
+      if ((apiKey || apiSecret) && !isEncryptionKeyConfigured()) {
+        res.status(503).json({
+          success: false,
+          error: {
+            code: 'ENCRYPTION_KEY_NOT_CONFIGURED',
+            message: '서버에 암호화 키가 설정되지 않아 결제 credential 을 저장할 수 없습니다',
+          },
+        });
+        return;
+      }
       const encryptedKey = apiKey ? encrypt(apiKey) : null;
       const encryptedSecret = apiSecret ? encrypt(apiSecret) : null;
 
