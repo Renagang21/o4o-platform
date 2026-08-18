@@ -30,29 +30,7 @@ import { StorePolicyService, PaymentConfigService } from '@o4o/platform-core/sto
 import { authenticate } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { encrypt, decrypt } from '../../utils/crypto.js';
-
-/**
- * Resolve store ownership across services.
- */
-async function isStoreOwner(
-  dataSource: DataSource,
-  storeId: string,
-  serviceKey: string,
-  userId: string,
-): Promise<boolean> {
-  const ownershipQueries: Record<string, string> = {
-    glycopharm: `SELECT 1 FROM organizations WHERE id = $1 AND created_by_user_id = $2 LIMIT 1`,
-    cosmetics: `SELECT 1 FROM cosmetics.cosmetics_stores WHERE id = $1 AND created_by_user_id = $2 LIMIT 1`,
-  };
-
-  const query = ownershipQueries[serviceKey];
-  if (!query) {
-    return false;
-  }
-
-  const result = await dataSource.query(query, [storeId, userId]);
-  return result.length > 0;
-}
+import { isStoreOwner } from './store-policy.ownership.js';
 
 /**
  * Mask a string, showing only last 4 characters.
