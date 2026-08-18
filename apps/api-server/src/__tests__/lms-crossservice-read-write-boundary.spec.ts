@@ -255,10 +255,15 @@ describe('정적 회귀 — read 경로 guard 배선', () => {
     expect(read('apps/api-server/src/modules/lms/controllers/AssignmentController.ts')).toContain('guardAssignmentScope');
   });
 
+  // WO-O4O-LMS-CERTIFICATE-OWNERSHIP-AND-READ-AUTHORIZATION-BOUNDARY-FIX-V1:
+  // scope → ownership 판정은 controller 인라인이 아니라 공통 owner guard 로 이관됐다.
   it('certificate 단건/다운로드는 course scope 를 소유자 확인보다 먼저 본다', () => {
     const cert = read('apps/api-server/src/modules/lms/controllers/CertificateController.ts');
-    const scopeIdx = cert.indexOf('guardLoadedCourseScope(req, res, certificate.course?.serviceKey');
-    const ownerIdx = cert.indexOf('certificate.userId !== requestUserId');
+    expect(cert).toContain('resolveOwnedCertificateByIdOrRespond(req, res, id)');
+
+    const guard = read('apps/api-server/src/modules/lms/utils/lms-certificate-owner-guard.ts');
+    const scopeIdx = guard.indexOf('guardLoadedCourseScope(req, res, (certificate as any).course?.serviceKey');
+    const ownerIdx = guard.indexOf('certificate.userId !== userId');
     expect(scopeIdx).toBeGreaterThan(-1);
     expect(ownerIdx).toBeGreaterThan(scopeIdx);
   });

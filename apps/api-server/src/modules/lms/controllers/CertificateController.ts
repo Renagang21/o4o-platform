@@ -6,6 +6,12 @@ import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §7
 // 수료증 발급/UX 정책은 서비스별로 유지하고, service boundary 만 공통 보장한다.
 import { guardLoadedCourseScope, resolveScopeOrRespond } from '../utils/lms-scope-guard.js';
+// WO-O4O-LMS-CERTIFICATE-OWNERSHIP-AND-READ-AUTHORIZATION-BOUNDARY-FIX-V1
+// private read 는 scope → ownership 순으로 공통 helper 가 판정한다.
+import {
+  resolveOwnedCertificateByIdOrRespond,
+  resolveOwnedCertificateByNumberOrRespond,
+} from '../utils/lms-certificate-owner-guard.js';
 
 /**
  * CertificateController
@@ -31,6 +37,26 @@ function resolveVerificationBase(serviceKey: string | null | undefined): string 
 }
 
 export class CertificateController extends BaseController {
+  /**
+   * WO-O4O-LMS-CERTIFICATE-OWNERSHIP-AND-READ-AUTHORIZATION-BOUNDARY-FIX-V1 §9
+   * 진위확인 응답 최소 필드. user id/email 등 개인정보를 포함하지 않는다.
+   */
+  private static toPublicVerificationView(certificate: any): Record<string, any> {
+    return {
+      certificateId: certificate.id,
+      certificateCode: certificate.certificateNumber,
+      userName: certificate.user?.name || '수강자',
+      courseTitle: certificate.course?.title || '과정',
+      completedAt: certificate.completedAt
+        ? new Date(certificate.completedAt).toISOString().split('T')[0]
+        : null,
+      issuedAt: certificate.issuedAt
+        ? new Date(certificate.issuedAt).toISOString().split('T')[0]
+        : null,
+      issuer: certificate.issuerName || 'O4O LMS',
+    };
+  }
+
   static async issueCertificate(req: Request, res: Response): Promise<any> {
     try {
       const data = req.body;
@@ -58,15 +84,10 @@ export class CertificateController extends BaseController {
   static async getCertificate(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
-      const service = CertificateService.getInstance();
 
-      const certificate = await service.getCertificate(id);
-
-      if (!certificate) {
-        return BaseController.notFound(res, 'Certificate not found');
-      }
-
-      if (!guardLoadedCourseScope(req, res, certificate.course?.serviceKey, 'Certificate not found')) return;
+      // scope → ownership 순으로 판정한다 (타인 certificate 는 404).
+      const certificate = await resolveOwnedCertificateByIdOrRespond(req, res, id);
+      if (!certificate) return;
 
       return BaseController.ok(res, { certificate });
     } catch (error: any) {
@@ -78,15 +99,10 @@ export class CertificateController extends BaseController {
   static async getCertificateByNumber(req: Request, res: Response): Promise<any> {
     try {
       const { certificateNumber } = req.params;
-      const service = CertificateService.getInstance();
 
-      const certificate = await service.getCertificateByNumber(certificateNumber);
-
-      if (!certificate) {
-        return BaseController.notFound(res, 'Certificate not found');
-      }
-
-      if (!guardLoadedCourseScope(req, res, certificate.course?.serviceKey, 'Certificate not found')) return;
+      // certificateNumber 는 발급물에 인쇄되는 식별자일 뿐 인가 근거가 아니다 → 소유권 확인.
+      const certificate = await resolveOwnedCertificateByNumberOrRespond(req, res, certificateNumber);
+      if (!certificate) return;
 
       return BaseController.ok(res, { certificate });
     } catch (error: any) {
@@ -97,11 +113,20 @@ export class CertificateController extends BaseController {
 
   static async listCertificates(req: Request, res: Response): Promise<any> {
     try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return BaseController.unauthorized(res, 'User not authenticated');
+      }
+
       const scope = resolveScopeOrRespond(req, res);
       if (!scope.ok) return;
 
       // client raw serviceKey 를 신뢰하지 않고 canonical 해석값으로 덮어쓴다.
-      const filters: any = { ...req.query, serviceKey: scope.scope };
+      // WO-O4O-LMS-CERTIFICATE-OWNERSHIP-AND-READ-AUTHORIZATION-BOUNDARY-FIX-V1:
+      // user-facing 목록은 항상 요청자 본인 범위다. 관리 조회는 기존 requireKpaAdmin
+      // 계약(issue/update/revoke/renew)을 쓰고, 여기에 elevated bypass 를 만들지 않는다.
+      // client 가 보낸 userId 는 신뢰하지 않고 덮어쓴다.
+      const filters: any = { ...req.query, userId, serviceKey: scope.scope };
       const service = CertificateService.getInstance();
 
       const { certificates, total } = await service.listCertificates(filters);
@@ -159,7 +184,13 @@ export class CertificateController extends BaseController {
 
       if (!guardLoadedCourseScope(req, res, certificate.course?.serviceKey, 'Certificate not found or invalid')) return;
 
-      return BaseController.ok(res, { certificate, verified: true });
+      // WO-O4O-LMS-CERTIFICATE-OWNERSHIP-AND-READ-AUTHORIZATION-BOUNDARY-FIX-V1 §3/§9:
+      // verificationCode 소지만으로 접근하는 진위확인 경로다. private read 와 같은
+      // 전체 entity 계약을 쓰지 않고, `/certificates/:id/verify` 와 동일한 최소 필드만 반환한다.
+      return BaseController.ok(res, {
+        certificate: CertificateController.toPublicVerificationView(certificate),
+        verified: true,
+      });
     } catch (error: any) {
       logger.error('[CertificateController.verifyCertificate] Error', { error: error.message });
       return BaseController.error(res, error);
@@ -236,24 +267,10 @@ export class CertificateController extends BaseController {
         return res.status(200).json({ valid: false });
       }
 
-      const userName = (certificate.user as any)?.name || '수강자';
-      const courseTitle = certificate.course?.title || '과정';
-
+      // 공개 계약 유지 — 최소 필드만 반환한다 (개인정보 과노출 금지).
       return res.status(200).json({
         valid: true,
-        certificate: {
-          certificateId: certificate.id,
-          certificateCode: certificate.certificateNumber,
-          userName,
-          courseTitle,
-          completedAt: certificate.completedAt
-            ? new Date(certificate.completedAt).toISOString().split('T')[0]
-            : null,
-          issuedAt: certificate.issuedAt
-            ? new Date(certificate.issuedAt).toISOString().split('T')[0]
-            : null,
-          issuer: certificate.issuerName || 'O4O LMS',
-        },
+        certificate: CertificateController.toPublicVerificationView(certificate),
       });
     } catch (error: any) {
       logger.error('[CertificateController.verifyPublic] Error', { error: error.message });
@@ -265,26 +282,12 @@ export class CertificateController extends BaseController {
   static async downloadPdf(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
-      const requestUserId = (req as any).user?.id;
 
-      if (!requestUserId) {
-        return BaseController.unauthorized(res, 'User not authenticated');
-      }
-
-      const service = CertificateService.getInstance();
-      const certificate = await service.getCertificate(id);
-
-      if (!certificate) {
-        return BaseController.notFound(res, 'Certificate not found');
-      }
-
-      // service boundary 를 소유자 확인보다 먼저 판정한다 (§3 판정 순서)
-      if (!guardLoadedCourseScope(req, res, certificate.course?.serviceKey, 'Certificate not found')) return;
-
-      // 본인 수료증만 다운로드 가능
-      if (certificate.userId !== requestUserId) {
-        return BaseController.forbidden(res, 'Access denied');
-      }
+      // service boundary 를 소유자 확인보다 먼저 판정한다 (§4 판정 순서).
+      // WO-O4O-LMS-CERTIFICATE-OWNERSHIP-AND-READ-AUTHORIZATION-BOUNDARY-FIX-V1:
+      // 단건 read 와 동일 helper 를 쓰고, 타인 수료증은 403 이 아니라 404 로 존재를 숨긴다.
+      const certificate = await resolveOwnedCertificateByIdOrRespond(req, res, id);
+      if (!certificate) return;
 
       const userName = (certificate.user as any)?.name || '수강자';
       const courseTitle = certificate.course?.title || '과정';
