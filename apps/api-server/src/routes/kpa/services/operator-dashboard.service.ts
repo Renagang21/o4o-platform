@@ -251,7 +251,9 @@ async function fetchSecondaryCounts(
   isAdmin: boolean,
 ): Promise<SecondaryCounts> {
   // KPA Member pending = kpa_members.status='pending' (어드민 API 와 같은 source).
-  // 이벤트 오퍼 승인 대기 = organization_product_listings.status='pending' (service_key='kpa-society').
+  // 이벤트 오퍼 승인 대기 = organization_product_listings.status='pending' (service_key='kpa-groupbuy').
+  //   WO-O4O-STORE-SERVICE-KEY-RESIDUAL-INTEGRITY-CLEANUP-V1: 종전 'kpa-society' 는 일반 진열 pending 까지
+  //   세어 운영자 큐(listPendingListings(KPA_GROUPBUY)) 와 어긋났다 → 큐와 동일 key 로 정렬.
   //   WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1: 약국 서비스 신청 pending 대체.
   //   EventOfferService.countPendingListings 와 동일 쿼리(신규 통계 없음).
   // 상품 신청 pending = kpa_product_applications.status='pending' (operator-product-applications/stats endpoint 와 동일).
@@ -272,7 +274,7 @@ async function fetchSecondaryCounts(
     `).catch(() => [{ count: '0' }]),
     dataSource.query(`
       SELECT COUNT(*) AS count FROM organization_product_listings
-      WHERE service_key = 'kpa-society' AND status = 'pending'
+      WHERE service_key = 'kpa-groupbuy' AND status = 'pending'
     `).catch(() => [{ count: '0' }]),
     dataSource.query(`
       SELECT COUNT(*) AS count FROM kpa_product_applications WHERE status = 'pending'
