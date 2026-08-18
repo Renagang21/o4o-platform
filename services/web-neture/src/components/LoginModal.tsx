@@ -17,6 +17,10 @@ import { X, Eye, EyeOff } from 'lucide-react';
 import { useAuth, useLoginModal } from '../contexts';
 
 const REMEMBER_EMAIL_KEY = 'neture_remember_email';
+// WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1:
+//   App.tsx 의 동명 상수와 같은 값. App 이 LoginModal 을 import 하므로 역방향 import 는
+//   순환이 된다 — GlycoPharm 과 동일한 로컬 상수 패턴을 따른다.
+const LOGIN_EXPLICIT_NAV_KEY = 'neture_login_explicit_nav';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -73,6 +77,10 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
     }
 
     if (returnUrl && !returnUrl.startsWith('/workspace/')) {
+      // WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1:
+      //   PostLoginRedirect 가 같은 auth 변화에 반응해 역할 대시보드로 덮어쓰지 않도록 표시한다.
+      //   production 실측: 미인증 /operator → 로그인 → /admin 착지(원래 경로 복귀 실패).
+      sessionStorage.setItem(LOGIN_EXPLICIT_NAV_KEY, '1');
       navigate(returnUrl);
     }
     onClose();

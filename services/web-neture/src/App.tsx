@@ -575,6 +575,11 @@ function PageLoading() {
   );
 }
 
+// WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1:
+//   LoginModal 이 returnUrl 로 명시 이동했음을 PostLoginRedirect 에 알리는 1회성 플래그.
+//   LoginModal.tsx 의 동명 상수와 같은 값이어야 한다(App → LoginModal 단방향 import 유지).
+const LOGIN_EXPLICIT_NAV_KEY = 'neture_login_explicit_nav';
+
 // WO-O4O-NETURE-POSTLOGINREDIRECT-CANONICAL-ALIGNMENT-V1:
 // 로그인 직후 1회 역할 기반 redirect 수행.
 // / 또는 /login 경로에서만 동작. workspace 경로 early-exit.
@@ -597,6 +602,16 @@ function PostLoginRedirect() {
     if (!justLoggedIn && !didRedirectRef.current) return;
     if (isLoading || !user) return;
     if (didRedirectRef.current) return;
+
+    // WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1:
+    //   LoginModal 이 returnUrl 로 이미 이동시켰으면 여기서 다시 보내지 않는다.
+    //   아래 pathname 가드만으로는 부족하다 — 이 effect 가 modal 의 navigate 보다 먼저 돌면
+    //   pathname 이 아직 '/' 라 통과해 역할 대시보드로 덮어쓴다(GlycoPharm 4e62945ad 와 동일 레이스).
+    if (sessionStorage.getItem(LOGIN_EXPLICIT_NAV_KEY)) {
+      sessionStorage.removeItem(LOGIN_EXPLICIT_NAV_KEY);
+      didRedirectRef.current = true;
+      return;
+    }
 
     // / 또는 /login 경로에서만 동작
     if (location.pathname !== '/' && location.pathname !== '/login') {
