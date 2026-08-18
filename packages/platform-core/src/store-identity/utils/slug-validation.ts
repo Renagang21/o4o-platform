@@ -88,28 +88,55 @@ export function validateSlug(slug: string): SlugValidationResult {
 /**
  * Generate a slug from a store name
  *
+ * WO-O4O-STORE-SLUG-CANONICAL-CONTRACT-HARDENING-V1 §4:
+ *   생성 규칙과 `validateSlug` 규칙은 반드시 일치해야 한다.
+ *   (구) 구현은 `\w` 를 보존 문자 집합에 써서 `_` 를 남겼고, 그 결과
+ *   `"E2E_TEST Pharmacy"` → `e2e_test-pharmacy` 처럼 **validator 가 거부하는 slug**
+ *   를 생성해 `generateUniqueSlug` 가 100회 재시도 후 throw 했다.
+ *   또 MAX_LENGTH 절단이 말단 하이픈을 남길 수 있었다.
+ *
  * Rules:
  * - Preserves Korean characters
  * - Converts to lowercase
- * - Replaces spaces with hyphens
- * - Removes invalid characters
+ * - Converts underscore/whitespace runs to the canonical separator (-)
+ * - Removes characters outside the validator's allowed set
  * - Collapses consecutive hyphens
- * - Trims to max length
+ * - Trims leading/trailing hyphens (절단 이후에도 재확인)
  */
 export function generateSlugFromName(name: string): string {
   return name
     .toLowerCase()
     .trim()
-    // Keep Korean, alphanumeric, spaces, hyphens
-    .replace(/[^\w\uAC00-\uD7AF\s-]/g, '')
-    // Spaces to hyphens
-    .replace(/\s+/g, '-')
+    // underscore / whitespace → canonical separator
+    .replace(/[_\s]+/g, '-')
+    // validator 허용 문자 집합(a-z, 0-9, 한글, -) 외 제거
+    .replace(/[^a-z0-9가-힯-]/g, '')
     // Collapse multiple hyphens
     .replace(/-+/g, '-')
     // Trim leading/trailing hyphens
     .replace(/^-+|-+$/g, '')
     // Max length
-    .slice(0, SLUG_CONSTRAINTS.MAX_LENGTH);
+    .slice(0, SLUG_CONSTRAINTS.MAX_LENGTH)
+    // 절단으로 생긴 말단 하이픈 제거
+    .replace(/-+$/g, '');
+}
+
+/**
+ * 이름 기반 채번의 **base slug** 를 validator 계약에 맞춰 보정한다.
+ *
+ * WO-O4O-STORE-SLUG-CANONICAL-CONTRACT-HARDENING-V1 §4:
+ *   `generateSlugFromName` 이 빈 문자열을 돌려주는 이름(예: `"!!!"`, `"___"`)은
+ *   숫자 suffix 재시도(`-1` … `-100`)로도 유효 slug 가 되지 않는다(`-1` 은 STARTS_WITH_HYPHEN).
+ *   이 경우에만 fallback base 를 쓴다. TOO_SHORT / RESERVED 는 기존대로
+ *   숫자 suffix 로 해소되므로 base 를 바꾸지 않는다(기존 채번 결과 회귀 0).
+ */
+export const SLUG_FALLBACK_BASE = 'my-store';
+
+export function toValidSlugBase(name: string, fallback: string = SLUG_FALLBACK_BASE): string {
+  const base = generateSlugFromName(name);
+  if (base.length > 0) return base;
+  const normalizedFallback = generateSlugFromName(fallback);
+  return normalizedFallback.length > 0 ? normalizedFallback : SLUG_FALLBACK_BASE;
 }
 
 /**

@@ -40,7 +40,7 @@
  */
 
 import type { DataSource, QueryRunner } from 'typeorm';
-import { StoreSlugService } from '@o4o/platform-core/store-identity';
+import { StoreSlugService, generateSlugFromName } from '@o4o/platform-core/store-identity';
 import { organizationOpsService } from '../../modules/organization/services/organization-ops.service.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import logger from '../../utils/logger.js';
@@ -168,24 +168,17 @@ function digitsOnly(v: unknown): string {
 /**
  * slug base 정규화.
  *
- * 공통 `generateSlugFromName` 은 `\w` 를 보존해 **밑줄(_)을 통과시키지만**,
- * `validateSlug` 의 PATTERN(`[a-z0-9가-힣-]`)은 밑줄을 거부한다. 그래서 이름에 `_` 가
- * 들어가면 base 도 `-1`…`-100` 접미사도 전부 INVALID_CHARACTERS 가 되어
- * generateUniqueSlug 가 100회 시도 후 throw 한다.
+ * WO-O4O-STORE-SLUG-CANONICAL-CONTRACT-HARDENING-V1 §4:
+ *   과거에는 공통 `generateSlugFromName` 이 `\w` 를 보존해 밑줄(_)을 통과시켰고,
+ *   `validateSlug` 가 그 결과를 거부해 base 도 `-1`…`-100` 접미사도 전부 INVALID_CHARACTERS
+ *   가 되어 `generateUniqueSlug` 가 100회 시도 후 throw 했다. 그래서 여기서 별도 정규화를
+ *   중복 구현했었다. **정규화 규칙은 이제 공통 유틸이 소유한다**(중복 규칙 제거).
  *
- * 공통 유틸의 동작을 바꾸면 KPA/GP/K-Cos 의 기존 slug 생성 결과가 달라지므로 건드리지 않고,
- * 여기서 입력 base 만 미리 정규화해 넘긴다. 정규화 결과가 최소 길이(3) 미만이면
- * 조직 code(`ph-pharm-…`, 항상 유효)를 fallback 으로 쓴다.
+ *   이 함수에 남는 책임은 PharmacyHub 고유의 fallback 뿐이다 —
+ *   정규화 결과가 최소 길이(3) 미만이면 조직 code(`ph-pharm-…`, 항상 유효)를 쓴다.
  */
 function slugBase(name: string, fallback: string): string {
-  const normalized = name
-    .toLowerCase()
-    .trim()
-    .replace(/[_\s]+/g, '-')
-    // 허용 문자 집합은 SLUG_CONSTRAINTS.PATTERN 과 동일 (가-힯 = 한글 음절)
-    .replace(/[^a-z0-9가-힯-]/g, '')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
+  const normalized = generateSlugFromName(name);
   return normalized.length >= 3 ? normalized : fallback;
 }
 

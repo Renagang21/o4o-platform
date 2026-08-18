@@ -56,8 +56,12 @@ export class PlatformStoreSlug {
   slug!: string;
 
   /**
-   * The ID of the store in its respective service table.
-   * e.g., glycopharm_pharmacies.id or cosmetics_stores.id
+   * The canonical store axis is **organizations.id** (all services reserve with the
+   * organization id — kpa / glycopharm / cosmetics / pharmacy-hub).
+   *
+   * WO-O4O-CROSS-SERVICE-STORE-ORPHAN-SLUG-INTEGRITY-CLEANUP-V1 §6 에서 축을 고정했다.
+   * 서비스 전용 매장 테이블 PK(예: cosmetics_stores.id)를 넣으면 공개 조회가 영구 404 이고
+   * 조직 삭제 시 orphan slug 가 남는다.
    */
   @Column({ type: 'uuid', name: 'store_id' })
   storeId!: string;

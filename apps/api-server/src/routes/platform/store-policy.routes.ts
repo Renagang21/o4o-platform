@@ -545,15 +545,13 @@ export function createStorePolicyRoutes(dataSource: DataSource): Router {
         changedBy: ctx.userId,
       });
 
-      // Also update the slug in the service-specific store table
-      const updateQueries: Record<string, string> = {
-        // glycopharm: slug stored in platform_store_slugs only (no slug column on organizations)
-        cosmetics: `UPDATE cosmetics.cosmetics_stores SET slug = $1 WHERE id = $2`,
-      };
-      const updateQuery = updateQueries[ctx.serviceKey];
-      if (updateQuery) {
-        await dataSource.query(updateQuery, [updated.slug, ctx.storeId]);
-      }
+      // WO-O4O-STORE-SLUG-CANONICAL-CONTRACT-HARDENING-V1 §5:
+      //   public store slug 의 SSOT 는 `platform_store_slugs` 하나다.
+      //   여기서 `cosmetics.cosmetics_stores.slug` 를 mirror 로 갱신하던 코드는
+      //     (1) `ctx.storeId`(= organizations.id)를 store 테이블 PK 와 대조해 **항상 0 row**
+      //         만 갱신했고(무의미한 write),
+      //     (2) SSOT 를 이원화해 값이 갈라질 수 있었다.
+      //   → mirror write 를 중단한다. 레거시 컬럼 자체의 제거/migration 은 별도 WO.
 
       res.json({
         success: true,

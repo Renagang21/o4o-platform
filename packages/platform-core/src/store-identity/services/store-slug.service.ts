@@ -15,7 +15,7 @@ import { PlatformStoreSlug, type StoreSlugServiceKey } from '../entities/platfor
 import { PlatformStoreSlugHistory } from '../entities/platform-store-slug-history.entity.js';
 import {
   validateSlug,
-  generateSlugFromName,
+  toValidSlugBase,
   normalizeSlug,
   type SlugValidationError,
 } from '../utils/slug-validation.js';
@@ -149,7 +149,9 @@ export class StoreSlugService {
    * If the base slug is taken, appends -1, -2, etc.
    */
   async generateUniqueSlug(baseName: string): Promise<string> {
-    const baseSlug = generateSlugFromName(baseName);
+    // WO-O4O-STORE-SLUG-CANONICAL-CONTRACT-HARDENING-V1 §4:
+    //   base slug 는 첫 생성부터 validator 계약을 만족해야 한다(숫자 suffix 로 증상을 덮지 않는다).
+    const baseSlug = toValidSlugBase(baseName);
 
     // Try base slug first
     const baseAvailability = await this.checkAvailability(baseSlug);

@@ -62,6 +62,13 @@ export function createStorePopStaffController(
   async function resolvePharmacy(slug: string): Promise<OrganizationStore | null> {
     const record = await slugService.findBySlug(slug);
     if (!record || !record.isActive) return null;
+    // WO-O4O-STORE-SLUG-CANONICAL-CONTRACT-HARDENING-V1 §6:
+    //   공개 조회는 slug 만 맞는다고 끝내지 않고 **service 귀속까지 일치**해야 한다.
+    //   이 컨트롤러는 서비스별 mount(`/api/v1/{service}/stores/:slug/...`)이고
+    //   `serviceKey` 는 slug 축(kpa / glycopharm / cosmetics)과 같은 값이 주입된다.
+    //   slug row 의 service_key 가 다르면 이 서비스의 공개 매장이 아니다
+    //   (다서비스 enrollment 조직이 다른 서비스 slug 로 열리던 결함).
+    if (record.serviceKey !== serviceKey) return null;
     return orgRepo.findOne({ where: { id: record.storeId, isActive: true } });
   }
 

@@ -232,10 +232,14 @@ export class CosmeticsStoreService {
       ]);
     }
 
+    // WO-O4O-STORE-SLUG-CANONICAL-CONTRACT-HARDENING-V1 §5:
+    //   public store slug 의 SSOT 는 `platform_store_slugs` 하나다.
+    //   `cosmetics_stores.slug` 는 LEGACY_MIRROR 이며 runtime 공개 조회 소비처가 없다
+    //   (조회는 전부 registry 를 본다). 신규 생성에서 mirror write 를 중단해 값이
+    //   갈라질 여지를 없앤다. 컬럼 제거/migration 은 별도 WO.
     const store = queryRunner.manager.create('CosmeticsStore', {
       name: input.storeName,
       code: storeCode,
-      slug,
       businessNumber: input.businessNumber,
       ownerName: input.ownerName,
       contactPhone: input.contactPhone,
@@ -323,8 +327,9 @@ export class CosmeticsStoreService {
       const existing = await slugService.findByStoreId(organizationId, 'cosmetics');
       if (existing) return;
 
-      // store 테이블이 이미 가진 slug 가 있으면 그 값을 그대로 registry 에 맞춘다
-      // (두 축이 갈라지지 않게). 사용 불가하면 이름 기반 채번으로 되돌린다.
+      // 레거시 mirror(`cosmetics_stores.slug`)에 값이 남아 있으면 **provisioning 시점 1회**
+      // 그 값을 registry 로 승격한다(기존 공개 URL 보존). runtime 공개 조회는 registry 만 본다.
+      // WO-O4O-STORE-SLUG-CANONICAL-CONTRACT-HARDENING-V1 §5
       let slug: string | null = null;
       if (storeSlug) {
         const availability = await slugService.checkAvailability(storeSlug);

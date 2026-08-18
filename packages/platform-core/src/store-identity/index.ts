@@ -27,6 +27,8 @@ export {
 export {
   validateSlug,
   generateSlugFromName,
+  toValidSlugBase,
+  SLUG_FALLBACK_BASE,
   normalizeSlug,
   SLUG_CONSTRAINTS,
   type SlugValidationResult,
