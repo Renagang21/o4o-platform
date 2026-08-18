@@ -141,6 +141,21 @@ store-policy 는 **organization 단위 정책**이다(정책·결제설정·B2C 
 (`organization.id != cosmetics_stores.id` 강제 fixture) / role 없으면 조직 조회 없이 차단 /
 같은 서비스 조직 2개여도 slug 특정 매장이면 통과 / kpa·pharmacy-hub 동일 축 판정 / glycopharm legacy 유지 / neture 판정 제외.
 
+### 7-1. production post-fix smoke (revision `o4o-core-api-03358-s55`)
+
+| 요청 | 수정 전 | 수정 후 |
+|---|:---:|:---:|
+| `GET /stores/테스트-뷰티샵/policies` (public) | 200 | **200** |
+| `GET /stores/테스트-뷰티샵/payment-config` (KCos owner) | 500 | **200** |
+| `GET /stores/테스트-뷰티샵/slug/can-change` (KCos owner) | 500 | **200** `{canChange:true}` |
+| `GET /stores/test-kcos-store-owner/payment-config` (KCos 비소유자) | 500 | **403 FORBIDDEN** |
+| `GET /stores/네뚜레-약국/payment-config` (KPA owner) | 403 | **200** |
+| `GET /stores/중앙약국/payment-config` (KPA 비소유자) | 403 | **403 FORBIDDEN** |
+| `GET /stores/no-such-store-xyz/payment-config` | 404 | **404 STORE_NOT_FOUND** |
+| 미인증 | 401 | **401 AUTH_REQUIRED** |
+
+read-only 요청만 수행했다 (production write 0).
+
 ---
 
 ## 8. 잔존 위험
