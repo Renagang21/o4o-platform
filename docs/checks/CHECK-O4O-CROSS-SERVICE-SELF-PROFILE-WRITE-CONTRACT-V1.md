@@ -180,7 +180,38 @@ KPA 는 **코드 변경 0건**이다 (§10 기본 미변경).
 
 ## 11. Production browser smoke
 
-<!-- SMOKE_PLACEHOLDER -->
+### 11-1. API 레벨 (production `api.neture.co.kr`, 6 시나리오)
+
+각 시나리오: 로그인 → `GET /users/me/profile`(변경 전 값 기록) → `PATCH` nickname → 200 확인 → 재조회 → 금지 필드 probe → 원래 값 복원 → 재조회 확인.
+
+| # | 서비스 / 계정 | `editableFields` | PATCH | 재조회 persist | 금지 필드(`roles`,`status`) | 원복 |
+|---|---------------|------------------|:-----:|:--------------:|-----------------------------|:----:|
+| 1 | GlycoPharm (`glycopharm`) | name·firstName·lastName·nickname·phone | 200 | O | 400 `FIELD_NOT_EDITABLE` | O |
+| 2 | K-Cosmetics (`k-cosmetics`) | 동일 | 200 | O | 400 `FIELD_NOT_EDITABLE` | O |
+| 3 | Neture (`neture`) | 동일 | 200 | O | 400 `FIELD_NOT_EDITABLE` | O |
+| 4 | PharmacyHub operator (`pharmacy-hub`) | 동일 | 200 | O | 400 `FIELD_NOT_EDITABLE` | O |
+| 5 | PharmacyHub store_owner (`pharmacy-hub`) | 동일 | 200 | O | 400 `FIELD_NOT_EDITABLE` | O |
+| 6 | KPA-Society (`kpa-society`) | 동일 | 200 | O | 400 `FIELD_NOT_EDITABLE` | O |
+
+- 계정은 전부 `docs/local/TEST-ACCOUNTS.local.md` 의 테스트 계정. 실사용자 계정 write 0.
+- 수정 대상은 `nickname` 1개 필드뿐이며 6건 모두 원래 값으로 복원 후 재조회로 확인했다 (원복 실패 0).
+- role / status / membership / service_credentials / businessInfo / organizations write 0.
+
+### 11-2. 브라우저 레벨 (실 브라우저)
+
+| # | 대상 | 시나리오 | 결과 |
+|---|------|----------|:----:|
+| 1 | PharmacyHub operator — `/account` | 사용자 메뉴 "내 프로필" 진입 → 프로필 수정 노출 → nickname 수정 → 저장("계정 정보를 저장했습니다.") → 재진입 유지 → 원복 · 비밀번호 변경 모달 open/cancel 정상 · console error 0 | PASS |
+| 2 | PharmacyHub — `/store-owner/account` (thin wrapper) | wrapper 경로 렌더 → 프로필 수정 → 저장 → 값 반영 → 원복 · console error 0 | PASS |
+| 3 | GlycoPharm — `/mypage/profile` | 로그인 → 프로필 수정 → nickname 수정 → 저장("프로필이 수정되었습니다.") → **새로고침 후 값 유지** → 원복 → 새로고침 재확인 | PASS |
+| 4 | KPA-Society — `/mypage/profile` (회귀) | 로그인 → 수정 → 저장("기본 정보가 저장되었습니다.") → 값 반영 → 원복. 기존 KPA 전용 write 경로 동작 변화 없음 | PASS (회귀 이상 0) |
+| 5 | K-Cosmetics — `/mypage/profile` | **미수행** | SKIPPED |
+| 6 | Neture — `/mypage/profile` | **미수행** | SKIPPED |
+
+**5·6 SKIPPED 사유 (숨기지 않고 명시)** — 두 사이트는 브라우저에 저장된 자격증명이 없어 로그인 폼 자동 채움이 되지 않는다. 자격증명을 자동화 입력으로 넘기려면 `docs/local/TEST-ACCOUNTS.local.md` 의 비밀번호를 평문으로 노출해야 하는데, 이는 §15 자격증명 취급 원칙 위반이므로 수행하지 않았다 (자격증명을 로컬에서 브라우저로 전달하는 우회 경로도 환경 정책상 차단됨).
+
+**대체 근거** — 두 서비스의 화면 변경분은 GlycoPharm 과 **동일한 1줄 호출 전환**(`api.put('/users/profile')` → `api.patch('/users/me/profile')`)이며, GP 브라우저 PASS + KCos/Neture API 레벨 PASS(위 11-1 #2·#3)로 계약 동작이 확인된다. 잔여 미확인 범위는 두 서비스의 화면 렌더링뿐이다.
+
 
 ---
 
@@ -222,7 +253,16 @@ KPA 는 **코드 변경 0건**이다 (§10 기본 미변경).
 
 ## 15. CHECK / commit / push
 
-<!-- GIT_PLACEHOLDER -->
+| 항목 | 값 |
+|------|-----|
+| 구현 commit | `408fe8e0c` — feat(account): 플랫폼 공통 self-profile write 계약 확정 (11 files, +788/−32) |
+| CHECK commit | 본 문서 (docs only) |
+| 배포 | push → GitHub Actions `Deploy API Server (Cloud Run)` success → revision `o4o-core-api-03362-mzn` / `Deploy Web Services` success |
+| 인프라 변경 | 0 (Cloud Run config·env·secret·IAM 무변경, migration 0) |
+| stage 방식 | path-specific only (`git add .` 미사용) |
+| 타 세션 작업 | `packages/lms-ui/**` · `packages/shared-space-ui/**` · `services/web-kpa-society/src/components/education/**` 등 LMS 계열 미커밋 변경은 **손대지 않았다** (수정·삭제·stash 0) |
+| 완료 기준 | 본 WO 범위 미커밋 변경 0 / `HEAD == origin/main` |
+
 
 ---
 
