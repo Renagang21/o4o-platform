@@ -14,7 +14,8 @@ import { OperatorCapability } from '@o4o/types';
 
 export const ENABLED_CAPABILITIES: OperatorCapability[] = [
   OperatorCapability.MEMBERSHIP_APPROVAL,
-  // WO-O4O-PHARMACY-HUB-SERVICE-LEGAL-SETTINGS-ADOPTION-V1:
-  //   system 그룹(법정정보 설정) 노출용. 해당 그룹의 실재 항목은 /operator/settings/legal 1건이다.
-  OperatorCapability.SETTINGS,
+  // WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1:
+  //   법정정보 설정이 관리자 영역으로 이동해 운영자 system 그룹의 실재 항목이 0 이 되었으므로
+  //   SETTINGS capability 를 되돌린다(빈 그룹 헤딩 노출 방지). 관리자 영역 capability 는
+  //   config/adminMenuGroups.ts 의 ADMIN_ENABLED_CAPABILITIES 가 소유한다.
 ];

@@ -22,8 +22,10 @@
  *   /operator                    운영자 셸 (OperatorLayoutWrapper — 공통 OperatorAreaShell)
  *     ├ (index)                  서비스 운영자 진입점
  *     ├ /memberships             가입 신청 관리 목록
- *     ├ /memberships/:id         가입 신청 상세
- *     └ /settings/legal          법정정보 설정 (공통 service-legal 컴포넌트)
+ *     └ /memberships/:id         가입 신청 상세
+ *   /admin                       관리자 셸 (AdminLayoutWrapper — 공통 OperatorAreaShell + admin 가드)
+ *     ├ (index)                  관리자 대시보드 (공통 4-Block @o4o/admin-ux-core)
+ *     └ /settings/legal-terms    법정정보·약관 설정 (공통 service-legal 컴포넌트)
  *
  *   /store-hub                   매장허브 홈 — 자원 탐색 진입점 (공통 StoreHubTemplate)
  *
@@ -64,6 +66,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { StoreOwnerShell } from './layouts/StoreOwnerShell';
 // WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1
 import { OperatorLayoutWrapper } from './layouts/OperatorLayoutWrapper';
+import { AdminLayoutWrapper } from './layouts/AdminLayoutWrapper';
 // WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1
 import { SupplierShell } from './layouts/SupplierShell';
 // WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1 — 공개 영역 공통 셸(헤더·푸터)
@@ -83,7 +86,8 @@ import ForumDetailPage from './pages/forum/ForumDetailPage';
 import ForumWritePage from './pages/forum/ForumWritePage';
 import MembershipsPage from './pages/operator/MembershipsPage';
 // WO-O4O-PHARMACY-HUB-SERVICE-LEGAL-SETTINGS-ADOPTION-V1 — 공통 법정정보 설정 채택
-import ServiceLegalSettingsPage from './pages/operator/ServiceLegalSettingsPage';
+import PharmacyHubAdminDashboard from './pages/admin/PharmacyHubAdminDashboard';
+import ServiceLegalSettingsPage from './pages/admin/ServiceLegalSettingsPage';
 import MembershipDetailPage from './pages/operator/MembershipDetailPage';
 // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
 import SupplierProductsPage from './pages/supplier/ProductsPage';
@@ -229,13 +233,20 @@ export default function App() {
             <Route index element={<OperatorDashboardPage />} />
             <Route path="memberships" element={<MembershipsPage />} />
             <Route path="memberships/:membershipId" element={<MembershipDetailPage />} />
-            {/*
-              WO-O4O-PHARMACY-HUB-SERVICE-LEGAL-SETTINGS-ADOPTION-V1
-              법정정보 설정 — 공통 @o4o/operator-core-ui 컴포넌트 wrapper.
-              실제 권한은 backend requireServiceLegalScope(PHARMACY_HUB_SCOPE_CONFIG) 가 강제한다
-              (조회 operator 이상 / 저장 admin). 프론트 라우트는 UX 안내다.
-            */}
-            <Route path="settings/legal" element={<ServiceLegalSettingsPage />} />
+          </Route>
+
+          {/*
+            관리자 영역 셸 (WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1)
+            AdminLayoutWrapper = MembershipGate + 역할 가드(admin | platform:super_admin)
+              + 공통 OperatorAreaShell. K-Cosmetics / GlycoPharm / Neture / KPA 의 `/admin` 과 같은 축이다.
+            admin 이 operator API 를 쓸 수 있다는 이유로 두 영역을 합치지 않는다.
+
+            법정정보·약관 설정은 저장이 `pharmacy-hub:admin` 권한이므로 다른 4서비스와 동일하게
+            관리자 영역으로 이동했다 (기존 `/operator/settings/legal` 제거 — 이중 진입점 방지).
+          */}
+          <Route path="/admin" element={<AdminLayoutWrapper />}>
+            <Route index element={<PharmacyHubAdminDashboard />} />
+            <Route path="settings/legal-terms" element={<ServiceLegalSettingsPage />} />
           </Route>
 
           {/*

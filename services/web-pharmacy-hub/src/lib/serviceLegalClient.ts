@@ -1,30 +1,19 @@
 /**
- * Pharmacy-Hub Operator — 법정정보 설정 wrapper
+ * serviceLegalClient — Pharmacy-Hub service-legal API 어댑터 (SSOT)
  *
- * WO-O4O-PHARMACY-HUB-SERVICE-LEGAL-SETTINGS-ADOPTION-V1
+ * WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1
  *
- * Neture / GlycoPharm / K-Cosmetics / KPA 와 동일하게 공통 컴포넌트
- * `@o4o/operator-core-ui/modules/service-legal` 에 serviceKey('pharmacy-hub') +
- * authClient 기반 api 어댑터만 주입한다. 전용 대형 페이지를 새로 만들지 않는다.
+ * 기존에는 법정정보 설정 화면 안에 어댑터가 들어 있었다. 관리자 대시보드도 같은
+ * endpoint 를 읽어야 하므로(정책 문서 게시 현황) 어댑터를 lib 로 올려 **한 벌만** 둔다.
  *
  * backend 계약: WO-O4O-SERVICE-LEGAL-POLICY-SETTINGS-BACKEND-V1
- *   GET/PUT /api/v1/admin/services/pharmacy-hub/legal-profile
- * 권한: requireServiceLegalScope → PHARMACY_HUB_SCOPE_CONFIG
- *   조회 = pharmacy-hub:operator 이상 / 저장 = pharmacy-hub:admin
- *   (WO-O4O-PHARMACY-HUB-LEGAL-SERVICE-SCOPE-AND-FOOTER-404-FIX-V1 에서 legal scope 연결 완료)
- *
- * 탭 범위: 전체(profile · policies · status).
- *   WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1 에서 공개 route
- *   `/terms` · `/privacy` (공통 PolicyDocumentViewer) 가 생겨 게시 문서가 도달 가능해졌으므로,
- *   보류했던 'policies' 탭을 다른 4서비스와 동일하게 연다(enabledTabs 미지정 = 전체).
+ *   GET/PUT  /api/v1/admin/services/pharmacy-hub/legal-profile
+ *   GET/POST/PUT/PATCH /api/v1/admin/services/pharmacy-hub/policies[/:id][/publish|/lifecycle]
+ * 권한: requireServiceLegalScope(PHARMACY_HUB_SCOPE_CONFIG) — 조회 operator 이상 / 저장 admin.
  */
 
-import {
-  ServiceLegalSettingsPage as SharedServiceLegalSettingsPage,
-  type ServiceLegalApi,
-} from '@o4o/operator-core-ui/modules/service-legal';
-import { api } from '../../lib/apiClient';
-import { SERVICE_KEY } from '../../config/service';
+import type { ServiceLegalApi } from '@o4o/operator-core-ui/modules/service-legal';
+import { api } from './apiClient';
 
 /** axios 오류 → 사용자 메시지(권한 우회 없이 상태별 표시). */
 function toError(err: any): Error {
@@ -37,7 +26,7 @@ function toError(err: any): Error {
   return new Error(typeof serverMsg === 'string' ? serverMsg : '서버 오류가 발생했습니다.');
 }
 
-const legalApi: ServiceLegalApi = {
+export const legalApi: ServiceLegalApi = {
   async getLegalProfile(serviceKey) {
     try {
       const res = await api.get(`/admin/services/${serviceKey}/legal-profile`);
@@ -54,7 +43,6 @@ const legalApi: ServiceLegalApi = {
       throw toError(err);
     }
   },
-  // 아래 정책문서 메서드는 'policies' 탭을 노출하지 않으므로 호출되지 않는다(인터페이스 충족용).
   async listPolicies(serviceKey) {
     try {
       const res = await api.get(`/admin/services/${serviceKey}/policies`);
@@ -96,13 +84,3 @@ const legalApi: ServiceLegalApi = {
     }
   },
 };
-
-export default function ServiceLegalSettingsPage() {
-  return (
-    <SharedServiceLegalSettingsPage
-      serviceKey={SERVICE_KEY}
-      api={legalApi}
-      title="서비스 설정 — 법정정보·약관"
-    />
-  );
-}

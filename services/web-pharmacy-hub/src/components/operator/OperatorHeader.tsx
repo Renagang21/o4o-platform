@@ -16,7 +16,23 @@ import { getUserDisplayName } from '@o4o/account-ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { BRAND } from '../../config/service';
 
-export function OperatorHeader() {
+/**
+ * WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1
+ *
+ * 관리자 영역(/admin)도 같은 상단바 규격을 쓰므로 **헤더 사본을 만들지 않고**
+ * 영역 라벨·홈 경로만 prop 으로 받는다. 기본값은 기존 운영자 영역과 동일하다(동작 불변).
+ */
+export interface OperatorHeaderProps {
+  /** 브랜드 로고 클릭 시 이동할 영역 홈. 기본 `/operator` */
+  areaHome?: string;
+  /** 영역 배지 문구. 기본 `서비스 운영자` */
+  areaLabel?: string;
+}
+
+export function OperatorHeader({
+  areaHome = '/operator',
+  areaLabel = '서비스 운영자',
+}: OperatorHeaderProps = {}) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const userName = user ? getUserDisplayName(user) : '';
@@ -25,14 +41,14 @@ export function OperatorHeader() {
     <header className="sticky top-0 z-50 shrink-0 border-b border-slate-200/50 bg-white/95 backdrop-blur-lg">
       <div className="flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-3">
-          <Link to="/operator" className="flex items-center gap-2">
+          <Link to={areaHome} className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600 shadow-md">
               <ShieldCheck className="h-4 w-4 text-white" />
             </div>
             <span className="hidden text-base font-bold text-slate-800 sm:inline">{BRAND.name}</span>
           </Link>
           <span className="rounded-lg bg-teal-100 px-3 py-1.5 text-sm font-medium text-teal-700">
-            서비스 운영자
+            {areaLabel}
           </span>
         </div>
 

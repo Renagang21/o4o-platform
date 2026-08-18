@@ -33,6 +33,14 @@ export const ROLES = {
   operator: `${SERVICE_KEY}:operator`,
 } as const;
 
+/**
+ * 플랫폼 전역 최고 관리자 (WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1)
+ *
+ * backend `PHARMACY_HUB_SCOPE_CONFIG.platformBypass = true` 와 같은 계약이다.
+ * K-Cosmetics / GlycoPharm / Neture 헤더도 동일하게 서비스 admin 과 함께 취급한다.
+ */
+export const PLATFORM_SUPER_ADMIN = 'platform:super_admin' as const;
+
 export const ROLE_LABELS: Record<string, string> = {
   [ROLES.admin]: '서비스 관리자',
   [ROLES.storeOwner]: '약국 경영자',
@@ -48,10 +56,15 @@ export const ROLE_LABELS: Record<string, string> = {
  * 프론트가 더 넓으면 화면은 열리고 API 는 403 이 되며, 더 좁으면 권한이 있는데도 막힌다.
  *
  * admin ⊃ operator. store_owner / supplier 는 사업자 신분이라 admin 이 대신하지 않는다.
+ *
+ * WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1:
+ *   platform:super_admin 을 admin/operator 만족 역할로 추가한다(backend platformBypass 와 정렬).
+ *   store_owner / supplier 는 사업자 신분이므로 플랫폼 관리자가 대신하지 않는다 —
+ *   해당 API 는 본인 레코드 기준이라 메뉴만 열면 403 이 된다.
  */
 export const ROLE_SCOPE_MAPPING: Record<string, readonly string[]> = {
-  [ROLES.admin]: [ROLES.admin],
-  [ROLES.operator]: [ROLES.operator, ROLES.admin],
+  [ROLES.admin]: [ROLES.admin, PLATFORM_SUPER_ADMIN],
+  [ROLES.operator]: [ROLES.operator, ROLES.admin, PLATFORM_SUPER_ADMIN],
   [ROLES.storeOwner]: [ROLES.storeOwner],
   [ROLES.supplier]: [ROLES.supplier],
 };

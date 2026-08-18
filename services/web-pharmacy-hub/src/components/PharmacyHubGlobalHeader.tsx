@@ -21,7 +21,7 @@
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, LogIn, Pill, Store, Truck, UserCircle } from 'lucide-react';
+import { LayoutDashboard, LogIn, Pill, Shield, Store, Truck, UserCircle } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem, filterContextualNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
@@ -39,6 +39,14 @@ export function PharmacyHubGlobalHeader() {
 
   const roles: string[] = Array.isArray(user?.roles) ? (user!.roles as string[]) : [];
 
+  /**
+   * WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1
+   *
+   * admin 과 operator 는 **독립 업무 영역**이다. admin 이 operator API 를 쓸 수 있다는
+   * 이유로 메뉴를 하나로 합치지 않는다 (K-Cosmetics / GlycoPharm / Neture 와 같은 계약).
+   * 두 역할을 모두 만족하면 두 항목이 모두 보인다.
+   */
+  const isAdmin = isAuthenticated && satisfiesRole(roles, ROLES.admin);
   const isOperator = isAuthenticated && satisfiesRole(roles, ROLES.operator);
   const isSupplier = isAuthenticated && satisfiesRole(roles, ROLES.supplier);
   /**
@@ -123,9 +131,14 @@ export function PharmacyHubGlobalHeader() {
               {ROLE_LABELS[ROLES.supplier]}
             </GlobalHeaderMenuItem>
           )}
+          {isAdmin && (
+            <GlobalHeaderMenuItem to="/admin" icon={<Shield className="w-4 h-4" />}>
+              관리자 대시보드
+            </GlobalHeaderMenuItem>
+          )}
           {isOperator && (
             <GlobalHeaderMenuItem to="/operator" icon={<LayoutDashboard className="w-4 h-4" />}>
-              {ROLE_LABELS[ROLES.operator]}
+              운영 대시보드
             </GlobalHeaderMenuItem>
           )}
           {/*

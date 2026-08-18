@@ -26,11 +26,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   // 가입 신청 관리 = service_memberships 승인/반려 (MEMBERSHIP_APPROVAL capability).
   // 실제 권한 경계는 backend pharmacy-hub:operator scope guard 가 강제한다.
   approvals: [{ label: '가입 신청 관리', path: '/operator/memberships' }],
-  // WO-O4O-PHARMACY-HUB-SERVICE-LEGAL-SETTINGS-ADOPTION-V1:
-  //   법정정보 설정 = 공통 service-legal 화면(/operator/settings/legal).
-  //   backend 조회 권한이 pharmacy-hub:operator 이상이므로 adminOnly 로 숨기지 않는다
-  //   (저장은 admin 만 가능하며 backend 가 403 으로 강제한다 — 프론트에서 이중 판정하지 않는다).
-  system: [{ label: '법정정보 설정', path: '/operator/settings/legal' }],
+  // WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1:
+  //   법정정보·약관 설정은 저장이 admin 권한인 화면이라 다른 4서비스와 동일하게
+  //   관리자 영역(/admin/settings/legal-terms)으로 이동했다 → 운영자 메뉴에서 제거.
+  //   config/adminMenuGroups.ts 가 해당 항목을 소유한다.
 };
 
 // ─── Domain IA ────────────────────────────────────────────────

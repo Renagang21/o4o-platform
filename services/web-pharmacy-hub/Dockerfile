@@ -35,6 +35,7 @@ COPY packages/auth-react/package.json ./packages/auth-react/
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/operator-core-ui/package.json ./packages/operator-core-ui/
+COPY packages/admin-ux-core/package.json ./packages/admin-ux-core/
 COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 COPY packages/error-handling/package.json ./packages/error-handling/
 COPY packages/ui/package.json ./packages/ui/
@@ -69,6 +70,7 @@ COPY packages/auth-react/ ./packages/auth-react/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/operator-core-ui/ ./packages/operator-core-ui/
+COPY packages/admin-ux-core/ ./packages/admin-ux-core/
 COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/ui/ ./packages/ui/
