@@ -33,7 +33,9 @@ const VALID_SERVICE_KEYS = Object.values(SERVICE_KEYS) as string[];
 //
 //   아래 두 헬퍼는 **서비스 경계 축이 아니라 row 판별자 축**으로만 남는다.
 //   organization_product_listings.service_key 는 한 매장 안에서도 복수 값을 가진다
-//   ('kpa-society' 일반 진열 / 'kpa-groupbuy' 이벤트오퍼 / 'kpa' 주문 파생행 — 본 파일 /orderable 참조).
+//   ('kpa-society' 일반 진열 및 주문 파생행(source_type='event-offer') / 'kpa-groupbuy' 이벤트오퍼 —
+//    본 파일 /orderable 참조). WO-O4O-STORE-SERVICE-KEY-RESIDUAL-INTEGRITY-CLEANUP-V1 이후
+//    파생행 service_key 는 canonical 'kpa-society' 이며 구분은 source_type 으로만 한다.
 //   따라서 `/listings/:id`(PUT) · `/listings/:id/channels`(GET·PUT) 는 **수정 대상 row 를 지목**하기 위해
 //   클라이언트가 그 row 의 실제 service_key 를 보내야 한다(프론트 pharmacyProducts.ts 주석과 동일 계약).
 //   서버가 마운트 키로 고정하면 혼합 도메인(all 탭) 진열 관리가 깨진다.
@@ -634,7 +636,7 @@ export function createPharmacyProductsController(
           AND s.status = 'ACTIVE'
           -- WO 답변 정정: 이벤트·특가는 약국 OPL 권위가 아니다. 이벤트 OPL 은 운영자 조직 소유이며
           --   약국은 이벤트 탭(/groupbuy)에서 별도 조회한다. 약국 org OPL 에 존재할 수 있는 유일한
-          --   이벤트 관련 행은 '주문 후 파생 진열 행'(service_key='kpa', source_type='event-offer')뿐인데,
+          --   이벤트 관련 행은 '주문 후 파생 진열 행'(source_type='event-offer')뿐인데,
           --   이는 재주문 가능한 B2B 상품이 아니라 이벤트 주문 산출물이므로 주문 상품 목록에서 제외한다.
           AND opl.source_type IS DISTINCT FROM 'event-offer'
           AND (

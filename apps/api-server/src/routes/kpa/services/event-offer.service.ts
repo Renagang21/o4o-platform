@@ -35,8 +35,12 @@ import {
 // Event Offer service_key → Store(매장 진열) service_key 매핑.
 // 매핑된 항목만 참여 후 매장 진열 등록 후처리를 실행한다.
 // 새 서비스 도입 시 이 맵에 항목 추가만으로 확장 가능.
+// WO-O4O-STORE-SERVICE-KEY-RESIDUAL-INTEGRITY-CLEANUP-V1:
+//   OPL.service_key 는 platform canonical 축이다(utils/listing-service-key.ts SSOT,
+//   migration 20260411300000-NormalizeKpaServiceKeys 가 'kpa' → 'kpa-society' 를 표준으로 확정).
+//   KPA 만 role-prefix 'kpa' 로 남아 있어 legacy row 를 계속 생성했다 → canonical 로 정렬.
 const STORE_SERVICE_KEY_MAP: Record<string, string> = {
-  [SERVICE_KEYS.KPA_GROUPBUY]: SERVICE_KEYS.KPA,
+  [SERVICE_KEYS.KPA_GROUPBUY]: SERVICE_KEYS.KPA_SOCIETY,
   // WO-O4O-EVENT-OFFER-KCOS-ADOPTION-V1: K-Cosmetics 적용
   [SERVICE_KEYS.K_COSMETICS_EVENT_OFFER]: SERVICE_KEYS.K_COSMETICS,
   // WO-O4O-GLYCOPHARM-EVENT-OFFERS-BACKEND-CANONICAL-ALIGNMENT-V1
