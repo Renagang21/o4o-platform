@@ -257,6 +257,25 @@ router 결합은 `renderLink` 주입, 조회는 `config.fetchItems` / `config.fe
 
 ---
 
+## 8-A. Production browser smoke (§16)
+
+- 배포: `Deploy Web Services (Cloud Run)` run 32114059127 — 6개 web 서비스 전부 success (commit `38cc33ff2`)
+- 대상: `k-cosmetics-web` / `glycopharm-web` · desktop 1440×900 + mobile 390×844
+
+| 화면 | 만족 | console error | HTTP≥400 | 가로 overflow |
+|------|------|---------------|----------|----------------|
+| KCos `/content` (desktop·mobile) | 렌더 OK — empty state | 0 | 0 | 0px |
+| KCos `/resources` (desktop·mobile) | 렌더 OK | 0 | 0 | 0px |
+| GP `/content` (desktop·mobile) | 렌더 OK — empty state | 0 | 0 | 0px |
+| GP `/resources` (desktop·mobile) | 렌더 OK | 0 | 0 | 0px |
+| KCos·GP `/content/{존재하지-않는-id}` (desktop·mobile) | 오류 상태 + `다시 시도` + `← 목록으로` | 1 (의도된 404 로그) | 조회 대상 404 외 0 | 0px |
+
+- 흰 화면 0 / JS exception 0 / 신규 404·500 0 / cross-service 데이터 혼입 0 / mobile 가로 overflow 0
+- **empty state 가 오류 삼킴이 아님을 확인**: `GET /api/v1/cosmetics/contents` · `GET /api/v1/glycopharm/contents` → `{"success":true,...,"total":0}` (200 정상 0건)
+- **한계**: 두 서비스 프로덕션에 콘텐츠가 0건이라 **카드 목록·더 보기·상세 정상경로는 브라우저로 재현하지 못했다.** 해당 경로는 37건 회귀 테스트(서버 렌더링)로만 고정돼 있다.
+
+---
+
 ## 9. 잔존 위험 · 후속 후보 (수정하지 않음, 보고만)
 
 1. **K-Cosmetics `ResourcesPage` adapter** — 헤더 주석은 `sub_type=resource` 를 명시하나 실제 호출은 `/cosmetics/contents` 에 해당 파라미터를 넘기지 않는다. 자료실 목록 모집단 정의 문제로 별도 WO 후보.
