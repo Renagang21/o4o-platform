@@ -187,7 +187,10 @@ function toRequestDto(c: ProductCandidate) {
 
 export function createStoreProductRequestController(dataSource: DataSource): Router {
   const router = Router();
-  const requireStoreOwner = createRequireStoreOwner(dataSource);
+  // WO-O4O-STORE-OWNER-BACKCOMPAT-SERVICEKEY-MIGRATION-V1 §3
+  // `/api/v1/store/product-requests` 소비처는 services/web-kpa-society 뿐이다
+  // (admin-dashboard 는 `/api/v1/operator/store-product-requests` 를 쓴다).
+  const requireStoreOwner = createRequireStoreOwner(dataSource, 'kpa');
   const candidateRepo = dataSource.getRepository(ProductCandidate);
   const candidateService = new ProductCandidateService(dataSource);
 

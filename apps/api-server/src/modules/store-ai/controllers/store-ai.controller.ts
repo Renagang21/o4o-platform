@@ -26,7 +26,12 @@ export function createStoreAiRouter(dataSource: DataSource): Router {
   const insightService = new StoreAiInsightService(dataSource);
   const productSnapshotService = new StoreAiProductSnapshotService(dataSource);
   const productInsightService = new StoreAiProductInsightService(dataSource);
-  const requireStoreOwner = createRequireStoreOwner(dataSource);
+  // WO-O4O-STORE-OWNER-BACKCOMPAT-SERVICEKEY-MIGRATION-V1 §3
+  // 이 라우터의 유일한 소비처는 services/web-glycopharm 이다
+  // (register-routes.ts `/api/v1/store-hub/ai` 단일 mount).
+  // serviceKey 없는 back-compat 는 타 서비스 store_owner 가 glycopharm 매장 AI 를
+  // 조회할 수 있는 경로였으므로 명시 serviceKey 로 전환한다.
+  const requireStoreOwner = createRequireStoreOwner(dataSource, 'glycopharm');
 
   // GET /health — AI 시스템 진단 (public)
   router.get('/health', async (_req, res) => {
