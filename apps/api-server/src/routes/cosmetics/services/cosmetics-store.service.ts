@@ -247,8 +247,17 @@ export class CosmeticsStoreService {
     const savedStore = await queryRunner.manager.save('CosmeticsStore', store);
 
     // Register slug in platform-wide registry
+    //
+    // WO-O4O-CROSS-SERVICE-STORE-ORPHAN-SLUG-INTEGRITY-CLEANUP-V1 §6
+    //   `platform_store_slugs.store_id` 의 canonical 축은 **organizations.id** 다
+    //   (kpa / glycopharm / pharmacy-hub 전부 조직 id 로 예약한다).
+    //   여기만 `cosmetics.cosmetics_stores.id` 를 넣고 있었다. 그 결과
+    //     (1) 공개 조회(resolvePublicStore)가 organizations 를 찾으므로 항상 404 이고,
+    //     (2) 조직 삭제 시 slug 잔재 정리(OrganizationService.deleteOrganization)가
+    //         store_id 로 매칭되지 않아 orphan slug 가 그대로 남는다.
+    //   → 조직 id 로 예약해 다른 서비스와 같은 축에 맞춘다.
     await slugService.reserveSlug({
-      storeId: (savedStore as any).id,
+      storeId: orgId,
       serviceKey: 'cosmetics',
       slug,
     });
