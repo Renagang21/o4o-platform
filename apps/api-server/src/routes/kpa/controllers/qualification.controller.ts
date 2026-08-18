@@ -224,7 +224,7 @@ export function createQualificationController(
 
         const [rows, countRows] = await Promise.all([
           dataSource.query(
-            `SELECT r.*, u.name AS user_name, u.email AS user_email, u.created_at AS user_created_at
+            `SELECT r.*, u.name AS user_name, u.email AS user_email, u."createdAt" AS user_created_at
              FROM qualification_requests r
              LEFT JOIN users u ON u.id = r.user_id
              ${where}

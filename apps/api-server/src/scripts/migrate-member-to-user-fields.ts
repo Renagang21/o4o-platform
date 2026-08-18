@@ -116,7 +116,7 @@ async function migrateMemberToUserFields(): Promise<MigrationStats> {
           values.push(user_id);
           const query = `
             UPDATE users
-            SET ${updates.join(', ')}, updated_at = NOW()
+            SET ${updates.join(', ')}, "updatedAt" = NOW()
             WHERE id = $${paramIndex}
           `;
 
