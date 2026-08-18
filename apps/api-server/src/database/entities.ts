@@ -293,6 +293,12 @@ import {
 import { ExternalChannelProductLink } from '../modules/external-sales/entities/external-channel-product-link.entity.js';
 
 // ============================================================================
+// CAFE24 ENTITIES (WO-O4O-CAFE24-OAUTH-PRODUCT-CENSUS-V1)
+// Cafe24 OAuth 연결정보만 저장한다. Cafe24 상품/주문/회원 원장 복제 아님.
+// ============================================================================
+import { Cafe24Connection } from '../modules/cafe24/entities/Cafe24Connection.entity.js';
+
+// ============================================================================
 // KPA ENTITIES (Pharmacist Association SaaS)
 // ============================================================================
 import {
@@ -775,6 +781,10 @@ export const entities = [
   // EXTERNAL SALES ENTITIES (WO-O4O-KPA-NAVER-ONLINE-SALES-CONNECTION-AND-PILOT-CLOSEOUT-V1)
   // ============================================================================
   ExternalChannelProductLink,
+  // ============================================================================
+  // CAFE24 ENTITIES (WO-O4O-CAFE24-OAUTH-PRODUCT-CENSUS-V1)
+  // ============================================================================
+  Cafe24Connection,
   // ============================================================================
   // KPA ENTITIES (Pharmacist Association SaaS)
   // ============================================================================

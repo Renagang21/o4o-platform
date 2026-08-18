@@ -471,6 +471,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Landing routes:', landingError);
     }
 
+    // 24-e2d-5. Register Cafe24 OAuth (admin 전용) — mall 연결정보만 관리
+    //           (WO-O4O-CAFE24-OAUTH-PRODUCT-CENSUS-V1 §5)
+    try {
+      const { createCafe24OAuthController } = await import('../modules/cafe24/controllers/cafe24-oauth.controller.js');
+      app.use('/api/v1/admin/cafe24', createCafe24OAuthController(dataSource));
+      logger.info('✅ Cafe24 OAuth routes registered at /api/v1/admin/cafe24');
+    } catch (cafe24Error) {
+      logger.error('Failed to register Cafe24 OAuth routes:', cafe24Error);
+    }
+
     // 24-e2e. Register Product Usage Links (read-only) — master 활용 연결 조회
     //         (WO-O4O-ADMIN-O4O-PRODUCT-USAGE-LINKS-READONLY-V1)
     try {
