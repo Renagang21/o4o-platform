@@ -39,6 +39,23 @@ PharmacyHub   store-owner Account/Profile 계열
 
 조사 축: `route` · `page` · `component` · `API client` · `backend endpoint` · `controller/service` · **실제 write table** · `메뉴 진입점` · `desktop/mobile UI`
 
+**census 단위는 화면이 아니라 기능이다.** `MyProfilePage` 한 화면 안에서도 아래는 각각 별개 기능으로 계산한다.
+
+```text
+기본 개인정보 표시/수정
+연락처
+닉네임
+직역/면허
+사업자정보
+매장정보
+서비스 membership 정보
+비밀번호 변경
+계정 상태/탈퇴
+서비스별 고유 profile
+```
+
+이렇게 쪼개야 GP 와 K-Cosmetics 처럼 화면이 겉보기에 비슷한 경우가 **API 계약만 다른 것인지**, KPA 처럼 **실제 도메인 정보가 다른 것인지** 구분된다. 화면 개수 기준 census 는 인정하지 않는다.
+
 기능 단위 판정 라벨:
 
 ```text
@@ -105,7 +122,11 @@ ProfilePage / ProfileLayout
 
 ## 3. 실행 순서
 
-1. **시작 정합** — `origin/main` 최신 기준. `git fetch origin` → `git status -sb` → clean 확인.
+1. **시작 정합** — `git fetch origin` → `git status -sb` → clean 확인 → `git pull --ff-only origin main`.
+   **특정 과거 commit 을 기준으로 삼지 않는다.** 작업 시작 시점의 최신 `origin/main` 을 pull 한 뒤 census 를 새로 산출한다.
+   - 직전 main 작업 `WO-O4O-KCOS-GP-MISSING-STORE-SLUG-CANONICALIZATION-V1` 이 commit `ca73ac342` 까지 `origin/main` 에 반영됐고, 그 이후로도 커밋이 계속 쌓이고 있다.
+   - **직전 slug 작업의 잔존 위험 5건은 본 WO 범위 밖이므로 접촉하지 않는다.**
+   - census 에서 `organizations` · 매장/사업자 정보가 나오면 **현재 main 의 최신 조직 · 서비스 축을 기준으로** 조사한다.
 2. **선행 CHECK 정독** — `CHECK-O4O-CROSS-SERVICE-PROFILE-DATA-OWNERSHIP-AND-WRITE-PATH-INTEGRITY-AUDIT-V1.md`.
 3. **현재 main 재검증** — 과거 감사 결과를 그대로 믿지 않는다. 아래 P0/P1 이 후속 작업으로 **이미 수정됐는지** 확인하고, 수정됐으면 **다시 수정하지 않는다**.
    ```text
