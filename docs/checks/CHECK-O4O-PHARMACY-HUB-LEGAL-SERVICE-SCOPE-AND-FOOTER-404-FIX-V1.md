@@ -146,13 +146,40 @@ role-prefix 축(kpa, cosmetics)             rejected  (계약을 넓히지 않�
 
 ## 8. 배포 결과
 
-<!-- 배포 후 채움 -->
+- commit: `c6ff9c023` → `main` push (2026-08-18 00:01 UTC)
+- 배포: `Deploy API Server (Cloud Run)` → **서빙 revision `o4o-core-api-03333-z68`** (생성 00:08:04Z)
+- 반영 확인 시각: 2026-08-18 09:08 KST
+
+### 엔드포인트 실측 (`https://api.neture.co.kr/api/v1/public/services/{key}/footer-legal`)
+
+| serviceKey | 배포 전 | 배포 후 |
+|---|:---:|:---:|
+| `pharmacy-hub` | **404** | **200** `{"success":true,"data":null}` |
+| `kpa-society` | 200 | 200 |
+| `neture` | 200 | 200 |
+| `glycopharm` | 200 | 200 |
+| `k-cosmetics` | 200 | 200 |
+| `unknown-svc` (음성 대조) | 404 | **404** `UNKNOWN_SERVICE` (계약 유지) |
+
+배포 전 404 재현 → 배포 후 해소를 같은 명령으로 확인했다. 기존 4서비스 응답은 배포 전후 동일하다.
 
 ---
 
 ## 9. desktop / mobile 브라우저 확인 · console/network 404
 
-<!-- 배포 후 채움 -->
+실 브라우저(Playwright, 프로덕션 `https://pharmacyhub.co.kr`) · 계정 `pharmacy-hub:store_owner`.
+
+| 뷰포트 | 경로 | footer-legal | 네트워크 404 | console error |
+|---|---|:---:|:---:|:---:|
+| desktop 1440×900 | `/login` (비로그인) | **200** | 0 | 0 *(auth/me·refresh 401 은 비로그인 부트스트랩 — 본 WO 무관)* |
+| desktop 1440×900 | `/` (로그인 후) | **200** | **0** | **0** |
+| desktop 1440×900 | `/store-owner` | 호출 없음(앱 셸에 공개 푸터 없음) | **0** | **0** |
+| mobile 390×844 | `/join/status` (로그인 후) | **200** | **0** | **0** |
+
+- 로그인 → `/store-owner` 진입 정상(매장 경영 홈 렌더, dashboard API 200).
+- 푸터 법정정보 영역은 `data:null` 이므로 **비표시** — 이는 4서비스와 동일한 기존 계약이며 결함이 아니다(§5).
+
+**완료 기준 대비: footer legal 404 = 0 / desktop PASS / mobile PASS / console error = 0 — 모두 충족.**
 
 ---
 
