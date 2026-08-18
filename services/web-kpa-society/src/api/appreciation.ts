@@ -3,7 +3,11 @@
  * WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1
  */
 
-import { apiClient } from './client';
+// WO-O4O-LMS-KPA-FRONTEND-API-CONTRACT-RESIDUE-CLEANUP-V1 §5/§6:
+// appreciation 은 서비스 중립 공용 도메인이며 backend mount 는 `/api/v1/appreciation/*` 하나뿐이다.
+// KPA `apiClient`(base=/api/v1/kpa)를 쓰면 `/api/v1/kpa/appreciation/*` 로 나가 전부 404 였다.
+// 화면별 URL patch 가 아니라 client 한 곳에서 canonical base(`coreApiClient`)로 정렬한다.
+import { coreApiClient } from './client';
 import type { ApiResponse } from '../types';
 
 export interface AppreciationSummary {
@@ -26,24 +30,25 @@ export interface AppreciationSend {
 
 export const appreciationApi = {
   send: (data: { targetType: string; targetId: string; amount: number; message?: string }) =>
-    apiClient.post<ApiResponse<{ appreciation: AppreciationSend }>>('/appreciation/send', data),
+    coreApiClient.post<ApiResponse<{ appreciation: AppreciationSend }>>('/appreciation/send', data),
 
+  // backend 는 okPaginated 로 `{ success, data: AppreciationSend[], pagination }` 를 준다.
   getMySent: (params?: { page?: number; limit?: number }) =>
-    apiClient.get<ApiResponse<{ items: AppreciationSend[]; pagination: any }>>('/appreciation/my-sent', params),
+    coreApiClient.get<ApiResponse<AppreciationSend[]>>('/appreciation/my-sent', params),
 
   getMyReceived: (params?: { page?: number; limit?: number }) =>
-    apiClient.get<ApiResponse<{ items: AppreciationSend[]; pagination: any }>>('/appreciation/my-received', params),
+    coreApiClient.get<ApiResponse<AppreciationSend[]>>('/appreciation/my-received', params),
 
   getSummary: (targetType: string, targetId: string) =>
-    apiClient.get<ApiResponse<AppreciationSummary>>(`/appreciation/${targetType}/${targetId}/summary`),
+    coreApiClient.get<ApiResponse<AppreciationSummary>>(`/appreciation/${targetType}/${targetId}/summary`),
 
   getRecent: (targetType: string, targetId: string) =>
-    apiClient.get<ApiResponse<{ items: AppreciationSend[] }>>(`/appreciation/${targetType}/${targetId}/recent`),
+    coreApiClient.get<ApiResponse<{ items: AppreciationSend[] }>>(`/appreciation/${targetType}/${targetId}/recent`),
 };
 
 // WO-O4O-KPA-APPRECIATION-PANEL-ALIGN-V1
 // @o4o/shared-space-ui AppreciationPanel 의 AppreciationApi 인터페이스에 맞춘 adapter.
-// KPA apiClient 는 raw Promise<T> 를 반환 (axios wrap 없음) — { success, data: ... } 그대로.
+// KPA coreApiClient 는 raw Promise<T> 를 반환 (axios wrap 없음) — { success, data: ... } 그대로.
 import type {
   AppreciationApi,
   AppreciationTargetType,

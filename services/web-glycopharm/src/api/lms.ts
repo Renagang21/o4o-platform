@@ -337,12 +337,20 @@ export const lmsApi = {
     return this.getQuizForLesson(lessonId);
   },
 
+  // WO-O4O-LMS-KPA-FRONTEND-API-CONTRACT-RESIDUE-CLEANUP-V1 §3:
+  // certificates 하위의 course 별 단건 조회 경로는 backend 에 존재한 적 없었다(항상 404 → null).
+  // 신규 endpoint 를 만들지 않고, 이미 있는 canonical 목록 endpoint(`GET /lms/certificates`,
+  // 요청자 본인 + course scope 로 서버가 강제)를 courseId 필터로 재사용한다.
   getMyCertificate: async (courseId: string): Promise<LmsCertificate | null> => {
     try {
-      const { data } = await api.get<{ success: boolean; data: { certificate: LmsCertificate } }>(
-        `/lms/certificates/course/${courseId}`,
-      );
-      return data.data.certificate;
+      const { data } = await api.get<any>('/lms/certificates', {
+        params: { courseId, limit: 1 },
+      });
+      const body = data?.data ?? data ?? {};
+      const items: LmsCertificate[] = Array.isArray(body)
+        ? body
+        : (body.data ?? body.certificates ?? []);
+      return items[0] ?? null;
     } catch {
       return null;
     }

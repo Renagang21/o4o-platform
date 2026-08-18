@@ -112,8 +112,11 @@ export const lmsApi = {
   getCertificate: (id: string) =>
     apiClient.get<ApiResponse<Certificate>>(`/lms/certificates/${id}`),
 
-  downloadCertificate: (id: string) =>
-    apiClient.get<Blob>(`/lms/certificates/${id}/download`),
+  // WO-O4O-LMS-KPA-FRONTEND-API-CONTRACT-RESIDUE-CLEANUP-V1 §4/§8:
+  // `downloadCertificate` 는 (1) 존재하지 않는 `/download` 경로, (2) JSON 파싱 전용
+  // apiClient 로 Blob 을 받을 수 없는 구현, (3) 소비처 0 인 dead code 였으므로 제거했다.
+  // KPA 수료증 PDF 다운로드의 canonical 경로는 `/api/v1/lms/certificates/:id/pdf` 이며
+  // `MyCertificatesPage` 가 이미 이 경로를 직접 사용한다.
 
   // 퀴즈 (WO-O4O-QUIZ-SYSTEM-V1)
   // WO-O4O-LMS-V2-COMMONIZATION-CLEANUP-V1: factory 위임 전환.
