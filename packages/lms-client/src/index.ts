@@ -133,27 +133,53 @@ export interface LmsHttpClient {
  *   - 운영자용 API (`operator*`) — KPA 전용.
  *   - 과제/라이브 (assignment, live) — Phase 5+ 에서 검토.
  */
-export function createLmsLearnerClient(http: LmsHttpClient) {
+/**
+ * WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1
+ *
+ * generic `/api/v1/lms/*` 를 사용하는 서비스(K-Cosmetics / GlycoPharm)가 자신의
+ * service boundary 를 백엔드에 알리기 위한 옵션. 전달하면 read 요청에 canonical
+ * `serviceKey` 가 자동 첨부된다 — 페이지별 URL 수정이 아니라 client 계층에서 처리한다.
+ *
+ * KPA-Society 는 `/api/v1/kpa/lms/*` 라우트 컨텍스트로 경계가 정해지므로 전달하지 않는다.
+ * 미전달 시 동작은 종전과 완전히 동일하다(무경계).
+ *
+ * ⚠️ client-side filtering 은 금지다. 이 값은 서버 필터의 입력일 뿐,
+ *    응답을 프론트에서 걸러내는 용도가 아니다.
+ */
+export interface LmsClientOptions {
+  /** canonical service key ('k-cosmetics' | 'glycopharm' | ...) */
+  serviceKey?: string;
+}
+
+export function createLmsLearnerClient(http: LmsHttpClient, options: LmsClientOptions = {}) {
+  const scopeParams: Record<string, unknown> = options.serviceKey
+    ? { serviceKey: options.serviceKey }
+    : {};
+  const withScope = (params?: Record<string, unknown>): Record<string, unknown> | undefined => {
+    const merged = { ...scopeParams, ...(params ?? {}) };
+    return Object.keys(merged).length > 0 ? merged : undefined;
+  };
+
   return {
     // ── Read-only (Step 1) ────────────────────────────────────────────────
 
     /** 강의 단건 조회. 반환: `{ success, data: { course: T } }` */
     getCourse<T extends LmsCourseBase = LmsCourseBase>(id: string): Promise<LmsApiResponse<{ course: T }>> {
-      return http.get<LmsApiResponse<{ course: T }>>(`/lms/courses/${id}`);
+      return http.get<LmsApiResponse<{ course: T }>>(`/lms/courses/${id}`, withScope());
     },
 
     /** 강의 목록 조회. 반환: `LmsPaginatedResponse<T>` (data 배열 + pagination/meta 옵션). */
     getCourses<T extends LmsCourseBase = LmsCourseBase>(
       params?: Record<string, unknown>,
     ): Promise<LmsPaginatedResponse<T>> {
-      return http.get<LmsPaginatedResponse<T>>('/lms/courses', params);
+      return http.get<LmsPaginatedResponse<T>>('/lms/courses', withScope(params));
     },
 
     /** 코스 레슨 목록. 반환: `{ success, data: T[] }` */
     getLessons<T extends LmsLessonBase = LmsLessonBase>(
       courseId: string,
     ): Promise<LmsApiResponse<T[]>> {
-      return http.get<LmsApiResponse<T[]>>(`/lms/courses/${courseId}/lessons`);
+      return http.get<LmsApiResponse<T[]>>(`/lms/courses/${courseId}/lessons`, withScope());
     },
 
     /** 본인의 특정 강의 수강 정보. 반환: `{ success, data: { enrollment: T } }` */

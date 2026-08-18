@@ -6,6 +6,10 @@ import { sanitizeInstructor } from '../utils/sanitize-user.js';
 import { notificationService } from '../../../services/NotificationService.js';
 import { logEvent } from '../../../common/event-log.service.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: canonical service key SSOT
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
+
+const KPA_SOCIETY_SERVICE_KEY: string = SERVICE_KEYS.KPA_SOCIETY;
 
 /** WO-O4O-GLOBAL-EVENT-LOG-MINIMAL-V1: actor passed from controller for audit trail */
 type EventActor = { id: string; role: string | null };
@@ -69,6 +73,10 @@ export interface CourseFilters {
   // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1: 미전달 시 필터 미적용(전체).
   // 비로그인 컨트롤러에서 PUBLIC을 강제 주입.
   visibility?: CourseVisibility;
+  // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: canonical service key 경계.
+  // 미전달(undefined) = 무경계(legacy/admin/platform 카탈로그) — 현행 동작 유지.
+  // 값은 controller 가 resolveLmsServiceScope() 로 검증한 canonical key 만 넣는다.
+  serviceKey?: string;
 }
 
 export class CourseService extends BaseService<Course> {
@@ -154,6 +162,7 @@ export class CourseService extends BaseService<Course> {
       limit = 20,
       contentKind,
       visibility,
+      serviceKey,
     } = filters;
 
     const query = this.courseRepository.createQueryBuilder('course');
@@ -168,6 +177,17 @@ export class CourseService extends BaseService<Course> {
     // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1: visibility 명시 시 필터 적용
     if (visibility) {
       query.andWhere('course.visibility = :visibility', { visibility });
+    }
+
+    // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: service boundary.
+    // 미전달 시 무필터(현행) — generic/admin 경로 호환. KPA scope 는 legacy null 강의를
+    // 함께 포함한다 (기존 `serviceKey ?? 'kpa-society'` fallback 과 동일 판단).
+    if (serviceKey) {
+      if (serviceKey === KPA_SOCIETY_SERVICE_KEY) {
+        query.andWhere('(course.serviceKey = :svcKey OR course.serviceKey IS NULL)', { svcKey: serviceKey });
+      } else {
+        query.andWhere('course.serviceKey = :svcKey', { svcKey: serviceKey });
+      }
     }
 
     // Filters

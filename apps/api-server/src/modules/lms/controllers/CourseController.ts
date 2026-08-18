@@ -5,6 +5,13 @@ import { CourseService } from '../services/CourseService.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 import { AppDataSource } from '../../../database/connection.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1
+import {
+  resolveLmsServiceScope,
+  isCourseInServiceScope,
+  InvalidLmsServiceKeyError,
+  INVALID_SERVICE_KEY_CODE,
+} from '../utils/lms-service-scope.js';
 
 /**
  * CourseController
@@ -67,9 +74,26 @@ export class CourseController extends BaseController {
       const { id } = req.params;
       const service = CourseService.getInstance();
 
+      // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: 목록과 동일한 경계를 상세에도 적용.
+      // 무경계 요청(legacy/admin)은 현행대로 통과한다.
+      let serviceScope: string | undefined;
+      try {
+        serviceScope = resolveLmsServiceScope(req);
+      } catch (e) {
+        if (e instanceof InvalidLmsServiceKeyError) {
+          return BaseController.badRequest(res, '알 수 없는 serviceKey 입니다', INVALID_SERVICE_KEY_CODE);
+        }
+        throw e;
+      }
+
       const course = await service.getCourse(id);
 
       if (!course) {
+        return BaseController.notFound(res, 'Course not found');
+      }
+
+      // 다른 서비스의 강의는 존재 자체를 노출하지 않는다 (403 아닌 404).
+      if (!isCourseInServiceScope(course.serviceKey, serviceScope)) {
         return BaseController.notFound(res, 'Course not found');
       }
 
@@ -91,6 +115,17 @@ export class CourseController extends BaseController {
     try {
       const filters: any = { ...req.query };
       const service = CourseService.getInstance();
+
+      // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: service boundary.
+      // 클라이언트가 보낸 raw serviceKey 를 그대로 쓰지 않고, 검증된 canonical 값으로 덮어쓴다.
+      try {
+        filters.serviceKey = resolveLmsServiceScope(req);
+      } catch (e) {
+        if (e instanceof InvalidLmsServiceKeyError) {
+          return BaseController.badRequest(res, '알 수 없는 serviceKey 입니다', INVALID_SERVICE_KEY_CODE);
+        }
+        throw e;
+      }
 
       // WO-KPA-LMS-COURSE-VISIBILITY-ACCESS-POLICY-V1
       // 비로그인은 visibility='public' 강제. 클라이언트가 다른 값을 보내도 덮어씀.

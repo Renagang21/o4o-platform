@@ -159,6 +159,8 @@ import { kpaActionConfig } from './action-definitions.js';
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
 import { forumContextMiddleware } from '../../middleware/forum-context.middleware.js';
+// WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1
+import { lmsContextMiddleware } from '../../modules/lms/utils/lms-service-scope.js';
 
 // LMS Controllers
 import { CourseController } from '../../modules/lms/controllers/CourseController.js';
@@ -698,6 +700,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // LMS Routes - /api/v1/kpa/lms/*
   // ============================================================================
   const lmsRouter = Router();
+
+  // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: 서비스 prefix 라우트 컨텍스트.
+  // Forum 의 forumContextMiddleware 선례와 동일 계약 — serviceCode 는 RBAC role prefix 이고
+  // controller 가 resolveCanonicalServiceKey() 로 'kpa-society' 로 변환한다.
+  lmsRouter.use(lmsContextMiddleware({ serviceCode: 'kpa' }));
 
   // Courses
   lmsRouter.get('/courses', optionalAuth, asyncHandler(CourseController.listCourses));

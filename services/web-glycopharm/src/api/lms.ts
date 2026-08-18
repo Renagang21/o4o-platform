@@ -187,7 +187,9 @@ const lmsHttp: LmsHttpClient = {
 };
 
 const instructorClient = createLmsInstructorClient(lmsHttp);
-const learnerClient = createLmsLearnerClient(lmsHttp);
+// WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: generic `/api/v1/lms/*` 소비 서비스는
+// canonical serviceKey 를 client 계층에서 주입해 서버 필터로 경계를 정한다 (client-side filtering 아님).
+const learnerClient = createLmsLearnerClient(lmsHttp, { serviceKey: 'glycopharm' });
 
 // ─── Phase 3 Instructor 타입 (WO-O4O-GLYCOPHARM-LMS-PHASE3-INSTRUCTOR-PARITY-V1) ────────
 

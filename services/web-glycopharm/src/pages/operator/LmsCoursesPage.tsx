@@ -3,7 +3,7 @@
  * WO-GLYCOPHARM-INSTRUCTOR-OPERATOR-V1
  * WO-O4O-OPERATOR-DATATABLE-SOURCE-ALIGN-V1: DataTable @o4o/ui → @o4o/operator-ux-core
  *
- * GET /lms/courses (no status filter — admin view of all courses)
+ * GET /lms/courses (no status filter — admin view of all courses, service-scoped)
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
-import { api } from '@/lib/apiClient';
+import { lmsApi } from '@/api/lms';
 import PageHeader from '@/components/common/PageHeader';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -107,15 +107,16 @@ export default function LmsCoursesPage() {
     setLoading(true);
     setError(null);
     try {
-      const query = new URLSearchParams({ page: String(currentPage), limit: '20' });
-      if (searchStr) query.set('search', searchStr);
-      const { data } = await api.get<{
-        success: boolean;
-        data: CourseRow[];
-        meta: PaginationMeta;
-      }>(`/lms/courses?${query.toString()}`);
-      setCourses(data.data ?? []);
-      if (data.meta) setMeta(data.meta);
+      // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1:
+      // 직접 URL 호출 → 공통 API client(lmsApi) 경유. serviceKey 경계는 client 계층이 주입한다.
+      const res = await lmsApi.operatorGetCourses({
+        page: currentPage,
+        limit: 20,
+        ...(searchStr ? { search: searchStr } : {}),
+      });
+      setCourses((res.data ?? []) as unknown as CourseRow[]);
+      const pagination = res.meta ?? res.pagination;
+      if (pagination) setMeta(pagination);
     } catch {
       setError('강의 목록을 불러오지 못했습니다.');
     } finally {

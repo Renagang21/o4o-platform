@@ -3,6 +3,13 @@ import { BaseController } from '../../../common/base.controller.js';
 import { LessonService } from '../services/LessonService.js';
 import { CourseService } from '../services/CourseService.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1
+import {
+  resolveLmsServiceScope,
+  isCourseInServiceScope,
+  InvalidLmsServiceKeyError,
+  INVALID_SERVICE_KEY_CODE,
+} from '../utils/lms-service-scope.js';
 
 /**
  * LessonController
@@ -66,6 +73,24 @@ export class LessonController extends BaseController {
       const { courseId } = req.params;
       const filters = req.query;
       const service = LessonService.getInstance();
+
+      // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1: 강의와 동일한 service boundary.
+      // scope 가 있는 요청에서만 course 를 조회한다 (무경계 요청은 추가 쿼리 0).
+      let serviceScope: string | undefined;
+      try {
+        serviceScope = resolveLmsServiceScope(req);
+      } catch (e) {
+        if (e instanceof InvalidLmsServiceKeyError) {
+          return BaseController.badRequest(res, '알 수 없는 serviceKey 입니다', INVALID_SERVICE_KEY_CODE);
+        }
+        throw e;
+      }
+      if (serviceScope) {
+        const course = await CourseService.getInstance().getCourse(courseId);
+        if (!course || !isCourseInServiceScope(course.serviceKey, serviceScope)) {
+          return BaseController.notFound(res, 'Course not found');
+        }
+      }
 
       const { lessons, total } = await service.listLessonsByCourse(courseId, filters as any);
 
