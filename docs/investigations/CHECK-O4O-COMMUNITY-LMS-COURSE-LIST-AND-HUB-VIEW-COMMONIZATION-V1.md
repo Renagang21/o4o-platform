@@ -122,18 +122,28 @@ OUT_OF_SCOPE: 6
 
 ---
 
-## 7. Browser smoke
+## 7. Browser smoke (production, commit `c42f1d0dc` 배포 후)
 
 | 대상 | 결과 |
 |---|---|
-| KPA `/lms` (desktop / mobile) | (배포 후 기록) |
-| KPA `/courses` 목록·검색·필터·상세 진입·back | (배포 후 기록) |
-| KPA `/instructors/:id` 강의 카드 | (배포 후 기록) |
-| K-Cosmetics `/lms` 0-course empty | (배포 후 기록) |
-| GlycoPharm `/lms` 0-course empty | (배포 후 기록) |
+| KPA `/lms` (desktop) | PASS — 표형 hub, 총 5개 강의, 실패응답 0 / JS 오류 0 / 가로 스크롤 0 |
+| KPA `/lms` (mobile 390px) | PASS — 총 3개 강의(공개), 오류 0 / 가로 스크롤 0 |
+| KPA `/courses` (desktop) | PASS — 공통 `CourseListView` 카드 목록, 무료 배지·"자세히 보기 →" footer 정상 |
+| KPA `/courses` 검색 `약` | PASS — `?search=약&page=1`, 결과 0 → emptyState("검색 결과가 없습니다") |
+| KPA `/courses` 필터 `무료` | PASS — `&price=free` URL 계약 유지 |
+| KPA 카드 → 상세 → back | PASS — `/courses/{uuid}` 진입, back 시 목록·쿼리 복원 |
+| KPA `/courses` (mobile 390px) | PASS — 비로그인 컨텍스트에서 `gateSlot`(로그인 안내) 정상, 가로 스크롤 0 |
+| K-Cosmetics `/lms` (desktop / mobile) | PASS — 0-course empty("등록된 강의가 없습니다"), KPA 강의 혼입 0, 오류 0 |
+| GlycoPharm `/lms` (desktop) | PASS — 총 0개 empty, cross-service 혼입 0, 오류 0 |
+| KPA `/instructors/{userId}` | 렌더 PASS(예외 0) — 단, 프로덕션에 공개 강사 프로필이 없어(`/lms/instructors/:id/public-profile` 404) **카드 grid 실데이터 미검증**. 공통 `CourseCard` 렌더는 단위 테스트로 고정 |
 
----
+**공통**: white screen 0 / JS exception 0 / **이번 변경으로 생긴 404·500 0** / 가로 스크롤 0.
+
+### 범위 밖 선행 결함 (수정하지 않음 — 보고만)
+
+1. `k-cosmetics.co.kr` **커스텀 도메인의 deep link 전부 404** (`/lms`, `/forum`, 임의 경로 동일 / `/` 만 200). SPA fallback 미설정으로 보이며 본 WO 변경과 무관하다(동일 빌드가 Cloud Run URL `k-cosmetics-web-…run.app/lms` 에서는 200 + 정상 empty). 별도 WO 권장.
+2. KPA `/courses/{id}`(CourseIntroPage, Detail 축 = 본 WO 제외)에서 `⏱ NaN분` 표기와 `/kpa/lms/enrollments/me/course/:id` 404. 선행 상태이며 목록 축과 무관.
 
 ## 8. 문서 정합
 
-발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건
+발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건 (§7 범위 밖 선행 결함)
