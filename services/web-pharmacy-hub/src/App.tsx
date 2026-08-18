@@ -22,7 +22,8 @@
  *   /operator                    운영자 셸 (OperatorLayoutWrapper — 공통 OperatorAreaShell)
  *     ├ (index)                  서비스 운영자 진입점
  *     ├ /memberships             가입 신청 관리 목록
- *     └ /memberships/:id         가입 신청 상세
+ *     ├ /memberships/:id         가입 신청 상세
+ *     └ /settings/legal          법정정보 설정 (공통 service-legal 컴포넌트)
  *
  *   /store-hub                   매장허브 홈 — 자원 탐색 진입점 (공통 StoreHubTemplate)
  *
@@ -80,6 +81,8 @@ import ForumListPage from './pages/forum/ForumListPage';
 import ForumDetailPage from './pages/forum/ForumDetailPage';
 import ForumWritePage from './pages/forum/ForumWritePage';
 import MembershipsPage from './pages/operator/MembershipsPage';
+// WO-O4O-PHARMACY-HUB-SERVICE-LEGAL-SETTINGS-ADOPTION-V1 — 공통 법정정보 설정 채택
+import ServiceLegalSettingsPage from './pages/operator/ServiceLegalSettingsPage';
 import MembershipDetailPage from './pages/operator/MembershipDetailPage';
 // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
 import SupplierProductsPage from './pages/supplier/ProductsPage';
@@ -218,6 +221,13 @@ export default function App() {
             <Route index element={<OperatorDashboardPage />} />
             <Route path="memberships" element={<MembershipsPage />} />
             <Route path="memberships/:membershipId" element={<MembershipDetailPage />} />
+            {/*
+              WO-O4O-PHARMACY-HUB-SERVICE-LEGAL-SETTINGS-ADOPTION-V1
+              법정정보 설정 — 공통 @o4o/operator-core-ui 컴포넌트 wrapper.
+              실제 권한은 backend requireServiceLegalScope(PHARMACY_HUB_SCOPE_CONFIG) 가 강제한다
+              (조회 operator 이상 / 저장 admin). 프론트 라우트는 UX 안내다.
+            */}
+            <Route path="settings/legal" element={<ServiceLegalSettingsPage />} />
           </Route>
 
           {/*

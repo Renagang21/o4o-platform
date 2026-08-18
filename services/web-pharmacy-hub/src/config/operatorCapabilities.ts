@@ -14,4 +14,7 @@ import { OperatorCapability } from '@o4o/types';
 
 export const ENABLED_CAPABILITIES: OperatorCapability[] = [
   OperatorCapability.MEMBERSHIP_APPROVAL,
+  // WO-O4O-PHARMACY-HUB-SERVICE-LEGAL-SETTINGS-ADOPTION-V1:
+  //   system 그룹(법정정보 설정) 노출용. 해당 그룹의 실재 항목은 /operator/settings/legal 1건이다.
+  OperatorCapability.SETTINGS,
 ];
