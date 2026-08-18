@@ -3,6 +3,8 @@ import { BaseController } from '../../../common/base.controller.js';
 import { CompletionService } from '../services/CompletionService.js';
 import { CourseService } from '../services/CourseService.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
+import { resolveScopeOrRespond } from '../utils/lms-scope-guard.js';
 
 /**
  * CompletionController
@@ -25,8 +27,11 @@ export class CompletionController extends BaseController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
 
+      const scope = resolveScopeOrRespond(req, res);
+      if (!scope.ok) return;
+
       const service = CompletionService.getInstance();
-      const { completions, total } = await service.getMyCompletions(userId, page, limit);
+      const { completions, total } = await service.getMyCompletions(userId, page, limit, scope.scope);
 
       // Enrich with course info
       const courseService = CourseService.getInstance();

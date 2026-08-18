@@ -16,6 +16,13 @@ import type { Request, Response, NextFunction } from 'express';
 import { AppDataSource } from '../../../database/connection.js';
 import { Course, CourseVisibility, Enrollment, EnrollmentStatus } from '@o4o/lms-core';
 import { In } from 'typeorm';
+// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
+import {
+  resolveLmsServiceScope,
+  isCourseInServiceScope,
+  InvalidLmsServiceKeyError,
+  INVALID_SERVICE_KEY_CODE,
+} from '../utils/lms-service-scope.js';
 
 interface RequireEnrollmentOptions {
   /** lesson 라우트에서 lessonId → courseId 역추적 */
@@ -53,11 +60,31 @@ export function requireEnrollment(options?: RequireEnrollmentOptions) {
     const courseRepo = AppDataSource.getRepository(Course);
     const course = await courseRepo.findOne({
       where: { id: courseId },
-      select: ['id', 'visibility', 'isPaid', 'requiresApproval'],
+      select: ['id', 'visibility', 'isPaid', 'requiresApproval', 'serviceKey'],
     });
 
     if (!course) {
       return res.status(404).json({ success: false, error: 'Course not found' });
+    }
+
+    // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §3 / §5:
+    // service boundary 는 enrollment 권한과 별개이며 항상 먼저 판정한다.
+    // enrollment 가 있어도 타 서비스 course/lesson 에는 접근할 수 없다.
+    let serviceScope: string | undefined;
+    try {
+      serviceScope = resolveLmsServiceScope(req);
+    } catch (e) {
+      if (e instanceof InvalidLmsServiceKeyError) {
+        return res
+          .status(400)
+          .json({ success: false, error: '알 수 없는 serviceKey 입니다', code: INVALID_SERVICE_KEY_CODE });
+      }
+      throw e;
+    }
+    if (!isCourseInServiceScope(course.serviceKey, serviceScope)) {
+      // non-disclosure — scope 밖 resource 는 존재를 드러내지 않는다
+      const message = options?.checkLesson ? 'Lesson not found' : 'Course not found';
+      return res.status(404).json({ success: false, error: message });
     }
 
     // PUBLIC 강의: enrollment 없이 통과

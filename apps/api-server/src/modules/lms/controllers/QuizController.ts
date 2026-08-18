@@ -3,6 +3,9 @@ import { BaseController } from '../../../common/base.controller.js';
 import { QuizService } from '../services/QuizService.js';
 import { CourseService } from '../services/CourseService.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §5
+// quiz/assignment 신규 기능 구현이 아니라, lesson→course 역추적 service boundary 만 적용한다.
+import { guardLessonScope, guardQuizScope } from '../utils/lms-scope-guard.js';
 
 /**
  * QuizController
@@ -19,6 +22,9 @@ export class QuizController extends BaseController {
   static async getQuizForLesson(req: Request, res: Response): Promise<any> {
     try {
       const { lessonId } = req.params;
+
+      if (!(await guardLessonScope(req, res, lessonId))) return;
+
       const service = QuizService.getInstance();
 
       const quiz = await service.getQuizForLesson(lessonId);
@@ -53,6 +59,8 @@ export class QuizController extends BaseController {
         return BaseController.error(res, 'answers array is required', 400);
       }
 
+      if (!(await guardQuizScope(req, res, quizId))) return;
+
       const service = QuizService.getInstance();
       const result = await service.submitQuiz(quizId, userId, { answers });
 
@@ -83,6 +91,8 @@ export class QuizController extends BaseController {
       if (!userId) {
         return BaseController.unauthorized(res, 'User not authenticated');
       }
+
+      if (!(await guardQuizScope(req, res, quizId))) return;
 
       const service = QuizService.getInstance();
       const attempts = await service.getUserAttempts(quizId, userId);

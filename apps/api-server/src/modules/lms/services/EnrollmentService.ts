@@ -6,6 +6,8 @@ import { CourseService } from './CourseService.js';
 import { CompletionService } from './CompletionService.js';
 import { sanitizeUserFields } from '../utils/sanitize-user.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
+import { applyCourseScopeToQuery } from '../utils/lms-scope-guard.js';
 // WO-O4O-LMS-COMPLETION-REWARD-POLICY-SEPARATION-V1: reward 는 정책 설정 시에만 지급
 import { CreditSourceType } from '../../credit/entities/CreditTransaction.js';
 import { CREDIT_DESCRIPTIONS } from '../../credit/credit-constants.js';
@@ -30,6 +32,12 @@ export interface UpdateEnrollmentRequest {
 
 export interface EnrollmentFilters {
   status?: EnrollmentStatus;
+  /**
+   * WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
+   * canonical service key. controller 가 `resolveLmsServiceScope` 로 해석한 값만 넣는다
+   * (client raw 값 금지). undefined = 무경계(legacy/admin).
+   */
+  serviceKey?: string;
   courseId?: string;
   userId?: string;
   organizationId?: string;
@@ -207,6 +215,7 @@ export class EnrollmentService extends BaseService<Enrollment> {
       courseId,
       userId,
       organizationId,
+      serviceKey,
       page = 1,
       limit = 20
     } = filters;
@@ -240,6 +249,9 @@ export class EnrollmentService extends BaseService<Enrollment> {
     query.leftJoinAndSelect('enrollment.course', 'course');
     query.leftJoinAndSelect('enrollment.user', 'user');
     query.leftJoinAndSelect('enrollment.organization', 'organization');
+
+    // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1: SQL 단계 service scope.
+    applyCourseScopeToQuery(query, 'course', serviceKey);
 
     const [enrollments, total] = await query.getManyAndCount();
 

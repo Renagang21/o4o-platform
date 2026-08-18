@@ -4,6 +4,8 @@ import { AssignmentService } from '../services/AssignmentService.js';
 import { LessonService } from '../services/LessonService.js';
 import { CourseService } from '../services/CourseService.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §5
+import { guardLessonScope, guardAssignmentScope } from '../utils/lms-scope-guard.js';
 
 /**
  * AssignmentController
@@ -71,6 +73,9 @@ export class AssignmentController extends BaseController {
   static async getAssignmentForLesson(req: Request, res: Response): Promise<any> {
     try {
       const { lessonId } = req.params;
+
+      if (!(await guardLessonScope(req, res, lessonId))) return;
+
       const service = AssignmentService.getInstance();
       const assignment = await service.getAssignmentByLesson(lessonId);
 
@@ -99,6 +104,8 @@ export class AssignmentController extends BaseController {
         return BaseController.error(res, 'content is required', 400);
       }
 
+      if (!(await guardAssignmentScope(req, res, assignmentId))) return;
+
       const service = AssignmentService.getInstance();
       const result = await service.submitAssignment(assignmentId, userId, { content });
 
@@ -121,6 +128,8 @@ export class AssignmentController extends BaseController {
       const { assignmentId } = req.params;
       const userId = (req as any).user?.id;
       if (!userId) return BaseController.unauthorized(res, 'User not authenticated');
+
+      if (!(await guardAssignmentScope(req, res, assignmentId))) return;
 
       const service = AssignmentService.getInstance();
       const submission = await service.getMySubmission(assignmentId, userId);

@@ -3,6 +3,8 @@ import { AppDataSource } from '../../../database/connection.js';
 import { CourseCompletion } from '../entities/CourseCompletion.js';
 import { CertificateService } from './CertificateService.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 /**
  * CompletionService
@@ -94,13 +96,41 @@ export class CompletionService {
     userId: string,
     page: number = 1,
     limit: number = 20,
+    /**
+     * WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
+     * canonical service key (controller 해석값). undefined = 무경계(legacy/admin).
+     */
+    serviceKey?: string,
   ): Promise<{ completions: CourseCompletion[]; total: number }> {
-    const [completions, total] = await this.completionRepository.findAndCount({
-      where: { userId },
-      order: { completedAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    if (!serviceKey) {
+      const [completions, total] = await this.completionRepository.findAndCount({
+        where: { userId },
+        order: { completedAt: 'DESC' },
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+
+      return { completions, total };
+    }
+
+    // course_completions 는 course relation 이 없으므로 lms_courses 를 직접 join 한다.
+    // legacy `service_key IS NULL` 은 KPA scope 에만 포함 (isCourseInServiceScope 와 동일 규칙).
+    const query = this.completionRepository
+      .createQueryBuilder('completion')
+      .innerJoin('lms_courses', 'course', 'course.id = completion."courseId"')
+      .where('completion.userId = :userId', { userId });
+
+    if (serviceKey === SERVICE_KEYS.KPA_SOCIETY) {
+      query.andWhere('(course.service_key = :lmsScopeKey OR course.service_key IS NULL)', { lmsScopeKey: serviceKey });
+    } else {
+      query.andWhere('course.service_key = :lmsScopeKey', { lmsScopeKey: serviceKey });
+    }
+
+    const [completions, total] = await query
+      .orderBy('completion.completedAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
 
     return { completions, total };
   }

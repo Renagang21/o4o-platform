@@ -6,6 +6,8 @@ import { CourseService } from './CourseService.js';
 import { EnrollmentService } from './EnrollmentService.js';
 import { sanitizeUserFields } from '../utils/sanitize-user.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
+import { applyCourseScopeToQuery } from '../utils/lms-scope-guard.js';
 
 export interface IssueCertificateRequest {
   userId: string;
@@ -26,6 +28,11 @@ export interface UpdateCertificateRequest {
 
 export interface CertificateFilters {
   userId?: string;
+  /**
+   * WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
+   * canonical service key (controller 해석값). undefined = 무경계.
+   */
+  serviceKey?: string;
   courseId?: string;
   isValid?: boolean;
   page?: number;
@@ -188,6 +195,7 @@ export class CertificateService extends BaseService<Certificate> {
       userId,
       courseId,
       isValid,
+      serviceKey,
       page = 1,
       limit = 20
     } = filters;
@@ -216,6 +224,9 @@ export class CertificateService extends BaseService<Certificate> {
     // Include relations
     query.leftJoinAndSelect('certificate.user', 'user');
     query.leftJoinAndSelect('certificate.course', 'course');
+
+    // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1: SQL 단계 service scope.
+    applyCourseScopeToQuery(query, 'course', serviceKey);
 
     const [certificates, total] = await query.getManyAndCount();
 

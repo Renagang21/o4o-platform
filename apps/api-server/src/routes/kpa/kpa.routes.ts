@@ -174,6 +174,10 @@ import { CourseService } from '../../modules/lms/services/CourseService.js';
 import { CreditController } from '../../modules/credit/controllers/CreditController.js';
 // WO-O4O-COMPLETION-V1
 import { CompletionController } from '../../modules/lms/controllers/CompletionController.js';
+// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §9:
+// KPA 학습 화면(lmsViewAdapter)이 실제로 호출하는데 remount 누락으로 404 나던 경로 보강.
+import { QuizController } from '../../modules/lms/controllers/QuizController.js';
+import { AssignmentController } from '../../modules/lms/controllers/AssignmentController.js';
 import { requireEnrollment } from '../../modules/lms/middleware/requireEnrollment.js';
 
 /**
@@ -730,6 +734,17 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   lmsRouter.get('/enrollments/:courseId', authenticate, asyncHandler(EnrollmentController.getMyEnrollmentForCourse));
   lmsRouter.post('/courses/:courseId/enroll', authenticate, asyncHandler(EnrollmentController.enrollCourse));
   lmsRouter.post('/enrollments/:courseId/progress', authenticate, asyncHandler(EnrollmentController.updateLessonProgress));
+
+  // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §9 (routing defect fix)
+  // KPA `lmsViewAdapter` 는 quiz/assignment 학습자 API 를 호출하지만 remount 에 빠져 있어
+  // `/api/v1/kpa/lms/*` 에서 404 였다. 신규 기능 구현이 아니라 generic 라우터와 동일한
+  // 핸들러·가드를 그대로 remount 하는 정합 조치다.
+  lmsRouter.get('/lessons/:lessonId/quiz', authenticate, asyncHandler(QuizController.getQuizForLesson));
+  lmsRouter.post('/quizzes/:quizId/submit', authenticate, asyncHandler(QuizController.submitQuiz));
+  lmsRouter.get('/quizzes/:quizId/attempts', authenticate, asyncHandler(QuizController.getAttempts));
+  lmsRouter.get('/lessons/:lessonId/assignment', authenticate, asyncHandler(AssignmentController.getAssignmentForLesson));
+  lmsRouter.post('/assignments/:assignmentId/submit', authenticate, asyncHandler(AssignmentController.submitAssignment));
+  lmsRouter.get('/assignments/:assignmentId/my', authenticate, asyncHandler(AssignmentController.getMySubmission));
 
   // Certificates
   lmsRouter.get('/certificates', authenticate, asyncHandler(CertificateController.getMyCertificates));

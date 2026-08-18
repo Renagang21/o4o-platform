@@ -351,8 +351,11 @@ export const lmsApi = {
   downloadCertificate: async (
     certificateId: string,
   ): Promise<Blob> => {
+    // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §7:
+    // 백엔드 canonical 경로는 `/lms/certificates/:id/pdf` 다.
+    // `/download` 는 존재한 적 없는 경로로, 수료증 다운로드가 404 였다.
     const { data } = await api.get<Blob>(
-      `/lms/certificates/${certificateId}/download`,
+      `/lms/certificates/${certificateId}/pdf`,
       { responseType: 'blob' },
     );
     return data;

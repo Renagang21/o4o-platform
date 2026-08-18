@@ -86,7 +86,11 @@ export function resolveLmsServiceScope(req: Request): string | undefined {
   if (prefix) return resolveCanonicalServiceKey(prefix);
 
   // 2) 명시적 serviceKey 계약
-  const raw = req.query?.serviceKey;
+  // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1:
+  // 동일 파라미터가 중복 전달되면 express 는 배열을 준다. 배열을 무시하면 scope 가
+  // 조용히 사라지므로(무경계 요청으로 강등) 첫 값을 사용한다.
+  const rawParam = req.query?.serviceKey;
+  const raw = Array.isArray(rawParam) ? rawParam[0] : rawParam;
   const value = typeof raw === 'string' ? raw.trim() : '';
   if (!value) return undefined; // 3) 무경계 — 현행 유지
 

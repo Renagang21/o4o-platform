@@ -3,6 +3,9 @@ import { BaseController } from '../../../common/base.controller.js';
 import { CertificateService } from '../services/CertificateService.js';
 import { generateCertificatePdf } from '../utils/certificatePdf.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §7
+// 수료증 발급/UX 정책은 서비스별로 유지하고, service boundary 만 공통 보장한다.
+import { guardLoadedCourseScope, resolveScopeOrRespond } from '../utils/lms-scope-guard.js';
 
 /**
  * CertificateController
@@ -63,6 +66,8 @@ export class CertificateController extends BaseController {
         return BaseController.notFound(res, 'Certificate not found');
       }
 
+      if (!guardLoadedCourseScope(req, res, certificate.course?.serviceKey, 'Certificate not found')) return;
+
       return BaseController.ok(res, { certificate });
     } catch (error: any) {
       logger.error('[CertificateController.getCertificate] Error', { error: error.message });
@@ -81,6 +86,8 @@ export class CertificateController extends BaseController {
         return BaseController.notFound(res, 'Certificate not found');
       }
 
+      if (!guardLoadedCourseScope(req, res, certificate.course?.serviceKey, 'Certificate not found')) return;
+
       return BaseController.ok(res, { certificate });
     } catch (error: any) {
       logger.error('[CertificateController.getCertificateByNumber] Error', { error: error.message });
@@ -90,10 +97,14 @@ export class CertificateController extends BaseController {
 
   static async listCertificates(req: Request, res: Response): Promise<any> {
     try {
-      const filters = req.query;
+      const scope = resolveScopeOrRespond(req, res);
+      if (!scope.ok) return;
+
+      // client raw serviceKey 를 신뢰하지 않고 canonical 해석값으로 덮어쓴다.
+      const filters: any = { ...req.query, serviceKey: scope.scope };
       const service = CertificateService.getInstance();
 
-      const { certificates, total } = await service.listCertificates(filters as any);
+      const { certificates, total } = await service.listCertificates(filters);
 
       return BaseController.okPaginated(res, certificates, {
         total,
@@ -115,7 +126,10 @@ export class CertificateController extends BaseController {
         return BaseController.unauthorized(res, 'User not authenticated');
       }
 
-      const filters: any = { ...req.query, userId };
+      const scope = resolveScopeOrRespond(req, res);
+      if (!scope.ok) return;
+
+      const filters: any = { ...req.query, userId, serviceKey: scope.scope };
       const service = CertificateService.getInstance();
 
       const { certificates, total } = await service.listCertificates(filters);
@@ -142,6 +156,8 @@ export class CertificateController extends BaseController {
       if (!certificate) {
         return BaseController.notFound(res, 'Certificate not found or invalid');
       }
+
+      if (!guardLoadedCourseScope(req, res, certificate.course?.serviceKey, 'Certificate not found or invalid')) return;
 
       return BaseController.ok(res, { certificate, verified: true });
     } catch (error: any) {
@@ -261,6 +277,9 @@ export class CertificateController extends BaseController {
       if (!certificate) {
         return BaseController.notFound(res, 'Certificate not found');
       }
+
+      // service boundary 를 소유자 확인보다 먼저 판정한다 (§3 판정 순서)
+      if (!guardLoadedCourseScope(req, res, certificate.course?.serviceKey, 'Certificate not found')) return;
 
       // 본인 수료증만 다운로드 가능
       if (certificate.userId !== requestUserId) {

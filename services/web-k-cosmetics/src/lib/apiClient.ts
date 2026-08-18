@@ -24,3 +24,28 @@ export const api = authClient.api;
 // WO-O4O-STORE-PRODUCTS-AUTHCLIENT-INJECTION-FIX-V1:
 // store-products-ui 공통 패키지가 K-Cosmetics 의 localStorage-strategy authClient 를 사용하도록 주입.
 configureStoreProductsApi(api);
+
+// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
+// generic `/api/v1/lms/*` 를 쓰는 서비스는 요청마다 canonical serviceKey 를 실어야
+// 백엔드가 service boundary 를 적용할 수 있다. 호출부마다 붙이면 누락이 생기므로
+// LMS 경로 전체에 대해 client 계층에서 한 번만 부착한다 (read/write 모두).
+//
+// ⚠️ client-side filtering 이 아니다. 서버 SQL 필터의 입력일 뿐이다.
+// 이미 명시된 값(@o4o/lms-client 가 붙인 값)은 덮어쓰지 않는다 — 중복 전달 방지.
+const LMS_SERVICE_KEY = 'k-cosmetics';
+
+interface LmsScopedRequestConfig {
+  url?: string;
+  params?: Record<string, unknown>;
+}
+
+api.interceptors.request.use((config: LmsScopedRequestConfig) => {
+  const url = config.url ?? '';
+  if (!url.startsWith('/lms/') && url !== '/lms') return config;
+
+  const params = config.params ?? {};
+  if (params.serviceKey === undefined && !url.includes('serviceKey=')) {
+    config.params = { ...params, serviceKey: LMS_SERVICE_KEY };
+  }
+  return config;
+});

@@ -10,6 +10,8 @@ import {
   InvalidLmsServiceKeyError,
   INVALID_SERVICE_KEY_CODE,
 } from '../utils/lms-service-scope.js';
+// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
+import { guardLessonScope } from '../utils/lms-scope-guard.js';
 
 /**
  * LessonController
@@ -53,6 +55,12 @@ export class LessonController extends BaseController {
   static async getLesson(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+
+      // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §5:
+      // lesson → course 역추적으로 service boundary 판정. lessonId 만 알아도
+      // 타 서비스 lesson 을 열람할 수 없다.
+      if (!(await guardLessonScope(req, res, id))) return;
+
       const service = LessonService.getInstance();
 
       const lesson = await service.getLesson(id);

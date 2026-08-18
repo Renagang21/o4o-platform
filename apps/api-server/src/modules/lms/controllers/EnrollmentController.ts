@@ -3,6 +3,12 @@ import { BaseController } from '../../../common/base.controller.js';
 import { EnrollmentService } from '../services/EnrollmentService.js';
 import { AppDataSource } from '../../../database/connection.js';
 import logger from '../../../utils/logger.js';
+// WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1
+import {
+  guardCourseScope,
+  guardLoadedCourseScope,
+  resolveScopeOrRespond,
+} from '../utils/lms-scope-guard.js';
 
 /**
  * EnrollmentController
@@ -10,6 +16,24 @@ import logger from '../../../utils/logger.js';
  * Handles course enrollment and student management
  */
 export class EnrollmentController extends BaseController {
+  /**
+   * WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §6
+   * enrollment id 기반 mutation 이 요청 scope 안의 course 를 대상으로 하는지 확인한다.
+   * 무경계(legacy/admin) 요청에서는 추가 쿼리 0 으로 통과한다.
+   */
+  private static async ensureEnrollmentInScope(req: Request, res: Response, id: string): Promise<boolean> {
+    const scope = resolveScopeOrRespond(req, res);
+    if (!scope.ok) return false;
+    if (!scope.scope) return true;
+
+    const enrollment = await EnrollmentService.getInstance().getEnrollment(id);
+    if (!enrollment) {
+      BaseController.notFound(res, 'Enrollment not found');
+      return false;
+    }
+    return guardLoadedCourseScope(req, res, enrollment.course?.serviceKey, 'Enrollment not found');
+  }
+
   static async enrollCourse(req: Request, res: Response): Promise<any> {
     try {
       const { courseId } = req.params;
@@ -18,6 +42,11 @@ export class EnrollmentController extends BaseController {
       if (!userId) {
         return BaseController.unauthorized(res, 'User not authenticated');
       }
+
+      // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §4:
+      // enrollment 권한 판단 이전에 service boundary 를 먼저 확인한다.
+      // 타 서비스 courseId 로는 수강 신청 자체가 불가능해야 한다.
+      if (!(await guardCourseScope(req, res, courseId))) return;
 
       const data = { courseId, userId };
       const service = EnrollmentService.getInstance();
@@ -51,6 +80,9 @@ export class EnrollmentController extends BaseController {
         return BaseController.notFound(res, 'Enrollment not found');
       }
 
+      // 이미 로드된 course relation 으로 service boundary 판정 (추가 쿼리 0)
+      if (!guardLoadedCourseScope(req, res, enrollment.course?.serviceKey, 'Enrollment not found')) return;
+
       return BaseController.ok(res, { enrollment });
     } catch (error: any) {
       logger.error('[EnrollmentController.getEnrollment] Error', { error: error.message });
@@ -60,10 +92,14 @@ export class EnrollmentController extends BaseController {
 
   static async listEnrollments(req: Request, res: Response): Promise<any> {
     try {
-      const filters = req.query;
+      const scope = resolveScopeOrRespond(req, res);
+      if (!scope.ok) return;
+
+      // client 가 보낸 raw serviceKey 를 신뢰하지 않고 canonical 해석값으로 덮어쓴다.
+      const filters: any = { ...req.query, serviceKey: scope.scope };
       const service = EnrollmentService.getInstance();
 
-      const { enrollments, total } = await service.listEnrollments(filters as any);
+      const { enrollments, total } = await service.listEnrollments(filters);
 
       return BaseController.okPaginated(res, enrollments, {
         total,
@@ -85,7 +121,10 @@ export class EnrollmentController extends BaseController {
         return BaseController.unauthorized(res, 'User not authenticated');
       }
 
-      const filters: any = { ...req.query, userId };
+      const scope = resolveScopeOrRespond(req, res);
+      if (!scope.ok) return;
+
+      const filters: any = { ...req.query, userId, serviceKey: scope.scope };
       const service = EnrollmentService.getInstance();
 
       const { enrollments, total } = await service.listEnrollments(filters);
@@ -106,6 +145,9 @@ export class EnrollmentController extends BaseController {
     try {
       const { id } = req.params;
       const data = req.body;
+
+      if (!(await EnrollmentController.ensureEnrollmentInScope(req, res, id))) return;
+
       const service = EnrollmentService.getInstance();
 
       const enrollment = await service.updateEnrollment(id, data);
@@ -125,6 +167,9 @@ export class EnrollmentController extends BaseController {
   static async startEnrollment(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+
+      if (!(await EnrollmentController.ensureEnrollmentInScope(req, res, id))) return;
+
       const service = EnrollmentService.getInstance();
 
       const enrollment = await service.startEnrollment(id);
@@ -145,6 +190,9 @@ export class EnrollmentController extends BaseController {
     try {
       const { id } = req.params;
       const { finalScore } = req.body;
+
+      if (!(await EnrollmentController.ensureEnrollmentInScope(req, res, id))) return;
+
       const service = EnrollmentService.getInstance();
 
       const enrollment = await service.completeEnrollment(id, finalScore);
@@ -164,6 +212,9 @@ export class EnrollmentController extends BaseController {
   static async cancelEnrollment(req: Request, res: Response): Promise<any> {
     try {
       const { id } = req.params;
+
+      if (!(await EnrollmentController.ensureEnrollmentInScope(req, res, id))) return;
+
       const service = EnrollmentService.getInstance();
 
       const enrollment = await service.cancelEnrollment(id);
@@ -187,6 +238,8 @@ export class EnrollmentController extends BaseController {
       const userId = (req as any).user?.id;
 
       if (!userId) return BaseController.unauthorized(res, 'User not authenticated');
+
+      if (!(await guardCourseScope(req, res, courseId))) return;
 
       const service = EnrollmentService.getInstance();
       const enrollment = await service.getEnrollmentByUserAndCourse(userId, courseId);
@@ -218,6 +271,10 @@ export class EnrollmentController extends BaseController {
 
       if (!userId) return BaseController.unauthorized(res, 'User not authenticated');
 
+      // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §6:
+      // resource service scope → enrollment/ownership → progress mutation 순서.
+      if (!(await guardCourseScope(req, res, courseId))) return;
+
       const service = EnrollmentService.getInstance();
       const enrollment = await service.getEnrollmentByUserAndCourse(userId, courseId);
 
@@ -237,6 +294,12 @@ export class EnrollmentController extends BaseController {
         const lessonRepo = AppDataSource.getRepository('Lesson');
         const lesson: any = await lessonRepo.findOne({ where: { id: lessonId } });
         if (!lesson) return BaseController.notFound(res, 'Lesson not found');
+
+        // WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1 §6:
+        // lesson 이 경로의 course 에 속하는지 반드시 확인한다. 확인하지 않으면
+        // 자기 course 에 등록된 사용자가 타 course(=타 서비스) lessonId 로
+        // 진도를 기록할 수 있다.
+        if (lesson.courseId !== courseId) return BaseController.notFound(res, 'Lesson not found');
 
         if (lesson.type === 'quiz' || lesson.type === 'assignment') {
           return BaseController.error(
