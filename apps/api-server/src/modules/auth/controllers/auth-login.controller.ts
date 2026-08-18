@@ -81,10 +81,13 @@ export class AuthLoginController extends BaseController {
 
       // WO-O4O-NAME-NORMALIZATION-V1: displayName 추가
       const loginUser = result.user as Record<string, unknown>;
+      // WO-O4O-CROSS-SERVICE-PROFILE-FINAL-BROWSER-CLOSURE-V1:
+      //   /auth/me 와 동일 우선순위 (name > lastName+firstName > email prefix).
       loginUser.displayName =
-        (result.user.lastName || result.user.firstName)
-          ? `${result.user.lastName || ''}${result.user.firstName || ''}`.trim()
-          : result.user.name || result.user.email?.split('@')[0] || '사용자';
+        result.user.name
+        || `${result.user.lastName || ''}${result.user.firstName || ''}`.trim()
+        || result.user.email?.split('@')[0]
+        || '사용자';
 
       // Response: Cookie is primary, JSON tokens for cross-origin or legacy support
       return BaseController.ok(res, {

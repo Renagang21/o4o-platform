@@ -79,10 +79,18 @@ export class AuthAccountController extends BaseController {
       // WO-O4O-KPA-FORUM-DISPLAYNAME-NICKNAME-ALIGNMENT-V1:
       //   toPublicData() 가 nickname 을 포함하지 않는 fallback 경로에서도 일관 노출.
       ud0.nickname = req.user.nickname || null;
+      // WO-O4O-CROSS-SERVICE-PROFILE-FINAL-BROWSER-CLOSURE-V1:
+      //   표시 우선순위 정본은 `name > (lastName + firstName) > email prefix` 다
+      //   (update-profile.dto.ts 한국식 이름 표시 규칙). lastName/firstName 을 쓰는
+      //   모든 write 경로(KPA mypage.service · MembershipConsoleController)는 name 을
+      //   함께 동기화하므로 name 이 항상 최신이다. 반대로 canonical self-profile 계약
+      //   (`PATCH /users/me/profile`)은 name 만 수정하므로, 파생값을 먼저 쓰면 프로필에서
+      //   이름을 저장해도 /auth/me 가 옛 이름을 돌려줘 저장이 되돌아간 것처럼 보였다.
       ud0.displayName =
-        (req.user.lastName || req.user.firstName)
-          ? `${req.user.lastName || ''}${req.user.firstName || ''}`.trim()
-          : req.user.name || req.user.email?.split('@')[0] || '사용자';
+        req.user.name
+        || `${req.user.lastName || ''}${req.user.firstName || ''}`.trim()
+        || req.user.email?.split('@')[0]
+        || '사용자';
 
       // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA enrichment 제거
       // pharmacistQualification, activityType, kpaMembership는
