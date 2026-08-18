@@ -150,8 +150,17 @@ export function createRequireStoreOwner(
 
     // WO-O4O-STORE-OWNER-MEMBERSHIP-CANONICALIZATION-V1
     // serviceKey 가 명시된 경우 service_memberships.active 사전 검증.
-    // back-compat 경로(serviceKey 미지정)는 본 WO 에서 변경 없음 — 점진 마이그레이션.
     // JWT memberships 직접 사용 — request 당 추가 DB query 없음.
+    //
+    // WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1 (read/guard 축):
+    //   back-compat 경로(serviceKey 미지정)는 membership 검증을 통째로 건너뛰고 있었다.
+    //   role_assignments 의 store_owner role 만 있으면 suspended/rejected/withdrawn
+    //   회원도 서비스 중립 store 라우트(store-library / store-ai / product-library /
+    //   product-request / store-tablet)에 진입할 수 있었다.
+    //   이 경로는 조직 해석이 서비스 중립이라 "어느 서비스의 membership 인지" 를
+    //   결정할 수 없으므로, 서비스 단위 판정 대신 **active membership 최소 1개** 를
+    //   요구한다 (fail-closed). 서비스 단위 정밀 판정은 serviceKey 를 넘기는
+    //   호출부로의 점진 마이그레이션으로 계속 해소한다.
     if (serviceKey) {
       const membershipKey = resolveCanonicalServiceKey(serviceKey);
       const memberships: { serviceKey: string; status: string }[] =
@@ -169,6 +178,25 @@ export function createRequireStoreOwner(
         res.status(403).json({
           success: false,
           error: `Service membership is ${membership.status}. Active membership required.`,
+          code: 'MEMBERSHIP_NOT_ACTIVE',
+        });
+        return;
+      }
+    } else {
+      const memberships: { serviceKey: string; status: string }[] =
+        (user as any).memberships || [];
+      if (memberships.length === 0) {
+        res.status(403).json({
+          success: false,
+          error: 'No service membership found',
+          code: 'MEMBERSHIP_NOT_FOUND',
+        });
+        return;
+      }
+      if (!memberships.some((m) => m.status === 'active')) {
+        res.status(403).json({
+          success: false,
+          error: 'No active service membership. Active membership required.',
           code: 'MEMBERSHIP_NOT_ACTIVE',
         });
         return;
