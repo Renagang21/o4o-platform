@@ -278,15 +278,35 @@ courseId 만 알면 write 도 가능했다).
 
 ## 13. 브라우저 smoke (WO §13)
 
-배포 후 실측. 상세는 §완료 보고 참조.
+프로덕션 배포 후 Playwright 실측 (2026-08-18, revision `o4o-core-api-03345-zt6`).
 
-| 서비스 | 경로 | 결과 |
+### 13-1. 비로그인
+
+| 서비스 | 경로 | LMS 호출 | 결과 |
+|---|---|---|---|
+| KPA-Society | `/lms` → 상세 | `200 /kpa/lms/courses?status=published` n=3 keys=`["kpa-society"]` · `200 /kpa/lms/courses/:id` · `200 .../lessons` | PASS — 혼입 0 |
+| K-Cosmetics | `/lms` | `200 /lms/courses?serviceKey=k-cosmetics&status=published` n=0 keys=`[]` | PASS — "총 0개의 강의" (이전에는 KPA 강의 노출) |
+| GlycoPharm | `/lms` | `200 /lms/courses?serviceKey=glycopharm&status=published` n=0 keys=`[]` | PASS — "총 0개의 강의" |
+
+### 13-2. 로그인 (KPA, `docs/local/TEST-ACCOUNTS.local.md` KPA operator)
+
+| 단계 | 호출 | 결과 |
 |---|---|---|
-| KPA-Society | /lms → 상세 → enroll 상태 → lesson → progress → certificate | (배포 후 기록) |
-| K-Cosmetics | /lms → 상세 → lesson | (배포 후 기록) |
-| GlycoPharm | /lms → 상세 → lesson → certificate/PDF | (배포 후 기록) |
+| `/lms` 목록 | `200 /kpa/lms/courses?status=published&page=1&limit=20` n=5 keys=`["kpa-society"]` | PASS — "총 5개의 강의" |
+| 강의 상세 | `200 /kpa/lms/courses/:courseId` | PASS |
+| 커리큘럼 | `200 /kpa/lms/courses/:courseId/lessons` n=1 | PASS |
+| 수강 상태 | `200 /kpa/lms/enrollments/me/course/:courseId` | PASS |
+| 레슨 진입 | `200 /kpa/lms/lessons/:lessonId` (`/lms/course/:courseId/lesson/:lessonId`) | PASS — 진도율 UI 정상 |
 
-기준: cross-service 혼입 0 / 404·500 0 / white screen 0 / JS exception 0.
+### 13-3. 기준 대비 판정
+
+| 기준 | 결과 |
+|---|---|
+| cross-service 혼입 0 | **PASS** — 3 서비스 모두 자기 serviceKey 만 |
+| white screen 0 | **PASS** |
+| LMS 경로 404·500 0 | **PASS** — LMS 호출 전부 200 |
+| JS exception 0 | **PASS** — 스크립트 예외 0 |
+| 콘솔 오류 0 | **부분** — KPA 강의 상세에서 404 리소스 오류 6~10건. **LMS 아님** (아래 §15-4) |
 
 ---
 
@@ -340,7 +360,14 @@ courseId 만 알면 write 도 가능했다).
    여러 서비스 강의를 한 화면에서 다루는 현행 계약을 보존했다. 운영 콘솔 단위의
    service scope 정렬이 필요하면 별도 트랙.
 
-4. **GlycoPharm `getMyCertificate` 는 dead code**
+4. **KPA 강의 상세의 `appreciation` 404 (LMS 무관 · 범위 밖)**
+   `/api/v1/kpa/appreciation/lms_course/:id/{summary,recent}` 가 404 다.
+   원인은 `services/web-kpa-society/src/api/appreciation.ts` 가 base `/api/v1/kpa` 인 `apiClient` 를
+   쓰는데, 백엔드는 `app.use('/api/v1/appreciation', ...)` 로만 마운트돼 있다 (`coreApiClient` 를 써야 함).
+   Forum·Contents·MyDashboard 도 같은 클라이언트를 쓰므로 **LMS 한정 문제가 아니고 이번 WO 이전부터 존재**한다.
+   WO §14 "무관한 404 수정 금지" 에 해당하여 손대지 않았다. **별도 WO 필요.**
+
+5. **GlycoPharm `getMyCertificate` 는 dead code**
    존재하지 않는 `/lms/certificates/course/:courseId` 를 호출하지만 **호출부가 없다**.
    실패를 삼켜 `null` 을 반환하는 형태라 load-error 계약에도 어긋난다.
    범위 밖이라 제거하지 않고 기록만 한다.
@@ -349,7 +376,7 @@ courseId 만 알면 write 도 가능했다).
 
 ## 16. 문서 정합
 
-발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(잔존 위험 1 — enrollment 소유권).
+발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건(잔존 위험 1 — enrollment 소유권 / 잔존 위험 4 — appreciation client base 불일치).
 
 ---
 
