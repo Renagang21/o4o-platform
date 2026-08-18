@@ -4,7 +4,7 @@
 - **선행 WO**: `WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1`, `WO-O4O-LMS-CROSSSERVICE-READ-WRITE-BOUNDARY-COMPLETION-V1`
 - **작성일**: 2026-08-18
 - **시작 commit**: `23fe9973d` (작업 중 origin/main 은 타 세션 커밋으로 `5ac121923` 까지 진행)
-- **판정**: **PASS_WITH_RESIDUAL_RISK**
+- **판정**: **CODE_PASS / DEPLOY_BLOCKED** — 코드·테스트·검증 전부 통과, production 배포는 인프라 결함(VPC connector 부재)으로 차단 (§10-A)
 
 ---
 
@@ -169,18 +169,50 @@ api-server 전체 — **139 suites / 2,206 tests PASS**, `tsc --noEmit` PASS, mi
 
 ---
 
+## 10-A. production 배포 — **차단됨 (인프라, 본 변경과 무관)**
+
+commit `527ed7e23` push 후 `Deploy API Server (Cloud Run)` 실행(run `32098517053`)이 실패했다.
+
+```
+ERROR: (gcloud.run.deploy) VPC connector
+projects/netureyoutube/locations/asia-northeast3/connectors/o4o-vpc-connector
+does not exist, or Cloud Run does not have permission to use it.
+```
+
+- `gcloud compute networks vpc-access connectors list --region asia-northeast3` → **Listed 0 items** (커넥터 부재 확정)
+- `.github/workflows/deploy-api.yml:322-323` 이 여전히 `--vpc-connector=o4o-vpc-connector`, `--vpc-egress=private-ranges-only` 를 전달한다
+- 직전 커밋(`5ac121923`) 배포는 성공했고, 그 이후 시점에 커넥터가 사라졌다 → **api-server 전체 배포가 막힌 상태**이며 본 WO 코드 변경과 인과가 없다
+- 워크플로/인프라 수정은 CLAUDE.md 중지 조건(“Docker · CI · build 인프라 변경 필요”, “현재 변경과 무관한 build 실패”)에 해당 → **수정하지 않고 보고**
+
+현재 서비스 리비전은 `o4o-core-api-03350-cpg`(= `5ac121923` 기준), `/health` 200 으로 **production 은 정상 가동 중**이나 본 수정은 아직 반영되지 않았다.
+
+### 배포 전 production 실측 — 결함 재현 (read-only)
+
+`sohae2100@gmail.com` 로그인 후, 타 사용자(`renagang21@gmail.com`) 소유 enrollment 를 ID 로 조회:
+
+| 요청 | 응답 |
+|---|---|
+| `GET /api/v1/lms/enrollments/6d025cca-…` (타인 소유) | **200** — `userId`, 소유자 email 까지 노출 |
+| `GET /api/v1/lms/enrollments/ca7fd6e1-…` (본인 소유) | 200 (정상) |
+
+→ 결함은 실재하며, 배포만 되면 위 타인 조회는 404 로 바뀐다(신규 스펙으로 증명).
+WO §10 에 따라 **production 에서 타인 enrollment mutation 실험은 수행하지 않았다.**
+
+---
+
 ## 11. 잔존 위험
 
 1. **certificate id 기반 read** — `GET /lms/certificates/:id`, `/certificates/number/:certificateNumber`, `/certificates` 목록은 service scope 는 있으나 owner check 가 없다. 현재 `lms_certificates` 0건이라 실피해 0이며, 수료증 정책 변경은 본 WO §11 제외 범위 → **별도 WO 권고**.
 2. `GET /enrollments` 목록의 elevated 판정은 course 단위 소유(instructor 본인 강의)까지 좁히지 않는다. instructor 는 서비스 범위 전체 목록을 본다(기존 계약 유지). 정책 재설계는 제외 범위.
 3. 실 production 에서 **타인 enrollment mutation 실험은 수행하지 않았다**(WO §10). cross-user 차단은 automated test 로 증명했다.
 4. (선행 WO 이월) KPA `appreciation` 클라이언트 base 불일치로 인한 404 6건 — LMS 무관, 별도 WO 대기.
+5. **가장 큰 잔존 위험: 미배포.** §10-A 의 VPC connector 부재가 해소되기 전까지 production 에는 결함이 그대로 남아 있다. `.github/workflows/deploy-api.yml` 의 VPC 플래그 처리(커넥터 재생성 또는 플래그 제거)는 **별도 WO 필요**이며, 그때까지 api-server 의 모든 배포가 막힌다.
 
 ---
 
 ## 12. 문서 정합
 
-발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건 (certificate owner check)
+발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건 (certificate owner check, deploy-api VPC connector 복구)
 
 ---
 
