@@ -119,6 +119,20 @@ export class OrganizationService {
    * 조직 삭제
    *
    * 하위 조직이나 소속 멤버가 있으면 삭제 불가
+   *
+   * WO-O4O-KPA-STORE-ORPHAN-SLUG-INTEGRITY-CLEANUP-V1 §4
+   *   organizations 를 hard delete 하면 이 조직을 가리키던 매장 slug
+   *   (`platform_store_slugs.store_id`, `platform_store_slug_history.store_id`) 가
+   *   그대로 남아 orphan 이 된다. 두 테이블에는 FK 가 없어 DB 가 막아 주지 않는다
+   *   (같은 계열의 `organization_service_enrollments` 는 FK ON DELETE CASCADE 라 자동 정리된다).
+   *
+   *   orphan slug 는 조회 경로 대부분에서 404 로 끝나지만, UNIQUE(slug) 네임스페이스를
+   *   영구 점유하고 store-policy 경로에서는 404 대신 403 을 만든다.
+   *   → 조직 삭제와 같은 트랜잭션에서 slug 잔재를 함께 정리한다.
+   *
+   *   organization-core 는 platform-core 에 의존하지 않으므로 entity import 없이
+   *   `to_regclass` 로 테이블 존재를 확인한 뒤 raw SQL 로만 접근한다
+   *   (해당 테이블이 없는 배포에서도 조직 삭제가 깨지지 않는다).
    */
   async deleteOrganization(id: string): Promise<void> {
     const org = await this.organizationRepo.findOne({ where: { id } });
@@ -143,21 +157,34 @@ export class OrganizationService {
       );
     }
 
-    // 3. 삭제 전 상위 조직의 childrenCount 감소
-    if (org.parentId) {
-      const parent = await this.organizationRepo.findOne({
-        where: { id: org.parentId },
-      });
-      if (parent) {
-        await this.organizationRepo.update(
-          { id: parent.id },
-          { childrenCount: Math.max(0, parent.childrenCount - 1) }
-        );
+    await this.dataSource.transaction(async (manager) => {
+      // 3. 삭제 전 상위 조직의 childrenCount 감소
+      if (org.parentId) {
+        const parent = await manager.getRepository(Organization).findOne({
+          where: { id: org.parentId },
+        });
+        if (parent) {
+          await manager.getRepository(Organization).update(
+            { id: parent.id },
+            { childrenCount: Math.max(0, parent.childrenCount - 1) }
+          );
+        }
       }
-    }
 
-    // 4. 삭제
-    await this.organizationRepo.delete({ id });
+      // 4. 매장 slug 잔재 정리 (FK 부재 보완 — 위 doc comment 참조)
+      for (const table of ['platform_store_slugs', 'platform_store_slug_history']) {
+        const exists = await manager.query(
+          `SELECT to_regclass($1) IS NOT NULL AS present`,
+          [`public.${table}`]
+        );
+        if (exists?.[0]?.present) {
+          await manager.query(`DELETE FROM ${table} WHERE store_id = $1`, [id]);
+        }
+      }
+
+      // 5. 삭제
+      await manager.getRepository(Organization).delete({ id });
+    });
   }
 
   /**
