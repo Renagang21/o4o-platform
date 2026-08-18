@@ -13,6 +13,7 @@
  */
 
 import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { isAdminOrAbove } from '@o4o/auth-utils';
 import { filterMenuByRole } from '@o4o/ui';
 import { OperatorAreaShell } from '@o4o/operator-ux-core';
@@ -21,7 +22,34 @@ import { MembershipGate } from '../components/MembershipGate';
 import { OperatorHeader } from '../components/operator/OperatorHeader';
 import { ENABLED_CAPABILITIES } from '../config/operatorCapabilities';
 import { UNIFIED_MENU, PHARMACY_HUB_OPERATOR_DOMAIN_IA } from '../config/operatorMenuGroups';
-import { SERVICE_KEY } from '../config/service';
+import { ROLES, SERVICE_KEY, satisfiesRole } from '../config/service';
+
+/**
+ * WO-O4O-CROSSSERVICE-ADMIN-OPERATOR-ROLE-ENTRY-FINAL-CLOSURE-V1
+ *
+ * 운영자 역할이 없는 사용자(예: store_owner)가 `/operator` 로 직접 진입하면
+ * 셸은 렌더되고 내부 페이지 API 만 403 이 되어 raw 오류 카드가 노출됐다.
+ * 관리자 영역(AdminLayoutWrapper.NoAdminAccess)과 같은 형태의 역할 안내 +
+ * 안전한 복귀 링크로 대체한다. API guard·권한 범위는 변경하지 않는다.
+ */
+function NoOperatorAccess() {
+  return (
+    <div className="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-6 text-center">
+      <h2 className="mb-2 text-lg font-semibold">운영자 권한이 필요합니다</h2>
+      <p className="mb-4 text-sm text-gray-600">
+        이 영역은 서비스 운영자 전용입니다. 매장 업무는 내 매장에서 처리해 주세요.
+      </p>
+      <div className="flex items-center justify-center gap-4">
+        <Link to="/store-owner" className="text-sm text-primary-600 underline">
+          내 매장으로 이동
+        </Link>
+        <Link to="/" className="text-sm text-gray-500 underline">
+          홈으로
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 export function OperatorLayoutWrapper() {
   const { user } = useAuth();
@@ -30,6 +58,17 @@ export function OperatorLayoutWrapper() {
   const isAdmin = user ? isAdminOrAbove((user.roles as string[]) ?? [], SERVICE_KEY) : false;
 
   const menuItems = useMemo(() => filterMenuByRole(UNIFIED_MENU, isAdmin), [isAdmin]);
+
+  // 운영자 이상 여부 — satisfiesRole(operator) 는 operator | admin | platform:super_admin 을 포함한다.
+  const isOperator = satisfiesRole(((user?.roles as string[]) ?? []), ROLES.operator);
+
+  if (!isOperator) {
+    return (
+      <MembershipGate>
+        <NoOperatorAccess />
+      </MembershipGate>
+    );
+  }
 
   return (
     <MembershipGate>

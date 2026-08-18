@@ -12,6 +12,7 @@ import { Home, User, Settings, LogOut, Shield } from 'lucide-react';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { useAuth, type User as UserType } from '../../contexts';
 import { SUPER_OPERATOR_ROLES, hasAnyRole } from '../../lib/role-constants';
+import { useKpaUserRoles } from '../KpaUserMenu';
 
 function isSuperOperator(user: UserType | null): boolean {
   if (!user) return false;
@@ -28,8 +29,13 @@ export function StoreUserDropdown({ homeLink = '/', onLogout }: StoreUserDropdow
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
-  const isAdmin = user ? user.roles.includes('kpa:admin') : false;
-  const isOperator = user ? user.roles.includes('kpa:operator') : false;
+  /**
+   * WO-O4O-CROSSSERVICE-ADMIN-OPERATOR-ROLE-ENTRY-FINAL-CLOSURE-V1:
+   *   역할 판정을 KPA 프로필 메뉴 SSOT(`useKpaUserRoles`)로 수렴한다.
+   *   기존의 `roles.includes('kpa:admin')` 직접 비교는 platform:super_admin 을
+   *   누락시켜 KpaUserMenu(desktop/mobile) 와 결과가 달랐다(drift).
+   */
+  const { isAdmin, isOperator } = useKpaUserRoles(user);
   const superOp = isSuperOperator(user);
 
   return (
@@ -83,13 +89,24 @@ export function StoreUserDropdown({ homeLink = '/', onLogout }: StoreUserDropdow
               {superOp ? (
                 /* Super Operator: 간소화 메뉴 */
                 <>
-                  <DropdownLink
-                    to={isAdmin ? '/admin' : '/operator'}
-                    icon={<Shield className="w-4 h-4 text-amber-600" />}
-                    onClick={() => setOpen(false)}
-                  >
-                    {isAdmin ? '관리자 대시보드' : '운영 대시보드'}
-                  </DropdownLink>
+                  {isAdmin && (
+                    <DropdownLink
+                      to="/admin"
+                      icon={<Shield className="w-4 h-4 text-amber-600" />}
+                      onClick={() => setOpen(false)}
+                    >
+                      관리자 대시보드
+                    </DropdownLink>
+                  )}
+                  {isOperator && (
+                    <DropdownLink
+                      to="/operator"
+                      icon={<Shield className="w-4 h-4 text-amber-600" />}
+                      onClick={() => setOpen(false)}
+                    >
+                      운영 대시보드
+                    </DropdownLink>
+                  )}
                   <DropdownLink to="/mypage" icon={<Home className="w-4 h-4 text-slate-500" />} onClick={() => setOpen(false)}>
                     마이페이지
                   </DropdownLink>
@@ -97,13 +114,25 @@ export function StoreUserDropdown({ homeLink = '/', onLogout }: StoreUserDropdow
               ) : (
                 /* 일반 사용자 — WO-KPA-OPERATOR-USER-MENU-CLEANUP-V1 */
                 <>
-                  {(isAdmin || isOperator) && (
+                  {/* WO-O4O-CROSSSERVICE-ADMIN-OPERATOR-ROLE-ENTRY-FINAL-CLOSURE-V1:
+                      legacy ternary(admin 이면 운영 대시보드 숨김) 제거 —
+                      KPA canonical(KpaUserMenuItems) 과 동일하게 역할별 독립 표시. */}
+                  {isAdmin && (
                     <DropdownLink
-                      to={isAdmin ? '/admin' : '/operator'}
+                      to="/admin"
                       icon={<Shield className="w-4 h-4 text-slate-500" />}
                       onClick={() => setOpen(false)}
                     >
-                      {isAdmin ? '관리자 대시보드' : '운영 대시보드'}
+                      관리자 대시보드
+                    </DropdownLink>
+                  )}
+                  {isOperator && (
+                    <DropdownLink
+                      to="/operator"
+                      icon={<Shield className="w-4 h-4 text-slate-500" />}
+                      onClick={() => setOpen(false)}
+                    >
+                      운영 대시보드
                     </DropdownLink>
                   )}
                   {/* WO-O4O-DASHBOARD-SWITCHER-DORMANT-CODE-CLEANUP-V1 (2026-05-23):
