@@ -6,6 +6,7 @@
  * order detail enrichment, shipment lookup, and order referral attribution.
  */
 import type { DataSource } from 'typeorm';
+import { NON_CANONICAL_ENROLLMENT_CODES } from '../../../utils/listing-service-key.js';
 
 export class SellerService {
   constructor(private dataSource: DataSource) {}
@@ -136,12 +137,19 @@ export class SellerService {
 
   /**
    * Resolve serviceKey from organization_service_enrollments
+   *
+   * WO-O4O-KCOS-ENROLLMENT-SERVICE-KEY-CANONICALIZATION-V1:
+   *   같은 조직이 canonical('k-cosmetics')과 legacy 별칭('cosmetics')을 동시에 보유할 수 있어
+   *   ORDER BY 없는 LIMIT 1 은 비결정적이었다. canonical 행을 우선 선택하고,
+   *   동률이면 먼저 등록된 행으로 고정한다. (별칭 집합 = security-core SSOT 파생)
    */
   async resolveServiceKey(organizationId: string): Promise<string> {
     const enrollment = await this.dataSource.query(
       `SELECT service_code FROM organization_service_enrollments
-       WHERE organization_id = $1 AND status = 'active' LIMIT 1`,
-      [organizationId],
+       WHERE organization_id = $1 AND status = 'active'
+       ORDER BY (service_code = ANY($2::text[])) ASC, enrolled_at ASC NULLS LAST, service_code ASC
+       LIMIT 1`,
+      [organizationId, NON_CANONICAL_ENROLLMENT_CODES],
     );
     return enrollment[0]?.service_code || 'kpa-society';
   }
