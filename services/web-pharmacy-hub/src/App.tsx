@@ -115,6 +115,8 @@ import BlogEditorPage from './pages/store-owner/BlogEditorPage';
 // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1
 import StoreInfoPage from './pages/store-owner/StoreInfoPage';
 import AccountPage from './pages/store-owner/AccountPage';
+// WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1 — 역할 무관 개인 프로필 (canonical /account)
+import MyProfilePage from './pages/account/MyProfilePage';
 // WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 — 매장 실행 자산 (QR · POP · 사이니지 · 상품 설명서)
 import QrPage from './pages/store-owner/QrPage';
 import PopPage from './pages/store-owner/PopPage';
@@ -147,6 +149,17 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/join" element={<JoinPage />} />
           <Route path="/join/status" element={<JoinStatusPage />} />
+
+          {/*
+            내 프로필 (WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1 — production 잔여 결함)
+            개인 계정(users) 화면은 역할 셸에 종속되지 않는다. 기존에는 매장 셸 안의
+            `/store-owner/account` 가 유일한 계정 화면이라 운영자·공급자에게는 Profile
+            진입점이 아예 없었다. 로그인만 하면 들어올 수 있는 공개 셸 route 로 올린다.
+            가입 상태(pending/rejected)와 무관하게 본인 계정 확인·비밀번호 변경은 가능해야
+            하므로 MembershipGate 를 걸지 않는다(미인증 안내는 화면이 직접 렌더).
+            매장·사업자 정보(organizations)는 이 화면에 없다 — `/store-owner/info` 소관.
+          */}
+          <Route path="/account" element={<MyProfilePage />} />
 
           {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
               공개 정책 문서. 다른 4서비스와 같은 공통 PolicyDocumentViewer 소비(게시 문서만 표시,

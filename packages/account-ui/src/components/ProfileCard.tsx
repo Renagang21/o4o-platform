@@ -11,6 +11,11 @@ interface ProfileCardProps {
   statusColor?: string;
   isEditing: boolean;
   saving: boolean;
+  /**
+   * false 면 수정 버튼을 렌더하지 않는다 (편집 가능한 필드가 하나도 없는 조회 전용 화면).
+   * 기본값 true — 기존 소비처 동작 불변.
+   */
+  canEdit?: boolean;
   onEdit: () => void;
   onSave: () => void;
   onCancel: () => void;
@@ -26,6 +31,7 @@ export function ProfileCard({
   statusColor,
   isEditing,
   saving,
+  canEdit = true,
   onEdit,
   onSave,
   onCancel,
@@ -54,7 +60,7 @@ export function ProfileCard({
             )}
           </div>
         </div>
-        {!isEditing && (
+        {!isEditing && canEdit && (
           <button
             onClick={onEdit}
             aria-label="프로필 수정"

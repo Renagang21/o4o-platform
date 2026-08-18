@@ -243,4 +243,81 @@ localhost ↔ 원격 API 조합에서는 CORS · 쿠키 도메인 문제로 실�
 
 ## 10. 문서 정합
 
-발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 5건 (§9).
+발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 6건 (§9 · §11-6).
+
+---
+
+## 11. 추가 기록 — Production 잔여 결함 1건 (PharmacyHub operator profile entry)
+
+> 본 WO 범위 안에서 처리했다(별도 WO 로 분리하지 않음).
+
+### 11-1. 결함
+
+PharmacyHub 에 `pharmacy-hub:operator` 계정으로 로그인하면 GlobalHeader 사용자 드롭다운에
+`서비스 운영자` · `가입 상태` · `로그아웃` 만 노출되고 **개인 Profile 진입점이 없었다.**
+운영자는 Profile Core 에 접근할 수 없는 상태였다.
+
+### 11-2. 현재 main 재확인 결과
+
+| # | 확인 항목 | 결과 |
+|:--:|---|---|
+| 1 | operator 용 canonical 개인 Profile route 존재 여부 | **없음.** 개인 계정 화면은 `/store-owner/account` 하나뿐 |
+| 2 | `PharmacyHubGlobalHeader.tsx` 의 계정 진입점 게이트 | 확인됨 — `{isStoreOwner && ...}` 로 `내 계정`(/store-owner/account) 게이트. 주석에 "유일한 계정 화면" 명시 |
+| 3 | `App.tsx` 의 account route 위치 | 확인됨 — `/store-owner` 셸(StoreOwnerGuard) 하위. 메뉴만 열면 operator 는 API 403 |
+| 4 | `AccountProfileSection` 을 쓰는 별도 공통/운영자 profile route | **없음** |
+| 5 | `/store-owner/account` 가 store_owner 전용 도메인 화면인가 | **아니다.** 화면 내용은 `users` 축(이름·닉네임·연락처·이메일·비밀번호)뿐이고 매장 정보는 `/store-owner/info` 소관. 즉 **위치만 매장 셸**이었다 |
+| 6 | 나머지 4서비스 동일 결함 | **없음** — KPA `KpaUserMenu.tsx` · GP `GlycoGlobalHeader.tsx` · KCos `KCosGlobalHeader.tsx` · Neture `NetureUserMenu.tsx` 모두 역할 게이트 없이 `/mypage` 노출. 재확인만 하고 미변경 |
+
+**백엔드 경계 (변경하지 않음)**
+
+- `GET·PATCH /api/v1/pharmacy-hub/store-owner/account/profile` 은 `requirePharmacyHubScope('pharmacy-hub:store_owner')` 뒤에 있다.
+- `PHARMACY_HUB_SCOPE_CONFIG.scopeRoleMapping` 에서 `store_owner` 는 **store_owner 만** 만족한다(operator/admin 대리 없음 — Foundation 설계 의도).
+- 공통 `/api/v1/users/*` 는 `/password` · `/me/contact` 를 제외하면 전부 `requireAdmin` 뒤이고, `PATCH /auth/me/profile` 은 KPA 직역(activityType) 전용이다.
+- → **모든 로그인 사용자가 본인 name/nickname/phone 을 수정할 수 있는 공통 계약이 없다.**
+
+### 11-3. 수정 (frontend only)
+
+| 파일 | 내용 |
+|---|---|
+| `services/web-pharmacy-hub/src/pages/account/MyProfilePage.tsx` (신규) | 개인 계정 화면 본체. Profile Core(`AccountProfileSection` + `SecuritySection` + `PasswordChangeModal` + `MyPageAuthRequired`) 사용 |
+| `services/web-pharmacy-hub/src/pages/store-owner/AccountPage.tsx` | 242L → **thin wrapper**. `<MyProfilePage showNotifications />` 만 렌더 — 화면 두 벌 금지 |
+| `services/web-pharmacy-hub/src/App.tsx` | 공개 셸 하위 canonical route `/account` 추가 |
+| `services/web-pharmacy-hub/src/components/PharmacyHubGlobalHeader.tsx` | `isStoreOwner` 게이트 제거 → 모든 로그인 사용자에게 **`내 프로필`**(/account) 노출 |
+| `packages/account-ui/src/components/ProfileCard.tsx` | `canEdit?: boolean` (기본 true) — false 면 수정 버튼 미렌더 |
+| `packages/account-ui/src/components/AccountProfileSection.tsx` | 편집 가능 필드가 0 이면 `canEdit=false` 전달 (빈 편집 모드 진입 방지) |
+
+**설계 판단**
+
+- `/store-owner/account` URL 은 유지한다 — 공통 `store-ui-core` 매장 사이드바(설정 › 내 계정)가 이 URL 을 가리킨다. F3 Store Layer 공통 config 는 건드리지 않았다.
+- 편집 가능 여부는 **역할 하드코딩이 아니라 서버 응답**으로 결정한다. `GET .../account/profile` 200 → 편집 가능, 403 → 조회 전용 폴백(세션 `GET /auth/me` 값). StoreOwnerGuard 도 backend scope 도 완화하지 않았다.
+- 이 화면은 `users` 축만 렌더한다. 매장·사업자 정보(`organizations`)는 포함하지 않으므로 **operator 에게 store_owner 전용 자산이 노출되지 않는다.**
+
+### 11-4. 용어 축
+
+- PharmacyHub 사용자 드롭다운의 개인 계정 진입점 명칭 = **`내 프로필`** (기존 `내 계정` 에서 변경).
+- `내 약국` / `매장 정보` / `사업자 정보` 는 역할·도메인 화면으로 분리 유지.
+- 나머지 4서비스의 `마이페이지` 라벨은 이번에 변경하지 않았다 → §11-6 후속 항목.
+
+### 11-5. 검증
+
+| 항목 | 결과 |
+|---|---|
+| `@o4o/account-ui` `tsc --build` | PASS |
+| `web-pharmacy-hub` `tsc --noEmit` | PASS |
+| `web-pharmacy-hub` `npm run build` | PASS |
+| `web-kpa-society` · `web-glycopharm` · `web-k-cosmetics` · `web-neture` `tsc --noEmit` | PASS (ProfileCard 변경은 additive · 기본값 true) |
+| 모바일/데스크톱 노출 | 코드 확인 — 공통 `GlobalHeader` 는 데스크톱 드롭다운과 모바일 drawer 양쪽에 `userMenuItems` 를 렌더하며 PH 는 `showMobileUserMenu` 를 끄지 않는다 |
+| 기존 store_owner / admin / supplier 메뉴 | 미변경 (`내 약국` · `관리자 대시보드` · `운영 대시보드` · `공급자` 항목 그대로) |
+| **실브라우저 스모크** | **미수행** — 미배포 상태이며 로컬 dev 에 API 프록시가 없고(`VITE_API_BASE_URL` 이 원격 지정) 쿠키 기반 세션이 localhost 로 넘어오지 않는다. 숨기지 않고 §11-6 에 MUST_FIX 로 남긴다 |
+
+### 11-6. 잔여 MUST_FIX_BEFORE_CLOSE (추가)
+
+| # | 항목 | 성격 |
+|:--:|---|---|
+| 6 | **operator 본인 프로필 수정 계약 부재** — 현재 operator/supplier 는 `/account` 에서 **조회 + 비밀번호 변경만** 가능하고 이름·닉네임·연락처 수정은 불가하다. 해소하려면 backend 에 "PH 회원 본인" scope 의 self-profile 계약이 필요하다(예: `PharmacyHubAccountController` 를 store_owner scope 가 아닌 membership-active scope 경로에도 등록). 본 WO 는 backend 변경 금지 조건이라 **수행하지 않았다** | 승인 필요 (backend) |
+| 7 | 배포 후 PharmacyHub 실브라우저 스모크 — operator/store_owner/supplier/admin 각 역할로 드롭다운 `내 프로필` → `/account` 200 · 조회 · (store_owner) 수정·저장·새로고침 유지 · 비밀번호 모달 · 모바일 drawer | 검증 |
+| 8 | 나머지 4서비스 `마이페이지` ↔ PharmacyHub `내 프로필` 라벨 축 정렬 여부 | 정책 판단 → 별도 WO |
+
+**추가 발견 (범위 밖 · 미수정, 보고만)**
+
+GP / KCos / Neture 의 `MyProfilePage` 저장 경로 `PUT /api/v1/users/profile` 은 backend `users.routes.ts` 에 해당 route 가 없어 `router.use(requireAdmin)` 뒤의 `PUT /:id` 로 떨어진다. 일반 사용자에게는 403(또는 UUID 검증 400)이 예상된다. **본 WO 이전부터 있던 상태**이며 이번 공통화가 만든 회귀가 아니다(어댑터가 기존 호출을 그대로 옮겼다). 교정은 backend 변경이 필요하므로 별도 승인 대상이다.

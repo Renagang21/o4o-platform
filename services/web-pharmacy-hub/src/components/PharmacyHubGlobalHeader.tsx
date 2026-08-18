@@ -142,16 +142,17 @@ export function PharmacyHubGlobalHeader() {
             </GlobalHeaderMenuItem>
           )}
           {/*
-            내 계정 = 매장 셸 안의 /store-owner/account 가 유일한 계정 화면이다.
-            매장 진입 권한이 없는 사용자에게는 열리지 않으므로 노출하지 않는다(데드링크 방지).
-            운영자는 매장 셸에는 들어가지만 계정 프로필은 store_owner 본인 레코드라 403 이 되므로
-            store_owner 본인에게만 노출한다. 대신 모든 로그인 사용자가 볼 수 있는 가입 상태를 둔다.
+            내 프로필 = 개인 계정(users) 화면. 역할과 무관하게 모든 로그인 사용자에게 노출한다.
+            WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1 (production 잔여 결함):
+              기존에는 매장 셸 안의 /store-owner/account 만 있어 `isStoreOwner` 로 게이트했고,
+              그 결과 운영자·공급자에게는 Profile 진입점이 아예 없었다. 개인 계정 화면을
+              역할 셸 밖 canonical route `/account` 로 올려 데드링크 없이 전원에게 연다.
+              (`/store-owner/account` 는 매장 셸 사이드바용으로 유지 — 같은 화면을 렌더한다)
+            매장·사업자 정보는 이 진입점이 아니라 `내 약국`(역할·도메인 화면) 소관이다.
           */}
-          {isStoreOwner && (
-            <GlobalHeaderMenuItem to="/store-owner/account" icon={<UserCircle className="w-4 h-4" />}>
-              내 계정
-            </GlobalHeaderMenuItem>
-          )}
+          <GlobalHeaderMenuItem to="/account" icon={<UserCircle className="w-4 h-4" />}>
+            내 프로필
+          </GlobalHeaderMenuItem>
           <GlobalHeaderMenuItem to="/join/status" icon={<LogIn className="w-4 h-4" />}>
             가입 상태
           </GlobalHeaderMenuItem>

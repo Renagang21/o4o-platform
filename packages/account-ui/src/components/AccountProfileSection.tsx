@@ -87,6 +87,11 @@ export function AccountProfileSection({
   const [saved, setSaved] = useState(false);
 
   const editableKeys = fields.filter((f) => f.editable !== false).map((f) => f.key);
+  /**
+   * 편집 가능한 필드가 하나도 없으면 수정 버튼을 노출하지 않는다.
+   * (역할·계약상 수정 경로가 없는 조회 전용 화면 — 빈 편집 모드로 들어가지 않게 한다)
+   */
+  const canEdit = editableKeys.length > 0;
 
   const buildDraft = useCallback(() => {
     const next: Record<string, string> = {};
@@ -146,6 +151,7 @@ export function AccountProfileSection({
         statusColor={statusColor}
         isEditing={isEditing}
         saving={saving}
+        canEdit={canEdit}
         onEdit={handleEdit}
         onSave={() => void handleSave()}
         onCancel={handleCancel}
