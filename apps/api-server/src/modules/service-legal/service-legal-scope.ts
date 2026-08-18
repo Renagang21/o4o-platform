@@ -19,6 +19,11 @@ import {
   COSMETICS_SCOPE_CONFIG,
 } from '@o4o/security-core';
 import type { ServiceScopeGuardConfig } from '@o4o/security-core';
+// WO-O4O-PHARMACY-HUB-LEGAL-SERVICE-SCOPE-AND-FOOTER-404-FIX-V1:
+//   PHARMACY_HUB_SCOPE_CONFIG 는 security-core(F1 Freeze) 가 아니라 api-server 로컬에 있다
+//   (pharmacy-hub-scope.middleware.ts 주석 참조). 여기서도 그 정의를 그대로 재사용한다 —
+//   legal 용 config 를 새로 만들면 권한 표가 둘로 갈라진다.
+import { PHARMACY_HUB_SCOPE_CONFIG } from '../../middleware/pharmacy-hub-scope.middleware.js';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 
 /** 본 기능이 관리하는 canonical serviceKey (service-catalog 기준). */
@@ -27,6 +32,10 @@ export const SUPPORTED_LEGAL_SERVICE_KEYS = [
   'glycopharm',
   'kpa-society',
   'k-cosmetics',
+  // WO-O4O-PHARMACY-HUB-LEGAL-SERVICE-SCOPE-AND-FOOTER-404-FIX-V1:
+  //   pharmacy-hub 는 공개 푸터를 가진 정식 서비스인데 이 집합에 없어
+  //   GET /public/services/pharmacy-hub/footer-legal 이 UNKNOWN_SERVICE 404 였다.
+  'pharmacy-hub',
 ] as const;
 
 export type LegalServiceKey = (typeof SUPPORTED_LEGAL_SERVICE_KEYS)[number];
@@ -66,6 +75,9 @@ const CONFIG_BY_SERVICE_KEY: Record<LegalServiceKey, ServiceScopeGuardConfig> = 
   glycopharm: GLYCOPHARM_SCOPE_CONFIG,
   'kpa-society': KPA_SCOPE_CONFIG,
   'k-cosmetics': COSMETICS_SCOPE_CONFIG,
+  // rolePrefix 가 'pharmacy-hub' 로 self-map 인 유일한 서비스다 (kpa→kpa-society 같은 축 분리 없음).
+  // 따라서 admin write scope 는 `pharmacy-hub:admin` · read 는 `pharmacy-hub:operator` 가 된다.
+  'pharmacy-hub': PHARMACY_HUB_SCOPE_CONFIG,
 };
 
 const GUARD_BY_SERVICE_KEY: Record<
