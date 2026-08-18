@@ -6,10 +6,12 @@
  * 업무 계약 구분(§8) — 주문 내역은 하나가 아니다:
  *   (1) **buyer checkout ledger** = 매장이 공급자에게 낸 구매/발주 내역.
  *       buyerId 기준 `checkout_orders` (`/checkout/orders`). ← **본 View 의 범위**
- *       현행 소비처: KPA `StoreOrdersPage`, GlycoPharm `PharmacyOrders`.
- *   (2) 소비자 storefront 주문 = 매장이 **받은** 주문(K-Cosmetics `/cosmetics/orders`,
- *       channel local/travel · fulfillment). 방향이 반대이므로 합치지 않는다.
- *   (3) PharmacyHub 주문 = paymentGroup 결제 우선 계약(`supplierNotified` 기준 표시).
+ *       현행 소비처: KPA `StoreOrdersPage`, GlycoPharm `PharmacyOrders`,
+ *       K-Cosmetics `StoreOrdersPage`.
+ *       (K-Cosmetics `/cosmetics/orders` 는 list/get 모두 `co."buyerId" = 요청자` 스코프이므로
+ *        같은 buyer ledger 다 — WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1
+ *        에서 재확인 후 편입. channel(local/travel) 컬럼과 상세 패널은 KCos slot 으로 유지.)
+ *   (2) PharmacyHub 주문 = paymentGroup 결제 우선 계약(`supplierNotified` 기준 표시).
  *       결제 전 주문을 "접수됨"으로 표현하지 않는 고유 규칙이 있어 합치지 않는다.
  *
  * 공통화 대상은 두 buyer ledger 화면이 문자 그대로 복제하고 있던 뼈대다:

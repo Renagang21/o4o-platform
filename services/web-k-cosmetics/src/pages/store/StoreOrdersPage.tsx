@@ -1,24 +1,22 @@
 /**
- * StoreOrdersPage — K-Cosmetics 내 매장 주문 관리
+ * StoreOrdersPage — K-Cosmetics 내 매장 주문 내역 (buyer)
  *
  * WO-O4O-KCOSMETICS-STORE-ORDERS-FRONTEND-ALIGNMENT-V1
+ * WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1:
+ *   본 화면의 데이터 계약은 `/api/v1/cosmetics/orders` = **buyerId 스코프 checkout_orders**
+ *   (컨트롤러 list/get 모두 `co."buyerId" = 요청자`). 즉 KPA `StoreOrdersPage` ·
+ *   GlycoPharm `PharmacyOrders` 와 **같은 buyer 구매/발주 내역**이다.
+ *   그럼에도 헤더 / 상태 탭 / loading·error·empty / 페이지네이션 뼈대를 inline style 로
+ *   따로 구현하고 있어(사본), 두 서비스가 공유하는 `BuyerOrderLedgerView` 로 이관한다.
+ *   K-Cosmetics 고유는 config·slot 으로만 남긴다 — 채널(local/travel) 컬럼 · 행 클릭 상세 패널.
+ *   API·응답 shape·상태 라벨 매핑 무변경.
  *
- * Backend: /api/v1/cosmetics/orders
- * K-Cosmetics 사용자-facing 문구는 "내 매장", "매장 주문" 기준
- * ⚠️ "내 약국" 또는 약국 전용 문구 사용 금지
+ * ⚠️ "내 약국" 또는 약국 전용 문구 사용 금지 (K-Cosmetics 는 "내 매장")
  * ⚠️ 정산/인보이스 기능 포함 금지 (별도 IR로 설계 예정)
  */
 
-import { useState, useEffect, useCallback, type CSSProperties } from 'react';
-import {
-  ShoppingCart,
-  RefreshCw,
-  ChevronLeft,
-  ChevronRight,
-  AlertTriangle,
-  Loader2,
-  X,
-} from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo, type CSSProperties } from 'react';
+import { AlertTriangle, Loader2, X } from 'lucide-react';
 import {
   getStoreOrders,
   getStoreOrder,
@@ -26,16 +24,18 @@ import {
   type StoreOrderDetail,
 } from '@/api/storeOrders';
 // 3서비스 공통 buyer checkout 상태 표시 매핑 (WO-O4O-STORE-CHECKOUT-STATUS-LABEL-ALIGNMENT-V1)
+// + buyer 주문 내역 공통 뼈대 (WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1 §8)
 import {
   BUYER_CHECKOUT_STATUS_TABS,
   getBuyerCheckoutStatusDisplay,
   getBuyerPaymentStatusLabel,
   BuyerOrderStatusBadge,
+  BuyerOrderLedgerView,
 } from '@o4o/store-ui-core';
 
 const PAGE_SIZE = 20;
-
-const STATUS_TABS = BUYER_CHECKOUT_STATUS_TABS;
+/** buyer endpoint 의 상태 필터는 화면에서 처리한다 → 한 번에 받아 client-side 필터/집계 (KPA 동일). */
+const FETCH_LIMIT = 100;
 
 const CHANNEL_LABEL: Record<string, string> = {
   local:  '매장',
@@ -53,11 +53,26 @@ function formatDate(iso: string): string {
   });
 }
 
+/** KPI 집계 판정 — 기존 상태 라벨 매핑과 동일 해석을 유지한다. */
+function isPaid(o: StoreOrder): boolean {
+  const st = (o.status || '').toLowerCase();
+  const pay = (o.paymentStatus || '').toLowerCase();
+  return pay === 'paid' || st === 'paid';
+}
+
+function isCancelled(o: StoreOrder): boolean {
+  const st = (o.status || '').toLowerCase();
+  return st === 'cancelled' || st === 'refunded';
+}
+
+/** checkout status 원값으로 탭 매칭 (파생 상태 collapse 없음 — 기존 서버 필터와 동일 기준). */
+function matchStatus(o: StoreOrder, tabKey: string): boolean {
+  return tabKey === 'all' ? true : (o.status || '').toLowerCase() === tabKey;
+}
+
 export default function StoreOrdersPage() {
   const [orders, setOrders] = useState<StoreOrder[]>([]);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,17 +81,13 @@ export default function StoreOrdersPage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
 
-  const loadOrders = useCallback(async (p: number, status: string) => {
+  const loadOrders = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await getStoreOrders({
-        page: p,
-        limit: PAGE_SIZE,
-        status: status !== 'all' ? status : undefined,
-      });
+      const res = await getStoreOrders({ page: 1, limit: FETCH_LIMIT });
       setOrders(res.data || []);
-      setTotal(res.pagination?.total ?? 0);
+      setTotal(res.pagination?.total ?? (res.data || []).length);
     } catch (e: any) {
       setError(e?.message || '주문 목록을 불러오지 못했습니다');
     } finally {
@@ -85,15 +96,10 @@ export default function StoreOrdersPage() {
   }, []);
 
   useEffect(() => {
-    loadOrders(page, statusFilter);
-  }, [page, statusFilter, loadOrders]);
+    loadOrders();
+  }, [loadOrders]);
 
-  const handleStatusChange = (key: string) => {
-    setStatusFilter(key);
-    setPage(1);
-  };
-
-  const handleRowClick = async (order: StoreOrder) => {
+  const handleRowClick = useCallback(async (order: StoreOrder) => {
     setSelectedId(order.id);
     setDetail(null);
     setDetailError(null);
@@ -106,177 +112,94 @@ export default function StoreOrdersPage() {
     } finally {
       setDetailLoading(false);
     }
-  };
+  }, []);
 
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const renderList = useMemo(
+    () => (rows: StoreOrder[]) => (
+      <div style={s.tableWrap}>
+        <table style={s.table}>
+          <thead>
+            <tr>
+              <th style={s.th}>주문번호</th>
+              <th style={s.th}>주문일시</th>
+              <th style={s.th}>채널</th>
+              <th style={s.th}>상품 수</th>
+              <th style={{ ...s.th, textAlign: 'right' }}>주문 금액</th>
+              <th style={{ ...s.th, textAlign: 'center' }}>주문 상태</th>
+              <th style={{ ...s.th, textAlign: 'center' }}>결제 상태</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((order) => (
+              <tr
+                key={order.id}
+                onClick={() => handleRowClick(order)}
+                style={{ ...s.tr, ...(order.id === selectedId ? s.trActive : {}) }}
+              >
+                <td style={s.td}>
+                  <span style={{ fontWeight: 500, fontSize: 13, color: '#1F2937' }}>
+                    {order.orderNumber}
+                  </span>
+                </td>
+                <td style={s.td}>
+                  <span style={{ fontSize: 12, color: '#6B7280' }}>{formatDate(order.createdAt)}</span>
+                </td>
+                <td style={s.td}>
+                  <span style={{ fontSize: 12, color: '#374151' }}>
+                    {CHANNEL_LABEL[order.channel] ?? order.channel}
+                  </span>
+                </td>
+                <td style={s.td}>
+                  <span style={{ fontSize: 13, color: '#374151' }}>{order.itemCount}개</span>
+                </td>
+                <td style={{ ...s.td, textAlign: 'right' }}>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: '#1F2937' }}>
+                    {formatAmount(order.totalAmount)}
+                  </span>
+                </td>
+                <td style={{ ...s.td, textAlign: 'center' }}>
+                  <BuyerOrderStatusBadge status={order.status} />
+                </td>
+                <td style={{ ...s.td, textAlign: 'center' }}>
+                  <span style={{ fontSize: 12, color: '#6B7280' }}>
+                    {getBuyerPaymentStatusLabel(order.paymentStatus)}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ),
+    [handleRowClick, selectedId],
+  );
 
   return (
     <div style={s.container}>
-      {/* Header */}
-      <div style={s.header}>
-        <div>
-          <div style={s.breadcrumb}>
-            <span>내 매장</span>
-            <span style={{ color: '#9CA3AF' }}>/</span>
-            <span style={{ color: '#374151' }}>주문 관리</span>
-          </div>
-          <h1 style={s.title}>
-            <ShoppingCart size={20} style={{ color: '#0EA5E9' }} />
-            매장 주문 관리
-          </h1>
-          <p style={s.subtitle}>
-            매장에 접수된 주문 내역을 확인하고 관리합니다.
-          </p>
-        </div>
-        <button
-          onClick={() => loadOrders(page, statusFilter)}
-          style={s.refreshBtn}
-          disabled={loading}
-        >
-          <RefreshCw size={14} />
-          새로고침
-        </button>
-      </div>
+      <BuyerOrderLedgerView<StoreOrder>
+        orders={orders}
+        loading={loading}
+        error={error}
+        onRetry={loadOrders}
+        totalCount={total}
+        accent="pink"
+        title="주문 내역"
+        description="내 매장이 공급자에게 주문한 상품의 주문·결제 진행 상태를 확인합니다"
+        statusTabs={BUYER_CHECKOUT_STATUS_TABS}
+        matchStatus={matchStatus}
+        isPaid={isPaid}
+        isCancelled={isCancelled}
+        searchPlaceholder="주문번호 검색"
+        pageSize={PAGE_SIZE}
+        renderList={renderList}
+        empty={{
+          title: '주문 내역이 없습니다',
+          description: '매장 허브에서 상품이나 이벤트 오퍼를 주문하면 이곳에서 확인할 수 있습니다.',
+          filteredDescription: '검색 조건에 맞는 주문이 없습니다.',
+        }}
+      />
 
-      {/* Status Tabs */}
-      <div style={s.tabBar}>
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => handleStatusChange(tab.key)}
-            style={{
-              ...s.tab,
-              ...(statusFilter === tab.key ? s.tabActive : {}),
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Error */}
-      {error && (
-        <div style={s.errorBox}>
-          <AlertTriangle size={16} style={{ color: '#DC2626', flexShrink: 0 }} />
-          <span style={{ fontSize: 13, color: '#991B1B', flex: 1 }}>{error}</span>
-          <button
-            type="button"
-            onClick={() => loadOrders(page, statusFilter)}
-            style={s.retryBtn}
-          >
-            재시도
-          </button>
-        </div>
-      )}
-
-      {/* Table */}
-      <div style={s.tableWrap}>
-        {loading ? (
-          <div style={s.center}>
-            <Loader2 size={28} style={{ color: '#0EA5E9', animation: 'spin 1s linear infinite' }} />
-            <span style={{ marginLeft: 10, fontSize: 13, color: '#9CA3AF' }}>불러오는 중...</span>
-          </div>
-        ) : orders.length === 0 ? (
-          <div style={s.empty}>
-            <ShoppingCart size={40} style={{ color: '#E5E7EB', marginBottom: 12 }} />
-            <p style={{ fontSize: 14, color: '#6B7280', margin: 0 }}>
-              {statusFilter !== 'all' ? '해당 상태의 주문이 없습니다.' : '매장 주문이 없습니다.'}
-            </p>
-          </div>
-        ) : (
-          <table style={s.table}>
-            <thead>
-              <tr>
-                <th style={s.th}>주문번호</th>
-                <th style={s.th}>주문일시</th>
-                <th style={s.th}>채널</th>
-                <th style={s.th}>상품 수</th>
-                <th style={{ ...s.th, textAlign: 'right' }}>주문 금액</th>
-                <th style={{ ...s.th, textAlign: 'center' }}>주문 상태</th>
-                <th style={{ ...s.th, textAlign: 'center' }}>결제 상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => {
-                const isSelected = order.id === selectedId;
-                return (
-                  <tr
-                    key={order.id}
-                    onClick={() => handleRowClick(order)}
-                    style={{
-                      ...s.tr,
-                      ...(isSelected ? s.trActive : {}),
-                    }}
-                  >
-                    <td style={s.td}>
-                      <span style={{ fontWeight: 500, fontSize: 13, color: '#1F2937' }}>
-                        {order.orderNumber}
-                      </span>
-                    </td>
-                    <td style={s.td}>
-                      <span style={{ fontSize: 12, color: '#6B7280' }}>
-                        {formatDate(order.createdAt)}
-                      </span>
-                    </td>
-                    <td style={s.td}>
-                      <span style={{ fontSize: 12, color: '#374151' }}>
-                        {CHANNEL_LABEL[order.channel] ?? order.channel}
-                      </span>
-                    </td>
-                    <td style={s.td}>
-                      <span style={{ fontSize: 13, color: '#374151' }}>
-                        {order.itemCount}개
-                      </span>
-                    </td>
-                    <td style={{ ...s.td, textAlign: 'right' }}>
-                      <span style={{ fontSize: 13, fontWeight: 500, color: '#1F2937' }}>
-                        {formatAmount(order.totalAmount)}
-                      </span>
-                    </td>
-                    <td style={{ ...s.td, textAlign: 'center' }}>
-                      <BuyerOrderStatusBadge status={order.status} />
-                    </td>
-                    <td style={{ ...s.td, textAlign: 'center' }}>
-                      <span style={{ fontSize: 12, color: '#6B7280' }}>
-                        {getBuyerPaymentStatusLabel(order.paymentStatus)}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* Pagination */}
-      {!loading && totalPages > 1 && (
-        <div style={s.pagination}>
-          <button
-            type="button"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-            style={{ ...s.pageBtn, opacity: page === 1 ? 0.4 : 1 }}
-          >
-            <ChevronLeft size={14} />
-          </button>
-          <span style={{ fontSize: 13, color: '#374151' }}>
-            {page} / {totalPages}
-          </span>
-          <button
-            type="button"
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
-            style={{ ...s.pageBtn, opacity: page === totalPages ? 0.4 : 1 }}
-          >
-            <ChevronRight size={14} />
-          </button>
-          <span style={{ fontSize: 12, color: '#9CA3AF' }}>총 {total}건</span>
-        </div>
-      )}
-
-      {/* Detail Panel */}
+      {/* Detail Panel — K-Cosmetics 고유(행 클릭 상세) */}
       {selectedId && (
         <div style={s.detailPanel}>
           <div style={s.detailHeader}>
@@ -292,7 +215,7 @@ export default function StoreOrdersPage() {
 
           {detailLoading ? (
             <div style={s.center}>
-              <Loader2 size={20} style={{ color: '#0EA5E9' }} />
+              <Loader2 size={20} style={{ color: '#DB2777' }} />
               <span style={{ marginLeft: 8, fontSize: 13, color: '#9CA3AF' }}>불러오는 중...</span>
             </div>
           ) : detailError ? (
@@ -389,26 +312,14 @@ export default function StoreOrdersPage() {
 
 const s: Record<string, CSSProperties> = {
   container:    { padding: '24px', maxWidth: '1100px', margin: '0 auto' },
-  header:       { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 20 },
-  breadcrumb:   { display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#9CA3AF', marginBottom: 6 },
-  title:        { display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 20, fontWeight: 600, color: '#1F2937', margin: 0 },
-  subtitle:     { fontSize: 13, color: '#6B7280', margin: '6px 0 0', lineHeight: 1.5 },
-  refreshBtn:   { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: '#fff', border: '1px solid #D1D5DB', borderRadius: 6, fontSize: 13, color: '#374151', cursor: 'pointer' },
-  tabBar:       { display: 'flex', gap: 4, marginBottom: 16, borderBottom: '1px solid #E5E7EB', paddingBottom: 0 },
-  tab:          { padding: '8px 16px', background: 'transparent', border: 'none', borderBottom: '2px solid transparent', fontSize: 13, color: '#6B7280', cursor: 'pointer', fontWeight: 400, marginBottom: -1 },
-  tabActive:    { color: '#0EA5E9', borderBottomColor: '#0EA5E9', fontWeight: 600 },
   errorBox:     { display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 8, marginBottom: 16 },
-  retryBtn:     { padding: '4px 10px', fontSize: 12, color: '#DC2626', background: '#fff', border: '1px solid #FECACA', borderRadius: 4, cursor: 'pointer', flexShrink: 0 },
-  tableWrap:    { background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'hidden' },
+  tableWrap:    { background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, overflow: 'auto' },
   center:       { display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 24px' },
-  empty:        { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', padding: '60px 24px' },
   table:        { width: '100%', borderCollapse: 'collapse' as const },
   th:           { padding: '10px 14px', fontSize: 12, fontWeight: 600, color: '#6B7280', background: '#F9FAFB', borderBottom: '1px solid #E5E7EB', textAlign: 'left' as const, whiteSpace: 'nowrap' as const },
   tr:           { cursor: 'pointer', transition: 'background 0.1s' },
-  trActive:     { background: '#F0F9FF' },
+  trActive:     { background: '#FDF2F8' },
   td:           { padding: '12px 14px', fontSize: 13, color: '#374151', borderBottom: '1px solid #F3F4F6', verticalAlign: 'middle' as const },
-  pagination:   { display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginTop: 16 },
-  pageBtn:      { display: 'inline-flex', alignItems: 'center', padding: '6px 10px', background: '#fff', border: '1px solid #D1D5DB', borderRadius: 6, cursor: 'pointer' },
   detailPanel:  { marginTop: 20, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, padding: '20px 24px' },
   detailHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #E5E7EB' },
   detailTitle:  { fontSize: 15, fontWeight: 600, color: '#1F2937', margin: 0 },
