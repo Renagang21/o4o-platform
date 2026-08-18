@@ -236,8 +236,11 @@ export function generateRefreshToken(user: User, tokenFamily?: string): string {
  * @param domain - Domain for the token (default: neture.co.kr)
  * @returns AuthTokens object with both tokens
  */
-export function generateTokens(user: User, roles: string[], domain: string = 'neture.co.kr', memberships?: { serviceKey: string; status: string; role?: string }[]): AuthTokens {
-  const tokenFamily = uuidv4();
+export function generateTokens(user: User, roles: string[], domain: string = 'neture.co.kr', memberships?: { serviceKey: string; status: string; role?: string }[], reuseTokenFamily?: string | null): AuthTokens {
+  // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
+  //   reuseTokenFamily 를 넘기면 기존 세션 family 를 그대로 승계한다 (교차 서비스 handoff 용).
+  //   넘기지 않으면 새 family 를 발급한다 (신규 로그인).
+  const tokenFamily = reuseTokenFamily || uuidv4();
 
   const accessToken = generateAccessToken(user, roles, domain, memberships);
   const refreshToken = generateRefreshToken(user, tokenFamily);

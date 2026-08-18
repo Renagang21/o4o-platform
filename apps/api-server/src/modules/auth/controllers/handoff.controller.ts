@@ -25,6 +25,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../entities/User.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
+import { persistRefreshTokenFamily } from '../../../services/auth/auth-context.helper.js';
 import { setAuthCookies } from '../../../utils/cookie.utils.js';
 import { getService, O4O_SERVICES } from '../../../config/service-catalog.js';
 import logger from '../../../utils/logger.js';
@@ -159,7 +160,7 @@ export class HandoffController extends BaseController {
     }
 
     try {
-      // 1. Exchange token from Redis (single-use)
+      // 1. Exchange handoff token (single-use, PostgreSQL)
       const payload = await handoffTokenService.exchangeToken(token);
       if (!payload) {
         return BaseController.error(
@@ -241,7 +242,18 @@ export class HandoffController extends BaseController {
       }
 
       // 5. Generate auth tokens
-      const tokens = tokenUtils.generateTokens(user, roles, 'neture.co.kr', memberships);
+      // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
+      //   handoff 는 새 로그인이 아니라 기존 세션의 교차 서비스 승계다.
+      //   새 family 를 발급하면 원 서비스 세션이 family mismatch 로 죽는다 → 기존 family 를 승계한다.
+      //   (기존 family 가 없으면 새로 발급하고 아래에서 기록한다.)
+      const tokens = tokenUtils.generateTokens(
+        user,
+        roles,
+        'neture.co.kr',
+        memberships,
+        user.refreshTokenFamily ?? null,
+      );
+      await persistRefreshTokenFamily(user.id, tokens.refreshToken);
 
       // 6. Set cookies (domain auto-detected from Origin header via getCookieDomainFromOrigin)
       setAuthCookies(req, res, tokens);

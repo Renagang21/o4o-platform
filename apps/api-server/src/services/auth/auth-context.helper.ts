@@ -47,6 +47,29 @@ export async function generateTokensWithContext(
 }
 
 /**
+ * WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1
+ *
+ * refresh token family 계약:
+ *   토큰을 발급하는 **모든 경로**는 발급한 refresh token 의 family 를
+ *   users.refreshTokenFamily 에 반드시 기록한다.
+ *   기록하지 않으면 (1) 다음 refresh 가 family mismatch 로 도난 처리되거나
+ *   (2) family 가 null 인 채로 남아 logout / logout-all 무효화가 무력해진다.
+ *
+ * users 는 namingStrategy 미적용이라 컬럼명이 quoted camelCase 다.
+ */
+export async function persistRefreshTokenFamily(
+  userId: string,
+  refreshToken: string,
+): Promise<void> {
+  const tokenFamily = tokenUtils.getTokenFamily(refreshToken);
+  if (!tokenFamily) return;
+  await AppDataSource.query(
+    `UPDATE users SET "refreshTokenFamily" = $1 WHERE id = $2`,
+    [tokenFamily, userId],
+  );
+}
+
+/**
  * Inject freshened roles into user public data.
  * Compensates for users.roles column removal (Phase3-E).
  */

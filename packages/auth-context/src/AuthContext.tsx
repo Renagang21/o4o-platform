@@ -82,6 +82,8 @@ interface AuthContextType {
   authClient?: any; // AuthClient instance for API calls
   login: (credentials: { email: string; password: string; serviceKey?: string }) => Promise<void>;
   logout: () => void;
+  /** WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1: 전 기기 로그아웃 (refresh token family 폐기) */
+  logoutAll: () => Promise<void>;
   clearError: () => void;
   getSessionStatus: () => SessionStatus | null;
 }

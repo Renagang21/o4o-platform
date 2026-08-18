@@ -35,6 +35,7 @@ export class AuthTokenSessionService {
    * - REFRESH_TOKEN_EXPIRED: Token has expired (do NOT retry)
    * - REFRESH_TOKEN_INVALID: Token is malformed or signature invalid (do NOT retry)
    * - TOKEN_FAMILY_MISMATCH: Token rotation detected, possible theft (do NOT retry)
+   * - TOKEN_FAMILY_REVOKED: logout / logout-all 로 폐기된 세션 (do NOT retry)
    * - USER_NOT_FOUND: User does not exist or is inactive (do NOT retry)
    */
   async refreshTokens(refreshToken: string): Promise<AuthTokens> {
@@ -84,12 +85,29 @@ export class AuthTokenSessionService {
       throw error;
     }
 
+    // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
+    //   family 가 없는 refresh token 은 계약 위반이다. 재발급을 허용하지 않는다.
+    if (!payload.tokenFamily) {
+      const error = new Error('Refresh token has no token family') as Error & { code: string };
+      error.code = 'REFRESH_TOKEN_INVALID';
+      throw error;
+    }
+
+    // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
+    //   users.refreshTokenFamily 가 비어 있다 = logout / logout-all / 도난 대응으로
+    //   해당 사용자의 모든 refresh token 이 폐기된 상태다.
+    //   이전에는 이 조건이 family 검사 전체를 우회시켜 logout-all 이 무력했다.
+    if (!user.refreshTokenFamily) {
+      logger.warn('[refreshTokens] refresh rejected — token family revoked', { userId: user.id });
+      const error = new Error('세션이 종료되었습니다. 다시 로그인해 주세요.') as Error & {
+        code: string;
+      };
+      error.code = 'TOKEN_FAMILY_REVOKED';
+      throw error;
+    }
+
     // Phase 2.5: Token family check for rotation security
-    if (
-      user.refreshTokenFamily &&
-      payload.tokenFamily &&
-      user.refreshTokenFamily !== payload.tokenFamily
-    ) {
+    if (user.refreshTokenFamily !== payload.tokenFamily) {
       logger.warn('Token family mismatch - possible token theft detected', {
         userId: user.id,
         expectedFamily: user.refreshTokenFamily,
@@ -144,9 +162,13 @@ export class AuthTokenSessionService {
 
   /**
    * Logout from all devices
+   *
+   * WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
+   *   users.refreshTokenFamily 를 비우면 refreshTokens() 가 TOKEN_FAMILY_REVOKED 로
+   *   거부하므로, 이미 발급된 모든 기기의 refresh token 이 즉시 무효가 된다.
+   *   (현재 데이터 모델에 기기별 세션 레코드가 없어 무효화 단위는 사용자 전체다.)
    */
   async logoutAll(userId: string): Promise<void> {
-    // refreshTokenFamily 를 null 로 만드는 것이 전 기기 무효화의 실효 수단이다.
     await this.logout(userId);
   }
 

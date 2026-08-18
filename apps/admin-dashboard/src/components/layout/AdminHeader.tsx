@@ -17,7 +17,7 @@ interface AdminHeaderProps {
 }
 
 const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
-  const { user, logout, getSessionStatus } = useAuth();
+  const { user, logout, logoutAll, getSessionStatus } = useAuth();
   const [sessionStatus, setSessionStatus] = useState(getSessionStatus());
 
   // 세션 상태 업데이트
@@ -36,6 +36,19 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
     } catch (error: any) {
     // Error logging - use proper error handler
       toast.error('로그아웃 처리 중 오류가 발생했습니다.');
+    }
+  };
+
+  /**
+   * WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1
+   * "모든 기기에서 로그아웃" 은 logout() 이 아니라 logoutAll() 을 호출해야 한다.
+   */
+  const handleLogoutAll = async () => {
+    try {
+      await logoutAll();
+      toast.success('모든 기기에서 로그아웃되었습니다.');
+    } catch (error: any) {
+      toast.error('전체 로그아웃 처리 중 오류가 발생했습니다.');
     }
   };
 
@@ -189,10 +202,7 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
               </DropdownMenuLabel>
               
               <DropdownMenuItem 
-                onClick={() => {
-                  toast.success('모든 기기에서 로그아웃됩니다.');
-                  logout();
-                }}
+                onClick={handleLogoutAll}
                 className="text-orange-600 focus:text-orange-600 focus:bg-orange-50"
               >
                 <Shield className="mr-2 h-3 w-3" />

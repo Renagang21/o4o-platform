@@ -28,6 +28,7 @@ import { AccountLinkingService } from '../account-linking.service.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import {
   generateTokensWithContext,
+  persistRefreshTokenFamily,
   injectRolesIntoPublicData,
 } from './auth-context.helper.js';
 import { ActionLogService } from '@o4o/action-log-core';
@@ -338,6 +339,9 @@ export class AuthLoginService {
       // Generate tokens
       const { tokens, roles } = await generateTokensWithContext(user);
 
+      // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1: 발급한 family 를 반드시 기록한다
+      await persistRefreshTokenFamily(user.id, tokens.refreshToken);
+
       // Log successful login
       await this.logLoginAttempt(
         user.id,
@@ -394,6 +398,9 @@ export class AuthLoginService {
 
       // Generate tokens
       const { tokens, roles } = await generateTokensWithContext(existingUserByEmail);
+
+      // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1: 발급한 family 를 반드시 기록한다
+      await persistRefreshTokenFamily(existingUserByEmail.id, tokens.refreshToken);
 
       // Log successful login
       await this.logLoginAttempt(
@@ -468,6 +475,9 @@ export class AuthLoginService {
 
     // Generate tokens
     const { tokens, roles } = await generateTokensWithContext(newUser);
+
+    // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1: 발급한 family 를 반드시 기록한다
+    await persistRefreshTokenFamily(newUser.id, tokens.refreshToken);
 
     // Log new user creation and login
     await this.logLoginAttempt(

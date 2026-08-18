@@ -4,6 +4,7 @@ import { emailService } from './email.service.js';
 import { Request, Response } from 'express';
 import logger from '../utils/logger.js';
 import * as tokenUtils from '../utils/token.utils.js';
+import { persistRefreshTokenFamily } from './auth/auth-context.helper.js';
 import * as cookieUtils from '../utils/cookie.utils.js';
 import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
@@ -122,6 +123,9 @@ export class SocialAuthService {
       [user.id]
     ).catch(() => []);
     const tokens = tokenUtils.generateTokens(user, roles, 'neture.co.kr', memberships);
+
+    // WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1: 발급한 refresh token family 를 반드시 기록한다
+    await persistRefreshTokenFamily(user.id, tokens.refreshToken);
 
     // Set cookies using cookieUtils (SSOT for cookie management)
     // Uses request origin for multi-domain cookie support

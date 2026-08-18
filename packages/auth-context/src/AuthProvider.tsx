@@ -268,6 +268,21 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     localStorage.removeItem('admin-auth-storage');
   };
 
+  /**
+   * WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1
+   * 전 기기 로그아웃 — 서버에서 refresh token family 를 폐기한 뒤 로컬 세션을 정리한다.
+   * 서버 호출이 실패하면 로컬만 지워 "전 기기 로그아웃됨"으로 오인시키지 않고 그대로 throw 한다.
+   */
+  const logoutAll = async () => {
+    await authClient.logoutAll();
+    setUser(null);
+    setError(null);
+    if (strategy === 'localStorage') {
+      clearAllTokens();
+    }
+    localStorage.removeItem('admin-auth-storage');
+  };
+
   const clearError = () => {
     setError(null);
   };
@@ -321,6 +336,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     authClient, // Expose authClient for API calls
     login,
     logout,
+    logoutAll,
     clearError,
     getSessionStatus
   };

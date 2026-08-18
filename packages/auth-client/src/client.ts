@@ -305,6 +305,23 @@ export class AuthClient {
   }
 
   /**
+   * Logout from all devices
+   *
+   * WO-O4O-LOGOUT-ALL-TOKEN-INVALIDATION-V1:
+   *   서버가 users.refreshTokenFamily 를 폐기하여 이미 발급된 모든 refresh token 을 무효화한다.
+   *   실패는 호출부로 전파한다 (일반 logout 과 달리 조용히 삼키면 안 된다).
+   */
+  async logoutAll(): Promise<void> {
+    try {
+      await this.api.post('/auth/logout-all', {});
+    } finally {
+      if (this.strategy === 'localStorage') {
+        clearAllTokens();
+      }
+    }
+  }
+
+  /**
    * Check session status
    *
    * Phase 6-7: Works with both strategies
