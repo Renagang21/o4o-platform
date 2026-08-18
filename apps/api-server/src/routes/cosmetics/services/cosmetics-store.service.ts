@@ -300,6 +300,51 @@ export class CosmeticsStoreService {
   }
 
   /**
+   * WO-O4O-KCOS-GP-MISSING-STORE-SLUG-CANONICALIZATION-V1
+   *
+   * 신규 매장 생성(`createStoreWithOrg`)은 slug 를 예약하지만, **기존 store 연결 경로**
+   * (`linkOwnerToStore`)는 organization member + enrollment 만 보강하고 slug 를 예약하지
+   * 않았다. 그래서 legacy backfill 로 만들어진 slug 없는 매장은 owner 가 연결돼도
+   * 공개 매장 slug 가 계속 없는 상태로 남는다.
+   *
+   * 다른 서비스의 canonical provisioning 과 동일한 계약으로 보강한다
+   * (`kpa-store-organization.provisioning.ts` §6 · `PharmacyHubStoreProvisioningService`):
+   *   - storeId 축 = organizations.id
+   *   - 이미 slug 가 있으면 no-op (멱등)
+   *   - 실패는 비차단
+   */
+  private async ensureCosmeticsStoreSlug(
+    organizationId: string,
+    storeSlug: string | null,
+    storeName: string | null,
+  ): Promise<void> {
+    try {
+      const slugService = new StoreSlugService(this.dataSource);
+      const existing = await slugService.findByStoreId(organizationId, 'cosmetics');
+      if (existing) return;
+
+      // store 테이블이 이미 가진 slug 가 있으면 그 값을 그대로 registry 에 맞춘다
+      // (두 축이 갈라지지 않게). 사용 불가하면 이름 기반 채번으로 되돌린다.
+      let slug: string | null = null;
+      if (storeSlug) {
+        const availability = await slugService.checkAvailability(storeSlug);
+        if (availability.available) slug = storeSlug;
+      }
+      if (!slug) {
+        if (!storeName) return;
+        slug = await slugService.generateUniqueSlug(storeName);
+      }
+
+      await slugService.reserveSlug({ storeId: organizationId, serviceKey: 'cosmetics', slug });
+    } catch (slugError) {
+      console.error(
+        `[CosmeticsStore] store slug reservation failed for organization ${organizationId}:`,
+        slugError,
+      );
+    }
+  }
+
+  /**
    * 동일 사업자번호 store 가 이미 존재할 때, 사용자를 해당 store 의 owner 로 연결한다 (멱등).
    * (org member + enrollment + cosmetics:store_owner 역할까지 보강.)
    */
@@ -318,7 +363,7 @@ export class CosmeticsStoreService {
     }
 
     const rows = await this.dataSource.query(
-      `SELECT organization_id FROM cosmetics.cosmetics_stores WHERE id = $1 LIMIT 1`,
+      `SELECT organization_id, name, slug FROM cosmetics.cosmetics_stores WHERE id = $1 LIMIT 1`,
       [storeId],
     );
     const orgId = rows[0]?.organization_id;
@@ -333,6 +378,7 @@ export class CosmeticsStoreService {
         organizationId: orgId,
         serviceCode: 'k-cosmetics',
       });
+      await this.ensureCosmeticsStoreSlug(orgId, rows[0]?.slug ?? null, rows[0]?.name ?? null);
     }
 
     await this.ensureStoreOwnerRole(userId, assignedBy);

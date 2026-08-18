@@ -23,6 +23,8 @@ import { RoleAssignmentService } from '../../../modules/auth/services/role-assig
 import { notificationService } from '../../../services/NotificationService.js';
 // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-APPROVAL-FLOW-ENROLLMENT-CREATION-FIX-V1
 import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
+// WO-O4O-KCOS-GP-MISSING-STORE-SLUG-CANONICALIZATION-V1: 승인 경로 slug 예약 누락 보강
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
 export interface ApplyMemberDto {
   subRole: 'pharmacy_owner' | 'staff_pharmacist';
@@ -145,6 +147,7 @@ export class GlycopharmMemberService {
             serviceCode: 'glycopharm',
           });
           await organizationOpsService.setOwner(member.organizationId, member.userId);
+          await this.ensureGlycopharmStoreSlug(member.organizationId);
         } else {
           // 신규 조직: ensureOrganization + setOwner + enrollService 한꺼번에 (canonical helper)
           const meta = (member.metadata ?? {}) as Record<string, unknown>;
@@ -152,7 +155,7 @@ export class GlycopharmMemberService {
           if (pharmacyName) {
             // code 패턴: 사용자 UUID 의 첫 12 hex (deterministic → 재실행 시 ensureOrganization 의 ON CONFLICT (code) 동일 row 반환)
             const orgCode = `gp-pharm-${member.userId.replace(/-/g, '').substring(0, 12)}`;
-            await organizationOpsService.ensureOrganizationWithOwnerAndService(
+            const orgResult = await organizationOpsService.ensureOrganizationWithOwnerAndService(
               {
                 name: pharmacyName,
                 code: orgCode,
@@ -166,6 +169,7 @@ export class GlycopharmMemberService {
               member.userId,
               'glycopharm',
             );
+            await this.ensureGlycopharmStoreSlug(orgResult.id, pharmacyName);
           } else {
             console.warn(
               `[GlycopharmMember] pharmacy_owner approval ${member.id} has neither organizationId nor metadata.pharmacyName — ` +
@@ -209,6 +213,46 @@ export class GlycopharmMemberService {
     }
 
     return member;
+  }
+
+  /**
+   * WO-O4O-KCOS-GP-MISSING-STORE-SLUG-CANONICALIZATION-V1
+   *
+   * 약국경영자 승인 경로는 organization + owner + enrollment 까지만 만들고
+   * `platform_store_slugs` 예약을 하지 않아, 승인된 정상 조직인데 공개 매장 slug 가
+   * 없는 상태가 만들어졌다 (프로덕션 GlycoPharm 조직 2곳이 이 형태).
+   *
+   * 다른 서비스의 canonical provisioning 과 동일한 계약으로 보강한다
+   * (`kpa-store-organization.provisioning.ts` §6 · `PharmacyHubStoreProvisioningService`):
+   *   - storeId 축 = organizations.id
+   *   - 이미 slug 가 있으면 no-op (멱등)
+   *   - 실패는 비차단 — 조직·소유·enrollment 는 이미 확정됐으므로 승인 자체를 깨지 않는다
+   */
+  private async ensureGlycopharmStoreSlug(organizationId: string, fallbackName?: string): Promise<void> {
+    try {
+      const slugService = new StoreSlugService(this.dataSource);
+      const existing = await slugService.findByStoreId(organizationId, 'glycopharm');
+      if (existing) return;
+
+      let baseName = fallbackName ?? null;
+      if (!baseName) {
+        const rows = await this.dataSource.query(
+          `SELECT name FROM organizations WHERE id = $1 LIMIT 1`,
+          [organizationId],
+        );
+        baseName = rows[0]?.name ?? null;
+      }
+      if (!baseName) return;
+
+      const slug = await slugService.generateUniqueSlug(baseName);
+      await slugService.reserveSlug({ storeId: organizationId, serviceKey: 'glycopharm', slug });
+    } catch (slugError) {
+      // slug 는 공개 매장/QR 진입에만 필요하다 — 승인 흐름은 비차단.
+      console.error(
+        `[GlycopharmMember] store slug reservation failed for organization ${organizationId}:`,
+        slugError,
+      );
+    }
   }
 
   /**
