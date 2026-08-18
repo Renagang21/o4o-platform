@@ -18,6 +18,17 @@
 
 import type { DataSource } from 'typeorm';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
+import { STORE_SERVICE_ORG_LINKAGE } from '../../../utils/store-organization.resolver.js';
+
+/**
+ * WO-O4O-KCOS-ENROLLMENT-SERVICE-KEY-CANONICALIZATION-V1
+ *
+ * K-Cos enrollment 조회 키. canonical 은 'k-cosmetics'(platform-level) 이고
+ * 'cosmetics'(role/product-level)는 centralization 이전에 적재된 legacy 별칭이다.
+ * 새 맵을 만들지 않고 공통 SSOT(STORE_SERVICE_ORG_LINKAGE) 의 enrollmentCodes 를
+ * 그대로 쓴다 — canonical 우선, legacy 는 호환용.
+ */
+const K_COSMETICS_ENROLLMENT_CODES = STORE_SERVICE_ORG_LINKAGE.cosmetics.enrollmentCodes;
 
 export interface ResolveOrganizationInput {
   dataSource: DataSource;
@@ -55,10 +66,12 @@ export async function resolveOrganizationForEventOffer(
 
   // ── K-Cosmetics Event Offer (k-cosmetics-event-offer) ────────────────────
   // WO-O4O-EVENT-OFFER-KCOS-CREATE-V1
-  // WO-O4O-EVENT-OFFER-KCOS-E2E-SMOKE-V1: organization_service_enrollments.service_code는
-  //   생성 시점부터 'cosmetics'(product-level)로 적재됨 — seed migration / organization-ops
-  //   동일. SERVICE_KEYS.K_COSMETICS('k-cosmetics', platform-level)과 다른 키이므로
-  //   resolver는 반드시 SERVICE_KEYS.COSMETICS를 질의 키로 사용해야 한다.
+  // WO-O4O-EVENT-OFFER-KCOS-E2E-SMOKE-V1 (당시 관측): enrollment 가 'cosmetics' 로만 적재돼
+  //   있어 resolver 가 SERVICE_KEYS.COSMETICS 단일 키를 질의했다.
+  // WO-O4O-KCOS-ENROLLMENT-SERVICE-KEY-CANONICALIZATION-V1 (정정): 현재 생성 경로
+  //   (cosmetics-store.service / backfill migration)는 모두 canonical 'k-cosmetics' 를
+  //   적재한다. legacy 'cosmetics' 행만 보는 단일 키 질의는 신규 K-Cos 조직을 놓친다.
+  //   → 공통 SSOT 의 enrollmentCodes(canonical + legacy alias)로 질의한다.
   if (serviceKey === SERVICE_KEYS.K_COSMETICS_EVENT_OFFER) {
     if (roleType === 'operator') {
       // 사용자가 멤버인 organization 중 K-Cos에 enroll된 active 조직을 매핑.
@@ -69,7 +82,7 @@ export async function resolveOrganizationForEventOffer(
          FROM organization_members om
          JOIN organization_service_enrollments ose
            ON ose.organization_id = om.organization_id
-          AND ose.service_code = $2
+          AND ose.service_code = ANY($2::text[])
           AND ose.status = 'active'
          WHERE om.user_id = $1
            AND om.role IN ('owner','admin','manager')
@@ -78,7 +91,7 @@ export async function resolveOrganizationForEventOffer(
          -- 허용 집합(서비스 enroll 조건)은 그대로, 선택만 결정적으로 만든다.
          ORDER BY om.is_primary DESC NULLS LAST, om.joined_at ASC, om.organization_id ASC
          LIMIT 1`,
-        [userId, SERVICE_KEYS.COSMETICS],
+        [userId, K_COSMETICS_ENROLLMENT_CODES],
       );
       return rows[0]?.organization_id ?? null;
     }
@@ -89,11 +102,11 @@ export async function resolveOrganizationForEventOffer(
       const rows = await dataSource.query(
         `SELECT ose.organization_id
          FROM organization_service_enrollments ose
-         WHERE ose.service_code = $1
+         WHERE ose.service_code = ANY($1::text[])
            AND ose.status = 'active'
-         ORDER BY ose.created_at ASC NULLS LAST
+         ORDER BY ose.created_at ASC NULLS LAST, ose.organization_id ASC
          LIMIT 1`,
-        [SERVICE_KEYS.COSMETICS],
+        [K_COSMETICS_ENROLLMENT_CODES],
       );
       return rows[0]?.organization_id ?? null;
     }

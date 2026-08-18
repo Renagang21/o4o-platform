@@ -13,6 +13,7 @@
 import type { DataSource, QueryRunner } from 'typeorm';
 import logger from './logger.js';
 import { isDrugProductById } from '../modules/neture/guards/drug-access.guard.js';
+import { NON_CANONICAL_ENROLLMENT_CODES } from './listing-service-key.js';
 
 /** DataSource 또는 QueryRunner 양쪽에서 query() 실행 가능 */
 type QueryExecutor = Pick<DataSource, 'query'> | Pick<QueryRunner, 'query'>;
@@ -95,9 +96,14 @@ export async function autoExpandPublicProduct(
        JOIN organizations o ON o.id = ose.organization_id
        WHERE o."isActive" = true
          AND ose.status = 'active'
+         -- WO-O4O-KCOS-ENROLLMENT-SERVICE-KEY-CANONICALIZATION-V1:
+         --   enrollment.service_code 를 그대로 OPL.service_key 로 복사하므로,
+         --   role/product-level 별칭('cosmetics' / 'kpa') 잔재 행은 제외한다.
+         --   (canonical 행이 같은 조직에 이미 있어 진열 대상이 줄지 않는다)
+         AND NOT (ose.service_code = ANY($3::text[]))
          AND ${drugAudienceSqlCondition('$2', 'ose.service_code')}
        ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING`,
-      [offerId, masterId],
+      [offerId, masterId, NON_CANONICAL_ENROLLMENT_CODES],
     );
 
     const count = Array.isArray(result) ? result.length : (result as { rowCount?: number }).rowCount ?? 0;

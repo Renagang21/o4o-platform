@@ -23,6 +23,7 @@
  * packages/security-core 의 resolveCanonicalServiceKey / resolveRolePrefixFromCanonicalServiceKey
  * 를 쓴다. 로컬 하드코딩 맵을 다시 만들지 않는다.
  */
+import { ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY } from '@o4o/security-core';
 import { SERVICE_KEYS } from '../constants/service-keys.js';
 
 /** OPL service_key 로 인정되는 canonical membership key (platform-level). */
@@ -68,3 +69,19 @@ export function deriveListingServiceKeyFromMemberships(
   const first = active[0]?.serviceKey ?? null;
   return first && LISTING_SERVICE_KEYS.includes(first) ? first : null;
 }
+
+/**
+ * WO-O4O-KCOS-ENROLLMENT-SERVICE-KEY-CANONICALIZATION-V1
+ *
+ * `organization_service_enrollments.service_code` 에 남아 있는 **role/product-level 별칭**.
+ * 이 값들은 platform_services 에 등록돼 있으나 type='tool'(제품 도메인) 이며
+ * 서비스 가입(enrollment) 축의 canonical key 가 아니다:
+ *   'cosmetics' → canonical 'k-cosmetics' · 'kpa' → canonical 'kpa-society'
+ *
+ * 새 로컬 맵을 만들지 않고 security-core 의 SSOT(ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY)
+ * 에서 그대로 파생한다. enrollment.service_code 를 **그대로 복사**하는 경로
+ * (auto-listing 등)는 이 집합을 제외해야 OPL 에 비-canonical key 가 새로 생기지 않는다.
+ */
+export const NON_CANONICAL_ENROLLMENT_CODES: readonly string[] = Object.freeze(
+  Object.keys(ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY),
+);
