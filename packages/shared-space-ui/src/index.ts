@@ -160,6 +160,43 @@ export type {
 export { CommunityContentSearchBar } from './community/CommunityContentSearchBar';
 export type { CommunityContentSearchBarProps } from './community/CommunityContentSearchBar';
 
+/* WO-O4O-COMMUNITY-CONTENT-RESOURCE-FRONTEND-VIEW-COMMONIZATION-V1:
+ * 커뮤니티 콘텐츠·자료실 목록/상세 공통 View + adapter 계약.
+ * 서비스는 fetch adapter · config · renderLink 만 주입한다 (서비스 분기 없음). */
+export {
+  CommunityContentLoadingState,
+  CommunityContentErrorState,
+  CommunityContentEmptyState,
+  formatCommunityContentDate,
+} from './community/CommunityContentStates';
+export type {
+  CommunityContentLoadingStateProps,
+  CommunityContentErrorStateProps,
+  CommunityContentEmptyStateProps,
+} from './community/CommunityContentStates';
+export { CommunityContentListView, CommunityContentListTemplate } from './community/CommunityContentListView';
+export type {
+  CommunityContentListItem,
+  CommunityContentListViewProps,
+  CommunityContentListConfig,
+  CommunityContentListTemplateProps,
+  CommunityContentListFetchParams,
+  CommunityContentListFetchResult,
+  CommunityContentRenderLink,
+} from './community/CommunityContentListView';
+export {
+  STANDARD_CONTENT_STATUS_LABEL,
+  standardContentBadges,
+  standardContentToListItem,
+  standardContentToDetailData,
+} from './community/standardContentAdapters';
+export type { StandardCommunityContentRecord } from './community/standardContentAdapters';
+export { CommunityContentDetailTemplate } from './community/CommunityContentDetailTemplate';
+export type {
+  CommunityContentDetailConfig,
+  CommunityContentDetailTemplateProps,
+} from './community/CommunityContentDetailTemplate';
+
 /* WO-O4O-COMMUNITY-HOME-LATEST-ACTIVITY-SECTION-COMMONIZATION-V1: 홈 최신 활동 공통 View */
 export {
   LatestActivitySection,
