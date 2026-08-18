@@ -210,8 +210,20 @@ export const lmsApi = {
   enrollCourse: (courseId: string) => learnerClient.enrollCourse<LmsEnrollment>(courseId),
 
   // 진행률 업데이트 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2.
-  updateProgress: (courseId: string, lessonId: string, completed: boolean) =>
-    learnerClient.updateProgress<LmsEnrollment>(courseId, lessonId, completed),
+  // WO-O4O-COMMUNITY-LMS-COURSE-DETAIL-AND-LESSON-PLAYER-COMMONIZATION-V1:
+  //   백엔드 공통 정책(WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1)이 video/article 완료 시
+  //   메트릭을 요구한다. 기존 KCos 호출은 메트릭 없이 보내 거부되던 잠재 결함 → 인자 추가.
+  updateProgress: (
+    courseId: string,
+    lessonId: string,
+    completed: boolean,
+    metrics?: {
+      watchedSeconds?: number;
+      progressRatio?: number;
+      scrolledRatio?: number;
+      dwellTimeSeconds?: number;
+    },
+  ) => learnerClient.updateProgress<LmsEnrollment>(courseId, lessonId, completed, metrics),
 
   // 퀴즈 조회 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP1.
   getQuizForLesson: (lessonId: string) => learnerClient.getQuizForLesson<LmsQuiz>(lessonId),

@@ -147,6 +147,9 @@ import { uploadSingleMiddleware } from '../../middleware/upload.middleware.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: legacy role utils removed
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { mapCmsStatus, mapCmsAuthorRole, mapCmsVisibilityScope } from '@o4o/types';
+// WO-O4O-COMMUNITY-CONTENT-RESOURCE-KPA-CORE-ADOPTION-CLOSURE-V1
+import { createContentResourceCore } from '../common/content-resource/content-resource-core.js';
+import { createKpaContentResourceConfig } from './controllers/kpa-content-resource.config.js';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 import { ActionLogService } from '@o4o/action-log-core';
 // WO-O4O-OPERATOR-ACTION-LAYER-V1
@@ -1512,6 +1515,16 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   }));
 
   // ============================================================================
+  // WO-O4O-COMMUNITY-CONTENT-RESOURCE-KPA-CORE-ADOPTION-CLOSURE-V1
+  //   콘텐츠/자료실 공통 Core. 물리 테이블(kpa_contents)은 그대로 두고 handler 로직만 공유한다.
+  //   detail / create / update / recommend / AI 3종은 KPA 고유라 라우터에 그대로 남는다.
+  // ============================================================================
+  const kpaContentCore = createContentResourceCore(
+    dataSource,
+    createKpaContentResourceConfig({ mapCmsStatus, audit: writeAuditLog }),
+  );
+
+  // ============================================================================
   // CONTENT HUB ROUTES — WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1
   // WO-KPA-CONTENT-HUB-FOUNDATION-V1: 커뮤니티 콘텐츠 허브 확장
   // ============================================================================
@@ -1528,104 +1541,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
     // GET /contents — 목록 (optionalAuth: 공개 접근)
     // WO-KPA-CONTENT-HUB-FOUNDATION-V1: content_type, sub_type, sort 필터 추가
-    contentRouter.get('/', optionalAuth as any, asyncHandler(async (req: Request, res: Response) => {
-      const { page = '1', limit = '20', category, search, status: statusFilter, tag, content_type: contentTypeFilter, sub_type: subTypeFilter, sort = 'latest', my } = req.query;
-      const pageNum = Math.max(1, Number(page));
-      const limitNum = Math.min(100, Math.max(1, Number(limit)));
-      const offset = (pageNum - 1) * limitNum;
-      const userId = (req as any).user?.id;
-
-      const conditions: string[] = [`c.is_deleted = false`];
-      const params: any[] = [];
-      let idx = 1;
-
-      // WO-O4O-KPA-OPERATOR-CONTENT-LIST-STATUS-FILTER-UX-FIX-V1:
-      //   status=all = 운영자 콘텐츠 허브 '전체 관리 목록'(draft+ready 등 전체 상태, 작성자 무관).
-      //   운영자/관리자만 전체 노출 — 그 외 로그인 사용자는 기존 기본(published OR 본인)으로 폴백,
-      //   비로그인은 published 만(아래 분기). status 미지정('') 기본 동작은 변경하지 않는다.
-      const isAllStatus = statusFilter === 'all';
-      const isOperatorUser = isKpaOperatorOrAdmin((req as any).user);
-
-      // my=true: 내 콘텐츠만 (로그인 필수)
-      if (my === 'true' && userId) {
-        conditions.push(`c.created_by = $${idx++}`);
-        params.push(userId);
-      } else if (!userId) {
-        conditions.push(`c.status = 'published'`);
-      } else if (isAllStatus) {
-        // 운영자/관리자: status 조건 미추가 → 전체 상태 관리 목록. 그 외: 기존 기본으로 폴백.
-        if (!isOperatorUser) {
-          conditions.push(`(c.status = 'published' OR c.created_by = $${idx++})`);
-          params.push(userId);
-        }
-      } else if (!statusFilter) {
-        // 비로그인 시 published만, 로그인 시 본인 draft/private도 포함
-        conditions.push(`(c.status = 'published' OR c.created_by = $${idx++})`);
-        params.push(userId);
-      }
-
-      if (category) { conditions.push(`c.category = $${idx++}`); params.push(category); }
-      if (statusFilter && !isAllStatus) { conditions.push(`c.status = $${idx++}`); params.push(statusFilter); }
-      if (contentTypeFilter) { conditions.push(`c.content_type = $${idx++}`); params.push(contentTypeFilter); }
-      if (subTypeFilter) { conditions.push(`c.sub_type = $${idx++}`); params.push(subTypeFilter); }
-      if (search) {
-        conditions.push(`(c.title ILIKE $${idx} OR c.summary ILIKE $${idx} OR c.body ILIKE $${idx} OR c.author_name ILIKE $${idx} OR c.tags::text ILIKE $${idx})`);
-        params.push(`%${search}%`); idx++;
-      }
-      if (tag) {
-        conditions.push(`c.tags @> $${idx++}::jsonb`);
-        params.push(JSON.stringify([tag]));
-      }
-
-      // Sort
-      let orderBy = 'c.created_at DESC';
-      if (sort === 'popular') orderBy = 'c.like_count DESC, c.created_at DESC';
-      else if (sort === 'views') orderBy = 'c.view_count DESC, c.created_at DESC';
-
-      const where = `WHERE ${conditions.join(' AND ')}`;
-      const [[{ total }], rows] = await Promise.all([
-        dataSource.query(`SELECT COUNT(*)::int as total FROM kpa_contents c ${where}`, params),
-        dataSource.query(
-          // WO-O4O-KPA-CONTENT-REUSABLE-POLICY-LIST-DETAIL-PARITY-V1:
-          //   reusable_policy 누락으로 목록·Drawer·자료실의 restricted 판정이 항상 false 였다
-          //   (상세는 SELECT * 라 정확). 서버 복사 게이트는 기존 그대로이고 응답 필드만 맞춘다.
-          // WO-O4O-KPA-RESOURCE-LIST-SOURCE-URL-PAYLOAD-PARITY-V1:
-          //   source_url 누락으로 자료실 행 버튼('파일 링크 복사')이 항상
-          //   "복사할 파일 링크가 없습니다" 로 실패했다(상세에는 존재 → Drawer 다운로드는 정상).
-          //   source_file_name 도 함께 반환한다 — 목록 카드의 파일 유형 배지가 확장자로
-          //   판정되므로(getFileType), source_url 만 넣으면 배지가 뜨면서 '기타' 로 오표시된다.
-          //   응답 필드 추가(additive)만이며 조회 조건·권한·복사 게이트는 무변경이다.
-          `SELECT c.id, c.title, c.summary, c.category, c.tags, c.status,
-                  c.source_type, c.usage_type, c.thumbnail_url, c.created_by, c.created_at, c.updated_at,
-                  c.content_type, c.sub_type, c.like_count, c.view_count, c.author_name,
-                  c.reusable_policy, c.source_url, c.source_file_name
-           FROM kpa_contents c ${where}
-           ORDER BY ${orderBy}
-           LIMIT $${idx} OFFSET $${idx + 1}`,
-          [...params, limitNum, offset]
-        ),
-      ]);
-
-      res.json({
-        success: true,
-        data: {
-          items: rows.map((row: any) => ({
-            ...row,
-            // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
-            producer: 'service_admin' as const,
-            producerRef: row.created_by ?? '',
-            visibility: 'service' as const,
-            serviceKey: 'kpa-society' as const,
-            contentType: 'document' as const,
-            metaStatus: mapCmsStatus(row.status === 'published' ? 'pending' : (row.status ?? 'draft')),
-          })),
-          total,
-          page: pageNum,
-          limit: limitNum,
-          totalPages: Math.ceil(total / limitNum),
-        },
-      });
-    }));
+    // WO-O4O-COMMUNITY-CONTENT-RESOURCE-KPA-CORE-ADOPTION-CLOSURE-V1: 공통 Core 채택
+    contentRouter.get('/', optionalAuth as any, asyncHandler(kpaContentCore.list));
 
     // POST /contents — 등록 (인증된 사용자)
     // WO-KPA-CONTENT-HUB-FOUNDATION-V1: 일반 사용자도 콘텐츠 생성 가능
@@ -1875,29 +1792,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
     // DELETE /contents/:id — soft delete (본인 또는 운영자)
     // WO-KPA-CONTENT-HUB-FOUNDATION-V1: 작성자 본인 또는 kpa:operator 삭제 가능
-    contentRouter.delete('/:id', authenticate, asyncHandler(async (req: Request, res: Response) => {
-      const user = (req as any).user;
-      const userId = user?.id;
-      const [existing] = await dataSource.query(
-        `SELECT id, title, created_by FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
-        [req.params.id]
-      );
-      if (!existing) {
-        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
-        return;
-      }
-
-      const isOwner = existing.created_by === userId;
-      const isOperator = isKpaOperatorOrAdmin(user);
-      if (!isOwner && !isOperator) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '삭제 권한이 없습니다' } });
-        return;
-      }
-
-      await dataSource.query(`UPDATE kpa_contents SET is_deleted = true, updated_at = NOW() WHERE id = $1`, [existing.id]);
-      await writeAuditLog(user, 'CONTENT_DELETED', 'kpa_content', existing.id, { title: existing.title });
-      res.json({ success: true, data: { deleted: true, id: existing.id } });
-    }));
+    // WO-O4O-COMMUNITY-CONTENT-RESOURCE-KPA-CORE-ADOPTION-CLOSURE-V1: 공통 Core 채택
+    contentRouter.delete('/:id', authenticate, asyncHandler(kpaContentCore.remove));
 
     // ── Recommend toggle (WO-KPA-CONTENT-HUB-FOUNDATION-V1) ─────────────────
     contentRouter.post('/:id/recommend', authenticate, asyncHandler(async (req: Request, res: Response) => {
@@ -1953,13 +1849,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     }));
 
     // ── View count (WO-KPA-CONTENT-HUB-FOUNDATION-V1) ────────────────────
-    contentRouter.post('/:id/view', optionalAuth as any, asyncHandler(async (req: Request, res: Response) => {
-      await dataSource.query(
-        `UPDATE kpa_contents SET view_count = view_count + 1 WHERE id = $1 AND is_deleted = false`,
-        [req.params.id]
-      );
-      res.json({ success: true });
-    }));
+    // WO-O4O-COMMUNITY-CONTENT-RESOURCE-KPA-CORE-ADOPTION-CLOSURE-V1: 공통 Core 채택
+    contentRouter.post('/:id/view', optionalAuth as any, asyncHandler(kpaContentCore.incrementView));
 
     // ── AI endpoints (WO-O4O-STORE-CONTENT-USAGE-RECOMPOSE-V1: stubs → execute()) ──
 
@@ -2072,162 +1963,30 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const opResourcesRouter = Router();
 
     // GET /operator/resources — 운영자 자료실 목록 (모든 status 포함)
+    // WO-O4O-COMMUNITY-CONTENT-RESOURCE-KPA-CORE-ADOPTION-CLOSURE-V1: 공통 Core 채택
     opResourcesRouter.get(
       '/',
       authenticate,
       requireKpaScope('kpa:operator') as any,
-      asyncHandler(async (req: Request, res: Response) => {
-        const {
-          page = '1',
-          limit = '20',
-          search,
-          source_type: sourceTypeFilter,
-          status: statusFilter,
-          usage_type: usageTypeFilter,
-        } = req.query;
-        const pageNum = Math.max(1, Number(page));
-        const limitNum = Math.min(100, Math.max(1, Number(limit)));
-        const offset = (pageNum - 1) * limitNum;
-
-        // WO-KPA-CONTENT-RESOURCE-SUBTYPE-SEPARATION-V1: 자료실 항목만 조회
-        const conditions: string[] = [`c.is_deleted = false`, `c.sub_type = 'resource'`];
-        const params: any[] = [];
-        let idx = 1;
-
-        if (sourceTypeFilter) {
-          conditions.push(`c.source_type = $${idx++}`);
-          params.push(sourceTypeFilter);
-        }
-        if (statusFilter) {
-          conditions.push(`c.status = $${idx++}`);
-          params.push(statusFilter);
-        }
-        if (usageTypeFilter) {
-          conditions.push(`c.usage_type = $${idx++}`);
-          params.push(usageTypeFilter);
-        }
-        if (search) {
-          conditions.push(
-            `(c.title ILIKE $${idx} OR c.summary ILIKE $${idx} OR c.tags::text ILIKE $${idx})`,
-          );
-          params.push(`%${search}%`);
-          idx++;
-        }
-
-        const where = `WHERE ${conditions.join(' AND ')}`;
-        const [[{ total }], rows] = await Promise.all([
-          dataSource.query(
-            `SELECT COUNT(*)::int as total FROM kpa_contents c ${where}`,
-            params,
-          ),
-          dataSource.query(
-            `SELECT c.id, c.title, c.summary, c.tags, c.category, c.status,
-                    c.source_type, c.usage_type, c.source_url, c.source_file_name,
-                    c.thumbnail_url, c.created_by, c.author_name,
-                    c.view_count, c.like_count, c.created_at, c.updated_at
-             FROM kpa_contents c ${where}
-             ORDER BY c.created_at DESC
-             LIMIT $${idx} OFFSET $${idx + 1}`,
-            [...params, limitNum, offset],
-          ),
-        ]);
-
-        res.json({
-          success: true,
-          data: {
-            items: rows,
-            total,
-            page: pageNum,
-            limit: limitNum,
-            totalPages: Math.ceil(total / limitNum),
-          },
-        });
-      }),
+      asyncHandler(kpaContentCore.operatorList),
     );
 
     // PATCH /operator/resources/:id/status — 상태 변경 (숨김/노출)
+    // WO-O4O-COMMUNITY-CONTENT-RESOURCE-KPA-CORE-ADOPTION-CLOSURE-V1: 공통 Core 채택
     opResourcesRouter.patch(
       '/:id/status',
       authenticate,
       requireKpaScope('kpa:operator') as any,
-      asyncHandler(async (req: Request, res: Response) => {
-        const user = (req as any).user;
-        const { status: newStatus } = req.body;
-        // WO-O4O-KPA-CONTENT-STATUS-SEMANTICS-AUDIT-V1: 'ready' 추가.
-      //   content-meta SSOT 상 kpa_contents.status = draft|ready('발행 가능/검토 완료').
-      //   기존엔 'ready'(운영자 '완료')가 누락돼 draft 로 silently coercion 되던 버그를 수정한다.
-      //   published/private 는 backward-compat 유지(제거 시 기존 행 영향).
-      const validStatuses = ['draft', 'ready', 'published', 'private'];
-        if (!newStatus || !validStatuses.includes(newStatus)) {
-          res.status(400).json({
-            success: false,
-            error: {
-              code: 'VALIDATION_ERROR',
-              message: `status must be one of: ${validStatuses.join(', ')}`,
-            },
-          });
-          return;
-        }
-
-        const [existing] = await dataSource.query(
-          `SELECT id, title, status FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
-          [req.params.id],
-        );
-        if (!existing) {
-          res.status(404).json({
-            success: false,
-            error: { code: 'NOT_FOUND', message: '자료를 찾을 수 없습니다' },
-          });
-          return;
-        }
-
-        const [updated] = await dataSource.query(
-          `UPDATE kpa_contents SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *`,
-          [newStatus, existing.id],
-        );
-        await writeAuditLog(
-          user,
-          'RESOURCE_STATUS_CHANGED',
-          'kpa_content',
-          updated.id,
-          { title: updated.title, from: existing.status, to: newStatus },
-        );
-        res.json({ success: true, data: updated });
-      }),
+      asyncHandler(kpaContentCore.operatorUpdateStatus),
     );
 
     // DELETE /operator/resources/:id — soft delete
+    // WO-O4O-COMMUNITY-CONTENT-RESOURCE-KPA-CORE-ADOPTION-CLOSURE-V1: 공통 Core 채택
     opResourcesRouter.delete(
       '/:id',
       authenticate,
       requireKpaScope('kpa:operator') as any,
-      asyncHandler(async (req: Request, res: Response) => {
-        const user = (req as any).user;
-        const [existing] = await dataSource.query(
-          `SELECT id, title FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
-          [req.params.id],
-        );
-        if (!existing) {
-          res.status(404).json({
-            success: false,
-            error: { code: 'NOT_FOUND', message: '자료를 찾을 수 없습니다' },
-          });
-          return;
-        }
-
-        await dataSource.query(
-          `UPDATE kpa_contents SET is_deleted = true, updated_at = NOW() WHERE id = $1`,
-          [existing.id],
-        );
-        await writeAuditLog(
-          user,
-          'RESOURCE_DELETED',
-          'kpa_content',
-          existing.id,
-          { title: existing.title },
-        );
-        res.json({ success: true, data: { deleted: true, id: existing.id } });
-      }),
+      asyncHandler(kpaContentCore.operatorRemove),
     );
 
     router.use('/operator/resources', opResourcesRouter);

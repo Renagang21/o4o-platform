@@ -55,6 +55,82 @@ export function ForumDetailLoadingState({
   );
 }
 
+// ─── Skeleton (WO-O4O-COMMUNITY-FORUM-KPA-NETURE-VIEW-CONVERGENCE-V1) ──
+export interface ForumDetailSkeletonStateProps {
+  /** breadcrumb 자리 표시 */
+  showBreadcrumb?: boolean;
+  /** 본문 자리 표시 줄 수 */
+  contentLines?: number;
+  /** 댓글 자리 표시 개수 (0 이면 미표시) */
+  commentItems?: number;
+  className?: string;
+  style?: CSSProperties;
+}
+
+const SKELETON_KEYFRAME = '@keyframes fds-skeleton-pulse{0%,100%{opacity:1}50%{opacity:0.5}}';
+
+function Bar({ width, height = 14, marginBottom }: { width: string; height?: number; marginBottom?: number }) {
+  return (
+    <span
+      aria-hidden
+      style={{
+        display: 'block',
+        width,
+        height,
+        marginBottom,
+        backgroundColor: '#e2e8f0',
+        borderRadius: 4,
+        animation: 'fds-skeleton-pulse 1.5s ease-in-out infinite',
+      }}
+    />
+  );
+}
+
+/** Neture 상세가 자체 구현하던 스켈레톤을 공통화한 로딩 표현(정보 밀도가 높은 상세용). */
+export function ForumDetailSkeletonState({
+  showBreadcrumb = true,
+  contentLines = 4,
+  commentItems = 2,
+  className,
+  style,
+}: ForumDetailSkeletonStateProps) {
+  return (
+    <div className={className} style={style} aria-busy>
+      <style>{SKELETON_KEYFRAME}</style>
+      {showBreadcrumb && (
+        <div style={skeletonStyles.breadcrumb}>
+          <Bar width="40px" />
+          <span style={skeletonStyles.divider}>/</span>
+          <Bar width="40px" />
+          <span style={skeletonStyles.divider}>/</span>
+          <Bar width="50px" />
+        </div>
+      )}
+      <div style={skeletonStyles.headerBlock}>
+        <Bar width="80px" height={20} marginBottom={16} />
+        <Bar width="70%" height={28} marginBottom={16} />
+        <Bar width="180px" />
+      </div>
+      <div style={{ marginBottom: 32 }}>
+        {Array.from({ length: contentLines }, (_, i) => (
+          <Bar key={i} width={`${90 - i * 10}%`} height={16} marginBottom={12} />
+        ))}
+      </div>
+      {commentItems > 0 && (
+        <div style={skeletonStyles.commentBlock}>
+          <Bar width="100px" height={18} marginBottom={24} />
+          {Array.from({ length: commentItems }, (_, i) => (
+            <div key={i} style={skeletonStyles.commentItem}>
+              <Bar width="120px" marginBottom={8} />
+              <Bar width="80%" />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Error / NotFound 공통 내부 렌더 ──────────────────────────────────
 interface BaseStateProps {
   icon?: ReactNode;
@@ -187,5 +263,31 @@ const stateStyles: Record<string, CSSProperties> = {
     border: 'none',
     borderRadius: 8,
     cursor: 'pointer',
+  },
+};
+
+const skeletonStyles: Record<string, CSSProperties> = {
+  breadcrumb: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    fontSize: 14,
+    marginBottom: 24,
+  },
+  divider: {
+    color: '#cbd5e1',
+  },
+  headerBlock: {
+    marginBottom: 32,
+    paddingBottom: 24,
+    borderBottom: '1px solid #e2e8f0',
+  },
+  commentBlock: {
+    borderTop: '1px solid #e2e8f0',
+    paddingTop: 32,
+  },
+  commentItem: {
+    padding: '20px 0',
+    borderBottom: '1px solid #f1f5f9',
   },
 };

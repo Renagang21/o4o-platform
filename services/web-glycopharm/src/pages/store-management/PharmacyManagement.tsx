@@ -8,6 +8,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { apiClient } from '@/services/api';
+// WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1
+import { FORUM_BASE } from '@/services/forumApi';
 import { glycopharmConfig } from '@o4o/operator-ux-core';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadError } from '@o4o/ui';
@@ -135,7 +137,7 @@ function ForumFeed() {
     setLoading(true);
     setLoadError(false);
     apiClient
-      .get<ForumPostRaw[]>('/api/v1/glycopharm/forum/posts?limit=15')
+      .get<ForumPostRaw[]>(`${FORUM_BASE}/posts?limit=15`)
       .then((res) => {
         if (res.error) {
           setLoadError(true);

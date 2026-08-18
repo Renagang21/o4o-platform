@@ -296,8 +296,20 @@ export const lmsApi = {
     answers: Array<{ questionId: string; answer: string | string[] }>,
   ) => learnerClient.submitQuiz<QuizSubmitResult>(quizId, answers),
 
-  updateProgress: (courseId: string, lessonId: string, completed = true) =>
-    learnerClient.updateProgress<LmsEnrollment>(courseId, lessonId, completed),
+  // WO-O4O-COMMUNITY-LMS-COURSE-DETAIL-AND-LESSON-PLAYER-COMMONIZATION-V1:
+  //   백엔드 공통 정책(WO-O4O-LMS-LESSON-TYPE-COMPLETION-RULES-V1)이 video/article 완료 시
+  //   메트릭을 요구한다. 기존 GlycoPharm 호출은 메트릭 없이 보내 거부되던 잠재 결함 → 인자 추가.
+  updateProgress: (
+    courseId: string,
+    lessonId: string,
+    completed = true,
+    metrics?: {
+      watchedSeconds?: number;
+      progressRatio?: number;
+      scrolledRatio?: number;
+      dwellTimeSeconds?: number;
+    },
+  ) => learnerClient.updateProgress<LmsEnrollment>(courseId, lessonId, completed, metrics),
 
   // ─── deprecated alias (LMS-CLIENT-CONVENTION-V1 §4) ───────────────────────
   // 기존 페이지 호환을 위해 유지. 신규 코드는 위의 표준 이름 사용.

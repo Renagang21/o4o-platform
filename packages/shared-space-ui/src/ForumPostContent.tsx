@@ -22,9 +22,11 @@ export interface ForumPostContentProps {
   html?: string;
   className?: string;
   style?: CSSProperties;
+  /** string content 를 escape 후 개행 변환해 렌더 (legacy plain-text 정책) */
+  escapePlainText?: boolean;
 }
 
-export function ForumPostContent({ content, html, className, style }: ForumPostContentProps) {
-  const resolvedHtml = html ?? forumContentToHtml(content);
+export function ForumPostContent({ content, html, className, style, escapePlainText }: ForumPostContentProps) {
+  const resolvedHtml = html ?? forumContentToHtml(content, { escapePlainText });
   return <ContentRenderer html={resolvedHtml} className={className} style={style} />;
 }

@@ -65,12 +65,25 @@ function blockToHtml(block: ForumContentBlock): string {
  * 서비스별 고유 변환(예: Neture legacy escape, GP plain-text)을 유지하려면 호출측이
  * 직접 변환해 ForumPostContent 의 `html` prop 으로 넘긴다.
  */
-export function forumContentToHtml(content: unknown): string {
+export interface ForumContentToHtmlOptions {
+  /**
+   * string content 를 HTML 로 신뢰하지 않고 escape 후 개행을 `<br />` 로 변환한다.
+   * (WO-O4O-COMMUNITY-FORUM-KPA-NETURE-VIEW-CONVERGENCE-V1 — Neture legacy plain-text 정책)
+   */
+  escapePlainText?: boolean;
+}
+
+export function forumContentToHtml(content: unknown, options?: ForumContentToHtmlOptions): string {
   if (Array.isArray(content)) {
     return (content as ForumContentBlock[]).map(blockToHtml).join('');
   }
   if (typeof content === 'string') {
-    return content;
+    if (!options?.escapePlainText) return content;
+    return content
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br />');
   }
   return '';
 }

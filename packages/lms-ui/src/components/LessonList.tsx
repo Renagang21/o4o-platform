@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, MouseEvent, ReactNode } from 'react';
 import type { LessonItemView, LessonKind } from '../types';
 import { DEFAULT_ACCENT } from '../types';
 
@@ -17,8 +17,44 @@ export interface LessonListProps {
    *        locked 레슨은 클릭 불가. trailing 액션은 렌더하지 않는다(행 자체가 액션).
    */
   rowClickMode?: 'action' | 'row';
+  /**
+   * 'light'(기본): 흰 배경 카드 안. 'dark': 레슨 플레이어 사이드바(짙은 배경).
+   * 색만 바뀌고 구조/동작은 동일하다.
+   */
+  variant?: 'light' | 'dark';
   style?: CSSProperties;
 }
+
+interface LessonListPalette {
+  title: string;
+  meta: string;
+  divider: string;
+  hoverBg: string;
+  currentBg: string;
+  idleBadgeBg: string;
+  idleBadgeFg: string;
+}
+
+const PALETTES: Record<'light' | 'dark', LessonListPalette> = {
+  light: {
+    title: '#0f172a',
+    meta: '#94a3b8',
+    divider: '#f1f5f9',
+    hoverBg: '#f8fafc',
+    currentBg: '#f8fafc',
+    idleBadgeBg: '#e2e8f0',
+    idleBadgeFg: '#64748b',
+  },
+  dark: {
+    title: '#e2e8f0',
+    meta: '#64748b',
+    divider: '#1e293b',
+    hoverBg: '#1e293b',
+    currentBg: '#1e293b',
+    idleBadgeBg: '#334155',
+    idleBadgeFg: '#cbd5e1',
+  },
+};
 
 const KIND_ICON: Record<LessonKind, string> = {
   video: '🎬',
@@ -32,7 +68,6 @@ const itemStyle: CSSProperties = {
   alignItems: 'center',
   gap: '12px',
   padding: '12px 0',
-  borderBottom: '1px solid #f1f5f9',
 };
 
 interface LessonRowProps {
@@ -41,20 +76,36 @@ interface LessonRowProps {
   accent: string;
   openLabel: string;
   rowClickMode: 'action' | 'row';
+  palette: LessonListPalette;
+  padded: boolean;
   href?: string;
   onLessonClick?: (lesson: LessonItemView) => void;
 }
 
-function LessonRow({ lesson, index, accent, openLabel, rowClickMode, href, onLessonClick }: LessonRowProps) {
+function LessonRow({ lesson, index, accent, openLabel, rowClickMode, palette, padded, href, onLessonClick }: LessonRowProps) {
   const [hover, setHover] = useState(false);
   const accessible = !lesson.locked;
   const rowClickable = rowClickMode === 'row' && accessible && (!!href || !!onLessonClick);
 
   const background = lesson.current
-    ? '#f8fafc'
+    ? palette.currentBg
     : rowClickable && hover
-      ? '#f8fafc'
+      ? palette.hoverBg
       : undefined;
+
+  const rowStyle: CSSProperties = {
+    ...itemStyle,
+    padding: padded ? '12px 16px' : itemStyle.padding,
+    borderBottom: `1px solid ${palette.divider}`,
+  };
+
+  /** href 가 있어도 onLessonClick 이 있으면 좌클릭은 SPA 이동으로 가로챈다. */
+  const handleAnchorClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (!onLessonClick) return;
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    onLessonClick(lesson);
+  };
 
   // 행 내부(번호/완료 + 타입·제목·미리보기·길이). action/row 모드 공통.
   const inner: ReactNode = (
@@ -70,8 +121,8 @@ function LessonRow({ lesson, index, accent, openLabel, rowClickMode, href, onLes
           fontSize: '13px',
           fontWeight: 600,
           flexShrink: 0,
-          background: lesson.completed ? accent : '#e2e8f0',
-          color: lesson.completed ? '#fff' : '#64748b',
+          background: lesson.completed ? accent : palette.idleBadgeBg,
+          color: lesson.completed ? '#fff' : palette.idleBadgeFg,
         }}
       >
         {lesson.completed ? '✓' : (lesson.order ?? index + 1)}
@@ -79,7 +130,7 @@ function LessonRow({ lesson, index, accent, openLabel, rowClickMode, href, onLes
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           {lesson.kind && <span style={{ fontSize: '13px' }}>{KIND_ICON[lesson.kind]}</span>}
-          <span style={{ fontSize: '14px', fontWeight: lesson.current ? 700 : 500, color: '#0f172a' }}>
+          <span style={{ fontSize: '14px', fontWeight: lesson.current ? 700 : 500, color: palette.title }}>
             {lesson.title}
           </span>
           {lesson.isPreview && (
@@ -89,7 +140,7 @@ function LessonRow({ lesson, index, accent, openLabel, rowClickMode, href, onLes
           )}
         </div>
         {typeof lesson.durationMinutes === 'number' && (
-          <span style={{ fontSize: '12px', color: '#94a3b8' }}>{lesson.durationMinutes}분</span>
+          <span style={{ fontSize: '12px', color: palette.meta }}>{lesson.durationMinutes}분</span>
         )}
       </div>
     </>
@@ -105,7 +156,8 @@ function LessonRow({ lesson, index, accent, openLabel, rowClickMode, href, onLes
         aria-current={ariaCurrent}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
-        style={{ ...itemStyle, background, textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
+        onClick={handleAnchorClick}
+        style={{ ...rowStyle, background, textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
       >
         {inner}
       </a>
@@ -120,12 +172,12 @@ function LessonRow({ lesson, index, accent, openLabel, rowClickMode, href, onLes
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
         style={{
-          ...itemStyle,
+          ...rowStyle,
           background,
           width: '100%',
           textAlign: 'left',
           border: 'none',
-          borderBottom: '1px solid #f1f5f9',
+          borderBottom: `1px solid ${palette.divider}`,
           cursor: 'pointer',
           font: 'inherit',
         }}
@@ -137,7 +189,7 @@ function LessonRow({ lesson, index, accent, openLabel, rowClickMode, href, onLes
 
   // ── action mode(기본) 또는 locked/네비게이션 대상 없음: 비클릭 행 + trailing 액션 ──
   return (
-    <div style={{ ...itemStyle, background }} aria-current={ariaCurrent} aria-disabled={accessible ? undefined : true}>
+    <div style={{ ...rowStyle, background }} aria-current={ariaCurrent} aria-disabled={accessible ? undefined : true}>
       {inner}
       {rowClickMode === 'action' && accessible && href && (
         <a href={href} style={{ fontSize: '13px', fontWeight: 600, color: accent, textDecoration: 'none', flexShrink: 0 }}>
@@ -173,8 +225,10 @@ export function LessonList({
   accent = DEFAULT_ACCENT,
   openLabel = '보기',
   rowClickMode = 'action',
+  variant = 'light',
   style,
 }: LessonListProps) {
+  const palette = PALETTES[variant];
   return (
     <div style={style}>
       {lessons.map((lesson, index) => (
@@ -185,6 +239,8 @@ export function LessonList({
           accent={accent}
           openLabel={openLabel}
           rowClickMode={rowClickMode}
+          palette={palette}
+          padded={variant === 'dark'}
           href={!lesson.locked ? hrefFor?.(lesson) : undefined}
           onLessonClick={onLessonClick}
         />

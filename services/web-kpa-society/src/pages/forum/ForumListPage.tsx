@@ -18,7 +18,7 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Link2, Trash2, Sparkles, Tag, AlertCircle, RefreshCw, ChevronDown, X } from 'lucide-react';
+import { Link2, Trash2, Sparkles, Tag, AlertCircle, RefreshCw, ChevronDown } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { BaseTable, ActionBar, RowActionMenu, PageSection, PageContainer, Card, type O4OColumn, type ActionBarAction, type RowActionItem } from '@o4o/ui';
 import { PageHeader } from '../../components/common';
@@ -28,7 +28,13 @@ import { useAuth } from '../../contexts';
 import type { ForumInfo, ForumPost } from '../../types';
 import { buildAiClipboardText, stripHtml, blocksToText } from '../../utils/ai-clipboard';
 // WO-O4O-FORUM-LIST-SHARED-PRIMITIVES-V1 / WO-O4O-FORUM-LIST-PAGINATION-UNIFY-V1: 공통 유틸·페이지네이션
-import { formatForumDate as formatDate, HubPagination } from '@o4o/shared-space-ui';
+// WO-O4O-COMMUNITY-FORUM-KPA-NETURE-VIEW-CONVERGENCE-V1: 목록 상단 toolbar/info bar 공통 부품
+import {
+  formatForumDate as formatDate,
+  HubPagination,
+  ForumListToolbar,
+  ForumListInfoBar,
+} from '@o4o/shared-space-ui';
 
 const PAGE_SIZE = 10;
 
@@ -266,8 +272,7 @@ export function ForumListPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearchSubmit = () => {
     updateParams({ q: searchInput.trim(), page: '' });
   };
 
@@ -573,75 +578,35 @@ export function ForumListPage() {
         </div>
       )}
 
-      {/* Search + Forum Filter (WO-O4O-KPA-FORUM-ALL-SEARCH-AND-FILTER-UX-V1) */}
-      <div className="mb-4">
-        <form
-          className="flex flex-col sm:flex-row gap-2 mb-3"
-          onSubmit={handleSearchSubmit}
-        >
-          {/* 포럼 선택 Combobox */}
+      {/* Search + Forum Filter (WO-O4O-KPA-FORUM-ALL-SEARCH-AND-FILTER-UX-V1)
+          WO-O4O-COMMUNITY-FORUM-KPA-NETURE-VIEW-CONVERGENCE-V1: 공통 ForumListToolbar 로 수렴.
+          포럼 선택 Combobox 는 KPA 고유 필터이므로 filterSlot 으로 주입한다. */}
+      <ForumListToolbar
+        searchValue={searchInput}
+        onSearchChange={setSearchInput}
+        onSearchSubmit={handleSearchSubmit}
+        searchPlaceholder="제목 또는 내용 검색"
+        filterInline
+        filterSlot={
           <ForumCombobox
             forums={forums}
             value={forumParam}
             onChange={handleForumChange}
           />
-
-          {/* 제목/내용 검색 */}
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="제목 또는 내용 검색"
-            className="flex-1 px-3.5 py-2 text-sm border border-slate-200 rounded-md outline-none bg-white"
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 text-sm font-medium text-white bg-primary border-none rounded-md cursor-pointer whitespace-nowrap"
-          >
-            검색
-          </button>
-        </form>
-
-        {/* 글쓰기 버튼 */}
-        {user && (
-          <div className="flex justify-end mb-2">
+        }
+        chips={activeChips}
+        onClearAll={handleClearAll}
+        actionSlot={
+          user ? (
             <Link
               to="/forum/write"
               className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-primary rounded-md no-underline whitespace-nowrap"
             >
               글쓰기
             </Link>
-          </div>
-        )}
-
-        {/* 활성 필터 칩 */}
-        {activeChips.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap px-3 py-2 bg-primary-50 rounded-md border border-primary-200">
-            <span className="text-xs text-primary-600 font-medium shrink-0">필터:</span>
-            {activeChips.map((chip) => (
-              <span
-                key={chip.label}
-                className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-white border border-primary-200 text-primary-700 rounded-full"
-              >
-                {chip.label}
-                <button
-                  type="button"
-                  onClick={chip.onRemove}
-                  className="inline-flex items-center justify-center w-3.5 h-3.5 text-primary-400 hover:text-primary-700 bg-transparent border-none cursor-pointer p-0"
-                >
-                  <X size={10} />
-                </button>
-              </span>
-            ))}
-            <button
-              onClick={handleClearAll}
-              className="ml-auto text-xs text-primary-600 bg-transparent border-none cursor-pointer underline px-1 py-0.5"
-            >
-              전체 초기화
-            </button>
-          </div>
-        )}
-      </div>
+          ) : null
+        }
+      />
 
       {/* Bulk ActionBar */}
       {selectedKeys.size > 0 && (
@@ -654,16 +619,12 @@ export function ForumListPage() {
 
       {/* Info bar */}
       {!loading && (
-        <div className="flex justify-between items-center py-2 mb-1">
-          <span className="text-xs text-slate-500">
-            {hasFilters
-              ? `검색 결과 ${totalCount}건`
-              : `총 ${totalCount}개의 게시글`}
-          </span>
-          {totalPages > 1 && (
-            <span className="text-xs text-slate-400">{currentPage} / {totalPages} 페이지</span>
-          )}
-        </div>
+        <ForumListInfoBar
+          totalCount={totalCount}
+          filtered={hasFilters}
+          currentPage={currentPage}
+          totalPages={totalPages}
+        />
       )}
 
       {/* Desktop: Table */}

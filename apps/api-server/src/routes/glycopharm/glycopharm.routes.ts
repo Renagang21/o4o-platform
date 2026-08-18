@@ -86,6 +86,9 @@ import { createPharmacyContextMiddleware } from './pharmacy-context.middleware.j
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
+// WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1:
+//   폐쇄형 포럼 멤버십 — KCos/Neture/PharmacyHub 가 쓰는 공통 컨트롤러를 그대로 재사용한다.
+import { ForumMembershipController } from '../../controllers/forum/ForumMembershipController.js';
 import { forumContextMiddleware } from '../../middleware/forum-context.middleware.js';
 import { FORUM_ORGS } from '../../controllers/forum/forum-organizations.js';
 
@@ -182,6 +185,8 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const forumRouter = Router();
   const forumController = new ForumController();
+  // WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1
+  const forumMembershipController = new ForumMembershipController();
 
   // Inject service context for all forum routes
   forumRouter.use(forumContextMiddleware({ serviceCode: 'glycopharm', organizationId: FORUM_ORGS.GLYCOPHARM }));
@@ -206,6 +211,12 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
 
   // Forum Directory — Named routes BEFORE :id (path /categories kept for compat)
   forumRouter.get('/categories', forumController.listForums.bind(forumController));
+  // WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1:
+  //   프런트(fetchPopularForums)가 쓰던 generic `/api/v1/forum/categories/popular` 를 이 서비스
+  //   스코프로 옮기기 위한 mount. 공통 ForumDirectoryController.getPopularForums 를 그대로 쓰며
+  //   격리는 forumContextMiddleware → applyContextFilter 계약에 위임한다(신규 로직 없음).
+  //   `/categories/:id` 보다 반드시 먼저 등록해야 'popular' 가 :id 로 잡히지 않는다.
+  forumRouter.get('/categories/popular', forumController.getPopularForums.bind(forumController));
   forumRouter.get('/categories/mine', authenticate, forumController.listMyForums.bind(forumController));
   forumRouter.get('/categories/:id', forumController.getForum.bind(forumController));
   forumRouter.patch('/categories/:id/owner', authenticate, forumController.updateMyForum.bind(forumController));
@@ -213,6 +224,19 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   forumRouter.post('/categories', authenticate, forumController.createForum.bind(forumController));
   forumRouter.put('/categories/:id', authenticate, forumController.updateForum.bind(forumController));
   forumRouter.delete('/categories/:id', authenticate, forumController.deleteForum.bind(forumController));
+
+  // Forum Membership (폐쇄형 포럼 가입/회원 관리)
+  // WO-O4O-GLYCOPHARM-FORUM-SERVICE-BOUNDARY-AND-CROSSSERVICE-READ-WRITE-ISOLATION-FIX-V1:
+  //   프런트 forumMembershipApi 가 쓰던 generic `/api/v1/forum/categories/:id/...` 를 서비스
+  //   스코프로 옮긴다. mount 형태·핸들러·권한은 service-forum.routes.ts(KCos/Neture/PharmacyHub)
+  //   와 동일하며 GlycoPharm 전용 분기를 두지 않는다. 소유자 검증은 기존 ForumMembershipService 계약 그대로.
+  forumRouter.post('/categories/:id/join-requests', authenticate, forumMembershipController.requestJoin.bind(forumMembershipController));
+  forumRouter.get('/categories/:id/join-requests', authenticate, forumMembershipController.listJoinRequests.bind(forumMembershipController));
+  forumRouter.post('/categories/:id/join-requests/:requestId/approve', authenticate, forumMembershipController.approveJoin.bind(forumMembershipController));
+  forumRouter.post('/categories/:id/join-requests/:requestId/reject', authenticate, forumMembershipController.rejectJoin.bind(forumMembershipController));
+  forumRouter.get('/categories/:id/members', authenticate, forumMembershipController.listMembers.bind(forumMembershipController));
+  forumRouter.delete('/categories/:id/members/:userId', authenticate, forumMembershipController.removeMember.bind(forumMembershipController));
+  forumRouter.get('/categories/:id/membership-status', optionalAuth, forumMembershipController.getMembershipStatus.bind(forumMembershipController));
 
   // Moderation
   forumRouter.get('/moderation', authenticate, forumController.getModerationQueue.bind(forumController));
