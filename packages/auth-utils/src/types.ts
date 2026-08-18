@@ -4,6 +4,8 @@ export interface ApiUser {
   email: string;
   fullName?: string;
   name?: string;
+  /** users.name (표시명 정본) — /auth/me toPublicData 가 이 키로 내린다 */
+  displayName?: string;
   role?: string;           // legacy 단일 역할
   roles?: string[];        // RBAC 역할 배열
   status?: string;
