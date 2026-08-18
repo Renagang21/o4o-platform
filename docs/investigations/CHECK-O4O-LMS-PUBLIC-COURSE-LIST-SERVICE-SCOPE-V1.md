@@ -192,6 +192,50 @@ GlycoPharm 자체 강의는 0건이고, 목록 쿼리에 service 조건이 없�
 
 ---
 
-## 12. 문서 정합
+---
 
-발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건 → **해당 없음**
+## 12. 프로덕션 배포 후 검증 (§11)
+
+- 배포: commit `0e6902dc4` → `Deploy API Server (Cloud Run)` **success**, `Deploy Web Services (Cloud Run)` **success**.
+
+### 12-1. API 계약 (배포 후 실측)
+
+| # | 요청 | 결과 |
+|---|---|---|
+| 0 | (배포 전 baseline) generic `?status=published` | KPA 강의 3건 노출 — **결함 재현 확인** |
+| 1 | generic `?serviceKey=k-cosmetics` | `data: []`, total 0 |
+| 2 | generic `?serviceKey=glycopharm` | `data: []`, total 0 |
+| 3 | `/api/v1/kpa/lms/courses?status=published` | 3건, serviceKey 전량 `kpa-society` |
+| 4 | generic `?serviceKey=no-such-service` | **400** `{"code":"INVALID_SERVICE_KEY"}` |
+| 5 | generic serviceKey 미전달 | 3건 (무경계 유지 — legacy/admin 호환 계약대로) |
+
+### 12-2. 브라우저 smoke (Playwright, 실제 프로덕션 도메인)
+
+| 화면 | 결과 |
+|---|---|
+| `kpa-society.co.kr/lms` | HTTP 200 · `/api/v1/kpa/lms/courses` 호출 · **3건 전량 kpa-society** · console error 0 |
+| `kpa-society.co.kr/lms` (로그인) | 5건(회원제 포함) · 전량 KPA · 타 서비스 혼입 0 |
+| KPA 강의 상세 | 200 · 레슨 목록 200 · 정상 렌더 |
+| KPA 레슨 화면 | 정상 렌더. 비로그인 시 `401 → "Authentication required"` 안내 (기존 인증 계약, 백지 아님) |
+| `k-cosmetics.site/lms` | HTTP 200 · 호출 URL 에 **`serviceKey=k-cosmetics` 포함** · 0건 · "등록된 강의가 없습니다" 빈 상태 · console error 0 |
+| `glycopharm.co.kr/lms` | HTTP 200 · 호출 URL 에 **`serviceKey=glycopharm` 포함** · 0건 · 빈 상태 정상 · console error 0 |
+
+**§11 완료 조건**: 백지 화면 **0** / LMS 관련 404·500 **0** / 빈 상태 정상 표시 **확인** /
+cross-service 혼입 **0**.
+
+### 12-3. 범위 밖 기존 결함 (수정하지 않음, 보고만)
+
+KPA 강의 상세 화면에서 LMS 와 무관한 기존 404 가 관측된다. 이번 변경과 무관하며
+(커밋 diff 에 해당 경로 없음) 백엔드에 라우트 자체가 없다.
+
+- `GET /api/v1/kpa/appreciation/lms_course/:id/summary` · `/recent` — 404
+- `GET /api/v1/kpa/legal/documents/published/terms` · `/privacy` — 404
+- `GET /api/v1/public/services/kpa-society/policies/terms` · `/privacy` — 404
+
+→ **별도 WO 제안 1건** (프런트 소비처 vs 백엔드 미구현 라우트 정합).
+
+---
+
+## 13. 문서 정합
+
+발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / **별도 WO 제안 1건** (§12-3)
