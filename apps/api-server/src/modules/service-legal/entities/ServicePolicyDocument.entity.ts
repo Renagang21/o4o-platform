@@ -37,7 +37,7 @@ export class ServicePolicyDocument {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  /** neture | glycopharm | kpa-society | k-cosmetics */
+  /** neture | glycopharm | kpa-society | k-cosmetics | pharmacy-hub */
   @Column({ type: 'varchar', length: 50 })
   service_key!: string;
 
@@ -64,7 +64,7 @@ export class ServicePolicyDocument {
   @Column({ type: 'int', default: 1 })
   version!: number;
 
-  /** draft | published */
+  /** draft | published | archived (물리 삭제 대신 이력 보존) */
   @Column({ type: 'varchar', length: 20, default: 'draft' })
   status!: string;
 

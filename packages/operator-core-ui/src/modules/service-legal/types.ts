@@ -3,7 +3,7 @@
  *
  * WO-O4O-ADMIN-SERVICE-LEGAL-POLICY-SETTINGS-UI-V1
  *
- * 4 service 공통 "법정정보·약관 설정" Admin UI 의 데이터/어댑터 타입.
+ * 5 service 공통 "법정정보·약관 설정" Admin UI 의 데이터/어댑터 타입.
  * 서버 endpoint 가 service-scoped + 인증이 필요하므로, 실제 HTTP 호출은 service 측
  * (각 web-* 의 authClient)에서 구현해 `ServiceLegalApi` 어댑터로 주입한다.
  *
@@ -11,6 +11,7 @@
  *   GET/PUT  /api/v1/admin/services/:serviceKey/legal-profile
  *   GET/POST/PUT /api/v1/admin/services/:serviceKey/policies[/:id]
  *   PATCH    /api/v1/admin/services/:serviceKey/policies/:id/publish
+ *   PATCH    /api/v1/admin/services/:serviceKey/policies/:id/lifecycle
  */
 
 /** 법정정보 (admin DTO — null 허용, placeholder 없음). */
@@ -69,7 +70,7 @@ export interface ServicePolicyDocumentDto {
   slug: string | null;
   content: string;
   version: number;
-  status: string; // draft | published
+  status: string; // draft | published | archived
   effectiveDate: string | null;
   publishedAt: string | null;
   publishedBy: string | null;
@@ -92,6 +93,7 @@ export interface ServicePolicyDocumentInput {
 }
 
 export type PublishAction = 'publish' | 'unpublish';
+export type PolicyLifecycleAction = 'archive' | 'restore';
 
 /**
  * service 측이 구현해 주입하는 어댑터.
@@ -105,6 +107,7 @@ export interface ServiceLegalApi {
   createPolicy(serviceKey: string, payload: ServicePolicyDocumentInput): Promise<ServicePolicyDocumentDto>;
   updatePolicy(serviceKey: string, id: string, payload: ServicePolicyDocumentInput): Promise<ServicePolicyDocumentDto>;
   publishPolicy(serviceKey: string, id: string, action: PublishAction): Promise<ServicePolicyDocumentDto>;
+  changePolicyLifecycle(serviceKey: string, id: string, action: PolicyLifecycleAction): Promise<ServicePolicyDocumentDto>;
 }
 
 /** UI 에 노출하는 정책 문서 유형 화이트리스트 (백엔드와 동일). */

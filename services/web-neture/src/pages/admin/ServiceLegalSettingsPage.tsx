@@ -23,7 +23,7 @@ function toError(err: any): Error {
   if (status === 401) return new Error('로그인이 필요합니다.');
   if (status === 403) return new Error('이 서비스 설정을 수정할 권한이 없습니다.');
   if (status === 404) return new Error(typeof serverMsg === 'string' ? serverMsg : '데이터를 찾을 수 없습니다.');
-  if (status === 400 || status === 422) return new Error(typeof serverMsg === 'string' ? serverMsg : '입력값을 확인해 주세요.');
+  if (status === 400 || status === 409 || status === 422) return new Error(typeof serverMsg === 'string' ? serverMsg : '입력값을 확인해 주세요.');
   return new Error(typeof serverMsg === 'string' ? serverMsg : '서버 오류가 발생했습니다.');
 }
 
@@ -71,6 +71,14 @@ const legalApi: ServiceLegalApi = {
   async publishPolicy(serviceKey, id, action) {
     try {
       const res = await api.patch(`/admin/services/${serviceKey}/policies/${id}/publish`, { action });
+      return res.data?.data;
+    } catch (err) {
+      throw toError(err);
+    }
+  },
+  async changePolicyLifecycle(serviceKey, id, action) {
+    try {
+      const res = await api.patch(`/admin/services/${serviceKey}/policies/${id}/lifecycle`, { action });
       return res.data?.data;
     } catch (err) {
       throw toError(err);

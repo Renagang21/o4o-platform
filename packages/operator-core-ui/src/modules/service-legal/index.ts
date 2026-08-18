@@ -15,5 +15,6 @@ export type {
   ServicePolicyDocumentDto,
   ServicePolicyDocumentInput,
   PublishAction,
+  PolicyLifecycleAction,
   ServiceLegalSettingsPageProps,
 } from './types';
