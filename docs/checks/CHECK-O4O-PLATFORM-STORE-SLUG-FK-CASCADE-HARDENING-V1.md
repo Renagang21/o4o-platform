@@ -165,7 +165,22 @@ KCos·GP(`store-slug-store-id-axis.spec.ts` / `store-slug-canonical-contract.spe
 
 migration 은 CI/CD 자동 적용이 원칙이다(CLAUDE.md §0). **실데이터 organization 삭제 smoke 는 하지 않았다.**
 
-적용 후 검증 결과는 §7-1 에 기록한다.
+### 7-1. 적용 후 production 검증 (read-only)
+
+배포 워크플로 `Deploy API Server (Cloud Run)` run `32107242129` (commit `871e28c1e`) **success** 후 실측.
+
+| 항목 | 결과 |
+|---|---|
+| `typeorm_migrations` 적용 기록 | **`AddPlatformStoreSlugsOrganizationFk20270312000000`** |
+| FK 정의 | `FOREIGN KEY (store_id) REFERENCES organizations(id) **ON DELETE CASCADE**` |
+| `confdeltype` / `convalidated` | `c` / `true` |
+| `platform_store_slugs` 총 row / active | **15 / 15** (pre 와 동일) |
+| orphan (= invalid store_id) | **0** |
+| service_key 분포 | cosmetics 2 / kpa 7 / pharmacy-hub 6 (pre 와 동일) |
+| 중복 slug | 0 |
+| `platform_store_slug_history` | 0 row |
+
+기존 15개 slug 는 손실·변경 없이 그대로다. 실데이터 organization 삭제 smoke 는 수행하지 않았다(§10 금지).
 
 ---
 
