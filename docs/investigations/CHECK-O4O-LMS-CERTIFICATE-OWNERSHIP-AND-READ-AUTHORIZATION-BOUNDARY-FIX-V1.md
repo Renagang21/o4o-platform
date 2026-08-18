@@ -6,7 +6,8 @@
   - [`CHECK-O4O-LMS-ENROLLMENT-OWNERSHIP-AND-AUTHORIZATION-BOUNDARY-FIX-V1`](./CHECK-O4O-LMS-ENROLLMENT-OWNERSHIP-AND-AUTHORIZATION-BOUNDARY-FIX-V1.md)
   - [`CHECK-O4O-DEPLOY-API-VPC-CONNECTOR-RECOVERY-AND-LMS-OWNERSHIP-PRODUCTION-CLOSURE-V1`](./CHECK-O4O-DEPLOY-API-VPC-CONNECTOR-RECOVERY-AND-LMS-OWNERSHIP-PRODUCTION-CLOSURE-V1.md) (§7-4 에서 본 결함을 이월)
 - **일자**: 2026-08-18
-- **시작 commit**: `eb62f361e`
+- **시작 commit**: `eb62f361e` / **최종 commit**: `a07ece90d`
+- **배포**: Deploy API Server run `32104466761` success → Cloud Run revision **`o4o-core-api-03357-nlr`**
 - **최종 판정**: **PASS (production runtime 은 `DATA_FIXTURE_BLOCKED`)**
 
 ---
@@ -130,24 +131,42 @@
 
 ## 8. production 검증 (§12) — `DATA_FIXTURE_BLOCKED`
 
-certificate 가 0건이라 "본인 200 / 타인 404 / cross-service 404" 를 프로덕션 실데이터로 재현할 수 없다. WO §12 에 따라 **검증용 certificate 를 발급하지 않았다**(프로덕션 write 금지). 대신 다음으로 닫는다.
+certificate 가 0건이라 "본인 200 / 타인 404 / cross-service 404" 를 프로덕션 실데이터로 재현할 수 없다. WO §12 에 따라 **검증용 certificate 를 발급하지 않았다**(프로덕션 write 금지). 대신 다음 4가지로 닫는다.
 
-1. 자동화 fixture 테스트 29건 PASS (위 §6)
-2. 배포 commit 에 helper·controller 변경 포함 확인
-3. endpoint 기본 동작이 404(non-disclosure)임을 런타임에서 확인
+1. 자동화 fixture 테스트 29건 PASS (§6)
+2. 배포 commit `a07ece90d` (revision `o4o-core-api-03357-nlr`) 에 owner guard·controller 변경 포함
+3. 배포된 endpoint 의 기본 동작 실측 (아래)
 4. DB 0건 실측 (§7)
+
+배포 후 런타임 실측 (계정 `sohae2100@gmail.com` / `kpa-society`, write 0):
+
+| 검증 | 결과 |
+|---|---|
+| `GET /lms/certificates/{uuid}` | **404 `NOT_FOUND`** (non-disclosure body) |
+| `GET /lms/certificates/number/{no}` | **404 `NOT_FOUND`** |
+| `GET /lms/certificates/{uuid}/pdf` | **404 `NOT_FOUND`** (기존 403 → 404 전환 확인) |
+| `GET /lms/certificates` | 200 · `total=0` (본인 범위) |
+| `GET /lms/certificates/me` | 200 · `total=0` |
+| `GET /kpa/lms/certificates/{uuid}` | **404 `NOT_FOUND`** (remount 경로 동일 계약) |
+| 미인증 private read | **401 `AUTH_REQUIRED`** |
+| 공개 `GET /lms/certificates/{uuid}/verify` (미인증) | **200 `{valid:false}`** — 공개 계약 유지 |
+| `?serviceKey=not-a-service` | **400 `INVALID_SERVICE_KEY`** (조회 이전 차단) |
+| `/health` | 200 |
 
 ## 9. 회귀 스모크 (§13)
 
+실브라우저(Playwright, headless) 실측:
+
 | 대상 | 결과 |
 |---|---|
-| `/health` | 200 |
-| KPA `/lms` 목록 · 강의 상세 · 레슨 | 200 |
-| enrollment / progress | 200 |
-| certificate UI | KPA 에 수료증 화면 없음(공개 검증 페이지만 존재) |
-| K-Cosmetics / GlycoPharm `/lms` | 200 (빈 상태 정상) |
-| 신규 404/500 | 0건 (기존 `kpa/appreciation/lms_course/*` 404 2건은 이번 변경과 무관한 기존 결함) |
+| KPA `/lms` 목록 | 200 · `GET /kpa/lms/courses` n=3 · serviceKey 전부 `kpa-society` · console error **0** |
+| KPA 강의 상세 | 200 · 실패 응답 6건은 **전부 기존 `kpa/appreciation/lms_course/*/summary\|recent` 404** (이번 변경과 무관, §14 제외 항목) |
+| KPA 공개 수료증 검증 페이지 `/certificate/verify/{id}` | 200 · 실패 응답 0 · console error 0 · 무효 수료증 안내 정상 렌더 |
+| K-Cosmetics `/lms` | 200 · n=0 빈 상태 정상 · console error 0 |
+| GlycoPharm `/lms` | 200 · n=0 빈 상태 정상 · console error 0 (최초 관측된 module MIME 에러 7건은 stale chunk 캐시 artifact — cache-bust 재측정 시 **0건**) |
+| 신규 404/500 | **0건** |
 | 백지 화면 / JS 예외 | 0건 |
+| enrollment / progress 회귀 | LMS boundary spec 89건 + 전체 jest 2266건 PASS 로 확인 |
 
 ## 10. 잔존 위험
 
