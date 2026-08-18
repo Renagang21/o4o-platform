@@ -5,7 +5,8 @@
  * WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1:
  *   `@o4o/account-ui` 의 `AccountProfileSection` / `MyPageAuthRequired` 채택.
  *
- * /mypage/profile — 이름 수정. PUT /api/v1/users/profile
+ * /mypage/profile — 이름 수정. PATCH /api/v1/users/me/profile
+ * WO-O4O-CROSS-SERVICE-SELF-PROFILE-WRITE-CONTRACT-V1: canonical self-profile 계약 채택.
  */
 
 import { Link } from 'react-router-dom';
@@ -78,7 +79,7 @@ export default function MyProfilePage() {
 
   const handleSave = async (draft: Record<string, string>) => {
     const patch = { name: draft.name, nickname: draft.nickname, phone: draft.phone };
-    await api.put('/users/profile', patch);
+    await api.patch('/users/me/profile', patch);
     updateUser(patch);
     toast.success('프로필이 수정되었습니다.');
   };

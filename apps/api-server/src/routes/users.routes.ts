@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { UserManagementController } from '../controllers/UserManagementController.js';
 import { authenticate, requireAdmin, type AuthRequest } from '../middleware/auth.middleware.js';
-import { UserController } from '../modules/user/controllers/index.js';
+import { UserController, SelfProfileController } from '../modules/user/controllers/index.js';
 import { UserRole } from '../types/auth.js';
 import { asyncHandler } from '../middleware/error-handler.js';
 import { validationResult } from 'express-validator';
@@ -67,6 +67,27 @@ router.patch(
   asyncHandler(async (req: AuthRequest, res: Response) => {
     return UserController.updateContactSettings(req, res);
   })
+);
+
+// ---------------------------------------------------------------------------
+// WO-O4O-CROSS-SERVICE-SELF-PROFILE-WRITE-CONTRACT-V1
+// GET/PATCH /api/v1/users/me/profile — 인증 사용자의 ACCOUNT_CORE 자기 조회·수정
+//   플랫폼 공통 canonical self-profile 계약 (서비스별 임시 API 금지).
+//   requireAdmin 적용 전에 등록 — 일반 사용자가 호출할 수 있어야 한다.
+//   대상은 항상 req.user.id 이며 body/path 로 다른 사용자를 지목할 수 없다.
+// ---------------------------------------------------------------------------
+router.get(
+  '/me/profile',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    return SelfProfileController.getSelfProfile(req, res);
+  }),
+);
+
+router.patch(
+  '/me/profile',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    return SelfProfileController.updateSelfProfile(req, res);
+  }),
 );
 
 // WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1

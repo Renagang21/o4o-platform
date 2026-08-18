@@ -5,3 +5,4 @@
  */
 
 export * from './user.controller.js';
+export * from './self-profile.controller.js';

@@ -5,7 +5,9 @@
  * WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1:
  *   ProfileCard + ProfileInfoField 목록 + 편집/저장 상태기계 4중 복제를
  *   `@o4o/account-ui` 의 `AccountProfileSection` 으로 수렴.
- *   이 화면은 field 구성 + `PUT /users/profile` adapter 만 담당한다.
+ *   이 화면은 field 구성 + canonical self-profile adapter 만 담당한다.
+ * WO-O4O-CROSS-SERVICE-SELF-PROFILE-WRITE-CONTRACT-V1:
+ *   ACCOUNT_CORE write 를 공통 계약 `PATCH /api/v1/users/me/profile` 로 정렬.
  *
  * /mypage/profile — 이름, 연락처 등 개인정보 편집 전용 페이지.
  */
@@ -112,7 +114,7 @@ export default function MyProfilePage() {
       nickname: draft.nickname,
       phone: draft.phone,
     };
-    await api.put('/users/profile', patch);
+    await api.patch('/users/me/profile', patch);
     updateUser(patch);
     toast.success('프로필이 수정되었습니다.');
   };

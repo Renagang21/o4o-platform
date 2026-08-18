@@ -5,7 +5,8 @@
  * WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1:
  *   `@o4o/account-ui` 의 `AccountProfileSection` / `MyPageAuthRequired` 채택.
  *
- * /mypage/profile — 이름 수정. PUT /api/v1/users/profile
+ * /mypage/profile — 이름 수정. PATCH /api/v1/users/me/profile
+ * WO-O4O-CROSS-SERVICE-SELF-PROFILE-WRITE-CONTRACT-V1: canonical self-profile 계약 채택.
  */
 
 import { User, Mail, Shield } from 'lucide-react';
@@ -59,7 +60,7 @@ export default function MyProfilePage() {
   };
 
   const handleSave = async (draft: Record<string, string>) => {
-    await api.put('/users/profile', { name: draft.name });
+    await api.patch('/users/me/profile', { name: draft.name });
     updateUser({ name: draft.name });
     toast.success('프로필이 수정되었습니다.');
   };

@@ -63,7 +63,7 @@ function defaultErrorMessage(err: unknown): string {
  * GlycoPharm / K-Cosmetics / Neture / Pharmacy-Hub 의 프로필 화면에 4벌 복제돼 있던
  * "ProfileCard + ProfileInfoField 목록 + 편집/저장 상태기계" 를 단일 구현으로 수렴한다.
  * 서비스 차이는 `fields` 구성과 `onSave` adapter 로만 표현한다 —
- * API 계약(`PUT /users/profile` vs `PATCH /pharmacy-hub/...`)은 호출자가 흡수한다.
+ * API 계약(canonical `PATCH /api/v1/users/me/profile` 등)은 호출자가 흡수한다.
  */
 export function AccountProfileSection({
   initial,

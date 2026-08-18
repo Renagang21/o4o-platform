@@ -14,11 +14,14 @@
  *    렌더하지 않으므로 운영자에게 store_owner 자산이 노출되지 않는다.
  * ⚠️ 비밀번호는 모달 밖으로 나가지 않는다 — 상태 저장·로깅 금지.
  *
+ * WO-O4O-CROSS-SERVICE-SELF-PROFILE-WRITE-CONTRACT-V1:
+ *   프로필 계약이 플랫폼 공통 `GET/PATCH /api/v1/users/me/profile` 로 확정돼,
+ *   운영자·공급자·매장주 구분 없이 인증 사용자 본인이 자기 ACCOUNT_CORE 를 수정한다.
+ *
  * 편집 가능 여부는 **역할 하드코딩이 아니라 서버 응답으로** 결정한다:
- *   GET /pharmacy-hub/store-owner/account/profile 이 200 이면 편집 가능,
- *   403 이면 조회 전용으로 떨어진다. 프론트에서 가드를 완화하지 않으며 403 을
- *   회피하려고 store_owner 경로를 억지로 열지 않는다.
- *   (운영자 본인 프로필의 수정 계약은 backend 부재 — CHECK 문서 잔여 항목 참조)
+ *   응답의 `editableFields` 에 들어 있는 필드만 편집 가능하게 렌더한다.
+ *   프론트에서 가드를 완화하지 않으며, 403 을 회피하려고 store_owner 경로를
+ *   억지로 열지 않는다.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -45,7 +48,7 @@ import { errorMessage, errorStatus } from '../../lib/api/pharmacyHubOrders';
 import { useAuth } from '../../contexts/AuthContext';
 import { ROLE_LABELS, ROLES, SERVICE_KEY } from '../../config/service';
 
-/** 편집 가능 계정의 필드 구성 (서버 editableFields = name · nickname · phone 과 같은 축) */
+/** 편집 가능 계정의 필드 구성 (서버 editableFields 와 같은 축: name · nickname · phone) */
 const FIELDS: AccountProfileFieldSpec[] = [
   { key: 'name', label: '이름', icon: <UserIcon className="h-4 w-4 text-gray-400" /> },
   { key: 'nickname', label: '닉네임' },
@@ -71,8 +74,8 @@ function resolveRoleLabel(roles: readonly string[]): string {
 }
 
 /**
- * 수정 계약이 없는 계정의 조회 폴백. 세션(GET /auth/me)이 이미 보유한 값만 쓴다 —
- * 이 화면 때문에 새 backend 계약을 만들지 않는다.
+ * 조회 폴백. canonical 계약이 어떤 이유로 거부되면(403) 세션(GET /auth/me)이 이미
+ * 보유한 값만으로 조회 전용 화면을 유지한다 — 화면을 빈 오류로 떨어뜨리지 않는다.
  */
 function profileFromSession(user: Record<string, unknown> | null): AccountProfile | null {
   if (!user) return null;
@@ -115,12 +118,14 @@ export default function MyProfilePage({
       return;
     }
     try {
-      setProfile(await fetchAccountProfile());
-      setCanEdit(true);
+      const loaded = await fetchAccountProfile();
+      setProfile(loaded);
+      // 서버가 알려준 편집 가능 필드로만 판단한다 (역할 하드코딩 금지).
+      setCanEdit((loaded.editableFields?.length ?? 0) > 0);
     } catch (err) {
       const status = errorStatus(err);
       if (status === 403) {
-        // 프로필 수정 계약이 없는 계정(운영자·공급자 등) — 세션 값으로 조회만 제공한다.
+        // 예외적으로 계약이 거부된 계정 — 세션 값으로 조회만 제공한다.
         const fallback = profileFromSession(user as Record<string, unknown> | null);
         if (fallback) {
           setProfile(fallback);
