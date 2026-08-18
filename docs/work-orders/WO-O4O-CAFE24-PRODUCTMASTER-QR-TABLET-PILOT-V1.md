@@ -1,13 +1,15 @@
 # WO-O4O-CAFE24-PRODUCTMASTER-QR-TABLET-PILOT-V1
 
-> **상태**: 핸드오프 (미실행) · **작성일**: 2026-08-18
+> **상태**: 핸드오프 (미실행) · **작성일**: 2026-08-18 · **범위 보강**: 2026-08-18 (Digital Signage 추가)
 > 이 WO 는 다른 작업방/작업자에게 넘기기 위한 요청서다. 상단에 즉시 실행 지시가 없으면 착수하지 않는다.
+> 파일명은 초판 그대로 유지한다 (rename 하지 않는다). 실제 범위는 **QR + Tablet + Digital Signage** 다.
 
 ## 목적
 
 Cafe24 쇼핑몰 사업자가 기존 상품·회원·주문·결제·배송 구조를 그대로 유지하면서,
-O4O ProductMaster와 상품을 연결하고 O4O의 QR·Tablet 기능을 이용할 수 있는
-최소 실사용 Pilot을 구현한다.
+O4O ProductMaster와 상품을 연결하고
+O4O의 제품 설명서·QR·Tablet·Digital Signage 기능을
+매장 판매지원에 이용할 수 있는 최소 실사용 Pilot을 구현한다.
 
 이번 Pilot의 사업 범위는 다음뿐이다.
 
@@ -16,6 +18,7 @@ Cafe24 상품
 → O4O 제품정보/설명서
 → QR
 → Tablet
+→ Digital Signage
 
 주문·결제·배송·회원·재고·이벤트·유통참여형 펀딩은 범위 밖이다.
 
@@ -58,7 +61,8 @@ Cafe24 상품
 - O4O 표준 제품 설명서/콘텐츠
 - QR 기능
 - Tablet 기능
-- QR/Tablet 사용기록
+- Digital Signage 기능
+- QR/Tablet/Signage 사용기록
 
 ### 절대 하지 않을 것
 
@@ -118,6 +122,31 @@ Cafe24에서 필요한 것은 기존 Master의 lookup뿐이다.
 - @o4o/tablet-kiosk-core
 
 특히 API 주입 방식과 O4O 내부 store/user/serviceKey 의존성을 확인한다.
+
+### Digital Signage
+
+현재 O4O Digital Signage 구조를 확인한다.
+
+- store 기준 playlist / screen / playback 구조
+- media/content ownership
+- product/content를 playlist에 추가하는 경로
+- publish 계약
+- public playback 계약
+- store / organization / serviceKey 의존성
+- supplier/operator/store 전용 권한 결합 여부
+- usage/report/event 구조
+
+Cafe24 Pilot에서는 기존 Signage 구조를 최대한 재사용한다.
+
+이미 supplier signage media/campaign/report, public playback,
+`digital-signage-core` 가 존재하므로
+이 작업은 **새 Signage 시스템 구축이 아니라 기존 구조의 외부 소비 가능성 조사**다.
+
+단, Signage 사용을 위해 기존 supplier 유통구조나
+특정 서비스 membership을 만들어야만 한다면 억지로 편입하지 않는다.
+
+그 경우 Cafe24 external commerce account가
+Signage를 사용할 수 있도록 하는 최소 adapter 경계를 CHECK에 기록한다.
 
 ---
 
@@ -206,6 +235,7 @@ Cafe24 상품 A
 - O4O 제품 설명서 확인
 - QR 사용
 - Tablet에 추가
+- Digital Signage에 추가
 
 예:
 
@@ -215,6 +245,7 @@ O4O 연결: PM-xxxxx
 [제품 설명서]
 [QR]
 [Tablet에 추가]
+[Signage에 추가]
 
 ---
 
@@ -278,7 +309,81 @@ O4O Tablet 범위 밖:
 
 ---
 
-## 10. 화면 목표
+## 10. Digital Signage Pilot
+
+기존 O4O Digital Signage 구조를 최대한 재사용한다.
+
+목표:
+
+Cafe24 상품
+→ ProductMaster
+→ O4O 제품/콘텐츠
+→ Signage Playlist
+→ 매장 디스플레이
+
+초기 Pilot의 기능은 최소화한다.
+
+Cafe24 상품 목록 또는 연결된 ProductMaster에서:
+
+[Signage에 추가]
+
+를 선택하면
+해당 상품 또는 연결된 O4O 콘텐츠를
+기존 Signage Playlist에 추가할 수 있게 한다.
+
+Pilot에서 필요한 최소 기능:
+
+- Signage 대상 매장/화면 확인
+- 기존 playlist 조회
+- 상품/콘텐츠 추가
+- 상품/콘텐츠 제거
+- 순서 확인
+- publish
+- 실제 playback 확인
+
+### 원장 경계
+
+Tablet과 동일하게 Cafe24 상품 자체를 Signage 콘텐츠로 저장하지 않는다.
+
+금지:
+
+```text
+Cafe24 Product (name / price / stock / description / image)
+  → O4O Signage DB 로 복제
+```
+
+기본:
+
+```text
+Cafe24 Product 101
+      ↓ mapping
+ProductMaster PM-001
+      ↓
+O4O Signage Content
+```
+
+Cafe24는 상품 원장이고,
+O4O Digital Signage가 화면/playlist/content 원장이다.
+
+Cafe24의 상품 이미지·가격을 Signage에 표시하려는 요구가 실제로 나오면
+그때 별도 runtime data source로 검토한다. 초기에는 넣지 않는다.
+
+### 초기 범위 밖
+
+다음은 구현하지 않는다.
+
+- 판매량 기반 자동 편성
+- 재고 기반 자동 편성
+- Cafe24 프로모션 자동 반영
+- 광고 입찰
+- 공급자 캠페인 자동 연결
+- 복잡한 스케줄링
+- Signage 전용 신규 CMS
+- Cafe24 상품 상세정보를 Signage 원장으로 복제
+
+---
+
+## 11. 화면 목표
 
 Pilot에서는 Cafe24 앱 안에서 다음 한 화면이면 충분하다.
 
@@ -289,19 +394,22 @@ Pilot에서는 Cafe24 앱 안에서 다음 한 화면이면 충분하다.
 - 상품 총수
 - O4O 연결수
 - 미연결수
+- QR 사용수
+- Tablet 사용수
+- Signage 사용수
 
 상품 목록:
 
 상품명 | Cafe24 ID | O4O 연결 | 액션
 
-상품 A | 101 | PM-001 | 설명서 / QR / Tablet
+상품 A | 101 | PM-001 | 설명서 / QR / Tablet / Signage
 상품 B | 102 | 미연결 | O4O 상품 찾기
 
 복잡한 Dashboard 만들지 않는다.
 
 ---
 
-## 11. Naver / Coupang 범위
+## 12. Naver / Coupang 범위
 
 이번 코드 작업에서 다음은 구현 금지.
 
@@ -327,7 +435,7 @@ O4O ProductMaster 데이터가 Market Plus 상품 등록에
 
 ---
 
-## 12. 검증
+## 13. 검증
 
 최소 실제 흐름을 통과시킨다.
 
@@ -338,13 +446,14 @@ O4O ProductMaster 데이터가 Market Plus 상품 등록에
 5. 설명서 확인
 6. QR 생성/접근
 7. Tablet Screen Set에 추가
-8. 기존 O4O 서비스 회귀 없음
+8. Digital Signage Playlist에 추가 및 playback 확인
+9. 기존 O4O 서비스 회귀 없음
 
 가능하면 여러 상품으로 매칭 결과도 기록한다.
 
 ---
 
-## 13. CHECK
+## 14. CHECK
 
 작성:
 
@@ -361,6 +470,13 @@ docs/investigations/CHECK-O4O-CAFE24-PRODUCTMASTER-QR-TABLET-PILOT-V1.md
 - 신규 코드
 - QR 계약 결과
 - Tablet 계약 결과
+- Signage 기존 구조 및 ownership
+- Cafe24 external account에서 Signage 사용 가능 여부
+- playlist/product/content 연결 방식
+- publish/playback 결과
+- 기존 Signage 코드 재사용 부분
+- 신규 adapter 필요 여부
+- serviceKey/store membership 결합 여부
 - Supplier/Offer/Listing 생성 0 확인
 - 주문/회원/결제 API 사용 0 확인
 - browser smoke
@@ -369,13 +485,14 @@ docs/investigations/CHECK-O4O-CAFE24-PRODUCTMASTER-QR-TABLET-PILOT-V1.md
 
 ---
 
-## 14. 중지 조건
+## 15. 중지 조건
 
 다음은 억지로 구현하지 않는다.
 
 - Cafe24 상품 식별정보가 ProductMaster 매칭에 현저히 부족
 - QR 접근정책을 바꿔야만 Pilot 가능
 - Tablet 사용에 기존 O4O membership/store 생성이 필수
+- Signage 사용에 기존 supplier 유통구조 또는 특정 service membership 생성이 필수
 - Cafe24 앱을 기존 supplier/serviceKey로 넣어야만 동작
 - 기존 ProductMaster를 수정해야만 매핑 가능
 - 주문/회원 권한을 받아야만 기본 Pilot 가능
@@ -384,7 +501,7 @@ docs/investigations/CHECK-O4O-CAFE24-PRODUCTMASTER-QR-TABLET-PILOT-V1.md
 
 ---
 
-## 15. 완료
+## 16. 완료
 
 코드/DB 변경이 필요한 경우 최소 범위로 구현하고:
 
@@ -401,7 +518,25 @@ docs/investigations/CHECK-O4O-CAFE24-PRODUCTMASTER-QR-TABLET-PILOT-V1.md
 
 ---
 
-## 부록 — 참고 근거 (조사 시점 2026-08-18)
+## 부록 A — Pilot 의 제품 개념
+
+> **Cafe24 사업자가 자기 쇼핑몰 상품을 O4O ProductMaster에 연결하고,
+> 그 상품을 매장에서 설명서·QR·Tablet·Digital Signage로 활용하게 하는 서비스**
+
+역할 구분:
+
+```text
+거래 (온라인 판매) = Cafe24        매장 판매지원 = O4O
+  Cafe24                             ProductMaster
+  → 자사몰                            → 제품 설명서
+  → Naver                             → QR
+  → Coupang                           → Tablet
+  → 주문/결제/배송                     → Digital Signage
+```
+
+---
+
+## 부록 B — 참고 근거 (조사 시점 2026-08-18)
 
 - Cafe24 개발자 등록 시 테스트 쇼핑몰 자동 생성, 일반 앱은 OAuth 2.0 승인 후 Admin API 호출: https://developers.cafe24.com/docs-new/en/docs/guide/intro
 - 상품 단건 조회는 `READ_PRODUCT` scope 로 가능 (주문·회원 권한 불필요): https://developers.cafe24.com/docs-new/docs/admin/get-products-by-product-no
