@@ -154,8 +154,9 @@ API 서버는 **`apps/api-server/.env`** 만 읽습니다 (루트 `.env` 아님)
 
 운영 DB에 대한 write는 CLAUDE.md §0의 승인 규칙을 그대로 따릅니다 (read-only 검증만 자유).
 
-다른 인스턴스(`neture-db` 등)에 연결하려면 `start-cloud-sql-proxy.cmd`의
-`INSTANCE_CONNECTION_NAME`을 수정합니다.
+다른 인스턴스에 연결하려면 `start-cloud-sql-proxy.cmd`의
+`INSTANCE_CONNECTION_NAME`을 수정합니다. 현재 이 프로젝트의 Cloud SQL 인스턴스는
+`o4o-platform-db` 하나뿐입니다 (`neture-db` 는 2026-08-18 영구 삭제).
 
 **마이그레이션은 `main` 배포 시 CI/CD에서 자동 실행**됩니다 (CLAUDE.md §0).
 로컬 수동 실행은 예외 상황에 한정합니다.
