@@ -11,18 +11,27 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { CourseCard, type CourseCardView } from '@o4o/lms-ui';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { lmsApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
 import type { InstructorPublicProfile, InstructorCourseItem } from '../../types';
 
 
-const formatDuration = (minutes: number) => {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  if (h > 0) return m > 0 ? `${h}시간 ${m}분` : `${h}시간`;
-  return `${m}분`;
-};
+/**
+ * WO-O4O-COMMUNITY-LMS-COURSE-LIST-AND-HUB-VIEW-COMMONIZATION-V1:
+ * 지역 CourseCard(카드 JSX/배지/메타/푸터 중복)를 공통 `CourseCard`(@o4o/lms-ui)로 수렴.
+ * 강사 고유 정보(학점)는 badgeSlot 으로 주입한다.
+ */
+const toCardView = (course: InstructorCourseItem): CourseCardView => ({
+  id: course.id,
+  title: course.title,
+  description: course.description,
+  thumbnailUrl: course.thumbnail,
+  durationMinutes: course.duration,
+  enrollmentCount: course.currentEnrollments,
+  isPaid: course.isPaid,
+});
 
 export function InstructorProfilePage() {
   const { userId } = useParams<{ userId: string }>();
@@ -124,7 +133,23 @@ export function InstructorProfilePage() {
       ) : (
         <div style={styles.courseGrid}>
           {courses.map(course => (
-            <CourseCard key={course.id} course={course} />
+            <CourseCard
+              key={course.id}
+              course={toCardView(course)}
+              href={`/courses/${course.id}`}
+              accent={colors.primary}
+              freeBadge
+              priceLabel={course.price ? `₩${course.price.toLocaleString()}` : undefined}
+              badgeSlot={course.credits > 0 ? <span style={styles.creditBadge}>🎓 {course.credits}학점</span> : undefined}
+              footerSlot={
+                <>
+                  <span style={styles.enrollCount}>
+                    {course.currentEnrollments > 0 ? `${course.currentEnrollments}명 수강중` : '새 강좌'}
+                  </span>
+                  <span style={styles.detailLink}>자세히 보기 →</span>
+                </>
+              }
+            />
           ))}
         </div>
       )}
@@ -138,45 +163,6 @@ function StatBox({ label, value }: { label: string; value: number }) {
       <div style={styles.statValue}>{value}</div>
       <div style={styles.statLabel}>{label}</div>
     </Card>
-  );
-}
-
-function CourseCard({ course }: { course: InstructorCourseItem }) {
-  return (
-    <Link to={`/courses/${course.id}`} style={styles.courseLink}>
-      <Card hover padding="none">
-        <div style={styles.courseThumbnail}>
-          {course.thumbnail ? (
-            <img src={course.thumbnail} alt={course.title} style={styles.thumbnailImage} />
-          ) : (
-            <div style={styles.thumbnailPlaceholder}>📚</div>
-          )}
-        </div>
-        <div style={styles.courseContent}>
-          <div style={styles.courseHeader}>
-            {course.isPaid ? (
-              <span style={styles.paidBadge}>
-                유료{course.price ? ` ₩${course.price.toLocaleString()}` : ''}
-              </span>
-            ) : (
-              <span style={styles.freeBadge}>무료</span>
-            )}
-          </div>
-          <h3 style={styles.courseTitle}>{course.title}</h3>
-          <p style={styles.courseDescription}>{course.description}</p>
-          <div style={styles.courseMeta}>
-            <span>⏱ {formatDuration(course.duration)}</span>
-            {course.credits > 0 && <span>🎓 {course.credits}학점</span>}
-          </div>
-          <div style={styles.courseFooter}>
-            <span style={styles.enrollCount}>
-              {course.currentEnrollments > 0 ? `${course.currentEnrollments}명 수강중` : '새 강좌'}
-            </span>
-            <span style={styles.detailLink}>자세히 보기 →</span>
-          </div>
-        </div>
-      </Card>
-    </Link>
   );
 }
 
@@ -282,80 +268,6 @@ const styles: Record<string, React.CSSProperties> = {
     gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
     gap: '24px',
   },
-  courseLink: {
-    textDecoration: 'none',
-    color: 'inherit',
-  },
-  courseThumbnail: {
-    height: '160px',
-    backgroundColor: colors.neutral100,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderTopLeftRadius: '12px',
-    borderTopRightRadius: '12px',
-    overflow: 'hidden',
-  },
-  thumbnailImage: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  },
-  thumbnailPlaceholder: {
-    fontSize: '48px',
-  },
-  courseContent: {
-    padding: '20px',
-  },
-  courseHeader: {
-    display: 'flex',
-    gap: '8px',
-    marginBottom: '12px',
-  },
-  freeBadge: {
-    padding: '2px 8px',
-    backgroundColor: '#ecfdf5',
-    color: '#059669',
-    borderRadius: '4px',
-    fontSize: '12px',
-    fontWeight: 500,
-  },
-  paidBadge: {
-    padding: '2px 8px',
-    backgroundColor: '#fef3c7',
-    color: '#92400e',
-    borderRadius: '4px',
-    fontSize: '12px',
-    fontWeight: 500,
-  },
-  courseTitle: {
-    ...typography.headingS,
-    color: colors.neutral900,
-    margin: 0,
-    marginBottom: '8px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-  },
-  courseDescription: {
-    ...typography.bodyS,
-    color: colors.neutral500,
-    marginBottom: '12px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-  },
-  courseMeta: {
-    display: 'flex',
-    gap: '12px',
-    ...typography.bodyS,
-    color: colors.neutral500,
-    flexWrap: 'wrap',
-  },
   courseFooter: {
     marginTop: '12px',
     paddingTop: '12px',
@@ -363,6 +275,14 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  creditBadge: {
+    padding: '2px 10px',
+    borderRadius: '9999px',
+    backgroundColor: '#eef2ff',
+    color: '#4338ca',
+    fontSize: '12px',
+    fontWeight: 600,
   },
   enrollCount: {
     ...typography.bodyS,

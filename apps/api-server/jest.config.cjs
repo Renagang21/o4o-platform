@@ -18,6 +18,9 @@ module.exports = {
         esModuleInterop: true,
         allowSyntheticDefaultImports: true,
         types: ['jest', 'node'],
+        // WO-O4O-COMMUNITY-LMS-COURSE-LIST-AND-HUB-VIEW-COMMONIZATION-V1:
+        // 공통 LMS View(.tsx) 를 react-dom/server 로 정적 렌더해 계약을 고정한다.
+        jsx: 'react-jsx',
       },
       useESM: false, // Disable ESM for ts-jest
       diagnostics: false,

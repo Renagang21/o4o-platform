@@ -4,8 +4,10 @@
  * WO-O4O-LMS-COURSECARD-RETIRE-OR-SPECIALIZE-V1 (specialize / dormant)
  *
  * 역할: CourseCard 카드들의 grid + loading/error/empty shell. featured / 추천 / 관련 강의 등
- * **카드형 노출면**용. `/lms` 목록 hub 의 canonical 표현 아님 — canonical hub 목록은
- * `LmsHubTemplate`(@o4o/shared-space-ui, 테이블). 현재 실서비스 소비처 없음(dormant).
+ * **소규모 카드형 노출면**용 최소 shell. `/lms` 목록 hub 의 canonical 표현 아님 — canonical hub
+ * 목록은 `LmsHubTemplate`(@o4o/shared-space-ui, 테이블).
+ * 검색·필터·페이지네이션을 포함한 카드형 **목록 화면**은 `views/CourseListView` 를 쓴다
+ * (WO-O4O-COMMUNITY-LMS-COURSE-LIST-AND-HUB-VIEW-COMMONIZATION-V1). 현재 소비처 없음(dormant).
  */
 import type { CSSProperties, ReactNode } from 'react';
 import type { CourseCardView } from '../types';

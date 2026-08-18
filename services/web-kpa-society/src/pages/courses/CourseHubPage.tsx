@@ -1,20 +1,23 @@
 /**
  * CourseHubPage - Course 허브 (공개 탐색 페이지)
  *
- * WO-CONTENT-COURSE-HUB-DESIGN-V1
+ * WO-CONTENT-COURSE-HUB-DESIGN-V1 (최초 설계)
+ * WO-O4O-COMMUNITY-LMS-COURSE-LIST-AND-HUB-VIEW-COMMONIZATION-V1:
+ *   자체 카드 grid / 검색 / 필터 chip / loading·error·empty / 페이지네이션 JSX 를
+ *   공통 `CourseListView`(@o4o/lms-ui)로 수렴. 본 페이지는 데이터 조회 + route +
+ *   서비스 config 만 담당한다(presentational 중복 제거).
  *
- * 플랫폼 내 모든 공개 Course를 콘텐츠처럼 탐색.
- * - /courses 경로
- * - 미인증: 로그인 유도
- * - 인증: 검색 + 필터 + 카드 그리드
- * - Core/DB/API 변경 없음
+ * 유지되는 KPA 고유 동작:
+ *   - 미인증 시 로그인 유도 게이트(gateSlot)
+ *   - 가격 필터(무료/유료) — API 미지원이라 client-side 필터
+ *   - 상세 경로 `/courses/:id`
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { PageSection, PageContainer } from '@o4o/ui';
-import { LoadError } from '@o4o/ui';
-import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
+import { CourseListView, type CourseCardView } from '@o4o/lms-ui';
+import { PageHeader, LoadingSpinner, EmptyState, Pagination } from '../../components/common';
 import { lmsApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { useAuthModal } from '../../contexts/LoginModalContext';
@@ -22,6 +25,27 @@ import { colors, typography } from '../../styles/theme';
 import type { Course } from '../../types';
 
 type PriceFilter = 'all' | 'free' | 'paid';
+
+const PRICE_OPTIONS = [
+  { key: 'all', label: '전체' },
+  { key: 'free', label: '무료' },
+  { key: 'paid', label: '유료' },
+];
+
+/** Course(API) → 공통 카드 view model. */
+function toCardView(c: Course): CourseCardView {
+  return {
+    id: c.id,
+    title: c.title,
+    description: c.description,
+    thumbnailUrl: c.thumbnail,
+    instructorName: (c as any).instructor?.name || c.instructorName || undefined,
+    lessonCount: c.lessonCount,
+    durationMinutes: c.duration,
+    enrollmentCount: c.enrollmentCount,
+    isPaid: !!c.isPaid,
+  };
+}
 
 export function CourseHubPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -70,32 +94,31 @@ export function CourseHubPage() {
 
   // Client-side price filter (API doesn't support isPaid filter)
   const filteredCourses = useMemo(() => {
-    if (currentPrice === 'all') return courses;
-    return courses.filter(c =>
-      currentPrice === 'free' ? !c.isPaid : !!c.isPaid
-    );
+    const scoped = currentPrice === 'all'
+      ? courses
+      : courses.filter(c => (currentPrice === 'free' ? !c.isPaid : !!c.isPaid));
+    return scoped.map(toCardView);
   }, [courses, currentPrice]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const priceOf = useMemo(() => {
+    const map = new Map<string, number | undefined>();
+    courses.forEach(c => map.set(c.id, c.price));
+    return map;
+  }, [courses]);
+
+  const applySearch = () => {
     setSearchParams(prev => {
-      if (searchInput.trim()) {
-        prev.set('search', searchInput.trim());
-      } else {
-        prev.delete('search');
-      }
+      if (searchInput.trim()) prev.set('search', searchInput.trim());
+      else prev.delete('search');
       prev.set('page', '1');
       return prev;
     });
   };
 
-  const handlePriceFilter = (filter: PriceFilter) => {
+  const handlePriceFilter = (filter: string) => {
     setSearchParams(prev => {
-      if (filter === 'all') {
-        prev.delete('price');
-      } else {
-        prev.set('price', filter);
-      }
+      if (filter === 'all') prev.delete('price');
+      else prev.set('price', filter);
       prev.set('page', '1');
       return prev;
     });
@@ -106,13 +129,6 @@ export function CourseHubPage() {
       prev.set('page', String(page));
       return prev;
     });
-  };
-
-  const formatDuration = (minutes: number) => {
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    if (h > 0) return m > 0 ? `${h}시간 ${m}분` : `${h}시간`;
-    return `${m}분`;
   };
 
   // 미인증 상태
@@ -140,117 +156,68 @@ export function CourseHubPage() {
   return (
     <PageSection last>
       <PageContainer>
-      <PageHeader
-        title="강좌"
-        description="플랫폼 교육 콘텐츠를 탐색하세요"
-        breadcrumb={[{ label: '홈', href: '/' }, { label: '강좌' }]}
-      />
-
-      {/* Search */}
-      <form onSubmit={handleSearch} style={styles.searchForm}>
-        <input
-          type="text"
-          value={searchInput}
-          onChange={e => setSearchInput(e.target.value)}
-          placeholder="강좌 검색..."
-          style={styles.searchInput}
-        />
-        <button type="submit" style={styles.searchButton}>
-          검색
-        </button>
-      </form>
-
-      {/* Price filter chips */}
-      <div style={styles.filterRow}>
-        {(['all', 'free', 'paid'] as PriceFilter[]).map(filter => (
-          <button
-            key={filter}
-            onClick={() => handlePriceFilter(filter)}
-            style={{
-              ...styles.filterChip,
-              ...(currentPrice === filter ? styles.filterChipActive : {}),
-            }}
-          >
-            {filter === 'all' ? '전체' : filter === 'free' ? '무료' : '유료'}
-          </button>
-        ))}
-      </div>
-
-      {/* Course Grid */}
-      {loadError ? (
-        <LoadError onRetry={() => void loadData()} />
-      ) : filteredCourses.length === 0 ? (
-        <EmptyState
-          icon="📋"
-          title={currentSearch ? '검색 결과가 없습니다' : '등록된 강좌가 없습니다'}
-          description={currentSearch
-            ? `"${currentSearch}"에 대한 검색 결과가 없습니다.`
-            : '곧 새로운 강좌가 등록될 예정입니다.'
+        <CourseListView
+          courses={filteredCourses}
+          loading={false}
+          error={loadError}
+          onRetry={() => void loadData()}
+          accent={colors.primary}
+          hrefFor={(course) => `/courses/${course.id}`}
+          freeBadge
+          priceLabelFor={(course) => {
+            const price = priceOf.get(course.id);
+            return price ? `₩${price.toLocaleString()}` : undefined;
+          }}
+          renderCardFooter={(course) => (
+            <>
+              <span style={styles.enrollCount}>
+                {(course.enrollmentCount ?? 0) > 0 ? `${course.enrollmentCount}명 수강중` : '새 강좌'}
+              </span>
+              <span style={styles.detailLink}>자세히 보기 →</span>
+            </>
+          )}
+          headerSlot={
+            <PageHeader
+              title="강좌"
+              description="플랫폼 교육 콘텐츠를 탐색하세요"
+              breadcrumb={[{ label: '홈', href: '/' }, { label: '강좌' }]}
+            />
           }
-        />
-      ) : (
-        <>
-          <div style={styles.courseGrid}>
-            {filteredCourses.map(course => (
-              <Link key={course.id} to={`/courses/${course.id}`} style={styles.courseLink}>
-                <Card hover padding="none">
-                  <div style={styles.courseThumbnail}>
-                    {course.thumbnail ? (
-                      <img src={course.thumbnail} alt={course.title} style={styles.thumbnailImage} />
-                    ) : (
-                      <div style={styles.thumbnailPlaceholder}>📚</div>
-                    )}
-                  </div>
-                  <div style={styles.courseContent}>
-                    <div style={styles.courseHeader}>
-                      {course.isPaid ? (
-                        <span style={styles.paidBadge}>
-                          유료{course.price ? ` ₩${course.price.toLocaleString()}` : ''}
-                        </span>
-                      ) : (
-                        <span style={styles.freeBadge}>무료</span>
-                      )}
-                    </div>
-                    <h3 style={styles.courseTitle}>{course.title}</h3>
-                    <p style={styles.courseDescription}>{course.description}</p>
-                    <div style={styles.courseMeta}>
-                      <span>👤 {(course as any).instructor?.name || course.instructorName || '-'}</span>
-                      <span>📖 {course.lessonCount}개 강의</span>
-                      <span>⏱ {formatDuration(course.duration)}</span>
-                    </div>
-                    <div style={styles.courseFooter}>
-                      <span style={styles.enrollCount}>
-                        {course.enrollmentCount > 0 ? `${course.enrollmentCount}명 수강중` : '새 강좌'}
-                      </span>
-                      <span style={styles.detailLink}>자세히 보기 →</span>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
-
-          {totalPages > 1 && (
+          search={{
+            value: searchInput,
+            onChange: setSearchInput,
+            onSubmit: applySearch,
+            placeholder: '강좌 검색...',
+          }}
+          filters={{
+            value: currentPrice,
+            options: PRICE_OPTIONS,
+            onChange: handlePriceFilter,
+          }}
+          emptyState={
+            <EmptyState
+              icon="📋"
+              title={currentSearch ? '검색 결과가 없습니다' : '등록된 강좌가 없습니다'}
+              description={currentSearch
+                ? `"${currentSearch}"에 대한 검색 결과가 없습니다.`
+                : '곧 새로운 강좌가 등록될 예정입니다.'
+              }
+            />
+          }
+          paginationSlot={totalPages > 1 ? (
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={handlePageChange}
             />
-          )}
-        </>
-      )}
+          ) : undefined}
+        />
       </PageContainer>
     </PageSection>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  container: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    padding: '0 20px 40px',
-  },
-
   // Login prompt
   loginPrompt: {
     display: 'flex',
@@ -287,142 +254,6 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
   },
 
-  // Search
-  searchForm: {
-    display: 'flex',
-    gap: '8px',
-    marginBottom: '16px',
-  },
-  searchInput: {
-    flex: 1,
-    padding: '12px 16px',
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '8px',
-    fontSize: '15px',
-    outline: 'none',
-  },
-  searchButton: {
-    padding: '12px 24px',
-    backgroundColor: colors.primary,
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '15px',
-    fontWeight: 500,
-    cursor: 'pointer',
-    flexShrink: 0,
-  },
-
-  // Filters
-  filterRow: {
-    display: 'flex',
-    gap: '8px',
-    marginBottom: '24px',
-  },
-  filterChip: {
-    padding: '8px 20px',
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '20px',
-    backgroundColor: '#ffffff',
-    color: colors.neutral600,
-    fontSize: '14px',
-    fontWeight: 500,
-    cursor: 'pointer',
-  },
-  filterChipActive: {
-    backgroundColor: colors.primary,
-    color: '#ffffff',
-    borderColor: colors.primary,
-  },
-
-  // Grid
-  courseGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '24px',
-  },
-  courseLink: {
-    textDecoration: 'none',
-    color: 'inherit',
-  },
-  courseThumbnail: {
-    height: '160px',
-    backgroundColor: colors.neutral100,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderTopLeftRadius: '12px',
-    borderTopRightRadius: '12px',
-    overflow: 'hidden',
-  },
-  thumbnailImage: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  },
-  thumbnailPlaceholder: {
-    fontSize: '48px',
-  },
-  courseContent: {
-    padding: '20px',
-  },
-  courseHeader: {
-    display: 'flex',
-    gap: '8px',
-    marginBottom: '12px',
-  },
-  freeBadge: {
-    padding: '2px 8px',
-    backgroundColor: '#ecfdf5',
-    color: '#059669',
-    borderRadius: '4px',
-    fontSize: '12px',
-    fontWeight: 500,
-  },
-  paidBadge: {
-    padding: '2px 8px',
-    backgroundColor: '#fef3c7',
-    color: '#92400e',
-    borderRadius: '4px',
-    fontSize: '12px',
-    fontWeight: 500,
-  },
-  courseTitle: {
-    ...typography.headingS,
-    color: colors.neutral900,
-    margin: 0,
-    marginBottom: '8px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-  },
-  courseDescription: {
-    ...typography.bodyS,
-    color: colors.neutral500,
-    marginBottom: '12px',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-  },
-  courseMeta: {
-    display: 'flex',
-    gap: '12px',
-    ...typography.bodyS,
-    color: colors.neutral500,
-    flexWrap: 'wrap',
-  },
-  courseFooter: {
-    marginTop: '12px',
-    paddingTop: '12px',
-    borderTop: `1px solid ${colors.neutral100}`,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   enrollCount: {
     ...typography.bodyS,
     color: colors.accentGreen,

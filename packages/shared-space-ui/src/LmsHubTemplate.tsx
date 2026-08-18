@@ -120,6 +120,9 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-COMMUNITY-LMS-COURSE-LIST-AND-HUB-VIEW-COMMONIZATION-V1:
+  // 조회 실패를 빈 목록으로 삼켜 "등록된 강의가 없습니다" 로 위장하지 않는다(O4O Load-Error 계약).
+  const [loadError, setLoadError] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   const currentPage = parseInt(searchParams.get('page') || '1');
@@ -129,6 +132,7 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
 
   const loadCourses = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const result = await config.fetchCourses({
         search: currentSearch || undefined,
@@ -139,6 +143,7 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
       setTotalPages(result.totalPages);
       setTotal(result.total ?? result.data.length);
     } catch {
+      setLoadError(true);
       setCourses([]);
       setTotalPages(1);
       setTotal(0);
@@ -364,7 +369,7 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
         </div>
 
         {/* Result count */}
-        {!loading && (
+        {!loading && !loadError && (
           <div style={styles.resultInfo}>
             {currentSearch ? `검색 결과 ${total}건` : `총 ${total}개의 강의`}
           </div>
@@ -382,6 +387,14 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
         {/* Table */}
         {loading ? (
           <div style={styles.loading}>강의를 불러오는 중...</div>
+        ) : loadError ? (
+          <div style={styles.errorState}>
+            <p style={styles.errorTitle}>강의 목록을 불러오지 못했습니다</p>
+            <p style={styles.errorDesc}>잠시 후 다시 시도해 주세요.</p>
+            <button type="button" onClick={() => void loadCourses()} style={{ ...styles.retryBtn, color: accent, borderColor: accent }}>
+              다시 시도
+            </button>
+          </div>
         ) : (
           <>
             <div style={styles.tableWrap}>
@@ -540,6 +553,33 @@ const styles: Record<string, React.CSSProperties> = {
   },
   paginationWrap: {
     marginTop: '16px',
+  },
+  errorState: {
+    textAlign: 'center' as const,
+    padding: '60px 20px',
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+  },
+  errorTitle: {
+    fontSize: '15px',
+    fontWeight: 600,
+    color: '#b91c1c',
+    margin: '0 0 6px 0',
+  },
+  errorDesc: {
+    fontSize: '13px',
+    color: '#94a3b8',
+    margin: '0 0 16px 0',
+  },
+  retryBtn: {
+    padding: '8px 20px',
+    fontSize: '14px',
+    fontWeight: 600,
+    background: '#ffffff',
+    border: '1px solid',
+    borderRadius: '8px',
+    cursor: 'pointer',
   },
   emptyState: {
     textAlign: 'center' as const,
