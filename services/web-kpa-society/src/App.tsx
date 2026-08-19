@@ -270,9 +270,9 @@ import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
-import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
+import { MyStoreShell, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
+import { fetchStoreCapabilities } from './api/storeHub';
 import { getUserDisplayName } from '@o4o/account-ui';
-import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 공통 footer 법정정보 loader
 import { loadFooterLegal } from './lib/footerLegal';
 import { KpaGlobalHeader } from './components/KpaGlobalHeader';
@@ -505,34 +505,32 @@ function KpaStoreLayoutWrapper() {
     return () => { cancelled = true; };
   }, []);
 
-  // WO-O4O-STORE-CAPABILITY-CONSISTENCY-FIX-V1: GlycoPharm/K-Cosmetics와 동일한 capability 필터링 적용
-  const enabledCaps = useStoreCapabilities();
-  const resolvedConfig = resolveStoreMenu(KPA_SOCIETY_STORE_CONFIG, enabledCaps);
-
   return (
-    <div className="min-h-screen flex flex-col">
-      <KpaGlobalHeader />
-      <StoreDashboardLayout
-        config={resolvedConfig}
-        userName={user ? getUserDisplayName(user) : ''}
-        homeLink="/"
-        orgName={pharmacyName}
-        onLogout={() => { logout(); navigate('/'); }}
-        hideTopBar
-        footer={
-          <StoreFacingFooter
-            serviceKey="kpa-society"
-            serviceName="약사회"
-            loadProfile={loadFooterLegal}
-            links={{ terms: '/policy', privacy: '/privacy', contact: '/contact' }}
-          />
-        }
-      />
-      {/* WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
-          내 약국(store) 영역에도 모바일 하단 utility nav(알림/내정보) 제공 + 하단 여백 확보. */}
-      <div className="md:hidden" aria-hidden style={{ height: 'calc(3.5rem + env(safe-area-inset-bottom, 0px))' }} />
-      <MobileBottomNav />
-    </div>
+    <MyStoreShell
+      config={KPA_SOCIETY_STORE_CONFIG}
+      fetchCapabilities={fetchStoreCapabilities}
+      userName={user ? getUserDisplayName(user) : ''}
+      homeLink="/"
+      orgName={pharmacyName}
+      onLogout={() => { logout(); navigate('/'); }}
+      header={<KpaGlobalHeader />}
+      footer={
+        <StoreFacingFooter
+          serviceKey="kpa-society"
+          serviceName="약사회"
+          loadProfile={loadFooterLegal}
+          links={{ terms: '/policy', privacy: '/privacy', contact: '/contact' }}
+        />
+      }
+      below={
+        <>
+          {/* WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
+              내 약국(store) 영역에도 모바일 하단 utility nav(알림/내정보) 제공 + 하단 여백 확보. */}
+          <div className="md:hidden" aria-hidden style={{ height: 'calc(3.5rem + env(safe-area-inset-bottom, 0px))' }} />
+          <MobileBottomNav />
+        </>
+      }
+    />
   );
 }
 

@@ -29,6 +29,11 @@ export {
 
 // Layout
 export { StoreDashboardLayout } from './layout/StoreDashboardLayout';
+// WO-O4O-MY-STORE-UNIFIED-SCREEN-ARCHITECTURE-AND-ADOPTION-V1:
+//   "내 매장" 화면 골격(외곽 div + header slot + capability 해석 + Layout 배선) 공통 Shell.
+//   서비스 App.tsx 의 StoreLayoutWrapper 복사본을 대체한다.
+export { MyStoreShell, useStoreCapabilities } from './layout/MyStoreShell';
+export type { MyStoreShellProps, StoreCapabilityFlag } from './layout/MyStoreShell';
 
 // Components
 export { StorePlaceholderPage } from './components/StorePlaceholderPage';

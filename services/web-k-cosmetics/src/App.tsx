@@ -139,9 +139,9 @@ const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/Te
 const ForcedContentPage = lazy(() => import('@/pages/operator/signage/ForcedContentPage'));
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-import { StoreDashboardLayout, COSMETICS_STORE_CONFIG, resolveStoreMenu, StoreOwnerGuard } from '@o4o/store-ui-core';
+import { MyStoreShell, COSMETICS_STORE_CONFIG, StoreOwnerGuard } from '@o4o/store-ui-core';
+import { fetchStoreCapabilities } from './api/storeHub';
 import { getUserDisplayName } from '@o4o/account-ui';
-import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 공통 footer 법정정보 loader
 import { loadFooterLegal } from './lib/footerLegal';
 
@@ -358,28 +358,24 @@ function StoreOwnerRoute({ children }: { children: React.ReactNode }) {
 function StoreLayoutWrapper() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const enabledCaps = useStoreCapabilities();
-  const resolvedConfig = resolveStoreMenu(COSMETICS_STORE_CONFIG, enabledCaps);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <KCosGlobalHeader />
-      <StoreDashboardLayout
-        config={resolvedConfig}
-        userName={user ? getUserDisplayName(user) : ''}
-        homeLink="/"
-        onLogout={() => { logout(); navigate('/'); }}
-        hideTopBar
-        footer={
-          <StoreFacingFooter
-            serviceKey="k-cosmetics"
-            serviceName="K-Cosmetics"
-            loadProfile={loadFooterLegal}
-            links={{ terms: '/terms', privacy: '/privacy', contact: '/contact' }}
-          />
-        }
-      />
-    </div>
+    <MyStoreShell
+      config={COSMETICS_STORE_CONFIG}
+      fetchCapabilities={fetchStoreCapabilities}
+      userName={user ? getUserDisplayName(user) : ''}
+      homeLink="/"
+      onLogout={() => { logout(); navigate('/'); }}
+      header={<KCosGlobalHeader />}
+      footer={
+        <StoreFacingFooter
+          serviceKey="k-cosmetics"
+          serviceName="K-Cosmetics"
+          loadProfile={loadFooterLegal}
+          links={{ terms: '/terms', privacy: '/privacy', contact: '/contact' }}
+        />
+      }
+    />
   );
 }
 

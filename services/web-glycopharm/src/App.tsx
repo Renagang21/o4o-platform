@@ -240,10 +240,10 @@ import {
 } from '@o4o/shared-space-ui';
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
+import { MyStoreShell, GLYCOPHARM_STORE_CONFIG } from '@o4o/store-ui-core';
+import { fetchStoreCapabilities } from './api/storeHub';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { GlycoGlobalHeader } from './components/GlycoGlobalHeader';
-import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 공통 footer 법정정보 loader
 import { loadFooterLegal } from './lib/footerLegal';
 const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
@@ -449,29 +449,25 @@ function SoftGuard({ feature, allowedRoles, children }: {
 function StoreLayoutWrapper() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const enabledCaps = useStoreCapabilities();
-  const resolvedConfig = resolveStoreMenu(GLYCOPHARM_STORE_CONFIG, enabledCaps);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <GlycoGlobalHeader />
-      <StoreDashboardLayout
-        config={resolvedConfig}
-        userName={user ? getUserDisplayName(user) : ''}
-        homeLink="/"
-        onLogout={() => { logout(); navigate('/'); }}
-        banner={<RedirectNoticeBanner />}
-        hideTopBar
-        footer={
-          <StoreFacingFooter
-            serviceKey="glycopharm"
-            serviceName="GlycoPharm"
-            loadProfile={loadFooterLegal}
-            links={{ terms: '/terms', privacy: '/privacy', contact: '/contact' }}
-          />
-        }
-      />
-    </div>
+    <MyStoreShell
+      config={GLYCOPHARM_STORE_CONFIG}
+      fetchCapabilities={fetchStoreCapabilities}
+      userName={user ? getUserDisplayName(user) : ''}
+      homeLink="/"
+      onLogout={() => { logout(); navigate('/'); }}
+      header={<GlycoGlobalHeader />}
+      banner={<RedirectNoticeBanner />}
+      footer={
+        <StoreFacingFooter
+          serviceKey="glycopharm"
+          serviceName="GlycoPharm"
+          loadProfile={loadFooterLegal}
+          links={{ terms: '/terms', privacy: '/privacy', contact: '/contact' }}
+        />
+      }
+    />
   );
 }
 

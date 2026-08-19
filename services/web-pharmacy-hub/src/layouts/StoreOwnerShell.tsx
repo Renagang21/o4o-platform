@@ -3,7 +3,7 @@
  *
  * WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1
  *
- * 공통 `@o4o/store-ui-core` 의 StoreDashboardLayout / StoreOwnerGuard 를 그대로 사용하고,
+ * 공통 `@o4o/store-ui-core` 의 MyStoreShell / StoreOwnerGuard 를 그대로 사용하고,
  * 서비스 차이(auth context 연결 · 가입 상태 게이트 · basePath)만 여기서 주입한다.
  * KPA / K-Cosmetics 셸을 복사하지 않으며, Pharmacy-Hub 전용 Layout·Sidebar 사본도 만들지 않는다.
  *
@@ -24,7 +24,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { StoreDashboardLayout, StoreOwnerGuard, PHARMACY_HUB_STORE_CONFIG } from '@o4o/store-ui-core';
+import { MyStoreShell, StoreOwnerGuard, PHARMACY_HUB_STORE_CONFIG } from '@o4o/store-ui-core';
 import type { StoreOwnerGuardUser } from '@o4o/store-ui-core';
 import { AccessDenied } from '@o4o/ui';
 import { getUserDisplayName } from '@o4o/account-ui';
@@ -37,7 +37,7 @@ function ShellLayout() {
   const navigate = useNavigate();
 
   return (
-    <StoreDashboardLayout
+    <MyStoreShell
       config={PHARMACY_HUB_STORE_CONFIG}
       userName={user ? getUserDisplayName(user) : ''}
       homeLink="/"
