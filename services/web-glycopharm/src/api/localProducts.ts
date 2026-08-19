@@ -4,7 +4,11 @@
  * WO-O4O-STORE-LOCAL-PRODUCT-UI-V1
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 auto-refresh
  *
- * Platform-level API: /api/v1/store/local-products
+ * Service-scoped API: /api/v1/glycopharm/store/local-products
+ * WO-O4O-STORE-LOCAL-PRODUCTS-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+ *   서비스 중립 경로(`/api/v1/store/local-products`)는 다중 조직 사용자에게 타 서비스
+ *   조직을 선택할 수 있어, 같은 My Store 문맥의 handled-products 와 다른 매장을 보게 된다.
+ *   서비스 스코프 경로(`/api/v1/glycopharm/store/local-products`)로 이전한다 — 백엔드에서 serviceKey 로 조직을 확정한다.
  * Local Products are Display Domain only — NOT Commerce Objects.
  */
 
@@ -82,7 +86,7 @@ export async function fetchLocalProducts(params?: {
   if (params?.highlightOnly) qs.set('highlightOnly', params.highlightOnly);
 
   const query = qs.toString();
-  const res = await api.get(`/store/local-products${query ? `?${query}` : ''}`);
+  const res = await api.get(`/glycopharm/store/local-products${query ? `?${query}` : ''}`);
   return res.data?.data;
 }
 
@@ -92,14 +96,14 @@ export async function fetchLocalProducts(params?: {
  * 다른 조직 상품·미존재 → 404.
  */
 export async function getLocalProduct(id: string): Promise<LocalProduct> {
-  const res = await api.get(`/store/local-products/${id}`);
+  const res = await api.get(`/glycopharm/store/local-products/${id}`);
   return res.data?.data;
 }
 
 export async function createLocalProduct(
   data: LocalProductInput,
 ): Promise<LocalProduct> {
-  const res = await api.post('/store/local-products', data);
+  const res = await api.post('/glycopharm/store/local-products', data);
   return res.data?.data;
 }
 
@@ -107,10 +111,10 @@ export async function updateLocalProduct(
   id: string,
   data: Partial<LocalProductInput>,
 ): Promise<LocalProduct> {
-  const res = await api.put(`/store/local-products/${id}`, data);
+  const res = await api.put(`/glycopharm/store/local-products/${id}`, data);
   return res.data?.data;
 }
 
 export async function deleteLocalProduct(id: string): Promise<void> {
-  await api.delete(`/store/local-products/${id}`);
+  await api.delete(`/glycopharm/store/local-products/${id}`);
 }

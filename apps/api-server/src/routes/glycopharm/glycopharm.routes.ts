@@ -91,6 +91,7 @@ import { ForumController } from '../../controllers/forum/ForumController.js';
 import { ForumMembershipController } from '../../controllers/forum/ForumMembershipController.js';
 import { forumContextMiddleware } from '../../middleware/forum-context.middleware.js';
 import { FORUM_ORGS } from '../../controllers/forum/forum-organizations.js';
+import { createStoreLocalProductRoutes } from '../platform/store-local-product.routes.js';
 
 /**
  * GlycoPharm Scope Guard — powered by @o4o/security-core
@@ -407,6 +408,12 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey='glycopharm' 전달 →
   //   glycopharm:store_owner 또는 glycopharm:pharmacist 만 통과 (cross-service leakage 차단).
   router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any, 'glycopharm'));
+
+  // Store Local Products — 매장 자체 상품 (WO-O4O-STORE-LOCAL-PRODUCTS-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1)
+  //   서비스 중립 mount(`/api/v1/store/local-products`)는 다중 조직 사용자에게 타 서비스 조직을
+  //   고를 수 있다. 같은 My Store 문맥의 handled-products 와 **같은 조직**을 해석하도록
+  //   serviceKey='glycopharm' 를 명시한 canonical mount 를 제공한다.
+  router.use('/store', createStoreLocalProductRoutes(dataSource, 'glycopharm'));
 
   // Asset Snapshot
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));

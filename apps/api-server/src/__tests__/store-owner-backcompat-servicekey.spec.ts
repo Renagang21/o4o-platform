@@ -167,7 +167,6 @@ describe('§9 census — SERVICE_NEUTRAL_BACKCOMPAT 잔여 집합이 늘지 않�
     'modules/store-ai/controllers/product-ai-recommendation.controller.ts',
     'modules/store/store-library.routes.ts',
     'routes/o4o-store/controllers/store-product-library.controller.ts',
-    'routes/platform/store-local-product.routes.ts',
     'routes/platform/store-tablet.routes.ts',
   ].sort();
 
@@ -184,7 +183,12 @@ describe('§9 census — SERVICE_NEUTRAL_BACKCOMPAT 잔여 집합이 늘지 않�
     return out;
   }
 
-  it('serviceKey 없는 호출부는 문서화된 6곳뿐이다', () => {
+  /**
+   * WO-O4O-STORE-LOCAL-PRODUCTS-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+   *   `routes/platform/store-local-product.routes.ts` 는 mount 단계에서 serviceKey 를 주입받아
+   *   목록에서 빠졌다 (서비스별 mount = canonical / 서비스 중립 mount = back-compat).
+   */
+  it('serviceKey 없는 호출부는 문서화된 5곳뿐이다', () => {
     const found = new Set<string>();
 
     for (const file of collect(API_SERVER_SRC)) {

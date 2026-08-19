@@ -12,7 +12,8 @@
  * WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1 (2026-07-29):
  *   canonical 저장 위치 = `store_local_products.detail_html`
  *     - 조회: 목록 응답 row 의 detailHtml / detail_html (추가 조회 API 없음)
- *     - 저장: PUT /api/v1/store/local-products/:id  { detailHtml }  (부분 업데이트)
+ *     - 저장: PUT /api/v1/kpa/store/local-products/:id  { detailHtml }  (부분 업데이트)
+ *       (WO-O4O-STORE-LOCAL-PRODUCTS-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1: 서비스 스코프 경로)
  *   description / summary / usage_info / caution_info 는 본 화면에서 건드리지 않는다.
  *
  * WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1:

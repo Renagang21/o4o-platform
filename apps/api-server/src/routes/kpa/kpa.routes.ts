@@ -179,6 +179,7 @@ import { CompletionController } from '../../modules/lms/controllers/CompletionCo
 import { QuizController } from '../../modules/lms/controllers/QuizController.js';
 import { AssignmentController } from '../../modules/lms/controllers/AssignmentController.js';
 import { requireEnrollment } from '../../modules/lms/middleware/requireEnrollment.js';
+import { createStoreLocalProductRoutes } from '../platform/store-local-product.routes.js';
 
 /**
  * KPA Scope Guard — powered by @o4o/security-core
@@ -424,6 +425,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Pharmacy Products routes (WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1)
   // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey='kpa' 전달 → kpa:store_owner 만 통과.
   router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any, 'kpa'));
+
+  // Store Local Products — 매장 자체 상품 (WO-O4O-STORE-LOCAL-PRODUCTS-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1)
+  //   서비스 중립 mount(`/api/v1/store/local-products`)는 다중 조직 사용자에게 타 서비스 조직을
+  //   고를 수 있다. 같은 My Store 문맥의 handled-products 와 **같은 조직**을 해석하도록
+  //   serviceKey='kpa' 를 명시한 canonical mount 를 제공한다.
+  router.use('/store', createStoreLocalProductRoutes(dataSource, 'kpa'));
 
   // Asset Snapshot routes (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));

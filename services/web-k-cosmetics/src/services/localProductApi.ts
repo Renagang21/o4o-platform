@@ -4,13 +4,17 @@
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
  * WO-O4O-STORE-LOCAL-PRODUCT-UI-V1
  *
- * Platform-level API: /api/v1/store/local-products
+ * Service-scoped API: /api/v1/cosmetics/store/local-products
+ * WO-O4O-STORE-LOCAL-PRODUCTS-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+ *   서비스 중립 경로(`/api/v1/store/local-products`)는 다중 조직 사용자에게 타 서비스
+ *   조직을 선택할 수 있어, 같은 My Store 문맥의 handled-products 와 다른 매장을 보게 된다.
+ *   서비스 스코프 경로(`/api/v1/cosmetics/store/local-products`)로 이전한다 — 백엔드에서 serviceKey 로 조직을 확정한다.
  * Local Products are Display Domain only — NOT Commerce Objects.
  */
 
 import { api } from '../lib/apiClient';
 
-const BASE = '/store';
+const BASE = '/cosmetics/store';
 
 // ==================== Types ====================
 

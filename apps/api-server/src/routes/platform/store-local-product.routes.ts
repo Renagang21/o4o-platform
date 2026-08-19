@@ -13,7 +13,20 @@
  * StoreLocalProduct는 Commerce Object가 아니다.
  * Checkout/EcommerceOrder와 완전 분리된 Display Domain.
  *
- * API Namespace: /api/v1/store/local-products
+ * WO-O4O-STORE-LOCAL-PRODUCTS-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
+ *   조직 결정에 **명시적 service context** 를 받는다.
+ *   서비스 중립 mount(`/api/v1/store/local-products`)는 back-compat 로 유지하되
+ *   (`SERVICE_NEUTRAL_BACKCOMPAT`), 서비스별 mount 는 serviceKey 를 주입해
+ *   handled-products 와 **같은 organization** 을 해석한다.
+ *
+ *   왜 필요한가 (프로덕션 실측): 다중 조직 사용자는 serviceKey 없는 해석이
+ *   `is_primary DESC → joined_at ASC` 순으로 **다른 서비스의 조직**(예: Neture 공급자
+ *   조직)을 고른다. 같은 화면군의 handled-products 는 serviceKey='kpa' 로 약국 조직을
+ *   해석하므로 두 API 가 서로 다른 매장을 보게 된다(취급제품 local 8건 vs 자체상품 0건).
+ *
+ * API Namespace
+ *   서비스 스코프 : /api/v1/{kpa|cosmetics|glycopharm}/store/local-products  (canonical)
+ *   서비스 중립   : /api/v1/store/local-products                             (back-compat)
  *
  * ┌──────────────────────────────────────────────────────┐
  * │ AUTHENTICATED (requireAuth + pharmacy owner)         │
@@ -31,6 +44,7 @@ import { DataSource } from 'typeorm';
 type AuthMiddleware = RequestHandler;
 import type { AuthRequest } from '../../types/auth.js';
 import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
+import type { StoreOwnerServiceKey } from '../../utils/store-organization.resolver.js';
 import {
   listLocalProducts,
   getLocalProduct,
@@ -64,6 +78,11 @@ function sendFailure(res: Response, result: ServiceResult<unknown>): void {
 
 export function createStoreLocalProductRoutes(
   dataSource: DataSource,
+  /**
+   * 지정 시 해당 서비스에 등록된 조직만 후보가 된다(타 서비스 조직 fallback 0).
+   * 미지정 시 기존 서비스 중립 동작 — 신규 mount 는 반드시 지정한다.
+   */
+  serviceKey?: StoreOwnerServiceKey,
 ): Router {
   const router = Router();
 
@@ -94,7 +113,7 @@ export function createStoreLocalProductRoutes(
       return null;
     }
     const userRoles: string[] = authReq.user?.roles || [];
-    return await resolveStoreAccess(dataSource, userId, userRoles);
+    return await resolveStoreAccess(dataSource, userId, userRoles, serviceKey);
   }
 
   /**
