@@ -134,9 +134,22 @@ Tests:       6 passed, 6 total
 | Cloud Run ERROR | §8-1 |
 | 실제 수료증 1건 end-to-end | **수행 불가 — production `lms_certificates` 0건.** 수료증을 새로 만들려면 production write 가 필요하므로 수행하지 않았다 (숨기지 않고 기록). |
 
-### 8-1. 배포 후 실측
+### 8-1. 배포 후 실측 (2026-08-19 03:10 KST 기준 UTC)
 
-> 배포 완료 후 채워 넣는다.
+- commit `ea392d071` push → **Deploy API Server (Cloud Run) run 32210818979 = success**
+- 신규 리비전 **`o4o-core-api-03377-cwj`** (2026-08-19T03:09:59Z), 트래픽 100% 이관 완료
+  - image `api-server@sha256:159f816f...3da4bd`
+- 배포 후 env 재확인: 총 21건, `URL`/`FRONT` 매칭 **0건** → 코드 fallback 이 그대로 유효
+- `GET https://api.neture.co.kr/health` → **200**
+- 신규 리비전 severity>=ERROR → **0건**
+- 신규 리비전 `httpRequest.status>=500` → **0건**
+  (조회된 500 1건은 배포 **이전** 리비전 `o4o-core-api-03376-ztj` 의 03:00:16
+  `/api/v1/lms/courses/courses?serviceKey=glycopharm` 로, 이번 변경과 무관한 기존 결함이다.
+  경로가 `courses/courses` 로 중복돼 있다 — 이번 WO 범위 밖, 별도 WO 후보로 기록만 한다.)
+- 소스 잔존 `k-cosmetics.co.kr` (dist 제외 3건, 모두 URL 생성 경로 아님):
+  - `migrations/1736611201000-SeedNetureData.ts:258` — §5 판정에 따라 미변경
+  - `utils/certificate-verification-base.ts:15` — 주석
+  - `utils/__tests__/certificate-verification-base.test.ts:44` — 회귀 방지 단언
 
 ## 9. 부수 관측 (이번 WO 에서 변경하지 않음)
 
