@@ -47,6 +47,11 @@ export const forumApi = {
     search?: string;
     tag?: string;
     sortBy?: string;
+    /**
+     * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §10
+     * 'me' → 로그인 사용자 본인 글만(내가 쓴 글). 5서비스 공통 query contract.
+     */
+    author?: 'me';
   }) =>
     apiClient.get<PaginatedResponse<ForumPost>>(`${getForumBasePath()}/posts`, params),
 

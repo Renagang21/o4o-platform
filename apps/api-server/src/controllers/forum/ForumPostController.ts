@@ -38,6 +38,22 @@ export class ForumPostController extends ForumControllerBase {
       const status = req.query.status as PostStatus;
       const sortBy = (req.query.sortBy as string) || 'latest';
 
+      // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1:
+      //   My Posts 공통 query contract. 서비스별로 다른 query 이름을 만들지 않는다.
+      //   author=me + 인증 + route 의 canonical service scope = "내가 쓴 글".
+      const myPostsOnly = (req.query.author as string) === 'me';
+
+      const { userId: uid, roles } = this.getUserFromReq(req);
+
+      if (myPostsOnly && !uid) {
+        res.status(401).json({
+          success: false,
+          error: '로그인이 필요합니다.',
+          code: 'AUTH_REQUIRED',
+        });
+        return;
+      }
+
       const queryBuilder = this.postRepository
         .createQueryBuilder('post')
         .leftJoinAndSelect('post.author', 'author');
@@ -45,13 +61,19 @@ export class ForumPostController extends ForumControllerBase {
       // Status filter
       if (status) {
         queryBuilder.where('post.status = :status', { status });
+      } else if (myPostsOnly) {
+        // 본인 글 목록은 draft/pending 등 비공개 상태도 본인에게는 보여야 한다.
+        queryBuilder.where('post.authorId = :myAuthorId', { myAuthorId: uid });
       } else {
         queryBuilder.where('post.status = :status', { status: PostStatus.PUBLISHED });
       }
 
+      if (myPostsOnly) {
+        queryBuilder.andWhere('post.authorId = :myAuthorId', { myAuthorId: uid });
+      }
+
       // Forum filter + WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
       // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
-      const { userId: uid, roles } = this.getUserFromReq(req);
       if (forumId) {
         queryBuilder.andWhere('post.forumId = :forumId', { forumId });
         const access = await this.checkClosedForumAccess(forumId, uid, roles);

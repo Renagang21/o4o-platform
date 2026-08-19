@@ -128,6 +128,8 @@ export default function ForumHubPage() {
     infoLinks: [
       { label: '전체 글', href: '/forum' },
       { label: '내 포럼', href: '/forum/my-dashboard' },
+      // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11
+      { label: '내가 쓴 글', href: '/forum/my-posts' },
       { label: '피드백', href: '/forum/feedback' },
     ],
   };

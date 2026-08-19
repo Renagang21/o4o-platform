@@ -66,6 +66,8 @@ export function CourseDetailView({
 }: CourseDetailViewProps) {
   const { labels, notify } = config;
   const accent = config.accent ?? DEFAULT_ACCENT;
+  // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §8
+  const enrollmentEnabled = config.enrollmentEnabled !== false;
 
   const [course, setCourse] = useState<LmsCourseDetailData | null>(null);
   const [lessons, setLessons] = useState<LmsLessonData[]>([]);
@@ -100,7 +102,7 @@ export function CourseDetailView({
       }
 
       // 3) 수강 정보 — 로그인 상태에서만. 미수강이면 조회 실패가 정상이다.
-      if (config.isAuthenticated) {
+      if (config.isAuthenticated && config.enrollmentEnabled !== false) {
         try {
           setEnrollment(await port.getEnrollment(courseId));
         } catch {
@@ -118,7 +120,7 @@ export function CourseDetailView({
     // config 객체는 매 렌더 새로 만들어질 수 있어 의존성에서 제외하고
     // 재조회 트리거는 courseId / 인증 상태로 한정한다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, config.isAuthenticated, port]);
+  }, [courseId, config.isAuthenticated, config.enrollmentEnabled, port]);
 
   useEffect(() => {
     if (courseId) void loadData();
@@ -283,7 +285,7 @@ export function CourseDetailView({
             <h2 style={sectionTitleStyle}>{labels.lessonsSectionTitle}</h2>
             {lessons.length === 0 ? (
               <p style={{ fontSize: '14px', color: '#94a3b8', margin: 0 }}>
-                {enrollment
+                {enrollment || !enrollmentEnabled
                   ? `등록된 ${labels.lessonWord}이 아직 없습니다.`
                   : `수강 신청 후 ${labels.lessonWord} 목록을 볼 수 있습니다.`}
               </p>
@@ -302,7 +304,7 @@ export function CourseDetailView({
                   durationMinutes: lesson.durationMinutes,
                   completed: completedIds.includes(lesson.id),
                   isPreview: lesson.isPreview,
-                  locked: !(enrollment || lesson.isPreview),
+                  locked: enrollmentEnabled ? !(enrollment || lesson.isPreview) : false,
                 }))}
               />
             )}
@@ -317,7 +319,7 @@ export function CourseDetailView({
               <div style={thumbnailPlaceholderStyle}>📚</div>
             )}
 
-            {!enrollment && !isArchived && course.visibility && course.visibility !== 'public' && (
+            {enrollmentEnabled && !enrollment && !isArchived && course.visibility && course.visibility !== 'public' && (
               <div style={accessPolicyNoteStyle}>
                 {course.isPaid ? (
                   <NoPaymentNotice paid variant="plain" />
@@ -389,6 +391,19 @@ export function CourseDetailView({
                     <p style={sidebarNoteStyle}>{labels.lessonWord}이 아직 등록되지 않았습니다.</p>
                   )}
                 </div>
+              )
+            ) : !enrollmentEnabled ? (
+              /* Enrollment 미사용 서비스 — 바로 학습(조회) 진입만 제공한다. */
+              firstLessonId ? (
+                <NavLink
+                  to={resolveLessonPath(config, course.id, firstLessonId)}
+                  navigate={config.navigate}
+                  style={primaryButtonStyle(accent)}
+                >
+                  {labels.continueLabel}
+                </NavLink>
+              ) : (
+                <p style={sidebarNoteStyle}>{labels.lessonWord}이 아직 등록되지 않았습니다.</p>
               )
             ) : (
               <button

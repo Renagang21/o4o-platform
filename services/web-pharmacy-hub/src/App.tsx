@@ -16,6 +16,12 @@
  *   /forum/posts                 게시글 목록
  *   /forum/posts/:postId         게시글 상세 (WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1)
  *   /forum/write                 글쓰기      (동일 WO · write 권한은 backend guard 가 강제)
+ *   /forum/my-posts              내가 쓴 글 (WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §9)
+ *   /community                   커뮤니티 홈 (동일 WO §4 — StandardHomeTemplate + LatestActivitySection)
+ *   /community/search            커뮤니티 검색 (동일 WO §6 — forum 중심)
+ *   /education                   교육 허브 (동일 WO §7 — 공통 LmsHubTemplate)
+ *   /education/course/:id        강의 상세 (공통 CourseDetailView · enrollment 비활성)
+ *   /education/course/:courseId/lesson/:lessonId  레슨 (공통 LessonPlayerView)
  *   /supplier                    공급자 셸 (SupplierShell)
  *     ├ (index)                  공급자 진입점
  *     └ /products                내 상품 Pharmacy-Hub 제공 설정 (WO-...-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1)
@@ -84,6 +90,13 @@ import ForumListPage from './pages/forum/ForumListPage';
 // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1 — 상세 · 작성
 import ForumDetailPage from './pages/forum/ForumDetailPage';
 import ForumWritePage from './pages/forum/ForumWritePage';
+// WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 — 커뮤니티 baseline
+import MyPostsPage from './pages/forum/MyPostsPage';
+import CommunityHomePage from './pages/community/CommunityHomePage';
+import CommunitySearchPage from './pages/community/CommunitySearchPage';
+import EducationPage from './pages/education/EducationPage';
+import LmsCourseDetailPage from './pages/education/LmsCourseDetailPage';
+import LmsLessonPage from './pages/education/LmsLessonPage';
 import MembershipsPage from './pages/operator/MembershipsPage';
 // WO-O4O-PHARMACY-HUB-SERVICE-LEGAL-SETTINGS-ADOPTION-V1 — 공통 법정정보 설정 채택
 import PharmacyHubAdminDashboard from './pages/admin/PharmacyHubAdminDashboard';
@@ -201,6 +214,57 @@ export default function App() {
             element={
               <MembershipGate>
                 <ForumWritePage />
+              </MembershipGate>
+            }
+          />
+          {/* WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §9 */}
+          <Route
+            path="/forum/my-posts"
+            element={
+              <MembershipGate>
+                <MyPostsPage />
+              </MembershipGate>
+            }
+          />
+          {/* 동일 WO §4·§6 — 커뮤니티 홈 · 검색 */}
+          <Route
+            path="/community"
+            element={
+              <MembershipGate>
+                <CommunityHomePage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/community/search"
+            element={
+              <MembershipGate>
+                <CommunitySearchPage />
+              </MembershipGate>
+            }
+          />
+          {/* 동일 WO §7 — 교육(LMS) 조회·학습 baseline */}
+          <Route
+            path="/education"
+            element={
+              <MembershipGate>
+                <EducationPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/education/course/:id"
+            element={
+              <MembershipGate>
+                <LmsCourseDetailPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/education/course/:courseId/lesson/:lessonId"
+            element={
+              <MembershipGate>
+                <LmsLessonPage />
               </MembershipGate>
             }
           />

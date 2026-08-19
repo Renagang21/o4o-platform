@@ -35,6 +35,7 @@ interface ForumPostRow {
   isPinned?: boolean | null;
   type?: ForumListItem['postType'];
   excerpt?: string | null;
+  status?: string | null;
 }
 
 interface ForumPostListResponse {
@@ -73,6 +74,15 @@ export async function fetchPharmacyHubForumCategories(): Promise<ForumHubCategor
     }));
 }
 
+/** 비공개 상태(임시저장/승인대기)만 배지로 표기한다. 게시 상태는 배지 없음. */
+function forumStatusLabel(status?: string | null): string | undefined {
+  if (!status || status === 'publish' || status === 'published') return undefined;
+  if (status === 'draft') return '임시저장';
+  if (status === 'pending') return '승인대기';
+  if (status === 'private') return '비공개';
+  return undefined;
+}
+
 /** Service-scoped list adapter — base 자체가 PharmacyHub 컨텍스트다. */
 export async function fetchPharmacyHubForumPosts(params: {
   forumId?: string;
@@ -80,6 +90,11 @@ export async function fetchPharmacyHubForumPosts(params: {
   limit?: number;
   search?: string;
   sortBy?: 'latest' | 'oldest' | 'popular';
+  /**
+   * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §10
+   * 공통 My Posts query contract — 서비스별 다른 query 이름을 만들지 않는다.
+   */
+  author?: 'me';
 }): Promise<PharmacyHubForumPostListResult> {
   const query = new URLSearchParams();
   if (params.forumId) query.set('forumId', params.forumId);
@@ -87,6 +102,7 @@ export async function fetchPharmacyHubForumPosts(params: {
   if (params.limit) query.set('limit', String(params.limit));
   if (params.search) query.set('search', params.search);
   if (params.sortBy) query.set('sortBy', params.sortBy);
+  if (params.author) query.set('author', params.author);
 
   const response = await api.get<ForumPostListResponse>(`${FORUM_BASE}/posts?${query.toString()}`);
   const body = response.data;
@@ -109,6 +125,7 @@ export async function fetchPharmacyHubForumPosts(params: {
       isPinned: Boolean(post.isPinned),
       postType: post.type,
       excerpt: post.excerpt ?? undefined,
+      statusLabel: forumStatusLabel(post.status),
       routeTo: '',
     })),
     page,

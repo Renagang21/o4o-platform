@@ -3355,6 +3355,12 @@ importers:
       '@o4o/error-handling':
         specifier: workspace:*
         version: link:../../packages/error-handling
+      '@o4o/lms-client':
+        specifier: workspace:*
+        version: link:../../packages/lms-client
+      '@o4o/lms-ui':
+        specifier: workspace:*
+        version: link:../../packages/lms-ui
       '@o4o/operator-core-ui':
         specifier: workspace:*
         version: link:../../packages/operator-core-ui

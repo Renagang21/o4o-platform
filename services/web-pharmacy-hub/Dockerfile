@@ -56,6 +56,11 @@ COPY packages/tablet-kiosk-core/package.json ./packages/tablet-kiosk-core/
 #   source-mode 패키지라 별도 build 단계는 필요 없다. 의존(@o4o/ui · @o4o/content-editor)은 위에 이미 있다.
 COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 
+# WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1:
+#   공통 LMS(교육) 패키지 — package.json 블록과 source 블록 양쪽에 필요하다.
+COPY packages/lms-client/package.json ./packages/lms-client/
+COPY packages/lms-ui/package.json ./packages/lms-ui/
+
 # Copy service package.json
 COPY services/web-pharmacy-hub/package.json ./services/web-pharmacy-hub/
 
@@ -82,6 +87,9 @@ COPY packages/screen-content-core/ ./packages/screen-content-core/
 COPY packages/tablet-kiosk-core/ ./packages/tablet-kiosk-core/
 COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 
+COPY packages/lms-client/ ./packages/lms-client/
+COPY packages/lms-ui/ ./packages/lms-ui/
+
 # Copy service source
 COPY services/web-pharmacy-hub/ ./services/web-pharmacy-hub/
 
@@ -96,6 +104,8 @@ RUN pnpm --filter @o4o/ui build
 RUN pnpm --filter @o4o/account-ui build
 # @o4o/content-editor 도 dist-mode — 빌드 필요. (WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1)
 RUN pnpm --filter @o4o/content-editor build
+# @o4o/lms-client 는 dist-mode — 빌드 필요. (@o4o/lms-ui 는 source-mode)
+RUN pnpm --filter @o4o/lms-client build
 
 # Build-time environment variables for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr

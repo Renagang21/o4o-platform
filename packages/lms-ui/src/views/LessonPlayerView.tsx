@@ -61,6 +61,8 @@ export function LessonPlayerView({
 }: LessonPlayerViewProps) {
   const { labels, notify } = config;
   const accent = config.accent ?? DEFAULT_ACCENT;
+  // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §8
+  const enrollmentEnabled = config.enrollmentEnabled !== false;
 
   const [course, setCourse] = useState<LmsCourseDetailData | null>(null);
   const [lessons, setLessons] = useState<LmsLessonData[]>([]);
@@ -139,9 +141,13 @@ export function LessonPlayerView({
       }
       setLesson(detail);
 
-      try {
-        setEnrollment(await port.getEnrollment(courseId));
-      } catch {
+      if (config.enrollmentEnabled !== false) {
+        try {
+          setEnrollment(await port.getEnrollment(courseId));
+        } catch {
+          setEnrollment(null);
+        }
+      } else {
         setEnrollment(null);
       }
 
@@ -712,7 +718,7 @@ export function LessonPlayerView({
             )}
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              {isCompleted ? (
+              {!enrollmentEnabled ? null : isCompleted ? (
                 <span style={completedChipStyle}>완료됨</span>
               ) : (
                 lesson.type !== 'quiz' &&

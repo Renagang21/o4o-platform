@@ -35,6 +35,8 @@ const ForumDetailPage = lazy(() => import('./pages/forum/ForumDetailPage').then(
 const ForumWritePage = lazy(() => import('./pages/forum/ForumWritePage').then(m => ({ default: m.ForumWritePage })));
 // WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
 const ForumFeedPage = lazy(() => import('./pages/forum/ForumFeedPage').then(m => ({ default: m.ForumFeedPage })));
+// WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11
+const ForumMyPostsPage = lazy(() => import('./pages/forum/MyPostsPage').then(m => ({ default: m.MyPostsPage })));
 
 
 // LMS pages — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy (barrel unwound)
@@ -619,6 +621,9 @@ function App() {
            * ======================================== */}
           <Route path="/forum" element={<Layout serviceName={SERVICE_NAME}><ForumHomePage /></Layout>} />
           <Route path="/forum/all" element={<Layout serviceName={SERVICE_NAME}><ForumListPage /></Layout>} />
+          {/* WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11: 내가 쓴 글(공통 View).
+              /forum/:slug catch-all 보다 반드시 앞에 둔다. */}
+          <Route path="/forum/my-posts" element={<Layout serviceName={SERVICE_NAME}><ForumMyPostsPage /></Layout>} />
           <Route path="/forum/post/:id" element={<Layout serviceName={SERVICE_NAME}><ForumDetailPage /></Layout>} />
           <Route path="/forum/:slug/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
           <Route path="/forum/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />

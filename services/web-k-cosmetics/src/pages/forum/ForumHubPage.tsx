@@ -74,6 +74,8 @@ export function ForumHubPage() {
       { label: '공지사항', href: '/forum/posts?type=announcement' },
       // WO-O4O-FORUM-CANONICAL-SPRINT2-CLEANUP-V1
       { label: '내 포럼', href: '/forum/my-dashboard' },
+      // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11
+      { label: '내가 쓴 글', href: '/forum/my-posts' },
     ],
   };
 

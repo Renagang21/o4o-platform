@@ -34,6 +34,10 @@
  */
 
 import { Router } from 'express';
+import type { Request, Response } from 'express';
+// WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1
+import { optionalAuth } from '../../middleware/auth.middleware.js';
+import { asyncHandler } from '../../middleware/error-handler.js';
 import { getService } from '../../config/service-catalog.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
@@ -581,6 +585,105 @@ export function createPharmacyHubRoutes(): Router {
       writeGuards: [requireActiveServiceMembership(SERVICE_KEY)],
     }),
   );
+
+  // ===========================================================================
+  // Community Home — /api/v1/pharmacy-hub/home/latest
+  // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1
+  //
+  //   공통 LatestActivitySection 계약({type,id,title,authorName,createdAt,href}) 을
+  //   그대로 사용한다. Pharmacy-Hub 는 Content/Resources 가 아직 없으므로
+  //   forum / course 두 축만 반환한다 (미구현 축을 가짜로 채우지 않는다).
+  //   forum 은 forum_category_requests.service_code, course 는 lms_courses.service_key
+  //   로 서비스 경계를 건다.
+  // ===========================================================================
+  const homeRouter = Router();
+
+  homeRouter.get(
+    '/latest',
+    optionalAuth as any,
+    asyncHandler(async (req: Request, res: Response) => {
+      const filterType = ((req.query.type as string) || 'all').toLowerCase();
+      const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+      const perLimit = filterType === 'all' ? 10 : limit;
+
+      type LatestItem = {
+        type: string;
+        id: string;
+        title: string;
+        authorName?: string;
+        createdAt: string;
+        href: string;
+      };
+      const items: LatestItem[] = [];
+      const tasks: Promise<void>[] = [];
+
+      if (filterType === 'all' || filterType === 'forum') {
+        tasks.push(
+          (async () => {
+            const rows: any[] = await AppDataSource.query(
+              `SELECT p.id, p.title, p.created_at,
+                      COALESCE(u.nickname, u.name) AS author_name
+                 FROM forum_post p
+                 INNER JOIN forum_category_requests f
+                         ON p.forum_id = f.id AND f.status = 'completed'
+                 LEFT JOIN users u ON p.author_id = u.id
+                WHERE p.status = 'publish'
+                  AND p.organization_id IS NULL
+                  AND f.forum_type != 'closed'
+                  AND f.service_code = $1
+                ORDER BY p.created_at DESC
+                LIMIT $2`,
+              [SERVICE_KEY, perLimit],
+            );
+            for (const r of rows) {
+              items.push({
+                type: 'forum',
+                id: r.id,
+                title: r.title,
+                authorName: r.author_name ?? undefined,
+                createdAt: new Date(r.created_at).toISOString(),
+                href: `/forum/posts/${r.id}`,
+              });
+            }
+          })(),
+        );
+      }
+
+      if (filterType === 'all' || filterType === 'course') {
+        tasks.push(
+          (async () => {
+            const rows: any[] = await AppDataSource.query(
+              `SELECT c.id, c.title, c.created_at, u.name AS author_name
+                 FROM lms_courses c
+                 LEFT JOIN users u ON c.instructor_id = u.id
+                WHERE c.status = 'published'
+                  AND c.service_key = $1
+                ORDER BY c.created_at DESC
+                LIMIT $2`,
+              [SERVICE_KEY, perLimit],
+            );
+            for (const r of rows) {
+              items.push({
+                type: 'course',
+                id: r.id,
+                title: r.title,
+                authorName: r.author_name ?? undefined,
+                createdAt: new Date(r.created_at).toISOString(),
+                href: `/education/course/${r.id}`,
+              });
+            }
+          })(),
+        );
+      }
+
+      // 조회 실패를 빈 목록으로 위장하지 않는다 — 한 축이라도 실패하면 500 으로 올린다.
+      await Promise.all(tasks);
+      items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      res.json({ success: true, data: items.slice(0, limit) });
+    }),
+  );
+
+  router.use('/home', homeRouter);
 
   return router;
 }

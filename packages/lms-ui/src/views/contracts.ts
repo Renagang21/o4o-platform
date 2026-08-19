@@ -254,6 +254,15 @@ export interface LmsViewConfig {
   navigate: (path: string) => void;
   notify: LmsViewNotify;
   labels: LmsViewLabels;
+  /**
+   * 수강신청·진도 기능 사용 여부. 기본 true(기존 서비스 동작 유지).
+   *
+   * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §8:
+   *   Pharmacy-Hub baseline 은 "조회·학습"만이며 Enrollment/Progress 는 범위 밖이다.
+   *   false 면 수강신청 CTA · 진도바 · 완료 처리 · 수료 모달을 노출하지 않고
+   *   enrollment 조회도 하지 않는다(공통 LMS 정책은 그대로 둔다 — config 로만 끈다).
+   */
+  enrollmentEnabled?: boolean;
 }
 
 export function resolveCoursePath(config: LmsViewConfig, courseId: string): string {

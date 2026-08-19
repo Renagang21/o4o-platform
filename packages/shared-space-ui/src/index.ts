@@ -42,6 +42,9 @@ export type { ForumListItem, ForumListItemPostType } from './forumListItem';
 
 /* WO-O4O-FORUM-LIST-PAGE-TEMPLATE-V1: 포럼 목록 공통 presentational 컴포넌트 */
 export { ForumListTemplate } from './ForumListTemplate';
+// WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1
+export { MyForumPostsTemplate } from './community/MyForumPostsTemplate';
+export type { MyForumPostsTemplateProps } from './community/MyForumPostsTemplate';
 export type { ForumListTemplateProps } from './ForumListTemplate';
 
 /* WO-O4O-GUIDE-UI-COMPONENT-V1: 화면 안 상황 안내 카드 (전 서비스 공통) */

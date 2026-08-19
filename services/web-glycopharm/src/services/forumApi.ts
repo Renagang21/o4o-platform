@@ -340,3 +340,68 @@ export const forumMembershipApi = {
       `${FORUM_BASE}/categories/${forumId}/membership-status`,
     ),
 };
+
+// ============================================================================
+// My Posts — WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §10·§11
+//   공통 query contract: 인증 + route 의 canonical service scope + `author=me`.
+//   서비스별 전용 endpoint/query 이름을 만들지 않는다.
+//   raw → ForumListItem 매핑(상세 경로 포함)은 서비스 adapter 인 이 파일이 담당한다.
+// ============================================================================
+
+import type { ForumListItem, ForumListItemPostType } from '@o4o/shared-space-ui';
+
+export interface MyForumPostsResult {
+  posts: ForumListItem[];
+  page: number;
+  totalPages: number;
+  total: number;
+}
+
+const MY_POST_TYPES: ForumListItemPostType[] = ['discussion', 'question', 'announcement', 'poll', 'guide'];
+
+function myPostStatusLabel(status?: string | null): string | undefined {
+  if (!status || status === 'publish' || status === 'published') return undefined;
+  if (status === 'draft') return '임시저장';
+  if (status === 'pending') return '승인대기';
+  if (status === 'private') return '비공개';
+  return undefined;
+}
+
+export async function fetchMyForumPosts(params: {
+  page?: number;
+  limit?: number;
+}): Promise<MyForumPostsResult> {
+  const query = new URLSearchParams();
+  query.set('author', 'me');
+  if (params.page) query.set('page', String(params.page));
+  if (params.limit) query.set('limit', String(params.limit));
+
+  // 조회 실패를 빈 목록으로 위장하지 않는다 — throw 해서 공통 View 의 error 상태로 보낸다.
+  const response = await api.get(`${FORUM_BASE}/posts?${query.toString()}`);
+  const body = response.data;
+  if (body && body.success === false) {
+    throw new Error(body.error || '내가 쓴 글을 불러오지 못했습니다.');
+  }
+
+  const rows: ForumPostResponse[] = Array.isArray(body) ? body : (body?.data ?? []);
+  return {
+    posts: rows.map((post) => ({
+      id: post.id,
+      title: post.title,
+      authorName: post.author?.nickname || post.author?.name || '나',
+      createdAt: post.createdAt,
+      commentCount: post.commentCount ?? 0,
+      likeCount: post.likeCount ?? 0,
+      isPinned: Boolean(post.isPinned),
+      viewCount: post.viewCount ?? 0,
+      postType: MY_POST_TYPES.includes(post.type as ForumListItemPostType)
+        ? (post.type as ForumListItemPostType)
+        : undefined,
+      statusLabel: myPostStatusLabel(post.status),
+      routeTo: `/forum/posts/${post.id}`,
+    })),
+    page: body?.pagination?.page ?? params.page ?? 1,
+    totalPages: body?.pagination?.totalPages ?? 0,
+    total: body?.totalCount ?? body?.pagination?.total ?? rows.length,
+  };
+}

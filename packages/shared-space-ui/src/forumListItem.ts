@@ -52,4 +52,9 @@ export interface ForumListItem {
   excerpt?: string;
   /** 수정 시각(ISO) */
   updatedAt?: string;
+  /**
+   * 상태 배지 라벨(임시저장/검토중 등) — My Posts 처럼 비공개 상태 글이 섞이는 목록에서 사용.
+   * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1
+   */
+  statusLabel?: string;
 }

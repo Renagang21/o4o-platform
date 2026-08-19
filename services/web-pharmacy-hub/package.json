@@ -17,6 +17,8 @@
     "@o4o/auth-utils": "workspace:*",
     "@o4o/content-editor": "workspace:*",
     "@o4o/error-handling": "workspace:*",
+    "@o4o/lms-client": "workspace:*",
+    "@o4o/lms-ui": "workspace:*",
     "@o4o/operator-core-ui": "workspace:*",
     "@o4o/operator-ux-core": "workspace:*",
     "@o4o/screen-content-core": "workspace:*",

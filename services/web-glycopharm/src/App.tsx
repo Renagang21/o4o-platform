@@ -289,6 +289,8 @@ const RequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategoryPage
 const MyRequestsPage = lazy(() => import('@/pages/forum/MyRequestsPage'));
 // WO-O4O-GLYCOPHARM-FORUM-DASHBOARD-V1
 const MyForumDashboardPage = lazy(() => import('@/pages/forum/MyForumDashboardPage'));
+// WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11
+const ForumMyPostsPage = lazy(() => import('@/pages/forum/MyPostsPage'));
 const ForumMemberManagementPage = lazy(() => import('@/pages/forum/ForumMemberManagementPage'));
 const ForumFeedbackPage = lazy(() => import('@/pages/forum/ForumFeedbackPage'));
 const EducationPage = lazy(() => import('@/pages/education/EducationPage'));
@@ -613,6 +615,8 @@ function AppRoutes() {
         <Route path="forum/posts/:id" element={<ForumPostDetailPage />} />
         <Route path="forum/request-category" element={<RequestCategoryPage />} />
         <Route path="forum/my-requests" element={<MyRequestsPage />} />
+        {/* WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11: 내가 쓴 글(공통 View) */}
+        <Route path="forum/my-posts" element={<ForumMyPostsPage />} />
         {/* WO-O4O-GLYCOPHARM-FORUM-DASHBOARD-V1 */}
         <Route path="forum/my-dashboard" element={<MyForumDashboardPage />} />
         {/* WO-O4O-FORUM-MEMBER-MANAGEMENT-EXPANSION-FRONTEND-V1 */}

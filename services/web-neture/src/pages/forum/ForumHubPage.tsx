@@ -142,6 +142,9 @@ export default function ForumHubPage({
       { label: '포럼 개설 신청', href: '/forum/request' },
       { label: '인기 글', href: `${basePath}/posts?sort=popular` },
       { label: '공지사항', href: `${basePath}/posts?type=announcement` },
+      // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11
+      // 내가 쓴 글은 canonical 커뮤니티 포럼(/forum) 에만 존재한다(공급자·파트너 허브 제외).
+      ...(basePath === '/forum' ? [{ label: '내가 쓴 글', href: '/forum/my-posts' }] : []),
     ],
   }), [title, description, basePath]);
 

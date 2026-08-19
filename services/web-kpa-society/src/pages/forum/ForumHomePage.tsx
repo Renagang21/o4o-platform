@@ -89,6 +89,8 @@ const kpaForumConfig: ForumHubConfig = {
   infoLinks: [
     { label: '포럼 목록', href: '/forum/all' },
     { label: '포럼 개설 신청', href: '/forum/request' },
+    // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11
+    { label: '내가 쓴 글', href: '/forum/my-posts' },
     { label: '내 활동', href: '/mypage' },
     { label: '이용약관', href: '/policy' },
   ],

@@ -100,6 +100,8 @@ const PostDetailPage = lazy(() => import('@/pages/forum').then(m => ({ default: 
 const ForumWritePage = lazy(() => import('@/pages/forum/ForumWritePage'));
 // WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
 const MyForumDashboardPage = lazy(() => import('@/pages/forum/MyForumDashboardPage'));
+// WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11
+const ForumMyPostsPage = lazy(() => import('@/pages/forum/MyPostsPage'));
 const ForumRequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategoryPage'));
 // WO-O4O-FORUM-MEMBER-MANAGEMENT-EXPANSION-FRONTEND-V1
 const ForumMemberManagementPage = lazy(() => import('@/pages/forum/ForumMemberManagementPage'));
@@ -485,6 +487,15 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <ForumWritePage />
+            </ProtectedRoute>
+          }
+        />
+        {/* WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11: 내가 쓴 글(공통 View) */}
+        <Route
+          path="forum/my-posts"
+          element={
+            <ProtectedRoute>
+              <ForumMyPostsPage />
             </ProtectedRoute>
           }
         />

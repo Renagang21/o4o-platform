@@ -119,6 +119,8 @@ import { ForumPage } from './pages/forum/ForumPage';
 import { ForumWritePage } from './pages/forum/ForumWritePage';
 import { ForumPostPage } from './pages/forum/ForumPostPage';
 import ForumHubPage from './pages/forum/ForumHubPage';
+// WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11
+import ForumMyPostsPage from './pages/forum/MyPostsPage';
 // WO-O4O-NETURE-FORUM-CREATION-REQUEST-ENTRY-ALIGN-KPA-V1: 일반 회원 포럼 개설 신청 진입
 import ForumRequestPage from './pages/forum/ForumRequestPage';
 
@@ -756,6 +758,8 @@ function App() {
               <Route path="/forum/request" element={<ForumRequestPage />} />
               <Route path="/forum/posts" element={<ForumPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" />} />
               <Route path="/forum/write" element={<ForumWritePage />} />
+              {/* WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11: 내가 쓴 글(공통 View) */}
+              <Route path="/forum/my-posts" element={<ForumMyPostsPage />} />
               <Route path="/forum/post/:slug" element={<ForumPostPage />} />
 
               {/* Notices */}

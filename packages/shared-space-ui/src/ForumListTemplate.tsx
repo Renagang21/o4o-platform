@@ -36,6 +36,12 @@ export interface ForumListTemplateProps {
   /** 빈 목록 렌더(검색결과 없음/글쓰기 CTA 등 page 별 액션 — slot). 미전달 시 기본 문구. */
   renderEmpty?: () => ReactNode;
 
+  /**
+   * 작성자 컬럼 표시. 기본 true(기존 목록 동작 유지).
+   * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1:
+   *   My Posts 는 전부 본인 글이므로 작성자 컬럼을 숨긴다.
+   */
+  showAuthor?: boolean;
   /** 유형 배지 컬럼 표시 (K-Cosmetics·Neture true / GlycoPharm false) */
   showPostType?: boolean;
   /** 유형 배지 렌더(서비스별 라벨/색 — slot). showPostType=true 일 때 사용 */
@@ -65,6 +71,7 @@ export function ForumListTemplate({
   onRetry,
   renderEmpty,
   showPostType = false,
+  showAuthor = true,
   renderTypeBadge,
   renderTitleBadge,
   showLikeCount = true,
@@ -73,14 +80,20 @@ export function ForumListTemplate({
   accentColor = '#2563EB',
 }: ForumListTemplateProps) {
   const colCount =
-    (showPostType ? 1 : 0) + 3 /* title/author/date */ + (showLikeCount ? 1 : 0) + (showCommentCount ? 1 : 0);
+    (showPostType ? 1 : 0) +
+    2 /* title/date */ +
+    (showAuthor ? 1 : 0) +
+    (showLikeCount ? 1 : 0) +
+    (showCommentCount ? 1 : 0);
 
   const Header = () => (
     <thead>
       <tr>
         {showPostType && <th className={`${TH} text-left`} style={{ width: '60px' }}>유형</th>}
         <th className={`${TH} text-left`}>제목</th>
-        <th className={`${TH} text-left`} style={{ width: '100px' }}>작성자</th>
+        {showAuthor && (
+          <th className={`${TH} text-left`} style={{ width: '100px' }}>작성자</th>
+        )}
         <th className={`${TH} text-left`} style={{ width: '100px' }}>작성일</th>
         {showLikeCount && <th className={`${TH} text-center`} style={{ width: '50px' }}>좋아요</th>}
         {showCommentCount && <th className={`${TH} text-center`} style={{ width: '50px' }}>댓글</th>}
@@ -111,9 +124,11 @@ export function ForumListTemplate({
           <span className="ml-1.5 text-xs font-medium" style={{ color: accentColor }}>[{post.commentCount}]</span>
         )}
       </td>
-      <td className={`${TD} text-xs text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap`} style={{ width: '100px' }}>
-        {post.authorName}
-      </td>
+      {showAuthor && (
+        <td className={`${TD} text-xs text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap`} style={{ width: '100px' }}>
+          {post.authorName}
+        </td>
+      )}
       <td className={`${TD} text-xs text-slate-400 overflow-hidden text-ellipsis whitespace-nowrap`} style={{ width: '100px' }}>
         {formatForumDate(post.createdAt)}
       </td>

@@ -22,9 +22,24 @@ import { ROLE_LABELS, ROLES } from './service';
  * `/forum` 은 MembershipGate 뒤에 있지만 게이트가 "가입 신청" 안내를 렌더하므로
  * 미가입자에게도 의미 있는 진입점이다(데드링크 아님).
  */
+/*
+ * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §13:
+ *   PH 커뮤니티 navigation 최소 구성 = 커뮤니티 홈 / 포럼 / 검색 / 교육 / 내 글.
+ *   Content · Resources 는 PH 에 미구현이므로 링크를 만들지 않는다("준비 중" dead route 금지).
+ */
 export const PH_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: '홈', href: '/' },
-  { label: '커뮤니티', href: '/forum' },
+  {
+    label: '커뮤니티',
+    href: '/community',
+    children: [
+      { label: '커뮤니티 홈', href: '/community' },
+      { label: '포럼', href: '/forum' },
+      { label: '검색', href: '/community/search' },
+      { label: '내 글', href: '/forum/my-posts' },
+    ],
+  },
+  { label: '교육', href: '/education' },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
@@ -67,7 +82,9 @@ export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }
     title: '서비스',
     links: [
       { label: '홈', href: '/' },
-      { label: '커뮤니티', href: '/forum' },
+      { label: '커뮤니티', href: '/community' },
+      { label: '포럼', href: '/forum' },
+      { label: '교육', href: '/education' },
     ],
   },
   {
