@@ -12,16 +12,23 @@ import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/lib/apiClient';
 import { toast } from '@o4o/error-handling';
 import { MyPageLayout, MyPageAuthRequired, AccountSecuritySettings } from '@o4o/account-ui';
+import { GLYCOPHARM_MYPAGE_NAV_ITEMS } from './navItems';
 
 export default function MySettingsPage() {
   const { user, logoutAll } = useAuth();
 
+  // WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1:
+  // 로그인 안내도 Shell 안에서 렌더한다 (헤더·네비게이션 유실 금지).
   if (!user) {
-    return <MyPageAuthRequired />;
+    return (
+      <MyPageLayout title="설정" width="form" navItems={GLYCOPHARM_MYPAGE_NAV_ITEMS}>
+        <MyPageAuthRequired />
+      </MyPageLayout>
+    );
   }
 
   return (
-    <MyPageLayout title="마이페이지" width="form">
+    <MyPageLayout title="설정" width="form" navItems={GLYCOPHARM_MYPAGE_NAV_ITEMS}>
       <AccountSecuritySettings
         showTwoFactorNotice
         notify={{ success: toast.success, error: toast.error }}

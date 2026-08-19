@@ -8,7 +8,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Mail,
@@ -21,9 +20,17 @@ import {
   Gift,
   ClipboardList,
 } from 'lucide-react';
-import { MyPageLayout, QuickActionsSection, RoleBadgeGroup, MyPageHubCard } from '@o4o/account-ui';
+import {
+  MyPageLayout,
+  QuickActionsSection,
+  RoleBadgeGroup,
+  MyPageAuthRequired,
+  MyPageUserSummary,
+  MyPageEntryCardGrid,
+} from '@o4o/account-ui';
 import type { RoleBadgeTone } from '@o4o/account-ui';
 import { appreciationApi, type AppreciationSend } from '@/api/appreciation';
+import { GLYCOPHARM_MYPAGE_NAV_ITEMS } from './navItems';
 
 const roleLabels: Record<string, string> = {
   admin: '관리자',
@@ -69,11 +76,19 @@ export default function MyPageHub() {
   const receivedTotal = receivedItems.reduce((s, i) => s + i.amount, 0);
   const sentTotal = sentItems.reduce((s, i) => s + i.amount, 0);
 
+  // WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1:
+  // 서비스마다 다르게 손으로 만든 로그인 안내를 공통 컴포넌트로 수렴하고,
+  // 안내 화면에서도 헤더·네비게이션을 유지한다.
   if (!user) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <p className="text-slate-500">로그인이 필요합니다.</p>
-      </div>
+      <MyPageLayout
+        title="마이페이지"
+        width="wide"
+        breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
+        navItems={GLYCOPHARM_MYPAGE_NAV_ITEMS}
+      >
+        <MyPageAuthRequired />
+      </MyPageLayout>
     );
   }
 
@@ -87,68 +102,45 @@ export default function MyPageHub() {
       title="마이페이지"
       width="wide"
       breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
+      navItems={GLYCOPHARM_MYPAGE_NAV_ITEMS}
+      userSummary={
+        /* 공통 요약 카드 — 4 서비스에 복제돼 있던 마크업을 MyPageUserSummary 로 수렴.
+           표시 항목(이메일/연락처/역할/상태)은 그대로 보존한다. */
+        <MyPageUserSummary
+          initial={initial}
+          name={displayName}
+          email={user.email}
+          actionHref="/mypage/profile"
+          badges={
+            <RoleBadgeGroup
+              badges={[
+                { key: 'role', label: roleLabel, tone: 'primary', variant: 'solid' },
+                ...(status.label
+                  ? [{ key: 'status', label: status.label, tone: status.tone, variant: 'soft' as const }]
+                  : []),
+              ]}
+              size="md"
+            />
+          }
+          infoRows={[
+            { key: 'email', icon: <Mail className="w-4 h-4 text-gray-400" />, label: '이메일', value: user.email },
+            { key: 'phone', icon: <Phone className="w-4 h-4 text-gray-400" />, label: '연락처', value: user.phone || '-' },
+            { key: 'role', icon: <Building2 className="w-4 h-4 text-gray-400" />, label: '역할', value: roleLabel },
+            { key: 'status', icon: <Shield className="w-4 h-4 text-gray-400" />, label: '상태', value: status.label },
+          ]}
+        />
+      }
     >
-      {/* Profile Summary Card — KPA-Society 정렬: 흰색 카드 + 좌측 아바타 + 정보 + 우측 수정 버튼 */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-        <div className="flex items-center gap-5">
-          <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-            <span className="text-3xl font-bold text-gray-400">{initial}</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-bold text-gray-900 truncate">{displayName}</h2>
-            <p className="text-sm text-gray-500 truncate mt-0.5">{user.email}</p>
-            <div className="mt-2">
-              <RoleBadgeGroup
-                badges={[
-                  { key: 'role', label: roleLabel, tone: 'primary', variant: 'solid' },
-                  ...(status.label
-                    ? [{ key: 'status', label: status.label, tone: status.tone, variant: 'soft' as const }]
-                    : []),
-                ]}
-                size="md"
-              />
-            </div>
-          </div>
-          <Link
-            to="/mypage/profile"
-            className="flex-shrink-0 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
-          >
-            프로필 수정
-          </Link>
-        </div>
-        {/* 상세 정보 — 새 흰색 카드 구조 안에서 재배치 (이메일/연락처/역할/상태 보존) */}
-        <div className="mt-5 pt-5 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
-          <InfoRow icon={<Mail className="w-4 h-4 text-gray-400" />} label="이메일" value={user.email} />
-          <InfoRow icon={<Phone className="w-4 h-4 text-gray-400" />} label="연락처" value={user.phone || '-'} />
-          <InfoRow icon={<Building2 className="w-4 h-4 text-gray-400" />} label="역할" value={roleLabel} />
-          <InfoRow icon={<Shield className="w-4 h-4 text-gray-400" />} label="상태" value={status.label} />
-        </div>
-      </div>
-
-      {/* LMS Navigation Cards — KPA 흰색 카드 그리드 정렬 (프로필/설정은 상단 탭·수정 버튼으로 일원화) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-        <MyPageHubCard
-          title="내 강의"
-          href="/mypage/enrollments"
-          icon={<BookOpen className="w-5 h-5" />}
-        />
-        <MyPageHubCard
-          title="수료증"
-          href="/mypage/certificates"
-          icon={<Award className="w-5 h-5" />}
-        />
-        <MyPageHubCard
-          title="크레딧 / 포인트"
-          href="/mypage/credits"
-          icon={<Coins className="w-5 h-5" />}
-        />
-        {/* WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1 */}
-        <MyPageHubCard
-          title="내 신청"
-          href="/mypage/my-requests"
-          icon={<ClipboardList className="w-5 h-5" />}
-        />
-      </div>
+      {/* 진입 카드 — 공통 MyPageEntryCardGrid (프로필/설정은 상단 탭·수정 버튼으로 일원화) */}
+      <MyPageEntryCardGrid
+        items={[
+          { key: 'enrollments', title: '내 강의', href: '/mypage/enrollments', icon: <BookOpen className="w-5 h-5" /> },
+          { key: 'certificates', title: '수료증', href: '/mypage/certificates', icon: <Award className="w-5 h-5" /> },
+          { key: 'credits', title: '크레딧 / 포인트', href: '/mypage/credits', icon: <Coins className="w-5 h-5" /> },
+          // WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
+          { key: 'my-requests', title: '내 신청', href: '/mypage/my-requests', icon: <ClipboardList className="w-5 h-5" /> },
+        ]}
+      />
 
       {/* Appreciation Activity Card */}
       {!appreciationLoading && (
@@ -200,15 +192,5 @@ export default function MyPageHub() {
         onLogout={logout}
       />
     </MyPageLayout>
-  );
-}
-
-function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-3 py-2">
-      {icon}
-      <span className="text-xs text-gray-400 w-14">{label}</span>
-      <span className="text-sm text-gray-700">{value}</span>
-    </div>
   );
 }

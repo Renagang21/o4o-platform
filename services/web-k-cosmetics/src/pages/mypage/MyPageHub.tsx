@@ -5,15 +5,23 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { Mail, Phone, Shield, BookOpen, Award, Coins, Gift, ClipboardList } from 'lucide-react';
-import { MyPageLayout, QuickActionsSection, RoleBadge, MyPageHubCard } from '@o4o/account-ui';
+import {
+  MyPageLayout,
+  QuickActionsSection,
+  RoleBadge,
+  MyPageAuthRequired,
+  MyPageUserSummary,
+  MyPageEntryCardGrid,
+} from '@o4o/account-ui';
 import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
 import { appreciationApi, type AppreciationSend } from '@/api/appreciation';
 
 export default function MyPageHub() {
   const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
   const [receivedItems, setReceivedItems] = useState<AppreciationSend[]>([]);
   const [sentItems, setSentItems] = useState<AppreciationSend[]>([]);
   const [appreciationLoading, setAppreciationLoading] = useState(true);
@@ -38,19 +46,19 @@ export default function MyPageHub() {
   const receivedTotal = receivedItems.reduce((s, i) => s + i.amount, 0);
   const sentTotal = sentItems.reduce((s, i) => s + i.amount, 0);
 
+  // WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1:
+  // 손으로 만든 로그인 안내 카드를 공통 컴포넌트로 수렴하고, 안내 화면에서도
+  // 헤더·네비게이션을 유지한다.
   if (!isAuthenticated || !user) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-sm p-8 text-center max-w-sm w-full">
-          <h1 className="text-lg font-semibold text-gray-900 mb-4">로그인이 필요합니다</h1>
-          <Link
-            to="/login"
-            className="block w-full py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors text-center"
-          >
-            로그인
-          </Link>
-        </div>
-      </div>
+      <MyPageLayout
+        title="마이페이지"
+        width="wide"
+        breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
+        navItems={KCOS_MYPAGE_NAV_ITEMS}
+      >
+        <MyPageAuthRequired actionLabel="로그인" onAction={() => navigate('/login')} />
+      </MyPageLayout>
     );
   }
 
@@ -63,60 +71,33 @@ export default function MyPageHub() {
       width="wide"
       breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
       navItems={KCOS_MYPAGE_NAV_ITEMS}
+      userSummary={
+        /* 공통 요약 카드 — 표시 항목(이메일/연락처/역할)은 그대로 보존한다. */
+        <MyPageUserSummary
+          initial={user.name?.charAt(0) || '?'}
+          name={user.name}
+          email={user.email}
+          actionHref="/mypage/profile"
+          badges={<RoleBadge label={roleLabel ?? '사용자'} tone="primary" variant="solid" size="md" />}
+          infoRows={[
+            { key: 'email', icon: <Mail className="w-4 h-4 text-gray-400" />, label: '이메일', value: user.email },
+            { key: 'phone', icon: <Phone className="w-4 h-4 text-gray-400" />, label: '연락처', value: user.phone || '미등록' },
+            { key: 'role', icon: <Shield className="w-4 h-4 text-gray-400" />, label: '역할', value: roleLabel ?? '사용자' },
+          ]}
+        />
+      }
     >
-      {/* Profile Summary Card — KPA-Society 정렬: 흰색 카드 + 좌측 아바타 + 정보 + 우측 수정 버튼 */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-        <div className="flex items-center gap-5">
-          <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-            <span className="text-3xl font-bold text-gray-400">{user.name?.charAt(0) || '?'}</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-bold text-gray-900 truncate">{user.name}</h2>
-            <p className="text-sm text-gray-500 truncate mt-0.5">{user.email}</p>
-            <div className="mt-2">
-              <RoleBadge label={roleLabel ?? '사용자'} tone="primary" variant="solid" size="md" />
-            </div>
-          </div>
-          <Link
-            to="/mypage/profile"
-            className="flex-shrink-0 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
-          >
-            프로필 수정
-          </Link>
-        </div>
-        {/* 상세 정보 — 새 흰색 카드 구조 안에서 재배치 (이메일/연락처/역할 보존) */}
-        <div className="mt-5 pt-5 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
-          <InfoRow icon={<Mail className="w-4 h-4 text-gray-400" />} label="이메일" value={user.email} />
-          <InfoRow icon={<Phone className="w-4 h-4 text-gray-400" />} label="연락처" value={user.phone || '미등록'} />
-          <InfoRow icon={<Shield className="w-4 h-4 text-gray-400" />} label="역할" value={roleLabel ?? '사용자'} />
-        </div>
-      </div>
-
-      {/* Feature Cards — KPA 흰색 카드 그리드 정렬 (프로필/설정은 상단 탭·수정 버튼으로 일원화) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-        {/* LMS MyPage (WO-O4O-KCOS-LMS-MYPAGE-CANONICAL-ALIGNMENT-V1) */}
-        <MyPageHubCard
-          title="내 수강"
-          href="/mypage/enrollments"
-          icon={<BookOpen className="w-5 h-5" />}
-        />
-        <MyPageHubCard
-          title="학습 결과"
-          href="/mypage/certificates"
-          icon={<Award className="w-5 h-5" />}
-        />
-        <MyPageHubCard
-          title="내 크레딧"
-          href="/mypage/credits"
-          icon={<Coins className="w-5 h-5" />}
-        />
-        {/* WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1 */}
-        <MyPageHubCard
-          title="내 신청"
-          href="/mypage/my-requests"
-          icon={<ClipboardList className="w-5 h-5" />}
-        />
-      </div>
+      {/* 진입 카드 — 공통 MyPageEntryCardGrid (프로필/설정은 상단 탭·수정 버튼으로 일원화) */}
+      <MyPageEntryCardGrid
+        items={[
+          // LMS MyPage (WO-O4O-KCOS-LMS-MYPAGE-CANONICAL-ALIGNMENT-V1)
+          { key: 'enrollments', title: '내 수강', href: '/mypage/enrollments', icon: <BookOpen className="w-5 h-5" /> },
+          { key: 'certificates', title: '학습 결과', href: '/mypage/certificates', icon: <Award className="w-5 h-5" /> },
+          { key: 'credits', title: '내 크레딧', href: '/mypage/credits', icon: <Coins className="w-5 h-5" /> },
+          // WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
+          { key: 'my-requests', title: '내 신청', href: '/mypage/my-requests', icon: <ClipboardList className="w-5 h-5" /> },
+        ]}
+      />
 
       {/* Appreciation Activity Card */}
       {!appreciationLoading && (
@@ -169,15 +150,5 @@ export default function MyPageHub() {
         onLogout={logout}
       />
     </MyPageLayout>
-  );
-}
-
-function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-3 py-2">
-      {icon}
-      <span className="text-xs text-gray-400 w-14">{label}</span>
-      <span className="text-sm text-gray-700">{value}</span>
-    </div>
   );
 }

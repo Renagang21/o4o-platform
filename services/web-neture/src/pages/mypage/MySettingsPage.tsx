@@ -14,26 +14,32 @@ import { useAuth } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
 import { api } from '../../lib/apiClient';
 import { MyPageLayout, MyPageAuthRequired, AccountSecuritySettings } from '@o4o/account-ui';
+import { getNetureMyPageNavItems } from './navItems';
 
 export default function MySettingsPage() {
   const { user, isAuthenticated, logoutAll } = useAuth();
   const { openLoginModal } = useLoginModal();
 
+  // WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1:
+  // 로그인 안내도 Shell 안에서 렌더한다 (헤더·네비게이션 유실 금지).
   if (!isAuthenticated || !user) {
     return (
-      <MyPageAuthRequired
-        icon={<User className="w-8 h-8 text-gray-400" />}
-        description="마이페이지를 이용하려면 로그인해주세요."
-        onAction={() => openLoginModal('/mypage/settings')}
-      />
+      <MyPageLayout title="설정" width="form" navItems={getNetureMyPageNavItems([])}>
+        <MyPageAuthRequired
+          icon={<User className="w-8 h-8 text-gray-400" />}
+          description="마이페이지를 이용하려면 로그인해주세요."
+          onAction={() => openLoginModal('/mypage/settings')}
+        />
+      </MyPageLayout>
     );
   }
 
   return (
     <MyPageLayout
-      title="마이페이지"
+      title="설정"
       subtitle="계정 보안 및 환경 설정을 관리합니다"
       width="form"
+      navItems={getNetureMyPageNavItems(user.roles)}
       breadcrumb={[
         { label: '홈', href: '/' },
         { label: '마이페이지', href: '/mypage' },

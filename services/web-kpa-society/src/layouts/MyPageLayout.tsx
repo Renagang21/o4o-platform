@@ -1,23 +1,23 @@
 /**
- * MyPageLayout — KPA-Society /mypage 공통 외곽 wrapper
+ * MyPageLayout — KPA-Society /mypage 외곽 wrapper
  *
- * WO-O4O-KPA-MYPAGE-RESPONSIVE-LAYOUT-CANONICALIZATION-V1
- * 근거: docs/investigations/IR-O4O-KPA-MYPAGE-UI-CONSISTENCY-AUDIT-V1.md
+ * WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1
+ * (선행: WO-O4O-KPA-MYPAGE-RESPONSIVE-LAYOUT-CANONICALIZATION-V1)
  *
- * 책임:
- * - container 폭/패딩 canonical 기준 (outer: max-w-[1120px], form inner: max-w-[860px])
- * - PageHeader 렌더링 (title/description/breadcrumb)
- * - MyPageNavigation 렌더링 (KPA_MYPAGE_NAV_ITEMS 고정)
- * - children 에 페이지 고유 콘텐츠 위임
+ * 변경: 골격(container 폭 · header · navigation)을 자체 구현하지 않고 공통
+ *       `MyPageShell` 에 위임한다. KPA 가 갖고 있던 canonical 폭 기준
+ *       (outer 1120px / form inner 860px)이 그대로 Shell 의 기준이 되었으므로
+ *       화면 결과는 동일하다.
  *
- * width prop:
- *   - 'wide' (default) / 'list' — outer 1120px 그대로 사용
- *   - 'form'                    — children을 max-w-[860px] inner wrapper로 제한
+ * 이 파일은 **KPA 호출부 호환 어댑터**로만 남는다:
+ *   - prop 이름 `description` (Shell 은 `subtitle`)
+ *   - KPA_MYPAGE_NAV_ITEMS 주입
+ *   - width 기본값 'wide'
+ * 페이지들은 수정 없이 그대로 동작한다.
  */
 
 import type { ReactNode } from 'react';
-import { PageHeader } from '../components/common';
-import { MyPageNavigation } from '@o4o/account-ui';
+import { MyPageShell } from '@o4o/account-ui';
 import { KPA_MYPAGE_NAV_ITEMS } from '../pages/mypage/navItems';
 
 export type MyPageWidth = 'form' | 'list' | 'wide';
@@ -27,6 +27,12 @@ export interface MyPageLayoutProps {
   description?: string;
   breadcrumb?: { label: string; href?: string }[];
   width?: MyPageWidth;
+  /** 제목 우측 액션 슬롯 (알림 벨 등). */
+  headerActions?: ReactNode;
+  /** 상태/공지 배너 슬롯 — navigation 바로 아래. */
+  statusNotice?: ReactNode;
+  /** 사용자 요약 카드 슬롯. */
+  userSummary?: ReactNode;
   children: ReactNode;
 }
 
@@ -35,17 +41,24 @@ export function MyPageLayout({
   description,
   breadcrumb,
   width = 'wide',
+  headerActions,
+  statusNotice,
+  userSummary,
   children,
 }: MyPageLayoutProps) {
   return (
-    <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
-      <PageHeader title={title} description={description} breadcrumb={breadcrumb} />
-      <MyPageNavigation items={KPA_MYPAGE_NAV_ITEMS} />
-      {width === 'form' ? (
-        <div className="w-full max-w-[860px]">{children}</div>
-      ) : (
-        children
-      )}
-    </div>
+    <MyPageShell
+      title={title}
+      subtitle={description}
+      breadcrumb={breadcrumb}
+      width={width}
+      basePath="/mypage"
+      navItems={KPA_MYPAGE_NAV_ITEMS}
+      headerActions={headerActions}
+      statusNotice={statusNotice}
+      userSummary={userSummary}
+    >
+      {children}
+    </MyPageShell>
   );
 }

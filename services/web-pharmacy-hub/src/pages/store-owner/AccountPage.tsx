@@ -13,5 +13,9 @@ import MyProfilePage from '../account/MyProfilePage';
 
 export default function AccountPage() {
   // 매장 셸 상단바에는 알림 벨이 없으므로 화면이 직접 렌더한다(기존 동작 보존).
-  return <MyProfilePage showNotifications />;
+  //
+  // WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1:
+  //   매장 셸은 이미 자체 사이드바·상단 chrome 을 갖고 있으므로 공통 My Page Shell 을
+  //   이중으로 씌우지 않는다. canonical `/account` 쪽만 Shell 안에서 렌더된다.
+  return <MyProfilePage showNotifications withShell={false} />;
 }

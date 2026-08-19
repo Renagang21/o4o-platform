@@ -22,6 +22,7 @@ import {
   AccountProfileSection,
   type AccountProfileFieldSpec,
 } from '@o4o/account-ui';
+import { GLYCOPHARM_MYPAGE_NAV_ITEMS } from './navItems';
 
 const roleLabels: Record<string, string> = {
   admin: '관리자',
@@ -44,8 +45,14 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 export default function MyProfilePage() {
   const { user, updateUser } = useAuth();
 
+  // WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1:
+  // 로그인 안내도 Shell 안에서 렌더한다 (헤더·네비게이션 유실 금지).
   if (!user) {
-    return <MyPageAuthRequired />;
+    return (
+      <MyPageLayout title="프로필" width="form" navItems={GLYCOPHARM_MYPAGE_NAV_ITEMS}>
+        <MyPageAuthRequired />
+      </MyPageLayout>
+    );
   }
 
   const status = statusLabels[user.status] || statusLabels.pending;
@@ -120,7 +127,7 @@ export default function MyProfilePage() {
   };
 
   return (
-    <MyPageLayout title="마이페이지" width="form">
+    <MyPageLayout title="프로필" width="form" navItems={GLYCOPHARM_MYPAGE_NAV_ITEMS}>
       <AccountProfileSection
         initial={user.lastName?.charAt(0) || user.name?.charAt(0) || '?'}
         name={displayName}

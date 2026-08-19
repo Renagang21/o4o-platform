@@ -25,18 +25,21 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { LogOut, Mail, Phone, User as UserIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   AccountProfileSection,
   MyPageAuthRequired,
   MyPageLoadingState,
+  MyPageShell,
   NotificationBell,
   PasswordChangeModal,
   SecuritySection,
   useNotifications,
   type AccountProfileFieldSpec,
 } from '@o4o/account-ui';
+import { PHARMACY_HUB_ACCOUNT_NAV_ITEMS } from './navItems';
 import {
   changeAccountPassword,
   fetchAccountProfile,
@@ -95,8 +98,17 @@ function profileFromSession(user: Record<string, unknown> | null): AccountProfil
 export default function MyProfilePage({
   /** 매장 셸 안에는 공개 헤더의 알림 벨이 없으므로 화면이 직접 렌더한다. */
   showNotifications = false,
+  /**
+   * WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1:
+   * canonical route `/account` 는 공통 My Page Shell(헤더 + navigation) 안에서
+   * 렌더한다. 매장 셸(`/store-owner/account`)은 이미 자체 chrome·사이드바를 갖고
+   * 있으므로 Shell 을 이중으로 씌우지 않는다 → 그쪽만 false.
+   * §13 계약(개인 = /account, 매장 셸 = 호환 route)은 그대로다.
+   */
+  withShell = true,
 }: {
   showNotifications?: boolean;
+  withShell?: boolean;
 }) {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const navigate = useNavigate();
@@ -153,50 +165,72 @@ export default function MyProfilePage({
     navigate('/');
   };
 
+  const notificationBell = (
+    <NotificationBell
+      unreadCount={notifications.unreadCount}
+      notifications={notifications.notifications}
+      loading={notifications.loading}
+      onOpen={() => void notifications.refetchList()}
+      onMarkAsRead={(id) => void notifications.markAsRead(id)}
+      onMarkAllAsRead={() => void notifications.markAllAsRead()}
+    />
+  );
+
+  /**
+   * 화면 골격 — 상태(로딩/미인증/오류/정상)와 무관하게 같은 그릇을 쓴다.
+   * 로딩·오류일 때만 헤더가 사라지는 구조를 만들지 않는다.
+   */
+  // 컴포넌트가 아니라 **함수 호출**로 감싼다 — 렌더마다 새 컴포넌트 타입이 생기면
+  // 안쪽 편집 폼이 통째로 remount 되어 입력 중이던 값이 날아간다.
+  const frame = (children: ReactNode) =>
+    withShell ? (
+      <MyPageShell
+        title="내 프로필"
+        width="form"
+        basePath="/account"
+        navItems={PHARMACY_HUB_ACCOUNT_NAV_ITEMS}
+        headerActions={showNotifications ? notificationBell : undefined}
+      >
+        {children}
+      </MyPageShell>
+    ) : (
+      // 매장 셸 안 — 셸이 이미 제목 영역을 갖고 있지 않으므로 화면이 제목을 렌더한다.
+      <div className="space-y-5">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold text-slate-900">내 프로필</h1>
+          {showNotifications && notificationBell}
+        </div>
+        {children}
+      </div>
+    );
+
   if (isLoading || loading) {
-    return <MyPageLoadingState message="계정 정보를 불러오는 중..." />;
+    return frame(<MyPageLoadingState message="계정 정보를 불러오는 중..." />);
   }
 
   if (!isAuthenticated) {
-    return (
+    return frame(
       <MyPageAuthRequired
         description="내 프로필은 로그인 후 이용할 수 있습니다."
         actionLabel="로그인"
         onAction={() => navigate('/login')}
-      />
+      />,
     );
   }
 
   if (error || !profile) {
-    return (
-      <div className="space-y-4">
-        <h1 className="text-xl font-bold text-slate-900">내 프로필</h1>
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          {error ?? '계정 정보를 불러오지 못했습니다.'}
-        </div>
-      </div>
+    return frame(
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        {error ?? '계정 정보를 불러오지 못했습니다.'}
+      </div>,
     );
   }
 
   const displayName = profile.name || profile.nickname || profile.email;
   const roles: string[] = Array.isArray(user?.roles) ? (user!.roles as string[]) : [];
 
-  return (
+  return frame(
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-900">내 프로필</h1>
-        {showNotifications && (
-          <NotificationBell
-            unreadCount={notifications.unreadCount}
-            notifications={notifications.notifications}
-            loading={notifications.loading}
-            onOpen={() => void notifications.refetchList()}
-            onMarkAsRead={(id) => void notifications.markAsRead(id)}
-            onMarkAllAsRead={() => void notifications.markAllAsRead()}
-          />
-        )}
-      </div>
-
       <AccountProfileSection
         initial={(displayName || '?').charAt(0).toUpperCase()}
         name={displayName}
@@ -249,6 +283,6 @@ export default function MyProfilePage({
         onClose={() => setPasswordOpen(false)}
         onSubmit={changeAccountPassword}
       />
-    </div>
+    </div>,
   );
 }

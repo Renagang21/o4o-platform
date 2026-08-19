@@ -13,6 +13,7 @@ import { MyPageLayout } from '@o4o/account-ui';
 import { MyRequestsInbox } from '@o4o/account-ui';
 import type { MyRequestItem } from '@o4o/account-ui';
 import { mypageApi } from '@/api/mypage';
+import { GLYCOPHARM_MYPAGE_NAV_ITEMS } from './navItems';
 
 const TYPE_FILTERS = [
   { key: '', label: '전체' },
@@ -43,7 +44,12 @@ export default function MyRequestsPage() {
   }, [loadData]);
 
   return (
-    <MyPageLayout title="내 신청 내역" subtitle="회원 신청 및 약국 참여 신청 내역을 확인합니다" width="wide">
+    <MyPageLayout
+      title="내 신청 내역"
+      subtitle="회원 신청 및 약국 참여 신청 내역을 확인합니다"
+      width="wide"
+      navItems={GLYCOPHARM_MYPAGE_NAV_ITEMS}
+    >
       <MyRequestsInbox
         items={items}
         loading={loading}

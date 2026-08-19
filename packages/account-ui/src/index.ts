@@ -7,6 +7,28 @@ export { QuickActionsSection } from './components/QuickActionsSection.js';
 export { MyPageNavigation } from './components/MyPageNavigation.js';
 export { MyPageLayout } from './components/MyPageLayout.js';
 export type { MyPageBreadcrumbItem, MyPageLayoutWidth } from './components/MyPageLayout.js';
+
+// ---------------------------------------------------------------------------
+// My Page Shell — WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1
+// 5 서비스 My Page 공통 화면 골격(Shell / Layout / Navigation).
+// `MyPageLayout` 은 `MyPageShell` 의 호환 별칭이며 구현은 하나뿐이다.
+// ---------------------------------------------------------------------------
+export { MyPageShell } from './components/MyPageShell.js';
+export type { MyPageShellProps } from './components/MyPageShell.js';
+export {
+  resolveMyPageNavItems,
+  resolveMyPageNavHref,
+} from './components/MyPageNavigation.js';
+export { MyPageUserSummary } from './components/MyPageUserSummary.js';
+export type {
+  MyPageUserSummaryProps,
+  MyPageUserSummaryInfoRow,
+} from './components/MyPageUserSummary.js';
+export { MyPageEntryCardGrid } from './components/MyPageEntryCardGrid.js';
+export type {
+  MyPageEntryCardGridProps,
+  MyPageEntryCardItem,
+} from './components/MyPageEntryCardGrid.js';
 export { SettingsSection } from './components/SettingsSection.js';
 export { GlobalUserProfileDropdown } from './components/GlobalUserProfileDropdown.js';
 // WO-O4O-MYPAGE-PHASE1-NAV-ROLEBADGE-CANONICALIZATION-V1

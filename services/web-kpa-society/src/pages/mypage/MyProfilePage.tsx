@@ -311,19 +311,27 @@ export function MyProfilePage() {
   // ─── Guards ───
   if (!user) {
     return (
-      <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
+      /* WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1:
+         상태 화면도 Shell 안에서 렌더한다 (헤더·네비게이션 유실 금지). */
+      <MyPageLayout title="프로필">
         <MyPageEmptyState icon="🔒" title="로그인이 필요합니다" description="프로필을 확인하려면 로그인해주세요." />
-      </div>
+      </MyPageLayout>
     );
   }
 
-  if (loading) return <MyPageLoadingState message="프로필을 불러오는 중..." />;
+  if (loading) {
+    return (
+      <MyPageLayout title="프로필">
+        <MyPageLoadingState message="프로필을 불러오는 중..." />
+      </MyPageLayout>
+    );
+  }
 
   if (error) {
     return (
-      <div className="w-full max-w-[1120px] mx-auto px-4 sm:px-5 lg:px-6 pb-10">
+      <MyPageLayout title="프로필">
         <MyPageEmptyState icon="⚠️" title="오류가 발생했습니다" description={error} actionLabel="다시 시도" onAction={loadData} />
-      </div>
+      </MyPageLayout>
     );
   }
 
