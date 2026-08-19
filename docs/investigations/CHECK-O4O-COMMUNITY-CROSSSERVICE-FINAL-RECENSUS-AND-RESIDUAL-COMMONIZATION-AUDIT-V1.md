@@ -488,3 +488,106 @@ delete=404 {"success":false,"error":"Post not found"}
 > 부수 관측(코드 결함 아님): K-Cosmetics · GlycoPharm · PharmacyHub 는 `forum_category_requests` 에 **completed forum 이 0건**이다.
 > 따라서 게시판 선택이 비어 있고, 그 상태에서는 글을 쓸 수 없다. 이는 데이터/운영 상태이며 코드 결함이 아니다 →
 > §15 의 `VALID_NOT_IMPLEMENTED (PRODUCT_DECISION_REQUIRED)` 로 분류한다.
+
+### 14-6. smoke 4차 — R16 수정 배포 후 재검증 (프로덕션)
+
+commit `4870afa30` 배포 완료(Deploy API Server / Deploy Web Services / CodeQL 전부 success) 후 실브라우저(Playwright, desktop 1366×900 + mobile 390×844) 재검증.
+
+| 서비스 | 진입 | 결과 |
+|---|---|---|
+| KPA-Society | `/forum/write` (slug 없는 진입) | 게시판 선택 노출 `["kpa-society 개선","테스트-회원제 포럼"]` → 작성 **성공**(상세 이동) → 좋아요 `1` → `/forum/edit/:id` 수정 반영 → 삭제 후 목록에서 사라짐. **왕복 PASS** |
+| K-Cosmetics | `/forum/write` | 선택 = `["No forum available"]` 빈 상태 문구 노출. 제목·본문 입력 후 등록 클릭 → **POST 발생 0건 · URL 유지 · JS exception 0** (무응답 저장 없음) |
+| GlycoPharm | `/forum/write` | 선택 = `["게시판 없음"]` + "아직 글을 등록할 수 있는 게시판이 없습니다." → 등록 클릭 시 **POST 0건**, 차단 |
+| Neture | `/forum/write` | 작성 **성공** → 좋아요 `1` → 수정 반영 → 삭제 완료. **왕복 PASS** (`categorySlug` 로 forum 확정) |
+| PharmacyHub | `/forum/write` | 선택 = `["게시판 없음"]` (기존 canonical 패턴 유지, 회귀 없음) |
+
+백엔드 fail-closed 직접 확인 (서비스 컨텍스트 + forum 미지정):
+
+```
+POST /api/v1/cosmetics/forum/posts
+→ 400 {"success":false,"error":"A forum must be selected before writing in this service.","code":"FORUM_REQUIRED"}
+```
+
+**§17 기준 판정**
+
+| 기준 | 결과 |
+|---|:--:|
+| white screen = 0 | PASS (5서비스 × desktop/mobile 전 경로 textLen > 0) |
+| JS exception = 0 | PASS (pageerror 0건) |
+| 신규 404 · 500 = 0 | PASS — 관측된 404 는 KPA 약관·개인정보 문서(`/policies/terms` 등) **선행 미구성**뿐이며 커뮤니티 공통화와 무관(§15-5) |
+| cross-service data mixing = 0 | PASS (각 서비스 목록에 타 서비스 게시글 0건) |
+| mobile horizontal overflow = 0 | PASS (`scrollWidth - clientWidth = 0`, 5서비스 전 경로) |
+
+orphan 재점검: generic 경로 `GET /api/v1/forum/posts?limit=100` → 게시글 **4건 전부 `forumId` 보유, orphan 0건** (smoke 중 생성한 게시글은 전부 삭제 완료).
+
+---
+
+## 15. 최종 residual 분류 (§18)
+
+### 15-1. MUST_FIX_BEFORE_COMMUNITY_CLOSE
+
+| # | 항목 | 상태 |
+|---|---|---|
+| R15 | 공통 write 계약(`POST/PUT /forum/posts`) 이 HTML string content 에서 500 (`DOMParser is not defined`) — KPA·KCos·GP·PH 4개 서비스 글쓰기 실패 | **본 WO 에서 수정 완료** (§14-4) |
+| R14 | KPA 댓글 인라인 수정 버튼 미렌더 — 공통 `PUT /comments/:id` 도달 불가 | **본 WO 에서 수정 완료** (§14-2) |
+| R16 | forum 미지정 작성이 `forum_id = NULL` 로 저장돼 그 서비스에서 영구 비가시(작성 201 → 목록·상세·수정·삭제 전부 불가) — KPA·KCos·GP·NET | **본 WO 에서 수정 완료** (§14-5) — backend fail-closed(`FORUM_REQUIRED`) + 4개 글쓰기 화면 게시판 선택 도입 |
+
+**미해소 MUST_FIX: 0건.**
+
+### 15-2. VALID_SERVICE_SPECIFIC (12)
+
+census 상 SS 는 4개 cell 에서만 나온다 (§2 · L09 · E09 · G02 · G04).
+
+| cell | 항목 | 해당 서비스 | 유지 근거 |
+|---|---|---|---|
+| L09 | 강사 인접 사용자 기능 | KPA · KCos · GP (3) | 강사 운영 화면은 서비스별 교육 운영 정책에 종속 |
+| E09 | 내 콘텐츠 | NET (1) | KPA=커뮤니티 작성물 / NET=워크스페이스 자산 — 업무 축이 다름 |
+| G02 | 기능 가이드 | KPA · KCos · GP · NET (4) | 서비스별 안내 문구·화면 |
+| G04 | 서비스 고유 커뮤니티 확장 | KPA · KCos · GP · NET (4) | 각 서비스 사업 고유 기능 (KPA 연차보고·자격, GP forum/feedback, KCos partners, NET service-update forum) |
+
+공통 부품을 강제하면 업무 의미가 왜곡되므로 **전건 유지**한다 (공통화 미달이 아니다).
+
+### 15-3. VALID_NOT_IMPLEMENTED (82)
+
+- `INTENDED_ABSENCE` 76 — 해당 서비스에 그 기능 축 자체가 없다(예: PharmacyHub LMS/자료실, KCos·GP 인증서 발급 백엔드 미구성). 공통 부품은 이미 존재하므로 도입 시 재구현이 아니라 배선이다.
+- `PRODUCT_DECISION_REQUIRED` 6 — 도입 여부가 제품 결정 사안(예: PH 커뮤니티 홈 활동 피드, KCos 강의 수강/진도).
+  - 여기에 §14-5 부수 관측이 더해진다: **KCos · GP · PH 는 `forum_category_requests` 에 completed forum 이 0건**이다.
+    코드 경로는 5서비스 공통으로 열려 있고, 게시판 개설은 운영·제품 결정이다(본 WO 에서 데이터 생성하지 않는다).
+- `ADOPTION_GAP` **0** — 즉시 수정 가능한 배선 누락은 본 WO 에서 전부 닫았다.
+
+### 15-4. VALID_OUT_OF_SCOPE (5)
+
+store-hub 자료실(`/store-hub/library/*`) · operator 콘솔 · 태블릿 screen set 등 커뮤니티가 아닌 축.
+
+### 15-5. FOLLOW_UP_NON_BLOCKING
+
+| 항목 | 내용 |
+|---|---|
+| KPA 약관·개인정보 문서 404 | footer 정책 문서 endpoint 미구성 (커뮤니티 공통화 무관, §14-3) |
+| LMS 비-UUID id → 500 | 404 로 바꾸는 backend 견고성 개선 (본 WO 미접촉, §14-3) |
+| `packages/forum-core` `htmlToBlocks` | 브라우저 전용 구현을 유지한다(프론트 소비처 존재). 서버 경로는 `forumContentServer` 로 분리됐다 — 장기적으로 단일 구현 통합은 별도 WO |
+
+---
+
+## 16. 최종 판정 (§15 · §23)
+
+| §15 완료 선언 기준 | 결과 | 근거 |
+|---|:--:|---|
+| 미조사 0 | PASS | §2 전체 295 cell 판정 기록 |
+| VIEW_DUPLICATED 0 | PASS | §6 |
+| 잔존 CORE_ONLY 전건 근거 | PASS | §5 (19건, 분류 A 적정 19 / B·C 0) |
+| 즉시 수정 가능한 adoption gap 0 | PASS | §7 R1~R12 · §14-2 R13·R14 · §14-4 R15 · §14-5 R16 로 전부 해소, §9 ADOPTION_GAP 0 |
+| cross-service boundary known defect 0 | PASS | §4 · §13-1 (boundary spec 포함 backend 전체 PASS), smoke 에서 데이터 혼입 0 |
+| 주요 서비스 browser smoke PASS | PASS | §14 (5서비스 desktop+mobile) + §14-6 재검증(작성 왕복) |
+| shared package · typecheck · build PASS | PASS | §13-2 · §13-3 |
+| 공통화 기인 dead link · white screen · JS exception 0 | PASS | §14-1 |
+
+**MUST_FIX_BEFORE_COMMUNITY_CLOSE = 0** (§15-1 의 R14·R15·R16 은 본 WO 에서 수정·배포·재검증 완료).
+
+### 결론
+
+> **커뮤니티 cross-service 공통화 최종 완료**
+
+- 커뮤니티 user-facing 모집단 295 cell 중 공통 부품 소비 가능한 영역은 전부 공통화됐다 (FC 177 / CO 19 / VD 0).
+- 잔존 CORE_ONLY 19건은 "공통 Core + 서비스 고유 정보구조" 로 적정하며, 잔존 SERVICE_SPECIFIC 12건과 NOT_IMPLEMENTED 82건은 공통화 미달이 아니라 제품축 부재·제품 판단 대기다.
+- 후속(FOLLOW_UP_NON_BLOCKING)은 §15-5 3건이며 커뮤니티 완료 선언을 막지 않는다.
