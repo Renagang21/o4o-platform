@@ -443,3 +443,23 @@ N 이 295 로 같은 것은 우연이 아니라 **같은 6축 프레임(Forum 18
 |---|---|---|
 | KPA footer 약관·개인정보 문서 조회 | `GET /api/v1/public/services/kpa-society/policies/{terms,privacy}` · `GET /api/v1/kpa/legal/documents/published/{terms,privacy}` 404 | 선행 결함 — 커뮤니티 공통화 기인 아님. FOLLOW_UP_NON_BLOCKING |
 | LMS 강의 상세에 비-UUID id 전달 | `GET /api/v1/lms/courses/{non-uuid}` 가 404 가 아니라 **500** | 선행 backend 견고성 결함(본 WO 미접촉). FOLLOW_UP_NON_BLOCKING |
+
+### 14-4. smoke 2차 — 글쓰기 왕복에서 발견한 공통 write 결함 (R15)
+
+KCos·GP·PH 는 커뮤니티 목록이 0건이라 기존 데이터로 상세 상호작용을 실행할 수 없었다.
+그래서 **작성 → 좋아요 → 수정 → 삭제** 자가정리 왕복을 실제 브라우저로 시도했고, K-Cosmetics `/forum/write` 제출이
+`POST /api/v1/cosmetics/forum/posts` **500** 으로 실패했다. 동일 요청을 API 로 재현해 원인 문자열을 확보했다.
+
+```
+500 {"success":false,"error":"DOMParser is not defined"}
+```
+
+| 항목 | 내용 |
+|---|---|
+| 원인 | `ForumPostController.createPost/updatePost` 가 `@o4o/forum-core.normalizeContent()` 호출 → `htmlToBlocks()` → **브라우저 전용 `DOMParser`**. Node 런타임에서 항상 throw |
+| 영향 범위 | content 를 **HTML string 으로 보내는 서비스 전부** — KPA-Society · K-Cosmetics · GlycoPharm · PharmacyHub 의 글 작성/수정. Neture 만 클라이언트에서 `htmlToBlocks()` 로 Block[] 변환 후 전송해 영향 없음 |
+| 기인 | **선행 결함**(본 WO 이전). 프론트의 "백엔드가 정규화한다" 주석과 백엔드 구현이 어긋난 상태가 유지되고 있었다 |
+| 판정 | 공통 write 계약 자체가 4개 서비스에서 실패 → **MUST_FIX_BEFORE_COMMUNITY_CLOSE** |
+| 조치 | `apps/api-server/src/utils/forumContentServer.ts` 신설 — 기존 의존성 `node-html-parser` 로 **forum-core 와 동일한 Block 매핑**을 서버에서 수행. `ForumPostController` 의 두 호출 지점을 교체 |
+| 저장 포맷 | 변경 없음 (`Block[]`). API 계약·DB schema·migration 변경 0건 |
+| 회귀 가드 | `apps/api-server/src/__tests__/community-forum-content-server-normalization.spec.ts` (4 tests) — DOMParser 부재 환경에서 paragraph/heading/list/quote/code/image/divider 매핑 + 컨트롤러가 DOMParser 의존 import 를 되살리지 못하게 고정 |

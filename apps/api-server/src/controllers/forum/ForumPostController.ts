@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { PostStatus } from '@o4o/forum-core/entities';
-import { normalizeContent, blocksToText, normalizeMetadata } from '@o4o/forum-core';
+import { blocksToText, normalizeMetadata } from '@o4o/forum-core';
+// WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+//   forum-core 의 normalizeContent 는 브라우저 DOMParser 의존 → Node 에서 500.
+//   같은 Block 매핑의 서버 구현으로 교체한다 (계약·저장 포맷 동일).
+import { normalizeForumContentServer as normalizeContent } from '../../utils/forumContentServer.js';
 import logger from '../../utils/logger.js';
 import { ForumControllerBase } from './ForumControllerBase.js';
 // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-or-platform-admin edit/delete check
