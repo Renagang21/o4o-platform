@@ -670,6 +670,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   forumRouter.put('/posts/:id', authenticate, forumController.updatePost.bind(forumController));
   forumRouter.delete('/posts/:id', authenticate, forumController.deletePost.bind(forumController));
   forumRouter.post('/posts/:id/like', authenticate, forumController.toggleLike.bind(forumController));
+  // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §8 (routing defect fix)
+  //   KPA 프런트(forumApi.pinPost)는 `/api/v1/kpa/forum/posts/:id/pin` 을 호출하는데 remount 에
+  //   빠져 있어 404 였다(WO-KPA-A-FORUM-NOTICE-PIN-BY-OWNER-V1 기능이 실질 사망).
+  //   신규 기능이 아니라 공통 핸들러·가드를 그대로 서비스 스코프에 remount 하는 정합 조치다.
+  forumRouter.patch('/posts/:id/pin', authenticate, forumController.pinPost.bind(forumController));
 
   // Comments
   forumRouter.get('/posts/:postId/comments', forumController.listComments.bind(forumController));

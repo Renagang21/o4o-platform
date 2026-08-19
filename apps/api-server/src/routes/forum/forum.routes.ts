@@ -7,6 +7,8 @@ import { ForumMembershipController } from '../../controllers/forum/ForumMembersh
 // @deprecated WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1: Forum category request approval moved to KPA Extension (/api/v1/kpa/forum-requests/*)
 // import { createForumCategoryRequestRoutes } from '../../controllers/forum/ForumCategoryRequestController.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
+import type { RequestHandler } from 'express';
+import { isPlatformAdmin } from '../../utils/role.utils.js';
 import notificationRoutes from './forum.notifications.routes.js';
 import aiRoutes from './forum.ai.routes.js';
 import recommendationRoutes from './forum.recommendation.routes.js';
@@ -15,6 +17,31 @@ import operatorForumRoutes from './operator-forum.routes.js';
 import adminForumRoutes from './admin-forum.routes.js';
 
 const router: Router = Router();
+
+/**
+ * WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §8
+ *
+ * generic `/api/v1/forum/*` 에는 forumContextMiddleware 가 없다 → ForumControllerBase 의
+ * service scope 판정이 전부 무경계로 통과한다. 읽기는 admin-dashboard 계약이라 그대로 두되,
+ * **쓰기(작성/수정/삭제/댓글/좋아요/고정)** 는 서비스 경계를 우회하는 cross-service 통로가
+ * 되므로 platform admin 으로 제한한다. 서비스 사용자 경로는 `/api/v1/{service}/forum/*` 이다.
+ *
+ * 판정 소스는 컨트롤러의 governance override 와 동일한 isPlatformAdmin(roles) 이며
+ * 새 권한 개념을 만들지 않는다.
+ */
+const requireGenericForumWriteAdmin: RequestHandler = (req, res, next) => {
+  const roles: string[] = (req as any).user?.roles || [];
+  if (isPlatformAdmin(roles)) {
+    next();
+    return;
+  }
+  res.status(403).json({
+    success: false,
+    error: 'Generic forum write requires platform admin. Use the service-scoped forum API.',
+    code: 'FORUM_GENERIC_WRITE_ADMIN_ONLY',
+  });
+};
+
 const postController = new ForumPostController();
 const forumDirectoryController = new ForumDirectoryController();
 const commentController = new ForumCommentController();
@@ -63,19 +90,19 @@ router.get('/posts/tags/popular', optionalAuth, postController.getPopularTags.bi
 router.get('/posts/:id', optionalAuth, postController.getPost.bind(postController));
 
 // Create post (authenticated - login required)
-router.post('/posts', authenticate, postController.createPost.bind(postController));
+router.post('/posts', authenticate, requireGenericForumWriteAdmin, postController.createPost.bind(postController));
 
 // Update post (authenticated)
-router.put('/posts/:id', authenticate, postController.updatePost.bind(postController));
+router.put('/posts/:id', authenticate, requireGenericForumWriteAdmin, postController.updatePost.bind(postController));
 
 // Delete post (authenticated)
-router.delete('/posts/:id', authenticate, postController.deletePost.bind(postController));
+router.delete('/posts/:id', authenticate, requireGenericForumWriteAdmin, postController.deletePost.bind(postController));
 
 // Like/unlike post (authenticated)
-router.post('/posts/:id/like', authenticate, postController.toggleLike.bind(postController));
+router.post('/posts/:id/like', authenticate, requireGenericForumWriteAdmin, postController.toggleLike.bind(postController));
 
 // Pin/unpin post as forum notice (authenticated, forum owner only) — WO-KPA-A-FORUM-NOTICE-PIN-BY-OWNER-V1
-router.patch('/posts/:id/pin', authenticate, postController.pinPost.bind(postController));
+router.patch('/posts/:id/pin', authenticate, requireGenericForumWriteAdmin, postController.pinPost.bind(postController));
 
 // ============================================================================
 // Post Comments
@@ -87,13 +114,13 @@ router.get('/posts/:postId/comments', commentController.listComments.bind(commen
 // Comments
 // ============================================================================
 // Create comment (authenticated)
-router.post('/comments', authenticate, commentController.createComment.bind(commentController));
+router.post('/comments', authenticate, requireGenericForumWriteAdmin, commentController.createComment.bind(commentController));
 
 // Update comment (authenticated - author or admin)
-router.put('/comments/:id', authenticate, commentController.updateComment.bind(commentController));
+router.put('/comments/:id', authenticate, requireGenericForumWriteAdmin, commentController.updateComment.bind(commentController));
 
 // Delete comment (authenticated - author or admin)
-router.delete('/comments/:id', authenticate, commentController.deleteComment.bind(commentController));
+router.delete('/comments/:id', authenticate, requireGenericForumWriteAdmin, commentController.deleteComment.bind(commentController));
 
 // ============================================================================
 // Forum Directory — Named routes BEFORE :id to avoid parameter matching

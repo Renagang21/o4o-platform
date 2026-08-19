@@ -35,6 +35,9 @@ export class ForumController {
   updatePost = (req: Request, res: Response) => this.posts.updatePost(req, res);
   deletePost = (req: Request, res: Response) => this.posts.deletePost(req, res);
   toggleLike = (req: Request, res: Response) => this.posts.toggleLike(req, res);
+  // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §8
+  //   facade 에 pin 위임이 없어 서비스 라우터가 pin 을 remount 할 수 없었다.
+  pinPost = (req: Request, res: Response) => this.posts.pinPost(req, res);
   getPopularTags = (req: Request, res: Response) => this.posts.getPopularTags(req, res);
 
   // ---- Forum Directory (formerly Categories) ----

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { CommentStatus } from '@o4o/forum-core/entities';
+import { CommentStatus, PostStatus } from '@o4o/forum-core/entities';
 import logger from '../../utils/logger.js';
 import { ForumControllerBase } from './ForumControllerBase.js';
 // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-or-platform-admin edit/delete check
@@ -120,10 +120,22 @@ export class ForumCommentController extends ForumControllerBase {
         return;
       }
 
-      // Check if post exists
-      const post = await this.postRepository.findOne({ where: { id: postId } });
+      // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §4:
+      //   기존 구현은 postId 단독 조회였다 → 타 서비스 게시글에 댓글을 달 수 있었다.
+      //   대상 post 는 반드시 현재 서비스 컨텍스트 안에서 해석한다.
+      //   없음/타 서비스는 동일하게 404 (존재 비공개 — 기존 400 도 404 로 통일).
+      const post = await this.resolveForumPostInServiceScope(postId, this.getForumContext(req));
       if (!post) {
-        res.status(400).json({
+        res.status(404).json({
+          success: false,
+          error: 'Post not found',
+        });
+        return;
+      }
+
+      // 보관(soft delete)된 게시글에는 댓글을 달 수 없다 — 존재를 노출하지 않는다.
+      if (post.status === PostStatus.ARCHIVED) {
+        res.status(404).json({
           success: false,
           error: 'Post not found',
         });
@@ -134,7 +146,7 @@ export class ForumCommentController extends ForumControllerBase {
       // WO-O4O-FORUM-CATEGORY-CLEANUP-V1: use forumId (forum_category_requests)
       if (post.forumId) {
         const { userId: cuid, roles: croles } = this.getUserFromReq(req);
-        const access = await this.checkClosedForumAccess(post.forumId, cuid, croles);
+        const access = await this.assertForumWriteAccess(post.forumId, cuid, croles);
         if (!access.allowed) {
           res.status(403).json({
             success: false,
@@ -144,6 +156,18 @@ export class ForumCommentController extends ForumControllerBase {
           });
           return;
         }
+      }
+
+      // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §7:
+      //   작성자가 설정한 댓글 허용/잠금 상태는 ForumPost.canUserComment 계약에 이미 있으나
+      //   댓글 생성 경로에서 검사되지 않았다. 기존 필드를 그대로 강제한다(신규 정책 아님).
+      if (post.isLocked || post.allowComments === false) {
+        res.status(403).json({
+          success: false,
+          error: 'Comments are disabled for this post.',
+          code: 'COMMENTS_DISABLED',
+        });
+        return;
       }
 
       const comment = this.commentRepository.create({
@@ -205,15 +229,19 @@ export class ForumCommentController extends ForumControllerBase {
         return;
       }
 
-      const comment = await this.commentRepository.findOne({
-        where: { id },
-        relations: ['author'],
-      });
-
-      if (!comment) {
+      // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §5:
+      //   comment → post → forum → service scope 순으로 해석한다.
+      //   타 서비스 commentId 는 존재를 노출하지 않고 404 로 응답한다.
+      const resolved = await this.resolveForumCommentInServiceScope(
+        id,
+        this.getForumContext(req),
+        { relations: ['author'] },
+      );
+      if (!resolved) {
         res.status(404).json({ success: false, error: 'Comment not found' });
         return;
       }
+      const comment = resolved.comment;
 
       // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-only; platform admin governance override
       if (comment.authorId !== userId && !isPlatformAdmin(userRoles)) {
@@ -255,11 +283,13 @@ export class ForumCommentController extends ForumControllerBase {
 
       const { id } = req.params;
 
-      const comment = await this.commentRepository.findOne({ where: { id } });
-      if (!comment) {
+      // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §5
+      const resolved = await this.resolveForumCommentInServiceScope(id, this.getForumContext(req));
+      if (!resolved) {
         res.status(404).json({ success: false, error: 'Comment not found' });
         return;
       }
+      const comment = resolved.comment;
 
       // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-only; platform admin governance override
       if (comment.authorId !== userId && !isPlatformAdmin(userRoles)) {
@@ -267,15 +297,21 @@ export class ForumCommentController extends ForumControllerBase {
         return;
       }
 
+      // 이미 삭제된 댓글을 다시 삭제해도 commentCount 가 중복 차감되지 않게 한다
+      // (WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §5 — count 정합).
+      const alreadyDeleted = comment.status === CommentStatus.DELETED;
+
       // Soft delete
       comment.status = CommentStatus.DELETED;
       await this.commentRepository.save(comment);
 
       // Decrement post comment count
-      const post = await this.postRepository.findOne({ where: { id: comment.postId } });
-      if (post && post.commentCount > 0) {
-        post.commentCount -= 1;
-        await this.postRepository.save(post);
+      if (!alreadyDeleted) {
+        const post = resolved.post;
+        if (post && post.commentCount > 0) {
+          post.commentCount -= 1;
+          await this.postRepository.save(post);
+        }
       }
 
       res.status(200).json({ success: true, message: 'Comment deleted successfully' });

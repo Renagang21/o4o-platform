@@ -268,8 +268,11 @@ describe('forum write boundary — isForumInServiceScope', () => {
   });
 
   it('update / delete 도 대상 post 의 forum 을 서비스 경계로 검사한다', () => {
+    // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §9:
+    //   경로별 raw lookup + isForumInServiceScope 복제를 공통 resolver 로 대체했다.
+    //   경계 계약은 동일(오히려 like/pin 까지 확대)하므로 검사 대상만 resolver 로 옮긴다.
     const guards = POST_CONTROLLER.match(
-      /await this\.isForumInServiceScope\(post\.forumId, this\.getForumContext\(req\)\)/g,
+      /await this\.resolveForumPostInServiceScope\([\s\S]{0,80}?this\.getForumContext\(req\)\)/g,
     );
     expect(guards).not.toBeNull();
     expect(guards!.length).toBeGreaterThanOrEqual(2);

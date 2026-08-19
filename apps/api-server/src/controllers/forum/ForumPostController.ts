@@ -309,6 +309,23 @@ export class ForumPostController extends ForumControllerBase {
         }
       }
 
+      // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §7:
+      //   폐쇄형 포럼은 읽기·댓글이 이미 멤버십을 요구한다. 글 작성만 무검사였던
+      //   비대칭을 같은 계약(checkClosedForumAccess)으로 맞춘다 — 신규 정책 아님.
+      if (resolvedForumId) {
+        const { userId: cuid, roles: croles } = this.getUserFromReq(req);
+        const access = await this.assertForumWriteAccess(resolvedForumId, cuid, croles);
+        if (!access.allowed) {
+          res.status(403).json({
+            success: false,
+            error: 'Membership is required to write in this closed forum.',
+            code: 'CLOSED_FORUM_ACCESS_DENIED',
+            data: { forumId: resolvedForumId },
+          });
+          return;
+        }
+      }
+
       const post = this.postRepository.create({
         title,
         content: normalizedContent,
@@ -360,18 +377,12 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
-      const post = await this.postRepository.findOne({ where: { id } });
-      if (!post) {
-        res.status(404).json({
-          success: false,
-          error: 'Post not found',
-        });
-        return;
-      }
-
       // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1:
       //   다른 서비스의 게시글은 존재 자체를 노출하지 않는다 (404, 403 아님).
-      if (!(await this.isForumInServiceScope(post.forumId, this.getForumContext(req)))) {
+      // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1:
+      //   조회 + 경계 판정을 공통 resolver 로 통일한다 (경로별 복제 제거).
+      const post = await this.resolveForumPostInServiceScope(id, this.getForumContext(req));
+      if (!post) {
         res.status(404).json({
           success: false,
           error: 'Post not found',
@@ -468,18 +479,12 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
-      const post = await this.postRepository.findOne({ where: { id } });
-      if (!post) {
-        res.status(404).json({
-          success: false,
-          error: 'Post not found',
-        });
-        return;
-      }
-
       // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1:
       //   다른 서비스의 게시글은 존재 자체를 노출하지 않는다 (404, 403 아님).
-      if (!(await this.isForumInServiceScope(post.forumId, this.getForumContext(req)))) {
+      // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1:
+      //   조회 + 경계 판정을 공통 resolver 로 통일한다 (경로별 복제 제거).
+      const post = await this.resolveForumPostInServiceScope(id, this.getForumContext(req));
+      if (!post) {
         res.status(404).json({
           success: false,
           error: 'Post not found',
@@ -535,7 +540,10 @@ export class ForumPostController extends ForumControllerBase {
       const { id } = req.params;
       const { pin } = req.body;
 
-      const post = await this.postRepository.findOne({ where: { id } });
+      // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §8:
+      //   pin 은 postId 단독 조회였다 → 타 서비스 게시글의 존재가 403(NOT_FORUM_OWNER)으로
+      //   드러났다. 서비스 경계 밖 게시글은 update/delete 와 동일하게 404 로 감춘다.
+      const post = await this.resolveForumPostInServiceScope(id, this.getForumContext(req));
       if (!post) {
         res.status(404).json({ success: false, error: 'Post not found' });
         return;
@@ -557,8 +565,16 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
+      // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §8:
+      //   generic write 경로가 platform admin 전용으로 분리되면서, owner-only 판정만으로는
+      //   admin/operator 의 moderation pin 이 성립하지 않는다. closed-forum bypass 와 동일한
+      //   규칙(platform admin 전역 / 동일 서비스 operator)만 재사용한다.
+      const moderationOverride = await this.hasForumModerationOverride(
+        post.forumId,
+        this.getUserFromReq(req).roles,
+      );
       const isOwnerByCreester = forum.requester_id === userId;
-      if (!isOwnerByCreester) {
+      if (!moderationOverride && !isOwnerByCreester) {
         const [member] = await AppDataSource.query(
           `SELECT role FROM forum_category_members WHERE forum_category_id = $1 AND user_id = $2 LIMIT 1`,
           [post.forumId, userId],
@@ -602,10 +618,29 @@ export class ForumPostController extends ForumControllerBase {
       }
 
       const { id: postId } = req.params;
-      const post = await this.postRepository.findOne({ where: { id: postId } });
+
+      // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §6:
+      //   like 는 postId 단독 조회였다 → 타 서비스 게시글에 좋아요/취소가 가능했고
+      //   폐쇄형 포럼 비회원도 좋아요를 남길 수 있었다. 상세 조회와 동일 계약으로 맞춘다.
+      const ctx = this.getForumContext(req);
+      const post = await this.resolveForumPostInServiceScope(postId, ctx);
       if (!post) {
         res.status(404).json({ success: false, error: 'Post not found' });
         return;
+      }
+
+      if (post.forumId) {
+        const { userId: luid, roles: lroles } = this.getUserFromReq(req);
+        const access = await this.assertForumWriteAccess(post.forumId, luid, lroles);
+        if (!access.allowed) {
+          res.status(403).json({
+            success: false,
+            error: 'This post belongs to a closed forum. Membership is required.',
+            code: 'CLOSED_FORUM_ACCESS_DENIED',
+            data: { forumId: post.forumId },
+          });
+          return;
+        }
       }
 
       // Check if forum_post_like table exists (graceful fallback)

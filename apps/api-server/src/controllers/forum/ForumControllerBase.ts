@@ -177,6 +177,79 @@ export class ForumControllerBase {
   }
 
   // ---------------------------------------------------------------------------
+  // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1
+  // Interaction(댓글 / 좋아요 / 고정) 공통 target 해석기.
+  //
+  // Canonical authorization 순서 (§3):
+  //   인증 → service context → service scope 안에서 target 조회 → closed forum 판정
+  //   → ownership/operator/admin 판정 → mutation → count/derived state
+  //
+  // 아래 helper 는 "raw entity lookup 후 나중에 service scope 확인" 패턴을 없애기 위한
+  // 단일 진입점이다. 경로마다 service scope 코드를 복제하지 않는다.
+  // ---------------------------------------------------------------------------
+
+  /**
+   * postId 를 현재 서비스 컨텍스트 안에서 해석한다.
+   * - 존재하지 않음 / 타 서비스 forum 소속 → null (호출자는 동일하게 404 로 응답한다 = 비공개)
+   * - generic/admin 경로(컨텍스트 없음) → 기존대로 무경계 통과
+   */
+  protected async resolveForumPostInServiceScope(
+    postId: string,
+    ctx: ForumContext | undefined,
+  ): Promise<ForumPost | null> {
+    if (!postId) return null;
+    const post = await this.postRepository.findOne({ where: { id: postId } });
+    if (!post) return null;
+    if (!(await this.isForumInServiceScope(post.forumId, ctx))) return null;
+    return post;
+  }
+
+  /**
+   * commentId → comment → post → forum → service scope 로 해석한다.
+   * 어느 단계에서든 경계를 벗어나면 null 이며, 호출자는 404 로 응답한다.
+   */
+  protected async resolveForumCommentInServiceScope(
+    commentId: string,
+    ctx: ForumContext | undefined,
+    options: { relations?: string[] } = {},
+  ): Promise<{ comment: ForumComment; post: ForumPost | null } | null> {
+    if (!commentId) return null;
+    const comment = await this.commentRepository.findOne({
+      where: { id: commentId },
+      ...(options.relations ? { relations: options.relations } : {}),
+    });
+    if (!comment) return null;
+
+    const post = comment.postId
+      ? await this.postRepository.findOne({ where: { id: comment.postId } })
+      : null;
+
+    // 댓글은 post 를 통해서만 서비스에 귀속된다. post 가 없으면(고아 댓글) 경계 판정 불가 →
+    // 서비스 컨텍스트가 있는 경로에서는 노출하지 않는다.
+    const canonical = this.getCanonicalServiceKey(ctx);
+    if (canonical) {
+      if (!post) return null;
+      if (!(await this.isForumInServiceScope(post.forumId, ctx))) return null;
+    }
+
+    return { comment, post };
+  }
+
+  /**
+   * 폐쇄형 포럼 쓰기 접근 판정.
+   * 읽기(checkClosedForumAccess)와 동일한 멤버십/운영자 계약을 쓰기에도 그대로 적용한다.
+   * 새로운 membership 정책을 도입하지 않는다.
+   */
+  protected async assertForumWriteAccess(
+    forumId: string | null | undefined,
+    userId: string | undefined,
+    userRoles: string[],
+  ): Promise<{ allowed: boolean; forumType?: string }> {
+    if (!forumId) return { allowed: true };
+    return this.checkClosedForumAccess(forumId, userId, userRoles);
+  }
+
+  // ---------------------------------------------------------------------------
   // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1: closed forum access helpers
   // ---------------------------------------------------------------------------
 
@@ -184,6 +257,30 @@ export class ForumControllerBase {
   protected getUserFromReq(req: Request): { userId?: string; roles: string[] } {
     const user = (req as any).user;
     return { userId: user?.id, roles: user?.roles || [] };
+  }
+
+  /**
+   * WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §8
+   *
+   * forum 소유자 외에 moderation override 가 성립하는지 판정한다.
+   * 판정 기준은 closed forum bypass 와 **동일한 규칙을 재사용**한다:
+   *   - platform admin/super_admin → 전역 허용
+   *   - 해당 forum 의 service_code 에 대응하는 service operator/admin → 같은 서비스만 허용
+   * 새로운 권한 개념을 만들지 않는다 (cross-service operator bypass 없음).
+   */
+  protected async hasForumModerationOverride(
+    forumId: string | null | undefined,
+    userRoles: string[],
+  ): Promise<boolean> {
+    if (!forumId) return false;
+    if (isPlatformAdmin(userRoles)) return true;
+    const [forum] = await AppDataSource.query(
+      `SELECT service_code FROM forum_category_requests WHERE id = $1 LIMIT 1`,
+      [forumId],
+    );
+    if (!forum || !forum.service_code) return false;
+    const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(forum.service_code);
+    return rolePrefix ? isServiceOperator(userRoles, rolePrefix as ServiceKey) : false;
   }
 
   /**
