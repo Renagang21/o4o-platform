@@ -159,4 +159,38 @@ Navigation(§8)·Home(§9) 은 이미 공통 정본을 4서비스가 채택하�
 
 ## 10. 배포 후 브라우저 검증 (§13)
 
-*(배포 완료 후 아래 절을 채운다 — desktop 1440 / mobile 390, 4서비스)*
+- **검증 시각**: 2026-08-19 · **배포 커밋**: `69dfb6f53` (Deploy Web Services (Cloud Run) = success)
+- **계정**: 매장 경영자 계정 1개 (`docs/local/TEST-ACCOUNTS.local.md`) — 자격증명은 어떤 산출물에도 기록하지 않았다.
+- **방식**: Playwright chromium (headless), 실제 프로덕션 도메인 로그인 → 각 서비스 메뉴 config 의 **전 항목** 순회.
+
+| 서비스 | 도메인 | 메뉴 항목 | desktop 1440 | mobile 390 |
+|---|---|---:|:---:|:---:|
+| KPA-Society | `kpa-society.co.kr` | 25 | 25/25 PASS | 25/25 PASS |
+| K-Cosmetics | `k-cosmetics.site` | 24 | 24/24 PASS | 24/24 PASS |
+| GlycoPharm | `glycopharm.co.kr` | 27 | 27/27 PASS | 27/27 PASS |
+| Pharmacy-Hub | `pharmacyhub.co.kr` | 16 | 16/16 PASS | 16/16 PASS |
+| **합계** | | **92** | **92/92** | **92/92** |
+
+판정 기준별 결과 (4서비스 × 2뷰포트 전수):
+
+| 기준 | 결과 |
+|---|---|
+| white screen (본문 텍스트 40자 미만) | **0** |
+| JS exception (`pageerror`) | **0** |
+| dead link (메뉴 → route 미존재) | **0** |
+| 메뉴 접근 불가 (nav 미렌더) | **0** — 전 화면에서 `nav/aside` 렌더 확인 |
+| horizontal overflow | 매장 화면 **0** (아래 주석 1건 예외) |
+| 콘텐츠 잘림 | 관측 없음 |
+
+**주석 — GlycoPharm 모바일 39px overflow(본 WO 원인 아님)**
+
+`glycopharm.co.kr` 모바일 390px 에서 `scrollWidth 429` 가 관측됐다. 원인 요소는
+class 없는 폭 119px `BUTTON` 이며 **로그인 전 공개 홈 `/` 에서도 동일하게 재현**된다.
+같은 Shell 안의 `/store/products` 는 overflow 0 이다.
+→ Shell/Layout 이 아니라 전역에 얹히는 요소(위젯)의 문제다. 본 WO 범위 밖이며 별도 확인 대상으로 보고만 한다.
+
+**주석 — K-Cosmetics 도메인**
+
+프로덕션 도메인은 `k-cosmetics.site` 다 (`VITE_SERVICE_URL_K_COSMETICS`, deploy-web-services.yml:47).
+과거 CHECK 기록물 일부에 나오는 `k-cosmetics.co.kr` 은 현재 404 를 반환하는 별개 주소다.
+기록물은 §16 정비 대상이 아니므로 수정하지 않고 여기 사실만 남긴다.
