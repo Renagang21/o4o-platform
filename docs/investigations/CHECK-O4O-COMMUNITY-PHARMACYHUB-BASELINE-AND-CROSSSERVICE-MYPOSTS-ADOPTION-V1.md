@@ -137,12 +137,51 @@
 | `@o4o/lms-ui` typecheck | PASS (0) |
 | 5서비스 build (`tsc && vite build`) | 전부 PASS (exit 0) |
 | **migration** | **0건** |
+| 후속 fix `23d795c5e` 후 api-server typecheck | PASS (0) |
+| 후속 fix 후 PH·My Posts spec | 12 tests PASS (5→6 + 6) |
 
 ---
 
 ## 7. Production browser smoke (§17)
 
-> 배포 후 기록.
+실행: Playwright(headless Chromium) · desktop 1440x900 / mobile 390x844 · 실 계정 로그인 후 접속.
+자격증명은 `docs/local/TEST-ACCOUNTS.local.md` 에서만 읽어 환경변수로 주입(스크립트에 하드코딩 없음).
+
+### 7-1. PharmacyHub 전 동선 (commit `23d795c5e` 배포 후 재측정)
+
+| route | viewport | 렌더 | overflow | console error | 4xx/5xx |
+|---|---|:---:|:---:|:---:|:---:|
+| `/community` | desktop / mobile | OK | 0 | 0 | 0 |
+| `/community/search?q=약` | desktop / mobile | OK | 0 | 0 | 0 |
+| `/education` | desktop / mobile | OK | 0 | 0 | 0 |
+| `/forum/my-posts` | desktop / mobile | OK | 0 | 0 | 0 |
+
+white screen 0 / JS exception 0 / dead link 0 / horizontal overflow 0.
+
+### 7-2. 1차 smoke 에서 발견한 결함 — `/api/v1/pharmacy-hub/home/latest` 500 (해소)
+
+- **증상**: PH `/community` desktop·mobile 에서 `500 GET /api/v1/pharmacy-hub/home/latest?type=all&limit=6` (페이지 자체는 렌더, Latest Activity 만 실패).
+- **원인**: `lms_courses` 는 quoted camelCase 컬럼(`"instructorId"`/`"createdAt"`) 이고 `service_key` 만 snake_case
+  (`20260410000001-CreateLmsCoreTables` + `20261101000000-AddServiceKeyToLmsCourses`) 인데,
+  course 집계 쿼리가 `c.instructor_id` / `c.created_at` 로 조회 → `column c.instructor_id does not exist`.
+- **표면화 경위**: 본 WO 에서 `Promise.allSettled` → `Promise.all` 로 바꿔 조회 실패를 빈 목록으로 위장하지 않게 만들면서 드러났다.
+  즉 이전에도 PH course 축은 항상 실패하고 있었고 빈 배열로 삼켜지고 있었다.
+- **수정**: `c."instructorId"` / `c."createdAt"` 로 정정 (commit `23d795c5e`). migration 없음.
+- **재발 방지**: `pharmacy-hub-community-baseline.spec.ts` 에 snake_case 오조회 금지 assertion 1건 추가.
+- **재검증**: `type=all|course|forum` 3축 모두 `200 {"success":true,"data":[]}` · `/community` 재smoke 에서 console error 0 / bad response 0.
+
+### 7-3. Cross-service My Posts (`/forum/my-posts`)
+
+| 서비스 | origin | 결과 | overflow | console error | 4xx/5xx |
+|---|---|---|:---:|:---:|:---:|
+| KPA-Society | `kpa-society.co.kr` | 총 3건 (본인 글 목록 정상) | 0 | 0 | 0 |
+| K-Cosmetics | `k-cosmetics.site` | 총 0건 (empty state) | 0 | 0 | 0 |
+| GlycoPharm | `glycopharm.co.kr` | 총 0건 (empty state) | 0 | 0 | 0 |
+| Neture | `neture.co.kr` | 총 1건 | 0 | 0 | 0 |
+| PharmacyHub | `pharmacyhub.co.kr` | 총 0건 (empty state) | 0 | 0 | 0 |
+
+서비스별 건수가 서로 다르다는 사실이 곧 **service scope 격리 + `author=me` 필터가 동시에 동작**한다는 관측 증거다
+(같은 계정으로 5서비스 접속, 타 서비스 글 혼입 0).
 
 ---
 
