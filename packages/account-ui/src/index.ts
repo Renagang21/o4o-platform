@@ -1,7 +1,6 @@
 export { AccountPageLayout } from './components/AccountPageLayout.js';
 export { ProfileCard } from './components/ProfileCard.js';
 export { ProfileInfoField } from './components/ProfileInfoField.js';
-export { SecuritySection } from './components/SecuritySection.js';
 export { PasswordChangeModal } from './components/PasswordChangeModal.js';
 export { QuickActionsSection } from './components/QuickActionsSection.js';
 export { MyPageNavigation } from './components/MyPageNavigation.js';
@@ -145,6 +144,8 @@ export type {
   BusinessProfileAccent,
 } from './components/BusinessProfileSection.js';
 
+// WO-O4O-CROSS-SERVICE-MYPAGE-SETTINGS-SECURITY-COMMONIZATION-V1:
+//   `SecuritySection` 은 소비처 0 이 되어 제거했다 (5 서비스 전부 AccountSecuritySettings 사용).
 export { AccountSecuritySettings } from './components/AccountSecuritySettings.js';
 export type {
   AccountSecuritySettingsProps,

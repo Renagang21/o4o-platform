@@ -26,16 +26,15 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { LogOut, Mail, Phone, User as UserIcon } from 'lucide-react';
+import { Mail, Phone, User as UserIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   AccountProfileSection,
+  AccountSecuritySettings,
   MyPageAuthRequired,
   MyPageLoadingState,
   MyPageShell,
   NotificationBell,
-  PasswordChangeModal,
-  SecuritySection,
   useNotifications,
   type AccountProfileFieldSpec,
 } from '@o4o/account-ui';
@@ -117,7 +116,6 @@ export default function MyProfilePage({
   const [canEdit, setCanEdit] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [passwordOpen, setPasswordOpen] = useState(false);
 
   const notifications = useNotifications(notificationsApi, {
     enabled: isAuthenticated && showNotifications,
@@ -261,27 +259,17 @@ export default function MyProfilePage({
         )}
       </AccountProfileSection>
 
-      <SecuritySection
-        onPasswordChange={() => setPasswordOpen(true)}
-        description="Pharmacy-Hub 로그인 비밀번호"
-      />
-
-      <div className="rounded-2xl bg-white p-6 shadow-sm">
-        <h3 className="mb-4 text-sm font-semibold text-gray-900">세션</h3>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="flex w-full items-center justify-between rounded-xl bg-gray-50 p-4 text-sm text-gray-700 transition-colors hover:bg-gray-100"
-        >
-          <span>로그아웃</span>
-          <LogOut className="h-4 w-4 text-gray-400" />
-        </button>
-      </div>
-
-      <PasswordChangeModal
-        open={passwordOpen}
-        onClose={() => setPasswordOpen(false)}
-        onSubmit={changeAccountPassword}
+      {/* WO-O4O-CROSS-SERVICE-MYPAGE-SETTINGS-SECURITY-COMMONIZATION-V1:
+          보안 설정(비밀번호) · 계정 관리(로그아웃) 를 5 서비스 공통
+          `AccountSecuritySettings` 로 수렴한다. Pharmacy-Hub 는 `/mypage` 축이 없어
+          이 화면이 Profile + Settings 를 함께 담는다(§13 계약 유지).
+          `logoutAll` 계약이 없으므로 현재 기기 로그아웃만 노출한다 — 세션 backend 는
+          신설하지 않는다.
+          ⚠️ 비밀번호 값은 공통 모달 밖으로 나가지 않는다. */}
+      <AccountSecuritySettings
+        securityDescription="Pharmacy-Hub 로그인 비밀번호"
+        onChangePassword={changeAccountPassword}
+        onLogout={handleLogout}
       />
     </div>,
   );

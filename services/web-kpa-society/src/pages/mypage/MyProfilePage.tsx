@@ -4,7 +4,7 @@
  * WO-KPA-PROFILE-ROLE-BASED-V1: API 데이터 구조 기반 역할별 프로필
  * WO-KPA-SOCIETY-PROFILE-TABS-AND-ROLE-DETAILS-V1: 탭 UI (기본 정보 / 직역 정보)
  *
- * Tab 1 (기본 정보): 이름, 연락처, 이메일 + 비밀번호 변경
+ * Tab 1 (기본 정보): 이름, 연락처, 이메일 (+ 비밀번호 변경은 /mypage/settings 로 연결)
  * Tab 2 (직역 정보): 약사면허, 직역, 출신교 + 역할별 사업장/근무지 정보 + 소속 조직
  */
 
@@ -19,8 +19,9 @@ import {
   MyPageEmptyState,
   // WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1:
   //   KPA 자체 인라인 비밀번호 변경 폼 → 공통 SecuritySection + PasswordChangeModal 로 수렴.
-  SecuritySection,
-  PasswordChangeModal,
+  // WO-O4O-CROSS-SERVICE-MYPAGE-SETTINGS-SECURITY-COMMONIZATION-V1:
+  //   비밀번호 변경 진입은 `/mypage/settings`(AccountSecuritySettings) 단일 계약으로 이동.
+  //   Profile 은 프로필 필드만 소유한다 (진입은 링크로만 연결).
 } from '@o4o/account-ui';
 import { mypageApi, type ProfileResponse } from '../../api';
 // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
@@ -120,8 +121,6 @@ export function MyProfilePage() {
     storeDetailAddress: '',
   });
 
-  // Password — 입력값은 공통 PasswordChangeModal 안에서만 유지된다 (이 화면에 저장하지 않는다).
-  const [passwordOpen, setPasswordOpen] = useState(false);
 
   // WO-O4O-KPA-PROFILE-AND-STOREOWNER-UX-ALIGN-V1: 매장 운영 권한 capability 상태
 
@@ -276,26 +275,6 @@ export function MyProfilePage() {
   const handleRoleCancel = () => {
     if (profile) resetRoleForm(profile);
     setIsRoleEdit(false);
-  };
-
-  // ─── Password handler ───
-  //   검증(일치 / 8자 이상) · 성공 피드백 · 실패 메시지는 공통 모달이 담당한다.
-  //   여기서는 KPA credential API 호출과 오역 메시지 정정만 수행한다.
-  const handlePasswordChange = async (
-    currentPassword: string,
-    newPassword: string,
-    newPasswordConfirm: string,
-  ) => {
-    try {
-      await mypageApi.changePassword({ currentPassword, newPassword, newPasswordConfirm });
-      toast.success('비밀번호가 변경되었습니다.');
-    } catch (err: any) {
-      const message = err?.message || '비밀번호 변경에 실패했습니다.';
-      if (message.includes('incorrect') || message.includes('Current password')) {
-        throw new Error('현재 비밀번호가 올바르지 않습니다.');
-      }
-      throw err;
-    }
   };
 
   // ─── Tab switch ───
@@ -479,18 +458,18 @@ export function MyProfilePage() {
             )}
           </Card>
 
-          {/* 비밀번호 변경 — 공통 계층 (WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1) */}
+          {/* WO-O4O-CROSS-SERVICE-MYPAGE-SETTINGS-SECURITY-COMMONIZATION-V1:
+              비밀번호 변경은 5 서비스 공통 계약(설정 = 보안·계정 관리)으로 수렴했다.
+              Profile 에서는 화면을 두 벌 만들지 않고 canonical route 로 연결만 한다. */}
           <div style={{ marginTop: '24px' }}>
-            <SecuritySection
-              onPasswordChange={() => setPasswordOpen(true)}
-              description="KPA 로그인 비밀번호"
-            />
+            <Card padding="large">
+              <h3 style={styles.sectionTitle}>보안 설정</h3>
+              <Link to="/mypage/settings" style={styles.securityLink}>
+                <span>비밀번호 변경</span>
+                <span style={{ color: colors.neutral500, fontSize: '13px' }}>설정에서 변경 →</span>
+              </Link>
+            </Card>
           </div>
-          <PasswordChangeModal
-            open={passwordOpen}
-            onClose={() => setPasswordOpen(false)}
-            onSubmit={handlePasswordChange}
-          />
         </>
       )}
 
@@ -766,6 +745,17 @@ export function MyProfilePage() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
+  securityLink: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '16px',
+    backgroundColor: colors.neutral50,
+    borderRadius: '12px',
+    color: colors.neutral900,
+    fontSize: '14px',
+    textDecoration: 'none',
+  },
   // Tab bar
   tabBar: {
     display: 'flex',

@@ -5,6 +5,11 @@
  *   `계정 탈퇴` mock action 제거. mypageApi.requestWithdraw() 미구현 상태에서
  *   사용자에게 "탈퇴 요청 접수됨" 으로 성공 표시하는 위험 mock 이었음.
  *   백엔드 API 도입 시 재추가 (별도 WO).
+ *
+ * WO-O4O-CROSS-SERVICE-MYPAGE-SETTINGS-SECURITY-COMMONIZATION-V1:
+ *   `모든 기기 로그아웃` 로컬 복제 + `/mypage/profile` 에 흩어져 있던 비밀번호 변경 진입을
+ *   공통 `AccountSecuritySettings` 로 수렴한다. GlycoPharm / K-Cosmetics / Neture 와 같은
+ *   계약(설정 = 보안·계정 관리)으로 정렬한다. 알림 수신 설정은 KPA 고유 확장으로 잔존한다.
  */
 
 import { useState, useEffect } from 'react';
@@ -12,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
-import { MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
+import { MyPageLoadingState, MyPageEmptyState, AccountSecuritySettings } from '@o4o/account-ui';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -56,20 +61,6 @@ export function MySettingsPage() {
       toast.error('설정 변경에 실패했습니다.');
     } finally {
       setSaving(false);
-    }
-  };
-
-  const handleLogoutAll = async () => {
-    const confirmed = window.confirm(
-      '모든 기기에서 로그아웃됩니다.\n현재 기기도 로그아웃됩니다.\n\n계속하시겠습니까?'
-    );
-    if (!confirmed) return;
-
-    try {
-      await logoutAll();
-      navigate('/');
-    } catch (err) {
-      toast.error('로그아웃에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -175,22 +166,23 @@ export function MySettingsPage() {
         </div>
       </Card>
 
-      {/* 계정 관리 */}
-      <Card padding="large">
-        <h3 style={styles.sectionTitle}>계정 관리</h3>
-
-        <div style={styles.dangerZone}>
-          <button
-            style={styles.dangerButton}
-            onClick={handleLogoutAll}
-          >
-            모든 기기에서 로그아웃
-          </button>
-          {/* WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V1:
-              `계정 탈퇴` 버튼 제거. mypageApi.requestWithdraw() backend 미구현 상태에서
-              사용자에게 mock 성공 표시하던 위험 action. API 도입 시 별도 WO 로 재추가. */}
-        </div>
-      </Card>
+      {/* 보안 설정 / 계정 관리 — 공통 계층
+          WO-O4O-CROSS-SERVICE-MYPAGE-SETTINGS-SECURITY-COMMONIZATION-V1
+          ⚠️ 비밀번호 값은 공통 모달 밖으로 나가지 않는다 (이 화면에 저장·로깅하지 않는다).
+          WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V1 의 `계정 탈퇴` 제거는 유지한다
+          (mypageApi.requestWithdraw() backend 미구현). */}
+      <AccountSecuritySettings
+        securityDescription="KPA 로그인 비밀번호"
+        notify={{ success: toast.success, error: toast.error }}
+        onLogoutAll={logoutAll}
+        logoutAllIncludesCurrentDevice
+        onAfterLogoutAll={() => navigate('/')}
+        onChangePassword={async (currentPassword, newPassword, newPasswordConfirm) => {
+          // serviceKey='kpa-society' 는 mypageApi.changePassword 가 주입한다
+          // (WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1).
+          await mypageApi.changePassword({ currentPassword, newPassword, newPasswordConfirm });
+        }}
+      />
     </MyPageLayout>
   );
 }
@@ -249,21 +241,6 @@ const styles: Record<string, React.CSSProperties> = {
     left: '2px',
     transition: 'transform 0.2s',
     boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-  },
-  dangerZone: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  },
-  dangerButton: {
-    padding: '12px 20px',
-    backgroundColor: colors.white,
-    color: colors.accentRed,
-    border: `1px solid ${colors.accentRed}`,
-    borderRadius: '6px',
-    fontSize: '14px',
-    cursor: 'pointer',
-    textAlign: 'left',
   },
   // WO-O4O-MYPAGE-TIER1-DEAD-STUB-CLEANUP-V1: 탈퇴 모달 관련 styles 제거 (mock action 제거 동반)
 };
