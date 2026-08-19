@@ -21,10 +21,10 @@ import {
   MyPageLayout,
   QuickActionsSection,
   RoleBadgeGroup,
-  MyPageEmptyState,
   MyPageAuthRequired,
   MyPageUserSummary,
   MyPageEntryCardGrid,
+  MyPageActivityFeed,
 } from '@o4o/account-ui';
 import { SUPPLIER_ONLY_ROLES } from '../../lib/role-constants';
 import { getNetureMyPageNavItems } from './navItems';
@@ -93,11 +93,12 @@ export default function MyPageHub() {
       }
     >
 
-      {/* 최근 활동 */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-4">최근 활동</h3>
-        <MyPageEmptyState description="최근 활동이 없습니다." />
-      </div>
+      {/* 최근 활동 — 공통 MyPageActivityFeed
+          (WO-O4O-CROSS-SERVICE-MYPAGE-HOME-HUB-COMMONIZATION-V1 §8)
+          Neture 는 아직 개인 활동 원장 소비 계약이 없어 빈 목록을 넘긴다.
+          활동 API 신설은 이번 범위 밖(WO §12·§13)이며, 계약이 생기면
+          items 만 채우면 된다 — 화면 골격은 더 손대지 않는다. */}
+      <MyPageActivityFeed items={[]} />
 
       {/* 하단 바로가기 (WO-O4O-MYPAGE-HUB-CARD-CANONICAL-ALIGNMENT-V1) — 공통 MyPageEntryCardGrid */}
       <MyPageEntryCardGrid

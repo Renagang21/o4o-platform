@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
-import { Mail, Phone, Shield, BookOpen, Award, Coins, Gift, ClipboardList } from 'lucide-react';
+import { Mail, Phone, Shield, BookOpen, Award, Coins, ClipboardList } from 'lucide-react';
 import {
   MyPageLayout,
   QuickActionsSection,
@@ -15,6 +15,7 @@ import {
   MyPageAuthRequired,
   MyPageUserSummary,
   MyPageEntryCardGrid,
+  MyPageAppreciationCard,
 } from '@o4o/account-ui';
 import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
 import { appreciationApi, type AppreciationSend } from '@/api/appreciation';
@@ -99,48 +100,16 @@ export default function MyPageHub() {
         ]}
       />
 
-      {/* Appreciation Activity Card */}
+      {/* 감사 활동 — 공통 MyPageAppreciationCard
+          (WO-O4O-CROSS-SERVICE-MYPAGE-HOME-HUB-COMMONIZATION-V1 §8) */}
       {!appreciationLoading && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-          <div className="flex items-center gap-2 px-5 py-4 border-b border-gray-100">
-            <Gift className="w-4 h-4 text-amber-500" />
-            <h3 className="text-sm font-semibold text-gray-800">감사 활동</h3>
-          </div>
-          {receivedTotal === 0 && sentTotal === 0 ? (
-            <div className="px-5 py-6 text-center">
-              <p className="text-sm text-gray-400 mb-1">아직 받은 감사가 없습니다.</p>
-              <p className="text-xs text-gray-300">좋은 글과 자료를 공유하면 감사 포인트를 받을 수 있습니다.</p>
-            </div>
-          ) : (
-            <div className="p-5 space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-amber-50 rounded-xl px-4 py-3 text-center">
-                  <p className="text-xs text-amber-600 mb-1">받은 감사</p>
-                  <p className="text-xl font-bold text-amber-800">{receivedTotal.toLocaleString()}P</p>
-                  <p className="text-xs text-amber-500 mt-0.5">{receivedItems.length}건</p>
-                </div>
-                <div className="bg-gray-50 rounded-xl px-4 py-3 text-center">
-                  <p className="text-xs text-gray-500 mb-1">보낸 감사</p>
-                  <p className="text-xl font-bold text-gray-700">{sentTotal.toLocaleString()}P</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{sentItems.length}건</p>
-                </div>
-              </div>
-              {receivedItems.filter(r => r.message).length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">최근 받은 감사 메시지</p>
-                  <div className="space-y-2">
-                    {receivedItems.filter(r => r.message).slice(0, 3).map((r, i) => (
-                      <div key={i} className="flex justify-between items-center text-xs bg-amber-50 rounded-lg px-3 py-2">
-                        <span className="italic text-amber-700 flex-1 mr-2 truncate">"{r.message}"</span>
-                        <span className="font-semibold text-amber-600 whitespace-nowrap">+{r.amount}P</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+        <MyPageAppreciationCard
+          receivedTotal={receivedTotal}
+          sentTotal={sentTotal}
+          receivedCount={receivedItems.length}
+          sentCount={sentItems.length}
+          receivedItems={receivedItems.map((r, i) => ({ key: String(i), message: r.message, amount: r.amount }))}
+        />
       )}
 
       {/* Quick Actions */}

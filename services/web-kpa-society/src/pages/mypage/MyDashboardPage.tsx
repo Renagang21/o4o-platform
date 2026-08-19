@@ -1,20 +1,35 @@
 /**
- * MyDashboardPage - 마이페이지 대시보드
+ * MyDashboardPage - 마이페이지 대시보드 (KPA-Society My Page Home)
  *
  * WO-KPA-A-MYPAGE-HUB-NAVIGATION-AND-CTA-ENHANCEMENT-V1
  * - MyPageNavigation 탭 네비게이션 추가
  * - 내 포럼 바로가기 추가, 작성 글 카드 링크 연결
  *
- * WO-MARKET-TRIAL-KPA-DASHBOARD-SUMMARY-V1
- * - 모집 중 Trial 요약 숫자 + 내 참여 현황 통합 위젯
- * - Gateway API로 모집 중 신호 추가 (발견성 강화)
+ * WO-O4O-CROSS-SERVICE-MYPAGE-HOME-HUB-COMMONIZATION-V1
+ * - 손으로 만든 사용자 요약 카드 → 공통 `MyPageUserSummary` (Shell 의 userSummary 슬롯)
+ * - 손으로 만든 최근 활동 카드 → 공통 `MyPageActivityFeed`
+ * - 손으로 만든 감사 활동 카드 → 공통 `MyPageAppreciationCard`
+ * - 손으로 만든 하단 바로가기 → 공통 `MyPageEntryCardGrid`
+ * - 활동 요약 타일(수강/수료/수료증/작성 글/이벤트)은 KPA 고유 지표라
+ *   `SERVICE_SPECIFIC` 으로 유지한다 (다른 4 서비스에 대응 화면 없음).
+ *
+ * 데이터 계약(mypageApi / appreciationApi)은 변경하지 않는다 — 표현만 공통화한다.
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { UserCog, MessageSquare, GraduationCap, ScrollText, ClipboardList, Settings } from 'lucide-react';
 import { Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
-import { RoleBadgeGroup, MyPageLoadingState, MyPageEmptyState } from '@o4o/account-ui';
+import {
+  RoleBadgeGroup,
+  MyPageLoadingState,
+  MyPageEmptyState,
+  MyPageUserSummary,
+  MyPageEntryCardGrid,
+  MyPageActivityFeed,
+  MyPageAppreciationCard,
+} from '@o4o/account-ui';
 import { mypageApi } from '../../api';
 import { appreciationApi, type AppreciationSend } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
@@ -38,6 +53,20 @@ function getUserDisplayName(user: any): string {
   if (!user) return '사용자';
   return user.name || '사용자';
 }
+
+/** 활동 타입 → 아이콘. 표시 전용 매핑이며 활동 모델은 그대로 둔다. */
+const ACTIVITY_ICONS: Record<string, string> = {
+  course_progress: '📚',
+  forum_post: '💬',
+  groupbuy: '🛒',
+  certificate: '🎓',
+};
+
+/** 감사 대상 타입 → 라벨. 표시 전용 매핑. */
+const APPRECIATION_TARGET_LABELS: Record<string, string> = {
+  forum_post: '포럼',
+  lms_course: '강의',
+};
 
 export function MyDashboardPage() {
   const { user } = useAuth();
@@ -132,40 +161,33 @@ export function MyDashboardPage() {
       title="마이페이지"
       breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
       width="wide"
+      userSummary={
+        /* 사용자 요약 — 4 서비스 공통 카드. 배지 구성(소속 분회·역할)은 KPA 판정 그대로. */
+        <MyPageUserSummary
+          initial="👤"
+          name={getUserDisplayName(user)}
+          email={user.email}
+          actionHref="/mypage/profile"
+          badges={
+            <RoleBadgeGroup
+              badges={[
+                ...((user as any).organizationId
+                  ? [{ key: 'org', label: '🏢 소속 분회', tone: 'slate' as const, variant: 'soft' as const }]
+                  : []),
+                {
+                  key: 'role',
+                  label: user.roles.includes('admin') ? '관리자' : user.roles.includes('officer') ? '임원' : '회원',
+                  tone: 'primary',
+                  variant: 'solid',
+                },
+              ]}
+              size="md"
+            />
+          }
+        />
+      }
     >
-      {/* 사용자 프로필 요약 */}
-      <Card padding="large" style={{ marginBottom: '24px' }}>
-        <div style={styles.profileSection}>
-          <div style={styles.avatar}>
-            <span>👤</span>
-          </div>
-          <div style={styles.profileInfo}>
-            <h2 style={styles.userName}>{getUserDisplayName(user)}</h2>
-            <p style={styles.userEmail}>{user.email}</p>
-            <div style={styles.userMeta}>
-              <RoleBadgeGroup
-                badges={[
-                  ...((user as any).organizationId
-                    ? [{ key: 'org', label: '🏢 소속 분회', tone: 'slate' as const, variant: 'soft' as const }]
-                    : []),
-                  {
-                    key: 'role',
-                    label: user.roles.includes('admin') ? '관리자' : user.roles.includes('officer') ? '임원' : '회원',
-                    tone: 'primary',
-                    variant: 'solid',
-                  },
-                ]}
-                size="md"
-              />
-            </div>
-          </div>
-          <Link to="profile" style={styles.editButton}>
-            프로필 수정
-          </Link>
-        </div>
-      </Card>
-
-      {/* 활동 요약 카드 */}
+      {/* 활동 요약 카드 — KPA 고유 지표 (SERVICE_SPECIFIC) */}
       <div style={styles.summaryGrid}>
         <Link to={`/mypage/enrollments`} style={styles.summaryLink}>
           <Card padding="medium">
@@ -216,170 +238,60 @@ export function MyDashboardPage() {
       {/* Market Trial 위젯 제거 — WO-MARKET-TRIAL-CROSS-SERVICE-ENTRY-ONLY-MIGRATION-V1
           Market Trial 실행은 Neture로 통합됨. 진입은 커뮤니티 Home의 단일 배너로 일원화. */}
 
-      {/* 최근 활동 */}
-      <Card padding="large" style={{ marginTop: '24px' }}>
-        <h3 style={styles.sectionTitle}>최근 활동</h3>
-        {activities.length === 0 ? (
-          <p style={styles.noActivity}>최근 활동이 없습니다.</p>
-        ) : (
-          <div style={styles.activityList}>
-            {activities.map((activity, index) => (
-              <div key={index} style={styles.activityItem}>
-                <span style={styles.activityIcon}>
-                  {activity.type === 'course_progress' && '📚'}
-                  {activity.type === 'forum_post' && '💬'}
-                  {activity.type === 'groupbuy' && '🛒'}
-                  {activity.type === 'certificate' && '🎓'}
-                </span>
-                <div style={styles.activityContent}>
-                  <span style={styles.activityTitle}>{activity.title}</span>
-                  <span style={styles.activityDesc}>{activity.description}</span>
-                </div>
-                <span style={styles.activityDate}>
-                  {new Date(activity.date).toLocaleDateString()}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
-
-      {/* WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1: 내 감사 활동 */}
-      {(receivedTotal > 0 || sentTotal > 0 || recentReceived.length > 0 || recentSent.length > 0) && (
-        <Card padding="large" style={{ marginTop: '24px' }}>
-          <h3 style={styles.sectionTitle}>내 감사 활동</h3>
-          <div style={aStyles.totals}>
-            <div style={aStyles.totalItem}>
-              <span style={aStyles.totalIcon}>🎁</span>
-              <span style={aStyles.totalValue}>{receivedTotal.toLocaleString()}P</span>
-              <span style={aStyles.totalLabel}>받은 감사</span>
-            </div>
-            <div style={aStyles.totalItem}>
-              <span style={aStyles.totalIcon}>💝</span>
-              <span style={aStyles.totalValue}>{sentTotal.toLocaleString()}P</span>
-              <span style={aStyles.totalLabel}>보낸 감사</span>
-            </div>
-          </div>
-
-          {recentReceived.length > 0 && (
-            <div style={aStyles.listBlock}>
-              <p style={aStyles.listLabel}>최근 받은 감사</p>
-              {recentReceived.map((r, i) => (
-                <div key={i} style={aStyles.listRow}>
-                  <span style={aStyles.listType}>🎁</span>
-                  <span style={aStyles.listTarget}>{r.targetType === 'forum_post' ? '포럼' : r.targetType === 'lms_course' ? '강의' : '콘텐츠'}</span>
-                  {r.message && <span style={aStyles.listMsg}>"{r.message.length > 30 ? r.message.slice(0, 30) + '…' : r.message}"</span>}
-                  <span style={aStyles.listAmt}>+{r.amount}P</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {recentSent.length > 0 && (
-            <div style={{ ...aStyles.listBlock, marginTop: '12px' }}>
-              <p style={aStyles.listLabel}>최근 보낸 감사</p>
-              {recentSent.map((r, i) => (
-                <div key={i} style={aStyles.listRow}>
-                  <span style={aStyles.listType}>💝</span>
-                  <span style={aStyles.listTarget}>{r.targetType === 'forum_post' ? '포럼' : r.targetType === 'lms_course' ? '강의' : '콘텐츠'}</span>
-                  {r.message && <span style={aStyles.listMsg}>"{r.message.length > 30 ? r.message.slice(0, 30) + '…' : r.message}"</span>}
-                  <span style={aStyles.listAmt}>-{r.amount}P</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
-      )}
-
-      {/* 바로가기 */}
-      <div style={styles.quickLinks}>
-        <Link to={`/mypage/profile`} style={styles.quickLink}>
-          <span style={styles.quickLinkIcon}>👤</span>
-          <span>프로필</span>
-        </Link>
-        <Link to={`/mypage/my-forums`} style={styles.quickLink}>
-          <span style={styles.quickLinkIcon}>💬</span>
-          <span>내 포럼</span>
-        </Link>
-        <Link to={`/mypage/certificates`} style={styles.quickLink}>
-          <span style={styles.quickLinkIcon}>🎓</span>
-          <span>학습 결과</span>
-        </Link>
-        <Link to={`/mypage/qualifications`} style={styles.quickLink}>
-          <span style={styles.quickLinkIcon}>📜</span>
-          <span>내 자격</span>
-        </Link>
-        {/* WO-O4O-MYPAGE-MY-REQUESTS-HUB-CARD-ALIGNMENT-V1 */}
-        <Link to={`/mypage/my-requests`} style={styles.quickLink}>
-          <span style={styles.quickLinkIcon}>📋</span>
-          <span>내 신청</span>
-        </Link>
-        <Link to={`/mypage/settings`} style={styles.quickLink}>
-          <span style={styles.quickLinkIcon}>⚙️</span>
-          <span>설정</span>
-        </Link>
+      {/* 최근 활동 — 공통 MyPageActivityFeed
+          (WO-O4O-CROSS-SERVICE-MYPAGE-HOME-HUB-COMMONIZATION-V1 §8) */}
+      <div style={{ marginTop: '24px' }}>
+        <MyPageActivityFeed
+          items={activities.map((activity, index) => ({
+            key: String(index),
+            icon: ACTIVITY_ICONS[activity.type],
+            title: activity.title,
+            description: activity.description,
+            meta: new Date(activity.date).toLocaleDateString(),
+          }))}
+        />
       </div>
+
+      {/* 내 감사 활동 — 공통 MyPageAppreciationCard
+          (WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1 표시 계약 보존:
+           합계·목록이 모두 비면 카드 자체를 렌더하지 않는다) */}
+      <MyPageAppreciationCard
+        title="내 감사 활동"
+        hideWhenEmpty
+        receivedTotal={receivedTotal}
+        sentTotal={sentTotal}
+        receivedItems={recentReceived.map((r, i) => ({
+          key: String(i),
+          targetLabel: APPRECIATION_TARGET_LABELS[r.targetType] ?? '콘텐츠',
+          message: r.message,
+          amount: r.amount,
+        }))}
+        sentItems={recentSent.map((r, i) => ({
+          key: String(i),
+          targetLabel: APPRECIATION_TARGET_LABELS[r.targetType] ?? '콘텐츠',
+          message: r.message,
+          amount: r.amount,
+        }))}
+      />
+
+      {/* 바로가기 — 공통 MyPageEntryCardGrid (4 서비스 동일 배치) */}
+      <MyPageEntryCardGrid
+        columns={3}
+        items={[
+          { key: 'profile', title: '프로필', href: '/mypage/profile', icon: <UserCog className="w-5 h-5" /> },
+          { key: 'my-forums', title: '내 포럼', href: '/mypage/my-forums', icon: <MessageSquare className="w-5 h-5" /> },
+          { key: 'certificates', title: '학습 결과', href: '/mypage/certificates', icon: <GraduationCap className="w-5 h-5" /> },
+          { key: 'qualifications', title: '내 자격', href: '/mypage/qualifications', icon: <ScrollText className="w-5 h-5" /> },
+          // WO-O4O-MYPAGE-MY-REQUESTS-HUB-CARD-ALIGNMENT-V1
+          { key: 'my-requests', title: '내 신청', href: '/mypage/my-requests', icon: <ClipboardList className="w-5 h-5" /> },
+          { key: 'settings', title: '설정', href: '/mypage/settings', icon: <Settings className="w-5 h-5" /> },
+        ]}
+      />
     </MyPageLayout>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  profileSection: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px',
-  },
-  avatar: {
-    width: '80px',
-    height: '80px',
-    borderRadius: '50%',
-    backgroundColor: colors.neutral100,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '36px',
-    flexShrink: 0,
-  },
-  profileInfo: {
-    flex: 1,
-  },
-  userName: {
-    ...typography.headingL,
-    color: colors.neutral900,
-    margin: 0,
-  },
-  userEmail: {
-    ...typography.bodyM,
-    color: colors.neutral500,
-    marginTop: '4px',
-  },
-  userMeta: {
-    display: 'flex',
-    gap: '8px',
-    marginTop: '8px',
-  },
-  orgBadge: {
-    ...typography.bodyS,
-    padding: '4px 10px',
-    backgroundColor: colors.neutral100,
-    color: colors.neutral700,
-    borderRadius: '4px',
-  },
-  roleBadge: {
-    ...typography.bodyS,
-    padding: '4px 10px',
-    backgroundColor: colors.primary,
-    color: colors.white,
-    borderRadius: '4px',
-  },
-  editButton: {
-    padding: '10px 20px',
-    backgroundColor: colors.neutral100,
-    color: colors.neutral700,
-    textDecoration: 'none',
-    borderRadius: '6px',
-    fontSize: '14px',
-  },
   summaryGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
@@ -409,291 +321,5 @@ const styles: Record<string, React.CSSProperties> = {
     ...typography.bodyS,
     color: colors.neutral500,
     marginTop: '4px',
-  },
-  sectionTitle: {
-    ...typography.headingM,
-    color: colors.neutral900,
-    marginTop: 0,
-    marginBottom: '16px',
-  },
-  noActivity: {
-    ...typography.bodyM,
-    color: colors.neutral500,
-    textAlign: 'center',
-    padding: '32px',
-  },
-  activityList: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  activityItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '12px 0',
-    borderBottom: `1px solid ${colors.neutral100}`,
-  },
-  activityIcon: {
-    fontSize: '20px',
-    width: '32px',
-    textAlign: 'center',
-  },
-  activityContent: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  activityTitle: {
-    ...typography.bodyM,
-    color: colors.neutral800,
-    fontWeight: 500,
-  },
-  activityDesc: {
-    ...typography.bodyS,
-    color: colors.neutral500,
-  },
-  activityDate: {
-    ...typography.bodyS,
-    color: colors.neutral400,
-  },
-  quickLinks: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '12px',
-    marginTop: '24px',
-  },
-  quickLink: {
-    flex: '1 1 80px',
-    minWidth: '80px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '16px 8px',
-    backgroundColor: colors.neutral50,
-    borderRadius: '12px',
-    textDecoration: 'none',
-    color: colors.neutral700,
-  },
-  quickLinkIcon: {
-    fontSize: '28px',
-    marginBottom: '8px',
-  },
-  // Market Trial 섹션
-  trialSummaryRow: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '32px',
-    padding: '16px 0',
-    marginBottom: '16px',
-    backgroundColor: colors.neutral50,
-    borderRadius: '8px',
-  },
-  trialSummaryStat: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    gap: '4px',
-  },
-  trialSummaryNumber: {
-    fontSize: '1.5rem',
-    fontWeight: 700,
-    color: colors.neutral900,
-  },
-  trialSummaryLabel: {
-    ...typography.bodyS,
-    color: colors.neutral500,
-  },
-  trialSummaryDivider: {
-    width: '1px',
-    height: '32px',
-    backgroundColor: colors.neutral200,
-  },
-  trialSubSection: {
-    marginBottom: '16px',
-  },
-  trialSubTitle: {
-    ...typography.bodyS,
-    fontWeight: 600,
-    color: colors.neutral500,
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.02em',
-    marginBottom: '8px',
-    marginTop: 0,
-  },
-  trialMoreLink: {
-    display: 'block',
-    textAlign: 'center' as const,
-    ...typography.bodyS,
-    color: colors.primary,
-    textDecoration: 'none',
-    padding: '8px 0',
-    fontWeight: 500,
-  },
-  trialHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '16px',
-  },
-  trialHubLink: {
-    ...typography.bodyS,
-    color: colors.primary,
-    textDecoration: 'none',
-    fontWeight: 500,
-  },
-  trialEmptyState: {
-    textAlign: 'center' as const,
-    padding: '24px 0',
-  },
-  trialEmptyIcon: {
-    fontSize: '32px',
-    display: 'block',
-    marginBottom: '8px',
-  },
-  trialEmptyText: {
-    ...typography.bodyM,
-    color: colors.neutral500,
-    margin: '0 0 12px',
-  },
-  trialEmptyLink: {
-    ...typography.bodyS,
-    color: colors.primary,
-    textDecoration: 'none',
-    fontWeight: 500,
-  },
-  trialList: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-  },
-  trialItem: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '12px',
-    padding: '12px 0',
-    borderBottom: `1px solid ${colors.neutral100}`,
-    textDecoration: 'none',
-    color: 'inherit',
-  },
-  trialItemContent: {
-    flex: 1,
-    minWidth: 0,
-    display: 'flex',
-    flexDirection: 'column' as const,
-  },
-  trialTitle: {
-    ...typography.bodyM,
-    color: colors.neutral800,
-    fontWeight: 500,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap' as const,
-  },
-  trialMeta: {
-    ...typography.bodyS,
-    color: colors.neutral500,
-    marginTop: '2px',
-  },
-  trialItemRight: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    flexShrink: 0,
-  },
-  trialStatusBadge: {
-    ...typography.bodyS,
-    padding: '3px 8px',
-    borderRadius: '10px',
-    fontWeight: 500,
-    whiteSpace: 'nowrap' as const,
-  },
-  trialRewardBadge: {
-    ...typography.bodyS,
-    padding: '3px 8px',
-    borderRadius: '10px',
-    backgroundColor: '#CCFBF1',
-    color: '#115E59',
-    fontWeight: 500,
-    whiteSpace: 'nowrap' as const,
-  },
-};
-
-// WO-O4O-APPRECIATION-CULTURE-UI-PHASE1-V1
-const aStyles: Record<string, React.CSSProperties> = {
-  totals: {
-    display: 'flex',
-    gap: '16px',
-    marginBottom: '16px',
-  },
-  totalItem: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '16px',
-    backgroundColor: '#fffbeb',
-    borderRadius: '10px',
-    border: '1px solid #fde68a',
-    gap: '4px',
-  },
-  totalIcon: {
-    fontSize: '24px',
-  },
-  totalValue: {
-    fontSize: '22px',
-    fontWeight: 700,
-    color: '#92400e',
-  },
-  totalLabel: {
-    fontSize: '12px',
-    color: '#b45309',
-    fontWeight: 500,
-  },
-  listBlock: {
-    paddingTop: '12px',
-    borderTop: '1px solid #fef3c7',
-  },
-  listLabel: {
-    margin: '0 0 8px',
-    fontSize: '12px',
-    fontWeight: 600,
-    color: '#b45309',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.05em',
-  },
-  listRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '6px 0',
-    borderBottom: '1px solid #fef9e7',
-  },
-  listType: {
-    fontSize: '14px',
-    flexShrink: 0,
-  },
-  listTarget: {
-    fontSize: '12px',
-    color: '#6b7280',
-    backgroundColor: '#f3f4f6',
-    padding: '2px 6px',
-    borderRadius: '4px',
-    flexShrink: 0,
-  },
-  listMsg: {
-    fontSize: '13px',
-    color: '#78350f',
-    fontStyle: 'italic',
-    flex: 1,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap' as const,
-  },
-  listAmt: {
-    fontSize: '13px',
-    fontWeight: 600,
-    color: '#92400e',
-    flexShrink: 0,
   },
 };

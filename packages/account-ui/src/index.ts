@@ -29,6 +29,21 @@ export type {
   MyPageEntryCardGridProps,
   MyPageEntryCardItem,
 } from './components/MyPageEntryCardGrid.js';
+// ---------------------------------------------------------------------------
+// My Page Home/Hub Core — WO-O4O-CROSS-SERVICE-MYPAGE-HOME-HUB-COMMONIZATION-V1
+// Home 첫 화면의 "최근 활동" · "감사 활동" 표현 구조 공통화.
+// 데이터 조회·모델은 각 서비스 소관이며 여기서는 표시만 한다.
+// ---------------------------------------------------------------------------
+export { MyPageActivityFeed } from './components/MyPageActivityFeed.js';
+export type {
+  MyPageActivityFeedProps,
+  MyPageActivityItem,
+} from './components/MyPageActivityFeed.js';
+export { MyPageAppreciationCard } from './components/MyPageAppreciationCard.js';
+export type {
+  MyPageAppreciationCardProps,
+  MyPageAppreciationEntry,
+} from './components/MyPageAppreciationCard.js';
 export { SettingsSection } from './components/SettingsSection.js';
 export { GlobalUserProfileDropdown } from './components/GlobalUserProfileDropdown.js';
 // WO-O4O-MYPAGE-PHASE1-NAV-ROLEBADGE-CANONICALIZATION-V1
