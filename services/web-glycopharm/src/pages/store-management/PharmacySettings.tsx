@@ -331,7 +331,7 @@ export default function PharmacySettings() {
                   </label>
                 </div>
 
-                <div className="grid gap-5">
+                <div className="grid gap-5 [&>*]:min-w-0">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
                       약국명
@@ -379,7 +379,7 @@ export default function PharmacySettings() {
                     />
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-5">
+                  <div className="grid md:grid-cols-2 gap-5 [&>*]:min-w-0">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">
                         연락처
@@ -433,7 +433,7 @@ export default function PharmacySettings() {
                       스토어 디자인
                     </h3>
 
-                    <div className="grid md:grid-cols-2 gap-5">
+                    <div className="grid md:grid-cols-2 gap-5 [&>*]:min-w-0">
                       {/* Template 선택 */}
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
