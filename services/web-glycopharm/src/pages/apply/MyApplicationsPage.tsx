@@ -31,12 +31,14 @@ const SERVICE_LABELS: Record<ServiceType, { label: string; icon: typeof Building
 
 /**
  * GlycoPharm 상태 enum 은 재설계하지 않는다 (§9).
- * 공통 표시 모델(label/tone)만 이 서비스 표현으로 덮어쓴다.
+ *
+ * `glycopharm_applications.status` 의 `submitted` 는 "운영자 검토 대기" 를 뜻하므로
+ * 공통 기본 라벨(`submitted` = '제출됨')이 아니라 `pending` 과 같은 '검토 중' 으로 표시한다.
+ * 같은 신청서를 보여주는 `/mypage/my-requests`(backend 가 `pending` 으로 내려줌)와
+ * 라벨/tone 이 어긋나지 않도록 맞춘 것이다. `approved` / `rejected` 는 공통 기본값을 그대로 쓴다.
  */
 const STATUS_OVERRIDES = {
-  submitted: { label: '심사 중', tone: 'amber' as const },
-  approved: { label: '승인됨', tone: 'emerald' as const },
-  rejected: { label: '반려됨', tone: 'rose' as const },
+  submitted: { label: '검토 중', tone: 'amber' as const },
 };
 
 const TYPE_OVERRIDES = {

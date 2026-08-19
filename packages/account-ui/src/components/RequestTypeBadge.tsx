@@ -18,6 +18,9 @@ export interface RequestTypeConfig {
 const DEFAULT_TYPE_CONFIG: Record<string, RequestTypeConfig> = {
   forum_category:          { label: '포럼',   tone: 'blue'    },
   forum_delete:            { label: '삭제',   tone: 'rose'    },
+  // WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §9:
+  // `kpa_approval_requests.entity_type` 실측값. 미매핑 시 raw enum 이 그대로 노출됐다.
+  forum_member_join:       { label: '포럼 가입', tone: 'blue'  },
   course:                  { label: '강좌',   tone: 'purple'  },
   course_enrollment:       { label: '수강',   tone: 'primary' },
   instructor_qualification:{ label: '강사',   tone: 'emerald' },

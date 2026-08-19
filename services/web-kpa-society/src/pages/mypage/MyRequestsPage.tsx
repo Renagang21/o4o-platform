@@ -27,6 +27,9 @@ import { forumRequestApi } from '../../api/forum';
 const TYPE_FILTERS = [
   { key: '', label: '전체' },
   { key: 'forum_category', label: '포럼' },
+  // WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §5:
+  // `forum_member_join` 은 실제 데이터가 있으나 필터 탭이 없어 '전체' 에서만 보였다.
+  { key: 'forum_member_join', label: '포럼 가입' },
   { key: 'course', label: '강좌' },
   { key: 'instructor_qualification', label: '강사' },
   { key: 'membership', label: '가입' },
