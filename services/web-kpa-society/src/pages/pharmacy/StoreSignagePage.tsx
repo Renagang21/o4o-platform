@@ -59,7 +59,6 @@ import {
   Search,
 } from 'lucide-react';
 import { DataTable, type Column, BaseDetailDrawer } from '@o4o/ui';
-import { useAuth } from '../../contexts';
 import {
   fetchSchedules,
   createSchedule,
@@ -99,6 +98,7 @@ import {
 } from '../../api/signageMedia';
 import { StoreAssetSelectorModal } from '../../components/store/StoreAssetSelectorModal';
 import type { AssetSelectorResult as LibrarySelectorResult } from '../../components/store/StoreAssetSelectorModal';
+import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 
 /* ─── Constants ──────────────────────────────── */
 
@@ -166,8 +166,10 @@ type ActiveTab = 'assets' | 'playlist' | 'schedules';
 export function StoreSignagePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
-  const organizationId = user?.kpaMembership?.organizationId || '';
+  // WO-O4O-KPA-SIGNAGE-CANONICAL-API-403-RESOLUTION-V1:
+  //   kpaMembership.organizationId(회원 자격 조직) → canonical 매장 조직으로 교정.
+  //   signage store API 는 매장 조직만 인정한다.
+  const { organizationId } = useStoreOrganizationId();
 
   // URL-based tab derivation (IA restructure)
   const activeTab = useMemo((): ActiveTab => {

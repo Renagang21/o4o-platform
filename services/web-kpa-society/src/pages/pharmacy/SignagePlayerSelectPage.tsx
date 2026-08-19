@@ -18,7 +18,7 @@ import { Calendar, Tv } from 'lucide-react';
 import { SignagePlayerSelectView } from '@o4o/store-ui-core';
 import { fetchStorePlaylists } from '../../api/storePlaylist';
 import { fetchActiveContent, type ActiveContentResult } from '../../api/signageSchedule';
-import { useAuth } from '../../contexts';
+import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 
 /** HH:MM:SS → HH:MM */
 function toHHMM(t: string): string {
@@ -26,8 +26,8 @@ function toHHMM(t: string): string {
 }
 
 export function SignagePlayerSelectPage() {
-  const { user } = useAuth();
-  const organizationId = user?.kpaMembership?.organizationId || '';
+  // WO-O4O-KPA-SIGNAGE-CANONICAL-API-403-RESOLUTION-V1: canonical 매장 조직 사용
+  const { organizationId } = useStoreOrganizationId();
 
   const [selectedPlayerKeys, setSelectedPlayerKeys] = useState<string[]>([]);
   const [activeContent, setActiveContent] = useState<ActiveContentResult | null>(null);

@@ -20,8 +20,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { X, Loader2, AlertCircle, List, Calendar, Maximize, Minimize, Play, MonitorPlay } from 'lucide-react';
 import { publicContentApi, type SignagePlaylist } from '../../lib/api/signageV2';
 import { getAccessToken } from '../../contexts/AuthContext';
-import { useAuth } from '../../contexts';
 import { fetchActiveContent, type StorePlaylistActiveItem } from '../../api/signageSchedule';
+import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -206,7 +206,7 @@ function exitFullscreen() {
 export function SignagePlaybackPage() {
   const { playlistId } = useParams<{ playlistId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { organizationId: storeOrganizationId, loading: storeOrgLoading } = useStoreOrganizationId();
 
   const isScheduleMode = playlistId === '_schedule';
 
@@ -230,7 +230,10 @@ export function SignagePlaybackPage() {
 
     // ── Schedule mode ───────────────────────────────────────────────────────
     if (isScheduleMode) {
-      const orgId = user?.kpaMembership?.organizationId;
+      // WO-O4O-KPA-SIGNAGE-CANONICAL-API-403-RESOLUTION-V1: canonical 매장 조직 사용.
+      //   해석은 비동기이므로 로딩 중에는 '조직 없음' 으로 단정하지 않는다.
+      if (storeOrgLoading) return;
+      const orgId = storeOrganizationId;
       if (!orgId) {
         setError('조직 정보를 찾을 수 없습니다.');
         setLoading(false);
@@ -283,7 +286,7 @@ export function SignagePlaybackPage() {
       )
       .catch(() => setError('플레이리스트를 불러오지 못했습니다.'))
       .finally(() => setLoading(false));
-  }, [playlistId]);
+  }, [playlistId, isScheduleMode, storeOrganizationId, storeOrgLoading]);
 
   // ── 아이템 순서 정렬 ────────────────────────────────────────────────────────
   const items = playbackData?.items ?? [];
