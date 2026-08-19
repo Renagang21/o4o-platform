@@ -3,6 +3,8 @@
  *
  * WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §8
  * View 는 @o4o/account-ui MyCertificatesView 로 공통화. 본 파일은 데이터 로딩 + 다운로드만 담당.
+ * WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-FINAL-CLOSURE-V1 §4:
+ *   공통 My Page navigation(navItems) adoption 누락분 교정.
  * API: GET /lms/certificates, GET /lms/certificates/:id/pdf
  */
 
@@ -12,6 +14,7 @@ import { MyPageLayout, MyPageAuthRequired, MyCertificatesView } from '@o4o/accou
 import { lmsApi } from '@/api/lms';
 import { api } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
+import { GLYCOPHARM_MYPAGE_NAV_ITEMS } from './navItems';
 
 export default function MyCertificatesPage() {
   const navigate = useNavigate();
@@ -58,11 +61,21 @@ export default function MyCertificatesPage() {
   };
 
   if (!isAuthenticated || !user) {
-    return <MyPageAuthRequired />;
+    // 로그인 안내도 Shell 안에서 렌더한다 (헤더·네비게이션 유실 금지).
+    return (
+      <MyPageLayout title="학습 결과" width="wide" navItems={GLYCOPHARM_MYPAGE_NAV_ITEMS}>
+        <MyPageAuthRequired />
+      </MyPageLayout>
+    );
   }
 
   return (
-    <MyPageLayout title="학습 결과" subtitle="수료한 교육 과정의 수료증을 확인하세요" width="wide">
+    <MyPageLayout
+      title="학습 결과"
+      subtitle="수료한 교육 과정의 수료증을 확인하세요"
+      width="wide"
+      navItems={GLYCOPHARM_MYPAGE_NAV_ITEMS}
+    >
       <MyCertificatesView
         certificates={certificates}
         loading={loading}
