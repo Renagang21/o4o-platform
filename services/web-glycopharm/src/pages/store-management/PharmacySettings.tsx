@@ -342,7 +342,7 @@ export default function PharmacySettings() {
                       onChange={(e) =>
                         setStoreSettings((prev) => ({ ...prev, storeName: e.target.value }))
                       }
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="min-w-0 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
 
@@ -375,7 +375,7 @@ export default function PharmacySettings() {
                         setStoreSettings((prev) => ({ ...prev, description: e.target.value }))
                       }
                       rows={3}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                      className="min-w-0 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
                     />
                   </div>
 
@@ -390,7 +390,7 @@ export default function PharmacySettings() {
                         onChange={(e) =>
                           setStoreSettings((prev) => ({ ...prev, phone: e.target.value }))
                         }
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="min-w-0 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
 
@@ -407,7 +407,7 @@ export default function PharmacySettings() {
                             businessNumber: e.target.value,
                           }))
                         }
-                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="min-w-0 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                   </div>
@@ -422,7 +422,7 @@ export default function PharmacySettings() {
                       onChange={(e) =>
                         setStoreSettings((prev) => ({ ...prev, address: e.target.value }))
                       }
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="min-w-0 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     />
                   </div>
 
@@ -448,7 +448,7 @@ export default function PharmacySettings() {
                               template: e.target.value as StoreTemplate,
                             }))
                           }
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                          className="min-w-0 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
                         >
                           <option value="franchise-standard">프랜차이즈 표준</option>
                         </select>
@@ -471,7 +471,7 @@ export default function PharmacySettings() {
                               theme: e.target.value as StoreTheme,
                             }))
                           }
-                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                          className="min-w-0 w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
                         >
                           {THEME_METAS.map((themeMeta) => (
                             <option key={themeMeta.id} value={themeMeta.id}>
