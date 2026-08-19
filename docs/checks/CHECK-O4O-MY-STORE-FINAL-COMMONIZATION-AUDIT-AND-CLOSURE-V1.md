@@ -71,6 +71,8 @@
 
 ## 4. 분류 집계 (§5)
 
+> **SUPERSEDED-BY-ADDENDUM**: 아래 수치는 축/cell 단위가 혼재해 있다. 정본은 **ADDENDUM A-1**.
+
 | 분류 | 건수 | 비고 |
 |---|---:|---|
 | FULLY_COMMON | 24 | 구현한 전 서비스가 동일 공통 View 를 채택한 축 |
@@ -128,6 +130,7 @@ handled-products dedupe · store-policy ownership axis · store-slug canonical c
 메뉴 경로를 route tree 와 대조.
 
 - dead menu **0** · dead route **0** · unexpected 404 **0**
+- 역방향(메뉴 미노출 라이브 route) 검증은 **ADDENDUM A-4** 참조
 
 ## 9. Production browser smoke (§12·§13)
 
@@ -210,6 +213,8 @@ byte-identical 한 유일 쌍은 `StoreBlogPage`/`StoreBlogPostPage`(KCos↔GP)�
 
 ## 12. NOT_IMPLEMENTED (§16)
 
+> **SUPERSEDED-BY-ADDENDUM**: 재판정 결과는 **ADDENDUM A-3** (필수 NOT_IMPLEMENTED = 0).
+
 메뉴·route 가 모두 없어 "미구현"으로 판정한 축(공통화 결함 아님):
 KCos/GP 취급 제품 · PH 상품 상세설명 / 마케팅 분석 / 채용 지원 / 외국인 관광객 / 매장 자산 /
 판매 채널 / 사이니지 플레이리스트·플레이어 선택 · KPA 공급 카탈로그.
@@ -245,3 +250,130 @@ NON_BLOCKING_TECH_DEBT 4건(13절)은 본 트랙의 종료 조건이 아니며 �
 ## 15. 문서 정합
 
 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건(13-1, 13-2)
+
+---
+
+# ADDENDUM — 최종 숫자 정합화 (2026-08-19)
+
+본 addendum 은 1차 보고의 두 가지 숫자 정합성 지적(모집단 141 ↔ 집계 50, `NOT_IMPLEMENTED 12`)을
+정합화한다. 새 WO 없이 본 CHECK 내에서 마감한다. 아래 수치가 §4·§12 의 **정본**이며,
+위 4절·12절의 1차 수치는 본 addendum 으로 대체된다(SUPERSEDED-BY-ADDENDUM).
+
+## A-1. 두 모집단의 분리
+
+1차 보고는 **route/page 모집단(141)** 과 **기능 판정 모집단** 을 구분하지 않은 채 한쪽 합계만
+제시해 141 ↔ 50 관계가 설명되지 않았다. 두 모집단은 층위가 다르며 각각 독립적으로 닫힌다.
+
+### Census A — Route/Page census
+
+| 서비스 | page/view |
+|---|---:|
+| KPA-Society | 44 |
+| K-Cosmetics | 33 |
+| GlycoPharm | 42 |
+| PharmacyHub | 22 |
+| **합계** | **141** |
+| 미조사 | **0** |
+
+### Census B — Functional commonization census
+
+판정 단위는 **기능축 × 서비스 = cell** 이다. 3절 매트릭스의 **23 기능축 × 4 서비스 = 92 cell**.
+
+| 분류 | cell |
+|---|---:|
+| FULLY_COMMON | 62 |
+| CORE_ONLY | **0** |
+| VIEW_DUPLICATED | **0** |
+| SERVICE_SPECIFIC | 17 |
+| OUT_OF_SCOPE (서비스 정책상 부재) | 9 |
+| NON_BLOCKING_OPTIONAL (선택 기능 미구현) | 4 |
+| **필수 NOT_IMPLEMENTED** | **0** |
+| **합계** | **92** |
+| 미조사 | **0** |
+
+1차 보고의 `24 / 14 / 12 (=50)` 은 축 단위와 cell 단위가 섞인 집계였다. 본 표는 **전부 cell 단위**다.
+
+### 두 모집단의 관계
+
+141 page 는 전부 Census B 의 축 중 하나에 귀속된다(귀속 불가 0). 구현된 cell(62+17=79)이
+141 page 를 담고, 미구현 cell(9+4=13)은 page 0 이다. 라우트 인프라(Layout wrapper·RoleGuard·
+ParamRedirect 등 8개)는 Shell/Navigation 축으로 귀속했다.
+
+## A-2. 1차 매트릭스 오류 2건 정정
+
+숫자 정합화 과정에서 3절 매트릭스의 셀 판정 오류 2건을 발견해 정정한다.
+
+| 축 | 서비스 | 1차 | 정정 | 근거 |
+|---|---|---|---|---|
+| 매장 설정/정보 | KPA | 미구현 | **SERVICE_SPECIFIC** | `PharmacyInfoPage`(`/store/info`) + `/store/settings` 존재. 메뉴 `pharmacy-info`·`store-settings`(`storeMenuConfig.ts:436-439`). "공통 View 없음"을 "미구현"으로 잘못 기재 |
+| 공급 카탈로그 | KPA | 미구현 | **SERVICE_SPECIFIC** | 메뉴 `products`='O4O 제품'(`/store/commerce/products`) 존재. `SupplyCatalogHub` 미채택일 뿐 축은 구현됨 |
+
+정정 반영 후 SERVICE_SPECIFIC 15 → 17, 미구현 15 → 13 이다.
+
+## A-3. 미구현 13 cell 재판정 (WO 계약 적용)
+
+WO 계약 — *필수 기능 누락 → BLOCKING · 정책상 부재 → SERVICE_SPECIFIC/OUT_OF_SCOPE ·
+향후 선택 → NON_BLOCKING* — 을 13 cell 에 1건씩 적용했다.
+판정 근거는 **해당 서비스 `StoreDashboardConfig` 의 메뉴 축 존재 여부**다(정책의 SSOT).
+
+| # | 축 | 서비스 | 메뉴 축 | 판정 |
+|---:|---|---|---|---|
+| 1 | 취급 제품 | KCos | 없음 | OUT_OF_SCOPE |
+| 2 | 취급 제품 | GP | 없음 | OUT_OF_SCOPE |
+| 3 | 상품 상세설명 | PH | 없음 | OUT_OF_SCOPE |
+| 4 | 판매 채널 | PH | 없음 | OUT_OF_SCOPE |
+| 5 | 마케팅 분석 | PH | 없음 | OUT_OF_SCOPE |
+| 6 | 제품 마케팅/POP 진입 | PH | 없음 | OUT_OF_SCOPE |
+| 7 | 매장 자산 | PH | 없음 | OUT_OF_SCOPE |
+| 8 | 채용 지원 | PH | 없음 | OUT_OF_SCOPE |
+| 9 | 외국인 관광객 | PH | 없음 | OUT_OF_SCOPE |
+| 10 | POP(직원용) | KPA | `pop` 있음 | NON_BLOCKING_OPTIONAL |
+| 11 | POP(직원용) | PH | `pop` 있음 | NON_BLOCKING_OPTIONAL |
+| 12 | 사이니지 플레이리스트 등록 | PH | `signage` 있음 | NON_BLOCKING_OPTIONAL |
+| 13 | 사이니지 플레이어 선택 | PH | `signage` 있음 | NON_BLOCKING_OPTIONAL |
+
+- 1–9: 해당 서비스 메뉴 축 자체가 없다 = **서비스 정책상 원래 없는 기능** → OUT_OF_SCOPE.
+  9건 전부 대응하는 메뉴 항목이 없으므로 dead menu 를 만들지 않는다(8절 결과와 일관).
+- 10–13: 상위 축은 존재하고 **하위 화면만 없다** = 향후 선택 기능 → NON_BLOCKING_OPTIONAL.
+- **필수 My Store 기능 누락 = 0.** 4서비스 메뉴 config 교집합에 해당하는 필수 축
+  (`home` · `products` · `local-products` · `orders` · `pop` · `qr` · `content-blog` ·
+  `library-contents` · `signage` · `store-info`)은 **10축 전부 4/4 구현**이다.
+
+## A-4. 8절(§11) 정정 — 메뉴 미노출 라이브 route 2건
+
+8절은 `메뉴 → route` 방향만 검증해 "dead menu 0 / dead route 0" 으로 적었다. 역방향
+(`route 있는 실기능인데 메뉴에 없음` = 기능 은폐)을 추가 검증한 결과 2건을 발견했다.
+
+| # | route | 메뉴 노출 | 판단 |
+|---:|---|---|---|
+| 1 | GP `/store/commerce/tablet-displays` (`StoreTabletDisplaysPage`) | GP config 에만 `tablet-displays` 키 없음 (KPA·KCos·PH 는 있음) | **IA drift 후보** — GP 태블릿 비노출이 정책인지 확인 필요 |
+| 2 | KPA·KCos `/store/content` (`StoreAssetsPage`) | GP 만 `content` 키 보유 | **의도된 legacy** — KPA/KCos 는 자료함(`StoreLibraryResourcesPage`)이 `/store/assets` 를 흡수 |
+
+- 2번은 자료함 통합의 결과로 정상. 1번은 **메뉴 노출 여부가 GP 서비스 정책 판단**이라
+  본 감사에서 임의로 메뉴를 추가하지 않았다(§18 기능 추가 금지). 13절에 기술부채로 등재한다.
+- 정정된 8절 결론: **dead menu 0 · dead route 0 · unexpected 404 0 · 메뉴 미노출 라이브 route 2
+  (의도 1 / 확인 필요 1)**.
+
+## A-5. 13절(§17) 갱신
+
+**BLOCKING: 0** — 변동 없음. 필수 NOT_IMPLEMENTED 0 이 확인되어 판정 논리가 닫힌다.
+
+NON_BLOCKING_TECH_DEBT 에 다음을 추가한다(기존 4건 + 2건 = 6건).
+
+5. GP `/store/commerce/tablet-displays` 메뉴 미노출 — 노출/은퇴 중 택일 필요(A-4 #1)
+6. NON_BLOCKING_OPTIONAL 4 cell(POP 직원용 KPA·PH / PH 사이니지 하위 2화면) — 선택 기능
+
+## A-6. 최종 판정 재확인
+
+| 종료 조건 | 기준 | 실측 | 판정 |
+|---|---|---|---|
+| 미조사 (Census A) | 0 | 0 / 141 | PASS |
+| 미조사 (Census B) | 0 | 0 / 92 | PASS |
+| CORE_ONLY | 0 | 0 | PASS |
+| VIEW_DUPLICATED | 0 | 0 | PASS |
+| **필수 NOT_IMPLEMENTED** | 0 | **0** | PASS |
+| BLOCKING | 0 | 0 | PASS |
+| 공통 셸 adoption | 4서비스 | 4 / 4 | PASS |
+| production smoke | 전 항목 0 | 184행 flagged 0 | PASS |
+
+→ **최종 판정 PASS 유지. 내 매장 전체 공통화 완료.**
