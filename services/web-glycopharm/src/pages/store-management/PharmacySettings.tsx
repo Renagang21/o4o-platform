@@ -350,8 +350,8 @@ export default function PharmacySettings() {
                     <label className="block text-sm font-medium text-slate-700 mb-2">
                       매장 URL
                     </label>
-                    <div className="flex items-center">
-                      <span className="px-4 py-3 bg-slate-100 border border-r-0 border-slate-200 rounded-l-xl text-slate-500 text-sm">
+                    <div className="flex min-w-0 items-center">
+                      <span className="shrink-0 px-4 py-3 bg-slate-100 border border-r-0 border-slate-200 rounded-l-xl text-slate-500 text-sm">
                         glycopharm.co.kr/store/
                       </span>
                       <input
@@ -360,7 +360,7 @@ export default function PharmacySettings() {
                         onChange={(e) =>
                           setStoreSettings((prev) => ({ ...prev, storeSlug: e.target.value }))
                         }
-                        className="flex-1 px-4 py-3 rounded-r-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="min-w-0 flex-1 px-4 py-3 rounded-r-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
                       />
                     </div>
                   </div>
