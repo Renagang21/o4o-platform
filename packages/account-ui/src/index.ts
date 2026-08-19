@@ -92,7 +92,14 @@ export type {
   MyRequestStatus,
   MyRequestTypeFilterTab,
   MyRequestsInboxProps,
+  MyRequestResultLink,
 } from './components/MyRequestsInbox.js';
+// WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §8 — 공통 adapter
+export {
+  normalizeForumCategoryRequest,
+  normalizeForumCategoryRequests,
+  sortRequestsByCreatedAtDesc,
+} from './adapters/requestNormalizers.js';
 export { RequestStatusBadge, DEFAULT_STATUS_CONFIG } from './components/RequestStatusBadge.js';
 export type { RequestStatusBadgeProps, RequestStatusConfig } from './components/RequestStatusBadge.js';
 export { RequestTypeBadge, DEFAULT_TYPE_CONFIG } from './components/RequestTypeBadge.js';

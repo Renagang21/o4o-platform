@@ -10,6 +10,8 @@
 
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { RequestStatusBadge } from '@o4o/account-ui';
+import type { RequestStatusConfig } from '@o4o/account-ui';
 import { api } from '../lib/apiClient';
 import { useAuth } from '../contexts/AuthContext';
 import { BRAND, ROLE_LABELS, ROLES, SERVICE_KEY } from '../config/service';
@@ -38,6 +40,21 @@ const STATUS_MESSAGE: Record<string, string> = {
   rejected: '아래 반려 사유를 확인한 뒤 서비스 운영자에게 재검토를 요청해 주세요.',
   suspended: '서비스 운영자에게 문의해 주세요.',
   withdrawn: '서비스 운영자에게 문의해 주세요.',
+};
+
+/**
+ * WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §9
+ *
+ * service_memberships.status enum 은 재설계하지 않는다. 공통 `RequestStatusBadge`
+ * 에 tone/label 만 이 서비스 표현으로 넘긴다.
+ */
+const STATUS_BADGE_OVERRIDES: Record<string, RequestStatusConfig> = {
+  none: { label: '신청 전', tone: 'slate' },
+  pending: { label: '승인 대기', tone: 'amber' },
+  active: { label: '승인됨', tone: 'emerald' },
+  rejected: { label: '반려됨', tone: 'rose' },
+  suspended: { label: '이용 정지', tone: 'rose' },
+  withdrawn: { label: '탈퇴', tone: 'slate' },
 };
 
 const ENTRY_PATH: Record<string, string> = {
@@ -109,9 +126,15 @@ export default function JoinStatusPage() {
         <p className="text-sm text-red-600">{error}</p>
       ) : (
         <div className="rounded-lg border border-gray-200 bg-white p-6">
-          <h2 className="mb-2 text-lg font-semibold">
-            {STATUS_TITLE[data?.status ?? 'none'] ?? STATUS_TITLE.none}
-          </h2>
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-semibold">
+              {STATUS_TITLE[data?.status ?? 'none'] ?? STATUS_TITLE.none}
+            </h2>
+            <RequestStatusBadge
+              status={data?.status ?? 'none'}
+              overrides={STATUS_BADGE_OVERRIDES}
+            />
+          </div>
           <p className="mb-4 text-sm text-gray-600">
             {STATUS_MESSAGE[data?.status ?? 'none'] ?? STATUS_MESSAGE.none}
           </p>

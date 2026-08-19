@@ -18,6 +18,8 @@ const TYPE_FILTERS = [
   { key: '', label: '전체' },
   { key: 'store_application', label: '매장 신청' },
   { key: 'course_enrollment', label: '수강 신청' },
+  // WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §5
+  { key: 'forum_category', label: '포럼 신청' },
 ];
 
 export default function MyRequestsPage() {
@@ -45,7 +47,7 @@ export default function MyRequestsPage() {
   return (
     <MyPageLayout
       title="내 신청 내역"
-      subtitle="매장 입점 및 수강 신청 내역을 확인합니다"
+      subtitle="매장 입점 · 수강 · 포럼 개설 신청 내역을 확인합니다"
       width="wide"
       navItems={KCOS_MYPAGE_NAV_ITEMS}
     >
@@ -56,7 +58,7 @@ export default function MyRequestsPage() {
         onRetry={loadData}
         typeFilters={TYPE_FILTERS}
         emptyTitle="신청 내역이 없습니다"
-        emptyDescription="매장 입점 신청 또는 강의 수강 신청을 하면 여기에 표시됩니다"
+        emptyDescription="매장 입점 · 강의 수강 · 포럼 개설 신청을 하면 여기에 표시됩니다"
       />
     </MyPageLayout>
   );

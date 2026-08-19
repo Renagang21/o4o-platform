@@ -14,7 +14,9 @@
  */
 
 import { api } from '../lib/apiClient';
+import { normalizeForumCategoryRequest, sortRequestsByCreatedAtDesc } from '@o4o/account-ui';
 import type { MyRequestItem } from '@o4o/account-ui';
+import { fetchMyForumRequests } from '../services/forumApi';
 
 // ── WO-O4O-KCOSMETICS-STORE-PROFILE-EDIT-PAGE-V1 ─────────────────────────
 
@@ -122,9 +124,13 @@ function normalizeLmsEnrollment(enrollment: any): MyRequestItem {
 
 export const kcosMyRequestsApi = {
   getMyRequests: async (): Promise<MyRequestItem[]> => {
-    const [storeRes, lmsRes] = await Promise.allSettled([
+    const [storeRes, lmsRes, forumRes] = await Promise.allSettled([
       api.get<any>('/cosmetics/stores/application/me'),
       api.get<any>('/lms/enrollments/me'),
+      // WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §5·§18:
+      // 포럼 개설 신청은 K-Cos 에서 제출은 되지만 사용자 상태 조회 화면이 없었다
+      // (`fetchMyForumRequests` 소비처 0). 신규 endpoint 없이 기존 계약을 연결한다.
+      fetchMyForumRequests(),
     ]);
 
     const items: MyRequestItem[] = [];
@@ -153,10 +159,13 @@ export const kcosMyRequestsApi = {
       }
     }
 
-    items.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
+    if (forumRes.status === 'fulfilled') {
+      const requests: any[] = Array.isArray(forumRes.value?.data) ? forumRes.value.data : [];
+      for (const request of requests) {
+        items.push({ ...normalizeForumCategoryRequest(request), serviceKey: 'k-cosmetics' });
+      }
+    }
 
-    return items;
+    return sortRequestsByCreatedAtDesc(items);
   },
 };

@@ -81,6 +81,16 @@ export interface MyRequestTypeFilterTab {
   entityTypes?: string[];
 }
 
+/**
+ * 승인 결과로 생성된 대상으로 이동하는 링크.
+ * WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §10:
+ * 공통 View 안에 서비스 route 를 하드코딩하지 않고 호출 측이 결정한다.
+ */
+export interface MyRequestResultLink {
+  href: string;
+  label: string;
+}
+
 export interface MyRequestsInboxProps {
   items: MyRequestItem[];
   loading?: boolean;
@@ -90,6 +100,18 @@ export interface MyRequestsInboxProps {
   statusOverrides?: Partial<Record<string, RequestStatusConfig>>;
   typeOverrides?: Partial<Record<string, RequestTypeConfig>>;
   getItemHref?: (item: MyRequestItem) => string | undefined;
+  /**
+   * 승인 결과 링크 결정자. 지정하지 않으면 forum_category 기본 fallback 을 쓴다
+   * (기존 호출부 호환). §10 — 서비스 정책은 호출 측이 갖는다.
+   */
+  resultLink?: (item: MyRequestItem) => MyRequestResultLink | null | undefined;
+  /**
+   * 상세 영역 확장 슬롯. 서비스 고유 필드(신청 서비스 종류·사업자번호 등)를
+   * 공통 상세 구조 안에서 렌더한다 (§14 — 상세를 서비스별로 재구현하지 않는다).
+   */
+  detailSlot?: (item: MyRequestItem) => ReactNode;
+  /** 상단 3-stat 요약 표시 여부 (기본 true). */
+  showStats?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
   actionSection?: ReactNode;
@@ -125,6 +147,9 @@ export function MyRequestsInbox({
   statusOverrides,
   typeOverrides,
   getItemHref,
+  resultLink,
+  detailSlot,
+  showStats = true,
   emptyTitle,
   emptyDescription,
   actionSection,
@@ -149,7 +174,7 @@ export function MyRequestsInbox({
   return (
     <div className={className}>
       {/* Stats */}
-      {!loading && !error && items.length > 0 && (
+      {showStats && !loading && !error && items.length > 0 && (
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
             <div className="text-2xl font-bold text-slate-800">{items.length}</div>
@@ -236,6 +261,18 @@ export function MyRequestsInbox({
             const reason = item.payload?.reason as string | undefined;
             const tags = item.payload?.tags as string[] | undefined;
             const adminFeedback = (item.revisionNote || item.reviewComment) as string | undefined;
+
+            // 승인 결과 링크: 호출 측 결정자 우선, 없으면 forum_category 기본 fallback.
+            const resolvedResultLink: MyRequestResultLink | null =
+              (resultLink ? resultLink(item) ?? null : null) ??
+              (!resultLink &&
+              item.status === 'approved' &&
+              item.entityType === 'forum_category' &&
+              resultSlug
+                ? { href: `/forum?category=${resultSlug}`, label: '생성된 포럼 보기' }
+                : null);
+
+            const submittedLabel = item.submittedAt ?? item.createdAt;
 
             return (
               <div key={item.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
@@ -364,21 +401,28 @@ export function MyRequestsInbox({
                         </div>
                       )}
 
-                      {/* Result link — approved forum category */}
-                      {item.status === 'approved' &&
-                        item.entityType === 'forum_category' &&
-                        resultSlug && (
-                          <Link
-                            to={`/forum?category=${resultSlug}`}
-                            className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                            생성된 포럼 보기
-                          </Link>
-                        )}
+                      {/* 서비스 고유 상세 필드 (§14 확장 슬롯) */}
+                      {detailSlot?.(item)}
+
+                      {/* 신청일 / 처리일 (§5-4) */}
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-xs text-slate-500">
+                        <span>신청일: {formatDate(submittedLabel)}</span>
+                        {item.reviewedAt && <span>처리일: {formatDate(item.reviewedAt)}</span>}
+                      </div>
+
+                      {/* Result link — 호출 측 결정 또는 forum_category fallback */}
+                      {resolvedResultLink && (
+                        <Link
+                          to={resolvedResultLink.href}
+                          className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm"
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                          {resolvedResultLink.label}
+                        </Link>
+                      )}
 
                       {/* Generic result link */}
-                      {itemHref && !(item.status === 'approved' && item.entityType === 'forum_category' && resultSlug) && (
+                      {itemHref && !resolvedResultLink && (
                         <Link
                           to={itemHref}
                           className="inline-flex items-center gap-2 px-3 py-2 bg-slate-50 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm"

@@ -14,7 +14,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageSquare } from 'lucide-react';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
-import { MyRequestsInbox } from '@o4o/account-ui';
+import { MyRequestsInbox, normalizeForumCategoryRequest } from '@o4o/account-ui';
 import type { MyRequestItem } from '@o4o/account-ui';
 import { mypageApi } from '../../api/mypage';
 import type { UnifiedRequestItem } from '../../api/mypage';
@@ -34,34 +34,10 @@ const TYPE_FILTERS = [
 
 // ============================================================================
 // Normalize forum-core data → MyRequestItem
+// WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §8:
+//   `GET /forum/category-requests/my` 변환은 공통 adapter 로 이전했다
+//   (`normalizeForumCategoryRequest` — KPA / GlycoPharm / K-Cosmetics 공용).
 // ============================================================================
-
-function normalizeForumRequest(raw: any): MyRequestItem {
-  return {
-    id: raw.id,
-    entityType: 'forum_category',
-    status: raw.status || 'pending',
-    displayTitle: raw.name || raw.payload?.name || '포럼 신청',
-    displayDescription: raw.description || raw.payload?.description || '',
-    reviewComment: raw.reviewComment || raw.review_comment || null,
-    revisionNote: raw.revisionNote || raw.revision_note || null,
-    reviewedAt: raw.reviewedAt || raw.reviewed_at || null,
-    resultEntityId: raw.createdCategoryId || raw.result_entity_id || null,
-    resultMetadata: raw.createdCategorySlug
-      ? { slug: raw.createdCategorySlug }
-      : raw.result_metadata || null,
-    submittedAt: raw.submittedAt || raw.submitted_at || raw.createdAt || raw.created_at || null,
-    createdAt: raw.createdAt || raw.created_at,
-    updatedAt: raw.updatedAt || raw.updated_at,
-    payload: {
-      name: raw.name,
-      description: raw.description,
-      reason: raw.reason,
-      forumType: raw.forumType || raw.forum_type || raw.payload?.forumType,
-      tags: raw.tags || raw.payload?.tags || undefined,
-    },
-  };
-}
 
 // UnifiedRequestItem → MyRequestItem (필드 호환)
 function toMyRequestItem(item: UnifiedRequestItem): MyRequestItem {
@@ -89,7 +65,7 @@ export default function MyRequestsPage() {
 
       const approvalItems: MyRequestItem[] = ((approvalRes as any)?.data || []).map(toMyRequestItem);
       const forumRaw: any[] = (forumRes as any)?.data || [];
-      const forumItems = forumRaw.map(normalizeForumRequest);
+      const forumItems = forumRaw.map(normalizeForumCategoryRequest);
 
       // 병합 + id 기준 중복 제거 (approval 우선)
       const seen = new Set(approvalItems.map(i => i.id));

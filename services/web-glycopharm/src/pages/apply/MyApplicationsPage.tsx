@@ -1,8 +1,21 @@
-import { useState, useEffect } from 'react';
+/**
+ * MyApplicationsPage — 내 신청 목록 / 상태 확인 (GlycoPharm 참여 신청)
+ *
+ * WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §5·§6·§8·§14
+ *
+ * 변경: 목록/상태/상세 표현을 자체 구현하지 않고 공통 `MyRequestsInbox` 에 위임한다.
+ *       backend 계약(`GET /glycopharm/applications/me` 등 기존 호출)은 그대로이며,
+ *       변환은 이 파일의 adapter(`toRequestItem`)에서만 한다(§8).
+ *       서비스 고유 필드(신청 서비스 종류·사업자번호·메모)는 `detailSlot` 확장으로 유지한다.
+ */
+
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, CheckCircle, XCircle, AlertCircle, Building2, Truck, Monitor } from 'lucide-react';
+import { Building2, Truck, Monitor } from 'lucide-react';
+import { MyRequestsInbox } from '@o4o/account-ui';
+import type { MyRequestItem } from '@o4o/account-ui';
 import { glycopharmApi } from '@/api/glycopharm';
-import type { GlycopharmApplication, ApplicationStatus, ServiceType } from '@/api/glycopharm';
+import type { GlycopharmApplication, ServiceType } from '@/api/glycopharm';
 import { GuideBlock } from '@o4o/shared-space-ui';
 import { fetchGuidePageContent } from '@/api/guideContent';
 
@@ -10,25 +23,61 @@ const GUIDE_PAGE_KEY = 'user.application.status';
 const GUIDEBLOCK_SECTION_KEY = 'guideblock-page-help';
 const SERVICE_KEY = 'glycopharm';
 
-/**
- * My Applications Page
- * (B) 내 신청 목록 / 상태 확인
- */
-
 const SERVICE_LABELS: Record<ServiceType, { label: string; icon: typeof Building2 }> = {
   dropshipping: { label: '무재고 판매', icon: Truck },
   sample_sales: { label: '샘플 판매', icon: Building2 },
   digital_signage: { label: '디지털사이니지', icon: Monitor },
 };
 
+/**
+ * GlycoPharm 상태 enum 은 재설계하지 않는다 (§9).
+ * 공통 표시 모델(label/tone)만 이 서비스 표현으로 덮어쓴다.
+ */
+const STATUS_OVERRIDES = {
+  submitted: { label: '심사 중', tone: 'amber' as const },
+  approved: { label: '승인됨', tone: 'emerald' as const },
+  rejected: { label: '반려됨', tone: 'rose' as const },
+};
+
+const TYPE_OVERRIDES = {
+  service_application: { label: '참여 신청', tone: 'blue' as const },
+};
+
+/** GlycopharmApplication → 최소 공통 view model (§8). */
+function toRequestItem(app: GlycopharmApplication): MyRequestItem {
+  return {
+    id: app.id,
+    entityType: 'service_application',
+    status: app.status,
+    displayTitle: app.organizationName || '약국 참여 신청',
+    displayDescription: app.organizationType === 'pharmacy_chain' ? '약국 체인' : '개인 약국',
+    reviewComment: app.rejectionReason ?? null,
+    revisionNote: null,
+    reviewedAt: app.decidedAt ?? null,
+    resultEntityId: null,
+    resultMetadata: null,
+    submittedAt: app.submittedAt ?? null,
+    createdAt: app.submittedAt ?? new Date().toISOString(),
+    updatedAt: app.decidedAt ?? app.submittedAt,
+    serviceKey: SERVICE_KEY,
+    payload: {
+      serviceTypes: app.serviceTypes ?? [],
+      businessNumber: app.businessNumber ?? null,
+      note: app.note ?? null,
+    },
+  };
+}
+
 export default function MyApplicationsPage() {
-  const [applications, setApplications] = useState<GlycopharmApplication[]>([]);
+  const [items, setItems] = useState<MyRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [authRequired, setAuthRequired] = useState(false);
 
   const [guideTitle, setGuideTitle] = useState<string | null>(null);
   const [guideDesc, setGuideDesc] = useState<string | null>(null);
   const [guideSteps, setGuideSteps] = useState<string[] | null>(null);
+
   useEffect(() => {
     let cancelled = false;
     fetchGuidePageContent(SERVICE_KEY, GUIDE_PAGE_KEY)
@@ -47,19 +96,17 @@ export default function MyApplicationsPage() {
     return () => { cancelled = true; };
   }, []);
 
-  useEffect(() => {
-    loadApplications();
-  }, []);
-
-  const loadApplications = async () => {
+  const loadApplications = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setAuthRequired(false);
 
     try {
       const response = await glycopharmApi.getMyApplications();
-      setApplications(response.applications);
+      setItems((response.applications ?? []).map(toRequestItem));
     } catch (err: any) {
       if (err.status === 401 || err.code === 'UNAUTHORIZED') {
+        setAuthRequired(true);
         setError('로그인이 필요합니다.');
       } else {
         setError(err.message || '신청 목록을 불러오는데 실패했습니다.');
@@ -67,40 +114,11 @@ export default function MyApplicationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const getStatusConfig = (status: ApplicationStatus) => {
-    switch (status) {
-      case 'submitted':
-        return {
-          label: '심사 중',
-          icon: Clock,
-          bgColor: 'bg-amber-100',
-          textColor: 'text-amber-700',
-        };
-      case 'approved':
-        return {
-          label: '승인됨',
-          icon: CheckCircle,
-          bgColor: 'bg-green-100',
-          textColor: 'text-green-700',
-        };
-      case 'rejected':
-        return {
-          label: '반려됨',
-          icon: XCircle,
-          bgColor: 'bg-red-100',
-          textColor: 'text-red-700',
-        };
-      default:
-        return {
-          label: status,
-          icon: Clock,
-          bgColor: 'bg-slate-100',
-          textColor: 'text-slate-700',
-        };
-    }
-  };
+  useEffect(() => {
+    loadApplications();
+  }, [loadApplications]);
 
   return (
     <div className="min-h-screen bg-slate-50 py-16">
@@ -125,140 +143,83 @@ export default function MyApplicationsPage() {
           />
         </div>
 
-        {/* Loading */}
-        {loading && (
-          <div className="text-center py-16">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto mb-4"></div>
-            <p className="text-slate-500">불러오는 중...</p>
-          </div>
-        )}
-
-        {/* Error */}
-        {error && (
+        {/* 인증 필요 — 의도된 guard 는 오류 UI 가 아니라 로그인 안내로 표시한다 (§15) */}
+        {authRequired ? (
           <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertCircle className="w-6 h-6 text-red-500" />
-            </div>
-            <p className="text-slate-700 mb-6">{error}</p>
-            {error.includes('로그인') ? (
-              <Link
-                to="/login"
-                className="inline-block px-6 py-3 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-colors"
-              >
-                로그인하기
-              </Link>
-            ) : (
-              <button
-                onClick={loadApplications}
-                className="px-6 py-3 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-colors"
-              >
-                다시 시도
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Applications List */}
-        {!loading && !error && applications.length > 0 && (
-          <div className="space-y-4">
-            {applications.map((app) => {
-              const statusConfig = getStatusConfig(app.status);
-              const StatusIcon = statusConfig.icon;
-
-              return (
-                <div key={app.id} className="bg-white rounded-2xl shadow-sm p-6">
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-800 mb-1">
-                        {app.organizationName}
-                      </h3>
-                      <p className="text-sm text-slate-500">개인 약국</p>
-                    </div>
-                    <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${statusConfig.bgColor}`}>
-                      <StatusIcon className={`w-4 h-4 ${statusConfig.textColor}`} />
-                      <span className={`text-sm font-medium ${statusConfig.textColor}`}>
-                        {statusConfig.label}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Services */}
-                  <div className="mb-4">
-                    <p className="text-xs text-slate-400 mb-2">신청 서비스</p>
-                    <div className="flex flex-wrap gap-2">
-                      {app.serviceTypes.map((serviceType) => {
-                        const service = SERVICE_LABELS[serviceType];
-                        const Icon = service.icon;
-                        return (
-                          <div
-                            key={serviceType}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 rounded-lg"
-                          >
-                            <Icon className="w-3.5 h-3.5 text-slate-500" />
-                            <span className="text-sm text-slate-600">{service.label}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Info */}
-                  {app.businessNumber && (
-                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
-                      <span className="text-slate-400">사업자번호:</span>
-                      <span>{app.businessNumber}</span>
-                    </div>
-                  )}
-
-                  {app.note && (
-                    <div className="text-sm text-slate-500 mb-4">
-                      <span className="text-slate-400">메모: </span>
-                      {app.note}
-                    </div>
-                  )}
-
-                  {/* Rejection Reason */}
-                  {app.status === 'rejected' && app.rejectionReason && (
-                    <div className="p-3 bg-red-50 rounded-lg mb-4">
-                      <p className="text-sm text-red-700">
-                        <span className="font-medium">반려 사유: </span>
-                        {app.rejectionReason}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Footer */}
-                  <div className="flex items-center gap-4 pt-4 border-t border-slate-100">
-                    <span className="text-xs text-slate-400">
-                      신청일: {new Date(app.submittedAt).toLocaleDateString('ko-KR')}
-                    </span>
-                    {app.decidedAt && (
-                      <span className="text-xs text-slate-400">
-                        처리일: {new Date(app.decidedAt).toLocaleDateString('ko-KR')}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!loading && !error && applications.length === 0 && (
-          <div className="bg-white rounded-2xl shadow-sm p-12 text-center">
-            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Building2 className="w-8 h-8 text-slate-400" />
-            </div>
-            <p className="text-slate-500 mb-6">신청 내역이 없습니다.</p>
+            <p className="text-slate-700 mb-6">신청 내역을 확인하려면 로그인해 주세요.</p>
             <Link
-              to="/apply"
+              to="/login"
               className="inline-block px-6 py-3 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-colors"
             >
-              참여 신청하기
+              로그인하기
             </Link>
           </div>
+        ) : (
+          <MyRequestsInbox
+            items={items}
+            loading={loading}
+            error={error}
+            onRetry={loadApplications}
+            showStats={false}
+            statusOverrides={STATUS_OVERRIDES}
+            typeOverrides={TYPE_OVERRIDES}
+            detailSlot={(item) => {
+              const serviceTypes = (item.payload?.serviceTypes as ServiceType[] | undefined) ?? [];
+              const businessNumber = item.payload?.businessNumber as string | null | undefined;
+              const note = item.payload?.note as string | null | undefined;
+              return (
+                <>
+                  {serviceTypes.length > 0 && (
+                    <div>
+                      <div className="text-xs font-medium text-slate-500 mb-1.5">신청 서비스</div>
+                      <div className="flex flex-wrap gap-2">
+                        {serviceTypes.map((serviceType) => {
+                          const service = SERVICE_LABELS[serviceType];
+                          if (!service) return null;
+                          const Icon = service.icon;
+                          return (
+                            <div
+                              key={serviceType}
+                              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 rounded-lg"
+                            >
+                              <Icon className="w-3.5 h-3.5 text-slate-500" />
+                              <span className="text-sm text-slate-600">{service.label}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  {businessNumber && (
+                    <div>
+                      <div className="text-xs font-medium text-slate-500 mb-1">사업자번호</div>
+                      <p className="text-sm text-slate-700">{businessNumber}</p>
+                    </div>
+                  )}
+                  {note && (
+                    <div>
+                      <div className="text-xs font-medium text-slate-500 mb-1">메모</div>
+                      <p className="text-sm text-slate-700">{note}</p>
+                    </div>
+                  )}
+                </>
+              );
+            }}
+            emptyTitle="신청 내역이 없습니다"
+            emptyDescription="참여 신청을 하면 여기에 표시됩니다"
+            actionSection={
+              !loading && !error && items.length === 0 ? (
+                <div className="mb-4 text-center">
+                  <Link
+                    to="/apply"
+                    className="inline-block px-6 py-3 bg-primary-600 text-white font-semibold rounded-xl hover:bg-primary-700 transition-colors"
+                  >
+                    참여 신청하기
+                  </Link>
+                </div>
+              ) : null
+            }
+          />
         )}
       </div>
     </div>
