@@ -388,6 +388,9 @@ const QrLandingPage = lazy(() => import('./pages/store/QrLandingPage'));
 // Product Landing (WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1 / Phase 2b) — neture.co.kr/p/:publicKey
 const ProductLandingPage = lazy(() => import('./pages/ProductLandingPage'));
 
+// Cafe24 App URL 진입점 (WO-O4O-CAFE24-APP-ENTRY-ROUTE-V1) — neture.co.kr/cafe24
+const Cafe24AppEntryPage = lazy(() => import('./pages/Cafe24AppEntryPage'));
+
 // Catalog Import
 const CatalogImportDashboardPage = lazy(() => import('./pages/admin/catalog-import/CatalogImportDashboardPage'));
 const CSVImportPage = lazy(() => import('./pages/admin/catalog-import/CSVImportPage'));
@@ -721,6 +724,9 @@ function App() {
             <Route path="/register/pending" element={<RegisterPendingPage />} />
             <Route path="/qr/:slug" element={<QrLandingPage />} />
             <Route path="/p/:publicKey" element={<ProductLandingPage />} />
+            {/* Cafe24 Developers 의 App URL 진입점. Cafe24 관리자 iframe 안에서 열리므로
+                Neture 사이트 크롬(NetureLayout)을 씌우지 않는다. */}
+            <Route path="/cafe24" element={<Cafe24AppEntryPage />} />
 
             {/* ================================================================
                 Neture 메인 (NetureLayout)
