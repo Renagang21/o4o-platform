@@ -159,9 +159,35 @@ export async function deleteForumComment(commentId: string): Promise<void> {
 }
 
 // WO-O4O-FORUM-TAG-CANONICAL-ALIGNMENT-V1: categoryId 제거 (KPA Canonical 정렬)
+// WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+//   글은 반드시 이 서비스의 forum 에 속해야 한다(미지정 시 서버가 400 FORUM_REQUIRED).
+//   PharmacyHub 글쓰기와 같은 축 — 공통 `GET /forum/categories` 를 그대로 소비한다.
+export interface WritableForum {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export async function fetchWritableForums(): Promise<WritableForum[]> {
+  try {
+    const response = await api.get(`${FORUM_BASE}/categories?limit=100`);
+    const raw = response.data?.data;
+    const items = Array.isArray(raw) ? raw : raw?.items;
+    return (items || []).map((item: any) => ({
+      id: String(item.id),
+      name: String(item.name ?? item.title ?? item.slug ?? ''),
+      slug: String(item.slug ?? ''),
+    }));
+  } catch (error) {
+    console.error('Error fetching writable forums:', error);
+    return [];
+  }
+}
+
 export async function createForumPost(payload: {
   title: string;
   type: string;
+  forumId: string;
   // WO-O4O-FORUM-WRITE-EDITOR-CONTENT-PARITY-V1: blocks(Block[]) 정렬 — string 호환 유지
   content: unknown[] | string;
 }): Promise<{ success: boolean; data?: { id: string }; id?: string; error?: string }> {

@@ -27,6 +27,30 @@ export function ForumWritePage() {
   // edit 모드 초기값 버퍼 — 폼 마운트(로딩 게이트 이후) 시 initial* 로 전달. 이후 편집 상태는 폼이 소유.
   const [title, setTitle] = useState('');
   const [editorHtml, setEditorHtml] = useState('');
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   forum 미지정 작성(/forum/write)은 forum_id NULL 로 저장돼 목록·상세에서 다시 보이지 않았다.
+  //   slug 가 없는 진입에서는 대상 포럼을 선택한다 (PharmacyHub 글쓰기와 같은 축).
+  const needsForumPick = !isEdit && !forumSlug;
+  const [forums, setForums] = useState<Array<{ id: string; name: string }>>([]);
+  const [forumId, setForumId] = useState('');
+  const [forumsLoading, setForumsLoading] = useState(needsForumPick);
+
+  useEffect(() => {
+    if (!needsForumPick) return;
+    let alive = true;
+    forumApi.getCategories()
+      .then((res) => {
+        if (!alive) return;
+        const raw: any = (res as any)?.data;
+        const items: any[] = Array.isArray(raw) ? raw : (raw?.items ?? []);
+        const list = items.map((item) => ({ id: String(item.id), name: String(item.name ?? item.slug ?? '') }));
+        setForums(list);
+        if (list.length > 0) setForumId((prev) => prev || list[0].id);
+      })
+      .catch(() => { if (alive) setForums([]); })
+      .finally(() => { if (alive) setForumsLoading(false); });
+    return () => { alive = false; };
+  }, [needsForumPick]);
 
   useEffect(() => {
     if (!isEdit || !id) return;
@@ -48,7 +72,13 @@ export function ForumWritePage() {
     // content 는 HTML string 으로 전송 — 백엔드 normalizeContent 가 Block[] 정규화
     const submitData = forumSlug
       ? { title: payload.title, content: payload.editorHtml, forumSlug }
-      : { title: payload.title, content: payload.editorHtml };
+      : (needsForumPick && forumId)
+        ? { title: payload.title, content: payload.editorHtml, forumId }
+        : { title: payload.title, content: payload.editorHtml };
+    if (needsForumPick && !forumId) {
+      toast.error('글을 등록할 포럼을 선택해주세요.');
+      return;
+    }
     try {
       if (isEdit && id) {
         await forumApi.updatePost(id, submitData);
@@ -113,6 +143,28 @@ export function ForumWritePage() {
           <p style={styles.authorHint}>(표시명은 프로필에서 변경할 수 있습니다)</p>
         </div>
 
+        {needsForumPick && (
+          <div style={styles.forumPick}>
+            <label style={styles.authorLabel} htmlFor="kpa-forum-select">포럼</label>
+            <select
+              id="kpa-forum-select"
+              value={forumId}
+              disabled={forumsLoading || forums.length === 0}
+              onChange={(e) => setForumId(e.target.value)}
+              style={styles.forumSelect}
+            >
+              {forumsLoading && <option value="">불러오는 중…</option>}
+              {!forumsLoading && forums.length === 0 && <option value="">포럼 없음</option>}
+              {forums.map((forum) => (
+                <option key={forum.id} value={forum.id}>{forum.name}</option>
+              ))}
+            </select>
+            {!forumsLoading && forums.length === 0 && (
+              <p style={styles.authorHint}>아직 글을 등록할 수 있는 포럼이 없습니다.</p>
+            )}
+          </div>
+        )}
+
         <ForumWriteForm
           initialTitle={title}
           initialContentHtml={editorHtml}
@@ -143,6 +195,19 @@ export function ForumWritePage() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
+  forumPick: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: 6,
+    marginBottom: 16,
+  },
+  forumSelect: {
+    padding: '10px 14px',
+    fontSize: 15,
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: 8,
+    backgroundColor: 'white',
+  },
   container: {
     maxWidth: '800px',
     margin: '0 auto',

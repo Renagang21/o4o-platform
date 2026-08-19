@@ -559,6 +559,12 @@ export interface CreateForumPostPayload {
   title: string;
   content: string | any[]; // Block[] or string for backward compatibility
   categorySlug: string;
+  /**
+   * WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+   *   글은 반드시 이 서비스의 forum 에 속해야 한다. forum 이 확정되지 않으면 서버가
+   *   400 FORUM_REQUIRED 로 막는다(과거에는 forum_id NULL 로 저장돼 글이 사라졌다).
+   */
+  forumId?: string;
   // WO-NETURE-EXTERNAL-CONTACT-V1: Show author's contact on this post
   showContactOnPost?: boolean;
 }
@@ -615,6 +621,7 @@ export async function createForumPost(
     const response = await api.post(`${FORUM_BASE}/posts`, {
       title: payload.title,
       content: payload.content,
+      ...(payload.forumId ? { forumId: payload.forumId } : {}),
       categorySlug: payload.categorySlug,
       type: 'discussion',
       // WO-NETURE-EXTERNAL-CONTACT-V1

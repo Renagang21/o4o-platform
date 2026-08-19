@@ -25,6 +25,7 @@ import { ForumWriteForm, type ForumWriteFormPayload } from '@o4o/shared-space-ui
 import { useAuth, useLoginModal } from '../../contexts';
 import {
   createForumPost,
+  fetchForumCategories,
   updateForumPost,
   fetchForumPostBySlug,
   fetchUserContactSettings,
@@ -58,6 +59,26 @@ export function ForumWritePage({
   const [searchParams] = useSearchParams();
   const editPostId = searchParams.get('edit');
   const isEditMode = !!editPostId;
+
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   categorySlug 만 보내면 실제 forum 이 확정되지 않아 글이 forum_id NULL 로 저장되고
+  //   Neture 목록에서 다시 보이지 않았다. 공통 `GET /forum/categories` 로 대상 forum 을 확정한다.
+  const [forumId, setForumId] = useState('');
+
+  useEffect(() => {
+    if (isEditMode) return;
+    let alive = true;
+    fetchForumCategories()
+      .then((res) => {
+        if (!alive) return;
+        const items: any[] = Array.isArray(res?.data) ? res.data : [];
+        const matched = items.find((item) => item?.slug === categorySlug) || items[0];
+        if (matched?.id) setForumId(String(matched.id));
+      })
+      .catch(() => { /* forum 확정 실패 시 제출 단계에서 안내 */ });
+    return () => { alive = false; };
+  }, [isEditMode, categorySlug]);
+
   const { isAuthenticated } = useAuth();
   const { openLoginModal } = useLoginModal();
 
@@ -182,9 +203,14 @@ export function ForumWritePage({
     try {
       const blocks = htmlToBlocks(payload.editorHtml);
       const base = (backPath || '/forum').replace(/\/$/, '');
+      if (!forumId) {
+        setError('현재 글을 등록할 수 있는 게시판이 없습니다. 잠시 후 다시 시도해주세요.');
+        return;
+      }
       const response = await createForumPost({
         title: payload.title,
         content: blocks,
+        forumId,
         categorySlug: categorySlug,
         showContactOnPost: hasContactInfo ? showContactOnPost : false,
       });

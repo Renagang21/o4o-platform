@@ -12,7 +12,8 @@
 import { CSSProperties, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { createForumPost, fetchForumPostById, updateForumPost } from '../../services/forumApi';
+import { createForumPost, fetchForumPostById, fetchWritableForums, updateForumPost } from '../../services/forumApi';
+import type { WritableForum } from '../../services/forumApi';
 import { toast } from '@o4o/error-handling';
 // WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1: 공통 글쓰기 폼(create-only)
 import { ForumWriteForm, forumContentToHtml } from '@o4o/shared-space-ui';
@@ -37,6 +38,25 @@ export default function ForumWritePage() {
   const [loading, setLoading] = useState(isEdit);
   const [initialTitle, setInitialTitle] = useState('');
   const [initialContentHtml, setInitialContentHtml] = useState('');
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   forum 미지정 작성은 forum_id NULL 로 저장돼 이 서비스에서 다시 보이지 않는다.
+  //   PharmacyHub 글쓰기와 같은 축으로 대상 게시판을 선택한다.
+  const [forums, setForums] = useState<WritableForum[]>([]);
+  const [forumId, setForumId] = useState('');
+  const [forumsLoading, setForumsLoading] = useState(!isEdit);
+
+  useEffect(() => {
+    if (isEdit) return;
+    let alive = true;
+    fetchWritableForums()
+      .then((list) => {
+        if (!alive) return;
+        setForums(list);
+        if (list.length > 0) setForumId((prev) => prev || list[0].id);
+      })
+      .finally(() => { if (alive) setForumsLoading(false); });
+    return () => { alive = false; };
+  }, [isEdit]);
 
   useEffect(() => {
     if (!isEdit || !postId) return;
@@ -73,10 +93,15 @@ export default function ForumWritePage() {
   };
 
   const handleCreate = async (payload: ForumWriteFormPayload) => {
+    if (!forumId) {
+      toast.error('Please select a forum to post in.');
+      return;
+    }
     try {
       const data = await createForumPost({
         title: payload.title,
         type: payload.type ?? 'discussion',
+        forumId,
         // 백엔드 normalizeContent 가 HTML→Block[] 정규화 (forum-core 프론트 의존 제거)
         content: payload.editorHtml,
       });
@@ -124,6 +149,28 @@ export default function ForumWritePage() {
             <span style={styles.authorLabel}>Display name:</span>
             <span style={styles.authorName}>{user.nickname || user.name}</span>
             <p style={styles.authorHint}>(You can change your display name in your profile settings)</p>
+          </div>
+        )}
+
+        {!isEdit && (
+          <div style={styles.field}>
+            <label style={styles.label} htmlFor="kcos-forum-select">Forum</label>
+            <select
+              id="kcos-forum-select"
+              value={forumId}
+              disabled={forumsLoading || forums.length === 0}
+              onChange={(e) => setForumId(e.target.value)}
+              style={styles.select}
+            >
+              {forumsLoading && <option value="">Loading…</option>}
+              {!forumsLoading && forums.length === 0 && <option value="">No forum available</option>}
+              {forums.map((forum) => (
+                <option key={forum.id} value={forum.id}>{forum.name}</option>
+              ))}
+            </select>
+            {!forumsLoading && forums.length === 0 && (
+              <p style={styles.authorHint}>No forum is open for posting yet. Please try again later.</p>
+            )}
           </div>
         )}
 

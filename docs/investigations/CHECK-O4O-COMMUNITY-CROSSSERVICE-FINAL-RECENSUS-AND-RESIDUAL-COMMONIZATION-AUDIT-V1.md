@@ -463,3 +463,28 @@ KCos·GP·PH 는 커뮤니티 목록이 0건이라 기존 데이터로 상세 �
 | 조치 | `apps/api-server/src/utils/forumContentServer.ts` 신설 — 기존 의존성 `node-html-parser` 로 **forum-core 와 동일한 Block 매핑**을 서버에서 수행. `ForumPostController` 의 두 호출 지점을 교체 |
 | 저장 포맷 | 변경 없음 (`Block[]`). API 계약·DB schema·migration 변경 0건 |
 | 회귀 가드 | `apps/api-server/src/__tests__/community-forum-content-server-normalization.spec.ts` (4 tests) — DOMParser 부재 환경에서 paragraph/heading/list/quote/code/image/divider 매핑 + 컨트롤러가 DOMParser 의존 import 를 되살리지 못하게 고정 |
+
+### 14-5. smoke 3차 — 작성 성공 이후 드러난 orphan write 결함 (R16)
+
+R15 배포 후 K-Cosmetics 작성은 **201** 로 성공했으나, 같은 컨텍스트의 삭제가 404 였다.
+
+```
+create=201 {"success":true,"data":{"id":"125428a4-…","forumId":null, …}}
+delete=404 {"success":false,"error":"Post not found"}
+```
+
+| 항목 | 내용 |
+|---|---|
+| 원인 | `createPost` 가 `forumId`/`forumSlug` 를 못 받으면 `forum_id = NULL` 로 저장한다. 반면 `ForumControllerBase` 의 `applyServiceScope` 는 `EXISTS(forum_category_requests … service_code = ctx)` 를, `isForumInServiceScope` 는 `if (!forumId) return false;` 를 적용한다 → **작성은 성공하고 그 서비스에서는 영원히 보이지 않는다**(목록·상세·수정·삭제·좋아요·댓글 전부 불가) |
+| 영향 범위 | forum 을 지정하지 않고 보내던 모든 진입점 — K-Cosmetics `/forum/write`, GlycoPharm `/forum/write`, KPA-Society slug 없는 `/forum/write`(목록 상단 "글쓰기" 링크), Neture(`categorySlug` 만 전송 → 백엔드가 해석하지 않던 키). PharmacyHub 만 `forumId` 를 보내 영향 없음 |
+| 기인 | **선행 결함**. R15 로 500 이 사라지기 전까지는 이 경로가 성공한 적이 없어 드러나지 않았다 |
+| 판정 | 공통 write 계약이 4개 서비스에서 데이터를 조용히 유실 → **MUST_FIX_BEFORE_COMMUNITY_CLOSE** |
+| 조치 (backend) | `ForumPostController.createPost` — ① Neture 의 `categorySlug` 를 `forumSlug` 와 같은 축으로 해석 ② 서비스 컨텍스트에서 forum 이 확정되지 않으면 **400 `FORUM_REQUIRED`** 로 fail-closed. generic/admin(`/api/v1/forum/*`) 경로는 현행 유지 |
+| 조치 (frontend) | KPA(slug 없는 진입)·K-Cosmetics·GlycoPharm 글쓰기에 **PharmacyHub 와 같은 축**의 게시판 선택(`GET /forum/categories` 소비)을 도입하고 `forumId` 를 전송. Neture 는 `categorySlug` 에 대응하는 forum 을 조회해 `forumId` 를 확정 후 전송. 등록 가능한 게시판이 없으면 빈 상태 문구로 안내(무응답 제출 없음) |
+| 저장 포맷 | 변경 없음. DB schema·migration 0건 |
+| 회귀 가드 | `apps/api-server/src/__tests__/community-forum-orphan-write-guard.spec.ts` (4 tests) — `FORUM_REQUIRED` 가 scope 검사(403)보다 먼저 실행됨 · `categorySlug` 동축 해석 · `forum_id NULL = scope 밖` 전제 고정 |
+| 프로덕션 정리 | 검증 중 생성된 orphan 1건(`125428a4-…`) 을 generic admin 경로로 삭제. 재조회 결과 프로덕션 forum 게시글 3건 전부 `forum_id` 보유, **orphan 0건** |
+
+> 부수 관측(코드 결함 아님): K-Cosmetics · GlycoPharm · PharmacyHub 는 `forum_category_requests` 에 **completed forum 이 0건**이다.
+> 따라서 게시판 선택이 비어 있고, 그 상태에서는 글을 쓸 수 없다. 이는 데이터/운영 상태이며 코드 결함이 아니다 →
+> §15 의 `VALID_NOT_IMPLEMENTED (PRODUCT_DECISION_REQUIRED)` 로 분류한다.

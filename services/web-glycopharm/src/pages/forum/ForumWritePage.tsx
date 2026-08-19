@@ -14,7 +14,8 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { createForumPost, fetchForumPost, updateForumPost } from '@/services/forumApi';
+import { createForumPost, fetchForumPost, fetchWritableForums, updateForumPost } from '@/services/forumApi';
+import type { WritableForum } from '@/services/forumApi';
 import { toast } from '@o4o/error-handling';
 // WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1: 공통 글쓰기 폼(create-only)
 import { ForumWriteForm, forumContentToHtml } from '@o4o/shared-space-ui';
@@ -38,6 +39,24 @@ export default function ForumWritePage() {
   const [loading, setLoading] = useState(isEdit);
   const [initialTitle, setInitialTitle] = useState('');
   const [initialContentHtml, setInitialContentHtml] = useState('');
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   forum 미지정 작성은 forum_id NULL 로 저장돼 이 서비스에서 다시 보이지 않는다.
+  const [forums, setForums] = useState<WritableForum[]>([]);
+  const [forumId, setForumId] = useState('');
+  const [forumsLoading, setForumsLoading] = useState(!isEdit);
+
+  useEffect(() => {
+    if (isEdit) return;
+    let alive = true;
+    fetchWritableForums()
+      .then((list) => {
+        if (!alive) return;
+        setForums(list);
+        if (list.length > 0) setForumId((prev) => prev || list[0].id);
+      })
+      .finally(() => { if (alive) setForumsLoading(false); });
+    return () => { alive = false; };
+  }, [isEdit]);
 
   useEffect(() => {
     if (!isEdit || !postId) return;
@@ -74,10 +93,15 @@ export default function ForumWritePage() {
   };
 
   const handleCreate = async (payload: ForumWriteFormPayload) => {
+    if (!forumId) {
+      toast.error('글을 등록할 게시판을 선택해주세요.');
+      return;
+    }
     try {
       const data = await createForumPost({
         title: payload.title,
         type: payload.type ?? 'discussion',
+        forumId,
         // 백엔드 normalizeContent 가 HTML→Block[] 정규화 (forum-core 프론트 의존 제거)
         content: payload.editorHtml,
       });
@@ -129,6 +153,28 @@ export default function ForumWritePage() {
             <span style={styles.authorLabel}>작성자 표시명:</span>
             <span style={styles.authorName}>{user.nickname || user.name}</span>
             <p style={styles.authorHint}>(표시명은 프로필에서 변경할 수 있습니다)</p>
+          </div>
+        )}
+
+        {!isEdit && (
+          <div style={styles.field}>
+            <label style={styles.label} htmlFor="gp-forum-select">게시판</label>
+            <select
+              id="gp-forum-select"
+              value={forumId}
+              disabled={forumsLoading || forums.length === 0}
+              onChange={(e) => setForumId(e.target.value)}
+              style={styles.select}
+            >
+              {forumsLoading && <option value="">불러오는 중…</option>}
+              {!forumsLoading && forums.length === 0 && <option value="">게시판 없음</option>}
+              {forums.map((forum) => (
+                <option key={forum.id} value={forum.id}>{forum.name}</option>
+              ))}
+            </select>
+            {!forumsLoading && forums.length === 0 && (
+              <p style={styles.authorHint}>아직 글을 등록할 수 있는 게시판이 없습니다.</p>
+            )}
           </div>
         )}
 

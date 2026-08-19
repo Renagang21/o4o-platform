@@ -262,7 +262,7 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
-      const { title, content, excerpt, type, tags, isPinned, allowComments, metadata, showContactOnPost, forumSlug, forumId: forumIdFromBody } = req.body;
+      const { title, content, excerpt, type, tags, isPinned, allowComments, metadata, showContactOnPost, forumSlug, categorySlug, forumId: forumIdFromBody } = req.body;
 
       // Generate slug from title
       const slug = this.generateSlug(title);
@@ -287,19 +287,38 @@ export class ForumPostController extends ForumControllerBase {
       //   forum 인지 확인한다. 컨텍스트가 없는 generic/admin 경로는 현행 유지.
       const canonicalServiceKey = this.getCanonicalServiceKey(ctx);
       let resolvedForumId: string | null = null;
+      // Neture write 는 categorySlug 라는 이름으로 같은 값을 보낸다 — 같은 축으로 해석한다.
+      const requestedForumSlug =
+        (typeof forumSlug === 'string' && forumSlug) ||
+        (typeof categorySlug === 'string' && categorySlug) ||
+        null;
       if (forumIdFromBody && typeof forumIdFromBody === 'string') {
         resolvedForumId = forumIdFromBody;
-      } else if (forumSlug && typeof forumSlug === 'string') {
+      } else if (requestedForumSlug) {
         const rows = await this.postRepository.manager.query(
           canonicalServiceKey
             ? `SELECT id FROM forum_category_requests WHERE slug = $1 AND status = 'completed' AND service_code = $2 LIMIT 1`
             : `SELECT id FROM forum_category_requests WHERE slug = $1 AND status = 'completed' LIMIT 1`,
-          canonicalServiceKey ? [forumSlug, canonicalServiceKey] : [forumSlug],
+          canonicalServiceKey ? [requestedForumSlug, canonicalServiceKey] : [requestedForumSlug],
         );
         resolvedForumId = rows[0]?.id ?? null;
       }
 
-      if (canonicalServiceKey && (forumIdFromBody || forumSlug)) {
+      // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+      //   서비스 컨텍스트에서 forum 이 확정되지 않으면 forum_id = NULL 로 저장되고,
+      //   applyServiceScope / isForumInServiceScope 가 그 글을 그 서비스에서 다시
+      //   볼 수 없게 만든다(작성 201 → 목록·상세·수정·삭제 전부 불가). 조용한 유실이므로
+      //   fail-closed 로 막는다. 컨텍스트 없는 generic/admin 경로는 현행 유지.
+      if (canonicalServiceKey && !resolvedForumId) {
+        res.status(400).json({
+          success: false,
+          error: 'A forum must be selected before writing in this service.',
+          code: 'FORUM_REQUIRED',
+        });
+        return;
+      }
+
+      if (canonicalServiceKey && (forumIdFromBody || requestedForumSlug)) {
         // 대상 forum 을 지정한 작성은 반드시 현재 서비스의 forum 이어야 한다.
         const inScope =
           !!resolvedForumId && (await this.isForumInServiceScope(resolvedForumId, ctx));
