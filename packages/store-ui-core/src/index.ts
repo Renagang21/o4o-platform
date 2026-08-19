@@ -35,6 +35,36 @@ export { StoreDashboardLayout } from './layout/StoreDashboardLayout';
 export { MyStoreShell, useStoreCapabilities } from './layout/MyStoreShell';
 export type { MyStoreShellProps, StoreCapabilityFlag } from './layout/MyStoreShell';
 
+// 내 매장 기능 화면 공통 페이지 골격 (WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A)
+//   breadcrumb + 아이콘 제목 + 부제 + 우측 액션(+새로고침) + 선택적 4상태(loading/error/empty/list).
+//   StoreLibraryPageShell 은 이 컴포넌트에 위임한다.
+export { StorePageShell, storePageStyles } from './components/page/StorePageShell';
+export type {
+  StorePageShellProps,
+  StorePageShellLabels,
+  StorePageShellState,
+} from './components/page/StorePageShell';
+
+/* WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-B:
+   매장 사이니지 화면 공통 순수 로직 (KPA·GlycoPharm 이 본문까지 동일하게 복제하던 helper 12개) */
+export {
+  FORCED_WARN_DAYS,
+  SIGNAGE_DAY_LABELS,
+  formatDate as formatSignageDate,
+  formatShortDate as formatSignageShortDate,
+  daysUntil,
+  isForcedActive,
+  isForcedExpiringSoon,
+  isForcedExpired,
+  toHHMM,
+  isScheduleNowActive,
+  getCurrentSchedule,
+  getNextSchedule,
+  computeSignageKpi,
+  detectVideoSource,
+} from './signage/signageHelpers';
+export type { SignageAssetLike, SignageForcedLike, SignageScheduleLike } from './signage/signageHelpers';
+
 // Components
 export { StorePlaceholderPage } from './components/StorePlaceholderPage';
 // WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1

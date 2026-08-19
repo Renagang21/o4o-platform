@@ -236,6 +236,11 @@ export type {
   SignagePlaylistSurface,
 } from './signage/SignagePlaylistCreateShell';
 
+/* WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A:
+   내 매장 플레이리스트 등록 화면 공통 View (KPA/KCos/GP 3벌 껍데기 복제 제거) */
+export { StorePlaylistCreateView } from './signage/StorePlaylistCreateView';
+export type { StorePlaylistCreateViewProps } from './signage/StorePlaylistCreateView';
+
 /* Template Presets — WO-O4O-TEMPLATE-PRESET-DEFINITION-V1 */
 export { templates, templatePresets } from './templates';
 export type { TemplateKey, TemplateTokens, TemplatePreset, PresetCategory } from './templates';

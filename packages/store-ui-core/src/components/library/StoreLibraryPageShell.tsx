@@ -4,11 +4,14 @@
  *
  * Resources / Contents 두 화면이 동일하게 갖고 있던 breadcrumb · 제목 · 새로고침 ·
  * loading / error / empty / list 분기를 한 단위로 모은다. LoadError(@o4o/ui) 계약 유지.
+ *
+ * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A:
+ *   같은 골격을 자료함 밖에서도 쓰기 위해 StorePageShell 로 일반화하고 여기서는 위임만 한다.
+ *   자료함 화면의 렌더 결과(폭 900 · list style · 문구 계약)는 변경하지 않는다.
  */
 
-import { RefreshCw } from 'lucide-react';
 import type { ComponentType, ReactNode } from 'react';
-import { LoadError } from '@o4o/ui';
+import { StorePageShell } from '../page/StorePageShell';
 import { libraryStyles } from './libraryStyles';
 import type { StoreLibraryLabels } from './types';
 
@@ -43,47 +46,28 @@ export function StoreLibraryPageShell({
   footer,
 }: StoreLibraryPageShellProps) {
   return (
-    <div style={libraryStyles.container}>
-      <div style={libraryStyles.header}>
-        <div>
-          <div style={libraryStyles.breadcrumb}>
-            <span>{labels.breadcrumbRoot}</span>
-            <span style={{ color: '#94a3b8' }}>/</span>
-            <span style={{ color: '#334155' }}>{labels.pageTitle}</span>
-          </div>
-          <h1 style={libraryStyles.title}>
-            <Icon size={20} style={{ color: iconColor }} />
-            {labels.pageTitle}
-          </h1>
-          <p style={libraryStyles.subtitle}>{labels.subtitle}</p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          {headerActions}
-          <button onClick={onReload} style={libraryStyles.refreshBtn} disabled={loading}>
-            <RefreshCw size={14} />
-            새로고침
-          </button>
-        </div>
-      </div>
-
-      {loading ? (
-        <div style={libraryStyles.empty}>
-          <p style={{ color: '#64748b', fontSize: 14 }}>불러오는 중...</p>
-        </div>
-      ) : loadError ? (
-        // 조회 실패를 "없습니다"(empty) 로 위장하지 않는다(4상태 계약).
-        <LoadError onRetry={() => void onReload()} />
-      ) : isEmpty ? (
-        <div style={libraryStyles.empty}>
-          <Icon size={32} style={{ color: '#cbd5e1', marginBottom: 12 }} />
-          <p style={{ color: '#64748b', fontSize: 14, margin: 0 }}>{labels.emptyTitle}</p>
-          <p style={{ color: '#94a3b8', fontSize: 13, margin: '6px 0 0' }}>{labels.emptyHint}</p>
-        </div>
-      ) : (
-        <div style={libraryStyles.list}>{children}</div>
-      )}
-
-      {footer}
-    </div>
+    <StorePageShell
+      labels={{
+        breadcrumbRoot: labels.breadcrumbRoot,
+        pageTitle: labels.pageTitle,
+        subtitle: labels.subtitle,
+      }}
+      Icon={Icon}
+      iconColor={iconColor}
+      maxWidth={900}
+      headerActions={headerActions}
+      onReload={onReload}
+      state={{
+        loading,
+        loadError,
+        isEmpty,
+        emptyTitle: labels.emptyTitle,
+        emptyHint: labels.emptyHint,
+        listStyle: libraryStyles.list,
+      }}
+      footer={footer}
+    >
+      {children}
+    </StorePageShell>
   );
 }

@@ -4,8 +4,12 @@
  *
  * 원본: WO-O4O-PRODUCT-MARKETING-GRAPH-V1 / WO-O4O-PRODUCT-MARKETING-POP-BUILDER-EXTRACTION-V1.
  * KCos·GP 사본은 헤더 주석과 타입 추론 표기만 달랐다 — API adapter 만 주입받고 본체는 원본 그대로다.
- * KPA 사본은 load-error 계약(실패/빈 상태 분리·재시도)이 적용돼 동작이 다르므로 이 View 를
- * 쓰지 않는다(통합하려면 KCos/GP 에 error UI 를 추가해야 하고 그것은 신규 기능이다).
+ *
+ * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A/§7:
+ *   KPA 사본만 적용돼 있던 load-error 계약(WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1)
+ *   — 조회 실패와 "자산 없음" 분리 · 재조회 실패 시 기존 내용 유지 · 연결 해제 실패 안내 —
+ *   을 이 공통 View 로 올려 KPA 가 채택할 수 있게 했다. KCos/GP 는 기존 silent catch 가
+ *   플랫폼 load-error 계약 위반이었으므로 함께 정렬된다(성공 경로 동작·문구 변경 없음).
  */
 
 import { useState, useEffect, useCallback, type CSSProperties } from 'react';
@@ -96,6 +100,11 @@ export function ProductMarketingView({
   const navigate = useNavigate();
   const [data, setData] = useState<ProductMarketingData | null>(null);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1:
+  //   조회/연결 해제 실패를 silent catch 로 삼키지 않는다. 실패와 "자산 없음" 을 분리하고 재시도를 제공한다.
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [unlinkingId, setUnlinkingId] = useState<string | null>(null);
 
   // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
   //   legacy builder route(`/store/commerce/products/:id/pop`) 경유 제거 → canonical POP 화면 직접 진입.
@@ -132,13 +141,18 @@ export function ProductMarketingView({
   const fetchData = useCallback(async () => {
     if (!productId) return;
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await getProductMarketing(productId);
       if (res.success && res.data) {
         setData(res.data);
+      } else {
+        // success=false 도 실패로 취급한다(이전에는 조용히 통과해 빈 화면처럼 보였다).
+        setLoadError('마케팅 자산 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
       }
     } catch {
-      // silent
+      // 재조회 실패 시 기존 data 는 유지한다.
+      setLoadError('마케팅 자산 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setLoading(false);
     }
@@ -177,12 +191,21 @@ export function ProductMarketingView({
   };
 
   const handleUnlink = async (linkId: string) => {
-    if (!productId) return;
+    if (!productId || unlinkingId) return;
+    setUnlinkingId(linkId);
+    setActionError(null);
     try {
       const res = await unlinkProductMarketingAsset(productId, linkId);
-      if (res.success) fetchData();
+      if (res.success) {
+        await fetchData();
+      } else {
+        // 실패 시 목록에서 제거하지 않아 기존 연결 상태가 그대로 유지된다.
+        setActionError('연결을 해제하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      }
     } catch {
-      // silent
+      setActionError('연결을 해제하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setUnlinkingId(null);
     }
   };
 
@@ -192,6 +215,22 @@ export function ProductMarketingView({
         <div style={styles.loadingState}>
           <RefreshCw size={24} style={{ color: c.neutral300 }} />
           <p style={{ color: c.neutral500, fontSize: '14px', marginTop: '12px' }}>불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 조회 실패 + 표시할 데이터 없음 → 오류 상태(재시도). "자산이 없음" 과 구분한다.
+  if (!data && loadError) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.loadingState}>
+          <Link2 size={48} style={{ color: '#FCA5A5' }} />
+          <p style={{ color: '#991B1B', fontSize: '15px', fontWeight: 600, marginTop: '12px' }}>
+            마케팅 자산 정보를 불러오지 못했습니다.
+          </p>
+          <p style={{ color: c.neutral500, fontSize: '13px', marginTop: '4px' }}>잠시 후 다시 시도해 주세요.</p>
+          <button type="button" onClick={() => void fetchData()} style={styles.retryBtn}>다시 시도</button>
         </div>
       </div>
     );
@@ -242,6 +281,22 @@ export function ProductMarketingView({
           </button>
         </div>
       </div>
+
+      {/* WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1: 재조회 실패 — 기존 내용 유지 + 안내·재시도 */}
+      {loadError && (
+        <div style={styles.inlineError}>
+          <span>최신 마케팅 자산 정보를 불러오지 못했습니다. 아래는 마지막으로 불러온 내용입니다.</span>
+          <button type="button" onClick={() => void fetchData()} style={styles.inlineErrorBtn}>다시 시도</button>
+        </div>
+      )}
+
+      {/* mutation 실패 안내 — 연결 상태는 변경되지 않았음 */}
+      {actionError && (
+        <div style={styles.inlineError}>
+          <span>{actionError}</span>
+          <button type="button" onClick={() => setActionError(null)} style={styles.inlineErrorBtn}>닫기</button>
+        </div>
+      )}
 
       {/* Summary KPI */}
       <div style={styles.kpiGrid}>
@@ -303,7 +358,12 @@ export function ProductMarketingView({
                     {link && (
                       <button
                         onClick={() => handleUnlink(link.id)}
-                        style={styles.unlinkBtn}
+                        disabled={unlinkingId === link.id}
+                        style={{
+                          ...styles.unlinkBtn,
+                          opacity: unlinkingId === link.id ? 0.5 : 1,
+                          cursor: unlinkingId === link.id ? 'not-allowed' : 'pointer',
+                        }}
                         title="연결 해제"
                       >
                         <Trash2 size={13} />
@@ -355,7 +415,12 @@ export function ProductMarketingView({
                     {link && (
                       <button
                         onClick={() => handleUnlink(link.id)}
-                        style={styles.unlinkBtn}
+                        disabled={unlinkingId === link.id}
+                        style={{
+                          ...styles.unlinkBtn,
+                          opacity: unlinkingId === link.id ? 0.5 : 1,
+                          cursor: unlinkingId === link.id ? 'not-allowed' : 'pointer',
+                        }}
                         title="연결 해제"
                       >
                         <Trash2 size={13} />
@@ -375,6 +440,40 @@ export function ProductMarketingView({
 // ── 스타일 ──
 
 const styles: Record<string, CSSProperties> = {
+  // WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1
+  inlineError: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+    marginBottom: '16px',
+    padding: '10px 14px',
+    borderRadius: '8px',
+    border: '1px solid #FECACA',
+    backgroundColor: '#FEF2F2',
+    color: '#991B1B',
+    fontSize: '13px',
+  },
+  inlineErrorBtn: {
+    flexShrink: 0,
+    border: '1px solid #FCA5A5',
+    borderRadius: '6px',
+    backgroundColor: '#fff',
+    color: '#991B1B',
+    fontSize: '12px',
+    padding: '4px 12px',
+    cursor: 'pointer',
+  },
+  retryBtn: {
+    marginTop: '16px',
+    border: '1px solid #FCA5A5',
+    borderRadius: '6px',
+    backgroundColor: '#fff',
+    color: '#991B1B',
+    fontSize: '13px',
+    padding: '8px 18px',
+    cursor: 'pointer',
+  },
   container: {
     padding: '24px',
     maxWidth: '960px',

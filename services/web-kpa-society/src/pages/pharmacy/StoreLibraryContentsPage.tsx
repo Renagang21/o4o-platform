@@ -25,13 +25,18 @@
  *   기존 페이지 내부에 직접 정의되어 있던 TopTabBar / SubTabBar / DocumentsSection /
  *   LessonsSection 을 StoreContentsSelector 로 추출. 본 페이지와 production-materials
  *   모달이 같은 canonical selector 를 공유한다. 페이지 동작/UX 변경 없음.
+ *
+ * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A:
+ *   손으로 짜던 breadcrumb·제목·부제·헤더 액션과 그 style map 을 공통 StorePageShell 로 이관.
+ *   본문(StoreContentsSelector)·모달·동작은 무변경.
  */
 
 import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { BookOpen, RefreshCw, PenSquare, Lightbulb } from 'lucide-react';
+import { BookOpen, PenSquare, Lightbulb } from 'lucide-react';
 // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 콘텐츠 제작 가이드(안내 UI)
 import { ContentCreationGuideModal } from './ContentCreationGuideModal';
+import { StorePageShell } from '@o4o/store-ui-core';
 import { storeAssetControlApi } from '../../api/assetSnapshot';
 import { colors } from '../../styles/theme';
 import { StartProductionModal, type ProductionSource, type ProductionSourceItem } from './StartProductionModal';
@@ -95,25 +100,21 @@ export default function StoreLibraryContentsPage() {
   }, []);
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <div>
-          <div style={styles.breadcrumb}>
-            {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
-                실제 사이드바 그룹명은 '약국 자료함' — breadcrumb 을 일치시킨다. */}
-            <span>약국 자료함</span>
-            <span style={{ color: colors.neutral300 }}>/</span>
-            <span style={{ color: colors.neutral700 }}>콘텐츠</span>
-          </div>
-          <h1 style={styles.title}>
-            <BookOpen size={20} style={{ color: colors.primary }} />
-            콘텐츠
-          </h1>
-          <p style={styles.subtitle}>
-            매장 콘텐츠를 관리합니다. 콘텐츠를 선택하면 하단 작업막대에서 QR·POP·인쇄용 PDF 등 제작 기능을 사용할 수 있습니다.
-          </p>
-        </div>
-        <div style={styles.headerActions}>
+    <StorePageShell
+      labels={{
+        // WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
+        //   실제 사이드바 그룹명은 '약국 자료함' — breadcrumb 을 일치시킨다.
+        breadcrumbRoot: '약국 자료함',
+        pageTitle: '콘텐츠',
+        subtitle:
+          '매장 콘텐츠를 관리합니다. 콘텐츠를 선택하면 하단 작업막대에서 QR·POP·인쇄용 PDF 등 제작 기능을 사용할 수 있습니다.',
+      }}
+      Icon={BookOpen}
+      iconColor={colors.primary}
+      maxWidth={1100}
+      onReload={reload}
+      headerActions={
+        <>
           <button
             type="button"
             onClick={() => setCreateFromResourcesOpen(true)}
@@ -127,13 +128,9 @@ export default function StoreLibraryContentsPage() {
             <Lightbulb size={14} />
             콘텐츠 제작 가이드
           </button>
-          <button onClick={reload} style={styles.refreshBtn}>
-            <RefreshCw size={14} />
-            새로고침
-          </button>
-        </div>
-      </div>
-
+        </>
+      }
+    >
       {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
           공통 selector 를 'page' 모드로 mount — 콘텐츠 목록 + 검색 + 선택 + 제작 시작 + 선택 제거 */}
       <StoreContentsSelector
@@ -161,54 +158,13 @@ export default function StoreLibraryContentsPage() {
 
       {/* WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1 */}
       <ContentCreationGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} />
-    </div>
+    </StorePageShell>
   );
 }
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 
 const styles: Record<string, CSSProperties> = {
-  container: {
-    padding: '24px',
-    maxWidth: '1100px',
-    margin: '0 auto',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: '16px',
-    marginBottom: '20px',
-    flexWrap: 'wrap',
-  },
-  breadcrumb: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    fontSize: '13px',
-    color: colors.neutral400,
-    marginBottom: '6px',
-  },
-  title: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '20px',
-    fontWeight: 600,
-    color: colors.neutral800,
-    margin: 0,
-  },
-  subtitle: {
-    fontSize: '13px',
-    color: colors.neutral500,
-    margin: '6px 0 0',
-  },
-  headerActions: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    flexWrap: 'wrap',
-  },
   createBtn: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -220,18 +176,6 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '13px',
     fontWeight: 500,
     color: colors.white,
-    cursor: 'pointer',
-  },
-  refreshBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '6px 12px',
-    background: colors.white,
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '6px',
-    fontSize: '13px',
-    color: colors.neutral700,
     cursor: 'pointer',
   },
   // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 보조(outline) 버튼

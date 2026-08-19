@@ -6,6 +6,10 @@
  *   - 저장 endpoint(store-playlists)는 현행 유지 — 매장 목록 조회와 동일 테이블(데이터 정합성).
  *   - 항목(미디어)은 생성 후 목록/상세에서 HUB 복사로 추가한다.
  *
+ * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A:
+ *   KPA/KCos/GP 3벌이 복제하던 화면 껍데기(뒤로가기·제목·부제)를 공통 StorePlaylistCreateView 로 이관.
+ *   저장 API·목록 경로·accent 색만 주입한다. 동작·문구 변경 없음.
+ *
  * ⚠️ KEEP-LEGACY (docs/baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md):
  *   내 매장 저장을 canonical POST /api/signage/:serviceKey/playlists 로 바꾸지 말 것.
  *   store_playlist_items(snapshot_id) ≠ signage_playlist_items(mediaId) — 항목 모델 비호환.
@@ -14,7 +18,7 @@
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SignagePlaylistCreateShell } from '@o4o/shared-space-ui';
+import { StorePlaylistCreateView } from '@o4o/shared-space-ui';
 import type { SignagePlaylistCreateValues } from '@o4o/shared-space-ui';
 import { createStorePlaylist } from '../../api/storePlaylist';
 
@@ -34,31 +38,14 @@ export function StorePlaylistCreatePage() {
   }, [navigate]);
 
   return (
-    <div style={{ maxWidth: 720, margin: '0 auto', padding: '24px 16px 48px' }}>
-      <div style={{ marginBottom: 24 }}>
-        <button
-          onClick={() => navigate(LIST_PATH)}
-          style={{ background: 'none', border: 'none', fontSize: 14, color: '#2563eb', cursor: 'pointer', padding: 0, marginBottom: 8, display: 'block' }}
-        >
-          ← 내 플레이리스트로
-        </button>
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#1e293b' }}>새 플레이리스트</h1>
-        <p style={{ margin: '6px 0 0', fontSize: 13, color: '#64748b' }}>
-          플레이리스트를 만든 뒤 HUB 콘텐츠를 가져와 항목을 추가합니다.
-        </p>
-      </div>
-
-      <SignagePlaylistCreateShell
-        config={{
-          surface: 'store',
-          submitLabel: '생성',
-          namePlaceholder: '플레이리스트 이름을 입력하세요',
-          descriptionPlaceholder: '이 플레이리스트의 사용 목적이나 적용 위치를 간략히 기록하세요',
-        }}
-        onSubmit={handleSubmit}
-        onCancel={() => navigate(LIST_PATH)}
-      />
-    </div>
+    <StorePlaylistCreateView
+      accentColor="#2563eb"
+      onBack={() => navigate(LIST_PATH)}
+      onSubmit={handleSubmit}
+      config={{
+        descriptionPlaceholder: '이 플레이리스트의 사용 목적이나 적용 위치를 간략히 기록하세요',
+      }}
+    />
   );
 }
 

@@ -15,10 +15,14 @@
  * 삭제 정책:
  *   - 직접 업로드 항목: hard delete (DELETE /store/assets/:id)
  *   - 가져온 snapshot 항목: hard delete (DELETE /assets/:id) — 원본 자료 영향 없음
+ *
+ * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-A:
+ *   손으로 짜던 breadcrumb·제목·부제·헤더 액션(자료 등록/새로고침)을 공통 StorePageShell 로 이관.
+ *   본문(ActionBar + DataTable + Drawer)·삭제 정책·조회 경로는 무변경.
  */
 
 import { useEffect, useState, useCallback, useMemo, type CSSProperties } from 'react';
-import { Library, ExternalLink, Trash2, RefreshCw, FileDown, Link as LinkIcon, FileText, Download, X, Plus } from 'lucide-react';
+import { Library, ExternalLink, Trash2, FileDown, Link as LinkIcon, FileText, Download, X, Plus } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
   getStoreExecutionAssets,
@@ -27,6 +31,7 @@ import {
   type AssetType,
 } from '../../api/storeExecutionAssets';
 import { assetSnapshotApi, type AssetSnapshotItem } from '../../api/assetSnapshot';
+import { StorePageShell } from '@o4o/store-ui-core';
 import { colors } from '../../styles/theme';
 import { stripHtml, blocksToText } from '../../utils/ai-clipboard';
 import { RegisterStoreResourceModal } from './RegisterStoreResourceModal';
@@ -296,43 +301,31 @@ export default function StoreLibraryResourcesPage() {
   );
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <div>
-          <div style={styles.breadcrumb}>
-            {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
-                실제 사이드바 그룹명은 '약국 자료함' — breadcrumb 을 일치시킨다. */}
-            <span>약국 자료함</span>
-            <span style={{ color: colors.neutral300 }}>/</span>
-            <span style={{ color: colors.neutral700 }}>자료</span>
-          </div>
-          <h1 style={styles.title}>
-            <Library size={20} style={{ color: colors.primary }} />
-            자료
-          </h1>
-          <p style={styles.subtitle}>
+    <StorePageShell
+      labels={{
+        // WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
+        //   실제 사이드바 그룹명은 '약국 자료함' — breadcrumb 을 일치시킨다.
+        breadcrumbRoot: '약국 자료함',
+        pageTitle: '자료',
+        subtitle: (
+          <>
             콘텐츠를 만들 때 참고할 원소스 자료를 보관합니다.
-          </p>
-          <p style={styles.subtitle}>
+            <br />
             커뮤니티 자료를 가져오거나 직접 자료를 등록할 수 있습니다.
-          </p>
-        </div>
-        <div style={styles.headerActions}>
-          <button
-            type="button"
-            onClick={() => setRegisterOpen(true)}
-            style={styles.registerBtn}
-          >
-            <Plus size={14} />
-            자료 등록
-          </button>
-          <button onClick={fetchItems} style={styles.refreshBtn} disabled={loading}>
-            <RefreshCw size={14} />
-            새로고침
-          </button>
-        </div>
-      </div>
-
+          </>
+        ),
+      }}
+      Icon={Library}
+      iconColor={colors.primary}
+      maxWidth={1100}
+      onReload={fetchItems}
+      headerActions={
+        <button type="button" onClick={() => setRegisterOpen(true)} style={styles.registerBtn}>
+          <Plus size={14} />
+          자료 등록
+        </button>
+      }
+    >
       {/* WO-O4O-KPA-STORE-LIBRARY-RESOURCES-STANDARD-TABLE-V1: ActionBar — 선택 일괄 삭제 */}
       <div style={{ marginBottom: '12px' }}>
         <ActionBar
@@ -491,7 +484,7 @@ export default function StoreLibraryResourcesPage() {
         onClose={() => setRegisterOpen(false)}
         onRegistered={fetchItems}
       />
-    </div>
+    </StorePageShell>
   );
 }
 
@@ -595,46 +588,6 @@ function DetailField({ label, value }: { label: string; value: string }) {
 }
 
 const styles: Record<string, CSSProperties> = {
-  container: {
-    padding: '24px',
-    maxWidth: '900px',
-    margin: '0 auto',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: '16px',
-    marginBottom: '24px',
-  },
-  breadcrumb: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    fontSize: '13px',
-    color: colors.neutral400,
-    marginBottom: '6px',
-  },
-  title: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '20px',
-    fontWeight: 600,
-    color: colors.neutral800,
-    margin: 0,
-  },
-  subtitle: {
-    fontSize: '13px',
-    color: colors.neutral500,
-    margin: '6px 0 0',
-  },
-  headerActions: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    flexShrink: 0,
-  },
   registerBtn: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -646,18 +599,6 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '13px',
     color: colors.white,
     fontWeight: 500,
-    cursor: 'pointer',
-  },
-  refreshBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '6px 12px',
-    background: colors.white,
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '6px',
-    fontSize: '13px',
-    color: colors.neutral700,
     cursor: 'pointer',
   },
   toolbar: {

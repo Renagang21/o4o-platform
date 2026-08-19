@@ -46,6 +46,12 @@ export {
 export { StoreAssetsPanel } from './components/StoreAssetsPanel';
 export type { StoreAssetsPanelProps } from './components/StoreAssetsPanel';
 
+// WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1
+//   StoreAssetsView = 조회·상태전이 controller + Panel 을 묶은 화면 단위 공통 View.
+//   KPA·KCos·GP 의 StoreAssetsPage 사본 3벌을 대체한다 (API 클라이언트만 주입).
+export { StoreAssetsView } from './components/StoreAssetsView';
+export type { StoreAssetsViewProps, StoreAssetsViewApi } from './components/StoreAssetsView';
+
 export { ForcedSection } from './components/ForcedSection';
 export type { ForcedSectionProps } from './components/ForcedSection';
 

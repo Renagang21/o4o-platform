@@ -5,9 +5,13 @@
  * 원본: WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1 / WO-KPA-STORE-SIGNAGE-IA-RESTRUCTURE-V2.
  * KCos·GP 사본의 차이는 accent Tailwind class 뿐이었다(동작·route·API 동일).
  * Tailwind 는 동적 class 조합을 purge 하므로 accent 는 완성된 class 문자열로 주입받는다.
+ *
+ * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-B:
+ *   KPA 사본이 유일하게 더 갖고 있던 두 가지(활성 스케줄 배너 · 행 선택)를 slot/optional prop 으로
+ *   열어 KPA 도 같은 View 를 쓰게 한다. 미주입 서비스(KCos·GP)의 렌더 결과는 이전과 동일하다.
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, type ReactNode } from 'react';
 import { Search, Play, ListVideo, AlertCircle } from 'lucide-react';
 import { DataTable, type Column } from '@o4o/ui';
 
@@ -26,6 +30,16 @@ export interface SignagePlayerSelectViewProps {
   playButtonClassName?: string;
   /** 검색 input Tailwind class (서비스 accent) */
   searchInputClassName?: string;
+  /**
+   * 제목과 검색창 사이 slot — KPA 의 "현재 활성 스케줄" 배너처럼
+   * 서비스에만 있는 부가 정보를 넣는다. 미주입 시 아무것도 렌더되지 않는다.
+   */
+  headerExtra?: ReactNode;
+  /** 행 선택 (KPA 송출 대상 다중 선택). 미주입 시 선택 컬럼 없음 — 기존 동작. */
+  rowSelection?: {
+    selectedRowKeys: string[];
+    onChange: (keys: string[]) => void;
+  };
 }
 
 const DEFAULT_PLAY_BTN =
@@ -37,6 +51,8 @@ export function SignagePlayerSelectView({
   fetchStorePlaylists,
   playButtonClassName = DEFAULT_PLAY_BTN,
   searchInputClassName = DEFAULT_SEARCH_INPUT,
+  headerExtra,
+  rowSelection,
 }: SignagePlayerSelectViewProps) {
   const [playlists, setPlaylists] = useState<SignageSelectPlaylist[]>([]);
   const [loading, setLoading] = useState(true);
@@ -142,6 +158,8 @@ export function SignagePlayerSelectView({
         </div>
       </div>
 
+      {headerExtra}
+
       {/* Search */}
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -164,6 +182,7 @@ export function SignagePlayerSelectView({
 
       {/* Table */}
       <DataTable<SignageSelectPlaylist>
+        rowSelection={rowSelection}
         columns={columns}
         dataSource={filtered}
         rowKey="id"
