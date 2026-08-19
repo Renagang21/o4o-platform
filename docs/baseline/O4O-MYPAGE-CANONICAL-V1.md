@@ -126,6 +126,29 @@
 
 → **현재 구현이 본 baseline 과 100% 정합.** baseline 채택으로 인한 즉시 코드 변경 없음.
 
+### 5.1 Pharmacy-Hub 축 (2026-08-19 추가 — 구현 사실 기록)
+
+본 baseline V1 작성(2026-05-24) 시점에는 4 service(KPA / GP / K-Cos / Neture)만 존재했다.
+이후 신설된 **Pharmacy-Hub** 는 `/mypage` 축을 만들지 않고 **`/account`** 를 개인 계정
+canonical route 로 사용한다. 아래는 **현재 구현 사실의 기록**이며 §1~§4 의 정책 변경이 아니다.
+
+| 항목 | Pharmacy-Hub 현재 구현 |
+|---|---|
+| 개인 계정 canonical route | **`/account`** (`services/web-pharmacy-hub/src/pages/account/MyProfilePage.tsx`) |
+| Shell | `@o4o/account-ui` 의 `MyPageShell` 채택 (`basePath='/account'`) |
+| nav 축 | `PHARMACY_HUB_ACCOUNT_NAV_ITEMS` — 내 프로필(`/account`) · 가입 상태(`/join/status`) |
+| 프로필 수정 | `PATCH /users/me/profile` — §2 매트릭스 L1 항목과 동일 계약 |
+| 비밀번호 변경 | `PUT /users/password` with `serviceKey='pharmacy-hub'` — §2 매트릭스 L2 항목과 동일 계약 |
+| `/store-owner/account` | 매장 셸 URL 유지용 **thin wrapper**(`withShell={false}`). 같은 화면을 두 벌 구현하지 않으며 공통 Shell 을 이중으로 씌우지 않는다. 이 URL 은 store-ui-core 사이드바(설정 › 내 계정)가 가리키므로 **제거·강제 redirect 하지 않는다.** |
+
+즉 Pharmacy-Hub 는 **route 이름만 `/mypage` 대신 `/account`** 일 뿐, §4 Drift 방지 원칙
+(서비스별 계정 UI · service-scoped credential · web-account 금지 범위)은 그대로 지킨다.
+route 명칭 통일 여부는 본 baseline 이 결정하지 않는다(별건).
+
+근거: `WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1` §13 ·
+`WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1` ·
+[CHECK-O4O-CROSS-SERVICE-MYPAGE-SHELL-FINAL-CLOSURE-V1](../checks/CHECK-O4O-CROSS-SERVICE-MYPAGE-SHELL-FINAL-CLOSURE-V1.md)
+
 ---
 
 ## 6. Identity V2 정합성
