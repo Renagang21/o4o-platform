@@ -344,16 +344,7 @@ export function ForumDetailPage() {
             isAuthor: user?.id === comment.authorId || isAdmin,
           }))}
           onEditComment={(commentId, content) => { void handleUpdateComment(commentId, content); }}
-          renderCommentActions={(comment) =>
-            comment.isAuthor ? (
-              <button
-                style={styles.commentDeleteButton}
-                onClick={() => handleDeleteComment(comment.id)}
-              >
-                삭제
-              </button>
-            ) : null
-          }
+          onDeleteComment={(commentId) => { handleDeleteComment(commentId); }}
         />
       </div>
 
@@ -535,15 +526,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-  },
-  commentDeleteButton: {
-    padding: '4px 10px',
-    fontSize: '12px',
-    color: colors.neutral500,
-    backgroundColor: 'transparent',
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: '4px',
-    cursor: 'pointer',
   },
   commentAuthor: {
     fontWeight: 500,

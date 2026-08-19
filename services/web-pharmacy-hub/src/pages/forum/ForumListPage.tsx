@@ -141,9 +141,6 @@ renderEmpty={() => (
 )}
         />
 
-        <p className="mt-3 text-center text-xs text-slate-400">
-댓글·좋아요는 다음 커뮤니티 공통화 단계에서 연결됩니다.
-        </p>
       </div>
     </main>
   );

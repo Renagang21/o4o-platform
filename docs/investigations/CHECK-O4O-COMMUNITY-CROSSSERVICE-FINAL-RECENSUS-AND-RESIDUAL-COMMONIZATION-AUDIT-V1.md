@@ -384,7 +384,7 @@ N 이 295 로 같은 것은 우연이 아니라 **같은 6축 프레임(Forum 18
 | forum interaction spec (`community-forum-interaction-and-write-boundary-commonization.spec.ts`) | **PASS** |
 | LMS boundary spec (`lms-course-list-hub-view-commonization.spec.ts`) | **PASS** |
 | content/resource spec (`community-content-resource-frontend-view-commonization.spec.ts`) | **PASS** |
-| `apps/api-server` 전체 jest | **PASS — 155 suites / 2452 tests, exit 0** |
+| `apps/api-server` 전체 jest | **PASS — 156 suites / 2462 tests, exit 0** (rebase 후 재실행) |
 
 ### 13-2. Shared package
 
@@ -409,3 +409,37 @@ N 이 295 로 같은 것은 우연이 아니라 **같은 6축 프레임(Forum 18
 
 ---
 
+
+## 14. Production browser smoke (§17)
+
+배포 commit `ed7d6ed17` (Deploy Web Services / Deploy API Server 모두 success) 기준, 실제 브라우저(Chromium)로 로그인 후 순회했다.
+계정은 `docs/local/TEST-ACCOUNTS.local.md` SSOT 를 런타임 env 로만 주입했고 스크립트·저장소 어디에도 기록하지 않았다.
+측정 항목: 문서 status / body innerText 길이(white screen) / console error / pageerror / 4xx·5xx 응답 / 390px 폭 가로 overflow.
+
+### 14-1. 서비스별 결과
+
+| 서비스 | 로그인 | 순회 경로 | white screen | JS exception | 신규 404·500 | mobile overflow |
+|---|:--:|---|:--:|:--:|:--:|:--:|
+| KPA-Society | PASS | `/community` `/forum` `/forum/all` `/forum/post/{id}` `/content` `/content/resources` `/content/notice` `/lms` `/lms/courses` `/lms/course/{id}` `/mypage` | 0 | 0 | 0 | 0 |
+| K-Cosmetics | PASS | `/forum` `/forum/posts` `/content` `/resources` `/lms` `/mypage` `/mypage/enrollments` `/mypage/credits` `/mypage/certificates` | 0 | 0 | 0 | 0 |
+| GlycoPharm | PASS | `/forum` `/forum/posts` `/content` `/resources` `/lms` `/mypage` | 0 | 0 | 0 | 0 |
+| PharmacyHub | PASS | `/forum` `/forum/posts` `/account` | 0 | 0 | 0 | 0 |
+| Neture | PASS | `/forum` `/forum/posts` `/content` `/notices` `/mypage` | 0 | 0 | 0 | 0 |
+
+- KCos·GP 커뮤니티 목록(포럼/콘텐츠/강의/자료실)은 **정상 empty state**(`총 0개` + 안내문)로 렌더된다. 데이터 0건은 serviceKey 격리 결과이며 오류가 아니다.
+- cross-service data mixing: KPA 목록에는 KPA 데이터만, Neture `/content` 에는 Neture 콘텐츠 3건만 노출됐다. 타 서비스 데이터 유입 **0건**.
+- KPA `/forum/post/{id}` 상세에서 **좋아요 / 수정 / 삭제 / 댓글 등록** 표면이 모두 렌더됐고, 댓글 **작성 → 삭제** 라운드트립을 실제로 수행해 200 응답을 확인했다(검증용 댓글은 삭제 완료).
+
+### 14-2. smoke 로 발견해 본 WO 에서 고친 residual
+
+| # | 서비스 | 내용 | 조치 |
+|---|---|---|---|
+| R13 | PharmacyHub | `/forum/posts` 하단에 "댓글·좋아요는 다음 커뮤니티 공통화 단계에서 연결됩니다" 안내문이 남아 있었다 (본 WO 에서 이미 연결됨) | 문구 제거 |
+| R14 | KPA-Society | `ForumCommentList` 에 `renderCommentActions`(삭제 전용) 를 넘겨 공통 부품의 **인라인 수정 버튼이 렌더되지 않았다** — 본 WO 에서 추가한 `PUT /comments/:id` 가 UI 에서 도달 불가 | `renderCommentActions` 제거 후 `onEditComment`/`onDeleteComment` 로 공통 내장 액션 채택 (5서비스 동일 계약) |
+
+### 14-3. 본 WO 와 무관한 선행 인프라 결함 (기록만)
+
+| 항목 | 관측 | 판정 |
+|---|---|---|
+| KPA footer 약관·개인정보 문서 조회 | `GET /api/v1/public/services/kpa-society/policies/{terms,privacy}` · `GET /api/v1/kpa/legal/documents/published/{terms,privacy}` 404 | 선행 결함 — 커뮤니티 공통화 기인 아님. FOLLOW_UP_NON_BLOCKING |
+| LMS 강의 상세에 비-UUID id 전달 | `GET /api/v1/lms/courses/{non-uuid}` 가 404 가 아니라 **500** | 선행 backend 견고성 결함(본 WO 미접촉). FOLLOW_UP_NON_BLOCKING |
