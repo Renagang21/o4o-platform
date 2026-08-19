@@ -205,7 +205,26 @@
 
 ---
 
-## 10. 판정 집계
+## 10. Production 배포 · Browser/Runtime Smoke (§17)
+
+- 배포: CI run `32201235885` success → `o4o-core-api` revision `o4o-core-api-03372-mpn`
+- 브라우저 smoke (headless chromium, 비로그인 · mutation 0):
+
+| 화면 | 결과 |
+|---|---|
+| KPA `/forum`, `/forum/all` | 정상 렌더 · JS error 0 · 4xx/5xx 0 · 게시글 3건(kpa-society) |
+| Neture `/forum`, `/forum/posts` | 정상 렌더 · JS error 0 · 4xx/5xx 0 |
+| Pharmacy-Hub `/forum`, `/forum/posts` | MembershipGate 로그인 안내 정상 노출 · JS error 0 · 4xx/5xx 0 |
+| K-Cosmetics `/forum`, `/forum/posts` | 정상 렌더 · JS error 0 · 4xx/5xx 0 |
+| GlycoPharm `/forum`, `/forum/posts` | 정상 렌더 · JS error 0 · 4xx/5xx 0 · 총 0건 |
+
+- 타 서비스 데이터 혼입 0 (게시글 4건 전부 kpa-society, 타 서비스 목록에 미노출).
+- API guard smoke (비인증, 상태 변경 없음): generic `POST /api/v1/forum/posts`, `PATCH /api/v1/forum/posts/:id/pin`, `POST /api/v1/forum/comments`, 서비스 `POST /api/v1/kpa/forum/posts/:id/like` 모두 `401 AUTH_REQUIRED`. 서비스 read (`/api/v1/kpa/forum/posts`, `/api/v1/neture/forum/posts`) `200`.
+- production 에 대한 cross-service mutation 시도는 하지 않았다. cross-service 거부는 automated negative tests 로 증명한다.
+
+---
+
+## 11. 판정 집계
 
 ```
 전체 모집단: 44
