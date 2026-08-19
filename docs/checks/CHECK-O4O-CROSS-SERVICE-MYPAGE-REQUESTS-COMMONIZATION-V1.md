@@ -223,6 +223,16 @@ dead link 0 / 잘못된 상태 라벨 **2건 발견 → 교정 후 0** / 잘못�
 mobile 기능 소실 0 / double shell 0.
 
 관측된 401 은 전부 미로그인 상태의 `auth/me`·`auth/refresh` 로 의도된 동작이다.
+### 교정 후 재검증 (run `32224640233` / `7892aaf0a` · 7 job 전부 success)
+
+| 확인 | 결과 |
+|---|---|
+| KPA 유형 뱃지 | `forum_member_join` → **'포럼 가입'** 정상 표시 (raw enum 소멸) |
+| KPA `포럼 가입` 필터 탭 | 노출 + 클릭 시 해당 건 유지 |
+| GP `/apply/my-applications` | 테스트약국 · 2026년 5월 27일 · **'검토 중'** |
+| GP `/mypage/my-requests` | 같은 건 · **'검토 중'** → 두 화면 라벨 일치 |
+| mobile 390×844 (KPA · GP) | overflow 0 · 잘린 텍스트 0건 |
+
 
 ---
 
