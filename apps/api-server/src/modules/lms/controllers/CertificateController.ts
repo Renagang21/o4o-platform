@@ -12,6 +12,9 @@ import {
   resolveOwnedCertificateByIdOrRespond,
   resolveOwnedCertificateByNumberOrRespond,
 } from '../utils/lms-certificate-owner-guard.js';
+// WO-O4O-KCOSMETICS-CERTIFICATE-VERIFICATION-DOMAIN-FALLBACK-FIX-V1
+// 검증 링크 base URL 결정 계약은 util 로 분리해 unit test 로 고정한다.
+import { resolveVerificationBase } from '../utils/certificate-verification-base.js';
 
 /**
  * CertificateController
@@ -19,22 +22,6 @@ import {
  * Handles certificate issuance and verification
  */
 
-/**
- * WO-O4O-LMS-CERTIFICATE-DOMAIN-V1
- * Map course.serviceKey → frontend base URL for certificate verification links.
- * null/unknown serviceKey = legacy course → KPA fallback for backward compat.
- */
-function resolveVerificationBase(serviceKey: string | null | undefined): string {
-  switch (serviceKey) {
-    case 'k-cosmetics':
-      return process.env.KCOSMETICS_FRONTEND_URL || process.env.FRONTEND_URL || 'https://k-cosmetics.co.kr';
-    case 'glycopharm':
-      return process.env.GLYCOPHARM_FRONTEND_URL || process.env.FRONTEND_URL || 'https://glycopharm.co.kr';
-    case 'kpa-society':
-    default:
-      return process.env.KPA_FRONTEND_URL || process.env.FRONTEND_URL || 'https://kpa-society.co.kr';
-  }
-}
 
 export class CertificateController extends BaseController {
   /**
