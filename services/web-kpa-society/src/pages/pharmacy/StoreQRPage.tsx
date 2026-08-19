@@ -654,7 +654,7 @@ export function StoreQRPage() {
         {/* WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (A안):
             QR 생성 진입을 페이지 내부 선택 모달로 직접 오픈 (내 자료함 이탈 동선 보완).
             기존 운영자 제공 QR "가져오기" 동선은 보조로 유지. */}
-        <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <button
             type="button"
             onClick={() => setShowSelector(true)}
@@ -1457,6 +1457,9 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    // 모바일 폭에서 액션 버튼이 가로 overflow 를 만들지 않도록 줄바꿈 허용
+    flexWrap: 'wrap',
+    gap: '12px',
     marginBottom: '24px',
   },
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터 탭

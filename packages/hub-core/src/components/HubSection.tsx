@@ -6,6 +6,7 @@
 
 import type { HubCardDefinition, HubSignal, HubActionResult } from '../types.js';
 import { HubCard } from './HubCard.js';
+import { useIsNarrowViewport } from './useIsNarrowViewport.js';
 
 interface HubSectionProps {
   title: string;
@@ -17,6 +18,8 @@ interface HubSectionProps {
 }
 
 export function HubSection({ title, badge, cards, signals, onCardClick, onActionTrigger }: HubSectionProps) {
+  const isNarrow = useIsNarrowViewport();
+
   if (cards.length === 0) return null;
 
   return (
@@ -25,7 +28,7 @@ export function HubSection({ title, badge, cards, signals, onCardClick, onAction
         <h2 style={styles.title}>{title}</h2>
         {badge && <span style={styles.badge}>{badge}</span>}
       </div>
-      <div style={styles.cardGrid}>
+      <div style={{ ...styles.cardGrid, gridTemplateColumns: isNarrow ? '1fr' : 'repeat(3, 1fr)' }}>
         {cards.map((card) => (
           <HubCard
             key={card.id}

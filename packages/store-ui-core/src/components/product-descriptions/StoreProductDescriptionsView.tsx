@@ -18,6 +18,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { Save, RefreshCw, FileText, Package, FolderOpen, LayoutTemplate } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { parseProductionRouterState } from '../../utils/productionUtils';
+import { useIsNarrowViewport } from '../../hooks/useIsNarrowViewport';
 
 /** 서비스 localProduct 응답 중 이 화면이 쓰는 필드만 (서비스는 더 많은 필드를 가진다) */
 export interface StoreDescriptionProduct {
@@ -141,7 +142,8 @@ export function StoreProductDescriptionsView({
   renderEditor,
 }: StoreProductDescriptionsViewProps) {
   const t: StoreProductDescriptionsTheme = { ...DEFAULT_THEME, ...themeOverrides };
-  const styles = buildStyles(t);
+  const isNarrow = useIsNarrowViewport();
+  const styles = buildStyles(t, isNarrow);
 
   // KCos/GP 현행 문구 = storeNoun 기반 기본값. 서비스가 준 원문이 있으면 그것을 그대로 쓴다.
   const labels: StoreProductDescriptionsLabels = {
@@ -514,7 +516,7 @@ export function StoreProductDescriptionsView({
  * 값은 KCos/GP 현행과 동일하며, theme 미주입 시 DEFAULT_THEME 로 기존과 완전히 같은 결과가 된다.
  * 서비스 간 차이가 없는 값(경고/성공 색 등)은 토큰화하지 않고 그대로 둔다.
  */
-function buildStyles(t: StoreProductDescriptionsTheme): Record<string, CSSProperties> {
+function buildStyles(t: StoreProductDescriptionsTheme, isNarrow = false): Record<string, CSSProperties> {
   return {
     container: { padding: '24px', maxWidth: '1100px', margin: '0 auto' },
     header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', marginBottom: '24px' },
@@ -523,15 +525,16 @@ function buildStyles(t: StoreProductDescriptionsTheme): Record<string, CSSProper
     templateBadge: { display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '3px 8px', background: t.templateBadgeBg, color: t.templateBadgeColor, borderRadius: '5px', fontSize: '12px', fontWeight: 600 },
     subtitle: { fontSize: '13px', color: t.textMuted, margin: '6px 0 0', lineHeight: 1.5 },
     refreshBtn: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: t.surface, border: `1px solid ${t.inputBorder}`, borderRadius: '6px', fontSize: '13px', color: t.textBody, cursor: 'pointer' },
-    layout: { display: 'grid', gridTemplateColumns: '280px 1fr', gap: '16px', alignItems: 'flex-start' },
-    sidebar: { background: t.surface, border: `1px solid ${t.divider}`, borderRadius: '8px', padding: '12px', maxHeight: '600px', overflowY: 'auto' as const },
+    // 모바일(<=768px)에서는 1열. grid item 은 minWidth:0 이어야 내부 편집기가 폭을 밀어내지 않는다.
+    layout: { display: 'grid', gridTemplateColumns: isNarrow ? '1fr' : '280px 1fr', gap: '16px', alignItems: 'flex-start' },
+    sidebar: { minWidth: 0, background: t.surface, border: `1px solid ${t.divider}`, borderRadius: '8px', padding: '12px', maxHeight: '600px', overflowY: 'auto' as const },
     sidebarTitle: { fontSize: '13px', fontWeight: 600, color: t.sidebarTitleColor, margin: '0 0 8px', padding: '0 4px' },
     sidebarEmpty: { fontSize: '13px', color: t.textMuted, padding: '12px 4px', margin: 0 },
     productList: { listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column' as const, gap: '2px' },
     productItem: { display: 'flex', alignItems: 'center', gap: '8px', width: '100%', padding: '8px 10px', background: 'transparent', border: '1px solid transparent', borderRadius: '6px', fontSize: '13px', color: t.textBody, cursor: 'pointer', textAlign: 'left' as const },
     productItemActive: { background: '#EFF6FF', borderColor: '#BFDBFE', color: '#2563EB', fontWeight: 500 },
     productName: { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const },
-    editor: { background: t.surface, border: `1px solid ${t.divider}`, borderRadius: '8px', padding: '20px', display: 'flex', flexDirection: 'column' as const, gap: '12px', minHeight: '400px' },
+    editor: { minWidth: 0, background: t.surface, border: `1px solid ${t.divider}`, borderRadius: '8px', padding: '20px', display: 'flex', flexDirection: 'column' as const, gap: '12px', minHeight: '400px' },
     editorEmpty: { flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.textSubtle, fontSize: '14px', minHeight: '300px' },
     editorHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', paddingBottom: '12px', borderBottom: `1px solid ${t.divider}` },
     editorProductName: { fontSize: '15px', fontWeight: 600, color: t.textStrong },

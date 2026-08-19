@@ -280,7 +280,7 @@ export default function PharmacySettings() {
 
       <div className="grid lg:grid-cols-4 gap-6">
         {/* Sidebar */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 min-w-0">
           <nav className="bg-white rounded-2xl shadow-sm p-2 space-y-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -303,7 +303,7 @@ export default function PharmacySettings() {
         </div>
 
         {/* Content */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 min-w-0">
           <div className="bg-white rounded-2xl shadow-sm p-6">
             {activeTab === 'store' && (
               <div className="space-y-6">

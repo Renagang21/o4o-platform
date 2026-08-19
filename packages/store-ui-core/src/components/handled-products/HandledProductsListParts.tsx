@@ -196,7 +196,7 @@ export function HandledProductsToolbar({
       {leadingSlot}
       {onSearchSubmit ? (
         <form
-          className="ml-auto flex items-center gap-2"
+          className="ml-auto flex flex-wrap items-center gap-2"
           onSubmit={(e) => {
             e.preventDefault();
             onSearchSubmit();
@@ -212,7 +212,7 @@ export function HandledProductsToolbar({
           {trailingSlot}
         </form>
       ) : (
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex flex-wrap items-center gap-2">
           {searchField}
           {trailingSlot}
         </div>

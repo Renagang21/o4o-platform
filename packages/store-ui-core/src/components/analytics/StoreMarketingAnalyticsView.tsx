@@ -10,6 +10,7 @@
 import { useState, useEffect, useCallback, useMemo, type CSSProperties } from 'react';
 import { BarChart3, TrendingUp, QrCode, Smartphone, Monitor, Tablet, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useIsNarrowViewport } from '../../hooks/useIsNarrowViewport';
 
 export interface StoreMarketingAnalyticsData {
   totalScans: number;
@@ -48,7 +49,8 @@ export function StoreMarketingAnalyticsView({
   breadcrumbRootLabel = '매장 실행',
   backTo = '/store',
 }: StoreMarketingAnalyticsViewProps) {
-  const styles = useMemo(() => makeStyles(primaryColor), [primaryColor]);
+  const isNarrow = useIsNarrowViewport();
+  const styles = useMemo(() => makeStyles(primaryColor, isNarrow), [primaryColor, isNarrow]);
   const [data, setData] = useState<StoreMarketingAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -229,7 +231,7 @@ export function StoreMarketingAnalyticsView({
 
 // ── 스타일 ──
 
-function makeStyles(primary: string): Record<string, CSSProperties> {
+function makeStyles(primary: string, isNarrow = false): Record<string, CSSProperties> {
   return {
   container: {
     padding: '24px',
@@ -276,7 +278,8 @@ function makeStyles(primary: string): Record<string, CSSProperties> {
   // KPI
   kpiGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
+    // 모바일(<=768px)에서는 2열 — 4열 고정은 가로 overflow 를 만든다.
+    gridTemplateColumns: isNarrow ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
     gap: '12px',
     marginBottom: '24px',
   },
@@ -365,7 +368,7 @@ function makeStyles(primary: string): Record<string, CSSProperties> {
   // Two column
   twoCol: {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
+    gridTemplateColumns: isNarrow ? '1fr' : '1fr 1fr',
     gap: '16px',
   },
 

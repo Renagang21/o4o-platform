@@ -494,3 +494,6 @@ export * from './components/signage';
 export * from './components/channels';
 export * from './components/qr';
 export * from './components/blog';
+
+// 공통 View 반응형 판정 (WO-O4O-MY-STORE-FINAL-COMMONIZATION-AUDIT-AND-CLOSURE-V1 §12)
+export { useIsNarrowViewport } from './hooks/useIsNarrowViewport';
