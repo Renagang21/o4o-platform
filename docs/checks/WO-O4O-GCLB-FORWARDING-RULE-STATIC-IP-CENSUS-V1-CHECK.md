@@ -220,7 +220,16 @@ WO §6 은 traffic 이 있으면 삭제 후보로 올리지 말 것을 요구한
 | 문서 내 IP 기록 | `docs/investigations/CHECK-O4O-WEB-ACCOUNT-ENTRY-FLOW-REGRESSION-V1.md:146`, `docs/archive/work-orders/WO-O4O-E2E-REGISTRATION-APPROVAL-LOGIN-TEST-V1-REPORT.md:112` — 둘 다 `136.110.132.35` 로 **현재와 일치** |
 | production 도메인 config | `.github/workflows/deploy-web-services.yml` 이 `k-cosmetics.site` · `pharmacyhub.co.kr` 사용 — **현재 DNS 와 일치** |
 
-**dead config 발견 0건.** 수정 대상 없음.
+**LB 인프라 관련 dead config 0건.** 다만 아래 **도메인 dead reference 3건**을 추가로 발견했다 (WO §11 “기록만, 수정하지 않는다” 적용 — 이번 WO 에서 수정하지 않음).
+
+| 위치 | 내용 | 평가 |
+|---|---|---|
+| `apps/api-server/src/modules/lms/controllers/CertificateController.ts:30` | `resolveVerificationBase('k-cosmetics')` 의 최종 fallback 이 리터럴 `https://k-cosmetics.co.kr` | **살아있는 경로.** 배포된 `o4o-core-api` 에 `KCOSMETICS_FRONTEND_URL` · `FRONTEND_URL` 이 **둘 다 미설정**(env 21개 중 URL 계열 0개)이므로, k-cosmetics 수료증 검증 링크가 **production 이 아닌 `k-cosmetics.co.kr`(203.245.12.x, GCP 외)로 생성**된다. 정본은 `k-cosmetics.site` |
+| `apps/api-server/src/migrations/1736611201000-SeedNetureData.ts:258` | seed 데이터 URL `https://k-cosmetics.co.kr/store/beauty-cosmetic` | seed 전용. 영향도 낮음 |
+| 같은 2건의 `apps/api-server/dist/**` 복사본 | 빌드 산출물 | 소스 수정 시 함께 해소 |
+
+> `glucoseview.com` · `pharmacy-hub.co.kr` 은 `services/` · `packages/` · `apps/` 에서 참조 **0건**.
+> `74.125.204.121` (account.neture.co.kr) 의 rDNS 는 `ti-in-f121.1e100.net` — Google 인프라가 맞음을 확인했다.
 
 ---
 
@@ -300,4 +309,4 @@ domain↔IP↔LB 관계 미확정 0          ✅ UNKNOWN 0
 ```
 
 **후속 삭제 WO 필요 여부: 필요.** 단 비용 절감액이 작으므로(월 $3~7 추정) 우선순위는 낮고, 동기는 평문 HTTP 진입점 제거다.
-§9 의 legacy SSL certificate 9개 정리도 별도 WO 후보다.
+§9 의 legacy SSL certificate 9개 정리, 그리고 §8 의 `k-cosmetics.co.kr` fallback 교정도 각각 별도 WO 후보다.
