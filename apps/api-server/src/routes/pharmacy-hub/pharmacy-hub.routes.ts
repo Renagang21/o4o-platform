@@ -653,12 +653,14 @@ export function createPharmacyHubRoutes(): Router {
         tasks.push(
           (async () => {
             const rows: any[] = await AppDataSource.query(
-              `SELECT c.id, c.title, c.created_at, u.name AS author_name
+              // lms_courses 는 quoted camelCase 컬럼("instructorId"/"createdAt")이고
+              // service_key 만 snake_case 다 (20261101000000-AddServiceKeyToLmsCourses).
+              `SELECT c.id, c.title, c."createdAt" AS created_at, u.name AS author_name
                  FROM lms_courses c
-                 LEFT JOIN users u ON c.instructor_id = u.id
+                 LEFT JOIN users u ON c."instructorId" = u.id
                 WHERE c.status = 'published'
                   AND c.service_key = $1
-                ORDER BY c.created_at DESC
+                ORDER BY c."createdAt" DESC
                 LIMIT $2`,
               [SERVICE_KEY, perLimit],
             );

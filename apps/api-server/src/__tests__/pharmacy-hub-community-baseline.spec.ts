@@ -38,6 +38,13 @@ describe('PharmacyHub Community baseline — /home/latest 서비스 경계', () 
     expect(LATEST).not.toContain('custom_posts');
   });
 
+  it('lms_courses 는 quoted camelCase 컬럼으로 조회한다(snake_case 오조회 재발 방지)', () => {
+    expect(LATEST).toContain('c."instructorId"');
+    expect(LATEST).toContain('c."createdAt"');
+    expect(LATEST).not.toContain('c.instructor_id');
+    expect(LATEST).not.toContain('c.created_at');
+  });
+
   it('조회 실패를 빈 목록으로 위장하지 않는다(allSettled 로 삼키지 않는다)', () => {
     expect(LATEST).toContain('await Promise.all(tasks)');
     expect(LATEST).not.toContain('Promise.allSettled');
