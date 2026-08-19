@@ -1,0 +1,17 @@
+[
+  {
+    "name": "keep-recent-50-versions",
+    "action": { "type": "Keep" },
+    "mostRecentVersions": { "keepCount": 50 }
+  },
+  {
+    "name": "delete-untagged-older-than-30d",
+    "action": { "type": "Delete" },
+    "condition": { "tagState": "UNTAGGED", "olderThan": "30d" }
+  },
+  {
+    "name": "delete-any-older-than-30d",
+    "action": { "type": "Delete" },
+    "condition": { "tagState": "ANY", "olderThan": "30d" }
+  }
+]
