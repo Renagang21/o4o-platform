@@ -2,7 +2,7 @@
 
 - **WO**: WO-O4O-STORE-LOCAL-PRODUCTS-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1
 - **일자**: 2026-08-19
-- **판정**: FIXED — 서비스 스코프 mount 추가로 `handled-products` 와 `local-products` 의 organization 해석 일치
+- **판정**: FIXED · **배포 후 production 검증 PASS** (2026-08-19, §5)
 - **DB write**: 0 (프로덕션 read-only 조회만)
 - **관련**: `docs/checks/CHECK-O4O-STORE-OWNER-BACKCOMPAT-SERVICEKEY-MIGRATION-V1.md`,
   `docs/checks/CHECK-O4O-STORE-HANDLED-PRODUCTS-CROSS-SERVICE-DEDUPE-CONTRACT-V1.md`
@@ -114,13 +114,26 @@ serviceKey 가 없으면 `resolveStoreOrganization()` 의 back-compat 경로가 
 
 ---
 
-## 5. 배포 후 확인 (예상)
+## 5. 배포 후 검증 (production, read-only) — PASS
 
-`/api/v1/kpa/store/local-products` 가 KPA 약국 조직(`9c87f46b…`)을 해석해 자체상품 8건을 반환하고,
-`handled-products` 와 organization 이 동일해야 한다.
-(WO §10: 데이터 건수를 맞추는 것이 목표가 아니라 **조직 해석이 같아지는 것**이 목표다.)
+- 배포: commit `26bb95e8e` → CI `Deploy API Server (Cloud Run)` success → revision `o4o-core-api-03373-jjm` (2026-08-19 01:25Z)
+- 계정: KPA 약국 경영자 테스트 계정(다중 조직 보유), `serviceKey='kpa-society'` 로그인 200
+- 데이터 write 0 (GET 만 호출)
 
----
+| 호출 | 결과 |
+|---|---|
+| `GET /api/v1/kpa/store/local-products` | 200 · total **8** |
+| `GET /api/v1/store/handled-products` | 200 · 29건 중 local 출처 **8**건 |
+| `GET /api/v1/store/local-products` (중립 back-compat) | 200 · total **0** (기존 동작 그대로) |
+| `GET /api/v1/cosmetics/store/local-products` | 200 · total 0 (K-Cosmetics 조직 — KPA 데이터 유출 0) |
+| `GET /api/v1/glycopharm/store/local-products` | 200 · total 0 (GlycoPharm 조직 — 유출 0) |
+
+**핵심 판정**: 서비스 스코프 local-products 의 8개 id 와 handled-products 의 local 출처 8개 id 가
+**완전히 동일**하다(`099eee4f / 0a5340af / 1fcce2f6 / 5e7344c5 / 868341a6 / 9048863d / 91cfdb0d / cd3a2b29`).
+→ 두 API 가 같은 organization(KPA 약국 `9c87f46b…`)을 해석한다. WO §10 목표 달성.
+
+중립 mount 가 여전히 0건인 것은 **의도된 back-compat 유지**이며, 프론트 3개 서비스는 모두
+서비스 스코프 경로를 소비하도록 이전됐다.
 
 ## 6. 남은 부채 (별도 WO 후보)
 
