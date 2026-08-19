@@ -4,9 +4,7 @@
 export { HeroBannerSection } from './HeroBannerSection';
 export type { HeroBannerAd, HeroBannerFallback, HeroBannerSectionProps } from './HeroBannerSection';
 
-export { HeroSummarySection } from './HeroSummarySection';
 export { NewsNoticesSection } from './NewsNoticesSection';
-export { ActivitySection } from './ActivitySection';
 export { AppEntrySection } from './AppEntrySection';
 export { CtaGuidanceSection } from './CtaGuidanceSection';
 export { O4OHelpSection } from './O4OHelpSection';
@@ -51,8 +49,6 @@ export { GuideBlock } from './GuideBlock';
 export type { GuideBlockProps, GuideBlockVariant } from './GuideBlock';
 
 /* WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1: LMS 강의 Reference Metadata preview (자료함/POP/QR/블로그 공용) */
-export { LessonCardPreview } from './LessonCardPreview';
-export type { LessonCardPreviewProps, LessonCardPreviewVariant } from './LessonCardPreview';
 
 /* WO-O4O-APPRECIATION-PANEL-COMPONENT-EXTRACTION-V1: 감사 포인트 공통 컴포넌트 (Forum/LMS/Content 공용) */
 export { AppreciationPanel } from './AppreciationPanel';
@@ -263,17 +259,13 @@ export { usePageSeo, getMeta, setMeta, removeMeta, setCanonical, removeCanonical
 export type {
   /* Data types */
   NoticeItem,
-  FeaturedPost,
-  RecentPost,
   SignageMediaItem,
   SignagePlaylistItem,
   ContentHighlightItem,
   /* WO-O4O-LESSON-CARD-PREVIEW-COMPONENT-V1: LMS 강의 Reference Metadata 공용 타입 */
   LessonSnapshotContent,
   /* Component props */
-  HeroSummarySectionProps,
   NewsNoticesSectionProps,
-  ActivitySectionProps,
   AppEntrySectionProps,
   CtaGuidanceSectionProps,
   O4OHelpSectionProps,

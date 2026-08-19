@@ -9,13 +9,13 @@
  * RichTextEditor HTML 을 그대로 전송 — 백엔드 normalizeContent 가 Block[] 정규화.
  */
 
-import { CSSProperties } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { CSSProperties, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { createForumPost } from '../../services/forumApi';
+import { createForumPost, fetchForumPostById, updateForumPost } from '../../services/forumApi';
 import { toast } from '@o4o/error-handling';
 // WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1: 공통 글쓰기 폼(create-only)
-import { ForumWriteForm } from '@o4o/shared-space-ui';
+import { ForumWriteForm, forumContentToHtml } from '@o4o/shared-space-ui';
 import type { ForumWriteFormPayload, ForumWriteFormPostTypeOption } from '@o4o/shared-space-ui';
 
 const POST_TYPES: ForumWriteFormPostTypeOption[] = [
@@ -29,6 +29,48 @@ const POST_TYPES: ForumWriteFormPostTypeOption[] = [
 export default function ForumWritePage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   게시글 수정 adoption gap 해소 — 같은 페이지의 edit 모드(KPA ForumWritePage 와 같은 축).
+  //   초기값 버퍼만 여기서 소유하고, 이후 편집 상태는 공통 ForumWriteForm 이 소유한다.
+  const { postId } = useParams<{ postId?: string }>();
+  const isEdit = Boolean(postId);
+  const [loading, setLoading] = useState(isEdit);
+  const [initialTitle, setInitialTitle] = useState('');
+  const [initialContentHtml, setInitialContentHtml] = useState('');
+
+  useEffect(() => {
+    if (!isEdit || !postId) return;
+    let alive = true;
+    fetchForumPostById(postId)
+      .then((res) => {
+        if (!alive || !res?.data) return;
+        setInitialTitle(res.data.title);
+        setInitialContentHtml(forumContentToHtml(res.data.content));
+      })
+      .catch(() => toast.error('게시글을 불러오지 못했습니다.'))
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [isEdit, postId]);
+
+  const handleUpdate = async (payload: ForumWriteFormPayload) => {
+    if (!postId) return;
+    try {
+      const data = await updateForumPost(postId, {
+        title: payload.title,
+        type: payload.type ?? 'discussion',
+        content: payload.editorHtml,
+      });
+      if (data.success) {
+        navigate(`/forum/post/${postId}`);
+      } else {
+        toast.error(data.error || 'Failed to update post.');
+      }
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 403) toast.error('본인이 작성한 글만 수정할 수 있습니다.');
+      else toast.error(err.response?.data?.error || 'Network error. Please try again.');
+    }
+  };
 
   const handleCreate = async (payload: ForumWriteFormPayload) => {
     try {
@@ -49,6 +91,16 @@ export default function ForumWritePage() {
     }
   };
 
+  if (isEdit && loading) {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <p style={styles.loginText}>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div style={styles.page}>
@@ -65,7 +117,7 @@ export default function ForumWritePage() {
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        <h1 style={styles.heading}>Write a Post</h1>
+        <h1 style={styles.heading}>{isEdit ? 'Edit Post' : 'Write a Post'}</h1>
 
         {user && (
           <div style={styles.authorInfo}>
@@ -76,6 +128,8 @@ export default function ForumWritePage() {
         )}
 
         <ForumWriteForm
+          initialTitle={initialTitle}
+          initialContentHtml={initialContentHtml}
           showPostType
           postTypeOptions={POST_TYPES}
           postTypeLabel="Post Type"
@@ -83,13 +137,13 @@ export default function ForumWritePage() {
           titlePlaceholder="Enter post title"
           contentLabel="Content"
           contentPlaceholder="Write your post content here"
-          submitLabel="Post"
-          submittingLabel="Posting..."
+          submitLabel={isEdit ? 'Update' : 'Post'}
+          submittingLabel={isEdit ? 'Updating...' : 'Posting...'}
           cancelLabel="Cancel"
           theme="pink"
           minHeight="300px"
           editorProps={{ preset: 'compact' }}
-          onSubmit={handleCreate}
+          onSubmit={isEdit ? handleUpdate : handleCreate}
           onCancel={() => navigate(-1)}
           onInvalid={(reason) =>
             toast.error(reason === 'title' ? 'Please enter a title.' : 'Please enter content.')

@@ -478,6 +478,16 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        {/* WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+            게시글 수정 adoption gap 해소 — 동일 페이지 edit 모드(KPA /forum/edit/:id 와 같은 축). */}
+        <Route
+          path="forum/edit/:postId"
+          element={
+            <ProtectedRoute>
+              <ForumWritePage />
+            </ProtectedRoute>
+          }
+        />
         {/* WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 */}
         <Route
           path="forum/my-dashboard"

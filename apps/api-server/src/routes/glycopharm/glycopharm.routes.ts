@@ -209,6 +209,12 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // Comments
   forumRouter.get('/posts/:postId/comments', forumController.listComments.bind(forumController));
   forumRouter.post('/comments', authenticate, forumController.createComment.bind(forumController));
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C
+  //   댓글 작성/수정/삭제 route 가 서비스 라우터에 remount 되지 않아 프런트가 쓸 수 없었다.
+  //   공통 service-forum.routes.ts 와 동일한 경로·핸들러를 그대로 remount 한다(신규 로직 0).
+  forumRouter.post('/posts/:postId/comments', authenticate, forumController.createComment.bind(forumController));
+  forumRouter.put('/comments/:id', authenticate, forumController.updateComment.bind(forumController));
+  forumRouter.delete('/comments/:id', authenticate, forumController.deleteComment.bind(forumController));
 
   // Forum Directory — Named routes BEFORE :id (path /categories kept for compat)
   forumRouter.get('/categories', forumController.listForums.bind(forumController));

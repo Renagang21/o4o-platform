@@ -8,6 +8,11 @@ import { ContentRenderer } from '@o4o/content-editor';
 import {
   fetchForumPostById,
   fetchForumComments,
+  createForumComment,
+  updateForumComment,
+  deleteForumComment,
+  deleteForumPost,
+  toggleForumPostLike,
   getAuthorName,
   type ForumPost,
   type ForumComment,
@@ -22,6 +27,8 @@ import {
   ForumDetailErrorState,
   ForumDetailNotFoundState,
   ForumCommentList,
+  ForumCommentForm,
+  ForumLikeButton,
 } from '@o4o/shared-space-ui';
 import { appreciationPanelApi } from '@/api/appreciation';
 
@@ -58,6 +65,16 @@ export default function PostDetailPage() {
   const [comments, setComments] = useState<ForumComment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   댓글 쓰기 adoption gap 해소 — 공통 ForumCommentForm + 공통 backend 소비.
+  const [commentInput, setCommentInput] = useState('');
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   좋아요 adoption gap 해소 — 공통 ForumLikeButton + 공통 backend `POST /posts/:id/like`.
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [likePending, setLikePending] = useState(false);
 
   useEffect(() => {
     async function loadPost() {
@@ -78,6 +95,8 @@ export default function PostDetailPage() {
         }
 
         setPost(postResponse.data);
+        setIsLiked(Boolean((postResponse.data as any)?.isLiked));
+        setLikeCount(postResponse.data.likeCount ?? 0);
         setComments(commentsResponse.data || []);
       } catch (err) {
         console.error('Error loading post:', err);
@@ -89,6 +108,92 @@ export default function PostDetailPage() {
 
     loadPost();
   }, [postId]);
+
+  const reloadComments = async (id: string) => {
+    try {
+      const res = await fetchForumComments(id);
+      setComments(res.data || []);
+    } catch {
+      // 댓글 재조회 실패는 본문 표시를 막지 않는다.
+    }
+  };
+
+  const commentErrorMessage = (err: unknown, fallback: string): string => {
+    const status = (err as { response?: { status?: number } })?.response?.status;
+    if (status === 401) return '로그인이 필요합니다.';
+    if (status === 403) return '이 커뮤니티에 참여한 회원만 사용할 수 있습니다.';
+    return fallback;
+  };
+
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   본인 게시글 수정·삭제 adoption gap 해소. 최종 권한 판정은 backend 가 한다.
+  const handleDeletePost = async () => {
+    if (!postId) return;
+    if (!window.confirm('게시글을 삭제하시겠습니까?')) return;
+    try {
+      await deleteForumPost(postId);
+      navigate('/forum/posts');
+    } catch (err) {
+      toast.error(commentErrorMessage(err, '게시글을 삭제하지 못했습니다.'));
+    }
+  };
+
+  const handleToggleLike = async () => {
+    if (!postId) return;
+    if (!user?.id) {
+      navigate('/login');
+      return;
+    }
+    setLikePending(true);
+    setCommentError(null);
+    try {
+      const result = await toggleForumPostLike(postId);
+      setIsLiked(result.isLiked);
+      setLikeCount(result.likeCount);
+    } catch (err) {
+      setCommentError(commentErrorMessage(err, '좋아요 처리에 실패했습니다.'));
+    } finally {
+      setLikePending(false);
+    }
+  };
+
+  const handleSubmitComment = async () => {
+    if (!postId || !commentInput.trim()) return;
+    setCommentSubmitting(true);
+    setCommentError(null);
+    try {
+      await createForumComment(postId, commentInput.trim());
+      setCommentInput('');
+      await reloadComments(postId);
+    } catch (err) {
+      setCommentError(commentErrorMessage(err, '댓글을 등록하지 못했습니다.'));
+    } finally {
+      setCommentSubmitting(false);
+    }
+  };
+
+  const handleEditComment = async (commentId: string, content: string) => {
+    if (!postId || !content.trim()) return;
+    setCommentError(null);
+    try {
+      await updateForumComment(commentId, content.trim());
+      await reloadComments(postId);
+    } catch (err) {
+      setCommentError(commentErrorMessage(err, '댓글을 수정하지 못했습니다.'));
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!postId) return;
+    if (!window.confirm('댓글을 삭제하시겠습니까?')) return;
+    setCommentError(null);
+    try {
+      await deleteForumComment(commentId);
+      await reloadComments(postId);
+    } catch (err) {
+      setCommentError(commentErrorMessage(err, '댓글을 삭제하지 못했습니다.'));
+    }
+  };
 
   // WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1: AppreciationPanel onError 핸들러
   const handleAppreciationError = (err: any) => {
@@ -134,9 +239,30 @@ export default function PostDetailPage() {
           ) : null}
         />
 
+        {Boolean(user?.id && post.author?.id === user.id) && (
+          <div style={styles.postActions}>
+            <button style={styles.postActionBtn} onClick={() => navigate(`/forum/edit/${post.id}`)}>
+              수정
+            </button>
+            <button style={styles.postDeleteBtn} onClick={() => { void handleDeletePost(); }}>
+              삭제
+            </button>
+          </div>
+        )}
+
         <div style={styles.content}>
           {/* WO-O4O-FORUM-DETAIL-PRIMITIVES-EXTRACTION-V1: 본문 공통 부품(댓글 렌더는 기존 유지) */}
           <ForumPostContent content={post.content} />
+        </div>
+
+        <div style={styles.likeRow}>
+          <ForumLikeButton
+            liked={isLiked}
+            count={likeCount}
+            disabled={likePending}
+            compact
+            onClick={() => { void handleToggleLike(); }}
+          />
         </div>
       </article>
 
@@ -158,6 +284,19 @@ export default function PostDetailPage() {
         <h2 style={styles.commentsTitle}>
           댓글 {comments.length}개
         </h2>
+        <ForumCommentForm
+          value={commentInput}
+          onChange={setCommentInput}
+          onSubmit={() => { void handleSubmitComment(); }}
+          submitting={commentSubmitting}
+          authenticated={Boolean(user?.id)}
+          error={commentError}
+          loginPrompt={(
+            <div style={styles.commentLoginPrompt}>
+              <Link to="/login">로그인</Link> 후 댓글을 작성할 수 있습니다.
+            </div>
+          )}
+        />
         <ForumCommentList
           comments={comments.map((comment) => ({
             id: comment.id,
@@ -166,11 +305,14 @@ export default function PostDetailPage() {
               ? blocksToHtmlInline(comment.content)
               : (comment.content || ''),
             createdAt: formatDate(comment.createdAt),
+            isAuthor: Boolean(user?.id && comment.author?.id === user.id),
           }))}
           emptyMessage="아직 댓글이 없습니다."
           renderContent={(comment) => (
             <ContentRenderer html={comment.content} style={styles.commentContent} />
           )}
+          onEditComment={(id, content) => { void handleEditComment(id, content); }}
+          onDeleteComment={(id) => { void handleDeleteComment(id); }}
         />
       </section>
 
@@ -184,6 +326,46 @@ export default function PostDetailPage() {
 }
 
 const styles: Record<string, React.CSSProperties> = {
+  postActions: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: 8,
+    padding: '0 0 12px',
+  },
+  postActionBtn: {
+    padding: '4px 12px',
+    fontSize: 12,
+    border: '1px solid #e2e8f0',
+    borderRadius: 6,
+    background: 'white',
+    color: '#475569',
+    cursor: 'pointer',
+  },
+  postDeleteBtn: {
+    padding: '4px 12px',
+    fontSize: 12,
+    border: '1px solid #fecdd3',
+    borderRadius: 6,
+    background: 'white',
+    color: '#e11d48',
+    cursor: 'pointer',
+  },
+  likeRow: {
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '24px 0 4px',
+    borderTop: '1px solid #f1f5f9',
+    marginTop: '24px',
+  },
+  commentLoginPrompt: {
+    marginBottom: '24px',
+    padding: '16px',
+    borderRadius: '8px',
+    background: '#f8fafc',
+    color: '#64748b',
+    fontSize: '14px',
+    textAlign: 'center',
+  },
   container: {
     maxWidth: '800px',
     margin: '0 auto',

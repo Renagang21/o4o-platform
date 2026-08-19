@@ -11,13 +11,13 @@
  * Uses apiClient centralized pattern (GlycoPharm standard).
  */
 
-import type { CSSProperties } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, type CSSProperties } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { createForumPost } from '@/services/forumApi';
+import { createForumPost, fetchForumPost, updateForumPost } from '@/services/forumApi';
 import { toast } from '@o4o/error-handling';
 // WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1: 공통 글쓰기 폼(create-only)
-import { ForumWriteForm } from '@o4o/shared-space-ui';
+import { ForumWriteForm, forumContentToHtml } from '@o4o/shared-space-ui';
 import type { ForumWriteFormPayload, ForumWriteFormPostTypeOption } from '@o4o/shared-space-ui';
 
 const POST_TYPES: ForumWriteFormPostTypeOption[] = [
@@ -31,6 +31,47 @@ const POST_TYPES: ForumWriteFormPostTypeOption[] = [
 export default function ForumWritePage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   게시글 수정 adoption gap 해소 — 같은 페이지의 edit 모드(KPA ForumWritePage 와 같은 축).
+  const { postId } = useParams<{ postId?: string }>();
+  const isEdit = Boolean(postId);
+  const [loading, setLoading] = useState(isEdit);
+  const [initialTitle, setInitialTitle] = useState('');
+  const [initialContentHtml, setInitialContentHtml] = useState('');
+
+  useEffect(() => {
+    if (!isEdit || !postId) return;
+    let alive = true;
+    fetchForumPost(postId)
+      .then((res) => {
+        if (!alive || !res?.data) return;
+        setInitialTitle(res.data.title);
+        setInitialContentHtml(forumContentToHtml((res.data as any).content));
+      })
+      .catch(() => toast.error('게시글을 불러오지 못했습니다.'))
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [isEdit, postId]);
+
+  const handleUpdate = async (payload: ForumWriteFormPayload) => {
+    if (!postId) return;
+    try {
+      const data = await updateForumPost(postId, {
+        title: payload.title,
+        type: payload.type ?? 'discussion',
+        content: payload.editorHtml,
+      });
+      if (data.success) {
+        navigate(`/forum/posts/${postId}`);
+      } else {
+        toast.error(data.error || '게시글 수정에 실패했습니다.');
+      }
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 403) toast.error('본인이 작성한 글만 수정할 수 있습니다.');
+      else toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+  };
 
   const handleCreate = async (payload: ForumWriteFormPayload) => {
     try {
@@ -55,6 +96,16 @@ export default function ForumWritePage() {
     }
   };
 
+  if (isEdit && loading) {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <p style={styles.loginText}>불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div style={styles.page}>
@@ -71,7 +122,7 @@ export default function ForumWritePage() {
   return (
     <div style={styles.page}>
       <div style={styles.container}>
-        <h1 style={styles.heading}>글쓰기</h1>
+        <h1 style={styles.heading}>{isEdit ? '글 수정' : '글쓰기'}</h1>
 
         {user && (
           <div style={styles.authorInfo}>
@@ -82,6 +133,8 @@ export default function ForumWritePage() {
         )}
 
         <ForumWriteForm
+          initialTitle={initialTitle}
+          initialContentHtml={initialContentHtml}
           showPostType
           postTypeOptions={POST_TYPES}
           postTypeLabel="글 유형"
@@ -89,13 +142,13 @@ export default function ForumWritePage() {
           titlePlaceholder="게시글 제목을 입력하세요"
           contentLabel="내용"
           contentPlaceholder="게시글 내용을 작성하세요"
-          submitLabel="등록"
-          submittingLabel="등록 중..."
+          submitLabel={isEdit ? '수정하기' : '등록'}
+          submittingLabel={isEdit ? '수정 중...' : '등록 중...'}
           cancelLabel="취소"
           theme="emerald"
           minHeight="300px"
           editorProps={{ preset: 'compact' }}
-          onSubmit={handleCreate}
+          onSubmit={isEdit ? handleUpdate : handleCreate}
           onCancel={() => navigate(-1)}
           onInvalid={(reason) =>
             toast.error(reason === 'title' ? '제목을 입력해주세요.' : '내용을 입력해주세요.')

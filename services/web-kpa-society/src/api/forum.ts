@@ -85,6 +85,10 @@ export const forumApi = {
       parentId,
     }),
 
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C
+  updateComment: (commentId: string, content: string) =>
+    apiClient.put<ApiResponse<ForumComment>>(`${getForumBasePath()}/comments/${commentId}`, { content }),
+
   deleteComment: (postId: string, commentId: string) =>
     apiClient.delete<ApiResponse<void>>(`${getForumBasePath()}/posts/${postId}/comments/${commentId}`),
 

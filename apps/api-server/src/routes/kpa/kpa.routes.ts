@@ -689,6 +689,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // WO-FORUM-COMMENT-ROUTE-STANDARDIZATION-V1: RESTful nested 경로 추가 (프론트 정합)
   forumRouter.post('/posts/:postId/comments', authenticate, forumController.createComment.bind(forumController));
   forumRouter.delete('/posts/:postId/comments/:id', authenticate, forumController.deleteComment.bind(forumController));
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C
+  //   댓글 수정 route 만 remount 되지 않아 KPA 만 댓글 수정을 못 했다.
+  //   공통 service-forum.routes.ts 와 동일 경로·핸들러 그대로 사용한다(신규 로직 0).
+  forumRouter.put('/comments/:id', authenticate, forumController.updateComment.bind(forumController));
 
   // Forum Directory (읽기: 공개, 쓰기: admin scope — WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1)
   // (path /categories kept for compat — WO-O4O-FORUM-NAMING-CLEANUP-V1)

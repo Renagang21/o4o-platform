@@ -13,39 +13,9 @@ export interface NoticeItem {
 }
 
 /* ------------------------------------------------------------------ */
-/*  FeaturedPost — ActivitySection (인기 글 Top 3)                      */
-/* ------------------------------------------------------------------ */
-export interface FeaturedPost {
-  id: string;
-  title: string;
-  author: string;
-  viewCount: number;
-  category?: string;
-  href: string;
-}
-
-/* ------------------------------------------------------------------ */
-/*  RecentPost — ActivitySection (최근 글 5)                            */
-/* ------------------------------------------------------------------ */
-export interface RecentPost {
-  id: string;
-  title: string;
-  date: string;
-  href: string;
-  category?: string;
-  author?: string;
-}
-
-/* ------------------------------------------------------------------ */
 /*  Component Props                                                    */
 /* ------------------------------------------------------------------ */
 
-export interface HeroSummarySectionProps {
-  greeting: string;
-  subtitle?: string;
-  ctas: Array<{ label: string; href: string; icon?: ReactNode }>;
-  accentColor?: string;
-}
 
 export interface NewsNoticesSectionProps {
   title?: string;
@@ -65,18 +35,6 @@ export interface NewsNoticesSectionProps {
   viewAllHref?: string;
   accentColor?: string;
   accentBg?: string;
-}
-
-export interface ActivitySectionProps {
-  title?: string;
-  featuredPosts: FeaturedPost[];
-  recentPosts: RecentPost[];
-  loading?: boolean;
-  emptyMessage?: string;
-  emptyActionLabel?: string;
-  emptyActionHref?: string;
-  viewAllHref?: string;
-  accentColor?: string;
 }
 
 export interface AppEntrySectionProps {

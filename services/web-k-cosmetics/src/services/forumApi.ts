@@ -128,6 +128,37 @@ export async function fetchForumComments(postId: string): Promise<CommentsRespon
 }
 
 // ============================================================================
+// Post like (WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C)
+//   공통 backend 의 `POST /posts/:id/like` 를 그대로 소비한다. UI 는 공통 ForumLikeButton.
+// ============================================================================
+
+export async function toggleForumPostLike(
+  postId: string,
+): Promise<{ likeCount: number; isLiked: boolean }> {
+  const response = await api.post(`${FORUM_BASE}/posts/${postId}/like`);
+  const data = response.data?.data ?? response.data;
+  return { likeCount: data?.likeCount ?? 0, isLiked: Boolean(data?.isLiked) };
+}
+
+// ============================================================================
+// Comment write (WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C)
+//   공통 backend(service-forum.routes.ts / glycopharm forum router) 의 댓글 쓰기 경로를
+//   그대로 소비한다. 권한 판정은 서버가 하고, 클라이언트는 401/403 을 안내로만 바꾼다.
+// ============================================================================
+
+export async function createForumComment(postId: string, content: string): Promise<void> {
+  await api.post(`${FORUM_BASE}/posts/${postId}/comments`, { content });
+}
+
+export async function updateForumComment(commentId: string, content: string): Promise<void> {
+  await api.put(`${FORUM_BASE}/comments/${commentId}`, { content });
+}
+
+export async function deleteForumComment(commentId: string): Promise<void> {
+  await api.delete(`${FORUM_BASE}/comments/${commentId}`);
+}
+
+// ============================================================================
 // Popular Forums
 // ============================================================================
 
@@ -217,6 +248,24 @@ export async function createForumPost(payload: {
 }): Promise<{ success: boolean; data?: { id: string }; error?: string }> {
   const response = await api.post(`${FORUM_BASE}/posts`, payload);
   return response.data;
+}
+
+// ============================================================================
+// Post edit/delete (WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C)
+//   공통 backend 의 `PUT /posts/:id` · `DELETE /posts/:id` 를 그대로 소비한다.
+//   작성자·권한 판정은 서버가 하고, 클라이언트는 401/403 을 안내로만 바꾼다.
+// ============================================================================
+
+export async function updateForumPost(
+  postId: string,
+  payload: { title: string; type?: ForumPostType; content: unknown[] | string },
+): Promise<{ success: boolean; data?: { id: string }; error?: string }> {
+  const response = await api.put(`${FORUM_BASE}/posts/${postId}`, payload);
+  return response.data;
+}
+
+export async function deleteForumPost(postId: string): Promise<void> {
+  await api.delete(`${FORUM_BASE}/posts/${postId}`);
 }
 
 export async function fetchMyCategories(): Promise<{ success: boolean; data: any[] }> {

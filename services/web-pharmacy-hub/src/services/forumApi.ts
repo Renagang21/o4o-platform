@@ -146,6 +146,7 @@ export interface PharmacyHubForumPostDetail {
   viewCount: number;
   likeCount: number;
   commentCount: number;
+  isLiked: boolean;
   isPinned: boolean;
   type?: ForumListItem['postType'];
   tags?: string[] | null;
@@ -183,6 +184,7 @@ export async function fetchPharmacyHubForumPost(
     viewCount: row.viewCount ?? 0,
     likeCount: row.likeCount ?? 0,
     commentCount: row.commentCount ?? 0,
+    isLiked: Boolean(row.isLiked),
     isPinned: Boolean(row.isPinned),
     type: row.type,
     tags: row.tags ?? null,
@@ -212,4 +214,109 @@ export async function createPharmacyHubForumPost(
     throw new Error(body?.error || '게시글을 등록하지 못했습니다.');
   }
   return { id: body.data.id };
+}
+
+export async function updatePharmacyHubForumPost(
+  postId: string,
+  payload: { title: string; content: unknown[] | string; type?: string },
+): Promise<void> {
+  const response = await api.put<ForumPostDetailResponse>(`${FORUM_BASE}/posts/${postId}`, {
+    title: payload.title,
+    content: payload.content,
+    ...(payload.type ? { type: payload.type } : {}),
+  });
+  if (!response.data?.success) {
+    throw new Error(response.data?.error || '게시글을 수정하지 못했습니다.');
+  }
+}
+
+export async function deletePharmacyHubForumPost(postId: string): Promise<void> {
+  await api.delete(`${FORUM_BASE}/posts/${postId}`);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 댓글 · 좋아요 — WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §10
+// 공통 backend(createServiceForumRouter)의 interaction endpoint 를 PharmacyHub base 로 소비한다.
+// 서비스 격리·쓰기 권한(requireActiveServiceMembership)은 서버가 전담한다.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface PharmacyHubForumComment {
+  id: string;
+  content: string;
+  authorId?: string | null;
+  authorName: string;
+  createdAt: string;
+  updatedAt?: string | null;
+}
+
+interface ForumCommentListResponse {
+  success: boolean;
+  data?: Record<string, any>[];
+  totalCount?: number;
+  error?: string;
+}
+
+function toComment(row: Record<string, any>): PharmacyHubForumComment {
+  return {
+    id: row.id,
+    content: row.content ?? '',
+    authorId: row.authorId ?? row.author?.id ?? null,
+    authorName: row.authorName || row.author?.nickname || row.author?.name || '익명',
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt ?? null,
+  };
+}
+
+export async function fetchPharmacyHubForumComments(
+  postId: string,
+): Promise<PharmacyHubForumComment[]> {
+  const response = await api.get<ForumCommentListResponse>(
+    `${FORUM_BASE}/posts/${encodeURIComponent(postId)}/comments`,
+  );
+  const body = response.data;
+  if (!body?.success) throw new Error(body?.error || '댓글을 불러오지 못했습니다.');
+  return (body.data ?? []).map(toComment);
+}
+
+export async function createPharmacyHubForumComment(
+  postId: string,
+  content: string,
+): Promise<PharmacyHubForumComment> {
+  const response = await api.post<{ success: boolean; data?: Record<string, any>; error?: string }>(
+    `${FORUM_BASE}/posts/${encodeURIComponent(postId)}/comments`,
+    { content },
+  );
+  const body = response.data;
+  if (!body?.success || !body.data) throw new Error(body?.error || '댓글을 등록하지 못했습니다.');
+  return toComment(body.data);
+}
+
+export async function updatePharmacyHubForumComment(
+  commentId: string,
+  content: string,
+): Promise<void> {
+  const response = await api.put<{ success: boolean; error?: string }>(
+    `${FORUM_BASE}/comments/${encodeURIComponent(commentId)}`,
+    { content },
+  );
+  if (!response.data?.success) throw new Error(response.data?.error || '댓글을 수정하지 못했습니다.');
+}
+
+export async function deletePharmacyHubForumComment(commentId: string): Promise<void> {
+  const response = await api.delete<{ success: boolean; error?: string }>(
+    `${FORUM_BASE}/comments/${encodeURIComponent(commentId)}`,
+  );
+  if (!response.data?.success) throw new Error(response.data?.error || '댓글을 삭제하지 못했습니다.');
+}
+
+export async function togglePharmacyHubForumPostLike(
+  postId: string,
+): Promise<{ likeCount: number; isLiked: boolean }> {
+  const response = await api.post<{ success: boolean; data?: { likeCount: number; isLiked: boolean }; error?: string }>(
+    `${FORUM_BASE}/posts/${encodeURIComponent(postId)}/like`,
+    {},
+  );
+  const body = response.data;
+  if (!body?.success || !body.data) throw new Error(body?.error || '좋아요 처리에 실패했습니다.');
+  return { likeCount: body.data.likeCount ?? 0, isLiked: Boolean(body.data.isLiked) };
 }

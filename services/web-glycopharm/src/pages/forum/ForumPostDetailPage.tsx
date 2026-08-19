@@ -11,7 +11,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageSquare, Eye, Heart } from 'lucide-react';
-import { fetchForumPost, fetchPostComments, extractTextContent, type ForumPostDetail, type ForumComment } from '@/services/forumApi';
+import { fetchForumPost, fetchPostComments, createForumComment, updateForumComment, deleteForumComment, deleteForumPost, toggleForumPostLike, extractTextContent, type ForumPostDetail, type ForumComment } from '@/services/forumApi';
 import { toast } from '@o4o/error-handling';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -22,6 +22,8 @@ import {
   ForumDetailErrorState,
   ForumDetailNotFoundState,
   ForumCommentList,
+  ForumCommentForm,
+  ForumLikeButton,
 } from '@o4o/shared-space-ui';
 import { appreciationPanelApi } from '@/api/appreciation';
 
@@ -42,8 +44,18 @@ export default function ForumPostDetailPage() {
 
   const [post, setPost] = useState<PostDetail | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   좋아요 adoption gap 해소 — 공통 ForumLikeButton + 공통 backend `POST /posts/:id/like`.
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [likePending, setLikePending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   댓글 쓰기 adoption gap 해소 — 공통 ForumCommentForm + 공통 backend 소비.
+  const [commentInput, setCommentInput] = useState('');
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -57,6 +69,8 @@ export default function ForumPostDetailPage() {
       .then(([postRes, commentRes]) => {
         if (postRes.success && postRes.data) {
           setPost(postRes.data as PostDetail);
+          setIsLiked(Boolean((postRes.data as any)?.isLiked));
+          setLikeCount((postRes.data as any)?.likeCount ?? 0);
         } else {
           setError('게시글을 찾을 수 없습니다.');
         }
@@ -65,6 +79,91 @@ export default function ForumPostDetailPage() {
       .catch(() => setError('게시글을 불러오지 못했습니다.'))
       .finally(() => setLoading(false));
   }, [id]);
+
+  const reloadComments = async (postId: string) => {
+    try {
+      const res = await fetchPostComments(postId);
+      setComments(res.data as Comment[]);
+    } catch {
+      // 댓글 재조회 실패는 본문 표시를 막지 않는다.
+    }
+  };
+
+  const commentErrorMessage = (err: unknown, fallback: string): string => {
+    const status = (err as { response?: { status?: number } })?.response?.status;
+    if (status === 401) return '로그인이 필요합니다.';
+    if (status === 403) return '이 커뮤니티에 참여한 회원만 사용할 수 있습니다.';
+    return fallback;
+  };
+
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   본인 게시글 수정·삭제 adoption gap 해소. 최종 권한 판정은 backend 가 한다.
+  const handleDeletePost = async () => {
+    if (!id) return;
+    if (!window.confirm('게시글을 삭제하시겠습니까?')) return;
+    try {
+      await deleteForumPost(id);
+      navigate('/forum/posts');
+    } catch (err) {
+      toast.error(commentErrorMessage(err, '게시글을 삭제하지 못했습니다.'));
+    }
+  };
+
+  const handleToggleLike = async () => {
+    if (!id) return;
+    if (!user?.id) {
+      navigate('/login');
+      return;
+    }
+    setLikePending(true);
+    try {
+      const result = await toggleForumPostLike(id);
+      setIsLiked(result.isLiked);
+      setLikeCount(result.likeCount);
+    } catch (err) {
+      toast.error(commentErrorMessage(err, '좋아요 처리에 실패했습니다.'));
+    } finally {
+      setLikePending(false);
+    }
+  };
+
+  const handleSubmitComment = async () => {
+    if (!id || !commentInput.trim()) return;
+    setCommentSubmitting(true);
+    setCommentError(null);
+    try {
+      await createForumComment(id, commentInput.trim());
+      setCommentInput('');
+      await reloadComments(id);
+    } catch (err) {
+      setCommentError(commentErrorMessage(err, '댓글을 등록하지 못했습니다.'));
+    } finally {
+      setCommentSubmitting(false);
+    }
+  };
+
+  const handleEditComment = async (commentId: string, content: string) => {
+    if (!id || !content.trim()) return;
+    setCommentError(null);
+    try {
+      await updateForumComment(commentId, content.trim());
+      await reloadComments(id);
+    } catch (err) {
+      setCommentError(commentErrorMessage(err, '댓글을 수정하지 못했습니다.'));
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!id) return;
+    if (!window.confirm('댓글을 삭제하시겠습니까?')) return;
+    setCommentError(null);
+    try {
+      await deleteForumComment(commentId);
+      await reloadComments(id);
+    } catch (err) {
+      setCommentError(commentErrorMessage(err, '댓글을 삭제하지 못했습니다.'));
+    }
+  };
 
   // WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1: AppreciationPanel onError 핸들러
   const handleAppreciationError = (err: any) => {
@@ -129,16 +228,33 @@ export default function ForumPostDetailPage() {
                   <Eye className="w-3.5 h-3.5" />
                   {post.viewCount}
                 </span>
-                {(post.likeCount ?? 0) > 0 && (
+                {likeCount > 0 && (
                   <span className="flex items-center gap-1 text-xs text-slate-400">
                     <Heart className="w-3.5 h-3.5" />
-                    {post.likeCount}
+                    {likeCount}
                   </span>
                 )}
               </>
             }
           />
         </div>
+
+        {Boolean(user?.id && post.author?.id === user.id) && (
+          <div className="flex justify-end gap-2 px-6 pt-4">
+            <button
+              className="rounded border border-slate-300 px-3 py-1 text-xs text-slate-600"
+              onClick={() => navigate(`/forum/edit/${post.id}`)}
+            >
+              수정
+            </button>
+            <button
+              className="rounded border border-red-200 px-3 py-1 text-xs text-red-600"
+              onClick={() => { void handleDeletePost(); }}
+            >
+              삭제
+            </button>
+          </div>
+        )}
 
         {/* 본문 */}
         <div className="px-6 py-6 min-h-[120px]">
@@ -150,6 +266,16 @@ export default function ForumPostDetailPage() {
           ) : (
             <p className="text-sm text-slate-400 italic">본문 내용이 없습니다.</p>
           )}
+        </div>
+
+        <div className="flex justify-center border-t border-slate-100 px-6 py-5">
+          <ForumLikeButton
+            liked={isLiked}
+            count={likeCount}
+            disabled={likePending}
+            compact
+            onClick={() => { void handleToggleLike(); }}
+          />
         </div>
       </article>
 
@@ -175,14 +301,31 @@ export default function ForumPostDetailPage() {
           </h2>
         </div>
 
+        <ForumCommentForm
+          value={commentInput}
+          onChange={setCommentInput}
+          onSubmit={() => { void handleSubmitComment(); }}
+          submitting={commentSubmitting}
+          authenticated={Boolean(user?.id)}
+          error={commentError}
+          loginPrompt={(
+            <div className="mb-6 rounded-lg bg-slate-50 p-4 text-center text-sm text-slate-500">
+              <Link to="/login" className="text-primary-600 underline">로그인</Link> 후 댓글을 작성할 수 있습니다.
+            </div>
+          )}
+        />
+
         <ForumCommentList
           comments={comments.map((comment) => ({
             id: comment.id,
             authorName: comment.author?.nickname || comment.author?.name || '익명',
             content: comment.content || comment.body || '',
             createdAt: new Date(comment.createdAt).toLocaleDateString('ko-KR'),
+            isAuthor: Boolean(user?.id && comment.author?.id === user.id),
           }))}
           emptyMessage="아직 댓글이 없습니다."
+          onEditComment={(commentId, content) => { void handleEditComment(commentId, content); }}
+          onDeleteComment={(commentId) => { void handleDeleteComment(commentId); }}
         />
       </section>
 

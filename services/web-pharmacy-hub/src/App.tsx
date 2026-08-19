@@ -195,6 +195,15 @@ export default function App() {
               </MembershipGate>
             }
           />
+          {/* WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C */}
+          <Route
+            path="/forum/edit/:postId"
+            element={
+              <MembershipGate>
+                <ForumWritePage />
+              </MembershipGate>
+            }
+          />
           <Route
             path="/forum/posts/:postId"
             element={

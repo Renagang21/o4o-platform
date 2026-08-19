@@ -128,3 +128,14 @@ export type {
   AccountSecuritySettingsProps,
   AccountSecurityNotify,
 } from './components/AccountSecuritySettings.js';
+
+// ---------------------------------------------------------------------------
+// LMS MyPage Views — WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1
+// K-Cosmetics / GlycoPharm 의 수강·크레딧·수료증 View 중복 공통화.
+// ---------------------------------------------------------------------------
+export { MyEnrollmentsView } from './components/MyEnrollmentsView.js';
+export type { MyEnrollmentsViewProps, MyEnrollmentStatus } from './components/MyEnrollmentsView.js';
+export { MyCreditsView } from './components/MyCreditsView.js';
+export type { MyCreditsViewProps } from './components/MyCreditsView.js';
+export { MyCertificatesView } from './components/MyCertificatesView.js';
+export type { MyCertificatesViewProps } from './components/MyCertificatesView.js';

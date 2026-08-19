@@ -155,6 +155,19 @@ export function ForumDetailPage() {
     }
   };
 
+  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
+  //   댓글 수정 adoption gap 해소 — 공통 ForumCommentList 의 편집 UI 를 그대로 쓴다.
+  const handleUpdateComment = async (commentId: string, content: string) => {
+    if (!post || !content.trim()) return;
+    try {
+      await forumApi.updateComment(commentId, content.trim());
+      const res = await forumApi.getComments(post.id);
+      setComments(res.data);
+    } catch (err) {
+      toast.error('댓글 수정에 실패했습니다.');
+    }
+  };
+
   const handleDeleteComment = async (commentId: string) => {
     if (!post || !confirm('댓글을 삭제하시겠습니까?')) return;
     try {
@@ -330,6 +343,7 @@ export function ForumDetailPage() {
             createdAt: new Date(comment.createdAt).toLocaleDateString('ko-KR'),
             isAuthor: user?.id === comment.authorId || isAdmin,
           }))}
+          onEditComment={(commentId, content) => { void handleUpdateComment(commentId, content); }}
           renderCommentActions={(comment) =>
             comment.isAuthor ? (
               <button
