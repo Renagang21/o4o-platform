@@ -24,12 +24,63 @@
  *   기본값(includeInactive=false, 기본 managePaths)에서 생성되는 SQL 은 KPA·GlycoPharm·
  *   K-Cosmetics 가 쓰던 것과 동일하다. 응답은 `masterId` 1개만 additive 로 늘었다
  *   (기존 필드 제거·의미 변경 0 — 기존 화면 무영향).
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * WO-O4O-STORE-HANDLED-PRODUCTS-CROSS-SERVICE-DEDUPE-CONTRACT-V1
+ *
+ * 문제
+ *   같은 매장(organization)이 같은 공급 offer 를 서로 다른 service_key 로 여러 번 진열해
+ *   같은 상품이 목록에 2~3회 반복 노출됐다. 운영 실측(2026-08-19):
+ *     (org, master) 그룹 26개 중 25개는 listing 1건, 1개 그룹만 3건이며
+ *     그 3건은 organization_id·master_id·offer_id·price(NULL)·status('pending')·
+ *     is_active(true) 가 전부 같고 service_key 와 source_type 만 달랐다 → TRUE_DUPLICATE.
+ *
+ * 왜 service_key 필터로 닫지 않는가
+ *   OPL.service_key 는 이 화면의 서비스 축이 아니다. 진열 생성 경로마다 축이 다르다:
+ *     - store-product-library : 사용자 membership 에서 도출(MULTI_MEMBERSHIP_PRIORITY 가
+ *       neture 우선) → KPA 약국의 실제 취급 제품 20건이 service_key='neture' 로 저장돼 있다.
+ *     - event-offer 파생행    : 참여한 이벤트의 서비스로 저장('glycopharm' / 'k-cosmetics').
+ *     - auto-listing          : enrollment.service_code 복사.
+ *   따라서 "현재 서비스의 canonical key 만 필터"하면 실제 취급 제품 20/23 이 화면에서
+ *   사라진다(기능 은폐). Boundary Policy §7 상 Store Ops 의 경계는 organizationId 이고,
+ *   이 화면은 매장 단위 제품 풀이므로 **service_key 는 경계가 아니다**.
+ *
+ * 확정 계약 — HYBRID(제품 중심 1행, 진열 식별자는 대표 행 유지)
+ *   동일 항목 판정 키(supply identity) = (organization_id, master_id, offer_id).
+ *     - master 가 같아도 offer 가 다르면 공급처·공급조건이 다르므로 **합치지 않는다**
+ *       (SERVICE_DISTINCT 보존). offer_id 는 NULL 끼리만 같은 그룹이다.
+ *     - master 가 없는 예외 행은 자기 자신만의 그룹이다(id 로 대체).
+ *   대표 행 선정(임의 우선순위 금지 — 기존 계약 근거만 사용):
+ *     1) is_active DESC          매장이 실제로 진열 중인 행이 우선
+ *     2) source_type IS NULL DESC 매장이 명시적으로 등록한 행 우선. 근거: pharmacy-products
+ *        controller 가 source_type='event-offer' 를 "주문 후 파생 진열 행" 으로 규정하고
+ *        주문 가능 목록에서 제외한다(파생행은 대표가 아니다).
+ *     3) created_at ASC, id ASC   결정적 tie-break(페이지네이션 안정).
+ *   가격이 낮다는 이유로 대표를 고르지 않는다.
+ *
+ * 쓰기 경로 정합 (읽기만 합치면 "지웠는데 다시 나타난다")
+ *   remove / setActive 는 대표 행 1건이 아니라 **같은 supply identity 그룹 전체**에
+ *   적용한다. 매장 관점에서 "이 제품을 내린다/끈다" 는 제품 단위 동작이기 때문이다.
+ *   조직 경계(organization_id)는 그대로 유지된다.
+ *
+ * 미변경
+ *   응답 shape·필드·pagination 계약 무변경(total 도 중복 제거 후 기준이라 items 와 일치).
+ *   store_local_products(local) 은 master 축이 없어 중복 판정 대상이 아니다 — 무접촉.
  */
 
 import type { DataSource, EntityManager } from 'typeorm';
 import { deriveProductClassification } from '../../modules/neture/utils/product-type.util.js';
 
 export type HandledProductSourceType = 'listing' | 'local';
+
+/**
+ * 동일 항목(supply identity) 판정 키 — 읽기(dedupe)와 쓰기(group 적용)가 **같은 정의**를 쓴다.
+ *   organization_id + master_id(없으면 자기 id) + offer_id(NULL 끼리만 동일 그룹)
+ * SQL 파편이지만 사용자 입력을 포함하지 않는 고정 문자열이다(Boundary Policy: binding 대상 아님).
+ */
+const HANDLED_LISTING_IDENTITY_PARTITION =
+  "opl.organization_id, COALESCE(opl.master_id::text, opl.id::text), opl.offer_id";
+
 
 interface UnifiedRow {
   source_type: HandledProductSourceType;
@@ -118,7 +169,12 @@ export async function listHandledProducts(
   const searchListing = hasSearch ? ` AND pm.name ILIKE $2` : '';
   const searchLocal = hasSearch ? ` AND lp.name ILIKE $2` : '';
 
+  // 같은 supply identity(= organization_id, master_id, offer_id)의 진열행이 service_key 만
+  // 달라 반복 노출되던 것을 대표 1행으로 접는다. 상세 계약·근거는 파일 상단 주석 참조.
   const listingSelect = `
+        SELECT source_type, source_id, name, image_url, price, is_active, listing_status,
+               start_at, end_at, master_id, updated_at, regulatory_type, drug_category
+        FROM (
         SELECT 'listing'::text AS source_type, opl.id AS source_id, pm.name AS name,
                (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = opl.master_id AND pi.deleted_at IS NULL
                  ORDER BY pi.is_primary DESC, pi.sort_order ASC LIMIT 1) AS image_url,
@@ -126,11 +182,18 @@ export async function listHandledProducts(
                opl.is_active AS is_active, opl.status AS listing_status,
                opl.start_at AS start_at, opl.end_at AS end_at, opl.master_id AS master_id,
                opl.updated_at AS updated_at,
-               pm.regulatory_type AS regulatory_type, pm.drug_category AS drug_category
+               pm.regulatory_type AS regulatory_type, pm.drug_category AS drug_category,
+               ROW_NUMBER() OVER (
+                 PARTITION BY ${HANDLED_LISTING_IDENTITY_PARTITION}
+                 ORDER BY opl.is_active DESC, (opl.source_type IS NULL) DESC,
+                          opl.created_at ASC, opl.id ASC
+               ) AS identity_rank
         FROM organization_product_listings opl
         LEFT JOIN product_masters pm ON pm.id = opl.master_id
         LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
-        WHERE opl.organization_id = $1${activeListing}${searchListing}`;
+        WHERE opl.organization_id = $1${activeListing}${searchListing}
+        ) listing_ranked
+        WHERE identity_rank = 1`;
 
   const localSelect = `
         SELECT 'local'::text AS source_type, lp.id AS source_id, lp.name AS name,
@@ -219,6 +282,29 @@ export function parseHandledProductRefs(rawItems: unknown): HandledProductRef[] 
   ) as HandledProductRef[];
 }
 
+/**
+ * 참조 진열행과 **같은 supply identity** 인 행 전체(자기 자신 포함)를 반환한다.
+ * 판정 키는 조회 dedupe 와 동일하다 — 읽기에서 접힌 형제 행이 쓰기에서 남지 않게 한다.
+ * organization_id 경계는 항상 유지한다(Boundary Policy). 대상 없음 = 빈 배열(호출자가 404 처리).
+ */
+async function resolveListingIdentityGroup(
+  m: EntityManager,
+  organizationId: string,
+  sourceId: string,
+): Promise<string[]> {
+  const rows: Array<{ id: string }> = await m.query(
+    `SELECT sib.id
+       FROM organization_product_listings sib
+       JOIN organization_product_listings ref
+         ON ref.id = $1 AND ref.organization_id = $2
+      WHERE sib.organization_id = $2
+        AND COALESCE(sib.master_id::text, sib.id::text) = COALESCE(ref.master_id::text, ref.id::text)
+        AND sib.offer_id IS NOT DISTINCT FROM ref.offer_id`,
+    [sourceId, organizationId],
+  );
+  return rows.map((r) => r.id);
+}
+
 export interface RemoveHandledProductsResult {
   removed: number;
   failed: Array<{ sourceType: string; sourceId: string; reason: string }>;
@@ -242,15 +328,27 @@ export async function removeHandledProducts(
   for (const it of refs) {
     try {
       await dataSource.transaction(async (m: EntityManager) => {
+        // listing 은 supply identity 그룹 전체가 대상이다(목록이 그 단위로 접히므로).
+        // local 은 중복 판정 축이 없어 기존대로 단건이다.
+        const targetIds =
+          it.sourceType === 'listing'
+            ? await resolveListingIdentityGroup(m, organizationId, it.sourceId)
+            : [it.sourceId];
+        if (targetIds.length === 0) {
+          const e: any = new Error('NOT_FOUND');
+          e.code = 'NOT_FOUND';
+          throw e;
+        }
+
         await m.query(
           `DELETE FROM kpa_store_content_product_links
-               WHERE organization_id = $1 AND product_source_type = $2 AND product_source_id = $3`,
-          [organizationId, it.sourceType, it.sourceId],
+               WHERE organization_id = $1 AND product_source_type = $2 AND product_source_id = ANY($3::uuid[])`,
+          [organizationId, it.sourceType, targetIds],
         );
         const table = it.sourceType === 'listing' ? 'organization_product_listings' : 'store_local_products';
         const del = await m.query(
-          `DELETE FROM ${table} WHERE id = $1 AND organization_id = $2 RETURNING id`,
-          [it.sourceId, organizationId],
+          `DELETE FROM ${table} WHERE id = ANY($1::uuid[]) AND organization_id = $2 RETURNING id`,
+          [targetIds, organizationId],
         );
         if (affectedRows(del) === 0) {
           const e: any = new Error('NOT_FOUND');
@@ -279,9 +377,23 @@ export async function setHandledProductActive(
   ref: HandledProductRef,
   isActive: boolean,
 ): Promise<boolean> {
-  const table = ref.sourceType === 'listing' ? 'organization_product_listings' : 'store_local_products';
+  if (ref.sourceType === 'listing') {
+    // 목록이 supply identity 단위이므로 활성 토글도 그 단위다. 대표 행만 끄면 형제 행이
+    // 대표로 승격돼 "껐는데 그대로 켜져 있다"로 보인다.
+    return await dataSource.transaction(async (m: EntityManager) => {
+      const ids = await resolveListingIdentityGroup(m, organizationId, ref.sourceId);
+      if (ids.length === 0) return false;
+      const raw = await m.query(
+        `UPDATE organization_product_listings SET is_active = $1, updated_at = NOW()
+          WHERE id = ANY($2::uuid[]) AND organization_id = $3`,
+        [isActive, ids, organizationId],
+      );
+      return affectedRows(raw) > 0;
+    });
+  }
+
   const raw = await dataSource.query(
-    `UPDATE ${table} SET is_active = $1, updated_at = NOW()
+    `UPDATE store_local_products SET is_active = $1, updated_at = NOW()
       WHERE id = $2 AND organization_id = $3`,
     [isActive, ref.sourceId, organizationId],
   );
