@@ -165,22 +165,64 @@
 | vite build — 4서비스 | 전부 BUILD OK |
 | Frontend unit test | 해당 4서비스에 test suite 없음 (미실행) |
 | Backend Jest | backend 변경 0건 → 미실행 |
-| Production browser smoke | 배포 후 수행 — §10 |
+| Production browser smoke | 배포 후 실측 완료 — §10 (결함 1건 발견·수정) |
 
 ---
 
-## 10. Production browser smoke (§9/§10)
+## 10. Production browser smoke (§9/§10) — 실측
 
-이번 변경은 frontend 전용이며 배포는 main push 후 CI 가 수행한다. 배포 완료 후 아래 경로를 desktop 1440 / mobile 390 두 폭에서 확인한다.
+수행: 2026-08-19, 배포 완료(Deploy Web Services / Cloud Run, sha `3e801ec69`) 이후.
+도구: Playwright chromium headless (repo 내장), 계정 = `docs/local/TEST-ACCOUNTS.local.md` 의 매장 계정(자격증명은 이 문서에 적지 않는다).
+호스트: KPA `kpa-society.co.kr` · GP `glycopharm.co.kr` · PH `pharmacyhub.co.kr` · KCos `k-cosmetics-web-...run.app`
+(`k-cosmetics.co.kr` 은 Cafe24 쇼핑몰 도메인이라 앱 진입점이 아니다 — 검증 호스트 주의).
 
-| 서비스 | 경로 |
-|---|---|
-| KPA | /store/content · /store/library/contents · /store/library/resources · /store/marketing/signage/playlist/new · /store/marketing/signage/player · /store/commerce/products/:id/marketing |
-| KCos | /store/content · /store/marketing/signage/playlist/new · /store/marketing/signage/player · /store/commerce/products/:id/marketing |
-| GP | /store/content · /store/marketing/signage/playlist/new · /store/marketing/signage/player · /store/commerce/products/:id/marketing |
-| PH | 이번 변경 없음 — 회귀 확인용 /store-owner 진입만 |
+### 10-1. 배포 반영 확인 (chunk 실측)
 
-판정 기준: white screen 0 / JS exception 0 / dead link 0 / 가로 overflow 0 / header·action 접근 불가 0 / editor·preview clipping 0. 데이터가 없어 확인 불가한 화면은 BLOCKED_DATA 로 기록한다.
+3서비스 모두 `ProductMarketingPage-*.js` 가 **공통 View 1벌(≈11.2KB)** 로 축소됐고, 새 load-error 문구
+("…마지막으로 불러온 내용입니다")가 배포 chunk 안에 존재한다 → 공통화 코드가 프로덕션에 반영됨.
+
+| 서비스 | chunk | 새 load-error 문구 |
+|---|---|:--:|
+| KPA | ProductMarketingPage-DYKZ-ryY.js (11,197B) | YES |
+| GP | ProductMarketingPage-Brg7M0NE.js (11,161B) | YES |
+| KCos | ProductMarketingPage-DG75DeEt.js (11,195B) | YES |
+
+### 10-2. 경로별 결과
+
+| 서비스 | 경로 | D1440 | M390 | JS 예외 | dead link | 비고 |
+|---|---|:--:|:--:|:--:|:--:|---|
+| KPA | /store/content | PASS | PASS | 0 | 0 | 매장 자산 KPI·필터·목록 렌더 |
+| KPA | /store/library/contents | PASS | **FIXED** | 0 | 0 | M390 가로 20px overflow → 아래 10-3 |
+| KPA | /store/library/resources | PASS | PASS | 0 | 0 | 자료 목록 7건 이상 렌더 |
+| KPA | /store/marketing/signage/playlist/new | PASS | PASS | 0 | 0 | 공통 StorePlaylistCreateView (제목/설명/태그 3필드) |
+| KPA | /store/marketing/signage/player | PASS | PASS | 0 | 0 | 게시 플레이리스트 0건 → 정상 empty |
+| KPA | /store/commerce/products/:id/marketing | BLOCKED_DATA | BLOCKED_DATA | 0 | 0 | 아래 10-4 |
+| KCos | /store/content | PASS | PASS | 0 | 0 | |
+| KCos | /store/marketing/signage/playlist/new | PASS | PASS | 0 | 0 | 태그·설명 비노출 config 그대로 |
+| KCos | /store/marketing/signage/player | PASS | PASS | 0 | 0 | |
+| GP | /store/content | PASS | PASS | 0 | 0 | |
+| GP | /store/marketing/signage/playlist/new | PASS | PASS | 0 | 0 | |
+| GP | /store/marketing/signage/player | PASS | PASS | 0 | 0 | |
+| PH | /store-owner (회귀) | PASS | PASS | 0 | 0 | 이번 변경 없음 · 진입 정상 |
+
+white screen 0 · JS exception(pageerror) 0 · editor/preview clipping 0.
+KPA/KCos/GP/PH 4서비스 모두 매장 계정 로그인 성공(로그인 후 각 매장 진입 경로로 정상 리다이렉트).
+
+### 10-3. 실측으로 발견해 이번 WO 안에서 고친 결함 1건
+
+`/store/library/contents` M390 에서 문서 가로 overflow 20px. 원인은 이번에 채택한 공통
+`StorePageShell` 의 헤더 액션 행이 `flexWrap` 없이 3버튼(콘텐츠 제작 / 제작 가이드 / 새로고침)을
+한 줄에 강제한 것. 공통 shell 에 `flexWrap: 'wrap'` + `justifyContent: 'flex-end'` 를 넣어
+좁은 폭에서 액션이 줄바꿈하도록 수정했다(데스크톱 렌더 무변경). 같은 shell 을 쓰는 다른 화면
+(`/store/library/resources`, `/store/content`)은 수정 전에도 overflow 0 이었다.
+
+### 10-4. BLOCKED_DATA — ProductMarketing 실 데이터
+
+`/store/commerce/products/:productId/marketing` 는 **앱 안에 이 경로로 가는 링크가 없다**
+(KPA 소스 전수 grep 결과 진입 링크 0). 실 productId 를 UI 로 얻을 수 없어 실데이터 렌더는 BLOCKED_DATA 로 남긴다.
+다만 잘못된 id 로 직접 진입해 API 500 을 만든 경우, 공통 View 가 새 load-error 계약대로
+"마케팅 자산 정보를 불러오지 못했습니다 / 다시 시도" 화면을 렌더하는 것을 실측 확인했다
+(백지·무한 로딩·빈 목록 위장 없음). 진입 링크 부재 자체는 이번 WO 범위 밖이며 §7 후속 후보로 기록한다.
 
 ---
 

@@ -168,8 +168,9 @@ export function StorePageShell({
           </h1>
           {labels.subtitle && <p style={storePageStyles.subtitle}>{labels.subtitle}</p>}
         </div>
+        {/* 모바일(390)에서 액션이 3개 이상이면 줄바꿈해야 가로 overflow 가 나지 않는다 (§9). */}
         {(headerActions || onReload) && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 8 }}>
             {headerActions}
             {onReload && (
               <button onClick={onReload} style={storePageStyles.refreshBtn} disabled={state?.loading}>
