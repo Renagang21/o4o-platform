@@ -192,7 +192,7 @@
 | 서비스 | 경로 | D1440 | M390 | JS 예외 | dead link | 비고 |
 |---|---|:--:|:--:|:--:|:--:|---|
 | KPA | /store/content | PASS | PASS | 0 | 0 | 매장 자산 KPI·필터·목록 렌더 |
-| KPA | /store/library/contents | PASS | **FIXED** | 0 | 0 | M390 가로 20px overflow → 아래 10-3 |
+| KPA | /store/library/contents | PASS | PASS(수정 후) | 0 | 0 | M390 가로 20px overflow 발견 → 수정·재배포 후 0 (10-3) |
 | KPA | /store/library/resources | PASS | PASS | 0 | 0 | 자료 목록 7건 이상 렌더 |
 | KPA | /store/marketing/signage/playlist/new | PASS | PASS | 0 | 0 | 공통 StorePlaylistCreateView (제목/설명/태그 3필드) |
 | KPA | /store/marketing/signage/player | PASS | PASS | 0 | 0 | 게시 플레이리스트 0건 → 정상 empty |
@@ -223,6 +223,19 @@ KPA/KCos/GP/PH 4서비스 모두 매장 계정 로그인 성공(로그인 후 �
 다만 잘못된 id 로 직접 진입해 API 500 을 만든 경우, 공통 View 가 새 load-error 계약대로
 "마케팅 자산 정보를 불러오지 못했습니다 / 다시 시도" 화면을 렌더하는 것을 실측 확인했다
 (백지·무한 로딩·빈 목록 위장 없음). 진입 링크 부재 자체는 이번 WO 범위 밖이며 §7 후속 후보로 기록한다.
+
+### 10-5. 수정 재배포 후 재측정 (sha `eed18b9e1`)
+
+| 서비스 | 경로 | D1440 overflow | M390 overflow | JS 예외 |
+|---|---|:--:|:--:|:--:|
+| KPA | /store/library/contents | 0 | **0** (수정 전 20) | 0 |
+| KPA | /store/library/resources · /store/content · signage/playlist/new · signage/player | 0 | 0 | 0 |
+| GP | /store/content · signage/playlist/new | 0 | 0 | 0 |
+| KCos | /store/content · signage/playlist/new | 0 | 0 | 0 |
+
+M390 표 화면에서 뷰포트 밖으로 나가는 버튼(자료함 4~7개, 매장 자산 2개)은 **전부 가로 스크롤
+컨테이너 안의 표 셀 버튼**임을 실측 확인했다(`clippedInsideScroller == clipped`). 페이지 자체는
+가로로 밀리지 않으며(문서 overflow 0), 표를 옆으로 밀면 접근 가능하다 — 기존 표 패턴이며 이번 변경과 무관하다.
 
 ---
 
