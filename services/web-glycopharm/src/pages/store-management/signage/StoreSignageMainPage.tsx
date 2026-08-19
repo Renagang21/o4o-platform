@@ -22,7 +22,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   GuideBackLink,
   // WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-B: 공통 사이니지 순수 로직
-  FORCED_WARN_DAYS,
   SIGNAGE_DAY_LABELS as DAY_LABELS,
   formatSignageDate as formatDate,
   formatSignageShortDate as formatShortDate,
