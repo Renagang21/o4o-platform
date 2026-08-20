@@ -253,17 +253,63 @@ npx vitest run --config packages/shared-space-ui/vitest.config.mjs packages/shar
 
 ## 11. Production browser smoke (WO §17)
 
-배포 후 desktop(1440×900) · mobile(390×844) 2 viewport.
+배포 commit `b6f272df3` · deploy run `32342076307` (6 web service job 전부 success) 후
+desktop(1440×900) · mobile(390×844) 2 viewport 로 실제 브라우저 접속 검증.
 
-_(§12 에 결과 기록)_
+점검 항목: HTTP status · 최종 URL(redirect 결과) · h1 · anchor 수 · body 텍스트 길이 ·
+`scrollWidth - clientWidth`(mobile overflow) · `pageerror` / `console.error`.
 
 ---
 
 ## 12. Smoke 결과
 
-| viewport | 서비스 | URL | 결과 |
-|---|---|---|---|
-| — | — | — | _배포 후 기록_ |
+### 12-1. 전체 결과
+
+**총 40 case (20 URL × 2 viewport) — 전부 PASS.**
+
+| 공통 기준 | 결과 |
+|---|---|
+| dead navigation | **0** (전 case 200) |
+| white screen | **0** (전 case h1 존재 · body text ≥ 1,249자) |
+| JS exception / console error | **0** |
+| 신규 404 · 500 | **0** |
+| mobile overflow | **0** (`scrollWidth - clientWidth = 0` 전 case) |
+| `/service-guide` ↔ `/guide` 고립 | **해소** (§12-3) |
+
+### 12-2. URL 별 (desktop / mobile 동일 결과)
+
+| 서비스 | URL | status | 최종 URL | h1 | 판정 |
+|---|---|:-:|---|---|:-:|
+| KPA | `/service-guide` | 200 | `/service-guide` | 약사와 약대생을 위한 커뮤니티 서비스 안내 | PASS |
+| KPA | `/guide` | 200 | **`/guide/intro`** | O4O 개요 | PASS (신규 alias) |
+| KPA | `/guide/intro` | 200 | `/guide/intro` | O4O 개요 | PASS |
+| KPA | `/guide/usage` | 200 | `/guide/usage` | 서비스 활용 방법 | PASS |
+| KPA | `/guide/features` | 200 | `/guide/features` | 기능별 이용 방법 | PASS |
+| KPA | `/guide/features/signage` | 200 | 동일 | 디지털 사이니지 이용 방법 | PASS |
+| K-Cosmetics | `/service-guide` | 200 | `/service-guide` | 화장품 매장 운영을 위한 O4O 서비스 안내 | PASS |
+| K-Cosmetics | `/guide` | 200 | **`/guide/intro`** | O4O 개요 | PASS (신규 alias) |
+| K-Cosmetics | `/guide/intro` | 200 | `/guide/intro` | O4O 개요 | PASS |
+| K-Cosmetics | `/guide/usage` | 200 | `/guide/usage` | 서비스 활용 방법 | PASS |
+| K-Cosmetics | `/guide/features` | 200 | `/guide/features` | 기능별 이용 방법 | PASS |
+| K-Cosmetics | `/guide/features/signage` | 200 | 동일 | 디지털 사이니지 이용 방법 | PASS |
+| GlycoPharm | `/service-guide` | 200 | `/service-guide` | 약국 운영을 위한 O4O 서비스 안내 | PASS |
+| GlycoPharm | `/guide` | 200 | **`/guide/intro`** | O4O 개요 | PASS (신규 alias) |
+| GlycoPharm | `/guide/intro` | 200 | `/guide/intro` | O4O 개요 | PASS |
+| GlycoPharm | `/guide/usage` | 200 | `/guide/usage` | 서비스 활용 방법 | PASS |
+| GlycoPharm | `/guide/features` | 200 | `/guide/features` | 기능별 이용 방법 | PASS |
+| GlycoPharm | `/guide/features/signage` | 200 | 동일 | 디지털 사이니지 이용 방법 | PASS |
+| Neture | `/guide` | 200 | **`/guide`** (redirect 없음) | O4O 플랫폼 이용 안내 | PASS (회귀 없음) |
+| Neture | `/guide/o4o-overview` | 200 | 동일 | O4O 개요 | PASS |
+
+### 12-3. 고립 해소 확인 (실제 렌더된 `<a href>` 검사)
+
+| 서비스 | `/service-guide` → `/guide/intro` | → `/guide/usage` | → `/guide/features` | `/guide/intro` → `/service-guide` |
+|---|:-:|:-:|:-:|:-:|
+| KPA | OK | OK | OK | OK |
+| K-Cosmetics | OK | OK | OK | OK |
+| GlycoPharm | OK | OK | OK | OK |
+
+공통화 전 이 6개 링크는 **전부 0건**이었다 (§3-2 · §3-3 discoverability 문제).
 
 ---
 
