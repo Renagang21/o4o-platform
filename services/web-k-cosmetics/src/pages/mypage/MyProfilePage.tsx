@@ -96,9 +96,14 @@ export default function MyProfilePage() {
   };
 
   return (
+    /*
+     * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1:
+     *   leaf 화면인데 허브 제목("마이페이지")을 그대로 써서, KCos 만 어느 화면에
+     *   있는지 제목으로 알 수 없었다. KPA/GP/Neture/PH 와 동일하게 화면 이름을 쓴다.
+     */
     <MyPageLayout
-      title="마이페이지"
-      subtitle="내 정보를 확인하고 관리할 수 있습니다"
+      title="프로필"
+      subtitle="기본 정보를 확인하고 수정할 수 있습니다"
       width="form"
       navItems={KCOS_MYPAGE_NAV_ITEMS}
     >
