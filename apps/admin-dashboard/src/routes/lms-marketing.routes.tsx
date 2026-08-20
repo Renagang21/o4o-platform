@@ -5,15 +5,17 @@ import { Suspense, lazy } from 'react';
 // LMS-Instructor Pages (WO-LMS-INSTRUCTOR-DASHBOARD-UX-REFINEMENT-V1)
 const LmsInstructorRouter = lazy(() => import('@/pages/lms-instructor/LmsInstructorRouter'));
 
-// LMS-Marketing Pages (Phase R10 & R11)
-const MarketingPublisherRouter = lazy(() => import('@/pages/marketing/publisher/MarketingPublisherRouter'));
-const OnboardingHome = lazy(() => import('@/pages/marketing/onboarding/OnboardingHome'));
-const SupplierProfileForm = lazy(() => import('@/pages/marketing/onboarding/SupplierProfileForm'));
-const AutomationSettings = lazy(() => import('@/pages/marketing/automation/AutomationSettings'));
-
-// LMS-Marketing Engagement Dashboard (Phase R12)
-const SupplierEngagementDashboard = lazy(() => import('@/pages/marketing/supplier-engagement'));
-const OperatorConsole = lazy(() => import('@/pages/marketing/operator-console'));
+/**
+ * LMS-Marketing publisher/onboarding/automation/engagement 콘솔 제거
+ * (WO-O4O-ADMIN-LMS-MARKETING-CONSOLE-RETIREMENT-V1)
+ *
+ * backend `@o4o/lms-marketing` 는 Phase R7 에서 삭제됐고 entity 등록도 해제돼
+ * `/api/v1/lms/marketing/*` 는 프로덕션에서 전량 404 다. 목록·저장·발행이 모두 실패하는
+ * 죽은 관리 UI 였으므로 route · page · API client 를 함께 제거했다.
+ * 제거된 route: /admin/marketing/publisher/* · /admin/marketing/onboarding(/profile) ·
+ *              /admin/marketing/automation · /admin/marketing/supplier/engagement ·
+ *              /admin/marketing/operator/console
+ */
 
 // Digital Signage Management (Phase 6)
 const DigitalSignageRouter = lazy(() => import('@/pages/digital-signage/DigitalSignageRouter'));
@@ -51,7 +53,10 @@ const PageLoader = () => (
 );
 
 /**
- * LMS & Marketing routes — LMS yaksa, LMS instructor, marketing, digital signage
+ * LMS instructor · digital signage · store content/POP/QR/tablet routes
+ *
+ * (파일명은 역사적 이유로 `lms-marketing.routes` 를 유지한다. marketing publisher 콘솔은
+ *  WO-O4O-ADMIN-LMS-MARKETING-CONSOLE-RETIREMENT-V1 에서 제거됐다.)
  */
 export function LmsMarketingRoutes() {
   return [
@@ -60,54 +65,6 @@ export function LmsMarketingRoutes() {
       <Suspense fallback={<PageLoader />}>
         <LmsInstructorRouter />
       </Suspense>
-    } />,
-
-    // LMS-Marketing - Publisher (Phase R10)
-    <Route key="/admin/marketing/publisher/*" path="/admin/marketing/publisher/*" element={
-      <AdminProtectedRoute requiredPermissions={['marketing.write']}>
-        <Suspense fallback={<PageLoader />}>
-          <MarketingPublisherRouter />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // LMS-Marketing - Onboarding & Automation (Phase R11)
-    <Route key="/admin/marketing/onboarding" path="/admin/marketing/onboarding" element={
-      <AdminProtectedRoute requiredPermissions={['marketing.read']}>
-        <Suspense fallback={<PageLoader />}>
-          <OnboardingHome />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/marketing/onboarding/profile" path="/admin/marketing/onboarding/profile" element={
-      <AdminProtectedRoute requiredPermissions={['marketing.write']}>
-        <Suspense fallback={<PageLoader />}>
-          <SupplierProfileForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/marketing/automation" path="/admin/marketing/automation" element={
-      <AdminProtectedRoute requiredPermissions={['marketing.manage']}>
-        <Suspense fallback={<PageLoader />}>
-          <AutomationSettings />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // LMS-Marketing Engagement Dashboard (Phase R12)
-    <Route key="/admin/marketing/supplier/engagement" path="/admin/marketing/supplier/engagement" element={
-      <AdminProtectedRoute requiredPermissions={['marketing.read']}>
-        <Suspense fallback={<PageLoader />}>
-          <SupplierEngagementDashboard />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/marketing/operator/console" path="/admin/marketing/operator/console" element={
-      <AdminProtectedRoute requiredPermissions={['marketing.manage']}>
-        <Suspense fallback={<PageLoader />}>
-          <OperatorConsole />
-        </Suspense>
-      </AdminProtectedRoute>
     } />,
 
     // Digital Signage Management (Phase 6)
