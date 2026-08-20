@@ -15,18 +15,31 @@ interface StatePayload {
   shopNo: number;
   nonce: string;
   exp: number;
+  /**
+   * OAuth 를 시작한 O4O 관리자 id.
+   * **권한 부여용이 아니다** — callback 은 이 값으로 권한을 판정하지 않는다.
+   * connection 의 attribution(누가 연결했는가) 기록에만 쓴다.
+   * (WO-O4O-CAFE24-OAUTH-CALLBACK-AUTH-BOUNDARY-FIX-V1)
+   */
+  uid?: string | null;
 }
 
 function sign(secret: string, body: string): string {
   return crypto.createHmac('sha256', secret).update(body).digest('base64url');
 }
 
-export function issueState(secret: string, mallId: string, shopNo: number): string {
+export function issueState(
+  secret: string,
+  mallId: string,
+  shopNo: number,
+  uid?: string | null,
+): string {
   const payload: StatePayload = {
     mallId,
     shopNo,
     nonce: crypto.randomBytes(12).toString('base64url'),
     exp: Date.now() + STATE_TTL_MS,
+    uid: uid ?? null,
   };
   const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
   return `${body}.${sign(secret, body)}`;
