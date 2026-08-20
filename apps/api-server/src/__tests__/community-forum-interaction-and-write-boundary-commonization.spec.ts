@@ -339,6 +339,56 @@ describe('Comment create boundary (§4)', () => {
     expect(disabled.out.body.code).toBe('COMMENTS_DISABLED');
   });
 
+  it('대댓글 parentId 는 같은 게시글의 댓글이어야 한다 (타 게시글/타 서비스 parent → 404)', async () => {
+    state.posts = [post('post-kpa', KPA_FORUM.id), post('post-neture', OTHER_FORUM.id)];
+    state.comments = [
+      { id: 'c-other', postId: 'post-neture', authorId: 'user-9', status: FakeCommentStatus.PUBLISHED },
+    ];
+
+    const cross = makeRes();
+    await controller.createComment(
+      makeReq({
+        user: USER,
+        ctx: KPA_CTX,
+        body: { postId: 'post-kpa', content: 'hi', parentId: 'c-other' },
+      }),
+      cross.res,
+    );
+    expect(cross.out.status).toBe(404);
+    expect(cross.out.body.code).toBe('PARENT_COMMENT_NOT_FOUND');
+    expect(state.savedComments).toHaveLength(0);
+
+    const missing = makeRes();
+    await controller.createComment(
+      makeReq({
+        user: USER,
+        ctx: KPA_CTX,
+        body: { postId: 'post-kpa', content: 'hi', parentId: 'no-such-comment' },
+      }),
+      missing.res,
+    );
+    expect(missing.out.status).toBe(404);
+    expect(state.savedComments).toHaveLength(0);
+  });
+
+  it('같은 게시글의 댓글을 parent 로 하는 대댓글은 생성된다', async () => {
+    state.posts = [post('post-kpa', KPA_FORUM.id)];
+    state.comments = [
+      { id: 'c-same', postId: 'post-kpa', authorId: 'user-9', status: FakeCommentStatus.PUBLISHED },
+    ];
+    const { res, out } = makeRes();
+    await controller.createComment(
+      makeReq({
+        user: USER,
+        ctx: KPA_CTX,
+        body: { postId: 'post-kpa', content: 'hi', parentId: 'c-same' },
+      }),
+      res,
+    );
+    expect(out.status).toBe(201);
+    expect(state.savedComments[0].parentId).toBe('c-same');
+  });
+
   it('archived 게시글은 존재를 노출하지 않는다 (404)', async () => {
     state.posts = [post('post-archived', KPA_FORUM.id, { status: FakePostStatus.ARCHIVED })];
     const { res, out } = makeRes();

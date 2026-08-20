@@ -239,4 +239,109 @@ OUT_OF_SCOPE: 16
 
 ---
 
+---
+
+## 12. 2026-08-20 재조사 (WO 재실행 · 현재 main 기준)
+
+> 동일 WO 가 다시 전달되어 **과거 census 를 구현 목록으로 재사용하지 않고** 현재 코드 기준으로 전수 재조사했다.
+> 시작 commit `9897eef5b`.
+
+### 12-1. 재조사 결과 — 백엔드 경계
+
+| 축 | 현재 상태 | 판정 |
+|---|---|---|
+| canonical authorization 순서 (§3) | comment create/update/delete · post update/delete · like · pin 전부 `resolveForumPostInServiceScope` / `resolveForumCommentInServiceScope` → `assertForumWriteAccess` → ownership/override 순서 유지 | 유지 |
+| 공통 helper 4종 | `ForumControllerBase` 에 그대로 존재, 서비스별 복붙·`if service === kpa` 분기 0건 | 유지 |
+| generic `/api/v1/forum/*` write | `requireGenericForumWriteAdmin` (platform admin 전용) 유지 | 유지 |
+| KPA pin remount · `PUT /comments/:id` | 유지 | 유지 |
+| comment delete 재삭제 count 중복 차감 가드 | `alreadyDeleted` 가드 유지 | 유지 |
+
+### 12-2. 신규 확정 결함 1건 — 대댓글 `parentId` 미검증
+
+- **증상**: `createComment` 가 body 의 `parentId` 를 검증 없이 저장했다. post 는 service scope 안에서 해석되지만 parent 댓글은 어떤 게시글의 것이어도 통과 → **다른 서비스 게시글의 댓글에 답글을 붙일 수 있는 경계 누수**.
+- **수정**: parent 를 조회해 `parent.postId !== post.id` 면 `404 PARENT_COMMENT_NOT_FOUND`. post 가 이미 scope 안에서 해석돼 있으므로 같은 게시글 검사만으로 경계가 닫힌다.
+- **파일**: `apps/api-server/src/controllers/forum/ForumCommentController.ts`
+- **회귀 테스트**: 2건 추가 (타 게시글 parent → 404 · 존재하지 않는 parent → 404 · 같은 게시글 parent → 201)
+
+### 12-3. 의도된 비대칭 (수정하지 않음, §8)
+
+- comment update/delete 의 override 는 `isPlatformAdmin` 단독인데, pin 은 **same-service operator** override 를 갖는다.
+- pin 은 moderation action, comment 삭제는 타인 글 삭제 권한 확대라 **제품 결정**이다. §8 의 목표는 *우연한* 권한 누락 제거이므로 이 차이는 정책으로 보존하고 기록만 한다.
+
+### 12-4. 프런트 adoption 재조사 — §6 표 갱신
+
+§6 표(2026-08-19)는 **stale** 이다. 이후 트랙에서 5개 서비스 전부가 공통 부품을 소비하도록 정리됐다.
+
+| 서비스 | 상세 화면 | `ForumLikeButton` | `ForumCommentForm` | `ForumCommentList` | 판정 |
+|---|---|:--:|:--:|:--:|---|
+| KPA | `ForumDetailPage.tsx` | O | O | O | FULLY_COMMON (+ pin = SERVICE_SPECIFIC) |
+| Neture | `ForumPostPage.tsx` | O | O | O | FULLY_COMMON |
+| Pharmacy-Hub | `ForumDetailPage.tsx` | O | O | O | FULLY_COMMON (기존 `NOT_IMPLEMENTED` 해소) |
+| K-Cosmetics | `PostDetailPage.tsx` | O | O | O | FULLY_COMMON (기존 "read-only 유지" 무효) |
+| GlycoPharm | `ForumPostDetailPage.tsx` | O | O | O | FULLY_COMMON |
+
+- 서비스별 중복 댓글/좋아요 JSX **0건** — 재조사 시점에 이미 제거돼 있어 본 회차 View 재작성 0건 (§13 "backend 수정만 필요하면 억지로 View 를 재작성하지 않는다" 적용).
+- KCos / GP 에 신규 write 버튼·endpoint 추가 0건 (§12) — 기존 adoption 확인만 했다.
+
+### 12-5. 중복 제거 수치 (§19)
+
+| 항목 | before | after |
+|---|---:|---:|
+| interaction backend handler | 8 | 8 (신규 0) |
+| 공통 interaction component | 3 | 3 |
+| 서비스별 중복 interaction JSX | 0 | 0 |
+| 제거한 중복 라인 | — | 0 (이번 회차는 backend 경계 결함 1건 수정) |
+| 잔존 `VIEW_DUPLICATED` | 0 | 0 |
+| 잔존 `CORE_ONLY` | 0 | 0 |
+
+### 12-6. Production 확인 (§17, read-only)
+
+`cloud-sql-proxy` + `psql` 직접 접속은 이번에도 password 인증에 실패했다 (`apps/api-server/.env` 의 `DB_PASSWORD` 가 빈 값, 런타임 비밀번호는 Secret Manager 참조로 해석). 선례 `docs/checks/CHECK-O4O-CONTENT-RESOURCE-USAGE-TRACE-V1.md:84` 와 동일한 벽이며, 동일하게 **배포된 read-only API** 로 대체 확인했다. **write 시도 0건 · production 에 테스트 post/comment/like 생성 0건.**
+
+| 항목 | 결과 (API 관측) |
+|---|---|
+| forum service_code × type | kpa-society open 1 / kpa-society closed 1 / neture open 1 · cosmetics·glycopharm·pharmacy-hub 0 |
+| post 분포 | kpa-society 3 (전량, 단일 open forum) · 그 외 서비스 0 |
+| pinned post | 0 |
+| comment | 2 (전부 `postId` = 같은 kpa 게시글, orphan 0) |
+| 대댓글(`parentId` 有) | 0 → 12-2 수정의 데이터 영향 없음 |
+| cross-service post 조회 | KPA post id 를 neture/cosmetics/glycopharm/pharmacy-hub prefix 로 조회 → **전부 404** |
+| cross-service comment 조회 | 동일 id 의 `/comments` → **전부 404** |
+| closed forum 비로그인 조회 | `403 CLOSED_FORUM_ACCESS_DENIED` |
+
+### 12-7. 검증 (§22)
+
+| 항목 | 결과 |
+|---|---|
+| 본 spec | 27 passed (25 → +2) |
+| api-server 전체 jest | **161 suites / 2,490 tests PASS** |
+| api-server typecheck | PASS |
+| frontend build 5종 (kpa-society · k-cosmetics · glycopharm · neture · pharmacy-hub) | 전부 exit 0 |
+| migration | 0 |
+
+### 12-8. 판정 집계 (재조사)
+
+```
+전체 모집단: 44
+FULLY_COMMON: 27
+CORE_ONLY: 0
+VIEW_DUPLICATED: 0
+SERVICE_SPECIFIC: 2   (KPA pin · generic admin write)
+NOT_IMPLEMENTED: 1    (comment like)
+OUT_OF_SCOPE: 14
+미조사: 0
+```
+
+```
+조사 interaction endpoint: 44
+SERVICE_SCOPE_FIXED: 1        (comment parentId cross-post/cross-service)
+CLOSED_FORUM_GAP_FIXED: 0     (기 수정분 유지 확인)
+OWNERSHIP_GAP_FIXED: 0        (의도된 비대칭 1건 기록 보존)
+VIEW_DUPLICATION_FIXED: 0     (재조사 시점 잔여 0)
+```
+
+> §9 잔존 위험 중 3번(Pharmacy-Hub interaction UI 부재)은 12-4 로 **해소**됐다. 1·2·4 번은 유지된다.
+
+
+
 **이 CHECK 는 Forum Interaction / Write Boundary 축 기록이며, 커뮤니티 전체 공통화 완료를 의미하지 않는다.**

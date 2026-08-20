@@ -170,6 +170,22 @@ export class ForumCommentController extends ForumControllerBase {
         return;
       }
 
+      // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §4 (재조사 잔여):
+      //   parentId 가 body 에서 그대로 저장되고 있었다 → 다른 게시글(=다른 서비스)의 댓글에
+      //   답글을 붙일 수 있었다. 대댓글 부모는 반드시 **같은 게시글**의 댓글이어야 한다.
+      //   post 는 이미 service scope 안에서 해석됐으므로 postId 일치 검사만으로 경계가 닫힌다.
+      if (parentId) {
+        const parent = await this.commentRepository.findOne({ where: { id: parentId } });
+        if (!parent || parent.postId !== post.id) {
+          res.status(404).json({
+            success: false,
+            error: 'Parent comment not found',
+            code: 'PARENT_COMMENT_NOT_FOUND',
+          });
+          return;
+        }
+      }
+
       const comment = this.commentRepository.create({
         postId,
         content: content.trim(),
