@@ -217,6 +217,14 @@ export default function MyProfilePage({
   );
 
   /**
+   * canonical `/account` 는 공개 GlobalHeader 아래에 있고 그 헤더의 utilitySlot
+   * NotificationBell 은 `hidden md:flex` 다 → md 이상에서는 헤더 벨이 유일한 진입점,
+   * md 미만에서만 이 벨이 진입점이 된다. 두 벨이 동시에 보이지 않게 md:hidden 으로 감싼다.
+   * (매장 셸 branch 는 공개 헤더가 없으므로 폭 제한 없이 그대로 렌더한다.)
+   */
+  const mobileOnlyNotificationBell = <div className="md:hidden">{notificationBell}</div>;
+
+  /**
    * 화면 골격 — 상태(로딩/미인증/오류/정상)와 무관하게 같은 그릇을 쓴다.
    * 로딩·오류일 때만 헤더가 사라지는 구조를 만들지 않는다.
    */
@@ -229,7 +237,7 @@ export default function MyProfilePage({
         width="form"
         basePath="/account"
         navItems={PHARMACY_HUB_ACCOUNT_NAV_ITEMS}
-        headerActions={showNotifications ? notificationBell : undefined}
+        headerActions={showNotifications ? mobileOnlyNotificationBell : undefined}
       >
         {children}
       </MyPageShell>
