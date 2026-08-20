@@ -316,6 +316,7 @@ jobs:
           --set-env-vars="GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" \
           --set-env-vars="TOSS_PAYMENTS_CLIENT_KEY=${{ secrets.TOSS_PAYMENTS_CLIENT_KEY }}" \
           --set-env-vars="TOSS_PAYMENTS_SECRET_KEY=${{ secrets.TOSS_PAYMENTS_SECRET_KEY }}" \
+          --set-env-vars="CAFE24_REDIRECT_URI=https://api.neture.co.kr/api/v1/admin/cafe24/callback" \
           --clear-vpc-connector \
           --add-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db
 
