@@ -25,6 +25,13 @@ export type {
   GuideFeaturesPageProps,
   GuideFeatureManualSection,
   GuideFeatureManualPageProps,
+  // WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1
+  GuideIconComponent,
+  GuideServiceIntroCard,
+  GuideServiceIntroAction,
+  GuideServiceIntroCardSection,
+  GuideServiceIntroStep,
+  GuideServiceIntroPageProps,
 } from './types.js';
 
 // Pages
@@ -145,3 +152,10 @@ export {
   kCosmeticsGuideFeatureBlogProps,
   kCosmeticsGuideFeatureProductionMaterialsProps,
 } from './copy/k-cosmetics.js';
+
+// WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1
+//   /service-guide 공통 서비스 소개 landing + 서비스별 config
+export { GuideServiceIntroPage } from './GuideServiceIntroPage.js';
+export { kpaServiceIntroProps } from './copy/kpa.js';
+export { kCosmeticsServiceIntroProps } from './copy/k-cosmetics.js';
+export { glycopharmServiceIntroProps } from './copy/glycopharm.js';

@@ -688,6 +688,8 @@ function AppRoutes() {
         <Route path="mobile/pharmacy" element={<MobilePharmacyPage />} />
 
         {/* Guide pages — WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1 */}
+        {/* WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1 §7: /guide 는 별도 landing 을 만들지 않고 canonical 진입점(/guide/intro) 으로 보낸다 */}
+        <Route path="guide" element={<Navigate to="/guide/intro" replace />} />
         <Route path="guide/intro" element={<GuideIntroPage {...glycopharmGuideIntroProps} />} />
         <Route path="guide/intro/structure" element={<GuideIntroStructurePage {...glycopharmGuideIntroStructureProps} />} />
         <Route path="guide/intro/kpa" element={<GuideIntroKpaPage {...glycopharmGuideIntroKpaProps} />} />

@@ -76,6 +76,8 @@ export interface GuideIntroPageProps {
     home: GuideNavLink;       // '← 홈으로'
     next: GuideNavLink;       // '서비스 활용 방법 →'
     features: GuideNavLink;   // '기능별 이용 방법'
+    /** WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1 §9: '서비스 소개'(/service-guide) 상호 연결 */
+    serviceGuide?: GuideNavLink;
   };
   /** WO-O4O-GUIDE-INLINE-EDIT-V1: 선택적 텍스트 렌더러. 설명 영역을 동적 콘텐츠로 대체할 때 사용 */
   renderText?: GuideTextRenderer;
@@ -321,5 +323,74 @@ export interface GuideFeatureManualPageProps {
     home: GuideNavLink;
   };
   /** WO-O4O-GUIDE-INLINE-EDIT-V1: 선택적 텍스트 렌더러 */
+  renderText?: GuideTextRenderer;
+}
+
+// ─── /service-guide (서비스 소개 landing) ───────────────────────────────
+//
+// WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1
+//
+// `/service-guide` 는 "이 서비스가 무엇인가" 를 설명하는 공개 소개 landing 이고,
+// `/guide/*` 는 "이 기능을 어떻게 쓰는가" 를 설명하는 기능 이용 안내다 (역할 분리 = 판정 A).
+// KPA / K-Cosmetics / GlycoPharm 의 기존 ServiceGuidePage 3개가 같은 구조였으므로
+// 아래 계약 하나로 수렴시키고, 서비스별 문구·아이콘·경로는 copy 파일에서 주입한다.
+
+/** lucide-react 아이콘처럼 className 만 받는 아이콘 컴포넌트 */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type GuideIconComponent = any;
+
+export interface GuideServiceIntroCard {
+  icon: GuideIconComponent;
+  title: string;
+  desc: string;
+}
+
+export interface GuideServiceIntroAction {
+  to: string;
+  label: string;
+  icon?: GuideIconComponent;
+}
+
+export interface GuideServiceIntroCardSection {
+  title: string;
+  description?: string;
+  cards: GuideServiceIntroCard[];
+  /** 주요 기능 그리드 열 수 (기본 3). 카드가 4개인 서비스는 2 를 쓴다. */
+  columns?: 2 | 3;
+  /** 카드 그리드 아래 보조 안내 문구 */
+  note?: string;
+}
+
+export interface GuideServiceIntroStep {
+  no: string;
+  title: string;
+}
+
+export interface GuideServiceIntroPageProps {
+  /** Hero 배지 문구 (기본 '서비스 안내') */
+  badge?: string;
+  headline: string;
+  lead: string;
+  heroActions: GuideServiceIntroAction[];
+  intro: { title: string; paragraphs: string[] };
+  audiences: GuideServiceIntroCardSection;
+  features: GuideServiceIntroCardSection;
+  steps: { title: string; description?: string; items: GuideServiceIntroStep[] };
+  contact: {
+    title: string;
+    body: string;
+    note?: string;
+    action: GuideServiceIntroAction;
+    icon?: GuideIconComponent;
+  };
+  /**
+   * §9 — `/service-guide` 와 `/guide` 를 서로 고립된 화면으로 두지 않기 위한 상호 연결 블록.
+   * 기능 이용 안내(`/guide/intro` · `/guide/usage` · `/guide/features`) 로 넘어가는 링크를 넣는다.
+   */
+  relatedGuide?: {
+    title: string;
+    description?: string;
+    links: GuideServiceIntroAction[];
+  };
   renderText?: GuideTextRenderer;
 }

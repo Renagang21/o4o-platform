@@ -23,7 +23,11 @@ import type {
   GuideUsagePageProps,
   GuideFeaturesPageProps,
   GuideFeatureManualPageProps,
+  GuideServiceIntroPageProps,
 } from '../types.js';
+// WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1: /service-guide 공통 landing 아이콘
+import { ArrowRight, BookOpen, Building2, Compass, FileText, Handshake, HelpCircle, LayoutGrid, MessageSquare, MonitorPlay, Store } from 'lucide-react';
+
 
 // ─── /guide/intro ──────────────────────────────────────────────────────
 
@@ -84,6 +88,8 @@ export const kCosmeticsGuideIntroProps: GuideIntroPageProps = {
     home: { label: '← 홈으로', to: '/' },
     next: { label: '서비스 활용 방법 →', to: '/guide/usage' },
     features: { label: '기능별 이용 방법', to: '/guide/features' },
+    // WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1 §9: 서비스 소개 landing 상호 연결
+    serviceGuide: { label: '서비스 소개', to: '/service-guide' },
   },
 };
 
@@ -1128,5 +1134,108 @@ export const kCosmeticsGuideFeatureProductionMaterialsProps: GuideFeatureManualP
   bottomNav: {
     prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
     home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /service-guide (서비스 소개 landing) ───────────────────────────────
+//
+// WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1 §12 · §13
+// 기존 services/web-k-cosmetics/src/pages/ServiceGuidePage.tsx 의 데이터를 그대로 옮긴 것이다.
+
+export const kCosmeticsServiceIntroProps: GuideServiceIntroPageProps = {
+  headline: '화장품 매장 운영을 위한 O4O 서비스 안내',
+  lead:
+    'K-Cosmetics는 화장품 매장 경영자가 상품 정보, 콘텐츠, 이벤트 오퍼, 매장 실행 자료를 활용해 ' +
+    '오프라인 매장 운영을 강화할 수 있도록 지원하는 O4O 기반 매장 운영 서비스입니다.',
+  heroActions: [
+    { to: '/store-hub', label: '매장 운영 허브 보기', icon: LayoutGrid },
+    { to: '/contact', label: '문의하기', icon: MessageSquare },
+  ],
+  intro: {
+    title: '서비스 소개',
+    paragraphs: [
+      'K-Cosmetics는 오프라인 화장품 매장의 운영을 온라인 도구로 지원하기 위한 서비스입니다.',
+      '매장 경영자는 상품 정보, 콘텐츠, 이벤트 오퍼, 매장 실행 자료를 확인하고, 매장 운영 허브와 ' +
+        '내 매장 기능을 통해 매장 현장에서 활용할 수 있는 자료를 관리할 수 있습니다.',
+    ],
+  },
+  audiences: {
+    title: '이용 대상',
+    description: '매장 운영과 관련된 다양한 참여자가 K-Cosmetics를 활용할 수 있습니다.',
+    cards: [
+      {
+        icon: Building2,
+        title: '화장품 매장 경영자',
+        desc: '매장 운영에 필요한 상품 정보, 콘텐츠, 이벤트 오퍼, 실행 자료를 확인하고 활용할 수 있습니다.',
+      },
+      {
+        icon: Store,
+        title: '매장 운영 담당자',
+        desc: '고객 안내, 상품 설명, 콘텐츠 활용 등 매장 운영 보조 업무에 필요한 자료를 확인할 수 있습니다.',
+      },
+      {
+        icon: Handshake,
+        title: '공급 · 제휴 사업자',
+        desc: '화장품 매장에서 활용할 수 있는 상품, 콘텐츠, 이벤트 오퍼 등과 관련된 제휴 문의를 진행할 수 있습니다.',
+      },
+    ],
+  },
+  features: {
+    title: '주요 기능',
+    description: '매장 운영과 콘텐츠 활용을 위한 핵심 기능을 제공합니다.',
+    cards: [
+      {
+        icon: Building2,
+        title: '매장 운영 지원',
+        desc: '화장품 매장 운영에 필요한 정보와 자료를 한 곳에서 확인할 수 있습니다.',
+      },
+      {
+        icon: LayoutGrid,
+        title: '매장 운영 허브',
+        desc: '상품, 콘텐츠, 이벤트 오퍼 등 매장에서 활용할 수 있는 항목을 확인합니다.',
+      },
+      { icon: Store, title: '내 매장', desc: '매장별 운영 정보와 활용 자료를 관리합니다.' },
+      {
+        icon: FileText,
+        title: '콘텐츠 활용',
+        desc: '고객 안내, 상품 설명, POP, QR 등 매장 현장에서 활용할 수 있는 자료를 제공합니다.',
+      },
+      {
+        icon: MonitorPlay,
+        title: '디지털 안내 도구',
+        desc: '매장 내 TV나 화면을 활용한 고객 안내 콘텐츠 운영을 지원합니다.',
+      },
+      {
+        icon: HelpCircle,
+        title: '문의 안내',
+        desc: '서비스 이용, 가입, 권한, 제휴, 오류 신고와 관련된 문의를 안내합니다.',
+      },
+    ],
+  },
+  steps: {
+    title: '이용 흐름',
+    description: '회원가입부터 매장 현장 활용까지의 기본 흐름입니다.',
+    items: [
+      { no: '01', title: '회원가입 또는 로그인' },
+      { no: '02', title: '서비스 이용 권한 확인' },
+      { no: '03', title: '매장 운영 허브에서 매장 활용 자료 확인' },
+      { no: '04', title: '내 매장에서 매장별 정보와 자료 관리' },
+      { no: '05', title: '필요한 콘텐츠와 실행 자료를 매장 현장에서 활용' },
+    ],
+  },
+  relatedGuide: {
+    title: '기능 사용 가이드',
+    description: '서비스 소개를 확인했다면, 실제 기능을 어떻게 쓰는지는 이용 가이드에서 이어서 볼 수 있습니다.',
+    links: [
+      { to: '/guide/intro', label: 'O4O 개요', icon: BookOpen },
+      { to: '/guide/usage', label: '서비스 활용 방법', icon: Compass },
+      { to: '/guide/features', label: '기능별 이용 방법', icon: LayoutGrid },
+    ],
+  },
+  contact: {
+    title: '문의 안내',
+    body: '서비스 이용, 가입, 권한, 공급 · 제휴, 오류 신고와 관련된 문의는 문의하기를 통해 접수할 수 있습니다.',
+    note: '문의 수신 경로와 푸터 문의 링크는 후속 푸터 / 문의 정비 작업에서 함께 정리합니다.',
+    action: { to: '/contact', label: '문의하기', icon: ArrowRight },
   },
 };

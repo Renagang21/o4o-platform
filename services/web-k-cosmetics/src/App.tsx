@@ -651,6 +651,8 @@ function AppRoutes() {
         <Route path="services/tourists" element={<TouristHubPage />} />
 
         {/* Guide pages — WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1 */}
+        {/* WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1 §7: /guide 는 별도 landing 을 만들지 않고 canonical 진입점(/guide/intro) 으로 보낸다 */}
+        <Route path="guide" element={<Navigate to="/guide/intro" replace />} />
         <Route path="guide/intro" element={<GuideIntroPage {...kCosmeticsGuideIntroProps} />} />
         <Route path="guide/intro/structure" element={<GuideIntroStructurePage {...kCosmeticsGuideIntroStructureProps} />} />
         <Route path="guide/intro/kpa" element={<GuideIntroKpaPage {...kCosmeticsGuideIntroKpaProps} />} />

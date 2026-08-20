@@ -72,9 +72,15 @@ export function GuideIntroPage({ hero, sections, bottomNav, renderText }: GuideI
         <PageContainer>
           <div style={bottomNavStyles.inner}>
             <Link to={bottomNav.home.to} style={bottomNavStyles.muted}>{bottomNav.home.label}</Link>
+            {/* WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1 §9: 서비스 소개(/service-guide) 상호 연결 */}
             <div style={bottomNavStyles.group}>
               <Link to={bottomNav.next.to} style={bottomNavStyles.primary}>{bottomNav.next.label}</Link>
               <Link to={bottomNav.features.to} style={bottomNavStyles.muted}>{bottomNav.features.label}</Link>
+              {bottomNav.serviceGuide ? (
+                <Link to={bottomNav.serviceGuide.to} style={bottomNavStyles.muted}>
+                  {bottomNav.serviceGuide.label}
+                </Link>
+              ) : null}
             </div>
           </div>
         </PageContainer>

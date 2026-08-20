@@ -16,7 +16,11 @@ import type {
   GuideUsagePageProps,
   GuideFeaturesPageProps,
   GuideFeatureManualPageProps,
+  GuideServiceIntroPageProps,
 } from '../types.js';
+// WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1: /service-guide 공통 landing 아이콘
+import { ArrowRight, BookOpen, Compass, GraduationCap, LayoutGrid, Megaphone, MessageSquare, MessagesSquare, Share2, Store, Users } from 'lucide-react';
+
 
 // ─── /guide/intro ──────────────────────────────────────────────────────
 
@@ -102,6 +106,8 @@ export const kpaGuideIntroProps: GuideIntroPageProps = {
     home: { label: '← 홈으로', to: '/' },
     next: { label: '서비스 활용 방법 →', to: '/guide/usage' },
     features: { label: '기능별 이용 방법', to: '/guide/features' },
+    // WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1 §9: 서비스 소개 landing 상호 연결
+    serviceGuide: { label: '서비스 소개', to: '/service-guide' },
   },
 };
 
@@ -1961,5 +1967,108 @@ export const kpaGuideForMemberProps: GuideUsagePageProps = {
   bottomNav: {
     prev: { label: '← 서비스 운영자', to: '/guide/for/operator' },
     next: { label: '홈으로 →', to: '/' },
+  },
+};
+
+// ─── /service-guide (서비스 소개 landing) ───────────────────────────────
+//
+// WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1 §12 · §13
+// 기존 services/web-kpa-society/src/pages/service-guide/ServiceGuidePage.tsx 의 데이터를
+// 그대로 옮긴 것이다. 문구 변경 없음.
+
+export const kpaServiceIntroProps: GuideServiceIntroPageProps = {
+  headline: '약사와 약대생을 위한 커뮤니티 서비스 안내',
+  lead:
+    'KPA Society는 약사와 약대생이 정보를 나누고 소통할 수 있도록 지원하는 커뮤니티 서비스입니다. ' +
+    '커뮤니티를 중심으로 전문 정보와 약국 현장 소식을 공유하며, 약국 경영자에게는 권한에 따라 ' +
+    '일부 경영지원 기능도 제공합니다.',
+  heroActions: [
+    { to: '/', label: '커뮤니티 보기', icon: Users },
+    { to: '/contact', label: '문의하기', icon: MessageSquare },
+  ],
+  intro: {
+    title: '서비스 소개',
+    paragraphs: [
+      'KPA Society는 약사와 약대생이 함께 참여할 수 있는 커뮤니티 기반 서비스입니다. ' +
+        '서비스 사용자는 커뮤니티를 통해 전문 정보, 서비스 소식, 약국 현장의 다양한 경험을 확인하고 ' +
+        '의견을 나눌 수 있습니다.',
+      '또한 약국 경영자 권한이 있는 사용자에게는 약국 운영에 도움이 되는 일부 경영지원 기능도 함께 제공됩니다.',
+    ],
+  },
+  audiences: {
+    title: '이용 대상',
+    description: '약사·약대생을 중심으로 약국 경영자까지 함께 이용할 수 있습니다.',
+    cards: [
+      {
+        icon: Users,
+        title: '약사',
+        desc: '전문 정보, 서비스 소식, 약국 현장 관련 내용을 확인하고 커뮤니티에서 의견을 나눌 수 있습니다.',
+      },
+      {
+        icon: GraduationCap,
+        title: '약대생',
+        desc: '약업계 정보와 커뮤니티 소식을 확인하고, 약사 커뮤니티 안에서 다양한 정보를 접할 수 있습니다.',
+      },
+      {
+        icon: Store,
+        title: '약국 경영자',
+        desc: '권한에 따라 약국 운영에 도움이 되는 일부 경영지원 기능을 이용할 수 있습니다.',
+      },
+    ],
+  },
+  // 커뮤니티 중심. 경영지원은 "안내" 1개 카드로만 — 세부 기능 미나열.
+  features: {
+    title: '주요 기능',
+    description: '커뮤니티를 중심으로 정보 공유와 소통을 지원합니다.',
+    columns: 2,
+    note: '약국 경영지원 기능은 권한 기반 부가 기능으로, 이 공개 안내에서는 세부 기능을 나열하지 않습니다.',
+    cards: [
+      {
+        icon: Users,
+        title: '약사·약대생 커뮤니티',
+        desc: '약사와 약대생이 정보를 확인하고 의견을 나눌 수 있는 커뮤니티 공간을 제공합니다.',
+      },
+      {
+        icon: Share2,
+        title: '정보 공유',
+        desc: '전문 정보, 서비스 소식, 약국 현장과 관련된 다양한 내용을 확인할 수 있습니다.',
+      },
+      {
+        icon: MessagesSquare,
+        title: '참여와 소통',
+        desc: '게시글, 댓글, 공지 등을 통해 커뮤니티 구성원 간 소통을 지원합니다.',
+      },
+      {
+        icon: Megaphone,
+        title: '경영지원 기능 안내',
+        desc: '약국 경영자에게는 권한에 따라 약국 운영에 도움이 되는 일부 기능을 제공합니다.',
+      },
+    ],
+  },
+  steps: {
+    title: '이용 흐름',
+    description: '회원가입부터 커뮤니티 참여까지의 기본 흐름입니다.',
+    items: [
+      { no: '01', title: '회원가입 또는 로그인' },
+      { no: '02', title: '서비스 이용 권한 확인' },
+      { no: '03', title: '커뮤니티에서 정보와 소식 확인' },
+      { no: '04', title: '게시글과 댓글을 통한 참여와 소통' },
+      { no: '05', title: '약국 경영자는 권한에 따라 제공되는 경영지원 기능 활용' },
+    ],
+  },
+  relatedGuide: {
+    title: '기능 사용 가이드',
+    description: '서비스 소개를 확인했다면, 실제 기능을 어떻게 쓰는지는 이용 가이드에서 이어서 볼 수 있습니다.',
+    links: [
+      { to: '/guide/intro', label: 'O4O 개요', icon: BookOpen },
+      { to: '/guide/usage', label: '서비스 활용 방법', icon: Compass },
+      { to: '/guide/features', label: '기능별 이용 방법', icon: LayoutGrid },
+    ],
+  },
+  contact: {
+    title: '문의 안내',
+    body: '서비스 이용, 가입, 권한, 커뮤니티 이용, 오류 신고와 관련된 문의는 문의하기를 통해 접수할 수 있습니다.',
+    note: '문의 수신 경로와 푸터 문의 링크는 후속 푸터 / 문의 정비 작업에서 함께 정리합니다.',
+    action: { to: '/contact', label: '문의하기', icon: ArrowRight },
   },
 };
