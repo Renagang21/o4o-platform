@@ -1469,63 +1469,23 @@ export class MarketTrialOperatorController {
 }
 
 // ============================================================================
-// WO-MARKET-TRIAL-CONVERSION-NOTIFICATION-V1
+// WO-MARKET-TRIAL-CONVERSION-NOTIFICATION-V1 — 제거됨
+// WO-O4O-NOTIFICATION-TARGET-LEGACY-ROW-REMEDIATION-AND-FINAL-CLOSURE-V1 (MF-2)
+//
+// Trial → Product 전환 알림 producer(dispatchConversionNotifications)를 삭제했다.
+//   - 전환 기능 자체가 WO-O4O-MARKET-TRIAL-CONVERSION-COLUMNS-DROP-V1(7b7b0d1fa)에서
+//     content-only 모델로 은퇴하며 convert route·핸들러·컬럼이 제거됐고, 이 함수만
+//     호출부 0개인 고아 코드로 남아 있었다 (저장소 전역 call site = 0).
+//   - 이 함수는 `metadata.linkUrl = /hub/products/{id}` 를 기록하는 유일한 producer 였다.
+//     `/hub/products/:id` 는 web-neture route tree 에 존재하지 않고(`/hub` 는 `/workspace/hub`
+//     redirect 뿐), 공통 resolver(resolveNotificationTarget)는 `metadata.targetUrl` 만 읽으므로
+//     `linkUrl` 은 애초에 이동을 발생시키지도 못했다.
+//   - 프로덕션 실측(2026-08-20): 이 producer 가 만든 row = 0건
+//     (metadata LIKE %/hub/% = 0, metadata ? linkUrl = 0, trialId+productId = 0).
+//   - 따라서 유효 destination 을 새로 만들지 않고(§13·§14 신규 route/page 금지) producer 를
+//     제거하는 것이 DEAD_ROUTE 를 닫는 최소 교정이다. resolver 에 linkUrl fallback 을 추가하는
+//     방식(= producer 결함 은폐)은 §17 위반이므로 채택하지 않았다.
 // ============================================================================
-
-/**
- * Fire-and-forget: notify product-reward participants when their trial converts to a product.
- *
- * Guards:
- * - Checks notificationSentAt to prevent duplicate sends
- * - Skips users with no active account (is_active = false / deleted)
- */
-async function dispatchConversionNotifications(
-  ds: DataSource,
-  trialId: string,
-  productId: string,
-  productName: string,
-  trialRepo: Repository<MarketTrial>,
-): Promise<void> {
-  // Re-read from DB to guard against duplicate dispatch
-  const fresh = await trialRepo.findOne({ where: { id: trialId } });
-  if (!fresh || fresh.notificationSentAt) {
-    return; // already dispatched or trial missing
-  }
-
-  // Mark as dispatched BEFORE sending to prevent races
-  await ds.query(
-    `UPDATE market_trials SET "notificationSentAt" = NOW() WHERE id = $1 AND "notificationSentAt" IS NULL`,
-    [trialId],
-  );
-
-  // Fetch product-reward participants (active users only)
-  const participants: Array<{ participantId: string }> = await ds.query(
-    `SELECT p."participantId"
-     FROM market_trial_participants p
-     JOIN users u ON u.id = p."participantId"
-     WHERE p."marketTrialId" = $1
-       AND p."rewardType" = 'product'
-       AND u."isActive" = true`,
-    [trialId],
-  );
-
-  if (!participants.length) return;
-
-  const title = '참여하신 Trial 상품이 정식 등록되었습니다';
-  const message = `"${productName}" 상품이 정식 등록되었습니다. 지금 바로 확인해보세요.`;
-  const metadata = JSON.stringify({ trialId, productId, linkUrl: `/hub/products/${productId}` });
-
-  // Batch insert notifications — one per participant
-  for (const { participantId } of participants) {
-    await ds.query(
-      `INSERT INTO notifications (id, "userId", channel, type, title, message, metadata, "isRead", "createdAt")
-       VALUES (gen_random_uuid(), $1, 'in_app', 'custom', $2, $3, $4, false, NOW())`,
-      [participantId, title, message, metadata],
-    );
-  }
-
-  console.error(`[MarketTrial] Sent conversion notifications for trial ${trialId} → ${participants.length} participant(s)`);
-}
 
 // ============================================================================
 // DTO converters

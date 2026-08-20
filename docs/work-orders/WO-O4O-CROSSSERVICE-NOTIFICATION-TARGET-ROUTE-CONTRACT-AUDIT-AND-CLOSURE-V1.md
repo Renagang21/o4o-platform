@@ -342,6 +342,17 @@ FOLLOWUP / BLOCKED
 
 로 남기고 억지로 route를 만든다.
 
+> **[정정 주석 — WO-O4O-NOTIFICATION-TARGET-LEGACY-ROW-REMEDIATION-AND-FINAL-CLOSURE-V1 §2, 2026-08-20]**
+> 위 문장은 **오기**다. 정본은 다음과 같다.
+>
+> ```text
+> FOLLOWUP / BLOCKED
+> 로 남기고 억지로 route를 만들지 않는다.
+> ```
+>
+> 원문 커밋(`c9d80d2aa`)은 이미 push 되어 history 재작성을 하지 않으므로 본 주석으로 정정한다.
+> 선행 audit 은 이미 "만들지 않는다" 독법(본 문서 부기 B)으로 실행됐으므로 **실행 결과 영향은 없다.**
+
 ---
 
 ## 11. Route SSOT 조사
