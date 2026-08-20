@@ -161,8 +161,8 @@ middleware(`requireSignageStore`)·handler·path 문자열 모두 **불변**.
 | `signage-servicekey-canonicalization.spec.ts` | PASS |
 | api-server `tsc --noEmit` | PASS |
 | api-server 전체 Jest | **PASS — 164 suites / 2541 tests** |
-| production API smoke | (아래 §10 기록) |
-| KPA / KCos / GP browser 회귀 | (아래 §12 기록) |
+| production API smoke | **PASS — calendar 500 = 0** (§10) |
+| KPA / KCos / GP browser 회귀 | **PASS — api 4xx/5xx 0 · console error 0** (§12) |
 
 > 참고: `packages/financial-core` 의 `tsup: No input files` 빌드 실패는 이번 변경과 무관한 **기존 상태**이며,
 > `--no-bail` 로 나머지 패키지를 빌드한 뒤 typecheck 를 수행했다.
@@ -171,7 +171,33 @@ middleware(`requireSignageStore`)·handler·path 문자열 모두 **불변**.
 
 ## 10. Production 검증 (배포 후)
 
-*배포 후 기록*
+배포: main `829989f02` → GitHub Actions run 32338315393 성공 → Cloud Run revision **`o4o-core-api-03401-fhs`**.
+검증 대상 `https://api.neture.co.kr` · **DB write 0 (조회만)**.
+
+| serviceKey | 요청 | 수정 전 | 수정 후 |
+|---|---|---|---|
+| kpa-society | `/schedules/calendar?startDate=2026-08-01&endDate=2026-08-31` | 500 uuid cast | **200** `{"data":{"events":[],"startDate":"2026-08-01","endDate":"2026-08-31"}}` |
+| kpa-society | `/schedules/calendar` (query 없음) | 500 uuid cast | **400** `startDate and endDate are required` (= calendar handler 진입) |
+| k-cosmetics | 위 2건 동일 | 500 / 500 | **200 / 400** |
+| glycopharm | 위 2건 동일 | 500 / 500 | **200 / 400** |
+
+### 회귀 대조군 (수정 후, 3 서비스 공통)
+
+| 요청 | 결과 |
+|---|---|
+| `/schedules` | 200 `{"data":[],"meta":{...,"total":0}}` (변화 없음) |
+| `/schedules/<random-uuid>` | 404 `Schedule not found` (변화 없음) |
+
+### Guard 회귀 (수정 후, calendar)
+
+| 조건 | 결과 |
+|---|---|
+| 미인증 | 401 `AUTH_REQUIRED` |
+| 알 수 없는 serviceKey | 400 `INVALID_SERVICE_KEY` |
+| 타 서비스 org | 403 `SIGNAGE_STORE_REQUIRED` |
+| organization 헤더 없음 | 400 `ORGANIZATION_ID_REQUIRED` |
+
+→ 수정 전 기준선(§2)과 **완전히 동일**. **calendar 관련 500 = 0.**
 
 ---
 
@@ -184,7 +210,17 @@ middleware(`requireSignageStore`)·handler·path 문자열 모두 **불변**.
 
 ## 12. Browser 회귀
 
-*기록*
+headless Playwright · 프로덕션 3 도메인 · 매장 계정 로그인 (자격증명은 gitignored 문서에서만 주입).
+
+| 서비스 | 로그인 | 확인 화면 | 렌더 | api 4xx/5xx | console error |
+|---|---|---|---|---|---|
+| KPA (`kpa-society.co.kr`) | → `/store` | `/store/marketing/signage/playlist`, `/player`, `/schedules`, `/videos` | 정상 | **0** | **0** |
+| KCos (`k-cosmetics.site`) | → `/store` | `/store/marketing/signage/playlist`, `/player`, `/schedules`, `/videos` | 정상 | **0** | **0** |
+| GP (`glycopharm.co.kr`) | → `/store` | `/store/marketing/signage/playlist`, `/schedules` | 정상 | **0** | **0** |
+
+- white screen 0 · JS exception 0 · 사이니지 메뉴 트리(플레이리스트/동영상/스케줄) 정상 노출.
+- **재생 자체는 실행하지 못했다** — 3 서비스 모두 signage 데이터가 0행이라 선택할 플레이어/플레이리스트가 없다.
+  이는 WO §13 제외 항목("Signage 데이터 0행")에 해당하며 이번 수정과 무관하다.
 
 ---
 
