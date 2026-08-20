@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileQuestion, ArrowLeft, Save, Globe, GlobeLock, Plus, Trash2, ExternalLink, BarChart3, StopCircle } from 'lucide-react';
+import { FileQuestion, ArrowLeft, Save, Globe, GlobeLock, Plus, Trash2, BarChart3, StopCircle } from 'lucide-react';
 import { AGTabs, type AGTabItem } from '@/components/ag/AGTabs';
 import { quizCampaignApi, type UpdateQuizCampaignDto, type QuizCampaign, type QuizQuestion, type QuizReward, type TargetAudience } from '@/lib/api/lmsMarketing';
 
@@ -656,12 +656,10 @@ export default function QuizEditPage() {
                   </Button>
                 </>
               )}
-              <Button variant="ghost" asChild>
-                <a href={`/marketing/quiz/${campaign.id}`} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Preview
-                </a>
-              </Button>
+              {/* WO-O4O-MAIN-SITE-UNIQUE-VIEWER-MIGRATION-AND-PREVIEW-LINK-CLOSURE-V1
+                  Preview 링크는 `o4o-main-site` 의 `/marketing/quiz/:id` viewer 를 가리켰다.
+                  해당 viewer 는 DEAD_FEATURE 로 제거됐고 admin 상대경로로는 애초에 404 였다.
+                  대체 viewer 가 없어 재지정 대신 링크를 제거했다. */}
               <Button variant="ghost" asChild>
                 <Link to={`/admin/marketing/insights/campaign/quiz/${campaign.id}`}>
                   <BarChart3 className="h-4 w-4 mr-2" />

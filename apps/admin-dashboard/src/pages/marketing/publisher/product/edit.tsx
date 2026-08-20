@@ -16,7 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Package, ArrowLeft, Save, Globe, GlobeLock, ExternalLink } from 'lucide-react';
+import { Package, ArrowLeft, Save, Globe, GlobeLock } from 'lucide-react';
 import { AGTabs, type AGTabItem } from '@/components/ag/AGTabs';
 import { productContentApi, type UpdateProductContentDto, type ProductContent, type TargetAudience } from '@/lib/api/lmsMarketing';
 
@@ -347,16 +347,10 @@ export default function ProductEditPage() {
                   Publish
                 </Button>
               )}
-              <Button variant="ghost" asChild>
-                <a
-                  href={`/marketing/product/${product.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Preview
-                </a>
-              </Button>
+              {/* WO-O4O-MAIN-SITE-UNIQUE-VIEWER-MIGRATION-AND-PREVIEW-LINK-CLOSURE-V1
+                  Preview 링크는 `o4o-main-site` 의 `/marketing/product/:id` viewer 를 가리켰다.
+                  해당 viewer 는 DEAD_FEATURE 로 제거됐고 admin 상대경로로는 애초에 404 였다.
+                  대체 viewer 가 없어 재지정 대신 링크를 제거했다. */}
             </div>
             <div className="flex gap-4">
               <Button

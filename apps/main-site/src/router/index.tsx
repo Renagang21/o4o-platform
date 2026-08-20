@@ -22,19 +22,12 @@ const ForumDetailPage = lazy(() => import('@/pages/forum/ForumDetailPage'));
 const MyCoursesPage = lazy(() => import('@/pages/lms/MyCoursesPage'));
 const CourseDetailPage = lazy(() => import('@/pages/lms/CourseDetailPage'));
 const LessonPage = lazy(() => import('@/pages/lms/LessonPage'));
-const BundleViewerPage = lazy(() =>
-  import('@/pages/lms/bundle/BundleViewerPage').then((m) => ({ default: m.BundleViewerPage }))
-);
 
-// Marketing pages
-const ProductContentViewerPage = lazy(() =>
-  import('@/pages/marketing/product/ProductContentViewerPage').then((m) => ({
-    default: m.ProductContentViewerPage,
-  }))
-);
-const QuizCampaignViewerPage = lazy(() =>
-  import('@/pages/marketing/quiz/QuizCampaignViewerPage')
-);
+// WO-O4O-MAIN-SITE-UNIQUE-VIEWER-MIGRATION-AND-PREVIEW-LINK-CLOSURE-V1
+//   `/lms/bundle/:bundleId` · `/marketing/product/:id` · `/marketing/quiz/:id` 3개 viewer 를 제거했다.
+//   backend `@o4o/lms-marketing` 은 Phase R7 에서 삭제됐고 entity 등록도 해제돼
+//   `/api/v1/lms/marketing/*` · `/api/v1/lms/bundles` 는 프로덕션에서 404 다.
+//   외부 진입 소비처도 0 이라 DEAD_FEATURE 로 판정해 이전 대신 제거했다.
 
 // Member Portal
 // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
@@ -113,15 +106,6 @@ export function AppRouter() {
                       </RequireAuth>
                     }
                   />
-                  {/* LMS ContentBundle Viewer */}
-                  <Route path="/lms/bundle/:bundleId" element={<BundleViewerPage />} />
-
-                  {/* Marketing - Product Content Viewer */}
-                  <Route path="/marketing/product/:id" element={<ProductContentViewerPage />} />
-
-                  {/* Marketing - Quiz Campaign Viewer */}
-                  <Route path="/marketing/quiz/:id" element={<QuizCampaignViewerPage />} />
-
                   {/* Seller Dashboard (관리자/판매원 접근 가능) */}
                   <Route
                     path="/seller/dashboard"
