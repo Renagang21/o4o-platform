@@ -220,7 +220,7 @@ backend 변경 없음 → api-server 전체 검증 미실시 (WO §11 명시). *
 `document.documentElement.scrollWidth - clientWidth = 0` (mobile overflow 0) ·
 `pageerror` 0 (JS exception 0) · 신규 4xx/5xx 응답 0 · dead navigation 0.
 
-smoke 러너: standalone Playwright(`chromium.launch()` · isolated context) 로 desktop/mobile 2 viewport × 8 URL 실행,
+smoke 러너: standalone Playwright(`chromium.launch()` · isolated context) 로 desktop/mobile 2 viewport × 9 URL 실행(FAILURES=0),
 페이지 innerText 와 모든 `<a href>` 를 합쳐 stale 문자열 부재 / canonical 문자열 존재를 동시 판정.
 
 > **smoke 중 추가 발견 · 동일 유형 마감(WO §9)**: KPA `/guide/for/operator` step 02 의
@@ -230,6 +230,11 @@ smoke 러너: standalone Playwright(`chromium.launch()` · isolated context) 로
 > → `/operator/{docs, resources, guide-contents, ai-report}` 로 교정.
 > 묶음 routeLabel 이 검사에서 빠지던 구멍도 함께 막았다 — 계약 테스트에 `expandBraces()` 를 추가해
 > `{a, b}` 형태를 개별 경로로 펼쳐 검증한다. 4 서비스 brace-expanded 미해결 참조 **0건**.
+> 이 교정 배포(`8c2199743`) 후 KPA 4 페이지를 재-smoke 해 `content-hub` 문자열 노출 0 · `/operator/docs` 노출을 확인했다.
+
+**CTA 실제 진입 확인(WO §4)** — K-Cosmetics `/guide/features/signage` 의 CTA `href` 실측값은
+`/store/marketing/signage/playlist` (legacy `/store/signage/playlist` 아님). 클릭 이동 시 비로그인 상태에서는
+`/login` 권한 게이트로 정상 전환되며 404 · 오류 화면 · JS exception 0. (로그인 게이트는 기존 정책 동작.)
 
 ---
 
