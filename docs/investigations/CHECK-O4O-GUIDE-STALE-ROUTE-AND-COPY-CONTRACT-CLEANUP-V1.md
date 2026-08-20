@@ -11,8 +11,8 @@
 ## 1. 집계
 
 ```
-조사 stale/dead 항목: 7
-FIXED_ROUTE: 5
+조사 stale/dead 항목: 8
+FIXED_ROUTE: 6
 FIXED_COPY: 2
 REMOVED_OBSOLETE_GUIDE: 1
 DEFERRED_TO_LANDING: 2
@@ -205,13 +205,31 @@ backend 변경 없음 → api-server 전체 검증 미실시 (WO §11 명시). *
 
 배포 후 desktop + mobile 로 확인한다. 기준: dead navigation 0 / white screen 0 / JS exception 0 / 신규 404 · 500 0 / mobile overflow 0.
 
-| 대상 | 확인 항목 | 결과 |
+| 대상 (desktop 1440×900 · mobile 390×844) | 확인 항목 | 결과 |
 |---|---|---|
-| GlycoPharm `/guide/features` | `B2C 가격 설정` CTA 제거 · 오류 화면 0 | (배포 후 기록) |
-| GlycoPharm `/guide/usage` | `소매가 설정` 문구 → `채널 노출 활성화` · `/store/:pharmacyId/tablet` 표기 | (배포 후 기록) |
-| K-Cosmetics `/guide/features/signage` | CTA → `/store/marketing/signage/playlist` 진입 | (배포 후 기록) |
-| K-Cosmetics `/guide/usage` | `/store/requests` 표기 제거 · `/store/interest-requests` · `/store/marketing/qr` | (배포 후 기록) |
-| KPA `/guide` role guide | `B2C 판매` 표현 제거 | (배포 후 기록) |
+| GlycoPharm `/guide/features` | `B2C 가격 설정` CTA 제거 · `/store/commerce/products/b2c` · `/tablet/:slug` 노출 0 · `/store/channels` · `/store/:pharmacyId/tablet` 노출 | PASS (desktop · mobile) |
+| GlycoPharm `/guide/usage` | `소매가 설정 및 활성화` 제거 → `채널 노출 활성화` · `/store/:pharmacyId/tablet` 표기 · GP `/store/requests` 유지(실재 route) | PASS (desktop · mobile) |
+| K-Cosmetics `/guide/features/signage` | `/store/signage/playlist` 노출 0 · `/store/marketing/signage/playlist` 노출 | PASS (desktop · mobile) |
+| K-Cosmetics `/guide/features` | legacy `/store/signage/playlist` 노출 0 | PASS (desktop · mobile) |
+| K-Cosmetics `/guide/usage` | `/store/requests` · `/store/qr` 노출 0 · `/store/interest-requests` · `/store/marketing/qr` · `/store/marketing/signage/playlist` 노출 | PASS (desktop · mobile) |
+| KPA `/guide/for/store-owner` | `B2C 판매` 노출 0 | PASS (desktop · mobile) |
+| KPA `/guide/for/operator` | `B2C 판매` · `/operator/content-hub` 노출 0 | PASS (desktop · mobile) |
+| KPA `/guide/features` · `/guide/usage` | `B2C 판매` · `/operator/content-hub` 노출 0 | PASS (desktop · mobile) |
+
+전 대상 공통 측정값: HTTP status 200 · body text 1,200자 이상(white screen 0) ·
+`document.documentElement.scrollWidth - clientWidth = 0` (mobile overflow 0) ·
+`pageerror` 0 (JS exception 0) · 신규 4xx/5xx 응답 0 · dead navigation 0.
+
+smoke 러너: standalone Playwright(`chromium.launch()` · isolated context) 로 desktop/mobile 2 viewport × 8 URL 실행,
+페이지 innerText 와 모든 `<a href>` 를 합쳐 stale 문자열 부재 / canonical 문자열 존재를 동시 판정.
+
+> **smoke 중 추가 발견 · 동일 유형 마감(WO §9)**: KPA `/guide/for/operator` step 02 의
+> `routeLabel: '/operator/{content-hub, resources, guide-contents, ai-report}'` 이 남아 있었다.
+> bare `/operator/content-hub` route 는 존재하지 않고 canonical 은 `/operator/docs` 이다
+> (`OperatorRoutes.tsx:142` `docs` · `:144` `content-hub/:id` 만 존재).
+> → `/operator/{docs, resources, guide-contents, ai-report}` 로 교정.
+> 묶음 routeLabel 이 검사에서 빠지던 구멍도 함께 막았다 — 계약 테스트에 `expandBraces()` 를 추가해
+> `{a, b}` 형태를 개별 경로로 펼쳐 검증한다. 4 서비스 brace-expanded 미해결 참조 **0건**.
 
 ---
 

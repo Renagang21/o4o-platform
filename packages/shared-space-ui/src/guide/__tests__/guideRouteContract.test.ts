@@ -113,8 +113,21 @@ function stripComments(text: string): string {
   return text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 }
 
+/**
+ * `/operator/{docs, resources}` 형태의 묶음 routeLabel 을 개별 경로로 펼친다.
+ * 펼치지 않으면 묶음 안의 stale segment 가 검사에서 빠진다.
+ */
+function expandBraces(text: string): string {
+  return text.replace(/(\/[a-z][a-zA-Z0-9/_:-]*)\{([^}]*)\}/g, (_m, base: string, inner: string) =>
+    inner
+      .split(',')
+      .map((part) => `${base}${part.trim()}`)
+      .join(' '),
+  );
+}
+
 function guideRefs(text: string): string[] {
-  const found = text.match(/\/[a-z][a-zA-Z0-9/_:-]*/g) ?? [];
+  const found = expandBraces(text).match(/\/[a-z][a-zA-Z0-9/_:-]*/g) ?? [];
   return [...new Set(found.map((r) => r.replace(/\/$/, '')))].filter((r) => r.length > 1 && !IGNORE.test(r));
 }
 

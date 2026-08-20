@@ -1799,7 +1799,7 @@ export const kpaGuideForOperatorProps: GuideUsagePageProps = {
     {
       step: '02',
       title: '콘텐츠·자료 구성과 게시',
-      routeLabel: '/operator/{content-hub, resources, guide-contents, ai-report}',
+      routeLabel: '/operator/{docs, resources, guide-contents, ai-report}',
       description:
         '운영자가 직접 콘텐츠를 작성하거나 자료실을 정리해서 매장 HUB 로 게시합니다. AI 리포트로 운영 데이터를 참고합니다.',
       items: [
