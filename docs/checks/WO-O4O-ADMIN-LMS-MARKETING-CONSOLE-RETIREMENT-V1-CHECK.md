@@ -195,7 +195,53 @@ src/routes/lms-marketing.routes.tsx  — lazy import 6 · route 6 제거 + 근�
 
 ## 11. Production 검증 (§11)
 
-> 배포 후 채워 넣는다.
+배포: `deploy-admin.yml` run `32338393671` (`c3c075164`) **success**, `version.json` = `2026.08.20-0611`.
+
+### 11-1. 배포 산출물 직접 검증 (deployed bundle)
+
+`https://admin.neture.co.kr` 의 실제 배포 chunk 를 내려받아 문자열을 대조했다.
+
+| 대상 | `admin/marketing` | `lms/marketing` |
+|---|:--:|:--:|
+| `assets/index-DBcsKlwM.js` (entry, route table 포함) | **0** | **0** |
+| vendor chunk 5종 | 0 | 0 |
+
+대조군 — **같은 entry chunk 안에 형제 ACTIVE route 는 그대로 존재**한다:
+
+| 문자열 | 히트 |
+|---|:--:|
+| `admin/digital-signage` | 2 |
+| `store-content` | 3 |
+| `admin/lms-instructor` | 1 |
+| `store/tablet/settings` | 1 |
+| **`admin/marketing`** | **0** |
+
+→ marketing route 만 사라지고 **공용 route bundle 의 나머지 route 는 깨지지 않았다.**
+lazy chunk 도 서버·로컬 `dist/assets` 양쪽에 `Marketing*`/`Publisher*`/`Onboarding*`/`Automation*` 파일이 **0건**이다.
+
+### 11-2. HTTP 확인
+
+| 항목 | 결과 |
+|---|---|
+| `https://admin.neture.co.kr/` | 200 |
+| `/admin/marketing/publisher` · `/admin/marketing/onboarding` | 200 (SPA fallback `index.html`). route 테이블에 항목이 없으므로 **클라이언트에서 NotFound 로 처리**된다. SPA 특성상 서버 404 는 나오지 않는다 |
+
+### 11-3. 신규 ERROR / 5xx
+
+| 항목 | 결과 |
+|---|---|
+| LB 5xx (20분) | **0** |
+| Cloud Run `severity>=ERROR` (25분) | 13건 — **전부 이번 변경과 무관** |
+
+13건 내역: `/api/v1/admin/cafe24/callback` 3건(502/503, `Python-urllib`·`curl` — 같은 워크스테이션에서 진행 중인 **다른 세션의 Cafe24 OAuth 작업**, 미커밋 WIP `apps/api-server/src/modules/cafe24/**` 와 대응) · `/api/signage/*/schedules/calendar`·`/not-a-uuid`·`/media/library` 10건(`userAgent: node` — **다른 세션의 signage smoke**, 방금 머지된 `829989f02` 관련).
+admin-dashboard 는 정적 SPA 라 이 경로들을 호출하지 않는다. **이번 변경에서 비롯된 신규 ERROR 0.**
+
+### 11-4. 수행하지 못한 항목 (숨기지 않음)
+
+**실브라우저 로그인 smoke 를 수행하지 못했다.** Playwright 가 쓰는 Chrome 영속 프로필이 **다른 세션의 브라우저에 의해 점유**돼 launch 가 실패했다.
+직전 WO 에서 정한 임시 프로세스 안전 규칙(자기 PID 만 종료 · 프로세스명 기준 전체 종료 금지)에 따라 **점유 중인 브라우저를 강제 종료하지 않았다.**
+
+대신 §11-1 의 **배포 산출물 직접 검증**으로 대체했다. 이 방법은 "route 가 실제로 사라졌는가 / 형제 route 가 살아 있는가" 를 배포된 코드 자체에서 확인한다. 다만 **로그인 후 화면 렌더링과 console error 0 은 직접 관측하지 못했다.** 변경 범위가 route 6건 제거 + 자기 완결 파일 삭제이고 공용 layout·guard 를 건드리지 않았으며 build·tsc·route test 가 모두 PASS 이므로 판정에는 영향이 없다고 본다.
 
 ---
 
