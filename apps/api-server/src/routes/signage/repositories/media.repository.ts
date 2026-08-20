@@ -183,8 +183,13 @@ export class SignageMediaRepository {
     platform: SignageMedia[];
     organization: SignageMedia[];
   }> {
+    // WO-O4O-SIGNAGE-MEDIA-LIBRARY-ROUTE-SHADOWING-AND-GUARD-CONTRACT-V1
+    // `qb.where()` 는 TypeORM 에서 기존 WHERE 를 **전부 덮어쓴다**.
+    // 이전 구현은 여기서 `where()` 를 호출해 앞서 건 serviceKey / organizationId
+    // 경계 필터를 지워버렸다 (CLAUDE.md §7 Guard Rule 3 위반 · 전 tenant 노출).
+    // 공통 조건은 반드시 `andWhere()` 로만 덧붙인다.
     const baseQuery = (qb: any) => {
-      qb.where('media.deletedAt IS NULL');
+      qb.andWhere('media.deletedAt IS NULL');
       qb.andWhere('media.status = :status', { status: 'active' });
       if (mediaType) {
         qb.andWhere('media.mediaType = :mediaType', { mediaType });

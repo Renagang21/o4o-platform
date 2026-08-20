@@ -93,6 +93,16 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // POST /api/signage/:serviceKey/media - Create media (store-owned)
   router.post('/media', requireSignageStore, mediaCtrl.createMedia);
 
+  // ========== Media Library Routes ==========
+  // GET /api/signage/:serviceKey/media/library - Get media library (platform + org)
+  //
+  // WO-O4O-SIGNAGE-MEDIA-LIBRARY-ROUTE-SHADOWING-AND-GUARD-CONTRACT-V1
+  // NOTE: static path MUST stay registered before '/media/:id',
+  // otherwise Express matches it as :id='library' (route shadowing).
+  // Guard 는 형제 media route 와 동일한 requireSignageOperatorOrStore 다
+  // (shadowing 상태의 실제 production 계약과 동일 — 권한 완화 없음).
+  router.get('/media/library', requireSignageOperatorOrStore, mediaCtrl.getMediaLibrary);
+
   // GET /api/signage/:serviceKey/media/:id - Get media by ID
   router.get('/media/:id', requireSignageOperatorOrStore, mediaCtrl.getMedia);
 
@@ -192,10 +202,6 @@ export function createSignageRoutes(dataSource: DataSource): Router {
 
   // DELETE /api/signage/:serviceKey/layout-presets/:id - Delete layout preset (Operator only)
   router.delete('/layout-presets/:id', requireSignageOperator, contentCtrl.deleteLayoutPreset);
-
-  // ========== Media Library Routes ==========
-  // GET /api/signage/:serviceKey/media/library - Get media library (platform + org + supplier)
-  router.get('/media/library', allowSignageStoreRead, mediaCtrl.getMediaLibrary);
 
   // ========== Upload Routes (Store can upload to their library) ==========
   // POST /api/signage/:serviceKey/upload/presigned - Get presigned upload URL
