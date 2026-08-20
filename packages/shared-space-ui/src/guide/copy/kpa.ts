@@ -1730,7 +1730,7 @@ export const kpaGuideForStoreOwnerProps: GuideUsagePageProps = {
       title: '상품 마스터와 주문',
       routeLabel: '/store/commerce/*',
       description:
-        '취급 상품 정보를 정리하고 B2B 발주 · B2C 판매를 한 곳에서 관리합니다.',
+        '취급 상품 정보를 정리하고 B2B 발주 · 매장 진열을 한 곳에서 관리합니다.',
       items: [
         { label: '상품 마스터', detail: '/store/my-products — 취급 상품 정보·가격·재고' },
         { label: 'B2B 발주', detail: '/store/commerce/products — 공급자 카탈로그 조회·주문' },
@@ -1803,7 +1803,7 @@ export const kpaGuideForOperatorProps: GuideUsagePageProps = {
       description:
         '운영자가 직접 콘텐츠를 작성하거나 자료실을 정리해서 매장 HUB 로 게시합니다. AI 리포트로 운영 데이터를 참고합니다.',
       items: [
-        { label: '콘텐츠 작성·HUB 게시', detail: '/operator/content-hub — RichTextEditor 기반 항목별 게시' },
+        { label: '콘텐츠 작성·HUB 게시', detail: '/operator/docs — RichTextEditor 기반 항목별 게시' },
         { label: '자료실 관리', detail: '/operator/resources — 자료 등록·분류·배포' },
         { label: '가이드 콘텐츠 편집', detail: '/operator/guide-contents — 사용자 가이드 inline 편집' },
         { label: 'AI 리포트 조회', detail: '/operator/ai-report — 운영 데이터 분석' },

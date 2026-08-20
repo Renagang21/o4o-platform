@@ -325,7 +325,7 @@ export const glycopharmGuideUsageProps: GuideUsagePageProps = {
       title: '상품 확보',
       routeLabel: '/store/commerce/products',
       description:
-        '플랫폼 B2B 카탈로그에서 취급할 상품을 선택해 내 매장에 추가합니다. 승인 후 소매가를 설정하고 노출을 활성화하면 판매 준비가 완료됩니다.',
+        '플랫폼 B2B 카탈로그에서 취급할 상품을 선택해 내 매장에 추가합니다. 승인 후 채널 진열에서 노출을 활성화하면 판매 준비가 완료됩니다.',
       items: [
         {
           label: 'B2B 카탈로그 탐색',
@@ -336,8 +336,8 @@ export const glycopharmGuideUsageProps: GuideUsagePageProps = {
           detail: '상품 옆 + 버튼으로 신청합니다. 승인 전까지는 대기(pending) 상태로 표시됩니다.',
         },
         {
-          label: '소매가 설정 및 활성화',
-          detail: 'B2C 탭(/store/commerce/products/b2c)에서 소매가를 입력하고 노출 토글을 켭니다.',
+          label: '채널 노출 활성화',
+          detail: '채널 진열(/store/channels)에서 노출할 채널을 고르고 진열을 활성화합니다.',
         },
       ],
     },
@@ -386,7 +386,7 @@ export const glycopharmGuideUsageProps: GuideUsagePageProps = {
     {
       step: '04',
       title: '고객 요청',
-      routeLabel: '/tablet/:slug (고객 화면)',
+      routeLabel: '/store/:pharmacyId/tablet (고객 화면)',
       description:
         '고객이 태블릿 키오스크에서 관심 상품을 선택하고 상담을 요청합니다. 인증 없이 접근 가능하며, 요청 후 처리 상태를 실시간으로 확인합니다.',
       items: [
@@ -523,7 +523,6 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
       items: [
         { label: '운영 홈', route: '/store' },
         { label: '상품 구성', route: '/store/commerce/products' },
-        { label: 'B2C 가격 설정', route: '/store/commerce/products/b2c' },
         { label: '채널 진열', route: '/store/channels' },
         { label: '고객 요청 관리', route: '/store/requests' },
         { label: '주문 관리', route: '/store/commerce/orders' },
@@ -547,7 +546,7 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
       description: 'QR 코드로 고객을 유입하고 태블릿 키오스크로 상담 요청을 연결합니다.',
       items: [
         { label: 'QR 코드 관리', route: '/store/marketing/qr' },
-        { label: '태블릿 키오스크', route: '/tablet/:slug' },
+        { label: '태블릿 키오스크', route: '/store/:pharmacyId/tablet' },
         { label: '마케팅 분석', route: '/store/analytics/marketing' },
       ],
       linkTo: '/store/marketing/qr',

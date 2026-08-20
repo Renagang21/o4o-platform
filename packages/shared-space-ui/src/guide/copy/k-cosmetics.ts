@@ -11,7 +11,7 @@
  *   /lms              ✅  EducationPage
  *   /library/content  ✅  ContentLibraryPage  (NOT /content)
  *   /resources        ✅  ResourcesPage
- *   /store/signage/playlist ✅  StoreSignagePage (WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1)
+ *   /store/marketing/signage/playlist ✅  StoreSignagePage (WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1)
  */
 
 import type {
@@ -372,7 +372,7 @@ export const kCosmeticsGuideUsageProps: GuideUsagePageProps = {
     {
       step: '03',
       title: '고객 유입',
-      routeLabel: '/store/qr',
+      routeLabel: '/store/marketing/qr',
       description:
         'QR 코드를 생성해 고객이 매장 페이지로 바로 진입하도록 유도합니다.',
       items: [
@@ -393,7 +393,7 @@ export const kCosmeticsGuideUsageProps: GuideUsagePageProps = {
     {
       step: '04',
       title: '고객 대응',
-      routeLabel: '/store/requests',
+      routeLabel: '/store/interest-requests',
       description:
         '직원 화면에서 고객 요청을 실시간으로 확인하고 상태를 처리합니다.',
       items: [
@@ -435,7 +435,7 @@ export const kCosmeticsGuideUsageProps: GuideUsagePageProps = {
     {
       step: '06',
       title: '사이니지 운영',
-      routeLabel: '/store/signage/playlist',
+      routeLabel: '/store/marketing/signage/playlist',
       description:
         '매장 디스플레이에 재생할 콘텐츠를 플레이리스트로 구성합니다.',
       items: [
@@ -514,7 +514,7 @@ export const kCosmeticsGuideFeaturesProps: GuideFeaturesPageProps = {
     {
       step: '05',
       title: '디지털 사이니지',
-      primaryRoute: '/store/signage/playlist',
+      primaryRoute: '/store/marketing/signage/playlist',
       description: '매장 디스플레이에 재생할 콘텐츠를 플레이리스트로 구성합니다.',
       items: [
         { label: '디지털 사이니지 이용 방법', route: '/guide/features/signage' },
@@ -843,7 +843,7 @@ export const kCosmeticsGuideFeatureSignageProps: GuideFeatureManualPageProps = {
     eyebrow: '기능별 이용 방법',
     title: '디지털 사이니지 이용 방법',
     description: '영상 콘텐츠, 플레이리스트, 매장 TV 노출',
-    primaryAction: { label: '플레이리스트 관리로 이동 →', to: '/store/signage/playlist' },
+    primaryAction: { label: '플레이리스트 관리로 이동 →', to: '/store/marketing/signage/playlist' },
     flowBarTitle: '이용 흐름',
     flowLabels: ['사이니지 이동', '콘텐츠 준비', '플레이리스트 구성', '매장 적용', '운영 기준'],
   },
@@ -851,10 +851,10 @@ export const kCosmeticsGuideFeatureSignageProps: GuideFeatureManualPageProps = {
     {
       step: '01',
       title: '사이니지 이동',
-      routeLabel: '/store/signage/playlist',
+      routeLabel: '/store/marketing/signage/playlist',
       description: '플레이리스트 관리 화면으로 진입해 사이니지 운영을 시작합니다.',
       items: [
-        { label: '플레이리스트 진입', detail: '/store/signage/playlist 로 이동합니다.' },
+        { label: '플레이리스트 진입', detail: '/store/marketing/signage/playlist 로 이동합니다.' },
         { label: '플레이리스트 목록', detail: '매장에 등록된 플레이리스트와 상태를 확인합니다.' },
         { label: '사이니지 관리 화면', detail: '플레이리스트별 콘텐츠 구성을 관리합니다.' },
       ],
