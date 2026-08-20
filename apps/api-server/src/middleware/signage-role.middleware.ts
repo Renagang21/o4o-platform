@@ -16,6 +16,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { hasPlatformRole, logLegacyRoleUsage } from '../utils/role.utils.js';
 import { AppDataSource } from '../database/connection.js';
+import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
+import {
+  STORE_SERVICE_ORG_LINKAGE,
+  isOrganizationLinkedToService,
+  type StoreOwnerServiceKey,
+} from '../utils/store-organization.resolver.js';
 
 // Extend Express Request interface
 declare module 'express' {
@@ -108,6 +114,50 @@ export function hasSignageOperatorPermission(user: any, serviceKey: string): boo
   }
 
   return false;
+}
+
+/**
+ * Signage URL 의 `:serviceKey` → 매장 조직 귀속 판정용 서비스 키
+ *
+ * WO-O4O-SIGNAGE-CROSS-SERVICE-ORGANIZATION-SCOPE-GUARD-V1
+ *
+ * 변환은 `@o4o/security-core` 의 canonical SSOT 만 사용한다
+ * ('kpa-society' → 'kpa', 'k-cosmetics' → 'cosmetics', 나머지 self-map).
+ * 로컬 mapping 상수를 새로 만들지 않는다.
+ *
+ * 귀속 계약(`STORE_SERVICE_ORG_LINKAGE`)에 없는 serviceKey
+ * (pharmacy / tourism / common / neture / test)는 "이 조직이 그 서비스 매장인가"를
+ * 판정할 SSOT 가 없다. 추정으로 차단하지 않고 **기존 동작을 유지**한다 (null 반환).
+ */
+export function toStoreOwnerServiceKey(signageServiceKey: string | undefined): StoreOwnerServiceKey | null {
+  if (!signageServiceKey) return null;
+  const prefix = resolveRolePrefixFromCanonicalServiceKey(signageServiceKey);
+  return Object.prototype.hasOwnProperty.call(STORE_SERVICE_ORG_LINKAGE, prefix)
+    ? (prefix as StoreOwnerServiceKey)
+    : null;
+}
+
+/**
+ * store 스코프 요청에서 organization 이 요청 서비스에 귀속되는지 확인한다.
+ *
+ * 소유 검사(`organization_members`)만으로는 **타 서비스 매장 조직 id 가 통과**한다
+ * (본 WO 재현: KPA signage 에 K-Cosmetics 매장 org → 200). 소유 + 서비스 귀속을
+ * 모두 만족할 때만 통과시킨다.
+ *
+ * - 귀속 SSOT 가 없는 serviceKey → 검사하지 않음(기존 동작 유지)
+ * - DB 오류 → fail-closed (기존 소유 검사 fallback 과 동일 정책)
+ */
+async function isSignageOrganizationInService(
+  serviceKey: string | undefined,
+  organizationId: string,
+): Promise<boolean> {
+  const storeKey = toStoreOwnerServiceKey(serviceKey);
+  if (!storeKey) return true;
+  try {
+    return await isOrganizationLinkedToService(AppDataSource, organizationId, storeKey);
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -300,6 +350,21 @@ export const requireSignageStore = async (
     }
   }
 
+  // WO-O4O-SIGNAGE-CROSS-SERVICE-ORGANIZATION-SCOPE-GUARD-V1
+  // 소유 검사만으로는 **타 서비스 매장 organization id** 가 통과한다.
+  // 소유 + 요청 서비스 귀속을 모두 만족해야 한다 (platform admin 은 기존대로 우회).
+  if (
+    !hasSignageAdminPermission(req.user) &&
+    !(await isSignageOrganizationInService(serviceKey, organizationId))
+  ) {
+    return res.status(403).json({
+      success: false,
+      error: 'Forbidden',
+      code: 'SIGNAGE_STORE_REQUIRED',
+      message: 'You do not have access to this store',
+    });
+  }
+
   // Set context
   req.signageContext = {
     role: 'store',
@@ -423,6 +488,16 @@ export const requireSignageOperatorOrStore = async (
         );
         hasAccess = rows && rows.length > 0;
       } catch { /* fall through */ }
+    }
+    // WO-O4O-SIGNAGE-CROSS-SERVICE-ORGANIZATION-SCOPE-GUARD-V1
+    // store branch 에만 적용한다. operator branch 는 위에서 이미 return 했으므로
+    // organization scope 없이 접근하는 operator 계약은 영향을 받지 않는다.
+    if (
+      hasAccess &&
+      !hasSignageAdminPermission(req.user) &&
+      !(await isSignageOrganizationInService(serviceKey, organizationId))
+    ) {
+      hasAccess = false;
     }
     if (hasAccess) {
       req.signageContext = {

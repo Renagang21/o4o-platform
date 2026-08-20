@@ -79,6 +79,45 @@ export const STORE_SERVICE_ORG_LINKAGE: Readonly<
   'pharmacy-hub': { enrollmentCodes: ['pharmacy-hub'], slugKeys: ['pharmacy-hub'] },
 });
 
+/**
+ * 이 organization 이 해당 서비스의 매장인가?
+ *
+ * WO-O4O-SIGNAGE-CROSS-SERVICE-ORGANIZATION-SCOPE-GUARD-V1
+ *
+ * `findStoreOrganizationCandidates()` 는 "이 **사용자**의 이 서비스 매장" 을 찾는다.
+ * 반면 Signage 처럼 **클라이언트가 organization 을 지정**하는 축에서는
+ * "소유 여부" 와 "그 조직이 요청 서비스 소속인가" 를 따로 판정해야 한다.
+ * 귀속 판정 근거는 위 두 계약(enrollment / store slug)으로 **동일**하다 —
+ * 새 테이블·새 mapping 을 만들지 않는다.
+ *
+ * 한 organization 이 복수 서비스에 정상 귀속될 수 있으므로(합법 구조),
+ * "요청 서비스에 귀속 기록이 존재하는가" 만 본다. 다른 서비스 귀속은 배제 사유가 아니다.
+ */
+export async function isOrganizationLinkedToService(
+  dataSource: DataSource,
+  organizationId: string,
+  serviceKey: StoreOwnerServiceKey,
+): Promise<boolean> {
+  const linkage = STORE_SERVICE_ORG_LINKAGE[serviceKey];
+  const rows = await dataSource.query(
+    `SELECT 1
+       WHERE EXISTS (
+               SELECT 1 FROM organization_service_enrollments e
+                WHERE e.organization_id = $1
+                  AND e.service_code = ANY($2::text[])
+                  AND e.status = 'active'
+             )
+          OR EXISTS (
+               SELECT 1 FROM platform_store_slugs s
+                WHERE s.store_id = $1
+                  AND s.service_key = ANY($3::text[])
+                  AND s.is_active = true
+             )`,
+    [organizationId, linkage.enrollmentCodes, linkage.slugKeys],
+  );
+  return Array.isArray(rows) && rows.length > 0;
+}
+
 export interface StoreOrganizationCandidate {
   organizationId: string;
   memberRole: string;
