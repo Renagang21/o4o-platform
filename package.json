@@ -21,8 +21,8 @@
   "scripts": {
     "// === 개발 스크립트 ===": "",
     "// WO-O4O-TYPES-AUTO-BUILD-GUARD-V1: dev 시작 전 build:types 강제로 stale dist 방지": "",
-    "dev": "pnpm run build:types && concurrently \"pnpm run dev:web\" \"pnpm run dev:admin\"",
-    "dev:web": "pnpm run build:types && pnpm --filter=@o4o/main-site run dev",
+    "// WO-O4O-RETIRED-MAIN-SITE-LMS-MARKETING-RESIDUE-FINAL-CLEANUP-V1: main-site 는 RETIRED_RUNTIME 이고 `@o4o/main-site` 필터는 실제 패키지명(@o4o/main-site-nextgen)과 달라 아무 것도 매칭하지 않는 no-op 이었다. dev:web 제거.": "",
+    "dev": "pnpm run dev:admin",
     "dev:admin": "pnpm run build:types && pnpm --filter=@o4o/admin-dashboard run dev",
     "dev:api": "pnpm run build:types && cd apps/api-server && pnpm run dev",
     "start:api": "cd apps/api-server && pnpm run start",

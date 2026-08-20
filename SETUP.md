@@ -131,8 +131,7 @@ Listening on 127.0.0.1:5442
 pnpm run build:packages   # 최초 1회 또는 packages/ 수정 시
 pnpm run dev:admin        # Admin Dashboard  → http://localhost:5173
 pnpm run dev:api          # API 서버         → http://localhost:3001
-pnpm run dev:web          # Main Site
-pnpm run dev              # web + admin 동시
+pnpm run dev              # Admin Dashboard (= dev:admin)
 ```
 
 API 상태 확인: `curl http://localhost:3001/health`
