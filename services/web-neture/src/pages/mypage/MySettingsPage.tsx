@@ -13,12 +13,26 @@ import { toast } from '@o4o/error-handling';
 import { useAuth } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
 import { api } from '../../lib/apiClient';
-import { MyPageLayout, MyPageAuthRequired, AccountSecuritySettings } from '@o4o/account-ui';
+import { MyPageLayout, MyPageAuthRequired, MyPageLoadingState, AccountSecuritySettings } from '@o4o/account-ui';
 import { getNetureMyPageNavItems } from './navItems';
 
 export default function MySettingsPage() {
-  const { user, isAuthenticated, logoutAll } = useAuth();
+  const { user, isAuthenticated, isLoading, logoutAll } = useAuth();
   const { openLoginModal } = useLoginModal();
+
+  /**
+   * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1:
+   *   /mypage/* 에는 route guard 가 없어 auth bootstrap 중에도 미인증 분기가 먼저 렌더됐다.
+   *   그 결과 로그인한 사용자에게 "로그인이 필요합니다" 가 수 초간 노출됐다.
+   *   로딩은 미인증 분기보다 먼저, Shell 안에서 렌더한다.
+   */
+  if (isLoading) {
+    return (
+      <MyPageLayout title="설정" width="form" navItems={getNetureMyPageNavItems([])}>
+        <MyPageLoadingState message="계정 정보를 불러오는 중..." />
+      </MyPageLayout>
+    );
+  }
 
   // WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1:
   // 로그인 안내도 Shell 안에서 렌더한다 (헤더·네비게이션 유실 금지).

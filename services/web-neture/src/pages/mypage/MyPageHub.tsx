@@ -22,6 +22,7 @@ import {
   QuickActionsSection,
   RoleBadgeGroup,
   MyPageAuthRequired,
+  MyPageLoadingState,
   MyPageUserSummary,
   MyPageEntryCardGrid,
   MyPageActivityFeed,
@@ -32,9 +33,23 @@ import { SUPPLIER_ONLY_ROLES } from '../../lib/role-constants';
 import { getNetureMyPageNavItems } from './navItems';
 
 export default function MyPageHub() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
+
+  /**
+   * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1:
+   *   /mypage/* 에는 route guard 가 없어 auth bootstrap 중에도 미인증 분기가 먼저 렌더됐다.
+   *   그 결과 로그인한 사용자에게 "로그인이 필요합니다" 가 수 초간 노출됐다.
+   *   로딩은 미인증 분기보다 먼저, Shell 안에서 렌더한다.
+   */
+  if (isLoading) {
+    return (
+      <MyPageLayout title="마이페이지" width="wide" navItems={getNetureMyPageNavItems([])}>
+        <MyPageLoadingState message="마이페이지를 불러오는 중..." />
+      </MyPageLayout>
+    );
+  }
 
   // WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1:
   // 손으로 만든 로그인 안내를 공통 컴포넌트로 수렴하고, 안내 화면에서도 헤더를 유지한다.

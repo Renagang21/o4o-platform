@@ -10,15 +10,29 @@
  */
 
 import { User } from 'lucide-react';
-import { MyPageLayout, MyPageAuthRequired } from '@o4o/account-ui';
+import { MyPageLayout, MyPageAuthRequired, MyPageLoadingState } from '@o4o/account-ui';
 import SupplierProfilePage from '../supplier/SupplierProfilePage';
 import { useAuth } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
 import { getNetureMyPageNavItems } from './navItems';
 
 export default function MyBusinessProfilePage() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const { openLoginModal } = useLoginModal();
+
+  /**
+   * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1:
+   *   /mypage/* 에는 route guard 가 없어 auth bootstrap 중에도 미인증 분기가 먼저 렌더됐다.
+   *   그 결과 로그인한 사용자에게 "로그인이 필요합니다" 가 수 초간 노출됐다.
+   *   로딩은 미인증 분기보다 먼저, Shell 안에서 렌더한다.
+   */
+  if (isLoading) {
+    return (
+      <MyPageLayout title="사업자 정보" width="form" navItems={getNetureMyPageNavItems([])}>
+        <MyPageLoadingState message="사업자 정보를 불러오는 중..." />
+      </MyPageLayout>
+    );
+  }
 
   /**
    * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1:
