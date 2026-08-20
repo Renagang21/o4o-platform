@@ -2,7 +2,8 @@
 
 - **WO**: [`WO-O4O-CROSS-SERVICE-MYPAGE-HELP-SUPPORT-COMMONIZATION-V1`](../work-orders/WO-O4O-CROSS-SERVICE-MYPAGE-HELP-SUPPORT-COMMONIZATION-V1.md)
 - **작성일**: 2026-08-20
-- **판정**: **CLOSED_WITH_FOLLOWUPS** (§32 FINAL CLOSED 조건 미충족 — 아래 §21 참조)
+- **판정**: **FINAL CLOSED** (2026-08-20 `WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1` §19-A / §29 로 정합화. 작성 시점 판정은 `CLOSED_WITH_FOLLOWUPS` 였다 — 전환 근거는 §21 참조)
+- **판정의 의미**: "사용자 self-read 문의 기능까지 구현 완료" 가 **아니다**. **현행 공통화 대상은 모두 수렴했고, self-read 문의는 별도 신규 기능**이라는 뜻이다. §20 followup F1~F10 은 그대로 유효하다.
 - **코드 변경**: **0건** (§21 "없는 기능을 만들지 않는다" 원칙에 따른 정상 결과)
 
 ---
@@ -336,6 +337,33 @@ adoption 대상 공통 자산이 생성되지 않았으므로 5서비스 모두 
 ```text
 MYPAGE HELP/SUPPORT TRACK = CLOSED_WITH_FOLLOWUPS
 ```
+
+### (추가 2026-08-20) 상태 전환 — CLOSED_WITH_FOLLOWUPS → FINAL CLOSED
+
+위 §21 본문은 **작성 시점(2026-08-20, 기준 commit `a9af02ae7`)의 판단 기록으로 그대로 보존한다.**
+이후 `WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1` §19 가 이 상태를 A/B 로 확정하도록 요구했고,
+FINAL AUDIT 이 **현재 main 코드에서 직접 재확인**한 결과는 다음과 같다.
+
+| §19-A 조건 | 재확인 결과 (현재 main) |
+|---|---|
+| My Page 에 사용자 "내 문의" 기능을 제공한다는 확정된 제품 계약 없음 | 충족 — 5서비스 nav 정의 5개 · entry card grid 4개 어디에도 Help/Support 항목 0. `@o4o/account-ui` 에 Help/Support 전용 component 0 |
+| 기능 부재가 서비스 간 UI 공통화 결함이 아님 | 충족 — `VIEW_DUPLICATED = 0` · `CORE_ONLY = 0`. 수렴할 중복 UI 자체가 존재한 적 없음 |
+| dead entry 없음 | 충족 — My Page 축 Help/Support 진입점 0 → 죽은 진입점도 0 |
+
+FINAL AUDIT WO §28 의 분기선(`기능이 아직 없음 = NOT_IMPLEMENTED (blocker 아님)` vs
+`노출된 기능이 backend 단절로 죽어 있음 = MUST_FIX`)에 비추면,
+(B) 의 전제인 **"이미 사용자에게 노출된 진입점"이 존재하지 않는다.**
+
+→ **§19-A 확정**: `NOT_IMPLEMENTED / 별도 신규 기능`. My Page 전체 FINAL CLOSE 를 막지 않는다.
+→ §29 에 따라 트랙 상태만 정합화한다. **history·followup 은 삭제하지 않는다** (§20 F1~F10 전량 유지).
+
+```text
+MYPAGE HELP/SUPPORT TRACK = FINAL CLOSED
+  (= 현행 공통화 대상 전량 수렴 완료
+     ≠ 사용자 self-read 문의 기능 구현 완료)
+```
+
+정합화 근거 문서: [`CHECK-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1.md`](CHECK-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1.md) §17 · §26
 
 ---
 
