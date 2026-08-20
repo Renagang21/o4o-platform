@@ -20,7 +20,6 @@
 | `deploy-api.yml` | `o4o-core-api` (+ 마이그레이션 Job) |
 | `deploy-web-services.yml` | 서비스별 웹 5종 (변경 감지 후 선별 배포) |
 | `deploy-admin.yml` | `o4o-admin-dashboard` |
-| `deploy-main-site.yml` | `o4o-main-site` |
 
 ## 자동화
 

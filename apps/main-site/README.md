@@ -1,5 +1,11 @@
 # O4O Platform - NextGen Frontend
 
+> **상태: RETIRED_RUNTIME (2026-08-20)**
+> Cloud Run `o4o-main-site` 와 `deploy-main-site.yml` 은 폐기됐다.
+> 이 source 는 참고·재사용 자산으로만 남으며 **배포 대상이 아니다.**
+> 근거: [WO-O4O-MAIN-SITE-DECOMMISSION-FINAL-CLOSURE-V1-CHECK](../../docs/checks/WO-O4O-MAIN-SITE-DECOMMISSION-FINAL-CLOSURE-V1-CHECK.md)
+> (`ci-pipeline.yml` 의 build 검증에는 계속 포함돼 컴파일 가능 상태를 유지한다.)
+
 Complete rewrite of the O4O Platform frontend using View-based architecture.
 
 ## Architecture

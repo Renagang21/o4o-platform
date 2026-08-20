@@ -110,7 +110,6 @@ GCP Cloud Run으로 배포하며, GitHub Actions가 `main` 기준으로 자동 �
 | `deploy-api.yml` | `o4o-core-api` |
 | `deploy-web-services.yml` | 서비스별 웹 |
 | `deploy-admin.yml` | 관리자 대시보드 |
-| `deploy-main-site.yml` | 메인 사이트 |
 
 DB 마이그레이션은 `main` 배포 시 CI/CD에서 자동 실행됩니다.
 

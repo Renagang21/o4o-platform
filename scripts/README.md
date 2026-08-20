@@ -16,7 +16,6 @@
 |--------|--------|------|---------------|
 | `o4o-core-api` | api.neture.co.kr | API 서버 | `deploy-api.yml` |
 | `o4o-admin-dashboard` | admin.neture.co.kr | Admin Dashboard | `deploy-admin.yml` |
-| `o4o-main-site` | (도메인 미연결) | Legacy 통합 앱 — LB/DNS 소비처 0 · run.app 직접 접근만 가능 (WO-O4O-MAIN-SITE-RUNTIME-CONTRACT-AUDIT-AND-DECOMMISSION-DECISION-V1) | `deploy-main-site.yml` |
 | `neture-web` | neture.co.kr | 네처 서비스 웹 | `deploy-web-services.yml` |
 | `k-cosmetics-web` | k-cosmetics.site | K-화장품 | `deploy-web-services.yml` |
 | `kpa-society-web` | kpa-society.co.kr | 약사회 SaaS | `deploy-web-services.yml` |
@@ -29,7 +28,6 @@
 .github/workflows/
 ├── deploy-api.yml            # o4o-core-api 배포
 ├── deploy-admin.yml          # o4o-admin-dashboard 배포
-├── deploy-main-site.yml      # o4o-main-site 배포
 ├── deploy-web-services.yml   # 서비스별 웹 5종 배포 (변경 감지 후 선별 배포)
 ├── ci-pipeline.yml           # type-check · lint(ratchet) · test · build 검증 (대부분 blocking)
 ├── ci-appstore-guard.yml     # App Store 패키지 가드
