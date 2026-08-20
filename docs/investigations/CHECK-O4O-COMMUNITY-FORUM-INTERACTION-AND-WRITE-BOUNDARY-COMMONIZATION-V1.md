@@ -344,4 +344,22 @@ VIEW_DUPLICATION_FIXED: 0     (재조사 시점 잔여 0)
 
 
 
+### 12-9. Production 배포 · Browser Smoke (§18, 재조사분)
+
+- commit `3b06ad03d` → `Deploy API Server (Cloud Run)` run `32316171958` **success**
+- headless chromium · 비로그인 · **mutation 0** · desktop(1440×900) + mobile(390×844)
+
+| 화면 | D | M | JS error | API 4xx/5xx |
+|---|:--:|:--:|:--:|:--:|
+| KPA `/forum/all` | 정상 (총 3건) | 정상 | 0 | 0 |
+| KPA `/forum/post/{id}` (댓글 2건 게시글) | 정상 (좋아요 버튼 노출) | 정상 | 0 | 0 |
+| Neture `/forum` | 정상 | 정상 | 0 | 0 |
+| Pharmacy-Hub `/forum` | 로그인 안내 게이트 정상 | 정상 | 0 | 0 |
+
+- white screen 0 · JS exception 0 · 신규 404·500 0
+- cross-service 데이터 혼입 0 (KPA 목록 3건 전부 kpa-society, Neture/PH 목록에 미노출)
+- 비로그인 상태에서 **댓글 작성 폼 · 수정/삭제 · pin 컨트롤 노출 0** (unauthorized control 노출 없음)
+- production 에 대한 mutation(댓글 작성/삭제/좋아요 토글) 시도 0건. cross-service 거부는 negative test + read API 404 관측으로 증명한다.
+
+
 **이 CHECK 는 Forum Interaction / Write Boundary 축 기록이며, 커뮤니티 전체 공통화 완료를 의미하지 않는다.**
