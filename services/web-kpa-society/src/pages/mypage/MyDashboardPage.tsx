@@ -33,6 +33,8 @@ import {
   MyPageAppreciationCard,
 } from '@o4o/account-ui';
 import { getServiceMembershipStatus } from '../../lib/membershipGate';
+import { ROLES } from '../../lib/role-constants';
+import { KPA_ROLE_PRIORITY } from '../../config/dashboard';
 import { mypageApi } from '../../api';
 import { appreciationApi, type AppreciationSend } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
@@ -43,13 +45,24 @@ import type { UserActivity } from '../../api/mypage';
  * WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1 §9
  *
  * 역할 라벨 사전·우선순위는 **서비스 소관**(각 서비스 role 체계가 다르다).
- * 해석 규칙만 공통 `resolveRoleLabel` 을 쓴다. 기존 표시 문자열은 그대로 유지한다.
+ * 해석 규칙만 공통 `resolveRoleLabel` 을 쓴다.
+ *
+ * production 검증에서 확인된 결함 교정: 기존 사전 키가 접두사 없는 `admin`/`officer`
+ * 였는데 KPA 실제 role 문자열은 `kpa:admin` / `kpa:operator` 처럼 service-prefixed 다
+ * (`lib/role-constants.ts` 가 SSOT). 그래서 kpa:admin 보유자에게도 '회원' 이 노출됐다.
+ * role 체계 자체는 바꾸지 않고(§11), 사전 키를 canonical 값으로 맞추고 우선순위는
+ * 로그인 redirect 와 같은 `KPA_ROLE_PRIORITY` 를 재사용한다. legacy 무접두 키는 남긴다.
  */
 const KPA_ROLE_LABELS: Record<string, string> = {
+  [ROLES.PLATFORM_SUPER_ADMIN]: '최고 관리자',
+  [ROLES.KPA_ADMIN]: '관리자',
+  [ROLES.KPA_OPERATOR]: '운영자',
+  [ROLES.KPA_STORE_OWNER]: '약국 경영자',
+  // legacy(무접두) 데이터 호환 — 표시 문자열은 종전과 동일하다.
   admin: '관리자',
   officer: '임원',
 };
-const KPA_ROLE_PRIORITY = ['admin', 'officer'] as const;
+const KPA_MYPAGE_ROLE_PRIORITY = [...KPA_ROLE_PRIORITY, 'admin', 'officer'] as const;
 
 interface DashboardSummary {
   enrolledCourses: number;
@@ -195,7 +208,7 @@ export function MyDashboardPage() {
                     /* 역할 라벨 해석은 5 서비스 공통 규칙(우선순위 기반) — 배열 순서에 의존하지 않는다. */
                     label: resolveRoleLabel(user.roles, {
                       labels: KPA_ROLE_LABELS,
-                      priority: KPA_ROLE_PRIORITY,
+                      priority: KPA_MYPAGE_ROLE_PRIORITY,
                       fallback: '회원',
                     }),
                     tone: 'primary',
