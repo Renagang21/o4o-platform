@@ -1,8 +1,13 @@
 # CHECK-O4O-CROSS-SERVICE-MYPAGE-NOTIFICATIONS-COMMONIZATION-V1
 
 > WO: `docs/work-orders/WO-O4O-CROSS-SERVICE-MYPAGE-NOTIFICATIONS-COMMONIZATION-V1.md`
-> 판정: **CLOSED_WITH_FOLLOWUPS** (MUST_FIX_BEFORE_CLOSE 1건 = 타 트랙 소관 · §21 참조)
+> 판정: **FINAL CLOSED** (2026-08-20 전환 · MUST_FIX_BEFORE_CLOSE = 0)
 > 작성일: 2026-08-20
+>
+> **[상태 전환 — 2026-08-20]** 최초 판정은 `CLOSED_WITH_FOLLOWUPS` (MUST_FIX 1건 = §21 M-1) 였다.
+> `WO-O4O-NOTIFICATION-TARGET-LEGACY-ROW-REMEDIATION-AND-FINAL-CLOSURE-V1` 이 M-1 을 해소하여
+> **`MYPAGE NOTIFICATIONS TRACK = FINAL CLOSED`** 로 전환한다.
+> 근거: [`CHECK-O4O-NOTIFICATION-TARGET-LEGACY-ROW-REMEDIATION-AND-FINAL-CLOSURE-V1`](CHECK-O4O-NOTIFICATION-TARGET-LEGACY-ROW-REMEDIATION-AND-FINAL-CLOSURE-V1.md)
 
 ---
 
@@ -298,6 +303,13 @@ PH 에 하단 nav 를 새로 만들지 않았다 — 셸/레이아웃 트랙 소
 - 필요 조치: cross-app deep link 계약(절대 URL 허용 여부 또는 web-neture 측 대응 화면)을 정하는 **별도 WO**.
 
 따라서 본 WO 는 `FINAL CLOSED` 가 아니라 **CLOSED_WITH_FOLLOWUPS** 로 마감한다.
+
+> **[해소 기록 — 2026-08-20]** M-1 은 `WO-O4O-NOTIFICATION-TARGET-LEGACY-ROW-REMEDIATION-AND-FINAL-CLOSURE-V1`
+> 에서 해소됐다. 프로덕션 legacy row 2건의 `metadata.targetUrl` 을 `/admin/o4o-product-db/store-requests` →
+> **`/operator/product-candidates`** 로 교정했고(트랜잭션 · 15 row 중 2건), 프로덕션 브라우저에서
+> 알림 클릭 → `/operator/product-candidates` 도달(404 없음)을 실측했다.
+> 이로써 `MUST_FIX_BEFORE_CLOSE = 0` 이 되어 본 문서 상단 판정을 **FINAL CLOSED** 로 전환했다.
+> 상세: [`CHECK-O4O-NOTIFICATION-TARGET-LEGACY-ROW-REMEDIATION-AND-FINAL-CLOSURE-V1`](CHECK-O4O-NOTIFICATION-TARGET-LEGACY-ROW-REMEDIATION-AND-FINAL-CLOSURE-V1.md)
 
 ---
 
