@@ -36,7 +36,9 @@ export function loadCafe24OAuthConfig(): Cafe24OAuthConfig | null {
     clientId,
     clientSecret,
     redirectUri,
-    apiVersion: process.env.CAFE24_API_VERSION || '2024-06-01',
+    // 등록된 Cafe24 앱의 기본 버전. 앱에 없는 버전을 보내면 모든 Admin API 가 400 이다
+    // ("... version you requested is not available"). 실측 기준값 = 2026-03-01.
+    apiVersion: process.env.CAFE24_API_VERSION || '2026-03-01',
     scopes,
   };
 }

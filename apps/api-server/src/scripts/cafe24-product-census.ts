@@ -25,13 +25,33 @@
 import 'reflect-metadata';
 import * as fs from 'fs';
 import * as path from 'path';
-import { AppDataSource } from '../database/connection.js';
+import { DataSource } from 'typeorm';
 import { Cafe24ConnectionService } from '../modules/cafe24/services/cafe24-connection.service.js';
+import { Cafe24Connection } from '../modules/cafe24/entities/Cafe24Connection.entity.js';
 import { loadCafe24OAuthConfig } from '../modules/cafe24/cafe24-oauth.client.js';
 import { fetchProductCount, fetchProductPage } from '../modules/cafe24/cafe24-admin-api.client.js';
 import type { Cafe24ProductRow } from '../modules/cafe24/cafe24-admin-api.client.js';
 import { normalizeName } from '../modules/neture/services/bulk-match.service.js';
 import { normalizeIdentifier } from '../modules/neture/utils/product-identifier.util.js';
+
+/**
+ * 이 러너 전용 DataSource.
+ * 앱의 AppDataSource 는 전체 entity 를 로드해 tsx 실행 시 ColumnTypeUndefinedError 로 죽는다.
+ * census 에 실제로 필요한 entity 는 Cafe24Connection 하나뿐이고, 나머지 조회는 raw SQL 이다.
+ * (encryption-key-rotation.ts 와 동일한 패턴)
+ */
+const AppDataSource = new DataSource({
+  type: 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: Number(process.env.DB_PORT || 5432),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  entities: [Cafe24Connection],
+  synchronize: false,
+  migrationsRun: false,
+  logging: false,
+});
 
 type MatchStatus = 'EXACT' | 'AMBIGUOUS' | 'SIMILAR' | 'NOT_FOUND';
 type MatchMethod =
