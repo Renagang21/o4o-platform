@@ -175,7 +175,56 @@ PharmacyHub 전용 Guide framework 는 만들지 않는다.
 
 ## 9. §11 Production browser smoke
 
-> 배포 후 기록 (후속 커밋).
+- 대상: `https://pharmacyhub.co.kr` (deploy run `32344976426` / headSha `39901c13101e92ec39d45b0d2af98f96cdf10d7d` — `deploy-pharmacy-hub: success`)
+- 도구: Playwright chromium · desktop 1280×900 / mobile 390×844
+- 판정 기준: status 200 · 본문 길이 ≥ 80 (white screen) · pageerror/console.error 0 · 수평 overflow ≤ 1px · 최종 URL 일치(`/guide` 만 `/guide/intro` 수렴)
+
+### 9-1. 17 route × 2 viewport = 34 case — 전수 PASS
+
+| route | desktop h1 | mobile h1 | status | ovf | JS err |
+|---|---|---|---|:---:|:---:|
+| `/service-guide` | 약국 경영을 위한 O4O 서비스 안내 | 동일 | 200 | 0 | 0 |
+| `/guide` → `/guide/intro` | O4O 개요 | 동일 | 200 | 0 | 0 |
+| `/guide/intro` | O4O 개요 | 동일 | 200 | 0 | 0 |
+| `/guide/intro/structure` | O4O 기본 구조 | 동일 | 200 | 0 | 0 |
+| `/guide/intro/kpa` | PharmacyHub 위치 | 동일 | 200 | 0 | 0 |
+| `/guide/intro/operation` | 운영 구조 | 동일 | 200 | 0 | 0 |
+| `/guide/intro/concept` | 핵심 개념 | 동일 | 200 | 0 | 0 |
+| `/guide/usage` | 서비스 활용 방법 | 동일 | 200 | 0 | 0 |
+| `/guide/features` | 기능별 이용 방법 | 동일 | 200 | 0 | 0 |
+| `/guide/features/forum` | 커뮤니티 이용 방법 | 동일 | 200 | 0 | 0 |
+| `/guide/features/supply-order` | 공급 상품 주문 방법 | 동일 | 200 | 0 | 0 |
+| `/guide/features/store-products` | 매장 제품 관리 방법 | 동일 | 200 | 0 | 0 |
+| `/guide/features/content` | 콘텐츠 · 자료함 이용 방법 | 동일 | 200 | 0 | 0 |
+| `/guide/features/qr` | QR 이용 방법 | 동일 | 200 | 0 | 0 |
+| `/guide/features/pop` | POP 이용 방법 | 동일 | 200 | 0 | 0 |
+| `/guide/features/signage` | 디지털 사이니지 이용 방법 | 동일 | 200 | 0 | 0 |
+| `/guide/features/tablet` | 태블릿 이용 방법 | 동일 | 200 | 0 | 0 |
+| `/guide/features/manuals` | 상품 설명서 이용 방법 | 동일 | 200 | 0 | 0 |
+
+`/guide` 는 desktop · mobile 모두 최종 URL 이 `/guide/intro` 로 1회 수렴했고, `/guide/intro` 는 자기 자신으로 머무르므로 **redirect loop 0**.
+
+### 9-2. dead link — Guide 화면이 노출하는 내부 링크 31개 전수 PASS
+
+`/` · `/community` · `/community/search` · `/education` · `/forum` · `/forum/my-posts` · `/guide/features` · `/guide/intro` · `/guide/intro/{structure, kpa, operation, concept}` · `/guide/usage` · `/join` · `/join/status` · `/privacy` · `/service-guide` · `/terms` · `/store-owner/{blog, cart, content, handled-products, library, local-products, manuals, orders, pop, products, qr, signage, tablets}`
+
+전부 status 200 · "페이지를 찾을 수 없음" 문구 0. (`/store-owner/*` 는 미로그인 상태에서 로그인 안내 화면을 렌더하며 404/500 이 아니다.)
+
+### 9-3. §11 상호 링크 — 실 `<a href>` 기준
+
+| 방향 | 실측 href | 결과 |
+|---|---|:---:|
+| `/service-guide` → `/guide/intro` | `/guide/intro` | PASS |
+| `/service-guide` → `/guide/usage` | `/guide/usage` | PASS |
+| `/service-guide` → `/guide/features` | `/guide/features` | PASS |
+| `/guide/intro` → `/service-guide` | `/service-guide` | PASS |
+
+### 9-4. 집계
+
+```text
+dead link 0 / 404·500 0 / white screen 0 / JS exception 0 / mobile overflow 0 / redirect loop 0
+FAIL 총계 0 (34 route case + 31 link case + 4 상호링크 = 69 case)
+```
 
 ---
 
@@ -210,4 +259,6 @@ dead entry 해소: 3 (O4OHelpSection 준비중 카드)
 기존 4서비스 회귀: 0
 tests: 40 passed
 build: 5/5 PASS
+production smoke: 69/69 PASS (desktop+mobile)
+dead link 0 / 404·500 0 / white screen 0 / JS exception 0 / mobile overflow 0 / redirect loop 0
 ```
