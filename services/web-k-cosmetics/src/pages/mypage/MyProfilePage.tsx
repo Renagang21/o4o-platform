@@ -10,7 +10,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { useAuth, ROLE_LABELS } from '@/contexts/AuthContext';
+import { useAuth, ROLE_LABELS, KCOSMETICS_ROLE_PRIORITY } from '@/contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import { api } from '@/lib/apiClient';
 import { User, Mail, Phone, Shield } from 'lucide-react';
@@ -18,6 +18,7 @@ import {
   MyPageLayout,
   MyPageAuthRequired,
   AccountProfileSection,
+  resolveRoleLabel,
   type AccountProfileFieldSpec,
 } from '@o4o/account-ui';
 import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
@@ -38,7 +39,17 @@ export default function MyProfilePage() {
     );
   }
 
-  const roleLabel = ROLE_LABELS[user.roles[0]];
+  /**
+   * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1:
+   *   `ROLE_LABELS[user.roles[0]]` 은 backend 가 돌려주는 배열 순서에 의존해
+   *   라벨이 비는 결함이 있었다(프로덕션에서 역할 `-` 로 표시).
+   *   MyPageHub 가 이미 쓰는 공통 해석기·우선순위와 축을 맞춘다.
+   */
+  const roleLabel = resolveRoleLabel(user.roles, {
+    labels: ROLE_LABELS,
+    priority: KCOSMETICS_ROLE_PRIORITY,
+    fallback: '사용자',
+  });
 
   const fields: AccountProfileFieldSpec[] = [
     { key: 'name', label: '이름', icon: <User className="w-5 h-5 text-gray-400" /> },

@@ -117,7 +117,22 @@ export function MyQualificationsPage() {
     }
   };
 
-  if (loading) return <div style={styles.loading}>불러오는 중...</div>;
+  /**
+   * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1:
+   *   로딩 상태만 MyPageLayout 밖에서 렌더돼 이 화면에서만 My Page 골격(제목·탭·breadcrumb)이
+   *   잠깐 사라졌다. 로딩도 Shell 안에서 렌더한다.
+   */
+  if (loading) {
+    return (
+      <MyPageLayout
+        title="내 자격"
+        breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지', href: '/mypage' }, { label: '내 자격' }]}
+        width="list"
+      >
+        <div style={styles.loading}>불러오는 중...</div>
+      </MyPageLayout>
+    );
+  }
 
   return (
     <MyPageLayout

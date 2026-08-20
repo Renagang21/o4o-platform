@@ -85,7 +85,12 @@ export default function MyPageHub() {
               <RoleBadgeGroup
                 badges={[
                   { key: 'role', label: roleLabel, tone: 'primary', variant: 'solid' },
-                  ...(isSupplier
+                  /**
+                   * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1:
+                   *   공급자 계정은 roleLabel 자체가 '공급자' 라 같은 배지가 두 번 찍혔다.
+                   *   보조 배지는 roleLabel 이 '공급자' 가 아닐 때만 덧붙인다.
+                   */
+                  ...(isSupplier && roleLabel !== '공급자'
                     ? [{ key: 'supplier', label: '공급자', tone: 'slate' as const, variant: 'soft' as const }]
                     : []),
                 ]}
