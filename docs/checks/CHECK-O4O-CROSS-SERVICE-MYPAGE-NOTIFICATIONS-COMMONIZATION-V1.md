@@ -231,6 +231,13 @@ PH 에 하단 nav 를 새로 만들지 않았다 — 셸/레이아웃 트랙 소
 | Pharmacy-Hub | 1440 | `/account` 헤더 액션 벨 → `알림이 없습니다.` (알림 0건 · 정상 empty) |
 | Pharmacy-Hub | 390 | 가시 벨 1개(`/account` 본문) → 모바일 진입 확보 |
 
+**PH 후속 재검증** (배포 run `32323030818` = `858c0c043` 반영 후 실측, 계정 `sohae2100@gmail.com`):
+
+| 폭 | `aria-label="알림"` DOM | 가시 | 가시 위치 | 비고 |
+|---|:--:|:--:|---|---|
+| 1440x900 | 2 | 1 | `header` (본문 벨 width 0) | 데스크톱 이중 벨 해소 확인 |
+| 390x844 | 2 | 1 | `main` = `/account` (헤더 벨 width 0) | 클릭 → dialog `알림 / 알림이 없습니다.` · scrollWidth 375 = clientWidth 375 (가로 overflow 0) |
+
 §25 통과 판정:
 
 | 항목 | 결과 |
