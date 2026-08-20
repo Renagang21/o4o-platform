@@ -27,11 +27,18 @@ import {
   MyPageUserSummary,
   MyPageEntryCardGrid,
   MyPageAppreciationCard,
+  buildMembershipViewModel,
 } from '@o4o/account-ui';
-import type { RoleBadgeTone } from '@o4o/account-ui';
 import { appreciationApi, type AppreciationSend } from '@/api/appreciation';
 import { GLYCOPHARM_MYPAGE_NAV_ITEMS } from './navItems';
+import { SERVICE_KEY, getServiceMembershipStatus } from '@/lib/membershipGate';
 
+/**
+ * WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1 §9
+ *
+ * 역할 라벨 사전·우선순위는 서비스 소관. 해석 규칙(우선순위 기반)과 상태 표현은
+ * 공통 계층(`buildMembershipViewModel`)을 쓴다.
+ */
 const roleLabels: Record<string, string> = {
   admin: '관리자',
   operator: '운영자',
@@ -42,13 +49,15 @@ const roleLabels: Record<string, string> = {
   consumer: '소비자',
 };
 
-const statusLabels: Record<string, { label: string; tone: RoleBadgeTone }> = {
-  pending: { label: '승인 대기', tone: 'amber' },
-  approved: { label: '승인됨', tone: 'emerald' },
-  active: { label: '승인됨', tone: 'emerald' },
-  rejected: { label: '거부됨', tone: 'rose' },
-  suspended: { label: '정지됨', tone: 'slate' },
-};
+const GLYCOPHARM_ROLE_PRIORITY = [
+  'admin',
+  'operator',
+  'pharmacy',
+  'pharmacist',
+  'supplier',
+  'partner',
+  'consumer',
+] as const;
 
 export default function MyPageHub() {
   const { user, logout } = useAuth();
@@ -92,9 +101,23 @@ export default function MyPageHub() {
     );
   }
 
-  const status = statusLabels[user.status] || statusLabels.pending;
+  /**
+   * 상태 축 교정 (WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1):
+   * 기존에는 Identity 축인 `users.status` 를 서비스 가입 상태로 표시해
+   * (AuthContext 기본값 'approved') 실제 승인 상태와 어긋났다.
+   * canonical 축인 `service_memberships.status` 로 정렬한다.
+   */
+  const membership = buildMembershipViewModel({
+    status: getServiceMembershipStatus(user),
+    roles: user.roles,
+    roleLabels,
+    rolePriority: GLYCOPHARM_ROLE_PRIORITY,
+    roleFallback: user.roles[0] ?? '회원',
+  });
   const displayName = (user.lastName && user.firstName) ? `${user.lastName}${user.firstName}` : user.name;
-  const roleLabel = roleLabels[user.memberships?.find(m => m.serviceKey === 'glycopharm')?.role || ''] || roleLabels[user.roles[0]] || user.roles[0];
+  // 이 서비스 membership 이 보유한 역할이 있으면 그것을 대표 라벨로 우선한다.
+  const membershipRole = user.memberships?.find(m => m.serviceKey === SERVICE_KEY)?.role;
+  const roleLabel = (membershipRole ? roleLabels[membershipRole] : undefined) ?? membership.roleLabel;
   const initial = user.lastName?.charAt(0) || user.name?.charAt(0) || '?';
 
   return (
@@ -115,9 +138,12 @@ export default function MyPageHub() {
             <RoleBadgeGroup
               badges={[
                 { key: 'role', label: roleLabel, tone: 'primary', variant: 'solid' },
-                ...(status.label
-                  ? [{ key: 'status', label: status.label, tone: status.tone, variant: 'soft' as const }]
-                  : []),
+                {
+                  key: 'status',
+                  label: membership.statusLabel,
+                  tone: membership.statusTone,
+                  variant: 'soft' as const,
+                },
               ]}
               size="md"
             />
@@ -126,7 +152,7 @@ export default function MyPageHub() {
             { key: 'email', icon: <Mail className="w-4 h-4 text-gray-400" />, label: '이메일', value: user.email },
             { key: 'phone', icon: <Phone className="w-4 h-4 text-gray-400" />, label: '연락처', value: user.phone || '-' },
             { key: 'role', icon: <Building2 className="w-4 h-4 text-gray-400" />, label: '역할', value: roleLabel },
-            { key: 'status', icon: <Shield className="w-4 h-4 text-gray-400" />, label: '상태', value: status.label },
+            { key: 'status', icon: <Shield className="w-4 h-4 text-gray-400" />, label: '상태', value: membership.statusLabel },
           ]}
         />
       }

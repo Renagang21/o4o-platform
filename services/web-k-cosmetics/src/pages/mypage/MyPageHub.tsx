@@ -6,18 +6,25 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
+import {
+  useAuth,
+  ROLE_LABELS,
+  KCOSMETICS_ROLE_PRIORITY,
+  getKCosmeticsDashboardRoute,
+} from '@/contexts/AuthContext';
 import { Mail, Phone, Shield, BookOpen, Award, Coins, ClipboardList } from 'lucide-react';
 import {
   MyPageLayout,
   QuickActionsSection,
-  RoleBadge,
+  RoleBadgeGroup,
   MyPageAuthRequired,
   MyPageUserSummary,
   MyPageEntryCardGrid,
   MyPageAppreciationCard,
+  buildMembershipViewModel,
 } from '@o4o/account-ui';
 import { KCOS_MYPAGE_NAV_ITEMS } from './navItems';
+import { getServiceMembershipStatus } from '@/lib/membershipGate';
 import { appreciationApi, type AppreciationSend } from '@/api/appreciation';
 
 export default function MyPageHub() {
@@ -64,7 +71,22 @@ export default function MyPageHub() {
   }
 
   const dashboardPath = getKCosmeticsDashboardRoute(user.roles);
-  const roleLabel = ROLE_LABELS[user.roles[0]];
+  /**
+   * WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1 §9
+   *
+   * 결함 교정: `ROLE_LABELS[user.roles[0]]` 은 backend 가 돌려주는 배열 순서에
+   * 의존해 복수 역할 사용자에게 역할 라벨이 흔들렸다. 대시보드 라우팅과 같은
+   * 우선순위(KCOSMETICS_ROLE_PRIORITY)를 공통 해석기에 넘겨 축을 맞춘다.
+   * 서비스 가입 상태(service_memberships.status)도 함께 표시한다.
+   */
+  const membership = buildMembershipViewModel({
+    status: getServiceMembershipStatus(user),
+    roles: user.roles,
+    roleLabels: ROLE_LABELS,
+    rolePriority: KCOSMETICS_ROLE_PRIORITY,
+    roleFallback: '사용자',
+  });
+  const roleLabel = membership.roleLabel;
 
   return (
     <MyPageLayout
@@ -79,11 +101,25 @@ export default function MyPageHub() {
           name={user.name}
           email={user.email}
           actionHref="/mypage/profile"
-          badges={<RoleBadge label={roleLabel ?? '사용자'} tone="primary" variant="solid" size="md" />}
+          badges={
+            <RoleBadgeGroup
+              badges={[
+                { key: 'role', label: roleLabel, tone: 'primary', variant: 'solid' },
+                {
+                  key: 'status',
+                  label: membership.statusLabel,
+                  tone: membership.statusTone,
+                  variant: 'soft',
+                },
+              ]}
+              size="md"
+            />
+          }
           infoRows={[
             { key: 'email', icon: <Mail className="w-4 h-4 text-gray-400" />, label: '이메일', value: user.email },
             { key: 'phone', icon: <Phone className="w-4 h-4 text-gray-400" />, label: '연락처', value: user.phone || '미등록' },
-            { key: 'role', icon: <Shield className="w-4 h-4 text-gray-400" />, label: '역할', value: roleLabel ?? '사용자' },
+            { key: 'role', icon: <Shield className="w-4 h-4 text-gray-400" />, label: '역할', value: roleLabel },
+            { key: 'status', icon: <Shield className="w-4 h-4 text-gray-400" />, label: '상태', value: membership.statusLabel },
           ]}
         />
       }

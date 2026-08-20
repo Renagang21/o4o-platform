@@ -10,8 +10,8 @@
 
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { RequestStatusBadge } from '@o4o/account-ui';
-import type { RequestStatusConfig } from '@o4o/account-ui';
+import { MembershipStatusBadge } from '@o4o/account-ui';
+import type { MembershipStatusConfig } from '@o4o/account-ui';
 import { api } from '../lib/apiClient';
 import { useAuth } from '../contexts/AuthContext';
 import { BRAND, ROLE_LABELS, ROLES, SERVICE_KEY } from '../config/service';
@@ -44,17 +44,14 @@ const STATUS_MESSAGE: Record<string, string> = {
 
 /**
  * WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §9
+ * WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1 §10
  *
- * service_memberships.status enum 은 재설계하지 않는다. 공통 `RequestStatusBadge`
- * 에 tone/label 만 이 서비스 표현으로 넘긴다.
+ * service_memberships.status enum 은 재설계하지 않는다. 상태 표현은 5 서비스 공통
+ * `MembershipStatusBadge`(DEFAULT_MEMBERSHIP_STATUS_CONFIG) 를 쓰고, 이 화면에서만
+ * 다른 표현(가입 신청 화면이므로 '미가입' 대신 '신청 전')만 override 로 남긴다.
  */
-const STATUS_BADGE_OVERRIDES: Record<string, RequestStatusConfig> = {
+const STATUS_BADGE_OVERRIDES: Record<string, MembershipStatusConfig> = {
   none: { label: '신청 전', tone: 'slate' },
-  pending: { label: '승인 대기', tone: 'amber' },
-  active: { label: '승인됨', tone: 'emerald' },
-  rejected: { label: '반려됨', tone: 'rose' },
-  suspended: { label: '이용 정지', tone: 'rose' },
-  withdrawn: { label: '탈퇴', tone: 'slate' },
 };
 
 const ENTRY_PATH: Record<string, string> = {
@@ -130,7 +127,7 @@ export default function JoinStatusPage() {
             <h2 className="text-lg font-semibold">
               {STATUS_TITLE[data?.status ?? 'none'] ?? STATUS_TITLE.none}
             </h2>
-            <RequestStatusBadge
+            <MembershipStatusBadge
               status={data?.status ?? 'none'}
               overrides={STATUS_BADGE_OVERRIDES}
             />

@@ -33,11 +33,14 @@ import {
   AccountSecuritySettings,
   MyPageAuthRequired,
   MyPageLoadingState,
+  MembershipStatusBadge,
   MyPageShell,
   NotificationBell,
+  resolveRoleLabel,
   useNotifications,
   type AccountProfileFieldSpec,
 } from '@o4o/account-ui';
+import { getServiceMembershipStatus } from '../../lib/membershipGate';
 import { PHARMACY_HUB_ACCOUNT_NAV_ITEMS } from './navItems';
 import {
   changeAccountPassword,
@@ -48,7 +51,7 @@ import {
 import { notificationsApi } from '../../lib/api/notifications';
 import { errorMessage, errorStatus } from '../../lib/api/pharmacyHubOrders';
 import { useAuth } from '../../contexts/AuthContext';
-import { ROLE_LABELS, ROLES, SERVICE_KEY } from '../../config/service';
+import { PLATFORM_SUPER_ADMIN, ROLE_LABELS, ROLES, SERVICE_KEY } from '../../config/service';
 
 /** 편집 가능 계정의 필드 구성 (서버 editableFields 와 같은 축: name · nickname · phone) */
 const FIELDS: AccountProfileFieldSpec[] = [
@@ -67,12 +70,27 @@ const FIELDS: AccountProfileFieldSpec[] = [
 /** 조회 전용(수정 계약이 없는 계정) 필드 구성 — 같은 항목을 읽기 전용으로만 보여준다. */
 const READONLY_FIELDS: AccountProfileFieldSpec[] = FIELDS.map((f) => ({ ...f, editable: false }));
 
-/** 보유 역할 중 Pharmacy-Hub 역할 라벨 — 없으면 중립 라벨. */
-function resolveRoleLabel(roles: readonly string[]): string {
-  for (const role of roles) {
-    if (ROLE_LABELS[role]) return ROLE_LABELS[role];
-  }
-  return '회원';
+/**
+ * 보유 역할 중 Pharmacy-Hub 역할 라벨 — 없으면 중립 라벨.
+ *
+ * WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1 §9:
+ * 같은 해석 루프가 5 서비스에 복제돼 있어 공통 `resolveRoleLabel` 로 수렴했다.
+ * 라벨 사전(ROLE_LABELS)·우선순위는 이 서비스 config 소관이다.
+ */
+const PHARMACY_HUB_ROLE_PRIORITY = [
+  PLATFORM_SUPER_ADMIN,
+  ROLES.admin,
+  ROLES.operator,
+  ROLES.supplier,
+  ROLES.storeOwner,
+] as const;
+
+function resolvePharmacyHubRoleLabel(roles: readonly string[]): string {
+  return resolveRoleLabel(roles, {
+    labels: ROLE_LABELS,
+    priority: PHARMACY_HUB_ROLE_PRIORITY,
+    fallback: '회원',
+  });
 }
 
 /**
@@ -229,11 +247,18 @@ export default function MyProfilePage({
 
   return frame(
     <div className="space-y-5">
+      {/* 서비스 가입 상태 — service_memberships.status 축 (5 서비스 공통 표현)
+          WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1 */}
+      <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+        <span>서비스 가입 상태</span>
+        <MembershipStatusBadge status={getServiceMembershipStatus(user)} />
+      </div>
+
       <AccountProfileSection
         initial={(displayName || '?').charAt(0).toUpperCase()}
         name={displayName}
         email={profile.email}
-        roleLabel={roles.length > 0 ? resolveRoleLabel(roles) : ROLE_LABELS[ROLES.storeOwner]}
+        roleLabel={roles.length > 0 ? resolvePharmacyHubRoleLabel(roles) : ROLE_LABELS[ROLES.storeOwner]}
         fields={canEdit ? FIELDS : READONLY_FIELDS}
         values={{
           name: profile.name ?? '',

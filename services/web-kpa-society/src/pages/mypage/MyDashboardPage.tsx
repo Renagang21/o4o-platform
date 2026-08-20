@@ -23,6 +23,8 @@ import { Card } from '../../components/common';
 import { MyPageLayout } from '../../layouts/MyPageLayout';
 import {
   RoleBadgeGroup,
+  MembershipStatusBadge,
+  resolveRoleLabel,
   MyPageLoadingState,
   MyPageEmptyState,
   MyPageUserSummary,
@@ -30,11 +32,24 @@ import {
   MyPageActivityFeed,
   MyPageAppreciationCard,
 } from '@o4o/account-ui';
+import { getServiceMembershipStatus } from '../../lib/membershipGate';
 import { mypageApi } from '../../api';
 import { appreciationApi, type AppreciationSend } from '../../api/appreciation';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { UserActivity } from '../../api/mypage';
+
+/**
+ * WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1 §9
+ *
+ * 역할 라벨 사전·우선순위는 **서비스 소관**(각 서비스 role 체계가 다르다).
+ * 해석 규칙만 공통 `resolveRoleLabel` 을 쓴다. 기존 표시 문자열은 그대로 유지한다.
+ */
+const KPA_ROLE_LABELS: Record<string, string> = {
+  admin: '관리자',
+  officer: '임원',
+};
+const KPA_ROLE_PRIORITY = ['admin', 'officer'] as const;
 
 interface DashboardSummary {
   enrolledCourses: number;
@@ -169,20 +184,29 @@ export function MyDashboardPage() {
           email={user.email}
           actionHref="/mypage/profile"
           badges={
-            <RoleBadgeGroup
-              badges={[
-                ...((user as any).organizationId
-                  ? [{ key: 'org', label: '🏢 소속 분회', tone: 'slate' as const, variant: 'soft' as const }]
-                  : []),
-                {
-                  key: 'role',
-                  label: user.roles.includes('admin') ? '관리자' : user.roles.includes('officer') ? '임원' : '회원',
-                  tone: 'primary',
-                  variant: 'solid',
-                },
-              ]}
-              size="md"
-            />
+            <div className="flex items-center gap-2 flex-wrap">
+              <RoleBadgeGroup
+                badges={[
+                  ...((user as any).organizationId
+                    ? [{ key: 'org', label: '🏢 소속 분회', tone: 'slate' as const, variant: 'soft' as const }]
+                    : []),
+                  {
+                    key: 'role',
+                    /* 역할 라벨 해석은 5 서비스 공통 규칙(우선순위 기반) — 배열 순서에 의존하지 않는다. */
+                    label: resolveRoleLabel(user.roles, {
+                      labels: KPA_ROLE_LABELS,
+                      priority: KPA_ROLE_PRIORITY,
+                      fallback: '회원',
+                    }),
+                    tone: 'primary',
+                    variant: 'solid',
+                  },
+                ]}
+                size="md"
+              />
+              {/* 서비스 가입 상태 — service_memberships.status 축 (users.status 아님) */}
+              <MembershipStatusBadge status={getServiceMembershipStatus(user)} size="md" />
+            </div>
           }
         />
       }

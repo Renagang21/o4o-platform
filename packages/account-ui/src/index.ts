@@ -162,3 +162,39 @@ export { MyCreditsView } from './components/MyCreditsView.js';
 export type { MyCreditsViewProps } from './components/MyCreditsView.js';
 export { MyCertificatesView } from './components/MyCertificatesView.js';
 export type { MyCertificatesViewProps } from './components/MyCertificatesView.js';
+
+// ---------------------------------------------------------------------------
+// Membership / Role Status Core
+// WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1
+//
+// 5 서비스의 가입 상태(service_memberships.status) 표현 · 역할 라벨 해석 ·
+// 상태 안내 화면을 공통화한다.
+//   - 상태/역할 **판정** 은 `@o4o/auth-utils` 와 각 서비스 config 소관 (여기서 하지 않는다)
+//   - 이 계층은 표현(label/tone/문구/마크업) 만 담당한다
+// ---------------------------------------------------------------------------
+export {
+  DEFAULT_MEMBERSHIP_STATUS_CONFIG,
+  DEFAULT_MEMBERSHIP_STATUS_NOTICE,
+  MEMBERSHIP_SERVICE_TOKEN,
+  resolveMembershipStatusConfig,
+  resolveMembershipStatusNotice,
+  resolveRoleLabel,
+  resolveRoleLabels,
+  buildMembershipViewModel,
+} from './adapters/membershipNormalizers.js';
+export type {
+  MembershipStatusConfig,
+  MembershipStatusNoticeContent,
+  ResolveMembershipStatusNoticeOptions,
+  ResolveRoleLabelOptions,
+  MembershipViewModel,
+  MembershipViewModelAction,
+  BuildMembershipViewModelInput,
+} from './adapters/membershipNormalizers.js';
+export { MembershipStatusBadge } from './components/MembershipStatusBadge.js';
+export type { MembershipStatusBadgeProps } from './components/MembershipStatusBadge.js';
+export { MembershipStatusNotice } from './components/MembershipStatusNotice.js';
+export type {
+  MembershipStatusNoticeProps,
+  MembershipStatusNoticeAction,
+} from './components/MembershipStatusNotice.js';

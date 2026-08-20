@@ -6,6 +6,7 @@
  */
 
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { resolveRoleLabel } from '@o4o/account-ui';
 
 // WO-O4O-NETURE-SELLER-LEGACY-CLEANUP-TO-STORE-OWNER-PARTICIPANT-V1:
 // store_owner 가 canonical (Neture 내부 participant type, 권한 role 아님).
@@ -61,13 +62,16 @@ export function getNetureDashboardRoute(roles: string[]): string {
  * `user.roles[0]`만 사용하면 배열 순서가 우선순위와 무관할 수 있어
  * Operator/Admin 사용자에게도 '사용자' 라벨이 노출되는 문제가 있다.
  * NETURE_ROLE_PRIORITY 순서로 매칭하여 ROLE_LABELS에서 라벨을 찾는다.
+ *
+ * WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1 §9:
+ * 같은 우선순위 해석 루프가 5 서비스에 복제돼 있어 공통 `resolveRoleLabel` 로
+ * 수렴했다. 사전(ROLE_LABELS)·우선순위(NETURE_ROLE_PRIORITY)는 Neture 소관으로
+ * 남으며, 반환 문자열은 종전과 동일하다.
  */
 export function getNetureRoleLabel(roles: string[] | undefined | null): string {
-  if (!roles || roles.length === 0) return '사용자';
-  for (const role of NETURE_ROLE_PRIORITY) {
-    if (roles.includes(role)) {
-      return ROLE_LABELS[role] ?? '사용자';
-    }
-  }
-  return '사용자';
+  return resolveRoleLabel(roles, {
+    labels: ROLE_LABELS,
+    priority: NETURE_ROLE_PRIORITY,
+    fallback: '사용자',
+  });
 }

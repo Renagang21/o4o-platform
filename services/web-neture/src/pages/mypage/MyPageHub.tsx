@@ -25,7 +25,9 @@ import {
   MyPageUserSummary,
   MyPageEntryCardGrid,
   MyPageActivityFeed,
+  MembershipStatusBadge,
 } from '@o4o/account-ui';
+import { getServiceMembershipStatus } from '../../lib/membershipGate';
 import { SUPPLIER_ONLY_ROLES } from '../../lib/role-constants';
 import { getNetureMyPageNavItems } from './navItems';
 
@@ -79,15 +81,20 @@ export default function MyPageHub() {
           email={user.email}
           actionHref="/mypage/profile"
           badges={
-            <RoleBadgeGroup
-              badges={[
-                { key: 'role', label: roleLabel, tone: 'primary', variant: 'solid' },
-                ...(isSupplier
-                  ? [{ key: 'supplier', label: '공급자', tone: 'slate' as const, variant: 'soft' as const }]
-                  : []),
-              ]}
-              size="md"
-            />
+            <div className="flex items-center gap-2 flex-wrap">
+              <RoleBadgeGroup
+                badges={[
+                  { key: 'role', label: roleLabel, tone: 'primary', variant: 'solid' },
+                  ...(isSupplier
+                    ? [{ key: 'supplier', label: '공급자', tone: 'slate' as const, variant: 'soft' as const }]
+                    : []),
+                ]}
+                size="md"
+              />
+              {/* 서비스 가입 상태 — service_memberships.status 축
+                  (WO-O4O-CROSS-SERVICE-MYPAGE-MEMBERSHIP-ROLE-STATUS-COMMONIZATION-V1) */}
+              <MembershipStatusBadge status={getServiceMembershipStatus(user)} size="md" />
+            </div>
           }
         />
       }
