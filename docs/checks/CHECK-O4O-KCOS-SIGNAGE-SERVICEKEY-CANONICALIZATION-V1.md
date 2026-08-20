@@ -183,7 +183,40 @@ DB write · migration.
 
 ## 9. Production smoke (§10)
 
-배포 후 기록. (본 CHECK 커밋 시점 = 배포 전)
+배포: `0b7a01ec3` → API `o4o-core-api-03397-qvb` · Web `deploy-k-cosmetics` success.
+
+### 9-1. API 매트릭스 (`api.neture.co.kr`, KCos 매장 계정)
+
+| serviceKey | path | organization | 결과 |
+|---|---|---|---|
+| `k-cosmetics` | `/playlists` · `/media` · `/schedules` | 자기 KCos 매장 org | **200** (수정 전 400) |
+| `cosmetics` (alias) | 동일 3종 | 자기 KCos 매장 org | 200 (수렴) |
+| `k-cosmetics` | `/playlists` | KPA-only org | **403** `SIGNAGE_ACCESS_DENIED` |
+| `k-cosmetics` | `/playlists` | GP-only org | **403** `SIGNAGE_ACCESS_DENIED` |
+| `k-cosmetics` | `/playlists` | 존재하지 않는 org | **403** `SIGNAGE_ACCESS_DENIED` |
+| `cosmetics` (alias) | `/playlists` | KPA-only / GP-only / 없는 org | 403 (동일) |
+| `k-cosmetics` · `cosmetics` | `/public/media` | (헤더 없음) | 200 |
+| `kpa-society` | `/playlists` | KPA 매장 org | 200 (회귀 없음) |
+| `glycopharm` | `/playlists` | GP 매장 org | 200 (회귀 없음) |
+| `bogus-key` | `/playlists` | — | **400** `INVALID_SERVICE_KEY` (유지) |
+| `k-cosmetics` | `/playlists` | 쿠키 없음 | **401** `AUTH_REQUIRED` (유지) |
+
+→ **serviceKey 400 = 0 · cross-service 403 계약 그대로 · 미등록 key 400 유지 · 미인증 401 유지.**
+
+### 9-2. 브라우저 smoke (`k-cosmetics.site`, headless Chromium)
+
+| 화면 | 결과 |
+|---|---|
+| 로그인 → 내 매장(`/store`) | 200, 정상 렌더 |
+| `/store/marketing/signage/playlist` · `/videos` · `/schedules` · `/player` | 정상 렌더 (매장 화면은 `/api/v1/cosmetics/store-playlists` 계열 — 200) |
+| `/operator/signage/content` | `GET /api/signage/k-cosmetics/public/playlists` **200** |
+| `/operator/signage/hq-media` | `GET /api/signage/k-cosmetics/media?source=hq` **200** |
+| `/operator/signage/hq-playlists` | `GET /api/signage/k-cosmetics/playlists?source=hq` **200** |
+| `/operator/signage/templates` | `GET /api/signage/k-cosmetics/templates` **200** |
+| `/operator/signage/forced-content` | `GET /api/signage/k-cosmetics/hq/forced-content` **200** |
+
+**API 4xx/5xx 0건 · JS console error 0건 · white screen 0건.**
+데이터가 없는 목록은 empty state 로 정상 판정했고, 상태 코드·권한 판정은 위 9-1 매트릭스로 별도 검증했다.
 
 ---
 
