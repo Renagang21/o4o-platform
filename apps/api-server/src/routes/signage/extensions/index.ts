@@ -13,6 +13,7 @@ import { extensionRegistry } from './common/index.js';
 import { createPharmacyRouter } from './pharmacy/index.js';
 import { createCosmeticsRouter } from './cosmetics/index.js';
 import { createSellerRouter } from './seller/index.js';
+import { getSignageServiceKey } from '../../../middleware/signage-role.middleware.js';
 
 // ============================================================================
 // EXTENSION ROUTER FACTORY
@@ -59,7 +60,7 @@ export function createExtensionRouters(dataSource: DataSource): Router {
   router.get('/status', (req, res) => {
     const configs = extensionRegistry.getAllConfigs();
     const enabled = extensionRegistry.getEnabledExtensions();
-    const params = req.params as { serviceKey?: string };
+    const serviceKey = getSignageServiceKey(req);
 
     res.json({
       data: {
@@ -67,7 +68,7 @@ export function createExtensionRouters(dataSource: DataSource): Router {
         enabled,
       },
       meta: {
-        serviceKey: params.serviceKey,
+        serviceKey,
         timestamp: new Date().toISOString(),
       },
     });

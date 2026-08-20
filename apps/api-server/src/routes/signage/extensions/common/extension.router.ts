@@ -15,6 +15,7 @@ import type { DataSource } from 'typeorm';
 import type { ExtensionType } from './extension.types.js';
 import { requireExtensionEnabled, createExtensionGuards } from './extension.guards.js';
 import { createCoreAdapter, CoreExtensionAdapter } from './extension.adapter.js';
+import { getSignageServiceKey } from '../../../../middleware/signage-role.middleware.js';
 
 // ============================================================================
 // TYPES
@@ -84,7 +85,7 @@ export function createExtensionRouter(options: ExtensionRouterOptions): Router {
   router.use((req: Request, res: Response, next: NextFunction) => {
     const extReq = req as ExtensionRequest;
     extReq.extensionType = extensionType;
-    extReq.serviceKey = req.params.serviceKey;
+    extReq.serviceKey = getSignageServiceKey(req);
     extReq.organizationId = (req as any).organizationId || (req as any).user?.organizationId;
     extReq.coreAdapter = coreAdapter;
     next();

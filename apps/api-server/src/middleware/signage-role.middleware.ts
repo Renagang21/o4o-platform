@@ -16,7 +16,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { hasPlatformRole, logLegacyRoleUsage } from '../utils/role.utils.js';
 import { AppDataSource } from '../database/connection.js';
-import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
+import {
+  resolveCanonicalServiceKey,
+  resolveRolePrefixFromCanonicalServiceKey,
+} from '@o4o/security-core';
 import {
   STORE_SERVICE_ORG_LINKAGE,
   isOrganizationLinkedToService,
@@ -45,6 +48,34 @@ declare module 'express' {
  * WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
  *   'platform:admin' 분기 제거 (보유자 0 · 독립 권한 0).
  */
+/**
+ * Signage URL 의 `:serviceKey` → **canonical service key**
+ *
+ * WO-O4O-KCOS-SIGNAGE-SERVICEKEY-CANONICALIZATION-V1
+ *
+ * Signage API 의 `:serviceKey` 정본은 `@o4o/security-core` 의 canonical service key
+ * ('kpa-society' · 'k-cosmetics' · 'glycopharm' · 'neture') 다. 역할 prefix
+ * ('kpa' · 'cosmetics') 로 들어온 legacy alias 는 canonical SSOT
+ * (`resolveCanonicalServiceKey`) 를 통해 **하나의 내부 key 로 수렴**시킨다.
+ *
+ * - 서비스별 if/else 나 새로운 mapping 표를 만들지 않는다 (SSOT 는 security-core 하나).
+ * - 역할 prefix 가 필요한 곳은 `resolveRolePrefixFromCanonicalServiceKey` 로 되돌린다.
+ */
+export function canonicalizeSignageServiceKey(raw: string | undefined): string {
+  if (!raw) return '';
+  return resolveCanonicalServiceKey(raw);
+}
+
+/**
+ * 요청에서 canonical signage serviceKey 를 얻는다.
+ *
+ * Signage 의 모든 권한 판정·데이터 scope 는 이 함수 하나만 사용한다
+ * (`req.params.serviceKey` 직접 사용 금지 — alias 가 그대로 데이터 축에 새는 경로다).
+ */
+export function getSignageServiceKey(req: Request): string {
+  return canonicalizeSignageServiceKey(req.params?.serviceKey);
+}
+
 export function hasSignageAdminPermission(user: any): boolean {
   if (!user) return false;
 
@@ -105,7 +136,7 @@ export function hasSignageOperatorPermission(user: any, serviceKey: string): boo
   // e.g. glycopharm:operator, glycopharm:admin → signage:glycopharm access
   // KPA services: kpa-society serviceKey maps to kpa: role prefix
   const userRoles: string[] = user.roles || [];
-  const rolePrefix = serviceKey.startsWith('kpa-') ? 'kpa' : serviceKey;
+  const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(serviceKey);
   if (userRoles.some((r: string) =>
     r === `${serviceKey}:operator` || r === `${serviceKey}:admin` ||
     r === `${rolePrefix}:operator` || r === `${rolePrefix}:admin`
@@ -255,7 +286,7 @@ export const requireSignageOperator = (
     });
   }
 
-  const { serviceKey } = req.params;
+  const serviceKey = getSignageServiceKey(req);
 
   if (!serviceKey) {
     return res.status(400).json({
@@ -308,7 +339,7 @@ export const requireSignageStore = async (
     });
   }
 
-  const { serviceKey } = req.params;
+  const serviceKey = getSignageServiceKey(req);
   // Organization ID can come from header, query, or body
   const organizationId =
     (req.headers['x-organization-id'] as string) ||
@@ -399,7 +430,7 @@ export const allowSignageStoreRead = (
     });
   }
 
-  const { serviceKey } = req.params;
+  const serviceKey = getSignageServiceKey(req);
   const organizationId =
     (req.headers['x-organization-id'] as string) ||
     (req.query.organizationId as string) ||
@@ -461,7 +492,7 @@ export const requireSignageOperatorOrStore = async (
     });
   }
 
-  const { serviceKey } = req.params;
+  const serviceKey = getSignageServiceKey(req);
   const organizationId =
     (req.headers['x-organization-id'] as string) ||
     (req.query.organizationId as string) ||
@@ -552,8 +583,8 @@ export function hasSignageCommunityPermission(user: any, serviceKey: string): bo
   if (userRoles.some((r: string) => r.startsWith(`${serviceKey}:`))) return true;
 
   // KPA prefix mapping: kpa-society → kpa (e.g., kpa:member, kpa:pharmacist)
-  const rolePrefix = serviceKey.startsWith('kpa-') ? 'kpa' : null;
-  if (rolePrefix && userRoles.some((r: string) => r.startsWith(`${rolePrefix}:`))) return true;
+  const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(serviceKey);
+  if (rolePrefix !== serviceKey && userRoles.some((r: string) => r.startsWith(`${rolePrefix}:`))) return true;
 
   return false;
 }
@@ -611,7 +642,7 @@ export const requireSignageCommunity = (
     });
   }
 
-  const { serviceKey } = req.params;
+  const serviceKey = getSignageServiceKey(req);
 
   if (!serviceKey) {
     return res.status(400).json({
@@ -663,7 +694,7 @@ export const requireSignageSupplier = (
     });
   }
 
-  const { serviceKey } = req.params;
+  const serviceKey = getSignageServiceKey(req);
 
   if (!serviceKey) {
     return res.status(400).json({
@@ -703,9 +734,9 @@ export const validateServiceKey = (
   res: Response,
   next: NextFunction
 ) => {
-  const { serviceKey } = req.params;
+  const rawServiceKey = req.params?.serviceKey;
 
-  if (!serviceKey) {
+  if (!rawServiceKey) {
     return res.status(400).json({
       success: false,
       error: 'Bad Request',
@@ -714,15 +745,24 @@ export const validateServiceKey = (
     });
   }
 
+  const canonical = canonicalizeSignageServiceKey(rawServiceKey);
+
   // WO-O4O-SIGNAGE-PLAYBACK-LOG-SECURITY-HARDENING-V1
   // 미등록 serviceKey 차단 — console.warn 후 통과 금지
-  const validServiceKeys = ['pharmacy', 'cosmetics', 'tourism', 'common', 'kpa-society', 'neture', 'glycopharm'];
-  if (!validServiceKeys.includes(serviceKey) && serviceKey !== 'test') {
+  //
+  // WO-O4O-KCOS-SIGNAGE-SERVICEKEY-CANONICALIZATION-V1
+  //   허용 목록은 **canonical service key** 로만 유지한다.
+  //   'cosmetics' / 'kpa' 처럼 역할 prefix 로 들어온 alias 는 여기서 canonical SSOT 로
+  //   수렴된 뒤 판정된다 (둘 다 무조건 허용하는 것이 아니라, 하나의 key 로 정규화된다).
+  //   'pharmacy' / 'tourism' / 'common' 은 canonical 대응이 없는 legacy key 이며
+  //   본 WO 범위 밖이라 기존 동작을 그대로 유지한다.
+  const validServiceKeys = ['pharmacy', 'k-cosmetics', 'tourism', 'common', 'kpa-society', 'neture', 'glycopharm'];
+  if (!validServiceKeys.includes(canonical) && canonical !== 'test') {
     return res.status(400).json({
       success: false,
       error: 'Bad Request',
       code: 'INVALID_SERVICE_KEY',
-      message: `Invalid service key: ${serviceKey}`,
+      message: `Invalid service key: ${rawServiceKey}`,
     });
   }
 

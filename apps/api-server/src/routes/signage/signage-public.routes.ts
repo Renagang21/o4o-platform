@@ -10,7 +10,7 @@
  */
 import { Router, Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
-import { validateServiceKey } from '../../middleware/signage-role.middleware.js';
+import { validateServiceKey, getSignageServiceKey } from '../../middleware/signage-role.middleware.js';
 import { playbackLogLimiter } from '../../config/rate-limiters.config.js';
 
 interface PublicQueryParams {
@@ -40,7 +40,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
    */
   router.get('/media', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const serviceKey = req.params.serviceKey;
+      const serviceKey = getSignageServiceKey(req);
       const { source, limit = '20', page = '1', search } = req.query as PublicQueryParams;
 
       const limitNum = Math.min(parseInt(limit) || 20, 50);
@@ -114,7 +114,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
    */
   router.get('/playlists', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const serviceKey = req.params.serviceKey;
+      const serviceKey = getSignageServiceKey(req);
       const { source, limit = '20', page = '1' } = req.query as PublicQueryParams;
 
       const limitNum = Math.min(parseInt(limit) || 20, 50);
@@ -187,7 +187,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
    */
   router.get('/media/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const serviceKey = req.params.serviceKey;
+      const serviceKey = getSignageServiceKey(req);
       const { id } = req.params;
 
       const media = await dataSource.query(`
@@ -223,7 +223,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
    */
   router.get('/playlists/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const serviceKey = req.params.serviceKey;
+      const serviceKey = getSignageServiceKey(req);
       const { id } = req.params;
 
       const playlists = await dataSource.query(`
@@ -310,7 +310,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
     playbackLogLimiter,
     async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const serviceKey = req.params.serviceKey;
+        const serviceKey = getSignageServiceKey(req);
         const { mediaId, playlistId } = req.body as { mediaId?: string; playlistId?: string };
 
         // 1. mediaId 필수 검증

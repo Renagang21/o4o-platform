@@ -15,6 +15,7 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
+import { getSignageServiceKey } from '../../../middleware/signage-role.middleware.js';
 
 function detectVideoSourceType(url: string): { sourceType: 'youtube' | 'vimeo'; embedId: string } {
   const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
@@ -41,7 +42,7 @@ export class SignageForcedContentController {
    */
   list = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { serviceKey } = req.params;
+      const serviceKey = getSignageServiceKey(req);
 
       const rows = await this.dataSource.query(
         `SELECT
@@ -77,7 +78,7 @@ export class SignageForcedContentController {
    */
   create = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { serviceKey } = req.params;
+      const serviceKey = getSignageServiceKey(req);
       const userId = (req as any).user?.id;
       const { title, videoUrl, thumbnailUrl, startAt, endAt, note } = req.body;
       // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1
@@ -154,7 +155,8 @@ export class SignageForcedContentController {
    */
   update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { serviceKey, id } = req.params;
+      const serviceKey = getSignageServiceKey(req);
+      const { id } = req.params;
       const { title, videoUrl, thumbnailUrl, startAt, endAt, isActive, note } = req.body;
       // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1
       const { targetSurface, tabletDurationSeconds } = req.body as { targetSurface?: string; tabletDurationSeconds?: number };
@@ -263,7 +265,8 @@ export class SignageForcedContentController {
    */
   remove = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { serviceKey, id } = req.params;
+      const serviceKey = getSignageServiceKey(req);
+      const { id } = req.params;
 
       const rows = await this.dataSource.query(
         `UPDATE signage_forced_content

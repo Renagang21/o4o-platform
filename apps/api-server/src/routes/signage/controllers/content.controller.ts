@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
 import { SignageContentService } from '../services/content.service.js';
 import { extractScope, extractUserId } from './signage-helpers.js';
+import { getSignageServiceKey } from '../../../middleware/signage-role.middleware.js';
 import type {
   CreateContentBlockDto,
   UpdateContentBlockDto,
@@ -110,7 +111,7 @@ export class SignageContentController {
 
   getLayoutPreset = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const serviceKey = req.params.serviceKey;
+      const serviceKey = getSignageServiceKey(req);
       const { id } = req.params;
 
       const preset = await this.service.getLayoutPreset(id, serviceKey);
@@ -127,7 +128,7 @@ export class SignageContentController {
 
   getLayoutPresets = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const serviceKey = req.params.serviceKey;
+      const serviceKey = getSignageServiceKey(req);
       const query: LayoutPresetQueryDto = {
         page: parseInt(req.query.page as string) || 1,
         limit: parseInt(req.query.limit as string) || 20,
@@ -147,7 +148,7 @@ export class SignageContentController {
 
   createLayoutPreset = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const serviceKey = req.params.serviceKey;
+      const serviceKey = getSignageServiceKey(req);
       const dto: CreateLayoutPresetDto = req.body;
 
       const preset = await this.service.createLayoutPreset(dto, serviceKey);
