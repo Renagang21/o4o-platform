@@ -16,6 +16,7 @@ import { GuideServiceIntroPage } from '../GuideServiceIntroPage.js';
 import { kpaServiceIntroProps } from '../copy/kpa.js';
 import { kCosmeticsServiceIntroProps } from '../copy/k-cosmetics.js';
 import { glycopharmServiceIntroProps } from '../copy/glycopharm.js';
+import { pharmacyHubServiceIntroProps } from '../copy/pharmacy-hub.js';
 import type { GuideServiceIntroPageProps } from '../types.js';
 
 const ROOT = resolve(__dirname, '../../../../..');
@@ -35,6 +36,8 @@ const SERVICES: [string, GuideServiceIntroPageProps][] = [
   ['KPA', kpaServiceIntroProps],
   ['K-Cosmetics', kCosmeticsServiceIntroProps],
   ['GlycoPharm', glycopharmServiceIntroProps],
+  // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
+  ['PharmacyHub', pharmacyHubServiceIntroProps],
 ];
 
 describe('GuideServiceIntroPage — 렌더 계약', () => {
@@ -146,5 +149,75 @@ describe('Route contract — /service-guide 와 /guide 관계 유지', () => {
       const src = read(`packages/shared-space-ui/src/guide/copy/${f}`);
       expect(src).toContain("serviceGuide: { label: '서비스 소개', to: '/service-guide' }");
     }
+  });
+});
+
+describe('PharmacyHub adoption — WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1', () => {
+  const APP = 'services/web-pharmacy-hub/src/App.tsx';
+
+  it('공통 View 를 route 에 직접 mount 한다 (PharmacyHub 전용 Guide page 파일 0)', () => {
+    const src = read(APP);
+    expect(src).toContain('@o4o/shared-space-ui');
+    for (const v of [
+      'GuideServiceIntroPage',
+      'GuideIntroPage',
+      'GuideUsagePage',
+      'GuideFeaturesPage',
+      'GuideFeatureManualPage',
+    ]) {
+      expect(src).toContain(v);
+    }
+    // 서비스별 View 복제 0 — PharmacyHub 안에 guide 화면 소스가 따로 생기지 않았다.
+    expect(() => read('services/web-pharmacy-hub/src/pages/guide')).toThrow();
+    expect(() => read('services/web-pharmacy-hub/src/pages/ServiceGuidePage.tsx')).toThrow();
+  });
+
+  it('deep-link route 가 모두 등재된다', () => {
+    const src = read(APP);
+    for (const p of [
+      'service-guide',
+      'guide/intro',
+      'guide/intro/structure',
+      'guide/intro/kpa',
+      'guide/intro/operation',
+      'guide/intro/concept',
+      'guide/usage',
+      'guide/features',
+      'guide/features/forum',
+      'guide/features/supply-order',
+      'guide/features/store-products',
+      'guide/features/content',
+      'guide/features/qr',
+      'guide/features/pop',
+      'guide/features/signage',
+      'guide/features/tablet',
+      'guide/features/manuals',
+    ]) {
+      expect(src).toMatch(new RegExp(`path="/?${p}"`));
+    }
+  });
+
+  it('/guide 는 canonical 진입점(/guide/intro) 으로 수렴한다 (redirect loop 0)', () => {
+    const src = read(APP);
+    expect(src).toMatch(/path="\/?guide"\s+element=\{<Navigate to="\/guide\/intro" replace \/>\}/);
+    // /guide/intro 자체는 redirect 가 아니라 실제 페이지여야 loop 가 생기지 않는다.
+    expect(src).toMatch(/path="\/guide\/intro"\s+element=\{<GuideIntroPage/);
+  });
+
+  it('공개 소개 ↔ 기능 매뉴얼 상호 연결이 copy 에 있다', () => {
+    const copy = read('packages/shared-space-ui/src/guide/copy/pharmacy-hub.ts');
+    // /service-guide → /guide/*
+    expect(copy).toContain("to: '/guide/intro'");
+    expect(copy).toContain("to: '/guide/usage'");
+    expect(copy).toContain("to: '/guide/features'");
+    // /guide/intro → /service-guide
+    expect(copy).toContain("serviceGuide: { label: '서비스 소개', to: '/service-guide' }");
+  });
+
+  it('navigation 에 Guide 진입점이 등재된다 (고립 0)', () => {
+    const nav = read('services/web-pharmacy-hub/src/config/navigation.ts');
+    expect(nav).toContain("href: '/service-guide'");
+    expect(nav).toContain("href: '/guide/intro'");
+    expect(nav).toContain("href: '/guide/features'");
   });
 });

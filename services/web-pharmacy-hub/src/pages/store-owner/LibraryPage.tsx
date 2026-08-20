@@ -10,7 +10,9 @@
  * QR·직접작성 소스는 Pharmacy-Hub V1 범위 밖이라 주입하지 않는다(선택 소스 — 미주입 시 빈 배열).
  *
  * 교차 진입 CTA 기본값(`/store/marketing/*`)은 Pharmacy-Hub 에 route 가 없다 →
- * PH route 로 override 한다 (데드링크 0). 가이드 페이지도 없어 guideLink=null.
+ * PH route 로 override 한다 (데드링크 0).
+ * WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1: 공통 Guide 채택으로 `/guide/features/content` 가 생겨
+ * guideLink 를 null 에서 실제 매뉴얼로 되살린다.
  *
  * fetchDerivations: Pharmacy-Hub 에는 원본→사본 파생(store_asset_derivations) 생성 경로가
  * 아직 없다. 공통 `/store/asset-derivations` 는 KPA/GP/KCos mount 전용 가드(requirePharmacyOwner)
@@ -88,7 +90,7 @@ export default function StoreOwnerLibraryPage() {
         onRefresh={load}
         fetchDerivations={fetchDerivations}
         crossCreateLinks={CROSS_LINKS}
-        guideLink={null}
+        guideLink={{ to: '/guide/features/content', label: '콘텐츠·자료함 이용 방법' }}
       />
       <div className="mx-auto max-w-[900px] px-6 pb-8 text-sm">
         <Link to="/store-owner/library/resources" className="text-blue-600 underline">

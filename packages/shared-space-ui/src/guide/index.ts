@@ -159,3 +159,25 @@ export { GuideServiceIntroPage } from './GuideServiceIntroPage.js';
 export { kpaServiceIntroProps } from './copy/kpa.js';
 export { kCosmeticsServiceIntroProps } from './copy/k-cosmetics.js';
 export { glycopharmServiceIntroProps } from './copy/glycopharm.js';
+
+// WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
+//   PharmacyHub 는 공통 Guide View 를 그대로 채택하고 copy/config 만 주입한다.
+export {
+  pharmacyHubServiceIntroProps,
+  pharmacyHubGuideIntroProps,
+  pharmacyHubGuideIntroStructureProps,
+  pharmacyHubGuideIntroKpaProps,
+  pharmacyHubGuideIntroOperationProps,
+  pharmacyHubGuideIntroConceptProps,
+  pharmacyHubGuideUsageProps,
+  pharmacyHubGuideFeaturesProps,
+  pharmacyHubGuideFeatureForumProps,
+  pharmacyHubGuideFeatureSupplyOrderProps,
+  pharmacyHubGuideFeatureStoreProductsProps,
+  pharmacyHubGuideFeatureContentProps,
+  pharmacyHubGuideFeatureQrProps,
+  pharmacyHubGuideFeaturePopProps,
+  pharmacyHubGuideFeatureSignageProps,
+  pharmacyHubGuideFeatureTabletProps,
+  pharmacyHubGuideFeatureManualsProps,
+} from './copy/pharmacy-hub.js';

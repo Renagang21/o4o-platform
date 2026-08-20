@@ -40,6 +40,18 @@ export const PH_PUBLIC_NAV: GlobalHeaderNavItem[] = [
     ],
   },
   { label: '교육', href: '/education' },
+  // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
+  // 공개 서비스 소개(/service-guide) 와 기능 이용 매뉴얼(/guide/*) 진입점.
+  // 두 route 모두 App.tsx 에 실제로 등재돼 있다 (데드링크 0 원칙).
+  {
+    label: '이용 안내',
+    href: '/service-guide',
+    children: [
+      { label: '서비스 소개', href: '/service-guide' },
+      { label: '이용 가이드', href: '/guide/intro' },
+      { label: '기능별 이용 방법', href: '/guide/features' },
+    ],
+  },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
@@ -74,7 +86,8 @@ export const PH_CONTEXTUAL_NAV: PhContextualNavItem[] = [
 /**
  * 공개 푸터 링크 — **실제 route 가 있는 경로만**.
  * WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1 에서 /terms · /privacy route 가
- * 생겼으므로 '약관' 섹션을 추가한다. /contact · /service-guide 는 여전히 route 가 없어 넣지 않는다.
+ * 생겼으므로 '약관' 섹션을 추가한다. /contact 는 여전히 route 가 없어 넣지 않는다.
+ * WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1: /service-guide · /guide 가 등재되어 '이용 안내' 섹션을 추가한다.
  * 법정정보는 하드코딩하지 않고 PublicLegalFooterInfo(API) 가 값이 있을 때만 렌더한다.
  */
 export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }[] = [
@@ -85,6 +98,14 @@ export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }
       { label: '커뮤니티', href: '/community' },
       { label: '포럼', href: '/forum' },
       { label: '교육', href: '/education' },
+    ],
+  },
+  {
+    title: '이용 안내',
+    links: [
+      { label: '서비스 소개', href: '/service-guide' },
+      { label: '이용 가이드', href: '/guide/intro' },
+      { label: '기능별 이용 방법', href: '/guide/features' },
     ],
   },
   {

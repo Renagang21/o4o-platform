@@ -140,7 +140,17 @@ export default function CommunityHomePage() {
         href: '/join',
         linkLabel: '가입 안내 보기',
       }}
-      help={{ currentServiceKey: 'pharmacy-hub' }}
+      // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
+      // 공통 O4OHelpSection 의 기본 usageItems 는 href='#' 3개(데드 엔트리)다.
+      // PharmacyHub 는 공통 Guide 를 채택했으므로 실제 매뉴얼 route 로 대체한다.
+      help={{
+        currentServiceKey: 'pharmacy-hub',
+        usageItems: [
+          { title: '서비스 소개', description: 'PharmacyHub 가 어떤 서비스인지 확인하세요', href: '/service-guide' },
+          { title: '이용 가이드', description: '가입부터 매장 실행까지 이용 순서를 안내합니다', href: '/guide/intro' },
+          { title: '기능별 이용 방법', description: '주문·매장 제품·콘텐츠·매장 실행 사용법을 봅니다', href: '/guide/features' },
+        ],
+      }}
     />
   );
 }

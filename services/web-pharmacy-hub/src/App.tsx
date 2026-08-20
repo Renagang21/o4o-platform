@@ -64,9 +64,9 @@
  * 프론트 라우트는 UX 안내이며 권한 판정 근거가 아니다.
  */
 
-// WO-O4O-WEB-CATCH-ALL-ROUTE-CROSS-SERVICE-V1: catch-all 이 Navigate → NotFoundPage 로 바뀌면서
-// 이 파일에서 Navigate 사용처가 0 이 됐다 (다른 redirect 는 없다).
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+// WO-O4O-WEB-CATCH-ALL-ROUTE-CROSS-SERVICE-V1: catch-all 은 Navigate 가 아니라 NotFoundPage 다.
+// WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1: `/guide` → `/guide/intro` canonical 수렴에만 Navigate 를 쓴다.
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { AuthProvider } from './contexts/AuthContext';
 import { StoreOwnerShell } from './layouts/StoreOwnerShell';
@@ -78,6 +78,36 @@ import { SupplierShell } from './layouts/SupplierShell';
 // WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1 — 공개 영역 공통 셸(헤더·푸터)
 import { PublicLayout } from './layouts/PublicLayout';
 import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
+// WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
+// 공통 Guide View(@o4o/shared-space-ui) 를 그대로 채택한다. PharmacyHub 전용 Guide page 파일은 만들지 않는다.
+import {
+  GuideServiceIntroPage,
+  GuideIntroPage,
+  GuideIntroStructurePage,
+  GuideIntroKpaPage,
+  GuideIntroOperationPage,
+  GuideIntroConceptPage,
+  GuideUsagePage,
+  GuideFeaturesPage,
+  GuideFeatureManualPage,
+  pharmacyHubServiceIntroProps,
+  pharmacyHubGuideIntroProps,
+  pharmacyHubGuideIntroStructureProps,
+  pharmacyHubGuideIntroKpaProps,
+  pharmacyHubGuideIntroOperationProps,
+  pharmacyHubGuideIntroConceptProps,
+  pharmacyHubGuideUsageProps,
+  pharmacyHubGuideFeaturesProps,
+  pharmacyHubGuideFeatureForumProps,
+  pharmacyHubGuideFeatureSupplyOrderProps,
+  pharmacyHubGuideFeatureStoreProductsProps,
+  pharmacyHubGuideFeatureContentProps,
+  pharmacyHubGuideFeatureQrProps,
+  pharmacyHubGuideFeaturePopProps,
+  pharmacyHubGuideFeatureSignageProps,
+  pharmacyHubGuideFeatureTabletProps,
+  pharmacyHubGuideFeatureManualsProps,
+} from '@o4o/shared-space-ui';
 import { MembershipGate } from './components/MembershipGate';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -180,6 +210,72 @@ export default function App() {
               만들지 않는다. */}
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
+
+          {/*
+            WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
+
+            `/service-guide` = 공개 서비스 소개 (이 서비스가 무엇인가)
+            `/guide/*`       = 기능 이용 매뉴얼 (이 기능을 어떻게 쓰는가)
+            역할이 다르므로 둘 다 유지하고 서로 링크로 연결한다.
+
+            모두 공통 View + PharmacyHub copy config 만 사용한다 (서비스별 View 복제 0).
+            공개 문서이므로 MembershipGate 를 걸지 않는다 — 가입 검토 중인 사용자도 읽을 수 있어야 한다.
+          */}
+          <Route path="/service-guide" element={<GuideServiceIntroPage {...pharmacyHubServiceIntroProps} />} />
+          <Route path="/guide" element={<Navigate to="/guide/intro" replace />} />
+          <Route path="/guide/intro" element={<GuideIntroPage {...pharmacyHubGuideIntroProps} />} />
+          <Route
+            path="/guide/intro/structure"
+            element={<GuideIntroStructurePage {...pharmacyHubGuideIntroStructureProps} />}
+          />
+          <Route path="/guide/intro/kpa" element={<GuideIntroKpaPage {...pharmacyHubGuideIntroKpaProps} />} />
+          <Route
+            path="/guide/intro/operation"
+            element={<GuideIntroOperationPage {...pharmacyHubGuideIntroOperationProps} />}
+          />
+          <Route
+            path="/guide/intro/concept"
+            element={<GuideIntroConceptPage {...pharmacyHubGuideIntroConceptProps} />}
+          />
+          <Route path="/guide/usage" element={<GuideUsagePage {...pharmacyHubGuideUsageProps} />} />
+          <Route path="/guide/features" element={<GuideFeaturesPage {...pharmacyHubGuideFeaturesProps} />} />
+          {/* 실제 지원하는 기능만 매뉴얼로 노출한다 (없는 기능을 만들어 넣지 않는다) */}
+          <Route
+            path="/guide/features/forum"
+            element={<GuideFeatureManualPage {...pharmacyHubGuideFeatureForumProps} />}
+          />
+          <Route
+            path="/guide/features/supply-order"
+            element={<GuideFeatureManualPage {...pharmacyHubGuideFeatureSupplyOrderProps} />}
+          />
+          <Route
+            path="/guide/features/store-products"
+            element={<GuideFeatureManualPage {...pharmacyHubGuideFeatureStoreProductsProps} />}
+          />
+          <Route
+            path="/guide/features/content"
+            element={<GuideFeatureManualPage {...pharmacyHubGuideFeatureContentProps} />}
+          />
+          <Route
+            path="/guide/features/qr"
+            element={<GuideFeatureManualPage {...pharmacyHubGuideFeatureQrProps} />}
+          />
+          <Route
+            path="/guide/features/pop"
+            element={<GuideFeatureManualPage {...pharmacyHubGuideFeaturePopProps} />}
+          />
+          <Route
+            path="/guide/features/signage"
+            element={<GuideFeatureManualPage {...pharmacyHubGuideFeatureSignageProps} />}
+          />
+          <Route
+            path="/guide/features/tablet"
+            element={<GuideFeatureManualPage {...pharmacyHubGuideFeatureTabletProps} />}
+          />
+          <Route
+            path="/guide/features/manuals"
+            element={<GuideFeatureManualPage {...pharmacyHubGuideFeatureManualsProps} />}
+          />
 
           {/* WO-O4O-PHARMACY-HUB-COMMUNITY-HOME-COMMON-CORE-V1 — active PharmacyHub 회원만 */}
           <Route

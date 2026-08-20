@@ -90,6 +90,8 @@ const SERVICES: Svc[] = [
   { key: 'k-cosmetics', dir: 'services/web-k-cosmetics', copy: 'k-cosmetics.ts' },
   { key: 'glycopharm', dir: 'services/web-glycopharm', copy: 'glycopharm.ts' },
   { key: 'neture', dir: 'services/web-neture', copy: 'neture.ts' },
+  // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
+  { key: 'pharmacy-hub', dir: 'services/web-pharmacy-hub', copy: 'pharmacy-hub.ts' },
 ];
 
 const IGNORE = /^\/(types|api|http)/;
