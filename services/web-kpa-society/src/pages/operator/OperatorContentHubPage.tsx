@@ -1,56 +1,39 @@
 /**
- * OperatorContentHubPage — 콘텐츠 정리 허브
+ * OperatorContentHubPage (KPA) — 콘텐츠 정리 허브
  *
- * WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1
- * WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1:
- *   raw <table>/thead/tbody → @o4o/operator-ux-core DataTable + ListColumnDef 로 정렬.
- *   기존 필터/페이지네이션/row action/등록·수정 모달은 그대로 유지.
- *   selection / bulk action 은 본 WO scope 외 (LEGACY → PARTIAL 승격).
+ * WO-O4O-COMMUNITY-OPERATOR-CONSOLE-VIEW-CONVERGENCE-V1:
+ *   기존 KPA 구현(707L)을 @o4o/operator-core-ui/modules/operator-content-hub 의
+ *   OperatorContentHubConsole 로 승격하고, 본 파일은 wrapper 로만 남긴다.
+ *   - client(adapter): /api/v1/kpa/contents + mediaApi.upload
+ *   - config: status enum(ready/draft) · 카테고리 · RichTextEditor · 상세 이동
+ *   - slot: 콘텐츠 제작 가이드 모달
+ *   status/노출 정책은 backend 계약 그대로이며 View 가 재해석하지 않는다.
+ *
+ * 이전 이력:
+ *   WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1
+ *   WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1
+ *   WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1
+ *   WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1
+ *   WO-O4O-KPA-OPERATOR-CONTENT-LIST-STATUS-FILTER-UX-FIX-V1
+ *   WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Plus, Search, RefreshCw, Pencil, Trash2, Tag,
-  FileText, ChevronRight, Loader2, AlertCircle, Lightbulb,
-} from 'lucide-react';
-// WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1: 콘텐츠 제작 가이드(공통 모달, operator 모드)
+import { Lightbulb } from 'lucide-react';
+import { OperatorContentHubConsole } from '@o4o/operator-core-ui/modules/operator-content-hub';
+import type {
+  ContentHubClient,
+  ContentHubListParams,
+  ContentHubListResult,
+  ContentHubPayload,
+  ContentHubStatusOption,
+} from '@o4o/operator-core-ui/modules/operator-content-hub';
 import { ContentCreationGuideModal } from '../pharmacy/ContentCreationGuideModal';
-import { DataTable } from '@o4o/operator-ux-core';
-import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getAccessToken } from '../../contexts/AuthContext';
-import { toast } from '@o4o/error-handling';
-import { ConfirmActionDialog } from '@o4o/ui';
-// WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1:
-//   콘텐츠 등록 모달의 JSON textarea → canonical RichTextEditor (body HTML 저장).
-//   O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1 §3.2 "RichTextEditor 기반" 준수.
-import { RichTextEditor, isBlankHtml } from '@o4o/content-editor';
 import { mediaApi } from '../../api/media';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface ContentItem {
-  id: string;
-  title: string;
-  summary: string | null;
-  category: string | null;
-  tags: string[];
-  status: 'draft' | 'ready';
-  source_type: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface Pagination {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
-
-// ─── API helper ───────────────────────────────────────────────────────────────
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const token = getAccessToken();
@@ -63,645 +46,102 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     },
   });
   const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body?.error?.message || body?.error || `API error ${res.status}`);
-  return body;
+  if (!res.ok) throw new Error((body as any)?.error?.message || (body as any)?.error || `API error ${res.status}`);
+  return body as T;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
-  draft: { label: '초안', cls: 'bg-amber-100 text-amber-700' },
-  ready: { label: '완료', cls: 'bg-green-100 text-green-700' },
-};
-
-const SOURCE_LABEL: Record<string, string> = {
-  upload: '파일',
-  external: '링크',
-  manual: '직접 입력',
-};
-
-// ─── Component ────────────────────────────────────────────────────────────────
-
-export default function OperatorContentHubPage() {
-  const navigate = useNavigate();
-  const [items, setItems] = useState<ContentItem[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0, totalPages: 1 });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchInput, setSearchInput] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  // WO-O4O-KPA-OPERATOR-CONTENT-LIST-STATUS-FILTER-UX-FIX-V1:
-  //   기본 = '전체'(all) — 운영자 관리 목록은 draft+ready 를 함께 보여준다(초안→완료 전환 시 사라지지 않음).
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [deleting, setDeleting] = useState<string | null>(null);
-  // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
-  //   window.confirm(파괴적 삭제) → ConfirmActionDialog(danger). 대상 보관 후 확인 시 삭제 실행.
-  const [deleteTarget, setDeleteTarget] = useState<ContentItem | null>(null);
-  // WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1
-  const [guideOpen, setGuideOpen] = useState(false);
-
-  // ─── Modal: 등록/수정 ──────────────────────────────────────────────────────
-  const [showModal, setShowModal] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
-    title: '',
-    summary: '',
-    category: '',
-    tags: '',        // comma-separated → string[]
-    status: 'draft' as 'draft' | 'ready',
-    source_type: 'manual' as 'manual' | 'upload' | 'external',
-    source_url: '',
-    body: '',       // RichTextEditor HTML (canonical 본문)
-  });
-  const [editLoading, setEditLoading] = useState(false);
-
-  const fetchItems = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams({ page: String(currentPage), limit: '20' });
-      if (searchTerm) params.set('search', searchTerm);
-      if (categoryFilter) params.set('category', categoryFilter);
-      if (statusFilter) params.set('status', statusFilter);
-
-      const data = await apiFetch<{ success: boolean; data: { items: ContentItem[]; total: number; page: number; limit: number; totalPages: number } }>(
-        `/api/v1/kpa/contents?${params}`
-      );
-      if (data.success) {
-        setItems(data.data.items);
-        setPagination({ page: data.data.page, limit: data.data.limit, total: data.data.total, totalPages: data.data.totalPages });
-      }
-    } catch (e: any) {
-      setError(e?.message || '콘텐츠를 불러올 수 없습니다');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentPage, searchTerm, categoryFilter, statusFilter]);
-
-  useEffect(() => { fetchItems(); }, [fetchItems]);
-
-  const handleSearch = () => { setSearchTerm(searchInput); setCurrentPage(1); };
-
-  // ─── Delete ───────────────────────────────────────────────────────────────
-  const handleDelete = (item: ContentItem) => setDeleteTarget(item);
-  const confirmDelete = async () => {
-    const item = deleteTarget;
-    if (!item) return;
-    setDeleting(item.id);
-    try {
-      await apiFetch(`/api/v1/kpa/contents/${item.id}`, { method: 'DELETE' });
-      toast.success('삭제되었습니다');
-      await fetchItems();
-    } catch (e: any) {
-      toast.error(e?.message || '삭제에 실패했습니다');
-    } finally {
-      setDeleting(null);
-      setDeleteTarget(null);
-    }
-  };
-
-  // ─── Modal helpers ────────────────────────────────────────────────────────
-  // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: editor 이미지 업로드 핸들러
-  //   (PharmacyBlogPage 와 동일한 canonical 패턴 — mediaApi.upload)
-  const handleImageUpload = async (file: File): Promise<string> => {
+const client: ContentHubClient = {
+  async list(params: ContentHubListParams): Promise<ContentHubListResult> {
+    const qs = new URLSearchParams({ page: String(params.page), limit: String(params.limit) });
+    if (params.search) qs.set('search', params.search);
+    if (params.category) qs.set('category', params.category);
+    if (params.status) qs.set('status', params.status);
+    const data = await apiFetch<{ success: boolean; data: ContentHubListResult }>(`/api/v1/kpa/contents?${qs}`);
+    if (!data?.success) throw new Error('콘텐츠를 불러올 수 없습니다');
+    return data.data;
+  },
+  async get(id: string) {
+    const detail = await apiFetch<{ success: boolean; data: { body?: string | null; source_url?: string | null } }>(
+      `/api/v1/kpa/contents/${id}`
+    );
+    return detail?.data ?? {};
+  },
+  async create(payload: ContentHubPayload) {
+    await apiFetch('/api/v1/kpa/contents', { method: 'POST', body: JSON.stringify(payload) });
+  },
+  async update(id: string, payload: ContentHubPayload) {
+    await apiFetch(`/api/v1/kpa/contents/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+  },
+  async remove(id: string) {
+    await apiFetch(`/api/v1/kpa/contents/${id}`, { method: 'DELETE' });
+  },
+  // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: PharmacyBlogPage 와 동일한 canonical 패턴
+  async uploadImage(file: File) {
     const res = await mediaApi.upload(file, true, 'kpa-society', 'content-hub');
     if (res.success && res.data) return res.data.url;
     throw new Error(res.error || '이미지 업로드에 실패했습니다.');
-  };
+  },
+};
 
-  const openCreate = () => {
-    setEditingId(null);
-    // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1:
-    //   "저장 = 즉시 사용 가능" 표준. 신규 콘텐츠 기본값은 'ready'(완료) — 저장 직후
-    //   QR 선택기/사용처에서 바로 선택 가능해야 한다. 초안은 사용자가 모달 상태를
-    //   '초안'으로 명시적으로 바꿨을 때만 만들어진다.
-    setForm({ title: '', summary: '', category: '', tags: '', status: 'ready', source_type: 'manual', source_url: '', body: '' });
-    setShowModal(true);
-  };
+// WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 + WO-O4O-KPA-OPERATOR-CONTENT-DRAFT-TO-READY-UI-V1 §6.2
+const STATUS_OPTIONS: ContentHubStatusOption[] = [
+  {
+    value: 'ready',
+    label: '완료',
+    badgeClass: 'bg-green-100 text-green-700',
+    formLabel: '완료 (즉시 사용)',
+    formHint: '완료: QR 만들기와 매장 허브 콘텐츠 허브 탭에 표시됩니다.',
+  },
+  {
+    value: 'draft',
+    label: '초안',
+    badgeClass: 'bg-amber-100 text-amber-700',
+    formLabel: '초안 (비노출)',
+    formHint: '초안: 운영자 콘텐츠 허브에만 보이며 QR·매장 허브에는 표시되지 않습니다.',
+  },
+];
 
-  const openEdit = async (item: ContentItem) => {
-    setEditingId(item.id);
-    setForm({
-      title: item.title,
-      summary: item.summary || '',
-      category: item.category || '',
-      tags: (item.tags || []).join(', '),
-      status: item.status,
-      source_type: (item.source_type as any) || 'manual',
-      source_url: '',
-      body: '',
-    });
-    setShowModal(true);
-    // 본문(body HTML)은 리스트 응답에 없으므로 상세 조회로 prefill
-    setEditLoading(true);
-    try {
-      const detail = await apiFetch<{ success: boolean; data: { body?: string | null; source_url?: string | null } }>(
-        `/api/v1/kpa/contents/${item.id}`
-      );
-      if (detail.success) {
-        setForm(f => ({
-          ...f,
-          body: detail.data.body || '',
-          source_url: detail.data.source_url || '',
-        }));
-      }
-    } catch {
-      /* prefill 실패 시 빈 본문으로 편집 시작 — 저장 시 기존 blocks 는 보존됨 */
-    } finally {
-      setEditLoading(false);
-    }
-  };
+const CATEGORY_OPTIONS = ['약국경영', '법령/규정', '마케팅', '교육', '공지'];
 
-  const handleSave = async () => {
-    if (!form.title.trim()) { toast.error('제목은 필수입니다'); return; }
+export default function OperatorContentHubPage() {
+  const navigate = useNavigate();
+  const [guideOpen, setGuideOpen] = useState(false);
 
-    // O4O Tag Policy V1 — sanitize + 최소 1개 필수
-    const sanitizedTags = [...new Set(
-      form.tags.split(',').map(t => t.trim().replace(/^#/, '')).filter(Boolean).filter(t => t.length <= 30)
-    )];
-    if (sanitizedTags.length === 0) { toast.error('태그를 1개 이상 입력해주세요'); return; }
-
-    // WO-O4O-STANDARD-EDITOR-HTML-DIRECT-INPUT-PREVIEW-SAVE-FIX-V1 §4.2/§5.4:
-    //   빈 태그(<p></p> 등)만 있는 본문은 빈 본문으로 정규화. 직접 입력(manual)은 본문 필수.
-    const normalizedBody = isBlankHtml(form.body) ? null : form.body;
-    if (form.source_type === 'manual' && !normalizedBody) {
-      toast.error('내용이 없습니다. 본문을 입력해주세요');
-      return;
-    }
-
-    setSaving(true);
-    try {
-      // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1:
-      //   본문은 RichTextEditor HTML(body)로 저장. legacy blocks 는 미전송 → PATCH 시 보존.
-      const payload = {
-        title: form.title.trim(),
-        summary: form.summary || null,
-        category: form.category || null,
-        tags: sanitizedTags,
-        status: form.status,
-        source_type: form.source_type,
-        source_url: form.source_url || null,
-        body: normalizedBody,
-      };
-
-      if (editingId) {
-        await apiFetch(`/api/v1/kpa/contents/${editingId}`, { method: 'PATCH', body: JSON.stringify(payload) });
-        toast.success('수정되었습니다');
-      } else {
-        await apiFetch('/api/v1/kpa/contents', { method: 'POST', body: JSON.stringify(payload) });
-        toast.success('등록되었습니다');
-      }
-      setShowModal(false);
-      await fetchItems();
-    } catch (e: any) {
-      toast.error(e?.message || '저장에 실패했습니다');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const formatDate = (d: string) => {
-    try { return new Date(d).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }); }
-    catch { return '-'; }
-  };
-
-  // ─── Columns (WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1) ───
-  //   raw <table> 의 6개 컬럼을 ListColumnDef 로 정렬.
-  //   inline 아이콘 액션(복사/수정/삭제) 은 기존 UX 유지 — RowActionMenu 도입은 본 WO scope 외.
-  const contentColumns: ListColumnDef<ContentItem>[] = [
-    {
-      key: 'title',
-      header: '제목',
-      width: '34%',
-      render: (_v, item) => (
-        <button
-          onClick={() => navigate(`/operator/content-hub/${item.id}`)}
-          className="text-left group w-full"
-        >
-          <p className="font-medium text-sm text-slate-800 group-hover:text-blue-600 flex items-center gap-1">
-            <FileText className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-            {item.title}
-            <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-blue-400 ml-auto" />
-          </p>
-          {item.summary && (
-            <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">{item.summary}</p>
-          )}
-        </button>
-      ),
-    },
-    {
-      key: 'category_tags',
-      header: '카테고리 / 태그',
-      width: '18%',
-      render: (_v, item) => (
-        <>
-          {item.category && (
-            <span className="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-600 mb-1">{item.category}</span>
-          )}
-          {(item.tags || []).length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {item.tags.slice(0, 3).map(t => (
-                <span key={t} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-blue-50 text-blue-600">
-                  <Tag className="w-2.5 h-2.5" />{t}
-                </span>
-              ))}
-              {item.tags.length > 3 && <span className="text-xs text-slate-400">+{item.tags.length - 3}</span>}
-            </div>
-          )}
-        </>
-      ),
-    },
-    {
-      key: 'source_type',
-      header: '유형',
-      width: '8%',
-      align: 'center',
-      render: (_v, item) => (
-        <span className="text-xs text-slate-500">{SOURCE_LABEL[item.source_type] || item.source_type}</span>
-      ),
-    },
-    {
-      key: 'status',
-      header: '상태',
-      width: '8%',
-      align: 'center',
-      render: (_v, item) => {
-        const badge = STATUS_BADGE[item.status] || STATUS_BADGE.draft;
-        return (
-          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badge.cls}`}>{badge.label}</span>
-        );
-      },
-    },
-    {
-      key: 'created_at',
-      header: '등록일',
-      width: '10%',
-      sortable: true,
-      sortAccessor: (item) => new Date(item.created_at).getTime(),
-      render: (_v, item) => (
-        <span className="text-sm text-slate-500">{formatDate(item.created_at)}</span>
-      ),
-    },
-    {
-      key: '_actions',
-      header: '액션',
-      width: '22%',
-      align: 'right',
-      render: (_v, item) => {
-        const isDeleting = deleting === item.id;
-        return (
-          <div className="flex items-center justify-end gap-1">
-            <button
-              onClick={() => openEdit(item)}
-              title="수정"
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500"
-            >
-              <Pencil className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => handleDelete(item)}
-              disabled={isDeleting}
-              title="삭제"
-              className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 disabled:opacity-40"
-            >
-              {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-            </button>
-          </div>
-        );
-      },
-    },
-  ];
-
-  // ─── Render ───────────────────────────────────────────────────────────────
+  // WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1: 보조(outline) 버튼
+  const headerActions = useMemo(() => (
+    <button
+      onClick={() => setGuideOpen(true)}
+      className="flex items-center gap-2 px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-50 text-sm font-medium"
+    >
+      <Lightbulb className="w-4 h-4" />
+      콘텐츠 제작 가이드
+    </button>
+  ), []);
 
   return (
-    <div className="space-y-6">
-
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">콘텐츠 허브 관리</h1>
-          <p className="text-slate-500 text-sm mt-1">재사용 가능한 콘텐츠를 구조화하여 관리합니다</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={fetchItems}
-            disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-sm disabled:opacity-50"
-          >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            새로고침
-          </button>
-          {/* WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1: 보조(outline) 버튼 */}
-          <button
-            onClick={() => setGuideOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-50 text-sm font-medium"
-          >
-            <Lightbulb className="w-4 h-4" />
-            콘텐츠 제작 가이드
-          </button>
-          <button
-            onClick={openCreate}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 text-sm font-medium"
-          >
-            <Plus className="w-4 h-4" />
-            콘텐츠 만들기
-          </button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl p-4 border border-slate-100">
-          <p className="text-2xl font-bold text-slate-800">{pagination.total}</p>
-          <p className="text-xs text-slate-500">전체 콘텐츠</p>
-        </div>
-        <div className="bg-white rounded-xl p-4 border border-slate-100">
-          <p className="text-2xl font-bold text-green-600">{items.filter(i => i.status === 'ready').length}</p>
-          <p className="text-xs text-slate-500">완료 (현재 페이지)</p>
-        </div>
-        <div className="bg-white rounded-xl p-4 border border-slate-100">
-          <p className="text-2xl font-bold text-amber-500">{items.filter(i => i.status === 'draft').length}</p>
-          <p className="text-xs text-slate-500">초안 (현재 페이지)</p>
-        </div>
-      </div>
-
-      {error && (
-        <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          {error}
-        </div>
-      )}
-
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
-
-        {/* Filters */}
-        <div className="p-4 border-b border-slate-100 flex items-center gap-3 flex-wrap">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="제목/요약 검색..."
-              value={searchInput}
-              onChange={e => setSearchInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-            />
-          </div>
-          <select
-            value={categoryFilter}
-            onChange={e => { setCategoryFilter(e.target.value); setCurrentPage(1); }}
-            className="px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">전체 카테고리</option>
-            <option value="약국경영">약국경영</option>
-            <option value="법령/규정">법령/규정</option>
-            <option value="마케팅">마케팅</option>
-            <option value="교육">교육</option>
-            <option value="공지">공지</option>
-          </select>
-          <select
-            value={statusFilter}
-            onChange={e => { setStatusFilter(e.target.value); setCurrentPage(1); }}
-            className="px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {/* WO-O4O-KPA-OPERATOR-CONTENT-LIST-STATUS-FILTER-UX-FIX-V1:
-                기본 '전체'(all)=draft+ready. '' (published OR 본인) legacy 분기는 사용 안 함. */}
-            <option value="all">전체</option>
-            <option value="ready">완료 (즉시 사용)</option>
-            <option value="draft">초안 (비노출)</option>
-          </select>
-          <button
-            onClick={handleSearch}
-            className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 text-sm font-medium"
-          >
-            검색
-          </button>
-        </div>
-
-        {/* DataTable — canonical @o4o/operator-ux-core
-            WO-O4O-KPA-OPERATOR-LEGACY-TABLE-CANONICAL-MIGRATION-V1:
-              raw <table> + 자체 thead/tbody + 자체 spinner/empty 분기 → DataTable 내장 처리. */}
-        <DataTable<ContentItem>
-          columns={contentColumns}
-          data={items}
-          rowKey="id"
-          loading={isLoading}
-          emptyMessage={
-            <span>
-              등록된 콘텐츠가 없습니다.
-              <button onClick={openCreate} className="ml-2 text-blue-500 underline">첫 콘텐츠 등록</button>
-            </span>
-          }
-          tableId="kpa-operator-content-hub"
-        />
-
-        {/* Pagination */}
-        {!isLoading && pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
-            <p className="text-sm text-slate-500">
-              총 {pagination.total}개 중 {(pagination.page - 1) * pagination.limit + 1}-
-              {Math.min(pagination.page * pagination.limit, pagination.total)}개
-            </p>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-              </button>
-              {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                const start = Math.max(1, Math.min(currentPage - 2, pagination.totalPages - 4));
-                return start + i;
-              }).filter(p => p <= pagination.totalPages).map(p => (
-                <button
-                  key={p}
-                  onClick={() => setCurrentPage(p)}
-                  className={`w-8 h-8 rounded-lg text-sm font-medium ${currentPage === p ? 'bg-slate-700 text-white' : 'hover:bg-slate-100 text-slate-600'}`}
-                >
-                  {p}
-                </button>
-              ))}
-              <button
-                onClick={() => setCurrentPage(Math.min(pagination.totalPages, currentPage + 1))}
-                disabled={currentPage === pagination.totalPages}
-                className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ── 등록/수정 Modal ─────────────────────────────────────────────────── */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-5 border-b border-slate-100">
-              <h2 className="font-semibold text-slate-800">{editingId ? '콘텐츠 수정' : '콘텐츠 등록'}</h2>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-            <div className="p-5 space-y-4">
-              {/* 제목 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">제목 <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={form.title}
-                  onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="콘텐츠 제목"
-                />
-              </div>
-              {/* 요약 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">요약</label>
-                <textarea
-                  value={form.summary}
-                  onChange={e => setForm(f => ({ ...f, summary: e.target.value }))}
-                  rows={2}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                  placeholder="콘텐츠 요약 (AI 생성 또는 직접 입력)"
-                />
-              </div>
-              {/* 카테고리 + 상태 */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">카테고리</label>
-                  <input
-                    type="text"
-                    value={form.category}
-                    onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="약국경영, 법령/규정 등"
-                    list="category-suggestions"
-                  />
-                  <datalist id="category-suggestions">
-                    <option value="약국경영" />
-                    <option value="법령/규정" />
-                    <option value="마케팅" />
-                    <option value="교육" />
-                    <option value="공지" />
-                  </datalist>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">상태</label>
-                  {/* WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1:
-                      기본=완료(저장 즉시 사용 가능). 초안은 QR 선택기/사용처에 노출되지 않는다. */}
-                  <select
-                    value={form.status}
-                    onChange={e => setForm(f => ({ ...f, status: e.target.value as 'draft' | 'ready' }))}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="ready">완료 (즉시 사용)</option>
-                    <option value="draft">초안 (비노출)</option>
-                  </select>
-                  {/* WO-O4O-KPA-OPERATOR-CONTENT-DRAFT-TO-READY-UI-V1 §6.2:
-                      기존 초안 → 완료 전환 시 노출 범위를 명확히 안내. */}
-                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                    {form.status === 'ready'
-                      ? '완료: QR 만들기와 매장 허브 콘텐츠 허브 탭에 표시됩니다.'
-                      : '초안: 운영자 콘텐츠 허브에만 보이며 QR·매장 허브에는 표시되지 않습니다.'}
-                  </p>
-                </div>
-              </div>
-              {/* 태그 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">태그</label>
-                <input
-                  type="text"
-                  value={form.tags}
-                  onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="쉼표로 구분: 약가, 급여, 청구 ..."
-                />
-              </div>
-              {/* 원본 유형 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">원본 유형</label>
-                <select
-                  value={form.source_type}
-                  onChange={e => setForm(f => ({ ...f, source_type: e.target.value as any }))}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="manual">직접 입력</option>
-                  <option value="external">외부 링크</option>
-                  <option value="upload">파일 업로드</option>
-                </select>
-              </div>
-              {/* 외부 링크 */}
-              {form.source_type === 'external' && (
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">외부 링크 URL</label>
-                  <input
-                    type="url"
-                    value={form.source_url}
-                    onChange={e => setForm(f => ({ ...f, source_url: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://..."
-                  />
-                </div>
-              )}
-              {/* 본문 — canonical RichTextEditor (WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1) */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">본문</label>
-                {editLoading ? (
-                  <div className="flex items-center justify-center gap-2 py-12 text-sm text-slate-400 border border-slate-200 rounded-lg">
-                    <Loader2 className="w-4 h-4 animate-spin" /> 본문 불러오는 중…
-                  </div>
-                ) : (
-                  <RichTextEditor
-                    value={form.body}
-                    onChange={(c) => setForm(f => ({ ...f, body: c.html }))}
-                    onImageUpload={handleImageUpload}
-                    placeholder="고객에게 보여줄 안내 콘텐츠를 작성하세요"
-                    minHeight="320px"
-                    preset="full"
-                  />
-                )}
-              </div>
-            </div>
-            <div className="flex items-center justify-end gap-3 p-5 border-t border-slate-100">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 text-sm font-medium disabled:opacity-50"
-              >
-                {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                {editingId ? '저장' : '등록'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1 */}
-      <ContentCreationGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} mode="operator" />
-
-      <ConfirmActionDialog
-        open={!!deleteTarget}
-        title="콘텐츠 삭제"
-        message={deleteTarget ? `"${deleteTarget.title}"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.` : ''}
-        variant="danger"
-        confirmText="삭제"
-        loading={!!deleting}
-        onConfirm={confirmDelete}
-        onClose={() => setDeleteTarget(null)}
+    <>
+      <OperatorContentHubConsole
+        client={client}
+        tableId="kpa-operator-content-hub"
+        title="콘텐츠 허브 관리"
+        subtitle="재사용 가능한 콘텐츠를 구조화하여 관리합니다"
+        statusOptions={STATUS_OPTIONS}
+        defaultStatus="ready"
+        allStatusValue="all"
+        allStatusLabel="전체"
+        statCards={[
+          { label: '완료 (현재 페이지)', status: 'ready', tone: 'green' },
+          { label: '초안 (현재 페이지)', status: 'draft', tone: 'amber' },
+        ]}
+        categoryOptions={CATEGORY_OPTIONS}
+        bodyEditor="rich"
+        editorPlaceholder="콘텐츠 본문을 작성하세요. 이미지·표·링크를 사용할 수 있습니다."
+        requireBodyForManual
+        onOpenItem={(item) => navigate(`/operator/content-hub/${item.id}`)}
+        createButtonLabel="콘텐츠 만들기"
+        headerActions={headerActions}
       />
-    </div>
+      <ContentCreationGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} mode="operator" />
+    </>
   );
 }

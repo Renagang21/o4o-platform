@@ -29,7 +29,9 @@
     "./modules/hub-content-list": "./src/modules/hub-content-list/index.ts",
     "./modules/signage-hq": "./src/modules/signage-hq/index.ts",
     "./modules/qr-template-write": "./src/modules/qr-template-write/index.ts",
-    "./modules/operator-analytics": "./src/modules/operator-analytics/index.ts"
+    "./modules/operator-analytics": "./src/modules/operator-analytics/index.ts",
+    "./modules/community-home": "./src/modules/community-home/index.ts",
+    "./modules/operator-content-hub": "./src/modules/operator-content-hub/index.ts"
   },
   "dependencies": {
     "@o4o/content-editor": "workspace:*",
