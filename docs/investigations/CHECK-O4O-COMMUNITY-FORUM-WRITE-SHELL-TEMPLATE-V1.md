@@ -168,6 +168,50 @@ children  ← 폼 본문(ForumWriteForm)
 
 ---
 
+## 10-2. 프로덕션 배포 · 브라우저 스모크 (§16)
+
+**배포** — commit `009051388` · workflow run `32326205830` "Deploy Web Services (Cloud Run)" **success**
+(`deploy-k-cosmetics: success` · `deploy-glycopharm: success` · 전체 job success). 백엔드/마이그레이션 변경 없음.
+
+**계정** — `docs/local/TEST-ACCOUNTS.local.md` 의 K-Cosmetics / GlycoPharm 운영자 계정. 자격증명은 문서/코드에 기록하지 않는다.
+**원칙** — 운영 데이터 write 0건. 게시글 생성/수정 submit 은 수행하지 않고 렌더 · selector · validation · cancel 만 확인했다.
+
+| # | service | viewport | 대상 | 결과 |
+|---|---|---|---|---|
+| 1 | K-Cosmetics | desktop 1440 | `/forum/write` (비로그인) | route guard 가 `/login` 으로 리다이렉트 — 셸 로그인 게이트 이전 단계. 기존 동작 |
+| 2 | K-Cosmetics | desktop 1440 | `/forum/write` (로그인) | `Write a Post` heading · `Display name: Rena` + hint · `Forum` selector · Post Type/Title/Content/Cancel/Post 정상 |
+| 3 | K-Cosmetics | desktop 1440 | 제목 미입력 submit | toast `Please enter a title.` — API 호출 없음 |
+| 4 | K-Cosmetics | desktop 1440 | 내용 미입력 submit | toast `Please enter content.` — API 호출 없음 |
+| 5 | K-Cosmetics | desktop 1440 | `Cancel` | `navigate(-1)` 로 직전 화면 복귀 (기존 동작 동일) |
+| 6 | K-Cosmetics | desktop 1440 | `/forum/edit/:postId` | `Edit Post` heading · **게시판 selector 미노출** · submit label `Update` — edit 계약대로 |
+| 7 | K-Cosmetics | mobile 390 | `/forum/write` | `Write a Post` 렌더 · `scrollWidth 375 ≤ innerWidth 390` → 가로 overflow 0 |
+| 8 | GlycoPharm | desktop 1440 | `/forum/write` (비로그인) | **공통 셸 로그인 게이트** `로그인이 필요합니다` / `게시글을 작성하려면 로그인해주세요.` 정상 렌더 |
+| 9 | GlycoPharm | desktop 1440 | `/forum/write` (로그인) | `글쓰기` heading · `작성자 표시명: Rena` + hint · `게시판` selector · 글 유형/제목/내용/취소/등록 정상 |
+| 10 | GlycoPharm | desktop 1440 | 제목 미입력 submit | toast `제목을 입력해주세요.` — API 호출 없음 |
+| 11 | GlycoPharm | desktop 1440 | 내용 미입력 submit | toast `내용을 입력해주세요.` — API 호출 없음 |
+| 12 | GlycoPharm | desktop 1440 | `/forum/edit/:postId` | `글 수정` heading · `#gp-forum-select` 미존재 · submit label `수정하기` |
+| 13 | GlycoPharm | mobile 390 | `/forum/write` | `글쓰기` 렌더 · `scrollWidth 382 ≤ innerWidth 390` → 가로 overflow 0 |
+
+**게시판 selector 빈 상태** — 두 서비스 모두 `게시판 없음` / `No forum available` (disabled + 안내문) 로 표시됐다.
+이는 프로덕션 데이터 조건이다: `GET /api/v1/cosmetics/forum/categories` · `GET /api/v1/glycopharm/forum/categories` 모두 `count: 0`,
+`GET .../forum/posts` 도 `total: 0`. `fetchWritableForums` 는 본 WO 에서 변경하지 않았으므로 회귀가 아니다.
+동시에 **다른 서비스 forum option 혼입 0건** 이 자명하게 성립한다.
+
+**§16 판정 기준**
+
+```
+white screen: 0
+JS exception: 0
+신규 404 / 500: 0
+mobile 가로 overflow: 0
+잘못된 서비스 forum option 혼입: 0
+```
+
+관측된 콘솔 에러는 모두 기존/의도된 것이다 — ① 비로그인 상태의 `auth/me` · `auth/refresh` 401 (기존 부트스트랩 동작),
+② `/forum/edit/00000000-...` 의 404 (실 게시글이 0건이라 합성 UUID 로 edit 셸 렌더만 확인한 결과). 신규 예외는 없다.
+
+---
+
 ## 11. 최종 판정
 
 | # | 영역 | service | route | 이전 | 최종 |
