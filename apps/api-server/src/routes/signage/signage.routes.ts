@@ -109,6 +109,11 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // POST /api/signage/:serviceKey/schedules - Create schedule
   router.post('/schedules', requireSignageStore, scheduleCtrl.createSchedule);
 
+  // GET /api/signage/:serviceKey/schedules/calendar - Get schedule calendar view
+  // NOTE: static path MUST stay registered before '/schedules/:id',
+  // otherwise Express matches it as :id='calendar' (route shadowing).
+  router.get('/schedules/calendar', requireSignageStore, scheduleCtrl.getScheduleCalendar);
+
   // GET /api/signage/:serviceKey/schedules/:id - Get schedule by ID
   router.get('/schedules/:id', requireSignageStore, scheduleCtrl.getSchedule);
 
@@ -191,10 +196,6 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // ========== Media Library Routes ==========
   // GET /api/signage/:serviceKey/media/library - Get media library (platform + org + supplier)
   router.get('/media/library', allowSignageStoreRead, mediaCtrl.getMediaLibrary);
-
-  // ========== Schedule Calendar Routes ==========
-  // GET /api/signage/:serviceKey/schedules/calendar - Get schedule calendar view
-  router.get('/schedules/calendar', requireSignageStore, scheduleCtrl.getScheduleCalendar);
 
   // ========== Upload Routes (Store can upload to their library) ==========
   // POST /api/signage/:serviceKey/upload/presigned - Get presigned upload URL
