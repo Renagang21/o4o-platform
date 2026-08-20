@@ -13,7 +13,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Building2, Bell, User, LogIn, LogOut, X } from 'lucide-react';
-import { useNotifications } from '@o4o/account-ui';
+import { useNotifications, NotificationSheet, NotificationTabBadge } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
@@ -24,20 +24,6 @@ import {
   KpaUserMenuItems,
 } from './KpaUserMenu';
 import { resolveNotificationTarget } from '../lib/notificationRouting';
-
-function formatRelative(dateString: string): string {
-  const d = new Date(dateString);
-  if (isNaN(d.getTime())) return '';
-  const sec = Math.floor((Date.now() - d.getTime()) / 1000);
-  if (sec < 60) return '방금 전';
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min}분 전`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}시간 전`;
-  const day = Math.floor(hr / 24);
-  if (day < 7) return `${day}일 전`;
-  return d.toLocaleDateString('ko-KR');
-}
 
 // 약국 경영 active 판정: /mobile/pharmacy, /pharmacy, /store-hub, /store (slug 경로 제외)
 function isPharmacyActive(pathname: string): boolean {
@@ -172,14 +158,7 @@ export function MobileBottomNav() {
       >
         <span style={{ position: 'relative', display: 'inline-flex' }}>
           <Bell size={22} strokeWidth={openSheet === 'notif' ? 2.5 : 1.75} />
-          {notif.unreadCount > 0 && (
-            <span
-              aria-label={`읽지 않은 알림 ${notif.unreadCount}건`}
-              style={badgeStyle}
-            >
-              {notif.unreadCount > 99 ? '99+' : notif.unreadCount}
-            </span>
-          )}
+          <NotificationTabBadge unreadCount={notif.unreadCount} style={badgeStyle} />
         </span>
         <span style={labelStyle}>알림</span>
       </button>
@@ -204,66 +183,19 @@ export function MobileBottomNav() {
         />
       )}
 
-      {/* ── 알림 시트 (데스크톱 NotificationBell 과 동일 source) ── */}
+      {/* ── 알림 시트 — 공통 NotificationSheet (WO-O4O-CROSS-SERVICE-MYPAGE-NOTIFICATIONS-COMMONIZATION-V1) ── */}
       {openSheet === 'notif' && (
-        <div
-          role="dialog"
-          aria-label="알림 목록"
-          className="md:hidden fixed left-0 right-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-2xl max-h-[80vh] flex flex-col"
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)' }}
-        >
-          <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-slate-100">
-            <p className="text-sm font-semibold text-slate-900">알림</p>
-            <div className="flex items-center gap-1">
-              {notif.unreadCount > 0 && (
-                <button
-                  onClick={() => void notif.markAllAsRead()}
-                  className="text-xs text-blue-600 hover:bg-blue-50 rounded px-2 py-1"
-                >
-                  모두 읽음
-                </button>
-              )}
-              <button
-                onClick={closeSheet}
-                aria-label="닫기"
-                className="shrink-0 p-1.5 rounded-lg text-slate-400 hover:bg-slate-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-          <div className="overflow-y-auto">
-            {notif.loading ? (
-              <div className="px-4 py-8 text-center text-sm text-slate-500">불러오는 중...</div>
-            ) : notif.notifications.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-slate-500">알림이 없습니다.</div>
-            ) : (
-              <ul className="divide-y divide-slate-100">
-                {notif.notifications.map((n) => (
-                  <li key={n.id}>
-                    <button
-                      onClick={() => handleNotifItem(n)}
-                      className={`w-full text-left px-4 py-3 transition ${n.isRead ? 'bg-white' : 'bg-blue-50/50'} hover:bg-slate-50`}
-                    >
-                      <div className="flex items-start gap-2">
-                        {!n.isRead && (
-                          <span className="mt-1.5 inline-block w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-slate-900 truncate">{n.title}</div>
-                          {n.message && (
-                            <div className="mt-0.5 text-xs text-slate-600 line-clamp-2">{n.message}</div>
-                          )}
-                          <div className="mt-1 text-[11px] text-slate-400">{formatRelative(n.createdAt)}</div>
-                        </div>
-                      </div>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
+        <NotificationSheet
+          notifications={notif.notifications}
+          unreadCount={notif.unreadCount}
+          loading={notif.loading}
+          onClose={closeSheet}
+          onItemClick={handleNotifItem}
+          onMarkAllAsRead={() => void notif.markAllAsRead()}
+          markAllClassName="text-blue-600 hover:bg-blue-50"
+          accentDotClassName="bg-blue-500"
+          unreadRowClassName="bg-blue-50/50"
+        />
       )}
 
       {/* ── 프로필 시트 (사용자 이름·이메일 + 역할별 대시보드 + 계정 메뉴 + 로그아웃) ── */}

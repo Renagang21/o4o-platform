@@ -20,6 +20,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Bell } from 'lucide-react';
 import type { NotificationItem } from '../notifications/types.js';
+import { NotificationListBody } from '../notifications/NotificationListBody.js';
 
 export interface NotificationBellProps {
   unreadCount: number;
@@ -39,21 +40,6 @@ export interface NotificationBellProps {
   ariaLabel?: string;
   /** Custom renderer for an item — overrides the default row. */
   renderItem?: (notification: NotificationItem) => ReactNode;
-}
-
-function formatRelative(dateString: string): string {
-  const d = new Date(dateString);
-  if (isNaN(d.getTime())) return '';
-  const diffMs = Date.now() - d.getTime();
-  const sec = Math.floor(diffMs / 1000);
-  if (sec < 60) return '방금 전';
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min}분 전`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}시간 전`;
-  const day = Math.floor(hr / 24);
-  if (day < 7) return `${day}일 전`;
-  return d.toLocaleDateString('ko-KR');
 }
 
 export function NotificationBell(props: NotificationBellProps) {
@@ -155,55 +141,13 @@ export function NotificationBell(props: NotificationBellProps) {
           </div>
 
           <div className="overflow-y-auto flex-1">
-            {loading && notifications.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-gray-500">
-                불러오는 중...
-              </div>
-            ) : notifications.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-gray-500">
-                {emptyText}
-              </div>
-            ) : (
-              <ul className="divide-y divide-gray-100">
-                {notifications.map((n) => (
-                  <li key={n.id}>
-                    {renderItem ? (
-                      <div onClick={() => handleItem(n)}>{renderItem(n)}</div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => handleItem(n)}
-                        className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition ${
-                          n.isRead ? 'bg-white' : 'bg-blue-50/50'
-                        }`}
-                      >
-                        <div className="flex items-start gap-2">
-                          {!n.isRead && (
-                            <span
-                              className="mt-1.5 inline-block w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"
-                              aria-label="읽지 않음"
-                            />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium text-gray-900 truncate">
-                              {n.title}
-                            </div>
-                            {n.message && (
-                              <div className="mt-0.5 text-xs text-gray-600 line-clamp-2">
-                                {n.message}
-                              </div>
-                            )}
-                            <div className="mt-1 text-[11px] text-gray-400">
-                              {formatRelative(n.createdAt)}
-                            </div>
-                          </div>
-                        </div>
-                      </button>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <NotificationListBody
+              notifications={notifications}
+              loading={loading}
+              onItemClick={handleItem}
+              emptyText={emptyText}
+              renderItem={renderItem}
+            />
           </div>
         </div>
       )}

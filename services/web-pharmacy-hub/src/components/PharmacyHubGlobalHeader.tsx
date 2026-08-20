@@ -23,7 +23,8 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, LogIn, Pill, Shield, Store, Truck, UserCircle } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem, filterContextualNav } from '@o4o/ui';
-import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
+import { NotificationBell, useNotifications,
+  resolveNotificationTarget, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { useAuth } from '../contexts/AuthContext';
 import { BRAND, ROLES, ROLE_LABELS, SERVICE_KEY, satisfiesRole } from '../config/service';
@@ -80,10 +81,14 @@ export function PharmacyHubGlobalHeader() {
     serviceKey: SERVICE_KEY,
   });
 
+  // WO-O4O-CROSS-SERVICE-MYPAGE-NOTIFICATIONS-COMMONIZATION-V1:
+  //   metadata.targetUrl 을 검증 없이 navigate 하던 인라인 구현을 공통
+  //   resolveNotificationTarget 으로 교체했다 (내부 절대 경로만 통과 —
+  //   `//host` 같은 protocol-relative 값 차단).
   const handleNotificationClick = useCallback(
     (n: NotificationItem) => {
-      const target = (n.metadata as Record<string, unknown> | undefined)?.targetUrl;
-      if (typeof target === 'string' && target.length > 0) navigate(target);
+      const target = resolveNotificationTarget(n);
+      if (target) navigate(target);
     },
     [navigate],
   );

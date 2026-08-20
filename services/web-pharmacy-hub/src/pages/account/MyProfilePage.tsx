@@ -38,7 +38,9 @@ import {
   NotificationBell,
   resolveRoleLabel,
   useNotifications,
+  resolveNotificationTarget,
   type AccountProfileFieldSpec,
+  type NotificationItem,
 } from '@o4o/account-ui';
 import { getServiceMembershipStatus } from '../../lib/membershipGate';
 import { PHARMACY_HUB_ACCOUNT_NAV_ITEMS } from './navItems';
@@ -113,8 +115,16 @@ function profileFromSession(user: Record<string, unknown> | null): AccountProfil
 }
 
 export default function MyProfilePage({
-  /** 매장 셸 안에는 공개 헤더의 알림 벨이 없으므로 화면이 직접 렌더한다. */
-  showNotifications = false,
+  /**
+   * 매장 셸 안에는 공개 헤더의 알림 벨이 없으므로 화면이 직접 렌더한다.
+   *
+   * WO-O4O-CROSS-SERVICE-MYPAGE-NOTIFICATIONS-COMMONIZATION-V1:
+   *   기본값을 true 로 올렸다. 공통 GlobalHeader 의 utilitySlot(NotificationBell)은
+   *   `hidden md:flex` 안에 있어 모바일에서 렌더되지 않고, Pharmacy-Hub 에는
+   *   모바일 하단 nav 가 없어 canonical `/account` 가 유일한 모바일 알림 진입점이다.
+   *   MyPageShell 의 headerActions 는 폭과 무관하게 렌더된다.
+   */
+  showNotifications = true,
   /**
    * WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1:
    * canonical route `/account` 는 공통 My Page Shell(헤더 + navigation) 안에서
@@ -181,12 +191,26 @@ export default function MyProfilePage({
     navigate('/');
   };
 
+  /**
+   * WO-O4O-CROSS-SERVICE-MYPAGE-NOTIFICATIONS-COMMONIZATION-V1:
+   *   `onItemClick` 이 없어 알림을 눌러도 아무 데도 가지 않던 dead deep link 를
+   *   공통 resolveNotificationTarget 으로 연결했다 (헤더 벨과 동일 계약).
+   */
+  const handleNotificationClick = useCallback(
+    (n: NotificationItem) => {
+      const target = resolveNotificationTarget(n);
+      if (target) navigate(target);
+    },
+    [navigate],
+  );
+
   const notificationBell = (
     <NotificationBell
       unreadCount={notifications.unreadCount}
       notifications={notifications.notifications}
       loading={notifications.loading}
       onOpen={() => void notifications.refetchList()}
+      onItemClick={handleNotificationClick}
       onMarkAsRead={(id) => void notifications.markAsRead(id)}
       onMarkAllAsRead={() => void notifications.markAllAsRead()}
     />

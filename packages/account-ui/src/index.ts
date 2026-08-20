@@ -116,6 +116,19 @@ export type {
   NotificationApiClient,
 } from './notifications/types.js';
 
+// WO-O4O-CROSS-SERVICE-MYPAGE-NOTIFICATIONS-COMMONIZATION-V1
+// 모바일 알림 시트 · 목록 본문 · 상대 시각 · deep link 해석기 (5서비스 공통 정본)
+export { NotificationSheet, NotificationTabBadge } from './components/NotificationSheet.js';
+export type { NotificationSheetProps } from './components/NotificationSheet.js';
+export { NotificationListBody } from './notifications/NotificationListBody.js';
+export type { NotificationListBodyProps } from './notifications/NotificationListBody.js';
+export { formatRelativeTime } from './notifications/formatRelative.js';
+export {
+  resolveNotificationTarget,
+  toInternalPath,
+} from './notifications/resolveTarget.js';
+export type { ResolveNotificationTargetOptions } from './notifications/resolveTarget.js';
+
 // WO-O4O-BUSINESS-REGISTRATION-COMMON-UI-COMPONENT-V1
 export { BusinessRegistrationFields } from './components/BusinessRegistrationFields.js';
 export type {
