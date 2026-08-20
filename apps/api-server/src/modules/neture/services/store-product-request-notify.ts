@@ -16,9 +16,36 @@ import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { notificationService } from '../../../services/NotificationService.js';
 import logger from '../../../utils/logger.js';
 
-// 관리자 검토 화면(admin-dashboard O4O 상품 DB) / 매장 요청 목록(handled-products 상단 '내 등록 요청')
-const ADMIN_TARGET_URL = '/admin/o4o-product-db/store-requests';
-const STORE_TARGET_URL = '/store/handled-products';
+// ── target route 계약 (WO-O4O-CROSSSERVICE-NOTIFICATION-TARGET-ROUTE-CONTRACT-AUDIT-AND-CLOSURE-V1) ──
+// 알림은 notification.serviceKey 로 필터되어 **해당 서비스 web 앱 헤더에서만** 노출되고, 헤더는
+// metadata.targetUrl 로 자기 origin 내부 경로만 navigate 한다(resolveNotificationTarget 는 내부 절대
+// 경로만 통과시킨다). 따라서 target 은 serviceKey 별 route tree 에 실재하는 경로여야 한다.
+// partner-contract.service.ts 의 resolveRecruitmentApplicationTargetUrl 선례와 동일 패턴.
+//
+// 검토 화면 현황:
+//   - neture : /operator/product-candidates (ProductCandidateReviewPage — sourceType 'store_web' 포함) ✅
+//   - kpa / glycopharm / cosmetics : 서비스 web 에 검토 화면 없음. 유일한 검토 콘솔은
+//     admin-dashboard `/admin/o4o-product-db/store-requests` 이며 **다른 origin(admin.neture.co.kr)** 이라
+//     서비스 web 알림의 내부 경로 target 으로 표현할 수 없다 → targetUrl 미지정(이동 없음).
+//     새 서비스측 검토 route 신설은 본 WO 범위 밖(§26) → FOLLOWUP.
+const ADMIN_TARGET_URL_BY_SERVICE: Record<string, string> = {
+  neture: '/operator/product-candidates',
+};
+
+// 매장 요청 목록(handled-products 상단 '내 등록 요청') — KPA 매장 web 에만 실재한다.
+const STORE_TARGET_URL_BY_SERVICE: Record<string, string> = {
+  kpa: '/store/handled-products',
+};
+
+/** role-prefix serviceKey → 검토 화면 경로. 없으면 undefined(= targetUrl 미지정). */
+function adminTargetUrl(sk: string | null): string | undefined {
+  return sk ? ADMIN_TARGET_URL_BY_SERVICE[sk] : undefined;
+}
+
+/** role-prefix serviceKey → 매장 요청 목록 경로. 없으면 undefined(= targetUrl 미지정). */
+function storeTargetUrl(sk: string | null): string | undefined {
+  return sk ? STORE_TARGET_URL_BY_SERVICE[sk] : undefined;
+}
 
 function canonical(sk: string | null): string | undefined {
   if (!sk) return undefined;
@@ -51,7 +78,11 @@ export async function notifyAdminsOfStoreProductRequest(
           serviceKey: canonical(sk),
           organizationId: input.organizationId ?? undefined,
           actorId: input.actorId ?? undefined,
-          metadata: { requestId: input.requestId, productName: name, targetUrl: ADMIN_TARGET_URL },
+          metadata: {
+            requestId: input.requestId,
+            productName: name,
+            ...(adminTargetUrl(sk) ? { targetUrl: adminTargetUrl(sk) } : {}),
+          },
         }),
       ),
     );
@@ -105,7 +136,11 @@ export async function notifySubmitterOfStoreProductRequestDecision(
       serviceKey: canonical(input.serviceKey),
       organizationId: input.organizationId ?? undefined,
       actorId: input.actorId ?? undefined,
-      metadata: { requestId: input.requestId, productName: name, targetUrl: STORE_TARGET_URL },
+      metadata: {
+        requestId: input.requestId,
+        productName: name,
+        ...(storeTargetUrl(input.serviceKey) ? { targetUrl: storeTargetUrl(input.serviceKey) } : {}),
+      },
     });
   } catch (e) {
     logger.warn('[StoreProductRequestNotify] submitter notify failed (best-effort)', e);

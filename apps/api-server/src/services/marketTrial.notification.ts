@@ -56,6 +56,10 @@ async function safeCreate(payload: MarketTrialNotificationPayload): Promise<Noti
         supplierId: payload.trial.supplierId,
         participantId: payload.participantId,
         deepLink: payload.deepLink,
+        // WO-O4O-CROSSSERVICE-NOTIFICATION-TARGET-ROUTE-CONTRACT-AUDIT-AND-CLOSURE-V1:
+        //   공통 resolveNotificationTarget 는 metadata.targetUrl 만 읽는다. 기존 deepLink 는
+        //   기존 소비처 호환을 위해 유지하고 canonical 키를 함께 기록한다(경로 동일).
+        targetUrl: payload.deepLink,
       },
     });
   } catch (error) {

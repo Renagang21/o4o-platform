@@ -191,7 +191,13 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
                   message: `[${typeLabel}] ${cleanSubject}`,
                   serviceKey,
                   // WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1: 알림 클릭 → Admin 문의 관리
-                  metadata: { contactInquiryId: entity.id, inquiryType: type, targetUrl: '/admin/contact-inquiries' },
+                  // WO-O4O-CROSSSERVICE-NOTIFICATION-TARGET-ROUTE-CONTRACT-AUDIT-AND-CLOSURE-V1:
+                //   수신자는 `{prefix}:operator` + `{prefix}:admin` 인데 이전 target
+                //   `/admin/contact-inquiries` 는 admin 전용 guard(ProtectedRoute allowedRoles=
+                //   admin/super_admin) 라 operator 수신자가 열 수 없었다(ROLE_MISMATCH).
+                //   문의 관리 canonical 화면은 GlycoPharm/K-Cosmetics 모두 operator 로 이관된
+                //   `/operator/contacts`(OperatorRoute = operator+admin+super_admin) 다.
+                metadata: { contactInquiryId: entity.id, inquiryType: type, targetUrl: '/operator/contacts' },
                 }),
               ),
             );
