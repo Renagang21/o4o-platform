@@ -96,6 +96,14 @@ export type {
   ForumWriteFormPostTypeOption,
 } from './ForumWriteForm';
 
+/* WO-O4O-COMMUNITY-FORUM-WRITE-SHELL-TEMPLATE-V1: 글쓰기/수정 화면 셸(폼 본문 외 페이지 골격) */
+export { ForumWritePageShell } from './ForumWritePageShell';
+export type {
+  ForumWritePageShellProps,
+  ForumWritePageShellLabels,
+  ForumWritePageShellForumOption,
+} from './ForumWritePageShell';
+
 /* WO-O4O-FORUM-DETAIL-PRIMITIVES-EXTRACTION-V1: forum detail 본문 렌더 공통 부품 + content 변환기 */
 export { ForumPostContent } from './ForumPostContent';
 export type { ForumPostContentProps } from './ForumPostContent';

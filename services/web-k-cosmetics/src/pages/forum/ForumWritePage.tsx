@@ -1,23 +1,25 @@
 /**
- * ForumWritePage — Simplified Forum Post Creation
+ * ForumWritePage (K-Cosmetics) — Forum Post Create / Edit
  *
  * WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
  * WO-O4O-FORUM-TAG-CANONICAL-ALIGNMENT-V1: category 제거 (KPA Canonical 정렬)
+ * WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1: 폼 본문 = @o4o/shared-space-ui ForumWriteForm
+ * WO-O4O-COMMUNITY-FORUM-WRITE-SHELL-TEMPLATE-V1:
+ *   폼을 감싸던 화면 셸(page/container · heading · 작성자 표시 · 로그인 게이트 · 로딩 · 게시판 selector)을
+ *   공통 ForumWritePageShell 로 승격. 본 파일은 data/mutation/navigation + 라벨 config 만 소유한다.
  *
- * Route: /forum/write
- * WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1: @o4o/shared-space-ui ForumWriteForm 기반(create-only).
+ * Route: /forum/write · /forum/edit/:postId
  * RichTextEditor HTML 을 그대로 전송 — 백엔드 normalizeContent 가 Block[] 정규화.
  */
 
-import { CSSProperties, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { createForumPost, fetchForumPostById, fetchWritableForums, updateForumPost } from '../../services/forumApi';
 import type { WritableForum } from '../../services/forumApi';
 import { toast } from '@o4o/error-handling';
-// WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1: 공통 글쓰기 폼(create-only)
-import { ForumWriteForm, forumContentToHtml } from '@o4o/shared-space-ui';
-import type { ForumWriteFormPayload, ForumWriteFormPostTypeOption } from '@o4o/shared-space-ui';
+import { ForumWriteForm, ForumWritePageShell, forumContentToHtml } from '@o4o/shared-space-ui';
+import type { ForumWriteFormPayload, ForumWriteFormPostTypeOption, ForumWritePageShellLabels } from '@o4o/shared-space-ui';
 
 const POST_TYPES: ForumWriteFormPostTypeOption[] = [
   { value: 'discussion', label: 'Discussion' },
@@ -26,6 +28,20 @@ const POST_TYPES: ForumWriteFormPostTypeOption[] = [
   { value: 'poll', label: 'Poll' },
   { value: 'announcement', label: 'Announcement' },
 ];
+
+const SHELL_LABELS: ForumWritePageShellLabels = {
+  createHeading: 'Write a Post',
+  editHeading: 'Edit Post',
+  loadingText: 'Loading...',
+  loginTitle: 'Login Required',
+  loginDescription: 'Please log in to write a post.',
+  authorLabel: 'Display name:',
+  authorHint: '(You can change your display name in your profile settings)',
+  forumLabel: 'Forum',
+  forumLoadingOption: 'Loading…',
+  forumEmptyOption: 'No forum available',
+  forumEmptyHint: 'No forum is open for posting yet. Please try again later.',
+};
 
 export default function ForumWritePage() {
   const navigate = useNavigate();
@@ -38,9 +54,7 @@ export default function ForumWritePage() {
   const [loading, setLoading] = useState(isEdit);
   const [initialTitle, setInitialTitle] = useState('');
   const [initialContentHtml, setInitialContentHtml] = useState('');
-  // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
-  //   forum 미지정 작성은 forum_id NULL 로 저장돼 이 서비스에서 다시 보이지 않는다.
-  //   PharmacyHub 글쓰기와 같은 축으로 대상 게시판을 선택한다.
+  // forum 미지정 작성은 forum_id NULL 로 저장돼 이 서비스에서 다시 보이지 않는다 → 대상 게시판 선택 유지.
   const [forums, setForums] = useState<WritableForum[]>([]);
   const [forumId, setForumId] = useState('');
   const [forumsLoading, setForumsLoading] = useState(!isEdit);
@@ -116,214 +130,41 @@ export default function ForumWritePage() {
     }
   };
 
-  if (isEdit && loading) {
-    return (
-      <div style={styles.page}>
-        <div style={styles.container}>
-          <p style={styles.loginText}>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div style={styles.page}>
-        <div style={styles.container}>
-          <div style={styles.loginPrompt}>
-            <h2 style={styles.loginTitle}>Login Required</h2>
-            <p style={styles.loginText}>Please log in to write a post.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div style={styles.page}>
-      <div style={styles.container}>
-        <h1 style={styles.heading}>{isEdit ? 'Edit Post' : 'Write a Post'}</h1>
-
-        {user && (
-          <div style={styles.authorInfo}>
-            <span style={styles.authorLabel}>Display name:</span>
-            <span style={styles.authorName}>{user.nickname || user.name}</span>
-            <p style={styles.authorHint}>(You can change your display name in your profile settings)</p>
-          </div>
-        )}
-
-        {!isEdit && (
-          <div style={styles.field}>
-            <label style={styles.label} htmlFor="kcos-forum-select">Forum</label>
-            <select
-              id="kcos-forum-select"
-              value={forumId}
-              disabled={forumsLoading || forums.length === 0}
-              onChange={(e) => setForumId(e.target.value)}
-              style={styles.select}
-            >
-              {forumsLoading && <option value="">Loading…</option>}
-              {!forumsLoading && forums.length === 0 && <option value="">No forum available</option>}
-              {forums.map((forum) => (
-                <option key={forum.id} value={forum.id}>{forum.name}</option>
-              ))}
-            </select>
-            {!forumsLoading && forums.length === 0 && (
-              <p style={styles.authorHint}>No forum is open for posting yet. Please try again later.</p>
-            )}
-          </div>
-        )}
-
-        <ForumWriteForm
-          initialTitle={initialTitle}
-          initialContentHtml={initialContentHtml}
-          showPostType
-          postTypeOptions={POST_TYPES}
-          postTypeLabel="Post Type"
-          titleLabel="Title"
-          titlePlaceholder="Enter post title"
-          contentLabel="Content"
-          contentPlaceholder="Write your post content here"
-          submitLabel={isEdit ? 'Update' : 'Post'}
-          submittingLabel={isEdit ? 'Updating...' : 'Posting...'}
-          cancelLabel="Cancel"
-          theme="pink"
-          minHeight="300px"
-          editorProps={{ preset: 'compact' }}
-          onSubmit={isEdit ? handleUpdate : handleCreate}
-          onCancel={() => navigate(-1)}
-          onInvalid={(reason) =>
-            toast.error(reason === 'title' ? 'Please enter a title.' : 'Please enter content.')
-          }
-        />
-      </div>
-    </div>
+    <ForumWritePageShell
+      mode={isEdit ? 'edit' : 'create'}
+      isAuthenticated={isAuthenticated}
+      isLoading={isEdit && loading}
+      authorName={user ? (user.nickname || user.name) : null}
+      forums={forums}
+      forumId={forumId}
+      forumsLoading={forumsLoading}
+      onForumChange={setForumId}
+      selectId="kcos-forum-select"
+      labels={SHELL_LABELS}
+    >
+      <ForumWriteForm
+        initialTitle={initialTitle}
+        initialContentHtml={initialContentHtml}
+        showPostType
+        postTypeOptions={POST_TYPES}
+        postTypeLabel="Post Type"
+        titleLabel="Title"
+        titlePlaceholder="Enter post title"
+        contentLabel="Content"
+        contentPlaceholder="Write your post content here"
+        submitLabel={isEdit ? 'Update' : 'Post'}
+        submittingLabel={isEdit ? 'Updating...' : 'Posting...'}
+        cancelLabel="Cancel"
+        theme="pink"
+        minHeight="300px"
+        editorProps={{ preset: 'compact' }}
+        onSubmit={isEdit ? handleUpdate : handleCreate}
+        onCancel={() => navigate(-1)}
+        onInvalid={(reason) =>
+          toast.error(reason === 'title' ? 'Please enter a title.' : 'Please enter content.')
+        }
+      />
+    </ForumWritePageShell>
   );
 }
-
-const styles: Record<string, CSSProperties> = {
-  page: {
-    minHeight: '60vh',
-    backgroundColor: '#f8fafc',
-  },
-  container: {
-    maxWidth: 720,
-    margin: '0 auto',
-    padding: '32px 16px',
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: 700,
-    color: '#1e293b',
-    marginBottom: 24,
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: 20,
-  },
-  field: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: 6,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#475569',
-  },
-  input: {
-    padding: '10px 14px',
-    fontSize: 15,
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    outline: 'none',
-    backgroundColor: 'white',
-  },
-  select: {
-    padding: '10px 14px',
-    fontSize: 15,
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    outline: 'none',
-    backgroundColor: 'white',
-    cursor: 'pointer',
-  },
-  textarea: {
-    padding: '12px 14px',
-    fontSize: 15,
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    outline: 'none',
-    backgroundColor: 'white',
-    resize: 'vertical' as const,
-    fontFamily: 'inherit',
-    lineHeight: 1.6,
-  },
-  actions: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    gap: 12,
-    marginTop: 8,
-  },
-  cancelBtn: {
-    padding: '10px 24px',
-    fontSize: 14,
-    fontWeight: 500,
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    backgroundColor: 'white',
-    color: '#475569',
-    cursor: 'pointer',
-  },
-  submitBtn: {
-    padding: '10px 32px',
-    fontSize: 14,
-    fontWeight: 600,
-    border: 'none',
-    borderRadius: 8,
-    backgroundColor: '#DB2777',
-    color: 'white',
-    cursor: 'pointer',
-  },
-  authorInfo: {
-    display: 'flex',
-    flexWrap: 'wrap' as const,
-    alignItems: 'center',
-    gap: 8,
-    padding: '12px 16px',
-    backgroundColor: '#f1f5f9',
-    borderRadius: 8,
-    marginBottom: 24,
-  },
-  authorLabel: {
-    fontSize: 13,
-    color: '#64748b',
-  },
-  authorName: {
-    fontSize: 14,
-    fontWeight: 600,
-    color: '#1e293b',
-  },
-  authorHint: {
-    fontSize: 12,
-    color: '#94a3b8',
-    margin: 0,
-    width: '100%',
-    marginTop: 2,
-  },
-  loginPrompt: {
-    textAlign: 'center' as const,
-    padding: '48px 0',
-  },
-  loginTitle: {
-    fontSize: 20,
-    fontWeight: 700,
-    color: '#1e293b',
-    marginBottom: 8,
-  },
-  loginText: {
-    fontSize: 14,
-    color: '#64748b',
-  },
-};

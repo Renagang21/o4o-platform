@@ -57,7 +57,7 @@ function renderConsole(props: Partial<React.ComponentProps<typeof OperatorConten
 
 describe('OperatorContentHubConsole', () => {
   it('loading 중에는 새로고침 버튼이 비활성화된다', () => {
-    renderConsole({ client: makeClient({ list: vi.fn(() => new Promise(() => {})) }) });
+    renderConsole({ client: makeClient({ list: vi.fn(() => new Promise<never>(() => {})) }) });
     expect((screen.getByText('새로고침').closest('button') as HTMLButtonElement).disabled).toBe(true);
   });
 
