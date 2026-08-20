@@ -141,6 +141,17 @@ wrapper 는 default export 컴포넌트 시그니처를 유지하므로 라우�
 
 Neture 는 이전에 없던 **retry** 를, GP 는 이전에 없던 **ConfirmActionDialog 기반 삭제 확인**을 공통화로 획득했다.
 
+### 6-1. 관측된 표시 차이 1건 (의도된 것)
+
+기존 KPA/GP 구현은 `statusOptions` 에 없는 status 값을 **무조건 '초안' 배지로 표시**했다(`STATUS_BADGE[status] || STATUS_BADGE.draft`).
+공통 View 는 알 수 없는 status 를 **원본 값 그대로 중립 배지**로 표시한다.
+
+브라우저 smoke 에서 KPA `/operator/docs` 의 일부 행이 `published` 로 표시됐다 —
+KPA 문서상 enum(`draft|ready`) 밖의 값이 프로덕션 데이터에 실재한다는 뜻이며, 기존 화면은 이를 '초안' 으로 **오표시**하고 있었다.
+공통 View 가 값을 재해석하지 않는 편이 §11(권한·정책 재해석 금지)에 부합하므로 원본 표시를 유지했다.
+
+> 데이터 자체(왜 KPA contents 에 `published` 가 있는지)는 본 WO 범위 밖이다 — 별도 조사 필요 시 후속 WO 로 분리한다.
+
 ---
 
 ## 7. 테스트 (§12)
@@ -190,6 +201,23 @@ backend 변경 0 → `apps/api-server` 전체 build 불필요. DB migration **�
 **B21 + C7 관련 `MUST_FIX_BEFORE_CLOSE` = 0 → WO 완료 조건 충족.**
 
 남은 커뮤니티 closure blocker: **B8 Forum Write Shell KCos ↔ GlycoPharm 2 cell** (본 WO §16 제외 범위).
+
+---
+
+## 9-1. 배포 · 브라우저 smoke (§14)
+
+- CI `Deploy Web Services (Cloud Run)` run `32322639212` — 7 job 전부 success (kpa-society · glycopharm · neture · k-cosmetics · kpa-branch · pharmacy-hub)
+- 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 운영자 계정 (실 로그인, 권한 없는 계정 강제 접근 테스트 없음)
+
+| 화면 | 결과 |
+|---|---|
+| KPA `/operator/community` | Home 편집 · 4탭(Hero/페이지/스폰서/하단 링크) · empty 정상 |
+| KPA `/operator/docs` | 콘텐츠 허브 관리 · 가이드 버튼 · 카테고리 필터 · 6건 목록 정상 |
+| GlycoPharm `/operator/community` | Home 편집 · 3탭 · 제한적 제공 안내 배너 정상 |
+| GlycoPharm `/operator/docs` | 콘텐츠 허브 · 3상태 필터 · empty + 첫 등록 CTA 정상 |
+| Neture `/admin/community-admin` | 커뮤니티 관리 · 3탭 · empty 정상 |
+
+white screen **0** · JS exception **0** · 신규 4xx/5xx **0** · mobile(390px) overflow **0**
 
 ---
 
