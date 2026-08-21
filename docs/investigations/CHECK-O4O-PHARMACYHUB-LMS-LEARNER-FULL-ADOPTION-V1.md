@@ -45,7 +45,7 @@ PH 쪽에는 adapter 배선 · thin wrapper 화면 · route/navigation 만 추�
 | 13 | **과제 (Assignment)** | 레슨 화면 (adapter 배선) | 레슨 화면 (adapter 배선) | `LessonPlayerView` (port) | `lmsApi.getAssignmentForLesson` · `submitAssignment` | `GET /lms/lessons/:id/assignment`, `POST .../submit` | **ADOPTED (신규)** |
 | 14 | **이수 학점 (Credits)** | `/mypage/credits` | `/account/credits` | `MyCreditsView` | `api.get('/credits/me')` | `GET /credits/me`, `/me/transactions` | **ADOPTED (신규)** |
 | 15 | 강사 프로필 (Instructor Profile) | `/courses/:id` 내 링크 1곳 | — | — | — | `GET /kpa/instructors/:id` (KPA 전용 마운트) | **EXCLUDED** (§14 · 근거 §3-1) |
-| 16 | 강사/운영자 콘솔 | `/lms/instructor/*` | — | — | — | `/lms/instructor/*` | **GAP** (§16 · `PH_LMS_OPERATOR_OR_INSTRUCTOR_GAP`) |
+| 16 | 강사/운영자 콘솔 (+ 강의 승인) | `/lms/instructor/*` · KPA 전용 승인 경로 | — | — | — | `/lms/instructor/*` · `/lms/operator/courses/:id/approve` | **GAP** (§16 · `PH_LMS_OPERATOR_OR_INSTRUCTOR_GAP` — §2-5 참조) |
 
 ### tally (§27)
 
@@ -103,6 +103,22 @@ WO 가 요구한 재검증 결과 **실제 user-facing capability** 이며 PH �
 
 `/lms/instructor/*` 는 learner flow 와 분리된 관리 영역이다. WO §16 에 따라 **구현하지 않고 GAP 으로만 기록**한다.
 이 항목은 본 WO 완료를 막지 않는다. 후속 트랙(운영자/강사 콘솔 채택)에서 다룬다.
+
+### 2-5. PH 는 현재 published 강좌가 0 이다 — 원인은 operator 축 (§16 GAP)
+
+§24 E2E 중 확인한 사실이다. **learner 채택의 결함이 아니다.**
+
+- 프로덕션 `GET /lms/courses?serviceKey=pharmacy-hub&status=published` → **total 0**.
+- 강의 생성(`POST /lms/courses`)은 `lms:instructor` 로 정상 동작하며 `serviceKey='pharmacy-hub'` 로 저장된다(실측).
+- 그러나 게시는 `PUBLISH_REQUIRES_APPROVAL` 로 **운영자 승인**을 요구하고,
+  승인 가드 `requireLmsOperator`(`modules/lms/routes/lms.routes.ts:32`)의 허용 목록은
+  `admin · super_admin · platform:super_admin · cosmetics:* · glycopharm:*` 뿐이라
+  **`pharmacy-hub:operator` / `pharmacy-hub:admin` 이 없다.**
+- 즉 PH 강좌는 PH 자신의 운영자가 게시할 수 없다 → PH 에 공개 강좌가 존재할 수 없다.
+
+이 허용 목록은 **operator 축**이며 WO §16 이 명시적으로 "구현하지 않고 GAP 으로 기록,
+본 WO 완료를 막지 않는다" 라고 정한 영역이다. 또한 CLAUDE.md 중지 조건의 *권한·role 변경* 에 해당하므로
+본 WO 에서 손대지 않았다. `PH_LMS_OPERATOR_OR_INSTRUCTOR_GAP` 에 합산해 후속 WO 로 넘긴다.
 
 ---
 
@@ -166,7 +182,59 @@ WO 가 요구한 재검증 결과 **실제 user-facing capability** 이며 PH �
 
 CI 의 `date-fns` 관련 실패(Admin Dashboard) 도 기존 선행 실패이며 lockfile 변경이 필요해 범위 밖이다.
 
-### 4-2. 서비스 경계 (§19) 확인
+### 4-2. 프로덕션 브라우저 E2E (§24)
+
+프로덕션 `https://pharmacyhub.co.kr` · Playwright · **desktop 1440×900 + mobile 390×844 양쪽 수행**.
+계정은 `docs/local/TEST-ACCOUNTS.local.md` 에서 실행 시점에 읽었다(하드코딩·커밋 0).
+
+| 화면 | desktop | mobile | 비고 |
+|---|:---:|:---:|---|
+| `/education` (비로그인) | 200 | 200 | 로그인 안내 정상 |
+| `/certificate/verify/:id` (비로그인) | 200 | 200 | 없는 수료증 → "유효하지 않은 수료증입니다" 정상 |
+| 로그인 | PASS | PASS | — |
+| `/account/enrollments` | 200 | 200 | 탭 4종 + 빈 상태 + "강의 둘러보기" CTA |
+| `/account/certificates` | 200 | 200 | 빈 상태 정상 |
+| `/account/credits` | 200 | 200 | **보유 크레딧 230 C 실제 표시** (§15 채택 근거 실증) |
+
+**집계: 404/500 = 0 · white screen = 0 · JS exception = 0 · 4xx·5xx 응답 = 0 ·
+가로 overflow = 0 (desktop 1440=1440, mobile 390=390) · 타 서비스 문자열 노출 = 0.**
+
+#### 미검증 구간과 그 이유
+
+`Enroll → Lesson → Progress → Completion → Certificate` 는 **프로덕션에서 실행하지 못했다.**
+PH 에 published 강좌가 0 이기 때문이며, 원인은 §2-5 의 operator 승인 축(§16 GAP)이다.
+
+§24 의 "식별 가능한 test fixture" 지침에 따라 실제로 fixture 를 시도했고 다음을 확인했다.
+
+1. `[E2E-FIXTURE]` 강좌 + 레슨 생성 **성공** — `serviceKey='pharmacy-hub'` 로 정상 저장.
+2. 게시 **거부** — `PUBLISH_REQUIRES_APPROVAL` (PH 운영자에게 승인 권한 없음, §2-5).
+3. draft 강좌 수강신청 **거부** — `Course enrollment is not available` (정상 동작).
+4. **정리 완료** — 레슨 삭제 + 강좌 archive. PH 교육 허브 노출 0
+   (허브는 `status:'published'` 로 조회 — `EducationPage.tsx:43`, 실측 total 0).
+
+따라서 해당 구간은 **정적 계약(신규 spec 26 + LMS 회귀 188)과 KPA parity** 로 담보한다.
+PH 와 KPA 는 동일한 `LessonPlayerView` · 동일한 port · 동일한 `/api/v1/lms/*` 를 쓰며
+차이는 주입되는 `serviceKey` 뿐이다.
+
+#### 관찰 (범위 밖 · 수정하지 않음)
+
+인증 없는 `GET /lms/courses?serviceKey=...` 는 `status` 미지정 시 **draft·archived 강좌도 반환**한다
+(fixture 정리 후에도 archived 1건이 응답에 남음). 공통 LMS 의 기존 동작이며 본 WO 변경과 무관하다.
+각 서비스 허브가 `status:'published'` 를 명시해 실제 노출은 없으나, API 계약 자체는 별도 판단이 필요하다.
+
+### 4-3. 서비스 경계 (§19) 확인
+
+프로덕션 실측 — **동일 사용자·동일 토큰**으로 scope 만 바꿔 조회했다.
+
+| 요청 | 결과 |
+|---|---|
+| `GET /lms/enrollments/me?serviceKey=pharmacy-hub` | **0건** |
+| `GET /lms/enrollments/me?serviceKey=kpa-society` | **3건** |
+| `GET /lms/certificates?serviceKey=pharmacy-hub` | 0건 |
+
+PH 화면에 KPA 수강 이력이 섞이지 않음을 프로덕션에서 직접 확인했다.
+또한 `CertificateController.listCertificates` 는 client 가 보낸 `userId`·`serviceKey` 를 신뢰하지 않고
+요청자 본인 + canonical scope 로 덮어쓴다(코드 확인).
 
 - PH client 는 `/kpa/lms` · `/cosmetics/lms` · `/glycopharm/lms` 를 호출하지 않는다 (spec 고정).
 - 모든 learner read 는 `serviceKey=pharmacy-hub` 를 동반한다 (`withScope`).
@@ -180,15 +248,16 @@ CI 의 `date-fns` 관련 실패(Admin Dashboard) 도 기존 선행 실패이며 
 
 | ID | 내용 |
 |---|---|
-| `PH_LMS_OPERATOR_OR_INSTRUCTOR_GAP` | PH 강사/운영자 LMS 콘솔 채택 (learner flow 아님 · §16) |
+| `PH_LMS_OPERATOR_OR_INSTRUCTOR_GAP` | PH 강사/운영자 LMS 콘솔 채택 (learner flow 아님 · §16). **`requireLmsOperator` 허용 목록에 `pharmacy-hub:*` 누락** 포함 — 이것이 풀려야 PH 에 published 강좌가 생기고 learner 동선을 프로덕션에서 실측할 수 있다 (§2-5 · §4-2) |
 | 강사 프로필 service-neutral 승격 | `/kpa/instructors/*` → 공통 `/lms/instructors/*` (serviceKey 필터 신설). 선행 없이는 PH 채택 불가 |
 | `@o4o/action-log-core` 삭제건 정리 | 다른 세션 WIP. api-server 전체 typecheck 복구 선행 조건 |
+| 공개 강의 목록 status 계약 | 인증 없는 `GET /lms/courses` 가 draft·archived 를 반환 (§4-2 관찰). 공통 LMS 기존 동작 |
 
 ---
 
 ## 6. 문서 정합
 
-- 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 3건 (§5)
+- 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 4건 (§5)
 
 ---
 
