@@ -38,10 +38,15 @@ interface MembershipGateProps {
 /** 안내 문구에 넣을 서비스 표시명 (공통 문구의 `{service}` 자리). */
 const SERVICE_NAME = 'KPA-Society';
 
-/** 가입 신청 화면 경로 (KPA 기준). 없는 경우는 홈으로 fallback. */
-const APPLY_PATH: Partial<Record<string, string>> = {
-  'kpa-society': '/member/apply',
-};
+/**
+ * 가입 신청 화면 경로. 값이 없으면 신청 CTA 를 노출하지 않는다.
+ *
+ * WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1 §7:
+ * KPA-Society 에는 `/member/apply` route 가 존재하지 않는다 (catch-all → NotFoundPage).
+ * 살아있지 않은 경로를 CTA 로 노출하면 dead navigation 이므로 매핑을 비워 둔다.
+ * KPA 가입 신청 화면이 실제로 생기면 그때 canonical 경로를 여기에 추가한다.
+ */
+const APPLY_PATH: Partial<Record<string, string>> = {};
 
 export function MembershipGate({ children, serviceKey = SERVICE_KEY }: MembershipGateProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
