@@ -186,7 +186,10 @@ export function createLmsLearnerClient(http: LmsHttpClient, options: LmsClientOp
     getEnrollmentByCourse<T extends LmsEnrollmentBase = LmsEnrollmentBase>(
       courseId: string,
     ): Promise<LmsApiResponse<{ enrollment: T }>> {
-      return http.get<LmsApiResponse<{ enrollment: T }>>(`/lms/enrollments/me/course/${courseId}`);
+      return http.get<LmsApiResponse<{ enrollment: T }>>(
+        `/lms/enrollments/me/course/${courseId}`,
+        withScope(),
+      );
     },
 
     /**
@@ -199,14 +202,14 @@ export function createLmsLearnerClient(http: LmsHttpClient, options: LmsClientOp
     ): Promise<LmsApiResponse<T[]> & { pagination?: { page: number; limit: number; total: number; totalPages: number } }> {
       return http.get<
         LmsApiResponse<T[]> & { pagination?: { page: number; limit: number; total: number; totalPages: number } }
-      >('/lms/enrollments/me', params);
+      >('/lms/enrollments/me', withScope(params));
     },
 
     /** 레슨에 연결된 퀴즈 조회. 반환: `{ success, data: { quiz: T } }` */
     getQuizForLesson<T = unknown>(
       lessonId: string,
     ): Promise<LmsApiResponse<{ quiz: T }>> {
-      return http.get<LmsApiResponse<{ quiz: T }>>(`/lms/lessons/${lessonId}/quiz`);
+      return http.get<LmsApiResponse<{ quiz: T }>>(`/lms/lessons/${lessonId}/quiz`, withScope());
     },
 
     // ── Write (Step 2 — WO-O4O-LMS-CLIENT-EXTRACTION-V2-STEP2) ────────────
@@ -248,6 +251,65 @@ export function createLmsLearnerClient(http: LmsHttpClient, options: LmsClientOp
       return http.post<LmsApiResponse<{ enrollment: T }>>(
         `/lms/enrollments/${courseId}/progress`,
         { lessonId, completed, ...(metrics ?? {}) },
+      );
+    },
+
+    /**
+     * 레슨에 연결된 과제 조회 (`GET /lms/lessons/:lessonId/assignment`).
+     * WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §13: 서비스별 ad-hoc 래퍼 대신
+     * 공통 client 로 올린다 — service scope 부착도 여기서 일괄 처리된다.
+     * 반환: `{ success, data: { assignment: T } }`
+     */
+    getAssignmentForLesson<T = unknown>(
+      lessonId: string,
+    ): Promise<LmsApiResponse<{ assignment: T }>> {
+      return http.get<LmsApiResponse<{ assignment: T }>>(
+        `/lms/lessons/${lessonId}/assignment`,
+        withScope(),
+      );
+    },
+
+    /** 본인 과제 제출물 조회 (`GET /lms/assignments/:assignmentId/my`). */
+    getMyAssignmentSubmission<T = unknown>(
+      assignmentId: string,
+    ): Promise<LmsApiResponse<{ submission: T | null }>> {
+      return http.get<LmsApiResponse<{ submission: T | null }>>(
+        `/lms/assignments/${assignmentId}/my`,
+        withScope(),
+      );
+    },
+
+    /**
+     * 내 수료증 목록 (`GET /lms/certificates`).
+     * 백엔드는 토큰의 userId 를 강제하고 해석된 serviceKey 로 필터한다
+     * (WO-O4O-LMS-CERTIFICATE-OWNERSHIP-AND-READ-AUTHORIZATION-BOUNDARY-FIX-V1).
+     */
+    getMyCertificates<T extends LmsCertificateBase = LmsCertificateBase>(
+      params?: Record<string, unknown>,
+    ): Promise<LmsApiResponse<T[]> & { pagination?: { page: number; limit: number; total: number; totalPages: number } }> {
+      return http.get<
+        LmsApiResponse<T[]> & { pagination?: { page: number; limit: number; total: number; totalPages: number } }
+      >('/lms/certificates', withScope(params));
+    },
+
+    /** 수료증 단건 (`GET /lms/certificates/:id`) — 타인 수료증은 백엔드가 404. */
+    getCertificate<T extends LmsCertificateBase = LmsCertificateBase>(
+      id: string,
+    ): Promise<LmsApiResponse<{ certificate: T }>> {
+      return http.get<LmsApiResponse<{ certificate: T }>>(`/lms/certificates/${id}`, withScope());
+    },
+
+    /**
+     * 과제 제출 (`POST /lms/assignments/:assignmentId/submit`).
+     * 반환: `{ success, data: { submission, lessonCompleted } }`
+     */
+    submitAssignment<T = unknown>(
+      assignmentId: string,
+      content: string,
+    ): Promise<LmsApiResponse<{ submission: T; lessonCompleted: boolean }>> {
+      return http.post<LmsApiResponse<{ submission: T; lessonCompleted: boolean }>>(
+        `/lms/assignments/${assignmentId}/submit`,
+        { content },
       );
     },
 

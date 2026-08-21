@@ -16,6 +16,11 @@ export function resolveVerificationBase(serviceKey: string | null | undefined): 
       return process.env.KCOSMETICS_FRONTEND_URL || process.env.FRONTEND_URL || 'https://k-cosmetics.site';
     case 'glycopharm':
       return process.env.GLYCOPHARM_FRONTEND_URL || process.env.FRONTEND_URL || 'https://glycopharm.co.kr';
+    case 'pharmacy-hub':
+      // WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §21 (누락된 serviceKey 매핑)
+      // PH 수료증도 공통 LMS lifecycle 로 발급되는데 매핑이 없어 검증 링크가
+      // KPA 도메인으로 인쇄되고 있었다. 계약 변경 없이 case 만 추가한다.
+      return process.env.PHARMACY_HUB_FRONTEND_URL || process.env.FRONTEND_URL || 'https://pharmacyhub.co.kr';
     case 'kpa-society':
     default:
       return process.env.KPA_FRONTEND_URL || process.env.FRONTEND_URL || 'https://kpa-society.co.kr';

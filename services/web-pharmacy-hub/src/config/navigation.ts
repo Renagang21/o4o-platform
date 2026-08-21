@@ -43,7 +43,18 @@ export const PH_PUBLIC_NAV: GlobalHeaderNavItem[] = [
       { label: '포럼 개설 신청', href: '/forum/request' },
     ],
   },
-  { label: '교육', href: '/education' },
+  // WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §17:
+  //   교육 허브 + learner 개인 화면(내 수강 / 내 수료증)을 상단에서 바로 잡는다.
+  //   deep-link only 상태를 남기지 않는다. 세 route 모두 App.tsx 에 등재돼 있다.
+  {
+    label: '교육',
+    href: '/education',
+    children: [
+      { label: '교육 허브', href: '/education' },
+      { label: '내 수강', href: '/account/enrollments' },
+      { label: '내 수료증', href: '/account/certificates' },
+    ],
+  },
   // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
   // 공개 서비스 소개(/service-guide) 와 기능 이용 매뉴얼(/guide/*) 진입점.
   // 두 route 모두 App.tsx 에 실제로 등재돼 있다 (데드링크 0 원칙).
@@ -100,6 +111,9 @@ export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }
       { label: '커뮤니티', href: '/community' },
       { label: '포럼', href: '/forum' },
       { label: '교육', href: '/education' },
+      // 동일 WO §17 — 학습 이력 진입점
+      { label: '내 수강', href: '/account/enrollments' },
+      { label: '내 수료증', href: '/account/certificates' },
     ],
   },
   {

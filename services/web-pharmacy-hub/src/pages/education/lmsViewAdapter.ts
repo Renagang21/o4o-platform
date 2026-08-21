@@ -6,19 +6,39 @@
  * `@o4o/lms-ui` 의 CourseDetailView / LessonPlayerView 가 요구하는 `LmsLearnerPort` 를
  * PH `lmsApi` 위에 구현한다.
  *
- * §8: PH baseline 은 "조회·학습"만이므로 Enrollment / Progress 는 사용하지 않는다.
- *   - config.enrollmentEnabled = false 로 공통 View 의 해당 CTA 를 비활성화한다.
- *   - port 의 필수 메서드 시그니처는 유지하되(공통 계약 변경 금지) 호출되지 않는 no-op 으로 둔다.
- *   - quiz / assignment / AI 는 optional 메서드이므로 미구현 = 해당 UI 미노출.
+ * WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1:
+ *   learner 전 동선을 채택한다 — enrollment / progress / quiz / assignment / AI 를 모두
+ *   공통 계약(`/api/v1/lms/*` + `/api/v1/ai/analyze`) 위에 연결한다.
+ *   PH 전용 enrollment 구현 · 진도 state machine · certificate controller 는 만들지 않는다.
  */
 
 import { createLmsLabels, type LmsLearnerPort, type LmsViewLabels } from '@o4o/lms-ui';
-import { lmsApi } from '../../api/lms';
+import { lmsApi, normalizeEnrollment } from '../../api/lms';
+import { aiApi } from '../../api/ai';
 
 export const PH_LMS_ACCENT = '#0f766e';
 export const PH_LMS_HUB_PATH = '/education';
+/** PH 개인 축은 `/mypage` 가 아니라 `/account` 다 (§18 · 기존 PH 계약 유지). */
+export const PH_LMS_CERTIFICATES_PATH = '/account/certificates';
+export const PH_LMS_ENROLLMENTS_PATH = '/account/enrollments';
 
-export const phLmsLabels: LmsViewLabels = createLmsLabels({});
+export const phLmsLabels: LmsViewLabels = createLmsLabels({
+  enrolledMessage: '수강 신청이 완료되었습니다.',
+  enrollFailedMessage: '수강 신청에 실패했습니다.',
+  certificateLabel: '수료증 보기',
+});
+
+function toEnrollment(raw: unknown) {
+  const e = normalizeEnrollment(raw as any);
+  if (!e) return null;
+  return {
+    id: e.id,
+    status: e.status,
+    progress: e.progress ?? 0,
+    completedLessons: e.completedLessons ?? 0,
+    completedLessonIds: e.metadata?.completedLessonIds ?? [],
+  };
+}
 
 function toLesson(l: any) {
   return {
@@ -69,8 +89,112 @@ export const phLmsPort: LmsLearnerPort = {
     return l ? toLesson(l) : null;
   },
 
-  // §8 범위 밖 — enrollmentEnabled=false 이므로 공통 View 가 호출하지 않는다.
-  getEnrollment: async () => null,
-  enroll: async () => null,
-  updateProgress: async () => null,
+  getEnrollment: async (courseId) => {
+    const res = (await lmsApi.getEnrollmentByCourse(courseId)) as any;
+    return toEnrollment(res?.data?.enrollment ?? res?.data);
+  },
+
+  enroll: async (courseId) => {
+    const res = (await lmsApi.enrollCourse(courseId)) as any;
+    return toEnrollment(res?.data?.enrollment ?? res?.data);
+  },
+
+  updateProgress: async (courseId, lessonId, completed, metrics) => {
+    const res = (await lmsApi.updateProgress(courseId, lessonId, completed, metrics)) as any;
+    return toEnrollment(res?.data?.enrollment ?? res?.data);
+  },
+
+  getQuizForLesson: async (lessonId) => {
+    const res = (await lmsApi.getQuizForLesson(lessonId)) as any;
+    const q = res?.data?.quiz ?? res?.data ?? null;
+    if (!q) return null;
+    return {
+      id: q.id,
+      title: q.title,
+      description: q.description,
+      passingScore: q.passingScore,
+      questions: (q.questions ?? []).map((qq: any) => ({
+        id: qq.id,
+        question: qq.question,
+        type: qq.type,
+        options: qq.options,
+        points: qq.points,
+      })),
+    };
+  },
+
+  submitQuiz: async (quizId, answers) => {
+    const res = (await lmsApi.submitQuiz(quizId, answers)) as any;
+    const r = res?.data ?? null;
+    if (!r) return null;
+    return {
+      score: r.score,
+      passed: r.passed,
+      correctCount: r.correctCount,
+      total: r.total,
+      creditsEarned: r.creditsEarned ?? 0,
+      answers: (r.answers ?? []).map((a: any) => ({ questionId: a.questionId, isCorrect: !!a.isCorrect })),
+    };
+  },
+
+  getAssignmentForLesson: async (lessonId) => {
+    const res = (await lmsApi.getAssignmentForLesson(lessonId)) as any;
+    const a = res?.data?.assignment ?? null;
+    if (!a) return null;
+    return { id: a.id, instructions: a.instructions, dueDate: a.dueDate };
+  },
+
+  getMyAssignmentSubmission: async (assignmentId) => {
+    const res = (await lmsApi.getMyAssignmentSubmission(assignmentId)) as any;
+    const s = res?.data?.submission ?? null;
+    if (!s) return null;
+    return {
+      id: s.id,
+      content: s.content,
+      submittedAt: s.submittedAt,
+      gradingStatus: s.gradingStatus,
+      score: s.score,
+      feedback: s.feedback,
+      gradedAt: s.gradedAt,
+    };
+  },
+
+  submitAssignment: async (assignmentId, content) => {
+    const res = (await lmsApi.submitAssignment(assignmentId, content)) as any;
+    const s = res?.data?.submission ?? null;
+    return {
+      submission: s
+        ? {
+            id: s.id,
+            content: s.content,
+            submittedAt: s.submittedAt,
+            gradingStatus: s.gradingStatus,
+            score: s.score,
+            feedback: s.feedback,
+            gradedAt: s.gradedAt,
+          }
+        : null,
+      lessonCompleted: !!res?.data?.lessonCompleted,
+    };
+  },
+
+  analyzeQuiz: async (input) => {
+    const res = await aiApi.analyzeQuiz({
+      ...input,
+      questions: input.questions.map((q) => ({
+        ...q,
+        type: q.type as 'single' | 'multi' | 'text' | undefined,
+      })),
+    });
+    const r = (res as any)?.data ?? null;
+    if (!r) return null;
+    return { summary: r.summary, insights: r.insights ?? [], recommendations: r.recommendations ?? [] };
+  },
+
+  feedbackAssignment: async (input) => {
+    const res = await aiApi.feedbackAssignment(input);
+    const r = (res as any)?.data ?? null;
+    if (!r) return null;
+    return { summary: r.summary, insights: r.insights ?? [], recommendations: r.recommendations ?? [] };
+  },
 };

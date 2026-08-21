@@ -8,6 +8,7 @@ const ENV_KEYS = [
   'KCOSMETICS_FRONTEND_URL',
   'GLYCOPHARM_FRONTEND_URL',
   'KPA_FRONTEND_URL',
+  'PHARMACY_HUB_FRONTEND_URL',
   'FRONTEND_URL',
 ] as const;
 
@@ -50,6 +51,14 @@ describe('resolveVerificationBase — 수료증 검증 링크 base URL 계약', 
     expect(resolveVerificationBase(null)).toBe('https://kpa-society.co.kr');
     expect(resolveVerificationBase(undefined)).toBe('https://kpa-society.co.kr');
     expect(resolveVerificationBase('unknown-service')).toBe('https://kpa-society.co.kr');
+  });
+
+  /** WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §21 — PH serviceKey 매핑 */
+  it('case 4-c: pharmacy-hub 는 자기 도메인으로 떨어진다 (KPA 로 새지 않는다)', () => {
+    expect(resolveVerificationBase('pharmacy-hub')).toBe('https://pharmacyhub.co.kr');
+    process.env.PHARMACY_HUB_FRONTEND_URL = 'https://ph.example';
+    expect(resolveVerificationBase('pharmacy-hub')).toBe('https://ph.example');
+    expect(resolveVerificationBase('kpa-society')).toBe('https://kpa-society.co.kr');
   });
 
   it('case 4-b: 서비스별 env 는 다른 서비스에 새지 않는다', () => {

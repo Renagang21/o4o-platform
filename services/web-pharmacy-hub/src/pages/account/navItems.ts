@@ -16,7 +16,16 @@
 
 import type { MyPageNavItem } from '@o4o/account-ui';
 
+/**
+ * WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §17·§18:
+ *   LMS learner 개인 화면(내 수강 / 내 수료증 / 내 크레딧)을 같은 `/account` 축에
+ *   추가한다. 기능은 있는데 진입점이 없는 deep-link only 상태를 남기지 않는다.
+ *   My Page 구조 자체는 재설계하지 않는다 — nav item 추가로 끝낸다.
+ */
 export const PHARMACY_HUB_ACCOUNT_NAV_ITEMS: MyPageNavItem[] = [
   { label: '내 프로필', path: '', end: true },
+  { label: '내 수강', path: '/enrollments' },
+  { label: '내 수료증', path: '/certificates' },
+  { label: '내 크레딧', path: '/credits' },
   { label: '가입 상태', path: '/join/status', href: '/join/status' },
 ];

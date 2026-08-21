@@ -1,8 +1,11 @@
 /**
  * LmsLessonPage — Pharmacy-Hub 레슨 플레이어
  *
- * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §7·§8
+ * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §7
  * 화면은 공통 `LessonPlayerView`. 본 파일은 PH 어댑터(port/config/본문 렌더러)만 담당한다.
+ *
+ * WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §8·§9·§12·§13:
+ *   진도·완료·퀴즈·과제 동선을 공통 View 그대로 사용한다(PH 전용 state machine 없음).
  */
 
 import { useMemo } from 'react';
@@ -10,24 +13,32 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { ContentRenderer } from '@o4o/content-editor';
 import { LessonPlayerView, type LmsViewConfig } from '@o4o/lms-ui';
-import { PH_LMS_ACCENT, PH_LMS_HUB_PATH, phLmsLabels, phLmsPort } from './lmsViewAdapter';
+import { useAuth } from '../../contexts/AuthContext';
+import {
+  PH_LMS_ACCENT,
+  PH_LMS_CERTIFICATES_PATH,
+  PH_LMS_HUB_PATH,
+  phLmsLabels,
+  phLmsPort,
+} from './lmsViewAdapter';
 
 export default function LmsLessonPage() {
   const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const config: LmsViewConfig = useMemo(
     () => ({
       accent: PH_LMS_ACCENT,
       hubPath: PH_LMS_HUB_PATH,
-      certificatesPath: null,
-      isAuthenticated: true,
+      certificatesPath: PH_LMS_CERTIFICATES_PATH,
+      isAuthenticated,
+      onRequireLogin: () => navigate('/login'),
       navigate: (path: string) => navigate(path),
       notify: { success: (m) => toast.success(m), error: (m) => toast.error(m) },
       labels: phLmsLabels,
-      enrollmentEnabled: false,
     }),
-    [navigate],
+    [navigate, isAuthenticated],
   );
 
   if (!courseId || !lessonId) return null;

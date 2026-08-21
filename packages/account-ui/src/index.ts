@@ -173,6 +173,10 @@ export { MyEnrollmentsView } from './components/MyEnrollmentsView.js';
 export type { MyEnrollmentsViewProps, MyEnrollmentStatus } from './components/MyEnrollmentsView.js';
 export { MyCreditsView } from './components/MyCreditsView.js';
 export type { MyCreditsViewProps } from './components/MyCreditsView.js';
+// WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §10·§20 — 수료증 공개 검증 공통 View
+export { CertificateVerifyView } from './components/CertificateVerifyView.js';
+export type { CertificateVerifyViewProps } from './components/CertificateVerifyView.js';
+
 export { MyCertificatesView } from './components/MyCertificatesView.js';
 export type { MyCertificatesViewProps } from './components/MyCertificatesView.js';
 
