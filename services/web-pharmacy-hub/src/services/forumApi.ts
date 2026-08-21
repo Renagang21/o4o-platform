@@ -337,3 +337,122 @@ export async function togglePharmacyHubForumPostLike(
   if (!body?.success || !body.data) throw new Error(body?.error || '좋아요 처리에 실패했습니다.');
   return { likeCount: body.data.likeCount ?? 0, isLiked: Boolean(body.data.isLiked) };
 }
+
+// ============================================================================
+// Operator Forum API — WO-O4O-PHARMACYHUB-OPERATOR-COMMUNITY-AND-COMMON-CAPABILITY-FULL-ADOPTION-V1
+//
+// 공통 `/api/v1/forum/operator/*` (serviceCode=pharmacy-hub). backend 변경 없음 —
+// operator-forum.routes.ts 의 SERVICE_CODE_TO_RBAC_KEY 에 'pharmacy-hub' 가 이미 있다.
+//
+// 위 public forum 계열과 달리 operator 계열은 서비스 prefix base 가 아니라
+// 플랫폼 공통 base 를 쓰므로 serviceCode 질의 파라미터가 **필수**다.
+// ============================================================================
+
+const OPERATOR_BASE = '/forum/operator';
+const SVC = 'serviceCode=pharmacy-hub';
+
+const svcQuery = (extra?: Record<string, string | number | undefined>) => {
+  const q = new URLSearchParams({ serviceCode: 'pharmacy-hub' });
+  for (const [k, v] of Object.entries(extra ?? {})) {
+    if (v !== undefined && v !== null && v !== '') q.set(k, String(v));
+  }
+  return q.toString();
+};
+
+export const forumOperatorApi = {
+  getRequests: async (params?: { status?: string; page?: number; limit?: number }) => {
+    const res = await api.get(`${OPERATOR_BASE}/requests?${svcQuery(params)}`);
+    return res.data;
+  },
+
+  getPendingCount: async () => {
+    const res = await api.get(`${OPERATOR_BASE}/requests/pending-count?${SVC}`);
+    return res.data;
+  },
+
+  getRequestDetail: async (id: string) => {
+    const res = await api.get(`${OPERATOR_BASE}/requests/${encodeURIComponent(id)}?${SVC}`);
+    return res.data;
+  },
+
+  review: async (
+    id: string,
+    data: { action: 'approve' | 'reject' | 'revision'; reviewComment?: string },
+  ) => {
+    const res = await api.patch(`${OPERATOR_BASE}/requests/${encodeURIComponent(id)}/review?${SVC}`, data);
+    return res.data;
+  },
+
+  getDeleteRequests: async (params?: { status?: string }) => {
+    const res = await api.get(`${OPERATOR_BASE}/delete-requests?${svcQuery(params)}`);
+    return res.data;
+  },
+
+  getDeletePendingCount: async () => {
+    const res = await api.get(`${OPERATOR_BASE}/delete-requests/pending-count?${SVC}`);
+    return res.data;
+  },
+
+  approveDelete: async (id: string, data?: { reviewComment?: string }) => {
+    const res = await api.post(
+      `${OPERATOR_BASE}/delete-requests/${encodeURIComponent(id)}/approve?${SVC}`,
+      data || {},
+    );
+    return res.data;
+  },
+
+  rejectDelete: async (id: string, data?: { reviewComment?: string }) => {
+    const res = await api.post(
+      `${OPERATOR_BASE}/delete-requests/${encodeURIComponent(id)}/reject?${SVC}`,
+      data || {},
+    );
+    return res.data;
+  },
+};
+
+export const forumCategoriesOperatorApi = {
+  getCategories: async () => {
+    const res = await api.get(`${OPERATOR_BASE}/categories?${SVC}`);
+    return res.data;
+  },
+  updateCategory: async (id: string, data: unknown) => {
+    const res = await api.patch(`${OPERATOR_BASE}/categories/${encodeURIComponent(id)}?${SVC}`, data);
+    return res.data;
+  },
+  directDeactivate: async (id: string, data: unknown) => {
+    const res = await api.post(
+      `${OPERATOR_BASE}/categories/${encodeURIComponent(id)}/deactivate?${SVC}`,
+      data,
+    );
+    return res.data;
+  },
+  activate: async (id: string) => {
+    const res = await api.post(`${OPERATOR_BASE}/categories/${encodeURIComponent(id)}/activate?${SVC}`, {});
+    return res.data;
+  },
+  getDeleteCheck: async (id: string) => {
+    const res = await api.get(`${OPERATOR_BASE}/categories/${encodeURIComponent(id)}/delete-check?${SVC}`);
+    return res.data;
+  },
+  hardDelete: async (id: string, data: unknown) => {
+    const res = await api.delete(`${OPERATOR_BASE}/categories/${encodeURIComponent(id)}/hard?${SVC}`, {
+      data,
+    });
+    return res.data;
+  },
+};
+
+export const forumAnalyticsApi = {
+  getSummary: async () => {
+    const res = await api.get(`${OPERATOR_BASE}/analytics/summary?${SVC}`);
+    return res.data;
+  },
+  getTrend: async (days?: number) => {
+    const res = await api.get(`${OPERATOR_BASE}/analytics/trend?${svcQuery({ days })}`);
+    return res.data;
+  },
+  getActivity: async (limit?: number) => {
+    const res = await api.get(`${OPERATOR_BASE}/analytics/activity?${svcQuery({ limit })}`);
+    return res.data;
+  },
+};

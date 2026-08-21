@@ -132,6 +132,16 @@ import MembershipsPage from './pages/operator/MembershipsPage';
 import PharmacyHubAdminDashboard from './pages/admin/PharmacyHubAdminDashboard';
 import ServiceLegalSettingsPage from './pages/admin/ServiceLegalSettingsPage';
 import MembershipDetailPage from './pages/operator/MembershipDetailPage';
+// WO-O4O-PHARMACYHUB-OPERATOR-COMMUNITY-AND-COMMON-CAPABILITY-FULL-ADOPTION-V1
+//   공통 Operator Core (@o4o/operator-core-ui · @o4o/ui) 채택 화면 8종
+import OperatorMembersPage from './pages/operator/MembersPage';
+import OperatorForumPage from './pages/operator/OperatorForumPage';
+import OperatorForumRequestsPage from './pages/operator/ForumRequestsPage';
+import OperatorForumCategoriesPage from './pages/operator/ForumCategoriesManagementPage';
+import OperatorForumDeleteRequestsPage from './pages/operator/ForumDeleteRequestsPage';
+import OperatorForumAnalyticsPage from './pages/operator/ForumAnalyticsPage';
+import OperatorAnalyticsPage from './pages/operator/AnalyticsPage';
+import OperatorRoleManagementPage from './pages/operator/RoleManagementPage';
 // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
 import SupplierProductsPage from './pages/supplier/ProductsPage';
 // WO-O4O-PHARMACY-HUB-STORE-HUB-HOME-INTRODUCTION-V1 — 매장허브 홈 (공통 StoreHubTemplate)
@@ -415,6 +425,19 @@ export default function App() {
             <Route index element={<OperatorDashboardPage />} />
             <Route path="memberships" element={<MembershipsPage />} />
             <Route path="memberships/:membershipId" element={<MembershipDetailPage />} />
+            {/*
+              WO-O4O-PHARMACYHUB-OPERATOR-COMMUNITY-AND-COMMON-CAPABILITY-FULL-ADOPTION-V1:
+                공통 Operator capability 실채택 (메뉴만 추가하지 않는다 — 각 route 는
+                공통 Core 화면 + 공통 backend 에 연결돼 있다).
+            */}
+            <Route path="members" element={<OperatorMembersPage />} />
+            <Route path="forum" element={<OperatorForumPage />} />
+            <Route path="forum-requests" element={<OperatorForumRequestsPage />} />
+            <Route path="forum-categories" element={<OperatorForumCategoriesPage />} />
+            <Route path="forum-delete-requests" element={<OperatorForumDeleteRequestsPage />} />
+            <Route path="forum-analytics" element={<OperatorForumAnalyticsPage />} />
+            <Route path="analytics" element={<OperatorAnalyticsPage />} />
+            <Route path="roles" element={<OperatorRoleManagementPage />} />
           </Route>
 
           {/*
