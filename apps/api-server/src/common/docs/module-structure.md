@@ -53,7 +53,6 @@ The API Server is organized into these domains:
 | **commerce** | E-commerce core | Products, cart, wishlist |
 | **dropshipping** | Order fulfillment | Orders, suppliers, inventory |
 | **cms** | Content management | Posts, pages, media, forms |
-| **sites** | Multi-site builder | Sites, themes, menus |
 | **signage** | Digital signage | Playlists, schedules, devices |
 | **admin** | Admin operations | Jobs, settlements, analytics |
 | **partner** | Partner/seller management | Seller dashboard, reports |

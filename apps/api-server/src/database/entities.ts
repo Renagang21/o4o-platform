@@ -105,8 +105,8 @@ import { ForumNotification } from '../entities/ForumNotification.js';
 // SignageDevice, SignageSlide replaced by digital-signage-core entities
 // Deployment entities
 import { DeploymentInstance } from '../modules/deployment/deployment.entity.js';
-// Site entities
-import { Site } from '../modules/sites/site.entity.js';
+// Site entities (Multi-Site Builder) 는 WO-O4O-MULTI-SITE-BUILDER-SITES-DOMAIN-CENSUS-AND-RETIREMENT-V1
+// 에서 retire 됐다. `sites` 테이블은 production 에 생성된 적이 없다.
 
 // ✅ CMS Module V2 entities (Phase C-2)
 // Note: CMSCustomPostType removed - now unified with CustomPostType using cms_cpt_types table
@@ -644,8 +644,6 @@ export const entities = [
   // Digital Signage legacy entities removed — see digital-signage-core
   // Deployment entities
   DeploymentInstance,
-  // Site entities
-  Site,
   // ✅ CMS Module V2 entities (Phase C-2) - local entities, kept
   CMSCustomField,
   CMSView,

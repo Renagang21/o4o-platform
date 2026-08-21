@@ -8,7 +8,8 @@
  *   - `sites` migration(`9000000000000-CreateSitesTable.ts`)은 실행된 적 없이
  *     2026-01-08 `chore(migrations): remove 124 unexecuted migrations` 에서 제거됐다.
  *   - production DB 에 `sites` 는 존재하지 않는다(`to_regclass` = null).
- *   - site 를 생성하는 `modules/sites/sites.routes.ts` 는 어디에도 mount 돼 있지 않다.
+ *   - site 를 생성하는 `modules/sites/sites.routes.ts` 도 mount 돼 있지 않았다
+ *     (해당 도메인은 WO-O4O-MULTI-SITE-BUILDER-SITES-DOMAIN-CENSUS-AND-RETIREMENT-V1 에서 제거됨).
  *     → 데이터가 생길 수 있는 경로 자체가 없다.
  *   - 실측: summary·report = 500(`relation "sites" does not exist`),
  *           tenants·apps·themes·warnings = 200 빈 배열, validate = tenantsValidated 0.

@@ -179,10 +179,15 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   // WO-O4O-SERVICE-MONITOR-SITES-TABLE-DEPENDENCY-AUDIT-AND-CLOSURE-V1 (판정 MONITOR_LEGACY_RETIRE):
   //   `/api/v1/service/monitor/*` 8개는 `sites` 테이블(Multi-Site Builder, 2025-12 설계)에만 의존했다.
   //   해당 migration 은 실행된 적 없이 2026-01-08 `chore(migrations): remove 124 unexecuted migrations`
-  //   에서 제거됐고, site 를 생성하는 `modules/sites/sites.routes.ts` 는 어디에도 mount 돼 있지 않다.
+  //   에서 제거됐고, site 를 생성하는 `modules/sites/sites.routes.ts` 도 mount 돼 있지 않았다.
   //   즉 production 에 데이터가 존재할 수 있는 경로 자체가 없어 summary·report 는 500,
   //   나머지 5개는 항상 빈 배열이었다. 대체 canonical table 도 없어 schema 복구 대상이 아니다.
   //   → router 미등록(404)으로 retire. 상세는 CHECK 문서.
+  // WO-O4O-MULTI-SITE-BUILDER-SITES-DOMAIN-CENSUS-AND-RETIREMENT-V1 (판정 RETIRE_CONFIRMED):
+  //   후속으로 `modules/sites/*`(entity·routes·dto)와 `database/entities.ts` 의 Site 등록까지
+  //   제거했다. `/api/sites`·`/api/v1/sites` mount 는 2025-12-11 `refactor(api-server):
+  //   Phase 8-3 Legacy Entity Removal & Service Cleanup` 에서 이미 해제된 상태였다.
+  //   `branch_sites`(KPA 분회 홈페이지)는 별개 ACTIVE 도메인이며 유지한다.
 
   logger.info('✅ Core API routes registered');
 }
