@@ -91,7 +91,7 @@ KPA / GlycoPharm / K-Cosmetics / Neture = **0**.
 | active 판정 | `isActive(item.href, pathname)` — parent href 단독 |
 | `filterContextualNav` | `toNavItem` 이 `{ label, href }` 로 정규화하여 children 을 **버린다** |
 | route matcher / breadcrumb / sidebar / analytics | `.children` 읽기는 전부 `AGSidebar` 의 `NavItem`(`path` 기반 · `types.ts`) 과 `apps/admin-dashboard` 관리자 메뉴 빌더 — **별개 타입** |
-| tests / fixtures | `GlobalHeaderNavItem` · `PH_PUBLIC_NAV` · `filterContextualNav` 참조 spec/test **0건** |
+| tests / fixtures | ⚠️ **이 칸의 최초 판정은 틀렸다 — §17 참조** |
 | `GlobalHeaderMenuItem.children` | React `ReactNode` — nav 필드와 무관 |
 
 > 코드 자체가 consumer 0 을 증언한다: [CommunityHomePage.tsx](../../services/web-pharmacy-hub/src/pages/community/CommunityHomePage.tsx)
@@ -351,6 +351,66 @@ GLOBAL_HEADER_CHILDREN_CONTRACT = REMOVED
 - PharmacyHub dead `children` config **없음**
 - 하위 route 및 실제 진입 UI **유지** (route 삭제 0 · 대체 진입 10/10)
 - Header/Footer 공통화 트랙 **`CLOSED` 판정 유지** (변경하지 않았다)
+
+---
+
+## 17. 배포 후 CI 실패 — consumer 조사 누락과 그 교정
+
+**최초 커밋 `a0f8cc48c` 는 main 을 red 로 만들었다.** 숨기지 않고 기록한다.
+
+### 17-1. 무슨 일이 있었나
+
+| 항목 | 값 |
+|------|-----|
+| 실패 run | `32488018335` (CI Pipeline, head `d9ecc678a` = 내 커밋을 포함한 최신 main) |
+| 실패 job | Code Quality Check → api-server Jest |
+| 결과 | Test Suites 1 failed / 179 passed · Tests **2 failed** / 2894 passed |
+| 실패 테스트 | `pharmacy-hub-community-capability-adoption.spec.ts` §14 — `/forum/request` · `/forum/my-dashboard` 가 `공개 navigation 에 노출된다` |
+
+`a0f8cc48c` 자체의 CI run 은 병렬 세션 push 로 **cancelled** 되어 실패가 그때 드러나지 않았고,
+`d98533518` run 도 같은 이유로 cancelled 됐다. 실패는 `d9ecc678a` run 에서 처음 관측됐다.
+→ **cancelled 를 "일단 통과"로 취급하면 안 된다**는 사례가 하나 더 생겼다.
+
+### 17-2. 근본 원인 — §2-3 consumer 조사의 방법론 결함
+
+최초 consumer census 는 `GlobalHeaderNavItem` · `PH_PUBLIC_NAV` · `filterContextualNav` 라는
+**식별자(identifier)** 로만 검색했다. 그러나 이 spec 은 `navigation.ts` 를 **raw text 로 읽어**
+`href: '/forum/request'` 같은 **문자열**을 단언한다. 세 식별자를 하나도 포함하지 않으므로
+식별자 검색에 걸리지 않았다. 위치도 frontend 가 아닌 `apps/api-server/src/__tests__/` 였다.
+
+```text
+잘못된 판정: "children 을 읽는 test 0건"
+실제       : navigation.ts 를 텍스트로 읽는 spec 3개 존재
+             (community-capability / content-resource / lms-learner)
+```
+
+**교훈**: config 파일을 지울 때는 심볼 참조뿐 아니라 **그 파일을 문자열로 읽는 소비자**도 찾아야 한다.
+검색축은 `식별자` + `파일경로 문자열`(`config/navigation`) + `값 문자열`(`href: '/...'`) 3개다.
+
+### 17-3. 왜 2건만 실패했나
+
+`/resources` · `/account/enrollments` · `/account/certificates` 를 단언하는 나머지 2개 spec 은
+그 route 들이 **`PH_FOOTER_SECTIONS` 에 그대로 남아 있어** 통과했다.
+`/forum/request` · `/forum/my-dashboard` 는 footer 에 없는 유일한 2개였다.
+
+### 17-4. 교정
+
+계약의 요구는 describe 명 그대로 "**기능 존재 + 진입점 없음 상태를 남기지 않는다**" 이지
+"header navigation 에 있을 것" 이 아니다. 두 route 의 실제 진입 표면은 `ForumHubPage` 의
+`infoLinks` 이므로 단언을 그 표면으로 옮겼다 — **가드를 약화하지 않고 대상만 정정**했다.
+
+| 파일 | 변경 |
+|------|------|
+| `pharmacy-hub-community-capability-adoption.spec.ts` | `forumHubPage` fixture 추가 · §14 단언을 `navigation` → `forumHubPage` 로 이동 · 진입 표면 자체(`/forum`)가 공개 nav 에 있는지 검사하는 테스트 **추가** |
+| `pharmacy-hub-lms-learner-adoption.spec.ts` | 테스트 명이 "교육 메뉴에서" 였으나 실제 통과 근거는 footer 였다(내 변경으로 이름이 사실과 어긋남). 이름을 실제와 맞추고 단언 범위를 `PH_FOOTER_SECTIONS` 블록으로 **좁혔다**(전체 파일 grep → footer 블록) |
+
+로컬 검증: 3개 spec **68 tests 전부 PASS**.
+
+### 17-5. 계약 판정은 바뀌지 않는다
+
+`children` 제거 판정 자체는 유효하다 — 이 테스트들은 `children` 을 소비한 것이 아니라
+**진입점 존재**를 보증했고, 그 보증은 Footer · 허브 카드 · infoLinks 로 계속 성립한다(§7).
+route 삭제 0 · 대체 진입 10/10 도 그대로다.
 
 ---
 

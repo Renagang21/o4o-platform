@@ -27,6 +27,7 @@ const dashboardPage = read(`${PH_WEB}/pages/forum/MyForumDashboardPage.tsx`);
 const memberPage = read(`${PH_WEB}/pages/forum/ForumMemberManagementPage.tsx`);
 const listPage = read(`${PH_WEB}/pages/forum/ForumListPage.tsx`);
 const detailPage = read(`${PH_WEB}/pages/forum/ForumDetailPage.tsx`);
+const forumHubPage = read(`${PH_WEB}/pages/forum/ForumHubPage.tsx`);
 const serviceCatalog = read('apps/api-server/src/config/service-catalog.ts');
 const phRoutes = read('apps/api-server/src/routes/pharmacy-hub/pharmacy-hub.routes.ts');
 const categoryRequestRoutes = read('apps/api-server/src/routes/forum/forum-category-request.routes.ts');
@@ -158,8 +159,19 @@ describe('§14 navigation — 기능 존재 + 진입점 없음 상태를 남기�
     expect(appTsx).toContain('path="/forum/my-dashboard/:forumId/members"');
   });
 
-  it.each(NEW_ROUTES)('%s 가 공개 navigation 에 노출된다', (route) => {
-    expect(navigation).toContain(`href: '${route}'`);
+  /*
+   * WO-O4O-GLOBAL-HEADER-UNUSED-CHILDREN-CONTRACT-REMOVAL-V1:
+   *   공통 GlobalHeader 의 nav `children` 계약이 제거되어 PrimaryNav 는 1단이다.
+   *   §14 가 요구하는 것은 "진입점이 존재할 것" 이지 "header navigation 에 있을 것" 이 아니다
+   *   (describe 명 참조). 두 route 의 실제 진입 표면은 ForumHubPage 의 infoLinks 이므로
+   *   계약을 그 표면에 고정한다 — header 로 되돌리려면 parent 항목 승격이 필요하다.
+   */
+  it.each(NEW_ROUTES)('%s 가 실제 진입 UI(ForumHub infoLinks)에 노출된다', (route) => {
+    expect(forumHubPage).toContain(`href: '${route}'`);
+  });
+
+  it('진입 표면인 ForumHub 자체가 공개 navigation 에서 도달 가능하다', () => {
+    expect(navigation).toContain("href: '/forum'");
   });
 
   it('새 커뮤니티 route 는 MembershipGate 뒤에 있다(권한 모델 신설 없음 §15)', () => {

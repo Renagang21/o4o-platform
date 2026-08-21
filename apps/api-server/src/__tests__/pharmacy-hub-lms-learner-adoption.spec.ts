@@ -231,9 +231,16 @@ describe('§17·§18 navigation — 진입점 없는 기능을 남기지 않는�
     expect(stripComments(phAppTsx)).not.toContain('path="/mypage"');
   });
 
-  it('교육 메뉴에서 내 수강·내 수료증으로 바로 갈 수 있다 (§17)', () => {
-    expect(phNavigation).toContain("href: '/account/enrollments'");
-    expect(phNavigation).toContain("href: '/account/certificates'");
+  /*
+   * WO-O4O-GLOBAL-HEADER-UNUSED-CHILDREN-CONTRACT-REMOVAL-V1:
+   *   header nav `children` 제거로 두 route 의 진입점은 '교육' 메뉴가 아니라
+   *   PH_FOOTER_SECTIONS('서비스' 섹션)와 My Page nav 다. 단언 대상은 그대로
+   *   navigation.ts 지만, 통과 근거가 footer 이므로 테스트 명을 실제와 맞춘다.
+   */
+  it('Footer 에서 내 수강·내 수료증으로 바로 갈 수 있다 (§17 — deep-link only 금지)', () => {
+    const footerBlock = phNavigation.slice(phNavigation.indexOf('PH_FOOTER_SECTIONS'));
+    expect(footerBlock).toContain("href: '/account/enrollments'");
+    expect(footerBlock).toContain("href: '/account/certificates'");
   });
 
   it('learner 화면은 /education 으로 되돌아간다 (다른 서비스 경로로 새지 않는다)', () => {
