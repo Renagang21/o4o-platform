@@ -319,12 +319,25 @@ describe('자료실 축 — 3서비스 공통 Template 유지', () => {
   });
 });
 
-describe('Pharmacy-Hub — 커뮤니티 콘텐츠·자료실 미구현 사실 고정', () => {
+describe('Pharmacy-Hub — 커뮤니티 자료실 채택 / 콘텐츠 미구현 사실 고정', () => {
   const app = read('services/web-pharmacy-hub/src/App.tsx');
 
-  it('커뮤니티 `/content` · `/resources` route 가 존재하지 않는다', () => {
+  /**
+   * WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §9·§12
+   *
+   * 자료실(`/resources`)은 공통 ResourcesHubTemplate 로 채택돼 더 이상 미구현이 아니다.
+   * 콘텐츠(`/content`)는 PH 에서 forum pinned post 가 canonical 이므로 중복 모델을
+   * 만들지 않는다(§10) — 미구현 사실을 계속 고정한다.
+   */
+  it('커뮤니티 `/content` route 는 여전히 존재하지 않는다(중복 모델 금지)', () => {
     expect(app).not.toContain('path="/content"');
-    expect(app).not.toContain('path="/resources"');
+  });
+
+  it('자료실 `/resources` 는 공통 Template + serviceKey 계약으로 채택돼 있다', () => {
+    expect(app).toContain('path="/resources"');
+    const page = read('services/web-pharmacy-hub/src/pages/resources/PharmacyHubResourcesPage.tsx');
+    expect(page).toContain('ResourcesHubTemplate');
+    expect(page).toContain('pharmacy-hub');
   });
 
   it('구현된 content/library 는 store-owner 축(Store Production Material)이다', () => {

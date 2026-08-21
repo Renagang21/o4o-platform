@@ -130,6 +130,7 @@ import MyForumDashboardPage from './pages/forum/MyForumDashboardPage';
 import ForumMemberManagementPage from './pages/forum/ForumMemberManagementPage';
 import CommunityHomePage from './pages/community/CommunityHomePage';
 import CommunitySearchPage from './pages/community/CommunitySearchPage';
+import PharmacyHubResourcesPage from './pages/resources/PharmacyHubResourcesPage';
 import EducationPage from './pages/education/EducationPage';
 import LmsCourseDetailPage from './pages/education/LmsCourseDetailPage';
 import LmsLessonPage from './pages/education/LmsLessonPage';
@@ -401,6 +402,16 @@ export default function App() {
             element={
               <MembershipGate>
                 <CommunitySearchPage />
+              </MembershipGate>
+            }
+          />
+          {/* WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §9·§12
+              공통 ResourcesHubTemplate 채택 — 원장은 공통 cms_contents(serviceKey='pharmacy-hub') */}
+          <Route
+            path="/resources"
+            element={
+              <MembershipGate>
+                <PharmacyHubResourcesPage />
               </MembershipGate>
             }
           />

@@ -25,7 +25,11 @@ import { ROLE_LABELS, ROLES } from './service';
 /*
  * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §13:
  *   PH 커뮤니티 navigation 최소 구성 = 커뮤니티 홈 / 포럼 / 검색 / 교육 / 내 글.
- *   Content · Resources 는 PH 에 미구현이므로 링크를 만들지 않는다("준비 중" dead route 금지).
+ *
+ * WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12:
+ *   자료실(/resources)이 공통 ResourcesHubTemplate 로 실제 구현되어 링크를 추가한다.
+ *   Content(공지·소식)는 PH 에서 forum pinned post 가 canonical 이므로 별도 링크를
+ *   만들지 않는다 — 같은 의미의 중복 모델을 만들지 않는다(§10).
  */
 export const PH_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: '홈', href: '/' },
@@ -41,6 +45,8 @@ export const PH_PUBLIC_NAV: GlobalHeaderNavItem[] = [
       // 아래 두 route 는 App.tsx 에 실제로 등재돼 있다 (데드링크 0 원칙 유지).
       { label: '내 포럼', href: '/forum/my-dashboard' },
       { label: '포럼 개설 신청', href: '/forum/request' },
+      // WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12
+      { label: '자료실', href: '/resources' },
     ],
   },
   // WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §17:

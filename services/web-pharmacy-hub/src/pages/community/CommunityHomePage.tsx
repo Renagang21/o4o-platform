@@ -4,8 +4,14 @@
  * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §4·§5·§13
  *
  * - 기존 공통 자산(StandardHomeTemplate / LatestActivitySection)만으로 구성한다.
- * - PH 는 Content · Resources 가 미구현이므로 해당 탭·카드·링크를 만들지 않는다
+ * - PH 는 Content 가 미구현이므로 해당 탭·카드·링크를 만들지 않는다
  *   (§4: placeholder 기능을 새로 만들지 않는다 / §13: dead route 금지).
+ *
+ * WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12:
+ *   자료실(/resources)은 이후 채택돼 실재하지만, "최신 활동" 탭은 추가하지 않는다.
+ *   탭 데이터는 `/pharmacy-hub/home/latest` 가 공급하며 resource 타입을 다루지 않아
+ *   backend 변경 없이는 항상 빈 탭이 된다(§14 신규 backend 0 / §4 placeholder 금지).
+ *   진입점은 global navigation 의 '커뮤니티 > 자료실' 링크가 담당한다.
  * - 최신 활동은 공통 View 를 그대로 쓰고, 데이터만 `/pharmacy-hub/home/latest` 로 주입한다.
  */
 
