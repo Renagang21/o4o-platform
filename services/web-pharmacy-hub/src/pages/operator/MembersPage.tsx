@@ -129,8 +129,9 @@ export default function MembersPage() {
         { key: 'store_owner', label: '매장(약국)', roleFilter: ['pharmacy-hub:store_owner', 'store_owner'] },
         { key: 'supplier', label: '공급자', roleFilter: ['pharmacy-hub:supplier', 'supplier'] },
       ]}
+      // 공통 콘솔이 마지막에 built-in `pending`(가입 신청) 탭을 항상 덧붙인다.
+      // 여기서 pending 을 또 선언하면 "가입 신청" 탭이 2개로 중복 렌더된다.
       statusTabs={[
-        { key: 'status-pending', label: '가입 신청', status: 'pending' },
         { key: 'status-active', label: '활성', status: 'active' },
         { key: 'status-rejected', label: '반려', status: 'rejected' },
       ]}

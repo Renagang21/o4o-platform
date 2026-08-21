@@ -139,10 +139,26 @@ export function resolveOperatorScope(
   scope: ServiceScope,
   query: { serviceKey?: unknown; all?: unknown }
 ): ResolvedOperatorScope | null {
+  const sk = typeof query.serviceKey === 'string' ? query.serviceKey.trim() : '';
+
   if (!scope.isPlatformAdmin) {
+    // WO-O4O-PHARMACYHUB-OPERATOR-COMMUNITY-AND-COMMON-CAPABILITY-FULL-ADOPTION-V1:
+    //   다중 서비스 operator(여러 서비스에 operator/admin role 을 가진 계정)는
+    //   scope.serviceKeys 가 복수였고, 명시한 serviceKey 가 무시돼 **타 서비스 데이터가
+    //   섞여 나왔다** (프로덕션 확인: Pharmacy-Hub 회원 관리에 neture/kpa-society/
+    //   k-cosmetics 회원 7명, 운영 활동 로그에 glycopharm.* 액션 노출).
+    //   F6 Boundary Policy Rule 3 위반이므로 명시 serviceKey 로 **좁히기만** 한다.
+    //   - 보유 scope 안의 키  → 그 키 하나로 축소
+    //   - 보유 scope 밖의 키  → 빈 scope (권한 확대 불가 · 결과 0건)
+    //   - serviceKey 미지정   → 종전과 동일(보유 scope 전체)
+    //   어떤 경로로도 scope.serviceKeys 를 넘어서지 않는다.
+    if (sk && sk !== 'all') {
+      const narrowed = scope.serviceKeys.includes(sk) ? [sk] : [];
+      return { mode: 'service-scoped', serviceKeys: narrowed, crossService: false };
+    }
     return { mode: 'service-scoped', serviceKeys: scope.serviceKeys, crossService: false };
   }
-  const sk = typeof query.serviceKey === 'string' ? query.serviceKey.trim() : '';
+
   if (sk && sk !== 'all') {
     return { mode: 'platform-scoped', serviceKeys: [sk], crossService: false };
   }
