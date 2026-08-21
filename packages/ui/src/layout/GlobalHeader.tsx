@@ -18,10 +18,15 @@ import { User, Menu, X } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
+/**
+ * PrimaryNav 는 1단이다.
+ * WO-O4O-GLOBAL-HEADER-UNUSED-CHILDREN-CONTRACT-REMOVAL-V1:
+ *   미사용 `children` 계약을 제거했다(GLOBAL_HEADER_CHILDREN_CONTRACT = REMOVED).
+ *   상단 노출이 필요한 항목은 submenu 가 아니라 parent 항목으로 승격한다.
+ */
 export interface GlobalHeaderNavItem {
   label: string;
   href: string;
-  children?: { label: string; href: string }[];
 }
 
 export interface GlobalHeaderBrand {

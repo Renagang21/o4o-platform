@@ -23,56 +23,30 @@ import { ROLE_LABELS, ROLES } from './service';
  * 미가입자에게도 의미 있는 진입점이다(데드링크 아님).
  */
 /*
- * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §13:
- *   PH 커뮤니티 navigation 최소 구성 = 커뮤니티 홈 / 포럼 / 검색 / 교육 / 내 글.
+ * WO-O4O-GLOBAL-HEADER-UNUSED-CHILDREN-CONTRACT-REMOVAL-V1:
+ *   PrimaryNav 는 1단이다. 공통 GlobalHeader 에 submenu 렌더러가 없어
+ *   `children` 은 한 번도 렌더된 적이 없고, 계약 자체가 제거됐다.
+ *   상단 노출이 필요한 항목은 여기 parent 로 승격한다 (children 부활 금지).
  *
- * WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12:
- *   자료실(/resources)이 공통 ResourcesHubTemplate 로 실제 구현되어 링크를 추가한다.
+ * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §13 ·
+ * WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12 의
+ * 하위 진입점 요구(포럼 · 검색 · 내 글 · 자료실 등)는 Footer · 허브 카드가 충족한다.
  *   Content(공지·소식)는 PH 에서 forum pinned post 가 canonical 이므로 별도 링크를
  *   만들지 않는다 — 같은 의미의 중복 모델을 만들지 않는다(§10).
  */
 export const PH_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: '홈', href: '/' },
-  {
-    label: '커뮤니티',
-    href: '/community',
-    children: [
-      { label: '커뮤니티 홈', href: '/community' },
-      { label: '포럼', href: '/forum' },
-      { label: '검색', href: '/community/search' },
-      { label: '내 글', href: '/forum/my-posts' },
-      // WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §14
-      // 아래 두 route 는 App.tsx 에 실제로 등재돼 있다 (데드링크 0 원칙 유지).
-      { label: '내 포럼', href: '/forum/my-dashboard' },
-      { label: '포럼 개설 신청', href: '/forum/request' },
-      // WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12
-      { label: '자료실', href: '/resources' },
-    ],
-  },
+  // 커뮤니티 하위(포럼 · 검색 · 내 글 · 내 포럼 · 포럼 개설 신청 · 자료실)는
+  // CommunityHomePage 카드 · ForumHubPage infoLinks · Footer '서비스' 가 담당한다.
+  { label: '커뮤니티', href: '/community' },
   // WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §17:
-  //   교육 허브 + learner 개인 화면(내 수강 / 내 수료증)을 상단에서 바로 잡는다.
-  //   deep-link only 상태를 남기지 않는다. 세 route 모두 App.tsx 에 등재돼 있다.
-  {
-    label: '교육',
-    href: '/education',
-    children: [
-      { label: '교육 허브', href: '/education' },
-      { label: '내 수강', href: '/account/enrollments' },
-      { label: '내 수료증', href: '/account/certificates' },
-    ],
-  },
+  //   learner 개인 화면(내 수강 / 내 수료증)은 Footer '서비스' 섹션과
+  //   My Page nav(PHARMACY_HUB_ACCOUNT_NAV_ITEMS)가 담당한다 — deep-link only 아님.
+  { label: '교육', href: '/education' },
   // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
-  // 공개 서비스 소개(/service-guide) 와 기능 이용 매뉴얼(/guide/*) 진입점.
-  // 두 route 모두 App.tsx 에 실제로 등재돼 있다 (데드링크 0 원칙).
-  {
-    label: '이용 안내',
-    href: '/service-guide',
-    children: [
-      { label: '서비스 소개', href: '/service-guide' },
-      { label: '이용 가이드', href: '/guide/intro' },
-      { label: '기능별 이용 방법', href: '/guide/features' },
-    ],
-  },
+  //   기능 이용 매뉴얼(/guide/*)은 Footer '이용 안내' 섹션과
+  //   CommunityHomePage help 섹션이 담당한다.
+  { label: '이용 안내', href: '/service-guide' },
 ];
 
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
