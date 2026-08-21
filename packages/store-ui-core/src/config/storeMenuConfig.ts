@@ -206,6 +206,10 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
     { label: '콘텐츠·자료함', items: [
       { key: 'store-contents', label: '매장 콘텐츠', subPath: '/content' },
       { key: 'library',        label: '자료함',      subPath: '/library' },
+      // WO-O4O-KPA-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-CAPABILITY-PARITY-AUDIT-V1 §11/§17
+      //   route(`/store-owner/library/resources`) 와 화면이 이미 있는데 사이드바 진입점만 없었다
+      //   (in-page 링크로만 도달) — KPA/GlycoPharm/K-Cosmetics 와 동일하게 '자료' 항목을 노출한다.
+      { key: 'library-resources', label: '자료',    subPath: '/library/resources' },
       { key: 'blog',           label: '블로그',      subPath: '/blog' },
     ]},
     // WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 (2026-08-08)
