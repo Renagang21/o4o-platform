@@ -3,7 +3,7 @@
 - **WO**: `WO-O4O-SIGNAGE-RESOURCE-ID-VALIDATION-AND-INVALID-UUID-NORMALIZATION-V1`
 - **작업일**: 2026-08-21
 - **상태**: CLOSED
-- **commit**: `60b6d33ac` (코드) · `<CHECK_COMMIT>` (본 문서)
+- **commit**: `60b6d33ac` (코드) · `a20980a71` (본 문서)
 
 ---
 
