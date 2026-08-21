@@ -58,7 +58,7 @@ import { AiUsageAggregate } from '../modules/ai-policy/entities/ai-usage-aggrega
 import { AiBillingSummary } from '../modules/ai-policy/entities/ai-billing-summary.entity.js';
 // App System entities
 import { App } from '../entities/App.js';
-import { AppInstance } from '../entities/AppInstance.js';
+// AppInstance (app_instances) retired — WO-O4O-APP-INSTANCES-LIFECYCLE-CENSUS-AND-CANONICAL-DISPOSITION-V1
 import { AppUsageLog } from '../entities/AppUsageLog.js';
 import { AppRegistry } from '../entities/AppRegistry.js';
 // Cart/Order/Settlement entities removed - legacy commerce entities
@@ -614,7 +614,6 @@ export const entities = [
   AIUsageLog,
   // App System entities
   App,
-  AppInstance,
   AppUsageLog,
   AppRegistry,
   // Cart/Order/Settlement entities removed - legacy commerce

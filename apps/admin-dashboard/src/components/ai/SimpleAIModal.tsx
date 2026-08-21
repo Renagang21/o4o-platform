@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,6 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Sparkles, AlertCircle } from 'lucide-react';
 import { simpleAIGenerator, AI_MODELS, type AIModel, type Block, type GenerateResult } from '@/services/ai/SimpleAIGenerator';
-import { AppSystemKeyService } from '@/services/app-system-keys.service';
 
 interface SimpleAIModalProps {
   isOpen: boolean;
@@ -45,39 +44,12 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
   const [progressMessage, setProgressMessage] = useState('');
   const [elapsedTime, setElapsedTime] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [isAppInstalled, setIsAppInstalled] = useState(false);
 
-  // 모달이 열릴 때 저장된 API 키 자동 로드 (App System에서)
-  useEffect(() => {
-    const loadSavedSettings = async () => {
-      if (isOpen) {
-        try {
-          // Check if Gemini app is installed
-          const installed = await AppSystemKeyService.isGeminiInstalled();
-          setIsAppInstalled(installed);
-
-          if (installed) {
-            // Load API key and model from App System
-            const savedApiKey = await AppSystemKeyService.getGeminiKey();
-            const savedModel = await AppSystemKeyService.getGeminiModel();
-
-            if (savedApiKey) {
-              setApiKey(savedApiKey);
-            }
-
-            if (savedModel) {
-              setModel(savedModel as AIModel);
-            }
-          }
-        } catch (error) {
-          // API 키 로드 실패 시 무시 (사용자가 직접 입력 가능)
-          // Error is logged for debugging but not shown to user
-        }
-      }
-    };
-
-    loadSavedSettings();
-  }, [isOpen]);
+  // WO-O4O-APP-INSTANCES-LIFECYCLE-CENSUS-AND-CANONICAL-DISPOSITION-V1
+  //   기존의 App System(`app_instances`) 자동 로드 useEffect 를 제거했다.
+  //   그 경로는 이미 존재하지 않는 `/api/v1/apps/:slug/instance` 를 호출해 항상 404 였고,
+  //   isGeminiInstalled() 는 언제나 false, API 키·모델 자동 채움은 한 번도 동작하지 않았다.
+  //   따라서 제거는 동작 보존이다(사용자는 아래 입력란에 직접 키를 입력한다).
 
   // Gemini 모델만 필터링
   const geminiModels = Object.entries(AI_MODELS).filter(([key]) => key.startsWith('gemini-'));
@@ -264,13 +236,11 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
                 <Sparkles className="w-4 h-4 text-blue-600" />
                 <span className="font-medium text-blue-900">Google Gemini AI 사용</span>
               </div>
-              {!isAppInstalled && (
-                <p className="text-xs text-blue-700 mt-1">
-                  💡 <a href="/admin/settings/app-services" target="_blank" className="underline hover:no-underline">
-                    AI Services 설정
-                  </a>에서 Gemini 앱을 먼저 설치하세요.
-                </p>
-              )}
+              <p className="text-xs text-blue-700 mt-1">
+                💡 <a href="/admin/settings/app-services" target="_blank" className="underline hover:no-underline">
+                  AI Services 설정
+                </a>에서 Gemini 앱을 먼저 설치하세요.
+              </p>
             </div>
 
             {/* 모델 선택 */}

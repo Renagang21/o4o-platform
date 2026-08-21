@@ -1,42 +1,29 @@
 /**
  * App Registry Service
- * Manages app registration, instances, and execution
+ * Manages `apps` (App) registration and usage statistics read.
+ *
+ * WO-O4O-APP-INSTANCES-LIFECYCLE-CENSUS-AND-CANONICAL-DISPOSITION-V1 (retire):
+ *   테넌트별 앱 설치 instance (`app_instances` / AppInstance) 계약을 제거했다.
+ *   - production 0 row · inbound/outbound FK 0 · runtime read/write consumer 0
+ *   - 이 계약을 노출하던 `routes/apps.ts` + `controllers/apps.controller.ts` 는
+ *     이미 8d58243bf · 32273509a 에서 제거되어 `/api/v1/apps/:slug/install|instance|config|execute`
+ *     엔드포인트가 존재하지 않았다(= install/getInstance/updateConfig/execute 는 도달 불가).
+ *   - 앱 설치·활성 상태의 정본은 `app_registry` (AppManager · `/api/v1/admin/apps`) 이며
+ *     본 서비스와 무관하다. AI 실행 경로의 정본은 서버측 AI proxy(`@o4o/ai-core`) 다.
+ *
+ * 주의(명칭 충돌): 본 서비스 이름은 "AppRegistry" 지만 `app_registry` 테이블을 다루지 않는다.
+ *   본 서비스 = `apps` 테이블 / `AppManager` = `app_registry` 테이블.
  */
 
 import { Repository, DataSource } from 'typeorm';
 import { App } from '../entities/App.js';
-import { AppInstance } from '../entities/AppInstance.js';
 import { AppUsageLog } from '../entities/AppUsageLog.js';
 import { AIUsageLog, AIProvider } from '../entities/AIUsageLog.js';
-import { execute as executeAI } from '@o4o/ai-core';
 import logger from '../utils/logger.js';
-
-interface ExecuteOptions {
-  appSlug: string;
-  action: string;
-  payload: any;
-  userId?: string;
-  businessId?: string | null;
-}
-
-interface ExecuteResult {
-  success: boolean;
-  data?: any;
-  error?: {
-    type: string;
-    message: string;
-  };
-  usage?: {
-    inputTokens?: number;
-    outputTokens?: number;
-    durationMs: number;
-  };
-}
 
 class AppRegistryService {
   private static instance: AppRegistryService;
   private appRepository!: Repository<App>;
-  private instanceRepository!: Repository<AppInstance>;
   private usageLogRepository!: Repository<AppUsageLog>;
   private aiUsageLogRepository!: Repository<AIUsageLog>;
   private dataSource!: DataSource;
@@ -56,7 +43,6 @@ class AppRegistryService {
   initialize(dataSource: DataSource): void {
     this.dataSource = dataSource;
     this.appRepository = dataSource.getRepository(App);
-    this.instanceRepository = dataSource.getRepository(AppInstance);
     this.usageLogRepository = dataSource.getRepository(AppUsageLog);
     this.aiUsageLogRepository = dataSource.getRepository(AIUsageLog);
     logger.info('✅ App Registry Service initialized');
@@ -105,225 +91,6 @@ class AppRegistryService {
     return await this.appRepository.find({
       where: { status: 'active' }
     });
-  }
-
-  /**
-   * Install app (create instance)
-   */
-  async install(appSlug: string, businessId: string | null = null, config?: Record<string, any>): Promise<AppInstance> {
-    const app = await this.getBySlug(appSlug);
-    if (!app) {
-      throw new Error(`App not found: ${appSlug}`);
-    }
-
-    // Check if already installed
-    const existing = await this.instanceRepository.findOne({
-      where: { appId: app.id, businessId }
-    });
-
-    if (existing) {
-      throw new Error(`App already installed: ${appSlug}`);
-    }
-
-    const instance = this.instanceRepository.create({
-      appId: app.id,
-      businessId,
-      config,
-      status: 'active'
-    });
-
-    await this.instanceRepository.save(instance);
-    logger.info(`✅ App installed: ${appSlug} (business: ${businessId || 'global'})`);
-
-    return instance;
-  }
-
-  /**
-   * Get app instance
-   */
-  async getInstance(appSlug: string, businessId: string | null = null): Promise<AppInstance | null> {
-    const app = await this.getBySlug(appSlug);
-    if (!app) {
-      return null;
-    }
-
-    return await this.instanceRepository.findOne({
-      where: { appId: app.id, businessId },
-      relations: ['app']
-    });
-  }
-
-  /**
-   * Update app instance config
-   */
-  async updateConfig(appSlug: string, config: Record<string, any>, businessId: string | null = null): Promise<AppInstance> {
-    const instance = await this.getInstance(appSlug, businessId);
-    if (!instance) {
-      throw new Error(`App instance not found: ${appSlug}`);
-    }
-
-    instance.config = { ...instance.config, ...config };
-    await this.instanceRepository.save(instance);
-
-    logger.info(`⚙️  App config updated: ${appSlug}`);
-    return instance;
-  }
-
-  /**
-   * Execute app action
-   */
-  async execute(options: ExecuteOptions): Promise<ExecuteResult> {
-    const startTime = Date.now();
-    const { appSlug, action, payload, userId, businessId = null } = options;
-
-    try {
-      // Get app instance
-      const instance = await this.getInstance(appSlug, businessId);
-      if (!instance) {
-        throw new Error(`App not installed: ${appSlug}`);
-      }
-
-      if (instance.status !== 'active') {
-        throw new Error(`App is not active: ${appSlug}`);
-      }
-
-      // Validate config (e.g., API key)
-      if (!instance.config || Object.keys(instance.config).length === 0) {
-        throw new Error(`App not configured: ${appSlug}. Please set API keys in settings.`);
-      }
-
-      // Execute app-specific logic
-      // This will be delegated to provider-specific services
-      const result = await this.executeAppLogic(instance, action, payload);
-
-      const durationMs = Date.now() - startTime;
-
-      // Log usage
-      await this.logUsage({
-        appId: instance.appId,
-        userId,
-        businessId,
-        action,
-        status: 'success',
-        inputTokens: result.usage?.inputTokens,
-        outputTokens: result.usage?.outputTokens,
-        durationMs,
-        model: result.model,
-        metadata: { payload, result: result.data }
-      });
-
-      // Increment usage count
-      instance.usageCount += 1;
-      await this.instanceRepository.save(instance);
-
-      return {
-        success: true,
-        data: result.data,
-        usage: {
-          inputTokens: result.usage?.inputTokens,
-          outputTokens: result.usage?.outputTokens,
-          durationMs
-        }
-      };
-
-    } catch (error: any) {
-      const durationMs = Date.now() - startTime;
-      const errorType = this.categorizeError(error);
-
-      // Log error
-      await this.logUsage({
-        appId: (await this.getBySlug(appSlug))?.id || '',
-        userId,
-        businessId,
-        action,
-        status: 'error',
-        errorType,
-        errorMessage: error.message,
-        durationMs,
-        metadata: { payload }
-      });
-
-      logger.error(`❌ App execution failed: ${appSlug}/${action}`, error);
-
-      return {
-        success: false,
-        error: {
-          type: errorType,
-          message: error.message
-        }
-      };
-    }
-  }
-
-  /**
-   * Execute app-specific logic
-   * WO-O4O-AI-CORE-SERVICE-UNIFICATION-V1: execute() via @o4o/ai-core
-   */
-  private async executeAppLogic(instance: AppInstance, action: string, payload: any): Promise<any> {
-    const app = instance.app;
-    const config = instance.config || {};
-
-    switch (app.provider) {
-      case 'google': {
-        if (action !== 'generate-text') {
-          throw new Error(`Unknown action: ${action}`);
-        }
-        if (!config.apiKey) {
-          throw new Error('Google AI API key not configured');
-        }
-        // WO-O4O-AI-CORE-SERVICE-UNIFICATION-V1
-        const aiResult = await executeAI({
-          systemPrompt: '',
-          userPrompt: payload.prompt,
-          responseMode: 'text',
-          config: {
-            apiKey: config.apiKey,
-            model: config.model || payload.model,
-            temperature: config.temperature || payload.temperature,
-            maxTokens: payload.maxOutputTokens ?? 2048,
-          },
-          meta: { service: 'app-registry', callerName: 'AppRegistryService' },
-        });
-        return {
-          data: { text: aiResult.content },
-          usage: { inputTokens: aiResult.promptTokens, outputTokens: aiResult.completionTokens },
-          model: aiResult.model,
-        };
-      }
-
-      default:
-        throw new Error(`App execution not implemented for provider: ${app.provider}`);
-    }
-  }
-
-  /**
-   * Log usage
-   */
-  private async logUsage(data: Partial<AppUsageLog>): Promise<void> {
-    const log = this.usageLogRepository.create(data);
-    await this.usageLogRepository.save(log);
-  }
-
-  /**
-   * Categorize error type
-   */
-  private categorizeError(error: Error): string {
-    const message = error.message.toLowerCase();
-
-    if (message.includes('api key') || message.includes('unauthorized') || message.includes('authentication')) {
-      return 'AUTH';
-    }
-    if (message.includes('quota') || message.includes('limit exceeded')) {
-      return 'QUOTA';
-    }
-    if (message.includes('timeout') || message.includes('timed out')) {
-      return 'TIMEOUT';
-    }
-    if (message.includes('not configured') || message.includes('not installed')) {
-      return 'CONFIG';
-    }
-
-    return 'PROVIDER_ERROR';
   }
 
   /**

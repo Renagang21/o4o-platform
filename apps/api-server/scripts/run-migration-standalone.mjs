@@ -120,18 +120,9 @@ const MIGRATIONS = [
       CREATE INDEX IF NOT EXISTS "IDX_apps_status" ON "apps" ("status");
       CREATE INDEX IF NOT EXISTS "IDX_apps_slug" ON "apps" ("slug");
 
-      CREATE TABLE IF NOT EXISTS "app_instances" (
-        "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-        "appId" uuid NOT NULL,
-        "businessId" uuid,
-        "status" varchar(20) NOT NULL DEFAULT 'active',
-        "config" jsonb,
-        "usageCount" integer NOT NULL DEFAULT 0,
-        "installedAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        CONSTRAINT "PK_app_instances" PRIMARY KEY ("id")
-      );
-      CREATE INDEX IF NOT EXISTS "IDX_app_instances_app_business" ON "app_instances" ("appId", "businessId");
+      -- WO-O4O-APP-INSTANCES-LIFECYCLE-CENSUS-AND-CANONICAL-DISPOSITION-V1:
+      -- "app_instances" DDL 제거. 테넌트별 앱 설치 instance 계약은 retire 되었고
+      -- AppInstance entity 도 제거됐다. 신규 부트스트랩에서 이 테이블을 만들지 않는다.
 
       CREATE TABLE IF NOT EXISTS "app_usage_logs" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
