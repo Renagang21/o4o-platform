@@ -174,7 +174,7 @@ UNKNOWN 0                      : 충족
 | `/service/monitor/{tenants,apps,themes,warnings}` | 200 + 빈 배열(오류 은폐) | **404** |
 | `POST /service/monitor/validate` | 200 + `success:false` | **404** |
 | `/service/monitor/tenant/:id` | 404 (항상) | **404** |
-| 비인증 | 401 | 404 (라우트 부재가 우선) |
+| 비인증 | 401 | **401** — 실측 결과. `/api/v1/service/monitor/*` 는 이제 형제 라우터 `/api/v1/service`(prefix 일치)로 흘러 그 `authenticate` 에 먼저 걸린다. 인증 후 404 |
 
 retire 된 endpoint 는 404 가 기본이라는 §11 규칙을 따른다. legacy 를 generic 500 으로 남기지 않는다.
 
@@ -207,9 +207,43 @@ DB fixture 기반 contract test 는 추가하지 않았다 — query 교정이 �
 
 read-only SELECT 외 DB write 0. production 상태 변경 0.
 
-### 배포 후
+### 배포 후 — commit `4ad32dedb`, Deploy API Server / Admin Dashboard **모두 success**
 
-(배포 후 채움)
+super_admin 세션 기준:
+
+| 요청 | 전 | 후 |
+|---|---|---|
+| `GET /service/monitor/tenants` | 200 빈값 | **404** |
+| `GET /service/monitor/apps` | 200 빈값 | **404** |
+| `GET /service/monitor/themes` | 200 빈값 | **404** |
+| `GET /service/monitor/warnings` | 200 빈값 | **404** |
+| `GET /service/monitor/summary` | **500** `relation "sites" does not exist` | **404** |
+| `GET /service/monitor/tenant/foo` | 404 | **404** |
+| `POST /service/monitor/validate` | 200 `success:false` | **404** |
+| `GET /service/monitor/report` | **500** `relation "sites" does not exist` | **404** |
+
+- **`sites does not exist` 오류 0** — 배포 후 로그에 `sites` 문자열 자체가 없다.
+- 비인증 호출은 404 가 아니라 **401** 이다(위 §8 표에 정정 반영). 라우트가 사라져
+  prefix 가 겹치는 `/api/v1/service`(provisioning) 라우터의 `authenticate` 에 먼저 걸리기 때문이며,
+  인증 후에는 404 다. 비인증에 정보가 더 노출되는 방향이 아니므로 그대로 둔다.
+
+### 대조군 / 회귀
+
+| 대상 | 결과 |
+|---|---|
+| `/health` | **200** `alive` |
+| `/health/database` | **200** `healthy`, pingMs 3, PostgreSQL 15.17 |
+| `/api/v1/service-admin/templates` | **200** |
+| `/api/v1/service/templates` | **200** (직전 WO 의 guard 유지 확인) |
+| `/api/v1/appstore` | **200** |
+
+배포 후 Cloud Run **신규 ERROR 0 / 신규 5xx 0** (severity>=ERROR 또는 status>=500 조회 결과 0건).
+Admin Dashboard 배포도 success — 제거된 `/admin/services*` 는 SPA 기본 라우팅으로 처리된다.
+
+> CI Pipeline 워크플로는 `cancelled` 로 끝났는데, 이는 본 커밋 직후 다른 세션이
+> `adbd04ef6` 를 push 해 동시성 그룹이 이전 실행을 취소했기 때문이다.
+> 본 커밋의 Deploy API Server / Deploy Admin Dashboard 는 둘 다 success 로 완료됐고,
+> 위 실측은 그 배포 결과에 대한 것이다.
 
 ---
 
