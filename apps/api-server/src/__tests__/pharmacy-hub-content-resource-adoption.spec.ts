@@ -136,6 +136,14 @@ describe('§12 navigation — route 고립 0 / dead link 0', () => {
     expect(navigation).toContain("href: '/resources'");
   });
 
+  it('공통 GlobalHeader 가 children 을 렌더하지 않으므로 실제 진입점을 별도로 둔다 §12', () => {
+    // packages/ui GlobalHeader 는 nav item 의 children 을 렌더하지 않는다(플랫폼 공통 제약).
+    // 따라서 자료실은 커뮤니티 홈 카드 + footer 라는 실렌더 진입점을 함께 가진다.
+    expect(communityHome).toContain("href: '/resources'");
+    const footerBlock = navigation.slice(navigation.indexOf('PH_FOOTER_SECTIONS'));
+    expect(footerBlock).toContain("href: '/resources'");
+  });
+
   it('구현되지 않은 /content 링크를 navigation 에 만들지 않는다 §10·§12', () => {
     expect(navigation).not.toContain("href: '/content'");
     expect(appTsx).not.toContain('path="/content"');

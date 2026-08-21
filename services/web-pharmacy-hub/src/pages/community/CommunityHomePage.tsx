@@ -139,6 +139,10 @@ export default function CommunityHomePage() {
         { title: '교육', description: '매장 운영·상품 이해 교육 콘텐츠', href: '/education' },
         { title: '커뮤니티 검색', description: '커뮤니티 글을 한 번에 검색', href: '/community/search' },
         { title: '내 글', description: '내가 작성한 글 모아보기', href: '/forum/my-posts' },
+        // WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12
+        //   공통 GlobalHeader 는 nav item 의 children 을 렌더하지 않는다(플랫폼 공통 제약).
+        //   따라서 자료실의 실제 진입점은 이 커뮤니티 홈 카드와 footer 가 담당한다.
+        { title: '자료실', description: '약국 운영에 활용할 자료를 모아보기', href: '/resources' },
       ]}
       cta={{
         title: 'PharmacyHub 커뮤니티에 참여하세요',

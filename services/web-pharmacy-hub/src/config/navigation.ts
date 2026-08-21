@@ -116,6 +116,8 @@ export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }
       { label: '홈', href: '/' },
       { label: '커뮤니티', href: '/community' },
       { label: '포럼', href: '/forum' },
+      // WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12
+      { label: '자료실', href: '/resources' },
       { label: '교육', href: '/education' },
       // 동일 WO §17 — 학습 이력 진입점
       { label: '내 수강', href: '/account/enrollments' },
