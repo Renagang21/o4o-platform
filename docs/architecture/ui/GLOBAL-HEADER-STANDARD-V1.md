@@ -575,10 +575,14 @@ serviceNavigation
 - 본 문서는 구현이 끝난 뒤에도 **신규 화면·신규 서비스가 따라야 할 상시 표준**으로 유지된다
 - 이후의 모든 Header/Layout/Navigation 변경은 본 문서의 원칙을 벗어나지 않아야 한다
 
-### 표준 범위 밖 (미결정)
+### 하위 메뉴(submenu) 계약 — 결정 완료, 제거 대기
 
-- `GlobalHeaderNavItem.children` (하위 메뉴) 은 타입에는 존재하나 공통 Header 가 렌더하지 않는다.
-  dropdown 계약으로 채택할지 필드를 폐기할지는 **본 문서에서 확정하지 않는다** — 별도 결정 WO 대상이다.
+- `GlobalHeaderNavItem.children` (하위 메뉴) 은 타입에는 존재하나 공통 Header 가 렌더하지 않는다 (소비자 0).
+- **판정: `GLOBAL_HEADER_CHILDREN_CONTRACT = REMOVE_UNUSED_CHILDREN`**
+  (2026-08-21 · [CHECK-O4O-GLOBAL-HEADER-SUBMENU-CONTRACT-DECISION-V1](../../checks/CHECK-O4O-GLOBAL-HEADER-SUBMENU-CONTRACT-DECISION-V1.md))
+- 즉 **Header submenu 는 본 표준의 구성 요소가 아니다.** PrimaryNav 는 1단 수평 메뉴를 유지하고,
+  하위 화면 진입은 허브 페이지·Footer·My Page nav 등 화면 내 UI 로 제공한다.
+- 실제 필드 제거는 공통 타입 변경이므로 후속 `WO-O4O-GLOBAL-HEADER-UNUSED-CHILDREN-CONTRACT-REMOVAL-V1` 에서 수행한다.
 
 ---
 
