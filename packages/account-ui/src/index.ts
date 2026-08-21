@@ -211,3 +211,40 @@ export type {
   MembershipStatusNoticeProps,
   MembershipStatusNoticeAction,
 } from './components/MembershipStatusNotice.js';
+
+// ---------------------------------------------------------------------------
+// Mobile Bottom Nav Core — WO-O4O-CROSSSERVICE-MOBILE-BOTTOM-NAV-COMMONIZATION-V1
+// KPA / GlycoPharm / K-Cosmetics / Neture 하단 nav 의 렌더 shell · 탭 · 시트 개폐를
+// 공통화한다. 메뉴 구성 · route · active 판정 · 역할별 노출은 서비스가 주입한다
+// (공통 Core 안에 serviceKey 분기를 두지 않는다).
+// ---------------------------------------------------------------------------
+export { MobileBottomNav } from './mobile-nav/MobileBottomNav.js';
+export type {
+  MobileBottomNavProps,
+  MobileBottomNavItem,
+} from './mobile-nav/MobileBottomNav.js';
+export {
+  MobileBottomNavShell,
+  MobileBottomNavSpacer,
+  MobileBottomNavBackdrop,
+} from './mobile-nav/MobileBottomNavShell.js';
+export type { MobileBottomNavShellProps } from './mobile-nav/MobileBottomNavShell.js';
+export { MobileBottomNavTab } from './mobile-nav/MobileBottomNavTab.js';
+export type {
+  MobileBottomNavTabProps,
+  MobileBottomNavTabIconProps,
+} from './mobile-nav/MobileBottomNavTab.js';
+export { MobileBottomNavProfileSheet } from './mobile-nav/MobileBottomNavProfileSheet.js';
+export type { MobileBottomNavProfileSheetProps } from './mobile-nav/MobileBottomNavProfileSheet.js';
+export { useMobileBottomNavSheet } from './mobile-nav/useMobileBottomNavSheet.js';
+export type {
+  MobileBottomNavSheetKind,
+  UseMobileBottomNavSheetResult,
+} from './mobile-nav/useMobileBottomNavSheet.js';
+export {
+  MOBILE_BOTTOM_NAV_BASE_CLASS,
+  mobileBottomNavSafeAreaStyle,
+  mobileBottomNavTabStyle,
+  mobileBottomNavLabelStyle,
+  mobileBottomNavBadgeStyle,
+} from './mobile-nav/mobileBottomNavStyles.js';

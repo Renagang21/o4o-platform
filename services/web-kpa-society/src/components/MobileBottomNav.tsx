@@ -2,19 +2,34 @@
  * MobileBottomNav — KPA-Society 모바일 하단 네비게이션
  *
  * WO-O4O-KPA-MOBILE-MENU-STRUCTURE-PHASE2-V1
+ * WO-O4O-CROSSSERVICE-MOBILE-BOTTOM-NAV-COMMONIZATION-V1:
+ *   렌더 shell(nav 배치 · 탭 마크업 · 스타일 토큰 · backdrop · 프로필 시트 · 시트
+ *   개폐)을 공통 `@o4o/account-ui` Mobile Bottom Nav Core 로 옮겼다. 이 파일에는
+ *   KPA 고유의 메뉴 구성 · route · active 판정 · 브랜드 색만 남는다.
  *
- * md 미만(768px 이하) 에서만 표시 (md:hidden).
- * 웹 헤더/메뉴 구조에 영향 없음.
+ * md 미만(768px 이하) 에서만 표시 (md:hidden). 웹 헤더/메뉴 구조에 영향 없음.
  *
  * 비로그인: 커뮤니티 + 로그인 버튼 (로그인 우선 노출)
  * 로그인:   커뮤니티 / 약국 경영 / 알림 / 내정보
+ *
+ * WO-O4O-KPA-MOBILE-NAV-AND-PROFILE-MENU-SEPARATION-V1:
+ *   '내정보' 탭 = 사용자 프로필 메뉴(bottom sheet). 사이트 nav(상단 햄버거)와 분리.
+ * WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
+ *   '알림' 탭 = 알림 bottom sheet. 데스크톱 상단 NotificationBell 과 동일 source
+ *   재사용(모바일에서는 상단 utility 숨김). 한 번에 하나의 시트만 open.
  */
 
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Building2, Bell, User, LogIn, LogOut, X } from 'lucide-react';
-import { useNotifications, NotificationSheet, NotificationTabBadge } from '@o4o/account-ui';
-import type { NotificationItem } from '@o4o/account-ui';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Home, Building2, Bell, User, LogIn } from 'lucide-react';
+import {
+  useNotifications,
+  NotificationSheet,
+  MobileBottomNav as MobileBottomNavCore,
+  MobileBottomNavBackdrop,
+  MobileBottomNavProfileSheet,
+  useMobileBottomNavSheet,
+} from '@o4o/account-ui';
+import type { NotificationItem, MobileBottomNavItem } from '@o4o/account-ui';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { notificationsApi } from '../api/notifications';
@@ -24,6 +39,12 @@ import {
   KpaUserMenuItems,
 } from './KpaUserMenu';
 import { resolveNotificationTarget } from '../lib/notificationRouting';
+
+/** KPA 브랜드 active 색. */
+const ACTIVE_COLOR = '#2563eb';
+
+/** KPA 배지 위치/굵기 (공통 기본값과 다른 부분만 — 기존 UX 보존). */
+const BADGE_STYLE: React.CSSProperties = { top: -6, fontWeight: 600 };
 
 // 약국 경영 active 판정: /mobile/pharmacy, /pharmacy, /store-hub, /store (slug 경로 제외)
 function isPharmacyActive(pathname: string): boolean {
@@ -40,34 +61,37 @@ function isPharmacyActive(pathname: string): boolean {
   return false;
 }
 
+// 커뮤니티 active 판정
+function isCommunityActive(pathname: string): boolean {
+  return (
+    pathname === '/' ||
+    pathname.startsWith('/forum') ||
+    pathname.startsWith('/lms') ||
+    pathname.startsWith('/resources')
+  );
+}
+
 export function MobileBottomNav() {
   const { user, logout } = useAuth();
   const { openLoginModal } = useAuthModal();
-  const location = useLocation();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { pathname } = location;
 
-  // WO-O4O-KPA-MOBILE-NAV-AND-PROFILE-MENU-SEPARATION-V1:
-  //   '내정보' 탭 = 사용자 프로필 메뉴(bottom sheet) 열기. 사이트 nav(상단 햄버거)와 분리.
-  // WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
-  //   '알림' 탭 = 알림 bottom sheet. 데스크톱 상단 NotificationBell 과 동일 source 재사용
-  //   (모바일에서는 상단 utility 숨김 → 하단으로 이동). 한 번에 하나의 시트만 open.
-  const [openSheet, setOpenSheet] = useState<'none' | 'profile' | 'notif'>('none');
+  const { openSheet, close: closeSheet, open, toggle } = useMobileBottomNavSheet(pathname);
 
   // 알림 — KpaGlobalHeader 와 동일 serviceKey('kpa-society') source. 새 API 없음.
   const notif = useNotifications(notificationsApi, { enabled: !!user, serviceKey: 'kpa-society' });
 
-  const isCommunity = pathname === '/' || pathname.startsWith('/forum') || pathname.startsWith('/lms') || pathname.startsWith('/resources');
+  const isCommunity = isCommunityActive(pathname);
   const isPharmacy = isPharmacyActive(pathname);
 
   function handlePharmacyTab() {
     if (!isPharmacy) navigate('/mobile/pharmacy');
   }
 
-  const closeSheet = () => setOpenSheet('none');
-
-  function openNotif() {
-    setOpenSheet('notif');
+  function handleNotifTab() {
+    if (openSheet === 'notif') return closeSheet();
+    open('notif');
     void notif.refetchList();
   }
 
@@ -84,106 +108,46 @@ export function MobileBottomNav() {
     navigate('/');
   }
 
-  // ESC 로 닫기 + 열렸을 때 배경 스크롤 잠금
-  useEffect(() => {
-    if (openSheet === 'none') return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpenSheet('none'); };
-    document.addEventListener('keydown', onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [openSheet]);
-
-  // 라우트 이동 시 시트 자동 닫힘 (메뉴 항목 클릭 후)
-  useEffect(() => { setOpenSheet('none'); }, [pathname]);
-
   // 비로그인: 커뮤니티 + 로그인 우선 노출
   if (!user) {
-    return (
-      <nav
-        className={NAV_CLASS}
-        style={navSafeArea}
-        aria-label="모바일 하단 메뉴"
-      >
-        <Link to="/" style={isCommunity ? { ...tabStyle, ...activeStyle } : tabStyle} aria-label="커뮤니티">
-          <Home size={22} strokeWidth={isCommunity ? 2.5 : 1.75} />
-          <span style={labelStyle}>커뮤니티</span>
-        </Link>
-        <button
-          onClick={openLoginModal}
-          style={{ ...tabStyle, ...loginStyle }}
-          aria-label="로그인"
-        >
-          <LogIn size={22} strokeWidth={2} />
-          <span style={labelStyle}>로그인</span>
-        </button>
-      </nav>
-    );
+    const guestItems: MobileBottomNavItem[] = [
+      { key: 'community', label: '커뮤니티', icon: Home, to: '/', active: isCommunity },
+      { key: 'login', label: '로그인', icon: LogIn, onClick: openLoginModal, emphasis: true },
+    ];
+    return <MobileBottomNavCore items={guestItems} activeColor={ACTIVE_COLOR} />;
   }
 
   // 로그인: 커뮤니티 / 약국 경영 / 알림 / 내정보
+  const items: MobileBottomNavItem[] = [
+    { key: 'community', label: '커뮤니티', icon: Home, to: '/', active: isCommunity },
+    { key: 'pharmacy', label: '약국 경영', icon: Building2, onClick: handlePharmacyTab, active: isPharmacy },
+    {
+      key: 'notif',
+      label: '알림',
+      icon: Bell,
+      onClick: handleNotifTab,
+      active: openSheet === 'notif',
+      ariaHasPopup: 'dialog',
+      ariaExpanded: openSheet === 'notif',
+      badgeCount: notif.unreadCount,
+      badgeStyle: BADGE_STYLE,
+    },
+    {
+      key: 'profile',
+      label: '내정보',
+      icon: User,
+      onClick: () => toggle('profile'),
+      active: openSheet === 'profile',
+      ariaHasPopup: 'menu',
+      ariaExpanded: openSheet === 'profile',
+    },
+  ];
+
   return (
-    <nav
-      className={NAV_CLASS}
-      style={navSafeArea}
-      aria-label="모바일 하단 메뉴"
-    >
-      <Link
-        to="/"
-        style={isCommunity ? { ...tabStyle, ...activeStyle } : tabStyle}
-        aria-label="커뮤니티"
-      >
-        <Home size={22} strokeWidth={isCommunity ? 2.5 : 1.75} />
-        <span style={labelStyle}>커뮤니티</span>
-      </Link>
+    <MobileBottomNavCore items={items} activeColor={ACTIVE_COLOR}>
+      {openSheet !== 'none' && <MobileBottomNavBackdrop onClick={closeSheet} />}
 
-      <button
-        onClick={handlePharmacyTab}
-        style={isPharmacy ? { ...tabStyle, ...activeStyle } : tabStyle}
-        aria-label="약국 경영"
-      >
-        <Building2 size={22} strokeWidth={isPharmacy ? 2.5 : 1.75} />
-        <span style={labelStyle}>약국 경영</span>
-      </button>
-
-      <button
-        onClick={() => (openSheet === 'notif' ? closeSheet() : openNotif())}
-        style={openSheet === 'notif' ? { ...tabStyle, ...activeStyle } : tabStyle}
-        aria-label="알림"
-        aria-haspopup="dialog"
-        aria-expanded={openSheet === 'notif'}
-      >
-        <span style={{ position: 'relative', display: 'inline-flex' }}>
-          <Bell size={22} strokeWidth={openSheet === 'notif' ? 2.5 : 1.75} />
-          <NotificationTabBadge unreadCount={notif.unreadCount} style={badgeStyle} />
-        </span>
-        <span style={labelStyle}>알림</span>
-      </button>
-
-      <button
-        onClick={() => (openSheet === 'profile' ? closeSheet() : setOpenSheet('profile'))}
-        style={openSheet === 'profile' ? { ...tabStyle, ...activeStyle } : tabStyle}
-        aria-label="내정보"
-        aria-haspopup="menu"
-        aria-expanded={openSheet === 'profile'}
-      >
-        <User size={22} strokeWidth={openSheet === 'profile' ? 2.5 : 1.75} />
-        <span style={labelStyle}>내정보</span>
-      </button>
-
-      {/* ── 공통 backdrop ── */}
-      {openSheet !== 'none' && (
-        <div
-          onClick={closeSheet}
-          aria-hidden
-          className="md:hidden fixed inset-0 z-40 bg-black/30"
-        />
-      )}
-
-      {/* ── 알림 시트 — 공통 NotificationSheet (WO-O4O-CROSS-SERVICE-MYPAGE-NOTIFICATIONS-COMMONIZATION-V1) ── */}
+      {/* 알림 시트 — 공통 NotificationSheet (WO-O4O-CROSS-SERVICE-MYPAGE-NOTIFICATIONS-COMMONIZATION-V1) */}
       {openSheet === 'notif' && (
         <NotificationSheet
           notifications={notif.notifications}
@@ -198,106 +162,19 @@ export function MobileBottomNav() {
         />
       )}
 
-      {/* ── 프로필 시트 (사용자 이름·이메일 + 역할별 대시보드 + 계정 메뉴 + 로그아웃) ── */}
+      {/* 프로필 시트 (이름·이메일 + 역할별 대시보드 + 계정 메뉴 + 로그아웃) */}
       {openSheet === 'profile' && (
-        <div
-          role="menu"
-          aria-label="내 정보 메뉴"
-          className="md:hidden fixed left-0 right-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-2xl max-h-[80vh] overflow-y-auto"
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)' }}
+        <MobileBottomNavProfileSheet
+          displayName={getKpaUserDisplayName(user)}
+          email={user?.email}
+          roleLabel={getKpaServiceRoleLabel(user)}
+          roleLabelClassName="text-blue-700"
+          onClose={closeSheet}
+          onLogout={() => void handleLogout()}
         >
-          <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-slate-100">
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-slate-900 truncate">
-                {getKpaUserDisplayName(user)}님
-              </p>
-              <p className="text-xs text-slate-500 break-all">{user?.email}</p>
-              {getKpaServiceRoleLabel(user) && (
-                <p className="mt-0.5 text-xs font-medium text-blue-700">
-                  {getKpaServiceRoleLabel(user)}
-                </p>
-              )}
-            </div>
-            <button
-              onClick={closeSheet}
-              aria-label="닫기"
-              className="shrink-0 p-1.5 rounded-lg text-slate-400 hover:bg-slate-100"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <nav className="py-1">
-            <KpaUserMenuItems user={user} onItemClick={closeSheet} />
-          </nav>
-          <div className="border-t border-slate-100 py-1">
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 text-left"
-            >
-              <LogOut className="w-4 h-4" />
-              로그아웃
-            </button>
-          </div>
-        </div>
+          <KpaUserMenuItems user={user} onItemClick={closeSheet} />
+        </MobileBottomNavProfileSheet>
       )}
-    </nav>
+    </MobileBottomNavCore>
   );
 }
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-// display/visibility는 Tailwind만 제어 — inline style로 display 지정 금지
-// (inline style은 md:hidden보다 우선순위가 높아 재정의됨)
-const NAV_CLASS =
-  'flex md:hidden fixed bottom-0 left-0 right-0 z-40 items-stretch bg-white border-t border-slate-200';
-
-// safe-area-inset만 inline style로 — Tailwind 미지원 CSS custom property
-const navSafeArea: React.CSSProperties = {
-  paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-};
-
-const tabStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flex: 1,
-  gap: 2,
-  padding: '8px 0',
-  border: 'none',
-  background: 'none',
-  cursor: 'pointer',
-  textDecoration: 'none',
-  color: '#94a3b8',
-};
-
-const activeStyle: React.CSSProperties = {
-  color: '#2563eb',
-};
-
-const loginStyle: React.CSSProperties = {
-  color: '#2563eb',
-  fontWeight: 700,
-};
-
-const labelStyle: React.CSSProperties = {
-  fontSize: 10,
-  fontWeight: 500,
-  lineHeight: 1,
-};
-
-const badgeStyle: React.CSSProperties = {
-  position: 'absolute',
-  top: -6,
-  right: -8,
-  minWidth: 16,
-  height: 16,
-  padding: '0 4px',
-  borderRadius: 999,
-  background: '#ef4444',
-  color: '#fff',
-  fontSize: 10,
-  fontWeight: 600,
-  lineHeight: '16px',
-  textAlign: 'center',
-};
