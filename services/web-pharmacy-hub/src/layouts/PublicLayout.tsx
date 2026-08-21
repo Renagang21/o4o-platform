@@ -10,7 +10,7 @@
  *   / · /login · /join · /join/status · /forum/* · catch-all(404)
  *
  * 비적용 (기존 계약 유지 — 의도적):
- *   - /store-owner/* · /store-hub · /operator/* · /supplier/*
+ *   - /store-owner/* · /store-hub · /operator/*
  *     → 각 역할 업무 셸이 자체 상단바를 갖는다. 여기 헤더를 얹으면 이중 헤더가 된다.
  *   - /qr/:slug → 소비자가 스캔하는 공개 랜딩. 서비스 내비게이션을 노출하지 않는 계약이다.
  */

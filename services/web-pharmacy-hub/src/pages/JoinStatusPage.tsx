@@ -56,7 +56,6 @@ const STATUS_BADGE_OVERRIDES: Record<string, MembershipStatusConfig> = {
 
 const ENTRY_PATH: Record<string, string> = {
   [ROLES.storeOwner]: '/store-owner',
-  [ROLES.supplier]: '/supplier',
   [ROLES.operator]: '/operator',
 };
 

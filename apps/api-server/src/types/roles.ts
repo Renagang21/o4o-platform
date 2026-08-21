@@ -104,19 +104,21 @@ export type LmsRole =
  * - admin       : 서비스 관리 책임자 (WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1)
  * - operator    : 서비스 운영자 (가입 승인 · 회원 관리 · 커뮤니티 · 공지/운영자 콘텐츠)
  * - store_owner : 약국 경영자 (기존 store_owner 계열과 동일 의미, 서비스 경계만 분리)
- * - supplier    : 공급자 (기존 공통 공급자 원장을 재사용, Pharmacy-Hub 노출 경계만 분리)
+ *
+ * supplier 역할은 없다 (WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1).
+ * 공급자는 Neture 에서만 활동하는 주체이며 Pharmacy-Hub 회원이 아니다. 다시 추가하지 않는다 —
+ * 정본: docs/baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md
  *
  * 역할 계층 (WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1):
  *   admin ⊃ operator — KPA/Neture/K-Cosmetics 와 동일한 표준 계층.
- *   admin 은 운영 권한만 포괄하며 store_owner/supplier 의 **사업자 신분 권한은 포함하지 않는다.**
+ *   admin 은 운영 권한만 포괄하며 store_owner 의 **사업자 신분 권한은 포함하지 않는다.**
  *   (Foundation 단계에서는 admin 을 두지 않고 platform 축에 맡겼으나, 서비스 관리 책임자와
  *    일상 운영 담당자를 구분할 수 없어 표준 계층으로 정렬했다.)
  */
 export type PharmacyHubRole =
   | 'pharmacy-hub:admin'
   | 'pharmacy-hub:operator'
-  | 'pharmacy-hub:store_owner'
-  | 'pharmacy-hub:supplier';
+  | 'pharmacy-hub:store_owner';
 
 /**
  * Union of all service-prefixed roles
@@ -530,14 +532,6 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     role: 'pharmacy-hub:store_owner',
     label: 'Pharmacy-Hub Store Owner',
     description: '파머시 허브 약국 경영자',
-    service: 'pharmacy-hub',
-    category: 'commerce',
-    deprecated: false
-  },
-  'pharmacy-hub:supplier': {
-    role: 'pharmacy-hub:supplier',
-    label: 'Pharmacy-Hub Supplier',
-    description: '파머시 허브 공급자 (공통 공급자 원장 재사용, 노출 경계만 분리)',
     service: 'pharmacy-hub',
     category: 'commerce',
     deprecated: false

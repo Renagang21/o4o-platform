@@ -21,7 +21,7 @@
  *
  *   단순히 origin 을 고쳐 되살리지 않는다. 공급자 상품 등록·수정의 canonical 원장은
  *   Neture 공급자 화면(`/api/v1/neture/supplier/products`)이며, 이는 backend 주석에도
- *   명시돼 있다(PharmacyHubSupplierProductController.ts:13).
+ *   명시돼 있다(modules/neture/controllers/supplier-service-delivery.controller.ts).
  *
  * 이 화면은 API 를 호출하지 않는다.
  */

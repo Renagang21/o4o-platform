@@ -40,8 +40,6 @@ const ROLE_DISPLAY: Record<string, string> = {
   general: '일반 회원',
   'pharmacy-hub:store_owner': '매장(약국)',
   store_owner: '매장(약국)',
-  'pharmacy-hub:supplier': '공급자',
-  supplier: '공급자',
 };
 
 function phTokens(u: UserData): Set<string> {
@@ -127,7 +125,6 @@ export default function MembersPage() {
       ]}
       roleTabs={[
         { key: 'store_owner', label: '매장(약국)', roleFilter: ['pharmacy-hub:store_owner', 'store_owner'] },
-        { key: 'supplier', label: '공급자', roleFilter: ['pharmacy-hub:supplier', 'supplier'] },
       ]}
       // 공통 콘솔이 마지막에 built-in `pending`(가입 신청) 탭을 항상 덧붙인다.
       // 여기서 pending 을 또 선언하면 "가입 신청" 탭이 2개로 중복 렌더된다.

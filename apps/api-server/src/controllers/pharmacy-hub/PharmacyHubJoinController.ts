@@ -9,7 +9,9 @@
  *     (service_memberships 를 직접 INSERT 하지 않는다 — 가입 SSOT 이중화 방지)
  *   - serviceKey 는 항상 서버가 'pharmacy-hub' 로 강제한다. 클라이언트 값은 무시된다.
  *   - status 는 Core 경로가 항상 'pending' 으로 생성한다.
- *   - roleType 은 store_owner / supplier 만 허용한다 (§5.2). operator 자가 신청 불가.
+ *   - roleType 은 store_owner 만 허용한다. operator·강사 등은 자가 신청이 아니라 사후 부여다.
+ *     공급자는 Pharmacy-Hub 회원이 아니므로 가입 역할이 아니다
+ *     (WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1).
  *
  * 중복 신청 (§6-A):
  *   active     → ALREADY_MEMBER
@@ -30,12 +32,11 @@ import logger from '../../utils/logger.js';
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 
 /** 신청 가능한 역할 (§5.2 — operator 제외) */
-const ALLOWED_ROLE_TYPES = ['store_owner', 'supplier'] as const;
+const ALLOWED_ROLE_TYPES = ['store_owner'] as const;
 type AllowedRoleType = (typeof ALLOWED_ROLE_TYPES)[number];
 
 const ROLE_LABEL: Record<AllowedRoleType, string> = {
   store_owner: '약국 경영자',
-  supplier: '공급자',
 };
 
 /** 이미 가입 이력이 있는 경우의 응답 (409) */
@@ -62,8 +63,8 @@ const DUPLICATE_RESPONSE: Record<string, { code: string; message: string }> = {
   },
 };
 
-/** 역할별 최소 프로필 (§4.4) — 신규 프로필 테이블 없이 기존 users.businessInfo 축만 사용 */
-function validateMinimalProfile(roleType: AllowedRoleType, body: Record<string, any>): string[] {
+/** 가입 최소 프로필 (§4.4) — 신규 프로필 테이블 없이 기존 users.businessInfo 축만 사용 */
+function validateMinimalProfile(body: Record<string, any>): string[] {
   const filled = (v: unknown) => String(v ?? '').trim() !== '';
   const digits = (v: unknown) => String(v ?? '').replace(/\D/g, '').length;
 
@@ -71,14 +72,8 @@ function validateMinimalProfile(roleType: AllowedRoleType, body: Record<string, 
   if (!filled(body.name) && !(filled(body.lastName) && filled(body.firstName))) missing.push('name');
   if (digits(body.phone) < 9) missing.push('phone');
 
-  if (roleType === 'store_owner') {
-    // 약국명 — 기존 businessName 축 재사용 (companyName fallback)
-    if (!filled(body.businessName) && !filled(body.companyName)) missing.push('businessName');
-  } else {
-    // 공급자: 회사명 + 담당자명
-    if (!filled(body.companyName) && !filled(body.businessName)) missing.push('companyName');
-    if (!filled(body.contactName)) missing.push('contactName');
-  }
+  // 약국명 — 기존 businessName 축 재사용 (companyName fallback)
+  if (!filled(body.businessName) && !filled(body.companyName)) missing.push('businessName');
   return missing;
 }
 
@@ -94,7 +89,7 @@ export class PharmacyHubJoinController {
     if (!ALLOWED_ROLE_TYPES.includes(roleType as AllowedRoleType)) {
       return res.status(400).json({
         success: false,
-        error: '가입 신청 역할이 필요합니다. (약국 경영자 / 공급자)',
+        error: '가입 신청 역할이 필요합니다. (약국 경영자)',
         code: 'PHARMACY_HUB_SIGNUP_ROLE_REQUIRED',
       });
     }
@@ -104,7 +99,7 @@ export class PharmacyHubJoinController {
       return res.status(400).json({ success: false, error: '이메일이 필요합니다.', code: 'EMAIL_REQUIRED' });
     }
 
-    const missingFields = validateMinimalProfile(roleType as AllowedRoleType, body);
+    const missingFields = validateMinimalProfile(body);
     if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,

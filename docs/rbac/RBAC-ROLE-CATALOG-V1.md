@@ -36,7 +36,7 @@
 | `glycopharm:` | 글라이코팜 | `glycopharm:admin`, `glycopharm:operator`, `glycopharm:pharmacist`, `glycopharm:store_owner` |
 | `glucoseview:` | 글루코스뷰 | `glucoseview:admin`, `glucoseview:operator` |
 | `cosmetics:` | K-화장품 | `cosmetics:admin`, `cosmetics:operator` |
-| `pharmacy-hub:` | 파머시 허브 | `pharmacy-hub:admin`, `pharmacy-hub:operator`, `pharmacy-hub:store_owner`, `pharmacy-hub:supplier` |
+| `pharmacy-hub:` | 파머시 허브 | `pharmacy-hub:admin`, `pharmacy-hub:operator`, `pharmacy-hub:store_owner` |
 
 #### Admin ⊃ Operator 계층
 
@@ -47,8 +47,12 @@ KPA · Neture · K-Cosmetics · Pharmacy-Hub · GlycoPharm 은 동일 계층을 
 {service}:operator 요구 → operator 또는 admin 허용
 ```
 
-- Pharmacy-Hub 의 `store_owner` · `supplier` 는 **사업자 신분** 역할이므로 admin 이 대신하지 않는다
+- Pharmacy-Hub 의 `store_owner` 는 **사업자 신분** 역할이므로 admin 이 대신하지 않는다
   (`pharmacy-hub:admin` 은 운영 권한만 포괄).
+- **`pharmacy-hub:supplier` 는 없다** (WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1).
+  공급자는 Pharmacy-Hub 회원이 아니라 Neture 공급자(`neture:supplier`)이며, Neture 에서 켠 제공
+  설정이 Pharmacy-Hub 매장 HUB 로 그대로 유입된다. 정본:
+  [`docs/baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md`](../baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md).
 - Pharmacy-Hub scope config 위치는 `apps/api-server/src/middleware/pharmacy-hub-scope.middleware.ts` 다.
   `security-core` 가 F1 Freeze 대상이라 의도적으로 로컬에 둔 것이며, 아래 §5 절차 2번의 예외다.
 - GlycoPharm 은 `scopeRoleMapping` 이 없어 두 역할이 fallback(allowedRoles 전체 허용) 으로

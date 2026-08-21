@@ -7,7 +7,10 @@
  *   admin       요구 → admin 만
  *   operator    요구 → operator 또는 admin
  *   store_owner 요구 → store_owner 만   (admin 이 사업자 신분을 대신하지 않는다)
- *   supplier    요구 → supplier 만       (동일)
+ *
+ * supplier scope 는 존재하지 않는다
+ * (WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1).
+ * 공급자는 Pharmacy-Hub 회원이 아니므로, 그 부재를 아래 config 계약 테스트가 고정한다.
  *
  * PHARMACY_HUB_SCOPE_CONFIG 는 security-core(F1 Freeze) 가 아니라 api-server 로컬에 있으므로
  * scope-guard.spec.ts(3서비스 config) 와 분리한 별도 파일로 둔다.
@@ -32,7 +35,8 @@ const requireScope = createServiceScopeGuard(PHARMACY_HUB_SCOPE_CONFIG);
 const ADMIN = 'pharmacy-hub:admin';
 const OPERATOR = 'pharmacy-hub:operator';
 const STORE_OWNER = 'pharmacy-hub:store_owner';
-const SUPPLIER = 'pharmacy-hub:supplier';
+/** 제거된 역할 — 되돌아오지 않는지 확인하는 용도로만 쓴다. */
+const REMOVED_SUPPLIER = 'pharmacy-hub:supplier';
 
 async function check(scope: string, roles: string[]) {
   return executeGuard(requireScope(scope), createMockUser({ roles }));
@@ -73,12 +77,6 @@ describe('Pharmacy-Hub Scope Guard', () => {
       expect(result.allowed).toBe(false);
       expect(result.statusCode).toBe(403);
     });
-
-    it('admin role → denied for supplier scope (403)', async () => {
-      const result = await check(SUPPLIER, [ADMIN]);
-      expect(result.allowed).toBe(false);
-      expect(result.statusCode).toBe(403);
-    });
   });
 
   // Foundation WO 계약 — admin 도입으로 바뀌지 않아야 하는 회귀 케이스
@@ -87,18 +85,8 @@ describe('Pharmacy-Hub Scope Guard', () => {
       expect((await check(STORE_OWNER, [STORE_OWNER])).allowed).toBe(true);
     });
 
-    it('supplier role → passes supplier scope', async () => {
-      expect((await check(SUPPLIER, [SUPPLIER])).allowed).toBe(true);
-    });
-
     it('store_owner role → denied for operator scope (403)', async () => {
       const result = await check(OPERATOR, [STORE_OWNER]);
-      expect(result.allowed).toBe(false);
-      expect(result.statusCode).toBe(403);
-    });
-
-    it('supplier role → denied for operator scope (403)', async () => {
-      const result = await check(OPERATOR, [SUPPLIER]);
       expect(result.allowed).toBe(false);
       expect(result.statusCode).toBe(403);
     });
@@ -154,13 +142,27 @@ describe('Pharmacy-Hub Scope Guard', () => {
   });
 
   describe('config 계약', () => {
-    it('allowedRoles 는 4역할이다', () => {
+    it('allowedRoles 는 3역할이다 (supplier 없음)', () => {
       expect(PHARMACY_HUB_SCOPE_CONFIG.allowedRoles).toEqual([
         ADMIN,
         OPERATOR,
         STORE_OWNER,
-        SUPPLIER,
       ]);
+    });
+
+    it('supplier 역할은 되돌아오지 않는다', () => {
+      // 공급자는 Neture 에서만 활동한다. 이 역할이 다시 config 에 들어오면
+      // 공급자에게 Pharmacy-Hub membership 을 요구하는 구조로 되돌아간다.
+      expect(PHARMACY_HUB_SCOPE_CONFIG.allowedRoles).not.toContain(REMOVED_SUPPLIER);
+      expect(PHARMACY_HUB_SCOPE_CONFIG.scopeRoleMapping ?? {}).not.toHaveProperty(REMOVED_SUPPLIER);
+    });
+
+    it('supplier 역할 보유자는 어떤 scope 도 통과하지 못한다', async () => {
+      for (const scope of [ADMIN, OPERATOR, STORE_OWNER]) {
+        const result = await check(scope, [REMOVED_SUPPLIER]);
+        expect(result.allowed).toBe(false);
+        expect(result.statusCode).toBe(403);
+      }
     });
 
     it('scopeRoleMapping 이 모든 scope 에 명시돼 있다 (fallback 의존 금지)', () => {
@@ -168,11 +170,10 @@ describe('Pharmacy-Hub Scope Guard', () => {
       // (GlycoPharm 이 그 상태였고 WO-O4O-GLYCOPHARM-AUTHORIZATION-HIERARCHY-AUDIT-AND-FIX-V1
       //  에서 해소됐다 — 이제 5개 서비스 모두 mapping 을 명시한다.)
       const mapping = PHARMACY_HUB_SCOPE_CONFIG.scopeRoleMapping ?? {};
-      expect(Object.keys(mapping).sort()).toEqual([ADMIN, OPERATOR, STORE_OWNER, SUPPLIER].sort());
+      expect(Object.keys(mapping).sort()).toEqual([ADMIN, OPERATOR, STORE_OWNER].sort());
       expect(mapping[OPERATOR]).toEqual([OPERATOR, ADMIN]);
       expect(mapping[ADMIN]).toEqual([ADMIN]);
       expect(mapping[STORE_OWNER]).toEqual([STORE_OWNER]);
-      expect(mapping[SUPPLIER]).toEqual([SUPPLIER]);
     });
   });
 });

@@ -487,6 +487,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Operator Canonical Workflow V1** (검수·승인 UX) | `docs/architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md` |
 | **Operator Non-Approval UX Baseline V1** (5 Workspace — 자료 등록 / AI 작업 / 큐레이션 / 매장 지원 / 운영 수익) | `docs/baseline/O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md` |
 | **Operator HUB Content Publishing Standard V1** (RichTextEditor 기반 항목별 게시 — Source Ingestion 보류) | `docs/baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md` |
+| **Pharmacy-Hub Service Model Baseline V1** (PharmacyHub = KPA류 공통 매장경영 구조 − 공급 승인/매장지원 operator capability · supplier 역할 없음) | `docs/baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md` |
 | **Store Menu Canonical Tree V1** (매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 — 6 항목, 설문 V1 외) | `docs/baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md` |
 | **Operator Core Design V1** | `docs/architecture/OPERATOR-CORE-DESIGN-V1.md` |
 | **Operator Core Extraction Verify Checklist V1** (완료 기록 — 현행 기준 문서 아님) | `docs/archive/reports/OPERATOR-CORE-EXTRACTION-VERIFY-CHECKLIST-V1.md` |

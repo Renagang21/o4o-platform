@@ -44,8 +44,6 @@ import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requirePharmacyHubScope } from '../../middleware/pharmacy-hub-scope.middleware.js';
 import { PharmacyHubJoinController } from '../../controllers/pharmacy-hub/PharmacyHubJoinController.js';
 import { PharmacyHubMembershipConsoleController } from '../../controllers/pharmacy-hub/PharmacyHubMembershipConsoleController.js';
-// WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
-import { PharmacyHubSupplierProductController } from '../../controllers/pharmacy-hub/PharmacyHubSupplierProductController.js';
 import { PharmacyHubStoreProductController } from '../../controllers/pharmacy-hub/PharmacyHubStoreProductController.js';
 import { PharmacyHubStoreDashboardController } from '../../controllers/pharmacy-hub/PharmacyHubStoreDashboardController.js';
 // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1
@@ -76,9 +74,7 @@ import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/Pharma
 import { PharmacyHubOrderController } from '../../controllers/pharmacy-hub/PharmacyHubOrderController.js';
 // WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1 (Phase 2)
 import { PharmacyHubPaymentController } from '../../controllers/pharmacy-hub/PharmacyHubPaymentController.js';
-import { PharmacyHubSupplierOrderController } from '../../controllers/pharmacy-hub/PharmacyHubSupplierOrderController.js';
 import { PharmacyHubOperatorFulfillmentController } from '../../controllers/pharmacy-hub/PharmacyHubOperatorFulfillmentController.js';
-import { createRequireActiveSupplier } from '../../modules/neture/middleware/neture-identity.middleware.js';
 import { AppDataSource } from '../../database/connection.js';
 import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
 
@@ -138,7 +134,6 @@ export function createPharmacyHubRoutes(): Router {
         roles: serviceRoles,
         entryPoints: {
           storeOwner: serviceRoles.includes(`${SERVICE_KEY}:store_owner`),
-          supplier: serviceRoles.includes(`${SERVICE_KEY}:supplier`),
           operator: serviceRoles.includes(`${SERVICE_KEY}:operator`),
         },
       },
@@ -198,36 +193,16 @@ export function createPharmacyHubRoutes(): Router {
     (_req, res) => res.json({ success: true, data: { scope: `${SERVICE_KEY}:store_owner` } })
   );
 
-  router.get(
-    '/supplier/ping',
-    requireAuth as any,
-    requirePharmacyHubScope(`${SERVICE_KEY}:supplier`),
-    (_req, res) => res.json({ success: true, data: { scope: `${SERVICE_KEY}:supplier` } })
-  );
-
   // ───────────────────────────────────────────────────────────────────────────
-  // 공급자 상품 제공 설정 (WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1 §6-A)
+  // 공급자 경로 없음 (WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1)
   //
-  //   자격 3중 (WO §4.2):
-  //     requireAuth
-  //     → requirePharmacyHubScope('pharmacy-hub:supplier')  membership active + 역할
-  //     → createRequireActiveSupplier                        Neture 공급자 원장 + ACTIVE
-  //   본인 소유 Offer 검증은 setServiceDelivery / 목록 WHERE supplier_id 에서 수행한다.
-  //
-  //   상품 등록·수정은 여기 없다 — 기존 Neture 공급자 원장이 담당한다 (§9).
+  //   공급자는 Pharmacy-Hub 회원이 아니다. 제공 설정·주문 처리는 Neture 에 있다:
+  //     /api/v1/neture/supplier/services/pharmacy-hub/products
+  //     /api/v1/neture/supplier/services/pharmacy-hub/orders
+  //   여기에 `/supplier/*` 를 다시 추가하지 않는다 — 그러면 공급자에게 Pharmacy-Hub
+  //   membership 을 요구하게 되어 서비스 모델이 다시 깨진다.
+  //   정본: docs/baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md
   // ───────────────────────────────────────────────────────────────────────────
-  const supplierProductGuards = [
-    requireAuth as any,
-    requirePharmacyHubScope(`${SERVICE_KEY}:supplier`),
-    createRequireActiveSupplier(AppDataSource) as any,
-  ];
-
-  router.get('/supplier/products', ...supplierProductGuards, PharmacyHubSupplierProductController.list);
-  router.patch(
-    '/supplier/products/:offerId/delivery',
-    ...supplierProductGuards,
-    PharmacyHubSupplierProductController.setDelivery,
-  );
 
   // ───────────────────────────────────────────────────────────────────────────
   // 약국 경영자 상품 조회 (§6-D)
@@ -500,18 +475,6 @@ export function createPharmacyHubRoutes(): Router {
     ...storeOwnerGuards,
     PharmacyHubPaymentController.cancelAfterPayment,
   );
-
-  // ───────────────────────────────────────────────────────────────────────────
-  // 공급자 주문 처리 (WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1)
-  //
-  //   자격은 상품 제공 설정과 동일한 3중 guard 를 재사용한다.
-  //   조회·전이 모두 service_key='pharmacy-hub' + 본인 공급자 소유로 스코프된다 —
-  //   Neture 주문은 이 경로에 절대 노출되지 않는다.
-  // ───────────────────────────────────────────────────────────────────────────
-  router.get('/supplier/orders', ...supplierProductGuards, PharmacyHubSupplierOrderController.list);
-  router.get('/supplier/orders/:orderId', ...supplierProductGuards, PharmacyHubSupplierOrderController.detail);
-  router.post('/supplier/orders/:orderId/accept', ...supplierProductGuards, PharmacyHubSupplierOrderController.accept);
-  router.post('/supplier/orders/:orderId/ship', ...supplierProductGuards, PharmacyHubSupplierOrderController.ship);
 
   // ───────────────────────────────────────────────────────────────────────────
   // 운영자 fulfillment 복구 (결제됐지만 공급자에게 전달되지 않은 주문의 유일한 공식 복구 경로)

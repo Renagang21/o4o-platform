@@ -22,7 +22,6 @@ import { BRAND, ROLE_LABELS, ROLES, SERVICE_KEY } from '../../config/service';
 /** 신청 역할 표시 — service.ts 의 ROLE_LABELS 를 그대로 쓴다(라벨 사본 금지). */
 const ROLE_DISPLAY: Record<string, string> = {
   [ROLES.storeOwner]: ROLE_LABELS[ROLES.storeOwner],
-  [ROLES.supplier]: ROLE_LABELS[ROLES.supplier],
   [ROLES.operator]: ROLE_LABELS[ROLES.operator],
   [ROLES.admin]: ROLE_LABELS[ROLES.admin],
 };

@@ -95,7 +95,7 @@ describe('OperatorsPage — 비밀번호 write 계약', () => {
       expect(roles).toMatch(/'pharmacy-hub:admin'/);
       expect(roles).toMatch(/'pharmacy-hub:operator'/);
       // 사업자 신분 역할은 이 화면(서비스 운영자 등록)의 대상이 아니다.
-      expect(roles).not.toMatch(/pharmacy-hub:store_owner|pharmacy-hub:supplier/);
+      expect(roles).not.toMatch(/pharmacy-hub:store_owner/);
     });
 
     it('대상 서비스에 기본값(KPA 고정)을 두지 않는다', () => {

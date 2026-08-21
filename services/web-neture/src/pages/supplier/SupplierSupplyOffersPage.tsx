@@ -8,7 +8,7 @@
  * (오퍼 모드 선택은 WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1 에서 구현 완료 — 상품 등록·수정 화면에서 선택한다)
  */
 import { Link } from 'react-router-dom';
-import { Boxes, Users, Network, ArrowRight } from 'lucide-react';
+import { Boxes, Users, Network, Pill, ArrowRight } from 'lucide-react';
 
 export default function SupplierSupplyOffersPage() {
   return (
@@ -47,12 +47,35 @@ export default function SupplierSupplyOffersPage() {
           </div>
           <p className="text-sm text-slate-600 mb-3">
             각 제품이 어느 서비스(KPA Society·GlycoPharm·K-Cosmetics)에 공급/승인되었는지는 제품 목록의 서비스·승인 상태로 확인합니다.
+            이 세 서비스는 운영자 공급 승인 축이므로 신청 후 승인이 필요합니다.
           </p>
           <Link
             to="/supplier/products"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700"
           >
             제품 목록에서 상태 확인 <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/*
+          WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1
+          Pharmacy-Hub 는 운영자 공급 승인이 없는 **직접 opt-in** 축이다. 공급자는
+          Pharmacy-Hub 회원이 아니며, 제공 설정은 여기(Neture)에서만 한다.
+        */}
+        <div className="rounded-lg border border-slate-200 bg-white p-5">
+          <div className="flex items-center gap-2 mb-1">
+            <Pill className="w-5 h-5 text-teal-600" />
+            <h2 className="font-semibold text-slate-800">Pharmacy-Hub 제공 설정</h2>
+          </div>
+          <p className="text-sm text-slate-600 mb-3">
+            약국 경영자 대상 서비스입니다. 운영자 상품 승인이 없어 제공을 시작하면 즉시 매장
+            HUB 에 노출되며, 서비스별 공급가를 따로 정할 수 있습니다.
+          </p>
+          <Link
+            to="/supplier/services/pharmacy-hub"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700"
+          >
+            Pharmacy-Hub 제공 설정으로 이동 <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 

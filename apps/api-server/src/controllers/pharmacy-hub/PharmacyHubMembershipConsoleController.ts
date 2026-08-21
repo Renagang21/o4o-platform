@@ -18,7 +18,7 @@
  * 역할 부여 (§6-E):
  *   MembershipApprovalService 가 단일 트랜잭션에서
  *   service_memberships(active) + users + role_assignments(멱등 upsert) 를 함께 처리한다.
- *   부여되는 role 은 service_memberships.role 값 = 'pharmacy-hub:store_owner' | 'pharmacy-hub:supplier'.
+ *   부여되는 role 은 service_memberships.role 값 = 'pharmacy-hub:store_owner'.
  *   반려 시에는 역할을 부여하지 않는다.
  */
 

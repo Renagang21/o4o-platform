@@ -240,7 +240,7 @@ describe('기존 held 계약 보존', () => {
     const { svc } = makeService({});
     (svc as any).dataSource.query = jest.fn(async (sql: string) =>
       String(sql).includes('service_memberships')
-        ? [{ role: 'pharmacy-hub:supplier', status: 'active' }]
+        ? [{ role: 'pharmacy-hub:operator', status: 'active' }]
         : [],
     );
     const r = await svc.provisionStoreSubject(USER, null, true);

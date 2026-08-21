@@ -22,14 +22,19 @@ export const BRAND = {
   name: 'Pharmacy-Hub',
   nameKo: '파머시 허브',
   domain: 'pharmacyhub.co.kr',
-  tagline: '공급자와 약국 경영자를 직접 연결하는 약국 전문 서비스',
+  tagline: '약국 경영자를 위한 약국 전문 서비스',
 } as const;
 
-/** 역할 진입점 (Foundation 3 역할 + admin — WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1) */
+/**
+ * 역할 진입점 (WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1)
+ *
+ * supplier 는 없다 — 공급자는 Pharmacy-Hub 회원이 아니라 Neture 에서만 활동한다
+ * (WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1).
+ * backend `PHARMACY_HUB_SCOPE_CONFIG.allowedRoles` 와 같은 표를 유지한다.
+ */
 export const ROLES = {
   admin: `${SERVICE_KEY}:admin`,
   storeOwner: `${SERVICE_KEY}:store_owner`,
-  supplier: `${SERVICE_KEY}:supplier`,
   operator: `${SERVICE_KEY}:operator`,
 } as const;
 
@@ -44,7 +49,6 @@ export const PLATFORM_SUPER_ADMIN = 'platform:super_admin' as const;
 export const ROLE_LABELS: Record<string, string> = {
   [ROLES.admin]: '서비스 관리자',
   [ROLES.storeOwner]: '약국 경영자',
-  [ROLES.supplier]: '공급자',
   [ROLES.operator]: '서비스 운영자',
 };
 
@@ -55,18 +59,17 @@ export const ROLE_LABELS: Record<string, string> = {
  * (`apps/api-server/src/middleware/pharmacy-hub-scope.middleware.ts`) 와 **같은 표**여야 한다.
  * 프론트가 더 넓으면 화면은 열리고 API 는 403 이 되며, 더 좁으면 권한이 있는데도 막힌다.
  *
- * admin ⊃ operator. store_owner / supplier 는 사업자 신분이라 admin 이 대신하지 않는다.
+ * admin ⊃ operator. store_owner 는 사업자 신분이라 admin 이 대신하지 않는다.
  *
  * WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1:
  *   platform:super_admin 을 admin/operator 만족 역할로 추가한다(backend platformBypass 와 정렬).
- *   store_owner / supplier 는 사업자 신분이므로 플랫폼 관리자가 대신하지 않는다 —
+ *   store_owner 는 사업자 신분이므로 플랫폼 관리자가 대신하지 않는다 —
  *   해당 API 는 본인 레코드 기준이라 메뉴만 열면 403 이 된다.
  */
 export const ROLE_SCOPE_MAPPING: Record<string, readonly string[]> = {
   [ROLES.admin]: [ROLES.admin, PLATFORM_SUPER_ADMIN],
   [ROLES.operator]: [ROLES.operator, ROLES.admin, PLATFORM_SUPER_ADMIN],
   [ROLES.storeOwner]: [ROLES.storeOwner],
-  [ROLES.supplier]: [ROLES.supplier],
 };
 
 /** 보유 역할이 요구 역할을 만족하는가 (계층 포함) */

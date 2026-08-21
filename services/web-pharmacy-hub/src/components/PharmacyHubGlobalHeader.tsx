@@ -15,19 +15,19 @@
  * 다시 하드코딩하지 않는다(backend scopeRoleMapping 과 같은 표 유지).
  *
  * 이 헤더는 **공개 영역 셸(PublicLayout)** 전용이다. 역할별 업무 셸
- * (StoreDashboardLayout / OperatorAreaShell / SupplierShell) 은 각자의 상단바 계약을
+ * (StoreDashboardLayout / OperatorAreaShell) 은 각자의 상단바 계약을
  * 그대로 유지한다 — 이중 헤더를 만들지 않는다.
  */
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, LogIn, Pill, Shield, Store, Truck, UserCircle } from 'lucide-react';
+import { LayoutDashboard, LogIn, Pill, Shield, Store, UserCircle } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem, filterContextualNav } from '@o4o/ui';
 import { NotificationBell, useNotifications,
   resolveNotificationTarget, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { useAuth } from '../contexts/AuthContext';
-import { BRAND, ROLES, ROLE_LABELS, SERVICE_KEY, satisfiesRole } from '../config/service';
+import { BRAND, ROLES, SERVICE_KEY, satisfiesRole } from '../config/service';
 import { PH_CONTEXTUAL_NAV, PH_PUBLIC_NAV } from '../config/navigation';
 import { notificationsApi } from '../lib/api/notifications';
 
@@ -49,7 +49,6 @@ export function PharmacyHubGlobalHeader() {
    */
   const isAdmin = isAuthenticated && satisfiesRole(roles, ROLES.admin);
   const isOperator = isAuthenticated && satisfiesRole(roles, ROLES.operator);
-  const isSupplier = isAuthenticated && satisfiesRole(roles, ROLES.supplier);
   /**
    * StoreOwnerGuard('pharmacy-hub') 통과 조건과 같은 표 —
    * store_owner 본인 + operator/admin(운영 목적 진입 허용). 메뉴와 가드가 어긋나지 않게 한다.
@@ -60,7 +59,6 @@ export function PharmacyHubGlobalHeader() {
   const contextualNav = filterContextualNav(PH_CONTEXTUAL_NAV, {
     storeManager: !!isStoreManager,
     storeOwner: !!isStoreOwner,
-    supplier: !!isSupplier,
     operator: !!isOperator,
   });
 
@@ -129,11 +127,6 @@ export function PharmacyHubGlobalHeader() {
           {isStoreOwner && (
             <GlobalHeaderMenuItem to="/store-owner" icon={<Store className="w-4 h-4" />}>
               내 약국
-            </GlobalHeaderMenuItem>
-          )}
-          {isSupplier && (
-            <GlobalHeaderMenuItem to="/supplier" icon={<Truck className="w-4 h-4" />}>
-              {ROLE_LABELS[ROLES.supplier]}
             </GlobalHeaderMenuItem>
           )}
           {isAdmin && (

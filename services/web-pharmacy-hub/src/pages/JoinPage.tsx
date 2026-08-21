@@ -3,9 +3,11 @@
  *
  * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §6-B
  *
- * 흐름: 역할 선택(약국 경영자 / 공급자) → 최소 정보 입력 → 신청 → 승인 대기 안내.
+ * 흐름: 최소 정보 입력 → 신청 → 승인 대기 안내.
  *   - serviceKey 는 클라이언트가 보내지 않는다. 서버가 'pharmacy-hub' 로 강제한다.
- *   - 운영자(operator) 는 신청 대상이 아니다 (§5.2).
+ *   - 가입 역할은 약국 경영자 하나뿐이라 선택 단계가 없다
+ *     (WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1).
+ *     공급자는 Pharmacy-Hub 회원이 아니고, 운영자·강사는 자가 신청이 아니라 사후 부여다.
  *   - 신규 사용자·기존 O4O 사용자 모두 동일 폼을 사용한다 (백엔드가 이메일로 분기).
  */
 
@@ -14,34 +16,25 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../lib/apiClient';
 import { BRAND } from '../config/service';
 
-type RoleType = 'store_owner' | 'supplier';
-
-const ROLE_OPTIONS: { value: RoleType; label: string; desc: string }[] = [
-  { value: 'store_owner', label: '약국 경영자', desc: '공급자 제공 상품·자료를 이용하는 약국' },
-  { value: 'supplier', label: '공급자', desc: '약국에 상품·자료를 제공하는 공급자' },
-];
+/** 유일한 가입 역할 — 백엔드 `ALLOWED_ROLE_TYPES` 와 같은 표다. */
+const ROLE_TYPE = 'store_owner' as const;
 
 const FIELD_LABEL: Record<string, string> = {
   name: '이름',
   phone: '연락처',
   businessName: '약국명',
-  companyName: '회사명',
-  contactName: '담당자명',
   email: '이메일',
   password: '비밀번호',
 };
 
 export default function JoinPage() {
   const navigate = useNavigate();
-  const [roleType, setRoleType] = useState<RoleType | null>(null);
   const [form, setForm] = useState({
     email: '',
     password: '',
     name: '',
     phone: '',
     businessName: '',
-    companyName: '',
-    contactName: '',
   });
   const [error, setError] = useState<string | null>(null);
   const [missing, setMissing] = useState<string[]>([]);
@@ -52,20 +45,17 @@ export default function JoinPage() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!roleType) return;
     setError(null);
     setMissing([]);
     setSubmitting(true);
     try {
       await api.post('/pharmacy-hub/join', {
-        roleType,
+        roleType: ROLE_TYPE,
         email: form.email,
         password: form.password,
         name: form.name,
         phone: form.phone,
-        ...(roleType === 'store_owner'
-          ? { businessName: form.businessName }
-          : { companyName: form.companyName, contactName: form.contactName }),
+        businessName: form.businessName,
         tos: true,
         privacyAccepted: true,
       });
@@ -86,31 +76,8 @@ export default function JoinPage() {
         {BRAND.nameKo} — 신청 후 서비스 운영자의 승인이 필요합니다.
       </p>
 
-      <section className="mb-6">
-        <h2 className="mb-2 text-sm font-semibold text-gray-700">1. 신청 역할 선택</h2>
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {ROLE_OPTIONS.map((opt) => (
-            <li key={opt.value}>
-              <button
-                type="button"
-                onClick={() => setRoleType(opt.value)}
-                className={`w-full rounded-lg border p-4 text-left ${
-                  roleType === opt.value
-                    ? 'border-primary-600 bg-primary-50'
-                    : 'border-gray-200 bg-white'
-                }`}
-              >
-                <span className="block font-medium">{opt.label}</span>
-                <span className="mt-1 block text-xs text-gray-500">{opt.desc}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {roleType && (
-        <form onSubmit={onSubmit} className="space-y-3 rounded-lg border border-gray-200 bg-white p-5">
-          <h2 className="text-sm font-semibold text-gray-700">2. 최소 정보 입력</h2>
+      <form onSubmit={onSubmit} className="space-y-3 rounded-lg border border-gray-200 bg-white p-5">
+          <h2 className="text-sm font-semibold text-gray-700">약국 경영자 정보</h2>
 
           <label className="block text-sm">
             이메일
@@ -154,38 +121,15 @@ export default function JoinPage() {
             />
           </label>
 
-          {roleType === 'store_owner' ? (
-            <label className="block text-sm">
-              약국명
-              <input
-                value={form.businessName}
-                onChange={set('businessName')}
-                required
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-              />
-            </label>
-          ) : (
-            <>
-              <label className="block text-sm">
-                회사명
-                <input
-                  value={form.companyName}
-                  onChange={set('companyName')}
-                  required
-                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-                />
-              </label>
-              <label className="block text-sm">
-                담당자명
-                <input
-                  value={form.contactName}
-                  onChange={set('contactName')}
-                  required
-                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
-                />
-              </label>
-            </>
-          )}
+          <label className="block text-sm">
+            약국명
+            <input
+              value={form.businessName}
+              onChange={set('businessName')}
+              required
+              className="mt-1 w-full rounded border border-gray-300 px-3 py-2"
+            />
+          </label>
 
           {error && (
             <div className="text-sm text-red-600">
@@ -205,8 +149,7 @@ export default function JoinPage() {
           >
             {submitting ? '신청 중…' : '가입 신청'}
           </button>
-        </form>
-      )}
+      </form>
 
       <p className="mt-4 text-center text-sm">
         <Link to="/join/status" className="text-primary-600 underline">

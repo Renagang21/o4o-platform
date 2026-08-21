@@ -225,6 +225,9 @@ const SupplierProductCreatePage = lazy(() => import('./pages/supplier/SupplierPr
 const SupplierProductRegisterEntryPage = lazy(() => import('./pages/supplier/SupplierProductRegisterEntryPage'));
 const SupplierBulkRegisterPage = lazy(() => import('./pages/supplier/SupplierBulkRegisterPage'));
 const SupplierSupplyOffersPage = lazy(() => import('./pages/supplier/SupplierSupplyOffersPage'));
+// WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1:
+//   공급자 직접 opt-in 서비스(Pharmacy-Hub) 제공 설정 — Pharmacy-Hub 에는 공급자 shell 이 없다.
+const SupplierServiceDeliveryPage = lazy(() => import('./pages/supplier/SupplierServiceDeliveryPage'));
 // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1
 const SupplierRecruitmentsPage = lazy(() => import('./pages/supplier/SupplierRecruitmentsPage'));
 // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1
@@ -853,6 +856,7 @@ function App() {
               <Route path="/supplier/products/register" element={<SupplierProductRegisterEntryPage />} />
               <Route path="/supplier/products/bulk" element={<SupplierBulkRegisterPage />} />
               <Route path="/supplier/supply-offers" element={<SupplierSupplyOffersPage />} />
+              <Route path="/supplier/services/:serviceKey" element={<SupplierServiceDeliveryPage />} />
               {/* WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1 */}
               <Route path="/supplier/recruitments" element={<SupplierRecruitmentsPage />} />
               {/* WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1 */}

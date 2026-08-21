@@ -22,8 +22,7 @@ import { getServiceMembershipStatus } from '../lib/membershipGate';
 
 const ENTRIES = [
   { to: '/store-owner', role: ROLES.storeOwner, desc: '공급 상품 주문 · 매장 콘텐츠 · 실행 자산(QR·POP·사이니지)' },
-  { to: '/supplier', role: ROLES.supplier, desc: '내 상품 Pharmacy-Hub 제공 설정' },
-  { to: '/operator', role: ROLES.operator, desc: '가입 신청 승인·반려' },
+  { to: '/operator', role: ROLES.operator, desc: '가입·회원 운영 · 커뮤니티(포럼) 운영' },
 ];
 
 export default function HomePage() {

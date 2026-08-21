@@ -5,7 +5,8 @@
  * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1
  * WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1 — /store-owner 하위를 공통 매장 셸로 편입
  * WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1 — /operator 하위를 공통 운영자 셸로 편입
- * WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1 — /supplier 하위를 공급자 셸로 편입
+ * WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1 — /supplier 셸 제거
+ *   (공급자는 Pharmacy-Hub 회원이 아니다. 제공 설정은 Neture 공급자 화면에 있다.)
  *
  * 라우트:
  *   /                            홈 (브랜드 표시 + 역할별 진입점)
@@ -22,9 +23,6 @@
  *   /education                   교육 허브 (동일 WO §7 — 공통 LmsHubTemplate)
  *   /education/course/:id        강의 상세 (공통 CourseDetailView · enrollment 비활성)
  *   /education/course/:courseId/lesson/:lessonId  레슨 (공통 LessonPlayerView)
- *   /supplier                    공급자 셸 (SupplierShell)
- *     ├ (index)                  공급자 진입점
- *     └ /products                내 상품 Pharmacy-Hub 제공 설정 (WO-...-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1)
  *   /operator                    운영자 셸 (OperatorLayoutWrapper — 공통 OperatorAreaShell)
  *     ├ (index)                  서비스 운영자 진입점
  *     ├ /memberships             가입 신청 관리 목록
@@ -73,8 +71,6 @@ import { StoreOwnerShell } from './layouts/StoreOwnerShell';
 // WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1
 import { OperatorLayoutWrapper } from './layouts/OperatorLayoutWrapper';
 import { AdminLayoutWrapper } from './layouts/AdminLayoutWrapper';
-// WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1
-import { SupplierShell } from './layouts/SupplierShell';
 // WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1 — 공개 영역 공통 셸(헤더·푸터)
 import { PublicLayout } from './layouts/PublicLayout';
 import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
@@ -142,8 +138,6 @@ import OperatorForumDeleteRequestsPage from './pages/operator/ForumDeleteRequest
 import OperatorForumAnalyticsPage from './pages/operator/ForumAnalyticsPage';
 import OperatorAnalyticsPage from './pages/operator/AnalyticsPage';
 import OperatorRoleManagementPage from './pages/operator/RoleManagementPage';
-// WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
-import SupplierProductsPage from './pages/supplier/ProductsPage';
 // WO-O4O-PHARMACY-HUB-STORE-HUB-HOME-INTRODUCTION-V1 — 매장허브 홈 (공통 StoreHubTemplate)
 import StoreHubPage from './pages/store-hub/StoreHubPage';
 import StoreOwnerHomePage from './pages/store-owner/HomePage';
@@ -194,7 +188,7 @@ export default function App() {
             공개 영역 셸 (WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1)
             PublicLayout = 공통 GlobalHeader(브릿지) + <Outlet/> + 공개 푸터.
             URL 은 하나도 바뀌지 않는다 — pathless layout route 로 감싸기만 한다.
-            역할 업무 셸(/store-owner · /store-hub · /operator · /supplier)과
+            역할 업무 셸(/store-owner · /store-hub · /operator)과
             공개 QR 랜딩(/qr/:slug)은 자체 상단 계약이 있어 여기 포함하지 않는다.
           */}
           <Route element={<PublicLayout />}>
@@ -385,29 +379,12 @@ export default function App() {
           </Route>
 
           {/*
-            공급자 영역 셸 (WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1)
-            SupplierShell = MembershipGate + 공급자 헤더/사이드바 + <Outlet/>.
-            공통 Supplier Shell 은 아직 존재하지 않아(조사 결과 — CHECK §2) 최소 thin wrapper 로 둔다.
-            URL 2개(/supplier · /supplier/products) 는 그대로 두고 nested route 로만 정리한다 —
-            하위 화면 컴포넌트·상품 업무 로직 무변경.
+            /supplier 는 없다 (WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1).
+            공급자는 Pharmacy-Hub 회원이 아니라 Neture 에서만 활동하는 주체다. 제공 설정·주문 처리는
+            Neture 공급자 화면(/supplier/services)에 있고, 그 결과가 매장허브에 자동 노출된다.
+            여기에 공급자 셸을 다시 만들지 않는다 — 정본:
+            docs/baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md
           */}
-          <Route path="/supplier" element={<SupplierShell />}>
-            <Route
-              index
-              element={
-                /*
-                  WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1:
-                    plannedFeatures(미구현 로드맵) 화면 노출 제거 — 실제 진입 가능한
-                    기능만 안내한다. 로드맵은 WO 문서가 보유한다.
-                */
-                <RoleEntryPage
-                  role={ROLES.supplier}
-                  links={[{ to: '/supplier/products', label: '상품 제공 설정' }]}
-                />
-              }
-            />
-            <Route path="products" element={<SupplierProductsPage />} />
-          </Route>
 
           {/*
             운영자 영역 셸 (WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1)

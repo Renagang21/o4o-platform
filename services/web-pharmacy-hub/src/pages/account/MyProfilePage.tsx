@@ -83,7 +83,6 @@ const PHARMACY_HUB_ROLE_PRIORITY = [
   PLATFORM_SUPER_ADMIN,
   ROLES.admin,
   ROLES.operator,
-  ROLES.supplier,
   ROLES.storeOwner,
 ] as const;
 

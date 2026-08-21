@@ -57,7 +57,7 @@ export const PH_PUBLIC_NAV: GlobalHeaderNavItem[] = [
 // ─── Contextual Nav ──────────────────────────────────────────────────────────
 
 export type PhContextualNavItem = ContextualNavItem<
-  'storeManager' | 'storeOwner' | 'supplier' | 'operator'
+  'storeManager' | 'storeOwner' | 'operator'
 >;
 
 /**
@@ -69,7 +69,6 @@ export type PhContextualNavItem = ContextualNavItem<
  *   - storeOwner   : satisfiesRole(ROLES.storeOwner) — 매장 본인 데이터 화면 전용.
  *                    운영자도 매장 셸 자체에는 들어가지만 `/pharmacy-hub/store-owner/*` API 는
  *                    본인 매장 레코드 기준이라 403 이다. 메뉴는 실제로 열리는 것만 노출한다.
- *   - supplier     : satisfiesRole(ROLES.supplier)
  *   - operator     : satisfiesRole(ROLES.operator) — admin 포함(ROLE_SCOPE_MAPPING)
  *
  * HUB 우선 — 비KPA 서비스는 매장 HUB 가 먼저 노출된다(K-Cosmetics canonical 정합).
@@ -77,7 +76,6 @@ export type PhContextualNavItem = ContextualNavItem<
 export const PH_CONTEXTUAL_NAV: PhContextualNavItem[] = [
   { label: '매장 허브', href: '/store-hub', visibleWhen: 'storeManager' },
   { label: '내 약국', href: '/store-owner', visibleWhen: 'storeOwner' },
-  { label: ROLE_LABELS[ROLES.supplier], href: '/supplier', visibleWhen: 'supplier' },
   { label: ROLE_LABELS[ROLES.operator], href: '/operator', visibleWhen: 'operator' },
 ];
 
