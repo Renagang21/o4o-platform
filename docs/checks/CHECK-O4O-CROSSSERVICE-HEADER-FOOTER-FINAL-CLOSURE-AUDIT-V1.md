@@ -379,14 +379,79 @@ Playwright(Chromium) 실브라우저. Desktop 1440×900 · Mobile 390×844.
 
 ---
 
-## 18. production 검증 (§26 · §28-18)
+## 18. production 검증 (§26 · §28-18) — **수정 후 실측 PASS** (2026-08-21 갱신)
 
-- 17-1 은 **수정 전 배포본**에 대한 프로덕션 실측이다 — 그래서 `#services` 결함이 프로덕션에서 재현됐다.
-- 15절의 코드 수정은 이 커밋 시점에 **아직 배포되지 않았다**.
-  → **수정 후 상태의 production 검증 = 미확인**. preview PASS 를 production PASS 로 보고하지 않는다(§25).
-- 배포(main 머지 후 CI/CD) 뒤 `https://kpa-society.co.kr/services/pharmacy` 에서 dead anchor 0 · 모바일 overflow 0 을
-  재확인하는 것을 후속 확인 항목으로 남긴다.
+> 본 절은 마감 연장 작업(2026-08-21)에서 **수정본 배포 후 production 실측 결과**로 갱신했다.
+> 최초 작성 시점에는 15절 수정이 미배포 상태여서 "수정 후 production = 미확인" 으로 기록돼 있었다.
+> 다른 절(17-1 등)의 **수정 전 배포본 기록은 사실 기록이므로 그대로 보존**한다 (CLAUDE.md §16-1 · WO §19).
 
+### 18-1. 배포 반영 근거
+
+| 항목 | 값 |
+|---|---|
+| 수정 커밋 | `3635838ed` (4 파일) |
+| CI 워크플로 | `Deploy Web Services (Cloud Run)` run **`32454324338`** (headSha `3635838ed5b0690b622ce06ee49a99605c4c0122`, `conclusion=success`, 2026-08-21T06:25:22Z → 06:28:51Z) |
+| job 결과 | `deploy-kpa-society` / `deploy-glycopharm` / `deploy-k-cosmetics` = **success** · `deploy-pharmacy-hub` / `deploy-neture` / `deploy-kpa-branch` = **skipped** (해당 서비스 변경 없음 — 정상) |
+| Cloud Run 활성 리비전 (asia-northeast3) | `kpa-society-web-01880-7zw` (06:28:29Z) · `glycopharm-web-01309-vxs` (06:28:12Z) · `k-cosmetics-web-01052-6tp` (06:28:05Z) — 각 서비스 트래픽 100% |
+| 미변경 서비스 리비전 | `neture-web-01505-cnh` · `pharmacy-hub-web-00133-k9v` (배포 skip 과 일치) |
+| 측정 시각 | 2026-08-21 06:32~06:38 UTC (Playwright/Chromium, 쿼리스트링 캐시 버스트 적용) |
+
+### 18-2. 수정 대상 3건 production 실측
+
+| # | 대상 | 기대 | production 실측 | 판정 |
+|---|---|---|---|---|
+| 1 | KPA `PlatformHeader` dead anchor | `#services` 없음 · `#about` 은 유지되고 대상 `id` 실재 | `kpa-society.co.kr/services/pharmacy` header/footer anchor = `["#about"]` **단 1건**, `#services` **0건**, `document.getElementById('about')` 존재 → **dead anchor 0** | PASS |
+| 2 | GlycoPharm 공개 Footer 연도 | 현재 연도(2026) | `© 2026 GlycoPharm. All rights reserved.` | PASS |
+| 3 | K-Cosmetics 공개 Footer 연도 | 현재 연도(2026) | `© 2026 K-Cosmetics. All rights reserved.` | PASS |
+| 3-b | GlycoPharm `StoreLayout` footer 연도 (로그인 필요 영역) | 현재 연도(2026) | 배포 번들 `glycopharm.co.kr/assets/index--i8qzWqY.js` 전수 스캔 결과 `All rights reserved` 문자열 **2 occurrence 모두 동적 변수** (`["© ", t, " GlycoPharm. All rights reserved."]`) — 하드코딩 `2025` **0건**. 공개 Footer 가 같은 번들에서 2026 을 렌더하는 것으로 동일 변수의 정상 동작 확인 | PASS (번들 근거) |
+
+> `2025` 하드코딩 잔존 여부는 배포 번들 문자열 전수 스캔으로 확인했다 — GlycoPharm / K-Cosmetics 양쪽 모두 **0건**.
+> 3-b 는 인증 필요 화면이라 브라우저 직접 렌더 대신 **배포 산출물 근거**로 판정했다(측정 한계 명시).
+
+### 18-3. 5서비스 대표 화면 × 2 뷰포트 재측정 (Desktop 1440×900 / Mobile 390×844)
+
+6 화면 × 2 뷰포트 = **12 측정, 전부 HTTP 200**.
+
+| 화면 | 뷰포트 | header | footer | header 높이 | `href="#"` | dead anchor | 저작권 | scrollWidth/innerWidth | console error | 렌더 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `kpa-society.co.kr/` | D / M | 1 / 1 | 1 / 1 | 65 / 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 0 | 정상 |
+| `kpa-society.co.kr/services/pharmacy` | D / M | 1 / 1 | 1 / 1 | 65 / 65 | 0 | **0** | 2026 | 1440/1440 · **390/390** | 0 | 정상 |
+| `glycopharm.co.kr/` | D / M | 1 / 1 | 1 / 1 | 65 / 65 | 0 | 0 | **2026** | 1440/1440 · 390/390 | 0 | 정상 |
+| `k-cosmetics.site/` | D / M | 1 / 1 | 1 / 1 | 65 / 65 | 0 | 0 | **2026** | 1440/1440 · 390/390 | 0 | 정상 |
+| `pharmacyhub.co.kr/` | D / M | 1 / 1 | 1 / 1 | 65 / 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 0 | 정상 |
+| `neture.co.kr/` | D / M | 1 / 1 | 1 / 1 | 65 / 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 0 | 정상 |
+
+- **이중 header / 이중 footer = 0** (전 화면 header 1 · footer 1).
+- **white screen / JS exception = 0** — 전 화면 `body.innerText` 555~1273자 렌더, console error 0, pageerror 0.
+- 17-1 에서 관측됐던 `kpa-society.co.kr/services/pharmacy` **모바일 가로 overflow(396>390) 도 해소**됐다 (390/390).
+- 모바일 bottom nav: KPA / GlycoPharm / K-Cosmetics = 1, PharmacyHub = 0(의도), Neture = 0(비인증 시 미렌더) — 11·12절 판정과 동일.
+- 검증 함정 주의 기록: K-Cosmetics 는 반드시 **`k-cosmetics.site`** 로 측정했다 (`k-cosmetics.co.kr` 은 외부 쇼핑몰).
+
+### 18-4. header/footer dead link 전수 (production 실접속)
+
+5서비스 header/footer 의 내부 링크 **42 경로 전수 접속** — 전부 HTTP 200 · 404/Not Found 표시 0 · pageerror 0.
+
+| 서비스 | 검증 경로 | 결과 |
+|---|---|---|
+| KPA | `/` `/service-guide` `/about` `/contact` `/guide/intro` `/policy` `/privacy` `/login` `/guide/features/{signage,forum,content}` (11) | dead 0 |
+| GlycoPharm | `/` `/service-guide` `/contact` `/forum` `/lms` `/business` `/terms` `/privacy` (8) | dead 0 |
+| K-Cosmetics | `/` `/service-guide` `/contact` `/register` `/terms` `/privacy` (6) | dead 0 |
+| PharmacyHub | `/` `/community` `/education` `/service-guide` `/forum` `/account/{enrollments,certificates}` `/guide/{intro,features}` `/join` `/join/status` `/terms` `/privacy` (13) | dead 0 |
+| Neture | `/` `/guide` `/contact` `/terms` `/privacy` (5) | dead 0 |
+
+- GlycoPharm / K-Cosmetics 의 `terms` · `privacy` 는 중첩 상대 route 라 소스 grep 으로 보이지 않지만 **실접속 200 · 정상 렌더**로 확인했다.
+- 5서비스 `terms` / `privacy` 는 route 는 살아 있고 본문이 "현재 공개된 문서가 없습니다" 다 — **dead link 가 아니라 20절 FOLLOW_UP #2(정책 문서 미게시)** 이며 closure 를 막지 않는다.
+- PharmacyHub 에 `/contact` route 가 없는 것은 **의도된 계약**이므로 결함으로 세지 않는다(6·7절 판정 유지).
+- `mailto:` 링크 2건(GlycoPharm `support@glycopharm.co.kr` · K-Cosmetics `support@k-cosmetics.site`)은 route dead link 대상 밖이다.
+
+### 18-5. 판정
+
+```text
+production adoption = PASS
+```
+
+- 20절 FOLLOW_UP **#10 "15절 수정본의 production 재확인" 은 본 절로 해소**됐다 (기록 보존을 위해 20절 표는 원문 유지).
+- 코드 수정 **0건** — 본 갱신은 문서(CHECK) 갱신뿐이다.
 ---
 
 ## 19. MUST_FIX_BEFORE_CLOSE 목록 (§28-19)
@@ -457,6 +522,7 @@ closure 를 막지 않는다(§8). 필요 시 별도 WO 로 다룬다.
 ```text
 HEADER_FOOTER_COMMONIZATION = CLOSED
 MUST_FIX_BEFORE_CLOSE = 0
+production adoption = PASS
 ```
 
-**최종 판정: CLOSE**
+**최종 판정: CLOSE** · **production adoption = PASS** (18절 · 2026-08-21 수정본 배포 후 실측)
