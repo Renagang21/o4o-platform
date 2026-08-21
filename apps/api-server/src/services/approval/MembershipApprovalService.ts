@@ -162,9 +162,14 @@ export interface ReactivateResult {
  */
 function resolveGrantedRole(serviceKey: string, role: string | null | undefined): string | null {
   if (!role) return null;
+  // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1 (D4):
+  //   'store_owner' 추가 — k-cosmetics membership.role 에 prefix 없는 legacy 값이 남아 있어
+  //   그대로 부여하면 service-neutral 전역 역할 'store_owner' 가 새로 생성된다. 그 역할은
+  //   k-cosmetics operator 의 scope 밖이라 회수조차 불가능해진다(F9 RBAC SSOT 위반).
+  //   pharmacy-hub bare role 정규화(migration 20270317000000)와 같은 원칙이다.
   if (
     serviceKey === 'k-cosmetics' &&
-    ['seller', 'cosmetics:seller', 'k-cosmetics:seller'].includes(role)
+    ['seller', 'cosmetics:seller', 'k-cosmetics:seller', 'store_owner'].includes(role)
   ) {
     return 'cosmetics:store_owner';
   }

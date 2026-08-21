@@ -1588,9 +1588,15 @@ export class MembershipConsoleController {
         }
         // 1. Service scope check — prefixed roles must match prefix, unprefixed roles must match serviceKey
         const allowedPrefixes = scope.rolePrefixes.map((p: string) => `${p}:`);
+        // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1 (D4):
+        //   role prefix 와 canonical service_key 는 다르다('cosmetics' vs 'k-cosmetics').
+        //   prefix 없는 요청이 prefixed 역할로 해석된 경우 serviceKey 비교만 하면
+        //   자기 서비스 역할인데도 403 이 되어 회수 경로가 완전히 막힌다.
+        //   해석된 이름이 자기 prefix 로 시작하면 prefixed 분기와 동일 판정을 적용한다(권한 확대 아님).
         const inScope = role.includes(':')
           ? allowedPrefixes.some((prefix: string) => role.startsWith(prefix))
-          : scope.serviceKeys.includes(roleEntity.serviceKey);
+          : scope.serviceKeys.includes(roleEntity.serviceKey) ||
+            allowedPrefixes.some((prefix: string) => roleEntity!.name.startsWith(prefix));
         if (!inScope) {
           res.status(403).json({ success: false, error: 'Cannot remove roles outside your service scope' });
           return;
