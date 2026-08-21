@@ -102,8 +102,6 @@ jobs:
         # Cosmetics Extensions
         echo "📦 Cosmetics Extensions..."
         pnpm --filter '@o4o/cosmetics-seller-extension' run build
-        pnpm --filter '@o4o/cosmetics-supplier-extension' run build
-        pnpm --filter '@o4o/cosmetics-sample-display-extension' run build
 
         echo ""
         echo "✅ All API-specific packages built successfully!"
