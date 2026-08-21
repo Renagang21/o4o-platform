@@ -59,6 +59,7 @@ export function OperatorAnalyticsPage({
   tableId = 'operator-analytics-actions',
   activePeriodClass,
   barClass,
+  notice,
 }: OperatorAnalyticsPageProps) {
   const [days, setDays] = useState(30);
 
@@ -180,6 +181,9 @@ export function OperatorAnalyticsPage({
     <div className="p-6 mx-auto" style={{ maxWidth: 1100 }}>
       <h1 className="text-2xl font-bold text-slate-900 mb-2">운영 액션 분석</h1>
       <p className="text-sm text-slate-500 mb-6">운영자 승인/거절 등 액션 이력을 분석합니다.</p>
+
+      {/* 서비스별 안내 슬롯 (선택) — 미주입 서비스는 아무것도 렌더하지 않는다 */}
+      {notice}
 
       {/* Period Filter */}
       <div className="flex gap-2 mb-6">

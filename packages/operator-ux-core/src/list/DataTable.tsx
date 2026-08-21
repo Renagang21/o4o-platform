@@ -8,10 +8,36 @@
  * 정렬/렌더링/empty/loading은 BaseTable에 일임한다.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BaseTable } from '@o4o/ui';
 import type { O4OColumn } from '@o4o/ui';
 import type { DataTableProps } from './types';
+
+/**
+ * 모바일 폭 감지 — `stickyOnMobile` 컬럼을 좁은 화면에서만 고정하기 위해 사용한다.
+ * WO-O4O-OPERATOR-GP-VIEW-DEDUP-AND-CROSSSERVICE-TABLE-UX-ALIGN-V1
+ *
+ * SSR / matchMedia 미지원 환경에서는 항상 false → desktop 렌더와 동일하다.
+ */
+const MOBILE_QUERY = '(max-width: 640px)';
+
+function useIsMobileWidth(): boolean {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const mql = window.matchMedia(MOBILE_QUERY);
+    const apply = () => setIsMobile(mql.matches);
+    apply();
+    // Safari < 14 는 addEventListener 미지원 → addListener fallback
+    if (typeof mql.addEventListener === 'function') {
+      mql.addEventListener('change', apply);
+      return () => mql.removeEventListener('change', apply);
+    }
+    mql.addListener(apply);
+    return () => mql.removeListener(apply);
+  }, []);
+  return isMobile;
+}
 
 function getRowKeyValue<T extends Record<string, any>>(
   row: T,
@@ -64,6 +90,7 @@ export function DataTable<T extends Record<string, any>>({
   };
 
   const expandEnabled = !!expandable && !!renderExpandedRow;
+  const isMobile = useIsMobileWidth();
   // Loading skeleton
   if (loading) {
     return (
@@ -87,13 +114,14 @@ export function DataTable<T extends Record<string, any>>({
     maxWidth: col.maxWidth,
     resizable: col.resizable,
     system: col.system,
-    sticky: col.sticky,
     align: col.align,
     sortable: col.sortable,
     sortAccessor: col.sortAccessor,
     render: col.render,
     accessor: col.accessor,
     onCellClick: col.onCellClick,
+    // 모바일에서만 고정되는 신원 컬럼 (desktop 은 col.sticky 그대로)
+    sticky: col.sticky || (isMobile && col.stickyOnMobile),
   }));
 
   // selectable → _select 체크박스 컬럼 자동 생성

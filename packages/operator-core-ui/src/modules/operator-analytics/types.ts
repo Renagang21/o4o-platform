@@ -9,6 +9,8 @@
  * serviceKey 는 쿼리 파라미터다. 실차이는 HTTP client · serviceKey · 액션 라벨 사전뿐이다.
  */
 
+import type { ReactNode } from 'react';
+
 export interface AnalyticsActionSummary {
   action_key: string;
   status: string;
@@ -59,4 +61,12 @@ export interface OperatorAnalyticsPageProps {
   activePeriodClass: string;
   /** 일별 추이 막대 색 (예: 'bg-blue-500') */
   barClass: string;
+  /**
+   * 제목 아래 · 기간 필터 위에 놓이는 서비스별 안내 슬롯 (선택).
+   *
+   * WO-O4O-OPERATOR-GP-VIEW-DEDUP-AND-CROSSSERVICE-TABLE-UX-ALIGN-V1:
+   *   GlycoPharm 로컬 화면이 갖고 있던 "분석 기능 준비 중" 안내를 보존하기 위한 주입점.
+   *   미주입 서비스(KPA · Neture · PharmacyHub)는 아무것도 렌더하지 않는다 — 기존 출력 불변.
+   */
+  notice?: ReactNode;
 }

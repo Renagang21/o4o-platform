@@ -38,8 +38,18 @@ export interface ListColumnDef<T> {
   resizable?: boolean;
   /** 시스템 컬럼 — reorder/visibility 대상 제외 */
   system?: boolean;
-  /** sticky 고정 (left: 0) */
+  /** sticky 고정 (선두 sticky 컬럼들의 누적 폭만큼 left offset) */
   sticky?: boolean;
+  /**
+   * 모바일 폭(≤640px)에서만 sticky 고정.
+   *
+   * WO-O4O-OPERATOR-GP-VIEW-DEDUP-AND-CROSSSERVICE-TABLE-UX-ALIGN-V1:
+   *   좁은 화면에서 상태·액션 컬럼을 보려고 가로 스크롤하면 행의 신원(이름 등)이
+   *   화면 밖으로 사라져 "어느 행을 보고 있는지" 알 수 없었다.
+   *   신원 컬럼에 이 플래그를 주면 선택 체크박스와 함께 좌측에 고정된다.
+   *   desktop 에서는 아무 효과가 없다 (기존 렌더 그대로).
+   */
+  stickyOnMobile?: boolean;
   /** 텍스트 정렬 */
   align?: 'left' | 'center' | 'right';
   /** 정렬 가능 여부 (BaseTable 프론트 정렬) */

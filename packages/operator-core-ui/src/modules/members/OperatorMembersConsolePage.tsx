@@ -681,6 +681,10 @@ export function OperatorMembersConsolePage({
       // 서버 정렬(serverSort)에는 'name' 단일 키가 없음(firstName/lastName 분리) → client 정렬 모드에서만 sortable
       sortable: !serverSort,
       width: '180px',
+      // WO-O4O-OPERATOR-GP-VIEW-DEDUP-AND-CROSSSERVICE-TABLE-UX-ALIGN-V1:
+      //   모바일에서 상태·권한 컬럼을 보려 가로 스크롤할 때 행 신원이 사라지지 않도록 고정.
+      //   desktop 렌더는 변화 없음.
+      stickyOnMobile: true,
       sortAccessor: (u) => getUserName(u),
       render: (_v, user) => (
         <div className="flex items-center gap-2">

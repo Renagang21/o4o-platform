@@ -345,6 +345,56 @@ export function BaseTable<T extends Record<string, any>>({
 
   const [colWidths, setColWidths] = useState<number[]>([]);
   const tableRef = useRef<HTMLTableElement>(null);
+
+  // ─── Sticky 컬럼 좌측 offset (다중 sticky 지원) ───────────────────────
+  // WO-O4O-OPERATOR-GP-VIEW-DEDUP-AND-CROSSSERVICE-TABLE-UX-ALIGN-V1
+  //
+  // 이전에는 sticky 컬럼이 무조건 `left: 0` 이었다. sticky 가 1개일 때는 맞지만
+  // 2개 이상이면 전부 좌측 0 에 겹쳐 뒤 컬럼이 앞 컬럼을 덮었다.
+  // 선행 sticky 컬럼들의 **실제 렌더 폭**을 누적해 offset 을 계산한다.
+  //
+  // sticky 컬럼이 연속하지 않아도 된다(예: [_select, 액션, 이름] 에서 _select·이름만 sticky).
+  // sticky 컬럼들은 지정 순서대로 좌측에 나란히 붙고, 사이의 비-sticky 컬럼은 그 아래로 스크롤된다.
+  // sticky 가 0~1개인 기존 소비처는 offset 이 0 이라 렌더 결과가 완전히 동일하다 (회귀 없음).
+  const stickyIndexes = useMemo(
+    () => effectiveColumns.map((c, i) => (c.sticky ? i : -1)).filter((i) => i >= 0),
+    [effectiveColumns],
+  );
+  const [stickyOffsets, setStickyOffsets] = useState<Record<number, number>>({});
+
+  useEffect(() => {
+    if (stickyIndexes.length <= 1) {
+      setStickyOffsets((prev) => (Object.keys(prev).length === 0 ? prev : {}));
+      return;
+    }
+    const measure = () => {
+      const headRow = tableRef.current?.tHead?.rows?.[0];
+      if (!headRow) return;
+      const next: Record<number, number> = {};
+      let acc = 0;
+      for (const ci of stickyIndexes) {
+        next[ci] = acc;
+        acc += (headRow.cells[ci] as HTMLElement | undefined)?.offsetWidth ?? 0;
+      }
+      setStickyOffsets((prev) => {
+        const same =
+          Object.keys(prev).length === Object.keys(next).length &&
+          stickyIndexes.every((ci) => prev[ci] === next[ci]);
+        return same ? prev : next;
+      });
+    };
+    measure();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    if (ro && tableRef.current) ro.observe(tableRef.current);
+    window.addEventListener('resize', measure);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [stickyIndexes]);
+
+  /** sticky 컬럼의 left 값 — 측정 전이거나 단일 sticky 면 0 (기존 동작). */
+  const stickyLeftOf = (ci: number) => stickyOffsets[ci] ?? 0;
   const dragResizeRef = useRef<{
     colIndex: number;
     startX: number;
@@ -492,7 +542,7 @@ export function BaseTable<T extends Record<string, any>>({
 
               // Sticky styles
               const stickyStyle: React.CSSProperties = isSticky
-                ? { position: 'sticky', left: 0, zIndex: 20, backgroundColor: 'inherit' }
+                ? { position: 'sticky', left: stickyLeftOf(ci), zIndex: 20, backgroundColor: 'inherit' }
                 : {};
 
               // Selection column: render select-all checkbox
@@ -633,7 +683,7 @@ export function BaseTable<T extends Record<string, any>>({
                       // Sticky body cell
                       if (col.sticky) {
                         tdStyle.position = 'sticky';
-                        tdStyle.left = 0;
+                        tdStyle.left = stickyLeftOf(ci);
                         tdStyle.zIndex = 10;
                         tdStyle.backgroundColor = 'inherit';
                       }

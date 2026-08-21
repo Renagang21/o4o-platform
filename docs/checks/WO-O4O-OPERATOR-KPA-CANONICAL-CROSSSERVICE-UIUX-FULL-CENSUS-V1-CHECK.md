@@ -115,11 +115,19 @@ DomainIASidebar(커뮤니티 운영 / 매장 HUB 운영 / 운영 공통)
 
 ### 2-5. mobile 390×844 — **cross-service 공통 결함**
 
+> **정정 (2026-08-21, 후속 WO 실측)**: 최초 기록은 "가로 overflow container 없음 · 테이블이 화면 밖으로
+> 잘림" 이라고 적었으나 **기전이 틀렸다.** 실제로는 `overflow-x-auto` 컨테이너가 있고
+> `scrollLeft` 가 정상 이동하며(KPA 645px · PH 717px) 페이지 body 는 넘치지 않는다
+> (`document.scrollWidth == clientWidth == 390`). **가로 스크롤은 이미 정상 동작한다.**
+> 아래 판정(NOT_IMPLEMENTED)은 유지되지만 근거는 "overflow 방치" 가 아니라 "가독성 미대응" 이다.
+
 - 셸은 반응형 정상: sidebar → "운영자 메뉴" 접이식 + 하단 탭바
-- **그러나 DataTable 컬럼이 desktop 과 100% 동일** (5개 서비스 · 23개 화면 전수 일치).
-  card 전환 · 컬럼 우선순위 · horizontal scroll container 없음 → 390px 에서 **테이블이 화면 밖으로 잘림**
-  (KPA `/operator/members` 는 `이름` 컬럼에서 절단, 나머지 6컬럼 접근 불가)
-- 이는 특정 서비스 drift 가 아니라 **공통 `DataTable` 자체의 미구현**이다 → §10 3차 WO 로 분리
+- 테이블은 `overflow-x-auto` 로 **담기고 스크롤된다** — 페이지 가로 넘침 0
+- **그러나 DataTable 컬럼이 desktop 과 100% 동일** (5개 서비스 · 23개 화면 전수 일치):
+  컬럼 우선순위 · card 전환 · **신원 컬럼 고정 없음** → 상태·권한 컬럼을 보려고 가로 스크롤하면
+  행의 신원(이름)이 화면 밖으로 사라져 "어느 행을 보는지" 알 수 없다
+  (선택 체크박스만 `sticky` 로 고정돼 있었다)
+- 이는 특정 서비스 drift 가 아니라 **공통 `DataTable` 의 미대응**이다 → §10 3차 WO 로 분리
 
 > 부수 관측: KPA `/operator/members` 회원 1건의 이름이 `◆◆◆◆◆` 로 깨져 렌더된다 (인코딩 아티팩트).
 > 본 WO 범위 밖이므로 수정하지 않고 보고만 한다.
@@ -206,7 +214,7 @@ DomainIASidebar(커뮤니티 운영 / 매장 HUB 운영 / 운영 공통)
 
 | # | 업무 | KPA | Neture | K-Cos | GP | PH | 비고 |
 |:--:|---|:--:|:--:|:--:|:--:|:--:|---|
-| E1 | 매장 관리 목록 | FC | **VD** | FC | **UD** | **NI** | GP 는 core-ui+ux-core 혼용(192줄). PH 는 baseline §5 "매장 조회 KEEP" 인데 화면 없음 |
+| E1 | 매장 관리 목록 | FC | **VD** | FC | **UD** | **SS** | GP 는 core-ui+ux-core 혼용(192줄). PH 재판정 → §8-A |
 | E2 | 매장 상세 | FC | NA | FC | **VD** | NA | GP 419줄 자체 구현 |
 | E3 | 채널 관리 | FC | NA | FC | **VD** | NA | GP 408줄 자체 구현 |
 | E4 | 내 매장(콕핏) | NA | NA | **SS** | NA | NA | KCos 676줄 |
@@ -273,7 +281,7 @@ DomainIASidebar(커뮤니티 운영 / 매장 HUB 운영 / 운영 공통)
 | L1 | Operator 셸 · 사이드바 | FC | FC | FC | FC | FC | 5개 전부 `OperatorAreaShell` + `DomainIASidebar` |
 | L2 | Domain IA 구성 | FC | **SS** | FC | FC | **SS** | Neture=공급·유통/커머스·정산/커뮤니티·콘텐츠/운영공통, PH=가입·회원/커뮤니티/공통 (정당한 주입) |
 | L3 | 404 / deep link | FC | FC | FC | FC | FC | 실측 5/5 동일 |
-| L4 | mobile 반응형 리스트 | **NI** | **NI** | **NI** | **NI** | **NI** | 5개 전부 컬럼 미축약 — 공통 DataTable 미구현 |
+| L4 | mobile 반응형 리스트 | **NI** | **NI** | **NI** | **NI** | **NI** | 가로 스크롤은 정상. 컬럼 우선순위·신원 고정 미대응 (§2-5 정정 참조) |
 
 ---
 
@@ -305,9 +313,9 @@ DomainIASidebar(커뮤니티 운영 / 매장 HUB 운영 / 운영 공통)
 | FULLY_COMMON | 130 | 44.8% |
 | UX_DRIFT | 12 | 4.1% |
 | VIEW_DUPLICATED | 28 | 9.7% |
-| SERVICE_SPECIFIC | 10 | 3.4% |
+| SERVICE_SPECIFIC | 11 | 3.8% |
 | NOT_APPLICABLE | 81 | 27.9% |
-| NOT_IMPLEMENTED | 29 | 10.0% |
+| NOT_IMPLEMENTED | 28 | 9.7% |
 | **합계** | **290** | **100%** |
 | **미조사** | **0** | — |
 | **UNCLASSIFIED** | **0** | — |
@@ -320,7 +328,7 @@ DomainIASidebar(커뮤니티 운영 / 매장 HUB 운영 / 운영 공통)
 | Neture | 17 | 1 | 6 | 7 | 22 | 5 | 58 |
 | K-Cosmetics | 36 | 0 | 4 | 1 | 10 | 7 | 58 |
 | GlycoPharm | 26 | 2 | 18 | 1 | 6 | 5 | 58 |
-| PharmacyHub | 14 | 1 | 0 | 1 | 32 | 10 | 58 |
+| PharmacyHub | 14 | 1 | 0 | 2 | 32 | 9 | 58 |
 
 **판정**
 
@@ -396,7 +404,7 @@ GP VD 18건 = A4 · A5 · D3 · D5 · E2 · E3 · F2 · G1 · G2 · G3 · G4 · 
 
 A4 가입 신청(255) · D3 이벤트 오퍼(275) · F2 상품 상세(309) · K4 서비스 설정(161)
 
-## 8. NOT_IMPLEMENTED 전 목록 (29건 — 전수)
+## 8. NOT_IMPLEMENTED 전 목록 (28건 — 전수)
 
 | 서비스 | 건수 | 업무 |
 |---|:--:|---|
@@ -404,17 +412,45 @@ A4 가입 신청(255) · D3 이벤트 오퍼(275) · F2 상품 상세(309) · K4
 | Neture | 5 | C1 CMS · C2 콘텐츠 허브 · C3 자료실 · K2 감사 로그 · L4 mobile |
 | **K-Cos** | 7 | C2 콘텐츠 허브 · H4 동영상 · H5 다국어 · H6 태블릿 · **J3 운영 분석** · K2 감사 로그 · L4 mobile |
 | GlycoPharm | 5 | H4 동영상 · H5 다국어 · H6 태블릿 · K2 감사 로그 · L4 mobile |
-| **PharmacyHub** | 10 | C1 CMS · C3 자료실 · C4 안내 문구 · **E1 매장 관리** · I1 LMS · I2 설문 · I3 문의 · J2 AI 리포트 · K2 감사 로그 · L4 mobile |
+| **PharmacyHub** | 9 | C1 CMS · C3 자료실 · C4 안내 문구 · I1 LMS · I2 설문 · I3 문의 · J2 AI 리포트 · K2 감사 로그 · L4 mobile |
 
-**특히 주목할 3건**
+**특히 주목할 2건**
 
 1. **K-Cos J3 운영 분석** — 4개 서비스가 보유한 업무인데 route·page 자체가 없다. 공통 `operator-analytics` 모듈도 존재한다.
-2. **PH E1 매장 관리** — `O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1 §5` 가 "매장·회원 조회 = **KEEP**" 으로 판정했는데 화면이 없다. baseline 과 구현의 불일치.
-3. **L4 mobile (5/5)** — 서비스 drift 가 아니라 공통 `DataTable` 미구현. 단일 수정으로 5서비스 동시 해결 가능.
+2. **L4 mobile (5/5)** — 서비스 drift 가 아니라 공통 `DataTable` 의 가독성 미대응 (§2-5 정정 참조).
 
 > PH 의 승인·매장지원 축(D1~D8 · G1~G4 · H1~H3)은
 > `O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1 §5` 가 **REMOVE(신설 금지)** 로 못박았으므로
 > NOT_IMPLEMENTED 가 아니라 **NOT_APPLICABLE** 로 판정했다. K2 감사 로그는 REMOVE 목록에 없어 NI 로 둔다.
+
+---
+
+## 8-A. PharmacyHub 매장 관리 재판정 (E1) — **NOT_IMPLEMENTED → SERVICE_SPECIFIC**
+
+최초 census 는 baseline §5 의 "매장·회원 조회 = KEEP" 한 줄만 보고 **NOT_IMPLEMENTED(실제 누락)** 로
+적었다. baseline 문구와 현재 영역 구분을 다시 대조한 결과 **오판**이다.
+
+### 근거
+
+| # | 확인 사항 | 실측 |
+|:--:|---|---|
+| 1 | PharmacyHub 에 매장 업무가 있는가 | **있다.** `/store-owner` · `/store-owner/payment` · `/store-hub` route 실재 (App.tsx) |
+| 2 | baseline 이 Operator 측 매장 관리를 요구하는가 | **아니다.** §5 는 "**공급자 업무 대행(매장 지원)** = REMOVE(신설 금지)" 로 닫았다. KPA 식 매장 관리(매장 목록 → 상세 → capability 토글 → 채널 관리)는 성격상 매장 지원이다 |
+| 3 | §6 매장 HUB 판정 | A(매장 경영자 상품 조회·상세·주문) · B(공통 매장경영 Core) = **KEEP·COMMON** — 둘 다 **store-owner 축**이지 operator 축이 아니다 |
+| 4 | §5 "매장·회원 조회 KEEP" 의 의미 | Operator 가 공통 Operator OS 를 **재사용할 수 있다**는 capability 진술이지, 특정 화면을 만들라는 요구가 아니다 |
+
+### 판정
+
+**SERVICE_SPECIFIC** — 업무가 없는 것이 아니라 **다른 축에 다르게 존재**한다.
+PharmacyHub 의 매장 업무는 operator 가 매장을 관리하는 형태가 아니라
+**매장 경영자 self-service(`/store-owner` · `/store-hub`)** 로 설계돼 있다.
+KPA 식 operator 매장 관리를 대칭으로 넣는 것은 baseline §5 REMOVE 위반이다.
+
+### 남은 확인 1건 (구현 아님 — 판단 요청)
+
+§5 의 "매장 **조회**" 를 문자 그대로 읽으면 *읽기 전용* operator 매장 목록은 허용 범위일 수 있다.
+다만 현재 baseline 어디에도 그 화면을 요구하는 문장이 없고, 만들면 매장 지원 축으로 번질 위험이 있다.
+**이번 WO 에서는 구현하지 않았다.** 필요 여부는 baseline 소유자 판단 사항이다.
 
 ---
 
