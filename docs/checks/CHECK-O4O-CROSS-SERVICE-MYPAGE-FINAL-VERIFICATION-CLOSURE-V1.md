@@ -218,7 +218,8 @@ Notification 읽음처리 / DB 직접 변경 / 테스트 계정 생성
 
 - 위 1347건은 전부 워크트리에서 workspace 패키지 산출물이 없어 발생하는 `TS2307 Cannot find module '@o4o/*'` 및 그로부터 파생된 `TS7006` 계열의 **선행 환경 오류**이며 본 WO 변경과 무관하다.
 - 동일 tsconfig 로 수정 전/후를 각각 실행해 건수가 동일함을 실측했다.
-- **미확인**: monorepo 전체 build 는 수행하지 않았다. 실 빌드 검증은 push 후 CI/CD(`kpa-society-web` 배포)로 확인한다.
+- monorepo 전체 build 는 로컬에서 수행하지 않았고, **CI/CD 로 확인했다**: push 후 `Deploy Web Services (Cloud Run)` 의 `detect-changes` → `deploy-kpa-society` 잡이 **성공**했고 `kpa-society-web` 이 `kpa-society-web-01868-mgh` → **`kpa-society-web-01869-wmb`** 로 갱신됐다.
+- **배포 후 재검증 (390×844)**: `https://kpa-society.co.kr/mypage` — h1 "마이페이지", nav 9 항목 정상, 가로 overflow 0 (`scrollWidth 375 / clientWidth 375`), console error 0, 문서 전체에 `/member/apply` 링크 **0건**.
 
 ---
 
