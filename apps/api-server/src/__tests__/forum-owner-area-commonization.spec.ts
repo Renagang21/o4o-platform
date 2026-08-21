@@ -76,7 +76,32 @@ const MEMBER_PAGES: OwnerPage[] = [
   { service: 'K-Cosmetics', file: 'services/web-k-cosmetics/src/pages/forum/ForumMemberManagementPage.tsx', component: 'ForumOwnerMemberManagement', before: 354 },
 ];
 
-const ALL_PAGES = [...DASHBOARD_PAGES, ...MEMBER_PAGES];
+/** census 시점 이미 복제로 존재하던 4서비스 — 감축 폭 단언의 기준이 된다. */
+const CENSUS_PAGES = [...DASHBOARD_PAGES, ...MEMBER_PAGES];
+
+/**
+ * census 이후 **채택**된 서비스.
+ *
+ * WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 (§7·§8) 에서 PharmacyHub 가
+ * 소유자 영역을 공통 View 채택으로 신설했다. census 당시 NOT_IMPLEMENTED 였으므로
+ * "복제 감축" 기준(before LOC)이 없다 — 따라서 총량 단언에는 넣지 않고,
+ * 공통 소비 · 복제 지문 0 · wrapper 상한만 census 서비스와 동일하게 고정한다.
+ *
+ * 이 축의 목적은 "PharmacyHub 에 소유자 영역이 있는가"가 아니라
+ * **있다면 반드시 공통 View 로만 존재하는가** 이다 (신규 복제 유입 차단).
+ */
+interface AdoptedOwnerPage {
+  service: string;
+  file: string;
+  component: 'ForumOwnerDashboard' | 'ForumOwnerMemberManagement';
+}
+
+const ADOPTED_PAGES: AdoptedOwnerPage[] = [
+  { service: 'Pharmacy-Hub', file: 'services/web-pharmacy-hub/src/pages/forum/MyForumDashboardPage.tsx', component: 'ForumOwnerDashboard' },
+  { service: 'Pharmacy-Hub', file: 'services/web-pharmacy-hub/src/pages/forum/ForumMemberManagementPage.tsx', component: 'ForumOwnerMemberManagement' },
+];
+
+const ALL_PAGES = [...CENSUS_PAGES, ...ADOPTED_PAGES];
 
 /** 서비스 어댑터 (endpoint 배선 + accent 만 담당) */
 const ADAPTERS: Array<{ service: string; file: string }> = [
@@ -84,6 +109,8 @@ const ADAPTERS: Array<{ service: string; file: string }> = [
   { service: 'GlycoPharm', file: 'services/web-glycopharm/src/services/forumOwnerAdapter.ts' },
   { service: 'K-Cosmetics', file: 'services/web-k-cosmetics/src/services/forumOwnerAdapter.ts' },
   { service: 'Neture', file: 'services/web-neture/src/services/forumOwnerAdapter.ts' },
+  // WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §7·§8 채택분
+  { service: 'Pharmacy-Hub', file: 'services/web-pharmacy-hub/src/services/forumOwnerAdapter.ts' },
 ];
 
 /** 어댑터가 반드시 채워야 하는 accent 토큰 */
@@ -147,16 +174,20 @@ describe('서비스 파일에 복제 마크업이 남아 있지 않다', () => {
     expect(found).toEqual([]);
   });
 
-  it.each(ALL_PAGES)('$service $component — LOC 가 이전 대비 크게 줄었다', ({ file, before }) => {
+  it.each(CENSUS_PAGES)('$service $component — LOC 가 이전 대비 크게 줄었다', ({ file, before }) => {
     const after = loc(file);
     expect(after).toBeLessThan(before);
     // 어댑터 주입 wrapper 수준(≤ 80줄)까지 내려왔는지 고정한다.
     expect(after).toBeLessThanOrEqual(80);
   });
 
+  it.each(ADOPTED_PAGES)('$service $component — 채택분도 wrapper 상한(≤ 80줄)을 지킨다', ({ file }) => {
+    expect(loc(file)).toBeLessThanOrEqual(80);
+  });
+
   it('소유자 화면 총 LOC 가 census 기준(3,103) 대비 1/5 미만이다', () => {
-    const beforeTotal = ALL_PAGES.reduce((sum, p) => sum + p.before, 0);
-    const afterTotal = ALL_PAGES.reduce((sum, p) => sum + loc(p.file), 0);
+    const beforeTotal = CENSUS_PAGES.reduce((sum, p) => sum + p.before, 0);
+    const afterTotal = CENSUS_PAGES.reduce((sum, p) => sum + loc(p.file), 0);
     expect(beforeTotal).toBe(3103);
     expect(afterTotal).toBeLessThan(beforeTotal / 5);
   });
@@ -256,7 +287,18 @@ describe('서비스 고유 정책이 보존된다', () => {
     expect(read('services/web-k-cosmetics/src/pages/forum/MyForumDashboardPage.tsx')).toContain('💄');
   });
 
-  it('Pharmacy-Hub — 소유자 영역을 신설하지 않는다 (census NOT_IMPLEMENTED 유지)', () => {
+  /**
+   * WO-O4O-CI-FORUM-OWNER-AREA-COMMONIZATION-TEST-BASELINE-RECOVERY-V1
+   *
+   * 이전 단언은 census 시점 사실("PharmacyHub 는 소유자 영역이 없다")을 그대로 고정했다.
+   * 그 뒤 WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 이 PH 소유자 영역을
+   * **공통 View 채택**으로 신설했으므로(복제가 아니다) 그 단언은 낡았다.
+   *
+   * 이 축이 실제로 지켜야 할 계약은 "없어야 한다"가 아니라
+   * **"PH 의 ForumOwner 소비는 공통 View wrapper + adapter 3곳뿐"** 이다.
+   * 즉 PH 안에 소유자 화면을 다시 구현한 파일이 생기면 실패한다.
+   */
+  it('Pharmacy-Hub — 소유자 영역은 공통 View 채택으로만 존재한다 (자체 재구현 0)', () => {
     const phDir = path.join(REPO, 'services/web-pharmacy-hub/src');
     const hits: string[] = [];
     const walk = (dir: string) => {
@@ -264,12 +306,27 @@ describe('서비스 고유 정책이 보존된다', () => {
         const full = path.join(dir, entry.name);
         if (entry.isDirectory()) walk(full);
         else if (/\.tsx?$/.test(entry.name) && fs.readFileSync(full, 'utf8').includes('ForumOwner')) {
-          hits.push(path.relative(phDir, full));
+          hits.push(path.relative(phDir, full).split(path.sep).join('/'));
         }
       }
     };
     walk(phDir);
-    expect(hits).toEqual([]);
+
+    // 허용되는 소비처는 이 3곳뿐이다 — 늘어나면 복제 회귀로 본다.
+    expect(hits.sort()).toEqual([
+      'pages/forum/ForumMemberManagementPage.tsx',
+      'pages/forum/MyForumDashboardPage.tsx',
+      'services/forumOwnerAdapter.ts',
+    ]);
+
+    // 그리고 그 소비는 공통 컴포넌트/factory 여야 한다 (자체 구현 금지).
+    const dash = read('services/web-pharmacy-hub/src/pages/forum/MyForumDashboardPage.tsx');
+    const members = read('services/web-pharmacy-hub/src/pages/forum/ForumMemberManagementPage.tsx');
+    const adapter = read('services/web-pharmacy-hub/src/services/forumOwnerAdapter.ts');
+    expect(dash).toContain(`from '@o4o/shared-space-ui'`);
+    expect(members).toContain(`from '@o4o/shared-space-ui'`);
+    expect(adapter).toContain('createForumOwnerApi');
+    expect(adapter).toContain('createForumOwnerMembershipApi');
   });
 });
 
@@ -291,8 +348,8 @@ describe('accent 주입과 Tailwind 스캔', () => {
     expect(source).not.toMatch(/['"`](?:text|bg|border|ring|hover:[a-z-]+)-\$\{/);
   });
 
-  it('소유 서비스 4곳의 tailwind content 가 shared-space-ui 를 스캔한다', () => {
-    for (const svc of ['web-kpa-society', 'web-glycopharm', 'web-k-cosmetics', 'web-neture']) {
+  it('소유 서비스 5곳의 tailwind content 가 shared-space-ui 를 스캔한다', () => {
+    for (const svc of ['web-kpa-society', 'web-glycopharm', 'web-k-cosmetics', 'web-neture', 'web-pharmacy-hub']) {
       const config = read(`services/${svc}/tailwind.config.js`);
       expect(`${svc}:${config.includes('packages/shared-space-ui/src')}`).toBe(`${svc}:true`);
     }
