@@ -97,8 +97,85 @@ pending/rejected membership 있음   → approveMembership()      (기존)
 부수 관측: `packages/financial-core` 는 `src` 가 비어 `tsup` 이 "No input files" 로 실패한다 —
 `origin/main` 선행 상태이며 본 WO 와 무관하다.
 
-## 5. 서비스별 lifecycle E2E
+## 5. 서비스별 lifecycle E2E (production)
 
-## 6. 서비스별 role E2E
+검증 계정 = E2E fixture `o4o-e2e-auth-main@neture.co.kr` (`44fa7733-…f757`). **실사용자 데이터 미접촉.**
+
+| 서비스 | 경로 | 비활성화 | 재활성화 | 새로고침 후 | 원복 |
+|---|---|---|---|---|---|
+| KPA-Society | `/operator/members` drawer (`PATCH /kpa/members/:id/status`) | PASS (`renagang21`) | **PASS** | 활성 유지 · `kpa:store_owner` 복원 | 완료 |
+| K-Cosmetics | `/admin/members` drawer (`PATCH /operator/members/:userId/status`) | PASS (활성4/정지1) | **PASS** (활성5/정지0) | 5개 membership 전부 `active` | 완료 |
+| Neture | 공통 `PATCH /operator/members/:userId/status` (Neture 운영자 토큰) | PASS (5개 → `suspended`) | **PASS** (5개 → `active`) | 상세 재조회 유지 | 완료 |
+| Pharmacy-Hub | `/operator/members` drawer (공통 endpoint) | PASS (활성8→7) | **PASS** (활성7→8) | 새로고침 후 활성8 유지 | 완료 |
+
+수정 전이라면 재활성화는 4서비스 모두 **200 + 무변화** 였다. 현재는 실제 상태 전이가 관측된다.
+
+`users.status` 는 4서비스 전 구간에서 `suspended`(2026-08-14 선행 값) 그대로다 —
+서비스 운영자 조치가 플랫폼 축을 건드리지 않는다는 경계가 유지됨을 뜻한다.
+
+**관측 (수정 대상 아님)**: `suspend`/`reactivate` 는 `service_key = ANY(scope.serviceKeys)` 로 동작하므로
+다중 서비스 scope 운영자가 실행하면 자기 scope 안의 membership 전체에 적용된다.
+이는 `suspendMembershipCore` 의 선행 동작이며 본 WO 의 `reactivate` 는 그것을 대칭으로 되돌릴 뿐이다
+(WO 금지 조항 "서비스 간 membership 상태 동시 변경" 을 새로 도입하지 않았다). 별도 WO 판단 대상.
+
+## 6. 서비스별 role E2E (production)
+
+**canonical serviceKey 필터 (D4)**
+
+| 필터 값 | KPA 운영자 | Neture 운영자 | Pharmacy-Hub |
+|---|---|---|---|
+| `kpa-society` | 200 / 8 | 200 / 8 | (lockedServiceKey) |
+| `k-cosmetics` | 200 / 7 | 200 / 7 | — |
+| `neture` | 200 / 5 | 200 / 5 | — |
+| `glycopharm` | 200 / 7 | 200 / 7 | — |
+| `pharmacy-hub` | 200 / 3 | 200 / 3 | **200 / 3** (`?service=pharmacy-hub`) |
+| 무필터 | 200 / 33 (scope 6키 합집합, 수정 전 0) | 200 | — |
+| `platform` · `lms` | 403 | 403 | — |
+
+`platform`·`lms` 403 은 scope guard 정상 동작이며 결함이 아니다.
+프로덕션 DOM 의 `<option value>` 는 `''|platform|neture|glycopharm|kpa-society|k-cosmetics|pharmacy-hub|lms` — canonical 전환이 배포에 반영됐다.
+역할 추가 모달도 채워진다(KPA 31 / Neture 30). 수정 전 "할당 가능한 역할이 없습니다".
+
+**역할 부여 → 회수 → 원복**
+
+| 서비스 | 대상 역할 | 부여 | 회수 | 상태 |
+|---|---|---|---|---|
+| KPA-Society | `kpa:student` | `POST 200` (11→12) | PASS | 비활성 = 권한 없음 (원복) |
+| K-Cosmetics | `cosmetics:partner` | `POST 200` (10→11) | PASS | 비활성 = 권한 없음 (원복) |
+| Neture | `neture:partner` | `POST 200` (11→12) | PASS | 비활성 = 권한 없음 (원복) |
+| Pharmacy-Hub | — | **미실행** | — | 아래 사유 |
+
+* 회수는 공통 UI 계약상 hard delete 가 아니라 `is_active=false` 다. 기존 `kpa:store_owner` 비활성 행과 동일한 형태이므로
+  **유효 권한 기준 원상복구**이며, row 자체는 남는다. 이를 숨기지 않고 기록한다.
+* Pharmacy-Hub 는 `services/web-pharmacy-hub/src/App.tsx` 에 `members/:id` (UserDetailPage) route 가 없어
+  **역할 부여/회수 UI 진입점이 존재하지 않는다.** 우회 API 호출로 "검증했다" 고 적지 않고 미실행으로 보고한다.
+  role 카탈로그 read 는 위 표대로 PASS.
+
+**기타 브라우저 검증**: desktop(1440) · mobile(390) 양쪽에서 Neture `/admin/roles` · Neture 회원 상세 deep link + 새로고침 ·
+Pharmacy-Hub `/operator/roles` · `/operator/members` 로드 — 예상치 못한 4xx/5xx 0 · 가로 overflow 0 · white screen 0 · JS exception 0.
+GlycoPharm 은 공유 `RoleManagementPage` + 공유 backend 를 통해 `glycopharm` 필터 200/7 로 확인했고, typecheck·build 회귀도 PASS(§4).
 
 ## 7. 결론
+
+D3 · D4 **완료**. API 신설 0 · route 변경 0 · DB schema/migration/backfill 0.
+
+**범위 밖에서 발견한 결함 (본 WO 에서 고치지 않음 — 별도 WO 제안)**
+
+1. **KPA 회원 목록 id 축 혼용** — 목록이 `id = kpa_members.id ?? service_memberships.id` 를 반환한다.
+   `kpa_members` 행이 없는 계정은 `PATCH /kpa/members/:id/status` 가 **404 Member not found**.
+   (`o4o-e2e-auth-main@neture.co.kr` 재현. `kpa_members` 행이 있는 `renagang21` 은 정상 → 위 §5 는 후자로 수행.)
+2. **KPA drawer "전체 상세 페이지 →" 404** — 링크가 `users.id` 가 아니라 위 목록 `id` 를 쓴다.
+   `GET /operator/members/{kpa_members.id}` → 404. 1번과 같은 결함 계열.
+3. **Neture 회원 drawer "비활성화" 의 계약 불일치** — 공통 `…/status` (suspend) 가 아니라
+   `PATCH /operator/members/:membershipId/reject` 를 호출한다. 결과는 `suspended` 가 아닌 `rejected` 이고,
+   같은 drawer 에 되돌리는 버튼이 없어 회원 상세의 "멤버십 승인" 으로만 복구된다(복구 확인 완료).
+   라벨(비활성화)과 실제 축(거부)이 다르다.
+4. **Pharmacy-Hub 회원 상세 route 부재** — §6 참조.
+
+**선행 실패 (본 WO 무관, 은폐하지 않음)**
+
+* CI Pipeline "Code Quality Check" — `TS2307: Cannot find module 'date-fns'`
+  (`apps/admin-dashboard/src/pages/services/ServiceOverview.tsx` · `apps/main-site/src/components/forum/notifications/NotificationItem.tsx`).
+  본 WO 검증 중 관측했고 `18797cfd9` · `2ee6c8113` 에서도 동일 실패했다.
+  다른 세션이 `a066ef81a` (WO-O4O-CI-FRONTEND-TYPECHECK-BASELINE-RECOVERY-V1) 로 phantom import 를 제거해 해소했다.
+* `packages/financial-core` — `src` 가 비어 `tsup` 이 "No input files" 로 실패 (§4).
