@@ -2,7 +2,7 @@
  * KPA Society — Navigation 중앙 설정
  *
  * WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1
- * 표준: docs/architecture/ui/global-header-standard-v1.md §6
+ * 표준: docs/architecture/ui/GLOBAL-HEADER-STANDARD-V1.md §6
  *
  * 모든 Main Header 메뉴 정의를 이 파일에서 관리한다.
  * Header 내부 하드코딩 금지.
