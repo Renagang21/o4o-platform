@@ -1,9 +1,10 @@
 # O4O Global Header / Layout / Navigation Standard v1.0
 
 > **작성일**: 2026-04-17
-> **근거**: IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1
+> **최종 갱신**: 2026-08-21 — WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (현재 구현 상태 정합)
+> **근거**: IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 ([docs/archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md](../../archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md))
 > **상태**: Active Standard
-> **범위**: kpa-society, glycopharm, neture, k-cosmetics 및 향후 신규 서비스 전체
+> **범위**: kpa-society, glycopharm, neture, k-cosmetics, **pharmacy-hub** 및 향후 신규 서비스 전체
 > **원칙**: 이 문서는 표준 정의만 포함한다. 구현 코드, 컴포넌트 API, props 설계는 포함하지 않는다.
 
 ---
@@ -12,13 +13,17 @@
 
 O4O 플랫폼의 모든 서비스가 따라야 할 **Global Header / Layout / Navigation 표준 원칙**을 정의한다.
 
-이 문서가 해결하는 문제:
+이 문서가 해결한 문제 (2026-04-17 IR 시점의 상태):
 
-- Main/Public Header에 대한 플랫폼 공통 컴포넌트가 존재하지 않는다
-- 4개 서비스 모두 독립적으로 Header를 구현하고 있다
-- Navigation 메뉴가 각 서비스/파일에 하드코딩으로 분산되어 있다
-- 스타일링 방식이 서비스별로 다르다 (inline style vs Tailwind)
-- 역할에 따라 완전히 다른 사이트처럼 보이는 경우가 있다
+- Main/Public Header에 대한 플랫폼 공통 컴포넌트가 존재하지 않았다
+- 당시 4개 서비스 모두 독립적으로 Header를 구현하고 있었다
+- Navigation 메뉴가 각 서비스/파일에 하드코딩으로 분산되어 있었다
+- 스타일링 방식이 서비스별로 달랐다 (inline style vs Tailwind)
+- 역할에 따라 완전히 다른 사이트처럼 보이는 경우가 있었다
+
+**현재 상태 (2026-08-21):** 위 문제는 WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1 계열 작업으로 해소되었고,
+Header/Footer 공통화 트랙은 종료(CLOSED) 상태다 — 2절 참조. 본 문서는 그 결과를 유지·확장하기 위한
+**표준 정의**로서 계속 유효하다.
 
 이 문서가 하지 않는 것:
 
@@ -29,7 +34,11 @@ O4O 플랫폼의 모든 서비스가 따라야 할 **Global Header / Layout / Na
 
 ---
 
-## 2. 조사 결과 요약
+## 2. 조사 결과 요약과 현재 상태
+
+### 2.1 표준 제정 당시 조사 (2026-04-17, 역사적 기록)
+
+> 아래 표는 **표준 제정 근거가 된 과거 시점의 상태**다. 현재 구현 상태는 2.2 를 본다.
 
 IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 (2026-04-17) 핵심 수치:
 
@@ -54,9 +63,41 @@ IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 (2026-04-17) 핵심 수치:
 | TYPE D | Navigation 하드코딩 분산 | 전체 4개 |
 | TYPE E | 공유 컴포넌트 미활용 | neture (Store) |
 
+### 2.2 현재 구현 상태 (2026-08-21 기준, 현행)
+
+| 항목 | 현재 상태 |
+|------|-----------|
+| 적용 대상 서비스 | **5개** (kpa-society, glycopharm, neture, k-cosmetics, **pharmacy-hub**) |
+| Main/Public Header 공유 컴포넌트 | **있음** — `@o4o/ui` `GlobalHeader` ([packages/ui/src/layout/GlobalHeader.tsx](../../../packages/ui/src/layout/GlobalHeader.tsx)) |
+| 서비스별 Header | **thin bridge** 5개 — `KpaGlobalHeader` / `GlycoGlobalHeader` / `KCosGlobalHeader` / `NetureGlobalHeader` / `PharmacyHubGlobalHeader` |
+| Navigation 정의 위치 | **5서비스 모두 `src/config/navigation.ts` 로 분리** (Header 내부 하드코딩 해소) |
+| contextual 노출 조건 | 공통 `filterContextualNav` (`@o4o/ui`) 로 통일 |
+| Operator Shell 공유 | 유지 (`@o4o/ui` OperatorShell) |
+| Store Shell 공유 | 유지 (`@o4o/store-ui-core` StoreDashboardLayout) |
+| MobileBottomNav | 공통 Core (`@o4o/account-ui` mobile-nav) + 서비스별 탭 구성 |
+| Header/Footer 공통화 트랙 | **CLOSED** — [CHECK-O4O-CROSSSERVICE-HEADER-FOOTER-FINAL-CLOSURE-AUDIT-V1](../../checks/CHECK-O4O-CROSSSERVICE-HEADER-FOOTER-FINAL-CLOSURE-AUDIT-V1.md) |
+
+**구조 요약 — "완전 동일"이 아니라 "공통 Core + 서비스별 주입"이다.**
+
+```text
+공통 Core        @o4o/ui GlobalHeader (4슬롯, props-only, 서비스 Context 비의존)
+   +
+서비스별 bridge   {Service}GlobalHeader — AuthContext / LoginModal / 알림 / 역할 라벨 배선
+   +
+서비스별 config   src/config/navigation.ts — publicNav / contextualNav / footer 섹션
+   +
+서비스별 semantics 메뉴 항목·브랜드·역할 판정·대시보드 route 는 서비스마다 다르다
+```
+
+즉 **모든 서비스의 Header 가 같은 메뉴를 갖는다는 뜻이 아니다.** 공통인 것은 구조·슬롯·높이·동작 계약이고,
+navigation / AuthContext / role 배선의 차이는 bridge·config 계층에서 정상적으로 유지된다.
+
 ---
 
 ## 3. 왜 공통 표준이 필요한가
+
+> 이 절은 표준 제정의 **근거**다. 서술된 문제 상황은 2026-04-17 시점을 가리키며,
+> 현재는 대부분 해소되었다(2.2). 표준을 계속 유지해야 하는 이유로 읽는다.
 
 ### 3.1 사용자 경험 일관성
 
@@ -70,8 +111,9 @@ operator, store owner, admin은 **같은 서비스 내에서 하는 다른 일**
 
 ### 3.3 유지보수 효율
 
-4개 서비스 × 서비스당 평균 2~3개 Header = 8~12개의 독립된 Header 코드가 존재한다.
-동일한 기능(로그인 버튼, ServiceSwitcher, 사용자 드롭다운)이 각각 별도로 구현되어 있어 변경 비용이 선형적으로 증가한다.
+표준 제정 당시 4개 서비스 × 서비스당 평균 2~3개 Header = 8~12개의 독립된 Header 코드가 존재했다.
+동일한 기능(로그인 버튼, ServiceSwitcher, 사용자 드롭다운)이 각각 별도로 구현되어 있어 변경 비용이 선형적으로 증가했다.
+현재는 공통 `GlobalHeader` 1개 + 서비스별 thin bridge 5개 구조이므로, 공통 동작 변경은 Core 1곳에서 처리된다.
 
 ### 3.4 신규 서비스 온보딩
 
@@ -159,13 +201,18 @@ GlobalLayout
 - 서비스와 무관하게 동일한 구조
 - BrandSlot만 서비스별 주입, 나머지는 공통
 
-해당하는 현재 컴포넌트:
-- kpa: `Header.tsx` (Main)
-- glycopharm: `Header.tsx`
-- neture: `NetureLayout` / `MainLayout` 내장 Header
-- k-cosmetics: `Header.tsx`
+해당하는 현재 컴포넌트 (2026-08-21):
 
-→ 이들은 모두 **같은 계층의 같은 역할**을 수행하고 있으며, 하나의 공통 표준으로 통합 가능하다.
+| 계층 | 컴포넌트 |
+|------|----------|
+| 공통 Core | `@o4o/ui` `GlobalHeader` |
+| kpa-society | `KpaGlobalHeader` |
+| glycopharm | `GlycoGlobalHeader` |
+| neture | `NetureGlobalHeader` |
+| k-cosmetics | `KCosGlobalHeader` |
+| pharmacy-hub | `PharmacyHubGlobalHeader` |
+
+→ 서비스별 독립 `Header.tsx` 는 제거되었고, 위 bridge 들은 공통 Core 에 **브랜드·메뉴·인증 배선만 주입**한다.
 
 #### Layer B: Context Layer
 
@@ -243,15 +290,18 @@ Context 표현 방법 (비허용):
 
 ## 6. Navigation 관리 원칙
 
-### 6.1 현재 문제
+### 6.1 배경 (2026-04-17 당시 문제)
 
-모든 서비스의 메뉴가 각 Header/Layout 파일 내부에 상수 배열로 하드코딩되어 있다.
+모든 서비스의 메뉴가 각 Header/Layout 파일 내부에 상수 배열로 하드코딩되어 있었다.
 
 - kpa: 4곳 분산 (`menuItems`, `demoMenuItems`, `KPA_STORE_NAV_ITEMS`, `HUB_MENU_ITEMS`)
 - glycopharm: 2곳 분산 (`publicMenuItems`+`pharmacyMenuItems`, `roleConfig`)
 - neture: 2곳 분산 (NetureLayout 내 nav, MainLayout 내 nav)
 - k-cosmetics: 1곳 (Header.tsx 내 nav)
 - **중앙화된 메뉴 설정 시스템이 없음**
+
+**현재 상태:** 5서비스 모두 `src/config/navigation.ts` 단일 파일에서 `publicNav` / `contextualNav` 를 정의하고,
+노출 조건은 공통 `filterContextualNav` 로 처리한다. 아래 6.2~6.4 원칙은 그 구조를 유지하기 위한 기준으로 계속 적용된다.
 
 ### 6.2 표준 원칙
 
@@ -327,14 +377,16 @@ serviceNavigation
 | Admin | 없음 | ContextBar 또는 Badge ("관리") | Admin Sidebar 표시 |
 | Supplier/Partner | 없음 | ContextBar 또는 Badge | Space Sidebar 표시 |
 
-### 7.3 현재 위반 사례와 표준 방향
+### 7.3 표준 제정 당시 위반 사례와 해소 결과
 
-| 현재 상태 | 문제 | 표준 방향 |
-|-----------|------|-----------|
-| kpa: Admin 진입 시 Header 완전 소멸, AdminSidebar만 표시 | 같은 서비스인지 인식 불가 | GlobalHeader 유지 + Admin Sidebar 표시 |
-| kpa: Operator 진입 시 커스텀 renderHeader로 완전 교체 | 브랜드 일관성 약화 | GlobalHeader 유지 + Operator Context 표현 |
-| glycopharm: Admin 진입 시 DashboardLayout 이중 헤더 | 공개 페이지와 완전히 다른 경험 | GlobalHeader 유지 + Admin Context 표현 |
-| neture: 역할별로 완전히 다른 Layout (Supplier/Partner 등) | 동일 서비스 내 분절 | GlobalHeader 공통 + Space별 Workspace 분리 |
+| 당시 상태 (2026-04-17) | 문제 | 표준 방향 | 현재 (2026-08-21) |
+|-----------|------|-----------|-------------------|
+| kpa: Admin 진입 시 Header 완전 소멸, AdminSidebar만 표시 | 같은 서비스인지 인식 불가 | GlobalHeader 유지 + Admin Sidebar 표시 | 해소 — `AdminLayout` 이 `KpaGlobalHeader` 렌더 |
+| kpa: Operator 진입 시 커스텀 renderHeader로 완전 교체 | 브랜드 일관성 약화 | GlobalHeader 유지 + Operator Context 표현 | 해소 — `KpaOperatorLayoutWrapper` 가 `header={<KpaGlobalHeader />}` 전달 |
+| glycopharm: Admin 진입 시 DashboardLayout 이중 헤더 | 공개 페이지와 완전히 다른 경험 | GlobalHeader 유지 + Admin Context 표현 | 해소 — `DashboardLayout` 이 `GlycoGlobalHeader` 단일 렌더 |
+| neture: 역할별로 완전히 다른 Layout (Supplier/Partner 등) | 동일 서비스 내 분절 | GlobalHeader 공통 + Space별 Workspace 분리 | 해소 — `MainLayout`/`NetureLayout`/`AdminLayoutWrapper` 모두 `NetureGlobalHeader` |
+
+→ 위 4건은 모두 해소되었다. 표는 **표준이 실제로 적용된 근거**로 남긴다.
 
 ### 7.4 별도 Shell 허용 기준
 
@@ -352,7 +404,9 @@ serviceNavigation
 
 ## 8. 스타일링 원칙
 
-### 8.1 현재 상태
+### 8.1 배경 (2026-04-17 당시) 과 현재
+
+당시 상태:
 
 | 서비스 | 스타일링 방식 | Header 높이 |
 |--------|--------------|:-----------:|
@@ -361,10 +415,14 @@ serviceNavigation
 | neture | Tailwind CSS | 64px |
 | k-cosmetics | inline style | 64px |
 
+**현재 상태:** 공통 `GlobalHeader` 가 Tailwind 기반이고 높이는 `h-16`(64px) 로 고정되어 있어,
+5서비스 Header 의 스타일링 방식과 높이는 Core 에서 단일하게 결정된다.
+아래 8.2 표준 방향은 신규 화면·신규 서비스에 계속 적용된다.
+
 ### 8.2 표준 방향
 
 1. **신규 공통 Header/Layout 컴포넌트는 Tailwind CSS 기반을 표준으로 한다**
-   - 이유: 기존 4개 서비스 중 2개(glycopharm, neture)가 이미 Tailwind 사용 중
+   - 이유: 표준 제정 당시 4개 서비스 중 2개(glycopharm, neture)가 이미 Tailwind 사용 중이었고, 현재 공통 GlobalHeader 가 Tailwind 기반이다
    - 이유: 공유 패키지(`@o4o/ui`, `@o4o/store-ui-core`)가 Tailwind 기반
 
 2. **기존 inline style 서비스(kpa, k-cosmetics)는 즉시 전면 교체하지 않는다**
@@ -380,12 +438,15 @@ serviceNavigation
 
 ### 8.3 서비스별 브랜드 토큰 (참고)
 
+각 서비스 bridge 의 `brand` prop 이 실제 주입값이다 (2026-08-21 기준).
+
 | 서비스 | Primary Color | 로고 아이콘 | 서비스명 | 서브타이틀 |
 |--------|:------------:|:----------:|:--------:|:---------:|
-| kpa-society | `#2563eb` (blue) | 💊 | 대한약사회 | 약사 전문 플랫폼 |
-| glycopharm | `#10b981` (green) | Activity (lucide) | GlycoPharm | 혈당 관리 플랫폼 |
-| neture | `#059669` (green) | 텍스트 로고 | Neture | B2B 유통 플랫폼 |
-| k-cosmetics | `#e91e63` (pink) | 💄 | K-Cosmetics | K-Beauty 전문 플랫폼 |
+| kpa-society | `#2563eb` | 💊 | KPA-Society | 약사 전문 플랫폼 |
+| glycopharm | `#059669` | 💉 | GlycoPharm | 혈당관리 전문 플랫폼 |
+| neture | `#059669` | 🌿 | Neture | 공급자·파트너 협업 플랫폼 |
+| k-cosmetics | `#db2777` | Sparkles (lucide) | K-Cosmetics | K-Beauty 전문 플랫폼 |
+| pharmacy-hub | `PH_PRIMARY` (config) | Pill (lucide) | Pharmacy-Hub | 파머시 허브 |
 
 → 이 차이는 BrandSlot의 서비스별 주입으로 해결하며, Header 구조 자체를 바꾸는 이유가 아니다.
 
@@ -443,7 +504,18 @@ serviceNavigation
 
 ## 11. 적용 우선순위
 
-> 이 섹션은 구현 지시가 아니라 **표준 적용의 권장 순서**다.
+> 이 섹션은 구현 지시가 아니라 **표준 적용의 권장 순서**였다.
+> Phase 1~5 는 완료되었고(2.2), Phase 6 은 상시 규칙으로 계속 적용된다.
+> PharmacyHub 는 Phase 6 규칙에 따라 신규 서비스로서 처음부터 공통 Header 구조를 채택했다.
+
+| Phase | 대상 | 상태 |
+|:---:|------|------|
+| 1 | 공통 GlobalHeader 정의·구축 | 완료 (`@o4o/ui` GlobalHeader) |
+| 2 | KPA Society | 완료 |
+| 3 | GlycoPharm | 완료 |
+| 4 | Neture | 완료 |
+| 5 | K-Cosmetics | 완료 |
+| 6 | 신규 서비스 강제 적용 | 상시 적용 — PharmacyHub 채택 완료 |
 
 ### Phase 1: Main/Public Header 표준 컴포넌트 정의 및 구축
 
@@ -472,7 +544,7 @@ serviceNavigation
 - 가장 단순한 구조이므로 적용 부담 최소
 - inline style → Tailwind 이관 병행
 
-### Phase 6: 신규 서비스 강제 적용
+### Phase 6: 신규 서비스 강제 적용 (상시)
 
 - 이 시점 이후 생성되는 모든 서비스는 GlobalHeader 표준을 필수 적용
 - 독립 Header 구현을 코드 리뷰에서 거부
@@ -485,10 +557,10 @@ serviceNavigation
 
 | # | 원칙 | 근거 |
 |---|------|------|
-| 1 | **Main/Public Header는 플랫폼 공통 컴포넌트로 존재해야 한다** | TYPE A — 4개 서비스 모두 독립 구현 중 |
+| 1 | **Main/Public Header는 플랫폼 공통 컴포넌트로 존재해야 한다** | TYPE A — 당시 4개 서비스 모두 독립 구현. 현재 `@o4o/ui` GlobalHeader 로 해소 |
 | 2 | **Layout은 Global / Context / Workspace 3-Layer로 구분한다** | TYPE B, C — 역할별 Header 교체 및 Layout 중복 해소 |
 | 3 | **GlobalHeader는 역할이 바뀌어도 유지된다** | TYPE B — operator/store/admin 진입 시 Header 소멸 방지 |
-| 4 | **Navigation은 중앙 config에서 관리한다** | TYPE D — 4개 서비스 전체 하드코딩 분산 해소 |
+| 4 | **Navigation은 중앙 config에서 관리한다** | TYPE D — 하드코딩 분산 해소. 현재 5서비스 `src/config/navigation.ts` |
 | 5 | **서비스별 차이는 BrandSlot과 PrimaryNav 항목으로 표현한다** | 브랜드 아이덴티티 유지하면서 구조 통일 |
 | 6 | **역할 상태는 ContextBar/Badge/Sidebar로 표현한다** | Header 자체를 교체하지 않는 원칙 |
 | 7 | **스타일링은 Tailwind 기반을 표준으로 한다** | glycopharm/neture 및 공유 패키지 기존 방식 계승 |
@@ -498,12 +570,19 @@ serviceNavigation
 
 ### 이 문서의 위치
 
-- IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 → **본 문서 (표준 정의)** → WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1 (구현)
-- 본 문서는 구현의 **필수 선행 조건**이다
-- 구현 WO는 본 문서의 원칙을 벗어나지 않아야 한다
+- IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 (조사) → **본 문서 (표준 정의)** → WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1 계열 (구현, 완료)
+- 구현 결과의 최종 감사·종료 기록: [CHECK-O4O-CROSSSERVICE-HEADER-FOOTER-FINAL-CLOSURE-AUDIT-V1](../../checks/CHECK-O4O-CROSSSERVICE-HEADER-FOOTER-FINAL-CLOSURE-AUDIT-V1.md)
+- 본 문서는 구현이 끝난 뒤에도 **신규 화면·신규 서비스가 따라야 할 상시 표준**으로 유지된다
+- 이후의 모든 Header/Layout/Navigation 변경은 본 문서의 원칙을 벗어나지 않아야 한다
+
+### 표준 범위 밖 (미결정)
+
+- `GlobalHeaderNavItem.children` (하위 메뉴) 은 타입에는 존재하나 공통 Header 가 렌더하지 않는다.
+  dropdown 계약으로 채택할지 필드를 폐기할지는 **본 문서에서 확정하지 않는다** — 별도 결정 WO 대상이다.
 
 ---
 
 *작성: WO-O4O-GLOBAL-HEADER-STANDARD-V1*
 *근거: IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 (2026-04-17)*
-*다음 단계: WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1 (구현)*
+*구현: WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1 계열 — 완료 · Header/Footer 공통화 트랙 CLOSED*
+*현재 상태 정합: WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (2026-08-21)*
