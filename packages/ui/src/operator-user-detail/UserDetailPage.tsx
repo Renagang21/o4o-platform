@@ -493,6 +493,18 @@ export default function UserDetailPage({
     );
   }
 
+  // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+  //   서비스 운영자 화면의 lifecycle 축은 users.status(플랫폼 축)가 아니라 대상 serviceKey 의
+  //   service_membership.status 다. 백엔드 write(PATCH /operator/members/:id/status + serviceKey,
+  //   POST /:id/reactivate) 도 membership 축만 바꾸므로, 버튼 게이팅을 같은 축으로 맞춘다.
+  //   users.status='suspended'(플랫폼 조치) 인데 서비스 membership 은 active 인 계정에서
+  //   운영자가 '정지'를 아예 못 누르던 불일치를 제거한다.
+  //   serviceKey 미설정(플랫폼 콘솔)은 기존 계약대로 users.status 를 그대로 쓴다.
+  const serviceMembership = config.serviceKey
+    ? memberships.find((m) => m.serviceKey === config.serviceKey)
+    : undefined;
+  const lifecycleStatus = serviceMembership?.status ?? user.status;
+
   return (
     <div className="p-6 max-w-5xl">
       {/* Back Button */}
@@ -511,7 +523,7 @@ export default function UserDetailPage({
             <p className="text-sm text-slate-500">{user.email}</p>
           </div>
         </div>
-        <StatusBadge status={user.status} />
+        <StatusBadge status={lifecycleStatus} />
       </div>
 
       {/* 기본 정보 */}
@@ -561,7 +573,7 @@ export default function UserDetailPage({
 
           {/* Actions */}
           <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-100">
-            {user.status === 'pending' && (
+            {lifecycleStatus === 'pending' && (
               <>
                 <button
                   onClick={() => handleStatusChange('approved')}
@@ -579,7 +591,7 @@ export default function UserDetailPage({
                 </button>
               </>
             )}
-            {(user.status === 'active' || user.status === 'approved') && (
+            {(lifecycleStatus === 'active' || lifecycleStatus === 'approved') && (
               <button
                 onClick={() => handleStatusChange('suspended')}
                 disabled={actionLoading === 'status'}
@@ -588,7 +600,7 @@ export default function UserDetailPage({
                 <XCircle className="w-4 h-4" />정지
               </button>
             )}
-            {user.status === 'suspended' && (
+            {lifecycleStatus === 'suspended' && (
               <button
                 onClick={handleReactivate}
                 disabled={actionLoading === 'reactivate'}
@@ -597,7 +609,7 @@ export default function UserDetailPage({
                 <CheckCircle className="w-4 h-4" />복구
               </button>
             )}
-            {user.status === 'rejected' && (
+            {lifecycleStatus === 'rejected' && (
               <button
                 onClick={() => handleStatusChange('approved')}
                 disabled={actionLoading === 'status'}

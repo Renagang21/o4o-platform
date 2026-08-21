@@ -439,7 +439,21 @@ export class MembershipConsoleController {
         // Prefer service membership status over global users.status.
         // users.status may be 'deleted'/'inactive' while membership is 'active' —
         // in a service-scoped operator view, the membership status is authoritative.
-        let effectiveStatus = memberships.length > 0 ? memberships[0].status : u.status;
+        // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+        //   memberships[0] 는 **가장 최근 생성된 아무 서비스** membership 이다.
+        //   platform admin 은 위 batch 조회에서 5개 서비스 membership 을 모두 받으므로,
+        //   serviceKey=neture 로 조회해도 다른 서비스의 active 가 뽑혀 방금 정지시킨 회원이
+        //   목록에서 계속 '활성'으로 보였다(write 축 ≠ read 축).
+        //   요청 scope 에 해당하는 서비스의 membership 을 우선한다.
+        const scopedMembership =
+          resolved.serviceKeys !== null
+            ? memberships.find((m: any) => resolved.serviceKeys!.includes(m.serviceKey))
+            : undefined;
+        let effectiveStatus = scopedMembership
+          ? scopedMembership.status
+          : memberships.length > 0
+            ? memberships[0].status
+            : u.status;
         if (status && status !== 'all' && memberships.length > 0) {
           const matched = memberships.find((m: any) => m.status === status);
           if (matched) effectiveStatus = matched.status;

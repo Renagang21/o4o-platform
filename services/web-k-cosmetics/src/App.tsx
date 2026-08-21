@@ -692,7 +692,8 @@ function AppRoutes() {
         <Route path="members/:id" element={<OperatorUserDetailPage />} />
         {/* legacy /admin/users redirect */}
         <Route path="users" element={<Navigate to="/admin/members" replace />} />
-        <Route path="users/:id" element={<Navigate to="/admin/members" replace />} />
+        {/* WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1 */}
+        <Route path="users/:id" element={<OperatorUserDetailPage />} />
         <Route path="settings" element={<OperatorSettingsPage />} />
         {/* WO-O4O-GP-KCOS-SERVICE-LEGAL-POLICY-SETTINGS-UI-ROLLOUT-V1 */}
         <Route path="settings/legal-terms" element={<ServiceLegalSettingsPage />} />
@@ -750,7 +751,10 @@ function AppRoutes() {
         <Route path="members/:id" element={<OperatorUserDetailPage />} />
         {/* legacy redirect (WO-O4O-MEMBERSHIP-CONSOLE-V1) */}
         <Route path="users" element={<Navigate to="/operator/members" replace />} />
-        <Route path="users/:id" element={<Navigate to="/operator/members" replace />} />
+        {/* WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+            legacy alias 로 들어온 상세 deep link 는 id 를 잃고 목록으로 튕기면 안 된다.
+            Neture 와 동일하게 alias 경로에서도 동일 상세 화면을 렌더한다. */}
+        <Route path="users/:id" element={<OperatorUserDetailPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
         {/* Store Cockpit (WO-KCOS-STORES-PHASE3-STORE-COCKPIT-V1) */}

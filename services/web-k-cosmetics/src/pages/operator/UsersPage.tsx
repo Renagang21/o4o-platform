@@ -132,6 +132,10 @@ export default function UsersPage() {
     <OperatorMembersConsolePage
       serviceKey="k-cosmetics"
       client={kcosMembersClient}
+      // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+      //   K-Cos canonical 상세 경로는 /operator/members/:id 다. 기본값(/operator/users/:id)은
+      //   legacy alias 로 id 를 잃고 목록으로 redirect 되므로 데드링크가 된다.
+      fullDetailHref={(u) => `/operator/members/${u.id}`}
       serverSort
       syncUrl
       getPrimaryRole={getPrimaryRole}

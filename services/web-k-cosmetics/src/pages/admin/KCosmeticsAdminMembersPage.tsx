@@ -143,6 +143,9 @@ export default function KCosmeticsAdminMembersPage() {
     <OperatorMembersConsolePage
       serviceKey="k-cosmetics"
       client={adminMembersClient}
+      // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+      //   admin 콘솔의 canonical 상세 경로는 /admin/members/:id (기본값은 데드링크).
+      fullDetailHref={(u) => `/admin/members/${u.id}`}
       getPrimaryRole={kcosAdminGetPrimaryRole}
       roleDisplayMap={KCOS_ADMIN_ROLE_DISPLAY}
       roleColumnHeader="회원 유형"
