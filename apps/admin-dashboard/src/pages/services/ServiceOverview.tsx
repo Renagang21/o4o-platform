@@ -52,8 +52,18 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { authClient } from '@o4o/auth-client';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
+
+// WO-O4O-CI-FRONTEND-TYPECHECK-BASELINE-RECOVERY-V1
+// date-fns 는 저장소 전역에서 이미 제거됐고(7d9c056cc) 어떤 workspace 도 선언하지 않는다.
+// 여기 두 곳만 import 가 남아 CI frontend type-check 를 TS2307 로 막고 있었다.
+// 출력 포맷(`yyyy-MM-dd HH:mm[:ss]`)은 그대로 유지한 로컬 헬퍼로 대체한다.
+const pad2 = (n: number): string => String(n).padStart(2, '0');
+const formatDateTime = (value: string | number | Date, withSeconds = false): string => {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '-';
+  const base = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  return withSeconds ? `${base}:${pad2(d.getSeconds())}` : base;
+};
 
 // Types
 interface TenantInfo {
@@ -842,7 +852,7 @@ export default function ServiceOverview() {
                           {warning.description}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
-                          {format(new Date(warning.detectedAt), 'yyyy-MM-dd HH:mm', { locale: ko })}
+                          {formatDateTime(warning.detectedAt)}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -868,7 +878,7 @@ export default function ServiceOverview() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Last validation completed at: {format(new Date(summary.lastValidationAt), 'yyyy-MM-dd HH:mm:ss', { locale: ko })}
+                  Last validation completed at: {formatDateTime(summary.lastValidationAt, true)}
                 </p>
               </CardContent>
             </Card>

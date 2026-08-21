@@ -5,8 +5,25 @@
 
 'use client';
 
-import { formatDistanceToNow } from 'date-fns';
-import { ko } from 'date-fns/locale';
+
+// WO-O4O-CI-FRONTEND-TYPECHECK-BASELINE-RECOVERY-V1
+// date-fns 는 저장소 전역에서 제거됐고 어떤 workspace 도 선언하지 않는다(TS2307 원인).
+// 같은 forum 컴포넌트들(ForumCommentSection / ForumHome 등)이 이미 쓰는 로컬 상대시간
+// 헬퍼와 동일한 형식으로 대체한다.
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '';
+  const diff = Date.now() - date.getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor(diff / (1000 * 60));
+
+  if (days > 7) return date.toLocaleDateString('ko-KR');
+  if (days > 0) return `${days}일 전`;
+  if (hours > 0) return `${hours}시간 전`;
+  if (minutes > 0) return `${minutes}분 전`;
+  return '방금 전';
+}
 
 // Notification type from API
 export interface ForumNotification {
@@ -79,10 +96,7 @@ export function NotificationItem({
   const actorAvatar = notification.metadata?.actorAvatar || notification.actor?.avatar;
 
   // Format time
-  const timeAgo = formatDistanceToNow(new Date(notification.createdAt), {
-    addSuffix: true,
-    locale: ko,
-  });
+  const timeAgo = formatRelativeTime(notification.createdAt);
 
   return (
     <button

@@ -91,7 +91,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@tanstack/react-query',
       '@o4o/utils',
       '@o4o/ui',
-      'date-fns',
       '@wordpress/blocks',
       '@wordpress/block-editor',
       '@wordpress/components',
