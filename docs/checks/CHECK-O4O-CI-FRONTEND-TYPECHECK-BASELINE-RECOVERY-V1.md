@@ -106,13 +106,21 @@ CI-only 오류(카테고리 I)는 **0건**이다. 로컬 clean install 재현이
 | 대상 범위 | app-store packages(`forum-app`,`forum-neture`) + `apps/*`(api-server 제외) + `services/*` 전체 | 전부 통과 |
 | production build (main-site) | `bash scripts/ci-build-app.sh main-site` | **PASS** (exit 0) |
 | production build (admin-dashboard) | `bash scripts/ci-build-app.sh admin-dashboard` | (아래 §8-1) |
-| 실제 GitHub Actions | push 후 `CI Pipeline` 실행 | (아래 §8-2) |
+| 실제 GitHub Actions | push 후 `CI Pipeline` 실행 | **PASS** (아래 §8-2) |
 
 ### 8-1. admin-dashboard build
 `bash scripts/ci-build-app.sh admin-dashboard` → **PASS** (exit 0). 스크립트 내부의 `pnpm install` 이후에도 `pnpm-lock.yaml` 변경 0건.
 
 ### 8-2. 실제 GitHub Actions 검증 (§15)
-(push 후 실제 실행 결과를 후속 커밋으로 이 절에 기록한다.)
+| 대상 커밋 | run | `Run TypeScript check (Frontend only)` | 비고 |
+|-----------|-----|----------------------------------------|------|
+| `0f5641a84` (수정 전) | `32447022710` | **failure** | 이 step 단독 실패 |
+| `a066ef81a` (이번 수정) | `32447888163` | **success** | App Store packages step 도 success. 이후 다른 세션 push 로 concurrency `cancel-in-progress` 발동해 run 전체는 cancelled |
+| `46216e841` (수정 이후 main) | `32448253785` | **success** | run 결론은 failure 이나 실패 step 은 `Run tests (api-server Jest)` 하나뿐 |
+
+**판정**: WO 대상 step 은 실제 GitHub Actions 에서 **복구 확인**됐다. 이번 변경으로 새로 깨진 step 은 **0건**이다.
+
+**무관한 잔여 CI 부채(이번 범위 밖)**: run `32448253785` 의 `Run tests (api-server Jest)` 실패 = `src/__tests__/forum-owner-area-commonization.spec.ts` › "Pharmacy-Hub — 소유자 영역을 신설하지 않는다 (census NOT_IMPLEMENTED 유지)". 다른 세션의 PharmacyHub 커밋(`46216e841`)에서 유입된 backend 테스트 실패이며 frontend type-check 와 무관하다. 수정하지 않고 보고만 한다.
 
 ## 9. before/after 회귀 비교 (§16)
 
