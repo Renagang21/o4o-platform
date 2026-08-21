@@ -3,7 +3,8 @@
 - **WO**: [`WO-O4O-CROSSSERVICE-HEADER-FOOTER-FINAL-CLOSURE-AUDIT-V1`](../work-orders/WO-O4O-CROSSSERVICE-HEADER-FOOTER-FINAL-CLOSURE-AUDIT-V1.md)
 - **실행일**: 2026-08-21
 - **성격**: Header / Footer / Mobile Bottom Nav / Shell 공통화 트랙 **최종 종료 감사** (W5 Public Footer config 정렬 흡수)
-- **최종 판정**: **CLOSE** — `HEADER_FOOTER_COMMONIZATION = CLOSED` · `MUST_FIX_BEFORE_CLOSE = 0`
+- **최종 판정**: **CLOSE** — `HEADER_FOOTER_COMMONIZATION = CLOSED` · `PRODUCTION_ADOPTION = PASS` · `MUST_FIX_BEFORE_CLOSE = 0`
+- **production adoption 재검증**: 2026-08-21 2차 (18-6절) — `WO-O4O-CROSSSERVICE-HEADER-FOOTER-PRODUCTION-ADOPTION-FINAL-VERIFICATION-V1`
 
 > WO 본문 뒤 「부기 A~K」는 실행 시점 측정값이며 지시가 아니다. 본 CHECK 의 모든 수치·판정은 §2 대로
 > **현재 main 코드와 프로덕션에서 다시 산출**했다. 부기와 다른 항목은 그때마다 명시했다.
@@ -452,6 +453,107 @@ production adoption = PASS
 
 - 20절 FOLLOW_UP **#10 "15절 수정본의 production 재확인" 은 본 절로 해소**됐다 (기록 보존을 위해 20절 표는 원문 유지).
 - 코드 수정 **0건** — 본 갱신은 문서(CHECK) 갱신뿐이다.
+
+### 18-6. production adoption 전수 재검증 (2026-08-21 2차 · `WO-O4O-CROSSSERVICE-HEADER-FOOTER-PRODUCTION-ADOPTION-FINAL-VERIFICATION-V1`)
+
+> 18-1~18-5 는 `3635838ed` 배포 직후(리비전 `kpa-society-web-01880-7zw` 세대) 측정이다.
+> 이후 `Deploy Web Services (Cloud Run)` run **`32455238689`** (headSha `7387109bf`) 가 **6 web 서비스 전부 재배포**해
+> 리비전 세대가 바뀌었으므로, **현행 리비전 기준으로 다시 전수 측정**했다. 18-1~18-5 기록은 사실 기록이므로 보존한다.
+
+#### 18-6-1. 현행 배포 기준점
+
+| 항목 | 값 |
+|---|---|
+| 검증 시점 `origin/main` | `82e54ff21` |
+| 최신 web 배포 run | `32455238689` (headSha `7387109bf`, `conclusion=success`) — `deploy-kpa-society` / `deploy-glycopharm` / `deploy-k-cosmetics` / `deploy-neture` / `deploy-pharmacy-hub` / `deploy-kpa-branch` **전부 success** |
+| Cloud Run 활성 리비전 (asia-northeast3, 트래픽 100%) | `kpa-society-web-01881-69c` · `glycopharm-web-01310-6vt` · `k-cosmetics-web-01053-k5c` · `neture-web-01506-wcx` · `pharmacy-hub-web-00134-qrh` |
+| `3635838ed..82e54ff21` 의 web 변경 | `packages/ui/src/operator-user-detail/UserDetailPage.tsx` · `services/web-k-cosmetics` 3파일 (운영자 회원 상세 WO) — **Header/Footer/Nav/Shell 모집단 무관** |
+| 측정 도구 | Playwright / Chromium headless, 쿼리스트링 캐시 버스트(`?cb=`) 적용 |
+
+#### 18-6-2. production asset 기준 재확인 (배포 번들 문자열 전수 스캔)
+
+| 서비스 | 스캔 대상 | `#services` | 하드코딩 `2025` 저작권 | 판정 |
+|---|---|---|---|---|
+| KPA | `index-C3iEdDNX.js` + vendor 3종 (1,310,903 B) | **0건** | 0건 | PASS |
+| GlycoPharm | `index-BkR0Zar1.js` (1,254,386 B) | 0건 | **0건** — `All rights reserved` 3 occurrence 전부 동적 변수 (`["© ", t, " GlycoPharm. …"]` 2건 = 공개 Footer·`StoreLayout`, `["© ", l, " ", e, …]` 1건 = 공통 Footer) | PASS |
+| K-Cosmetics | `index-DKEko4y8.js` (1,227,587 B) | 0건 | **0건** — 2 occurrence 전부 동적 변수 | PASS |
+
+#### 18-6-3. 5서비스 × (대표 화면 + deep link 2) × 2 뷰포트 = **30 측정**
+
+각 화면은 **URL 직접 진입 후 하드 새로고침**까지 수행해 SPA rewrite 를 확인했다 (진입/새로고침 모두 HTTP 200, header/footer 개수 동일).
+
+| 서비스 | 화면 | 진입/새로고침 | header/footer | header 높이 | `href="#"` | dead anchor | 저작권 | scrollWidth/innerWidth (D · M) | 본문 길이 (D · M) | 404 표시 | console error / pageerror |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| KPA | `/` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 1273 · 1177 | 없음 | 0 / 0 |
+| KPA | `/services/pharmacy` | 200/200 | 1/1 | 65 | 0 | **0** | 2026 | 1440/1440 · 390/390 | 613 · 613 | 없음 | 0 / 0 |
+| KPA | `/guide/intro` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 1383 · 1358 | 없음 | 0 / 0 |
+| GlycoPharm | `/` | 200/200 | 1/1 | 65 | 0 | 0 | **2026** | 1440/1440 · 390/390 | 1133 · 1087 | 없음 | 0 / 0 |
+| GlycoPharm | `/service-guide` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 1580 · 1561 | 없음 | 0 / 0 |
+| GlycoPharm | `/forum` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 424 · 405 | 없음 | 0 / 0 |
+| K-Cosmetics | `/` | 200/200 | 1/1 | 65 | 0 | 0 | **2026** | 1440/1440 · 390/390 | 1133 · 1087 | 없음 | 0 / 0 |
+| K-Cosmetics | `/service-guide` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 1589 · 1570 | 없음 | 0 / 0 |
+| K-Cosmetics | `/terms` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 288 · 269 | 없음 | **1 / 0** (아래 주) |
+| PharmacyHub | `/` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 580 · 555 | 없음 | 0 / 0 |
+| PharmacyHub | `/community` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 312 · 287 | 없음 | 0 / 0 |
+| PharmacyHub | `/education` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 312 · 287 | 없음 | 0 / 0 |
+| Neture | `/` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 1105 · 1073 | 없음 | 0 / 0 |
+| Neture | `/guide` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 3279 · 3248 | 없음 | 0 / 0 |
+| Neture | `/contact` | 200/200 | 1/1 | 65 | 0 | 0 | 2026 | 1440/1440 · 390/390 | 503 · 472 | 없음 | 0 / 0 |
+
+- **이중 header / 이중 footer = 0** (30 측정 전부 header 1 · footer 1).
+- **가로 overflow = 0** — 전 측정에서 `scrollWidth == innerWidth`. 본문 가림 회귀 없음 (header `sticky`, 높이 65 고정).
+- **white screen = 0 · JS exception(pageerror) = 0 · 예상치 못한 404/500 = 0.**
+- K-Cosmetics `/terms` 의 console error 1건은 `GET https://api.neture.co.kr/api/v1/public/services/k-cosmetics/policies/terms` **404** 이며, 화면은 "현재 공개된 문서가 없습니다" 를 정상 렌더한다. **JS exception 아님** — 20절 FOLLOW_UP #2(정책 문서 미게시)의 네트워크 표현이므로 결함으로 계상하지 않는다.
+
+#### 18-6-4. 수정 대상 3건의 화면 직접 확인
+
+| # | 대상 | production 실측 (DOM) | 판정 |
+|---|---|---|---|
+| 1 | KPA `#services` dead anchor 제거 | `kpa-society.co.kr/services/pharmacy` — `a[href="#services"]` **0개**, 페이지 HTML 전체에 `#services` 문자열 **부재**. 남은 hash anchor 는 `#about` 1건이며 `document.getElementById('about')` **존재** → dead anchor 0. `/` 는 hash anchor 자체가 0건 | PASS |
+| 2 | GlycoPharm 동적 연도 | footer 텍스트 `© 2026 GlycoPharm. All rights reserved.` | PASS |
+| 3 | K-Cosmetics 동적 연도 | footer 텍스트 `© 2026 K-Cosmetics. All rights reserved.` | PASS |
+| 참고 | 나머지 3서비스 저작권 | KPA `Copyright © 2026 약사회. All Rights Reserved.` · PharmacyHub `© 2026 Pharmacy-Hub. All rights reserved.` · Neture `© 2026 Neture. 공급자 · 파트너 협업 플랫폼` | 전부 2026 |
+
+> GlycoPharm `StoreLayout` footer(로그인 필요 영역)는 18-2 의 3-b 와 동일하게 **배포 번들 근거**로 판정했다.
+> 이번 재검증은 **비인증 공개 화면 범위**이며, 인증 필요 화면은 브라우저로 직접 렌더하지 않았다 — **측정 한계로 명시**한다.
+
+#### 18-6-5. Mobile navigation 기능 검증 (390×844, touch context)
+
+| 서비스 | 메뉴 버튼 | 클릭 후 노출 링크 | 메뉴 링크 실이동 | fixed bottom nav | pageerror |
+|---|---|---|---|---|---|
+| KPA | `메뉴 열기` 존재 | 29 → **33** | `/service-guide` → 200 (`KPA Society — 약사 커뮤니티·강의·매장 지원`) | 1 | 0 |
+| GlycoPharm | `메뉴 열기` 존재 | 29 → **32** | `/service-guide` → 200 (`GlycoPharm - 혈당관리 전문 플랫폼`) | 1 | 0 |
+| K-Cosmetics | `메뉴 열기` 존재 | 28 → **31** | `/service-guide` → 200 (`K-Cosmetics - O4O Platform`) | 1 | 0 |
+| PharmacyHub | `메뉴 열기` 존재 | 20 → **24** | `/community` → 200 (`Pharmacy-Hub 파머시 허브`) | 0 (11·12절 판정대로 **의도**) | 0 |
+| Neture | `메뉴 열기` 존재 | 27 → **30** | `/guide` → 200 (`이용 안내 — Neture`) | 0 (비인증 시 미렌더 — 11절 판정) | 0 |
+
+**모바일 핵심 navigation 불가 = 0** (5서비스 전부 메뉴 열림 + 실제 이동 성공).
+
+#### 18-6-6. header/footer/nav 링크 전수 실접속
+
+수집된 내부 링크 **43 경로 전수 브라우저 접속** — **HTTP 200 = 43/43 · 404 렌더 0 · pageerror 0**.
+
+| 서비스 | 경로 수 | 결과 |
+|---|---|---|
+| KPA | 11 (`/` `/service-guide` `/about` `/contact` `/guide/intro` `/policy` `/privacy` `/login` `/guide/features/{signage,forum,content}`) | dead 0 |
+| GlycoPharm | 8 (`/` `/service-guide` `/contact` `/forum` `/lms` `/business` `/terms` `/privacy`) | dead 0 |
+| K-Cosmetics | 6 (`/` `/service-guide` `/contact` `/register` `/terms` `/privacy`) | dead 0 |
+| PharmacyHub | 13 (`/` `/community` `/education` `/service-guide` `/forum` `/account/{enrollments,certificates}` `/guide/{intro,features}` `/join` `/join/status` `/terms` `/privacy`) | dead 0 |
+| Neture | 5 (`/` `/guide` `/contact` `/terms` `/privacy`) | dead 0 |
+
+- Neture header 의 **cross-service 외부 링크 3건**도 추가 확인: `kpa-society.co.kr/` · `www.glycopharm.co.kr` · `www.k-cosmetics.site/` = 전부 **200**.
+- 18-4 의 오탐 방지 판정을 그대로 재확인했다 — PharmacyHub `/contact` 부재는 **의도된 계약**, GlycoPharm·K-Cosmetics `terms`/`privacy` 는 중첩 상대 route 라 **실접속으로 200 확인**, `terms`/`privacy` 본문의 "현재 공개된 문서가 없습니다" 는 dead link 가 아니라 **FOLLOW_UP #2**, 법정정보 블록 미표시는 `PublicLegalFooterInfo` 계약(profile 없으면 `null`)이다.
+- K-Cosmetics 는 반드시 **`k-cosmetics.site`** 로 측정했다 (`k-cosmetics.co.kr` 은 무관한 외부 쇼핑몰).
+
+#### 18-6-7. 재검증 판정
+
+```text
+PRODUCTION_ADOPTION = PASS
+```
+
+- 발견된 신규 결함 **0건** → 이번 재검증에서 수행한 **코드 수정 0건**.
+- 20절 FOLLOW_UP 은 재분류·구현하지 않았다. 미확인 항목은 **인증 필요 화면(GlycoPharm `StoreLayout` 등)** 이며 18-6-4 에 측정 한계로 명시했다.
+
 ---
 
 ## 19. MUST_FIX_BEFORE_CLOSE 목록 (§28-19)
@@ -521,8 +623,9 @@ closure 를 막지 않는다(§8). 필요 시 별도 WO 로 다룬다.
 
 ```text
 HEADER_FOOTER_COMMONIZATION = CLOSED
+PRODUCTION_ADOPTION = PASS
 MUST_FIX_BEFORE_CLOSE = 0
-production adoption = PASS
 ```
 
-**최종 판정: CLOSE** · **production adoption = PASS** (18절 · 2026-08-21 수정본 배포 후 실측)
+**최종 판정: CLOSE** · **PRODUCTION_ADOPTION = PASS**
+(18절 — 2026-08-21 수정본 배포 후 1차 실측 + **18-6절 현행 리비전 기준 전수 재검증**, `WO-O4O-CROSSSERVICE-HEADER-FOOTER-PRODUCTION-ADOPTION-FINAL-VERIFICATION-V1`)
