@@ -168,13 +168,48 @@ retire 방식은 §12 지시대로 **404(라우트 미등록)** 를 택했다 �
 
 ## 9. Production 검증 (§14)
 
-배포 후 기록 → §10.
+- commit `0f5641a84` / Deploy API Server (Cloud Run) **success** / 리비전 교체 확인
+- 검증 시각: 2026-08-21 (배포 직후)
 
 ---
 
 ## 10. 배포 후 결과
 
-(배포 후 채움)
+### 제거된 계약 (§12 — 404, deprecated 응답 아님)
+
+| 요청 | 결과 |
+|---|---|
+| `POST /api/v1/appstore/install` | 404 |
+| `POST /api/v1/appstore/activate` | 404 |
+| `POST /api/v1/appstore/deactivate` | 404 |
+| `DELETE /api/v1/appstore/uninstall` | 404 |
+| `GET /api/v1/appstore/modules` | 404 |
+
+401/403 이 아니라 404 이며, 비인증 상태에서도 write 가 도달할 라우트가 없다.
+
+### 유지된 계약
+
+| 요청 | 결과 |
+|---|---|
+| `GET /api/v1/appstore` (비인증) | 200 |
+| `GET /api/v1/appstore/partnerops` (비인증) | 200, 상태 필드 없음(카탈로그 메타데이터만) |
+| `GET /api/v1/appstore/no-such-app` (비인증) | 404 |
+| `GET /api/v1/admin/apps` (비인증) | 401 |
+| `GET /api/v1/admin/apps` (인증·super_admin 아님) | 403 |
+| `GET /api/v1/apps/availability` (비인증) | 401 |
+| `GET /api/v1/apps/availability` (인증) | 200 — active app **6개 전부 정상** (`membership-yaksa`, `annualfee-yaksa`, `reporting-yaksa`, `digital-signage`, `digital-signage-core`, `partnerops`) |
+| `/health` | 200 |
+| `/health/database` | `status: healthy` (pingMs 4) |
+
+> `platform:super_admin` 자격증명이 `TEST-ACCOUNTS.local.md` 에 없어
+> `/admin/apps` 의 **허용(200) 경로는 production 에서 검증하지 못했다.** 401/403 차단만 확인했다.
+> §14 지시대로 production 에서 실제 install/uninstall write 는 수행하지 않았다.
+
+### 회귀
+
+- 배포 후 15분 Cloud Run **신규 ERROR 0 / 신규 5xx 0**.
+  (배포 전 1시간 baseline 에는 `auth/login`·`glycopharm/*` 관련 5xx 가 존재했으며, 본 변경과 무관하고 배포 후 재현되지 않았다.)
+- `app_registry` 6행 / `app_instances` 0행 — 배포 전후 동일. DB write 0.
 
 ---
 
