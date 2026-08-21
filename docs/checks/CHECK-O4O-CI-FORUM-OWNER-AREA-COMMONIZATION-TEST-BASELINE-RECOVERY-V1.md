@@ -132,19 +132,60 @@
 실제 CI 의 `Run TypeScript check (Frontend only)` step 으로 확인한다(§8-4).
 
 ### 8-4. 실제 GitHub Actions (§15)
-<!--GHA-->
+워크플로 `CI Pipeline` / job `Code Quality Check` 기준 (`main` push).
 
-## 9. Browser smoke 미수행 사유 (§14)
+| run | headSha | Frontend type-check | App Store / api-server type-check | ESLint ratchet | api-server Jest | run 결론 |
+|---|---|---|---|---|---|---|
+| `32448253785` | `46216e841` (본 WO 이전) | success | success | success | **failure** — forum-owner-area spec | failure |
+| `32449459615` | `564f27890` (타 WO) | success | success | **failure (70 > 69)** | skipped | failure |
+| `32450858719` | `c3e99f85c` (타 WO) | success | success | **failure (70 > 69)** | skipped | failure |
+| `32451405784` | `20800d2ca` (**본 WO**) | **success** | success | **failure (70 > 69)** | skipped | failure |
+
+판정:
+
+- §15 전제 중 **`Run TypeScript check (Frontend only)` 는 PASS 유지**가 실제 CI 에서 확인됐다
+  (선행 WO `WO-O4O-CI-FRONTEND-TYPECHECK-BASELINE-RECOVERY-V1` baseline 유지).
+- §15 의 **`Run tests (api-server Jest)` 는 CI 에서 관측하지 못했다.** 이유는 본 WO 의 변경이 아니라,
+  같은 job 에서 **앞선 step 인 `Run ESLint (regression ratchet)` 이 실패해 Jest step 이 `skipped`** 되기 때문이다.
+- 이 ESLint 실패는 **본 WO 이전부터 존재**한다. 직전 커밋 `c3e99f85c` · `564f27890` 에서 동일 메시지
+  (`ESLint: 70 errors, 2303 warnings (error baseline 69)`) 로 이미 실패했고, lint 오류 목록에
+  `forum-owner-area-commonization` 은 **0회** 등장한다.
+- 따라서 본 WO 범위의 Jest 계약은 **CI 와 동일 조건의 로컬 실행(§8-2, exit 0 / 2786 passed)** 으로 확정하고,
+  CI 측 최종 확인은 아래 §9 부채가 해소된 직후 run 에서 자동으로 관측된다.
+
+### 8-5. before / after
+
+| 항목 | before (`46216e841`) | after (`20800d2ca`) |
+|---|---|---|
+| `forum-owner-area-commonization` | 1 failed / 54 passed | **0 failed / 65 passed** |
+| api-server 전체 Jest | FAIL (1 suite) | **PASS (172/172, 2786 tests)** |
+| `pharmacy-hub-community-capability-adoption` 와의 계약 | 정면 충돌 | 정합 |
+
+## 9. 새로 드러난 CI 부채 (§12 별도 분류 — 본 WO 범위 밖)
+
+| 항목 | 내용 |
+|---|---|
+| 현상 | `Run ESLint (regression ratchet)` 이 `70 > 69` 로 실패 → 이후 Jest·Vitest step 전부 `skipped` |
+| 마지막 PASS | run `32448253785` (`46216e841`) |
+| 최초 FAIL | run `32449459615` (**`564f27890`** — `WO-O4O-SERVICE-API-AUTHORIZATION-BOUNDARY-AUDIT-AND-HARDENING-V1`, 타 세션) |
+| 원인 | `apps/api-server/src/__tests__/service-provisioning-guard.spec.ts:113` 의 `require()` 에 붙인 억제 주석이 **폐기된 규칙명**(`@typescript-eslint/no-var-requires`)이라 실제 규칙 `@typescript-eslint/no-require-imports` 를 억제하지 못함 → 신규 오류 1건이 baseline 69 를 초과 |
+| 본 WO 와의 관계 | 무관. 본 WO 변경 파일은 lint 오류 목록에 등장하지 않음 |
+| 조치 | **미수정**. CLAUDE.md 실행 원칙(범위 외 수정 금지)에 따라 보고 후 **별도 WO 로 분리**한다 |
+
+> 참고로 같은 run 에는 `apps/api-server/src/__tests__/pharmacy-hub-community-capability-adoption.spec.ts:39`
+> 의 `no-control-regex` 오류도 있으나, 이는 baseline 69 에 이미 포함된 기존 오류다.
+
+## 10. Browser smoke 미수행 사유 (§14)
 
 이번 변경은 **테스트 파일 1개**뿐이며 사용자 route·component·menu·backend 는 **한 줄도 바뀌지 않았다**.
 따라서 배포도 browser smoke 도 필요하지 않다. PH 포럼 소유자 동선 자체의 브라우저 검증은
 선행 WO(`WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1`)의 CHECK 가 이미 담당한다.
 
-## 10. 범위 밖 / 잔여
+## 11. 범위 밖 / 잔여
 
 - Forum·Community 전체 공통화 재감사, PH 신규 기능, My Store·Store Hub·Operator·DB·RBAC 변경 — 모두 미수행(§16).
 - PH `Content/Resources` 축은 선행 WO 에서 `pharmacy_hub_*` 테이블 부재로 중지 상태 — 이번 WO 와 무관.
 
 ## 문서 정합
 
-문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건
+문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(§9 ESLint ratchet 부채)
