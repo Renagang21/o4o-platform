@@ -152,6 +152,14 @@ export interface ContentHubConfig {
   emptyMessage?: string;
   emptyFilteredMessage?: string;
 
+  /**
+   * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1:
+   *   href 는 외부 링크 전용(새 탭)이라 앱 내부 상세로 이동할 방법이 없었다.
+   *   내부 상세 route 를 가진 소비처를 위한 generic hook — 서비스 분기가 아니다.
+   *   href 가 있으면 기존대로 외부 링크가 우선한다(기존 소비처 무영향).
+   */
+  onItemClick?: (item: ContentHubItem) => void;
+
   /** 리스트 섹션 전체 오버라이드 — card grid 등 서비스별 레이아웃 */
   renderItems?: (items: ContentHubItem[], ctx: ContentHubItemContext) => React.ReactNode;
 }
@@ -369,7 +377,7 @@ export function ContentHubTemplate({ config }: { config: ContentHubConfig }) {
       ) : config.renderItems ? (
         config.renderItems(items, itemCtx)
       ) : (
-        <DefaultTableView items={items} ctx={itemCtx} showCopyCol={!!config.onCopy} />
+        <DefaultTableView items={items} ctx={itemCtx} showCopyCol={!!config.onCopy} onItemClick={config.onItemClick} />
       )}
 
       {/* Pagination */}
@@ -425,9 +433,12 @@ export default ContentHubTemplate;
 function getContentHubColumns({
   ctx,
   showCopyCol,
+  onItemClick,
 }: {
   ctx: ContentHubItemContext;
   showCopyCol: boolean;
+  /** 내부 상세 route 로 이동하는 소비처용 (href 가 없을 때만 사용) */
+  onItemClick?: (item: ContentHubItem) => void;
 }): O4OColumn<ContentHubItem>[] {
   const columns: O4OColumn<ContentHubItem>[] = [
     {
@@ -454,6 +465,14 @@ function getContentHubColumns({
             <a href={item.href} target="_blank" rel="noopener noreferrer" style={st.titleLink}>
               {item.title}
             </a>
+          ) : onItemClick ? (
+            <button
+              type="button"
+              onClick={() => onItemClick(item)}
+              style={{ ...st.titleLink, background: 'none', border: 0, padding: 0, cursor: 'pointer', textAlign: 'left' }}
+            >
+              {item.title}
+            </button>
           ) : (
             <span style={st.titleText}>{item.title}</span>
           )}
@@ -546,15 +565,17 @@ function DefaultTableView({
   items,
   ctx,
   showCopyCol,
+  onItemClick,
 }: {
   items: ContentHubItem[];
   ctx: ContentHubItemContext;
   showCopyCol: boolean;
+  onItemClick?: (item: ContentHubItem) => void;
 }) {
   return (
     <div style={st.tableWrapper}>
       <BaseTable<ContentHubItem>
-        columns={getContentHubColumns({ ctx, showCopyCol })}
+        columns={getContentHubColumns({ ctx, showCopyCol, onItemClick })}
         data={items}
         rowKey={(item) => item.id}
         rowClassName={(item) => (item.isPinned ? 'bg-amber-50' : '')}

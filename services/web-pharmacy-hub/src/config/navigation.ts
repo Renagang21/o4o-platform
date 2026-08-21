@@ -46,6 +46,7 @@ export const PH_PUBLIC_NAV: GlobalHeaderNavItem[] = [
       { label: '내 포럼', href: '/forum/my-dashboard' },
       { label: '포럼 개설 신청', href: '/forum/request' },
       // WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12
+      { label: '콘텐츠', href: '/content' },
       { label: '자료실', href: '/resources' },
     ],
   },
@@ -117,6 +118,7 @@ export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }
       { label: '커뮤니티', href: '/community' },
       { label: '포럼', href: '/forum' },
       // WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12
+      { label: '콘텐츠', href: '/content' },
       { label: '자료실', href: '/resources' },
       { label: '교육', href: '/education' },
       // 동일 WO §17 — 학습 이력 진입점

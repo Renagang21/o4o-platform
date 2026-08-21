@@ -131,6 +131,9 @@ import ForumMemberManagementPage from './pages/forum/ForumMemberManagementPage';
 import CommunityHomePage from './pages/community/CommunityHomePage';
 import CommunitySearchPage from './pages/community/CommunitySearchPage';
 import PharmacyHubResourcesPage from './pages/resources/PharmacyHubResourcesPage';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 — 회원 콘텐츠
+import PharmacyHubContentPage from './pages/content/PharmacyHubContentPage';
+import PharmacyHubContentDetailPage from './pages/content/PharmacyHubContentDetailPage';
 import EducationPage from './pages/education/EducationPage';
 import LmsCourseDetailPage from './pages/education/LmsCourseDetailPage';
 import LmsLessonPage from './pages/education/LmsLessonPage';
@@ -412,6 +415,26 @@ export default function App() {
             element={
               <MembershipGate>
                 <PharmacyHubResourcesPage />
+
+          {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1
+              공통 ContentHubTemplate / CommunityContentDetailView 채택 —
+              원장은 공통 cms_contents(serviceKey='pharmacy-hub', type='content') */}
+          <Route
+            path="/content"
+            element={
+              <MembershipGate>
+                <PharmacyHubContentPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/content/:id"
+            element={
+              <MembershipGate>
+                <PharmacyHubContentDetailPage />
+              </MembershipGate>
+            }
+          />
               </MembershipGate>
             }
           />
