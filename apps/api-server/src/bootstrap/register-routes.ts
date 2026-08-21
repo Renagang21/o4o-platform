@@ -48,7 +48,6 @@ import adminPlatformAccountsRoutes from '../routes/admin/platform-accounts.route
 import adminPlatformUsersRoutes from '../routes/admin/platform-users.routes.js';
 // WO-O4O-SECURITY-IP-BLOCK-TTL-AND-UNBLOCK-V1
 import adminSecurityBlockedIpsRoutes from '../routes/admin/security-blocked-ips.routes.js';
-import serviceMonitorRoutes from '../routes/service-monitor.routes.js';
 
 // ============================================================================
 // DOMAIN ROUTE IMPORTS (registered after DB init)
@@ -177,7 +176,13 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   app.use('/api/v1/admin/platform-accounts', adminPlatformAccountsRoutes);
   app.use('/api/v1/admin/platform-users', adminPlatformUsersRoutes);
   app.use('/api/v1/admin/security', adminSecurityBlockedIpsRoutes);
-  app.use('/api/v1/service/monitor', serviceMonitorRoutes);
+  // WO-O4O-SERVICE-MONITOR-SITES-TABLE-DEPENDENCY-AUDIT-AND-CLOSURE-V1 (판정 MONITOR_LEGACY_RETIRE):
+  //   `/api/v1/service/monitor/*` 8개는 `sites` 테이블(Multi-Site Builder, 2025-12 설계)에만 의존했다.
+  //   해당 migration 은 실행된 적 없이 2026-01-08 `chore(migrations): remove 124 unexecuted migrations`
+  //   에서 제거됐고, site 를 생성하는 `modules/sites/sites.routes.ts` 는 어디에도 mount 돼 있지 않다.
+  //   즉 production 에 데이터가 존재할 수 있는 경로 자체가 없어 summary·report 는 500,
+  //   나머지 5개는 항상 빈 배열이었다. 대체 canonical table 도 없어 schema 복구 대상이 아니다.
+  //   → router 미등록(404)으로 retire. 상세는 CHECK 문서.
 
   logger.info('✅ Core API routes registered');
 }

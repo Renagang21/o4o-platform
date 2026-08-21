@@ -16,8 +16,6 @@ const IntegratedMonitoring = lazy(() => import('@/pages/monitoring/IntegratedMon
 const PerformanceDashboard = lazy(() => import('@/pages/monitoring/PerformanceDashboard'));
 const OperationsDashboard = lazy(() => import('@/pages/dashboard/phase2.4'));
 
-// Service Monitoring (Phase 9 Task 3)
-const ServiceOverview = lazy(() => import('@/pages/services/ServiceOverview'));
 
 // Auth Analytics (WO-O4O-AUTH-ANALYTICS-UI-V1)
 const AuthAnalyticsPage = lazy(() => import('@/pages/operator/AuthAnalyticsPage'));
@@ -118,21 +116,10 @@ export function PlatformRoutes() {
       </AdminProtectedRoute>
     } />,
 
-    // Phase 9 Task 3 - Service Monitoring Dashboard
-    <Route key="/admin/services/overview" path="/admin/services/overview" element={
-      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <ServiceOverview />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/services" path="/admin/services" element={
-      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <ServiceOverview />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
+    // WO-O4O-SERVICE-MONITOR-SITES-TABLE-DEPENDENCY-AUDIT-AND-CLOSURE-V1:
+    //   /admin/services · /admin/services/overview (ServiceOverview) 는 backend
+    //   /api/v1/service/monitor/* 전용 화면이었고, 그 API 가 legacy retire 되어 함께 제거한다.
+    //   (nav 메뉴 진입점 0 · 30일 로그 organic 호출 0 · summary/report 는 항상 500)
 
     // Auth Analytics (WO-O4O-AUTH-ANALYTICS-UI-V1)
     <Route key="/operator/analytics/auth" path="/operator/analytics/auth" element={
