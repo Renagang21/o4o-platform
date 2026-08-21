@@ -58,6 +58,13 @@ export interface RoleManagementPageProps {
     success: (msg: string) => void;
     error: (msg: string) => void;
   };
+  /**
+   * WO-O4O-PHARMACYHUB-OPERATOR-COMMUNITY-AND-COMMON-CAPABILITY-FULL-ADOPTION-V1:
+   *   단일 서비스 콘솔에서 그 서비스의 역할 카탈로그만 보여주고 싶을 때 canonical
+   *   service_key 를 넘긴다. 필터 select 를 숨기고 항상 그 키로 조회한다.
+   *   미지정이면 종전과 동일(전체 + 서비스 선택 필터).
+   */
+  lockedServiceKey?: string;
 }
 
 // ─── Constants ───────────────────────────────────────────────
@@ -84,7 +91,7 @@ const EMPTY_FORM: RoleFormData = {
 
 // ─── Component ───────────────────────────────────────────────
 
-export function RoleManagementPage({ apiClient, isAdmin, toast }: RoleManagementPageProps) {
+export function RoleManagementPage({ apiClient, isAdmin, toast, lockedServiceKey }: RoleManagementPageProps) {
   // ─── API Helper ──────────────────────────────────────────
   async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
     const url = path.replace(/^\/api\/v1/, '') || '/';
@@ -100,7 +107,7 @@ export function RoleManagementPage({ apiClient, isAdmin, toast }: RoleManagement
   const [roles, setRoles] = useState<RoleData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [serviceFilter, setServiceFilter] = useState('');
+  const [serviceFilter, setServiceFilter] = useState(lockedServiceKey ?? '');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Modal state
@@ -264,15 +271,17 @@ export function RoleManagementPage({ apiClient, isAdmin, toast }: RoleManagement
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
-        <select
-          value={serviceFilter}
-          onChange={(e) => setServiceFilter(e.target.value)}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        >
-          {SERVICE_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
+        {!lockedServiceKey && (
+          <select
+            value={serviceFilter}
+            onChange={(e) => setServiceFilter(e.target.value)}
+            className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            {SERVICE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        )}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
