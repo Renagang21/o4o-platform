@@ -200,6 +200,45 @@ Guide landing 재공통화 / PharmacyHub Guide 재구축 / 스크린샷 / 기능
 
 ---
 
+## 11. 프로덕션 브라우저 smoke (WO §18)
+
+- 배포: commit `ab79a18ce` → GitHub Actions `Deploy Web Services (Cloud Run)` run `32433069534` **success** (5 web 서비스 전부)
+- 실행일: 2026-08-21 · Playwright(Chromium) · desktop 1440×900 / mobile 390×844
+- 프로덕션 DB write 0 · 로그인 불필요한 공개 Guide 경로만 접근
+
+### 11-1. 화면 렌더 (24 케이스 = 12 경로 × 2 viewport)
+
+| 서비스 | 경로 | h1 | desktop | mobile |
+|---|---|---|:--:|:--:|
+| GlycoPharm | `/guide/features` | 기능별 이용 방법 | PASS | PASS |
+| GlycoPharm | `/guide/features/lms` | 강의(LMS) 이용 방법 | PASS | PASS |
+| GlycoPharm | `/guide/features/store` | 약국 매장 운영 이용 방법 | PASS | PASS |
+| GlycoPharm | `/guide/features/qr` | QR 코드 이용 방법 | PASS | PASS |
+| K-Cosmetics | `/guide/features` | 기능별 이용 방법 | PASS | PASS |
+| K-Cosmetics | `/guide/features/store` | 매장 운영 이용 방법 | PASS | PASS |
+| K-Cosmetics | `/guide/features/qr` | QR · 태블릿 이용 방법 | PASS | PASS |
+| PharmacyHub(회귀) | `/guide/features` | 기능별 이용 방법 | PASS | PASS |
+| PharmacyHub(회귀) | `/guide/features/pop` | POP 이용 방법 | PASS | PASS |
+| PharmacyHub(회귀) | `/guide/features/tablet` | 태블릿 이용 방법 | PASS | PASS |
+| PharmacyHub(회귀) | `/guide/features/manuals` | 상품 설명서 이용 방법 | PASS | PASS |
+| PharmacyHub(회귀) | `/guide/features/signage` | 디지털 사이니지 이용 방법 | PASS | PASS |
+
+**24/24 PASS** · 404·오류 화면 0 · 콘솔 error 0
+
+### 11-2. 진입 링크 도달성 (§14)
+
+기능별 이용 방법 index 의 실제 `<a href>` 를 프로덕션에서 확인.
+
+| 서비스 | 확인한 링크 | 결과 |
+|---|---|:--:|
+| GlycoPharm | `/guide/features/{lms,store,qr}` | 3/3 PASS |
+| K-Cosmetics | `/guide/features/{store,qr}` | 2/2 PASS |
+| PharmacyHub | `/guide/features/{pop,signage,tablet,manuals}` | 4/4 PASS (orphan 교정 확인) |
+
+**9/9 PASS** — URL 만 아는 사람만 도달하는 Guide 0.
+
+---
+
 ## 10. 문서 정합 (CLAUDE.md §16)
 
 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건(위 §9-1, §9-2).
