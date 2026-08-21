@@ -48,7 +48,11 @@ describe('Multi-Tenant AppStore Filtering', () => {
 
             // Expected apps (cosmetics-specific + global)
             expect(appIds).toContain('cosmetics-seller-extension');
-            expect(appIds).toContain('cosmetics-supplier-extension');
+            expect(appIds).toContain('forum-cosmetics');
+            // WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1:
+            //   삭제된 패키지의 카탈로그 항목이 제거되어 설치 가능 목록에 노출되지 않는다.
+            expect(appIds).not.toContain('cosmetics-supplier-extension');
+            expect(appIds).not.toContain('cosmetics-sample-display-extension');
             // WO-O4O-LEGACY-COSMETICS-PARTNER-REMOVAL-V1:
             //   레거시 'cosmetics-partner' 카탈로그 항목이 제거되어 더 이상 노출되지 않는다.
             expect(appIds).not.toContain('cosmetics-partner');
@@ -150,7 +154,11 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const appIds = catalog.map(app => app.appId);
 
             // Expected apps
-            expect(appIds).toContain('cosmetics-supplier-extension');
+            // WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1:
+            //   'cosmetics-supplier-extension' 카탈로그 항목 제거에 따라 supplierops 소비처는
+            //   'market-trial' 만 남는다. retired 항목은 supplierops 목록에도 노출되지 않는다.
+            expect(appIds).toContain('market-trial');
+            expect(appIds).not.toContain('cosmetics-supplier-extension');
             // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
             //   serviceGroup 'supplierops' 는 유지되지만 동명 앱 카탈로그 항목은 제거되었다.
             expect(appIds).not.toContain('supplierops');
@@ -244,7 +252,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
             // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
             //   'dropshipping-cosmetics' 제거 → 잔존 cosmetics 전용 앱으로 대표 검증한다.
             const appIds = recommended.map(app => app.appId);
-            expect(appIds).toContain('cosmetics-sample-display-extension');
+            // WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1:
+            //   'cosmetics-sample-display-extension' 제거 → 잔존 cosmetics 전용 앱으로 대체 검증한다.
+            expect(appIds).toContain('forum-cosmetics');
+            expect(appIds).not.toContain('cosmetics-sample-display-extension');
 
             expect(cosmetics.serviceGroup).toBe('cosmetics');
         });
@@ -286,8 +297,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
 
             // Cosmetics should have its own extension, yaksa should not
             // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: 'dropshipping-cosmetics' 제거에 따른 대체 검증
-            expect(cosmeticsIds).toContain('cosmetics-sample-display-extension');
-            expect(yaksaIds).not.toContain('cosmetics-sample-display-extension');
+            // WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1: 위 항목 제거에 따라 'forum-cosmetics' 로 대체 검증한다.
+            expect(cosmeticsIds).toContain('forum-cosmetics');
+            expect(yaksaIds).not.toContain('forum-cosmetics');
+            expect(cosmeticsIds).not.toContain('cosmetics-sample-display-extension');
 
             // Yaksa should have its own app, cosmetics should not
             // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
@@ -355,8 +368,19 @@ describe('Multi-Tenant AppStore Filtering', () => {
 
             // Install a cosmetics-scoped app - should succeed
             // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: 'dropshipping-cosmetics' 제거에 따른 대체 검증
-            const result = canInstallApp('cosmetics-sample-display-extension', 'cosmetics');
+            // WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1: 제거된 앱 대신 잔존 cosmetics 전용 앱으로 검증한다.
+            const result = canInstallApp('forum-cosmetics', 'cosmetics');
             expect(result.canInstall).toBe(true);
+
+            // 제거된 화장품 확장은 카탈로그에 없어 설치 후보가 되지 않는다
+            expect(canInstallApp('cosmetics-sample-display-extension', 'cosmetics')).toEqual({
+                canInstall: false,
+                reason: 'App not found in catalog',
+            });
+            expect(canInstallApp('cosmetics-supplier-extension', 'cosmetics')).toEqual({
+                canInstall: false,
+                reason: 'App not found in catalog',
+            });
 
             // Install global app - should succeed
             const result2 = canInstallApp('organization-forum', 'cosmetics');
@@ -369,7 +393,8 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const { yaksa, tourist, sellerops } = representatives;
 
             // Yaksa cannot install cosmetics app
-            expect(canInstallApp('cosmetics-sample-display-extension', 'yaksa').canInstall).toBe(false);
+            // WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1: 제거된 앱 대신 잔존 cosmetics 전용 앱으로 검증한다.
+            expect(canInstallApp('forum-cosmetics', 'yaksa').canInstall).toBe(false);
 
             // Tourist cannot install yaksa app
             // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:

@@ -370,8 +370,11 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
 
     // Still disabled (Phase R2):
     // 17. Cosmetics Seller routes (/api/v1/cosmetics-seller) - @o4o/cosmetics-seller-extension
-    // 18. Cosmetics Sample Display routes - @o4o/cosmetics-sample-display-extension
-    // 19. Cosmetics Supplier routes - @o4o/cosmetics-supplier-extension
+    //     패키지는 존재하나 라우트는 아직 마운트하지 않는다.
+    // WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1:
+    //   18. Cosmetics Sample Display · 19. Cosmetics Supplier 항목을 제거했다.
+    //   두 패키지는 commit 2d5be046b 에서 삭제되어 'disabled'(재활성 대기) 가 아니라
+    //   존재하지 않는 라우트다. App Store 카탈로그 항목도 함께 제거했다.
 
     // 20. Register Partner routes (Phase K)
     app.use('/api/partner', partnerRoutes);

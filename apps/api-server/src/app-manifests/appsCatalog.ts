@@ -328,31 +328,14 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
     serviceGroups: ['cosmetics', 'sellerops'],
   },
-  {
-    appId: 'cosmetics-supplier-extension',
-    name: 'Cosmetics Supplier Extension',
-    version: '1.0.0',
-    description: '브랜드(공급사) 관리 - 가격정책, 샘플공급, 승인, 캠페인 관리',
-    category: 'commerce',
-    tags: ['화장품', 'cosmetics', 'supplier', 'brand', 'price', 'campaign'],
-    type: 'extension',
-    // WO-O4O-LEGACY-COSMETICS-PARTNER-REMOVAL-V1: 제거된 'cosmetics-partner' 의존 참조 삭제
-    dependencies: {},
-    author: 'O4O Platform',
-    serviceGroups: ['cosmetics', 'supplierops'],
-  },
-  {
-    appId: 'cosmetics-sample-display-extension',
-    name: 'Cosmetics Sample & Display Extension',
-    version: '1.0.0',
-    description: '샘플/테스터, 진열(Display), 전환율 관리 - Seller와 Supplier 연결 운영 모듈',
-    category: 'commerce',
-    tags: ['화장품', 'cosmetics', 'sample', 'display', 'tester', 'conversion'],
-    type: 'extension',
-    dependencies: { 'cosmetics-seller-extension': '>=1.0.0', 'cosmetics-supplier-extension': '>=1.0.0' },
-    author: 'O4O Platform',
-    serviceGroups: ['cosmetics'],
-  },
+  // WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1:
+  //   'cosmetics-supplier-extension' · 'cosmetics-sample-display-extension' 카탈로그 항목을 제거했다.
+  //   두 패키지(@o4o/cosmetics-supplier-extension · @o4o/cosmetics-sample-display-extension)는
+  //   commit 2d5be046b 에서 삭제되어 workspace · manifest.ts · 마운트된 라우트가 모두 없다.
+  //   설치를 시도하면 ModuleLoader 가 모듈을 찾지 못해 항상 실패했고(거짓 성공 없음),
+  //   production app_registry 에도 설치 레코드가 없다(설치 소비처 0).
+  //   존재하지 않는 확장을 '설치 가능'으로 노출하는 거짓 계약이므로 카탈로그에서 제거한다.
+  //   살아 있는 'cosmetics-seller-extension' 은 별개의 ACTIVE 패키지이며 유지한다.
 
   // ============================================
   // Yaksa Organization Apps (yaksa)
@@ -394,7 +377,11 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     serviceGroups: ['signage'],
   },
 
-  // serviceGroup id 'sellerops' / 'supplierops' 는 화장품 확장이 사용 중이라 유지한다.
+  // serviceGroup id 'sellerops' / 'supplierops' 는 카탈로그 항목이 사용 중이라 유지한다.
+  //   sellerops: 'cosmetics-seller-extension' · 'market-trial'
+  //   supplierops: 'market-trial'
+  //   (WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1 로
+  //    'cosmetics-supplier-extension' 이 제거되어 supplierops 소비처가 market-trial 만 남았다)
   // admin-dashboard 의 동명 로컬 페이지(src/pages/{sellerops,supplierops})는 별개 자산이다.
 
   // ============================================
