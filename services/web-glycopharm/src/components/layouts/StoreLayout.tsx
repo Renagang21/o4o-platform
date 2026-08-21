@@ -21,6 +21,8 @@ import { StoreModeProvider } from '@/contexts/StoreModeContext';
 import { StoreThemeProvider } from '@/contexts/StoreThemeContext';
 
 function StoreLayoutContent() {
+  // WO-O4O-CROSSSERVICE-HEADER-FOOTER-FINAL-CLOSURE-AUDIT-V1 §18: stale 하드코딩 연도 → 동적 연도
+  const currentYear = new Date().getFullYear();
   const { pharmacyId: storeSlug } = useParams<{ pharmacyId: string }>();
   const { user, isAuthenticated } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -285,7 +287,7 @@ function StoreLayoutContent() {
             </div>
             <div className="text-sm text-slate-500">
               <p>본 매장은 GlycoPharm 플랫폼에서 운영됩니다.</p>
-              <p className="mt-1">© 2025 GlycoPharm. All rights reserved.</p>
+              <p className="mt-1">© {currentYear} GlycoPharm. All rights reserved.</p>
             </div>
           </div>
         </div>

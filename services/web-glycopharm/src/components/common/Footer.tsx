@@ -7,6 +7,8 @@ import { useRegisterModal } from '@/contexts/RegisterModalContext';
 import { loadFooterLegal } from '@/lib/footerLegal';
 
 export default function Footer() {
+  // WO-O4O-CROSSSERVICE-HEADER-FOOTER-FINAL-CLOSURE-AUDIT-V1 §18: stale 하드코딩 연도 → 동적 연도
+  const currentYear = new Date().getFullYear();
   const { openRegisterModal } = useRegisterModal();
   return (
     <footer className="bg-slate-900 text-slate-300">
@@ -118,7 +120,7 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="text-sm text-slate-500">
-              <p>&copy; 2025 GlycoPharm. All rights reserved.</p>
+              <p>&copy; {currentYear} GlycoPharm. All rights reserved.</p>
               {/* WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1: 법정정보는 하드코딩 금지 — API 값 있을 때만 표시 */}
               <PublicLegalFooterInfo serviceKey="glycopharm" loadProfile={loadFooterLegal} style={{ marginTop: 8 }} />
             </div>

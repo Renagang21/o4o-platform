@@ -10,6 +10,8 @@ import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { loadFooterLegal } from '@/lib/footerLegal';
 
 export default function Footer() {
+  // WO-O4O-CROSSSERVICE-HEADER-FOOTER-FINAL-CLOSURE-AUDIT-V1 §18: stale 하드코딩 연도 → 동적 연도
+  const currentYear = new Date().getFullYear();
   return (
     <footer style={styles.footer}>
       {/* Main Footer */}
@@ -85,7 +87,7 @@ export default function Footer() {
       <div style={styles.bottomBar}>
         <div style={styles.bottomContainer}>
           <div style={styles.bottomContent}>
-            <p style={styles.copyright}>&copy; 2025 K-Cosmetics. All rights reserved.</p>
+            <p style={styles.copyright}>&copy; {currentYear} K-Cosmetics. All rights reserved.</p>
           </div>
           {/* WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1:
               WO-O4O-GP-KCOS-FOOTER-PLACEHOLDER-LEGAL-INFO-SUPPRESSION-V1 의 placeholder 제거를 잇는 동적 재도입.
