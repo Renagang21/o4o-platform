@@ -98,13 +98,13 @@ master ACTIVE 만 본다. **`offer_service_approvals` 를 보지 않는다.** �
 - 강사·커뮤니티 운영자 등은 **가입 역할이 아니다**. 사후 부여만 허용한다 (원칙 7).
 - `roles` 테이블의 seed row 와 migration `20270216000000` 은 **이력이므로 보존**한다
   (migration 은 불변 이력 — 편집 금지). 실사용 배정은 0건이었다 (§6).
-- **잔여 갭(미해소, 별도 WO 필요)**: 그 seed row 는 `is_assignable = true` · `is_active = true` 다.
-  역할 카탈로그는 `roles` 테이블 조회(`roleService.getRolesByService('pharmacy-hub')`)이므로
-  운영자 역할 관리 화면에 `pharmacy-hub:supplier` 가 **선택지로 계속 보일 수 있다**.
-  배정되더라도 `PHARMACY_HUB_SCOPE_CONFIG` 에 없어 어떤 scope 도 통과하지 못하므로 권한 상승은
-  없지만(§7-1 잠금 테스트), 카탈로그에서 사라지지 않는 한 재유입 표면은 남는다.
-  해소는 DB write(`UPDATE roles SET is_assignable = false, is_active = false`) 또는 신규 migration 이
-  필요하므로 **사용자 승인 후 별도 WO** 로 처리한다 (CLAUDE.md §0 · 중지 조건).
+- **카탈로그 폐기(해소됨)**: seed 직후 그 row 는 `is_assignable = true` · `is_active = true` 라
+  운영자 역할 관리 화면(`roleService.getRolesByService('pharmacy-hub')`)에 **선택지로 남아 있었다**.
+  `WO-O4O-PHARMACYHUB-RETIRED-SUPPLIER-ROLE-CATALOG-CLOSURE-V1` 이 신규 migration
+  `20270314000000-DeactivatePharmacyHubSupplierRole` 로 `is_assignable = false` ·
+  `is_active = false` 로 닫았다. role.service 의 조회·검증이 모두 `isActive: true` 필터이므로
+  **목록 노출과 신규 배정이 동시에** 닫힌다. row 자체는 이력으로 보존한다(hard delete 금지).
+  → [`CHECK-O4O-PHARMACYHUB-RETIRED-SUPPLIER-ROLE-CATALOG-CLOSURE-V1`](../checks/CHECK-O4O-PHARMACYHUB-RETIRED-SUPPLIER-ROLE-CATALOG-CLOSURE-V1.md)
 
 ---
 
@@ -141,7 +141,8 @@ master ACTIVE 만 본다. **`offer_service_approvals` 를 보지 않는다.** �
 다음이 발견되면 **이 문서 위반**이다.
 
 1. `pharmacy-hub:supplier` 역할·membership·scope 재등장
-   (`roles` 카탈로그 row 는 §4 잔여 갭으로 아직 남아 있다 — 배정 시도가 관측되면 그 자체가 신호다)
+   (`roles` row 는 이력으로 보존하되 `is_active = false` 로 닫혀 있다 — 다시 `true` 로 되돌리는
+   변경이 나타나면 그 자체가 신호다)
 2. `services/web-pharmacy-hub` 에 `/supplier` route · SupplierShell · supplier 메뉴 재등장
 3. `routes/pharmacy-hub/**` 에 `/supplier/*` 엔드포인트 재등장
 4. Pharmacy-Hub 운영자 화면에 공급자/상품 **승인** 기능 등장
