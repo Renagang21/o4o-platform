@@ -36,7 +36,7 @@ const sharedIndex = read('packages/shared-space-ui/src/index.ts');
 
 /** 주석은 계약이 아니다 — 경계 검사는 실제 코드에만 적용한다. */
 const stripComments = (src: string) =>
-  src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ 	]*\/\/.*$/gm, '');
+  src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
 
 const forumApiCode = stripComments(forumApi);
 
