@@ -24,7 +24,7 @@
  *   /community                   커뮤니티 홈 (동일 WO §4 — StandardHomeTemplate + LatestActivitySection)
  *   /community/search            커뮤니티 검색 (동일 WO §6 — forum 중심)
  *   /education                   교육 허브 (동일 WO §7 — 공통 LmsHubTemplate)
- *   /education/course/:id        강의 상세 (공통 CourseDetailView · 수강신청 활성 — LMS learner adoption WO §6)
+ *   /education/course/:id        강의 상세 (공통 CourseDetailView · enrollment 비활성)
  *   /education/course/:courseId/lesson/:lessonId  레슨 (공통 LessonPlayerView)
  *   /operator                    운영자 셸 (OperatorLayoutWrapper — 공통 OperatorAreaShell)
  *     ├ (index)                  서비스 운영자 진입점
@@ -53,10 +53,6 @@
  *     ├ /blog/:id/edit           블로그 글 수정 (동일 WO)
  *     ├ /info                  매장 정보 (조직 · WO-...-STORE-INFO-AND-ACCOUNT-V1)
  *     └ /account                 내 계정 (사용자 · 동일 WO)
- *        ├ /account/enrollments   내 수강 목록 (LMS learner adoption WO §7)
- *        ├ /account/certificates  내 수료증 (동일 WO §11)
- *        └ /account/credits       내 크레딧 (동일 WO §15)
- *   /certificate/verify/:id      수료증 공개 검증 (동일 WO §10 · 인증 없음)
  *   /store-owner/payment         결제 (셸 동일 · 사이드바 메뉴 미노출 deep route)
  *     ├ /success                 PG 성공 callback
  *     └ /fail                    PG 실패 callback
@@ -177,12 +173,6 @@ import StoreInfoPage from './pages/store-owner/StoreInfoPage';
 import AccountPage from './pages/store-owner/AccountPage';
 // WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1 — 역할 무관 개인 프로필 (canonical /account)
 import MyProfilePage from './pages/account/MyProfilePage';
-// WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §7·§11·§15 — LMS learner 개인 화면
-import MyEnrollmentsPage from './pages/account/MyEnrollmentsPage';
-import MyCertificatesPage from './pages/account/MyCertificatesPage';
-import MyCreditsPage from './pages/account/MyCreditsPage';
-// 동일 WO §10 — 수료증 공개 검증 (인증 불필요)
-import CertificateVerifyPage from './pages/education/CertificateVerifyPage';
 // WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 — 매장 실행 자산 (QR · POP · 사이니지 · 상품 설명서)
 import QrPage from './pages/store-owner/QrPage';
 import PopPage from './pages/store-owner/PopPage';
@@ -225,22 +215,6 @@ export default function App() {
             매장·사업자 정보(organizations)는 이 화면에 없다 — `/store-owner/info` 소관.
           */}
           <Route path="/account" element={<MyProfilePage />} />
-
-          {/*
-            WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §7·§11·§15·§17
-
-            LMS learner 개인 화면. 개인 축은 `/account` 이며 `/mypage` 를 새로 만들지
-            않는다(§13 계약 유지). 미인증 안내는 화면이 직접 렌더하므로 MembershipGate 를
-            걸지 않는다 — 승인 대기·반려 사용자도 자신의 학습 이력을 확인할 수 있어야 한다.
-            데이터 경계는 백엔드 serviceKey 스코프가 담당한다(§19).
-          */}
-          <Route path="/account/enrollments" element={<MyEnrollmentsPage />} />
-          <Route path="/account/certificates" element={<MyCertificatesPage />} />
-          <Route path="/account/credits" element={<MyCreditsPage />} />
-
-          {/* 동일 WO §10 — 수료증 공개 검증. 수료증 공유 링크의 착지점이며 인증이 없다.
-              이 route 가 없으면 공통 MyCertificatesView 의 "링크 복사" 가 데드링크가 된다. */}
-          <Route path="/certificate/verify/:certificateId" element={<CertificateVerifyPage />} />
 
           {/* WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1:
               공개 정책 문서. 다른 4서비스와 같은 공통 PolicyDocumentViewer 소비(게시 문서만 표시,
