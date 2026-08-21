@@ -67,17 +67,31 @@ PH `App.tsx` 는 283줄 → **592줄**로 병렬 세션들이 이 트랙을 크�
 - `href` 우선 유지 → 기존 4개 소비처(KPA/GP/KCos/Neture) 동작 무변경
 - 구현 중 스코프 버그 2건(`config` 미도달)을 typecheck 로 잡아 prop 스레딩으로 수정
 
-### 3-2. 회원 **작성**(create/edit)을 넣지 않은 이유 — 권한 모델 경계
+### 3-2. 회원 **작성**(create/edit) 미구현 — 판정 보류 (설계 결정 필요)
 
-`cms_contents` 쓰기 인가(`cms-content-mutation.handler.ts` `authorizeCmsMutation`)는
-`platform:super_admin` 또는 `{serviceKey}:admin|operator` **만** 허용한다. 일반 회원은 쓸 수 없다.
+이번 세션 초기 서술은 "권한 모델 재설계 필요"로 단정했으나 **부정확했다.** 실제 대조 결과는 아래와 같다.
 
-KPA `/content` 는 회원 작성형(`POST /api/v1/kpa/contents` = 평범한 `authenticate`)이므로,
-PH 에서 같은 것을 하려면 `authorizeCmsMutation` 을 회원까지 열어야 한다. 그런데 이 handler 는
-**전 서비스 공통 CMS 원장**을 지키므로, 완화하면 kpa/neture/cosmetics/glycopharm 까지 영향이 간다.
+**canonical write 경로가 둘이다.**
 
-→ WO §7 중지 조건("서비스 격리 또는 권한 모델을 깨야 함")에 해당한다. 구현하지 않았고,
-   회원 작성 CTA 도 노출하지 않았다(노출하면 반드시 403 인 dead CTA). **후속 판단 필요.**
+| 모델 | 원장 | 회원 작성 | 소비 서비스 | 근거 |
+|---|---|:--:|---|---|
+| **A** | `{service}_contents` | **가능** (`authenticate` 만) | KPA · GlycoPharm · K-Cosmetics | `kpa.routes.ts:1587` `contentRouter.post('/', authenticate, …)` · `resources.controller.ts:74` `router.post('/', authenticate, write.create)` |
+| **B** | `cms_contents` | **불가** (`{serviceKey}:admin\|operator`) | PharmacyHub(읽기) · 플랫폼 CMS | `cms-content-mutation.handler.ts` `authorizeCmsMutation` |
+
+즉 "PH 가 회원 작성을 못 한다"는 **`cms_contents` 인가가 잘못됐다는 뜻이 아니라**,
+PH 가 A 가 아니라 B 위에 있다는 뜻이다. KPA 3서비스는 회원 작성형이 **실재**하므로
+(즉 "KPA 에도 없어서 gap 이 아니다" 는 성립하지 않는다) parity 관점의 gap 은 맞다.
+
+**선택지 3가지 — 다음 세션에서 판정한다.**
+
+1. **`INTENTIONAL_DIFFERENCE`** — PH 콘텐츠는 운영자 발행 모델(읽기 전용)이 제품 의도라고 확정.
+   PH 공지 canonical 이 이미 forum pinned post 인 점(선행 CHECK §10)과 정합적이다.
+2. **B 확장** — `authorizeCmsMutation` 에 회원 작성을 허용. 단 이 handler 는 **전 서비스 공통 CMS 원장**을
+   지키므로 kpa/neture/cosmetics/glycopharm 에 모두 영향 → 공통 권한 모델 변경으로 신중히 다뤄야 한다.
+3. **A 채택** — `pharmacy_hub_contents` 신규 테이블 필요 → **확정 canonical(§1) 위반이므로 배제.**
+
+이번 세션에는 구현하지 않았고 회원 작성 CTA 도 노출하지 않았다(노출 시 반드시 403 인 dead CTA).
+**판정 자체가 미완이므로 gap 으로 계상한다.**
 
 ---
 
@@ -179,7 +193,8 @@ P2: 6
 
 1. **운영자 Content/Resources 가 dead navigation** — `operatorMenuGroups` 에 키만 선언돼 있고 route 가 없다.
    WO §21(dead link 0)에 위배되므로 **다음 착수 1순위**.
-2. **회원 콘텐츠 작성 부재** — KPA 는 회원 작성형인데 PH 는 읽기 전용이다. 권한 모델 판단 전까지 parity gap 으로 남는다.
+2. **회원 콘텐츠 작성 부재** — KPA/GP/KCos 3서비스는 회원 작성형이 실재하고 PH 는 읽기 전용이다.
+   §3-2 의 선택지 1/2 중 판정이 필요하며(3은 배제), 판정 전까지 parity gap 으로 계상한다.
 3. **내 매장 9개 축 미착수** — 각 항목 §14 판정(active/필요/shared Core) 자체가 아직 없다.
 4. **공통 템플릿 변경의 타 서비스 영향 미실측** — 구조상 안전하나 4개 서비스 build 를 돌리지 못했다.
 5. **집계 근사** — §5 경고 참조.
@@ -199,3 +214,42 @@ KPA_PH_COMMUNITY_MY_STORE_PARITY = NOT_COMPLETE
 구현(코드) 완료         = NOT_COMPLETE  (CODE_GAP 잔존)
 production verification = NOT_PERFORMED (ENVIRONMENT_UNVERIFIED)
 ```
+
+---
+
+## 9. 인계 — 같은 WO 를 이어서 완료한다
+
+**새 WO 를 만들지 않는다.** 이 문서의 WO 를 그대로 이어간다.
+
+```text
+worktree : C:/tmp/o4o-ph-parity   (clean)
+branch   : work/ph-parity-closure (main 미병합)
+resume   : 6502904ce
+canonical: cms_contents + serviceKey  — pharmacy_hub_contents 신규 테이블/migration 금지
+```
+
+시작 시 최신 `origin/main` 진행분을 확인해 충돌 없이 동기화하고, **기존 구현을 재작성하지 않는다.**
+
+### 실행 순서 (중간 완료 선언 없이 잔여 전체를 연속 처리)
+
+1. PH 운영자 Content/Resources **dead navigation 해소** + canonical CMS adapter 채택
+   (`@o4o/operator-core-ui/modules/operator-content-hub` · `.../modules/resources`,
+    PH 는 `cms_contents` API 라 CMS 기반 console client adapter 필요)
+2. 회원 Content create/edit — §3-2 선택지 1/2 판정 후 필요하면 공통 권한 모델로 **안전하게** 구현
+3. My Store 잔여 9개 축 §14 전수 판정 → 필요한 capability 전부 채택
+4. Signage partial flow 완결
+5. **97 모집단을 항목 단위로 전수 재대조** — §5 의 근사 수치를 제거한다 (closure 숫자로 쓰지 말 것)
+6. 가능한 tests / typecheck / build
+7. 본 CHECK 갱신
+8. path-specific commit / push
+9. 안전하게 가능하면 main 병합까지
+
+### 완료 조건
+
+```text
+미조사 = 0 · PARTIAL_ADOPTION = 0 · MISSING_ADOPTION = 0
+P0 = 0 · P1 = 0 · dead navigation = 0
+```
+
+환경 제약(배포·E2E)은 **코드 gap 을 남기는 사유가 되지 않는다.** 코드 완료와
+production verification 을 분리 판정한다.
