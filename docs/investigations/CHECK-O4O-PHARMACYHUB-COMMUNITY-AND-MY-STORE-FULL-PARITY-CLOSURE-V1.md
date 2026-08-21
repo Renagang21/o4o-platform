@@ -272,9 +272,7 @@ main 이 `GlobalHeaderNavItem.children` 계약을 플랫폼 전역에서 제거�
 
 ### 실행 순서 (중간 완료 선언 없이 잔여 전체를 연속 처리)
 
-1. PH 운영자 Content/Resources 채택 — **공통 콘솔 generic 확장 선행 필요**
-   (status 목록·허용 전이·삭제 capability 를 config 화. §4-1 blocker 참조.
-    확장 후 KPA/GP/KCos 3서비스 회귀 확인 필수)
+1. PH 운영자 Content/Resources 채택 — **공통 콘솔 generic 확장 선행 필요** (§9-2)
 2. 회원 Content create/edit — §3-2 선택지 1/2 판정 후 필요하면 공통 권한 모델로 **안전하게** 구현
 3. My Store 잔여 9개 축 §14 전수 판정 → 필요한 capability 전부 채택
 4. Signage partial flow 완결
@@ -284,12 +282,59 @@ main 이 `GlobalHeaderNavItem.children` 계약을 플랫폼 전역에서 제거�
 8. path-specific commit / push
 9. 안전하게 가능하면 main 병합까지
 
+### 9-2. 착수 1순위 — 공통 운영자 콘솔 generic capability 확장 (확정 스펙)
+
+이건 **PH 전용 콘솔을 새로 만드는 문제가 아니다.** 기존 공통 콘솔이 **서로 다른 lifecycle 을
+안전하게 표현하지 못하는 것**이 blocker다(§4-1). 따라서 콘솔에 capability/config 계약을 넣는다.
+
+**config 로 표현할 축**
+
+```text
+statuses            표시·선택 가능한 상태 목록
+allowedTransitions  현재 상태 → 가능한 다음 상태
+supportsDelete      삭제 지원 여부
+field capability    source_type / usage_type / reusable_policy 등 보유 여부
+action visibility   위 조건에서 파생되는 액션 노출
+```
+
+**PH `cms_contents` 계약 (주입값)**
+
+```text
+statuses : draft | pending | published | archived
+lifecycle: draft     → pending | archived
+           pending   → published | draft
+           published → archived
+           archived  → (terminal)
+delete   : unsupported
+```
+
+**기존 `{service}_contents` 계열은 default config 로 현재 동작을 그대로 보존한다.**
+
+**구현 원칙**
+
+- `if (serviceKey === 'pharmacy-hub')` 식 **서비스 분기 금지**
+- `supportsDelete` · `statuses` · `allowedTransitions` · field capability 등 **generic config** 사용
+- PH 에서 **존재하지 않는 delete CTA 노출 금지**
+- PH 에서 **불가능한 lifecycle action 노출 금지**
+- **기존 KPA/GP/KCos UI·행동 변화 0**
+
+확장 후 PH operator Content/Resources adapter 를 `cms_contents` + `serviceKey='pharmacy-hub'` 에
+연결하고 canonical operator navigation 에 추가한다.
+
+**같은 세션에서 반드시 회귀**: KPA · GlycoPharm · K-Cosmetics · PharmacyHub 4서비스의
+operator Content/Resources.
+
+운영자 축이 닫히면 **중간 완료 선언하지 말고** My Store 잔여 9축으로 그대로 진행한다.
+
 ### 완료 조건
 
 ```text
 미조사 = 0 · PARTIAL_ADOPTION = 0 · MISSING_ADOPTION = 0
 P0 = 0 · P1 = 0 · dead navigation = 0
 ```
+
+마지막 census 는 **근사 집계 사용 금지** — 선행 97 capability 를 항목별로 실제 재대조해
+최종 수치를 다시 산출한다(§5 경고 참조).
 
 환경 제약(배포·E2E)은 **코드 gap 을 남기는 사유가 되지 않는다.** 코드 완료와
 production verification 을 분리 판정한다.
