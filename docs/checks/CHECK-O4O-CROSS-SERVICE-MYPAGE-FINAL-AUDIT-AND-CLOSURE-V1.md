@@ -2,7 +2,8 @@
 
 - **WO**: [`WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1`](../work-orders/WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1.md)
 - **작성일**: 2026-08-20
-- **판정**: **CLOSED_WITH_FOLLOWUPS**
+- **판정**: **FINAL CLOSED** (2026-08-21 정합화 — 원 판정 `CLOSED_WITH_FOLLOWUPS`)
+- **정합화 근거**: 아래 §27 이 남긴 검증 공백 2건이 후속 WO [`WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1`](../work-orders/WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1.md) 에서 해소됐다 → [`CHECK-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1`](CHECK-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1.md). 아래 본문의 원 기록(미확인 표기 포함)은 **당시 사실 그대로 보존**한다.
 - **판정 근거 요약**: WO §28 의 MUST_FIX 조건(노출된 진입점이 backend 단절로 죽어 있음 / 잘못된 role·status 노출 / dead route / Shell 우회)에 해당하는 **발견분 6건을 전량 수정·배포·프로덕션 재검증 완료**했다. 남은 항목은 전부 §31 backlog(진입점 없음 · 도달 불가 코드 · 축 밖 화면 · 검증 공백)이며 사용자 노출 결함이 아니다. `FINAL CLOSED` 를 선언하지 않는 이유는 §27 에 명시한다.
 
 ---
@@ -153,6 +154,8 @@ KCos 5화면(`MyProfilePage:29-40` · `MySettingsPage:21-32` · `MyCertificatesP
 - 5서비스 모두 승인 상태를 `MembershipStatusBadge` 또는 동등 배지로 표기하며, 프로덕션 검증 계정은 전부 `승인됨` 이었다.
 - **pending / rejected 계정의 실제 프로덕션 렌더는 검증하지 못했다.** 해당 상태의 테스트 계정이 SSOT(`docs/local/TEST-ACCOUNTS.local.md`)에 없고, §24(production write = 0)에 따라 상태를 만들지 않았다. → **미확인**, backlog B7.
 
+> **2026-08-21 후속 해소 (WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1 §7-B)**: pending/rejected 상태 테스트 계정은 재확인 결과에도 존재하지 않았고, 후속 WO 역시 계정 생성·상태 변경을 금지했다. 대신 WO §7-B 가 정한 **3단 정적 계약 증거(guard·렌더 분기·status normalizer)** 를 5서비스 전체에서 실코드로 확인해 **동등 PASS** 판정을 받았다. 위 원 기록(당시 미확인)은 그대로 둔다.
+
 ---
 
 ## 11. Profile
@@ -233,6 +236,11 @@ KCos 5화면(`MyProfilePage:29-40` · `MySettingsPage:21-32` · `MyCertificatesP
 
 > GP · PH 은 이번 WO 코드 변경이 **0** 이라 모바일 회귀 위험이 없다고 판단해 desktop 검증만 수행했다. 숨기지 않고 미확인으로 기록한다.
 
+> **2026-08-21 후속 해소 (WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1 §10·§13)**: 위 표의 GP mobile "미실시" 2칸과 PH mobile "미실시" 칸이 실제 프로덕션 390×844 브라우저 검증으로 해소됐다.
+> - GP: `/mypage` 7 route 전수 PASS (가로 overflow 0 · double shell 0 · console error 0 · network 전부 200).
+> - PH: `/account` · `/store-owner/account` PASS (Shell 밖 early return 없음 · double shell 0 · sidebar/활성표시 정상).
+> 상세는 [`CHECK-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1`](CHECK-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1.md) §4·§5. 위 표의 원 기록은 당시 사실이므로 수정하지 않는다.
+
 ---
 
 ## 20. production browser
@@ -289,6 +297,9 @@ KCos 5화면(`MyProfilePage:29-40` · `MySettingsPage:21-32` · `MyCertificatesP
 
 §31 에 따라 위 항목은 트랙을 자동 실패시키지 않는다.
 
+> **2026-08-21 후속 갱신**: **B7 (pending/rejected 프로덕션 렌더 미검증)** 은 후속 WO 에서 §7-B 3단 정적 계약 증거 PASS 로 **해소**됐다 (표의 원 기록은 보존). 나머지 backlog 는 그대로 유효하다.
+> 같은 후속 WO 에서 새로 발견·수정된 결함 1건: KPA `MembershipGate` 의 가입 신청 CTA 가 존재하지 않는 `/member/apply` 를 가리키던 dead navigation (최소 수정으로 CTA 제거).
+
 ---
 
 ## 25. MUST_FIX_BEFORE_CLOSE
@@ -325,6 +336,20 @@ CROSS-SERVICE MY PAGE TRACK = CLOSED_WITH_FOLLOWUPS
   (사용자 노출 결함 = 0 · MUST_FIX 잔여 = 0
    미해소는 검증 공백 2건뿐)
 ```
+
+> **2026-08-21 상태 전환 — `FINAL CLOSED`**
+>
+> 아래 1·2 번 사유(검증 공백 2건)가 후속 WO `WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1` 에서 해소돼
+> 본 트랙의 현재 상태는 다음과 같다.
+>
+> ```text
+> CROSS-SERVICE MY PAGE TRACK = FINAL CLOSED
+> ```
+>
+> - 1번(pending/rejected 미검증) → 후속 WO §7-B 3단 정적 계약 증거 PASS.
+> - 2번(GP · PH mobile 390×844 미실시) → 후속 WO §10·§13 프로덕션 실검증 PASS.
+>
+> 아래 원문(전환 이전 판정과 그 사유)은 **당시 기록으로 보존**한다.
 
 **§30 의 `FINAL CLOSED` 를 선언하지 않는 이유** — §31 에 따라 강제 종료보다 정확한 기록을 택한다.
 
