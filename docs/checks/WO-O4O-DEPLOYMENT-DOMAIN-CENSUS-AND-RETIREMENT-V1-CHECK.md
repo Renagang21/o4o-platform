@@ -295,7 +295,32 @@ UNKNOWN 0
 
 ### 배포 후
 
-<!-- FILLED_AFTER_DEPLOY -->
+커밋 `acefe70e4` · CI `Deploy API Server (Cloud Run)` **success** ·
+신규 리비전 **`o4o-core-api-03440-qxj`** · 검증 시각 2026-08-21T07:24~07:27Z.
+
+| 항목 | 실측 | 판정 |
+|---|---|---|
+| Cloud Run 부팅 (entity 등록 제거 후 TypeORM) | 신규 리비전 Ready, `/health` `uptime` 85s 정상 기동 | PASS |
+| `GET /health` | **200** `{"status":"alive","environment":"production"}` | PASS |
+| `GET /health/database` | **200** `status:"healthy"`, `pingMs` 4, `activeConnections` 10, `longRunningQueries` 0 | PASS |
+| `GET /api/v1/appstore` | **200** `success:true`, 앱 목록 정상 | PASS |
+| `GET /api/v1/service/templates` (미인증 / 로그인 후) | **401** `AUTH_REQUIRED` / **403** `Admin privileges required` | PASS (라우터 생존 · 500 아님) |
+| `GET /api/v1/service-admin/templates` (미인증 / 로그인 후) | **401** / **403** | PASS |
+| 로그인 `POST /api/v1/auth/login` (`serviceKey=neture`) | **200**, `/api/v1/auth/status` **200** `authenticated:true` | PASS |
+| `GET /api/v1/deployment` · `GET /api/deployment` | **404** `Cannot GET ...` (2025-12-11 이후 동일, 이번 retire 로 새로 사라진 route 아님) | PASS (기대 404) |
+| Cloud Run 신규 ERROR | 신규 리비전 로그 `severity>=ERROR OR httpRequest.status>=500` **0건** | PASS |
+| `deployment_instances` / `DeploymentInstance` 관련 오류 | **0건** | PASS |
+| 신규 5xx | **0건** | PASS |
+
+검증 한계(숨기지 않고 기록):
+
+- `/service/templates` · `/service-admin/templates` 는 `platform:super_admin` 급 권한을 요구한다.
+  `docs/local/TEST-ACCOUNTS.local.md` 에 해당 계정 비밀번호가 없어 **200 본문까지는 확인하지 못했다.**
+  미인증 401 → 로그인 후 403 전이로 "라우터가 mount 돼 있고 가드까지 도달하며 500 이 아니다" 까지 확증했다.
+  이번 WO 의 위험(entity 등록 제거로 인한 부팅/스키마 오류)은 이 범위에서 배제된다.
+- 로그 조회 창은 신규 리비전 기준 `--freshness=1h` 이며, 동일 쿼리에서 리비전 로그 자체는 정상 반환된다
+  (빈 결과가 필터 오류가 아님을 sanity 확인 완료).
+
 
 ---
 
