@@ -29,7 +29,7 @@ import {
 import { fetchMembershipStatusCount } from '../../lib/membershipConsoleClient';
 import { forumOperatorApi } from '../../services/forumApi';
 import { api } from '../../lib/apiClient';
-import { BRAND } from '../../config/service';
+import { BRAND, SERVICE_KEY } from '../../config/service';
 
 interface StatusCounts {
   pending: number;
@@ -100,7 +100,12 @@ export default function OperatorDashboardPage() {
 
     let activityItems: ActivityItem[] | null = null;
     try {
-      const res = await api.get('/operator/analytics/actions', { params: { limit: 8 } });
+      // serviceKey 를 반드시 명시한다. platform admin / 다중 서비스 역할 보유자는
+      // resolveOperatorScope 가 cross-service 로 해석해 타 서비스 action_logs 가 섞인다
+      // (프로덕션 검증에서 glycopharm.* 액션 유입 확인).
+      const res = await api.get('/operator/analytics/actions', {
+        params: { limit: 8, serviceKey: SERVICE_KEY },
+      });
       const rows: any[] = res.data?.data?.actions ?? res.data?.data?.items ?? res.data?.data ?? [];
       activityItems = (Array.isArray(rows) ? rows : []).map((row) => ({
         id: String(row.id),
