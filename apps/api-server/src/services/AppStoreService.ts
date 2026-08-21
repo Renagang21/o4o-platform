@@ -32,6 +32,26 @@ import type {
 } from '../app-manifests/appsCatalog.js';
 
 /**
+ * AppStore 도메인 오류
+ *
+ * WO-O4O-APPSTORE-AUTHORIZATION-BOUNDARY-AUDIT-AND-HARDENING-V1 §11:
+ * 카탈로그에 없는 app / 설치되지 않은 app / 의존성 누락은 서버 오류가 아니라
+ * client error 다. route 계층이 message 문자열을 파싱하지 않고 status 를 그대로
+ * 사용할 수 있도록 status·code 를 오류 객체에 싣는다.
+ * (Error 를 상속하므로 기존 `instanceof Error` 소비처 계약은 그대로 유지된다.)
+ */
+export class AppStoreError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly code: string
+  ) {
+    super(message);
+    this.name = 'AppStoreError';
+  }
+}
+
+/**
  * AppStore Service
  *
  * Manages app installation, activation, deactivation, and uninstallation
@@ -50,12 +70,12 @@ export class AppStoreService {
 
     // Check if app exists in catalog
     if (!isInCatalog(appId)) {
-      throw new Error(`App ${appId} not found in catalog`);
+      throw new AppStoreError(`App ${appId} not found in catalog`, 404, 'APP_NOT_IN_CATALOG');
     }
 
     const catalogItem = getCatalogItem(appId);
     if (!catalogItem) {
-      throw new Error(`App ${appId} not found in catalog`);
+      throw new AppStoreError(`App ${appId} not found in catalog`, 404, 'APP_NOT_IN_CATALOG');
     }
 
     // Check if already installed
@@ -72,7 +92,11 @@ export class AppStoreService {
 
     const module = moduleLoader.getModule(appId);
     if (!module) {
-      throw new Error(`Failed to load app ${appId} - package not found in workspace`);
+      throw new AppStoreError(
+        `Failed to load app ${appId} - package not found in workspace`,
+        500,
+        'APP_PACKAGE_NOT_LOADED'
+      );
     }
 
     // Check dependencies
@@ -81,7 +105,11 @@ export class AppStoreService {
       for (const depId of appModule.dependsOn) {
         const depModule = moduleLoader.getModule(depId);
         if (!depModule) {
-          throw new Error(`Missing dependency: ${depId} required by ${appId}`);
+          throw new AppStoreError(
+            `Missing dependency: ${depId} required by ${appId}`,
+            409,
+            'APP_DEPENDENCY_MISSING'
+          );
         }
       }
     }
@@ -108,7 +136,7 @@ export class AppStoreService {
 
     const module = moduleLoader.getModule(appId);
     if (!module) {
-      throw new Error(`App ${appId} not installed`);
+      throw new AppStoreError(`App ${appId} not installed`, 404, 'APP_NOT_INSTALLED');
     }
 
     const { module: appModule } = module;
@@ -160,7 +188,7 @@ export class AppStoreService {
 
     const module = moduleLoader.getModule(appId);
     if (!module) {
-      throw new Error(`App ${appId} not installed`);
+      throw new AppStoreError(`App ${appId} not installed`, 404, 'APP_NOT_INSTALLED');
     }
 
     if (module.status === 'active') {
@@ -187,7 +215,7 @@ export class AppStoreService {
 
     const module = moduleLoader.getModule(appId);
     if (!module) {
-      throw new Error(`App ${appId} not installed`);
+      throw new AppStoreError(`App ${appId} not installed`, 404, 'APP_NOT_INSTALLED');
     }
 
     if (module.status !== 'active') {
