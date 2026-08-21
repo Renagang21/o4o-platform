@@ -103,8 +103,10 @@ import {
 import { ForumNotification } from '../entities/ForumNotification.js';
 // Digital Signage legacy entities removed (WO-O4O-SIGNAGE-CONTENT-CENTERED-REFACTOR-V1 Phase 5)
 // SignageDevice, SignageSlide replaced by digital-signage-core entities
-// Deployment entities
-import { DeploymentInstance } from '../modules/deployment/deployment.entity.js';
+// Deployment entities (application-level DeploymentInstance) 는
+// WO-O4O-DEPLOYMENT-DOMAIN-CENSUS-AND-RETIREMENT-V1 에서 retire 됐다.
+// `deployment_instances` 테이블은 production 에 생성된 적이 없다.
+// (실제 배포 인프라 = GitHub Actions / Cloud Run 은 이 도메인과 무관하다.)
 // Site entities (Multi-Site Builder) 는 WO-O4O-MULTI-SITE-BUILDER-SITES-DOMAIN-CENSUS-AND-RETIREMENT-V1
 // 에서 retire 됐다. `sites` 테이블은 production 에 생성된 적이 없다.
 
@@ -642,8 +644,6 @@ export const entities = [
   // Forum Notification entity (Phase 13) - local entity
   ForumNotification,
   // Digital Signage legacy entities removed — see digital-signage-core
-  // Deployment entities
-  DeploymentInstance,
   // ✅ CMS Module V2 entities (Phase C-2) - local entities, kept
   CMSCustomField,
   CMSView,

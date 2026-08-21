@@ -188,6 +188,15 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   //   제거했다. `/api/sites`·`/api/v1/sites` mount 는 2025-12-11 `refactor(api-server):
   //   Phase 8-3 Legacy Entity Removal & Service Cleanup` 에서 이미 해제된 상태였다.
   //   `branch_sites`(KPA 분회 홈페이지)는 별개 ACTIVE 도메인이며 유지한다.
+  // WO-O4O-DEPLOYMENT-DOMAIN-CENSUS-AND-RETIREMENT-V1 (판정 RETIRE_CONFIRMED):
+  //   같은 2025-12 설계의 후속 단계였던 application-level Deployment 도메인
+  //   (`modules/deployment/*` = DeploymentInstance entity + DTO)도 retire 했다.
+  //   `/api/deployment`·`/api/v1/deployment` mount 는 2025-12-11 Phase 8-3 에서 해제됐고
+  //   route 파일은 2026-01-06 `chore(api-server): remove 30 unused route files` 에서 삭제됐다.
+  //   서버 provisioning 은 setTimeout 기반 mock 구현이었고 `deployment_instances`
+  //   테이블은 production 에 생성된 적이 없다.
+  //   ⚠ 실제 배포 인프라(GitHub Actions `.github/workflows/deploy-*.yml`, Cloud Run,
+  //   Dockerfile, Artifact Registry)는 별개 축이며 이 retire 와 무관하다.
 
   logger.info('✅ Core API routes registered');
 }

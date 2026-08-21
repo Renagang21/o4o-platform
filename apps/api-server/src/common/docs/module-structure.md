@@ -56,7 +56,6 @@ The API Server is organized into these domains:
 | **signage** | Digital signage | Playlists, schedules, devices |
 | **admin** | Admin operations | Jobs, settlements, analytics |
 | **partner** | Partner/seller management | Seller dashboard, reports |
-| **deployment** | DevOps utilities | Health checks, monitoring |
 | **shared** | Cross-domain utilities | Common helpers, types |
 
 ---
