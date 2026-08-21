@@ -127,7 +127,29 @@ PharmacyHub 전용 복제 View 0 / PH 전용 backend controller 0 / DB schema �
 
 ## 11. Production smoke (§18)
 
-(배포 후 기록 — 아래 §12 참조)
+배포: `Deploy Web Services (Cloud Run)` run `32445144265` — `deploy-pharmacy-hub` ✓ (2m23s). 대상 `https://pharmacyhub.co.kr`.
+
+### 화면 smoke (desktop 1440×900 / mobile 390×844)
+
+| route | desktop | mobile |
+|---|---|---|
+| `/forum` | 렌더 OK | 렌더 OK |
+| `/forum/request` | 신청 폼 렌더 OK | 렌더 OK |
+| `/forum/my-dashboard` | 신청 내역·운영 포럼 섹션 렌더 OK | 렌더 OK |
+
+white screen 0 / JS exception 0 / unexpected 4xx·5xx 0 / dead navigation 0 / cross-service mixing 0.
+
+### P0 동선 end-to-end (test fixture 생성 → 반려로 종료)
+
+`pharmacy-hub:store_owner` 계정으로 진행했다.
+
+1. `/forum/request` 제출 → 성공 후 `/forum/my-dashboard` 로 이동
+2. 내 신청 내역에 `ZZ-테스트-포럼-WO-ADOPTION-V1` **검토 중** 표시 (`1 전체 신청 / 1 진행 중 / 0 승인됨`)
+3. `pharmacy-hub:operator` 로 `/operator/forum` → "포럼 개설 요청 1건" 유입 확인
+4. `/operator/forum-requests` 큐에 신청 레코드(포럼명·설명·신청자·신청일·상태) 표시 확인
+5. 상세에서 **거절** 처리 → 재조회 시 `거절됨`, 대기 건수 0
+
+승인은 실제 포럼을 생성하므로 수행하지 않았다. 운영 데이터 훼손 0 — 테스트 신청 1건이 `거절됨` 상태로 남고 포럼은 생성되지 않았다.
 
 ## 12. 잔존 gap
 
