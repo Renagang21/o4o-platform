@@ -50,6 +50,17 @@ UPDATE service_memberships sm SET role = 'pharmacy-hub:' || sm.role
                   AND ra.is_active = true)
 ```
 
+**배포 후 프로덕션 확인 (commit `adbd04ef6` · api `Deploy API Server` success)**:
+`typeorm_migrations` 에 `NormalizePharmacyHubBareMembershipRoles20270317000000` 기록,
+`service_memberships` 의 **prefix 없는 pharmacy-hub row 잔여 = 0**.
+현재 분포 = `pharmacy-hub:admin` 1(active) · `member` 2(active) · `operator` 2(active) ·
+`store_owner` 5(active)+1(rejected). 운영자 가입 신청 관리 화면도 세 건이 원문 `operator`/`admin`/
+`store_owner` 대신 "서비스 운영자"/"서비스 관리자"/"약국 경영자" 로 표시된다.
+
+활성 bare `role_assignments` 는 4건 유지 — `pharmacy`(deleted/active 각 1) ·
+`store_owner`(deleted 1) · `member`(suspended 1). 모두 PharmacyHub scope 를 열지 않으며
+위 표의 보존 사유가 적용된다.
+
 EXISTS 가드로 **권한 확대가 구조적으로 불가능**하다. row 삭제·사용자·자격증명·승인 상태 무변경.
 `down()` 은 문서화된 no-op (표기 되돌림이 오히려 drift 복원).
 
@@ -87,6 +98,9 @@ EXISTS 가드로 **권한 확대가 구조적으로 불가능**하다. row 삭�
 | `/operator`, `/operator/memberships` → "운영자 권한이 필요합니다" 차단 | PASS |
 | store_owner API 4종 직접 호출 → **403 `Required scope: pharmacy-hub:store_owner`** | PASS |
 | operator API 직접 호출 → **403 `Required scope: pharmacy-hub:operator`** | PASS |
+
+**배포 후 확인**: 홈 역할 카드가 실제로 필터링된다 — operator+admin 계정은 "서비스 운영자" 카드만,
+store_owner 계정은 "약국 경영자" 카드만, 비로그인 방문자는 2개 모두. JS 예외 0.
 
 **발견 1건 (수정함)**: 홈 "역할별 진입점" 카드가 로그인 사용자에게도 **보유 역할과 무관하게** 노출돼
 약사 회원에게 매장 경영/운영자 카드가 dead link 로 보였다 → `HomePage.tsx` 를 `satisfiesRole` 기준으로
