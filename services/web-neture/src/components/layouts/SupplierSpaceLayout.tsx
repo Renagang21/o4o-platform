@@ -8,6 +8,13 @@
  * - 좌측: 사이드바 (w-60, collapsible groups)
  * - 모바일: 수평 아이콘 바
  * - 스코프: /supplier/*
+ *
+ * WO-O4O-NETURE-SHELL-FOOTER-LEGAL-CONTRACT-ADOPTION-V1:
+ *   footer 를 Neture canonical 법정 계약에 편입한다(shell 구조·마크업 불변).
+ *   canonical source = MainLayout/NetureLayout 과 동일한
+ *   PublicLegalFooterInfo(serviceKey="neture") + loadFooterLegal.
+ *   법정 route 는 Neture 기준: 이용약관 /terms · 개인정보처리방침 /privacy · 문의 /contact.
+ *   (KPA 의 /policy 를 복사하지 않는다 — Neture 에는 /terms 가 canonical 이다.)
  */
 
 import { useState, useMemo, useEffect } from 'react';
@@ -26,8 +33,11 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
 import { NetureBottomNav } from '../NetureBottomNav';
+// WO-O4O-NETURE-SHELL-FOOTER-LEGAL-CONTRACT-ADOPTION-V1: 공개 푸터와 동일 loader 재사용
+import { loadFooterLegal } from '../../lib/footerLegal';
 import { SUPPLIER_ACCESS_ROLES } from '../../lib/role-constants';
 
 // WO-NETURE-SUPPLIER-PRODUCT-LIST-WIDE-TABLE-VIEW-APPLY-V1
@@ -365,8 +375,16 @@ export default function SupplierSpaceLayout() {
       <footer className="bg-white border-t border-gray-200 mt-auto shrink-0">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
-            <p>&copy; 2026 Neture. 공급자 &middot; 파트너 협업 플랫폼</p>
+            <div className="text-center sm:text-left">
+              <p>&copy; 2026 Neture. 공급자 &middot; 파트너 협업 플랫폼</p>
+              {/* 법정정보 — 하드코딩하지 않는다. 미설정/비활성/오류면 아무것도 렌더하지 않음(null). */}
+              <div className="text-xs text-gray-400 mt-1">
+                <PublicLegalFooterInfo serviceKey="neture" loadProfile={loadFooterLegal} />
+              </div>
+            </div>
             <div className="flex items-center gap-4 text-xs text-gray-400">
+              <Link to="/terms" className="hover:text-primary-600 transition-colors">이용약관</Link>
+              <Link to="/privacy" className="hover:text-primary-600 transition-colors">개인정보처리방침</Link>
               {/* WO-O4O-NETURE-SUPPLIER-CANONICAL-WORKSPACE-SMOKE-CLOSEOUT-V1:
                   `/about` 은 App.tsx 에 route 가 없고 catch-all 도 없어 클릭 시 빈 화면이 됐다.
                   대체 화면을 임의로 지정하지 않고 죽은 링크만 제거한다.

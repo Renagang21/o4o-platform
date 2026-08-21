@@ -8,6 +8,12 @@
  * - 좌측: 사이드바 (w-60, collapsible groups)
  * - 모바일: 수평 아이콘 바
  * - 스코프: /workspace 하위 모든 페이지
+ *
+ * WO-O4O-NETURE-SHELL-FOOTER-LEGAL-CONTRACT-ADOPTION-V1:
+ *   footer 를 Neture canonical 법정 계약에 편입한다(좌측 2줄 구조 등 기존 마크업 유지).
+ *   canonical source = MainLayout/NetureLayout 과 동일한
+ *   PublicLegalFooterInfo(serviceKey="neture") + loadFooterLegal.
+ *   법정 route 는 Neture 기준: 이용약관 /terms · 개인정보처리방침 /privacy · 문의 /contact.
  */
 
 import { useState } from 'react';
@@ -23,8 +29,11 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
 import { SUPPLIER_HUB_ACCESS_ROLES } from '../../lib/role-constants';
+// WO-O4O-NETURE-SHELL-FOOTER-LEGAL-CONTRACT-ADOPTION-V1: 공개 푸터와 동일 loader 재사용
+import { loadFooterLegal } from '../../lib/footerLegal';
 
 /* ------------------------------------------------------------------ */
 /*  Sidebar 그룹 정의                                                   */
@@ -222,10 +231,19 @@ export default function SupplierOpsLayout() {
                   메인으로
                 </Link>
               </p>
+              {/* 법정정보 — 하드코딩하지 않는다. 미설정/비활성/오류면 아무것도 렌더하지 않음(null). */}
+              <div className="text-xs text-gray-400 mt-1">
+                <PublicLegalFooterInfo serviceKey="neture" loadProfile={loadFooterLegal} />
+              </div>
             </div>
-            <Link to="/forum" className="text-xs text-green-600 hover:text-green-700 transition-colors">
-              포럼
-            </Link>
+            <div className="flex items-center gap-4 text-xs text-gray-400">
+              <Link to="/forum" className="text-green-600 hover:text-green-700 transition-colors">
+                포럼
+              </Link>
+              <Link to="/terms" className="hover:text-primary-600 transition-colors">이용약관</Link>
+              <Link to="/privacy" className="hover:text-primary-600 transition-colors">개인정보처리방침</Link>
+              <Link to="/contact" className="hover:text-primary-600 transition-colors">Contact Us</Link>
+            </div>
           </div>
         </div>
       </footer>
