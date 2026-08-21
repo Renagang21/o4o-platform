@@ -1,0 +1,281 @@
+# CHECK-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1
+
+**대상 WO**: WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1
+**기준 commit**: `d9ecc678a` (origin/main)
+**작성일**: 2026-08-21
+**결과**: **§9 `platform + serviceKey` 의미 확정 (선행 WO 중지 조건 해소)** · 코드 변경 0 (§17 환경 blocker)
+
+---
+
+## 0. 요약
+
+```text
+CMS read endpoint census      완료 (미조사 0)
+consumer census               완료 (미조사 0)
+visibilityScope 의미 census   완료 — 코드 근거로 확정
+§9 platform + serviceKey      확정: B. service-public (serviceKey 가 경계)
+
+코드 수정                     0  — 디스크 여유 96~102MB 로 검증 불가 (§17)
+production DB write           0
+```
+
+**이번 WO 의 실질 산출물**: 선행 CHECK(`…CMS-CONTENT-DETAIL-SERVICE-SCOPE-GUARD-V1` §9)가
+"정책 미확정" 으로 남긴 **중지 조건을 코드 근거로 해소**했다. 이제 구현 방향이 확정 가능하다.
+
+---
+
+## 1. CMS read endpoint census (WO §4) — 최신 main 재산출, 미조사 0
+
+mount: `app.use('/api/v1/cms', ...)`. read 성격 endpoint만 추림.
+
+| # | method/path | auth | serviceKey 입력 | organizationId | visibility filter | status filter | scope 강제 |
+|---|---|---|---|---|---|---|:---:|
+| 1 | `GET /cms/stats` | optionalAuth | query(선택) | query(선택) | — | — | ❌ |
+| 2 | `GET /cms/contents` | optionalAuth | **query(선택)** | query(선택) | query(선택) | 비인증=published 강제 | ❌ |
+| 3 | `GET /cms/contents/:id` | optionalAuth | **query(선택)** ※선행 WO 로 추가 | — | — | 비인증=published 강제 | ⚠️ opt-in |
+| 4 | `GET /cms/slots/:slotKey` | optionalAuth | query(선택) | query(선택) | — | activeOnly | ❌ |
+| 5 | `GET /cms/slots` | requireAuth + `requireSlotAccess` | slot scope | — | — | — | ✅ |
+
+### 1-1. 같은 `cms_contents` 를 읽는 **서비스별 wrapper (scope 강제됨)**
+
+| 경로 | scope 처리 | 근거 |
+|---|---|---|
+| `ContentQueryService.listPublished()` | `where.serviceKey = In(config.serviceKeys)` **항상 제한** | `content-query.service.ts:48` |
+| `HubContentService.queryCms()` | `where = { serviceKey, status:'published', visibilityScope: In(['platform','service']) }` | `hub-content.service.ts:270-274` |
+| GP / KCos `/{service}/contents/:id` | URL 에 서비스 축 존재 | 서비스별 라우트 |
+
+→ **경계를 강제하는 canonical read 경로는 이미 존재한다.** 강제하지 않는 것은 `/api/v1/cms/*` 공통 라우트뿐이다.
+
+---
+
+## 2. Consumer census (WO §5) — 미조사 0
+
+| caller | 분류 | 대상 endpoint | serviceKey 전달 | org context | cross-service 필요 |
+|---|---|---|:---:|:---:|:---:|
+| **PharmacyHub** `/resources` | SERVICE_MEMBER | 목록 + 상세 | ✅ (목록·상세 모두) | ❌ | ❌ |
+| **K-Cosmetics** `api/cms.ts` | SERVICE_MEMBER | 목록 · slot | ✅ (기본값 `'cosmetics'`) | ❌ | ❌ |
+| **admin-dashboard** `CMSContentList` | PLATFORM_ADMIN | 목록(전 서비스) + 상세 | ❌ | ❌ | ✅ **업무상 필요** |
+| GlycoPharm `api/cms.ts getContent` | — | 상세 | — | — | **dead (소비처 0)** |
+| KPA / Neture | — | `/cms/*` 호출 **0** | — | — | — |
+| 서비스별 wrapper (§1-1) | SERVICE_MEMBER / PUBLIC | 자체 route | 내부 강제 | — | ❌ |
+
+**핵심**: 상세(`/contents/:id`) 소비자 중 cross-service 가 필요한 것은 **admin-dashboard 하나**이며,
+그마저도 **목록 row 에서 `content.serviceKey` 를 이미 알고 있다**(`handleEdit(content)` → `getContent(content.id)`).
+→ 상세는 **관리자 예외 없이도** 서비스 스코프화가 가능하다.
+
+---
+
+## 3. Production visibility 데이터 census (WO §7) — read-only, 최신 재산출
+
+| serviceKey | visibilityScope | status | rows | organizationId |
+|---|---|---|---:|---|
+| glycopharm | service | draft | 63 | 전부 NULL |
+| glycopharm | platform | published | 2 | NULL |
+| glycopharm | service | archived | 1 | NULL |
+| **kpa** | platform | published | **1** | NULL |
+| **kpa-society** | platform | published | **53** | **32건 non-NULL** |
+| neture | platform | published | 3 | NULL |
+| neture | service | draft/archived | 3 | NULL |
+| **pharmacy-hub** | — | — | **0** | — |
+
+```text
+serviceKey IS NULL (global) 행: 0
+visibilityScope='organization' 행: 0        ← 모델엔 있으나 cms_contents 에는 미사용
+published 행: 전부 visibilityScope='platform'
+```
+
+**비정상 조합**: `visibilityScope='platform'` 인데 `organizationId` 가 채워진 kpa-society 32건.
+`organization` scope 를 쓰지 않으면서 org 를 기록한 상태다(§8-C 참조).
+
+---
+
+## 4. `visibilityScope` 실제 의미 (WO §6) — 이름이 아니라 코드로 확정
+
+### 4-1. 누가 설정하는가 (create 경로)
+
+`cms-content-mutation.handler.ts:150-154`
+
+```ts
+const authorRole      = isPlatformAdmin ? 'admin'    : 'service_admin';
+const visibilityScope = isPlatformAdmin ? (reqVisibilityScope || 'platform') : 'service';
+```
+
+- **같은 `isPlatformAdmin` 불리언에서 `authorRole` 과 함께 파생된다.**
+- service admin 은 `'service'` 로 **강제**되고 `serviceKey` 가 **필수**다.
+- 즉 `visibilityScope` 는 사실상 **"누가 만들었는가"(제작 주체) 축**이며 `authorRole` 과 1:1 이다.
+
+### 4-2. 어떻게 읽히는가 (read 소비처)
+
+| 소비처 | 처리 |
+|---|---|
+| `HubContentService.queryCms` | `serviceKey` **고정** + `visibilityScope: In(['platform','service'])` → **둘을 함께** 그 서비스 안에서 노출 |
+| `ContentQueryService.listPublished` | `serviceKey` **고정**, `visibilityScope` 는 **선택적 추가 필터**일 뿐 |
+| `/cms/contents`, `/cms/contents/:id` | `visibilityScope` 는 단순 query 필터, 경계 아님 |
+
+→ **어떤 read 경로도 `visibilityScope='platform'` 을 근거로 serviceKey 경계를 넘지 않는다.**
+
+---
+
+## 5. §9 최종 판정 — `platform + serviceKey`
+
+> ## **B. service-public** — `serviceKey` 가 경계다.
+> `visibilityScope` 는 **서비스 내부의 제작 주체/노출 축**이지 cross-service 공개 축이 아니다.
+
+| 값 | 확정된 의미 |
+|---|---|
+| `platform` | **플랫폼 운영자가 제작**한 콘텐츠 (`authorRole='admin'`). 노출 범위는 여전히 그 `serviceKey` 안 |
+| `service` | **서비스 운영자가 제작**한 콘텐츠 (`authorRole='service_admin'`) |
+| `organization` | `cms_contents` 에는 **사용되지 않음**(0건). KPA store content 쪽 별도 테이블이 DB CHECK 로 사용 |
+
+**근거 3종**
+1. **생성**: `visibilityScope` 가 `authorRole` 과 같은 불리언에서 파생 → 제작 주체 축 (§4-1)
+2. **소비**: canonical HUB 조회가 `serviceKey` 고정 + `platform`·`service` 를 **함께** 노출 (§4-2)
+3. **데이터**: `serviceKey IS NULL` 인 진짜 global 행이 **0건** — cross-service 공개 콘텐츠는 실재하지 않는다 (§3)
+
+→ 선행 WO 가 "`platform` 이 cross-service 공개를 뜻하는지 불명확" 으로 남긴 **중지 조건 해소**.
+→ 따라서 `/cms/contents*` 가 `serviceKey` 없이 전 서비스를 반환하는 현 동작은 **정책상 정당화되지 않는다.**
+
+---
+
+## 6. 확정된 read 계약 (WO §8·§10·§11·§12)
+
+§5 판정에 따라 아래가 canonical 이다. (구현은 §17 사유로 미적용)
+
+| 주체 | 계약 |
+|---|---|
+| **ANONYMOUS** | `serviceKey` 필요 · `status='published'` 만. `platform`/`service` 모두 그 서비스 안에서 노출 |
+| **SERVICE_MEMBER** | 자기 service context 안에서 `published`(+ 권한 시 draft). **serviceKey 생략으로 타 서비스 조회 불가** |
+| **PLATFORM_ADMIN** | cross-service 조회 유지. 단 **역할 기반 인가**(`isPlatformAdmin`, `authorizeCmsMutation` 과 동일 근거)로 허용하며 "파라미터 생략 = 관리자 모드" 로 구현하지 않는다 |
+| **ORGANIZATION** | `cms_contents` 에 0건이므로 이번 범위에서 **계약을 발명하지 않는다** (WO §14 준수) |
+
+### 6-1. canonical service context SSOT (WO §13·§20)
+
+새 헤더·새 mapping 을 만들 필요가 없다. 기존 축을 그대로 쓴다.
+
+```text
+query serviceKey            — 목록·상세 공통 (기존 계약)
+ContentQueryService.config  — 서비스별 serviceKeys 집합
+KPA alias                   — serviceKey IN ('kpa-society','kpa')
+                              (kpa-asset.resolver.ts:88 이 canonical 로 명시)
+```
+
+**KPA alias 영향(WO §20)**: read 에서 `kpa` 1건 + `kpa-society` 53건을 **한 집합으로** 다뤄야 한다.
+한쪽만 비교하면 콘텐츠가 사라지거나(1건 누락) 경계가 새는 방향 모두 가능하다.
+`ContentQueryService` 는 이미 alias 집합을 쓰고 있고, `/cms/contents*` 는 단일 문자열 비교라 **정렬 필요**.
+
+---
+
+## 7. list/detail invariant (WO §15) — 현재 상태
+
+```text
+목록: serviceKey 생략 시 전 서비스 반환   (경계 없음)
+상세: serviceKey 생략 시 전 서비스 반환   (경계 없음, 선행 WO 로 opt-in 만 추가)
+```
+
+→ 두 경로가 **같은 방식으로** 열려 있어 invariant 자체는 깨지지 않았으나,
+   **둘 다 닫혀야** WO §15 가 성립한다. 상세만 닫으면 목록이 남고, 목록만 닫으면 상세가 남는다.
+
+---
+
+## 8. 횡전개 (WO §24)
+
+| 대상 | 상태 |
+|---|---|
+| `GET /cms/slots/:slotKey` | `serviceKey` 선택 필터 — **동일 결함 축** |
+| `GET /cms/stats` | `serviceKey` 선택 필터 — 집계 수치가 전 서비스 합산될 수 있음 |
+| attachment/download 전용 endpoint | **없음** (`attachments` 는 content row 의 jsonb 필드) |
+| `content-assets` 라우트 | detail `:id` endpoint 없음 |
+| slot mutation (`PUT/DELETE /slots/:id`) | `requireSlotAccess` 가드 존재 |
+
+→ 함께 닫아야 할 것은 **`/cms/contents`(목록) · `/cms/contents/:id`(상세) · `/cms/slots/:slotKey` · `/cms/stats`** 4개다.
+
+---
+
+## 9. 실제 수정 내용
+
+**없음 (0건).** 사유는 §17.
+
+선행 WO(`d98533518`)에서 적용된 상세 opt-in scope 와 invalid UUID 404 정규화는 그대로 유지된다.
+이번 WO 는 그 위에 **정책 확정**만 얹었다.
+
+---
+
+## 10. 검증
+
+| 항목 | 결과 |
+|---|---|
+| 코드 변경 | 0 → 신규 테스트·build 대상 없음 |
+| 선행 CMS detail scope 테스트 | **12/12 PASS** (회귀 없음 확인, `--runInBand`) |
+| production read-only census | **수행** (§3, write 0) |
+| production API matrix (WO §22) · browser smoke (WO §23) | **미수행** — 코드 변경이 없어 회귀 대상이 없고, 환경 제약(§17) |
+
+---
+
+## 11. 정책 미해결 / GAP (WO §27 대조)
+
+```text
+CMS read endpoint census 미조사 0            ✅
+consumer census 미조사 0                     ✅
+visibility 데이터 census 완료                ✅
+platform/service/organization 계약 확정      ✅ (§5·§6) — organization 은 데이터 0 이라 발명 안 함
+anonymous/member/operator-admin 계약 확정    ✅ (§6)
+list/detail scope 동일                       ❌ 미구현 (§7)
+암묵적 serviceKey 생략 cross-service 제거     ❌ 미구현
+명시적 admin cross-service 계약 유지          ⏸ 설계 확정, 미구현
+invalid UUID 500 회귀 0                      ✅ (선행 WO 유지, 12/12)
+신규 API contract 0                          ✅ (기존 query 축만 사용하는 설계)
+schema/migration 0                           ✅
+production DB write 0                        ✅
+```
+
+### 11-1. 남은 구현 (설계는 확정됨)
+
+1. `/cms/contents` 목록 · `/cms/slots/:slotKey` · `/cms/stats` 에 `serviceKey` 경계 강제
+2. `/cms/contents/:id` 상세를 opt-in → **강제**로 전환하고 admin-dashboard 가 `content.serviceKey` 를 전달
+3. KPA alias 를 `IN ('kpa-society','kpa')` 로 정렬 (§6-1)
+4. PLATFORM_ADMIN cross-service 는 `isPlatformAdmin` **역할 근거**로 분기 (파라미터 생략 아님)
+
+### 11-2. 후속 부채 (WO §18·§25 — 이번에 건드리지 않음)
+
+| # | 내용 |
+|---|---|
+| 1 | `kpa-society` 콘텐츠 53건이 `authorizeCmsMutation` 의 alias 미정규화로 platform admin 외 수정 불가 |
+| 2 | `visibilityScope='platform'` + `organizationId` non-NULL 32건 — org 를 쓰지 않으면서 기록한 조합 (§3) |
+| 3 | GlycoPharm `api/cms.ts getContent` dead code |
+| 4 | `serviceKey='kpa'` 1건 — canonical `kpa-society` 로의 데이터 정합은 **migration 필요** → WO §25 에 따라 별도 보고 |
+
+---
+
+## 12. 중지 사유 (WO §26 아님 — 환경 제약)
+
+정책 판단은 §5 에서 **해소**됐다. 이번에 구현하지 못한 사유는 정책이 아니라 **작업 환경**이다.
+
+```text
+디스크 여유:  537MB → (jest 1회) → 96MB → (내 산출물 정리) → 102MB
+C: 전체:      223G / 223G 사용 (100%)
+```
+
+- `pnpm exec jest` **1회 실행에 약 440MB** 의 임시 공간을 쓴다. 현재 여유로는 **전체 회귀를 돌릴 수 없다.**
+- WO §27 은 `Jest/typecheck/build PASS` 를 완료 조건으로 요구한다 → **검증 불가 상태에서 read 경계를 바꾸는 것은
+  공개·관리자 계약을 깨뜨릴 위험이 크다**(§2 의 admin-dashboard·KCos·PH 소비처 전부 영향).
+- 따라서 **census 와 정책 확정까지만 확정 산출물로 남기고 구현은 분리**한다.
+- 내 작업 산출물(`c:/tmp/wo-viewdup`, 3MB)은 정리했다. 남은 사용량은 이번 세션과 무관하다.
+
+---
+
+## 13. DB / schema 영향
+
+**없음.** production read-only 조회만 수행했다.
+
+---
+
+## 14. 작업공간 (WO §3) — 편차 기록
+
+fresh worktree 를 요구했으나 **주 작업트리에서 수행**했다 — 디스크 여유 537MB→102MB 로 worktree + install 이 불가능하다.
+코드 변경이 0 이므로 격리 필요성은 낮았다. `git add .` 미사용 · 타 세션 WIP 미접촉 · path-specific stage 유지.
+
+---
+
+## 문서 정합
+
+발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건 (§11-1 구현 · §11-2 부채 4종)
