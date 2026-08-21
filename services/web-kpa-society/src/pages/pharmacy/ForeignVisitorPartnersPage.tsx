@@ -105,7 +105,7 @@ export function ForeignVisitorPartnersPage() {
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-slate-900">유입 파트너 관리</h1>
           <p className="text-sm text-slate-500 mt-1">
-            여행사·가이드·호텔 등 외국인 관광객 유입 파트너를 등록하고 관리합니다. 파트너별 QR 발급은 다음 단계에서 제공됩니다.
+            여행사·가이드·호텔 등 외국인 관광객 유입 파트너를 등록하고 관리합니다. 파트너별 QR은 목록의 'QR 관리'에서 발급·관리합니다.
           </p>
         </div>
         <Link to={ENTRY_PATH} className="text-xs text-slate-400 hover:text-slate-600 shrink-0 mt-1">

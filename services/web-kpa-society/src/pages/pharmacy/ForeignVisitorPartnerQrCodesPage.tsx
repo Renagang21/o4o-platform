@@ -333,7 +333,7 @@ function QrViewModal({ qr, onClose }: { qr: ForeignVisitorPartnerQrCode; onClose
             )}
           </div>
           <p className="text-[11px] text-slate-400 break-all text-center max-w-[260px]">{qr.landingUrl}</p>
-          <p className="text-[11px] text-slate-400 text-center">랜딩 화면은 다음 단계에서 연결됩니다.</p>
+          <p className="text-[11px] text-slate-400 text-center">스캔하면 위 주소의 외국인 고객 안내 화면으로 연결됩니다.</p>
           <div className="flex items-center gap-2">
             <button type="button" onClick={copy} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}{copied ? '복사됨' : 'URL 복사'}
