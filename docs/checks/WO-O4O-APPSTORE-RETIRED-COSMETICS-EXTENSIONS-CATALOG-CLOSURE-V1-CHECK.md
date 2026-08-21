@@ -138,20 +138,25 @@ installable count 정합: spec 에 하드코딩된 카탈로그 개수 단언은
 
 ## 10. Production 검증 (§12)
 
-배포 후 결과는 아래에 갱신한다.
+배포: `Deploy API Server (Cloud Run)` run `32439872493` **success** · `AppStore Guard` run `32439872316` **success** (commit `8d33e36cd`).
 
 | 항목 | 결과 |
 |---|---|
-| `GET /api/v1/appstore` | (배포 후 기재) |
-| retired 2개 노출 | (배포 후 기재) |
-| `cosmetics-seller-extension` 정상 | (배포 후 기재) |
-| 설치 API 신규 5xx | (배포 후 기재) |
-| `/health` · `/health/database` | (배포 후 기재) |
-| Cloud Run 신규 ERROR | (배포 후 기재) |
+| `GET /api/v1/appstore` | 200 · **17 apps** (배포 전 19) |
+| retired 2개 목록 노출 | **0** |
+| retired 2개 상세 `GET /api/v1/appstore/{id}` | **404** (배포 전 200 → 거짓 계약 해소) |
+| `cosmetics-seller-extension` | 목록 포함 · 상세 200 (회귀 없음) |
+| 대체 검증 앱 `market-trial` · `forum-cosmetics` | 둘 다 목록 포함 · 상세 200 |
+| `POST /install` (retired) | `App cosmetics-supplier-extension not found in catalog` — **카탈로그 게이트에서 차단**. 이전에는 `package not found in workspace`(모듈 로더 단계)였다 |
+| `/health` | 200 |
+| `/health/database` | `healthy` · pingMs 3 · version 15.17 |
+| Cloud Run 신규 ERROR | **1건 = 위 검증용 install 요청 자체**. 그 외 신규 ERROR **0** |
+
+> 미해결(범위 밖): `POST /install` 실패 응답이 여전히 **HTTP 500** 이다. 이는 `appstore.routes.ts` 가 모든 예외를 500 으로 매핑하는 기존 동작이며 이번 변경으로 생긴 신규 5xx 가 아니다(배포 전에도 500). 400/404 매핑은 후속 후보로 남긴다.
 
 ## 11. Git
 
-- commit: 본 문서와 함께 커밋
+- commit: `8d33e36cd` (코드+테스트+CHECK) · `(본 갱신 커밋)` (§10 배포 후 결과 기재)
 - push: main
 
 ## 12. 문서 정합
@@ -166,3 +171,4 @@ installable count 정합: spec 에 하드코딩된 카탈로그 개수 단언은
 3. `packages/cosmetics-seller-extension` 프론트엔드 페이지의 미마운트 API 호출 정리.
 4. `apps/admin-dashboard/src/pages/{cosmetics-sample,cosmetics-supplier}/` 미라우팅 페이지군 처리.
 5. `apps/main-site` 소스 잔존 여부 판단(Cloud Run 은 이미 폐기).
+6. `POST /api/v1/appstore/install` 의 실패 응답 상태코드 매핑(카탈로그 부재 → 400/404).
