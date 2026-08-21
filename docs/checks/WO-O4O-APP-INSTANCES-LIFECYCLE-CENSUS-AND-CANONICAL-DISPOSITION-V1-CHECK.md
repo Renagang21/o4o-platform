@@ -372,6 +372,34 @@ provisioning 의존 · migration 의미 불명 · UNKNOWN — **전부 미해당
 | admin-dashboard `type-check` | ✅ **에러 0** |
 | eslint (변경 파일 4개) | ✅ **error 0** / warning 5 — 전부 **기존 항목** (`currentBlocks`·`editMode`·`setEditMode`·`progress`·`editModes`), 본 변경과 무관 |
 
+### CI 결과 — 본 변경 기인 오류 0 (§18 별도 증명)
+
+`CI Pipeline` (run 32488018335, commit `d9ecc678a`) 이 **failure** 로 끝났다. 숨기지 않고 기록한다.
+
+```text
+Test Suites: 1 failed, 179 passed, 180 total
+Tests:       2 failed, 2894 passed, 2896 total
+
+PASS src/__tests__/app-instances-retirement.spec.ts        ← 본 WO 신규
+PASS src/routes/__tests__/appstore-auth-boundary.test.ts   ← App Store 회귀 가드
+FAIL src/__tests__/pharmacy-hub-community-capability-adoption.spec.ts
+  ● §14 navigation › /forum/request 가 공개 navigation 에 노출된다
+  ● §14 navigation › /forum/my-dashboard 가 공개 navigation 에 노출된다
+```
+
+**본 변경과 무관함을 실증한다** (CLAUDE.md 중지 조건 "현재 변경과 무관한 build·test 실패").
+
+| 증거 | 결과 |
+|---|---|
+| 본 commit 이 건드린 파일 9개 중 pharmacy-hub / forum 파일 | **0건** |
+| 실패 spec 이 읽는 입력 파일이 부모 `d98533518` → `d9ecc678a` 사이에 변경됐는가 | **0건** (`git diff --name-only` 빈 결과) |
+| 부모 commit `d98533518` 의 `services/web-pharmacy-hub/src/config/navigation.ts` 에 `forum/request`·`forum/my-dashboard` 존재 여부 | **0회** — 부모에서도 동일하게 실패 |
+| 본 WO 신규·회귀 테스트 CI 결과 | **PASS** |
+
+→ 입력이 하나도 바뀌지 않았으므로 이 spec 의 결과는 부모 commit 에서와 **논리적으로 동일**하다. **선행 실패(pre-existing)** 이며 `WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1` 계보의 미완 항목이다. 범위 외이므로 **수정하지 않고 보고**한다(§20 후속 후보 5).
+
+**clean deploy 성공**: Deploy API Server ✅ / Deploy Admin Dashboard ✅ / CodeQL ✅ — 3개 모두 `d9ecc678a` 에서 success.
+
 > 게이트 오탐 1건 처리: 신규 테스트가 `getInstance(` 를 금지어로 검사해 최초 1회 실패했다.
 > 확인 결과 **싱글턴 접근자 `static getInstance(): AppRegistryService`** 와의 명칭 충돌(오탐)이었다.
 > 저작을 우회하지 않고 **규칙을 `getInstance(appSlug` 시그니처로 좁힌 뒤**, 싱글턴 접근자는
@@ -398,7 +426,29 @@ Cloud Run ingress 가 `internal-and-cloud-load-balancing` 이라 `*.run.app` 직
 
 ### 배포 후
 
-<!-- POST_DEPLOY_VERIFICATION -->
+- commit `d9ecc678a` · Cloud Run revision **`o4o-core-api-03444-cd9`**
+- 워크플로: **Deploy API Server ✅ success** / **Deploy Admin Dashboard ✅ success** / **CodeQL ✅ success**
+
+| 항목 | 배포 전 | 배포 후 | 판정 |
+|---|---|---|---|
+| `/health` | 200 | **200** | 동일 |
+| `/health/database` | healthy | **healthy** (`pingMs:3`, `activeConnections:10`, `longRunningQueries:0`) | 동일 |
+| `/api/v1/appstore` | 200 | **200** (6,394 bytes) | 동일 |
+| `/api/v1/admin/apps` (미인증) | 401 | **401** | auth 경계 유지 |
+| `/api/v1/apps/availability` (미인증) | 401 | **401** | auth 경계 유지 |
+| `app_registry` rows | 6 | **6** | **불변** |
+| `app_instances` rows | 0 | **0** | 의도된 최종 상태 |
+| `apps` rows | 1 | **1** | 불변 |
+
+**신규 ERROR 0 / 신규 5xx 0** — 배포 시각(13:39Z) 이후 `severity>=ERROR` 로그 조회 결과 **0건**.
+
+```text
+gcloud logging read 'resource.type=cloud_run_revision AND
+  resource.labels.service_name=o4o-core-api AND severity>=ERROR AND
+  timestamp>="2026-08-21T13:39:00Z"' --limit 20   →   결과 없음
+```
+
+`app_registry` 6행이 배포 전후 동일하므로 **App Store 회귀 0** 이다.
 
 **App install/uninstall write 는 production 에서 수행하지 않았다** (§19 준수).
 **DB write 0** — 본 WO 의 모든 DB 접근은 SELECT 전용이었다.
@@ -433,6 +483,7 @@ Cloud Run ingress 가 `internal-and-cloud-load-balancing` 이라 `*.run.app` 직
 | 2 | drift table 일괄 schema-cleanup (`app_instances` · `app_usage_logs` 등) | 생성 migration 이력이 없는 테이블들의 rollback 계약 설계 후 일괄 DROP 판단 |
 | 3 | `AppRegistryService` 명칭 정정 (`AppService` 등) | `app_registry` 를 다루지 않는데 이름이 그렇게 읽힌다. 조사 혼동 유발 (NAME_COLLISION) |
 | 4 | `AppRegistryService.getUsageStats()` / `getByProvider()` / `getByCategory()` / `getAllActive()` 소비처 0 | `app_instances` 무관이라 본 WO 범위 밖. 별도 dead-code 판정 필요 |
+| 5 | **`pharmacy-hub-community-capability-adoption.spec.ts` §14 navigation 2건 선행 실패** | `services/web-pharmacy-hub/src/config/navigation.ts` 에 `/forum/request`·`/forum/my-dashboard` 항목 부재. `WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1` 계보. **main CI red 상태이므로 우선순위 높음** |
 
 ---
 
