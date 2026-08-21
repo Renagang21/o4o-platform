@@ -1,58 +1,20 @@
 /**
- * WO-O4O-APPSTORE-AUTHORIZATION-BOUNDARY-AUDIT-AND-HARDENING-V1
+ * WO-O4O-APPSTORE-DUAL-CONTRACT-CENSUS-AND-CANONICALIZATION-V1
+ * (선행: WO-O4O-APPSTORE-AUTHORIZATION-BOUNDARY-AUDIT-AND-HARDENING-V1)
  *
- * `/api/v1/appstore` 의 인증·인가 경계와 상태코드 계약을 고정한다.
+ * `/api/v1/appstore` 의 남은 계약을 고정한다.
  *
- * - 카탈로그 목록/상세 = PUBLIC_READ (비인증 200 / 없는 app 404)
- * - install·activate·deactivate·uninstall = PRIVILEGED_WRITE
- *   (비인증 401 / 인증됐지만 platform:super_admin 아님 403)
- * - GET /modules = 디버그 read 로 동일 가드 (CLAUDE.md §8)
- * - 카탈로그에 없는 app(은퇴 포함) install → 500 이 아니라 404
+ * - 카탈로그 목록/상세 = PUBLIC_READ (비인증 200 / 없는 app 404 / 상태 필드 미노출)
+ * - install·activate·deactivate·uninstall·GET /modules = 제거됨
+ *   → 라우트 미등록이므로 인증 여부와 무관하게 404 (401/403 을 강제하지 않는다)
+ *
+ * 상태 변경 정본은 `/api/v1/admin/apps` (authenticate + requireAdmin, app_registry) 이며,
+ * 인증 사용자용 활성 여부 read 는 `GET /api/v1/apps/availability` 다.
  */
 import express from 'express';
 import request from 'supertest';
 
-const ROLES: Record<string, string[]> = {
-  superadmin: ['platform:super_admin'],
-  'cosmetics-operator': ['cosmetics:operator'],
-  plain: [],
-};
-
-jest.mock('../../common/middleware/auth/authentication.middleware.js', () => {
-  const stub = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const id = req.headers['x-test-user'] as string | undefined;
-    if (!id) {
-      res.status(401).json({ success: false, code: 'AUTH_REQUIRED' });
-      return;
-    }
-    (req as unknown as { user: unknown }).user = { id, email: `${id}@test.local` };
-    next();
-  };
-  return { requireAuth: stub, authenticate: stub, authenticateToken: stub, authenticateCookie: stub };
-});
-
-jest.mock('../../modules/auth/services/role-assignment.service.js', () => ({
-  roleAssignmentService: {
-    hasAnyRole: jest.fn(async (userId: string, roles: string[]) =>
-      (ROLES[userId] ?? []).some((r) => roles.includes(r)),
-    ),
-    getActiveRoles: jest.fn(async (userId: string) => (ROLES[userId] ?? []).map((role) => ({ role }))),
-  },
-}));
-
-// module registry 스캔(파일시스템 glob)을 타지 않도록 실제 로더 대신 stub 을 쓴다.
-// AppStoreError 는 실제 구현을 그대로 사용해 status 매핑 계약을 검증한다.
-jest.mock('../../modules/module-loader.js', () => ({
-  moduleLoader: {
-    getModule: jest.fn(() => undefined),
-    getRegistry: jest.fn(() => new Map()),
-    getActiveModules: jest.fn(() => []),
-    loadAll: jest.fn(async () => undefined),
-    installModule: jest.fn(async () => undefined),
-  },
-}));
-
-const WRITE_ROUTES: Array<{ method: 'post' | 'delete'; path: string }> = [
+const RETIRED_ROUTES: Array<{ method: 'post' | 'delete'; path: string }> = [
   { method: 'post', path: '/api/v1/appstore/install' },
   { method: 'post', path: '/api/v1/appstore/activate' },
   { method: 'post', path: '/api/v1/appstore/deactivate' },
@@ -67,111 +29,93 @@ async function buildApp() {
   return app;
 }
 
-describe('WO-O4O-APPSTORE-AUTHORIZATION-BOUNDARY-AUDIT-AND-HARDENING-V1', () => {
+describe('WO-O4O-APPSTORE-DUAL-CONTRACT-CENSUS-AND-CANONICALIZATION-V1', () => {
   let app: express.Express;
 
   beforeAll(async () => {
     app = await buildApp();
   });
 
-  describe('공개 조회 (PUBLIC_READ) 는 유지된다', () => {
+  describe('공개 카탈로그 조회 (PUBLIC_READ) 는 유지된다', () => {
     it('비인증 목록 조회는 200', async () => {
       const res = await request(app).get('/api/v1/appstore');
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
       expect(Array.isArray(res.body.data)).toBe(true);
+      expect(res.body.total).toBe(res.body.data.length);
+      expect(Array.isArray(res.body.categories)).toBe(true);
     });
 
-    it('비인증 상세 조회는 200 (active app)', async () => {
+    it('비인증 상세 조회는 200', async () => {
       const res = await request(app).get('/api/v1/appstore/cosmetics-seller-extension');
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
+      expect(res.body.data.appId).toBe('cosmetics-seller-extension');
     });
 
-    it('존재하지 않는 app 상세는 404', async () => {
+    it('카탈로그에 없는 app 상세는 404', async () => {
       const res = await request(app).get('/api/v1/appstore/no-such-app-xyz');
       expect(res.status).toBe(404);
+      expect(res.body.success).toBe(false);
     });
 
-    it('은퇴한 app 상세는 404', async () => {
+    it('은퇴한 app(cosmetics-supplier-extension) 상세도 404', async () => {
       const res = await request(app).get('/api/v1/appstore/cosmetics-supplier-extension');
       expect(res.status).toBe(404);
     });
-  });
 
-  describe('상태 변경 (PRIVILEGED_WRITE) — 인증 경계', () => {
-    it.each(WRITE_ROUTES)('비인증 $method $path 는 401', async ({ method, path }) => {
-      const res = await request(app)[method](path).send({ appId: 'cosmetics-seller-extension' });
-      expect(res.status).toBe(401);
-    });
-
-    it.each(WRITE_ROUTES)('권한 없는 사용자의 $method $path 는 403', async ({ method, path }) => {
-      const res = await request(app)[method](path)
-        .set('x-test-user', 'plain')
-        .send({ appId: 'cosmetics-seller-extension' });
-      expect(res.status).toBe(403);
-    });
-
-    it.each(WRITE_ROUTES)('service operator 의 $method $path 도 403', async ({ method, path }) => {
-      const res = await request(app)[method](path)
-        .set('x-test-user', 'cosmetics-operator')
-        .send({ appId: 'cosmetics-seller-extension' });
-      expect(res.status).toBe(403);
-    });
-  });
-
-  describe('디버그 read — GET /modules', () => {
-    it('비인증은 401', async () => {
-      const res = await request(app).get('/api/v1/appstore/modules');
-      expect(res.status).toBe(401);
-    });
-
-    it('권한 없는 사용자는 403', async () => {
-      const res = await request(app).get('/api/v1/appstore/modules').set('x-test-user', 'plain');
-      expect(res.status).toBe(403);
-    });
-
-    it('platform:super_admin 은 200', async () => {
-      const res = await request(app).get('/api/v1/appstore/modules').set('x-test-user', 'superadmin');
+    it('search 필터가 동작한다', async () => {
+      const res = await request(app).get('/api/v1/appstore?search=forum');
       expect(res.status).toBe(200);
-      expect(res.body.success).toBe(true);
+      expect(res.body.data.length).toBeGreaterThan(0);
+    });
+
+    it('category 필터가 동작한다', async () => {
+      const res = await request(app).get('/api/v1/appstore?category=core');
+      expect(res.status).toBe(200);
+      expect(res.body.data.every((a: { category: string }) => a.category === 'core')).toBe(true);
+    });
+
+    it('응답에 ModuleLoader 파생 설치 상태 필드를 포함하지 않는다', async () => {
+      // 카탈로그 고유의 `status`(AppStatus: active/experimental 등 카탈로그 등재 상태)는
+      // 유지된다. 제거 대상은 ModuleLoader registry 에서 파생되던 **설치 상태** 필드다.
+      const res = await request(app).get('/api/v1/appstore');
+      expect(res.status).toBe(200);
+      for (const item of res.body.data) {
+        expect(item).not.toHaveProperty('installed');
+        expect(item).not.toHaveProperty('loadedAt');
+        expect(item).not.toHaveProperty('activatedAt');
+        expect(item.status).not.toBe('not_installed');
+      }
+    });
+
+    it('상세 응답에도 상태 필드가 없다', async () => {
+      const res = await request(app).get('/api/v1/appstore/partnerops');
+      expect(res.status).toBe(200);
+      expect(res.body.data).not.toHaveProperty('installed');
+      expect(res.body.data).not.toHaveProperty('moduleDetails');
+      expect(res.body.data.status).not.toBe('not_installed');
     });
   });
 
-  describe('상태코드 계약 (관리자 인증 후)', () => {
-    it.each(WRITE_ROUTES)('appId 누락 $method $path 는 400', async ({ method, path }) => {
-      const res = await request(app)[method](path).set('x-test-user', 'superadmin').send({});
-      expect(res.status).toBe(400);
+  describe('제거된 write 계약은 라우트가 존재하지 않는다', () => {
+    it.each(RETIRED_ROUTES)('$method $path → 404', async ({ method, path }) => {
+      const res = await request(app)[method](path).send({ appId: 'partnerops' });
+      expect(res.status).toBe(404);
     });
 
-    it('카탈로그에 없는 app install 은 404 (500 아님)', async () => {
-      const res = await request(app)
-        .post('/api/v1/appstore/install')
-        .set('x-test-user', 'superadmin')
-        .send({ appId: 'no-such-app-xyz' });
-      expect(res.status).toBe(404);
-      expect(res.body.code).toBe('APP_NOT_IN_CATALOG');
+    it.each(RETIRED_ROUTES)('$method $path 는 401/403 을 반환하지 않는다', async ({ method, path }) => {
+      const res = await request(app)[method](path).send({ appId: 'partnerops' });
+      expect([401, 403]).not.toContain(res.status);
     });
+  });
 
-    it('은퇴한 app install 은 404 (500 아님)', async () => {
-      const res = await request(app)
-        .post('/api/v1/appstore/install')
-        .set('x-test-user', 'superadmin')
-        .send({ appId: 'cosmetics-supplier-extension' });
+  describe('제거된 디버그 read (GET /modules)', () => {
+    it('GET /api/v1/appstore/modules 는 module registry 를 노출하지 않는다', async () => {
+      const res = await request(app).get('/api/v1/appstore/modules');
+      // `/:appId` 로 매칭되지만 카탈로그에 'modules' 가 없으므로 404 다.
       expect(res.status).toBe(404);
-      expect(res.body.code).toBe('APP_NOT_IN_CATALOG');
-    });
-
-    it.each([
-      { path: '/api/v1/appstore/activate', method: 'post' as const },
-      { path: '/api/v1/appstore/deactivate', method: 'post' as const },
-      { path: '/api/v1/appstore/uninstall', method: 'delete' as const },
-    ])('설치되지 않은 app 의 $path 는 404 (500 아님)', async ({ method, path }) => {
-      const res = await request(app)[method](path)
-        .set('x-test-user', 'superadmin')
-        .send({ appId: 'cosmetics-seller-extension' });
-      expect(res.status).toBe(404);
-      expect(res.body.code).toBe('APP_NOT_INSTALLED');
+      expect(res.body).not.toHaveProperty('activeCount');
     });
   });
 });

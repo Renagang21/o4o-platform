@@ -23,7 +23,7 @@ import {
   isAppAvailableForService,
   getAppsForServiceGroupWithDependencies,
 } from '../app-manifests/appsCatalog.js';
-import type { AppModule, ModuleRegistryEntry } from '../modules/types.js';
+import type { AppModule } from '../modules/types.js';
 import type {
   AppCatalogItem,
   ServiceGroup,
@@ -244,21 +244,9 @@ export class AppStoreService {
     return moduleLoader.getActiveModules();
   }
 
-  /**
-   * Get app details
-   *
-   * @param appId - App identifier
-   * @returns Combined catalog info and module status
-   */
-  getAppDetails(appId: string): {
-    catalog: AppCatalogItem | undefined;
-    module: ModuleRegistryEntry | undefined;
-  } {
-    return {
-      catalog: getCatalogItem(appId),
-      module: moduleLoader.getModule(appId)
-    };
-  }
+  // getAppDetails() 는 제거됐다 (WO-O4O-APPSTORE-DUAL-CONTRACT-CENSUS-AND-CANONICALIZATION-V1).
+  //   유일한 소비처였던 `GET /api/v1/appstore/:appId` 가 정적 카탈로그 read 로 축소되며
+  //   ModuleLoader registry 파생 상태를 더 이상 노출하지 않는다.
 
   /**
    * Check if app is installed
