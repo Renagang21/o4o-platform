@@ -20,6 +20,15 @@ import {
   mapCmsStatus,
 } from '@o4o/types';
 
+/**
+ * WO-O4O-CMS-CONTENT-DETAIL-SERVICE-SCOPE-GUARD-V1:
+ *   상세 조회에 잘못된 형식의 id 가 오면 Postgres 가 `invalid input syntax for type uuid` 로 던져
+ *   500 + DB 원문이 그대로 노출됐다. 형식 검증 후 **기존 canonical 404** 로 정규화한다
+ *   (존재 여부를 구분해 노출하지 않는 기존 정책과 동일한 응답).
+ *   기존 컨트롤러들과 같은 관례를 쓴다 (BranchServiceMembershipController 등).
+ */
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export function createCmsContentQueryRoutes(deps: {
   dataSource: DataSource;
 }): Router {
@@ -261,10 +270,29 @@ export function createCmsContentQueryRoutes(deps: {
   router.get('/contents/:id', optionalAuth, async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
+      // WO-O4O-CMS-CONTENT-DETAIL-SERVICE-SCOPE-GUARD-V1:
+      //   목록(GET /contents)과 **동일한 기존 query 계약**(`serviceKey`)을 상세에서도 인정한다.
+      //   신규 파라미터·헤더를 만들지 않는다. 주어지면 DB 조회 자체를 그 서비스로 제한하고,
+      //   주어지지 않으면 기존 동작(공개 published 조회 · admin cross-service)을 그대로 유지한다.
+      const { serviceKey } = req.query;
       const contentRepo = dataSource.getRepository(CmsContent);
 
+      // 잘못된 UUID 는 DB 까지 보내지 않고 canonical 404 로 응답한다 (DB 오류 원문 노출 금지).
+      if (!UUID_REGEX.test(id)) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'Content not found' },
+        });
+        return;
+      }
+
+      const detailWhere: Record<string, unknown> = { id };
+      if (serviceKey) {
+        detailWhere.serviceKey = serviceKey as string;
+      }
+
       const content = await contentRepo.findOne({
-        where: { id },
+        where: detailWhere,
       });
 
       // WO-O4O-CMS-PUBLIC-VISIBILITY-HARDENING-V1:

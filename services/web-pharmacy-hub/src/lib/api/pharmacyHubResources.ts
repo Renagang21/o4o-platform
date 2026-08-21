@@ -93,7 +93,12 @@ export async function listPharmacyHubResources(
 export async function getPharmacyHubResource(id: string): Promise<CmsContentItem> {
   let body: any;
   try {
-    const res = await api.get(`${BASE}/${encodeURIComponent(id)}`);
+    // WO-O4O-CMS-CONTENT-DETAIL-SERVICE-SCOPE-GUARD-V1:
+    //   목록과 동일하게 상세에도 serviceKey 를 보낸다. 서버가 **조회 자체를** 이 서비스로 제한하므로
+    //   타 서비스 UUID 는 404 가 된다(아래 클라이언트 검사는 방어층으로 남긴다).
+    const res = await api.get(`${BASE}/${encodeURIComponent(id)}`, {
+      params: { serviceKey: SERVICE_KEY },
+    });
     body = res.data;
   } catch {
     throw new Error('PH_RESOURCE_DETAIL_FAILED');
