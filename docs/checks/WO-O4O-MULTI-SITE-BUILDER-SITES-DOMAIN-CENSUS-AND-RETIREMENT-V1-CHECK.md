@@ -262,7 +262,33 @@ sites ≠ branch_sites
 
 ### 배포 후
 
-<!-- FILLED_AFTER_DEPLOY -->
+커밋 `173948bab` · CI `Deploy API Server (Cloud Run)` run `32455275270` **success** ·
+신규 리비전 **`o4o-core-api-03437-csb`** (100% 트래픽) · 검증 시각 2026-08-21T06:53~06:56Z.
+
+| 항목 | 실측 | 판정 |
+|---|---|---|
+| Cloud Run 부팅 (entity 등록 제거 후 TypeORM) | 신규 리비전 Ready, `/health` `uptime` 85s 정상 기동 | PASS |
+| `GET /health` | **200** `{"status":"alive","environment":"production"}` | PASS |
+| `GET /health/database` | **200** `status:"healthy"`, `pingMs` 4, `activeConnections` 10, `longRunningQueries` 0 | PASS |
+| `GET /api/v1/service/templates` (미인증) | **401** `AUTH_REQUIRED` | PASS (가드 정상) |
+| `GET /api/v1/service/templates` (로그인 후) | **403** `Admin privileges required` | PASS (라우터 살아 있음 · 500 아님) |
+| `GET /api/v1/service-admin/templates` (미인증 / 로그인 후) | **401** / **403** | PASS |
+| `GET /api/v1/appstore` | **200** `success:true`, 앱 목록 정상 반환 | PASS |
+| 로그인 `POST /api/v1/auth/login` (`serviceKey=neture`) | **200**, `accessToken`·`refreshToken` 쿠키 발급, `/api/v1/auth/status` **200** `authenticated:true` | PASS |
+| Cloud Run 신규 ERROR | 신규 리비전 로그 `severity>=ERROR OR httpRequest.status>=500` **0건** | PASS |
+| `sites` relation 오류 | 신규 리비전 로그에 `sites`/`Site` 매칭 **0건** | PASS |
+| 신규 5xx | **0건** (위 쿼리에 포함) | PASS |
+
+검증 한계(숨기지 않고 기록):
+
+- `/service/templates` · `/service-admin/templates` 는 `platform:super_admin` 급 권한을 요구한다.
+  `docs/local/TEST-ACCOUNTS.local.md` 에 해당 계정(`renariver21@gmail.com` · `super-admin@o4o.com`) 의
+  비밀번호가 없어 **200 본문까지는 확인하지 못했다.** 미인증 401 → 로그인 후 403 전이로
+  "라우터가 mount 돼 있고 가드까지 도달하며 `sites` 관련 500 이 아니다" 까지만 확증했다.
+  이번 WO 의 위험(entity 등록 제거로 인한 부팅/스키마 오류)은 이 범위에서 배제된다.
+- 로그 조회 창은 신규 리비전 `o4o-core-api-03437-csb` 기준 `--freshness=1h` 이다.
+  동일 쿼리에서 리비전 로그 자체는 정상 반환되므로 빈 결과는 필터 오류가 아니다(sanity 확인 완료).
+
 
 ---
 
