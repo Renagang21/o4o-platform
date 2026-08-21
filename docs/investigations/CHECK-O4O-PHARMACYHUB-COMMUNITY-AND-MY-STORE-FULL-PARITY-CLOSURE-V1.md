@@ -101,13 +101,43 @@ PH 가 A 가 아니라 B 위에 있다는 뜻이다. KPA 3서비스는 회원 �
 
 | capability | 상태 | 비고 |
 |---|---|---|
-| 운영자 Content 관리 | **MISSING_ADOPTION** | PH `operatorMenuGroups` 에 `content` 키가 이미 선언돼 있으나 route/page 없음 → **현재 dead navigation** |
-| 운영자 Resources 관리 | **MISSING_ADOPTION** | 동일 (`resources` 키 선언, route 없음) |
+| 운영자 Content 관리 | **MISSING_ADOPTION** | route/page 없음 |
+| 운영자 Resources 관리 | **MISSING_ADOPTION** | route/page 없음 |
 
-공통 모듈은 존재한다 — `@o4o/operator-core-ui/modules/operator-content-hub`, `.../modules/resources`
-(`OperatorResourcesConsolePage`). KCos 가 이미 소비 중이라 채택 경로는 확인됐다.
-다만 KCos client 는 `{service}_contents` API 를, PH 는 `cms_contents` API 를 쓰므로
-**CMS 기반 `ResourcesConsoleClient` / `ContentHubClient` adapter 작성이 필요**하다. 미착수.
+#### 정정 — "dead navigation" 서술은 틀렸다
+
+이전 판(§4-1)은 `operatorMenuGroups` 에 `content`/`resources` 키가 있으니 **dead navigation** 이라고 적었다.
+**사실이 아니다.** 그 키들은 `PHARMACY_HUB_GROUP_TO_DOMAIN` / `..._DOMAIN_GROUP_ORDER` 에만 있고
+`UNIFIED_MENU` 에는 항목이 없다. 같은 파일 주석이 근거다 —
+*"STANDARD_GROUPS 의 13 key 전부를 매핑한다(부분 매핑 시 그룹이 사라진다). 현재 UNIFIED_MENU 에
+없는 그룹은 항목 0 이라 sidebar 에서 skip 된다."*
+
+→ **dead navigation 0.** 순수 미채택(MISSING_ADOPTION)이다.
+
+#### 채택 blocker — 두 원장의 lifecycle 이 다르다 (신규 확인)
+
+공통 모듈은 존재하고(`@o4o/operator-core-ui/modules/{operator-content-hub,resources}`) KCos 가 소비 중이다.
+그러나 **PH 는 그대로 붙일 수 없다.**
+
+| 축 | 공통 콘솔 전제 (`{service}_contents`) | PH 실제 (`cms_contents`) |
+|---|---|---|
+| status | `draft \| published \| private` | `draft \| pending \| published \| archived` (4-stage) |
+| 전이 | 자유 | `draft→pending\|archived` · `pending→published\|draft` · `published→archived` · `archived` terminal |
+| 삭제 | `operatorDelete` 필요 | **DELETE endpoint 없음** (`POST /contents` · `PUT /contents/:id` · `PATCH /contents/:id/status` 뿐) |
+| 필드 | `source_type`/`usage_type`/`reusable_policy` | 없음 — `attachments`/`linkUrl` 에서 파생해야 함 |
+
+근거: `cms-content.service.ts:22` `CMS_ALLOWED_TRANSITIONS` · `cms-content-mutation.handler.ts` route 목록.
+
+`ResourcesConsoleClient` 는 `operatorList` · `operatorUpdateStatus(id, 'draft'|'published'|'private')` ·
+`operatorDelete` 를 요구한다. PH 에 그대로 매핑하면 **UI 가 존재하지 않는 상태값을 노출하고
+불법 전이가 400 으로 떨어지며 삭제 버튼이 dead CTA** 가 된다.
+
+**필요한 조치**: 공통 콘솔을 generic 하게 확장한다 —
+status 목록·허용 전이·삭제 capability 를 config 로 받고 미제공 시 해당 UI 를 숨긴다.
+서비스 분기(`if service === 'pharmacy-hub'`)는 금지. 다만 이 컴포넌트는 **KPA/GP/KCos 3서비스가
+이미 소비 중**이라 확장 후 3서비스 회귀 확인이 함께 필요하다.
+
+→ 이번 세션에서는 착수하지 않았다(§7-6 참조). **다음 착수 1순위.**
 
 ### 4-2. 내 매장 (grep 실측 — PH 0 / KPA 보유)
 
@@ -191,8 +221,8 @@ P2: 6
 
 ## 7. 잔존 위험
 
-1. **운영자 Content/Resources 가 dead navigation** — `operatorMenuGroups` 에 키만 선언돼 있고 route 가 없다.
-   WO §21(dead link 0)에 위배되므로 **다음 착수 1순위**.
+1. **운영자 Content/Resources 미채택** — dead navigation 은 아니다(§4-1 정정). 채택하려면 공통 콘솔의
+   status/전이/삭제 계약을 generic 확장해야 하고, KPA/GP/KCos 3서비스 회귀가 함께 필요하다. **다음 착수 1순위.**
 2. **회원 콘텐츠 작성 부재** — KPA/GP/KCos 3서비스는 회원 작성형이 실재하고 PH 는 읽기 전용이다.
    §3-2 의 선택지 1/2 중 판정이 필요하며(3은 배제), 판정 전까지 parity gap 으로 계상한다.
 3. **내 매장 9개 축 미착수** — 각 항목 §14 판정(active/필요/shared Core) 자체가 아직 없다.
@@ -224,17 +254,27 @@ production verification = NOT_PERFORMED (ENVIRONMENT_UNVERIFIED)
 ```text
 worktree : C:/tmp/o4o-ph-parity   (clean)
 branch   : work/ph-parity-closure (main 미병합)
-resume   : 6502904ce
+resume   : 90c67a1b1  (origin/main a0f8cc48c 머지 완료)
 canonical: cms_contents + serviceKey  — pharmacy_hub_contents 신규 테이블/migration 금지
 ```
 
-시작 시 최신 `origin/main` 진행분을 확인해 충돌 없이 동기화하고, **기존 구현을 재작성하지 않는다.**
+`origin/main` 동기화는 **완료했다**(§9-1). **기존 구현을 재작성하지 않는다.**
+
+### 9-1. main 머지 결과
+
+`a0f8cc48c refactor(ui): remove unused global header children contract` 를 머지했다.
+`services/web-pharmacy-hub/src/config/navigation.ts` 1건 충돌 — **main 채택**으로 해소했다.
+
+main 이 `GlobalHeaderNavItem.children` 계약을 플랫폼 전역에서 제거했다(공통 GlobalHeader 에 submenu
+렌더러가 없어 한 번도 렌더된 적 없음). 이전 세션이 `children` 안에 넣었던 콘텐츠 링크는 그대로 두면
+**렌더되지 않는 dead entry** 가 되므로 제거하고, 실제로 렌더되는 **Footer '서비스' 섹션**의
+콘텐츠 진입점만 유지했다(해당 라인은 충돌 없이 살아남았다).
 
 ### 실행 순서 (중간 완료 선언 없이 잔여 전체를 연속 처리)
 
-1. PH 운영자 Content/Resources **dead navigation 해소** + canonical CMS adapter 채택
-   (`@o4o/operator-core-ui/modules/operator-content-hub` · `.../modules/resources`,
-    PH 는 `cms_contents` API 라 CMS 기반 console client adapter 필요)
+1. PH 운영자 Content/Resources 채택 — **공통 콘솔 generic 확장 선행 필요**
+   (status 목록·허용 전이·삭제 capability 를 config 화. §4-1 blocker 참조.
+    확장 후 KPA/GP/KCos 3서비스 회귀 확인 필수)
 2. 회원 Content create/edit — §3-2 선택지 1/2 판정 후 필요하면 공통 권한 모델로 **안전하게** 구현
 3. My Store 잔여 9개 축 §14 전수 판정 → 필요한 capability 전부 채택
 4. Signage partial flow 완결
