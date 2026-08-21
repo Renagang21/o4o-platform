@@ -2,7 +2,7 @@
 
 - **WO**: `docs/work-orders/WO-O4O-KPA-PLATFORM-FOOTER-LEGAL-CONTRACT-ADOPTION-V1.md`
 - **실행일**: 2026-08-21
-- **기준점**: `HEAD == origin/main == e42b48115`
+- **기준점**: 작업 시작 시 `HEAD == origin/main == e42b48115` · push 시 origin/main 이 `2a3815c3f` 로 선행하여 rebase 후 재push (최종 commit `d783843f2`)
 - **범위**: KPA `PlatformFooter` 의 법정 링크 계약 복구 (**Header/Footer 전체 공통화 아님**)
 - **판정**: PASS (browser smoke 는 **로컬 preview 빌드 기준** — 프로덕션 미배포, 아래 §9 참조)
 
