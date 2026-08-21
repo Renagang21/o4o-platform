@@ -171,17 +171,84 @@ WO 명시 제외 대상(매장 HUB · 거래 개입) 및 PH 에 대응 도메인
 |------|------|
 | `pnpm --filter pharmacy-hub-web build` (`tsc -b && vite build`) | PASS |
 | `pnpm --filter @o4o/api-server type-check` | PASS |
-| 프로덕션 브라우저 E2E | §7 |
+| 프로덕션 브라우저 E2E | PASS — §7 |
+| KPA 공통 화면 회귀 | PASS — §7-5 |
 
 ---
 
 ## 7. 브라우저 E2E (프로덕션)
 
-_배포 후 기록._
+계정 `sohae2100@gmail.com` (`pharmacy-hub:operator` + `pharmacy-hub:admin`), `https://pharmacyhub.co.kr`.
+검증 시점 커밋: web `7e0e313db` (Deploy Web Services success) · api `c6983a670`(= `7184aba3f` 포함, Deploy API Server success).
+
+### 7-1. 화면 전수 (deep link + 하드 새로고침)
+
+| Route | 결과 |
+|-------|------|
+| `/operator` | KPI 5(가입 대기 0 · 승인 8 · 반려 1 · 포럼 신청 0 · 삭제 요청 0) · Action Queue 비어 있음 · Recent Activity 8건 전부 pharmacy-hub |
+| `/operator/memberships` | 9행 · 승인/반려/전체 탭 정상 |
+| `/operator/members` | 9행(전체 9 / 활성 8 / 반려 1 / 가입 신청 0) · 가입 신청 탭 1개 |
+| `/operator/forum` | 정상 empty state (총 포럼 0 · 게시글 0) |
+| `/operator/forum-requests` | 정상 empty state |
+| `/operator/forum-categories` | 정상 empty state ("승인된 포럼이 여기에 표시됩니다") |
+| `/operator/forum-delete-requests` | 정상 empty state · 상태 탭 4개 |
+| `/operator/forum-analytics` | 정상 empty state · 지표 6개 0 |
+| `/operator/analytics` | 액션 24건 · 전부 pharmacy-hub(`member_*` / `service_legal:*`) |
+| `/operator/roles` | pharmacy-hub 역할 4개만 · 서비스 선택 필터 미노출 |
+| `/operator/does-not-exist-xyz` | 서비스 404 페이지(요청 경로 표기 + 홈/뒤로) |
+
+### 7-2. 완료 기준
+
+| 기준 | 결과 |
+|------|:---:|
+| 필요 capability 메뉴 누락 | 0 |
+| dead link | 0 |
+| placeholder · "준비 중" | 0 |
+| white screen | 0 |
+| JS exception (console error) | 0 |
+| 예상치 못한 404 · 500 | 0 |
+
+### 7-3. 반응형
+
+- desktop 1440×900 — 사이드바 고정, 3 그룹 + 포럼 하위 5개 정상.
+- mobile 390×844 — 햄버거(`운영자 메뉴`) 드로어로 전환, 전 메뉴/포럼 하위 5개 접근 가능, `scrollWidth == clientWidth`(가로 스크롤 0).
+
+### 7-4. 안전 write E2E
+
+`[E2E_TEST] W9 약국장`(픽스처 계정) 대상 회원 상태 write 왕복.
+
+| 단계 | 결과 |
+|------|------|
+| 회원 상세 모달 → `비활성화` | 200 · 활성 8→7 · 행 상태 `정지` · membership `pharmacy-hub · suspended` |
+| 모달 → `활성화` | HTTP 200 이지만 **상태 미변경** (아래 D3) |
+| 상태 원복 (`pending` → `approved`, 동일 운영자 endpoint) | 활성 7→8 · 행 상태 `활성` — **검증 전 상태로 완전 복구** |
+
+→ write 경로(권한·serviceScope·audit)는 실제 동작 확인. 원복 완료로 프로덕션 잔여 변경 0.
+
+### 7-5. KPA 회귀 (공통 모듈 변경 영향)
+
+| KPA 화면 | 결과 |
+|---------|------|
+| `/operator/analytics` | 정상 · KPA 액션 2건만 (serviceKey `kpa-society` 축소 결과 동일) |
+| `/operator/members` | 정상 · KPA 6명 · 약사/약대생 탭 · 액션 컬럼 등 KPA 고유 UX 유지 |
+| `/operator/roles` | 정상 · 19개 + 서비스 선택 필터 유지 (`lockedServiceKey` 미전달 → 종전 동작) |
+
+→ View / 기능 회귀 0.
+
+---
+
+## 7-A. 검증 중 확정된 결함과 처리
+
+| # | 결함 | 근본 원인 | 처리 |
+|---|------|-----------|------|
+| D1 | `/operator/members` · `/operator/analytics/actions` 에 **타 서비스 데이터 혼입** (회원 16명 중 neture/kpa-society/k-cosmetics 7명, 로그에 `glycopharm.*`) | `resolveOperatorScope` 의 비-platform-admin 분기가 `query.serviceKey` 를 전혀 읽지 않음 (F6 Boundary Rule 3 위반) | `serviceScope.ts` 에서 **좁히기 전용** 해석 추가 (`7184aba3f`). 보유 scope 밖 키는 빈 scope. 프로덕션 재검증: 회원 9 · 액션 24 로 정상화 |
+| D2 | `/operator/members` 에 `가입 신청` 탭 2개 | 공통 콘솔이 built-in `pending` 탭을 항상 덧붙이는데 wrapper 가 중복 선언 | wrapper 에서 `status-pending` 제거 (`7184aba3f`) |
+| D3 | 회원 상세 모달 `활성화` 버튼이 **동작하지 않음**(200 · 무변화 · 토스트 없음) | 공통 `MembershipConsoleController.updateMemberStatus` 의 `approved` 분기가 `status IN ('pending','rejected')` membership 만 조회 — `suspended` 는 대상 밖. `비활성화`→`활성화` 왕복 불가 | **본 WO 범위 밖(4개 서비스 공유 backend 계약)** — 미수정, 별도 WO 제안. 우회 경로(`pending`→`approved`)는 존재 |
+| D4 | 공통 `RoleManagementPage` 의 `SERVICE_OPTIONS` 가 role prefix(`kpa`,`cosmetics`) 값을 쓰는데 backend 는 canonical key(`kpa-society`,`k-cosmetics`) 와 비교 | 기존 잠재 결함 (본 WO 이전부터) | 미수정 · 보고만. Pharmacy-Hub 는 `lockedServiceKey` 로 우회 |
 
 ---
 
 ## 8. 문서 정합
 
-발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 4건
-(`NOT_IMPLEMENTED` ①③⑤ 공통 콘텐츠 테이블화 · ④ surveys service scope · ② KPA community manage 공통화 · ⑦ 공통 감사 로그 라우트)
+발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 6건
+(`NOT_IMPLEMENTED` ①③⑤ 공통 콘텐츠 테이블화 · ④ surveys service scope · ② KPA community manage 공통화 · ⑦ 공통 감사 로그 라우트 · §7-A D3 suspended 재활성화 계약 · §7-A D4 `SERVICE_OPTIONS` canonical key)
