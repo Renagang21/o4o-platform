@@ -30,6 +30,24 @@ function detectVideoSourceType(url: string): { sourceType: 'youtube' | 'vimeo'; 
   });
 }
 
+// WO-O4O-SIGNAGE-FORCED-CONTENT-DELETE-NOT-FOUND-NORMALIZATION-V1
+//
+// TypeORM(postgres) 의 `query()` 는 UPDATE/DELETE 명령에 한해 결과를
+// `[rows, affectedRowCount]` 형태로 반환한다 (PostgresQueryRunner: raw.command 가
+// UPDATE/DELETE 면 result.raw = [raw.rows, raw.rowCount]).
+// 그래서 `RETURNING` 결과를 그대로 rows 배열로 취급하면 length 가 항상 2 가 되어
+// "대상 없음"(0행) 판정이 성립하지 않는다. 여기서 rows 와 affected 를 분리한다.
+// SELECT/INSERT 는 rows 배열을 그대로 돌려주므로 두 형태 모두 허용한다.
+function readWriteResult<T = any>(raw: unknown): { rows: T[]; affected: number } {
+  if (Array.isArray(raw) && Array.isArray(raw[0])) {
+    const rows = raw[0] as T[];
+    const affected = Number(raw[1] ?? rows.length);
+    return { rows, affected: Number.isFinite(affected) ? affected : rows.length };
+  }
+  const rows = (Array.isArray(raw) ? raw : []) as T[];
+  return { rows, affected: rows.length };
+}
+
 // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 노출 대상(디지털 사이니지/태블릿/둘 다)
 const VALID_TARGET_SURFACES = ['signage', 'tablet_idle', 'both'];
 
@@ -227,7 +245,7 @@ export class SignageForcedContentController {
         return;
       }
 
-      const rows = await this.dataSource.query(
+      const raw = await this.dataSource.query(
         `UPDATE signage_forced_content
          SET ${sets.join(', ')}
          WHERE id = $1 AND service_key = $2 AND deleted_at IS NULL
@@ -248,7 +266,9 @@ export class SignageForcedContentController {
         params,
       );
 
-      if (rows.length === 0) {
+      // WO-O4O-SIGNAGE-FORCED-CONTENT-DELETE-NOT-FOUND-NORMALIZATION-V1: 0행 = 대상 없음
+      const { rows, affected } = readWriteResult(raw);
+      if (affected === 0 || rows.length === 0) {
         res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Forced content not found' } });
         return;
       }
@@ -268,7 +288,7 @@ export class SignageForcedContentController {
       const serviceKey = getSignageServiceKey(req);
       const { id } = req.params;
 
-      const rows = await this.dataSource.query(
+      const raw = await this.dataSource.query(
         `UPDATE signage_forced_content
          SET deleted_at = NOW(), updated_at = NOW()
          WHERE id = $1 AND service_key = $2 AND deleted_at IS NULL
@@ -276,7 +296,9 @@ export class SignageForcedContentController {
         [id, serviceKey],
       );
 
-      if (rows.length === 0) {
+      // WO-O4O-SIGNAGE-FORCED-CONTENT-DELETE-NOT-FOUND-NORMALIZATION-V1: 0행 = 대상 없음
+      const { rows, affected } = readWriteResult(raw);
+      if (affected === 0 || rows.length === 0) {
         res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Forced content not found' } });
         return;
       }
