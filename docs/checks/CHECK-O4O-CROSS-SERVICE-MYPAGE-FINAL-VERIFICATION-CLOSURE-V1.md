@@ -11,8 +11,8 @@
 | 항목 | 값 |
 |---|---|
 | 검증 기준 commit | `dc32baf7a` (= 검증 시작 시점 `origin/main`) |
-| 본 WO 수정 commit | KPA MembershipGate dead nav 제거 (아래 §14) |
-| 본 WO 문서 commit | 본 CHECK + 선행 CHECK 정합화 (아래 §14) |
+| 본 WO 수정 commit | `807f3c5d4` — KPA MembershipGate dead nav 제거 |
+| 본 WO 문서 commit | `7b63a676a` — 본 CHECK 신규 + 선행 CHECK 정합화 |
 
 | Cloud Run 서비스 | 검증 시점 latest ready revision |
 |---|---|
@@ -286,8 +286,9 @@ WO §18 대응:
 
 | 항목 | 값 |
 |---|---|
-| 수정 commit | `fix(kpa-society): MembershipGate 가입 신청 CTA dead navigation 제거` |
-| CHECK 문서 commit | 본 CHECK 신규 + 선행 CHECK 상태 정합화 |
+| 수정 commit | `807f3c5d4` fix(kpa-society): MembershipGate 가입 신청 CTA dead navigation 제거 |
+| CHECK 문서 commit | `7b63a676a` docs(check): 본 CHECK 신규 + 선행 CHECK 상태 정합화 |
 | stage 방식 | path-specific only (`git add .` 미사용) |
 | 다른 세션 파일 | 미접촉 |
-| 완료 조건 | 본 WO 범위 미커밋 0 · `HEAD == origin/main` |
+| 완료 조건 | 충족 — 본 WO 범위 미커밋 0 · `HEAD == origin/main` (`7b63a676a`) |
+| 비고 | push 시 origin/main 이 `60b6d33ac` 로 선행돼 있어 rebase 후 push 했다 (다른 세션 커밋 미변경) |
