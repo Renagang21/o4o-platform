@@ -17,6 +17,7 @@ import {
   validateServiceKey,
 } from '../../middleware/signage-role.middleware.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
+import { validateUuidParams } from '../../middleware/validate-uuid-param.middleware.js';
 
 /**
  * Create Signage Routes
@@ -57,34 +58,34 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   router.post('/playlists', requireSignageStore, playlistCtrl.createPlaylist);
 
   // GET /api/signage/:serviceKey/playlists/:id - Get playlist by ID
-  router.get('/playlists/:id', requireSignageOperatorOrStore, playlistCtrl.getPlaylist);
+  router.get('/playlists/:id', requireSignageOperatorOrStore, validateUuidParams('id'), playlistCtrl.getPlaylist);
 
   // PATCH /api/signage/:serviceKey/playlists/:id - Update playlist
-  router.patch('/playlists/:id', requireSignageStore, playlistCtrl.updatePlaylist);
+  router.patch('/playlists/:id', requireSignageStore, validateUuidParams('id'), playlistCtrl.updatePlaylist);
 
   // DELETE /api/signage/:serviceKey/playlists/:id - Delete playlist (soft delete)
-  router.delete('/playlists/:id', requireSignageStore, playlistCtrl.deletePlaylist);
+  router.delete('/playlists/:id', requireSignageStore, validateUuidParams('id'), playlistCtrl.deletePlaylist);
 
   // ========== Playlist Item Routes (Store + Operator) ==========
   // WO-KPA-OPERATOR-HQ-PLAYLIST-CREATE-FLOW-REFINE-V1: requireSignageStore → requireSignageOperatorOrStore
   // HQ operators need item management for global playlists (no organizationId)
   // GET /api/signage/:serviceKey/playlists/:playlistId/items - List playlist items
-  router.get('/playlists/:playlistId/items', requireSignageOperatorOrStore, playlistCtrl.getPlaylistItems);
+  router.get('/playlists/:playlistId/items', requireSignageOperatorOrStore, validateUuidParams('playlistId'), playlistCtrl.getPlaylistItems);
 
   // POST /api/signage/:serviceKey/playlists/:playlistId/items - Add item to playlist
-  router.post('/playlists/:playlistId/items', requireSignageOperatorOrStore, playlistCtrl.addPlaylistItem);
+  router.post('/playlists/:playlistId/items', requireSignageOperatorOrStore, validateUuidParams('playlistId'), playlistCtrl.addPlaylistItem);
 
   // POST /api/signage/:serviceKey/playlists/:playlistId/items/bulk - Bulk add items
-  router.post('/playlists/:playlistId/items/bulk', requireSignageOperatorOrStore, playlistCtrl.addPlaylistItemsBulk);
+  router.post('/playlists/:playlistId/items/bulk', requireSignageOperatorOrStore, validateUuidParams('playlistId'), playlistCtrl.addPlaylistItemsBulk);
 
   // POST /api/signage/:serviceKey/playlists/:playlistId/items/reorder - Reorder items
-  router.post('/playlists/:playlistId/items/reorder', requireSignageOperatorOrStore, playlistCtrl.reorderPlaylistItems);
+  router.post('/playlists/:playlistId/items/reorder', requireSignageOperatorOrStore, validateUuidParams('playlistId'), playlistCtrl.reorderPlaylistItems);
 
   // PATCH /api/signage/:serviceKey/playlists/:playlistId/items/:itemId - Update item
-  router.patch('/playlists/:playlistId/items/:itemId', requireSignageOperatorOrStore, playlistCtrl.updatePlaylistItem);
+  router.patch('/playlists/:playlistId/items/:itemId', requireSignageOperatorOrStore, validateUuidParams('playlistId', 'itemId'), playlistCtrl.updatePlaylistItem);
 
   // DELETE /api/signage/:serviceKey/playlists/:playlistId/items/:itemId - Delete item
-  router.delete('/playlists/:playlistId/items/:itemId', requireSignageOperatorOrStore, playlistCtrl.deletePlaylistItem);
+  router.delete('/playlists/:playlistId/items/:itemId', requireSignageOperatorOrStore, validateUuidParams('playlistId', 'itemId'), playlistCtrl.deletePlaylistItem);
 
   // ========== Store Media Routes (Store-owned media) ==========
   // GET /api/signage/:serviceKey/media - List media (filtered by org)
@@ -104,13 +105,13 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   router.get('/media/library', requireSignageOperatorOrStore, mediaCtrl.getMediaLibrary);
 
   // GET /api/signage/:serviceKey/media/:id - Get media by ID
-  router.get('/media/:id', requireSignageOperatorOrStore, mediaCtrl.getMedia);
+  router.get('/media/:id', requireSignageOperatorOrStore, validateUuidParams('id'), mediaCtrl.getMedia);
 
   // PATCH /api/signage/:serviceKey/media/:id - Update media
-  router.patch('/media/:id', requireSignageStore, mediaCtrl.updateMedia);
+  router.patch('/media/:id', requireSignageStore, validateUuidParams('id'), mediaCtrl.updateMedia);
 
   // DELETE /api/signage/:serviceKey/media/:id - Delete media (soft delete)
-  router.delete('/media/:id', requireSignageStore, mediaCtrl.deleteMedia);
+  router.delete('/media/:id', requireSignageStore, validateUuidParams('id'), mediaCtrl.deleteMedia);
 
   // ========== Store Schedule Routes (Store-only) ==========
   // GET /api/signage/:serviceKey/schedules - List schedules
@@ -125,13 +126,13 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   router.get('/schedules/calendar', requireSignageStore, scheduleCtrl.getScheduleCalendar);
 
   // GET /api/signage/:serviceKey/schedules/:id - Get schedule by ID
-  router.get('/schedules/:id', requireSignageStore, scheduleCtrl.getSchedule);
+  router.get('/schedules/:id', requireSignageStore, validateUuidParams('id'), scheduleCtrl.getSchedule);
 
   // PATCH /api/signage/:serviceKey/schedules/:id - Update schedule
-  router.patch('/schedules/:id', requireSignageStore, scheduleCtrl.updateSchedule);
+  router.patch('/schedules/:id', requireSignageStore, validateUuidParams('id'), scheduleCtrl.updateSchedule);
 
   // DELETE /api/signage/:serviceKey/schedules/:id - Delete schedule (soft delete)
-  router.delete('/schedules/:id', requireSignageStore, scheduleCtrl.deleteSchedule);
+  router.delete('/schedules/:id', requireSignageStore, validateUuidParams('id'), scheduleCtrl.deleteSchedule);
 
   // ========== Active Content Resolution (Player - less strict) ==========
   // GET /api/signage/:serviceKey/active-content - Resolve active content for channel
@@ -147,29 +148,29 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   router.post('/templates', requireSignageOperator, templateCtrl.createTemplate);
 
   // GET /api/signage/:serviceKey/templates/:id - Get template by ID
-  router.get('/templates/:id', allowSignageStoreRead, templateCtrl.getTemplate);
+  router.get('/templates/:id', allowSignageStoreRead, validateUuidParams('id'), templateCtrl.getTemplate);
 
   // PATCH /api/signage/:serviceKey/templates/:id - Update template (Operator only)
-  router.patch('/templates/:id', requireSignageOperator, templateCtrl.updateTemplate);
+  router.patch('/templates/:id', requireSignageOperator, validateUuidParams('id'), templateCtrl.updateTemplate);
 
   // DELETE /api/signage/:serviceKey/templates/:id - Delete template (Operator only)
-  router.delete('/templates/:id', requireSignageOperator, templateCtrl.deleteTemplate);
+  router.delete('/templates/:id', requireSignageOperator, validateUuidParams('id'), templateCtrl.deleteTemplate);
 
   // POST /api/signage/:serviceKey/templates/preview - Generate template preview
   router.post('/templates/preview', allowSignageStoreRead, templateCtrl.previewTemplate);
 
   // ========== Template Zone Routes (Operator managed) ==========
   // GET /api/signage/:serviceKey/templates/:templateId/zones - List template zones
-  router.get('/templates/:templateId/zones', allowSignageStoreRead, templateCtrl.getTemplateZones);
+  router.get('/templates/:templateId/zones', allowSignageStoreRead, validateUuidParams('templateId'), templateCtrl.getTemplateZones);
 
   // POST /api/signage/:serviceKey/templates/:templateId/zones - Add zone (Operator only)
-  router.post('/templates/:templateId/zones', requireSignageOperator, templateCtrl.addTemplateZone);
+  router.post('/templates/:templateId/zones', requireSignageOperator, validateUuidParams('templateId'), templateCtrl.addTemplateZone);
 
   // PATCH /api/signage/:serviceKey/templates/:templateId/zones/:zoneId - Update zone (Operator only)
-  router.patch('/templates/:templateId/zones/:zoneId', requireSignageOperator, templateCtrl.updateTemplateZone);
+  router.patch('/templates/:templateId/zones/:zoneId', requireSignageOperator, validateUuidParams('templateId', 'zoneId'), templateCtrl.updateTemplateZone);
 
   // DELETE /api/signage/:serviceKey/templates/:templateId/zones/:zoneId - Delete zone (Operator only)
-  router.delete('/templates/:templateId/zones/:zoneId', requireSignageOperator, templateCtrl.deleteTemplateZone);
+  router.delete('/templates/:templateId/zones/:zoneId', requireSignageOperator, validateUuidParams('templateId', 'zoneId'), templateCtrl.deleteTemplateZone);
 
   // ========== Content Block Routes (Operator managed) ==========
   // GET /api/signage/:serviceKey/content-blocks - List content blocks
@@ -179,13 +180,13 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   router.post('/content-blocks', requireSignageOperator, contentCtrl.createContentBlock);
 
   // GET /api/signage/:serviceKey/content-blocks/:id - Get content block by ID
-  router.get('/content-blocks/:id', allowSignageStoreRead, contentCtrl.getContentBlock);
+  router.get('/content-blocks/:id', allowSignageStoreRead, validateUuidParams('id'), contentCtrl.getContentBlock);
 
   // PATCH /api/signage/:serviceKey/content-blocks/:id - Update content block (Operator only)
-  router.patch('/content-blocks/:id', requireSignageOperator, contentCtrl.updateContentBlock);
+  router.patch('/content-blocks/:id', requireSignageOperator, validateUuidParams('id'), contentCtrl.updateContentBlock);
 
   // DELETE /api/signage/:serviceKey/content-blocks/:id - Delete content block (Operator only)
-  router.delete('/content-blocks/:id', requireSignageOperator, contentCtrl.deleteContentBlock);
+  router.delete('/content-blocks/:id', requireSignageOperator, validateUuidParams('id'), contentCtrl.deleteContentBlock);
 
   // ========== Layout Preset Routes (Operator managed) ==========
   // GET /api/signage/:serviceKey/layout-presets - List layout presets
@@ -195,13 +196,13 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   router.post('/layout-presets', requireSignageOperator, contentCtrl.createLayoutPreset);
 
   // GET /api/signage/:serviceKey/layout-presets/:id - Get layout preset by ID
-  router.get('/layout-presets/:id', allowSignageStoreRead, contentCtrl.getLayoutPreset);
+  router.get('/layout-presets/:id', allowSignageStoreRead, validateUuidParams('id'), contentCtrl.getLayoutPreset);
 
   // PATCH /api/signage/:serviceKey/layout-presets/:id - Update layout preset (Operator only)
-  router.patch('/layout-presets/:id', requireSignageOperator, contentCtrl.updateLayoutPreset);
+  router.patch('/layout-presets/:id', requireSignageOperator, validateUuidParams('id'), contentCtrl.updateLayoutPreset);
 
   // DELETE /api/signage/:serviceKey/layout-presets/:id - Delete layout preset (Operator only)
-  router.delete('/layout-presets/:id', requireSignageOperator, contentCtrl.deleteLayoutPreset);
+  router.delete('/layout-presets/:id', requireSignageOperator, validateUuidParams('id'), contentCtrl.deleteLayoutPreset);
 
   // ========== Upload Routes (Store can upload to their library) ==========
   // POST /api/signage/:serviceKey/upload/presigned - Get presigned upload URL
@@ -236,29 +237,29 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   router.post('/hq/media', requireSignageOperator, globalCtrl.createHqMedia);
 
   // PATCH /api/signage/:serviceKey/hq/playlists/:id/status - Transition HQ playlist status (WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1)
-  router.patch('/hq/playlists/:id/status', requireSignageOperator, globalCtrl.transitionHqPlaylistStatus);
+  router.patch('/hq/playlists/:id/status', requireSignageOperator, validateUuidParams('id'), globalCtrl.transitionHqPlaylistStatus);
 
   // PATCH /api/signage/:serviceKey/hq/media/:id/status - Transition HQ media status (WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1)
-  router.patch('/hq/media/:id/status', requireSignageOperator, globalCtrl.transitionHqMediaStatus);
+  router.patch('/hq/media/:id/status', requireSignageOperator, validateUuidParams('id'), globalCtrl.transitionHqMediaStatus);
 
   // PATCH /api/signage/:serviceKey/hq/playlists/:id - Update HQ playlist
-  router.patch('/hq/playlists/:id', requireSignageOperator, globalCtrl.updateHqPlaylist);
+  router.patch('/hq/playlists/:id', requireSignageOperator, validateUuidParams('id'), globalCtrl.updateHqPlaylist);
 
   // PATCH /api/signage/:serviceKey/hq/media/:id - Update HQ media
-  router.patch('/hq/media/:id', requireSignageOperator, globalCtrl.updateHqMedia);
+  router.patch('/hq/media/:id', requireSignageOperator, validateUuidParams('id'), globalCtrl.updateHqMedia);
 
   // DELETE /api/signage/:serviceKey/hq/playlists/:id - Hard delete HQ playlist (Operator only)
   // WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1
-  router.delete('/hq/playlists/:id', requireSignageOperator, playlistCtrl.hardDeletePlaylist);
+  router.delete('/hq/playlists/:id', requireSignageOperator, validateUuidParams('id'), playlistCtrl.hardDeletePlaylist);
 
   // GET /api/signage/:serviceKey/hq/media/:id/usage - Media usage lookup (Operator only)
   // WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1 (Scope 3)
-  router.get('/hq/media/:id/usage', requireSignageOperator, mediaCtrl.getMediaUsage);
+  router.get('/hq/media/:id/usage', requireSignageOperator, validateUuidParams('id'), mediaCtrl.getMediaUsage);
 
   // DELETE /api/signage/:serviceKey/hq/media/:id - Hard delete HQ media (Operator only)
   // WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1
   // + WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1 (Scope 4/5): 사용 중 409 차단
-  router.delete('/hq/media/:id', requireSignageOperator, mediaCtrl.hardDeleteMedia);
+  router.delete('/hq/media/:id', requireSignageOperator, validateUuidParams('id'), mediaCtrl.hardDeleteMedia);
 
   // ========== Forced Content Routes (WO-KPA-SIGNAGE-FORCED-CONTENT-IMPLEMENTATION-V1) ==========
   // Operator manages forced content that is auto-injected into all store playlists at query time
@@ -270,10 +271,10 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   router.post('/hq/forced-content', requireSignageOperator, forcedCtrl.create);
 
   // PATCH /api/signage/:serviceKey/hq/forced-content/:id - Update forced content
-  router.patch('/hq/forced-content/:id', requireSignageOperator, forcedCtrl.update);
+  router.patch('/hq/forced-content/:id', requireSignageOperator, validateUuidParams('id'), forcedCtrl.update);
 
   // DELETE /api/signage/:serviceKey/hq/forced-content/:id - Soft delete forced content
-  router.delete('/hq/forced-content/:id', requireSignageOperator, forcedCtrl.remove);
+  router.delete('/hq/forced-content/:id', requireSignageOperator, validateUuidParams('id'), forcedCtrl.remove);
 
   // ========== Community Content Creation Routes (WO-O4O-SIGNAGE-COMMUNITY-AUTHORSHIP-PHASE1-V1) ==========
   // Community creates global content with source='community', scope='global'
@@ -282,13 +283,13 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   router.post('/community/media', requireSignageCommunity, globalCtrl.createCommunityMedia);
 
   // DELETE /api/signage/:serviceKey/community/media/:id - Delete own community media
-  router.delete('/community/media/:id', requireSignageCommunity, globalCtrl.deleteCommunityMedia);
+  router.delete('/community/media/:id', requireSignageCommunity, validateUuidParams('id'), globalCtrl.deleteCommunityMedia);
 
   // POST /api/signage/:serviceKey/community/playlists - Create community playlist (scope: global)
   router.post('/community/playlists', requireSignageCommunity, globalCtrl.createCommunityPlaylist);
 
   // DELETE /api/signage/:serviceKey/community/playlists/:id - Delete own community playlist
-  router.delete('/community/playlists/:id', requireSignageCommunity, globalCtrl.deleteCommunityPlaylist);
+  router.delete('/community/playlists/:id', requireSignageCommunity, validateUuidParams('id'), globalCtrl.deleteCommunityPlaylist);
 
   // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone routes removed
   // Content copy is now handled via asset-snapshot-copy (assetSnapshotApi.copy)

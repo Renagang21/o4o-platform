@@ -159,7 +159,11 @@ describe('router stack — static /media/library 가 dynamic /media/:id 보다 �
       stack
         .find((x: any) => x.route.path === path && x.route.methods.get)
         .route.stack.map((s: any) => s.name)
-        .slice(0, -1); // 마지막은 controller handler
+        .slice(0, -1) // 마지막은 controller handler
+        // WO-O4O-SIGNAGE-RESOURCE-ID-VALIDATION-AND-INVALID-UUID-NORMALIZATION-V1:
+        // `:id` route 에는 uuid 형식 validator 가 추가된다. 이는 권한 계약이 아니라
+        // 형식 검사이므로 guard chain 비교 대상에서 제외한다.
+        .filter((n: string) => n !== 'validateUuidParams');
     expect(names('/media/library')).toEqual(names('/media/:id'));
     expect(names('/media/library')).toContain('requireSignageOperatorOrStore');
   });

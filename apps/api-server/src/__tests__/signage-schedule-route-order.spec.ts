@@ -149,7 +149,10 @@ describe('router stack — static /schedules/calendar 가 dynamic /schedules/:id
       stack
         .find((x: any) => x.route.path === path && x.route.methods.get)
         .route.stack.map((s: any) => s.name)
-        .slice(0, -1); // 마지막은 controller handler
+        .slice(0, -1) // 마지막은 controller handler
+        // WO-O4O-SIGNAGE-RESOURCE-ID-VALIDATION-AND-INVALID-UUID-NORMALIZATION-V1:
+        // `:id` route 에만 붙는 uuid 형식 validator 는 권한 계약이 아니므로 비교에서 제외한다.
+        .filter((n: string) => n !== 'validateUuidParams');
     expect(names('/schedules/calendar')).toEqual(names('/schedules/:id'));
     expect(names('/schedules/calendar')).toContain('requireSignageStore');
   });

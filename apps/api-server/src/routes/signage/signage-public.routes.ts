@@ -12,6 +12,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
 import { validateServiceKey, getSignageServiceKey } from '../../middleware/signage-role.middleware.js';
 import { playbackLogLimiter } from '../../config/rate-limiters.config.js';
+import { validateUuidParams } from '../../middleware/validate-uuid-param.middleware.js';
 
 interface PublicQueryParams {
   source?: string;
@@ -185,7 +186,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
    *
    * 공개 미디어 단일 조회
    */
-  router.get('/media/:id', async (req: Request, res: Response, next: NextFunction) => {
+  router.get('/media/:id', validateUuidParams('id'), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serviceKey = getSignageServiceKey(req);
       const { id } = req.params;
@@ -221,7 +222,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
    *
    * 공개 플레이리스트 단일 조회 (아이템 포함)
    */
-  router.get('/playlists/:id', async (req: Request, res: Response, next: NextFunction) => {
+  router.get('/playlists/:id', validateUuidParams('id'), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serviceKey = getSignageServiceKey(req);
       const { id } = req.params;
