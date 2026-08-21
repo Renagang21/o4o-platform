@@ -214,9 +214,39 @@ admin-dashboard 외 서비스(KPA / PharmacyHub / K-Cosmetics / GlycoPharm / Net
 
 → 비인증 요청이 write handler 본문까지 도달했음이 실측으로 확인됨. 실제 상태 변경은 registry 공백으로 차단.
 
-### 배포 후
+### 배포 후 — commit `564f27890`, Deploy API Server (Cloud Run) **success**
 
-(배포 후 채움)
+| 요청 | 비로그인 | 로그인(KPA admin/operator, super_admin 아님) | platform:super_admin |
+|---|---|---|---|
+| `GET /service/templates` | **401** | **403** | **200** (`data:[] count:0`) |
+| `GET /service/stats` | **401** | **403** | **200** |
+| `GET /service/templates/platform-core` | **401** | **403** | **404** |
+| `GET /service/templates/recommend/global` | **401** | — | — |
+| `POST /service/create` `{}` | **401** | **403** | **400** |
+| `POST /service/create` (없는 template) | **401** | **403** | **404** |
+| `POST /service/templates/{없는id}/install` | **401** | **403** | **404** (배포 전 500) |
+| `GET /service/monitor/summary` | **401** | **403** | 500 — 아래 주석 |
+
+- 401/403/400/404 계약 전부 기대값과 일치. **무인증 write 도달 0 / 무권한 write 도달 0.**
+- production 에서 성공 write 는 수행하지 않았다(§9·§17). 없는 template 대상 요청으로만 확인했고,
+  성공 경로는 테스트(`service-provisioning-guard.spec.ts`)로 대체했다.
+
+### 회귀
+
+- `/health` **200**, `/health/database` **healthy** (pingMs 4)
+- super_admin read 회귀 없음: `/api/v1/appstore` 200, `/api/v1/apps/availability` 200(6 apps),
+  `/api/v1/service-admin/templates` 200
+- KPA / PharmacyHub / K-Cosmetics / GlycoPharm / Neture 프론트에서 `/api/v1/service/*` 호출 0건이므로
+  서비스별 교차 회귀 대상 없음(대조군 확인 결과 소비처는 admin-dashboard 단일).
+- 배포 후 15분 Cloud Run **신규 ERROR 0 / Service API 관련 신규 5xx 0**.
+
+> **범위 밖 기존 결함 1건 (미수정, 후속 후보)**
+> `GET /api/v1/service/monitor/summary` 를 super_admin 으로 호출하면
+> `relation "sites" does not exist` 로 **500** 이 난다. 본 WO 는 monitor 라우터·서비스를
+> 변경하지 않았고 원인은 DB 테이블 부재이므로 본 변경으로 생긴 회귀가 아니다.
+> 로그상 24시간 내 동일 오류가 이 검증 호출뿐인 이유는 해당 화면(super_admin 전용
+> `ServiceOverview`)이 호출된 적이 없기 때문이며, 배포 전 재현은 확보하지 못했다.
+> 위 "신규 5xx 0" 집계에서 이 1건은 본 검증이 유발한 것으로 분리해 기록한다.
 
 ---
 
@@ -226,4 +256,5 @@ admin-dashboard 외 서비스(KPA / PharmacyHub / K-Cosmetics / GlycoPharm / Net
 2. 소비처 0인 4개(`GET /templates/:id`, `POST /create`, `GET /templates/recommend/:sg`, `GET /stats`) retire 판단
 3. `service-templates/templates/*.json` · `init-packs` 가 배포 이미지에 없어 provisioning 전체가 production 무효 — 살릴지/은퇴할지 결정 (ModuleLoader 와 동일한 축)
 4. `serviceInitializer` 전 단계 TODO 스텁 — 기능 미구현 상태 명문화 또는 제거
-5. `/api/v1/service/monitor` 가 Core phase, `/api/v1/service` 가 Domain phase 에 등록되는 mount 분산 정리
+5. `GET /api/v1/service/monitor/summary` 500 (`relation "sites" does not exist`) — 범위 밖 기존 결함
+6. `/api/v1/service/monitor` 가 Core phase, `/api/v1/service` 가 Domain phase 에 등록되는 mount 분산 정리
