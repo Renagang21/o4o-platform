@@ -145,6 +145,12 @@ export interface ReactivateResult {
 }
 
 /**
+ * prefix 없는 legacy membership role 중 정규화 대상.
+ * 5개 서비스 모두 `{prefix}:{role}` 카탈로그 항목이 존재하는 값만 넣는다.
+ */
+const BARE_ROLE_NORMALIZATION_TARGETS = ['member', 'store_owner'];
+
+/**
  * service_memberships.role → role_assignments.role 매핑 (승인 시 실제로 부여되는 역할).
  *
  * WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1:
@@ -162,16 +168,21 @@ export interface ReactivateResult {
  */
 function resolveGrantedRole(serviceKey: string, role: string | null | undefined): string | null {
   if (!role) return null;
-  // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1 (D4):
-  //   'store_owner' 추가 — k-cosmetics membership.role 에 prefix 없는 legacy 값이 남아 있어
-  //   그대로 부여하면 service-neutral 전역 역할 'store_owner' 가 새로 생성된다. 그 역할은
-  //   k-cosmetics operator 의 scope 밖이라 회수조차 불가능해진다(F9 RBAC SSOT 위반).
-  //   pharmacy-hub bare role 정규화(migration 20270317000000)와 같은 원칙이다.
   if (
     serviceKey === 'k-cosmetics' &&
-    ['seller', 'cosmetics:seller', 'k-cosmetics:seller', 'store_owner'].includes(role)
+    ['seller', 'cosmetics:seller', 'k-cosmetics:seller'].includes(role)
   ) {
     return 'cosmetics:store_owner';
+  }
+  // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1 (D4):
+  //   service_memberships.role 에는 prefix 없는 legacy 값('member','store_owner')이 남아 있다.
+  //   그대로 부여하면 서비스 축이 없는 **전역 역할**이 새로 생성돼 lifecycle 이 serviceKey
+  //   경계를 넘고(F9 RBAC SSOT 위반), 서비스 operator 의 scope 밖이라 회수조차 불가능해진다.
+  //   → 자기 서비스 prefix 를 붙인다. prefix 도출은 @o4o/security-core SSOT 만 사용한다.
+  //   pharmacy-hub bare role 정규화(migration 20270317000000)와 같은 원칙이며,
+  //   대상은 5개 서비스 모두 prefixed 카탈로그 항목이 존재하는 값으로 한정한다.
+  if (!role.includes(':') && BARE_ROLE_NORMALIZATION_TARGETS.includes(role)) {
+    return `${resolveRolePrefixFromCanonicalServiceKey(serviceKey)}:${role}`;
   }
   return role;
 }
@@ -340,7 +351,7 @@ export class MembershipApprovalService {
       );
 
       // STEP3: Ensure role_assignment exists (idempotent — ON CONFLICT updates timestamp)
-      const memberRole = resolveGrantedRole(membership.service_key, membership.role) || 'member';
+      const memberRole = resolveGrantedRole(membership.service_key, membership.role || 'member')!;
       const roleOutcome = await this.activateRoleAssignment(queryRunner, userId, memberRole, approvedBy);
       logger.info('[APPROVAL][STEP3] role ACTIVATE', { userId, role: memberRole, outcome: roleOutcome });
 
@@ -851,7 +862,7 @@ export class MembershipApprovalService {
       // STEP3: Reactivate role_assignments for each membership role
       const reactivatedRoles: string[] = [];
       for (const membership of selectResult) {
-        const memberRole = resolveGrantedRole(membership.service_key, membership.role) || 'member';
+        const memberRole = resolveGrantedRole(membership.service_key, membership.role || 'member')!;
         const roleOutcome = await this.activateRoleAssignment(queryRunner, userId, memberRole, reactivatedBy);
         logger.info('[REACTIVATE][STEP3] role ACTIVATE', { userId, role: memberRole, outcome: roleOutcome });
         reactivatedRoles.push(memberRole);
