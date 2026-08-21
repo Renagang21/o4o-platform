@@ -12,6 +12,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
+  ClosedForumJoinPanel,
   ForumCommentForm,
   ForumCommentList,
   ForumDetailErrorState,
@@ -24,11 +25,13 @@ import {
 } from '@o4o/shared-space-ui';
 import { useAuth } from '../../contexts/AuthContext';
 import {
+  closedForumIdFromError,
   createPharmacyHubForumComment,
   deletePharmacyHubForumComment,
   deletePharmacyHubForumPost,
   fetchPharmacyHubForumComments,
   fetchPharmacyHubForumPost,
+  forumMembershipApi,
   togglePharmacyHubForumPostLike,
   updatePharmacyHubForumComment,
   type PharmacyHubForumComment,
@@ -51,6 +54,8 @@ export default function ForumDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
+  /** WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §6 — 회원제 포럼 차단 시 가입 신청 패널 */
+  const [closedForumId, setClosedForumId] = useState<string | null>(null);
 
   const [comments, setComments] = useState<PharmacyHubForumComment[]>([]);
   const [commentInput, setCommentInput] = useState('');
@@ -81,6 +86,7 @@ export default function ForumDetailPage() {
     setLoading(true);
     setError(null);
     setNotFound(false);
+    setClosedForumId(null);
     try {
       const detail = await fetchPharmacyHubForumPost(postId);
       setPost(detail);
@@ -90,7 +96,9 @@ export default function ForumDetailPage() {
     } catch (err) {
       const status = (err as { response?: { status?: number } })?.response?.status;
       setPost(null);
-      if (status === 404) setNotFound(true);
+      const closedId = closedForumIdFromError(err);
+      if (closedId) setClosedForumId(closedId);
+      else if (status === 404) setNotFound(true);
       else setError(err instanceof Error ? err.message : '게시글을 불러오지 못했습니다.');
     } finally {
       setLoading(false);
@@ -177,7 +185,19 @@ export default function ForumDetailPage() {
 
         {loading && <ForumDetailLoadingState message="게시글을 불러오는 중입니다." />}
 
-        {!loading && notFound && (
+        {!loading && closedForumId && (
+          <ClosedForumJoinPanel
+            forumId={closedForumId}
+            isAuthenticated={isAuthenticated}
+            userKey={user?.id ?? null}
+            api={forumMembershipApi}
+            variant="page"
+            onBack={goList}
+            palette={{ primary: '#2563EB' }}
+          />
+        )}
+
+        {!loading && !closedForumId && notFound && (
           <ForumDetailNotFoundState
             message="게시글을 찾을 수 없습니다. 삭제되었거나 접근 권한이 없습니다."
             backLabel="게시글 목록으로"
@@ -185,7 +205,7 @@ export default function ForumDetailPage() {
           />
         )}
 
-        {!loading && !notFound && error && (
+        {!loading && !closedForumId && !notFound && error && (
           <ForumDetailErrorState
             message={error}
             backLabel="게시글 목록으로"
@@ -195,7 +215,7 @@ export default function ForumDetailPage() {
           />
         )}
 
-        {!loading && !notFound && !error && post && (
+        {!loading && !closedForumId && !notFound && !error && post && (
           <>
             <article className="rounded-lg border border-slate-200 bg-white p-6">
               <ForumPostHeader

@@ -37,6 +37,10 @@ export const PH_PUBLIC_NAV: GlobalHeaderNavItem[] = [
       { label: '포럼', href: '/forum' },
       { label: '검색', href: '/community/search' },
       { label: '내 글', href: '/forum/my-posts' },
+      // WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §14
+      // 아래 두 route 는 App.tsx 에 실제로 등재돼 있다 (데드링크 0 원칙 유지).
+      { label: '내 포럼', href: '/forum/my-dashboard' },
+      { label: '포럼 개설 신청', href: '/forum/request' },
     ],
   },
   { label: '교육', href: '/education' },

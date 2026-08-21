@@ -18,6 +18,9 @@
  *   /forum/posts/:postId         게시글 상세 (WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1)
  *   /forum/write                 글쓰기      (동일 WO · write 권한은 backend guard 가 강제)
  *   /forum/my-posts              내가 쓴 글 (WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §9)
+ *   /forum/request               포럼 개설 신청 (WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §5)
+ *   /forum/my-dashboard          내 포럼 · 내 신청 현황 (동일 WO §5·§7)
+ *   /forum/my-dashboard/:forumId/members  포럼 회원 관리 (동일 WO §8)
  *   /community                   커뮤니티 홈 (동일 WO §4 — StandardHomeTemplate + LatestActivitySection)
  *   /community/search            커뮤니티 검색 (동일 WO §6 — forum 중심)
  *   /education                   교육 허브 (동일 WO §7 — 공통 LmsHubTemplate)
@@ -107,7 +110,6 @@ import {
 import { MembershipGate } from './components/MembershipGate';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
-import RoleEntryPage from './pages/RoleEntryPage';
 import JoinPage from './pages/JoinPage';
 import JoinStatusPage from './pages/JoinStatusPage';
 import OperatorDashboardPage from './pages/operator/OperatorDashboardPage';
@@ -118,6 +120,10 @@ import ForumDetailPage from './pages/forum/ForumDetailPage';
 import ForumWritePage from './pages/forum/ForumWritePage';
 // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 — 커뮤니티 baseline
 import MyPostsPage from './pages/forum/MyPostsPage';
+// WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §5·§7·§8
+import RequestForumPage from './pages/forum/RequestForumPage';
+import MyForumDashboardPage from './pages/forum/MyForumDashboardPage';
+import ForumMemberManagementPage from './pages/forum/ForumMemberManagementPage';
 import CommunityHomePage from './pages/community/CommunityHomePage';
 import CommunitySearchPage from './pages/community/CommunitySearchPage';
 import EducationPage from './pages/education/EducationPage';
@@ -175,7 +181,6 @@ import QrLandingPage from './pages/QrLandingPage';
 import NotFoundPage from './pages/NotFoundPage';
 // WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1 — 태블릿 · 화면 세트
 import TabletsPage from './pages/store-owner/TabletsPage';
-import { ROLES } from './config/service';
 
 export default function App() {
   return (
@@ -314,6 +319,33 @@ export default function App() {
             element={
               <MembershipGate>
                 <ForumWritePage />
+              </MembershipGate>
+            }
+          />
+          {/* WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §5·§7·§8·§9
+              포럼 개설 신청 → 내 신청 현황/내 포럼 → 회원 관리·삭제 요청.
+              화면은 전부 공통 View(@o4o/shared-space-ui) wrapper 다. */}
+          <Route
+            path="/forum/request"
+            element={
+              <MembershipGate>
+                <RequestForumPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/forum/my-dashboard"
+            element={
+              <MembershipGate>
+                <MyForumDashboardPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/forum/my-dashboard/:forumId/members"
+            element={
+              <MembershipGate>
+                <ForumMemberManagementPage />
               </MembershipGate>
             }
           />

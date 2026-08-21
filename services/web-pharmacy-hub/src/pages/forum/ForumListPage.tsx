@@ -1,12 +1,28 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ForumListTemplate, type ForumListItem } from '@o4o/shared-space-ui';
-import { fetchPharmacyHubForumPosts } from '../../services/forumApi';
+import {
+  ClosedForumJoinPanel,
+  ForumListTemplate,
+  type ForumListItem,
+} from '@o4o/shared-space-ui';
+import {
+  closedForumIdFromError,
+  fetchPharmacyHubForumPosts,
+  forumMembershipApi,
+} from '../../services/forumApi';
+import { useAuth } from '../../contexts/AuthContext';
 
 const PAGE_SIZE = 20;
 
+/** 403 응답이 회원제 포럼 차단인지만 판정한다(응답 body 에 forumId 가 없을 때의 보조 경로). */
+function isClosedForumError(err: unknown): boolean {
+  const res = (err as { response?: { status?: number; data?: any } })?.response;
+  return res?.status === 403 && res?.data?.code === 'CLOSED_FORUM_ACCESS_DENIED';
+}
+
 export default function ForumListPage() {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const forumId = searchParams.get('forum') || undefined;
   const page = Math.max(1, Number(searchParams.get('page') || 1));
@@ -19,12 +35,19 @@ export default function ForumListPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(search);
+  /**
+   * WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §6
+   * 회원제(closed) 포럼은 backend 가 403 CLOSED_FORUM_ACCESS_DENIED 로 막는다.
+   * 그 경우 일반 오류가 아니라 공통 가입 신청 패널을 보여준다.
+   */
+  const [closedForumId, setClosedForumId] = useState<string | null>(null);
 
   useEffect(() => setSearchInput(search), [search]);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setClosedForumId(null);
     try {
       const result = await fetchPharmacyHubForumPosts({
         forumId,
@@ -40,7 +63,12 @@ export default function ForumListPage() {
       setPosts([]);
       setTotalPages(0);
       setTotal(0);
-      setError(err instanceof Error ? err.message : '게시글을 불러오지 못했습니다.');
+      const closedId = closedForumIdFromError(err);
+      if (closedId || (forumId && isClosedForumError(err))) {
+        setClosedForumId(closedId ?? forumId ?? null);
+      } else {
+        setError(err instanceof Error ? err.message : '게시글을 불러오지 못했습니다.');
+      }
     } finally {
       setLoading(false);
     }
@@ -120,6 +148,18 @@ onSubmit={(event) => {
 </div>
         )}
 
+        {closedForumId ? (
+<div className="rounded-lg border border-slate-200 bg-white">
+  <ClosedForumJoinPanel
+    forumId={closedForumId}
+    isAuthenticated={isAuthenticated}
+    userKey={user?.id ?? null}
+    api={forumMembershipApi}
+    variant="cell"
+    palette={{ primary: '#2563EB' }}
+  />
+</div>
+        ) : (
         <ForumListTemplate
 posts={listPosts}
 pinnedPosts={pinnedPosts}
@@ -140,6 +180,7 @@ renderEmpty={() => (
   </p>
 )}
         />
+        )}
 
       </div>
     </main>

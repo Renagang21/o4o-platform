@@ -86,6 +86,16 @@ export type { ForumHubCategory, ForumHubPost, ForumHubConfig } from './ForumHubT
 export { ForumRequestForm } from './ForumRequestForm';
 export type { ForumRequestFormProps, ForumRequestFormPayload, ForumRequestFormTheme } from './ForumRequestForm';
 
+/* 회원제(closed) 포럼 접근 차단 + 가입 신청 공통 패널
+ * WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §6 */
+export { ClosedForumJoinPanel, DEFAULT_CLOSED_FORUM_PALETTE } from './ClosedForumJoinPanel';
+export type {
+  ClosedForumJoinPanelProps,
+  ClosedForumJoinApi,
+  ClosedForumJoinPalette,
+  ClosedForumJoinStatus,
+} from './ClosedForumJoinPanel';
+
 /* WO-O4O-FORUM-WRITE-FORM-COMMONIZATION-V1: 포럼 글쓰기 공통 폼 (create-only) */
 export { ForumWriteForm } from './ForumWriteForm';
 export type {

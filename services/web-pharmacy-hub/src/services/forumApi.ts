@@ -456,3 +456,160 @@ export const forumAnalyticsApi = {
     return res.data;
   },
 };
+
+// ============================================================================
+// 포럼 소유자 · 개설 신청 · 회원(가입) API
+// WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §5·§6·§7·§8·§9
+//
+// backend 변경 0. 아래 endpoint 는 전부 이미 존재한다.
+//   - `${FORUM_BASE}/categories/*`  : 공통 createServiceForumRouter (PharmacyHub 마운트 완료)
+//   - `/forum/category-requests/*`  : 공통 forum-category-request.routes
+//     (service-catalog 에 'pharmacy-hub' 가 등재돼 있어 serviceCode 검증을 통과한다)
+//
+// K-Cosmetics(services/web-k-cosmetics/src/services/forumApi.ts) 와 **같은 공통 라우터 계약**을
+// 소비한다. KPA 는 `/api/v1/kpa/forum` 전용 변형이라 참조 대상이 아니다.
+// ============================================================================
+
+export async function fetchMyPharmacyHubForums(): Promise<{ success: boolean; data: any[] }> {
+  try {
+    const response = await api.get(`${FORUM_BASE}/categories/mine`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching my forums:', error);
+    return { success: false, data: [] };
+  }
+}
+
+export async function updateMyPharmacyHubForum(
+  id: string,
+  data: { name?: string; description?: string; iconEmoji?: string | null; iconUrl?: string | null },
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await api.patch(`${FORUM_BASE}/categories/${encodeURIComponent(id)}/owner`, data);
+    return response.data;
+  } catch (error: any) {
+    const msg = error?.response?.data?.message || error?.response?.data?.error || '저장에 실패했습니다.';
+    return { success: false, error: msg };
+  }
+}
+
+/** 포럼 삭제 **요청**. 소유자 직접 hard delete 는 만들지 않는다(운영자 심사 경유 — §9). */
+export async function requestDeletePharmacyHubForum(
+  id: string,
+  data: { reason?: string },
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await api.post(
+      `${FORUM_BASE}/categories/${encodeURIComponent(id)}/delete-request`,
+      data,
+    );
+    return response.data;
+  } catch (error: any) {
+    const msg = error?.response?.data?.message || error?.response?.data?.error || '삭제 요청에 실패했습니다.';
+    return { success: false, error: msg };
+  }
+}
+
+/** 내 포럼 개설 신청 현황 — 공통 base 이므로 serviceCode 질의 파라미터가 필수다. */
+export async function fetchMyPharmacyHubForumRequests(): Promise<{ success: boolean; data: any[] }> {
+  try {
+    const response = await api.get('/forum/category-requests/my?serviceCode=pharmacy-hub');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching my forum requests:', error);
+    return { success: false, data: [] };
+  }
+}
+
+/** 포럼 개설 신청(P0). 승인 심사는 운영자 큐(`/forum/operator/requests`)로 유입된다. */
+export async function createPharmacyHubForumCategoryRequest(data: {
+  name: string;
+  description: string;
+  reason?: string;
+  tags?: string[];
+}): Promise<{ success: boolean; data?: any; error?: string }> {
+  try {
+    const response = await api.post('/forum/category-requests', {
+      ...data,
+      serviceCode: 'pharmacy-hub',
+    });
+    return response.data;
+  } catch (error: any) {
+    const msg = error?.response?.data?.message || error?.response?.data?.error || '신청에 실패했습니다.';
+    return { success: false, error: msg };
+  }
+}
+
+export interface PharmacyHubForumJoinRequest {
+  id: string;
+  user_id: string;
+  requester_id: string;
+  requester_name: string | null;
+  requester_email: string | null;
+  user_display_name: string | null;
+  user_name: string | null;
+  user_email: string | null;
+  status: string;
+  message: string | null;
+  created_at: string;
+}
+
+export interface PharmacyHubForumMember {
+  id: string;
+  user_id: string;
+  role: 'owner' | 'member';
+  joined_at: string;
+  user_name: string | null;
+  user_email: string | null;
+}
+
+export const forumMembershipApi = {
+  getJoinRequests: (forumId: string) =>
+    api.get<{ success: boolean; data: PharmacyHubForumJoinRequest[] }>(
+      `${FORUM_BASE}/categories/${encodeURIComponent(forumId)}/join-requests`,
+    ),
+
+  approveJoin: (forumId: string, requestId: string) =>
+    api.post<{ success: boolean; data: any }>(
+      `${FORUM_BASE}/categories/${encodeURIComponent(forumId)}/join-requests/${encodeURIComponent(requestId)}/approve`,
+    ),
+
+  rejectJoin: (forumId: string, requestId: string, reviewComment?: string) =>
+    api.post<{ success: boolean; data: any }>(
+      `${FORUM_BASE}/categories/${encodeURIComponent(forumId)}/join-requests/${encodeURIComponent(requestId)}/reject`,
+      { reviewComment },
+    ),
+
+  getMembers: (forumId: string) =>
+    api.get<{ success: boolean; data: PharmacyHubForumMember[] }>(
+      `${FORUM_BASE}/categories/${encodeURIComponent(forumId)}/members`,
+    ),
+
+  removeMember: (forumId: string, userId: string) =>
+    api.delete<{ success: boolean; data: any }>(
+      `${FORUM_BASE}/categories/${encodeURIComponent(forumId)}/members/${encodeURIComponent(userId)}`,
+    ),
+
+  requestJoin: (forumId: string) =>
+    api.post<{ success: boolean; data: any }>(
+      `${FORUM_BASE}/categories/${encodeURIComponent(forumId)}/join-requests`,
+    ),
+
+  getMembershipStatus: (forumId: string) =>
+    api.get<{
+      success: boolean;
+      data: { isMember: boolean; role: string | null; pendingRequest: boolean };
+    }>(`${FORUM_BASE}/categories/${encodeURIComponent(forumId)}/membership-status`),
+};
+
+/**
+ * 403 `CLOSED_FORUM_ACCESS_DENIED` 응답에서 대상 포럼 id 를 꺼낸다.
+ * backend 계약: `{ success:false, code:'CLOSED_FORUM_ACCESS_DENIED', data:{ forumId } }`.
+ * 회원제 포럼이 아니면 null 을 돌려주므로 호출부의 일반 오류 처리와 겹치지 않는다.
+ */
+export function closedForumIdFromError(err: unknown): string | null {
+  const body = (err as { response?: { status?: number; data?: any } })?.response;
+  if (body?.status !== 403) return null;
+  if (body?.data?.code !== 'CLOSED_FORUM_ACCESS_DENIED') return null;
+  return body?.data?.data?.forumId ?? null;
+}
