@@ -6,6 +6,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
+import type { EntityManager } from 'typeorm';
 import { KpaMember, OrganizationStore, KpaMemberService, KpaAuditLog } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
@@ -44,6 +45,103 @@ class MemberInfoAbort extends Error {
     this.name = 'MemberInfoAbort';
   }
 }
+
+/**
+ * WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1
+ *
+ * KPA 회원 canonical ID 계약
+ * ─────────────────────────
+ * 공통 운영자 콘솔(@o4o/operator-core-ui · @o4o/ui 회원 상세)의 `UserData.id` 는
+ * 4서비스 공통으로 **users.id** 다. KPA 전용 식별자(kpa_members.id /
+ * service_memberships.id)는 **이 백엔드 경계에서만** 해석하며, 프론트 wrapper 는
+ * 어떤 ID 변환도 하지 않는다 (KPA 전용 ID 를 공통 Core 계약으로 승격하지 않는다).
+ *
+ * 따라서 KPA 회원 라우트의 `:id` 는 users.id | kpa_members.id |
+ * service_memberships.id 를 모두 허용한다 (legacy 링크·북마크 호환).
+ *
+ * kpa_members row 가 없는 정상 회원(service_memberships 만 존재)은 PATCH /:id/info 가
+ * 이미 쓰고 있던 skeleton ensure 정책을 그대로 적용해 상태 변경이 404 로 막히지 않게 한다.
+ */
+/**
+ * 해석에 필요한 최소 실행기. DataSource / EntityManager 어느 쪽으로도 만들 수 있어
+ * **새 트랜잭션을 열지 않는다** (호출부의 트랜잭션 경계를 바꾸지 않는다).
+ */
+interface KpaMemberResolveRunner {
+  query(sql: string, params?: unknown[]): Promise<any>;
+  findMember(where: Record<string, unknown>): Promise<KpaMember | null>;
+}
+
+function resolveRunnerFromManager(manager: EntityManager): KpaMemberResolveRunner {
+  return {
+    query: (sql, params) => manager.query(sql, params as any[]),
+    findMember: (where) => manager.findOne(KpaMember, { where: where as any }),
+  };
+}
+
+function resolveRunnerFromDataSource(dataSource: DataSource): KpaMemberResolveRunner {
+  return {
+    query: (sql, params) => dataSource.query(sql, params as any[]),
+    findMember: (where) => dataSource.getRepository(KpaMember).findOne({ where: where as any }),
+  };
+}
+
+async function resolveKpaMemberByAnyId(
+  manager: KpaMemberResolveRunner,
+  id: string,
+): Promise<{ member: KpaMember; ensured: boolean }> {
+  // 1) kpa_members.id
+  const byMemberId = await manager.findMember({ id });
+  if (byMemberId) return { member: byMemberId, ensured: false };
+
+  // 2) users.id 또는 service_memberships.id → user_id 해석
+  const smRows = await manager.query(
+    `SELECT id, user_id, status, role, created_at
+       FROM service_memberships
+      WHERE (id = $1 OR user_id = $1) AND service_key IN ('kpa-society', 'kpa')
+      ORDER BY created_at ASC
+      LIMIT 1`,
+    [id],
+  );
+  if (smRows.length === 0) {
+    throw new MemberInfoAbort(404, 'NOT_FOUND', 'Member not found');
+  }
+  const sm = smRows[0];
+
+  // 3) 같은 user 의 kpa_members row (sm.id ≠ km.id 인 경우 포함)
+  const byUserId = await manager.findMember({ user_id: sm.user_id });
+  if (byUserId) return { member: byUserId, ensured: false };
+
+  // 4) skeleton ensure — backfill migration 과 동일 derive 정책
+  const profilePresence = await manager.query(
+    `SELECT
+       EXISTS(SELECT 1 FROM kpa_pharmacist_profiles WHERE user_id = $1) AS has_pp,
+       EXISTS(SELECT 1 FROM kpa_student_profiles WHERE user_id = $1) AS has_sp`,
+    [sm.user_id],
+  );
+  const hasPp = !!profilePresence[0]?.has_pp;
+  const hasSp = !!profilePresence[0]?.has_sp;
+  const derivedType = hasPp ? 'pharmacist' : hasSp ? 'pharmacy_student_member' : 'pharmacist';
+  const safeRole = ['member', 'operator', 'admin'].includes(sm.role) ? sm.role : 'member';
+  const safeStatus = sm.status === 'active' ? 'active' : 'pending';
+  const joinedAt = sm.status === 'active' ? new Date(sm.created_at) : null;
+
+  const insertResult = await manager.query(
+    `INSERT INTO kpa_members
+       (user_id, role, status, identity_status, membership_type, joined_at, created_at, updated_at)
+     VALUES ($1, $2, $3, 'active', $4, $5, NOW(), NOW())
+     RETURNING id`,
+    [sm.user_id, safeRole, safeStatus, derivedType, joinedAt],
+  );
+  const insertedId: string | undefined = insertResult?.[0]?.id;
+  const ensured = insertedId ? await manager.findMember({ id: insertedId }) : null;
+  if (!ensured) {
+    throw new MemberInfoAbort(500, 'INTERNAL_ERROR', 'Failed to ensure kpa_members skeleton');
+  }
+  return { member: ensured, ensured: true };
+}
+
+const KPA_MEMBER_ENSURED_WARNING =
+  'KPA 회원 정보(kpa_members)가 누락되어 있어 기본 정보로 자동 생성했습니다.';
 
 const handleValidationErrors = (req: Request, res: Response, next: any): void => {
   const errors = validationResult(req);
@@ -533,11 +631,29 @@ export function createMemberController(
     ],
     async (req: AuthRequest, res: Response): Promise<void> => {
       try {
-        const member = await memberRepo.findOne({ where: { id: req.params.id } });
-        if (!member) {
-          res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Member not found' } });
-          return;
+        // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+        //   `:id` = users.id(공통 콘솔 canonical) | kpa_members.id | service_memberships.id.
+        //   기존 구현은 kpa_members.id 만 조회해서, kpa_members row 가 없는 정상 회원
+        //   (service_memberships 만 존재)의 상태 변경이 항상 404 였다.
+        //   PATCH /:id/info 와 동일한 skeleton ensure 정책으로 수렴한다.
+        const warnings: string[] = [];
+        let resolvedMember: { member: KpaMember; ensured: boolean };
+        try {
+          resolvedMember = await resolveKpaMemberByAnyId(
+            resolveRunnerFromDataSource(dataSource),
+            req.params.id,
+          );
+        } catch (resolveError) {
+          if (resolveError instanceof MemberInfoAbort) {
+            res.status(resolveError.status).json({
+              error: { code: resolveError.code, message: resolveError.message },
+            });
+            return;
+          }
+          throw resolveError;
         }
+        const member = resolvedMember.member;
+        if (resolvedMember.ensured) warnings.push(KPA_MEMBER_ENSURED_WARNING);
 
         const oldStatus = member.status;
         const newStatus = req.body.status;
@@ -546,7 +662,7 @@ export function createMemberController(
         // WO-O4O-KPA-ORGANIZATIONS-RAW-SQL-COLUMN-ALIGNMENT-V1:
         //   auto-activation silent catch 가 운영자 인지를 차단하던 문제 정정.
         //   PATCH /:id/info 의 warnings 패턴과 동일하게 응답에 명시한다.
-        const warnings: string[] = [];
+        //   (warnings 선언은 ID 해석 단계로 이동 — skeleton ensure 경고를 함께 담는다.)
 
         // identity_status 동기화 (WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected 추가)
         if (newStatus === 'suspended' || newStatus === 'rejected') {
@@ -1168,61 +1284,12 @@ export function createMemberController(
           // ─── WO-O4O-KPA-OPERATOR-MEMBER-CANONICAL-EDIT-COMPLETE-V1 ───
           //   km.id 또는 sm.id 양쪽 허용 + km 누락 시 skeleton ensure.
           //   GET /kpa/members 가 m.id = km_id ?? sm_id 로 반환하므로 양쪽 모두 도달 가능.
-          let member = await manager.findOne(KpaMember, { where: { id: req.params.id } });
-          let memberWasEnsured = false;
-
-          if (!member) {
-            // req.params.id 가 service_memberships.id 일 수 있음 — fallback 시도
-            const smRows = await manager.query(
-              `SELECT user_id, status, role, created_at
-               FROM service_memberships
-               WHERE id = $1 AND service_key IN ('kpa-society', 'kpa')
-               LIMIT 1`,
-              [req.params.id]
-            );
-            if (smRows.length === 0) {
-              throw new MemberInfoAbort(404, 'NOT_FOUND', 'Member not found');
-            }
-            const sm = smRows[0];
-
-            // 동일 user 의 km 존재 여부 재확인 (sm.id 와 km.id 가 다른 경우)
-            const existingKm = await manager.findOne(KpaMember, { where: { user_id: sm.user_id } });
-            if (existingKm) {
-              member = existingKm;
-            } else {
-              // skeleton 생성 — backfill migration 과 동일 derive 정책
-              const profilePresence = await manager.query(
-                `SELECT
-                   EXISTS(SELECT 1 FROM kpa_pharmacist_profiles WHERE user_id = $1) AS has_pp,
-                   EXISTS(SELECT 1 FROM kpa_student_profiles WHERE user_id = $1) AS has_sp`,
-                [sm.user_id]
-              );
-              const hasPp = !!profilePresence[0]?.has_pp;
-              const hasSp = !!profilePresence[0]?.has_sp;
-              const derivedType = hasPp ? 'pharmacist' : hasSp ? 'pharmacy_student_member' : 'pharmacist';
-              const safeRole = ['member', 'operator', 'admin'].includes(sm.role) ? sm.role : 'member';
-              const safeStatus = sm.status === 'active' ? 'active' : 'pending';
-              const joinedAt = sm.status === 'active' ? new Date(sm.created_at) : null;
-
-              // raw SQL INSERT — TypeORM Repository.create 오버로드 타입 회피 + 결과 row 즉시 반환.
-              const insertResult = await manager.query(
-                `INSERT INTO kpa_members
-                   (user_id, role, status, identity_status, membership_type, joined_at, created_at, updated_at)
-                 VALUES ($1, $2, $3, 'active', $4, $5, NOW(), NOW())
-                 RETURNING id`,
-                [sm.user_id, safeRole, safeStatus, derivedType, joinedAt]
-              );
-              const insertedId: string | undefined = insertResult?.[0]?.id;
-              const ensured = insertedId
-                ? await manager.findOne(KpaMember, { where: { id: insertedId } })
-                : null;
-              if (!ensured) {
-                throw new MemberInfoAbort(500, 'INTERNAL_ERROR', 'Failed to ensure kpa_members skeleton');
-              }
-              member = ensured;
-              memberWasEnsured = true;
-            }
-          }
+          // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+          //   users.id(공통 콘솔 canonical) 까지 포함한 3-way 해석 + skeleton ensure 를
+          //   모듈 공통 helper 로 수렴 (PATCH /:id/status 와 동일 계약).
+          const resolvedInfo = await resolveKpaMemberByAnyId(resolveRunnerFromManager(manager), req.params.id);
+          const member = resolvedInfo.member;
+          const memberWasEnsured = resolvedInfo.ensured;
 
           if (memberWasEnsured) {
             changes._kpa_member_ensured = true;

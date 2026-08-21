@@ -105,7 +105,7 @@ const netureMembersClient: MembersConsoleClient = {
     const { data } = await api.get('/operator/members/stats?serviceKey=neture');
     return data;
   },
-  async updateStatus(userId, status, currentStatus, user) {
+  async updateStatus(userId, status, currentStatus) {
     if (status === 'approved' && (currentStatus === 'pending' || currentStatus === 'rejected')) {
       // WO-O4O-NETURE-OPERATOR-MEMBERS-SUPPLIER-PENDING-UX-CLARIFY-V1:
       //   이 액션은 1단계(회원 가입 승인)다. 이미 가입 승인된(active) 회원은 백엔드가
@@ -129,14 +129,17 @@ const netureMembersClient: MembersConsoleClient = {
       await api.post(`/neture/operator/registrations/${userId}/reject`, { reason: '운영자 거부' });
       return;
     }
-    // 정지 / 활성화 → membership console (membership.id 필요)
-    const netureMembership = user?.memberships?.find((m) => m.serviceKey === 'neture');
-    if (!netureMembership) return;
-    const endpoint =
-      status === 'suspended'
-        ? `/operator/members/${netureMembership.id}/reject`
-        : `/operator/members/${netureMembership.id}/approve`;
-    await api.patch(endpoint);
+    // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+    //   정지/활성화는 lifecycle 축이다 — canonical 계약은 active → suspended,
+    //   suspended → active 이며 'rejected' 는 **가입 반려** 의미에만 쓴다.
+    //   기존 구현은 비활성화를 membership `reject` 로 매핑해서 정상 회원이 '거절' 상태가 됐고
+    //   (목록의 거절 카운터가 올라감) 같은 화면에서 재활성화도 되지 않았다.
+    //   공통 lifecycle endpoint(PATCH /operator/members/:userId/status)로 정렬한다.
+    //   serviceKey 를 함께 보내 이 콘솔의 조치가 neture membership 에만 적용되게 한다.
+    await api.patch(`/operator/members/${userId}/status`, {
+      status: status === 'approved' ? 'active' : status,
+      serviceKey: 'neture',
+    });
   },
   async batchUpdateStatus(ids, status) {
     const r = await api.post('/neture/operator/registrations/batch', {
@@ -350,7 +353,7 @@ export default function UsersManagementPage() {
           icon: <UserX size={14} />,
           getTargetIds: (users) => users.filter((u) => u.status === 'active').map((u) => u.id),
           executeBatch: async (ids) => {
-            const { data } = await api.post('/operator/members/batch-status', { ids, status: 'suspended' });
+            const { data } = await api.post('/operator/members/batch-status', { ids, status: 'suspended', serviceKey: 'neture' });
             return { data };
           },
           confirm: { title: '일괄 정지 확인', message: '선택한 회원을 정지 처리합니다.', confirmText: '정지', variant: 'danger' },
@@ -367,7 +370,7 @@ export default function UsersManagementPage() {
             users.filter((u) => ['suspended', 'withdrawn'].includes(u.status)).map((u) => u.id),
           executeBatch: async (ids) => {
             const settled = await Promise.allSettled(
-              ids.map((id) => api.post(`/operator/members/${id}/reactivate`)),
+              ids.map((id) => api.post(`/operator/members/${id}/reactivate`, { serviceKey: 'neture' })),
             );
             return {
               data: {

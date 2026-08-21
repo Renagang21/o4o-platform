@@ -88,7 +88,9 @@ const membersClient: MembersConsoleClient = {
     return data;
   },
   async updateStatus(userId, status) {
-    await api.patch(`/operator/members/${userId}/status`, { status });
+    // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+    //   lifecycle write 는 대상 serviceKey 의 membership 에만 적용된다 (타 서비스 fan-out 차단).
+    await api.patch(`/operator/members/${userId}/status`, { status, serviceKey: SERVICE_KEY });
   },
 };
 
@@ -97,6 +99,9 @@ export default function MembersPage() {
     <OperatorMembersConsolePage
       serviceKey={SERVICE_KEY}
       client={membersClient}
+      // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+      //   drawer → 전체 상세 deep link. `u.id` = users.id (공통 콘솔 canonical 축).
+      fullDetailHref={(u) => `/operator/members/${u.id}`}
       serverSort
       getPrimaryRole={getPrimaryRole}
       roleDisplayMap={ROLE_DISPLAY}

@@ -82,6 +82,19 @@ export interface UserDetailApiAdapter {
 export interface UserDetailConfig {
   /** 테마 색상 계열 */
   theme: 'primary' | 'blue';
+  /**
+   * WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+   *   이 콘솔이 대상으로 하는 canonical service_key.
+   *   상태 변경 / 재활성화 write 에 함께 전달해 **해당 서비스 membership 에만**
+   *   조치가 적용되게 한다 (미지정 시 서버는 종전 동작 = 운영자 보유 scope 전체).
+   */
+  serviceKey?: string;
+  /**
+   * WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+   *   "목록으로" 및 삭제 후 이동 경로. 서비스별 회원 목록 route 가 다르다.
+   *   미지정 시 종전 기본값 `/operator/users`.
+   */
+  listPath?: string;
   /** 사업자 정보 섹션 라벨 */
   labels: {
     /** 섹션 제목 (e.g., "사업자 정보", "약국 정보") */

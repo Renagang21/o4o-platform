@@ -30,6 +30,8 @@ const apiAdapter = createUserDetailApiAdapter(api);
 // ─── Config ──────────────────────────────────────────────────
 
 const netureConfig: UserDetailConfig = {
+  // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1
+  serviceKey: 'neture',
   theme: 'primary',
   labels: {
     businessInfoTitle: '사업자 정보',
@@ -45,21 +47,20 @@ const netureConfig: UserDetailConfig = {
  * 정지/활성화 → MembershipConsole API
  */
 const netureActions: UserDetailActions = {
-  handleStatusChange: async (userId, status, { user, memberships, api: adapter }) => {
+  handleStatusChange: async (userId, status, { user, api: adapter }) => {
     if (status === 'approved' && (user.status === 'pending' || user.status === 'rejected')) {
       await adapter.post(`/neture/operator/registrations/${userId}/approve`);
     } else if (status === 'rejected' && user.status === 'pending') {
       await adapter.post(`/neture/operator/registrations/${userId}/reject`, { reason: '운영자 거부' });
     } else {
-      const netureMembership = memberships.find(m => m.serviceKey === 'neture');
-      if (netureMembership) {
-        const endpoint = status === 'suspended'
-          ? `/operator/members/${netureMembership.id}/reject`
-          : `/operator/members/${netureMembership.id}/approve`;
-        await adapter.patch(endpoint);
-      } else {
-        await adapter.patch(`/operator/members/${userId}/status`, { status });
-      }
+      // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+      //   정지/활성화 canonical 계약 = active → suspended / suspended → active.
+      //   membership `reject`(가입 반려) 매핑을 제거하고 공통 lifecycle endpoint 로 정렬한다.
+      //   serviceKey 로 neture membership 경계를 명시한다.
+      await adapter.patch(`/operator/members/${userId}/status`, {
+        status: status === 'approved' ? 'active' : status,
+        serviceKey: 'neture',
+      });
     }
   },
 };

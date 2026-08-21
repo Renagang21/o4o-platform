@@ -387,7 +387,12 @@ export default function UserDetailPage({
             return;
           }
         }
-        await apiAdapter.patch(`/operator/members/${id}/status`, { status });
+        // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+        //   serviceKey 를 실어 lifecycle 조치가 이 서비스 membership 에만 적용되게 한다.
+        await apiAdapter.patch(`/operator/members/${id}/status`, {
+          status,
+          ...(config.serviceKey ? { serviceKey: config.serviceKey } : {}),
+        });
       }
       fetchDetail();
     } catch (err: any) {
@@ -403,7 +408,7 @@ export default function UserDetailPage({
     if (!confirm('이 사용자의 멤버십과 역할을 복구하시겠습니까?')) return;
     setActionLoading('reactivate');
     try {
-      await apiAdapter.post(`/operator/members/${id}/reactivate`);
+      await apiAdapter.post(`/operator/members/${id}/reactivate`, config.serviceKey ? { serviceKey: config.serviceKey } : undefined);
       fetchDetail();
     } catch (err: any) {
       alert(err.message || '복구에 실패했습니다.');
@@ -418,7 +423,7 @@ export default function UserDetailPage({
     setActionLoading('delete');
     try {
       await apiAdapter.delete(`/operator/members/${id}`);
-      navigate('/operator/users');
+      navigate(config.listPath ?? '/operator/users');
     } catch (err: any) {
       alert(err.message || '오류가 발생했습니다.');
     } finally {
@@ -478,7 +483,7 @@ export default function UserDetailPage({
   if (error || !user) {
     return (
       <div className="p-6">
-        <button onClick={() => navigate('/operator/users')} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 mb-4">
+        <button onClick={() => navigate(config.listPath ?? '/operator/users')} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 mb-4">
           <ArrowLeft className="w-4 h-4" />뒤로가기
         </button>
         <div className="flex items-center gap-2 rounded-lg bg-red-50 p-4 text-sm text-red-700">
@@ -491,7 +496,7 @@ export default function UserDetailPage({
   return (
     <div className="p-6 max-w-5xl">
       {/* Back Button */}
-      <button onClick={() => navigate('/operator/users')} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 mb-4">
+      <button onClick={() => navigate(config.listPath ?? '/operator/users')} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 mb-4">
         <ArrowLeft className="w-4 h-4" />회원 목록
       </button>
 

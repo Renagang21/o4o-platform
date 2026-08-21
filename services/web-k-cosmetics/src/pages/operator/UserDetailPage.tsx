@@ -23,6 +23,8 @@ const apiAdapter = createUserDetailApiAdapter(api);
 // ─── Config ──────────────────────────────────────────────────
 
 const cosmeticsConfig: UserDetailConfig = {
+  // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1
+  serviceKey: 'k-cosmetics',
   theme: 'primary',
   labels: {
     businessInfoTitle: '사업자 정보',

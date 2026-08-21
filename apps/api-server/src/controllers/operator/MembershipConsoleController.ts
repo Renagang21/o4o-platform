@@ -232,6 +232,42 @@ export class MembershipConsoleController {
   /**
    * Service boundary check — non-platform-admin can only access users in their service scope
    */
+  /**
+   * WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1 (lifecycle fan-out 경계)
+   *
+   * 원칙: "서비스 운영자의 회원 상태 변경은 해당 serviceKey 의 membership 에만 영향을 줘야 한다."
+   *
+   * 기존 write 경로(updateMemberStatus / batchUpdateStatus / reactivateMember)는
+   * `scope.serviceKeys`(= 운영자가 보유한 **모든** 서비스)를 그대로 MembershipApprovalService 에
+   * 넘겼다. 다중 서비스 operator 나 platform admin 이 한 콘솔에서 정지/재활성화하면
+   * 같은 사용자의 **다른 서비스 membership 과 role_assignments 까지** 함께 바뀐다.
+   * 읽기 경로는 이미 `resolveOperatorScope` 로 좁혀져 있어 축이 어긋나 있었다.
+   *
+   * 교정: write 요청도 명시 serviceKey(body 우선, query fallback)로 좁힌다.
+   *   - service operator : 보유 scope 안이면 그 키 하나로 축소, 밖이면 빈 scope (권한 확대 불가)
+   *   - platform admin   : 지정한 키 하나로 축소 (scope 필터가 실제 적용되도록 flag 도 내린다)
+   *   - serviceKey 미지정: 종전 동작 유지 (하위 호환 — 미채택 클라이언트 보호)
+   *
+   * users.status(플랫폼 축)는 이 helper 로 바뀌지 않는다 — 기존 계약 그대로다.
+   */
+  private resolveWriteScope(
+    req: Request,
+    scope: ServiceScope,
+  ): { isPlatformAdmin: boolean; serviceKeys: string[] } {
+    const raw = (req.body && (req.body as any).serviceKey) ?? (req.query as any)?.serviceKey;
+    const sk = typeof raw === 'string' ? raw.trim() : '';
+    if (!sk || sk === 'all') {
+      return { isPlatformAdmin: scope.isPlatformAdmin, serviceKeys: scope.serviceKeys };
+    }
+    if (scope.isPlatformAdmin) {
+      return { isPlatformAdmin: false, serviceKeys: [sk] };
+    }
+    return {
+      isPlatformAdmin: false,
+      serviceKeys: scope.serviceKeys.includes(sk) ? [sk] : [],
+    };
+  }
+
   private async checkServiceBoundary(userId: string, serviceKeys: string[]): Promise<boolean> {
     const result = await AppDataSource.query(
       `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = ANY($2) LIMIT 1`,
@@ -681,6 +717,7 @@ export class MembershipConsoleController {
   updateMemberStatus = async (req: Request, res: Response): Promise<void> => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
+      const writeScope = this.resolveWriteScope(req, scope);
       const { userId } = req.params;
       if (!isValidUuid(userId)) {
         res.status(400).json(INVALID_USER_ID_RESPONSE);
@@ -694,8 +731,8 @@ export class MembershipConsoleController {
         return;
       }
 
-      if (!scope.isPlatformAdmin) {
-        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+      if (!writeScope.isPlatformAdmin) {
+        const hasAccess = await this.checkServiceBoundary(userId, writeScope.serviceKeys);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
@@ -705,14 +742,14 @@ export class MembershipConsoleController {
       if (status === 'approved' || status === 'active') {
         // Delegate to MembershipApprovalService for atomic 3-table consistency
         // (membership + user + role_assignments in single transaction)
-        const pendingMemberships = scope.isPlatformAdmin
+        const pendingMemberships = writeScope.isPlatformAdmin
           ? await AppDataSource.query(
               `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
               [userId]
             )
           : await AppDataSource.query(
               `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
-              [userId, scope.serviceKeys]
+              [userId, writeScope.serviceKeys]
             );
 
         if (pendingMemberships.length > 0) {
@@ -720,8 +757,8 @@ export class MembershipConsoleController {
             const approved = await approvalService.approveMembership({
               membershipId: m.id,
               approvedBy: updatedBy,
-              isPlatformAdmin: scope.isPlatformAdmin,
-              serviceKeys: scope.serviceKeys,
+              isPlatformAdmin: writeScope.isPlatformAdmin,
+              serviceKeys: writeScope.serviceKeys,
             });
             // WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1: 판매자 승인 시 내 매장 context 자동 provision
             await this.ensureCosmeticsStoreContext(approved);
@@ -730,8 +767,8 @@ export class MembershipConsoleController {
           await approvalService.reactivateMembership({
             userId,
             reactivatedBy: updatedBy,
-            isPlatformAdmin: scope.isPlatformAdmin,
-            serviceKeys: scope.serviceKeys,
+            isPlatformAdmin: writeScope.isPlatformAdmin,
+            serviceKeys: writeScope.serviceKeys,
           })
         ) {
           // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 (D3):
@@ -741,7 +778,7 @@ export class MembershipConsoleController {
           //   재활성화의 canonical 경로는 이미 존재한다 — reactivateMembership
           //   (membership + user + role_assignments atomic, POST /:userId/reactivate 와 동일).
           //   비활성화(suspended)의 역동작이므로 활성화 요청은 여기로 위임한다.
-          //   경계는 그대로다: 비-platform-admin 은 scope.serviceKeys 안의 membership 만
+          //   경계는 그대로다: 비-platform-admin 은 writeScope.serviceKeys 안의 membership 만
           //   되살리고 users.status='suspended'(플랫폼 조치)는 건드리지 않는다.
         } else {
           // No pending / reactivatable memberships — just activate user (idempotent)
@@ -764,8 +801,8 @@ export class MembershipConsoleController {
         const result = await approvalService.suspendMembership({
           userId,
           suspendedBy: updatedBy,
-          isPlatformAdmin: scope.isPlatformAdmin,
-          serviceKeys: scope.serviceKeys,
+          isPlatformAdmin: writeScope.isPlatformAdmin,
+          serviceKeys: writeScope.serviceKeys,
         });
 
         if (!result) {
@@ -782,14 +819,14 @@ export class MembershipConsoleController {
         //
         // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
         //   service_memberships.status(SSOT) 갱신은 그대로 유지 — 목록 필터가 이 값을 본다.
-        const rejectableMemberships = scope.isPlatformAdmin
+        const rejectableMemberships = writeScope.isPlatformAdmin
           ? await AppDataSource.query(
               `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active')`,
               [userId]
             )
           : await AppDataSource.query(
               `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)`,
-              [userId, scope.serviceKeys]
+              [userId, writeScope.serviceKeys]
             );
 
         let rejectedCount = 0;
@@ -797,8 +834,8 @@ export class MembershipConsoleController {
           const rejected = await approvalService.rejectMembership({
             membershipId: m.id,
             reason: req.body.reason || null,
-            isPlatformAdmin: scope.isPlatformAdmin,
-            serviceKeys: scope.serviceKeys,
+            isPlatformAdmin: writeScope.isPlatformAdmin,
+            serviceKeys: writeScope.serviceKeys,
           });
           if (rejected) rejectedCount += 1;
         }
@@ -818,7 +855,7 @@ export class MembershipConsoleController {
         //   서비스 접근 차단은 membership 만으로 성립한다 —
         //   membership-guard.middleware 가 `membership.status !== 'active'` 를 403 으로 막는다.
         const target = status.toLowerCase();
-        const updated = scope.isPlatformAdmin
+        const updated = writeScope.isPlatformAdmin
           ? await AppDataSource.query(
               `UPDATE service_memberships SET status = $1, updated_at = NOW()
                WHERE user_id = $2 AND status <> $1 RETURNING id`,
@@ -827,7 +864,7 @@ export class MembershipConsoleController {
           : await AppDataSource.query(
               `UPDATE service_memberships SET status = $1, updated_at = NOW()
                WHERE user_id = $2 AND service_key = ANY($3) AND status <> $1 RETURNING id`,
-              [target, userId, scope.serviceKeys]
+              [target, userId, writeScope.serviceKeys]
             );
 
         // pg driver 는 `UPDATE ... RETURNING` 에 [rows, rowCount] 를 반환한다.
@@ -886,14 +923,15 @@ export class MembershipConsoleController {
       }
 
       const scope: ServiceScope = (req as any).serviceScope;
+      const writeScope = this.resolveWriteScope(req, scope);
       const updatedBy = (req as any).user?.id || null;
       const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
 
       for (const userId of ids) {
         try {
           // Check access
-          if (!scope.isPlatformAdmin) {
-            const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+          if (!writeScope.isPlatformAdmin) {
+            const hasAccess = await this.checkServiceBoundary(userId, writeScope.serviceKeys);
             if (!hasAccess) {
               results.push({ id: userId, status: 'failed', error: 'User not found or out of scope' });
               continue;
@@ -901,14 +939,14 @@ export class MembershipConsoleController {
           }
 
           if (targetStatus === 'approved') {
-            const pendingMemberships = scope.isPlatformAdmin
+            const pendingMemberships = writeScope.isPlatformAdmin
               ? await AppDataSource.query(
                   `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
                   [userId]
                 )
               : await AppDataSource.query(
                   `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
-                  [userId, scope.serviceKeys]
+                  [userId, writeScope.serviceKeys]
                 );
 
             if (pendingMemberships.length > 0) {
@@ -916,8 +954,8 @@ export class MembershipConsoleController {
                 const approved = await approvalService.approveMembership({
                   membershipId: m.id,
                   approvedBy: updatedBy,
-                  isPlatformAdmin: scope.isPlatformAdmin,
-                  serviceKeys: scope.serviceKeys,
+                  isPlatformAdmin: writeScope.isPlatformAdmin,
+                  serviceKeys: writeScope.serviceKeys,
                 });
                 // WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1: 판매자 승인 시 내 매장 context 자동 provision
                 await this.ensureCosmeticsStoreContext(approved);
@@ -926,8 +964,8 @@ export class MembershipConsoleController {
               await approvalService.reactivateMembership({
                 userId,
                 reactivatedBy: updatedBy,
-                isPlatformAdmin: scope.isPlatformAdmin,
-                serviceKeys: scope.serviceKeys,
+                isPlatformAdmin: writeScope.isPlatformAdmin,
+                serviceKeys: writeScope.serviceKeys,
               })
             ) {
               // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 (D3):
@@ -948,22 +986,22 @@ export class MembershipConsoleController {
             const result = await approvalService.suspendMembership({
               userId,
               suspendedBy: updatedBy,
-              isPlatformAdmin: scope.isPlatformAdmin,
-              serviceKeys: scope.serviceKeys,
+              isPlatformAdmin: writeScope.isPlatformAdmin,
+              serviceKeys: writeScope.serviceKeys,
             });
             if (!result) {
               results.push({ id: userId, status: 'skipped', error: 'No active memberships found' });
               continue;
             }
           } else if (targetStatus === 'rejected') {
-            const pendingMemberships = scope.isPlatformAdmin
+            const pendingMemberships = writeScope.isPlatformAdmin
               ? await AppDataSource.query(
                   `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active')`,
                   [userId]
                 )
               : await AppDataSource.query(
                   `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)`,
-                  [userId, scope.serviceKeys]
+                  [userId, writeScope.serviceKeys]
                 );
 
             // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
@@ -973,8 +1011,8 @@ export class MembershipConsoleController {
               const rejected = await approvalService.rejectMembership({
                 membershipId: m.id,
                 reason: req.body.reason || null,
-                isPlatformAdmin: scope.isPlatformAdmin,
-                serviceKeys: scope.serviceKeys,
+                isPlatformAdmin: writeScope.isPlatformAdmin,
+                serviceKeys: writeScope.serviceKeys,
               });
               if (rejected) rejectedCount += 1;
             }
@@ -985,7 +1023,7 @@ export class MembershipConsoleController {
             }
           }
 
-          const serviceKey = scope.serviceKeys[0] || 'platform';
+          const serviceKey = writeScope.serviceKeys[0] || 'platform';
           this.getActionLogService()?.logSuccess(serviceKey, updatedBy || 'unknown', `${serviceKey}.operator.member_batch_${targetStatus}`, {
             meta: { targetId: userId, statusAfter: targetStatus },
           }).catch(() => {});
@@ -1016,6 +1054,7 @@ export class MembershipConsoleController {
   reactivateMember = async (req: Request, res: Response): Promise<void> => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
+      const writeScope = this.resolveWriteScope(req, scope);
       const { userId } = req.params;
       if (!isValidUuid(userId)) {
         res.status(400).json(INVALID_USER_ID_RESPONSE);
@@ -1023,8 +1062,8 @@ export class MembershipConsoleController {
       }
       const reactivatedBy = (req as any).user?.id || null;
 
-      if (!scope.isPlatformAdmin) {
-        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+      if (!writeScope.isPlatformAdmin) {
+        const hasAccess = await this.checkServiceBoundary(userId, writeScope.serviceKeys);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
@@ -1034,8 +1073,8 @@ export class MembershipConsoleController {
       const result = await approvalService.reactivateMembership({
         userId,
         reactivatedBy,
-        isPlatformAdmin: scope.isPlatformAdmin,
-        serviceKeys: scope.serviceKeys,
+        isPlatformAdmin: writeScope.isPlatformAdmin,
+        serviceKeys: writeScope.serviceKeys,
       });
 
       if (!result) {
@@ -1044,7 +1083,7 @@ export class MembershipConsoleController {
       }
 
       // Audit logging
-      const serviceKey = scope.serviceKeys[0] || 'platform';
+      const serviceKey = writeScope.serviceKeys[0] || 'platform';
       this.getActionLogService()?.logSuccess(
         serviceKey,
         reactivatedBy || 'unknown',

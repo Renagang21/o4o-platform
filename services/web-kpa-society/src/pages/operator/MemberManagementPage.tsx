@@ -17,7 +17,7 @@
  *   - 소프트 탈퇴:      PATCH /kpa/members/:id/status  status=withdrawn (bulk)
  */
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import { toast } from '@o4o/error-handling';
 import {
   CheckCircle,
@@ -70,6 +70,12 @@ interface KpaMemberRaw {
 }
 
 interface KpaUserData extends UserData {
+  /**
+   * WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+   *   KPA 전용 행 식별자(kpa_members.id ?? service_memberships.id). 표시·디버깅용이며
+   *   API 호출에는 쓰지 않는다 — 서버가 users.id 를 canonical 로 받는다.
+   */
+  kpa_member_row_id: string;
   has_kpa_member: boolean;
   membership_type: string | null;
   license_number: string | null;
@@ -124,7 +130,15 @@ function formatDate(dateStr: string | null | undefined): string {
 
 function kpaMemberToUserData(m: KpaMemberRaw): KpaUserData {
   return {
-    id: m.id,
+    // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+    //   공통 운영자 콘솔의 `UserData.id` canonical 축은 4서비스 공통 **users.id** 다.
+    //   기존에는 KPA 만 `km_id ?? sm_id`(KPA 전용 축)를 실어서
+    //     - "전체 상세 페이지 →"(/operator/users/:id → GET /operator/members/:userId) 404
+    //     - 비밀번호 변경이 ref map 우회(member.id → user_id)를 필요로 함
+    //   두 결함을 만들었다. KPA 전용 id 는 서버가 해석한다
+    //   (PATCH /kpa/members/:id/{status,info} 가 users.id | km.id | sm.id 3-way 허용).
+    id: m.user_id,
+    kpa_member_row_id: m.id,
     email: m.user?.email ?? '',
     name: m.user?.name ?? '',
     nickname: m.user?.nickname ?? undefined,
@@ -197,10 +211,6 @@ export default function MemberManagementPage() {
   //   가입 신청서(KpaApplication) outer tab·deeplink(?tab=applications)·stats 제거 — dead flow.
   //   회원 승인 canonical 화면만 유지. (?tab=applications 딥링크는 아래 wrapper 가 무시하고 회원 목록 렌더.)
 
-  // member.id → user_id 매핑 — wrapper 의 password modal 이 user.id (=member.id) 만
-  // 넘기는데, /operator/members/:userId 는 실제 users.id 가 필요하므로 list/listAll 시점에 적재.
-  const memberIdToUserIdRef = useRef<Map<string, string>>(new Map());
-
   const client: MembersConsoleClient = useMemo(() => ({
     async list(params: MembersConsoleListParams) {
       const reqParams: Record<string, string | number | boolean | undefined> = {
@@ -213,7 +223,6 @@ export default function MemberManagementPage() {
         '/members', reqParams,
       );
       const list = res.data || [];
-      list.forEach((m) => memberIdToUserIdRef.current.set(m.id, m.user_id));
       return {
         users: list.map(kpaMemberToUserData),
         pagination: {
@@ -227,7 +236,6 @@ export default function MemberManagementPage() {
     async listAll() {
       const res = await apiClient.get<{ data: KpaMemberRaw[]; total: number }>('/members', { limit: 1000 });
       const list = res.data || [];
-      list.forEach((m) => memberIdToUserIdRef.current.set(m.id, m.user_id));
       return { users: list.map(kpaMemberToUserData) };
     },
     async stats() {
@@ -258,11 +266,9 @@ export default function MemberManagementPage() {
       const mapped: MemberStatus = status === 'approved' ? 'active' : status;
       return fanOutStatusBatch(ids, mapped);
     },
-    async updatePassword(memberId: string, password: string, serviceKey: string) {
-      const userId = memberIdToUserIdRef.current.get(memberId);
-      if (!userId) {
-        throw new Error('사용자 정보를 찾을 수 없습니다. 목록을 새로고침한 뒤 다시 시도해 주세요.');
-      }
+    async updatePassword(userId: string, password: string, serviceKey: string) {
+      // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+      //   `UserData.id` 가 users.id 로 정렬되어 wrapper 의 ID 변환 map 이 불필요해졌다.
       // WO-O4O-KPA-SERVICE-OPERATOR-MANAGEMENT-INFORMATION-AUDIT-V1:
       //   비밀번호 변경은 플랫폼 공통 operator 콘솔 API(`/api/v1/operator/members/:userId`) 다.
       //   kpa 전용 apiClient(base `/api/v1/kpa`) 로 호출하면 `/api/v1/kpa/operator/members/:userId`
@@ -360,7 +366,7 @@ export default function MemberManagementPage() {
               divider: true,
               visible: (u) => {
                 const k = u as KpaUserData;
-                return k.status === 'active' && k.has_kpa_member;
+                return k.status === 'active';
               },
               confirm: {
                 title: '회원 정지',
@@ -384,7 +390,7 @@ export default function MemberManagementPage() {
               icon: <CheckCircle size={14} />,
               visible: (u) => {
                 const k = u as KpaUserData;
-                return k.status === 'suspended' && k.has_kpa_member;
+                return k.status === 'suspended';
               },
               onClick: async (u) => {
                 try {
@@ -405,7 +411,7 @@ export default function MemberManagementPage() {
               getTargetIds: (users) => users
                 .filter((u) => {
                   const k = u as KpaUserData;
-                  return k.status === 'active' && k.has_kpa_member;
+                  return k.status === 'active';
                 })
                 .map((u) => u.id),
               executeBatch: (ids) => fanOutStatusBatch(ids, 'suspended'),
@@ -424,7 +430,7 @@ export default function MemberManagementPage() {
               getTargetIds: (users) => users
                 .filter((u) => {
                   const k = u as KpaUserData;
-                  return k.status === 'suspended' && k.has_kpa_member;
+                  return k.status === 'suspended';
                 })
                 .map((u) => u.id),
               executeBatch: (ids) => fanOutStatusBatch(ids, 'active'),
@@ -443,7 +449,7 @@ export default function MemberManagementPage() {
               getTargetIds: (users) => users
                 .filter((u) => {
                   const k = u as KpaUserData;
-                  return k.status !== 'withdrawn' && k.has_kpa_member;
+                  return k.status !== 'withdrawn';
                 })
                 .map((u) => u.id),
               executeBatch: (ids) => fanOutStatusBatch(ids, 'withdrawn'),

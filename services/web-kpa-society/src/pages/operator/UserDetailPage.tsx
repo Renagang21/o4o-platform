@@ -24,6 +24,9 @@ const apiAdapter = createUserDetailApiAdapter(authClient.api);
 // ─── Config ──────────────────────────────────────────────────
 
 const kpaConfig: UserDetailConfig = {
+  // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+  //   lifecycle write 는 이 serviceKey 의 membership 에만 영향을 준다 (fan-out 차단).
+  serviceKey: 'kpa-society',
   theme: 'blue',
   labels: {
     businessInfoTitle: '약국 정보',

@@ -110,10 +110,12 @@ const kcosMembersClient: MembersConsoleClient = {
     return data;
   },
   async updateStatus(userId, status) {
-    await api.patch(`/operator/members/${userId}/status`, { status });
+    // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-DETAIL-ID-AND-STATUS-CONTRACT-CLOSURE-V1:
+    //   lifecycle write 는 대상 serviceKey 의 membership 에만 적용된다 (타 서비스 fan-out 차단).
+    await api.patch(`/operator/members/${userId}/status`, { status, serviceKey: 'k-cosmetics' });
   },
   async batchUpdateStatus(ids, status) {
-    const { data } = await api.post('/operator/members/batch-status', { ids, status });
+    const { data } = await api.post('/operator/members/batch-status', { ids, status, serviceKey: 'k-cosmetics' });
     return data;
   },
   async updatePassword(userId, password, serviceKey) {
@@ -231,7 +233,7 @@ export default function UsersPage() {
           getTargetIds: (users) =>
             users.filter((u) => u.status === 'active' || u.status === 'approved').map((u) => u.id),
           executeBatch: async (ids) => {
-            const { data } = await api.post('/operator/members/batch-status', { ids, status: 'suspended' });
+            const { data } = await api.post('/operator/members/batch-status', { ids, status: 'suspended', serviceKey: 'k-cosmetics' });
             return { data };
           },
           confirm: { title: '일괄 정지 확인', message: '선택한 회원을 정지 처리합니다.', confirmText: '정지', variant: 'danger' },
@@ -244,7 +246,7 @@ export default function UsersPage() {
           getTargetIds: (users) => users.filter((u) => u.status === 'suspended').map((u) => u.id),
           executeBatch: async (ids) => {
             const settled = await Promise.allSettled(
-              ids.map((id) => api.patch(`/operator/members/${id}/status`, { status: 'active' })),
+              ids.map((id) => api.patch(`/operator/members/${id}/status`, { status: 'active', serviceKey: 'k-cosmetics' })),
             );
             return {
               data: {
