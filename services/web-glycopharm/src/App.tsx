@@ -235,6 +235,9 @@ import {
   glycopharmGuideFeaturePopProps,
   glycopharmGuideFeatureBlogProps,
   glycopharmGuideFeatureProductionMaterialsProps,
+  glycopharmGuideFeatureLmsProps,
+  glycopharmGuideFeatureStoreProps,
+  glycopharmGuideFeatureQrProps,
   // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: store-facing compact 푸터
   StoreFacingFooter,
 } from '@o4o/shared-space-ui';
@@ -704,6 +707,9 @@ function AppRoutes() {
         <Route path="guide/features/pop" element={<GuideFeatureManualPage {...glycopharmGuideFeaturePopProps} />} />
         <Route path="guide/features/blog" element={<GuideFeatureManualPage {...glycopharmGuideFeatureBlogProps} />} />
         <Route path="guide/features/production-materials" element={<GuideFeatureManualPage {...glycopharmGuideFeatureProductionMaterialsProps} />} />
+        <Route path="guide/features/lms" element={<GuideFeatureManualPage {...glycopharmGuideFeatureLmsProps} />} />
+        <Route path="guide/features/store" element={<GuideFeatureManualPage {...glycopharmGuideFeatureStoreProps} />} />
+        <Route path="guide/features/qr" element={<GuideFeatureManualPage {...glycopharmGuideFeatureQrProps} />} />
 
         <Route path="apply" element={<PharmacyApplyPage />} />
         <Route path="apply/pharmacist" element={<PharmacistApplyPage />} />

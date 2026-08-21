@@ -474,7 +474,7 @@ export const kCosmeticsGuideFeaturesProps: GuideFeaturesPageProps = {
     title: '기능별 이용 방법',
     description: 'K-Cosmetics 주요 기능을 카테고리별로 정리했습니다. 필요한 기능을 선택해 바로 이동합니다.',
     flowBarTitle: '기능 카테고리',
-    flowLabels: ['포럼', '강의', '콘텐츠', '자료실', '사이니지', 'POP', '블로그', '제작 자료'],
+    flowLabels: ['포럼', '강의', '콘텐츠', '자료실', '사이니지', 'POP', '블로그', '제작 자료', '매장 운영', 'QR · 태블릿'],
   },
   groups: [
     {
@@ -561,6 +561,31 @@ export const kCosmeticsGuideFeaturesProps: GuideFeaturesPageProps = {
         { label: '제작 자료 열기', route: '/store/library/production-materials' },
       ],
       linkTo: '/guide/features/production-materials',
+    },
+    {
+      step: '09',
+      title: '매장 운영',
+      primaryRoute: '/store',
+      description: '매장 상품·거래, 매장 활성화, 자료함, 설정을 한 곳에서 관리합니다. 승인된 매장 계정이 필요합니다.',
+      items: [
+        { label: '매장 운영 이용 방법', route: '/guide/features/store' },
+        { label: '운영 홈', route: '/store' },
+        { label: '상품 구성', route: '/store/commerce/products' },
+        { label: '주문 관리', route: '/store/commerce/orders' },
+      ],
+      linkTo: '/guide/features/store',
+    },
+    {
+      step: '10',
+      title: 'QR · 태블릿',
+      primaryRoute: '/store/marketing/qr',
+      description: '매장 자료를 QR로 연결하고 매장 태블릿 화면으로 고객에게 보여줍니다.',
+      items: [
+        { label: 'QR · 태블릿 이용 방법', route: '/guide/features/qr' },
+        { label: 'QR 코드 관리', route: '/store/marketing/qr' },
+        { label: '태블릿 화면 관리', route: '/store/commerce/tablet-displays' },
+      ],
+      linkTo: '/guide/features/qr',
     },
   ],
   bottomNav: {
@@ -1237,5 +1262,157 @@ export const kCosmeticsServiceIntroProps: GuideServiceIntroPageProps = {
     body: '서비스 이용, 가입, 권한, 공급 · 제휴, 오류 신고와 관련된 문의는 문의하기를 통해 접수할 수 있습니다.',
     note: '문의 수신 경로와 푸터 문의 링크는 후속 푸터 / 문의 정비 작업에서 함께 정리합니다.',
     action: { to: '/contact', label: '문의하기', icon: ArrowRight },
+  },
+};
+
+// ─── /guide/features/store ─────────────────────────────────────────────
+
+export const kCosmeticsGuideFeatureStoreProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '매장 운영 이용 방법',
+    description: '매장 상품·거래, 매장 활성화, 자료함, 설정을 한 곳에서 관리',
+    primaryAction: { label: '매장 운영으로 이동 →', to: '/store' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['운영 홈 이동', '매장 상품·거래', '매장 활성화', '자료함 · 제작 자료', '분석 · 설정'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '운영 홈 이동',
+      routeLabel: '/store',
+      description: '승인된 매장 계정으로 로그인한 뒤 매장 운영 화면으로 진입합니다.',
+      items: [
+        { label: '매장 진입', detail: '/store 로 이동하면 매장 운영 홈이 표시됩니다.' },
+        { label: '계정 조건', detail: '승인된 매장 계정에서만 매장 메뉴가 표시됩니다.' },
+        { label: '메뉴 구조', detail: '왼쪽 메뉴에서 상품·거래, 활성화, 자료함, 사이니지, 채널 영역으로 이동합니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '매장 상품·거래',
+      routeLabel: '/store/commerce/products',
+      description: '취급할 상품을 구성하고 주문·승인 상태를 확인합니다.',
+      items: [
+        { label: '상품 확인', detail: '/store/commerce/products 에서 공급자가 제공하는 상품을 확인합니다.' },
+        { label: '주문 관리', detail: '/store/commerce/orders 에서 내 매장이 주문한 상품의 진행 상태를 확인합니다.' },
+        { label: '신청·승인 현황', detail: '/store/commerce/recruitment-applications 에서 신청 결과를 확인합니다.' },
+        { label: '관심 요청 관리', detail: '/store/interest-requests 에서 고객이 남긴 관심 요청을 확인합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '매장 활성화',
+      routeLabel: '/store/my-products',
+      description: '고객에게 보여줄 제품과 안내 자료를 준비합니다.',
+      items: [
+        { label: '내 매장 제품', detail: '/store/my-products 에서 우리 매장이 취급하는 제품을 관리합니다.' },
+        { label: '자체 상품', detail: '/store/commerce/local-products 에서 매장 자체 상품을 등록합니다.' },
+        { label: '상품 설명', detail: '/store/library/product-descriptions 에서 제품 설명서를 확인합니다.' },
+        { label: '매장 블로그', detail: '/store/content/blog 에서 상품 소개·매장 안내 글을 발행합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '자료함 · 제작 자료',
+      routeLabel: '/store/library/contents',
+      description: '매장에서 사용할 자료를 모으고 만든 실행 자산을 관리합니다.',
+      items: [
+        { label: '콘텐츠 자료함', detail: '/store/library/contents 에서 매장용 콘텐츠를 확인합니다.' },
+        { label: '파일 자료함', detail: '/store/library/resources 에서 내려받을 파일 자료를 확인합니다.' },
+        { label: '제작 자료', detail: '/store/library/production-materials 에서 만든 POP·QR·블로그를 확인합니다.' },
+        { label: '콘텐츠 가져오기', detail: '/store/content 에서 플랫폼 자료를 내 매장으로 가져옵니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '분석 · 설정',
+      routeLabel: '/store/analytics/marketing',
+      description: '매장 성과를 확인하고 매장 정보를 관리합니다.',
+      items: [
+        { label: '마케팅 분석', detail: '/store/analytics/marketing 에서 고객 유입과 성과를 확인합니다.' },
+        { label: '정산·인보이스', detail: '/store/commerce/billing 에서 정산 내역을 확인합니다.' },
+        { label: '매장 정보', detail: '/store/info 에서 매장·사업자 정보를 관리합니다.' },
+        { label: '매장 설정', detail: '/store/settings 에서 매장 노출과 운영 설정을 변경합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/qr ────────────────────────────────────────────────
+
+export const kCosmeticsGuideFeatureQrProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: 'QR · 태블릿 이용 방법',
+    description: '매장 자료를 QR과 태블릿 화면으로 고객에게 연결',
+    primaryAction: { label: 'QR 코드로 이동 →', to: '/store/marketing/qr' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['QR 이동', 'QR 만들기', '인쇄 · 배치', '태블릿 연결', '활용 기준'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: 'QR 이동',
+      routeLabel: '/store/marketing/qr',
+      description: '매장 메뉴의 매장 활성화 > QR 코드에서 QR 목록을 확인합니다.',
+      items: [
+        { label: 'QR 목록 진입', detail: '/store/marketing/qr 로 이동하면 만든 QR 목록이 표시됩니다.' },
+        { label: '목록 확인', detail: '제목, 연결 유형, 등록일로 기존 QR을 확인합니다.' },
+        { label: '첫 QR', detail: 'QR이 하나도 없으면 첫 QR 만들기 버튼으로 시작합니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: 'QR 만들기',
+      description: '연결 대상을 선택해 새 QR을 만듭니다.',
+      items: [
+        { label: '새 QR 만들기', detail: '새 QR 만들기 버튼을 눌러 등록 창을 엽니다.' },
+        { label: '제목 입력', detail: 'QR을 구분할 이름을 입력합니다. 필수 항목입니다.' },
+        { label: '연결 유형 선택', detail: '링크, 상품, 프로모션, 페이지 중 연결 대상을 선택합니다.' },
+        { label: '대상 지정', detail: '매장 자료, 홈페이지, 이벤트 페이지 등 연결할 주소 또는 ID를 입력합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '인쇄 · 배치',
+      description: '만든 QR을 매장 현장에 배치합니다.',
+      items: [
+        { label: 'QR 이미지 저장', detail: '목록에서 QR 이미지를 내려받아 인쇄물에 사용합니다.' },
+        { label: 'POP 결합', detail: '/store/marketing/pop 에서 만든 POP에 QR을 함께 배치합니다.' },
+        { label: '배치 위치', detail: '진열대·체험대·계산대 등 고객 동선에 맞춰 부착합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '태블릿 연결',
+      routeLabel: '/store/commerce/tablet-displays',
+      description: '매장 태블릿에 표시할 화면과 대기 영상을 구성합니다.',
+      items: [
+        { label: '태블릿 메뉴', detail: '매장 메뉴의 채널 > 태블릿에서 /store/commerce/tablet-displays 로 이동합니다.' },
+        { label: '태블릿 구성', detail: '고객에게 보여줄 제품과 자료를 태블릿 화면에 배치합니다.' },
+        { label: '대기 영상', detail: '고객 조작이 없을 때 재생할 대기 영상을 설정합니다.' },
+        { label: '채널 확인', detail: '/store/channels 에서 매장 채널 구성과 연결 상태를 확인합니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '활용 기준',
+      description: 'QR과 태블릿은 고객이 스스로 정보를 확인하게 하는 안내 수단입니다.',
+      items: [
+        { label: '연결 대상 점검', detail: '부착 전 QR을 직접 스캔해 연결 화면을 확인합니다.' },
+        { label: '용도별 분리', detail: '상품 안내, 이벤트, 매장 소개 QR을 용도별로 나눠 만듭니다.' },
+        { label: '내용 최신 유지', detail: '연결된 자료가 바뀌면 QR과 태블릿 구성도 함께 점검합니다.' },
+        { label: '요청 확인', detail: '/store/interest-requests 에서 접수된 고객 관심 요청을 확인합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
   },
 };

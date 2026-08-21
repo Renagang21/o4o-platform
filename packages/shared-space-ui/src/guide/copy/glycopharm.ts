@@ -488,7 +488,7 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
     title: '기능별 이용 방법',
     description: 'GlycoPharm 주요 기능을 카테고리별로 정리했습니다. 필요한 기능을 선택해 바로 이동합니다.',
     flowBarTitle: '기능 카테고리',
-    flowLabels: ['커뮤니티', '콘텐츠', '자료실', '매장 운영', '사이니지', 'QR · Tablet', 'POP', '블로그', '제작 자료'],
+    flowLabels: ['커뮤니티', '콘텐츠', '자료실', '매장 운영', '사이니지', 'QR · Tablet', 'POP', '블로그', '제작 자료', '강의'],
   },
   groups: [
     {
@@ -527,13 +527,14 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
       primaryRoute: '/store',
       description: '약국 매장의 상품·채널·고객 요청을 통합 관리합니다. 승인된 매장 계정 필요.',
       items: [
+        { label: '약국 매장 운영 이용 방법', route: '/guide/features/store' },
         { label: '운영 홈', route: '/store' },
         { label: '상품 구성', route: '/store/commerce/products' },
         { label: '채널 진열', route: '/store/channels' },
         { label: '고객 요청 관리', route: '/store/requests' },
         { label: '주문 관리', route: '/store/commerce/orders' },
       ],
-      linkTo: '/store',
+      linkTo: '/guide/features/store',
     },
     {
       step: '05',
@@ -551,11 +552,12 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
       primaryRoute: '/store/marketing/qr',
       description: 'QR 코드로 고객을 유입하고 태블릿 키오스크로 상담 요청을 연결합니다.',
       items: [
+        { label: 'QR 코드 이용 방법', route: '/guide/features/qr' },
         { label: 'QR 코드 관리', route: '/store/marketing/qr' },
         { label: '태블릿 키오스크', route: '/store/:pharmacyId/tablet' },
         { label: '마케팅 분석', route: '/store/analytics/marketing' },
       ],
-      linkTo: '/store/marketing/qr',
+      linkTo: '/guide/features/qr',
     },
     {
       step: '07',
@@ -591,6 +593,18 @@ export const glycopharmGuideFeaturesProps: GuideFeaturesPageProps = {
         { label: '제작 자료 열기', route: '/store/library/production-materials' },
       ],
       linkTo: '/guide/features/production-materials',
+    },
+    {
+      step: '10',
+      title: '강의',
+      primaryRoute: '/lms',
+      description: '혈당관리 전문성을 높이는 교육 과정을 온라인으로 수강하고 수료증을 관리합니다.',
+      items: [
+        { label: '강의(LMS) 이용 방법', route: '/guide/features/lms' },
+        { label: '강의 목록', route: '/lms' },
+        { label: '내 수강 내역', route: '/mypage/enrollments' },
+      ],
+      linkTo: '/guide/features/lms',
     },
   ],
   bottomNav: {
@@ -1222,5 +1236,228 @@ export const glycopharmServiceIntroProps: GuideServiceIntroPageProps = {
     body: '서비스 이용, 가입, 권한, 공급 · 제휴, 오류 신고와 관련된 문의는 문의하기를 통해 접수할 수 있습니다.',
     note: '문의 수신 경로와 푸터 문의 링크는 후속 푸터 / 문의 정비 작업에서 함께 정리합니다.',
     action: { to: '/contact', label: '문의하기', icon: ArrowRight },
+  },
+};
+
+// ─── /guide/features/lms ───────────────────────────────────────────────
+
+export const glycopharmGuideFeatureLmsProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '강의(LMS) 이용 방법',
+    description: '혈당관리 전문성을 높이는 온라인 교육 과정',
+    primaryAction: { label: '강의로 이동 →', to: '/lms' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['강의 이동', '강의 찾기', '수강 신청', '강의 수강', '수강 이력 · 수료증'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '강의 이동',
+      routeLabel: '/lms',
+      description: '강의 목록으로 진입해 수강 가능한 과정을 확인합니다.',
+      items: [
+        { label: '강의 진입', detail: '/lms 로 이동하면 수강 가능한 강의 목록이 표시됩니다.' },
+        { label: '강의 목록', detail: '카테고리별로 정리된 혈당관리·상담 교육 과정을 확인합니다.' },
+        { label: '강의 상세 열기', detail: '강의 카드를 선택하면 강의 상세 화면으로 이동합니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '강의 찾기',
+      description: '키워드 검색으로 필요한 과정을 빠르게 찾습니다.',
+      items: [
+        { label: '키워드 검색', detail: '강의명·주제 키워드로 강의를 검색합니다.' },
+        { label: '커리큘럼 확인', detail: '상세 화면에서 강의 목표와 레슨 구성을 확인합니다.' },
+        { label: '강사 정보 확인', detail: '강의를 진행하는 강사와 소개를 확인합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '수강 신청',
+      description: '강의 상세 화면에서 수강을 신청합니다.',
+      items: [
+        { label: '수강 신청', detail: '강의 상세 화면의 수강 신청 버튼으로 수강을 시작합니다.' },
+        { label: '로그인 필요', detail: '로그인하지 않은 상태에서 신청하면 로그인 창이 먼저 표시됩니다.' },
+        { label: '신청 확인', detail: '신청 후 상세 화면에서 수강 중 상태로 바뀌는지 확인합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '강의 수강',
+      description: '레슨 화면에서 커리큘럼 순서대로 수강합니다.',
+      items: [
+        { label: '레슨 재생', detail: '레슨을 선택하면 전용 레슨 화면으로 이동해 재생합니다.' },
+        { label: '진도 확인', detail: '완료한 레슨과 남은 레슨을 커리큘럼에서 확인합니다.' },
+        { label: '이어 듣기', detail: '중단한 레슨은 강의 상세 화면에서 다시 이어서 수강합니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '수강 이력 · 수료증',
+      routeLabel: '/mypage/enrollments',
+      description: '내 수강 내역과 수료 결과를 마이페이지에서 관리합니다.',
+      items: [
+        { label: '수강 내역', detail: '/mypage/enrollments 에서 신청한 강의와 진행 상태를 확인합니다.' },
+        { label: '수료증 확인', detail: '/mypage/certificates 에서 수료한 강의의 수료증을 확인합니다.' },
+        { label: '수료증 저장', detail: '수료증은 별도 화면 없이 강의 화면에서 PDF로 내려받습니다.' },
+        { label: '매장 응대 활용', detail: '학습한 내용을 약국 상담과 고객 안내에 활용합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/store ─────────────────────────────────────────────
+
+export const glycopharmGuideFeatureStoreProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: '약국 매장 운영 이용 방법',
+    description: '상품·거래, 약국 활성화, 자료함, 경영을 한 곳에서 관리',
+    primaryAction: { label: '매장 운영으로 이동 →', to: '/store' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['운영 홈 이동', '약국 상품·거래', '약국 활성화', '자료함 · 제작 자료', '경영 · 설정'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: '운영 홈 이동',
+      routeLabel: '/store',
+      description: '승인된 약국 계정으로 로그인한 뒤 매장 운영 화면으로 진입합니다.',
+      items: [
+        { label: '매장 진입', detail: '/store 로 이동하면 약국 운영 대시보드가 표시됩니다.' },
+        { label: '계정 조건', detail: '승인된 약국 매장 계정에서만 매장 메뉴가 표시됩니다.' },
+        { label: '메뉴 구조', detail: '왼쪽 메뉴에서 상품·거래, 활성화, 자료함, 사이니지, 경영 영역으로 이동합니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: '약국 상품·거래',
+      routeLabel: '/store/commerce/products',
+      description: '취급할 상품을 구성하고 거래·주문 상태를 확인합니다.',
+      items: [
+        { label: '상품 확인', detail: '/store/commerce/products 에서 공급자가 제공하는 상품을 확인합니다.' },
+        { label: '거래 신청', detail: '/store/b2b-order 에서 필요한 상품의 거래를 신청합니다.' },
+        { label: '주문 관리', detail: '/store/commerce/orders 에서 주문·결제 진행 상태를 확인합니다.' },
+        { label: '신청·승인 현황', detail: '/store/commerce/recruitment-applications 에서 신청 결과를 확인합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '약국 활성화',
+      routeLabel: '/store/my-products',
+      description: '고객에게 보여줄 제품과 안내 자료를 준비합니다.',
+      items: [
+        { label: '내 약국 제품', detail: '/store/my-products 에서 우리 약국이 취급하는 제품을 관리합니다.' },
+        { label: '자체 상품', detail: '/store/commerce/local-products 에서 약국 자체 상품을 등록합니다.' },
+        { label: '상품 설명', detail: '/store/library/product-descriptions 에서 제품 설명서를 확인합니다.' },
+        { label: '고객 요청', detail: '/store/requests 에서 고객이 남긴 상담·문의 요청을 확인합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '자료함 · 제작 자료',
+      routeLabel: '/store/library/contents',
+      description: '약국에서 사용할 자료를 모으고 만든 실행 자산을 관리합니다.',
+      items: [
+        { label: '콘텐츠 자료함', detail: '/store/library/contents 에서 매장용 콘텐츠를 확인합니다.' },
+        { label: '파일 자료함', detail: '/store/library/resources 에서 내려받을 파일 자료를 확인합니다.' },
+        { label: '제작 자료', detail: '/store/library/production-materials 에서 만든 POP·QR·블로그를 확인합니다.' },
+        { label: '콘텐츠 가져오기', detail: '/store/content 에서 플랫폼 자료를 내 약국으로 가져옵니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '경영 · 설정',
+      routeLabel: '/store/management',
+      description: '약국 경영 지표와 매장 정보를 관리합니다.',
+      items: [
+        { label: '약국 경영', detail: '/store/management 에서 약국 운영 현황을 확인합니다.' },
+        { label: '정산·인보이스', detail: '/store/billing 에서 정산 내역을 확인합니다.' },
+        { label: '매장 정보', detail: '/store/info 에서 약국·사업자 정보를 관리합니다.' },
+        { label: '매장 설정', detail: '/store/settings 에서 매장 노출과 운영 설정을 변경합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
+  },
+};
+
+// ─── /guide/features/qr ────────────────────────────────────────────────
+
+export const glycopharmGuideFeatureQrProps: GuideFeatureManualPageProps = {
+  hero: {
+    eyebrow: '기능별 이용 방법',
+    title: 'QR 코드 이용 방법',
+    description: '약국 자료·안내 페이지를 QR로 연결해 고객에게 전달',
+    primaryAction: { label: 'QR 코드로 이동 →', to: '/store/marketing/qr' },
+    flowBarTitle: '이용 흐름',
+    flowLabels: ['QR 이동', 'QR 만들기', '인쇄 · 배치', '고객 유입 확인', '활용 기준'],
+  },
+  sections: [
+    {
+      step: '01',
+      title: 'QR 이동',
+      routeLabel: '/store/marketing/qr',
+      description: '매장 메뉴의 약국 활성화 > QR 코드에서 QR 목록을 확인합니다.',
+      items: [
+        { label: 'QR 목록 진입', detail: '/store/marketing/qr 로 이동하면 만든 QR 목록이 표시됩니다.' },
+        { label: '목록 확인', detail: '제목, 연결 유형, 등록일로 기존 QR을 확인합니다.' },
+        { label: '첫 QR', detail: 'QR이 하나도 없으면 첫 QR 만들기 버튼으로 시작합니다.' },
+      ],
+    },
+    {
+      step: '02',
+      title: 'QR 만들기',
+      description: '연결 대상을 선택해 새 QR을 만듭니다.',
+      items: [
+        { label: '새 QR 만들기', detail: '새 QR 만들기 버튼을 눌러 등록 창을 엽니다.' },
+        { label: '제목 입력', detail: 'QR을 구분할 이름을 입력합니다. 필수 항목입니다.' },
+        { label: '연결 유형 선택', detail: '링크, 상품, 프로모션, 페이지 중 연결 대상을 선택합니다.' },
+        { label: '대상 지정', detail: '선택한 유형에 맞는 주소 또는 ID를 입력합니다.' },
+      ],
+    },
+    {
+      step: '03',
+      title: '인쇄 · 배치',
+      description: '만든 QR을 약국 현장에 배치합니다.',
+      items: [
+        { label: 'QR 이미지 저장', detail: '목록에서 QR 이미지를 내려받아 인쇄물에 사용합니다.' },
+        { label: 'POP 결합', detail: '/store/marketing/pop 에서 만든 POP에 QR을 함께 배치합니다.' },
+        { label: '배치 위치', detail: '진열대·상담대·창구 등 고객 동선에 맞춰 부착합니다.' },
+      ],
+    },
+    {
+      step: '04',
+      title: '고객 유입 확인',
+      routeLabel: '/store/analytics/marketing',
+      description: 'QR을 통해 들어온 고객 흐름을 확인합니다.',
+      items: [
+        { label: '마케팅 분석', detail: '/store/analytics/marketing 에서 유입 지표를 확인합니다.' },
+        { label: '전환 퍼널', detail: '/store/funnel 에서 유입 이후 흐름을 확인합니다.' },
+        { label: '고객 요청 확인', detail: '/store/requests 에서 QR을 통해 접수된 상담 요청을 확인합니다.' },
+      ],
+    },
+    {
+      step: '05',
+      title: '활용 기준',
+      description: 'QR은 고객이 스스로 정보를 확인하게 하는 안내 수단입니다.',
+      items: [
+        { label: '연결 대상 점검', detail: '부착 전 QR을 직접 스캔해 연결 화면을 확인합니다.' },
+        { label: '용도별 분리', detail: '상품 안내, 이벤트, 매장 소개 QR을 용도별로 나눠 만듭니다.' },
+        { label: '내용 최신 유지', detail: '연결된 자료가 바뀌면 QR 대상도 함께 점검합니다.' },
+        { label: '전문가 안내 유지', detail: '복약·건강 관련 내용은 약국 내 약사 상담 안내를 함께 표시합니다.' },
+      ],
+    },
+  ],
+  bottomNav: {
+    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
+    home: { label: '홈으로', to: '/' },
   },
 };

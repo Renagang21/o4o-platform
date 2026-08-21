@@ -85,6 +85,10 @@ export {
   glycopharmGuideFeaturePopProps,
   glycopharmGuideFeatureBlogProps,
   glycopharmGuideFeatureProductionMaterialsProps,
+  // WO-O4O-GUIDE-CROSSSERVICE-COVERAGE-GAP-CLOSURE-V1 (A형 gap 해소)
+  glycopharmGuideFeatureLmsProps,
+  glycopharmGuideFeatureStoreProps,
+  glycopharmGuideFeatureQrProps,
 } from './copy/glycopharm.js';
 
 // WO-O4O-NETURE-GUIDE-IA-AND-WRAPPER-PAGES-V1
@@ -151,6 +155,9 @@ export {
   kCosmeticsGuideFeaturePopProps,
   kCosmeticsGuideFeatureBlogProps,
   kCosmeticsGuideFeatureProductionMaterialsProps,
+  // WO-O4O-GUIDE-CROSSSERVICE-COVERAGE-GAP-CLOSURE-V1 (A형 gap 해소)
+  kCosmeticsGuideFeatureStoreProps,
+  kCosmeticsGuideFeatureQrProps,
 } from './copy/k-cosmetics.js';
 
 // WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1

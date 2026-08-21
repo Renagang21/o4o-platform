@@ -264,6 +264,8 @@ import {
   kCosmeticsGuideFeaturePopProps,
   kCosmeticsGuideFeatureBlogProps,
   kCosmeticsGuideFeatureProductionMaterialsProps,
+  kCosmeticsGuideFeatureStoreProps,
+  kCosmeticsGuideFeatureQrProps,
   // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: store-facing compact 푸터
   StoreFacingFooter,
 } from '@o4o/shared-space-ui';
@@ -668,6 +670,8 @@ function AppRoutes() {
         <Route path="guide/features/pop" element={<GuideFeatureManualPage {...kCosmeticsGuideFeaturePopProps} />} />
         <Route path="guide/features/blog" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureBlogProps} />} />
         <Route path="guide/features/production-materials" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureProductionMaterialsProps} />} />
+        <Route path="guide/features/store" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureStoreProps} />} />
+        <Route path="guide/features/qr" element={<GuideFeatureManualPage {...kCosmeticsGuideFeatureQrProps} />} />
       </Route>
 
       {/* Admin Dashboard (WO-K-COSMETICS-ADMIN-AREA-V1: 구조 관리 영역 신설) */}
