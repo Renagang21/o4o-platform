@@ -18,10 +18,16 @@
  * WO-O4O-CROSSSERVICE-HEADER-MENU-FOOTER-UI-COMPLETION-V1:
  *   PublicLayout(공통 GlobalHeader + 푸터) 안에서 렌더된다. 헤더가 이미 브랜드명·서비스명을
  *   표시하므로 페이지 상단의 중복 브랜드 블록을 히어로(가치 제안)로 정리한다.
+ *
+ * WO-O4O-PHARMACYHUB-FINAL-ROLE-ENTRY-AND-PRODUCTION-ADOPTION-CLOSURE-V1:
+ *   로그인 사용자에게는 **보유 역할로 실제 진입 가능한 카드만** 노출한다. 약사 회원에게
+ *   매장 경영·운영자 카드를 그대로 보여주면 클릭 → "접근 권한이 없습니다" 화면이 되어
+ *   dead link 가 된다(진입점 정합성). 비로그인 방문자에게는 서비스 안내 목적으로
+ *   전체 목록을 유지한다. 판정표는 config/service.ts 의 satisfiesRole 하나뿐이다.
  */
 
 import { Link } from 'react-router-dom';
-import { BRAND, ROLES, ROLE_LABELS } from '../config/service';
+import { BRAND, ROLES, ROLE_LABELS, satisfiesRole } from '../config/service';
 import { useAuth } from '../contexts/AuthContext';
 import { getServiceMembershipStatus } from '../lib/membershipGate';
 
@@ -33,6 +39,9 @@ const ENTRIES = [
 export default function HomePage() {
   const { user, isAuthenticated } = useAuth();
   const status = getServiceMembershipStatus(user);
+  const roles: string[] = Array.isArray(user?.roles) ? (user!.roles as string[]) : [];
+  // 비로그인: 서비스 안내로 전체 노출 / 로그인: 실제 진입 가능한 카드만.
+  const entries = isAuthenticated ? ENTRIES.filter((e) => satisfiesRole(roles, e.role)) : ENTRIES;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
@@ -89,23 +98,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section>
-        <h2 className="mb-3 text-sm font-semibold text-gray-700">역할별 진입점</h2>
-        <p className="mb-3 text-xs text-gray-500">
-          약사 회원은 커뮤니티·교육을 바로 이용합니다. 아래 영역은 해당 역할이 부여된 계정만
-          이용할 수 있습니다.
-        </p>
-        <ul className="grid gap-3 sm:grid-cols-3">
-          {ENTRIES.map((e) => (
-            <li key={e.to} className="rounded-lg border border-gray-200 bg-white p-4">
-              <Link to={e.to} className="font-medium text-primary-700">
-                {ROLE_LABELS[e.role]}
-              </Link>
-              <p className="mt-1 text-xs text-gray-500">{e.desc}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {entries.length > 0 && (
+        <section>
+          <h2 className="mb-3 text-sm font-semibold text-gray-700">역할별 진입점</h2>
+          <p className="mb-3 text-xs text-gray-500">
+            {isAuthenticated
+              ? '보유하신 역할로 이용할 수 있는 영역입니다.'
+              : '약사 회원은 커뮤니티·교육을 바로 이용합니다. 아래 영역은 해당 역할이 부여된 계정만 이용할 수 있습니다.'}
+          </p>
+          <ul className="grid gap-3 sm:grid-cols-3">
+            {entries.map((e) => (
+              <li key={e.to} className="rounded-lg border border-gray-200 bg-white p-4">
+                <Link to={e.to} className="font-medium text-primary-700">
+                  {ROLE_LABELS[e.role]}
+                </Link>
+                <p className="mt-1 text-xs text-gray-500">{e.desc}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

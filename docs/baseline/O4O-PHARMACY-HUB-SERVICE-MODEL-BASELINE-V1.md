@@ -188,6 +188,9 @@ Pharmacy-Hub 는 이 축을 **재사용**하며 전용 자격 테이블·전용 
    (= 일반 약사 회원이 매장 경영 capability 를 무단 획득)
 9. 약사 **자격**을 뜻하는 role(`pharmacy-hub:pharmacist` 등) 신설 또는 Pharmacy-Hub 전용 자격 테이블 신설
 10. 가입 write-path 가 `constants/pharmacy-hub-signup-roles.ts` 대신 자체 허용 목록을 갖는 것
+11. 로그인 사용자 화면(홈 역할 카드 · 헤더/사이드 메뉴)에 **보유하지 않은 역할의 진입점**이 노출되는 것
+    (클릭 시 "접근 권한이 없습니다" 로 끝나는 dead link — 판정은 `config/service.ts` 의
+    `satisfiesRole` 하나로만 한다)
 
 1~4 · 7~10 은 다음 spec 이 잠근다:
 `apps/api-server/src/__tests__/pharmacy-hub-member-model-contract.spec.ts` ·
@@ -195,7 +198,38 @@ Pharmacy-Hub 는 이 축을 **재사용**하며 전용 자격 테이블·전용 
 
 ---
 
-## 8. 이전 문서 정정
+## 8. 프로덕션 검증 상태 (최종)
+
+> `WO-O4O-PHARMACYHUB-FINAL-ROLE-ENTRY-AND-PRODUCTION-ADOPTION-CLOSURE-V1` (2026-08-21)
+> 실제 프로덕션(`pharmacyhub.co.kr` · `api.neture.co.kr`)에서 역할별 가입·승인·진입을
+> end-to-end 로 검증했다. 아래가 **최종 상태**이며, 이 축은 더 이상 분할 WO 로 쪼개지 않는다.
+> 상세 결과 → [`CHECK-O4O-PHARMACYHUB-FINAL-ROLE-ENTRY-AND-PRODUCTION-ADOPTION-CLOSURE-V1`](../checks/CHECK-O4O-PHARMACYHUB-FINAL-ROLE-ENTRY-AND-PRODUCTION-ADOPTION-CLOSURE-V1.md)
+
+**활성 role 카탈로그 = 정확히 4개** (운영자 역할 관리 화면 실측 "역할 관리 (4개)"):
+`pharmacy-hub:admin` · `pharmacy-hub:operator` · `pharmacy-hub:member` · `pharmacy-hub:store_owner`
+— 모두 `is_active = is_assignable = true`. `pharmacy-hub:supplier` 는 둘 다 `false` 로
+목록·배정 양쪽에서 닫혀 있다(row 는 이력 보존).
+
+| 축 | 프로덕션 실측 |
+|---|---|
+| 일반 약사 회원 | `/join` member 선택 → 약국명 요구 없음 → pending → 운영자 승인 → 로그인 → `roles = ["pharmacy-hub:member"]` · `entryPoints = { storeOwner: false, operator: false }` |
+| store_owner API (member 호출) | `403 FORBIDDEN · Required scope: pharmacy-hub:store_owner` |
+| operator API (member 호출) | `403 FORBIDDEN · Required scope: pharmacy-hub:operator` |
+| 약국 경영자 | `/join` store_owner 선택 → 약국명 필수 → 승인 → 프로비저닝(조직/매장 `connected`) → 매장 HUB·상품·콘텐츠·QR·매장정보 정상 |
+| store_owner → operator 화면 | 라우트 차단 + API 403 |
+| operator / admin | `/operator` 5화면 · `/admin` 법정정보 설정 정상. 운영자 화면에 **공급자 승인 기능 없음** |
+| supplier 잔재 | route 0 · shell 0 · menu 0 · scope 0 (`supplierId` 등 Neture 공급 **데이터** 필드는 §6-A 로 정상) |
+
+**`service_memberships.role` 표기**: PharmacyHub 는 prefixed 표기(`pharmacy-hub:<role>`)가 정본이다.
+승인 시 `MembershipApprovalService` 가 이 값을 그대로 `role_assignments` 에 부여하기 때문이다.
+prefix 없는 잔여 3건(`admin`/`operator`/`store_owner` — 모두 suspended 계정)은
+`20270317000000-NormalizePharmacyHubBareMembershipRoles` 가 **이미 같은 prefixed role 을
+활성 보유한 사용자에 한해서만**(EXISTS 가드) 표기를 교정한다. 권한 결과는 변하지 않는다
+(authz 는 `role_assignments` + `membership.status` 만 읽고 `membership.role` 을 읽지 않는다).
+
+---
+
+## 9. 이전 문서 정정
 
 아래는 **기록물(WO)이므로 편집하지 않는다** (CLAUDE.md §16-1). 현재 기준은 본 문서다.
 
