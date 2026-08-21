@@ -143,7 +143,7 @@ tenant isolation test 는 §4 사유로 해당 없음 — 대신 **service opera
 ## 9. 회귀 검증 (§14)
 
 `apps/api-server/tests/multi-tenant/appstore.spec.ts` — **24 PASS** (테스트 변경 없음).
-대조군 `cosmetics-seller-extension` · `forum-cosmetics` · `market-trial` · `sellerops` 목록 노출·상세·카탈로그 계약 회귀 0.
+대조군 `cosmetics-seller-extension` · `forum-cosmetics` · `market-trial` 목록 노출·상세·카탈로그 계약 회귀 0.
 공개 목록/상세 응답 형식 무변경. active App Store 기능 축소 0.
 
 - typecheck: 이번 WO 변경 파일 오류 **0**.
@@ -164,16 +164,62 @@ tenant isolation test 는 §4 사유로 해당 없음 — 대신 **service opera
 | 비인증 `POST /api/v1/appstore/install {}` | 400 |
 | 비인증 `GET /api/v1/admin/apps/market` (대조군) | 401 |
 
-### 배포 후
+### 배포 후 (revision `o4o-core-api-03422-kdm`, 2026-08-21)
 
-(배포 완료 후 기록)
+**비인증**
+
+| 요청 | 결과 |
+|---|---|
+| `GET /api/v1/appstore` | 200 · 카탈로그 17건 (변동 없음) |
+| `GET /api/v1/appstore/cosmetics-seller-extension` | 200 |
+| `GET /api/v1/appstore/no-such-app-xyz` | 404 |
+| `GET /api/v1/appstore/cosmetics-supplier-extension` (은퇴) | 404 |
+| `GET /api/v1/appstore/modules` | **401** `AUTH_REQUIRED` (배포 전 200) |
+| `POST /appstore/install` | **401** (배포 전 500) |
+| `POST /appstore/activate` | **401** (배포 전 500) |
+| `POST /appstore/deactivate` | **401** |
+| `DELETE /appstore/uninstall` | **401** |
+| `POST /appstore/install {}` (body 누락) | **401** — 인증이 body 검증보다 먼저 |
+| `GET /api/v1/admin/apps/market` (대조군) | 401 (변동 없음) |
+
+**인증됐으나 권한 없음** — `renagang21@gmail.com` (약국 경영자, serviceKey `kpa-society`, 쿠키 세션)
+
+| 요청 | 결과 |
+|---|---|
+| `POST /appstore/install` · `activate` · `deactivate` · `DELETE /uninstall` | 전부 **403** `{"error":"Admin privileges required","code":"FORBIDDEN"}` |
+| `GET /appstore/modules` | **403** |
+| `GET /appstore` | **200** (공개 조회 유지 확인) |
+| `GET /admin/apps/market` (대조군) | 403 — 동일 계약 |
+
+**서비스 관리자** — `sohae2100@gmail.com` (KPA-Society admin/operator)
+
+| 요청 | 결과 |
+|---|---|
+| `GET /appstore/modules` | **403** |
+| `GET /admin/apps/market` (대조군) | **403** — 두 API 가 동일하게 `platform:super_admin` 을 요구함을 확인 |
+
+**허용(200) 경로 실측은 수행하지 못했다.** `docs/local/TEST-ACCOUNTS.local.md` 에
+`platform:super_admin` 자격증명이 없어 프로덕션에서 super_admin 성공 경로를 확인할 수 없었다.
+해당 경로는 jest 계약 테스트(`platform:super_admin` → `GET /modules` 200)로만 검증했다.
+또한 §15 지침대로 실제 active app 의 install/uninstall write 는 프로덕션에서 수행하지 않았다.
+
+**상태 · 로그**
+
+| 항목 | 결과 |
+|---|---|
+| `/health` | 200 `alive` |
+| `/health/database` | 200 `healthy` (pingMs 3, activeConnections 10) |
+| 신규 revision `severity>=ERROR` | **0건** |
+| 신규 revision `httpRequest.status>=500` | **0건** |
+| 카탈로그 대조군 노출 | `cosmetics-seller-extension` · `forum-cosmetics` · `market-trial` 정상 노출 (회귀 0) |
 
 ---
 
 ## 11. Git
 
-- commit: (아래 기록)
-- push: main
+- commit: `88f06da0a` (코드·테스트·CHECK) → 본 배포 후 실측 기록은 후속 commit
+- push: `origin/main` 완료
+- 배포 revision: `o4o-core-api-03422-kdm`
 
 ## 12. 문서 정합
 
