@@ -16,6 +16,7 @@ const mockApprovalService = {
   approveMembership: jest.fn(),
   rejectMembership: jest.fn(),
   suspendMembership: jest.fn(),
+  reactivateMembership: jest.fn(),
 };
 
 jest.mock('../../../database/connection.js', () => ({
@@ -97,6 +98,8 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
     mockApprovalService.rejectMembership.mockResolvedValue({ id: 'm1', service_key: 'glycopharm' });
     mockApprovalService.suspendMembership.mockResolvedValue({ suspended: 1 });
     mockApprovalService.approveMembership.mockResolvedValue({ id: 'm1', service_key: 'glycopharm' });
+    // 기본값 = 되살릴 suspended/withdrawn membership 없음
+    mockApprovalService.reactivateMembership.mockResolvedValue(null);
   });
 
   describe('반려 (rejected)', () => {
@@ -223,7 +226,26 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
       expect(usersWrites()).toEqual([]);
     });
 
-    it('pending 이 없을 때의 활성화는 suspended 계정을 되살리지 않는다 (status 화이트리스트)', async () => {
+    it('pending 이 없고 suspended membership 이 있으면 reactivateMembership 에 위임한다', async () => {
+      // WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 (D3)
+      //   회귀 대상: suspended → active 가 200 을 주면서 아무것도 바꾸지 않던 결함.
+      primeQuery([]);
+      mockApprovalService.reactivateMembership.mockResolvedValue({
+        reactivatedMemberships: 1, reactivatedRoles: ['glycopharm:pharmacy'], userId: USER_ID,
+      });
+      const res = makeRes();
+
+      await controller.updateMemberStatus(makeReq('approved'), res);
+
+      expect(mockApprovalService.reactivateMembership).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: USER_ID, isPlatformAdmin: false, serviceKeys: ['glycopharm'] }),
+      );
+      // canonical 경로가 처리했으므로 컨트롤러가 users 를 직접 쓰지 않는다
+      expect(usersWrites()).toEqual([]);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    });
+
+    it('되살릴 membership 이 없을 때의 활성화는 suspended 계정을 되살리지 않는다 (status 화이트리스트)', async () => {
       primeQuery([]);
       const res = makeRes();
 

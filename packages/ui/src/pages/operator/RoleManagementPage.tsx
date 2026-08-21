@@ -69,13 +69,22 @@ export interface RoleManagementPageProps {
 
 // ─── Constants ───────────────────────────────────────────────
 
+/**
+ * WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 (D4)
+ *
+ * value 는 **canonical service key** 다 (service_memberships.service_key 축).
+ * 종전에는 role prefix('kpa','cosmetics')를 보내서 backend 의 scope 비교
+ * (canonical 'kpa-society','k-cosmetics')와 어긋나 403 이 났다.
+ * roles 테이블의 prefix 축 변환은 backend RoleController.toRoleCatalogKey 가 전담한다.
+ */
 const SERVICE_OPTIONS = [
   { value: '', label: '전체' },
   { value: 'platform', label: 'Platform' },
   { value: 'neture', label: 'Neture' },
   { value: 'glycopharm', label: 'GlycoPharm' },
-  { value: 'kpa', label: 'KPA' },
-  { value: 'cosmetics', label: 'K-Cosmetics' },
+  { value: 'kpa-society', label: 'KPA' },
+  { value: 'k-cosmetics', label: 'K-Cosmetics' },
+  { value: 'pharmacy-hub', label: 'Pharmacy-Hub' },
   { value: 'lms', label: 'LMS' },
 ];
 
@@ -451,7 +460,7 @@ export function RoleManagementPage({ apiClient, isAdmin, toast, lockedServiceKey
                     value={form.serviceKey}
                     onChange={(e) => setForm({ ...form, serviceKey: e.target.value })}
                     disabled={!!editingRole}
-                    placeholder="예: kpa"
+                    placeholder="예: kpa-society"
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
                   />
                 </div>
