@@ -3,7 +3,12 @@
  *
  * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
  *
- * 역할별 진입점 3개(약국 경영자 / 공급자 / 서비스 운영자)와 로그인·커뮤니티 진입점을 노출한다.
+ * 역할별 진입점과 로그인·커뮤니티 진입점을 노출한다.
+ *
+ * WO-O4O-PHARMACYHUB-PHARMACIST-MEMBER-AND-STORE-OWNER-MODEL-CLOSURE-V1:
+ *   회원 유형은 약사 회원 / 약국 경영자 둘이다. 약사 회원의 이용 범위(커뮤니티·교육)는
+ *   역할 진입점이 아니라 위 커뮤니티/교육 섹션이며, 역할 카드는 **추가 권한이 필요한**
+ *   영역(매장 경영 · 운영자)만 나열한다. 공급자 진입점은 없다.
  *
  * WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1:
  *   진입점 설명이 "(준비 중)" 으로 남아 있었으나 세 영역 모두 실제 화면이 있다
@@ -86,6 +91,10 @@ export default function HomePage() {
 
       <section>
         <h2 className="mb-3 text-sm font-semibold text-gray-700">역할별 진입점</h2>
+        <p className="mb-3 text-xs text-gray-500">
+          약사 회원은 커뮤니티·교육을 바로 이용합니다. 아래 영역은 해당 역할이 부여된 계정만
+          이용할 수 있습니다.
+        </p>
         <ul className="grid gap-3 sm:grid-cols-3">
           {ENTRIES.map((e) => (
             <li key={e.to} className="rounded-lg border border-gray-200 bg-white p-4">

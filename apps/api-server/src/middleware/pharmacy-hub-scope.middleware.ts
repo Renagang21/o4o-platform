@@ -40,6 +40,13 @@ import { createMembershipScopeGuard } from '../common/middleware/membership-guar
  *   operator 는 store_owner scope 를 대신 통과하지 않는다. 운영자는 가입 승인·회원
  *   관리·커뮤니티·공지 담당이며, 공급자 ↔ 약국 간 일반 상품 거래에 개입하지 않는다.
  *
+ *   member scope 도 없다 (WO-O4O-PHARMACYHUB-PHARMACIST-MEMBER-AND-STORE-OWNER-MODEL-CLOSURE-V1).
+ *   `pharmacy-hub:member` 는 **가입 유형**이지 capability 가 아니다. 일반 약사 회원의 이용 범위
+ *   (커뮤니티·교육·콘텐츠)는 membership active 로만 판정하며 scope guard 를 통과할 필요가 없다.
+ *   따라서 allowedRoles 에 넣지 않는다 — 넣으면 mapping 이 없는 scope 에서 fallback 으로
+ *   전체 allowedRoles 가 허용돼 일반 회원이 매장 API 를 통과할 수 있다.
+ *   일반 약사 회원이 매장 경영 화면·API 를 쓰려면 store_owner 로 승격돼야 한다.
+ *
  *   supplier scope 는 없다 (WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1).
  *   공급자 자격은 Neture 공급자 원장(`createRequireActiveSupplier`)이 유일한 축이며,
  *   Pharmacy-Hub membership 을 요구하지 않는다.

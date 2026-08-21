@@ -9,9 +9,15 @@
  *     (service_memberships 를 직접 INSERT 하지 않는다 — 가입 SSOT 이중화 방지)
  *   - serviceKey 는 항상 서버가 'pharmacy-hub' 로 강제한다. 클라이언트 값은 무시된다.
  *   - status 는 Core 경로가 항상 'pending' 으로 생성한다.
- *   - roleType 은 store_owner 만 허용한다. operator·강사 등은 자가 신청이 아니라 사후 부여다.
+ *   - roleType 은 member(일반 약사 회원) / store_owner(약국 경영자) 둘만 허용한다
+ *     (WO-O4O-PHARMACYHUB-PHARMACIST-MEMBER-AND-STORE-OWNER-MODEL-CLOSURE-V1).
+ *     operator·admin·강사·커뮤니티 운영자는 자가 신청이 아니라 사후 부여다.
  *     공급자는 Pharmacy-Hub 회원이 아니므로 가입 역할이 아니다
  *     (WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1).
+ *   - 두 유형의 차이는 **매장 경영 capability 하나뿐**이다. 일반 약사 회원은 서비스 회원
+ *     자격만 가지며(커뮤니티·교육·콘텐츠), 매장 HUB·매장 경영 API 는 store_owner 만 쓴다.
+ *     약사 "자격" 은 role 이 아니라 profile 축(kpa_pharmacist_profiles)이며 이 경로에서
+ *     추론하지 않는다 — 정본 baseline §4 참조.
  *
  * 중복 신청 (§6-A):
  *   active     → ALREADY_MEMBER
@@ -27,17 +33,23 @@ import { User } from '../../modules/auth/entities/User.js';
 import { ServiceMembership } from '../../modules/auth/entities/ServiceMembership.js';
 import { AuthRegisterController } from '../../modules/auth/controllers/auth-register.controller.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
+import {
+  PHARMACY_HUB_SIGNUP_ROLES,
+  PHARMACY_HUB_SIGNUP_ROLE_LABEL,
+  type PharmacyHubSignupRole,
+} from '../../constants/pharmacy-hub-signup-roles.js';
 import logger from '../../utils/logger.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 
-/** 신청 가능한 역할 (§5.2 — operator 제외) */
-const ALLOWED_ROLE_TYPES = ['store_owner'] as const;
-type AllowedRoleType = (typeof ALLOWED_ROLE_TYPES)[number];
+/**
+ * 신청 가능한 역할 (§5.2 — operator·admin 제외, 공급자 없음)
+ * 목록은 공통 Core 경로와 **같은 SSOT** 를 본다. 사본을 두지 않는다.
+ */
+const ALLOWED_ROLE_TYPES = PHARMACY_HUB_SIGNUP_ROLES;
+type AllowedRoleType = PharmacyHubSignupRole;
 
-const ROLE_LABEL: Record<AllowedRoleType, string> = {
-  store_owner: '약국 경영자',
-};
+const ROLE_LABEL = PHARMACY_HUB_SIGNUP_ROLE_LABEL;
 
 /** 이미 가입 이력이 있는 경우의 응답 (409) */
 const DUPLICATE_RESPONSE: Record<string, { code: string; message: string }> = {
@@ -63,8 +75,14 @@ const DUPLICATE_RESPONSE: Record<string, { code: string; message: string }> = {
   },
 };
 
-/** 가입 최소 프로필 (§4.4) — 신규 프로필 테이블 없이 기존 users.businessInfo 축만 사용 */
-function validateMinimalProfile(body: Record<string, any>): string[] {
+/**
+ * 가입 최소 프로필 (§4.4) — 신규 프로필 테이블 없이 기존 users.businessInfo 축만 사용.
+ *
+ * WO-O4O-PHARMACYHUB-PHARMACIST-MEMBER-AND-STORE-OWNER-MODEL-CLOSURE-V1:
+ *   약국명(businessName)은 **약국 경영자에게만** 요구한다. 일반 약사 회원에게 약국 경영
+ *   정보를 요구하면 두 유형을 다시 뒤섞는 것이다(원칙 ②).
+ */
+function validateMinimalProfile(body: Record<string, any>, roleType: AllowedRoleType): string[] {
   const filled = (v: unknown) => String(v ?? '').trim() !== '';
   const digits = (v: unknown) => String(v ?? '').replace(/\D/g, '').length;
 
@@ -72,8 +90,10 @@ function validateMinimalProfile(body: Record<string, any>): string[] {
   if (!filled(body.name) && !(filled(body.lastName) && filled(body.firstName))) missing.push('name');
   if (digits(body.phone) < 9) missing.push('phone');
 
-  // 약국명 — 기존 businessName 축 재사용 (companyName fallback)
-  if (!filled(body.businessName) && !filled(body.companyName)) missing.push('businessName');
+  // 약국명 — 기존 businessName 축 재사용 (companyName fallback). 약국 경영자 전용 항목.
+  if (roleType === 'store_owner' && !filled(body.businessName) && !filled(body.companyName)) {
+    missing.push('businessName');
+  }
   return missing;
 }
 
@@ -89,7 +109,7 @@ export class PharmacyHubJoinController {
     if (!ALLOWED_ROLE_TYPES.includes(roleType as AllowedRoleType)) {
       return res.status(400).json({
         success: false,
-        error: '가입 신청 역할이 필요합니다. (약국 경영자)',
+        error: '가입 신청 역할이 필요합니다. (약사 회원 / 약국 경영자)',
         code: 'PHARMACY_HUB_SIGNUP_ROLE_REQUIRED',
       });
     }
@@ -99,7 +119,7 @@ export class PharmacyHubJoinController {
       return res.status(400).json({ success: false, error: '이메일이 필요합니다.', code: 'EMAIL_REQUIRED' });
     }
 
-    const missingFields = validateMinimalProfile(body);
+    const missingFields = validateMinimalProfile(body, roleType as AllowedRoleType);
     if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,

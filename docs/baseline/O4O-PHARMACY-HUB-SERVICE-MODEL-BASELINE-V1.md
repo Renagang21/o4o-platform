@@ -86,11 +86,46 @@ master ACTIVE 만 본다. **`offer_service_approvals` 를 보지 않는다.** �
 
 ## 4. 역할 모델 (최종)
 
-| Role | 가입 경로 | 성격 |
+> 2026-08-21 개정 — `WO-O4O-PHARMACYHUB-PHARMACIST-MEMBER-AND-STORE-OWNER-MODEL-CLOSURE-V1`
+> 일반 약사 회원(`pharmacy-hub:member`) 을 추가하고, **자격(qualification) 축**을 역할 축과 분리해 명문화했다.
+
+| Role | 가입 경로 | 성격 | 매장 경영 capability |
+|---|---|---|:---:|
+| `pharmacy-hub:member` | `/join` (self-signup) | **일반 약사 회원** — 서비스 회원 자격 | ✕ |
+| `pharmacy-hub:store_owner` | `/join` (self-signup) | **약국 경영자** — 사업자 신분 | ○ |
+| `pharmacy-hub:operator` | 사후 부여 | 서비스 운영 | ✕ |
+| `pharmacy-hub:admin` | 사후 부여 | 구조·정책·거버넌스 | ✕ |
+
+### 4-1. 세 축의 분리 (자격 ≠ 가입 유형 ≠ capability)
+
+| 축 | 저장소 | Pharmacy-Hub 표현 |
 |---|---|---|
-| `pharmacy-hub:store_owner` | `/join` (유일한 self-signup 역할) | 약국 경영자 — 사업자 신분 |
-| `pharmacy-hub:operator` | 사후 부여 | 서비스 운영 |
-| `pharmacy-hub:admin` | 사후 부여 | 구조·정책·거버넌스 |
+| **Identity** | `users` | 공통 |
+| **가입/승인** | `service_memberships` (`service_key`, `role`, `status`) | `pharmacy-hub:member` / `pharmacy-hub:store_owner` |
+| **RBAC** | `role_assignments` | 승인 시 membership.role 을 그대로 부여 (member 는 **장부 기록**일 뿐 scope 아님) |
+| **자격(Qualification)** | `kpa_pharmacist_profiles` (person 단위 — `service_key` 컬럼 없음) | 약사 면허·활동유형. **role 로 만들지 않는다** |
+
+**왜 자격을 role 로 만들지 않는가 (KPA 선례):** `kpa:pharmacist` · `kpa:student` 는
+`20260326300000-DeactivateQualificationRoles` 로 비활성화되고 profile 축으로 대체됐다.
+자격 profile 은 **실제 자격 데이터가 있을 때만** 생성한다
+(`auth-register.controller.ts` — `activityType` 또는 `licenseNumber` 가 있을 때만 write).
+빈 skeleton profile 을 만들어 "약사임"을 표시하지 않는다.
+Pharmacy-Hub 는 이 축을 **재사용**하며 전용 자격 테이블·전용 자격 role 을 신설하지 않는다.
+
+### 4-2. 두 가입 유형의 유일한 차이
+
+- **일반 약사 회원**: membership `status = 'active'` 만으로 커뮤니티·교육·콘텐츠를 이용한다.
+  scope guard 를 통과할 필요가 없으므로 `PHARMACY_HUB_SCOPE_CONFIG.allowedRoles` 에 **넣지 않는다**
+  (넣으면 mapping 없는 scope 에서 fallback 으로 전체 allowedRoles 가 허용된다).
+  `PharmacyHubStoreProvisioningService` 도 store_owner 가 아니면 `skipped` 이므로 매장/조직이 생기지 않는다.
+- **약국 경영자**: 위에 **매장 경영 capability** 가 더해진다 (매장 HUB · 매장 경영 API · 조직/매장 프로비저닝).
+- 승격은 사후 role/membership 변경이며, 가입 화면이 자격으로 이를 부여하지 않는다.
+
+### 4-3. 가입 write-path SSOT
+
+허용 목록은 `apps/api-server/src/constants/pharmacy-hub-signup-roles.ts` 하나다.
+공통 Core(`AuthRegisterController.register`) 와 얇은 래퍼(`PharmacyHubJoinController`) 가 **같은 목록**을 본다.
+과거 래퍼만 막고 Core 경로를 열어둬 우회 가입이 가능했던 잔여 결함이 있었다 — 목록 사본을 만들지 않는다.
 
 - **`pharmacy-hub:supplier` 는 존재하지 않는다.** 역할 union · `ROLE_REGISTRY` ·
   `PHARMACY_HUB_SCOPE_CONFIG.allowedRoles` · `scopeRoleMapping` 어디에도 없다.
@@ -148,7 +183,15 @@ master ACTIVE 만 본다. **`offer_service_approvals` 를 보지 않는다.** �
 4. Pharmacy-Hub 운영자 화면에 공급자/상품 **승인** 기능 등장
 5. `supplier_product_offers` 를 Pharmacy-Hub 전용 테이블로 복제
 6. Pharmacy-Hub 전용 supplier identity/원장 신설
-7. `/join` 에 store_owner 외 역할 선택지 추가
+7. `/join` 에 **member · store_owner 외** 역할 선택지 추가 (operator·admin·강사·공급자 self-signup)
+8. `pharmacy-hub:member` 가 `PHARMACY_HUB_SCOPE_CONFIG.allowedRoles` 또는 `scopeRoleMapping` 에 등장
+   (= 일반 약사 회원이 매장 경영 capability 를 무단 획득)
+9. 약사 **자격**을 뜻하는 role(`pharmacy-hub:pharmacist` 등) 신설 또는 Pharmacy-Hub 전용 자격 테이블 신설
+10. 가입 write-path 가 `constants/pharmacy-hub-signup-roles.ts` 대신 자체 허용 목록을 갖는 것
+
+1~4 · 7~10 은 다음 spec 이 잠근다:
+`apps/api-server/src/__tests__/pharmacy-hub-member-model-contract.spec.ts` ·
+`apps/api-server/src/__tests__/security/pharmacy-hub-scope-guard.spec.ts`
 
 ---
 
@@ -160,7 +203,8 @@ master ACTIVE 만 본다. **`offer_service_approvals` 를 보지 않는다.** �
 |---|---|---|
 | `WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1` | 가입 역할에 supplier 포함 | store_owner 단일 (§4) |
 | `WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1` | `pharmacy-hub:supplier` 부여 | 해당 역할 없음 (§4) |
-| `WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1` | 역할표에 Supplier | 3역할 (§4) |
+| `WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1` | 역할표에 Supplier | 4역할 (§4) |
+| `WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1` | 가입 역할 = store_owner 단일 | member / store_owner 2유형 (§4) |
 | `WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1` | Pharmacy-Hub 내 공급자 상품/주문 화면 | Neture 로 이동 (§3-2) |
 | `WO-O4O-PHARMACY-HUB-SUPPLIER-SHELL-COMMON-CORE-ADOPTION-V1` | SupplierShell 공통 Core 채택 | shell 자체 제거 (§6-C) |
 

@@ -21,6 +21,9 @@ import { BRAND, ROLE_LABELS, ROLES, SERVICE_KEY } from '../../config/service';
 
 /** 신청 역할 표시 — service.ts 의 ROLE_LABELS 를 그대로 쓴다(라벨 사본 금지). */
 const ROLE_DISPLAY: Record<string, string> = {
+  // WO-O4O-PHARMACYHUB-PHARMACIST-MEMBER-AND-STORE-OWNER-MODEL-CLOSURE-V1:
+  //   자가 가입 유형 2개(약사 회원 / 약국 경영자)를 신청 역할 컬럼에서 구분한다.
+  [ROLES.member]: ROLE_LABELS[ROLES.member],
   [ROLES.storeOwner]: ROLE_LABELS[ROLES.storeOwner],
   [ROLES.operator]: ROLE_LABELS[ROLES.operator],
   [ROLES.admin]: ROLE_LABELS[ROLES.admin],

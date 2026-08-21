@@ -118,6 +118,7 @@ export type LmsRole =
 export type PharmacyHubRole =
   | 'pharmacy-hub:admin'
   | 'pharmacy-hub:operator'
+  | 'pharmacy-hub:member'
   | 'pharmacy-hub:store_owner';
 
 /**
@@ -524,6 +525,24 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     role: 'pharmacy-hub:operator',
     label: 'Pharmacy-Hub Operator',
     description: '파머시 허브 서비스 운영자 (가입 승인 · 회원 관리 · 커뮤니티 · 공지)',
+    service: 'pharmacy-hub',
+    category: 'service',
+    deprecated: false
+  },
+  /**
+   * WO-O4O-PHARMACYHUB-PHARMACIST-MEMBER-AND-STORE-OWNER-MODEL-CLOSURE-V1
+   *
+   * 일반 약사 회원 — 서비스 회원 자격만 갖는 축이다(커뮤니티·교육·콘텐츠 열람).
+   * **scope 를 부여하지 않는다**: `PHARMACY_HUB_SCOPE_CONFIG.allowedRoles` 에 없다.
+   * 매장 경영 capability 는 `pharmacy-hub:store_owner` 만 갖는다.
+   *
+   * 약사 "자격" 은 role 이 아니라 profile 축이다 (KPA 선례: kpa:pharmacist 폐기 →
+   * kpa_pharmacist_profiles). 이 role 은 자격 증명이 아니라 가입 유형이다.
+   */
+  'pharmacy-hub:member': {
+    role: 'pharmacy-hub:member',
+    label: 'Pharmacy-Hub Member',
+    description: '파머시 허브 일반 약사 회원 (매장 경영 capability 없음)',
     service: 'pharmacy-hub',
     category: 'service',
     deprecated: false

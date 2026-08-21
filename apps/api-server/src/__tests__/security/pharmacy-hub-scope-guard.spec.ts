@@ -37,6 +37,12 @@ const OPERATOR = 'pharmacy-hub:operator';
 const STORE_OWNER = 'pharmacy-hub:store_owner';
 /** 제거된 역할 — 되돌아오지 않는지 확인하는 용도로만 쓴다. */
 const REMOVED_SUPPLIER = 'pharmacy-hub:supplier';
+/**
+ * 일반 약사 회원 — 가입 유형이지 capability 가 아니다
+ * (WO-O4O-PHARMACYHUB-PHARMACIST-MEMBER-AND-STORE-OWNER-MODEL-CLOSURE-V1).
+ * scope 를 하나도 열지 않는 것이 계약이다.
+ */
+const MEMBER = 'pharmacy-hub:member';
 
 async function check(scope: string, roles: string[]) {
   return executeGuard(requireScope(scope), createMockUser({ roles }));
@@ -160,6 +166,21 @@ describe('Pharmacy-Hub Scope Guard', () => {
     it('supplier 역할 보유자는 어떤 scope 도 통과하지 못한다', async () => {
       for (const scope of [ADMIN, OPERATOR, STORE_OWNER]) {
         const result = await check(scope, [REMOVED_SUPPLIER]);
+        expect(result.allowed).toBe(false);
+        expect(result.statusCode).toBe(403);
+      }
+    });
+
+    it('member 역할은 scope 축이 아니다 (allowedRoles · mapping 모두 부재)', () => {
+      // member 를 allowedRoles 에 넣으면 mapping 없는 scope 에서 fallback 으로 전체가 허용돼
+      // 일반 약사 회원이 매장 경영 API 를 통과한다.
+      expect(PHARMACY_HUB_SCOPE_CONFIG.allowedRoles).not.toContain(MEMBER);
+      expect(PHARMACY_HUB_SCOPE_CONFIG.scopeRoleMapping ?? {}).not.toHaveProperty(MEMBER);
+    });
+
+    it('일반 약사 회원은 어떤 scope 도 통과하지 못한다 (매장 capability 무단 획득 금지)', async () => {
+      for (const scope of [ADMIN, OPERATOR, STORE_OWNER]) {
+        const result = await check(scope, [MEMBER]);
         expect(result.allowed).toBe(false);
         expect(result.statusCode).toBe(403);
       }

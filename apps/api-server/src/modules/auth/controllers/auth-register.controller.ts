@@ -20,6 +20,7 @@ import { PasswordResetService } from '../../../services/passwordResetService.js'
 //   KPA-Society 가입 신청 시 운영자에게 in-app 알림 발송.
 //   contact-request.controller.ts 의 broadcast 패턴을 그대로 사용한다.
 import { notificationService } from '../../../services/NotificationService.js';
+import { isPharmacyHubSignupRole } from '../../../constants/pharmacy-hub-signup-roles.js';
 
 export class AuthRegisterController extends BaseController {
   /**
@@ -108,16 +109,20 @@ export class AuthRegisterController extends BaseController {
         }
       }
 
-      // WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §5.2:
-      //   Pharmacy-Hub 가입 신청 역할은 약국 경영자(store_owner) / 공급자(supplier) 만 허용한다.
-      //   operator 는 자가 신청 경로가 없다 — 기존 admin role grant flow 에서만 부여된다.
+      // WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §5.2 +
+      // WO-O4O-PHARMACYHUB-PHARMACIST-MEMBER-AND-STORE-OWNER-MODEL-CLOSURE-V1:
+      //   Pharmacy-Hub 자가 가입 유형은 **일반 약사 회원(member) / 약국 경영자(store_owner)** 둘뿐이다.
+      //   - supplier 제거: 공급자는 Pharmacy-Hub 회원이 아니다. Neture 공급자 원장이 유일한 축이며,
+      //     래퍼(PharmacyHubJoinController)만 막고 이 Core 경로를 열어두면 우회 가입이 가능했다
+      //     (WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1 잔여 결함).
+      //   - operator / admin / 강사 / 커뮤니티 운영자는 자가 신청 경로가 없다 — 사후 role grant 뿐이다.
       //   (Neture 의 NETURE_SIGNUP_ROLE_REQUIRED 와 동일 패턴 — serviceKey 로 한정하므로 타 서비스 무영향.)
-      const PHARMACY_HUB_ALLOWED_SIGNUP_ROLES = ['store_owner', 'supplier'];
+      //   허용 목록 SSOT = constants/pharmacy-hub-signup-roles.ts (래퍼와 같은 목록을 본다)
       if (serviceKey === 'pharmacy-hub') {
-        if (!data.role || !PHARMACY_HUB_ALLOWED_SIGNUP_ROLES.includes(data.role)) {
+        if (!isPharmacyHubSignupRole(data.role)) {
           return BaseController.error(
             res,
-            'Pharmacy-Hub 가입 신청 역할이 필요합니다. (약국 경영자 / 공급자)',
+            'Pharmacy-Hub 가입 신청 역할이 필요합니다. (약사 회원 / 약국 경영자)',
             400,
             'PHARMACY_HUB_SIGNUP_ROLE_REQUIRED',
           );
@@ -152,7 +157,12 @@ export class AuthRegisterController extends BaseController {
       //   Pharmacy-Hub 는 처음부터 prefixed role 을 service_memberships.role 에 저장한다.
       //   승인 시 MembershipApprovalService 가 이 값을 그대로 role_assignments 에 부여하므로
       //   (k-cosmetics 선례와 동일 메커니즘) 별도 매핑 코드를 만들지 않는다.
-      //   여기 저장되는 값은 위 §5.2 게이트를 통과한 store_owner / supplier 뿐이다.
+      //   여기 저장되는 값은 위 §5.2 게이트를 통과한 member / store_owner 뿐이다.
+      // WO-O4O-PHARMACYHUB-PHARMACIST-MEMBER-AND-STORE-OWNER-MODEL-CLOSURE-V1:
+      //   effectiveRole 이 아니라 **게이트를 통과한 data.role** 로 조립한다.
+      //   'member' 는 공통 VALID_ROLES(users.role 축)에 없는 값이라 effectiveRole 이 'user' 로
+      //   fallback 되고, 그대로 붙이면 'pharmacy-hub:user' 라는 없는 역할이 생긴다.
+      //   (kpa-branch 가 'kpa-branch:member' 를 하드코딩한 것과 같은 이유다.)
       // WO-O4O-KPA-BRANCH-SERVICE-CREDENTIAL-ONBOARDING-V1:
       //   kpa-branch 는 prefixed role 을 그대로 저장한다. 승인 시 MembershipApprovalService 가
       //   이 값을 role_assignments 에 부여하므로 별도 매핑 코드를 만들지 않는다 (pharmacy-hub 선례).
@@ -160,7 +170,7 @@ export class AuthRegisterController extends BaseController {
       const membershipRole = serviceKey === 'kpa-branch'
         ? 'kpa-branch:member'
         : serviceKey === 'pharmacy-hub'
-          ? `pharmacy-hub:${effectiveRole}`
+          ? `pharmacy-hub:${data.role}`
           : serviceKey === 'k-cosmetics' && SELLER_LEGACY_ROLES.includes(effectiveRole)
             ? 'cosmetics:store_owner'
             : effectiveRole;

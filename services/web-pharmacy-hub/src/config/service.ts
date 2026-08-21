@@ -34,6 +34,15 @@ export const BRAND = {
  */
 export const ROLES = {
   admin: `${SERVICE_KEY}:admin`,
+  /**
+   * 일반 약사 회원 (WO-O4O-PHARMACYHUB-PHARMACIST-MEMBER-AND-STORE-OWNER-MODEL-CLOSURE-V1)
+   *
+   * 서비스 회원 자격만 갖는 축이다 — 커뮤니티·교육·콘텐츠는 MembershipGate(가입 상태 active)
+   * 로만 열리며 이 역할을 요구하지 않는다. **매장 경영 capability 는 없다**:
+   * backend `PHARMACY_HUB_SCOPE_CONFIG.allowedRoles` 에도 없으므로 아래 ROLE_SCOPE_MAPPING
+   * 에 store_owner 를 만족시키는 항목으로 넣지 않는다.
+   */
+  member: `${SERVICE_KEY}:member`,
   storeOwner: `${SERVICE_KEY}:store_owner`,
   operator: `${SERVICE_KEY}:operator`,
 } as const;
@@ -48,6 +57,7 @@ export const PLATFORM_SUPER_ADMIN = 'platform:super_admin' as const;
 
 export const ROLE_LABELS: Record<string, string> = {
   [ROLES.admin]: '서비스 관리자',
+  [ROLES.member]: '약사 회원',
   [ROLES.storeOwner]: '약국 경영자',
   [ROLES.operator]: '서비스 운영자',
 };
@@ -70,6 +80,9 @@ export const ROLE_SCOPE_MAPPING: Record<string, readonly string[]> = {
   [ROLES.admin]: [ROLES.admin, PLATFORM_SUPER_ADMIN],
   [ROLES.operator]: [ROLES.operator, ROLES.admin, PLATFORM_SUPER_ADMIN],
   [ROLES.storeOwner]: [ROLES.storeOwner],
+  // 약사 회원은 자기 자신만 만족한다 — 어떤 상위 역할도 대신하지 않고,
+  // 어떤 상위 권한도 이 역할로 열리지 않는다.
+  [ROLES.member]: [ROLES.member],
 };
 
 /** 보유 역할이 요구 역할을 만족하는가 (계층 포함) */
