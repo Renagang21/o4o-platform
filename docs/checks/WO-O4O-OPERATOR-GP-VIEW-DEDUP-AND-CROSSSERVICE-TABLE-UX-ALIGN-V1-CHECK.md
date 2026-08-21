@@ -143,25 +143,71 @@ SSR / matchMedia 미지원 환경도 false 로 떨어진다.
 
 `pnpm run build:packages` (공통 패키지 6개 변경분 포함) 통과.
 
-### 6-2. 브라우저 검증 — **미완. 배포 필요.** (숨기지 않고 기록)
+### 6-2. 브라우저 검증 — **배포 후 실측 완료**
 
-| 시도 | 결과 |
-|---|---|
-| 로컬 preview(`vite preview :4321`) + 프로덕션 API | ❌ **인증 불가** — 5개 화면 전부 로그인 화면. `localhost` origin 이 프로덕션 API 의 CORS/세션 경계 밖이다 |
-| 프로덕션 직접 확인 | ❌ 이번 변경이 **아직 배포되지 않았다** |
-| 웹 폼 로그인 | ❌ L2 `service_credentials` 비밀번호 전량 unknown (선행 CHECK §2-1) |
+배포: `b91f47196` → `Deploy Web Services (Cloud Run)` **success**.
 
-**따라서 이번 WO 의 브라우저 검증 항목은 통과로 기록하지 않는다.**
-배포 후 아래를 실측해야 완료다:
+> 로컬 preview 로는 검증할 수 없었다 — `localhost` origin 이 프로덕션 API 의 CORS/세션 경계 밖이라
+> 5개 화면 전부 로그인 화면으로 떨어졌다. 웹 폼 로그인도 L2 credential 미확보로 불가(선행 CHECK §2-1).
+> 따라서 **배포 후 프로덕션 실측**으로 검증했다 (L1 토큰 주입, read-only + 안전 fixture 1건).
+
+**① 전수 스캔 — 38 관측 / 문제 0**
+
+| 범위 | desktop 1440×900 | mobile 390×844 |
+|---|:--:|:--:|
+| GP 대상 14 경로 (13업무 + 대시보드) | ✅ | ✅ |
+| 5서비스 DataTable 대표 화면(회원 관리) | ✅ | ✅ |
+
+전 항목 `HTTP 200` · **white screen 0** · **JS exception 0** · **page overflow 0** · 예기치 않은 404/500 0.
+
+**② mobile 신원 컬럼 고정 — 5서비스 전부 동작**
 
 ```
-GP  : 대상 13화면 × (목록 / selection / ActionBar / row action / detail / deep link+refresh)
-5서비스: DataTable 대표 화면 desktop 1440×900 + mobile 390×844
-        · mobile 신원 컬럼 고정 동작
-        · desktop sticky 회귀 0
-        · white screen 0 / JS exception 0 / unexpected 404·500 0
-write fixture: selection → bulk → restore
+mobile  KPA      sticky=[{i:0,left:"0px"}, {i:2,txt:"이름▴",left:"49px"}]
+mobile  GP       sticky=[{i:0,left:"0px"}, {i:2,txt:"이름", left:"49px"}]
+mobile  K-Cos    sticky=[{i:0,left:"0px"}, {i:2,txt:"이름", left:"49px"}]
+mobile  Neture   sticky=[{i:0,left:"0px"}, {i:2,txt:"이름", left:"49px"}]
+mobile  PH       sticky=[{i:0,txt:"이름", left:"0px"}]     ← 선택 컬럼이 없어 이름이 첫 컬럼
 ```
+
+`left: 49px` = 선택 체크박스 컬럼 실측 폭 → **다중 sticky offset 계산이 실제로 동작**한다.
+PharmacyHub 는 선택 컬럼이 없어 `left: 0` 단독 — 설계대로다.
+
+**③ desktop 회귀 0 — 실측 증명**
+
+desktop 19 관측 전부 `sticky=[{i:0,left:"0px"}]` **하나뿐**. `이름` 컬럼은 desktop 에서 sticky 가 아니다.
+`stickyOnMobile` 이 desktop 에 새지 않음을 확인했다.
+
+**④ GP ↔ KPA 나란히 대조 — 수렴 확인**
+
+| 화면 | GP | KPA | 일치 |
+|---|---|---|:--:|
+| 채널 관리 | `액션·매장·채널·상태·생성일` | 동일 | ✅ |
+| 설문조사 관리 | `∅·제목·상태·보상·응답 수·기간·생성일` | 동일 | ✅ |
+| 운영 액션 분석 | `일시·액션·상태·상세` | 동일 | ✅ |
+| 매장 HUB 블로그 | `∅·액션·제목▴·슬러그·상태·수정일▴·발행일▴` | 동일 | ✅ |
+
+**⑤ canonical 체인 실측 (안전 fixture 1건, 생성→검증→삭제)**
+
+GP 의 수렴 화면들은 **실데이터가 0건**이라 selection 체인이 비어 있었다.
+`/operator/blog` 에 **draft** 글 1건을 API 로 만들어(매장 HUB 미노출) UI 체인을 끝까지 돌렸다.
+
+```
+draft 생성(201)
+ → 목록 렌더 (컬럼 KPA 동일)
+ → select-all
+ → ActionBar  "1개 선택 · 일괄 발행 (1) · 일괄 보관 (1) · 일괄 삭제 (1) · 선택 해제"
+ → 일괄 보관 클릭 → ConfirmActionDialog(["취소","보관"]) → "보관"
+ → status: draft → **archived**            ← 실제 상태 전이 확인
+ → fixture 삭제(200) → 재조회 404          ← 정리 완료
+jsErrors 0
+```
+
+> 첫 시도에서 `status = draft` 로 남아 실패처럼 보였으나, 원인은 **테스트가 불완전**했던 것이다
+> (공통 모듈은 native `confirm` 이 아니라 React `ConfirmActionDialog` 를 쓴다 — 모달 확정 버튼 미클릭).
+> 모달 내부 버튼을 클릭하니 정상 전이했다. 제품 결함이 아니다.
+
+**정리 확인**: 검증 후 `GET /api/v1/glycopharm/operator/blog/posts` → `0건`. 프로덕션 잔여물 없음.
 
 ---
 
@@ -181,11 +227,12 @@ write fixture: selection → bulk → restore
 |---|---|
 | GP 대상 VIEW_DUPLICATED → 0 | ✅ 대상 12건 → 0 (전체 18 → 6, 잔여 6 은 선행 판단 필요) |
 | GP service-local 중복 View 제거 | ✅ 순감 5,455 LOC · dead file 1개 삭제 |
-| 공통 Table UX 채택 | ✅ 13업무 공통 모듈 채택 |
-| 5서비스 mobile table 결함 해소 | ⚠ **코드 반영 완료 · 배포 후 실측 필요** (§6-2) |
-| desktop regression 0 | ⚠ **정적으로는 통과**(5×typecheck·build) · **브라우저 실측 미완** |
+| 공통 Table UX 채택 | ✅ 13업무 공통 모듈 채택 · canonical 체인 실측(§6-2 ⑤) |
+| 5서비스 mobile table 결함 해소 | ✅ 5/5 신원 컬럼 고정 실측 (§6-2 ②) |
+| desktop regression 0 | ✅ desktop 19 관측 sticky 1개뿐 — 실측 증명 (§6-2 ③) |
 | 미조사 0 | ✅ |
 | DB/API/schema 변경 0 | ✅ |
+| production 잔여물 0 | ✅ fixture 1건 생성 후 삭제·재조회 404 확인 |
 
 **문서 정합**: 발견 3건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건
 — 선행 CHECK 정정 3건(§2-5 모바일 기전 · §8-A PH 재판정 · I1 LMS 판정)은 인라인 반영

@@ -237,8 +237,12 @@ describe('정적 회귀 가드 — mount 계약 / 프런트 소비', () => {
   });
 
   it('서비스 화면이 generic 목록 URL 을 직접 호출하지 않는다', () => {
+    // WO-O4O-OPERATOR-GP-VIEW-DEDUP-AND-CROSSSERVICE-TABLE-UX-ALIGN-V1:
+    //   기존 대상 `LmsCoursesPage.tsx` 는 route 에서 이미 분리된 dead code(import 0)라 삭제했다.
+    //   `/operator/lms` 가 실제로 렌더하는 화면은 공통 `OperatorLmsCoursesManager` 를 쓰는
+    //   `OperatorLmsCoursesPage.tsx` 이므로 가드 대상을 실렌더 경로로 옮긴다 (가드 의미 동일).
     const pages = [
-      'services/web-glycopharm/src/pages/operator/LmsCoursesPage.tsx',
+      'services/web-glycopharm/src/pages/operator/OperatorLmsCoursesPage.tsx',
     ];
     for (const rel of pages) {
       const src = read(rel);
