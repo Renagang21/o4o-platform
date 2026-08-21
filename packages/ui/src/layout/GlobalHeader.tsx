@@ -2,7 +2,7 @@
  * GlobalHeader — O4O Platform 공통 Header
  *
  * WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1
- * 표준: docs/architecture/ui/global-header-standard-v1.md
+ * 표준: docs/architecture/ui/GLOBAL-HEADER-STANDARD-V1.md
  *
  * 4-슬롯 구조: BrandSlot / PrimaryNav / UtilityArea / UserArea
  * 높이: 64px 고정
