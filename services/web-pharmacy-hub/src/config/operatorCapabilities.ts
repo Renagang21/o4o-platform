@@ -27,6 +27,11 @@ export const ENABLED_CAPABILITIES: OperatorCapability[] = [
   //     SETTINGS        → system    : 역할 관리 (/operator/roles, adminOnly)
   //   매장/상품/주문/사이니지 capability 는 켜지 않는다 — Pharmacy-Hub 는 매장 HUB·거래 개입
   //   기능을 운영자 축에 두지 않는다(WO 제외 대상).
+  // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+  //   CONTENT_MANAGEMENT -> resources : 자료실 관리 (/operator/resources).
+  //   이 capability 가 없으면 메뉴 항목이 있어도 DomainIASidebar 가 그룹을 숨긴다(기능 은폐).
+  //   PH UNIFIED_MENU 에 content · lms 항목은 없으므로 빈 그룹 헤딩은 생기지 않는다.
+  OperatorCapability.CONTENT_MANAGEMENT,
   OperatorCapability.USER_MANAGEMENT,
   OperatorCapability.COMMUNITY,
   OperatorCapability.ANALYTICS,
