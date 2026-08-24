@@ -5,7 +5,6 @@ export { MyCertificatesPage } from './MyCertificatesPage';
 // WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1:
 //   PersonalStatusReportPage 제거. route 등록 없이 barrel 만 export 됐던 Mock 화면이며,
 //   제출 대상 신상신고 백엔드 도메인이 존재하지 않는다.
-export { AnnualReportFormPage } from './AnnualReportFormPage';
 export { default as MyForumDashboardPage } from './MyForumDashboardPage';
 export { default as RequestCategoryPage } from './RequestCategoryPage';
 export { default as MyRequestsPage } from './MyRequestsPage';

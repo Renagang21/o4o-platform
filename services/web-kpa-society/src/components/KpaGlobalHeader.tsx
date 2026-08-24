@@ -13,7 +13,7 @@
 
 import { useNavigate, Link } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
-import { GlobalHeader, filterContextualNav } from '@o4o/ui';
+import { GlobalHeader, buildCommunityPrimaryNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { isStoreOwnerDual } from '@o4o/auth-utils';
@@ -83,14 +83,17 @@ export function KpaGlobalHeader() {
   // 로그인:   커뮤니티 / [내 매장] / [약국 HUB] / 서비스 안내 / About
   // WO-O4O-KPA-SOCIETY-SERVICE-GUIDE-PAGE-V1: contextual 항목 뒤, About 앞에 "서비스 안내" 삽입.
   // KPA 는 operator/admin 전체 노출 정책을 적용하지 않는다 (showAll 미주입 — 기존 동작 보존).
-  const roleItems = filterContextualNav(KPA_CONTEXTUAL_NAV, { storeOwner: isStoreOwner });
-  const computedNav = [
-    ...KPA_BASE_NAV,
-    ...roleItems,
-    KPA_SERVICE_GUIDE_NAV_ITEM,
-    KPA_ABOUT_NAV_ITEM,
-    ...(user ? [] : [KPA_CONTACT_NAV_ITEM]),
-  ];
+  // WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §9:
+  //   조립 순서(base → 역할 → 안내 → 비로그인 전용)를 공통 buildCommunityPrimaryNav 로 이관.
+  //   항목·노출 조건은 config/navigation.ts 소유 그대로다.
+  const computedNav = buildCommunityPrimaryNav({
+    base: KPA_BASE_NAV,
+    contextual: KPA_CONTEXTUAL_NAV,
+    conditions: { storeOwner: isStoreOwner },
+    trailing: [KPA_SERVICE_GUIDE_NAV_ITEM, KPA_ABOUT_NAV_ITEM],
+    guestTrailing: [KPA_CONTACT_NAV_ITEM],
+    isAuthenticated: !!user,
+  });
 
   // User 정보 변환
   // isLoading 중 placeholder를 전달해 GlobalHeader의 isAuthenticated && user 조건 충족.

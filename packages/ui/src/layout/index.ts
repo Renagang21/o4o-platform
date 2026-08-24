@@ -94,6 +94,8 @@ export * from '../operator-shell';
 export * from './GlobalHeader';
 // WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1: contextual nav 공통 필터
 export * from './filterContextualNav';
+/* WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §9 */
+export * from './buildCommunityPrimaryNav';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Design Core Layout System v1.0 - End of File

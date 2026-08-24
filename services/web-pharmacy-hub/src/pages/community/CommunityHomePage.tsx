@@ -1,9 +1,18 @@
 /**
- * CommunityHomePage — Pharmacy-Hub 커뮤니티 홈 (/community)
+ * CommunityHomePage — Pharmacy-Hub 커뮤니티 홈 (canonical `/`)
  *
  * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §4·§5·§13
+ * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §8·§10·§12:
+ *   KPA-Society 와 **같은 공통 컨테이너** `CommunityServiceHome`(@o4o/shared-space-ui) 을
+ *   소비한다. 이 파일에는 PharmacyHub config(문구·카드·CTA·accent)와 data adapter 만 있다.
+ *   KPA JSX 를 복제하지 않는다 — 두 서비스가 같은 컨테이너를 각자의 config·data 로 쓴다.
  *
- * - 기존 공통 자산(StandardHomeTemplate / LatestActivitySection)만으로 구성한다.
+ *   또한 이 화면이 서비스 루트(`/`)의 canonical 홈이 됐다. 기존 서비스 소개형 HomePage 는
+ *   폐기하고, 그 화면이 갖고 있던 두 요소를 이 홈의 슬롯으로 옮겼다:
+ *     - 가입 상태 안내 밴드 → latestHeaderSlot
+ *     - 역할별 진입점 카드 → valueGuideSlot (KPA 와 같은 after-help 배치)
+ *   `/community` 는 `/` 로 redirect 된다(기존 링크 보존 · 중복 홈 제거).
+ *
  * - PH 는 Content 가 미구현이므로 해당 탭·카드·링크를 만들지 않는다
  *   (§4: placeholder 기능을 새로 만들지 않는다 / §13: dead route 금지).
  *
@@ -11,22 +20,22 @@
  *   자료실(/resources)은 이후 채택돼 실재하지만, "최신 활동" 탭은 추가하지 않는다.
  *   탭 데이터는 `/pharmacy-hub/home/latest` 가 공급하며 resource 타입을 다루지 않아
  *   backend 변경 없이는 항상 빈 탭이 된다(§14 신규 backend 0 / §4 placeholder 금지).
- *   진입점은 global navigation 의 '커뮤니티 > 자료실' 링크가 담당한다.
- * - 최신 활동은 공통 View 를 그대로 쓰고, 데이터만 `/pharmacy-hub/home/latest` 로 주입한다.
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
-  StandardHomeTemplate,
-  LatestActivitySection,
+  CommunityServiceHome,
   LATEST_ACTIVITY_ACCENTS,
-  LATEST_ACTIVITY_SUMMARY_LIMIT,
+  AppEntrySection,
   type LatestActivityTab,
   type NoticeItem,
 } from '@o4o/shared-space-ui';
-import { homeApi, type LatestItem } from '../../api/home';
+import { homeApi } from '../../api/home';
 import { fetchPharmacyHubForumPosts } from '../../services/forumApi';
+import { BRAND, ROLES, ROLE_LABELS, satisfiesRole } from '../../config/service';
+import { useAuth } from '../../contexts/AuthContext';
+import { getServiceMembershipStatus } from '../../lib/membershipGate';
 
 /** PH 에 실제 존재하는 공간만 탭으로 노출한다(콘텐츠/자료실/사이니지 제외). */
 const LATEST_TABS: LatestActivityTab[] = [
@@ -35,61 +44,58 @@ const LATEST_TABS: LatestActivityTab[] = [
   { key: 'course', label: '교육', shortcutHref: '/education', shortcutLabel: '교육 바로가기' },
 ];
 
+/**
+ * 역할별 진입점 — 추가 권한이 필요한 영역만 나열한다.
+ * (약사 회원의 이용 범위인 커뮤니티·교육은 위 앱 진입 카드가 담당한다.)
+ */
+const ROLE_ENTRIES = [
+  { to: '/store-owner', role: ROLES.storeOwner, desc: '공급 상품 주문 · 매장 콘텐츠 · 실행 자산(QR·POP·사이니지)' },
+  { to: '/operator', role: ROLES.operator, desc: '가입·회원 운영 · 커뮤니티(포럼) 운영' },
+];
+
 export default function CommunityHomePage() {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  const membershipStatus = getServiceMembershipStatus(user);
+  const roles: string[] = Array.isArray(user?.roles) ? (user!.roles as string[]) : [];
 
-  const [notices, setNotices] = useState<NoticeItem[]>([]);
-  const [noticesLoading, setNoticesLoading] = useState(true);
-  const [noticesError, setNoticesError] = useState(false);
-  const [noticesReloadKey, setNoticesReloadKey] = useState(0);
+  /**
+   * WO-O4O-PHARMACYHUB-FINAL-ROLE-ENTRY-AND-PRODUCTION-ADOPTION-CLOSURE-V1:
+   *   로그인 사용자에게는 **보유 역할로 실제 진입 가능한 카드만** 노출한다(데드링크 0).
+   *   비로그인 방문자에게는 서비스 안내 목적으로 전체 목록을 유지한다.
+   */
+  const roleEntries = isAuthenticated
+    ? ROLE_ENTRIES.filter((e) => satisfiesRole(roles, e.role))
+    : ROLE_ENTRIES;
 
-  const [latestItems, setLatestItems] = useState<LatestItem[]>([]);
-  const [latestTab, setLatestTab] = useState('all');
-  const [latestLoading, setLatestLoading] = useState(true);
-  const [latestError, setLatestError] = useState(false);
-  const [latestReloadKey, setLatestReloadKey] = useState(0);
-
-  const loadNotices = useCallback(async () => {
-    setNoticesLoading(true);
-    setNoticesError(false);
-    try {
-      const result = await fetchPharmacyHubForumPosts({ limit: 20, sortBy: 'latest' });
-      setNotices(
-        result.posts
-          .filter((post) => post.isPinned)
-          .slice(0, 5)
-          .map((post) => ({
-            id: post.id,
-            title: post.title,
-            date: post.createdAt,
-            href: `/forum/posts/${post.id}`,
-            isPinned: true,
-          })),
-      );
-    } catch {
-      setNotices([]);
-      setNoticesError(true);
-    } finally {
-      setNoticesLoading(false);
-    }
+  /** 공지 adapter — PH 의 공지 canonical 은 forum pinned post 다. 실패는 throw 한다. */
+  const loadNotices = useCallback(async (): Promise<NoticeItem[]> => {
+    const result = await fetchPharmacyHubForumPosts({ limit: 20, sortBy: 'latest' });
+    if (!Array.isArray(result?.posts)) throw new Error('공지를 불러오지 못했습니다.');
+    return result.posts
+      .filter((post) => post.isPinned)
+      .slice(0, 5)
+      .map((post) => ({
+        id: post.id,
+        title: post.title,
+        date: post.createdAt,
+        href: `/forum/posts/${post.id}`,
+        isPinned: true,
+      }));
   }, []);
 
-  useEffect(() => { void loadNotices(); }, [loadNotices, noticesReloadKey]);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLatestLoading(true);
-    setLatestError(false);
-    homeApi
-      .getLatest({ type: latestTab, limit: LATEST_ACTIVITY_SUMMARY_LIMIT })
-      .then((items) => { if (!cancelled) setLatestItems(items); })
-      .catch(() => { if (!cancelled) { setLatestItems([]); setLatestError(true); } })
-      .finally(() => { if (!cancelled) setLatestLoading(false); });
-    return () => { cancelled = true; };
-  }, [latestTab, latestReloadKey]);
+  /** 최신 활동 adapter — homeApi.getLatest 는 실패 시 이미 throw 한다. */
+  const loadLatest = useCallback(
+    (tab: string, limit: number) => homeApi.getLatest({ type: tab, limit }),
+    [],
+  );
 
   return (
-    <StandardHomeTemplate
+    <CommunityServiceHome
+      navigate={(path) => navigate(path)}
+      data={{ loadNotices, loadLatest }}
+      latestTabs={LATEST_TABS}
+      latestAccent={LATEST_ACTIVITY_ACCENTS.emerald}
       heroSlot={
         <div className="border-b border-slate-200 bg-gradient-to-br from-teal-50 to-white px-4 py-10 md:py-14">
           <div className="mx-auto max-w-5xl">
@@ -97,7 +103,7 @@ export default function CommunityHomePage() {
               PharmacyHub 커뮤니티
             </span>
             <h1 className="mt-3 text-2xl font-bold text-slate-900 md:text-3xl">
-              약국과 공급자가 함께 쓰는 커뮤니티
+              {BRAND.tagline}
             </h1>
             <p className="mt-2 text-sm text-slate-600 md:text-base">
               포럼에서 정보를 나누고, 교육 콘텐츠로 매장 운영 역량을 키웁니다.
@@ -105,11 +111,32 @@ export default function CommunityHomePage() {
           </div>
         </div>
       }
-      notices={notices}
-      noticesLoading={noticesLoading}
+      /* 가입 상태 안내 — 폐기한 서비스 소개 홈에서 이관(진입점 손실 0). */
+      latestHeaderSlot={
+        <div className="mb-6 rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
+          {isAuthenticated ? (
+            <p className="m-0">
+              로그인 상태 · 서비스 가입 상태: <strong>{membershipStatus}</strong>
+              {membershipStatus !== 'active' && (
+                <>
+                  {' · '}
+                  <Link to="/join/status" className="text-teal-700 underline">
+                    신청 상태 확인
+                  </Link>
+                </>
+              )}
+            </p>
+          ) : (
+            <p className="m-0">
+              <Link to="/login" className="text-teal-700 underline">로그인</Link>
+              {' '}후 글쓰기·교육 수강을 이용할 수 있습니다. 아직 회원이 아니라면{' '}
+              <Link to="/join" className="text-teal-700 underline">가입 신청</Link>
+              을 진행해 주세요.
+            </p>
+          )}
+        </div>
+      }
       noticesTitle="공지"
-      noticesError={noticesError}
-      onNoticesRetry={() => setNoticesReloadKey((k) => k + 1)}
       noticesViewAllHref="/forum/posts"
       noticesRightSlot={
         <div className="flex-1 rounded-lg border border-slate-200 bg-white p-5">
@@ -121,19 +148,6 @@ export default function CommunityHomePage() {
           </ul>
         </div>
       }
-      latestSlot={
-        <LatestActivitySection
-          tabs={LATEST_TABS}
-          items={latestItems}
-          activeTab={latestTab}
-          onTabChange={setLatestTab}
-          loading={latestLoading}
-          loadError={latestError}
-          onRetry={() => setLatestReloadKey((k) => k + 1)}
-          navigate={(path) => navigate(path)}
-          accent={LATEST_ACTIVITY_ACCENTS.emerald}
-        />
-      }
       appEntryCards={[
         { title: '포럼', description: '약국·공급자 정보 교류 게시판', href: '/forum' },
         { title: '교육', description: '매장 운영·상품 이해 교육 콘텐츠', href: '/education' },
@@ -144,6 +158,21 @@ export default function CommunityHomePage() {
         //   따라서 자료실의 실제 진입점은 이 커뮤니티 홈 카드와 footer 가 담당한다.
         { title: '자료실', description: '약국 운영에 활용할 자료를 모아보기', href: '/resources' },
       ]}
+      /* KPA 와 같은 배치 계약 — 역할별 활용 안내는 진입 CTA 가 아니라 가이드 영역에 둔다. */
+      valueGuidePlacement="after-help"
+      valueGuideSlot={
+        roleEntries.length > 0 ? (
+          <AppEntrySection
+            title="역할별 진입점"
+            accentColor="#0d9488"
+            cards={roleEntries.map((e) => ({
+              title: ROLE_LABELS[e.role],
+              description: e.desc,
+              href: e.to,
+            }))}
+          />
+        ) : undefined
+      }
       cta={{
         title: 'PharmacyHub 커뮤니티에 참여하세요',
         description: '가입 승인 후 포럼 글쓰기와 교육 콘텐츠를 이용할 수 있습니다.',

@@ -14,7 +14,6 @@ export function PharmacyServicePage() {
     <InfoPageLayout
       title="약국 서비스"
       subtitle="개별 약국을 위한 서비스 환경"
-      badgeType="none"
       icon="💊"
     >
       <div style={styles.section}>

@@ -3,7 +3,7 @@
  *
  * WO-O4O-KPA-B-C-ACCESS-POLICY-IMPLEMENTATION-V1
  *
- * KPA-b (분회 서비스), KPA-c (분회 관리) 접근을 약사 회원으로 제한.
+ * 약사 회원 전용 영역 접근을 제한한다.
  * 학생(membershipType === 'student')은 차단.
  *
  * 검증 순서:

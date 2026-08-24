@@ -1,11 +1,12 @@
 /**
  * Forum API 서비스
  *
- * WO-FORUM-DEMO-SCOPE-ISOLATION-V1
+ * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §3:
+ *   `/demo/*`(지부·분회 데모) 스코프 분기 잔재를 제거했다. KPA-Society 본체는
+ *   **항상 커뮤니티 스코프(`/forum`)** 만 쓴다 — scope='community'
+ *   (organizationId IS NULL). 분회 업무는 별도 분회 서비스 소관이다.
  *
- * API base path는 현재 라우트에 따라 결정됨:
- * - /demo/* 경로 → /demo-forum API (데모 스코프, 빈 결과 반환)
- * - 그 외 경로 → /forum API (커뮤니티 스코프)
+ * base URL 은 client.ts 가 `/api/v1/kpa` prefix 를 붙이므로 여기서 다시 붙이지 않는다.
  */
 
 import { apiClient } from './client';
@@ -18,26 +19,13 @@ import type {
   ApiResponse,
 } from '../types';
 
-/**
- * Get forum API base path based on current route
- * /demo/* routes → /demo-forum (demo scope, returns empty)
- * Other routes → /forum (community scope, KPA 커뮤니티 글만)
- *
- * WO-FORUM-SCOPE-FIX: KPA-Society는 항상 /forum 사용
- * - /forum: scope='community' → organizationId IS NULL 글만
- * - API base URL already includes /api/v1/kpa prefix in client.ts
- *
- * Note: client.ts already adds /api/v1/kpa prefix, so we don't add /kpa/ here
- */
-function getForumBasePath(): string {
-  // 항상 community scope 사용 (베타 테스트 - 하드코딩 제거)
-  return '/forum';
-}
+/** KPA-Society 커뮤니티 스코프 고정 base path */
+const FORUM_BASE = '/forum';
 
 export const forumApi = {
   // 포럼 정보 — ForumDetailPage 비공개 포럼 소유자 검증에 필수
   getForum: (id: string) =>
-    apiClient.get<ApiResponse<ForumInfo>>(`${getForumBasePath()}/categories/${id}`),
+    apiClient.get<ApiResponse<ForumInfo>>(`${FORUM_BASE}/categories/${id}`),
 
   // 게시글
   getPosts: (params?: {
@@ -53,63 +41,63 @@ export const forumApi = {
      */
     author?: 'me';
   }) =>
-    apiClient.get<PaginatedResponse<ForumPost>>(`${getForumBasePath()}/posts`, params),
+    apiClient.get<PaginatedResponse<ForumPost>>(`${FORUM_BASE}/posts`, params),
 
   getPopularTags: (limit?: number) =>
     apiClient.get<ApiResponse<{ tag: string; count: number }[]>>(
-      `${getForumBasePath()}/posts/tags/popular`,
+      `${FORUM_BASE}/posts/tags/popular`,
       limit ? { limit } : undefined,
     ),
 
   getPost: (id: string) =>
-    apiClient.get<ApiResponse<ForumPost>>(`${getForumBasePath()}/posts/${id}`),
+    apiClient.get<ApiResponse<ForumPost>>(`${FORUM_BASE}/posts/${id}`),
 
   createPost: (data: CreatePostRequest) =>
-    apiClient.post<ApiResponse<ForumPost>>(`${getForumBasePath()}/posts`, data),
+    apiClient.post<ApiResponse<ForumPost>>(`${FORUM_BASE}/posts`, data),
 
   updatePost: (id: string, data: Partial<CreatePostRequest>) =>
-    apiClient.put<ApiResponse<ForumPost>>(`${getForumBasePath()}/posts/${id}`, data),
+    apiClient.put<ApiResponse<ForumPost>>(`${FORUM_BASE}/posts/${id}`, data),
 
   deletePost: (id: string) =>
-    apiClient.delete<ApiResponse<void>>(`${getForumBasePath()}/posts/${id}`),
+    apiClient.delete<ApiResponse<void>>(`${FORUM_BASE}/posts/${id}`),
 
   likePost: (id: string) =>
-    apiClient.post<ApiResponse<{ likeCount: number; isLiked: boolean }>>(`${getForumBasePath()}/posts/${id}/like`),
+    apiClient.post<ApiResponse<{ likeCount: number; isLiked: boolean }>>(`${FORUM_BASE}/posts/${id}/like`),
 
   // WO-KPA-A-FORUM-NOTICE-PIN-BY-OWNER-V1: forum owner pin/unpin
   pinPost: (id: string, pin: boolean) =>
-    apiClient.patch<ApiResponse<{ id: string; isPinned: boolean }>>(`${getForumBasePath()}/posts/${id}/pin`, { pin }),
+    apiClient.patch<ApiResponse<{ id: string; isPinned: boolean }>>(`${FORUM_BASE}/posts/${id}/pin`, { pin }),
 
   // 댓글
   getComments: (postId: string) =>
-    apiClient.get<ApiResponse<ForumComment[]>>(`${getForumBasePath()}/posts/${postId}/comments`),
+    apiClient.get<ApiResponse<ForumComment[]>>(`${FORUM_BASE}/posts/${postId}/comments`),
 
   createComment: (postId: string, content: string, parentId?: string) =>
-    apiClient.post<ApiResponse<ForumComment>>(`${getForumBasePath()}/posts/${postId}/comments`, {
+    apiClient.post<ApiResponse<ForumComment>>(`${FORUM_BASE}/posts/${postId}/comments`, {
       content,
       parentId,
     }),
 
   // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C
   updateComment: (commentId: string, content: string) =>
-    apiClient.put<ApiResponse<ForumComment>>(`${getForumBasePath()}/comments/${commentId}`, { content }),
+    apiClient.put<ApiResponse<ForumComment>>(`${FORUM_BASE}/comments/${commentId}`, { content }),
 
   deleteComment: (postId: string, commentId: string) =>
-    apiClient.delete<ApiResponse<void>>(`${getForumBasePath()}/posts/${postId}/comments/${commentId}`),
+    apiClient.delete<ApiResponse<void>>(`${FORUM_BASE}/posts/${postId}/comments/${commentId}`),
 
   // 공개 포럼 목록 (WO-O4O-KPA-FORUM-ALL-SEARCH-AND-FILTER-UX-V1)
   getCategories: () =>
-    apiClient.get<ApiResponse<ForumInfo[]>>(`${getForumBasePath()}/categories`),
+    apiClient.get<ApiResponse<ForumInfo[]>>(`${FORUM_BASE}/categories`),
 
   // Owner routes — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
   getMyForums: () =>
-    apiClient.get<ApiResponse<ForumInfo[]>>(`${getForumBasePath()}/categories/mine`),
+    apiClient.get<ApiResponse<ForumInfo[]>>(`${FORUM_BASE}/categories/mine`),
 
   updateMyForum: (id: string, data: { name?: string; description?: string; iconEmoji?: string | null; iconUrl?: string | null }) =>
-    apiClient.patch<ApiResponse<ForumInfo>>(`${getForumBasePath()}/categories/${id}/owner`, data),
+    apiClient.patch<ApiResponse<ForumInfo>>(`${FORUM_BASE}/categories/${id}/owner`, data),
 
   requestDeleteForum: (id: string, data: { reason?: string }) =>
-    apiClient.post<ApiResponse<void>>(`${getForumBasePath()}/categories/${id}/delete-request`, data),
+    apiClient.post<ApiResponse<void>>(`${FORUM_BASE}/categories/${id}/delete-request`, data),
 };
 
 // ============================================================================
@@ -139,39 +127,39 @@ export interface ForumMember {
 export const forumMembershipApi = {
   getJoinRequests: (forumId: string) =>
     apiClient.get<ApiResponse<ForumJoinRequest[]>>(
-      `${getForumBasePath()}/categories/${forumId}/join-requests`,
+      `${FORUM_BASE}/categories/${forumId}/join-requests`,
     ),
 
   approveJoin: (forumId: string, requestId: string) =>
     apiClient.post<ApiResponse<{ requestId: string; status: string; userId: string }>>(
-      `${getForumBasePath()}/categories/${forumId}/members/${requestId}/approve`,
+      `${FORUM_BASE}/categories/${forumId}/members/${requestId}/approve`,
     ),
 
   rejectJoin: (forumId: string, requestId: string, reviewComment?: string) =>
     apiClient.post<ApiResponse<{ requestId: string; status: string }>>(
-      `${getForumBasePath()}/categories/${forumId}/members/${requestId}/reject`,
+      `${FORUM_BASE}/categories/${forumId}/members/${requestId}/reject`,
       { reviewComment },
     ),
 
   getMembers: (forumId: string) =>
     apiClient.get<ApiResponse<ForumMember[]>>(
-      `${getForumBasePath()}/categories/${forumId}/members`,
+      `${FORUM_BASE}/categories/${forumId}/members`,
     ),
 
   removeMember: (forumId: string, userId: string) =>
     apiClient.delete<ApiResponse<{ removed: boolean; userId: string }>>(
-      `${getForumBasePath()}/categories/${forumId}/members/${userId}`,
+      `${FORUM_BASE}/categories/${forumId}/members/${userId}`,
     ),
 
   // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1: 일반 사용자용
   requestJoin: (forumId: string) =>
     apiClient.post<ApiResponse<any>>(
-      `${getForumBasePath()}/categories/${forumId}/join`,
+      `${FORUM_BASE}/categories/${forumId}/join`,
     ),
 
   getMembershipStatus: (forumId: string) =>
     apiClient.get<ApiResponse<{ isMember: boolean; role: string | null; pendingRequest: boolean }>>(
-      `${getForumBasePath()}/categories/${forumId}/membership-status`,
+      `${FORUM_BASE}/categories/${forumId}/membership-status`,
     ),
 };
 

@@ -12,7 +12,6 @@ export function ForumServicePage() {
     <InfoPageLayout
       title="약사 포럼"
       subtitle="약사를 위한 전용 커뮤니티"
-      badgeType="none"
       icon="💬"
     >
       <div style={styles.section}>

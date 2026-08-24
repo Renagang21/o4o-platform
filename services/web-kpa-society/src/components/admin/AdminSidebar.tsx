@@ -1,8 +1,8 @@
 /**
- * AdminSidebar - 지부 관리자 사이드바 (구조 관리 전용)
+ * AdminSidebar - KPA-Society 관리자 사이드바 (구조 관리 전용)
  *
  * WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1:
- * - Admin은 구조 관리만: 분회, 회원, 위원회, 임원, 설정
+ * - Admin은 구조 관리만: 회원, 설정
  *
  * WO-O4O-ADMIN-DASHBOARD-REFINE-V1:
  * - inline style → Tailwind + lucide-react

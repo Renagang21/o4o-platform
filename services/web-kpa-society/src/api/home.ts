@@ -8,7 +8,6 @@
  */
 
 import { apiClient } from './client';
-import { communityApi, type CommunityAd } from './community';
 import type { SignageHomeMedia, SignageHomePlaylist } from '@o4o/types/signage';
 import type { ForumHomePost } from '@o4o/types/forum';
 import type { ForumHubItem, ForumActivityCategory } from '../types';
@@ -75,10 +74,12 @@ interface ForumActivityResponse {
   data: ForumActivityCategory[];
 }
 
-export interface HomePageData {
-  notices: HomeNotice[];
-  heroAds: CommunityAd[];
-}
+/*
+ * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §8:
+ *   `prefetchAll()` / `HomePageData` 제거. 공통 CommunityServiceHome 이 공지·최신활동을
+ *   각각의 adapter 로 조회하므로 두 조회를 Promise.allSettled 로 묶어 **실패를 빈 배열로
+ *   삼키던** 경로가 사라졌다. 공지 실패는 이제 loadError 상태로 드러난다.
+ */
 
 // WO-O4O-KPA-HOME-LATEST-ACTIVITY-SECTION-V1
 export interface LatestItem {
@@ -120,23 +121,6 @@ export const homeApi = {
   getLatest: (params?: { type?: string; limit?: number }) =>
     apiClient.get<{ success: boolean; data: LatestItem[] }>('/home/latest', params),
 
-  /**
-   * Home 페이지 필수 데이터를 병렬로 가져오기
-   * WO-O4O-KPA-HOME-API-TRIM-V1: 실제 CommunityHomePage 소비 데이터(notices + heroAds)만 유지
-   */
-  async prefetchAll(): Promise<HomePageData> {
-    const [noticesRes, heroRes] = await Promise.allSettled([
-      apiClient.get<NoticesResponse>('/home/notices', { limit: 5 }),
-      communityApi.getHeroAds(),
-    ]);
-
-    return {
-      notices: noticesRes.status === 'fulfilled' ? noticesRes.value.data ?? [] : [],
-      heroAds: heroRes.status === 'fulfilled'
-        ? (heroRes.value as any)?.data?.ads ?? (heroRes.value as any)?.ads ?? []
-        : [],
-    };
-  },
 };
 
 export type { HomeNotice, HomeForumPost, HomeFeatured, HomeMedia, HomePlaylist };

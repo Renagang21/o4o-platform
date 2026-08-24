@@ -13,7 +13,6 @@ export function LmsServicePage() {
     <InfoPageLayout
       title="콘텐츠 안내"
       subtitle="약사 개인을 위한 콘텐츠 열람 및 진행 관리 서비스"
-      badgeType="none"
       icon="📄"
     >
       <div style={styles.section}>

@@ -11,6 +11,11 @@
  * WO-KPA-HOME-STRUCTURE-REFINEMENT-V1: 홈 구조 정리 (4블록 허브)
  * WO-KPA-COMMUNITY-ACCESS-GATE-V1: 비로그인 사용자 서비스 카드 클릭 시 로그인 유도
  * WO-O4O-STANDARD-HOME-TEMPLATE-V1: StandardHomeTemplate 적용
+ * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §8:
+ *   조회 상태 기계(공지·최신활동의 loading/loadError/retry/tab)를 공통
+ *   `CommunityServiceHome`(@o4o/shared-space-ui) 로 이관했다. 이 파일에는 KPA config
+ *   (히어로·카드·CTA·가이드)와 data adapter 만 남는다. Pharmacy-Hub 가 같은 컨테이너를
+ *   자기 config·data 로 소비한다 (JSX 복제 금지).
  *
  * 섹션 구조 (3블록):
  * ├─ HeroBannerSection        — 동적 광고 캐러셀 (KPA 고유)
@@ -25,10 +30,8 @@ import { Store, Network, Users, BookOpen } from 'lucide-react';
 import { PageHero, Card, useTemplate } from '@o4o/ui';
 import {
   HeroBannerSection,
-  StandardHomeTemplate,
-  LatestActivitySection,
+  CommunityServiceHome,
   LATEST_ACTIVITY_ACCENTS,
-  LATEST_ACTIVITY_SUMMARY_LIMIT,
   buildLatestActivityTabs,
   AppEntrySection,
   O4OHelpSection,
@@ -40,7 +43,7 @@ import {
 } from '@o4o/shared-space-ui';
 import type { NoticeItem } from '@o4o/shared-space-ui';
 import { homeApi } from '../api/home';
-import type { HomePageData, LatestItem } from '../api/home';
+import { communityApi, type CommunityAd } from '../api/community';
 import { useAuth } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/LoginModalContext';
 
@@ -69,14 +72,16 @@ export function CommunityHomePage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { openLoginModal, setOnLoginSuccess } = useAuthModal();
-  const [data, setData] = useState<HomePageData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [latestItems, setLatestItems] = useState<LatestItem[]>([]);
-  const [latestTab, setLatestTab] = useState('all');
-  const [latestLoading, setLatestLoading] = useState(true);
-  // WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1: 오류/0건 구분 + 재시도
-  const [latestError, setLatestError] = useState(false);
-  const [latestReloadKey, setLatestReloadKey] = useState(0);
+
+  // 히어로 광고는 KPA 고유 장식이다 — 실패 시 공통 fallback 히어로가 렌더된다.
+  const [heroAds, setHeroAds] = useState<CommunityAd[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    communityApi.getHeroAds()
+      .then((res) => { if (!cancelled) setHeroAds(res?.ads ?? []); })
+      .catch(() => { /* fallback 히어로 유지 */ });
+    return () => { cancelled = true; };
+  }, []);
 
   // WO-KPA-COMMUNITY-ACCESS-GATE-V1: 비로그인 사용자 카드 클릭 시 로그인 유도
   const handleCardClick = useCallback((href: string, e: React.MouseEvent) => {
@@ -87,43 +92,44 @@ export function CommunityHomePage() {
     }
   }, [isAuthenticated, navigate, openLoginModal, setOnLoginSuccess]);
 
-  useEffect(() => {
-    homeApi.prefetchAll()
-      .then(setData)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+  /**
+   * 공지 adapter — 실패는 반드시 throw 한다.
+   * (이전에는 `catch(() => {})` 로 삼켜 조회 실패가 "공지 없음"으로 위장됐다.)
+   *
+   * WO-O4O-KPA-MAIN-HOME-LINK-CANONICAL-ALIGNMENT-V1:
+   *   공지 데이터는 `/home/notices` → cms_contents 다. KPA 에는 cms_contents 공개 상세
+   *   라우트가 없으므로 잘못된 링크 대신 비링크 항목으로 표시한다(데드링크 0).
+   */
+  const loadNotices = useCallback(async (): Promise<NoticeItem[]> => {
+    const res = await homeApi.getNotices(5);
+    if (!res?.success || !Array.isArray(res.data)) {
+      throw new Error('공지를 불러오지 못했습니다.');
+    }
+    return res.data.map((n) => ({
+      id: n.id,
+      title: n.title,
+      date: n.publishedAt || n.createdAt,
+      isPinned: n.isPinned,
+    }));
   }, []);
 
-  useEffect(() => {
-    setLatestLoading(true);
-    setLatestError(false);
-    homeApi.getLatest({ type: latestTab, limit: LATEST_ACTIVITY_SUMMARY_LIMIT })
-      .then((res) => {
-        // 계약 위반(비배열)도 실패로 간주 — 빈 목록으로 위장하지 않는다
-        if (!Array.isArray(res?.data)) { setLatestItems([]); setLatestError(true); return; }
-        setLatestItems(res.data);
-      })
-      .catch(() => { setLatestItems([]); setLatestError(true); })
-      .finally(() => setLatestLoading(false));
-  }, [latestTab, latestReloadKey]);
-
-  // WO-O4O-KPA-MAIN-HOME-LINK-CANONICAL-ALIGNMENT-V1:
-  //   공지 데이터는 `/home/notices` → cms_contents 다. 기존 href `/content/{id}` 는
-  //   kpa_contents 상세를 조회하는 경로라 클릭 시 "콘텐츠를 찾을 수 없습니다" 가 떴다.
-  //   KPA 에는 cms_contents 를 표시하는 공개 상세 라우트가 없으므로(=/content/notice 는
-  //   /content 로 redirect) 잘못된 링크를 노출하지 않고 비링크로 표시한다.
-  //   NewsNoticesSection 이 href 없는 항목을 이미 지원하며, K-Cosmetics 도 동일 방식이다.
-  const noticeItems: NoticeItem[] = (data?.notices ?? []).map((n) => ({
-    id: n.id,
-    title: n.title,
-    date: n.publishedAt || n.createdAt,
-    isPinned: n.isPinned,
-  }));
+  const loadLatest = useCallback(async (tab: string, limit: number) => {
+    const res = await homeApi.getLatest({ type: tab, limit });
+    // 계약 위반(비배열)도 실패로 간주 — 빈 목록으로 위장하지 않는다
+    if (!res?.success || !Array.isArray(res.data)) {
+      throw new Error('최신 활동을 불러오지 못했습니다.');
+    }
+    return res.data;
+  }, []);
 
   const iconCls = `flex items-center justify-center shrink-0 ${tpl?.icon?.wrapper ?? ''} ${tpl?.icon?.icon ?? 'text-primary'}`;
 
   return (
-    <StandardHomeTemplate
+    <CommunityServiceHome
+      navigate={(path) => navigate(path)}
+      data={{ loadNotices, loadLatest }}
+      latestTabs={LATEST_TABS}
+      latestAccent={LATEST_ACTIVITY_ACCENTS.blue}
       heroSlot={
         <PageHero>
           {/* WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1: 임시 공용 체험 계정 안내 (추후 제거 예정) */}
@@ -139,7 +145,7 @@ export function CommunityHomePage() {
             </Link>
           </div>
           <HeroBannerSection
-            ads={data?.heroAds ?? []}
+            ads={heroAds}
             fallback={{
               // WO-O4O-KPA-HERO-FALLBACK-VALUE-COPY-V1:
               // Hero fallback 을 "커뮤니티 소개" 에서 "O4O 가치 전달" 로 전환.
@@ -155,8 +161,6 @@ export function CommunityHomePage() {
           />
         </PageHero>
       }
-      notices={noticeItems}
-      noticesLoading={loading}
       noticesAccentBg="var(--color-primary-light, #eff6ff)"
       noticesRightSlot={
         <>
@@ -178,19 +182,6 @@ export function CommunityHomePage() {
             </a>
           </Card>
         </>
-      }
-      latestSlot={
-        <LatestActivitySection
-          tabs={LATEST_TABS}
-          items={latestItems}
-          activeTab={latestTab}
-          onTabChange={setLatestTab}
-          loading={latestLoading}
-          loadError={latestError}
-          onRetry={() => setLatestReloadKey((k) => k + 1)}
-          navigate={(path) => navigate(path)}
-          accent={LATEST_ACTIVITY_ACCENTS.blue}
-        />
       }
       // WO-O4O-KPA-HOME-ROLE-USAGE-MANUAL-RECLASSIFY-V1:
       //   이 영역은 작업 시작 진입(CTA)이 아니라 "사용자 유형별 활용 안내(매뉴얼)" 다.

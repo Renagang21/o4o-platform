@@ -1,5 +1,5 @@
 /**
- * AdminLayout - 지부 관리자 레이아웃
+ * AdminLayout - KPA-Society 관리자 레이아웃
  *
  * WO-O4O-ADMIN-DASHBOARD-REFINE-V1:
  * - inline style → Tailwind 전환

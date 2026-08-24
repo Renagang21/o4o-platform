@@ -9,7 +9,7 @@ const queryClient = new QueryClient({
 import { Layout } from './components';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
-import { AuthProvider, OrganizationProvider } from './contexts';
+import { AuthProvider } from './contexts';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { TemplateProvider, NotFound } from '@o4o/ui';
 import { templates, usePageSeo, StoreFacingFooter } from '@o4o/shared-space-ui';
@@ -86,7 +86,6 @@ const SurveyDetailPage = lazy(() => import('./pages/survey/SurveyDetailPage'));
 // Event Offer pages — Phase 2 lazy (barrel unwound)
 // WO-O4O-KPA-EVENT-OFFER-LIST-LEGACY-RETIRE-V1: legacy EventOfferListPage 제거.
 //   canonical = KpaEventOfferPage (enriched ViewModel) — /store-hub/event-offers
-//   /demo/event-offers 라우트는 canonical 로 redirect.
 const EventOfferDetailPage = lazy(() => import('./pages/event-offer/EventOfferDetailPage').then(m => ({ default: m.EventOfferDetailPage })));
 const KpaEventOfferPage = lazy(() => import('./pages/event-offer/KpaEventOfferPage').then(m => ({ default: m.KpaEventOfferPage })));
 // WO-O4O-EVENT-OFFER-TO-CART-MIGRATION-V1 (Phase 1a): canonical store cart 확인 화면
@@ -120,7 +119,7 @@ const KpaRequestCategoryPage = lazy(() => import('./pages/mypage/RequestCategory
 const MyRequestsPage = lazy(() => import('./pages/mypage/MyRequestsPage'));
 const ForumMemberManagementPage = lazy(() => import('./pages/mypage/ForumMemberManagementPage'));
 
-// Admin Routes (지부 관리자) — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
+// Admin Routes (KPA-Society 관리자) — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
 const AdminRoutes = lazy(() => import('./routes/AdminRoutes').then(m => ({ default: m.AdminRoutes })));
 
 // Operator Routes (서비스 운영자) — WO-KPA-SOCIETY-APP-ROUTE-CODE-SPLITTING-V1: lazy
@@ -338,12 +337,11 @@ const MultilingualProductPublicLandingPage = lazy(() => import('./pages/public/M
 const ForeignVisitorAffiliatePublicLandingPage = lazy(() => import('./pages/public/ForeignVisitorAffiliatePublicLandingPage').then(m => ({ default: m.ForeignVisitorAffiliatePublicLandingPage })));
 
 /**
- * KPA Society - 약사회 SaaS
+ * KPA Society - 커뮤니티 서비스
  *
- * WO-KPA-DEMO-ROUTE-ISOLATION-V1
- * - 기존 약사회 서비스 전체를 /demo 하위로 이동
- * - / 경로는 플랫폼 홈용으로 비워둠
- * - 기존 서비스 코드 변경 없이 라우팅만 이동
+ * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §5:
+ * `/` 는 커뮤니티 홈(canonical)이다. 과거 `/demo/*`(지부·분회 데모) 영역은 존재하지 않으며
+ * 지부·분회 기능은 별도 분회 서비스(services/web-kpa-branch) 소관이다.
  */
 
 const SERVICE_NAME = 'KPA-Society';
@@ -566,7 +564,6 @@ function App() {
     <O4OErrorBoundary>
     <AuthProvider>
       <LoginModalProvider>
-      <OrganizationProvider>
       <BrowserRouter>
         <SeoWatcher />
         {/* WO-KPA-CONTEXT-SWITCHER-AND-ORG-RESOLUTION-V1: 라우트 기반 서비스 컨텍스트 */}
@@ -582,20 +579,20 @@ function App() {
         <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* =========================================================
-           * SVC-A: 커뮤니티 서비스 (Community Service)
+           * 커뮤니티 서비스 (Community Service) — KPA-Society 본체
            * WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
            *
            * SCOPE: 커뮤니티 중심 서비스
-           * - / : 커뮤니티 홈 (공개)
+           * - / : 커뮤니티 홈 (canonical)
            * - /dashboard : /mypage 리다이렉트 (WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1)
-           * - /forum/* : 커뮤니티 포럼 (/demo/forum과 별도)
+           * - /forum/* : 커뮤니티 포럼
            * - /services/* : 서비스 소개 페이지
            * - /join/* : 서비스 참여 페이지
            * - /pharmacy/* : 약국 경영지원 (실 서비스)
            * - /work/* : 근무약사 업무
            *
-           * NOTE: 커뮤니티 UX에서 /demo/*로 연결 금지
-           * /demo는 지부/분회 서비스(SVC-B) 전용 영역
+           * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §3:
+           * 지부·분회(구 SVC-B / `/demo/*`) 진입점은 본체에 두지 않는다 — 분회 서비스 소관.
            *
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
            * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
@@ -617,7 +614,6 @@ function App() {
            * WO-KPA-COMMUNITY-FORUM-ROUTES-V1
            *
            * / 경로의 커뮤니티 홈에서 접근하는 포럼
-           * /demo/forum과 별도의 URL 구조
            * ======================================== */}
           <Route path="/forum" element={<Layout serviceName={SERVICE_NAME}><ForumHomePage /></Layout>} />
           <Route path="/forum/all" element={<Layout serviceName={SERVICE_NAME}><ForumListPage /></Layout>} />
@@ -663,15 +659,17 @@ function App() {
           <Route path="/guide/for/operator" element={<Layout serviceName={SERVICE_NAME}><GuideForOperatorPage /></Layout>} />
           <Route path="/guide/for/member" element={<Layout serviceName={SERVICE_NAME}><GuideForMemberPage /></Layout>} />
 
-          {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
-          <Route path="/services/branch" element={<Navigate to="/" replace />} />
-          <Route path="/services/division" element={<Navigate to="/" replace />} />
-          <Route path="/services/pharmacy" element={<PharmacyServicePage />} />
-          <Route path="/services/forum" element={<ForumServicePage />} />
-          <Route path="/services/lms" element={<LmsServicePage />} />
+          {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
+              WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §3·§15:
+              지부(/services/branch) · 분회(/services/division) 소개 alias 제거.
+              대상 화면은 이미 사라졌고 유입 링크도 0 이라 "/ 로 되돌리는" redirect 만 남아 있었다.
+              지부·분회는 별도 분회 서비스(services/web-kpa-branch) 소관이다. */}
+          <Route path="/services/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyServicePage /></Layout>} />
+          <Route path="/services/forum" element={<Layout serviceName={SERVICE_NAME}><ForumServicePage /></Layout>} />
+          <Route path="/services/lms" element={<Layout serviceName={SERVICE_NAME}><LmsServicePage /></Layout>} />
 
           {/* Join/Participation Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
-          <Route path="/join/pharmacy" element={<PharmacyJoinPage />} />
+          <Route path="/join/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyJoinPage /></Layout>} />
 
           {/* ========================================
            * 약국 경영지원 — /pharmacy/* 레거시 경로
@@ -760,7 +758,6 @@ function App() {
            * WO-KPA-COMMUNITY-ROOT-ROUTES-V1
            *
            * / 경로의 커뮤니티 홈에서 접근하는 서비스들
-           * /demo/* 와 분리된 실제 라우트
            * ======================================== */}
 
           {/* My Content (내 콘텐츠 관리) - WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1 */}
@@ -1130,7 +1127,6 @@ function App() {
         </TemplateProvider>
         </ServiceProvider>
       </BrowserRouter>
-      </OrganizationProvider>
       </LoginModalProvider>
     </AuthProvider>
     </O4OErrorBoundary>

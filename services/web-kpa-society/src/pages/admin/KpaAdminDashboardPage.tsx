@@ -5,11 +5,15 @@
  *
  * WO-O4O-KPA-ADMIN-DASHBOARD-ADMIN-UX-CORE-MIGRATION-V1:
  *   독자 JSX 구현 → @o4o/admin-ux-core AdminDashboardLayout 4-Block 정합 (Neture/GP/KCOS 정렬).
- *   - A Structure Snapshot: 활성 회원 / 승인 대기 / 등록 분회 KPI
+ *   - A Structure Snapshot: 활성 회원 / 승인 대기 KPI
  *   - B Policy Overview: KPA admin 정책 설정 개념 없음 → 빈 배열(미표시)
  *   - C Governance Alerts: 전용 데이터 소스 없음 → 빈 배열("구조 이상 없음")
  *   - D Structure Actions: 회원 관리 / 운영 대시보드 진입
- *   최근 가입 신청 목록(분회 신청 detail)은 KPA 특수 섹션으로 레이아웃 하단 유지.
+ *   최근 가입 신청 목록은 KPA 특수 섹션으로 레이아웃 하단 유지.
+ *
+ * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §3·§4:
+ *   '등록 분회' KPI 제거 — 지부·분회 통계는 별도 분회 서비스(services/web-kpa-branch) 소관이다.
+ *   backend(getDistrictSummary) 는 변경하지 않는다(다른 소비처 계약 보존).
  *   operatorApi.getDistrictSummary(10) / AdminAuthGuard / route / 권한 구조 무변경.
  *   indigo 헤더 시각 정체성 유지.
  */
@@ -76,7 +80,6 @@ export function KpaAdminDashboardPage() {
           value: kpis.pendingApprovals,
           status: kpis.pendingApprovals > 0 ? 'attention' : 'stable',
         },
-        { key: 'total-branches', label: '등록 분회', value: kpis.totalBranches, status: 'stable' },
       ]
     : [];
 
@@ -122,7 +125,7 @@ export function KpaAdminDashboardPage() {
       {/* ── 공개 상태 점검 (WO-O4O-KPA-ADMIN-PUBLIC-READINESS-CHECK-V1) ── */}
       <AdminPublicReadinessCard />
 
-      {/* ── 최근 가입 신청 목록 (KPA 특수 섹션 — 분회 신청 detail, 레이아웃 외부 유지) ── */}
+      {/* ── 최근 가입 신청 목록 (KPA 특수 섹션 — 레이아웃 외부 유지) ── */}
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <h2 className="text-sm font-semibold text-slate-700">최근 가입 신청</h2>

@@ -3,7 +3,8 @@
  */
 
 // 약사 회원 타입 (신고서 양식 기반)
-export * from './pharmacist';
+// (WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §4)
+// 지부·분회 신고서 기반 pharmacist 타입은 소비처 0 으로 제거했다. 분회 업무는 services/web-kpa-branch 소관.
 
 // 공통 타입
 export interface PaginatedResponse<T> {

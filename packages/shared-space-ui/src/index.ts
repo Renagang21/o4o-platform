@@ -229,6 +229,23 @@ export type {
   LatestActivityAccent,
 } from './community/LatestActivitySection';
 
+/* WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §8:
+   커뮤니티 홈 공통 컨테이너 — 조회 상태 기계(4상태 계약)를 서비스마다 복제하지 않는다. */
+export { CommunityServiceHome } from './community/CommunityServiceHome';
+
+/* WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §14:
+   커뮤니티 서비스 공개 푸터 공통 View — 링크는 서비스 config 가 소유한다. */
+export { CommunitySiteFooter } from './community/CommunitySiteFooter';
+export type {
+  CommunitySiteFooterProps,
+  CommunityFooterSection,
+  CommunityFooterLink,
+} from './community/CommunitySiteFooter';
+export type {
+  CommunityServiceHomeProps,
+  CommunityHomeDataAdapters,
+} from './community/CommunityServiceHome';
+
 export { StoreHubTemplate } from './StoreHubTemplate';
 export type { StoreHubResourceCard, StoreHubFlowStep, StoreHubConfig, StoreHubTemplateProps } from './StoreHubTemplate';
 

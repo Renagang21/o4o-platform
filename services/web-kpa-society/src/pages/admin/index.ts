@@ -1,3 +1,3 @@
 /**
- * Admin Pages - 지부 관리자 페이지
+ * Admin Pages - KPA-Society 관리자 페이지
  */

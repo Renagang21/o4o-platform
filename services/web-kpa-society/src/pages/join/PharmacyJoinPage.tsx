@@ -16,7 +16,6 @@ export function PharmacyJoinPage() {
     <InfoPageLayout
       title="약국 서비스 참여 안내"
       subtitle="약국별 맞춤 서비스 이용 방법"
-      badgeType="none"
       icon="💊"
     >
       <div style={styles.section}>

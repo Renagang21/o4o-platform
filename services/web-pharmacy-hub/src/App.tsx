@@ -21,7 +21,8 @@
  *   /forum/request               포럼 개설 신청 (WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §5)
  *   /forum/my-dashboard          내 포럼 · 내 신청 현황 (동일 WO §5·§7)
  *   /forum/my-dashboard/:forumId/members  포럼 회원 관리 (동일 WO §8)
- *   /community                   커뮤니티 홈 (동일 WO §4 — StandardHomeTemplate + LatestActivitySection)
+ *   /                            커뮤니티 홈 (canonical · 공통 CommunityServiceHome)
+ *   /community                   → `/` redirect (기존 링크 보존)
  *   /community/search            커뮤니티 검색 (동일 WO §6 — forum 중심)
  *   /education                   교육 허브 (동일 WO §7 — 공통 LmsHubTemplate)
  *   /education/course/:id        강의 상세 (공통 CourseDetailView · 수강신청 활성 — LMS learner adoption WO §6)
@@ -112,7 +113,6 @@ import {
   pharmacyHubGuideFeatureManualsProps,
 } from '@o4o/shared-space-ui';
 import { MembershipGate } from './components/MembershipGate';
-import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import JoinPage from './pages/JoinPage';
 import JoinStatusPage from './pages/JoinStatusPage';
@@ -211,7 +211,16 @@ export default function App() {
             공개 QR 랜딩(/qr/:slug)은 자체 상단 계약이 있어 여기 포함하지 않는다.
           */}
           <Route element={<PublicLayout />}>
-          <Route path="/" element={<HomePage />} />
+          {/*
+            WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §10·§12
+            서비스 루트 = 커뮤니티 홈. KPA-Society 와 같은 canonical 구조다.
+            (기존 서비스 소개형 HomePage 는 폐기 — 같은 성격의 홈이 `/` 와 `/community`
+             둘로 갈려 있던 구조를 하나로 모았다. 가입 상태 밴드·역할 진입 카드는
+             커뮤니티 홈 슬롯으로 이관해 진입점 손실이 없다.)
+            공개 홈이다 — MembershipGate 를 걸지 않는다. backend `/home/latest` 는
+            optionalAuth, 포럼 읽기도 공개라 미가입 방문자에게도 실제 내용이 보인다.
+          */}
+          <Route path="/" element={<CommunityHomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/join" element={<JoinPage />} />
           <Route path="/join/status" element={<JoinStatusPage />} />
@@ -388,15 +397,9 @@ export default function App() {
               </MembershipGate>
             }
           />
-          {/* 동일 WO §4·§6 — 커뮤니티 홈 · 검색 */}
-          <Route
-            path="/community"
-            element={
-              <MembershipGate>
-                <CommunityHomePage />
-              </MembershipGate>
-            }
-          />
+          {/* 동일 WO §4·§6 — 커뮤니티 검색.
+              `/community` 는 canonical 홈(`/`) 으로 redirect 한다 (기존 링크 보존). */}
+          <Route path="/community" element={<Navigate to="/" replace />} />
           <Route
             path="/community/search"
             element={

@@ -190,7 +190,9 @@ export function MyDashboardPage() {
       breadcrumb={[{ label: '홈', href: '/' }, { label: '마이페이지' }]}
       width="wide"
       userSummary={
-        /* 사용자 요약 — 4 서비스 공통 카드. 배지 구성(소속 분회·역할)은 KPA 판정 그대로. */
+        /* 사용자 요약 — 4 서비스 공통 카드. 배지 구성(소속 조직·역할)은 KPA 판정 그대로.
+           WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §3:
+           '소속 분회' → '소속 조직' — 분회는 분회 서비스 소관이며 본체 배지는 조직 중립이다. */
         <MyPageUserSummary
           initial="👤"
           name={getUserDisplayName(user)}
@@ -201,7 +203,7 @@ export function MyDashboardPage() {
               <RoleBadgeGroup
                 badges={[
                   ...((user as any).organizationId
-                    ? [{ key: 'org', label: '🏢 소속 분회', tone: 'slate' as const, variant: 'soft' as const }]
+                    ? [{ key: 'org', label: '🏢 소속 조직', tone: 'slate' as const, variant: 'soft' as const }]
                     : []),
                   {
                     key: 'role',

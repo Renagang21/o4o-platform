@@ -59,7 +59,7 @@ export function ContactPage() {
                 약사 네트워크와 연결된 조직과의 협력 문의를 받습니다.
               </p>
               <ul style={s.cardList}>
-                <li style={s.cardListItem}>약사회 / 지부·분회</li>
+                <li style={s.cardListItem}>약사회 / 약사 단체</li>
                 <li style={s.cardListItem}>전문약사 학술 모임</li>
                 <li style={s.cardListItem}>협동조합 / 공동 구매</li>
                 <li style={s.cardListItem}>공급·유통 파트너</li>

@@ -42,3 +42,50 @@ export const KPA_CONTEXTUAL_NAV: KpaContextualNavItem[] = [
   { label: kpaConfig.terminology.myStoreLabel, href: '/store', visibleWhen: 'storeOwner' },
   { label: kpaConfig.terminology.storeHubLabel, href: '/store-hub', visibleWhen: 'storeOwner' },
 ];
+
+// ─── Footer Nav ──────────────────────────────────────────────────────────────
+
+/**
+ * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §14
+ *
+ * 푸터 링크 SSOT. View 는 공통 `CommunitySiteFooter`(@o4o/shared-space-ui) 이고
+ * Pharmacy-Hub(PH_FOOTER_SECTIONS) 와 같은 구조를 쓴다.
+ *
+ * 데드링크 0: 여기 등재하는 href 는 전부 App.tsx 에 실제 route 가 있는 경로다.
+ * 법정정보(사업자번호 등)는 하드코딩하지 않는다 — PublicLegalFooterInfo(API) 소관.
+ */
+export const KPA_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }[] = [
+  {
+    title: '서비스',
+    links: [
+      { label: '포럼', href: '/forum' },
+      { label: '강의', href: '/lms' },
+      { label: '콘텐츠', href: '/content' },
+      { label: '디지털사이니지', href: '/signage' },
+      { label: '자료실', href: '/resources' },
+    ],
+  },
+  {
+    title: '이용 안내',
+    links: [
+      { label: '서비스 안내', href: '/service-guide' },
+      { label: '이용 가이드', href: '/guide/intro' },
+      { label: '기능별 이용 방법', href: '/guide/features' },
+    ],
+  },
+  {
+    title: '약사회',
+    links: [
+      { label: '약사회 소개', href: '/about' },
+      { label: '협업 문의', href: '/contact' },
+    ],
+  },
+  {
+    title: '약관',
+    links: [
+      // WO-O4O-KPA-SERVICE-LEGAL-PROFILE-FOOTER-V1: KPA 약관 route 는 /policy 다(/terms 아님).
+      { label: '이용약관', href: '/policy' },
+      { label: '개인정보처리방침', href: '/privacy' },
+    ],
+  },
+];

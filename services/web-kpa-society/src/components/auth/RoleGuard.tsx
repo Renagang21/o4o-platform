@@ -8,7 +8,7 @@
  *   KPA 고유분(로딩 문구 · 권한없음 안내 · MembershipGate)만 주입으로 남는다.
  *
  * KPA는 user.roles[] 배열 기반 역할 체크.
- * 단순 역할 체크용 — 분회 소유권 검증은 KPA 전용 Guard 를 사용한다.
+ * 단순 역할 체크용 — 조직 소유권 검증은 KPA 전용 Guard 를 사용한다.
  * (KPA 전용 Guard: AdminAuthGuard / HubGuard / PharmacyGuard / PharmacyOwnerOnlyGuard /
  *  PharmacistOnlyGuard — 이번 WO 에서 통합하지 않는다.)
  *

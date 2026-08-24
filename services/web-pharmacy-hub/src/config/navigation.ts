@@ -17,11 +17,6 @@ import { ROLE_LABELS, ROLES } from './service';
 
 // ─── Public Nav ──────────────────────────────────────────────────────────────
 
-/**
- * 비로그인 포함 전체 노출.
- * `/forum` 은 MembershipGate 뒤에 있지만 게이트가 "가입 신청" 안내를 렌더하므로
- * 미가입자에게도 의미 있는 진입점이다(데드링크 아님).
- */
 /*
  * WO-O4O-GLOBAL-HEADER-UNUSED-CHILDREN-CONTRACT-REMOVAL-V1:
  *   PrimaryNav 는 1단이다. 공통 GlobalHeader 에 submenu 렌더러가 없어
@@ -34,18 +29,28 @@ import { ROLE_LABELS, ROLES } from './service';
  *   Content(공지·소식)는 PH 에서 forum pinned post 가 canonical 이므로 별도 링크를
  *   만들지 않는다 — 같은 의미의 중복 모델을 만들지 않는다(§10).
  */
-export const PH_PUBLIC_NAV: GlobalHeaderNavItem[] = [
-  { label: '홈', href: '/' },
-  // 커뮤니티 하위(포럼 · 검색 · 내 글 · 내 포럼 · 포럼 개설 신청 · 자료실)는
-  // CommunityHomePage 카드 · ForumHubPage infoLinks · Footer '서비스' 가 담당한다.
-  { label: '커뮤니티', href: '/community' },
+/*
+ * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §6·§9·§10:
+ *   canonical 커뮤니티 구조를 KPA-Society 와 공유한다 — `/` 자체가 커뮤니티 홈이다.
+ *   기존의 `홈(/)` + `커뮤니티(/community)` 2 항목은 같은 성격의 진입점이 둘로 갈린
+ *   구조였다. `/community` 는 `/` 로 redirect 되며(기존 링크 보존), 메뉴에서는 제거한다.
+ *
+ * 조립 순서는 공통 buildCommunityPrimaryNav(@o4o/ui) 가 고정한다:
+ *   PH_BASE_NAV → 역할 contextual → PH_TRAILING_NAV
+ */
+export const PH_BASE_NAV: GlobalHeaderNavItem[] = [
+  { label: '커뮤니티', href: '/' },
+];
+
+/** 역할 진입점 뒤에 오는 공개 안내 항목 (KPA 의 '서비스 안내' 위치와 동일 축). */
+export const PH_TRAILING_NAV: GlobalHeaderNavItem[] = [
   // WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §17:
   //   learner 개인 화면(내 수강 / 내 수료증)은 Footer '서비스' 섹션과
   //   My Page nav(PHARMACY_HUB_ACCOUNT_NAV_ITEMS)가 담당한다 — deep-link only 아님.
   { label: '교육', href: '/education' },
   // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
   //   기능 이용 매뉴얼(/guide/*)은 Footer '이용 안내' 섹션과
-  //   CommunityHomePage help 섹션이 담당한다.
+  //   커뮤니티 홈 help 섹션이 담당한다.
   { label: '이용 안내', href: '/service-guide' },
 ];
 
@@ -87,8 +92,7 @@ export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }
   {
     title: '서비스',
     links: [
-      { label: '홈', href: '/' },
-      { label: '커뮤니티', href: '/community' },
+      { label: '커뮤니티', href: '/' },
       { label: '포럼', href: '/forum' },
       // WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12
       { label: '자료실', href: '/resources' },

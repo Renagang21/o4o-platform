@@ -1,5 +1,5 @@
 /**
- * AdminAuthGuard - 지부 관리자 권한 체크 컴포넌트
+ * AdminAuthGuard - KPA-Society 관리자 권한 체크 컴포넌트
  *
  * WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1:
  *   로컬 권한없음 카드를 공통 @o4o/ui AccessDenied 로 교체. 판정 로직은 변경하지 않는다.
@@ -36,7 +36,7 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
         if (hasBranchAdminRole) {
           setIsAuthorized(true);
         } else {
-          setError('지부 관리자 권한이 없습니다.');
+          setError('관리자 권한이 없습니다.');
           setIsAuthorized(false);
         }
       } catch (err) {

@@ -22,13 +22,13 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, LogIn, Pill, Shield, Store, UserCircle } from 'lucide-react';
-import { GlobalHeader, GlobalHeaderMenuItem, filterContextualNav } from '@o4o/ui';
+import { GlobalHeader, GlobalHeaderMenuItem, buildCommunityPrimaryNav } from '@o4o/ui';
 import { NotificationBell, useNotifications,
   resolveNotificationTarget, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
 import { useAuth } from '../contexts/AuthContext';
 import { BRAND, ROLES, SERVICE_KEY, satisfiesRole } from '../config/service';
-import { PH_CONTEXTUAL_NAV, PH_PUBLIC_NAV } from '../config/navigation';
+import { PH_BASE_NAV, PH_CONTEXTUAL_NAV, PH_TRAILING_NAV } from '../config/navigation';
 import { notificationsApi } from '../lib/api/notifications';
 
 /** 브랜드 primary — 다른 서비스와 구분되는 Pharmacy-Hub 색(teal, 공급자 헤더와 동일 계열) */
@@ -56,10 +56,22 @@ export function PharmacyHubGlobalHeader() {
   const isStoreOwner = isAuthenticated && satisfiesRole(roles, ROLES.storeOwner);
   const isStoreManager = isStoreOwner || isOperator;
 
-  const contextualNav = filterContextualNav(PH_CONTEXTUAL_NAV, {
-    storeManager: !!isStoreManager,
-    storeOwner: !!isStoreOwner,
-    operator: !!isOperator,
+  /*
+   * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §9:
+   *   KPA 와 같은 공통 조립기(buildCommunityPrimaryNav)를 쓴다 —
+   *   base(커뮤니티) → 역할 진입점 → 이용 안내 순서를 두 서비스가 공유한다.
+   *   항목·역할 판정표는 config/navigation.ts · config/service.ts 소유 그대로다.
+   */
+  const primaryNav = buildCommunityPrimaryNav({
+    base: PH_BASE_NAV,
+    contextual: PH_CONTEXTUAL_NAV,
+    conditions: {
+      storeManager: !!isStoreManager,
+      storeOwner: !!isStoreOwner,
+      operator: !!isOperator,
+    },
+    trailing: PH_TRAILING_NAV,
+    isAuthenticated,
   });
 
   /**
@@ -104,8 +116,7 @@ export function PharmacyHubGlobalHeader() {
         subtitle: BRAND.nameKo,
         primaryColor: PH_PRIMARY,
       }}
-      publicNav={PH_PUBLIC_NAV}
-      contextualNav={contextualNav}
+      publicNav={primaryNav}
       user={headerUser}
       /** Pharmacy-Hub 는 로그인 모달이 없다(전용 /login 화면 계약). 모달 대신 라우팅한다. */
       onLogin={() => navigate('/login')}
