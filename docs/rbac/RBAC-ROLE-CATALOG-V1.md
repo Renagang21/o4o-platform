@@ -8,23 +8,58 @@
 
 ### Platform Roles (접두어 없음)
 
-| Role | 용도 |
-|------|------|
-| `super_admin` | 플랫폼 최고 관리자 |
-| `admin` | 플랫폼 관리자 |
-| `operator` | 플랫폼 운영자 |
-| `user` | 일반 사용자 (기본값) |
-| `customer` | 고객 |
+| Role | 용도 | 부여 |
+|------|------|------|
+| `user` | 일반 사용자 (기본값) | 허용 |
+| `customer` | 고객 | 허용 |
 
-### Commerce Roles (접두어 없음)
+#### 접두어 없는 admin tier(`super_admin` · `admin` · `operator`)는 **신규 부여 금지**
+
+플랫폼 관리자 역할의 정본은 **`platform:` 접두어 계약**이다(`platform:super_admin`).
+접두어 없는 admin tier 는 legacy 값이며 **어떤 경로도 새로 부여하지 않는다.**
+
+- 멤버십 lifecycle(승인 · 정지 해제)은 `isBareAdminTierRole()` 로 부여를 거부한다
+  — `apps/api-server/src/services/approval/MembershipApprovalService.ts`.
+  서비스 membership 의 `role` 문자열이 `admin`/`super_admin` 이어도 역할은 생기지 않는다
+  (WO-O4O-CROSSSERVICE-LEGACY-BARE-ROLE-CENSUS-AND-CLEANUP-V1 D-B).
+- Neture 가입 승인도 같은 이유로 승격을 거부한다
+  (`operator-registration.service.ts` — `ROLE_PROMOTION_NOT_ALLOWED`).
+- 추측 변환도 하지 않는다. bare 값에 서비스 접두어를 붙이는 것은 권한 확대다.
+
+**아직 읽는 곳은 있다**(회수가 아니라 부여만 막은 상태). 아래 소비처는 legacy 호환으로
+bare 값을 여전히 인정하므로, 값이 존재하면 그대로 동작한다.
+
+| 소비처 | 인정하는 bare 값 |
+|--------|------------------|
+| `services/auth/auth-login.service.ts` (`PLATFORM_ADMIN_ROLES`) | `super_admin` |
+| `modules/lms/routes/lms.routes.ts` (`PLATFORM_ADMIN_ROLES`) | `admin` · `super_admin` |
+| `utils/role-revoke-safety.ts` (`isAdminTierRoleName` — 회수 안전장치) | `admin` · `operator` · `super_admin` |
+
+> 2026-08-24 프로덕션 실측: 활성 bare admin tier 0행(`super_admin` 1행은 비활성 이력).
+> 즉 위 소비처가 실제로 태우는 사용자는 없다. 소비처 제거는 별도 판단 사항이다.
+
+`platform:admin` · `platform:operator` 는 **코드에서 제거됐다**(보유자 0 ·
+`platform:super_admin` 대비 독립 권한 0) — `apps/api-server/src/types/roles.ts`.
+
+### Commerce · Service Roles (접두어 없음)
 
 | Role | 용도 |
 |------|------|
 | `vendor` | 벤더 |
 | `seller` | 판매자 |
-| `supplier` | 공급자 |
+| `supplier` | 공급자 — Neture 공급자에 실사용. 접두어 없음이 의도된 계약이다 (WO-NETURE-ROLE-NORMALIZATION-V1) |
 | `partner` | 파트너 |
 | `manager` | 매니저 |
+| `pharmacy` | GlycoPharm 약국. 접두어 없음이 **정규값**이다 — `20260318110000-RenamePharmacistToPharmacyRole` 로 `pharmacist` → `pharmacy` 개명, `20260326100000-NormalizeGlycopharmPharmacyRole` 로 확정. 소비처는 bare 문자열을 직접 읽는다 (`controllers/forum/ForumRecommendationController.ts`) |
+
+> 2026-08-24 프로덕션 실측(활성 role_assignments): `supplier` 6 · `pharmacy` 2 · `customer` 7 · `user` 2.
+> `vendor` · `seller` · `partner` · `manager` 는 **보유자 0** 이다. 목록에는 남기되 신규 부여 대상이 아니다.
+> (`manager` 를 조회하는 코드 대부분은 `organization_members.role` — RBAC role 축이 아니다.)
+
+> `store_owner` 는 이 목록에 없다 — 매장 경영자 판정은 전부 접두어 형태다
+> (`{kpa|glycopharm|cosmetics|pharmacy-hub}:store_owner`). bare `store_owner` 를 읽는
+> 소비처는 0이며, 유일하게 남아 있던 활성 1행은 회수됐다
+> (migration `20270318000000-RevokeOrphanedBareStoreOwnerRole`).
 
 ### Service Prefix Roles
 

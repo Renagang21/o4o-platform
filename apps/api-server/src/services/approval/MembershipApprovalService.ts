@@ -229,8 +229,22 @@ export class MembershipApprovalService {
     queryRunner: MembershipTxExecutor,
     userId: string,
     role: string,
-    assignedBy: string | null
-  ): Promise<'already_active' | 'reactivated' | 'created'> {
+    assignedBy: string | null,
+    /**
+     * WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §7·§9
+     *
+     * `'grant'`       — 최초 승인. 역할 row 가 없으면 만든다 (approveMembership).
+     * `'restore-only'`— 정지 해제. **row 를 새로 만들지 않는다** (reactivateMembership).
+     *
+     * 왜 나누는가: reactivate 의 INSERT 분기가 "membership.role 문자열이 무엇이든 그에 해당하는
+     * 역할을 없던 것도 새로 만들어 준다" 는 권한 합성 통로였다. bare admin tier 차단
+     * (WO-...-LEGACY-BARE-ROLE-CENSUS-AND-CLEANUP-V1 D-B)은 그 특수 사례만 막았다.
+     * 정상 lifecycle 에서는 suspend 가 역할을 내려놓기만 하므로(row 는 보존) 비활성 row 가
+     * 반드시 존재하고, restore-only 로도 원상복구된다. 없다면 그것은 "정지 이전에 갖고 있지
+     * 않았던 역할" 이므로 복구가 아니라 신규 부여다 — 하지 않는다.
+     */
+    mode: 'grant' | 'restore-only' = 'grant'
+  ): Promise<'already_active' | 'reactivated' | 'created' | 'skipped_no_row'> {
     const active = normalizeReturningRows(
       await queryRunner.query(
         `UPDATE role_assignments SET updated_at = NOW()
@@ -254,6 +268,11 @@ export class MembershipApprovalService {
       )
     );
     if (reactivated.length > 0) return 'reactivated';
+
+    if (mode === 'restore-only') {
+      logger.warn('[ROLE][restore-only] no existing role row — grant SKIPPED', { userId, role });
+      return 'skipped_no_row';
+    }
 
     await queryRunner.query(
       `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
@@ -722,25 +741,28 @@ export class MembershipApprovalService {
       //   service_memberships.role (member/operator/admin) 만으로는 kpa:store_owner 같은
       //   capability role 이 회수되지 않는다. kpa:store_owner 는 service_memberships 와 별개의
       //   role_assignments 단독 row 이기 때문 (IR-O4O-KPA-STORE-PERMISSION-ADDRESS-DRIFT-AUDIT-V1 §3-2 F1).
-      //   kpa-society membership 이 정지/거부될 때 kpa:store_owner 도 명시적으로 deactivate.
-      //   다른 서비스(glycopharm/cosmetics)의 store_owner 는 본 단계에서 손대지 않음 — 각 서비스
-      //   정지 흐름이 자체적으로 처리해야 함.
-      const hasKpaSocietyMembership = selectResult.some((m: any) => m.service_key === 'kpa-society');
-      if (hasKpaSocietyMembership) {
-        logger.info('[SUSPEND][STEP2.5] kpa:store_owner DEACTIVATE', { userId });
-        // WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1: UPDATE ... RETURNING 반환 형태 정규화
-        const storeOwnerRows = normalizeReturningRows(
-          await queryRunner.query(
-            `UPDATE role_assignments SET is_active = false, updated_at = NOW()
-             WHERE user_id = $1 AND role = $2 AND is_active = true
-             RETURNING id`,
-            [userId, 'kpa:store_owner']
-          )
-        );
-        if (storeOwnerRows.length > 0) {
-          deactivatedRoles.push('kpa:store_owner');
+      //
+      // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §6·§9:
+      //   이 단계가 kpa-society 에만 걸려 있어 glycopharm / k-cosmetics / pharmacy-hub 는
+      //   정지해도 `{prefix}:store_owner` 가 활성으로 남았다 (5개 서비스 lifecycle INCONSISTENT).
+      //   정지된 membership 의 서비스마다 대칭으로 회수한다. 정지한 서비스의 역할만 건드리며
+      //   (cross-service fan-out 0), prefix 는 @o4o/security-core SSOT 에서 도출한다.
+      //
+      //   접근 차단 자체는 membership 게이트가 정본이다(store-owner.utils.ts isStoreOwner).
+      //   이 회수는 role 문자열을 직접 읽는 legacy consumer(auth-helpers 매장 플래그 등)를
+      //   위한 이중 방어이지 SSOT 가 아니다.
+      const storeOwnerServiceKeys = Array.from(
+        new Set<string>(selectResult.map((m: any) => m.service_key as string))
+      );
+      for (const svcKey of storeOwnerServiceKeys) {
+        const storeOwnerRole = `${resolveRolePrefixFromCanonicalServiceKey(svcKey)}:store_owner`;
+        const affected = await this.deactivateRoleAssignment(queryRunner, userId, storeOwnerRole);
+        if (affected > 0) {
+          logger.info('[SUSPEND][STEP2.5] store_owner DEACTIVATE', { userId, role: storeOwnerRole, affected });
+          deactivatedRoles.push(storeOwnerRole);
         }
       }
+      const hasKpaSocietyMembership = selectResult.some((m: any) => m.service_key === 'kpa-society');
 
       // STEP3: WO-O4O-KPA-MEMBERSHIP-STATUS-SYNC-V1 — kpa_members projection sync
       //   service_key='kpa-society' 인 membership 이 포함된 경우에만 kpa_members.status='suspended'.
@@ -905,9 +927,15 @@ export class MembershipApprovalService {
           });
           continue;
         }
-        const roleOutcome = await this.activateRoleAssignment(queryRunner, userId, memberRole, reactivatedBy);
+        // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §9:
+        //   복구는 **복구만** 한다. 정지 이전에 없던 역할을 새로 만들지 않는다.
+        const roleOutcome = await this.activateRoleAssignment(
+          queryRunner, userId, memberRole, reactivatedBy, 'restore-only'
+        );
         logger.info('[REACTIVATE][STEP3] role ACTIVATE', { userId, role: memberRole, outcome: roleOutcome });
-        reactivatedRoles.push(memberRole);
+        if (roleOutcome !== 'skipped_no_row') {
+          reactivatedRoles.push(memberRole);
+        }
       }
 
       // STEP3.5: WO-O4O-KPA-STORE-OWNER-ROLE-LIFECYCLE-FIX-V1
@@ -917,27 +945,42 @@ export class MembershipApprovalService {
       //     (b) deactivated row 가 존재할 때만 in-place 활성화 (UPDATE only — INSERT 없음)
       //   부여 자체는 별도 트리거 (PATCH /:id/status pending→active 자동활성화,
       //   PATCH /:id/info activity_type 전환) 가 담당. 본 단계는 "정지 직전 상태 복귀" 만 수행.
+      //
+      // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §6·§9:
+      //   SUSPEND STEP2.5 를 5개 서비스 대칭으로 확장했으므로 복구도 같은 축으로 맞춘다.
+      //   전 서비스 공통으로 **비활성 row 가 있을 때만** in-place 복구한다(INSERT 없음 —
+      //   activateRoleAssignment 의 restore-only 와 같은 원칙). kpa 만 추가로
+      //   kpa_pharmacist_profiles.activity_type='pharmacy_owner' 게이트를 유지한다
+      //   (다른 직역으로 전환한 회원의 매장 권한이 복구로 되살아나지 않게 하는 기존 계약).
       const hasKpaSocietyMembership = selectResult.some((m: any) => m.service_key === 'kpa-society');
+      let kpaStoreOwnerAllowed = false;
       if (hasKpaSocietyMembership) {
         const profileRows = await queryRunner.query(
           `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,
           [userId]
         );
-        const isPharmacyOwner = profileRows?.[0]?.activity_type === 'pharmacy_owner';
-        if (isPharmacyOwner) {
-          logger.info('[REACTIVATE][STEP3.5] kpa:store_owner RESTORE candidate', { userId });
-          // WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1: UPDATE ... RETURNING 반환 형태 정규화
-          const restoredRows = normalizeReturningRows(
-            await queryRunner.query(
-              `UPDATE role_assignments SET is_active = true, updated_at = NOW()
-               WHERE user_id = $1 AND role = $2 AND is_active = false
-               RETURNING id`,
-              [userId, 'kpa:store_owner']
-            )
-          );
-          if (restoredRows.length > 0) {
-            reactivatedRoles.push('kpa:store_owner');
-          }
+        kpaStoreOwnerAllowed = profileRows?.[0]?.activity_type === 'pharmacy_owner';
+      }
+
+      const restoreServiceKeys = Array.from(
+        new Set<string>(selectResult.map((m: any) => m.service_key as string))
+      );
+      for (const svcKey of restoreServiceKeys) {
+        if (svcKey === 'kpa-society' && !kpaStoreOwnerAllowed) continue;
+        const storeOwnerRole = `${resolveRolePrefixFromCanonicalServiceKey(svcKey)}:store_owner`;
+        if (reactivatedRoles.includes(storeOwnerRole)) continue;
+        // WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1: UPDATE ... RETURNING 반환 형태 정규화
+        const restoredRows = normalizeReturningRows(
+          await queryRunner.query(
+            `UPDATE role_assignments SET is_active = true, updated_at = NOW()
+             WHERE user_id = $1 AND role = $2 AND is_active = false
+             RETURNING id`,
+            [userId, storeOwnerRole]
+          )
+        );
+        if (restoredRows.length > 0) {
+          logger.info('[REACTIVATE][STEP3.5] store_owner RESTORED', { userId, role: storeOwnerRole });
+          reactivatedRoles.push(storeOwnerRole);
         }
       }
 
@@ -1074,7 +1117,7 @@ export class MembershipApprovalService {
       }
 
       const membershipIds = selectResult.map((m: any) => m.id);
-      const affectedServiceKeys: string[] = Array.from(new Set(selectResult.map((m: any) => m.service_key as string)));
+      const affectedServiceKeys: string[] = Array.from(new Set<string>(selectResult.map((m: any) => m.service_key as string)));
 
       logger.info('[WITHDRAW][STEP0] memberships locked', {
         userId, count: selectResult.length, affectedServiceKeys,

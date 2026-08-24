@@ -39,6 +39,12 @@ function makeRes() {
 }
 
 const ROLE_ROW = [{ '?column?': 1 }];
+/**
+ * WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §7:
+ *   isStoreOwner() 가 role 조회 **앞에** active membership 을 DB 로 확인한다.
+ *   fake dataSource 는 순서 큐이므로 membership 응답이 먼저 와야 한다.
+ */
+const MEMBERSHIP_ROW = [{ '?column?': 1 }];
 
 /** role-prefix 축 serviceKey → service_memberships canonical key. */
 const CANONICAL: Record<StoreOwnerServiceKey, string> = {
@@ -52,7 +58,7 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
   const services = Object.keys(CANONICAL) as StoreOwnerServiceKey[];
 
   it.each(services)('%s store_owner + 같은 서비스 active membership → PASS', async (svc) => {
-    const dataSource = makeDataSource([ROLE_ROW, [{ organization_id: 'org-' + svc, role: 'owner' }]]);
+    const dataSource = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, [{ organization_id: 'org-' + svc, role: 'owner' }]]);
     const guard = createRequireStoreOwner(dataSource, svc);
     const res = makeRes();
     const next = jest.fn();
@@ -69,7 +75,7 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
 
   it.each(services)('%s route + 타 서비스 membership 만 보유 → 403 MEMBERSHIP_NOT_FOUND', async (svc) => {
     const other = services.find((s) => s !== svc)!;
-    const dataSource = makeDataSource([ROLE_ROW, [{ organization_id: 'org-x', role: 'owner' }]]);
+    const dataSource = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, [{ organization_id: 'org-x', role: 'owner' }]]);
     const guard = createRequireStoreOwner(dataSource, svc);
     const res = makeRes();
     const next = jest.fn();
@@ -86,7 +92,7 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
   });
 
   it('multi-service 계정이라도 현재 route 의 serviceKey 조직만 후보로 조회한다', async () => {
-    const dataSource = makeDataSource([ROLE_ROW, [{ organization_id: 'org-gp', role: 'owner' }]]);
+    const dataSource = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, [{ organization_id: 'org-gp', role: 'owner' }]]);
     const guard = createRequireStoreOwner(dataSource, 'glycopharm');
     const req: any = {
       user: {
@@ -103,7 +109,7 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
 
     expect(req.organizationId).toBe('org-gp');
     // 조직 후보 조회 SQL 에 glycopharm linkage 만 들어간다 (타 서비스 조직 fallback 금지)
-    const orgCall = dataSource.query.mock.calls[1];
+    const orgCall = dataSource.query.mock.calls[2];
     expect(orgCall[0]).toContain('organization_service_enrollments');
     expect(JSON.stringify(orgCall[1])).toContain('glycopharm');
     expect(JSON.stringify(orgCall[1])).not.toContain('kpa');

@@ -97,6 +97,15 @@ function makeDataSource() {
   const listOrgParams: string[] = [];
   const dataSource = {
     query: jest.fn(async (sql: string, params: any[] = []) => {
+      // 0) membership 게이트
+      //    WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §7:
+      //    isStoreOwner() 가 role 조회 앞에서 active membership 을 확인한다.
+      //    이 fixture 의 계정은 4개 서비스 모두 active 회원이므로 항상 통과시킨다
+      //    (정지 계약 자체는 store-owner 가드 회귀 테스트가 따로 고정한다).
+      if (sql.includes('service_memberships')) {
+        return [{ ok: 1 }];
+      }
+
       // 1) role 게이트
       if (sql.includes('role_assignments')) {
         const allowed = params[1] as string[];

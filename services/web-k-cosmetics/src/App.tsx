@@ -142,6 +142,7 @@ const ForcedContentPage = lazy(() => import('@/pages/operator/signage/ForcedCont
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { MyStoreShell, COSMETICS_STORE_CONFIG, StoreOwnerGuard } from '@o4o/store-ui-core';
+import { MembershipGate } from './components/auth/MembershipGate';
 import { fetchStoreCapabilities } from './api/storeHub';
 import { getUserDisplayName } from '@o4o/account-ui';
 // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 공통 footer 법정정보 loader
@@ -339,8 +340,13 @@ const ProtectedRoute = RoleGuard;
  * WO-O4O-MY-STORE-CROSSSERVICE-CANONICAL-GUARD-ALIGNMENT-V1:
  *   기존 inline ProtectedRoute(allowedRoles=[...role-only...]) → 공통 StoreOwnerGuard.
  *   GlycoPharm canonical 의 3-way OR (role / membership / operator-or-above) 흡수.
- *   K-Cosmetics 는 membership-based store_owner SSOT 미보유 — 현재는 role/operator 분기로만 통과되며,
+ *   K-Cosmetics 는 membership-based store_owner SSOT 미보유 — 통과 판정은 role/operator 분기로만 이뤄지며,
  *   향후 cosmetics 도 membership SSOT 도입 시 StoreOwnerGuard 의 cfg.membershipStoreOwnerRole 만 활성화하면 됨.
+ *
+ * WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1:
+ *   membershipGate 를 주입한다. 이전에는 이 마운트만 gate 없이 role 로 통과해서,
+ *   membership 이 정지돼도 role 이 살아 있으면 매장 UI 가 열렸다
+ *   (glycopharm PharmacyStoreGuard · kpa PharmacyGuard 는 이미 주입 중).
  */
 function StoreOwnerRoute({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -352,6 +358,7 @@ function StoreOwnerRoute({ children }: { children: React.ReactNode }) {
       isLoading={isLoading}
       // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1: 무안내 redirect 대신 공통 안내 화면
       renderDenied={<AccessDenied message="내 매장은 매장 경영자 계정만 이용할 수 있습니다." />}
+      membershipGate={MembershipGate}
     >
       {children}
     </StoreOwnerGuard>

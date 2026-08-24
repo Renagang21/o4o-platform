@@ -23,6 +23,13 @@
  *   MembershipGate / WO-O4O-BACKEND-MEMBERSHIP-GUARD-CANONICALIZATION-V1 과 동일 정책).
  *   serviceKey 미지정 back-compat 경로는 본 WO 범위에서 변경하지 않음 — 점진 마이그레이션.
  *   request 당 추가 DB query 0건 (JWT memberships 직접 사용).
+ *
+ * WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1:
+ *   membership 검사를 `isStoreOwner()` 안으로 내린다. 미들웨어(createRequireStoreOwner)에만
+ *   있던 검사는 같은 함수를 쓰는 다른 진입점(requireStoreAuth / optionalStoreAuth /
+ *   resolveStoreAccess)을 보호하지 못했다. 이제 매장 판정의 접근 게이트는 한 곳이다.
+ *   미들웨어의 JWT 사전 검사는 상태코드 구분(MEMBERSHIP_NOT_FOUND / MEMBERSHIP_NOT_ACTIVE)을
+ *   위해 남긴다 — 이중 방어이며 판정은 DB 가 정본이다.
  */
 
 import type { DataSource } from 'typeorm';
@@ -100,12 +107,47 @@ export async function isStoreOwner(
     ? STORE_OWNER_ROLES_BY_SERVICE[serviceKey]
     : ALL_STORE_OWNER_ROLES;
 
-  const [raRecord] = await dataSource.query(
-    `SELECT 1 FROM role_assignments
-     WHERE user_id = $1 AND role = ANY($2::text[]) AND is_active = true
-     LIMIT 1`,
-    [userId, allowedRoles]
-  );
+  // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §7
+  //   canonical 계약: **membership = 서비스에 들어갈 수 있느냐**, role = 그 안에서 무엇을
+  //   할 수 있느냐. 그런데 이 함수는 role_assignments 만 보고 있어서, 이 함수를 통과 지점으로
+  //   쓰는 경로 전부가 role-only 였다:
+  //     - auth-context.middleware 의 requireStoreAuth / optionalStoreAuth
+  //       (store-hub 공개 GET 4개 — kpa/glycopharm/cosmetics)
+  //     - resolveStoreAccess() 를 직접 부르는 store-playlist / store-handled-products /
+  //       store-local-product / event-offer / seller 경로
+  //   createRequireStoreOwner 만 JWT memberships 로 별도 검사하고 있었다(3-way drift).
+  //   판정을 여기 한 곳으로 모아 정지된 회원이 매장 경로로 들어오지 못하게 한다.
+  //
+  //   JWT 가 아니라 DB 를 본다 — 정지는 토큰 재발급을 기다리지 않고 즉시 반영된다.
+  //   serviceKey 미지정 back-compat 경로는 "어느 서비스인지" 를 결정할 수 없으므로
+  //   createRequireStoreOwner 와 같은 정책(active membership 최소 1개, fail-closed)을 쓴다.
+  //
+  //   2026-08-24 프로덕션 실측: 활성 store_owner role 보유자 18명 전원이 같은 서비스의
+  //   active membership 을 보유(kpa 5/5 · cosmetics 4/4 · glycopharm 3/3 · pharmacy-hub 6/6),
+  //   suspended/withdrawn membership 0건 → 현행 사용자 동작 변화 0.
+  const membershipKey = serviceKey ? resolveCanonicalServiceKey(serviceKey) : null;
+  const [membershipRecord] = membershipKey
+    ? await dataSource.query(
+        `SELECT 1 FROM service_memberships
+         WHERE user_id = $1 AND service_key = $2 AND status = 'active'
+         LIMIT 1`,
+        [userId, membershipKey]
+      )
+    : await dataSource.query(
+        `SELECT 1 FROM service_memberships
+         WHERE user_id = $1 AND status = 'active'
+         LIMIT 1`,
+        [userId]
+      );
+
+  const [raRecord] = membershipRecord
+    ? await dataSource.query(
+        `SELECT 1 FROM role_assignments
+         WHERE user_id = $1 AND role = ANY($2::text[]) AND is_active = true
+         LIMIT 1`,
+        [userId, allowedRoles]
+      )
+    : [];
   if (!raRecord) {
     return {
       isOwner: false,

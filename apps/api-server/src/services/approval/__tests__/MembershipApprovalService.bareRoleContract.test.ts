@@ -129,10 +129,26 @@ const SERVICES: Array<{ serviceKey: string; prefix: string }> = [
   { serviceKey: 'pharmacy-hub', prefix: 'pharmacy-hub' },
 ];
 
-function seed(serviceKey: string, membershipRole: string, status: 'pending' | 'suspended') {
+/**
+ * WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §9:
+ *   재활성화는 **restore-only** 다 — 정지 이전에 없던 역할을 새로 만들지 않는다.
+ *   따라서 'suspended' fixture 는 정지가 실제로 남기는 모양(= 해당 역할의 비활성 row)을
+ *   그대로 재현해야 한다. row 를 비워두면 "복구되지 않는다" 가 아니라 "애초에 없던 역할"을
+ *   시험하게 된다. 정지가 그 역할을 만들 수 없는 경우(bare admin tier)는 seedRoles=false.
+ */
+function seed(
+  serviceKey: string,
+  membershipRole: string,
+  status: 'pending' | 'suspended',
+  suspendedRole?: string | null,
+) {
+  const roles =
+    status === 'suspended' && suspendedRole
+      ? [{ id: 'ra-0', user_id: 'u1', role: suspendedRole, is_active: false }]
+      : [];
   db = {
     memberships: [{ id: 'm-1', user_id: 'u1', service_key: serviceKey, role: membershipRole, status }],
-    roles: [],
+    roles,
     users: [{ id: 'u1', status: status === 'suspended' ? 'suspended' : 'pending', isActive: false }],
   };
   queries.length = 0;
@@ -171,9 +187,21 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
     it.each(['member', 'store_owner'])(
       "정지→복구 시에도 bare '%s' 를 되살리지 않는다",
       async (role) => {
-        seed(serviceKey, role, 'suspended');
+        seed(serviceKey, role, 'suspended', `${prefix}:${role}`);
         await reactivate();
         expect(grantedRoles()).toEqual([`${prefix}:${role}`]);
+      },
+    );
+
+    it.each(['member', 'store_owner'])(
+      "복구는 restore-only — 정지 이전에 없던 '%s' 역할을 새로 만들지 않는다",
+      async (role) => {
+        seed(serviceKey, role, 'suspended', null);
+        await reactivate();
+        expect(db.roles).toHaveLength(0);
+        expect(queries.some((q) => q.sql.includes('INSERT INTO role_assignments'))).toBe(false);
+        // 멤버십 복구 자체는 진행된다 (역할 부여만 건너뛴다)
+        expect(db.memberships[0].status).toBe('active');
       },
     );
 
@@ -189,7 +217,7 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
     it.each(['admin', 'operator', 'super_admin'])(
       "bare admin tier '%s' 는 복구해도 부여하지 않는다",
       async (role) => {
-        seed(serviceKey, role, 'suspended');
+        seed(serviceKey, role, 'suspended', null);
         await reactivate();
         expect(db.roles).toHaveLength(0);
       },
@@ -217,7 +245,7 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
 
   describe('prefixed 역할은 그대로 둔다', () => {
     it.each(['kpa:admin', 'cosmetics:operator', 'platform:super_admin'])('%s', async (role) => {
-      seed('kpa-society', role, 'suspended');
+      seed('kpa-society', role, 'suspended', role);
       await reactivate();
       expect(grantedRoles()).toEqual([role]);
     });

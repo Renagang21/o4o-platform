@@ -31,6 +31,12 @@ function makeDataSource(responses: Row[][]) {
 }
 
 const ROLE_ROW = [{ '?column?': 1 }];
+/**
+ * WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1:
+ * isStoreOwner() 가 role 조회에 앞서 active membership 을 먼저 확인한다.
+ * 순서 기반 stub 이므로 role 응답 앞에 membership 응답을 넣어 준다.
+ */
+const MEMBERSHIP_ROW = [{ ok: 1 }];
 
 describe('store organization resolution — service scoped', () => {
   it('A. 단일 서비스 + 단일 org → 그 org 로 확정', async () => {
@@ -104,7 +110,7 @@ describe('store organization resolution — service scoped', () => {
   });
 
   it('isStoreOwner: role 은 있으나 서비스 조직이 없으면 organizationId=null', async () => {
-    const { dataSource } = makeDataSource([ROLE_ROW, []]);
+    const { dataSource } = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, []]);
     const result = await isStoreOwner(dataSource, 'user-1', 'glycopharm');
     expect(result.isOwner).toBe(true);
     expect(result.organizationId).toBeNull();
@@ -138,6 +144,7 @@ describe('createRequireStoreOwner — guard 응답', () => {
 
   it('D. 후보 2개 → 409 AMBIGUOUS_STORE_CONNECTION (임의 통과 금지)', async () => {
     const { dataSource } = makeDataSource([
+      MEMBERSHIP_ROW,
       ROLE_ROW,
       [
         { organization_id: 'org-a', role: 'owner' },
@@ -154,7 +161,7 @@ describe('createRequireStoreOwner — guard 응답', () => {
   });
 
   it('C. 서비스 조직 없음 → 403 STORE_OWNER_REQUIRED', async () => {
-    const { dataSource } = makeDataSource([ROLE_ROW, []]);
+    const { dataSource } = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, []]);
     const guard = createRequireStoreOwner(dataSource, 'kpa');
     const res = makeRes();
     const next = jest.fn();
@@ -165,6 +172,7 @@ describe('createRequireStoreOwner — guard 응답', () => {
 
   it('A. 정상 → next() + req.organizationId 주입', async () => {
     const { dataSource } = makeDataSource([
+      MEMBERSHIP_ROW,
       ROLE_ROW,
       [{ organization_id: 'org-kpa', role: 'owner' }],
     ]);
