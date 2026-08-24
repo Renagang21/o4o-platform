@@ -223,15 +223,27 @@ membership 보유자 2명 중 1명은 `platform:super_admin` 을 갖고 있지 �
 
 ---
 
-## 8. 프로덕션 검증 (§11) — 배포 후 확인 항목
+## 8. 프로덕션 검증 (§11) — 배포 후 실측
 
-migration 은 main 배포 시 CI/CD 로 실행된다.
+배포: `Deploy API Server (Cloud Run)` run 32683417358 SUCCESS
+(`Run database migrations` 포함) · revision `o4o-core-api-03448-bs7` 100% 트래픽.
 
-- [ ] `typeorm_migrations` 에 `RevokeOrphanedBareStoreOwnerRole20270318000000` 기록
-- [ ] `store_owner` 활성 행 1 → 0, bare 총 행 22 유지 (삭제 0)
-- [ ] prefixed 56/46 · `service_memberships` 42 · `users.status='deleted'` 32 불변
-- [ ] fixture `44fa7733…` 활성 역할 8건 불변
-- [ ] 서비스 operator 로그인 → 회원 상세 진입 → 역할 조회 정상 (403/404/5xx 없음)
+| 확인 항목 | 기대 | 실측 | 결과 |
+|---|---:|---:|:--:|
+| `typeorm_migrations` 기록 | 있음 | `RevokeOrphanedBareStoreOwnerRole20270318000000` | ✅ |
+| bare role 총 행 (삭제 0) | 22 | 22 | ✅ |
+| bare role 활성 행 | 17 | 17 | ✅ |
+| `store_owner` 활성 | 0 | 0 | ✅ |
+| prefixed 총 / 활성 | 56 / 46 | 56 / 46 | ✅ |
+| `service_memberships` 총 | 42 | 42 | ✅ |
+| `users.status='deleted'` | 32 | 32 | ✅ |
+| fixture `44fa7733…` 활성 역할 | 8 | 8 | ✅ |
+| `/health` · `/health/database` | 200 · healthy | 200 · healthy (ping 4ms) | ✅ |
+
+**하지 않은 검증(명시)**: 승인·재활성화 write path 자체는 프로덕션에서 실행하지 않았다.
+실행하려면 실제 회원의 멤버십 상태를 바꿔야 하므로(운영 데이터 변경) 범위 밖으로 뒀다.
+해당 경로는 회귀 테스트 63 케이스 + 정적 확인으로 검증했고, 읽기 화면 계약은 이번 변경이
+건드리지 않는다.
 
 ---
 
