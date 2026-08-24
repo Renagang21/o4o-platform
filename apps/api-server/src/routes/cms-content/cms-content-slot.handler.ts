@@ -25,6 +25,7 @@ import { roleAssignmentService } from '../../modules/auth/services/role-assignme
 import logger from '../../utils/logger.js';
 import {
   resolveCmsReadScope,
+  resolveCmsServiceKeys,
   CMS_SERVICE_KEY_REQUIRED_ERROR,
 } from './cms-content-utils.js';
 
@@ -37,15 +38,17 @@ import {
  *
  * CmsContentSlot.serviceKey uses full names (kpa-society, k-cosmetics)
  * while security-core roles use short prefixes (kpa, cosmetics).
+ *
+ * WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1 (§9·§10):
+ *   값을 손으로 적지 않고 `resolveCmsServiceKeys()`(= security-core canonical SSOT 파생)
+ *   로 만든다. read 경계와 slot 관리 경계가 같은 alias 집합을 쓰게 된다.
+ *   prefix 목록만 여기서 유지한다 (어떤 서비스가 slot 관리 축을 갖는지는 별개 관심사).
  */
-const SCOPE_TO_CMS_KEYS: Record<string, string[]> = {
-  kpa: ['kpa-society', 'kpa'],
-  cosmetics: ['k-cosmetics', 'cosmetics'],
-  neture: ['neture'],
-  glycopharm: ['glycopharm'],
-};
+const KNOWN_PREFIXES = ['kpa', 'cosmetics', 'neture', 'glycopharm'];
 
-const KNOWN_PREFIXES = Object.keys(SCOPE_TO_CMS_KEYS);
+const SCOPE_TO_CMS_KEYS: Record<string, string[]> = Object.fromEntries(
+  KNOWN_PREFIXES.map((prefix) => [prefix, resolveCmsServiceKeys(prefix)]),
+);
 const PLATFORM_ADMIN_ROLES = ['platform:super_admin'];
 const OPERATOR_SUFFIXES = [':admin', ':operator'];
 

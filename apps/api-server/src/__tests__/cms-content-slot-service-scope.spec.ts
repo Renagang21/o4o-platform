@@ -97,7 +97,7 @@ describe('공개 slot 조회의 serviceKey 경계', () => {
   it('serviceKey=kpa 는 kpa-society alias 를 포함한다', async () => {
     const res = await request(makeApp()).get('/cms/slots/home-hero?serviceKey=kpa');
     expect(res.status).toBe(200);
-    expect(res.body.meta.serviceKeys).toEqual(['kpa', 'kpa-society']);
+    expect(res.body.meta.serviceKeys).toEqual(['kpa-society', 'kpa']);
     expect(res.body.data[0].content.id).toBe('c-1');
   });
 

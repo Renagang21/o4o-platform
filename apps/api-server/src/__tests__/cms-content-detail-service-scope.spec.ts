@@ -62,6 +62,10 @@ const ROWS = [
   { id: '22222222-2222-4222-8222-222222222222', serviceKey: 'kpa-society', status: 'published', title: 'KPA', organizationId: null },
   { id: '33333333-3333-4333-8333-333333333333', serviceKey: 'glycopharm', status: 'published', title: 'GP', organizationId: null },
   { id: '44444444-4444-4444-8444-444444444444', serviceKey: 'kpa-society', status: 'draft', title: 'KPA draft', organizationId: null },
+  { id: '55555555-5555-4555-8555-555555555555', serviceKey: 'k-cosmetics', status: 'published', title: 'KCos', organizationId: null },
+  { id: '66666666-6666-4666-8666-666666666666', serviceKey: 'cosmetics', status: 'published', title: 'KCos legacy', organizationId: null },
+  // §11: visibilityScope='platform' 은 cross-service 공개가 **아니다** (제작 주체 축)
+  { id: '77777777-7777-4777-8777-777777777777', serviceKey: 'glycopharm', status: 'published', title: 'GP platform-visibility', organizationId: null, visibilityScope: 'platform' },
 ];
 
 /** where.serviceKey 는 alias 집합이라 `In([...])` FindOperator 로 들어온다 */
@@ -106,6 +110,9 @@ const PH = ROWS[0].id;
 const KPA = ROWS[1].id;
 const GP = ROWS[2].id;
 const KPA_DRAFT = ROWS[3].id;
+const KCOS = ROWS[4].id;
+const KCOS_LEGACY = ROWS[5].id;
+const GP_PLATFORM = ROWS[6].id;
 const MISSING = '99999999-9999-4999-8999-999999999999';
 
 describe('§17 list/detail 정합 — 목록에 없는 타 서비스 row 는 상세로도 못 본다', () => {
@@ -176,9 +183,39 @@ describe('KPA serviceKey alias — kpa / kpa-society 는 같은 경계다', () =
     expect(res.body.data.id).toBe(KPA);
   });
 
+  it('serviceKey=kpa-society 로도 legacy kpa 축이 같은 집합이다', async () => {
+    const res = await request(makeApp()).get(`/cms/contents/${KPA}?serviceKey=kpa-society`);
+    expect(res.status).toBe(200);
+    expect(matchServiceKey({ serviceKey: 'kpa' }, lastWhere)).toBe(true);
+  });
+
   it('alias 는 KPA 축에만 적용된다 (kpa 로 GP 는 못 본다)', async () => {
     const res = await request(makeApp()).get(`/cms/contents/${GP}?serviceKey=kpa`);
     expect(res.status).toBe(404);
+  });
+});
+
+describe('K-Cosmetics alias — cosmetics / k-cosmetics 도 같은 canonical 축이다 (WO §10)', () => {
+  it('serviceKey=cosmetics 로 k-cosmetics row 를 조회한다', async () => {
+    const res = await request(makeApp()).get(`/cms/contents/${KCOS}?serviceKey=cosmetics`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.id).toBe(KCOS);
+  });
+
+  it('serviceKey=k-cosmetics 로 legacy cosmetics row 를 조회한다', async () => {
+    const res = await request(makeApp()).get(`/cms/contents/${KCOS_LEGACY}?serviceKey=k-cosmetics`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.id).toBe(KCOS_LEGACY);
+  });
+
+  it('KCos context 로 KPA row 는 못 본다 (alias 가 경계를 넓히지 않는다)', async () => {
+    const res = await request(makeApp()).get(`/cms/contents/${KPA}?serviceKey=cosmetics`);
+    expect(res.status).toBe(404);
+  });
+
+  it('self-map 서비스는 자기 키 1개다 (alias 발명 금지)', async () => {
+    await request(makeApp()).get(`/cms/contents/${PH}?serviceKey=pharmacy-hub`);
+    expect(lastWhere.serviceKey?._value).toEqual(['pharmacy-hub']);
   });
 });
 
@@ -204,8 +241,26 @@ describe('§7 list/detail invariant — 목록·집계도 같은 경계로 닫�
   it('GET /cms/stats?serviceKey=kpa 는 alias 집합으로 집계한다', async () => {
     const res = await request(makeApp()).get('/cms/stats?serviceKey=kpa');
     expect(res.status).toBe(200);
-    expect(res.body.scope.serviceKeys).toEqual(['kpa', 'kpa-society']);
+    expect(res.body.scope.serviceKeys).toEqual(['kpa-society', 'kpa']);
     expect(res.body.scope.crossService).toBe(false);
+  });
+});
+
+describe("§11 visibilityScope='platform' 은 cross-service global 이 아니다", () => {
+  it('GP platform-visibility row 는 KPA context 에서 보이지 않는다', async () => {
+    const res = await request(makeApp()).get(`/cms/contents/${GP_PLATFORM}?serviceKey=kpa-society`);
+    expect(res.status).toBe(404);
+  });
+
+  it('GP platform-visibility row 는 자기 서비스에서는 정상 조회된다', async () => {
+    const res = await request(makeApp()).get(`/cms/contents/${GP_PLATFORM}?serviceKey=glycopharm`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.id).toBe(GP_PLATFORM);
+  });
+
+  it('service boundary 가 visibilityScope 보다 먼저 적용된다 (조회 조건 자체)', async () => {
+    await request(makeApp()).get(`/cms/contents/${GP_PLATFORM}?serviceKey=kpa-society`);
+    expect(lastWhere.serviceKey?._value).toEqual(['kpa-society', 'kpa']);
   });
 });
 

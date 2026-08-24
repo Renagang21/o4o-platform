@@ -5,6 +5,11 @@
  * Extracted from cms-content.routes.ts
  */
 
+import {
+  resolveCanonicalServiceKey,
+  resolveRolePrefixFromCanonicalServiceKey,
+} from '@o4o/security-core';
+
 // WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: local type aliases (matches CmsContent entity)
 export type ContentAuthorRole = 'admin' | 'service_admin' | 'supplier' | 'community';
 export type ContentVisibilityScope = 'platform' | 'service' | 'organization';
@@ -24,22 +29,22 @@ export const VALID_CONTENT_TYPES = ['hero', 'notice', 'guide', 'knowledge'] as c
 // ============================================================================
 
 /**
- * serviceKey alias 집합.
+ * serviceKey alias 집합 — **CMS 전용 mapping 을 만들지 않는다** (WO §9·§10).
  *
- * `cms_contents.serviceKey` 는 같은 서비스를 두 값으로 기록해 왔다.
- * canonical 근거: `modules/asset-snapshot/resolvers/kpa-asset.resolver.ts`
- * (`serviceKey: In(['kpa', 'kpa-society'])`) 및 `ContentQueryService` 의 serviceKeys 집합.
+ * `cms_contents.serviceKey` 는 같은 서비스를 canonical 값과 role-prefix 값 두 가지로
+ * 기록해 왔다 (프로덕션 실측: `kpa-society` 53건 + legacy `kpa` 1건).
+ * 그 대응은 이미 `@o4o/security-core` 의 canonical SSOT 가 갖고 있으므로
+ * **양방향 resolver 를 합성**해서 파생시킨다. 여기서 `{ 'kpa-society': [...] }` 같은
+ * 로컬 map 을 새로 선언하면 SSOT 가 두 벌이 된다 (security-core §Drift prevention).
  *
- * 한쪽만 비교하면 콘텐츠가 사라지거나(프로덕션 `kpa` 1건 누락) 경계가 새는 방향 모두 가능하다.
+ *   'kpa' | 'kpa-society'         → ['kpa-society', 'kpa']
+ *   'cosmetics' | 'k-cosmetics'   → ['k-cosmetics', 'cosmetics']
+ *   'neture' | 'glycopharm' | 'pharmacy-hub' → 자기 자신 1개 (self-map)
  */
-const CMS_SERVICE_KEY_ALIASES: Record<string, string[]> = {
-  kpa: ['kpa', 'kpa-society'],
-  'kpa-society': ['kpa', 'kpa-society'],
-};
-
-/** 주어진 serviceKey 가 실제로 가리키는 키 집합. alias 가 없으면 자기 자신 1개. */
 export function resolveCmsServiceKeys(serviceKey: string): string[] {
-  return CMS_SERVICE_KEY_ALIASES[serviceKey] ?? [serviceKey];
+  const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(serviceKey);
+  const canonical = resolveCanonicalServiceKey(rolePrefix);
+  return canonical === rolePrefix ? [canonical] : [canonical, rolePrefix];
 }
 
 /** platform admin 판정 근거 — mutation 측 `authorizeCmsMutation` 과 **동일한 근거**를 쓴다. */
