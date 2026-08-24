@@ -41,7 +41,11 @@ const resourcesPageCode = stripComments(resourcesPage);
 
 describe('§8 Content/Resource 모델 — 공통 원장 + serviceKey 경계', () => {
   it('공통 CMS 조회 API 는 serviceKey 로 서비스를 필터한다(PH 전용 endpoint 신설 없음)', () => {
-    expect(cmsQueryHandler).toContain('where.serviceKey = serviceKey as string');
+    // WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1:
+    //   serviceKey 는 이제 opt-in 필터가 아니라 **강제 read 경계**이며,
+    //   alias 집합(kpa/kpa-society)을 위해 `In(scope.serviceKeys)` 로 들어간다.
+    expect(cmsQueryHandler).toContain('where.serviceKey = In(scope.serviceKeys)');
+    expect(cmsQueryHandler).toContain('CMS_SERVICE_KEY_REQUIRED_ERROR');
   });
 
   it('공통 CMS 쓰기 인가는 serviceKey 파생이다 — PH 전용 allowlist 가 필요 없다', () => {

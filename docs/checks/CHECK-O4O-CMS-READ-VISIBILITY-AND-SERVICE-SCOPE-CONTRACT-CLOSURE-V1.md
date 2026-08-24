@@ -3,7 +3,8 @@
 **대상 WO**: WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1
 **기준 commit**: `d9ecc678a` (origin/main)
 **작성일**: 2026-08-21
-**결과**: **§9 `platform + serviceKey` 의미 확정 (선행 WO 중지 조건 해소)** · 코드 변경 0 (§17 환경 blocker)
+**결과**: **§9 `platform + serviceKey` 의미 확정** + **§11-1 read 경계 구현 완료** (2026-08-24 재개)
+**구현 재개 commit 기준**: `21ed6d88d` (origin/main)
 
 ---
 
@@ -17,6 +18,18 @@ visibilityScope 의미 census   완료 — 코드 근거로 확정
 
 코드 수정                     0  — 디스크 여유 96~102MB 로 검증 불가 (§17)
 production DB write           0
+```
+
+**2026-08-24 재개** — §12 의 중지 사유는 **정책이 아니라 디스크**였고, 다른 작업 PC 에서 여유가 확보돼
+새 WO 없이 같은 WO 를 그대로 재개했다. §11-1 의 남은 구현 4건을 모두 적용하고 검증했다 (§9-1·§10-1).
+
+```text
+read 경계 강제 (contents/:id · contents · stats · slots/:slotKey)   ✅
+KPA alias (kpa ↔ kpa-society) 정렬                                  ✅
+PLATFORM_ADMIN cross-service = 역할 근거 (파라미터 생략 아님)        ✅
+jest / typecheck                                                    ✅ PASS
+production DB write                                                 0
+schema / migration                                                  0
 ```
 
 **이번 WO 의 실질 산출물**: 선행 CHECK(`…CMS-CONTENT-DETAIL-SERVICE-SCOPE-GUARD-V1` §9)가
@@ -191,7 +204,7 @@ KPA alias                   — serviceKey IN ('kpa-society','kpa')
 
 ---
 
-## 9. 실제 수정 내용
+## 9. 실제 수정 내용 (1차 — 2026-08-21)
 
 **없음 (0건).** 사유는 §17.
 
@@ -200,7 +213,41 @@ KPA alias                   — serviceKey IN ('kpa-society','kpa')
 
 ---
 
-## 10. 검증
+## 9-1. 실제 수정 내용 (2차 — 2026-08-24 재개, §11-1 구현)
+
+### backend
+
+| 파일 | 내용 |
+|---|---|
+| `apps/api-server/src/routes/cms-content/cms-content-utils.ts` | read 경계 계약의 **단일 구현**을 추가. `resolveCmsServiceKeys()` (KPA alias) · `isCmsPlatformAdmin()` · `resolveCmsReadScope()` · `CMS_SERVICE_KEY_REQUIRED_ERROR` |
+| `.../cms-content-query.handler.ts` | `/stats` · `/contents` · `/contents/:id` 3개 read 를 같은 `readScope()` 로 닫음. 상세는 opt-in → **강제**. `serviceKey` 없으면 `400 SERVICE_KEY_REQUIRED` |
+| `.../cms-content-slot.handler.ts` | 공개 `GET /slots/:slotKey` 에 동일 경계 적용 (§8 횡전개). `meta` 에 `serviceKeys`/`crossService` 노출 |
+| `.../cms-content-mutation.handler.ts` | `authorizeCmsMutation` 의 platform admin 판정을 공유 `isCmsPlatformAdmin()` 으로 수렴. **동작 변화 없음** (근거를 두 곳에 두지 않기 위함) |
+
+설계상 중요한 두 지점:
+
+- **차단은 응답 가공이 아니라 DB 조회 조건**이다 (`where.serviceKey = In(scope.serviceKeys)`).
+  `/contents` 의 search QueryBuilder 경로는 `In()` FindOperator 를 `= :key` 로 바인딩하면 깨지므로
+  `serviceKey` 만 루프에서 제외하고 `IN (:...scopeServiceKeys)` 로 별도 처리했다.
+- **`serviceKey` 생략은 관리자 모드가 아니다.** 생략은 `platform:super_admin` **역할**이 있을 때만
+  cross-service 로 허용된다 (JWT roles → `roleAssignmentService.hasAnyRole` fallback).
+  일반 로그인 사용자의 생략은 400 이다.
+
+### frontend
+
+| 파일 | 내용 |
+|---|---|
+| `apps/admin-dashboard/src/lib/cms.ts` | `getContent(id, params?: { serviceKey? })` — 상세도 경계를 전달할 수 있게 확장 |
+| `apps/admin-dashboard/src/pages/cms/contents/CMSContentList.tsx` | 편집 진입 시 `content.serviceKey` 전달 (목록이 이미 갖고 있는 값) |
+| `services/web-glycopharm/src/api/cms.ts` | `getContentById` 에 `serviceKey` 기본값(`glycopharm`) — 목록/슬롯과 동일. (이 client 는 여전히 소비처 0 = §11-2 부채 3) |
+
+**변경 불필요로 확인된 소비처**: KCos `api/cms.ts` (항상 `serviceKey` 세팅) · PH `pharmacyHubResources.ts`
+(목록·상세 모두 `serviceKey='pharmacy-hub'`) · admin-dashboard slot 화면
+(`SlotContentAssignment` / `SlotFormModal` — serviceKey 미선택 시 `platform:super_admin` 역할로 cross-service).
+
+---
+
+## 10. 검증 (1차)
 
 | 항목 | 결과 |
 |---|---|
@@ -208,6 +255,20 @@ KPA alias                   — serviceKey IN ('kpa-society','kpa')
 | 선행 CMS detail scope 테스트 | **12/12 PASS** (회귀 없음 확인, `--runInBand`) |
 | production read-only census | **수행** (§3, write 0) |
 | production API matrix (WO §22) · browser smoke (WO §23) | **미수행** — 코드 변경이 없어 회귀 대상이 없고, 환경 제약(§17) |
+
+---
+
+## 10-1. 검증 (2차 — 2026-08-24)
+
+| 항목 | 결과 |
+|---|---|
+| `cms-content-detail-service-scope.spec.ts` | **20/20 PASS** (12 → 20 확장: 400 계약 · 역할 기반 cross-service · KPA alias · list/stats 경계) |
+| `cms-content-slot-service-scope.spec.ts` (신규) | **4/4 PASS** |
+| `pharmacy-hub-content-resource-adoption.spec.ts` | **18/18 PASS** — 정적 가드가 옛 리터럴(`where.serviceKey = serviceKey as string`)을 검사하고 있어 새 계약 문자열로 교정 |
+| 인접 회귀 (`kpa-content-resource-core-adoption` · `content-resource-core-table-isolation` · `community-content-resource-frontend-view-commonization` · `pharmacy-hub-community-capability-adoption`) | **PASS** |
+| `tsc --noEmit` — api-server · admin-dashboard · web-glycopharm | **PASS** |
+| production DB write | **0** |
+| production API matrix (WO §22) · browser smoke (WO §23) | **미수행** — 배포 후 수행 대상 (아래 §11 잔여) |
 
 ---
 
@@ -219,21 +280,25 @@ consumer census 미조사 0                     ✅
 visibility 데이터 census 완료                ✅
 platform/service/organization 계약 확정      ✅ (§5·§6) — organization 은 데이터 0 이라 발명 안 함
 anonymous/member/operator-admin 계약 확정    ✅ (§6)
-list/detail scope 동일                       ❌ 미구현 (§7)
-암묵적 serviceKey 생략 cross-service 제거     ❌ 미구현
-명시적 admin cross-service 계약 유지          ⏸ 설계 확정, 미구현
+list/detail scope 동일                       ✅ 구현 (§9-1)
+암묵적 serviceKey 생략 cross-service 제거     ✅ 구현 (400 SERVICE_KEY_REQUIRED)
+명시적 admin cross-service 계약 유지          ✅ 구현 (platform:super_admin 역할 근거)
 invalid UUID 500 회귀 0                      ✅ (선행 WO 유지, 12/12)
 신규 API contract 0                          ✅ (기존 query 축만 사용하는 설계)
 schema/migration 0                           ✅
 production DB write 0                        ✅
 ```
 
-### 11-1. 남은 구현 (설계는 확정됨)
+### 11-1. 남은 구현 (설계는 확정됨) → **2026-08-24 4건 전부 완료** (§9-1)
 
 1. `/cms/contents` 목록 · `/cms/slots/:slotKey` · `/cms/stats` 에 `serviceKey` 경계 강제
 2. `/cms/contents/:id` 상세를 opt-in → **강제**로 전환하고 admin-dashboard 가 `content.serviceKey` 를 전달
 3. KPA alias 를 `IN ('kpa-society','kpa')` 로 정렬 (§6-1)
 4. PLATFORM_ADMIN cross-service 는 `isPlatformAdmin` **역할 근거**로 분기 (파라미터 생략 아님)
+
+**남은 것은 배포 후 검증뿐이다** — production API matrix(WO §22) · browser smoke(WO §23).
+CMS read 는 공개 경로를 포함하므로 배포 후 KCos 홈 슬롯 · PH 자료실 · admin-dashboard CMS 목록/편집을
+실제로 확인해야 한다.
 
 ### 11-2. 후속 부채 (WO §18·§25 — 이번에 건드리지 않음)
 
@@ -241,12 +306,12 @@ production DB write 0                        ✅
 |---|---|
 | 1 | `kpa-society` 콘텐츠 53건이 `authorizeCmsMutation` 의 alias 미정규화로 platform admin 외 수정 불가 |
 | 2 | `visibilityScope='platform'` + `organizationId` non-NULL 32건 — org 를 쓰지 않으면서 기록한 조합 (§3) |
-| 3 | GlycoPharm `api/cms.ts getContent` dead code |
+| 3 | GlycoPharm `api/cms.ts getContent` dead code — 이번에 `serviceKey` 기본값만 맞췄고 **소비처는 여전히 0** |
 | 4 | `serviceKey='kpa'` 1건 — canonical `kpa-society` 로의 데이터 정합은 **migration 필요** → WO §25 에 따라 별도 보고 |
 
 ---
 
-## 12. 중지 사유 (WO §26 아님 — 환경 제약)
+## 12. 중지 사유 (WO §26 아님 — 환경 제약) → **2026-08-24 해소**
 
 정책 판단은 §5 에서 **해소**됐다. 이번에 구현하지 못한 사유는 정책이 아니라 **작업 환경**이다.
 
@@ -261,11 +326,16 @@ C: 전체:      223G / 223G 사용 (100%)
 - 따라서 **census 와 정책 확정까지만 확정 산출물로 남기고 구현은 분리**한다.
 - 내 작업 산출물(`c:/tmp/wo-viewdup`, 3MB)은 정리했다. 남은 사용량은 이번 세션과 무관하다.
 
+**해소 (2026-08-24)**: 여유 공간이 충분한 작업 PC 에서 같은 WO 를 **새 WO 없이 재개**했다.
+정책 재조사는 하지 않았다 (`serviceKey = read boundary` 는 §5 에서 이미 확정). jest·typecheck 를
+전부 실행할 수 있었으므로 WO §27 의 검증 조건을 충족한다.
+
 ---
 
 ## 13. DB / schema 영향
 
-**없음.** production read-only 조회만 수행했다.
+**없음.** production read-only 조회만 수행했다. 2차 구현에서도 schema·migration·DB write 는 0 이다
+(경계는 전부 기존 컬럼 `serviceKey` 의 query 조건으로만 구현했다).
 
 ---
 
@@ -274,8 +344,15 @@ C: 전체:      223G / 223G 사용 (100%)
 fresh worktree 를 요구했으나 **주 작업트리에서 수행**했다 — 디스크 여유 537MB→102MB 로 worktree + install 이 불가능하다.
 코드 변경이 0 이므로 격리 필요성은 낮았다. `git add .` 미사용 · 타 세션 WIP 미접촉 · path-specific stage 유지.
 
+**2차(2026-08-24)** 도 주 작업트리에서 수행했다. 같은 원칙을 유지한다 — `git add .` 미사용,
+타 세션의 dirty/미추적 파일(`apps/api-server/src/routes/operator/analytics.routes.ts`,
+`docs/checks/WO-O4O-OPERATOR-CROSSSERVICE-...-CHECK.md`) 미접촉, path-specific stage.
+
 ---
 
 ## 문서 정합
 
 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건 (§11-1 구현 · §11-2 부채 4종)
+
+**2026-08-24 재개분**: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건 (§11-2 부채 4종 잔존).
+§11-1 은 별도 WO 없이 **같은 WO 로 구현 완료**했다.

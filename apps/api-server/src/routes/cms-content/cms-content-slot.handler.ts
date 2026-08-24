@@ -23,6 +23,10 @@ import { CmsContent, CmsContentSlot } from '@o4o-apps/cms-core';
 import { optionalAuth, requireAuth } from '../../middleware/auth.middleware.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import logger from '../../utils/logger.js';
+import {
+  resolveCmsReadScope,
+  CMS_SERVICE_KEY_REQUIRED_ERROR,
+} from './cms-content-utils.js';
 
 // ============================================================================
 // WO-O4O-PROMOTION-SLOT-API-OPERATOR-V1: Operator scope infrastructure
@@ -200,10 +204,24 @@ export function createCmsContentSlotRoutes(deps: {
       const slotRepo = dataSource.getRepository(CmsContentSlot);
       const now = new Date();
 
+      // WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1:
+      //   slot 공개 조회도 `/cms/contents` 와 **같은 경계**를 쓴다 (CHECK §8 횡전개).
+      //   serviceKey 생략은 PLATFORM_ADMIN 역할로만 허용된다.
+      const scope = await resolveCmsReadScope({
+        user: (req as any).user,
+        serviceKey,
+        roleChecker: roleAssignmentService,
+        onError: (m) => logger.warn('[CMS] Platform admin RoleAssignment check failed:', m),
+      });
+      if (!scope.ok) {
+        res.status(400).json(CMS_SERVICE_KEY_REQUIRED_ERROR);
+        return;
+      }
+
       // Build where clause
       const where: any = { slotKey };
-      if (serviceKey) {
-        where.serviceKey = serviceKey as string;
+      if (scope.serviceKeys) {
+        where.serviceKey = In(scope.serviceKeys);
       }
       if (organizationId) {
         where.organizationId = organizationId as string;
@@ -257,6 +275,8 @@ export function createCmsContentSlotRoutes(deps: {
         meta: {
           slotKey,
           serviceKey: serviceKey || null,
+          serviceKeys: scope.serviceKeys,
+          crossService: scope.crossService,
           organizationId: organizationId || null,
           total: filteredSlots.length,
         },

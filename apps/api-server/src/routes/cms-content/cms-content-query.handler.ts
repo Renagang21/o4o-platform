@@ -11,14 +11,20 @@
  */
 
 import { Router, Request, Response } from 'express';
-import type { DataSource } from 'typeorm';
+import { In, type DataSource } from 'typeorm';
 import { CmsContent, ContentType, ContentStatus } from '@o4o-apps/cms-core';
 import { optionalAuth } from '../../middleware/auth.middleware.js';
+import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
+import logger from '../../utils/logger.js';
 import {
   mapCmsAuthorRole,
   mapCmsVisibilityScope,
   mapCmsStatus,
 } from '@o4o/types';
+import {
+  resolveCmsReadScope,
+  CMS_SERVICE_KEY_REQUIRED_ERROR,
+} from './cms-content-utils.js';
 
 /**
  * WO-O4O-CMS-CONTENT-DETAIL-SERVICE-SCOPE-GUARD-V1:
@@ -36,6 +42,19 @@ export function createCmsContentQueryRoutes(deps: {
   const { dataSource } = deps;
 
   /**
+   * WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1:
+   *   공통 read 경계 판정. `serviceKey` 가 경계이며, 생략은 **PLATFORM_ADMIN 역할**로만 허용된다.
+   *   (파라미터 생략을 관리자 모드로 해석하지 않는다 — CHECK §6)
+   */
+  const readScope = (req: Request, serviceKey: unknown) =>
+    resolveCmsReadScope({
+      user: (req as any).user,
+      serviceKey,
+      roleChecker: roleAssignmentService,
+      onError: (m) => logger.warn('[CMS] Platform admin RoleAssignment check failed:', m),
+    });
+
+  /**
    * GET /cms/stats
    * Get content statistics for dashboards
    *
@@ -48,10 +67,18 @@ export function createCmsContentQueryRoutes(deps: {
       const { serviceKey, organizationId } = req.query;
       const contentRepo = dataSource.getRepository(CmsContent);
 
+      // WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1:
+      //   집계도 read 다. serviceKey 없이 전 서비스를 합산하던 동작을 닫는다 (CHECK §8).
+      const scope = await readScope(req, serviceKey);
+      if (!scope.ok) {
+        res.status(400).json(CMS_SERVICE_KEY_REQUIRED_ERROR);
+        return;
+      }
+
       // Build base where clause for scope
       const baseWhere: any = {};
-      if (serviceKey) {
-        baseWhere.serviceKey = serviceKey as string;
+      if (scope.serviceKeys) {
+        baseWhere.serviceKey = In(scope.serviceKeys);
       }
       if (organizationId) {
         baseWhere.organizationId = organizationId as string;
@@ -117,6 +144,8 @@ export function createCmsContentQueryRoutes(deps: {
         },
         scope: {
           serviceKey: serviceKey || null,
+          serviceKeys: scope.serviceKeys,
+          crossService: scope.crossService,
           organizationId: organizationId || null,
         },
       });
@@ -161,10 +190,19 @@ export function createCmsContentQueryRoutes(deps: {
 
       const contentRepo = dataSource.getRepository(CmsContent);
 
+      // WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1:
+      //   목록이 serviceKey 없이 전 서비스를 반환하던 동작을 닫는다.
+      //   상세(:id)와 **같은 경계**여야 list/detail invariant 가 성립한다 (CHECK §7).
+      const scope = await readScope(req, serviceKey);
+      if (!scope.ok) {
+        res.status(400).json(CMS_SERVICE_KEY_REQUIRED_ERROR);
+        return;
+      }
+
       // Build where clause
       const where: any = {};
-      if (serviceKey) {
-        where.serviceKey = serviceKey as string;
+      if (scope.serviceKeys) {
+        where.serviceKey = In(scope.serviceKeys);
       }
       if (organizationId) {
         where.organizationId = organizationId as string;
@@ -200,8 +238,15 @@ export function createCmsContentQueryRoutes(deps: {
       if (search && typeof search === 'string' && search.trim()) {
         const qb = contentRepo.createQueryBuilder('c');
         Object.entries(where).forEach(([key, val]) => {
+          // serviceKey 는 alias 집합이라 `= :key` 로 바인딩하면 안 된다 (FindOperator 가 그대로 들어간다).
+          if (key === 'serviceKey') return;
           qb.andWhere(`c."${key}" = :${key}`, { [key]: val });
         });
+        if (scope.serviceKeys) {
+          qb.andWhere('c."serviceKey" IN (:...scopeServiceKeys)', {
+            scopeServiceKeys: scope.serviceKeys,
+          });
+        }
         const searchTerm = `%${search.trim()}%`;
         qb.andWhere('(c.title ILIKE :search OR c.summary ILIKE :search)', { search: searchTerm });
         qb.orderBy('c."isPinned"', 'DESC')
@@ -272,8 +317,9 @@ export function createCmsContentQueryRoutes(deps: {
       const { id } = req.params;
       // WO-O4O-CMS-CONTENT-DETAIL-SERVICE-SCOPE-GUARD-V1:
       //   목록(GET /contents)과 **동일한 기존 query 계약**(`serviceKey`)을 상세에서도 인정한다.
-      //   신규 파라미터·헤더를 만들지 않는다. 주어지면 DB 조회 자체를 그 서비스로 제한하고,
-      //   주어지지 않으면 기존 동작(공개 published 조회 · admin cross-service)을 그대로 유지한다.
+      //   신규 파라미터·헤더를 만들지 않는다. 주어지면 DB 조회 자체를 그 서비스로 제한한다.
+      // WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1:
+      //   opt-in 이던 이 경계를 **강제**로 전환한다. 생략은 PLATFORM_ADMIN 역할로만 허용된다.
       const { serviceKey } = req.query;
       const contentRepo = dataSource.getRepository(CmsContent);
 
@@ -286,9 +332,15 @@ export function createCmsContentQueryRoutes(deps: {
         return;
       }
 
+      const scope = await readScope(req, serviceKey);
+      if (!scope.ok) {
+        res.status(400).json(CMS_SERVICE_KEY_REQUIRED_ERROR);
+        return;
+      }
+
       const detailWhere: Record<string, unknown> = { id };
-      if (serviceKey) {
-        detailWhere.serviceKey = serviceKey as string;
+      if (scope.serviceKeys) {
+        detailWhere.serviceKey = In(scope.serviceKeys);
       }
 
       const content = await contentRepo.findOne({

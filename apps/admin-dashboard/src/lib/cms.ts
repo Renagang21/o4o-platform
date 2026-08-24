@@ -550,8 +550,13 @@ export const cmsAPI = {
     return response.data;
   },
 
-  async getContent(id: string): Promise<CmsContent> {
-    const response = await api.get(`/cms/contents/${id}`);
+  /**
+   * WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1:
+   *   상세 조회도 `serviceKey` 가 read boundary 다. 목록에서 얻은 `content.serviceKey` 를
+   *   그대로 넘긴다. 생략하면 platform admin 역할일 때만 cross-service 로 허용된다.
+   */
+  async getContent(id: string, params?: { serviceKey?: string }): Promise<CmsContent> {
+    const response = await api.get(`/cms/contents/${id}`, { params });
     return response.data.data;
   },
 

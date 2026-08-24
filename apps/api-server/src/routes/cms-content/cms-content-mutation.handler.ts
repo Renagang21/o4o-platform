@@ -23,7 +23,7 @@ import { roleAssignmentService } from '../../modules/auth/services/role-assignme
 import logger from '../../utils/logger.js';
 import { CmsContentService, StatusValidationError, StatusTransitionError } from './cms-content.service.js';
 import type { ContentAuthorRole, ContentVisibilityScope } from './cms-content-utils.js';
-import { VALID_CONTENT_TYPES } from './cms-content-utils.js';
+import { VALID_CONTENT_TYPES, isCmsPlatformAdmin } from './cms-content-utils.js';
 
 /**
  * WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
@@ -44,16 +44,12 @@ async function authorizeCmsMutation(
   if (!user) return { allowed: false, isPlatformAdmin: false };
 
   const jwtRoles: string[] = user.roles || [];
-  const platformRoleNames = ['platform:super_admin'];
 
-  let isPlatformAdmin = jwtRoles.some((r) => platformRoleNames.includes(r));
-  if (!isPlatformAdmin) {
-    try {
-      isPlatformAdmin = await roleAssignmentService.hasAnyRole(user.id, platformRoleNames);
-    } catch (err) {
-      logger.warn('[CMS] Platform admin RoleAssignment check failed:', (err as Error).message);
-    }
-  }
+  // WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1:
+  //   platform admin 판정을 read 측과 **한 벌**로 공유한다 (근거를 두 곳에 두지 않는다).
+  const isPlatformAdmin = await isCmsPlatformAdmin(user, roleAssignmentService, (m) =>
+    logger.warn('[CMS] Platform admin RoleAssignment check failed:', m),
+  );
 
   if (isPlatformAdmin) return { allowed: true, isPlatformAdmin: true };
 

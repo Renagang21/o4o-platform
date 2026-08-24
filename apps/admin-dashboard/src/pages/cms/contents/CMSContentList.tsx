@@ -129,7 +129,7 @@ export default function CMSContentList() {
     if (hydratingId) return;
     setHydratingId(content.id);
     try {
-      const detail = await cmsAPI.getContent(content.id);
+      const detail = await cmsAPI.getContent(content.id, { serviceKey: content.serviceKey });
       setEditingContent(detail);
       setIsModalOpen(true);
     } catch (error: any) {

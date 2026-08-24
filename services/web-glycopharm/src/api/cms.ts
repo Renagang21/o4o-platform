@@ -114,8 +114,15 @@ export const cmsApi = {
    * WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1: CRUD 메서드 추가
    */
 
-  getContentById: async (id: string): Promise<{ success: boolean; data: CmsContentDetail }> => {
-    const res = await api.get(`/cms/contents/${id}`);
+  // WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1:
+  //   상세도 serviceKey 가 read 경계다. 목록/슬롯과 동일하게 기본값을 보낸다.
+  getContentById: async (
+    id: string,
+    options?: { serviceKey?: string }
+  ): Promise<{ success: boolean; data: CmsContentDetail }> => {
+    const res = await api.get(`/cms/contents/${id}`, {
+      params: { serviceKey: options?.serviceKey || 'glycopharm' },
+    });
     return res.data;
   },
 
