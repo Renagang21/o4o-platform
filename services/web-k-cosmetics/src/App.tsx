@@ -224,6 +224,10 @@ const OperatorGuideContentsPage = lazy(() => import('@/pages/operator/OperatorGu
 const OperatorResourcesPage = lazy(() => import('@/pages/operator/OperatorResourcesPage'));
 // Operator Content Management (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1)
 const OperatorContentPage = lazy(() => import('@/pages/operator/OperatorContentPage'));
+// WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+//   운영 분석 / Home 편집 공통 모듈 채택 (K-Cosmetics 만 미채택이었다)
+const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
+const OperatorCommunityManagementPage = lazy(() => import('@/pages/operator/CommunityManagementPage'));
 // WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1
 const OperatorLmsCoursesPage = lazy(() => import('@/pages/operator/OperatorLmsCoursesPage'));
 
@@ -775,6 +779,11 @@ function AppRoutes() {
         <Route path="resources" element={<OperatorResourcesPage />} />
         {/* Content Management 공지/뉴스 (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1) */}
         <Route path="content-management" element={<OperatorContentPage />} />
+        {/* WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+            운영 분석 — 공통 /api/v1/operator/analytics/* (신규 API 0) */}
+        <Route path="analytics" element={<OperatorAnalyticsPage />} />
+        {/* Home 편집 — 기존 /api/v1/cosmetics/community/manage/* (신규 API 0) */}
+        <Route path="community" element={<OperatorCommunityManagementPage />} />
         {/* 문의 관리 — operator 이관 (WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1) */}
         <Route path="contacts" element={<OperatorContactInquiriesPage />} />
         {/* LMS 강의 관리 (WO-KCOS-OPERATOR-LMS-BOOTSTRAP-V1) */}

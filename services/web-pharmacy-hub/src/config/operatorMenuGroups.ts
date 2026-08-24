@@ -41,6 +41,11 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
+  // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+  //   자료실 관리 = 공통 CMS(`/api/v1/cms/contents`, serviceKey=pharmacy-hub, type=knowledge).
+  //   회원 자료실(/resources)은 이미 있었으나 등록 경로가 없어 항상 0건이었다
+  //   (REQUIRED_BUT_MISSING). 신규 table/migration/backend route/권한 변경 없음.
+  resources: [{ label: '자료실 관리', path: '/operator/resources' }],
   // 운영 분석 = 공통 /api/v1/operator/analytics/* (action_logs 기반).
   analytics: [{ label: '운영 분석', path: '/operator/analytics' }],
   // 역할 관리 = role_assignments (RBAC SSOT). 조회는 운영자, 변경은 platform admin 만

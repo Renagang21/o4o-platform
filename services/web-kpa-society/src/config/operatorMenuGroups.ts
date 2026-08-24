@@ -82,6 +82,11 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: 'Home 편집', path: '/operator/community' },
     { label: '콘텐츠 허브 관리', path: '/operator/docs' },
     { label: '설문조사 관리', path: '/operator/surveys' },
+    // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+    //   /operator/collaboration-requests 는 실기능 화면(협업·강의 문의 처리)인데 sidebar 진입점이
+    //   없어 안내 문서 링크로만 도달 가능했다 → 기능 은폐. K-Cosmetics '문의 관리'(content 그룹)와
+    //   같은 자리에 진입점을 복구한다. route/page/API 불변.
+    { label: '협업 문의 관리', path: '/operator/collaboration-requests' },
   ],
   // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자료실 독립 최상위 그룹
   resources: [

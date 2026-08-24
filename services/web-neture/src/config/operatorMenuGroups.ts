@@ -42,6 +42,15 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   approvals: [
     { label: '가입 승인', path: '/operator/applications' },
+    // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+    //   /operator/product-approvals (OperatorProductApprovalPage) 는 operatorProductApi(neture:operator)
+    //   기반 실기능인데 sidebar 진입점이 없어 대시보드 축 링크로만 도달 가능했다 (기능 은폐).
+    //   /operator/product-service-approvals (ProductServiceApprovalPage) 는 서비스별 상품 승인으로
+    //   backend `/neture/operator/service-approvals`(requireAuth + neture:operator) 실기능이나
+    //   어떤 메뉴에도 없었다. admin '서비스 승인'(/admin/service-approvals)은 파트너 서비스 승인이라
+    //   대상이 달라 대체 관계가 아니다. 라우트/guard 무변경, 메뉴 진입점만 추가한다.
+    { label: '상품 승인', path: '/operator/product-approvals' },
+    { label: '서비스별 상품 승인', path: '/operator/product-service-approvals' },
     { label: '유통참여형 펀딩', path: '/operator/market-trial' },
     { label: '서비스 승인', path: '/admin/service-approvals', adminOnly: true },
   ],
@@ -50,6 +59,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '상품 관리', path: '/operator/all-registered-products' },
     // WO-O4O-OPERATOR-PRODUCT-CANDIDATE-REVIEW-UI-V1 (Phase 5): 모바일·공급자·import 후보 검토
     { label: '상품 후보 검토', path: '/operator/product-candidates' },
+    // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+    //   판매자 모집 상품 Overview — backend `/neture/operator/recruiting-products/*` 실기능인데
+    //   메뉴 진입점이 없어 URL 직접 입력으로만 도달 가능했다 (기능 은폐).
+    { label: '판매자 모집 상품', path: '/operator/recruiting-products' },
     // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: 큐레이션 메뉴 비노출 (운영자 통제 최소화)
     { label: '카테고리 관리', path: '/admin/categories', adminOnly: true },
     { label: '브랜드 관리', path: '/admin/brands', adminOnly: true },

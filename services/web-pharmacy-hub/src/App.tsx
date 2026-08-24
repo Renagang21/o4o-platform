@@ -151,6 +151,9 @@ import OperatorForumCategoriesPage from './pages/operator/ForumCategoriesManagem
 import OperatorForumDeleteRequestsPage from './pages/operator/ForumDeleteRequestsPage';
 import OperatorForumAnalyticsPage from './pages/operator/ForumAnalyticsPage';
 import OperatorAnalyticsPage from './pages/operator/AnalyticsPage';
+// WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+//   자료실 관리 (공통 CMS `/cms/contents` · serviceKey=pharmacy-hub · type=knowledge)
+import OperatorResourcesPage from './pages/operator/ResourcesPage';
 import OperatorRoleManagementPage from './pages/operator/RoleManagementPage';
 // WO-O4O-PHARMACY-HUB-STORE-HUB-HOME-INTRODUCTION-V1 — 매장허브 홈 (공통 StoreHubTemplate)
 import StoreHubPage from './pages/store-hub/StoreHubPage';
@@ -490,6 +493,7 @@ export default function App() {
             <Route path="forum-delete-requests" element={<OperatorForumDeleteRequestsPage />} />
             <Route path="forum-analytics" element={<OperatorForumAnalyticsPage />} />
             <Route path="analytics" element={<OperatorAnalyticsPage />} />
+            <Route path="resources" element={<OperatorResourcesPage />} />
             <Route path="roles" element={<OperatorRoleManagementPage />} />
           </Route>
 

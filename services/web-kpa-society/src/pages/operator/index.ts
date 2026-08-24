@@ -9,7 +9,6 @@ export { default as OperatorAiReportPage } from './OperatorAiReportPage';
 export { default as ForumRequestsManagementPage } from './ForumRequestsManagementPage';
 export { default as ForumCategoriesManagementPage } from './ForumCategoriesManagementPage';
 export { default as ForumDeleteRequestsPage } from './ForumDeleteRequestsPage';
-export { LegalManagementPage } from './LegalManagementPage';
 
 export { default as ForumAnalyticsDashboard } from './ForumAnalyticsDashboard';
 export { default as MemberManagementPage } from './MemberManagementPage';

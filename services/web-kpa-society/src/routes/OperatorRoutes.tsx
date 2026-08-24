@@ -20,7 +20,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorAiReportPage, ForumRequestsManagementPage, ForumCategoriesManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorLmsCoursesPage, OperatorResourcesPage, OperatorProductsPage, OperatorOrdersPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumRequestsManagementPage, ForumCategoriesManagementPage, ForumDeleteRequestsPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, ProductApplicationManagementPage, CommunityManagementPage, QualificationRequestsPage, OperatorLmsCoursesPage, OperatorResourcesPage, OperatorProductsPage, OperatorOrdersPage } from '../pages/operator';
 // WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: UsersPage → /operator/members redirect
 import UserDetailPage from '../pages/operator/UserDetailPage';
 import RoleManagementPage from '../pages/operator/RoleManagementPage';
@@ -128,8 +128,15 @@ export function OperatorRoutes() {
           {/* WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: 운영자 태블릿 화면 세트 원본 제작기 */}
           <Route path="tablet/screen-sets" element={<OperatorTabletScreenSetsPage />} />
 
-          {/* 약관 관리 (WO-KPA-LEGAL-PAGES-V1) — admin-only */}
-          <Route path="legal" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><LegalManagementPage /></RoleGuard>} />
+          {/* WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+              legacy 약관 관리(/operator/legal, WO-KPA-LEGAL-PAGES-V1) 은퇴.
+              canonical 은 관리자 → 법정정보·약관 설정(/admin/settings/legal, service_policy_documents)
+              이며 메뉴는 이미 제거돼 있었다(WO-O4O-KPA-POLICY-DOCUMENTS-SERVICE-POLICY-MIGRATION-V1
+              이 "후속 cleanup WO 에서 제거 판단" 으로 남긴 항목).
+              프로덕션 확인: canonical/legacy 양쪽 모두 published 문서 0건 → 편집 대상 데이터 없음.
+              backend(`/kpa/operator/legal/documents`) 와 kpa_legal_documents 는 변경하지 않는다
+              (공개 route 의 legacy fallback 안전망 보존). deep link 는 canonical 로 redirect. */}
+          <Route path="legal" element={<Navigate to="/admin/settings/legal" replace />} />
 
           {/* 감사 로그 (WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1) — admin-only */}
           <Route path="audit-logs" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><AuditLogPage /></RoleGuard>} />

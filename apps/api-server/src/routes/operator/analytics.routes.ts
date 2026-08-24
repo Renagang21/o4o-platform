@@ -46,6 +46,10 @@ const requireOperatorOrAdmin = requireRole([
   //   공통 API 는 이미 service scope 로 격리되는데 allowlist 에만 pharmacy-hub 가 빠져 있었다.
   //   (injectServiceScope 가 'pharmacy-hub' 를 self-map 하므로 데이터 경계는 그대로다.)
   'pharmacy-hub:admin', 'pharmacy-hub:operator',
+  // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+  //   K-Cosmetics 만 allowlist 에서 누락돼 있었다(다른 공통 operator route 는 모두 포함).
+  //   injectServiceScope 가 'cosmetics' → 'k-cosmetics' 로 self-map 하므로 데이터 경계는 불변이다.
+  'cosmetics:admin', 'cosmetics:operator',
 ]);
 
 export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {

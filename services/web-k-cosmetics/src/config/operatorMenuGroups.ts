@@ -52,10 +52,14 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   //   content 그룹에서 안내 문구 관리 → lms, 자료실 관리 → resources 로 분리.
   // WO-O4O-CROSSSERVICE-OPERATOR-CONTENT-MENU-PARITY-V1:
   //   canonical Content 라벨 정합 — '공지/뉴스 관리' → '공지사항/뉴스' (KPA/GP 와 동일 라벨).
-  //   Home 편집(/operator/community) · 콘텐츠 허브(/operator/docs) 는 K-Cosmetics 에 route 부재 →
-  //   dead link 방지 위해 메뉴 미추가 (후속 별도 WO: page/route 신설 필요).
+  // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+  //   Home 편집(/operator/community) — 위 주석이 예고한 "후속 별도 WO" 를 본 WO 에서 종료.
+  //   backend(`/cosmetics/community/manage/*`) · client(communityManageApi) 는 이미 존재했고
+  //   화면만 없었다 → 공통 CommunityHomeConsole 채택 후 메뉴 추가 (dead link 아님).
+  //   콘텐츠 허브(/operator/docs) 는 여전히 route 부재 → 미추가 유지.
   content: [
     { label: '공지사항/뉴스', path: '/operator/content-management' },
+    { label: 'Home 편집', path: '/operator/community' },
     // WO-O4O-KCOSMETICS-OPERATOR-SURVEYS-V1
     { label: '설문조사 관리', path: '/operator/surveys' },
     // WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1:
@@ -97,7 +101,13 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
-  analytics: [{ label: 'AI 리포트', path: '/operator/ai-report' }],
+  // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+  //   운영 분석 — KPA/GP/Neture/PharmacyHub 4 서비스가 이미 소비 중인 공통 콘솔.
+  //   K-Cosmetics 만 route·page·menu 가 모두 없었다(REQUIRED_BUT_MISSING).
+  analytics: [
+    { label: 'AI 리포트', path: '/operator/ai-report' },
+    { label: '운영 분석', path: '/operator/analytics' },
+  ],
 };
 
 // ─── Role-based Filter ────────────────────────────────────────

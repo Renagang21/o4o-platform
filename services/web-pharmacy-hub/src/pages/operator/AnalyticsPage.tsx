@@ -18,10 +18,16 @@ const client: OperatorAnalyticsClient = {
   getInsight: (params) => api.get('/operator/analytics/insight', { params }).then((r: { data: unknown }) => r.data),
 };
 
-/** action_logs.action_key → 한글 라벨 (pharmacy-hub 실측 키). */
+/**
+ * action_logs.action_key → 한글 라벨 (pharmacy-hub 실측 키).
+ *
+ * WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
+ *   저장 형식은 `{serviceKey}.operator.{action}` 인데 short key 로 등록돼 있어
+ *   라벨이 한 번도 적용되지 않았다(last-segment fallback 으로 원문이 노출). full key 로 교정.
+ */
 const ACTION_LABELS: Record<string, string> = {
-  member_approve: '가입 승인',
-  member_reject: '가입 반려',
+  'pharmacy-hub.operator.member_approve': '가입 승인',
+  'pharmacy-hub.operator.member_reject': '가입 반려',
 };
 
 export default function AnalyticsPage() {
