@@ -52,7 +52,7 @@
 
 ---
 
-## 2. 수정 내역 (FIX-1 ~ FIX-7)
+## 2. 수정 내역 (FIX-1 ~ FIX-8)
 
 | # | 대상 | 판정 | 조치 |
 |---|---|---|---|
@@ -63,6 +63,7 @@
 | FIX-5 | `services/web-pharmacy-hub` 자료실 (§4 재판정) | REQUIRED_BUT_MISSING | ① `pharmacyHubResources.ts` 의 `type` 을 계약에 없는 `'resource'` → 공통 CMS `'knowledge'` 로 정정(조회 항상 0건·등록 400 이던 원인) ② 운영자 콘솔 `ResourcesPage.tsx` 신규 — 목록/검색/상태필터 + RichTextEditor 등록·수정 + 상태 전이. 전이표는 서버 `CMS_ALLOWED_TRANSITIONS` 와 동일하게 제한 ③ 라우트 + 메뉴('자료실 관리'). **cms-core(동결)·schema·migration 무변경** |
 | FIX-6 | `services/web-kpa-society/.../operator/LegalManagementPage.tsx` | DEAD_OR_UNUSED | legacy `/operator/legal` 은퇴 → `/admin/settings/legal` redirect. 메뉴는 이미 제거돼 있었고 프로덕션에서 canonical·legacy 양쪽 published 문서 0건 확인. backend(`/kpa/operator/legal/documents`) · `kpa_legal_documents` 는 무변경 |
 | FIX-7 | `services/web-neture/src/config/operatorMenuGroups.ts` | 기능 은폐 3건 | `상품 승인`(/operator/product-approvals) · `서비스별 상품 승인`(/operator/product-service-approvals) · `판매자 모집 상품`(/operator/recruiting-products) 메뉴 진입점 추가. 라우트·guard 무변경 |
+| FIX-8 | `services/web-pharmacy-hub/src/config/operatorCapabilities.ts` | 기능 은폐 (배포 후 실브라우저 검증에서 발견) | FIX-5 로 메뉴 항목을 추가했으나 PH `ENABLED_CAPABILITIES` 에 `CONTENT_MANAGEMENT` 가 없어 `DomainIASidebar` 가 `resources` 그룹 자체를 숨기고 있었다(항목이 있어도 노출 0). capability 추가로 해소. PH `UNIFIED_MENU` 에 `content`·`lms` 항목은 없어 빈 그룹 헤딩은 생기지 않는다 |
 
 부수 정정: PharmacyHub `AnalyticsPage.tsx` 의 `ACTION_LABELS` 키가 짧은 키(`member_approve`)로 돼 있어
 `action_logs` 의 실제 키(`pharmacy-hub.operator.member_approve`)와 매칭되지 않던 drift 를 교정.
@@ -121,7 +122,53 @@
 
 ## 5. 배포 후 프로덕션 실브라우저 검증
 
-(배포 후 기록)
+- 방식: headless Chromium(Playwright) 실로그인 → 서비스별 운영자 메뉴 **전 경로 직접 방문**(deep link) + hard load.
+  sidebar DOM 열거는 다항목 그룹이 기본 접힘이라 과소보고되므로 **config 기준 전 경로 열거**로 수행.
+- 계정: 실 운영자 계정(`sohae2100@gmail.com`) — 4 공식 서비스.
+- 판정: white screen(main 텍스트 40자 미만) / placeholder(준비 중·Coming Soon) / 예기치 않은 4xx·5xx / JS exception / 리다이렉트 이탈.
+
+### 5-1. 경로 방문 결과
+
+| 서비스 | 커밋 | desktop 1440×900 | mobile 390×844 | 비고 |
+|---|---|---|---|---|
+| KPA-Society | `ee177e6b6` | 38 / 38 clean | 29 / 29 clean | FIX-4 '협업 문의 관리' 메뉴 노출·정상 |
+| K-Cosmetics | `ee177e6b6` | 32 / 32 clean | 18 / 18 clean | FIX-2 `/operator/analytics` · FIX-3 `/operator/community` 실렌더 확인 (FIX-1 로 403 해소) |
+| Neture | `ee177e6b6` | 22 / 25 | 13 / 14 | 아래 5-2 |
+| PharmacyHub | `34b4ac983` | **11 / 11 clean** | **11 / 11 clean** | FIX-8 배포 후 재검증. sidebar 에 `자료실 관리 → /operator/resources` 노출 확인 |
+
+### 5-2. Neture 잔여 flag 2건 (전부 이번 WO 수정 범위 밖 — 은폐하지 않고 기록)
+
+1. `/operator/actions` — 자동 판정에서 WHITE 로 표시됐으나 **오탐**이다. 대기시간 10초로 재측정 시
+   "Action Queue / 총 작업 2건 / 긴급 1건" 이 정상 렌더되고 실패 요청 0건. 초기 로딩이 3.2초 임계를 넘겼을 뿐이다.
+2. `/operator/ai-card-report` · `/operator/ai-operations` — `/api/ai/card-report` · `/api/ai/operations` 가 **403**.
+   원인은 backend guard 가 `requireAdmin`(= `platform:super_admin` 단독, `WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1`)인데
+   메뉴의 `adminOnly` 는 `isAdminOrAbove(serviceKey)`(= `neture:admin` 도 true)로 해석되기 때문이다.
+   **본 WO 이전부터 존재**했고 `WO-O4O-NETURE-OPERATOR-PRODUCTION-DEFECT-CLOSURE-V1` 이 "guard 는 유지하고 admin 메뉴로만 노출"로 기록한 상태다.
+   해소하려면 권한 모델 변경 또는 공통 `UnifiedMenuItem` 계약에 `platformAdminOnly` 플래그 신설이 필요 → **§6 중지 조건**(권한 모델 자체 변경 / 공통 계약 변경).
+   **별도 WO 제안**: AI 리포트 guard ↔ 메뉴 가시성 계약 정합.
+
+### 5-3. 쓰기 검증 (안전 fixture + 원복)
+
+| 항목 | 결과 |
+|---|---|
+| PH 자료실 신규 adoption lifecycle | **PASS** — 등록(draft) → 수정(제목 변경 반영) → `검토 요청`(pending) → `게시`(published) → `보관`(archived) 전 구간 성공. API 4xx/5xx 0건, JS exception 0건 |
+| 원복 | fixture 를 terminal 상태 `archived` 로 종료. 회원 자료실 `/resources` 에서 노출되지 않음을 실브라우저로 확인 (공통 CMS 전이표상 archived 는 종점이며 콘솔에 하드 삭제 경로를 만들지 않았다) |
+| cross-service data leak | **0** — PH fixture 가 KPA `/operator/resources`·`/operator/content`, KCos `/operator/resources`·`/operator/content-management` 어디에도 나타나지 않음 |
+| serviceKey write fan-out | **0** — 위와 동일 근거 |
+| 회원 상태 변경 → 원복 / role grant → revoke / 승인·반려 1건 | **미실행 (기록)** — 프로덕션에 안전 fixture 가 없다. PH·KPA 모두 승인 대기 큐 **0건**이고, PH 회원 콘솔은 조회 전용(행 단위 write 없음), `/operator/roles` 는 backend 가 platform admin 전용이라 운영자 세션에 write 버튼이 없다. 실행하려면 신규 프로덕션 사용자·RBAC row 를 만들어야 하므로 수행하지 않았다 |
+
+### 5-4. 필수 결과
+
+| 항목 | 결과 |
+|---|---|
+| dead link | 0 |
+| white screen | 0 (Neture 오탐 1건 재확인 후 정상) |
+| JS exception | 0 |
+| 예기치 않은 404/500 | 0 |
+| 403 | 2 경로 — 기존 결함, 5-2 기록 |
+| cross-service data leak | 0 |
+| serviceKey write fan-out | 0 |
+| placeholder | 0 |
 
 ---
 
@@ -135,8 +182,9 @@
 | 정당하지 않은 UX_DRIFT | 0 |
 | dead menu / route | 0 |
 | cross-service scope 결함 | 0 (FIX-1 로 해소) |
-| production adoption gap | §5 기록 후 확정 |
+| production adoption gap | 0 (§5) |
+| **판정** | `OPERATOR_COMMONIZATION = CLOSED` · `PRODUCTION_ADOPTION = PASS` · `MUST_FIX_BEFORE_CLOSE = 0` |
 
 ## 7. 문서 정합
 
-발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건(공통 감사 로그 조회 계약)
+발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건(① 공통 감사 로그 조회 계약 ② Neture AI 리포트 guard ↔ 메뉴 가시성 계약 정합)
