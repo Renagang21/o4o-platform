@@ -159,6 +159,22 @@ naming convention은 기존 `o4o-encryption-key` 를 따랐다. IAM 범위도 �
 
 GitHub secret `GCP_DB_PASSWORD` 는 이제 미사용이 된다 (삭제는 별도 판단).
 
+### CI 재배포 end-to-end 검증 (사후)
+
+워크플로 수정 커밋(`fbe050940`) 푸시로 `Deploy API Server` 가 실제 실행됐고 **success** 로 종료했다.
+
+| 검증 항목 | 결과 |
+|---|---|
+| workflow run 32698637283 | completed / success |
+| 생성 revision | `o4o-core-api-03453-q6q` (100% traffic) |
+| `DB_PASSWORD` | **secretKeyRef `o4o-db-password` 유지** (literal 재주입 없음) |
+| `ENCRYPTION_KEY` / `CAFE24_CLIENT_SECRET` | secretKeyRef 보존 (`--update-secrets` 가 기존 secret 미삭제) |
+| migration job (`--set-secrets` 경로) | 생성/갱신 후 실행 성공, `DB_PASSWORD` = secretKeyRef |
+| `/health` · `/health/database` · `/api/v1/auth/status` | 200 · healthy(pingMs 4) · 200 |
+
+→ 이관이 **CI 배포 사이클을 통과해 지속됨**을 확인했다 (일회성 수동 변경 아님).
+
+
 ---
 
 ## 8. runtime service account IAM
