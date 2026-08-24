@@ -16,6 +16,7 @@
 import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
 import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
+import { isAdminTierRoleName } from '../../utils/role-revoke-safety.js';
 
 /**
  * WO-O4O-KPA-MEMBERSHIP-STATUS-SINGLE-TRANSACTION-CONVERGENCE-V1
@@ -187,6 +188,31 @@ function resolveGrantedRole(serviceKey: string, role: string | null | undefined)
   return role;
 }
 
+/**
+ * 접두어 없는 admin tier 역할 판정 (WO-O4O-CROSSSERVICE-LEGACY-BARE-ROLE-CENSUS-AND-CLEANUP-V1 §9)
+ *
+ * `service_memberships.role` 에는 legacy 표기로 prefix 없는 `admin` · `operator` · `super_admin`
+ * 이 실재한다(2026-08-24 프로덕션 census: kpa-society/admin 1 · glycopharm/operator 1 ·
+ * platform/super_admin 2). 승인·재활성화 STEP3 은 이 값을 그대로 부여하므로 그대로 두면
+ *
+ *   ① 서비스 축이 없는 **전역** admin tier 역할이 새로 생기고
+ *   ② `super_admin` 은 로그인 경로가 `platform:super_admin` 과 동등하게 취급하므로
+ *      (`auth-login.service.ts` PLATFORM_ADMIN_ROLES) 멤버십 재활성화만으로 플랫폼 관리자가 된다.
+ *
+ * 부여만 막는다(회수는 그대로). admin·operator 부여는 플랫폼 관리자 전용 경로의 책임이며
+ * (WO-O4O-NETURE-OPERATOR-ROLE-ASSIGNMENT-AUTHORITY-LOCK-V1), Neture 가입 승인도 이미 같은
+ * 이유로 승격을 거부한다(`operator-registration.service.ts` ROLE_PROMOTION_NOT_ALLOWED).
+ *
+ * prefixed admin tier(`kpa:admin` 등)는 대상이 아니다 — 정지 시 내려간 역할을 되살리는
+ * 정상 lifecycle 이라 막으면 suspend↔reactivate 대칭이 깨진다.
+ *
+ * 추측 변환도 하지 않는다. bare 값에 서비스 prefix 를 붙이는 것은 권한 확대이므로
+ * 부여를 **건너뛰기만** 한다(멤버십 상태 전이는 그대로 진행).
+ */
+function isBareAdminTierRole(role: string): boolean {
+  return !role.includes(':') && isAdminTierRoleName(role);
+}
+
 export class MembershipApprovalService {
 
   /**
@@ -352,8 +378,16 @@ export class MembershipApprovalService {
 
       // STEP3: Ensure role_assignment exists (idempotent — ON CONFLICT updates timestamp)
       const memberRole = resolveGrantedRole(membership.service_key, membership.role || 'member')!;
-      const roleOutcome = await this.activateRoleAssignment(queryRunner, userId, memberRole, approvedBy);
-      logger.info('[APPROVAL][STEP3] role ACTIVATE', { userId, role: memberRole, outcome: roleOutcome });
+      if (isBareAdminTierRole(memberRole)) {
+        logger.warn('[APPROVAL][STEP3] bare admin-tier role grant SKIPPED', {
+          userId,
+          role: memberRole,
+          serviceKey: membership.service_key,
+        });
+      } else {
+        const roleOutcome = await this.activateRoleAssignment(queryRunner, userId, memberRole, approvedBy);
+        logger.info('[APPROVAL][STEP3] role ACTIVATE', { userId, role: memberRole, outcome: roleOutcome });
+      }
 
       // STEP4: WO-O4O-KPA-MEMBERSHIP-SYNC-FIX-V1 — kpa_members upsert on approve
       //   service_memberships 가 KPA 가입 상태 SSOT. kpa_members 는 domain profile (optional).
@@ -863,6 +897,14 @@ export class MembershipApprovalService {
       const reactivatedRoles: string[] = [];
       for (const membership of selectResult) {
         const memberRole = resolveGrantedRole(membership.service_key, membership.role || 'member')!;
+        if (isBareAdminTierRole(memberRole)) {
+          logger.warn('[REACTIVATE][STEP3] bare admin-tier role grant SKIPPED', {
+            userId,
+            role: memberRole,
+            serviceKey: membership.service_key,
+          });
+          continue;
+        }
         const roleOutcome = await this.activateRoleAssignment(queryRunner, userId, memberRole, reactivatedBy);
         logger.info('[REACTIVATE][STEP3] role ACTIVATE', { userId, role: memberRole, outcome: roleOutcome });
         reactivatedRoles.push(memberRole);

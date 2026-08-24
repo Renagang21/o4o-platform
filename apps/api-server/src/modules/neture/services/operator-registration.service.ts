@@ -149,10 +149,17 @@ export class OperatorRegistrationService {
         throw new Error('ROLE_PROMOTION_NOT_ALLOWED');
       }
       const finalRole = rawRole;
+      // WO-O4O-CROSSSERVICE-LEGACY-BARE-ROLE-CENSUS-AND-CLEANUP-V1 §9:
+      //   migration 20270301000000 이 `unique_active_role_per_user UNIQUE (user_id, role, is_active)`
+      //   를 부분 유니크 인덱스 `(user_id, role) WHERE is_active` 로 교체했는데 이 호출부만
+      //   옛 3 컬럼 추론 대상을 그대로 두고 있었다. 대응 제약이 없으면 Postgres 는 데이터와
+      //   무관하게 42P10 으로 실패하므로 **Neture 가입 승인 트랜잭션 전체가 깨진다**.
+      //   같은 규칙을 쓰는 다른 호출부(MembershipApprovalService · PharmacyHubStoreProvisioningService)
+      //   와 표현을 일치시킨다. 부여 대상 role 문자열은 바꾸지 않는다.
       await queryRunner.query(
         `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
          VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
-         ON CONFLICT (user_id, role, is_active) DO UPDATE SET updated_at = NOW()`,
+         ON CONFLICT (user_id, role) WHERE is_active DO UPDATE SET updated_at = NOW()`,
         [userId, finalRole, approvedBy],
       );
 
