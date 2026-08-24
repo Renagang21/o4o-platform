@@ -89,5 +89,93 @@ lockfile 이 어긋난 채 push 되면 실패한다. 즉 lockfile 동기화 요�
 
 - 브랜치 전략(`main` 직접 작업 유지) · PR 의무화 · worktree
 - CI 워크플로 · dependency · lockfile
-- `CLAUDE.md` · `AGENTS.md`
+- `CLAUDE.md` · `AGENTS.md` (§6·§7 은 이후 WO-O4O-CROSSSESSION-SAFE-COMMIT-AND-LITERAL-CONSUMER-GUARD-V1 에서 한 줄씩 참조만 추가했다)
 - 기존 stash 6건
+
+---
+
+## 6. Safe Commit 계약 (WO-O4O-CROSSSESSION-SAFE-COMMIT-AND-LITERAL-CONSUMER-GUARD-V1)
+
+§3 규칙 4 는 **stage** 만 좁혔다. 실제 사고(`431526533`)는 stage 가 아니라 **commit** 에서 났다.
+`git add <내 파일>` 을 지켰어도, index 에 다른 세션이 올려둔 삭제 5건이 남아 있는 상태에서
+pathspec 없는 `git commit` 을 실행하면 **index 전체가 커밋된다.**
+
+> **핵심 계약: foreign staged 파일이 존재하는 상태에서 pathspec 없는 `git commit` 실행 금지.**
+> `git add .` 만 금지하는 것으로는 이 사고를 막지 못한다.
+
+### 6-1. 작업 시작 시 (소유권 기준선)
+
+```bash
+git status --short          # 이미 있는 변경 = 내 것이 아니다
+git branch --show-current
+git rev-parse HEAD          # 완료 후 delta 비교의 기준선
+```
+
+기존 변경을 **내 변경으로 간주하지 않는다.** 시작 시점의 목록이 소유권 판정 기준이다.
+
+### 6-2. 커밋 직전 (필수)
+
+```bash
+git diff --cached --name-only
+node scripts/git/check-staged-scope.mjs <내 작업 경로...>
+```
+
+가드는 **읽기 전용**이다. index · worktree · stash 를 건드리지 않는다.
+차집합이 0 이 아니면 exit 1 이며, 그 상태에서 일반 커밋은 금지다.
+
+### 6-3. 커밋 표준형
+
+```bash
+git add -- <내 파일...>
+git commit -m "..." -- <내 파일...>     # pathspec 을 반드시 붙인다
+```
+
+pathspec 을 붙인 커밋은 index 상태와 무관하게 지정한 경로만 커밋한다.
+
+### 6-4. 커밋 직후 범위 검증
+
+```bash
+git show --stat --oneline HEAD
+git diff --name-status <6-1 의 기준 HEAD>..HEAD
+```
+
+확인 항목: 내 작업 외 파일 0 / foreign deletion 0 / 예상 밖 수정 0.
+병렬 세션의 커밋이 그 사이에 들어왔다면 기준선 delta 에는 남의 커밋도 섞이므로,
+**해당 커밋 자체의 tree delta(`git show --stat`)** 를 함께 본다.
+
+### 6-5. 사고 발생 시 (forward-only)
+
+이미 잘못 커밋·push 했다면 **되돌리는 방향이 아니라 앞으로 고친다.**
+
+1. `git checkout <직전 정상 SHA> -- <잘못 삭제/변경된 경로...>`
+2. `git commit -m "revert(...): ..." -- <그 경로...>`
+3. push
+
+금지: dirty 공유 worktree 에서 무작정 `pull`/`rebase` · foreign staged WIP 가 있는 상태의
+`reset --hard` · 남의 WIP 를 `stash` 로 옮기기 · `--force` push · 공유 main 에서 `amend`.
+`commit-tree` 같은 plumbing 을 썼다면 보고에 명시한다(일반 기본 절차로 만들지 않는다).
+
+### 6-6. push 거절 시 우선순위
+
+```text
+1) git fetch origin  → 무엇이 들어왔는지 확인 (log/diff)
+2) 내 커밋이 이미 ancestor 인지 확인 (git merge-base --is-ancestor)
+3) 작업트리가 clean 이면 pull --ff-only 또는 rebase
+4) dirty 면 pull 하지 않고, 내 커밋만 pathspec 으로 재정리
+5) 그래도 막히면 중지하고 보고 — force push 는 선택지가 아니다
+```
+
+---
+
+## 7. CI 실패 귀속 (concurrency)
+
+GitHub Actions concurrency 는 앞선 커밋의 run 을 취소한다. 따라서
+**실패를 처음 "관측한" SHA 와 실패를 "도입한" SHA 는 다를 수 있다.**
+
+판정 라벨: `CURRENT_COMMIT_CAUSED` / `EARLIER_COMMIT_SURFACED_LATE` / `PREEXISTING` /
+`UNRELATED_PARALLEL_CHANGE` / `UNKNOWN`.
+
+> "다른 세션 문제 같다" 는 추정은 허용하지 않는다. 다음 중 하나로 증명한다.
+> - 해당 커밋 이전 SHA 에서 같은 테스트를 실행해 결과 비교
+> - 취소된(cancelled) run 목록을 확인해 최초 도입 지점을 특정
+> - 실패 파일이 내 변경 경로와 무관함을 diff 로 제시

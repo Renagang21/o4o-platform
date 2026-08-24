@@ -106,6 +106,62 @@ filtering 정책 문제**였다 (§8 Case Study). 같은 클래스의 문제는 
 
 ---
 
+---
+
+## 3-A. 리터럴 소비처 인구조사 (WO-O4O-CROSSSESSION-SAFE-COMMIT-AND-LITERAL-CONSUMER-GUARD-V1)
+
+§3 은 **import 경로**를 전수 검색하라고만 했다. 실제 사고(`a0f8cc48c`)는 import 가 아니라
+**문자열 리터럴 소비처**에서 났다. 계약을 제거해도 runtime import graph 에는 아무 흔적이 없고,
+소스를 `readFileSync` 해서 문자열을 단언하는 테스트만 조용히 red 가 됐다.
+
+> **하나의 grep 결과만으로 "소비처 0" 을 선언하지 않는다.**
+
+### 3-A-1. 4개 축을 모두 본다
+
+| 축 | 예 |
+|----|-----|
+| symbol · identifier | `GlobalHeaderNavItem` · `PH_PUBLIC_NAV` |
+| endpoint · path 리터럴 | `/api/v1/forum/category-requests` |
+| 사용자 노출 href · route 리터럴 | `href: '/forum/request'` · `path="/forum/request"` |
+| raw-source assertion | 소스를 읽어 문자열을 단언하는 spec |
+
+### 3-A-2. raw-source 소비처 탐지
+
+다음 표지가 있는 테스트는 **runtime import graph 에 나타나지 않는다.**
+
+```text
+readFileSync · readFile( · fs.readFile · toContain( · includes( · match( · 정규식 · snapshot · sourceText
+```
+
+**결정적 규칙: 값 리터럴만 검색하면 놓친다.**
+raw-source spec 은 대개 `read(`${PH_WEB}/config/navigation.ts`)` 처럼 대상을 **파일 경로**로 잡고,
+단언 값은 `` `href: '${route}'` `` 처럼 template literal 로 조립한다.
+그래서 **수정 대상 파일의 경로 문자열 자체를 반드시 함께 검색**해야 한다.
+
+```bash
+node scripts/quality/check-literal-consumers.mjs --source <수정 대상 파일 경로>
+node scripts/quality/check-literal-consumers.mjs "href: '/forum/request'" "/forum/request"
+```
+
+### 3-A-3. route · href 제거 시 최소 검색 집합
+
+```text
+[ ] 정확한 route 리터럴        [ ] 상위 경로
+[ ] 컴포넌트 / 페이지 이름      [ ] API endpoint
+[ ] href 리터럴                [ ] navigation label
+[ ] capability 이름            [ ] 수정 대상 파일 경로 (3-A-2)
+```
+
+### 3-A-4. 소비처 분류
+
+`ACTIVE_RUNTIME` / `ACTIVE_UI` / `ACTIVE_TEST_CONTRACT` / `RAW_SOURCE_CONTRACT` /
+`HISTORICAL_DOC` / `COMMENT_ONLY` / `DEAD_REFERENCE` / `UNKNOWN`
+
+**`ACTIVE_TEST_CONTRACT` 와 `RAW_SOURCE_CONTRACT` 는 실제 소비처로 센다.**
+이 둘이 남아 있으면 "소비처 0" 이 아니다 — 계약을 함께 갱신하거나, 왜 갱신하지 않는지 CHECK 에 남긴다.
+
+---
+
 ## 4. 수정 중 원칙
 
 ```text

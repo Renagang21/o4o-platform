@@ -138,6 +138,11 @@
 > [`docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) 가 정본이다.**
 > path-specific stage 강제, `git add .` 금지, 다른 세션 미추적 파일 불가침,
 > pre-commit lockfile 검증 계약, 완료 조건(`HEAD == origin/main`)이 모두 그 문서에 있다.
+>
+> **Safe Commit 계약(같은 문서 §6)**: foreign staged 파일이 index 에 있는 상태에서
+> **pathspec 없는 `git commit` 실행 금지**. `git add .` 금지만으로는 막지 못한다.
+> 커밋 직전 `node scripts/git/check-staged-scope.mjs <내 작업 경로...>` 로 확인하고,
+> `git commit -m "..." -- <내 파일...>` 형태로 커밋한다.
 
 ### App 계층 (절대 규칙)
 
@@ -165,6 +170,11 @@ Core → Extension → Feature → Service
 - KPA-only / GlycoPharm-only / K-Cosmetics-only / Neture-only 임시 예외로 해결하지 말고, **공통 정책 문제인지 먼저 판단**한다.
 - route, role, capability, visibility, feature flag, extension contract 필터를 함께 검증한다 (빈 그룹/빈 block 제거로 화면에서 사라질 가능성 포함).
 - DB backfill / migration / capability 주입으로 UI 정책 문제를 임시 해결하지 않는다. route 없는 메뉴는 노출하지 않고, route 있는 실기능 메뉴는 숨기지 않는다 (데드링크 0 / 기능 은폐 0).
+
+공통 계약(타입·nav 항목·route·href)을 제거할 때는 **식별자 검색만으로 소비처 0 을 선언하지 않는다.**
+소스를 `readFileSync` 해서 문자열을 단언하는 raw-source spec 은 import graph 에 나타나지 않으므로
+`node scripts/quality/check-literal-consumers.mjs --source <수정 대상 파일>` 로 함께 조사한다
+(프로토콜 §3-A).
 
 > 📄 세부 절차: `docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md`
 

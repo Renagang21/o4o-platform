@@ -55,6 +55,8 @@
 
 - 작업 전 `git status --short` · `git branch --show-current` · `git fetch origin` · `git status -sb`
 - **path-specific stage 만 사용.** `git add .` · `git add -A` · `git commit -am` 금지
+- **커밋도 pathspec 을 붙인다.** foreign staged 파일이 있으면 pathspec 없는 `git commit` 금지
+  (커밋 직전 `node scripts/git/check-staged-scope.mjs <내 작업 경로...>` → `git commit -m "..." -- <내 파일...>`)
 - 다른 세션의 수정·미추적 파일은 **불가침** (판단·커밋·정리 대상 아님)
 - 범위 밖 파일을 `restore` / `reset` / `stash` 하지 않는다
 - `--force` push 금지
