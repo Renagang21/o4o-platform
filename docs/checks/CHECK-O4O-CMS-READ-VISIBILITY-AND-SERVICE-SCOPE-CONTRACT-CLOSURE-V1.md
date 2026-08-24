@@ -5,6 +5,7 @@
 **작성일**: 2026-08-21
 **결과**: **§9 `platform + serviceKey` 의미 확정** + **§11-1 read 경계 구현 완료** (2026-08-24 재개)
 **구현 재개 commit 기준**: `21ed6d88d` (origin/main)
+**구현/배포 commit**: `1a5babf96` (경계 강제) · `6cf2d935c` (alias SSOT 수렴) — Cloud Run revision `o4o-core-api-03452-hdz`
 
 ---
 
@@ -247,6 +248,31 @@ KPA alias                   — serviceKey IN ('kpa-society','kpa')
 
 ---
 
+## 9-2. alias SSOT 수렴 (WO §9·§10 — `6cf2d935c`)
+
+1차 구현에서 CMS 로컬에 `CMS_SERVICE_KEY_ALIASES = { 'kpa-society': [...], 'kpa': [...] }` 를 선언했는데,
+이는 WO §9 가 금지한 **CMS 전용 mapping 신설**이다 (SSOT 2벌). 다음과 같이 플랫폼 canonical SSOT 파생으로 교체했다.
+
+```ts
+// cms-content-utils.ts — @o4o/security-core 의 양방향 resolver 합성
+export function resolveCmsServiceKeys(serviceKey: string): string[] {
+  const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(serviceKey);
+  const canonical  = resolveCanonicalServiceKey(rolePrefix);
+  return canonical === rolePrefix ? [canonical] : [canonical, rolePrefix];
+}
+```
+
+| 입력 | 결과 |
+|---|---|
+| `kpa` · `kpa-society` | `['kpa-society', 'kpa']` |
+| `cosmetics` · `k-cosmetics` | `['k-cosmetics', 'cosmetics']` (§10 이 추가 코드 없이 성립) |
+| `neture` · `glycopharm` · `pharmacy-hub` | 자기 자신 1개 (self-map) |
+
+`cms-content-slot.handler.ts` 의 로컬 alias 값(`SCOPE_TO_CMS_KEYS`)도 같은 helper 파생으로 바꿔
+**read 경계와 slot manage 범위가 한 벌의 파생**을 쓰게 했다.
+
+---
+
 ## 10. 검증 (1차)
 
 | 항목 | 결과 |
@@ -262,13 +288,69 @@ KPA alias                   — serviceKey IN ('kpa-society','kpa')
 
 | 항목 | 결과 |
 |---|---|
-| `cms-content-detail-service-scope.spec.ts` | **20/20 PASS** (12 → 20 확장: 400 계약 · 역할 기반 cross-service · KPA alias · list/stats 경계) |
+| `cms-content-detail-service-scope.spec.ts` | **28/28 PASS** (12 → 20 → 28: 400 계약 · 역할 기반 cross-service · KPA/KCos alias · platform visibility · list/stats 경계) |
 | `cms-content-slot-service-scope.spec.ts` (신규) | **4/4 PASS** |
 | `pharmacy-hub-content-resource-adoption.spec.ts` | **18/18 PASS** — 정적 가드가 옛 리터럴(`where.serviceKey = serviceKey as string`)을 검사하고 있어 새 계약 문자열로 교정 |
 | 인접 회귀 (`kpa-content-resource-core-adoption` · `content-resource-core-table-isolation` · `community-content-resource-frontend-view-commonization` · `pharmacy-hub-community-capability-adoption`) | **PASS** |
 | `tsc --noEmit` — api-server · admin-dashboard · web-glycopharm | **PASS** |
 | production DB write | **0** |
-| production API matrix (WO §22) · browser smoke (WO §23) | **미수행** — 배포 후 수행 대상 (아래 §11 잔여) |
+| production API matrix (WO §16) · browser smoke (WO §17) | **완료** — 아래 §10-2 |
+
+---
+
+## 10-2. 전체 회귀 · 배포 · production 실측 (2026-08-24, WO §16·§17·§18)
+
+### 전체 회귀 (이 PC 실행, 완화·skip 0)
+
+| 항목 | 결과 |
+|---|---|
+| api-server `tsc --noEmit` | **PASS** |
+| api-server **전체 Jest** (`--runInBand`, `--max-old-space-size=3072`) | **182 suites / 2980 tests PASS** (exit 0) |
+| admin-dashboard production build | **PASS** |
+| web-glycopharm production build | **PASS** |
+| 선행 실패(타 세션 귀속) | **0건** — CMS 관련 실패를 선행 실패로 귀속시킨 항목 없음 (WO §19) |
+
+### 배포
+
+`Deploy API Server (Cloud Run)` @ `6cf2d935c` — success → revision `o4o-core-api-03452-hdz` (2026-08-24 06:01 UTC).
+
+### production read-only drift (WO §2, write 0)
+
+`cms_contents` 총 **127**건 · `serviceKey IS NULL` **0** · `visibilityScope='organization'` **0**.
+§3 census 대비 차이는 `pharmacy-hub | service | archived` **1건 증가**뿐(총 126→127)이며 정책 판정에 영향 없다.
+PH 의 `published` 자료는 여전히 0건이므로 자료실 목록 0건은 정상 상태다.
+
+### cross-service read matrix (`https://api.neture.co.kr/api/v1/cms`, 익명, DB write 0)
+
+| 요청 | 기대 | 실측 |
+|---|---|---|
+| `GET /contents` (serviceKey 생략) | 차단 | **400 `SERVICE_KEY_REQUIRED`** — 과거처럼 전체 CMS 를 반환하지 않음 |
+| `GET /contents?serviceKey=pharmacy-hub&status=published` | 자기 서비스만 | **200 / 0건** (DB 실제 0건) |
+| `GET /contents?serviceKey=kpa-society` | 자기 서비스만 | **200 / kpa-society row** |
+| `GET /contents/{KPA uuid}?serviceKey=pharmacy-hub` | 차단 | **404 `NOT_FOUND`** |
+| `GET /contents/{GP uuid}?serviceKey=pharmacy-hub` | 차단 | **404** |
+| `GET /contents/{KPA uuid}?serviceKey=kpa-society` | 허용 | **200** |
+| `GET /contents/{legacy `kpa` uuid}?serviceKey=kpa-society` | alias 허용 | **200** |
+| `GET /contents/{kpa-society uuid}?serviceKey=kpa` | 역방향 alias 허용 | **200** |
+| `GET /contents/{GP uuid}?serviceKey=kpa-society` | 차단 | **404** |
+| `GET /contents/{GP uuid}?serviceKey=glycopharm` | 허용 | **200** |
+| `GET /contents/{uuid}` (serviceKey 생략, 익명) | 차단 | **400** |
+| `GET /contents/not-a-uuid?serviceKey=kpa-society` | canonical not-found | **404 `NOT_FOUND`** (500·Postgres 텍스트 노출 없음) |
+| `GET /stats` (생략) / `?serviceKey=kpa` | 차단 / 허용 | **400** / **200**, `scope.serviceKeys = ["kpa-society","kpa"]` |
+| `GET /slots/home-hero` (생략) / `?serviceKey=kpa-society` | 차단 / 허용 | **400** / **200**, `meta.serviceKeys = ["kpa-society","kpa"]`, `crossService=false` |
+| admin-dashboard(platform:super_admin) `GET /cms/contents` (생략) | cross-service 유지 | **200** — 역할 근거로 허용 |
+
+### 실브라우저 smoke (Playwright chromium, 프로덕션)
+
+| 화면 | 결과 |
+|---|---|
+| PH `/resources` Desktop 1440 | 정상 렌더 · `GET /cms/contents?serviceKey=pharmacy-hub&type=knowledge&status=published` **200** · "총 0개의 자료" (DB 0건과 일치) · console error 0 · pageerror 0 |
+| PH `/resources` Mobile 390 | 정상 렌더 · 동일 요청 200 · console error 0 |
+| K-Cosmetics `https://k-cosmetics.site/` | 정상 렌더 · `GET /cms/contents?serviceKey=cosmetics&type=notice&status=published` **200** · error 0 |
+| admin-dashboard `/admin/cms/contents` · `/admin/cms/slots` | 정상 렌더 · serviceKey 생략 요청 **200** (cross-service 목록 유지, glycopharm row 표시) · error 0 |
+| admin-dashboard 편집 진입(상세 hydrate) | `GET /cms/contents/857ac192-…?serviceKey=glycopharm` **200** — §8 대로 상세에 `content.serviceKey` 동행. 에러 토스트·console error 0 |
+
+백화면 0 · JS 예외 0 · 신규 500 0 · 자기 서비스 콘텐츠 유실 0 · cross-service 노출 0.
 
 ---
 
@@ -356,3 +438,5 @@ fresh worktree 를 요구했으나 **주 작업트리에서 수행**했다 — �
 
 **2026-08-24 재개분**: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건 (§11-2 부채 4종 잔존).
 §11-1 은 별도 WO 없이 **같은 WO 로 구현 완료**했다.
+
+**2026-08-24 최종(배포·실측분)**: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건.
