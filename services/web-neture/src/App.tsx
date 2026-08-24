@@ -314,9 +314,6 @@ const AiEnginesPage = lazy(() =>
 const AiPolicyPage = lazy(() =>
   import('./pages/admin/ai').then((m) => ({ default: m.AiPolicyPage }))
 );
-const AssetQualityPage = lazy(() =>
-  import('./pages/admin/ai').then((m) => ({ default: m.AssetQualityPage }))
-);
 const AiCostPage = lazy(() =>
   import('./pages/admin/ai').then((m) => ({ default: m.AiCostPage }))
 );
@@ -1072,7 +1069,9 @@ function App() {
               <Route path="/admin/users/:id" element={<UserDetailPage />} />
               <Route path="/admin/stores" element={<StoreManagementPage />} />
               <Route path="/admin/orders" element={<OrdersManagementPage />} />
-              <Route path="/admin/ai-report" element={<OperatorAiReportPage />} />
+              {/* WO-O4O-NETURE-OPERATOR-AI-GUARD-AND-MENU-VISIBILITY-FINAL-CLOSURE-V1 §2:
+                  admin sidebar 에 진입점이 없던 중복 alias → canonical /operator/ai-report 로 redirect. */}
+              <Route path="/admin/ai-report" element={<Navigate to="/operator/ai-report" replace />} />
               <Route path="/admin/settings/notifications" element={<EmailNotificationSettingsPage />} />
               {/* WO-O4O-NETURE-ADMIN-OPERATOR-URL-SEPARATION-V1: 가입 승인은 operator 업무 → /operator/applications */}
               <Route path="/admin/applications" element={<Navigate to="/operator/applications" replace />} />
@@ -1086,7 +1085,6 @@ function App() {
               <Route path="/admin/recruiting-products" element={<RecruitingProductsOverviewPage />} />
               <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/admin/ai-operations" element={<AiOperationsPage />} />
-              <Route path="/admin/ai/asset-quality" element={<AssetQualityPage />} />
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /admin/signage/* 제거 (Neture signage 미대상) */}
               <Route path="/admin/homepage-cms" element={<HomepageCmsPage />} />
               <Route path="/admin/analytics" element={<OperatorAnalyticsPage />} />
@@ -1202,9 +1200,13 @@ function App() {
               <Route path="/operator/all-products" element={<Navigate to="/operator/all-registered-products" replace />} />
               <Route path="/operator/all-registered-products" element={<AllRegisteredProductsPage />} />
               <Route path="/operator/recruiting-products" element={<RecruitingProductsOverviewPage />} />
-              <Route path="/operator/ai-card-report" element={<AiCardReportPage />} />
-              <Route path="/operator/ai-operations" element={<AiOperationsPage />} />
-              <Route path="/operator/ai/asset-quality" element={<AssetQualityPage />} />
+              {/* WO-O4O-NETURE-OPERATOR-AI-GUARD-AND-MENU-VISIBILITY-FINAL-CLOSURE-V1 §3-B:
+                  두 화면의 API(/api/ai/card-report, /api/ai/operations)는 requireAdmin
+                  (= platform:super_admin) 이라 operator 축 route 는 진입점 없는 중복 alias 였다.
+                  canonical /admin/* 로 redirect (권한 확대 없음 — AdminRoute 가 그대로 판정). */}
+              <Route path="/operator/ai-card-report" element={<Navigate to="/admin/ai-card-report" replace />} />
+              <Route path="/operator/ai-operations" element={<Navigate to="/admin/ai-operations" replace />} />
+              {/* /operator/ai/asset-quality 은퇴 — backend 계약 없이 mock 상수만 렌더하던 화면. */}
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /operator/signage/* 제거 (Neture signage 미대상) */}
               <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
               {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}

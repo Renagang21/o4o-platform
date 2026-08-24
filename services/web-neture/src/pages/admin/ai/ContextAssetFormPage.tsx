@@ -203,7 +203,7 @@ export default function ContextAssetFormPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
               <Link
-                to="/operator/ai-admin/context-assets"
+                to="/admin/ai-admin/context-assets"
                 className="flex items-center gap-2 text-gray-500 hover:text-gray-700"
               >
                 <ArrowLeft className="w-5 h-5" />

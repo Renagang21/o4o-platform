@@ -243,43 +243,37 @@ export default function AnswerCompositionRulesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex gap-6">
             <Link
-              to="/operator/ai-admin"
+              to="/admin/ai-admin"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               대시보드
             </Link>
             <Link
-              to="/operator/ai-admin/engines"
+              to="/admin/ai-admin/engines"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               엔진 설정
             </Link>
             <Link
-              to="/operator/ai-admin/policy"
+              to="/admin/ai-admin/policy"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               사용 기준 설정
             </Link>
             <Link
-              to="/operator/ai-admin/asset-quality"
-              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
-            >
-              품질 관리
-            </Link>
-            <Link
-              to="/operator/ai-admin/cost"
+              to="/admin/ai-admin/cost"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               비용 현황
             </Link>
             <Link
-              to="/operator/ai-admin/context-assets"
+              to="/admin/ai-admin/context-assets"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               Context Asset
             </Link>
             <Link
-              to="/operator/ai-admin/composition-rules"
+              to="/admin/ai-admin/composition-rules"
               className="py-4 px-1 border-b-2 border-primary-600 text-primary-600 font-medium text-sm"
             >
               응답 규칙
@@ -650,12 +644,9 @@ export default function AnswerCompositionRulesPage() {
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
               <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-blue-800">
-                <strong>품질 루프 연결</strong>: 위반 조건이 탐지되면{' '}
-                <Link to="/operator/ai-admin/asset-quality" className="underline">
-                  품질 관리 페이지
-                </Link>
-                에서 개선 요청으로 등록됩니다. 서비스 운영자와 관리자가 협력하여 규칙 준수 상태를
-                유지합니다.
+                {/* WO-O4O-NETURE-OPERATOR-AI-GUARD-AND-MENU-VISIBILITY-FINAL-CLOSURE-V1:
+                    품질 관리 화면은 backend 계약 없이 mock 만 렌더해 은퇴했다 → dead link 제거. */}
+                <strong>품질 루프 연결</strong>: 위반 조건이 탐지되면 개선 요청 대상으로 기록됩니다.
               </div>
             </div>
           </div>

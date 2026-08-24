@@ -96,20 +96,17 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '삭제된 포럼', path: '/admin/forum-deleted', adminOnly: true },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
+  // WO-O4O-NETURE-OPERATOR-AI-GUARD-AND-MENU-VISIBILITY-FINAL-CLOSURE-V1 §3:
+  //   operator sidebar 는 OperatorLayoutWrapper 가 filterMenuByRole(UNIFIED_MENU, false) 로
+  //   렌더하므로 여기의 adminOnly 항목은 **어디에도 렌더되지 않는 dead config** 였다
+  //   (admin sidebar 는 getAdminMenu() 가 별도 소유). AI 관리/카드 규칙/비즈팩 admin 항목은
+  //   getAdminMenu() 로 일원화하고 여기서는 제거한다.
+  //   'Asset Quality'(/operator/ai/asset-quality) 는 backend 계약 없이 mock 상수만 렌더하는
+  //   화면이라 운영자에게 허위 품질 지표를 보였다 → 메뉴·route 동시 은퇴.
   analytics: [
     { label: 'AI 리포트', path: '/operator/ai-report' },
-    // WO-O4O-NETURE-OPERATOR-PRODUCTION-DEFECT-CLOSURE-V1 (A안 동일 계열):
-    // 두 화면의 데이터 API(/api/ai/card-report, /api/ai/operations)는 requireAdmin
-    // (= platform:super_admin 전용) 이라 neture:operator 로는 403 이고, 화면은 0 값으로만 렌더된다.
-    // 플랫폼 공통 AI 운영 계약이므로 guard 는 유지하고 admin 메뉴로만 노출한다.
-    { label: 'AI 카드 리포트', path: '/operator/ai-card-report', adminOnly: true },
-    { label: 'AI 운영', path: '/operator/ai-operations', adminOnly: true },
-    { label: 'Asset Quality', path: '/operator/ai/asset-quality' },
     { label: '운영 분석', path: '/operator/analytics' },
     // WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: '공급자 품질'(/operator/supplier-quality) 은퇴 — CSV batch 품질 전용, 데이터 0
-    { label: 'AI 관리', path: '/admin/ai-admin', adminOnly: true },
-    { label: 'AI 카드 규칙', path: '/admin/ai-card-rules', adminOnly: true },
-    { label: 'AI 비즈팩', path: '/admin/ai-business-pack', adminOnly: true },
   ],
   system: [
     // WO-O4O-NETURE-OPERATOR-PRODUCTION-DEFECT-CLOSURE-V1 (A안):
@@ -141,7 +138,16 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
  *   admin 계정이 operator 영역으로 진입하려면 /operator 로 이동 (AdminRoute 가 operator 업무를
  *   별도 접근 차단하지 않음).
  */
-export function getAdminMenu(): Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> {
+/**
+ * WO-O4O-NETURE-OPERATOR-AI-GUARD-AND-MENU-VISIBILITY-FINAL-CLOSURE-V1 §3-B:
+ *   AI 관리(/admin/ai-admin)·AI 카드 리포트·AI 운영의 backend(`/api/ai/**`)는 requireAdmin
+ *   = `platform:super_admin` 전용이다. `neture:admin` 에게 메뉴를 보여주면 클릭 시 403 이
+ *   빈 화면으로 위장된다 → 권한을 넓히지 않고 **메뉴 진입점을 실제 권한에 맞게 제한**한다.
+ *   isPlatformAdmin=true 일 때만 플랫폼 AI 항목을 노출한다.
+ */
+export function getAdminMenu(
+  isPlatformAdmin = false,
+): Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> {
   return {
     dashboard: [
       { label: '관리자 대시보드', path: '/admin', exact: true },
@@ -180,9 +186,17 @@ export function getAdminMenu(): Partial<Record<OperatorGroupKey, OperatorMenuIte
       { label: '삭제된 포럼', path: '/admin/forum-deleted' },
     ],
     analytics: [
-      { label: 'AI 관리', path: '/admin/ai-admin' },
+      // 정적 안내 화면 (API 호출 없음) — neture:admin 도 정상 열람 가능.
       { label: 'AI 카드 규칙', path: '/admin/ai-card-rules' },
       { label: 'AI 비즈팩', path: '/admin/ai-business-pack' },
+      // 플랫폼 전용 (requireAdmin = platform:super_admin).
+      ...(isPlatformAdmin
+        ? [
+            { label: 'AI 관리', path: '/admin/ai-admin' },
+            { label: 'AI 카드 리포트', path: '/admin/ai-card-report' },
+            { label: 'AI 운영', path: '/admin/ai-operations' },
+          ]
+        : []),
     ],
     system: [
       // ── Neture 서비스 관리 (Neture 자체 서비스 설정) ──
