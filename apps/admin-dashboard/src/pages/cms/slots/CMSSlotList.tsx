@@ -32,15 +32,10 @@ import cmsAPI, { CmsContentSlot } from '@/lib/cms';
 import toast from 'react-hot-toast';
 import SlotFormModal from './SlotFormModal';
 import SlotContentAssignment from './SlotContentAssignment';
+import { cmsServiceOptionsWithAll } from '../cmsServiceCatalog';
 
 // Available services
-const SERVICES = [
-  { value: '', label: 'All Services' },
-  { value: 'glycopharm', label: 'Glycopharm' },
-  { value: 'kpa', label: 'KPA Society' },
-  { value: 'neture', label: 'Neture' },
-  { value: 'k-cosmetics', label: 'K-Cosmetics' },
-];
+const SERVICES = cmsServiceOptionsWithAll('All Services');
 
 // Common slot keys for quick creation
 const COMMON_SLOT_KEYS = [

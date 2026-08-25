@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { X, Search } from 'lucide-react';
 import cmsAPI, { CmsContentSlot, CmsContent } from '@/lib/cms';
 import toast from 'react-hot-toast';
+import { cmsServiceOptionsWithAll } from '../cmsServiceCatalog';
 
 interface SlotFormModalProps {
   slot: CmsContentSlot | null;
@@ -16,13 +17,7 @@ interface SlotFormModalProps {
 }
 
 // Available services
-const SERVICES = [
-  { value: '', label: 'Global (No Service)' },
-  { value: 'glycopharm', label: 'Glycopharm' },
-  { value: 'kpa', label: 'KPA Society' },
-  { value: 'neture', label: 'Neture' },
-  { value: 'k-cosmetics', label: 'K-Cosmetics' },
-];
+const SERVICES = cmsServiceOptionsWithAll('Global (No Service)');
 
 // Common slot keys
 const COMMON_SLOT_KEYS = [

@@ -31,15 +31,10 @@ import channelAPI, { Channel, ChannelType, ChannelStatus } from '@/lib/channels'
 import toast from 'react-hot-toast';
 import ChannelFormModal from './ChannelFormModal';
 import ChannelContentsPreview from './ChannelContentsPreview';
+import { cmsServiceOptionsWithAll } from '../cmsServiceCatalog';
 
 // Available services
-const SERVICES = [
-  { value: '', label: 'All Services' },
-  { value: 'glycopharm', label: 'Glycopharm' },
-  { value: 'kpa', label: 'KPA Society' },
-  { value: 'neture', label: 'Neture' },
-  { value: 'k-cosmetics', label: 'K-Cosmetics' },
-];
+const SERVICES = cmsServiceOptionsWithAll('All Services');
 
 // Channel types
 const CHANNEL_TYPES: { value: ChannelType | ''; label: string; icon: React.ElementType }[] = [

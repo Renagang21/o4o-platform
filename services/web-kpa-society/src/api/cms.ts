@@ -4,6 +4,16 @@
  * WO-P2-IMPLEMENT-CONTENT: API endpoints for CMS content
  */
 
+/**
+ * WO-O4O-CMS-SERVICEKEY-ALIAS-SSOT-RESIDUAL-CLOSURE-V1
+ *
+ * KPA 의 CMS 원장 canonical key. 이전에는 각 호출이 role prefix('kpa')를 기본값으로
+ * 보냈다 — 서버가 alias 집합으로 확장하므로 결과는 같았지만 축이 섞여 있었다.
+ * 값을 canonical 로 맞추고 한 곳에서만 선언한다. legacy `serviceKey='kpa'` row 는
+ * 서버 read 경계가 alias 집합으로 함께 조회하므로 계속 노출된다.
+ */
+const KPA_CMS_SERVICE_KEY = 'kpa-society';
+
 // CMS API uses /api/v1/cms namespace
 const CMS_API_BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/cms`
@@ -122,7 +132,7 @@ export const cmsApi = {
     }
   ): Promise<SlotsResponse> => {
     return fetchFromCms<SlotsResponse>(`/slots/${slotKey}`, {
-      serviceKey: options?.serviceKey || 'kpa',
+      serviceKey: options?.serviceKey || KPA_CMS_SERVICE_KEY,
       organizationId: options?.organizationId || '',
       activeOnly: options?.activeOnly !== false ? 'true' : 'false',
     });
@@ -142,7 +152,7 @@ export const cmsApi = {
     offset?: number;
   }): Promise<ContentsResponse> => {
     return fetchFromCms<ContentsResponse>('/contents', {
-      serviceKey: options?.serviceKey || 'kpa',
+      serviceKey: options?.serviceKey || KPA_CMS_SERVICE_KEY,
       organizationId: options?.organizationId || '',
       type: options?.type || '',
       status: options?.status || '',
@@ -161,7 +171,7 @@ export const cmsApi = {
     organizationId?: string;
   }): Promise<StatsResponse> => {
     return fetchFromCms<StatsResponse>('/stats', {
-      serviceKey: options?.serviceKey || 'kpa',
+      serviceKey: options?.serviceKey || KPA_CMS_SERVICE_KEY,
       organizationId: options?.organizationId || '',
     });
   },

@@ -183,3 +183,30 @@ A docs/checks/CHECK-O4O-CMS-KPA-MUTATION-SERVICEKEY-CANONICALIZATION-V1.md
 
 WO §20 변경 금지 목록 전부 미접촉. §21 중지 조건 해당 없음
 (security-core resolver 만으로 두 축 사상이 완결되므로 첫 번째 중지 조건 비해당).
+
+---
+
+## Addendum — production smoke 재시도 결과 (2026-08-25)
+
+후속 WO(`WO-O4O-CMS-SERVICEKEY-ALIAS-SSOT-RESIDUAL-CLOSURE-V1` §3)에서 §13 미수행 항목을
+다시 시도했다. 결과: **BLOCKED_ENV — 수행 불가**. 다만 사유가 이전 기록보다 정확해졌다.
+
+배포 실측:
+
+```
+Cloud Run  o4o-core-api  image tag = 4a692207f6c917153a0da5501aff1a40abd7dbdd
+git log -1 4a692207f  → fix(rbac): cross-service 권한 판정을 membership+role 계약으로 최종 정합
+git merge-base --is-ancestor 0795c6922 4a692207f  → NOT_DEPLOYED
+```
+
+즉 **production 은 이번 수정(`0795c6922`)이 포함되지 않은 리비전을 돌리고 있다.**
+따라서 "KPA operator 가 자기 kpa-society content 를 수정해 403 이 해소된다" 는
+자격증명 유무와 무관하게 **현 시점 production 에서 관측 자체가 불가능**하다.
+(이전 기록의 "자격증명 접근 거부" 는 부차적 사유였고, 1차 사유는 미배포다.)
+
+수정 전 403 의 근거는 그대로 유효하다 — production role 실측에 `kpa-society:*` 역할이
+0건이므로 `${serviceKey}:operator` 조립은 어떤 사용자로도 통과할 수 없다.
+
+후속 조치: 이 브랜치가 main 에 반영·배포된 뒤 KPA operator 계정으로
+create/update/publish/archive 스모크를 수행해야 한다. 그때까지 이 항목은 열려 있다.
+production DB write 는 이 재시도에서도 0건이다.

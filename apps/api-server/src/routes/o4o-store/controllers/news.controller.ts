@@ -23,6 +23,7 @@ import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { ContentQueryService } from '../../../modules/content/index.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
+import { resolveCmsServiceKeys } from '../../cms-content/cms-content-utils.js';
 
 type AuthMiddleware = (...args: any[]) => any;
 type ScopeMiddlewareFn = (scope: string) => AuthMiddleware;
@@ -39,8 +40,11 @@ export function createNewsController(
 ): Router {
   const router = Router();
   const contentRepo = dataSource.getRepository('CmsContent');
+  // WO-O4O-CMS-SERVICEKEY-ALIAS-SSOT-RESIDUAL-CLOSURE-V1:
+  //   canonical key 하나만 넣으면 같은 서비스의 legacy alias row 가 조회에서 고립된다.
+  //   read 경계와 같은 alias 집합을 쓴다 (self-map 서비스는 결과가 동일하다).
   const contentService = new ContentQueryService(dataSource, {
-    serviceKeys: [serviceKey],
+    serviceKeys: resolveCmsServiceKeys(serviceKey),
     defaultTypes: ['notice', 'news'],
   });
 
