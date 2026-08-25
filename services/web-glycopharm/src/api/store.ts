@@ -1,14 +1,15 @@
 /**
- * Store API Client for GlycoPharm B2C Store
- * 회원 약국 몰 API 연동
+ * Store API Client — GlycoPharm 매장 공개 정보 (상품·카테고리·스토어프론트 구성)
+ *
+ * WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+ *   "B2C Store" 성격을 제거하고 **정보 제공 전용** 클라이언트로 축소했다.
+ *   소비자 장바구니·주문·결제는 O4O 범위가 아니다 (`O4O-STORE-COMMERCE-BOUNDARY-V1` §2 · §4).
  */
 
 import type {
   PharmacyStore,
   StoreProduct,
   StoreCategory,
-  CartItem,
-  StoreOrder,
   StoreApplication,
   StoreApiResponse,
   StorePaginatedResponse,
@@ -169,121 +170,14 @@ class StoreApiClient {
   }
 
   // ============================================================================
-  // Cart API (소비자용 - 인증 필요)
+  // WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1
+  //
+  //   소비자용 Cart API 5종 · 소비자용 Order API 4종 제거.
+  //   `O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1: 매장 경영자는 O4O로 소비자에게 판매하지 않는다.
+  //   또한 이 9개 메서드가 호출하던 `/glycopharm/stores/:slug/cart` ·
+  //   `/glycopharm/stores/:slug/orders*` 는 백엔드에 **라우트가 존재하지 않아** 404 였다 (DEAD).
+  //   매장의 구매/발주(B2B) 내역은 `api/pharmacy.ts` 의 `/glycopharm/checkout/orders*` 축이 담당한다.
   // ============================================================================
-
-  /**
-   * 장바구니 조회
-   */
-  async getCart(storeSlug: string): Promise<StoreApiResponse<CartItem[]>> {
-    return this.request(`/glycopharm/stores/${storeSlug}/cart`);
-  }
-
-  /**
-   * 장바구니 상품 추가
-   */
-  async addToCart(
-    storeSlug: string,
-    productId: string,
-    quantity: number
-  ): Promise<StoreApiResponse<CartItem>> {
-    return this.request(`/glycopharm/stores/${storeSlug}/cart`, {
-      method: 'POST',
-      body: JSON.stringify({ productId, quantity }),
-    });
-  }
-
-  /**
-   * 장바구니 상품 수량 변경
-   */
-  async updateCartItem(
-    storeSlug: string,
-    cartItemId: string,
-    quantity: number
-  ): Promise<StoreApiResponse<CartItem>> {
-    return this.request(`/glycopharm/stores/${storeSlug}/cart/${cartItemId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ quantity }),
-    });
-  }
-
-  /**
-   * 장바구니 상품 삭제
-   */
-  async removeFromCart(storeSlug: string, cartItemId: string): Promise<StoreApiResponse<void>> {
-    return this.request(`/glycopharm/stores/${storeSlug}/cart/${cartItemId}`, {
-      method: 'DELETE',
-    });
-  }
-
-  /**
-   * 장바구니 비우기
-   */
-  async clearCart(storeSlug: string): Promise<StoreApiResponse<void>> {
-    return this.request(`/glycopharm/stores/${storeSlug}/cart`, {
-      method: 'DELETE',
-    });
-  }
-
-  // ============================================================================
-  // Order API (소비자용 - 인증 필요)
-  // ============================================================================
-
-  /**
-   * 주문 생성
-   */
-  async createOrder(
-    storeSlug: string,
-    data: {
-      items: Array<{ productId: string; quantity: number }>;
-      shippingAddress: {
-        recipient: string;
-        phone: string;
-        zipCode: string;
-        address1: string;
-        address2?: string;
-        memo?: string;
-      };
-      paymentMethod: string;
-    }
-  ): Promise<StoreApiResponse<StoreOrder>> {
-    return this.request(`/glycopharm/stores/${storeSlug}/orders`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  /**
-   * 내 주문 목록
-   */
-  async getMyOrders(
-    storeSlug: string,
-    params?: { page?: number; pageSize?: number }
-  ): Promise<StoreApiResponse<StorePaginatedResponse<StoreOrder>>> {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.set('page', params.page.toString());
-    if (params?.pageSize) searchParams.set('pageSize', params.pageSize.toString());
-
-    const queryString = searchParams.toString();
-    return this.request(`/glycopharm/stores/${storeSlug}/orders/mine${queryString ? `?${queryString}` : ''}`);
-  }
-
-  /**
-   * 주문 상세 조회
-   */
-  async getOrderDetail(storeSlug: string, orderId: string): Promise<StoreApiResponse<StoreOrder>> {
-    return this.request(`/glycopharm/stores/${storeSlug}/orders/${orderId}`);
-  }
-
-  /**
-   * 주문 취소
-   */
-  async cancelOrder(storeSlug: string, orderId: string, reason?: string): Promise<StoreApiResponse<StoreOrder>> {
-    return this.request(`/glycopharm/stores/${storeSlug}/orders/${orderId}/cancel`, {
-      method: 'POST',
-      body: JSON.stringify({ reason }),
-    });
-  }
 
   // ============================================================================
   // Store Application API (약국용 - 인증 필요)

@@ -266,16 +266,21 @@ describe('refund/cancel 경로의 소스 계약 (raw-source)', () => {
     expect(src).not.toContain("'operator'");
   });
 
-  it('KPA 매장 주문 상태 변경(취소/환불)은 membership+role+매장 소유권을 함께 요구한다', () => {
+  // WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+  //   기존 'KPA 매장 주문 상태 변경(취소/환불)은 membership+role+매장 소유권을 함께 요구한다' 는
+  //   `/checkout/store-orders/:orderId/status` (sellerOrganizationId 축 = 매장이 판매자) 를 검증했다.
+  //   그 경로 자체가 은퇴했으므로, 검증 대상을 "판매자 축이 다시 살아나지 않는다" 로 바꾼다.
+  //   근거: `O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §2-2 · §3 · §7.
+  it('KPA checkout 컨트롤러에 매장=판매자(seller) 주문 축이 존재하지 않는다', () => {
     const src = readFileSync(join(SRC, 'routes/kpa/controllers/kpa-checkout.controller.ts'), 'utf-8');
-    expect(src).toContain("createRequireStoreOwner(dataSource, 'kpa')");
-    const i = src.indexOf("'/store-orders/:orderId/status'");
-    expect(i).toBeGreaterThan(-1);
-    expect(src.slice(i, i + 200)).toContain('requireStoreOwner');
-    // 주문 소유권 축: 매장 조직 + 서비스 키 (타 서비스 주문 fan-out 차단)
-    const body = src.slice(i, i + 3000);
-    expect(body).toContain('sellerOrganizationId: organizationId');
-    expect(body).toContain("['kpa-society', 'kpa'].includes(meta.serviceKey)");
+    expect(src).not.toMatch(/router\.(get|patch|post|put)\(\s*'\/store-orders/);
+    expect(src).not.toContain('sellerOrganizationId: organizationId');
+  });
+
+  it('KPA 소비자→매장 주문 생성 경로는 410 으로 은퇴했다', () => {
+    const src = readFileSync(join(SRC, 'routes/kpa/controllers/kpa-checkout.controller.ts'), 'utf-8');
+    expect(src).toContain("code: 'STORE_CONSUMER_ORDER_RETIRED'");
+    expect(src).toContain('res.status(410)');
   });
 
   it('플랫폼 주문 관리 API 는 platform:super_admin 만 허용한다', () => {

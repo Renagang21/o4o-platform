@@ -1,186 +1,31 @@
 /**
- * Checkout & Order API Client
+ * Checkout & Order API Client — **buyer(구매/발주) 축 전용**
  *
  * WO-STORE-B2B-ORDER-EXECUTION-FLOW-V1
+ * WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+ *   판매자(seller) 축 및 주문 생성 producer 제거.
  *
- * POST /checkout                  — 주문 생성 (B2B/B2C 공용)
- * GET  /checkout/store-orders     — 매장 주문 목록 (판매자 관점)
- * GET  /checkout/store-orders/kpi — 매장 주문 KPI
+ * GET  /checkout/orders             — 내 매장 구매/발주 목록 (buyerId)
+ * GET  /checkout/orders/:id         — 상세
+ * POST /checkout/orders/:id/cancel  — 결제 전 취소
  */
 
 import { apiClient } from './client';
 
-// ── Types ──
-
-export interface CreateOrderItem {
-  productId: string;
-  quantity: number;
-}
-
-export interface CreateOrderRequest {
-  organizationId: string;
-  items: CreateOrderItem[];
-  deliveryMethod?: 'pickup' | 'delivery';
-}
-
-export interface CreateOrderResponse {
-  orderId: string;
-  orderNumber: string;
-  orderType: string;
-  status: string;
-  paymentStatus: string;
-  subtotal: number;
-  shippingFee: number;
-  discount: number;
-  totalAmount: number;
-  items: Array<{
-    productId: string;
-    productName: string;
-    quantity: number;
-    unitPrice: number;
-    subtotal: number;
-  }>;
-  createdAt: string;
-}
-
-export interface StoreOrder {
-  id: string;
-  orderNumber: string;
-  status: string;
-  paymentStatus: string;
-  totalAmount: number;
-  subtotal: number;
-  shippingFee: number;
-  discount: number;
-  buyerId: string;
-  itemCount: number;
-  items: Array<{
-    productName: string;
-    quantity: number;
-    unitPrice: number;
-    subtotal: number;
-  }>;
-  metadata: {
-    channelType: string;
-    deliveryMethod: string;
-    organizationName: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface StoreOrderKpi {
-  total: number;
-  pending: number;
-  completed: number;
-  monthlyRevenue: number;
-}
-
-export interface StoreOrderDetail {
-  id: string;
-  orderNumber: string;
-  status: string;
-  paymentStatus: string;
-  totalAmount: number;
-  subtotal: number;
-  shippingFee: number;
-  discount: number;
-  buyerName: string;
-  buyerEmail: string;
-  items: Array<{
-    productId: string;
-    productName: string;
-    quantity: number;
-    unitPrice: number;
-    subtotal: number;
-  }>;
-  metadata: {
-    serviceKey: string;
-    channelType: string;
-    deliveryMethod: string;
-    organizationName: string;
-  };
-  shippingAddress: {
-    recipientName: string;
-    phone: string;
-    zipCode: string;
-    address1: string;
-    address2?: string;
-    memo?: string;
-  } | null;
-  payments: Array<{
-    id: string;
-    amount: number;
-    status: string;
-    method: string | null;
-    cardCompany: string | null;
-    approvedAt: string | null;
-    refundedAmount: number;
-    refundReason: string | null;
-    refundedAt: string | null;
-    createdAt: string;
-  }>;
-  logs: Array<{
-    id: string;
-    action: string;
-    previousStatus: string | null;
-    newStatus: string | null;
-    performedBy: string;
-    performerType: string;
-    message: string | null;
-    createdAt: string;
-  }>;
-  paidAt: string | null;
-  cancelledAt: string | null;
-  refundedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
 // ── API Functions ──
-
-export async function createOrder(
-  request: CreateOrderRequest,
-): Promise<{ success: boolean; data: CreateOrderResponse }> {
-  return apiClient.post('/checkout', request);
-}
-
-export async function getStoreOrders(params?: {
-  status?: string;
-  page?: number;
-  limit?: number;
-}): Promise<{
-  success: boolean;
-  data: StoreOrder[];
-  pagination: { page: number; limit: number; total: number; totalPages: number };
-}> {
-  return apiClient.get('/checkout/store-orders', params);
-}
-
-export async function getStoreOrderKpi(): Promise<{
-  success: boolean;
-  data: StoreOrderKpi;
-}> {
-  return apiClient.get('/checkout/store-orders/kpi');
-}
-
-export async function getStoreOrderDetail(orderId: string): Promise<{
-  success: boolean;
-  data: StoreOrderDetail;
-}> {
-  return apiClient.get(`/checkout/store-orders/${orderId}`);
-}
-
-export async function updateStoreOrderStatus(
-  orderId: string,
-  body: { action: 'cancel' | 'refund'; reason: string },
-): Promise<{ success: boolean; data: any }> {
-  return apiClient.patch(`/checkout/store-orders/${orderId}/status`, body);
-}
+//
+// WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+//   아래 함수들을 제거했다. 대응 백엔드 경로가 은퇴했기 때문이다.
+//     · createOrder()            → `POST /kpa/checkout` (410, 소비자→매장 주문 생성 producer)
+//     · getStoreOrders()         ┐
+//     · getStoreOrderKpi()       │ `GET|PATCH /kpa/checkout/store-orders*` (제거)
+//     · getStoreOrderDetail()    │  sellerOrganizationId 축 = 매장이 판매자인 관점
+//     · updateStoreOrderStatus() ┘
+//   근거: `O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §2-2 · §3 · §7.
+//   보존: 아래 buyer(구매/발주) 축 — 매장이 **구매자**인 B2B 는 현행 canonical 이다.
 
 // ── Buyer 구매/발주 내역 (checkout_orders, buyerId 기준) ──
 // IR-O4O-STORE-ORDER-DIRECTION-SEMANTICS-CROSSSERVICE-V1: "내 매장 주문 내역" canonical = buyer.
-// (위 store-orders* 는 sellerOrganizationId 기준 "판매자 관점" — 별도 seller 화면 후보로 보존.)
 
 export interface BuyerOrder {
   id: string;

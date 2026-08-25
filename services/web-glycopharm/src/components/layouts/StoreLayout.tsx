@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Store,
-  ShoppingCart,
   User,
   Menu,
   X,
@@ -26,7 +25,6 @@ function StoreLayoutContent() {
   const { pharmacyId: storeSlug } = useParams<{ pharmacyId: string }>();
   const { user, isAuthenticated } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [cartCount] = useState(0);
   const [store, setStore] = useState<PharmacyStore | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -153,17 +151,9 @@ function StoreLayoutContent() {
 
             {/* Actions */}
             <div className="flex items-center gap-3">
-              <NavLink
-                to={`/store/${storeSlug}/cart`}
-                className="relative p-2 rounded-xl hover:bg-slate-100"
-              >
-                <ShoppingCart className="w-6 h-6 text-slate-600" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </NavLink>
+            {/* WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+                장바구니 진입로 제거 — O4O 는 소비자 checkout/결제를 제공하지 않는다
+                (`O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §5). */}
 
               {isAuthenticated ? (
                 <NavLink

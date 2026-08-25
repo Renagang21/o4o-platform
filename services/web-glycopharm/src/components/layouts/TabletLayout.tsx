@@ -12,7 +12,6 @@ import { Outlet, useParams, NavLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
   Store,
-  ShoppingCart,
   Home,
   Package,
   Search,
@@ -50,7 +49,6 @@ const PURPOSE_MESSAGES: Record<RequestPurpose, string> = {
 function TabletHeader({ store }: { store: PharmacyStore }) {
   const { getStorePath } = useStoreMode();
   const { pharmacyId } = useParams<{ pharmacyId: string }>();
-  const [cartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
 
   // 직원 요청 다이얼로그
@@ -149,18 +147,9 @@ function TabletHeader({ store }: { store: PharmacyStore }) {
           {/* 액션 버튼 */}
           <div className="flex items-center gap-3">
             {/* 장바구니 */}
-            <NavLink
-              to={getStorePath('cart')}
-              className="relative flex items-center gap-2 px-5 py-3 bg-primary-600 text-white rounded-xl text-lg font-semibold hover:bg-primary-700 transition-colors"
-            >
-              <ShoppingCart className="w-6 h-6" />
-              <span>관심 상품</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-sm rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </NavLink>
+            {/* WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+                장바구니 진입로 제거 — O4O 는 소비자 checkout/결제를 제공하지 않는다
+                (`O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §5). */}
 
             {/* 직원 요청 */}
             <button

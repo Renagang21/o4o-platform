@@ -332,16 +332,20 @@ export function createStoreHubController(
           return;
         }
 
-        // WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
-        //   KPA 자체 storefront(B2C) 은퇴 — 신규 B2C 채널 생성을 차단한다.
+        // WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1 (KPA 한정 차단)
+        // WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1 (전 서비스로 확대):
+        //   O4O 는 매장 경영자를 위한 소비자 전자상거래를 만들지 않는다
+        //   (`O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §2-2 · §3).
+        //   따라서 자체 storefront(B2C) 채널 신규 생성은 **서비스 구분 없이** 차단한다.
+        //   KIOSK / TABLET / SIGNAGE 는 정보 제공 수단이므로 영향받지 않는다 (boundary §4).
         //   기존 B2C row 는 역사 데이터로 보존하며 조회·진열 경로는 그대로 동작한다.
-        //   서비스 한정 차단: GlycoPharm / K-Cosmetics 의 B2C 는 영향받지 않는다.
-        if (serviceKey === 'kpa' && channelType === 'B2C') {
+        if (channelType === 'B2C') {
           res.status(410).json({
             success: false,
             error: {
               code: 'STORE_B2C_CHANNEL_RETIRED',
-              message: 'KPA self-operated storefront is retired. Online sales move to external channels.',
+              message:
+                'O4O self-operated storefront (B2C) is retired for all services. Online sales move to external channels.',
             },
           });
           return;

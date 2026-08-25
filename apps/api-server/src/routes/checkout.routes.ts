@@ -1,9 +1,11 @@
 /**
- * Checkout Routes
+ * Checkout Order Administration Routes
  *
- * Phase N-1: 실거래 MVP
- *
- * @package Phase N-1 - Checkout
+ * WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+ *   `POST /initiate` · `POST /confirm` 제거 — 플랫폼 직접판매(`platform-seller`) 경로였고
+ *   확정 사업 계약은 `PLATFORM_DIRECT_SALE_BUSINESS_CONTRACT = NONE` 이다
+ *   (`O4O-STORE-COMMERCE-BOUNDARY-V1` §13-1). 프론트엔드 호출자 0건.
+ *   남은 3개는 canonical 원장 `checkout_orders` 관리·조회 경로다.
  */
 
 import { Router } from 'express';
@@ -11,20 +13,6 @@ import { CheckoutController } from '../controllers/checkout/checkoutController.j
 import { authenticate } from '../middleware/auth.middleware.js';
 
 const router: Router = Router();
-
-/**
- * POST /api/checkout/initiate
- * 주문 생성 + 결제 준비
- * - 인증 필수
- */
-router.post('/initiate', authenticate, CheckoutController.initiate);
-
-/**
- * POST /api/checkout/confirm
- * 결제 승인 (Toss 결제 성공 후)
- * - 인증 불필요 (Toss redirect에서 호출)
- */
-router.post('/confirm', CheckoutController.confirm);
 
 /**
  * POST /api/checkout/refund

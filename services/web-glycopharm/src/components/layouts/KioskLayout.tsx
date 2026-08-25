@@ -11,7 +11,6 @@ import { Outlet, useParams, NavLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
   Store,
-  ShoppingCart,
   RotateCcw,
   Loader2,
   AlertCircle,
@@ -25,7 +24,6 @@ import { StoreThemeProvider } from '@/contexts/StoreThemeContext';
 // 키오스크 헤더 컴포넌트
 function KioskHeader({ store }: { store: PharmacyStore }) {
   const { resetTimer, resetKiosk, getStorePath } = useStoreMode();
-  const [cartCount] = useState(0);
 
   // 리셋 타이머 경고 (30초 이하)
   const showTimerWarning = resetTimer <= 30 && resetTimer > 0;
@@ -61,18 +59,9 @@ function KioskHeader({ store }: { store: PharmacyStore }) {
           {/* 액션 버튼 */}
           <div className="flex items-center gap-4">
             {/* 장바구니 */}
-            <NavLink
-              to={getStorePath('cart')}
-              className="relative flex items-center gap-3 px-6 py-4 bg-primary-600 text-white rounded-2xl text-xl font-bold hover:bg-primary-700 transition-colors"
-            >
-              <ShoppingCart className="w-8 h-8" />
-              <span>장바구니</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white text-lg rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </NavLink>
+            {/* WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+                장바구니 진입로 제거 — O4O 는 소비자 checkout/결제를 제공하지 않는다
+                (`O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §5). */}
 
             {/* 처음으로 */}
             <button
