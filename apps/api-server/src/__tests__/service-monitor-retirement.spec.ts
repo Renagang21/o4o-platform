@@ -84,14 +84,23 @@ describe('WO-O4O-SERVICE-MONITOR-SITES-TABLE-DEPENDENCY-AUDIT-AND-CLOSURE-V1', (
     });
   });
 
-  describe('형제 라우터는 영향을 받지 않는다', () => {
+  // WO-O4O-SERVICE-PROVISIONING-CANONICAL-CONTRACT-AND-LEGACY-API-CLOSURE-V1:
+  //   이 WO 당시 "형제 라우터" 로 유지를 단언했던 `/api/v1/service` ·
+  //   `/api/v1/service-admin` 도 후속 전수조사에서 production 실효 0 으로 확인돼
+  //   (templates 0개 · initializer 전 단계 스텁 · service-admin 소비처 0) 함께 retire 됐다.
+  //   따라서 "유지" 단언을 "재등록 안 함" 단언으로 뒤집는다. 근거·범위는
+  //   `service-provisioning-retirement.spec.ts` 와 CHECK 문서에 있다.
+  describe('형제 라우터도 후속 WO 에서 retire 됐다', () => {
     const source = fs.readFileSync(REGISTER_ROUTES, 'utf-8');
 
     it.each([
-      ["/api/v1/service", 'serviceProvisioningRoutes'],
-      ["/api/v1/service-admin", 'serviceAdminRoutes'],
-    ])('%s mount 가 유지된다', (mountPath, routerName) => {
-      expect(source).toContain(`app.use('${mountPath}', ${routerName});`);
+      ['/api/v1/service'],
+      ['/api/v1/service-admin'],
+    ])('%s mount 가 되살아나지 않는다', (mountPath) => {
+      const mountLines = source
+        .split(/\r?\n/)
+        .filter((line) => /app\.use\(/.test(line) && !/^\s*\/\//.test(line));
+      expect(mountLines.some((line) => line.includes(`'${mountPath}'`))).toBe(false);
     });
   });
 });

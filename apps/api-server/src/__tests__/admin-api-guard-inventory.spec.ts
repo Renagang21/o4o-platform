@@ -318,11 +318,14 @@ describe('관리자 API guard 인벤토리 — 신규 mount 가 guard 밖에 추
     expect(stale).toEqual([]);
   });
 
-  it('선행 두 WO 가 고친 경로는 라우터 수준 guard 를 유지한다 (per-endpoint 로 되돌아가지 않는다)', () => {
-    // 라우터 수준 guard 여야 이후 추가되는 endpoint 가 방어선을 자동 상속한다.
-    const serviceAdmin = inventory.find((m) => m.urlPath === '/api/v1/service-admin');
-    expect(serviceAdmin).toBeDefined();
-    expect(serviceAdmin!.routerLevel).toBe(true);
+  // WO-O4O-SERVICE-PROVISIONING-CANONICAL-CONTRACT-AND-LEGACY-API-CLOSURE-V1:
+  //   `/api/v1/service-admin` 을 대상으로 하던 "라우터 수준 guard 유지" 단언을 제거했다.
+  //   그 라우터가 소비처 0 · 데이터 소스 전무로 retire 되어 mount 자체가 사라졌기 때문이다
+  //   (guard 가 약해진 것이 아니라 보호 대상이 없어졌다). 재등록 방지는
+  //   `service-provisioning-retirement.spec.ts` 가 담당한다.
+  it('retire 된 /api/v1/service-admin 이 인벤토리에 되살아나지 않는다', () => {
+    expect(inventory.find((m) => m.urlPath === '/api/v1/service-admin')).toBeUndefined();
+    expect(inventory.find((m) => m.urlPath === '/api/v1/service')).toBeUndefined();
   });
 });
 

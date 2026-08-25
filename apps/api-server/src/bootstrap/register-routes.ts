@@ -53,14 +53,10 @@ import adminSecurityBlockedIpsRoutes from '../routes/admin/security-blocked-ips.
 // DOMAIN ROUTE IMPORTS (registered after DB init)
 // ============================================================================
 import { moduleLoader } from '../modules/module-loader.js';
-import { templateRegistry } from '../service-templates/template-registry.js';
-import { initPackRegistry } from '../service-templates/init-pack-registry.js';
 
 import appstoreRoutes from '../routes/appstore.routes.js';
 import navigationRoutes from '../routes/navigation.routes.js';
 import routesRoutes from '../routes/routes.routes.js';
-import serviceProvisioningRoutes from '../routes/service-provisioning.routes.js';
-import serviceAdminRoutes from '../routes/service-admin.routes.js';
 import publicRoutes from '../routes/public.routes.js';
 import platformInquiryRoutes, { adminRouter as platformInquiryAdminRoutes } from '../routes/v1/platformInquiry.routes.js';
 import { createPlatformServicesRoutes } from '../routes/platform-services/platform-services.routes.js';
@@ -265,27 +261,40 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/v1/routes', routesRoutes);
     logger.info('✅ Routes API registered at /api/v1/routes');
 
-    // 5. Load Service Templates and register provisioning routes (Phase 7)
-    try {
-      await templateRegistry.loadAll();
-      app.use('/api/v1/service', serviceProvisioningRoutes);
-      logger.info(`✅ Service Templates loaded: ${templateRegistry.getStats().total} templates`);
-      logger.info('✅ Service Provisioning routes registered at /api/v1/service');
-    } catch (templateError) {
-      logger.error('Service Template loading failed:', templateError);
-    }
-
-    // 6. Load Init Packs (Phase 8 - Service Environment Initialization)
-    try {
-      await initPackRegistry.loadAll();
-      logger.info(`✅ Init Packs loaded: ${initPackRegistry.getStats().total} packs`);
-    } catch (initPackError) {
-      logger.error('Init Pack loading failed:', initPackError);
-    }
-
-    // 7. Register Service Admin routes (Phase 8)
-    app.use('/api/v1/service-admin', serviceAdminRoutes);
-    logger.info('✅ Service Admin routes registered at /api/v1/service-admin');
+    // 5–7. WO-O4O-SERVICE-PROVISIONING-CANONICAL-CONTRACT-AND-LEGACY-API-CLOSURE-V1
+    //   (판정 SERVICE_PROVISIONING_LEGACY_RETIRE — 전 축)
+    //
+    //   Phase 7/8 Service Provisioning · Service Admin 축 전체를 retire 했다.
+    //   `/api/v1/service/*`(7) · `/api/v1/service-admin/*`(8) 모두 더 이상 mount 하지 않는다.
+    //
+    //   production 실측 (o4o-core-api Cloud Run, 전 revision 공통):
+    //     [TemplateRegistry] Templates directory not found: /app/dist/templates   → 0 templates
+    //     [InitPackRegistry] Init packs directory not found: /app/dist/init-packs → 0 packs
+    //   Dockerfile 은 dist/main.js 번들과 dist/database · src/assets · mail-templates 만 COPY 하고
+    //   `service-templates/{templates,init-packs}/*.json` 은 이미지에 들어간 적이 없다.
+    //   따라서 templates read 는 항상 빈 배열, template detail · preview · create · install 은
+    //   항상 404 였다 — provisioning write 실효 0.
+    //
+    //   복구하지 않고 제거한 근거:
+    //     - `serviceInitializer.initializeService()` 8단계(menus/categories/settings/theme/
+    //       pages/seedData/roles/hooks)가 전부 `// TODO: Integrate with ...` + logger.debug 스텁이었다.
+    //       생성 개수를 돌려주지만 어느 테이블에도 쓰지 않는다(응답이 사실과 다름).
+    //     - `serviceInstaller` 의 install 경로는 in-memory ModuleLoader registry 만 건드리고
+    //       App Store canonical 정본인 `app_registry` 테이블에는 전혀 쓰지 않았다.
+    //     - `themePresetService` 저장소는 `new Map()` 이며 주석에도 "would be DB in
+    //       production" 으로 명시돼 있었다. Cloud Run 에서 PUT theme 는 즉시 유실된다.
+    //
+    //   소비처 실측:
+    //     - `/api/v1/service-admin/*` : 저장소 전수 검색 소비처 0 (frontend · packages · scripts).
+    //     - `/api/v1/service/*` : admin-dashboard `ServiceTemplateSelector` 가 templates/preview/
+    //       install 3개를 호출했으나 production 에선 항상 빈 목록이어서 install 까지
+    //       도달할 수 없었고, 그 UI 는 AppStore READ-ONLY 계약(WO-APPSTORE-UI-DEMOTION)과도
+    //       충돌했다. 해당 탭·컴포넌트·API 클라이언트를 함께 제거했다.
+    //     - 30일 Cloud Run 로그의 해당 경로 호출은 전부 선행 WO smoke 트래픽이다(유기 0).
+    //
+    //   ⚠ App Store canonical 축(`app_registry`, `/api/v1/admin/apps`, `/api/v1/appstore`,
+    //   `/api/v1/apps/availability`, AppManager)과 ModuleLoader 의 부트 시 dynamic route ·
+    //   entity 등록은 별개 ACTIVE 축이며 이 retire 와 무관하다. 상세는 CHECK 문서.
 
     // 8. Register Public routes (no auth required)
     app.use('/api/v1/public', publicRoutes);

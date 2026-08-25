@@ -8,9 +8,14 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 // WO-APPSTORE-UI-DEMOTION: SecurityValidationResult removed - runtime control not supported
 import { adminAppsApi, AppRegistryEntry, AppCatalogItem, ServiceGroup, ServiceGroupMeta, DisabledAppEntry, DisabledAppsSummary } from '@/api/admin-apps';
-import ServiceTemplateSelector from '@/components/apps/ServiceTemplateSelector';
 
-type Tab = 'market' | 'installed' | 'templates' | 'disabled';
+// WO-O4O-SERVICE-PROVISIONING-CANONICAL-CONTRACT-AND-LEGACY-API-CLOSURE-V1
+//   (판정 SERVICE_PROVISIONING_LEGACY_RETIRE — 전 축)
+//   'templates' 탭을 제거했다. 그 탭의 `ServiceTemplateSelector` 는 `/api/v1/service/*`
+//   전용 화면이었고, production 배포 이미지에 template JSON 이 없어 목록이 항상 비어
+//   있었으며(실측 0개) install 은 항상 404 였다. 해당 API 축이 retire 되어 함께 제거한다.
+//   앱 번들 일괄 설치는 AppStore READ-ONLY 계약(WO-APPSTORE-UI-DEMOTION)과도 충돌했다.
+type Tab = 'market' | 'installed' | 'disabled';
 
 // Service Group Icons mapping
 const SERVICE_GROUP_ICONS: Record<ServiceGroup, React.ComponentType<{ className?: string }>> = {
@@ -219,17 +224,6 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
       {/* Tabs - WO-APPSTORE-UI-DEMOTION: Read-only module explorer */}
       <div className="flex space-x-4 border-b">
         <button
-          onClick={() => setActiveTab('templates')}
-          className={`px-4 py-2 font-medium border-b-2 transition-colors ${
-            activeTab === 'templates'
-              ? 'border-blue-500 text-blue-600'
-              : 'border-transparent text-gray-600 hover:text-gray-800'
-          }`}
-        >
-          <Layers className="inline-block w-4 h-4 mr-2" />
-          서비스 템플릿
-        </button>
-        <button
           onClick={() => setActiveTab('market')}
           className={`px-4 py-2 font-medium border-b-2 transition-colors ${
             activeTab === 'market'
@@ -309,8 +303,7 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
         </div>
       )}
 
-      {/* Search and Filter Bar - Hide on templates tab */}
-      {activeTab !== 'templates' && (
+      {/* Search and Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Search Input */}
         <div className="relative flex-1">
@@ -362,12 +355,11 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
           </>
         )}
       </div>
-      )}
 
       {/* WO-APPSTORE-UI-DEMOTION: Remote Install Modal removed - runtime control not supported */}
 
       {/* Filter Results Info */}
-      {activeTab !== 'templates' && (searchQuery || selectedCategory !== 'all' || selectedServiceGroup !== 'all') && (
+      {(searchQuery || selectedCategory !== 'all' || selectedServiceGroup !== 'all') && (
         <div className="text-sm text-gray-500">
           {activeTab === 'market' ? (
             <>
@@ -385,11 +377,6 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
             </>
           )}
         </div>
-      )}
-
-      {/* Templates Tab */}
-      {activeTab === 'templates' && (
-        <ServiceTemplateSelector onInstallComplete={loadData} />
       )}
 
       {/* Market Tab */}
