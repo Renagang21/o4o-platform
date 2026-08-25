@@ -28,9 +28,11 @@
  *       WO-APPSTORE-UI-DEMOTION 과도 충돌) → 컴포넌트·탭·API 클라이언트까지 함께 제거.
  *       30일 Cloud Run 로그의 호출은 전부 선행 WO smoke 트래픽(유기 0).
  *
- * ⚠ App Store canonical 축(`app_registry`, `/api/v1/admin/apps`, `/api/v1/appstore`,
- *   `/api/v1/apps/availability`, AppManager)과 ModuleLoader 의 부트 시 dynamic route ·
- *   entity 등록은 별개 ACTIVE 축이며 이 retire 와 무관하다.
+ * ⚠ App Store canonical 축(`app_registry`, `/api/v1/admin/apps` READ, `/api/v1/appstore`,
+ *   `/api/v1/apps/availability`, AppManager read)은 별개 축이며 이 retire 와 무관하다.
+ *   단, 여기서 "ACTIVE" 로 적었던 ModuleLoader 는 후속
+ *   WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1 에서
+ *   실효 0(dynamic route 0 · entity 0)으로 확인돼 retire 됐다.
  *
  * 이 테스트는 **재등록 방지 계약**이다. DB · 네트워크 접근 0.
  */
@@ -168,9 +170,16 @@ describe('WO-O4O-SERVICE-PROVISIONING-CANONICAL-CONTRACT-AND-LEGACY-API-CLOSURE-
       expect(registerSrc).toContain(`app.use('${mountPath}', ${routerName});`);
     });
 
-    it('ModuleLoader 는 부트 시 계속 사용된다 (provisioning 전용이 아니다)', () => {
-      expect(registerSrc).toContain("import { moduleLoader } from '../modules/module-loader.js';");
-      expect(registerSrc).toContain('await moduleLoader.loadAll();');
+    // WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1:
+    //   이 WO 당시 "별개 ACTIVE 축" 으로 유지를 단언했던 ModuleLoader 는 후속 전수조사에서
+    //   모든 환경에서 dynamic route 0 · entity 0 으로 확인돼 함께 retire 됐다
+    //   (production 이미지에 packages/ 가 없어 glob 결과 0, 로컬 재현에서도 17개 중 13개가
+    //   manifest.id 부재로 거부되고 나머지 4개는 router export 0).
+    //   따라서 "유지" 단언을 "재도입 안 함" 단언으로 뒤집는다. 근거는
+    //   `app-management-runtime-residue-retirement.spec.ts` 와 CHECK 문서에 있다.
+    it('ModuleLoader 는 부트 시 다시 도입되지 않는다', () => {
+      expect(registerSrc).not.toContain("from '../modules/module-loader.js'");
+      expect(registerSrc).not.toContain('moduleLoader.loadAll()');
     });
   });
 });

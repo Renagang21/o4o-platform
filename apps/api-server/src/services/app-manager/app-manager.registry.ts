@@ -3,28 +3,17 @@
  *
  * WO-O4O-APP-MANAGER-SERVICE-SPLIT-V1
  * Extracted from AppManager.ts
+ *
+ * WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1:
+ *   write 축 은퇴로 호출자가 사라진 isInstalled() · canUninstall() 을 제거했다.
+ *   canUninstall 은 AppDependencyResolver 에 의존했고, 그 resolver 는 빈 manifestRegistry
+ *   때문에 항상 의존성 0 을 반환하던 dead 계층이라 파일 자체를 제거했다.
  */
 
 import type { Repository } from 'typeorm';
 import type { AppRegistry } from '../../entities/AppRegistry.js';
 import { getCatalogItem } from '../../app-manifests/appsCatalog.js';
 import { isNewerVersion } from '../../utils/semver.js';
-import type { AppDependencyResolver } from '../AppDependencyResolver.js';
-
-/**
- * Check if an app is installed
- *
- * @param repo - AppRegistry repository
- * @param appId - App identifier
- * @returns true if app is installed
- */
-export async function isInstalled(
-  repo: Repository<AppRegistry>,
-  appId: string
-): Promise<boolean> {
-  const entry = await repo.findOne({ where: { appId } });
-  return !!entry;
-}
 
 /**
  * List all installed apps
@@ -86,21 +75,6 @@ export async function listActiveApps(
       installedAt: 'DESC',
     },
   });
-}
-
-/**
- * Check if an app can be uninstalled
- * Returns list of dependent apps if any
- *
- * @param dependencyResolver - AppDependencyResolver instance
- * @param appId - App identifier
- * @returns Array of dependent appIds (empty if can uninstall)
- */
-export async function canUninstall(
-  dependencyResolver: AppDependencyResolver,
-  appId: string
-): Promise<string[]> {
-  return dependencyResolver.findDependents(appId);
 }
 
 /**

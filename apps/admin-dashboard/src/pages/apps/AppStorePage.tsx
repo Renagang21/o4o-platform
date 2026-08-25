@@ -565,33 +565,9 @@ const AppStorePage: FC<AppStorePageProps> = ({ defaultTab = 'market' }) => {
                         설치일:{' '}
                         {new Date(app.installedAt).toLocaleDateString('ko-KR')}
                       </div>
-
-                      {/* Ownership data section */}
-                      {(app.ownsTables && app.ownsTables.length > 0) ||
-                       (app.ownsCPT && app.ownsCPT.length > 0) ||
-                       (app.ownsACF && app.ownsACF.length > 0) ? (
-                        <div className="mt-3 pt-3 border-t border-gray-200">
-                          <div className="font-medium text-gray-700 mb-1">소유 데이터:</div>
-                          {app.ownsTables && app.ownsTables.length > 0 && (
-                            <div className="text-xs">
-                              <span className="font-medium">테이블:</span>{' '}
-                              {app.ownsTables.join(', ')}
-                            </div>
-                          )}
-                          {app.ownsCPT && app.ownsCPT.length > 0 && (
-                            <div className="text-xs">
-                              <span className="font-medium">CPT:</span>{' '}
-                              {app.ownsCPT.join(', ')}
-                            </div>
-                          )}
-                          {app.ownsACF && app.ownsACF.length > 0 && (
-                            <div className="text-xs">
-                              <span className="font-medium">ACF:</span>{' '}
-                              {app.ownsACF.join(', ')}
-                            </div>
-                          )}
-                        </div>
-                      ) : null}
+                      {/* WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1:
+                          소유 데이터(테이블/CPT/ACF) 섹션 제거 — 파생 원본인
+                          manifestRegistry 가 비어 있어 항상 렌더링되지 않았다. */}
                     </div>
                     {/* WO-APPSTORE-UI-DEMOTION: Control buttons removed - read-only status display */}
                     <div className="mt-3 pt-3 border-t border-gray-200">

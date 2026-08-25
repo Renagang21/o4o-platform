@@ -53,9 +53,9 @@ export interface AppRegistryEntry {
   availableVersion?: string; // Latest version from catalog
   hasUpdate?: boolean;       // Whether an update is available
   canRollback?: boolean;     // Whether rollback is available
-  ownsTables?: string[];     // Tables owned by this app
-  ownsCPT?: string[];        // CPTs owned by this app
-  ownsACF?: string[];        // ACF groups owned by this app
+  // WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1:
+  //   ownsTables / ownsCPT / ownsACF 는 비어 있던 manifestRegistry 파생값이라
+  //   응답에서 제거됐다(항상 빈 배열이었다).
 }
 
 /**
@@ -93,25 +93,6 @@ export interface AppCatalogItem {
   riskLevel?: 'low' | 'medium' | 'high' | 'critical';  // Security risk level
   serviceGroups?: ServiceGroup[];               // Service groups this app belongs to
   incompatibleWith?: string[];                  // Apps that are incompatible with this app
-}
-
-/**
- * Remote App Install Options
- */
-export interface RemoteInstallOptions {
-  manifestUrl: string;
-  expectedHash?: string;
-  skipHashVerification?: boolean;
-}
-
-/**
- * Security Validation Result
- */
-export interface SecurityValidationResult {
-  valid: boolean;
-  errors: Array<{ code: string; message: string; field?: string }>;
-  warnings: Array<{ code: string; message: string; field?: string }>;
-  riskLevel: 'low' | 'medium' | 'high' | 'critical';
 }
 
 /**
@@ -210,49 +191,6 @@ export const adminAppsApi = {
   },
 
   /**
-   * Install an app
-   */
-  installApp: async (appId: string): Promise<void> => {
-    await api.post('/admin/apps/install', { appId });
-  },
-
-  /**
-   * Activate an app
-   */
-  activateApp: async (appId: string): Promise<void> => {
-    await api.post('/admin/apps/activate', { appId });
-  },
-
-  /**
-   * Deactivate an app
-   */
-  deactivateApp: async (appId: string): Promise<void> => {
-    await api.post('/admin/apps/deactivate', { appId });
-  },
-
-  /**
-   * Uninstall an app
-   */
-  uninstallApp: async (appId: string, purge: boolean = false): Promise<void> => {
-    await api.post('/admin/apps/uninstall', { appId, purge });
-  },
-
-  /**
-   * Update an app to the latest version
-   */
-  updateApp: async (appId: string): Promise<void> => {
-    await api.post('/admin/apps/update', { appId });
-  },
-
-  /**
-   * Rollback an app to its previous version
-   */
-  rollbackApp: async (appId: string): Promise<{ revertedTo: string }> => {
-    const response = await api.post('/admin/apps/rollback', { appId });
-    return response.data;
-  },
-
-  /**
    * Get version info for an app
    */
   getVersionInfo: async (appId: string): Promise<VersionInfo> => {
@@ -260,24 +198,13 @@ export const adminAppsApi = {
     return response.data;
   },
 
-  /**
-   * Install a remote app from URL
-   */
-  installRemoteApp: async (options: RemoteInstallOptions): Promise<{ appId: string; manifest: AppCatalogItem }> => {
-    const response = await api.post('/admin/apps/install-remote', options);
-    return response.data;
-  },
-
-  /**
-   * Validate a remote manifest URL (preview before install)
-   */
-  validateRemoteManifest: async (manifestUrl: string): Promise<{
-    manifest: AppCatalogItem;
-    validation: SecurityValidationResult;
-  }> => {
-    const response = await api.post('/admin/apps/validate-remote', { manifestUrl });
-    return response.data;
-  },
+  // WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1
+  //   (판정 ADMIN_APPS_WRITE_RETIRE)
+  //   write 8종 클라이언트(installApp · activateApp · deactivateApp · uninstallApp ·
+  //   updateApp · rollbackApp · installRemoteApp · validateRemoteManifest)와
+  //   RemoteInstallOptions · SecurityValidationResult 타입을 제거했다.
+  //   backend `/api/v1/admin/apps` 의 대응 POST 8개도 함께 은퇴했다.
+  //   AppStore 화면은 WO-APPSTORE-UI-DEMOTION 이후 READ-ONLY 이고 호출이 0이었다.
 
   // WO-O4O-SERVICE-PROVISIONING-CANONICAL-CONTRACT-AND-LEGACY-API-CLOSURE-V1
   //   (판정 SERVICE_PROVISIONING_LEGACY_RETIRE — 전 축)

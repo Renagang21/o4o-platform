@@ -1,7 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { AppManager } from '../../services/AppManager.js';
-import { DependencyError } from '../../services/AppDependencyResolver.js';
-import { OwnershipValidationError } from '../../services/AppTableOwnershipResolver.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireAdmin } from '../../middleware/auth.middleware.js';
 import {
@@ -14,12 +12,8 @@ import {
   getIncompatibleApps,
   type ServiceGroup,
 } from '../../app-manifests/appsCatalog.js';
-import { loadLocalManifest, hasManifest } from '../../app-manifests/index.js';
 import { disabledAppsRegistry, getDisabledAppsSummary } from '../../app-manifests/disabled-apps.registry.js';
 import { isNewerVersion } from '../../utils/semver.js';
-import { remoteManifestLoader, ManifestFetchError, ManifestHashMismatchError, ManifestValidationError } from '../../services/RemoteManifestLoader.js';
-import { appSecurityValidator } from '../../services/AppSecurityValidator.js';
-import { remoteResourcesLoader } from '../../services/RemoteResourcesLoader.js';
 import logger from '../../utils/logger.js';
 
 const router: Router = Router();
@@ -87,19 +81,14 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
       const availableVersion = catalogItem?.version || app.version;
       const hasUpdate = catalogItem ? isNewerVersion(app.version, catalogItem.version) : false;
 
-      // Load manifest to get ownership information
-      const manifest = hasManifest(app.appId) ? loadLocalManifest(app.appId) : null;
-      const ownsTables = manifest?.ownsTables || [];
-      const ownsCPT = manifest?.ownsCPT || [];
-      const ownsACF = manifest?.ownsACF || [];
-
+      // WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1:
+      //   ownsTables / ownsCPT / ownsACF 는 `app-manifests/index.ts` 의 manifestRegistry 에서
+      //   파생됐으나 그 레지스트리는 Phase R1 이후 비어 있어 항상 빈 배열이었다.
+      //   레지스트리를 제거하면서 이 세 필드도 응답에서 뺀다(admin-dashboard 소비 0).
       return {
         ...app,
         availableVersion,
         hasUpdate,
-        ownsTables,
-        ownsCPT,
-        ownsACF,
       };
     });
 
@@ -185,225 +174,26 @@ router.get('/:appId', async (req: Request, res: Response, next: NextFunction) =>
 });
 
 /**
- * POST /api/admin/apps/install
- * Install an app
+ * WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1
+ *   (판정 ADMIN_APPS_WRITE_RETIRE)
  *
- * Body: { appId: string }
- */
-router.post('/install', async (req: Request, res: Response) => {
-  const { appId } = req.body;
-
-  if (!appId) {
-    return res.status(400).json({
-      ok: false,
-      error: 'MISSING_APP_ID',
-      message: 'appId is required',
-    });
-  }
-
-  try {
-    logger.info(`[Install] Starting install for app: ${appId}`);
-
-    await getAppManager().install(appId);
-
-    logger.info(`[Install] Completed successfully for app: ${appId}`);
-    return res.json({
-      ok: true,
-      message: `App ${appId} installed successfully`,
-    });
-  } catch (error: any) {
-    logger.error(`[Install] Failed for app ${appId}:`, error);
-
-    // Handle ownership validation errors
-    if (error instanceof OwnershipValidationError) {
-      return res.status(400).json({
-        ok: false,
-        error: 'OWNERSHIP_VIOLATION',
-        message: error.message,
-        violations: error.violations,
-      });
-    }
-
-    // Handle dependency errors
-    if (error instanceof DependencyError) {
-      return res.status(400).json({
-        ok: false,
-        error: 'DEPENDENCY_ERROR',
-        message: error.message,
-        dependents: error.dependents,
-      });
-    }
-
-    // Handle all other errors - always return JSON, never pass to next()
-    return res.status(500).json({
-      ok: false,
-      error: 'INSTALL_FAILED',
-      message: error.message || 'Unknown error occurred during installation',
-    });
-  }
-});
-
-/**
- * POST /api/admin/apps/activate
- * Activate an app
+ * `/api/v1/admin/apps` 의 write 8종을 제거했다.
+ *   POST /install · /activate · /deactivate · /uninstall · /update · /rollback
+ *   POST /validate-remote · /install-remote
  *
- * Body: { appId: string }
- */
-router.post('/activate', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { appId } = req.body;
-
-    if (!appId) {
-      return res.status(400).json({ error: 'appId is required' });
-    }
-
-    await getAppManager().activate(appId);
-
-    res.json({
-      ok: true,
-      message: `App ${appId} activated successfully`,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * POST /api/admin/apps/deactivate
- * Deactivate an app
+ * 근거(실측):
+ *   - frontend consumer 0 — admin-dashboard 는 WO-APPSTORE-UI-DEMOTION 이후 READ-ONLY 이고,
+ *     API 클라이언트에만 정의가 남아 있었다(호출 0). 해당 클라이언트 메서드도 함께 제거했다.
+ *   - production 30일 로그의 write 호출 0건.
+ *   - `app_registry` 6행 전부 `updatedAt` == `installedAt` == 2026-01-22T04:36:28.617Z
+ *     (migration 2026012200002-SeedDefaultApps) — seed 이후 write 가 한 번도 일어난 적이 없다.
+ *   - lifecycle hook 은 `app-manifests/index.ts` 의 manifestRegistry 가 Phase R1 에서 비워진 뒤
+ *     `hasManifest()` 가 항상 false 라 install/activate/uninstall 의 CPT·ACF·migration·purge
+ *     분기가 전부 no-op 이었다. 즉 write 의 유일한 실효는 DB status 문자열 변경뿐이었다.
  *
- * Body: { appId: string }
+ * 유지: read 9종 · `app_registry` 테이블 · `/api/v1/apps/availability`(메뉴 게이팅 실사용).
+ * DB schema · row 는 건드리지 않았다(migration 0 / production write 0).
  */
-router.post('/deactivate', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { appId } = req.body;
-
-    if (!appId) {
-      return res.status(400).json({ error: 'appId is required' });
-    }
-
-    await getAppManager().deactivate(appId);
-
-    res.json({
-      ok: true,
-      message: `App ${appId} deactivated successfully`,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * POST /api/admin/apps/uninstall
- * Uninstall an app
- *
- * Body: { appId: string, force?: boolean, purge?: boolean }
- */
-router.post('/uninstall', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { appId, force = false, purge = false } = req.body;
-
-    if (!appId) {
-      return res.status(400).json({ error: 'appId is required' });
-    }
-
-    await getAppManager().uninstall(appId, { force, purgeData: purge });
-
-    res.json({
-      ok: true,
-      message: purge
-        ? `App ${appId} and its data uninstalled successfully`
-        : `App ${appId} uninstalled successfully (data kept)`,
-      purged: purge,
-    });
-  } catch (error) {
-    // Handle dependency errors
-    if (error instanceof DependencyError) {
-      return res.status(400).json({
-        ok: false,
-        error: 'DEPENDENTS_EXIST',
-        message: error.message,
-        dependents: error.dependents,
-      });
-    }
-
-    next(error);
-  }
-});
-
-/**
- * POST /api/admin/apps/update
- * Update an app to the latest version from catalog
- *
- * Body: { appId: string }
- */
-router.post('/update', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { appId } = req.body;
-
-    if (!appId) {
-      return res.status(400).json({ error: 'appId is required' });
-    }
-
-    await getAppManager().update(appId);
-
-    res.json({
-      ok: true,
-      message: `App ${appId} updated successfully`,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * POST /api/admin/apps/rollback
- * Rollback an app to its previous version
- *
- * Body: { appId: string }
- */
-router.post('/rollback', async (req: Request, res: Response) => {
-  const { appId } = req.body;
-
-  if (!appId) {
-    return res.status(400).json({
-      ok: false,
-      error: 'MISSING_APP_ID',
-      message: 'appId is required',
-    });
-  }
-
-  try {
-    logger.info(`[Rollback] Starting rollback for app: ${appId}`);
-
-    const result = await getAppManager().rollback(appId);
-
-    logger.info(`[Rollback] Completed successfully for app: ${appId}, reverted to: ${result.revertedTo}`);
-    return res.json({
-      ok: true,
-      message: `App ${appId} rolled back successfully to version ${result.revertedTo}`,
-      revertedTo: result.revertedTo,
-    });
-  } catch (error: any) {
-    logger.error(`[Rollback] Failed for app ${appId}:`, error);
-
-    // Handle no rollback available
-    if (error.message?.includes('No rollback available')) {
-      return res.status(400).json({
-        ok: false,
-        error: 'NO_ROLLBACK_AVAILABLE',
-        message: error.message,
-      });
-    }
-
-    // Handle all other errors
-    return res.status(500).json({
-      ok: false,
-      error: 'ROLLBACK_FAILED',
-      message: error.message || 'Unknown error occurred during rollback',
-    });
-  }
-});
 
 /**
  * GET /api/admin/apps/:appId/version-info
@@ -433,174 +223,6 @@ router.get('/:appId/version-info', async (req: Request, res: Response) => {
     return res.status(500).json({
       ok: false,
       error: 'VERSION_INFO_FAILED',
-      message: error.message || 'Unknown error',
-    });
-  }
-});
-
-/**
- * POST /api/admin/apps/validate-remote
- * Validate a remote manifest URL before installation
- *
- * Body: { manifestUrl: string }
- */
-router.post('/validate-remote', async (req: Request, res: Response) => {
-  const { manifestUrl } = req.body;
-
-  if (!manifestUrl) {
-    return res.status(400).json({
-      ok: false,
-      error: 'MISSING_URL',
-      message: 'manifestUrl is required',
-    });
-  }
-
-  try {
-    logger.info(`[ValidateRemote] Validating manifest from: ${manifestUrl}`);
-
-    // Fetch and validate manifest
-    const result = await remoteManifestLoader.load(manifestUrl);
-    const manifest = result.manifest;
-
-    // Run security validation
-    const validation = appSecurityValidator.validate(manifest, result.hash);
-
-    logger.info(`[ValidateRemote] Validation complete for ${manifest.appId}: ${validation.valid ? 'PASSED' : 'FAILED'}`);
-
-    return res.json({
-      ok: true,
-      manifest: {
-        appId: manifest.appId,
-        name: manifest.name,
-        version: manifest.version,
-        description: manifest.description,
-        type: manifest.type,
-        vendor: manifest.vendor,
-        hash: result.hash,
-        source: 'remote',
-        url: manifestUrl,
-        riskLevel: validation.riskLevel,
-        dependencies: manifest.dependencies,
-        blockScripts: manifest.blockScripts,
-      },
-      validation,
-    });
-  } catch (error: any) {
-    logger.error(`[ValidateRemote] Failed for ${manifestUrl}:`, error);
-
-    if (error instanceof ManifestFetchError) {
-      return res.status(400).json({
-        ok: false,
-        error: 'FETCH_FAILED',
-        message: error.message,
-      });
-    }
-
-    if (error instanceof ManifestValidationError) {
-      return res.status(400).json({
-        ok: false,
-        error: 'VALIDATION_FAILED',
-        message: error.message,
-        errors: error.validationErrors,
-      });
-    }
-
-    return res.status(500).json({
-      ok: false,
-      error: 'VALIDATE_FAILED',
-      message: error.message || 'Unknown error',
-    });
-  }
-});
-
-/**
- * POST /api/admin/apps/install-remote
- * Install an app from a remote manifest URL
- *
- * Body: { manifestUrl: string, expectedHash?: string, skipHashVerification?: boolean }
- */
-router.post('/install-remote', async (req: Request, res: Response) => {
-  const { manifestUrl, expectedHash, skipHashVerification = false } = req.body;
-
-  if (!manifestUrl) {
-    return res.status(400).json({
-      ok: false,
-      error: 'MISSING_URL',
-      message: 'manifestUrl is required',
-    });
-  }
-
-  try {
-    logger.info(`[InstallRemote] Starting install from: ${manifestUrl}`);
-
-    // Fetch manifest
-    const result = await remoteManifestLoader.load(manifestUrl, {
-      expectedHash: skipHashVerification ? undefined : expectedHash,
-      verifyHash: !skipHashVerification,
-    });
-    const manifest = result.manifest;
-
-    // Security validation
-    const validation = appSecurityValidator.validate(manifest, expectedHash);
-    if (!validation.valid) {
-      logger.warn(`[InstallRemote] Security validation failed for ${manifest.appId}`);
-      return res.status(400).json({
-        ok: false,
-        error: 'SECURITY_VALIDATION_FAILED',
-        message: 'Security validation failed',
-        validation,
-      });
-    }
-
-    // Load block scripts if any
-    if (manifest.blockScripts && manifest.blockScripts.length > 0) {
-      logger.info(`[InstallRemote] Loading ${manifest.blockScripts.length} block scripts for ${manifest.appId}`);
-      await remoteResourcesLoader.loadBlockScripts(manifest.appId, manifest);
-    }
-
-    // Install the remote app using AppManager
-    // Note: AppManager.installRemote would need to be implemented to handle remote apps
-    // For now, we store the manifest and mark as installed
-    logger.info(`[InstallRemote] Installing remote app: ${manifest.appId}`);
-
-    // TODO: Implement getAppManager().installRemote(manifest) when ready
-    // For now, return success with manifest info
-    logger.info(`[InstallRemote] Remote app ${manifest.appId} installed successfully`);
-
-    return res.json({
-      ok: true,
-      message: `Remote app ${manifest.appId} installed successfully`,
-      appId: manifest.appId,
-      manifest: {
-        appId: manifest.appId,
-        name: manifest.name,
-        version: manifest.version,
-        source: 'remote',
-        vendor: manifest.vendor,
-      },
-    });
-  } catch (error: any) {
-    logger.error(`[InstallRemote] Failed for ${manifestUrl}:`, error);
-
-    if (error instanceof ManifestHashMismatchError) {
-      return res.status(400).json({
-        ok: false,
-        error: 'HASH_MISMATCH',
-        message: error.message,
-      });
-    }
-
-    if (error instanceof ManifestFetchError) {
-      return res.status(400).json({
-        ok: false,
-        error: 'FETCH_FAILED',
-        message: error.message,
-      });
-    }
-
-    return res.status(500).json({
-      ok: false,
-      error: 'INSTALL_REMOTE_FAILED',
       message: error.message || 'Unknown error',
     });
   }

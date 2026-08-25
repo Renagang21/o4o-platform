@@ -52,7 +52,6 @@ import adminSecurityBlockedIpsRoutes from '../routes/admin/security-blocked-ips.
 // ============================================================================
 // DOMAIN ROUTE IMPORTS (registered after DB init)
 // ============================================================================
-import { moduleLoader } from '../modules/module-loader.js';
 
 import appstoreRoutes from '../routes/appstore.routes.js';
 import navigationRoutes from '../routes/navigation.routes.js';
@@ -203,51 +202,28 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
 export async function registerDomainRoutes(app: Application, dataSource: DataSource): Promise<void> {
   try {
     // ========================================================================
-    // MODULE LOADER — Load and Activate Apps (Phase 5)
+    // WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1
+    //   (판정 MODULE_LOADER_RETIRE)
+    //
+    // 여기에 있던 ModuleLoader 부트 4단계(loadAll → installModule → activateModule →
+    // getModuleRouter 동적 mount)와 getAllEntities() 수집을 제거했다.
+    //
+    // 실측 근거:
+    //   - production 부트 로그(전 revision 공통):
+    //       [ModuleLoader] Loading 0 modules...  /  Loaded 0 app modules:
+    //       Install hooks ran for 0/0 modules    /  Activated 0/0 modules
+    //       Registered 0 dynamic routes:
+    //     배포 이미지에 packages/ 가 없어 glob 대상이 0 이었다.
+    //   - 로컬 workspace 에서 같은 스캔을 재현해도 17개 manifest 중 13개가
+    //     top-level `id` 가 없어 loadModule() 에서 거부된다. 남는 4개도
+    //     dist/backend/index.js 가 named export `routes` 를 내보내지 않아 라우터 0.
+    //     → 어떤 환경에서도 동적 route 0 · entity 0 이다.
+    //   - ModuleLoader 소비처는 이 부트 블록이 유일했다(선행 WO 들에서
+    //     service-admin.routes · appstore /modules · AppStoreService 가 모두 은퇴).
+    //
+    // 앱 설치·활성 정본은 `app_registry` 테이블이며, 그 read 는 AppManager 와
+    // `/api/v1/apps/availability` 가 담당한다. 도메인 route 는 아래처럼 정적 mount 한다.
     // ========================================================================
-    logger.info('📦 Loading app modules...');
-
-    // 1. Scan workspace and load all app manifests
-    await moduleLoader.loadAll();
-    const loadedModules = Array.from(moduleLoader.getRegistry().keys());
-    logger.info(`✅ Loaded ${loadedModules.length} app modules: ${loadedModules.join(', ')}`);
-
-    // 2. Install all modules (멱등성 전제)
-    let installedCount = 0;
-    for (const moduleId of loadedModules) {
-      try {
-        await moduleLoader.installModule(moduleId, dataSource);
-        installedCount++;
-      } catch (installError) {
-        logger.warn(`Install hook failed for ${moduleId}, continuing:`, installError);
-      }
-    }
-    logger.info(`✅ Install hooks ran for ${installedCount}/${loadedModules.length} modules`);
-
-    // 3. Activate all modules (with dependency resolution and dataSource)
-    let activatedCount = 0;
-    for (const moduleId of loadedModules) {
-      try {
-        await moduleLoader.activateModule(moduleId, dataSource);
-        activatedCount++;
-      } catch (activationError) {
-        logger.error(`Failed to activate module ${moduleId}:`, activationError);
-      }
-    }
-    logger.info(`✅ Activated ${activatedCount}/${loadedModules.length} modules`);
-
-    // 4. Register dynamic routes from activated modules
-    const routesRegistered: string[] = [];
-    for (const moduleId of loadedModules) {
-      const router = moduleLoader.getModuleRouter(moduleId, dataSource);
-      if (router) {
-        const basePath = `/api/v1/${moduleId}`;
-        app.use(basePath, router);
-        routesRegistered.push(`${basePath} → ${moduleId}`);
-      }
-    }
-    logger.info(`✅ Registered ${routesRegistered.length} dynamic routes:`);
-    routesRegistered.forEach(route => logger.info(`   - ${route}`));
 
     // 4. Register AppStore routes for app lifecycle management
     app.use('/api/v1/appstore', appstoreRoutes);
@@ -1152,16 +1128,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 프로덕션 product_approvals 는 0 row 로 승인할 대상 자체가 없었다.
     // ProductApprovalV2Service 는 정식 route 들이 계속 사용하므로 유지한다.
 
-    logger.info('✅ Routes registered via module loader');
-
-    // Collect entities from modules (for future TypeORM integration)
-    const moduleEntities = moduleLoader.getAllEntities();
-    if (moduleEntities.length > 0) {
-      logger.info(`📊 Collected ${moduleEntities.length} entities from modules`);
-    }
-
-  } catch (moduleLoaderError) {
-    logger.error('Module Loader initialization failed:', moduleLoaderError);
-    // Continue server startup even if module loading fails
+    logger.info('✅ Domain routes registered');
+  } catch (domainRoutesError) {
+    logger.error('Domain route registration failed:', domainRoutesError);
+    // Continue server startup even if a domain route group fails to register
   }
 }
