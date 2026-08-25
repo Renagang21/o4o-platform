@@ -13,6 +13,7 @@ import channelAPI, {
   CreateChannelData,
 } from '@/lib/channels';
 import toast from 'react-hot-toast';
+import { cmsServiceOptionsWithAll } from '../cmsServiceCatalog';
 
 interface ChannelFormModalProps {
   channel: Channel | null;
@@ -21,13 +22,7 @@ interface ChannelFormModalProps {
 }
 
 // Available services
-const SERVICES = [
-  { value: '', label: 'Global (All Services)' },
-  { value: 'glycopharm', label: 'Glycopharm' },
-  { value: 'kpa', label: 'KPA Society' },
-  { value: 'neture', label: 'Neture' },
-  { value: 'k-cosmetics', label: 'K-Cosmetics' },
-];
+const SERVICES = cmsServiceOptionsWithAll('Global (All Services)');
 
 // Channel types
 const CHANNEL_TYPES: { value: ChannelType; label: string; description: string }[] = [

@@ -26,6 +26,8 @@ import logger from '../../utils/logger.js';
 import {
   resolveCmsReadScope,
   resolveCmsServiceKeys,
+  canonicalizeCmsServiceKey,
+  isSameCmsService,
   CMS_SERVICE_KEY_REQUIRED_ERROR,
 } from './cms-content-utils.js';
 
@@ -325,15 +327,20 @@ export function createCmsContentSlotRoutes(deps: {
             });
             return;
           }
-          where.serviceKey = serviceKey as string;
+          // WO-O4O-CMS-SERVICEKEY-ALIAS-SSOT-RESIDUAL-CLOSURE-V1:
+          //   문자열 동등 필터는 alias 를 고립시킨다. `kpa-society` 로 필터하면
+          //   legacy `kpa` slot 이 보이지 않고, `kpa` 로 필터하면 canonical slot 이
+          //   보이지 않는다(실측: kpa-society 28건 / kpa 1건). read 경계와 같은
+          //   alias 집합으로 조회한다.
+          where.serviceKey = In(resolveCmsServiceKeys(serviceKey as string));
         } else {
           // No serviceKey specified — restrict to operator's allowed keys
           where.serviceKey = In(access.allowedCmsKeys);
         }
       } else {
-        // Admin: optional serviceKey filter
+        // Admin: optional serviceKey filter (alias 집합으로 확장 — 위와 같은 이유)
         if (serviceKey) {
-          where.serviceKey = serviceKey as string;
+          where.serviceKey = In(resolveCmsServiceKeys(serviceKey as string));
         }
       }
 
@@ -463,7 +470,10 @@ export function createCmsContentSlotRoutes(deps: {
 
       const slot = slotRepo.create({
         slotKey,
-        serviceKey: serviceKey || null,
+        // WO-O4O-CMS-SERVICEKEY-ALIAS-SSOT-RESIDUAL-CLOSURE-V1 §9:
+        //   신규 slot 은 항상 canonical key 로 저장한다. admin UI 가 role prefix
+        //   ('kpa') 를 보내도 새 legacy row 를 만들지 않는다.
+        serviceKey: serviceKey ? canonicalizeCmsServiceKey(String(serviceKey)) : null,
         organizationId: organizationId || null,
         contentId,
         sortOrder,
@@ -559,7 +569,8 @@ export function createCmsContentSlotRoutes(deps: {
       }
 
       // WO-O4O-PROMOTION-SLOT-API-OPERATOR-V1: operators cannot change serviceKey
-      if (!access.isAdmin && serviceKey !== undefined && serviceKey !== slot.serviceKey) {
+      // alias 재전송('kpa' ↔ 'kpa-society')은 **변경이 아니다** — 같은 canonical service 다.
+      if (!access.isAdmin && serviceKey !== undefined && !isSameCmsService(serviceKey, slot.serviceKey)) {
         res.status(403).json({
           success: false,
           error: { code: 'SERVICE_KEY_IMMUTABLE', message: 'Operators cannot change the serviceKey of an existing slot' },
@@ -596,7 +607,10 @@ export function createCmsContentSlotRoutes(deps: {
 
       // Update fields
       if (slotKey !== undefined) slot.slotKey = slotKey;
-      if (serviceKey !== undefined) slot.serviceKey = serviceKey;
+      // legacy slot 을 alias 재전송으로 조용히 migration 하지 않는다 (§11: data migration 은 별도 판정).
+      if (serviceKey !== undefined && !isSameCmsService(serviceKey, slot.serviceKey)) {
+        slot.serviceKey = serviceKey ? canonicalizeCmsServiceKey(String(serviceKey)) : null;
+      }
       if (sortOrder !== undefined) slot.sortOrder = sortOrder;
       if (isActive !== undefined) slot.isActive = isActive;
       if (startsAt !== undefined) slot.startsAt = startsAt ? new Date(startsAt) : null;

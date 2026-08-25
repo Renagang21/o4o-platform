@@ -26,6 +26,7 @@ import {
 import cmsAPI, { CmsContent, ContentType, ContentStatus } from '@/lib/cms';
 import toast from 'react-hot-toast';
 import ContentFormModal from './ContentFormModal';
+import { cmsServiceOptionsWithAll } from '../cmsServiceCatalog';
 
 // ContentMeta display labels (WO-CONTENT-META-UI-INTEGRATION-V1)
 const PRODUCER_LABELS: Record<string, string> = {
@@ -44,13 +45,7 @@ const VISIBILITY_LABELS: Record<string, string> = {
 };
 
 // Available services for filtering
-const SERVICES = [
-  { value: '', label: 'All Services' },
-  { value: 'glycopharm', label: 'Glycopharm' },
-  { value: 'kpa', label: 'KPA Society' },
-  { value: 'neture', label: 'Neture' },
-  { value: 'k-cosmetics', label: 'K-Cosmetics' },
-];
+const SERVICES = cmsServiceOptionsWithAll('All Services');
 
 // Content types for P0 (only hero and notice)
 const CONTENT_TYPES: { value: ContentType | ''; label: string }[] = [

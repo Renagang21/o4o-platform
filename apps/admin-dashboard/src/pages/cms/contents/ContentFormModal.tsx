@@ -18,6 +18,7 @@ import { RichTextEditor } from '@o4o/content-editor';
 //   (htmlToBlocks.ts 의 유일한 import 는 `import type { Block }` 로 런타임 의존이 0)
 import { htmlToBlocks, blocksToHtml } from '@o4o/forum-core/src/utils/htmlToBlocks';
 import { uploadImageForEditor } from '@/api/media-library.api';
+import { cmsServiceOptionsWithAll } from '../cmsServiceCatalog';
 
 interface ContentFormModalProps {
   content: CmsContent | null;
@@ -26,13 +27,7 @@ interface ContentFormModalProps {
 }
 
 // Available services
-const SERVICES = [
-  { value: '', label: 'Global (No Service)' },
-  { value: 'glycopharm', label: 'Glycopharm' },
-  { value: 'kpa', label: 'KPA Society' },
-  { value: 'neture', label: 'Neture' },
-  { value: 'k-cosmetics', label: 'K-Cosmetics' },
-];
+const SERVICES = cmsServiceOptionsWithAll('Global (No Service)');
 
 // Content types
 const CONTENT_TYPES: { value: ContentType; label: string; description: string }[] = [

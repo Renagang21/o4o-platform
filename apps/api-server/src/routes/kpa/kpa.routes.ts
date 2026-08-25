@@ -47,6 +47,8 @@
  */
 
 import { Router, RequestHandler, Request, Response } from 'express';
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
+import { resolveCmsServiceKeys } from '../cms-content/cms-content-utils.js';
 import { DataSource } from 'typeorm';
 import { ContentQueryService } from '../../modules/content/index.js';
 import { SignageQueryService } from '../../modules/signage/index.js';
@@ -199,8 +201,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // APP-CONTENT Phase 2: shared content query service
   // WO-O4O-KPA-CODE-CLEANUP-V1: unified to 'kpa-society' (backward compat includes legacy 'kpa')
+  // WO-O4O-CMS-SERVICEKEY-ALIAS-SSOT-RESIDUAL-CLOSURE-V1: alias 집합은 security-core 파생이다.
   const contentService = new ContentQueryService(dataSource, {
-    serviceKeys: ['kpa-society', 'kpa'],
+    serviceKeys: resolveCmsServiceKeys('kpa'),
     defaultTypes: ['notice', 'news'],
   });
 
@@ -1205,8 +1208,14 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   const contentRepo = dataSource.getRepository(CmsContent);
   const auditRepo = dataSource.getRepository(KpaAuditLog);
   // WO-O4O-KPA-CODE-CLEANUP-V1: unified to 'kpa-society'
-  const KPA_SERVICE_KEY = 'kpa-society';
-  const KPA_SERVICE_KEYS = ['kpa-society', 'kpa']; // backward compat for reads
+  // WO-O4O-CMS-SERVICEKEY-ALIAS-SSOT-RESIDUAL-CLOSURE-V1:
+  //   두 값을 손으로 적지 않는다. 여기서 다루는 건 `cms_contents` 원장 축이므로
+  //   CMS read/mutation 이 쓰는 것과 **같은** security-core 파생(`resolveCmsServiceKeys`)을
+  //   재사용한다. 로컬 `['kpa-society','kpa']` 배열은 SSOT 를 두 벌로 만든다.
+  //   (기존 주석은 "for reads" 였지만 실제로는 아래 PUT/DELETE/batch mutation 도
+  //    같은 집합으로 대상 row 를 찾는다 — legacy row 수정 호환이 이 집합에 달려 있다.)
+  const KPA_SERVICE_KEY = resolveCanonicalServiceKey('kpa');
+  const KPA_SERVICE_KEYS = resolveCmsServiceKeys('kpa');
   const ALLOWED_TYPES = ['notice', 'news', 'event'];
 
   // WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1: helper
