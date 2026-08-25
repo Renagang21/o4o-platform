@@ -193,6 +193,63 @@ ORDER BY cnt DESC;
 
 ---
 
+## 8-A. 권한 판정 계약 (authorization contract)
+
+> 추가: 2026-08-25 · WO-O4O-CROSSSERVICE-IDENTITY-RBAC-MEMBERSHIP-FINAL-AUDIT-AND-CLOSURE-V1
+> 이 절은 §6 "JWT Payload 구조" 를 **대체하지 않고 한정**한다. JWT 의 `roles`/`memberships`
+> 는 여전히 로그인 시점 스냅샷이지만, **진입 게이트의 최종 판정 근거는 DB** 다.
+
+### 권한 = active membership + 필요한 role/capability
+
+두 축은 역할이 다르다.
+
+| 축 | 질문 | SSOT |
+|----|------|------|
+| `users.id` | 너는 누구인가 (전역 identity) | `users` |
+| `service_memberships.status` | 이 서비스에 **들어올 수 있는가** | `service_memberships` |
+| `role_assignments.role` | 그 안에서 **무엇을 할 수 있는가** | `role_assignments` |
+
+금지되는 판정 형태:
+
+- `service role only` — role 만 보고 membership 을 보지 않음
+- `JWT role snapshot only` — 토큰 스냅샷만 보고 DB 를 확인하지 않음
+- `bare legacy role only` — 무접두 `admin` / `super_admin` 단독 판정
+
+`suspended` 와 `rejected` 는 서로 다른 상태이며, 서비스별로 재해석하지 않는다.
+
+### 정지 즉시성
+
+게이트에서의 membership 판정은 DB 를 본다. 운영자가 회원을 정지시키면 그 회원의
+기존 토큰이 만료되기를 기다리지 않고 즉시 차단된다.
+
+- `common/middleware/membership-guard.middleware.ts` — JWT 사전검사(빠른 거부) 후 DB 확정검사
+- `utils/store-owner.utils.ts` `isStoreOwner()` — DB `service_memberships(active)` 선검사
+- `middleware/signage-role.middleware.ts` — signage 6개 게이트 전부 active membership 요구
+- `utils/service-membership.ts` — 위 판정의 공용 SSOT (`resolveCanonicalServiceKey` 경유, 실패 시 fail-closed)
+
+정지 시 refresh token 을 일괄 폐기하는 방식은 **쓰지 않는다** — 토큰은 전역이라
+한 서비스의 정지가 다른 서비스의 세션까지 끊는 cross-service fan-out 이 된다.
+
+### platform override
+
+`platform:super_admin` 단독 통과는 **경로별로 명시된 경우에만** 허용한다.
+
+| 경로 | override | 근거 |
+|------|----------|------|
+| `createMembershipScopeGuard` | `config.platformBypass === true` 인 서비스만 | 서비스별 설정 (KPA 는 `false`) |
+| signage 게이트 | `hasSignageAdminPermission()` | 운영/디버깅 최소 예외 |
+| Neture `PlatformRoute` | membership 요구 안 함 | cross-service surface (서비스 멤버십과 무관) |
+| `requireAdmin` | `platform:super_admin` 전용 | 플랫폼 관리 API |
+
+### 프런트엔드
+
+membership 판정 SSOT 는 `@o4o/auth-utils` 의 `membershipGate` 이며 데이터원은
+`GET /auth/me` 다(JWT 아님). 5개 서비스가 각자 `lib/membershipGate.ts` 에서
+자기 `SERVICE_KEY` 만 바인딩해 re-export 한다 —
+`kpa-society` · `k-cosmetics` · `glycopharm` · `neture` · `pharmacy-hub`.
+
+---
+
 ## 9. 관련 문서
 
 | 문서 | 관계 |
@@ -201,6 +258,7 @@ ORDER BY cnt DESC;
 | `docs/architecture/USER-OPERATOR-FREEZE-V1.md` (F11) | users/role_assignments/memberships 테이블 freeze |
 | `docs/rbac/RBAC-RUNBOOK-V1.md` | 운영 장애 대응 절차 |
 | `docs/rbac/RBAC-ROLE-CATALOG-V1.md` | 역할 목록 및 분류 |
+| `docs/checks/WO-O4O-CROSSSERVICE-IDENTITY-RBAC-MEMBERSHIP-FINAL-AUDIT-AND-CLOSURE-V1-CHECK.md` | 권한 판정 계약 최종 감사 (§8-A 근거) |
 
 ---
 

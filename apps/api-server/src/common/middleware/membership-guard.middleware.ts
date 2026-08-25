@@ -32,11 +32,18 @@
  * - 멤버십 없음 → 403 MEMBERSHIP_NOT_FOUND
  * - 멤버십 비활성 → 403 MEMBERSHIP_NOT_ACTIVE
  * - 멤버십 active → 기존 scope guard로 위임
+ *
+ * CORE_CHANGE (F10 §3.2 "버그 수정") — WO-O4O-CROSSSERVICE-IDENTITY-RBAC-MEMBERSHIP-FINAL-AUDIT-AND-CLOSURE-V1
+ *   판정 **근거**를 JWT 스냅샷 단독 → JWT 사전검사 + DB 확정검사로 바꾼다.
+ *   미들웨어 체인 · API 계약(응답 코드 MEMBERSHIP_NOT_FOUND / MEMBERSHIP_NOT_ACTIVE) ·
+ *   엔티티 · 시그니처는 모두 그대로다. 정지 즉시성 0 이라는 결함 수정이다.
  */
 
 import type { RequestHandler } from 'express';
 import { createServiceScopeGuard, resolveCanonicalServiceKey } from '@o4o/security-core';
 import type { ServiceScopeGuardConfig } from '@o4o/security-core';
+import { AppDataSource } from '../../database/connection.js';
+import { getServiceMembershipStatusFromDb } from '../../utils/service-membership.js';
 
 // WO-O4O-BACKFILL-MIGRATION-CANONICAL-KEY-CONSISTENCY-V1:
 //   scope serviceKey → service_memberships.service_key 매핑은 @o4o/security-core 의
@@ -61,7 +68,7 @@ export function createMembershipScopeGuard(
   return function requireScope(scope: string): RequestHandler {
     const scopeHandler = originalGuard(scope);
 
-    return (req, res, next) => {
+    return async (req, res, next) => {
       const user = (req as any).user;
       if (!user) {
         res.status(401).json({
@@ -91,7 +98,8 @@ export function createMembershipScopeGuard(
       //   canonical bootstrap seed 가 모든 admin/operator 에게 정식 active membership 을
       //   부여하면서 전제가 무효화. 이제 role 과 membership 이 모두 있어야 한다.
 
-      // Check service membership from JWT payload
+      // ── 1단계: JWT 스냅샷 사전 검사 (빠른 거부) ────────────────────────
+      // 토큰에 이미 "없음/비활성" 이 실려 있으면 DB 를 보지 않고 거부한다.
       const memberships: { serviceKey: string; status: string }[] = user.memberships || [];
       const membership = memberships.find((m: { serviceKey: string }) => m.serviceKey === membershipKey);
 
@@ -111,6 +119,44 @@ export function createMembershipScopeGuard(
           code: 'MEMBERSHIP_NOT_ACTIVE',
         });
         return;
+      }
+
+      // ── 2단계: DB 확정 검사 (정지 즉시성) ─────────────────────────────
+      // WO-O4O-CROSSSERVICE-IDENTITY-RBAC-MEMBERSHIP-FINAL-AUDIT-AND-CLOSURE-V1
+      //
+      // 1단계만 있던 시절, membership 판정 근거가 **JWT 스냅샷 하나**였다. 토큰은
+      // 로그인/refresh 때만 갱신되므로 운영자가 회원을 정지시켜도 그 회원의 기존 토큰은
+      // 만료될 때까지 계속 통과했다(즉시성 0 — 선행 WO
+      // CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §10-2 잔여).
+      //
+      // 정본은 DB 다. 긍정 판정(=통과)일 때만 DB 를 확인하므로, 이미 거부된 요청에는
+      // 질의가 늘지 않는다. `isStoreOwner()` 가 같은 정책으로 먼저 내려가 있고
+      // (동 WO §4), 이 가드가 그 마지막 한 곳이다.
+      //
+      // 정지 시 refresh token 을 일괄 폐기하는 방식은 쓰지 않는다 — 토큰은 전역이라
+      // 한 서비스의 정지가 다른 4개 서비스의 세션까지 끊는 cross-service fan-out 이 된다.
+      //
+      // DataSource 가 아직 초기화되지 않은 구간(부팅 직전·단위테스트)에서는 1단계 판정을
+      // 그대로 쓴다. 이 구간에는 정지 즉시성 요구가 없고, DB 없이 fail-closed 하면
+      // 부팅 중 요청이 전부 403 이 된다.
+      if (AppDataSource.isInitialized) {
+        const dbStatus = await getServiceMembershipStatusFromDb(
+          AppDataSource,
+          user.id ?? user.userId,
+          membershipKey,
+        ).catch(() => 'none' as const);
+
+        if (dbStatus !== 'active') {
+          res.status(403).json({
+            success: false,
+            error:
+              dbStatus === 'none'
+                ? `No membership found for service: ${config.serviceKey}`
+                : `Service membership is ${dbStatus}. Active membership required.`,
+            code: dbStatus === 'none' ? 'MEMBERSHIP_NOT_FOUND' : 'MEMBERSHIP_NOT_ACTIVE',
+          });
+          return;
+        }
       }
 
       // Membership active → delegate to original scope guard

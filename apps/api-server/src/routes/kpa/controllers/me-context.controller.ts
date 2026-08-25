@@ -50,11 +50,24 @@ export function createMeContextController(
         om.role AS org_member_role
       FROM users u
       LEFT JOIN kpa_pharmacist_profiles pp ON pp.user_id = u.id
+      -- WO-O4O-CROSSSERVICE-IDENTITY-RBAC-MEMBERSHIP-FINAL-AUDIT-AND-CLOSURE-V1
+      --   CROSS_SERVICE_LEAK 수정. 이 응답은 KPA-Society 의 me-context 이고,
+      --   프런트(AuthContext → KpaGlobalHeader → isStoreOwnerDual)가 이 값을
+      --   'kpa:store_owner' 와 동등하게 취급해 KPA 약국 HUB UI 를 연다.
+      --   그런데 종전 조건은 glycopharm / cosmetics 의 store_owner 까지 참으로 만들어,
+      --   **KPA 매장 권한이 없는 타 서비스 경영자에게 KPA 매장 표면이 열렸다**.
+      --   판정을 kpa:store_owner 로 한정하고, membership 축(kpa-society active)까지
+      --   요구한다 — role 은 "무엇을 할 수 있느냐", membership 은 "들어올 수 있느냐".
       LEFT JOIN (
-        SELECT user_id FROM role_assignments
-        WHERE user_id = $1
-          AND role IN ('kpa:store_owner','glycopharm:store_owner','cosmetics:store_owner')
-          AND is_active = true
+        SELECT ra0.user_id
+        FROM role_assignments ra0
+        JOIN service_memberships sm0
+          ON sm0.user_id = ra0.user_id
+         AND sm0.service_key = 'kpa-society'
+         AND sm0.status = 'active'
+        WHERE ra0.user_id = $1
+          AND ra0.role = 'kpa:store_owner'
+          AND ra0.is_active = true
         LIMIT 1
       ) ra ON ra.user_id = u.id
       LEFT JOIN kpa_members km ON km.user_id = u.id

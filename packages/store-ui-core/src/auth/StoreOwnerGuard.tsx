@@ -72,7 +72,13 @@ const SERVICE_ROLES: Record<StoreOwnerServiceKey, ServiceRoleConfig> = {
     storeOwner: 'cosmetics:store_owner',
     admin: 'cosmetics:admin',
     operator: 'cosmetics:operator',
-    membershipServiceKey: 'cosmetics',
+    // WO-O4O-CROSSSERVICE-IDENTITY-RBAC-MEMBERSHIP-FINAL-AUDIT-AND-CLOSURE-V1:
+    //   service_memberships.service_key 의 canonical 값은 'k-cosmetics' 다
+    //   (role prefix 'cosmetics' 와 다르다 — backend resolveCanonicalServiceKey SSOT).
+    //   'cosmetics' 로 적혀 있어 이 키로 membership 을 찾으면 항상 0건이었다.
+    //   현재 cosmetics 는 membershipStoreOwnerRole=null 이라 실사용 영향은 없었지만,
+    //   membership 기반 판정을 켜는 순간 조용히 전원 차단되는 잠복 결함이므로 지금 맞춘다.
+    membershipServiceKey: 'k-cosmetics',
     membershipStoreOwnerRole: null,
   },
   // WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1 (additive — 기존 3서비스 무영향)

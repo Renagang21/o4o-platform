@@ -221,17 +221,20 @@ describe('cross-service 권한 회귀 (§8) — canonical key 로도 그대로 �
     expect(req.signageContext.serviceKey).toBe('k-cosmetics');
   });
 
-  it('operator 계약 회귀 없음 — KCos operator 는 canonical key 로 통과', () => {
+  // WO-O4O-CROSSSERVICE-IDENTITY-RBAC-MEMBERSHIP-FINAL-AUDIT-AND-CLOSURE-V1:
+  //   signage 게이트가 membership 을 DB 로 확인하면서 async 가 되었다. 판정 계약은 그대로이고
+  //   호출을 await 로 맞춘다 (DataSource 미초기화 구간에서는 membership 검사를 건너뛴다).
+  it('operator 계약 회귀 없음 — KCos operator 는 canonical key 로 통과', async () => {
     const res = makeRes();
     const next = jest.fn();
-    requireSignageOperator(makeReq('k-cosmetics', undefined, { id: 'op', roles: ['cosmetics:operator'] }), res, next);
+    await requireSignageOperator(makeReq('k-cosmetics', undefined, { id: 'op', roles: ['cosmetics:operator'] }), res, next);
     expect(next).toHaveBeenCalled();
   });
 
-  it('operator 아님 → 403 SIGNAGE_OPERATOR_REQUIRED', () => {
+  it('operator 아님 → 403 SIGNAGE_OPERATOR_REQUIRED', async () => {
     const res = makeRes();
     const next = jest.fn();
-    requireSignageOperator(makeReq('k-cosmetics', undefined, { id: 'u', roles: ['kpa:operator'] }), res, next);
+    await requireSignageOperator(makeReq('k-cosmetics', undefined, { id: 'u', roles: ['kpa:operator'] }), res, next);
     expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json.mock.calls[0][0].code).toBe('SIGNAGE_OPERATOR_REQUIRED');
   });

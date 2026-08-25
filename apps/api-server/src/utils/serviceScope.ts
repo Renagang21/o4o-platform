@@ -85,10 +85,35 @@ export function injectServiceScope(req: Request, _res: Response, next: NextFunct
   const user = (req as any).user;
   const userRoles: string[] = user?.roles || [];
   const scope = extractServiceScope(userRoles);
+  const memberships: { serviceKey: string; status: string }[] = user?.memberships || [];
+
+  // WO-O4O-CROSSSERVICE-IDENTITY-RBAC-MEMBERSHIP-FINAL-AUDIT-AND-CLOSURE-V1:
+  //   role 로 파생한 scope 에서 **비활성 membership(정지/탈퇴/거부) 서비스를 제거**한다.
+  //   종전에는 role 만 보았기 때문에, 정지된 회원이 role 을 그대로 들고 있으면
+  //   그 서비스 데이터가 계속 scope 안에 남았다 (선행 WO
+  //   CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §10-1 잔여 3계열 중 하나).
+  //
+  //   **negative filter 만** 적용한다 — membership row 가 아예 없는 서비스는 건드리지 않는다.
+  //   membership 축이 없는 내부/운영 계열(role 만으로 운영되는 scope)을 깨지 않기 위해서다.
+  //   즉 "있는데 active 가 아니다" 만 제거하고, "없다" 는 종전 동작을 유지한다.
+  //
+  //   판정 근거는 JWT 스냅샷이다. 이 미들웨어는 **진입 게이트가 아니라 데이터 격리 scope**
+  //   계산이고(진입 차단은 membership-guard 가 DB 로 확정한다), sync 시그니처를 유지해야
+  //   99개 호출부의 체인이 바뀌지 않는다. 정지 즉시성은 게이트 쪽에서 이미 닫혔다.
+  if (!scope.isPlatformAdmin && scope.serviceKeys.length > 0 && memberships.length > 0) {
+    const inactiveKeys = new Set(
+      memberships.filter(m => m.status !== 'active').map(m => m.serviceKey)
+    );
+    if (inactiveKeys.size > 0) {
+      scope.serviceKeys = scope.serviceKeys.filter(k => !inactiveKeys.has(k));
+      scope.rolePrefixes = scope.rolePrefixes.filter(
+        p => !inactiveKeys.has(resolveServiceKey(p))
+      );
+    }
+  }
 
   // If no service scope from roles, derive from JWT memberships
   if (!scope.isPlatformAdmin && scope.serviceKeys.length === 0) {
-    const memberships: { serviceKey: string; status: string }[] = user?.memberships || [];
     const activeKeys = memberships
       .filter(m => m.status === 'active')
       .map(m => m.serviceKey);

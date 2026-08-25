@@ -6,6 +6,7 @@
  */
 import { Request } from 'express';
 import { AppDataSource } from '../../../database/connection.js';
+import { isStoreOwner as isStoreOwnerSsot } from '../../../utils/store-owner.utils.js';
 /**
  * Check if request is cross-origin.
  * Cross-origin requests need tokens in response body since cookies won't work.
@@ -55,15 +56,19 @@ export async function derivePharmacistQualification(userId: string): Promise<{
 }> {
   // WO-O4O-STORE-OWNER-LEGACY-CLEANUP-V1
   // role_assignments는 store_owner 판단의 단일 소스다.
-  const [raRecord] = await AppDataSource.query(
-    `SELECT 1 FROM role_assignments
-     WHERE user_id = $1
-       AND role IN ('kpa:store_owner', 'glycopharm:store_owner', 'cosmetics:store_owner')
-       AND is_active = true
-     LIMIT 1`,
-    [userId]
-  );
-  const isStoreOwner = !!raRecord;
+  //
+  // WO-O4O-CROSSSERVICE-IDENTITY-RBAC-MEMBERSHIP-FINAL-AUDIT-AND-CLOSURE-V1:
+  //   여기서 role 목록을 직접 나열하던 것을 store-owner SSOT(isStoreOwner)로 위임한다.
+  //   직접 나열은 두 가지 결함을 갖고 있었다.
+  //     1) membership 을 보지 않았다 — 정지된 회원도 매장 경영자 자격이 계속 참으로 나왔다
+  //        (선행 WO ...SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §10-1 잔여 3계열 중 마지막).
+  //     2) 'pharmacy-hub:store_owner' 가 누락돼 있었다 — 약국 HUB 경영자만 자격이 거짓이었다.
+  //   isStoreOwner() 는 active membership 을 DB 로 먼저 확인한 뒤 role 을 보므로 두 결함이
+  //   동시에 닫히고, 서비스별 role 목록도 한 곳(STORE_OWNER_ROLES_BY_SERVICE)만 남는다.
+  //   serviceKey 미지정(back-compat) 형태를 쓰는 이유: 이 헬퍼는 특정 서비스가 아니라
+  //   **계정 전역의 약사 자격**을 계산한다.
+  const storeOwnerCheck = await isStoreOwnerSsot(AppDataSource, userId);
+  const isStoreOwner = storeOwnerCheck.isOwner;
 
   const [profile] = await AppDataSource.query(
     `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,

@@ -10,6 +10,7 @@ import { AccessDenied } from '@o4o/ui';
 import { useAuth, User } from '../../contexts/AuthContext';
 import { LoadingSpinner } from '../common';
 import { ROLES } from '../../lib/role-constants';
+import { isServiceAccessAllowed } from '../../lib/membershipGate';
 
 interface AdminAuthGuardProps {
   children: React.ReactNode;
@@ -31,6 +32,20 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
       }
 
       try {
+        // WO-O4O-CROSSSERVICE-IDENTITY-RBAC-MEMBERSHIP-FINAL-AUDIT-AND-CLOSURE-V1
+        //   /admin/* 전체가 role(또는 membershipRole) 하나로만 열려 있었다.
+        //   canonical 계약은 **active membership + 필요한 role** 이다 — role 만으로는
+        //   서비스 진입 자격을 대신할 수 없다. 정지/탈퇴된 kpa:admin 이 관리자 화면을
+        //   그대로 열 수 있던 경로를 닫는다 (선행 WO ...SUSPENSION-ROLE-LIFECYCLE-
+        //   CONTRACT-V1 §10-3 잔여).
+        //   membership 판정 SSOT 는 lib/membershipGate (데이터원: GET /auth/me).
+        //   platform:super_admin 은 isServiceAccessAllowed() 안에서 기존대로 우회한다.
+        if (!isServiceAccessAllowed(user)) {
+          setError('KPA 약사회 서비스 이용 자격이 없습니다.');
+          setIsAuthorized(false);
+          return;
+        }
+
         const hasBranchAdminRole = checkBranchAdminRole(user);
 
         if (hasBranchAdminRole) {

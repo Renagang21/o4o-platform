@@ -25,6 +25,7 @@ import {
   isOrganizationLinkedToService,
   type StoreOwnerServiceKey,
 } from '../utils/store-organization.resolver.js';
+import { hasActiveServiceMembership } from '../utils/service-membership.js';
 
 // Extend Express Request interface
 declare module 'express' {
@@ -105,6 +106,55 @@ export function hasSignageAdminPermission(user: any): boolean {
   }
 
   return false;
+}
+
+/**
+ * Signage serviceKey 중 **service_memberships 축이 존재하는** canonical key 목록.
+ *
+ * WO-O4O-CROSSSERVICE-IDENTITY-RBAC-MEMBERSHIP-FINAL-AUDIT-AND-CLOSURE-V1
+ *
+ * 'pharmacy' / 'tourism' / 'common' / 'test' 는 canonical service 가 아니라 legacy
+ * signage key 다. 이 key 들에는 "이 사용자가 그 서비스 회원인가" 를 판정할 SSOT 가 없으므로
+ * 추정으로 차단하지 않는다 (`toStoreOwnerServiceKey` 의 기존 정책과 동일).
+ */
+const MEMBERSHIP_BACKED_SIGNAGE_SERVICE_KEYS = new Set([
+  'kpa-society',
+  'k-cosmetics',
+  'glycopharm',
+  'neture',
+]);
+
+/**
+ * signage 접근에 필요한 **active membership** 검사.
+ *
+ * WO-O4O-CROSSSERVICE-IDENTITY-RBAC-MEMBERSHIP-FINAL-AUDIT-AND-CLOSURE-V1
+ *
+ * 선행 WO(CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §10-1)가
+ * 남긴 잔여 3계열 중 하나 — signage 권한 계열은 role(JWT) 만 보고 membership 을 보지 않았다.
+ * 그 결과 정지된 회원도 signage operator/store/community/supplier 표면으로 들어올 수 있었고,
+ * 이것이 suspend 경로에서 role soft-revoke 를 계속 유지해야 했던 이유였다.
+ *
+ * 판정은 DB 다 (JWT 스냅샷은 정지 즉시성이 0). platform:super_admin 은 기존 계약대로 우회한다.
+ *
+ * @returns true = 통과(검사 대상 아님 포함) · false = 차단
+ */
+async function hasSignageServiceMembership(user: any, serviceKey: string): Promise<boolean> {
+  if (hasSignageAdminPermission(user)) return true;
+  if (!MEMBERSHIP_BACKED_SIGNAGE_SERVICE_KEYS.has(serviceKey)) return true;
+  const userId = user?.id || user?.userId;
+  if (!userId) return false;
+  if (!AppDataSource.isInitialized) return true;
+  return hasActiveServiceMembership(AppDataSource, userId, serviceKey);
+}
+
+/** membership 차단 응답 (모든 signage 게이트 공통) */
+function denySignageMembership(res: Response, serviceKey: string) {
+  return res.status(403).json({
+    success: false,
+    error: 'Forbidden',
+    code: 'MEMBERSHIP_NOT_ACTIVE',
+    message: `Active service membership required for service: ${serviceKey}`,
+  });
 }
 
 /**
@@ -272,7 +322,7 @@ export const requireSignageAdmin = (
  * - Community approval
  * - Forced content management
  */
-export const requireSignageOperator = (
+export const requireSignageOperator = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -304,6 +354,11 @@ export const requireSignageOperator = (
       code: 'SIGNAGE_OPERATOR_REQUIRED',
       message: `Operator permission required for service: ${serviceKey}`,
     });
+  }
+
+  // role 이 있어도 그 서비스 회원이 아니면(정지 포함) 진입 불가
+  if (!(await hasSignageServiceMembership(req.user, serviceKey))) {
+    return denySignageMembership(res, serviceKey);
   }
 
   // Set context
@@ -340,6 +395,12 @@ export const requireSignageStore = async (
   }
 
   const serviceKey = getSignageServiceKey(req);
+
+  // role/organization 검사 이전에 서비스 회원 여부를 먼저 본다 (membership = 진입 자격)
+  if (!(await hasSignageServiceMembership(req.user, serviceKey))) {
+    return denySignageMembership(res, serviceKey);
+  }
+
   // Organization ID can come from header, query, or body
   const organizationId =
     (req.headers['x-organization-id'] as string) ||
@@ -416,7 +477,7 @@ export const requireSignageStore = async (
  * Use for:
  * - /api/signage/:serviceKey/global/* routes (read-only)
  */
-export const allowSignageStoreRead = (
+export const allowSignageStoreRead = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -431,6 +492,11 @@ export const allowSignageStoreRead = (
   }
 
   const serviceKey = getSignageServiceKey(req);
+
+  if (!(await hasSignageServiceMembership(req.user, serviceKey))) {
+    return denySignageMembership(res, serviceKey);
+  }
+
   const organizationId =
     (req.headers['x-organization-id'] as string) ||
     (req.query.organizationId as string) ||
@@ -493,6 +559,11 @@ export const requireSignageOperatorOrStore = async (
   }
 
   const serviceKey = getSignageServiceKey(req);
+
+  if (!(await hasSignageServiceMembership(req.user, serviceKey))) {
+    return denySignageMembership(res, serviceKey);
+  }
+
   const organizationId =
     (req.headers['x-organization-id'] as string) ||
     (req.query.organizationId as string) ||
@@ -628,7 +699,7 @@ export function hasSignageSupplierPermission(user: any, serviceKey: string): boo
  * - Community content creation (media, playlists)
  * - Created content is source='community', scope='global'
  */
-export const requireSignageCommunity = (
+export const requireSignageCommunity = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -662,6 +733,10 @@ export const requireSignageCommunity = (
     });
   }
 
+  if (!(await hasSignageServiceMembership(req.user, serviceKey))) {
+    return denySignageMembership(res, serviceKey);
+  }
+
   // Set context
   req.signageContext = {
     role: 'operator', // Community acts at operator level for global content
@@ -680,7 +755,7 @@ export const requireSignageCommunity = (
  * - Supplier content creation (media, playlists)
  * - Created content is source='supplier', scope='global'
  */
-export const requireSignageSupplier = (
+export const requireSignageSupplier = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -712,6 +787,10 @@ export const requireSignageSupplier = (
       code: 'SIGNAGE_SUPPLIER_REQUIRED',
       message: 'Supplier permission required',
     });
+  }
+
+  if (!(await hasSignageServiceMembership(req.user, serviceKey))) {
+    return denySignageMembership(res, serviceKey);
   }
 
   // Set context
