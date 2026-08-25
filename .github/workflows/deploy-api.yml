@@ -368,6 +368,56 @@ jobs:
 
         echo "✅ Migrations completed successfully"
 
+    - name: Refresh one-off Cloud Run job image references
+      # ---------------------------------------------------------------
+      # WO-O4O-CLOUDRUN-JOB-IMAGE-REFERENCE-RECOVERY-AND-DEPLOYMENT-CONTRACT-V1
+      #
+      # Canonical image reference contract:
+      # - api-server 이미지 1개가 모든 Cloud Run Job entrypoint(dist/*-job.js)를 포함한다.
+      # - 따라서 모든 one-off Job 은 매 배포마다 방금 push 한 IMAGE_TAG 로 재고정한다.
+      # - 이 단계가 없으면 Job 은 생성 당시 SHA 에 영구 고정되고,
+      #   Artifact Registry cleanup(delete-any-older-than-30d, tagState=ANY)에 의해
+      #   30일 후 이미지가 GC 되어 "Image not found" 로 실행 불가가 된다. (2026-08-25 실장애)
+      #
+      # 주의: --image 만 갱신한다. env/secret/args 는 Job 별 운영 설정이므로 건드리지 않는다.
+      #       (특히 *_APPLY 게이트와 DB_PASSWORD secretKeyRef 를 덮어쓰면 안 된다)
+      # ---------------------------------------------------------------
+      run: |
+        set -euo pipefail
+        FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+
+        ONEOFF_JOBS=(
+          o4o-drug-representative-grouping
+          o4o-drug-seed-candidate-import
+          o4o-drug-seed-promotion-apply
+          o4o-drug-shared-desc-bulk-canonical
+          o4o-easy-drug-image-copy
+          o4o-easy-drug-seed-candidate-import
+          o4o-easy-drug-shared-description-derive
+        )
+
+        FAILED=0
+        for JOB in "${ONEOFF_JOBS[@]}"; do
+          if ! gcloud run jobs describe "${JOB}" \
+                 --region=${{ env.REGION }} --project=${{ env.PROJECT_ID }} >/dev/null 2>&1; then
+            echo "notice: ${JOB} 미존재 - skip"
+            continue
+          fi
+          if gcloud run jobs update "${JOB}" \
+               --image="${FULL_IMAGE}" \
+               --region=${{ env.REGION }} \
+               --project=${{ env.PROJECT_ID }} \
+               --quiet >/dev/null 2>&1; then
+            echo "  OK   ${JOB} -> ${{ env.IMAGE_TAG }}"
+          else
+            echo "  FAIL ${JOB} 이미지 갱신 실패"
+            FAILED=1
+          fi
+        done
+
+        [ "${FAILED}" -eq 0 ] || { echo "one-off job 이미지 갱신 실패"; exit 1; }
+        echo "one-off Cloud Run job 이미지 참조 갱신 완료"
+
     - name: Verify deployment
       run: |
         echo "🔍 Verifying deployment..."
