@@ -26,7 +26,17 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Mail, Phone, User as UserIcon } from 'lucide-react';
+import {
+  Award,
+  ClipboardList,
+  Coins,
+  GraduationCap,
+  Mail,
+  MessageSquare,
+  Phone,
+  User as UserIcon,
+  UsersRound,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   AccountProfileSection,
@@ -35,6 +45,7 @@ import {
   MyPageLoadingState,
   MembershipStatusBadge,
   MyPageShell,
+  MyPageEntryCardGrid,
   NotificationBell,
   resolveRoleLabel,
   useNotifications,
@@ -326,6 +337,23 @@ export default function MyProfilePage({
         securityDescription="Pharmacy-Hub 로그인 비밀번호"
         onChangePassword={changeAccountPassword}
         onLogout={handleLogout}
+      />
+
+      {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §5 (#47·#51)
+          개인 축 진입 허브. Pharmacy-Hub 는 `/mypage` 축이 없어 이 화면이 My Page Home
+          역할을 겸하므로(§13 계약 유지), KPA `/mypage` 대시보드의 바로가기와 같은
+          공통 `MyPageEntryCardGrid` 로 내 활동 3축(내 글 · 내 수강 · 내 신청)을 모은다.
+          `/mypage` 를 신설하지 않고, 존재하는 route 만 연결한다(데드 링크 0). */}
+      <MyPageEntryCardGrid
+        title="바로가기"
+        items={[
+          { key: 'my-posts', title: '내 글', href: '/forum/my-posts', icon: <MessageSquare className="h-5 w-5" /> },
+          { key: 'my-forums', title: '내 포럼', href: '/forum/my-dashboard', icon: <UsersRound className="h-5 w-5" /> },
+          { key: 'enrollments', title: '내 수강', href: '/account/enrollments', icon: <GraduationCap className="h-5 w-5" /> },
+          { key: 'certificates', title: '내 수료증', href: '/account/certificates', icon: <Award className="h-5 w-5" /> },
+          { key: 'credits', title: '내 크레딧', href: '/account/credits', icon: <Coins className="h-5 w-5" /> },
+          { key: 'my-requests', title: '내 신청', href: '/account/my-requests', icon: <ClipboardList className="h-5 w-5" /> },
+        ]}
       />
     </div>,
   );

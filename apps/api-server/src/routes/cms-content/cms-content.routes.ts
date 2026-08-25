@@ -16,6 +16,8 @@
  * - GET /api/v1/cms/contents/:id - Get single content
  * - PUT /api/v1/cms/contents/:id - Update content (admin)
  * - PATCH /api/v1/cms/contents/:id/status - Change status (admin)
+ * - POST /api/v1/cms/contents/:id/view - Increment view count (public)
+ * - POST /api/v1/cms/contents/:id/recommend - Toggle recommendation (member)
  *
  * Slot Endpoints:
  * - GET /api/v1/cms/slots - List all slots (admin)
@@ -34,6 +36,7 @@ import { CmsContentService } from './cms-content.service.js';
 import { createCmsContentQueryRoutes } from './cms-content-query.handler.js';
 import { createCmsContentSlotRoutes } from './cms-content-slot.handler.js';
 import { createCmsContentMutationRoutes } from './cms-content-mutation.handler.js';
+import { createCmsContentEngagementRoutes } from './cms-content-engagement.js';
 
 /**
  * Create CMS Content routes
@@ -52,6 +55,11 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
 
   // Content write endpoints (POST /contents, PUT /contents/:id, PATCH /contents/:id/status)
   router.use('/', createCmsContentMutationRoutes({ dataSource, cmsContentService }));
+
+  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 (audit #28):
+  //   Engagement endpoints (POST /contents/:id/view, POST /contents/:id/recommend).
+  //   이미 존재하던 `cms_contents."viewCount"` · `cms_content_recommendations` 를 소비만 한다.
+  router.use('/', createCmsContentEngagementRoutes({ dataSource }));
 
   /**
    * GET /cms/health

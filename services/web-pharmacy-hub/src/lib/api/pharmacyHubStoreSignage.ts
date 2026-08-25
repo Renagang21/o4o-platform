@@ -67,7 +67,7 @@ export interface SignageSources {
     mimeType: string | null;
     fileUrl: string | null;
   }>;
-  /** 매장 소유 signage_media. Pharmacy-Hub 는 등록 경로가 없어 보통 빈 배열이며 정상이다. */
+  /** 매장 소유 signage_media. '내 동영상' 탭에서 등록한다 (#69). */
   media: Array<{
     id: string;
     name: string;
@@ -132,4 +132,118 @@ export async function reorderItems(playlistId: string, order: string[]): Promise
 export async function deletePlaylistItem(playlistId: string, itemId: string): Promise<void> {
   const res = await api.delete(`${BASE}/playlists/${playlistId}/items/${itemId}`);
   unwrap<unknown>(res.data, '항목을 삭제하지 못했습니다.');
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * 내 동영상 (#69) · 편성 (#70)
+ *
+ * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8
+ *   GET/POST/PATCH/DELETE /pharmacy-hub/store-owner/signage/media[/:id]
+ *   GET/POST/PATCH/DELETE /pharmacy-hub/store-owner/signage/schedules[/:id]
+ * 원장은 KPA 와 같은 `signage_media` · `signage_schedules` 다 — 신규 테이블 0.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+export interface SignageMedia {
+  id: string;
+  name: string;
+  description: string | null;
+  mediaType: string;
+  sourceType: string;
+  sourceUrl: string;
+  embedId: string | null;
+  thumbnailUrl: string | null;
+  status: string;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SignageSchedule {
+  id: string;
+  name: string;
+  playlistId: string | null;
+  storePlaylistId: string | null;
+  channelId: string | null;
+  daysOfWeek: number[];
+  startTime: string;
+  endTime: string;
+  validFrom: string | null;
+  validUntil: string | null;
+  priority: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function fetchSignageMedia(): Promise<{
+  storeConnection: StoreConnectionState;
+  items: SignageMedia[];
+}> {
+  const res = await api.get(`${BASE}/media`);
+  return unwrap(res.data, '동영상을 불러오지 못했습니다.');
+}
+
+export async function createSignageMedia(input: {
+  name: string;
+  sourceUrl: string;
+  description?: string;
+  tags?: string[];
+}): Promise<SignageMedia> {
+  const res = await api.post(`${BASE}/media`, input);
+  return unwrap(res.data, '동영상을 등록하지 못했습니다.');
+}
+
+export async function updateSignageMedia(
+  id: string,
+  input: { name?: string; sourceUrl?: string; description?: string; tags?: string[] },
+): Promise<SignageMedia> {
+  const res = await api.patch(`${BASE}/media/${id}`, input);
+  return unwrap(res.data, '동영상을 수정하지 못했습니다.');
+}
+
+export async function deleteSignageMedia(id: string): Promise<void> {
+  const res = await api.delete(`${BASE}/media/${id}`);
+  unwrap(res.data, '동영상을 삭제하지 못했습니다.');
+}
+
+export async function fetchSignageSchedules(): Promise<{
+  storeConnection: StoreConnectionState;
+  items: SignageSchedule[];
+}> {
+  const res = await api.get(`${BASE}/schedules`);
+  return unwrap(res.data, '편성을 불러오지 못했습니다.');
+}
+
+export async function createSignageSchedule(input: {
+  name: string;
+  storePlaylistId: string;
+  daysOfWeek: number[];
+  startTime: string;
+  endTime: string;
+  priority?: number;
+  isActive?: boolean;
+}): Promise<SignageSchedule> {
+  const res = await api.post(`${BASE}/schedules`, input);
+  return unwrap(res.data, '편성을 만들지 못했습니다.');
+}
+
+export async function updateSignageSchedule(
+  id: string,
+  input: {
+    name?: string;
+    storePlaylistId?: string;
+    daysOfWeek?: number[];
+    startTime?: string;
+    endTime?: string;
+    priority?: number;
+    isActive?: boolean;
+  },
+): Promise<SignageSchedule> {
+  const res = await api.patch(`${BASE}/schedules/${id}`, input);
+  return unwrap(res.data, '편성을 수정하지 못했습니다.');
+}
+
+export async function deleteSignageSchedule(id: string): Promise<void> {
+  const res = await api.delete(`${BASE}/schedules/${id}`);
+  unwrap(res.data, '편성을 삭제하지 못했습니다.');
 }

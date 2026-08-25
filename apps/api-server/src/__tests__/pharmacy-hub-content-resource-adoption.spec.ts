@@ -89,10 +89,43 @@ describe('§9 자료실 View — 공통 ResourcesHubTemplate 채택', () => {
     expect(stripComments(template)).not.toContain('pharmacy-hub');
   });
 
-  it('learner 화면에 operator 기능을 섞지 않는다 §13 (등록·수정·삭제 액션 없음)', () => {
-    for (const opAction of ['createAction', 'getEditHref', 'onDelete', 'onBulkDelete']) {
+  /**
+   * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6 (audit #27)
+   *
+   * 이전 WO 는 "등록·수정·삭제 액션 없음"을 §13 의 표현으로 얼려 두었다. 그런데 KPA 정본에서
+   * 자료 등록·수정은 **회원 capability** 다 (`/resources/new`, `/resources/:id/edit` — 로그인만
+   * 요구하고 operator role 을 요구하지 않는다). 따라서 PH 미보유는 §13 준수가 아니라
+   * MISSING_ADOPTION 이었다.
+   *
+   * §13 이 실제로 금지하는 것은 **남의 자료를 편집·삭제하는 운영자 축**이다. 그 경계를 얼린다:
+   *   금지(운영자 축) : getEditHref · onDelete · onBulkDelete
+   *   허용(회원 축)   : createAction · getOwnerEditHref · onOwnerDelete (+ getCurrentUserId 로 소유자 판정)
+   */
+  it('learner 화면에 operator 축(남의 자료 편집·삭제)을 섞지 않는다 §13', () => {
+    for (const opAction of ['getEditHref', 'onDelete', 'onBulkDelete']) {
       expect(resourcesPageCode).not.toContain(opAction);
     }
+  });
+
+  it('회원 자신의 자료 등록·수정 축은 공통 template 슬롯으로 연결한다 (#27)', () => {
+    expect(resourcesPageCode).toContain('createAction');
+    expect(resourcesPageCode).toContain('getOwnerEditHref');
+    // 소유자 판정 없이 owner 액션을 노출하지 않는다.
+    expect(resourcesPageCode).toContain('getCurrentUserId');
+  });
+
+  it('자료 등록·수정 링크와 route 가 짝을 이룬다(데드링크 0)', () => {
+    const appTsx = read('services/web-pharmacy-hub/src/App.tsx');
+    expect(resourcesPageCode).toContain("href: '/resources/new'");
+    expect(appTsx).toContain('path="/resources/new"');
+    expect(resourcesPageCode).toContain('/resources/${id}/edit');
+    expect(appTsx).toContain('path="/resources/:id/edit"');
+  });
+
+  it('없는 DELETE API 를 부르지 않는다 — 회원 삭제는 archived 전이다 (§3 금지 패턴)', () => {
+    const api = stripComments(read('services/web-pharmacy-hub/src/lib/api/pharmacyHubResources.ts'));
+    expect(api).not.toMatch(/api\.delete\(/);
+    expect(api).toContain("setPharmacyHubResourceStatus(id, 'archived')");
   });
 
   it('empty / loading / error 상태 문구를 config 로 제공한다', () => {
@@ -153,16 +186,33 @@ describe('§12 navigation — route 고립 0 / dead link 0', () => {
     expect(footerBlock).toContain("href: '/resources'");
   });
 
-  it('구현되지 않은 /content 링크를 navigation 에 만들지 않는다 §10·§12', () => {
-    expect(navigation).not.toContain("href: '/content'");
-    expect(appTsx).not.toContain('path="/content"');
+  /*
+   * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §2·§6:
+   *   이 두 계약은 "PH 에 Content 가 없다"는 **당시 사실**을 고정한 것이었다.
+   *   §6 에서 회원 Content 가 실제로 구현됐고 §2 에서 backend 최신활동 축도 추가됐으므로,
+   *   같은 취지(빈 탭·데드링크 금지)를 **현재 사실 기준**으로 다시 고정한다.
+   */
+  it('/content 링크와 route 가 짝을 이룬다(데드링크 0)', () => {
+    expect(navigation).toContain("href: '/content'");
+    expect(appTsx).toContain('path="/content"');
   });
 
-  it('커뮤니티 홈은 backend 가 공급하지 않는 자료 탭을 만들지 않는다(빈 탭 금지)', () => {
+  it('최신활동 탭은 backend 가 실제로 공급하는 축만 노출한다(빈 탭 금지)', () => {
     const tabsBlock = communityHome.slice(
       communityHome.indexOf('const LATEST_TABS'),
       communityHome.indexOf('export default'),
     );
-    expect(tabsBlock).not.toContain("key: 'resource'");
+    const phRoutes = read('apps/api-server/src/routes/pharmacy-hub/pharmacy-hub.routes.ts');
+    const latestBlock = phRoutes.slice(
+      phRoutes.indexOf("homeRouter.get("),
+      phRoutes.indexOf("router.use('/home'"),
+    );
+    for (const axis of ['forum', 'course', 'content', 'resource']) {
+      if (!tabsBlock.includes(`key: '${axis}'`)) continue;
+      expect(latestBlock).toContain(`'${axis}'`);
+    }
+    // 반대 방향 — backend 가 공급하는 축은 탭으로 노출된다(고립 축 0).
+    expect(tabsBlock).toContain("key: 'content'");
+    expect(tabsBlock).toContain("key: 'resource'");
   });
 });

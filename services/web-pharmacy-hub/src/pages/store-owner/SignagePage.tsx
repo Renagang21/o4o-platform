@@ -7,12 +7,14 @@
  * 항목을 추가하면 원본이 아니라 **매장 사본**이 만들어지므로, 이후 원본이 바뀌어도
  * 재생 목록은 그대로 유지된다.
  *
- * 신규 미디어 등록 화면은 만들지 않는다 — 미디어 원본 작성은 운영자·공급자 영역이고
- * Pharmacy-Hub 에는 아직 그 축이 없다. 매장은 자기 자료함(W8)에서 항목을 가져온다.
+ * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#69 · #70):
+ *   KPA 와 같은 3탭 구조로 맞춘다 — [내 동영상] [재생 목록] [편성].
+ *   동영상 원장은 공통 `signage_media`, 편성 원장은 공통 `signage_schedules` 다.
+ *   매장은 자기 자료함(W8) 자료와 자기가 등록한 동영상을 재생 목록에 담는다.
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   fetchPlaylists,
   fetchSignageSources,
@@ -29,8 +31,63 @@ import {
   type SignageSources,
 } from '../../lib/api/pharmacyHubStoreSignage';
 import { StoreConnectionNotice, type StoreConnectionState } from '../../components/store-owner/StoreConnectionNotice';
+import SignageMediaPanel from './signage/SignageMediaPanel';
+import SignageSchedulePanel from './signage/SignageSchedulePanel';
+
+/** 탭 = 경로. KPA 도 videos·schedules 를 별도 경로로 두므로 딥링크·사이드바가 짝을 이룬다. */
+const TABS = [
+  { key: 'media', label: '내 동영상', path: '/store-owner/signage/media' },
+  { key: 'playlists', label: '재생 목록', path: '/store-owner/signage' },
+  { key: 'schedules', label: '편성', path: '/store-owner/signage/schedules' },
+] as const;
 
 export default function StoreOwnerSignagePage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const active = location.pathname.endsWith('/media')
+    ? 'media'
+    : location.pathname.endsWith('/schedules')
+      ? 'schedules'
+      : 'playlists';
+
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mb-6">
+        <h1 className="text-xl font-bold">디지털 사이니지</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          매장 화면에 돌릴 동영상을 등록하고, 재생 목록으로 묶고, 요일·시간대로 편성합니다.
+        </p>
+      </div>
+
+      <div className="mb-6 flex gap-1 border-b border-gray-200">
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => navigate(t.path)}
+            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
+              active === t.key
+                ? 'border-blue-600 text-blue-700'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {active === 'media' ? (
+        <SignageMediaPanel />
+      ) : active === 'schedules' ? (
+        <SignageSchedulePanel />
+      ) : (
+        <PlaylistsPanel />
+      )}
+    </div>
+  );
+}
+
+function PlaylistsPanel() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [connection, setConnection] = useState<StoreConnectionState | null>(null);
   const [loading, setLoading] = useState(true);
@@ -77,14 +134,11 @@ export default function StoreOwnerSignagePage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold">디지털 사이니지</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            매장 화면에 돌릴 재생 목록을 구성합니다. 자료함에 등록한 자료를 순서대로 담으세요.
-          </p>
-        </div>
+    <div>
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <p className="text-sm text-gray-500">
+          자료함 자료와 내 동영상을 순서대로 담아 재생 목록을 만듭니다.
+        </p>
         {connection?.status === 'connected' && (
           <button
             type="button"

@@ -39,9 +39,21 @@ export interface LocalProductsStoreConnection {
   errorCode: 'AMBIGUOUS_STORE_CONNECTION' | null;
 }
 
+/**
+ * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7 (상품 설명 축)
+ *   공통 backend(`store-local-products.service.ts`)는 PH 에도 `detail_html` 을 그대로
+ *   select·저장한다. 공통 `StoreLocalProduct(Input)` 이 최소 공통 부분집합일 뿐이므로
+ *   `StoreLocalProductsApi<T, I>` 가 안내하는 방식대로 서비스 측에서 확장한다
+ *   — API 계약 변경 아님, 신규 필드·table 0.
+ */
+export type PharmacyHubLocalProduct = StoreLocalProduct & { detailHtml?: string | null };
+export type PharmacyHubLocalProductInput = Partial<StoreLocalProductInput> & {
+  detailHtml?: string | null;
+};
+
 export interface LocalProductsPage {
   storeConnection: LocalProductsStoreConnection;
-  items: StoreLocalProduct[];
+  items: PharmacyHubLocalProduct[];
   total: number;
   page: number;
   limit: number;
@@ -65,12 +77,19 @@ export async function createLocalProduct(input: StoreLocalProductInput): Promise
   return unwrap<StoreLocalProduct>(res.data, '매장 자체 상품을 등록하지 못했습니다.');
 }
 
+/**
+ * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7
+ *   백엔드 update 는 실제로 **부분 갱신**이다 (store-local-products.service.ts 가
+ *   모든 필드를 `!== undefined` 로 가드한다). KPA 의 동명 client 도 `Partial<...>` 이다.
+ *   PH 만 전체 입력을 요구하던 것이 계약보다 좁았던 것이므로 canonical 형태로 맞춘다.
+ *   기존 전체 입력 호출부는 그대로 통과한다 (runtime 동작 변화 0).
+ */
 export async function updateLocalProduct(
   id: string,
-  input: StoreLocalProductInput,
-): Promise<StoreLocalProduct> {
+  input: PharmacyHubLocalProductInput,
+): Promise<PharmacyHubLocalProduct> {
   const res = await api.put(`${BASE}/${id}`, input);
-  return unwrap<StoreLocalProduct>(res.data, '매장 자체 상품을 수정하지 못했습니다.');
+  return unwrap<PharmacyHubLocalProduct>(res.data, '매장 자체 상품을 수정하지 못했습니다.');
 }
 
 /** 비활성화(soft delete). 공통 구조에 물리 삭제 경로가 없으며 새로 만들지 않는다. */

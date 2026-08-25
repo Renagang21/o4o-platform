@@ -192,6 +192,10 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'products',         label: '공급 상품', subPath: '/products' },
       { key: 'cart',             label: '장바구니',  subPath: '/cart' },
       { key: 'purchase-orders',  label: '주문 내역', subPath: '/orders' },
+      // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7:
+      //   KPA/GP/KCos 와 같은 service-neutral 계약(/neture/partner/applications/mine) 채택.
+      //   '판매자 모집' 탐색은 backend proxy 가 kpa-society 고정이라 PH 에 없다(§7 판정 기록).
+      { key: 'recruitment-applications', label: '신청·승인 현황', subPath: '/recruitment-applications' },
     ]},
     // WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1 (2026-08-05)
     //   '공급 상품'(B2B 구매 대상)과 **다른 축**이라 별도 섹션으로 둔다 — 합치지 않는다.
@@ -210,6 +214,13 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
       //   route(`/store-owner/library/resources`) 와 화면이 이미 있는데 사이드바 진입점만 없었다
       //   (in-page 링크로만 도달) — KPA/GlycoPharm/K-Cosmetics 와 동일하게 '자료' 항목을 노출한다.
       { key: 'library-resources', label: '자료',    subPath: '/library/resources' },
+      // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7:
+      //   매장 자체 상품(store_local_products.detail_html) 상세설명 — 공통 View 채택.
+      { key: 'product-descriptions', label: '상품 설명', subPath: '/product-descriptions' },
+      // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#76):
+      //   외국인 고객용 다국어 상품 안내 — 원장은 공통 store_multilingual_product_content_groups/pages.
+      //   KPA 의 '매장 HUB 가져오기' 축은 PH 에 운영자 원본이 없어(#85·#86) 만들지 않는다.
+      { key: 'multilingual-contents', label: '다국어 상품 콘텐츠', subPath: '/multilingual-product-contents' },
       { key: 'blog',           label: '블로그',      subPath: '/blog' },
     ]},
     // WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 (2026-08-08)
@@ -225,6 +236,12 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'qr',      label: 'QR',           subPath: '/qr' },
       { key: 'pop',     label: 'POP',          subPath: '/pop' },
       { key: 'signage', label: '디지털 사이니지', subPath: '/signage' },
+      // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#69·#70):
+      //   동영상(`signage_media`)·편성(`signage_schedules`) 축을 KPA 와 같은 공통 원장으로 채택했다.
+      //   앞선 "미채택" 판정은 매장이 자기 동영상을 등록할 경로를 열면서 해소됐다.
+      { key: 'signage-media',     label: '사이니지 동영상', subPath: '/signage/media' },
+      { key: 'signage-schedules', label: '사이니지 편성',   subPath: '/signage/schedules' },
+      { key: 'signage-player', label: 'TV 재생', subPath: '/signage/player' },
       { key: 'tablets', label: '태블릿',           subPath: '/tablets' },
       { key: 'manuals', label: '상품 설명서',    subPath: '/manuals' },
     ]},
@@ -232,6 +249,18 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
     //   route 와 실제 기능이 함께 준비된 뒤에만 노출한다 ("준비 중" 메뉴 0).
     //   매장 정보 = organizations(조직) / 내 계정 = users(사용자) — 서로 다른 축이라 항목을 분리한다.
     //   KPA 전용 계정·자격·면허·분회 메뉴는 가져오지 않는다.
+    // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7:
+    //   KPA/GP/KCos 와 동일한 공통 controller·View 채택 (store_qr_scan_events 집계).
+    // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#79):
+    //   외국인 여행객 판매지원 — KPA/GP/KCos 와 동일한 '판매 채널 확장' 그룹·라벨.
+    //   backend 는 공통 /foreign-visitor + /store-entitlements 이며 serviceKey allowlist 만 확장했다.
+    //   유료 이용권 게이트라 미보유 상태에도 진입 화면(잠금 안내·결제)이 있어 데드링크가 아니다.
+    { label: '판매 채널 확장', items: [
+      { key: 'foreign-visitor-sales-support', label: '외국인 여행객 판매지원', subPath: '/foreign-visitor' },
+    ]},
+    { label: '분석', items: [
+      { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
+    ]},
     { label: '설정', items: [
       { key: 'store-info', label: '매장 정보', subPath: '/info' },
       { key: 'account',    label: '내 계정',   subPath: '/account' },

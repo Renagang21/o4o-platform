@@ -305,6 +305,13 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
   const limit = config.pageLimit ?? 20;
   const currentPage = parseInt(searchParams.get('page') || '1');
   const searchQuery = searchParams.get('search') || '';
+  /*
+   * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §2:
+   *   자료 상세는 drawer 라 지금까지 deep-link 가 불가능했다 — 홈 최신활동 피드·검색
+   *   결과가 개별 자료를 가리킬 수 없었다는 뜻이다. 공통 계약으로 `?item=<id>` 를 추가한다.
+   *   파라미터가 없으면 기존 동작과 완전히 동일하다(기존 3서비스 회귀 0).
+   */
+  const deepLinkItemId = searchParams.get('item') || '';
 
   useEffect(() => { setSearchInput(searchQuery); }, [searchQuery]);
 
@@ -374,6 +381,37 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
       setDrawerLoading(false);
     }
   }, [config]);
+
+  /** `?item=<id>` deep-link — 목록에 없는 id 여도 fetchDetail 로 직접 연다. */
+  useEffect(() => {
+    if (!deepLinkItemId || !config.fetchDetail) return;
+    if (drawerItem?.id === deepLinkItemId) return;
+    let cancelled = false;
+    setDrawerLoading(true);
+    config
+      .fetchDetail(deepLinkItemId)
+      .then((detail) => {
+        if (cancelled) return;
+        setDrawerItem(detail);
+        config.trackView?.(deepLinkItemId);
+      })
+      .catch(() => {
+        // 없는 자료면 drawer 를 열지 않는다 — 목록은 그대로 보인다.
+      })
+      .finally(() => {
+        if (!cancelled) setDrawerLoading(false);
+      });
+    return () => { cancelled = true; };
+    // drawerItem 은 의도적으로 deps 에서 뺀다 — 열린 뒤 재조회 루프를 만들지 않는다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deepLinkItemId, config]);
+
+  const closeDrawer = useCallback(() => {
+    setDrawerItem(null);
+    if (deepLinkItemId) {
+      setSearchParams(prev => { prev.delete('item'); return prev; });
+    }
+  }, [deepLinkItemId, setSearchParams]);
 
   // ─── Delete ───────────────────────────────────────────────────────────────
 
@@ -984,7 +1022,7 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
       {config.fetchDetail && (
         <BaseDetailDrawer
           open={!!drawerItem}
-          onClose={() => setDrawerItem(null)}
+          onClose={closeDrawer}
           title={drawerItem?.title}
           width="60vw"
           loading={drawerLoading}

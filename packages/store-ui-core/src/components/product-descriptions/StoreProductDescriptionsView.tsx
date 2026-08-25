@@ -124,6 +124,18 @@ export interface StoreProductDescriptionsViewProps {
   theme?: Partial<StoreProductDescriptionsTheme>;
   /** 제작 시작에서 넘어온 templateId 해석 (서비스별 registry) */
   findTemplate?: (templateId: string) => StoreDescriptionTemplate | null | undefined;
+  /**
+   * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7:
+   *   화면 안 두 링크의 basePath 가 서비스마다 다르다(KPA·GP·KCos `/store` / PharmacyHub `/store-owner`).
+   *   기존 하드코딩 경로를 **기본값으로 그대로 둔 optional prop** 으로 연다 — serviceKey 분기를 만들지 않는다.
+   *   미주입 서비스의 링크는 이전과 완전히 동일하다.
+   */
+  links?: {
+    /** 자체 상품 등록 화면 */
+    localProducts?: string;
+    /** 내 자료함(상세설명 제작 시작) 화면 */
+    library?: string;
+  };
   /** 본문 편집기 slot (RichTextEditor 주입) */
   renderEditor: (ctx: {
     editorKey: string;
@@ -140,7 +152,10 @@ export function StoreProductDescriptionsView({
   theme: themeOverrides,
   findTemplate,
   renderEditor,
+  links,
 }: StoreProductDescriptionsViewProps) {
+  const localProductsHref = links?.localProducts ?? '/store/commerce/local-products';
+  const libraryHref = links?.library ?? '/store/library/contents';
   const t: StoreProductDescriptionsTheme = { ...DEFAULT_THEME, ...themeOverrides };
   const isNarrow = useIsNarrowViewport();
   const styles = buildStyles(t, isNarrow);
@@ -390,7 +405,7 @@ export function StoreProductDescriptionsView({
           ) : products.length === 0 ? (
             <div style={{ padding: '12px 4px' }}>
               <p style={styles.sidebarEmpty}>{labels.emptyText}</p>
-              <Link to="/store/commerce/local-products" style={styles.sidebarLink}>
+              <Link to={localProductsHref} style={styles.sidebarLink}>
                 <Package size={13} />
                 {labels.emptyLinkText}
               </Link>
@@ -424,7 +439,7 @@ export function StoreProductDescriptionsView({
           {!selectedProduct ? (
             <div style={{ ...styles.editorEmpty, flexDirection: 'column' as const, gap: '12px' }}>
               <span>왼쪽에서 상품을 선택하세요.</span>
-              <Link to="/store/library/contents" style={styles.libraryLink}>
+              <Link to={libraryHref} style={styles.libraryLink}>
                 <FolderOpen size={14} />
                 내 자료함에서 상세설명 만들기
               </Link>

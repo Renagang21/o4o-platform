@@ -21,7 +21,7 @@
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, LogIn, Pill, Shield, Store, UserCircle } from 'lucide-react';
+import { GraduationCap, LayoutDashboard, LogIn, Pill, Shield, Store, UserCircle } from 'lucide-react';
 import { GlobalHeader, GlobalHeaderMenuItem, buildCommunityPrimaryNav } from '@o4o/ui';
 import { NotificationBell, useNotifications,
   resolveNotificationTarget, getUserDisplayName } from '@o4o/account-ui';
@@ -55,6 +55,15 @@ export function PharmacyHubGlobalHeader() {
    */
   const isStoreOwner = isAuthenticated && satisfiesRole(roles, ROLES.storeOwner);
   const isStoreManager = isStoreOwner || isOperator;
+
+  /**
+   * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#42)
+   *   강사 진입점은 **실제 `lms:instructor` 보유자에게만** 노출한다.
+   *   admin/operator 도 route guard 는 통과하지만(운영 목적 진입),
+   *   관리자라는 이유로 강의 대시보드를 메뉴에 띄우지 않는다
+   *   (KPA / GlycoPharm / K-Cosmetics canonical 정합 — 메뉴 오염 방지).
+   */
+  const isInstructor = isAuthenticated && roles.includes('lms:instructor');
 
   /*
    * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §9:
@@ -148,6 +157,12 @@ export function PharmacyHubGlobalHeader() {
           {isOperator && (
             <GlobalHeaderMenuItem to="/operator" icon={<LayoutDashboard className="w-4 h-4" />}>
               운영 대시보드
+            </GlobalHeaderMenuItem>
+          )}
+          {/* 동일 WO §4 (#42) — 강사 운영 콘솔 진입점 */}
+          {isInstructor && (
+            <GlobalHeaderMenuItem to="/instructor" icon={<GraduationCap className="w-4 h-4" />}>
+              강의 대시보드
             </GlobalHeaderMenuItem>
           )}
           {/*

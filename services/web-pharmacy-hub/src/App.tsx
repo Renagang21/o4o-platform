@@ -75,7 +75,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { AuthProvider } from './contexts/AuthContext';
-import { StoreOwnerShell } from './layouts/StoreOwnerShell';
+import { StoreOwnerShell, StoreOwnerChromeFreeGuard } from './layouts/StoreOwnerShell';
 // WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1
 import { OperatorLayoutWrapper } from './layouts/OperatorLayoutWrapper';
 import { AdminLayoutWrapper } from './layouts/AdminLayoutWrapper';
@@ -131,6 +131,15 @@ import ForumMemberManagementPage from './pages/forum/ForumMemberManagementPage';
 import CommunityHomePage from './pages/community/CommunityHomePage';
 import CommunitySearchPage from './pages/community/CommunitySearchPage';
 import PharmacyHubResourcesPage from './pages/resources/PharmacyHubResourcesPage';
+import PharmacyHubResourceWritePage from './pages/resources/PharmacyHubResourceWritePage';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6 — 회원 커뮤니티 콘텐츠 (#20·#21·#22·#23)
+import PharmacyHubContentListPage from './pages/content/PharmacyHubContentListPage';
+import PharmacyHubContentDetailPage from './pages/content/PharmacyHubContentDetailPage';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 6 (#24)
+//   회원 설문 열람·응답. 원장/API 는 공통 /api/v1/surveys (serviceKey='pharmacy-hub').
+import PharmacyHubSurveyListPage from './pages/content/PharmacyHubSurveyListPage';
+import PharmacyHubSurveyDetailPage from './pages/content/PharmacyHubSurveyDetailPage';
+import PharmacyHubContentWritePage from './pages/content/PharmacyHubContentWritePage';
 import EducationPage from './pages/education/EducationPage';
 import LmsCourseDetailPage from './pages/education/LmsCourseDetailPage';
 import LmsLessonPage from './pages/education/LmsLessonPage';
@@ -154,6 +163,29 @@ import OperatorAnalyticsPage from './pages/operator/AnalyticsPage';
 // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
 //   자료실 관리 (공통 CMS `/cms/contents` · serviceKey=pharmacy-hub · type=knowledge)
 import OperatorResourcesPage from './pages/operator/ResourcesPage';
+import OperatorCommunityContentsPage from './pages/operator/CommunityContentsPage';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 4 (#97)
+//   설문조사 관리 — 화면 본체는 공통 @o4o/operator-core-ui Surveys module.
+import OperatorSurveyListPage from './pages/operator/survey/OperatorSurveyListPage';
+import OperatorSurveyCreatePage from './pages/operator/survey/OperatorSurveyCreatePage';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#95)
+//   강의 운영 관리 — 공통 @o4o/operator-core-ui OperatorLmsCoursesManager.
+import OperatorLmsCoursesPage from './pages/operator/OperatorLmsCoursesPage';
+// 동일 WO §4 (#96) — 안내 문구 관리 (공통 GuideContentsConsolePage).
+import OperatorGuideContentsPage from './pages/operator/OperatorGuideContentsPage';
+
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#42)
+//   강사 운영 콘솔. 화면 본체는 공통 @o4o/operator-core-ui instructor 모듈이고
+//   backend 는 서비스 중립 `/api/v1/lms/instructor/*` (requireInstructor) 이다.
+import InstructorGate from './pages/instructor/InstructorGate';
+import InstructorDashboardPage from './pages/instructor/InstructorDashboardPage';
+import InstructorCoursesPage from './pages/instructor/InstructorCoursesPage';
+import InstructorCourseEditPage from './pages/instructor/InstructorCourseEditPage';
+import InstructorEnrollmentsPage from './pages/instructor/InstructorEnrollmentsPage';
+import InstructorSubmissionsPage from './pages/instructor/InstructorSubmissionsPage';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4:
+//   공지/뉴스 관리 (공통 @o4o/operator-core-ui CmsContentManager · /pharmacy-hub/news)
+import OperatorContentPage from './pages/operator/ContentPage';
 import OperatorRoleManagementPage from './pages/operator/RoleManagementPage';
 // WO-O4O-PHARMACY-HUB-STORE-HUB-HOME-INTRODUCTION-V1 — 매장허브 홈 (공통 StoreHubTemplate)
 import StoreHubPage from './pages/store-hub/StoreHubPage';
@@ -184,6 +216,7 @@ import MyProfilePage from './pages/account/MyProfilePage';
 // WO-O4O-PHARMACYHUB-LMS-LEARNER-FULL-ADOPTION-V1 §7·§11·§15 — LMS learner 개인 화면
 import MyEnrollmentsPage from './pages/account/MyEnrollmentsPage';
 import MyCertificatesPage from './pages/account/MyCertificatesPage';
+import MyRequestsPage from './pages/account/MyRequestsPage';
 import MyCreditsPage from './pages/account/MyCreditsPage';
 // 동일 WO §10 — 수료증 공개 검증 (인증 불필요)
 import CertificateVerifyPage from './pages/education/CertificateVerifyPage';
@@ -191,6 +224,25 @@ import CertificateVerifyPage from './pages/education/CertificateVerifyPage';
 import QrPage from './pages/store-owner/QrPage';
 import PopPage from './pages/store-owner/PopPage';
 import SignagePage from './pages/store-owner/SignagePage';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7·§8 — 공통 View 채택
+import StoreProductDescriptionsPage from './pages/store-owner/ProductDescriptionsPage';
+import StoreMarketingAnalyticsPage from './pages/store-owner/MarketingAnalyticsPage';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#76) 다국어 상품 콘텐츠
+import MultilingualContentsMyPage from './pages/store-owner/MultilingualContentsMyPage';
+import StoreProductMultilingualContentPage from './pages/store-owner/StoreProductMultilingualContentPage';
+import MultilingualProductPublicLandingPage from './pages/public/MultilingualProductPublicLandingPage';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#79) 외국인 여행객 판매지원
+import ForeignVisitorSalesSupportPage from './pages/store-owner/ForeignVisitorSalesSupportPage';
+import ForeignVisitorPartnersPage from './pages/store-owner/ForeignVisitorPartnersPage';
+import ForeignVisitorPartnerQrCodesPage from './pages/store-owner/ForeignVisitorPartnerQrCodesPage';
+import {
+  ForeignVisitorSalesSupportPaymentSuccessPage,
+  ForeignVisitorSalesSupportPaymentFailPage,
+} from './pages/store-owner/ForeignVisitorSalesSupportPaymentResultPage';
+import ForeignVisitorAffiliatePublicLandingPage from './pages/public/ForeignVisitorAffiliatePublicLandingPage';
+import StoreRecruitmentApplicationsPage from './pages/store-owner/RecruitmentApplicationsPage';
+import SignagePlayerSelectPage from './pages/store-owner/SignagePlayerSelectPage';
+import SignagePlaybackPage from './pages/store-owner/SignagePlaybackPage';
 import ManualsPage from './pages/store-owner/ManualsPage';
 import ManualDetailPage from './pages/store-owner/ManualDetailPage';
 import QrLandingPage from './pages/QrLandingPage';
@@ -250,6 +302,9 @@ export default function App() {
           <Route path="/account/enrollments" element={<MyEnrollmentsPage />} />
           <Route path="/account/certificates" element={<MyCertificatesPage />} />
           <Route path="/account/credits" element={<MyCreditsPage />} />
+          {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §5 (#19·#51)
+              통합 신청함 — KPA `/mypage/my-requests` 와 같은 공통 MyRequestsInbox. */}
+          <Route path="/account/my-requests" element={<MyRequestsPage />} />
 
           {/* 동일 WO §10 — 수료증 공개 검증. 수료증 공유 링크의 착지점이며 인증이 없다.
               이 route 가 없으면 공통 MyCertificatesView 의 "링크 복사" 가 데드링크가 된다. */}
@@ -326,6 +381,26 @@ export default function App() {
           <Route
             path="/guide/features/manuals"
             element={<GuideFeatureManualPage {...pharmacyHubGuideFeatureManualsProps} />}
+          />
+
+          {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#42)
+              강사 운영 콘솔. PH 에는 RoleGuard 컴포넌트가 없으므로 서비스 표준대로
+              MembershipGate + 역할 확인(InstructorGate)으로 감싼다.
+              강사 신청/승인 동선은 두지 않는다 — backend 가 KPA 전용(requireKpaAdmin)이라
+              PH 에서는 dead navigation 이 된다. */}
+          <Route path="/instructor" element={<InstructorGate><InstructorDashboardPage /></InstructorGate>} />
+          <Route path="/instructor/courses" element={<InstructorGate><InstructorCoursesPage /></InstructorGate>} />
+          <Route path="/instructor/courses/new" element={<InstructorGate><InstructorCourseEditPage /></InstructorGate>} />
+          <Route path="/instructor/courses/:courseId" element={<InstructorGate><InstructorCourseEditPage /></InstructorGate>} />
+          <Route
+            path="/instructor/courses/:courseId/enrollments"
+            element={<InstructorGate><InstructorEnrollmentsPage /></InstructorGate>}
+          />
+          {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#40)
+              과제 제출물 채점 — 공통 `/lms/instructor/*` (requireInstructor) 계약. */}
+          <Route
+            path="/instructor/courses/:courseId/lessons/:lessonId/submissions"
+            element={<InstructorGate><InstructorSubmissionsPage /></InstructorGate>}
           />
 
           {/* WO-O4O-PHARMACY-HUB-COMMUNITY-HOME-COMMON-CORE-V1 — active PharmacyHub 회원만 */}
@@ -421,6 +496,83 @@ export default function App() {
               </MembershipGate>
             }
           />
+          {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6 (#27)
+              회원 자료 등록·수정. KPA `/resources/new` · `/resources/:id/edit` 와 동일 경로 형태.
+              자료 상세는 공통 ResourcesHubTemplate 의 drawer 이므로 `/resources/:id` 는 만들지 않는다
+              (KPA 도 동일 — 상세 route 없음). */}
+          <Route
+            path="/resources/new"
+            element={
+              <MembershipGate>
+                <PharmacyHubResourceWritePage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/resources/:id/edit"
+            element={
+              <MembershipGate>
+                <PharmacyHubResourceWritePage />
+              </MembershipGate>
+            }
+          />
+          {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6 — 회원 커뮤니티 콘텐츠
+              원장은 공통 cms_contents(serviceKey='pharmacy-hub', type='knowledge',
+              metadata.subType='content') — 신규 table 0. KPA `/content` 동선과 동일한 경로 형태.
+              작성 경로는 `/content/documents/new` 로 3서비스 표준과 맞춘다. */}
+          <Route
+            path="/content"
+            element={
+              <MembershipGate>
+                <PharmacyHubContentListPage />
+              </MembershipGate>
+            }
+          />
+          {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 6 (#24)
+              회원 설문. KPA `/content/surveys` 와 같은 경로 형태이며 원장은 공통
+              `/api/v1/surveys` (serviceKey='pharmacy-hub') — 신규 table 0.
+              정적 세그먼트가 `/content/:id` 보다 우선 매칭된다. */}
+          <Route
+            path="/content/surveys"
+            element={
+              <MembershipGate>
+                <PharmacyHubSurveyListPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/content/surveys/:id"
+            element={
+              <MembershipGate>
+                <PharmacyHubSurveyDetailPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/content/documents/new"
+            element={
+              <MembershipGate>
+                <PharmacyHubContentWritePage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/content/:id/edit"
+            element={
+              <MembershipGate>
+                <PharmacyHubContentWritePage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/content/:id"
+            element={
+              <MembershipGate>
+                <PharmacyHubContentDetailPage />
+              </MembershipGate>
+            }
+          />
+
           {/* 동일 WO §7 — 교육(LMS) 조회·학습 baseline */}
           <Route
             path="/education"
@@ -493,7 +645,19 @@ export default function App() {
             <Route path="forum-delete-requests" element={<OperatorForumDeleteRequestsPage />} />
             <Route path="forum-analytics" element={<OperatorForumAnalyticsPage />} />
             <Route path="analytics" element={<OperatorAnalyticsPage />} />
+            <Route path="content" element={<OperatorContentPage />} />
             <Route path="resources" element={<OperatorResourcesPage />} />
+            {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#93)
+                회원 콘텐츠 검토 큐. 자료실 관리와 같은 공통 console, subType 축만 다르다. */}
+            <Route path="community-contents" element={<OperatorCommunityContentsPage />} />
+            {/* 동일 WO 4 (#97) — KPA/GP/KCos 와 같은 공통 설문 콘솔. */}
+            <Route path="surveys" element={<OperatorSurveyListPage />} />
+            <Route path="surveys/new" element={<OperatorSurveyCreatePage />} />
+            {/* 동일 WO §4 (#95) — 공통 LMS 운영 콘솔. 서비스 경계는 backend 가
+                course.serviceKey 로 강제한다(isCourseAccessibleByOperator). */}
+            <Route path="lms" element={<OperatorLmsCoursesPage />} />
+            {/* 동일 WO §4 (#96) */}
+            <Route path="guide-contents" element={<OperatorGuideContentsPage />} />
             <Route path="roles" element={<OperatorRoleManagementPage />} />
           </Route>
 
@@ -527,6 +691,14 @@ export default function App() {
             StoreOwnerShell = StoreOwnerGuard(pharmacy-hub) + MembershipGate + 공통 StoreDashboardLayout.
             하위 화면은 URL·컴포넌트 그대로 셸의 <Outlet/> 안으로 편입한다 (이중 운영 없음).
           */}
+          {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8
+              실제 송출(매장 화면) — KPA 선례와 동일하게 매장 셸 wrapper 밖 top-level route 로 격리한다.
+              header/sidebar/footer 가 송출 화면에 mount 되지 않는다 (CSS 덮기 의존 제거).
+              React Router 는 더 구체적인 정적 세그먼트를 먼저 매칭하므로 `/store-owner` 와 충돌하지 않는다. */}
+          <Route
+            path="/store-owner/signage/play/:playlistId"
+            element={<StoreOwnerChromeFreeGuard><SignagePlaybackPage /></StoreOwnerChromeFreeGuard>}
+          />
           <Route path="/store-owner" element={<StoreOwnerShell />}>
             <Route index element={<StoreOwnerHomePage />} />
             <Route path="products" element={<StoreOwnerProductsPage />} />
@@ -548,9 +720,46 @@ export default function App() {
             <Route path="qr" element={<QrPage />} />
             <Route path="pop" element={<PopPage />} />
             <Route path="signage" element={<SignagePage />} />
+            {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#69·#70)
+                동영상·편성은 같은 화면의 탭이지만, KPA 와 동일하게 경로를 나눠 사이드바·딥링크가 짝을 이룬다. */}
+            <Route path="signage/media" element={<SignagePage />} />
+            <Route path="signage/schedules" element={<SignagePage />} />
+            {/* WO-O4O-PHARMACYHUB-...-PARITY-CLOSURE-V1 §8: TV 재생 대상 선택.
+                실제 송출 화면(/store-owner/signage/play/:playlistId)은 매장 셸 밖 top-level route 다. */}
+            <Route path="signage/player" element={<SignagePlayerSelectPage />} />
             <Route path="tablets" element={<TabletsPage />} />
             <Route path="manuals" element={<ManualsPage />} />
             <Route path="manuals/:listingId" element={<ManualDetailPage />} />
+            {/* WO-O4O-PHARMACYHUB-...-PARITY-CLOSURE-V1 §7: 상품 설명 / 신청·승인 현황 / 마케팅 분석 */}
+            <Route path="product-descriptions" element={<StoreProductDescriptionsPage />} />
+            <Route path="recruitment-applications" element={<StoreRecruitmentApplicationsPage />} />
+            <Route path="analytics/marketing" element={<StoreMarketingAnalyticsPage />} />
+            {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#76)
+                다국어 상품 콘텐츠 — 목록(내 매장) + 상품별 저작. 공통 controller·원장 재사용.
+                HUB 가져오기 축은 PH 에 운영자 원본이 없어(#85·#86) 만들지 않는다. */}
+            <Route path="multilingual-product-contents" element={<MultilingualContentsMyPage />} />
+            <Route
+              path="products/multilingual/:targetKind/:targetId"
+              element={<StoreProductMultilingualContentPage />}
+            />
+            {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#79)
+                외국인 여행객 판매지원 — 이용권(월 구독) 게이트 + 유입 파트너 + 파트너별 제휴 QR.
+                backend 는 서비스 공용 /foreign-visitor · /store-entitlements 를 serviceKey 로 스코프한다.
+                payment/success|fail 은 Toss 리다이렉트 착지점이라 경로가 계약의 일부다. */}
+            <Route path="foreign-visitor" element={<ForeignVisitorSalesSupportPage />} />
+            <Route path="foreign-visitor/partners" element={<ForeignVisitorPartnersPage />} />
+            <Route
+              path="foreign-visitor/partners/:partnerId/qr-codes"
+              element={<ForeignVisitorPartnerQrCodesPage />}
+            />
+            <Route
+              path="foreign-visitor/payment/success"
+              element={<ForeignVisitorSalesSupportPaymentSuccessPage />}
+            />
+            <Route
+              path="foreign-visitor/payment/fail"
+              element={<ForeignVisitorSalesSupportPaymentFailPage />}
+            />
             {/* WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 — 설정 (매장 정보 / 내 계정) */}
             <Route path="info" element={<StoreInfoPage />} />
             <Route path="account" element={<AccountPage />} />
@@ -575,6 +784,23 @@ export default function App() {
             로그인·매장 셸을 요구하지 않는다.
           */}
           <Route path="/qr/:slug" element={<QrLandingPage />} />
+
+          {/*
+            공개 다국어 상품 안내 랜딩 (WO-O4O-PHARMACYHUB-...-PARITY-CLOSURE-V1 §8 #76)
+            QR payload = https://pharmacyhub.co.kr/multilingual-products/{publicKey}.
+            외국인 고객이 스캔하는 화면이라 로그인·매장 셸을 요구하지 않는다.
+          */}
+          <Route path="/multilingual-products/:publicKey" element={<MultilingualProductPublicLandingPage />} />
+
+          {/*
+            공개 제휴 QR 랜딩 (WO-O4O-PHARMACYHUB-...-PARITY-CLOSURE-V1 §8 #79)
+            QR payload = https://pharmacyhub.co.kr/foreign-visitor/affiliate/{shortCode}.
+            외국인 고객이 스캔하는 화면이라 로그인·매장 셸을 요구하지 않는다.
+          */}
+          <Route
+            path="/foreign-visitor/affiliate/:shortCode"
+            element={<ForeignVisitorAffiliatePublicLandingPage />}
+          />
 
           {/*
             catch-all — 반드시 마지막

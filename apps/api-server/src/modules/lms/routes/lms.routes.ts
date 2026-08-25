@@ -29,10 +29,16 @@ const requireKpaAdmin = createMembershipScopeGuard(KPA_SCOPE_CONFIG)('kpa:admin'
 // KPA operators use /api/v1/kpa/lms/operator/* (KPA-specific scope guard).
 // This natural separation enforces kpa:operator cannot approve via the global route.
 // Cross-service isolation between non-KPA operators requires Course.serviceKey — WO-O4O-LMS-COURSE-SERVICEKEY-V1.
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 4 (#95):
+//   Pharmacy-Hub 를 allowlist 에 추가만 한다 (분기·복제 없음). 서비스 간 격리는 아래
+//   isCourseAccessibleByOperator 가 course.serviceKey 로 계속 강제한다 —
+//   'pharmacy-hub' 는 self-map 이므로 resolveCanonicalServiceKey 로 그대로 해석된다.
+//   기존 3서비스의 허용 role 집합·동작은 불변.
 const requireLmsOperator = requireRole([
   'admin', 'super_admin', 'platform:super_admin',
   'cosmetics:admin', 'cosmetics:operator',
   'glycopharm:admin', 'glycopharm:operator',
+  'pharmacy-hub:admin', 'pharmacy-hub:operator',
 ]);
 
 // WO-O4O-LMS-COURSE-SERVICEKEY-V1: Service-scope check for operator course actions.

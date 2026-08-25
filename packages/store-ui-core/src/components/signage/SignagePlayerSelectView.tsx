@@ -40,10 +40,19 @@ export interface SignagePlayerSelectViewProps {
     selectedRowKeys: string[];
     onChange: (keys: string[]) => void;
   };
+  /**
+   * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8:
+   *   재생 route 의 basePath 가 서비스마다 다르다(KPA·GP·KCos `/store` / PharmacyHub `/store-owner`).
+   *   기존 하드코딩 경로를 **기본값으로 그대로 둔 optional prop** 으로 열어 serviceKey 분기를 만들지 않는다.
+   *   미주입 서비스의 동작은 이전과 완전히 동일하다.
+   */
+  playPathPrefix?: string;
 }
 
 const DEFAULT_PLAY_BTN =
   'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-pink-600 text-white hover:bg-pink-700 transition-colors';
+/** 기존 3개 서비스(KPA·GP·KCos)가 쓰던 재생 경로 — 기본값으로 보존한다. */
+const DEFAULT_PLAY_PATH_PREFIX = '/store/marketing/signage/play';
 const DEFAULT_SEARCH_INPUT =
   'w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent';
 
@@ -53,6 +62,7 @@ export function SignagePlayerSelectView({
   searchInputClassName = DEFAULT_SEARCH_INPUT,
   headerExtra,
   rowSelection,
+  playPathPrefix = DEFAULT_PLAY_PATH_PREFIX,
 }: SignagePlayerSelectViewProps) {
   const [playlists, setPlaylists] = useState<SignageSelectPlaylist[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,7 +94,7 @@ export function SignagePlayerSelectView({
   }, [playlists, keyword]);
 
   const handlePlay = (playlistId: string) => {
-    window.open(`/store/marketing/signage/play/${playlistId}`, '_blank');
+    window.open(`${playPathPrefix}/${playlistId}`, '_blank');
   };
 
   const columns: Column<SignageSelectPlaylist>[] = [

@@ -319,18 +319,28 @@ describe('자료실 축 — 3서비스 공통 Template 유지', () => {
   });
 });
 
-describe('Pharmacy-Hub — 커뮤니티 자료실 채택 / 콘텐츠 미구현 사실 고정', () => {
+describe('Pharmacy-Hub — 커뮤니티 자료실·콘텐츠 공통 View 채택', () => {
   const app = read('services/web-pharmacy-hub/src/App.tsx');
 
   /**
-   * WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §9·§12
-   *
-   * 자료실(`/resources`)은 공통 ResourcesHubTemplate 로 채택돼 더 이상 미구현이 아니다.
-   * 콘텐츠(`/content`)는 PH 에서 forum pinned post 가 canonical 이므로 중복 모델을
-   * 만들지 않는다(§10) — 미구현 사실을 계속 고정한다.
+   * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6:
+   *   콘텐츠(`/content`)도 채택됐다. 중복 모델 금지 취지는 유지되므로 **공통 원장·공통 View**
+   *   를 쓰는지로 고정한다 — PH 전용 화면 복제나 전용 table 이 아니어야 한다.
    */
-  it('커뮤니티 `/content` route 는 여전히 존재하지 않는다(중복 모델 금지)', () => {
-    expect(app).not.toContain('path="/content"');
+  it('커뮤니티 `/content` 는 공통 shell + 공통 cms_contents 로 채택돼 있다', () => {
+    expect(app).toContain('path="/content"');
+    const listPage = read('services/web-pharmacy-hub/src/pages/content/PharmacyHubContentListPage.tsx');
+    const writePage = read('services/web-pharmacy-hub/src/pages/content/PharmacyHubContentWritePage.tsx');
+    const detailPage = read('services/web-pharmacy-hub/src/pages/content/PharmacyHubContentDetailPage.tsx');
+    expect(listPage).toContain('CommunityContentListTemplate');
+    expect(writePage).toContain('CommunityContentWriteShell');
+    expect(detailPage).toContain('CommunityContentDetailTemplate');
+    // 주석은 판정 근거 서술이라(전용 table 금지를 명시) 코드만 본다.
+    const apiClient = read('services/web-pharmacy-hub/src/lib/api/pharmacyHubContents.ts')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+    expect(apiClient).toContain("'/cms/contents'");
+    expect(apiClient).not.toContain('pharmacy_hub_contents');
   });
 
   it('자료실 `/resources` 는 공통 Template + serviceKey 계약으로 채택돼 있다', () => {

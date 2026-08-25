@@ -78,6 +78,45 @@ export function normalizeForumCategoryRequests(input: unknown): MyRequestItem[] 
   return list.map(normalizeForumCategoryRequest);
 }
 
+/**
+ * `GET /api/v1/lms/enrollments/me` 응답 1건 → `MyRequestItem`.
+ *
+ * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §5(#19·#51):
+ *   K-Cosmetics 가 쓰던 변환과 **같은 backend 계약**을 PharmacyHub 도 소비하므로
+ *   이 모듈의 등재 기준("여러 서비스가 같은 계약을 소비할 때")에 맞춰 공통화한다.
+ *   서비스별로 다른 값은 `serviceKey` 하나뿐이라 인자로 받는다.
+ */
+export function normalizeLmsEnrollment(input: unknown, serviceKey?: string): MyRequestItem {
+  const raw = (input ?? {}) as AnyRecord;
+  const course = (pick<AnyRecord>(raw, 'course') ?? {}) as AnyRecord;
+  const createdAt =
+    pick<string>(raw, 'createdAt', 'created_at') ??
+    pick<string>(raw, 'startedAt', 'started_at') ??
+    new Date().toISOString();
+
+  return {
+    id: String(pick<string>(raw, 'id') ?? ''),
+    entityType: 'course_enrollment',
+    status: pick<string>(raw, 'status') ?? 'in_progress',
+    displayTitle:
+      pick<string>(course, 'title') ?? pick<string>(raw, 'courseTitle', 'course_title') ?? '강의 수강',
+    displayDescription: pick<string>(course, 'category') ?? null,
+    reviewComment: null,
+    revisionNote: null,
+    reviewedAt: pick<string>(raw, 'completedAt', 'completed_at') ?? null,
+    resultEntityId: pick<string>(raw, 'courseId', 'course_id') ?? null,
+    resultMetadata: null,
+    submittedAt: pick<string>(raw, 'startedAt', 'started_at') ?? createdAt,
+    createdAt,
+    updatedAt: pick<string>(raw, 'updatedAt', 'updated_at') ?? createdAt,
+    ...(serviceKey ? { serviceKey } : {}),
+    payload: {
+      courseId: pick(raw, 'courseId', 'course_id') ?? null,
+      progress: pick(raw, 'progressPercentage', 'progress_percentage', 'progress') ?? null,
+    },
+  };
+}
+
 /** `createdAt` 기준 최신순 병합 정렬 (여러 소스를 합칠 때 공통 사용). */
 export function sortRequestsByCreatedAtDesc(items: MyRequestItem[]): MyRequestItem[] {
   return [...items].sort(

@@ -36,6 +36,18 @@ const BASE = '/cms/contents';
  */
 const RESOURCE_TYPE = 'knowledge';
 
+/**
+ * 원장 하위 축 (`metadata.subType`).
+ *
+ * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6:
+ *   KPA 는 한 원장(`kpa_contents`)을 `sub_type` 으로 **콘텐츠 / 자료실** 두 축으로 나눈다.
+ *   PH 원장인 공통 `cms_contents` 에는 그 컬럼이 없으므로 기존 `metadata` jsonb 에 같은 축을 둔다
+ *   (신규 컬럼·migration 0). 공통 read 는 `subType` 쿼리 파라미터로 이 축을 필터한다.
+ *
+ *   프로덕션 실측상 pharmacy-hub 의 knowledge 행은 0건이라 소급 대상 데이터가 없다.
+ */
+const RESOURCE_SUB_TYPE = 'resource';
+
 export interface CmsAttachment {
   url: string;
   name: string;
@@ -58,6 +70,22 @@ export interface CmsContentItem {
   createdAt: string;
   authorRole?: string | null;
   metadata?: Record<string, unknown> | null;
+  /** 작성자 ID. 상세는 `createdBy`, 목록은 ContentMeta `producerRef` 로 온다. */
+  createdBy?: string | null;
+  producerRef?: string | null;
+  /**
+   * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 (audit #28):
+   *   공통 CMS 가 engagement 축을 공급할 때만 존재한다. 서버가 조회에 실패하면
+   *   **필드 자체가 생략**되므로 undefined 를 0 으로 바꾸지 않는다.
+   */
+  viewCount?: number;
+  recommendCount?: number;
+  isRecommendedByMe?: boolean;
+}
+
+/** 목록/상세 어느 쪽 응답이든 작성자 ID 를 하나로 읽는다. */
+export function cmsAuthorId(c: CmsContentItem | null | undefined): string | null {
+  return c?.createdBy ?? c?.producerRef ?? null;
 }
 
 export interface CmsContentListResult {
@@ -87,6 +115,7 @@ export async function listPharmacyHubResources(
       params: {
         serviceKey: SERVICE_KEY,
         type: RESOURCE_TYPE,
+        subType: RESOURCE_SUB_TYPE,
         status: 'published',
         limit: params.limit,
         offset: params.offset,
@@ -146,6 +175,7 @@ export async function listPharmacyHubResourcesForOperator(params: {
       params: {
         serviceKey: SERVICE_KEY,
         type: RESOURCE_TYPE,
+        subType: RESOURCE_SUB_TYPE,
         limit: params.limit,
         offset: params.offset,
         ...(params.status ? { status: params.status } : {}),
@@ -175,6 +205,7 @@ export async function createPharmacyHubResource(input: ResourceWriteInput): Prom
     const res = await api.post(BASE, {
       serviceKey: SERVICE_KEY,
       type: RESOURCE_TYPE,
+      metadata: { subType: RESOURCE_SUB_TYPE },
       title: input.title,
       summary: input.summary || null,
       body: input.body || null,
@@ -225,3 +256,51 @@ export async function setPharmacyHubResourceStatus(
   }
   return unwrap<CmsContentItem>(resBody, 'PH_RESOURCE_STATUS_FAILED');
 }
+
+// ─── 회원 쓰기 경로 (WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1, audit #27) ───
+//
+// KPA 는 `/resources/new` · `/resources/:id/edit` 로 **회원**이 자료를 등록·수정한다.
+// PH 도 같은 capability 를 갖는다 — 원장은 그대로 공통 `cms_contents`,
+// `authorRole='community'` · `metadata.subType='resource'`. 신규 table 0 / migration 0.
+//
+// 위의 운영자 함수들과 갈리는 축은 **본문 subType 전달 방식** 하나다:
+//   운영자 경로 : metadata.subType   (mutation handler 가 metadata 를 그대로 저장)
+//   회원 경로   : top-level subType  (handler 가 capability 화이트리스트로 정규화)
+// 서버가 요청자 권한에 따라 두 경로 중 하나를 타므로 **양쪽 모두** 실어 보낸다 —
+// 어느 분기로 저장되든 자료실 축(`subType='resource'`)이 유실되지 않는다.
+
+/** 회원 자료 등록. 서버가 authorRole='community' · status='draft' 로 고정 생성한다. */
+export async function createPharmacyHubMemberResource(
+  input: ResourceWriteInput,
+): Promise<CmsContentItem> {
+  let resBody: any;
+  try {
+    const res = await api.post(BASE, {
+      serviceKey: SERVICE_KEY,
+      type: RESOURCE_TYPE,
+      subType: RESOURCE_SUB_TYPE,
+      metadata: { subType: RESOURCE_SUB_TYPE },
+      title: input.title,
+      summary: input.summary || null,
+      body: input.body || null,
+      linkUrl: input.linkUrl || null,
+      linkText: input.linkText || null,
+    });
+    resBody = res.data;
+  } catch {
+    throw new Error('PH_RESOURCE_CREATE_FAILED');
+  }
+  return unwrap<CmsContentItem>(resBody, 'PH_RESOURCE_CREATE_FAILED');
+}
+
+/** 검토 요청 (draft → pending). 회원은 스스로 게시하지 못한다. */
+export const submitPharmacyHubResource = (id: string) =>
+  setPharmacyHubResourceStatus(id, 'pending');
+
+/**
+ * 회원 축의 "삭제" (draft|published → archived).
+ * 공통 `cms_contents` 에는 DELETE 엔드포인트가 없다 — 없는 CTA 를 만들지 않고
+ * 실제로 존재하는 보관 전이로 구현한다 (§3 금지 패턴).
+ */
+export const archivePharmacyHubResource = (id: string) =>
+  setPharmacyHubResourceStatus(id, 'archived');

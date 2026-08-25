@@ -23,6 +23,7 @@
  *   기존 동작 보존이 목적이며 셸(사이드바·상단바)은 동일하게 렌더한다.
  */
 
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MyStoreShell, StoreOwnerGuard, PHARMACY_HUB_STORE_CONFIG } from '@o4o/store-ui-core';
 import type { StoreOwnerGuardUser } from '@o4o/store-ui-core';
@@ -91,6 +92,34 @@ export function StoreOwnerShell({
       membershipGate={MembershipGate}
     >
       <ShellLayout />
+    </StoreOwnerGuard>
+  );
+}
+
+/**
+ * StoreOwnerChromeFreeGuard — 매장 셸 chrome 없이 같은 접근 판정만 적용한다.
+ *
+ * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8
+ *   사이니지 실제 송출 화면(`/store-owner/signage/play/:playlistId`)은 매장 TV 에 그대로 나가므로
+ *   header/sidebar/footer 가 mount 되면 안 된다(KPA 선례와 동일한 격리).
+ *   가드(역할·가입 상태)는 셸과 완전히 동일한 것을 재사용한다 — 판정 로직 복제 0.
+ */
+export function StoreOwnerChromeFreeGuard({ children }: { children: ReactNode }) {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const guardUser: StoreOwnerGuardUser | null = user
+    ? { roles: user.roles ?? undefined, memberships: user.memberships ?? undefined }
+    : null;
+
+  return (
+    <StoreOwnerGuard
+      serviceKey="pharmacy-hub"
+      user={guardUser}
+      isAuthenticated={isAuthenticated}
+      isLoading={isLoading}
+      renderDenied={<AccessDenied message="약국 경영 화면은 약국 경영자 계정만 이용할 수 있습니다." />}
+      membershipGate={MembershipGate}
+    >
+      {children}
     </StoreOwnerGuard>
   );
 }

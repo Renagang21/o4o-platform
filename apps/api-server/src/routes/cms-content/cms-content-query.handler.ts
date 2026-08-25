@@ -23,8 +23,10 @@ import {
 } from '@o4o/types';
 import {
   resolveCmsReadScope,
+  hasCmsServiceOperatorRole,
   CMS_SERVICE_KEY_REQUIRED_ERROR,
 } from './cms-content-utils.js';
+import { loadCmsEngagement } from './cms-content-engagement.js';
 
 /**
  * WO-O4O-CMS-CONTENT-DETAIL-SERVICE-SCOPE-GUARD-V1:
@@ -53,6 +55,38 @@ export function createCmsContentQueryRoutes(deps: {
       roleChecker: roleAssignmentService,
       onError: (m) => logger.warn('[CMS] Platform admin RoleAssignment check failed:', m),
     });
+
+  /**
+   * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6 — 회원 저작 콘텐츠의 비공개 행 가시성.
+   *
+   *   공통 CMS 에 `authorRole='community'` 행이 생기면, 인증만 하면 `?status=draft` 로
+   *   **남의 초안**을 읽을 수 있게 된다. 회원 저작을 여는 것과 같은 변경에서 닫는다.
+   *
+   *   판정: platform admin 또는 해당 서비스 운영자면 종전대로 전부 본다.
+   *         그 외에는 community 행 중 `published` 가 아닌 것은 **작성자 본인만** 본다.
+   *
+   *   community 행이 없는 서비스(KPA/GP/KCos/Neture)에는 해당 조건이 걸릴 대상이 없어
+   *   기존 read 결과가 그대로다 (behavior 변화 0).
+   */
+  const communityReadRestriction = async (
+    req: Request,
+    serviceKey: unknown,
+  ): Promise<{ restrict: boolean; selfId: string | null }> => {
+    const user = (req as any).user;
+    if (!user) return { restrict: false, selfId: null }; // 비인증은 이미 published 로 고정된다
+    const key = typeof serviceKey === 'string' && serviceKey.trim() ? serviceKey.trim() : null;
+    const privileged =
+      (await resolveCmsReadScope({
+        user,
+        serviceKey: undefined,
+        roleChecker: roleAssignmentService,
+        onError: (m) => logger.warn('[CMS] Platform admin RoleAssignment check failed:', m),
+      })).ok ||
+      (await hasCmsServiceOperatorRole(user, key, roleAssignmentService, (m) =>
+        logger.warn('[CMS] Service role RoleAssignment check failed:', m),
+      ));
+    return { restrict: !privileged, selfId: user.id ?? null };
+  };
 
   /**
    * GET /cms/stats
@@ -186,6 +220,10 @@ export function createCmsContentQueryRoutes(deps: {
         limit = '20',
         offset = '0',
         search,
+        // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6: 회원의 "내 콘텐츠" 축. 인증 사용자 본인 행만 좁힌다.
+        mine,
+        // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6: 원장 하위 축 (콘텐츠 / 자료실). metadata.subType 에 기록된다.
+        subType,
       } = req.query;
 
       const contentRepo = dataSource.getRepository(CmsContent);
@@ -232,36 +270,89 @@ export function createCmsContentQueryRoutes(deps: {
       const takeVal = parseInt(limit as string, 10);
       const skipVal = parseInt(offset as string, 10);
 
+      const { restrict, selfId } = await communityReadRestriction(req, serviceKey);
+      if (mine === 'true' && !selfId) {
+        res.status(401).json({
+          success: false,
+          error: { code: 'AUTH_REQUIRED', message: 'Authentication required for mine=true' },
+        });
+        return;
+      }
+
+      /*
+       * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6:
+       *   추가 조건(회원 가시성 제한 · subType · mine · search)이 하나라도 걸릴 때만
+       *   QueryBuilder 로 간다. 아무것도 걸리지 않으면 **기존 findAndCount 경로 그대로**다
+       *   — 기존 4서비스의 목록 쿼리·정렬·페이지네이션이 한 글자도 달라지지 않는다.
+       *   `restrict` 가 false 인 경우 가시성 조건은 정의상 no-op 이므로 생략해도 동치다.
+       */
+      const hasSearch = typeof search === 'string' && !!search.trim();
+      const hasSubType = typeof subType === 'string' && !!subType.trim();
+      const needsQueryBuilder = restrict || hasSearch || hasSubType || mine === 'true';
+
       let contents: CmsContent[];
       let total: number;
 
-      if (search && typeof search === 'string' && search.trim()) {
-        const qb = contentRepo.createQueryBuilder('c');
-        Object.entries(where).forEach(([key, val]) => {
-          // serviceKey 는 alias 집합이라 `= :key` 로 바인딩하면 안 된다 (FindOperator 가 그대로 들어간다).
-          if (key === 'serviceKey') return;
-          qb.andWhere(`c."${key}" = :${key}`, { [key]: val });
-        });
-        if (scope.serviceKeys) {
-          qb.andWhere('c."serviceKey" IN (:...scopeServiceKeys)', {
-            scopeServiceKeys: scope.serviceKeys,
-          });
-        }
-        const searchTerm = `%${search.trim()}%`;
-        qb.andWhere('(c.title ILIKE :search OR c.summary ILIKE :search)', { search: searchTerm });
-        qb.orderBy('c."isPinned"', 'DESC')
-          .addOrderBy('c."sortOrder"', 'ASC')
-          .addOrderBy('c."createdAt"', 'DESC');
-        qb.take(takeVal).skip(skipVal);
-        [contents, total] = await qb.getManyAndCount();
-      } else {
+      if (!needsQueryBuilder) {
         [contents, total] = await contentRepo.findAndCount({
           where,
           order: { isPinned: 'DESC', sortOrder: 'ASC', createdAt: 'DESC' },
           take: takeVal,
           skip: skipVal,
         });
+      } else {
+      const qb = contentRepo.createQueryBuilder('c');
+      Object.entries(where).forEach(([key, val]) => {
+        // serviceKey 는 alias 집합이라 `= :key` 로 바인딩하면 안 된다 (FindOperator 가 그대로 들어간다).
+        if (key === 'serviceKey') return;
+        qb.andWhere(`c."${key}" = :${key}`, { [key]: val });
+      });
+      if (scope.serviceKeys) {
+        qb.andWhere('c."serviceKey" IN (:...scopeServiceKeys)', {
+          scopeServiceKeys: scope.serviceKeys,
+        });
       }
+      if (hasSearch) {
+        qb.andWhere('(c.title ILIKE :search OR c.summary ILIKE :search)', {
+          search: `%${(search as string).trim()}%`,
+        });
+      }
+
+      if (hasSubType) {
+        qb.andWhere(`c."metadata"->>'subType' = :subType`, { subType: (subType as string).trim() });
+      }
+
+      if (restrict) {
+        // community 행은 published 이거나 본인 것만 보인다. 그 외 authorRole 은 종전 그대로.
+        qb.andWhere(
+          `(c."authorRole" IS DISTINCT FROM 'community' OR c."status" = 'published'${
+            selfId ? ' OR c."createdBy" = :selfId' : ''
+          })`,
+          selfId ? { selfId } : {},
+        );
+      }
+      if (mine === 'true') {
+        qb.andWhere('c."createdBy" = :mineId', { mineId: selfId });
+      }
+
+      qb.orderBy('c."isPinned"', 'DESC')
+        .addOrderBy('c."sortOrder"', 'ASC')
+        .addOrderBy('c."createdAt"', 'DESC')
+        .take(takeVal)
+        .skip(skipVal);
+
+      [contents, total] = await qb.getManyAndCount();
+      }
+
+      // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 (audit #28):
+      //   추천/조회수는 별도 축(`cms_content_recommendations`, `cms_contents."viewCount"`)이라
+      //   entity(cms-core 는 동결) 에 없다. 한 번의 raw 조회로 붙인다.
+      //   조회가 불가능하면 `null` 이 돌아오고 **필드를 생략**한다 — 0 으로 위장하지 않는다.
+      const engagement = await loadCmsEngagement(
+        dataSource,
+        contents.map(c => c.id),
+        (req as any).user?.id ?? null,
+      );
 
       res.json({
         success: true,
@@ -291,6 +382,7 @@ export function createCmsContentQueryRoutes(deps: {
             serviceKey: (content as any).serviceKey ?? undefined,
             contentType: 'cms_block' as const,
             metaStatus: mapCmsStatus(content.status as any),
+            ...(engagement?.get(content.id) ?? {}),
           };
         }),
         pagination: {
@@ -357,12 +449,30 @@ export function createCmsContentQueryRoutes(deps: {
         return;
       }
 
+      // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6: 목록과 **같은 경계**를 상세에도 적용한다 (list/detail invariant).
+      if ((content as any).authorRole === 'community' && content.status !== 'published') {
+        const { restrict, selfId } = await communityReadRestriction(req, serviceKey);
+        if (restrict && (content as any).createdBy !== selfId) {
+          res.status(404).json({
+            success: false,
+            error: { code: 'NOT_FOUND', message: 'Content not found' },
+          });
+          return;
+        }
+      }
+
       const authorRole = (content as any).authorRole ?? 'admin';
       const visibilityScope = (content as any).visibilityScope ?? 'platform';
+      const detailEngagement = await loadCmsEngagement(
+        dataSource,
+        [content.id],
+        (req as any).user?.id ?? null,
+      );
       res.json({
         success: true,
         data: {
           ...content,
+          ...(detailEngagement?.get(content.id) ?? {}),
           // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
           producer: mapCmsAuthorRole(authorRole),
           producerRef: (content as any).createdBy ?? '',

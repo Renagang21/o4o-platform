@@ -96,6 +96,7 @@ export type {
 // WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §8 — 공통 adapter
 export {
   normalizeForumCategoryRequest,
+  normalizeLmsEnrollment,
   normalizeForumCategoryRequests,
   sortRequestsByCreatedAtDesc,
 } from './adapters/requestNormalizers.js';

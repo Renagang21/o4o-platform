@@ -27,5 +27,7 @@ export const PHARMACY_HUB_ACCOUNT_NAV_ITEMS: MyPageNavItem[] = [
   { label: '내 수강', path: '/enrollments' },
   { label: '내 수료증', path: '/certificates' },
   { label: '내 크레딧', path: '/credits' },
+  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §5 (#19·#51)
+  { label: '내 신청', path: '/my-requests' },
   { label: '가입 상태', path: '/join/status', href: '/join/status' },
 ];

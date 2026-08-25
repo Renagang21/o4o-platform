@@ -45,7 +45,33 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   //   자료실 관리 = 공통 CMS(`/api/v1/cms/contents`, serviceKey=pharmacy-hub, type=knowledge).
   //   회원 자료실(/resources)은 이미 있었으나 등록 경로가 없어 항상 0건이었다
   //   (REQUIRED_BUT_MISSING). 신규 table/migration/backend route/권한 변경 없음.
+  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4:
+  //   공지·뉴스 관리 = 공통 CmsContentManager + 공통 news controller
+  //   (`/api/v1/pharmacy-hub/news/*`, 원장 cms_contents · serviceKey=pharmacy-hub).
+  //   KPA/GP/KCos 3 서비스가 이미 쓰는 화면의 채택이며 PH 전용 사본은 없다.
+  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#93):
+  //   커뮤니티 콘텐츠 관리 = 회원이 작성해 검토 요청한 콘텐츠의 검토·게시 큐.
+  //   공지·뉴스(운영자 발신)와 원장은 같고 축(subType)이 다르다 — 별도 항목으로 노출한다.
+  content: [
+    { label: '공지·뉴스 관리', path: '/operator/content' },
+    { label: '커뮤니티 콘텐츠 관리', path: '/operator/community-contents' },
+    // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 4 (#97):
+    //   설문조사 관리 = 공통 /api/v1/surveys (serviceKey=pharmacy-hub) + 공통
+    //   @o4o/operator-core-ui Surveys module. KPA/GP/KCos 도 같은 content 그룹에 둔다.
+    //   회원 응답 동선(/content/surveys)이 같은 WO 에서 함께 열려 dead-end 가 아니다.
+    { label: '설문조사 관리', path: '/operator/surveys' },
+  ],
   resources: [{ label: '자료실 관리', path: '/operator/resources' }],
+  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#95):
+  //   강의 관리 = 공통 /api/v1/lms/operator/courses/*. backend allowlist 에
+  //   pharmacy-hub role 을 추가만 했고 분기·사본은 없다.
+  lms: [
+    { label: '강의 관리', path: '/operator/lms' },
+    // 동일 WO §4 (#96): 안내 문구 관리 = 공통 guide contents (serviceKey 경계).
+    //   다른 4서비스와 같은 lms 그룹에 둔다. GP 의 '강사 승인'은
+    //   KPA 전용 backend guard(requireKpaAdmin) 라 PH 에는 둘 수 없다(dead nav 금지).
+    { label: '안내 문구 관리', path: '/operator/guide-contents' },
+  ],
   // 운영 분석 = 공통 /api/v1/operator/analytics/* (action_logs 기반).
   analytics: [{ label: '운영 분석', path: '/operator/analytics' }],
   // 역할 관리 = role_assignments (RBAC SSOT). 조회는 운영자, 변경은 platform admin 만

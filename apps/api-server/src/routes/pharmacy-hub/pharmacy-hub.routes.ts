@@ -61,8 +61,16 @@ import { PharmacyHubStoreQrController } from '../../controllers/pharmacy-hub/Pha
 import { PharmacyHubStoreManualController } from '../../controllers/pharmacy-hub/PharmacyHubStoreManualController.js';
 import { PharmacyHubStorePopController } from '../../controllers/pharmacy-hub/PharmacyHubStorePopController.js';
 import { PharmacyHubStoreSignageController } from '../../controllers/pharmacy-hub/PharmacyHubStoreSignageController.js';
+import {
+  PharmacyHubStoreSignageMediaController,
+  PharmacyHubStoreSignageScheduleController,
+} from '../../controllers/pharmacy-hub/PharmacyHubStoreSignageAxesController.js';
 // WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1 (태블릿 · Screen Set)
 import { createStoreTabletRoutes } from '../platform/store-tablet.routes.js';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (Operator Content 채택)
+import { createNewsController } from '../o4o-store/controllers/news.controller.js';
+import { createStoreAnalyticsController } from '../o4o-store/controllers/store-analytics.controller.js';
+import { createMultilingualProductContentController } from '../o4o-store/controllers/multilingual-product-content.controller.js'; // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#76)
 // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
 import {
   createServiceForumRouter,
@@ -420,6 +428,30 @@ export function createPharmacyHubRoutes(): Router {
   );
 
   // ───────────────────────────────────────────────────────────────────────────
+  // 매장 실행 자산 — 사이니지 미디어 · 편성
+  //
+  //   WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#69 · #70)
+  //   KPA 가 쓰는 것과 같은 원장(`signage_media` · `signage_schedules`)을 공통 service 로
+  //   호출한다. 신규 테이블·migration 0. 조직은 서버가 해석한다(클라이언트 미신뢰).
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get('/store-owner/signage/media', ...storeOwnerGuards, PharmacyHubStoreSignageMediaController.list);
+  router.post('/store-owner/signage/media', ...storeOwnerGuards, PharmacyHubStoreSignageMediaController.create);
+  router.patch('/store-owner/signage/media/:id', ...storeOwnerGuards, PharmacyHubStoreSignageMediaController.update);
+  router.delete('/store-owner/signage/media/:id', ...storeOwnerGuards, PharmacyHubStoreSignageMediaController.remove);
+  router.get('/store-owner/signage/schedules', ...storeOwnerGuards, PharmacyHubStoreSignageScheduleController.list);
+  router.post('/store-owner/signage/schedules', ...storeOwnerGuards, PharmacyHubStoreSignageScheduleController.create);
+  router.patch(
+    '/store-owner/signage/schedules/:id',
+    ...storeOwnerGuards,
+    PharmacyHubStoreSignageScheduleController.update,
+  );
+  router.delete(
+    '/store-owner/signage/schedules/:id',
+    ...storeOwnerGuards,
+    PharmacyHubStoreSignageScheduleController.remove,
+  );
+
+  // ───────────────────────────────────────────────────────────────────────────
   // 매장 실행 자산 — 상품 설명서 (동일 WO 범위 E, 조회 전용)
   //
   //   canonical = shared_product_descriptions (description_type='STORE', status='canonical').
@@ -554,10 +586,16 @@ export function createPharmacyHubRoutes(): Router {
   // WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1
   //
   //   공통 LatestActivitySection 계약({type,id,title,authorName,createdAt,href}) 을
-  //   그대로 사용한다. Pharmacy-Hub 는 Content/Resources 가 아직 없으므로
-  //   forum / course 두 축만 반환한다 (미구현 축을 가짜로 채우지 않는다).
+  //   그대로 사용한다.
   //   forum 은 forum_category_requests.service_code, course 는 lms_courses.service_key
   //   로 서비스 경계를 건다.
+  //
+  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §2:
+  //   Content/Resources 가 실재하게 됐으므로 content / resource 두 축을 추가한다.
+  //   원장은 공통 cms_contents(serviceKey='pharmacy-hub', type='knowledge') 하나이며,
+  //   metadata->>'subType' 이 콘텐츠('content')와 자료실('resource')을 가른다
+  //   (KPA 의 sub_type 축과 같은 의미 — 신규 table 0).
+  //   published 만 노출한다 — 회원 draft/pending 은 홈 피드에 오르지 않는다.
   // ===========================================================================
   const homeRouter = Router();
 
@@ -641,6 +679,44 @@ export function createPharmacyHubRoutes(): Router {
         );
       }
 
+      // Content / Resources — 같은 cms_contents 원장, subType 으로만 갈린다.
+      const cmsAxes: Array<{ axis: string; subType: string; hrefFor: (id: string) => string }> = [
+        { axis: 'content', subType: 'content', hrefFor: (id) => `/content/${id}` },
+        // 자료 상세는 공통 ResourcesHubTemplate 의 drawer 다 — `?item=` deep-link 로 연다.
+        { axis: 'resource', subType: 'resource', hrefFor: (id) => `/resources?item=${id}` },
+      ];
+      for (const { axis, subType, hrefFor } of cmsAxes) {
+        if (filterType !== 'all' && filterType !== axis) continue;
+        tasks.push(
+          (async () => {
+            const rows: any[] = await AppDataSource.query(
+              // cms_contents 는 quoted camelCase 컬럼이다(CmsContent.entity.ts).
+              `SELECT c.id, c.title, c."createdAt" AS created_at,
+                      COALESCE(u.nickname, u.name) AS author_name
+                 FROM cms_contents c
+                 LEFT JOIN users u ON c."createdBy" = u.id
+                WHERE c."serviceKey" = $1
+                  AND c.type = 'knowledge'
+                  AND c.status = 'published'
+                  AND COALESCE(c."metadata"->>'subType', 'content') = $2
+                ORDER BY c."createdAt" DESC
+                LIMIT $3`,
+              [SERVICE_KEY, subType, perLimit],
+            );
+            for (const r of rows) {
+              items.push({
+                type: axis,
+                id: r.id,
+                title: r.title,
+                authorName: r.author_name ?? undefined,
+                createdAt: new Date(r.created_at).toISOString(),
+                href: hrefFor(r.id),
+              });
+            }
+          })(),
+        );
+      }
+
       // 조회 실패를 빈 목록으로 위장하지 않는다 — 한 축이라도 실패하면 500 으로 올린다.
       await Promise.all(tasks);
       items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -649,6 +725,40 @@ export function createPharmacyHubRoutes(): Router {
   );
 
   router.use('/home', homeRouter);
+
+  // ===========================================================================
+  // News / Notice Routes - /api/v1/pharmacy-hub/news/*
+  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4
+  //   KPA / GlycoPharm / K-Cosmetics 가 이미 쓰는 **공통 factory** 를 그대로 마운트한다.
+  //   원장 = 공통 `cms_contents` (serviceKey='pharmacy-hub') — 신규 table 0 / migration 0.
+  //   신규 계약이 아니라 기존 공통 계약의 서비스 채택이다.
+  // ===========================================================================
+  router.use('/news', createNewsController(
+    AppDataSource,
+    requireAuth as any,
+    optionalAuth as any,
+    requirePharmacyHubScope as any,
+    SERVICE_KEY,
+    `${SERVICE_KEY}:operator`,
+  ));
+
+  // ===========================================================================
+  // Store Marketing Analytics - /api/v1/pharmacy-hub/pharmacy/analytics/*
+  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7
+  //   KPA / GlycoPharm / K-Cosmetics 와 **동일한 공통 factory** 를 동일한 형태로 마운트한다.
+  //   집계 원장 = 공통 store_qr_scan_events / store_qr_codes (organization_id 축) — 신규 table 0.
+  // ===========================================================================
+  router.use('/', createStoreAnalyticsController(AppDataSource, requireAuth as any, 'pharmacy-hub'));
+
+  // ===========================================================================
+  // Multilingual Product Content - /api/v1/pharmacy-hub/pharmacy/multilingual-product-contents/*
+  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#76)
+  //   KPA / GlycoPharm / K-Cosmetics 와 **동일한 공통 factory** 를 serviceKey 만 바꿔 마운트한다.
+  //   원장 = 공통 store_multilingual_product_content_groups/pages (organization_id 축) — 신규 table 0.
+  //   HUB 탐색(/hub)·가져오기(/import)는 service_key 로 스코프되어 PH 는 운영자 원본이 0건이다
+  //   (매장허브 운영자 개입 부재 = #85·#86 INTENTIONAL_DIFFERENCE). 따라서 PH UI 는 저작 축만 노출한다.
+  // ===========================================================================
+  router.use('/', createMultilingualProductContentController(AppDataSource, requireAuth as any, 'pharmacy-hub'));
 
   return router;
 }

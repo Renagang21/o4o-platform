@@ -25,9 +25,11 @@ import { ROLE_LABELS, ROLES } from './service';
  *
  * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §13 ·
  * WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12 의
- * 하위 진입점 요구(포럼 · 검색 · 내 글 · 자료실 등)는 Footer · 허브 카드가 충족한다.
- *   Content(공지·소식)는 PH 에서 forum pinned post 가 canonical 이므로 별도 링크를
+ * 하위 진입점 요구(포럼 · 검색 · 내 글 · 자료실 · 콘텐츠 등)는 Footer · 허브 카드가 충족한다.
+ *   공지·소식은 PH 에서 forum pinned post 가 canonical 이므로 별도 링크를
  *   만들지 않는다 — 같은 의미의 중복 모델을 만들지 않는다(§10).
+ *   반면 회원 지식 콘텐츠(`/content`)는 공지와 다른 축이며 실재하므로 Footer 에 등재한다
+ *   (WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §2·§6).
  */
 /*
  * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §6·§9·§10:
@@ -96,6 +98,10 @@ export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }
       { label: '포럼', href: '/forum' },
       // WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12
       { label: '자료실', href: '/resources' },
+      // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6
+      { label: '콘텐츠', href: '/content' },
+      // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 6 (#24)
+      { label: '설문조사', href: '/content/surveys' },
       { label: '교육', href: '/education' },
       // 동일 WO §17 — 학습 이력 진입점
       { label: '내 수강', href: '/account/enrollments' },

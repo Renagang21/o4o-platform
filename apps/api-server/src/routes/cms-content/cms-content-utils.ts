@@ -14,6 +14,21 @@ import {
 export type ContentAuthorRole = 'admin' | 'service_admin' | 'supplier' | 'community';
 export type ContentVisibilityScope = 'platform' | 'service' | 'organization';
 
+/**
+ * CMS 상태 전이 정본(SSOT).
+ *
+ * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6:
+ *   `CmsContentService.transitionContentStatus` 가 이 표로 검증하고,
+ *   회원 self-transition capability 는 이 표의 **부분집합**이어야 한다.
+ *   표를 두 벌로 복사하지 않도록 entity 의존이 없는 이 모듈에 둔다.
+ */
+export const CMS_ALLOWED_TRANSITIONS: Record<string, string[]> = {
+  draft: ['pending', 'archived'],
+  pending: ['published', 'draft'],
+  published: ['archived'],
+  archived: [],
+};
+
 // Supported content types — used in POST and PUT validation
 export const VALID_CONTENT_TYPES = ['hero', 'notice', 'guide', 'knowledge'] as const;
 
@@ -106,6 +121,31 @@ export async function isCmsPlatformAdmin(
   if (jwtRoles.some((r) => CMS_PLATFORM_ADMIN_ROLES.includes(r))) return true;
   try {
     return await roleChecker.hasAnyRole(user.id, CMS_PLATFORM_ADMIN_ROLES);
+  } catch (err) {
+    onError?.((err as Error).message);
+    return false;
+  }
+}
+
+/**
+ * 서비스 운영 권한(`{serviceKey}:admin` | `{serviceKey}:operator`) 보유 여부.
+ *
+ * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6:
+ *   mutation 측 `authorizeCmsMutation` 이 쓰던 절차를 여기로 올려 **한 벌**로 공유한다.
+ *   read 측(회원 저작 콘텐츠의 비공개 행 가시성)과 write 측이 서로 다른 근거를 쓰면 안 된다.
+ */
+export async function hasCmsServiceOperatorRole(
+  user: { id: string; roles?: string[] } | undefined,
+  serviceKey: string | null | undefined,
+  roleChecker: CmsRoleChecker,
+  onError?: (message: string) => void,
+): Promise<boolean> {
+  if (!user || !serviceKey) return false;
+  const allowedServiceRoles = [`${serviceKey}:admin`, `${serviceKey}:operator`];
+  const jwtRoles: string[] = user.roles || [];
+  if (jwtRoles.some((r) => allowedServiceRoles.includes(r))) return true;
+  try {
+    return await roleChecker.hasAnyRole(user.id, allowedServiceRoles);
   } catch (err) {
     onError?.((err as Error).message);
     return false;

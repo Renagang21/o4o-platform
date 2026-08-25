@@ -26,10 +26,19 @@ import type { ContentAuthorRole, ContentVisibilityScope } from './cms-content-ut
 import {
   VALID_CONTENT_TYPES,
   isCmsPlatformAdmin,
+  hasCmsServiceOperatorRole,
   canonicalizeCmsServiceKey,
   resolveCmsRolePrefix,
   isSameCmsService,
 } from './cms-content-utils.js';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6 — 회원 저작 capability (config 축, 서비스 분기 없음)
+import {
+  authorizeCmsMemberCreate,
+  authorizeCmsMemberUpdate,
+  authorizeCmsMemberTransition,
+  normalizeCmsMemberSubType,
+  type CmsMemberAuthoringCapability,
+} from './cms-content-member-authoring.js';
 
 /**
  * WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
@@ -55,8 +64,6 @@ async function authorizeCmsMutation(
 ): Promise<{ allowed: boolean; isPlatformAdmin: boolean }> {
   if (!user) return { allowed: false, isPlatformAdmin: false };
 
-  const jwtRoles: string[] = user.roles || [];
-
   // WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1:
   //   platform admin 판정을 read 측과 **한 벌**로 공유한다 (근거를 두 곳에 두지 않는다).
   const isPlatformAdmin = await isCmsPlatformAdmin(user, roleAssignmentService, (m) =>
@@ -68,18 +75,16 @@ async function authorizeCmsMutation(
   // Service-scoped: requires serviceKey + matching service:operator|admin role
   if (!serviceKey) return { allowed: false, isPlatformAdmin: false };
 
-  // role 축으로 접는다: 'kpa-society' → 'kpa', 'k-cosmetics' → 'cosmetics',
-  // legacy row 의 'kpa' / 'cosmetics' 도 self-map 으로 같은 prefix 가 된다.
-  const rolePrefix = resolveCmsRolePrefix(serviceKey);
-  const allowedServiceRoles = [`${rolePrefix}:admin`, `${rolePrefix}:operator`];
-  let hasServiceRole = jwtRoles.some((r) => allowedServiceRoles.includes(r));
-  if (!hasServiceRole) {
-    try {
-      hasServiceRole = await roleAssignmentService.hasAnyRole(user.id, allowedServiceRoles);
-    } catch (err) {
-      logger.warn('[CMS] Service role RoleAssignment check failed:', (err as Error).message);
-    }
-  }
+  // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6:
+  //   서비스 운영 권한 판정은 공통 helper 한 벌만 쓴다 (read 측과 동일 근거).
+  // WO-O4O-CMS-KPA-MUTATION-SERVICEKEY-CANONICALIZATION-V1:
+  //   role 축으로 접는다 — 'kpa-society' → 'kpa', 'k-cosmetics' → 'cosmetics'.
+  const hasServiceRole = await hasCmsServiceOperatorRole(
+    user,
+    resolveCmsRolePrefix(serviceKey),
+    roleAssignmentService,
+    (m) => logger.warn('[CMS] Service role RoleAssignment check failed:', m),
+  );
 
   return { allowed: hasServiceRole, isPlatformAdmin: false };
 }
@@ -124,20 +129,31 @@ export function createCmsContentMutationRoutes(deps: {
         isOperatorPicked = false,
         metadata = {},
         visibilityScope: reqVisibilityScope,
+        // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6: 원장 하위 축 (KPA `sub_type` 대응). 회원 경로에서만 의미를 갖는다.
+        subType: reqSubType,
       } = req.body;
 
       // WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
       // Authorize against target serviceKey (platform admin, or the service's operator|admin role)
       const { allowed, isPlatformAdmin } = await authorizeCmsMutation(user, serviceKey);
+
+      // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6
+      // operator/admin 인가에서 떨어지면 **회원 저작 capability** 를 본다.
+      // capability 가 등록되지 않은 서비스(KPA/GP/KCos/Neture)는 종전과 완전히 동일한 403 이다.
+      let memberCapability: CmsMemberAuthoringCapability | null = null;
       if (!allowed) {
-        res.status(403).json({
-          success: false,
-          error: {
-            code: 'FORBIDDEN',
-            message: 'Admin, service admin, or service operator privileges required for this serviceKey',
-          },
-        });
-        return;
+        const memberDecision = authorizeCmsMemberCreate(user as any, serviceKey, type);
+        if (!memberDecision.allowed) {
+          res.status(403).json({
+            success: false,
+            error: {
+              code: 'FORBIDDEN',
+              message: 'Admin, service admin, or service operator privileges required for this serviceKey',
+            },
+          });
+          return;
+        }
+        memberCapability = memberDecision.capability;
       }
 
       // Validate required fields
@@ -159,10 +175,17 @@ export function createCmsContentMutationRoutes(deps: {
       }
 
       // Determine author_role and visibility_scope
-      const authorRole: ContentAuthorRole = isPlatformAdmin ? 'admin' : 'service_admin';
-      const visibilityScope: ContentVisibilityScope = isPlatformAdmin
-        ? (reqVisibilityScope || 'platform')
-        : 'service';
+      // 회원 저작 행의 제작 주체·노출 축은 요청 본문이 아니라 capability 가 고정한다.
+      const authorRole: ContentAuthorRole = memberCapability
+        ? memberCapability.authorRole
+        : isPlatformAdmin
+          ? 'admin'
+          : 'service_admin';
+      const visibilityScope: ContentVisibilityScope = memberCapability
+        ? memberCapability.visibilityScope
+        : isPlatformAdmin
+          ? (reqVisibilityScope || 'platform')
+          : 'service';
 
       // Service admin must provide serviceKey
       if (!isPlatformAdmin && !serviceKey) {
@@ -195,10 +218,17 @@ export function createCmsContentMutationRoutes(deps: {
         linkUrl: linkUrl || null,
         linkText: linkText || null,
         status: 'draft' as ContentStatus,
-        sortOrder,
-        isPinned,
-        isOperatorPicked,
-        metadata: { ...metadata, creatorType: authorRole === 'admin' ? 'operator' : 'operator' },
+        // 회원 저작 행은 진열 축(고정·운영자 픽·정렬)을 스스로 조작할 수 없다 — 운영자 축 전용이다.
+        sortOrder: memberCapability ? 0 : sortOrder,
+        isPinned: memberCapability ? false : isPinned,
+        isOperatorPicked: memberCapability ? false : isOperatorPicked,
+        // 회원 저작 행의 metadata 는 요청 본문을 그대로 받지 않는다 — 계약이 아는 키만 기록한다.
+        metadata: memberCapability
+          ? {
+              creatorType: 'member',
+              subType: normalizeCmsMemberSubType(memberCapability, reqSubType),
+            }
+          : { ...metadata, creatorType: 'operator' },
         createdBy: user.id,
       } as any);
 
@@ -263,7 +293,12 @@ export function createCmsContentMutationRoutes(deps: {
       // Service-scoped authorization against the existing content's serviceKey.
       // Non-platform-admin callers cannot move content across services.
       const putAuth = await authorizeCmsMutation(req.user, content.serviceKey);
-      if (!putAuth.allowed) {
+
+      // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6
+      // 운영자 인가가 없으면 **작성자 본인의 community 콘텐츠**만 수정할 수 있다.
+      // capability 미등록 서비스에서는 항상 false 이므로 기존 403 계약이 그대로 유지된다.
+      const isMemberEdit = !putAuth.allowed && authorizeCmsMemberUpdate(req.user as any, content as any);
+      if (!putAuth.allowed && !isMemberEdit) {
         res.status(403).json({
           success: false,
           error: {
@@ -273,6 +308,20 @@ export function createCmsContentMutationRoutes(deps: {
         });
         return;
       }
+      // 회원 수정은 서비스 경계·type·진열 축을 건드릴 수 없다 (본문 축만 수정한다).
+      if (isMemberEdit && (
+        (serviceKey !== undefined && !isSameCmsService(serviceKey, content.serviceKey)) ||
+        (type !== undefined && type !== content.type) ||
+        sortOrder !== undefined || isPinned !== undefined ||
+        isOperatorPicked !== undefined || metadata !== undefined
+      )) {
+        res.status(403).json({
+          success: false,
+          error: { code: 'FORBIDDEN', message: 'Author may only edit content fields' },
+        });
+        return;
+      }
+
       // Non-platform-admins may not change serviceKey (would escape their scope).
       // WO-O4O-CMS-KPA-MUTATION-SERVICEKEY-CANONICALIZATION-V1 §11:
       //   alias 쌍('kpa' ↔ 'kpa-society')은 **같은 canonical service** 이므로
@@ -359,7 +408,14 @@ export function createCmsContentMutationRoutes(deps: {
         return;
       }
       const patchAuth = await authorizeCmsMutation(req.user, existing.serviceKey);
-      if (!patchAuth.allowed) {
+
+      // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6
+      // 작성자 본인은 자기 community 콘텐츠에 대해 capability 가 정의한 **부분집합 전이**만 할 수 있다
+      // (제출 draft→pending / 취소 pending→draft / 회수·삭제 draft|published→archived).
+      // 최종 유효성은 그대로 서버 정본 `CMS_ALLOWED_TRANSITIONS` 가 재검증한다.
+      const isMemberTransition =
+        !patchAuth.allowed && authorizeCmsMemberTransition(req.user as any, existing as any, status);
+      if (!patchAuth.allowed && !isMemberTransition) {
         res.status(403).json({
           success: false,
           error: {

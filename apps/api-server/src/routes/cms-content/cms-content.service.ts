@@ -9,6 +9,8 @@
 import type { DataSource, Repository } from 'typeorm';
 import { CmsContent } from '@o4o-apps/cms-core';
 import type { ContentStatus } from '@o4o-apps/cms-core';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6: 전이 정본은 entity 의존이 없는 utils 에 둔다 (계약 테스트가 SSOT 를 직접 참조할 수 있도록).
+import { CMS_ALLOWED_TRANSITIONS } from './cms-content-utils.js';
 
 /**
  * Allowed CMS content status transitions.
@@ -19,12 +21,6 @@ import type { ContentStatus } from '@o4o-apps/cms-core';
  *   published → archived
  *   archived  → (terminal — no transitions)
  */
-const CMS_ALLOWED_TRANSITIONS: Record<string, string[]> = {
-  draft: ['pending', 'archived'],
-  pending: ['published', 'draft'],
-  published: ['archived'],
-  archived: [],
-};
 
 const VALID_STATUSES: ContentStatus[] = ['draft', 'pending', 'published', 'archived'];
 

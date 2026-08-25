@@ -13,13 +13,13 @@
  *     - 역할별 진입점 카드 → valueGuideSlot (KPA 와 같은 after-help 배치)
  *   `/community` 는 `/` 로 redirect 된다(기존 링크 보존 · 중복 홈 제거).
  *
- * - PH 는 Content 가 미구현이므로 해당 탭·카드·링크를 만들지 않는다
- *   (§4: placeholder 기능을 새로 만들지 않는다 / §13: dead route 금지).
- *
- * WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12:
- *   자료실(/resources)은 이후 채택돼 실재하지만, "최신 활동" 탭은 추가하지 않는다.
- *   탭 데이터는 `/pharmacy-hub/home/latest` 가 공급하며 resource 타입을 다루지 않아
- *   backend 변경 없이는 항상 빈 탭이 된다(§14 신규 backend 0 / §4 placeholder 금지).
+ * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §2:
+ *   콘텐츠(/content)·자료실(/resources)이 실재하게 됐다. 과거의
+ *   "PH 는 Content 가 미구현이므로 탭·카드·링크를 만들지 않는다" 주석은 사실이 아니게 되어
+ *   제거하고, KPA 와 같은 4축(forum·content·resource·course) 최신 활동 탭과
+ *   진입 카드를 노출한다. `/pharmacy-hub/home/latest` 도 같은 WO 에서 두 축을 공급한다 —
+ *   빈 탭(placeholder)을 만드는 것이 아니라 실제 축을 붙이는 것이다.
+ *   홈 구조 자체는 재설계하지 않는다(§7: Home/Menu 는 회귀 확인만).
  */
 
 import { useCallback } from 'react';
@@ -37,10 +37,12 @@ import { BRAND, ROLES, ROLE_LABELS, satisfiesRole } from '../../config/service';
 import { useAuth } from '../../contexts/AuthContext';
 import { getServiceMembershipStatus } from '../../lib/membershipGate';
 
-/** PH 에 실제 존재하는 공간만 탭으로 노출한다(콘텐츠/자료실/사이니지 제외). */
+/** PH 에 실제 존재하는 공간만 탭으로 노출한다(사이니지는 커뮤니티 축이 아니라 제외). */
 const LATEST_TABS: LatestActivityTab[] = [
   { key: 'all', label: '전체', shortcutHref: null, shortcutLabel: null },
   { key: 'forum', label: '포럼', shortcutHref: '/forum', shortcutLabel: '포럼 바로가기' },
+  { key: 'content', label: '콘텐츠', shortcutHref: '/content', shortcutLabel: '콘텐츠 바로가기' },
+  { key: 'resource', label: '자료실', shortcutHref: '/resources', shortcutLabel: '자료실 바로가기' },
   { key: 'course', label: '교육', shortcutHref: '/education', shortcutLabel: '교육 바로가기' },
 ];
 
@@ -145,17 +147,18 @@ export default function CommunityHomePage() {
             <li>· 포럼 글쓰기는 PharmacyHub 가입 승인 후 가능합니다.</li>
             <li>· 교육 콘텐츠는 PharmacyHub 에 등록된 강의만 표시됩니다.</li>
             <li>· 내가 쓴 글은 커뮤니티 메뉴의 [내 글]에서 확인할 수 있습니다.</li>
+            <li>· 콘텐츠는 작성 후 검토를 거쳐 공개됩니다.</li>
           </ul>
         </div>
       }
       appEntryCards={[
         { title: '포럼', description: '약국·공급자 정보 교류 게시판', href: '/forum' },
         { title: '교육', description: '매장 운영·상품 이해 교육 콘텐츠', href: '/education' },
+        { title: '콘텐츠', description: '회원이 작성한 지식 콘텐츠 읽고 쓰기', href: '/content' },
         { title: '커뮤니티 검색', description: '커뮤니티 글을 한 번에 검색', href: '/community/search' },
         { title: '내 글', description: '내가 작성한 글 모아보기', href: '/forum/my-posts' },
-        // WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12
-        //   공통 GlobalHeader 는 nav item 의 children 을 렌더하지 않는다(플랫폼 공통 제약).
-        //   따라서 자료실의 실제 진입점은 이 커뮤니티 홈 카드와 footer 가 담당한다.
+        // 공통 GlobalHeader 는 nav item 의 children 을 렌더하지 않는다(플랫폼 공통 제약).
+        //   따라서 콘텐츠·자료실의 실제 진입점은 이 커뮤니티 홈 카드와 footer 가 담당한다.
         { title: '자료실', description: '약국 운영에 활용할 자료를 모아보기', href: '/resources' },
       ]}
       /* KPA 와 같은 배치 계약 — 역할별 활용 안내는 진입 CTA 가 아니라 가이드 영역에 둔다. */

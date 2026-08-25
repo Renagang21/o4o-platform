@@ -12,10 +12,17 @@
  * 삭제는 **비활성화(soft delete)** 다. 물리 삭제 경로는 만들지 않는다.
  */
 
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Languages } from 'lucide-react';
 import { StoreLocalProductsManager } from '@o4o/store-ui-core';
-import type { StoreLocalProductsApi } from '@o4o/store-ui-core';
+import type { StoreLocalProductsApi, StoreLocalProductsExtraColumn } from '@o4o/store-ui-core';
+// WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#76):
+//   상품 목록이 다국어 상품 콘텐츠의 진입점이다 (KPA 와 같은 축).
+import {
+  getMlcSummaryMap,
+  type MlcSummaryItem,
+} from '../../lib/api/pharmacyHubMultilingualContents';
 import {
   fetchLocalProducts,
   createLocalProduct,
@@ -36,8 +43,11 @@ const localProductsApi: StoreLocalProductsApi = {
 };
 
 export default function StoreOwnerLocalProductsPage() {
+  const navigate = useNavigate();
   const [connection, setConnection] = useState<LocalProductsStoreConnection | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // 상품별 다국어 콘텐츠 연결 요약 (목록 1회 조회 — 행마다 호출하지 않는다)
+  const [mlcSummary, setMlcSummary] = useState<Map<string, MlcSummaryItem>>(new Map());
 
   // 매장 연결 상태를 먼저 확인한다. 미연결·다중 상태에서 등록·수정을 시도하면
   // 서버가 409 로 막으므로, 화면 단에서 안내만 하고 편집 UI 를 열지 않는다.
@@ -54,6 +64,47 @@ export default function StoreOwnerLocalProductsPage() {
       cancelled = true;
     };
   }, []);
+
+  // 다국어 요약은 매장이 연결된 뒤에만 의미가 있다. 실패해도 목록 자체는 계속 쓴다.
+  useEffect(() => {
+    if (connection?.status !== 'connected') return;
+    let cancelled = false;
+    getMlcSummaryMap('local')
+      .then((map) => {
+        if (!cancelled) setMlcSummary(map);
+      })
+      .catch(() => {
+        /* 배지 없이 목록만 렌더 */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [connection?.status]);
+
+  const extraColumns = useMemo<Array<StoreLocalProductsExtraColumn<any>>>(
+    () => [
+      {
+        key: 'multilingual',
+        header: '다국어',
+        width: 170,
+        render: (product: any) => {
+          const summary = mlcSummary.get(product.id);
+          return (
+            <button
+              type="button"
+              onClick={() => navigate(`/store-owner/products/multilingual/local/${product.id}`)}
+              className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-[11px] text-indigo-700 hover:bg-indigo-100"
+              title={summary ? `언어 ${summary.localeCount}개 (${summary.locales.join(' · ')})` : '다국어 안내를 작성합니다'}
+            >
+              <Languages className="h-3 w-3" />
+              {summary && summary.localeCount > 0 ? `다국어 ${summary.localeCount}` : '다국어 안내'}
+            </button>
+          );
+        },
+      },
+    ],
+    [mlcSummary, navigate],
+  );
 
   if (error) {
     return (
@@ -99,6 +150,7 @@ export default function StoreOwnerLocalProductsPage() {
       }}
       // Pharmacy-Hub 에는 `/store/*` 후속 화면이 없다 — dead link 대신 버튼을 숨긴다.
       actions={{ onTabletDisplays: null, onMarketingAssets: null, onCreatePop: null }}
+      extraColumns={extraColumns}
     />
   );
 }
