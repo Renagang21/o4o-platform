@@ -23,16 +23,28 @@ import { roleAssignmentService } from '../../modules/auth/services/role-assignme
 import logger from '../../utils/logger.js';
 import { CmsContentService, StatusValidationError, StatusTransitionError } from './cms-content.service.js';
 import type { ContentAuthorRole, ContentVisibilityScope } from './cms-content-utils.js';
-import { VALID_CONTENT_TYPES, isCmsPlatformAdmin } from './cms-content-utils.js';
+import {
+  VALID_CONTENT_TYPES,
+  isCmsPlatformAdmin,
+  canonicalizeCmsServiceKey,
+  resolveCmsRolePrefix,
+  isSameCmsService,
+} from './cms-content-utils.js';
 
 /**
  * WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
+ * WO-O4O-CMS-KPA-MUTATION-SERVICEKEY-CANONICALIZATION-V1
  *
  * Authorize a CMS mutation request against a target serviceKey.
  *
  * Allowed:
  *   - platform:super_admin (any serviceKey)
- *   - `${serviceKey}:admin` or `${serviceKey}:operator` (only matching serviceKey)
+ *   - `${rolePrefix}:admin` / `${rolePrefix}:operator` for the **same canonical service**
+ *
+ * ⚠️ `serviceKey` 는 CMS 원장 축(`kpa-society`)이고 role 은 role scope 축(`kpa`)이다.
+ *    두 축을 문자열로 직접 이어붙이면(`${serviceKey}:operator`) KPA 는 항상 어긋나
+ *    정상 운영자가 자기 콘텐츠를 못 고친다. security-core canonical SSOT 로 role 축에
+ *    접어서 비교한다 — CMS 로컬 alias map 을 만들지 않는다.
  *
  * Returns { allowed, isPlatformAdmin } so callers can decide author_role / visibility_scope.
  * Checks JWT payload roles first, falls back to RoleAssignment table.
@@ -56,7 +68,10 @@ async function authorizeCmsMutation(
   // Service-scoped: requires serviceKey + matching service:operator|admin role
   if (!serviceKey) return { allowed: false, isPlatformAdmin: false };
 
-  const allowedServiceRoles = [`${serviceKey}:admin`, `${serviceKey}:operator`];
+  // role 축으로 접는다: 'kpa-society' → 'kpa', 'k-cosmetics' → 'cosmetics',
+  // legacy row 의 'kpa' / 'cosmetics' 도 self-map 으로 같은 prefix 가 된다.
+  const rolePrefix = resolveCmsRolePrefix(serviceKey);
+  const allowedServiceRoles = [`${rolePrefix}:admin`, `${rolePrefix}:operator`];
   let hasServiceRole = jwtRoles.some((r) => allowedServiceRoles.includes(r));
   if (!hasServiceRole) {
     try {
@@ -112,7 +127,7 @@ export function createCmsContentMutationRoutes(deps: {
       } = req.body;
 
       // WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
-      // Authorize against target serviceKey (allows platform admin OR ${serviceKey}:operator|admin)
+      // Authorize against target serviceKey (platform admin, or the service's operator|admin role)
       const { allowed, isPlatformAdmin } = await authorizeCmsMutation(user, serviceKey);
       if (!allowed) {
         res.status(403).json({
@@ -160,8 +175,15 @@ export function createCmsContentMutationRoutes(deps: {
 
       const contentRepo = dataSource.getRepository(CmsContent);
 
+      // WO-O4O-CMS-KPA-MUTATION-SERVICEKEY-CANONICALIZATION-V1 §10:
+      //   신규 row 는 항상 canonical service key 로 저장한다. 호출자가 role prefix 축
+      //   ('kpa' / 'cosmetics') 를 보내도 legacy 값을 새로 만들지 않는다.
+      const canonicalServiceKey: string | null = serviceKey
+        ? canonicalizeCmsServiceKey(String(serviceKey))
+        : null;
+
       const content = contentRepo.create({
-        serviceKey: serviceKey || null,
+        serviceKey: canonicalServiceKey,
         organizationId: organizationId || null,
         type: type as ContentType,
         title,
@@ -251,8 +273,13 @@ export function createCmsContentMutationRoutes(deps: {
         });
         return;
       }
-      // Non-platform-admins may not change serviceKey (would escape their scope)
-      if (!putAuth.isPlatformAdmin && serviceKey !== undefined && serviceKey !== content.serviceKey) {
+      // Non-platform-admins may not change serviceKey (would escape their scope).
+      // WO-O4O-CMS-KPA-MUTATION-SERVICEKEY-CANONICALIZATION-V1 §11:
+      //   alias 쌍('kpa' ↔ 'kpa-society')은 **같은 canonical service** 이므로
+      //   ownership 이전이 아니다. 문자열 동등성으로 판정하지 않는다.
+      const serviceKeyChanged =
+        serviceKey !== undefined && !isSameCmsService(serviceKey, content.serviceKey);
+      if (!putAuth.isPlatformAdmin && serviceKeyChanged) {
         res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Cannot change serviceKey without platform admin role' },
@@ -260,8 +287,12 @@ export function createCmsContentMutationRoutes(deps: {
         return;
       }
 
-      // Update fields if provided
-      if (serviceKey !== undefined) content.serviceKey = serviceKey;
+      // Update fields if provided.
+      // 같은 canonical service 를 가리키는 alias 재전송은 **쓰지 않는다** — legacy row 를
+      // 이번 계약이 조용히 migration 하지 않기 위함이다 (WO §9: legacy row migration 0).
+      if (serviceKeyChanged) {
+        content.serviceKey = serviceKey ? canonicalizeCmsServiceKey(String(serviceKey)) : null;
+      }
       if (type !== undefined) {
         // Supported content types
         if (!VALID_CONTENT_TYPES.includes(type)) {

@@ -47,6 +47,44 @@ export function resolveCmsServiceKeys(serviceKey: string): string[] {
   return canonical === rolePrefix ? [canonical] : [canonical, rolePrefix];
 }
 
+/**
+ * WO-O4O-CMS-KPA-MUTATION-SERVICEKEY-CANONICALIZATION-V1
+ *
+ * CMS `serviceKey` 축(canonical `kpa-society` / legacy role-prefix `kpa`)을 **canonical 한 벌**로
+ * 접는다. read 측 {@link resolveCmsServiceKeys} 와 **같은 security-core 왕복**을 쓴다 —
+ * `if (serviceKey === 'kpa-society') ...` 같은 CMS 로컬 분기를 만들지 않는다 (WO §8 금지).
+ *
+ *   'kpa' | 'kpa-society'       → 'kpa-society'
+ *   'cosmetics' | 'k-cosmetics' → 'k-cosmetics'
+ *   'glycopharm' | 'pharmacy-hub' | 'neture' → 자기 자신 (self-map)
+ */
+export function canonicalizeCmsServiceKey(serviceKey: string): string {
+  return resolveCanonicalServiceKey(resolveRolePrefixFromCanonicalServiceKey(serviceKey));
+}
+
+/**
+ * CMS `serviceKey` 에 대응하는 **role prefix** 를 돌려준다.
+ *
+ * mutation 인가가 `${serviceKey}:operator` 를 그대로 조립하면 KPA 는
+ * role scope(`kpa`) 와 CMS service key(`kpa-society`) 축이 달라 항상 어긋난다
+ * (§7 실측 403 원인). role 축으로 접어서 비교한다.
+ *
+ *   'kpa-society' | 'kpa'       → 'kpa'
+ *   'k-cosmetics' | 'cosmetics' → 'cosmetics'
+ */
+export function resolveCmsRolePrefix(serviceKey: string): string {
+  return resolveRolePrefixFromCanonicalServiceKey(serviceKey);
+}
+
+/**
+ * 두 `serviceKey` 문자열이 **같은 canonical service** 를 가리키는지 판정한다.
+ * `'kpa' === 'kpa-society'` 같은 alias 쌍을 문자열 동등성으로 비교하지 않기 위한 계약.
+ */
+export function isSameCmsService(a: string | null | undefined, b: string | null | undefined): boolean {
+  if (!a || !b) return a === b || (!a && !b);
+  return canonicalizeCmsServiceKey(a) === canonicalizeCmsServiceKey(b);
+}
+
 /** platform admin 판정 근거 — mutation 측 `authorizeCmsMutation` 과 **동일한 근거**를 쓴다. */
 export const CMS_PLATFORM_ADMIN_ROLES = ['platform:super_admin'];
 
