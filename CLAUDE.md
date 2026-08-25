@@ -444,6 +444,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 |------|------|
 | **O4O 사업 철학 SSOT (최상위)** | `docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md` |
 | **O4O 3자 Canonical Flow SSOT** | `docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md` |
+| **O4O Store Commerce Boundary (canonical business boundary)** | `docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md` — 매장 경영자는 O4O로 소비자에게 판매하지 않는다 / 자체 매장 전자상거래 없음 / 판매 실행 = 외부 POS·외부 판매채널 / 태블릿·QR = 정보 제공 / legacy commerce 판정 규칙·개발 금지선. **store · cart · checkout · orders · payments · refund · PG · POS · tablet · QR · 외부 판매채널 관련 작업의 선행 기준** |
 | Cosmetics 도메인 | `docs/architecture/COSMETICS-DOMAIN-RULES.md` |
 | Business 서비스 | `docs/architecture/BUSINESS-SERVICE-RULES.md` |
 | O4O Store/Order | `docs/architecture/O4O-STORE-RULES.md` |

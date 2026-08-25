@@ -8,6 +8,7 @@
 |------|------|------|
 | `O4O-BUSINESS-PHILOSOPHY-V1.md` | Active | O4O 사업 철학 SSOT — 3자 구조·HUB·AI 역할 최상위 기준 |
 | `O4O-3-ROLE-FLOW-BASELINE-V1.md` | Active | 공급자→운영자→매장 3자 Canonical Flow — 책임 매트릭스·데이터 흐름 |
+| `O4O-STORE-COMMERCE-BOUNDARY-V1.md` | Active | 매장 commerce 사업 경계 — 매장 경영자 소비자 판매 없음 · 판매 실행 = POS/외부채널 · legacy commerce 판정 규칙 |
 | `O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md` | Active | 운영자 Non-Approval UX — 5 Workspace 기준, 승인 중심 편향 방지 |
 | `O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md` | Active | HUB 콘텐츠 게시 표준 — RichTextEditor 기반 6종 항목별 게시 |
 | `BASELINE-OPERATOR-OS-V1.md` | Frozen | Core 패키지 동결, Hub/Trigger/Security 기준선 |

@@ -1,5 +1,21 @@
 # IR-O4O-CHECKOUT-STABLE-DECLARATION-V1
 
+> ---
+>
+> **[2026-08-25 · Business Boundary 정합 표기]**
+> 본 문서의 "Storefront 4중 게이트" · "Checkout 7중 검증" 은
+> [`O4O-RETAIL-STABLE-V1`](../platform/architecture/O4O-RETAIL-STABLE-V1.md) 과 동일한
+> `channel_type = 'B2C'` 매장 storefront closed loop 을 대상으로 한다.
+>
+> canonical business boundary 문서
+> [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) §2 · §12 기준으로
+> **충돌 후보**이며, 같은 문서 §8 판정 전까지 `UNKNOWN` 이다.
+> 해당 결제 경로는 `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1` 로 이미
+> `410 STORE_SALE_PAYMENT_DEPRECATED` 차단 상태다. 본문은 변경하지 않았다.
+>
+> ---
+
+
 **O4O Platform - Checkout Layer Stable Declaration (Legacy Cleanup Included)**
 
 | 항목 | 값 |

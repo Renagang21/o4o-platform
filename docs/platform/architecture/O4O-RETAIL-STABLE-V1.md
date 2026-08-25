@@ -1,5 +1,27 @@
 # O4O Retail Stable v1.0 — Platform Architecture Freeze
 
+> ---
+>
+> **[2026-08-25 · Business Boundary 정합 표기]**
+> 본 문서가 기술하는 `Hub → Storefront → Checkout → Payment → Order` closed loop 은
+> `organization_channels.channel_type = 'B2C'` 를 게이트로 사용한다 — 즉 **매장(약국) 조직을
+> 상대로 소비자가 O4O 안에서 결제하는 경로**다.
+>
+> 이는 canonical business boundary 문서
+> [`O4O-STORE-COMMERCE-BOUNDARY-V1`](../../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) §2 · §12 의
+> "매장 경영자는 O4O를 이용하여 소비자에게 판매하지 않는다" 원칙과 **충돌 후보**다.
+>
+> 실제로 이 loop 의 **결제 leg 은 이미 차단되어 있다** — `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1`
+> 이 glycopharm · cosmetics · kpa 의 payment prepare/confirm 을 `410 STORE_SALE_PAYMENT_DEPRECATED`
+> 로 막았다. 즉 본 문서가 기술하는 "폐쇄 루프"는 현재 문서 그대로 동작하지 않는다.
+>
+> 본 표기는 판정이 아니다. 해당 문서 §8 판정 절차(producer / consumer / production 사용 여부)를
+> 거치기 전까지 이 loop 은 `UNKNOWN` 이며, **기능을 복구·확장하지 않는다.**
+> 본 문서의 FROZEN 상태와 본문은 변경하지 않았다.
+>
+> ---
+
+
 > **Status**: FROZEN
 > **Effective**: 2026-02-16
 > **Authority**: CLAUDE.md Section 13-A (Retail Stable Rule)
