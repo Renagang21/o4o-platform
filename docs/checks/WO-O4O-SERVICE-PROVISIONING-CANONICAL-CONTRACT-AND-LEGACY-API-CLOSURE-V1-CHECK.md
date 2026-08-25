@@ -213,7 +213,45 @@ mount 해제 후에는 전역 404 로 떨어진다 — 즉 retire 는 `/api/v1/s
 
 ---
 
-## 11. 한계
+## 11. Production 검증 (§21) — 배포 후 실측
+
+- 배포 commit `23fdb013e` / Cloud Run revision **`o4o-core-api-03457-jbh`** (2026-08-25 05:30 UTC)
+
+| 경로 | retire 전 | retire 후 | 판정 |
+|---|---|---|---|
+| `GET /api/v1/service/templates` | 401 | **404** `Cannot GET` | mount 해제 확인 |
+| `GET /api/v1/service/templates/:id` | 401 | **404** | 〃 |
+| `POST /api/v1/service/create` | 401 | **404** | 〃 |
+| `GET /api/v1/service/stats` | 401 | **404** | 〃 |
+| `GET /api/v1/service-admin/summary` | 401 | **404** | 〃 |
+| `GET /api/v1/service-admin/theme` | 401 | **404** | 〃 |
+| `GET /api/v1/service-admin/templates` | 401 | **404** | 〃 |
+| `GET /api/v1/service-admin/stats` | 401 | **404** | 〃 |
+
+> retire 전 401 은 §7 대로 라우터 수준 `authenticate` 가 라우트 매칭보다 먼저
+> 실행됐기 때문이다. 이제 전역 404 로 정직하게 떨어진다.
+
+**canonical 축 정상 (§14)**
+
+| 경로 | 결과 |
+|---|---|
+| `GET /health` | **200** |
+| `GET /health/database` | **200** `status: healthy`, PostgreSQL 15.17, pingMs 3, longRunningQueries 0 |
+| `GET /api/v1/appstore` | **200** |
+| `GET /api/v1/apps/availability` | **401**(무인증 — 정상 guard) |
+| `GET /api/v1/admin/apps` | **401**(무인증 — 정상 guard) |
+
+**로그**
+
+- 배포 후 20분 구간 `severity>=ERROR` / `httpRequest.status>=500`: **0건**
+- `[TemplateRegistry] Templates directory not found` · `[InitPackRegistry] ...`
+  부트 경고: **소멸**(loader 자체가 제거돼 더 이상 출력되지 않는다)
+
+**CI**: Deploy API Server ✅ / Deploy Admin Dashboard ✅ / CodeQL ✅
+
+---
+
+## 12. 한계
 
 인증 토큰이 필요한 production 호출은 이 세션에서 수행할 수 없었다(자격 증명 전송 차단).
 따라서 super_admin 인증 상태의 endpoint 응답 본문 실측 대신 **Cloud Run 부트 로그 ·
@@ -222,7 +260,7 @@ write 단계 전부 스텁, consumer 0)는 모두 인증과 무관하게 확정�
 
 ---
 
-## 12. 후속 후보 (범위 밖)
+## 13. 후속 후보 (범위 밖)
 
 1. `modules/sites/site.entity.ts` · `database/entities.ts` 의 `sites` 잔재 (선행 WO 에서 이월)
 2. `docs/` 내 Phase 7/8 service template 서술 — 본 CHECK 로 대체 서술 필요
