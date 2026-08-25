@@ -9,7 +9,8 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { DataSource, Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { DataSource, Between, In, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { resolveCmsServiceKeys } from '../cms-content/cms-content-utils.js';
 import { ChannelPlaybackLog } from '@o4o-apps/cms-core';
 import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js';
 
@@ -67,7 +68,8 @@ export function createAdminPlaybackLogRoutes(dataSource: DataSource): Router {
         where.contentId = contentId as string;
       }
       if (serviceKey) {
-        where.serviceKey = serviceKey as string;
+        // WO-O4O-CHANNELS-SERVICEKEY-CANONICAL-SCOPE-ALIGNMENT-V1: alias/canonical 동일 모집단.
+        where.serviceKey = In(resolveCmsServiceKeys(String(serviceKey)));
       }
       if (organizationId) {
         where.organizationId = organizationId as string;
@@ -173,7 +175,10 @@ export function createAdminPlaybackLogRoutes(dataSource: DataSource): Router {
         qb.andWhere('log.channelId = :channelId', { channelId });
       }
       if (serviceKey) {
-        qb.andWhere('log.serviceKey = :serviceKey', { serviceKey });
+        // WO-O4O-CHANNELS-SERVICEKEY-CANONICAL-SCOPE-ALIGNMENT-V1: alias/canonical 동일 모집단.
+        qb.andWhere('log.serviceKey IN (:...serviceKeys)', {
+          serviceKeys: resolveCmsServiceKeys(String(serviceKey)),
+        });
       }
       if (from) {
         qb.andWhere('log.playedAt >= :from', { from: new Date(from as string) });

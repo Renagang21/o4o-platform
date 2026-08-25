@@ -53,7 +53,11 @@ export class Channel {
   @Index()
   serviceKey!: string | null;
   // null = cross-service channel
-  // 'glycopharm', 'kpa', 'neture', 'k-cosmetics'
+  // canonical CMS ledger service key — CmsContentSlot.serviceKey 와 같은 축이다.
+  // 'glycopharm' | 'kpa-society' | 'neture' | 'k-cosmetics' | 'pharmacy-hub'
+  // WO-O4O-CHANNELS-SERVICEKEY-CANONICAL-SCOPE-ALIGNMENT-V1:
+  //   role prefix('kpa','cosmetics')를 여기에 저장하지 않는다. 입력으로 들어오면
+  //   라우트에서 security-core resolver 로 canonical 로 수렴시켜 저장한다.
 
   // ═══════════════════════════════════════════════════════════════
   // IDENTITY (What is this channel?)

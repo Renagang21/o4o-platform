@@ -20,9 +20,15 @@
 // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
 import { getTrustedClientIp } from '../../utils/trusted-client-ip.js';
 import { Router, Request, Response } from 'express';
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import { Channel, ChannelType, ChannelStatus, CmsContent, CmsContentSlot, ChannelPlaybackLog, ChannelHeartbeat } from '@o4o-apps/cms-core';
 import { optionalAuth, requireAdmin } from '../../middleware/auth.middleware.js';
+// WO-O4O-CHANNELS-SERVICEKEY-CANONICAL-SCOPE-ALIGNMENT-V1
+//   channels.serviceKey 는 CMS ledger service key 다(= slot.serviceKey 와 같은 축).
+//   따라서 canonical/alias 해석은 CMS read 경계가 이미 쓰는 helper 를 그대로 쓴다.
+//   여기서 ['kpa-society','kpa'] 같은 로컬 alias 배열을 새로 만들지 않는다.
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
+import { resolveCmsServiceKeys } from '../cms-content/cms-content-utils.js';
 
 // Valid channel types
 const VALID_CHANNEL_TYPES: ChannelType[] = ['tv', 'kiosk', 'signage', 'web'];
@@ -69,7 +75,8 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       // Build where clause
       const where: any = {};
       if (serviceKey) {
-        where.serviceKey = serviceKey as string;
+        // alias 입력('kpa')과 canonical 입력('kpa-society')이 같은 모집단을 반환해야 한다.
+        where.serviceKey = In(resolveCmsServiceKeys(String(serviceKey)));
       }
       if (organizationId) {
         where.organizationId = organizationId as string;
@@ -263,7 +270,8 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       }
 
       const channel = channelRepo.create({
-        serviceKey: serviceKey || null,
+        // 신규 write 는 항상 canonical ledger key 로 저장한다(role prefix 저장 금지).
+        serviceKey: serviceKey ? resolveCanonicalServiceKey(String(serviceKey)) : null,
         organizationId: organizationId || null,
         name,
         code: code || null,
@@ -373,7 +381,7 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       }
 
       // Update fields
-      if (serviceKey !== undefined) channel.serviceKey = serviceKey;
+      if (serviceKey !== undefined) channel.serviceKey = serviceKey ? resolveCanonicalServiceKey(String(serviceKey)) : null;
       if (organizationId !== undefined) channel.organizationId = organizationId;
       if (name !== undefined) channel.name = name;
       if (code !== undefined) channel.code = code;
@@ -553,7 +561,12 @@ export function createChannelRoutes(dataSource: DataSource): Router {
 
       // Scope filtering: match channel's scope OR null (global)
       if (channel.serviceKey) {
-        qb.andWhere('(slot.serviceKey = :serviceKey OR slot.serviceKey IS NULL)', { serviceKey: channel.serviceKey });
+        // 문자열 동등 비교는 alias 를 고립시킨다: canonical 채널('kpa-society')이
+        // legacy slot('kpa', slotKey=intranet-hero)을 놓치고, 그 반대도 마찬가지다.
+        // CMS slot 이 이미 alias 집합으로 같은 서비스를 인식하므로 여기서도 같은 집합을 쓴다.
+        qb.andWhere('(slot.serviceKey IN (:...serviceKeys) OR slot.serviceKey IS NULL)', {
+          serviceKeys: resolveCmsServiceKeys(channel.serviceKey),
+        });
       } else {
         qb.andWhere('slot.serviceKey IS NULL');
       }

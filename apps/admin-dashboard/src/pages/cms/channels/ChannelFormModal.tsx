@@ -22,6 +22,11 @@ interface ChannelFormModalProps {
 }
 
 // Available services
+// WO-O4O-CMS-CHANNELS-COMPLETED-BRANCHES-MAIN-INTEGRATION-V1 §7·§8:
+//   value 는 canonical ledger key 다. role prefix('kpa','cosmetics')를 서버로 보내지 않는다
+//   (WO-O4O-CHANNELS-SERVICEKEY-CANONICAL-SCOPE-ALIGNMENT-V1). 그 canonical 값 목록은
+//   화면마다 복사하지 않고 CMS 공통 카탈로그 한 벌에서 가져온다
+//   (WO-O4O-CMS-SERVICEKEY-ALIAS-SSOT-RESIDUAL-CLOSURE-V1 §7). 두 계약이 모두 유지된다.
 const SERVICES = cmsServiceOptionsWithAll('Global (All Services)');
 
 // Channel types
