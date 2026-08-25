@@ -13,17 +13,25 @@
 |:---:|------|------|
 | 1 | `CLAUDE.md` (본 문서) | 기술/운영 규칙 |
 | 2 | [`docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md`](docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | **사업 철학 SSOT** — 공급자/운영사업자/매장 정의, HUB 철학, AI 역할 |
-| 3 | [`docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md`](docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | **3자 Canonical Flow SSOT** — 누가/언제/무엇을/어떻게 넘기는가 (책임 매트릭스 · 데이터 흐름 · Drift 가드) |
-| 4 | Operator UX Baselines ([`Canonical Workflow`](docs/architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md) 검수·승인 UX + [`Non-Approval UX Baseline`](docs/baseline/O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md) 5 Workspace UX + [`HUB Content Publishing Standard`](docs/baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) RichTextEditor 기반 항목별 게시 — Source Ingestion 보류) | **Operator UX 영역 SSOT** — 자매 구조 |
-| 5 | Store Side Standards ([`Store Menu Canonical Tree`](docs/baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md) 매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 — 6 항목: 상품 상세 / POP / QR / 블로그 / 사이니지 / 고객 안내문. 설문 V1 범위 외) | **Store 측 메뉴·축 SSOT** — Operator HUB 게시 표준의 매장 측 대응 |
-| 6 | 영역별 Freeze / Baseline / IR | 도메인·계층별 세부 규칙 |
+| 3 | [`docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) | **매장 commerce 사업 경계 SSOT** — 매장 경영자는 O4O로 소비자에게 판매하지 않는다 / O4O 자체 소비자 전자상거래 없음 / 판매 실행 = 외부 POS·외부 판매채널 / legacy commerce 판정 규칙·개발 금지선 |
+| 4 | [`docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md`](docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | **3자 Canonical Flow SSOT** — 누가/언제/무엇을/어떻게 넘기는가 (책임 매트릭스 · 데이터 흐름 · Drift 가드) |
+| 5 | Operator UX Baselines ([`Canonical Workflow`](docs/architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md) 검수·승인 UX + [`Non-Approval UX Baseline`](docs/baseline/O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md) 5 Workspace UX + [`HUB Content Publishing Standard`](docs/baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) RichTextEditor 기반 항목별 게시 — Source Ingestion 보류) | **Operator UX 영역 SSOT** — 자매 구조 |
+| 6 | Store Side Standards ([`Store Menu Canonical Tree`](docs/baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md) 매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 — 6 항목: 상품 상세 / POP / QR / 블로그 / 사이니지 / 고객 안내문. 설문 V1 범위 외) | **Store 측 메뉴·축 SSOT** — Operator HUB 게시 표준의 매장 측 대응 |
+| 7 | 영역별 Freeze / Baseline / IR | 도메인·계층별 세부 규칙 |
+| 8 | 개별 WO / CHECK | 과거 시점의 실행 기록 — 현재 사업 규정보다 우선하지 않는다 |
 
 **우선순위 적용:**
 
 - `O4O-BUSINESS-PHILOSOPHY-V1` 의 §3 (참여 주체) / §4 (Canonical Flow) / §5 (HUB 철학) / §6 (AI 역할) / §7 (Drift 방지) 정의는 영역별 문서(Operator, Supplier, HUB, Store, AI 등)에 우선한다.
+- `O4O-STORE-COMMERCE-BOUNDARY-V1` 의 §2 (최상위 원칙) / §7 (매장 환불) / §8 (기존 코드 취급) / §9 (legacy 분류) / §10 (개발 금지선) / §12 (B2B vs 소비자 order) / §13 (플랫폼 직접판매) / §14 (precedence) 는 **cart · checkout · orders · payments · refund · PG · POS · tablet · QR · 외부 판매채널** 관련 모든 영역 문서·코드 판단에 우선한다.
+  **이 문서는 코드보다 먼저 읽는다.** 저장소에 checkout/payment/refund 코드가 존재한다는 사실은 그 기능이 현행 사업 기능이라는 근거가 아니다 (동 문서 §8 · §14).
 - `O4O-3-ROLE-FLOW-BASELINE-V1` 의 §2 (책임 매트릭스) / §3 (데이터 흐름) / §4 (원천 자료 vs 실행 자산) / §5 (AI 개입) / §6 (Drift 금지/권장 흐름) 정의는 영역별 흐름·권한·검수 정책에 우선한다.
 
 충돌 시 위 순서를 기준으로 영역별 문서를 정렬한다. 영역별 Freeze 문서 변경은 별도 WO 필요.
+
+> **역추론 금지.** "코드에 `platform-seller` / checkout / refund 가 있으니 그 사업을 유지한다" 는 판단은
+> 허용하지 않는다. **사업 계약이 먼저이고 코드는 그 계약에 맞게 정리한다.**
+> 2026-08-25 확정: `PLATFORM_DIRECT_SALE_BUSINESS_CONTRACT = NONE`
 
 ---
 

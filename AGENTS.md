@@ -13,6 +13,7 @@
 | 영역 | 정본 |
 |---|---|
 | 사업 철학 (참여 주체 · HUB · AI 역할) | [`docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md`](docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) |
+| **매장 commerce 사업 경계 (cart · checkout · orders · payments · refund · PG · POS · tablet · QR · 외부 판매채널)** | [`docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) — **코드보다 먼저 읽는다** |
 | 3자 Canonical Flow (책임 · 데이터 흐름) | [`docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md`](docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) |
 | Domain Boundary · Guard Rules 5종 | [`docs/architecture/O4O-BOUNDARY-POLICY-V1.md`](docs/architecture/O4O-BOUNDARY-POLICY-V1.md) |
 | Core 동결 범위 | [`docs/architecture/O4O-CORE-FREEZE-V1.md`](docs/architecture/O4O-CORE-FREEZE-V1.md) |
@@ -28,9 +29,16 @@
 충돌 시 우선순위:
 
 1. 사용자의 현재 명시적 지시
-2. 영역별 Freeze / Baseline 정본 (위 표)
-3. 본 문서(AGENTS.md)의 실행 규칙
-4. 작업별 IR / WO / CHECK
+2. 사업 경계 정본 — `O4O-BUSINESS-PHILOSOPHY-V1` · `O4O-STORE-COMMERCE-BOUNDARY-V1`
+3. 영역별 Freeze / Baseline 정본 (위 표)
+4. 본 문서(AGENTS.md)의 실행 규칙
+5. 작업별 IR / WO / CHECK
+
+> **역추론 금지.** 저장소에 cart / checkout / payment / refund / `platform-seller` 코드가
+> **존재한다는 사실은 그 기능이 현행 사업 기능이라는 근거가 아니다.**
+> 사업 계약이 먼저이고 코드는 그 계약에 맞게 정리한다
+> (`O4O-STORE-COMMERCE-BOUNDARY-V1` §8 · §14).
+> 2026-08-25 확정: `PLATFORM_DIRECT_SALE_BUSINESS_CONTRACT = NONE`
 
 ---
 
