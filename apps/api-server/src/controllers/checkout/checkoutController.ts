@@ -15,6 +15,7 @@ import { tossPaymentsService } from '../../services/toss-payments.service.js';
 import { checkoutService } from '../../services/checkout.service.js';
 import { DrugCommerceBlockedError } from '../../modules/neture/guards/drug-commerce.guard.js';
 import logger from '../../utils/logger.js';
+import { isPlatformAdmin } from '../../utils/role.utils.js';
 
 // Phase N-1 고정 설정
 const PHASE_N1_CONFIG = {
@@ -283,11 +284,26 @@ export class CheckoutController {
     try {
       const user = (req as any).user;
 
-      // Phase N-2: 운영자만 환불 가능
-      if (!user || !user.roles?.some((r: string) => ['admin', 'operator'].includes(r))) {
+      // WO-O4O-CHECKOUT-REFUND-AUTHORIZATION-CANONICAL-ROLE-CONTRACT-V1
+      //   종전 조건: 무접두 `admin` / `operator` 배타 판정.
+      //   현행 canonical RBAC 에서 무접두 role 은 **신규 authority 로 쓰지 않는다**
+      //   (F9 RBAC SSOT / RBAC-CANONICAL-STATE-V1 §8-A). 따라서 이 조건은
+      //   통과 가능한 주체가 없는 **기능 폐색**이자, 무접두 role 이 하나라도
+      //   주입되면 곧바로 환불 권한이 되는 privilege escalation 표면이었다.
+      //
+      //   본 엔드포인트의 업무 주체는 **플랫폼 운영자**다 — 주문 생성부
+      //   (`initiate`)가 sellerId='platform-seller' / supplierId 를 고정 상수로 박는
+      //   플랫폼 자체 판매 경로이고, 서비스 매장 주문(sellerOrganizationId +
+      //   metadata.serviceKey)의 환불은 매장 경영자 축(`requireStoreOwner`)이
+      //   별도 엔드포인트로 이미 담당한다.
+      //   → canonical authority = `platform:super_admin` (platform:admin 은 존재하지 않음).
+      //
+      //   platform override 는 cross-service 전역이며, 동일 권한의
+      //   `POST /api/admin/orders/:id/refund` 와 같은 계약이다 (명시적 문서화 대상).
+      if (!user || !isPlatformAdmin(user.roles || [])) {
         return res.status(403).json({
           success: false,
-          message: 'Only operators can process refunds',
+          message: 'Only platform administrators can process refunds',
         });
       }
 
@@ -396,11 +412,11 @@ export class CheckoutController {
         });
       }
 
-      // 본인 주문인지 확인 (admin/operator는 모두 조회 가능)
-      if (
-        order.buyerId !== userId &&
-        !userRoles?.some((r: string) => ['admin', 'operator'].includes(r))
-      ) {
+      // 본인 주문이거나 플랫폼 운영자만 조회할 수 있다.
+      // WO-O4O-CHECKOUT-REFUND-AUTHORIZATION-CANONICAL-ROLE-CONTRACT-V1:
+      //   종전 무접두 `admin`/`operator` 판정을 canonical platform authority 로 교체.
+      //   읽기 경로도 같은 이유로 escalation 표면이었다(무접두 role 주입 → 타인 주문 열람).
+      if (order.buyerId !== userId && !isPlatformAdmin(userRoles || [])) {
         return res.status(403).json({
           success: false,
           message: 'Access denied',

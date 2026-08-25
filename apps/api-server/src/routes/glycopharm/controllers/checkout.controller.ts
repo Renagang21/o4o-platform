@@ -222,9 +222,26 @@ async function createCoreOrder(
 
 export function createCheckoutController(
   dataSource: DataSource,
-  requireAuth: (req: Request, res: Response, next: NextFunction) => void
+  requireAuth: (req: Request, res: Response, next: NextFunction) => void,
+  // WO-O4O-CHECKOUT-REFUND-AUTHORIZATION-CANONICAL-ROLE-CONTRACT-V1:
+  //   운영 성격 write 경로(`/cleanup-expired`)를 위한 GlycoPharm operator scope guard.
+  //   `requireGlycopharmScope('glycopharm:operator')` 를 주입한다 —
+  //   active glycopharm membership + glycopharm:operator role 을 함께 요구한다.
+  //   미주입 시 fail-closed (아래 requireGlycopharmOperator 참조).
+  requireOperatorScope?: (req: Request, res: Response, next: NextFunction) => void,
 ): Router {
   const router = Router();
+
+  // fail-closed 기본값 — guard 를 주입하지 않은 호출부에서 운영 write 가 열리지 않게 한다.
+  const requireGlycopharmOperator =
+    requireOperatorScope ??
+    ((_req: Request, res: Response, _next: NextFunction) => {
+      res.status(403).json({
+        success: false,
+        error: 'Forbidden',
+        code: 'OPERATOR_SCOPE_REQUIRED',
+      });
+    });
 
   const pharmacyRepo = dataSource.getRepository(OrganizationStore);
   const productRepo = dataSource.getRepository(GlycopharmProduct);
@@ -803,9 +820,15 @@ export function createCheckoutController(
   // 15분 이상 미결제 CREATED 주문을 자동 CANCELLED 처리.
   // Cron / admin 호출용. 인증 필수.
   // ============================================================================
+  // WO-O4O-CHECKOUT-REFUND-AUTHORIZATION-CANONICAL-ROLE-CONTRACT-V1:
+  //   종전에는 `requireAuth` 하나뿐이었다. **어느 서비스의 아무 로그인 사용자나**
+  //   GlycoPharm 의 미결제 주문을 일괄 cancelled 로 바꾸고, 응답으로 타인 주문의
+  //   orderNumber 목록까지 받아갈 수 있었다 (cross-service write + 정보 노출).
+  //   운영 성격 write 이므로 canonical service operator 계약으로 좁힌다.
   router.post(
     '/cleanup-expired',
     requireAuth,
+    requireGlycopharmOperator,
     async (_req: Request, res: Response) => {
       try {
         // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: canonical checkout_orders 기준.

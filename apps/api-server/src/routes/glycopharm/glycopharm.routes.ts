@@ -167,7 +167,10 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const checkoutController = createCheckoutController(
     dataSource,
-    coreRequireAuth as any
+    coreRequireAuth as any,
+    // WO-O4O-CHECKOUT-REFUND-AUTHORIZATION-CANONICAL-ROLE-CONTRACT-V1:
+    //   `/checkout/cleanup-expired` 운영 write 전용 scope guard 주입.
+    requireGlycopharmScope('glycopharm:operator') as any,
   );
   router.use('/checkout', checkoutController);
 

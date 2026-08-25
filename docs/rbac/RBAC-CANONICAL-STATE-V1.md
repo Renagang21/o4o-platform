@@ -240,6 +240,31 @@ ORDER BY cnt DESC;
 | signage 게이트 | `hasSignageAdminPermission()` | 운영/디버깅 최소 예외 |
 | Neture `PlatformRoute` | membership 요구 안 함 | cross-service surface (서비스 멤버십과 무관) |
 | `requireAdmin` | `platform:super_admin` 전용 | 플랫폼 관리 API |
+| `POST /api/checkout/refund` · `GET /api/orders/:id` | `platform:super_admin` 전용 | 플랫폼 자체 판매(`platform-seller`) 주문의 환불·조회 — WO-O4O-CHECKOUT-REFUND-AUTHORIZATION-CANONICAL-ROLE-CONTRACT-V1 |
+| `/api/admin/orders/**` | `platform:super_admin` 전용 | 플랫폼 전역 주문 관리 (cross-service 명시 계약) |
+
+### 환불 authorization 계약
+
+WO-O4O-CHECKOUT-REFUND-AUTHORIZATION-CANONICAL-ROLE-CONTRACT-V1 에서 확정.
+환불은 하나의 권한이 아니라 **업무 주체별로 분리된 세 축**이다.
+
+| 축 | 주체 | 판정 조건 | 대표 경로 |
+|----|------|----------|-----------|
+| `PLATFORM_REFUND_ADMIN` | 플랫폼 운영자 | `platform:super_admin` (cross-service, 명시적 override) | `POST /api/checkout/refund` · `POST /api/admin/orders/:id/refund` |
+| `STORE_OWNER_REFUND` | 판매 매장 경영자 | active service membership + `{service}:store_owner` + `sellerOrganizationId` 일치 + `metadata.serviceKey` 일치 | `PATCH /api/v1/kpa/checkout/store-orders/:orderId/status` |
+| `SERVICE_OPERATOR_REFUND` | 서비스 운영자 | active membership + `{service}:operator` | `PATCH /api/v1/neture/operator/market-trial/:id/participants/:pid/payment-status` (수기 정산 원장) |
+
+**서비스 운영자는 매장 주문의 환불 주체가 아니다.** 5개 서비스의 operator 주문 화면은
+모두 조회 전용으로 설계돼 있다(각 `pages/operator/OrdersPage.tsx` 주석). 매장 주문의
+환불 책임은 판매 주체인 매장 경영자에게 있고, 플랫폼 운영자가 전역 backstop 이다.
+
+구매자(customer) 축은 **환불 권한이 아니라 취소 권한**이며 별도 경로다:
+`services/checkout/store-order-cancel.service.ts` 가 `buyerId` + `metadata.serviceKey`
+로만 주문을 특정하고 운영자 role 을 요구하지 않는다. 결제 완료 주문은 이 경로로
+취소되지 않는다. Pharmacy-Hub 의 결제 후 그룹 취소는 **공급자 접수 전** 에 한해
+구매자 본인에게만 열린다(`cancelAfterPayment`, 접수 후 409 `SUPPLIER_ALREADY_ACCEPTED`).
+
+무접두 `admin` / `operator` 는 어떤 환불 경로에서도 authority 가 아니다.
 
 ### 프런트엔드
 
