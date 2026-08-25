@@ -48,6 +48,10 @@ function buildApp(opts: {
     query: async (sql: string, params: any[] = []) => {
       calls.push({ sql, params });
       // requirePharmacyOwner(createRequireStoreOwner → isStoreOwner) 는 실제로 실행시킨다.
+      // WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1:
+      //   isStoreOwner() 가 role_assignments 앞에서 service_memberships(active) 를 먼저 본다.
+      //   이 스텁 매장주는 위 requireAuth 의 JWT memberships 와 같은 상태(active)여야 한다.
+      if (/FROM service_memberships/i.test(sql)) return [{ '?column?': 1 }];
       if (/FROM role_assignments/i.test(sql)) return [{ '?column?': 1 }];
       if (/FROM organization_members/i.test(sql)) return [{ organization_id: ORG_ID, role: 'owner' }];
       if (/FROM supplier_product_offers/i.test(sql) && /neture_suppliers/i.test(sql)) return offerRows;

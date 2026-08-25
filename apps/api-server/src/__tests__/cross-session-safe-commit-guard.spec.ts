@@ -131,7 +131,10 @@ describe('§18 literal consumer census — raw-source 소비처를 놓치지 않
   });
 
   it('소비처가 없으면 DEAD_REFERENCE 로 보고한다', () => {
-    const r = runNode(LITERAL_CENSUS, ['__O4O_LITERAL_THAT_DOES_NOT_EXIST_20260824__']);
+    // 센티널을 소스에 리터럴로 두면 이 spec 자신이 소비처(RAW_SOURCE_CONTRACT)로 잡혀
+    // git grep 결과가 1건이 된다 — 조립해서 저장소 어디에도 존재하지 않게 만든다.
+    const absent = ['__O4O', 'LITERAL', 'THAT', 'DOES', 'NOT', 'EXIST', '20260824__'].join('_');
+    const r = runNode(LITERAL_CENSUS, [absent]);
     expect(r.status).toBe(0);
     expect(r.stdout).toContain('DEAD_REFERENCE');
   });

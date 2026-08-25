@@ -19,13 +19,27 @@ type Row = Record<string, unknown>;
 
 /**
  * SQL 내용으로 응답을 결정하는 stub.
+ * - service_memberships → 서비스 접근 게이트 (기본 active)
  * - role_assignments  → role 게이트
  * - organization_members → 조직 후보
  */
-function makeDataSource(opts: { hasRole: boolean; candidateOrgIds: string[]; orgCreators?: string[] }) {
+function makeDataSource(opts: {
+  hasRole: boolean;
+  candidateOrgIds: string[];
+  orgCreators?: string[];
+  /**
+   * WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1:
+   *   판정의 첫 게이트가 role 이 아니라 active membership 이다.
+   *   본 spec 의 관심사는 **id 축**이므로 기본값은 active 로 둔다.
+   */
+  hasActiveMembership?: boolean;
+}) {
   const calls: Array<{ sql: string; params: unknown[] }> = [];
   const query = jest.fn(async (sql: string, params: unknown[] = []): Promise<Row[]> => {
     calls.push({ sql, params });
+    if (sql.includes('service_memberships')) {
+      return opts.hasActiveMembership === false ? [] : [{ '?column?': 1 }];
+    }
     if (sql.includes('role_assignments')) return opts.hasRole ? [{ '?column?': 1 }] : [];
     if (sql.includes('organization_members')) {
       return opts.candidateOrgIds.map((id) => ({ organization_id: id, role: 'owner' }));
@@ -61,6 +75,16 @@ describe('store-policy ownership — canonical axis', () => {
     const { dataSource, calls } = makeDataSource({ hasRole: false, candidateOrgIds: [ORG_ID] });
     await expect(isStoreOwner(dataSource, ORG_ID, 'cosmetics', 'user-1')).resolves.toBe(false);
     expect(calls.some((c) => c.sql.includes('organization_members'))).toBe(false);
+  });
+
+  it('D-2. membership 이 active 가 아니면 role 도 보지 않고 차단한다', async () => {
+    const { dataSource, calls } = makeDataSource({
+      hasRole: true,
+      candidateOrgIds: [ORG_ID],
+      hasActiveMembership: false,
+    });
+    await expect(isStoreOwner(dataSource, ORG_ID, 'cosmetics', 'user-1')).resolves.toBe(false);
+    expect(calls.some((c) => c.sql.includes('role_assignments'))).toBe(false);
   });
 
   it('E. 같은 서비스 조직이 2개여도 slug 로 특정된 매장이면 통과한다 (ambiguous 로 막지 않음)', async () => {
