@@ -49,8 +49,13 @@ describe('§8 Content/Resource 모델 — 공통 원장 + serviceKey 경계', ()
   });
 
   it('공통 CMS 쓰기 인가는 serviceKey 파생이다 — PH 전용 allowlist 가 필요 없다', () => {
-    expect(cmsMutationHandler).toContain('`${serviceKey}:admin`');
-    expect(cmsMutationHandler).toContain('`${serviceKey}:operator`');
+    // WO-O4O-CMS-KPA-MUTATION-SERVICEKEY-CANONICALIZATION-V1:
+    //   파생은 유지하되 **role scope 축으로 접어서** 파생한다. `${serviceKey}:operator` 를
+    //   그대로 조립하면 KPA(kpa ↔ kpa-society)·KCos(cosmetics ↔ k-cosmetics)가 항상 어긋난다.
+    //   PH 는 self-map 이라 resolveCmsRolePrefix('pharmacy-hub') === 'pharmacy-hub' 로 동일하다.
+    expect(cmsMutationHandler).toContain('resolveCmsRolePrefix(serviceKey)');
+    expect(cmsMutationHandler).toContain('`${rolePrefix}:admin`');
+    expect(cmsMutationHandler).toContain('`${rolePrefix}:operator`');
     // 서비스명 하드코딩 allowlist 가 재등장하면 PH 는 다시 막힌다(LMS operator 축의 실패 유형).
     expect(stripComments(cmsMutationHandler)).not.toContain("'pharmacy-hub'");
   });
