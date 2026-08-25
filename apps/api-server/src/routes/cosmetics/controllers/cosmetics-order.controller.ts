@@ -15,20 +15,12 @@
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
-import { body, query, param, validationResult } from 'express-validator';
-import { DataSource, Brackets } from 'typeorm';
+import { query, param, validationResult } from 'express-validator';
+import { DataSource } from 'typeorm';
 // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: canonical checkout_orders 정렬 (ecommerce_orders 미존재 — H1).
 // create 를 CheckoutOrder 기준으로 정렬. list/get 은 이미 checkout_orders raw SQL.
-import {
-  CheckoutOrder,
-  CheckoutOrderStatus,
-  CheckoutPaymentStatus,
-  type ShippingAddress,
-} from '../../../entities/checkout/CheckoutOrder.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
-import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
-import { validateSupplierSellerRelation } from '../../../core/checkout/checkout-guard.service.js';
 // WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
 //   이벤트 오퍼 주문(metadata.serviceKey='k-cosmetics-event-offer')이 구매자 주문 목록/상세에서
 //   누락되던 결함. 기록(쓰기)은 그대로 두고 조회 범위만 canonical 집합으로 넓힌다.
@@ -98,33 +90,6 @@ interface CosmeticsOrderMetadata {
   commission?: CommissionMeta;
 }
 
-interface ProductSnapshot {
-  brandId?: string;
-  brandName?: string;
-  lineId?: string;
-  lineName?: string;
-}
-
-interface CreateCosmeticsOrderItemDto {
-  productId: string;
-  productName: string;
-  quantity: number;
-  unitPrice: number;
-  discount?: number;
-  sku?: string;
-  options?: Record<string, any>;
-  productSnapshot?: ProductSnapshot;
-}
-
-interface CreateCosmeticsOrderDto {
-  sellerId: string;
-  items: CreateCosmeticsOrderItemDto[];
-  metadata: CosmeticsOrderMetadata;
-  shippingAddress?: ShippingAddress;
-  shippingFee?: number;
-  discount?: number;
-}
-
 // ============================================================================
 // Validation Errors
 // ============================================================================
@@ -189,71 +154,6 @@ function handleValidationErrors(req: Request, res: Response): boolean {
 }
 
 /**
- * TaxRefund validation (H3-0)
- */
-function validateTaxRefund(
-  taxRefund: TaxRefundMeta & { amount?: number }
-): { valid: boolean; error?: string } {
-  if (typeof taxRefund.eligible !== 'boolean') {
-    return { valid: false, error: VALIDATION_ERRORS.TAXREFUND_ELIGIBLE_REQUIRED };
-  }
-  if ('amount' in taxRefund && taxRefund.amount !== undefined) {
-    return { valid: false, error: VALIDATION_ERRORS.TAXREFUND_AMOUNT_FORBIDDEN };
-  }
-  if (taxRefund.scheme && !['standard', 'instant'].includes(taxRefund.scheme)) {
-    return { valid: false, error: VALIDATION_ERRORS.TAXREFUND_INVALID_SCHEME };
-  }
-  if (taxRefund.estimatedRate !== undefined) {
-    if (typeof taxRefund.estimatedRate !== 'number' ||
-        taxRefund.estimatedRate < 0 ||
-        taxRefund.estimatedRate > 1) {
-      return { valid: false, error: VALIDATION_ERRORS.TAXREFUND_INVALID_RATE };
-    }
-  }
-  const validStatuses = ['pending', 'requested', 'completed', 'rejected'];
-  if (taxRefund.status && !validStatuses.includes(taxRefund.status)) {
-    return { valid: false, error: VALIDATION_ERRORS.TAXREFUND_INVALID_STATUS };
-  }
-  return { valid: true };
-}
-
-/**
- * Channel-specific validation
- */
-function validateChannelMetadata(
-  metadata: CosmeticsOrderMetadata
-): { valid: boolean; error?: string } {
-  if (!metadata?.channel) {
-    return { valid: false, error: VALIDATION_ERRORS.CHANNEL_REQUIRED };
-  }
-  if (!['local', 'travel'].includes(metadata.channel)) {
-    return { valid: false, error: VALIDATION_ERRORS.INVALID_CHANNEL };
-  }
-  if (metadata.channel === 'local') {
-    if (metadata.travel) {
-      return { valid: false, error: VALIDATION_ERRORS.LOCAL_HAS_TRAVEL_FIELDS };
-    }
-  }
-  if (metadata.channel === 'travel') {
-    if (!metadata.travel?.guideId) {
-      return { valid: false, error: VALIDATION_ERRORS.TRAVEL_GUIDE_REQUIRED };
-    }
-    if (metadata.local) {
-      return { valid: false, error: VALIDATION_ERRORS.TRAVEL_HAS_LOCAL_FIELDS };
-    }
-    if (metadata.travel.taxRefund) {
-      const taxRefundValidation = validateTaxRefund(
-        metadata.travel.taxRefund as TaxRefundMeta & { amount?: number }
-      );
-      if (!taxRefundValidation.valid) {
-        return taxRefundValidation;
-      }
-    }
-  }
-  return { valid: true };
-}
-
-/**
  * Parse and validate query filters for order listing (H3-1)
  */
 function parseOrderFilters(queryParams: Record<string, any>): {
@@ -300,97 +200,6 @@ function parseOrderFilters(queryParams: Record<string, any>): {
   return { valid: true, filters };
 }
 
-/**
- * Order number generation (COS-YYYYMMDD-XXXX)
- */
-function generateOrderNumber(): string {
-  const now = new Date();
-  const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-  return `COS-${dateStr}-${random}`;
-}
-
-// ============================================================================
-// Core Order Creation (GlycoPharm checkout.controller.ts 패턴 동일)
-// ============================================================================
-
-/**
- * Create order via E-commerce Core standard pattern.
- *
- * 트랜잭션 manager를 통해 Order + Items 원자적 생성.
- */
-async function createCoreOrder(
-  manager: import('typeorm').EntityManager,
-  dto: {
-    buyerId: string;
-    sellerId: string;
-    /** @deprecated EcommerceOrder.orderType 잔재 — CheckoutOrder 미사용(serviceKey 는 metadata) */
-    orderType?: unknown;
-    items: Array<{
-      productId?: string;
-      productName: string;
-      sku?: string;
-      quantity: number;
-      unitPrice: number;
-      discount?: number;
-      options?: Record<string, any>;
-      metadata?: Record<string, unknown>;
-    }>;
-    shippingAddress?: ShippingAddress;
-    shippingFee?: number;
-    discount?: number;
-    metadata?: Record<string, unknown>;
-    channel?: string;
-    storeId?: string;
-  }
-): Promise<CheckoutOrder> {
-  const subtotal = dto.items.reduce((sum, item) => {
-    return sum + (item.quantity * item.unitPrice - (item.discount || 0));
-  }, 0);
-
-  const shippingFee = dto.shippingFee || 0;
-  const discount = dto.discount || 0;
-  const totalAmount = subtotal + shippingFee - discount;
-
-  // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: CheckoutOrder(checkout_orders) 로 적재.
-  // items jsonb 인라인. channel/storeId 는 metadata 에 보존(list/get 가 metadata->>'channel' 사용).
-  // supplierId 는 CheckoutOrder 필수 — retail 주문이라 sellerId 동일값 사용.
-  const orderRepo = manager.getRepository(CheckoutOrder);
-
-  const order = orderRepo.create({
-    orderNumber: generateOrderNumber(),
-    buyerId: dto.buyerId,
-    sellerId: dto.sellerId,
-    supplierId: dto.sellerId,
-    items: dto.items.map((itemDto) => ({
-      productId: itemDto.productId ?? '',
-      productName: itemDto.productName,
-      quantity: itemDto.quantity,
-      unitPrice: itemDto.unitPrice,
-      subtotal: itemDto.quantity * itemDto.unitPrice - (itemDto.discount || 0),
-    })),
-    subtotal,
-    shippingFee,
-    discount,
-    totalAmount,
-    status: CheckoutOrderStatus.CREATED,
-    paymentStatus: CheckoutPaymentStatus.PENDING,
-    shippingAddress: dto.shippingAddress,
-    metadata: dto.metadata,
-  });
-
-  const savedOrder = await orderRepo.save(order);
-
-  logger.info('[CheckoutOrder] Cosmetics order created:', {
-    orderId: savedOrder.id,
-    orderNumber: savedOrder.orderNumber,
-    sellerId: savedOrder.sellerId,
-    totalAmount: savedOrder.totalAmount,
-  });
-
-  return savedOrder;
-}
-
 // ============================================================================
 // Controller Implementation
 // ============================================================================
@@ -398,208 +207,35 @@ async function createCoreOrder(
 export function createCosmeticsOrderController(
   dataSource: DataSource,
   requireAuth: (req: Request, res: Response, next: NextFunction) => void,
-  requireScope: (scope: string) => (req: Request, res: Response, next: NextFunction) => void
+  // WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+  //   주문 생성(POST) 은퇴로 `cosmetics:write` scope 사용처가 사라졌다.
+  //   호출부(cosmetics.routes.ts) 시그니처를 흔들지 않기 위해 인자는 유지한다.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _requireScope?: (scope: string) => (req: Request, res: Response, next: NextFunction) => void
 ): Router {
   const router = Router();
 
   // ==========================================================================
-  // POST /cosmetics/orders — 주문 생성
+  // POST /cosmetics/orders — 은퇴 (410)
+  //
+  // WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1
+  //
+  //   `OrderType = RETAIL` + `metadata.serviceKey='cosmetics'` + 채널 `local`/`travel` —
+  //   소비자가 매장을 상대로 O4O 안에서 결제하는 주문 생성 경로였다.
+  //   `O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §2-2 · §3 위반.
+  //
+  //   결제 leg 은 `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1` 이 이미
+  //   410 `STORE_SALE_PAYMENT_DEPRECATED` 로 차단했고, 본 WO 가 주문 생성 producer 를 닫는다.
+  //   조회 경로(`GET /cosmetics/orders*`)는 매장의 구매/발주 축이므로 보존한다.
   // ==========================================================================
-  router.post(
-    '/',
-    requireAuth,
-    requireScope('cosmetics:write'),
-    [
-      body('sellerId').notEmpty().isUUID().withMessage('sellerId must be a valid UUID'),
-      body('items').isArray({ min: 1 }).withMessage('items must be a non-empty array'),
-      body('items.*.productId').notEmpty().isUUID().withMessage('productId must be a valid UUID'),
-      body('items.*.productName').notEmpty().isString().withMessage('productName is required'),
-      body('items.*.quantity').isInt({ min: 1 }).withMessage('quantity must be at least 1'),
-      body('items.*.unitPrice').isInt({ min: 0 }).withMessage('unitPrice must be non-negative'),
-      body('items.*.discount').optional().isInt({ min: 0 }),
-      body('metadata').notEmpty().isObject().withMessage('metadata is required'),
-      body('metadata.channel')
-        .notEmpty()
-        .isIn(['local', 'travel'])
-        .withMessage('metadata.channel must be "local" or "travel"'),
-      body('shippingFee').optional().isInt({ min: 0 }),
-      body('discount').optional().isInt({ min: 0 }),
-    ],
-    async (req: Request, res: Response) => {
-      try {
-        opsMetrics.inc(OPS.CHECKOUT_ATTEMPT, { service: 'cosmetics' });
-
-        if (handleValidationErrors(req, res)) return;
-
-        const authReq = req as AuthRequest;
-        const buyerId = authReq.user?.id || authReq.authUser?.id;
-
-        if (!buyerId) {
-          return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
-        }
-
-        const dto: CreateCosmeticsOrderDto = req.body;
-
-        // 채널별 추가 검증
-        const channelValidation = validateChannelMetadata(dto.metadata);
-        if (!channelValidation.valid) {
-          return errorResponse(res, 400, 'CHANNEL_VALIDATION_ERROR', channelValidation.error!);
-        }
-
-        // 공급 계약 검증
-        const guardResult = await validateSupplierSellerRelation(dataSource, dto.sellerId);
-        if (!guardResult.allowed) {
-          return errorResponse(res, 403, guardResult.code || 'SUPPLY_CONTRACT_NOT_APPROVED', guardResult.reason || '공급 계약이 승인되지 않았습니다');
-        }
-
-        // ================================================================
-        // 제품 존재/활성 검증 (WO-O4O-DISTRIBUTION-GAP-HARDENING-V1)
-        // cosmetics_store_listings + cosmetics_products 기반
-        //
-        // WO-STORE-LOCAL-PRODUCT-HARDENING-V1: Checkout Guard
-        // StoreLocalProduct(store_local_products)는 Display Domain이며
-        // Commerce Object가 아니다.
-        // 이 체크아웃은 cosmetics.cosmetics_products / cosmetics_store_listings만 조회하므로
-        // store_local_products의 UUID는 구조적으로 PRODUCT_NOT_AVAILABLE로 거부된다.
-        // → store_local_products ↔ ecommerce_order_items 교차 경로 없음 (검증 완료)
-        // ================================================================
-        const productIds = dto.items.map((item) => item.productId);
-
-        if (dto.metadata.storeId) {
-          // storeId 있는 경우: listing 가시성 + product 활성 상태 동시 검증
-          const validProducts: Array<{ product_id: string }> = await dataSource.query(
-            `SELECT csl.product_id
-             FROM cosmetics.cosmetics_store_listings csl
-             JOIN cosmetics.cosmetics_products cp ON cp.id = csl.product_id
-             WHERE csl.store_id = $1
-               AND csl.product_id = ANY($2::uuid[])
-               AND csl.is_visible = true
-               AND cp.status = 'visible'`,
-            [dto.metadata.storeId, productIds]
-          );
-          const validProductIds = new Set(validProducts.map((p) => p.product_id));
-          const invalidProducts = productIds.filter((pid) => !validProductIds.has(pid));
-
-          if (invalidProducts.length > 0) {
-            opsMetrics.inc(OPS.CHECKOUT_BLOCKED_PRODUCT, { service: 'cosmetics' });
-            return errorResponse(res, 409, 'PRODUCT_NOT_AVAILABLE', VALIDATION_ERRORS.PRODUCT_NOT_AVAILABLE, {
-              invalidProductIds: invalidProducts,
-            });
-          }
-        } else {
-          // storeId 없는 경우: product 상태만 검증
-          const validProducts: Array<{ id: string }> = await dataSource.query(
-            `SELECT id
-             FROM cosmetics.cosmetics_products
-             WHERE id = ANY($1::uuid[])
-               AND status = 'visible'`,
-            [productIds]
-          );
-          const validProductIds = new Set(validProducts.map((p) => p.id));
-          const invalidProducts = productIds.filter((pid) => !validProductIds.has(pid));
-
-          if (invalidProducts.length > 0) {
-            opsMetrics.inc(OPS.CHECKOUT_BLOCKED_PRODUCT, { service: 'cosmetics' });
-            return errorResponse(res, 409, 'PRODUCT_NOT_AVAILABLE', VALIDATION_ERRORS.PRODUCT_NOT_AVAILABLE, {
-              invalidProductIds: invalidProducts,
-            });
-          }
-        }
-
-        // 트랜잭션으로 Order + Items 원자적 생성
-        let savedOrder!: CheckoutOrder;
-
-        await dataSource.transaction(async (manager) => {
-          const metadata: Record<string, unknown> = {
-            ...dto.metadata,
-            serviceKey: 'cosmetics',
-          };
-
-          savedOrder = await createCoreOrder(manager, {
-            buyerId,
-            sellerId: dto.sellerId,
-            items: dto.items.map((item) => ({
-              productId: item.productId,
-              productName: item.productName,
-              sku: item.sku,
-              quantity: item.quantity,
-              unitPrice: item.unitPrice,
-              discount: item.discount,
-              options: item.options,
-              metadata: item.productSnapshot
-                ? { productSnapshot: item.productSnapshot }
-                : undefined,
-            })),
-            shippingAddress: dto.shippingAddress,
-            shippingFee: dto.shippingFee,
-            discount: dto.discount,
-            metadata,
-            channel: dto.metadata.channel,
-            storeId: dto.metadata.storeId,
-          });
-        });
-
-        // 로깅
-        const logData: Record<string, any> = {
-          orderId: savedOrder.id,
-          orderNumber: savedOrder.orderNumber,
-          channel: dto.metadata.channel,
-          buyerId,
-          sellerId: dto.sellerId,
-          totalAmount: Number(savedOrder.totalAmount),
-          itemCount: dto.items.length,
-        };
-
-        if (dto.metadata.channel === 'travel' && dto.metadata.travel) {
-          logData.guideId = dto.metadata.travel.guideId;
-          logData.tourSessionId = dto.metadata.travel.tourSessionId;
-          if (dto.metadata.travel.taxRefund) {
-            logData.taxRefund = {
-              eligible: dto.metadata.travel.taxRefund.eligible,
-              scheme: dto.metadata.travel.taxRefund.scheme,
-              estimatedRate: dto.metadata.travel.taxRefund.estimatedRate,
-            };
-          }
-        }
-
-        opsMetrics.inc(OPS.CHECKOUT_SUCCESS, { service: 'cosmetics' });
-
-        logger.info('[Cosmetics Order] Created order:', logData);
-
-        res.status(201).json({
-          success: true,
-          data: {
-            orderId: savedOrder.id,
-            orderNumber: savedOrder.orderNumber,
-            orderType: 'RETAIL',
-            status: savedOrder.status,
-            paymentStatus: savedOrder.paymentStatus,
-            subtotal: Number(savedOrder.subtotal),
-            shippingFee: Number(savedOrder.shippingFee),
-            discount: Number(savedOrder.discount),
-            totalAmount: Number(savedOrder.totalAmount),
-            currency: 'KRW',
-            channel: dto.metadata.channel,
-            items: dto.items.map((item) => ({
-              productId: item.productId,
-              productName: item.productName,
-              quantity: item.quantity,
-              unitPrice: item.unitPrice,
-              discount: item.discount || 0,
-              subtotal: item.quantity * item.unitPrice - (item.discount || 0),
-            })),
-            createdAt: savedOrder.createdAt,
-          },
-          message: `${dto.metadata.channel.toUpperCase()} channel order created successfully`,
-        });
-      } catch (error: unknown) {
-        opsMetrics.inc(OPS.CHECKOUT_ERROR, { service: 'cosmetics' });
-        const err = error as Error;
-        logger.error('[Cosmetics Order] Create order error:', err);
-        errorResponse(res, 500, 'ORDER_CREATE_ERROR', 'Failed to create order');
-      }
-    }
-  );
+  router.post('/', (_req: Request, res: Response) => {
+    return res.status(410).json({
+      success: false,
+      code: 'STORE_CONSUMER_ORDER_RETIRED',
+      message:
+        '매장 소비자 주문은 O4O에서 제공하지 않습니다. 현장 판매는 매장의 POS, 온라인 판매는 외부 판매채널을 이용해 주세요.',
+    });
+  });
 
   // ==========================================================================
   // GET /cosmetics/orders — 주문 목록 조회 (DB 기반)

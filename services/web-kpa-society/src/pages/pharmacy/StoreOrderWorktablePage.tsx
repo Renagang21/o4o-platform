@@ -3,6 +3,14 @@
  *
  * WO-KPA-A-STORE-ORDER-WORKTABLE-WITH-SUPPLIER-SUMMARY-V1
  * WO-STORE-B2B-ORDER-EXECUTION-FLOW-V1: 주문 생성 기능 추가
+ * WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+ *   주문 실행 leg 제거. 이 작업대의 `주문하기` 는 `POST /kpa/checkout` 을 호출했는데,
+ *   그 엔드포인트는 `organization_channels.channel_type='B2C'` **승인된 자체 소비자 판매 채널**을
+ *   게이트로 요구하는 소비자→매장 commerce producer 였다
+ *   (`O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §2-2 · §3 위반 → 410 은퇴).
+ *   B2B 발주 의도 자체는 보호 대상이므로 화면은 유지하되, 실행은 canonical B2B 장바구니
+ *   (`/store-hub/cart`, `store_cart` + `EventOfferCartCheckoutService`) 로 안내한다.
+ *   작업대→canonical 장바구니 담기 이관은 후속 과제로 남긴다.
  *
  * 왼쪽: 관심상품 테이블 (DataTable + 수량 입력)
  * 오른쪽: 공급사별 주문 요약 패널 + 주문하기 버튼
@@ -14,10 +22,9 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DataTable } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
-import { Search, Package, RefreshCw, X, ShoppingCart, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { Search, Package, RefreshCw, X, ShoppingCart, AlertCircle } from 'lucide-react';
 import { getCatalog, getListings } from '../../api/pharmacyProducts';
 import type { CatalogProduct, ProductListing } from '../../api/pharmacyProducts';
-import { createOrder } from '../../api/checkout';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import { colors, borderRadius } from '../../styles/theme';
@@ -48,16 +55,6 @@ function formatPrice(v: number | null): string {
   return v.toLocaleString('ko-KR') + '원';
 }
 
-// ── Order Result Type ──
-
-interface OrderResult {
-  supplierId: string;
-  supplierName: string;
-  success: boolean;
-  orderNumber?: string;
-  error?: string;
-}
-
 // ── Component ──
 
 export function StoreOrderWorktablePage() {
@@ -74,9 +71,7 @@ export function StoreOrderWorktablePage() {
 
   // Order creation state
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [isOrdering, setIsOrdering] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
-  const [orderResults, setOrderResults] = useState<OrderResult[]>([]);
 
   // ── Data loading ──
 
@@ -179,74 +174,6 @@ export function StoreOrderWorktablePage() {
   const resetAllQuantities = useCallback(() => {
     setQuantities({});
   }, []);
-
-  // ── B2B Order creation ──
-
-  const handleCreateOrders = useCallback(async () => {
-    if (!organizationId) {
-      setOrderError('매장 정보를 찾을 수 없습니다. 다시 로그인해주세요.');
-      return;
-    }
-
-    setIsOrdering(true);
-    setOrderError(null);
-    const results: OrderResult[] = [];
-
-    // Group products by supplier
-    const supplierGroups = new Map<string, {
-      supplierName: string;
-      items: Array<{ productId: string; quantity: number }>;
-    }>();
-
-    products.forEach(p => {
-      const qty = quantities[p.id] || 0;
-      if (qty <= 0) return;
-
-      const existing = supplierGroups.get(p.supplierId);
-      if (existing) {
-        existing.items.push({ productId: p.id, quantity: qty });
-      } else {
-        supplierGroups.set(p.supplierId, {
-          supplierName: p.supplierName,
-          items: [{ productId: p.id, quantity: qty }],
-        });
-      }
-    });
-
-    // Sequential per-supplier order creation
-    for (const [supplierId, group] of supplierGroups) {
-      try {
-        const response = await createOrder({
-          organizationId,
-          items: group.items,
-          deliveryMethod: 'pickup',
-        });
-
-        results.push({
-          supplierId,
-          supplierName: group.supplierName,
-          success: true,
-          orderNumber: response.data.orderNumber,
-        });
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : '주문 생성에 실패했습니다';
-        results.push({
-          supplierId,
-          supplierName: group.supplierName,
-          success: false,
-          error: msg,
-        });
-      }
-    }
-
-    setOrderResults(results);
-    setIsOrdering(false);
-
-    const allSucceeded = results.every(r => r.success);
-    if (allSucceeded) {
-      resetAllQuantities();
-    }
-  }, [organizationId, products, quantities, resetAllQuantities]);
 
   // ── Filters ──
 
@@ -563,7 +490,6 @@ export function StoreOrderWorktablePage() {
               {/* Order button */}
               <button
                 onClick={() => {
-                  setOrderResults([]);
                   setOrderError(null);
                   setShowConfirmModal(true);
                 }}
@@ -571,7 +497,7 @@ export function StoreOrderWorktablePage() {
                 disabled={!organizationId}
               >
                 <ShoppingCart size={16} />
-                주문하기 ({supplierSummaries.length}건)
+                주문 내역 확인 ({supplierSummaries.length}건)
               </button>
             </>
           )}
@@ -580,58 +506,13 @@ export function StoreOrderWorktablePage() {
 
       {/* ── Confirm Order Modal ── */}
       {showConfirmModal && (
-        <div style={S.modalOverlay} onClick={() => !isOrdering && setShowConfirmModal(false)}>
+        <div style={S.modalOverlay} onClick={() => setShowConfirmModal(false)}>
           <div style={S.modalContent} onClick={e => e.stopPropagation()}>
-            {orderResults.length > 0 ? (
-              /* ── Results view ── */
-              <>
-                <h3 style={S.modalTitle}>
-                  {orderResults.every(r => r.success) ? 'B2B 주문 완료' : '주문 처리 결과'}
-                </h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {orderResults.map(r => (
-                    <div key={r.supplierId} style={{
-                      ...S.resultRow,
-                      borderLeft: `3px solid ${r.success ? '#10b981' : '#ef4444'}`,
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        {r.success
-                          ? <CheckCircle2 size={16} style={{ color: '#10b981' }} />
-                          : <XCircle size={16} style={{ color: '#ef4444' }} />
-                        }
-                        <span style={{ fontWeight: 600, fontSize: '14px' }}>{r.supplierName}</span>
-                      </div>
-                      {r.success
-                        ? <span style={{ color: '#10b981', fontSize: '13px' }}>{r.orderNumber}</span>
-                        : <span style={{ color: '#ef4444', fontSize: '13px' }}>{r.error}</span>
-                      }
-                    </div>
-                  ))}
-                </div>
-                <div style={S.modalActions}>
-                  {orderResults.every(r => r.success) ? (
-                    <button
-                      onClick={() => { setShowConfirmModal(false); navigate('/store/commerce/orders'); }}
-                      style={S.modalPrimaryBtn}
-                    >
-                      주문 관리로 이동
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setShowConfirmModal(false)}
-                      style={S.modalSecondaryBtn}
-                    >
-                      닫기
-                    </button>
-                  )}
-                </div>
-              </>
-            ) : (
-              /* ── Confirmation view ── */
-              <>
-                <h3 style={S.modalTitle}>B2B 주문 확인</h3>
+            <>
+                <h3 style={S.modalTitle}>B2B 주문 요약</h3>
                 <p style={{ fontSize: '13px', color: colors.neutral600, margin: '0 0 16px' }}>
-                  아래 내용으로 공급사별 {supplierSummaries.length}건의 B2B 주문을 생성합니다.
+                  공급사별 {supplierSummaries.length}건의 발주 예정 내역입니다.
+                  실제 발주는 <strong>매장 허브 &gt; 내 장바구니</strong>에서 진행합니다.
                 </p>
 
                 {supplierSummaries.map(s => {
@@ -682,20 +563,17 @@ export function StoreOrderWorktablePage() {
                   <button
                     onClick={() => setShowConfirmModal(false)}
                     style={S.modalSecondaryBtn}
-                    disabled={isOrdering}
                   >
-                    취소
+                    닫기
                   </button>
                   <button
-                    onClick={handleCreateOrders}
+                    onClick={() => { setShowConfirmModal(false); navigate('/store-hub/cart'); }}
                     style={S.modalPrimaryBtn}
-                    disabled={isOrdering}
                   >
-                    {isOrdering ? '주문 처리 중...' : `${supplierSummaries.length}건 주문하기`}
+                    내 장바구니로 이동
                   </button>
                 </div>
               </>
-            )}
           </div>
         </div>
       )}
@@ -1052,13 +930,5 @@ const S: Record<string, React.CSSProperties> = {
     borderRadius: borderRadius.md,
     marginTop: '12px',
     fontWeight: 600,
-  },
-  resultRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '10px 12px',
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.neutral50,
   },
 };

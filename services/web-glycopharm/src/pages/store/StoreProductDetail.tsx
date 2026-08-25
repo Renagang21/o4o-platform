@@ -13,7 +13,6 @@ import {
   Package,
   Minus,
   Plus,
-  ShoppingCart,
   Heart,
   Share2,
   Truck,
@@ -23,7 +22,6 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { storeApi } from '@/api/store';
-import { toast } from '@o4o/error-handling';
 import type { StoreProduct } from '@/types/store';
 
 export default function StoreProductDetail() {
@@ -34,7 +32,6 @@ export default function StoreProductDetail() {
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
-  const [addingToCart, setAddingToCart] = useState(false);
 
   useEffect(() => {
     if (!storeSlug || !productId) return;
@@ -68,19 +65,6 @@ export default function StoreProductDetail() {
     }
   };
 
-  const handleAddToCart = async () => {
-    if (!storeSlug || !productId) return;
-
-    setAddingToCart(true);
-    try {
-      await storeApi.addToCart(storeSlug, productId, quantity);
-      toast.success('장바구니에 추가되었습니다.');
-    } catch (err: any) {
-      toast.error(err.message || '장바구니 추가에 실패했습니다.');
-    } finally {
-      setAddingToCart(false);
-    }
-  };
 
   // 로딩 상태
   if (loading) {
@@ -242,20 +226,13 @@ export default function StoreProductDetail() {
             <button className="p-3 border rounded-xl hover:bg-slate-50">
               <Share2 className="w-6 h-6 text-slate-400" />
             </button>
-            <button
-              onClick={handleAddToCart}
-              disabled={addingToCart || !product.isActive}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors disabled:opacity-50"
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {addingToCart ? '추가 중...' : '장바구니'}
-            </button>
-            <button
-              disabled={!product.isActive}
-              className="flex-1 py-3 bg-slate-800 text-white font-medium rounded-xl hover:bg-slate-900 transition-colors disabled:opacity-50"
-            >
-              바로구매
-            </button>
+            {/* WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+                장바구니·바로구매 제거. O4O 는 소비자 결제를 제공하지 않는다
+                (`O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §3 · §5).
+                구매는 매장 현장(외부 POS) 또는 외부 판매채널에서 이루어진다. */}
+            <div className="flex-1 flex items-center justify-center px-4 py-3 text-sm text-slate-500 bg-slate-50 border rounded-xl text-center">
+              구매는 매장에서 안내받으실 수 있습니다.
+            </div>
           </div>
 
           {/* Badges */}

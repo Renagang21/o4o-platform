@@ -206,10 +206,11 @@ const PharmacySellPage = lazy(() => import('./pages/pharmacy/PharmacySellPage').
 const TabletRequestsPage = lazy(() => import('./pages/pharmacy/TabletRequestsPage').then(m => ({ default: m.TabletRequestsPage })));
 const PharmacyBlogPage = lazy(() => import('./pages/pharmacy/PharmacyBlogPage').then(m => ({ default: m.PharmacyBlogPage })));
 const StoreChannelsPage = lazy(() => import('./pages/pharmacy/StoreChannelsPage').then(m => ({ default: m.StoreChannelsPage })));
-// WO-O4O-KPA-ONLINE-SALES-ORDER-MANAGEMENT-AND-BUYER-ORDER-RELABEL-V1: 온라인 판매(seller) 주문 관리
-const OnlineSalesOrdersPage = lazy(() => import('./pages/pharmacy/OnlineSalesOrdersPage').then(m => ({ default: m.OnlineSalesOrdersPage })));
-// WO-O4O-KPA-ONLINE-SALES-ORDER-DETAIL-V1: 온라인 판매 주문 상세(읽기 전용)
-const OnlineSalesOrderDetailPage = lazy(() => import('./pages/pharmacy/OnlineSalesOrderDetailPage').then(m => ({ default: m.OnlineSalesOrderDetailPage })));
+// WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+//   온라인 판매(seller) 주문 관리/상세 은퇴 — 매장이 판매자인 소비자 주문 축
+//   (`O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §2-2 · §3). 메뉴 SSOT 는 다른 세션 WIP 로 미변경이라
+//   404 대신 은퇴 안내 화면을 렌더한다.
+const OnlineSalesOrdersRetiredPage = lazy(() => import('./pages/pharmacy/OnlineSalesOrdersRetiredPage').then(m => ({ default: m.OnlineSalesOrdersRetiredPage })));
 // WO-O4O-FOREIGN-VISITOR-SALES-SUPPORT-MENU-GATE-V1
 const ForeignVisitorSalesSupportPage = lazy(() => import('./pages/pharmacy/ForeignVisitorSalesSupportPage').then(m => ({ default: m.ForeignVisitorSalesSupportPage })));
 // WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1 (Phase 2): 구독 결제 결과 페이지
@@ -1061,10 +1062,9 @@ function App() {
                 StoreChannelsPage 를 B2C 전용 section('settings'|'products') 모드로 재사용. */}
             <Route path="online-sales/settings" element={<StoreChannelsPage section="settings" />} />
             <Route path="online-sales/products" element={<StoreChannelsPage section="products" />} />
-            {/* WO-O4O-KPA-ONLINE-SALES-ORDER-MANAGEMENT-AND-BUYER-ORDER-RELABEL-V1: 판매(seller) 주문 관리 */}
-            <Route path="online-sales/orders" element={<OnlineSalesOrdersPage />} />
-            {/* WO-O4O-KPA-ONLINE-SALES-ORDER-DETAIL-V1: 판매 주문 상세(읽기 전용) */}
-            <Route path="online-sales/orders/:orderId" element={<OnlineSalesOrderDetailPage />} />
+            {/* WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1: 판매(seller) 주문 관리 은퇴 */}
+            <Route path="online-sales/orders" element={<OnlineSalesOrdersRetiredPage />} />
+            <Route path="online-sales/orders/:orderId" element={<OnlineSalesOrdersRetiredPage />} />
             {/* ── Hidden routes (사이드바 미표시, URL 직접 접근 유지) ── */}
             {/* /store/channels → 온라인 판매 설정으로 redirect (채널 관리 메뉴 제거) */}
             <Route path="channels" element={<Navigate to="/store/online-sales/settings" replace />} />

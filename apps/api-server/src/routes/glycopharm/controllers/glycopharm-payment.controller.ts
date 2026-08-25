@@ -1,344 +1,49 @@
 /**
- * GlycoPharm Payment Controller
+ * GlycoPharm Payment Controller — 은퇴 (410)
  *
- * WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1
+ * WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1
  *
- * Payment Core Scaffold의 첫 번째 소비자.
- * PaymentCoreService를 통해 결제 흐름을 실행.
+ *   원 출처: `WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1` — 소비자가 매장을 상대로 O4O 안에서
+ *   결제하는 **매장 소비자 결제(STORE_SALE_PAYMENT)** 경로였다.
+ *   `O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §2-3 · §2-5 · §3 위반.
  *
- * 역할: PaymentCoreService 위임
- * - POST /prepare → PaymentCoreService.prepare()
- * - POST /confirm → PaymentCoreService.confirm()
- * - GET /order/:orderId → 결제 정보 조회 (Toss widget 렌더링용)
+ *   `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1` 이 `POST /prepare` ·
+ *   `POST /confirm` 을 410 으로 차단하면서 그 아래 PaymentCore/Toss 로직을
+ *   `no-unreachable` 로 보존해 두었으나, 본 WO 에서 **도달 불가능한 producer 를 제거**한다.
  *
- * 참조: cosmetics-payment.controller.ts (직접 Toss 호출 패턴)
+ *   `GET /order/:orderId` (Toss widget 렌더링용 결제정보 조회) 도 함께 은퇴한다.
+ *   prepare/confirm 이 없는 이상 결제창을 띄울 대상이 없고,
+ *   프론트엔드 호출자는 repo 전수 조사 결과 **0건**이다.
+ *
+ *   보호 대상(미변경): Pharmacy-Hub B2B 결제(`/pharmacy-hub/store-owner/payments/*`),
+ *   Neture B2B 결제(`/neture/b2b/payments/*`) — 매장이 **구매자**인 B2B 축.
+ *
+ *   경로 자체는 404 가 아닌 **410 (Gone)** 으로 남겨 은퇴 사실을 명시한다.
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
-import { body, param, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
-import { PaymentCoreService } from '@o4o/payment-core';
-// WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: 주문 lookup 을 canonical checkout_orders 로 정렬
-// (ecommerce_orders 미존재 — H1). create 와 동일 원장 사용해야 결제완료 시 주문 조회 가능.
-import { CheckoutOrder, CheckoutOrderStatus } from '../../../entities/checkout/CheckoutOrder.entity.js';
-import { TypeORMPaymentRepository } from '../../../services/payment/adapters/TypeORMPaymentRepository.js';
-import { TossPaymentProviderAdapter } from '../../../services/payment/adapters/TossPaymentProviderAdapter.js';
-import { EventHubPaymentPublisher } from '../../../services/payment/adapters/EventHubPaymentPublisher.js';
-import type { AuthRequest } from '../../../types/auth.js';
-import logger from '../../../utils/logger.js';
-import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
 
-function errorResponse(
-  res: Response,
-  statusCode: number,
-  code: string,
-  message: string,
-  details?: Record<string, unknown>,
-): Response {
-  return res.status(statusCode).json({
-    error: { code, message, details },
-  });
-}
-
-function handleValidationErrors(req: Request, res: Response): boolean {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    errorResponse(res, 400, 'VALIDATION_ERROR', 'Validation failed', {
-      fields: errors.mapped(),
-    });
-    return true;
-  }
-  return false;
-}
-
-/**
- * 주문명 생성 (Toss 결제창 표시용)
- */
-function generateOrderName(order: CheckoutOrder): string {
-  if (!order.items || order.items.length === 0) {
-    return '약국 주문';
-  }
-  const firstItem = order.items[0] as { productName?: string };
-  const itemName = firstItem?.productName || '약국 상품';
-  if (order.items.length === 1) {
-    return itemName;
-  }
-  return `${itemName} 외 ${order.items.length - 1}건`;
-}
+const RETIRED = {
+  success: false,
+  code: 'STORE_SALE_PAYMENT_DEPRECATED',
+  message:
+    '매장 소비자 결제는 O4O에서 제공하지 않습니다. 현장 결제는 매장의 POS, 온라인 판매는 외부 판매채널을 이용해 주세요.',
+} as const;
 
 export function createGlycopharmPaymentController(
-  dataSource: DataSource,
-  requireAuth: (req: Request, res: Response, next: NextFunction) => void,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _dataSource: DataSource,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _requireAuth: (req: Request, res: Response, next: NextFunction) => void,
 ): Router {
   const router = Router();
-  const orderRepository = dataSource.getRepository(CheckoutOrder);
 
-  // Adapter 인스턴스 생성 + PaymentCoreService 조립
-  const repository = new TypeORMPaymentRepository(dataSource);
-  const provider = new TossPaymentProviderAdapter();
-  const publisher = new EventHubPaymentPublisher();
-  const paymentService = new PaymentCoreService(repository, provider, publisher);
+  const gone = (_req: Request, res: Response) => res.status(410).json(RETIRED);
 
-  /**
-   * POST /payments/prepare
-   * 결제 세션 생성 (order → payment record)
-   */
-  router.post(
-    '/prepare',
-    requireAuth,
-    [
-      body('orderId').notEmpty().isUUID(),
-      body('successUrl').notEmpty().isURL(),
-      body('failUrl').notEmpty().isURL(),
-    ],
-    async (req: Request, res: Response) => {
-      // WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1: 소비자→매장 결제(STORE_SALE_PAYMENT)는 O4O 대상 아님.
-      //   PaymentCore.prepare/Toss 호출·DB 변경 전 차단. 조회성 GET /order/:orderId 는 보존(미차단).
-      return res.status(410).json({
-        success: false,
-        code: 'STORE_SALE_PAYMENT_DEPRECATED',
-        message: '매장 소비자 결제는 O4O에서 제공하지 않습니다. 상품 결제는 해당 매장의 POS 또는 현장 결제를 이용해 주세요.',
-      });
-      // 아래 기존 결제 생성 로직은 정책상 미도달(차단됨) — 구조 보존을 위해 유지.
-      // eslint-disable-next-line no-unreachable
-      try {
-        if (handleValidationErrors(req, res)) return;
-
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id || authReq.authUser?.id;
-        if (!userId) {
-          return errorResponse(res, 401, 'UNAUTHORIZED', 'Authentication required');
-        }
-
-        opsMetrics.inc(OPS.PAYMENT_PREPARE, { service: 'glycopharm' });
-
-        const { orderId, successUrl, failUrl } = req.body;
-
-        // 주문 조회 및 소유권 확인
-        const order = await orderRepository.findOne({
-          where: { id: orderId, buyerId: userId },
-        });
-
-        if (!order) {
-          return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
-        }
-
-        // 결제 가능 상태 확인
-        if (order.status !== CheckoutOrderStatus.CREATED && order.status !== CheckoutOrderStatus.PENDING_PAYMENT) {
-          return errorResponse(res, 400, 'ORDER_NOT_PAYABLE', 'Order is not in payable state', {
-            currentStatus: order.status,
-          });
-        }
-
-        // PaymentCoreService.prepare() 호출
-        const payment = await paymentService.prepare({
-          orderId: order.id,
-          orderName: generateOrderName(order),
-          amount: Number(order.totalAmount),
-          currency: 'KRW',
-          successUrl,
-          failUrl,
-          sourceService: 'glycopharm',
-        });
-
-        logger.info('[GlycoPharm Payment] Payment prepared', {
-          paymentId: payment.id,
-          orderId: order.id,
-          orderNumber: order.orderNumber,
-          amount: Number(order.totalAmount),
-        });
-
-        res.status(201).json({
-          success: true,
-          data: {
-            paymentId: payment.id,
-            transactionId: payment.transactionId,
-            orderId: order.id,
-            orderNumber: order.orderNumber,
-            amount: Number(order.totalAmount),
-            clientKey: (payment.metadata as Record<string, unknown>)?.clientKey,
-            isTestMode: (payment.metadata as Record<string, unknown>)?.isTestMode,
-          },
-        });
-      } catch (error: unknown) {
-        opsMetrics.inc(OPS.PAYMENT_PREPARE_ERROR, { service: 'glycopharm' });
-        const err = error as Error;
-        logger.error('[GlycoPharm Payment] Prepare error:', err);
-        errorResponse(res, 500, 'PAYMENT_PREPARE_ERROR', 'Failed to prepare payment');
-      }
-    },
-  );
-
-  /**
-   * POST /payments/confirm
-   * 결제 승인 (Toss 결제 완료 후 프론트에서 호출)
-   */
-  router.post(
-    '/confirm',
-    requireAuth,
-    [
-      body('paymentId').notEmpty().isUUID(),
-      body('paymentKey').notEmpty().isString(),
-      body('orderId').notEmpty().isUUID(),
-    ],
-    async (req: Request, res: Response) => {
-      // WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1: 소비자→매장 결제(STORE_SALE_PAYMENT)는 O4O 대상 아님.
-      //   PaymentCore.confirm/Toss 호출·DB 변경 전 차단. 조회성 GET /order/:orderId 는 보존(미차단).
-      return res.status(410).json({
-        success: false,
-        code: 'STORE_SALE_PAYMENT_DEPRECATED',
-        message: '매장 소비자 결제는 O4O에서 제공하지 않습니다. 상품 결제는 해당 매장의 POS 또는 현장 결제를 이용해 주세요.',
-      });
-      // 아래 기존 결제 승인 로직은 정책상 미도달(차단됨) — 구조 보존을 위해 유지.
-      // eslint-disable-next-line no-unreachable
-      try {
-        if (handleValidationErrors(req, res)) return;
-
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id || authReq.authUser?.id;
-        if (!userId) {
-          return errorResponse(res, 401, 'UNAUTHORIZED', 'Authentication required');
-        }
-
-        const { paymentId, paymentKey, orderId } = req.body;
-
-        // 주문 소유권 확인
-        const order = await orderRepository.findOne({
-          where: { id: orderId, buyerId: userId },
-        });
-
-        if (!order) {
-          return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
-        }
-
-        // PaymentCoreService.confirm() 호출
-        // 금액 검증은 PaymentCore 내부에서 수행 (payment.amount 사용)
-        // CREATED → CONFIRMING → PAID (+ Toss API + event emission)
-        const payment = await paymentService.confirm(
-          paymentId,
-          paymentKey,
-          order.orderNumber,
-          order.id,
-        );
-
-        opsMetrics.inc(OPS.PAYMENT_CONFIRM_SUCCESS, { service: 'glycopharm' });
-
-        logger.info('[GlycoPharm Payment] Payment confirmed', {
-          paymentId: payment.id,
-          orderId: order.id,
-          orderNumber: order.orderNumber,
-          status: payment.status,
-          paidAmount: payment.paidAmount,
-        });
-
-        res.json({
-          success: true,
-          data: {
-            paymentId: payment.id,
-            orderId: order.id,
-            orderNumber: order.orderNumber,
-            status: payment.status,
-            paidAmount: payment.paidAmount,
-            paymentMethod: payment.paymentMethod,
-            paidAt: payment.paidAt,
-          },
-        });
-      } catch (error: unknown) {
-        opsMetrics.inc(OPS.PAYMENT_CONFIRM_FAILED, { service: 'glycopharm' });
-        const err = error as Error;
-        logger.error('[GlycoPharm Payment] Confirm error:', err);
-
-        if (err.message === 'PAYMENT_NOT_FOUND') {
-          return errorResponse(res, 404, 'PAYMENT_NOT_FOUND', 'Payment record not found');
-        }
-        if (err.message?.startsWith('INVALID_PAYMENT_TRANSITION')) {
-          return errorResponse(res, 409, 'INVALID_PAYMENT_TRANSITION', err.message);
-        }
-        if (err.message === 'PAYMENT_ALREADY_PROCESSING') {
-          return errorResponse(res, 409, 'PAYMENT_ALREADY_PROCESSING', 'Payment is already being processed');
-        }
-        if (err.message === 'PAYMENT_AMOUNT_MISSING') {
-          return errorResponse(res, 400, 'PAYMENT_AMOUNT_MISSING', 'Payment amount not set during prepare');
-        }
-
-        // P0-2: paymentKey UNIQUE violation → idempotent 처리
-        const pgError = err as any;
-        if (pgError.code === '23505' && pgError.detail?.includes('paymentKey')) {
-          const existing = await paymentService.getStatus(req.body.paymentId);
-          if (existing && existing.status === 'PAID') {
-            return res.json({
-              success: true,
-              data: {
-                paymentId: existing.id,
-                orderId: existing.orderId,
-                status: existing.status,
-                paidAmount: existing.paidAmount,
-                paymentMethod: existing.paymentMethod,
-                paidAt: existing.paidAt,
-              },
-            });
-          }
-          opsMetrics.inc(OPS.PAYMENT_DUPLICATE_BLOCKED, { service: 'glycopharm' });
-          return errorResponse(res, 409, 'DUPLICATE_PAYMENT', 'Payment with this key already exists');
-        }
-
-        errorResponse(res, 400, 'PAYMENT_CONFIRM_ERROR', 'Payment confirmation failed', {
-          message: err.message,
-        });
-      }
-    },
-  );
-
-  /**
-   * GET /payments/order/:orderId
-   * 결제 정보 조회 (Toss widget 렌더링용)
-   */
-  router.get(
-    '/order/:orderId',
-    requireAuth,
-    [param('orderId').isUUID()],
-    async (req: Request, res: Response) => {
-      try {
-        if (handleValidationErrors(req, res)) return;
-
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id || authReq.authUser?.id;
-        if (!userId) {
-          return errorResponse(res, 401, 'UNAUTHORIZED', 'Authentication required');
-        }
-
-        const order = await orderRepository.findOne({
-          where: { id: req.params.orderId, buyerId: userId },
-        });
-
-        if (!order) {
-          return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
-        }
-
-        if (order.status !== CheckoutOrderStatus.CREATED && order.status !== CheckoutOrderStatus.PENDING_PAYMENT) {
-          return errorResponse(res, 400, 'ORDER_NOT_PAYABLE', 'Order is not payable', {
-            currentStatus: order.status,
-          });
-        }
-
-        res.json({
-          success: true,
-          data: {
-            orderId: order.id,
-            orderNumber: order.orderNumber,
-            orderName: generateOrderName(order),
-            amount: Number(order.totalAmount),
-            currency: 'KRW',
-            clientKey: process.env.TOSS_PAYMENTS_CLIENT_KEY || 'test_ck_test_key',
-          },
-        });
-      } catch (error: unknown) {
-        const err = error as Error;
-        logger.error('[GlycoPharm Payment] Get payment info error:', err);
-        errorResponse(res, 500, 'PAYMENT_INFO_ERROR', 'Failed to get payment info');
-      }
-    },
-  );
+  router.post('/prepare', gone);
+  router.post('/confirm', gone);
+  router.get('/order/:orderId', gone);
 
   return router;
 }

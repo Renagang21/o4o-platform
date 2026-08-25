@@ -271,11 +271,13 @@ const PharmacyInfoPage = lazy(() => import('@/pages/store/PharmacyInfoPage'));
 const StoreLocalProductsPage = lazy(() => import('@/pages/store-management/StoreLocalProductsPage'));
 const StoreTabletDisplaysPage = lazy(() => import('@/pages/store-management/StoreTabletDisplaysPage'));
 
-// Consumer Store
+// 매장 공개 정보 화면 (상품 정보 제공 — 판매·결제 아님)
+// WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+//   StoreCart 제거. `O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §5 — 태블릿·QR·매장 화면은
+//   상품/건강 정보 제공 수단이며 O4O 자체 checkout/결제 수단이 아니다.
 const StoreFront = lazy(() => import('@/pages/store/StoreFront'));
 const StoreProducts = lazy(() => import('@/pages/store/StoreProducts'));
 const StoreProductDetail = lazy(() => import('@/pages/store/StoreProductDetail'));
-const StoreCart = lazy(() => import('@/pages/store/StoreCart'));
 
 // WO-O4O-GLYCOPHARM-MENU-CANONICAL-ALIGN-V1: 모바일 약국 경영 허브
 const MobilePharmacyPage = lazy(() => import('@/pages/mobile/MobilePharmacyPage'));
@@ -955,12 +957,11 @@ function AppRoutes() {
         <Route path="settings" element={<SettingsPage />} />
       </Route>
 
-      {/* Consumer Store (Subdirectory) */}
+      {/* 매장 공개 정보 (Subdirectory) — 정보 제공 전용, 장바구니/결제 없음 */}
       <Route path="store/:pharmacyId" element={<StoreLayout />}>
         <Route index element={<StoreFront />} />
         <Route path="products" element={<StoreProducts />} />
         <Route path="products/:productId" element={<StoreProductDetail />} />
-        <Route path="cart" element={<StoreCart />} />
       </Route>
 
       {/* Kiosk Store Mode - 매장 내 키오스크 */}
@@ -968,7 +969,6 @@ function AppRoutes() {
         <Route index element={<StoreFront />} />
         <Route path="products" element={<StoreProducts />} />
         <Route path="products/:productId" element={<StoreProductDetail />} />
-        <Route path="cart" element={<StoreCart />} />
       </Route>
 
       {/* Tablet Store Mode - 직원 보조 태블릿 */}
@@ -976,7 +976,6 @@ function AppRoutes() {
         <Route index element={<StoreFront />} />
         <Route path="products" element={<StoreProducts />} />
         <Route path="products/:productId" element={<StoreProductDetail />} />
-        <Route path="cart" element={<StoreCart />} />
       </Route>
 
       {/* QR Landing (Phase 2-B: standalone public page, no layout) */}

@@ -272,7 +272,7 @@ export function StoreOrdersPage() {
       onRetry={loadData}
       accent="blue"
       title="발주 내역"
-      description="공급자에게 주문한 상품의 발주·결제·배송 진행 상태를 확인합니다 (온라인 판매 고객 주문은 ‘온라인 판매 > 주문 관리’)"
+      description="공급자에게 주문한 상품의 발주·결제·배송 진행 상태를 확인합니다"
       headerAction={
         <Link
           to="/store/commerce/order-worktable"
