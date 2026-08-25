@@ -10,7 +10,8 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { DataSource, Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { DataSource, Between, In, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { resolveCmsServiceKeys } from '../cms-content/cms-content-utils.js';
 import { Channel, ChannelHeartbeat } from '@o4o-apps/cms-core';
 import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js';
 
@@ -64,7 +65,8 @@ export function createAdminHeartbeatRoutes(dataSource: DataSource): Router {
         where.channelId = channelId as string;
       }
       if (serviceKey) {
-        where.serviceKey = serviceKey as string;
+        // WO-O4O-CHANNELS-SERVICEKEY-CANONICAL-SCOPE-ALIGNMENT-V1: alias/canonical 동일 모집단.
+        where.serviceKey = In(resolveCmsServiceKeys(String(serviceKey)));
       }
       if (organizationId) {
         where.organizationId = organizationId as string;
@@ -127,7 +129,8 @@ export function createAdminHeartbeatRoutes(dataSource: DataSource): Router {
       // Build channel query
       const channelWhere: any = {};
       if (serviceKey) {
-        channelWhere.serviceKey = serviceKey as string;
+        // WO-O4O-CHANNELS-SERVICEKEY-CANONICAL-SCOPE-ALIGNMENT-V1: alias/canonical 동일 모집단.
+        channelWhere.serviceKey = In(resolveCmsServiceKeys(String(serviceKey)));
       }
       if (organizationId) {
         channelWhere.organizationId = organizationId as string;

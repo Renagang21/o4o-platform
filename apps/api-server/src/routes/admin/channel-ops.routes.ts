@@ -9,7 +9,8 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
+import { resolveCmsServiceKeys } from '../cms-content/cms-content-utils.js';
 import { Channel, ChannelHeartbeat, ChannelPlaybackLog } from '@o4o-apps/cms-core';
 import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js';
 
@@ -83,7 +84,8 @@ export function createAdminChannelOpsRoutes(dataSource: DataSource): Router {
       // Build channel query
       const channelWhere: any = {};
       if (serviceKey) {
-        channelWhere.serviceKey = serviceKey as string;
+        // WO-O4O-CHANNELS-SERVICEKEY-CANONICAL-SCOPE-ALIGNMENT-V1: alias/canonical 동일 모집단.
+        channelWhere.serviceKey = In(resolveCmsServiceKeys(String(serviceKey)));
       }
       if (organizationId) {
         channelWhere.organizationId = organizationId as string;

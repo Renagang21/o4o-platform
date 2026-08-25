@@ -24,7 +24,9 @@ interface ChannelFormModalProps {
 const SERVICES = [
   { value: '', label: 'Global (All Services)' },
   { value: 'glycopharm', label: 'Glycopharm' },
-  { value: 'kpa', label: 'KPA Society' },
+  // WO-O4O-CHANNELS-SERVICEKEY-CANONICAL-SCOPE-ALIGNMENT-V1:
+  //   value 는 canonical ledger key 다. role prefix('kpa')를 보내지 않는다.
+  { value: 'kpa-society', label: 'KPA Society' },
   { value: 'neture', label: 'Neture' },
   { value: 'k-cosmetics', label: 'K-Cosmetics' },
 ];
