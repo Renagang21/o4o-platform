@@ -129,9 +129,30 @@ jobs:
     runs-on: ubuntu-latest
     needs: quality-check
     
+    # WO-O4O-MAIN-SITE-CI-BUILD-CONTRACT-CENSUS-AND-DISPOSITION-V1
+    #   판정: REDUCE_TO_LIGHTWEIGHT_CHECK — `main-site` 를 build matrix 에서 제외한다.
+    #
+    #   `apps/main-site` 는 RETIRED_RUNTIME 이다(Cloud Run service 0 / deploy workflow 0).
+    #   이 job 의 artifact 는 어떤 workflow 도 download 하지 않고(`download-artifact` 0회,
+    #   `continue-on-error: true`, 7일 보존), 이 job 을 `needs:` 로 받는 downstream job 도 없다.
+    #   즉 main-site build 는 production 에 어떤 영향도 주지 않는다.
+    #
+    #   "컴파일 가능 상태 유지" 라는 원래 목적은 이미 위 `quality-check` 가 더 넓게 수행한다:
+    #     - `pnpm run type-check:frontend` → `apps/main-site` `tsc --noEmit` (blocking)
+    #     - `node scripts/lint-ratchet.mjs` → 루트 `eslint .` (main-site 포함)
+    #   tsconfig `include: ["src"]` 는 src 102개 전부를 검사하지만, Vite build 의 module graph 는
+    #   진입점에서 도달 가능한 27개만 본다. 즉 **고아 소스를 지키는 것은 tsc 이지 build 가 아니다.**
+    #   main-site 의 `build` 는 `tsc && vite build` 라 tsc 절반은 그대로 중복이었다.
+    #
+    #   최근 CI run 60회에서 `Build Applications` 실패 0회(실패 9회는 전부 `Code Quality Check`).
+    #   main-site build 1회당 2분24초~3분13초를 push/PR 마다 소모했다.
+    #
+    #   재추가 조건: main-site 에 배포 대상 runtime 이 생기거나, artifact 를 소비하는
+    #   downstream job 이 생길 때. 근거 문서:
+    #   docs/checks/WO-O4O-MAIN-SITE-CI-BUILD-CONTRACT-CENSUS-AND-DISPOSITION-V1-CHECK.md
     strategy:
       matrix:
-        app: [main-site, admin-dashboard]
+        app: [admin-dashboard]
     
     steps:
     - uses: actions/checkout@v6

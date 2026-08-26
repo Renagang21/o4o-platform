@@ -4,7 +4,10 @@
 > Cloud Run `o4o-main-site` 와 `deploy-main-site.yml` 은 폐기됐다.
 > 이 source 는 참고·재사용 자산으로만 남으며 **배포 대상이 아니다.**
 > 근거: [WO-O4O-MAIN-SITE-DECOMMISSION-FINAL-CLOSURE-V1-CHECK](../../docs/checks/WO-O4O-MAIN-SITE-DECOMMISSION-FINAL-CLOSURE-V1-CHECK.md)
-> (`ci-pipeline.yml` 의 build 검증에는 계속 포함돼 컴파일 가능 상태를 유지한다.)
+> (~~`ci-pipeline.yml` 의 build 검증에는 계속 포함돼 컴파일 가능 상태를 유지한다.~~
+> 2026-08-26 `REDUCE_TO_LIGHTWEIGHT_CHECK` 로 build matrix 에서 빠졌다. 컴파일 가능 상태는
+> `quality-check` 의 `type-check:frontend`(`tsc --noEmit`) + `eslint .` 이 계속 보장한다.
+> 근거: [WO-O4O-MAIN-SITE-CI-BUILD-CONTRACT-CENSUS-AND-DISPOSITION-V1-CHECK](../../docs/checks/WO-O4O-MAIN-SITE-CI-BUILD-CONTRACT-CENSUS-AND-DISPOSITION-V1-CHECK.md))
 
 > **NextGen ViewRenderer 프레임워크는 2026-08-26 전면 은퇴했다 (RETIRE_CONFIRMED).**
 > 근거: [WO-O4O-MAIN-SITE-NEXTGEN-VIEWRENDERER-DOMAIN-CENSUS-AND-RETIREMENT-V1-CHECK](../../docs/checks/WO-O4O-MAIN-SITE-NEXTGEN-VIEWRENDERER-DOMAIN-CENSUS-AND-RETIREMENT-V1-CHECK.md)
