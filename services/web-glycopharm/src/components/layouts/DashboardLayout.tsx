@@ -6,8 +6,6 @@ import type { UserRole } from '@/types';
 import { GlycoGlobalHeader } from '../GlycoGlobalHeader';
 import {
   LayoutDashboard,
-  Package,
-  ShoppingCart,
   Users,
   Settings,
   Menu,
@@ -16,7 +14,6 @@ import {
   ChevronDown,
   ChevronRight,
   Building2,
-  Truck,
   Shield,
   Search,
   DollarSign,
@@ -71,17 +68,16 @@ const roleConfig: Record<string, RoleConfig> = {
       ]},
     ],
   },
-  [GLYCOPHARM_ROLES.SUPPLIER]: {
-    title: '공급자 관리',
-    icon: Truck,
-    color: 'blue',
-    menuItems: [
-      { path: '/supplier', label: '대시보드', icon: LayoutDashboard },
-      { path: '/supplier/products', label: '상품 관리', icon: Package },
-      { path: '/supplier/orders', label: '주문 현황', icon: ShoppingCart },
-      { path: '/supplier/settings', label: '설정', icon: Settings },
-    ],
-  },
+  // WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1 (결함 D3):
+  //   `GLYCOPHARM_ROLES.SUPPLIER` 메뉴 블록(대시보드/상품 관리/주문 현황/설정)을 제거했다.
+  //   (1) 이 레이아웃은 App.tsx 에서 ADMIN / CONSUMER 로만 렌더링된다 → SUPPLIER 설정은
+  //       어떤 경로로도 도달할 수 없는 dead config 였다.
+  //   (2) 가리키던 `/supplier`, `/supplier/products`, `/supplier/orders`, `/supplier/settings`
+  //       는 App.tsx 에서 `/supplier` · `/supplier/*` → `RoleNotAvailablePage` 로 고정돼 있다.
+  //       즉 살아났더라도 전부 "역할 없음" 페이지로 가는 메뉴였다.
+  //   GlycoPharm 은 공급자 역할 화면을 제공하지 않는다(위 라우트가 그 계약의 표현).
+  //   공급자(seller)의 B2B 주문 화면은 Neture 측 `/supplier/orders*`
+  //   (백엔드 `/api/v1/neture/supplier/orders*`) 가 canonical 이다. 재추가 금지.
   [GLYCOPHARM_ROLES.CONSUMER]: {
     title: '소비자',
     icon: Building2,

@@ -261,27 +261,12 @@ class UnifiedApiClient {
     }
   };
 
-  // E-commerce API
-  ecommerce = {
-    products: {
-      list: (params?: any) => this.client.get(this.v1('/ecommerce/products'), { params }),
-      get: (id: string) => this.client.get(this.v1(`/ecommerce/products/${id}`)),
-      create: (data: any) => this.client.post(this.v1('/ecommerce/products'), data),
-      update: (id: string, data: any) => this.client.put(this.v1(`/ecommerce/products/${id}`), data),
-      delete: (id: string) => this.client.delete(this.v1(`/ecommerce/products/${id}`)),
-    },
-    orders: {
-      list: (params?: any) => this.client.get(this.v1('/ecommerce/orders'), { params }),
-      get: (id: string) => this.client.get(this.v1(`/ecommerce/orders/${id}`)),
-      updateStatus: (id: string, status: string, note?: string) => 
-        this.client.put(this.v1(`/ecommerce/orders/${id}/status`), { status, note }),
-    },
-    cart: {
-      get: () => this.client.get(this.v1('/ecommerce/cart')),
-      update: (data: any) => this.client.post(this.v1('/ecommerce/cart'), data),
-      applyCoupon: (code: string) => this.client.post(this.v1('/ecommerce/cart/coupon'), { code }),
-    }
-  };
+  // WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1 (결함 D2):
+  //   `ecommerce = { products, orders, cart }` 블록을 제거했다.
+  //   전부 /api/v1/ecommerce/* 를 호출했으나 서버에 그 mount 가 없다(dead route, 소비처 0).
+  //   내용도 소비자 commerce(cart·coupon·주문 상태 변경)라 O4O-STORE-COMMERCE-BOUNDARY-V1 §10
+  //   개발 금지선 대상이다. 재추가 금지 — 매장의 공급자 주문(B2B)은
+  //   /api/v1/{service}/checkout/orders · /api/v1/store/cart/:serviceKey/* 가 canonical 이다.
 
   // Forum API
   forum = {

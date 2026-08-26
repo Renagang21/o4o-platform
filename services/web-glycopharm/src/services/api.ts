@@ -287,20 +287,9 @@ export const forumAnalyticsApi = {
   },
 };
 
-// WO-S2S-FLOW-RECOVERY-PHASE1-V1: Supplier Handling Request API
-export const supplierRequestApi = {
-  createHandlingRequest: (data: {
-    supplierId: string;
-    productId: string;
-    productName: string;
-    productCategory?: string;
-  }) =>
-    apiClient.post<{ id: string; status: string; createdAt: string }>(
-      '/api/v1/neture/supplier/requests',
-      {
-        ...data,
-        serviceId: 'glycopharm',
-        serviceName: 'GlycoPharm',
-      }
-    ),
-};
+// WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1 (결함 D4):
+//   `supplierRequestApi.createHandlingRequest` 를 제거했다. 대상이던
+//   `POST /api/v1/neture/supplier/requests` 는 WO-NETURE-SUPPLIER-OFFERS-DEAD-CODE-REMOVAL-V1
+//   (2026-04-25)에서 라우트가 삭제됐고 테이블도 drop 됐다 — 항상 실패하는 죽은 클라이언트였다.
+//   재추가 금지. 매장의 공급자 B2B 주문 canonical 축은
+//   `/api/v1/store/cart/glycopharm/*` → `checkout-confirm` → `/api/v1/glycopharm/checkout/orders` 다.

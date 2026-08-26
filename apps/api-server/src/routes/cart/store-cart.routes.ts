@@ -4,21 +4,28 @@
  *
  * 매장 경영자(buyer)의 서버 백엔드 장바구니 저장/조회 API.
  *
- * 경계: buyerId(=인증 사용자) + serviceKey(=URL 경로 파라미터).
+ * 이 cart 는 **B2B cart** 다 — 소비자 장바구니가 아니다.
+ * 담는 주체는 매장 경영자(buyer)이고 대상은 공급자 offer / event-offer 다.
+ * `docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md` 가 계약 정본이다.
+ * `O4O-STORE-COMMERCE-BOUNDARY-V1` 의 소비자 commerce 금지선 대상이 아니다(동 문서 §12).
+ *
+ * 경계: buyerId(=인증 사용자) + serviceKey(=URL 경로 파라미터) + **active service membership**.
  *   - CLAUDE.md §7 Guard Rule #4: serviceKey 는 경로 파라미터에서만 추출(스푸핑 금지).
  *   - buyerId 는 JWT 인증 사용자에서만 취득(body 신뢰 금지).
+ *   - membership 판정은 DB(`service_memberships`) — JWT 스냅샷 금지.
  *
  * API Namespace: /api/v1/store/cart/:serviceKey/*
- *   GET    /cart/:serviceKey/items             — 목록
- *   POST   /cart/:serviceKey/items             — 담기
- *   PATCH  /cart/:serviceKey/items/:id         — 수량 변경
- *   DELETE /cart/:serviceKey/items/:id         — 항목 삭제
- *   DELETE /cart/:serviceKey                   — 비우기
- *   GET    /cart/:serviceKey/groups            — 공급자별 묶음
- *   GET    /cart/:serviceKey/checkout-preview  — checkout 준비 미리보기(주문 미생성)
+ *   GET    /cart/:serviceKey/items               — 목록
+ *   POST   /cart/:serviceKey/items               — 담기
+ *   PATCH  /cart/:serviceKey/items/:id           — 수량 변경
+ *   DELETE /cart/:serviceKey/items/:id           — 항목 삭제
+ *   DELETE /cart/:serviceKey                     — 비우기
+ *   GET    /cart/:serviceKey/groups              — 공급자별 묶음
+ *   GET    /cart/:serviceKey/checkout-preview    — checkout 준비 미리보기(주문 미생성)
+ *   POST   /cart/:serviceKey/checkout-confirm    — event-offer 축 주문 확정(공급자별 분리 생성)
+ *   POST   /cart/:serviceKey/checkout-confirm-b2b— Neture B2B 축 주문 확정(payment-first)
  *
- * V1 범위: foundation 저장/조회만. 기존 cart 대체·participate 제거·수량 차감 이전·
- *          주문/결제/정산 변경 없음.
+ * 범위 밖: 소비자 checkout · PG 결제 기능 복구 · 매장이 판매자인 주문. 여기서 만들지 않는다.
  */
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
@@ -34,6 +41,12 @@ import {
   CartCheckoutError,
 } from '../../services/cart/event-offer-cart-checkout.service.js';
 import { NetureB2BCartCheckoutService } from '../../services/cart/neture-b2b-cart-checkout.service.js';
+// WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1 (결함 D1):
+//   이 라우터는 인증만 요구하고 경로의 :serviceKey 에 대한 membership 을 확인하지 않았다.
+//   그 결과 아무 서비스에도 소속되지 않은 인증 사용자가 임의 serviceKey 의 장바구니를 만들고
+//   checkout-confirm 으로 B2B 주문까지 생성할 수 있었다 (cross-service leak).
+//   판정 정본은 DB membership 이다 (JWT 스냅샷 금지 — `utils/service-membership.ts` 참조).
+import { hasActiveServiceMembership } from '../../utils/service-membership.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -84,6 +97,19 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
         success: false,
         error: `invalid serviceKey: ${serviceKey}`,
         code: 'VALIDATION_ERROR',
+      });
+      return null;
+    }
+
+    // WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1 (결함 D1):
+    //   serviceKey 격리는 "경로 파라미터 검증"만으로 성립하지 않는다. 그 서비스에 실제로
+    //   소속(active membership)돼 있어야 한다. suspended/pending/withdrawn/none 은 모두 차단.
+    //   fail-closed — DB 오류도 통과가 아니다(hasActiveServiceMembership 계약).
+    if (!(await hasActiveServiceMembership(dataSource, buyerId, serviceKey))) {
+      res.status(403).json({
+        success: false,
+        error: '해당 서비스의 활성 회원만 이용할 수 있습니다.',
+        code: 'SERVICE_MEMBERSHIP_REQUIRED',
       });
       return null;
     }

@@ -20,22 +20,10 @@ export interface SellerApprovedProduct {
 }
 
 export const sellerApi = {
-  async createHandlingRequest(data: {
-    supplierId: string;
-    productId: string;
-    productName: string;
-    productCategory?: string;
-    productPurpose?: string;
-    serviceId: string;
-    serviceName: string;
-  }): Promise<{ success: boolean; error?: string; data?: { id: string; status: string; createdAt: string } }> {
-    try {
-      const response = await api.post('/neture/supplier/requests', data);
-      return response.data;
-    } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
-    }
-  },
+  // WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1 (결함 D4):
+  //   `createHandlingRequest` 를 제거했다. 대상 `POST /neture/supplier/requests` 는
+  //   WO-NETURE-SUPPLIER-OFFERS-DEAD-CODE-REMOVAL-V1(2026-04-25)에서 삭제된 라우트이고
+  //   호출부도 0 이었다. 재추가 금지.
 
   async getMyApprovedProducts(): Promise<{
     success: boolean;

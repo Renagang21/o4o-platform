@@ -22,13 +22,10 @@ import {
   AlertTriangle,
   ChevronDown,
   X,
-  Send,
-  CheckCircle,
-  Loader2,
 } from 'lucide-react';
 import { LoadError } from '@o4o/ui';
 import { EmptyState, LoadingState } from '@/components/common';
-import { apiClient, supplierRequestApi } from '@/services/api';
+import { apiClient } from '@/services/api';
 import { toast } from '@o4o/error-handling';
 import type { B2BProduct, CartItem, B2BOrderSource, CartItemWarning } from '@/types';
 
@@ -58,9 +55,6 @@ export default function B2BOrderPage() {
   const [error, setError] = useState<string | null>(null);
 
   // WO-S2S-FLOW-RECOVERY-PHASE1-V1: 취급 요청 상태
-  const [requestingProducts, setRequestingProducts] = useState<Set<string>>(new Set());
-  const [requestedProducts, setRequestedProducts] = useState<Set<string>>(new Set());
-  const [requestErrors, setRequestErrors] = useState<Record<string, string>>({});
 
   // 데이터 로드
   useEffect(() => {
@@ -203,29 +197,6 @@ export default function B2BOrderPage() {
   const clearCart = () => {
     if (confirm('장바구니를 비우시겠습니까?')) {
       setCart([]);
-    }
-  };
-
-  // WO-S2S-FLOW-RECOVERY-PHASE1-V1: 취급 요청
-  const handleRequestHandling = async (product: B2BProduct) => {
-    setRequestingProducts((prev) => new Set(prev).add(product.id));
-    setRequestErrors((prev) => { const next = { ...prev }; delete next[product.id]; return next; });
-
-    const result = await supplierRequestApi.createHandlingRequest({
-      supplierId: product.supplierId,
-      productId: product.id,
-      productName: product.name,
-      productCategory: product.category,
-    });
-
-    setRequestingProducts((prev) => { const next = new Set(prev); next.delete(product.id); return next; });
-
-    if (result.data) {
-      setRequestedProducts((prev) => new Set(prev).add(product.id));
-    } else if (result.error?.code === 'DUPLICATE_REQUEST') {
-      setRequestedProducts((prev) => new Set(prev).add(product.id));
-    } else {
-      setRequestErrors((prev) => ({ ...prev, [product.id]: result.error?.message || '요청 실패' }));
     }
   };
 
@@ -487,31 +458,12 @@ export default function B2BOrderPage() {
                     </div>
                   )}
 
-                  {/* WO-S2S-FLOW-RECOVERY-PHASE1-V1: 취급 요청 버튼 */}
-                  <div className="mt-2 pt-2 border-t border-slate-100">
-                    {requestedProducts.has(product.id) ? (
-                      <span className="inline-flex items-center gap-1.5 text-sm text-green-600">
-                        <CheckCircle className="w-4 h-4" />
-                        요청됨
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => handleRequestHandling(product)}
-                        disabled={requestingProducts.has(product.id)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-700 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors disabled:opacity-50"
-                      >
-                        {requestingProducts.has(product.id) ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Send className="w-4 h-4" />
-                        )}
-                        {requestingProducts.has(product.id) ? '요청 중...' : '취급 요청'}
-                      </button>
-                    )}
-                    {requestErrors[product.id] && (
-                      <p className="mt-1 text-xs text-red-500">{requestErrors[product.id]}</p>
-                    )}
-                  </div>
+                  {/* WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1 (결함 D4):
+                      '취급 요청' 버튼을 제거했다. 유일한 쓰기 경로였던
+                      `POST /api/v1/neture/supplier/requests` 는
+                      WO-NETURE-SUPPLIER-OFFERS-DEAD-CODE-REMOVAL-V1(2026-04-25)에서 라우트가 삭제됐고
+                      대응 테이블도 migration 20260226000002 에서 drop 됐다. 즉 항상 실패하는 호출이었다.
+                      대체 기능을 여기서 새로 만들지 않는다(본 WO §22). */
                 </div>
               );
             })}
