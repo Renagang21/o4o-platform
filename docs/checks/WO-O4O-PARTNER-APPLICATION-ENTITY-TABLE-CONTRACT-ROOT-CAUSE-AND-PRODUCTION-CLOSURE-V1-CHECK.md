@@ -178,13 +178,25 @@ WO §6-C 제거 전제 검증:
 
 > `/partners` (PartnerInfoPage) 는 유지 — 별개의 살아 있는 안내 페이지다.
 
-### ⚠️ 남는 UX 공백 — 사용자 판단 필요
+### UX 공백 아님 — 서비스 정책과의 모순을 제거한 것 (배포 후 실측으로 정정)
 
-`MembershipGate` 는 **미가입 로그인 사용자**에게 "가입 신청하기" CTA 를 띄우고 있었다.
-그 CTA 는 **한 번도 동작한 적이 없다**(§3). 동작하지 않는 CTA 를 남기는 것보다 숨기는 편이 정확하므로 제거했고,
-현재 K-Cosmetics 에는 **자가 신청 UI 가 없다**(canonical backend `POST /cosmetics/stores/apply` 는 존재하나 UI 미구현 · 90일 호출 0건).
+초안에서는 "K-Cosmetics 자가 신청 UI 공백 → 후속 WO 로 신청 UI 구축"으로 적었다.
+**이 판단은 틀렸다.** 배포 후 E2E 중 살아 있는 `/partners`(`PartnerInfoPage.tsx:55-62`)의 본문이
+K-Cosmetics 의 명시 정책을 담고 있다:
 
-→ **후속 WO 제안**: canonical 축에 매장 신청 UI 를 붙이고 `APPLY_PATH` 를 그 경로로 복원.
+> **K-Cosmetics는 소비자를 위한 쇼핑 공간입니다.**
+> 공급자, 파트너, 협력사는 **이 서비스의 회원이 아닙니다.**
+> 참여 및 협력은 **네뚜레(Neture)** 를 통해 이루어집니다.
+> 모든 역할의 등록과 관리는 네뚜레에서 통합 진행됩니다.
+
+즉 **K-Cosmetics 에는 파트너 신청 접수가 존재해서는 안 된다.**
+`/partners/apply` 폼과 "파트너 신청하기" CTA 는 서비스 자신의 정책과 정면으로 모순이었고,
+`partner_applications` 가 만들어진 적 없다는 사실과도 일관된다.
+
+→ **신청 UI 를 만드는 후속 WO 는 제안하지 않는다.** 파트너/공급자 등록의 canonical 경로는 **Neture** 이며,
+   `/partners` 안내 페이지가 이미 그 경로를 안내하고 있다(유지됨).
+→ `cosmetics.cosmetics_store_applications` 는 **매장(store) 입점** 축이라 파트너 신청과 별개다.
+   0행·UI 없음·90일 호출 0건 상태이며 본 WO 범위 밖으로 남긴다.
 
 ---
 
@@ -227,12 +239,50 @@ CLAUDE.md 중지 조건 "현재 변경과 무관한 test 실패" → 보고만 �
 
 ---
 
-## 9. Production E2E
+## 9. Production E2E — 배포 후 실측 **PASS**
 
-§10 참조 (배포 후 실측 기록).
+배포: `01c7784dc` → `Deploy API Server (Cloud Run)` **success** · `Deploy Web Services (Cloud Run)` **success**.
 
-**write fixture 미실행 사유**: 이번 작업은 **제거**이며 생성 대상 업무가 존재하지 않는다.
-canonical 축(`cosmetics_store_applications`)은 본 WO 범위 밖이고, 억지 row 생성은 WO §9·§11 금지 사항이다.
+### ① 은퇴 endpoint — unexpected 5xx 0
+
+| 요청 | 응답 |
+|---|---|
+| `POST /api/v1/partner/applications` (익명, `{}`) | `401 AUTH_REQUIRED` |
+| 동 (인증, `{}`) | `403 Partner role required` |
+| 동 (인증, 유효 payload) | `403 Partner role required` |
+| `GET /api/v1/partner/applications/does-not-exist` (인증) | `403 Partner role required` |
+
+→ 은퇴 전과 동일. **500 계열 0건.** 401/403 은 21-a(`/api/v1/partner` 대시보드 라우터)의 의도된 응답이며
+   은퇴로 새로 생긴 것이 아니다.
+
+### ② 살아 있는 축 — 부수 피해 0
+
+| 경로 | 응답 |
+|---|---|
+| `GET /api/v1/neture/partner/applications/mine` | `200 {"success":true,"data":[]}` |
+| `GET /api/v1/cosmetics/stores/admin/applications` | `200 {"data":[],"meta":{...total:0}}` (empty state 정상) |
+| `GET /api/v1/partner/overview` (21-a) | `403 Partner role required` (계정이 파트너 아님 — 정상) |
+| `GET /health/detailed` | `200 healthy` (database check 포함) |
+
+### ③ K-Cosmetics SPA (desktop 1440×900)
+
+| 경로 | 결과 |
+|---|---|
+| `/partners/apply` | **404 화면** — "요청하신 페이지를 찾을 수 없습니다". 신청 폼 미렌더 ✅ |
+| `/partners` | 정상 (파트너 안내 — Neture 유도) ✅ |
+| `/operator/applications` | 정상 (canonical 검수 콘솔, table 렌더) ✅ |
+
+**jsErrors 0.**
+
+### ④ DB 재확인
+
+배포 후 `SELECT … WHERE table_name='partner_applications'` → **`NONE`**.
+`synchronize` 등으로 테이블이 자동 생성되지 않았음을 확인 (schema drift 0).
+
+### write fixture 미실행 사유
+
+이번 작업은 **제거**이며 생성 대상 업무가 존재하지 않는다.
+`cosmetics_store_applications` 는 본 WO 범위 밖이며, 억지 row 생성은 WO §9·§11 금지 사항이다.
 
 ---
 
@@ -261,4 +311,8 @@ try/catch 500 은폐 ✗ · `synchronize:true` ✗ · raw SQL 우회 ✗ · 권�
    현재는 `cloud-sql-proxy --token=$(gcloud auth print-access-token)` 우회로 접속했다.
 3. `packages/ecommerce-core` 은퇴 진행 중 → 관련 spec 1건 red (병렬 세션 소관).
 4. `content-guard` spec 2건 red (병렬 세션/기존 이슈).
-5. K-Cosmetics **자가 신청 UI 부재** (§6 UX 공백) — 후속 WO 대상.
+5. `cosmetics.cosmetics_store_applications` (매장 입점 축) — table·backend·운영자 검수 콘솔은 있으나
+   **신청 UI 가 없고 90일 호출 0건 · 0행**. 파트너 신청과는 별개 축이며 본 WO 범위 밖.
+   실제로 필요한 업무인지 별도 판단 필요.
+6. `PartnerInfoPage` 정책문("파트너는 K-Cosmetics 회원이 아니다 · 등록은 Neture")과
+   `MembershipGate` 의 "가입 신청하기" CTA 가 서로 모순이었다 — 본 WO 로 CTA 측을 정리했다.
