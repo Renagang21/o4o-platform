@@ -210,7 +210,8 @@ grep -rn "partner_applications" apps/api-server/src/database/migrations/*.ts
 | guard 회귀 spec (`typeorm-entity-registry-guard.spec.ts`) | ✅ 10/10 PASS |
 | api-server type-check (`tsc --noEmit`) | ✅ exit 0 |
 | 기존 entity/bootstrap 관련 tests<br>(`ai-admin-typeorm-entity-registration` · `channels-typeorm-entity-registration` · `bootstrap/__tests__`) | ✅ 4 suites / 101 tests PASS |
-| `node scripts/lint-ratchet.mjs` | ✅ 회귀 없음 |
+| `node scripts/lint-ratchet.mjs` | ⚠️ 로컬은 exit 1 (`1506 > 69`) — **내 변경 탓이 아니다.** 로컬 HEAD 가 origin/main 보다 18 commit 뒤져 `services/web-glycopharm/.../B2BOrderPage.tsx:467` 의 parsing error(origin/main 에서 이미 1줄 수정됨)가 남아 있어 오류가 증폭된다. 실제 병합 트리 기준은 CI `Run ESLint (regression ratchet)` ✅ SUCCESS |
+| 변경 파일 3개 직접 `npx eslint` | ✅ exit 0 |
 | CI 에서 guard step | ✅ SUCCESS (§10) |
 
 완료 기준 대조:
@@ -244,3 +245,47 @@ CI guard step                : SUCCESS
 ## 문서 정합
 
 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건 (`partner_applications` migration)
+
+---
+
+## §10 종료
+
+```
+commit  : 9d78f70f2  fix(api-server): TypeORM entity registry 정합성 가드 재작성 + CI 채택
+          (로컬 main 이 다른 세션 커밋으로 diverge 상태여서, origin/main 기준 임시 worktree 에
+           cherry-pick 후 push. 다른 세션 작업물은 건드리지 않았다.)
+push    : be35f160b..9d78f70f2 → origin/main
+```
+
+### CI 실제 결과
+
+내 커밋 직후 실행된 run 32941667661 은 후속 push 의 concurrency 규칙으로 **cancelled**
+(guard step 도달 전 취소). 내 커밋을 포함한 다음 run 에서 실제 결과를 확인했다.
+
+```
+run 32942092855  CI Pipeline  head 77dc85267 (9d78f70f2 포함)  → completed / success
+
+  Code Quality Check → success
+    Run TypeScript check (Frontend only)          success
+    Run TypeScript check (App Store packages)     success
+    Run TypeScript check (api-server)             success
+    Run ESLint (regression ratchet)               success
+    Guard unsafe operational routes               success
+    Guard TypeORM entity registry integrity       success   ← 본 WO
+    Check for console.log statements              success
+    Run tests (api-server Jest)                   success   ← 신규 guard spec 포함
+    Run tests (admin-dashboard Vitest)            success
+    Run tests (multi-tenant Vitest)               success
+  Build Applications (admin-dashboard) → success
+```
+
+기존 quality gate 순서와 동작은 변하지 않았다.
+
+### 잔여
+
+1. **`partner_applications` 테이블 migration 부재** — `PartnerApplication` 은 registry 에 등록했지만
+   테이블 생성 migration 이 없다. `/api/v1/partner/applications` 는 테이블 부재로 여전히 실패한다.
+   schema/migration 작업은 본 WO 의 중지 조건이므로 **별도 WO** 로 분리한다.
+2. **`DEAD_ENTITY` 48건의 존폐 판단** — 삭제할지 등록할지는 사업 판단이 필요하다.
+   현재는 `UNREGISTERED_INVENTORY` 로 동결돼 있어 방치돼도 새 결함은 유입되지 않는다.
+   정리 시 재고 목록에서 함께 제거하면 가드가 stale 항목을 즉시 잡는다.
