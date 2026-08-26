@@ -172,7 +172,7 @@ $ git ls-files scripts/audit/shortcode-registry-report.json
 (출력 없음)                                    ← PASS
 
 $ git check-ignore -v scripts/audit/shortcode-registry-report.json
-.gitignore:150:/scripts/audit/shortcode-registry-report.json	scripts/audit/shortcode-registry-report.json
+.gitignore:151:/scripts/audit/shortcode-registry-report.json	scripts/audit/shortcode-registry-report.json
                                                ← 기대 규칙 정확 매칭 PASS
 ```
 
@@ -360,3 +360,32 @@ report 를 원위치로 복원                     ← 이제 ignored 라 git �
 
 `--amend --only -- <paths>` 를 쓴 이유는 병렬 세션의 staged 파일이 index 에 있는
 상태에서 pathspec 없는 amend 가 그것들을 함께 삼키기 때문이다.
+
+### 14-3. 2 차 사고 — 병렬 세션 커밋을 amend 로 덮음 (복구 완료)
+
+CHECK 문서의 줄번호 오기(`.gitignore:150` → `151`) 하나를 접으려고 `--amend` 를
+한 번 더 썼는데, **그 사이 병렬 세션이 main 에 커밋을 올려 HEAD 가 바뀌어 있었다.**
+
+```text
+518252cc2  내 커밋
+6dc4d15f7  ← 병렬 세션 커밋 (docs(check): signage Channel 스택 감축 …)  ★ 새 HEAD
+git commit --amend …   → 내 커밋이 아니라 **저쪽 커밋**을 덮어씀
+```
+
+결과: 저쪽 커밋의 메시지가 내 메시지로 바뀌고 내 CHECK 수정이 그 안에 섞였다.
+`--only` 는 HEAD~ 트리 기준으로 재구성하므로 겉보기엔 내 변경이 사라진 것처럼 보였으나,
+`518252cc2` 는 부모로 **온전히 살아 있었다**.
+
+복구 (reflog 기준, 저쪽 worktree/staged 파일은 미접촉):
+
+```text
+git reset --soft 518252cc2                     ← 내 커밋으로 HEAD 복귀
+git commit -C 6dc4d15f7 -- <저쪽 CHECK 파일>    ← 메시지·author 그대로 재생성
+   → tree 해시 6dc4d15f7 와 **완전 동일** 확인
+   → author Renagang21 <…> 동일 확인
+git commit -m … -- <내 CHECK 파일>              ← 내 수정은 별도 커밋으로 분리
+```
+
+**교훈: 공유 main 에서 `--amend` 는 금지에 가깝다.** `git add .` 를 피하고 pathspec 을
+지켜도, amend 는 "그 사이 남이 올린 커밋"을 대상으로 삼을 수 있다. 되돌릴 변경은
+amend 가 아니라 **새 커밋**으로 얹는다.
