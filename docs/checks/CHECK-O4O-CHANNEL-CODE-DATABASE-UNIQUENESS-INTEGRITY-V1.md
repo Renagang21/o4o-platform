@@ -347,3 +347,31 @@ JSX 주석이 닫히지 않았다 — 줄이 `*/` 로 끝나고 `}` 가 없다(`
 - 검증: `services/web-glycopharm` 단독 `tsc -b` PASS,
   루트 `pnpm run type-check:frontend` → **OK (실패 단계 0)**.
   수정 전 같은 명령은 `1 step(s) FAILED — type-check services/web-glycopharm` 였다.
+
+### 16.2 ESLint ratchet — 내 spec 의 규칙명 오기 (커밋 `ca0338c78`)
+
+glycopharm type 오류가 걷히자 CI 는 다음 단계인 `node scripts/lint-ratchet.mjs` 에서 멈췄다:
+`ESLint 오류가 baseline 을 초과했습니다 (71 > 69)`.
+
+원인은 **이 WO 가 추가한 spec** 이었다.
+`channels-code-unique-integrity.spec.ts` 가 `/* eslint-disable @typescript-eslint/no-var-requires */`
+로 억제를 시도했지만, 이 저장소가 켜 놓은 규칙은 `@typescript-eslint/no-require-imports` 다.
+규칙명이 달라 억제가 걸리지 않았고 require 4곳(59, 346, 349, 352)이 그대로 오류로 집계됐다
+(67 → 71).
+
+- 규칙명을 맞추고 `jest.mock` 줄에 사유를 적은 inline disable 을 붙였다.
+- `require` 자체는 유지한다: `jest.mock` factory 는 hoist 되므로 `import` 를 쓸 수 없고,
+  실 Postgres 블록은 `CHANNELS_UQ_PG_URL` 이 없으면 로드되지 않아야 한다.
+- 규칙 완화 0 / 검사 범위 축소 0 / 남의 파일 억제 0.
+- 결과: `ESLint: 67 errors, 2194 warnings (baseline 69)` exit 0. spec 28건 그대로.
+- **`ERROR_BASELINE` 은 내리지 않았다.** 스크립트가 67 로 낮추라고 안내하지만
+  갱신 규칙은 "오류를 실제로 고친 뒤 낮춘다" 이고, 남은 2건 감소분은 다른 세션의 성과다.
+
+### 16.3 최종 CI 상태 (`ca0338c78`)
+
+| 워크플로 | 결과 |
+|---|---|
+| `CI Pipeline` | **success** (이 계열에서 처음으로 green) |
+| `CodeQL Security Analysis` | success |
+| `Deploy API Server (Cloud Run)` | success |
+| `Deploy Web Services (Cloud Run)` (`f2d304808`) | success — glycopharm 빌드 복구 확인 |
