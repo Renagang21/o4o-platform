@@ -31,7 +31,14 @@ import {
 // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: 프로덕션 canonical 주문 원장 = checkout_orders
 // (ecommerce_orders 미존재 — IR-O4O-ORDER-CANONICAL-TABLE-CONFIRM-V1 / CHECK-...-DIAGNOSTIC-RESULT-V1 H1 확정).
 // create/list/get 를 CheckoutOrder 기준으로 정렬. payment controller/handler 도 동일 원장 사용.
-import { CheckoutOrder } from '../../../entities/checkout/CheckoutOrder.entity.js';
+// WO-O4O-CROSSSERVICE-B2B-BUYER-ORDER-READ-CONTRACT-AND-COMMONIZATION-V1 (DF-1 · DF-4):
+//   buyer 주문 조회 의미·ownership·serviceKey 격리는 공통 Core 가 소유한다.
+//   이 controller 는 경로 · 서비스 scope · GlycoPharm 표기 adaptation 만 담당하는 wrapper 다.
+import {
+  listBuyerOrders,
+  getBuyerOrderDetail,
+  isBuyerOrderReadFailure,
+} from '../../../services/checkout/buyer-order-read.service.js';
 
 /** 'glycopharm' + 이벤트 오퍼 'glycopharm-event-offer' */
 const GP_BUYER_ORDER_SERVICE_KEYS = getBuyerOrderServiceKeys(SERVICE_KEYS.GLYCOPHARM);
@@ -141,27 +148,16 @@ export function createCheckoutController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
         }
 
-        const page = Number(req.query.page) || 1;
-        const limit = Math.min(Number(req.query.limit) || 20, 100);
-        const offset = (page - 1) * limit;
-
-        // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: checkout_orders + metadata.serviceKey 기준.
-        // legacy OrderType.GLYCOPHARM 분기 제거 — ecommerce_orders 미존재(H1)이므로 해당 row 없음.
-        const orderRepo = dataSource.getRepository(CheckoutOrder);
-        // WO-O4O-STORE-HUB-PRODUCTION-E2E-DATA-ENROLLMENT-AND-CLOSURE-V1:
-        //   alias 'order' 는 SQL 예약어라 생성 쿼리가 `syntax error at or near "order"` 로 실패했다
-        //   (프로덕션 500 / ORDER_LIST_ERROR). KPA·Cosmetics 와 동일하게 'co' 를 쓴다.
-        const [orders, total] = await orderRepo
-          .createQueryBuilder('co')
-          .where('co.buyerId = :buyerId', { buyerId })
-          .andWhere("co.metadata->>'serviceKey' IN (:...serviceKeys)", { serviceKeys: GP_BUYER_ORDER_SERVICE_KEYS })
-          .orderBy('co.createdAt', 'DESC')
-          .take(limit)
-          .skip(offset)
-          .getManyAndCount();
+        const { orders, pagination } = await listBuyerOrders(dataSource, {
+          buyerId,
+          serviceKeys: GP_BUYER_ORDER_SERVICE_KEYS,
+          page: req.query.page as string | undefined,
+          limit: req.query.limit as string | undefined,
+        });
 
         res.json({
           success: true,
+          // wrapper 책임 = GlycoPharm 표기(약국)만. 조회 의미·ownership·serviceKey 격리는 Core 소유.
           data: orders.map((order) => ({
             id: order.id,
             orderNumber: order.orderNumber,
@@ -172,15 +168,10 @@ export function createCheckoutController(
               id: (order.metadata as GlycopharmOrderMetadata)?.pharmacyId,
               name: (order.metadata as GlycopharmOrderMetadata)?.pharmacyName,
             },
-            itemCount: (order.items as unknown[])?.length || 0,
+            itemCount: order.itemCount,
             createdAt: order.createdAt,
           })),
-          pagination: {
-            page,
-            limit,
-            total,
-            totalPages: Math.ceil(total / limit),
-          },
+          pagination,
         });
       } catch (error: unknown) {
         const err = error as Error;
@@ -209,20 +200,17 @@ export function createCheckoutController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
         }
 
-        // WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1: checkout_orders + metadata.serviceKey 기준.
-        const orderRepoForGet = dataSource.getRepository(CheckoutOrder);
-        // alias 'order' = SQL 예약어 (위 목록 조회와 동일 사유)
-        const order = await orderRepoForGet
-          .createQueryBuilder('co')
-          .where('co.id = :orderId', { orderId })
-          .andWhere('co.buyerId = :buyerId', { buyerId })
-          .andWhere("co.metadata->>'serviceKey' IN (:...serviceKeys)", { serviceKeys: GP_BUYER_ORDER_SERVICE_KEYS })
-          .getOne();
+        const result = await getBuyerOrderDetail(dataSource, {
+          orderId: String(orderId ?? ''),
+          buyerId,
+          serviceKeys: GP_BUYER_ORDER_SERVICE_KEYS,
+        });
 
-        if (!order) {
-          return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
+        if (isBuyerOrderReadFailure(result)) {
+          return errorResponse(res, result.httpStatus, result.code, result.message);
         }
 
+        const order = result.order;
         const metadata = order.metadata as GlycopharmOrderMetadata;
 
         res.json({

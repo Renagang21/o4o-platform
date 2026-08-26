@@ -30,6 +30,14 @@ import {
   cancelStoreOrderBeforePayment,
   isCancelStoreOrderFailure,
 } from '../../../services/checkout/store-order-cancel.service.js';
+// WO-O4O-CROSSSERVICE-B2B-BUYER-ORDER-READ-CONTRACT-AND-COMMONIZATION-V1 (DF-1 · DF-4):
+//   buyer 주문 조회 의미·ownership·serviceKey 격리는 공통 Core 가 소유한다.
+//   이 controller 는 경로 · 서비스 scope · K-Cosmetics 표기/필터 adaptation 만 담당하는 wrapper 다.
+import {
+  listBuyerOrders,
+  getBuyerOrderDetail,
+  isBuyerOrderReadFailure,
+} from '../../../services/checkout/buyer-order-read.service.js';
 
 /** 'cosmetics'(주문 metadata 축) + 이벤트 오퍼 'k-cosmetics-event-offer' */
 const KCOS_BUYER_ORDER_SERVICE_KEYS = getBuyerOrderServiceKeys(SERVICE_KEYS.K_COSMETICS);
@@ -271,9 +279,6 @@ export function createCosmeticsOrderController(
         }
 
         const filters = filterResult.filters!;
-        const page = filters.page || 1;
-        const limit = Math.min(filters.limit || 20, 100);
-        const offset = (page - 1) * limit;
 
         // WO-O4O-COSMETICS-ORDERS-CANONICAL-CHECKOUT-ALIGNMENT-V1:
         //   canonical 주문 원장은 checkout_orders(CheckoutOrder) 다. off-contract EcommerceOrder
@@ -284,58 +289,24 @@ export function createCosmeticsOrderController(
         // WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
         //   이벤트 오퍼 주문('k-cosmetics-event-offer')이 누락되던 결함 — 조회 범위만 확장.
         //   Boundary Guard 유지: 키 집합도 parameter binding 으로 전달한다.
-        const whereClauses: string[] = [
-          'co."buyerId" = $1',
-          "co.metadata->>'serviceKey' = ANY($2::text[])",
-        ];
-        const params: any[] = [buyerId, KCOS_BUYER_ORDER_SERVICE_KEYS];
-
-        if (filters.channel) {
-          params.push(filters.channel);
-          whereClauses.push(`co.metadata->>'channel' = $${params.length}`);
-        }
-        if (filters.status) {
-          params.push(filters.status);
-          whereClauses.push(`co.status = $${params.length}`);
-        }
-        if (filters.guideId) {
-          params.push(filters.guideId);
-          whereClauses.push(`co.metadata->'travel'->>'guideId' = $${params.length}`);
-        }
-        if (filters.tourSessionId) {
-          params.push(filters.tourSessionId);
-          whereClauses.push(`co.metadata->'travel'->>'tourSessionId' = $${params.length}`);
-        }
-        if (filters.taxRefundEligible !== undefined) {
-          params.push(String(filters.taxRefundEligible));
-          whereClauses.push(`co.metadata->'travel'->'taxRefund'->>'eligible' = $${params.length}`);
-        }
-        if (filters.taxRefundStatus) {
-          params.push(filters.taxRefundStatus);
-          whereClauses.push(`co.metadata->'travel'->'taxRefund'->>'status' = $${params.length}`);
-        }
-
-        const whereSql = whereClauses.join(' AND ');
-
-        const countRows: Array<{ count: number }> = await dataSource.query(
-          `SELECT COUNT(*)::int AS count FROM checkout_orders co WHERE ${whereSql}`,
-          params,
-        );
-        const total = Number(countRows[0]?.count || 0);
-        const totalPages = Math.ceil(total / limit);
-
-        const rows: Array<Record<string, any>> = await dataSource.query(
-          `SELECT co.id, co."orderNumber", co.status, co."paymentStatus",
-                  co."totalAmount", co.metadata->>'channel' AS channel,
-                  co.metadata->>'storeName' AS "storeName",
-                  jsonb_array_length(COALESCE(co.items, '[]'::jsonb)) AS "itemCount",
-                  co."createdAt"
-           FROM checkout_orders co
-           WHERE ${whereSql}
-           ORDER BY co."createdAt" DESC
-           LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
-          [...params, limit, offset],
-        );
+        const { orders, pagination } = await listBuyerOrders(dataSource, {
+          buyerId,
+          serviceKeys: KCOS_BUYER_ORDER_SERVICE_KEYS,
+          page: filters.page,
+          limit: filters.limit,
+          // K-Cosmetics 고유 필터 — Core 가 SQL 을 소유하고 여기서는 값만 넘긴다.
+          filters: {
+            channel: filters.channel,
+            status: filters.status,
+            travelGuideId: filters.guideId,
+            travelTourSessionId: filters.tourSessionId,
+            travelTaxRefundEligible:
+              filters.taxRefundEligible !== undefined
+                ? String(filters.taxRefundEligible)
+                : undefined,
+            travelTaxRefundStatus: filters.taxRefundStatus,
+          },
+        });
 
         // Build applied filters info
         const appliedFilters: Record<string, any> = { buyerId };
@@ -354,18 +325,20 @@ export function createCosmeticsOrderController(
 
         res.json({
           success: true,
-          data: rows.map((row) => ({
-            id: row.id,
-            orderNumber: row.orderNumber,
-            status: row.status,
-            paymentStatus: row.paymentStatus,
-            totalAmount: Number(row.totalAmount),
-            channel: row.channel ?? undefined,
-            storeName: row.storeName ?? undefined,
-            itemCount: Number(row.itemCount) || 0,
-            createdAt: row.createdAt,
+          // wrapper 책임 = K-Cosmetics 표기(channel · storeName)만.
+          // 조회 의미·ownership·serviceKey 격리·필터 SQL 은 Core 소유.
+          data: orders.map((order) => ({
+            id: order.id,
+            orderNumber: order.orderNumber,
+            status: order.status,
+            paymentStatus: order.paymentStatus,
+            totalAmount: order.totalAmount,
+            channel: (order.metadata?.channel as string | undefined) ?? undefined,
+            storeName: (order.metadata?.storeName as string | undefined) ?? undefined,
+            itemCount: order.itemCount,
+            createdAt: order.createdAt,
           })),
-          pagination: { page, limit, total, totalPages },
+          pagination,
           filters: appliedFilters,
         });
       } catch (error: unknown) {
@@ -397,25 +370,19 @@ export function createCosmeticsOrderController(
         // WO-O4O-COSMETICS-ORDERS-CANONICAL-CHECKOUT-ALIGNMENT-V1:
         //   canonical checkout_orders 기준 단건 조회. items 는 checkout_orders.items JSONB.
         //   buyerId 스코프 + serviceKey 격리 유지. 응답 shape(StoreOrderDetail) 불변.
-        const detailRows: Array<Record<string, any>> = await dataSource.query(
-          `SELECT co.id, co."orderNumber", co.status, co."paymentStatus",
-                  co.subtotal, co."shippingFee", co.discount, co."totalAmount",
-                  co.metadata, co."shippingAddress", co.items,
-                  co."paidAt", co."createdAt", co."updatedAt"
-           FROM checkout_orders co
-           WHERE co.id = $1 AND co."buyerId" = $2
-             AND co.metadata->>'serviceKey' = ANY($3::text[])
-           LIMIT 1`,
-          [req.params.id, buyerId, KCOS_BUYER_ORDER_SERVICE_KEYS],
-        );
+        const result = await getBuyerOrderDetail(dataSource, {
+          orderId: String(req.params.id ?? ''),
+          buyerId,
+          serviceKeys: KCOS_BUYER_ORDER_SERVICE_KEYS,
+        });
 
-        const order = detailRows[0];
-        if (!order) {
-          return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
+        if (isBuyerOrderReadFailure(result)) {
+          return errorResponse(res, result.httpStatus, result.code, result.message);
         }
 
+        const order = result.order;
         const metadata = (order.metadata || {}) as CosmeticsOrderMetadata & { serviceKey: string };
-        const orderItems: any[] = Array.isArray(order.items) ? order.items : [];
+        const orderItems: any[] = order.items;
 
         res.json({
           success: true,
@@ -424,11 +391,11 @@ export function createCosmeticsOrderController(
             orderNumber: order.orderNumber,
             status: order.status,
             paymentStatus: order.paymentStatus,
-            subtotal: Number(order.subtotal),
-            shippingFee: Number(order.shippingFee),
-            discount: Number(order.discount),
-            totalAmount: Number(order.totalAmount),
-            currency: 'KRW', // checkout_orders 에는 currency 컬럼 없음 — 단일 통화(KRW) 고정
+            subtotal: order.subtotal,
+            shippingFee: order.shippingFee,
+            discount: order.discount,
+            totalAmount: order.totalAmount,
+            currency: order.currency, // checkout_orders 에는 currency 컬럼 없음 — 단일 통화(KRW) 고정
             channel: metadata?.channel,
             store: metadata?.storeId ? {
               id: metadata.storeId,

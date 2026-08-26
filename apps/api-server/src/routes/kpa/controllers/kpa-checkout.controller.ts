@@ -20,7 +20,14 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
-import { CheckoutOrder } from '../../../entities/checkout/CheckoutOrder.entity.js';
+// WO-O4O-CROSSSERVICE-B2B-BUYER-ORDER-READ-CONTRACT-AND-COMMONIZATION-V1 (DF-1 · DF-4):
+//   buyer 주문 조회 의미·ownership·serviceKey 격리는 공통 Core 가 소유한다.
+//   이 controller 는 경로 · 서비스 scope · KPA 표기 adaptation 만 담당하는 wrapper 다.
+import {
+  listBuyerOrders,
+  getBuyerOrderDetail,
+  isBuyerOrderReadFailure,
+} from '../../../services/checkout/buyer-order-read.service.js';
 // WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
 //   이벤트 오퍼 주문(metadata.serviceKey='kpa-groupbuy')이 구매자 주문 목록/상세에서 누락되던 결함.
 //   기록(쓰기)은 그대로 두고 조회 범위만 canonical 집합으로 넓힌다.
@@ -118,25 +125,16 @@ export function createKpaCheckoutController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
         }
 
-        const page = Number(req.query.page) || 1;
-        const limit = Math.min(Number(req.query.limit) || 20, 100);
-        const offset = (page - 1) * limit;
-
-        const orderRepo = dataSource.getRepository(CheckoutOrder);
-        const [orders, total] = await orderRepo
-          .createQueryBuilder('co')
-          .where('co.buyerId = :buyerId', { buyerId })
-          .andWhere(
-            "co.metadata->>'serviceKey' IN (:...serviceKeys)",
-            { serviceKeys: KPA_BUYER_ORDER_SERVICE_KEYS }
-          )
-          .orderBy('co.createdAt', 'DESC')
-          .take(limit)
-          .skip(offset)
-          .getManyAndCount();
+        const { orders, pagination } = await listBuyerOrders(dataSource, {
+          buyerId,
+          serviceKeys: KPA_BUYER_ORDER_SERVICE_KEYS,
+          page: req.query.page as string | undefined,
+          limit: req.query.limit as string | undefined,
+        });
 
         res.json({
           success: true,
+          // wrapper 책임 = KPA 표기(조직)만. 조회 의미·ownership·serviceKey 격리는 Core 소유.
           data: orders.map((order) => ({
             id: order.id,
             orderNumber: order.orderNumber,
@@ -147,15 +145,10 @@ export function createKpaCheckoutController(
               id: (order.metadata as KpaOrderMetadata)?.organizationId,
               name: (order.metadata as KpaOrderMetadata)?.organizationName,
             },
-            itemCount: order.items?.length || 0,
+            itemCount: order.itemCount,
             createdAt: order.createdAt,
           })),
-          pagination: {
-            page,
-            limit,
-            total,
-            totalPages: Math.ceil(total / limit),
-          },
+          pagination,
         });
       } catch (error: unknown) {
         const err = error as Error;
@@ -182,21 +175,17 @@ export function createKpaCheckoutController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'User not authenticated');
         }
 
-        const orderRepo = dataSource.getRepository(CheckoutOrder);
-        const order = await orderRepo
-          .createQueryBuilder('co')
-          .where('co.id = :orderId', { orderId })
-          .andWhere('co.buyerId = :buyerId', { buyerId })
-          .andWhere(
-            "co.metadata->>'serviceKey' IN (:...serviceKeys)",
-            { serviceKeys: KPA_BUYER_ORDER_SERVICE_KEYS }
-          )
-          .getOne();
+        const result = await getBuyerOrderDetail(dataSource, {
+          orderId: String(orderId ?? ''),
+          buyerId,
+          serviceKeys: KPA_BUYER_ORDER_SERVICE_KEYS,
+        });
 
-        if (!order) {
-          return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
+        if (isBuyerOrderReadFailure(result)) {
+          return errorResponse(res, result.httpStatus, result.code, result.message);
         }
 
+        const order = result.order;
         const metadata = order.metadata as KpaOrderMetadata;
 
         res.json({
