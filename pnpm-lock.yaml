@@ -1150,9 +1150,6 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.0.0
         version: 5.90.11(react@19.2.0)
-      axios:
-        specifier: ^1.6.0
-        version: 1.13.2
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -1184,9 +1181,6 @@ importers:
       tailwindcss:
         specifier: ^3.4.0
         version: 3.4.17(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@22.17.2)(typescript@5.9.3))
-      tsx:
-        specifier: ^4.19.0
-        version: 4.21.0
       typescript:
         specifier: ^5.6.0
         version: 5.9.3

@@ -5,15 +5,13 @@
  *
  * Checks:
  * 1. SSOT metadata (packages/shortcodes/src/metadata.ts)
- * 2. Main-site shortcode components (apps/main-site/src/components/shortcodes)
- * 3. API Server shortcode registry (uses SSOT)
- * 4. Admin Dashboard shortcode registry (uses SSOT)
+ * 2. API Server shortcode registry (uses SSOT)
+ * 3. Admin Dashboard shortcode registry (uses SSOT)
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { glob } from 'glob';
 
 // ESM equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -70,67 +68,19 @@ function getSSOTShortcodes(): Set<string> {
 }
 
 /**
- * Get implemented shortcode components from main-site
+ * WO-O4O-MAIN-SITE-RESIDUAL-DEPENDENCY-AND-DEAD-SCRIPT-CLEANUP-V1:
+ *   `apps/main-site/src/components/shortcodes` 를 스캔하던
+ *   `getImplementedShortcodes()` 와 그 결과를 쓰던 `compareShortcodes()` 를 제거했다.
+ *
+ *   해당 디렉터리는 NextGen ViewRenderer 축과 함께 은퇴했고
+ *   (WO-O4O-MAIN-SITE-NEXTGEN-VIEWRENDERER-DOMAIN-CENSUS-AND-RETIREMENT-V1),
+ *   그 뒤로 이 경로 검사는 항상 빈 집합을 돌려주어 비교 자체가 건너뛰어졌다.
+ *   즉 제거 전에도 **실행되지 않던 코드**다.
+ *
+ *   은퇴 경로를 다른 살아 있는 디렉터리로 억지로 재연결하지 않는다.
+ *   이 스크립트의 활성 검증(SSOT metadata · Admin Dashboard SSOT 사용 여부)은
+ *   그대로 유지된다.
  */
-async function getImplementedShortcodes(): Promise<Set<string>> {
-  const shortcodesDir = path.resolve(__dirname, '../apps/main-site/src/components/shortcodes');
-
-  if (!fs.existsSync(shortcodesDir)) {
-    result.warnings.push(`⚠️  Main-site shortcodes directory not found: ${shortcodesDir}`);
-    return new Set();
-  }
-
-  // Find all .tsx and .ts files in shortcodes directory
-  const files = await glob('**/*.{ts,tsx}', { cwd: shortcodesDir });
-
-  const implementedShortcodes = new Set<string>();
-
-  for (const file of files) {
-    const filePath = path.join(shortcodesDir, file);
-    const content = fs.readFileSync(filePath, 'utf-8');
-
-    // Look for shortcode name patterns:
-    // 1. ShortcodeDefinition with name property
-    // 2. registerShortcode('product', ...) (explicit registration)
-    // 3. export const ProductShortcode = ... (component name)
-
-    // First try to find ShortcodeDefinition with name property
-    const shortcodeDefRegex = /name:\s*['"]([^'"]+)['"]/g;
-    let match;
-    let foundAny = false;
-
-    while ((match = shortcodeDefRegex.exec(content)) !== null) {
-      // Skip if this is just a parameter name or nested object property
-      // Only count if it's in a ShortcodeDefinition context
-      const beforeMatch = content.substring(Math.max(0, match.index - 200), match.index);
-      if (beforeMatch.includes('ShortcodeDefinition') || beforeMatch.includes(': ShortcodeDefinition')) {
-        implementedShortcodes.add(match[1]);
-        foundAny = true;
-      }
-    }
-
-    // If no ShortcodeDefinition found, try other patterns
-    if (!foundAny) {
-      const componentMatch = content.match(/export\s+(?:const|function)\s+(\w+Shortcode)/);
-      const registerMatch = content.match(/registerShortcode\(['"]([^'"]+)['"]/);
-
-      if (registerMatch) {
-        implementedShortcodes.add(registerMatch[1]);
-      } else if (componentMatch) {
-        // Convert ProductShortcode -> product (snake_case convention)
-        const name = componentMatch[1]
-          .replace(/Shortcode$/, '')
-          .replace(/([A-Z])/g, '_$1')
-          .toLowerCase()
-          .replace(/^_/, '');
-        implementedShortcodes.add(name);
-      }
-    }
-  }
-
-  result.info.push(`📦 Found ${implementedShortcodes.size} implemented shortcode components`);
-  return implementedShortcodes;
-}
 
 /**
  * Get shortcodes used in API Server (should be using SSOT now)
@@ -178,44 +128,6 @@ function getAdminShortcodes(): Set<string> {
   }
 }
 
-/**
- * Compare sets and find inconsistencies
- */
-function compareShortcodes(ssot: Set<string>, implemented: Set<string>) {
-  // Check for shortcodes in SSOT but not implemented
-  const missingImplementations: string[] = [];
-  for (const name of ssot) {
-    if (!implemented.has(name)) {
-      missingImplementations.push(name);
-    }
-  }
-
-  // Check for implementations not in SSOT
-  const extraImplementations: string[] = [];
-  for (const name of implemented) {
-    if (!ssot.has(name)) {
-      extraImplementations.push(name);
-    }
-  }
-
-  if (missingImplementations.length > 0) {
-    result.errors.push(
-      `❌ Shortcodes in SSOT but NOT implemented:\n   ${missingImplementations.join(', ')}`
-    );
-    result.success = false;
-  }
-
-  if (extraImplementations.length > 0) {
-    result.warnings.push(
-      `⚠️  Shortcodes implemented but NOT in SSOT:\n   ${extraImplementations.join(', ')}`
-    );
-  }
-
-  if (missingImplementations.length === 0 && extraImplementations.length === 0) {
-    result.info.push(`✅ All SSOT shortcodes have implementations`);
-    result.info.push(`✅ All implementations are in SSOT`);
-  }
-}
 
 /**
  * Print verification results
@@ -260,22 +172,14 @@ function printResults() {
 async function verify() {
   console.log('Starting shortcode registry verification...\n');
 
-  // 1. Get SSOT shortcodes
-  const ssotShortcodes = getSSOTShortcodes();
+  // 1. Get SSOT shortcodes (파일 존재 · 개수를 result 에 기록한다)
+  getSSOTShortcodes();
 
-  // 2. Get implemented shortcodes
-  const implementedShortcodes = await getImplementedShortcodes();
-
-  // 3. Check API Server
+  // 2. Check API Server
   getAPIServerShortcodes();
 
-  // 4. Check Admin Dashboard
+  // 3. Check Admin Dashboard
   getAdminShortcodes();
-
-  // 5. Compare SSOT vs implementations
-  if (ssotShortcodes.size > 0 && implementedShortcodes.size > 0) {
-    compareShortcodes(ssotShortcodes, implementedShortcodes);
-  }
 
   // Print results
   printResults();

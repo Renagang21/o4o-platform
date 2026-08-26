@@ -15,7 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Import naming utilities
-import { toShortcodeName, fileNameToShortcodeName } from '../../packages/shortcodes/src/utils/shortcodeNaming.js';
+import { fileNameToShortcodeName } from '../../packages/shortcodes/src/utils/shortcodeNaming.js';
 
 interface ShortcodeFile {
   filePath: string;
@@ -88,8 +88,12 @@ function findFilesRecursive(dir: string, pattern: RegExp, exclude: RegExp[]): st
 function findShortcodeFiles(): ShortcodeFile[] {
   const projectRoot = path.join(__dirname, '../..');
 
+  // WO-O4O-MAIN-SITE-RESIDUAL-DEPENDENCY-AND-DEAD-SCRIPT-CLEANUP-V1:
+  //   `apps/main-site/src/components/shortcodes` 는 NextGen ViewRenderer 축과 함께
+  //   은퇴했다(WO-O4O-MAIN-SITE-NEXTGEN-VIEWRENDERER-DOMAIN-CENSUS-AND-RETIREMENT-V1).
+  //   이 감사 도구 자체는 admin-dashboard · packages/shortcodes 라는 **살아 있는**
+  //   shortcode 도메인을 계속 검사하므로 유지하고, 은퇴 경로 참조만 제거한다.
   const searchDirs = [
-    path.join(projectRoot, 'apps/main-site/src/components/shortcodes'),
     path.join(projectRoot, 'apps/admin-dashboard/src/components/shortcodes'),
     path.join(projectRoot, 'packages/shortcodes/src'),
   ];
@@ -161,42 +165,11 @@ function findRegisteredShortcodes(): RegistryEntry[] {
   const projectRoot = path.join(__dirname, '../..');
   const registrations: RegistryEntry[] = [];
 
-  // Check main-site shortcode definitions
-  const mainSiteShortcodesDir = path.join(
-    projectRoot,
-    'apps/main-site/src/components/shortcodes'
-  );
-
-  const indexFiles = findFilesRecursive(
-    mainSiteShortcodesDir,
-    /index\.ts$/,
-    []
-  );
-
-  for (const indexFile of indexFiles) {
-    const content = fs.readFileSync(indexFile, 'utf-8');
-
-    // Extract from export array pattern: export const xxxShortcodes = [...]
-    const arrayExportPattern = /export const (\w+Shortcodes)\s*=\s*\[([^\]]+)\]/gs;
-    const matches = content.matchAll(arrayExportPattern);
-
-    for (const match of matches) {
-      const arrayName = match[1];
-      const arrayContent = match[2];
-
-      // Extract shortcode variable names
-      const shortcodeNames = arrayContent.match(/\w+Shortcode/g) || [];
-
-      for (const varName of shortcodeNames) {
-        // Convert variable name to shortcode name
-        const shortcodeName = toShortcodeName(varName);
-        registrations.push({
-          name: shortcodeName,
-          source: `${path.relative(projectRoot, indexFile)} (${arrayName})`,
-        });
-      }
-    }
-  }
+  // WO-O4O-MAIN-SITE-RESIDUAL-DEPENDENCY-AND-DEAD-SCRIPT-CLEANUP-V1:
+  //   은퇴한 `apps/main-site/src/components/shortcodes` 의 index.ts 에서
+  //   등록 배열을 긁어오던 블록을 제거했다. 경로가 사라진 뒤로 이 블록은
+  //   항상 빈 결과를 돌려주었다 — 제거 전에도 실행되지 않던 코드다.
+  //   은퇴 경로를 다른 살아 있는 디렉터리로 억지로 재연결하지 않는다.
 
   // Check packages/shortcodes registration files
   const packagesShortcodesDir = path.join(

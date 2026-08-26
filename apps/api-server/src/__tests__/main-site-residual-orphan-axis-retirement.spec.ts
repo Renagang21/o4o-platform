@@ -35,11 +35,13 @@
  *   - yaksa 축 : `services/web-kpa-society` 는 자체 forum 컴포넌트를 갖고 있고
  *                main-site 를 import 하지 않는다 — 동일 소유권이 아니다.
  *
- * ⚠ 이번 WO 범위 밖(후속 정리 대상, 손대지 않음):
- *   - `axios` devDependency → ORPHAN_DEP (삭제 후 live consumer 0)
- *   - `tsx` devDependency → 미사용 (WO #5 부터)
- *   - 루트 `verify:shortcodes` 스크립트 · `scripts/audit/check-shortcode-registry.ts`
- *     (이미 삭제된 `components/shortcodes` 경로 참조)
+ * 이번 WO 범위 밖으로 남겨 둔 dependency · script 잔재는
+ * WO-O4O-MAIN-SITE-RESIDUAL-DEPENDENCY-AND-DEAD-SCRIPT-CLEANUP-V1 에서 종결했다
+ * (`main-site-residual-dependency-cleanup.spec.ts`):
+ *   - `axios` dependency · `tsx` devDependency → main-site orphan, 제거
+ *   - 루트 `verify:shortcodes` · `scripts/audit/check-shortcode-registry.ts`
+ *     → 살아 있는 shortcode 도메인을 검사하므로 KEEP_ACTIVE.
+ *       은퇴한 main-site 경로 스캔 코드만 제거했다.
  *
  * 이 테스트는 **재등록 방지 계약**이다. DB · 네트워크 접근 0.
  */

@@ -57,6 +57,22 @@
 `src/main.tsx` → `src/router/index.tsx` 의 명시적 Route 표로 동작하는 7개 페이지
 (auth · dashboard · forum · lms · seller dashboard)와 그 공통 컴포넌트·context 뿐이다.
 
+## package 계약 (2026-08-26 정리)
+
+`MINIMAL_SHELL` 로 줄어든 뒤 live 소스가 더 이상 쓰지 않던 잔재를 제거했다
+(`RETIRE_CONFIRMED`). 근거:
+[WO-O4O-MAIN-SITE-RESIDUAL-DEPENDENCY-AND-DEAD-SCRIPT-CLEANUP-V1-CHECK](../../docs/checks/WO-O4O-MAIN-SITE-RESIDUAL-DEPENDENCY-AND-DEAD-SCRIPT-CLEANUP-V1-CHECK.md) ·
+재등록 방지 계약: `apps/api-server/src/__tests__/main-site-residual-dependency-cleanup.spec.ts`
+
+| 제거 | 종류 | 사유 |
+|---|---|---|
+| `axios` | dependency | live 소스의 import 0 — HTTP 는 `@o4o/auth-client` 경유 |
+| `tsx` | devDependency | main-site script 는 전부 `vite` / `tsc` — 호출 0 |
+
+`@tanstack/react-query` · `react-router-dom` · `@o4o/*` 3종은 live shell 이 실제로
+사용하므로 유지한다. 두 패키지 모두 다른 workspace 가 계속 소유하므로
+`pnpm-lock.yaml` 은 main-site importer 블록만 줄었다.
+
 ## 개발
 
 ```bash
