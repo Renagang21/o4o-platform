@@ -463,7 +463,7 @@ export default function B2BOrderPage() {
                       `POST /api/v1/neture/supplier/requests` 는
                       WO-NETURE-SUPPLIER-OFFERS-DEAD-CODE-REMOVAL-V1(2026-04-25)에서 라우트가 삭제됐고
                       대응 테이블도 migration 20260226000002 에서 drop 됐다. 즉 항상 실패하는 호출이었다.
-                      대체 기능을 여기서 새로 만들지 않는다(본 WO §22). */
+                      대체 기능을 여기서 새로 만들지 않는다(본 WO §22). */}
                 </div>
               );
             })}
