@@ -14,6 +14,11 @@
  *   - 모든 단건 응답은 `{ success, data }` envelope 이다.
  */
 
+import { resolveContentRenderKind } from './content-render-kind'
+
+export { resolveContentRenderKind } from './content-render-kind'
+export type { ContentRenderKind } from './content-render-kind'
+
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr'
 
 export type ChannelType = 'tv' | 'kiosk' | 'signage' | 'web'
@@ -209,7 +214,8 @@ export function getContentDuration(
   }
 
   // Video content - use video duration (handled by video element)
-  if (content.content.contentType === 'video') {
+  // contentType 은 CMS 의 의미적 분류라 'video' 가 될 수 없다 → 실제 필드로 판정한다.
+  if (resolveContentRenderKind(content.content) === 'video') {
     return 0 // Signal to use video duration
   }
 

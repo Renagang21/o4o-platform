@@ -6,6 +6,7 @@ import {
   fetchChannelContents,
   isChannelPlayable,
   getContentDuration,
+  resolveContentRenderKind,
   sendPlaybackLog,
   sendHeartbeat,
   type Channel,
@@ -183,7 +184,7 @@ export default function ChannelPlayerPage() {
     if (!currentContent) return
 
     // Video handles its own timing via onEnded
-    if (currentContent.content.contentType === 'video') {
+    if (resolveContentRenderKind(currentContent.content) === 'video') {
       return
     }
 

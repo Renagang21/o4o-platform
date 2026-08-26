@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import { sanitizeHtml } from '@o4o/content-editor'
-import type { ChannelContent } from '@/api/channels'
+import { resolveContentRenderKind, type ChannelContent } from '@/api/channels'
 
 interface ContentRendererProps {
   content: ChannelContent
@@ -8,21 +8,21 @@ interface ContentRendererProps {
 }
 
 export default function ContentRenderer({ content, onVideoEnded }: ContentRendererProps) {
-  const contentType = content.content.contentType
+  // CMS content.type('hero' | 'notice' | ...)은 의미적 분류라 렌더 방식이 아니다.
+  // 실제 필드 기준 판정을 api/content-render-kind 한 벌로 한다.
+  const renderKind = resolveContentRenderKind(content.content)
   const contentData = content.content
 
-  switch (contentType) {
+  switch (renderKind) {
     case 'image':
       return <ImageContent content={contentData} />
     case 'video':
       return <VideoContent content={contentData} onEnded={onVideoEnded} />
     case 'html':
       return <HtmlContent content={contentData} />
-    case 'rich_text':
     case 'text':
-      return <TextContent content={contentData} />
     default:
-      return <FallbackContent content={contentData} />
+      return <TextContent content={contentData} />
   }
 }
 
