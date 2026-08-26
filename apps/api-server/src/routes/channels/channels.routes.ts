@@ -7,6 +7,7 @@
  * that connects CMS Slots to physical/virtual destinations (TV, kiosk, web, signage).
  *
  * Endpoints:
+ * - GET /api/v1/channels/health - Health check (must stay above /:id)
  * - GET /api/v1/channels - List channels (with filters)
  * - GET /api/v1/channels/:id - Get channel by ID
  * - GET /api/v1/channels/code/:code - Get channel by code
@@ -44,6 +45,22 @@ const VALID_ORIENTATIONS = ['landscape', 'portrait'];
  */
 export function createChannelRoutes(dataSource: DataSource): Router {
   const router = Router();
+
+  /**
+   * GET /channels/health
+   * Health check endpoint
+   *
+   * WO-O4O-CHANNELS-TYPEORM-ENTITY-REGISTRATION-AND-RUNTIME-CLOSURE-V1:
+   *   이 라우트는 반드시 '/:id' 보다 먼저 선언되어야 한다. 아래쪽에 두면
+   *   router.get('/:id') 가 먼저 매칭되어 /channels/health 가 400 INVALID_ID 로 응답한다.
+   */
+  router.get('/health', (req: Request, res: Response): void => {
+    res.json({
+      status: 'ok',
+      service: 'channels',
+      timestamp: new Date().toISOString(),
+    });
+  });
 
   /**
    * GET /channels
@@ -111,7 +128,7 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       console.error('Failed to list channels:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_ERROR', message: error.message },
+        error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
       });
     }
   });
@@ -145,7 +162,7 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       console.error('Failed to get channel by code:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_ERROR', message: error.message },
+        error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
       });
     }
   });
@@ -190,7 +207,7 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       console.error('Failed to get channel:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_ERROR', message: error.message },
+        error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
       });
     }
   });
@@ -298,7 +315,7 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       console.error('Failed to create channel:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_ERROR', message: error.message },
+        error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
       });
     }
   });
@@ -407,7 +424,7 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       console.error('Failed to update channel:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_ERROR', message: error.message },
+        error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
       });
     }
   });
@@ -451,7 +468,7 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       console.error('Failed to update channel status:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_ERROR', message: error.message },
+        error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
       });
     }
   });
@@ -484,7 +501,7 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       console.error('Failed to delete channel:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_ERROR', message: error.message },
+        error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
       });
     }
   });
@@ -634,7 +651,7 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       console.error('Failed to get channel contents:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_ERROR', message: error.message },
+        error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
       });
     }
   });
@@ -794,18 +811,6 @@ export function createChannelRoutes(dataSource: DataSource): Router {
         error: { code: 'HEARTBEAT_FAILED', message: 'Failed to record heartbeat' },
       });
     }
-  });
-
-  /**
-   * GET /channels/health
-   * Health check endpoint
-   */
-  router.get('/health', (req: Request, res: Response): void => {
-    res.json({
-      status: 'ok',
-      service: 'channels',
-      timestamp: new Date().toISOString(),
-    });
   });
 
   return router;

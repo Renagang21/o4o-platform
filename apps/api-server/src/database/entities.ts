@@ -479,6 +479,12 @@ import {
   CmsMediaFile,
   CmsMediaFolder,
   CmsMediaTag,
+  // WO-O4O-CHANNELS-TYPEORM-ENTITY-REGISTRATION-AND-RUNTIME-CLOSURE-V1:
+  //   channels runtime 축 3종. /api/v1/channels*, /api/v1/admin/channels/* 라우트가
+  //   getRepository 로 직접 사용하므로 셋을 항상 함께 등록한다(부분 등록 금지).
+  Channel,
+  ChannelPlaybackLog,
+  ChannelHeartbeat,
 } from '@o4o-apps/cms-core/entities';
 
 // ============================================================================
@@ -932,6 +938,13 @@ export const entities = [
   CmsMediaFile,
   CmsMediaFolder,
   CmsMediaTag,
+  // ============================================================================
+  // CHANNELS RUNTIME ENTITIES (WO-O4O-CHANNELS-TYPEORM-ENTITY-REGISTRATION-AND-RUNTIME-CLOSURE-V1)
+  // 미등록 시 /api/v1/channels 가 500 No metadata for "Channel" was found. 로 실패한다.
+  // ============================================================================
+  Channel,
+  ChannelPlaybackLog,
+  ChannelHeartbeat,
   // ============================================================================
   // DIGITAL-SIGNAGE-CORE ENTITIES (Phase 2: Production Build)
   // ============================================================================

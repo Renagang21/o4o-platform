@@ -101,7 +101,7 @@ export function createAdminHeartbeatRoutes(dataSource: DataSource): Router {
       console.error('Failed to list heartbeats:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_ERROR', message: error.message },
+        error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
       });
     }
   });
@@ -199,7 +199,7 @@ export function createAdminHeartbeatRoutes(dataSource: DataSource): Router {
       console.error('Failed to get channel status:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_ERROR', message: error.message },
+        error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
       });
     }
   });
@@ -292,7 +292,7 @@ export function createAdminHeartbeatRoutes(dataSource: DataSource): Router {
       console.error('Failed to get channel heartbeat history:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_ERROR', message: error.message },
+        error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
       });
     }
   });
