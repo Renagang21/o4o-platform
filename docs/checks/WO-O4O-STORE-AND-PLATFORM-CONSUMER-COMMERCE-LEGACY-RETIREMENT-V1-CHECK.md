@@ -1,6 +1,8 @@
 # WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1 — CHECK
 
-> **Status**: Complete (배포 전)
+> **Status**: Closed (배포 완료 · production smoke PASS · 2026-08-26)
+>
+> 종료 절차는 `WO-O4O-STORE-CONSUMER-COMMERCE-RETIREMENT-MAIN-INTEGRATION-AND-CLOSURE-V1` 로 수행했다 (§10).
 > **Date**: 2026-08-25
 > **상위 규정**: [`docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md`](../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md)
 > **사업 계약**: `PLATFORM_DIRECT_SALE_BUSINESS_CONTRACT = NONE` (2026-08-25 확정)
@@ -251,10 +253,10 @@ services/web-neture/src/lib/api/netureB2bPayments.ts:38         POST /neture/b2b
 
 | # | 항목 | 사유 |
 |---|---|---|
-| D-1 | `packages/store-ui-core/src/config/storeMenuConfig.ts` 의 `온라인 판매 > 주문 관리` 메뉴 행 제거 | 해당 파일이 **다른 세션의 WIP(dirty)** 이다. 수정·stage·restore 금지 원칙에 따라 건드리지 않았다. 대신 라우트를 은퇴 안내 화면으로 돌려 404 를 막았다 |
+| ~~D-1~~ | ~~`storeMenuConfig.ts` 의 `온라인 판매 > 주문 관리` 메뉴 행 제거~~ | **마감 (§10-3)** — 다른 세션 WIP 해소 후 `ccee613cd` 로 제거. 배포 번들에서 `online-sales-orders` 0건 확인 |
 | D-2 | `온라인 판매 > 판매 설정 / 판매 상품`(`StoreChannelsPage`, B2C 채널 진열) | 신규 B2C 채널 **생성**은 §3-5 로 전 서비스 차단했다. 기존 채널의 조회·진열 경로는 직전 WO 가 "역사 데이터로 보존" 하기로 한 계약이고, 진열은 거래 경로가 아니다. 별도 WO 로 판정할 항목 |
 | D-3 | 주문 작업대 → canonical B2B 장바구니 담기 이관 | 작업대의 발주 의도(B2B)는 보호 대상이지만, 실행 leg 이 legacy B2C 엔드포인트에 얹혀 있었다. `store_cart` 로의 담기 매핑은 신규 기능 설계이므로 본 WO 범위 밖 |
-| D-4 | 은퇴 경로 410 production 확인 | 배포 이후 수행 (§7) |
+| ~~D-4~~ | ~~은퇴 경로 410 production 확인~~ | **마감 (§10-5)** — 배포 후 실측. 3개 소비자 주문 경로 모두 live 410 `STORE_CONSUMER_ORDER_RETIRED` |
 
 ---
 
@@ -266,3 +268,138 @@ services/web-neture/src/lib/api/netureB2bPayments.ts:38         POST /neture/b2b
 - **L5**: `platform-seller` 코드가 존재했으나 사업 계약이 `NONE` 이므로 **코드를 계약에 맞춰 제거**했다.
 - **주문 작업대**: B2B 의도이지만 실행이 B2C 채널 게이트에 의존하고 있었다 →
   의도는 보호하고 legacy 배관만 잘라낸 뒤 이관을 DEFERRED 로 남겼다.
+
+---
+
+## 10. 종료 절차 (WO-O4O-STORE-CONSUMER-COMMERCE-RETIREMENT-MAIN-INTEGRATION-AND-CLOSURE-V1)
+
+### 10-1. WIP 안전 확인 · main 통합
+
+작업 시작 시점 working tree 는 완전히 clean 했고 `main...origin/main` 은 `fb49dabf2` 로 동기 상태였다.
+직전 WO 의 작업 커밋 `6098fb7de` 는 **다른 세션이 이미 main 으로 rebase** 해 `8b31e2ce4` 로 들어가 있었다.
+손실·중복 적용이 없음을 `git patch-id --stable` 로 검증했다.
+
+```text
+6098fb7de → 6daa91eb68c59546e99fb3917769828474f2d767
+8b31e2ce4 → 6daa91eb68c59546e99fb3917769828474f2d767   # IDENTICAL PATCH, --stat 동일
+```
+
+> `restore / stash / reset / checkout -- <file> / 강제 rebase / 다른 세션 파일 수정` 은 수행하지 않았다.
+
+### 10-2. Upstream 회귀검증
+
+`apps/api-server` cwd 에서 전체 jest 실행 — **Test Suites 193/193 passed, Tests 3214/3214 passed** (exit 0).
+
+### 10-3. D-1 — 메뉴 SSOT 판정 및 마감 (`ccee613cd`)
+
+**이름이 아니라 기능으로 판정했다.** 저장소에는 '주문 관리' 라벨이 4곳 이상 존재한다.
+
+| 메뉴 키 | 경로 | 축 | 판정 | 조치 |
+|---|---|---|---|---|
+| `online-sales-orders` (KPA) | `/online-sales/orders` | `checkout_orders` 를 `sellerOrganizationId` 로 조회 = **매장이 소비자에게 판매한 주문** | `LEGACY_STORE_COMMERCE` | **제거** |
+| `orders` (ALL_STORE_MENUS) | `/orders` | 매장 = 구매자 | `B2B_ACTIVE_CANONICAL` | 유지 |
+| `orders` (K-Cosmetics) | `/commerce/orders` | 매장 = 구매자 | `B2B_ACTIVE_CANONICAL` | 유지 |
+| `orders` (GlycoPharm) | `/commerce/orders` | 매장 = 구매자 | `B2B_ACTIVE_CANONICAL` | 유지 |
+| `orders` (KPA, '발주 내역') | `/commerce/orders` | 매장 = 구매자 | `B2B_ACTIVE_CANONICAL` | 유지 (라벨만 정비 완료) |
+
+제거 근거: 해당 행의 원본 주석 자체가 "판매(seller) 주문 관리" 라고 적고 있었고,
+백엔드 `GET|PATCH /kpa/checkout/store-orders*` 는 `8b31e2ce4` 에서 이미 제거되었다.
+제거 자리에는 **canonical 4행을 지우지 말라는 ⚠️ 경고 주석**을 남겼다.
+
+문서 정합: `packages/shared-space-ui/src/guide/copy/kpa.ts` 의
+`주문 관리 → /store/commerce/order-worktable — 주문 상태·배송` 안내는 작업대의 주문 실행 leg 은퇴 이후
+사실과 달랐다 → `발주 내역 → /store/commerce/orders` 로 정정.
+
+검증: `@o4o/web-kpa-society` · `@o4o/web-k-cosmetics` · `glycopharm-web` · `pharmacy-hub-web`
+4개 서비스 build(tsc + vite) PASS, eslint PASS.
+
+### 10-4. 배포
+
+`8b31e2ce4` (백엔드 은퇴 본체) 는 이미 2026-08-25 10:08 푸시에서 배포 성공한 상태였다
+(Deploy API `32835719671`, Deploy Web `32835719587`, 모두 `success`).
+
+`ccee613cd` (D-1) 배포 — 2026-08-26 00:38 push, 전 건 `success`:
+
+| workflow | run | 결과 | revision |
+|---|---|---|---|
+| Deploy API Server (Cloud Run) | `32915904018` | success (7m47s) | `o4o-core-api-03463-bc4` |
+| Deploy Web Services (Cloud Run) | `32915904054` | success (3m33s) | `kpa-society-web-01890-d65` · `glycopharm-web-01318-rph` · `k-cosmetics-web-01062-q79` · `pharmacy-hub-web-00146-knf` · `neture-web-01515-8p8` · `kpa-branch-web-00062-tcr` |
+| Deploy Admin Dashboard (Cloud Run) | `32915904002` | success (3m13s) | — |
+| CodeQL Security Analysis | `32915904040` | success (3m56s) | — |
+
+### 10-5. D-4 — Production smoke (배포 후 실측)
+
+> 안전한 GET / 410 / 404 / guard 확인만 수행했다.
+> **`실제 PG 결제 / 실제 PG 환불 / 실사용 소비자 주문 생성 / 실사용 주문 상태 변경` 은 수행하지 않았다.**
+> production DB read census 도 자격증명이 없어 수행하지 않았다 → `NO_PRODUCTION_DB_CENSUS` 유지.
+
+**은퇴 경로 — 410 (실측)**
+
+```text
+POST /api/v1/glycopharm/checkout          410  STORE_CONSUMER_ORDER_RETIRED
+POST /api/v1/cosmetics/orders             410  STORE_CONSUMER_ORDER_RETIRED
+POST /api/v1/kpa/checkout                 410  STORE_CONSUMER_ORDER_RETIRED
+POST /api/v1/glycopharm/payments/prepare  410  STORE_SALE_PAYMENT_DEPRECATED
+POST /api/v1/cosmetics/payments/prepare   410  STORE_SALE_PAYMENT_DEPRECATED
+POST /api/v1/kpa/payments/prepare         410  STORE_SALE_PAYMENT_DEPRECATED
+```
+
+**삭제된 route — canonical 404 (410 아님)**
+
+라우트를 통째로 지운 경로는 410 이 아니라 Express 기본 404 로 응답한다. 의도된 결과다.
+410 은 "계약상 은퇴" 를 알려야 하는 **producer 엔드포인트**에만 부여했고,
+seller 축 조회/변경 API 와 플랫폼 직접판매 producer 는 계약 자체가 존재하지 않으므로 404 가 정확하다.
+
+```text
+GET  /api/v1/kpa/checkout/store-orders        404  Cannot GET
+GET  /api/v1/kpa/checkout/store-orders/kpi    404  Cannot GET
+GET  /api/v1/kpa/checkout/store-orders/:id    404  Cannot GET
+POST /api/checkout/initiate                   404  Cannot POST
+POST /api/checkout/confirm                    404  Cannot POST
+```
+
+**보호 대상 회귀 — 5xx / white screen / dead menu / unexpected 404 없음**
+
+```text
+GET /api/v1/pharmacy-hub/service-info                 200  (정보 제공)
+GET /api/v1/pharmacy-hub/store-owner/cart             401  AUTH_REQUIRED  (매장 구매 B2B)
+GET /api/v1/pharmacy-hub/store-owner/orders           401  AUTH_REQUIRED  (공급자→매장 발주)
+GET /api/v1/pharmacy-hub/store-owner/handled-products 401  AUTH_REQUIRED  (상품 공급 신청)
+GET /api/v1/kpa/checkout/orders                       401  AUTH_REQUIRED  (buyer 축 발주 내역)
+GET /api/v1/kpa/store-hub/channels                    401  AUTH_REQUIRED  (외부 판매채널)
+```
+
+`과거 order / checkout 이름이 섞여 있다는 이유로 B2B 기능까지 차단된 사례는 없었다.`
+PharmacyHub 의 `store-owner/cart · orders · payments/prepare · payments/confirm` 은 전부 살아 있다.
+
+프론트엔드:
+
+```text
+https://kpa-society.co.kr/                          200
+https://kpa-society.co.kr/store/online-sales/orders 200  (은퇴 안내 화면)
+https://kpa-society.co.kr/store/commerce/orders     200  (canonical 발주 내역)
+https://glycopharm.co.kr/                           200
+https://k-cosmetics.site/                           200
+https://pharmacyhub.co.kr/                          200
+```
+
+배포된 KPA 번들(`index-DZ8wG3TF.js`, `vendor-o4o-COt1mqU8.js`)에서
+`online-sales-orders` 메뉴 키 **0건** — D-1 이 production 에 반영되었음을 확인했다.
+
+### 10-6. DEFERRED 최종 상태
+
+`DEFERRED = 2` (모두 **의도적** 잔여, 별도 WO 대상).
+
+| # | 상태 |
+|---|---|
+| D-1 | ✅ 마감 (§10-3) |
+| D-2 | ⏸ 유지 — `온라인 판매 > 판매 설정 / 판매 상품`. 신규 B2C 채널 **생성**은 이미 전 서비스 차단(§3-5). 기존 채널 조회·진열은 직전 WO 의 "역사 데이터 보존" 계약이며 거래 경로가 아니다 |
+| D-3 | ⏸ 유지 — 주문 작업대 → canonical `store_cart` 담기 이관. legacy 배관은 잘라냈고, 신규 매핑 설계는 본 트랙 범위 밖 |
+| D-4 | ✅ 마감 (§10-5) |
+
+### 10-7. 문서 정합
+
+- `O4O-STORE-COMMERCE-BOUNDARY-V1` §2 (매장 경영자는 소비자에게 판매하지 않는다 / 매장 판매·결제는 POS / 외부 판매채널이 실제 판매 주체) — 본 종료 결과와 **일치**. 수정 불필요.
+- `O4O-RETAIL-STABLE-V1` · `CHECKOUT-STABLE-DECLARATION-V1` — FROZEN 문서의 역사적 기술 계약은 **수정하지 않았다.**
+- 실제로 사실과 어긋나 고친 문서는 `shared-space-ui/guide/copy/kpa.ts` 안내 문구 1건뿐이다 (§10-3).
+
