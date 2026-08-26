@@ -56,6 +56,7 @@ jest.mock('../utils/logger.js', () => ({
   default: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), debug: jest.fn() },
 }));
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- jest.mock factory 는 hoist 되므로 import 를 쓸 수 없다
 jest.mock('@o4o-apps/cms-core', () => require('@o4o-apps/cms-core/entities'), { virtual: true });
 
 import {
@@ -342,7 +343,7 @@ describe('code lookup 과 migration 계약', () => {
 const PG_URL = process.env.CHANNELS_UQ_PG_URL;
 
 (PG_URL ? describe : describe.skip)('실 Postgres: channels.code 유일성', () => {
-  /* eslint-disable @typescript-eslint/no-var-requires */
+  /* eslint-disable @typescript-eslint/no-require-imports */
   const { DataSource } = require('typeorm');
   const {
     CreateChannelsTable1736600000000,
@@ -350,7 +351,7 @@ const PG_URL = process.env.CHANNELS_UQ_PG_URL;
   const {
     AddChannelsCodeUniqueIndex20270319000000,
   } = require('../database/migrations/20270319000000-AddChannelsCodeUniqueIndex.js');
-  /* eslint-enable @typescript-eslint/no-var-requires */
+  /* eslint-enable @typescript-eslint/no-require-imports */
 
   // baseDs: channels table 만 만드는 상태 (유니크 인덱스 이전)
   // uqDs:   이번 WO 의 migration 까지 포함하는 상태
