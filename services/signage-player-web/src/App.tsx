@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import ChannelPlayerPage from './pages/ChannelPlayerPage'
 import SignagePlayerPage from './pages/SignagePlayerPage'
 
 function App() {
@@ -10,9 +9,8 @@ function App() {
         <Route path="/signage/:serviceKey/channel/:channelId" element={<SignagePlayerPage />} />
         <Route path="/signage/:serviceKey/channel/code/:code" element={<SignagePlayerPage />} />
 
-        {/* Legacy Player routes (backward compatible) */}
-        <Route path="/player/channels/:channelId" element={<ChannelPlayerPage />} />
-        <Route path="/player/channels/code/:code" element={<ChannelPlayerPage />} />
+        {/* [RETIRED] /player/channels/* (CMS Channel 축) — WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1
+            프로덕션 channels 0행. canonical 재생 경로는 Tablet ScreenSet 축이다. */}
 
         {/* Default redirect to a placeholder */}
         <Route path="/" element={<DefaultPage />} />

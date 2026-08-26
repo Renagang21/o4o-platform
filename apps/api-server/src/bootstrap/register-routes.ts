@@ -112,10 +112,10 @@ import { createCmsContentRoutes } from '../routes/cms-content/cms-content.routes
 import { createContentAssetsRoutes } from '../routes/content/content-assets.routes.js';
 import { createDashboardAssetsRoutes } from '../routes/dashboard/dashboard-assets.routes.js';
 import { createSignageRoutes, createSignagePublicRoutes } from '../routes/signage/index.js';
-import { createChannelRoutes } from '../routes/channels/channels.routes.js';
-import { createAdminPlaybackLogRoutes } from '../routes/admin/channel-playback-logs.routes.js';
-import { createAdminHeartbeatRoutes } from '../routes/admin/channel-heartbeat.routes.js';
-import { createAdminChannelOpsRoutes } from '../routes/admin/channel-ops.routes.js';
+// [RETIRED] CMS Channel 축 (channels / channel_heartbeats / channel_playback_logs)
+// WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1
+// 프로덕션 3 테이블 전부 0행. canonical 재생 경로는 Tablet ScreenSet 축이다.
+// → docs/baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md
 import { createAdminOpsMetricsRoutes } from '../routes/admin/ops-metrics.routes.js';
 
 // ============================================================================
@@ -1021,14 +1021,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Dashboard Assets routes:', dashboardAssetsError);
     }
 
-    // 33. Register Channel routes (WO-P4-CHANNEL-IMPLEMENT-P0)
-    try {
-      const channelRoutes = createChannelRoutes(dataSource);
-      app.use('/api/v1/channels', channelRoutes);
-      logger.info('✅ Channel routes registered at /api/v1/channels');
-    } catch (channelError) {
-      logger.error('Failed to register Channel routes:', channelError);
-    }
+    // 33. [RETIRED] Channel routes — /api/v1/channels 는 더 이상 등록하지 않는다.
+    //     WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1
+    //     entity/table/migration 은 보존한다(schema drop 은 후속 단계).
 
     // 33-b-1. Register Signage PUBLIC routes — MUST be BEFORE authenticated routes
     try {
@@ -1048,32 +1043,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Signage routes:', signageError);
     }
 
-    // 34. Register Admin Channel Playback Logs routes (WO-P5-CHANNEL-PLAYBACK-LOG-P0)
-    try {
-      const adminPlaybackLogRoutes = createAdminPlaybackLogRoutes(dataSource);
-      app.use('/api/v1/admin/channel-playback-logs', adminPlaybackLogRoutes);
-      logger.info('✅ Admin Playback Log routes registered at /api/v1/admin/channel-playback-logs');
-    } catch (playbackLogError) {
-      logger.error('Failed to register Admin Playback Log routes:', playbackLogError);
-    }
-
-    // 35. Register Admin Channel Heartbeat routes (WO-P5-CHANNEL-HEARTBEAT-P1)
-    try {
-      const adminHeartbeatRoutes = createAdminHeartbeatRoutes(dataSource);
-      app.use('/api/v1/admin/channels/heartbeat', adminHeartbeatRoutes);
-      logger.info('✅ Admin Heartbeat routes registered at /api/v1/admin/channels/heartbeat');
-    } catch (heartbeatError) {
-      logger.error('Failed to register Admin Heartbeat routes:', heartbeatError);
-    }
-
-    // 36. Register Admin Channel Ops routes (WO-P6-CHANNEL-OPS-DASHBOARD-P0)
-    try {
-      const adminChannelOpsRoutes = createAdminChannelOpsRoutes(dataSource);
-      app.use('/api/v1/admin/channels/ops', adminChannelOpsRoutes);
-      logger.info('✅ Admin Channel Ops routes registered at /api/v1/admin/channels/ops');
-    } catch (channelOpsError) {
-      logger.error('Failed to register Admin Channel Ops routes:', channelOpsError);
-    }
+    // 34~36. [RETIRED] Admin Channel telemetry/ops routes.
+    //     /api/v1/admin/channel-playback-logs · /api/v1/admin/channels/heartbeat
+    //     · /api/v1/admin/channels/ops — 프로덕션 로그 0행, 소비 UI 동반 제거.
+    //     WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1
 
     // 37. Register Admin Ops Metrics routes (WO-NEXT-OPS-METRICS-P0)
     try {

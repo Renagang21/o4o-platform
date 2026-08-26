@@ -488,9 +488,10 @@ import {
   CmsMediaFile,
   CmsMediaFolder,
   CmsMediaTag,
-  // WO-O4O-CHANNELS-TYPEORM-ENTITY-REGISTRATION-AND-RUNTIME-CLOSURE-V1:
-  //   channels runtime 축 3종. /api/v1/channels*, /api/v1/admin/channels/* 라우트가
-  //   getRepository 로 직접 사용하므로 셋을 항상 함께 등록한다(부분 등록 금지).
+  // WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1:
+  //   channels 축 3종 — runtime 은퇴, schema 보존.
+  //   소비 라우트는 모두 제거됐지만 table 을 아직 drop 하지 않았으므로
+  //   metadata 정합을 위해 셋을 항상 함께 등록한다(부분 등록 금지).
   Channel,
   ChannelPlaybackLog,
   ChannelHeartbeat,
@@ -949,8 +950,12 @@ export const entities = [
   CmsMediaFolder,
   CmsMediaTag,
   // ============================================================================
-  // CHANNELS RUNTIME ENTITIES (WO-O4O-CHANNELS-TYPEORM-ENTITY-REGISTRATION-AND-RUNTIME-CLOSURE-V1)
-  // 미등록 시 /api/v1/channels 가 500 No metadata for "Channel" was found. 로 실패한다.
+  // CHANNELS ENTITIES — [RETIRED RUNTIME / RETAINED SCHEMA]
+  // WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1
+  // /api/v1/channels* 는 은퇴했다(라우트·admin UI·player 모두 제거).
+  // entity 는 table 을 아직 drop 하지 않았으므로 등록을 유지한다 — schema drop 은 후속 단계다.
+  // 이 세 entity 를 근거로 channel 라우트를 되살리지 않는다.
+  // canonical 재생 경로: docs/baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md
   // ============================================================================
   Channel,
   ChannelPlaybackLog,

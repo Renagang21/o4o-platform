@@ -220,18 +220,7 @@ export const adminMenuStatic: MenuItem[] = [
         icon: <Layers className="w-4 h-4" />,
         path: '/admin/cms/slots',
       },
-      {
-        id: 'cms-channels',
-        label: 'Channels',
-        icon: <Monitor className="w-4 h-4" />,
-        path: '/admin/cms/channels',
-      },
-      {
-        id: 'cms-channel-ops',
-        label: 'Channel Ops',
-        icon: <Activity className="w-4 h-4" />,
-        path: '/admin/cms/channels/ops',
-      },
+      // [RETIRED] cms-channels / cms-channel-ops — WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1
       {
         id: 'cms-cpts',
         label: 'Post Types',

@@ -48,11 +48,9 @@ const CMSContentList = lazy(() => import('@/pages/cms/contents/CMSContentList'))
 // CMS Slot Management (P3: WO-P3-CMS-SLOT-MANAGEMENT-P1)
 const CMSSlotList = lazy(() => import('@/pages/cms/slots/CMSSlotList'));
 
-// CMS Channel Management (P4: WO-P4-CHANNEL-IMPLEMENT-P0)
-const ChannelList = lazy(() => import('@/pages/cms/channels/ChannelList'));
+// [RETIRED] CMS Channel Management — WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1
 
-// Channel Operations Dashboard (P6: WO-P6-CHANNEL-OPS-DASHBOARD-P0)
-const ChannelOpsDashboard = lazy(() => import('@/pages/channels/ops/ChannelOpsDashboard'));
+// [RETIRED] Channel Operations Dashboard — WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1
 
 // Ops Metrics Dashboard (NEXT: WO-NEXT-OPS-METRICS-P0)
 const OpsMetricsDashboard = lazy(() => import('@/pages/ops/OpsMetricsDashboard'));
@@ -280,23 +278,10 @@ export function ContentRoutes() {
       </AdminProtectedRoute>
     } />,
 
-    // CMS Channel Routes (P4: WO-P4-CHANNEL-IMPLEMENT-P0)
-    <Route key="/admin/cms/channels" path="/admin/cms/channels" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <ChannelList />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // Channel Operations Dashboard (P6: WO-P6-CHANNEL-OPS-DASHBOARD-P0)
-    <Route key="/admin/cms/channels/ops" path="/admin/cms/channels/ops" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <ChannelOpsDashboard />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
+    // [RETIRED] /admin/cms/channels · /admin/cms/channels/ops
+    //   WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1
+    //   프로덕션 channels 0행. canonical 재생 경로는 Tablet ScreenSet 축이다.
+    //   (여기의 'channels' 는 CMS 방송 채널이며, 매장 판매채널 organization_channels 와 무관하다.)
 
     // Ops Metrics Dashboard (NEXT: WO-NEXT-OPS-METRICS-P0)
     <Route key="/admin/ops/metrics" path="/admin/ops/metrics" element={
