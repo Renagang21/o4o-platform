@@ -83,6 +83,14 @@ jobs:
     - name: Guard unsafe operational routes
       run: node scripts/check-unsafe-routes.mjs
 
+    # WO-O4O-TYPEORM-ENTITY-REGISTRY-INTEGRITY-GUARD-AND-CI-ADOPTION-V1
+    # 2026-08-25 사고(AiEngine/AiQueryPolicy/AiQueryLog 미등록 → /api/ai/admin/** 전면 500) 재발 방지. blocking.
+    #   apps/api-server/src/database/entities.ts = runtime entity registry SSOT
+    #   정의 ↔ registry 불일치(미등록 · 중복 · stale import · 배열 누락)를 정적으로 차단한다.
+    # DB 연결도 secret 도 필요 없는 순수 정적 검사다. 규칙 본문은 scripts/check-typeorm-entities.mjs 상단 주석 참조.
+    - name: Guard TypeORM entity registry integrity
+      run: node scripts/check-typeorm-entities.mjs
+
     - name: Check for console.log statements
       run: |
         # Find all console.log statements, excluding comments, test files, CLI scripts, config files, migrations, and logger utilities

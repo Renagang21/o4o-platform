@@ -353,6 +353,7 @@ import {
 // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
 // ============================================================================
 import {
+  PartnerApplication,
   PartnerContent,
   PartnerEvent,
   PartnerTarget,
@@ -853,6 +854,9 @@ export const entities = [
   PartnerContent,
   PartnerEvent,
   PartnerTarget,
+  // WO-PARTNER-APPLICATION-V1 / WO-O4O-TYPEORM-ENTITY-REGISTRY-INTEGRITY-GUARD-AND-CI-ADOPTION-V1
+  // /api/v1/partner/applications 가 getRepository(PartnerApplication) 로 소비한다 (미등록 시 500)
+  PartnerApplication,
   // ============================================================================
   // CONTENT TEMPLATE ENTITY (WO-O4O-CONTENT-TEMPLATE-SYSTEM-V1)
   // ============================================================================
