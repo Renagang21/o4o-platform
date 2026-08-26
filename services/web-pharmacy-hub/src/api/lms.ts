@@ -273,12 +273,25 @@ export const lmsApi = {
   getInstructorCourses: (): Promise<ApiResponse<LmsCourse[]>> =>
     lmsHttp.get<ApiResponse<LmsCourse[]>>('/lms/instructor/courses', { serviceKey: PH_SERVICE_KEY }),
 
+  // WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10:
+  //   backend envelope 은 `{ success, data: { courses: [...] } }` 이고 각 행은
+  //   `courseId / totalEnrollments` 이름을 쓴다 (KPA 소비 형태와 동일).
+  //   PH adapter 가 배열로 가정해 언제나 빈 목록이 됐고, 강사 대시보드가
+  //   `총 강의 0 / 등록된 강의가 없습니다` 로 고정 표시됐다 — production 실측 결함.
   instructorDashboardCourses: async (): Promise<{ data: InstructorDashboardCourse[] }> => {
     const { data } = await api.get<any>('/lms/instructor/dashboard/courses', {
       params: { serviceKey: PH_SERVICE_KEY },
     });
-    const list = data?.data ?? data;
-    return { data: Array.isArray(list) ? list : [] };
+    const payload = data?.data ?? data;
+    const list = Array.isArray(payload) ? payload : (payload?.courses ?? []);
+    return {
+      data: (Array.isArray(list) ? list : []).map((c: any) => ({
+        ...c,
+        id: c.id ?? c.courseId,
+        enrolledCount: c.enrolledCount ?? c.totalEnrollments,
+        completionRate: c.completionRate,
+      })) as InstructorDashboardCourse[],
+    };
   },
 
   instructorPendingEnrollments: async (): Promise<PendingEnrollment[]> => {

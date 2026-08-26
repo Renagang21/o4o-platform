@@ -75,6 +75,13 @@ describe('LMS instructor 목록 — service scope (§10/§13)', () => {
       expect(kpaLms).toContain('new URLSearchParams({ serviceKey: KPA_SERVICE_KEY })');
     });
 
+    it('PH 강사 대시보드가 backend envelope(`data.courses`)을 그대로 해석한다', () => {
+      // 배열로 가정하면 언제나 빈 목록이 되어 `총 강의 0` 이 고정된다 (production 실측 결함).
+      expect(phLms).toContain('const list = Array.isArray(payload) ? payload : (payload?.courses ?? []);');
+      expect(phLms).toContain('id: c.id ?? c.courseId');
+      expect(phLms).toContain('enrolledCount: c.enrolledCount ?? c.totalEnrollments');
+    });
+
     it('응답을 프런트에서 걸러내지 않는다 (client-side filtering 금지)', () => {
       for (const src of [phLms, kpaLms]) {
         expect(src).not.toMatch(/\.filter\([^)]*serviceKey/);
