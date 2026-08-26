@@ -96,7 +96,9 @@ export default function ChannelPlayerPage() {
   useEffect(() => {
     if (!channel || !channel.autoplay) return
 
-    const refreshInterval = channel.refreshIntervalSec * 1000
+    // WO-O4O-SIGNAGE-PLAYER-CHANNEL-CODE-LOOKUP-CONTRACT-CLOSURE-V1:
+    //   서버 refreshIntervalSec 은 nullable 이다(미설정 채널). null 이면 자동 갱신 없음.
+    const refreshInterval = (channel.refreshIntervalSec ?? 0) * 1000
     if (refreshInterval <= 0) return
 
     refreshTimerRef.current = window.setInterval(() => {
@@ -232,7 +234,7 @@ export default function ChannelPlayerPage() {
   return (
     <div className="player-container">
       <ContentRenderer
-        key={currentContent.id}
+        key={currentContent.slotId}
         content={currentContent}
         onVideoEnded={handleVideoEnded}
       />

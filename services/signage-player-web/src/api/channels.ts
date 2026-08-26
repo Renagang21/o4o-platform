@@ -1,6 +1,17 @@
 /**
  * Channel API Client for Signage Player
  * WO-P5-SIGNAGE-PLAYER-WEB-P0
+ *
+ * WO-O4O-SIGNAGE-PLAYER-CHANNEL-CODE-LOOKUP-CONTRACT-CLOSURE-V1
+ *
+ * 이 클라이언트는 `/api/v1/channels` (CMS channels 축)를 쓴다.
+ * (`SignagePlayerPage` 계열이 쓰는 `/api/signage/:serviceKey/*` 는 다른 축이다.)
+ *
+ * 서버 계약(확정):
+ *   - 목록 `GET /channels` 는 **enumeration** 이며 serviceKey 를 요구한다.
+ *     player 는 serviceKey 를 갖지 않으므로 목록을 호출하지 않는다.
+ *   - code 단건 조회는 `GET /channels/code/:code` 가 canonical 이다(익명 허용).
+ *   - 모든 단건 응답은 `{ success, data }` envelope 이다.
  */
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr'
@@ -11,10 +22,10 @@ export type Orientation = 'landscape' | 'portrait'
 
 export interface Channel {
   id: string
-  organizationId: string
-  serviceKey: string
+  organizationId: string | null
+  serviceKey: string | null
   name: string
-  code: string
+  code: string | null
   description?: string
   type: ChannelType
   slotKey: string
@@ -22,7 +33,7 @@ export interface Channel {
   resolution?: string
   orientation: Orientation
   autoplay: boolean
-  refreshIntervalSec: number
+  refreshIntervalSec: number | null
   defaultDurationSec: number
   location?: string
   metadata?: Record<string, unknown>
@@ -30,27 +41,27 @@ export interface Channel {
   updatedAt: string
 }
 
+/**
+ * player 가 실제로 사용하는 슬롯/콘텐츠 형태.
+ *
+ * 서버 `GET /channels/:id/contents` 는
+ *   { slotId, sortOrder, startsAt, endsAt, content: { id, type, title, summary, body, imageUrl, ... } }
+ * 를 돌려준다. 렌더러(ContentRenderer/getContentDuration)가 쓰는 이름과 다르므로
+ * **adapter 에서 서버 필드를 그대로 옮겨 담는다** — 새 필드를 만들어내지 않는다.
+ */
 export interface ChannelContent {
-  id: string
   slotId: string
-  contentId: string
-  slotKey: string
-  scope: string
   displayOrder: number
-  isActive: boolean
-  startDate?: string
-  endDate?: string
+  startDate: string | null
+  endDate: string | null
   content: {
     id: string
     title: string
-    slug: string
     contentType: string
-    status: string
     body?: string
     excerpt?: string
     featuredImage?: string
     metadata?: Record<string, unknown>
-    publishedAt?: string
   }
 }
 
@@ -60,11 +71,42 @@ export interface ChannelContentsResponse {
   totalCount: number
 }
 
+/** 서버 공통 envelope. */
+interface ApiEnvelope<T> {
+  success: boolean
+  data: T
+  error?: { code: string; message: string }
+}
+
+/** 서버 `/channels/:id/contents` 원본 응답. */
+interface ServerChannelContentsResponse {
+  success: boolean
+  data: Array<{
+    slotId: string
+    sortOrder: number
+    startsAt: string | null
+    endsAt: string | null
+    content: {
+      id: string
+      type: string
+      title: string
+      summary: string | null
+      body: string | null
+      imageUrl: string | null
+      linkUrl: string | null
+      linkText: string | null
+      metadata: Record<string, unknown>
+    }
+  }>
+  channel: Channel
+  meta: { total: number; fetchedAt?: string; message?: string }
+}
+
 /**
  * Fetch channel by ID
  */
 export async function fetchChannel(channelId: string): Promise<Channel> {
-  const response = await fetch(`${API_URL}/api/v1/channels/${channelId}`)
+  const response = await fetch(`${API_URL}/api/v1/channels/${encodeURIComponent(channelId)}`)
 
   if (!response.ok) {
     if (response.status === 404) {
@@ -73,33 +115,45 @@ export async function fetchChannel(channelId: string): Promise<Channel> {
     throw new Error(`Failed to fetch channel: ${response.status}`)
   }
 
-  return response.json()
+  return unwrapChannel(await response.json())
 }
 
 /**
- * Fetch channel by code
+ * Fetch channel by code — canonical exact lookup.
+ *
+ * 이전 구현은 `GET /channels?code=` 로 **목록 endpoint** 를 호출한 뒤 `data[0]` 을 썼다.
+ * 서버에는 `code` 목록 필터가 구현된 적이 없어서 그 호출은 필터가 무시된 전체 목록의
+ * 임의 첫 채널을 돌려주고 있었다(= 잘못된 채널 재생). 목록은 이제 serviceKey 를
+ * 요구하므로 400 이기도 하다. 단건 주소 조회는 처음부터 존재하던 `/channels/code/:code`
+ * 가 canonical 이다 — 목록 계약을 되살리지 않고 이쪽으로 수렴한다.
  */
 export async function fetchChannelByCode(code: string): Promise<Channel> {
-  const response = await fetch(`${API_URL}/api/v1/channels?code=${encodeURIComponent(code)}`)
+  const response = await fetch(`${API_URL}/api/v1/channels/code/${encodeURIComponent(code)}`)
 
   if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error('Channel not found')
+    }
     throw new Error(`Failed to fetch channel: ${response.status}`)
   }
 
-  const result = await response.json()
+  return unwrapChannel(await response.json())
+}
 
-  if (!result.data || result.data.length === 0) {
+/** 단건 응답 envelope 을 벗긴다. envelope 자체를 Channel 로 취급하면 id 가 undefined 가 된다. */
+function unwrapChannel(payload: ApiEnvelope<Channel> | Channel): Channel {
+  const channel = (payload as ApiEnvelope<Channel>)?.data ?? (payload as Channel)
+  if (!channel || !channel.id) {
     throw new Error('Channel not found')
   }
-
-  return result.data[0]
+  return channel
 }
 
 /**
  * Fetch channel contents for playback
  */
 export async function fetchChannelContents(channelId: string): Promise<ChannelContentsResponse> {
-  const response = await fetch(`${API_URL}/api/v1/channels/${channelId}/contents`)
+  const response = await fetch(`${API_URL}/api/v1/channels/${encodeURIComponent(channelId)}/contents`)
 
   if (!response.ok) {
     if (response.status === 404) {
@@ -108,7 +162,30 @@ export async function fetchChannelContents(channelId: string): Promise<ChannelCo
     throw new Error(`Failed to fetch channel contents: ${response.status}`)
   }
 
-  return response.json()
+  const payload = (await response.json()) as ServerChannelContentsResponse
+
+  // 서버 필드명을 렌더러가 쓰는 이름으로 옮긴다(값의 의미는 그대로다).
+  const contents: ChannelContent[] = (payload.data ?? []).map((slot) => ({
+    slotId: slot.slotId,
+    displayOrder: slot.sortOrder,
+    startDate: slot.startsAt,
+    endDate: slot.endsAt,
+    content: {
+      id: slot.content.id,
+      title: slot.content.title,
+      contentType: slot.content.type,
+      body: slot.content.body ?? undefined,
+      excerpt: slot.content.summary ?? undefined,
+      featuredImage: slot.content.imageUrl ?? undefined,
+      metadata: slot.content.metadata,
+    },
+  }))
+
+  return {
+    channel: payload.channel,
+    contents,
+    totalCount: payload.meta?.total ?? contents.length,
+  }
 }
 
 /**

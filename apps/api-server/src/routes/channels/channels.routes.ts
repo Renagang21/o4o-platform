@@ -170,8 +170,16 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       const { code } = req.params;
       const channelRepo = dataSource.getRepository(Channel);
 
+      // WO-O4O-SIGNAGE-PLAYER-CHANNEL-CODE-LOOKUP-CONTRACT-CLOSURE-V1 §13:
+      //   code 는 platform-global 식별자다 — 생성/수정 시 serviceKey 무관하게
+      //   중복을 거부한다(409 DUPLICATE_CODE). 다만 DB unique constraint 는 아직 없어
+      //   경쟁 조건으로 중복 row 가 생기면 findOne 이 임의의 한 건을 돌려준다.
+      //   exact lookup 이 호출마다 다른 채널을 재생시키지 않도록 **가장 오래된 행**으로
+      //   고정한다(중복 방지 정책상 원본이 먼저 만들어진 행이다).
+      //   unique constraint 추가는 이 WO 범위 밖(§30).
       const channel = await channelRepo.findOne({
         where: { code },
+        order: { createdAt: 'ASC' },
       });
 
       if (!channel) {
