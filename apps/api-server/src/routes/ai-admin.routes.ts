@@ -20,6 +20,7 @@ import { requireAdmin } from '../middleware/auth.middleware.js';
 import { aiAdminService } from '../services/ai-admin.service.js';
 import { AppDataSource } from '../database/connection.js';
 import type { AuthRequest } from '../types/auth.js';
+import logger from '../utils/logger.js';
 
 const router: Router = Router();
 
@@ -39,6 +40,7 @@ router.get('/dashboard', authenticate, requireAdmin, async (req, res: Response) 
       data: dashboard,
     });
   } catch (error: any) {
+    logger.error('AI Admin: dashboard 조회 실패', error);
     return res.status(500).json({
       success: false,
       error: '대시보드 데이터 조회 중 오류가 발생했습니다.',
@@ -62,6 +64,7 @@ router.get('/engines', authenticate, requireAdmin, async (req, res: Response) =>
       data: engines,
     });
   } catch (error: any) {
+    logger.error('AI Admin: 엔진 목록 조회 실패', error);
     return res.status(500).json({
       success: false,
       error: '엔진 목록 조회 중 오류가 발생했습니다.',
@@ -113,6 +116,7 @@ router.get('/policy', authenticate, requireAdmin, async (req, res: Response) => 
       data: policy,
     });
   } catch (error: any) {
+    logger.error('AI Admin: 정책 조회 실패', error);
     return res.status(500).json({
       success: false,
       error: '정책 조회 중 오류가 발생했습니다.',
@@ -166,6 +170,7 @@ router.get('/usage', authenticate, requireAdmin, async (req, res: Response) => {
       data: usage,
     });
   } catch (error: any) {
+    logger.error('AI Admin: 사용량 통계 조회 실패', error);
     return res.status(500).json({
       success: false,
       error: '사용량 통계 조회 중 오류가 발생했습니다.',

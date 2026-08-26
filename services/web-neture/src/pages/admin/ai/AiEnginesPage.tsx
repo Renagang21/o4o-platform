@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { api, API_BASE_URL } from '../../../lib/apiClient';
+import { AiAdminEmptyState, AiAdminErrorState, toAiAdminError, type AiAdminError } from './AiAdminStates';
 
 interface AiEngine {
   id: number;
@@ -25,6 +26,7 @@ export default function AiEnginesPage() {
   const [engines, setEngines] = useState<AiEngine[]>([]);
   const [loading, setLoading] = useState(true);
   const [activating, setActivating] = useState<number | null>(null);
+  const [error, setError] = useState<AiAdminError | null>(null);
 
   useEffect(() => {
     fetchEngines();
@@ -32,13 +34,19 @@ export default function AiEnginesPage() {
 
   const fetchEngines = async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data } = await api.get(`${API_BASE_URL}/api/ai/admin/engines`);
       if (data?.success) {
         setEngines(data.data);
+      } else {
+        setEngines([]);
+        setError({ status: 200, message: data?.error || '엔진 목록 응답 형식이 올바르지 않습니다.' });
       }
-    } catch (error) {
-      console.error('Failed to fetch engines:', error);
+    } catch (err) {
+      // 조회 실패를 빈 목록으로 위장하지 않는다.
+      setEngines([]);
+      setError(toAiAdminError(err));
     } finally {
       setLoading(false);
     }
@@ -148,6 +156,10 @@ export default function AiEnginesPage() {
           <div className="flex justify-center items-center h-64">
             <div className="text-gray-500">로딩 중...</div>
           </div>
+        ) : error ? (
+          <AiAdminErrorState error={error} onRetry={fetchEngines} retrying={loading} />
+        ) : engines.length === 0 ? (
+          <AiAdminEmptyState message="등록된 AI 엔진이 없습니다." />
         ) : (
           <div className="space-y-4">
             {engines.map((engine) => (

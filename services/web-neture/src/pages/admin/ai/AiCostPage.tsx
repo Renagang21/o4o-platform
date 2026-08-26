@@ -1,179 +1,71 @@
 /**
- * AiCostPage - 관리자 AI 비용 가시화 대시보드
+ * AiCostPage - 관리자 AI 비용 현황
  *
  * Work Order: WO-AI-COST-TOOLING-V1
- *
- * AI 운영 비용을 엔진별·서비스별·기간별로 가시화
- * - 비용 통제 도구 ❌
- * - 운영 판단/전략 의사결정 지원 도구 ⭕
+ * 개정: WO-O4O-NETURE-AI-ADMIN-API-500-ROOT-CAUSE-AND-PRODUCTION-CLOSURE-V1
+ *   - mock 데이터 표시를 제거하고 실제 집계 API(/api/ai/admin/analytics/*)에 연결한다.
+ *   - 백엔드 근거가 없는 지표(일별 추이, 패키지 준수율, 내부 단가표)는 표시하지 않는다.
+ *   - 조회 실패를 0건/빈 화면으로 위장하지 않는다.
  */
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
-import {
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
-  Activity,
-  Server,
-  Building2,
-  Calendar,
-  BarChart3,
-  PieChart,
-  Info,
-  Package,
-} from 'lucide-react';
-import {
-  type CostDashboardData,
-  type ServiceCostData,
-  type EngineCostData,
-  getCostLevel,
-  getCostLevelInfo,
-  formatCost,
-  formatPercent,
-  ENGINE_PRICING_TABLE,
-} from './aiCostConfig';
+import { Activity, BarChart3, DollarSign, Info, Server } from 'lucide-react';
+import { api, API_BASE_URL } from '../../../lib/apiClient';
+import { formatCost } from './aiCostConfig';
+import { AiAdminEmptyState, AiAdminErrorState, toAiAdminError, type AiAdminError } from './AiAdminStates';
 
-// ===== Mock 데이터 =====
-const mockCostData: CostDashboardData = {
-  summary: {
-    totalRequests: 15420,
-    totalCost: 18250.5,
-    avgCostPerRequest: 1.18,
-  },
-  byService: [
-    {
-      serviceId: 'neture',
-      serviceName: '네뚜레 (Neture)',
-      requests: 4520,
-      cost: 5424.0,
-      avgCost: 1.2,
-      packageCompliance: 100,
-    },
-    {
-      serviceId: 'k-cosmetics',
-      serviceName: 'K-코스메틱',
-      requests: 3890,
-      cost: 4279.0,
-      avgCost: 1.1,
-      packageCompliance: 91,
-    },
-    {
-      serviceId: 'glycopharm',
-      serviceName: '글라이코팜',
-      requests: 3210,
-      cost: 4173.0,
-      avgCost: 1.3,
-      packageCompliance: 70,
-    },
-    {
-      serviceId: 'kpa-society',
-      serviceName: 'KPA 약사회',
-      requests: 1650,
-      cost: 2009.5,
-      avgCost: 1.22,
-      packageCompliance: 100,
-    },
-  ],
-  byEngine: [
-    {
-      engineId: 'gemini-2.5-flash',
-      engineName: 'Gemini 2.5 Flash',
-      requests: 8500,
-      cost: 8500.0,
-      percentage: 46.6,
-    },
-    {
-      engineId: 'gemini-2.0-flash',
-      engineName: 'Gemini 2.0 Flash',
-      requests: 4200,
-      cost: 2940.0,
-      percentage: 16.1,
-    },
-    {
-      engineId: 'gpt-4o-mini',
-      engineName: 'GPT-4o Mini',
-      requests: 1820,
-      cost: 1456.0,
-      percentage: 8.0,
-    },
-    {
-      engineId: 'gemini-2.5-pro',
-      engineName: 'Gemini 2.5 Pro',
-      requests: 650,
-      cost: 1950.0,
-      percentage: 10.7,
-    },
-    {
-      engineId: 'claude-3-sonnet',
-      engineName: 'Claude 3 Sonnet',
-      requests: 250,
-      cost: 500.0,
-      percentage: 2.7,
-    },
-  ],
-  dailyTrend: [
-    { date: '2026-01-10', requests: 2100, cost: 2520.0 },
-    { date: '2026-01-11', requests: 2250, cost: 2700.0 },
-    { date: '2026-01-12', requests: 1980, cost: 2376.0 },
-    { date: '2026-01-13', requests: 2320, cost: 2784.0 },
-    { date: '2026-01-14', requests: 2180, cost: 2616.0 },
-    { date: '2026-01-15', requests: 2150, cost: 2580.0 },
-    { date: '2026-01-16', requests: 2440, cost: 2674.5 },
-  ],
-  period: {
-    start: '2026-01-10',
-    end: '2026-01-16',
-  },
-};
+interface CostSummaryResponse {
+  totalRequests: number;
+  totalTokens: number;
+  totalCost: number;
+  avgDurationMs: number;
+  errorRate: number;
+  successCount: number;
+  errorCount: number;
+  days: number;
+}
 
-// ===== 유틸 함수 =====
+interface ScopeCostRow {
+  scope: string;
+  requests: number;
+  tokens: number;
+  cost: number;
+  latency: number;
+  errors: number;
+}
+
+interface ModelCostRow {
+  provider: string;
+  model: string;
+  requests: number;
+  tokens: number;
+  cost: number;
+  errors: number;
+}
+
+const DAY_OPTIONS = [7, 30, 90];
+
 const formatNumber = (num: number) => num.toLocaleString('ko-KR');
 
-const formatDateShort = (dateStr: string) => {
-  const date = new Date(dateStr);
-  return `${date.getMonth() + 1}/${date.getDate()}`;
-};
-
-// ===== 컴포넌트 =====
-
-// 요약 카드
 function SummaryCard({
   icon: Icon,
   label,
   value,
   subValue,
-  trend,
   iconColor,
 }: {
   icon: typeof DollarSign;
   label: string;
   value: string;
   subValue?: string;
-  trend?: { value: number; isUp: boolean };
   iconColor: string;
 }) {
   return (
     <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-      <div className="flex items-start justify-between">
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${iconColor}`}>
-          <Icon className="w-5 h-5" />
-        </div>
-        {trend && (
-          <div
-            className={`flex items-center gap-1 text-xs font-medium ${
-              trend.isUp ? 'text-red-600' : 'text-green-600'
-            }`}
-          >
-            {trend.isUp ? (
-              <TrendingUp className="w-3 h-3" />
-            ) : (
-              <TrendingDown className="w-3 h-3" />
-            )}
-            {trend.value}%
-          </div>
-        )}
+      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${iconColor}`}>
+        <Icon className="w-5 h-5" />
       </div>
       <div className="mt-3">
         <div className="text-2xl font-bold text-gray-900">{value}</div>
@@ -184,257 +76,145 @@ function SummaryCard({
   );
 }
 
-// 서비스별 비용 테이블
-// WO-O4O-NETURE-EXPANDABLE-AND-REMAINING-LISTS-STANDARDIZATION-BATCH-V5:
-//   실제 목록(서비스별 비용)만 공용 DataTable 로 전환. 요약/분포/추이 차트는 리포트 레이아웃이라 유지.
-//   집계 값(요청수·비용·평균·준수율) 계산 로직은 변경하지 않고 표시만 옮긴다.
-function ServiceCostTable({ data }: { data: ServiceCostData[] }) {
-  const sortedData = [...data].sort((a, b) => b.cost - a.cost);
+export default function AiCostPage() {
+  const [days, setDays] = useState(7);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<AiAdminError | null>(null);
+  const [summary, setSummary] = useState<CostSummaryResponse | null>(null);
+  const [byScope, setByScope] = useState<ScopeCostRow[]>([]);
+  const [byModel, setByModel] = useState<ModelCostRow[]>([]);
 
-  const columns: ListColumnDef<ServiceCostData>[] = [
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [summaryRes, scopeRes, modelRes] = await Promise.all([
+        api.get(`${API_BASE_URL}/api/ai/admin/analytics/summary?days=${days}`),
+        api.get(`${API_BASE_URL}/api/ai/admin/analytics/by-scope?days=${days}`),
+        api.get(`${API_BASE_URL}/api/ai/admin/analytics/by-model?days=${days}`),
+      ]);
+
+      if (!summaryRes.data?.success || !scopeRes.data?.success || !modelRes.data?.success) {
+        setSummary(null);
+        setByScope([]);
+        setByModel([]);
+        setError({ status: 200, message: '비용 집계 응답 형식이 올바르지 않습니다.' });
+        return;
+      }
+
+      setSummary(summaryRes.data.data);
+      setByScope(scopeRes.data.data || []);
+      setByModel(modelRes.data.data || []);
+    } catch (err) {
+      setSummary(null);
+      setByScope([]);
+      setByModel([]);
+      setError(toAiAdminError(err));
+    } finally {
+      setLoading(false);
+    }
+  }, [days]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const scopeColumns: ListColumnDef<ScopeCostRow>[] = [
     {
-      key: 'serviceName',
-      header: '서비스',
+      key: 'scope',
+      header: '스코프',
       minWidth: 160,
-      render: (_v, service) => <div className="font-medium text-gray-900">{service.serviceName}</div>,
+      render: (_v, row) => <div className="font-medium text-gray-900">{row.scope}</div>,
     },
     {
       key: 'requests',
       header: '요청 수',
       align: 'right',
       width: '100px',
-      render: (_v, service) => <span className="text-gray-600">{formatNumber(service.requests)}</span>,
+      render: (_v, row) => <span className="text-gray-600">{formatNumber(row.requests)}</span>,
+    },
+    {
+      key: 'tokens',
+      header: '토큰',
+      align: 'right',
+      width: '110px',
+      render: (_v, row) => <span className="text-gray-600">{formatNumber(row.tokens)}</span>,
     },
     {
       key: 'cost',
-      header: '총 비용',
+      header: '추정 비용',
       align: 'right',
       width: '110px',
-      render: (_v, service) => <span className="font-medium text-gray-900">{formatCost(service.cost)}</span>,
+      render: (_v, row) => <span className="font-medium text-gray-900">{formatCost(row.cost)}</span>,
     },
     {
-      key: 'avgCost',
-      header: '평균 비용',
+      key: 'latency',
+      header: '평균 지연(ms)',
       align: 'right',
-      width: '110px',
-      render: (_v, service) => {
-        const levelInfo = getCostLevelInfo(getCostLevel(service.avgCost));
-        return (
-          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${levelInfo.bgColor} ${levelInfo.color}`}>
-            {formatCost(service.avgCost)}
-          </span>
-        );
-      },
+      width: '130px',
+      render: (_v, row) => <span className="text-gray-600">{formatNumber(row.latency)}</span>,
     },
     {
-      key: 'packageCompliance',
-      header: '패키지 준수율',
+      key: 'errors',
+      header: '오류',
       align: 'right',
-      width: '150px',
-      render: (_v, service) => (
-        <div className="flex items-center justify-end gap-2">
-          <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full ${
-                service.packageCompliance >= 100
-                  ? 'bg-green-500'
-                  : service.packageCompliance >= 70
-                    ? 'bg-amber-500'
-                    : 'bg-red-500'
-              }`}
-              style={{ width: `${Math.min(service.packageCompliance, 100)}%` }}
-            />
-          </div>
-          <span
-            className={`text-xs font-medium ${
-              service.packageCompliance >= 100
-                ? 'text-green-600'
-                : service.packageCompliance >= 70
-                  ? 'text-amber-600'
-                  : 'text-red-600'
-            }`}
-          >
-            {service.packageCompliance}%
-          </span>
-        </div>
+      width: '90px',
+      render: (_v, row) => (
+        <span className={row.errors > 0 ? 'text-red-600 font-medium' : 'text-gray-400'}>
+          {formatNumber(row.errors)}
+        </span>
       ),
     },
   ];
 
-  return (
-    <div>
-      <h3 className="font-semibold text-gray-900 flex items-center gap-2 mb-3">
-        <Building2 className="w-5 h-5 text-gray-400" />
-        서비스별 비용
-      </h3>
-      <DataTable<ServiceCostData>
-        columns={columns}
-        data={sortedData}
-        rowKey={(s) => s.serviceId}
-        emptyMessage="서비스별 비용 내역이 없습니다."
-      />
-    </div>
-  );
-}
-
-// 엔진별 비용 분포
-function EngineCostDistribution({ data }: { data: EngineCostData[] }) {
-  const sortedData = [...data].sort((a, b) => b.percentage - a.percentage);
-  const colors = [
-    'bg-blue-500',
-    'bg-green-500',
-    'bg-amber-500',
-    'bg-purple-500',
-    'bg-pink-500',
-    'bg-cyan-500',
+  const modelColumns: ListColumnDef<ModelCostRow>[] = [
+    {
+      key: 'model',
+      header: '모델',
+      minWidth: 180,
+      render: (_v, row) => (
+        <div>
+          <div className="font-medium text-gray-900">{row.model || '-'}</div>
+          <div className="text-xs text-gray-400">{row.provider || '-'}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'requests',
+      header: '요청 수',
+      align: 'right',
+      width: '100px',
+      render: (_v, row) => <span className="text-gray-600">{formatNumber(row.requests)}</span>,
+    },
+    {
+      key: 'tokens',
+      header: '토큰',
+      align: 'right',
+      width: '110px',
+      render: (_v, row) => <span className="text-gray-600">{formatNumber(row.tokens)}</span>,
+    },
+    {
+      key: 'cost',
+      header: '추정 비용',
+      align: 'right',
+      width: '110px',
+      render: (_v, row) => <span className="font-medium text-gray-900">{formatCost(row.cost)}</span>,
+    },
+    {
+      key: 'errors',
+      header: '오류',
+      align: 'right',
+      width: '90px',
+      render: (_v, row) => (
+        <span className={row.errors > 0 ? 'text-red-600 font-medium' : 'text-gray-400'}>
+          {formatNumber(row.errors)}
+        </span>
+      ),
+    },
   ];
 
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-      <div className="p-4 border-b border-gray-100">
-        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-          <Server className="w-5 h-5 text-gray-400" />
-          엔진별 비용 분포
-        </h3>
-      </div>
-      <div className="p-4">
-        {/* 비용 분포 바 */}
-        <div className="h-4 rounded-full overflow-hidden flex mb-4">
-          {sortedData.map((engine, idx) => (
-            <div
-              key={engine.engineId}
-              className={`${colors[idx % colors.length]} transition-all`}
-              style={{ width: `${engine.percentage}%` }}
-              title={`${engine.engineName}: ${formatPercent(engine.percentage)}`}
-            />
-          ))}
-        </div>
-
-        {/* 범례 */}
-        <div className="space-y-2">
-          {sortedData.map((engine, idx) => (
-            <div key={engine.engineId} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${colors[idx % colors.length]}`} />
-                <span className="text-sm text-gray-700">{engine.engineName}</span>
-              </div>
-              <div className="flex items-center gap-4 text-sm">
-                <span className="text-gray-500">{formatNumber(engine.requests)}건</span>
-                <span className="font-medium text-gray-900 w-16 text-right">
-                  {formatCost(engine.cost)}
-                </span>
-                <span className="text-gray-600 w-12 text-right">
-                  {formatPercent(engine.percentage)}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// 일별 추이 차트
-function DailyTrendChart({ data }: { data: CostDashboardData['dailyTrend'] }) {
-  const maxCost = Math.max(...data.map((d) => d.cost));
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-      <div className="p-4 border-b border-gray-100">
-        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-gray-400" />
-          일별 비용 추이
-        </h3>
-      </div>
-      <div className="p-4">
-        <div className="flex items-end justify-between gap-2 h-40">
-          {data.map((day) => (
-            <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-              <div className="text-xs text-gray-500 font-medium">{formatCost(day.cost)}</div>
-              <div className="w-full bg-gray-100 rounded-t-sm relative" style={{ height: '120px' }}>
-                <div
-                  className="absolute bottom-0 left-0 right-0 bg-primary-500 rounded-t-sm transition-all"
-                  style={{ height: `${(day.cost / maxCost) * 100}%` }}
-                />
-              </div>
-              <div className="text-xs text-gray-400">{formatDateShort(day.date)}</div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-3 gap-4 text-center">
-          <div>
-            <div className="text-lg font-bold text-gray-900">
-              {formatCost(data.reduce((sum, d) => sum + d.cost, 0) / data.length)}
-            </div>
-            <div className="text-xs text-gray-500">일 평균 비용</div>
-          </div>
-          <div>
-            <div className="text-lg font-bold text-gray-900">
-              {formatNumber(data.reduce((sum, d) => sum + d.requests, 0))}
-            </div>
-            <div className="text-xs text-gray-500">총 요청 수</div>
-          </div>
-          <div>
-            <div className="text-lg font-bold text-gray-900">{data.length}일</div>
-            <div className="text-xs text-gray-500">집계 기간</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// 엔진 단가 테이블
-function EnginePricingTable() {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-      >
-        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-          <PieChart className="w-5 h-5 text-gray-400" />
-          엔진 단가 기준표
-        </h3>
-        <span className="text-sm text-gray-500">{isExpanded ? '접기' : '펼치기'}</span>
-      </button>
-      {isExpanded && (
-        <div className="px-4 pb-4 border-t border-gray-100">
-          <div className="pt-4">
-            <div className="flex items-center gap-2 mb-3 text-xs text-amber-700 bg-amber-50 p-2 rounded-lg">
-              <Info className="w-4 h-4" />
-              <span>내부 기준 단가입니다. 실제 과금액과 다를 수 있습니다.</span>
-            </div>
-            <div className="space-y-2">
-              {ENGINE_PRICING_TABLE.map((engine) => (
-                <div
-                  key={engine.engineId}
-                  className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0"
-                >
-                  <div>
-                    <div className="font-medium text-gray-900">{engine.engineName}</div>
-                    <div className="text-xs text-gray-500">{engine.description}</div>
-                  </div>
-                  <div className="text-lg font-bold text-primary-600">{engine.unitCost}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ===== 메인 컴포넌트 =====
-export default function AiCostPage() {
-  const [data] = useState<CostDashboardData>(mockCostData);
-
-  const avgCostLevel = getCostLevel(data.summary.avgCostPerRequest);
-  const avgCostLevelInfo = getCostLevelInfo(avgCostLevel);
+  const avgCostPerRequest =
+    summary && summary.totalRequests > 0 ? summary.totalCost / summary.totalRequests : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -459,40 +239,40 @@ export default function AiCostPage() {
       {/* Sub Navigation */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex gap-6">
+          <nav className="flex gap-6 overflow-x-auto">
             <Link
               to="/admin/ai-admin"
-              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
+              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm whitespace-nowrap"
             >
               대시보드
             </Link>
             <Link
               to="/admin/ai-admin/engines"
-              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
+              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm whitespace-nowrap"
             >
               엔진 설정
             </Link>
             <Link
               to="/admin/ai-admin/policy"
-              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
+              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm whitespace-nowrap"
             >
               사용 기준 설정
             </Link>
             <Link
               to="/admin/ai-admin/cost"
-              className="py-4 px-1 border-b-2 border-primary-600 text-primary-600 font-medium text-sm"
+              className="py-4 px-1 border-b-2 border-primary-600 text-primary-600 font-medium text-sm whitespace-nowrap"
             >
               비용 현황
             </Link>
             <Link
               to="/admin/ai-admin/context-assets"
-              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
+              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm whitespace-nowrap"
             >
               Context Asset
             </Link>
             <Link
               to="/admin/ai-admin/composition-rules"
-              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
+              className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm whitespace-nowrap"
             >
               응답 규칙
             </Link>
@@ -502,85 +282,119 @@ export default function AiCostPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">AI 비용 현황</h1>
-          <p className="text-gray-500 mt-1">
-            {data.period.start} ~ {data.period.end} 기간의 AI 운영 비용을 확인합니다.
-          </p>
-        </div>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <SummaryCard
-            icon={Activity}
-            label="총 AI 요청"
-            value={formatNumber(data.summary.totalRequests)}
-            subValue="지난 7일"
-            iconColor="bg-blue-100 text-blue-600"
-          />
-          <SummaryCard
-            icon={DollarSign}
-            label="총 비용"
-            value={formatCost(data.summary.totalCost)}
-            subValue="내부 기준 단위"
-            trend={{ value: 5.2, isUp: true }}
-            iconColor="bg-green-100 text-green-600"
-          />
-          <SummaryCard
-            icon={BarChart3}
-            label="평균 비용/요청"
-            value={formatCost(data.summary.avgCostPerRequest)}
-            subValue={avgCostLevelInfo.label}
-            iconColor={`${avgCostLevelInfo.bgColor} ${avgCostLevelInfo.color}`}
-          />
-          <SummaryCard
-            icon={Package}
-            label="활성 엔진"
-            value={`${data.byEngine.length}개`}
-            subValue="사용 중인 AI 엔진"
-            iconColor="bg-purple-100 text-purple-600"
-          />
-        </div>
-
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {/* Service Cost Table - Full Width */}
-          <div className="lg:col-span-2">
-            <ServiceCostTable data={data.byService} />
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">AI 비용 현황</h1>
+            <p className="text-gray-500 mt-1">
+              최근 {days}일간 기록된 AI 사용 로그를 기준으로 집계합니다.
+            </p>
           </div>
-
-          {/* Engine Distribution */}
-          <div className="lg:col-span-1">
-            <EngineCostDistribution data={data.byEngine} />
+          <div className="flex items-center gap-2">
+            {DAY_OPTIONS.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setDays(option)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
+                  days === option
+                    ? 'bg-primary-600 text-white border-primary-600'
+                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                {option}일
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={fetchData}
+              disabled={loading}
+              className="px-3 py-1.5 rounded-lg text-sm font-medium border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+            >
+              {loading ? '새로고침 중...' : '새로고침'}
+            </button>
           </div>
         </div>
 
-        {/* Daily Trend & Engine Pricing */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <DailyTrendChart data={data.dailyTrend} />
-          <EnginePricingTable />
-        </div>
-
-        {/* Info Banners */}
-        <div className="space-y-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-blue-800">
-              <strong>비용 가시화 원칙</strong>: 이 대시보드는 비용 통제 도구가 아닌 운영 판단
-              도구입니다. 패키지 준수율과 비용을 함께 확인하여 "이 품질에 이 비용이 적절한가"를
-              판단하세요.
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="text-gray-500">로딩 중...</div>
+          </div>
+        ) : error ? (
+          <AiAdminErrorState error={error} onRetry={fetchData} retrying={loading} />
+        ) : (
+          <>
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+              <SummaryCard
+                icon={Activity}
+                label="총 AI 요청"
+                value={formatNumber(summary?.totalRequests ?? 0)}
+                subValue={`최근 ${days}일`}
+                iconColor="bg-blue-100 text-blue-600"
+              />
+              <SummaryCard
+                icon={DollarSign}
+                label="총 추정 비용"
+                value={formatCost(summary?.totalCost ?? 0)}
+                subValue="사용 로그 기반 추정치"
+                iconColor="bg-green-100 text-green-600"
+              />
+              <SummaryCard
+                icon={BarChart3}
+                label="평균 비용/요청"
+                value={formatCost(avgCostPerRequest)}
+                subValue={`토큰 ${formatNumber(summary?.totalTokens ?? 0)}`}
+                iconColor="bg-amber-100 text-amber-600"
+              />
+              <SummaryCard
+                icon={Server}
+                label="오류율"
+                value={`${summary?.errorRate ?? 0}%`}
+                subValue={`평균 응답 ${formatNumber(summary?.avgDurationMs ?? 0)}ms`}
+                iconColor="bg-purple-100 text-purple-600"
+              />
             </div>
-          </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
-            <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-amber-800">
-              <strong>비용 레벨 기준</strong>: 평균 비용 0.8 이하 = 낮음(녹색), 0.8~1.5 =
-              보통(노랑), 1.5 이상 = 높음(빨강). 이는 상대적 지표이며 실제 과금과 다를 수 있습니다.
+            {/* Scope */}
+            <section className="mb-6">
+              <h2 className="font-semibold text-gray-900 mb-3">스코프별 비용</h2>
+              {byScope.length === 0 ? (
+                <AiAdminEmptyState message={`최근 ${days}일간 기록된 AI 사용 로그가 없습니다.`} />
+              ) : (
+                <DataTable
+                  tableId="neture-ai-cost-by-scope"
+                  columns={scopeColumns}
+                  data={[...byScope].sort((a, b) => b.cost - a.cost)}
+                  rowKey={(row) => row.scope}
+                />
+              )}
+            </section>
+
+            {/* Model */}
+            <section className="mb-6">
+              <h2 className="font-semibold text-gray-900 mb-3">모델별 비용</h2>
+              {byModel.length === 0 ? (
+                <AiAdminEmptyState message={`최근 ${days}일간 기록된 AI 사용 로그가 없습니다.`} />
+              ) : (
+                <DataTable
+                  tableId="neture-ai-cost-by-model"
+                  columns={modelColumns}
+                  data={[...byModel].sort((a, b) => b.cost - a.cost)}
+                  rowKey={(row) => `${row.provider}:${row.model}`}
+                />
+              )}
+            </section>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
+              <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-blue-800">
+                <strong>비용 가시화 원칙</strong>: 이 화면은 비용 통제 도구가 아니라 운영 판단
+                도구입니다. 표시되는 비용은 <code>ai_usage_logs</code> 에 기록된 추정치이며 실제
+                과금액과 다를 수 있습니다.
+              </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </main>
     </div>
   );

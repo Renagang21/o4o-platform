@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { api, API_BASE_URL } from '../../../lib/apiClient';
+import { AiAdminErrorState, toAiAdminError, type AiAdminError } from './AiAdminStates';
 
 interface PolicySettings {
   freeDailyLimit: number;
@@ -25,6 +26,7 @@ export default function AiPolicyPage() {
   const [policy, setPolicy] = useState<PolicySettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<AiAdminError | null>(null);
   const [formData, setFormData] = useState({
     freeDailyLimit: 10,
     paidDailyLimit: 100,
@@ -39,6 +41,7 @@ export default function AiPolicyPage() {
 
   const fetchPolicy = async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data } = await api.get(`${API_BASE_URL}/api/ai/admin/policy`);
       if (data?.success) {
@@ -50,9 +53,14 @@ export default function AiPolicyPage() {
           warningThreshold: data.data.warningThreshold,
           aiEnabled: data.data.aiEnabled,
         });
+      } else {
+        setPolicy(null);
+        setError({ status: 200, message: data?.error || '정책 응답 형식이 올바르지 않습니다.' });
       }
-    } catch (error) {
-      console.error('Failed to fetch policy:', error);
+    } catch (err) {
+      // 조회 실패 시 기본값 폼을 보여주면 실제 정책을 덮어쓸 수 있으므로 폼 자체를 막는다.
+      setPolicy(null);
+      setError(toAiAdminError(err));
     } finally {
       setLoading(false);
     }
@@ -159,6 +167,8 @@ export default function AiPolicyPage() {
           <div className="flex justify-center items-center h-64">
             <div className="text-gray-500">로딩 중...</div>
           </div>
+        ) : error ? (
+          <AiAdminErrorState error={error} onRetry={fetchPolicy} retrying={loading} />
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">

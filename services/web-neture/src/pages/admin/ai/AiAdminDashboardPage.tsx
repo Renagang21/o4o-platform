@@ -12,6 +12,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api, API_BASE_URL } from '../../../lib/apiClient';
+import { AiAdminErrorState, toAiAdminError, type AiAdminError } from './AiAdminStates';
 
 interface AiEngineInfo {
   id: number;
@@ -51,6 +52,8 @@ export default function AiAdminDashboardPage() {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [usage, setUsage] = useState<UsageStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<AiAdminError | null>(null);
+  const [usageError, setUsageError] = useState<AiAdminError | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -58,19 +61,34 @@ export default function AiAdminDashboardPage() {
 
   const fetchData = async () => {
     setLoading(true);
+    setError(null);
+    setUsageError(null);
     try {
-      const [dashRes, usageRes] = await Promise.all([
+      // 대시보드는 필수, 사용량 추이는 부가 정보로 독립 처리한다.
+      const [dashRes, usageRes] = await Promise.allSettled([
         api.get(`${API_BASE_URL}/api/ai/admin/dashboard`),
         api.get(`${API_BASE_URL}/api/ai/admin/usage?days=7`),
       ]);
 
-      const dashData = dashRes.data;
-      const usageData = usageRes.data;
+      if (dashRes.status === 'rejected') {
+        setDashboard(null);
+        setError(toAiAdminError(dashRes.reason));
+      } else if (dashRes.value.data?.success) {
+        setDashboard(dashRes.value.data.data);
+      } else {
+        setDashboard(null);
+        setError({ status: 200, message: dashRes.value.data?.error || '대시보드 응답 형식이 올바르지 않습니다.' });
+      }
 
-      if (dashData?.success) setDashboard(dashData.data);
-      if (usageData?.success) setUsage(usageData.data);
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
+      if (usageRes.status === 'rejected') {
+        setUsage(null);
+        setUsageError(toAiAdminError(usageRes.reason));
+      } else if (usageRes.value.data?.success) {
+        setUsage(usageRes.value.data.data);
+      } else {
+        setUsage(null);
+        setUsageError({ status: 200, message: usageRes.value.data?.error || '사용량 응답 형식이 올바르지 않습니다.' });
+      }
     } finally {
       setLoading(false);
     }
@@ -178,6 +196,8 @@ export default function AiAdminDashboardPage() {
           <div className="flex justify-center items-center h-64">
             <div className="text-gray-500">로딩 중...</div>
           </div>
+        ) : error ? (
+          <AiAdminErrorState error={error} onRetry={fetchData} retrying={loading} />
         ) : dashboard ? (
           <>
             {/* Status Cards */}
@@ -268,6 +288,15 @@ export default function AiAdminDashboardPage() {
             </div>
 
             {/* Usage Trend */}
+            {usageError && (
+              <div
+                role="alert"
+                className="bg-white rounded-xl shadow-sm border border-red-200 p-6 text-sm text-red-600"
+              >
+                사용량 추이를 불러오지 못했습니다. {usageError.message}
+                {usageError.status !== null && <span className="text-gray-400"> (응답 코드: {usageError.status})</span>}
+              </div>
+            )}
             {usage && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h2 className="font-semibold text-gray-900 mb-4">사용량 추이 (최근 7일)</h2>
@@ -315,28 +344,28 @@ export default function AiAdminDashboardPage() {
           </>
         ) : (
           <div className="text-center py-12 text-gray-400">
-            데이터를 불러올 수 없습니다.
+            표시할 데이터가 없습니다.
           </div>
         )}
 
         {/* Quick Links */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
-            to="/operator/ai-operations"
+            to="/admin/ai-operations"
             className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:border-primary-300 transition-colors"
           >
             <div className="font-medium text-gray-900">실시간 운영 상태</div>
             <div className="text-sm text-gray-500">가드레일, 경고, 비정상 패턴</div>
           </Link>
           <Link
-            to="/operator/ai-card-report"
+            to="/admin/ai-card-report"
             className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:border-primary-300 transition-colors"
           >
             <div className="font-medium text-gray-900">카드 노출 리포트</div>
             <div className="text-sm text-gray-500">카드 노출 현황</div>
           </Link>
           <Link
-            to="/operator/ai-business-pack"
+            to="/admin/ai-business-pack"
             className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:border-primary-300 transition-colors"
           >
             <div className="font-medium text-gray-900">사업자용 안내</div>

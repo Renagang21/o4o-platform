@@ -56,6 +56,10 @@ import { AiLlmPolicy } from '../modules/ai-policy/entities/ai-llm-policy.entity.
 import { AiUsageQuota } from '../modules/ai-policy/entities/ai-usage-quota.entity.js';
 import { AiUsageAggregate } from '../modules/ai-policy/entities/ai-usage-aggregate.entity.js';
 import { AiBillingSummary } from '../modules/ai-policy/entities/ai-billing-summary.entity.js';
+// AI Query Control Plane entities (WO-AI-ADMIN-CONTROL-PLANE-V1) — ai-admin.service 가 Repository 로 사용
+import { AiEngine } from '../entities/AiEngine.js';
+import { AiQueryPolicy } from '../entities/AiQueryPolicy.js';
+import { AiQueryLog } from '../entities/AiQueryLog.js';
 // App System entities
 import { App } from '../entities/App.js';
 // AppInstance (app_instances) retired — WO-O4O-APP-INSTANCES-LIFECYCLE-CENSUS-AND-CANONICAL-DISPOSITION-V1
@@ -623,6 +627,10 @@ export const entities = [
   // AI Settings (unified)
   AiSettings,
   AIUsageLog,
+  // AI Query Control Plane (ai_engines / ai_query_policy / ai_query_logs)
+  AiEngine,
+  AiQueryPolicy,
+  AiQueryLog,
   // App System entities
   App,
   AppUsageLog,
