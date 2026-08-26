@@ -78,6 +78,14 @@ describe('WO-O4O-MAIN-SITE-APPSTORE-PARALLEL-AXIS-CENSUS-AND-RETIREMENT-V1', () 
     });
   });
 
+  /**
+   * WO-O4O-MAIN-SITE-NEXTGEN-VIEWRENDERER-DOMAIN-CENSUS-AND-RETIREMENT-V1:
+   *   이 WO 는 registry 에서 App Store 항목만 걷어내고 registry 자체는 남겼다.
+   *   후속 WO 에서 NextGen ViewRenderer 프레임워크 전체가 은퇴하면서
+   *   `components/registry/` 디렉터리 자체가 사라졌다. 더 강한 상태이므로
+   *   "파일이 존재하고 import 가 없다" 를 "파일 자체가 없다" 로 뒤집는다.
+   *   App Store 항목이 registry 를 통해 되살아날 수 없음은 그대로 보장된다.
+   */
   describe('main-site 레지스트리에 App Store 항목이 남아 있지 않다', () => {
     const registryFiles = [
       path.join(MAIN_SITE_SRC, 'components', 'registry', 'function.ts'),
@@ -85,23 +93,14 @@ describe('WO-O4O-MAIN-SITE-APPSTORE-PARALLEL-AXIS-CENSUS-AND-RETIREMENT-V1', () 
     ];
 
     it.each(registryFiles.map((f) => [path.basename(f), f]))(
-      '%s 가 존재하고 appstore 를 import 하지 않는다',
+      '%s 는 존재하지 않는다 (registry 축 전체 은퇴)',
       (_label, target) => {
-        expect(fs.existsSync(target)).toBe(true);
-        const src = fs.readFileSync(target, 'utf-8');
-        expect(src).not.toMatch(/^\s*import .*\/appstore\//m);
+        expect(fs.existsSync(target)).toBe(false);
       }
     );
 
-    it('appStoreManager / AppList / AppCard 등록이 없다', () => {
-      const joined = registryFiles.map((f) => fs.readFileSync(f, 'utf-8')).join('\n');
-      const code = joined
-        .split(/\r?\n/)
-        .filter((line) => !/^\s*(\/\/|\/\*|\*)/.test(line))
-        .join('\n');
-      expect(code).not.toMatch(/^\s*appStoreManager,\s*$/m);
-      expect(code).not.toMatch(/^\s*AppList,\s*$/m);
-      expect(code).not.toMatch(/^\s*AppCard,\s*$/m);
+    it('components/registry 디렉터리 자체가 없다', () => {
+      expect(fs.existsSync(path.join(MAIN_SITE_SRC, 'components', 'registry'))).toBe(false);
     });
   });
 

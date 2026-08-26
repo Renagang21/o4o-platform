@@ -7,11 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "generate:view": "tsx src/generator/cli.ts",
-    "generate:ai": "tsx src/ai/cli/generateFromAI.ts",
-    "list:views": "tsx src/generator/cli.ts list",
-    "delete:view": "tsx src/generator/cli.ts delete"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@o4o/auth-client": "workspace:*",
