@@ -266,17 +266,25 @@ export const lmsApi = {
   //   생성 강의의 serviceKey 는 CourseController 가 작성자 membership 에서 파생한다
   //   (WO-O4O-LMS-COURSE-SERVICEKEY-V1) — 프런트가 serviceKey 를 주입하지 않는다.
 
+  // WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10/§13:
+  //   강사 목록은 `instructorId` 만으로 좁혀져 있어 다른 서비스(kpa-society) 강의가
+  //   PH 화면에 그대로 보였다. learner client 와 같은 방식으로 serviceKey 를 서버에
+  //   전달해 경계를 맡긴다 (client-side filtering 아님).
   getInstructorCourses: (): Promise<ApiResponse<LmsCourse[]>> =>
-    lmsHttp.get<ApiResponse<LmsCourse[]>>('/lms/instructor/courses'),
+    lmsHttp.get<ApiResponse<LmsCourse[]>>('/lms/instructor/courses', { serviceKey: PH_SERVICE_KEY }),
 
   instructorDashboardCourses: async (): Promise<{ data: InstructorDashboardCourse[] }> => {
-    const { data } = await api.get<any>('/lms/instructor/dashboard/courses');
+    const { data } = await api.get<any>('/lms/instructor/dashboard/courses', {
+      params: { serviceKey: PH_SERVICE_KEY },
+    });
     const list = data?.data ?? data;
     return { data: Array.isArray(list) ? list : [] };
   },
 
   instructorPendingEnrollments: async (): Promise<PendingEnrollment[]> => {
-    const { data } = await api.get<any>('/lms/instructor/enrollments', { params: { status: 'pending' } });
+    const { data } = await api.get<any>('/lms/instructor/enrollments', {
+      params: { status: 'pending', serviceKey: PH_SERVICE_KEY },
+    });
     const list = data?.data ?? data;
     return Array.isArray(list) ? list : [];
   },

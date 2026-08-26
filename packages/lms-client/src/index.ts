@@ -344,14 +344,23 @@ export function createLmsLearnerClient(http: LmsHttpClient, options: LmsClientOp
  *   const instructorClient = createLmsInstructorClient(lmsHttp);
  *   const res = await instructorClient.getCourses<MyCourseType>();
  */
-export function createLmsInstructorClient(http: LmsHttpClient) {
+export function createLmsInstructorClient(http: LmsHttpClient, options: LmsClientOptions = {}) {
+  const scopeParams: Record<string, unknown> | undefined = options.serviceKey
+    ? { serviceKey: options.serviceKey }
+    : undefined;
+
   return {
     /**
      * 강사 본인 강의 목록 조회.
      * 반환은 표준 envelope. `T` 는 호출측에서 서비스별 확장 type 지정 가능.
+     *
+     * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10/§13:
+     *   `options.serviceKey` 를 주면 서버가 그 서비스(+legacy null) 강의로 좁힌다.
+     *   한 사람이 여러 서비스의 강사인 경우 타 서비스 강의가 노출되던 문제
+     *   (cross-service leakage) 를 서버 필터로 막는다. 미전달 시 동작 불변.
      */
     getCourses<T extends LmsInstructorCourseBase = LmsInstructorCourseBase>(): Promise<LmsApiResponse<T[]>> {
-      return http.get<LmsApiResponse<T[]>>('/lms/instructor/courses');
+      return http.get<LmsApiResponse<T[]>>('/lms/instructor/courses', scopeParams);
     },
   };
 }

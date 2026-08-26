@@ -3,6 +3,7 @@ import { BaseController } from '../../../common/base.controller.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { InstructorApplication, Enrollment, EnrollmentStatus, Course, ContentKind } from '@o4o/lms-core';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
+import { applyCourseScopeToQuery, resolveScopeOrRespond } from '../utils/lms-scope-guard.js';
 import logger from '../../../utils/logger.js';
 // WO-O4O-LMS-ASSIGNMENT-GRADING-V1
 import { AssignmentService } from '../services/AssignmentService.js';
@@ -16,6 +17,22 @@ import { CourseService } from '../services/CourseService.js';
  *
  * 강사 신청, 수강 승인/거절 등 강사 역할 관련 API
  */
+/**
+ * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10/§13
+ *
+ * 강사 목록 API 는 `instructorId` 만으로 좁혀 왔다. 한 사람이 여러 서비스에서
+ * 강사인 경우 Pharmacy-Hub 화면에 kpa-society 강의가 그대로 노출됐다
+ * (production 실측: PH `/instructor/courses` 총 7건 중 6건이 kpa-society —
+ * §20 완료 조건 `cross-service leakage = 0` 위반).
+ *
+ * 계약은 공개 목록(WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1)과 동일하다:
+ *   - `serviceKey` 미전달 → 무경계(종전 동작). 기존 소비처 불변.
+ *   - 전달 → `resolveLmsServiceScope` 로 canonical 해석 후 SQL 단계에서 필터.
+ *     legacy `service_key IS NULL` 의 KPA 귀속도 `applyCourseScopeToQuery` 가 정한다.
+ *
+ * LMS 전용 scope 규칙을 새로 만들지 않는다 — 기존 util 만 재사용한다.
+ */
+
 export class InstructorController extends BaseController {
   // ========================================
   // 강사 신청
@@ -216,12 +233,18 @@ export class InstructorController extends BaseController {
         where.contentKind = contentKind;
       }
 
-      const [courses, total] = await courseRepo.findAndCount({
-        where,
-        order: { createdAt: 'DESC' },
-        skip: (pageNum - 1) * limitNum,
-        take: limitNum,
-      });
+      // §10/§13: service scope (미전달 시 무경계 — 종전 동작)
+      const scope = resolveScopeOrRespond(req, res);
+      if (!scope.ok) return;
+
+      const query = courseRepo.createQueryBuilder('course').where(where);
+      applyCourseScopeToQuery(query, 'course', scope.scope);
+
+      const [courses, total] = await query
+        .orderBy('course.createdAt', 'DESC')
+        .skip((pageNum - 1) * limitNum)
+        .take(limitNum)
+        .getManyAndCount();
 
       return BaseController.okPaginated(res, courses, {
         total,
@@ -257,6 +280,11 @@ export class InstructorController extends BaseController {
       if (courseId && typeof courseId === 'string') {
         query.andWhere('enrollment.courseId = :courseId', { courseId });
       }
+
+      // §10/§13: service scope (미전달 시 무경계 — 종전 동작)
+      const scope = resolveScopeOrRespond(req, res);
+      if (!scope.ok) return;
+      applyCourseScopeToQuery(query, 'course', scope.scope);
 
       query
         .orderBy('enrollment.createdAt', 'DESC')
@@ -382,11 +410,16 @@ export class InstructorController extends BaseController {
 
       // 강사 본인 강의 목록
       const courseRepo = AppDataSource.getRepository(Course);
-      const courses = await courseRepo.find({
-        where: { instructorId: userId },
-        order: { createdAt: 'DESC' },
-        select: ['id', 'title', 'status', 'createdAt'],
-      });
+      // §10/§13: service scope (미전달 시 무경계 — 종전 동작)
+      const scope = resolveScopeOrRespond(req, res);
+      if (!scope.ok) return;
+
+      const courseQuery = courseRepo
+        .createQueryBuilder('course')
+        .select(['course.id', 'course.title', 'course.status', 'course.createdAt'])
+        .where('course.instructorId = :userId', { userId });
+      applyCourseScopeToQuery(courseQuery, 'course', scope.scope);
+      const courses = await courseQuery.orderBy('course.createdAt', 'DESC').getMany();
 
       if (courses.length === 0) {
         return BaseController.ok(res, { courses: [] });

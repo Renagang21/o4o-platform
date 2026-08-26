@@ -5,6 +5,16 @@
 
 import { authClient } from '../contexts/AuthContext';
 
+/**
+ * canonical service key — 서버 필터 입력 (client-side filtering 아님).
+ *
+ * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10/§13:
+ *   generic `/lms/instructor/*` 는 `instructorId` 만으로 좁혀져 있어, 여러 서비스의
+ *   강사인 사용자에게 타 서비스(pharmacy-hub 등) 강의가 KPA 화면에 노출됐다.
+ *   서버가 serviceKey(+legacy null)로 좁히도록 경계를 전달한다.
+ */
+const KPA_SERVICE_KEY = 'kpa-society';
+
 // WO-O4O-LMS-COURSE-APPROVAL-FLOW-V1: pending_review/rejected 추가
 export type CourseStatus =
   | 'draft'
@@ -175,7 +185,7 @@ export const lmsInstructorApi = {
    * 'content_resource' 또는 'all' 명시 가능.
    */
   myCourses: (page = 1, limit = 20, contentKind?: ContentKind | 'all') => {
-    const qs = new URLSearchParams({ page: String(page), limit: String(limit) });
+    const qs = new URLSearchParams({ page: String(page), limit: String(limit), serviceKey: KPA_SERVICE_KEY });
     if (contentKind) qs.set('contentKind', contentKind);
     return authClient.api.get<CoursesResponseWrapper>(`/lms/instructor/courses?${qs.toString()}`);
   },
@@ -270,7 +280,7 @@ export const lmsInstructorApi = {
           averageProgress: number;
         }>;
       };
-    }>('/lms/instructor/dashboard/courses'),
+    }>(`/lms/instructor/dashboard/courses?serviceKey=${KPA_SERVICE_KEY}`),
 
   // WO-O4O-MARKETING-CONTENT-OPERATIONS-MVP-V1
   /** 콘텐츠별 참여자 목록 */
@@ -378,7 +388,7 @@ export const lmsInstructorApi = {
 
   /** 본인 강의의 PENDING 수강신청 목록 */
   pendingEnrollments: (params?: { courseId?: string; page?: number; limit?: number }) => {
-    const qs = new URLSearchParams();
+    const qs = new URLSearchParams({ serviceKey: KPA_SERVICE_KEY });
     if (params?.courseId) qs.set('courseId', params.courseId);
     if (params?.page) qs.set('page', String(params.page));
     if (params?.limit) qs.set('limit', String(params.limit));
