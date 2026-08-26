@@ -352,6 +352,12 @@ export class QuizService {
     // Auto-complete enrollment if all lessons done
     if (completedCount >= totalLessons && totalLessons > 0) {
       enrollment.complete(enrollment.averageQuizScore ?? undefined);
+      // WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §15:
+      //   수료 상태를 **체인 호출 전에 저장**한다. CertificateService.issueCertificate 는
+      //   enrollment 를 DB 에서 다시 읽어 isCompleted() 를 검사하므로, 저장 전에 부르면
+      //   'Course must be completed before issuing certificate' 로 수료증이 발급되지 않는다
+      //   (production smoke: 수료 100% 인데 `내 수료증` 이 비어 있던 결함).
+      await this.enrollmentRepository.save(enrollment);
 
       // WO-O4O-CREDIT-SYSTEM-V1: Award credits for course complete
       // ── POLICY: IR-O4O-MARKETING-CONTENT-REWARD-POLICY-V1 ─────────────────────────
