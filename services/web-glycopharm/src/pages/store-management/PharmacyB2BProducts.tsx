@@ -13,8 +13,10 @@
  *   동일 API/컴포넌트를 재사용하되 헤더 문구와 tableId 만 내 약국 맥락으로 분리한다.
  *
  *   "내 약국에 추가" = 공급 상품 신청(ProductApproval PENDING). 신청 ≠ 주문.
- *   레거시 약국 자체 상품(glycopharm_products / pharmacyApi.getProducts)은 admin·b2b-order·
+ *   레거시 약국 자체 상품(glycopharm_products / pharmacyApi.getProducts)은 admin·operator·
  *   storefront·파트너 모집이 계속 소비하므로 본 전환에서 제거하지 않는다.
+ *   (WO-O4O-GLYCOPHARM-LEGACY-B2B-ORDER-PAGE-RETIREMENT-V1: b2b-order 는 소비처에서 빠졌다 —
+ *    그 화면이 은퇴하고 거래 신청이 이 화면으로 일원화됐다. 나머지 소비처는 그대로 보호한다.)
  */
 
 import { SupplyCatalogHub } from '@o4o/store-ui-core';

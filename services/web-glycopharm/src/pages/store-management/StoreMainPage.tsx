@@ -51,7 +51,9 @@ import { glycopharmConfig } from '@o4o/operator-ux-core';
 
 // ─── 주요 바로가기 (KPA StoreHomePage 3×2 그리드 패턴) ────
 const QUICK_ACTIONS = [
-  { label: 'B2B 주문', icon: Truck, desc: '공급사 상품 주문 확인', path: '/store/b2b-order', color: '#059669' },
+  // WO-O4O-GLYCOPHARM-LEGACY-B2B-ORDER-PAGE-RETIREMENT-V1:
+  //   레거시 /store/b2b-order 은퇴 → canonical 공급자 상품·거래 신청 화면으로 정렬.
+  { label: '상품·거래', icon: Truck, desc: '공급자 상품 확인·거래 신청', path: '/store/commerce/products', color: '#059669' },
   { label: '상품 관리', icon: Package, desc: '상품 목록 및 등록', path: '/store/products', color: '#7c3aed' },
   { label: '사이니지', icon: Tv, desc: '디지털 디스플레이 관리', path: '/store/marketing/signage/playlist', color: '#2563eb' },
   { label: '콘텐츠', icon: FileText, desc: '콘텐츠 가져오기', path: '/store/content', color: '#ec4899' },

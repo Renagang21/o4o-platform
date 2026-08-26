@@ -121,7 +121,10 @@ const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/Te
 const ForcedContentPage = lazy(() => import('@/pages/operator/signage/ForcedContentPage'));
 
 // B2B Order & Supply
-const B2BOrderPage = lazy(() => import('@/pages/store-management/b2b-order').then(m => ({ default: m.B2BOrderPage })));
+// WO-O4O-GLYCOPHARM-LEGACY-B2B-ORDER-PAGE-RETIREMENT-V1:
+//   레거시 /store/b2b-order(glycopharm_products 기반, 주문 stub)는 은퇴했다.
+//   canonical 공급자 상품·거래 신청 = /store/commerce/products. 라우트는 안내용으로 보존한다.
+const B2BOrderRetiredPage = lazy(() => import('@/pages/store-management/b2b-order').then(m => ({ default: m.B2BOrderRetiredPage })));
 const SupplyPage = lazy(() => import('@/pages/b2b').then(m => ({ default: m.SupplyPage })));
 
 // Forum Post Detail (WO-O4O-GLYCOPHARM-KPA-STYLE-UX-REFINE-P3-V1)
@@ -1077,7 +1080,7 @@ function AppRoutes() {
         <Route path="marketing/signage/media/:id" element={<SignageMediaDetailPage />} />
         <Route path="marketing/signage/preview" element={<SignagePreviewPage />} />
         {/* Extensions */}
-        <Route path="b2b-order" element={<B2BOrderPage />} />
+        <Route path="b2b-order" element={<B2BOrderRetiredPage />} />
         <Route path="requests" element={<CustomerRequestsPage />} />
         <Route path="funnel" element={<FunnelPage />} />
         {/* POP 생성 (WO-O4O-GLYCOPHARM-POP-STORE-EXECUTION-V1) */}

@@ -1341,7 +1341,7 @@ export const glycopharmGuideFeatureStoreProps: GuideFeatureManualPageProps = {
       description: '취급할 상품을 구성하고 거래·주문 상태를 확인합니다.',
       items: [
         { label: '상품 확인', detail: '/store/commerce/products 에서 공급자가 제공하는 상품을 확인합니다.' },
-        { label: '거래 신청', detail: '/store/b2b-order 에서 필요한 상품의 거래를 신청합니다.' },
+        { label: '거래 신청', detail: '/store/commerce/products 에서 필요한 상품을 내 약국에 추가해 거래를 신청합니다.' },
         { label: '주문 관리', detail: '/store/commerce/orders 에서 주문·결제 진행 상태를 확인합니다.' },
         { label: '신청·승인 현황', detail: '/store/commerce/recruitment-applications 에서 신청 결과를 확인합니다.' },
       ],

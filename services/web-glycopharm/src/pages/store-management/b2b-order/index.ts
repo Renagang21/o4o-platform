@@ -1,1 +1,1 @@
-export { default as B2BOrderPage } from './B2BOrderPage';
+export { default as B2BOrderRetiredPage } from './B2BOrderRetiredPage';

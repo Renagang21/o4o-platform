@@ -275,7 +275,8 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
  * WO-O4O-STORE-MENU-CANONICAL-TREE-ALIGNMENT-V2 (2026-06-05):
  *   "약국 상품·거래"(거래·주문 대상)를 최상단으로, 활성화 앵커는 "내 약국 제품"(제품=제작 기준 데이터).
  *   상품 = 공급자 거래 상품(B2B). GlycoPharm 의 owner 상품 화면은 /commerce/products(PharmacyB2BProducts, legacy /management/b2b redirect 보존),
- *   거래 신청은 /b2b-order. 기존 데드링크 정리: /products(미마운트), /market-trial(미마운트) 제거.
+ *   거래 신청도 같은 /commerce/products 가 담당한다(WO-O4O-GLYCOPHARM-LEGACY-B2B-ORDER-PAGE-RETIREMENT-V1
+ *   에서 레거시 /b2b-order 행 은퇴). 기존 데드링크 정리: /products(미마운트), /market-trial(미마운트) 제거.
  *   퍼널/콘텐츠 가져오기/채널은 마케팅·채널, 약국 경영/정산은 경영 그룹에 보존(실기능 — 은폐 금지).
  */
 export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
@@ -292,9 +293,12 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
       // WO-O4O-STORE-COMMERCE-PRODUCT-PAGE-CROSSSERVICE-PARITY-V1: canonical route 정렬.
       // 상품 = 공급자 거래 상품(B2B). owner 화면 = PharmacyB2BProducts(/commerce/products, KPA/KC 동형).
       // legacy /management/b2b 는 App.tsx 에서 redirect 보존(데드링크 0).
+      // WO-O4O-GLYCOPHARM-LEGACY-B2B-ORDER-PAGE-RETIREMENT-V1:
+      //   '거래 신청'(/b2b-order) 행 제거. 그 화면은 레거시 glycopharm_products 기반이라
+      //   공급자·공급가 앵커가 없고 주문 실행도 stub 이었다. 거래 신청은 이 '상품' 행
+      //   (/commerce/products = SupplyCatalogHub '내 약국에 추가' = ProductApproval)이 담당한다.
+      //   같은 기능을 두 행으로 노출하지 않는다.
       { key: 'products',  label: '상품',     subPath: '/commerce/products' },
-      // 거래 신청 = B2BOrderPage(/b2b-order)
-      { key: 'b2b-order', label: '거래 신청', subPath: '/b2b-order' },
       { key: 'orders',    label: '주문 관리', subPath: '/commerce/orders' },
       // WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1: 판매자 모집 신청 현황(조회)
       { key: 'recruitment-applications', label: '신청·승인 현황', subPath: '/commerce/recruitment-applications' },
