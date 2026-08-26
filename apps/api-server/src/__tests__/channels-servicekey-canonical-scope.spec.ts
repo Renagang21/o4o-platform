@@ -315,9 +315,15 @@ describe('GET /channels 의 serviceKey 필터', () => {
     expect(res.body.data[0].serviceKey).toBe('glycopharm');
   });
 
-  it('serviceKey 없으면 전체를 반환한다(기존 계약 유지)', async () => {
+  // WO-O4O-CHANNELS-SERVICE-SCOPED-AUTHORIZATION-CONTRACT-V1 §13:
+  //   "serviceKey 없으면 전체 반환" 은 익명 cross-service enumeration 이었다.
+  //   read 경계를 CMS 와 같은 한 벌(resolveCmsReadScope)로 맞추면서 계약이 바뀐다:
+  //   serviceKey 없는 목록은 platform admin 만 가능하고, 그 외에는 400 이다.
+  //   (actor 전수 검증은 channels-service-scoped-authorization-contract.spec.ts)
+  it('serviceKey 없으면 비-platform-admin 에게는 400 SERVICE_KEY_REQUIRED 다', async () => {
     const res = await request(makeApp().app).get('/channels');
-    expect(res.body.data).toHaveLength(3);
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('SERVICE_KEY_REQUIRED');
   });
 });
 

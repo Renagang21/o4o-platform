@@ -8,7 +8,7 @@
  *
  * Endpoints:
  * - GET /api/v1/channels/health - Health check (must stay above /:id)
- * - GET /api/v1/channels - List channels (with filters)
+ * - GET /api/v1/channels - List channels (serviceKey 필수 / platform admin 만 cross-service)
  * - GET /api/v1/channels/:id - Get channel by ID
  * - GET /api/v1/channels/code/:code - Get channel by code
  * - POST /api/v1/channels - Create channel (admin)
@@ -29,7 +29,16 @@ import { optionalAuth, requireAdmin } from '../../middleware/auth.middleware.js'
 //   따라서 canonical/alias 해석은 CMS read 경계가 이미 쓰는 helper 를 그대로 쓴다.
 //   여기서 ['kpa-society','kpa'] 같은 로컬 alias 배열을 새로 만들지 않는다.
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
-import { resolveCmsServiceKeys } from '../cms-content/cms-content-utils.js';
+import {
+  resolveCmsServiceKeys,
+  resolveCmsReadScope,
+  CMS_SERVICE_KEY_REQUIRED_ERROR,
+} from '../cms-content/cms-content-utils.js';
+// WO-O4O-CHANNELS-SERVICE-SCOPED-AUTHORIZATION-CONTRACT-V1
+//   channel 목록(enumeration)의 read 경계 판정 근거는 CMS read 경계와 **같은 한 벌**을 쓴다.
+//   platform admin 판정은 roleAssignmentService(RBAC SSOT)로만 하고
+//   `serviceKey 없음 = admin` 같은 암묵적 bypass 를 만들지 않는다 (WO §8).
+import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 
 // Valid channel types
 const VALID_CHANNEL_TYPES: ChannelType[] = ['tv', 'kiosk', 'signage', 'web'];
@@ -90,10 +99,29 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       const channelRepo = dataSource.getRepository(Channel);
 
       // Build where clause
+      // WO-O4O-CHANNELS-SERVICE-SCOPED-AUTHORIZATION-CONTRACT-V1 §13:
+      //   목록은 **enumeration** 이다. serviceKey 없이 전 서비스 channel 을 익명에게
+      //   돌려주던 동작을 닫는다. 판정은 CMS read 경계와 동일한 helper 한 벌로 한다.
+      //     serviceKey 주어짐            → 그 서비스(+alias)로 제한 (platform admin 도 동일)
+      //     serviceKey 없음 + platform admin → cross-service 유지 (역할 근거)
+      //     serviceKey 없음 + 그 외      → 400 SERVICE_KEY_REQUIRED (기존 CMS 에러 계약 재사용)
+      //   단건 조회(/:id, /code/:code, /:id/contents)는 device-addressed public read 로
+      //   기존 계약을 그대로 유지한다 — signage player 는 serviceKey 를 갖지 않는다.
+      const scope = await resolveCmsReadScope({
+        user: (req as any).user,
+        serviceKey,
+        roleChecker: roleAssignmentService,
+        onError: (message) => console.warn('[Channels] platform admin role check failed:', message),
+      });
+      if (!scope.ok) {
+        res.status(400).json(CMS_SERVICE_KEY_REQUIRED_ERROR);
+        return;
+      }
+
       const where: any = {};
-      if (serviceKey) {
+      if (scope.serviceKeys) {
         // alias 입력('kpa')과 canonical 입력('kpa-society')이 같은 모집단을 반환해야 한다.
-        where.serviceKey = In(resolveCmsServiceKeys(String(serviceKey)));
+        where.serviceKey = In(scope.serviceKeys);
       }
       if (organizationId) {
         where.organizationId = organizationId as string;

@@ -237,9 +237,12 @@ function makeApp() {
 }
 
 describe('WO §16/§17 channels runtime 계약', () => {
+  // WO-O4O-CHANNELS-SERVICE-SCOPED-AUTHORIZATION-CONTRACT-V1 §13 이후 목록은
+  // serviceKey 경계를 갖는다. 이 테스트의 관심사는 "등록되어 있으면 500 이 아니다" 이므로
+  // 경계를 만족하는 요청으로 확인한다(경계 자체는 authorization contract spec 이 검증).
   it('GET /api/v1/channels 는 빈 상태에서 500 이 아니라 200 + 빈 목록이다', async () => {
     const { app } = makeApp();
-    const res = await request(app).get('/api/v1/channels');
+    const res = await request(app).get('/api/v1/channels?serviceKey=kpa');
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data).toEqual([]);
@@ -308,7 +311,7 @@ describe('WO §18/§24 auth 및 내부 오류 비노출', () => {
     app.use(express.json());
     app.use('/api/v1/channels', createChannelRoutes(dataSource));
 
-    const res = await request(app).get('/api/v1/channels');
+    const res = await request(app).get('/api/v1/channels?serviceKey=kpa');
     expect(res.status).toBe(500);
     const body = JSON.stringify(res.body);
     expect(body).not.toContain('No metadata');
