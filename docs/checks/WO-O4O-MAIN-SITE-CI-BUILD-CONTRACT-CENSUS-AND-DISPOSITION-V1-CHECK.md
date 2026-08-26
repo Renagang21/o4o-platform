@@ -247,7 +247,7 @@ main-site build 의 성공/실패는 어떤 production 자산에도 도달하지
 | 스크립트 | consumer | 판정 | 조치 |
 |---|---|---|---|
 | `build:main-site` | `build:apps` · `build:apps:all` · `build:web` (root 내부) | `MAIN_SITE_ONLY` | **유지** |
-| `build:apps` | root `build` · `scripts/ci-build-app.sh:83`(`all` 분기) · `scripts/ci-complete-setup.sh:36` | `ACTIVE_GENERAL` | **유지** |
+| `build:apps` | root `build` · `scripts/ci-build-app.sh:83`(`all` 분기) · `scripts/ci-complete-setup.sh:36` · 루트 `README.md:69`(개발자 안내) | `ACTIVE_GENERAL` | **유지** |
 | `build:apps:all` | 없음 | `DEAD` 후보 | **유지** (§2 "consumer 확인 없이 삭제 금지" — 로컬 수동 사용 배제 불가) |
 | `build:web` | 없음 | `DEAD` 후보 | **유지** (동일) |
 | root `build` | `build:apps` 소비. CI 직접 호출 0 (`deploy-api.yml:122` 의 `pnpm run build` 는 `cd apps/api-server` 안이라 api-server 자체 build) | `ACTIVE_GENERAL` | **유지** |
@@ -259,6 +259,11 @@ main-site build 의 성공/실패는 어떤 production 자산에도 도달하지
 남겨두는 것이 참고 자산 보존 결정과 일관된다.
 `ci-build-app.sh` 의 main-site 분기도 제거하지 않는다 — CI 가 더 이상 호출하지 않을 뿐,
 수동 호출 경로로는 유효하다.
+
+> **보정 (census 후속):** 최초 작성 시 `build:apps` consumer 목록에서 루트 `README.md:69`
+> (`pnpm run build:apps       # 앱만` — 개발자 빌드 안내)이 누락돼 있었다.
+> 판정은 그대로 `ACTIVE_GENERAL` / **유지** 이며 근거가 1건 늘어난 것뿐이라
+> §13·§14 결론에는 영향이 없다.
 
 ---
 
