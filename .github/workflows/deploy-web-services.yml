@@ -20,12 +20,14 @@ on:
       - 'services/web-glycopharm/**'
       - 'services/web-pharmacy-hub/**'
       - 'services/web-kpa-branch/**'
+      # WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1
+      - 'services/signage-player-web/**'
       - 'packages/**'
       - '.github/workflows/deploy-web-services.yml'
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, glycopharm, pharmacy-hub, kpa-branch)'
+        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, glycopharm, pharmacy-hub, kpa-branch, signage-player)'
         required: false
         default: 'all'
 
@@ -52,6 +54,10 @@ env:
   # 분회 서비스는 단일 web service 하나만 운영한다 (분회별 Cloud Run 서비스 생성 금지).
   # 분회 tenant 는 URL segment(/{slug}) 또는 Host(branch_domains) 로만 해석된다.
   VITE_API_URL_KPA_BRANCH: https://api.neture.co.kr
+  # WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1
+  # Signage Player 는 익명 단말 런타임이다. public runtime config(API base) 만 주입한다.
+  # secret / service account key / DB credential 은 절대 주입하지 않는다.
+  VITE_API_URL_SIGNAGE_PLAYER: https://api.neture.co.kr
 
 jobs:
   detect-changes:
@@ -63,6 +69,7 @@ jobs:
       glycopharm: ${{ steps.changes.outputs.glycopharm }}
       pharmacy-hub: ${{ steps.changes.outputs.pharmacy-hub }}
       kpa-branch: ${{ steps.changes.outputs.kpa-branch }}
+      signage-player: ${{ steps.changes.outputs.signage-player }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -84,6 +91,7 @@ jobs:
               echo "glycopharm=true" >> $GITHUB_OUTPUT
               echo "pharmacy-hub=true" >> $GITHUB_OUTPUT
               echo "kpa-branch=true" >> $GITHUB_OUTPUT
+              echo "signage-player=true" >> $GITHUB_OUTPUT
             else
               echo "neture=$( [ "$SERVICE" = 'neture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "k-cosmetics=$( [ "$SERVICE" = 'k-cosmetics' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
@@ -91,6 +99,7 @@ jobs:
               echo "glycopharm=$( [ "$SERVICE" = 'glycopharm' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "pharmacy-hub=$( [ "$SERVICE" = 'pharmacy-hub' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "kpa-branch=$( [ "$SERVICE" = 'kpa-branch' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+              echo "signage-player=$( [ "$SERVICE" = 'signage-player' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
             fi
             exit 0
           fi
@@ -133,6 +142,7 @@ jobs:
             echo "glycopharm=true" >> $GITHUB_OUTPUT
             echo "pharmacy-hub=true" >> $GITHUB_OUTPUT
             echo "kpa-branch=true" >> $GITHUB_OUTPUT
+            echo "signage-player=true" >> $GITHUB_OUTPUT
             exit 0
           fi
 
@@ -153,6 +163,7 @@ jobs:
           decide "glycopharm" "services/web-glycopharm/"
           decide "pharmacy-hub" "services/web-pharmacy-hub/"
           decide "kpa-branch" "services/web-kpa-branch/"
+          decide "signage-player" "services/signage-player-web/"
 
   deploy-neture:
     needs: detect-changes
@@ -557,8 +568,89 @@ jobs:
 
           echo "Service URL: ${SERVICE_URL}"
 
+  # WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1
+  # 판정: A. INDEPENDENT_WEB_SERVICE.
+  # signage-player-web 은 자체 SPA router(/signage/... · /player/...) 와 SPA fallback 이
+  # 필요한 독립 런타임이며, 기존 web service 중 이 route 를 담당하는 서비스가 없다.
+  # 신규 인프라를 설계하지 않고 이 workflow 의 기존 per-service 패턴만 그대로 재사용한다.
+  # 접근 주소는 Cloud Run 생성 URL 을 쓴다 (hostname/DNS 정책 변경 없음).
+  deploy-signage-player:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.signage-player == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io --quiet
+
+      - name: Build and push Docker image
+        run: |
+          echo "Building signage-player-web Docker image..."
+          IMAGE_TAG="${{ github.sha }}"
+
+          # Build from repo root with Dockerfile path (for workspace packages)
+          docker build \
+            --platform linux/amd64 \
+            --build-arg VITE_API_URL=${{ env.VITE_API_URL_SIGNAGE_PLAYER }} \
+            -f services/signage-player-web/Dockerfile \
+            -t gcr.io/${{ env.PROJECT_ID }}/signage-player-web:${IMAGE_TAG} \
+            -t gcr.io/${{ env.PROJECT_ID }}/signage-player-web:latest \
+            .
+
+          docker push gcr.io/${{ env.PROJECT_ID }}/signage-player-web:${IMAGE_TAG}
+          docker push gcr.io/${{ env.PROJECT_ID }}/signage-player-web:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          echo "Deploying signage-player-web to Cloud Run..."
+
+          gcloud run deploy signage-player-web \
+            --image=gcr.io/${{ env.PROJECT_ID }}/signage-player-web:${{ github.sha }} \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --port=8080 \
+            --memory=256Mi \
+            --cpu=1 \
+            --min-instances=0 \
+            --max-instances=5
+
+          echo "signage-player-web deployed successfully!"
+
+      - name: Verify deployment
+        run: |
+          SERVICE_URL=$(gcloud run services describe signage-player-web \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --format="value(status.url)")
+
+          echo "Service URL: ${SERVICE_URL}"
+
+          # nginx /health (SPA fallback 이 아닌 전용 endpoint)
+          if curl -sf "${SERVICE_URL}/health" > /dev/null; then
+            echo "signage-player-web /health OK"
+          else
+            echo "signage-player-web may need a moment to start"
+          fi
+
   summary:
-    needs: [detect-changes, deploy-neture, deploy-k-cosmetics, deploy-kpa-society, deploy-glycopharm, deploy-pharmacy-hub, deploy-kpa-branch]
+    needs: [detect-changes, deploy-neture, deploy-k-cosmetics, deploy-kpa-society, deploy-glycopharm, deploy-pharmacy-hub, deploy-kpa-branch, deploy-signage-player]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -575,6 +667,7 @@ jobs:
           echo "  - glycopharm-web: ${{ needs.detect-changes.outputs.glycopharm }}"
           echo "  - pharmacy-hub-web: ${{ needs.detect-changes.outputs.pharmacy-hub }}"
           echo "  - kpa-branch-web: ${{ needs.detect-changes.outputs.kpa-branch }}"
+          echo "  - signage-player-web: ${{ needs.detect-changes.outputs.signage-player }}"
           echo ""
           echo "Time: $(date)"
           echo "Commit: ${{ github.sha }}"

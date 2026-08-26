@@ -74,6 +74,12 @@ export const getAllowedOrigins = (): string[] => {
     //   판정을 별도 WO 로 도입한다.
     "https://branch.kpa-society.co.kr",
     "https://kpa-branch-web-3e3aws7zqa-du.a.run.app",
+    // WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1:
+    //   signage-player-web(Cloud Run) 은 익명 단말 런타임으로 api.neture.co.kr 을
+    //   cross-origin 호출한다. 정확한 origin 1개만 추가한다 —
+    //   wildcard / credentials 완화 / reflect-origin 은 도입하지 않는다.
+    //   "https://signage.neture.co.kr" 은 이미 위에 등록돼 있으나 DNS 는 아직 없다(NXDOMAIN).
+    "https://signage-player-web-3e3aws7zqa-du.a.run.app",
   ];
 
   return [...devOrigins, ...ipOrigins, ...prodOrigins, ...envOrigins];
