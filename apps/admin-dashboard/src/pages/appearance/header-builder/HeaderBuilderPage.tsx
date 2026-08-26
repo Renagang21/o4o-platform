@@ -17,7 +17,6 @@ import {
   EyeOff,
   Menu as MenuIcon,
   Search,
-  ShoppingCart,
   User,
   Globe,
   Code,
@@ -45,7 +44,7 @@ const MODULE_TYPES: Array<{
   { type: 'secondary-menu', label: 'Secondary Menu', icon: <MenuIcon className="w-4 h-4" />, description: 'Secondary navigation' },
   { type: 'search', label: 'Search', icon: <Search className="w-4 h-4" />, description: 'Search box' },
   { type: 'account', label: 'Account', icon: <User className="w-4 h-4" />, description: 'User account links' },
-  { type: 'cart', label: 'Cart', icon: <ShoppingCart className="w-4 h-4" />, description: 'Shopping cart' },
+  // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1: cart 모듈 제거 — O4O 소비자 storefront/장바구니가 존재하지 않는다(PLATFORM_LEGACY).
   { type: 'button', label: 'Button', icon: <Plus className="w-4 h-4" />, description: 'Custom button' },
   { type: 'html', label: 'HTML', icon: <Code className="w-4 h-4" />, description: 'Custom HTML' },
   { type: 'widget', label: 'Widget', icon: <Layout className="w-4 h-4" />, description: 'Widget area' },

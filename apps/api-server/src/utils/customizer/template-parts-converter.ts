@@ -95,14 +95,6 @@ function convertModuleToBlock(module: any, settings?: any): any {
         ...module.settings
       }
     },
-    'cart': {
-      type: 'o4o/cart-icon',
-      data: {
-        showCount: true,
-        showTotal: false,
-        ...module.settings
-      }
-    },
     'button': {
       type: 'o4o/button',
       data: {

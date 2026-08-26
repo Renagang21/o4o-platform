@@ -39,7 +39,9 @@ export type ServiceKey = typeof SERVICE_KEYS[keyof typeof SERVICE_KEYS];
 /**
  * WO-O4O-OPL-SERVICEKEY-CANONICAL-CONSTANTS-V1
  * OPL visibility gate에서 허용하는 GlycoPharm serviceKey 목록.
- * store.controller / checkout.controller / GlycopharmPaymentEventHandler 3곳에서 공용.
+ * store.controller / checkout.controller 에서 공용.
+ * (GlycopharmPaymentEventHandler 는 WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1
+ *  에서 producer 0건 DEAD 판정으로 제거되었다.)
  */
 export const GLYCOPHARM_OPL_SERVICE_KEYS = [
   SERVICE_KEYS.GLYCOPHARM,

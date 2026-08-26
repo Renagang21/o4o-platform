@@ -67,7 +67,7 @@ ai-logs/
 |------|--------|------|
 | 추천 알고리즘 | 각 서비스 Extension | AI Core가 제공하지 않음 |
 | 벡터 DB | 인프라 영역 | AI Core가 제공하지 않음 |
-| 과금/결제 | ecommerce-core | AI Core가 제공하지 않음 |
+| 과금/결제 | payment-core | AI Core가 제공하지 않음 |
 | 모델 다중화 | 인프라 영역 | AI Core가 제공하지 않음 |
 | LLM 프롬프트 | ai-common-core | Chat UI용 프롬프트는 별도 |
 

@@ -330,7 +330,6 @@ export class SettingsService {
         'secondary-menu': 'core/navigation',
         'search': 'core/search',
         'account': 'o4o/account-menu',
-        'cart': 'o4o/cart-icon',
         'role-switcher': 'o4o/role-switcher',
         'button': 'o4o/button',
         'html': 'o4o/html',
@@ -403,14 +402,6 @@ export class SettingsService {
           showIcon: module.settings?.showIcon !== false,
           showLabel: module.settings?.showLabel !== false,
           label: module.settings?.label || 'Account',
-        };
-      } else if (module.type === 'cart') {
-        moduleData = {
-          ...moduleData,
-          showCount: module.settings?.showCount !== false,
-          showTotal: module.settings?.showTotal || false,
-          action: module.settings?.action || 'mini-cart',
-          cartUrl: module.settings?.cartUrl || '/cart',
         };
       }
 

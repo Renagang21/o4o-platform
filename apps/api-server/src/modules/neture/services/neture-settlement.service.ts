@@ -150,7 +150,7 @@ export class NetureSettlementService {
    *
    * readiness 판단 (§10.1 주의):
    *   delivered 주문은 status 가 'delivered' 로 덮여 'paid' 가 아니므로 status='paid' 는 쓰지 않는다.
-   *   - paid_at IS NOT NULL                       : online 결제(NeturePaymentEventHandler) 흔적
+   *   - paid_at IS NOT NULL                       : legacy online 결제 흔적(핸들러는 은퇴, 컬럼은 유지)
    *   - metadata.paymentStatus='paid'|paymentReady : checkout_order-origin / future bridge 주문
    *   - metadata.collectionStatus='confirmed'      : V2 collectionStatus 모델 대비(future-compatible)
    * → 결제 확인 없이 delivered 만 된 주문(legacy 우회·테스트)은 정산에서 제외된다. (pre-launch: 0건이 정상)

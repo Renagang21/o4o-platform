@@ -74,9 +74,7 @@ const CONFIG = {
 
   // 레거시 예외 (Phase 5 이전 코드, 향후 제거 예정)
   legacyExceptions: [
-    // ecommerce-core (Phase 5 이전 레거시, checkout으로 대체됨)
-    'packages/ecommerce-core/src/entities/EcommerceOrder.entity.ts',
-    'packages/ecommerce-core/src/entities/EcommercePayment.entity.ts',
+    // ecommerce-core 는 WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1 에서 package 째 제거되어 예외가 필요 없다.
     // pharmaceutical-core (GlycoPharm 레거시, Phase 5-A에서 차단됨)
     'packages/pharmaceutical-core/src/entities/PharmaOrder.entity.ts',
   ],

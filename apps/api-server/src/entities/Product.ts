@@ -2,10 +2,10 @@
  * Product Entity (Stub)
  *
  * This is a minimal stub entity to satisfy TypeScript compilation.
- * The actual product management has been moved to ecommerce-core package.
  * This stub is maintained for backward compatibility with legacy services.
  *
- * @deprecated Use @o4o/ecommerce-core entities for new development
+ * @deprecated 신규 개발에 사용하지 않는다. (구 안내 대상이던 @o4o/ecommerce-core 는
+ * WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1 에서 제거되었다.)
  */
 
 import {

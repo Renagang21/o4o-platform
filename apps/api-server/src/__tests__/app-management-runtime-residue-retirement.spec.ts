@@ -194,7 +194,7 @@ describe('WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1',
       expect(fs.existsSync(path.join(SRC, 'app-manifests', 'disabled-apps.registry.ts'))).toBe(true);
     });
 
-    it('packages 하위 manifest.ts 는 17개로 유지된다 (CI AppStore Guard 소비, 무접촉)', () => {
+    it('packages 하위 manifest.ts 는 16개로 유지된다 (CI AppStore Guard 소비, 무접촉)', () => {
       const packagesDir = path.resolve(API_SERVER, '..', '..', 'packages');
       const found: string[] = [];
       const walk = (dir: string, depth = 0) => {
@@ -207,7 +207,9 @@ describe('WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1',
         }
       };
       if (fs.existsSync(packagesDir)) walk(packagesDir);
-      expect(found).toHaveLength(17);
+      // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
+      //   ecommerce-core package 은퇴로 manifest 17 → 16.
+      expect(found).toHaveLength(16);
     });
 
     it('app_registry 를 건드리는 migration 이 이 WO 로 추가되지 않았다 (DB schema change 0)', () => {

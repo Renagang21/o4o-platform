@@ -7,7 +7,6 @@ import { SiteTitleSettings } from './SiteTitleSettings';
 import { MenuSettings } from './MenuSettings';
 import { SecondaryMenuSettings } from './SecondaryMenuSettings';
 import { SearchSettings } from './SearchSettings';
-import { CartSettings } from './CartSettings';
 import { RoleSwitcherSettings } from './RoleSwitcherSettings';
 import { WidgetSettings } from './WidgetSettings';
 import { ButtonSettings } from './ButtonSettings';
@@ -48,8 +47,6 @@ export const ModuleInspector: React.FC<ModuleInspectorProps> = ({
         return <SearchSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'account':
         return <AccountSettings settings={module.settings} onChange={handleSettingChange} />;
-      case 'cart':
-        return <CartSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'role-switcher':
         return <RoleSwitcherSettings settings={module.settings} onChange={handleSettingChange} />;
       case 'widget':

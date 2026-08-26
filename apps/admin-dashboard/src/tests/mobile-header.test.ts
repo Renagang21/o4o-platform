@@ -22,7 +22,6 @@ describe('Mobile Header Feature', () => {
         backgroundColor: '#ffffff',
         textColor: '#000000',
         showAccountIcon: true,
-        showCartIcon: true,
         showSearchIcon: false,
         submenuStyle: 'accordion',
         closeOnItemClick: false,
@@ -203,10 +202,6 @@ describe('Mobile Header Feature', () => {
       expect(showAccountIcon).toBe(true);
     });
 
-    it('should show/hide cart icon based on setting', () => {
-      const showCartIcon = false;
-      expect(showCartIcon).toBe(false);
-    });
   });
 
   describe('Performance', () => {

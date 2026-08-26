@@ -5,7 +5,6 @@ export { SiteTitleSettings } from './SiteTitleSettings';
 export { MenuSettings } from './MenuSettings';
 export { SecondaryMenuSettings } from './SecondaryMenuSettings';
 export { SearchSettings } from './SearchSettings';
-export { CartSettings } from './CartSettings';
 export { RoleSwitcherSettings } from './RoleSwitcherSettings';
 export { WidgetSettings } from './WidgetSettings';
 export { ButtonSettings } from './ButtonSettings';

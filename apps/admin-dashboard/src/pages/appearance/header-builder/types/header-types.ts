@@ -38,7 +38,6 @@ export type HeaderModuleType =
   | 'secondary-menu'
   | 'search'
   | 'account'
-  | 'cart'
   | 'button'
   | 'html'
   | 'widget'
@@ -188,24 +187,8 @@ export interface SearchModuleSettings {
   ariaLabel?: string;
 }
 
-/**
- * Cart Module Settings
- */
-export interface CartModuleSettings {
-  showCount?: boolean;
-  showTotal?: boolean;
-  action?: 'mini-cart' | 'page';
-  cartUrl?: string;
-  // Common settings
-  alignment?: 'left' | 'center' | 'right';
-  visibility?: { desktop: boolean; tablet: boolean; mobile: boolean };
-  spacing?: {
-    margin: { top: number; right: number; bottom: number; left: number };
-    padding: { top: number; right: number; bottom: number; left: number };
-  };
-  className?: string;
-  ariaLabel?: string;
-}
+// WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
+//   cart 헤더 모듈의 설정 인터페이스를 제거했다 (O4O 소비자 storefront 부재).
 
 /**
  * Account Module Settings
@@ -350,7 +333,6 @@ export interface MobileHeaderSettings {
   backgroundColor?: string;
   textColor?: string;
   showAccountIcon?: boolean;
-  showCartIcon?: boolean;
   showSearchIcon?: boolean;
   submenuStyle: 'accordion' | 'dropdown';
   closeOnItemClick?: boolean;

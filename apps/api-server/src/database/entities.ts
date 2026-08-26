@@ -448,7 +448,12 @@ import { ForeignVisitorPartnerQrScanEvent } from '../modules/foreign-visitor-par
 // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
 // Use official exports path (moduleResolution: bundler)
 // ============================================================================
-import { EcommerceOrder, EcommerceOrderItem, EcommercePayment } from '@o4o/ecommerce-core/entities';
+// WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
+//   @o4o/ecommerce-core entity 등록 제거 (package 자체 은퇴).
+//   ecommerce_orders / ecommerce_order_items / ecommerce_payments 는 production 에
+//   CREATE TABLE migration 이 없어 실제 테이블이 존재하지 않았고, canonical 주문
+//   원장은 checkout_orders 다. 잔여 raw SQL reader 는 order-metrics-fallback 의
+//   42P01 not_ready 가드로 이미 보호된다.
 
 // ============================================================================
 // CHECKOUT ENTITIES (WO-KPA-CHECKOUT-ORDER-ENTITY-ALIGNMENT-FIX-V1)
@@ -868,12 +873,6 @@ export const entities = [
   ForeignVisitorPartnerQrCode,
   // FOREIGN VISITOR PARTNER QR SCAN EVENT (WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-SCAN-EVENT-V1)
   ForeignVisitorPartnerQrScanEvent,
-  // ============================================================================
-  // E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
-  // ============================================================================
-  EcommerceOrder,
-  EcommerceOrderItem,
-  EcommercePayment,
   // ============================================================================
   // CHECKOUT ENTITIES (WO-KPA-CHECKOUT-ORDER-ENTITY-ALIGNMENT-FIX-V1)
   // ============================================================================

@@ -13,13 +13,13 @@
  * 설계(후보 C): 전용 serviceKey='neture-b2b' 구독.
  *   - 결제는 neture-b2b-payment.controller 가 PaymentCoreService.prepare/confirm(sourceService='neture-b2b')
  *     로 진행 → payment.completed(serviceKey='neture-b2b') 발행.
- *   - legacy NeturePaymentEventHandler(serviceKey='neture', neture_orders 전용)와 **serviceKey 분리** →
- *     충돌 없음.
+ *   - legacy NeturePaymentEventHandler(serviceKey='neture', neture_orders 전용)는
+ *     WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1 에서 제거되었다
+ *     (producer 였던 neture payment.controller mount 0건). serviceKey='neture-b2b' 는 그대로 유지.
  *   - 추가 안전장치: metadata.source='neture_b2b_checkout' 인 checkout_order 만 전이(오발 방지).
  *
  * 범위: paymentStatus 전이만. collectionStatus 미사용. 공급자 노출/fulfillment bridge 없음(후속 P2c).
  *
- * 참조: services/kpa/KpaPaymentEventHandler.ts (동일 패턴)
  */
 
 import { DataSource, Repository } from 'typeorm';

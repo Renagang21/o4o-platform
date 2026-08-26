@@ -653,22 +653,17 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       app.use('/api/v1/cosmetics', cosmeticsRoutes);
       logger.info('✅ Cosmetics routes registered at /api/v1/cosmetics');
 
-      // WO-O4O-PAYMENT-EXTENSION-ROLL-OUT-V0.1: 결제 이벤트 핸들러 초기화
-      const { initializeKCosmeticsPaymentHandler } = await import('../services/cosmetics/KCosmeticsPaymentEventHandler.js');
-      initializeKCosmeticsPaymentHandler(dataSource);
-      logger.info('✅ KCosmeticsPaymentEventHandler initialized');
+      // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
+      //   KCosmeticsPaymentEventHandler 제거 — payment.completed(serviceKey='cosmetics') 를
+      //   발행하던 유일한 producer 가 매장 소비자 결제 은퇴로 410 이 되어 소비처만 남았다.
     } catch (cosmeticsError) {
       logger.error('Failed to register Cosmetics routes:', cosmeticsError);
     }
 
-    // LMS Payment Handler (Dormant — v1 Freeze)
-    try {
-      const { initializeLmsPaymentHandler } = await import('../modules/lms/services/LmsPaymentEventHandler.js');
-      initializeLmsPaymentHandler(dataSource);
-      logger.info('✅ LmsPaymentEventHandler initialized (dormant)');
-    } catch (lmsPaymentError) {
-      logger.error('Failed to initialize LmsPaymentEventHandler:', lmsPaymentError);
-    }
+    // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
+    //   LmsPaymentEventHandler 제거 — serviceKey='lms' payment.completed producer 가
+    //   저장소 전체에 0건이었다(dormant · v1 Freeze). @o4o/ecommerce-core 의
+    //   마지막 런타임 소비처이기도 했다.
 
     // 26. (제거됨) Yaksa routes — WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1
     //   legacy `/api/v1/yaksa/*` 12 endpoint 는 production 소비처·내부 호출·운영 데이터가 모두 0으로
@@ -681,10 +676,8 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       app.use('/api/v1/glycopharm', glycopharmRoutes);
       logger.info('✅ Glycopharm routes registered at /api/v1/glycopharm');
 
-      // WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1: 결제 이벤트 핸들러 초기화
-      const { initializeGlycopharmPaymentHandler } = await import('../services/glycopharm/GlycopharmPaymentEventHandler.js');
-      initializeGlycopharmPaymentHandler(dataSource);
-      logger.info('✅ GlycopharmPaymentEventHandler initialized');
+      // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
+      //   GlycopharmPaymentEventHandler 제거 — serviceKey='glycopharm' producer 0건.
     } catch (glycopharmError) {
       logger.error('Failed to register Glycopharm routes:', glycopharmError);
     }
@@ -912,11 +905,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       app.use('/api/v1/kpa', kpaRoutes);
       logger.info('✅ KPA routes registered at /api/v1/kpa');
 
-      // WO-O4O-KPA-PAYMENT-EVENT-HANDLER-FIX-V1: KPA 결제 이벤트 핸들러 초기화(누락 복구)
-      // payment.completed(serviceKey='kpa') → checkout_orders paid 전이. 미등록 시 paymentStatus=pending 잔존 버그.
-      const { initializeKpaPaymentHandler } = await import('../services/kpa/KpaPaymentEventHandler.js');
-      initializeKpaPaymentHandler(dataSource);
-      logger.info('✅ KpaPaymentEventHandler initialized');
+      // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
+      //   KpaPaymentEventHandler 제거 — serviceKey='kpa' producer 0건.
+      //   (KPA B2B 발주는 O4O 결제 경로를 쓰지 않는다. 결제 축은 pharmacy-hub /
+      //    neture-b2b / store-service-subscription 만 살아 있다.)
 
       // 31-b. Register KPA Join Inquiry public routes (WO-KPA-JOIN-CONVERSION-V1)
       const kpaJoinPublicRoutes = createKpaJoinPublicRoutes(dataSource);
