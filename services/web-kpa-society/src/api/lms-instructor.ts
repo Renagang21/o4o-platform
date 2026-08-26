@@ -196,7 +196,12 @@ export const lmsInstructorApi = {
 
   /** 강의 생성 */
   createCourse: (dto: CreateCourseDto) =>
-    authClient.api.post<{ success: boolean; data: Course }>('/lms/courses', dto),
+    // WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10:
+    //   소속 서비스는 요청 scope 가 결정한다 — canonical serviceKey 를 명시한다.
+    authClient.api.post<{ success: boolean; data: Course }>(
+      '/lms/courses?serviceKey=kpa-society',
+      dto,
+    ),
 
   /** 강의 수정 */
   updateCourse: (id: string, dto: UpdateCourseDto) =>

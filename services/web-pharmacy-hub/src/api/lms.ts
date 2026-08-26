@@ -325,7 +325,11 @@ export const lmsApi = {
     visibility?: CourseVisibility;
     requiresApproval?: boolean;
   }): Promise<InstructorCourseDetail> => {
-    const { data } = await api.post<any>('/lms/courses', dto);
+    // §10: 생성 시점의 소속 서비스는 서버가 요청 scope 로 결정한다 —
+    //      client 는 canonical serviceKey 를 붙이기만 한다 (client-side filtering 아님).
+    const { data } = await api.post<any>('/lms/courses', dto, {
+      params: { serviceKey: PH_SERVICE_KEY },
+    });
     return data?.data?.course ?? data?.data ?? data;
   },
 

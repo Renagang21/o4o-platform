@@ -50,6 +50,24 @@ export class CourseController extends BaseController {
         data.instructorId = userId;
       }
 
+      // WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10:
+      //   강의가 소속될 서비스는 **요청의 LMS scope** 가 결정한다.
+      //   pharmacyhub.co.kr 에서 생성한 강의가 생성자의 첫 membership(kpa-society)으로
+      //   새는 mis-scoping 결함을 막는다. 무경계 요청(legacy/admin)에서만
+      //   기존 membership 유래 로직으로 돌아간다.
+      let createScope: string | undefined;
+      try {
+        createScope = resolveLmsServiceScope(req);
+      } catch (e) {
+        if (e instanceof InvalidLmsServiceKeyError) {
+          return BaseController.badRequest(res, '알 수 없는 serviceKey 입니다', INVALID_SERVICE_KEY_CODE);
+        }
+        throw e;
+      }
+      if (createScope) {
+        data.serviceKey = createScope;
+      }
+
       // WO-O4O-LMS-COURSE-SERVICEKEY-V1: derive serviceKey from creator's active service membership
       if (!data.serviceKey && userId) {
         const [membership] = await AppDataSource.query<{ service_key: string }[]>(
