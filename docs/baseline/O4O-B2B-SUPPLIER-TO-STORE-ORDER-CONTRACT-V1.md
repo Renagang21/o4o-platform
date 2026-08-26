@@ -299,10 +299,12 @@ KPA · GlycoPharm · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 �
 
 | # | 내용 | 왜 미루는가 |
 |---|---|---|
-| DF-1 | 매장 주문 조회 경로가 서비스마다 다르다 — KPA/GP 는 `/checkout/orders`, K-Cosmetics 는 `/orders` | 경로 변경은 frontend API contract 변경이다. CLAUDE.md 중지 조건 — 별도 WO 필요 |
+| DF-1 | 매장 주문 조회 경로가 서비스마다 다르다 — KPA/GP 는 `/checkout/orders`, K-Cosmetics 는 `/orders` | 경로 변경은 frontend API contract 변경이다. CLAUDE.md 중지 조건 — 별도 WO 필요 
+| ↳ **DF-1 종결** | `WO-O4O-CROSSSERVICE-B2B-BUYER-ORDER-READ-CONTRACT-AND-COMMONIZATION-V1` | 경로는 그대로 두고(`KEEP_COMPATIBLE_ALIASES`) **의미·ownership·응답 계약**을 §12 로 통일했다. 불일치의 실체는 경로 이름이 아니라 응답 계약이었다 |
 | DF-2 | GlycoPharm `/store/b2b-order` 의 "주문하기" 는 `toast.info('주문 기능은 준비 중입니다.')` 만 호출한다 | canonical 장바구니로 연결할지 여부는 **제품/UX 결정**이다. 임의로 배선하지 않는다 |
 | DF-3 | KPA `관심상품 주문 작업대` → canonical 장바구니 담기 이관 | 동일. 현재는 안내만 한다 |
 | DF-4 | 매장 buyer 주문 조회 컨트롤러가 KPA / GlycoPharm / K-Cosmetics 3벌로 중복 | `B2B_COMMONIZABLE` 로 분류. 공통화는 3서비스 동시 회귀가 필요해 별도 WO |
+| ↳ **DF-4 종결** | 동일 WO | 3벌 조회 SQL 을 `services/checkout/buyer-order-read.service.ts` 하나로 모았다. controller 3개는 thin wrapper |
 
 **DEFERRED 는 "모른다" 가 아니다.** 판정은 끝났고 실행만 미룬 것이다. `UNKNOWN = 0`.
 
@@ -316,3 +318,51 @@ KPA · GlycoPharm · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 �
 4. POS 를 B2B 주문 설계의 전제로 넣지 않는다.
 5. 본 문서와 충돌하는 코드는 **코드를 고친다** (역추론 금지 — CLAUDE.md).
 6. 본 문서 자체의 구조 변경은 별도 WO 가 필요하다.
+
+---
+
+## 12. 매장 buyer 주문 **조회** canonical 계약
+
+> 등재: `WO-O4O-CROSSSERVICE-B2B-BUYER-ORDER-READ-CONTRACT-AND-COMMONIZATION-V1` (DF-1 · DF-4 종결).
+> 본 절은 **조회(read)** 만 규정한다. 생성 · 결제 · 공급자 처리 · 배송 · 취소는 §3–§9 가 그대로 소유한다.
+
+### 12-1. 의미
+
+| 축 | 값 |
+|---|---|
+| 행위자 | 매장 구매자(store buyer) 본인 |
+| 저장소 | `checkout_orders` |
+| 서비스 범위 | `getBuyerOrderServiceKeys(platformServiceKey)` — **유일한 SSOT** |
+| 소유권 | `checkout_orders."buyerId"` |
+| 조회 연산 | 목록(list) + 상세(detail) |
+
+소비자 주문 축과 **섞지 않는다**. `checkout_orders` 라는 이름 때문에 과거 consumer commerce 를 복구하지 않는다.
+
+### 12-2. 단일 Core
+
+`apps/api-server/src/services/checkout/buyer-order-read.service.ts` 가 아래를 **혼자** 소유한다.
+
+- 합성 조건 `co."buyerId" = $1::uuid AND co.metadata->>'serviceKey' = ANY($2::text[])` — 두 조건은 분리 불가
+- 오류 계약: 없는 주문 / 타 organization 주문 / 타 serviceKey 주문 → **모두 동일한 404** (존재 여부 누설 금지)
+- 금액 정규화: `decimal` 문자열 → `number`
+- paging 정규화: `page >= 1`, `1 <= limit <= 100`
+- 호출자 값은 **오직 bind parameter** 로만 들어간다. SQL 문자열은 Core 만 만든다.
+
+controller 는 thin wrapper 다 — 경로 · 서비스 scope · 서비스별 표기(`organization` / `pharmacy` / `store`) adaptation 만 한다.
+
+### 12-3. 경로 (변경하지 않는다)
+
+| 서비스 | 목록 | 상세 |
+|---|---|---|
+| KPA Society | `GET /api/v1/kpa/checkout/orders` | `.../orders/:orderId` |
+| GlycoPharm | `GET /api/v1/glycopharm/checkout/orders` | `.../orders/:orderId` |
+| K-Cosmetics | `GET /api/v1/cosmetics/orders` | `/orders/:id` |
+
+경로 접두어 차이는 **의도적으로 남긴다** (`KEEP_COMPATIBLE_ALIASES`). 통일 대상은 경로 이름이 아니라 의미·소유권·응답 계약이다.
+
+### 12-4. 금지
+
+1. wrapper 가 `checkout_orders` 조회 SQL 을 직접 작성하는 것
+2. `buyerId` 를 `req.body` / `req.query` 에서 읽는 것 (인증 주체에서만 온다)
+3. serviceKey 집합을 controller 에 literal 로 다시 쓰는 것
+4. 조회 실패를 404 가 아닌 방식으로 구분해 응답하는 것
