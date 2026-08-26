@@ -144,6 +144,12 @@ docs/local/*.local.md
 # Verification script outputs (screenshots, findings JSON — reproducible by re-running the script)
 scripts/verify/output/
 
+# Shortcode registry audit output (WO-O4O-SHORTCODE-REGISTRY-REPORT-GENERATED-ARTIFACT-UNTRACK-AND-IGNORE-V1)
+#   check-shortcode-registry.ts 가 실행 머신의 **절대경로**(filePath)와 timestamp 를
+#   그대로 기록하는 생성 산출물이라 환경마다 diff 가 난다. 감사 도구 자체는 유지하고
+#   결과 파일만 추적에서 뺀다 — 필요하면 스크립트를 다시 실행해 로컬에서 재생성한다.
+/scripts/audit/shortcode-registry-report.json
+
 # Vite config build artifacts — source is vite.config.ts (services/web-* 는 .ts 만 추적)
 services/web-*/vite.config.js
 services/web-*/vite.config.d.ts

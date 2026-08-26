@@ -37,6 +37,9 @@ npx tsx scripts/audit/check-block-registry.ts
 
 - **`shortcode-registry-report.json`**
   - Machine-readable shortcode audit data
+  - Generated locally and git-ignored — the file records absolute paths of the
+    machine it ran on, so it is **not** committed. Re-run the audit script to
+    recreate it.
 
 - **`block-registry-report.json`**
   - Machine-readable block audit data
