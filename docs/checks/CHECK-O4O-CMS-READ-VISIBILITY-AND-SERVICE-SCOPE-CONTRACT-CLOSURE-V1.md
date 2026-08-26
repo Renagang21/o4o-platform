@@ -3,7 +3,7 @@
 **대상 WO**: WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1
 **기준 commit**: `d9ecc678a` (origin/main)
 **작성일**: 2026-08-21
-**결과**: **§9 `platform + serviceKey` 의미 확정** + **§11-1 read 경계 구현 완료** (2026-08-24 재개)
+**결과**: **§9 `platform + serviceKey` 의미 확정** + **§11-1 read 경계 구현 완료** (2026-08-24 재개) + **배포 후 독립 재검증 완료 · 결함 0건** (2026-08-26, §10-3)
 **구현 재개 commit 기준**: `21ed6d88d` (origin/main)
 **구현/배포 commit**: `1a5babf96` (경계 강제) · `6cf2d935c` (alias SSOT 수렴) — Cloud Run revision `o4o-core-api-03452-hdz`
 
@@ -280,7 +280,7 @@ export function resolveCmsServiceKeys(serviceKey: string): string[] {
 | 코드 변경 | 0 → 신규 테스트·build 대상 없음 |
 | 선행 CMS detail scope 테스트 | **12/12 PASS** (회귀 없음 확인, `--runInBand`) |
 | production read-only census | **수행** (§3, write 0) |
-| production API matrix (WO §22) · browser smoke (WO §23) | **미수행** — 코드 변경이 없어 회귀 대상이 없고, 환경 제약(§17) |
+| production API matrix (WO §22) · browser smoke (WO §23) | ~~미수행~~ → **완료** — 구현 PC §10-2 · 독립 재검증 §10-3 |
 
 ---
 
@@ -354,6 +354,80 @@ PH 의 `published` 자료는 여전히 0건이므로 자료실 목록 0건은 �
 
 ---
 
+## 10-3. 독립 재검증 — 종결 확인 (2026-08-26, WO-…-PRODUCTION-CLOSURE-V1)
+
+§10-2 는 구현 PC 의 실측이다. 여기서는 **다른 작업 PC 에서 현재 `origin/main` 기준으로 다시** 돌려
+같은 결론이 재현되는지 확인했다. 코드 변경 0 · production write 0.
+
+### 기준선
+
+```text
+HEAD == origin/main == bc13a977e   ·   branch=main   ·   worktree clean
+1a5babf96 (경계 강제)   → HEAD 의 ancestor ✅
+6cf2d935c (alias SSOT)  → HEAD 의 ancestor ✅
+```
+
+### 회귀 (이 PC 실행)
+
+| 항목 | 결과 |
+|---|---|
+| CMS 관련 spec 5종 (`detail` · `mutation` · `slot` · `member-authoring` · `alias-ssot`) | **5 suites / 117 tests PASS** |
+| api-server **전체 Jest** (`--runInBand`, heap 3072) | **214/215 suites · 3641 passed / 10 skipped / 1 failed** |
+| 실패 1건 판정 | `ecommerce-core-and-commerce-residue-retirement.spec.ts` — **CMS 무관 · 로컬 잔재**. `packages/ecommerce-core` 가 git 에서 삭제됐으나 **미추적 빌드 산출물**(`dist`/`node_modules`/`tsbuildinfo`)이 로컬에 남아 `existsSync` 가 true. fresh checkout(CI)에서는 발생하지 않는다. WO 의 unrelated cleanup 금지에 따라 삭제하지 않았다 |
+
+### production read-only matrix (익명 + platform:super_admin, write 0)
+
+`C:/tmp` 스크립트로 **27 케이스 실행 → 0 FAIL**. 본문 미기록, id/serviceKey/status 만 확인.
+
+| 그룹 | 케이스 | 결과 |
+|---|---|---|
+| A 자기 서비스 상세 | glycopharm · kpa-society · kpa · neture | **4/4 200** |
+| B serviceKey 누락 (익명) | `/contents/:id` · `/contents` · `/stats` · `/slots/home` | **4/4 400 `SERVICE_KEY_REQUIRED`** |
+| C 잘못된 serviceKey | 상세 / 목록 | **404** / **200 0건** |
+| D KPA alias | legacy `kpa` row ↔ `kpa-society` 양방향 · 목록 동수 | **4/4 200**, 목록 `kpa`=54 `kpa-society`=54 (53+1 합집합) |
+| E platform admin 생략 | 목록 · 상세 · stats | **3/3 200** (역할 근거) |
+| F admin + serviceKey | PH context + KPA UUID | **404** — admin 도 serviceKey 주면 제한됨 |
+| G 타 서비스 교차 조회 | 5조합 | **5/5 404** (+ kpa↔kpa-society 는 alias 라 정상 200) |
+| H visibility | draft 익명 / draft admin / archived PH 익명 | **404 / 200 / 404** |
+
+### 실브라우저 smoke (Playwright chromium, 프로덕션)
+
+| 화면 | 결과 |
+|---|---|
+| admin-dashboard `https://admin.neture.co.kr` 로그인 | **PASS** — `POST /auth/login` 200 → `/home` |
+| admin `/admin/cms/contents` | **PASS** — `GET /api/v1/cms/contents` (serviceKey 생략) **200**, **129 contents** cross-service 렌더 (glycopharm·kpa-society 확인). console error 0 |
+| admin CMS 목록 deep-link 새로고침 · 타 경로 경유 후 재진입 | **PASS** (3회 모두 200) |
+| K-Cosmetics `/` · `/service-guide` (익명) | **PASS** — `GET /cms/contents?serviceKey=cosmetics&…` **200** (**legacy alias 가 공개 경로에서 정상 동작**) |
+| K-Cosmetics `/` (모바일 390×844) | **PASS** — 동일 요청 200 |
+| PharmacyHub `/resources` (비로그인) | **PASS** — 백화면·JS 예외 0 |
+
+백화면 0 · 무한 로딩 0 · JS 예외 0 · 신규 4xx/5xx 0 · cross-service 노출 0.
+
+### BLOCKED 1건 (WO 중지 조건 — 계정 근거 부재)
+
+```text
+행: "인증된 비-platform-admin(일반 관리자·서비스 회원) + serviceKey 생략 → 400"
+```
+
+프로덕션에서 실측하지 못했다. `docs/local/TEST-ACCOUNTS.local.md` 기준 **verified 계정은
+`renariver21`(platform:super_admin) 하나뿐**이고 나머지 L2 는 전부 `unknown`,
+내 매장 검증 계정 2건은 `suspended` 다. 재활성화는 **프로덕션 write** 라 이 WO 가 금지한다.
+
+- **익명**이 같은 deny 경로를 통과하므로(§B 4/4 400) 계약의 거부 축 자체는 실측됐다.
+- "인증됨 + 비-platform-admin" 변형은 `cms-content-detail-service-scope.spec.ts` 의
+  `x-test-user` 케이스가 **결정적으로 고정**하고 있다(로그인만으로는 cross-service 근거가 되지 않음).
+
+### production 데이터 drift (판정 영향 없음)
+
+`cms_contents` 총 **127 → 129건**. 증가분은 `pharmacy-hub` archived 행이며 `published` 는 여전히 0,
+`serviceKey IS NULL` **0**, `visibilityScope='organization'` **0** 로 §3·§5 판정 근거는 그대로다.
+
+### 결론
+
+**결함 0건.** 계약(§6)과 구현·프로덕션 동작이 일치한다. 수정 없이 문서만 갱신했다.
+
+---
+
 ## 11. 정책 미해결 / GAP (WO §27 대조)
 
 ```text
@@ -378,7 +452,7 @@ production DB write 0                        ✅
 3. KPA alias 를 `IN ('kpa-society','kpa')` 로 정렬 (§6-1)
 4. PLATFORM_ADMIN cross-service 는 `isPlatformAdmin` **역할 근거**로 분기 (파라미터 생략 아님)
 
-**남은 것은 배포 후 검증뿐이다** — production API matrix(WO §22) · browser smoke(WO §23).
+~~**남은 것은 배포 후 검증뿐이다**~~ → **배포 후 검증 완료** (§10-2 구현 PC · §10-3 독립 재검증, 결함 0건).
 CMS read 는 공개 경로를 포함하므로 배포 후 KCos 홈 슬롯 · PH 자료실 · admin-dashboard CMS 목록/편집을
 실제로 확인해야 한다.
 
