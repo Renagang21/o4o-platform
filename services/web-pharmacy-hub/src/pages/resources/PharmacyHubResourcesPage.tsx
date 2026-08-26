@@ -18,7 +18,8 @@
  *   (§13 — learner 화면에 operator 기능 혼입 금지).
  */
 
-import { useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import {
   ResourcesHubTemplate,
@@ -72,8 +73,12 @@ function mapCmsToResource(c: CmsContentItem): ResourcesHubItem {
   };
 }
 
-function usePharmacyHubResourcesConfig(): ResourcesHubConfig {
+function usePharmacyHubResourcesConfig(
+  mine: boolean,
+  onToggleMine: () => void,
+): ResourcesHubConfig {
   const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const userId = user?.id ?? null;
 
   return useMemo<ResourcesHubConfig>(
@@ -92,6 +97,7 @@ function usePharmacyHubResourcesConfig(): ResourcesHubConfig {
           limit,
           offset: (page - 1) * limit,
           search,
+          mine,
         });
         return {
           items: items.map(mapCmsToResource),
@@ -104,8 +110,33 @@ function usePharmacyHubResourcesConfig(): ResourcesHubConfig {
       trackView: (id) => { void trackPharmacyHubCmsView(id); },
 
       // #27 회원 자료 등록·수정 — 로그인 회원에게만 노출한다.
+      //
+      // WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §7:
+      //   공개 목록은 `published` 만 보여주므로, 등록 직후(draft·pending)의 자기 자료가
+      //   목록에 없어 `getOwnerEditHref` 수정 경로에 도달할 수 없었다.
+      //   콘텐츠 목록(`/content`)과 같은 `내 자료 / 전체 자료` 축을 둔다.
       ...(isAuthenticated
-        ? { createAction: { label: '자료 등록', href: '/resources/new' } }
+        ? {
+            createAction: { label: '자료 등록', href: '/resources/new' },
+            headerAction: (
+              <div style={styles.actions}>
+                <button
+                  type="button"
+                  style={{ ...styles.toggleBtn, ...(mine ? styles.toggleBtnOn : {}) }}
+                  onClick={onToggleMine}
+                >
+                  {mine ? '전체 자료' : '내 자료'}
+                </button>
+                <button
+                  type="button"
+                  style={styles.createBtn}
+                  onClick={() => navigate('/resources/new')}
+                >
+                  자료 등록
+                </button>
+              </div>
+            ),
+          }
         : {}),
       getCurrentUserId: () => userId,
       getOwnerEditHref: (id) => `/resources/${id}/edit`,
@@ -116,13 +147,36 @@ function usePharmacyHubResourcesConfig(): ResourcesHubConfig {
       onToggleRecommend: (id) => togglePharmacyHubCmsRecommend(id),
       onToast: (message, type) => (type === 'error' ? toast.error(message) : toast.success(message)),
 
-      emptyMessage: '등록된 자료가 없습니다.',
+      emptyMessage: mine ? '등록한 자료가 없습니다.' : '등록된 자료가 없습니다.',
       emptyFilteredMessage: '검색 결과가 없습니다.',
     }),
-    [userId, isAuthenticated],
+    [userId, isAuthenticated, mine, onToggleMine, navigate],
   );
 }
 
+const styles: Record<string, React.CSSProperties> = {
+  actions: { display: 'inline-flex', gap: 8 },
+  toggleBtn: {
+    display: 'inline-flex', alignItems: 'center', padding: '8px 14px', fontSize: '0.8125rem',
+    fontWeight: 600, color: '#475569', backgroundColor: '#ffffff', border: '1px solid #e2e8f0',
+    borderRadius: 8, cursor: 'pointer',
+  },
+  toggleBtnOn: { color: '#0f766e', borderColor: '#99f6e4', backgroundColor: '#f0fdfa' },
+  createBtn: {
+    display: 'inline-flex', alignItems: 'center', gap: 4, padding: '8px 16px', fontSize: '0.8125rem',
+    fontWeight: 600, color: '#ffffff', backgroundColor: '#0f766e', border: 'none',
+    borderRadius: 8, cursor: 'pointer',
+  },
+};
+
 export default function PharmacyHubResourcesPage() {
-  return <ResourcesHubTemplate config={usePharmacyHubResourcesConfig()} />;
+  const [mine, setMine] = useState(false);
+  const onToggleMine = useCallback(() => setMine((v) => !v), []);
+  // 축을 바꾸면 template 내부 목록 state 를 초기화한다 (KPA 와 같은 remount 방식).
+  return (
+    <ResourcesHubTemplate
+      key={mine ? 'mine' : 'all'}
+      config={usePharmacyHubResourcesConfig(mine, onToggleMine)}
+    />
+  );
 }

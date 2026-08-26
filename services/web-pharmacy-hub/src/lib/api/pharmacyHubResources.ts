@@ -104,6 +104,13 @@ export interface ListResourcesParams {
   limit: number;
   offset: number;
   search?: string;
+  /**
+   * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §7:
+   *   true 면 본인이 등록한 자료만 (초안·검토중 포함). 서버가 `createdBy` 로 좁힌다.
+   *   회원 등록 자료는 `draft` 로 시작하므로 published 목록에는 나타나지 않는다 —
+   *   이 축이 없으면 등록자가 자기 자료의 수정 경로에 도달할 수 없다(콘텐츠 목록과 동일 계약).
+   */
+  mine?: boolean;
 }
 
 export async function listPharmacyHubResources(
@@ -116,7 +123,7 @@ export async function listPharmacyHubResources(
         serviceKey: SERVICE_KEY,
         type: RESOURCE_TYPE,
         subType: RESOURCE_SUB_TYPE,
-        status: 'published',
+        ...(params.mine ? { mine: 'true' } : { status: 'published' }),
         limit: params.limit,
         offset: params.offset,
         ...(params.search?.trim() ? { search: params.search.trim() } : {}),

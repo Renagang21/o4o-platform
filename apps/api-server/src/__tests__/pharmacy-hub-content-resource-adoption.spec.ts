@@ -114,6 +114,19 @@ describe('§9 자료실 View — 공통 ResourcesHubTemplate 채택', () => {
     expect(resourcesPageCode).toContain('getCurrentUserId');
   });
 
+  /**
+   * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §7 (production defect)
+   *   회원 등록 자료는 `draft` 로 시작하는데 목록이 `status: 'published'` 로 고정돼 있어
+   *   등록자가 자기 자료를 다시 찾을 수 없었다 → `getOwnerEditHref` 수정 경로가 도달 불가.
+   *   콘텐츠 목록과 같은 `mine` 축을 둔다(백엔드 `mine=true` 는 이미 존재 — 신규 API 0).
+   */
+  it('등록자가 자기 자료(초안·검토중)에 도달하는 축이 있다 — 수정 경로 고립 0', () => {
+    expect(resourcesApiCode).toContain("mine ? { mine: 'true' } : { status: 'published' }");
+    expect(resourcesPageCode).toContain('listPharmacyHubResources');
+    expect(resourcesPageCode).toContain("'전체 자료'");
+    expect(resourcesPageCode).toContain("'내 자료'");
+  });
+
   it('자료 등록·수정 링크와 route 가 짝을 이룬다(데드링크 0)', () => {
     const appTsx = read('services/web-pharmacy-hub/src/App.tsx');
     expect(resourcesPageCode).toContain("href: '/resources/new'");
