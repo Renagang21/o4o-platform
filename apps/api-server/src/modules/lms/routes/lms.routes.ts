@@ -48,15 +48,21 @@ const PLATFORM_ADMIN_ROLES = new Set(['admin', 'super_admin', 'platform:super_ad
 function isCourseAccessibleByOperator(roles: string[], courseServiceKey: string | null | undefined): boolean {
   if (roles.some(r => PLATFORM_ADMIN_ROLES.has(r))) return true;
   if (!courseServiceKey) return true; // legacy/unscoped course: backward compat
-  for (const role of roles) {
+  // WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §15:
+  //   기존 구현은 **첫 서비스 역할 하나만** 보고 즉시 판정해서, 여러 서비스를 운영하는
+  //   운영자(예: kpa:store_owner 가 목록 앞에 있는 pharmacy-hub:operator)가 자기 서비스
+  //   강의조차 승인하지 못했다 (403 SERVICE_SCOPE_VIOLATION — operator 콘솔의 dead CTA).
+  //   역할 목록 전체를 확인하되, 매칭 대상은 운영 역할(admin·operator)로 제한한다
+  //   (store_owner 같은 비운영 역할이 다른 서비스 강의 권한을 만들지 않도록).
+  return roles.some((role) => {
     const colon = role.indexOf(':');
-    if (colon <= 0) continue;
+    if (colon <= 0) return false;
     const prefix = role.slice(0, colon);
-    if (prefix !== 'lms' && prefix !== 'platform') {
-      return resolveCanonicalServiceKey(prefix) === courseServiceKey;
-    }
-  }
-  return false; // no identifiable service in roles
+    const suffix = role.slice(colon + 1);
+    if (prefix === 'lms' || prefix === 'platform') return false;
+    if (suffix !== 'admin' && suffix !== 'operator') return false;
+    return resolveCanonicalServiceKey(prefix) === courseServiceKey;
+  });
 }
 
 const router: Router = Router();
