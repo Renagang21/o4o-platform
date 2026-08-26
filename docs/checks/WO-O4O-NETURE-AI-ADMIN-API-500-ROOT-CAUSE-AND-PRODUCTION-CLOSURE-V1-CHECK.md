@@ -183,4 +183,93 @@ GlycoPharm 은 `/api/ai/admin/{analytics,quotas,billing}` 를 실제로 쓰므�
 
 ## 배포 후 재검증
 
-(배포 완료 후 채운다)
+- commit: `f8c9aedfc` (main), 배포 workflow **Deploy API Server (Cloud Run) success / Deploy Web Services (Cloud Run) success**
+- 검증: 2026-08-26, actor `renariver21@gmail.com` (`platform:super_admin`)
+
+### production API (24/24)
+
+| endpoint | 배포 전 | 배포 후 |
+|---|---|---|
+| GET /dashboard | **500** | **200** |
+| GET /engines | **500** | **200** |
+| GET /policy | **500** | **200** |
+| GET /usage?days=7 | **500** | **200** |
+| PUT /policy (현재값 그대로 no-op) | 미검증 | **200** (재조회 시 값 보존 확인) |
+| PUT /policy (`freeDailyLimit:-5`) | 미검증 | **400** |
+| PUT /engines/999999/activate | 미검증 | **400** |
+| GET /ops/summary · /ops/errors | 200 | 200 |
+| GET /analytics/{summary,by-scope,by-model,recent} | 200 | 200 |
+| GET /quotas · /quotas/status · /billing | 200 | 200 |
+| GET /billing/999999 · /billing/999999/export.csv | 미검증 | **404** |
+| POST /quotas (필드 누락) | 미검증 | **400** |
+| PUT /quotas/abc | 미검증 | **400** |
+| DELETE /quotas/999999 | 미검증 | **404** |
+| POST /billing/generate (month 누락) | 미검증 | **400** |
+| PUT /billing/999999/{confirm,paid,adjustment} | 미검증 | **400** |
+
+**unexpected 500 = 0.** 쓰기 endpoint 는 §7("안전한 fixture 가 없으면 무리해서 production 데이터를 만들지 않는다")에 따라
+**존재하지 않는 id / 누락 필드 negative probe** 와 **정책 no-op round-trip** 으로만 계약을 확인했다.
+실제 row 를 만드는 `POST /quotas`, `POST /billing/generate`(정상 인자), `PUT /billing/:id/{confirm,paid}` 의
+**성공 경로는 미실행** — 사유: production 과금/쿼터 데이터를 생성하게 된다.
+
+### 블라스트 반경 (같은 원인)
+
+| endpoint | 배포 전 | 배포 후 |
+|---|---|---|
+| GET /api/ai/usage | **500** | **200** |
+| GET /api/ai/history | **500** | **200** |
+| GET /api/ai/policy | **500** | **200** |
+
+`ai-editing-model-resolver` 의 정책 조회도 성공하므로, 관리자가 고른 엔진이 env 기본 모델로 조용히 대체되지 않는다.
+
+### 권한 회귀 (production 실측)
+
+| 주체 | 결과 |
+|---|---|
+| 미인증 | `/dashboard,/engines,/policy,/usage,/quotas,/billing` **전부 401** |
+| `sohae2100@gmail.com` (`neture:admin`,`neture:operator`,`glycopharm:admin/operator`,`cosmetics:admin/operator`,`kpa:admin/operator`,`pharmacy-hub:admin/operator`,`kpa-branch:operator`,`kpa:store_owner`) | 위 4개 + `/ops/*`,`/analytics/*`,`/quotas*`,`/billing` **전부 403** |
+| `platform:super_admin` | 200 |
+
+**cross-service leak = 0.** 타 서비스 admin/operator 를 다수 보유한 계정도 200 을 받지 못한다. 권한을 넓히지 않았다(§4 준수).
+
+> 파생 사실(범위 밖, 보고만): GlycoPharm 운영자 화면 `AiBillingPage` / `AiUsageDashboardPage` 는
+> `/api/ai/admin/*` 를 호출하는데 `glycopharm:admin/operator` 는 `requireAdmin` 을 통과하지 못해 403 이다.
+> 즉 두 화면은 현재 `platform:super_admin` 만 실사용 가능하다. 권한 모델 변경은 본 WO 금지사항이므로 기록만 한다.
+
+### production browser E2E (www.neture.co.kr, `platform:super_admin`)
+
+desktop **1440×900** / mobile **390×844** 각각에서 7개 경로를 최초 진입 + **하드 리프레시** 로 2회 렌더:
+`/admin/ai-admin`, `/admin/ai-admin/engines`, `/admin/ai-admin/policy`, `/admin/ai-admin/cost`,
+`/admin/ai-card-report`, `/admin/ai-operations`, `/admin/ai-business-pack`
+
+| 항목 | 결과 |
+|---|---|
+| white screen | **0** |
+| JS exception (`pageerror`) | **0** |
+| 화면에서 발생한 `/api/ai/**` 응답 | **전부 200** (dashboard, usage, engines, policy, analytics×3, card-report, operations) |
+| 가로 스크롤(모바일 포함) | **0** |
+| dead link | **0** — `/admin/ai-admin` 내부 링크 16개 전부 방문, 404 없음 |
+| 메뉴 클릭 경로 | `/admin` → 사이드바 **`분석`** 그룹 → **`AI 관리`** → `/admin/ai-admin` 도달 확인 (그룹 아코디언 기본 접힘일 뿐 dead menu 아님) |
+| 딥링크 | 7개 경로 모두 직접 URL 진입 성공 |
+| empty state | `/admin/ai-admin/cost` 는 최근 7일 `ai_usage_logs` 가 0건이라 **의도된 empty state** (오류와 구분해 렌더) |
+| error state | production 에서 인위적 500 을 만들 수 없어 **미실행**. 대신 신규 spec 이 500↔200 분기와 "빈 배열로 삼키지 않음"을 고정한다. |
+
+---
+
+## 잔여 / 별도 처리 대상 (본 WO 범위 밖, 보고만)
+
+1. **`scripts/check-typeorm-entities.mjs` 무력화** — 실행 시 `entities 배열 파싱 실패` 로 **exit 2**,
+   게다가 `.github/workflows/` 어디에도 **연결되어 있지 않다**(grep 0건). 이번 결함이 오래 남은 직접적 이유.
+2. **CI Pipeline 실패는 선행 상태** — `services/web-glycopharm/src/pages/store-management/b2b-order/B2BOrderPage.tsx:467`
+   `TS1109: Expression expected` (커밋 `2bb1a3e65`, 타 세션 작업). `2d375cde1` 부터 연속 실패이며 본 커밋과 무관하다.
+   타 세션 변경 불가침 원칙에 따라 만지지 않았다.
+3. **api-server jest 1건 실패** — `encryption-key-canonical-rollout.spec.ts` (ENCRYPTION_KEY 환경 의존), 본 diff 무관.
+4. **GlycoPharm AI 운영 화면의 권한 축 불일치** (위 권한 회귀 절 참조).
+
+---
+
+## 최종 판정
+
+- `NETURE_AI_ADMIN_RUNTIME = CLOSED`
+- `PRODUCTION_E2E = PASS`
+- `MUST_FIX_BEFORE_CLOSE = 0` (잔여 4건은 모두 본 WO 범위 밖 · 타 세션 소유 · 별도 WO 대상)
