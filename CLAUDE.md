@@ -14,6 +14,7 @@
 | 1 | `CLAUDE.md` (본 문서) | 기술/운영 규칙 |
 | 2 | [`docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md`](docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | **사업 철학 SSOT** — 공급자/운영사업자/매장 정의, HUB 철학, AI 역할 |
 | 3 | [`docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) | **매장 commerce 사업 경계 SSOT** — 매장 경영자는 O4O로 소비자에게 판매하지 않는다 / O4O 자체 소비자 전자상거래 없음 / 판매 실행 = 외부 POS·외부 판매채널 / legacy commerce 판정 규칙·개발 금지선 |
+| 3-A | [`docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md`](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) | **공급자→매장 B2B 주문 canonical SSOT** — 3번의 소비자 commerce 금지선에 대한 **B2B 쪽 정본**(동 문서 §12 의 B2B 축). 살아 있는 3개 축(event-offer / Neture B2B / PharmacyHub)은 전부 `store_cart_items → checkout_orders` 로 수렴 / `store_cart_items` = B2B cart(보호 대상) / actor·ownership·serviceKey·lifecycle·취소 계약 / **POS = 현재 비개발 영역** |
 | 4 | [`docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md`](docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | **3자 Canonical Flow SSOT** — 누가/언제/무엇을/어떻게 넘기는가 (책임 매트릭스 · 데이터 흐름 · Drift 가드) |
 | 5 | Operator UX Baselines ([`Canonical Workflow`](docs/architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md) 검수·승인 UX + [`Non-Approval UX Baseline`](docs/baseline/O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md) 5 Workspace UX + [`HUB Content Publishing Standard`](docs/baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) RichTextEditor 기반 항목별 게시 — Source Ingestion 보류) | **Operator UX 영역 SSOT** — 자매 구조 |
 | 6 | Store Side Standards ([`Store Menu Canonical Tree`](docs/baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md) 매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 — 6 항목: 상품 상세 / POP / QR / 블로그 / 사이니지 / 고객 안내문. 설문 V1 범위 외) | **Store 측 메뉴·축 SSOT** — Operator HUB 게시 표준의 매장 측 대응 |
@@ -25,6 +26,20 @@
 - `O4O-BUSINESS-PHILOSOPHY-V1` 의 §3 (참여 주체) / §4 (Canonical Flow) / §5 (HUB 철학) / §6 (AI 역할) / §7 (Drift 방지) 정의는 영역별 문서(Operator, Supplier, HUB, Store, AI 등)에 우선한다.
 - `O4O-STORE-COMMERCE-BOUNDARY-V1` 의 §2 (최상위 원칙) / §7 (매장 환불) / §8 (기존 코드 취급) / §9 (legacy 분류) / §10 (개발 금지선) / §12 (B2B vs 소비자 order) / §13 (플랫폼 직접판매) / §14 (precedence) 는 **cart · checkout · orders · payments · refund · PG · POS · tablet · QR · 외부 판매채널** 관련 모든 영역 문서·코드 판단에 우선한다.
   **이 문서는 코드보다 먼저 읽는다.** 저장소에 checkout/payment/refund 코드가 존재한다는 사실은 그 기능이 현행 사업 기능이라는 근거가 아니다 (동 문서 §8 · §14).
+- `O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1` 은 위 3번의 **역방향 고정**이다.
+  3번이 "소비자→매장 commerce 없음"을 정하고, 3-A 가 "**공급자→매장 B2B 주문은 O4O 의 공식 주문 축**"임을 정한다.
+  **3번의 소비자 commerce 금지선을 근거로 3-A 에 등재된 라우트·테이블·화면을 legacy 로 판정해 제거하지 않는다.**
+  `store_cart_items` · `checkout_orders` · `/api/v1/store/cart/*` 는 B2B 축이며 보호 대상이다.
+  B2B 주문 · 발주 · 공급 신청 · 매장 장바구니 관련 작업은 3번과 3-A 를 **함께** 선행 기준으로 삼는다.
+
+  현재 O4O 의 거래 축 구분(2026-08-26 확정):
+
+  ```text
+  소비자 → 매장          = O4O commerce 없음        (3번)
+  공급자 → 매장          = O4O B2B canonical        (3-A)
+  네이버/쿠팡 → 소비자   = 외부 판매채널 commerce   (범위 밖 · 손대지 않는다)
+  POS                    = 현재 비개발 영역          (선행조건으로 넣지 않는다)
+  ```
 - `O4O-3-ROLE-FLOW-BASELINE-V1` 의 §2 (책임 매트릭스) / §3 (데이터 흐름) / §4 (원천 자료 vs 실행 자산) / §5 (AI 개입) / §6 (Drift 금지/권장 흐름) 정의는 영역별 흐름·권한·검수 정책에 우선한다.
 
 충돌 시 위 순서를 기준으로 영역별 문서를 정렬한다. 영역별 Freeze 문서 변경은 별도 WO 필요.
@@ -453,6 +468,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **O4O 사업 철학 SSOT (최상위)** | `docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md` |
 | **O4O 3자 Canonical Flow SSOT** | `docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md` |
 | **O4O Store Commerce Boundary (canonical business boundary)** | `docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md` — 매장 경영자는 O4O로 소비자에게 판매하지 않는다 / 자체 매장 전자상거래 없음 / 판매 실행 = 외부 POS·외부 판매채널 / 태블릿·QR = 정보 제공 / legacy commerce 판정 규칙·개발 금지선. **store · cart · checkout · orders · payments · refund · PG · POS · tablet · QR · 외부 판매채널 관련 작업의 선행 기준** |
+| **O4O B2B Supplier → Store Order Contract (canonical order SSOT)** | `docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md` — 공급자→매장 B2B 주문의 정본. 살아 있는 3개 축(event-offer / Neture B2B / PharmacyHub)은 전부 `store_cart_items → checkout_orders` 로 수렴 / `store_cart_items` = **B2B cart**(소비자 cart 금지선 대상 아님) / actor·ownership·serviceKey·authorization·lifecycle·취소 계약 / 공급자 화면은 Neture 가 canonical / **POS = 현재 비개발 영역**. **B2B 주문 · 발주 · 공급 신청 · 매장 장바구니 관련 작업의 선행 기준 (위 Store Commerce Boundary 와 한 쌍)** |
 | Cosmetics 도메인 | `docs/architecture/COSMETICS-DOMAIN-RULES.md` |
 | Business 서비스 | `docs/architecture/BUSINESS-SERVICE-RULES.md` |
 | O4O Store/Order | `docs/architecture/O4O-STORE-RULES.md` |
@@ -608,6 +624,6 @@ WO 없이 발견 즉시 처리할 수 있다.
 
 ---
 
-*Updated: 2026-08-07*
-*Version: 8.11*
+*Updated: 2026-08-26*
+*Version: 8.12*
 *Status: Active Constitution*
