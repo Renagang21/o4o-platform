@@ -33,6 +33,19 @@ import { CourseService } from '../services/CourseService.js';
  * LMS 전용 scope 규칙을 새로 만들지 않는다 — 기존 util 만 재사용한다.
  */
 
+/**
+ * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §15:
+ *   보상(Credit) 지급 여부 판정 raw 서브쿼리. 종전 구현은 sourceType / sourceId /
+ *   userId 를 snake_case 컬럼명으로 참조했으나,
+ *   이 DataSource 는 SnakeNamingStrategy 를 쓰지 않는다 (connection.ts 에서 주석 처리).
+ *   `credit_transactions` · `lms_enrollments` 의 실제 컬럼은 camelCase 이므로
+ *   production 에서 `column ... source_type does not exist` 로 500 이 났다
+ *   (강사 `수강자 관리` 화면의 `/lms/instructor/participants/:courseId/summary`).
+ *   한 곳에서 정의해 5개 호출부가 같은 식별자를 쓰도록 한다.
+ */
+const CREDITED_COURSE_COMPLETE_EXISTS =
+  `SELECT 1 FROM credit_transactions ct2 WHERE ct2."sourceType" = 'course_complete' AND ct2."sourceId" = :courseId AND ct2."userId" = e."userId"`;
+
 export class InstructorController extends BaseController {
   // ========================================
   // 강사 신청
@@ -523,11 +536,11 @@ export class InstructorController extends BaseController {
           query.andWhere('e.status = :completedStatus', { completedStatus: 'completed' });
         }
         query.andWhere(
-          `NOT EXISTS (SELECT 1 FROM credit_transactions ct2 WHERE ct2.source_type = 'course_complete' AND ct2.source_id = :courseId AND ct2.user_id = e.user_id)`
+          `NOT EXISTS (${CREDITED_COURSE_COMPLETE_EXISTS})`
         );
       } else if (credited === 'true') {
         query.andWhere(
-          `EXISTS (SELECT 1 FROM credit_transactions ct2 WHERE ct2.source_type = 'course_complete' AND ct2.source_id = :courseId AND ct2.user_id = e.user_id)`
+          `EXISTS (${CREDITED_COURSE_COMPLETE_EXISTS})`
         );
       }
 
@@ -670,7 +683,7 @@ export class InstructorController extends BaseController {
         .where('e.courseId = :courseId', { courseId })
         .andWhere('e.status = :status', { status: 'completed' })
         .andWhere(
-          `NOT EXISTS (SELECT 1 FROM credit_transactions ct2 WHERE ct2.source_type = 'course_complete' AND ct2.source_id = :courseId AND ct2.user_id = e.user_id)`
+          `NOT EXISTS (${CREDITED_COURSE_COMPLETE_EXISTS})`
         )
         .getRawOne();
 
@@ -732,11 +745,11 @@ export class InstructorController extends BaseController {
           exportQuery.andWhere('e.status = :completedStatus', { completedStatus: 'completed' });
         }
         exportQuery.andWhere(
-          `NOT EXISTS (SELECT 1 FROM credit_transactions ct2 WHERE ct2.source_type = 'course_complete' AND ct2.source_id = :courseId AND ct2.user_id = e.user_id)`
+          `NOT EXISTS (${CREDITED_COURSE_COMPLETE_EXISTS})`
         );
       } else if (credited === 'true') {
         exportQuery.andWhere(
-          `EXISTS (SELECT 1 FROM credit_transactions ct2 WHERE ct2.source_type = 'course_complete' AND ct2.source_id = :courseId AND ct2.user_id = e.user_id)`
+          `EXISTS (${CREDITED_COURSE_COMPLETE_EXISTS})`
         );
       }
 
