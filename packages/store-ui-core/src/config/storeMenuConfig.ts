@@ -443,8 +443,14 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     { label: '온라인 판매', items: [
       { key: 'online-sales-settings', label: '판매 설정', subPath: '/online-sales/settings' },
       { key: 'online-sales-products', label: '판매 상품', subPath: '/online-sales/products' },
-      // WO-O4O-KPA-ONLINE-SALES-ORDER-MANAGEMENT-AND-BUYER-ORDER-RELABEL-V1: 판매(seller) 주문 관리
-      { key: 'online-sales-orders',   label: '주문 관리', subPath: '/online-sales/orders' },
+      // WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1 (D-1 마감):
+      //   '주문 관리'(`online-sales-orders`, /online-sales/orders) 제거.
+      //   이 항목은 `WO-O4O-KPA-ONLINE-SALES-ORDER-MANAGEMENT-AND-BUYER-ORDER-RELABEL-V1` 이 만든
+      //   **판매(seller) 주문 관리** = `checkout_orders` 를 `sellerOrganizationId` 로 조회하는
+      //   "매장이 소비자에게 판매한 주문" 축이었다. `O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §2-2 · §3.
+      //   백엔드 `GET|PATCH /kpa/checkout/store-orders*` 는 이미 제거되었다.
+      //   ⚠️ 이름이 같은 다른 '주문 관리'(`orders`, /commerce/orders)는 **매장이 구매자**인
+      //      B2B 발주 내역이며 canonical 이다 — 제거하지 않는다 (KPA 는 '발주 내역'으로 라벨 정비됨).
     ]},
     // WO-O4O-KPA-STORE-CONSULTATION-REQUEST-MENU-HIDDEN-ROUTE-CLEANUP-V1 (KPA 블록 한정):
     //   상담 요청은 요청 생성 시 매장 사용자 알림이 생성되고(WO-...-NOTIFICATION-WIRING-V1, smoke PASS),

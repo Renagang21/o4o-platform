@@ -584,7 +584,7 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
         { label: '진열 관리', route: '/store/commerce/products/b2c' },
         { label: '채널 진열', route: '/store/channels' },
         { label: '고객 요청 관리', route: '/store/requests' },
-        { label: '주문 관리', route: '/store/commerce/orders' },
+        { label: '발주 내역', route: '/store/commerce/orders' },
       ],
       linkTo: '/guide/features/store',
     },
@@ -1741,7 +1741,9 @@ export const kpaGuideForStoreOwnerProps: GuideUsagePageProps = {
         { label: '상품 마스터', detail: '/store/my-products — 취급 상품 정보·가격·재고' },
         { label: 'B2B 발주', detail: '/store/commerce/products — 공급자 카탈로그 조회·주문' },
         { label: '진열 관리', detail: '/store/commerce/products/b2c — 진열·채널 노출 설정' },
-        { label: '주문 관리', detail: '/store/commerce/order-worktable — 주문 상태·배송' },
+        // WO-O4O-STORE-AND-PLATFORM-CONSUMER-COMMERCE-LEGACY-RETIREMENT-V1:
+        //   주문 작업대의 주문 실행 leg 은퇴 → canonical 발주 내역(buyerId 축)으로 정정.
+        { label: '발주 내역', detail: '/store/commerce/orders — 발주·결제·배송 진행 상태' },
       ],
     },
     {
