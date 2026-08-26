@@ -170,11 +170,19 @@ describe('WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1',
 
   describe('canonical 축은 유지된다', () => {
     it.each([
-      ['/api/v1/appstore', 'appstoreRoutes'],
       ['/api/v1/apps', 'appAvailabilityRoutes'],
       ['/api/v1/admin/apps', 'adminAppsRoutes'],
     ])('%s mount 가 유지된다', (mountPath, routerName) => {
       expect(registerSrc).toContain(`app.use('${mountPath}', ${routerName});`);
+    });
+
+    // WO-O4O-PUBLIC-APPSTORE-READ-CONTRACT-CENSUS-AND-DISPOSITION-V1:
+    //   이 WO 당시 유지를 단언했던 `/api/v1/appstore` 는 후속 전수조사에서
+    //   code·frontend·external consumer 0, organic traffic 0,
+    //   `/admin/apps/market` 과 DUPLICATE_READ 로 확인돼 은퇴했다.
+    //   근거는 `public-appstore-read-retirement.spec.ts` 와 CHECK 문서에 있다.
+    it('/api/v1/appstore mount 는 되살아나지 않는다', () => {
+      expect(registerSrc).not.toContain("app.use('/api/v1/appstore'");
     });
 
     it.each(KEPT_ADMIN_READ_ROUTES.map((r) => [r]))('admin read 라우트 %s 가 유지된다', (route) => {

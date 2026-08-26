@@ -474,67 +474,12 @@ export function isInCatalog(appId: string): boolean {
   return APPS_CATALOG.some((app) => app.appId === appId);
 }
 
-/**
- * Search apps by query string
- * Searches in name, description, and tags
- *
- * @param query - Search query
- * @returns Array of matching catalog items
- */
-export function searchCatalog(query: string): AppCatalogItem[] {
-  if (!query || query.trim() === '') {
-    return APPS_CATALOG;
-  }
-
-  const normalizedQuery = query.toLowerCase().trim();
-
-  return APPS_CATALOG.filter((app) => {
-    // Search in name
-    if (app.name.toLowerCase().includes(normalizedQuery)) return true;
-
-    // Search in description
-    if (app.description?.toLowerCase().includes(normalizedQuery)) return true;
-
-    // Search in appId
-    if (app.appId.toLowerCase().includes(normalizedQuery)) return true;
-
-    // Search in tags
-    if (app.tags?.some((tag) => tag.toLowerCase().includes(normalizedQuery))) return true;
-
-    return false;
-  });
-}
-
-/**
- * Filter apps by category
- *
- * @param category - Category to filter by
- * @returns Array of matching catalog items
- */
-export function filterByCategory(category: string): AppCatalogItem[] {
-  if (!category || category === 'all') {
-    return APPS_CATALOG;
-  }
-
-  return APPS_CATALOG.filter((app) => app.category === category);
-}
-
-/**
- * Get all unique categories in catalog
- *
- * @returns Array of category names
- */
-export function getCategories(): string[] {
-  const categories = new Set<string>();
-
-  for (const app of APPS_CATALOG) {
-    if (app.category) {
-      categories.add(app.category);
-    }
-  }
-
-  return Array.from(categories).sort();
-}
+// WO-O4O-PUBLIC-APPSTORE-READ-CONTRACT-CENSUS-AND-DISPOSITION-V1:
+//   searchCatalog() · filterByCategory() · getCategories() 는 은퇴한
+//   `GET /api/v1/appstore` 의 search·category 질의 전용 helper 였고 다른 소비처가
+//   없었다(전수 검색 0). public surface 와 함께 제거한다.
+//   APPS_CATALOG 자체와 serviceGroup 계열 helper 는 admin/apps · CI guard ·
+//   multi-tenant 스펙이 계속 소비하므로 그대로 둔다.
 
 /**
  * Get apps that depend on a specific app

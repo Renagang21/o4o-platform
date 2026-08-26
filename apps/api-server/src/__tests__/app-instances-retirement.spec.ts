@@ -53,7 +53,10 @@ describe('app_instances retirement contract', () => {
   it('app_registry 정본은 그대로 유지된다 (회귀 가드)', () => {
     expect(existsSync(join(SRC, 'entities', 'AppRegistry.ts'))).toBe(true);
     expect(existsSync(join(SRC, 'routes', 'admin', 'apps.routes.ts'))).toBe(true);
-    expect(existsSync(join(SRC, 'routes', 'appstore.routes.ts'))).toBe(true);
+    // WO-O4O-PUBLIC-APPSTORE-READ-CONTRACT-CENSUS-AND-DISPOSITION-V1:
+    //   공개 카탈로그 API 2종이 은퇴하며 appstore.routes.ts 도 제거됐다.
+    //   app_registry 정본은 admin/apps · app-availability 로 유지된다.
+    expect(existsSync(join(SRC, 'routes', 'appstore.routes.ts'))).toBe(false);
     expect(existsSync(join(SRC, 'routes', 'app-availability.routes.ts'))).toBe(true);
 
     const entities = readFileSync(join(SRC, 'database', 'entities.ts'), 'utf-8');

@@ -53,7 +53,6 @@ import adminSecurityBlockedIpsRoutes from '../routes/admin/security-blocked-ips.
 // DOMAIN ROUTE IMPORTS (registered after DB init)
 // ============================================================================
 
-import appstoreRoutes from '../routes/appstore.routes.js';
 import navigationRoutes from '../routes/navigation.routes.js';
 import routesRoutes from '../routes/routes.routes.js';
 import publicRoutes from '../routes/public.routes.js';
@@ -225,9 +224,28 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // `/api/v1/apps/availability` 가 담당한다. 도메인 route 는 아래처럼 정적 mount 한다.
     // ========================================================================
 
-    // 4. Register AppStore routes for app lifecycle management
-    app.use('/api/v1/appstore', appstoreRoutes);
-    logger.info('✅ AppStore routes registered at /api/v1/appstore');
+    // ========================================================================
+    // WO-O4O-PUBLIC-APPSTORE-READ-CONTRACT-CENSUS-AND-DISPOSITION-V1
+    //   판정 PUBLIC_APPSTORE_READ_RETIRE — 공개 카탈로그 API 2종 은퇴
+    //     GET /api/v1/appstore
+    //     GET /api/v1/appstore/:appId
+    //
+    //   - code consumer 0: 저장소 전체에서 '/api/v1/appstore' 문자열을 호출하는 코드가
+    //     이 mount 와 자기 자신의 테스트뿐이었다.
+    //   - frontend consumer 0: admin AppStore 화면은 '/admin/apps/*' 만 호출한다.
+    //     main-site 의 appstore UI 는 별도 client-side registry 를 쓰며 라우팅도 없다.
+    //   - external contract 0: swagger/OpenAPI 에 appstore 경로가 등재된 적이 없고
+    //     SDK · partner docs · public developer docs 어디에도 나오지 않는다.
+    //   - organic traffic 0: 로그 보존 30일 관측창(2026-07-27~08-26) 전체 65건이
+    //     전부 curl 2개 IP 의 선행 WO 검증 트래픽이었다. 브라우저 · 봇 · 외부 클라이언트 0.
+    //   - unique value 0: 목록 응답은 인증된 'GET /api/v1/admin/apps/market' 이
+    //     반환하는 APPS_CATALOG 와 동일하다(DUPLICATE_READ). 상세는 그 부분집합이다.
+    //   - 무인증으로 앱 topology · 의존 그래프 · experimental 상태를 노출하고 있었다.
+    //
+    //   ⚠ APPS_CATALOG(정본 metadata) 는 유지한다. 이번 판정은 "정본을 인터넷에
+    //     공개하는 HTTP surface" 만 닫는 것이며, catalog 자체는 '/admin/apps' 와
+    //     CI AppStore Guard · multi-tenant 스펙이 계속 소비한다.
+    // ========================================================================
 
     // 4.1 Register Navigation routes (Phase P0 Task A - Dynamic Navigation)
     app.use('/api/v1/navigation', navigationRoutes);
