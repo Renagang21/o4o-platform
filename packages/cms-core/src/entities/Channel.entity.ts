@@ -72,6 +72,14 @@ export class Channel {
   code!: string | null;
   // Machine-readable unique code: "GN-TV-001", "SEOUL-LOBBY-01"
   // Used for device binding and API identification
+  //
+  // WO-O4O-CHANNEL-CODE-DATABASE-UNIQUENESS-INTEGRITY-V1:
+  //   유일성은 **DB 의 부분 유니크 인덱스** `UQ_channels_code`
+  //   (`ON channels (code) WHERE code IS NOT NULL`, migration 20270319000000)가 보장한다.
+  //   전역 유일이다 — serviceKey 별이 아니다(player 가 code 만으로 채널을 주소지정한다).
+  //   case-sensitive 이고 trim 하지 않는다. nullable 은 유지된다(코드 없는 채널 허용).
+  //   위 decorator 의 @Index() 는 이 테이블의 다른 인덱스들과 마찬가지로 표시용이며,
+  //   실제 인덱스 정본은 migration 이다(synchronize=false).
 
   @Column({ type: 'text', nullable: true })
   description!: string | null;

@@ -50,6 +50,33 @@ const VALID_CHANNEL_STATUSES: ChannelStatus[] = ['active', 'inactive', 'maintena
 const VALID_ORIENTATIONS = ['landscape', 'portrait'];
 
 /**
+ * WO-O4O-CHANNEL-CODE-DATABASE-UNIQUENESS-INTEGRITY-V1
+ *
+ * `channels.code` 의 부분 유니크 인덱스 이름(migration 20270319000000).
+ * 사전 검사(findOne)와 INSERT 사이의 경쟁 상태에서는 DB 가 유일성을 막는다.
+ * 그 위반을 기존 API 계약인 409 DUPLICATE_CODE 로 수렴시키기 위한 식별자다.
+ */
+const CHANNEL_CODE_UNIQUE_INDEX = 'UQ_channels_code';
+
+/**
+ * unique violation(23505) 중 **channels.code 제약** 인 경우에만 true.
+ *
+ * 모든 23505 를 DUPLICATE_CODE 로 바꾸면 다른 유니크 제약 위반까지 잘못된 업무 오류로
+ * 둔갑한다. constraint 이름으로 정확히 좁힌다. TypeORM 은 driver 오류를 wrap 하므로
+ * 양쪽(err, err.driverError)을 모두 본다.
+ */
+export function isChannelCodeDuplicateViolation(err: unknown): boolean {
+  const e = err as {
+    code?: string;
+    constraint?: string;
+    driverError?: { code?: string; constraint?: string };
+  };
+  const code = e?.code ?? e?.driverError?.code;
+  const constraint = e?.constraint ?? e?.driverError?.constraint;
+  return code === '23505' && constraint === CHANNEL_CODE_UNIQUE_INDEX;
+}
+
+/**
  * Create Channel routes
  */
 export function createChannelRoutes(dataSource: DataSource): Router {
@@ -348,6 +375,16 @@ export function createChannelRoutes(dataSource: DataSource): Router {
         data: saved,
       });
     } catch (error: any) {
+      // WO-O4O-CHANNEL-CODE-DATABASE-UNIQUENESS-INTEGRITY-V1 §16:
+      //   사전 검사를 통과했더라도 동시 요청이면 DB 유니크 인덱스가 INSERT 를 막는다.
+      //   그 경우 500 이나 Postgres 원문이 아니라 기존 계약인 409 DUPLICATE_CODE 로 응답한다.
+      if (isChannelCodeDuplicateViolation(error)) {
+        res.status(409).json({
+          success: false,
+          error: { code: 'DUPLICATE_CODE', message: 'A channel with this code already exists' },
+        });
+        return;
+      }
       console.error('Failed to create channel:', error);
       res.status(500).json({
         success: false,
@@ -457,6 +494,14 @@ export function createChannelRoutes(dataSource: DataSource): Router {
         data: updated,
       });
     } catch (error: any) {
+      // WO-O4O-CHANNEL-CODE-DATABASE-UNIQUENESS-INTEGRITY-V1 §16
+      if (isChannelCodeDuplicateViolation(error)) {
+        res.status(409).json({
+          success: false,
+          error: { code: 'DUPLICATE_CODE', message: 'A channel with this code already exists' },
+        });
+        return;
+      }
       console.error('Failed to update channel:', error);
       res.status(500).json({
         success: false,
