@@ -36,9 +36,9 @@ import { AdminSellerDetailView } from '@/components/ui/admin/AdminSellerDetailVi
 import { AdminSupplierListView } from '@/components/ui/admin/AdminSupplierListView';
 import { AdminSupplierDetailView } from '@/components/ui/admin/AdminSupplierDetailView';
 
-// AppStore UI Components
-import { AppList } from '@/components/ui/appstore/AppList';
-import { AppCard } from '@/components/ui/appstore/AppCard';
+// WO-O4O-MAIN-SITE-APPSTORE-PARALLEL-AXIS-CENSUS-AND-RETIREMENT-V1:
+//   AppList · AppCard 는 appStoreManager 가 반환하던 병렬 App Store 축 전용 UI 였다.
+//   진입 view(views/appstore.json) 가 라우팅되지 않아 렌더된 적이 없다.
 
 // CMS UI Components
 import { ViewList } from '@/components/ui/cms/ViewList';
@@ -143,9 +143,6 @@ export const UIComponentRegistry: Record<string, React.ComponentType<any>> = {
   AdminSellerDetailView,
   AdminSupplierListView,
   AdminSupplierDetailView,
-  // AppStore
-  AppList,
-  AppCard,
   // CMS
   ViewList,
   ViewForm,

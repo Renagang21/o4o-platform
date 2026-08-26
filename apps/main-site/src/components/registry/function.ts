@@ -44,8 +44,11 @@ import { adminSellerDetail } from '@/shortcodes/_functions/admin/adminSellerDeta
 import { adminSupplierList } from '@/shortcodes/_functions/admin/adminSupplierList';
 import { adminSupplierDetail } from '@/shortcodes/_functions/admin/adminSupplierDetail';
 
-// AppStore Function Components
-import { appStoreManager } from '@/shortcodes/_functions/appstore/appStoreManager';
+// WO-O4O-MAIN-SITE-APPSTORE-PARALLEL-AXIS-CENSUS-AND-RETIREMENT-V1:
+//   appStoreManager 는 main-site 전용 client-side AppRegistry 를 읽어 install/uninstall/
+//   toggle 을 전부 alert() 스텁으로 처리하던 병렬 App Store 축이었다.
+//   App 정의 정본은 APPS_CATALOG, 운영 상태는 app_registry 이며 read 는
+//   /api/v1/admin/apps · /api/v1/apps/availability 다. 병렬축만 제거한다.
 
 // CMS Function Components
 import { viewList } from '@/shortcodes/_functions/cms/viewList';
@@ -82,8 +85,6 @@ export const FunctionRegistry: Record<string, FunctionComponent> = {
   adminSellerDetail,
   adminSupplierList,
   adminSupplierDetail,
-  // AppStore
-  appStoreManager,
   // CMS
   viewList,
   viewForm,

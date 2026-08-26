@@ -6,16 +6,12 @@ import App from './App';
 import { AuthProvider, OrganizationProvider } from './context';
 import './index.css';
 
-// Initialize AppStore in background
-import { initializeAppStore } from './appstore';
-
-// Start AppStore initialization (non-blocking)
-initializeAppStore()
-  .then(() => {
-  })
-  .catch((error) => {
-    console.error('[Main] AppStore initialization failed:', error);
-  });
+// WO-O4O-MAIN-SITE-APPSTORE-PARALLEL-AXIS-CENSUS-AND-RETIREMENT-V1:
+//   부팅 시 initializeAppStore() 가 client-side AppRegistry 를 돌며
+//   @o4o-apps/commerce·customer·admin manifest 를 찾다 실패하면 stub manifest 로
+//   가짜 컴포넌트를 만들어 FunctionRegistry / UIComponentRegistry 에 주입했다.
+//   세 패키지는 존재하지 않고, 주입 결과를 읽는 ViewRenderer 는 어디서도
+//   import 되지 않아 실제 효과가 0 인 부팅 부작용이었다. 병렬축과 함께 제거한다.
 
 // Performance: Optimized React Query configuration
 const queryClient = new QueryClient({
