@@ -188,7 +188,7 @@ DB 컬럼 표기 통일(snake→camel)도 범위 밖으로 남겼다(§5 참조)
 |---|---|
 | api-server `tsc --noEmit` | 0 error |
 | api-server build (emit) | 성공 |
-| api-server Jest 전체 | **194 suites / 3232 tests / 0 fail** |
+| api-server Jest 전체 | **194 suites / 3242 tests / 0 fail** (rebase 후 재실행 기준) |
 | admin-dashboard typecheck | 0 error |
 | admin-dashboard build | 성공 (`built in 1m 46s`) |
 
@@ -220,6 +220,59 @@ packages/cms-core/src/entities/ChannelHeartbeat.entity.ts              컬럼 na
 | `synchronize` | `connection.ts`, `migration-config.ts` 모두 `false` (변경 없음) |
 | fixture 생성 | **0** |
 
-## 16. 배포 및 production 사후 확인 (§23/§26)
+## 16. 배포 (§26)
 
-(아래 섹션은 push/배포 후 실측으로 채운다)
+- main push: `2b931ff5ae48d624317baa56dab955ba509c9c57`
+  (push 직전 `origin/main` = `23f1cc723` 로 rebase, conflict 0. rebase 후 tsc/Jest 재실행 → 위 §13 수치)
+- GitHub Actions (headSha `2b931ff5a`):
+  - Deploy API Server (Cloud Run) — **success**
+  - Deploy Admin Dashboard (Cloud Run) — **success**
+  - Deploy Web Services (Cloud Run) — **success**
+  - CodeQL Security Analysis — **success**
+  - CI Pipeline — `cancelled` (이후 커밋 `6f950958f` 가 push 되어 concurrency 로 취소됨.
+    동일 트리에 대한 tsc/Jest 전체는 로컬에서 통과 확인 — §13)
+- 서빙 확인:
+  `o4o-core-api` 서빙 revision `o4o-core-api-03466-f7n`
+  image `asia-northeast3-docker.pkg.dev/netureyoutube/o4o-api/api-server:2b931ff5ae48d624317baa56dab955ba509c9c57`
+  → 이번 커밋 SHA 태그가 실제로 서빙 중.
+
+## 17. production 사후 smoke (§23) — read-only
+
+수정 전/후 비교:
+
+| 요청 | 수정 전 | 수정 후 |
+|---|---|---|
+| `GET /api/v1/channels` | 500 `No metadata for "Channel" was found.` | **200** `{"success":true,"data":[],"pagination":{"total":0,"limit":50,"offset":0}}` |
+| `GET /api/v1/channels?serviceKey=kpa` | 500 | **200** (빈 목록) |
+| `GET /api/v1/channels?serviceKey=kpa-society` | 500 | **200** (alias/canonical 동일 결과) |
+| `GET /api/v1/channels/health` | 400 `INVALID_ID` | **200** `{"status":"ok","service":"channels"}` |
+| `GET /api/v1/channels/:uuid` (없는 id) | 500 | **404 NOT_FOUND** |
+| `GET /api/v1/channels/code/NOPE` | 500 | **404 NOT_FOUND** |
+
+404 가 정상적으로 나온다는 것은 metadata 확보 후 실제 DB 조회까지 성공했다는 뜻이다
+(미등록이면 조회 이전에 500 이 났다).
+
+auth 계약(§18) — 모두 DB 접근 이전에 차단됨:
+
+| 요청 | 응답 |
+|---|---|
+| `POST /api/v1/channels` (미인증) | 401 `AUTH_REQUIRED` |
+| `GET /api/v1/admin/channels/ops` | 401 `AUTH_REQUIRED` |
+| `GET /api/v1/admin/channels/heartbeat/status` | 401 `AUTH_REQUIRED` |
+| `GET /api/v1/admin/channel-playback-logs` | 401 `AUTH_REQUIRED` |
+| `GET /api/v1/admin/channel-playback-logs/stats/summary` | 401 `AUTH_REQUIRED` |
+
+**AUTH_SMOKE_BLOCKED:** admin 인증 토큰이 없어 admin 전용 3개 라우트의 **인증 후** 200 응답과
+admin UI 브라우저 화면(로그인 필요)은 직접 확인하지 못했다.
+서버측 근거는 확보되어 있다 — 세 entity 모두 production DB 에 붙여 repository 초기화와
+실제 컬럼 SQL 전개를 실증했고(§7), admin UI 가 호출하는 `/channels` 계열은 200 이다.
+`POST /:id/playback-log`, `POST /:id/heartbeat` 는 인증이 없는 write 경로이므로
+production write 0 원칙에 따라 **호출하지 않았다**(테스트 fixture 로만 검증, §8).
+
+배포 후 재확인: `channels=0 logs=0 heartbeats=0` — 이번 작업으로 production 에 쓴 행 **0**.
+
+## 18. 판정
+
+**PASS** — `/api/v1/channels*` 의 500 이 제거되었고, 같은 runtime 축의
+`ChannelPlaybackLog` / `ChannelHeartbeat` 까지 등록·컬럼 정합·회귀 테스트로 함께 닫았다.
+남은 미확인 항목은 §17 의 admin 인증 후 smoke 하나이며, 그 원인은 credential 부재다.
