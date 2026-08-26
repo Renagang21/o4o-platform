@@ -353,7 +353,6 @@ import {
 // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
 // ============================================================================
 import {
-  PartnerApplication,
   PartnerContent,
   PartnerEvent,
   PartnerTarget,
@@ -854,9 +853,9 @@ export const entities = [
   PartnerContent,
   PartnerEvent,
   PartnerTarget,
-  // WO-PARTNER-APPLICATION-V1 / WO-O4O-TYPEORM-ENTITY-REGISTRY-INTEGRITY-GUARD-AND-CI-ADOPTION-V1
-  // /api/v1/partner/applications 가 getRepository(PartnerApplication) 로 소비한다 (미등록 시 500)
-  PartnerApplication,
+  // WO-O4O-PARTNER-APPLICATION-ENTITY-TABLE-CONTRACT-ROOT-CAUSE-AND-PRODUCTION-CLOSURE-V1:
+  //   PartnerApplication 등록 제거. 대상 테이블 partner_applications 는 migration 이 없어
+  //   프로덕션에 존재한 적이 없고, 소비 route 는 `/api/v1/partner` 마운트에 가려 도달 불가였다.
   // ============================================================================
   // CONTENT TEMPLATE ENTITY (WO-O4O-CONTENT-TEMPLATE-SYSTEM-V1)
   // ============================================================================

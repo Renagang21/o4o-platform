@@ -83,7 +83,7 @@ import { MarketTrialController } from '../controllers/market-trial/marketTrialCo
 import { MarketTrialOperatorController } from '../controllers/market-trial/marketTrialOperatorController.js';
 import { createNetureOperatorTrialRoutes } from '../routes/market-trial-operator.routes.js';
 import partnerRoutes from '../routes/partner.routes.js';
-import { partnerDashboardRoutes, partnerApplicationRoutes } from '../modules/partner/index.js';
+import { partnerDashboardRoutes } from '../modules/partner/index.js';
 import checkoutRoutes from '../routes/checkout.routes.js';
 import adminOrderRoutes from '../routes/admin-orders.routes.js';
 import adminDashboardRoutes from '../routes/admin/dashboard.routes.js';
@@ -406,9 +406,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/v1/partner', partnerDashboardRoutes);
     logger.info('✅ Partner Dashboard API v1 registered at /api/v1/partner');
 
-    // 21-b. Register Partner Application API (WO-PARTNER-APPLICATION-V1) - PUBLIC ENDPOINT
-    app.use('/api/v1/partner/applications', partnerApplicationRoutes);
-    logger.info('✅ Partner Application API registered at /api/v1/partner/applications');
+    // 21-b. (은퇴) Partner Application API — WO-PARTNER-APPLICATION-V1
+    //   WO-O4O-PARTNER-APPLICATION-ENTITY-TABLE-CONTRACT-ROOT-CAUSE-AND-PRODUCTION-CLOSURE-V1:
+    //   이 mount 는 **도달 불가**였다. 바로 위 21-a 가 `/api/v1/partner` 로 먼저 마운트되고
+    //   partner-dashboard.routes 가 router 레벨에서 `authenticate + partnerContextGuard` 를 걸기 때문에
+    //   `/api/v1/partner/applications` 는 항상 21-a 에 먼저 매칭돼 401/403('Partner role required')로 끝났다.
+    //   즉 "파트너가 되려는 사람"이 "파트너 역할"을 요구받는 논리적 모순 상태였고,
+    //   대상 테이블 `partner_applications` 는 migration 이 없어 프로덕션에 존재한 적도 없다.
+    //   canonical 대체 경로 = POST /api/v1/cosmetics/stores/apply
+    //   → cosmetics.cosmetics_store_applications → 운영자 검수 콘솔(/operator/applications).
+    //   90일 프로덕션 호출 0건. entity/service/route 전부 제거했다.
 
     // 22. Register Market Trial routes (Phase L-1)
     MarketTrialController.setDataSource(dataSource);

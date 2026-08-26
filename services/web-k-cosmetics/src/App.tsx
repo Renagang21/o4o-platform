@@ -71,8 +71,9 @@ const MyCertificatesPage = lazy(() => import('@/pages/mypage/MyCertificatesPage'
 // WO-O4O-MYPAGE-MY-REQUESTS-INBOX-GLYCO-KCOS-ROUTE-V1
 const KcosMyRequestsPage = lazy(() => import('@/pages/mypage/MyRequestsPage'));
 
-// Partner Application (WO-PARTNER-APPLICATION-V1)
-const PartnerApplyPage = lazy(() => import('@/pages/partners/ApplyPage'));
+// WO-O4O-PARTNER-APPLICATION-ENTITY-TABLE-CONTRACT-ROOT-CAUSE-AND-PRODUCTION-CLOSURE-V1:
+//   PartnerApplyPage(/partners/apply) 은퇴. 소비 API(POST /api/v1/partner/applications)는
+//   `/api/v1/partner` 마운트에 가려 401/403 으로만 응답했고 대상 테이블도 존재한 적이 없다.
 
 // Hub (WO-O4O-EXPLORATION-HUB-REMOVAL-V1: StoreHubTemplate 기반)
 // WO-O4O-STOREHUB-STRUCTURE-ALIGNMENT-V1: KCosmeticsHubLayout + nested routes
@@ -462,7 +463,6 @@ function AppRoutes() {
         {/* WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 모바일 매장 경영 허브 */}
         <Route path="mobile/store" element={<MobileStorePage />} />
         <Route path="partners" element={<PartnerInfoPage />} />
-        <Route path="partners/apply" element={<PartnerApplyPage />} />
 
         {/* Resources Hub (WO-KCOS-RESOURCES-HUB-IMPLEMENTATION-V1) */}
         <Route path="resources" element={<ResourcesPage />} />
