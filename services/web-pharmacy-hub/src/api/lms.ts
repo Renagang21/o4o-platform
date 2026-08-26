@@ -315,9 +315,15 @@ export const lmsApi = {
     return data?.data?.course ?? data?.data ?? data;
   },
 
+  // WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10:
+  //   `POST /lms/courses` 는 태그가 필수다 (O4O Tag Policy V1 — CourseService.createCourse).
+  //   생성 시점의 공개범위·승인 여부도 KPA 와 같은 축으로 함께 보낸다.
   instructorCreateCourse: async (dto: {
     title: string;
     description?: string;
+    tags?: string[];
+    visibility?: CourseVisibility;
+    requiresApproval?: boolean;
   }): Promise<InstructorCourseDetail> => {
     const { data } = await api.post<any>('/lms/courses', dto);
     return data?.data?.course ?? data?.data ?? data;

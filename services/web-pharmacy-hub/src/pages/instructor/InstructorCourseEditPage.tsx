@@ -335,9 +335,6 @@ export default function InstructorCourseEditPage() {
     () => !!(location.state as { justCreated?: boolean } | null)?.justCreated,
   );
 
-  const [newForm, setNewForm] = useState({ title: '', description: '' });
-  const [creating, setCreating] = useState(false);
-  const [createErr, setCreateErr] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     if (isNew || !courseId) return;
@@ -357,20 +354,21 @@ export default function InstructorCourseEditPage() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const handleCreateCourse = async () => {
-    if (!newForm.title.trim()) { setCreateErr('제목을 입력하세요.'); return; }
-    setCreating(true);
-    setCreateErr(null);
-    try {
-      const created = await lmsApi.instructorCreateCourse({
-        title: newForm.title.trim(),
-        description: newForm.description.trim() || undefined,
-      });
-      navigate(`/instructor/courses/${created.id}`, { state: { justCreated: true }, replace: true });
-    } catch (e: any) {
-      setCreateErr(e?.response?.data?.error || '강의 생성에 실패했습니다.');
-      setCreating(false);
-    }
+  /**
+   * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-MY-STORE-PRODUCTION-CLOSURE-V1 §10/§15:
+   *   PH 신규 강의 form 이 제목·설명만 보냈는데 `POST /lms/courses` 는 O4O Tag Policy V1 로
+   *   태그를 필수로 요구한다 — 화면에 태그 입력이 없어 `강의 생성` 이 항상 실패했다(production 실측).
+   *   KPA `CourseNewPage` 와 같은 공통 `InstructorCourseFormShell` 을 쓴다 (PH 전용 form 복제 제거).
+   */
+  const handleCreateCourse = async (values: InstructorCourseFormValues) => {
+    const created = await lmsApi.instructorCreateCourse({
+      title: values.title,
+      description: values.description || undefined,
+      tags: values.tags,
+      visibility: values.visibility,
+      requiresApproval: values.requiresApproval,
+    });
+    navigate(`/instructor/courses/${created.id}`, { state: { justCreated: true }, replace: true });
   };
 
   const handleSaveCourse = async (values: InstructorCourseFormValues) => {
@@ -438,32 +436,18 @@ export default function InstructorCourseEditPage() {
         <div style={s.section}>
           <div style={s.sectionTitle}>새 강의 만들기</div>
           <div style={s.card}>
-            <div style={s.field}>
-              <label style={s.label}>제목 *</label>
-              <input
-                style={s.input}
-                value={newForm.title}
-                onChange={(e) => setNewForm((f) => ({ ...f, title: e.target.value }))}
-                placeholder="강의 제목을 입력하세요"
-                onKeyDown={(e) => e.key === 'Enter' && handleCreateCourse()}
-              />
-            </div>
-            <div style={s.field}>
-              <label style={s.label}>설명</label>
-              <textarea
-                style={s.textarea}
-                value={newForm.description}
-                onChange={(e) => setNewForm((f) => ({ ...f, description: e.target.value }))}
-                placeholder="강의 설명 (선택)"
-              />
-            </div>
-            {createErr && <p style={s.error}>{createErr}</p>}
-            <div style={s.row}>
-              <button style={saveBtnStyle(creating || !newForm.title.trim())} disabled={creating || !newForm.title.trim()} onClick={handleCreateCourse}>
-                {creating ? '생성 중...' : '강의 생성'}
-              </button>
-              <button style={s.cancelBtn} onClick={() => navigate('/instructor/courses')}>취소</button>
-            </div>
+            <InstructorCourseFormShell
+              config={{
+                accent: C.primary,
+                submitLabel: '강의 생성',
+                submittingLabel: '생성 중...',
+                requireDescription: true,
+                requireTags: true,
+                fields: { reusablePolicy: false },
+              }}
+              onSubmit={handleCreateCourse}
+              onCancel={() => navigate('/instructor/courses')}
+            />
           </div>
         </div>
       </div>
