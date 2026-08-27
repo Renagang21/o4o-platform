@@ -22,18 +22,40 @@ const parsed = defaultParser.parse('[cpt_list type="ds_product" count="6"]');
 <ShortcodeRenderer content="[cpt_list type='ds_product' count='6']" />
 ```
 
-## 지원하는 Shortcodes
+## 등록 계약 (SSOT)
 
-### 동적 데이터
+registry 는 `src/registry.ts` 의 **`globalRegistry` 단일 인스턴스**다.
+renderer 도 editor 도 이 인스턴스만 조회하므로, **여기에 등록되지 않은 shortcode 는
+화면에서 원문 그대로 남거나 unknown 으로 표시된다.**
+
+등록은 **side-effect 가 아니다.** 이 패키지를 import 하는 것만으로는 아무것도
+등록되지 않고, 소비 앱이 initializer 를 호출해야 한다. 현재 유일한 bootstrap 은
+`apps/admin-dashboard/src/utils/register-dynamic-shortcodes.ts` 다.
+
+```typescript
+import { globalRegistry, registerPresetShortcode, registerDynamicShortcodes } from '@o4o/shortcodes';
+
+registerDynamicShortcodes(globalRegistry);
+registerPresetShortcode();
+```
+
+## 실제 등록되는 Shortcodes
+
+### 동적 데이터 (`registerDynamicShortcodes`)
 - `[cpt_list]` - CPT 게시물 목록
 - `[cpt_field]` - CPT 필드 값
 - `[acf_field]` - ACF 커스텀 필드
 - `[meta_field]` - 메타 필드 값
 
-### 기본 Shortcodes
-- `[gallery]` - 이미지 갤러리
-- `[button]` - 버튼
-- `[embed]` - 외부 컨텐츠 임베드
+### Preset (`registerPresetShortcode`)
+- `[preset]` - 저장된 preset 블록 렌더링
+
+### 등록되지 않는 정의
+- `[social_login]` · `[login_form]` · `[oauth_login]` — `registerAuthShortcodes()`
+  안에 정의돼 있으나 **호출자가 저장소 전체에서 0** 이다. 정의가 있다는 사실은
+  등록 근거가 아니다.
+
+정의·등록 상태는 `npx tsx scripts/audit/check-shortcode-registry.ts` 로 확인한다.
 
 ## 개발
 

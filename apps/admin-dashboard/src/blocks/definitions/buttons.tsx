@@ -7,6 +7,12 @@ import React from 'react';
 import { Square } from 'lucide-react';
 import { BlockDefinition } from '../registry/types';
 import { BlockComponent } from '../registry/types';
+// WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1:
+//   Vite(ESM) 번들에서 `require()` 는 런타임에 존재하지 않는다. 이 블록이
+//   registry 에 등록되지 않은 동안에는 드러나지 않던 결함이라, 등록 전에 정적
+//   ESM import 로 바꾼다. DynamicRenderer 는 BlockRegistry 만 참조하므로
+//   `blocks/index.ts` 와 순환하지 않는다.
+import { DynamicRenderer } from '../registry/DynamicRenderer';
 
 /**
  * Simple Buttons Block Component
@@ -36,7 +42,6 @@ const ButtonsBlock: BlockComponent = ({
       ) : (
         innerBlocks.map((block: any) => {
           // Render inner blocks (buttons)
-          const DynamicRenderer = require('../registry/DynamicRenderer').DynamicRenderer;
           return (
             <DynamicRenderer
               key={block.id}

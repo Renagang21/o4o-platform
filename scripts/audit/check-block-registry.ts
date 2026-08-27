@@ -104,8 +104,14 @@ function findFilesRecursive(dir: string, pattern: RegExp, exclude: RegExp[]): st
     const filePath = path.join(dir, file);
     const stat = fs.statSync(filePath);
 
-    // Skip excluded patterns
-    if (exclude.some(regex => regex.test(filePath))) {
+    // Skip excluded patterns.
+    //   WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1:
+    //   exclude 패턴은 `/\/SlideBlock\.tsx$/` 처럼 **`/` 로 앵커**돼 있는데
+    //   `path.join` 이 만든 경로는 Windows 에서 `\` 구분자다. 그래서 이 목록이
+    //   Windows 에서만 통째로 무력화됐다(= 플랫폼별로 audit 결과가 달라졌다).
+    //   판정 입력도 repo-relative POSIX 경로로 canonicalize 한다.
+    const probePath = `/${toRepoPath(filePath)}`;
+    if (exclude.some(regex => regex.test(probePath))) {
       continue;
     }
 
@@ -141,7 +147,6 @@ function findBlockFiles(): BlockFile[] {
     /\/form-types\.ts$/,
     /\/useSlideAttributes\.ts$/,
     /\/SlideEditPanel\.tsx$/,
-    /\/SlideBlock\.tsx$/,
     /\/SlidePreview\.tsx$/,
     /\/QueryControls\.tsx$/,
   ];
@@ -160,7 +165,13 @@ function findBlockFiles(): BlockFile[] {
         content.includes('BlockDefinition') &&
         (content.includes('export default') || content.includes('export const'))
       ) {
-        const blockName = fileNameToBlockName(fileName);
+        // WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1:
+        //   block 이름은 **소스에 선언된 `name:` 이 정본**이다. 파일명 유추는
+        //   `SlideBlock.tsx` → `o4o/slide-block` 처럼 선언값(`o4o/slide`)과
+        //   어긋나 실재하는 등록을 dangling 으로 오판했다. 선언값을 먼저 읽고
+        //   없을 때만 파일명 유추로 떨어진다.
+        const declaredName = content.match(/^\s*name:\s*['"](o4o\/[a-z0-9-]+)['"]/m);
+        const blockName = declaredName ? declaredName[1] : fileNameToBlockName(fileName);
 
         // Try to extract category from file
         const categoryMatch = content.match(/category:\s*['"](\w+)['"]/);
@@ -182,7 +193,7 @@ function findBlockFiles(): BlockFile[] {
 /**
  * Extract registered block names from the main registration file
  */
-function findRegisteredBlocks(): RegistryEntry[] {
+function findRegisteredBlocks(files: BlockFile[]): RegistryEntry[] {
   const projectRoot = path.join(__dirname, '../..');
   const registrations: RegistryEntry[] = [];
 
@@ -191,6 +202,8 @@ function findRegisteredBlocks(): RegistryEntry[] {
     projectRoot,
     'apps/admin-dashboard/src/blocks/index.ts'
   );
+
+  const indexDir = path.dirname(indexPath);
 
   if (fs.existsSync(indexPath)) {
     const content = fs.readFileSync(indexPath, 'utf-8');
@@ -201,15 +214,30 @@ function findRegisteredBlocks(): RegistryEntry[] {
 
     for (const match of importMatches) {
       const varName = match[1];
+      const specifier = match[2];
 
-      // Convert variable name to block name
-      // Example: paragraphBlockDefinition → o4o/paragraph
+      // WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1:
+      //   등록 이름을 **import 변수명에서 유추하면 안 된다.** 실제로 등록되는 것은
+      //   definition 객체이고, 그 이름은 정의 파일의 `name:` 이다.
+      //   `socialBlockDefinition` → `o4o/social` 로 유추했지만 선언값은
+      //   `o4o/social-links` 라, 살아 있는 등록 1건이 dangling + missing 한 쌍으로
+      //   잘못 보고됐다. import 대상 파일을 찾아 선언값을 그대로 쓴다.
+      const resolved = toRepoPath(path.resolve(indexDir, specifier));
+      const target = files.find(
+        f =>
+          f.filePath === `${resolved}.tsx` ||
+          f.filePath === `${resolved}.ts` ||
+          f.filePath.startsWith(`${resolved}/`)
+      );
+
+      // 대상 파일을 못 찾으면(정의 파일이 실제로 없으면) 변수명 유추로 떨어진다.
+      // 이 경로로 나온 이름이 dangling 으로 잡히는 것이 정상 동작이다.
       const baseName = varName.replace(/BlockDefinition$/, '');
       const kebabCase = baseName
         .replace(/([a-z])([A-Z])/g, '$1-$2')
         .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
         .toLowerCase();
-      const blockName = `o4o/${kebabCase}`;
+      const blockName = target ? target.blockName : `o4o/${kebabCase}`;
 
       registrations.push({
         name: blockName,
@@ -263,7 +291,7 @@ function generateReport(): AuditReport {
   console.log(`   Found ${files.length} block definition files`);
 
   console.log('📋 Extracting registered blocks...');
-  const registered = findRegisteredBlocks();
+  const registered = findRegisteredBlocks(files);
   console.log(`   Found ${registered.length} registered blocks`);
 
   console.log('🔬 Analyzing registry...');
