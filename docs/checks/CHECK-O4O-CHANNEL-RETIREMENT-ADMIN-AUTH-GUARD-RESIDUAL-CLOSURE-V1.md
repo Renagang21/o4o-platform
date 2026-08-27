@@ -166,7 +166,53 @@ lint-ratchet 이 남긴 `::notice::` (baseline 69 → 64 로 낮추라는 안내
 
 ## §10 CI Pipeline 실제 확인
 
-(commit/push 후 기록 — 아래 §부록 참조)
+push: `dd0ce9e48..5917ea0e4` (branch `main`)
+
+### 10-1. 수정 직전 main 의 실제 실패 (대조군)
+
+run `33034146350` (commit `dd0ce9e48`) — **failure**
+
+```
+FAIL src/bootstrap/__tests__/admin-route-auth-boundary.test.ts
+Test Suites: 1 failed, 211 passed, 212 total
+Tests:       3 failed, 3561 passed, 3564 total
+##[error]Process completed with exit code 1.
+```
+
+즉 main 의 CI 실패는 **오직 이 spec 1개 / 3 tests** 이었다.
+
+### 10-2. 내 commit 의 첫 run — cancelled (실패 아님)
+
+run `33034731120` (commit `5917ea0e4`) — **cancelled**
+사유: `Canceling since a higher priority waiting request for ci-CI Pipeline-refs/heads/main exists`
+— 다른 세션이 바로 위에 `fe74f6ec1` 을 push 해 concurrency 그룹이 선행 run 을 취소했다.
+테스트 실패가 아니다.
+
+### 10-3. 내 commit 을 포함한 후속 run — **SUCCESS**
+
+run `33035062106` (commit `fe74f6ec1`, `5917ea0e4` 포함) — **✓ success**
+
+| Job | 결과 |
+|---|---|
+| Code Quality Check (98395922617) | ✓ success, 9m25s |
+| Build Applications (admin-dashboard) (98397405915) | ✓ success, 3m8s |
+
+`Code Quality Check → Run tests (api-server Jest, serial to prevent OOM)`:
+
+```
+Test Suites: 212 passed, 212 total
+Tests:       3561 passed, 3561 total
+```
+
+수정 전 `1 failed / 3 failed` → 수정 후 `212 passed / 3561 passed`. **CI Pipeline green 복구 확인.**
+
+annotation 은 2종만 남았고 둘 다 실패가 아니다:
+Node.js 20 deprecation 경고, lint-ratchet 의 `ERROR_BASELINE` 하향 권장 notice.
+
+### 10-4. 그 외 workflow
+
+`CodeQL Security Analysis` / `Deploy API Server (Cloud Run)` 는 별도 workflow 이며
+WO §10 에 따라 이번 판정 대상이 아니다.
 
 ---
 
