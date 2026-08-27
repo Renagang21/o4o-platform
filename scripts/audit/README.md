@@ -55,15 +55,25 @@ byte-identical files.
 
 ## Current Status
 
+Last measured 2026-08-27 (`WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1`).
+
 ### Blocks
-- **Coverage**: 97% (32/33 registered)
-- **Missing**: 1 (buttons.tsx)
-- **Dangling**: 1 (slide)
+- **Coverage**: 100% (33/33 registered)
+- **Missing**: 0
+- **Dangling**: 0
+- Checker exits **0**.
 
 ### Shortcodes
-- **Coverage**: 26% (16/61 registered)
-- **Missing**: 47 components
-- **Dangling**: 5 entries
+- **Coverage**: 100% of the axis this scanner can verify (3/3 registered)
+- **Missing**: 2 (`approval_queue`, `product_shortcodes`)
+- **Dangling**: 0
+- Checker exits **1** on the 2 missing entries.
+
+Those 2 are **not defects in the registry this scanner reads**. They belong to the
+admin-dashboard lazy-loader axis (`src/utils/shortcode-loader.ts`), whose single
+source of truth is not yet settled — deliberately left open for a follow-up WO
+rather than closed with placeholder registrations. See
+[`docs/checks/WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1-CHECK.md`](../../docs/checks/WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1-CHECK.md).
 
 ## Usage Examples
 
@@ -105,10 +115,12 @@ fileNameToShortcodeName("ProductGrid.tsx") // → "product_grid"
 
 ## Next Steps
 
-1. **Immediate**: Register `buttons` block
-2. **Phase 1**: Register core e-commerce shortcodes
-3. **Phase 2**: Register dashboard shortcodes
-4. **Phase 3**: Register admin tool shortcodes
-5. **Phase 4**: Register dropshipping suite shortcodes
+1. ~~Register `buttons` block~~ — done (`o4o/buttons`, 2026-08-27).
+2. **Settle the shortcode registry SSOT.** Three registration mechanisms coexist
+   (`packages/shortcodes` `registerShortcode`, the admin-dashboard
+   `import.meta.glob` lazy loader, and a plain `adminShortcodes` component map),
+   and `registerAuthShortcodes()` currently has no caller. Until that is decided,
+   do not add registrations to make the checker exit 0.
 
-See `REGISTRY_AUDIT_REPORT.md` for detailed recommendations.
+`REGISTRY_AUDIT_REPORT.md` §2–§8 is a 2025-11-21 snapshot and is no longer
+current; its header carries the up-to-date figures.

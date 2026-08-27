@@ -6,6 +6,25 @@
 
 ---
 
+> ## 현재 수치 (2026-08-27 갱신)
+>
+> 아래 **§2~§8 은 2025-11-21 시점의 기록**이다. 그 뒤 main-site shortcode 축이
+> 은퇴했고(`WO-O4O-MAIN-SITE-NEXTGEN-VIEWRENDERER-DOMAIN-CENSUS-AND-RETIREMENT-V1`),
+> scanner 자체의 오탐도 정리돼(`WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1`)
+> 본문의 목록·수치는 더 이상 현행이 아니다. **현행 수치는 이 표가 정본이다.**
+>
+> | 축 | files | registered | missing | dangling | checker |
+> |---|---:|---:|---:|---:|---|
+> | Block | 33 | 33 | **0** | **0** | exit 0 |
+> | Shortcode | 3 | 3 | 2 | **0** | exit 1 |
+>
+> shortcode 잔여 missing 2 (`approval_queue` · `product_shortcodes`) 는 결함이
+> 아니라 **admin-dashboard lazy-loader 축**에 속하며, 그 축의 SSOT 가 아직
+> 확정되지 않아 별도 WO 로 분리했다. 판정 근거는
+> [`docs/checks/WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1-CHECK.md`](../../docs/checks/WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1-CHECK.md).
+
+---
+
 ## Executive Summary
 
 This audit systematically analyzed all block and shortcode components in the o4o-platform codebase to ensure registry integrity and proper component registration. The audit successfully created automated tools for ongoing registry health checks.

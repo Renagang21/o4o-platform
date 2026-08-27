@@ -23,6 +23,7 @@ import videoBlockDefinition from './definitions/video';
 
 // Design blocks
 import buttonBlockDefinition from './definitions/button';
+import buttonsBlockDefinition from './definitions/buttons';
 
 // Layout blocks
 import columnsBlockDefinition from './definitions/columns';
@@ -77,6 +78,7 @@ export function registerAllBlocks(): void {
 
   // Register design blocks
   blockRegistry.register(buttonBlockDefinition);
+  blockRegistry.register(buttonsBlockDefinition);
 
   // Register layout blocks
   blockRegistry.register(columnsBlockDefinition);

@@ -50,6 +50,8 @@ interface ShortcodeFile {
 interface RegistryEntry {
   name: string;
   source: string;
+  /** alias 판정용 — 등록 블록에 적힌 component 식별자. */
+  component?: string;
 }
 
 interface NamingMismatch {
@@ -93,8 +95,14 @@ function findFilesRecursive(dir: string, pattern: RegExp, exclude: RegExp[]): st
     const filePath = path.join(dir, file);
     const stat = fs.statSync(filePath);
 
-    // Skip excluded patterns
-    if (exclude.some(regex => regex.test(filePath))) {
+    // Skip excluded patterns.
+    //   WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1:
+    //   exclude 패턴은 `/\/index\.ts$/` 처럼 **`/` 로 앵커**돼 있는데
+    //   `path.join` 이 만든 경로는 Windows 에서 `\` 구분자다. 그래서 이 목록이
+    //   Windows 에서만 통째로 무력화됐다(= 플랫폼별로 audit 결과가 달라졌다).
+    //   판정 입력도 repo-relative POSIX 경로로 canonicalize 한다.
+    const probePath = `/${toRepoPath(filePath)}`;
+    if (exclude.some(regex => regex.test(probePath))) {
       continue;
     }
 
@@ -152,6 +160,13 @@ function findShortcodeFiles(): ShortcodeFile[] {
     /\/PresetShortcode\.tsx$/,
     /\/TemplateRenderer\.ts$/,
     /\/helpers\//,
+    // WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1:
+    //   shortcode **컴포넌트가 아닌 인프라 모듈**이다. 등록될 대상이 아니므로
+    //   registry 를 고치는 대신 scanner 를 좁힌다(가짜 등록 금지).
+    //     metadata.ts          — shortcode 메타데이터 정의
+    //     utils/**             — 명명 규칙 helper (shortcodeNaming.ts 등)
+    /\/metadata\.ts$/,
+    /\/utils\//,
   ];
 
   const allFiles: ShortcodeFile[] = [];
@@ -218,9 +233,20 @@ function findRegisteredShortcodes(): RegistryEntry[] {
 
     for (const match of matches) {
       const shortcodeName = match[1];
+
+      // WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1:
+      //   같은 component 를 다른 이름으로 등록하는 **alias** 가 있다
+      //   (`login_form` · `oauth_login` → SocialLogin, 소스에 `(alias)` 로 명시).
+      //   scanner 는 "이름 1개 = 파일 1개" 만 표현할 수 있어 alias 를 구현 없는
+      //   dangling 으로 오판했다. 등록 블록에서 component 식별자를 함께 읽어
+      //   구현 존재 여부를 그 쪽으로 판정한다.
+      const window = content.slice(match.index ?? 0, (match.index ?? 0) + 600);
+      const componentMatch = window.match(/component:\s*(\w+)/);
+
       registrations.push({
         name: shortcodeName,
         source: toRepoPath(indexFile),
+        ...(componentMatch ? { component: componentMatch[1] } : {}),
       });
     }
   }
@@ -284,8 +310,11 @@ function analyzeRegistry(
   }
 
   // Find dangling registrations
+  //   이름이 안 맞아도 등록된 component 구현 파일이 스캔 대상에 있으면
+  //   dangling 이 아니다(위 alias 주석 참조).
+  const componentNames = new Set(files.map(f => f.fileName.replace(/\.tsx?$/, '')));
   for (const reg of registered) {
-    if (!fileNames.has(reg.name)) {
+    if (!fileNames.has(reg.name) && !(reg.component && componentNames.has(reg.component))) {
       dangling.push(reg);
     }
   }
