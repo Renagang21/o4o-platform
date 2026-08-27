@@ -9,15 +9,16 @@
  * - loading freeze 없음
  * - user state 정상 (nav/profile 표시)
  *
- * 환경변수 필요:
- *   E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD
+ * 환경변수 필요 (서비스별 분리 — helpers/auth.helpers.ts 상단 계약 참조):
+ *   E2E_{KPA|KCOS|NETURE|GLYCO}_ADMIN_EMAIL / _PASSWORD
  *   (docs/local/TEST-ACCOUNTS.local.md 참조)
  */
 
 import { test, expect } from '@playwright/test';
 import {
   ALL_SERVICES,
-  getAdminCredentials,
+  getServiceCredentials,
+  expectAuthenticated,
   loginAs,
   trackAuthMeRequests,
   clearAuthTokens,
@@ -33,25 +34,27 @@ for (const svc of ALL_SERVICES) {
     });
 
     test('로그인 성공 → 인증 토큰 저장 (또는 /login 이탈)', async ({ page }) => {
-      const { email, password } = getAdminCredentials();
+      const { email, password } = getServiceCredentials(svc);
       const ok = await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
 
       expect(ok, `[${svc.name}] 로그인 폼 입력 실패`).toBe(true);
 
       const url = page.url();
       // K-Cosmetics는 lazy session 전략 — 로그인 후 자동 redirect 없음.
-      // 대신 토큰이 localStorage에 저장되었는지 확인.
+      // 따라서 redirect 여부가 아니라 **토큰 저장**을 로그인 성공의 증거로 삼는다.
+      //
+      // 이전 판정은 `!url.includes('/login') || tokenStored` 였다. OR 이라서
+      // "토큰은 없지만 URL 만 바뀐" 상태도 통과할 수 있었다. 토큰을 필수로 바꾼다.
       const tokenStored = await page.evaluate(() => !!localStorage.getItem('o4o_accessToken'));
 
-      const isLoginSuccess = !url.includes('/login') || tokenStored;
       expect(
-        isLoginSuccess,
-        `[${svc.name}] 로그인 후 /login 잔류 + 토큰 미저장 — 로그인 실패`,
+        tokenStored,
+        `[${svc.name}] 로그인 후 accessToken 미저장 — 로그인 실패 (url=${url})`,
       ).toBe(true);
     });
 
     test('로그인 후 /auth/me 중복 호출 없음', async ({ page }) => {
-      const { email, password } = getAdminCredentials();
+      const { email, password } = getServiceCredentials(svc);
       const tracker = trackAuthMeRequests(page);
 
       await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
@@ -68,7 +71,7 @@ for (const svc of ALL_SERVICES) {
     });
 
     test('로그인 후 loading freeze 없음', async ({ page }) => {
-      const { email, password } = getAdminCredentials();
+      const { email, password } = getServiceCredentials(svc);
       await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
 
       await waitForLoadingComplete(page, 6000);
@@ -82,17 +85,23 @@ for (const svc of ALL_SERVICES) {
       expect(spinnerVisible, `[${svc.name}] 로그인 후 6초째 스피너 표시 — loading freeze`).toBe(false);
     });
 
-    test('로그인 후 dashboard 접근 가능', async ({ page }) => {
-      const { email, password } = getAdminCredentials();
+    /**
+     * WO-O4O-KPA-AUTH-RUNTIME-E2E-LOGIN-REGRESSION-ROOT-CAUSE-AND-CI-CLOSURE-V1
+     *
+     * 이전 판정은 `expect(url).not.toMatch(/\/login/)` 하나였고, 실측 결과
+     * 4개 중 3개 서비스에서 **로그아웃 상태로도 통과**했다. URL 문자열이 아니라
+     * 인증 상태(토큰 · /auth/me · authenticated UI · 거부 화면 부재)로 판정한다.
+     */
+    test('로그인 후 dashboard 접근 가능 (인증 상태로 판정)', async ({ page }) => {
+      const { email, password } = getServiceCredentials(svc);
       await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
 
       // protected route 접근
       await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(3000);
+      await waitForLoadingComplete(page, 8000);
+      await page.waitForTimeout(1000);
 
-      const url = page.url();
-      // /login으로 다시 튕겨나가지 않아야 함
-      expect(url, `[${svc.name}] 로그인 후 dashboard 접근 시 /login 리다이렉트`).not.toMatch(/\/login/);
+      await expectAuthenticated(page, svc, `로그인 후 ${svc.protectedPath} 접근`);
     });
   });
 }

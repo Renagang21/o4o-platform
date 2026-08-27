@@ -8,18 +8,19 @@
  * - stale auth UI 제거
  * - 이후 protected route 접근 차단
  *
- * 환경변수 필요:
- *   E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD
+ * 환경변수 필요 (서비스별 분리):
+ *   E2E_{KPA|KCOS|NETURE|GLYCO}_ADMIN_EMAIL / _PASSWORD
+ *
+ * WO-O4O-KPA-AUTH-RUNTIME-E2E-LOGIN-REGRESSION-ROOT-CAUSE-AND-CI-CLOSURE-V1
+ * 로그인 실패를 skip 으로 흡수하지 않는다 (연쇄 오탐 차단).
  */
 
 import { test, expect } from '@playwright/test';
 import {
   ALL_SERVICES,
-  getAdminCredentials,
-  loginAs,
+  loginAndAssertAuthenticated,
   dispatchTokenClearedEvent,
   clearAuthTokens,
-  waitForLoadingComplete,
 } from './helpers/auth.helpers';
 
 for (const svc of ALL_SERVICES) {
@@ -39,27 +40,11 @@ for (const svc of ALL_SERVICES) {
        * 서비스의 HTTP-only 쿠키 세션이 있어도 SPA 레벨에서는
        * user state가 null이므로 즉시 /login redirect 발생해야 한다.
        */
-      const { email, password } = getAdminCredentials();
-
-      // 로그인
-      const ok = await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
-      if (!ok) {
-        test.skip(true, `[${svc.name}] 로그인 폼 접근 불가 — skip`);
-        return;
-      }
-
-      // protected route로 이동 (SPA 내에서 live 상태 유지)
-      await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
-      // auth 로딩 완료 대기 — K-Cosmetics checkSession() 완료(sessionCheckInProgressRef=false) 보장
-      // 이벤트 발행 전 ref가 false여야 token-cleared handler의 재체크 호출이 차단되지 않음
-      await waitForLoadingComplete(page, 8000);
-      await page.waitForTimeout(1000);
-
-      const urlBefore = page.url();
-      if (urlBefore.includes('/login')) {
-        test.skip(true, `[${svc.name}] 로그인 후 dashboard 접근 실패 — 계정 권한 확인 필요`);
-        return;
-      }
+      // 선행 조건: 로그인 성공 + 보호 화면에서 실제 인증 상태.
+      // (loginAndAssertAuthenticated 는 protected route 이동 후 auth 로딩 완료까지 대기한다 —
+      //  K-Cosmetics checkSession() 완료 보장이 이벤트 발행 전 필요하다.)
+      // 이전 구현은 로그인 실패·dashboard 접근 실패를 skip 으로 흡수해 결함을 숨겼다.
+      await loginAndAssertAuthenticated(page, svc);
 
       // auth:token-cleared 이벤트 발행 (토큰 클리어 + 이벤트 dispatch)
       await dispatchTokenClearedEvent(page);
@@ -97,16 +82,8 @@ for (const svc of ALL_SERVICES) {
     });
 
     test('auth:token-cleared 이벤트 → stale loading freeze 없음', async ({ page }) => {
-      const { email, password } = getAdminCredentials();
-
-      const ok = await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
-      if (!ok) {
-        test.skip(true, `[${svc.name}] 로그인 폼 접근 불가 — skip`);
-        return;
-      }
-
-      await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(2000);
+      // 선행 조건: 로그인 성공 + 보호 화면에서 실제 인증 상태
+      await loginAndAssertAuthenticated(page, svc);
 
       // 이벤트 발행 후 UI 동결 없는지 확인
       await dispatchTokenClearedEvent(page);

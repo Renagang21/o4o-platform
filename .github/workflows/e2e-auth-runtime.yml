@@ -71,31 +71,55 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install chromium --with-deps
 
-      - name: Validate E2E credentials
-        id: creds
+      # WO-O4O-KPA-AUTH-RUNTIME-E2E-LOGIN-REGRESSION-ROOT-CAUSE-AND-CI-CLOSURE-V1
+      #
+      # 공용 E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD 계약은 폐기했다.
+      # 실제 인증은 서비스별 L2 `service_credentials`(serviceKey 단위)로 판정되므로,
+      # 한 서비스의 비밀번호만 바뀌어도 공용 secret 하나로는 CI 전체가 깨지고
+      # 그 장애가 "코드 회귀"처럼 보인다 (2026-08-21 KPA 사례).
+      #
+      # 또한 미설정을 warning + skip 으로 흡수하지 않는다. 자격증명이 없으면
+      # 이 workflow 는 아무것도 검증하지 못하므로 초록불을 만들면 안 된다.
+      - name: Validate E2E credentials (per service)
         run: |
-          if [ -z "${{ secrets.E2E_ADMIN_EMAIL }}" ] || [ -z "${{ secrets.E2E_ADMIN_PASSWORD }}" ]; then
-            echo "configured=false" >> $GITHUB_OUTPUT
-            echo "::warning::E2E_ADMIN_EMAIL 또는 E2E_ADMIN_PASSWORD Secret이 설정되지 않았습니다."
-            echo "::warning::GitHub Secrets에 E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD를 추가하세요."
-          else
-            echo "configured=true" >> $GITHUB_OUTPUT
+          MISSING=""
+          check() {
+            if [ -z "$2" ]; then MISSING="$MISSING $1"; fi
+          }
+          check E2E_KPA_ADMIN_EMAIL      "${{ secrets.E2E_KPA_ADMIN_EMAIL }}"
+          check E2E_KPA_ADMIN_PASSWORD   "${{ secrets.E2E_KPA_ADMIN_PASSWORD }}"
+          check E2E_KCOS_ADMIN_EMAIL     "${{ secrets.E2E_KCOS_ADMIN_EMAIL }}"
+          check E2E_KCOS_ADMIN_PASSWORD  "${{ secrets.E2E_KCOS_ADMIN_PASSWORD }}"
+          check E2E_NETURE_ADMIN_EMAIL   "${{ secrets.E2E_NETURE_ADMIN_EMAIL }}"
+          check E2E_NETURE_ADMIN_PASSWORD "${{ secrets.E2E_NETURE_ADMIN_PASSWORD }}"
+          check E2E_GLYCO_ADMIN_EMAIL    "${{ secrets.E2E_GLYCO_ADMIN_EMAIL }}"
+          check E2E_GLYCO_ADMIN_PASSWORD "${{ secrets.E2E_GLYCO_ADMIN_PASSWORD }}"
+
+          if [ -n "$MISSING" ]; then
+            echo "::error::서비스별 E2E Secret 미설정:$MISSING"
+            echo ""
+            echo "설정 위치: GitHub repo → Settings → Secrets and variables → Actions"
+            echo "계약: serviceKey 별로 계정·비밀번호를 분리한다 (가능하면 E2E 전용 계정)."
+            echo "  kpa-society  → E2E_KPA_ADMIN_EMAIL    / E2E_KPA_ADMIN_PASSWORD"
+            echo "  k-cosmetics  → E2E_KCOS_ADMIN_EMAIL   / E2E_KCOS_ADMIN_PASSWORD"
+            echo "  neture       → E2E_NETURE_ADMIN_EMAIL / E2E_NETURE_ADMIN_PASSWORD"
+            echo "  glycopharm   → E2E_GLYCO_ADMIN_EMAIL  / E2E_GLYCO_ADMIN_PASSWORD"
+            exit 1
           fi
+          echo "✅ 4개 서비스 credential 모두 설정됨"
 
       - name: Run Auth Runtime E2E
-        if: steps.creds.outputs.configured == 'true'
         env:
-          E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
-          E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+          E2E_KPA_ADMIN_EMAIL: ${{ secrets.E2E_KPA_ADMIN_EMAIL }}
+          E2E_KPA_ADMIN_PASSWORD: ${{ secrets.E2E_KPA_ADMIN_PASSWORD }}
+          E2E_KCOS_ADMIN_EMAIL: ${{ secrets.E2E_KCOS_ADMIN_EMAIL }}
+          E2E_KCOS_ADMIN_PASSWORD: ${{ secrets.E2E_KCOS_ADMIN_PASSWORD }}
+          E2E_NETURE_ADMIN_EMAIL: ${{ secrets.E2E_NETURE_ADMIN_EMAIL }}
+          E2E_NETURE_ADMIN_PASSWORD: ${{ secrets.E2E_NETURE_ADMIN_PASSWORD }}
+          E2E_GLYCO_ADMIN_EMAIL: ${{ secrets.E2E_GLYCO_ADMIN_EMAIL }}
+          E2E_GLYCO_ADMIN_PASSWORD: ${{ secrets.E2E_GLYCO_ADMIN_PASSWORD }}
           CI: 'true'
         run: npx playwright test --config=e2e/auth-runtime/playwright.config.ts
-
-      - name: Skip notice (no credentials)
-        if: steps.creds.outputs.configured == 'false'
-        run: |
-          echo "⏭️ E2E 테스트 건너뜀 — Secret 미설정"
-          echo "   설정 방법: GitHub repo → Settings → Secrets → Actions"
-          echo "   필요 Secret: E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD"
 
       - name: Upload Playwright report (on failure)
         if: failure()

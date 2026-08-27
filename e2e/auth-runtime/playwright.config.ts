@@ -7,9 +7,12 @@
  * 실행: npx playwright test --config=e2e/auth-runtime/playwright.config.ts
  *
  * 자격증명: docs/local/TEST-ACCOUNTS.local.md 참조
- * 환경변수 설정:
- *   E2E_ADMIN_EMAIL=...
- *   E2E_ADMIN_PASSWORD=...
+ * 환경변수 설정 — **서비스별 분리** (공용 E2E_ADMIN_* 는 폐기):
+ *   E2E_KPA_ADMIN_EMAIL    / E2E_KPA_ADMIN_PASSWORD
+ *   E2E_KCOS_ADMIN_EMAIL   / E2E_KCOS_ADMIN_PASSWORD
+ *   E2E_NETURE_ADMIN_EMAIL / E2E_NETURE_ADMIN_PASSWORD
+ *   E2E_GLYCO_ADMIN_EMAIL  / E2E_GLYCO_ADMIN_PASSWORD
+ * 이유는 helpers/auth.helpers.ts 상단 credential 계약 주석 참조.
  */
 
 import { defineConfig, devices } from '@playwright/test';

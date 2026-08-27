@@ -9,18 +9,22 @@
  * - loading freeze 없음
  * - K-Cosmetics lazy session: protected route에서 checkSession 정상 트리거
  *
- * 환경변수 필요:
- *   E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD
+ * 환경변수 필요 (서비스별 분리):
+ *   E2E_{KPA|KCOS|NETURE|GLYCO}_ADMIN_EMAIL / _PASSWORD
+ *
+ * WO-O4O-KPA-AUTH-RUNTIME-E2E-LOGIN-REGRESSION-ROOT-CAUSE-AND-CI-CLOSURE-V1
+ * 세션 복원 판정도 URL 문자열이 아니라 인증 상태로 한다.
  */
 
 import { test, expect } from '@playwright/test';
 import {
   ALL_SERVICES,
-  getAdminCredentials,
+  getServiceCredentials,
   loginAs,
+  loginAndAssertAuthenticated,
+  expectAuthenticated,
   trackAuthMeRequests,
   clearAuthTokens,
-  waitForLoadingComplete,
 } from './helpers/auth.helpers';
 
 for (const svc of ALL_SERVICES) {
@@ -31,39 +35,20 @@ for (const svc of ALL_SERVICES) {
     });
 
     test('새로고침 후 세션 복원 — 로그인 유지', async ({ page }) => {
-      const { email, password } = getAdminCredentials();
-
-      // 로그인
-      await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
-      await page.waitForTimeout(2000);
-
-      // protected route로 이동
-      await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(3000);
-
-      // 현재 URL 기록
-      const urlBeforeRefresh = page.url();
+      // 선행 조건: 로그인 성공 + 실제 인증 상태 (실패 시 여기서 중단)
+      await loginAndAssertAuthenticated(page, svc);
 
       // 페이지 새로고침
       await page.reload({ waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(4000); // session restore 대기
 
-      const urlAfterRefresh = page.url();
-
-      // 새로고침 후 /login으로 튕겨나가지 않아야 함
-      expect(
-        urlAfterRefresh,
-        `[${svc.name}] 새로고침 후 /login으로 이동 — 세션 복원 실패`,
-      ).not.toMatch(/\/login/);
+      // 세션 복원 성공 = URL 이 /login 이 아닌 것이 아니라 **인증 상태 유지**
+      await expectAuthenticated(page, svc, '새로고침 후 세션 복원');
     });
 
     test('새로고침 시 /auth/me 중복 호출 없음', async ({ page }) => {
-      const { email, password } = getAdminCredentials();
-
-      // 로그인 후 protected route 이동
-      await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
-      await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(2000);
+      // 선행 조건 (tracker 생성 전에 수행 — 여기서 발생하는 요청은 집계 대상이 아니다)
+      await loginAndAssertAuthenticated(page, svc);
 
       // 새로고침 — 이 시점부터 /auth/me 카운트
       const tracker = trackAuthMeRequests(page);
@@ -85,11 +70,7 @@ for (const svc of ALL_SERVICES) {
        * 스피너는 데이터 로딩(위젯/차트 등)에 의해 계속 표시될 수 있어 제외.
        * URL 안정화 + 페이지 내 실제 콘텐츠 존재 여부로 freeze 판정.
        */
-      const { email, password } = getAdminCredentials();
-
-      await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
-      await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(2000);
+      await loginAndAssertAuthenticated(page, svc);
 
       await page.reload({ waitUntil: 'domcontentloaded' });
 
@@ -102,18 +83,19 @@ for (const svc of ALL_SERVICES) {
       // URL이 안정화 (5s 후와 8s 후가 동일) → redirect loop 없음
       expect(urlFinal, `[${svc.name}] URL이 계속 변경 — auth redirect loop 또는 freeze`).toBe(urlMid);
 
-      // /login으로 redirect되지 않음 (세션 복원 성공)
-      expect(urlFinal, `[${svc.name}] 새로고침 후 /login으로 — 세션 복원 실패`).not.toMatch(/\/login/);
+      // 세션 복원 성공 — 인증 상태로 판정한다 (URL 문자열 아님)
+      await expectAuthenticated(page, svc, '새로고침 후 freeze 검사');
     });
 
     test('K-Cosmetics lazy session: protected route 진입 시 checkSession 트리거', async ({ page }) => {
       // K-Cosmetics만 검증 — 다른 서비스는 skip
       if (svc.name !== 'K-Cosmetics') return;
 
-      const { email, password } = getAdminCredentials();
+      const { email, password } = getServiceCredentials(svc);
 
-      // 로그인
-      await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
+      // 로그인 (protected route 진입 전 상태를 유지해야 하므로 여기서는 goto 하지 않는다)
+      const formOk = await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
+      expect(formOk, '[K-Cosmetics] 로그인 폼 입력 실패').toBe(true);
       await page.waitForTimeout(2000);
 
       // 새로운 페이지에서 직접 protected route 접근 (session not yet checked)
@@ -121,12 +103,13 @@ for (const svc of ALL_SERVICES) {
       await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(4000);
 
-      const url = page.url();
-      // 인증된 상태여야 함
-      expect(url, '[K-Cosmetics] lazy checkSession 실패 — /login으로 리다이렉트').not.toMatch(/\/login/);
-
       // checkSession이 /auth/me를 1회 호출했어야 함 (단, 로그인 직후라면 isSessionChecked=true이므로 0회 가능)
-      expect(tracker.count(), '[K-Cosmetics] /auth/me 1회 초과').toBeLessThanOrEqual(1);
+      // 아래 인증 단언이 /auth/me 를 직접 호출하므로 **카운트를 먼저 읽는다.**
+      const authMeCount = tracker.count();
+      expect(authMeCount, '[K-Cosmetics] /auth/me 1회 초과').toBeLessThanOrEqual(1);
+
+      // 인증된 상태여야 함 — URL 문자열이 아니라 인증 상태로 판정
+      await expectAuthenticated(page, svc, 'lazy checkSession 후 protected route');
     });
   });
 }

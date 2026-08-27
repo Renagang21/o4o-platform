@@ -158,3 +158,92 @@ CI secret `E2E_ADMIN_PASSWORD` 는 변경 이전 값을 그대로 들고 있어 
    — 선행 WO 에서 보고한 **개발환경/검증 절차 정합화** 건과 동일 묶음.
 3. KPA `/admin` 은 미인증 시 redirect 없이 인라인 거부 화면을 렌더한다(다른 서비스와 패턴 다름).
    보안 결함은 아니나 cross-service 일관성 관점의 검토 대상.
+
+---
+
+## 10. 구조 개선 실행 — **C안 승인분 (2026-08-27)**
+
+승인 범위: `APPROVED = C` / 서비스별 E2E credential 분리 + 가능하면 E2E 전용 계정 +
+`#12` 인증상태 assertion 보강 + 동일 WO 에서 CI green 까지.
+
+### 10.1 항목별 결과
+
+| # | 항목 | 결과 |
+|:--:|---|---|
+| 1 | 공용 `E2E_ADMIN_PASSWORD` 계약 제거 | ✅ 코드·CI 참조 0 |
+| 2 | 서비스별 E2E credential secret 계약 도입 | ✅ 8개 변수 계약 확정 |
+| 3 | 운영 개인계정 → E2E 전용 계정 교체 | ⛔ **미수행 — 차단** (10.4) |
+| 4 | KPA 현행 L2 credential 과 E2E credential 정합 | ⛔ **미수행 — 차단** (10.4) |
+| 5 | 실제 로그인 폼으로 4서비스 로그인 검증 | ⛔ **미실행** — 3·4 선행 필요 |
+| 6 | `#12` URL 판정 → 인증상태 판정 교체 | ✅ |
+| 7 | logout 은 로그인 성공 후에만 검증 | ✅ 공통 setup 강제 |
+| 8 | CI 4서비스 login / protected / logout PASS | ⛔ **미달성** — 3·4 선행 필요 |
+| 9 | 공용 secret 참조 0 확인 | ✅ (10.3) |
+| 10 | CHECK → commit → push → CI green | ⚠️ **부분** — commit/push 완료, CI green 은 차단 |
+
+### 10.2 코드 변경
+
+| 파일 | 변경 |
+|---|---|
+| `e2e/auth-runtime/helpers/auth.helpers.ts` | `ServiceConfig` 에 `serviceKey` / `emailEnv` / `passwordEnv` 추가. `getAdminCredentials()` **삭제** → `getServiceCredentials(svc)` (미설정 시 **fallback 없이 throw**, 누락 변수명·serviceKey 명시). 인증증거 수집부 신설: `collectAuthEvidence` / `isAuthenticated` / `expectAuthenticated` / `loginAndAssertAuthenticated`. 약한 `expectNotOnLoginPage()` **삭제** |
+| `e2e/auth-runtime/auth-login.spec.ts` | `#9` 를 `accessToken` 필수로 강화. `#12` 를 URL 정규식 → `expectAuthenticated` 로 교체 |
+| `e2e/auth-runtime/auth-logout.spec.ts` | 두 테스트 모두 `loginAndAssertAuthenticated` 선행. `test.skip` 전량 제거. 실패 분기도 assert 로 전환 |
+| `e2e/auth-runtime/auth-refresh.spec.ts` | 1~3 로그인 성공 강제 + reload 후 `expectAuthenticated`. 4 는 `/auth/me` probe 가 중복호출 카운트를 오염시키지 않도록 `tracker.count()` 를 probe 앞에서 읽음 |
+| `e2e/auth-runtime/auth-token-cleared.spec.ts` | `loginAndAssertAuthenticated` 선행. `test.skip` 2건 제거 |
+| `e2e/auth-runtime/playwright.config.ts` | env 주석을 8개 변수 계약으로 교체 |
+| `.github/workflows/e2e-auth-runtime.yml` | 공용 secret 검증·env 제거 → 8개 secret 검증. **미설정 시 warning+skip 이 아니라 `exit 1`** (검증하지 못한 채 초록불을 만들지 않는다) |
+
+**`#12` 인증 판정 규칙** — 아래를 모두 만족해야 PASS:
+
+- `o4o_accessToken` 존재
+- URL 이 `/login` 이 아님
+- 거부 화면(`접근 권한이 없습니다`) 없음
+- `/api/v1/auth/me` 가 401/403 이 **아님**
+- `/api/v1/auth/me == 200` **또는** 인증 UI 신호(사용자/계정 메뉴 트리거) 존재
+
+`auth/me` 가 네트워크·CORS 로 도달 불가(`null`)일 때만 UI 신호로 대체한다.
+**"URL 이 `/login` 이 아니다"는 단독 PASS 근거로 쓰지 않는다.**
+
+### 10.3 검증
+
+| 검증 | 결과 |
+|---|---|
+| `npx tsc --noEmit` (e2e/auth-runtime 전체) | ✅ 오류 0 |
+| `npx eslint e2e/auth-runtime --ext .ts` | ✅ exit 0 |
+| YAML 파싱 (`js-yaml`) | ✅ OK |
+| `grep -rn E2E_ADMIN_EMAIL\|E2E_ADMIN_PASSWORD\|getAdminCredentials` (e2e/.github/scripts/docs) | ✅ 실행 참조 **0** — 잔존 5건은 전부 서술용(이 문서 §2/§3/§6/§7, 폐기 주석 2건) |
+| E2E 실제 실행 | ❌ **미실행** — 자격증명 없음 (10.4) |
+
+### 10.4 차단 — 사용자 조치 필요
+
+3·4·5·8 및 CI green 은 내가 완료할 수 없다. 이유:
+
+1. **E2E 전용 계정 생성** = 프로덕션 `service_credentials` 쓰기.
+   CLAUDE.md 중지 조건("DB 데이터 변경은 사용자 승인 필요")에 해당한다.
+2. **secret 값**은 내가 알지 못하며, 알아내거나 코드·CI 에 하드코딩해서도 안 된다
+   (CLAUDE.md "자격증명 하드코딩 금지").
+
+필요한 조치 — 서비스별 계정 준비 후 GitHub Actions Secrets 에 8개 등록:
+
+| serviceKey | EMAIL secret | PASSWORD secret |
+|---|---|---|
+| `kpa-society` | `E2E_KPA_ADMIN_EMAIL` | `E2E_KPA_ADMIN_PASSWORD` |
+| `k-cosmetics` | `E2E_KCOS_ADMIN_EMAIL` | `E2E_KCOS_ADMIN_PASSWORD` |
+| `neture` | `E2E_NETURE_ADMIN_EMAIL` | `E2E_NETURE_ADMIN_PASSWORD` |
+| `glycopharm` | `E2E_GLYCO_ADMIN_EMAIL` | `E2E_GLYCO_ADMIN_PASSWORD` |
+
+기존 `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD` 는 8개 등록 후 삭제 대상이다.
+
+8개 등록 전까지 `E2E — Auth Runtime Regression` 은 **red 유지**된다. 이는 의도된 동작이다 —
+검증 불가 상태를 skip 으로 흡수해 초록불로 보이게 하던 기존 계약이 이번 사고의 구조적 원인이다.
+
+### 10.5 종료 판정
+
+```
+SHARED_SECRET_CONTRACT   = REMOVED
+PER_SERVICE_CONTRACT     = DEFINED (secrets 미등록)
+TEST12_JUDGMENT          = FIXED (URL → auth-state)
+CASCADE_FALSE_PASS       = FIXED (login assertion in setup, test.skip 0)
+CI_GREEN                 = BLOCKED (사용자 조치 10.4)
+MUST_FIX_BEFORE_CLOSE    = 0 (코드 범위)
+```

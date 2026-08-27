@@ -2,9 +2,24 @@
  * Auth Runtime E2E — 공통 helpers
  *
  * CHECK-O4O-AUTH-RUNTIME-PLAYWRIGHT-E2E-V1
+ * WO-O4O-KPA-AUTH-RUNTIME-E2E-LOGIN-REGRESSION-ROOT-CAUSE-AND-CI-CLOSURE-V1
  *
  * 자격증명 하드코딩 금지 — docs/local/TEST-ACCOUNTS.local.md 참조.
- * 환경변수(E2E_ADMIN_EMAIL, E2E_ADMIN_PASSWORD)를 통해 주입한다.
+ *
+ * ── credential 계약 (2026-08-26 개정) ──
+ * 공용 `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD` 는 **폐기됐다.**
+ * 실제 인증은 서비스별 L2 `service_credentials`(serviceKey 단위) 로 판정되므로,
+ * 공용 secret 하나를 쓰면 **한 서비스의 비밀번호만 바뀜어도 CI 전체가 깨지고**
+ * 그 장애가 "코드 회귀"처럼 보인다 (2026-08-21 KPA 사례).
+ * 따라서 credential 은 **serviceKey 별로 분리**한다:
+ *
+ *   E2E_KPA_ADMIN_EMAIL    / E2E_KPA_ADMIN_PASSWORD      (kpa-society)
+ *   E2E_KCOS_ADMIN_EMAIL   / E2E_KCOS_ADMIN_PASSWORD     (k-cosmetics)
+ *   E2E_NETURE_ADMIN_EMAIL / E2E_NETURE_ADMIN_PASSWORD   (neture)
+ *   E2E_GLYCO_ADMIN_EMAIL  / E2E_GLYCO_ADMIN_PASSWORD    (glycopharm)
+ *
+ * 가능하면 **E2E 전용 계정**을 쓴다. 운영자 개인 계정을 CI 인증 fixture 로 쓰면
+ * 정상적인 비밀번호 변경이 다시 CI 장애로 보인다.
  */
 
 import { type Page, expect } from '@playwright/test';
@@ -13,12 +28,18 @@ import { type Page, expect } from '@playwright/test';
 
 export interface ServiceConfig {
   name: string;
+  /** 로그인 요청이 실제로 보내는 serviceKey — L2 `service_credentials` 조회 단위 */
+  serviceKey: string;
   baseUrl: string;
   loginPath: string;
   /** admin 또는 operator protected route */
   protectedPath: string;
   /** login 성공 후 도달할 경로 prefix */
   dashboardPrefix: string;
+  /** 서비스별 E2E 계정 email 환경변수명 */
+  emailEnv: string;
+  /** 서비스별 E2E 계정 password 환경변수명 */
+  passwordEnv: string;
   /** 서비스 특이사항 */
   note?: string;
 }
@@ -26,31 +47,43 @@ export interface ServiceConfig {
 export const SERVICES: Record<string, ServiceConfig> = {
   neture: {
     name: 'Neture',
+    serviceKey: 'neture',
     baseUrl: 'https://www.neture.co.kr',
     loginPath: '/login',
     protectedPath: '/admin',
     dashboardPrefix: '/admin',
+    emailEnv: 'E2E_NETURE_ADMIN_EMAIL',
+    passwordEnv: 'E2E_NETURE_ADMIN_PASSWORD',
   },
   glycopharm: {
     name: 'GlycoPharm',
+    serviceKey: 'glycopharm',
     baseUrl: 'https://glycopharm.co.kr',
     loginPath: '/login',
     protectedPath: '/operator',
     dashboardPrefix: '/operator',
+    emailEnv: 'E2E_GLYCO_ADMIN_EMAIL',
+    passwordEnv: 'E2E_GLYCO_ADMIN_PASSWORD',
   },
   kpa: {
     name: 'KPA-Society',
+    serviceKey: 'kpa-society',
     baseUrl: 'https://kpa-society.co.kr',
     loginPath: '/login',
     protectedPath: '/admin',
     dashboardPrefix: '/admin',
+    emailEnv: 'E2E_KPA_ADMIN_EMAIL',
+    passwordEnv: 'E2E_KPA_ADMIN_PASSWORD',
   },
   kcosmetics: {
     name: 'K-Cosmetics',
+    serviceKey: 'k-cosmetics',
     baseUrl: 'https://k-cosmetics.site',
     loginPath: '/login',
     protectedPath: '/operator',
     dashboardPrefix: '/operator',
+    emailEnv: 'E2E_KCOS_ADMIN_EMAIL',
+    passwordEnv: 'E2E_KCOS_ADMIN_PASSWORD',
     note: 'lazy session — RoleGuard에서 checkSession 트리거',
   },
 };
@@ -59,16 +92,36 @@ export const ALL_SERVICES = Object.values(SERVICES);
 
 // ─── Credential helpers (env only — no hardcoding) ───────────────────────────
 
-export function getAdminCredentials(): { email: string; password: string } {
-  const email = process.env.E2E_ADMIN_EMAIL;
-  const password = process.env.E2E_ADMIN_PASSWORD;
+/**
+ * 서비스별 E2E 자격증명을 환경변수에서 읽는다.
+ *
+ * fallback 을 두지 않는다. 공용 secret 으로 떨어지는 경로가 있으면
+ * 분리 계약이 조용히 무효화되고, 장애 시 어느 값이 쓰였는지 판별할 수 없다.
+ */
+export function getServiceCredentials(svc: ServiceConfig): { email: string; password: string } {
+  const email = process.env[svc.emailEnv];
+  const password = process.env[svc.passwordEnv];
   if (!email || !password) {
+    const missing = [!email ? svc.emailEnv : null, !password ? svc.passwordEnv : null].filter(Boolean);
     throw new Error(
-      'E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD 환경변수가 설정되지 않았습니다.\n' +
-        'docs/local/TEST-ACCOUNTS.local.md를 참조하여 설정하세요.',
+      `[${svc.name}] E2E 자격증명 미설정 — ${missing.join(', ')}
+` +
+        `  serviceKey=${svc.serviceKey} 의 L2 credential 과 정합해야 합니다.
+` +
+        '  값은 docs/local/TEST-ACCOUNTS.local.md (Git 추적 제외) / GitHub Actions Secrets 에서 관리합니다.',
     );
   }
   return { email, password };
+}
+
+/** 미설정된 서비스별 credential 환경변수명 목록 (preflight 보고용) */
+export function missingCredentialEnvs(services: ServiceConfig[] = ALL_SERVICES): string[] {
+  const missing: string[] = [];
+  for (const svc of services) {
+    if (!process.env[svc.emailEnv]) missing.push(svc.emailEnv);
+    if (!process.env[svc.passwordEnv]) missing.push(svc.passwordEnv);
+  }
+  return missing;
 }
 
 // ─── Network tracking ────────────────────────────────────────────────────────
@@ -247,13 +300,7 @@ export async function clickLogoutViaUI(
   }
 
   // 2) 드롭다운 트리거 클릭 (서비스별 aria-label 순서로 시도)
-  const triggerSelectors = [
-    'button[aria-label="사용자 메뉴"]',  // GlobalHeader (KPA / GlycoPharm / K-Cosmetics)
-    'button[aria-label="계정 메뉴"]',    // GlobalUserProfileDropdown (Neture)
-    'button[aria-label*="사용자"]',
-    'button[aria-label*="계정"]',
-    'button[aria-haspopup="true"]',
-  ];
+  const triggerSelectors = USER_MENU_TRIGGER_SELECTORS;
 
   let triggeredBy = '';
   for (const sel of triggerSelectors) {
@@ -354,6 +401,144 @@ export async function waitForLoadingComplete(page: Page, maxMs = 8000): Promise<
   // 타임아웃이 나도 테스트는 계속 — 호출부에서 별도 assertion
 }
 
+// ─── Authenticated-state evidence ────────────────────────────────────────────
+//
+// WO-O4O-KPA-AUTH-RUNTIME-E2E-LOGIN-REGRESSION-ROOT-CAUSE-AND-CI-CLOSURE-V1
+//
+// "URL 이 /login 이 아니다" 는 로그인 성공의 증거가 아니다. 실측 결과 4개 중 3개
+// 서비스가 **로그아웃 상태에서도** 그 조건을 만족했다 (KPA `/admin` 은 redirect 없이
+// 인라인 거부 화면을 렌더하고, Neture·GlycoPharm 은 `/` 로 착지한다).
+// 그래서 판정을 **인증 상태 신호**로 바꾼다.
+
+/** 로그인 상태에서만 렌더되는 사용자 메뉴 트리거 (GlobalHeader / GlobalUserProfileDropdown) */
+export const USER_MENU_TRIGGER_SELECTORS = [
+  'button[aria-label="사용자 메뉴"]',  // GlobalHeader (KPA / GlycoPharm / K-Cosmetics)
+  'button[aria-label="계정 메뉴"]',    // GlobalUserProfileDropdown (Neture)
+  'button[aria-label*="사용자"]',
+  'button[aria-label*="계정"]',
+  'button[aria-haspopup="true"]',
+];
+
+/** packages/ui/src/feedback/AccessDenied.tsx 의 ACCESS_DENIED_TITLE */
+const ACCESS_DENIED_TEXT = '접근 권한이 없습니다';
+
+/** 인증 사용자 API — 서비스 프론트가 쓰는 core API 와 동일 (`VITE_API_BASE_URL` + `/api/v1`) */
+export const API_BASE_URL = process.env.E2E_API_BASE_URL ?? 'https://api.neture.co.kr';
+
+export interface AuthEvidence {
+  /** localStorage 에 access token 이 있는가 */
+  accessToken: boolean;
+  /** 로그인 상태에서만 렌더되는 사용자 메뉴가 보이는가 */
+  userMenuVisible: boolean;
+  /** GET /api/v1/auth/me 상태 코드 (호출 실패 시 null) */
+  authMeStatus: number | null;
+  /** 보호 화면이 "접근 권한이 없습니다" 거부 화면인가 */
+  accessDenied: boolean;
+  url: string;
+}
+
+/** 현재 페이지의 인증 상태 증거를 모은다 (단언하지 않는다) */
+export async function collectAuthEvidence(page: Page): Promise<AuthEvidence> {
+  const accessToken = await page
+    .evaluate(() => !!localStorage.getItem('o4o_accessToken'))
+    .catch(() => false);
+
+  let userMenuVisible = false;
+  for (const sel of USER_MENU_TRIGGER_SELECTORS) {
+    if (await page.locator(sel).first().isVisible({ timeout: 1000 }).catch(() => false)) {
+      userMenuVisible = true;
+      break;
+    }
+  }
+
+  const accessDenied = await page
+    .getByText(ACCESS_DENIED_TEXT, { exact: false })
+    .first()
+    .isVisible({ timeout: 1000 })
+    .catch(() => false);
+
+  const authMeStatus = await page
+    .evaluate(async (apiBase) => {
+      try {
+        const token = localStorage.getItem('o4o_accessToken');
+        const res = await fetch(`${apiBase}/api/v1/auth/me`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        return res.status;
+      } catch {
+        return null;
+      }
+    }, API_BASE_URL)
+    .catch(() => null);
+
+  return { accessToken, userMenuVisible, authMeStatus, accessDenied, url: page.url() };
+}
+
+/**
+ * 인증됨 판정.
+ *
+ * 필수:  access token 존재  +  /login 아님  +  거부 화면 아님
+ * 그리고 실사용 신호가 최소 1개: `/auth/me` 200  또는  사용자 메뉴 렌더
+ *
+ * `/auth/me` 는 CORS·네트워크 사정으로 null 이 될 수 있어 단독 필수 조건으로 두지 않는다.
+ * 대신 **명시적 401/403 은 인증 실패로 확정**한다.
+ */
+export function isAuthenticated(e: AuthEvidence): boolean {
+  if (!e.accessToken) return false;
+  if (/\/login/.test(e.url)) return false;
+  if (e.accessDenied) return false;
+  if (e.authMeStatus === 401 || e.authMeStatus === 403) return false;
+  return e.authMeStatus === 200 || e.userMenuVisible;
+}
+
+export function describeAuthEvidence(e: AuthEvidence): string {
+  return (
+    `accessToken=${e.accessToken} · userMenu=${e.userMenuVisible} · ` +
+    `authMe=${e.authMeStatus ?? 'n/a'} · accessDenied=${e.accessDenied} · url=${e.url}`
+  );
+}
+
+/**
+ * 인증 상태를 단언한다. URL 문자열만으로 통과시키지 않는다.
+ */
+export async function expectAuthenticated(
+  page: Page,
+  svc: ServiceConfig,
+  context: string,
+): Promise<AuthEvidence> {
+  const evidence = await collectAuthEvidence(page);
+  expect(
+    isAuthenticated(evidence),
+    `[${svc.name}] ${context} — 인증 상태 아님: ${describeAuthEvidence(evidence)}`,
+  ).toBe(true);
+  return evidence;
+}
+
+/**
+ * 로그인 → 보호 화면 진입 → **인증 성공 단언**까지 수행하는 공통 setup.
+ *
+ * 로그인에 실패하면 여기서 즉시 실패한다. skip 하지 않는다.
+ * 이전 구현은 `if (!ok) test.skip(...)` 이었고, 그래서 2026-08-21 KPA 자격 drift 때
+ * 후속 dashboard/logout 테스트가 연쇄 오탐으로 통과했다.
+ */
+export async function loginAndAssertAuthenticated(
+  page: Page,
+  svc: ServiceConfig,
+): Promise<AuthEvidence> {
+  const { email, password } = getServiceCredentials(svc);
+
+  const formOk = await loginAs(page, svc.baseUrl, svc.loginPath, email, password);
+  expect(formOk, `[${svc.name}] 로그인 폼 입력 실패 (${svc.loginPath})`).toBe(true);
+
+  await page.goto(`${svc.baseUrl}${svc.protectedPath}`, { waitUntil: 'domcontentloaded' });
+  await waitForLoadingComplete(page, 8000);
+  await page.waitForTimeout(1000);
+
+  return expectAuthenticated(page, svc, `로그인 후 ${svc.protectedPath} 접근`);
+}
+
 // ─── Assertion helpers ───────────────────────────────────────────────────────
 
 /**
@@ -361,14 +546,6 @@ export async function waitForLoadingComplete(page: Page, maxMs = 8000): Promise<
  */
 export async function expectRedirectedToLogin(page: Page): Promise<void> {
   await expect(page).toHaveURL(/\/login/, { timeout: 8000 });
-}
-
-/**
- * 현재 URL이 로그인 페이지가 아님을 단언 (인증 완료)
- */
-export async function expectNotOnLoginPage(page: Page): Promise<void> {
-  const url = page.url();
-  expect(url).not.toMatch(/\/login/);
 }
 
 /**
