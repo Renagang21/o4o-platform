@@ -56,7 +56,7 @@ describe('canonical B2B cart payload (§12)', () => {
   });
 
   it('organizationId 를 클라이언트가 정하지 않는다 — 매장 판정 권위는 서버 (§14)', () => {
-    const p = buildSupplyCatalogCartPayload(product()) as Record<string, unknown>;
+    const p = buildSupplyCatalogCartPayload(product()) as unknown as Record<string, unknown>;
     expect('organizationId' in p).toBe(false);
   });
 });
