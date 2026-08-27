@@ -545,3 +545,77 @@ retirement PR [#184](https://github.com/Renagang21/o4o-platform/pull/184) 가 CI
 5번의 유일한 실패는 §13-1 에 기록한 것과 동일한 로컬 build 잔여물
 (`packages/ecommerce-core/{dist,node_modules,tsconfig.tsbuildinfo}`, `git ls-files` 빈 출력)이며
 본 변경과 무관하고 clean checkout(CI)에서는 통과한다. 테스트 삭제·skip 0.
+
+---
+
+## 20. 최종 배포 및 production smoke (closure)
+
+두 PR 이 순서대로 main 에 반영됐다.
+
+| 단계 | PR | merge commit |
+|---|---|---|
+| Signage retirement (구조 감축) | [#184](https://github.com/Renagang21/o4o-platform/pull/184) | `d16c38caf` |
+| 캠페인 forced content surface fix (기능) | [#186](https://github.com/Renagang21/o4o-platform/pull/186) | **`b5bab1f4d`** |
+
+**최종 production closure 기준 revision 은 두 변경을 모두 포함한 `b5bab1f4d` 다.**
+
+### 20-1. 배포
+
+`deploy-api.yml` 은 main push + `apps/api-server/**` path 에서 자동 트리거된다.
+
+| 항목 | 값 |
+|---|---|
+| run | [33051324486](https://github.com/Renagang21/o4o-platform/actions/runs/33051324486) — **success** |
+| 전 스텝 | build → image push → Cloud Run deploy → DB migration → Verify deployment 전부 success |
+| service | `o4o-core-api` / `asia-northeast3` / project `netureyoutube` |
+| serving revision | `o4o-core-api-03506-grj` · traffic **100%** · `latestRevision` |
+| image digest | `sha256:4edbc1566…` |
+| 그 digest 의 Artifact Registry tag | **`b5bab1f4d57fad…`**, `latest` |
+
+즉 서빙 중인 이미지가 closure commit `b5bab1f4d` 로 빌드된 것임을 **태그로 확인**했다(추정 아님).
+
+### 20-2. public read smoke (write 0)
+
+| 검사 | 결과 |
+|---|---|
+| `GET /api/health` | **200** · `status: alive` · `database: healthy` · `environment: production` |
+| uptime | 325s — revision 생성 시각(`07:56:51Z`)과 일치. 구 인스턴스가 아니다. |
+| `GET /api/v1/stores/__nonexistent__/tablet/idle` | **404** — canonical tablet idle 라우트가 마운트되어 도달하며 계약대로 응답 |
+| Channel stack 은퇴 유지 | `/api/v1/channels` · `/api/v1/organization-channels` · `/api/v1/cms/content-slots` · `/api/channels` → **전부 404** (auth gate 없이 404 = 실제 부재) |
+
+production DB write **0건**. credential/self-grant 우회 없음(§20).
+
+### 20-3. `AUTHORING_SMOKE_BLOCKED_AUTH`
+
+캠페인 승인 → forced content 생성 → 태블릿 노출까지의 **end-to-end production write smoke 는 실행하지 못했다.**
+
+- 캠페인 승인은 operator/HQ 인증이 필요하고 이 환경에 credential 이 없다.
+- `DB_*` / `DATABASE_URL` 미설정, `.env*.example` 만 존재 → DB 직접 조회 불가(§14 `BLOCKED_ENV` 와 동일 원인).
+- **실재 store slug 를 알 수 없다.** 공개 목록 엔드포인트가 없고
+  (`/api/v1/stores`, `/api/v1/physical-stores`, `/api/v1/store-network/stores` 전부 404),
+  저장소 문서의 `pharmacy-a-slug` 는 placeholder 다.
+  따라서 실데이터가 실린 tablet idle 응답은 확인하지 못했고 **추정하지 않는다.**
+
+대신 배포된 source/revision 과 public read 경로를 확인했다(20-1, 20-2).
+계약 자체는 신규 spec 15개 + 관련 276개 테스트로 검증되어 있다.
+
+### 20-4. 은퇴 엔드포인트의 외부 확인 한계 (정직하게 기록)
+
+PR #184 로 `/api/signage/:serviceKey` 라우터에서 12개 엔드포인트가 제거되어 67 → 55 가 됐다
+(`content-blocks` 4 · `layout-presets` 4 · `ai/generate` · `upload/presigned` 등).
+그러나 이 라우터는 `router.use(requireAuth)` 가 선행하므로 **미인증 요청은 제거 여부와 무관하게 401** 이다.
+
+```text
+/api/signage/kpa/content-blocks   401   (제거됨)
+/api/signage/kpa/forced-content   401   (유지됨)
+```
+
+즉 **외부 HTTP probe 로는 은퇴를 구분할 수 없다.** 이 항목은 source/revision 수준
+(20-1 의 image tag = `b5bab1f4d`)과 CI 가드 테스트로 확인한 것이며, 401 응답을 은퇴 근거로 쓰지 않았다.
+삭제된 `signage/extensions/**` 는 구 트리에서도 어디에도 mount 되지 않은 dead code 였으므로 노출 경로 변화가 없다.
+
+### 20-5. 남은 후속
+
+부채 1번 — `store-playlist.repository.ts` 의 forced merge 에 `target_surface` 필터가 없어
+`signage / tablet_idle / both` 의 reader 의미가 비대칭이다.
+후속 WO 후보: **`WO-O4O-SIGNAGE-FORCED-CONTENT-SURFACE-READ-CONTRACT-CLOSURE-V1`**.
