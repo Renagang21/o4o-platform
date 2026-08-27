@@ -231,3 +231,22 @@ MUST_FIX_BEFORE_CLOSE       = 0
 잔여(별도 WO 권장, 이번 WO 종료를 막지 않음):
 1. `/operator/ai-report` — backend 계약 없는 mock 상수 화면(D 판정). 은퇴 또는 실데이터 연결 필요.
 2. `packages/ui` vitest 가 CI 에서 실행되지 않아 메뉴 가시성 회귀를 잠글 자동 검증이 없다.
+
+---
+
+## 11. CI 실측 — 숨기지 않고 명시
+
+`CI Pipeline` 최신 main(`e485baba9`) = **failure**. 원인은 이번 변경이 아니다.
+
+```
+FAIL src/__tests__/encryption-key-rotation-runner.spec.ts
+  ● rotateCell › 저장된 값이 검증에 실패하면 원래 값으로 되돌린다
+    Expected: "ROLLED_BACK"   Received: "SKIPPED_ALREADY_CANONICAL"
+Test Suites: 1 failed, 216 passed, 217 total
+Tests:       1 failed, 3642 passed, 3643 total
+```
+
+- 이번 커밋(`204840350`)의 변경 파일은 `packages/ui` 2건 + `services/web-glycopharm` 5건 + CHECK 문서 1건이다. **api-server 파일 0건.**
+- 해당 spec 은 `349137d9f`(WO-O4O-ENCRYPTION-KEY-CANONICAL-ROLLOUT-V1, 다른 세션)가 도입했고, 그 커밋이 포함된 `449568b0c` 시점에는 CI 가 green 이었다. 이후 main 에 들어온 커밋은 `092c9d9f0`·`50299c428`(둘 다 다른 세션)과 이번 커밋뿐이며, 실패 지점은 `ENCRYPTION_KEY` 런타임 값에 의존하는 api-server 로직이다.
+- 즉 **다른 세션 소유 영역의 실패**다. 이번 WO 범위 밖이므로 수정하지 않았고, green 으로 위장하지도 않았다.
+- 이번 변경 자체의 검증은 7장(type-check 2종 exit 0, ESLint error 0)과 9장(production 실측) 으로 성립한다.
