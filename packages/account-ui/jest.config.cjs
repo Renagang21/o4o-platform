@@ -3,7 +3,8 @@
  *
  * packages/asset-copy-core · packages/appearance-system 과 동일한 패키지-로컬 jest 관행.
  * 루트 jest.config.js 는 `require` 를 쓰는데 루트 package.json 이 "type": "module" 이라
- * ESM 충돌로 기동하지 않는다 (본 WO 범위 밖의 기존 결함) — 그래서 패키지 로컬 config 를 둔다.
+ * 기동 불가였고, consumer 가 0 이어서 WO-O4O-PACKAGE-JEST-CI-ADOPTION-FULL-CENSUS-AND-CLOSURE-V1
+ * 에서 삭제했다. package-level Jest 는 전부 이 패키지 로컬 config 로만 실행된다(CI 연결됨).
  *
  * 테스트는 `src/` 밖(`__tests__/`)에 두어 패키지 tsconfig(include: src/**)의
  * build · type-check 산출물을 오염시키지 않는다.

@@ -166,6 +166,25 @@ jobs:
     - name: Run tests (shared-space-ui Vitest)
       run: npx vitest run --config packages/shared-space-ui/vitest.config.mjs
 
+    # WO-O4O-PACKAGE-JEST-CI-ADOPTION-FULL-CENSUS-AND-CLOSURE-V1
+    # package-local jest.config.cjs 만 있고 workflow step 이 없어 로컬 전용이던
+    # package-level Jest 3개(6 파일 · 96 tests) 를 blocking 으로 연결한다.
+    # 실패 패키지를 즉시 식별하기 위해 개별 step 으로 둔다.
+    # --passWithNoTests 를 쓰지 않으므로 test discovery 가 비면 exit 1 이다(실측 확인).
+    # DB · secret 불필요. 루트에 설치된 jest/ts-jest 를 그대로 쓴다.
+    #   asset-copy-core    권한 체크 · 스냅샷 · 크로스서비스 격리 (4 파일 · 64)
+    #   account-ui         사용자 표시명 공통화 계약 (1 파일 · 20)
+    #   appearance-system  버튼/브레드크럼/스크롤탑 CSS 생성 (1 파일 · 12)
+
+    - name: Run tests (asset-copy-core Jest)
+      run: cd packages/asset-copy-core && npx jest --config jest.config.cjs
+
+    - name: Run tests (account-ui Jest)
+      run: cd packages/account-ui && npx jest --config jest.config.cjs
+
+    - name: Run tests (appearance-system Jest)
+      run: cd packages/appearance-system && NODE_OPTIONS=--experimental-vm-modules npx jest --config jest.config.cjs
+
   # 2. Build all applications
   build:
     name: Build Applications
