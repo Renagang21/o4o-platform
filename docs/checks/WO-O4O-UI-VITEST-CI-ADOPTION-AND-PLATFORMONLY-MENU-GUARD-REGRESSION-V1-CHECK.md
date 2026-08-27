@@ -187,3 +187,58 @@ admin-dashboard · web-account · web-kpa-branch. **2-인자 consumer 회귀 0.*
 > lint-ratchet 이 `오류가 69 → 65 로 줄었습니다. ERROR_BASELINE 을 65 로 낮춰 주세요` notice 를
 > 출력한다. 이 감소는 이번 변경이 아니라 다른 WO 의 결과이고, baseline 조정은 이 WO 범위 밖이라
 > 건드리지 않았다 (병렬 세션 충돌 방지). 게이트는 정상 통과한다.
+
+---
+
+## 7. CI 실측 (push 후)
+
+commit `3cfac5875` · CI Pipeline run `33045379102` · **conclusion = success**
+(Code Quality Check: success · Build Applications (admin-dashboard): success)
+
+신규 step 로그 원문:
+
+```
+Run npx vitest run --config packages/ui/vitest.config.mjs
+ RUN  v3.2.4 /home/runner/work/o4o-platform/o4o-platform
+ ✓ packages/ui/src/operator-shell/__tests__/filterMenuByRole.test.ts (10 tests) 9ms
+ ✓ packages/ui/src/operator-user-detail/__tests__/UserDetailPasswordModal.test.tsx (9 tests) 647ms
+ Test Files  2 passed (2)
+      Tests  19 passed (19)
+```
+
+| CI step | 결과 |
+|---|---|
+| `Run tests (packages/ui Vitest)` | **success** — 19/19, 소요 1.97s |
+| platformOnly regression | **PASS** (10/10) |
+| `Run TypeScript check (Frontend only)` | `type-check:frontend: OK` |
+| `Run ESLint (regression ratchet)` | `ESLint: 65 errors, 2185 warnings (error baseline 65)` — 통과 |
+
+> 로컬 실행 시점의 baseline 은 69 였으나(§6), rebase 후 main 에는 다른 WO 가 이미
+> 65 로 낮춰둔 상태였다. 실제 오류 수 65 = baseline 65 로 정확히 통과한다.
+> CI 는 concurrency 취소 없이 완주했다.
+
+---
+
+## 8. 최종 판정
+
+```text
+packages/ui 테스트 CI 실행        = YES  (blocking step, continue-on-error/|| true 없음)
+platformOnly negative regression = PASS (mutation 으로 3건 실패 확인 → false positive 0)
+2-인자 backward compatibility     = PASS (4서비스 consumer + 전용 테스트 2건)
+false positive                    = 0
+UNJUDGED                          = 0
+CI step                           = SUCCESS
+```
+
+```text
+UI_VITEST_CI_ADOPTION = CLOSED
+PLATFORMONLY_GUARD    = PASS
+CI_GREEN              = PASS
+MUST_FIX_BEFORE_CLOSE = 0
+```
+
+### 잔여 (종료를 막지 않음)
+
+1. **package-level vitest config 5개(테스트 17개) 가 아직 CI 미연결** — §5. 별도 WO.
+2. `packages/ui` 의 `tsconfig.json` 이 테스트 파일을 exclude 하므로 테스트 코드 자체의
+   타입 오류는 tsc 가 아니라 vitest 실행이 잡는다 (기존 규약 유지, 의도적).
