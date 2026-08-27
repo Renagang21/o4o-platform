@@ -28,6 +28,26 @@ import type { DataSource, QueryRunner } from 'typeorm';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// WO-O4O-SIGNAGE-CAMPAIGN-FORCED-CONTENT-TABLET-SURFACE-DELIVERY-FIX-V1
+//
+// 결함: 이 INSERT 는 target_surface 를 지정하지 않아 DB default 'signage' 로 생성됐다.
+//   canonical Tablet idle resolver(store-public-tablet-idle-resolve.ts) 는
+//   `fc.target_surface IN ('tablet_idle','both')` 만 읽으므로,
+//   운영자가 사이니지 캠페인을 승인해도 그 forced content 가
+//   태블릿 대기화면에 영원히 도달하지 못했다.
+//
+// 수정 방향: reader 를 완화하지 않고 writer 가 canonical 값을 저장한다.
+//   'both' 를 쓰는 이유 — 캠페인은 기존 사이니지 surface
+//   (store_playlists forced merge, 4개 서비스에 마운트)에도 그대로 노출되어야 하고
+//   (기존 동작 보존), 동시에 canonical Tablet idle 경로에도 도달해야 한다.
+//   반면 'tablet_idle' 은 '사이니지 제외' 를 뜻하므로 적절하지 않다.
+//   값 집합은 forced-content.controller.ts 의 VALID_TARGET_SURFACES 와 동일하다.
+//
+// 기존 row 는 backfill 하지 않는다. 운영자 수동 경로의 default 'signage' 도 불변이다.
+const CAMPAIGN_TARGET_SURFACE = 'both';
+// 태블릿 대기화면 기본 재생 시간 — 운영자 수동 경로(forced-content.controller.ts) 기본값과 동일.
+const CAMPAIGN_TABLET_DURATION_SECONDS = 30;
+
 // WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1:
 // 'store_share_to_hub' 제거 — Store → Community publish/share 흐름 폐기.
 // 매장에서 만든 콘텐츠는 매장 전용으로 유지된다.
@@ -271,8 +291,8 @@ export class ContentApprovalService {
         `INSERT INTO signage_forced_content
            (service_key, title, video_url, source_type, embed_id, thumbnail_url,
             start_at, end_at, is_active, note, created_by_user_id,
-            media_id, campaign_request_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, $9, $10, $11, $12)`,
+            media_id, campaign_request_id, target_surface, tablet_duration_seconds)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, $9, $10, $11, $12, $13, $14)`,
         [
           serviceKey.trim(),
           title,
@@ -286,6 +306,8 @@ export class ContentApprovalService {
           null, // created_by_user_id — 운영자가 승인했으므로 NULL (공급자 ID는 payload에서 별도 추적)
           mediaId,
           requestId,
+          CAMPAIGN_TARGET_SURFACE,
+          CAMPAIGN_TABLET_DURATION_SECONDS,
         ],
       );
     }
