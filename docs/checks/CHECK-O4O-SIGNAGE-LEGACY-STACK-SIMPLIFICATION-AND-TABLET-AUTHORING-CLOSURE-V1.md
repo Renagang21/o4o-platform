@@ -399,3 +399,51 @@ GET/POST/DELETE/PATCH /tablets/:id/screen-sets*
 2. §12-2 신규 RETIRE 후보 3건 — 승인 후 별도 batch
 3. §3 `BLOCKED_ENV` 5개 테이블 — 승인된 DB read 경로 확보 시 재산출
 4. `apps/digital-signage-agent` 미배포 / `signage-player-web-00001-qjh` revision 고정 여부 — 별도 판단
+
+---
+
+## 15. main 병합 정렬 및 재검증 (PR #184)
+
+최초 작업 기준선(`e485baba`) 이후 `origin/main` 이 10커밋 진행하여, PR 생성 전 최신 main 을 병합했다.
+
+| 항목 | 값 |
+|---|---|
+| merge commit | `a929be253` (`origin/main = 063e811a5` 병합) |
+| PR | [#184](https://github.com/Renagang21/o4o-platform/pull/184) |
+| 충돌 | **1건** — `scripts/lint-ratchet.mjs` |
+| 병합 후 삭제 파일 수 | **103 유지** |
+| 보호 대상 diff | **0건** (`cms_content_slots` / `organization_channels` / `external_channel_*`) |
+
+### 15-1. lint baseline 충돌 해소 — 실측 재산출
+
+main `1b5e15fe2` 가 `ERROR_BASELINE` 을 69 → **65** 로, 본 브랜치가 69 → **63** 으로 각각 낮춰 같은 줄에서 충돌했다.
+어느 쪽 값도 병합 트리의 사실이 아니므로 **추정하지 않고 병합 트리에서 다시 측정**했다.
+
+```text
+병합 트리 실측: 64 errors / 2141 warnings   (44 파일)
+→ ERROR_BASELINE = 64  (근거 주석 동반)
+→ lint-ratchet exit 0
+```
+
+44개 파일의 오류는 전부 본 작업과 무관한 기존 오류다
+(cpt-engine · neture · otc 스크립트 · block-core 등. signage 경로 0건).
+
+### 15-2. 병합 트리 재검증
+
+| 검사 | 결과 |
+|---|---|
+| `lint-ratchet.mjs` (**build 산출물 생성 전**) | 64 / baseline 64 → **PASS** |
+| `tsc --noEmit` api-server | clean |
+| `tsc --noEmit` admin-dashboard · web-kpa-society · main-site | clean |
+| api-server 전체 Jest | **3675 / 3676** |
+
+전체 Jest 의 유일한 실패는 §13-1 에 기록한 것과 동일한 로컬 build 잔여물
+(`packages/ecommerce-core/{dist,node_modules,tsconfig.tsbuildinfo}`, `git ls-files` 빈 출력)이며
+본 변경과 무관하다. 삭제하지 않았고 clean checkout(CI)에서는 통과한다. 테스트 삭제·skip 0.
+
+### 15-3. 후속 WO 진행 상황
+
+§14-1 의 1번(`createCampaignForcedContent()` `target_surface` 누락)은 별도 WO 로 **수정 완료**되어
+`work/signage-campaign-forced-content-tablet-surface-v1` 에 있다.
+머지 순서는 **본 PR(구조 감축 기준선) → forced-content fix(기능 수정)** 이다.
+CHECK: `CHECK-O4O-SIGNAGE-CAMPAIGN-FORCED-CONTENT-TABLET-SURFACE-DELIVERY-FIX-V1.md`
