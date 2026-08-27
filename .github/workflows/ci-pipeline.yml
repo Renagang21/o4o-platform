@@ -140,6 +140,32 @@ jobs:
     - name: Run tests (packages/ui Vitest)
       run: npx vitest run --config packages/ui/vitest.config.mjs
 
+    # WO-O4O-PACKAGE-LEVEL-VITEST-CI-ADOPTION-FULL-CENSUS-AND-CLOSURE-V1
+    # vitest.config.mjs 만 있고 workflow step 이 없어 로컬 전용이던 package-level 테스트
+    # 5개(17 파일 · 241 tests) 를 blocking 으로 연결한다. 실패 패키지를 즉시 식별하기 위해
+    # 개별 step 으로 둔다. 모든 config 가 passWithNoTests: false 라 무실행 통과가 불가능하다.
+    # DB · secret 불필요. 루트에 설치된 vitest/jsdom/@testing-library 를 그대로 쓴다.
+    #   auth-utils       비밀번호 정책 · 오류 메시지 (17)
+    #   auth-react       라우트 가드 · 역할 선택 · 서비스 인증 (44)
+    #   store-ui-core    My Store parity 계약 (18)
+    #   operator-core-ui community/content-hub 콘솔 · resources lifecycle (53)
+    #   shared-space-ui  forum write shell · community nav · guide 계약 (109)
+
+    - name: Run tests (auth-utils Vitest)
+      run: npx vitest run --config packages/auth-utils/vitest.config.mjs
+
+    - name: Run tests (auth-react Vitest)
+      run: npx vitest run --config packages/auth-react/vitest.config.mjs
+
+    - name: Run tests (store-ui-core Vitest)
+      run: npx vitest run --config packages/store-ui-core/vitest.config.mjs
+
+    - name: Run tests (operator-core-ui Vitest)
+      run: npx vitest run --config packages/operator-core-ui/vitest.config.mjs
+
+    - name: Run tests (shared-space-ui Vitest)
+      run: npx vitest run --config packages/shared-space-ui/vitest.config.mjs
+
   # 2. Build all applications
   build:
     name: Build Applications

@@ -3,6 +3,10 @@
  *
  * WO-O4O-COMMUNITY-OPERATOR-CONSOLE-VIEW-CONVERGENCE-V1
  *
+ * WO-O4O-PACKAGE-LEVEL-VITEST-CI-ADOPTION-FULL-CENSUS-AND-CLOSURE-V1:
+ *   CI Pipeline / Code Quality Check 의 "Run tests (operator-core-ui Vitest)" 로 연결됨(blocking).
+ *   여기 include 에 잡히는 테스트는 전부 CI 에서 실행된다.
+ *
  * 실행: 저장소 루트에서
  *   npx vitest run --config packages/operator-core-ui/vitest.config.mjs
  *
