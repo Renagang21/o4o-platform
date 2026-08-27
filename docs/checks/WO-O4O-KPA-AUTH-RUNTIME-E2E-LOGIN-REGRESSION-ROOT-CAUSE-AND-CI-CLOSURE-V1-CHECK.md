@@ -247,13 +247,62 @@ CI secret `E2E_ADMIN_PASSWORD` 는 변경 이전 값을 그대로 들고 있어 
 
 > `CI Pipeline` 의 3건은 이 WO 범위 밖(§9 계열)이며 별도 처리 대상이다. 여기서 손대지 않았다.
 
-### 10.5 종료 판정
+### 10.5 중간 상태 — **WO 미종료** (2026-08-27, 사용자 확정)
 
 ```
-SHARED_SECRET_CONTRACT   = REMOVED
-PER_SERVICE_CONTRACT     = DEFINED (secrets 미등록)
-TEST12_JUDGMENT          = FIXED (URL → auth-state)
-CASCADE_FALSE_PASS       = FIXED (login assertion in setup, test.skip 0)
-CI_GREEN                 = BLOCKED (사용자 조치 10.4)
-MUST_FIX_BEFORE_CLOSE    = 0 (코드 범위)
+ROOT_CAUSE                       = CLOSED
+SERVICE_SPECIFIC_SECRET_CONTRACT = IMPLEMENTED
+FALSE_POSITIVE_AUTH_CHECK        = CLOSED
+CHAINED_FALSE_PASS               = CLOSED
+
+E2E_FIXTURE_PROVISIONING         = BLOCKED
+GITHUB_SECRETS                   = BLOCKED
+4_SERVICE_REAL_LOGIN_E2E         = NOT_VERIFIED
+CI_GREEN                         = BLOCKED
+
+MUST_FIX_BEFORE_CLOSE            = 1
+```
+
+`MUST_FIX_BEFORE_CLOSE = 1` 은 **fixture 공급**이다. 코드 결함이 아니다.
+
+> 현재 `E2E — Auth Runtime Regression` 의 red 는 새로운 코드 결함이 아니라
+> **필요한 fixture 가 아직 공급되지 않았음을 정확히 표시하는 red** 이다.
+> secret 등록 전 추가 코드 수정은 하지 않는다. fallback 을 되살리면 §6 원문제로 회귀한다.
+
+### 10.6 재개 조건 — 사용자 작업 (코드 작업 중단)
+
+**1. 서비스별 E2E 전용 관리 계정 생성** (4개)
+
+기존 개인 운영자 계정(`sohae2100`)의 비밀번호를 CI 에 맞추지 **않는다.**
+CI fixture 는 사람이 정상적으로 비밀번호를 변경해도 깨지지 않는 전용 계정이어야 한다.
+
+**2. GitHub Actions Secrets 8개 등록** (§10.4 표)
+
+**3. 기존 공용 secret 삭제**
+`E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD` — 실제 consumer 0 재확인 후 삭제.
+
+### 10.7 최종 검증 절차 (재개 시)
+
+```
+1. E2E — Auth Runtime Regression 재실행
+
+2. 4서비스 각각
+   실제 로그인 form
+   → access token 확인
+   → /auth/me 인증 확인
+   → protected page 확인
+   → refresh
+   → logout
+   → token cleared
+
+3. 4/4 PASS 확인
+
+4. CI Pipeline 도 최신 main 에서 green 인지 확인
+
+5. CHECK 최종 갱신
+
+6. 최종 판정
+   AUTH_RUNTIME_E2E      = CLOSED
+   CI_GREEN              = PASS
+   MUST_FIX_BEFORE_CLOSE = 0
 ```
