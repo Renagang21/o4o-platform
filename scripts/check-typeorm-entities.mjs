@@ -114,19 +114,10 @@ export const UNREGISTERED_INVENTORY = new Map([
   ['KpaInstructorQualification', { file: 'apps/api-server/src/routes/kpa/entities/kpa-instructor-qualification.entity.ts', reason: DEAD }],
   ['StoreEvent', { file: 'apps/api-server/src/routes/platform/entities/store-event.entity.ts', reason: DEAD }],
 
-  // --- signage extension (routes/signage/extensions/**) — repository 는 있으나 route 가 등록되지 않아 도달 불가 ---
-  ['CosmeticsBrandContent', { file: 'apps/api-server/src/routes/signage/extensions/cosmetics/entities/CosmeticsBrandContent.entity.ts', reason: DEAD_UNREACHABLE_SERVICE('routes/signage/extensions/cosmetics/repositories/**') }],
-  ['CosmeticsContentPreset', { file: 'apps/api-server/src/routes/signage/extensions/cosmetics/entities/CosmeticsContentPreset.entity.ts', reason: DEAD_UNREACHABLE_SERVICE('routes/signage/extensions/cosmetics/repositories/**') }],
-  ['CosmeticsTrendCard', { file: 'apps/api-server/src/routes/signage/extensions/cosmetics/entities/CosmeticsTrendCard.entity.ts', reason: DEAD_UNREACHABLE_SERVICE('routes/signage/extensions/cosmetics/repositories/**') }],
-  ['PharmacyCategory', { file: 'apps/api-server/src/routes/signage/extensions/pharmacy/entities/PharmacyCategory.entity.ts', reason: DEAD_UNREACHABLE_SERVICE('routes/signage/extensions/pharmacy/repositories/**') }],
-  ['PharmacyContent', { file: 'apps/api-server/src/routes/signage/extensions/pharmacy/entities/PharmacyContent.entity.ts', reason: DEAD_UNREACHABLE_SERVICE('routes/signage/extensions/pharmacy/repositories/**') }],
-  ['PharmacySeasonalCampaign', { file: 'apps/api-server/src/routes/signage/extensions/pharmacy/entities/PharmacySeasonalCampaign.entity.ts', reason: DEAD_UNREACHABLE_SERVICE('routes/signage/extensions/pharmacy/repositories/**') }],
-  ['PharmacyTemplatePreset', { file: 'apps/api-server/src/routes/signage/extensions/pharmacy/entities/PharmacyTemplatePreset.entity.ts', reason: DEAD_UNREACHABLE_SERVICE('routes/signage/extensions/pharmacy/repositories/**') }],
-  ['SellerCampaign', { file: 'apps/api-server/src/routes/signage/extensions/seller/entities/SellerCampaign.entity.ts', reason: DEAD_UNREACHABLE_SERVICE('routes/signage/extensions/seller/repositories/**') }],
-  ['SellerContent', { file: 'apps/api-server/src/routes/signage/extensions/seller/entities/SellerContent.entity.ts', reason: DEAD_UNREACHABLE_SERVICE('routes/signage/extensions/seller/repositories/**') }],
-  ['SellerContentMetric', { file: 'apps/api-server/src/routes/signage/extensions/seller/entities/SellerContentMetric.entity.ts', reason: DEAD_UNREACHABLE_SERVICE('routes/signage/extensions/seller/repositories/**') }],
-  ['SellerMetricEvent', { file: 'apps/api-server/src/routes/signage/extensions/seller/entities/SellerContentMetric.entity.ts', reason: DEAD_UNREACHABLE_SERVICE('routes/signage/extensions/seller/repositories/**') }],
-  ['SellerPartner', { file: 'apps/api-server/src/routes/signage/extensions/seller/entities/SellerPartner.entity.ts', reason: DEAD_UNREACHABLE_SERVICE('routes/signage/extensions/seller/repositories/**') }],
+  // --- [RETIRED] signage extension (routes/signage/extensions/**) ---
+  //   WO-O4O-SIGNAGE-LEGACY-STACK-SIMPLIFICATION-AND-TABLET-AUTHORING-CLOSURE-V1 에서
+  //   해당 subtree(42 파일)를 은퇴시켰으므로 재고 12건도 함께 제거한다.
+  //   이 entity 들은 애초에 entities 배열에 등록된 적이 없다 (미등록 재고) — TypeORM metadata 영향 없음.
 ]);
 
 const SKIP_DIR = new Set(['node_modules', 'dist', 'build', 'coverage', 'migrations', '__tests__', '__mocks__']);

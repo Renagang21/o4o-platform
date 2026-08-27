@@ -605,15 +605,6 @@ export const signageMediaApi = {
     }
   },
 
-  async getPresignedUrl(dto: PresignedUploadRequest, serviceKey?: string): Promise<ApiResponse<PresignedUploadResponse>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/upload/presigned`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to get presigned URL:', error);
-      return { success: false, error: 'Failed to get upload URL' };
-    }
-  },
 };
 
 // Schedule API
@@ -801,143 +792,10 @@ export const templateApi = {
 };
 
 // Content Block API
-export const contentBlockApi = {
-  async list(serviceKey?: string, params?: { page?: number; limit?: number; blockType?: ContentBlockType }): Promise<ApiResponse<PaginatedResponse<SignageContentBlock>>> {
-    try {
-      const base = getBaseUrl(serviceKey);
-      const searchParams = new URLSearchParams();
-      if (params?.page) searchParams.append('page', params.page.toString());
-      if (params?.limit) searchParams.append('limit', params.limit.toString());
-      if (params?.blockType) searchParams.append('blockType', params.blockType);
-      const query = searchParams.toString();
-      const url = query ? `${base}/content-blocks?${query}` : `${base}/content-blocks`;
-      const response = await authClient.api.get(url);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to list content blocks:', error);
-      return { success: false, error: 'Failed to list content blocks' };
-    }
-  },
-
-  async get(id: string, serviceKey?: string): Promise<ApiResponse<SignageContentBlock>> {
-    try {
-      const response = await authClient.api.get(`${getBaseUrl(serviceKey)}/content-blocks/${id}`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to get content block:', error);
-      return { success: false, error: 'Failed to get content block' };
-    }
-  },
-
-  async create(dto: CreateContentBlockDto, serviceKey?: string): Promise<ApiResponse<SignageContentBlock>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/content-blocks`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to create content block:', error);
-      return { success: false, error: 'Failed to create content block' };
-    }
-  },
-
-  async update(id: string, dto: Partial<CreateContentBlockDto>, serviceKey?: string): Promise<ApiResponse<SignageContentBlock>> {
-    try {
-      const response = await authClient.api.patch(`${getBaseUrl(serviceKey)}/content-blocks/${id}`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to update content block:', error);
-      return { success: false, error: 'Failed to update content block' };
-    }
-  },
-
-  async delete(id: string, serviceKey?: string): Promise<ApiResponse<void>> {
-    try {
-      await authClient.api.delete(`${getBaseUrl(serviceKey)}/content-blocks/${id}`);
-      return { success: true };
-    } catch (error) {
-      console.error('Failed to delete content block:', error);
-      return { success: false, error: 'Failed to delete content block' };
-    }
-  },
-};
 
 // Layout Preset API
-export const layoutPresetApi = {
-  async list(serviceKey?: string, params?: { category?: string; isSystem?: boolean }): Promise<ApiResponse<PaginatedResponse<SignageLayoutPreset>>> {
-    try {
-      const base = getBaseUrl(serviceKey);
-      const searchParams = new URLSearchParams();
-      if (params?.category) searchParams.append('category', params.category);
-      if (params?.isSystem !== undefined) searchParams.append('isSystem', params.isSystem.toString());
-      const query = searchParams.toString();
-      const url = query ? `${base}/layout-presets?${query}` : `${base}/layout-presets`;
-      const response = await authClient.api.get(url);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to list layout presets:', error);
-      return { success: false, error: 'Failed to list layout presets' };
-    }
-  },
-
-  async get(id: string, serviceKey?: string): Promise<ApiResponse<SignageLayoutPreset>> {
-    try {
-      const response = await authClient.api.get(`${getBaseUrl(serviceKey)}/layout-presets/${id}`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to get layout preset:', error);
-      return { success: false, error: 'Failed to get layout preset' };
-    }
-  },
-
-  async create(dto: CreateLayoutPresetDto, serviceKey?: string): Promise<ApiResponse<SignageLayoutPreset>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/layout-presets`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to create layout preset:', error);
-      return { success: false, error: 'Failed to create layout preset' };
-    }
-  },
-
-  async update(id: string, dto: Partial<CreateLayoutPresetDto>, serviceKey?: string): Promise<ApiResponse<SignageLayoutPreset>> {
-    try {
-      const response = await authClient.api.patch(`${getBaseUrl(serviceKey)}/layout-presets/${id}`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to update layout preset:', error);
-      return { success: false, error: 'Failed to update layout preset' };
-    }
-  },
-
-  async delete(id: string, serviceKey?: string): Promise<ApiResponse<void>> {
-    try {
-      await authClient.api.delete(`${getBaseUrl(serviceKey)}/layout-presets/${id}`);
-      return { success: true };
-    } catch (error) {
-      console.error('Failed to delete layout preset:', error);
-      return { success: false, error: 'Failed to delete layout preset' };
-    }
-  },
-};
 
 // AI Generation API
-export const aiGenerationApi = {
-  async generate(dto: {
-    prompt: string;
-    templateType: 'banner' | 'card' | 'poster' | 'slide';
-    style?: string;
-    targetWidth?: number;
-    targetHeight?: number;
-    parameters?: Record<string, unknown>;
-  }, serviceKey?: string): Promise<ApiResponse<{ generationId: string; status: string; result?: Record<string, unknown> }>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/ai/generate`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to generate AI content:', error);
-      return { success: false, error: 'Failed to generate content' };
-    }
-  },
-};
 
 // Global Content API (Content Hub)
 // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone 메서드 제거 (clonePlaylist, cloneMedia 삭제)

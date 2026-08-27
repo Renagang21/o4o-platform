@@ -39,7 +39,6 @@
       "@o4o/*": ["../../packages/*/dist"],
       "@o4o/forum-core": ["../../packages/forum-core/dist"],
       "@o4o/forum-core/*": ["../../packages/forum-core/dist/*"],
-      "@o4o-apps/signage": ["../../packages/@o4o-apps/signage/dist"],
       "@o4o-apps/*": ["../../packages/*/dist"],
       "@o4o-extensions/*": ["../../packages/*/dist"]
     },
