@@ -200,3 +200,74 @@ F. UNJUDGED                   = 0
 | **jest 기반 package 테스트 3개 · 6파일 CI 미실행** | `asset-copy-core`(4) · `account-ui`(1) · `appearance-system`(1). 각각 test script 와 jest config 가 있으나 workflow 가 호출하지 않는다. 러너가 달라 이번 step 패턴을 그대로 쓸 수 없어 분리. |
 | **NOT_RUNNABLE 2개 · 3파일** | `partner-core`(2, typeorm DataSource 의존 → DB 또는 mock 기반 결정 필요) · `shortcodes`(1, `*.spec.ts` 인데 어떤 config include 에도 걸리지 않음). 실행 기반을 새로 정해야 해서 조용히 연결하지 않았다. |
 | **루트 `jest.config.js` 가 dead** | 어떤 workflow 도 호출하지 않는다. 위 jest WO 에서 함께 판정하는 것이 자연스럽다. |
+
+---
+
+## 8. 실제 CI 검증 (§9)
+
+commit `4be07ba57` · CI Pipeline run `33048130287` · **conclusion = success**
+(Code Quality Check: success · Build Applications (admin-dashboard): success).
+**concurrency 취소된 run 이 아니라, 이 commit 을 head 로 완주한 run 이다.**
+
+| CI step | 로그 실측 |
+|---|---|
+| `Run tests (packages/ui Vitest)` | Test Files 2 passed / **Tests 19 passed** |
+| `Run tests (auth-utils Vitest)` | Test Files 2 passed / **Tests 17 passed** |
+| `Run tests (auth-react Vitest)` | Test Files 3 passed / **Tests 44 passed** |
+| `Run tests (store-ui-core Vitest)` | Test Files 1 passed / **Tests 18 passed** |
+| `Run tests (operator-core-ui Vitest)` | Test Files 4 passed / **Tests 53 passed** |
+| `Run tests (shared-space-ui Vitest)` | Test Files 7 passed / **Tests 109 passed** |
+| `Run TypeScript check (Frontend only)` | `type-check:frontend: OK` |
+| `Run ESLint (regression ratchet)` | `ESLint: 65 errors, 2185 warnings (error baseline 65)` — 통과 |
+
+CI 에서 실제로 실행된 package Vitest = **19 files / 260 tests, 전부 success**.
+로컬 실측(§6)과 파일 수·테스트 수가 정확히 일치한다 → **silent no-test pass 0**.
+
+---
+
+## 9. 금지 항목 준수 (§10)
+
+```text
+skip/todo 로 green 만들기               = 0  (5개 패키지 it.skip/it.todo/it.only 0건)
+passWithNoTests=true 로 무실행 은폐      = 0  (6개 config 전부 false)
+snapshot 대량 갱신                      = 0  (toMatchSnapshot 0건, 테스트 파일 무수정)
+새 테스트 framework 도입                 = 0  (기존 vitest 3.2.4)
+CI warning-only                        = 0  (continue-on-error · || true 0건)
+실제 기능 결함을 test 수정으로 은폐       = 0  (선행 실행 실패 0 → 수정할 대상 자체가 없었음)
+서비스 business logic 공통화로 범위 확대  = 0  (소스 코드 무수정, 변경은 workflow + config 주석뿐)
+```
+
+---
+
+## 10. 최종 판정
+
+```text
+package-level Vitest 모집단  = 전수 판정 (28 파일 / 11 패키지)
+LOCAL_ONLY_GREEN            = 0  (5개 전부 CI 연결됨)
+LOCAL_ONLY_RED              = 0
+NOT_RUNNABLE unresolved     = 2  (partner-core · shortcodes — §7 에 원인·조치 기록, 별도 WO)
+UNJUDGED                    = 0
+CI 에서 실행되는 package test = 19 files / 260 tests, 전부 success
+silent no-test pass         = 0
+false-green                 = 0  (mutation 실증)
+```
+
+```text
+PACKAGE_VITEST_CI_ADOPTION = CLOSED
+PACKAGE_TESTS_IN_CI        = PASS
+UNJUDGED                   = 0
+CI_GREEN                   = PASS
+MUST_FIX_BEFORE_CLOSE      = 0
+```
+
+> `NOT_RUNNABLE = 2` 는 **완료 기준의 "unresolved = 0" 을 형식적으로 만족시키기 위해
+> 억지로 연결하지 않았다.** `partner-core` 는 typeorm DataSource 의존이라 DB 또는 mock 설계
+> 결정이 필요하고, `shortcodes` 는 `*.spec.ts` 라 어떤 include 에도 걸리지 않는다.
+> 둘 다 이번 WO 의 "이미 존재하는 Vitest 를 CI 에 연결" 범위를 넘어서는 **실행 기반 신설**이므로
+> 원인·모집단을 기록하고 별도 WO 로 분리한다 (§7).
+
+### 잔여
+
+1. jest 기반 package 테스트 3개 · 6파일 CI 미연결 (`asset-copy-core` · `account-ui` · `appearance-system`).
+2. `NOT_RUNNABLE` 2개 · 3파일 (`partner-core` · `shortcodes`) — 실행 기반 결정 필요.
+3. 루트 `jest.config.js` dead — 위 2건과 함께 판정 권장.
