@@ -90,10 +90,17 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
+  // WO-O4O-GLYCOPHARM-AI-ADMIN-ROLE-GUARD-CONTRACT-AUDIT-AND-CLOSURE-V1:
+  //   'AI 사용량' / 'AI 정산' 의 backend 는 `/api/ai/admin/*` = requireAdmin
+  //   (= platform:super_admin 단독) 이고, 다루는 데이터도 **플랫폼 전역**이다
+  //   (`ai_usage_logs` 에 serviceKey 축 자체가 없다. quota/billing 의 layer_key 는
+  //    care/store/proxy 라는 기능축이지 서비스축이 아니다).
+  //   → glycopharm:admin/operator 에게 노출하면 클릭 시 403 이 빈 화면으로 위장된다.
+  //   권한을 넓히지 않고 진입점을 실제 권한에 맞춘다 (platformOnly).
   analytics: [
     { label: 'AI 리포트', path: '/operator/ai-report' },
-    { label: 'AI 사용량', path: '/operator/ai-usage' },
-    { label: 'AI 정산', path: '/operator/ai-billing' },
+    { label: 'AI 사용량', path: '/operator/ai-usage', platformOnly: true },
+    { label: 'AI 정산', path: '/operator/ai-billing', platformOnly: true },
     { label: '운영 분석', path: '/operator/analytics' },
   ],
   // care group removed — WO-O4O-GLYCOPHARM-CARE-REMOVAL-V1

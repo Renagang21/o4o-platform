@@ -18,6 +18,7 @@ import { OperatorAreaShell } from '@o4o/operator-ux-core';
 import { useAuth } from '../../contexts/AuthContext';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
 import { UNIFIED_MENU } from '../../config/operatorMenuGroups';
+import { hasPlatformAdminRole } from '../../lib/role-constants';
 import { GlycoGlobalHeader } from '../GlycoGlobalHeader';
 
 export default function OperatorLayoutWrapper() {
@@ -26,9 +27,13 @@ export default function OperatorLayoutWrapper() {
   // WO-O4O-OPERATOR-ROUTE-GUARD-COMMONIZATION-V1: 공통 helper 사용
   const isAdmin = user ? isAdminOrAbove(user.roles, 'glycopharm') : false;
 
+  // WO-O4O-GLYCOPHARM-AI-ADMIN-ROLE-GUARD-CONTRACT-AUDIT-AND-CLOSURE-V1:
+  //   platformOnly 항목(플랫폼 전역 AI 화면) 노출 판정. glycopharm:admin 단독은 false.
+  const isPlatformAdmin = hasPlatformAdminRole(user?.roles);
+
   const menuItems = useMemo(
-    () => filterMenuByRole(UNIFIED_MENU, isAdmin),
-    [isAdmin],
+    () => filterMenuByRole(UNIFIED_MENU, isAdmin, isPlatformAdmin),
+    [isAdmin, isPlatformAdmin],
   );
 
   return (

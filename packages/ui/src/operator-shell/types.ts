@@ -36,6 +36,16 @@ export interface OperatorMenuItem {
 export interface UnifiedMenuItem extends OperatorMenuItem {
   /** true = admin 역할에게만 표시 */
   adminOnly?: boolean;
+  /**
+   * WO-O4O-GLYCOPHARM-AI-ADMIN-ROLE-GUARD-CONTRACT-AUDIT-AND-CLOSURE-V1:
+   * true = `platform:super_admin` 에게만 표시. 서비스 admin(`{service}:admin`) 도 제외한다.
+   *
+   * backend guard 가 `requireAdmin`(= platform:super_admin 단독) 인 **플랫폼 전역 화면**을
+   * 서비스 운영 메뉴에 노출하면, 클릭 시 403 이 빈 화면으로 위장된다.
+   * 권한을 넓히는 대신 **메뉴 진입점을 실제 권한에 맞춘다.**
+   * 미지정(대부분)이면 기존 동작 그대로 — 4서비스 무영향.
+   */
+  platformOnly?: boolean;
 }
 
 /**

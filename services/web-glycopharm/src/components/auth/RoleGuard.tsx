@@ -34,6 +34,25 @@ export const RoleGuard = createRouteGuard({
 });
 
 /**
+ * PlatformRoute — platform:super_admin 전용 guard
+ *
+ * WO-O4O-GLYCOPHARM-AI-ADMIN-ROLE-GUARD-CONTRACT-AUDIT-AND-CLOSURE-V1:
+ *   backend `requireAdmin`(= platform:super_admin 단독) 으로 보호되는 **플랫폼 전역** 화면용.
+ *   `glycopharm:admin` / `glycopharm:operator` 단독은 차단된다 — backend 가 403 을 주는
+ *   화면에 진입시켜 빈 화면·오류로 위장시키지 않기 위함이다. 권한 확대는 없다.
+ *
+ *   cross-service surface 이므로 glycopharm membership 을 요구하지 않는다
+ *   (Neture PlatformRoute 와 동일 계약).
+ */
+export function PlatformRoute({ children, fallback = '/login' }: { children: ReactNode; fallback?: string }) {
+  return (
+    <RoleGuard allowedRoles={['platform:super_admin']} enforceMembership={false} fallback={fallback}>
+      {children}
+    </RoleGuard>
+  );
+}
+
+/**
  * OperatorRoute — service_memberships 기반 Operator 접근 제어
  *
  * WO-O4O-OPERATOR-VISIBILITY-UNIFICATION-V1

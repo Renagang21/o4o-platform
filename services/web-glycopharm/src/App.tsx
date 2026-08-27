@@ -25,7 +25,7 @@ import OperatorLayoutWrapper from '@/components/layouts/OperatorLayoutWrapper';
 import StoreLayout from '@/components/layouts/StoreLayout';
 import KioskLayout from '@/components/layouts/KioskLayout';
 import TabletLayout from '@/components/layouts/TabletLayout';
-import { RoleGuard, OperatorRoute } from '@/components/auth/RoleGuard';
+import { RoleGuard, OperatorRoute, PlatformRoute } from '@/components/auth/RoleGuard';
 import { AccessDenied } from '@o4o/ui';
 // WO-O4O-GLYCOPHARM-MY-STORE-MENU-MEMBERSHIP-GUARD-V1
 import { PharmacyStoreGuard } from '@/components/auth/PharmacyStoreGuard';
@@ -893,8 +893,14 @@ function AppRoutes() {
         <Route path="users" element={<Navigate to="/operator/members" replace />} />
         <Route path="users/:id" element={<UserDetailPage />} />
         <Route path="ai-report" element={<AiReportPage />} />
-        <Route path="ai-usage" element={<AiUsageDashboardPage />} />
-        <Route path="ai-billing" element={<AiBillingPage />} />
+        {/* WO-O4O-GLYCOPHARM-AI-ADMIN-ROLE-GUARD-CONTRACT-AUDIT-AND-CLOSURE-V1:
+            두 화면의 backend(`/api/ai/admin/analytics|quotas|billing`)는 requireAdmin
+            = platform:super_admin 단독이고, 데이터도 플랫폼 전역(서비스축 없음)이다.
+            OperatorRoute(=glycopharm operator 이상) 로 두면 진입 후 전부 403 이 되어
+            빈 화면으로 위장된다 → route 도 실제 권한(PlatformRoute)에 맞춘다.
+            backend guard 는 완화하지 않는다. */}
+        <Route path="ai-usage" element={<PlatformRoute><AiUsageDashboardPage /></PlatformRoute>} />
+        <Route path="ai-billing" element={<PlatformRoute><AiBillingPage /></PlatformRoute>} />
         <Route path="signage/library" element={<ContentLibraryPage />} />
         <Route path="signage/content" element={<ContentHubPage />} />
         <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />

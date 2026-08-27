@@ -25,6 +25,17 @@ export const GLYCOPHARM_ROLES = {
   LMS_INSTRUCTOR: 'lms:instructor',
 } as const;
 
+/**
+ * platform-admin 판정 — WO-O4O-GLYCOPHARM-AI-ADMIN-ROLE-GUARD-CONTRACT-AUDIT-AND-CLOSURE-V1
+ *
+ * `glycopharm:admin` 단독은 false. backend `requireAdmin`(= platform:super_admin 단독) 과
+ * 정합하는 유일한 프런트 판정이다. Neture 의 동명 헬퍼와 같은 계약.
+ */
+export function hasPlatformAdminRole(roles: string[] | undefined | null): boolean {
+  if (!roles || roles.length === 0) return false;
+  return roles.includes(GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN);
+}
+
 /** 약사 역할 확인 헬퍼 — glycopharm:pharmacist 단일 기준 */
 export function isPharmacistRole(role: string): boolean {
   return role === GLYCOPHARM_ROLES.PHARMACIST;
