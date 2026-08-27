@@ -72,7 +72,7 @@ export function isPlausibleCredential(plaintext: string): boolean {
 | 모호 케이스 | 양쪽으로 서로 다른 평문 | `HOLD_AMBIGUOUS`, write 없음 |
 | rollout 회귀 | `npx jest src/__tests__/encryption-key-canonical-rollout.spec.ts` | **8 passed** |
 | 타입 | `npx tsc --noEmit` (apps/api-server) | exit 0 |
-| 전체 | `npx jest --maxWorkers=1` | 아래 §6 |
+| 전체 | `npx jest --maxWorkers=1` | **217 suites / 3648 tests 통과** |
 
 ## 5. 판정
 
@@ -85,9 +85,9 @@ export function isPlausibleCredential(plaintext: string): boolean {
 | 5 | rollback / idempotency 계약 유지 | PASS — 기존 7 테스트 무변경 통과 |
 | 6 | 랜덤 IV 반복 flake 0 | PASS — 2000회 |
 | 7 | encryption-key rollout 회귀 | PASS — 8/8 |
-| 8 | 전체 Jest | §6 |
-| 9 | CI green | §6 |
-| 10 | CHECK + commit + push | 본 문서 / §6 |
+| 8 | 전체 Jest | PASS — 217 suites / 3648 tests |
+| 9 | CI green | PASS — `c2b7eb505` (e21ae63bc 포함) CI Pipeline success |
+| 10 | CHECK + commit + push | PASS — `e21ae63bc` push 완료 |
 
 `UNKNOWN = 0 · UNJUDGED = 0`
 
@@ -99,8 +99,8 @@ export function isPlausibleCredential(plaintext: string): boolean {
 | `node scripts/lint-ratchet.mjs` | 통과 (ESLint 64 errors, baseline 69). 64 로 낮추는 것은 **별도 maintenance 커밋**으로 분리 |
 | `node scripts/check-unsafe-routes.mjs` | 1393 파일 · 위반 0 |
 | `node scripts/check-typeorm-entities.mjs` | DEFINED_BUT_UNREGISTERED 0 / 중복 0 / stale 0 |
-| commit | (아래) |
-| CI Pipeline | (아래) |
+| commit | `e21ae63bc` (main). 범위: 위 2개 파일 + 본 CHECK |
+| CI Pipeline | `e21ae63bc` 자체 run 은 후속 세션 push(`fbcd9550d`, `c2b7eb505`)에 의해 concurrency **cancelled** (실패 아님). 같은 커밋의 Deploy API Server / CodeQL 은 success. `e21ae63bc` 를 포함하는 `c2b7eb505` 의 **CI Pipeline success** 로 통합 검증 완료 |
 
 ## 7. 남은 위험 · DEFERRED
 

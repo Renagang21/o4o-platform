@@ -16,12 +16,16 @@ npx tsx scripts/audit/check-block-registry.ts
 
 ### Utilities
 - **`../../packages/shortcodes/src/utils/shortcodeNaming.ts`**
-  - Naming convention utilities (PascalCase ↔ snake_case)
+  - Naming convention utilities (PascalCase ↔ snake_case).
+    **The audit scripts no longer use these to guess shortcode names** — a
+    filename is not a registration. Kept for callers that convert deliberately.
 
 ### Audit Scripts
 - **`check-shortcode-registry.ts`**
-  - Scans shortcode components
-  - Compares with registrations
+  - Collects declared shortcode `name:` tokens
+  - Resolves which of them the admin-dashboard bootstrap actually registers
+  - Classifies the rest as explained gaps (`DEAD_INITIALIZER` /
+    `UNMOUNTED_DEFINITION_BUNDLE`) or unexplained missing
   - Generates `shortcode-registry-report.json`
 
 - **`check-block-registry.ts`**
@@ -64,16 +68,26 @@ Last measured 2026-08-27 (`WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1
 - Checker exits **0**.
 
 ### Shortcodes
-- **Coverage**: 100% of the axis this scanner can verify (3/3 registered)
-- **Missing**: 2 (`approval_queue`, `product_shortcodes`)
-- **Dangling**: 0
-- Checker exits **1** on the 2 missing entries.
+- **Model**: registration is judged by **runtime reachability from the bootstrap**,
+  not by file existence. The canonical key is the declared `name:` — never derived
+  from a filename.
+- **SSOT**: the single `globalRegistry` instance in
+  `packages/shortcodes/src/registry.ts`. Both the renderer and the editor look up
+  through that one instance.
+- **Declared definitions**: 14
+- **Runtime registered**: 5 — `preset`, `cpt_list`, `cpt_field`, `acf_field`,
+  `meta_field` (bootstrap: `apps/admin-dashboard/src/utils/register-dynamic-shortcodes.ts`)
+- **Explained gaps**: 9 — `social_login` / `login_form` / `oauth_login`
+  (`DEAD_INITIALIZER`: `registerAuthShortcodes()` has no caller) and the 6 product
+  tokens in `productShortcodes.tsx` (`UNMOUNTED_DEFINITION_BUNDLE`: outside the
+  loader glob, zero importers).
+- **Unexplained missing**: 0 · **Dangling**: 0
+- Checker exits **0**.
 
-Those 2 are **not defects in the registry this scanner reads**. They belong to the
-admin-dashboard lazy-loader axis (`src/utils/shortcode-loader.ts`), whose single
-source of truth is not yet settled — deliberately left open for a follow-up WO
-rather than closed with placeholder registrations. See
-[`docs/checks/WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1-CHECK.md`](../../docs/checks/WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1-CHECK.md).
+The `approval_queue` / `product_shortcodes` entries earlier reported as missing
+were **filename-derived names that exist nowhere in the source**. They disappeared
+when the scanner switched to declared `name:` tokens. See
+[`docs/checks/WO-O4O-SHORTCODE-REGISTRY-SSOT-AND-RUNTIME-REACHABILITY-V1-CHECK.md`](../../docs/checks/WO-O4O-SHORTCODE-REGISTRY-SSOT-AND-RUNTIME-REACHABILITY-V1-CHECK.md).
 
 ## Usage Examples
 
@@ -116,11 +130,17 @@ fileNameToShortcodeName("ProductGrid.tsx") // → "product_grid"
 ## Next Steps
 
 1. ~~Register `buttons` block~~ — done (`o4o/buttons`, 2026-08-27).
-2. **Settle the shortcode registry SSOT.** Three registration mechanisms coexist
-   (`packages/shortcodes` `registerShortcode`, the admin-dashboard
-   `import.meta.glob` lazy loader, and a plain `adminShortcodes` component map),
-   and `registerAuthShortcodes()` currently has no caller. Until that is decided,
-   do not add registrations to make the checker exit 0.
+2. ~~Settle the shortcode registry SSOT~~ — done
+   (`WO-O4O-SHORTCODE-REGISTRY-SSOT-AND-RUNTIME-REACHABILITY-V1`, 2026-08-27):
+   `globalRegistry` is the single SSOT and audit now measures runtime reachability.
+3. **Decide the fate of `registerAuthShortcodes()`.** It is a confirmed
+   `DEAD_INITIALIZER` but is still re-exported from the package barrel; removing a
+   public export is a shared-contract change and needs its own WO.
+4. **Decide whether the product shortcode bundle should exist at all.**
+   `add_to_cart` / `product_grid` are consumer-commerce surfaces, so this is a
+   business-boundary call under
+   [`docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md`](../../docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) —
+   not an audit decision. Do not register them to make numbers look better.
 
 `REGISTRY_AUDIT_REPORT.md` §2–§8 is a 2025-11-21 snapshot and is no longer
 current; its header carries the up-to-date figures.

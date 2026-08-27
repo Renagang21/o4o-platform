@@ -172,45 +172,11 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // DELETE /api/signage/:serviceKey/templates/:templateId/zones/:zoneId - Delete zone (Operator only)
   router.delete('/templates/:templateId/zones/:zoneId', requireSignageOperator, validateUuidParams('templateId', 'zoneId'), templateCtrl.deleteTemplateZone);
 
-  // ========== Content Block Routes (Operator managed) ==========
-  // GET /api/signage/:serviceKey/content-blocks - List content blocks
-  router.get('/content-blocks', allowSignageStoreRead, contentCtrl.getContentBlocks);
-
-  // POST /api/signage/:serviceKey/content-blocks - Create content block (Operator only)
-  router.post('/content-blocks', requireSignageOperator, contentCtrl.createContentBlock);
-
-  // GET /api/signage/:serviceKey/content-blocks/:id - Get content block by ID
-  router.get('/content-blocks/:id', allowSignageStoreRead, validateUuidParams('id'), contentCtrl.getContentBlock);
-
-  // PATCH /api/signage/:serviceKey/content-blocks/:id - Update content block (Operator only)
-  router.patch('/content-blocks/:id', requireSignageOperator, validateUuidParams('id'), contentCtrl.updateContentBlock);
-
-  // DELETE /api/signage/:serviceKey/content-blocks/:id - Delete content block (Operator only)
-  router.delete('/content-blocks/:id', requireSignageOperator, validateUuidParams('id'), contentCtrl.deleteContentBlock);
-
-  // ========== Layout Preset Routes (Operator managed) ==========
-  // GET /api/signage/:serviceKey/layout-presets - List layout presets
-  router.get('/layout-presets', allowSignageStoreRead, contentCtrl.getLayoutPresets);
-
-  // POST /api/signage/:serviceKey/layout-presets - Create layout preset (Operator only)
-  router.post('/layout-presets', requireSignageOperator, contentCtrl.createLayoutPreset);
-
-  // GET /api/signage/:serviceKey/layout-presets/:id - Get layout preset by ID
-  router.get('/layout-presets/:id', allowSignageStoreRead, validateUuidParams('id'), contentCtrl.getLayoutPreset);
-
-  // PATCH /api/signage/:serviceKey/layout-presets/:id - Update layout preset (Operator only)
-  router.patch('/layout-presets/:id', requireSignageOperator, validateUuidParams('id'), contentCtrl.updateLayoutPreset);
-
-  // DELETE /api/signage/:serviceKey/layout-presets/:id - Delete layout preset (Operator only)
-  router.delete('/layout-presets/:id', requireSignageOperator, validateUuidParams('id'), contentCtrl.deleteLayoutPreset);
-
-  // ========== Upload Routes (Store can upload to their library) ==========
-  // POST /api/signage/:serviceKey/upload/presigned - Get presigned upload URL
-  router.post('/upload/presigned', requireSignageOperatorOrStore, scheduleCtrl.getPresignedUploadUrl);
-
-  // ========== AI Generation Routes (Store feature) ==========
-  // POST /api/signage/:serviceKey/ai/generate - Generate content with AI
-  router.post('/ai/generate', requireSignageOperatorOrStore, contentCtrl.generateWithAi);
+  // ========== [RETIRED] content-blocks / layout-presets / upload / ai ==========
+  // WO-O4O-SIGNAGE-LEGACY-STACK-SIMPLIFICATION-AND-TABLET-AUTHORING-CLOSURE-V1
+  // live consumer 0 — admin v2 dead UI 와 라우팅되지 않은 kpa-society AI 모달이 유일한 호출자였다.
+  // canonical 재생 경로(StoreTablet -> ScreenSet -> idle_media)와 무관하므로 route 등록만 제거한다.
+  // 테이블 / entity / controller 메서드는 남긴다 (schema DROP 금지).
 
   // ========== Sprint 2-6: Global Content Routes (Read-only for Store) ==========
   // These routes allow Stores to browse HQ/Supplier/Community content

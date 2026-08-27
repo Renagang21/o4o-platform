@@ -114,10 +114,12 @@ describe('block `o4o/buttons` 는 등록된 상태를 유지한다', () => {
 });
 
 describe('shortcode registry — alias 와 인프라 모듈 계약', () => {
-  it('alias 는 component 식별자로 구현 존재를 판정한다', () => {
+  it('alias 판정용 component 식별자를 정의 블록에서 함께 읽는다', () => {
+    // WO-O4O-SHORTCODE-REGISTRY-SSOT-AND-RUNTIME-REACHABILITY-V1 에서
+    // scanner 모델이 "파일 존재 → 등록 기대" 에서 "bootstrap 도달 → 등록" 으로
+    // 바뀌었다. component 식별자 추출은 alias 표현 수단으로 남는다.
     const src = readRoot(SHORTCODE_SCANNER);
-    expect(src).toContain("const componentMatch = window.match(/component:\\s*(\\w+)/);");
-    expect(src).toContain('reg.component && componentNames.has(reg.component)');
+    expect(src).toContain('const componentMatch = window.match(/component:\\s*(\\w+)/);');
   });
 
   it('`login_form` · `oauth_login` 은 SocialLogin 의 alias 로 남는다', () => {
@@ -159,18 +161,19 @@ describe('생성된 report 는 계약을 만족한다', () => {
     expect(parsed.registeredBlocks.map((r: { name: string }) => r.name)).toContain('o4o/buttons');
   });
 
-  it('shortcode report 가 있으면 dangling 0 · 남은 missing 은 설명된 2건뿐이다', () => {
+  it('shortcode report 가 있으면 설명되지 않은 missing · dangling 이 0 이다', () => {
     const abs = path.join(REPO_ROOT, REPORTS[1]);
     if (!fs.existsSync(abs)) return;
 
     const parsed = JSON.parse(fs.readFileSync(abs, 'utf-8'));
-    expect(parsed.summary.totalDangling).toBe(0);
 
-    // 이 2건은 **admin-dashboard lazy-loader 축**에 속하고, 그 축의 SSOT 가
-    // 아직 확정되지 않았다(별도 WO). 억지로 등록하지 않고 설명된 상태로 고정한다.
-    //   - ApprovalQueue.tsx      → admin/index.ts 는 ShortcodeDefinition[] 를 내보내지 않는다
-    //   - productShortcodes.tsx  → index 파일이 아니라 loader glob 밖이다
-    const names = parsed.missingInRegistry.map((f: { expectedName: string }) => f.expectedName).sort();
-    expect(names).toEqual(['approval_queue', 'product_shortcodes']);
+    // WO-O4O-SHORTCODE-REGISTRY-SSOT-AND-RUNTIME-REACHABILITY-V1:
+    //   이 WO 가 남긴 미확정 2건(`approval_queue` · `product_shortcodes`)은
+    //   **파일명에서 유추된 이름**이었고 소스 어디에도 존재하지 않았다.
+    //   scanner 가 선언된 `name:` 만 canonical key 로 쓰도록 바뀌면서 사라졌고,
+    //   등록되지 않는 정의는 원인별로 `explainedGaps` 에 분류된다.
+    expect(parsed.summary.totalDangling).toBe(0);
+    expect(parsed.summary.totalMissing).toBe(0);
+    expect(parsed.missingInRegistry).toEqual([]);
   });
 });

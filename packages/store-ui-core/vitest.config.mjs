@@ -3,6 +3,10 @@
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1
  *
+ * WO-O4O-PACKAGE-LEVEL-VITEST-CI-ADOPTION-FULL-CENSUS-AND-CLOSURE-V1:
+ *   CI Pipeline / Code Quality Check 의 "Run tests (store-ui-core Vitest)" 로 연결됨(blocking).
+ *   여기 include 에 잡히는 테스트는 전부 CI 에서 실행된다.
+ *
  * 실행: 저장소 루트에서
  *   npx vitest run --config packages/store-ui-core/vitest.config.mjs
  *
