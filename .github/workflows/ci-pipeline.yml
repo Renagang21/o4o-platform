@@ -131,6 +131,15 @@ jobs:
     - name: Run tests (multi-tenant Vitest)
       run: cd apps/api-server/tests/multi-tenant && npx vitest run --passWithNoTests
 
+    # WO-O4O-UI-VITEST-CI-ADOPTION-AND-PLATFORMONLY-MENU-GUARD-REGRESSION-V1
+    # packages/ui 의 vitest 는 config 만 있고 CI 에 연결돼 있지 않아 로컬 전용이었다.
+    # 공통 operator UI(4서비스 공유)의 회귀를 CI 에서 잡는다. blocking.
+    #   - filterMenuByRole 메뉴 가시성 계약 (adminOnly / platformOnly / 2-인자 하위호환)
+    #   - UserDetailPage 비밀번호 모달 serviceKey 선택
+    # DB · secret 불필요. 루트에 설치된 vitest/jsdom/@testing-library 를 그대로 쓴다.
+    - name: Run tests (packages/ui Vitest)
+      run: npx vitest run --config packages/ui/vitest.config.mjs
+
   # 2. Build all applications
   build:
     name: Build Applications
