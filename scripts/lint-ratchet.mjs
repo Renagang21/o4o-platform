@@ -36,7 +36,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 /** 현재 남아 있는 기존 ESLint 오류 수. 내리는 방향으로만 갱신할 것. */
-const ERROR_BASELINE = 69;
+const ERROR_BASELINE = 65;
 
 const baseline = Number(process.env.LINT_ERROR_BASELINE ?? ERROR_BASELINE);
 const reportPath = join(tmpdir(), `eslint-ratchet-${process.pid}.json`);
