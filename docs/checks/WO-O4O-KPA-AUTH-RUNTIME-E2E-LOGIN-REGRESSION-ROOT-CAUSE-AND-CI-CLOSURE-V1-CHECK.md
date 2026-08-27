@@ -237,6 +237,16 @@ CI secret `E2E_ADMIN_PASSWORD` 는 변경 이전 값을 그대로 들고 있어 
 8개 등록 전까지 `E2E — Auth Runtime Regression` 은 **red 유지**된다. 이는 의도된 동작이다 —
 검증 불가 상태를 skip 으로 흡수해 초록불로 보이게 하던 기존 계약이 이번 사고의 구조적 원인이다.
 
+### 10.4b push 후 CI 실측 (commit `dd0ce9e48`)
+
+| Run | 결과 | 판단 |
+|---|---|---|
+| `E2E — Auth Runtime Regression` (33034146402) | ❌ failure | **의도된 실패.** `Validate E2E credentials (per service)` 가 8개 secret 전부 미설정을 이름과 함께 출력하고 `exit 1`. 검증 불가 상태를 초록불로 만들지 않는다 |
+| `CodeQL Security Analysis` (33034146356) | ✅ success | |
+| `CI Pipeline` (33034146350) | ❌ failure | **내 변경과 무관 — 기존 실패.** `apps/api-server/src/bootstrap/__tests__/admin-route-auth-boundary.test.ts` 가 존재하지 않는 `routes/admin/channel-{playback-logs,heartbeat,ops}.routes.ts` 를 읽어 ENOENT 3건 (`3 failed / 3561 passed`). 직전 커밋 `a193ba4df` 의 run 32977730669 에서 **동일 3건**이 이미 실패 중이었음을 대조 확인 |
+
+> `CI Pipeline` 의 3건은 이 WO 범위 밖(§9 계열)이며 별도 처리 대상이다. 여기서 손대지 않았다.
+
 ### 10.5 종료 판정
 
 ```
