@@ -23,7 +23,7 @@
  *   GET    /cart/:serviceKey/groups              — 공급자별 묶음
  *   GET    /cart/:serviceKey/checkout-preview    — checkout 준비 미리보기(주문 미생성)
  *   POST   /cart/:serviceKey/checkout-confirm    — event-offer 축 주문 확정(공급자별 분리 생성)
- *   POST   /cart/:serviceKey/checkout-confirm-b2b— Neture B2B 축 주문 확정(payment-first)
+ *   POST   /cart/:serviceKey/checkout-confirm-b2b— B2B 축 주문 확정(payment-first, 공통 Core)
  *
  * 범위 밖: 소비자 checkout · PG 결제 기능 복구 · 매장이 판매자인 주문. 여기서 만들지 않는다.
  */
@@ -41,6 +41,12 @@ import {
   CartCheckoutError,
 } from '../../services/cart/event-offer-cart-checkout.service.js';
 import { NetureB2BCartCheckoutService } from '../../services/cart/neture-b2b-cart-checkout.service.js';
+// WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1:
+//   B2B confirm 은 하나의 service-agnostic Core 를 쓰고, 서비스별 공급 노출 정책만
+//   strategy 로 갈린다. route 는 통일하지 않는다(§24) — 같은 URL 아래에서 wrapper 만 고른다.
+import { StoreB2BCartCheckoutService } from '../../services/cart/store-b2b-cart-checkout.service.js';
+import { B2BConfirmError } from '../../services/cart/b2b-checkout-confirm.core.js';
+import { isApprovalEligibleServiceKey } from '../../modules/neture/constants/approval-service-keys.js';
 // WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1 (결함 D1):
 //   이 라우터는 인증만 요구하고 경로의 :serviceKey 에 대한 membership 을 확인하지 않았다.
 //   그 결과 아무 서비스에도 소속되지 않은 인증 사용자가 임의 serviceKey 의 장바구니를 만들고
@@ -55,6 +61,7 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
   const service = new StoreCartService(dataSource);
   const checkoutService = new EventOfferCartCheckoutService(dataSource);
   const b2bCheckoutService = new NetureB2BCartCheckoutService(dataSource);
+  const storeB2BCheckoutService = new StoreB2BCartCheckoutService(dataSource);
   const validServiceKeys = new Set(getAllServiceKeys());
 
   // Lazy-load requireAuth to avoid circular import (store-local-product 패턴과 동일)
@@ -126,6 +133,12 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
     }
     if (error instanceof CartCheckoutError) {
       res.status(400).json({ success: false, error: error.message, code: error.code });
+      return;
+    }
+    // 매장 조직 신뢰 경계(결함 O1)는 403/400 을 구분해서 돌려준다 —
+    // 다중 조직 사용자는 "선택하라"(400 AMBIGUOUS)이고, 타인 조직은 "권한 없음"(403)이다.
+    if (error instanceof B2BConfirmError) {
+      res.status(error.status).json({ success: false, error: error.message, code: error.code });
       return;
     }
     console.error(`[StoreCart] ${context} error:`, error);
@@ -234,9 +247,14 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
   );
 
   // WO-O4O-NETURE-B2B-CHECKOUT-ORCHESTRATOR-V1 (P2a, payment-first):
-  // Neture B2B/regular cart 항목을 공급자별 checkout_orders 로 생성(paymentStatus='pending').
-  // 결제 완료 전 공급자 미노출 · collectionStatus 미사용 · fulfillment bridge 없음(후속).
+  // b2b/regular cart 항목을 공급자별 checkout_orders 로 생성(paymentStatus='pending').
+  // 결제 완료 전 공급자 미노출 · collectionStatus 미사용 · bridge 는 결제 완료 이후.
   // event_offer checkout-confirm 과 분리된 별도 엔드포인트(회귀 방지).
+  //
+  // WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1:
+  //   승인축 서비스(glycopharm / kpa-society / k-cosmetics)는 `offer_service_approvals`
+  //   승인이 필요한 wrapper 로, neture 는 자기 공급 정책 wrapper 로 간다.
+  //   Pharmacy-Hub 는 자체 controller/route 를 유지한다(§21 · §24 — URL 통일 금지).
   router.post(
     '/cart/:serviceKey/checkout-confirm-b2b',
     async (req: Request, res: Response): Promise<void> => {
@@ -248,7 +266,14 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
           ? body.itemIds.filter((x: unknown): x is string => typeof x === 'string')
           : undefined;
         const note = typeof body.note === 'string' ? body.note : undefined;
-        const result = await b2bCheckoutService.confirm(scope, { itemIds, note });
+        // organizationId 는 **선택값(hint)** 이다. 권위는 서버 검증이다 (결함 O1).
+        const organizationId =
+          typeof body.organizationId === 'string' ? body.organizationId : undefined;
+
+        // 공급 노출 정책이 다른 두 wrapper — 응답 shape 은 동일하다.
+        const result = isApprovalEligibleServiceKey(scope.serviceKey)
+          ? await storeB2BCheckoutService.confirm(scope, { itemIds, note, organizationId })
+          : await b2bCheckoutService.confirm(scope, { itemIds, note, organizationId });
         res.json({ success: true, data: result });
       } catch (error) {
         handleError(res, error, 'POST checkout-confirm-b2b');

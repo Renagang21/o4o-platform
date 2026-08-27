@@ -2,52 +2,42 @@
  * PharmacyHubCartCheckoutService — Pharmacy-Hub 약국 장바구니 → 공급자별 주문 생성
  *
  * WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1 (Phase 1)
+ * Phase 2: WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1 (배송비 snapshot · paymentGroupId)
+ * 공통화: WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1
  *
  * canonical Store Cart(`store_cart_items`, serviceKey='pharmacy-hub')에 담긴 항목을
  * **공급자별 `checkout_orders`** 로 생성한다. 주문 생성은 E-commerce Core 단일 진입점인
  * `checkoutService.createOrder()` 만 사용한다 (CLAUDE.md §4).
  *
- * ── 왜 NetureB2BCartCheckoutService 를 재사용하지 않는가 ──────────────────────
- * 구조(공급자별 분리 · 서버 가격 재계산)는 같지만 **게이트 의미가 다르다**:
- *   Neture  : 상품별 승인(approval_status=APPROVED) 요구 · 조직(organizationId) 범위 요구 ·
- *             payment-first · orderType=STORE_RESTOCK · serviceKey 하드 가드('neture')
- *   Pharmacy-Hub: 상품별 운영자 승인 없음(approval_status 는 승인대상 3키 파생값이라 PENDING 이 정상) ·
- *             조직 격리 서비스가 아님 · 제공 축은 `service_keys @> {pharmacy-hub}`
- * 공용 파라미터화는 양쪽 계약을 흐리므로 계약을 분리한다(로직 일부 중복 허용).
+ * ── 왜 이제 Core 를 공유하는가 ────────────────────────────────────────────────
+ * 이전에는 "게이트 의미가 다르다"는 이유로 Neture 와 로직을 분리했다. 실제로 다른 것은
+ * **공급 노출 정책 하나**였고, 그것은 이제 `OfferExposureStrategy` 로 명시적으로 분리됐다:
+ *   Pharmacy-Hub → `optin`  : 공급자 opt-in(`service_keys @> {pharmacy-hub}`), 운영자 승인 없음
+ *   Neture       → `neture` : approval_status / distribution_type / allowed_seller_ids
+ *   승인축 3서비스 → `approval`: `offer_service_approvals` 승인 필수
+ * 나머지(가격 재확정 · 공급자 그룹 원자성 · 주문 생성 · cart 정리)는 Core 가 담당한다.
+ * 이 클래스에는 Pharmacy-Hub **계약 표면**만 남는다 — 실패 code 어휘, metadata, 결과 shape.
  *
  * ── 노출 게이트 (약국 상품 조회와 동일 SSOT) ──────────────────────────────────
  *   'pharmacy-hub' = ANY(spo.service_keys)   ← 공급자 opt-in (제공 축)
  *   spo.is_active = true · spo.deleted_at IS NULL
  *   spo.distribution_type <> 'PRIVATE'       ← PRIVATE 은 매장범위 모델, Pharmacy-Hub 에 축 없음
- *   neture_suppliers.status = 'ACTIVE'
- *   product_masters 유효(status ACTIVE)
+ *   neture_suppliers.status = 'ACTIVE' · product_masters.status = 'ACTIVE'
  * `PharmacyHubStoreProductController` 의 EXPOSURE_GATE_SQL 과 같은 조건이다 —
  * **조회에 보이면 담을 수 있고, 담을 수 있으면 주문 시점에 같은 기준으로 재검증**된다.
- *
- * ── Phase 2 (WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1) 에서 추가된 것 ─
- *   · 공급자 정책 기반 **배송비 snapshot** (Phase 1 의 고정 0 폐기)
- *   · **paymentGroupId** — 공급자가 여럿이어도 구매자는 1회 결제
- *   주문 생성 시점의 `paymentStatus` 는 여전히 건드리지 않는다(`createOrder` 기본값 pending).
- *   paid 전이는 오직 결제 완료 이벤트 핸들러만 수행한다.
  *
  * ── 여전히 범위 밖 ────────────────────────────────────────────────────────────
  *   정산 · 쿠폰 · 반품(부분) · 공급자별 분할 결제.
  */
-import { randomUUID } from 'crypto';
-import { DataSource, Repository, In } from 'typeorm';
-import { StoreCartItem } from '../../entities/cart/StoreCartItem.entity.js';
-import { checkoutService } from '../checkout.service.js';
+import { DataSource } from 'typeorm';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import {
-  calculateSupplierShippingFee,
-  type SupplierShippingPolicy,
-} from '../shipping/supplier-shipping.js';
+  B2BCheckoutConfirmCore,
+  type B2BConfirmAdapter,
+} from './b2b-checkout-confirm.core.js';
 import logger from '../../utils/logger.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
-
-/** 주문 대상 cart source type — Pharmacy-Hub 는 공급자 offer 직접 구매만 다룬다. */
-const ORDERABLE_SOURCE_TYPES = new Set<string>(['b2b', 'regular']);
 
 export class PharmacyHubCheckoutError extends Error {
   constructor(public code: string, message: string, public status = 400) {
@@ -65,31 +55,6 @@ export interface PharmacyHubCheckoutInput {
   note?: string;
 }
 
-interface OfferRow {
-  id: string;
-  supplier_id: string;
-  price_general: number;
-  service_unit_price: number | null;
-  is_active: boolean;
-  distribution_type: string;
-  track_inventory: boolean;
-  stock_quantity: number;
-  reserved_quantity: number;
-  supplier_status: string;
-  master_status: string | null;
-  product_name: string;
-  master_id: string;
-  base_shipping_fee: number | null;
-  free_shipping_threshold: number | null;
-}
-
-interface ValidItem {
-  item: StoreCartItem;
-  offer: OfferRow;
-  unitPrice: number;
-  subtotal: number;
-}
-
 export interface FailedItem {
   itemId: string;
   productName: string;
@@ -97,11 +62,76 @@ export interface FailedItem {
   reason: string;
 }
 
-export class PharmacyHubCartCheckoutService {
-  private repo: Repository<StoreCartItem>;
+/** Pharmacy-Hub 계약 표면 — code 어휘/metadata/seller 축. Core 가 이 adapter 를 호출한다. */
+const pharmacyHubAdapter: B2BConfirmAdapter = {
+  // Pharmacy-Hub 는 조직 격리 서비스가 아니다 — 조직을 주문에 승격하지 않는다.
+  organizationPolicy: 'unused',
+  requireCartSupplierId: false,
+  enforceCartSupplierMatch: false,
 
-  constructor(private dataSource: DataSource) {
-    this.repo = dataSource.getRepository(StoreCartItem);
+  unsupportedSourceType: () => ({
+    code: 'UNSUPPORTED_SOURCE_TYPE',
+    reason: '주문할 수 없는 항목입니다.',
+  }),
+  missingOffer: () => ({
+    code: 'MISSING_OFFER',
+    reason: '공급자 상품 정보가 없어 주문할 수 없습니다.',
+  }),
+  // 제공 축은 쿼리(strategy WHERE)에서 이미 걸러졌으므로 미조회 = 미제공 또는 삭제됨
+  offerNotFound: () => ({
+    code: 'NOT_DELIVERED',
+    reason: '현재 파머시 허브에 제공되지 않는 상품입니다.',
+  }),
+  groupPoisoned: () => ({
+    code: 'SUPPLIER_GROUP_FAILED',
+    reason: '같은 공급자의 다른 상품에 문제가 있어 주문하지 않았습니다.',
+  }),
+  orderCreateFailed: (error, ctx) => {
+    logger.error('[PharmacyHubCartCheckout] order creation failed', {
+      supplierId: ctx.supplierId,
+      buyerId: ctx.scope.buyerId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return {
+      code: 'ORDER_CREATE_FAILED',
+      reason: '주문 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+    };
+  },
+
+  onEmptySelection: () => {
+    throw new PharmacyHubCheckoutError('EMPTY_CART', '주문할 상품이 없습니다.', 400);
+  },
+
+  // 주문 시점 snapshot — 이후 상품/가격이 바뀌어도 주문 내역은 보존된다
+  buildLineItemMetadata: (v, ctx) => ({
+    supplierProductOfferId: v.offer.id,
+    masterId: v.offer.master_id,
+    supplierId: ctx.supplierId,
+    serviceKey: ctx.scope.serviceKey,
+    unitPriceSource: v.unitPriceSource,
+  }),
+
+  buildSellerAxis: (ctx) => ({ sellerId: ctx.supplierId }),
+
+  buildOrderMetadata: (ctx) => ({
+    // 서비스 경계 축 — 기존 3개 서비스와 동일 규약 (OrderType=RETAIL + metadata.serviceKey)
+    serviceKey: ctx.scope.serviceKey,
+    source: 'pharmacy_hub_cart',
+    note: ctx.input.note,
+    supplierId: ctx.supplierId,
+    // 공급자가 여럿이어도 1회 결제 — 결제 완료 이벤트가 이 그룹의 주문 전부를 전이시킨다.
+    paymentGroupId: ctx.paymentGroupId,
+    paymentGroupSource: 'pharmacy_hub_multi_supplier_cart',
+    shippingFeeSource: ctx.shippingResult.policySource,
+    freeShippingApplied: ctx.shippingResult.freeShippingApplied,
+  }),
+};
+
+export class PharmacyHubCartCheckoutService {
+  private core: B2BCheckoutConfirmCore;
+
+  constructor(dataSource: DataSource) {
+    this.core = new B2BCheckoutConfirmCore(dataSource, pharmacyHubAdapter);
   }
 
   /**
@@ -131,226 +161,23 @@ export class PharmacyHubCartCheckoutService {
       throw new PharmacyHubCheckoutError('INVALID_SCOPE', '구매자 정보를 확인할 수 없습니다.', 401);
     }
 
-    // 1. 대상 cart item 조회 (buyerId + serviceKey 경계)
-    const all = await this.repo.find({
-      where: { buyerId: scope.buyerId, serviceKey: SERVICE_KEY },
-      order: { createdAt: 'ASC' },
-    });
-
-    const selected = input.itemIds?.length
-      ? all.filter((it) => input.itemIds!.includes(it.id))
-      : all;
-
-    if (selected.length === 0) {
-      throw new PharmacyHubCheckoutError('EMPTY_CART', '주문할 상품이 없습니다.', 400);
-    }
-
-    // 이번 체크아웃에서 생성되는 모든 공급자 주문을 하나로 묶는 결제 그룹.
-    // 구매자는 공급자가 여럿이어도 **1회 결제**하고, 주문은 공급자별로 분리 유지된다.
-    const paymentGroupId = randomUUID();
-
-    const failedItems: FailedItem[] = [];
-    const candidates: StoreCartItem[] = [];
-
-    for (const it of selected) {
-      if (!ORDERABLE_SOURCE_TYPES.has(it.sourceType)) {
-        failedItems.push({ itemId: it.id, productName: it.productName, code: 'UNSUPPORTED_SOURCE_TYPE', reason: '주문할 수 없는 항목입니다.' });
-        continue;
-      }
-      if (!it.supplierProductOfferId) {
-        failedItems.push({ itemId: it.id, productName: it.productName, code: 'MISSING_OFFER', reason: '공급자 상품 정보가 없어 주문할 수 없습니다.' });
-        continue;
-      }
-      candidates.push(it);
-    }
-    if (candidates.length === 0) {
-      return { paymentGroupId, orders: [], failedItems };
-    }
-
-    // 2. 서버에서 현재 공급 상태·가격 재조회 (프론트가 보낸 단가는 신뢰하지 않는다)
-    const offerIds = [...new Set(candidates.map((c) => c.supplierProductOfferId as string))];
-    const offerRows: OfferRow[] = await this.dataSource.query(
-      `SELECT spo.id::text                AS id,
-              spo.supplier_id::text       AS supplier_id,
-              spo.price_general,
-              spo.is_active,
-              spo.distribution_type,
-              spo.track_inventory,
-              spo.stock_quantity,
-              spo.reserved_quantity,
-              spo.master_id::text         AS master_id,
-              ns.status                   AS supplier_status,
-              ns.base_shipping_fee,
-              ns.free_shipping_threshold,
-              COALESCE(pm.status, 'ACTIVE') AS master_status,
-              pm.name                     AS product_name,
-              (SELECT osp.unit_price FROM offer_service_prices osp
-                WHERE osp.offer_id = spo.id AND osp.service_key = $2) AS service_unit_price
-         FROM supplier_product_offers spo
-         JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-         JOIN product_masters pm  ON pm.id = spo.master_id
-        WHERE spo.id::text = ANY($1)
-          AND spo.deleted_at IS NULL
-          AND $2 = ANY(spo.service_keys)`,
-      [offerIds, SERVICE_KEY],
+    const result = await this.core.confirm(
+      { buyerId: scope.buyerId, serviceKey: SERVICE_KEY },
+      { itemIds: input.itemIds, note: input.note },
     );
-    const offerMap = new Map(offerRows.map((o) => [o.id, o]));
 
-    // 3. 게이트 검증 + 공급자 그룹 분류
-    const valids: ValidItem[] = [];
-    const poisonedSuppliers = new Set<string>();
-
-    for (const it of candidates) {
-      const offer = offerMap.get(it.supplierProductOfferId as string);
-      const fail = (code: string, reason: string) => {
-        failedItems.push({ itemId: it.id, productName: it.productName, code, reason });
-        if (offer?.supplier_id) poisonedSuppliers.add(offer.supplier_id);
-        if (it.supplierId) poisonedSuppliers.add(it.supplierId);
-      };
-
-      // 제공 축: 쿼리에서 service_keys 를 이미 걸렀으므로 미조회 = 미제공 또는 삭제됨
-      if (!offer) { fail('NOT_DELIVERED', '현재 파머시 허브에 제공되지 않는 상품입니다.'); continue; }
-      if (!offer.is_active) { fail('PRODUCT_INACTIVE', `비활성 상품입니다: ${offer.product_name}`); continue; }
-      if (offer.distribution_type === 'PRIVATE') { fail('DISTRIBUTION_DENIED', `구매할 수 없는 상품입니다: ${offer.product_name}`); continue; }
-      if (offer.supplier_status !== 'ACTIVE') { fail('SUPPLIER_INACTIVE', `비활성 공급자입니다: ${offer.product_name}`); continue; }
-      if (offer.master_status !== 'ACTIVE') { fail('MASTER_INACTIVE', `이용할 수 없는 상품입니다: ${offer.product_name}`); continue; }
-      if (!Number.isInteger(it.quantity) || it.quantity <= 0 || it.quantity > 1000) {
-        fail('INVALID_QUANTITY', `수량이 올바르지 않습니다: ${offer.product_name}`); continue;
-      }
-
-      // 적용 단가: 서비스별 공급가 우선, 없으면 기본 공급가 (조회 화면과 동일 규칙)
-      const unitPrice = offer.service_unit_price != null ? Number(offer.service_unit_price) : Number(offer.price_general);
-      if (!(unitPrice > 0)) { fail('INVALID_PRICE', `가격이 올바르지 않습니다: ${offer.product_name}`); continue; }
-
-      if (offer.track_inventory) {
-        const available = Number(offer.stock_quantity) - Number(offer.reserved_quantity);
-        if (available < it.quantity) {
-          fail('INSUFFICIENT_STOCK', `재고가 부족합니다: ${offer.product_name} (가용 ${available}, 요청 ${it.quantity})`); continue;
-        }
-      }
-
-      valids.push({ item: it, offer, unitPrice, subtotal: unitPrice * it.quantity });
-    }
-
-    // 4. 공급자별 그룹핑 — 서로 다른 공급자 상품은 절대 한 주문으로 합치지 않는다.
-    //    그룹 권위는 offer.supplier_id (cart 의 supplierId 가 아니라 서버 값)
-    const groups = new Map<string, ValidItem[]>();
-    for (const v of valids) {
-      if (poisonedSuppliers.has(v.offer.supplier_id)) continue;
-      const bucket = groups.get(v.offer.supplier_id);
-      if (bucket) bucket.push(v);
-      else groups.set(v.offer.supplier_id, [v]);
-    }
-
-    // 오염된 그룹의 유효 항목도 주문하지 않고 사유를 남긴다(그룹 금액 일관성)
-    for (const v of valids) {
-      if (!poisonedSuppliers.has(v.offer.supplier_id)) continue;
-      failedItems.push({
-        itemId: v.item.id,
-        productName: v.item.productName,
-        code: 'SUPPLIER_GROUP_FAILED',
-        reason: '같은 공급자의 다른 상품에 문제가 있어 주문하지 않았습니다.',
-      });
-    }
-
-    // 5. 공급자별 주문 생성
-    const orders: Array<{
-      orderId: string;
-      orderNumber: string;
-      supplierId: string;
-      subtotal: number;
-      shippingFee: number;
-      totalAmount: number;
-      itemCount: number;
-    }> = [];
-
-    for (const [supplierId, group] of groups.entries()) {
-      const lineItems = group.map((v) => ({
-        // ⚠️ productId = **SupplierProductOffer id** (master_id 아님).
-        //   공급자 workspace 는 `supplier_product_offers.id = neture_order_items.product_id` 로
-        //   주문을 스코프한다(Neture B2B 와 동일 축). master_id 를 넣으면 결제까지 성공하고도
-        //   공급자에게 영원히 보이지 않는 조용한 단절이 생긴다. masterId 는 metadata 에 보존한다.
-        productId: v.offer.id,
-        productName: v.offer.product_name,
-        quantity: v.item.quantity,
-        unitPrice: v.unitPrice,
-        subtotal: v.subtotal,
-        // 주문 시점 snapshot — 이후 상품/가격이 바뀌어도 주문 내역은 보존된다
-        metadata: {
-          supplierProductOfferId: v.offer.id,
-          masterId: v.offer.master_id,
-          supplierId,
-          serviceKey: SERVICE_KEY,
-          unitPriceSource: v.offer.service_unit_price != null ? 'offer_service_price' : 'price_general',
-        },
-      }));
-
-      const cartIds = group.map((v) => v.item.id);
-
-      // 배송비: 공급자 정책(neture_suppliers)으로 그룹 상품합계 기준 계산해 **주문 시점에 snapshot** 한다.
-      //   Phase 1 의 고정 0 은 더 이상 쓰지 않는다. 결제 금액은 이 snapshot 을 포함한 totalAmount 다.
-      //   정책 미설정 공급자는 calculateSupplierShippingFee 가 0(fallback) 을 돌려준다.
-      const groupSubtotal = group.reduce((sum, v) => sum + v.subtotal, 0);
-      const shippingPolicy: SupplierShippingPolicy = {
-        baseShippingFee:
-          group[0].offer.base_shipping_fee != null ? Number(group[0].offer.base_shipping_fee) : null,
-        freeShippingThreshold:
-          group[0].offer.free_shipping_threshold != null
-            ? Number(group[0].offer.free_shipping_threshold)
-            : null,
-      };
-      const shippingResult = calculateSupplierShippingFee(groupSubtotal, shippingPolicy);
-
-      try {
-        const savedOrder = await checkoutService.createOrder({
-          buyerId: scope.buyerId,
-          sellerId: supplierId,
-          supplierId,
-          items: lineItems,
-          shippingPolicy,
-          shippingFeeSnapshot: shippingResult.shippingFee,
-          metadata: {
-            // 서비스 경계 축 — 기존 3개 서비스와 동일 규약 (OrderType=RETAIL + metadata.serviceKey)
-            serviceKey: SERVICE_KEY,
-            source: 'pharmacy_hub_cart',
-            note: input.note,
-            supplierId,
-            // 공급자가 여럿이어도 1회 결제 — 결제 완료 이벤트가 이 그룹의 주문 전부를 전이시킨다.
-            paymentGroupId,
-            paymentGroupSource: 'pharmacy_hub_multi_supplier_cart',
-            shippingFeeSource: shippingResult.policySource,
-            freeShippingApplied: shippingResult.freeShippingApplied,
-          },
-        });
-
-        await this.repo.delete({ id: In(cartIds) });
-
-        orders.push({
-          orderId: savedOrder.id,
-          orderNumber: savedOrder.orderNumber,
-          supplierId,
-          subtotal: Number(savedOrder.subtotal),
-          shippingFee: Number(savedOrder.shippingFee),
-          totalAmount: Number(savedOrder.totalAmount),
-          itemCount: lineItems.length,
-        });
-      } catch (error) {
-        logger.error('[PharmacyHubCartCheckout] order creation failed', {
-          supplierId,
-          buyerId: scope.buyerId,
-          error: error instanceof Error ? error.message : String(error),
-        });
-        for (const v of group) {
-          failedItems.push({
-            itemId: v.item.id,
-            productName: v.item.productName,
-            code: 'ORDER_CREATE_FAILED',
-            reason: '주문 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.',
-          });
-        }
-      }
-    }
-
-    return { paymentGroupId, orders, failedItems };
+    return {
+      paymentGroupId: result.paymentGroupId,
+      orders: result.createdOrders.map((o) => ({
+        orderId: o.orderId,
+        orderNumber: o.orderNumber,
+        supplierId: o.supplierId,
+        subtotal: o.subtotal,
+        shippingFee: o.shippingFee,
+        totalAmount: o.totalAmount,
+        itemCount: o.itemCount,
+      })),
+      failedItems: result.failedItems,
+    };
   }
 }

@@ -13,6 +13,7 @@
 
 import type {
   AddCartItemInput,
+  B2BCheckoutConfirmResult,
   CheckoutConfirmResult,
   StoreCartApiOk as ApiOk,
   StoreCartItem,
@@ -50,6 +51,14 @@ export interface StoreCartApiClient {
     serviceKey: string,
     input?: { itemIds?: string[]; note?: string },
   ): Promise<ApiOk<CheckoutConfirmResult>>;
+  /**
+   * B2B 축 주문 확정 — 공급자 offer(`sourceType` ∈ {b2b, regular}) 항목 전용.
+   * event_offer 축(`checkoutConfirm`)과 endpoint 를 통일하지 않는다(API 호환 우선).
+   */
+  checkoutConfirmB2B(
+    serviceKey: string,
+    input?: { itemIds?: string[]; note?: string; organizationId?: string },
+  ): Promise<ApiOk<B2BCheckoutConfirmResult>>;
 }
 
 export function createStoreCartApi(http: StoreCartHttp): StoreCartApiClient {
@@ -78,6 +87,12 @@ export function createStoreCartApi(http: StoreCartHttp): StoreCartApiClient {
     checkoutConfirm: (serviceKey, input) =>
       http.post<ApiOk<CheckoutConfirmResult>>(
         `${base(serviceKey)}/checkout-confirm`,
+        input ?? {},
+      ),
+
+    checkoutConfirmB2B: (serviceKey, input) =>
+      http.post<ApiOk<B2BCheckoutConfirmResult>>(
+        `${base(serviceKey)}/checkout-confirm-b2b`,
         input ?? {},
       ),
   };

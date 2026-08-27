@@ -22,6 +22,7 @@
  * priceSnapshot 은 담을 때의 표시용 임시값일 뿐이다.
  */
 import { DataSource, Repository } from 'typeorm';
+import { isBuyerOrganizationAllowed } from '../../utils/buyer-organization.resolver.js';
 import {
   StoreCartItem,
   type CartSourceType,
@@ -208,10 +209,32 @@ export class StoreCartService {
       eventOfferId: input.eventOfferId ?? null,
     });
 
+    // WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1 (결함 O1):
+    //   `organizationId` 는 클라이언트가 보낸 값이다. 예전에는 검증 없이 저장됐고
+    //   B2B confirm 이 그것을 주문 소유 축으로 승격했다 — 타인 매장 명의 주문이 가능했다.
+    //   canonical: client organizationId = 선택값 / server validation = 권위.
+    //   지정하지 않으면 그대로 통과한다(조직 없이 담는 기존 흐름을 막지 않는다).
+    const requestedOrganizationId = input.organizationId?.trim() || null;
+    if (requestedOrganizationId) {
+      const allowed = await isBuyerOrganizationAllowed(
+        this.dataSource,
+        scope.buyerId,
+        scope.serviceKey,
+        requestedOrganizationId,
+      );
+      if (!allowed) {
+        throw new CartError(
+          '선택한 매장에 대한 권한이 없습니다.',
+          'FOREIGN_STORE_ORGANIZATION',
+          403,
+        );
+      }
+    }
+
     const item = this.repo.create({
       buyerId: scope.buyerId,
       serviceKey: scope.serviceKey,
-      organizationId: input.organizationId ?? null,
+      organizationId: requestedOrganizationId,
       sourceType,
       supplierId: input.supplierId ?? null,
       supplierProductOfferId: input.supplierProductOfferId ?? null,
@@ -455,7 +478,13 @@ export class StoreCartService {
   }
 }
 
-export type CartErrorCode = 'VALIDATION_ERROR' | 'NOT_FOUND' | DrugCommerceErrorCode;
+export type CartErrorCode =
+  | 'VALIDATION_ERROR'
+  | 'NOT_FOUND'
+  // WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1 (결함 O1):
+  //   클라이언트가 보낸 매장 조직이 서버 후보 집합 밖일 때 (타인 매장 명의 담기 차단)
+  | 'FOREIGN_STORE_ORGANIZATION'
+  | DrugCommerceErrorCode;
 
 const DRUG_COMMERCE_CODES = new Set<string>(Object.values(DrugCommerceErrorCode));
 
@@ -469,9 +498,11 @@ export class CartError extends Error {
   constructor(
     message: string,
     public code: CartErrorCode,
+    status?: number,
   ) {
     super(message);
     this.name = 'CartError';
-    if (DRUG_COMMERCE_CODES.has(code)) this.status = 403;
+    if (status !== undefined) this.status = status;
+    else if (DRUG_COMMERCE_CODES.has(code)) this.status = 403;
   }
 }

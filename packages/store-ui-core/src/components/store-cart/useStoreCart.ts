@@ -15,13 +15,20 @@
  * 계약 보존:
  *   - 금액은 backend 가 준 `displaySubtotal` / `shipping.shippingFee` / `displayTotal` 만 합산한다.
  *     단가 재계산 · 배송 정책 재판정을 frontend 에서 하지 않는다.
- *   - 주문 확정은 `checkout-confirm` 단일 경로. 결제/정산 정책은 backend 소관이다.
- *   - Pharmacy-Hub 는 결제 그룹(paymentGroupId) 기반의 **다른 주문 계약**이므로 이 Core 를 쓰지 않는다.
+ *   - 주문 확정 경로는 장바구니에 담긴 축이 결정한다:
+ *       event_offer 축 → `checkout-confirm`,  b2b/regular 축 → `checkout-confirm-b2b`.
+ *     (WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1 §24 —
+ *      두 경로를 하나의 URL 로 통일하지 않는다. 서버는 같은 공통 Core 를 쓴다.)
+ *     결제/정산 정책은 backend 소관이다.
+ *   - Pharmacy-Hub 는 자체 controller/route 를 유지하므로 이 Core 를 쓰지 않는다.
  */
 
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from '@o4o/error-handling';
 import type { CheckoutConfirmResult, StoreCartApi, SupplierGroup } from './storeCartTypes';
+
+/** 장바구니에 b2b/regular(공급자 offer 직접 구매) 항목이 있으면 B2B 확정 경로를 쓴다. */
+const B2B_SOURCE_TYPES = new Set(['b2b', 'regular']);
 
 export interface UseStoreCartOptions {
   api: StoreCartApi;
@@ -127,13 +134,29 @@ export function useStoreCart({ api, serviceKey }: UseStoreCartOptions): UseStore
     setConfirming(true);
     setConfirmResult(null);
     try {
-      const res = await api.checkoutConfirm(serviceKey);
-      setConfirmResult(res.data);
-      if (res.data.createdOrders.length > 0) {
-        toast.success(`${res.data.createdOrders.length}개 공급자 주문이 생성되었습니다.`);
+      // 담긴 축이 경로를 결정한다. 두 축이 섞이는 경우는 없다(서비스별로 한 축만 담긴다).
+      const hasB2B = groups.some((g) => g.items.some((i) => B2B_SOURCE_TYPES.has(i.sourceType)));
+      const data: CheckoutConfirmResult =
+        hasB2B && api.checkoutConfirmB2B
+          ? await api.checkoutConfirmB2B(serviceKey).then((res) => ({
+              serviceKey: res.data.serviceKey,
+              createdOrders: res.data.createdOrders,
+              // 화면 계약(`message`)을 유지한다 — 서버 code 는 표시하지 않는다.
+              failedItems: res.data.failedItems.map((f) => ({
+                itemId: f.itemId,
+                reason: f.code,
+                message: f.reason,
+              })),
+              removedCartItemIds: res.data.removedCartItemIds,
+            }))
+          : await api.checkoutConfirm(serviceKey).then((res) => res.data);
+
+      setConfirmResult(data);
+      if (data.createdOrders.length > 0) {
+        toast.success(`${data.createdOrders.length}개 공급자 주문이 생성되었습니다.`);
       }
-      if (res.data.failedItems.length > 0) {
-        toast.error(`${res.data.failedItems.length}개 항목은 주문하지 못했습니다.`);
+      if (data.failedItems.length > 0) {
+        toast.error(`${data.failedItems.length}개 항목은 주문하지 못했습니다.`);
       }
       await load(); // 성공 항목 제거 반영
     } catch (err) {

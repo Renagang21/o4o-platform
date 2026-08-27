@@ -87,7 +87,8 @@ export interface CreatedOrderSummary {
   orderId: string;
   orderNumber: string;
   supplierId: string;
-  sellerOrganizationId: string;
+  /** 매장 조직. 서버가 확정한 값이며, 조직 축을 쓰지 않는 주문에서는 null 이다. */
+  sellerOrganizationId: string | null;
   subtotal: number;
   shippingFee: number;
   totalAmount: number;
@@ -105,6 +106,29 @@ export interface CheckoutConfirmResult {
   serviceKey: string;
   createdOrders: CreatedOrderSummary[];
   failedItems: FailedCartItem[];
+  removedCartItemIds: string[];
+}
+
+/**
+ * WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1:
+ *   B2B(공급자 offer 직접 구매) 축 확정 결과. event_offer 축(`CheckoutConfirmResult`)과
+ *   **다른 endpoint** 다 — route 를 하나로 통일하지 않는다(§24). 서버는 두 경로 모두
+ *   같은 공통 Core 를 쓰지만 응답 shape 은 각 축의 기존 계약을 유지한다.
+ */
+export interface B2BCreatedOrderSummary extends CreatedOrderSummary {
+  paymentStatus: string;
+  paymentGroupId: string;
+}
+
+export interface B2BCheckoutConfirmResult {
+  serviceKey: string;
+  /** 다중 공급자 1회 결제 단위 */
+  paymentGroupId: string;
+  /** 사용자가 1회에 결제할 예정 금액 = Σ createdOrders.totalAmount */
+  groupTotalAmount: number;
+  orderCount: number;
+  createdOrders: B2BCreatedOrderSummary[];
+  failedItems: Array<{ itemId: string; productName: string; code: string; reason: string }>;
   removedCartItemIds: string[];
 }
 
@@ -133,4 +157,15 @@ export interface StoreCartApi {
     serviceKey: string,
     input?: { itemIds?: string[]; note?: string },
   ): Promise<StoreCartApiOk<CheckoutConfirmResult>>;
+  /**
+   * B2B 축 확정(선택). 구현하지 않은 서비스의 cart 는 event_offer 축만 담기므로
+   * 호출되지 않는다 — 기존 구현을 깨뜨리지 않기 위해 optional 이다.
+   *
+   * `organizationId` 는 **선택값(hint)** 이다. 권위는 서버 검증이며, 다중 매장 사용자가
+   * 어느 매장으로 주문할지 고르는 용도다(단일 매장이면 보내지 않아도 서버가 확정한다).
+   */
+  checkoutConfirmB2B?(
+    serviceKey: string,
+    input?: { itemIds?: string[]; note?: string; organizationId?: string },
+  ): Promise<StoreCartApiOk<B2BCheckoutConfirmResult>>;
 }

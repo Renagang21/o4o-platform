@@ -178,6 +178,52 @@ export async function findStoreOrganizationCandidates(
 }
 
 /**
+ * 서비스 조건 없는 매장 조직 후보 raw 행.
+ *
+ * 기존 back-compat 경로가 쓰던 쿼리 그대로다(허용 집합 불변). 별도 함수로 노출해
+ * `utils/buyer-organization.resolver.ts` 의 selection-validation 이 같은 SSOT 를 쓰게 한다
+ * (WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1).
+ */
+async function findUnscopedStoreOrganizationRows(
+  dataSource: DataSource,
+  userId: string,
+): Promise<Array<{ organization_id: string; role: string; is_primary: boolean | null; joined_at: string | null }>> {
+  const rows = await dataSource.query(
+    `SELECT DISTINCT ON (om.organization_id)
+            om.organization_id AS organization_id,
+            om.role            AS role,
+            om.is_primary      AS is_primary,
+            om.joined_at       AS joined_at
+       FROM organization_members om
+      WHERE om.user_id = $1
+        AND om.role = ANY($2::text[])
+        AND om.left_at IS NULL
+      ORDER BY om.organization_id, om.role`,
+    [userId, STORE_MEMBER_ROLES],
+  );
+  return rows as Array<{
+    organization_id: string;
+    role: string;
+    is_primary: boolean | null;
+    joined_at: string | null;
+  }>;
+}
+
+/**
+ * 서비스 스코프 없는 매장 조직 후보 목록 (candidate 형상).
+ *
+ * `STORE_SERVICE_ORG_LINKAGE` 에 매핑이 없는 serviceKey(예: `neture`)의 조직 검증에 쓴다.
+ * 허용 집합은 back-compat 경로와 **동일**하다 — 새 축을 만들지 않는다.
+ */
+export async function findAnyServiceStoreOrganizationCandidates(
+  dataSource: DataSource,
+  userId: string,
+): Promise<StoreOrganizationCandidate[]> {
+  const rows = await findUnscopedStoreOrganizationRows(dataSource, userId);
+  return rows.map((r) => ({ organizationId: r.organization_id, memberRole: r.role }));
+}
+
+/**
  * 매장 조직 확정.
  *
  * @param serviceKey 지정 시 해당 서비스에 등록된 조직만 후보가 된다.
@@ -213,26 +259,7 @@ export async function resolveStoreOrganization(
   }
 
   // back-compat: 서비스 조건 없음. 허용 집합 불변 + 선택만 결정적.
-  const rows = await dataSource.query(
-    `SELECT DISTINCT ON (om.organization_id)
-            om.organization_id AS organization_id,
-            om.role            AS role,
-            om.is_primary      AS is_primary,
-            om.joined_at       AS joined_at
-       FROM organization_members om
-      WHERE om.user_id = $1
-        AND om.role = ANY($2::text[])
-        AND om.left_at IS NULL
-      ORDER BY om.organization_id, om.role`,
-    [userId, STORE_MEMBER_ROLES],
-  );
-
-  const list = rows as Array<{
-    organization_id: string;
-    role: string;
-    is_primary: boolean | null;
-    joined_at: string | null;
-  }>;
+  const list = await findUnscopedStoreOrganizationRows(dataSource, userId);
   if (list.length === 0) return NONE;
 
   const sorted = [...list].sort((a, b) => {

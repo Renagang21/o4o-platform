@@ -305,6 +305,8 @@ KPA · GlycoPharm · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 �
 | DF-3 | KPA `관심상품 주문 작업대` → canonical 장바구니 담기 이관 | 동일. 현재는 안내만 한다 |
 | DF-4 | 매장 buyer 주문 조회 컨트롤러가 KPA / GlycoPharm / K-Cosmetics 3벌로 중복 | `B2B_COMMONIZABLE` 로 분류. 공통화는 3서비스 동시 회귀가 필요해 별도 WO |
 | ↳ **DF-4 종결** | 동일 WO | 3벌 조회 SQL 을 `services/checkout/buyer-order-read.service.ts` 하나로 모았다. controller 3개는 thin wrapper |
+| DF-5 | GlycoPharm 에 **`sourceType: 'b2b'` 를 만드는 frontend 생산자가 없다.** 서버(`checkout-confirm-b2b`)와 공통 client(`useStoreCart`)는 준비됐지만 승인 공급 상품을 장바구니에 담는 화면이 없다. `/store/commerce/products` 는 "공급 상품 **신청**"(ProductApproval PENDING) 이며 신청 ≠ 주문 | 담기 버튼을 붙이는 것은 그 화면의 **의미를 바꾸는 제품/UX 결정**이다 (DF-2 와 같은 이유). 임의 배선 금지 |
+| DF-6 | `neture` 노출 strategy 는 `spo.deleted_at IS NULL` 을 걸지 않는다 — soft-delete 된 offer 가 Neture confirm 에서 여전히 보인다 | 현행 main 과 **정확히 동일한 동작**이다. confirm 공통화 WO 에서 Neture 노출 범위를 바꾸면 §22 회귀 위험. 별도 WO 로 축소 |
 
 **DEFERRED 는 "모른다" 가 아니다.** 판정은 끝났고 실행만 미룬 것이다. `UNKNOWN = 0`.
 
@@ -366,3 +368,116 @@ controller 는 thin wrapper 다 — 경로 · 서비스 scope · 서비스별 �
 2. `buyerId` 를 `req.body` / `req.query` 에서 읽는 것 (인증 주체에서만 온다)
 3. serviceKey 집합을 controller 에 literal 로 다시 쓰는 것
 4. 조회 실패를 404 가 아닌 방식으로 구분해 응답하는 것
+
+---
+
+## 13. B2B checkout **confirm** canonical 계약
+
+> 등재: `WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1`.
+> 본 절은 **`store_cart_items` → `checkout_orders` 승격(confirm)** 만 규정한다.
+> 결제·공급자 fulfillment·배송·취소는 §3–§9 가 그대로 소유한다.
+
+### 13-1. 단일 Core
+
+`apps/api-server/src/services/cart/b2b-checkout-confirm.core.ts` — `B2BCheckoutConfirmCore`.
+
+confirm 의 **공통부는 서비스 무관(service-agnostic)** 이다.
+
+1. buyer 인증 주체 확인
+2. `store_cart_items` 를 `{ buyerId, serviceKey }` 로만 조회
+3. `sourceType ∈ { b2b, regular }` 만 승격 대상 (`B2B_ORDERABLE_SOURCE_TYPES`)
+4. 매장 조직 **서버 확정** (13-3)
+5. `supplier_product_offers` **재조회** — cart snapshot 을 신뢰하지 않는다
+6. `OfferExposureStrategy` 노출 판정 (13-2)
+7. canonical 단가 재확정 — `offer_service_prices[offerId, serviceKey]` → 없으면 `spo.price_general`
+   (frontend `priceSnapshot` 은 **판정 근거가 아니다**)
+8. `supplier_id` 기준 grouping · 그룹 내 1건이라도 실패하면 **그룹 전체 보류**
+9. `checkoutService.createOrder()` (CLAUDE.md §4 단일 진입)
+10. cart 정리 — `{ id: In(...), buyerId, serviceKey }` **경계 포함 삭제**
+
+**불변식 C1.** confirm 로직을 서비스별로 복제하지 않는다. 새 서비스는 adapter 만 추가한다.
+
+**불변식 C2.** confirm 은 `paymentStatus` 를 지정하지 않는다 (payment-first, 기본 `pending`).
+`CheckoutFulfillmentBridge` 는 **결제 완료 이후**에만 동작하며 confirm 밖에 있다.
+현재 위치가 `services/neture/checkout-fulfillment-bridge.service.ts` 인 것은 이름일 뿐이다 — 재배치하지 않는다.
+
+### 13-2. `OfferExposureStrategy` — 유일한 서비스 분기점
+
+`apps/api-server/src/services/cart/offer-exposure-strategy.ts`.
+§8 불변식 S2 의 공급 축을 confirm 에서 집행하는 지점이다.
+
+| strategy | 서비스 | 노출 근거 (SQL) | gate |
+|---|---|---|---|
+| `approval` | glycopharm · kpa-society · k-cosmetics | `EXISTS offer_service_approvals(offer_id, service_key, APPROVED)` | `MASTER_INACTIVE` · `DISTRIBUTION_DENIED` |
+| `optin` | pharmacy-hub | `$key = ANY(spo.service_keys)` | `DISTRIBUTION_DENIED` · `MASTER_INACTIVE` |
+| `neture` | neture | 없음 (junction 미사용) | `PRODUCT_NOT_APPROVED` · `DISTRIBUTION_DENIED` |
+
+**불변식 C3.** 승인축 서비스는 `service_keys` opt-in 만으로 주문할 수 없다.
+승인 행이 없으면 **주문 불가**다 — 승인 데이터가 0건이면 그것은 온보딩 부족이지 게이트 완화 사유가 아니다.
+
+**불변식 C4.** `APPROVAL_ELIGIBLE_SERVICE_KEYS ∩ SUPPLIER_OPTIN_SERVICE_KEYS = ∅`.
+모듈 로드 시점에 assert 하며, 위반하면 서버가 기동하지 않는다.
+
+**불변식 C5.** strategy 에 등록되지 않은 serviceKey 는 B2B confirm 대상이 아니다
+(`UNSUPPORTED_CART_SERVICE`).
+
+### 13-3. buyer 매장 조직 — **서버가 권위다**
+
+`apps/api-server/src/utils/buyer-organization.resolver.ts` — `resolveBuyerOrganization(ds, userId, serviceKey, requested?)`.
+
+| 상황 | 결과 |
+|---|---|
+| 접근 가능 조직 1개 | 서버가 자동 확정 |
+| 여러 개 + 올바른 선택 | 허용 |
+| 여러 개 + 선택 없음 | `400 AMBIGUOUS_STORE_ORGANIZATION` |
+| 타인 조직 선택 | `403 FOREIGN_STORE_ORGANIZATION` |
+| 접근 가능 조직 없음 | `403 STORE_ORGANIZATION_NOT_FOUND` |
+
+**불변식 C6.** 클라이언트가 보낸 `organizationId` 는 **선택값(hint)** 이다.
+`store_cart_items.organizationId` 는 **소유 증명이 아니다** — cart 에 박혀 있다는 이유로 주문 소유 축이 되지 않는다.
+검증은 **담는 시점(`POST /store/cart/:serviceKey/items`)과 확정 시점 양쪽**에서 이뤄진다.
+
+**불변식 C7.** 다중 조직 사용자를 단순 차단하지 않는다. 모호하면 400 으로 **선택을 요구**한다.
+
+| 서비스 | `organizationPolicy` | 이유 |
+|---|---|---|
+| 승인축 (glycopharm 등) | `required` | 매장이 주문 주체다 |
+| Neture | `validate-only` | 현행 client 가 조직을 보내지 않는다. 자동 확정하면 seller 축과 SERVICE 유통 판정이 바뀐다 (회귀) |
+| PharmacyHub | `unused` | 현행 계약에 조직 축이 없다 |
+
+### 13-4. route 표면 (통일하지 않는다)
+
+| 서비스 | 경로 | 구현 |
+|---|---|---|
+| KPA · GlycoPharm · K-Cosmetics (event_offer) | `POST /store/cart/:serviceKey/checkout-confirm` | `EventOfferCartCheckoutService` — **변경 없음** |
+| 승인축 B2B | `POST /store/cart/:serviceKey/checkout-confirm-b2b` | `StoreB2BCartCheckoutService` (wrapper) |
+| Neture B2B | 동일 경로 | `NetureB2BCartCheckoutService` (wrapper) |
+| PharmacyHub | 자체 `PharmacyHubOrderController` | `PharmacyHubCartCheckoutService` (wrapper) |
+
+라우팅 분기는 `isApprovalEligibleServiceKey(scope.serviceKey)` 하나다.
+**공통 Core + route 별 wrapper** 가 원칙이며, URL 을 하나로 합치지 않는다 (API compatibility 우선).
+
+**불변식 C8.** `checkout-confirm` (event_offer 축) 을 `checkout-confirm-b2b` 로 흡수하지 않는다.
+두 축은 §5-1 과 §5-2/§5-3 로 서로 다른 계약이다.
+
+### 13-5. bridge source tag
+
+`CheckoutFulfillmentBridge` 가 인식하는 `metadata.source`:
+
+| tag | sourceService |
+|---|---|
+| `neture_b2b_checkout` | `neture-b2b` |
+| `pharmacy_hub_cart` | `pharmacy-hub` |
+| `store_b2b_cart` (신규) | `store-b2b` |
+
+서비스별로 tag 를 쪼개지 않는다 — 공급자 workspace 의 실제 스코프 축은
+`metadata.serviceKey` → `neture_orders.service_key` 이고 `source` 는 bridge 진입 자격 판정용이다.
+**등록하지 않으면 주문은 생성·결제되고도 공급자에게 영원히 보이지 않는다.**
+
+### 13-6. 금지
+
+1. wrapper 가 offer 재조회 SQL · 단가 확정 · order 생성을 직접 하는 것
+2. `req.body.organizationId` 를 검증 없이 소유 축으로 쓰는 것
+3. cart 삭제를 `id` 만으로 수행하는 것 (`buyerId` · `serviceKey` 경계 필수)
+4. 승인축에서 `service_keys` opt-in 을 노출 근거로 쓰는 것
+5. confirm 안에서 fulfillment · 결제를 수행하는 것

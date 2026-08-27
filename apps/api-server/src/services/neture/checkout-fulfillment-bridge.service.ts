@@ -45,6 +45,11 @@ interface BridgeSourceDescriptor {
 const BRIDGE_SOURCES: Record<string, BridgeSourceDescriptor> = {
   [NETURE_B2B_ORDER_SOURCE]: { sourceService: 'neture-b2b' },
   pharmacy_hub_cart: { sourceService: 'pharmacy-hub' },
+  // WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1:
+  //   승인축 서비스(glycopharm / kpa-society / k-cosmetics)의 공통 B2B confirm.
+  //   등록하지 않으면 주문은 생성되고 결제까지 되지만 공급자에게 영원히 보이지 않는다
+  //   (UNSUPPORTED_SOURCE 로 조용히 skip). 서비스 스코프는 metadata.serviceKey 가 담당한다.
+  store_b2b_cart: { sourceService: 'store-b2b' },
 };
 
 export interface BridgeResult {
