@@ -13,6 +13,17 @@
  *   동일 API/컴포넌트를 재사용하되 헤더 문구와 tableId 만 내 약국 맥락으로 분리한다.
  *
  *   "내 약국에 추가" = 공급 상품 신청(ProductApproval PENDING). 신청 ≠ 주문.
+ *
+ * WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1:
+ *   이 화면에 canonical B2B 장바구니 producer 를 연결한다. 새 주문 UI 를 만드는 것이 아니라
+ *   이미 있는 공급 카탈로그를 이미 완성된 cart/confirm/order 축의 producer 로 잇는 것이다.
+ *
+ *     승인된 supplier_product_offers → store_cart_items(b2b)
+ *       → /store-hub/cart → checkout-confirm-b2b → checkout_orders
+ *
+ *   담기 ≠ 신청 ≠ 주문. 담기는 주문을 만들지 않으며, 자격(승인·유통·조직)과 가격 권위는
+ *   전부 서버에 있다. legacy `/store/b2b-order` 와 `glycopharm_products` 주문 경로는
+ *   되살리지 않는다(은퇴 유지).
  *   레거시 약국 자체 상품(glycopharm_products / pharmacyApi.getProducts)은 admin·operator·
  *   storefront·파트너 모집이 계속 소비하므로 본 전환에서 제거하지 않는다.
  *   (WO-O4O-GLYCOPHARM-LEGACY-B2B-ORDER-PAGE-RETIREMENT-V1: b2b-order 는 소비처에서 빠졌다 —
@@ -26,6 +37,12 @@ import {
   cancelProductByOfferId,
   type CatalogProduct,
 } from '../../api/pharmacyProducts';
+import { storeCartApi } from '../../api/storeCart';
+import { CART_SERVICE_KEY } from '../../utils/eventOfferCart';
+import { buildSupplyCatalogCartPayload } from '../../utils/supplyCatalogCart';
+
+/** 장바구니 화면 경로 (App.tsx 라우트와 동일). */
+const STORE_CART_PATH = '/store-hub/cart';
 
 export default function PharmacyB2BProducts() {
   return (
@@ -38,6 +55,12 @@ export default function PharmacyB2BProducts() {
         description: '약국에서 거래할 공급자 상품을 확인하고 내 약국에 추가할 수 있습니다.',
       }}
       api={{ getCatalog, applyBySupplyProductId, cancelProductByOfferId }}
+      cart={{
+        cartHref: STORE_CART_PATH,
+        addToCart: async (product) => {
+          await storeCartApi.addItem(CART_SERVICE_KEY, buildSupplyCatalogCartPayload(product));
+        },
+      }}
     />
   );
 }

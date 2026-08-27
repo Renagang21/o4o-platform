@@ -66,8 +66,18 @@ describe('approval strategy (§30)', () => {
 
   it('승인 행 조건을 SQL 에서 강제한다 — service_keys opt-in 으로 우회되지 않는다', () => {
     expect(s.offerWhereSql).toContain('offer_service_approvals');
-    expect(s.offerWhereSql).toContain("approval_status = 'APPROVED'");
+    expect(s.offerWhereSql).toContain("osa.approval_status = 'approved'");
     expect(s.offerWhereSql).not.toContain('service_keys');
+  });
+
+  // WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1 (§19)
+  //   `offer_service_approvals.approval_status` 는 **소문자** 도메인이다. 대문자
+  //   'APPROVED' 로 비교하면 EXISTS 가 항상 거짓이 되어 승인축 서비스 전체
+  //   (glycopharm / kpa-society / k-cosmetics)의 B2B confirm 이 조용히 0건이 된다.
+  //   게이트 완화가 아니라 **같은 축을 같은 표기로 비교**하는 정합 회귀 테스트다.
+  it("승인 junction 비교는 카탈로그 SSOT 와 같은 소문자 'approved' 를 쓴다", () => {
+    expect(s.offerWhereSql).not.toContain("osa.approval_status = 'APPROVED'");
+    expect(s.offerWhereSql).toMatch(/osa\.approval_status\s*=\s*'approved'/);
   });
 
   it('승인된 노출은 통과한다', () => {

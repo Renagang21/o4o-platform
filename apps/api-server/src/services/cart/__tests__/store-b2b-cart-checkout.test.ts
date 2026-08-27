@@ -100,7 +100,11 @@ describe('승인 게이트 (§18 · §19)', () => {
     await service.confirm(scope);
 
     expect(queries[0].sql).toContain('offer_service_approvals');
-    expect(queries[0].sql).toContain("approval_status = 'APPROVED'");
+    // WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1 (§19):
+    //   junction 승인 상태는 소문자 도메인('approved')이다. 대문자는
+    //   supplier_product_offers 축이며, 섞으면 승인 offer 가 0건으로 매칭된다.
+    expect(queries[0].sql).toContain("osa.approval_status = 'approved'");
+    expect(queries[0].sql).not.toContain("osa.approval_status = 'APPROVED'");
     // PharmacyHub 식 opt-in 축은 이 서비스의 노출 근거가 아니다
     expect(queries[0].sql).not.toContain('service_keys');
     expect(queries[0].params[1]).toBe('glycopharm');

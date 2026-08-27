@@ -306,6 +306,9 @@ KPA · GlycoPharm · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 �
 | DF-4 | 매장 buyer 주문 조회 컨트롤러가 KPA / GlycoPharm / K-Cosmetics 3벌로 중복 | `B2B_COMMONIZABLE` 로 분류. 공통화는 3서비스 동시 회귀가 필요해 별도 WO |
 | ↳ **DF-4 종결** | 동일 WO | 3벌 조회 SQL 을 `services/checkout/buyer-order-read.service.ts` 하나로 모았다. controller 3개는 thin wrapper |
 | DF-5 | GlycoPharm 에 **`sourceType: 'b2b'` 를 만드는 frontend 생산자가 없다.** 서버(`checkout-confirm-b2b`)와 공통 client(`useStoreCart`)는 준비됐지만 승인 공급 상품을 장바구니에 담는 화면이 없다. `/store/commerce/products` 는 "공급 상품 **신청**"(ProductApproval PENDING) 이며 신청 ≠ 주문 | 담기 버튼을 붙이는 것은 그 화면의 **의미를 바꾸는 제품/UX 결정**이다 (DF-2 와 같은 이유). 임의 배선 금지 |
+| ↳ **DF-5 종결** | `WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1` | 새 주문 UI 를 만들지 않고, `/store/commerce/products` 카탈로그를 **opt-in** cart producer 로 연결했다(§13-6). "신청"(ProductApproval) 액션은 그대로 남고 "담기"가 별개 액션으로 추가된다 — 담기 ≠ 신청 ≠ 주문 |
+| DF-7 | GlycoPharm 다중 매장(조직) 사용자를 위한 **조직 선택 UI 가 없다.** 서버는 `AMBIGUOUS_STORE_ORGANIZATION` 으로 fail closed 하고 화면은 그 사유를 그대로 보여준다 | 임의로 첫 조직을 고르지 않는 것이 계약(§13-3)이다. 선택 UI 는 조직 목록 조회 표면이 새로 필요하므로 별도 WO |
+| DF-8 | 승인축 `gate` 의 PRIVATE 판정은 `allowed_seller_ids` 를 **buyerId(사용자)** 와 비교하는데, 카탈로그 노출 판정은 **organizationId(매장)** 와 비교한다 — 카탈로그에 보이는 PRIVATE offer 가 confirm 에서 거부될 수 있다 | 공급 승인 정책의 축을 바꾸는 변경이고 glycopharm · kpa-society · k-cosmetics 3서비스에 동시 영향이다. 완화가 아니라 축 정렬이므로 별도 WO |
 | DF-6 | `neture` 노출 strategy 는 `spo.deleted_at IS NULL` 을 걸지 않는다 — soft-delete 된 offer 가 Neture confirm 에서 여전히 보인다 | 현행 main 과 **정확히 동일한 동작**이다. confirm 공통화 WO 에서 Neture 노출 범위를 바꾸면 §22 회귀 위험. 별도 WO 로 축소 |
 
 **DEFERRED 는 "모른다" 가 아니다.** 판정은 끝났고 실행만 미룬 것이다. `UNKNOWN = 0`.
@@ -408,7 +411,7 @@ confirm 의 **공통부는 서비스 무관(service-agnostic)** 이다.
 
 | strategy | 서비스 | 노출 근거 (SQL) | gate |
 |---|---|---|---|
-| `approval` | glycopharm · kpa-society · k-cosmetics | `EXISTS offer_service_approvals(offer_id, service_key, APPROVED)` | `MASTER_INACTIVE` · `DISTRIBUTION_DENIED` |
+| `approval` | glycopharm · kpa-society · k-cosmetics | `EXISTS offer_service_approvals(offer_id, service_key, approval_status = 'approved')` | `MASTER_INACTIVE` · `DISTRIBUTION_DENIED` |
 | `optin` | pharmacy-hub | `$key = ANY(spo.service_keys)` | `DISTRIBUTION_DENIED` · `MASTER_INACTIVE` |
 | `neture` | neture | 없음 (junction 미사용) | `PRODUCT_NOT_APPROVED` · `DISTRIBUTION_DENIED` |
 
@@ -420,6 +423,14 @@ confirm 의 **공통부는 서비스 무관(service-agnostic)** 이다.
 
 **불변식 C5.** strategy 에 등록되지 않은 serviceKey 는 B2B confirm 대상이 아니다
 (`UNSUPPORTED_CART_SERVICE`).
+
+**불변식 C6** (WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1).
+`offer_service_approvals.approval_status` 는 **소문자** 도메인이다(`pending` / `approved` / …).
+대문자 `'APPROVED'` 는 `supplier_product_offers.approval_status` 의 축이며 서로 다른 축이다.
+confirm 의 노출 SQL 은 카탈로그 SSOT(`buildServiceApprovalGateSql`)와 **같은 표기**로 비교해야 한다 —
+섞이면 `EXISTS` 가 항상 거짓이 되어 승인축 서비스 전체의 B2B confirm 이 조용히 0건이 된다.
+이는 게이트 완화가 아니라 정합 문제이며, 회귀 테스트로 고정한다
+(`offer-exposure-strategy.test.ts` · `store-b2b-cart-checkout.test.ts`).
 
 ### 13-3. buyer 매장 조직 — **서버가 권위다**
 
@@ -474,7 +485,33 @@ confirm 의 **공통부는 서비스 무관(service-agnostic)** 이다.
 `metadata.serviceKey` → `neture_orders.service_key` 이고 `source` 는 bridge 진입 자격 판정용이다.
 **등록하지 않으면 주문은 생성·결제되고도 공급자에게 영원히 보이지 않는다.**
 
-### 13-6. 금지
+### 13-6. cart producer — 승인 카탈로그가 유일한 B2B 담기 출처다
+
+WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1.
+
+`store_cart_items(sourceType='b2b')` 를 만드는 화면은 **승인된 공급 카탈로그**
+(`supplier_product_offers` 기반 catalog SSOT) 뿐이다. 카탈로그 행의 `id` 가 곧
+`supplier_product_offers.id` 이며, 이 값이 `supplierProductOfferId` 로 그대로 간다.
+
+| 축 | 권위 | 클라이언트가 보내는 값 |
+|---|---|---|
+| offer | `supplier_product_offers.id` (= 카탈로그 행 id) | 그대로 전달 |
+| supplier | `neture_suppliers.id` | 힌트(`requireCartSupplierId=false`) |
+| 가격 | 서버 `offer_service_prices[serviceKey]` → `price_general` | 표시용 snapshot 만 |
+| 매장 조직 | 서버 `resolveBuyerOrganization` | **보내지 않는다** |
+
+금지:
+
+- legacy 서비스 자체 상품(예: `glycopharm_products`)을 B2B 주문 source 로 쓰는 것
+- 표시명(`supplierName`) · manufacturer 문자열을 공급자 식별자로 쓰는 것
+- sku · barcode heuristic 으로 offer 를 매칭하는 것
+- frontend 가 승인·유통·조직 자격을 선판단해 담기를 막거나 허용하는 것
+  (자격 판정은 confirm 시 서버가 한다 — 담기 ≠ 주문)
+
+공통 컴포넌트(`SupplyCatalogHub`)에서 담기 UI 는 **opt-in** 이다. `cart` prop 을 주지 않은
+서비스는 렌더 트리·액션·문구가 종전과 동일해야 한다(신청 ≠ 주문 경계 유지).
+
+### 13-7. 금지
 
 1. wrapper 가 offer 재조회 SQL · 단가 확정 · order 생성을 직접 하는 것
 2. `req.body.organizationId` 를 검증 없이 소유 축으로 쓰는 것

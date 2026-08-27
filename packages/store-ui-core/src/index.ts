@@ -233,6 +233,8 @@ export type {
   SupplyCatalogGetParams,
   SupplyCatalogListResponse,
   SupplyCatalogAccent,
+  // WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1: opt-in 장바구니 producer 계약
+  SupplyCatalogCartProducer,
 } from './components/supply-catalog/SupplyCatalogHub';
 
 // 공급 상품 탐색 공통 Core (WO-O4O-STORE-HUB-SUPPLY-PRODUCT-EXPLORER-COMMONIZATION-V1)

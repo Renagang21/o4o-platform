@@ -185,6 +185,16 @@ jobs:
     - name: Run tests (appearance-system Jest)
       run: cd packages/appearance-system && NODE_OPTIONS=--experimental-vm-modules npx jest --config jest.config.cjs
 
+    # WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1
+    # 카탈로그 행 → canonical store_cart_items payload 계약(offer id · supplier 축 ·
+    # 표시용 가격 · organizationId 미전송)을 CI 에서 고정한다. blocking.
+    # GlycoPharm 에는 테스트 실행 경로가 아예 없었다 — 이 축은 잘못되면 legacy 상품 id 나
+    # 표시용 가격이 조용히 주문 경로로 새어 들어간다.
+    # (store-ui-core 의 opt-in 장바구니 producer 계약은 위 store-ui-core step 에서 실행된다.)
+    # DB · secret 불필요. 루트에 설치된 vitest/jsdom 을 그대로 쓴다.
+    - name: Run tests (web-glycopharm Vitest)
+      run: npx vitest run --config services/web-glycopharm/vitest.config.mjs
+
   # 2. Build all applications
   build:
     name: Build Applications
