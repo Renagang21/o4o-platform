@@ -14,6 +14,30 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/** repository root — 이 스크립트는 `scripts/audit/` 에 있다. */
+const PROJECT_ROOT = path.join(__dirname, '../..');
+
+/**
+ * WO-O4O-REGISTRY-AUDIT-GENERATOR-CANONICALIZATION-V1
+ *
+ * report 의 경로는 **repo root 기준 POSIX 경로**로만 기록한다.
+ * 절대경로를 그대로 넣으면 실행 머신마다 report 전체가 달라진다
+ * (`C:\Users\me\repo\x.ts` vs `/home/dev/repo/x.ts`).
+ * 구분자도 `/` 로 통일해 Windows/Linux 출력이 같아지게 한다.
+ *
+ * sibling 인 check-block-registry.ts 에 **같은 함수를 그대로** 둔다.
+ * 공용 helper 로 추출하면 scripts/ 의 모듈 경계가 커져 이번 범위를 넘는다.
+ */
+function toRepoPath(absPath: string): string {
+  return path.relative(PROJECT_ROOT, absPath).split(path.sep).join('/');
+}
+
+/**
+ * 기본 출력은 **재실행해도 byte-identical** 이어야 한다.
+ * 실행 시각이 필요한 경우에만 `--timestamp` 로 명시한다.
+ */
+const INCLUDE_TIMESTAMP = process.argv.includes('--timestamp');
+
 // Import naming utilities
 import { fileNameToShortcodeName } from '../../packages/shortcodes/src/utils/shortcodeNaming.js';
 
@@ -36,7 +60,8 @@ interface NamingMismatch {
 }
 
 interface AuditReport {
-  timestamp: string;
+  /** `--timestamp` 를 준 실행에서만 존재한다. */
+  timestamp?: string;
   foundComponents: ShortcodeFile[];
   registeredShortcodes: RegistryEntry[];
   missingInRegistry: ShortcodeFile[];
@@ -61,7 +86,8 @@ function findFilesRecursive(dir: string, pattern: RegExp, exclude: RegExp[]): st
     return results;
   }
 
-  const files = fs.readdirSync(dir);
+  // readdirSync 순서는 파일시스템마다 다르다 — 정렬해 순회 순서를 고정한다.
+  const files = fs.readdirSync(dir).sort();
 
   for (const file of files) {
     const filePath = path.join(dir, file);
@@ -148,7 +174,7 @@ function findShortcodeFiles(): ShortcodeFile[] {
       const expectedName = fileNameToShortcodeName(fileName);
 
       allFiles.push({
-        filePath,
+        filePath: toRepoPath(filePath),
         fileName,
         expectedName,
       });
@@ -194,7 +220,7 @@ function findRegisteredShortcodes(): RegistryEntry[] {
       const shortcodeName = match[1];
       registrations.push({
         name: shortcodeName,
-        source: path.relative(projectRoot, indexFile),
+        source: toRepoPath(indexFile),
       });
     }
   }
@@ -283,7 +309,7 @@ function generateReport(): AuditReport {
   const { missing, dangling, mismatches } = analyzeRegistry(files, registered);
 
   const report: AuditReport = {
-    timestamp: new Date().toISOString(),
+    ...(INCLUDE_TIMESTAMP ? { timestamp: new Date().toISOString() } : {}),
     foundComponents: files,
     registeredShortcodes: registered,
     missingInRegistry: missing,

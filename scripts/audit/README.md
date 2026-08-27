@@ -35,14 +35,23 @@ npx tsx scripts/audit/check-block-registry.ts
   - Recommendations and action items
   - Registration phase plan
 
+Both JSON reports are **generated locally and git-ignored** — re-run the matching
+audit script to recreate one. Each has its own anchored `.gitignore` rule; do not
+replace them with a broad `scripts/audit/*.json` pattern (that would also hide the
+audit scripts' siblings).
+
+Since `WO-O4O-REGISTRY-AUDIT-GENERATOR-CANONICALIZATION-V1` the output is
+**environment-independent**: paths are repo-relative POSIX paths and no timestamp
+is written unless you pass `--timestamp`. Two runs on the same commit produce
+byte-identical files.
+
 - **`shortcode-registry-report.json`**
   - Machine-readable shortcode audit data
-  - Generated locally and git-ignored — the file records absolute paths of the
-    machine it ran on, so it is **not** committed. Re-run the audit script to
-    recreate it.
+  - Generated, git-ignored
 
 - **`block-registry-report.json`**
   - Machine-readable block audit data
+  - Generated, git-ignored
 
 ## Current Status
 
