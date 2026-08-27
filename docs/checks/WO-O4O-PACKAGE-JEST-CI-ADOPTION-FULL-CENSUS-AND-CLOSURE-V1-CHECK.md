@@ -223,3 +223,77 @@ type-check / build 는 테스트 실행으로 보지 않았다. **`duplicate exe
 `pnpm run type-check:frontend` → **`type-check:frontend: OK` (exit 0)**.
 
 첫 실행은 이 worktree 의 workspace dist 산출물이 갖춰지지 않아 9 step 실패(`@o4o/auth-utils` 모듈 미해결 등)했으나, dev.mjs 의 선행 build 가 산출물을 채운 뒤 재실행에서 전부 통과했다. **이번 WO 의 변경(YAML·주석·문서·루트 config 삭제)은 TypeScript 소스를 건드리지 않는다.**
+
+---
+
+## §11 실제 CI 검증 (실측)
+
+| 항목 | 값 |
+|---|---|
+| 이번 commit | `18033e1cf` (push `5c398652b..18033e1cf`) |
+| 근거 run | **run `33051324480`** — `CI Pipeline`, head `b5bab1f4d`, **completed / success** |
+| commit 포함 여부 | `git merge-base --is-ancestor 18033e1cf b5bab1f4d` = **YES** |
+| 취소 run 취급 | `18033e1cf` 직행 run `33050887958` 은 concurrency 로 `cancelled` — **근거로 쓰지 않음**. 후속 run 으로 판정 |
+
+### 신규 3개 step 실측 (해당 run 의 `Code Quality Check` job)
+
+| step | 결과 | CI 로그 |
+|---|---|---|
+| `Run tests (asset-copy-core Jest)` | **success** | `Test Suites: 4 passed, 4 total` / `Tests: 64 passed, 64 total` |
+| `Run tests (account-ui Jest)` | **success** | `Test Suites: 1 passed, 1 total` / `Tests: 20 passed, 20 total` |
+| `Run tests (appearance-system Jest)` | **success** | `Test Suites: 1 passed, 1 total` / `Tests: 12 passed, 12 total` |
+
+기존 9개 test step(api-server Jest · admin-dashboard Vitest · multi-tenant Vitest · package Vitest 6개) 도 전부 `success` — 기존 CI 의미·순서 보존 확인.
+
+---
+
+## §12 금지 항목 준수
+
+| 금지 | 상태 |
+|---|---|
+| skip/todo 로 green 만들기 | 0건 |
+| `--passWithNoTests` | 0건 (기존 admin-dashboard·multi-tenant step 의 플래그는 이번 WO 가 만든 것이 아니며 손대지 않음) |
+| `\|\| true` | 0건 |
+| `continue-on-error` | 0건 |
+| snapshot 대량 갱신 | 0건 |
+| 새 테스트 framework 도입 | 0건 |
+| 실제 결함을 테스트 수정으로 은폐 | 0건 (제품 코드 수정 0) |
+| DB·secret 필요한 테스트를 unit test 로 위장 연결 | 0건 (`partner-core` 는 `NOT_RUNNABLE` 로 남김) |
+
+---
+
+## §13 완료 기준
+
+| 기준 | 결과 |
+|---|---|
+| 전수 판정 | 62 패키지 / 28 test 파일 전부 분류 |
+| `LOCAL_ONLY_GREEN` | **0** |
+| `LOCAL_ONLY_RED` | **0** |
+| `UNJUDGED` | **0** |
+| CI 실행 대상 Jest 전부 success | **3/3** |
+| silent no-test pass | **0** (exit 1 실측) |
+| duplicate execution | **0** |
+| false-green | **0** (mutation 3/3 실증) |
+| `CI_GREEN` | **PASS** (run `33051324480`) |
+
+---
+
+## 최종 판정
+
+```text
+PACKAGE_JEST_CI_ADOPTION = CLOSED
+PACKAGE_JESTS_IN_CI      = PASS
+UNJUDGED                 = 0
+CI_GREEN                 = PASS
+MUST_FIX_BEFORE_CLOSE    = 0
+```
+
+### 잔여 (이번 WO 범위 밖 · 별도 WO 후보)
+
+| 항목 | 내용 |
+|---|---|
+| `packages/partner-core` | test 2 파일, typeorm `DataSource` 의존으로 `NOT_RUNNABLE`. 실행 환경 설계가 필요 |
+| `packages/shortcodes` | `*.spec.ts` 1 파일, 어떤 config 의 testMatch 에도 안 걸림 |
+| `packages/block-core` | test 0개인데 `jest --passWithNoTests` 스크립트만 존재 — 스크립트 정리 또는 테스트 작성 |
+| `appearance-system` `pnpm test` | Windows 로컬에서 inline env 문법으로 실패 (CI 는 정상). cross-env 도입 등 DX 개선 |
+| `appearance-system` 테스트 강도 | CSS 출력 문자열 단언 위주로 negative 밀도 낮음 |
