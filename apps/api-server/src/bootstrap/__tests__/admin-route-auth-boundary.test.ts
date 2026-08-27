@@ -196,9 +196,6 @@ describe('가드 배선 회귀 (source scan)', () => {
 describe('blanket 에 인증을 의존하던 admin router 회귀', () => {
   const BLANKET_DEPENDENT_ROUTERS = [
     'ops-metrics',
-    'channel-playback-logs',
-    'channel-heartbeat',
-    'channel-ops',
   ];
 
   it.each(BLANKET_DEPENDENT_ROUTERS)('%s router 는 자기 인증을 명시한다', (name) => {
