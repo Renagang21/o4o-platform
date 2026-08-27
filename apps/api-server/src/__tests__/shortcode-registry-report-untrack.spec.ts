@@ -20,6 +20,19 @@
  *   check-shortcode-registry.ts   KEEP_ACTIVE — 감사 도구 자체는 유지한다.
  *   verify:shortcodes / verify:registry   KEEP_ACTIVE
  *
+ * 후속 — WO-O4O-BLOCK-REGISTRY-REPORT-GENERATED-ARTIFACT-UNTRACK-AND-IGNORE-V1
+ * ---------------------------------------------------------------
+ *   scripts/audit/block-registry-report.json   GENERATED_ARTIFACT_UNTRACK
+ *     └ sibling 인 block report 도 동일 근거로 닫혔다. tracked 사본은
+ *         `/home/dev/o4o-platform` 루트의 filePath 34 필드 + timestamp 였고,
+ *         이 머신 재실행 사본은 `C:\Users\home\coding\o4o-platform` 루트의 35 필드다.
+ *     └ consumer census : ACTIVE_RUNTIME_CONSUMER 0 · CI_CONSUMER 0 ·
+ *         ACTIVE_TEST_FIXTURE 0.
+ *
+ *   이전의 "sibling 을 함께 무시하지 않는다" assertion 은 **삭제가 아니라 교체**됐다.
+ *   두 report 는 이제 각각 **독립된 anchored 규칙**을 가져야 하고,
+ *   `*.json` · `scripts/audit/*.json` 같은 광범위 ignore 는 금지된다.
+ *
  * 이 테스트는 **재추적 방지 계약**이다. DB · 네트워크 접근 0.
  */
 import { execSync } from 'child_process';
@@ -30,8 +43,18 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..', '..', '..');
 const REPORT_REL = 'scripts/audit/shortcode-registry-report.json';
 const IGNORE_RULE = '/scripts/audit/shortcode-registry-report.json';
 
+const BLOCK_REPORT_REL = 'scripts/audit/block-registry-report.json';
+const BLOCK_IGNORE_RULE = '/scripts/audit/block-registry-report.json';
+
 const readRoot = (...seg: string[]) =>
   fs.readFileSync(path.join(REPO_ROOT, ...seg), 'utf-8');
+
+/** `.gitignore` 의 주석·빈 줄을 걷어낸 **실효 규칙** 목록. */
+const ignoreRules = () =>
+  readRoot('.gitignore')
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l && !l.startsWith('#'));
 
 /**
  * git 계약 검사는 실제 checkout 안에서만 의미가 있다. tarball/export 처럼
@@ -57,17 +80,32 @@ describe('생성 산출물 report 는 Git 에 추적하지 않는다', () => {
   });
 
   it('ignore 규칙이 광범위한 *.json 패턴이 아니다', () => {
-    const rules = readRoot('.gitignore')
-      .split(/\r?\n/)
-      .map((l) => l.trim())
-      .filter((l) => l && !l.startsWith('#'));
+    const rules = ignoreRules();
     expect(rules).not.toContain('*.json');
     expect(rules).not.toContain('**/*.json');
   });
 
-  it('sibling block-registry-report.json 까지 함께 무시하지 않는다', () => {
-    // 이번 WO 범위는 shortcode report 뿐이다. 규칙이 sibling 을 삼키면 범위 밖 변경이 된다.
-    expect(readRoot('.gitignore')).not.toContain('block-registry-report.json');
+  it('두 report 가 각각 독립된 anchored 규칙을 갖는다', () => {
+    // sibling 인 block report 도 WO-O4O-BLOCK-REGISTRY-REPORT-GENERATED-ARTIFACT-UNTRACK-AND-IGNORE-V1
+    // 에서 같은 판정으로 닫혔다. 두 규칙은 서로를 삼키지 않고 **파일 하나씩** 지목한다.
+    const rules = ignoreRules();
+    expect(rules).toContain(IGNORE_RULE);
+    expect(rules).toContain(BLOCK_IGNORE_RULE);
+  });
+
+  it('디렉터리 단위 broad ignore 로 대체하지 않는다', () => {
+    // `scripts/audit/` 를 통째로 무시하면 감사 도구(.ts)와 문서(.md)까지 추적에서 빠진다.
+    const rules = ignoreRules();
+    for (const broad of [
+      'scripts/audit/*.json',
+      '/scripts/audit/*.json',
+      '**/scripts/audit/*.json',
+      'scripts/audit/',
+      '/scripts/audit/',
+      'scripts/audit',
+    ]) {
+      expect(rules).not.toContain(broad);
+    }
   });
 
   describeGit('git tracking 상태', () => {
@@ -86,6 +124,23 @@ describe('생성 산출물 report 는 Git 에 추적하지 않는다', () => {
       }).trim();
       expect(matched).toContain('.gitignore');
       expect(matched).toContain(IGNORE_RULE);
+    });
+
+    it('sibling block report 도 tracked 목록에 없다', () => {
+      const tracked = execSync(`git ls-files -- ${BLOCK_REPORT_REL}`, {
+        cwd: REPO_ROOT,
+        encoding: 'utf-8',
+      }).trim();
+      expect(tracked).toBe('');
+    });
+
+    it('block report 경로가 자기 규칙에 걸린다 (shortcode 규칙이 아니다)', () => {
+      const matched = execSync(`git check-ignore -v -- ${BLOCK_REPORT_REL}`, {
+        cwd: REPO_ROOT,
+        encoding: 'utf-8',
+      }).trim();
+      expect(matched).toContain('.gitignore');
+      expect(matched).toContain(BLOCK_IGNORE_RULE);
     });
   });
 });
@@ -122,5 +177,19 @@ describe('감사 도구와 verify 체인은 그대로 유지한다', () => {
         path.join(REPO_ROOT, 'packages', 'shortcodes', 'src', 'utils', 'shortcodeNaming.ts')
       )
     ).toBe(true);
+  });
+});
+
+describe('block 감사 도구도 그대로 유지한다', () => {
+  const BLOCK_AUDIT_REL = 'scripts/audit/check-block-registry.ts';
+
+  it('check-block-registry.ts 가 존재한다', () => {
+    expect(fs.existsSync(path.join(REPO_ROOT, BLOCK_AUDIT_REL))).toBe(true);
+  });
+
+  it('감사 스크립트가 report 를 계속 생성한다 (기능 제거가 아니라 추적 해제다)', () => {
+    const audit = readRoot('scripts', 'audit', 'check-block-registry.ts');
+    expect(audit).toContain("'block-registry-report.json'");
+    expect(audit).toContain('writeFileSync');
   });
 });
