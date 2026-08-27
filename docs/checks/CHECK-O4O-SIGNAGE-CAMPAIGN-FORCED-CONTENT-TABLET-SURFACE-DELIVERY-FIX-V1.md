@@ -469,6 +469,37 @@ schema DROP                        0
 
 ---
 
-## 18. 최종 상태
+## 18. commit / push / deploy
 
-_(commit / push / deploy / production smoke 는 아래에 기록)_
+| 항목 | 상태 |
+|---|---|
+| commit | `4c27a2232` — 3 files (writer 1 · spec 1 · CHECK 1), path-specific stage (`git add .` 0) |
+| push | `origin/work/signage-campaign-forced-content-tablet-surface-v1` |
+| working tree | clean |
+| **main 반영 (§28)** | **미완 — `MAIN_MERGE_PENDING_USER_DECISION`** |
+| **Deploy API Server (§28)** | **미실행 — main 반영 전제 미충족** |
+| **serving revision 확인 (§28)** | 미실행 (동일) |
+| **production read-only smoke (§29)** | 미실행 (배포 전이므로 의미 없음) |
+| **browser smoke (§21)** | `AUTHORING_SMOKE_BLOCKED_AUTH` — 운영자 승인 write 를 수행할 credential 없음. 우회 credential 생성/self-grant 금지(§20) 준수 |
+
+### 18-1. main 반영을 자동으로 진행하지 않은 이유
+
+현재 main 미머지 브랜치가 **2개** 있고 순서가 산출물에 영향을 준다.
+
+```text
+work/signage-legacy-stack-simplification-v2        @ bc8aba79e  (retirement, ERROR_BASELINE 69→63)
+work/signage-campaign-forced-content-tablet-surface-v1 @ 4c27a2232  (본 수정, ERROR_BASELINE 미변경)
+```
+
+두 브랜치의 소스 파일 교집합은 0 이지만 `scripts/lint-ratchet.mjs` 는 retirement 쪽만 수정한다.
+retirement 가 먼저 머지되면 baseline 63 이 되고, 본 브랜치는 그 위에서도 통과한다(추가 error 0).
+반대 순서도 통과한다. 즉 순서 제약은 없으나 **머지 자체는 production 배포를 촉발**하므로
+사용자 판단으로 남긴다.
+
+### 18-2. production write 정책 (§20) 준수
+
+```text
+production DB write   0
+production 데이터 수정 0
+credential 생성/self-grant 0
+```
