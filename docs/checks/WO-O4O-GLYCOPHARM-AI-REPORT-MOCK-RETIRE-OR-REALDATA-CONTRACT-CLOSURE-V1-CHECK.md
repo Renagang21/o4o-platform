@@ -130,3 +130,59 @@ wrapper 가 주입하는 `headerActions = <AiSummaryButton contextLabel="AI 리�
 > 해당 패키지들을 빌드한 뒤 재실행해 `type-check:frontend: OK` 를 얻었다.
 
 KPA / K-Cosmetics / Neture AI report 는 config 무변경이며 type-check 전수 통과. 공통 `@o4o/ui` 도 무변경.
+
+---
+
+## 6. Production E2E (배포 후 실측)
+
+- 배포: `Deploy Web Services (Cloud Run)` `fbcd9550d` **success**
+- 절차: 로그인 → `/operator/ai-report` deep link → **hard refresh** → 본문·네트워크·콘솔 수집
+- mock 문자열 탐지: `글루코스밸런스 프로` · `서초 건강약국` · `프로바이오틱스 골드` · `1,456` · `4,523` · `수분크림 글로우`
+
+| 서비스 | 뷰포트 | 메뉴 `AI 리포트` | `분석 데이터 준비 중` | mock 문자열 | white screen | JS exception | 4xx/5xx |
+|---|---|:--:|:--:|:--:|:--:|:--:|:--:|
+| **GlycoPharm** | **1440×900** | ○ | ○ | **0** | ✕ | **0** | 0 / 0 |
+| **GlycoPharm** | **390×844** | ○ | ○ | **0** | ✕ | **0** | 0 / 0 |
+| K-Cosmetics | 1440×900 | ○ | ○ | 0 | ✕ | 0 | 0 / 0 |
+| KPA-Society | 1440×900 | ○ | ○ | 0 | ✕ | 0 | 4 / 0 (아래 주) |
+| Neture | 1440×900 | ○ | ○ | 0 | ✕ | 0 | 0 / 0 |
+
+GlycoPharm 실측 본문(1440×900):
+
+    … 공통 분석 AI 리포트 운영 분석 시스템
+    AI/Context Asset 리포트   AI 응답에서 노출된 Context Asset 현황을 분석합니다   [AI 요약]
+    Context Asset은 AI 응답에 포함된 제품, 약국, 콘텐츠, 공급사 정보입니다. …
+    분석 데이터 준비 중
+
+- **가짜 KPI·가짜 제품명·가짜 약국명이 화면에서 사라졌다.** `mock operational UI = 0`.
+- `AI 요약`(=`AiSummaryButton`) 은 empty mode 에서도 렌더된다 → **실기능 회귀 0**.
+- deep link · hard refresh 모두 `/operator/ai-report` 유지. dead link 0, unexpected 404/redirect 0.
+
+> KPA-Society 의 4xx 4건은 `/api/v1/public/services/kpa-society/policies/{terms,privacy}` ·
+> `/api/v1/kpa/legal/documents/published/{terms,privacy}` 404 다. AI 리포트와 무관한 **약관/개인정보 문서 미등록**
+> 이슈이고, 이번 변경은 KPA 파일을 건드리지 않는다. 범위 밖이므로 수정하지 않고 그대로 기록한다.
+
+---
+
+## 7. 완료 기준 판정
+
+```text
+UNJUDGED                    = 0
+mock operational UI         = 0
+dead menu                   = 0   (4서비스 공통 route 유지 — §2 근거)
+dead route                  = 0
+unexpected 403/404/500      = 0   (GlycoPharm 기준. KPA 약관 404 는 범위 밖·기존 이슈로 명시)
+cross-service leak          = 0   (표시 데이터 자체가 없음)
+```
+
+```text
+GLYCOPHARM_AI_REPORT_CONTRACT = CLOSED
+PRODUCTION_E2E                = PASS
+MUST_FIX_BEFORE_CLOSE         = 0
+```
+
+### 잔여 (별도 WO 권장, 종료를 막지 않음)
+
+1. **`@o4o/ui` `AiReportPage` 의 full mode 가 현재 consumer 0.** 4서비스가 모두 empty mode 가 되면서 full 렌더 경로(약 300줄)가 미사용이 됐다. 실데이터 연동 WO 가 다시 쓸 자산이므로 이번에 삭제하지 않았다. 실데이터 계획이 확정되지 않으면 제거 검토 대상.
+2. **AI 응답 분석 인프라 부재.** Context Asset 수집·저장·집계가 없어 4서비스 전부 empty 다. 실데이터 연동은 인프라 WO 선행 필요.
+3. KPA-Society 약관/개인정보 문서 404 4건 (위 주석).
