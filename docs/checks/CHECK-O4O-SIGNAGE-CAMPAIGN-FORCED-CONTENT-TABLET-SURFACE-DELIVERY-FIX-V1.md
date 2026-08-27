@@ -503,3 +503,45 @@ production DB write   0
 production 데이터 수정 0
 credential 생성/self-grant 0
 ```
+
+---
+
+## 19. main 정렬 및 전체 회귀 재실행
+
+머지 순서는 **Signage retirement(구조 감축) → 본 수정(기능 fix)** 으로 정했다.
+retirement PR [#184](https://github.com/Renagang21/o4o-platform/pull/184) 가 CI green 으로 main 에 반영된 뒤
+(`main = d16c38caf`), 그 새 기준선 위에서 본 브랜치를 다시 통과시켰다.
+소스 교집합이 0이어도 기존 브랜치를 그대로 merge 하지 않는다.
+
+| 항목 | 값 |
+|---|---|
+| 정렬 대상 main | `d16c38caf` (PR #184 merge commit) |
+| 정렬 방식 | `git merge origin/main` → **충돌 0** |
+| merge commit | `6a280d1b3` |
+| 두 작업의 변경 파일 교집합 | **0** |
+
+### 19-1. 병합 후 계약 재확인
+
+| 대상 | 상태 |
+|---|---|
+| writer `content-approval.service.ts` | `CAMPAIGN_TARGET_SURFACE = 'both'` · INSERT 에 `target_surface, tablet_duration_seconds` 유지 |
+| canonical reader `store-public-tablet-idle-resolve.ts` | **diff 0** (`target_surface IN ('tablet_idle','both')` 2곳 불변) |
+| 수동 운영자 writer `forced-content.controller.ts` | **diff 0** (default `'signage'` 불변) |
+| signage surface reader `store-playlist.repository.ts` | **diff 0** (surface 필터 없음 — 부채 1번으로 이월) |
+
+즉 retirement 로 Signage axis B 가 감축된 뒤에도 reader 를 완화하지 않았고, writer 만 canonical 값을 저장한다.
+
+### 19-2. 전체 회귀 결과 (정렬된 트리)
+
+| 순서 | 검사 | 결과 |
+|---|---|---|
+| 1 | `scripts/lint-ratchet.mjs` (**build 산출물 생성 전**, §27) | 64 errors / 2141 warnings / baseline 64 → **exit 0** |
+| 2 | `tsc --noEmit` api-server | clean |
+| 3 | 신규 spec `signage-campaign-forced-content-tablet-surface.spec.ts` | **15 / 15 PASS** |
+| 4 | 관련 suite `(signage\|tablet\|screen.?set\|forced\|campaign\|channel)` | **13 suites / 276 tests PASS** |
+| 5 | api-server 전체 Jest | **3690 / 3691 PASS** (220 suites 중 219 PASS) |
+
+4번에는 retirement 의 경계 가드인 `channels-stack-retirement.spec.ts` 가 포함되어 **PASS** 다.
+5번의 유일한 실패는 §13-1 에 기록한 것과 동일한 로컬 build 잔여물
+(`packages/ecommerce-core/{dist,node_modules,tsconfig.tsbuildinfo}`, `git ls-files` 빈 출력)이며
+본 변경과 무관하고 clean checkout(CI)에서는 통과한다. 테스트 삭제·skip 0.
