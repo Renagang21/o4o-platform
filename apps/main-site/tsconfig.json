@@ -16,9 +16,7 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@o4o-apps/signage": ["../../packages/@o4o-apps/signage"],
-      "@o4o-apps/signage/*": ["../../packages/@o4o-apps/signage/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"],

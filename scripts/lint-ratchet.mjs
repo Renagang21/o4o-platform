@@ -36,7 +36,10 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 /** 현재 남아 있는 기존 ESLint 오류 수. 내리는 방향으로만 갱신할 것. */
-const ERROR_BASELINE = 65;
+// WO-O4O-SIGNAGE-LEGACY-STACK-SIMPLIFICATION-AND-TABLET-AUTHORING-CLOSURE-V1:
+//   main(65) 과 본 브랜치(63) 가 같은 줄을 각각 낮춰 merge 충돌 → 병합 트리에서 실측 재산출.
+//   실측 64 (44 파일, 전부 본 작업과 무관한 기존 오류). 추정값을 쓰지 않는다.
+const ERROR_BASELINE = 64;
 
 const baseline = Number(process.env.LINT_ERROR_BASELINE ?? ERROR_BASELINE);
 const reportPath = join(tmpdir(), `eslint-ratchet-${process.pid}.json`);

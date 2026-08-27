@@ -582,9 +582,6 @@ importers:
       '@o4o-apps/digital-signage-core':
         specifier: workspace:*
         version: link:../../packages/digital-signage-core
-      '@o4o-apps/signage':
-        specifier: workspace:*
-        version: link:../../packages/@o4o-apps/signage
       '@o4o-extensions/organization-forum':
         specifier: workspace:*
         version: link:../../packages/organization-forum
@@ -1249,43 +1246,6 @@ importers:
         specifier: ^5.0.8
         version: 5.4.19(@types/node@20.19.25)(lightningcss@1.30.2)(terser@5.44.1)
 
-  packages/@o4o-apps/signage:
-    dependencies:
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../../types
-      '@tanstack/react-query':
-        specifier: ^5.0.0
-        version: 5.90.11(react@19.2.0)
-      class-transformer:
-        specifier: ^0.5.0
-        version: 0.5.1
-      class-validator:
-        specifier: ^0.14.0
-        version: 0.14.2
-      react:
-        specifier: 19.2.0
-        version: 19.2.0
-      react-router-dom:
-        specifier: ^6.0.0 || ^7.0.0
-        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      typeorm:
-        specifier: ^0.3.0
-        version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.25
-      '@types/react':
-        specifier: 19.2.7
-        version: 19.2.7
-      rimraf:
-        specifier: ^5.0.0
-        version: 5.0.10
-      typescript:
-        specifier: ^5.3.0
-        version: 5.9.3
-
   packages/account-ui:
     dependencies:
       '@o4o/types':
@@ -1747,19 +1707,6 @@ importers:
     devDependencies:
       typescript:
         specifier: ^5.3.3
-        version: 5.9.3
-
-  packages/digital-signage-contract:
-    dependencies:
-      axios:
-        specifier: ^1.6.0
-        version: 1.13.2
-    devDependencies:
-      '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.25
-      typescript:
-        specifier: ^5.3.0
         version: 5.9.3
 
   packages/digital-signage-core:

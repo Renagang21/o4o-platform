@@ -138,10 +138,12 @@ beforeEach(() => {
 });
 
 describe('census — UUID parameter route 전수 (미조사 0)', () => {
-  it('authenticated router: UUID parameter route 39개가 모두 validator 를 가진다', () => {
+  it('authenticated router: UUID parameter route 33개가 모두 validator 를 가진다', () => {
     const router: any = createSignageRoutes(fakeDataSource);
     const targets = uuidParamRoutes(router);
-    expect(targets.length).toBe(39);
+    // WO-O4O-SIGNAGE-LEGACY-STACK-SIMPLIFICATION-AND-TABLET-AUTHORING-CLOSURE-V1:
+    //   content-blocks/:id (get·patch·delete) + layout-presets/:id (get·patch·delete) 6건 은퇴로 39 → 33.
+    expect(targets.length).toBe(33);
 
     const layers = router.stack.filter((l: any) => l.route);
     for (const t of targets) {

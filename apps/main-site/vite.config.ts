@@ -8,7 +8,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@o4o-apps/signage': path.resolve(__dirname, '../../packages/@o4o-apps/signage'),
     },
   },
   server: {
