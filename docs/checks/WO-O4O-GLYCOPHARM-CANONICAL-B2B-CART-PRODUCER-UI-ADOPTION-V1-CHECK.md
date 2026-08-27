@@ -199,7 +199,32 @@ ActionBar 액션도 조건부다. KPA-Society · K-Cosmetics 는 prop 을 주지
 
 - 작업 격리 worktree: `C:/tmp/o4o-b2b-buyer-order-read` (branch `work/b2b-confirm-service-agnostic-v1`, base `origin/main` `063e811a5`)
 - Safe Commit 계약 준수: 명시 경로 `git add` → `node scripts/git/check-staged-scope.mjs` → 경로 스코프 commit. `git add .` 미사용, 타 세션 파일 미조작.
-- commit / push / CI 결과는 아래에 추가한다.
+- commit / push / CI 결과 (§48):
+
+| 항목 | 실측 |
+|---|---|
+| 커밋 1 | `1690f1377` feat(glycopharm): 승인 공급 카탈로그를 canonical B2B 장바구니 producer 로 연결한다 (14 파일) |
+| 커밋 2 | `c1ee1941a` fix(glycopharm): cart payload 테스트의 Record 캐스팅을 tsc 통과하도록 고친다 (1 파일) |
+| 최종 base | `origin/main` `b5bab1f4d` |
+| remote head | `c1ee1941a` — local HEAD 와 일치 확인 |
+| PR | [#185](https://github.com/Renagang21/o4o-platform/pull/185), `mergeable: MERGEABLE` |
+| CI Pipeline | **success** |
+| Guard Policy Check | success |
+| CodeQL Security Analysis | success |
+| PR Size Labeler | success |
+
+**rebase 기록.** 작업 중 `origin/main` 이 3회 앞서 나갔다(`4be07ba57` → `d16c38caf` → `b5bab1f4d`).
+매번 `.github/workflows/ci-pipeline.yml` 에서 충돌했으나 세 경우 모두 **서로 겹치지 않는 additive
+CI step** 이었으므로 양쪽을 모두 유지해 해소했다. 어느 쪽 step 도 삭제하지 않았다:
+package-level Vitest 5 step(`4be07ba57`) · package-level Jest 3 step(`18033e1cf`) ·
+본 WO 의 web-glycopharm Vitest 1 step 이 최종 파일에 모두 존재한다(실측 4·1건).
+remote 정렬에는 `--force-with-lease` 만 사용했다(`--force` 미사용) — 사용자 승인 후 수행.
+
+**CI 가 잡은 결함 1건.** 로컬 vitest 는 타입 검사를 하지 않으므로 `AddCartItemInput` 에
+index signature 가 없어 `as Record<string, unknown>` 직접 캐스팅이 TS2352 로 막히는 것을
+로컬에서 놓쳤고, CI `type-check:frontend` 의 `services/web-glycopharm` 단계에서 처음 드러났다.
+`as unknown as Record<string, unknown>` 으로 고쳤다(커밋 2). §14 검사 의도는 불변 —
+런타임 키 존재 여부만 본다.
 
 ## 7. DEFERRED
 
