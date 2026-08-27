@@ -162,6 +162,72 @@ backend `requireAdmin` **무변경**. GlycoPharm 의 메뉴/route 진입점만 �
 
 ---
 
-## 9. 종료 판정
+## 9. Production E2E (배포 후 실측)
 
-배포 후 production E2E 결과로 갱신한다. (커밋 시점: 미완료)
+- 배포: `Deploy Web Services (Cloud Run)` `204840350` **success**
+- 대상: `https://glycopharm.co.kr`
+- 뷰포트: **1440×900** / **390×844** (두 계정 × 두 뷰포트 = 4회 전수)
+- 절차: 로그인 → `/operator` → AI 메뉴 3건 deep link → **hard refresh** → 네트워크/콘솔 수집
+
+### 9.1 `glycopharm:admin` (roles 에 `platform:super_admin` 없음, 실측 확인)
+
+| 경로 | 메뉴 노출 | 진입 결과 | `/api/ai/admin/*` 호출 |
+|---|:--:|---|:--:|
+| `/operator/ai-report` | ○ | 정상 렌더 (사이드바 `공통 분석 > AI 리포트 · 운영 분석`) | 0건 |
+| `/operator/ai-usage` | **✕** | `🔒 접근 권한이 없습니다` (AccessDenied) | **0건** |
+| `/operator/ai-billing` | **✕** | `🔒 접근 권한이 없습니다` (AccessDenied) | **0건** |
+
+사이드바 실측 텍스트가 `공통 분석 AI 리포트 운영 분석` 으로, `AI 사용량` · `AI 정산` 이 **DOM 에 없다**.
+두 화면은 hard refresh 후에도 동일하게 차단되고, API 를 **한 번도 호출하지 않는다** → 403 이 발생할 여지 자체가 없다.
+
+### 9.2 `platform:super_admin`
+
+| 경로 | 메뉴 노출 | 진입 결과 | `/api/ai/admin/*` 응답 |
+|---|:--:|---|---|
+| `/operator/ai-report` | ○ | 정상 | — |
+| `/operator/ai-usage` | ○ | `AI 사용량 대시보드` 렌더 | `analytics/summary` `by-scope` `by-model` `recent` `quotas/status` **전부 200** |
+| `/operator/ai-billing` | ○ | `AI 정산 관리` 렌더 | `billing` **200** |
+
+사이드바 실측 텍스트: `공통 분석 AI 리포트 AI 사용량 AI 정산 운영 분석`.
+
+### 9.3 완료 조건 판정 (1440×900 · 390×844 동일)
+
+| 항목 | 결과 |
+|---|:--:|
+| 보이는 기능 → 정상 사용 가능 | ✅ |
+| 사용 불가 기능 → 메뉴에서 비노출 | ✅ |
+| 메뉴 보임 + 403 | **0** |
+| unexpected 500 | **0** |
+| white screen | **0** |
+| JS exception | **0** |
+| console error | **0** |
+| cross-service leak | **0** (서비스 admin 은 endpoint 도달 자체 불가) |
+
+### 9.4 회귀 실측
+
+| 대상 | 계정 | 결과 |
+|---|---|---|
+| Neture `/admin/ai-admin` | `platform:super_admin` | `AI 관리` 메뉴 노출 + `Neture \| AI 관리 대시보드` 정상 렌더. JS exception 0 / 5xx 0 → **직전 WO 계약 유지** |
+| Neture `/admin` | `platform:super_admin` | 정상 렌더, 회귀 없음 |
+| KPA-Society `/admin` | `kpa:admin` | `/admin/kpa-dashboard` 정상 렌더. `AI 사용량`/`AI 정산` 메뉴 없음(원래 없음). JS exception 0 / 5xx 0 |
+
+> 미실시로 남긴 항목(숨기지 않고 명시): Neture `/admin/ai-admin` 에 **다른 서비스 admin 계정으로 로그인해 403 을 확인**하려 했으나,
+> 서비스별 L2 credential 이 달라 해당 계정의 Neture 로그인 자체가 실패했다(미인증 → 진입 불가만 확인).
+> Neture 의 서비스-admin 차단은 직전 WO 에서 이미 확정된 계약이고 이번 변경이 Neture 파일을 건드리지 않으므로 회귀 위험은 없다.
+> K-Cosmetics · PharmacyHub 는 `/api/ai/admin` 참조가 0건이라 AI 축 회귀 대상이 아니다.
+
+---
+
+## 10. 최종 판정
+
+```text
+GLYCOPHARM_AI_ROLE_CONTRACT = CLOSED
+MENU_GUARD_MISMATCH         = 0
+UNEXPECTED_403              = 0
+UNJUDGED                    = 0
+MUST_FIX_BEFORE_CLOSE       = 0
+```
+
+잔여(별도 WO 권장, 이번 WO 종료를 막지 않음):
+1. `/operator/ai-report` — backend 계약 없는 mock 상수 화면(D 판정). 은퇴 또는 실데이터 연결 필요.
+2. `packages/ui` vitest 가 CI 에서 실행되지 않아 메뉴 가시성 회귀를 잠글 자동 검증이 없다.
