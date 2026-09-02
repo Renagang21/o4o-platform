@@ -14,7 +14,15 @@
  *
  * 의미 보존:
  *   - "내 매장에 추가" = 공급 상품 신청 (`api.applyBySupplyProductId` → ProductApproval(PENDING)).
- *     신청 ≠ 주문. 주문/장바구니/발주 버튼 미혼입.
+ *     신청 ≠ 주문. 신청 버튼은 어떤 경우에도 주문을 만들지 않는다.
+ *
+ * WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1:
+ *   `cart` prop 이 주어진 서비스에 한해 **opt-in** 으로 canonical B2B 장바구니 producer
+ *   (행 단위 · 선택 일괄)를 추가한다. prop 미지정이면 렌더 트리·액션·문구가 종전과 완전히 동일하므로
+ *   KPA-Society / K-Cosmetics 화면은 영향을 받지 않는다.
+ *   담기는 `store_cart_items` 에 담을 뿐이며 주문이 아니다 — 주문 확정은 장바구니의
+ *   `checkout-confirm-b2b` 축이고, 가격/노출/수량 권위는 전부 서버 재검증이다.
+ *   이 화면은 자격(승인·유통·조직)을 스스로 판단하지 않는다.
  *   - 유통유형 탭 PRIVATE = "공급 승인 대상" (구 '판매자 모집' 은 Neture 파트너 모집과 혼동되어 정정됨,
  *     WO-O4O-SELLER-RECRUITMENT-TERMINOLOGY-BOUNDARY-FIX-V1). 되돌리지 않는다.
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
@@ -26,7 +34,7 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import { Plus, Check, Trash2, X, Loader2 } from 'lucide-react';
+import { Plus, Check, Trash2, X, Loader2, ShoppingCart } from 'lucide-react';
 import { ActionBar } from '@o4o/ui';
 import { DataTable, Pagination } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
@@ -81,6 +89,21 @@ export interface SupplyCatalogHubLabels {
   showSupplierLogo?: boolean;
 }
 
+/**
+ * canonical B2B 장바구니 producer (opt-in).
+ *
+ * 이 계약은 카탈로그 행 → `store_cart_items` 한 방향만 담당한다. 주문 생성·가격 확정·
+ * 승인 판정은 전부 서버(`checkout-confirm-b2b`)의 몫이며 여기서 흉내 내지 않는다.
+ */
+export interface SupplyCatalogCartProducer<T extends SupplyCatalogProduct> {
+  /** 한 행을 장바구니에 담는다(수량 1). 실패 시 throw — 화면은 사유를 그대로 보여준다. */
+  addToCart(product: T): Promise<void>;
+  /** 담은 뒤 안내에 노출할 장바구니 경로. */
+  cartHref: string;
+  /** 버튼/안내 문구. 기본 '장바구니'. */
+  label?: string;
+}
+
 export interface SupplyCatalogHubProps<T extends SupplyCatalogProduct> {
   api: SupplyCatalogApi<T>;
   accent: SupplyCatalogAccent;
@@ -95,6 +118,11 @@ export interface SupplyCatalogHubProps<T extends SupplyCatalogProduct> {
   additionalColumns?: ListColumnDef<T>[];
   /** 공급가 아래 보조 라벨 (KPA '서비스가' / '일반가'). null 이면 미표시. */
   renderPriceSublabel?: (item: T) => string | null;
+  /**
+   * canonical B2B 장바구니 producer. **지정한 서비스에서만** 담기 UI 가 나타난다.
+   * 미지정(기본)이면 이 컴포넌트의 동작은 종전과 동일하다.
+   */
+  cart?: SupplyCatalogCartProducer<T>;
 }
 
 // ─── 탭 (유통유형 — KPA canonical 정합) ───────────────────────────────────────
@@ -166,6 +194,7 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
   heading,
   additionalColumns,
   renderPriceSublabel,
+  cart,
 }: SupplyCatalogHubProps<T>) {
   const ac = ACCENT_CLASSES[accent];
   const supplierLabel = labels?.supplierLabel ?? '공급자';
@@ -181,6 +210,13 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   /** 제외 확인 대상 — window.confirm 대신 인라인 다이얼로그(3 서비스 공통). */
   const [removeConfirmId, setRemoveConfirmId] = useState<string | null>(null);
+
+  // ─── 장바구니 producer 상태 (cart prop 이 있을 때만 의미가 있다) ──────────────
+  const cartLabel = cart?.label ?? '장바구니';
+  const [cartAddingId, setCartAddingId] = useState<string | null>(null);
+  const [cartBulkAdding, setCartBulkAdding] = useState(false);
+  const [cartAddedCount, setCartAddedCount] = useState(0);
+  const [cartError, setCartError] = useState<string | null>(null);
 
   // WO-O4O-STORE-HUB-SUPPLY-PRODUCT-EXPLORER-COMMONIZATION-V1:
   //   목록 조회 · 페이지네이션 · 탭 · loading/empty/error 상태를 공통 Core(useSupplyProductList)로 위임.
@@ -244,6 +280,48 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
     const { successCount } = await application.bulkApply(targets, { allAlreadyAdded });
     if (successCount > 0 || targets.length > 0) setSelectedIds(new Set());
   }, [application, products, selectedIds]);
+
+  // ─── 장바구니 담기 (opt-in) ───────────────────────────────────────────────
+  //   담기 = 주문 준비. 승인/유통/조직 자격은 확정 시 서버가 판정하므로 여기서 선차단하지 않는다.
+  const handleAddToCart = useCallback(
+    async (product: T) => {
+      if (!cart || cartAddingId || cartBulkAdding) return;
+      setCartAddingId(product.id);
+      setCartError(null);
+      try {
+        await cart.addToCart(product);
+        setCartAddedCount(c => c + 1);
+      } catch (e) {
+        setCartError((e as { message?: string })?.message || '장바구니에 담지 못했습니다.');
+      } finally {
+        setCartAddingId(null);
+      }
+    },
+    [cart, cartAddingId, cartBulkAdding],
+  );
+
+  const handleBulkAddToCart = useCallback(async () => {
+    if (!cart || cartBulkAdding) return;
+    const targets = products.filter(p => selectedIds.has(p.id));
+    if (targets.length === 0) return;
+    setCartBulkAdding(true);
+    setCartError(null);
+    let ok = 0;
+    const failed: string[] = [];
+    // 한 건 실패가 나머지를 막지 않는다. 실패 사유는 서버 문구를 그대로 보여준다.
+    for (const t of targets) {
+      try {
+        await cart.addToCart(t);
+        ok += 1;
+      } catch (e) {
+        failed.push(`${t.name}: ${(e as { message?: string })?.message || '담기 실패'}`);
+      }
+    }
+    setCartAddedCount(c => c + ok);
+    setCartError(failed.length > 0 ? failed.join(' / ') : null);
+    setCartBulkAdding(false);
+    if (ok > 0) setSelectedIds(new Set());
+  }, [cart, cartBulkAdding, products, selectedIds]);
 
   const notAddedSelectedCount = useMemo(
     () => [...selectedIds].filter(k => !products.find(p => p.id === k)?.isAdded).length,
@@ -311,6 +389,32 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
       },
     },
     ...(additionalColumns ?? []),
+    // 장바구니 컬럼 — cart prop 이 있을 때만 존재한다(다른 서비스는 컬럼 자체가 없다).
+    ...(cart
+      ? [{
+          key: '_cart',
+          header: cartLabel,
+          system: true,
+          align: 'center' as const,
+          width: '90px',
+          onCellClick: () => {},
+          render: (_v: unknown, row: T) => (
+            <div className="flex items-center justify-center">
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); handleAddToCart(row); }}
+                disabled={cartAddingId === row.id || cartBulkAdding}
+                title={`${cartLabel}에 담기`}
+                className={`inline-flex items-center justify-center w-7 h-7 rounded-full disabled:opacity-60 ${ac.applyBtn}`}
+              >
+                {cartAddingId === row.id
+                  ? <Loader2 className="w-4 h-4 animate-spin" />
+                  : <ShoppingCart className="w-4 h-4" />}
+              </button>
+            </div>
+          ),
+        } as ListColumnDef<T>]
+      : []),
     {
       key: '_actions',
       header: '액션',
@@ -357,7 +461,7 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
         );
       },
     },
-  ], [applyingId, removingId, ac, supplierLabel, storeNoun, showSupplierLogo, additionalColumns, renderPriceSublabel]); // eslint-disable-line react-hooks/exhaustive-deps
+  ], [applyingId, removingId, ac, supplierLabel, storeNoun, showSupplierLogo, additionalColumns, renderPriceSublabel, cart, cartLabel, cartAddingId, cartBulkAdding, handleAddToCart]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const totalPages = list.totalPages;
   const currentPage = list.page;
@@ -435,6 +539,23 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
         </div>
       ) : (
         <>
+          {/* 장바구니 담기 결과 — 담기 ≠ 주문. 확정은 장바구니에서 한다. */}
+          {cart && cartAddedCount > 0 && (
+            <div className="mb-3 flex items-start gap-2 px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-600">
+              <span className="shrink-0">🛒</span>
+              <span>
+                {cartLabel}에 <strong>{cartAddedCount}건</strong> 담았습니다. 담기는 주문이 아니며,
+                수량 변경과 주문 확정은 장바구니에서 합니다.{' '}
+                <a href={cart.cartHref} className={ac.linkBold}>{cartLabel}로 이동 →</a>
+              </span>
+            </div>
+          )}
+          {cart && cartError && (
+            <div className="mb-3 px-4 py-3 rounded-lg border border-red-200 bg-red-50 text-sm text-red-600">
+              {cartError}
+            </div>
+          )}
+
           {/* ActionBar — 선택 항목 있을 때만 */}
           <div className="mb-3">
             <ActionBar
@@ -457,6 +578,19 @@ export function SupplyCatalogHub<T extends SupplyCatalogProduct>({
                   tooltip: `선택한 상품을 ${storeNoun}에 일괄 추가합니다`,
                   visible: selectedIds.size > 0,
                 },
+                ...(cart
+                  ? [{
+                      key: 'bulk-cart',
+                      label: `${cartLabel}에 담기 (${selectedIds.size})`,
+                      onClick: handleBulkAddToCart,
+                      variant: 'default' as const,
+                      icon: <ShoppingCart className="w-3.5 h-3.5" />,
+                      loading: cartBulkAdding,
+                      group: 'actions',
+                      tooltip: `선택한 상품을 ${cartLabel}에 담습니다 (주문 확정은 장바구니에서)`,
+                      visible: selectedIds.size > 0,
+                    }]
+                  : []),
                 {
                   key: 'clear',
                   label: '선택 해제',

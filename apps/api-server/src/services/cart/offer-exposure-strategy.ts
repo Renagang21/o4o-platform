@@ -103,6 +103,14 @@ export interface OfferExposureStrategy {
  * `offer_service_approvals` 의 승인 행이 노출 권위다. 프로덕션에 승인 행이 몇 건인지와
  * 무관하게 게이트를 완화하지 않는다 — 0건이면 "공급 승인/온보딩이 없다"는 사실이지
  * 게이트를 낮출 근거가 아니다.
+ *
+ * 표기 축 (WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1 §19):
+ *   `offer_service_approvals.approval_status` 는 **소문자** 도메인이다
+ *   (entity default 'pending', backfill migration 'approved', 카탈로그 SSOT
+ *   `buildServiceApprovalGateSql` 도 'approved').
+ *   대문자 'APPROVED' 는 `supplier_product_offers.approval_status` 의 축이다.
+ *   두 축을 섞으면 EXISTS 가 항상 거짓이 되어 승인축 서비스 전체의 B2B confirm 이
+ *   조용히 0건이 된다 — 완화가 아니라 정합의 문제다.
  */
 const approvalStrategy: OfferExposureStrategy = {
   key: 'approval',
@@ -112,7 +120,8 @@ const approvalStrategy: OfferExposureStrategy = {
                 SELECT 1 FROM offer_service_approvals osa
                  WHERE osa.offer_id = spo.id
                    AND osa.service_key = $2
-                   AND osa.approval_status = 'APPROVED'
+                   -- 소문자 도메인이다 (윗 주석 참조). 대문자로 비교하지 않는다.
+                   AND osa.approval_status = 'approved'
               )`,
   gate(offer, ctx) {
     if (offer.master_status !== 'ACTIVE') {
