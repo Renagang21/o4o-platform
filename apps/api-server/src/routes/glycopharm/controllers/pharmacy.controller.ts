@@ -19,7 +19,6 @@ import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 // GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 // Orders will be handled via E-commerce Core with OrderType.GLYCOPHARM
 import type { PharmacyContextRequest } from '../pharmacy-context.middleware.js';
-import { GlycopharmRepository } from '../repositories/glycopharm.repository.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -194,74 +193,11 @@ export function createPharmacyController(
   return router;
 }
 
-/**
- * Create B2B products controller
- *
- * WO-GLYCOPHARM-B2B-PRODUCT-SEED-LINKING-V1 (Task T1-T2)
- * - Query actual products from database
- * - Filter by status='active' for both franchise and general B2B
- */
-export function createB2BController(
-  dataSource: DataSource,
-  requireAuth: AuthMiddleware
-): Router {
-  const router = Router();
-  const repository = new GlycopharmRepository(dataSource);
-
-  /**
-   * GET /b2b/products
-   * Get B2B products (franchise or general)
-   */
-  router.get(
-    '/products',
-    requireAuth,
-    async (req: Request, res: Response): Promise<void> => {
-      try {
-        const type = req.query.type as string; // 'franchise' or 'general'
-        const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 100;
-
-        // Query active products from database with type filter
-        // franchise → is_featured = true (exclusive products for franchise partners)
-        // general → all active products
-        const result = await repository.findAllProducts({
-          status: 'active',
-          is_featured: type === 'franchise' ? true : undefined,
-          page,
-          limit,
-        });
-
-        // Map to B2B product format
-        const products = result.data.map((product) => ({
-          id: product.id,
-          name: product.name,
-          category: product.category,
-          price: Number(product.price),
-          discountPrice: product.sale_price ? Number(product.sale_price) : undefined,
-          supplierName: product.manufacturer || 'Unknown',
-          image: product.images?.[0]?.url,
-          stock: product.stock_quantity,
-          status: product.status,
-          type: type || 'general',
-          isRecommended: product.is_featured || false,
-        }));
-
-        res.json({
-          success: true,
-          data: products,
-          meta: result.meta,
-        });
-      } catch (error: any) {
-        console.error('Failed to get B2B products:', error);
-        res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: error.message },
-        });
-      }
-    }
-  );
-
-  return router;
-}
+// WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1 §6:
+// createB2BController (GET /api/v1/glycopharm/b2b/products) removed.
+// legacy `glycopharm_products` 를 읽던 dead 경로였고 runtime consumer 0 이었다.
+// 매장 B2B 상품 조회의 canonical 경로는 `/api/v1/store/commerce/products` ·
+// `/api/v1/{service}/pharmacy/products/*` (supplier_product_offers 축)다.
 
 // WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1:
 // createMarketTrialsController removed.

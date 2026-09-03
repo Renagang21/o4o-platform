@@ -30,6 +30,20 @@ import type { CheckoutConfirmResult, StoreCartApi, SupplierGroup } from './store
 /** 장바구니에 b2b/regular(공급자 offer 직접 구매) 항목이 있으면 B2B 확정 경로를 쓴다. */
 const B2B_SOURCE_TYPES = new Set(['b2b', 'regular']);
 
+/** 이벤트오퍼 축 — 별도 확정 경로(`checkout-confirm`)와 별도 재고 예약 계약을 갖는다. */
+const EVENT_SOURCE_TYPES = new Set(['event_offer']);
+
+/**
+ * 축 혼재 안내 문구 (WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1 §8).
+ *
+ * 한 장바구니에 두 축이 섞이면 어느 경로로 보내도 반대 축 항목은 서버에서 항목 단위로
+ * 탈락한다(`UNSUPPORTED_CART_ITEM_SOURCE`). 서버는 이미 fail-closed 라 오염은 없지만
+ * 사용자에게는 "일부만 주문됨" 으로 보인다. 그래서 **확정 자체를 막고** 축을 나눠
+ * 주문하도록 안내한다 — 새 cart 구조를 만들지 않는 최소 처리다.
+ */
+export const MIXED_CART_AXIS_MESSAGE =
+  '이벤트 상품과 공급자 상품은 함께 주문할 수 없습니다. 한 축씩 나눠 주문해 주세요.';
+
 export interface UseStoreCartOptions {
   api: StoreCartApi;
   /** cart 경계 키 (URL 경로 파라미터). 예: 'kpa-society' · 'k-cosmetics' · 'glycopharm' */
@@ -134,8 +148,15 @@ export function useStoreCart({ api, serviceKey }: UseStoreCartOptions): UseStore
     setConfirming(true);
     setConfirmResult(null);
     try {
-      // 담긴 축이 경로를 결정한다. 두 축이 섞이는 경우는 없다(서비스별로 한 축만 담긴다).
-      const hasB2B = groups.some((g) => g.items.some((i) => B2B_SOURCE_TYPES.has(i.sourceType)));
+      // 담긴 축이 경로를 결정한다.
+      const items = groups.flatMap((g) => g.items);
+      const hasB2B = items.some((i) => B2B_SOURCE_TYPES.has(i.sourceType));
+      const hasEvent = items.some((i) => EVENT_SOURCE_TYPES.has(i.sourceType));
+      // 축 혼재는 확정하지 않는다 — 반쪽 주문 대신 사용자에게 분리 주문을 안내한다.
+      if (hasB2B && hasEvent) {
+        toast.error(MIXED_CART_AXIS_MESSAGE);
+        return;
+      }
       const data: CheckoutConfirmResult =
         hasB2B && api.checkoutConfirmB2B
           ? await api.checkoutConfirmB2B(serviceKey).then((res) => ({
@@ -164,7 +185,7 @@ export function useStoreCart({ api, serviceKey }: UseStoreCartOptions): UseStore
     } finally {
       setConfirming(false);
     }
-  }, [api, serviceKey, confirming, busy, groups.length, load]);
+  }, [api, serviceKey, confirming, busy, groups, load]);
 
   // WO-O4O-STORE-CART-SUPPLIER-GROUP-SHIPPING-PREVIEW-V1: 상품/배송비/총액 분리 (서버 값 합산만).
   const itemsSubtotal = groups.reduce((sum, g) => sum + g.displaySubtotal, 0);

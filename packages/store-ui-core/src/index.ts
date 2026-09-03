@@ -310,7 +310,7 @@ export type {
 } from './components/store-cart/storeCartTypes';
 export { createStoreCartApi } from './components/store-cart/createStoreCartApi';
 export type { StoreCartHttp, StoreCartApiClient } from './components/store-cart/createStoreCartApi';
-export { useStoreCart } from './components/store-cart/useStoreCart';
+export { useStoreCart, MIXED_CART_AXIS_MESSAGE } from './components/store-cart/useStoreCart';
 export type { UseStoreCartOptions, UseStoreCartResult } from './components/store-cart/useStoreCart';
 export { StoreCartView } from './components/store-cart/StoreCartView';
 export type { StoreCartViewProps, StoreCartAccent } from './components/store-cart/StoreCartView';

@@ -91,6 +91,10 @@ export interface OfferExposureStrategy {
   /**
    * offer enrich 쿼리에 추가되는 WHERE 절.
    * `$1` = offerIds(text[]), `$2` = serviceKey. 파라미터 바인딩만 쓴다(문자열 결합 금지).
+   *
+   * **soft delete(`spo.deleted_at`)는 여기에 넣지 않는다.** 삭제된 offer 배제는 공급 노출 정책이
+   * 아니라 3축 공통 불변식이며 `b2b-checkout-confirm.core.ts` 의 base 쿼리가 소유한다
+   * (WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1 DF-6 — 축마다 복사하다 `neture` 에서 누락됐다).
    */
   readonly offerWhereSql: string;
   /** 행 단위 공급 노출 판정. 통과면 null. */
@@ -115,7 +119,6 @@ export interface OfferExposureStrategy {
 const approvalStrategy: OfferExposureStrategy = {
   key: 'approval',
   offerWhereSql: `
-          AND spo.deleted_at IS NULL
           AND EXISTS (
                 SELECT 1 FROM offer_service_approvals osa
                  WHERE osa.offer_id = spo.id
@@ -152,7 +155,6 @@ const approvalStrategy: OfferExposureStrategy = {
 const optinStrategy: OfferExposureStrategy = {
   key: 'optin',
   offerWhereSql: `
-          AND spo.deleted_at IS NULL
           AND $2 = ANY(spo.service_keys)`,
   gate(offer) {
     if (offer.distribution_type === 'PRIVATE') {

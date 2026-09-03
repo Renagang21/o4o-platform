@@ -20,6 +20,7 @@ import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
+import { requireActiveServiceMembership } from '../../../middleware/service-membership.middleware.js';
 // WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1:
 //   이벤트 오퍼 주문(metadata.serviceKey='glycopharm-event-offer')이 구매자 주문 목록/상세에서
 //   누락되던 결함. 기록(쓰기)은 그대로 두고 조회 범위만 canonical 집합으로 넓힌다.
@@ -265,6 +266,11 @@ export function createCheckoutController(
   router.post(
     '/orders/:orderId/cancel',
     requireAuth,
+    // WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1 §13:
+    //   취소는 canonical `checkout_orders` 상태를 바꾸는 write 다(이벤트오퍼는 재고 복원까지).
+    //   cart write · 두 confirm 경로와 동일하게 active membership 을 요구한다 —
+    //   정지(suspended)/탈퇴 회원이 주문 원장을 바꾸지 못한다. 조회 경로에는 붙이지 않는다.
+    requireActiveServiceMembership(dataSource, SERVICE_KEYS.GLYCOPHARM),
     async (req: Request, res: Response) => {
       try {
         const authReq = req as AuthRequest;

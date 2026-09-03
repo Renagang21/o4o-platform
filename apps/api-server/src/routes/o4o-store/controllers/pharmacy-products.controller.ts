@@ -126,8 +126,12 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 /**
  * 신청 자격 검증 — catalog 목록에 노출될 수 있는 offer 인지 서버에서 재확인한다 (HUB-P0-01).
  *
- * catalog(`GET /catalog`) 의 WHERE 와 동일한 3조건 + 동일한 승인 게이트를 적용한다:
- *   spo.is_active = true / neture_suppliers.status = 'ACTIVE' / buildServiceApprovalGateSql
+ * catalog(`GET /catalog`) 의 WHERE 와 동일한 조건 + 동일한 승인 게이트를 적용한다:
+ *   spo.deleted_at IS NULL / spo.is_active = true / neture_suppliers.status = 'ACTIVE' /
+ *   buildServiceApprovalGateSql
+ *
+ * `spo.deleted_at IS NULL` 은 WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1 DF-6 에서 추가했다 —
+ * soft delete 된 offer 가 catalog · orderable · 신청 · 주문 확정 어느 축에도 남지 않게 한다.
  *
  * 반환: 노출 가능하면 distribution_type, 아니면 null.
  * 호출자는 null 을 404 OFFER_NOT_AVAILABLE 로 변환한다 (WO §8 — 내부 상태 미노출:
@@ -161,6 +165,7 @@ async function findApplicableOffer(
        JOIN neture_suppliers s ON s.id = spo.supplier_id
       WHERE spo.id = $1::uuid
         AND spo.is_active = true
+        AND spo.deleted_at IS NULL
         AND s.status = 'ACTIVE'
         ${gate}
         ${sellerScope}
@@ -301,6 +306,7 @@ export function createPharmacyProductsController(
        LEFT JOIN organizations o ON o.id = s.organization_id
        WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE', 'PRIVATE')
          AND spo.is_active = true
+         AND spo.deleted_at IS NULL
          AND s.status = 'ACTIVE'
          ${categoryFilter}
          ${distributionFilter}
@@ -350,6 +356,7 @@ export function createPharmacyProductsController(
        JOIN neture_suppliers s ON s.id = spo.supplier_id
        WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE', 'PRIVATE')
          AND spo.is_active = true
+         AND spo.deleted_at IS NULL
          AND s.status = 'ACTIVE'
          ${countCategoryFilter}
          ${countDistributionFilter}
@@ -633,6 +640,7 @@ export function createPharmacyProductsController(
         WHERE opl.organization_id = $1
           AND opl.is_active = true
           AND spo.is_active = true
+          AND spo.deleted_at IS NULL
           AND s.status = 'ACTIVE'
           -- WO 답변 정정: 이벤트·특가는 약국 OPL 권위가 아니다. 이벤트 OPL 은 운영자 조직 소유이며
           --   약국은 이벤트 탭(/groupbuy)에서 별도 조회한다. 약국 org OPL 에 존재할 수 있는 유일한

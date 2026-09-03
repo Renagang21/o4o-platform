@@ -5,7 +5,7 @@
  * Route factory for Glycopharm API endpoints
  */
 
-import { Router, RequestHandler, Request, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { ForumQueryService } from '../../modules/forum/index.js';
 import { SignageQueryService } from '../../modules/signage/index.js';
@@ -56,7 +56,7 @@ import { createAssetSnapshotController } from '../o4o-store/controllers/asset-sn
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
 import { createStoreExecutionAssetsController } from '../o4o-store/controllers/store-execution-assets.controller.js'; // WO-O4O-STORE-EXECUTION-ASSETS-CROSSSERVICE-PHASE2-D-V1
 import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
-import { createPharmacyController, createB2BController } from './controllers/pharmacy.controller.js';
+import { createPharmacyController } from './controllers/pharmacy.controller.js';
 import { createCustomerRequestController } from './controllers/customer-request.controller.js'; // Phase 1: Common Request
 import { createEventController } from './controllers/event.controller.js'; // Phase 2-A: Event → Request
 import { createFunnelController } from './controllers/funnel.controller.js'; // Phase 3-A: Funnel Visualization
@@ -75,7 +75,6 @@ import { createOperatorProductApplicationsController } from '../kpa/controllers/
 // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1: 판매자 모집 노출 승인 (glycopharm 고정 proxy)
 import { createServiceRecruitmentExposureProxyController } from '../../modules/neture/controllers/service-recruitment-exposure-proxy.controller.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
-import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 import { GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 import { ActionLogService } from '@o4o/action-log-core';
@@ -355,12 +354,9 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   );
   router.use('/', invoiceDispatchController);
 
-  // B2B products routes
-  const b2bController = createB2BController(
-    dataSource,
-    coreRequireAuth as any
-  );
-  router.use('/b2b', b2bController);
+  // WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1 §6:
+  //   GET /b2b/products (legacy glycopharm_products) 제거 — runtime consumer 0.
+  //   canonical: /api/v1/store/commerce/products · /api/v1/glycopharm/pharmacy/products/*
 
   // Market trials: WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1
   // Removed glycopharm-specific stub. Use common API: GET /api/market-trial?serviceKey=glycopharm

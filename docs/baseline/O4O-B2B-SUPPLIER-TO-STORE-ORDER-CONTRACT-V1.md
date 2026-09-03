@@ -227,6 +227,14 @@ Pharmacy-Hub 의 역할/스코프 가드를 걸 수 없었다.
 | 결제 후 · **공급자 접수 전 한정** | `POST /store-owner/payments/:paymentGroupId/cancel` | 결제 그룹 전체 |
 | 공급자 접수 후 | **경로 없음** | 신설하지 않는다 |
 
+**불변식 L0** (WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1 §13).
+주문 취소는 **write** 다 — `checkout_orders` 상태를 바꾸고 이벤트오퍼는 예약 재고까지 되돌린다.
+따라서 cart write · 두 confirm 경로와 **동일하게 active service membership 을 요구**한다
+(`requireActiveServiceMembership`, 403 `SERVICE_MEMBERSHIP_REQUIRED`).
+정지(suspended)·탈퇴 회원은 주문 원장을 바꿀 수 없다.
+반대로 **조회(목록·상세)에는 membership 게이트를 걸지 않는다** — 자기 주문 열람은 write 가 아니고,
+경계는 이미 `buyerId + serviceKeys` 로 닫혀 있다.
+
 **불변식 L1.** 배송비 · 가격 · 최소주문 조건은 공급자 offer 및 공급자 주문 조건
 (`GET /api/v1/neture/suppliers/:id/order-condition`) 에서 온다. **새 pricing engine 을 만들지 않는다.**
 
@@ -310,6 +318,7 @@ KPA · GlycoPharm · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 �
 | DF-7 | GlycoPharm 다중 매장(조직) 사용자를 위한 **조직 선택 UI 가 없다.** 서버는 `AMBIGUOUS_STORE_ORGANIZATION` 으로 fail closed 하고 화면은 그 사유를 그대로 보여준다 | 임의로 첫 조직을 고르지 않는 것이 계약(§13-3)이다. 선택 UI 는 조직 목록 조회 표면이 새로 필요하므로 별도 WO |
 | DF-8 | 승인축 `gate` 의 PRIVATE 판정은 `allowed_seller_ids` 를 **buyerId(사용자)** 와 비교하는데, 카탈로그 노출 판정은 **organizationId(매장)** 와 비교한다 — 카탈로그에 보이는 PRIVATE offer 가 confirm 에서 거부될 수 있다 | 공급 승인 정책의 축을 바꾸는 변경이고 glycopharm · kpa-society · k-cosmetics 3서비스에 동시 영향이다. 완화가 아니라 축 정렬이므로 별도 WO |
 | DF-6 | `neture` 노출 strategy 는 `spo.deleted_at IS NULL` 을 걸지 않는다 — soft-delete 된 offer 가 Neture confirm 에서 여전히 보인다 | 현행 main 과 **정확히 동일한 동작**이다. confirm 공통화 WO 에서 Neture 노출 범위를 바꾸면 §22 회귀 위험. 별도 WO 로 축소 |
+| ↳ **DF-6 종결** | `WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1` | soft delete 는 서비스별 공급 노출 정책이 아니라 **3축 공통 불변식**이라고 판정하고, strategy 조각이 아니라 `b2b-checkout-confirm.core.ts` 의 base 쿼리가 소유하게 옮겼다(`approval`/`optin` 조각에서 제거 · `neture` 축이 자동 상속). 같은 게이트를 catalog SSOT 4개 쿼리(`/catalog` 목록·건수 · `findApplicableOffer` · `/orderable`)에도 맞췄다 — `삭제된 offer → catalog 미노출 → cart 담기 불가 → confirm 불가` |
 
 **DEFERRED 는 "모른다" 가 아니다.** 판정은 끝났고 실행만 미룬 것이다. `UNKNOWN = 0`.
 
@@ -431,6 +440,12 @@ confirm 의 노출 SQL 은 카탈로그 SSOT(`buildServiceApprovalGateSql`)와 *
 섞이면 `EXISTS` 가 항상 거짓이 되어 승인축 서비스 전체의 B2B confirm 이 조용히 0건이 된다.
 이는 게이트 완화가 아니라 정합 문제이며, 회귀 테스트로 고정한다
 (`offer-exposure-strategy.test.ts` · `store-b2b-cart-checkout.test.ts`).
+
+**불변식 C7** (WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1, DF-6 종결).
+`spo.deleted_at IS NULL` 은 **strategy 조각이 아니라 Core 의 base 쿼리**가 소유한다.
+삭제된 offer 가 주문 가능한지는 서비스별 공급 노출 정책이 아니라 offer 자체의 존재 여부이므로
+3축 공통 불변식이다. 축마다 복사하면 축이 늘어날 때 누락되며 실제로 `neture` 축에 누락돼 있었다.
+`offerWhereSql` 에 soft-delete 조건을 다시 넣지 않는다 — 회귀 테스트가 그 부재를 단언한다.
 
 ### 13-3. buyer 매장 조직 — **서버가 권위다**
 
@@ -554,11 +569,33 @@ WO-O4O-KPA-INTEREST-PRODUCT-WORKTABLE-TO-CANONICAL-CART-ADOPTION-V1.
 - B2B 담기 대상 공급유형은 `b2b` · `operator` 뿐이다.
 - `event_offer` 는 기존 `checkout-confirm` 축 그대로 두고 승격하지 않는다.
 - `seller_recruitment` 는 주문 경로가 아니다.
-- KPA cart 에는 이벤트오퍼 항목이 이미 존재할 수 있고, `useStoreCart` 는 b2b 항목이
-  하나라도 있으면 cart 전체를 `checkout-confirm-b2b` 로 보낸다. 서버는 항목별로
-  fail-closed 하지만, 사용자에게 부분 실패로 보이지 않도록 **작업대에서 담기 전에
-  이벤트오퍼 혼재를 차단**한다. 이는 §13-6 의 "frontend 선판단 금지" 에 대한
+- KPA cart 에는 이벤트오퍼 항목이 이미 존재할 수 있다. 서버는 항목별로 fail-closed 하지만,
+  사용자에게 부분 실패로 보이지 않도록 **작업대에서 담기 전에 이벤트오퍼 혼재를 차단**한다. 이는 §13-6 의 "frontend 선판단 금지" 에 대한
   **명시적 예외**이며, 자격 판정이 아니라 **축 혼재 방지**다. 서버 판정을 완화하지 않는다.
 
 계약 고정: `services/web-kpa-society/src/utils/worktableCart.ts` +
 `src/utils/__tests__/worktableCart.test.ts` (CI `ci-pipeline.yml` 에서 실행).
+
+### 13-9. 확정 경로는 **담긴 축**이 결정한다 (2026-09-03)
+
+> 등재: `WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1` §7 · §8.
+
+`packages/store-ui-core` 의 `useStoreCart.confirmCheckout` 계약:
+
+| cart 내용 | 확정 경로 |
+|---|---|
+| `b2b` / `regular` 만 | `POST /cart/:serviceKey/checkout-confirm-b2b` |
+| `event_offer` 만 | `POST /cart/:serviceKey/checkout-confirm` |
+| 두 축 혼재 | **어느 경로도 호출하지 않는다** — 분리 주문 안내(`MIXED_CART_AXIS_MESSAGE`) |
+
+이전에는 b2b 항목이 하나라도 있으면 cart 전체를 `checkout-confirm-b2b` 로 보냈다.
+서버가 항목 단위로 fail-closed 하므로 **축 오염은 없었지만** 사용자에게는 "반쪽 주문"으로 보였다.
+새 cart architecture 를 만들지 않고 경로 선택만 고쳤다(§8 — 새 cart 구조 금지).
+
+적용 범위: `useStoreCart` 를 쓰는 KPA-Society · GlycoPharm · K-Cosmetics.
+Neture 매장 장바구니(`services/web-neture/.../StoreCartPage.tsx`)는 이 hook 을 쓰지 않지만
+`neture` 축에는 event-offer producer 자체가 없어(`getBuyerOrderServiceKeys` 의 event-offer 키는
+KPA/GP/K-Cosmetics 전용) 혼재가 성립하지 않는다 — **억지로 hook 으로 이관하지 않는다**.
+Pharmacy-Hub 는 자체 cart 표면을 유지한다(§13-4).
+
+계약 고정: `packages/store-ui-core/src/components/store-cart/__tests__/useStoreCart.axis-separation.test.tsx`.

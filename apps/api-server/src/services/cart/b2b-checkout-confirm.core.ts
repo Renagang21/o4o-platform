@@ -166,6 +166,12 @@ export interface B2BConfirmAdapter {
  *
  * `$1` = offerIds(text[]), `$2` = serviceKey. strategy 의 WHERE 절만 뒤에 붙는다 —
  * 값은 전부 파라미터 바인딩이고 strategy 조각은 코드 상수다(사용자 입력 결합 없음).
+ *
+ * soft delete(`spo.deleted_at`)는 **strategy 가 아니라 여기서** 건다
+ * (WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1 DF-6).
+ * 삭제된 offer 가 주문 가능한지는 서비스별 공급 노출 정책이 아니라 offer 자체의 존재 여부이므로
+ * 3축(approval / optin / neture) 공통 불변식이다. strategy 조각에 두면 축이 늘어날 때마다
+ * 누락될 수 있고 실제로 `neture` 축에 누락돼 있었다.
  */
 function buildOfferQuery(strategy: OfferExposureStrategy): string {
   return `SELECT spo.id::text            AS id,
@@ -190,7 +196,8 @@ function buildOfferQuery(strategy: OfferExposureStrategy): string {
             FROM supplier_product_offers spo
             JOIN product_masters pm  ON pm.id = spo.master_id
             JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-           WHERE spo.id::text = ANY($1)${strategy.offerWhereSql}`;
+           WHERE spo.id::text = ANY($1)
+             AND spo.deleted_at IS NULL${strategy.offerWhereSql}`;
 }
 
 export class B2BCheckoutConfirmCore {
