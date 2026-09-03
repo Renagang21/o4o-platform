@@ -177,7 +177,7 @@ pnpm run lint
 pnpm run lint:fix
 pnpm test
 pnpm run build
-pnpm run verify               # 레지스트리 검증 (shortcode / block / CPT)
+pnpm run verify               # 레지스트리 검증 (block / CPT)
 ```
 
 커밋 전 최소 `type-check` + `lint`를 실행합니다.

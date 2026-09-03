@@ -3,7 +3,6 @@ import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
 import { initVersionCheck } from '@/utils/versionCheck'
-import { globalRegistry } from '@o4o/shortcodes'
 import App from './App'
 import './styles/globals.css'
 // WordPress styles will be loaded only when needed
@@ -63,11 +62,6 @@ window.addEventListener('unhandledrejection', (event) => {
     }
   }
 });
-
-// Debug: Expose globalRegistry to window (development only)
-if (import.meta.env.DEV) {
-  (window as any).__shortcodeRegistry = globalRegistry;
-}
 
 // Note: StrictMode disabled for Slate.js compatibility
 // Slate's focus management conflicts with React's double-rendering in development mode

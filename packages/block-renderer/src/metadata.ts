@@ -408,22 +408,6 @@ export const blockMetadata: BlockMetadata[] = [
     aiPrompts: ['소셜 미디어 링크가 필요할 때']
   },
   {
-    name: 'o4o/shortcode',
-    title: '쇼트코드',
-    description: '커스텀 쇼트코드 실행',
-    category: 'widgets',
-    attributes: {
-      shortcode: { type: 'string', description: '쇼트코드' }
-    },
-    example: {
-      json: JSON.stringify({ type: 'o4o/shortcode', content: { shortcode: '[product id="123"]' } }, null, 2),
-      text: '쇼트코드'
-    },
-    version: '1.0.0',
-    tags: ['쇼트코드', 'shortcode'],
-    aiPrompts: ['커스텀 쇼트코드를 사용할 때']
-  },
-  {
     name: 'o4o/feature-card',
     title: 'Feature Card',
     description: '서비스 특징, 기능을 카드 형태로 표시',

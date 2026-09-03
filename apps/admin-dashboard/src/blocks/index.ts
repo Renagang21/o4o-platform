@@ -35,7 +35,6 @@ import separatorBlockDefinition from './definitions/separator';
 
 // Widget blocks
 import socialBlockDefinition from './definitions/social';
-import shortcodeBlockDefinition from './definitions/shortcode';
 import placeholderBlockDefinition from './definitions/placeholder';
 import { timelineChartBlockDefinition } from './generated/TimelineChart.definition.tsx';
 import accordionItemBlockDefinition from './definitions/accordion-item';
@@ -90,7 +89,6 @@ export function registerAllBlocks(): void {
 
   // Register widget blocks
   blockRegistry.register(socialBlockDefinition);
-  blockRegistry.register(shortcodeBlockDefinition);
   blockRegistry.register(placeholderBlockDefinition); // Phase 1-C: Placeholder for missing components
   blockRegistry.register(timelineChartBlockDefinition);
   blockRegistry.register(accordionItemBlockDefinition);

@@ -3,7 +3,7 @@ import { authClient } from '@o4o/auth-client';
 // Types
 export interface AIReference {
   id: string;
-  type: 'blocks' | 'shortcodes' | 'image-prompts';
+  type: 'blocks' | 'image-prompts';
   name: string;
   description: string;
   content: string;

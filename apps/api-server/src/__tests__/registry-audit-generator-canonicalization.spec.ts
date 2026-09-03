@@ -1,11 +1,10 @@
 /**
  * WO-O4O-REGISTRY-AUDIT-GENERATOR-CANONICALIZATION-V1
- *   — `scripts/audit/check-block-registry.ts` · `check-shortcode-registry.ts`
- *     출력 안정성(환경 독립성) 계약 테스트
+ *   — `scripts/audit/check-block-registry.ts` 출력 안정성(환경 독립성) 계약 테스트
  *
  * 배경
  * ---------------------------------------------------------------
- *   두 generator 는 report 에 **실행 머신의 절대경로**와 매 실행 시각의
+ *   generator 는 report 에 **실행 머신의 절대경로**와 매 실행 시각의
  *   timestamp 를 기록했다. 그래서 같은 commit 에서도 머신이 다르면 report 가
  *   통째로 달라졌고, 이것이 선행 WO 두 건에서 report 를 Git 추적에서 뺀
  *   직접 근거(`ENVIRONMENT_DEPENDENT_ARTIFACT`)였다.
@@ -14,7 +13,10 @@
  *     WO-O4O-BLOCK-REGISTRY-REPORT-GENERATED-ARTIFACT-UNTRACK-AND-IGNORE-V1
  *
  *   이번 WO 는 **원인 쪽**을 고친다. report 자체는 계속 git-ignored 다
- *   (추적 계약은 `shortcode-registry-report-untrack.spec.ts` 가 고정한다).
+ *   (추적 계약은 `block-registry-report-untrack.spec.ts` 가 고정한다).
+ *
+ *   shortcode generator 는 WO-O4O-SHORTCODE-DOMAIN-RETIREMENT-V1 에서
+ *   도메인과 함께 은퇴했다. 여기 남은 계약은 block generator 축뿐이다.
  *
  * 고정하는 계약
  * ---------------------------------------------------------------
@@ -30,7 +32,6 @@ import * as path from 'path';
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..', '..');
 const BLOCK_REL = 'scripts/audit/check-block-registry.ts';
-const SHORTCODE_REL = 'scripts/audit/check-shortcode-registry.ts';
 
 const readRoot = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf-8');
 
@@ -78,19 +79,18 @@ describe('generator 경로 canonicalization — Windows/Linux 동일 결과', ()
   });
 
   it('실행 플랫폼의 path 구현으로도 backslash 가 남지 않는다', () => {
-    const abs = path.join(REPO_ROOT, 'packages', 'shortcodes', 'src', 'metadata.ts');
+    const abs = path.join(REPO_ROOT, 'packages', 'block-renderer', 'src', 'metadata.ts');
     const rel = path.relative(REPO_ROOT, abs).split(path.sep).join('/');
 
-    expect(rel).toBe('packages/shortcodes/src/metadata.ts');
+    expect(rel).toBe('packages/block-renderer/src/metadata.ts');
     expect(rel).not.toContain(WIN_SEP);
     expect(path.isAbsolute(rel)).toBe(false);
   });
 });
 
-describe.each([
-  ['block', BLOCK_REL],
-  ['shortcode', SHORTCODE_REL],
-])('%s generator 가 canonicalization 계약을 유지한다', (_label, rel) => {
+describe('block generator 가 canonicalization 계약을 유지한다', () => {
+  const rel = BLOCK_REL;
+
   it('repo root 기준 POSIX 변환 helper 를 갖는다', () => {
     const src = readRoot(rel);
     expect(src).toContain('function toRepoPath(');
@@ -129,10 +129,7 @@ describe.each([
 });
 
 describe('생성된 report 가 남아 있으면 canonical 형태다', () => {
-  const reports = [
-    'scripts/audit/block-registry-report.json',
-    'scripts/audit/shortcode-registry-report.json',
-  ];
+  const reports = ['scripts/audit/block-registry-report.json'];
 
   it.each(reports)('%s — 절대경로 · backslash · 기본 timestamp 가 없다', (rel) => {
     const abs = path.join(REPO_ROOT, rel);

@@ -10,12 +10,11 @@ import {
 /**
  * AI Reference Entity
  *
- * Stores reference data for AI systems (blocks, shortcodes, image prompts, etc.)
+ * Stores reference data for AI systems (blocks, image prompts, etc.)
  * This enables dynamic updates through AI Services UI without code changes.
  *
  * Examples:
  * - type: 'blocks', name: 'blocks-reference' -> Block definitions for AI page generation
- * - type: 'shortcodes', name: 'shortcode-registry' -> Shortcode definitions
  * - type: 'image-prompts', name: 'style-guide' -> Image generation style guide
  * - type: 'video-prompts', name: 'video-templates' -> Video generation templates
  */
@@ -27,7 +26,7 @@ export class AIReference {
 
   /**
    * Reference type - extensible for future AI services
-   * Examples: 'blocks', 'shortcodes', 'image-prompts', 'video-prompts', 'audio-prompts'
+   * Examples: 'blocks', 'image-prompts', 'video-prompts', 'audio-prompts'
    */
   @Column({ type: 'varchar', length: 50 })
   @Index()
@@ -35,7 +34,7 @@ export class AIReference {
 
   /**
    * Reference name - unique within type
-   * Examples: 'blocks-reference', 'shortcode-registry', 'style-guide'
+   * Examples: 'blocks-reference', 'style-guide'
    */
   @Column({ type: 'varchar', length: 255 })
   name!: string;

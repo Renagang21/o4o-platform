@@ -6,10 +6,9 @@ Custom Post Type (CPT) & Advanced Custom Fields (ACF) Engine - Complete document
 
 1. [Quick Start Guide](#quick-start-guide)
 2. [Field Types Reference](#field-types-reference)
-3. [Shortcode Reference](#shortcode-reference)
-4. [API Reference](#api-reference)
-5. [Architecture Overview](#architecture-overview)
-6. [Components Reference](#components-reference)
+3. [API Reference](#api-reference)
+4. [Architecture Overview](#architecture-overview)
+5. [Components Reference](#components-reference)
 
 ---
 
@@ -83,23 +82,6 @@ function ContactPage() {
       onSuccess={(data) => console.log('Submitted:', data)}
     />
   );
-}
-```
-
-### Using Shortcodes
-
-```tsx
-import { ShortcodeRenderer } from '@/features/cpt-acf/components/ShortcodeRenderer';
-
-function TemplatePage() {
-  const content = `
-    Contact us using this form:
-    [cpt_form id="contact-form" showTitle="true"]
-
-    Or view our product price: [acf field="price"]
-  `;
-
-  return <ShortcodeRenderer content={content} />;
 }
 ```
 
@@ -462,80 +444,6 @@ Combined date and time.
 }
 ```
 
----
-
-## Shortcode Reference
-
-### Form Shortcode
-
-Render a form anywhere on your site.
-
-**Syntax:**
-```
-[cpt_form id="form-id"]
-[cpt_form slug="form-slug" showTitle="true" showDescription="true"]
-```
-
-**Attributes:**
-- `id` (optional): Form ID
-- `slug` (optional): Form slug (alternative to id)
-- `showTitle` (optional): Show form title (default: true)
-- `showDescription` (optional): Show form description (default: true)
-
-**Examples:**
-```
-[cpt_form id="contact-form"]
-[cpt_form slug="newsletter-signup" showTitle="false"]
-```
-
-### ACF Field Shortcode
-
-Display ACF field values in templates.
-
-**Syntax:**
-```
-[acf field="field_name"]
-[acf field="field_name" default="Not set"]
-```
-
-**Attributes:**
-- `field` (required): Field name or key
-- `default` (optional): Default value if field is empty
-- `alt` (optional, for images): Alternative text
-
-**Examples:**
-
-**Basic Fields:**
-```
-Product Price: [acf field="price"]
-Description: [acf field="description"]
-```
-
-**Link Field:**
-```
-[acf field="website_url"]
-<!-- Renders: <a href="..." target="_blank">Title</a> -->
-```
-
-**Image Field:**
-```
-[acf field="product_image" alt="Product photo"]
-<!-- Renders: <img src="..." alt="Product photo" /> -->
-```
-
-**Repeater Field:**
-```
-[acf field="team_members"]
-<!-- Renders list of team members with sub-fields -->
-```
-
-**With Default:**
-```
-[acf field="optional_field" default="Not specified"]
-```
-
----
-
 ## API Reference
 
 ### Forms API
@@ -691,8 +599,6 @@ GET /api/cpt-engine/field-groups
 src/features/cpt-acf/
 ├── components/
 │   ├── FormRenderer.tsx           # Front-end form rendering
-│   ├── ShortcodeRenderer.tsx      # Shortcode processor
-│   ├── ACFShortcodeRenderer.tsx   # ACF field renderer
 │   ├── fields/
 │   │   ├── TextFieldInput.tsx
 │   │   ├── RepeaterFieldInput.tsx
@@ -704,10 +610,8 @@ src/features/cpt-acf/
 │   ├── useCustomPostTypes.ts     # CPT management
 │   ├── useFieldGroups.ts          # Field group management
 │   └── useLocationEvaluation.ts   # Location rule evaluation
-├── types/
-│   └── acf.types.ts               # TypeScript definitions
-└── utils/
-    └── shortcode-parser.ts        # Shortcode parsing utilities
+└── types/
+    └── acf.types.ts               # TypeScript definitions
 ```
 
 ### Data Flow
@@ -722,14 +626,9 @@ src/features/cpt-acf/
    FormRenderer → API (load form) → Render fields → Submit → API
    ```
 
-3. **Shortcode Processing:**
+3. **Field Value Display:**
    ```
-   Content with shortcodes → ShortcodeRenderer → Parse → Replace with React components
-   ```
-
-4. **Field Value Display:**
-   ```
-   Template → ACFShortcodeRenderer → Get field values → Render by type
+   FormRenderer → Get field values → Render by type
    ```
 
 ### Location Rules
@@ -797,29 +696,6 @@ interface FormRendererProps {
   onError={(error) => {
     console.error('Submission failed:', error);
   }}
-/>
-```
-
-### ShortcodeRenderer
-
-Process and render shortcodes in content.
-
-**Props:**
-```typescript
-interface ShortcodeRendererProps {
-  content: string;                    // Content with shortcodes
-  fields?: CustomField[];             // Field definitions (for ACF)
-  values?: Record<string, any>;       // Field values (for ACF)
-  className?: string;
-}
-```
-
-**Usage:**
-```tsx
-<ShortcodeRenderer
-  content={pageContent}
-  fields={fieldDefinitions}
-  values={fieldValues}
 />
 ```
 
@@ -933,14 +809,6 @@ Provide sensible defaults for better UX:
 4. Network requests in browser DevTools
 5. Server logs for errors
 
-### Shortcodes not rendering
-
-**Check:**
-1. Shortcode syntax is correct
-2. Field names match exactly
-3. Field values are available in context
-4. No JavaScript errors in console
-
 ### Field values not saving
 
 **Check:**
@@ -967,7 +835,6 @@ If migrating from WordPress ACF:
 1. **Field Types**: Most ACF field types are supported with same names
 2. **Field Groups**: Export as JSON, convert to our format
 3. **Location Rules**: Similar syntax, minor adjustments needed
-4. **Shortcodes**: [acf field=""] syntax is identical
 
 ### From Custom Implementation
 

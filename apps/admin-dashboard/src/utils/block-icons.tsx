@@ -236,7 +236,6 @@ const BLOCK_ICONS: Record<string, React.ElementType> = {
   'core/page-break': ChevronsDown,
   
   // Widget blocks
-  'o4o/shortcode': Brackets,
   'core/archives': Archive,
   'core/calendar': Calendar,
   'core/categories': Folder,

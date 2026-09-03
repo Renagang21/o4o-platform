@@ -139,7 +139,6 @@ function normalizeBlockType(type: string): string {
     'separator': 'o4o/separator',
     'spacer': 'o4o/spacer',
     'table': 'o4o/table',
-    'shortcode': 'o4o/shortcode',
     'social-links': 'core/social-links',
 
     // O4O custom blocks

@@ -273,7 +273,7 @@ function runTypeCheck() {
   // Build packages first.
   // 주의: 이 목록은 배포 산출물 목록(SSOT = 루트 `build:packages`)이 아니라, 타입 해석에
   // 필요한 **최소 사전 빌드** 대상이다. `npx tsc` 로 in-place 빌드한다(buildPackages 참조).
-  const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'shortcodes', 'block-core', 'account-ui'];
+  const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'block-core', 'account-ui'];
 
   log.info('Building packages...');
   buildDistTypedPackages(t);
@@ -324,7 +324,7 @@ function runTypeCheckFrontend() {
   // Build packages first.
   // 주의: 이 목록은 배포 산출물 목록(SSOT = 루트 `build:packages`)이 아니라, 타입 해석에
   // 필요한 **최소 사전 빌드** 대상이다. `npx tsc` 로 in-place 빌드한다(buildPackages 참조).
-  const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'shortcodes', 'account-ui'];
+  const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'account-ui'];
 
   log.info('Building packages...');
   buildDistTypedPackages(t);
@@ -399,7 +399,7 @@ function runTests() {
  *
  * 이전에는 여기에 9개짜리 자체 목록을 두었고, 그것이 실제 빌드 대상과 어긋나 있었다.
  * 루트 체인은 17개(types · auth-utils · capabilities · appearance-system · auth-client ·
- * content-editor · utils · ui · auth-context · shortcodes · block-renderer · slide-app ·
+ * content-editor · utils · ui · auth-context · block-renderer · slide-app ·
  * organization-core · forum-core · pharmacy-ai-insight · ai-prompts · lms-client)를
  * **의존 순서대로** 빌드하며, CI 의 dist 검증 목록(.github/workflows/ci-pipeline.yml)도
  * 같은 17개를 확인한다. 즉 SSOT 는 루트 package.json 의 `build:packages` 하나다.

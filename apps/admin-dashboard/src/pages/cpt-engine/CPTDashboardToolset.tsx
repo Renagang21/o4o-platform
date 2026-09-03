@@ -202,7 +202,7 @@ const CPTDashboardToolset = () => {
           <div className="toolset-card">
             <div className="toolset-card-body">
               <h2>Content Templates</h2>
-              <p>React-based templates for rendering CPT content. Built with Gutenberg blocks and dynamic shortcodes.</p>
+              <p>React-based templates for rendering CPT content. Built with Gutenberg blocks.</p>
               <div style={{ marginTop: '20px' }}>
                 <button
                   className="toolset-btn-small"

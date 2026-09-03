@@ -15,7 +15,6 @@ interface ServerResponse {
     total: number;
     categories: any[];
     blocks?: any[];
-    shortcodes?: any[];
   };
 }
 
@@ -49,13 +48,12 @@ class ReferenceFetcherService {
   async fetchCompleteReference(): Promise<string> {
     try {
       // 1단계: 서버에서 데이터 가져오기 시도 (CPT 포함)
-      const [blocksRef, shortcodesRef, cptRef] = await Promise.all([
+      const [blocksRef, cptRef] = await Promise.all([
         this.fetchFromServer('/ai/blocks/reference', 'blocks'),
-        this.fetchFromServer('/ai/shortcodes/reference', 'shortcodes'),
         this.fetchCptReference().catch(() => null) // CPT 실패해도 계속 진행
       ]);
 
-      const reference = this.formatServerReference(blocksRef, shortcodesRef, cptRef);
+      const reference = this.formatServerReference(blocksRef, cptRef);
 
       // 서버 참조 데이터 로드 성공
       this.hasWarnedFallback = false;
@@ -144,7 +142,7 @@ class ReferenceFetcherService {
   /**
    * 서버 응답을 AI 프롬프트 형식으로 포맷
    */
-  private formatServerReference(blocksData: ServerResponse, shortcodesData: ServerResponse, cptData: any): string {
+  private formatServerReference(blocksData: ServerResponse, cptData: any): string {
     let reference = '';
 
     // 블록 레퍼런스
@@ -166,33 +164,6 @@ class ReferenceFetcherService {
         });
         reference += '\n';
       });
-    }
-
-    // 숏코드 레퍼런스
-    if (shortcodesData.success && shortcodesData.data.shortcodes) {
-      reference += '\n=== 사용 가능한 숏코드 (Shortcodes) ===\n\n';
-
-      const shortcodesByCategory = this.groupByCategory(
-        shortcodesData.data.shortcodes,
-        shortcodesData.data.categories
-      );
-
-      Object.entries(shortcodesByCategory).forEach(([categoryName, shortcodes]) => {
-        reference += `${categoryName}:\n`;
-        (shortcodes as any[]).forEach(sc => {
-          reference += `- ${sc.usage}: ${sc.description}\n`;
-          if (sc.parameters) {
-            reference += `  파라미터: ${sc.parameters}\n`;
-          }
-          if (sc.examples?.[0]) {
-            reference += `  예제: ${sc.examples[0]}\n`;
-          }
-        });
-        reference += '\n';
-      });
-
-      reference += '숏코드는 o4o/shortcode 블록으로 삽입:\n';
-      reference += '{"type": "o4o/shortcode", "content": {"shortcode": "[product id=\\"123\\"]"}}\n';
     }
 
     // ⭐ CPT 참조 데이터 추가

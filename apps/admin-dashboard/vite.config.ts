@@ -29,7 +29,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@/api': path.resolve(__dirname, './src/api'),
       '@/styles': path.resolve(__dirname, './src/styles'),
       // Workspace packages - map to dist directory, not index.js file
-      // This allows subpath imports like '@o4o/shortcodes/dynamic'
+      // This allows subpath imports like '@o4o/block-renderer/metadata'
       '@o4o/types': path.resolve(__dirname, '../../packages/types/dist'),
       '@o4o/utils': path.resolve(__dirname, '../../packages/utils/dist'),
       '@o4o/ui': path.resolve(__dirname, '../../packages/ui/dist'),
@@ -41,7 +41,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       //   (@o4o/types 등 기존 tsconfig paths 와 동일 패턴).
       '@o4o/security-core': path.resolve(__dirname, '../../packages/security-core/src'),
       '@o4o/auth-context': path.resolve(__dirname, '../../packages/auth-context/dist'),
-      '@o4o/shortcodes': path.resolve(__dirname, '../../packages/shortcodes/dist'),
       '@o4o/block-renderer': path.resolve(__dirname, '../../packages/block-renderer/dist'),
       '@o4o/slide-app': path.resolve(__dirname, '../../packages/slide-app/dist'),
       // Forum app packages - map to source directories for lazy loading
@@ -102,7 +101,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/types', // ES Module import 순서 문제 방지
       '@o4o/auth-client', // Workspace package - pre-bundling 방지 (항상 최신 빌드 사용)
       '@o4o/auth-context', // Workspace package - pre-bundling 방지
-      '@o4o/shortcodes', // Workspace package - pre-bundling 방지
       '@o4o/block-renderer', // Workspace package - pre-bundling 방지
       '@o4o/slide-app', // Workspace package - pre-bundling 방지
       '@o4o/pharmacy-ai-insight', // Pharmacy AI Insight - source imports

@@ -43,7 +43,6 @@
     "@o4o/auth-client": "workspace:*",
     "@o4o/auth-context": "workspace:*",
     "@o4o/block-renderer": "workspace:*",
-    "@o4o/shortcodes": "workspace:*",
     "@o4o/slide-app": "workspace:*",
     "@o4o/pharmacy-ai-insight": "workspace:*",
     "@o4o/types": "workspace:*",

@@ -54,7 +54,6 @@ const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) =>
       'oauth': 'OAuth',
       'email': '이메일',
       'integrations': '연동',
-      'shortcodes': 'Shortcodes',
       'apps': 'Apps',
       'by-app': '앱별 분류',
       'by-category': '카테고리별',
@@ -72,8 +71,8 @@ const AdminBreadcrumb: FC<AdminBreadcrumbProps> = ({ items, className = '' }) =>
       'library': '라이브러리'
     }
 
-    // 특별한 페이지들 처리 (설정, shortcodes 등)
-    const specialPages = ['settings', 'shortcodes', 'apps']
+    // 특별한 페이지들 처리 (설정, apps 등)
+    const specialPages = ['settings', 'apps']
     const mainPage = pathSegments[0]
     
     if (specialPages.includes(mainPage)) {

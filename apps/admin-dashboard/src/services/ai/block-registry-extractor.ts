@@ -5,7 +5,6 @@
  * Phase P0-C: Uses @o4o/block-renderer metadata as SSOT
  */
 
-import { generalShortcodes, extractFromRegistry } from './shortcode-registry';
 import { blockRegistry } from '@/blocks/registry/BlockRegistry';
 // Phase P0-C: Import metadata from SSOT
 import { blockMetadata, type BlockMetadata as BlockMetadataSSOT } from '@o4o/block-renderer';
@@ -17,14 +16,6 @@ export interface BlockMetadata {
   description: string;
   attributes: Record<string, any>;
   example?: string;
-}
-
-export interface ShortcodeMetadata {
-  name: string;
-  description: string;
-  attributes?: string[];
-  example: string;
-  category?: string;
 }
 
 /**
@@ -181,20 +172,6 @@ function getExampleContent(blockName: string): any {
 }
 
 /**
- * 숏코드 메타데이터 추출 (동적)
- * 실제 등록된 숏코드를 스캔하여 추출
- */
-export async function extractShortcodesMetadata(): Promise<ShortcodeMetadata[]> {
-  const shortcodes: ShortcodeMetadata[] = [];
-
-  // 1. 일반 숏코드 레지스트리에서 추출
-  const generalShortcodesMetadata = extractFromRegistry(generalShortcodes);
-  shortcodes.push(...generalShortcodesMetadata);
-
-  return shortcodes;
-}
-
-/**
  * AI 프롬프트용 블록 레퍼런스 생성
  */
 export function generateBlocksReference(): string {
@@ -229,43 +206,6 @@ export function generateBlocksReference(): string {
 }
 
 /**
- * AI 프롬프트용 숏코드 레퍼런스 생성
- */
-export async function generateShortcodesReference(): Promise<string> {
-  const shortcodes = await extractShortcodesMetadata();
-
-  const grouped = shortcodes.reduce((acc, sc) => {
-    const category = getShortcodeCategory(sc.name);
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(sc);
-    return acc;
-  }, {} as Record<string, ShortcodeMetadata[]>);
-
-  let reference = '=== 사용 가능한 숏코드 (Shortcodes) ===\n\n';
-
-  Object.entries(grouped).forEach(([category, categoryShortcodes]) => {
-    reference += `${category}:\n`;
-
-    categoryShortcodes.forEach(sc => {
-      reference += `- [${sc.name}]: ${sc.description}\n`;
-      if (sc.attributes && sc.attributes.length > 0) {
-        reference += `  속성: ${sc.attributes.join(', ')}\n`;
-      }
-      reference += `  예제: ${sc.example}\n`;
-    });
-
-    reference += '\n';
-  });
-
-  reference += '숏코드는 core/shortcode 블록으로 삽입:\n';
-  reference += '{"type": "core/shortcode", "content": {"shortcode": "[product id=\\"123\\"]"}}\n';
-
-  return reference;
-}
-
-/**
  * 카테고리 한글 이름
  */
 function getCategoryDisplayName(category: string): string {
@@ -285,20 +225,8 @@ function getCategoryDisplayName(category: string): string {
 }
 
 /**
- * 숏코드 카테고리 추론
- */
-function getShortcodeCategory(name: string): string {
-  if (name.includes('product') || name.includes('cart')) return 'E-commerce';
-  if (name.includes('form') || name.includes('view')) return 'Forms';
-  if (name.includes('video') || name.includes('gallery')) return 'Media';
-  if (name.includes('post') || name.includes('author')) return 'Content';
-  return 'Other';
-}
-
-/**
- * 전체 레퍼런스 생성 (블록 + 숏코드)
+ * 전체 레퍼런스 생성 (블록)
  */
 export async function generateCompleteReference(): Promise<string> {
-  const shortcodesRef = await generateShortcodesReference();
-  return generateBlocksReference() + '\n' + shortcodesRef;
+  return generateBlocksReference();
 }

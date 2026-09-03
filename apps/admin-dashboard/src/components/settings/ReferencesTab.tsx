@@ -101,7 +101,6 @@ const ReferencesTab: React.FC = () => {
           >
             <option value="">모든 타입</option>
             <option value="blocks">Blocks</option>
-            <option value="shortcodes">Shortcodes</option>
             <option value="image-prompts">Image Prompts</option>
           </select>
 

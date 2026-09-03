@@ -16,14 +16,12 @@
  *                                 tsx 를 호출하는 script 0. root 의 `npx tsx`
  *                                 도구 사용은 다른 workspace 소유라 그대로 산다.
  *
- *   verify:shortcodes                          KEEP_ACTIVE (ACTIVE_VALIDATION)
- *   scripts/verify-shortcodes.ts               KEEP_ACTIVE
- *   scripts/audit/check-shortcode-registry.ts  KEEP_ACTIVE (ACTIVE_AUDIT)
- *     └ 세 항목 모두 **살아 있는** shortcode 도메인
- *       (`packages/shortcodes` · `apps/admin-dashboard`)을 검사한다.
- *       은퇴한 것은 스크립트가 아니라 그 안의 main-site 경로 참조뿐이므로
- *       스크립트는 유지하고 은퇴 경로 스캔 코드만 제거했다.
- *       은퇴 경로를 다른 살아 있는 디렉터리로 억지로 재연결하지 않았다.
+ *   verify:shortcodes · scripts/verify-shortcodes.ts ·
+ *   scripts/audit/check-shortcode-registry.ts      RETIRED
+ *     └ 이 WO 시점에는 살아 있는 shortcode 도메인을 검사하는 KEEP_ACTIVE 자산이었다.
+ *       이후 WO-O4O-SHORTCODE-DOMAIN-RETIREMENT-V1 이 shortcode 도메인 전체를
+ *       은퇴시키면서 세 항목이 함께 사라졌다. 은퇴 계약은
+ *       `shortcode-domain-retirement.spec.ts` 가 고정한다.
  *
  * 보호 대상: `@tanstack/react-query`(main.tsx QueryClientProvider) ·
  *            live dependency 7 종 · main-site script 4 종 · 경량 CI 계약.
@@ -39,7 +37,6 @@ const MAIN_SITE_SRC = path.join(MAIN_SITE, 'src');
 
 const readJson = (p: string) => JSON.parse(fs.readFileSync(p, 'utf-8'));
 const mainSitePkg = readJson(path.join(MAIN_SITE, 'package.json'));
-const rootPkg = readJson(path.join(REPO_ROOT, 'package.json'));
 
 const walk = (dir: string): string[] => {
   const out: string[] = [];
@@ -131,62 +128,6 @@ describe('WO-O4O-MAIN-SITE-RESIDUAL-DEPENDENCY-AND-DEAD-SCRIPT-CLEANUP-V1', () =
     it('axios · tsx 패키지 엔트리 자체는 남아 있다 (다른 workspace 소유)', () => {
       expect(lock).toMatch(/^ {2}axios@/m);
       expect(lock).toMatch(/^ {2}tsx@/m);
-    });
-  });
-
-  describe('shortcode 검증 자산은 KEEP_ACTIVE 로 유지된다', () => {
-    it.each(['scripts/verify-shortcodes.ts', 'scripts/audit/check-shortcode-registry.ts'])(
-      '%s 는 존재한다',
-      (rel) => {
-        expect(fs.existsSync(path.join(REPO_ROOT, ...rel.split('/')))).toBe(true);
-      }
-    );
-
-    it.each(['verify:shortcodes', 'verify:registry', 'verify'])(
-      'root script "%s" 가 유지된다',
-      (name) => {
-        expect(rootPkg.scripts).toHaveProperty(name);
-      }
-    );
-
-    it('verify:registry 가 verify:shortcodes 를 계속 호출한다', () => {
-      expect(rootPkg.scripts['verify:registry']).toContain('verify:shortcodes');
-    });
-
-    it('두 스크립트가 살아 있는 shortcode 도메인을 계속 검사한다', () => {
-      const verify = fs.readFileSync(
-        path.join(REPO_ROOT, 'scripts', 'verify-shortcodes.ts'),
-        'utf-8'
-      );
-      expect(verify).toContain('packages/shortcodes/src/metadata.ts');
-      expect(verify).toContain('apps/admin-dashboard/src/services/ai/shortcode-registry.ts');
-
-      const audit = fs.readFileSync(
-        path.join(REPO_ROOT, 'scripts', 'audit', 'check-shortcode-registry.ts'),
-        'utf-8'
-      );
-      expect(audit).toContain('apps/admin-dashboard/src/components/shortcodes');
-      expect(audit).toContain('packages/shortcodes/src');
-    });
-  });
-
-  describe('은퇴한 main-site shortcode 경로를 다시 스캔하지 않는다', () => {
-    const SCRIPTS = [
-      path.join(REPO_ROOT, 'scripts', 'verify-shortcodes.ts'),
-      path.join(REPO_ROOT, 'scripts', 'audit', 'check-shortcode-registry.ts'),
-    ];
-
-    it.each(SCRIPTS.map((p) => [path.relative(REPO_ROOT, p), p]))(
-      '%s 의 실행 코드에 은퇴 경로 참조가 없다',
-      (_label, target) => {
-        expect(codeOf(target)).not.toContain('main-site/src/components/shortcodes');
-      }
-    );
-
-    it('감사 산출물에도 은퇴 경로가 남아 있지 않다', () => {
-      const report = path.join(REPO_ROOT, 'scripts', 'audit', 'shortcode-registry-report.json');
-      if (!fs.existsSync(report)) return;
-      expect(fs.readFileSync(report, 'utf-8')).not.toContain('main-site');
     });
   });
 });

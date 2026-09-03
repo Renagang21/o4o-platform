@@ -17,8 +17,7 @@ export const SIMPLE_GENERATOR_ROLE_RULES = `당신은 o4o-platform의 UI/UX Arch
 4. 자연어 설명 금지 - JSON만 출력
 5. 이미지 URL 사용 금지 (placeholder 사이트 포함)
 6. 모든 블록 타입은 반드시 "o4o/" prefix 사용
-7. Shortcode는 그대로 사용 가능 (o4o/shortcode 타입)
-8. **섹션 간 여백**: 주요 섹션 사이에는 반드시 o4o/spacer 블록을 사용하여 충분한 여백(50-80px)을 확보하시오
+7. **섹션 간 여백**: 주요 섹션 사이에는 반드시 o4o/spacer 블록을 사용하여 충분한 여백(50-80px)을 확보하시오
 
 **Missing Block 정책 (중요 - 2025-11-21 개선):**
 사용자의 요구사항을 구현하기 위해 필요한 블록이 Block Registry에 없다면:
@@ -233,9 +232,7 @@ export const SIMPLE_GENERATOR_LEGACY_RULES = `
 3. 이미지 블록에는 alt 텍스트만 포함하고 src는 비워두세요
 4. 버튼은 실제 링크 대신 "#" 사용
 5. 한국어로 작성하세요
-6. 사용자가 요청한 내용에 정확히 맞춰 생성하세요
-7. **절대 금지: shortcode, [tag] 형태, {{ }} 형태 출력 금지**
-8. shortcode는 수작업으로만 추가 가능합니다`;
+6. 사용자가 요청한 내용에 정확히 맞춰 생성하세요`;
 
 export const SIMPLE_GENERATOR_LEGACY_TEMPLATES: Record<string, string> = {
   landing: `랜딩 페이지 구성 요소:
@@ -343,11 +340,6 @@ export const SIMPLE_GENERATOR_BLOCK_FORMAT_EXAMPLE = `
           ]
         }
       ]
-    },
-    {
-      "type": "o4o/shortcode",
-      "content": {},
-      "attributes": {"shortcode": "[product-list category='electronics']"}
     }
   ]
 }
@@ -360,5 +352,4 @@ export const SIMPLE_GENERATOR_BLOCK_FORMAT_EXAMPLE = `
 5. button/image 블록: content는 빈 객체 {}, 데이터는 attributes에 넣으세요
 6. ✨ columns 블록: innerBlocks 배열에 column 블록들을 넣으세요
 7. ✨ column 블록: innerBlocks 배열에 다른 블록들을 넣을 수 있습니다
-8. ✨ shortcode 블록: content는 빈 객체 {}, attributes에 {"shortcode": "[product-list category='electronics']"}
-9. 이미지 url은 빈 문자열로, alt 텍스트만 사용하세요`;
+8. 이미지 url은 빈 문자열로, alt 텍스트만 사용하세요`;

@@ -53,7 +53,7 @@ run_type_check() {
     
     # Build packages first
     echo "Building packages..."
-    for pkg in types utils ui auth-client auth-context forum-types shortcodes block-core; do
+    for pkg in types utils ui auth-client auth-context forum-types block-core; do
         if [ -d "packages/$pkg" ]; then
             echo "  - Building @o4o/$pkg"
             (cd "packages/$pkg" && npx tsc 2>/dev/null) || true
@@ -85,7 +85,7 @@ run_type_check_frontend() {
     
     # Build packages first
     echo "Building packages..."
-    for pkg in types utils ui auth-client auth-context forum-types shortcodes block-core; do
+    for pkg in types utils ui auth-client auth-context forum-types block-core; do
         if [ -d "packages/$pkg" ]; then
             echo "  - Building @o4o/$pkg"
             (cd "packages/$pkg" && npx tsc 2>/dev/null) || true
@@ -149,7 +149,7 @@ build_packages() {
     echo -e "${GREEN}📦 Building packages...${NC}"
     
     # Build in dependency order
-    local packages=("types" "utils" "ui" "auth-client" "auth-context" "forum-types" "shortcodes")
+    local packages=("types" "utils" "ui" "auth-client" "auth-context" "forum-types")
     
     for pkg in "${packages[@]}"; do
         if [ -d "packages/$pkg" ]; then
