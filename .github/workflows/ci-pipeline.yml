@@ -195,6 +195,16 @@ jobs:
     - name: Run tests (web-glycopharm Vitest)
       run: npx vitest run --config services/web-glycopharm/vitest.config.mjs
 
+    # WO-O4O-KPA-INTEREST-PRODUCT-WORKTABLE-TO-CANONICAL-CART-ADOPTION-V1
+    # 관심상품 작업대 행 → canonical store_cart_items payload 및 "주문 가능" 판정 계약
+    # (offerId 동등 비교만 · 이름/SKU heuristic 0 · event_offer/seller_recruitment 축 분리 ·
+    #  표시용 가격 · organizationId 미전송)을 CI 에서 고정한다. blocking.
+    # KPA 에도 테스트 실행 경로가 없었다 — 이 축은 잘못되면 미승인 offer 나 이벤트오퍼 축이
+    # 조용히 B2B 주문 경로로 새어 들어간다.
+    # DB · secret 불필요. 루트에 설치된 vitest/jsdom 을 그대로 쓴다.
+    - name: Run tests (web-kpa-society Vitest)
+      run: npx vitest run --config services/web-kpa-society/vitest.config.mjs
+
   # 2. Build all applications
   build:
     name: Build Applications

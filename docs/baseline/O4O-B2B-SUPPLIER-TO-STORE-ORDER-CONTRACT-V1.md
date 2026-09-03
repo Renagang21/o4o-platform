@@ -518,3 +518,47 @@ WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1.
 3. cart 삭제를 `id` 만으로 수행하는 것 (`buyerId` · `serviceKey` 경계 필수)
 4. 승인축에서 `service_keys` opt-in 을 노출 근거로 쓰는 것
 5. confirm 안에서 fulfillment · 결제를 수행하는 것
+
+### 13-8. cart producer — KPA 관심상품 작업대 (2026-09-03)
+
+WO-O4O-KPA-INTEREST-PRODUCT-WORKTABLE-TO-CANONICAL-CART-ADOPTION-V1.
+
+§13-6 의 GlycoPharm 채택과 **같은 계약**을 KPA-Society 의 관심상품 작업대
+(`/pharmacy/store-order-worktable`)에 적용한 것이다. 새 주문 축이 아니다.
+
+```text
+관심상품 작업대(카탈로그 행)
+  → supplier_product_offers.id
+  → POST /api/v1/store/cart/kpa/items   (sourceType='b2b')
+  → store_cart_items
+  → POST /api/v1/store/cart/kpa/checkout-confirm-b2b   (service-agnostic Core)
+  → checkout_orders
+  → 매장 buyer 주문 조회 Core (§12)
+```
+
+**관심상품 ≠ 주문상품.** 작업대 행의 `isAdded`(신청·진열 이력)는 "관심"이지
+"주문 가능"이 아니다. 주문 가능 판정의 권위는 서버 `GET /pharmacy/products/orderable`
+이며, 그 쿼리가 offer 활성 · 공급자 ACTIVE · `offer_service_approvals` 승인 ·
+축 분리를 이미 수행한다. 프런트는 그 결과를 **읽기만** 하고 자체 자격 판정을 만들지 않는다.
+
+| 축 | 권위 | 클라이언트가 보내는 값 |
+|---|---|---|
+| offer | `supplier_product_offers.id` (= catalog SSOT 의 `spo.id AS "id"`) | 그대로 전달 |
+| 주문 가능 | 서버 `/pharmacy/products/orderable` (승인 게이트 포함) | 표시·안내용 |
+| supplier | `neture_suppliers.id` | 힌트 |
+| 가격 | 서버 `offer_service_prices['kpa-society']` → `price_general` | 표시용 snapshot |
+| 매장 조직 | 서버 `resolveBuyerOrganization` (`organizationPolicy='required'`) | **보내지 않는다** |
+
+축 분리 (§5-1 이벤트오퍼 축 보호):
+
+- B2B 담기 대상 공급유형은 `b2b` · `operator` 뿐이다.
+- `event_offer` 는 기존 `checkout-confirm` 축 그대로 두고 승격하지 않는다.
+- `seller_recruitment` 는 주문 경로가 아니다.
+- KPA cart 에는 이벤트오퍼 항목이 이미 존재할 수 있고, `useStoreCart` 는 b2b 항목이
+  하나라도 있으면 cart 전체를 `checkout-confirm-b2b` 로 보낸다. 서버는 항목별로
+  fail-closed 하지만, 사용자에게 부분 실패로 보이지 않도록 **작업대에서 담기 전에
+  이벤트오퍼 혼재를 차단**한다. 이는 §13-6 의 "frontend 선판단 금지" 에 대한
+  **명시적 예외**이며, 자격 판정이 아니라 **축 혼재 방지**다. 서버 판정을 완화하지 않는다.
+
+계약 고정: `services/web-kpa-society/src/utils/worktableCart.ts` +
+`src/utils/__tests__/worktableCart.test.ts` (CI `ci-pipeline.yml` 에서 실행).

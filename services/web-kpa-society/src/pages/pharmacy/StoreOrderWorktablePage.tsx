@@ -10,34 +10,61 @@
  *   (`O4O-STORE-COMMERCE-BOUNDARY-V1` §2-1 · §2-2 · §3 위반 → 410 은퇴).
  *   B2B 발주 의도 자체는 보호 대상이므로 화면은 유지하되, 실행은 canonical B2B 장바구니
  *   (`/store-hub/cart`, `store_cart` + `EventOfferCartCheckoutService`) 로 안내한다.
- *   작업대→canonical 장바구니 담기 이관은 후속 과제로 남긴다.
  *
- * 왼쪽: 관심상품 테이블 (DataTable + 수량 입력)
- * 오른쪽: 공급사별 주문 요약 패널 + 주문하기 버튼
+ * WO-O4O-KPA-INTEREST-PRODUCT-WORKTABLE-TO-CANONICAL-CART-ADOPTION-V1:
+ *   위 "후속 과제"를 종결한다. 작업대가 canonical B2B 장바구니 **producer** 가 된다.
+ *     관심상품(catalog.isAdded) → canonical supplier offer → store_cart_items(sourceType='b2b')
+ *     → service-agnostic B2B checkout confirm → checkout_orders → buyer order ledger
  *
- * 데이터: getCatalog(isListed/isApproved) + getListings() 클라이언트 병합
+ *   · 관심상품 ≠ 주문상품. 주문 가능 판정의 권위는 서버 `GET /pharmacy/products/orderable`
+ *     이며(offer 활성 · 공급자 ACTIVE · offer_service_approvals 승인 · 축 분리 포함),
+ *     이 화면은 그 결과를 offerId 동등 비교로 표시만 한다. 이름/SKU 매칭 0.
+ *   · 이벤트오퍼 축은 합치지 않는다 — 장바구니에 event_offer 항목이 있으면 담기를 차단한다
+ *     (확정 endpoint 가 축별로 다르다: checkout-confirm vs checkout-confirm-b2b).
+ *   · 표시 금액은 스냅샷이다. 확정 금액은 서버가 offer_service_prices[kpa-society] →
+ *     price_general 순으로 재확정한다.
+ *   · getListings() 상품명 문자열 병합 제거 — master_id/offer_id 리팩토링 이후 동작하지 않는
+ *     dead code 였고, 주문 경로에 이름 매칭을 남겨둘 수 없다.
+ *
+ * 왼쪽: 관심상품 테이블 (DataTable + 주문 가능 상태 + 수량 입력)
+ * 오른쪽: 공급사별 주문 요약 패널 + 장바구니 담기
+ *
+ * 데이터: getCatalog(isAdded) = 관심상품 · getOrderable() = 주문 가능 권위
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DataTable } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
-import { Search, Package, RefreshCw, X, ShoppingCart, AlertCircle } from 'lucide-react';
-import { getCatalog, getListings } from '../../api/pharmacyProducts';
-import type { CatalogProduct, ProductListing } from '../../api/pharmacyProducts';
+import { Search, Package, RefreshCw, X, ShoppingCart, AlertCircle, Loader2 } from 'lucide-react';
+import { getCatalog, getOrderable } from '../../api/pharmacyProducts';
+import type { CatalogProduct, OrderableProduct } from '../../api/pharmacyProducts';
+import { storeCartApi } from '../../api';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import { colors, borderRadius } from '../../styles/theme';
+import { CART_SERVICE_KEY } from '../../utils/eventOfferCart';
+import {
+  ORDERABILITY_HINT,
+  ORDERABILITY_LABEL,
+  buildOrderableIndex,
+  buildWorktableCartPayload,
+  resolveOrderability,
+} from '../../utils/worktableCart';
+import type { WorktableOrderability } from '../../utils/worktableCart';
 
 // ── Types ──
 
 interface WorktableProduct {
+  /** supplier_product_offers.id — catalog SSOT 가 반환한 canonical offer id */
   id: string;
   productName: string;
   supplierId: string;
   supplierName: string;
   category: string | null;
   basePrice: number | null;
+  /** 서버 주문가능 목록 기준 판정 (관심상품이라는 사실만으로 주문 가능이 아니다) */
+  orderability: WorktableOrderability;
 }
 
 interface SupplierSummary {
@@ -49,6 +76,29 @@ interface SupplierSummary {
 }
 
 // ── Helpers ──
+
+/**
+ * 주문 가능 목록 전량 조회.
+ *
+ * `/orderable` 은 page 당 최대 100건이다. 한 페이지만 읽으면 그 뒤의 주문 가능 상품이
+ * 조용히 "주문 불가"로 표시된다 — 판정을 낮추는 게 아니라 사실을 잘못 말하는 결함이므로
+ * 페이지를 끝까지 읽는다. 방어적 상한(20 페이지 = 2,000건)을 넘으면 더 읽지 않는다.
+ */
+const ORDERABLE_PAGE_SIZE = 100;
+const ORDERABLE_MAX_PAGES = 20;
+
+async function fetchAllOrderable(): Promise<OrderableProduct[]> {
+  const rows: OrderableProduct[] = [];
+  let page = 1;
+  for (; page <= ORDERABLE_MAX_PAGES; page++) {
+    const res = await getOrderable({ source: 'all', page, limit: ORDERABLE_PAGE_SIZE });
+    const batch = res.data || [];
+    rows.push(...batch);
+    const totalPages = res.pagination?.totalPages ?? 1;
+    if (batch.length === 0 || page >= totalPages) break;
+  }
+  return rows;
+}
 
 function formatPrice(v: number | null): string {
   if (v == null) return '—';
@@ -72,6 +122,7 @@ export function StoreOrderWorktablePage() {
   // Order creation state
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
 
   // ── Data loading ──
 
@@ -79,43 +130,34 @@ export function StoreOrderWorktablePage() {
     setLoading(true);
     setError(null);
     try {
-      const [catalogRes, listingsRes] = await Promise.all([
+      // 관심상품 목록(catalog.isAdded) 과 주문 가능 권위(orderable) 를 각각 서버에서 받는다.
+      // 둘의 대응은 offerId 동등 비교로만 한다 — 이름/SKU 매칭 없음.
+      const [catalogRes, orderableRows] = await Promise.all([
         getCatalog({ limit: 100 }),
-        getListings(),
+        fetchAllOrderable(),
       ]);
 
       const catalogProducts = catalogRes.data || [];
-      const listings = listingsRes.data || [];
+      const orderableIndex = buildOrderableIndex(orderableRows);
 
       // Filter to "관심상품": 내 매장에 추가된 상품
       const interestProducts = catalogProducts.filter(
         (p: CatalogProduct) => p.isAdded,
       );
 
-      // Build price map from listings (by product name)
-      const priceMap = new Map<string, number>();
-      listings.forEach((l: ProductListing) => {
-        if (l.retail_price != null) {
-          priceMap.set(l.product_name.trim().toLowerCase(), l.retail_price);
-        }
-      });
-
-      // Merge
-      const merged: WorktableProduct[] = interestProducts.map((c: CatalogProduct) => {
-        const nameKey = c.name.trim().toLowerCase();
-        return {
-          id: c.id,
-          productName: c.name,
-          supplierId: c.supplierId,
-          supplierName: c.supplierName,
-          category: c.category,
-          // WO-O4O-STORE-HUB-PRODUCTION-E2E-DATA-ENROLLMENT-AND-CLOSURE-V1:
-          //   진열 판매가(retail_price)가 아직 없는 신규 취급 상품은 주문 확인 화면 금액이
-          //   전부 0원으로 표시됐다. 작업대는 B2B 발주 화면이므로 공급가로 fallback 한다
-          //   (확정 금액은 backend 가 공급가 기준으로 재산정 — 모달 안내문과 동일 기준).
-          basePrice: priceMap.get(nameKey) ?? c.priceGold ?? c.priceGeneral ?? null,
-        };
-      });
+      const merged: WorktableProduct[] = interestProducts.map((c: CatalogProduct) => ({
+        id: c.id,
+        productName: c.name,
+        supplierId: c.supplierId,
+        supplierName: c.supplierName,
+        category: c.category,
+        // WO-O4O-STORE-HUB-PRODUCTION-E2E-DATA-ENROLLMENT-AND-CLOSURE-V1:
+        //   작업대는 B2B 발주 화면이므로 공급가를 표시한다.
+        //   WO-...-CANONICAL-CART-ADOPTION-V1: 확정 금액은 서버가
+        //   offer_service_prices[kpa-society] → price_general 로 재확정한다(표시용 스냅샷).
+        basePrice: c.priceGold ?? c.priceGeneral ?? null,
+        orderability: resolveOrderability(c.id, orderableIndex),
+      }));
 
       setProducts(merged);
     } catch {
@@ -142,14 +184,15 @@ export function StoreOrderWorktablePage() {
       setQuantities(prev => {
         const next = { ...prev };
         for (const [productId, qty] of Object.entries(preselect)) {
-          if (qty > 0 && products.some(p => p.id === productId)) {
+          // 주문 가능(서버 판정)한 관심상품만 수량을 받는다.
+          if (qty > 0 && products.some(p => p.id === productId && p.orderability === 'ORDERABLE')) {
             next[productId] = (next[productId] || 0) + qty;
           }
         }
         return next;
       });
       const addedCount = Object.entries(preselect).filter(
-        ([pid, q]) => q > 0 && products.some(p => p.id === pid),
+        ([pid, q]) => q > 0 && products.some(p => p.id === pid && p.orderability === 'ORDERABLE'),
       ).length;
       if (addedCount > 0) {
         toast.success(`카탈로그에서 선택한 ${addedCount}건의 상품이 작업대에 추가되었습니다.`);
@@ -205,6 +248,8 @@ export function StoreOrderWorktablePage() {
     products.forEach(p => {
       const qty = quantities[p.id] || 0;
       if (qty <= 0) return;
+      // 주문 불가 항목은 요약·담기 대상에서 제외한다(서버 판정 기준).
+      if (p.orderability !== 'ORDERABLE') return;
       const existing = map.get(p.supplierId);
       if (existing) {
         existing.itemCount++;
@@ -222,6 +267,65 @@ export function StoreOrderWorktablePage() {
     });
     return Array.from(map.values()).sort((a, b) => b.totalAmount - a.totalAmount);
   }, [products, quantities]);
+
+  // ── canonical B2B 장바구니 담기 ──
+  //
+  // WO-O4O-KPA-INTEREST-PRODUCT-WORKTABLE-TO-CANONICAL-CART-ADOPTION-V1
+  //   담기 = `POST /store/cart/kpa-society/items` (sourceType='b2b'). 주문이 아니다.
+  //   organizationId 는 보내지 않는다 — 매장 확정 권위는 서버(B2B confirm Core)다.
+  const addSelectionToCart = useCallback(async () => {
+    if (adding) return;
+    const targets = products
+      .filter(p => p.orderability === 'ORDERABLE' && (quantities[p.id] || 0) > 0)
+      .map(p => ({ product: p, quantity: quantities[p.id] }));
+    if (targets.length === 0) return;
+
+    setAdding(true);
+    setOrderError(null);
+    try {
+      // 축 혼합 차단 — 이벤트오퍼 항목과 B2B 항목은 확정 endpoint 가 다르다.
+      // 섞인 장바구니를 한 번에 확정하지 않는다(§15). 기존 이벤트 흐름은 그대로 둔다.
+      const current = await storeCartApi.list(CART_SERVICE_KEY);
+      const hasEventOffer = (current.data?.items || []).some(i => i.sourceType === 'event_offer');
+      if (hasEventOffer) {
+        setOrderError(
+          '장바구니에 이벤트 상품이 담겨 있습니다. 이벤트 주문을 먼저 완료하거나 비운 뒤에 B2B 발주를 담아주세요.',
+        );
+        return;
+      }
+
+      const failed: string[] = [];
+      let ok = 0;
+      for (const t of targets) {
+        try {
+          await storeCartApi.addItem(CART_SERVICE_KEY, buildWorktableCartPayload(t.product, t.quantity));
+          ok++;
+        } catch (e) {
+          failed.push(`${t.product.productName}: ${(e as { message?: string })?.message || '담기 실패'}`);
+        }
+      }
+
+      if (ok > 0) {
+        toast.success(`${ok}건을 장바구니에 담았습니다.`);
+        // 담긴 항목의 수량은 비운다 — 중복 담기 방지.
+        setQuantities(prev => {
+          const next = { ...prev };
+          targets.forEach(t => { if (!failed.some(f => f.startsWith(`${t.product.productName}:`))) delete next[t.product.id]; });
+          return next;
+        });
+      }
+      if (failed.length > 0) {
+        setOrderError(failed.join(' / '));
+      } else {
+        setShowConfirmModal(false);
+        navigate('/store-hub/cart');
+      }
+    } catch (e) {
+      setOrderError((e as { message?: string })?.message || '장바구니 조회에 실패했습니다.');
+    } finally {
+      setAdding(false);
+    }
+  }, [adding, products, quantities, navigate]);
 
   const totalOrderItems = supplierSummaries.reduce((s, x) => s + x.itemCount, 0);
   const totalOrderQty = supplierSummaries.reduce((s, x) => s + x.totalQuantity, 0);
@@ -256,6 +360,32 @@ export function StoreOrderWorktablePage() {
       ),
     },
     {
+      // 관심상품 ≠ 주문상품 — 서버(orderable)가 판정한 상태를 그대로 표시한다.
+      key: 'orderability',
+      title: '상태',
+      width: '96px',
+      align: 'center' as const,
+      render: (_v: unknown, row: WorktableProduct) => {
+        const ok = row.orderability === 'ORDERABLE';
+        return (
+          <span
+            style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              padding: '2px 8px',
+              borderRadius: '12px',
+              whiteSpace: 'nowrap',
+              color: ok ? '#047857' : colors.neutral500,
+              backgroundColor: ok ? '#ecfdf5' : colors.neutral100,
+            }}
+            title={ORDERABILITY_HINT[row.orderability]}
+          >
+            {ORDERABILITY_LABEL[row.orderability]}
+          </span>
+        );
+      },
+    },
+    {
       key: 'basePrice',
       title: '기준가',
       width: '100px',
@@ -272,15 +402,24 @@ export function StoreOrderWorktablePage() {
       title: '수량',
       width: '110px',
       align: 'center' as const,
-      render: (_v: unknown, row: WorktableProduct) => (
-        <input
-          type="number"
-          min={0}
-          value={quantities[row.id] || 0}
-          onChange={e => updateQuantity(row.id, parseInt(e.target.value) || 0)}
-          style={S.qtyInput}
-        />
-      ),
+      render: (_v: unknown, row: WorktableProduct) => {
+        const orderable = row.orderability === 'ORDERABLE';
+        return (
+          <input
+            type="number"
+            min={0}
+            value={quantities[row.id] || 0}
+            disabled={!orderable}
+            title={orderable ? undefined : ORDERABILITY_HINT[row.orderability]}
+            onChange={e => updateQuantity(row.id, parseInt(e.target.value) || 0)}
+            style={
+              orderable
+                ? S.qtyInput
+                : { ...S.qtyInput, backgroundColor: colors.neutral100, color: colors.neutral400, cursor: 'not-allowed' }
+            }
+          />
+        );
+      },
     },
     {
       key: 'subtotal',
@@ -512,7 +651,8 @@ export function StoreOrderWorktablePage() {
                 <h3 style={S.modalTitle}>B2B 주문 요약</h3>
                 <p style={{ fontSize: '13px', color: colors.neutral600, margin: '0 0 16px' }}>
                   공급사별 {supplierSummaries.length}건의 발주 예정 내역입니다.
-                  실제 발주는 <strong>매장 허브 &gt; 내 장바구니</strong>에서 진행합니다.
+                  담기를 누르면 <strong>매장 허브 &gt; 내 장바구니</strong>에 B2B 발주 항목으로 담기며,
+                  실제 주문 확정은 장바구니에서 진행합니다.
                 </p>
 
                 {supplierSummaries.map(s => {
@@ -552,7 +692,7 @@ export function StoreOrderWorktablePage() {
                 </div>
 
                 <p style={{ fontSize: '11px', color: colors.neutral400, margin: '8px 0 0', textAlign: 'center' }}>
-                  실제 결제 금액은 공급가 기준으로 산정됩니다
+                  표시 금액은 참고용입니다 — 확정 금액은 주문 시 서버가 공급가 기준으로 재산정합니다
                 </p>
 
                 {orderError && (
@@ -568,9 +708,24 @@ export function StoreOrderWorktablePage() {
                   </button>
                   <button
                     onClick={() => { setShowConfirmModal(false); navigate('/store-hub/cart'); }}
-                    style={S.modalPrimaryBtn}
+                    style={S.modalSecondaryBtn}
                   >
-                    내 장바구니로 이동
+                    장바구니 보기
+                  </button>
+                  <button
+                    onClick={addSelectionToCart}
+                    disabled={adding || totalOrderItems === 0}
+                    style={{
+                      ...S.modalPrimaryBtn,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      opacity: adding || totalOrderItems === 0 ? 0.6 : 1,
+                      cursor: adding || totalOrderItems === 0 ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {adding && <Loader2 size={14} className="animate-spin" />}
+                    {adding ? '담는 중...' : `장바구니에 담기 (${totalOrderItems}품목)`}
                   </button>
                 </div>
               </>
