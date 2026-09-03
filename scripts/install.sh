@@ -26,7 +26,6 @@ usage() {
     echo "  quick     - 빠른 설치 (최소 옵션)"
     echo "  split     - 순차적 분할 설치"
     echo "  parallel  - 병렬 분할 설치 (기본값)"
-    echo "  blocks    - 블록 패키지만 설치"
     echo "  ci        - CI/CD용 설치"
     echo ""
     exit 1
@@ -66,20 +65,6 @@ install_parallel() {
     pnpm run --parallel --filter "./packages/*" build
 }
 
-# 블록 패키지 설치
-install_blocks() {
-    echo -e "${YELLOW}🔲 Installing block packages with pnpm...${NC}"
-    check_pnpm
-    
-    # 블록 관련 패키지만 설치
-    pnpm install --filter "./packages/block*" --filter "./packages/blocks/*"
-    
-    # 블록 빌드
-    if [ -f "package.json" ] && grep -q "build:blocks" package.json; then
-        pnpm run build:blocks
-    fi
-}
-
 # CI 설치
 install_ci() {
     echo -e "${YELLOW}🔄 CI installation with pnpm...${NC}"
@@ -107,9 +92,6 @@ main() {
             ;;
         parallel)
             install_parallel
-            ;;
-        blocks)
-            install_blocks
             ;;
         ci)
             install_ci

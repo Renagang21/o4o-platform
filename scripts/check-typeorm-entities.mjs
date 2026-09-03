@@ -74,45 +74,15 @@ const DEAD_UNREACHABLE_SERVICE = (svc) =>
   `DEAD_ENTITY: ${svc} 에서만 repository 로 쓰이며, 그 모듈이 main.ts import 그래프에서 도달 불가`;
 
 export const UNREGISTERED_INVENTORY = new Map([
-  // --- src/entities/ 내 legacy 정의 ---
-  ['AIReference', { file: 'apps/api-server/src/entities/AIReference.ts', reason: DEAD }],
-  ['Alert', { file: 'apps/api-server/src/entities/Alert.ts', reason: DEAD_UNREACHABLE_SERVICE('services/CircuitBreakerService.ts · services/degradation/**') }],
-  ['AnalyticsReport', { file: 'apps/api-server/src/entities/AnalyticsReport.ts', reason: DEAD }],
-  ['AutomationLog', { file: 'apps/api-server/src/entities/AutomationLog.ts', reason: DEAD }],
-  ['AutomationRule', { file: 'apps/api-server/src/entities/AutomationRule.ts', reason: DEAD }],
-  ['BusinessInfo', { file: 'apps/api-server/src/entities/BusinessInfo.ts', reason: DEAD_UNREACHABLE_SERVICE('services/CommissionCalculator.ts') }],
-  ['CmsContentRecommendation', { file: 'apps/api-server/src/entities/CmsContentRecommendation.entity.ts', reason: DEAD }],
-  ['CommissionPolicy', { file: 'apps/api-server/src/entities/CommissionPolicy.ts', reason: DEAD_UNREACHABLE_SERVICE('services/PolicyResolutionService.ts') }],
-  ['ExternalChannel', { file: 'apps/api-server/src/entities/ExternalChannel.ts', reason: DEAD }],
-  ['NotificationTemplate', { file: 'apps/api-server/src/entities/NotificationTemplate.ts', reason: DEAD }],
-  ['OperationsDashboard', { file: 'apps/api-server/src/entities/OperationsDashboard.ts', reason: DEAD }],
-  ['PostRevision', { file: 'apps/api-server/src/entities/PostRevision.ts', reason: DEAD }],
-  ['Product', { file: 'apps/api-server/src/entities/Product.ts', reason: DEAD_UNREACHABLE_SERVICE('services/CommissionCalculator.ts · services/PolicyResolutionService.ts') }],
-  ['ScreenTemplate', { file: 'apps/api-server/src/entities/ScreenTemplate.ts', reason: DEAD }],
-  ['ShippingCarrier', { file: 'apps/api-server/src/entities/ShippingCarrier.ts', reason: DEAD }],
-  ['StatusPageIncident', { file: 'apps/api-server/src/entities/StatusPage.ts', reason: DEAD }],
-  ['StatusPageComponent', { file: 'apps/api-server/src/entities/StatusPage.ts', reason: DEAD }],
-  ['StatusPageMetric', { file: 'apps/api-server/src/entities/StatusPage.ts', reason: DEAD }],
-  ['StatusPageMaintenance', { file: 'apps/api-server/src/entities/StatusPage.ts', reason: DEAD }],
-  ['StatusPageSubscriber', { file: 'apps/api-server/src/entities/StatusPage.ts', reason: DEAD }],
-  ['Store', { file: 'apps/api-server/src/entities/Store.ts', reason: DEAD }],
-  ['Supplier', { file: 'apps/api-server/src/entities/Supplier.ts', reason: DEAD_UNREACHABLE_SERVICE('services/PolicyResolutionService.ts') }],
-  ['SystemMetrics', { file: 'apps/api-server/src/entities/SystemMetrics.ts', reason: DEAD_UNREACHABLE_SERVICE('services/CircuitBreakerService.ts · services/degradation/**') }],
-  ['Template', { file: 'apps/api-server/src/entities/Template.ts', reason: DEAD_UNREACHABLE_SERVICE('controllers/templatesController.ts') }],
-  ['UrlRedirect', { file: 'apps/api-server/src/entities/UrlRedirect.ts', reason: DEAD }],
-  ['UserAction', { file: 'apps/api-server/src/entities/UserAction.ts', reason: DEAD }],
-  ['UserSession', { file: 'apps/api-server/src/entities/UserSession.ts', reason: DEAD }],
-  ['Wishlist', { file: 'apps/api-server/src/entities/Wishlist.ts', reason: DEAD }],
-  ['WorkflowState', { file: 'apps/api-server/src/entities/WorkflowState.ts', reason: DEAD }],
-  ['WorkflowTransition', { file: 'apps/api-server/src/entities/WorkflowTransition.ts', reason: DEAD }],
-
+  // [WO-O4O-LEGACY-FILES-DEPENDENCIES-AND-DEAD-RUNTIME-FINAL-CLEANUP-V1]
+  //   `src/entities/**` 의 runtime 미도달 legacy entity 정의 31건이 파일째 제거되면서
+  //   해당 재고 항목도 함께 사라졌다. 남은 5건은 정의 파일이 살아 있는 미등록 재고다.
   // --- module / route 하위 legacy 정의 ---
   ['OfferServicePrice', { file: 'apps/api-server/src/modules/neture/entities/OfferServicePrice.entity.ts', reason: DEAD }],
   ['CosmeticsContent', { file: 'apps/api-server/src/routes/cosmetics/entities/cosmetics-content.entity.ts', reason: DEAD }],
   ['GlycopharmPharmacy', { file: 'apps/api-server/src/routes/glycopharm/entities/glycopharm-pharmacy.entity.ts', reason: DEAD }],
   ['KpaCourseRequest', { file: 'apps/api-server/src/routes/kpa/entities/kpa-course-request.entity.ts', reason: DEAD }],
   ['KpaInstructorQualification', { file: 'apps/api-server/src/routes/kpa/entities/kpa-instructor-qualification.entity.ts', reason: DEAD }],
-  ['StoreEvent', { file: 'apps/api-server/src/routes/platform/entities/store-event.entity.ts', reason: DEAD }],
 
   // --- [RETIRED] signage extension (routes/signage/extensions/**) ---
   //   WO-O4O-SIGNAGE-LEGACY-STACK-SIMPLIFICATION-AND-TABLET-AUTHORING-CLOSURE-V1 에서

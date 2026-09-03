@@ -10,14 +10,16 @@
     ".": "./dist/index.js",
     "./entities": "./dist/entities/index.js"
   },
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "rimraf dist",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@o4o/types": "workspace:*",
     "@o4o/organization-core": "workspace:*",
     "@o4o/interactive-content-core": "workspace:*",
     "@o4o/education-extension": "workspace:*"

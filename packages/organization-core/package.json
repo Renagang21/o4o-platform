@@ -15,9 +15,6 @@
     "clean": "rimraf dist",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "@o4o/types": "workspace:*"
-  },
   "peerDependencies": {
     "typeorm": "^0.3.0",
     "class-validator": "^0.14.0",

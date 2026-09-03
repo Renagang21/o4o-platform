@@ -1092,9 +1092,6 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:^
         version: link:../../packages/auth-client
-      '@o4o/types':
-        specifier: workspace:^
-        version: link:../../packages/types
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -1193,9 +1190,6 @@ importers:
       '@babel/types':
         specifier: ^7.23.6
         version: 7.28.5
-      '@o4o/auth-client':
-        specifier: workspace:*
-        version: link:../../packages/auth-client
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -1671,9 +1665,6 @@ importers:
 
   packages/cosmetics-seller-extension:
     dependencies:
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
       express:
         specifier: ^4.21.2
         version: 4.21.2
@@ -1724,9 +1715,6 @@ importers:
 
   packages/education-extension:
     dependencies:
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
       typeorm:
         specifier: ^0.3.0
         version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
@@ -1758,10 +1746,6 @@ importers:
         version: 5.4.5
 
   packages/financial-core:
-    dependencies:
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
     devDependencies:
       tsup:
         specifier: ^8.0.0
@@ -1865,9 +1849,6 @@ importers:
 
   packages/interactive-content-core:
     dependencies:
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
       express:
         specifier: ^4.18.0
         version: 4.21.2
@@ -1905,9 +1886,6 @@ importers:
       '@o4o/organization-core':
         specifier: workspace:*
         version: link:../organization-core
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
       class-transformer:
         specifier: ^0.5.0
         version: 0.5.1
@@ -1965,9 +1943,6 @@ importers:
 
   packages/market-trial:
     dependencies:
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
       class-transformer:
         specifier: ^0.5.0
         version: 0.5.1
@@ -2093,9 +2068,6 @@ importers:
       '@nestjs/core':
         specifier: ^10.0.0
         version: 10.4.20(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
       class-transformer:
         specifier: ^0.5.0
         version: 0.5.1
@@ -2121,12 +2093,6 @@ importers:
 
   packages/organization-forum:
     dependencies:
-      '@o4o/forum-core':
-        specifier: workspace:*
-        version: link:../forum-core
-      '@o4o/organization-core':
-        specifier: workspace:*
-        version: link:../organization-core
       typeorm:
         specifier: ^0.3.0
         version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
