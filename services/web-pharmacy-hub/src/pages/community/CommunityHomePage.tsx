@@ -8,10 +8,13 @@
  *   KPA JSX 를 복제하지 않는다 — 두 서비스가 같은 컨테이너를 각자의 config·data 로 쓴다.
  *
  *   또한 이 화면이 서비스 루트(`/`)의 canonical 홈이 됐다. 기존 서비스 소개형 HomePage 는
- *   폐기하고, 그 화면이 갖고 있던 두 요소를 이 홈의 슬롯으로 옮겼다:
- *     - 가입 상태 안내 밴드 → latestHeaderSlot
- *     - 역할별 진입점 카드 → valueGuideSlot (KPA 와 같은 after-help 배치)
- *   `/community` 는 `/` 로 redirect 된다(기존 링크 보존 · 중복 홈 제거).
+ *   폐기하고, 그 화면이 갖고 있던 가입 상태 안내 밴드를 이 홈의 latestHeaderSlot 으로
+ *   옮겼다. `/community` 는 `/` 로 redirect 된다(기존 링크 보존 · 중복 홈 제거).
+ *
+ * WO-O4O-PHARMACYHUB-HOME-ROLE-ENTRY-BLOCK-REMOVAL-V1:
+ *   홈의 `역할별 진입점` 블록(valueGuideSlot)을 제거했다. 역할별 실제 진입 경로는
+ *   GlobalHeader / 사용자 메뉴가 이미 제공하므로 홈에 중복으로 두지 않는다.
+ *   역할·권한 모델과 /store-owner·/operator·/admin route guard 는 그대로다.
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §2:
  *   콘텐츠(/content)·자료실(/resources)이 실재하게 됐다. 과거의
@@ -27,13 +30,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   CommunityServiceHome,
   LATEST_ACTIVITY_ACCENTS,
-  AppEntrySection,
   type LatestActivityTab,
   type NoticeItem,
 } from '@o4o/shared-space-ui';
 import { homeApi } from '../../api/home';
 import { fetchPharmacyHubForumPosts } from '../../services/forumApi';
-import { BRAND, ROLES, ROLE_LABELS, satisfiesRole } from '../../config/service';
+import { BRAND } from '../../config/service';
 import { useAuth } from '../../contexts/AuthContext';
 import { getServiceMembershipStatus } from '../../lib/membershipGate';
 
@@ -46,29 +48,10 @@ const LATEST_TABS: LatestActivityTab[] = [
   { key: 'course', label: '교육', shortcutHref: '/education', shortcutLabel: '교육 바로가기' },
 ];
 
-/**
- * 역할별 진입점 — 추가 권한이 필요한 영역만 나열한다.
- * (약사 회원의 이용 범위인 커뮤니티·교육은 위 앱 진입 카드가 담당한다.)
- */
-const ROLE_ENTRIES = [
-  { to: '/store-owner', role: ROLES.storeOwner, desc: '공급 상품 주문 · 매장 콘텐츠 · 실행 자산(QR·POP·사이니지)' },
-  { to: '/operator', role: ROLES.operator, desc: '가입·회원 운영 · 커뮤니티(포럼) 운영' },
-];
-
 export default function CommunityHomePage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const membershipStatus = getServiceMembershipStatus(user);
-  const roles: string[] = Array.isArray(user?.roles) ? (user!.roles as string[]) : [];
-
-  /**
-   * WO-O4O-PHARMACYHUB-FINAL-ROLE-ENTRY-AND-PRODUCTION-ADOPTION-CLOSURE-V1:
-   *   로그인 사용자에게는 **보유 역할로 실제 진입 가능한 카드만** 노출한다(데드링크 0).
-   *   비로그인 방문자에게는 서비스 안내 목적으로 전체 목록을 유지한다.
-   */
-  const roleEntries = isAuthenticated
-    ? ROLE_ENTRIES.filter((e) => satisfiesRole(roles, e.role))
-    : ROLE_ENTRIES;
 
   /** 공지 adapter — PH 의 공지 canonical 은 forum pinned post 다. 실패는 throw 한다. */
   const loadNotices = useCallback(async (): Promise<NoticeItem[]> => {
@@ -161,21 +144,6 @@ export default function CommunityHomePage() {
         //   따라서 콘텐츠·자료실의 실제 진입점은 이 커뮤니티 홈 카드와 footer 가 담당한다.
         { title: '자료실', description: '약국 운영에 활용할 자료를 모아보기', href: '/resources' },
       ]}
-      /* KPA 와 같은 배치 계약 — 역할별 활용 안내는 진입 CTA 가 아니라 가이드 영역에 둔다. */
-      valueGuidePlacement="after-help"
-      valueGuideSlot={
-        roleEntries.length > 0 ? (
-          <AppEntrySection
-            title="역할별 진입점"
-            accentColor="#0d9488"
-            cards={roleEntries.map((e) => ({
-              title: ROLE_LABELS[e.role],
-              description: e.desc,
-              href: e.to,
-            }))}
-          />
-        ) : undefined
-      }
       cta={{
         title: 'PharmacyHub 커뮤니티에 참여하세요',
         description: '가입 승인 후 포럼 글쓰기와 교육 콘텐츠를 이용할 수 있습니다.',

@@ -9,7 +9,6 @@
  *   (공급자는 Pharmacy-Hub 회원이 아니다. 제공 설정은 Neture 공급자 화면에 있다.)
  *
  * 라우트:
- *   /                            홈 (브랜드 표시 + 역할별 진입점)
  *   /login                       로그인 (serviceKey='pharmacy-hub')
  *   /join                        가입 신청 (public)
  *   /join/status                 내 가입 상태
