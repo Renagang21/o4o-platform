@@ -7,6 +7,32 @@
 - **branch**: `work/signage-forced-content-surface-read-contract-v2`
 - **작업일**: 2026-09-03
 
+### 최종 반영 상태
+
+| 항목 | 값 |
+|---|---|
+| 작업 commit | `433a01c1c` |
+| **merge commit** | **`21a514fa2dc65f6bc34b94135cb17f82b88f7e4c`** (PR #188, merged 2026-09-03T04:22:47Z) |
+| merge 후 `origin/main` | `21a514fa2` — `433a01c1c` 가 ancestor 임을 확인 |
+| merge 방식 | merge commit (GitHub) |
+| working tree | clean · `HEAD == origin/main` 확인 |
+
+**최종 CI 상태 (PR #188 — 전부 pass)**
+
+```text
+Code Quality Check                 pass  11m52s
+Analyze (typescript)               pass   2m51s
+Build Applications (admin-dashboard) pass  3m08s
+SonarCloud Code Analysis           pass   5m13s
+CodeQL                             pass
+Apply Size Labels                  pass
+mergeable=MERGEABLE  mergeState=CLEAN
+```
+
+> 로컬 lint-ratchet 는 다른 세션 WIP 로 오염돼 판정 불가였으나(§14),
+> CI 의 **Code Quality Check 가 clean branch 기준으로 pass** 하여
+> `168 > 64` 초과가 본 변경과 무관함이 독립적으로 확인됐다.
+
 ---
 
 ## 1. 과거 전제 재검증 (재사용하지 않음)
