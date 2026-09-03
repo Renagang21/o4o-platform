@@ -337,4 +337,56 @@ inner Button 추가 · DynamicRenderer 화면 조작은 위와 같은 CORS 사�
   `origin/main` 과 동일함을 실측 확인했다. staged 대상에서 제외했다.
 - 최신 `origin/main` 기반 임시 worktree 에서 cherry-pick → patch 동일성 확인 → FF push.
 
-*(commit hash 는 아래 절에 기록)*
+### 결과
+
+| 항목 | 값 |
+|---|---|
+| 작업 커밋 (로컬, `ae2e8373b` 위) | `2474b80b2` |
+| **push 된 커밋 (`origin/main` 위)** | **`810097c63`** |
+| 변경 규모 | 115 files · +815 / −14,018 |
+| push 전 `origin/main` | `b96f30945` |
+| push 후 `origin/main` | `810097c63` |
+
+§30 절차 실측:
+
+- 최신 `origin/main`(`b96f30945`) 기준 임시 worktree 생성 → `2474b80b2` cherry-pick
+- **patch-id 동일** (`8005ee364778234c6001d7373e10ce8ac0573cf9` = 원본 = 이식본) — 내용 변형 0
+- 부모 == `b96f30945` → **fast-forward 확인**
+- foreign signage 커밋 `ae2e8373b` **미포함** 확인 후 push
+- `rebase 0` · `autostash 0` · `--amend 0` · force-push 0
+- 임시 worktree 는 push 후 git 등록 해제 (디스크 잔여 디렉터리 `C:/tmp/wt-shortcode-retire`
+  는 파일 잠금으로 삭제 실패 — git worktree 목록에서는 제거됨, 저장소 영향 없음)
+
+### foreign 변경 보존 확인 (push 후)
+
+커밋에 포함된 파일 **115건 전부 shortcode 범위**이며, 다른 세션의
+unstaged 11 · untracked 5 는 워크트리에 **그대로 보존**됐다 (커밋 침범 0).
+
+---
+
+## 14. 최종 판정
+
+```text
+SHORTCODE_DOMAIN_RETIRED
+```
+
+| 완료 기준 (§34) | 결과 |
+|---|---|
+| `packages/shortcodes` 존재 | **0** |
+| runtime `@o4o/shortcodes` consumer | **0** |
+| admin shortcode bootstrap / editor block | **0 / 0** |
+| block-renderer shortcode renderer | **0** |
+| cosmetics seller shortcode definitions | **0** (패키지 자체는 보존) |
+| shortcode audit checker · `verify-shortcodes` · report 계약 | **0 / 0 / 0** |
+| production DB write · migration | **0 / 0** |
+| DEAD_REFERENCE · UNKNOWN | **0 / 0** |
+| typecheck · tests · build | **PASS · PASS · PASS** |
+| editor smoke | **부분 PASS** (boot·registry 실측 PASS / 인증 화면은 배포 후 잔여) |
+| foreign WIP 변경 | **0** |
+
+### 배포 후 잔여 항목 (후속)
+
+1. `admin.neture.co.kr` 배포 후 편집기 진입 · Block Inserter · Slash command ·
+   preview 실화면 스모크 (§26) — 로컬 origin CORS 차단으로 이번 회차 미수행
+2. Buttons inner Button 추가 · DynamicRenderer 화면 조작 (§27 이월 항목)
+
