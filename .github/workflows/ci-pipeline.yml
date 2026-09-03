@@ -252,7 +252,7 @@ jobs:
         MISSING_DIST=0
 
         # All packages built by build:packages (must stay in sync)
-        for pkg in types auth-utils capabilities appearance-system auth-client utils ui auth-context shortcodes block-renderer content-editor slide-app organization-core forum-core pharmacy-ai-insight ai-prompts lms-client account-ui; do
+        for pkg in types auth-utils capabilities appearance-system auth-client utils ui auth-context block-renderer content-editor slide-app organization-core forum-core pharmacy-ai-insight ai-prompts lms-client account-ui; do
           if [ ! -d "packages/$pkg/dist" ]; then
             echo "❌ packages/$pkg/dist not found!"
             MISSING_DIST=1
@@ -266,7 +266,7 @@ jobs:
           exit 1
         fi
 
-        echo "✅ All build:packages outputs verified ($(echo types capabilities appearance-system auth-client utils ui auth-context shortcodes block-renderer content-editor slide-app organization-core forum-core pharmacy-ai-insight lms-client account-ui | wc -w) packages)"
+        echo "✅ All build:packages outputs verified ($(echo types capabilities appearance-system auth-client utils ui auth-context block-renderer content-editor slide-app organization-core forum-core pharmacy-ai-insight lms-client account-ui | wc -w) packages)"
 
     - name: Build ${{ matrix.app }}
       run: bash scripts/ci-build-app.sh ${{ matrix.app }}

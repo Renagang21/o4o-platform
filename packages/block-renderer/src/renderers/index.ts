@@ -36,7 +36,6 @@ import { MarkdownBlock } from './special/MarkdownBlock';
 import { HtmlBlock } from './special/HtmlBlock';
 import { EmbedBlock } from './special/EmbedBlock';
 import { CoverBlock } from './special/CoverBlock';
-import { ShortcodeBlock } from './special/ShortcodeBlock';
 
 // Product blocks
 import { ProductCardBlock } from './product/ProductCardBlock';
@@ -150,10 +149,6 @@ export function registerAllBlocks() {
     'core/cover': CoverBlock,
     'o4o/cover': CoverBlock,
 
-    'shortcode': ShortcodeBlock,
-    'core/shortcode': ShortcodeBlock,
-    'o4o/shortcode': ShortcodeBlock,
-
     // Product blocks
     'product-card': ProductCardBlock,
     'o4o/product-card': ProductCardBlock,
@@ -206,7 +201,6 @@ export * from './special/MarkdownBlock';
 export * from './special/HtmlBlock';
 export * from './special/EmbedBlock';
 export * from './special/CoverBlock';
-export * from './special/ShortcodeBlock';
 
 export * from './product/ProductCardBlock';
 export * from './product/ProductTitleBlock';

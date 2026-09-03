@@ -1,38 +1,35 @@
 # Block & Shortcode Registry Audit Report
 
+> 역사 문서 — shortcode 축은 2026-09-03 에 은퇴했다. 아래 헤더 박스를 먼저 읽을 것.
+
 **Task ID:** R-1-3
 **Date:** 2025-11-21
 **Status:** Completed
 
 ---
 
-> ## 현재 수치 (2026-08-27 갱신)
+> ## 현재 수치 (2026-09-03 갱신)
+>
+> **shortcode 축은 은퇴했다** — `WO-O4O-SHORTCODE-DOMAIN-RETIREMENT-V1` (2026-09-03).
+> 선행 census(`WO-O4O-SHORTCODE-ACTUAL-USAGE-AND-RETIREMENT-READINESS-CENSUS-V1`)가
+> production stored usage 0 · service consumer 0 · production render usage 0 ·
+> external contract 0 으로 `RETIRE_READY` 판정했고, 그에 따라 `@o4o/shortcodes`
+> 패키지, admin shortcode 편집기, block-renderer shortcode 지원,
+> `check-shortcode-registry.ts`, `verify:shortcodes` 가 모두 제거됐다.
+> **이 문서의 shortcode 관련 §2~§8 서술은 전부 역사 기록이며 현행이 아니다.**
+> 은퇴 계약은 `apps/api-server/src/__tests__/shortcode-domain-retirement.spec.ts`,
+> 판정 근거는
+> [`docs/checks/WO-O4O-SHORTCODE-DOMAIN-RETIREMENT-V1-CHECK.md`](../../docs/checks/WO-O4O-SHORTCODE-DOMAIN-RETIREMENT-V1-CHECK.md).
 >
 > 아래 **§2~§8 은 2025-11-21 시점의 기록**이다. 그 뒤 main-site shortcode 축이
 > 은퇴했고(`WO-O4O-MAIN-SITE-NEXTGEN-VIEWRENDERER-DOMAIN-CENSUS-AND-RETIREMENT-V1`),
-> scanner 자체의 오탐도 정리됐으며(`WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1`),
-> shortcode 축은 **audit 모델 자체가 교체됐다**
-> (`WO-O4O-SHORTCODE-REGISTRY-SSOT-AND-RUNTIME-REACHABILITY-V1`).
+> scanner 자체의 오탐도 정리됐다(`WO-O4O-REGISTRY-AUDIT-MISSING-AND-DANGLING-CLOSURE-V1`).
 > 본문의 목록·수치는 더 이상 현행이 아니다. **현행 수치는 이 표가 정본이다.**
 >
 > | 축 | 기준 | 등록 | 설명된 gap | 미설명 missing | dangling | checker |
 > |---|---|---:|---:|---:|---:|---|
 > | Block | 정의 파일 33 | 33 | — | **0** | **0** | exit 0 |
-> | Shortcode | 선언 token 14 | 5 | 9 | **0** | **0** | exit 0 |
->
-> shortcode 축의 **SSOT 는 `packages/shortcodes/src/registry.ts` 의 `globalRegistry`
-> 단일 인스턴스**이고, renderer 와 editor 가 모두 그것만 조회한다. audit 은 이제
-> 파일 존재가 아니라 **bootstrap 에서 도달 가능한 등록 경로**를 기준으로 판정한다.
->
-> 등록되는 5건: `preset` · `cpt_list` · `cpt_field` · `acf_field` · `meta_field`.
-> 등록되지 않는 9건은 원인이 규명돼 있다 — `social_login` · `login_form` ·
-> `oauth_login` 은 호출자가 0 인 `registerAuthShortcodes()` 소속(`DEAD_INITIALIZER`),
-> product 6건은 loader glob 밖이고 importer 도 0 인 번들(`UNMOUNTED_DEFINITION_BUNDLE`).
->
-> 선행 WO 가 남긴 `approval_queue` · `product_shortcodes` 2건은 **파일명에서 유추된
-> 이름**이었고 소스 어디에도 없었다. 선언된 `name:` 만 canonical key 로 쓰면서 사라졌다.
-> 판정 근거는
-> [`docs/checks/WO-O4O-SHORTCODE-REGISTRY-SSOT-AND-RUNTIME-REACHABILITY-V1-CHECK.md`](../../docs/checks/WO-O4O-SHORTCODE-REGISTRY-SSOT-AND-RUNTIME-REACHABILITY-V1-CHECK.md).
+> | Shortcode | — | — | — | — | — | RETIRED |
 
 ---
 

@@ -40,8 +40,10 @@
  * (`main-site-residual-dependency-cleanup.spec.ts`):
  *   - `axios` dependency · `tsx` devDependency → main-site orphan, 제거
  *   - 루트 `verify:shortcodes` · `scripts/audit/check-shortcode-registry.ts`
- *     → 살아 있는 shortcode 도메인을 검사하므로 KEEP_ACTIVE.
- *       은퇴한 main-site 경로 스캔 코드만 제거했다.
+ *     → 그 WO 시점에는 살아 있는 shortcode 도메인을 검사하는 KEEP_ACTIVE 자산이었다.
+ *       이후 WO-O4O-SHORTCODE-DOMAIN-RETIREMENT-V1 이 shortcode 도메인 전체를
+ *       은퇴시키면서 두 자산도 함께 사라졌다
+ *       (은퇴 계약: `shortcode-domain-retirement.spec.ts`).
  *
  * 이 테스트는 **재등록 방지 계약**이다. DB · 네트워크 접근 0.
  */

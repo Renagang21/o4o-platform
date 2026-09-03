@@ -23,7 +23,7 @@ The platform has three distinct rendering contexts:
   - `renderMediaBlocks.tsx` - image, video, gallery, audio
   - `renderLayoutBlocks.tsx` - columns, group, spacer, separator, button, table
   - `renderMarkdown.tsx` - markdown using marked library
-  - `renderSpecialBlocks.tsx` - cover, slide, youtube, file, social-links, shortcode
+  - `renderSpecialBlocks.tsx` - cover, slide, youtube, file, social-links
 - Preview now has ~110 lines (down from 500+)
 - Each renderer module is focused, maintainable, and testable
 

@@ -73,7 +73,7 @@ pnpm run type-check            # 전체 (api-server 포함)
 pnpm run type-check:frontend   # api-server 제외
 pnpm run lint
 pnpm test
-pnpm run verify           # 레지스트리 검증 (shortcode / block / CPT)
+pnpm run verify           # 레지스트리 검증 (block / CPT)
 
 # 정리
 pnpm run clean

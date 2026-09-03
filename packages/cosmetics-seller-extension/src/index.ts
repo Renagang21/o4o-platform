@@ -24,9 +24,6 @@ export * from './backend/index.js';
 // Frontend
 export * from './frontend/index.js';
 
-// Shortcodes
-export { shortcodes } from './shortcodes/index.js';
-
 // Lifecycle
 export * from './lifecycle/index.js';
 

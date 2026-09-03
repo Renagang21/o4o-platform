@@ -117,21 +117,6 @@ export interface BlockSpec {
 }
 
 /**
- * Shortcode Block Attributes
- */
-export interface ShortcodeBlockAttributes {
-  /**
-   * Shortcode string (e.g., "[seller_dashboard]", "[login_form]")
-   */
-  code: string;
-
-  /**
-   * Optional parameters parsed from shortcode
-   */
-  params?: Record<string, string>;
-}
-
-/**
  * Placeholder Block Attributes
  */
 export interface PlaceholderBlockAttributes {

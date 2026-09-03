@@ -2,7 +2,7 @@
  * Product Card Block Renderer
  * Displays a product card for archive/listing pages
  *
- * Used in: CPTArchive, ViewPreset-based listings, Shortcodes
+ * Used in: CPTArchive, ViewPreset-based listings
  */
 
 import React from 'react';

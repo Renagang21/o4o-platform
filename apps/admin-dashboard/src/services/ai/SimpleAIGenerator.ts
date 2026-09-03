@@ -23,7 +23,6 @@ import {
   isAIResponseV1,
   isAIResponseV2,
   NewBlockRequest,
-  ShortcodeBlockAttributes,
   PlaceholderBlockAttributes,
 } from './types';
 
@@ -350,7 +349,6 @@ ${SIMPLE_GENERATOR_BLOCK_FORMAT_EXAMPLE}`;
    * Phase 1-A: V1/V2 포맷 모두 수용하는 블록 검증 및 정규화
    *
    * 변경 사항:
-   * - Shortcode 블록 제거 로직 삭제 (o4o/shortcode로 정상 통합)
    * - V1/V2 포맷 자동 감지 및 정규화
    * - Placeholder 블록 처리 로직 추가
    * - new_blocks_request 반환 지원
@@ -380,7 +378,6 @@ ${SIMPLE_GENERATOR_BLOCK_FORMAT_EXAMPLE}`;
 
   /**
    * 블록 정규화 (core/ → o4o/, content → attributes 등)
-   * ⚠️ Shortcode 블록 제거 로직 삭제됨 (Phase 1-A)
    */
   private normalizeBlocks(blocks: any[]): Block[] {
     if (!Array.isArray(blocks)) {
@@ -392,12 +389,6 @@ ${SIMPLE_GENERATOR_BLOCK_FORMAT_EXAMPLE}`;
       let blockType = block.type || 'o4o/paragraph';
       if (blockType.startsWith('core/')) {
         blockType = blockType.replace('core/', 'o4o/');
-      }
-
-      // ⭐ Phase 1-A: shortcode 타입 정규화
-      // shortcode/xxx → o4o/shortcode로 통합
-      if (blockType.includes('shortcode') && blockType !== 'o4o/shortcode') {
-        blockType = 'o4o/shortcode';
       }
 
       let content = block.content || {};
@@ -518,24 +509,6 @@ ${SIMPLE_GENERATOR_BLOCK_FORMAT_EXAMPLE}`;
             ...attributes,
             url: content.url || '',
             alt: content.alt || ''
-          };
-        }
-        // content는 항상 빈 객체
-        content = {};
-      }
-
-      // ⭐ Phase 1-A: shortcode 블록 처리
-      if (blockType === 'o4o/shortcode') {
-        // shortcode는 attributes.shortcode에 저장
-        if (typeof content === 'object' && content.shortcode) {
-          attributes = {
-            ...attributes,
-            shortcode: content.shortcode,
-          };
-        } else if (typeof content === 'string') {
-          attributes = {
-            ...attributes,
-            shortcode: content,
           };
         }
         // content는 항상 빈 객체

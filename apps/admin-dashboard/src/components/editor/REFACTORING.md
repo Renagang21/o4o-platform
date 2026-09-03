@@ -195,10 +195,9 @@ All AI features remain in the main GutenbergBlockEditor:
 ### Future Work Foundation
 This refactoring sets the foundation for:
 
-1. **Shortcode Integration** - Clean hook structure for shortcode rendering
-2. **Dropshipping UI** - Reusable components for marketplace features
-3. **AI Page Generator** - Modular AI features can be enhanced independently
-4. **Block Extensions** - New block types integrate cleanly with EditorCanvas
+1. **Dropshipping UI** - Reusable components for marketplace features
+2. **AI Page Generator** - Modular AI features can be enhanced independently
+3. **Block Extensions** - New block types integrate cleanly with EditorCanvas
 
 ## Technical Debt Remaining
 

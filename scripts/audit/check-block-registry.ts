@@ -24,9 +24,6 @@ const PROJECT_ROOT = path.join(__dirname, '../..');
  * 절대경로를 그대로 넣으면 실행 머신마다 report 전체가 달라진다
  * (`C:\Users\me\repo\x.ts` vs `/home/dev/repo/x.ts`).
  * 구분자도 `/` 로 통일해 Windows/Linux 출력이 같아지게 한다.
- *
- * sibling 인 check-shortcode-registry.ts 에 **같은 함수를 그대로** 둔다.
- * 공용 helper 로 추출하면 scripts/ 의 모듈 경계가 커져 이번 범위를 넘는다.
  */
 function toRepoPath(absPath: string): string {
   return path.relative(PROJECT_ROOT, absPath).split(path.sep).join('/');

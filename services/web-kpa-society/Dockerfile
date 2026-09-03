@@ -43,7 +43,6 @@ COPY packages/error-handling/package.json ./packages/error-handling/
 COPY packages/block-renderer/package.json ./packages/block-renderer/
 COPY packages/slide-app/package.json ./packages/slide-app/
 COPY packages/content-core/package.json ./packages/content-core/
-COPY packages/shortcodes/package.json ./packages/shortcodes/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/account-ui/package.json ./packages/account-ui/
 COPY packages/lms-client/package.json ./packages/lms-client/
@@ -84,7 +83,6 @@ COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/block-renderer/ ./packages/block-renderer/
 COPY packages/slide-app/ ./packages/slide-app/
 COPY packages/content-core/ ./packages/content-core/
-COPY packages/shortcodes/ ./packages/shortcodes/
 COPY packages/utils/ ./packages/utils/
 COPY packages/account-ui/ ./packages/account-ui/
 COPY packages/lms-client/ ./packages/lms-client/

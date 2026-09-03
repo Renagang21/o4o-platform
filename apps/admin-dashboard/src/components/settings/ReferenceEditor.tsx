@@ -93,7 +93,6 @@ const ReferenceEditor: React.FC<Props> = ({ reference, onSave, onCancel }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="blocks">Blocks</option>
-              <option value="shortcodes">Shortcodes</option>
               <option value="image-prompts">Image Prompts</option>
             </select>
           </div>

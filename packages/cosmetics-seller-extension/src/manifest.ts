@@ -201,51 +201,6 @@ export const cosmeticsSellerExtensionManifest = {
     'cosmetics-seller:admin',
   ],
 
-  // Shortcodes
-  shortcodes: [
-    {
-      name: 'cosmetics-seller-dashboard',
-      component: './frontend/shortcodes/seller-dashboard.js',
-      description: 'Seller Dashboard overview',
-      usage: '[cosmetics-seller-dashboard]',
-      attributes: {},
-    },
-    {
-      name: 'cosmetics-seller-displays',
-      component: './frontend/shortcodes/seller-displays.js',
-      description: 'Display management view',
-      usage: '[cosmetics-seller-displays]',
-      attributes: {},
-    },
-    {
-      name: 'cosmetics-seller-samples',
-      component: './frontend/shortcodes/seller-samples.js',
-      description: 'Sample management view',
-      usage: '[cosmetics-seller-samples]',
-      attributes: {},
-    },
-    {
-      name: 'cosmetics-seller-inventory',
-      component: './frontend/shortcodes/seller-inventory.js',
-      description: 'Inventory management view',
-      usage: '[cosmetics-seller-inventory]',
-      attributes: {},
-    },
-    {
-      name: 'cosmetics-seller-consultations',
-      component: './frontend/shortcodes/seller-consultations.js',
-      description: 'Consultation logs view',
-      usage: '[cosmetics-seller-consultations]',
-      attributes: {},
-    },
-    {
-      name: 'cosmetics-seller-kpi',
-      component: './frontend/shortcodes/seller-kpi.js',
-      description: 'Seller KPI dashboard',
-      usage: '[cosmetics-seller-kpi]',
-      attributes: {},
-    },
-  ],
 
   // Menu Configuration (표준 형식)
   menus: {
