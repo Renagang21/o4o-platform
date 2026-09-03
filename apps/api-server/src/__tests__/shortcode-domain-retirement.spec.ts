@@ -40,9 +40,17 @@ const FORMER_DEPENDENTS = [
   'apps/admin-dashboard/package.json',
   'packages/block-renderer/package.json',
   'packages/cosmetics-seller-extension/package.json',
-  // workspace glob 밖의 stale mirror stub — 문자열 잔재까지 함께 닫는다.
-  'apps/api-server/packages/block-renderer/package.json',
-  'apps/api-server/packages/cosmetics-seller-extension/package.json',
+];
+
+/**
+ * workspace glob 밖의 stale mirror stub.
+ * WO-O4O-LEGACY-FILES-DEPENDENCIES-AND-DEAD-RUNTIME-FINAL-CLEANUP-V1 에서
+ * `apps/api-server/packages/**` 전체가 제거됐다. 문자열 잔재 단언보다
+ * "파일 자체가 없다" 가 더 강한 계약이므로 존재 단언으로 승격한다.
+ */
+const REMOVED_MIRROR_STUBS = [
+  ['apps', 'api-server', 'packages', 'block-renderer', 'package.json'],
+  ['apps', 'api-server', 'packages', 'cosmetics-seller-extension', 'package.json'],
 ];
 
 describe('1. `@o4o/shortcodes` runtime dependency 가 0 이다', () => {
@@ -56,6 +64,10 @@ describe('1. `@o4o/shortcodes` runtime dependency 가 0 이다', () => {
     ]) {
       expect(Object.keys(pkg[field] ?? {})).not.toContain('@o4o/shortcodes');
     }
+  });
+
+  it.each(REMOVED_MIRROR_STUBS)('workspace 밖 mirror stub %s/%s/%s/%s/%s 가 없다', (...seg) => {
+    expect(exists(...seg)).toBe(false);
   });
 
   it('lockfile 에 `packages/shortcodes` importer 가 없다', () => {

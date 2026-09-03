@@ -60,15 +60,6 @@ run_type_check() {
         fi
     done
     
-    # Build block plugins
-    echo "Building block plugins..."
-    for pkg in text-content layout-media interactive dynamic; do
-        if [ -d "packages/blocks/$pkg" ]; then
-            echo "  - Building @o4o/$pkg-blocks"
-            (cd "packages/blocks/$pkg" && npx tsc --noEmit 2>/dev/null) || true
-        fi
-    done
-    
     # Type check apps
     echo "Type checking apps..."
     for app in api-server main-site admin-dashboard ecommerce digital-signage; do
@@ -89,15 +80,6 @@ run_type_check_frontend() {
         if [ -d "packages/$pkg" ]; then
             echo "  - Building @o4o/$pkg"
             (cd "packages/$pkg" && npx tsc 2>/dev/null) || true
-        fi
-    done
-    
-    # Build block plugins
-    echo "Building block plugins..."
-    for pkg in text-content layout-media interactive dynamic; do
-        if [ -d "packages/blocks/$pkg" ]; then
-            echo "  - Building @o4o/$pkg-blocks"
-            (cd "packages/blocks/$pkg" && npx tsc --noEmit 2>/dev/null) || true
         fi
     done
     
