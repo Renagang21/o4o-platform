@@ -105,6 +105,15 @@ export class StorePlaylistRepository {
   /**
    * Public playlist items — merges forced content if serviceKey provided.
    * Complex UNION ALL → raw SQL encapsulated.
+   *
+   * WO-O4O-SIGNAGE-FORCED-CONTENT-SURFACE-READ-CONTRACT-CLOSURE-V2
+   *   이 메서드는 사이니지 **재생(playback)** reader 다 —
+   *   GET /store-playlists/public/:id (무인증) → web-kpa-society `/public/signage`.
+   *   forced content UNION 이 target_surface 를 필터하지 않아
+   *   태블릿 전용('tablet_idle') 항목이 사이니지 재생 목록에 섞여 들어갔다.
+   *   canonical Tablet idle resolver 가 `IN ('tablet_idle','both')` 를 읽는 것과 대칭으로
+   *   여기서는 `IN ('signage','both')` 만 읽는다.
+   *   편집용 findPlaylistItems() 는 playback reader 가 아니므로 전체 surface 를 유지한다.
    */
   async findPublicPlaylistItems(playlistId: string, serviceKey?: string): Promise<PlaylistItemDto[]> {
     if (serviceKey) {
@@ -148,6 +157,7 @@ export class StorePlaylistRepository {
          WHERE fc.service_key = $2
            AND fc.is_active = true
            AND fc.deleted_at IS NULL
+           AND fc.target_surface IN ('signage','both')
            AND NOW() >= fc.start_at
            AND NOW() <= fc.end_at
 
