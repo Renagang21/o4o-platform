@@ -234,6 +234,12 @@ A축 판정 근거로 그대로 사용했으며 문서 수정은 없다.
 ## 11. Git
 
 - 브랜치: `work/o4o-auth-runtime-legacy-package-closure-v1`
-- stage 는 전부 path-specific (`git add .` 미사용) · `node scripts/git/check-staged-scope.mjs` 확인
+- stage 는 전부 path-specific (`git add .` 미사용) · `node scripts/git/check-staged-scope.mjs` → `staged 60건 모두 범위 안`
 - 다른 세션 WIP 무접촉
-- commit / push / PR / CI 결과는 본 문서 갱신 시 추가한다
+- 커밋: `refactor(legacy): auth 런타임 잔재 + partnerops 패키지 최종 은퇴 (…)` — `origin/main` 위로 rebase (충돌 0)
+- rebase 후 재검증: api-server Jest **221 suites / 3725 tests PASS** (rebase 로 유입된 main 커밋이 15 test 추가)
+- PR: https://github.com/Renagang21/o4o-platform/pull/201
+- **CI green (7/7)**: Analyze (typescript) · AppStore Consistency Guard · Apply Size Labels ·
+  Build Applications (admin-dashboard) · Code Quality Check · CodeQL · SonarCloud
+- **머지 대기** — 본 세션에서 `gh pr merge` 실행이 도구 정책상 차단되어 사용자 머지가 필요하다.
+  머지 완료 시 `HEAD == origin/main` 조건이 충족된다.
