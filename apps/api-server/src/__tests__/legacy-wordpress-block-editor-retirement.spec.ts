@@ -441,6 +441,35 @@ describe('10. 추적된 생성물 · dev tooling stale reference 정리 계약 (
   });
 });
 
+describe('11. dev/build config stale residue 계약 (WO-O4O-DEV-BUILD-CONFIG-AND-STALE-APP-REFERENCE-FINAL-CLEANUP-V1)', () => {
+  it('dev 스크립트 앱 순회 목록에 존재하지 않는 app 이 없다', () => {
+    const devSh = read('scripts/development/dev.sh');
+    const lists = [...devSh.matchAll(/for app in ([^;]+); do/g)].map((m) => m[1]);
+
+    expect(lists.length).toBeGreaterThan(0);
+    const missing: string[] = [];
+    for (const list of lists) {
+      for (const name of list.split(/\s+/).map((t) => t.trim()).filter(Boolean)) {
+        if (!exists(`apps/${name}`)) missing.push(name);
+      }
+    }
+    expect(missing).toEqual([]);
+  });
+
+  it('admin tsconfig.node.json 은 dead dist-node 산출물을 강제하지 않는다', () => {
+    const raw = read('apps/admin-dashboard/tsconfig.node.json');
+    const cfg = JSON.parse(stripComments(raw)) as {
+      compilerOptions?: Record<string, unknown>;
+    };
+    const opts = cfg.compilerOptions ?? {};
+
+    // outDir 은 남아 있어도 되지만(composite 는 emit 을 요구한다) dist-node 는 아니어야 한다.
+    expect(String(opts.outDir ?? '')).not.toContain('dist-node');
+    // project reference 계약(apps/admin-dashboard/tsconfig.json 의 references)에 필요하므로 유지한다.
+    expect(opts.composite).toBe(true);
+  });
+});
+
 /** 주석을 제거한다 — 은퇴 설명 주석이 계약 단언을 오탐시키지 않도록 한다. */
 function stripComments(src: string): string {
   return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '');

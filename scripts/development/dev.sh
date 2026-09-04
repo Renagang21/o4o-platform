@@ -62,7 +62,7 @@ run_type_check() {
     
     # Type check apps
     echo "Type checking apps..."
-    for app in api-server main-site admin-dashboard ecommerce digital-signage; do
+    for app in api-server main-site admin-dashboard; do
         if [ -d "apps/$app" ]; then
             echo "  - Checking $app"
             (cd "apps/$app" && npx tsc --noEmit 2>/dev/null) || true
@@ -85,7 +85,7 @@ run_type_check_frontend() {
     
     # Type check frontend apps only (skip api-server)
     echo "Type checking frontend apps..."
-    for app in main-site admin-dashboard ecommerce digital-signage; do
+    for app in main-site admin-dashboard; do
         if [ -d "apps/$app" ]; then
             echo "  - Checking $app"
             (cd "apps/$app" && npx tsc --noEmit 2>/dev/null) || true
@@ -118,7 +118,7 @@ run_build() {
     
     # Build apps
     echo "Building apps..."
-    for app in api-server main-site admin-dashboard ecommerce digital-signage; do
+    for app in api-server main-site admin-dashboard; do
         if [ -d "apps/$app" ]; then
             echo "  - Building $app"
             (cd "apps/$app" && pnpm run build) || true
