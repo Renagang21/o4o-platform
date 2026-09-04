@@ -1,0 +1,106 @@
+{
+  "phase": "ProductMaster 생성 경로 전수 감사 (§8) — 2026-09-04",
+  "method": "insert into product_masters 전수 grep(대소문자 무시, apps/packages/services/scripts) + ProductMaster repository .save()/.create() 호출부 전수 확인",
+  "contract": "master 생성 성공 → 해당 master 의 product_landings 존재 보장. 발급기는 mintForMaster 재사용(신규 QR generator 없음). TX 커밋 후 호출 → 생성 실패 시 orphan landing 0.",
+  "paths": [
+    {
+      "path": "modules/neture/services/catalog.service.ts :: resolveOrCreateMaster (+ createMasterWithoutBarcode)",
+      "class": "RUNTIME_CREATE",
+      "consumers": [
+        "controllers/product-master-create.controller.ts (관리자 신규 상품 등록)",
+        "controllers/admin.controller.ts",
+        "services/offer.service.ts (공급자 신규 제품 등록 — masterId 외부 주입 금지, 반드시 이 경로 경유)",
+        "modules/catalog-import/services/catalog-import-resolver.ts"
+      ],
+      "hooked": true,
+      "hook": "ensureProductLandingForMaster(AppDataSource, saved.id, 'master-create-mfds' | 'master-create-manual' | 'master-create-barcodeless') — 3개 create 분기 전부",
+      "note": "공급자 신규 등록이 이 경로로 수렴하므로 §13 '공급자 신규 제품' 요구가 여기서 충족된다."
+    },
+    {
+      "path": "modules/neture/services/store-product-request-admin.service.ts :: approveAsNewMaster",
+      "class": "RUNTIME_CREATE",
+      "consumers": ["매장 신규 상품 요청 → 관리자 승인(store_web)"],
+      "hooked": true,
+      "hook": "dataSource.transaction 결과를 받아 **커밋 후** ensureProductLandingForMaster(this.dataSource, result.masterId, 'store-request-new-master')",
+      "note": "TX 안에서 발급하지 않는다 — 승인 롤백 시 이 줄에 도달하지 않아 orphan 0."
+    },
+    {
+      "path": "modules/neture/services/csv-import.service.ts :: applyBatch / retryFailedRows (applyRow CREATE_MASTER)",
+      "class": "RUNTIME_CREATE (공급자 CSV/XLSX 업로드)",
+      "hooked": true,
+      "hook": "행별 createdMasterIds 수집 → 트랜잭션 commit 후 ensureProductLandingsForMasters(dataSource, ids, 'csv-import' | 'csv-import-retry')",
+      "note": "SAVEPOINT 로 롤백된 행은 목록에 없으므로 orphan 0. 기존 image/AI fire-and-forget 과 같은 위치."
+    },
+    {
+      "path": "modules/neture/services/product-candidate.service.ts :: (단건 promotion) → drug-import/DbPromotionMasterStore.createMaster",
+      "class": "RUNTIME_CREATE (관리자 candidate 승격)",
+      "hooked": true,
+      "hook": "transaction 결과 outcome.masterId 로 커밋 후 ensureProductLandingForMaster(..., 'drug-promotion')",
+      "note": "같은 파일의 drugExtensionService.ensureForProductMaster 와 동일한 best-effort 관용구."
+    },
+    {
+      "path": "drug-seed-promotion-apply-job.ts :: runCandidatePromotion(apply)",
+      "class": "BULK_CREATE (배치 job)",
+      "hooked": true,
+      "hook": "job 종료 후 reconcileMissingProductLandings(ds, {source:'drug-seed-promotion'}) — createdMaster>0 일 때만",
+      "note": "§11 방식 B(대량 완료 후 공통 reconcile). 도메인별 발급 코드 복사 없음."
+    },
+    {
+      "path": "scripts/drug-master-promotion-apply.ts :: runCandidatePromotion(apply)",
+      "class": "BULK_CREATE (CLI)",
+      "hooked": true,
+      "hook": "동일 — reconcileMissingProductLandings(AppDataSource, {source:'drug-promotion-script'})"
+    },
+    {
+      "path": "scripts/cosmetics-productmaster-apply-pilot/05-apply.mjs · 08-full-apply.mjs",
+      "class": "BULK_CREATE (개발용 seed script, raw SQL)",
+      "hooked": false,
+      "coverage": "§11 방식 B — 작업 종료 후 productmaster-landing-bulk-apply.ts 재실행. 스크립트 헤더에 reconcile 계약 명시.",
+      "note": "이번 누락 32,675건의 출처. .mjs raw SQL 이라 서비스 helper 를 직접 쓰지 않는다."
+    },
+    {
+      "path": "scripts/hff-*-apply.ts · hff-ko-agent-01-individual.mjs · hff-ko-final-hold-523-apply.mjs · rg-canonical-apply.ts",
+      "class": "BULK_CREATE (개발용 seed script, raw SQL)",
+      "hooked": false,
+      "coverage": "§11 방식 B — 동일",
+      "note": "이번 누락 40,946건의 출처."
+    },
+    {
+      "path": "scripts/medical-device-gate-b-promotion.ts",
+      "class": "BULK_CREATE (개발용 seed script)",
+      "hooked": false,
+      "coverage": "§11 방식 B — 동일"
+    },
+    {
+      "path": "database/migrations/20270209000000-DeleteHffCorruptedProductMasters.ts",
+      "class": "LEGACY/RESTORE",
+      "hooked": false,
+      "note": "손상 master 삭제 + down() 스냅샷 복원 전용. 신규 생성 경로가 아니며 landing 도 스냅샷으로 함께 복원한다(별도 발급 불필요)."
+    },
+    {
+      "path": "modules/catalog-import/services/catalog-import.service.ts · catalog-import-validator.ts",
+      "class": "READ_ONLY",
+      "hooked": false,
+      "note": "masterRepo 를 검증/조회에만 사용. 생성은 catalog-import-resolver → resolveOrCreateMaster 경유(위 1번에서 커버)."
+    },
+    {
+      "path": "modules/neture/services/product-candidate.service.ts :: refineDrugCategory (masterRepo.save)",
+      "class": "NOT_A_CREATE (UPDATE)",
+      "hooked": false,
+      "note": "drug_category 갱신. 신규 master 를 만들지 않는다."
+    },
+    {
+      "path": "modules/neture/services/catalog.service.ts :: updateProductMaster (masterRepo.save)",
+      "class": "NOT_A_CREATE (UPDATE)",
+      "hooked": false
+    }
+  ],
+  "summary": {
+    "runtimeCreatePaths": 4,
+    "runtimeCreateHooked": 4,
+    "bulkCreateEntrypointsHooked": 2,
+    "bulkSeedScriptsByReconcile": 3,
+    "readOnlyOrUpdateOrLegacy": 4,
+    "unhandledRuntimePath": 0
+  }
+}

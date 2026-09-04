@@ -22,6 +22,8 @@
 import 'reflect-metadata';
 import AppDataSource from '../database/data-source.js';
 import { runCandidatePromotion } from '../modules/neture/drug-import/drug-master-promotion-apply.db.js';
+// WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+import { reconcileMissingProductLandings } from '../modules/neture/services/product-landing.service.js';
 
 interface CliArgs {
   apply: boolean;
@@ -78,6 +80,15 @@ async function main(): Promise<void> {
       candidateSourceLabelLike: args.sourceLabel,
       limit: args.limit,
     });
+
+    // WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+    //   승격으로 신규 master 가 생겼으면 Landing(대표 QR) 누락분을 공통 reconcile 로 회수. 누락 0 이면 write 0.
+    if (args.apply && report.createdMaster > 0) {
+      const rec = await reconcileMissingProductLandings(AppDataSource, { source: 'drug-promotion-script' });
+      console.error(
+        `[landing] reconcile: scanned=${rec.scanned} created=${rec.created} skipped=${rec.skipped} remaining=${rec.remainingLikely}`,
+      );
+    }
 
     console.log(JSON.stringify(report, null, 2));
     console.error(

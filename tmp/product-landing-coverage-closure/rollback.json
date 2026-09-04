@@ -1,0 +1,17 @@
+{
+  "phase": "rollback 계약 (§16)",
+  "batchId": "product-landing-full-backfill-v1",
+  "scope": "이번 backfill 로 생성된 landing 73,645건만. 기존 198,394건은 대상이 아니다.",
+  "sql": "UPDATE product_landings SET deleted_at = now() WHERE metadata->>'batchId' = 'product-landing-full-backfill-v1' AND deleted_at IS NULL;",
+  "expectedAffectedRows": 73645,
+  "verifyAfterRollback": [
+    "SELECT count(*) FROM product_landings WHERE deleted_at IS NULL;  -- 198394 로 복귀",
+    "SELECT md5(string_agg(id||'|'||public_key||'|'||product_master_id||'|'||created_at, ',' ORDER BY id)) FROM product_landings WHERE metadata->>'batchId' IS DISTINCT FROM 'product-landing-full-backfill-v1';  -- 43751c78f065f0b332a5fbe6e2f79cc2 (불변)"
+  ],
+  "notes": [
+    "soft delete 만 사용한다 — public_key 는 tombstone 으로 보존되며 재사용하지 않는다(F12 #3).",
+    "ProductMaster · shared_product_descriptions 는 이번 apply 에서 변경되지 않았으므로 rollback 대상이 아니다.",
+    "on-create 코드(ensureProductLandingForMaster 호출부)는 SQL rollback 대상이 아니다 — 되돌리려면 코드 revert.",
+    "rollback 후 backfill 을 다시 하려면 같은 스크립트를 새 --batch-id 로 재실행한다(멱등)."
+  ]
+}

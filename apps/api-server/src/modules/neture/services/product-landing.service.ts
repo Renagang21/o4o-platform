@@ -307,3 +307,83 @@ export class ProductLandingService {
     };
   }
 }
+
+/**
+ * ProductMaster 생성 직후 Landing(대표 QR 진입점) 보장 — on-create coverage.
+ *
+ * WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+ *
+ * 새 QR 발급기를 만들지 않는다 — mintForMaster 를 그대로 재사용한다.
+ *  - **master 생성 트랜잭션이 커밋된 뒤** 호출한다. 생성이 롤백되면 호출 자체가 없으므로 orphan Landing 이 남지 않는다.
+ *  - 멱등: 이미 Landing 이 있으면 아무것도 하지 않는다(불변식 #7 · uniq_product_landings_master).
+ *  - best-effort: 실패해도 호출자 흐름(상품 등록·승인·import)을 막지 않는다. 누락분은
+ *    `scripts/productmaster-landing-bulk-apply.ts`(reconcile) 재실행으로 회수한다.
+ *
+ * @returns 이번 호출로 새로 발급했으면 true, 이미 있었거나 실패했으면 false.
+ */
+export async function ensureProductLandingForMaster(
+  dataSource: DataSource,
+  masterId: string,
+  source = 'on-create',
+): Promise<boolean> {
+  try {
+    const { created } = await new ProductLandingService(dataSource).mintForMaster(masterId, source);
+    return created;
+  } catch (err) {
+    logger.warn(
+      `[product-landing] on-create mint 실패 (master=${masterId}, source=${source}): ${String((err as any)?.message ?? err)} — reconcile 대상`,
+    );
+    return false;
+  }
+}
+
+/** 여러 master 에 대한 on-create 보장(대량 import 커밋 후). 한 건 실패가 나머지를 막지 않는다. */
+export async function ensureProductLandingsForMasters(
+  dataSource: DataSource,
+  masterIds: string[],
+  source = 'on-create',
+): Promise<{ created: number; skipped: number }> {
+  let created = 0;
+  let skipped = 0;
+  for (const masterId of [...new Set(masterIds.filter(Boolean))]) {
+    if (await ensureProductLandingForMaster(dataSource, masterId, source)) created++;
+    else skipped++;
+  }
+  return { created, skipped };
+}
+
+/**
+ * 대량 생성 작업(배치 job·seed script) 종료 후 Landing 누락분 회수 — reconcile.
+ *
+ * WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+ *
+ * 대량 경로는 도메인마다 Landing 발급 코드를 복사하지 않고, 작업이 끝난 뒤 이 함수 하나를 호출한다.
+ * 발급기는 동일(mintForMaster) — 새 QR 시스템이 아니다.
+ * 대상이 `limit` 을 넘으면 남은 분은 `scripts/productmaster-landing-bulk-apply.ts` 재실행으로 처리한다
+ * (그 스크립트가 대용량 reconcile 정본이며, 누락 0 이면 write 0 이다).
+ */
+export async function reconcileMissingProductLandings(
+  dataSource: DataSource,
+  opts: { limit?: number; source?: string } = {},
+): Promise<{ scanned: number; created: number; skipped: number; remainingLikely: boolean }> {
+  const limit = Math.min(Math.max(opts.limit ?? 20000, 1), 100000);
+  const rows: Array<{ id: string }> = await dataSource.query(
+    `SELECT pm.id FROM product_masters pm
+     WHERE NOT EXISTS (SELECT 1 FROM product_landings l WHERE l.product_master_id = pm.id AND l.deleted_at IS NULL)
+     LIMIT $1`,
+    [limit],
+  );
+  const { created, skipped } = await ensureProductLandingsForMasters(
+    dataSource,
+    rows.map((r) => r.id),
+    opts.source ?? 'bulk-reconcile',
+  );
+  const remainingLikely = rows.length >= limit;
+  if (rows.length > 0) {
+    logger.info(
+      `[product-landing] reconcile: scanned ${rows.length}, created ${created}, skipped ${skipped}` +
+        (remainingLikely ? ' — limit 도달, productmaster-landing-bulk-apply.ts 재실행 필요' : ''),
+    );
+  }
+  return { scanned: rows.length, created, skipped, remainingLikely };
+}

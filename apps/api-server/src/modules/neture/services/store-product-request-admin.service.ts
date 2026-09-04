@@ -25,6 +25,8 @@ import {
   sanitizeIdentifierValue,
 } from '../utils/product-identifier.util.js';
 import type { ProductClassification } from '../utils/product-type.util.js';
+// WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+import { ensureProductLandingForMaster } from './product-landing.service.js';
 import logger from '../../../utils/logger.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 
@@ -259,7 +261,7 @@ export class StoreProductRequestAdminService {
     const specParts = [candidate.candidateSpec, candidate.candidateUnit].map((s) => (s ?? '').trim()).filter(Boolean);
     const specification = specParts.length > 0 ? specParts.join(' ') : null;
 
-    return this.dataSource.transaction(async (m) => {
+    const result = await this.dataSource.transaction(async (m) => {
       // TX 내 바코드 재확인 (동시 생성 방어)
       if (masterBarcode) {
         const clash: Array<{ id: string }> = await m.query(
@@ -322,6 +324,14 @@ export class StoreProductRequestAdminService {
         organizationId: candidate.organizationId, productName: candidate.candidateName,
       };
     });
+
+    // WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+    //   신규 master 는 대표 QR 진입점(Landing)을 갖는다. TX **커밋 후** 발급한다 —
+    //   승인이 롤백되면 이 줄에 도달하지 않으므로 orphan Landing 이 남지 않는다. 멱등·best-effort.
+    if (result.masterId) {
+      await ensureProductLandingForMaster(this.dataSource, result.masterId, 'store-request-new-master');
+    }
+    return result;
   }
 
   /** 보완 요청 — candidate_status='revision_requested' + 메모. 매장이 수정 재제출 시 pending 복귀(P1). */

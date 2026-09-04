@@ -1,0 +1,32 @@
+{
+  "mode": "dry-run",
+  "writeCount": 0,
+  "totalMasters": 272039,
+  "alreadyHasLanding": 198394,
+  "toCreate": 73645,
+  "toCreateAll": 73645,
+  "limitApplied": null,
+  "sample": [
+    {
+      "id": "7eeed1e6-85c7-413b-a622-f2719a9ce7f4",
+      "name": "×무민] 리틀 미이 - 솝/비누"
+    },
+    {
+      "id": "442e8425-a685-4f29-87af-daa49993d4fc",
+      "name": "×무민] 무민 딜라이트 - 솝/비누"
+    },
+    {
+      "id": "c80b6b23-36f8-4eb2-a8dd-0befc7b36dc5",
+      "name": "×무민] 무민트롤 - 배쓰 밤/입욕제"
+    },
+    {
+      "id": "1e974f9d-212a-4271-bc4f-ddad6a05dfb7",
+      "name": "×무민] 무민마마 - 바디 로션"
+    },
+    {
+      "id": "700c5391-c664-4390-bed7-ad746e63e596",
+      "name": "×무민] 스너프킨 - 샤워 구미/바디 워시"
+    }
+  ],
+  "applyHint": "--apply --batch-id landing-seed-YYYYMMDD [--batch-size 1000] 로 실제 발급"
+}

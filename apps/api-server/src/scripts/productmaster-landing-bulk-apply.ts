@@ -12,6 +12,13 @@
  * 안전: QR 이미지 비저장(Landing 신원만 저장). ProductMaster 무변경. master 당 Landing 1개(UNIQUE).
  *       rollback = metadata->>'batchId' 기준 soft delete.
  *
+ * WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+ *   본 스크립트는 일회성 seed 도구가 아니라 **재실행 가능한 reconcile 도구**다.
+ *   - 런타임 생성 경로는 `ensureProductLandingForMaster()`(product-landing.service.ts)로 on-create 보장한다.
+ *   - 개발용 대량 생성 스크립트(hff-* / cosmetics-* / medical-device-* 등)는 landing 발급 코드를 복사하지 않는다.
+ *     **대량 생성 작업 종료 후 본 스크립트를 재실행**하면 coverage 가 100% 로 복구된다.
+ *   - 누락이 0 이면 dry-run toCreate=0, apply 해도 write 0 (멱등).
+ *
  * 실행(읽기 전용 dry-run):
  *   DB_HOST=127.0.0.1 DB_PORT=15432 DB_USERNAME=o4o_api DB_PASSWORD=... DB_NAME=o4o_platform \
  *     npx tsx src/scripts/productmaster-landing-bulk-apply.ts [--limit N] [--out r.json]

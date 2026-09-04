@@ -1,0 +1,24 @@
+{
+  "phase": "PRE-APPLY baseline fingerprint (§17) — 기존 landing 불변 검증용",
+  "rowCount": 198394,
+  "activeRowCount": 198394,
+  "minCreatedAt": "2026-07-09 07:02:18.125279+00",
+  "maxCreatedAt": "2026-07-10 08:06:12.870905+00",
+  "fingerprintFields": "md5(string_agg(id||'|'||public_key||'|'||product_master_id||'|'||created_at, ',' ORDER BY id))",
+  "fingerprint": "43751c78f065f0b332a5fbe6e2f79cc2",
+  "publicKeyFingerprint": "5cb276ec9451e5ac61cdcb19cc2f5eed",
+  "byProvenance": [
+    {
+      "src": "landing-seed-20260709",
+      "n": 198387
+    },
+    {
+      "src": "admin-qr-view",
+      "n": 5
+    },
+    {
+      "src": "admin",
+      "n": 2
+    }
+  ]
+}

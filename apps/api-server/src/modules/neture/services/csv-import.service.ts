@@ -40,6 +40,8 @@ import { parseXlsxToRecords } from './xlsx-parser.service.js';
 import { ProductImportCommonService } from './product-import-common.service.js';
 import { ImageStorageService } from './image-storage.service.js';
 import { CategoryMappingService } from './category-mapping.service.js';
+// WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+import { ensureProductLandingsForMasters } from './product-landing.service.js';
 import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import logger from '../../../utils/logger.js';
 
@@ -473,6 +475,8 @@ export class CsvImportService {
     let failedCount = 0;
     const aiContentInputs: ProductContentInput[] = [];
     const imageJobs: Array<{ masterId: string; imageUrl: string }> = [];
+    // WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1: 커밋 후 Landing 보장 대상
+    const createdMasterIds: string[] = [];
 
     const qr = this.dataSource.createQueryRunner();
     await qr.connect();
@@ -491,6 +495,7 @@ export class CsvImportService {
           row.offerId = result.offerId;
           appliedOffers++;
           if (result.createdMaster) createdMasters++;
+          if (result.createdMaster && result.masterId) createdMasterIds.push(result.masterId);
           if (result.imageJob) imageJobs.push(result.imageJob);
           if (result.aiInput) aiContentInputs.push(result.aiInput);
         } catch (err) {
@@ -525,6 +530,14 @@ export class CsvImportService {
     logger.info(
       `[CsvImport] Batch ${batchId} — status: ${batch.status}, applied: ${appliedOffers}, failed: ${failedCount}, masters: ${createdMasters}`,
     );
+
+    // WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+    //   신규 master 의 대표 QR 진입점(Landing) 보장. **커밋 후** 실행 — 롤백된 행은 목록에 없으므로 orphan 0.
+    //   멱등·best-effort. 실패분은 productmaster-landing-bulk-apply.ts(reconcile) 재실행으로 회수.
+    if (createdMasterIds.length > 0) {
+      const landing = await ensureProductLandingsForMasters(this.dataSource, createdMasterIds, 'csv-import');
+      logger.info(`[CsvImport] Batch ${batchId} — product landings: created ${landing.created}, skipped ${landing.skipped}`);
+    }
 
     // Fire-and-forget: Image pipeline (성공한 행만)
     // WO-O4O-NETURE-PRODUCT-IMPORT-IMAGE-STORAGE-BUCKET-ALIGNMENT-V1:
@@ -796,6 +809,8 @@ export class CsvImportService {
     let stillFailed = 0;
     const aiContentInputs: ProductContentInput[] = [];
     const imageJobs: Array<{ masterId: string; imageUrl: string }> = [];
+    // WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1: 커밋 후 Landing 보장 대상
+    const createdMasterIds: string[] = [];
 
     const qr = this.dataSource.createQueryRunner();
     await qr.connect();
@@ -814,6 +829,7 @@ export class CsvImportService {
           row.offerId = result.offerId;
           appliedOffers++;
           if (result.createdMaster) createdMasters++;
+          if (result.createdMaster && result.masterId) createdMasterIds.push(result.masterId);
           if (result.imageJob) imageJobs.push(result.imageJob);
           if (result.aiInput) aiContentInputs.push(result.aiInput);
         } catch (err) {
@@ -851,6 +867,12 @@ export class CsvImportService {
     logger.info(
       `[CsvImport] Retry batch ${batchId} — retried: ${failedRows.length}, newApplied: ${appliedOffers}, stillFailed: ${stillFailed}, batchStatus: ${batch.status}`,
     );
+
+    // WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1 (apply 경로와 동일 계약)
+    if (createdMasterIds.length > 0) {
+      const landing = await ensureProductLandingsForMasters(this.dataSource, createdMasterIds, 'csv-import-retry');
+      logger.info(`[CsvImport] Retry batch ${batchId} — product landings: created ${landing.created}, skipped ${landing.skipped}`);
+    }
 
     // Fire-and-forget: Image + AI (WO-...-IMAGE-STORAGE-BUCKET-ALIGNMENT-V1: 요약 저장)
     if (imageJobs.length > 0) {
