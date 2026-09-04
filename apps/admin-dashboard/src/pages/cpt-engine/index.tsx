@@ -5,7 +5,6 @@
 
 import { Routes, Route } from 'react-router-dom';
 import CPTDashboardToolset from './CPTDashboardToolset';
-import CPTContentEditorWrapper from './CPTContentEditorWrapper';
 import CPTBuilderWrapper from './components/CPTBuilderWrapper';
 import CPTContentList from './components/CPTContentList';
 import FormsManager from './forms/FormsManager';
@@ -25,8 +24,15 @@ const CPTEngine = () => {
       
       {/* Content Management Routes */}
       <Route path="content/:cptSlug" element={<CPTContentList />} />
-      <Route path="content/:cptSlug/new" element={<CPTContentEditorWrapper />} />
-      <Route path="content/:cptSlug/:postId/edit" element={<CPTContentEditorWrapper />} />
+      {/*
+        (제거됨) content/:cptSlug/new · content/:cptSlug/:postId/edit
+        WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1
+
+        `CPTContentEditorWrapper` 는 legacy WordPress block editor(`StandaloneEditor`) 로
+        가는 bridge 전용 파일이었고 다른 책임이 없었다. legacy editor 축과 함께 은퇴한다.
+        CPT Engine 본체(대시보드 · 타입 · 필드그룹 · 택소노미 · 폼 · 도구 · 콘텐츠 목록)는
+        이번 범위 밖이며 그대로 유지한다.
+      */}
       
       {/* Type Management Routes */}
       <Route path="types/new" element={<CPTBuilderWrapper />} />

@@ -149,8 +149,11 @@ describe('4. `o4o/shortcode` block 정의가 0 이다', () => {
   it('DynamicRenderer · block-icons 에 shortcode 매핑이 없다', () => {
     for (const rel of [
       'apps/admin-dashboard/src/blocks/registry/DynamicRenderer.tsx',
+      // `block-icons.tsx` 는 WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1 에서
+      // legacy editor 축과 함께 제거됐다. 파일 부재는 shortcode 매핑 0 을 더 강하게 만족한다.
       'apps/admin-dashboard/src/utils/block-icons.tsx',
     ]) {
+      if (!exists(...rel.split('/'))) continue;
       expect(readRoot(rel)).not.toContain('shortcode');
     }
   });

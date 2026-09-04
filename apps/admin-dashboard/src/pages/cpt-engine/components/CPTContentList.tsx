@@ -317,12 +317,11 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
         {/* Title and Add New */}
         <div className="flex items-center gap-3 mb-4">
           <h1 className="text-2xl font-normal text-gray-900">{cptName}</h1>
-          <button
-            onClick={() => navigate(`/cpt-engine/content/${effectiveType}/new`)}
-            className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-          >
-            새 {singularName} 추가
-          </button>
+          {/*
+            (제거됨) 새 항목 추가 버튼 — WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1
+            대상 route `/cpt-engine/content/:cptSlug/new` 가 legacy block editor bridge 였고
+            해당 축과 함께 은퇴했다. 목록·인라인 편집·삭제 등 나머지 기능은 유지한다.
+          */}
         </div>
 
         {/* Status Tabs */}
@@ -438,7 +437,7 @@ const CPTContentList: React.FC<CPTContentListProps> = ({
                         hovered={hoveredRow === post.id}
                         onSelect={() => handleSelectPost(post.id)}
                         onHover={setHoveredRow}
-                        onEdit={() => navigate(`/cpt-engine/content/${effectiveType}/${post.id}/edit`)}
+                        onEdit={() => handleQuickEditClick(post.id)}
                         onQuickEdit={() => handleQuickEditClick(post.id)}
                         onDelete={() => handleTrash(post.id)}
                         onRestore={() => handleRestore(post.id)}

@@ -2,9 +2,6 @@ import { Route } from 'react-router-dom';
 import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
 
-// Import EditorRouteWrapper to handle route-based remounting
-import EditorRouteWrapper from '@/pages/editor/EditorRouteWrapper';
-
 // UI Showcase
 const UIShowcase = lazy(() => import('@/pages/UIShowcase'));
 
@@ -32,19 +29,14 @@ const PageLoader = () => (
 );
 
 /**
- * Test & debug routes — UI showcase, test pages, gutenberg editor
+ * Test & debug routes — UI showcase, test pages
+ *
+ * (제거됨) /gutenberg — WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1
+ * legacy WordPress block editor 의 7번째 진입점이었고, `/editor/*` 보다 약한 가드로
+ * 프로덕션에 노출돼 있었다. legacy editor 축 전체와 함께 은퇴했다.
  */
 export function TestRoutes() {
   return [
-    // Gutenberg Editor - Using Standalone Full Screen Editor
-    <Route key="/gutenberg" path="/gutenberg" element={
-      <AdminProtectedRoute requiredPermissions={['content:write']}>
-        <Suspense fallback={<PageLoader />}>
-          <EditorRouteWrapper mode="post" />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
     // UI Showcase
     <Route key="/ui-showcase" path="/ui-showcase" element={
       <AdminProtectedRoute requiredRoles={['admin']}>

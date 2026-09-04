@@ -158,10 +158,6 @@ export default function TemplateParts() {
           <h1 className="text-2xl font-bold text-gray-900">템플릿 파트</h1>
           <p className="text-gray-600 mt-1">사이트의 헤더, 푸터, 사이드바 등을 관리합니다</p>
         </div>
-        <Button onClick={() => navigate('/appearance/template-parts/new')}>
-          <Plus className="w-4 h-4 mr-2" />
-          새 템플릿 파트
-        </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -187,12 +183,6 @@ export default function TemplateParts() {
               <p className="mt-1 text-sm text-gray-500">
                 새 템플릿 파트를 만들어 사이트를 커스터마이즈하세요.
               </p>
-              <div className="mt-6">
-                <Button onClick={() => navigate('/appearance/template-parts/new')}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  새 템플릿 파트 만들기
-                </Button>
-              </div>
             </div>
           ) : (
             <div className="grid gap-4">
@@ -244,14 +234,6 @@ export default function TemplateParts() {
                             ) : (
                               <Eye className="w-4 h-4" />
                             )}
-                          </Button>
-                          
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => navigate(`/appearance/template-parts/${part.id}/edit`)}
-                          >
-                            <Edit className="w-4 h-4" />
                           </Button>
                           
                           <Button

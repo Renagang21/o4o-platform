@@ -1,16 +1,24 @@
-import { Route, Routes } from 'react-router-dom';
-import { AdminProtectedRoute } from '@o4o/auth-context';
+import { Route } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
-import EditorLayout from '@/layouts/EditorLayout';
 import InitialRedirect from '@/components/InitialRedirect';
 
-// Import EditorRouteWrapper to handle route-based remounting
-import EditorRouteWrapper from '@/pages/editor/EditorRouteWrapper';
-
+/**
+ * WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1
+ *
+ * legacy WordPress(Gutenberg) block editor 축을 은퇴했다.
+ * - `/editor/*` 6 route (posts/pages/templates/patterns) + `EditorLayout` + `EditorRouteWrapper`
+ * - `/admin/preview` · `/preview/posts/:id` · `/preview/pages/:id` + `PostPreview`
+ *
+ * 근거: docs/checks/WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-CENSUS-V1-CHECK.md
+ * (백엔드 Post/Page 엔티티는 `6354e8755` 에서 제거돼 관련 endpoint 가 전부 404,
+ *  저장 데이터 0, 메뉴 진입점 0, 외부 소비처 0)
+ *
+ * canonical 편집 축은 `RichTextEditor`(@o4o/content-editor) + `cms_contents` 이며,
+ * CMS V2 미리보기 축인 `/preview/:slug` + `ViewPreview` 는 그대로 보존한다.
+ */
 const Login = lazy(() => import('@/pages/auth/Login'));
 const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
-const PostPreview = lazy(() => import('@/pages/preview/PostPreview'));
 const ViewPreview = lazy(() => import('@/pages/preview/ViewPreview'));
 const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'));
 
@@ -88,67 +96,8 @@ export function PublicRoutes() {
     // 루트 경로 - 인증 상태에 따라 리다이렉트
     <Route key="/" path="/" element={<InitialRedirect />} />,
 
-    // 미리보기 페이지 - 인증 불필요 (sessionStorage 기반)
-    <Route key="/admin/preview" path="/admin/preview" element={
-      <Suspense fallback={<PageLoader />}>
-        <PostPreview />
-      </Suspense>
-    } />,
-
-    // 독립형 편집기 라우트 - 관리자 레이아웃 밖에서 실행
-    <Route key="/editor/*" path="/editor/*" element={
-      <AdminProtectedRoute
-        requiredRoles={['admin']}
-        requiredPermissions={['content:write']}
-      >
-        <EditorLayout>
-          <Routes>
-            <Route path="posts/new" element={
-              <Suspense fallback={<PageLoader />}>
-                <EditorRouteWrapper mode="post" />
-              </Suspense>
-            } />
-            <Route path="posts/:id" element={
-              <Suspense fallback={<PageLoader />}>
-                <EditorRouteWrapper mode="post" />
-              </Suspense>
-            } />
-            <Route path="pages/new" element={
-              <Suspense fallback={<PageLoader />}>
-                <EditorRouteWrapper mode="page" />
-              </Suspense>
-            } />
-            <Route path="pages/:id" element={
-              <Suspense fallback={<PageLoader />}>
-                <EditorRouteWrapper mode="page" />
-              </Suspense>
-            } />
-            <Route path="templates/:id" element={
-              <Suspense fallback={<PageLoader />}>
-                <EditorRouteWrapper mode="template" />
-              </Suspense>
-            } />
-            <Route path="patterns/:id" element={
-              <Suspense fallback={<PageLoader />}>
-                <EditorRouteWrapper mode="pattern" />
-              </Suspense>
-            } />
-          </Routes>
-        </EditorLayout>
-      </AdminProtectedRoute>
-    } />,
-
-    // Preview Routes
-    <Route key="/preview/posts/:id" path="/preview/posts/:id" element={
-      <Suspense fallback={<PageLoader />}>
-        <PostPreview />
-      </Suspense>
-    } />,
-    <Route key="/preview/pages/:id" path="/preview/pages/:id" element={
-      <Suspense fallback={<PageLoader />}>
-        <PostPreview />
-      </Suspense>
-    } />,
+    // Preview Routes — CMS V2 축만 유지한다.
+    // (제거됨) /admin/preview · /preview/posts/:id · /preview/pages/:id — legacy PostPreview
     <Route key="/preview/:slug" path="/preview/:slug" element={
       <Suspense fallback={<PageLoader />}>
         <ViewPreview />

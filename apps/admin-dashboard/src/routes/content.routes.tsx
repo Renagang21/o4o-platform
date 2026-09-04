@@ -19,7 +19,8 @@ import { Suspense, lazy } from 'react';
 const LEGACY_CONTENT_REDIRECT = '/admin/cms/contents';
 
 // 글 관리 — Posts/Categories/CategoryEdit/Tags 는 위 legacy redirect 로 대체되어 참조하지 않는다.
-const PagesRouter = lazy(() => import('@/pages/pages/PagesRouter'));
+// 페이지 관리(PagesRouter/PageList)도 동일하게 legacy redirect 로 대체했다
+// (WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1).
 
 // Content Core Shell Pages (WO-O4O-OPERATOR-NAV-CONTENT-SHELL-V1)
 const ContentOverviewPage = lazy(() => import('@/pages/content'));
@@ -105,13 +106,9 @@ export function ContentRoutes() {
       <Navigate to={LEGACY_CONTENT_REDIRECT} replace />
     } />,
 
-    // 페이지 관리
+    // 페이지 관리 — legacy `/posts` API(404) 기반 화면이라 위 redirect 와 동일 처리한다.
     <Route key="/pages/*" path="/pages/*" element={
-      <AdminProtectedRoute requiredPermissions={['pages:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <PagesRouter />
-        </Suspense>
-      </AdminProtectedRoute>
+      <Navigate to={LEGACY_CONTENT_REDIRECT} replace />
     } />,
 
     // Content Core Shell (WO-O4O-OPERATOR-NAV-CONTENT-SHELL-V1)

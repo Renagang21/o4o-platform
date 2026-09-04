@@ -12,12 +12,8 @@ import { useAuth as useAuthContext } from '@o4o/auth-context';
 import '@/styles/o4o-admin-theme.css';
 import '@/styles/o4o-admin-sidebar.css';
 import '@/styles/admin-layout-fixed.css';
-import '@/styles/block-toolbar.css';
-import '@/styles/block-selection.css';
-import '@/styles/inspector-sidebar.css';
-import '@/styles/block-placeholder.css';
-import '@/styles/block-inserter.css';
-import '@/styles/inner-blocks.css';
+// (제거됨) legacy WordPress block editor 전용 CSS 6종
+// WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1
 
 // AI Config Migration - Fix old gemini-pro references
 import '@/utils/aiMigration';

@@ -8,7 +8,6 @@ const GeneralSettings = lazy(() => import('@/pages/settings/GeneralSettings'));
 const HeaderBuilder = lazy(() => import('@/pages/appearance/header-builder/HeaderBuilderPage'));
 const NavigationMenus = lazy(() => import('@/pages/menus/Menus'));
 const TemplateParts = lazy(() => import('@/pages/appearance/TemplateParts'));
-const TemplatePartEditor = lazy(() => import(/* webpackChunkName: "template-editor" */ '@/pages/appearance/TemplatePartEditor'));
 
 // Settings
 const Settings = lazy(() => import('@/pages/settings/Settings'));
@@ -80,20 +79,10 @@ export function AppearanceRoutes() {
         </Suspense>
       </AdminProtectedRoute>
     } />,
-    <Route key="/appearance/template-parts/new" path="/appearance/template-parts/new" element={
-      <AdminProtectedRoute requiredPermissions={['templates:write']}>
-        <Suspense fallback={<PageLoader />}>
-          <TemplatePartEditor />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/appearance/template-parts/:id/edit" path="/appearance/template-parts/:id/edit" element={
-      <AdminProtectedRoute requiredPermissions={['templates:write']}>
-        <Suspense fallback={<PageLoader />}>
-          <TemplatePartEditor />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
+    // (제거됨) /appearance/template-parts/new · /:id/edit — TemplatePartEditor
+    // WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1
+    // legacy block editor 기반 편집기이며 백엔드 `/template-parts` 는 프로덕션에서 404,
+    // `content_templates` row 0, 메뉴 진입점 0 이었다. 목록 화면(TemplateParts)은 유지한다.
 
     // 메일 관리
     <Route key="/mail/*" path="/mail/*" element={
