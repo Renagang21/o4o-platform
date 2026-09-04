@@ -10,9 +10,30 @@
 ## 0. 최종 판정
 
 ```text
-MY STORE SECONDARY QUALITY CLOSURE : NOT_CLOSED (GP tablet 흐름 1건 미완)
-사유: 권한 차단 — 아래 §7. 코드·계약 결함은 0이며 발견된 결함 1건은 수정·배포·재검증 완료.
+KPA          = PASS
+K-Cosmetics  = PASS
+PharmacyHub  = PASS
+GlycoPharm   = PASS_WITH_FIXTURE_LIMITATION
+
+MY STORE SECONDARY QUALITY CLOSURE : CLOSED
 ```
+
+GlycoPharm 은 production store-owner **fixture 부재**로 product pool → visibility → runtime
+전체 경로를 실브라우저로 완주하지 못했다. 그러나
+
+```text
+- 실제 폼 로그인 200
+- service-scoped org 후보 0
+- 403 STORE_OWNER_REQUIRED 정상
+- 타 서비스 org 오선택 0
+- 관련 회귀 테스트 PASS
+```
+
+이므로 **코드 회귀나 unresolved defect 가 아니라 production fixture coverage limitation** 으로 판정한다.
+
+검증을 위해 production 조직 membership 을 새로 조성하지 않았다 —
+이번 WO 의 목적은 공통화 코드와 실제 production 계약의 검증이지 fixture 조성이 아니며,
+"fixture 가 없으면 우회 생성하지 않는다" 원칙을 유지했다(2026-09-05 사용자 결정).
 
 | 완료 조건 (WO §15) | 결과 |
 |---|---|
@@ -21,7 +42,7 @@ MY STORE SECONDARY QUALITY CLOSURE : NOT_CLOSED (GP tablet 흐름 1건 미완)
 | KPA_POST_DEPLOY_E2E_PENDING 해소 | **PASS** (§4) |
 | KCos E2E_BLOCKED_AUTH 해소 | **PASS** (§3·§5) |
 | GP E2E_BLOCKED_AUTH 해소 | **PASS** (로그인 200) |
-| GP 매장 tablet 흐름 | **미완** — fixture 생성이 권한 차단 (§7) |
+| GP 매장 tablet 흐름 | **BLOCKED_BY_FIXTURE** — 회귀 아님 (§7) |
 | PH SERVICE_SPECIFIC 409 계약 회귀 없음 | **PASS** (§6) |
 | organization 오선택 0 | **PASS** |
 | TABLET visibility 무증상 실패 0 | **결함 1건 발견 → 수정·배포·재검증 완료** (§8) |
@@ -42,7 +63,7 @@ MY STORE SECONDARY QUALITY CLOSURE : NOT_CLOSED (GP tablet 흐름 1건 미완)
 | Screen Set/runtime | ✅ 12세트·4대 | ⛔ 태블릿 0대 | ⛔ | — |
 | QR landing | ✅ 200 | — | ⛔ | — |
 | browser console | ✅ err 0 / API 0 | ✅ err 0 / API 0 | — | — |
-| 최종 판정 | **PASS** | **PASS** | **PARTIAL** | **PASS** |
+| 최종 판정 | **PASS** | **PASS** | **PASS_WITH_FIXTURE_LIMITATION** | **PASS** |
 
 ---
 
@@ -205,7 +226,7 @@ PH            (service-specific seam)  → 409 STORE_NOT_CONNECTED
 
 ---
 
-## 7. GlycoPharm — PARTIAL
+## 7. GlycoPharm — PASS_WITH_FIXTURE_LIMITATION
 
 ### 7-1. 403 은 결함이 아니라 axis B 가 의도대로 동작한 결과다
 
@@ -225,7 +246,7 @@ GET /api/v1/glycopharm/store/tablets → 403 STORE_OWNER_REQUIRED
 
 **예전 버그였다면 여기서 KPA org 를 잘못 골랐을 자리다.** 즉 이 403 은 회귀가 아니라 수정의 증거다.
 
-### 7-2. 미완 사유 — 도구 권한 차단
+### 7-2. 미완 사유와 종결 결정 — fixture 를 조성하지 않는다
 
 사용자 승인 하에 `[E2E_TEST] 글라이코팜 검증 약국` 에 계정 A 를 **manager 1행**으로 추가하려 했다.
 런타임 API 를 먼저 조사했으나 **기존 org 에 멤버를 추가하는 라우트가 없다**
@@ -253,7 +274,31 @@ AFTER: 미실행
 
 대안으로 GP **매장 신청 → 승인 API** 흐름(canonical HTTP)도 검토했으나,
 그 경로는 **새 organization + slug + enrollment + auto-listing 다수 행**을 생성한다.
-사용자가 승인한 범위(멤버 1행)보다 크므로 임의로 실행하지 않았다.
+승인 범위(멤버 1행)보다 크므로 실행하지 않았다.
+
+### 7-3. 종결 결정 (2026-09-05)
+
+권한 규칙을 열어 다시 시도하거나 SQL 을 직접 실행하는 대신 **fixture 공백으로 확정하고 종결**한다.
+
+```text
+GP:
+  AUTH                          = PASS
+  SERVICE-SCOPED ORG RESOLUTION = PASS
+  STORE-OWNER FULL FLOW         = BLOCKED_BY_FIXTURE
+  REGRESSION                    = NO
+```
+
+근거:
+
+1. 이번 WO 의 목적은 **공통화 코드와 실제 production 계약의 검증**이지, 검증을 위해
+   production 조직 membership 을 조성하는 것이 아니다.
+2. 이번 공통화의 핵심 결함이었던 **타 서비스 조직 오선택은 production 에서 재현되지 않았고,
+   오히려 올바르게 거부됨**이 §7-1 로 확인됐다. 즉 검증 목적은 이미 달성됐다.
+3. 신규 membership 이 1행이라도 production 운영 상태를 바꾸는 것이고,
+   **"fixture 가 없으면 우회 생성하지 않는다"** 원칙과 어긋난다.
+
+따라서 GP 는 `PASS_WITH_FIXTURE_LIMITATION` 이며 unresolved defect 로 남기지 않는다.
+후속으로 GP 검증 fixture 가 정식으로 생기면 그때 tablet 전 경로를 완주한다(§문서 정합 제안 3).
 
 ---
 
@@ -350,7 +395,7 @@ SSOT 를 순회해 새 alias 쌍이 추가돼도 자동 반영되며, 이전 형
 ## 10. 미검증 사항
 
 ```text
-1. GP 매장 tablet 흐름 — §7-2 권한 차단으로 미수행.
+1. GP 매장 tablet 흐름 — fixture 부재로 미수행. 회귀가 아니라 coverage limitation (§7-3).
 2. PH AMBIGUOUS_STORE_CONNECTION — 다중 PH org 연결 계정이 없어 미실측.
 3. visibility truth table 6종 중 실측 2종(service_scope_mismatch · no_tablet_channel).
    나머지 4종(visible · offer_inactive · channel_not_approved · not_linked_to_channel)은
@@ -369,17 +414,30 @@ SSOT 를 순회해 새 alias 쌍이 추가돼도 자동 반영되며, 이전 형
 
 ```text
 BEFORE : 계정 A · B 모두 suspended
-DURING : canonical admin API 로 approved (사용자 승인)
-AFTER  : §7-2 결정 대기로 **현재 approved 유지**
-         GP 완주 여부가 정해지면 즉시 suspended 로 되돌린다(승인된 계획).
+DURING : canonical admin API 로 approved (사용자 승인) → 4서비스 E2E 수행
+AFTER  : canonical admin API 로 suspended 원복 완료 (HTTP 200 ×2)
 ```
+
+**원복을 선언만 하지 않고 실측했다** — 4개 (계정 × serviceKey) 조합 전부
+`ACCOUNT_NOT_ACTIVE` 로 다시 막히는 것을 확인했다.
+
+```text
+계정A/kpa-society  → ACCOUNT_NOT_ACTIVE
+계정A/glycopharm   → ACCOUNT_NOT_ACTIVE
+계정A/pharmacy-hub → ACCOUNT_NOT_ACTIVE
+계정B/k-cosmetics  → ACCOUNT_NOT_ACTIVE
+```
+
+검증 중 발급한 로컬 토큰 파일도 모두 삭제했다.
+`organization_members` 는 **추가하지 않았다** — GP org 는 BEFORE 그대로 members 1 (renagang21/owner).
 
 ---
 
 ## 12. 영향 · 금지선
 
 ```text
-production DB write : users.status 2행 (검증 전용 계정 재활성화, 승인·가역)
+production DB write : users.status 2행 — 재활성화 후 **원복 완료**(순변화 0)
+organization_members : 0행 (조성하지 않음)
 schema / migration  : 0
 코드 변경           : api-server 2파일 (+수정 1 · 신규 spec 1)
 web 서비스 변경     : 0 (배포 불필요)
@@ -396,3 +454,5 @@ Cafe24 파일럿 확대  : 0
 
 1. TABLET 채널을 가진 검증 매장 fixture 확보 — visibility truth table 6종 전수 실증용 (§10-3)
 2. PH 다중 org 연결 fixture — `AMBIGUOUS_STORE_CONNECTION` 실측용 (§10-2)
+3. GlycoPharm store-owner fixture 정식 확보 — GP tablet 전 경로 완주용 (§7-3).
+   이번에는 우회 조성하지 않고 coverage limitation 으로 남겼다.
