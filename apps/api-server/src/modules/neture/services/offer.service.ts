@@ -289,33 +289,6 @@ export class NetureOfferService {
   }
 
   /**
-   * POST /admin/offers/bulk-approve — 일괄 승인
-   * WO-O4O-NETURE-BULK-IMPORT-INTEGRATION-V1
-   */
-  async approveProducts(
-    offerIds: string[],
-    adminUserId: string,
-  ): Promise<{ approved: string[]; failed: Array<{ id: string; error: string }> }> {
-    const approved: string[] = [];
-    const failed: Array<{ id: string; error: string }> = [];
-
-    for (const offerId of offerIds) {
-      try {
-        const result = await this.approveProduct(offerId, adminUserId);
-        if (result.success) {
-          approved.push(offerId);
-        } else {
-          failed.push({ id: offerId, error: result.error || 'UNKNOWN' });
-        }
-      } catch (err) {
-        failed.push({ id: offerId, error: (err as Error).message || 'UNKNOWN' });
-      }
-    }
-
-    return { approved, failed };
-  }
-
-  /**
    * POST /admin/products/:id/reject — 상품 반려
    * WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1:
    *   Admin 반려 = 모든 service approvals → rejected → 파생 sync (cascade 포함)

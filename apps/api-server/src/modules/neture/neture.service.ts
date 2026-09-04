@@ -178,13 +178,6 @@ export class NetureService {
     return this.offerService.approveProduct(offerId, adminUserId);
   }
 
-  async approveProducts(
-    offerIds: string[],
-    adminUserId: string,
-  ): Promise<{ approved: string[]; failed: Array<{ id: string; error: string }> }> {
-    return this.offerService.approveProducts(offerIds, adminUserId);
-  }
-
   async rejectProduct(
     offerId: string,
     adminUserId: string,
