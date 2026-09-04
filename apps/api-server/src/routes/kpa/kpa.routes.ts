@@ -182,6 +182,7 @@ import { QuizController } from '../../modules/lms/controllers/QuizController.js'
 import { AssignmentController } from '../../modules/lms/controllers/AssignmentController.js';
 import { requireEnrollment } from '../../modules/lms/middleware/requireEnrollment.js';
 import { createStoreLocalProductRoutes } from '../platform/store-local-product.routes.js';
+import { createStoreTabletRoutes } from '../platform/store-tablet.routes.js';
 
 /**
  * KPA Scope Guard — powered by @o4o/security-core
@@ -434,6 +435,15 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   //   고를 수 있다. 같은 My Store 문맥의 handled-products 와 **같은 조직**을 해석하도록
   //   serviceKey='kpa' 를 명시한 canonical mount 를 제공한다.
   router.use('/store', createStoreLocalProductRoutes(dataSource, 'kpa'));
+
+  // Store Tablet / Screen Set — 내 매장 태블릿·화면구성
+  //   (WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 축 B)
+  //   서비스 중립 mount(`/api/v1/store/tablets`, `/screen-sets`, `/product-pool`)는
+  //   store_owner 판정에 serviceKey 를 주지 않아 다중 서비스 사용자에게 타 서비스 조직이
+  //   선택될 수 있었다. 같은 My Store 문맥의 local-products 와 **같은 조직**을 해석하도록
+  //   serviceKey='kpa' 를 명시한 canonical mount 를 제공한다.
+  //   서비스 중립 mount 는 그대로 두어 GlycoPharm·K-Cosmetics 동작은 불변이다.
+  router.use('/store', createStoreTabletRoutes(dataSource, { storeOwnerServiceKey: 'kpa' }));
 
   // Asset Snapshot routes (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));
