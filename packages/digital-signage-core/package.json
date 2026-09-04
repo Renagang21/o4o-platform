@@ -1,7 +1,7 @@
 {
   "name": "@o4o-apps/digital-signage-core",
   "version": "0.1.0",
-  "description": "Digital Signage Core - Media, Display, Schedule, Action management",
+  "description": "Digital Signage Core - Signage media, playlist, schedule, template entities",
   "type": "module",
   "main": "dist/backend/entities/index.js",
   "types": "dist/backend/entities/index.d.ts",

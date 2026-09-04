@@ -1,18 +1,11 @@
-// ========== Legacy Entities (for backward compatibility) ==========
-// Media management
-export * from './MediaSource.entity.js';
-export * from './MediaList.entity.js';
-export * from './MediaListItem.entity.js';
-
-// Display management
-export * from './Display.entity.js';
-export * from './DisplaySlot.entity.js';
-
-// Schedule management
-export * from './Schedule.entity.js';
-
-// Action execution
-export * from './ActionExecution.entity.js';
+// ========== Signage Core Entities ==========
+// Phase-6 legacy entities (MediaSource / MediaList / MediaListItem / Display /
+// DisplaySlot / Schedule / ActionExecution) 는 은퇴했다.
+//   WO-O4O-SIGNAGE-PHASE6-ENTITY-AND-PHYSICAL-TABLE-DISPOSITION-V1
+//   근거: TypeORM registry 미등록(`SignageCoreEntities` 만 등록) · 저장소 전체 소비처 0 ·
+//         생성 migration 0 · production 물리 테이블 부재(`to_regclass` = NULL) ·
+//         FK/논리참조 0. 물리 테이블이 없어 schema 변경(DROP) 은 수행하지 않았다.
+// 그 결과 entity 수는 16 → 9 로 줄었고, 남은 9개가 production runtime 전부다.
 
 // ========== Production-Ready Entities (Phase 2) ==========
 // Playlist management
@@ -37,15 +30,6 @@ export * from './SignageContentBlock.entity.js';
 // AI & Analytics — SignageAnalytics removed (WO-KPA-SIGNAGE-DEAD-CODE-CLEANUP-V1)
 export * from './SignageAiGenerationLog.entity.js';
 
-// ========== Legacy Entity Imports ==========
-import { MediaSource } from './MediaSource.entity.js';
-import { MediaList } from './MediaList.entity.js';
-import { MediaListItem } from './MediaListItem.entity.js';
-import { Display } from './Display.entity.js';
-import { DisplaySlot } from './DisplaySlot.entity.js';
-import { Schedule } from './Schedule.entity.js';
-import { ActionExecution } from './ActionExecution.entity.js';
-
 // ========== Production Entity Imports ==========
 import { SignagePlaylist } from './SignagePlaylist.entity.js';
 import { SignagePlaylistItem } from './SignagePlaylistItem.entity.js';
@@ -58,22 +42,9 @@ import { SignageContentBlock } from './SignageContentBlock.entity.js';
 import { SignageAiGenerationLog } from './SignageAiGenerationLog.entity.js';
 
 /**
- * Legacy entities (for backward compatibility)
- * @deprecated Use SignageCoreEntities instead
- */
-export const SignageEntities = [
-  MediaSource,
-  MediaList,
-  MediaListItem,
-  Display,
-  DisplaySlot,
-  Schedule,
-  ActionExecution,
-] as const;
-
-/**
- * Production-ready core entities (Phase 2)
- * Use this for new implementations
+ * Production-ready core entities — signage runtime 의 전부다.
+ * `SignageEntities` / `AllSignageEntities` (Phase-6 legacy 배열) 은
+ * WO-O4O-SIGNAGE-PHASE6-ENTITY-AND-PHYSICAL-TABLE-DISPOSITION-V1 에서 소비처 0 으로 제거됐다.
  */
 export const SignageCoreEntities = [
   // Playlist
@@ -90,12 +61,4 @@ export const SignageCoreEntities = [
   SignageContentBlock,
   // AI
   SignageAiGenerationLog,
-] as const;
-
-/**
- * All entities (legacy + production)
- */
-export const AllSignageEntities = [
-  ...SignageEntities,
-  ...SignageCoreEntities,
 ] as const;
