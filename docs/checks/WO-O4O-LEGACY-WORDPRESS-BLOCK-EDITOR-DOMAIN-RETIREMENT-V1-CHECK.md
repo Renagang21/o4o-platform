@@ -186,8 +186,11 @@ WO §33 은 "WordPress runtime 을 **unrelated active feature** 가 사용" 하�
 
 ### 잔여물 (WO §32)
 
-`C:/tmp/o4o-main-check-ff` — 선행 세션의 임시 worktree.
-`git worktree list --porcelain` **미등록**(git 인지 밖)이며 `rm -rf` 는 권한 거부로 실패했다.
+1. `C:/tmp/o4o-main-check-ff` — 선행 세션의 임시 worktree.
+2. `C:/tmp/o4o-wp-editor-push` — 이번 push 용 임시 worktree.
+
+둘 다 `git worktree list --porcelain` **미등록**(git 인지 밖)이고, 디렉터리 삭제는
+권한 거부(Permission denied)로 실패했다. 다른 worktree 의 사용 흔적은 없다.
 WO §32 에 따라 **filesystem 잔여물로만 보고**하며 은퇴 완료를 막지 않는다.
 
 ---
