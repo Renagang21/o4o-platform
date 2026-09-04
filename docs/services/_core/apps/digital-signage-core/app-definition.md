@@ -8,13 +8,16 @@
 
 | 책임 | 경계 |
 |------|------|
-| Media Source (URL/file) | 업종별 콘텐츠 → Extension |
-| Media List, Display, Display Slot | 렌더링 소비처 없음 (digital-signage-agent 은퇴) |
-| Schedule, Action Execution | |
+| Signage Media / Playlist / Playlist Item | 업종별 콘텐츠 → Extension |
+| Signage Schedule | |
+| Signage Template / Template Zone / Layout Preset / Content Block | |
+| Signage AI Generation Log | |
 
 ## 외부 노출
 
-**Types**: MediaSource, MediaList, Display, Schedule, ActionExecution
+**Entities (9)**: SignagePlaylist, SignagePlaylistItem, SignageMedia, SignageSchedule, SignageTemplate, SignageTemplateZone, SignageLayoutPreset, SignageContentBlock, SignageAiGenerationLog
+
+**Entity 배열**: `SignageCoreEntities` (api-server `database/entities.ts` 가 등록하는 유일한 배열)
 
 ## API Routes
 
@@ -29,4 +32,5 @@
 ## 비고
 
 - Extension Interface: Phase 3에서 구현 예정
+- Phase-6 legacy entity 7종(MediaSource / MediaList / MediaListItem / Display / DisplaySlot / Schedule / ActionExecution)은 은퇴했다 (WO-O4O-SIGNAGE-PHASE6-ENTITY-AND-PHYSICAL-TABLE-DISPOSITION-V1) — 소비처 0 · 생성 migration 0 · production 물리 테이블 부재
 - digital-signage-agent 는 은퇴했다 (WO-O4O-DIGITAL-SIGNAGE-AGENT-DEAD-RUNTIME-RETIREMENT-V1 · main `57df27e5e`) — 연동 대상 없음
