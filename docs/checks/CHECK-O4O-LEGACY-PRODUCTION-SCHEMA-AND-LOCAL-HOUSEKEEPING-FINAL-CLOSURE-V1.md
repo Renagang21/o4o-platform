@@ -4,7 +4,7 @@
 - **작업일**: 2026-09-04
 - **기준 커밋**: `origin/main` = `edeec6799`
 - **작업 브랜치**: `work/o4o-legacy-prod-schema-housekeeping-v1` (격리 worktree `C:/tmp/o4o-legacy-cleanup-v1`)
-- **판정**: **CLOSED_WITH_MANUAL_FOLLOWUP** — production schema 정리는 migration 으로 확정, local branch 4건만 권한 제약으로 `MANUAL_DELETE_REQUIRED`
+- **판정**: **CLOSED** (2026-09-04 merge 후 검증 완료 — §16) — 잔여는 코드/DB 변경이 아닌 사용자 실행 항목 2건(branch 4건 수동 삭제 · E2E secret 등록)
 
 ---
 
@@ -271,3 +271,58 @@ git branch -D work/o4o-post-legacy-editor-residue-v1              # 575cd69cc
 발견 1건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건
 
 - 발견: `authorization.middleware.ts` 의 `DROP_APPROVED_READY` 주석이 본 WO 로 낡음 → 같은 커밋에서 갱신 (인라인 허용 범위: 본 WO 대상 파일)
+
+---
+
+## 16. merge 후 검증 결과 (2026-09-04 추가)
+
+- PR **#205** merge — merge commit `7977519e4` · PR head `ee629917a`
+- 배포 workflow run `33844245962` — `Deploy to Cloud Run` → `Run database migrations` **전 step success**
+- 서빙 revision `o4o-core-api-03525-8b7`
+
+### 16-1. §14 항목별 결과
+
+| # | 항목 | 결과 |
+|:--:|---|---|
+| 1 | CI `Run database migrations` 성공 | **PASS** (run `33844245962`) |
+| 2 | `users.permissions` 컬럼 부재 | **PASS** — `information_schema.columns` count = `0` |
+| 2 | `to_regclass('store_events')` | **PASS** — `NULL` |
+| 2 | `to_regclass('organization_product_applications')` | **PASS** — `NULL` (TABLE_ABSENT 유지) |
+| 3 | `typeorm_migrations` 기록 | **PASS** — `653 DropUsersPermissionsColumn20270320000000` · `654 DropStoreEventsTable20270321000000` |
+| 4 | 서비스별 read smoke | **PASS** (아래 16-2) |
+| 5 | branch 4건 수동 삭제 | **MANUAL_DELETE_REQUIRED 유지** (§7 · 재대조 완료) |
+
+부수 확인: `users` 행수 `57` 정상 조회 · merge 후 Cloud Run ERROR severity 로그 **0건**.
+
+### 16-2. 인증 read smoke (프로덕션 `api.neture.co.kr`)
+
+| 경로 | 축 | HTTP |
+|---|---|:--:|
+| `/api/v1/auth/me` | auth 런타임 | 200 |
+| `/api/v1/auth/status` | auth 런타임 | 200 |
+| `/api/v1/kpa/members/me` | membership | 200 |
+| `/api/v1/kpa/operator/summary` | operator auth | 200 |
+| `/api/v1/glycopharm/forums` | GlycoPharm | 200 |
+| `/api/v1/cosmetics/operator/dashboard` | K-Cosmetics operator | 200 |
+| `/api/v1/cosmetics/orders` | order read | 200 |
+| `/api/v1/pharmacy-hub/join/status` · `/me/access` | PharmacyHub | 200 |
+| `/api/signage/kpa/media` | signage auth | 200 |
+| `/api/v1/neture/suppliers` | Neture | 200 |
+| `/api/v1/store/cart/kpa-society/items` | B2B cart (`store_cart_items`) | 200 |
+
+로그인 응답의 `user.permissions` 키는 **DROP 된 컬럼이 아니라 `getAllPermissions()` 파생값**이며
+값은 `[]` (§ COMPATIBILITY 기록과 일치). 회귀 아님.
+
+### 16-3. 미해결 (사용자 실행 필요)
+
+1. `MANUAL_DELETE_REQUIRED` branch 4건 — SHA 재대조 완료(미반영 커밋 0 · worktree 참조 0),
+   환경 권한 제약으로 `git branch -D` 실행 불가.
+2. workflow `E2E — Auth Runtime Regression` 은 본 WO **이전부터** step
+   `Validate E2E credentials (per service)` 에서 실패(직전 run `33819434853`, head `b64b2b61b` 동일 실패).
+   원인 = repo secret 8종 미등록. **본 WO 회귀 아님**이며, credential 등록은 CLAUDE.md §15 에 따라
+   AI 가 수행하지 않는다.
+
+### 16-4. 최종 판정
+
+**CLOSED** — production schema 정리·repo 정합·검증 전부 완료.
+잔여 2건은 코드/DB 변경이 아닌 **사용자 실행 항목**이다.
