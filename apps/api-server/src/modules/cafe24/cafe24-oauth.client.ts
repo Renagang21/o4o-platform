@@ -64,6 +64,30 @@ export interface Cafe24TokenResponse {
   shop_no?: string | number;
 }
 
+/**
+ * Cafe24 token 응답의 만료시각을 Date 로 바꾼다.
+ * WO-O4O-CAFE24-TOKEN-EXPIRY-TIMEZONE-FIX-V1
+ *
+ * Cafe24 는 `expires_at` / `refresh_token_expires_at` 를 **offset 없는 KST 벽시계 문자열**로 준다
+ * (예: `2026-09-04T15:34:52.000`). 이걸 `new Date(...)` 에 그대로 넣으면 Node 가 **실행 호스트의
+ * 로컬 시간대**로 해석한다. 개발 PC(KST)에서는 맞고 **Cloud Run(UTC)에서는 9시간 뒤로** 저장된다.
+ *
+ * 그 결과 프로덕션은 이미 죽은 access token 을 "아직 8시간 남았다"고 믿고 refresh 를 건너뛰며,
+ * 모든 Cafe24 Admin API 가 401 로 떨어진다 (2026-09-04 실측: 저장 만료 +8.45h, 실제 호출 401,
+ * 강제 refresh 후 정상).
+ *
+ * 그래서 offset 이 없는 값은 KST 로 못박아 해석한다. offset(Z / ±hh:mm)이 이미 붙어 있으면
+ * Cafe24 가 명시한 것이므로 그대로 신뢰한다.
+ */
+export function parseCafe24Timestamp(value: string): Date {
+  const raw = (value ?? '').trim();
+  if (!raw) throw new Error('CAFE24_INVALID_TIMESTAMP');
+  const hasOffset = /(?:Z|[+-]\d{2}:?\d{2})$/.test(raw);
+  const parsed = new Date(hasOffset ? raw : `${raw}+09:00`);
+  if (Number.isNaN(parsed.getTime())) throw new Error('CAFE24_INVALID_TIMESTAMP');
+  return parsed;
+}
+
 function basicAuthHeader(cfg: Cafe24OAuthConfig): string {
   return 'Basic ' + Buffer.from(`${cfg.clientId}:${cfg.clientSecret}`).toString('base64');
 }

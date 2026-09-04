@@ -16,12 +16,23 @@ import { Cafe24Connection } from '../entities/Cafe24Connection.entity.js';
 import type { Cafe24ConnectionStatus } from '../entities/Cafe24Connection.entity.js';
 import { encrypt, decrypt } from '../../../utils/crypto.js';
 import { assertTokenEncryptionConfigured } from '../cafe24-token-crypto.js';
-import { loadCafe24OAuthConfig, refreshAccessToken } from '../cafe24-oauth.client.js';
+import { loadCafe24OAuthConfig, parseCafe24Timestamp, refreshAccessToken } from '../cafe24-oauth.client.js';
 import type { Cafe24TokenResponse } from '../cafe24-oauth.client.js';
 import logger from '../../../utils/logger.js';
 
 /** access token 이 이 시간 안에 만료되면 미리 갱신한다 */
 const REFRESH_SKEW_MS = 5 * 60 * 1000;
+
+/**
+ * 저장된 access token 만료시각을 신뢰할 수 있는 상한.
+ * WO-O4O-CAFE24-TOKEN-EXPIRY-TIMEZONE-FIX-V1
+ *
+ * Cafe24 access token 수명은 2시간이다. 이보다 한참 먼 만료시각이 저장돼 있다면 그 값은
+ * timezone 결함으로 밀려 기록된 것이다(+9h). 이 fix 이전에 UTC 호스트가 써 넣은 행들이
+ * 여기 해당하며, 값을 그대로 믿으면 최대 9시간 동안 refresh 없이 401 이 계속된다.
+ * 상한을 넘으면 저장값을 믿지 않고 즉시 refresh 해서 스스로 복구한다 (migration 불필요).
+ */
+const MAX_ACCESS_TOKEN_LIFETIME_MS = 3 * 60 * 60 * 1000;
 
 /** 외부 노출용 요약 — token 은 절대 포함하지 않는다 */
 export interface Cafe24ConnectionSummary {
@@ -92,8 +103,8 @@ export class Cafe24ConnectionService {
       shopNo,
       accessTokenEnc: encrypt(token.access_token),
       refreshTokenEnc: encrypt(token.refresh_token),
-      accessTokenExpiresAt: new Date(token.expires_at),
-      refreshTokenExpiresAt: new Date(token.refresh_token_expires_at),
+      accessTokenExpiresAt: parseCafe24Timestamp(token.expires_at),
+      refreshTokenExpiresAt: parseCafe24Timestamp(token.refresh_token_expires_at),
       scopes: token.scopes ?? [],
       status: 'ACTIVE',
       lastError: null,
@@ -120,7 +131,9 @@ export class Cafe24ConnectionService {
 
     const now = Date.now();
     const accessExp = new Date(connection.accessTokenExpiresAt).getTime();
-    if (accessExp - REFRESH_SKEW_MS > now) {
+    // 상한을 넘는 만료시각 = 과거 timezone 결함으로 밀려 저장된 값 → 믿지 않고 refresh 한다.
+    const expiryTrustworthy = accessExp <= now + MAX_ACCESS_TOKEN_LIFETIME_MS;
+    if (expiryTrustworthy && accessExp - REFRESH_SKEW_MS > now) {
       return decrypt(connection.accessTokenEnc);
     }
 
@@ -143,8 +156,8 @@ export class Cafe24ConnectionService {
         {
           accessTokenEnc: encrypt(token.access_token),
           refreshTokenEnc: encrypt(token.refresh_token),
-          accessTokenExpiresAt: new Date(token.expires_at),
-          refreshTokenExpiresAt: new Date(token.refresh_token_expires_at),
+          accessTokenExpiresAt: parseCafe24Timestamp(token.expires_at),
+          refreshTokenExpiresAt: parseCafe24Timestamp(token.refresh_token_expires_at),
           scopes: token.scopes ?? connection.scopes,
           status: 'ACTIVE',
           lastError: null,
