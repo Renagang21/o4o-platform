@@ -1,25 +1,23 @@
 /**
- * Cafe24 상품 식별정보 Census + ProductMaster 매칭 실측 CLI
- * WO-O4O-CAFE24-OAUTH-PRODUCT-CENSUS-V1 §6·§7·§8
+ * Cafe24 상품·품목 Census + ProductMaster 매칭 실측 CLI (read-only)
+ *
+ * WO-O4O-CAFE24-OAUTH-PRODUCT-CENSUS-V1        (최초 — 상품 축 census)
+ * WO-O4O-CAFE24-REAL-WHOLESALE-MALL-CENSUS-V1  (개정 — 품목 축 + 개선 매처 + 사업 판정 지표)
  *
  * Usage:
- *   npx tsx src/scripts/cafe24-product-census.ts --mall <mall_id> [--shop 1] [--limit 0] [--out <path>]
- *     --limit 0 = 전량
+ *   npx tsx src/scripts/cafe24-product-census.ts --mall <mall_id> [--shop 1] [--limit 0]
+ *                                                [--variants 1] [--outdir <dir>]
+ *     --limit 0    = 전량
+ *     --variants 0 = 품목 조회 생략 (상품 축만)
  *
  * 안전 경계:
- *   - **DB write 0.** Cafe24 상품을 어떤 테이블에도 저장하지 않는다 (WO §2 원장 복제 금지).
- *     ProductMaster / ProductIdentifier / mapping 도 생성하지 않는다 (WO §8 — 실측까지).
- *   - Cafe24 는 상품 조회 endpoint 만 호출한다 (주문/회원/결제 금지).
- *   - 리포트에 token/secret 을 쓰지 않는다. 리포트는 repo 밖 경로를 기본값으로 쓴다.
+ *   - **DB write 0.** Cafe24 상품/품목을 어떤 테이블에도 저장하지 않는다.
+ *     ProductMaster / ProductIdentifier / mapping 도 생성·수정하지 않는다 (WO §14).
+ *   - scope 는 mall.read_product 만 쓴다. 주문·회원·결제·배송 endpoint 를 호출하지 않는다 (WO §3).
+ *   - 리포트에 token/secret 을 쓰지 않는다. 산출물은 repo 밖 경로가 기본값이다 (WO §16).
  *
- * 매칭 사다리 (강한 것부터). 기존 로직을 우선 재사용한다:
- *   1) barcode exact          — product_masters.barcode
- *   2) identifier exact       — product_identifiers.normalized_value (normalizeIdentifier 재사용)
- *   3) name+manufacturer exact— normalizeName 재사용 (bulk-match.service)
- *   4) name exact             — normalizeName 완전일치
- *   5) name similar           — ILIKE 부분일치 후보
- * 각 단계에서 후보 1건이면 EXACT, 2건 이상이면 AMBIGUOUS, 부분일치만 있으면 SIMILAR,
- * 전 단계 실패면 NOT_FOUND.
+ * 매칭은 BulkMatchService.matchItems() — 운영 코드를 그대로 호출한다.
+ * census 전용 사다리를 따로 두지 않는다 (실측과 운영 동작이 갈리면 판정이 무의미해진다).
  */
 
 import 'reflect-metadata';
@@ -29,16 +27,19 @@ import { DataSource } from 'typeorm';
 import { Cafe24ConnectionService } from '../modules/cafe24/services/cafe24-connection.service.js';
 import { Cafe24Connection } from '../modules/cafe24/entities/Cafe24Connection.entity.js';
 import { loadCafe24OAuthConfig } from '../modules/cafe24/cafe24-oauth.client.js';
-import { fetchProductCount, fetchProductPage } from '../modules/cafe24/cafe24-admin-api.client.js';
-import type { Cafe24ProductRow } from '../modules/cafe24/cafe24-admin-api.client.js';
-import { normalizeName } from '../modules/neture/services/bulk-match.service.js';
-import { normalizeIdentifier } from '../modules/neture/utils/product-identifier.util.js';
+import {
+  fetchProductCount,
+  fetchProductPage,
+  fetchProductVariants,
+} from '../modules/cafe24/cafe24-admin-api.client.js';
+import type { Cafe24ProductRow, Cafe24VariantRow } from '../modules/cafe24/cafe24-admin-api.client.js';
+import { BulkMatchService, normalizeKey } from '../modules/neture/services/bulk-match.service.js';
+import type { MatchResult } from '../modules/neture/services/bulk-match.service.js';
 
 /**
  * 이 러너 전용 DataSource.
  * 앱의 AppDataSource 는 전체 entity 를 로드해 tsx 실행 시 ColumnTypeUndefinedError 로 죽는다.
  * census 에 실제로 필요한 entity 는 Cafe24Connection 하나뿐이고, 나머지 조회는 raw SQL 이다.
- * (encryption-key-rotation.ts 와 동일한 패턴)
  */
 const AppDataSource = new DataSource({
   type: 'postgres',
@@ -53,20 +54,25 @@ const AppDataSource = new DataSource({
   logging: false,
 });
 
-type MatchStatus = 'EXACT' | 'AMBIGUOUS' | 'SIMILAR' | 'NOT_FOUND';
-type MatchMethod =
-  | 'barcode_exact'
-  | 'identifier_exact'
-  | 'name_manufacturer_exact'
-  | 'name_exact'
-  | 'name_similar'
-  | 'unmatched';
+/** WO §9 분류 — 사람 확인이 필요한지로 갈린다 */
+type CensusStatus =
+  | 'AUTO_EXACT_IDENTIFIER'
+  | 'AUTO_EXACT_NAME'
+  | 'AMBIGUOUS'
+  | 'SIMILAR_REVIEW'
+  | 'NOT_FOUND';
+
+/** BulkMatchService 의 batch 상한과 동일 (초과분은 서비스가 잘라낸다) */
+const MATCH_BATCH = 200;
+/** 품목 조회 동시성 — Cafe24 rate limit 보호 */
+const VARIANT_CONCURRENCY = 2;
 
 interface Args {
   mall: string;
   shop: number;
   limit: number;
-  out: string;
+  variants: boolean;
+  outdir: string;
 }
 
 function parseArgs(argv: string[]): Args {
@@ -85,35 +91,37 @@ function parseArgs(argv: string[]): Args {
     mall,
     shop: Number(get('shop') ?? 1) || 1,
     limit: Number(get('limit') ?? 0) || 0,
-    out: get('out') ?? path.resolve(process.cwd(), '..', '..', '..', `cafe24-product-census-${mall}.json`),
+    variants: (get('variants') ?? '1') !== '0',
+    outdir: get('outdir') ?? 'C:/tmp/cafe24-real-wholesale-census',
   };
 }
 
-/** 값이 census 상 "사용 가능"한가 (null/blank/공백만 제외) */
-function usable(v: unknown): v is string {
-  return typeof v === 'string' && v.trim().length > 0;
+function str(v: unknown): string {
+  return v === null || v === undefined ? '' : String(v).trim();
 }
 
 interface FieldCensus {
   field: string;
-  present: number;
+  populated: number;
   blank: number;
+  /** populated 중 값이 1회만 등장한 건수 */
   unique: number;
+  /** populated 중 값이 2회 이상 등장한 건수 */
   duplicate: number;
-  usableRate: number;
+  distinctValues: number;
+  populatedRate: number;
+  /** populated 이면서 유일한 비율 — "식별자로 쓸 수 있는" 비율 */
+  usableAsKeyRate: number;
 }
 
-function censusField(rows: Cafe24ProductRow[], field: string): FieldCensus {
-  let present = 0;
+function censusField(rows: Array<Record<string, unknown>>, field: string): FieldCensus {
   const counts = new Map<string, number>();
+  let populated = 0;
   for (const r of rows) {
-    const raw = r[field];
-    const v = raw === null || raw === undefined ? '' : String(raw);
-    if (v.trim().length > 0) {
-      present += 1;
-      const k = v.trim();
-      counts.set(k, (counts.get(k) ?? 0) + 1);
-    }
+    const v = str(r[field]);
+    if (!v) continue;
+    populated += 1;
+    counts.set(v, (counts.get(v) ?? 0) + 1);
   }
   let unique = 0;
   let duplicate = 0;
@@ -121,37 +129,89 @@ function censusField(rows: Cafe24ProductRow[], field: string): FieldCensus {
     if (c === 1) unique += 1;
     else duplicate += c;
   }
+  const n = rows.length || 1;
   return {
     field,
-    present,
-    blank: rows.length - present,
+    populated,
+    blank: rows.length - populated,
     unique,
     duplicate,
-    usableRate: rows.length ? Number((present / rows.length).toFixed(4)) : 0,
+    distinctValues: counts.size,
+    populatedRate: Number((populated / n).toFixed(4)),
+    usableAsKeyRate: Number((unique / n).toFixed(4)),
   };
+}
+
+/** 동시성 제한 map */
+async function mapLimit<T, R>(items: T[], limit: number, fn: (t: T, i: number) => Promise<R>): Promise<R[]> {
+  const out: R[] = new Array(items.length);
+  let cursor = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    for (;;) {
+      const i = cursor;
+      cursor += 1;
+      if (i >= items.length) return;
+      out[i] = await fn(items[i], i);
+    }
+  });
+  await Promise.all(workers);
+  return out;
+}
+
+/** WO §9 — matchItems 결과를 census 분류로 옮긴다 */
+function classify(r: MatchResult): CensusStatus {
+  if (r.status === 'EXACT_MATCH') {
+    return r.matchedBy === 'identifier_exact' ? 'AUTO_EXACT_IDENTIFIER' : 'AUTO_EXACT_NAME';
+  }
+  if (r.status === 'SIMILAR_MATCH') {
+    // 정규화 완전일치인데 master 가 복수 = 동명이품. 유사도 후보와 성격이 다르다.
+    return r.matchedBy === 'normalized_exact' ? 'AMBIGUOUS' : 'SIMILAR_REVIEW';
+  }
+  return 'NOT_FOUND';
+}
+
+interface RowOut {
+  product_no: number | null;
+  product_name: string;
+  custom_product_code: string;
+  variant_identifier_used: string;
+  status: CensusStatus;
+  matchedBy: string;
+  topScore: number | null;
+  master_id: string | null;
+  master_name: string | null;
+  n_candidates: number;
+  candidate_names: string[];
+  name_length: number;
 }
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
+  fs.mkdirSync(args.outdir, { recursive: true });
 
   const cfg = loadCafe24OAuthConfig();
   if (!cfg) {
-    console.error('CAFE24_CLIENT_ID/CAFE24_CLIENT_SECRET/CAFE24_REDIRECT_URI 미설정 — WO §11 중지 조건');
+    console.error('CAFE24_CLIENT_ID/CAFE24_CLIENT_SECRET/CAFE24_REDIRECT_URI 미설정');
     process.exit(3);
   }
 
   await AppDataSource.initialize();
+  const t0 = Date.now();
   try {
     const connService = new Cafe24ConnectionService(AppDataSource);
     const conn = await connService.findByMall(args.mall, args.shop);
     if (!conn) {
-      console.error(`연결 없음: mall=${args.mall} shop=${args.shop} — 먼저 /api/v1/admin/cafe24/authorize 로 연결하십시오`);
+      console.error(`연결 없음: mall=${args.mall} shop=${args.shop} — OAuth 연결이 먼저 필요합니다`);
       process.exit(4);
     }
-
+    // WO §4 — token 값 자체는 출력하지 않는다. 메타만 기록한다.
+    console.log(
+      `[A] mall=${conn.mallId} shop=${conn.shopNo} status=${conn.status} scopes=${JSON.stringify(conn.scopes)}`,
+    );
     const accessToken = await connService.getUsableAccessToken(conn);
 
-    // ---- Phase C: 실제 상품 조회 (저장 없음) ----
+    // ---- Phase B: 상품 전량 ----
+    const tB = Date.now();
     const total = await fetchProductCount(cfg, conn.mallId, accessToken, conn.shopNo);
     const target = args.limit > 0 ? Math.min(args.limit, total) : total;
     const rows: Cafe24ProductRow[] = [];
@@ -166,128 +226,201 @@ async function main(): Promise<void> {
       rows.push(...page.products);
       for (const k of page.observedKeys) observedKeys.add(k);
       if (page.products.length === 0) break;
-      console.log(`[census] fetched ${rows.length}/${target}`);
+      console.log(`[B] products ${rows.length}/${target}`);
     }
+    const msProducts = Date.now() - tB;
 
-    // ---- Phase 7: 식별정보 census ----
-    const censusFields = [
-      'product_no',
-      'product_code',
-      'custom_product_code',
-      'product_name',
-      'eng_product_name',
-      'model_name',
-      'brand_code',
-      'manufacturer_code',
-      'supplier_code',
-      'barcode',
-      'origin_place_value',
-    ];
-    const fieldCensus = censusFields.map((f) => censusField(rows, f));
+    // ---- Phase C: 품목(variants) 전량 ----
+    const tC = Date.now();
+    const variantsByProduct = new Map<number, Cafe24VariantRow[]>();
+    const variantKeys = new Set<string>();
+    let variantErrors = 0;
+    if (args.variants) {
+      const nos = rows.map((r) => Number(r.product_no)).filter((x) => Number.isFinite(x));
+      let done = 0;
+      await mapLimit(nos, VARIANT_CONCURRENCY, async (no) => {
+        try {
+          const v = await fetchProductVariants(cfg, conn.mallId, accessToken, no, conn.shopNo);
+          variantsByProduct.set(no, v.variants);
+          for (const k of v.observedKeys) variantKeys.add(k);
+        } catch {
+          variantErrors += 1;
+        }
+        done += 1;
+        if (done % 100 === 0) console.log(`[C] variants ${done}/${nos.length}`);
+      });
+    }
+    const msVariants = Date.now() - tC;
+    const allVariants = [...variantsByProduct.values()].flat();
 
-    // 상품명 normalization 결과
-    const normalizedNames = rows.map((r) => normalizeName(String(r.product_name ?? '')));
-    const normalizedNonEmpty = normalizedNames.filter((n) => n.length > 0);
-    const normalizedUnique = new Set(normalizedNonEmpty).size;
+    // ---- Phase D: 매칭 (운영 BulkMatchService) ----
+    const tD = Date.now();
+    const svc = new BulkMatchService(AppDataSource);
 
-    // ---- Phase 8: ProductMaster 매칭 실측 (DB write 0) ----
-    const byMethod: Record<MatchMethod, number> = {
-      barcode_exact: 0,
-      identifier_exact: 0,
-      name_manufacturer_exact: 0,
-      name_exact: 0,
-      name_similar: 0,
-      unmatched: 0,
+    /**
+     * WO §8 우선순위:
+     *   1) custom_product_code  2) custom_variant_code / gtin  3~) 상품명 축
+     * Cafe24 가 자동 생성하는 product_code / variant_code 는 O4O 식별자로 쓰지 않는다.
+     */
+    const codeOf = (r: Cafe24ProductRow): { code: string | null; source: string } => {
+      const cpc = str(r.custom_product_code);
+      if (cpc) return { code: cpc, source: 'custom_product_code' };
+      const vs = variantsByProduct.get(Number(r.product_no)) ?? [];
+      for (const v of vs) {
+        const cvc = str(v.custom_variant_code);
+        if (cvc) return { code: cvc, source: 'custom_variant_code' };
+      }
+      for (const v of vs) {
+        const g = str(v.gtin);
+        if (g) return { code: g, source: 'gtin' };
+      }
+      return { code: null, source: '' };
     };
-    const byStatus: Record<MatchStatus, number> = { EXACT: 0, AMBIGUOUS: 0, SIMILAR: 0, NOT_FOUND: 0 };
 
-    for (const r of rows) {
-      const result = await matchOne(r);
-      byMethod[result.method] += 1;
-      byStatus[result.status] += 1;
+    const inputs = rows.map((r) => {
+      const picked = codeOf(r);
+      return { row: r, name: str(r.product_name), code: picked.code, source: picked.source };
+    });
+
+    const results: MatchResult[] = [];
+    for (let i = 0; i < inputs.length; i += MATCH_BATCH) {
+      const chunk = inputs.slice(i, i + MATCH_BATCH);
+      results.push(...(await svc.matchItems(chunk.map((c) => ({ name: c.name, code: c.code })))));
+      console.log(`[D] matched ${results.length}/${inputs.length}`);
     }
+    const msMatching = Date.now() - tD;
+
+    const out: RowOut[] = results.map((res, i) => {
+      const src = inputs[i];
+      return {
+        product_no: Number(src.row.product_no) || null,
+        product_name: src.name,
+        custom_product_code: str(src.row.custom_product_code),
+        variant_identifier_used: src.source === 'custom_product_code' ? '' : src.source,
+        status: classify(res),
+        matchedBy: res.matchedBy,
+        topScore: res.topScore ?? null,
+        master_id: res.master?.id ?? null,
+        master_name: res.master?.name ?? null,
+        n_candidates: res.candidates?.length ?? 0,
+        candidate_names: (res.candidates ?? []).slice(0, 5).map((c) => c.name),
+        name_length: normalizeKey(src.name).length,
+      };
+    });
+
+    // ---- 집계 ----
+    const statuses: CensusStatus[] = [
+      'AUTO_EXACT_IDENTIFIER',
+      'AUTO_EXACT_NAME',
+      'AMBIGUOUS',
+      'SIMILAR_REVIEW',
+      'NOT_FOUND',
+    ];
+    const byStatus = Object.fromEntries(statuses.map((s) => [s, 0])) as Record<CensusStatus, number>;
+    for (const o of out) byStatus[o.status] += 1;
+
+    const n = out.length || 1;
+    const auto = byStatus.AUTO_EXACT_IDENTIFIER + byStatus.AUTO_EXACT_NAME;
+    const review = byStatus.AMBIGUOUS + byStatus.SIMILAR_REVIEW;
+
+    // WO §10 — 보유 여부별 / 이름 길이별 차이
+    const split = (pred: (o: RowOut) => boolean) => {
+      const g = out.filter(pred);
+      const a = g.filter((o) => o.status.startsWith('AUTO_')).length;
+      return { n: g.length, auto: a, autoRate: g.length ? Number((a / g.length).toFixed(4)) : 0 };
+    };
 
     const report = {
-      wo: 'WO-O4O-CAFE24-OAUTH-PRODUCT-CENSUS-V1',
+      wo: 'WO-O4O-CAFE24-REAL-WHOLESALE-MALL-CENSUS-V1',
       mallId: conn.mallId,
       shopNo: conn.shopNo,
       scopes: conn.scopes,
-      totalProductsInMall: total,
-      analyzed: rows.length,
-      observedResponseKeys: [...observedKeys].sort(),
-      fieldCensus,
-      nameNormalization: {
-        nonEmpty: normalizedNonEmpty.length,
-        unique: normalizedUnique,
-        collapsedByNormalization: normalizedNonEmpty.length - normalizedUnique,
+      TOTAL_PRODUCTS: total,
+      analyzedProducts: rows.length,
+      TOTAL_VARIANTS: allVariants.length,
+      variantsFetchedForProducts: variantsByProduct.size,
+      variantErrors,
+      variantsPerProduct: {
+        avg: variantsByProduct.size ? Number((allVariants.length / variantsByProduct.size).toFixed(3)) : 0,
+        max: Math.max(0, ...[...variantsByProduct.values()].map((v) => v.length)),
       },
+      observedProductKeys: [...observedKeys].sort(),
+      observedVariantKeys: [...variantKeys].sort(),
+      productFieldCensus: [
+        'product_no',
+        'product_code',
+        'custom_product_code',
+        'product_name',
+        'eng_product_name',
+        'internal_product_name',
+        'model_name',
+        'manufacturer_code',
+        'brand_code',
+        'supplier_code',
+      ].map((f) => censusField(rows as Array<Record<string, unknown>>, f)),
+      variantFieldCensus: ['variant_code', 'custom_variant_code', 'gtin'].map((f) =>
+        censusField(allVariants as Array<Record<string, unknown>>, f),
+      ),
       matchByStatus: byStatus,
-      matchByMethod: byMethod,
+      coreRatios: {
+        AUTO_MATCH_RATE: Number((auto / n).toFixed(4)),
+        IDENTIFIER_AUTO_RATE: Number((byStatus.AUTO_EXACT_IDENTIFIER / n).toFixed(4)),
+        NAME_AUTO_RATE: Number((byStatus.AUTO_EXACT_NAME / n).toFixed(4)),
+        HUMAN_REVIEW_RATE: Number((review / n).toFixed(4)),
+        AMBIGUOUS_RATE: Number((byStatus.AMBIGUOUS / n).toFixed(4)),
+        SIMILAR_REVIEW_RATE: Number((byStatus.SIMILAR_REVIEW / n).toFixed(4)),
+        NOT_FOUND_RATE: Number((byStatus.NOT_FOUND / n).toFixed(4)),
+      },
+      breakdown: {
+        withCustomProductCode: split((o) => !!o.custom_product_code),
+        withoutCustomProductCode: split((o) => !o.custom_product_code),
+        nameShort_lt10: split((o) => o.name_length < 10),
+        nameMid_10to25: split((o) => o.name_length >= 10 && o.name_length < 25),
+        nameLong_ge25: split((o) => o.name_length >= 25),
+      },
+      performance: {
+        msProducts,
+        msVariants,
+        msMatching,
+        msTotal: Date.now() - t0,
+        msMatchingPerProduct: Number((msMatching / n).toFixed(2)),
+        matchBatches: Math.ceil(out.length / MATCH_BATCH),
+        rssMB: Number((process.memoryUsage().rss / 1024 / 1024).toFixed(1)),
+        heapUsedMB: Number((process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1)),
+      },
       dbWrites: 0,
     };
 
-    fs.writeFileSync(args.out, JSON.stringify(report, null, 2), 'utf8');
-    console.log(JSON.stringify({ ...report, observedResponseKeys: observedKeys.size }, null, 2));
-    console.log(`\n리포트: ${args.out}`);
+    // WO §11 — precision 독립검증 표본 (자동확정 30 / ambiguous 20 / similar 20 / not_found 20)
+    const sampleOf = (pred: (o: RowOut) => boolean, k: number): RowOut[] => {
+      const g = out.filter(pred);
+      if (g.length <= k) return g;
+      const step = g.length / k;
+      return Array.from({ length: k }, (_, i) => g[Math.floor(i * step)]);
+    };
+    const samples = {
+      auto: sampleOf((o) => o.status.startsWith('AUTO_'), 30),
+      ambiguous: sampleOf((o) => o.status === 'AMBIGUOUS', 20),
+      similar: sampleOf((o) => o.status === 'SIMILAR_REVIEW', 20),
+      notFound: sampleOf((o) => o.status === 'NOT_FOUND', 20),
+    };
+
+    const base = path.join(args.outdir, `${conn.mallId}-shop${conn.shopNo}`);
+    fs.writeFileSync(`${base}-summary.json`, JSON.stringify(report, null, 2), 'utf8');
+    fs.writeFileSync(`${base}-rows.json`, JSON.stringify(out, null, 1), 'utf8');
+    fs.writeFileSync(`${base}-samples.json`, JSON.stringify(samples, null, 1), 'utf8');
+
+    console.log(
+      JSON.stringify(
+        { ...report, observedProductKeys: observedKeys.size, observedVariantKeys: variantKeys.size },
+        null,
+        2,
+      ),
+    );
+    console.log(`\n산출물: ${base}-{summary,rows,samples}.json`);
   } finally {
     await AppDataSource.destroy();
   }
-}
-
-async function matchOne(r: Cafe24ProductRow): Promise<{ status: MatchStatus; method: MatchMethod }> {
-  // 1) barcode exact
-  const barcode = usable(r.barcode) ? r.barcode.trim() : null;
-  if (barcode) {
-    const hits: Array<{ id: string }> = await AppDataSource.query(
-      `SELECT id FROM product_masters WHERE barcode = $1 AND status = 'ACTIVE' LIMIT 5`,
-      [barcode],
-    );
-    if (hits.length === 1) return { status: 'EXACT', method: 'barcode_exact' };
-    if (hits.length > 1) return { status: 'AMBIGUOUS', method: 'barcode_exact' };
-  }
-
-  // 2) identifier exact — Cafe24 자체코드/바코드를 식별자 후보로 시도
-  for (const raw of [barcode, usable(r.custom_product_code) ? r.custom_product_code : null]) {
-    if (!raw) continue;
-    const normalized = normalizeIdentifier('GTIN', raw) || raw.trim();
-    const hits: Array<{ product_master_id: string }> = await AppDataSource.query(
-      `SELECT DISTINCT product_master_id FROM product_identifiers
-        WHERE normalized_value = $1 AND deleted_at IS NULL LIMIT 5`,
-      [normalized],
-    );
-    if (hits.length === 1) return { status: 'EXACT', method: 'identifier_exact' };
-    if (hits.length > 1) return { status: 'AMBIGUOUS', method: 'identifier_exact' };
-  }
-
-  // 3~5) 이름 기반
-  const rawName = usable(r.product_name) ? r.product_name : '';
-  const norm = normalizeName(rawName);
-  if (!norm) return { status: 'NOT_FOUND', method: 'unmatched' };
-
-  const candidates: Array<{ id: string; name: string; manufacturer_name: string | null }> =
-    await AppDataSource.query(
-      `SELECT id, name, manufacturer_name FROM product_masters
-        WHERE name ILIKE $1 AND status = 'ACTIVE'
-        ORDER BY name ASC LIMIT 20`,
-      [`%${norm}%`],
-    );
-  if (candidates.length === 0) return { status: 'NOT_FOUND', method: 'unmatched' };
-
-  const exactName = candidates.filter((c) => normalizeName(c.name) === norm);
-
-  // 3) name + manufacturer exact — 제조사까지 맞으면 동명이품을 가른다
-  const mfr = usable(r.manufacturer_code) ? normalizeName(r.manufacturer_code) : '';
-  if (mfr && exactName.length > 1) {
-    const withMfr = exactName.filter((c) => c.manufacturer_name && normalizeName(c.manufacturer_name) === mfr);
-    if (withMfr.length === 1) return { status: 'EXACT', method: 'name_manufacturer_exact' };
-  }
-
-  // 4) name exact
-  if (exactName.length === 1) return { status: 'EXACT', method: 'name_exact' };
-  if (exactName.length > 1) return { status: 'AMBIGUOUS', method: 'name_exact' };
-
-  // 5) name similar (부분일치 후보만 존재)
-  return { status: 'SIMILAR', method: 'name_similar' };
 }
 
 main().catch((e) => {
