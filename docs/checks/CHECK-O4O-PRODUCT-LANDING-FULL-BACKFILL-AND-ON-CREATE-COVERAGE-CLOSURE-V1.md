@@ -1,11 +1,12 @@
 # CHECK-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
 
-Status: **DONE** — 누락 73,645건 전량 backfill + ProductMaster 생성 시점 Landing 계약 마감. 독립 검증 PASS.
+Status: **DONE (배포 완료)** — 누락 73,645건 전량 backfill + ProductMaster 생성 시점 Landing 계약 마감. 독립 검증 PASS.
+main `477352035` (PR #209) · Cloud Run revision `o4o-core-api-03532-tfm` · 배포 후 on-create 실검증 PASS (§11).
 WO: `WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1`
 선행 IR: `IR-O4O-STORE-PRODUCT-DESCRIPTION-QR-CODE-CENSUS-AND-GAP-AUDIT-V1` (commit `9aa2a48f8`)
 Date: 2026-09-04
 작업공간: worktree `C:\tmp\o4o-product-landing-coverage-closure` / branch `work/product-landing-coverage-closure-v1` (origin/main `5756d5ab6` 기준)
-산출물: `tmp/product-landing-coverage-closure/` (census · dry-run · apply-canary · apply-result · preexisting-landing-baseline · post-verify · create-path-audit · qr-smoke · rollback)
+산출물: `tmp/product-landing-coverage-closure/` (census · dry-run · apply-canary · apply-result · preexisting-landing-baseline · post-verify · create-path-audit · qr-smoke · rollback · post-deploy-verify)
 
 상위 기준: F12 `O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1` + `V2-AMENDMENT`(불변식 #7 — master 당 Landing 1개·대표 QR 1개) + `V3-AMENDMENT`(본문 인증 열람 · `ADR-0002`)
 
@@ -237,12 +238,32 @@ UPDATE product_landings SET deleted_at = now()
 
 ---
 
-## 11. 배포 (§20)
+## 11. 배포 · closeout (§20)
 
 - **schema 변경 없음 · migration 없음.**
-- **deploy: 이번 WO 에서 수행하지 않았다.** 코드는 `work/product-landing-coverage-closure-v1` 브랜치에만 있고 **main 병합을 하지 않았다**(WO §20 "main 직접 작업은 하지 않는다"). 따라서 **on-create 훅은 아직 프로덕션에서 동작하지 않는다.**
-- 즉 현재 프로덕션 상태는 **backfill 로 coverage 100% 달성 + on-create 는 병합·배포 대기**다. 병합·배포 전까지 신규 master 가 생기면 landing 이 다시 빠질 수 있으며, 그 구간은 reconcile 재실행으로 회수한다.
-- 병합·배포는 사용자 판단 사항으로 남긴다.
+- **main 병합 완료**: PR [#209](https://github.com/Renagang21/o4o-platform/pull/209) → main **`477352035`**.
+  - 병합 전 브랜치에 `origin/main`(9커밋) 선병합 → **충돌 0**, 병합 상태에서 `tsc --noEmit` 에러 0 · landing 테스트 **25/25 PASS** 재확인.
+  - PR CI: Code Quality Check · Analyze(typescript) · CodeQL · Build Applications(admin-dashboard) · Apply Size Labels **전부 SUCCESS**.
+  - **SonarCloud Code Analysis 는 FAILURE**. 원인은 단일 조건 `new_duplicated_lines_density 4.5% > 3%` 뿐이고 reliability·security·maintainability 는 전부 rating 1(최상)이다. main 브랜치의 현행 게이트가 이미 ERROR(중복 11.3% · reliability 4 · security 5)이고 직전 PR #207 도 동일하게 SonarCloud FAILURE 상태로 병합됐다(main 은 branch protection 없음). 즉 저장소 전반의 기존 조건이며 본 변경이 새로 악화시킨 등급은 없다 — **숨기지 않고 기록한다.**
+- **API 배포 완료**: `Deploy API Server (Cloud Run)` run `33883339838` **success** → revision **`o4o-core-api-03532-tfm`** (traffic 100%), `GET /health` 200.
+- 병합~배포 구간에 생성된 master **0건** → **reconcile 실행 불필요**(실행하지 않았다).
+
+### 배포 후 프로덕션 검증
+
+| 항목 | 결과 |
+|---|---|
+| **신규 ProductMaster 생성 → landing 자동 생성** | `POST /api/v1/admin/o4o-product-db/masters` (201) → master `591e2fb6-74cd-4683-9244-84c28a3c8b6b` · **landing 1행 즉시 생성** · publicKey `22s8dqs3sc9m` · **`metadata.source='master-create-barcodeless'`**(본 WO 의 on-create 훅이 발급) · status active |
+| **기존 master 재조회 시 `created=false`** | 신규 master QR 재호출 **created=false** (on-create 가 이미 발급) / backfill master(`7eeed1e6…`) QR 호출 **created=false** |
+| 신규 landing 공개 경로 | `GET /api/v1/public/product-landings/22s8dqs3sc9m` **200** · `https://neture.co.kr/p/22s8dqs3sc9m` **200** · QR SVG 1,594자 |
+| **masters without landing** | **0** |
+| ProductMaster / landing | 272,040 / 272,040 (**coverage 100%**) — smoke master 1건 포함 |
+| master당 중복 / public_key 중복 / orphan | **0 / 0 / 0** |
+| 기존 landing 지문 | **43751c78f065f0b332a5fbe6e2f79cc2 — 불변** |
+| 발급 출처 분포 | `landing-seed-20260709` 198,387 · `product-landing-full-backfill-v1` 73,645 · `admin-qr-view` 5 · `admin` 2 · **`master-create-barcodeless` 1(신규 훅)** |
+
+> 배포 후 smoke 로 생성한 master `591e2fb6-74cd-4683-9244-84c28a3c8b6b`("SMOKE on-create landing 20260904" / 제조사 "O4O SMOKE" / 일반)는 **삭제하지 않고 남겼다** — ProductMaster 삭제는 승인 대상이며, 2026-07 Phase 2 smoke master 와 같은 취급이다.
+
+**계약 마감**: 이 시점부터 **모든 ProductMaster 는 생성 즉시 대표 QR landing 을 갖는다.** STORE·B2B 설명서 유무와 무관하다.
 
 ---
 
