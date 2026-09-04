@@ -54,6 +54,13 @@ node_modules/
 .vite/
 dist/
 
+# tsc project-reference 산출물 (apps/admin-dashboard/tsconfig.node.json 의 outDir)
+# WO-O4O-TRACKED-GENERATED-ARTIFACT-AND-DEV-TOOLING-RESIDUE-CLEANUP-V1
+/apps/admin-dashboard/dist-node/
+
+# 로컬 node_modules 인벤토리 스냅샷 (생성물 · 소스 아님)
+/workspace-packages.json
+
 # TypeScript build cache
 *.tsbuildinfo
 

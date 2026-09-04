@@ -25,6 +25,7 @@
  *
  * 스크립트를 실행하지 않고 raw-source 로 단언한다. DB · 네트워크 접근 0.
  */
+import { execFileSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -376,6 +377,67 @@ describe('9. packages/block-core orphan 패키지 은퇴 계약 (WO-O4O-BLOCK-CO
     expect(exists(`${ADMIN_SRC}/blocks/index.ts`)).toBe(true);
     expect(exists('packages/block-renderer/package.json')).toBe(true);
     expect(exists('scripts/audit/check-block-registry.ts')).toBe(true);
+  });
+});
+
+describe('10. 추적된 생성물 · dev tooling stale reference 정리 계약 (WO-O4O-TRACKED-GENERATED-ARTIFACT-AND-DEV-TOOLING-RESIDUE-CLEANUP-V1)', () => {
+  const HAS_GIT = fs.existsSync(abs('.git'));
+
+  /** `git ls-files` 로 추적 목록을 얻는다. `.git` 이 없는 환경에서는 null. */
+  function tracked(pathspec: string): string[] | null {
+    if (!HAS_GIT) return null;
+    const out = execFileSync('git', ['ls-files', '--', pathspec], {
+      cwd: REPO_ROOT,
+      encoding: 'utf-8',
+    });
+    return out.split('\n').map((l) => l.trim()).filter(Boolean);
+  }
+
+  it.each([
+    ['apps/admin-dashboard/dist-node'],
+    ['workspace-packages.json'],
+  ])('%s 는 Git 에 추적되지 않는다 (생성물)', (pathspec) => {
+    const hits = tracked(pathspec);
+    if (hits === null) {
+      expect(HAS_GIT).toBe(false); // .git 없는 환경 — 추적 판정 불가
+      return;
+    }
+    expect(hits).toEqual([]);
+  });
+
+  it('.gitignore 에 anchored 규칙이 있고 광범위한 *.json ignore 는 없다', () => {
+    const lines = read('.gitignore')
+      .split('\n')
+      .map((l) => l.trim())
+      .filter((l) => l && !l.startsWith('#'));
+
+    expect(lines).toContain('/apps/admin-dashboard/dist-node/');
+    expect(lines).toContain('/workspace-packages.json');
+    expect(lines.filter((l) => /^!?\**\.json$|^\*\*\/\*\.json$/.test(l))).toEqual([]);
+  });
+
+  it('vite config 원본(소스)은 보존된다', () => {
+    expect(exists('apps/admin-dashboard/vite.config.ts')).toBe(true);
+    expect(exists('vite.config.shared.ts')).toBe(true);
+    expect(exists('apps/admin-dashboard/tsconfig.node.json')).toBe(true);
+  });
+
+  it('dev 스크립트 사전빌드 목록에 존재하지 않는 패키지가 없다', () => {
+    const devSh = read('scripts/development/dev.sh');
+    const lists = [
+      ...devSh.matchAll(/for pkg in ([^;]+); do/g),
+      ...devSh.matchAll(/local packages=\(([^)]*)\)/g),
+    ].map((m) => m[1]);
+
+    expect(lists.length).toBeGreaterThan(0);
+    const missing: string[] = [];
+    for (const list of lists) {
+      for (const name of list.split(/\s+/).map((t) => t.replace(/"/g, '').trim()).filter(Boolean)) {
+        if (name.includes('$')) continue; // 변수 확장(`"${packages[@]}"`)은 목록이 아니다
+        if (!exists(`packages/${name}`)) missing.push(name);
+      }
+    }
+    expect(missing).toEqual([]);
   });
 });
 

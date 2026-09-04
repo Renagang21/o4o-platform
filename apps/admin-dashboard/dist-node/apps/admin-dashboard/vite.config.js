@@ -32,18 +32,25 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
             '@o4o/utils': path.resolve(__dirname, '../../packages/utils/dist'),
             '@o4o/ui': path.resolve(__dirname, '../../packages/ui/dist'),
             '@o4o/auth-client': path.resolve(__dirname, '../../packages/auth-client/dist'),
+            // WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
+            //   role prefix → canonical service_key 변환(resolveCanonicalServiceKey) SSOT 재사용.
+            //   security-core 는 전 파일이 `import type` 뿐이라 런타임 의존이 없다(브라우저 안전).
+            //   build:packages 체인에 없는 패키지라 dist 를 전제하지 않고 src 를 직접 가리킨다
+            //   (@o4o/types 등 기존 tsconfig paths 와 동일 패턴).
+            '@o4o/security-core': path.resolve(__dirname, '../../packages/security-core/src'),
             '@o4o/auth-context': path.resolve(__dirname, '../../packages/auth-context/dist'),
             '@o4o/block-renderer': path.resolve(__dirname, '../../packages/block-renderer/dist'),
             '@o4o/slide-app': path.resolve(__dirname, '../../packages/slide-app/dist'),
             // Forum app packages - map to source directories for lazy loading
+            // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+            //   '@o4o/forum-core-yaksa' alias 제거 — 유일 소비처였던 /yaksa/communities
+            //   동적 import 3건과 packages/forum-yaksa 를 같은 커밋에서 함께 제거했다.
             '@o4o/forum-core': path.resolve(__dirname, '../../packages/forum-core'),
-            '@o4o/forum-core-yaksa': path.resolve(__dirname, '../../packages/forum-yaksa'),
-            // Dropshipping core - map to source for subpath imports
-            '@o4o/dropshipping-core': path.resolve(__dirname, '../../packages/dropshipping-core/src'),
             // Pharmacy AI Insight - map to source for lazy loading
             '@o4o/pharmacy-ai-insight': path.resolve(__dirname, '../../packages/pharmacy-ai-insight/src'),
-            // CGM Pharmacist App - map to source for lazy loading
-            '@o4o/cgm-pharmacist-app': path.resolve(__dirname, '../../packages/cgm-pharmacist-app/src'),
+            // AI Prompts - map to dist for subpath imports (@o4o/ai-prompts/admin)
+            '@o4o/ai-prompts': path.resolve(__dirname, '../../packages/ai-prompts/dist'),
+            '@o4o/content-editor': path.resolve(__dirname, '../../packages/content-editor/dist'),
             // Force React to use single version
             'react': path.resolve(__dirname, '../../node_modules/react'),
             'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
@@ -80,14 +87,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
             'react/jsx-runtime',
             '@tanstack/react-query',
             '@o4o/utils',
-            '@o4o/ui',
-            'date-fns',
-            '@wordpress/blocks',
-            '@wordpress/block-editor',
-            '@wordpress/components',
-            '@wordpress/element',
-            '@wordpress/data',
-            '@wordpress/i18n'
+            '@o4o/ui'
+            // (제거됨) '@wordpress/*' 6종 — WO-O4O-WINDOW-WP-POLYFILL-RETIREMENT-V1
+            //   설치되지 않은 패키지를 pre-bundle 대상으로 지정하던 dead 항목이다
+            //   (package.json · lockfile · source import 모두 0건).
         ],
         exclude: [
             '@o4o/types', // ES Module import 순서 문제 방지
@@ -95,11 +98,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
             '@o4o/auth-context', // Workspace package - pre-bundling 방지
             '@o4o/block-renderer', // Workspace package - pre-bundling 방지
             '@o4o/slide-app', // Workspace package - pre-bundling 방지
-            '@o4o/dropshipping-core', // Dropshipping core - source imports
             '@o4o/pharmacy-ai-insight', // Pharmacy AI Insight - source imports
-            '@o4o/cgm-pharmacist-app', // CGM Pharmacist App - source imports
-            '@o4o/forum-core', // Forum app packages - source imports
-            '@o4o/forum-core-yaksa'
+            '@o4o/forum-core' // Forum app packages - source imports
         ],
         esbuildOptions: {
             define: {
@@ -129,15 +129,14 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
             drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
             target: 'es2020'
         },
-        // modulepreload 설정 추가 - WordPress 청크 제외
-        modulePreload: {
-            resolveDependencies: (filename, deps, { hostId, hostType }) => {
-                // WordPress 관련 청크는 modulepreload에서 제외
-                return deps.filter((dep) => !dep.includes('wp-') &&
-                    !dep.includes('page-gutenberg') &&
-                    !dep.includes('@wordpress'));
-            }
-        },
+        /*
+          (제거됨) modulePreload.resolveDependencies — WordPress 청크 제외 필터
+          WO-O4O-WINDOW-WP-POLYFILL-RETIREMENT-V1
+    
+          필터 대상이던 `wp-*` · `@wordpress` chunk 는 대응 manualChunks 분기가
+          은퇴하면서 더 이상 생성되지 않는다(빌드 산출물 실측 0건).
+          필터를 제거해도 preload 대상 집합이 동일하다.
+        */
         rollupOptions: {
             ...sharedViteConfig.build?.rollupOptions,
             // External dependencies that should not be bundled
@@ -148,10 +147,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
                 }
                 // Exclude backend/Node.js modules that forum-core imports
                 if (id === 'express' || id === 'typeorm') {
-                    return true;
-                }
-                // Exclude @o4o/content-editor (imported by forum-core admin-ui)
-                if (id.includes('@o4o/content-editor')) {
                     return true;
                 }
                 return false;
@@ -174,17 +169,11 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
                     const sharedChunk = typeof output?.manualChunks === 'function' ? output.manualChunks(id) : undefined;
                     if (sharedChunk)
                         return sharedChunk;
-                    // WordPress 관련 모듈
-                    if (id.includes('@wordpress') ||
-                        id.includes('wordpress-initializer') ||
-                        id.includes('wordpress-dynamic-loader') ||
-                        id.includes('WordPressBlockEditor') ||
-                        id.includes('WordPressEditor') ||
-                        id.includes('GutenbergEditor')) {
-                        if (id.includes('@wordpress')) {
-                            return 'wp-all';
-                        }
-                    }
+                    /*
+                      (제거됨) `wp-all` manualChunks 분기 — WO-O4O-WINDOW-WP-POLYFILL-RETIREMENT-V1
+                      해당 패키지가 설치돼 있지 않아 한 번도 매칭된 적이 없다
+                      (빌드 산출물에 `wp-*` chunk 0건).
+                    */
                     // 나머지 node_modules
                     if (id.includes('node_modules')) {
                         if (id.includes('socket.io')) {
@@ -193,16 +182,12 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
                     }
                     // 블록 청크는 제거 - 너무 크고 React 의존성 문제 발생
                     // 대신 메인 번들에 포함되도록 함
-                    // 페이지 청크
-                    if (!id.includes('node_modules')) {
-                        // TemplatePartEditor 청크 제거 - React Context 초기화 문제 방지
-                        // if (id.includes('TemplatePartEditor')) {
-                        //   return 'page-template-editor';
-                        // }
-                        if (id.includes('GutenbergEditor') || id.includes('WordPressBlockEditor')) {
-                            return 'page-gutenberg';
-                        }
-                    }
+                    // (제거됨) 페이지 청크 — legacy editor 전용 분기
+                    //   WO-O4O-POST-LEGACY-EDITOR-API-BUILD-AND-ORPHAN-RESIDUE-CLEANUP-V1
+                    //   주석 처리돼 있던 `page-template-editor`(TemplatePartEditor) 분기와
+                    //   살아 있던 `page-gutenberg`(GutenbergEditor · WordPressBlockEditor) 분기를
+                    //   함께 제거했다. 세 파일 모두 legacy editor 은퇴로 저장소에 존재하지 않아
+                    //   은퇴 직후 빌드에서도 매칭된 chunk 는 0 이었다.
                 }
             }
         }
