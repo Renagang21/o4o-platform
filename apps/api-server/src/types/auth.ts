@@ -242,16 +242,3 @@ export interface CookieConfig {
     domain?: string;
   };
 }
-
-// Pricing result types
-export interface PricingResult {
-  enabled?: boolean;
-  degradationLevel?: string;
-  fallbackData?: Record<string, unknown>;
-  staticContent?: string;
-  fallbackUrl?: string;
-  readOnlyMode?: boolean;
-  essentialOnly?: boolean;
-  disabledFeatures?: string[];
-  metadata?: Record<string, string | number | boolean | string[]>;
-}

@@ -9,15 +9,14 @@ const BusinessDashboard = lazy(() => import('@/pages/dashboard/business/Business
 const ServiceContentManagerPage = lazy(() => import('@/pages/service-content-manager/ServiceContentManagerPage'));
 const AppDisabled = lazy(() => import('@/pages/error/AppDisabled'));
 
-// PD-3: Seller Dashboard Routes
-const SellerCatalog = lazy(() => import('@/pages/dashboard/seller/SellerCatalog'));
-const SellerProducts = lazy(() => import('@/pages/dashboard/seller/SellerProducts'));
-// PD-4: Orders Pages
-const SellerOrders = lazy(() => import('@/pages/dashboard/seller/SellerOrders'));
-const SupplierOrders = lazy(() => import('@/pages/dashboard/supplier/SupplierOrders'));
-// PD-5: Settlement Pages
-const SellerSettlements = lazy(() => import('@/pages/dashboard/seller/SellerSettlements'));
-const SupplierSettlements = lazy(() => import('@/pages/dashboard/supplier/SupplierSettlements'));
+// WO-O4O-LEGACY-RESIDUAL-RUNTIME-AND-DEFERRED-FINAL-CLOSURE-V1 (Axis D):
+// PD-3/PD-4/PD-5 seller·supplier 대시보드 6화면을 은퇴했다. 6화면 모두
+// 존재하지 않는 backend(`/api/v2/seller/*`, `/api/v2/supplier/*`,
+// `/api/v1/seller/settlements`, `/api/v1/supplier/settlements`)를 호출했고,
+// 진입 네비게이션도 0건이었다 (DEAD_CROSSLINK).
+// canonical: 공급자 정산 = web-neture `/supplier/settlements`
+//            (backend `/api/v1/neture/supplier/settlements`).
+// seller(플랫폼 직접판매) 축은 PLATFORM_DIRECT_SALE_BUSINESS_CONTRACT = NONE.
 
 // Loading component
 const PageLoader = () => (
@@ -72,58 +71,6 @@ export function DashboardRoutes() {
       <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
         <Suspense fallback={<PageLoader />}>
           <ServiceContentManagerPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // PD-3: Seller Dashboard Routes
-    <Route key="/dashboard/seller/catalog" path="/dashboard/seller/catalog" element={
-      <AdminProtectedRoute requiredRoles={['seller']}>
-        <Suspense fallback={<PageLoader />}>
-          <SellerCatalog />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/dashboard/seller/products" path="/dashboard/seller/products" element={
-      <AdminProtectedRoute requiredRoles={['seller']}>
-        <Suspense fallback={<PageLoader />}>
-          <SellerProducts />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // PD-4: Seller Orders
-    <Route key="/dashboard/seller/orders" path="/dashboard/seller/orders" element={
-      <AdminProtectedRoute requiredRoles={['seller']}>
-        <Suspense fallback={<PageLoader />}>
-          <SellerOrders />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // PD-5: Seller Settlements
-    <Route key="/dashboard/seller/settlements" path="/dashboard/seller/settlements" element={
-      <AdminProtectedRoute requiredRoles={['seller']}>
-        <Suspense fallback={<PageLoader />}>
-          <SellerSettlements />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // PD-4: Supplier Orders
-    <Route key="/dashboard/supplier/orders" path="/dashboard/supplier/orders" element={
-      <AdminProtectedRoute requiredRoles={['supplier']}>
-        <Suspense fallback={<PageLoader />}>
-          <SupplierOrders />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // PD-5: Supplier Settlements
-    <Route key="/dashboard/supplier/settlements" path="/dashboard/supplier/settlements" element={
-      <AdminProtectedRoute requiredRoles={['supplier']}>
-        <Suspense fallback={<PageLoader />}>
-          <SupplierSettlements />
         </Suspense>
       </AdminProtectedRoute>
     } />,
