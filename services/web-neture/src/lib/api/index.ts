@@ -129,7 +129,6 @@ export {
   type OperatorContactListParams,
   adminSettlementApi,
   adminCommissionApi,
-  adminProductApi,
   adminMasterApi,
   adminServiceApprovalApi,
   adminRegistrationApi,

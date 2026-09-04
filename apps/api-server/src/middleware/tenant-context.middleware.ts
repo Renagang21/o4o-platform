@@ -191,7 +191,7 @@ function extractServiceGroup(req: Request): ServiceGroup | undefined {
     }
   }
 
-  // Strategy 3: Path prefix (e.g., /api/v1/cosmetics-seller-extension/...)
+  // Strategy 3: Path prefix (e.g., /api/v1/<app-id>/...)
   const pathMatch = req.path.match(/^\/api\/v1\/(cosmetics|yaksa|tourist|seller|supplier)/);
   if (pathMatch) {
     const prefix = pathMatch[1];

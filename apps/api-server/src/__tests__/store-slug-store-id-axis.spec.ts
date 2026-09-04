@@ -39,6 +39,12 @@ const EXPECTED: Record<string, string[]> = {
   'routes/kpa/controllers/organization.controller.ts': ['saved.id'],
   'routes/kpa/services/kpa-store-organization.provisioning.ts': ['orgResult.id'],
   'services/pharmacy-hub/PharmacyHubStoreProvisioningService.ts': ['organizationId'],
+  // WO-O4O-POST-RETIREMENT-MAIN-BASELINE-HOUSEKEEPING-V1:
+  //   Cafe24 B2B 매장 회원 로그인 파일럿(WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1)이
+  //   9번째 호출부를 추가하면서 이 census 등재를 빠뜨려 guard 가 red 였다.
+  //   축 자체는 정상 — `storeId: organizationId` 로 organization id 축을 그대로 따른다.
+  //   (파일럿 코드를 고친 게 아니라 census 를 실제 호출부 집합에 맞춘 것이다.)
+  'services/cafe24-b2b/Cafe24B2bStoreProvisioningService.ts': ['organizationId'],
 };
 
 /** 축이 어긋난 것으로 확인된 표현식은 어떤 호출부에서도 다시 나타나면 안 된다. */
@@ -85,7 +91,7 @@ describe('§6 platform_store_slugs.store_id 축 census', () => {
     if (ids.length > 0) actual[rel] = ids;
   }
 
-  it('reserveSlug 호출부 집합이 문서화된 8곳뿐이다', () => {
+  it('reserveSlug 호출부 집합이 문서화된 9곳뿐이다', () => {
     expect(Object.keys(actual).sort()).toEqual(Object.keys(EXPECTED).sort());
   });
 

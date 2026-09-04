@@ -107,6 +107,9 @@ export interface GovernanceSupplier {
   createdAt: string;
 }
 
+// WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §8:
+// admin 전용 승인 API(adminSupplierApi.getPendingSuppliers/approveSupplier/rejectSupplier, adminProductApi)는 은퇴했다.
+// canonical 승인 client 는 operatorSupplierApi / operatorProductApi 이다.
 export const adminSupplierApi = {
   async getSuppliers(status?: string): Promise<AdminSupplier[]> {
     try {
@@ -120,17 +123,6 @@ export const adminSupplierApi = {
     }
   },
 
-  async getPendingSuppliers(): Promise<AdminSupplier[]> {
-    try {
-      const response = await api.get('/neture/admin/suppliers/pending');
-      return response.data.data || [];
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Admin API] Failed to fetch pending suppliers:', error);
-      throw error;
-    }
-  },
-
   // §5: 상태 관리(governance) 목록 — ACTIVE/INACTIVE + 최근 변경/주문·정산 지표.
   async getGovernanceSuppliers(): Promise<GovernanceSupplier[]> {
     try {
@@ -141,23 +133,6 @@ export const adminSupplierApi = {
       console.warn('[Admin API] Failed to fetch governance suppliers:', error);
       return [];
     }
-  },
-
-  async approveSupplier(id: string): Promise<SupplierApproveResult> {
-    try {
-      await api.post(`/neture/admin/suppliers/${id}/approve`);
-      return { success: true };
-    } catch (error: any) {
-      const err = error?.response?.data?.error;
-      return { success: false, code: err?.code, missingFields: err?.missingFields ?? [] };
-    }
-  },
-
-  async rejectSupplier(id: string, reason?: string): Promise<boolean> {
-    try {
-      await api.post(`/neture/admin/suppliers/${id}/reject`, { reason });
-      return true;
-    } catch { return false; }
   },
 
   // §6: 사유 필수. 진행 주문·미정산·정산 진행 시 backend 가 409 로 차단(강제 override 없음).
@@ -539,114 +514,6 @@ export interface AdminProductSummary {
   approved: number;
   rejected: number;
 }
-
-const ADMIN_PRODUCT_SUMMARY_DEFAULT: AdminProductSummary = { total: 0, pending: 0, approved: 0, rejected: 0 };
-
-export const adminProductApi = {
-  async getProducts(status?: string): Promise<AdminProduct[]> {
-    try {
-      const qs = status ? `?status=${status}` : '';
-      const response = await api.get(`/neture/admin/products${qs}`);
-      return response.data.data || [];
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Admin API] Failed to fetch products:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1
-   * server-driven pagination/search/sort 목록. 후속 standard list adoption 화면용.
-   * (기존 getProducts 는 그대로 유지 — 현재 화면 하위호환)
-   */
-  async getProductsList(
-    params?: AdminProductListParams,
-  ): Promise<{ data: AdminProduct[]; pagination: AdminProductPagination }> {
-    const fallback: AdminProductPagination = {
-      page: 1, limit: 20, total: 0, totalPages: 1, hasNextPage: false, hasPreviousPage: false,
-    };
-    try {
-      const sp = new URLSearchParams();
-      if (params?.page) sp.append('page', String(params.page));
-      if (params?.limit) sp.append('limit', String(params.limit));
-      if (params?.search) sp.append('search', params.search);
-      if (params?.sortBy) sp.append('sortBy', params.sortBy);
-      if (params?.sortOrder) sp.append('sortOrder', params.sortOrder);
-      if (params?.approvalStatus) sp.append('approvalStatus', params.approvalStatus);
-      if (params?.distributionType) sp.append('distributionType', params.distributionType);
-      if (params?.isActive !== undefined) sp.append('isActive', String(params.isActive));
-      if (params?.supplierId) sp.append('supplierId', params.supplierId);
-      const qs = sp.toString() ? `?${sp}` : '';
-      const response = await api.get(`/neture/admin/products${qs}`);
-      const result = response.data;
-      return { data: result.data || [], pagination: result.pagination || fallback };
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Admin API] Failed to fetch product list:', error);
-      return { data: [], pagination: fallback };
-    }
-  },
-
-  /**
-   * WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1
-   * 전체 기준 승인 상태 집계 (KPI 카드용). pagination 도입 후 client 전량 집계 대체.
-   */
-  async getSummary(
-    params?: { supplierId?: string; distributionType?: string; isActive?: boolean },
-  ): Promise<AdminProductSummary> {
-    try {
-      const sp = new URLSearchParams();
-      if (params?.supplierId) sp.append('supplierId', params.supplierId);
-      if (params?.distributionType) sp.append('distributionType', params.distributionType);
-      if (params?.isActive !== undefined) sp.append('isActive', String(params.isActive));
-      const qs = sp.toString() ? `?${sp}` : '';
-      const response = await api.get(`/neture/admin/products/summary${qs}`);
-      return response.data.data || ADMIN_PRODUCT_SUMMARY_DEFAULT;
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Admin API] Failed to fetch product summary:', error);
-      return ADMIN_PRODUCT_SUMMARY_DEFAULT;
-    }
-  },
-
-  async getPendingProducts(): Promise<AdminProduct[]> {
-    try {
-      const response = await api.get('/neture/admin/products/pending');
-      return response.data.data || [];
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Admin API] Failed to fetch pending products:', error);
-      throw error;
-    }
-  },
-
-  async approveProduct(id: string): Promise<boolean> {
-    try {
-      await api.post(`/neture/admin/products/${id}/approve`);
-      return true;
-    } catch { return false; }
-  },
-
-  async rejectProduct(id: string, reason?: string): Promise<boolean> {
-    try {
-      await api.post(`/neture/admin/products/${id}/reject`, { reason });
-      return true;
-    } catch { return false; }
-  },
-
-  /** V3: Batch approve */
-  async batchApprove(ids: string[]) {
-    const res = await api.post('/neture/admin/products/batch-approve', { ids });
-    return res.data;
-  },
-
-  /** V3: Batch reject */
-  async batchReject(ids: string[], reason?: string) {
-    const res = await api.post('/neture/admin/products/batch-reject', { ids, reason });
-    return res.data;
-  },
-};
 
 // ==================== Admin Master ====================
 

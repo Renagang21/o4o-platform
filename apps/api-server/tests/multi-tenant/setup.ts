@@ -111,7 +111,7 @@ function registerTestNavigationItems(navRegistry: NavigationRegistry): void {
     // Cosmetics navigation items
     navRegistry.registerNav({
         id: 'cosmetics-products',
-        appId: 'cosmetics-seller-extension',
+        appId: 'forum-cosmetics',
         label: 'Products',
         path: '/products',
         icon: 'package',
@@ -120,7 +120,7 @@ function registerTestNavigationItems(navRegistry: NavigationRegistry): void {
     });
     navRegistry.registerNav({
         id: 'cosmetics-reviews',
-        appId: 'cosmetics-seller-extension',
+        appId: 'forum-cosmetics',
         label: 'Reviews',
         path: '/reviews',
         icon: 'star',
@@ -129,7 +129,7 @@ function registerTestNavigationItems(navRegistry: NavigationRegistry): void {
     });
     navRegistry.registerNav({
         id: 'cosmetics-routines',
-        appId: 'cosmetics-seller-extension',
+        appId: 'forum-cosmetics',
         label: 'Routines',
         path: '/routines',
         icon: 'heart',
@@ -293,21 +293,21 @@ function registerTestViews(vRegistry: ViewRegistry): void {
         cptName: 'product',
         serviceGroups: ['cosmetics'],
         priority: 100,
-    }, 'cosmetics-seller-extension');
+    }, 'forum-cosmetics');
 
     vRegistry.registerView('cosmetics.product.detail', MockComponent, {
         type: 'detail',
         cptName: 'product',
         serviceGroups: ['cosmetics'],
         priority: 100,
-    }, 'cosmetics-seller-extension');
+    }, 'forum-cosmetics');
 
     vRegistry.registerView('cosmetics.review.list', MockComponent, {
         type: 'list',
         cptName: 'review',
         serviceGroups: ['cosmetics'],
         priority: 100,
-    }, 'cosmetics-seller-extension');
+    }, 'forum-cosmetics');
 
     // Yaksa views
     vRegistry.registerView('yaksa.member.list', MockComponent, {

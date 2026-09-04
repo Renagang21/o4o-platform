@@ -356,7 +356,6 @@ const AdminMemberManagementPage = lazy(() => import('./pages/admin/AdminMemberMa
 //   admin 공급자 화면은 승인/거절 제거 → 상태 관리(비활성화/재활성화) governance 전용으로 교체.
 //   승인·거절 canonical 은 운영자 승인 콘솔(/operator/suppliers).
 const AdminSupplierGovernancePage = lazy(() => import('./pages/admin/AdminSupplierGovernancePage'));
-const AdminProductApprovalPage = lazy(() => import('./pages/admin/AdminProductApprovalPage'));
 const AdminMasterManagementPage = lazy(() => import('./pages/admin/AdminMasterManagementPage'));
 const AdminServiceApprovalPage = lazy(() => import('./pages/admin/AdminServiceApprovalPage'));
 const AdminSettlementsPage = lazy(() => import('./pages/admin/AdminSettlementsPage'));
@@ -1110,7 +1109,6 @@ function App() {
                   구 admin 승인 화면은 governance 로 canonical redirect, 신규 상태 관리 라우트 신설 */}
               <Route path="/admin/admin-suppliers" element={<Navigate to="/admin/supplier-governance" replace />} />
               <Route path="/admin/supplier-governance" element={<AdminSupplierGovernancePage />} />
-              <Route path="/admin/product-approvals" element={<AdminProductApprovalPage />} />
               <Route path="/admin/masters" element={<AdminMasterManagementPage />} />
               <Route path="/admin/catalog-import" element={<CatalogImportDashboardPage />} />
               <Route path="/admin/catalog-import/csv" element={<CSVImportPage />} />
