@@ -4,6 +4,12 @@
 > **선행 CHECK**: [CHECK-O4O-CAFE24-CONTROLLED-PILOT-RESUME-READINESS-V1](../investigations/CHECK-O4O-CAFE24-CONTROLLED-PILOT-RESUME-READINESS-V1.md)
 > **실행일**: 2026-09-04 · **몰**: `sohae2100` · **scope**: `mall.read_product` 단독
 > **판정**: **PASS** — 표본 30건 전량 생성, variants 조회 성립, 매칭축 우선순위 확정
+>
+> **정정 (2026-09-04, [CHECK-...-RECALL-CLOSURE-...](CHECK-O4O-PRODUCTMASTER-MATCHING-RECALL-CLOSURE-FOR-CAFE24-V1.md) 재집계)**
+> 본 문서 §0 · §4-1 의 판정 분포 수치가 틀렸다. 산출물 `controlled-pilot-report.json` 재집계 결과가 정본이다.
+> `SIMILAR` **3 → 2** · `NOT_FOUND` **6 → 7** · 사다리 정답 **23 → 22/30** · 미적중 **7 → 8건**.
+> §4-2 표(미적중 상세)는 8건 중 7건만 싣고 있었다 (누락 1건 = G군 `홍삼농축액 15`, 동명이인 13건).
+> 원인 분석·결론(후보검색 recall 실패이지 키 변별력 문제가 아님)은 재집계 후에도 그대로 성립한다.
 
 ---
 
@@ -18,7 +24,7 @@
 | variants 조회 (`mall.read_product` 단독) | **실패 0/30** — scope 확대 불필요 |
 | 옵션 → 품목 수 | 기대 3/2/3 → **실제 3/2/3** (옵션 없는 27건은 전부 1품목) |
 | `custom_variant_code` / `gtin` | **0/35 · 0/35** — 1차 업로드 양식에 해당 열이 없어 공란 (2차 필요) |
-| 사다리 정답률 | 23/30 (미적중 7건은 전부 **후보검색 실패**, 키 변별력 문제 아님 — §4) |
+| 사다리 정답률 | 22/30 (정정) (미적중 8건은 전부 **후보검색 실패**, 키 변별력 문제 아님 — §4) |
 | 최우선 매칭축 | ① `custom_product_code → product_identifiers` ② `normalized_name` (§5) |
 
 DB write 0 (token refresh 로 인한 `cafe24_connections` 갱신은 예외). Cafe24 write API 0. 산출물은 전부 repo 밖 `C:/tmp/cafe24-pilot/`.
@@ -72,14 +78,14 @@ v5 업로드로 표본 30건이 전량 등록됐다. 몰 상품 수 70 = 기존 
 |---|---:|---:|---|
 | `EXACT(identifier)` | 6 | 6 | **100%** |
 | `EXACT(name)` | 14 | 14 | **100%** |
-| `SIMILAR` (dice ≥ 0.7) | 3 | 3 | **100%** |
+| `SIMILAR` (dice ≥ 0.7) | 2 | 2 | **100%** |
 | `AMBIGUOUS(name)` | 1 | 0 | 0% |
-| `NOT_FOUND` | 6 | — | — |
-| 합계 | 30 | 23 | |
+| `NOT_FOUND` | 7 | — | — |
+| 합계 | 30 | 22 | |
 
 `identifier_exact` 히트 6건은 **전부 기대 ProductMaster 적중** (A군 5 + G군 1).
 
-### 4-2. 미적중 7건은 "매칭키 실패"가 아니다
+### 4-2. 미적중 8건은 "매칭키 실패"가 아니다
 
 정답 ProductMaster 를 직접 읽어 Cafe24 상품명과의 거리를 따로 측정했다.
 

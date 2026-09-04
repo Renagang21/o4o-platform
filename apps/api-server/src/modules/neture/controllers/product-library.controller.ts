@@ -11,6 +11,7 @@ import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { NetureService } from '../neture.service.js';
 import { BulkMatchService } from '../services/bulk-match.service.js';
+import type { MatchInput } from '../services/bulk-match.service.js';
 import { AliasService, AliasSource } from '../services/alias.service.js';
 import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import { parseXlsxToRecords } from '../services/xlsx-parser.service.js';
@@ -324,10 +325,14 @@ export function createProductLibraryController(dataSource: DataSource): Router {
    * 이름 목록(JSON) 또는 XLSX 파일을 받아 ProductMaster 매칭 결과를 반환한다.
    * 배치 레코드 생성 없음 — 순수 preview 전용.
    *
-   * Body (JSON): { names: string[] }
-   * OR multipart file upload (XLSX/CSV): name 컬럼에서 추출
+   * Body (JSON): { names: string[] } 또는 { items: Array<{ name: string; code?: string }> }
+   * OR multipart file upload (XLSX/CSV): name 컬럼(+ custom_product_code/code 컬럼)에서 추출
    *
-   * Response: { success: true, data: MatchResult[], total: number }
+   * WO-O4O-PRODUCTMASTER-MATCHING-RECALL-CLOSURE-FOR-CAFE24-V1:
+   *   code 는 additive 입력이다. 있으면 ProductIdentifier 완전일치를 1순위 축으로 쓴다
+   *   (Cafe24 custom_product_code). 미전달 시 기존 이름 축 동작과 동일하다.
+   *
+   * Response: { success: true, data: MatchResult[], summary }
    */
   router.post(
     '/products/bulk-match',
@@ -335,34 +340,48 @@ export function createProductLibraryController(dataSource: DataSource): Router {
     uploadSingleMiddleware('file'),
     async (req: Request, res: Response) => {
       try {
-        let names: string[];
+        let items: MatchInput[];
 
         const uploadedFile = (req as any).file as Express.Multer.File | undefined;
         if (uploadedFile) {
-          // File upload path: parse XLSX/CSV → extract name column
+          // File upload path: parse XLSX/CSV → extract name (+ code) column
           const records: Array<Record<string, string>> = parseXlsxToRecords(uploadedFile.buffer);
-          names = records
-            .map((r) => (r['name'] || r['marketing_name'] || r['packaging_name'] || '').trim())
-            .filter(Boolean);
+          items = records
+            .map((r) => ({
+              name: (r['name'] || r['marketing_name'] || r['packaging_name'] || '').trim(),
+              code: (r['custom_product_code'] || r['code'] || '').trim() || null,
+            }))
+            .filter((it) => it.name || it.code);
         } else {
           // JSON path
-          const body = req.body as { names?: unknown };
-          if (!Array.isArray(body.names)) {
+          const body = req.body as { names?: unknown; items?: unknown };
+          if (Array.isArray(body.items)) {
+            items = (body.items as unknown[])
+              .map((raw) => {
+                const o = (raw ?? {}) as { name?: unknown; code?: unknown };
+                return {
+                  name: String(o.name ?? '').trim(),
+                  code: String(o.code ?? '').trim() || null,
+                };
+              })
+              .filter((it) => it.name || it.code);
+          } else if (Array.isArray(body.names)) {
+            items = (body.names as unknown[])
+              .map((n) => ({ name: String(n ?? '').trim() }))
+              .filter((it) => it.name);
+          } else {
             return res.status(400).json({ success: false, error: 'INVALID_INPUT', message: 'names array required' });
           }
-          names = (body.names as unknown[])
-            .map((n) => String(n ?? '').trim())
-            .filter(Boolean);
         }
 
-        if (names.length === 0) {
+        if (items.length === 0) {
           return res.status(400).json({ success: false, error: 'NO_NAMES', message: 'No names provided' });
         }
-        if (names.length > 200) {
+        if (items.length > 200) {
           return res.status(400).json({ success: false, error: 'TOO_MANY', message: 'Maximum 200 names per request' });
         }
 
-        const data = await bulkMatchService.matchNames(names);
+        const data = await bulkMatchService.matchItems(items);
         const summary = {
           total: data.length,
           exactMatch: data.filter((r) => r.status === 'EXACT_MATCH').length,

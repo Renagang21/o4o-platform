@@ -11,6 +11,7 @@ import logger from '../../../utils/logger.js';
 // WO-O4O-PRODUCT-DRUG-CATEGORY-ACTIVE-MODEL-F1-V1
 import { PRODUCT_DRUG_CATEGORIES } from '../utils/product-type.util.js';
 import type { ProductDrugCategory } from '../utils/product-type.util.js';
+import { normalizeName } from './bulk-match.service.js';
 
 /**
  * 상품 이용 상태 — WO-O4O-ADMIN-PRODUCT-MASTER-STATUS-FOUNDATION-V1 / ...-STATUS-ACTIONS-V1
@@ -398,6 +399,9 @@ export class NetureCatalogService {
 
     if (params.q) {
       // WO-O4O-PRODUCT-ALIAS-FOUNDATION-V1: alias 포함 검색
+      // WO-O4O-PRODUCTMASTER-MATCHING-RECALL-CLOSURE-FOR-CAFE24-V1:
+      //   alias 는 normalized_alias 에만 index 가 있고(@Index(['normalizedAlias'])) 저장도 정규화 값 기준이다.
+      //   raw alias 만 보던 기존 조건은 index 를 타지 않고 정규화 차이(공백/괄호)도 놓쳤다.
       qb.andWhere(
         `(m.name ILIKE :q
           OR m.regulatory_name ILIKE :q
@@ -405,9 +409,10 @@ export class NetureCatalogService {
           OR m.manufacturer_name ILIKE :q
           OR EXISTS (
             SELECT 1 FROM product_aliases pa
-            WHERE pa.product_master_id = m.id AND pa.alias ILIKE :q
+            WHERE pa.product_master_id = m.id
+              AND (pa.alias ILIKE :q OR pa.normalized_alias ILIKE :nq)
           ))`,
-        { q: `%${params.q}%` },
+        { q: `%${params.q}%`, nq: `%${normalizeName(params.q)}%` },
       );
       // 점수 기반 정렬: name 정확 일치 → alias 일치 → 부분 일치
       // WO-O4O-FIX-PRODUCT-SEARCH-ORDERBY-ALIAS-V1:
@@ -418,13 +423,14 @@ export class NetureCatalogService {
       qb.addSelect(
         `CASE
            WHEN LOWER(m.name) = LOWER(:exactQ) THEN 0
-           WHEN EXISTS (SELECT 1 FROM product_aliases pa WHERE pa.product_master_id = m.id AND LOWER(pa.alias) = LOWER(:exactQ)) THEN 1
+           WHEN EXISTS (SELECT 1 FROM product_aliases pa WHERE pa.product_master_id = m.id AND (LOWER(pa.alias) = LOWER(:exactQ) OR pa.normalized_alias = :exactNq)) THEN 1
            ELSE 2
          END`,
         'search_rank',
       );
       qb.orderBy('search_rank', 'ASC').addOrderBy('m.name', 'ASC');
       qb.setParameter('exactQ', params.q);
+      qb.setParameter('exactNq', normalizeName(params.q));
     } else {
       qb.orderBy('m.name', 'ASC');
     }
