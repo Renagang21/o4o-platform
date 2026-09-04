@@ -6,7 +6,7 @@
  * 검색·필터·정렬·pagination 은 원본에 없었고 추가하지 않는다(신규 기능 금지).
  */
 
-import { ArrowLeft, Loader2, Save, Tablet } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Loader2, Save, Tablet } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TabletDisplayListPanel } from './TabletDisplayListPanel';
@@ -128,6 +128,17 @@ export function StoreTabletDisplaysView<TIdleItem>({
                 disabled: s.savingIdle,
               })}
             </TabletIdlePlaylistSection>
+          )}
+
+          {!s.loadingPool && s.pool?.tabletChannel && !s.pool.tabletChannel.hasApprovedTabletChannel && (
+            <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+              <span>
+                {s.pool.tabletChannel.hasTabletChannel
+                  ? '태블릿 판매 채널이 아직 승인되지 않았습니다. 승인 전까지 여기서 구성한 공급 상품은 공개 태블릿 화면에 표시되지 않습니다.'
+                  : '매장에 태블릿 판매 채널이 없습니다. 채널이 등록·승인되기 전까지 공급 상품은 공개 태블릿 화면에 표시되지 않습니다.'}
+              </span>
+            </div>
           )}
 
           {!s.loadingPool && s.pool && (

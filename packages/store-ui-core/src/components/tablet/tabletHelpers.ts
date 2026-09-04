@@ -3,6 +3,10 @@
  * WO-O4O-MY-STORE-TABLET-DISPLAYS-KCOS-GP-COMMONIZATION-V1
  */
 
+import {
+  TABLET_VISIBILITY_FALLBACK_NOTICE,
+  TABLET_VISIBILITY_NOTICE,
+} from './types';
 import type {
   StoreTabletDisplayItem,
   StoreTabletProductPool,
@@ -74,7 +78,17 @@ export function buildPoolCandidates(
   if (tab === 'supplier') {
     return (pool?.supplierProducts || [])
       .filter((p) => !isInDisplay(entries, 'supplier', p.id))
-      .map((p) => ({ id: p.id, name: p.product_name, type: 'supplier' as const }));
+      .map((p) => ({
+        id: p.id,
+        name: p.product_name,
+        type: 'supplier' as const,
+        tabletVisible: p.tabletVisible,
+        visibilityNotice:
+          p.tabletVisible === false
+            ? (TABLET_VISIBILITY_NOTICE[String(p.tabletVisibilityReason ?? '')]
+              ?? TABLET_VISIBILITY_FALLBACK_NOTICE)
+            : null,
+      }));
   }
   return (pool?.localProducts || [])
     .filter((p) => !isInDisplay(entries, 'local', p.id))

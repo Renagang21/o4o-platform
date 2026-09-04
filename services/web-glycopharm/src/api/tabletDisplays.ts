@@ -4,12 +4,16 @@
  * WO-O4O-STORE-LOCAL-PRODUCT-UI-V1
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 auto-refresh
  *
- * Platform-level API: /api/v1/store/tablets
+ * Service-scoped API: /api/v1/glycopharm/store/tablets
+ * (WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 축 A —
+ *  서비스 중립 /api/v1/store/* 는 타 서비스 조직을 고를 수 있어 GlycoPharm 축으로 스코프)
  * Manages tablet device display configurations (supplier + local products).
  */
 
 import { api } from '@/lib/apiClient';
 import type { LocalProduct } from './localProducts';
+
+const BASE = '/glycopharm/store';
 
 // ==================== Types ====================
 
@@ -38,24 +42,32 @@ export interface PoolSupplierProduct {
   is_active: boolean;
   service_key: string;
   created_at: string;
+  /** 공개 태블릿 노출 판정 — WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 */
+  tabletVisible?: boolean;
+  tabletVisibilityReason?: string;
 }
 
 export interface ProductPool {
   supplierProducts: PoolSupplierProduct[];
   localProducts: LocalProduct[];
+  tabletChannel?: {
+    hasTabletChannel: boolean;
+    hasApprovedTabletChannel: boolean;
+    tabletChannelStatus: string | null;
+  } | null;
 }
 
 // ==================== API ====================
 
 export async function fetchTablets(): Promise<Tablet[]> {
-  const res = await api.get('/store/tablets');
+  const res = await api.get(`${BASE}/tablets`);
   return res.data?.data;
 }
 
 export async function fetchTabletDisplays(
   tabletId: string,
 ): Promise<DisplayItem[]> {
-  const res = await api.get(`/store/tablets/${tabletId}/displays`);
+  const res = await api.get(`${BASE}/tablets/${tabletId}/displays`);
   return res.data?.data;
 }
 
@@ -68,14 +80,14 @@ export async function saveTabletDisplays(
     isVisible?: boolean;
   }>,
 ): Promise<DisplayItem[]> {
-  const res = await api.put(`/store/tablets/${tabletId}/displays`, { displays });
+  const res = await api.put(`${BASE}/tablets/${tabletId}/displays`, { displays });
   return res.data?.data;
 }
 
 export async function fetchProductPool(
   tabletId: string,
 ): Promise<ProductPool> {
-  const res = await api.get(`/store/tablets/${tabletId}/product-pool`);
+  const res = await api.get(`${BASE}/tablets/${tabletId}/product-pool`);
   return res.data?.data;
 }
 
@@ -86,7 +98,7 @@ import type { IdlePlaylistItem } from '@o4o/tablet-kiosk-core';
 export async function fetchTabletIdlePlaylist(
   tabletId: string,
 ): Promise<IdlePlaylistItem[]> {
-  const res = await api.get(`/store/tablets/${tabletId}/idle-playlist`);
+  const res = await api.get(`${BASE}/tablets/${tabletId}/idle-playlist`);
   return Array.isArray(res.data?.data?.items) ? res.data.data.items : [];
 }
 
@@ -94,6 +106,6 @@ export async function saveTabletIdlePlaylist(
   tabletId: string,
   items: IdlePlaylistItem[],
 ): Promise<IdlePlaylistItem[]> {
-  const res = await api.put(`/store/tablets/${tabletId}/idle-playlist`, { items });
+  const res = await api.put(`${BASE}/tablets/${tabletId}/idle-playlist`, { items });
   return Array.isArray(res.data?.data?.items) ? res.data.data.items : [];
 }

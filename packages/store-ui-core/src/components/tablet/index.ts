@@ -42,9 +42,12 @@ export {
 export {
   DEFAULT_TABLET_LABELS,
   TABLET_TEAL_ACCENT,
+  TABLET_VISIBILITY_FALLBACK_NOTICE,
+  TABLET_VISIBILITY_NOTICE,
 } from './types';
 export type {
   StoreTabletAccentClasses,
+  StoreTabletChannelState,
   StoreTabletDisplayItem,
   StoreTabletDisplaysApi,
   StoreTabletDisplaysLabels,
@@ -55,4 +58,5 @@ export type {
   TabletDisplayEntry,
   TabletDisplaySaveInput,
   TabletPoolCandidate,
+  TabletVisibilityReason,
 } from './types';
