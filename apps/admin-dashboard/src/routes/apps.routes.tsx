@@ -17,9 +17,6 @@ const ForumPostForm = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/Foru
 // Pharmacy AI Insight (Phase 5 - Active)
 const PharmacyAiInsightSummary = lazy(() => import('@o4o/pharmacy-ai-insight').then(m => ({ default: m.SummaryPage })));
 
-// SupplierOps Pages
-const SupplierOpsRouter = lazy(() => import('@/pages/supplierops/SupplierOpsRouter'));
-
 // PartnerOps Pages
 const PartnerOpsRouter = lazy(() => import('@/pages/partnerops/PartnerOpsRouter'));
 
@@ -31,7 +28,7 @@ const PageLoader = () => (
 );
 
 /**
- * App routes — forum, pharmacy AI, supplierops, partnerops
+ * App routes — forum, pharmacy AI, partnerops
  */
 export function AppRoutes() {
   return [
@@ -51,7 +48,7 @@ export function AppRoutes() {
     //               운영자 관리(admin-forum.routes) router.use(authenticate)
     //   앱 availability 는 권한 검사를 대신하지 않는다.
     //
-    //   서비스별 확장 앱(pharmacy-ai-insight / supplierops 등)의 가드는 그대로 둔다.
+    //   서비스별 확장 앱(pharmacy-ai-insight / partnerops 등)의 가드는 그대로 둔다.
     <Route key="/forum" path="/forum" element={
       <AdminProtectedRoute requiredPermissions={['forum:read']}>
         <Suspense fallback={<PageLoader />}>
@@ -142,16 +139,22 @@ export function AppRoutes() {
     //   serviceGroup id 'sellerops' 는 살아 있는 카탈로그 항목
     //   ('cosmetics-seller-extension' · 'market-trial') 이 소비하므로 유지한다.
 
-    // SupplierOps - Supplier Operations App
-    <Route key="/supplierops/*" path="/supplierops/*" element={
-      <AdminProtectedRoute requiredRoles={['supplier', 'admin']}>
-        <AppRouteGuard appId="supplierops">
-          <Suspense fallback={<PageLoader />}>
-            <SupplierOpsRouter />
-          </Suspense>
-        </AppRouteGuard>
-      </AdminProtectedRoute>
-    } />,
+    // WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (A축):
+    //   /supplierops/* 라우트와 admin 로컬 pages/supplierops (11파일) 을 제거했다.
+    //   판정 LEGACY_DEAD. 근거:
+    //     - appId 'supplierops' 는 appsCatalog 에도 app_registry 에도 없다
+    //       (프로덕션 app_registry 6행 실측 · 카탈로그 appId 등록 0건) →
+    //       AppRouteGuard 가 항상 /error/app-disabled 로 보내던 도달 불가 라우트.
+    //     - 진입 네비게이션 0건 · ViewComponentRegistry 등록 0건.
+    //     - 13화면 중 4화면(Dashboard/Profile/Orders/Settlement)은 setTimeout 데모,
+    //       3화면은 이미 안내 페이지로 대체돼 있었다.
+    //     - 공급자 화면의 canonical 면은 Neture 다
+    //       (CLAUDE.md Priority Chain 3-A). admin-dashboard 는 공급자 canonical 면이 아니다.
+    //     - 기존 가드가 legacy `supplier` role literal 기반이라 WO §6 의 등록 조건
+    //       (active membership + service scope + canonical role + org ownership) 을
+    //       충족하지 못한다 → "파일이 존재한다"는 이유로 재등록하지 않는다(WO §5).
+    //   backend(/kpa/supplier/*, /neture/supplier/csv-import/*)는 건드리지 않았다.
+    //   serviceGroup id 'supplierops' 는 multi-tenant 소비처가 있어 유지한다.
 
     // PartnerOps - Partner/Affiliate Operations App
     <Route key="/partnerops/*" path="/partnerops/*" element={

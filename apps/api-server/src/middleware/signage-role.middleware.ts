@@ -14,7 +14,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { hasPlatformRole, logLegacyRoleUsage } from '../utils/role.utils.js';
+import { hasPlatformRole } from '../utils/role.utils.js';
 import { AppDataSource } from '../database/connection.js';
 import {
   resolveCanonicalServiceKey,
@@ -80,7 +80,6 @@ export function getSignageServiceKey(req: Request): string {
 export function hasSignageAdminPermission(user: any): boolean {
   if (!user) return false;
 
-  const userId = user.id || 'unknown';
   const userRoles: string[] = user.roles || [];
 
   // Check for platform-level admin roles (Priority 1)
@@ -92,17 +91,10 @@ export function hasSignageAdminPermission(user: any): boolean {
   //   user.permissions 스냅샷 grant 분기 제거 — 프로덕션 users 중 permissions 가 비어
   //   있지 않은 행이 0건이라 실행된 적이 없다. 권한 판정은 role 축을 따른다.
 
-  // Check database roles for signage-specific admin
-  if (user.dbRoles?.some((r: any) => r.name === 'signage-admin')) {
-    return true;
-  }
-
-  // Legacy role detection - log but deny access (role column removed, skip this check)
-
-  if (user.dbRoles?.some((r: any) => r.name === 'admin')) {
-    logLegacyRoleUsage(userId, 'admin', 'signage-role.middleware:hasSignageAdminPermission (dbRoles)');
-    return false; // Deny access for legacy dbRoles
-  }
+  // WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (E축):
+  //   user.dbRoles dead branch 제거 — dbRoles ManyToMany 관계는 Phase3-E 에서
+  //   삭제되어 producer 가 0 이다(User 엔티티에 해당 속성 없음 ·
+  //   authentication.middleware 로드 relations 에도 없음). 권한 판정은 role 축을 따른다.
 
   return false;
 }
@@ -174,15 +166,10 @@ export function hasSignageOperatorPermission(user: any, serviceKey: string): boo
   // WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (A축):
   //   user.permissions 스냅샷 grant 분기 제거 — 프로덕션 users 중 permissions 가 비어
   //   있지 않은 행이 0건이라 실행된 적이 없다. 권한 판정은 role 축을 따른다.
-  const operatorPermission = `signage:${serviceKey}:operator`;
-
-  // Check database roles for operator role
-  if (user.dbRoles?.some((r: any) =>
-    r.name === `signage-${serviceKey}-operator` ||
-    r.permissions?.includes(operatorPermission)
-  )) {
-    return true;
-  }
+  // WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (E축):
+  //   user.dbRoles dead branch 제거 — dbRoles ManyToMany 관계는 Phase3-E 에서
+  //   삭제되어 producer 가 0 이다(User 엔티티에 해당 속성 없음 ·
+  //   authentication.middleware 로드 relations 에도 없음). 권한 판정은 role 축을 따른다.
 
   // Service-level operator/admin roles also grant signage access
   // e.g. glycopharm:operator, glycopharm:admin → signage:glycopharm access
@@ -646,9 +633,6 @@ export function hasSignageCommunityPermission(user: any, serviceKey: string): bo
   // Check for prefixed community role (e.g., 'kpa:community')
   if (userRoles.some((r: string) => r.endsWith(':community'))) return true;
 
-  // Check database roles
-  if (user.dbRoles?.some((r: any) => r.name === 'community' || r.name?.endsWith(':community'))) return true;
-
   // Community is open to any authenticated user with a service-related role
   // Check if user has any role for the service key
   if (userRoles.some((r: string) => r.startsWith(`${serviceKey}:`))) return true;
@@ -684,9 +668,6 @@ export function hasSignageSupplierPermission(user: any, serviceKey: string): boo
 
   // Check for prefixed supplier role (e.g., 'neture:supplier', 'kpa:supplier')
   if (userRoles.some((r: string) => r.endsWith(':supplier'))) return true;
-
-  // Check database roles
-  if (user.dbRoles?.some((r: any) => r.name === 'supplier' || r.name?.endsWith(':supplier'))) return true;
 
   return false;
 }

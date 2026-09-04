@@ -33,7 +33,7 @@
     "build:capabilities": "pnpm --filter @o4o/capabilities run build",
     "build:ai-prompts": "pnpm --filter @o4o/ai-prompts run build",
     "build:pharmacy-ai-insight": "pnpm --filter @o4o/pharmacy-ai-insight run build",
-    "build:partner-packages": "pnpm --filter @o4o/partner-core run build && pnpm --filter @o4o/partnerops run build",
+    "build:partner-packages": "pnpm --filter @o4o/partner-core run build",
     "build:app-store-packages": "pnpm --filter @o4o/organization-core run build && pnpm --filter @o4o/forum-core run build",
     "build:lms-client": "pnpm --filter @o4o/lms-client run build",
     "typecheck:app-store-packages": "pnpm --filter @o4o/forum-core run typecheck",

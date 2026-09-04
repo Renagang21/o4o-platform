@@ -62,7 +62,7 @@ export interface ProfileMergeOptions {
     phone?: boolean;
     linkedAccounts?: boolean;
     businessInfo?: boolean;
-    permissions?: boolean;
+    // WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (D축): permissions 병합 옵션 제거 (소비처 0)
     roles?: boolean;
   };
 }

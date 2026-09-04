@@ -144,7 +144,11 @@ export interface AccessTokenPayload {
   name?: string;
   status?: UserStatus | string;
   businessInfo?: BusinessInfo;
-  permissions?: string[];
+  // WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (D축):
+  //   permissions claim 제거. 발급만 하고 읽는 곳이 0 이었다
+  //   (payload.permissions / decoded.permissions 소비처 repo 전역 0건 ·
+  //   인증 미들웨어는 req.user 에 DB 엔티티를 싣는다).
+  //   위 scopes claim 제거와 동일한 판정이다.
   /** 다중 역할 배열 (WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1) */
   roles?: string[];
   // WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:

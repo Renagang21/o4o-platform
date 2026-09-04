@@ -7,8 +7,9 @@
  *        settlement · ai-builder 및 하위 경로 모두 이 화면으로 연결된다)
  *
  * 왜 기능 화면이 아니라 안내 화면인가
- *   1. `packages/partnerops/src/backend` 에 route factory 는 있으나 api-server 가 마운트하지 않는다
- *      (`createRoutes` 호출 0건). 프로덕션에서 `/api/v1/partnerops/*` 는 전부 404 + text/html 이다.
+ *   1. backend 가 없다. 프로덕션에서 `/api/v1/partnerops/*` 는 전부 404 + text/html 이다.
+ *      (WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 B축에서 마운트된 적 없는
+ *       `packages/partnerops` 패키지 자체를 제거했다. 소비처 0.)
  *   2. install hook 이 만드는 `partnerops_*` 테이블과 partner-core 의 `partner_*` 엔티티가 갈라져 있어
  *      어느 쪽이 canonical 인지 정해지지 않았다.
  *   3. 전통 affiliate 수익·전환·자동 커미션 정산은 현재 O4O 방향과 맞지 않는다.
