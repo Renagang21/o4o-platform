@@ -1,0 +1,37 @@
+{
+  "source": "프로덕션 o4o_platform (Cloud SQL Auth Proxy, read-only SELECT). 측정일 2026-09-04.",
+  "totals": {
+    "productMasters": 272039,
+    "masterStatus": [{ "status": "ACTIVE", "count": 272039 }],
+    "storeCanonicalMasters": 96059,
+    "storeCanonicalRows": 232860
+  },
+  "sharedProductDescriptionsByTypeStatus": [
+    { "descriptionType": "STORE", "status": "canonical", "rows": 232860, "masters": 96059 },
+    { "descriptionType": "STORE", "status": "deprecated", "rows": 39686, "masters": 19436 },
+    { "descriptionType": "B2B", "status": "canonical", "rows": 32730, "masters": 32702 },
+    { "descriptionType": "STORE", "status": "hidden", "rows": 1023, "masters": 1014 },
+    { "descriptionType": "STORE", "status": "candidate", "rows": 286, "masters": 267 }
+  ],
+  "storeCanonicalByLanguage": [
+    { "language": "ko", "rows": 96059, "masters": 96059 },
+    { "language": "en", "rows": 63207, "masters": 63207 },
+    { "language": "zh", "rows": 41324, "masters": 41324 },
+    { "language": "ja", "rows": 32270, "masters": 32270 }
+  ],
+  "languageNote": "QR 은 제품당 1개이며 언어는 랜딩 언어탭으로 해소된다. 다국어 설명서가 QR 수를 늘리지 않는다(다국어 보유 미발급 master 40,958건도 QR 1개로 커버).",
+  "byRegulatoryType": [
+    { "regulatoryType": "DRUG",       "masters": 177413, "withQr": 177413, "missingQr": 0,     "storeCanonicalMasters": 22423, "storeCanonicalKoMasters": 22423, "storeCanonicalMissingQr": 0 },
+    { "regulatoryType": "건강기능식품", "masters": 40948,  "withQr": 2,      "missingQr": 40946, "storeCanonicalMasters": 40948, "storeCanonicalKoMasters": 40948, "storeCanonicalMissingQr": 40946 },
+    { "regulatoryType": "COSMETIC",   "masters": 32675,  "withQr": 0,      "missingQr": 32675, "storeCanonicalMasters": 32674, "storeCanonicalKoMasters": 32674, "storeCanonicalMissingQr": 32674 },
+    { "regulatoryType": "QUASI_DRUG", "masters": 17148,  "withQr": 17148,  "missingQr": 0,     "storeCanonicalMasters": 0,     "storeCanonicalKoMasters": 0,     "storeCanonicalMissingQr": 0 },
+    { "regulatoryType": "MEDICAL_DEVICE", "masters": 3826, "withQr": 3826, "missingQr": 0,     "storeCanonicalMasters": 0,     "storeCanonicalKoMasters": 0,     "storeCanonicalMissingQr": 0 },
+    { "regulatoryType": "일반",        "masters": 15,     "withQr": 3,      "missingQr": 12,    "storeCanonicalMasters": 14,    "storeCanonicalKoMasters": 14,    "storeCanonicalMissingQr": 12 },
+    { "regulatoryType": "GENERAL",    "masters": 14,     "withQr": 2,      "missingQr": 12,    "storeCanonicalMasters": 0,     "storeCanonicalKoMasters": 0,     "storeCanonicalMissingQr": 0 }
+  ],
+  "observations": [
+    "COSMETIC 기대값(ProductMaster 32,674 / KO STORE canonical 32,674)과 실측 차이: master 32,675 (STORE canonical 미보유 1건 포함). 설명서 32,674 는 기대값과 일치.",
+    "regulatory_type 표기가 혼재한다 — 영문 enum(DRUG/COSMETIC/QUASI_DRUG/MEDICAL_DEVICE/GENERAL)과 한글 문자열('건강기능식품','일반'). 본 감사 범위 밖 관측 사항이며 수정하지 않았다.",
+    "QUASI_DRUG(17,148)·MEDICAL_DEVICE(3,826)는 STORE canonical 설명서가 0건이지만 QR/Landing 은 100% 보유 — 계약상 정상(설명 없으면 placeholder 렌더)."
+  ]
+}

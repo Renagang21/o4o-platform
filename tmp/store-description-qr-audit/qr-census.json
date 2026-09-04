@@ -1,0 +1,48 @@
+{
+  "source": "프로덕션 read-only SELECT. 측정일 2026-09-04.",
+  "unit": "QR = product_landings 1행(= ProductMaster 1개). QR 이미지 미저장.",
+  "landings": {
+    "active": 198394,
+    "softDeleted": 0,
+    "distinctMasters": 198394,
+    "distinctPublicKeys": 198394,
+    "duplicatePerMaster": 0,
+    "duplicatePublicKey": 0,
+    "orphanMaster": 0,
+    "byStatus": [{ "status": "active", "exposureState": "ok", "count": 198394 }],
+    "byProvenance": [
+      { "source": "landing-seed-20260709 (Phase 3 bulk apply)", "count": 198387 },
+      { "source": "admin-qr-view (관리자 상세 QR 조회 시 멱등 발급)", "count": 5 },
+      { "source": "admin (Phase 2 smoke mint)", "count": 2 }
+    ]
+  },
+  "classification": {
+    "QR_OK": { "count": 198394, "definition": "master 에 active product_landings 1행 존재" },
+    "QR_MISSING": { "count": 73645, "definition": "master 에 active product_landings 없음", "ofWhichStoreCanonical": 73632, "ofWhichNoStoreDescription": 13 },
+    "QR_DUPLICATE": { "count": 0, "definition": "master 당 landing 2개 이상 또는 public_key 중복" },
+    "QR_BROKEN_TARGET": { "count": 0, "definition": "landing 이 존재하지 않는 master 를 가리킴 / 랜딩 라우트 dead", "routeCheck": "GET https://api.neture.co.kr/api/v1/public/product-landings/{key} = 200, https://neture.co.kr/p/{key} = 200, 없는 key = 404" },
+    "QR_TARGET_MISMATCH": { "count": 0, "definition": "landing.status != active 또는 exposure_state != ok", "note": "전량 active/ok" },
+    "CHECK": { "count": 0 }
+  },
+  "landingWithoutStoreDescription": {
+    "count": 175967,
+    "verdict": "결함 아님",
+    "reason": "계약상 설명서 없이도 QR/Landing 성립 — '상세 설명을 준비 중입니다.' placeholder 렌더 (F12 V2 파생규칙)."
+  },
+  "layer2StoreQrCodes": {
+    "total": 87,
+    "byLandingType": [
+      { "landingType": "screen_set", "count": 39, "active": 21 },
+      { "landingType": "product", "count": 18, "active": 18 },
+      { "landingType": "page", "count": 16, "active": 9 },
+      { "landingType": "link", "count": 13, "active": 0 },
+      { "landingType": "video", "count": 1, "active": 0 }
+    ],
+    "nullOrganization": 0,
+    "targetingProductMaster": 0,
+    "targetingSharedProductDescription": 0,
+    "productRowsResolvingToListing": 18,
+    "verdict": "전량 매장 스코프(계층 2). 제품 대표 QR 축과 충돌하지 않는다."
+  },
+  "productIdentifiersQrCode": { "count": 0, "note": "경로 S(저장형 identifier QR) 미채택 확인" }
+}

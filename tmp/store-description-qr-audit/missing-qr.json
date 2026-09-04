@@ -1,0 +1,1851 @@
+{
+  "source": "프로덕션 read-only SELECT. 측정일 2026-09-04.",
+  "issueType": "QR_MISSING",
+  "definition": "product_masters 에 active product_landings 행이 없어 제품 대표 QR(/p/{key}) 이 성립하지 않는 master",
+  "totals": {
+    "missingQr": 73645,
+    "withStoreCanonicalDescription": 73632,
+    "withoutAnyStoreCanonicalDescription": 13,
+    "allMasterStatus": "ACTIVE 73,645 (비활성/삭제 대상 0)"
+  },
+  "byRegulatoryType": [
+    {
+      "regulatoryType": "건강기능식품",
+      "missingQr": 40946,
+      "storeCanonicalMissingQr": 40946
+    },
+    {
+      "regulatoryType": "COSMETIC",
+      "missingQr": 32675,
+      "storeCanonicalMissingQr": 32674
+    },
+    {
+      "regulatoryType": "일반",
+      "missingQr": 12,
+      "storeCanonicalMissingQr": 12
+    },
+    {
+      "regulatoryType": "GENERAL",
+      "missingQr": 12,
+      "storeCanonicalMissingQr": 0
+    }
+  ],
+  "listCap": {
+    "emitted": 200,
+    "totalMatching": 73645,
+    "dropped": 73445,
+    "why": "전량 나열은 백필에 불필요하다 — 백필 대상은 NOT EXISTS 술어로 결정되며 고정 목록이 아니다(감사~적용 사이 신규 master 가 추가될 수 있다). 아래 SQL 로 언제든 전량 재생성 가능.",
+    "regenerateSql": "SELECT pm.id, pm.name, pm.regulatory_type FROM product_masters pm WHERE NOT EXISTS (SELECT 1 FROM product_landings l WHERE l.product_master_id=pm.id AND l.deleted_at IS NULL) ORDER BY pm.regulatory_type, pm.name;"
+  },
+  "fields": [
+    "masterId",
+    "productName",
+    "regulatoryType",
+    "storeDescriptionId",
+    "expectedQrTarget",
+    "existingQrId",
+    "issueType"
+  ],
+  "sample": [
+    {
+      "masterId": "869ddb7e-3116-4dc7-9751-91963cae7b87",
+      "productName": "청정 한방 흑염소 진액 골드",
+      "regulatoryType": "일반",
+      "storeDescriptionId": "e1014081-5c74-4729-886b-c4934161baf5",
+      "expectedQrTarget": "product_landings(product_master_id=869ddb7e-3116-4dc7-9751-91963cae7b87)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "f1eed8f0-0b4d-40e2-9ba1-fae74e21cfb3",
+      "productName": "천효 천문동 발효진액",
+      "regulatoryType": "일반",
+      "storeDescriptionId": "1d816adf-0043-4c09-8dac-8ef6cc5b20f2",
+      "expectedQrTarget": "product_landings(product_master_id=f1eed8f0-0b4d-40e2-9ba1-fae74e21cfb3)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9e90fe4f-dcf1-457a-934a-006ee2925701",
+      "productName": "리얼 리포좀 글루타치온 컴플렉스",
+      "regulatoryType": "일반",
+      "storeDescriptionId": "ab391aed-75cb-42e8-bda3-93c336c1a9cc",
+      "expectedQrTarget": "product_landings(product_master_id=9e90fe4f-dcf1-457a-934a-006ee2925701)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "66a16b58-05e5-4ac1-af3f-81c94a05c1d8",
+      "productName": "유기농 여주 담은 청정 한방 흑염소 진액 골드",
+      "regulatoryType": "일반",
+      "storeDescriptionId": "9a2f24a4-3b52-4902-9e21-a904e7f20e4b",
+      "expectedQrTarget": "product_landings(product_master_id=66a16b58-05e5-4ac1-af3f-81c94a05c1d8)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "fae6c67c-dad5-451c-937c-1b6caed61002",
+      "productName": "콸콸포맨",
+      "regulatoryType": "일반",
+      "storeDescriptionId": "cf2ed9ae-eca4-43f4-815f-9624b76c0d8b",
+      "expectedQrTarget": "product_landings(product_master_id=fae6c67c-dad5-451c-937c-1b6caed61002)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9bb6ffc9-bd1b-4c54-9cca-c25908434cb0",
+      "productName": "연년익수 춘",
+      "regulatoryType": "일반",
+      "storeDescriptionId": "be535e2b-bf83-4bd6-ae7a-0e53e6f80c38",
+      "expectedQrTarget": "product_landings(product_master_id=9bb6ffc9-bd1b-4c54-9cca-c25908434cb0)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "55c1c894-04f7-493d-806c-981ecfe96719",
+      "productName": "프리미엄 맥스 크릴오일",
+      "regulatoryType": "일반",
+      "storeDescriptionId": "1c07da3b-f15d-4281-a8cf-9f1377a06ba7",
+      "expectedQrTarget": "product_landings(product_master_id=55c1c894-04f7-493d-806c-981ecfe96719)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "144335cd-74dc-4999-b31a-bef21354854d",
+      "productName": "콸콸포맨 천문동 액상차",
+      "regulatoryType": "일반",
+      "storeDescriptionId": "63ed6d53-4db9-4401-88e0-d66b600ec9cd",
+      "expectedQrTarget": "product_landings(product_master_id=144335cd-74dc-4999-b31a-bef21354854d)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "55391213-31d2-44ac-ba29-404f2bbbae86",
+      "productName": "프리미어 파이토 대마종자유1100",
+      "regulatoryType": "일반",
+      "storeDescriptionId": "c961b5ac-0a1f-42a2-9650-9fc7ce72ac4f",
+      "expectedQrTarget": "product_landings(product_master_id=55391213-31d2-44ac-ba29-404f2bbbae86)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "86ea4d45-f041-4113-83d4-336e45cb09c4",
+      "productName": "리얼 매스틱 1300",
+      "regulatoryType": "일반",
+      "storeDescriptionId": "a60bf895-4dc9-426e-8d3f-d450de3876c4",
+      "expectedQrTarget": "product_landings(product_master_id=86ea4d45-f041-4113-83d4-336e45cb09c4)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "744444c9-37bc-4b28-b8b7-7792b55affff",
+      "productName": "리포좀 식물성 멜라토닌 함유 멜라치오 5",
+      "regulatoryType": "일반",
+      "storeDescriptionId": "0d9cfb83-cb6b-4c54-8177-6f451a5f8561",
+      "expectedQrTarget": "product_landings(product_master_id=744444c9-37bc-4b28-b8b7-7792b55affff)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9d3abd99-b484-4437-90f1-3160bd15e56f",
+      "productName": "알부민 PDRN 더블케어",
+      "regulatoryType": "일반",
+      "storeDescriptionId": "d7be23b4-ece0-4b4a-b898-0eedc8e7d9cf",
+      "expectedQrTarget": "product_landings(product_master_id=9d3abd99-b484-4437-90f1-3160bd15e56f)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "88a7e637-a089-49b5-bee7-092b5cc1630c",
+      "productName": "(구) 무르핀",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "f8d1f8ca-d4eb-46d7-bb7f-3e5d27d2bb62",
+      "expectedQrTarget": "product_landings(product_master_id=88a7e637-a089-49b5-bee7-092b5cc1630c)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "c35fd8e1-4f2a-4bce-9324-2cb9be37a88c",
+      "productName": "(구) 저래도 옹",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "f5763fcc-3ea2-4626-8121-1209e3d99d6c",
+      "expectedQrTarget": "product_landings(product_master_id=c35fd8e1-4f2a-4bce-9324-2cb9be37a88c)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9bf5e125-6162-4670-b992-49bd8f99b180",
+      "productName": "(구) 팻다운 톡",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "18c95651-64ce-4ec6-9d42-6e9baa1d9f2d",
+      "expectedQrTarget": "product_landings(product_master_id=9bf5e125-6162-4670-b992-49bd8f99b180)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "e5bcdeff-cec4-4ded-8633-af358f9f9bb8",
+      "productName": "(구)프로메가 레볼루션",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "22b11643-ebdf-4514-9781-e46b2ccb3b6b",
+      "expectedQrTarget": "product_landings(product_master_id=e5bcdeff-cec4-4ded-8633-af358f9f9bb8)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "245e3390-453d-4fee-82a9-4c89a04713c7",
+      "productName": "(구)트리플러스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "c2cf5ada-c2da-4434-b9d5-e7403ae95fe1",
+      "expectedQrTarget": "product_landings(product_master_id=245e3390-453d-4fee-82a9-4c89a04713c7)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "3bb1e35c-21f5-40fa-a82f-8f5b4f96fba1",
+      "productName": "(구)본포뮬러젤리",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "60d2b7a8-7bc4-4160-8c74-96939380ab93",
+      "expectedQrTarget": "product_landings(product_master_id=3bb1e35c-21f5-40fa-a82f-8f5b4f96fba1)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "94603f36-9660-462a-bad8-833bec8f0a28",
+      "productName": "+ 눈건강",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "13f5af6d-246c-4d0a-b432-d89a8f74aeb0",
+      "expectedQrTarget": "product_landings(product_master_id=94603f36-9660-462a-bad8-833bec8f0a28)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "1b02df8b-7be1-41b3-a7e5-ab11334b428a",
+      "productName": "+ 뼈건강",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "61d27298-64ab-415a-848a-31df23c03257",
+      "expectedQrTarget": "product_landings(product_master_id=1b02df8b-7be1-41b3-a7e5-ab11334b428a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "3aec693a-634c-48b7-ae60-e674bd47803e",
+      "productName": "+면역비책 발효홍삼",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "8bd54232-3196-4669-8348-93d420687ec4",
+      "expectedQrTarget": "product_landings(product_master_id=3aec693a-634c-48b7-ae60-e674bd47803e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "8608aaea-e051-4dd7-94ac-5d52d42cee30",
+      "productName": "뺌",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "58f87247-3c45-418e-b1e2-ae58dcde8f01",
+      "expectedQrTarget": "product_landings(product_master_id=8608aaea-e051-4dd7-94ac-5d52d42cee30)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "2c7957f2-fa6c-4272-8175-236b3a223408",
+      "productName": "철",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "abd06682-f342-4222-9bf0-a93ab6aae8bc",
+      "expectedQrTarget": "product_landings(product_master_id=2c7957f2-fa6c-4272-8175-236b3a223408)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "915937be-6423-413d-89d0-12e61894f48b",
+      "productName": "철",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "a6cec3e1-176e-4c48-9000-3b2daca6e1d7",
+      "expectedQrTarget": "product_landings(product_master_id=915937be-6423-413d-89d0-12e61894f48b)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "7fa486dd-e683-4dfc-bd60-c943e2ea22af",
+      "productName": "핏",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "0a0895f2-7452-4b68-a647-184bf1d8a12d",
+      "expectedQrTarget": "product_landings(product_master_id=7fa486dd-e683-4dfc-bd60-c943e2ea22af)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "8abbbfa4-7886-4701-bdb1-f8154e98cbf4",
+      "productName": "황",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "451b6ef3-a535-48f7-8685-ebea65c241be",
+      "expectedQrTarget": "product_landings(product_master_id=8abbbfa4-7886-4701-bdb1-f8154e98cbf4)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "ecce3104-40d6-4e25-b6e6-985c41e0c809",
+      "productName": "후",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "91d06ddf-3df0-45bc-a39a-78c988e13286",
+      "expectedQrTarget": "product_landings(product_master_id=ecce3104-40d6-4e25-b6e6-985c41e0c809)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "28e92cdc-45a2-49ff-8300-236bcccdec70",
+      "productName": "다~시원골드",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "8e1b437f-f106-47b9-8917-9ba3663d0cf3",
+      "expectedQrTarget": "product_landings(product_master_id=28e92cdc-45a2-49ff-8300-236bcccdec70)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "59310413-751a-4b73-9992-832b9bba3210",
+      "productName": "뼈 & 치아 솔루션",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "1efa00e0-80b0-4395-a980-a3777ec18c6f",
+      "expectedQrTarget": "product_landings(product_master_id=59310413-751a-4b73-9992-832b9bba3210)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "d7f7fafd-9403-443a-ba5c-1c2221492b1e",
+      "productName": "웰 원",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "dc8ce798-274a-4029-a1b4-f443d3bd602a",
+      "expectedQrTarget": "product_landings(product_master_id=d7f7fafd-9403-443a-ba5c-1c2221492b1e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "c31b5f92-2290-4814-a72e-3041e065f44b",
+      "productName": "필 캄",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "51e7bf99-860b-4981-bd36-3143489a4240",
+      "expectedQrTarget": "product_landings(product_master_id=c31b5f92-2290-4814-a72e-3041e065f44b)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "d26b2123-3ead-4961-a801-002e81430249",
+      "productName": "변 엔 장",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "910796aa-70c4-4467-ac4e-eebc0c93c3e2",
+      "expectedQrTarget": "product_landings(product_master_id=d26b2123-3ead-4961-a801-002e81430249)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "0de7d9a5-cd67-4f73-b1a4-f064d6c5eec3",
+      "productName": "썬 업 츄",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "e626dd74-2524-4e3a-aaab-ffb951bd9d5e",
+      "expectedQrTarget": "product_landings(product_master_id=0de7d9a5-cd67-4f73-b1a4-f064d6c5eec3)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "6194b6b4-3369-4f19-b019-03bd29252ce0",
+      "productName": "뺄 때 무꼬",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "25d9f634-d64b-497a-ad7e-6150d9fc24a2",
+      "expectedQrTarget": "product_landings(product_master_id=6194b6b4-3369-4f19-b019-03bd29252ce0)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "f38d23e9-5cfe-4568-b286-0cbbe0dbd3ee",
+      "productName": "올 댓 스킨",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "9b85f995-845f-44d7-bacb-461288612609",
+      "expectedQrTarget": "product_landings(product_master_id=f38d23e9-5cfe-4568-b286-0cbbe0dbd3ee)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "0e8d8460-91b7-4f25-9aff-57c56629c51a",
+      "productName": "올 댓 프로",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "7ee43032-21ea-4e7b-ac9e-9e648264381c",
+      "expectedQrTarget": "product_landings(product_master_id=0e8d8460-91b7-4f25-9aff-57c56629c51a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "16c076e2-3a2c-41b1-8242-2f49100d760a",
+      "productName": "컷 앤 다운",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "e3d59aad-63c8-4f80-922e-88772c51655f",
+      "expectedQrTarget": "product_landings(product_master_id=16c076e2-3a2c-41b1-8242-2f49100d760a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "51755e29-ae98-4d68-beda-fe8ea1378f76",
+      "productName": "쎈 눈 건강 플러스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "bc922d7a-ee49-46fb-b904-15357282080f",
+      "expectedQrTarget": "product_landings(product_master_id=51755e29-ae98-4d68-beda-fe8ea1378f76)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "359299e1-7b75-4921-88e5-b64c2d39310e",
+      "productName": "쎈 뼈 쌩쌩 플러스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "d67e5954-3936-4ad9-9eff-89ced87a4976",
+      "expectedQrTarget": "product_landings(product_master_id=359299e1-7b75-4921-88e5-b64c2d39310e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "189ab3d3-8fcb-4601-aaad-689c6c4a58ad",
+      "productName": "인 더 나잇 클리어티",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "3ebb2485-8566-4209-8db4-96586788305a",
+      "expectedQrTarget": "product_landings(product_master_id=189ab3d3-8fcb-4601-aaad-689c6c4a58ad)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "252ab0dc-04dc-4e3f-a49f-1fee60a9985c",
+      "productName": "더 알 플러스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "9bfed4c1-3b1e-4163-995b-c717049a2f57",
+      "expectedQrTarget": "product_landings(product_master_id=252ab0dc-04dc-4e3f-a49f-1fee60a9985c)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "bf85530f-c5e3-4563-a18c-cd0361318ce4",
+      "productName": "본 앤 조인트 액티브 메가 포뮬러",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "c1ea8ce7-2cc5-4a3f-be38-b21d78774de3",
+      "expectedQrTarget": "product_landings(product_master_id=bf85530f-c5e3-4563-a18c-cd0361318ce4)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "29e905a0-f80c-4d96-b74e-d0cee8067715",
+      "productName": "눈 앤 간건강 루테인 밀크씨슬",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "85f1c8ab-661a-42a9-888d-867232b788b9",
+      "expectedQrTarget": "product_landings(product_master_id=29e905a0-f80c-4d96-b74e-d0cee8067715)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "38a60c95-95e5-446a-a3cd-7f3058285780",
+      "productName": "내 몸 지킴이 수용성 프로폴리스 스프레이",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "c55b840e-8db3-4649-a0c0-bd7464e929b0",
+      "expectedQrTarget": "product_landings(product_master_id=38a60c95-95e5-446a-a3cd-7f3058285780)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "68faa807-4f46-452a-b59d-9d776bfe634f",
+      "productName": "눈 간 뼈건강&면역건강 활력",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "28468fd5-ed8f-4d63-8456-f4f8d606a414",
+      "expectedQrTarget": "product_landings(product_master_id=68faa807-4f46-452a-b59d-9d776bfe634f)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "dd717463-1c2b-420d-b8f0-805c8afc2a63",
+      "productName": "너 좀 예뻐진것 카테 녹차카테킨",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "e733e0d3-2449-42a5-ae61-1ee0d46f62cf",
+      "expectedQrTarget": "product_landings(product_master_id=dd717463-1c2b-420d-b8f0-805c8afc2a63)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9737e9e2-028d-4123-8f75-5529562bf9e5",
+      "productName": "뉴 셀렌",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "abc2ea2f-b21e-4dbd-b5d1-00a5ba4823e1",
+      "expectedQrTarget": "product_landings(product_master_id=9737e9e2-028d-4123-8f75-5529562bf9e5)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "e52aa32d-144a-4591-b51c-8a86131bd3c0",
+      "productName": "당 건강",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "004ad586-6667-4c45-bf65-ffb228619786",
+      "expectedQrTarget": "product_landings(product_master_id=e52aa32d-144a-4591-b51c-8a86131bd3c0)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "7504684c-87c1-4b13-8b04-f61abd43e07f",
+      "productName": "당 골드",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "ab4fd400-a231-4a8b-adc9-2e8cf8c5e2e1",
+      "expectedQrTarget": "product_landings(product_master_id=7504684c-87c1-4b13-8b04-f61abd43e07f)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9f4dab55-6c45-4f4c-9976-11a856783742",
+      "productName": "당 케어",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "509a8eb4-7315-4db6-9e19-2dff3d319fb9",
+      "expectedQrTarget": "product_landings(product_master_id=9f4dab55-6c45-4f4c-9976-11a856783742)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "05977249-6ae5-4a0b-b7a1-c4ef04e83288",
+      "productName": "더 레드",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "53d96abc-cf68-4b3e-9d2f-b9ae5fd63edb",
+      "expectedQrTarget": "product_landings(product_master_id=05977249-6ae5-4a0b-b7a1-c4ef04e83288)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9733df04-4376-469e-8c53-f622d20bc664",
+      "productName": "더 비움",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "e5c268ed-3346-4d48-a3c2-6bad5e5a695f",
+      "expectedQrTarget": "product_landings(product_master_id=9733df04-4376-469e-8c53-f622d20bc664)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "66b9e086-3a0d-4a09-8ebd-1668d37419b2",
+      "productName": "렁 케어",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "2d4c7c1e-940a-43ad-a259-ab271c3e2b3c",
+      "expectedQrTarget": "product_landings(product_master_id=66b9e086-3a0d-4a09-8ebd-1668d37419b2)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "a37e7db8-c88c-406b-853e-1c635bb299be",
+      "productName": "본 맥스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "3ee2d0d7-371d-4ab5-83a2-5cf8094accbd",
+      "expectedQrTarget": "product_landings(product_master_id=a37e7db8-c88c-406b-853e-1c635bb299be)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "29ed1740-4ec9-4c32-9220-77723c5e5b29",
+      "productName": "쎈 쾌변",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "cea19557-d105-4404-bae2-cce8dd7885f3",
+      "expectedQrTarget": "product_landings(product_master_id=29ed1740-4ec9-4c32-9220-77723c5e5b29)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "b0626ae1-4c4f-4458-918d-d7a606ab5dba",
+      "productName": "업 나우",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "ec8dd97e-f9c7-4835-bec6-53cc823ced7c",
+      "expectedQrTarget": "product_landings(product_master_id=b0626ae1-4c4f-4458-918d-d7a606ab5dba)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "aa054b50-4817-446e-9e1c-52655a2b87e2",
+      "productName": "윌 작약",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "2a3931b3-a595-4ad6-99c5-d70e4abe9662",
+      "expectedQrTarget": "product_landings(product_master_id=aa054b50-4817-446e-9e1c-52655a2b87e2)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "6c7568ff-b7d0-4f75-9649-0f26574dea89",
+      "productName": "인 케어",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "b940e5d2-1b33-48e3-b6b2-673419571d32",
+      "expectedQrTarget": "product_landings(product_master_id=6c7568ff-b7d0-4f75-9649-0f26574dea89)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "623b94b8-8736-42c0-83c3-d492ba5b442a",
+      "productName": "퀵 셀렌",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "bf6cb5cb-842f-4763-af5f-da5b696cc30d",
+      "expectedQrTarget": "product_landings(product_master_id=623b94b8-8736-42c0-83c3-d492ba5b442a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "dab25d36-2f5f-447d-af14-ded791b06c57",
+      "productName": "퀵 아연",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "fa321773-3f85-431d-906a-8e92638eab84",
+      "expectedQrTarget": "product_landings(product_master_id=dab25d36-2f5f-447d-af14-ded791b06c57)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "dfd74bb7-2a11-4a26-9123-8fd34bd615c6",
+      "productName": "통 분말",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "b6e8d9f1-bedb-417f-baa1-bbcecaff8724",
+      "expectedQrTarget": "product_landings(product_master_id=dfd74bb7-2a11-4a26-9123-8fd34bd615c6)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "6f18a989-1e25-4c1f-a9db-23f71e1d3c91",
+      "productName": "굿 슬립 정",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "b03c4158-8806-4280-8a57-99be143f799b",
+      "expectedQrTarget": "product_landings(product_master_id=6f18a989-1e25-4c1f-a9db-23f71e1d3c91)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "83e0ecd9-3c32-4962-b52c-282559728b26",
+      "productName": "더 쉬움 엠",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "99725c36-64ec-42d8-ad2b-d5f95b0794f6",
+      "expectedQrTarget": "product_landings(product_master_id=83e0ecd9-3c32-4962-b52c-282559728b26)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "b284363f-de01-430d-90b6-f3ee7a136816",
+      "productName": "원 데이 컷 리셋 핏",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "039fe0cd-fb46-4d97-bb87-a958de64a8f2",
+      "expectedQrTarget": "product_landings(product_master_id=b284363f-de01-430d-90b6-f3ee7a136816)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "97ca970d-f62c-4001-8b9f-cbd40127e320",
+      "productName": "내 몸에 풀 파워 면역젤리",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "6df43438-532d-4826-83b8-d792470e12ad",
+      "expectedQrTarget": "product_landings(product_master_id=97ca970d-f62c-4001-8b9f-cbd40127e320)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "d7af9749-daaf-4e18-a1af-f9b08271e012",
+      "productName": "내 간에 딱 실리마린",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "2d25f0d9-c64e-4818-883e-fe89487a2d1b",
+      "expectedQrTarget": "product_landings(product_master_id=d7af9749-daaf-4e18-a1af-f9b08271e012)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "432e832c-07b6-4a75-8936-8f1633034ac9",
+      "productName": "내 간에 딱 실리마린",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "ad2b2f5c-b792-4c37-98b5-84c83d995501",
+      "expectedQrTarget": "product_landings(product_master_id=432e832c-07b6-4a75-8936-8f1633034ac9)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "bec00f5f-7bcb-477f-b545-65e6dde00ef1",
+      "productName": "간 건강 리버",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "464f8072-d7e3-42fd-8a36-37b3a21a070b",
+      "expectedQrTarget": "product_landings(product_master_id=bec00f5f-7bcb-477f-b545-65e6dde00ef1)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "1115640b-ec53-4c95-a433-d5f7df98eee0",
+      "productName": "간 건강 리버",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "47b7e9e9-8714-402e-ba5e-af4f7a0c4568",
+      "expectedQrTarget": "product_landings(product_master_id=1115640b-ec53-4c95-a433-d5f7df98eee0)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "337c584a-9636-4aa7-a73b-14637ba2c881",
+      "productName": "간 편한 인생",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "c60000d5-5336-435e-b210-d2c6cd04bfb5",
+      "expectedQrTarget": "product_landings(product_master_id=337c584a-9636-4aa7-a73b-14637ba2c881)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "8b7afc15-a505-4947-a86c-521d482b14d2",
+      "productName": "넌 나의 혈당",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "8723bfd8-3c12-456c-9c35-a155f060d14a",
+      "expectedQrTarget": "product_landings(product_master_id=8b7afc15-a505-4947-a86c-521d482b14d2)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "67367952-7a73-4d50-9fcb-18ebf36c839b",
+      "productName": "눈 건강 케어",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "4c9d767e-c255-4950-8fd4-ca90f32ebf6d",
+      "expectedQrTarget": "product_landings(product_master_id=67367952-7a73-4d50-9fcb-18ebf36c839b)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "90e7445a-7149-4ce6-9652-8edb7503db21",
+      "productName": "더 쉬움 에스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "2beb6bb7-60f9-4fe4-a619-9e8e274eb4ee",
+      "expectedQrTarget": "product_landings(product_master_id=90e7445a-7149-4ce6-9652-8edb7503db21)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "b12f5364-ce13-4c79-9f0f-7371cb8aac72",
+      "productName": "마 본스 케어",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "d039d261-111f-4911-86e8-67bd21659392",
+      "expectedQrTarget": "product_landings(product_master_id=b12f5364-ce13-4c79-9f0f-7371cb8aac72)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "f5f88abb-17d6-405c-9450-cc8cb9d0b066",
+      "productName": "맨 파워 포텐",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "ec2a0676-1bdc-45fb-bc04-924fccac4369",
+      "expectedQrTarget": "product_landings(product_master_id=f5f88abb-17d6-405c-9450-cc8cb9d0b066)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "87e739d4-2d78-4ce2-add4-573c92c3dcb8",
+      "productName": "장 건강 골드",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "3eb0e83a-d82d-48d0-b29a-fa5c3b0c40d1",
+      "expectedQrTarget": "product_landings(product_master_id=87e739d4-2d78-4ce2-add4-573c92c3dcb8)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "4e9f4961-1c11-42e3-87a3-3341b0cdda2a",
+      "productName": "장 쾌변 케어",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "280f9e84-048d-441a-b9a5-bcf159fd6c87",
+      "expectedQrTarget": "product_landings(product_master_id=4e9f4961-1c11-42e3-87a3-3341b0cdda2a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "1fbb0a03-955f-48dd-92fd-f226437344ec",
+      "productName": "팻 이지 다운",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "aedcdda5-5b04-494a-9dbd-606e105184f4",
+      "expectedQrTarget": "product_landings(product_master_id=1fbb0a03-955f-48dd-92fd-f226437344ec)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "6437806f-ef37-49ac-b3ec-1b85273e2958",
+      "productName": "뮴 헤모 철분 액상",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "78066553-be4e-434c-9825-439d31d163f2",
+      "expectedQrTarget": "product_landings(product_master_id=6437806f-ef37-49ac-b3ec-1b85273e2958)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "67c91bf3-a124-4d0d-b00d-cffde1333c57",
+      "productName": "간 건강 더블 액티브",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "8ad029f3-9539-4619-b247-a20bf361ed8e",
+      "expectedQrTarget": "product_landings(product_master_id=67c91bf3-a124-4d0d-b00d-cffde1333c57)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "4ae52c46-e9e9-4e04-a06a-943c4afa55b2",
+      "productName": "굿 아이 케어 플러스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "0a698874-2017-43b9-8d26-8b77593d08db",
+      "expectedQrTarget": "product_landings(product_master_id=4ae52c46-e9e9-4e04-a06a-943c4afa55b2)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "c2cabeac-2416-4be4-9235-ad9381ac87cc",
+      "productName": "온 가족 면역 알로에",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "318eddfd-8ed3-431c-bd46-85d013914b73",
+      "expectedQrTarget": "product_landings(product_master_id=c2cabeac-2416-4be4-9235-ad9381ac87cc)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "f9d70e94-ef5e-48ba-9630-65a36edf7cba",
+      "productName": "잇 프리 칼로 파우더",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "53acc03c-5607-45d3-b77e-63dc46ae6d4d",
+      "expectedQrTarget": "product_landings(product_master_id=f9d70e94-ef5e-48ba-9630-65a36edf7cba)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "d3520b02-9ce4-49af-b975-a5da31ab8372",
+      "productName": "내 눈에 착한 루테인 키즈",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "e16bc945-0821-4a78-b368-b818d3718e8f",
+      "expectedQrTarget": "product_landings(product_master_id=d3520b02-9ce4-49af-b975-a5da31ab8372)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9ecb643c-cc2e-487b-9260-ff47fd12fa17",
+      "productName": "위 건강 케어 그린세라",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "60f5c538-a665-4cce-9d79-756ec42e3547",
+      "expectedQrTarget": "product_landings(product_master_id=9ecb643c-cc2e-487b-9260-ff47fd12fa17)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "2509a8c1-3fff-408e-bb32-87b1c51a62f4",
+      "productName": "질 요로 건강 이너펙타",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "9fa4eb3a-53c8-4304-9a9e-148b8fd765e1",
+      "expectedQrTarget": "product_landings(product_master_id=2509a8c1-3fff-408e-bb32-87b1c51a62f4)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "df0c0aa0-c0de-49ef-8cb6-69f8a75bfa20",
+      "productName": "간 건강 솔루션",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "5d089cbd-1b2a-431a-a25a-b8d728c3155c",
+      "expectedQrTarget": "product_landings(product_master_id=df0c0aa0-c0de-49ef-8cb6-69f8a75bfa20)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "81015938-dbd0-44e1-80d4-0c680584ee2a",
+      "productName": "간 건강 플러스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "68de132e-1296-44ec-b684-7f903cb47bee",
+      "expectedQrTarget": "product_landings(product_master_id=81015938-dbd0-44e1-80d4-0c680584ee2a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "5cd69e57-f0a0-4c76-99e3-908385c7e10d",
+      "productName": "간 건강 플러스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "f823dd2b-2c60-498a-8f32-a6c5c2d00e2b",
+      "expectedQrTarget": "product_landings(product_master_id=5cd69e57-f0a0-4c76-99e3-908385c7e10d)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "77acbad8-c56b-4692-8567-8e5fa763e970",
+      "productName": "굿 슬립 밸런스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "177a4c9f-18ca-4d38-9f29-d54e04f0c877",
+      "expectedQrTarget": "product_landings(product_master_id=77acbad8-c56b-4692-8567-8e5fa763e970)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "bd2fa732-770d-40ca-ace8-4ffda7cf8518",
+      "productName": "그 날에 대하여",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "d6884ec8-f15b-42db-bff5-431db597015b",
+      "expectedQrTarget": "product_landings(product_master_id=bd2fa732-770d-40ca-ace8-4ffda7cf8518)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "e18c5939-016e-4208-b028-24919e5c2fb7",
+      "productName": "내 변에 반하나",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "c6948cab-bbaf-4be6-914b-c515970e7608",
+      "expectedQrTarget": "product_landings(product_master_id=e18c5939-016e-4208-b028-24919e5c2fb7)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "40817e47-fef7-4a34-8e0f-238409ca5d3e",
+      "productName": "내 변에 반하나",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "8a7985ee-0aa7-4f32-9dc8-fcd4a6e2d8d6",
+      "expectedQrTarget": "product_landings(product_master_id=40817e47-fef7-4a34-8e0f-238409ca5d3e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "fc2ef439-a990-4e97-8a22-1b8ed9f33bde",
+      "productName": "눈 건강 루테인",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "73ed7191-4dcc-450c-b1d9-2f80c968e451",
+      "expectedQrTarget": "product_landings(product_master_id=fc2ef439-a990-4e97-8a22-1b8ed9f33bde)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "c32d068a-c768-4f27-8ac9-2522a31cdea1",
+      "productName": "눈 건강 루테인",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "8e56cca8-9421-439c-9248-e199391777fd",
+      "expectedQrTarget": "product_landings(product_master_id=c32d068a-c768-4f27-8ac9-2522a31cdea1)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "ef2849b6-9986-41b3-bdd3-034a5549fe73",
+      "productName": "더 힘찬 간애보",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "10cda1c0-edd8-473a-8df7-d520bc94641b",
+      "expectedQrTarget": "product_landings(product_master_id=ef2849b6-9986-41b3-bdd3-034a5549fe73)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "c7c11ab0-e65f-47ba-b70c-be0c2d76bf31",
+      "productName": "오 마이 비타민",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "d3c15596-e93c-49ac-acf3-cc492e76329a",
+      "expectedQrTarget": "product_landings(product_master_id=c7c11ab0-e65f-47ba-b70c-be0c2d76bf31)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "8663fde6-cf15-494a-8780-b3dbf67a2e6f",
+      "productName": "온 머리 인지청",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "721e6023-e0b4-416a-ad6c-ff934178dd33",
+      "expectedQrTarget": "product_landings(product_master_id=8663fde6-cf15-494a-8780-b3dbf67a2e6f)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "5c5406f1-f232-4ca5-849a-01f6c2a44a7a",
+      "productName": "위 건강 솔루션",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "0e017e1f-4a64-44fc-a925-4213e3bed915",
+      "expectedQrTarget": "product_landings(product_master_id=5c5406f1-f232-4ca5-849a-01f6c2a44a7a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9e7a482e-b107-4a54-9b31-456615ff5696",
+      "productName": "더 이상 버티다 간",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "658ffe96-7b4c-405a-a782-05317d7a21dc",
+      "expectedQrTarget": "product_landings(product_master_id=9e7a482e-b107-4a54-9b31-456615ff5696)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "bb2c00d5-9362-4328-b08b-c0929382611d",
+      "productName": "더 이상 버티다 간",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "10a7a8c8-6014-4bee-8829-c015b6a46904",
+      "expectedQrTarget": "product_landings(product_master_id=bb2c00d5-9362-4328-b08b-c0929382611d)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "7af8dc5d-b60f-481b-a7e9-de060b5c7093",
+      "productName": "뮴 이뮨 알로에 젤리",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "0d7ab7a4-c57f-4754-9f76-a01ccaeed0a2",
+      "expectedQrTarget": "product_landings(product_master_id=7af8dc5d-b60f-481b-a7e9-de060b5c7093)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "8e57efe2-2e9d-4ead-8d4e-57fb0d7995e3",
+      "productName": "뮴 키즈 리포퍼 철분 젤리",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "575acd60-c156-4ed0-b26c-f44a75bda578",
+      "expectedQrTarget": "product_landings(product_master_id=8e57efe2-2e9d-4ead-8d4e-57fb0d7995e3)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "57768f49-fbec-40fb-95c6-b46e72bdd604",
+      "productName": "더 데이 컨트롤 포뮬라",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "e43fc3ea-f3ac-45be-a8d6-990daa33c3b4",
+      "expectedQrTarget": "product_landings(product_master_id=57768f49-fbec-40fb-95c6-b46e72bdd604)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "29734de3-faff-4739-9319-65a10e8656fa",
+      "productName": "올 뷰티 콜라겐 포뮬러",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "f9f18025-46be-409e-9e11-18bc3386cde6",
+      "expectedQrTarget": "product_landings(product_master_id=29734de3-faff-4739-9319-65a10e8656fa)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "93ea2a55-1068-4157-98c6-e345aa1b5dad",
+      "productName": "위 케어 솔루션 헬리컷",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "a0cc734f-1910-4032-ad17-7e6317257d1b",
+      "expectedQrTarget": "product_landings(product_master_id=93ea2a55-1068-4157-98c6-e345aa1b5dad)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "6911d3f5-c995-4c32-9504-5d953c823717",
+      "productName": "장 편한 유산균 플러스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "251a5cbe-d401-4cad-a753-4eacca7d4415",
+      "expectedQrTarget": "product_landings(product_master_id=6911d3f5-c995-4c32-9504-5d953c823717)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "f9bc1583-0219-488a-8c67-f873b7a35192",
+      "productName": "장 피부 면역엔 알로에 젤리",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "bdde8ae4-eae6-433a-9322-067c9f012ddb",
+      "expectedQrTarget": "product_landings(product_master_id=f9bc1583-0219-488a-8c67-f873b7a35192)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "67936e32-2a62-456f-98f1-527459b62d37",
+      "productName": "장 피부 면역력 알로에 이뮨 젤리스틱",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "3233bfcf-365f-42a0-ade8-5584dd96475b",
+      "expectedQrTarget": "product_landings(product_master_id=67936e32-2a62-456f-98f1-527459b62d37)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "8a43dcef-b6e2-40c5-8003-45789070dc86",
+      "productName": "장 피부 면역력 알로에 이뮨 젤리스틱",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "b5415324-ebe3-4ebf-a106-73e8163b180b",
+      "expectedQrTarget": "product_landings(product_master_id=8a43dcef-b6e2-40c5-8003-45789070dc86)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "8762994e-9620-4ce7-a5fe-7de19b145c1f",
+      "productName": "키 성장 솔루션 파우더 딸기맛",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "895a9731-d5aa-4078-8f04-529bc328be95",
+      "expectedQrTarget": "product_landings(product_master_id=8762994e-9620-4ce7-a5fe-7de19b145c1f)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "f4812208-3f73-4001-a24c-829ea7eb0e1e",
+      "productName": "키 성장 솔루션 파우더 초코맛",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "4b15632f-ca2c-4d52-9bfd-98e128e623ba",
+      "expectedQrTarget": "product_landings(product_master_id=f4812208-3f73-4001-a24c-829ea7eb0e1e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "275a837b-80c0-4d94-8e3f-310dd27cc4fb",
+      "productName": "내 몸에 면역력 눈건강 레시피 루트칸 연질캡슐",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "8afce6bc-e3aa-48ea-b8c0-cf476fe83030",
+      "expectedQrTarget": "product_landings(product_master_id=275a837b-80c0-4d94-8e3f-310dd27cc4fb)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "b453ae8f-8ac6-453e-8ffc-0274eba0f335",
+      "productName": "간 건강 솔루션 밀크씨슬",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "62e81942-2024-416f-acaa-c8476b6f8acc",
+      "expectedQrTarget": "product_landings(product_master_id=b453ae8f-8ac6-453e-8ffc-0274eba0f335)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "b7f99921-2ad2-444a-a7ac-ce09d4b5a616",
+      "productName": "간 건강 올케어 밀크씨슬",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "50511e08-27b3-4b7f-968e-121b8718bc85",
+      "expectedQrTarget": "product_landings(product_master_id=b7f99921-2ad2-444a-a7ac-ce09d4b5a616)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "bdfe363f-6158-4aa2-8e68-15cfe8cd5027",
+      "productName": "간 건강 쿠퍼스 피로케어",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "ee71e145-a094-41f2-b9c6-ed875a52a1b6",
+      "expectedQrTarget": "product_landings(product_master_id=bdfe363f-6158-4aa2-8e68-15cfe8cd5027)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "6dadcd50-05e3-4915-bd19-723e9b19d8ac",
+      "productName": "간 건강 쿠퍼스 혈행케어",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "55b00e28-7c07-4e1e-b880-0206f76919c9",
+      "expectedQrTarget": "product_landings(product_master_id=6dadcd50-05e3-4915-bd19-723e9b19d8ac)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "e0adce50-8132-493a-8825-97ef56080be6",
+      "productName": "눈 케어 루테인 지아잔틴",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "317baecc-1f97-4628-a4ae-64cb81386cc8",
+      "expectedQrTarget": "product_landings(product_master_id=e0adce50-8132-493a-8825-97ef56080be6)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "83f3986e-7277-40f1-80d1-d5ec29af5ed5",
+      "productName": "팻 버닝 와사비 다이어트",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "c66fd82b-b0f1-471d-ad3f-42a3aa1978da",
+      "expectedQrTarget": "product_landings(product_master_id=83f3986e-7277-40f1-80d1-d5ec29af5ed5)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9ce692d5-0564-4ba6-a19e-08cdb203755c",
+      "productName": "내 간에 딱좋은 밀크씨슬 칸",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "ecc9bb40-83ba-4866-ac9e-0ab18bcb2908",
+      "expectedQrTarget": "product_landings(product_master_id=9ce692d5-0564-4ba6-a19e-08cdb203755c)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "80c08c99-fb13-4f63-848a-31d1129007f9",
+      "productName": "눈 건강 루테인 지아잔틴 솔루션",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "1dea56f4-5134-41c4-aff4-26df8be3d1c8",
+      "expectedQrTarget": "product_landings(product_master_id=80c08c99-fb13-4f63-848a-31d1129007f9)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "232dd10a-d8a4-48b9-8870-24955cb4c5cd",
+      "productName": "내 몸애 딱이야 셀렌효모 프리미엄",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "c04affac-811a-4518-8c45-9c7ad2547e1d",
+      "expectedQrTarget": "product_landings(product_master_id=232dd10a-d8a4-48b9-8870-24955cb4c5cd)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "6418c993-f72b-4531-a95c-af435684d29f",
+      "productName": "눈 건강 호안방 루테인지아잔틴",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "8778a1c9-9199-44a8-9ceb-269ca8820203",
+      "expectedQrTarget": "product_landings(product_master_id=6418c993-f72b-4531-a95c-af435684d29f)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "54f8e90f-ac58-465b-aaa2-17064af5ac9f",
+      "productName": "맨 파워 스트롱 쏘팔메토옥타코사놀 골드",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "4461520a-91e5-4a0c-92a0-fb84b7ebf72d",
+      "expectedQrTarget": "product_landings(product_master_id=54f8e90f-ac58-465b-aaa2-17064af5ac9f)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "1e4c5bfc-5264-4963-a31d-57009a9c9634",
+      "productName": "내 살을 부탁해!",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "ba129da0-70a4-4fe7-b470-bc05ba4173cb",
+      "expectedQrTarget": "product_landings(product_master_id=1e4c5bfc-5264-4963-a31d-57009a9c9634)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "755b87ad-c54f-44c2-ba0e-bec512b9fd6f",
+      "productName": "눈 건강 루테인/아스타잔틴",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "4852f9e4-1546-4c76-ade3-8d328dcb37a0",
+      "expectedQrTarget": "product_landings(product_master_id=755b87ad-c54f-44c2-ba0e-bec512b9fd6f)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "bcd357a7-3bfd-4d71-aad7-22a58702bd1b",
+      "productName": "간 건강 밀크씨슬",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "af5faa2f-6a08-492b-b643-f9d5c4121b40",
+      "expectedQrTarget": "product_landings(product_master_id=bcd357a7-3bfd-4d71-aad7-22a58702bd1b)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "28633102-e10e-481a-9fe1-92569d0bf269",
+      "productName": "간 건강 밀크씨슬",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "4d41d533-5d5d-4556-acd5-097a04a5f62a",
+      "expectedQrTarget": "product_landings(product_master_id=28633102-e10e-481a-9fe1-92569d0bf269)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "3cb48ad8-7d3c-4934-8875-667bbc48b8a6",
+      "productName": "간 건강 밀크씨슬",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "4209d043-493a-4f93-a984-8fec180e427c",
+      "expectedQrTarget": "product_landings(product_master_id=3cb48ad8-7d3c-4934-8875-667bbc48b8a6)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "628a859a-9a82-468b-9b91-5533c1f7738d",
+      "productName": "간 건강 밀크씨슬",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "bdf332e4-9fa6-4c93-8f50-b2931ede0ceb",
+      "expectedQrTarget": "product_landings(product_master_id=628a859a-9a82-468b-9b91-5533c1f7738d)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9fd48d2b-20c1-45ca-9dac-fcb4b6cdb660",
+      "productName": "간 채움 밀크씨슬",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "101c3095-a62f-4475-996e-4d8667dd8a3a",
+      "expectedQrTarget": "product_landings(product_master_id=9fd48d2b-20c1-45ca-9dac-fcb4b6cdb660)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "4d839b57-c060-4b35-bb45-773dbb278f3b",
+      "productName": "간 케어 밀크씨슬",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "2c23a77d-1289-4a38-925f-b02a706ada75",
+      "expectedQrTarget": "product_landings(product_master_id=4d839b57-c060-4b35-bb45-773dbb278f3b)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "0294ff58-dbdb-4b90-b36e-d07df8bd013b",
+      "productName": "간 튼튼 밀크씨슬",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "3c30401f-0d34-4483-9aaf-83fdc5bcc1a6",
+      "expectedQrTarget": "product_landings(product_master_id=0294ff58-dbdb-4b90-b36e-d07df8bd013b)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "7af88dc5-313a-47fc-9065-425f90ebb2c4",
+      "productName": "더 빼네 바나나맛",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "eaa8f532-9bf8-45fe-ab6e-a30a5ed8494f",
+      "expectedQrTarget": "product_landings(product_master_id=7af88dc5-313a-47fc-9065-425f90ebb2c4)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "cd713af9-2f49-42f7-bcf9-895e2c2d47ea",
+      "productName": "더 채움 프리미엄",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "59d9bd95-9ba2-44eb-9bfe-1f0778c8e24f",
+      "expectedQrTarget": "product_landings(product_master_id=cd713af9-2f49-42f7-bcf9-895e2c2d47ea)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "c4e0ce0d-a179-45b8-9bdc-c137568eed92",
+      "productName": "룩 킬팻 다이어트",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "6d5b21ab-16d7-41c3-b27f-06534f4a7aab",
+      "expectedQrTarget": "product_landings(product_master_id=c4e0ce0d-a179-45b8-9bdc-c137568eed92)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "f59f6f24-405d-4b0d-929a-55a286702102",
+      "productName": "올 인원 데일리팩",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "d3169c23-55c4-4613-82da-3a631cc72b7b",
+      "expectedQrTarget": "product_landings(product_master_id=f59f6f24-405d-4b0d-929a-55a286702102)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "57c50673-c87f-468e-b167-0bd557754c63",
+      "productName": "장 비움 프로젝트",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "15bbdb07-6fe8-409b-bbee-f9e2da88e9fc",
+      "expectedQrTarget": "product_landings(product_master_id=57c50673-c87f-468e-b167-0bd557754c63)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "1a78fc43-281f-4ebe-a6a2-4949d594f26e",
+      "productName": "흙 신령 쏘팔메토",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "915519ae-ffb8-4f75-ba47-572381037fcd",
+      "expectedQrTarget": "product_landings(product_master_id=1a78fc43-281f-4ebe-a6a2-4949d594f26e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "1314152e-5c35-4a56-8ce5-7bc1602f3726",
+      "productName": "간 건강 밀크씨슬 칸",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "16ae88cc-8137-4887-a1ec-461cd406512b",
+      "expectedQrTarget": "product_landings(product_master_id=1314152e-5c35-4a56-8ce5-7bc1602f3726)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "3eb10074-e0e5-4c38-ba65-85bb52cfd4dc",
+      "productName": "뮴 말랑 식이섬유 츄",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "6fef833f-2985-41d6-affa-8fd4ee42b6cd",
+      "expectedQrTarget": "product_landings(product_master_id=3eb10074-e0e5-4c38-ba65-85bb52cfd4dc)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "27711ba6-f863-4024-8468-4c88092bce0e",
+      "productName": "내 눈에 하트충전 젤리",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "26c3afc4-727c-4752-94b8-1ad406027f63",
+      "expectedQrTarget": "product_landings(product_master_id=27711ba6-f863-4024-8468-4c88092bce0e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "b56522de-cdc9-4653-a14c-143638ed8210",
+      "productName": "맨 케어 쏘팔메토 엑스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "cc6f5911-0b00-49a9-9d52-874fa4703512",
+      "expectedQrTarget": "product_landings(product_master_id=b56522de-cdc9-4653-a14c-143638ed8210)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "c39d5343-fd93-4c6b-8a68-849221ffb9c8",
+      "productName": "코 시원 노즈쉴드 젤리 스틱",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "03d86f67-0a5b-4944-8e1d-c56eb75fdc53",
+      "expectedQrTarget": "product_landings(product_master_id=c39d5343-fd93-4c6b-8a68-849221ffb9c8)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "fab37f22-961d-4026-bd52-71f12755b87e",
+      "productName": "간 건강 밀크씨슬 활력 플러스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "e701fd41-54f0-41ed-9d83-bc2014a2db70",
+      "expectedQrTarget": "product_landings(product_master_id=fab37f22-961d-4026-bd52-71f12755b87e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "2b276b0f-8f81-4fe9-b862-cae8f4e90957",
+      "productName": "장 피부 면역력엔 알로에",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "47197173-6911-44fc-90d1-3d77d9ca5709",
+      "expectedQrTarget": "product_landings(product_master_id=2b276b0f-8f81-4fe9-b862-cae8f4e90957)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "1bf04249-c066-4dbb-b9b7-723775901269",
+      "productName": "더 그린 프리미엄 더블케어",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "f46008ef-cd38-4f7b-b132-2d6acbfcc4bc",
+      "expectedQrTarget": "product_landings(product_master_id=1bf04249-c066-4dbb-b9b7-723775901269)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "956dc94d-edbc-4ea2-810e-1646d0409d95",
+      "productName": "질 건강 리스펙타 프로바이오틱스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "7c6d11c3-112d-404e-8192-123a58f802e5",
+      "expectedQrTarget": "product_landings(product_master_id=956dc94d-edbc-4ea2-810e-1646d0409d95)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "bbf940af-c4f3-4693-a27f-5d7fb2b4dc11",
+      "productName": "질 건강 리스펙타 프로바이오틱스 액티브",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "b813f458-6159-4c17-8abd-17da54dbd67b",
+      "expectedQrTarget": "product_landings(product_master_id=bbf940af-c4f3-4693-a27f-5d7fb2b4dc11)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "be8ebd0b-f9f7-4c93-91d7-d932722b2881",
+      "productName": "눈 건강 루아클리어",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "7b0118ca-3fb8-4a3e-b60d-05c5efc722bf",
+      "expectedQrTarget": "product_landings(product_master_id=be8ebd0b-f9f7-4c93-91d7-d932722b2881)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "25de9a0b-24ae-42e3-b500-368b336b8222",
+      "productName": "더 빼네 커피믹스맛",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "e05dc8ca-fa35-4e3e-9ce4-d76fc7ea4854",
+      "expectedQrTarget": "product_landings(product_master_id=25de9a0b-24ae-42e3-b500-368b336b8222)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "a9a4af74-c619-4c34-a41c-4be08c8866b2",
+      "productName": "더 빼네 헤이즐넛향",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "7d787598-5471-44dd-8247-c4bcc4310fad",
+      "expectedQrTarget": "product_landings(product_master_id=a9a4af74-c619-4c34-a41c-4be08c8866b2)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "21969c62-4f49-4712-a5be-bf47248fa9c1",
+      "productName": "더 촉촉 히알루론산",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "e0f78a34-0094-4644-a0a2-017a4a87f7b6",
+      "expectedQrTarget": "product_landings(product_master_id=21969c62-4f49-4712-a5be-bf47248fa9c1)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "46e9bd89-a2b6-4a4d-b13a-c728d745acee",
+      "productName": "뮴 항균 프로폴리스 칙",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "df9119bb-de13-474b-addc-e1b4c754d279",
+      "expectedQrTarget": "product_landings(product_master_id=46e9bd89-a2b6-4a4d-b13a-c728d745acee)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "975c227a-d57b-4d73-a4a3-1985d873ec6a",
+      "productName": "간 편한 피로개선엔 밀크씨슬+홍경천",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "b17247de-f586-4d88-8cde-fe229b4299a6",
+      "expectedQrTarget": "product_landings(product_master_id=975c227a-d57b-4d73-a4a3-1985d873ec6a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "5ab588d7-747d-4c61-8952-0fd7cbb4ae5b",
+      "productName": "더 빼네 샤인머스캣맛",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "fecd6cc0-d64e-4b5c-a172-0e1f2803eec2",
+      "expectedQrTarget": "product_landings(product_master_id=5ab588d7-747d-4c61-8952-0fd7cbb4ae5b)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "3f1ad097-e678-4168-b183-e602ef2ea4be",
+      "productName": "더 빼네 아메리카노맛",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "451b64a3-f389-4725-a2a9-c9c7c0724bbf",
+      "expectedQrTarget": "product_landings(product_master_id=3f1ad097-e678-4168-b183-e602ef2ea4be)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "7615ea69-dc96-461f-b5ca-b7b35b1a42dc",
+      "productName": "더 빼네 에스프레소맛",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "92ed8810-6227-4b62-8564-4c93682170ba",
+      "expectedQrTarget": "product_landings(product_master_id=7615ea69-dc96-461f-b5ca-b7b35b1a42dc)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "8ec1a113-4bbf-4a7f-ad41-86f91aac604e",
+      "productName": "장 건강 세븐바이오틱스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "f11acc1a-2476-4cdf-9468-dfca71660296",
+      "expectedQrTarget": "product_landings(product_master_id=8ec1a113-4bbf-4a7f-ad41-86f91aac604e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "a0dfe77b-c0a4-4fe4-8870-e827cf3f303a",
+      "productName": "장 건강 프로바이오틱스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "ab5f7635-7db8-47b9-be0b-5a4bf93a50a5",
+      "expectedQrTarget": "product_landings(product_master_id=a0dfe77b-c0a4-4fe4-8870-e827cf3f303a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "270ef649-4afe-42ff-8956-bff0b6e6569b",
+      "productName": "장 건강 프로바이오틱스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "0cdd9815-03cf-4dc3-8c22-49c3ef86e0e2",
+      "expectedQrTarget": "product_landings(product_master_id=270ef649-4afe-42ff-8956-bff0b6e6569b)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "d39e1799-68b4-4bad-843c-8df37bde45cd",
+      "productName": "장 건강 프로바이오틱스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "c41bc6f6-6156-4666-b222-86a91ed96b87",
+      "expectedQrTarget": "product_landings(product_master_id=d39e1799-68b4-4bad-843c-8df37bde45cd)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "1f96b40e-e01b-426c-b4e4-04b1c46266ca",
+      "productName": "장 튼튼 프로바이오틱스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "916e1134-591c-4079-a73b-f88a40614827",
+      "expectedQrTarget": "product_landings(product_master_id=1f96b40e-e01b-426c-b4e4-04b1c46266ca)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "88bcbeb4-ed58-4b5a-9abb-ebc95192057e",
+      "productName": "내 장에 프로바이오틱스 플러스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "5e3f05ee-1c7a-429d-9c7d-971a5125d2c1",
+      "expectedQrTarget": "product_landings(product_master_id=88bcbeb4-ed58-4b5a-9abb-ebc95192057e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "f5e1540e-878c-4fd2-86da-202e63e9aeba",
+      "productName": "눈 건강·간 건강·면역 건강·활력",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "b9e232dd-8923-48c7-b816-4afbdc05bee0",
+      "expectedQrTarget": "product_landings(product_master_id=f5e1540e-878c-4fd2-86da-202e63e9aeba)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "d102def0-f1a7-4dae-bed2-c5ba625ec2a2",
+      "productName": "간 건강·스트레스로 인한 피로 개선 부스터샷",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "0041cf9f-3709-4e1c-af5b-10529c0a38a5",
+      "expectedQrTarget": "product_landings(product_master_id=d102def0-f1a7-4dae-bed2-c5ba625ec2a2)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "042d12af-d85a-447a-a5cf-da74052a5482",
+      "productName": "장 건강&면역 퓨어 비피더스 유산균",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "de14a69f-f8cc-468d-9693-b159bbcd3ca5",
+      "expectedQrTarget": "product_landings(product_master_id=042d12af-d85a-447a-a5cf-da74052a5482)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "ee137225-b486-4c30-ad40-9939026b8a4a",
+      "productName": "간 솔루션",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "e23bd20f-c2b6-4c66-b4ad-4b5748c78890",
+      "expectedQrTarget": "product_landings(product_master_id=ee137225-b486-4c30-ad40-9939026b8a4a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9c8a47e8-0a60-4836-a064-b51206b9c0b1",
+      "productName": "간 솔루션",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "25a3d151-f7ab-4f92-b273-90d429f98858",
+      "expectedQrTarget": "product_landings(product_master_id=9c8a47e8-0a60-4836-a064-b51206b9c0b1)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "ab00162d-2185-437a-bb99-ce4f45185d6b",
+      "productName": "뇌 유산균",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "e2f92c3e-6bf8-4f91-bae8-faa59c115911",
+      "expectedQrTarget": "product_landings(product_master_id=ab00162d-2185-437a-bb99-ce4f45185d6b)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "35230ab3-e620-4832-87f3-647ca53af58e",
+      "productName": "눈 솔루션",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "9c8ff788-66a3-455d-8efc-6476d14abcdb",
+      "expectedQrTarget": "product_landings(product_master_id=35230ab3-e620-4832-87f3-647ca53af58e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "09a4abf4-fef0-46cb-8fc4-c936296568b4",
+      "productName": "눈 솔루션",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "ffeda34d-0f5b-40c2-9eba-e50cc633ed8c",
+      "expectedQrTarget": "product_landings(product_master_id=09a4abf4-fef0-46cb-8fc4-c936296568b4)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "3e614f6e-3b1e-4da7-b948-d50ec79d4b26",
+      "productName": "뉴 치파니",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "a4405567-ad8b-415d-aa48-5b182cd65c31",
+      "expectedQrTarget": "product_landings(product_master_id=3e614f6e-3b1e-4da7-b948-d50ec79d4b26)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "c0d3ae98-5390-407b-9373-c63bc3985d0a",
+      "productName": "당 쵸이스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "23e96ae1-d083-4539-808d-6ffb56cda780",
+      "expectedQrTarget": "product_landings(product_master_id=c0d3ae98-5390-407b-9373-c63bc3985d0a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "2eaf0c48-2250-4594-af08-657e04c9a0a6",
+      "productName": "더 간조은",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "d7941285-4c98-44ed-9e1d-dafd0859c7aa",
+      "expectedQrTarget": "product_landings(product_master_id=2eaf0c48-2250-4594-af08-657e04c9a0a6)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "6c3bc5a0-46d9-4e1c-afd7-88b0b3d39643",
+      "productName": "더 릴랙스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "022ef4ed-c89d-46b9-9c3d-8c4641be2e53",
+      "expectedQrTarget": "product_landings(product_master_id=6c3bc5a0-46d9-4e1c-afd7-88b0b3d39643)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "9306cb50-55d9-41c9-9a1b-1be18b0710a5",
+      "productName": "더 베스트",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "251d1d49-fc3f-4055-8001-e91fdd872ffb",
+      "expectedQrTarget": "product_landings(product_master_id=9306cb50-55d9-41c9-9a1b-1be18b0710a5)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "48c001a4-de4d-4375-9706-143ed16016cd",
+      "productName": "더 콜라겐",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "89216247-0e5e-4155-bf72-7ed8a7c6ab4b",
+      "expectedQrTarget": "product_landings(product_master_id=48c001a4-de4d-4375-9706-143ed16016cd)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "03c6b7f7-280c-4a68-b556-a03a4f94a0de",
+      "productName": "더 퍼스트",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "d0881eb9-7d7e-44b0-b586-2b9ffe98db8d",
+      "expectedQrTarget": "product_landings(product_master_id=03c6b7f7-280c-4a68-b556-a03a4f94a0de)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "8b5f984d-8c31-4bc9-87ed-774e3b52402b",
+      "productName": "번 밸런스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "b3da8c8d-bb6a-4b2c-8af4-baaa59fb530a",
+      "expectedQrTarget": "product_landings(product_master_id=8b5f984d-8c31-4bc9-87ed-774e3b52402b)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "8982b32e-eef4-4e19-9631-efd2465e7ca4",
+      "productName": "본 밸런스",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "2755de9a-b9a2-4b30-9041-126331521413",
+      "expectedQrTarget": "product_landings(product_master_id=8982b32e-eef4-4e19-9631-efd2465e7ca4)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "7a6baa84-5779-45de-920a-e1d9e0873b41",
+      "productName": "셀 디펜더",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "3fd1dcc8-7fb5-471c-9cc2-ec52f72d3d42",
+      "expectedQrTarget": "product_landings(product_master_id=7a6baa84-5779-45de-920a-e1d9e0873b41)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "a6812ae3-a772-4cd7-8dac-d95f01c7146a",
+      "productName": "셀 포뮬러",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "f7c7bc0c-5665-44e3-8fbf-cc44defbc6d1",
+      "expectedQrTarget": "product_landings(product_master_id=a6812ae3-a772-4cd7-8dac-d95f01c7146a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "4d6bbd4b-4f0a-47d6-a8de-545f86c5d58a",
+      "productName": "숲 속비움",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "31210793-c391-46eb-a05f-2712ad72dfb0",
+      "expectedQrTarget": "product_landings(product_master_id=4d6bbd4b-4f0a-47d6-a8de-545f86c5d58a)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "335a4269-6f0d-4553-bbd4-a44e75c5d623",
+      "productName": "슘 오리진",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "d7d8a0ed-6638-4bcb-9e41-60ba131a67a4",
+      "expectedQrTarget": "product_landings(product_master_id=335a4269-6f0d-4553-bbd4-a44e75c5d623)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "2d0ca737-0188-4b81-bb22-c7fcd93b7168",
+      "productName": "아 슬림정",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "f955406d-97ed-4c1a-b1d2-a644811837df",
+      "expectedQrTarget": "product_landings(product_master_id=2d0ca737-0188-4b81-bb22-c7fcd93b7168)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "b2c334fc-eaf4-445e-9f0a-fb70fc5686d4",
+      "productName": "엘 테아닌",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "582ba150-bd62-4d52-a6b0-4a784dbed595",
+      "expectedQrTarget": "product_landings(product_master_id=b2c334fc-eaf4-445e-9f0a-fb70fc5686d4)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "5d41b895-1f85-4215-a2f3-100271c87a89",
+      "productName": "위 솔루션",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "0061c08b-345e-4ece-9f49-c8d1b73f773f",
+      "expectedQrTarget": "product_landings(product_master_id=5d41b895-1f85-4215-a2f3-100271c87a89)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "7444b672-aad0-4503-8e62-9291e5297993",
+      "productName": "위 솔루션",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "826a4c18-c4dd-4c4d-9baf-d7f847ea6334",
+      "expectedQrTarget": "product_landings(product_master_id=7444b672-aad0-4503-8e62-9291e5297993)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "6187f5eb-2638-417b-82fd-b654fc0bd73e",
+      "productName": "장 유산균",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "9a0d184f-daf3-4a5b-a71e-6287b5dafa30",
+      "expectedQrTarget": "product_landings(product_master_id=6187f5eb-2638-417b-82fd-b654fc0bd73e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "43adb460-6c93-41f2-8497-85ee17d3a00d",
+      "productName": "포 에너지",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "24c7ad26-af12-436d-9dc2-12cdb05c747b",
+      "expectedQrTarget": "product_landings(product_master_id=43adb460-6c93-41f2-8497-85ee17d3a00d)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "a715d791-3855-429a-83a9-8424486e3f2b",
+      "productName": "포 에센셜",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "dc925df2-4048-4432-b1d6-e7e06075a779",
+      "expectedQrTarget": "product_landings(product_master_id=a715d791-3855-429a-83a9-8424486e3f2b)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "59f78576-8a54-493b-98c1-82fb86101365",
+      "productName": "핏 라이트",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "076e0648-9ef3-4802-a1df-28fa756206a0",
+      "expectedQrTarget": "product_landings(product_master_id=59f78576-8a54-493b-98c1-82fb86101365)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "44351e2b-394e-4765-9350-3031c07e00b3",
+      "productName": "그 남자의 비책",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "2c191adf-6239-48c6-91dd-2f4fd7cd5473",
+      "expectedQrTarget": "product_landings(product_master_id=44351e2b-394e-4765-9350-3031c07e00b3)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "14dc53fa-ab0d-4c09-bbae-bf0161ee1641",
+      "productName": "더 미네랄 철분",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "0265bbfd-279e-4f70-8d22-e935b9d75f6b",
+      "expectedQrTarget": "product_landings(product_master_id=14dc53fa-ab0d-4c09-bbae-bf0161ee1641)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "f7177ab0-640d-4345-a7e6-c58a8b8c9621",
+      "productName": "더 빼볼라 하다",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "cd9492d6-5eba-4f02-8c35-28a1a73a4161",
+      "expectedQrTarget": "product_landings(product_master_id=f7177ab0-640d-4345-a7e6-c58a8b8c9621)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "a45f3e1e-7893-4dbf-a22e-c08a0957d32e",
+      "productName": "더 스트롱 칼슘",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "636237df-7da4-4a5f-8571-04f75b6bcc25",
+      "expectedQrTarget": "product_landings(product_master_id=a45f3e1e-7893-4dbf-a22e-c08a0957d32e)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "7fefe343-7eca-4268-925a-9f15c5e2f287",
+      "productName": "더 콜라겐 뷰티",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "f76dc35a-cdd4-4d3f-ae99-72b61f872f41",
+      "expectedQrTarget": "product_landings(product_master_id=7fefe343-7eca-4268-925a-9f15c5e2f287)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "59d2bfa8-e84a-4d97-a860-8496a5071875",
+      "productName": "디 플러스 엔오",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "ec44e85e-75ce-4242-ad98-aa7b45533207",
+      "expectedQrTarget": "product_landings(product_master_id=59d2bfa8-e84a-4d97-a860-8496a5071875)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    },
+    {
+      "masterId": "fac6e428-b732-4bb0-b4bb-d499b62e9254",
+      "productName": "딥 밸런스 케어",
+      "regulatoryType": "건강기능식품",
+      "storeDescriptionId": "09cc1926-e42f-47f3-97ec-fb103d864cff",
+      "expectedQrTarget": "product_landings(product_master_id=fac6e428-b732-4bb0-b4bb-d499b62e9254)",
+      "existingQrId": null,
+      "issueType": "QR_MISSING"
+    }
+  ]
+}

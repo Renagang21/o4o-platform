@@ -1,0 +1,84 @@
+{
+  "auditedAt": "2026-09-04",
+  "generatedBy": "IR-O4O-STORE-PRODUCT-DESCRIPTION-QR-CODE-CENSUS-AND-GAP-AUDIT-V1",
+  "note": "timestamp 는 소비 측 스탬프. 모든 수치는 프로덕션 read-only SELECT 실측(2026-09-04).",
+
+  "canonicalOwnerUnit": {
+    "answer": "A. ProductMaster 당 QR 1개",
+    "evidence": [
+      "docs/baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V2-AMENDMENT.md 불변식 #7 — master 당 Landing 1개·대표 QR 1개(UNIQUE)",
+      "DB: uniq_product_landings_master UNIQUE(product_master_id) WHERE deleted_at IS NULL",
+      "DB: uniq_product_landings_public_key UNIQUE(public_key)"
+    ],
+    "rejected": {
+      "B_perStoreDescription": "설명서 단위 QR 아님. 설명서(SPD)는 Landing 이 렌더하는 블록 중 하나이며, 설명서가 없어도 QR/Landing 은 성립한다('상세 설명을 준비 중입니다.' placeholder).",
+      "C_perServiceOrStore": "매장 스코프 QR(store_qr_codes)은 계층 2 실행자산으로 별도 축. 제품 대표 QR 이 아니다.",
+      "D_separatePublicResourceQr": "F12 V1 #3 의 Resource permalink /r/{id} 는 코드/라우트 미구현(구현 0). 제품 축 정본은 /p/{key} 로 확정됨."
+    }
+  },
+
+  "storage": {
+    "qrImageStored": false,
+    "storedIdentityTable": "product_landings",
+    "storedIdentityColumn": "public_key",
+    "keyFormat": "12자 opaque (alphabet 'abcdefghijkmnpqrstuvwxyz23456789' — 0/1/l/o 제외), crypto.randomBytes",
+    "invariant": "F12 #4 — QR 이미지는 저장/관리하지 않고 런타임 동적 인코딩(generateQrSvg / generateQrPng)",
+    "issuePath": "apps/api-server/src/modules/neture/services/product-landing.service.ts :: mintForMaster (idempotent)"
+  },
+
+  "payloadAndUrl": {
+    "payload": "https://neture.co.kr/p/{public_key}",
+    "originEnv": "NETURE_PUBLIC_ORIGIN (기본 https://neture.co.kr)",
+    "urlBuilder": "productLandingUrl() — product-landing.service.ts",
+    "permanence": "master 기준 고정. 설명서 내용이 바뀌어도 URL/QR 불변(재발급 없음). rollback 은 metadata.batchId soft delete 만."
+  },
+
+  "linkage": {
+    "productMasterToQr": "Landing → ProductMaster 단방향 FK (product_landings.product_master_id). ProductMaster 에 역방향 FK 없음 (F12 #6).",
+    "storeDescriptionToQr": "직접 FK 없음. Landing 이 렌더 시 shared_product_descriptions(status='canonical', description_type='STORE', language) 를 master_id 로 동적 resolve.",
+    "consequence": "설명서 행 삭제/교체가 QR 을 깨뜨리지 않는다. 반대로 설명서만 만들고 Landing 을 발급하지 않으면 QR 이 성립하지 않는다."
+  },
+
+  "consumerPath": {
+    "publicApi": "GET /api/v1/public/product-landings/:publicKey (인증 미들웨어 없음, isAuthed 로 본문만 게이트)",
+    "frontendRoute": "services/web-neture/src/pages/ProductLandingPage.tsx — /p/:publicKey",
+    "authGate": {
+      "contract": "docs/baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V3-AMENDMENT.md + docs/adr/ADR-0002-o4o-product-description-authenticated-access.md",
+      "behavior": "비로그인 → 200 + authRequired=true + 제품명만. 본문/summary/언어/규제 미포함. 로그인 → 본문 제공.",
+      "note": "IR §3 의 '로그인 요구 없음' 기대는 현행 계약과 다르다. 로그인 게이트는 결함이 아니라 V3-AMENDMENT/ADR-0002 로 확정된 정책이다."
+    },
+    "notFound": "존재하지 않는 key → 404 LANDING_NOT_FOUND (인증필요와 구분)"
+  },
+
+  "reissueAndDedup": {
+    "idempotent": true,
+    "mechanism": "mintForMaster: 기존 조회 → 없으면 INSERT. master UNIQUE 충돌 시 재조회, public_key 충돌 시 최대 6회 재시도.",
+    "bulkScript": "apps/api-server/src/scripts/productmaster-landing-bulk-apply.ts — dry-run 기본, --apply --batch-id 게이트, NOT EXISTS 기준 재개 가능, ON CONFLICT DO NOTHING",
+    "runtimeSelfHeal": [
+      "GET /api/v1/store/handled-products/qr (store-handled-products.routes.ts) → getLandingQr = 없으면 발급",
+      "POST /store-owner/manuals/:listingId/qr (PharmacyHubStoreManualController) → getLandingQr = 없으면 발급",
+      "GET /admin/o4o-product-db/product-landings/by-master/:masterId/qr → getLandingQr = 없으면 발급"
+    ],
+    "readOnlyPaths": [
+      "GET /store-owner/manuals/:listingId (PharmacyHubStoreManualController:283) → getByMaster 만. Landing 없으면 landing:null (QR 미표시)"
+    ]
+  },
+
+  "competingAxes": {
+    "store_qr_codes": {
+      "layer": "계층 2 Store Production Material",
+      "boundary": "organization_id (null 0건)",
+      "target": "landing_target_id = organization_product_listings.id / screen_set / page / link / video",
+      "targetsProductMaster": 0,
+      "targetsSharedProductDescription": 0,
+      "verdict": "제품 대표 QR 과 경쟁하지 않는다. 축이 다르다(매장 실행자산 vs 제품 전역 자산)."
+    },
+    "resource_permalink_r_id": {
+      "verdict": "미구현. 코드/라우트 0건. F12 V1 #3 문서에만 존재.",
+      "impact": "제품 축 QR 판정에 사용하지 않는다."
+    },
+    "product_identifiers_QR_CODE": {
+      "verdict": "미채택(경로 S 보류). identifier_type='QR_CODE' 행 0건."
+    }
+  }
+}

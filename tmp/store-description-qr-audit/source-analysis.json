@@ -1,0 +1,60 @@
+{
+  "source": "코드 정적 분석 + 프로덕션 read-only SELECT. 측정일 2026-09-04.",
+  "rootCause": {
+    "statement": "QR(Landing) 발급은 2026-07-09 의 **1회성 bulk apply** 로만 채워졌고, ProductMaster 생성 시 자동 발급하는 훅(Phase 4)이 끝내 구현되지 않았다. 따라서 그 이후 생성된 master 는 예외 없이 QR 이 없다.",
+    "notCauses": [
+      "배치 실패/부분 성공 아님 — bulk apply 당시 대상 198,389 전량 발급, 중복·누락 0",
+      "특정 descriptionType 만 발급하는 로직 아님 — 발급은 설명서와 무관(master 단위)",
+      "중복 방지 skip 아님 — NOT EXISTS 대상 산정, 스킵된 master 0",
+      "URL 생성 누락 아님 — URL 은 저장하지 않고 public_key 로 런타임 조립"
+    ]
+  },
+  "timeline": {
+    "bulkApplyLastLandingCreatedAt": "2026-07-09T07:29:52Z",
+    "firstMasterWithoutLandingCreatedAt": "2026-07-09T13:51:58",
+    "verdict": "완전한 시간 절단면. bulk apply 이후 생성된 master 중 QR 보유는 관리자 화면 조회로 우연히 발급된 5건뿐이다.",
+    "mastersByCreatedMonth": [
+      { "month": "2026-06", "masters": 2, "withQr": 2 },
+      { "month": "2026-07", "masters": 239359, "withQr": 198392 },
+      { "month": "2026-08", "masters": 32678, "withQr": 0 }
+    ],
+    "missingByMonthAndType": [
+      { "month": "2026-07", "regulatoryType": "건강기능식품", "missing": 40946 },
+      { "month": "2026-07", "regulatoryType": "일반", "missing": 12 },
+      { "month": "2026-07", "regulatoryType": "GENERAL", "missing": 9 },
+      { "month": "2026-08", "regulatoryType": "COSMETIC", "missing": 32675 },
+      { "month": "2026-08", "regulatoryType": "GENERAL", "missing": 3 }
+    ]
+  },
+  "whichCreationPathsSkipQr": {
+    "finding": "product_masters 를 INSERT 하는 어떤 경로도 product_landings 를 발급하지 않는다. product_landings 를 참조하는 파일 전체(12개) 중 master 생성 코드는 0개다.",
+    "masterInsertPathsWithoutMint": [
+      "apps/api-server/src/scripts/cosmetics-productmaster-apply-pilot/05-apply.mjs, 08-full-apply.mjs (COSMETIC 32,675)",
+      "apps/api-server/src/scripts/hff-*-store-canonical-apply.ts / hff-*-apply.ts / hff-ko-agent-01-individual.mjs (건강기능식품 40,946)",
+      "apps/api-server/src/modules/neture/drug-import/drug-master-promotion-apply.db.ts",
+      "apps/api-server/src/scripts/medical-device-gate-b-promotion.ts",
+      "apps/api-server/src/modules/neture/services/store-product-request-admin.service.ts (런타임 신규상품 승인 경로)"
+    ],
+    "landingReferencingFiles": [
+      "modules/neture/services/product-landing.service.ts (발급·조회)",
+      "modules/neture/controllers/product-landing.controller.ts (public read / admin mint)",
+      "scripts/productmaster-landing-bulk-apply.ts (Phase 3 일괄)",
+      "routes/platform/store-handled-products.routes.ts (매장 상품 QR·내보내기 — 조회 시 멱등 발급)",
+      "controllers/pharmacy-hub/PharmacyHubStoreManualController.ts (상세는 읽기만, POST .../qr 만 발급)",
+      "routes/pharmacy-hub/pharmacy-hub.routes.ts / bootstrap/register-routes.ts (라우팅)",
+      "admin-dashboard: api/o4o-product-db.api.ts, pages/o4o-product-db/ProductMasterDetailPage.tsx (관리자 QR 섹션)",
+      "migrations: 20261225000000-CreateProductLandings.ts, 20270209000000-DeleteHffCorruptedProductMasters.ts",
+      "modules/neture/services/__tests__/product-landing.auth-gate.test.ts"
+    ]
+  },
+  "documentedButUnbuilt": {
+    "phase4": "CHECK-O4O-PRODUCT-LANDING-PHASE2-V1 §8 이 'Phase 4 on-create(신규 master 생성 시 Landing 자동 발급)' 를 다음 항목으로 명시했으나 착수되지 않았다. WO-O4O-PRODUCT-LANDING-ARCHITECTURE-V1 §5 롤아웃 표의 Phase 4(WO-O4O-PRODUCTMASTER-LANDING-ON-CREATE-V1) 도 미실행.",
+    "consequence": "Phase 3 의 '100% 커버리지' 는 2026-07-09 시점 사실이며, 그 이후 모집단 증가(198,389 → 272,039, +73,650)에 대해 자동 유지되는 장치가 없다."
+  },
+  "userVisibleImpact": {
+    "selfHealingPaths": "매장/관리자에서 QR 을 '보는' 경로(store-handled-products /qr, PharmacyHub POST .../qr, admin by-master/:id/qr)는 getLandingQr → mintForMaster 로 그 자리에서 멱등 발급하므로 사용자가 QR 을 요청하면 정상 생성된다.",
+    "brokenReadOnlyPath": "PharmacyHubStoreManualController.detail (GET /store-owner/manuals/:listingId) 은 getByMaster 만 호출해 발급하지 않는다 → Landing 미보유 master 는 landing:null 로 응답하여 매장 설명서 화면에서 QR/공개 URL 이 표시되지 않는다.",
+    "measuredExposure": "master 가 연결된 organization_product_listings 47건 중 32건(68%)이 Landing 미보유 master 를 가리킨다.",
+    "otherGaps": "제품 QR 일괄 인쇄·목록·통계 등 '미리 발급되어 있음'을 전제하는 경로는 누락군을 집계하지 못한다."
+  }
+}

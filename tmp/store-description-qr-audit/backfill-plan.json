@@ -1,0 +1,67 @@
+{
+  "status": "PLAN ONLY — 본 감사에서 DB write 0. 실행은 별도 apply WO + 사용자 승인 후.",
+  "verdict": "PASS — 백필 가능. 새 QR 시스템 신설 불필요, 기존 정본 스크립트 재사용.",
+  "targets": {
+    "QR_MISSING_total": 73645,
+    "autoCreatable": 73645,
+    "CHECK": 0,
+    "blocker": 0,
+    "existingQrNeedingFix": 0,
+    "rationale": "누락군 전량이 status=ACTIVE master 이고, 발급은 설명서 유무와 무관하며(계약), 중복·충돌·깨진 타깃이 0이므로 조건부 제외 대상이 없다."
+  },
+  "expectedWrites": {
+    "product_landings_insert": 73645,
+    "product_masters_update": 0,
+    "shared_product_descriptions_update": 0,
+    "store_qr_codes_insert": 0,
+    "mapping_rows": 0,
+    "qr_image_rows": 0,
+    "schemaChange": "없음",
+    "migrationNeeded": false,
+    "note": "실행 시점 수치는 감사 이후 신규 master 만큼 증가할 수 있다. 대상은 고정 목록이 아니라 NOT EXISTS 술어로 산정한다."
+  },
+  "reuse": {
+    "script": "apps/api-server/src/scripts/productmaster-landing-bulk-apply.ts",
+    "unchangedNeeded": true,
+    "properties": [
+      "dry-run 기본 · --apply --batch-id 이중 게이트",
+      "대상 = NOT EXISTS(active landing) → 재실행 안전(멱등)",
+      "public_key 충돌 시 ON CONFLICT DO NOTHING 후 다음 루프 재시도",
+      "metadata.batchId 기록 → batchId 기준 soft-delete rollback",
+      "batch INSERT(--batch-size, 기본 1000) → 중단/재개 가능"
+    ],
+    "precedent": "동일 스크립트로 2026-07-09 에 197,387건(+canary 1,000) 발급, 사후 무결성 중복 0 / 커버리지 100% 확인."
+  },
+  "idempotencyAndSafety": {
+    "duplicateRisk": "구조적으로 차단 — uniq_product_landings_master(partial) + uniq_product_landings_public_key",
+    "urlCollisionRisk": "public_key 32^12 공간 + unique index + 재시도. 기존 198,394건과 중복 0.",
+    "descriptionChangeImpact": "없음 — QR 은 master 기준 고정. 설명서 수정·언어 추가·재작성이 QR 을 재발급시키지 않는다.",
+    "reissuePolicy": "재발급 없음(F12 #3). 삭제는 soft delete(tombstone), key 재사용 금지.",
+    "existingQrImpact": "기존 198,394건 무영향 — INSERT 대상에서 NOT EXISTS 로 제외됨."
+  },
+  "recommendedSequence": [
+    "1) dry-run: productmaster-landing-bulk-apply.ts (write 0) 로 대상 수 재확인",
+    "2) canary --apply --limit 1000 → 무결성(중복 0 / 커버리지 증가분 일치) 확인",
+    "3) 전량 --apply --batch-id landing-seed-YYYYMMDD --batch-size 1000",
+    "4) 사후 검증: landing 수 = master 수, master당 중복 0, public_key 중복 0, 표본 /p/{key} 200",
+    "5) rollback 계약: UPDATE product_landings SET deleted_at=now() WHERE metadata->>'batchId'=<batchId> AND deleted_at IS NULL"
+  ],
+  "followUpRequired": {
+    "phase4OnCreate": {
+      "necessity": "필수",
+      "reason": "백필만 하면 같은 결함이 다음 대량 등록(예: 다음 공공데이터 seed)에서 재발한다. bulk apply 이후 73,645건이 쌓인 것이 그 실증이다.",
+      "proposedScope": "ProductMaster 생성 경로(런타임 승인 + 대량 seed 스크립트 공통)에서 mintForMaster 호출, 또는 주기적 reconcile 잡. 별도 WO 필요."
+    },
+    "pharmacyHubDetailQrDisplay": {
+      "necessity": "권장",
+      "reason": "백필 후에는 landing:null 사례가 사라지므로 우선순위는 내려가지만, 신규 master 창구가 열려 있는 한 조회 화면이 QR 을 못 보이는 구간은 남는다.",
+      "proposedScope": "GET /store-owner/manuals/:listingId 의 read-only 원칙을 유지할지, 발급 유도 UI 를 둘지 결정 — 별도 WO."
+    }
+  },
+  "outOfScope": [
+    "설명서 본문 생성·보강 (별도 설명 트랙)",
+    "store_qr_codes(계층 2 매장 QR) 변경",
+    "F12 baseline 개정 (현행 V2/V3-AMENDMENT 로 충분)",
+    "regulatory_type 표기 혼재('건강기능식품'/'일반' 한글 vs 영문 enum) 정리"
+  ]
+}

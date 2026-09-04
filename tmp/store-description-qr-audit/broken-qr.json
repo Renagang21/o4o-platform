@@ -1,0 +1,49 @@
+{
+  "source": "프로덕션 read-only SELECT + 프로덕션 HTTP 실검증. 측정일 2026-09-04.",
+  "summary": "이상(중복·깨진 타깃·불일치) 0건. 유일한 결함 축은 QR_MISSING 이다.",
+  "checks": [
+    {
+      "issueType": "QR_DUPLICATE",
+      "count": 0,
+      "evidence": "SELECT product_master_id FROM product_landings WHERE deleted_at IS NULL GROUP BY 1 HAVING count(*)>1 → 0행 / public_key 동일 쿼리 → 0행. DB 레벨 partial unique + unique index 로 구조적 보장."
+    },
+    {
+      "issueType": "QR_BROKEN_TARGET",
+      "count": 0,
+      "evidence": "존재하지 않는 master 를 가리키는 landing 0건. soft-deleted landing 0건. product_masters 는 전량 status=ACTIVE (비활성 master 를 가리키는 landing 없음)."
+    },
+    {
+      "issueType": "QR_TARGET_MISMATCH",
+      "count": 0,
+      "evidence": "landing 198,394행 전부 status='active' AND exposure_state='ok'. 노출 게이트로 차단되는 QR 없음."
+    },
+    {
+      "issueType": "QR_WITHOUT_DESCRIPTION",
+      "count": 175967,
+      "verdict": "결함 아님 (계약상 정상)",
+      "evidence": "F12 V2-AMENDMENT 파생규칙 — 설명 없으면 '상세 설명을 준비 중입니다.' placeholder. 프로덕션 smoke 로 재확인됨."
+    },
+    {
+      "issueType": "ORPHAN_STORE_DESCRIPTION",
+      "count": 0,
+      "evidence": "존재하지 않는 master 를 참조하는 canonical STORE 설명서 0건."
+    }
+  ],
+  "liveConsumerVerification": {
+    "checkedAt": "2026-09-04",
+    "sampleKey": "dkwxdbv7besn (DRUG · 마이어스콕정 · canonical STORE 보유)",
+    "results": [
+      { "case": "비로그인 GET /api/v1/public/product-landings/dkwxdbv7besn", "http": 200, "authRequired": true, "bodyIncluded": false, "verdict": "V3-AMENDMENT/ADR-0002 계약대로 동작" },
+      { "case": "로그인 GET (동일 key)", "http": 200, "authRequired": false, "hasCanonical": true, "descriptionType": "STORE", "contentLength": 839, "languages": ["ko","en","zh"], "resolvedLocale": "ko", "verdict": "정상" },
+      { "case": "GET https://neture.co.kr/p/dkwxdbv7besn (프론트)", "http": 200, "verdict": "라우트 활성 (services/web-neture/src/App.tsx:727)" },
+      { "case": "존재하지 않는 key", "http": 404, "verdict": "대상없음과 인증필요가 구분됨" }
+    ],
+    "note": "본 검증은 SELECT + GET 만 수행했다. QR_MISSING 표본에 대한 실제 발급(POST/mint)은 DB write 이므로 수행하지 않았다."
+  },
+  "missingSideDryRunEvidence": {
+    "question": "누락 master 가 기존 경로를 타면 정상 QR 이 만들어지는가?",
+    "answer": "예 — 이미 실증되어 있다. 코드 경로가 아니라 프로덕션 데이터가 증거다.",
+    "evidence": "landing 198,394건 중 5건의 metadata.source='admin-qr-view' 는 bulk apply(2026-07-09) 이후 생성된 master(건강기능식품 2 · 일반 3)에 대해 관리자 QR 조회 시 mintForMaster 가 멱등 발급한 결과다. 즉 누락군과 동일한 모집단에서 기존 발급 경로가 정상 동작한 실적이 있다.",
+    "note": "이 5건은 본 감사가 만든 것이 아니라 2026-07-10 에 이미 존재하던 행이다. 본 감사의 DB write = 0."
+  }
+}
