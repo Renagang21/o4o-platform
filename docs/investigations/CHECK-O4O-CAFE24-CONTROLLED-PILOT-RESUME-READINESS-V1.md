@@ -2,7 +2,7 @@
 
 > **WO**: WO-O4O-CAFE24-CONTROLLED-PILOT-RESUME-READINESS-V1
 > **선행**: [CHECK-O4O-CAFE24-OAUTH-PRODUCT-CENSUS-RESUME-V1](./CHECK-O4O-CAFE24-OAUTH-PRODUCT-CENSUS-RESUME-V1.md) · [CHECK-O4O-CAFE24-APP-ENTRY-ROUTE-V1](./CHECK-O4O-CAFE24-APP-ENTRY-ROUTE-V1.md) · [WO-O4O-CAFE24-PRODUCT-MATCHING-CONTROLLED-PILOT-V1](../work-orders/WO-O4O-CAFE24-PRODUCT-MATCHING-CONTROLLED-PILOT-V1.md)
-> **판정**: **PASS — 재승인 완료 · products/variants 실조회 성립 · Pilot 등록 대기**
+> **판정**: **PASS(연결·계약) / HOLD(1차 등록) — products·variants 실조회 성립, 그러나 표본 30건은 아직 몰에 없다 (§9)**
 > **일자**: 2026-09-04 (재승인 후 Phase C 재개분 포함)
 
 ## 0. 요약
@@ -16,6 +16,7 @@
 | Phase E Cafe24 등록용 데이터 준비 | 완료 — `C:/tmp/cafe24-pilot/` (repo 밖) |
 | Phase F 실제 양식 기반 업로드 CSV | **완료** — 90열 원본 양식 그대로 30행 · validation 통과. §5-3 |
 | 2차(품목 식별자) 입력 경로 조사 | 완료 (read-only) — 관리자 재고 엑셀이 canonical. §5-4 |
+| Phase G 1차 업로드 결과 실측 | **표본 30건 미생성** — 몰의 40건은 우리 표본이 아니다. §9 |
 | 후속 WO 자동 실행 | 없음 — 사용자 지시 대기 (WO §13) |
 
 **DB write 0.** Phase B 의 refresh 시도는 실패해 갱신이 없었고, 재승인 write 는 사용자가 O4O 화면에서 수행한 정상 운영 write 다.
@@ -338,3 +339,54 @@ refresh token 자동 갱신 잡 · 실도매몰 census.
   - 발견 2: 같은 문서 §4 의 응답 key "84개"는 당시 산출물 실측(86개)과 다르다(§3-4).
   - 둘 다 `docs/investigations/` 기록물이라 원문은 수정하지 않고 여기에만 남긴다 (CLAUDE.md §16-1 · §16-2).
   - 제안: `cafe24_connections.status` 지연 갱신(§1-1) — 만료를 주기적으로 반영하거나 운영 화면이 `refresh_token_expires_at` 을 표시하도록. 별도 WO.
+
+---
+
+## 9. Phase G — 1차 업로드 후 실측 (2026-09-04) · **표본 30건 미생성**
+
+사용자가 "1차 Pilot CSV 업로드 완료" 를 알려와 `sohae2100` 몰을 read-only 로 전수 재조회했다
+(`products/count` → `products` 전 페이지 → 상품별 `products/{no}/variants`, `mall.read_product` 단일 scope).
+산출물: `C:/tmp/cafe24-pilot/phase-g-report.json` · `phase-g-summary.txt`.
+
+### 9-1. 실측 결과 — 몰에 있는 40건은 우리 표본이 아니다
+
+| 항목 | 값 |
+|---|---|
+| 총 상품 수 | **40** (Phase C 시점 2건 → 40건) |
+| `product_no` 범위 | 11 ~ 50 (Phase C 의 기존 2건 `P000000I`/`P000000J` = no 9·10 은 **현재 목록에 없다**) |
+| 생성 시각 | **40건 전부 2026-09-04 11:15** (수 초 내 일괄 생성) |
+| 표본 30건과 상품명 일치 | **0건** (앞 6자 부분일치까지 봐도 0) |
+| 표본 자체상품코드(13건) 일치 | **0건** |
+| `custom_product_code` | 40건 전부 **빈 문자열** |
+| `model_name` / `internal_product_name` | 40건 전부 **비어 있음** |
+| `manufacturer_code` / `brand_code` | 40건 전부 기본값 `M0000000` / `B0000000` |
+| 옵션 | 40건 전부 옵션 없음 · 품목 1건씩 |
+
+몰에 실재하는 40건은 `햇살 가득 고함량 비타민D3 5000IU` · `온가족 생유산균 100억 …` 같은
+**일반 건강기능식품 상품명**이고, 우리 30건 표본(A~G군)의 어떤 값과도 겹치지 않는다.
+
+**판정: `cafe24-pilot-upload-v2.csv` 는 이 몰에 반영되지 않았다.** 다른 데이터가 업로드됐거나
+업로드가 반려됐을 가능성이 크다. 이 상태에서 §3 왕복 검증(자체상품코드 · model_name ·
+internal_product_name · 옵션→품목 수)은 **측정 자체가 성립하지 않는다.** 성립하지 않는 것을 측정했다고 적지 않는다.
+
+### 9-2. 이번 조회로 확정된 사실 (표본과 무관하게 유효)
+
+- `mall.read_product` 단일 scope 로 **40건 전부 variants HTTP 200** — §3-1 재확인(모집단 40으로 확대)
+- 옵션 없는 상품은 **정확히 품목 1건**(`{product_code}000A`) — §3-3 재확인(40/40)
+- 40건 전부 `custom_variant_code = ""` · `gtin = null` — **품목 식별자는 상품 등록만으로는 채워지지 않는다.**
+  §5-3 충돌 2(양식에 품목 열 없음)와 일치한다
+- 제조사·브랜드를 비운 채 등록하면 **기본 코드 `M0000000`/`B0000000` 가 자동으로 들어간다** — §5-3 충돌 1의 전제 확인
+
+### 9-3. 다음 행동 — 사용자 확인 대기 (중지)
+
+Controlled Pilot 본 매칭 판정은 **시작하지 않았다.** 품목 엑셀 다운로드 요청도 아직 보내지 않는다 —
+받아도 우리 표본 품목이 없어 채울 대상이 없기 때문이다. 확인이 필요한 것은 하나다:
+
+**어떤 파일이 업로드됐는가, 그리고 업로드 결과 화면에 성공/실패가 어떻게 나왔는가.**
+
+- 업로드가 반려됐다면 반려 메시지의 필드명만 알려주시면 그 열만 채워 v3 를 **1회** 재생성한다
+- 다른 파일이 올라간 것이라면 `cafe24-pilot-upload-v2.csv` 로 다시 업로드하면 된다
+- 11:15 에 생성된 40건은 **우리 실험 모집단이 아니다.** 남겨둘지 정리할지는 사용자 판단이며,
+  이 WO 는 Cafe24 write 를 하지 않으므로 삭제·수정하지 않는다
+
+표본 30건이 실제로 생성된 뒤에야 §5-4 의 2차(자체품목코드) → 3차(매칭 Census) 로 간다.
