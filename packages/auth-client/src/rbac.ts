@@ -258,13 +258,6 @@ export function checkRole(
 }
 
 /**
- * Create a permission guard function for route protection
- */
-export function createPermissionGuard(permission: string) {
-  return (user: MeResponse | null): boolean => hasPermission(user, permission);
-}
-
-/**
  * Create a role guard function for route protection
  */
 export function createRoleGuard(roles: string | string[]) {

@@ -67,7 +67,6 @@ export declare function checkRole(user: MeResponse | null, roles: string | strin
 /**
  * Create a permission guard function for route protection
  */
-export declare function createPermissionGuard(permission: string): (user: MeResponse | null) => boolean;
 /**
  * Create a role guard function for route protection
  */

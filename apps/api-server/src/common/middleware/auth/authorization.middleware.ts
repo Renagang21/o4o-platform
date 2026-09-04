@@ -192,6 +192,8 @@ export const requireRole = (roles: string | string[]) => {
 //   후속 정리 결과 (WO-O4O-FROZEN-AUTH-PERMISSIONS-DB-AND-KPA-SUPPLIER-ENDPOINT-FINAL-CLOSURE-V1):
 //   - JWT `permissions` claim · account-linking 병합 · `getAllPermissions` 스냅샷 read 는 제거됨.
 //   - `@o4o/organization-core` 의 `PermissionGuard` 는 소비처 0 으로 제거됨(A축 REMOVE_SAFE).
-//   - `users.permissions` 컬럼은 판정 `DROP_APPROVED_READY` (프로덕션 57행 전부 `[]` ·
-//     index/constraint/view/trigger/function 의존 0). 실제 DROP 은 별도 WO 이다.
+//   - `users.permissions` 컬럼은 WO-O4O-LEGACY-PRODUCTION-SCHEMA-AND-LOCAL-HOUSEKEEPING-
+//     FINAL-CLOSURE-V1 에서 프로덕션 DROP 됐다
+//     (`20270320000000-DropUsersPermissionsColumn`). 컬럼 재도입 금지 —
+//     권한 SSOT 는 `role_assignments` 다 (CLAUDE.md F9).
 // ============================================================================

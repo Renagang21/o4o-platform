@@ -50,8 +50,6 @@ async function checkAdminPermissions() {
       logger.info(`\n⚠️  No active role_assignments found`);
     }
 
-    logger.info(`\n📋 Direct user permissions: ${JSON.stringify(adminUser.permissions || [])}`);
-
     // Check if user has getAllPermissions method
     const allPermissions = adminUser.getAllPermissions();
     logger.info(`\n✅ Effective permissions (${allPermissions.length}):`);

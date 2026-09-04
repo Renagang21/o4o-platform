@@ -22,7 +22,7 @@
  * 운영 DB·네트워크를 사용하지 않는다. 소스 파일만 읽는다.
  */
 import { describe, it, expect } from 'vitest';
-import { readdirSync, readFileSync, statSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import { join } from 'path';
 
 const SRC = join(__dirname, '..');
@@ -76,18 +76,11 @@ describe('접두 중복(/api/v1/api/...) 무증식', () => {
    * /api/v1/partnerops 등 404). 따라서 이 WO 에서는 고치지 않고 목록으로 고정한다.
    * 새 파일이 추가되면 실패한다.
    */
-  const KNOWN = [
-    'components/ai/FloatingAiButton.tsx',
-    'components/organization/OrganizationSelector.tsx',
-    'components/organization/PermissionGuard.tsx',
-    'components/product/ProductSelector.tsx',
-    'features/cpt-acf/components/FormRenderer.tsx',
-    'hooks/useNotifications.ts',
-    'pages/dashboard/unified/cards/OverviewCard.tsx',
-    'pages/digital-signage/v2/ChannelEditor.tsx',
-    'pages/digital-signage/v2/ChannelList.tsx',
-    'services/api/zoneApi.ts',
-  ];
+  // WO-O4O-LEGACY-PRODUCTION-SCHEMA-AND-LOCAL-HOUSEKEEPING-FINAL-CLOSURE-V1 (§19)
+  //   목록 10건 중 9건은 후속 WO 들에서 파일 자체가 삭제돼 stale 이었다.
+  //   존재하지 않는 파일이 allowlist 에 남아 있으면 같은 경로가 되살아나도
+  //   가드가 통과한다. 실재하는 항목만 남기고, 아래 stale 방지 케이스를 함께 둔다.
+  const KNOWN = ['pages/dashboard/unified/cards/OverviewCard.tsx'];
 
   const offenders = (): string[] => {
     const out: string[] = [];
@@ -106,6 +99,10 @@ describe('접두 중복(/api/v1/api/...) 무증식', () => {
 
   it('알려진 목록 밖에서 새 접두 중복이 생기지 않는다', () => {
     expect(offenders().filter((f) => !KNOWN.includes(f))).toEqual([]);
+  });
+
+  it('알려진 목록에 사라진 파일이 남아 있지 않다 (stale allowlist 금지)', () => {
+    expect(KNOWN.filter((rel) => !existsSync(join(SRC, rel)))).toEqual([]);
   });
 });
 

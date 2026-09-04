@@ -515,8 +515,7 @@ export class AdminUserController {
           lastName,
           name,
           status,
-          isActive,
-          permissions: []
+          isActive
         });
         const saved = await txUserRepo.save(created);
 
