@@ -98,6 +98,39 @@ describe('A. runtime 진입점 은퇴 — 되살아나지 않는다', () => {
     expect(app).not.toContain('ChannelPlayerPage');
   });
 
+  // WO-O4O-POST-RETIREMENT-MAIN-BASELINE-HOUSEKEEPING-V1:
+  //   은퇴 후에도 admin ops-metrics 가 Channel/ChannelHeartbeat repository 로
+  //   테이블을 직접 읽고 있었다(route 은퇴 검색으로는 안 잡히는 entity 직접 소비).
+  //   "테이블이 보존됐다"는 사실이 runtime 접근 허가가 아니다.
+  it('admin ops-metrics 가 Channel entity 를 runtime 으로 읽지 않는다', () => {
+    const src = read('apps/api-server/src/routes/admin/ops-metrics.routes.ts');
+    expect(src).not.toMatch(/getRepository\(\s*Channel\s*\)/);
+    expect(src).not.toMatch(/getRepository\(\s*ChannelHeartbeat\s*\)/);
+    expect(src).not.toMatch(/getRepository\(\s*ChannelPlaybackLog\s*\)/);
+    // import 자체도 남기지 않는다(주석 설명은 허용).
+    expect(src).not.toMatch(/^import\s*\{[^}]*Channel[^}]*\}\s*from/m);
+  });
+
+  it('어떤 runtime 소스도 Channel entity repository 를 획득하지 않는다', () => {
+    const ROOTS = ['apps/api-server/src/routes', 'apps/api-server/src/services', 'apps/api-server/src/controllers'];
+    const offenders: string[] = [];
+    const walk = (abs: string, rel: string) => {
+      for (const e of fs.readdirSync(abs, { withFileTypes: true })) {
+        const a = path.join(abs, e.name);
+        const r = rel + '/' + e.name;
+        if (e.isDirectory()) { walk(a, r); continue; }
+        if (!e.name.endsWith('.ts')) continue;
+        const body = fs.readFileSync(a, 'utf-8');
+        if (/getRepository\(\s*(Channel|ChannelHeartbeat|ChannelPlaybackLog)\s*\)/.test(body)) offenders.push(r);
+      }
+    };
+    for (const root of ROOTS) {
+      const abs = path.join(REPO_ROOT, root);
+      if (fs.existsSync(abs)) walk(abs, root);
+    }
+    expect(offenders).toEqual([]);
+  });
+
   it('남은 소비처가 /api/v1/channels 를 더 이상 호출하지 않는다', () => {
     const CALLERS = [
       'apps/admin-dashboard/src/routes/content.routes.tsx',

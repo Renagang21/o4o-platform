@@ -12,11 +12,9 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { Channel, ChannelHeartbeat, CmsContent, CmsContentSlot } from '@o4o-apps/cms-core';
+import { CmsContent, CmsContentSlot } from '@o4o-apps/cms-core';
 import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js';
 
-// Default heartbeat threshold in seconds (2 minutes)
-const DEFAULT_HEARTBEAT_THRESHOLD_SEC = 120;
 
 // Critical slot keys that should have content
 const CRITICAL_SLOT_KEYS = ['home-hero', 'intranet-hero', 'dashboard-banner', 'store-tv-loop'];
@@ -46,59 +44,36 @@ export function createAdminOpsMetricsRoutes(dataSource: DataSource): Router {
    */
   router.get('/metrics', requireAdmin, async (req: Request, res: Response): Promise<void> => {
     try {
-      const { thresholdSec = String(DEFAULT_HEARTBEAT_THRESHOLD_SEC) } = req.query;
-      const thresholdMs = parseInt(thresholdSec as string, 10) * 1000;
+      // thresholdSec 은 응답에 그대로 되돌려준다(요청 파라미터 echo). 기존 계약 유지.
+      const { thresholdSec = '120' } = req.query as { thresholdSec?: string };
 
-      const channelRepo = dataSource.getRepository(Channel);
-      const heartbeatRepo = dataSource.getRepository(ChannelHeartbeat);
       const contentRepo = dataSource.getRepository(CmsContent);
       const slotRepo = dataSource.getRepository(CmsContentSlot);
 
       // ================================================================
-      // 1. CHANNEL METRICS
+      // 1. [RETIRED] CHANNEL METRICS — 제거됨
       // ================================================================
-      const channels = await channelRepo.find();
+      // WO-O4O-POST-RETIREMENT-MAIN-BASELINE-HOUSEKEEPING-V1
+      //   CMS Channel 축(channels / channel_heartbeats)은 은퇴했다
+      //   (WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1).
+      //   table 은 보존 중이지만 runtime 접근은 하지 않는다 —
+      //   "테이블이 남아 있다는 이유로 runtime 접근을 허용하지 않는다."
+      //   여기서 읽던 channels/heartbeat 는 프로덕션 0행이라 항상 0 을 보고하고 있었다.
+      //   canonical 재생 경로: docs/baseline/O4O-SIGNAGE-CANONICAL-PLAYBACK-PATH-V1.md
 
-      // Get latest heartbeat for each channel
+      //   응답 shape 은 그대로 둔다(소비 UI 계약 유지). 값은 은퇴 이전에도 프로덕션에서
+      //   항상 0 이었으므로 이 변경으로 응답이 달라지지 않는다.
       const channelStatusCounts = {
-        total: channels.length,
+        total: 0,
         online: 0,
         offline: 0,
         maintenance: 0,
         unknown: 0,
-      };
+      } as const;
 
-      // Count by service
+      // [RETIRED SOURCE] services 목록은 channels[].serviceKey 에서 파생됐다.
+      //   그 축이 은퇴해 유효한 출처가 없다. 새 출처를 임의로 만들지 않는다(별도 판단 필요).
       const serviceKeys = new Set<string>();
-
-      for (const channel of channels) {
-        if (channel.serviceKey) {
-          serviceKeys.add(channel.serviceKey);
-        }
-
-        // Check maintenance status first
-        if (channel.status === 'maintenance') {
-          channelStatusCounts.maintenance++;
-          continue;
-        }
-
-        // Get latest heartbeat
-        const latestHeartbeat = await heartbeatRepo.findOne({
-          where: { channelId: channel.id },
-          order: { receivedAt: 'DESC' },
-        });
-
-        if (!latestHeartbeat) {
-          channelStatusCounts.unknown++;
-        } else {
-          const timeSinceHeartbeat = Date.now() - latestHeartbeat.receivedAt.getTime();
-          if (timeSinceHeartbeat <= thresholdMs) {
-            channelStatusCounts.online++;
-          } else {
-            channelStatusCounts.offline++;
-          }
-        }
-      }
 
       // ================================================================
       // 2. CMS METRICS
@@ -149,39 +124,13 @@ export function createAdminOpsMetricsRoutes(dataSource: DataSource): Router {
       // 3. OPERATIONS STATUS INDICATORS
       // ================================================================
 
-      // Channels that are automated (online + has heartbeat + has content in slot)
-      let automatedCount = 0;
-      let manualAttentionCount = 0;
-      let contractControlledCount = 0;
-
-      for (const channel of channels) {
-        // Get latest heartbeat
-        const latestHeartbeat = await heartbeatRepo.findOne({
-          where: { channelId: channel.id },
-          order: { receivedAt: 'DESC' },
-        });
-
-        const isOnline = latestHeartbeat &&
-          (Date.now() - latestHeartbeat.receivedAt.getTime() <= thresholdMs);
-
-        // Check if slot has content
-        const slotContent = await slotRepo.findOne({
-          where: { slotKey: channel.slotKey, isActive: true },
-          relations: ['content'],
-        });
-        const hasContent = slotContent?.content?.status === 'published';
-
-        // Check if slot is locked (contract controlled)
-        const isLocked = slotContent?.isLocked;
-
-        if (isLocked) {
-          contractControlledCount++;
-        } else if (isOnline && hasContent) {
-          automatedCount++;
-        } else {
-          manualAttentionCount++;
-        }
-      }
+      // [RETIRED SOURCE] automated / manualAttention / contractControlled 는
+      //   channels 를 순회하며 heartbeat + slot 콘텐츠로 판정하던 값이다.
+      //   Channel 축 은퇴로 출처가 사라졌다. 은퇴 이전에도 channels 0행이라 셋 다 항상 0 이었다.
+      //   대체 출처는 임의로 정하지 않는다(별도 판단 필요).
+      const automatedCount = 0;
+      const manualAttentionCount = 0;
+      const contractControlledCount = 0;
 
       // ================================================================
       // 4. BUILD RESPONSE
