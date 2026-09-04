@@ -3,7 +3,7 @@
 **대상 WO**: WO-O4O-CMS-READ-VISIBILITY-AND-SERVICE-SCOPE-CONTRACT-CLOSURE-V1
 **기준 commit**: `d9ecc678a` (origin/main)
 **작성일**: 2026-08-21
-**결과**: **§9 `platform + serviceKey` 의미 확정** + **§11-1 read 경계 구현 완료** (2026-08-24 재개) + **배포 후 독립 재검증 완료 · 결함 0건** (2026-08-26, §10-3)
+**결과**: **§9 `platform + serviceKey` 의미 확정** + **§11-1 read 경계 구현 완료** (2026-08-24 재개) + **배포 후 독립 재검증 완료 · 결함 0건** (2026-08-26, §10-3) + **최종 종결 검증 완료 · 결함 0건 · BLOCKED 해소** (2026-09-04, §10-4)
 **구현 재개 commit 기준**: `21ed6d88d` (origin/main)
 **구현/배포 commit**: `1a5babf96` (경계 강제) · `6cf2d935c` (alias SSOT 수렴) — Cloud Run revision `o4o-core-api-03452-hdz`
 
@@ -428,6 +428,117 @@ HEAD == origin/main == bc13a977e   ·   branch=main   ·   worktree clean
 
 ---
 
+## 10-4. 최종 종결 검증 (2026-09-04, WO-…-PRODUCTION-CLOSURE-V1)
+
+§10-3 의 기준선은 `bc13a977e` 였다. 그 뒤 main 에 **126 커밋**이 쌓였고 그중 CMS 축을 실제로 건드린
+변경이 있어, **현재 `origin/main` 기준으로 전 구간을 다시 실측**했다.
+코드 변경 **0** · production DB write **0** · schema/migration **0** · 배포 **0**(재배포 불필요).
+
+### 기준선
+
+```text
+HEAD == origin/main == 466c8ec3c   ·   branch=main   ·   이번 WO 범위 미커밋 0
+1a5babf96 (경계 강제)   → HEAD 의 ancestor ✅
+6cf2d935c (alias SSOT)  → HEAD 의 ancestor ✅
+배포 상태: Cloud Run revision o4o-core-api-03530-m84 (2026-09-04 12:48 UTC, traffic 100%)
+          ← workflow `Deploy API Server (Cloud Run)` @ 466c8ec3c = success
+```
+
+### §10-3 이후 CMS 축 변경 3건 — 전부 계약 무영향으로 확인
+
+| 변경 | commit | 판정 |
+|---|---|---|
+| `services/web-glycopharm/src/api/cms.ts` **삭제** (167줄) | `3496d26bf` | §11-2 부채 3(“소비처 0 인 dead code”)이 **은퇴로 해소**. GP 홈은 CMS 호출 0 건(브라우저 실측) — 자기 서비스 콘텐츠 유실 없음 |
+| `apps/api-server/src/routes/cms-content/index.ts` (barrel) **삭제** | 은퇴 4축 마감분 | **무영향**. `bootstrap/register-routes.ts:111` 이 `cms-content.routes.js` 를 **직접 import** 하므로 라우트 등록 경로가 barrel 을 경유하지 않는다 |
+| `constants/service-keys.ts` 에 `cafe24-b2b` 추가 | `6d53fd1f2` | alias resolver 가 **self-map** 1키로 파생 → CMS read 에서 타 서비스와 섞이지 않는다. 실측 `?serviceKey=cafe24-b2b` **200 / 0건** |
+
+read 계약 구현부(`cms-content-utils.ts` · `cms-content-query.handler.ts` · `cms-content-slot.handler.ts`)는
+§10-3 이후 **변경 0** 이다. 계약 자체는 `1a5babf96` · `6cf2d935c` 상태 그대로다.
+
+### 회귀 (이 PC 실행, 완화·skip 0)
+
+| 항목 | 결과 |
+|---|---|
+| CMS 상세 spec 5종 (`detail` · `slot` · `mutation` · `member-authoring` · `alias-ssot`) | **5 suites / 117 tests PASS** |
+| api-server **전체 Jest** (`--runInBand --ci`, heap 3072) | **228 suites / 3824 tests 전부 PASS · 실패 0 · skip 0 · exit 0** (293.7s) |
+| §10-3 의 로컬 실패 1건 (`ecommerce-core-and-commerce-residue-retirement.spec.ts`) | **해소** — 로컬 미추적 빌드 잔재가 정리돼 이번엔 전 suite green. 선행 실패 귀속 항목 **0건** |
+
+### production read-only matrix (`https://api.neture.co.kr/api/v1/cms`, write 0)
+
+**39 케이스 → 0 FAIL / 0 SKIP.** 본문 미기록, id·serviceKey·status 만 확인.
+
+| 그룹 | 케이스 | 결과 |
+|---|---|---|
+| A 정상 serviceKey | 목록 5종(`kpa-society`·`glycopharm`·`neture`·`k-cosmetics`·`pharmacy-hub`) + 상세 3종 | **8/8 200** |
+| B serviceKey 누락 (익명) | `/contents` · `/contents/:id` · `/stats` · `/slots/home-hero` | **4/4 400 `SERVICE_KEY_REQUIRED`** |
+| C 잘못된 serviceKey | 목록 200/0건 · 상세 404 · 신규 키 `cafe24-b2b` 200/0건 · 비-UUID 상세 404 | **5/5** (500·PG 텍스트 노출 0) |
+| D KPA alias | 목록 동수 `kpa`=54 / `kpa-society`=54 · 양방향 상세 200 · `/stats` scope `["kpa-society","kpa"]` · `/slots` meta 동일 | **5/5** |
+| E platform:super_admin + 생략 | 목록 · stats · 상세 | **3/3 200** (역할 근거) |
+| F **일반 관리자**(인증 · 비-super_admin) + 생략 | 아래 “BLOCKED 해소” 참조 | **PASS** |
+| G 타 서비스 교차 조회 | 6조합 익명 + admin(PH context + KPA uuid) | **7/7 404** |
+| H visibility | draft 익명 404 / draft admin 200 / archived 익명 404 / published 목록 200 / 익명 목록 비-published 0건 / admin `status=draft` 목록 63건 전부 draft | **6/6** |
+
+### BLOCKED 해소 — §10-3 의 미실측 1건을 이번에 실측
+
+§10-3 은 “인증된 비-platform-admin + `serviceKey` 생략 → 400” 을 **계정 근거 부재로 BLOCKED** 처리했다.
+이번에 `docs/local/TEST-ACCOUNTS.local.md` §1 의 **verified L1 자격 2건**으로 실측했다 (read-only, write 0).
+
+| 계정 성격 (역할 요약) | `/cms/contents` 생략 | `/cms/stats` 생략 | `?serviceKey=kpa-society` |
+|---|---|---|---|
+| **5개 서비스 admin/operator** 보유 · `platform:super_admin` **없음** (`kpa:admin` · `glycopharm:admin` · `cosmetics:admin` · `neture:admin` · `pharmacy-hub:admin` 등 12개 역할) | **400 `SERVICE_KEY_REQUIRED`** | **400** | **200** |
+| 서비스 회원 · store_owner 계열 (`user` · `kpa:store_owner` · `supplier` 등 10개 역할) | **400 `SERVICE_KEY_REQUIRED`** | **400** | **200** |
+
+→ **“serviceKey 생략 = 관리자 모드” 가 아니라는 계약이 프로덕션에서 확정적으로 실증됐다.**
+서비스 단위 admin 을 5개나 들고 있어도 cross-service 는 열리지 않으며, 분기 근거는 `platform:super_admin` **하나뿐**이다.
+§10-3 의 BLOCKED 행은 **해소**되었다.
+
+### 실브라우저 smoke (Playwright chromium, 프로덕션)
+
+| 화면 | 결과 |
+|---|---|
+| admin-dashboard 로그인 | **PASS** — `POST /auth/login` 200 → `/home` |
+| admin `/admin/cms/contents` 목록 진입 | **PASS** — `GET /api/v1/cms/contents` (serviceKey 생략) 200 · **“129 contents”** cross-service 렌더 (glycopharm · kpa-society 행 확인) |
+| 새로고침 | **PASS** — 동일 경로 유지 · CMS 200 |
+| deep link 재진입 (`/admin/users` 경유 후 재진입) | **PASS** — 동일 경로 · CMS 200 |
+| admin `/admin/cms/slots` | **PASS** — `GET /api/v1/cms/slots` 200 |
+| **400/403 처리** — 익명으로 admin CMS 화면 직접 접근 | **PASS** — `/login` 으로 정상 바운스 (백화면·무한로딩 아님, JS 예외 0) |
+| K-Cosmetics `/` (Desktop 1440 · Mobile 390) | **PASS** — `GET /cms/contents?serviceKey=cosmetics&type=notice&status=published` **200** (legacy alias 가 공개 경로에서 정상 동작) |
+| PharmacyHub `/` · `/resources` (Desktop · Mobile) | **PASS** — 정상 렌더. `/resources` 는 **현재 로그인 게이트**라 익명 CMS 호출 0 (아래 관찰 1) |
+| KPA-Society `/` · GlycoPharm `/` · Neture `/` | **PASS** — 정상 렌더 · console error 0 · pageerror 0 · 4xx/5xx 0 (CMS 호출 0) |
+
+**백화면 0 · 무한 로딩 0 · JS 예외 0 · console error 0 · 신규 4xx/5xx 0 · cross-service 노출 0.**
+
+### 관찰 (계약 판정에 영향 없음 · 이번 WO 에서 손대지 않음)
+
+1. **PH `/resources` 가 로그인 게이트로 바뀌었다.** §10-2·§10-3 은 익명에서 자료실이 렌더되고
+   `GET /cms/contents?serviceKey=pharmacy-hub…` 200 이 나가는 상태를 기록했으나, 현재는 익명이면
+   “로그인이 필요합니다” 화면이라 CMS 호출 자체가 없다. PH 측 게이팅 변경이며 **CMS read 계약과 무관**하다
+   (API 축은 matrix A/G 에서 `serviceKey=pharmacy-hub` 200 · 교차 404 로 그대로 실증됨).
+2. **익명 목록의 `status` 파라미터는 무시된다.** `cms-content-query.handler.ts` 가 비인증에는
+   `where.status = 'published'` 를 **하드 고정**하고, 인증 사용자에게만 요청 `status` 를 적용한다.
+   `?status=draft` 를 줘도 익명은 published 만 받는다 — **deny-by-default 이고 유출이 아니다**.
+   (1차 측정에서 이를 결함으로 오판했다가 코드·실측으로 정정했다.)
+3. **CI Pipeline @ `466c8ec3c` = failure (CMS 무관 · 범위 밖).** `Code Quality Check` 의 ESLint
+   regression ratchet 이 **56 > baseline 55** 로 초과했고, 신규 오류는
+   `apps/api-server/src/modules/lms/services/CertificateService.ts:133` 의 `@ts-ignore` (LMS 축)다.
+   같은 커밋의 `Deploy API Server (Cloud Run)` 은 **success** 이며 현재 리비전이 그 산출물이다.
+   이 WO 의 “unrelated cleanup 금지” 에 따라 **수정하지 않았다** → 별도 WO 로 분리 권고.
+
+### production 데이터 drift (판정 영향 없음)
+
+`cms_contents` 총 **129건** (§10-3 과 동일). 분포:
+`glycopharm` 66 (published 2 / draft 63 / archived 1) · `kpa-society` 53 (published 53) ·
+`neture` 6 (published 3 / draft 2 / archived 1) · `pharmacy-hub` 3 (archived 3) · legacy `kpa` 1 (published 1).
+`serviceKey IS NULL` **0** — §3·§5 판정 근거 그대로다. PH 의 `published` 는 여전히 0 이므로 자료실 0건은 정상이다.
+
+### 결론
+
+**결함 0건.** 계약(§6) · 구현 · 프로덕션 동작이 현재 `origin/main` 기준으로도 일치한다.
+§10-3 이 남긴 **BLOCKED 1건까지 실측으로 해소**했으므로 이 WO 는 **종결**한다.
+코드 수정 0 · 재배포 0 · 문서만 갱신했다.
+
+---
+
 ## 11. 정책 미해결 / GAP (WO §27 대조)
 
 ```text
@@ -462,7 +573,7 @@ CMS read 는 공개 경로를 포함하므로 배포 후 KCos 홈 슬롯 · PH �
 |---|---|
 | 1 | `kpa-society` 콘텐츠 53건이 `authorizeCmsMutation` 의 alias 미정규화로 platform admin 외 수정 불가 |
 | 2 | `visibilityScope='platform'` + `organizationId` non-NULL 32건 — org 를 쓰지 않으면서 기록한 조합 (§3) |
-| 3 | GlycoPharm `api/cms.ts getContent` dead code — 이번에 `serviceKey` 기본값만 맞췄고 **소비처는 여전히 0** |
+| 3 | ~~GlycoPharm `api/cms.ts getContent` dead code — 소비처 0~~ → **해소** (2026-09-04 확인): `services/web-glycopharm/src/api/cms.ts` 가 `3496d26bf` 에서 은퇴 삭제됐다 (§10-4) |
 | 4 | `serviceKey='kpa'` 1건 — canonical `kpa-society` 로의 데이터 정합은 **migration 필요** → WO §25 에 따라 별도 보고 |
 
 ---
@@ -514,3 +625,6 @@ fresh worktree 를 요구했으나 **주 작업트리에서 수행**했다 — �
 §11-1 은 별도 WO 없이 **같은 WO 로 구현 완료**했다.
 
 **2026-08-24 최종(배포·실측분)**: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건.
+
+**2026-09-04 최종 종결(§10-4)**: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건
+(CI Pipeline ESLint ratchet 56>55 — LMS `CertificateService.ts` `@ts-ignore`, CMS 무관 · 범위 밖).
