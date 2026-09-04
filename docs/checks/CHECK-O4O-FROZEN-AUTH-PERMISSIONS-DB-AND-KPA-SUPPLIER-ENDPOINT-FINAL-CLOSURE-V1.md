@@ -222,7 +222,7 @@ security·retirement guard 성격의 기존 테스트는 **전부 유지**했다
 | `packages/organization-core` build (`tsc`) | **PASS** (exit 0) |
 | `packages/forum-core` build (`tsc`) — organization-core 실소비처 | **PASS** (exit 0) |
 | `apps/api-server` `pnpm type-check` | **PASS** |
-| `apps/api-server` Jest 전체 | **PASS** — 222 suites / 3739 tests |
+| `apps/api-server` Jest 전체 | **PASS** — 223 suites / 3760 tests (`origin/main` rebase 후 재실행 · exit 0) |
 | `node scripts/check-unsafe-routes.mjs` | **PASS** — 검사 1157개 · 위반 0 |
 | `node scripts/check-typeorm-entities.mjs` | **PASS** — DEFINED_BUT_UNREGISTERED 0 / 중복 0 / stale 0 |
 | `node scripts/lint-ratchet.mjs` | **PASS** |
