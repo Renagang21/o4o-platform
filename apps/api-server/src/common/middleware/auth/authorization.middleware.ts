@@ -189,7 +189,9 @@ export const requireRole = (roles: string | string[]) => {
 //     `hasAnyRole` 이며, 실제 라우트는 `requireAuth` + `require{Service}Scope`
 //     조합을 사용한다. 새 RBAC framework 를 만들지 않는다.
 //
-//   users.permissions 컬럼 · JWT `permissions` claim · account-linking 병합 ·
-//   @o4o/organization-core 의 PermissionGuard 는 이번 WO 범위 밖으로 남긴다
-//   (DB schema / 동결 Core §3 / 프론트 fallback 계약).
+//   후속 정리 결과 (WO-O4O-FROZEN-AUTH-PERMISSIONS-DB-AND-KPA-SUPPLIER-ENDPOINT-FINAL-CLOSURE-V1):
+//   - JWT `permissions` claim · account-linking 병합 · `getAllPermissions` 스냅샷 read 는 제거됨.
+//   - `@o4o/organization-core` 의 `PermissionGuard` 는 소비처 0 으로 제거됨(A축 REMOVE_SAFE).
+//   - `users.permissions` 컬럼은 판정 `DROP_APPROVED_READY` (프로덕션 57행 전부 `[]` ·
+//     index/constraint/view/trigger/function 의존 0). 실제 DROP 은 별도 WO 이다.
 // ============================================================================

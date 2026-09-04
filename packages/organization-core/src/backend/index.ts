@@ -14,7 +14,6 @@ export * from '../services/index.js';
 export * from '../controllers/index.js';
 
 // Guards
-export * from '../guards/index.js';
 
 // Types
 export * from '../types/index.js';

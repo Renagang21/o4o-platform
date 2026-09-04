@@ -90,11 +90,14 @@ export class User {
 
   // Direct permissions (in addition to role permissions)
   //
-  // WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (D축) — 판정 DROP_READY:
-  //   런타임 read 0 (`getAllPermissions` 참조 제거) · write 0
-  //   (account-linking 병합 제거) · 프로덕션 users 중 permissions 가
-  //   비어 있지 않은 행 0건. 실제 컬럼 DROP·migration 은 destructive 이므로
-  //   본 WO 에서 수행하지 않는다(별도 WO). 엔티티 정의만 유지한다.
+  // WO-O4O-FROZEN-AUTH-PERMISSIONS-DB-AND-KPA-SUPPLIER-ENDPOINT-FINAL-CLOSURE-V1 (B축)
+  //   — 판정 `DROP_APPROVED_READY`:
+  //   런타임 read 0 (`getAllPermissions` 참조 제거) · write 0 (account-linking 병합 제거) ·
+  //   프로덕션 users 57행 전부 `[]` (NULL 0 · non-empty 0) ·
+  //   index / constraint / view / trigger / function / generated column 의존 0
+  //   (pg_depend 유일 항목은 컬럼 자신의 DEFAULT).
+  //   실제 `ALTER TABLE users DROP COLUMN permissions` 및 migration 작성은
+  //   본 WO §13 에서 금지된다. 엔티티 정의만 유지한다.
   @Column({ type: 'json', default: () => "'[]'" })
   permissions!: string[];
 
