@@ -35,10 +35,16 @@ const ORG = 'aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa';
 interface Scenario {
   /** 이미 pharmacy-hub active enrollment 를 가진 조직인가 (멱등 재실행 경로) */
   alreadyPharmacyHub?: boolean;
-  /** organization_members 후보 (owner/admin/manager, left_at IS NULL) */
+  /**
+   * Pharmacy-Hub 로 스코프된 매장 조직 후보
+   * (`findStoreOrganizationCandidates(ds, userId, 'pharmacy-hub')` 의 결과).
+   * WO-...-SERVICE-SCOPED-RESOLUTION-V1 이후 KPA/K-Cosmetics 조직은 여기에 오지 않는다.
+   */
   memberOrgs?: Array<{ id: string; code: string; name: string }>;
   /** businessNumber 로 매칭되는 조직 */
   bnOrgs?: Array<{ id: string; code: string; name: string }>;
+  /** 위 bnOrgs 가 Pharmacy-Hub 에 연결된 조직인가 (기본 true — 기존 시나리오 의미 보존) */
+  bnOrgsLinkedToPharmacyHub?: boolean;
   /** organizations 단건 조회 결과 */
   org?: { id: string; code: string; name: string; type: string } | null;
   /** 타 서비스 active enrollment */
@@ -60,7 +66,15 @@ function makeService(sc: Scenario) {
     if (s.includes('FROM users')) {
       return [{ id: USER, name: '테스트', email: 't@example.com', businessInfo: sc.businessInfo ?? {} }];
     }
-    if (s.includes('FROM organization_members')) return sc.memberOrgs ?? [];
+    // 스코프된 후보 조회 — resolver 가 organization_id / role 로 돌려준다.
+    if (s.includes('FROM organization_members')) {
+      return (sc.memberOrgs ?? []).map((o) => ({ organization_id: o.id, role: 'owner' }));
+    }
+    // isOrganizationLinkedToService — enrollment OR platform_store_slugs 존재 확인.
+    // 후보 조회(위)와 달리 organization_members 를 읽지 않는다.
+    if (s.includes('platform_store_slugs')) {
+      return (sc.bnOrgsLinkedToPharmacyHub ?? true) ? [{ '?column?': 1 }] : [];
+    }
     // 사업자번호 매칭 (regexp_replace 사용) — organizations 단건 조회와 구분한다.
     if (s.includes('FROM organizations') && s.includes('regexp_replace')) return sc.bnOrgs ?? [];
     if (s.includes('FROM organizations') && s.includes('LIMIT 1')) {
@@ -234,6 +248,20 @@ describe('기존 held 계약 보존', () => {
     });
     expect(r.outcome).toBe('held');
     expect(r.holdReason).toBe('DUPLICATE_BUSINESS_NUMBER');
+  });
+
+  it('사업자번호가 맞아도 PH 조직이 아니면 후보가 아니다 (service scope)', async () => {
+    // WO-O4O-PHARMACYHUB-STORE-ORGANIZATION-SERVICE-SCOPED-RESOLUTION-V1
+    // K-Cosmetics 조직이 같은 사업자번호를 갖고 있어도 PH 후보로 세지 않는다.
+    const r = await resolve({
+      memberOrgs: [],
+      businessInfo: { businessNumber: '108-8699992', businessName: '새 약국' },
+      bnOrgs: [{ id: ORG, code: 'KCOSA3DDC841B946', name: '테스트 뷰티샵' }],
+      bnOrgsLinkedToPharmacyHub: false,
+      org: { id: ORG, code: 'KCOSA3DDC841B946', name: '테스트 뷰티샵', type: 'store' },
+    });
+    expect(r.outcome).toBe('created');
+    expect(r.organizationCode).toBe('ph-pharm-6967ebe02f87');
   });
 
   it('store_owner membership 이 아니면 대상 아님 (skipped)', async () => {
