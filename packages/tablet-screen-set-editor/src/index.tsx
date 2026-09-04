@@ -604,11 +604,43 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort, api, conte
 
 /** 상품 선택 목록의 원천(매장 취급 상품 + 매장 자체 상품). 소비처가 자기 API 로 주입한다. */
 export interface ScreenSetProductPool {
-  supplierProducts: Array<{ id: string; product_name: string; retail_price?: string | null; is_active?: boolean }>;
+  supplierProducts: Array<{
+    id: string; product_name: string; retail_price?: string | null; is_active?: boolean;
+    /**
+     * WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 (축 A):
+     *   실제 태블릿·미리보기(공개 런타임)에 노출될 수 있는 상품인지. 백엔드가 additive 로
+     *   내려준다(미제공 = 판정 정보 없음 → 기존과 동일하게 안내를 표시하지 않는다).
+     */
+    tabletVisible?: boolean;
+    tabletVisibilityReason?: string | null;
+  }>;
   localProducts: Array<{ id: string; name: string; price_display?: string | null; is_active?: boolean }>;
+  /** 매장 TABLET 채널 상태(안내·CTA 용). 미제공이면 안내를 표시하지 않는다. */
+  tabletChannel?: {
+    hasTabletChannel?: boolean;
+    hasApprovedTabletChannel?: boolean;
+    tabletChannelStatus?: string | null;
+  } | null;
 }
 
-type PoolEntry = { productType: 'supplier' | 'local'; productId: string; name: string; price: string };
+type PoolEntry = {
+  productType: 'supplier' | 'local'; productId: string; name: string; price: string;
+  /** true/false = 런타임 노출 판정, undefined = 판정 정보 없음 */
+  tabletVisible?: boolean;
+  visibilityNotice?: string | null;
+};
+
+/**
+ * WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 (축 A):
+ *   런타임 게이트(판매 채널 승인·공급 상태)는 그대로 두고, 왜 안 나오는지만 매장 언어로 설명한다.
+ */
+const VISIBILITY_NOTICE: Record<string, string> = {
+  no_tablet_channel: '매장에 태블릿 판매 채널이 없어 화면에 표시되지 않습니다.',
+  channel_not_approved: '태블릿 판매 채널이 승인 대기 상태라 화면에 표시되지 않습니다.',
+  not_linked_to_channel: '이 상품이 태블릿 판매 채널에 연결되어 있지 않아 화면에 표시되지 않습니다.',
+  offer_inactive: '공급 상태(공급자·공급 상품 활성)가 아니어서 화면에 표시되지 않습니다.',
+  service_scope_mismatch: '다른 서비스에서 등록된 상품이라 이 매장 화면에는 표시되지 않습니다.',
+};
 
 function poolEntries(pool: ScreenSetProductPool | null): PoolEntry[] {
   if (!pool) return [];
@@ -616,6 +648,10 @@ function poolEntries(pool: ScreenSetProductPool | null): PoolEntry[] {
     ...(pool.supplierProducts ?? []).map((p) => ({
       productType: 'supplier' as const, productId: String(p.id), name: p.product_name || '(이름 없음)',
       price: p.retail_price ? `${Number(p.retail_price).toLocaleString()}원` : '',
+      tabletVisible: typeof p.tabletVisible === 'boolean' ? p.tabletVisible : undefined,
+      visibilityNotice: p.tabletVisible === false
+        ? (VISIBILITY_NOTICE[String(p.tabletVisibilityReason ?? '')] ?? '현재 매장 노출 조건을 만족하지 않아 화면에 표시되지 않습니다.')
+        : null,
     })),
     ...(pool.localProducts ?? []).map((p) => ({
       productType: 'local' as const, productId: String(p.id), name: p.name || '(이름 없음)',
@@ -748,6 +784,16 @@ function ProductSelectEditor({ selected, onChange, fetchProductPool, fetchStoreQ
         </button>
       </div>
 
+      {/* WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 (축 A):
+          매장 단위 원인(태블릿 채널 미개설·미승인)은 상품별 안내보다 먼저 한 번만 알린다. */}
+      {pool?.tabletChannel && pool.tabletChannel.hasApprovedTabletChannel === false && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800 leading-relaxed">
+          {pool.tabletChannel.hasTabletChannel
+            ? '매장의 태블릿 판매 채널이 아직 승인되지 않아, 취급 상품은 실제 태블릿 화면에 표시되지 않습니다. 채널 승인 후 자동으로 표시됩니다.'
+            : '매장에 태블릿 판매 채널이 없어 취급 상품이 실제 태블릿 화면에 표시되지 않습니다. 매장 관리에서 태블릿 채널을 먼저 신청해 주세요.'}
+        </div>
+      )}
+
       {selected.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 text-center py-5 px-4">
           <p className="text-sm text-slate-500 leading-relaxed">선택한 상품이 없습니다.<br />코너 진열 상품이 자동으로 표시됩니다.</p>
@@ -767,7 +813,14 @@ function ProductSelectEditor({ selected, onChange, fetchProductPool, fetchStoreQ
                         {s.productType === 'supplier' ? '취급 상품' : '매장 상품'}
                       </span>
                       {e?.price && <span className="text-[11px] text-slate-500">{e.price}</span>}
+                      {/* WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 (축 A): 런타임 노출 불가 상태 */}
+                      {e?.tabletVisible === false && (
+                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded text-amber-700 bg-amber-50">노출 불가</span>
+                      )}
                     </div>
+                    {e?.tabletVisible === false && e.visibilityNotice && (
+                      <div className="mt-1 text-[11px] text-amber-700 leading-relaxed">{e.visibilityNotice}</div>
+                    )}
                     {/* WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 현재 선택된 QR 표시(미선택이면 안내만). */}
                     {fetchStoreQrCodes && (
                       <div className="mt-1 text-[11px] text-slate-500 truncate">
@@ -885,6 +938,11 @@ function ProductSelectEditor({ selected, onChange, fetchProductPool, fetchStoreQ
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium text-slate-800 truncate">{e.name}</div>
                         <div className="text-[11px] text-slate-400 truncate">{e.productType === 'supplier' ? '취급 상품' : '매장 상품'}{e.price ? ` · ${e.price}` : ''}</div>
+                        {/* WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 (축 A):
+                            선택은 막지 않는다 — 고를 수는 있으나 지금은 화면에 나오지 않는다는 사실을 먼저 알린다. */}
+                        {e.tabletVisible === false && e.visibilityNotice && (
+                          <div className="mt-1 text-[11px] text-amber-700 leading-relaxed">{e.visibilityNotice}</div>
+                        )}
                       </div>
                     </div>
                   </button>

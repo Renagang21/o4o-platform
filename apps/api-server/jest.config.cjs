@@ -41,6 +41,10 @@ module.exports = {
     // TypeORM metadata 를 build 해야 한다. dist 는 ESM 이라 ts-jest 가 변환하지 못하므로
     // 다른 패키지와 동일하게 src 로 매핑한다.
     '^@o4o-apps/cms-core/entities$': '<rootDir>/../../packages/cms-core/src/entities/index.ts',
+    // WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1:
+    // store-tablet 라우터가 공개 resolver 를 경유해 store-identity 서브패스를 참조한다.
+    // dist 는 ESM 이라 ts-jest 가 변환하지 못하므로 다른 패키지와 동일하게 src 로 매핑한다.
+    '^@o4o/platform-core/store-identity$': '<rootDir>/../../packages/platform-core/src/store-identity/index.ts',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
