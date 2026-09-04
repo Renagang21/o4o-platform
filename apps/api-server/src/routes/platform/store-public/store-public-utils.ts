@@ -11,6 +11,7 @@ import { Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import rateLimit from 'express-rate-limit';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-cache.js';
 import type { StoreBlock, TemplateProfile } from '../../glycopharm/entities/glycopharm-pharmacy.entity.js';
@@ -20,13 +21,26 @@ import type { StoreBlock, TemplateProfile } from '../../glycopharm/entities/glyc
 // ============================================================================
 
 /**
- * platform_store_slugs.service_key = 'kpa'
- * organization_product_listings.service_key = 'kpa-society'
- * 두 테이블 간 불일치 보정: OPL 조회 시 'kpa-society'도 포함.
+ * platform_store_slugs.service_key 와 organization_product_listings.service_key 의
+ * **canonical alias 불일치**를 보정한다. OPL 조회 시 두 표기를 모두 포함한다.
+ *
+ *   slug 'kpa'       ↔ listing 'kpa-society'
+ *   slug 'cosmetics' ↔ listing 'k-cosmetics'
+ *
+ * WO-O4O-MY-STORE-RUNTIME-CONTRACT-PRODUCTION-E2E-FINAL-CLOSURE-V1:
+ *   이전 구현은 `kpa` 만 하드코딩해 **cosmetics 매장의 자기 상품이 영구 비노출**이었다
+ *   (프로덕션 실측: slug `cosmetics` 매장의 listing 이 `k-cosmetics` 로 저장돼
+ *    태블릿·화면세트·공개 storefront 전 경로에서 service_scope_mismatch 로 떨어졌다).
+ *   새 로컬 맵을 만들지 않고 security-core 의 SSOT
+ *   (`ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY` = { kpa: 'kpa-society', cosmetics: 'k-cosmetics' })
+ *   에서 파생한다. self-map 서비스(neture · glycopharm · pharmacy-hub)는 `[key]` 그대로다.
+ *
+ * 게이트를 넓히지 않는다 — `kpa-groupbuy` · `k-cosmetics-event-offer` 같은
+ * **다른 축의 파생 키는 포함하지 않는다**(기존 kpa 동작과 동일한 범위).
  */
 export function resolveServiceKeys(serviceKey: string): string[] {
-  if (serviceKey === 'kpa') return ['kpa', 'kpa-society'];
-  return [serviceKey];
+  const canonical = resolveCanonicalServiceKey(serviceKey);
+  return canonical === serviceKey ? [serviceKey] : [serviceKey, canonical];
 }
 
 // ============================================================================
