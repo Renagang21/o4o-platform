@@ -31,8 +31,8 @@ import type { ProvisionResult } from '../services/pharmacy-hub/PharmacyHubStoreP
  * 경량 DataSource — 이 backfill 이 실제로 쓰는 entity 만 등록한다.
  *
  * 전역 AppDataSource 는 database/entities.ts 의 **전체 entity 그래프**를 로드한다.
- * 스크립트 실행에는 불필요할 뿐 아니라, 로컬에서 일부 공유 패키지 dist 의 순환 참조
- * (digital-signage-core MediaListItem ↔ MediaList) 때문에 import 단계에서 죽는다.
+ * 스크립트 실행에는 불필요할 뿐 아니라, 로컬에서 공유 패키지 dist 상태에 따라
+ * import 단계에서 죽을 수 있다.
  *
  * PharmacyHubStoreProvisioningService 는 dataSource 를 주입받고 organizations /
  * organization_members / role_assignments 등은 전부 raw SQL 로 접근하므로,
