@@ -3,7 +3,7 @@ name: E2E — Auth Runtime Regression
 # 4개 배포 서비스(Neture / GlycoPharm / KPA-Society / K-Cosmetics) auth runtime 검증
 # 실제 운영 URL을 대상으로 하므로 과도한 자동 실행 방지:
 #   - workflow_dispatch: 주 실행 방법 (배포 후 수동 검증)
-#   - push to main (e2e/auth-runtime/** 변경 시): E2E 코드 자체 변경에 한해 자동 실행
+#   - push to main: 로그인/세션 runtime 에 직접 영향이 있는 Auth 경로 변경 시 자동 실행
 
 on:
   workflow_dispatch:
@@ -22,6 +22,11 @@ on:
       # Auth 공통 패키지 (src만 — dist는 자동 생성이므로 제외)
       - 'packages/auth-utils/src/**'
       - 'packages/auth-client/src/**'
+      # RBAC helper 는 role/permission 판정 유틸이며 login/session runtime E2E의
+      # 직접 소비 경로가 아니다. dead helper 정리 같은 RBAC-only 변경이 서비스별
+      # credential gate를 불필요하게 깨우지 않도록 제외한다.
+      # 다른 auth-client 파일이 함께 바뀌면 positive pattern 때문에 E2E는 정상 실행된다.
+      - '!packages/auth-client/src/rbac.*'
       - 'packages/auth-react/src/**'
       - 'packages/security-core/src/**'
       # 서비스별 AuthContext (login/token 흐름 직접 제어)
