@@ -305,19 +305,11 @@ export const APPS_CATALOG: AppCatalogItem[] = [
   //   라우트도 남아 있지 않아 설치 가능한 실체가 없는 항목이었다.
   //   Partner 는 Neture 서비스의 활동 주체이며 Cosmetics 는 분야이므로,
   //   별도 Cosmetics Partner 앱을 다시 등록하지 않는다.
-  {
-    appId: 'cosmetics-seller-extension',
-    name: '화장품 판매원 관리',
-    version: '1.0.0',
-    description: '화장품 매장 판매원 운영 기능 - 진열, 샘플, 재고, 상담, KPI 관리',
-    category: 'commerce',
-    tags: ['화장품', 'cosmetics', 'seller', 'display', 'sample', 'inventory', 'kpi'],
-    type: 'extension',
-    status: 'active', // Phase 1 완료 - 2024-12 Active 전환
-    dependencies: {},
-    author: 'O4O Platform',
-    serviceGroups: ['cosmetics', 'sellerops'],
-  },
+  // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §21:
+  //   'cosmetics-seller-extension' 카탈로그 항목을 제거했다.
+  //   패키지 @o4o/cosmetics-seller-extension 을 같은 WO 에서 삭제했고(runtime 소비처 0 ·
+  //   라우트 미마운트 · production app_registry 설치 0행), 설치 가능한 실체가 없다.
+  //   K-Cosmetics 서비스 자체와 cosmetics serviceGroup 은 그대로 유지한다.
   // WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1:
   //   'cosmetics-supplier-extension' · 'cosmetics-sample-display-extension' 카탈로그 항목을 제거했다.
   //   두 패키지(@o4o/cosmetics-supplier-extension · @o4o/cosmetics-sample-display-extension)는
@@ -325,7 +317,8 @@ export const APPS_CATALOG: AppCatalogItem[] = [
   //   설치를 시도하면 ModuleLoader 가 모듈을 찾지 못해 항상 실패했고(거짓 성공 없음),
   //   production app_registry 에도 설치 레코드가 없다(설치 소비처 0).
   //   존재하지 않는 확장을 '설치 가능'으로 노출하는 거짓 계약이므로 카탈로그에서 제거한다.
-  //   살아 있는 'cosmetics-seller-extension' 은 별개의 ACTIVE 패키지이며 유지한다.
+  //   (같은 계열의 'cosmetics-seller-extension' 은 이후
+  //    WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 에서 제거되었다.)
 
   // ============================================
   // Yaksa Organization Apps (yaksa)
@@ -368,7 +361,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
   },
 
   // serviceGroup id 'sellerops' / 'supplierops' 는 카탈로그 항목이 사용 중이라 유지한다.
-  //   sellerops: 'cosmetics-seller-extension' · 'market-trial'
+  //   sellerops: 'market-trial'
   //   supplierops: 'market-trial'
   //   (WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1 로
   //    'cosmetics-supplier-extension' 이 제거되어 supplierops 소비처가 market-trial 만 남았다)

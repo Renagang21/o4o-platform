@@ -21,7 +21,8 @@
  *   5. block-renderer 의 shortcode alias 0
  *   6. `verify:shortcodes` script 0
  *   7. `scripts/audit/check-shortcode-registry.ts` 0
- *   8. cosmetics-seller-extension 의 shortcode 정의 0
+ *   8. cosmetics-seller-extension 패키지 부재
+ *      (WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §18 에서 패키지 전체 은퇴)
  *
  * 스크립트를 실행하지 않고 raw-source 로 단언한다. DB · 네트워크 접근 0.
  */
@@ -39,7 +40,9 @@ const readJson = (rel: string) => JSON.parse(readRoot(rel));
 const FORMER_DEPENDENTS = [
   'apps/admin-dashboard/package.json',
   'packages/block-renderer/package.json',
-  'packages/cosmetics-seller-extension/package.json',
+  // packages/cosmetics-seller-extension 은
+  // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §18 에서 패키지 자체가 삭제되어
+  // dependency 단언 대상이 아니다 (아래 8번에서 부재로 단언한다).
 ];
 
 /**
@@ -215,25 +218,25 @@ describe('7. `check-shortcode-registry` 가 0 이다', () => {
   });
 });
 
-describe('8. cosmetics-seller-extension 의 shortcode 정의가 0 이다', () => {
-  it('shortcodes 디렉터리가 없다', () => {
-    expect(exists('packages', 'cosmetics-seller-extension', 'src', 'shortcodes')).toBe(false);
+describe('8. cosmetics-seller-extension 패키지가 부재한다', () => {
+  // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §18:
+  //   shortcode 축만 은퇴했던 이전 계약을 패키지 전체 부재 계약으로 승격한다.
+  //   (runtime 소비처 0 · 라우트 미마운트 · production app_registry 설치 0행)
+  it('패키지 디렉터리가 없다', () => {
+    expect(exists('packages', 'cosmetics-seller-extension')).toBe(false);
   });
 
-  it('index · manifest 어디에도 shortcode 가 남지 않았다', () => {
-    for (const rel of [
-      'packages/cosmetics-seller-extension/src/index.ts',
-      'packages/cosmetics-seller-extension/src/manifest.ts',
-    ]) {
-      expect(readRoot(rel)).not.toContain('shortcode');
+  it('api-server 가 workspace dependency 로 들고 있지 않다', () => {
+    const pkg = readJson('apps/api-server/package.json');
+    for (const field of ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies']) {
+      expect(Object.keys(pkg[field] ?? {})).not.toContain('@o4o/cosmetics-seller-extension');
     }
+    expect(pkg.scripts?.['build:deps'] ?? '').not.toContain('cosmetics-seller-extension');
   });
 
-  it('package 자체 · manifest · lifecycle 은 삭제되지 않았다 (은퇴 범위는 shortcode 축뿐이다)', () => {
-    expect(exists('packages', 'cosmetics-seller-extension', 'package.json')).toBe(true);
-    expect(exists('packages', 'cosmetics-seller-extension', 'src', 'manifest.ts')).toBe(true);
-    const index = readRoot('packages/cosmetics-seller-extension/src/index.ts');
-    expect(index).toContain('manifest');
-    expect(index).toContain('lifecycle');
+  it('App Store 카탈로그에 항목이 없다', () => {
+    const catalog = readRoot('apps/api-server/src/app-manifests/appsCatalog.ts');
+    expect(catalog).not.toContain("appId: 'cosmetics-seller-extension'");
   });
+});
 });

@@ -102,9 +102,11 @@ describe('WO-O4O-PUBLIC-APPSTORE-READ-CONTRACT-CENSUS-AND-DISPOSITION-V1', () =>
     // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
     //   ecommerce-core app 은퇴로 17 → 16. (은퇴 자체의 계약은 해당 WO 의
     //   전용 spec 이 지킨다. 여기서는 "그 외 회귀 없음" 만 본다.)
-    it('카탈로그 항목이 16개로 유지된다', () => {
+    // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §21:
+    //   cosmetics-seller-extension 카탈로그 항목 제거로 16 → 15.
+    it('카탈로그 항목이 15개로 유지된다', () => {
       const entries = catalogSrc.match(/^\s{4}appId:\s*'/gm) ?? [];
-      expect(entries).toHaveLength(16);
+      expect(entries).toHaveLength(15);
     });
 
     it.each([

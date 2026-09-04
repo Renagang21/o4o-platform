@@ -29,8 +29,6 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@o4o/cosmetics-seller-extension/backend": ["../../packages/cosmetics-seller-extension/dist/backend"],
-      "@o4o/cosmetics-seller-extension/manifest": ["../../packages/cosmetics-seller-extension/dist/manifest"],
       "@o4o/ai-prompts/care": ["../../packages/ai-prompts/dist/care"],
       "@o4o/ai-prompts/store": ["../../packages/ai-prompts/dist/store"],
       "@o4o/ai-prompts/admin": ["../../packages/ai-prompts/dist/admin"],

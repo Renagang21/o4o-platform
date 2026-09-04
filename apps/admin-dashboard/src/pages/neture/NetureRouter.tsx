@@ -20,7 +20,6 @@ const PartnerDetailPage = React.lazy(() => import('./PartnerDetailPage'));
 const PartnershipRequestListPage = React.lazy(() => import('./PartnershipRequestListPage'));
 const PartnershipRequestDetailPage = React.lazy(() => import('./PartnershipRequestDetailPage'));
 const SupplierListPage = React.lazy(() => import('./SupplierListPage'));
-const ProductApprovalQueuePage = React.lazy(() => import('./ProductApprovalQueuePage'));
 const CategoryListPage = React.lazy(() => import('./CategoryListPage'));
 const BrandListPage = React.lazy(() => import('./BrandListPage'));
 
@@ -38,8 +37,7 @@ const NetureRouter: React.FC = () => {
         <Route path="products" element={<ProductListPage />} />
         <Route path="products/:productId" element={<ProductDetailPage />} />
 
-        {/* Product Approvals (WO-O4O-ADMIN-PRODUCT-APPROVAL-UI-V1) */}
-        <Route path="approvals" element={<ProductApprovalQueuePage />} />
+        {/* WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §8: admin 전용 상품 승인 큐는 은퇴 (canonical = Neture operator 승인 콘솔) */}
 
         {/* Suppliers (WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1) */}
         <Route path="suppliers" element={<SupplierListPage />} />

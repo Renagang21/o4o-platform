@@ -65,13 +65,9 @@ async function fetchSuppliers(params: { status?: string }): Promise<Supplier[]> 
   return response.data;
 }
 
-async function approveSupplier(id: string): Promise<void> {
-  await authClient.api.post(`/neture/admin/suppliers/${id}/approve`);
-}
-
-async function rejectSupplier(id: string): Promise<void> {
-  await authClient.api.post(`/neture/admin/suppliers/${id}/reject`);
-}
+// WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §8:
+// admin 전용 공급자 승인/거절은 은퇴했다 (canonical = Neture operator 승인 콘솔).
+// 목록 조회와 비활성화(governance)는 active 기능이므로 보존한다.
 
 async function deactivateSupplier(id: string): Promise<void> {
   await authClient.api.post(`/neture/admin/suppliers/${id}/deactivate`);
@@ -86,32 +82,10 @@ const SupplierListPage: React.FC = () => {
     queryFn: () => fetchSuppliers({ status: statusFilter || undefined }),
   });
 
-  const approveMutation = useMutation({
-    mutationFn: approveSupplier,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['neture', 'admin', 'suppliers'] }),
-  });
-
-  const rejectMutation = useMutation({
-    mutationFn: rejectSupplier,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['neture', 'admin', 'suppliers'] }),
-  });
-
   const deactivateMutation = useMutation({
     mutationFn: deactivateSupplier,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['neture', 'admin', 'suppliers'] }),
   });
-
-  const handleApprove = (supplier: Supplier) => {
-    if (window.confirm(`"${supplier.name}" 공급자를 승인하시겠습니까?`)) {
-      approveMutation.mutate(supplier.id);
-    }
-  };
-
-  const handleReject = (supplier: Supplier) => {
-    if (window.confirm(`"${supplier.name}" 공급자를 거절하시겠습니까?`)) {
-      rejectMutation.mutate(supplier.id);
-    }
-  };
 
   const handleDeactivate = (supplier: Supplier) => {
     if (window.confirm(`"${supplier.name}" 공급자를 비활성화하시겠습니까?`)) {
@@ -209,24 +183,6 @@ const SupplierListPage: React.FC = () => {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1.5">
-                      {supplier.status === 'PENDING' && (
-                        <>
-                          <button
-                            onClick={() => handleApprove(supplier)}
-                            disabled={approveMutation.isPending}
-                            className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 disabled:opacity-50"
-                          >
-                            도메인 승인
-                          </button>
-                          <button
-                            onClick={() => handleReject(supplier)}
-                            disabled={rejectMutation.isPending}
-                            className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"
-                          >
-                            거절
-                          </button>
-                        </>
-                      )}
                       {supplier.status === 'ACTIVE' && (
                         <button
                           onClick={() => handleDeactivate(supplier)}

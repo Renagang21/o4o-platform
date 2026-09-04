@@ -13,8 +13,7 @@
  *   PUT  /api/v1/stores/:slug/payment-config — Owner only: Create/update config
  *
  * B2C Channel:
- *   POST /api/v1/stores/:slug/channels/b2c/activate — Owner only: Activate (requires policy + payment)
- *   POST /api/v1/stores/:slug/channels/b2c/deactivate — Owner only: Deactivate
+ *   (RETIRED — WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §13)
  *
  * Slug Management:
  *   GET  /api/v1/stores/:slug/slug/can-change — Owner only: Check if slug change is allowed
@@ -340,124 +339,12 @@ export function createStorePolicyRoutes(dataSource: DataSource): Router {
   });
 
   // ==========================================================================
-  // B2C Channel Activation (Policy + Payment Guard)
+  // B2C Channel Activation — RETIRED
+  // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §13:
+  // POST /:slug/channels/b2c/activate · /deactivate 는 은퇴했다.
+  // 매장 소비자 commerce 는 O4O 범위 밖(O4O-STORE-COMMERCE-BOUNDARY-V1)이며,
+  // organization_channels 의 기존 B2C row 는 DB 변경 없이 그대로 둔다.
   // ==========================================================================
-
-  /**
-   * POST /api/v1/stores/:slug/channels/b2c/activate — Owner only
-   *
-   * Activation requirements:
-   * 1. termsOfService registered
-   * 2. privacyPolicy registered
-   * 3. paymentConfig active
-   */
-  router.post('/:slug/channels/b2c/activate', authenticate, async (req: Request, res: Response): Promise<void> => {
-    try {
-      const ctx = await resolveAndAuthorize(dataSource, req, res);
-      if (!ctx) return;
-
-      // Gate 1: Policy — termsOfService + privacyPolicy
-      const policyService = new StorePolicyService(dataSource);
-      const policy = await policyService.getActivePolicy(ctx.storeId, ctx.serviceKey as any);
-
-      if (!policy?.termsOfService || !policy?.privacyPolicy) {
-        res.status(400).json({
-          success: false,
-          error: {
-            code: 'POLICY_REQUIRED',
-            message: 'B2C 활성화를 위해 이용약관과 개인정보처리방침이 필요합니다.',
-          },
-        });
-        return;
-      }
-
-      // Gate 2: Payment Config — active config required
-      const configService = new PaymentConfigService(dataSource);
-      const paymentConfig = await configService.getActiveConfig(ctx.storeId, ctx.serviceKey as any);
-
-      if (!paymentConfig) {
-        res.status(400).json({
-          success: false,
-          error: {
-            code: 'PAYMENT_CONFIG_REQUIRED',
-            message: 'B2C 활성화를 위해 결제 설정이 필요합니다.',
-          },
-        });
-        return;
-      }
-
-      // UPSERT B2C channel: INSERT or UPDATE to APPROVED
-      const existing: Array<{ id: string }> = await dataSource.query(
-        `SELECT id FROM organization_channels
-         WHERE organization_id = $1 AND channel_type = 'B2C'
-         LIMIT 1`,
-        [ctx.storeId],
-      );
-
-      if (existing.length > 0) {
-        await dataSource.query(
-          `UPDATE organization_channels
-           SET status = 'APPROVED', approved_at = NOW(), updated_at = NOW()
-           WHERE id = $1`,
-          [existing[0].id],
-        );
-      } else {
-        await dataSource.query(
-          `INSERT INTO organization_channels (organization_id, channel_type, status, approved_at)
-           VALUES ($1, 'B2C', 'APPROVED', NOW())`,
-          [ctx.storeId],
-        );
-      }
-
-      res.json({
-        success: true,
-        data: { channelType: 'B2C', status: 'APPROVED' },
-      });
-    } catch (error: any) {
-      console.error('[StorePolicyRoutes] POST /:slug/channels/b2c/activate error:', error);
-      res.status(500).json({
-        success: false,
-        error: { code: 'INTERNAL_ERROR', message: 'Failed to activate B2C channel' },
-      });
-    }
-  });
-
-  /**
-   * POST /api/v1/stores/:slug/channels/b2c/deactivate — Owner only
-   */
-  router.post('/:slug/channels/b2c/deactivate', authenticate, async (req: Request, res: Response): Promise<void> => {
-    try {
-      const ctx = await resolveAndAuthorize(dataSource, req, res);
-      if (!ctx) return;
-
-      const result = await dataSource.query(
-        `UPDATE organization_channels
-         SET status = 'SUSPENDED', updated_at = NOW()
-         WHERE organization_id = $1 AND channel_type = 'B2C'
-         RETURNING id`,
-        [ctx.storeId],
-      );
-
-      if (result.length === 0) {
-        res.status(404).json({
-          success: false,
-          error: { code: 'CHANNEL_NOT_FOUND', message: 'B2C channel not found' },
-        });
-        return;
-      }
-
-      res.json({
-        success: true,
-        data: { channelType: 'B2C', status: 'SUSPENDED' },
-      });
-    } catch (error: any) {
-      console.error('[StorePolicyRoutes] POST /:slug/channels/b2c/deactivate error:', error);
-      res.status(500).json({
-        success: false,
-        error: { code: 'INTERNAL_ERROR', message: 'Failed to deactivate B2C channel' },
-      });
-    }
-  });
 
   // ==========================================================================
   // Slug Management

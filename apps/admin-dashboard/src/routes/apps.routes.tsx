@@ -136,8 +136,9 @@ export function AppRoutes() {
     //     - 진입 네비게이션 0건 · appsCatalog appId 등록 0건
     //       (WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1 에서 이미 제거됨).
     //     - 판매자(플랫폼 직접판매) 축은 PLATFORM_DIRECT_SALE_BUSINESS_CONTRACT = NONE.
-    //   serviceGroup id 'sellerops' 는 살아 있는 카탈로그 항목
-    //   ('cosmetics-seller-extension' · 'market-trial') 이 소비하므로 유지한다.
+    //   serviceGroup id 'sellerops' 는 살아 있는 카탈로그 항목('market-trial')이
+    //   소비하므로 유지한다. ('cosmetics-seller-extension' 은
+    //   WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 에서 제거되었다.)
 
     // WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (A축):
     //   /supplierops/* 라우트와 admin 로컬 pages/supplierops (11파일) 을 제거했다.

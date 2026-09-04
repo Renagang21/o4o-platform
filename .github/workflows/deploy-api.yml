@@ -97,10 +97,6 @@ jobs:
         pnpm --filter '@o4o-extensions/organization-forum' run build
         pnpm --filter '@o4o/market-trial' run build
 
-        # Cosmetics Extensions
-        echo "📦 Cosmetics Extensions..."
-        pnpm --filter '@o4o/cosmetics-seller-extension' run build
-
         echo ""
         echo "✅ All API-specific packages built successfully!"
 

@@ -194,7 +194,7 @@ describe('WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1',
       expect(fs.existsSync(path.join(SRC, 'app-manifests', 'disabled-apps.registry.ts'))).toBe(true);
     });
 
-    it('packages 하위 manifest.ts 는 14개로 유지된다 (CI AppStore Guard 소비, 무접촉)', () => {
+    it('packages 하위 manifest.ts 는 12개로 유지된다 (CI AppStore Guard 소비, 무접촉)', () => {
       const packagesDir = path.resolve(API_SERVER, '..', '..', 'packages');
       const found: string[] = [];
       const walk = (dir: string, depth = 0) => {
@@ -216,7 +216,9 @@ describe('WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1',
       //   해당 package 는 `./entities` subpath 만 소비되며 manifest 소비처는 0 이었다.
       // WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (B축):
       //   소비처 0 이던 `packages/partnerops` 제거로 14 → 13.
-      expect(found).toHaveLength(13);
+      // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §18:
+      //   runtime 소비처 0 이던 `packages/cosmetics-seller-extension` 제거로 13 → 12.
+      expect(found).toHaveLength(12);
     });
 
     it('app_registry 를 건드리는 migration 이 이 WO 로 추가되지 않았다 (DB schema change 0)', () => {

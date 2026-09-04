@@ -390,9 +390,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 14. Membership routes — WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
     //     에서 @o4o/membership-yaksa 와 함께 제거됨 (약사회 전용, 다른 소비처 0).
 
-    // Still disabled (Phase R2):
-    // 17. Cosmetics Seller routes (/api/v1/cosmetics-seller) - @o4o/cosmetics-seller-extension
-    //     패키지는 존재하나 라우트는 아직 마운트하지 않는다.
+    // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §18:
+    //   17. Cosmetics Seller routes (/api/v1/cosmetics-seller) 는 마운트된 적이 없고
+    //   패키지 @o4o/cosmetics-seller-extension 도 제거되어 존재하지 않는 라우트다.
     // WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1:
     //   18. Cosmetics Sample Display · 19. Cosmetics Supplier 항목을 제거했다.
     //   두 패키지는 commit 2d5be046b 에서 삭제되어 'disabled'(재활성 대기) 가 아니라

@@ -51,8 +51,8 @@ type SupplierRequest = AuthenticatedRequest & {
  * Creates the admin router with all admin-prefixed endpoints.
  *
  * The returned router should be mounted at `/admin` in the parent neture router
- * so that e.g. `router.get('/suppliers/pending', ...)` resolves to
- * `GET /api/v1/neture/admin/suppliers/pending`.
+ * so that e.g. `router.get('/suppliers/governance', ...)` resolves to
+ * `GET /api/v1/neture/admin/suppliers/governance`.
  */
 export function createAdminController(dataSource: DataSource): Router {
   const router = Router();
@@ -66,79 +66,9 @@ export function createAdminController(dataSource: DataSource): Router {
 
   // ==================== Admin: Supplier Management ====================
 
-  /**
-   * GET /admin/suppliers/pending
-   * 승인 대기 공급자 목록 (관리자 전용)
-   */
-  router.get('/suppliers/pending', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
-    try {
-      const suppliers = await netureService.getPendingSuppliers();
-      res.json({ success: true, data: suppliers });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching pending suppliers:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch pending suppliers' } });
-    }
-  });
-
-  /**
-   * POST /admin/suppliers/:id/approve
-   * 공급자 승인 (PENDING → ACTIVE)
-   */
-  router.post('/suppliers/:id/approve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { id } = req.params;
-      const approvedBy = req.user?.id;
-      if (!approvedBy) {
-        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
-      }
-
-      const result = await netureService.approveSupplier(id, approvedBy);
-      if (!result.success) {
-        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
-        // WO-O4O-NETURE-SUPPLIER-ACTIVATION-GATE-ALIGN-AND-ERROR-SURFACE-V1: 구조화된 누락 필드 전달
-        return res.status(status).json({ success: false, error: { code: result.error, message: result.error, missingFields: result.missingFields ?? [] } });
-      }
-
-      netureActionLogService.logSuccess('neture', approvedBy, 'neture.admin.supplier_approve', {
-        meta: { supplierId: id },
-      }).catch(() => {});
-
-      res.json({ success: true, data: result.data });
-    } catch (error) {
-      logger.error('[Neture API] Error approving supplier:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to approve supplier' } });
-    }
-  });
-
-  /**
-   * POST /admin/suppliers/:id/reject
-   * 공급자 거절 (PENDING → REJECTED)
-   */
-  router.post('/suppliers/:id/reject', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { id } = req.params;
-      const rejectedBy = req.user?.id;
-      if (!rejectedBy) {
-        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
-      }
-
-      const { reason } = req.body || {};
-      const result = await netureService.rejectSupplier(id, rejectedBy, reason);
-      if (!result.success) {
-        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
-        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
-      }
-
-      netureActionLogService.logSuccess('neture', rejectedBy, 'neture.admin.supplier_reject', {
-        meta: { supplierId: id, reason },
-      }).catch(() => {});
-
-      res.json({ success: true, data: result.data });
-    } catch (error) {
-      logger.error('[Neture API] Error rejecting supplier:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to reject supplier' } });
-    }
-  });
+  // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §8:
+  // admin 전용 공급자 승인/반려 route 는 은퇴했다. canonical 경로는 operator (/neture/operator/*) 이며
+  // 공유 service(netureService.approve*/reject*) 는 그대로 보존한다.
 
   /**
    * GET /admin/suppliers/governance
@@ -378,19 +308,9 @@ export function createAdminController(dataSource: DataSource): Router {
 
   // ==================== Admin: Product Management (WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1) ====================
 
-  /**
-   * GET /admin/products/pending
-   * 승인 대기 상품 목록
-   */
-  router.get('/products/pending', requireAuth, requireNetureScope('neture:admin'), async (_req: Request, res: Response) => {
-    try {
-      const products = await netureService.getPendingProducts();
-      res.json({ success: true, data: products });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching pending products:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch pending products' } });
-    }
-  });
+  // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §8:
+  // admin 전용 상품 대기 목록 승인/반려 route 는 은퇴했다. canonical 경로는 operator (/neture/operator/*) 이며
+  // 공유 service(netureService.approve*/reject*) 는 그대로 보존한다.
 
   /**
    * GET /admin/products/summary
@@ -418,148 +338,9 @@ export function createAdminController(dataSource: DataSource): Router {
     }
   });
 
-  /**
-   * POST /admin/products/:id/approve
-   * 상품 승인 (isActive = true)
-   */
-  router.post('/products/:id/approve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { id } = req.params;
-      const adminUserId = req.user?.id;
-      if (!adminUserId) {
-        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
-      }
-
-      const result = await netureService.approveProduct(id, adminUserId);
-      if (!result.success) {
-        const status = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;
-        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
-      }
-
-      netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.product_approve', {
-        meta: { productId: id },
-      }).catch(() => {});
-
-      res.json({ success: true, data: result.data });
-    } catch (error) {
-      logger.error('[Neture API] Error approving product:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to approve product' } });
-    }
-  });
-
-  /**
-   * POST /admin/products/:id/reject
-   * 상품 반려 (isActive 유지 false)
-   */
-  router.post('/products/:id/reject', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { id } = req.params;
-      const adminUserId = req.user?.id;
-      if (!adminUserId) {
-        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
-      }
-
-      const { reason } = req.body || {};
-      const result = await netureService.rejectProduct(id, adminUserId, reason);
-      if (!result.success) {
-        const status = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;
-        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
-      }
-
-      netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.product_reject', {
-        meta: { productId: id, reason },
-      }).catch(() => {});
-
-      res.json({ success: true, data: result.data });
-    } catch (error) {
-      logger.error('[Neture API] Error rejecting product:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to reject product' } });
-    }
-  });
-
-  // ─── V3 Batch Endpoints — WO-O4O-TABLE-STANDARD-V3-EXPANSION ───
-
-  /** POST /admin/products/batch-approve — 일괄 승인 (V3 표준) */
-  router.post('/products/batch-approve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { ids } = req.body;
-      if (!Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ success: false, error: 'ids array is required' });
-      }
-      if (ids.length > 50) {
-        return res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
-      }
-
-      const adminUserId = req.user?.id;
-      if (!adminUserId) {
-        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
-      }
-
-      const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
-
-      for (const id of ids) {
-        try {
-          const result = await netureService.approveProduct(id, adminUserId);
-          if (!result.success) {
-            results.push({ id, status: 'skipped', error: result.error || 'Not pending' });
-          } else {
-            netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.product_batch_approve', {
-              meta: { productId: id },
-            }).catch(() => {});
-            results.push({ id, status: 'success' });
-          }
-        } catch (err: any) {
-          results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
-        }
-      }
-
-      res.json({ success: true, data: { results } });
-    } catch (error) {
-      logger.error('[Neture API] Error batch-approving products:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to batch approve products' } });
-    }
-  });
-
-  /** POST /admin/products/batch-reject — 일괄 반려 (V3 표준) */
-  router.post('/products/batch-reject', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const { ids, reason } = req.body;
-      if (!Array.isArray(ids) || ids.length === 0) {
-        return res.status(400).json({ success: false, error: 'ids array is required' });
-      }
-      if (ids.length > 50) {
-        return res.status(400).json({ success: false, error: 'Maximum 50 items per batch' });
-      }
-
-      const adminUserId = req.user?.id;
-      if (!adminUserId) {
-        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
-      }
-
-      const results: Array<{ id: string; status: 'success' | 'skipped' | 'failed'; error?: string }> = [];
-
-      for (const id of ids) {
-        try {
-          const result = await netureService.rejectProduct(id, adminUserId, reason);
-          if (!result.success) {
-            results.push({ id, status: 'skipped', error: result.error || 'Not pending' });
-          } else {
-            netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.product_batch_reject', {
-              meta: { productId: id, reason },
-            }).catch(() => {});
-            results.push({ id, status: 'success' });
-          }
-        } catch (err: any) {
-          results.push({ id, status: 'failed', error: err.message || 'Unknown error' });
-        }
-      }
-
-      res.json({ success: true, data: { results } });
-    } catch (error) {
-      logger.error('[Neture API] Error batch-rejecting products:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to batch reject products' } });
-    }
-  });
+  // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §8:
+  // admin 전용 상품 승인/반려 route 는 은퇴했다. canonical 경로는 operator (/neture/operator/*) 이며
+  // 공유 service(netureService.approve*/reject*) 는 그대로 보존한다.
 
   /**
    * GET /admin/products

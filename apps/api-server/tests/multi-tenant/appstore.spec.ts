@@ -47,7 +47,9 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const appIds = catalog.map(app => app.appId);
 
             // Expected apps (cosmetics-specific + global)
-            expect(appIds).toContain('cosmetics-seller-extension');
+            // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §21:
+            //   'cosmetics-seller-extension' 카탈로그 항목·패키지가 제거되어 노출되지 않는다.
+            expect(appIds).not.toContain('cosmetics-seller-extension');
             expect(appIds).toContain('forum-cosmetics');
             // WO-O4O-APPSTORE-RETIRED-COSMETICS-EXTENSIONS-CATALOG-CLOSURE-V1:
             //   삭제된 패키지의 카탈로그 항목이 제거되어 설치 가능 목록에 노출되지 않는다.
@@ -135,7 +137,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const appIds = catalog.map(app => app.appId);
 
             // Expected apps
-            expect(appIds).toContain('cosmetics-seller-extension');
+            // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §21:
+            //   'cosmetics-seller-extension' 카탈로그 항목·패키지가 제거되어 노출되지 않는다.
+            expect(appIds).not.toContain('cosmetics-seller-extension');
+            expect(appIds).toContain('market-trial');
             // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
             //   serviceGroup 'sellerops' 는 유지되지만 동명 앱 카탈로그 항목은 제거되었다.
             expect(appIds).not.toContain('sellerops');
@@ -403,7 +408,9 @@ describe('Multi-Tenant AppStore Filtering', () => {
 
             // Sellerops can install a sellerops-scoped app
             // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: 'sellerops' 앱 항목 제거에 따른 대체 검증
-            expect(canInstallApp('cosmetics-seller-extension', 'sellerops').canInstall).toBe(true);
+            // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §21:
+            //   'cosmetics-seller-extension' 카탈로그 항목·패키지가 제거되어 노출되지 않는다.
+            expect(canInstallApp('market-trial', 'sellerops').canInstall).toBe(true);
         });
     });
 
@@ -465,7 +472,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
             // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
             //   dropshipping-cosmetics → dropshipping-core 의존 체인이 통째로 제거되었다.
             //   cosmetics 카탈로그에는 두 항목이 의존 해석 결과로도 나타나지 않아야 한다.
-            expect(cosmeticsIds).toContain('cosmetics-seller-extension');
+            // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §21:
+            //   'cosmetics-seller-extension' 카탈로그 항목·패키지가 제거되어 노출되지 않는다.
+            expect(cosmeticsIds).not.toContain('cosmetics-seller-extension');
+            expect(cosmeticsIds).toContain('forum-cosmetics');
             expect(cosmeticsIds).not.toContain('dropshipping-cosmetics');
             expect(cosmeticsIds).not.toContain('dropshipping-core');
 
@@ -491,7 +501,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const selleropsApps = getAppsForServiceGroupWithDependencies('sellerops');
             const appIds = selleropsApps.map(app => app.appId);
 
-            expect(appIds).toContain('cosmetics-seller-extension');
+            // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §21:
+            //   'cosmetics-seller-extension' 카탈로그 항목·패키지가 제거되어 노출되지 않는다.
+            expect(appIds).not.toContain('cosmetics-seller-extension');
+            expect(appIds).toContain('market-trial');
             expect(appIds).not.toContain('sellerops');
             expect(appIds).not.toContain('dropshipping-core');
         });
