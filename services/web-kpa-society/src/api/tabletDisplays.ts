@@ -12,7 +12,14 @@ import { tryRefreshToken } from './token-refresh';
 import type { LocalProduct } from './localProducts';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
-const BASE = `${API_BASE}/api/v1/store`;
+/**
+ * WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 (축 B):
+ *   서비스 중립 경로(`/api/v1/store/...`)는 store_owner 판정에 serviceKey 가 없어
+ *   다중 서비스 사용자에게 **타 서비스 조직**이 선택될 수 있다. 같은 My Store 문맥의
+ *   local-products(`/api/v1/kpa/store/local-products`)와 같은 조직을 해석하도록
+ *   KPA canonical mount 를 사용한다. 백엔드 라우터·핸들러는 동일하다.
+ */
+const BASE = `${API_BASE}/api/v1/kpa/store`;
 
 // ==================== Types ====================
 

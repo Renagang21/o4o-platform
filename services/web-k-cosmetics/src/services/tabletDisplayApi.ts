@@ -4,14 +4,20 @@
  * WO-O4O-STORE-LOCAL-PRODUCT-UI-V1
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
  *
- * Platform-level API: /api/v1/store/tablets
+ * Service-scoped API: /api/v1/cosmetics/store/tablets
+ * (WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 축 A —
+ *  서비스 중립 /api/v1/store/* 는 타 서비스 조직을 고를 수 있어 KCos 축으로 스코프)
  * Manages tablet device display configurations (supplier + local products).
  */
 
 import { api } from '../lib/apiClient';
 import type { LocalProduct } from './localProductApi';
+import type {
+  StoreTabletChannelState,
+  StoreTabletPoolSupplierProductRow,
+} from '@o4o/store-ui-core';
 
-const BASE = '/store';
+const BASE = '/cosmetics/store';
 
 // ==================== Types ====================
 
@@ -32,19 +38,16 @@ export interface DisplayItem {
   created_at?: string;
 }
 
-export interface PoolSupplierProduct {
-  id: string;
-  offer_id: string;
-  product_name: string;
-  retail_price: string;
-  is_active: boolean;
-  service_key: string;
-  created_at: string;
-}
+/**
+ * 공급 상품 행 · 채널 상태 계약은 `@o4o/store-ui-core` 가 정본이다.
+ * WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 (축 B)
+ */
+export type PoolSupplierProduct = StoreTabletPoolSupplierProductRow;
 
 export interface ProductPool {
   supplierProducts: PoolSupplierProduct[];
   localProducts: LocalProduct[];
+  tabletChannel?: StoreTabletChannelState | null;
 }
 
 // ==================== API ====================

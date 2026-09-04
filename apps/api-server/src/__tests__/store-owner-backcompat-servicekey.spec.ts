@@ -173,7 +173,6 @@ describe('§9 census — SERVICE_NEUTRAL_BACKCOMPAT 잔여 집합이 늘지 않�
     'modules/store-ai/controllers/product-ai-recommendation.controller.ts',
     'modules/store/store-library.routes.ts',
     'routes/o4o-store/controllers/store-product-library.controller.ts',
-    'routes/platform/store-tablet.routes.ts',
   ].sort();
 
   function collect(dir: string, out: string[] = []): string[] {
@@ -190,11 +189,15 @@ describe('§9 census — SERVICE_NEUTRAL_BACKCOMPAT 잔여 집합이 늘지 않�
   }
 
   /**
+   * WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 (축 B):
+   *   `routes/platform/store-tablet.routes.ts` 도 mount 옵션(storeOwnerServiceKey)으로 serviceKey 를
+   *   주입받게 되어 목록에서 빠졌다. 서비스 중립 `/api/v1/store` mount 는 무변경(기존 back-compat).
+   *
    * WO-O4O-STORE-LOCAL-PRODUCTS-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
    *   `routes/platform/store-local-product.routes.ts` 는 mount 단계에서 serviceKey 를 주입받아
    *   목록에서 빠졌다 (서비스별 mount = canonical / 서비스 중립 mount = back-compat).
    */
-  it('serviceKey 없는 호출부는 문서화된 5곳뿐이다', () => {
+  it('serviceKey 없는 호출부는 문서화된 4곳뿐이다', () => {
     const found = new Set<string>();
 
     for (const file of collect(API_SERVER_SRC)) {

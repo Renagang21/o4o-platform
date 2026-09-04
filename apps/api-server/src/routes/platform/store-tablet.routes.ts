@@ -41,7 +41,7 @@ import { TabletInterestRequest, InterestRequestStatus } from './entities/tablet-
 import { ProductMaster } from '../../modules/neture/entities/ProductMaster.entity.js';
 import { StoreProductProfile } from '../../modules/store-core/entities/StoreProductProfile.entity.js';
 import { validateGtin } from '../../utils/gtin.js';
-import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
+import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
 // WO-O4O-KPA-TABLET-IDLE-BLOCK-INTEGRATION-V1: idle_media block config 검증 (dual-read helper 모듈)
 import { parseIdleMediaConfig, resolveIdleMediaItems } from './store-tablet-idle-block.js';
 // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-SCHEMA-CONTRACT-V1: content_list config 검증
@@ -54,6 +54,12 @@ import { createStoreContentSourceAdapter } from './store-public/store-public-tab
 import { shapeStaticBlock, resolveTemplateKey } from './store-public/store-public-tablet-screen.js';
 // WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1: 미리보기도 실제 태블릿과 **같은** 선택 상품 resolver 를 재사용(복제 금지).
 import { resolveSelectedProductListSection } from './store-public/store-public-screen-set-resolve.js';
+// WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 (축 A):
+//   편집기 상품 풀에 **런타임 노출 가능 여부**를 additive 로 덧붙인다(런타임 게이트는 불변).
+import {
+  annotateTabletVisibility,
+  resolveStoreTabletChannelState,
+} from './store-tablet-product-visibility.js';
 // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: 저장 시 screen_set QR 멱등 확보 + URL 도출.
 import { ensureScreenSetQr, buildScreenSetQrUrl, setScreenSetQrActive } from './store-screen-set-qr.service.js';
 // WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 가져오기 provenance(추적 전용, FK 없음).
@@ -237,6 +243,18 @@ export interface StoreTabletRoutesOptions {
   qrServiceKey?: string;
   /** 매장 HUB 가 열람·복사하는 운영자 Screen Set 원본의 service_key (기본 `kpa`) */
   operatorTemplateServiceKey?: string;
+  /**
+   * store_owner 판정·조직 해석에 쓰이는 serviceKey
+   * (WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 축 B).
+   *
+   * 미지정 = 기존 back-compat 경로: `createRequireStoreOwner(dataSource)` 가 모든 서비스의
+   * store_owner role 을 허용하고 조직도 서비스 중립으로 고른다 → 다중 서비스 사용자에게
+   * **타 서비스 조직**이 선택될 수 있다(같은 My Store 문맥의 local-products 와 조직 불일치).
+   *
+   * 지정 시 해당 서비스에 등록된 조직만 후보가 되며 2개 이상이면 409(AMBIGUOUS)로 차단된다.
+   * `resolveOrganizationId` 가 주입된 경로(Pharmacy-Hub)에서는 이 옵션이 쓰이지 않는다.
+   */
+  storeOwnerServiceKey?: StoreOwnerServiceKey;
 }
 
 export function createStoreTabletRoutes(
@@ -244,12 +262,32 @@ export function createStoreTabletRoutes(
   options: StoreTabletRoutesOptions = {},
 ): Router {
   const router = Router();
-  const requirePharmacyOwner = createRequireStoreOwner(dataSource);
+  const requirePharmacyOwner = createRequireStoreOwner(dataSource, options.storeOwnerServiceKey);
 
   // 서비스별 주입값 — 미지정 시 기존 상수(kpa)와 동일하다.
   const qrServiceKey = options.qrServiceKey ?? TABLET_QR_SERVICE_KEY;
   const operatorTemplateServiceKey =
     options.operatorTemplateServiceKey ?? OPERATOR_TEMPLATE_SERVICE_KEY;
+
+  /**
+   * 매장 slug 의 service_key 해석 (WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 축 A).
+   *   공개 태블릿 런타임·미리보기와 **같은 기준**(platform_store_slugs)을 쓴다.
+   *   행이 없으면 기존 기본값(qrServiceKey)으로 fallback.
+   */
+  async function resolveStoreServiceKey(organizationId: string): Promise<string> {
+    try {
+      const rows = await dataSource.query(
+        `SELECT service_key AS "serviceKey" FROM platform_store_slugs
+          WHERE store_id = $1 AND is_active = true
+          ORDER BY updated_at DESC NULLS LAST LIMIT 1`,
+        [organizationId],
+      );
+      if (rows?.[0]?.serviceKey) return String(rows[0].serviceKey);
+    } catch (err) {
+      console.warn('[StoreTablet] store slug service_key resolve skipped:', (err as any)?.message);
+    }
+    return qrServiceKey;
+  }
 
   // Lazy-loaded requireAuth middleware
   let _requireAuth: AuthMiddleware;
@@ -1017,11 +1055,20 @@ export function createStoreTabletRoutes(
         ),
       ]);
 
+      // WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 (축 A):
+      //   선택 가능 목록은 그대로 두고 런타임 노출 여부만 덧붙인다(필터링하지 않는다).
+      const storeServiceKey = await resolveStoreServiceKey(organizationId);
+      const [annotatedSupplier, tabletChannel] = await Promise.all([
+        annotateTabletVisibility(dataSource, organizationId, storeServiceKey, supplierProducts),
+        resolveStoreTabletChannelState(dataSource, organizationId),
+      ]);
+
       res.json({
         success: true,
         data: {
-          supplierProducts,
+          supplierProducts: annotatedSupplier,
           localProducts,
+          tabletChannel,
         },
       });
     } catch (error: any) {
@@ -1072,7 +1119,13 @@ export function createStoreTabletRoutes(
           [organizationId],
         ),
       ]);
-      res.json({ success: true, data: { supplierProducts, localProducts } });
+      // WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 (축 A): 위와 동일한 annotation.
+      const storeServiceKey = await resolveStoreServiceKey(organizationId);
+      const [annotatedSupplier, tabletChannel] = await Promise.all([
+        annotateTabletVisibility(dataSource, organizationId, storeServiceKey, supplierProducts),
+        resolveStoreTabletChannelState(dataSource, organizationId),
+      ]);
+      res.json({ success: true, data: { supplierProducts: annotatedSupplier, localProducts, tabletChannel } });
     } catch (error: any) {
       console.error('[StoreTablet] GET /product-pool error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch product pool', code: 'INTERNAL_ERROR' });

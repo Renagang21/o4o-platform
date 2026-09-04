@@ -21,12 +21,12 @@ export interface StaffInterestRequest {
 }
 
 export async function fetchInterestRequests(): Promise<StaffInterestRequest[]> {
-  const res = await api.get('/store/interest/recent');
+  const res = await api.get('/glycopharm/store/interest/recent');
   return res.data?.data;
 }
 
 export async function fetchInterestPendingCount(): Promise<{ count: number }> {
-  const res = await api.get('/store/interest/pending-count');
+  const res = await api.get('/glycopharm/store/interest/pending-count');
   return res.data?.data;
 }
 
@@ -34,6 +34,6 @@ export async function updateInterestAction(
   id: string,
   action: 'acknowledge' | 'complete' | 'cancel',
 ): Promise<{ id: string; status: string; updatedAt: string }> {
-  const res = await api.patch(`/store/interest/${id}/${action}`);
+  const res = await api.patch(`/glycopharm/store/interest/${id}/${action}`);
   return res.data?.data;
 }

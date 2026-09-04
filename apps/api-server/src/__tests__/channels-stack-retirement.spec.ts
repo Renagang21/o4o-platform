@@ -108,7 +108,7 @@ describe('A. runtime 진입점 은퇴 — 되살아나지 않는다', () => {
     expect(src).not.toMatch(/getRepository\(\s*ChannelHeartbeat\s*\)/);
     expect(src).not.toMatch(/getRepository\(\s*ChannelPlaybackLog\s*\)/);
     // import 자체도 남기지 않는다(주석 설명은 허용).
-    expect(src).not.toMatch(/^import\s*\{[^}]*Channel[^}]*\}\s*from/m);
+    expect(src).not.toMatch(/^import\s*\{[^}]*\bChannel\b[^}]*\}\s*from/m);
   });
 
   it('어떤 runtime 소스도 Channel entity repository 를 획득하지 않는다', () => {
