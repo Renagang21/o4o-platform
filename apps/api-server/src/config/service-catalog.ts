@@ -94,6 +94,23 @@ export const O4O_SERVICES: O4OService[] = [
     description: '약사회 분회 홈페이지 및 분회 회원 관리 서비스',
     joinEnabled: false,
   },
+  /**
+   * WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1
+   *
+   * Cafe24 B2B — Cafe24 B2B 사업자의 거래처 매장에 O4O 매장 판매지원(설명서·QR·태블릿·
+   * 사이니지)을 제공하는 서비스. 회원은 **Cafe24 회원 로그인만으로** 진입하며 O4O 자체
+   * 가입 경로가 없다. 따라서 joinEnabled=false 이고 이 키는 /check-email·가입 UX 에
+   * 노출되지 않는다. domain 은 플랫폼 기본 호스트다 (별도 배포 없음).
+   * platform_services row 는 20270322000000-CreateCafe24MemberLinksAndSeedCafe24B2bService.
+   */
+  {
+    key: 'cafe24-b2b',
+    name: 'Cafe24 B2B',
+    nameKo: 'Cafe24 B2B 매장 지원',
+    domain: 'neture.co.kr',
+    description: 'Cafe24 B2B 사업자의 거래처 매장 판매지원 서비스',
+    joinEnabled: false,
+  },
 ];
 
 /** 서비스 키 → O4OService 조회 */

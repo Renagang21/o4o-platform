@@ -41,6 +41,9 @@ module.exports = {
     // TypeORM metadata 를 build 해야 한다. dist 는 ESM 이라 ts-jest 가 변환하지 못하므로
     // 다른 패키지와 동일하게 src 로 매핑한다.
     '^@o4o-apps/cms-core/entities$': '<rootDir>/../../packages/cms-core/src/entities/index.ts',
+    // WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1:
+    //   dist 는 ESM 이라 ts-jest 가 변환하지 못한다. 다른 패키지와 동일하게 src 로 매핑한다.
+    '^@o4o/platform-core/(.*)$': '<rootDir>/../../packages/platform-core/src/$1/index.ts',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
