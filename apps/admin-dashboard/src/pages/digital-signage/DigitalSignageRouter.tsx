@@ -3,21 +3,17 @@
  *
  * Admin Dashboard router for Digital Signage system management
  *
- * Route Structure (Role Reform V1):
- * - / (root): System Dashboard
- * - /settings: System settings
- * - /extensions: Extension app management
- * - /suppliers: Supplier management
- * - /analytics: System-wide analytics
- * - /monitoring: System monitoring
- * - /operations/*: Operations legacy (Phase 12)
+ * Route Structure (WO-O4O-SIGNAGE-RESIDUAL-DEAD-RUNTIME-FINAL-RETIREMENT-V1):
+ * - / (root): Content Hub
+ * - /content: Content Hub (`/api/signage/:serviceKey/global/*`)
+ *
+ * Phase 6 legacy 화면(media / display / schedule / action / operations)과
+ * Channel 기반 monitoring 화면은 consumer 0 이 증명되어 은퇴했다.
+ * 남은 canonical admin 진입점은 Content Hub 하나다.
  *
  * IMPORTANT: This router is for ADMIN ONLY.
  * - HQ Operator routes are in Service Frontend (/signage/hq/*)
  * - Store routes are in Service Frontend (/signage/store/*)
- *
- * See: ROLE-STRUCTURE-V3.md for role definitions
- * See: SIGNAGE-ROUTING-MAP-V3.md for full route structure
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
@@ -25,50 +21,8 @@ import { lazy, Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AppGuard } from '@/components/common/AppGuard';
 
-// ========== Admin System Pages ==========
-// System Dashboard / Monitoring
-const SystemDashboard = lazy(() => import('./v2/MonitoringDashboard'));
-
 // Content Hub (WO-SIGNAGE-CONTENT-HUB-V1)
 const ContentHub = lazy(() => import('./v2/ContentHub'));
-
-// System Settings
-const SystemSettings = lazy(() => import('./admin/SystemSettings'));
-
-// Extension Management
-const ExtensionList = lazy(() => import('./admin/ExtensionList'));
-
-// Supplier Management
-const SupplierList = lazy(() => import('./admin/SupplierList'));
-
-// System Analytics
-const SystemAnalytics = lazy(() => import('./admin/SystemAnalytics'));
-
-// ========== Operations Pages (Phase 12 Legacy) ==========
-const OperationsDashboard = lazy(() => import('./operations/OperationsDashboard'));
-const ActionHistory = lazy(() => import('./operations/ActionHistory'));
-const DisplayStatusMap = lazy(() => import('./operations/DisplayStatusMap'));
-const ProblemTracking = lazy(() => import('./operations/ProblemTracking'));
-
-// ========== Legacy Phase 6 Pages (for backward compatibility) ==========
-// Media pages
-const MediaSourceList = lazy(() => import('./media/MediaSourceList'));
-const MediaSourceDetail = lazy(() => import('./media/MediaSourceDetail'));
-const MediaListList = lazy(() => import('./media/MediaListList'));
-const MediaListDetail = lazy(() => import('./media/MediaListDetail'));
-
-// Display pages
-const DisplayList = lazy(() => import('./display/DisplayList'));
-const DisplayDetail = lazy(() => import('./display/DisplayDetail'));
-const DisplaySlotList = lazy(() => import('./display/DisplaySlotList'));
-
-// Schedule pages
-const ScheduleList = lazy(() => import('./schedule/ScheduleList'));
-const ScheduleDetail = lazy(() => import('./schedule/ScheduleDetail'));
-
-// Action pages
-const ActionExecutionList = lazy(() => import('./action/ActionExecutionList'));
-const ActionExecutionDetail = lazy(() => import('./action/ActionExecutionDetail'));
 
 const PageLoader = () => (
   <div className="p-6 space-y-4">
@@ -100,42 +54,10 @@ export default function DigitalSignageRouter() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* ========== Admin Dashboard Root ========== */}
-          <Route path="/" element={<Navigate to="monitoring" replace />} />
+          <Route path="/" element={<Navigate to="content" replace />} />
 
-          {/* ========== Admin: System Management ========== */}
-          <Route path="monitoring" element={<SystemDashboard />} />
+          {/* ========== Admin: Content Hub (canonical) ========== */}
           <Route path="content" element={<ContentHub />} />
-          <Route path="settings" element={<SystemSettings />} />
-          <Route path="extensions" element={<ExtensionList />} />
-          <Route path="suppliers" element={<SupplierList />} />
-          <Route path="analytics" element={<SystemAnalytics />} />
-
-          {/* ========== Admin: Operations (Phase 12) ========== */}
-          <Route path="operations" element={<OperationsDashboard />} />
-          <Route path="operations/history" element={<ActionHistory />} />
-          <Route path="operations/display-status" element={<DisplayStatusMap />} />
-          <Route path="operations/problems" element={<ProblemTracking />} />
-
-          {/* ========== Legacy Phase 6 Routes ========== */}
-          {/* These routes are kept for backward compatibility */}
-          {/* Media routes */}
-          <Route path="media/sources" element={<MediaSourceList />} />
-          <Route path="media/sources/:id" element={<MediaSourceDetail />} />
-          <Route path="media/lists" element={<MediaListList />} />
-          <Route path="media/lists/:id" element={<MediaListDetail />} />
-
-          {/* Display routes */}
-          <Route path="displays" element={<DisplayList />} />
-          <Route path="displays/:id" element={<DisplayDetail />} />
-          <Route path="display-slots" element={<DisplaySlotList />} />
-
-          {/* Schedule routes (legacy) */}
-          <Route path="schedules" element={<ScheduleList />} />
-          <Route path="schedules/:id" element={<ScheduleDetail />} />
-
-          {/* Action routes */}
-          <Route path="actions" element={<ActionExecutionList />} />
-          <Route path="actions/:id" element={<ActionExecutionDetail />} />
 
           {/* ========== Removed Routes (Role Reform) ========== */}
           {/* These routes have been moved to Service Frontend */}
@@ -205,7 +127,7 @@ export default function DigitalSignageRouter() {
           />
 
           {/* Catch-all for unknown routes */}
-          <Route path="*" element={<Navigate to="monitoring" replace />} />
+          <Route path="*" element={<Navigate to="content" replace />} />
         </Routes>
       </Suspense>
     </AppGuard>
