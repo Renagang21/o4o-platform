@@ -9,7 +9,7 @@
 | 책임 | 경계 |
 |------|------|
 | Media Source (URL/file) | 업종별 콘텐츠 → Extension |
-| Media List, Display, Display Slot | 렌더링 → digital-signage-agent |
+| Media List, Display, Display Slot | 렌더링 소비처 없음 (digital-signage-agent 은퇴) |
 | Schedule, Action Execution | |
 
 ## 외부 노출
@@ -29,4 +29,4 @@
 ## 비고
 
 - Extension Interface: Phase 3에서 구현 예정
-- digital-signage-agent와 연동
+- digital-signage-agent 는 은퇴했다 (WO-O4O-DIGITAL-SIGNAGE-AGENT-DEAD-RUNTIME-RETIREMENT-V1 · main `57df27e5e`) — 연동 대상 없음
