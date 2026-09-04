@@ -1,5 +1,15 @@
-// Smart Display (Digital Signage) Types
-// Signage Extension - URL 기반 콘텐츠 관리
+// Smart Display (Digital Signage) Types — GlycoPharm 콘텐츠 라이브러리 전용
+//
+// WO-O4O-SIGNAGE-POST-RETIREMENT-DOCS-AND-TYPE-RESIDUE-CLOSURE-V1:
+// Phase-6 signage 축(MediaSource / MediaSourceType / PlaylistItem / Playlist /
+// PlaylistStatus / DisplaySchedule / DayOfWeek / SharedPlaylist / PlaybackState /
+// ParsedVideoUrl / DisplaySettings / MySignageItem / SignageChannel) 은 소비처 0 으로
+// 제거했다. 현행 signage 타입 canonical 은 `@o4o/types/signage` 이며,
+// GlycoPharm signage 화면(MediaDetailPage / PlaylistDetailPage / HubSignageLibraryPage)
+// 은 그쪽을 사용한다.
+//
+// 아래 3종은 `ContentLibraryPage` (`/store/marketing/signage/library`) 가
+// `@/types` barrel 을 통해 실제로 소비하는 ACTIVE 타입이다.
 
 /**
  * 콘텐츠 유형
@@ -12,7 +22,7 @@ export type ContentType = 'video' | 'lms' | 'link';
 export type ContentSource = 'neture' | 'hq' | 'supplier' | 'pharmacy' | 'operator_ad';
 
 /**
- * 콘텐츠 아이템 (Signage Extension 핵심 타입)
+ * 콘텐츠 아이템 (Signage 콘텐츠 라이브러리 핵심 타입)
  */
 export interface ContentItem {
   id: string;
@@ -28,160 +38,4 @@ export interface ContentItem {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-}
-
-/**
- * My Signage 아이템 (약국별 편성)
- */
-export interface MySignageItem {
-  id: string;
-  pharmacyId: string;
-  contentId: string;
-  content?: ContentItem;
-  channel: string;            // TV1, TV2 등
-  order: number;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * 채널 정보
- */
-export interface SignageChannel {
-  id: string;
-  pharmacyId: string;
-  name: string;               // TV1, TV2 등
-  description?: string;
-  isDefault: boolean;
-  createdAt: string;
-}
-
-/**
- * 미디어 소스 타입 (기존 호환)
- */
-export type MediaSourceType = 'youtube' | 'vimeo';
-
-/**
- * 미디어 소스 - YouTube/Vimeo URL 정보
- */
-export interface MediaSource {
-  id: string;
-  name: string;
-  sourceType: MediaSourceType;
-  sourceUrl: string;       // 원본 URL
-  embedId: string;         // YouTube: video ID, Vimeo: video ID
-  thumbnailUrl?: string;   // 썸네일 URL
-  duration?: number;       // 재생 시간 (초)
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * 플레이리스트 아이템 - 재생 순서와 시간 설정
- */
-export interface PlaylistItem {
-  id: string;
-  mediaSourceId: string;
-  mediaSource: MediaSource;
-  order: number;           // 재생 순서
-  playDuration?: number;   // 재생 시간 (초), null이면 전체 재생
-  transitionType?: 'fade' | 'slide' | 'none';
-}
-
-/**
- * 플레이리스트 상태
- */
-export type PlaylistStatus = 'draft' | 'active' | 'archived';
-
-/**
- * 플레이리스트
- */
-export interface Playlist {
-  id: string;
-  pharmacyId: string;
-  name: string;
-  description?: string;
-  items: PlaylistItem[];
-  status: PlaylistStatus;
-  isPublic: boolean;       // 포럼에 공개 여부
-  totalDuration: number;   // 전체 재생 시간 (초)
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * 요일 타입 (0: 일요일 ~ 6: 토요일)
- */
-export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
-
-/**
- * 디스플레이 스케줄 - 시간대별 플레이리스트 배정
- */
-export interface DisplaySchedule {
-  id: string;
-  pharmacyId: string;
-  name: string;
-  playlistId: string;
-  playlist?: Playlist;
-  daysOfWeek: DayOfWeek[]; // 적용 요일
-  startTime: string;       // HH:mm 형식
-  endTime: string;         // HH:mm 형식
-  isActive: boolean;
-  priority: number;        // 스케줄 충돌 시 우선순위
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * 공유된 플레이리스트 (포럼용)
- */
-export interface SharedPlaylist {
-  id: string;
-  playlistId: string;
-  playlist: Playlist;
-  pharmacyName: string;
-  pharmacyId: string;
-  description?: string;
-  tags: string[];
-  likeCount: number;
-  downloadCount: number;   // 가져가기 횟수
-  isLikedByMe: boolean;
-  createdAt: string;
-}
-
-/**
- * 현재 재생 상태
- */
-export interface PlaybackState {
-  currentPlaylistId: string | null;
-  currentItemIndex: number;
-  isPlaying: boolean;
-  elapsedTime: number;
-  lastSyncAt: string;
-}
-
-/**
- * YouTube URL 파싱 결과
- */
-export interface ParsedVideoUrl {
-  isValid: boolean;
-  sourceType: MediaSourceType | null;
-  embedId: string | null;
-  thumbnailUrl: string | null;
-  errorMessage?: string;
-}
-
-/**
- * 디스플레이 설정
- */
-export interface DisplaySettings {
-  pharmacyId: string;
-  defaultPlaylistId?: string;
-  autoPlayEnabled: boolean;
-  showClockOverlay: boolean;
-  showPharmacyInfo: boolean;
-  transitionDuration: number; // ms
-  volume: number;             // 0-100
 }
