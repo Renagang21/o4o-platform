@@ -18,10 +18,15 @@
  *   공개 매장 slug = platform_store_slugs
  *   → Pharmacy-Hub 전용 조직/매장 테이블을 만들지 않는다.
  *
- * 조직 식별 전략 (재사용 우선):
- *   1) 사용자가 이미 소속된 조직(owner/admin/manager, left_at IS NULL) 이 정확히 1개면 그것을 쓴다.
+ * 조직 식별 전략 (재사용 우선 · **Pharmacy-Hub 로 스코프됨**):
+ *   WO-O4O-PHARMACYHUB-STORE-ORGANIZATION-SERVICE-SCOPED-RESOLUTION-V1 (2026-09-04)
+ *     후보 판정은 전 서비스 조직이 아니라 **PH 에 귀속된 조직**만 본다. 귀속 판정 SSOT 는
+ *     읽기 측과 동일한 `store-organization.resolver` (enrollment + platform_store_slugs) 다.
+ *     그전에는 KPA·GlycoPharm·K-Cosmetics·Neture 조직까지 한 후보군으로 세어,
+ *     멀티서비스 사용자가 PH 조직 0개인데도 AMBIGUOUS_ORGANIZATION 으로 영구 보류됐다.
+ *   1) 사용자가 소속된 **PH** 매장 조직(owner/admin/manager, left_at IS NULL) 이 정확히 1개면 그것을 쓴다.
  *      resolveStoreAccess() 가 바로 그 row 를 읽으므로 재사용이 곧 정합이다.
- *   2) 0개이고 businessInfo.businessNumber 가 있으면 동일 사업자번호 조직을 찾아 재사용한다.
+ *   2) 0개이고 businessInfo.businessNumber 가 있으면 동일 사업자번호 **PH** 조직을 찾아 재사용한다.
  *   3) 그래도 없으면 신규 생성. code = `ph-pharm-{userId 앞 12 hex}` — GlycoPharm 선례
  *      (`gp-pharm-{userId 12 hex}`) 와 동일한 **사용자 스코프 결정적 코드**다.
  *      Pharmacy-Hub 가입 폼은 사업자번호를 받지 않으므로(약국명·연락처만) KPA 의
@@ -29,8 +34,8 @@
  *      ensureOrganization 의 ON CONFLICT (code) 가 동일 row 를 반환한다(멱등).
  *
  * 보류(HOLD) 정책 — 추측으로 매장을 만들지 않는다:
- *   - 소속 조직 후보가 2개 이상        → AMBIGUOUS_ORGANIZATION
- *   - 동일 사업자번호 조직이 2개 이상  → DUPLICATE_BUSINESS_NUMBER
+ *   - 소속 **PH** 조직 후보가 2개 이상 → AMBIGUOUS_ORGANIZATION
+ *   - 동일 사업자번호 **PH** 조직 2개 이상 → DUPLICATE_BUSINESS_NUMBER
  *   - 약국명이 없어 조직명을 못 정함   → MISSING_STORE_NAME
  *   보류는 실패가 아니라 "사람이 판단할 대상"이며, 승인 자체를 되돌리지 않는다.
  *
@@ -46,7 +51,14 @@ import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import logger from '../../utils/logger.js';
 // WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
 //   organization_members 매장 역할 집합은 공통 SSOT 재사용 (로컬 정의 제거)
-import { STORE_MEMBER_ROLES } from '../../utils/store-organization.resolver.js';
+// WO-O4O-PHARMACYHUB-STORE-ORGANIZATION-SERVICE-SCOPED-RESOLUTION-V1:
+//   조직 후보 판정도 같은 SSOT 를 쓴다 (읽기 측 resolveStoreAccess 와 동일 함수)
+import {
+  STORE_MEMBER_ROLES,
+  findStoreOrganizationCandidates,
+  isOrganizationLinkedToService,
+  type StoreOwnerServiceKey,
+} from '../../utils/store-organization.resolver.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 /** 매장 주체를 갖는 유일한 Pharmacy-Hub 역할. supplier/operator 는 매장이 없다. */
@@ -257,7 +269,21 @@ export class PharmacyHubStoreProvisioningService {
       };
     }
 
-    // ── 2. dry-run: write 없이 예상 결과만 계산한다 ──
+    // ── 2. 조직명 확보 — 신규 생성 경로는 약국명이 없으면 성립하지 않는다 ──
+    //   WO-O4O-PHARMACYHUB-STORE-ORGANIZATION-SERVICE-SCOPED-RESOLUTION-V1:
+    //   이 판정은 원래 dry-run **뒤**에 있어서, dry-run 은 'created' 를 보고하는데
+    //   apply 는 held(MISSING_STORE_NAME) 로 끝나는 불일치가 있었다.
+    //   dry-run 을 apply 의 예고로 쓰려면 같은 게이트를 같은 순서로 통과해야 한다.
+    if (!resolved.organizationId && !storeName) {
+      return {
+        ...base,
+        outcome: 'held',
+        holdReason: 'MISSING_STORE_NAME',
+        detail: '약국명(businessInfo.businessName)이 비어 있어 조직명을 정할 수 없습니다.',
+      };
+    }
+
+    // ── 3. dry-run: write 없이 예상 결과만 계산한다 ──
     if (dryRun) {
       const slugPreview = resolved.organizationId
         ? await this.findSlug(resolved.organizationId)
@@ -271,15 +297,6 @@ export class PharmacyHubStoreProvisioningService {
         detail: resolved.organizationId
           ? `기존 조직 재사용 예정 (${resolved.reason})`
           : `신규 조직 생성 예정 (code=${orgCodeForUser(userId)}, name=${storeName})`,
-      };
-    }
-
-    if (!resolved.organizationId && !storeName) {
-      return {
-        ...base,
-        outcome: 'held',
-        holdReason: 'MISSING_STORE_NAME',
-        detail: '약국명(businessInfo.businessName)이 비어 있어 조직명을 정할 수 없습니다.',
       };
     }
 
@@ -482,6 +499,16 @@ export class PharmacyHubStoreProvisioningService {
 
   // ─── 내부 헬퍼 ────────────────────────────────────────────────────────
 
+  /** 보류 사유 메시지용 조직 라벨(code 우선, 없으면 id). 판정에는 쓰지 않는다. */
+  private async describeOrganizations(ids: string[]): Promise<string[]> {
+    if (ids.length === 0) return [];
+    const rows = await this.dataSource.query(
+      `SELECT id, code FROM organizations WHERE id = ANY($1::uuid[]) ORDER BY id`,
+      [ids],
+    );
+    return (rows as Array<{ id: string; code: string | null }>).map((r) => r.code || r.id);
+  }
+
   /**
    * 조직 결정. 재사용 우선, 모호하면 보류.
    */
@@ -496,33 +523,46 @@ export class PharmacyHubStoreProvisioningService {
     hold?: ProvisionHoldReason;
     detail?: string;
   }> {
-    // 1) 사용자가 이미 소속된 매장 조직
-    const memberOrgs = await this.dataSource.query(
-      `SELECT o.id, o.code, o.name
-       FROM organization_members om
-       JOIN organizations o ON o.id = om.organization_id
-       WHERE om.user_id = $1
-         AND om.role = ANY($2::text[])
-         AND om.left_at IS NULL
-       ORDER BY o.id`,
-      [userId, STORE_MEMBER_ROLES],
+    // 1) 사용자가 이미 소속된 **Pharmacy-Hub** 매장 조직
+    //
+    //    WO-O4O-PHARMACYHUB-STORE-ORGANIZATION-SERVICE-SCOPED-RESOLUTION-V1
+    //
+    //    결함(PH-BUG-03d): 이전 구현은 서비스 구분 없이 owner/admin/manager 조직
+    //    전체를 후보로 셀다. 그래서 KPA 약국 + GlycoPharm 약국 + K-Cosmetics 매장 +
+    //    Neture 공급자를 함께 가진 멀티서비스 사용자는 **PH 조직이 0개인데도**
+    //    AMBIGUOUS_ORGANIZATION 으로 영구 보류되어 PH 매장을 영원히 가질 수 없었다.
+    //    O4O 는 한 사람이 여러 서비스에 동시 참여하는 구조이므로 이건 정상 모양이 아니다.
+    //
+    //    수정: 후보 집합을 **읽기 측 canonical resolver 와 같은 함수**로 구한다.
+    //    `/store-owner/info` 가 not_connected 를 판정하는 근거가 바로 이 함수라,
+    //    write 측이 같은 함수를 쓰면 두 축이 구조적으로 어긋나질 수 없다.
+    //    서비스 경계 정의를 여기서 다시 쓰지 않는다(SQL 복제 금지).
+    //
+    //    ⚠️ ambiguity 안전장치는 제거하지 않는다 — **범위만** PH 로 좁힌다.
+    //       PH 후보가 2개 이상이면 여전히 사람 판단으로 넘긴다.
+    const phCandidates = await findStoreOrganizationCandidates(
+      this.dataSource,
+      userId,
+      SERVICE_KEY as StoreOwnerServiceKey,
     );
 
-    if (memberOrgs.length > 1) {
+    if (phCandidates.length > 1) {
+      const labels = await this.describeOrganizations(phCandidates.map((c) => c.organizationId));
       return {
         organizationId: null,
         organizationCode: null,
         reason: 'ambiguous',
         hold: 'AMBIGUOUS_ORGANIZATION',
         detail:
-          `소속 매장 조직이 ${memberOrgs.length}개입니다 ` +
-          `(${memberOrgs.map((o: any) => o.code || o.id).join(', ')}). ` +
+          `Pharmacy-Hub 매장 조직이 ${phCandidates.length}개입니다 ` +
+          `(${labels.join(', ')}). ` +
           `매장 조직은 자동 선택하지 않습니다(임의 선택 금지).`,
       };
     }
-    if (memberOrgs.length === 1) {
+    if (phCandidates.length === 1) {
+      const organizationId = phCandidates[0].organizationId;
       // WO-...-ORGANIZATION-REUSE-GUARD-V1: 후보가 1개여도 "그 조직이 무엇인지" 확인한다.
-      const safety = await this.validateOrganizationReuseSafety(memberOrgs[0].id);
+      const safety = await this.validateOrganizationReuseSafety(organizationId);
       if (!safety.safe) {
         return {
           organizationId: null,
@@ -532,22 +572,48 @@ export class PharmacyHubStoreProvisioningService {
           detail: safety.detail,
         };
       }
+      const [org] = await this.dataSource.query(
+        `SELECT code FROM organizations WHERE id = $1 LIMIT 1`,
+        [organizationId],
+      );
       return {
-        organizationId: memberOrgs[0].id,
-        organizationCode: memberOrgs[0].code ?? null,
+        organizationId,
+        organizationCode: org?.code ?? null,
         reason: 'existing organization_members',
       };
     }
 
     // 2) 동일 사업자번호 조직 (있을 때만)
+    //
+    //    WO-O4O-PHARMACYHUB-STORE-ORGANIZATION-SERVICE-SCOPED-RESOLUTION-V1
+    //
+    //    step 1 과 **같은 결함**이 여기에도 있었다: 사업자번호 매칭이 전 서비스 조직을
+    //    대상으로 돌아, 사업자번호가 같은 K-Cosmetics 뷰티샵이 PH 약국 후보로 올라온다
+    //    (실측: businessInfo 1088699992 → KCOSA3DDC841B946 '테스트 뷰티샵', type='store').
+    //    reuse-safety 가드가 뒤에서 막긴 하지만 결과는 신규 생성이 아니라
+    //    ORGANIZATION_TYPE_NOT_COMPATIBLE 보류다 — 즉 step 1 만 고치면 여전히 막힌다.
+    //
+    //    수정: 후보를 **이미 Pharmacy-Hub 에 귀속된 조직**으로 한정한다. 귀속 판정은
+    //    읽기 측과 동일한 SSOT(`isOrganizationLinkedToService`)를 쓴다(SQL 복제 금지).
+    //    남는 의미: "이 사업자번호의 PH 약국이 이미 있는데 사용자가 아직 그 조직의
+    //    구성원이 아닌" 경우의 재사용 — 원래 의도를 PH 경계 안에서 보존한다.
     if (businessNumber) {
-      const bnOrgs = await this.dataSource.query(
+      const bnAll = await this.dataSource.query(
         `SELECT id, code, name FROM organizations
          WHERE regexp_replace(COALESCE(business_number, ''), '\\D', '', 'g') = $1
            AND "isActive" = true
          ORDER BY id`,
         [businessNumber],
       );
+      const bnOrgs: any[] = [];
+      for (const cand of bnAll) {
+        const linked = await isOrganizationLinkedToService(
+          this.dataSource,
+          cand.id,
+          SERVICE_KEY as StoreOwnerServiceKey,
+        );
+        if (linked) bnOrgs.push(cand);
+      }
       if (bnOrgs.length > 1) {
         return {
           organizationId: null,
@@ -555,7 +621,7 @@ export class PharmacyHubStoreProvisioningService {
           reason: 'duplicate business number',
           hold: 'DUPLICATE_BUSINESS_NUMBER',
           detail:
-            `사업자번호 ${businessNumber} 로 조직이 ${bnOrgs.length}개 존재합니다 ` +
+            `사업자번호 ${businessNumber} 로 Pharmacy-Hub 조직이 ${bnOrgs.length}개 존재합니다 ` +
             `(${bnOrgs.map((o: any) => o.code || o.id).join(', ')}).`,
         };
       }

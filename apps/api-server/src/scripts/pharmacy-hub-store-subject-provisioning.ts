@@ -151,7 +151,14 @@ async function postVerify(): Promise<void> {
   const rows = await AppDataSource.query(
     `SELECT sm.user_id,
             u.email,
+            -- WO-O4O-PHARMACYHUB-STORE-ORGANIZATION-SERVICE-SCOPED-RESOLUTION-V1:
+            --   provisioning 이 PH 로 스코프되므로 검증도 PH 조직만 센다.
+            --   (전 서비스로 세면 KPA/GlycoPharm 조직을 함께 가진 멀티서비스 사용자가
+            --    정상 provisioning 직후에도 member_orgs>1 로 거짓 실패한다.)
             (SELECT COUNT(*) FROM organization_members om
+              JOIN organization_service_enrollments e
+                ON e.organization_id = om.organization_id
+               AND e.service_code = $1 AND e.status = 'active'
               WHERE om.user_id = sm.user_id
                 AND om.role IN ('owner','admin','manager')
                 AND om.left_at IS NULL)                                   AS member_orgs,
