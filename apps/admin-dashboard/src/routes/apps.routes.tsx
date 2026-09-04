@@ -17,9 +17,6 @@ const ForumPostForm = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/Foru
 // Pharmacy AI Insight (Phase 5 - Active)
 const PharmacyAiInsightSummary = lazy(() => import('@o4o/pharmacy-ai-insight').then(m => ({ default: m.SummaryPage })));
 
-// SellerOps Pages
-const SellerOpsRouter = lazy(() => import('@/pages/sellerops/SellerOpsRouter'));
-
 // SupplierOps Pages
 const SupplierOpsRouter = lazy(() => import('@/pages/supplierops/SupplierOpsRouter'));
 
@@ -34,7 +31,7 @@ const PageLoader = () => (
 );
 
 /**
- * App routes — forum, pharmacy AI, sellerops, supplierops, partnerops
+ * App routes — forum, pharmacy AI, supplierops, partnerops
  */
 export function AppRoutes() {
   return [
@@ -54,7 +51,7 @@ export function AppRoutes() {
     //               운영자 관리(admin-forum.routes) router.use(authenticate)
     //   앱 availability 는 권한 검사를 대신하지 않는다.
     //
-    //   서비스별 확장 앱(pharmacy-ai-insight / sellerops 등)의 가드는 그대로 둔다.
+    //   서비스별 확장 앱(pharmacy-ai-insight / supplierops 등)의 가드는 그대로 둔다.
     <Route key="/forum" path="/forum" element={
       <AdminProtectedRoute requiredPermissions={['forum:read']}>
         <Suspense fallback={<PageLoader />}>
@@ -132,16 +129,18 @@ export function AppRoutes() {
     //   `cgm-pharmacist-app` 은 app_registry 에 등록된 적이 없어 AppRouteGuard 가
     //   항상 /error/app-disabled 로 리다이렉트하던 도달 불가 라우트였다.
 
-    // SellerOps - Seller Operations App
-    <Route key="/sellerops/*" path="/sellerops/*" element={
-      <AdminProtectedRoute requiredRoles={['seller', 'admin']}>
-        <AppRouteGuard appId="sellerops">
-          <Suspense fallback={<PageLoader />}>
-            <SellerOpsRouter />
-          </Suspense>
-        </AppRouteGuard>
-      </AdminProtectedRoute>
-    } />,
+    // WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (C축):
+    //   /sellerops/* 라우트와 admin 로컬 pages/sellerops (10파일) 을 제거했다.
+    //   근거:
+    //     - appId 'sellerops' 는 app_registry 에 등록된 적이 없어(프로덕션 6행 실측)
+    //       AppRouteGuard 가 항상 /error/app-disabled 로 리다이렉트하던 도달 불가 라우트다.
+    //     - 9개 화면 중 8개가 setTimeout 데모 데이터였고, 유일한 write 인
+    //       ListingCreatePage 의 POST /sellerops/listings 는 api-server 에 존재하지 않았다.
+    //     - 진입 네비게이션 0건 · appsCatalog appId 등록 0건
+    //       (WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1 에서 이미 제거됨).
+    //     - 판매자(플랫폼 직접판매) 축은 PLATFORM_DIRECT_SALE_BUSINESS_CONTRACT = NONE.
+    //   serviceGroup id 'sellerops' 는 살아 있는 카탈로그 항목
+    //   ('cosmetics-seller-extension' · 'market-trial') 이 소비하므로 유지한다.
 
     // SupplierOps - Supplier Operations App
     <Route key="/supplierops/*" path="/supplierops/*" element={

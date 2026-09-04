@@ -470,7 +470,10 @@ export class NetureSettlementService {
       if (!userId) return;
       await notificationService.createNotification({
         userId,
-        type: 'custom',
+        // WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (B축 §11):
+        //   legacy 'custom' → canonical 'settlement.paid' 수렴.
+        //   새 notification transport 는 만들지 않고 기존 notificationService 를 그대로 쓴다.
+        type: 'settlement.paid',
         title: '정산이 완료되었습니다',
         message: '정산 지급이 완료되었습니다. 정산 내역에서 확인해 주세요.',
         serviceKey: 'neture',
