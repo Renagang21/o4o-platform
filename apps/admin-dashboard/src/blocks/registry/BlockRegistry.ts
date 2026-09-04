@@ -79,26 +79,17 @@ class BlockRegistry {
       categoryBlocks.add(definition.name);
     }
 
-    // Register with WordPress if available
-    if (window.wp?.blocks?.registerBlockType) {
-      try {
-        window.wp.blocks.registerBlockType(definition.name, {
-          title: definition.title,
-          description: definition.description || '',
-          category: definition.category,
-          icon: definition.icon,
-          keywords: definition.keywords || [],
-          attributes: definition.attributes || {},
-          supports: definition.supports || {},
-          edit: definition.component,
-          save: () => null, // We handle saving separately
-        });
-      } catch (error) {
-        if (import.meta.env.DEV) {
-          console.error(`Failed to register block "${definition.name}" with WordPress:`, error);
-        }
-      }
-    }
+    /*
+      (제거됨) 외부 WordPress 레지스트리 미러 등록 분기
+      WO-O4O-WINDOW-WP-POLYFILL-RETIREMENT-V1
+
+      polyfill 주입기(scripts/post-build.js)는 호출자가 0 이어서 어느 빌드에서도
+      실행되지 않았고, 프로덕션 런타임은 이미 WordPress 전역 없이 동작한다.
+      따라서 이 분기는 한 번도 실행된 적이 없는 호환 잔재였다.
+      등록 SSOT 는 아래 this.blocks / categoryIndex 이며 그대로 유지한다.
+
+      선행 census: docs/checks/WO-O4O-WINDOW-WP-POLYFILL-RUNTIME-CENSUS-V1-CHECK.md
+    */
   }
 
   /**

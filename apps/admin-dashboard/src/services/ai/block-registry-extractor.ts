@@ -52,24 +52,15 @@ export function extractBlocksMetadata(): BlockMetadata[] {
     }
   });
 
-  // WordPress 블록 레지스트리에서도 추출 (하위 호환성)
-  if (window.wp?.blocks?.getBlockTypes) {
-    const blockTypes = window.wp.blocks.getBlockTypes();
+  /*
+    (제거됨) WordPress 전역 레지스트리 하위호환 추출 분기
+    WO-O4O-WINDOW-WP-POLYFILL-RETIREMENT-V1
 
-    blockTypes.forEach((block: any) => {
-      // 이미 있는 블록은 건너뛰기
-      if (!blocks.find(b => b.name === block.name)) {
-        blocks.push({
-          name: block.name,
-          title: block.title,
-          category: block.category || 'common',
-          description: block.description || '',
-          attributes: block.attributes || {},
-          example: generateBlockExample(block)
-        });
-      }
-    });
-  }
+    프로덕션 런타임에 WordPress 전역이 존재하지 않아 한 번도 실행되지 않는 분기였다.
+    canonical 추출은 위의 blockRegistry.getAll() 이 전량을 책임한다.
+
+    선행 census: docs/checks/WO-O4O-WINDOW-WP-POLYFILL-RUNTIME-CENSUS-V1-CHECK.md
+  */
 
   return blocks;
 }

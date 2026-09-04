@@ -89,13 +89,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       'react/jsx-runtime',
       '@tanstack/react-query',
       '@o4o/utils',
-      '@o4o/ui',
-      '@wordpress/blocks',
-      '@wordpress/block-editor',
-      '@wordpress/components',
-      '@wordpress/element',
-      '@wordpress/data',
-      '@wordpress/i18n'
+      '@o4o/ui'
+      // (제거됨) '@wordpress/*' 6종 — WO-O4O-WINDOW-WP-POLYFILL-RETIREMENT-V1
+      //   설치되지 않은 패키지를 pre-bundle 대상으로 지정하던 dead 항목이다
+      //   (package.json · lockfile · source import 모두 0건).
     ],
     exclude: [
       '@o4o/types', // ES Module import 순서 문제 방지
@@ -134,18 +131,14 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       drop: process.env.NODE_ENV === 'production' ? ['console', 'debugger'] : [],
       target: 'es2020'
     },
-    // modulepreload 설정 추가 - WordPress 청크 제외
-    modulePreload: {
-      resolveDependencies: (filename: string, deps: string[], { hostId, hostType }: { hostId: string; hostType: string }) => {
-        // WordPress 관련 청크는 modulepreload에서 제외
-        return deps.filter((dep: string) =>
-          // (제거됨) `page-gutenberg` — 대응 manualChunks 분기가 은퇴해 생성되지 않는 chunk 이다.
-          //   WO-O4O-POST-LEGACY-EDITOR-API-BUILD-AND-ORPHAN-RESIDUE-CLEANUP-V1
-          !dep.includes('wp-') &&
-          !dep.includes('@wordpress')
-        )
-      }
-    },
+    /*
+      (제거됨) modulePreload.resolveDependencies — WordPress 청크 제외 필터
+      WO-O4O-WINDOW-WP-POLYFILL-RETIREMENT-V1
+
+      필터 대상이던 `wp-*` · `@wordpress` chunk 는 대응 manualChunks 분기가
+      은퇴하면서 더 이상 생성되지 않는다(빌드 산출물 실측 0건).
+      필터를 제거해도 preload 대상 집합이 동일하다.
+    */
     rollupOptions: {
       ...sharedViteConfig.build?.rollupOptions,
       // External dependencies that should not be bundled
@@ -180,15 +173,11 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
           const sharedChunk = typeof output?.manualChunks === 'function' ? output.manualChunks(id) : undefined;
           if (sharedChunk) return sharedChunk;
 
-          // WordPress 패키지 모듈
-          //   WO-O4O-POST-LEGACY-EDITOR-API-BUILD-AND-ORPHAN-RESIDUE-CLEANUP-V1:
-          //   조건에 함께 있던 legacy editor 식별자(`WordPressBlockEditor` ·
-          //   `WordPressEditor` · `GutenbergEditor`)를 제거했다. 어차피 내부 분기가
-          //   `@wordpress` 일 때만 chunk 를 반환해 동작에 영향이 없고, 해당 파일들은
-          //   `WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1` 에서 은퇴했다.
-          if (id.includes('@wordpress')) {
-            return 'wp-all';
-          }
+          /*
+            (제거됨) `wp-all` manualChunks 분기 — WO-O4O-WINDOW-WP-POLYFILL-RETIREMENT-V1
+            해당 패키지가 설치돼 있지 않아 한 번도 매칭된 적이 없다
+            (빌드 산출물에 `wp-*` chunk 0건).
+          */
 
           // 나머지 node_modules
           if (id.includes('node_modules')) {

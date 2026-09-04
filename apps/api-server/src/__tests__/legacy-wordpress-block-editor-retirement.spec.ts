@@ -253,6 +253,71 @@ describe('7. 후속 은퇴 잔여물 정리 계약 (WO-O4O-POST-LEGACY-EDITOR-AP
   });
 });
 
+describe('8. window.wp polyfill 축 은퇴 계약 (WO-O4O-WINDOW-WP-POLYFILL-RETIREMENT-V1)', () => {
+  /**
+   * 선행 census(`WO-O4O-WINDOW-WP-POLYFILL-RUNTIME-CENSUS-V1`)가
+   * production runtime `typeof window.wp === "undefined"` · 소비처 전부 optional ·
+   * `@wordpress/*` 의존성 0 을 실측해 `LEGACY_RETIRE_READY` 로 닫았고, 이 WO 가 실행했다.
+   *
+   * 기존 3번 describe 는 문자열 `wp.domReady` 만 검사해 optional chaining 표기
+   * (`wp?.domReady`)를 놓쳤다. 여기서 그 사각지대를 함께 고정한다.
+   *
+   * 범위는 admin-dashboard 활성 소스로 한정한다. `packages/block-core` 는
+   * consumer 0 orphan 패키지 문제이므로 별도 WO
+   * (`WO-O4O-BLOCK-CORE-ORPHAN-PACKAGE-CENSUS-AND-RETIREMENT-V1`) 대상이며 제외한다.
+   */
+  const ADMIN_ROOT = 'apps/admin-dashboard';
+
+  /** 검사 대상 = admin src(ts·tsx) + vite.config.ts + public/scripts 산출물. */
+  function adminActiveSources(): string[] {
+    const files = walk(abs(ADMIN_SRC)).filter((file) => /\.(ts|tsx)$/.test(file));
+    files.push(abs(`${ADMIN_ROOT}/vite.config.ts`));
+    for (const dir of ['public', 'scripts']) {
+      const full = abs(`${ADMIN_ROOT}/${dir}`);
+      if (fs.existsSync(full)) files.push(...walk(full).filter((f) => /\.(html|js|cjs|mjs)$/.test(f)));
+    }
+    return files;
+  }
+
+  it.each([
+    ['window.wp'],
+    ['globalThis.wp'],
+    ['wp.domReady'],
+    ['wp?.domReady'],
+    ['wp.blocks'],
+    ['@wordpress/'],
+  ])('admin-dashboard 활성 소스에 %s 잔재가 없다', (needle) => {
+    const hits = adminActiveSources()
+      .filter((file) => stripComments(fs.readFileSync(file, 'utf-8')).includes(needle))
+      .map((file) => path.relative(REPO_ROOT, file));
+    expect(hits).toEqual([]);
+  });
+
+  it('polyfill 주입 스크립트 scripts/post-build.js 가 없다', () => {
+    expect(exists(`${ADMIN_ROOT}/scripts/post-build.js`)).toBe(false);
+  });
+
+  it('WordPress CDN 로더 public/wordpress-cdn.html 이 없다', () => {
+    expect(exists(`${ADMIN_ROOT}/public/wordpress-cdn.html`)).toBe(false);
+  });
+
+  it('initializeCustomBlocks 진입점이 0 이다', () => {
+    const hits = adminActiveSources()
+      .filter((file) => stripComments(fs.readFileSync(file, 'utf-8')).includes('initializeCustomBlocks'))
+      .map((file) => path.relative(REPO_ROOT, file));
+    expect(hits).toEqual([]);
+  });
+
+  it('canonical block registry 축은 보존된다', () => {
+    const blocksIndex = read(`${ADMIN_SRC}/blocks/index.ts`);
+    expect(blocksIndex).toContain('export function registerAllBlocks');
+    expect(blocksIndex).toContain('export const CUSTOM_BLOCKS');
+    expect(exists(`${ADMIN_SRC}/blocks/registry/BlockRegistry.ts`)).toBe(true);
+    expect(exists(`${ADMIN_SRC}/blocks/registry/DynamicRenderer.tsx`)).toBe(true);
+    expect(exists(`${ADMIN_SRC}/services/ai/block-registry-extractor.ts`)).toBe(true);
+  });
+});
+
 /** 주석을 제거한다 — 은퇴 설명 주석이 계약 단언을 오탐시키지 않도록 한다. */
 function stripComments(src: string): string {
   return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '');

@@ -1,45 +1,10 @@
 declare global {
   interface Window {
-    wp: {
-      blocks?: {
-        registerBlockType?: (name: string, settings: unknown) => void;
-        getCategories?: () => unknown[];
-        getBlockTypes?: () => unknown[];
-        subscribe?: (callback: () => void) => () => void;
-        [key: string]: unknown;
-      };
-      data?: {
-        subscribe?: (callback: () => void) => () => void;
-        select?: (store: string) => unknown;
-        dispatch?: (store: string) => unknown;
-        [key: string]: unknown;
-      };
-      element?: {
-        createElement?: (type: unknown, props?: unknown, ...children: unknown[]) => unknown;
-        Fragment?: unknown;
-        [key: string]: unknown;
-      };
-      editor?: {
-        RichText?: unknown;
-        InspectorControls?: unknown;
-        BlockControls?: unknown;
-        [key: string]: unknown;
-      };
-      components?: {
-        PanelBody?: unknown;
-        PanelRow?: unknown;
-        TextControl?: unknown;
-        ToggleControl?: unknown;
-        Button?: unknown;
-        [key: string]: unknown;
-      };
-      hooks?: {
-        addFilter?: (hookName: string, namespace: string, callback: (...args: unknown[]) => unknown) => void;
-        addAction?: (hookName: string, namespace: string, callback: (...args: unknown[]) => void) => void;
-        [key: string]: unknown;
-      };
-      [key: string]: unknown;
-    };
+    /*
+      (제거됨) Window.wp 선언 — WO-O4O-WINDOW-WP-POLYFILL-RETIREMENT-V1
+      WordPress 전역 polyfill 축 은퇴에 따라 타입 선언도 함께 제거한다.
+      선행 census: docs/checks/WO-O4O-WINDOW-WP-POLYFILL-RUNTIME-CENSUS-V1-CHECK.md
+    */
     grecaptcha?: {
       ready?: (callback: () => void) => void;
       execute?: (siteKey: string, options?: { action: string }) => Promise<string>;

@@ -109,93 +109,18 @@ export function registerAllBlocks(): void {
 // Export registry for external use
 export { blockRegistry } from './registry/BlockRegistry';
 export * from './registry/types';
+/*
+  (제거됨) blockStyles · initializeCustomBlocks()
+  WO-O4O-WINDOW-WP-POLYFILL-RETIREMENT-V1
 
-// Additional block styles
-const blockStyles = `
-  /* Group Block Styles */
-  .o4o-group-block {
-    box-sizing: border-box;
-  }
-  
-  .o4o-group-block.flex {
-    display: flex;
-  }
-  
-  .o4o-group-block.grid {
-    display: grid;
-  }
-  
-  /* Columns Block Styles */
-  .o4o-columns-block {
-    display: flex;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .o4o-column-block {
-    box-sizing: border-box;
-    flex-grow: 0;
-    flex-shrink: 0;
-  }
-  
-  @media (max-width: 768px) {
-    .o4o-columns-block.stack-on-mobile {
-      flex-direction: column !important;
-    }
-    
-    .o4o-columns-block.stack-on-mobile .o4o-column-block {
-      flex-basis: 100% !important;
-      margin-bottom: 20px;
-    }
-  }
-  
-  /* InnerBlocks Styles */
-  .block-editor-inner-blocks {
-    height: 100%;
-  }
+  `initializeCustomBlocks()` 는 legacy WordPress block editor 호환 진입점이었다.
+  WordPress 전역 polyfill 의 domReady 를 기다린 뒤 편집기 전용 스타일을 주입하는 것이
+  유일한 책임이었고, 살아있는 호출자는 0 이었다(호출자는 archive 사본 2건뿐).
+  `blockStyles` 는 이 함수만의 payload 였으므로 함께 제거한다.
 
-  .block-editor-inner-blocks .block-editor-block-list__layout {
-    height: 100%;
-  }
-
-  /* Form Block Styles */
-  .o4o-post-form-block,
-  .o4o-cpt-form-block {
-    position: relative;
-  }
-
-  .o4o-form-field-block {
-    margin-bottom: 1rem;
-  }
-
-  .o4o-form-submit-block {
-    margin-top: 1.5rem;
-  }
-`;
-
-// Initialize custom blocks
-export function initializeCustomBlocks() {
-  // WordPress polyfill이 초기화되었는지 확인
-  const domReady = (window.wp?.domReady as ((callback: () => void) => void) | undefined) || ((callback: () => void) => {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', callback);
-    } else {
-      callback();
-    }
-  });
-  
-  domReady(() => {
-    // Add custom styles to the editor
-    const styleElement = document.createElement('style');
-    styleElement.textContent = blockStyles;
-    document.head.appendChild(styleElement);
-    
-    //   'o4o/group',
-    //   'o4o/columns',
-    //   'o4o/column'
-    // ]);
-  });
-}
+  선행 census: docs/checks/WO-O4O-WINDOW-WP-POLYFILL-RUNTIME-CENSUS-V1-CHECK.md
+  보존: registerAllBlocks() · blockRegistry · CUSTOM_BLOCKS
+*/
 
 // Export block names for use in allowed blocks lists
 export const CUSTOM_BLOCKS = [
