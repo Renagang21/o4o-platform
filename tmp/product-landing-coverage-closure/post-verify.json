@@ -1,0 +1,79 @@
+{
+  "phase": "POST-APPLY independent verify (§7 · §17) — apply 스크립트와 무관한 SQL 로 재측정",
+  "totalMasters": 272039,
+  "mastersWithActiveLanding": 272039,
+  "mastersWithoutLanding_QR_MISSING": 0,
+  "coveragePct": 100.0,
+  "mastersWithMoreThanOneActiveLanding": 0,
+  "duplicatePublicKey_allRows": 0,
+  "orphanLandings": 0,
+  "landingsTotalRows": 272039,
+  "landingsActive": 272039,
+  "landingsSoftDeleted": 0,
+  "nonActiveStatusLandings": 0,
+  "nullOrEmptyPublicKey": 0,
+  "publicKeyLengthDistinct": [
+    {
+      "len": 12,
+      "n": 272039
+    }
+  ],
+  "batchRows": 73645,
+  "preexistingFingerprint_afterApply": "43751c78f065f0b332a5fbe6e2f79cc2",
+  "preexistingRowCount_afterApply": 198394,
+  "byRegulatory": [
+    {
+      "regulatoryType": "DRUG",
+      "masters": 177413,
+      "withLanding": 177413,
+      "missingLanding": 0
+    },
+    {
+      "regulatoryType": "건강기능식품",
+      "masters": 40948,
+      "withLanding": 40948,
+      "missingLanding": 0
+    },
+    {
+      "regulatoryType": "COSMETIC",
+      "masters": 32675,
+      "withLanding": 32675,
+      "missingLanding": 0
+    },
+    {
+      "regulatoryType": "QUASI_DRUG",
+      "masters": 17148,
+      "withLanding": 17148,
+      "missingLanding": 0
+    },
+    {
+      "regulatoryType": "MEDICAL_DEVICE",
+      "masters": 3826,
+      "withLanding": 3826,
+      "missingLanding": 0
+    },
+    {
+      "regulatoryType": "일반",
+      "masters": 15,
+      "withLanding": 15,
+      "missingLanding": 0
+    },
+    {
+      "regulatoryType": "GENERAL",
+      "masters": 14,
+      "withLanding": 14,
+      "missingLanding": 0
+    }
+  ],
+  "finalRecheckAfterCodeChanges": {
+    "checkedAt": "2026-09-04",
+    "masters": 272039,
+    "landingsActive": 272039,
+    "missing": 0,
+    "duplicatePerMaster": 0,
+    "duplicatePublicKey": 0,
+    "orphan": 0,
+    "preexistingFingerprint": "43751c78f065f0b332a5fbe6e2f79cc2",
+    "verdict": "coverage 100% 유지"
+  }
+}

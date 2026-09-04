@@ -38,6 +38,8 @@ import { ProductDrugExtensionService } from './product-drug-extension.service.js
 // WO-O4O-DRUG-MASTER-CANDIDATE-PROMOTION-APPLY-V1
 import { promoteOne, promotionFieldsFromCandidate } from '../drug-import/drug-master-promotion-apply.service.js';
 import { DbPromotionMasterStore } from '../drug-import/drug-master-promotion-apply.db.js';
+// WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+import { ensureProductLandingForMaster } from './product-landing.service.js';
 
 /** classification 에 부착하는 drug extension 요약 (표시용 — 권한 아님) */
 export interface CandidateDrugExtensionSummary {
@@ -650,6 +652,13 @@ export class ProductCandidateService {
       const store = new DbPromotionMasterStore(manager, sourceBaseDate);
       return promoteOne(fields, store, ctx);
     });
+
+    // WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+    //   promotion 으로 master 가 생긴 경우 대표 QR 진입점(Landing) 보장. TX 커밋 후 · 멱등 · best-effort
+    //   (drugExtension 보장과 같은 성격 — 실패해도 promotion 자체는 되돌리지 않는다).
+    if (outcome.masterId) {
+      await ensureProductLandingForMaster(this.dataSource, outcome.masterId, 'drug-promotion');
+    }
 
     return {
       outcome: outcome.outcome,

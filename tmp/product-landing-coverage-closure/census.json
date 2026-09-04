@@ -1,0 +1,62 @@
+{
+  "phase": "PRE-APPLY census (§3)",
+  "totalMasters": 272039,
+  "mastersWithActiveLanding": 198394,
+  "mastersMissingLanding": 73645,
+  "activeLandings": 198394,
+  "softDeletedLandings": 0,
+  "duplicateLandingPerMaster": 0,
+  "duplicatePublicKey": 0,
+  "orphanLandings": 0,
+  "byRegulatory": [
+    {
+      "regulatoryType": "DRUG",
+      "masters": 177413,
+      "withLanding": 177413,
+      "missingLanding": 0,
+      "storeCanonicalMissingLanding": 0
+    },
+    {
+      "regulatoryType": "건강기능식품",
+      "masters": 40948,
+      "withLanding": 2,
+      "missingLanding": 40946,
+      "storeCanonicalMissingLanding": 40946
+    },
+    {
+      "regulatoryType": "COSMETIC",
+      "masters": 32675,
+      "withLanding": 0,
+      "missingLanding": 32675,
+      "storeCanonicalMissingLanding": 32674
+    },
+    {
+      "regulatoryType": "QUASI_DRUG",
+      "masters": 17148,
+      "withLanding": 17148,
+      "missingLanding": 0,
+      "storeCanonicalMissingLanding": 0
+    },
+    {
+      "regulatoryType": "MEDICAL_DEVICE",
+      "masters": 3826,
+      "withLanding": 3826,
+      "missingLanding": 0,
+      "storeCanonicalMissingLanding": 0
+    },
+    {
+      "regulatoryType": "일반",
+      "masters": 15,
+      "withLanding": 3,
+      "missingLanding": 12,
+      "storeCanonicalMissingLanding": 12
+    },
+    {
+      "regulatoryType": "GENERAL",
+      "masters": 14,
+      "withLanding": 2,
+      "missingLanding": 12,
+      "storeCanonicalMissingLanding": 0
+    }
+  ]
+}

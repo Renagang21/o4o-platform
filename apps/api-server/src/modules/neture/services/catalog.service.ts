@@ -12,6 +12,9 @@ import logger from '../../../utils/logger.js';
 import { PRODUCT_DRUG_CATEGORIES } from '../utils/product-type.util.js';
 import type { ProductDrugCategory } from '../utils/product-type.util.js';
 import { normalizeName } from './bulk-match.service.js';
+// WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1:
+//   신규 master 는 생성 직후 대표 QR 진입점(Landing)을 갖는다. 발급기는 신설하지 않고 공통 helper 재사용.
+import { ensureProductLandingForMaster } from './product-landing.service.js';
 
 /**
  * 상품 이용 상태 — WO-O4O-ADMIN-PRODUCT-MASTER-STATUS-FOUNDATION-V1 / ...-STATUS-ACTIONS-V1
@@ -186,6 +189,7 @@ export class NetureCatalogService {
 
       const saved = await this.masterRepo.save(master);
       logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} for barcode ${trimmed} (MFDS verified)`);
+      await ensureProductLandingForMaster(AppDataSource, saved.id, 'master-create-mfds');
       return { success: true, data: saved, created: true };
     }
 
@@ -209,6 +213,7 @@ export class NetureCatalogService {
 
       const saved = await this.masterRepo.save(master);
       logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} for barcode ${trimmed} (manual, MFDS unverified)`);
+      await ensureProductLandingForMaster(AppDataSource, saved.id, 'master-create-manual');
       return { success: true, data: saved, created: true };
     }
 
@@ -265,6 +270,7 @@ export class NetureCatalogService {
     try {
       const saved = await this.masterRepo.save(master);
       logger.info(`[NetureCatalogService] Created ProductMaster ${saved.id} (barcode=NULL, no synthetic code)`);
+      await ensureProductLandingForMaster(AppDataSource, saved.id, 'master-create-barcodeless');
       return { success: true, data: saved, created: true };
     } catch (e: any) {
       // 동시 등록으로 방금 같은 이름+제조사가 생겼을 수 있음 → 재조회

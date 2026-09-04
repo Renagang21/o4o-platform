@@ -101,3 +101,11 @@ smoke 발급 landing 2건(젤-씨과립·본프로탑정)은 실제 유효 데�
 - **Phase 4** on-create(신규 master 생성 시 Landing 자동 발급) · **Phase 5** Landing 콘텐츠 구성(공급자·매장·관련 블록·content_config) · **Phase 6** 노출 게이트(행정처분/회수 → exposure_state).
 - QR 일괄 인쇄/내보내기(다건) · store 화면 QR 연결은 후속.
 - 설명 채움 = 기존 설명 Dashboard/Queue 트랙(별개, 89% placeholder 를 실제 설명으로).
+
+---
+
+> **후속 상태 갱신 (2026-09-04)** — 위 §8 의 **Phase 4 (on-create 신규 master 생성 시 Landing 자동 발급) 는 완료**되었다.
+> 본 CHECK 의 §6 "Landing 없는 master 0" 은 2026-07-09 시점 기록이며, 이후 master 모집단이 198,389 → 272,039 로 늘어나는 동안
+> on-create 훅이 없어 73,645건이 누락됐다. 백필(batchId `product-landing-full-backfill-v1`) + on-create 계약 마감은
+> [`CHECK-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1`](CHECK-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1.md) 참조.
+> (Phase 5 · Phase 6 은 여전히 미착수.)

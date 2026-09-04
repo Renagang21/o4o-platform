@@ -20,6 +20,8 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { runCandidatePromotion } from './modules/neture/drug-import/drug-master-promotion-apply.db.js';
+// WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+import { reconcileMissingProductLandings } from './modules/neture/services/product-landing.service.js';
 
 const log = {
   info: (m: string) => console.log(`[DRUG-PROMOTE] ${new Date().toISOString()} INFO: ${m}`),
@@ -96,6 +98,14 @@ async function main(): Promise<void> {
     log.info(`skipped: cancelled=${report.skippedCancelled} checkDigit=${report.skippedInvalidStandardCodeCheckDigit} format=${report.skippedInvalidStandardCodeFormat} missing=${report.skippedMissingStandardCode} required=${report.skippedMissingRequired}`);
     log.info(`drugCategory: rx=${report.rxCount} otc=${report.otcCount} unspecified=${report.drugUnspecifiedCount}`);
     log.info(`groups: multiPackage=${report.multiPackageMfdsCodeCount} multiManufacturer=${report.multiManufacturerMfdsCodeCount}`);
+    // WO-O4O-PRODUCT-LANDING-FULL-BACKFILL-AND-ON-CREATE-COVERAGE-CLOSURE-V1
+    //   대량 승격으로 신규 master 가 생겼으면 종료 후 Landing(대표 QR) 누락분을 회수한다.
+    //   도메인별 발급 코드 복사 없이 공통 reconcile 1회 호출 — 누락 0 이면 write 0.
+    if (apply && report.createdMaster > 0) {
+      const rec = await reconcileMissingProductLandings(ds, { source: 'drug-seed-promotion' });
+      log.info(`productLanding reconcile: scanned=${rec.scanned} created=${rec.created} skipped=${rec.skipped} remaining=${rec.remainingLikely}`);
+    }
+
     log.info('JSON_REPORT_BEGIN');
     console.log(JSON.stringify(report));
     log.info('JSON_REPORT_END');

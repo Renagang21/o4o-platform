@@ -1,0 +1,9 @@
+{
+  "mode": "apply",
+  "batchId": "product-landing-full-backfill-v1",
+  "createdThisRun": 72645,
+  "totalLandingsNow": 272039,
+  "landingsInThisBatch": 73645,
+  "totalMasters": 272039,
+  "rollbackHint": "soft delete: UPDATE product_landings SET deleted_at=now() WHERE metadata->>'batchId' = 'product-landing-full-backfill-v1' AND deleted_at IS NULL"
+}
