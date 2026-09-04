@@ -194,7 +194,7 @@ describe('WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1',
       expect(fs.existsSync(path.join(SRC, 'app-manifests', 'disabled-apps.registry.ts'))).toBe(true);
     });
 
-    it('packages 하위 manifest.ts 는 15개로 유지된다 (CI AppStore Guard 소비, 무접촉)', () => {
+    it('packages 하위 manifest.ts 는 14개로 유지된다 (CI AppStore Guard 소비, 무접촉)', () => {
       const packagesDir = path.resolve(API_SERVER, '..', '..', 'packages');
       const found: string[] = [];
       const walk = (dir: string, depth = 0) => {
@@ -211,7 +211,10 @@ describe('WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1',
       //   ecommerce-core package 은퇴로 manifest 17 → 16.
       // WO-O4O-SIGNAGE-LEGACY-STACK-SIMPLIFICATION-AND-TABLET-AUTHORING-CLOSURE-V1:
       //   @o4o-apps/signage package 은퇴로 manifest 16 → 15.
-      expect(found).toHaveLength(15);
+      // WO-O4O-SIGNAGE-RESIDUAL-DEAD-RUNTIME-FINAL-RETIREMENT-V1:
+      //   digital-signage-core 의 dead backend runtime(manifest/routes/controllers/services) 은퇴로 15 → 14.
+      //   해당 package 는 `./entities` subpath 만 소비되며 manifest 소비처는 0 이었다.
+      expect(found).toHaveLength(14);
     });
 
     it('app_registry 를 건드리는 migration 이 이 WO 로 추가되지 않았다 (DB schema change 0)', () => {
