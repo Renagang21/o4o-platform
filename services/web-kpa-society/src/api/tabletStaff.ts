@@ -12,7 +12,9 @@ import { getAccessToken } from '../contexts/AuthContext';
 
 function getStoreApiBase(): string {
   const base = import.meta.env.VITE_API_BASE_URL || '';
-  return `${base}/api/v1/store`;
+  // WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 (축 B):
+  //   KPA canonical mount — serviceKey='kpa' 로 조직을 해석한다(타 서비스 조직 오선택 차단).
+  return `${base}/api/v1/kpa/store`;
 }
 
 async function authFetch(url: string, options: RequestInit = {}): Promise<any> {

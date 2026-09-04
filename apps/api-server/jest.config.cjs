@@ -43,6 +43,9 @@ module.exports = {
     '^@o4o-apps/cms-core/entities$': '<rootDir>/../../packages/cms-core/src/entities/index.ts',
     // WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1:
     //   dist 는 ESM 이라 ts-jest 가 변환하지 못한다. 다른 패키지와 동일하게 src 로 매핑한다.
+    // WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1:
+    //   store-tablet 라우터가 공개 resolver 를 경유해 참조하는
+    //   `@o4o/platform-core/store-identity` 도 아래 일반 패턴이 그대로 처리한다.
     '^@o4o/platform-core/(.*)$': '<rootDir>/../../packages/platform-core/src/$1/index.ts',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^(\\.{1,2}/.*)\\.js$': '$1',

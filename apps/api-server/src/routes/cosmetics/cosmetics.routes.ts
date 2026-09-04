@@ -81,6 +81,7 @@ import { cosmeticsActionConfig } from './action-definitions.js';
 // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
 import { createServiceForumRouter } from '../forum/service-forum.routes.js';
 import { createStoreLocalProductRoutes } from '../platform/store-local-product.routes.js';
+import { createStoreTabletRoutes } from '../platform/store-tablet.routes.js';
 
 export function createCosmeticsRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -146,6 +147,17 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   //   고를 수 있다. 같은 My Store 문맥의 handled-products 와 **같은 조직**을 해석하도록
   //   serviceKey='cosmetics' 를 명시한 canonical mount 를 제공한다.
   router.use('/store', createStoreLocalProductRoutes(dataSource, 'cosmetics'));
+
+  // Store Tablet — 태블릿 진열 · 상품 풀 · idle 재생목록 · 관심 상품
+  // WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 (축 A)
+  //   local-products 와 **같은 조직 해석**을 쓰도록 storeOwnerServiceKey='cosmetics' 로 스코프한다.
+  //   qr/operator template serviceKey 도 함께 지정해 기본값('kpa') fallback 을 제거한다.
+  //   서비스 중립 mount(`/api/v1/store/tablets`)는 back-compat 으로 남는다.
+  router.use('/store', createStoreTabletRoutes(dataSource, {
+    storeOwnerServiceKey: 'cosmetics',
+    qrServiceKey: 'cosmetics',
+    operatorTemplateServiceKey: 'cosmetics',
+  }));
 
   // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1
   // /api/v1/cosmetics/operator/product-applications — 운영자 공급 상품 신청 승인/거절

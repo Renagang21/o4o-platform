@@ -91,6 +91,7 @@ import { ForumMembershipController } from '../../controllers/forum/ForumMembersh
 import { forumContextMiddleware } from '../../middleware/forum-context.middleware.js';
 import { FORUM_ORGS } from '../../controllers/forum/forum-organizations.js';
 import { createStoreLocalProductRoutes } from '../platform/store-local-product.routes.js';
+import { createStoreTabletRoutes } from '../platform/store-tablet.routes.js';
 
 /**
  * GlycoPharm Scope Guard — powered by @o4o/security-core
@@ -419,6 +420,17 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   //   고를 수 있다. 같은 My Store 문맥의 handled-products 와 **같은 조직**을 해석하도록
   //   serviceKey='glycopharm' 를 명시한 canonical mount 를 제공한다.
   router.use('/store', createStoreLocalProductRoutes(dataSource, 'glycopharm'));
+
+  // Store Tablet — 태블릿 진열 · 상품 풀 · idle 재생목록 · 관심 상품
+  // WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 (축 A)
+  //   local-products 와 **같은 조직 해석**을 쓰도록 storeOwnerServiceKey='glycopharm' 로 스코프한다.
+  //   qr/operator template serviceKey 도 함께 지정해 기본값('kpa') fallback 을 제거한다.
+  //   서비스 중립 mount(`/api/v1/store/tablets`)는 back-compat 으로 남는다.
+  router.use('/store', createStoreTabletRoutes(dataSource, {
+    storeOwnerServiceKey: 'glycopharm',
+    qrServiceKey: 'glycopharm',
+    operatorTemplateServiceKey: 'glycopharm',
+  }));
 
   // Asset Snapshot
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));

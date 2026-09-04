@@ -3,7 +3,7 @@
  * WO-O4O-MY-STORE-TABLET-DISPLAYS-KCOS-GP-COMMONIZATION-V1
  */
 
-import { Package, Plus, ShoppingBag } from 'lucide-react';
+import { AlertTriangle, Package, Plus, ShoppingBag } from 'lucide-react';
 import { TabletProductTypeBadge } from './TabletProductTypeBadge';
 import type { StoreTabletProductPool, TabletDisplayEntry, TabletPoolCandidate } from './types';
 import { isInDisplay } from './tabletHelpers';
@@ -81,6 +81,12 @@ export function TabletProductPoolPanel({
                 />
                 <div className="flex-1 min-w-0">
                   <span className="text-sm text-slate-900 truncate block">{item.name}</span>
+                  {item.tabletVisible === false && (
+                    <span className="mt-0.5 flex items-start gap-1 text-[11px] text-amber-700">
+                      <AlertTriangle className="w-3 h-3 mt-[1px] shrink-0" />
+                      <span className="min-w-0">노출 불가 — {item.visibilityNotice}</span>
+                    </span>
+                  )}
                 </div>
                 <TabletProductTypeBadge type={item.type} />
               </label>
