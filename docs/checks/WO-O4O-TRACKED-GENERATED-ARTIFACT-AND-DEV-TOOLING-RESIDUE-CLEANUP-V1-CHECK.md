@@ -191,6 +191,18 @@ apps/admin-dashboard/dist-node/apps/admin-dashboard/vite.config.js
 상위에 이미 존재하는 `dist/` 규칙은 두 경로를 덮지 않으므로 중복이 아니다.
 광범위 규칙(`*.json` 류)은 추가하지 않았다.
 
+### 5-1. 커밋이 2개인 이유 (§27 사고 기록)
+
+첫 커밋 `ca6b70171` 은 `git commit -- <pathspec...>` 의 pathspec 에
+`apps/admin-dashboard/dist-node` 를 포함했는데, 그 사이에 §22 재생성 검증
+(`npx tsc -b --force`)으로 산출물이 다시 만들어져 있었다.
+pathspec commit 이 작업트리 상태를 다시 읽어 **삭제가 수정으로 바뀌었고 4파일이 다시 추적**됐다.
+WO §27 이 경고한 바로 그 상황이다.
+
+`--amend` 는 §26 금지이므로 **후속 커밋**에서
+`git rm -r --cached apps/admin-dashboard/dist-node` 를 **pathspec 없이** 커밋해 바로잡았다
+(staged 범위는 `check-staged-scope.mjs` 로 사전 확인). 최종 상태에서 추적 파일은 0개다.
+
 ---
 
 ## 6. Guard (§19-20)
