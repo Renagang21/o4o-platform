@@ -53,6 +53,7 @@ export type {
   StoreTabletDisplaysLabels,
   StoreTabletPoolLocalProduct,
   StoreTabletPoolSupplierProduct,
+  StoreTabletPoolSupplierProductRow,
   StoreTabletProductPool,
   StoreTabletSummary,
   TabletDisplayEntry,

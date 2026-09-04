@@ -12,6 +12,10 @@
 
 import { api } from '@/lib/apiClient';
 import type { LocalProduct } from './localProducts';
+import type {
+  StoreTabletChannelState,
+  StoreTabletPoolSupplierProductRow,
+} from '@o4o/store-ui-core';
 
 const BASE = '/glycopharm/store';
 
@@ -34,27 +38,16 @@ export interface DisplayItem {
   created_at?: string;
 }
 
-export interface PoolSupplierProduct {
-  id: string;
-  offer_id: string;
-  product_name: string;
-  retail_price: string;
-  is_active: boolean;
-  service_key: string;
-  created_at: string;
-  /** 공개 태블릿 노출 판정 — WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 */
-  tabletVisible?: boolean;
-  tabletVisibilityReason?: string;
-}
+/**
+ * 공급 상품 행 · 채널 상태 계약은 `@o4o/store-ui-core` 가 정본이다.
+ * WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 (축 B)
+ */
+export type PoolSupplierProduct = StoreTabletPoolSupplierProductRow;
 
 export interface ProductPool {
   supplierProducts: PoolSupplierProduct[];
   localProducts: LocalProduct[];
-  tabletChannel?: {
-    hasTabletChannel: boolean;
-    hasApprovedTabletChannel: boolean;
-    tabletChannelStatus: string | null;
-  } | null;
+  tabletChannel?: StoreTabletChannelState | null;
 }
 
 // ==================== API ====================

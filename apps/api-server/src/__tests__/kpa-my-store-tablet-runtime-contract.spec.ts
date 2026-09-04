@@ -9,7 +9,6 @@
  * DB 는 붙이지 않는다 — DataSource.query 를 stub 으로 대체한다.
  */
 
-import express from 'express';
 import request from 'supertest';
 
 jest.mock('../middleware/auth.middleware.js', () => ({
@@ -19,9 +18,12 @@ jest.mock('../middleware/auth.middleware.js', () => ({
   },
 }));
 
-import { createStoreTabletRoutes } from '../routes/platform/store-tablet.routes.js';
 import { annotateTabletVisibility } from '../routes/platform/store-tablet-product-visibility.js';
-import type { StoreOwnerServiceKey } from '../utils/store-organization.resolver.js';
+import {
+  ORG_KPA, ORG_COS, ORG_NETURE,
+  NETURE_PRIMARY_MEMBERSHIP, KPA_MEMBERSHIP, COS_MEMBERSHIP,
+  makeStoreTabletDataSource, makeStoreTabletApp,
+} from './helpers/store-tablet-org-stub.js';
 
 let CURRENT_ROLES: string[] = ['kpa:store_owner', 'cosmetics:store_owner'];
 let CURRENT_MEMBERSHIPS: Array<{ serviceKey: string; status: string }> = [
@@ -29,67 +31,16 @@ let CURRENT_MEMBERSHIPS: Array<{ serviceKey: string; status: string }> = [
   { serviceKey: 'k-cosmetics', status: 'active' },
 ];
 
-const ORG_KPA = 'org-kpa';
-const ORG_COS = 'org-cos';
-const ORG_NETURE = 'org-neture';
+/** KPA 시나리오: 매장 slug 있음 · TABLET 채널 승인 · 상품 노출 조건 충족 */
+const makeDataSource = () => makeStoreTabletDataSource({
+  memberships: [NETURE_PRIMARY_MEMBERSHIP, KPA_MEMBERSHIP, COS_MEMBERSHIP],
+  currentRoles: () => CURRENT_ROLES,
+  storeSlugRows: [{ serviceKey: 'kpa' }],
+  channelRows: [{ status: 'APPROVED' }],
+  poolServiceKey: 'kpa-society',
+});
 
-const MEMBERSHIPS = [
-  { organizationId: ORG_NETURE, role: 'owner', isPrimary: true, joinedAt: '2024-01-01', enrollments: ['neture'], slugKeys: [] as string[] },
-  { organizationId: ORG_KPA, role: 'owner', isPrimary: false, joinedAt: '2025-03-01', enrollments: ['kpa-society'], slugKeys: ['kpa'] },
-  { organizationId: ORG_COS, role: 'owner', isPrimary: false, joinedAt: '2025-04-01', enrollments: ['k-cosmetics'], slugKeys: [] },
-];
-
-function makeDataSource() {
-  const poolOrgParams: string[] = [];
-  const dataSource = {
-    query: jest.fn(async (sql: string, params: any[] = []) => {
-      if (sql.includes('service_memberships')) return [{ ok: 1 }];
-      if (sql.includes('role_assignments')) {
-        const allowed = params[1] as string[];
-        return CURRENT_ROLES.some((r) => allowed.includes(r)) ? [{ ok: 1 }] : [];
-      }
-      if (sql.includes('organization_service_enrollments')) {
-        const roles = params[1] as string[];
-        const enrollmentCodes = params[2] as string[];
-        const slugKeys = params[3] as string[];
-        return MEMBERSHIPS
-          .filter((m) => roles.includes(m.role)
-            && (m.enrollments.some((e) => enrollmentCodes.includes(e)) || m.slugKeys.some((s) => slugKeys.includes(s))))
-          .map((m) => ({ organization_id: m.organizationId, role: m.role }));
-      }
-      if (sql.includes('organization_members')) {
-        const roles = params[1] as string[];
-        return MEMBERSHIPS
-          .filter((m) => roles.includes(m.role))
-          .map((m) => ({ organization_id: m.organizationId, role: m.role, is_primary: m.isPrimary, joined_at: m.joinedAt }));
-      }
-      if (sql.includes('platform_store_slugs')) return [{ serviceKey: 'kpa' }];
-      if (sql.includes('FROM organization_channels')) return [{ status: 'APPROVED' }];
-      if (sql.includes('linked_approved')) {
-        return (params[2] as string[]).map((id) => ({
-          id, service_ok: true, offer_ok: true, linked_approved: true, linked_any: true,
-        }));
-      }
-      if (sql.includes('organization_product_listings')) {
-        poolOrgParams.push(params[0] as string);
-        return [{
-          id: 'listing-1', offer_id: 'offer-1', product_name: 'P', retail_price: '1000',
-          is_active: true, created_at: '2025-01-01', service_key: 'kpa-society',
-        }];
-      }
-      if (sql.includes('store_local_products')) return [];
-      return [];
-    }),
-  };
-  return { dataSource: dataSource as any, poolOrgParams };
-}
-
-function makeApp(dataSource: any, storeOwnerServiceKey?: StoreOwnerServiceKey) {
-  const app = express();
-  app.use(express.json());
-  app.use('/store', createStoreTabletRoutes(dataSource, storeOwnerServiceKey ? { storeOwnerServiceKey } : {}));
-  return app;
-}
+const makeApp = makeStoreTabletApp;
 
 beforeEach(() => {
   CURRENT_ROLES = ['kpa:store_owner', 'cosmetics:store_owner'];

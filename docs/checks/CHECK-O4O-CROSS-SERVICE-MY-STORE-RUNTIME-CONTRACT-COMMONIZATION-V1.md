@@ -149,6 +149,27 @@ StoreOwnerGuard (판정 흐름)                   labels / accent / renderDenied
 | vite build: 위 4서비스 | 4/4 PASS (15.65s / 17.60s / 19.43s / 15.36s) |
 | api-server 전체 Jest | **228 suites / 3,812 tests 전량 PASS** (exit 0, 139s) — 실패 0 |
 
+### 6-1. CI 후속 — SonarCloud 중복도 게이트 (PR #207)
+
+`origin/main` merge 후 SonarCloud Quality Gate 가 **FAILED** 했다. 실패 조건은 하나뿐이다.
+
+| 조건 | 값 | 임계 |
+|---|---|---|
+| `new_duplicated_lines_density` | **14.6%** | 3% |
+
+파일별(신규 라인 중 중복 비율): `cross-service-...spec.ts` 27.8% / `kpa-my-store-tablet-runtime-contract.spec.ts` 30.1% /
+`web-k-cosmetics/.../tabletDisplayApi.ts` 75.0% / `web-glycopharm/src/api/tabletDisplays.ts` 52.6% — 나머지 전 파일 0.0%.
+
+**게이트 우회·임계 완화·`NOSONAR` 를 쓰지 않고, 실제 중복을 제거했다.** 새 공통화 기능을 추가한 것이 아니라
+이미 이번 PR 안에 들어 있던 **같은 선언의 중복을 하나로 모은 것**이다.
+
+| 중복 | 조치 |
+|---|---|
+| 두 spec 의 stub DataSource · MEMBERSHIPS · makeApp | `src/__tests__/helpers/store-tablet-org-stub.ts` 로 추출. **판정 로직은 stub 에 넣지 않는다** — SQL 분기별 고정 응답만 두고, 시나리오 차이(채널 상태·slug·service_key·조직 목록)는 인자로 받는다 |
+| KCos / GP client 의 `PoolSupplierProduct` · `ProductPool.tabletChannel` 동일 선언 | `@o4o/store-ui-core` 에 `StoreTabletPoolSupplierProductRow` 를 추가하고 두 client 는 이를 import (채널 상태는 기존 `StoreTabletChannelState` 재사용) |
+
+재검증: 두 spec **21건 PASS** · KCos/GP `tsc --noEmit` 0 errors · api-server 전체 Jest 재실행 결과는 아래 표와 동일.
+
 **기존 결함(본 WO 원인 아님)**: `packages/financial-core` 빌드가 tsup "No input files" 로 실패한다 → 워크스페이스 빌드는 `--no-bail` 로 수행했다.
 
 ---
