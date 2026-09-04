@@ -239,4 +239,3 @@ describe('8. cosmetics-seller-extension 패키지가 부재한다', () => {
     expect(catalog).not.toContain("appId: 'cosmetics-seller-extension'");
   });
 });
-});
