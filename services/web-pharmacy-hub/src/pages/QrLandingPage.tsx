@@ -78,10 +78,23 @@ export default function QrLandingPage() {
           />
         </div>
       ) : product ? (
-        <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4">
-          <p className="text-base font-semibold text-gray-900">{product.name}</p>
-          {product.brandName && <p className="mt-1 text-sm text-gray-500">{product.brandName}</p>}
-          {product.description && <p className="mt-3 text-sm text-gray-700">{product.description}</p>}
+        <div className="mt-4 space-y-4">
+          <div className="rounded-lg border border-gray-200 bg-white p-4">
+            <p className="text-base font-semibold text-gray-900">{product.name}</p>
+            {product.brandName && <p className="mt-1 text-sm text-gray-500">{product.brandName}</p>}
+            {product.descriptionSummary && (
+              <p className="mt-2 text-sm text-gray-600">{product.descriptionSummary}</p>
+            )}
+            {product.description && <p className="mt-3 text-sm text-gray-700">{product.description}</p>}
+          </div>
+          {/* WO-O4O-PHARMACYHUB-DEMO-ACCOUNT-AND-LOGIN-VERIFICATION-V1 (G1):
+              매장 내부용 설명서(STORE/canonical) 본문 — 태블릿 제품 버튼과 같은 원본을 같은 렌더러로 보여준다. */}
+          {product.descriptionHtml && (
+            <ContentRenderer
+              html={product.descriptionHtml}
+              variant={hasStoreDescriptionMarkup(product.descriptionHtml) ? 'store-description' : 'product-detail'}
+            />
+          )}
         </div>
       ) : landing.landingType === 'link' ? (
         <p className="mt-4 text-sm text-gray-500">연결된 주소로 이동하고 있습니다…</p>

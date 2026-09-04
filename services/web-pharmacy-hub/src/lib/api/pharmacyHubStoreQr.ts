@@ -163,7 +163,19 @@ export interface PublicQrLanding {
   storeSlug: string | null;
   consultationCtaEnabled: boolean;
   consultationCtaLabel: string | null;
-  productDetails: { name: string; brandName: string | null; price: number | null; description: string | null } | null;
+  /**
+   * WO-O4O-PHARMACYHUB-DEMO-ACCOUNT-AND-LOGIN-VERIFICATION-V1 (G1):
+   *   descriptionHtml/descriptionSummary = 매장 내부용 설명서(SPD STORE/canonical/ko) — 태블릿 제품 버튼과 동일 원본.
+   *   설명서가 없으면 null (기존 이름/브랜드/규격 카드만 표시).
+   */
+  productDetails: {
+    name: string;
+    brandName: string | null;
+    price: number | null;
+    description: string | null;
+    descriptionHtml?: string | null;
+    descriptionSummary?: string | null;
+  } | null;
   videoUrl: string | null;
   pageContent: {
     available: true;
