@@ -227,31 +227,10 @@ export function isAnyManagerOrAbove(userRoles: string[]): boolean {
   );
 }
 
-/**
- * Migration helper: Log when legacy role format is used
- *
- * ⚠️ MONITORING ONLY - Remove after migration complete
- *
- * @param userId - User ID for tracking
- * @param legacyRole - Legacy role that was checked
- * @param context - Where the check occurred (controller/middleware name)
- *
- * @example
- * if (userRoles.includes('admin')) {
- *   logLegacyRoleUsage(userId, 'admin', 'member.controller');
- * }
- *
- * @deprecated Remove after migration complete (Phase 7)
- */
-export function logLegacyRoleUsage(
-  userId: string,
-  legacyRole: string,
-  context: string
-): void {
-  console.warn(
-    `[ROLE_MIGRATION] Legacy role format used: "${legacyRole}" | User: ${userId} | Context: ${context}`
-  );
-}
+// WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (F축):
+//   `logLegacyRoleUsage` 제거 — 마지막 호출부였던 signage-role.middleware 의
+//   dbRoles dead branch 를 E축에서 제거해 소비처가 0 이 되었다.
+//   (원래 주석부터 "MONITORING ONLY · @deprecated Remove after migration complete")
 
 /**
  * Migration helper: Check if a role string is prefixed format

@@ -89,6 +89,12 @@ export class User {
   }
 
   // Direct permissions (in addition to role permissions)
+  //
+  // WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (D축) — 판정 DROP_READY:
+  //   런타임 read 0 (`getAllPermissions` 참조 제거) · write 0
+  //   (account-linking 병합 제거) · 프로덕션 users 중 permissions 가
+  //   비어 있지 않은 행 0건. 실제 컬럼 DROP·migration 은 destructive 이므로
+  //   본 WO 에서 수행하지 않는다(별도 WO). 엔티티 정의만 유지한다.
   @Column({ type: 'json', default: () => "'[]'" })
   permissions!: string[];
 
@@ -263,7 +269,10 @@ export class User {
         'api.access', 'api.admin'
       ];
     }
-    return [...new Set([...(this.permissions || [])])];
+    // WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (D축):
+    //   users.permissions 스냅샷 read 제거. 권한 SSOT 는 role_assignments 이며
+    //   스냅샷은 권한 판정 근거가 아니다(프로덕션 non-empty 행 0건).
+    return [];
   }
 
   hasPermission(permission: string): boolean {

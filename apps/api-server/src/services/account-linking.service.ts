@@ -559,15 +559,12 @@ export class AccountLinkingService {
           };
         }
         
-        // Merge permissions (union of both)
-        if (mergeFields.permissions) {
-          const allPermissions = new Set([
-            ...(targetUser.permissions || []),
-            ...(sourceUser.permissions || [])
-          ]);
-          targetUser.permissions = Array.from(allPermissions);
-        }
-        
+        // WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1 (D축):
+        //   legacy permissions 스냅샷 병합 제거. users.permissions 는 권한 SSOT 가
+        //   아니며(SSOT = role_assignments) 계정 병합으로 권한이 증가하는 유일한
+        //   write 경로였다. 아래 roles 병합(role_assignments)이 canonical 이다.
+        //   다른 identity field 병합은 변경하지 않는다.
+
         // Merge roles via role_assignments (SSOT)
         if (mergeFields.roles) {
           const sourceRoles = await roleAssignmentService.getRoleNames(sourceUser.id);

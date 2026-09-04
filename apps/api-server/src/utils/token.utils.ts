@@ -90,7 +90,6 @@ export function generateAccessToken(user: User, roles: string[], domain: string 
     email: user.email,
     role: primaryRole,
     roles: userRoles, // Phase3-E: from RoleAssignment
-    permissions: user.permissions || [],
     memberships: memberships || [], // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1
     // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1:
     //   users.status 에서 파생되는 계정 접근 상태. 프론트 분기용 힌트이며
@@ -135,7 +134,6 @@ export function generateServiceAccessToken(
     email: serviceUser.email,
     name: serviceUser.displayName,
     role: 'service_user', // Not a platform role, just for identification
-    permissions: [],       // Service users have no platform permissions
     tokenType: 'service',  // Phase 1: Service User 인증 기반
     serviceId: serviceUser.serviceId,
     storeId: serviceUser.storeId,
@@ -473,7 +471,6 @@ export function generateGuestAccessToken(
     userId: guestData.guestSessionId, // Use guestSessionId as userId for consistency
     sub: guestData.guestSessionId,
     role: 'guest', // Not a platform role, just for identification
-    permissions: [],    // Guest users have no platform permissions
     tokenType: 'guest', // Phase 3: Guest 인증
     serviceId: guestData.serviceId,
     storeId: guestData.storeId,
