@@ -273,7 +273,7 @@ function runTypeCheck() {
   // Build packages first.
   // 주의: 이 목록은 배포 산출물 목록(SSOT = 루트 `build:packages`)이 아니라, 타입 해석에
   // 필요한 **최소 사전 빌드** 대상이다. `npx tsc` 로 in-place 빌드한다(buildPackages 참조).
-  const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'block-core', 'account-ui'];
+  const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'account-ui'];
 
   log.info('Building packages...');
   buildDistTypedPackages(t);

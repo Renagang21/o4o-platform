@@ -318,6 +318,67 @@ describe('8. window.wp polyfill 축 은퇴 계약 (WO-O4O-WINDOW-WP-POLYFILL-RET
   });
 });
 
+describe('9. packages/block-core orphan 패키지 은퇴 계약 (WO-O4O-BLOCK-CORE-ORPHAN-PACKAGE-CENSUS-AND-RETIREMENT-V1)', () => {
+  /**
+   * `packages/block-core` 는 `@o4o/block-core` 로 노출되던 legacy block plugin 엔진이었다.
+   * census 결과 runtime import 0 · package.json dependency 0(자기 자신 제외) ·
+   * CI 소비처 0 · 독립 산출물 0 · exported symbol 소비처 0 으로 orphan 이 확정되어
+   * 패키지 전체를 삭제했다. 8번 describe 가 범위 외로 남겨 둔 `window.wp` 4건 ·
+   * `@wordpress/*` external 5건도 패키지와 함께 사라졌다.
+   *
+   * 보존 축(별개 구현): admin blocks 레지스트리 · `@o4o/block-renderer`.
+   */
+  const SCAN_ROOTS = ['apps', 'packages', 'services', 'scripts'];
+  const SCAN_EXT = /\.(ts|tsx|js|jsx|mjs|cjs|json|sh|ya?ml)$/;
+  const SELF = path.relative(REPO_ROOT, __filename).split(path.sep).join('/');
+
+  let scanned: Array<{ rel: string; body: string }> | null = null;
+
+  /** 활성 소스 전수 — node_modules · dist · 빌드 산출물은 제외한다. */
+  function activeSources(): Array<{ rel: string; body: string }> {
+    if (scanned) return scanned;
+    const out: Array<{ rel: string; body: string }> = [];
+    for (const root of SCAN_ROOTS) {
+      const full = abs(root);
+      if (!fs.existsSync(full)) continue;
+      for (const file of walk(full)) {
+        const rel = path.relative(REPO_ROOT, file).split(path.sep).join('/');
+        if (/(^|\/)(node_modules|dist|build|coverage|\.turbo)(\/|$)/.test(rel)) continue;
+        if (!SCAN_EXT.test(rel) || rel === SELF) continue;
+        out.push({ rel, body: fs.readFileSync(file, 'utf-8') });
+      }
+    }
+    scanned = out;
+    return out;
+  }
+
+  it('packages/block-core 디렉터리가 없다', () => {
+    expect(exists('packages/block-core')).toBe(false);
+  });
+
+  it.each([['@o4o/block-core'], ['packages/block-core']])(
+    '활성 소스에 %s 참조가 없다',
+    (needle) => {
+      const hits = activeSources()
+        .filter(({ body }) => stripComments(body).includes(needle))
+        .map(({ rel }) => rel);
+      expect(hits).toEqual([]);
+    },
+    60_000,
+  );
+
+  it('pnpm-lock.yaml 에 block-core importer 가 없다', () => {
+    expect(read('pnpm-lock.yaml')).not.toContain('packages/block-core:');
+  });
+
+  it('보존 축은 그대로 존재한다', () => {
+    expect(exists(`${ADMIN_SRC}/blocks/registry/BlockRegistry.ts`)).toBe(true);
+    expect(exists(`${ADMIN_SRC}/blocks/index.ts`)).toBe(true);
+    expect(exists('packages/block-renderer/package.json')).toBe(true);
+    expect(exists('scripts/audit/check-block-registry.ts')).toBe(true);
+  });
+});
+
 /** 주석을 제거한다 — 은퇴 설명 주석이 계약 단언을 오탐시키지 않도록 한다. */
 function stripComments(src: string): string {
   return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '');

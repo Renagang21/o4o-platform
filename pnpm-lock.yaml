@@ -1448,28 +1448,6 @@ importers:
         specifier: workspace:*
         version: link:../types
 
-  packages/block-core:
-    dependencies:
-      react:
-        specifier: 19.2.0
-        version: 19.2.0
-      react-dom:
-        specifier: 19.2.0
-        version: 19.2.0(react@19.2.0)
-    devDependencies:
-      '@types/react':
-        specifier: 19.2.7
-        version: 19.2.7
-      '@types/react-dom':
-        specifier: 19.2.3
-        version: 19.2.3(@types/react@19.2.7)
-      tsup:
-        specifier: ^8.0.1
-        version: 8.5.1(@swc/core@1.13.5(@swc/helpers@0.5.17))(jiti@1.21.7)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.4.5)(yaml@2.8.2)
-      typescript:
-        specifier: 5.4.5
-        version: 5.4.5
-
   packages/block-renderer:
     dependencies:
       '@o4o-apps/content-core':
