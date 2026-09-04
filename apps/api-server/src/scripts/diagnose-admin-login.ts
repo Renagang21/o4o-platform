@@ -72,8 +72,7 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
             name: 'System Administrator',
             status: UserStatus.ACTIVE,
             isEmailVerified: true,
-            isActive: true,
-            permissions: []
+            isActive: true
           });
           await userRepo.save(newUser);
           await roleAssignmentService.assignRole({

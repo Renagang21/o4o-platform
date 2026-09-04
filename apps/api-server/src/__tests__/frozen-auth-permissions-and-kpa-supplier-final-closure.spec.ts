@@ -12,7 +12,8 @@
  * B. `users.permissions` — 판정 `DROP_APPROVED_READY`
  *    read 0 / write 0 / claim 0 · 프로덕션 57행 전부 `[]` ·
  *    schema 의존(index/constraint/view/trigger/function/generated) 0.
- *    실제 DROP 및 migration 작성은 WO §13 에 따라 수행하지 않는다.
+ *    실제 DROP 은 후속 WO-O4O-LEGACY-PRODUCTION-SCHEMA-AND-LOCAL-HOUSEKEEPING-FINAL-CLOSURE-V1
+ *    에서 승인·실행됐다(`20270320000000-DropUsersPermissionsColumn`).
  *
  * C. `/kpa/supplier/*` 3 endpoint — 판정 `CANONICAL_REEXPOSE`
  *    backend 는 살아 있고 operator 승인 축(`content-approval.service`)과
@@ -67,16 +68,18 @@ describe('WO-O4O-FROZEN-AUTH-PERMISSIONS-DB-AND-KPA-SUPPLIER-ENDPOINT-FINAL-CLOS
       expect(src).not.toContain('new Set([...(this.permissions || [])])');
     });
 
-    it('컬럼 정의는 유지된다 (실제 DROP · migration 은 WO §13 금지)', () => {
-      expect(read('modules', 'auth', 'entities', 'User.ts')).toContain('permissions!: string[];');
+    // 후속 WO-O4O-LEGACY-PRODUCTION-SCHEMA-AND-LOCAL-HOUSEKEEPING-FINAL-CLOSURE-V1 에서
+    // 실제 DROP 이 승인·실행됐다. 아래 두 계약은 그 결과에 맞춰 뒤집혔다.
+    it('컬럼 정의는 엔티티에서 제거됐다', () => {
+      expect(read('modules', 'auth', 'entities', 'User.ts')).not.toContain(
+        'permissions!: string[];',
+      );
     });
 
-    it('DROP migration 파일이 작성되지 않았다', () => {
+    it('DROP migration 이 존재한다', () => {
       const dir = path.join(SRC, 'database', 'migrations');
-      const offenders = fs
-        .readdirSync(dir)
-        .filter((f) => /DropUsersPermissions|RemoveUsersPermissions/i.test(f));
-      expect(offenders).toEqual([]);
+      const found = fs.readdirSync(dir).filter((f) => /DropUsersPermissionsColumn/.test(f));
+      expect(found.length).toBe(1);
     });
 
     it('JWT permissions claim 은 재발급되지 않는다', () => {

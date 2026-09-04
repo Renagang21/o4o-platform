@@ -104,9 +104,11 @@ describe('WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1', () => {
       expect(src).toContain('mergeFields.roles');
     });
 
-    it('users.permissions 컬럼 정의는 유지된다 (DROP 은 별도 WO)', () => {
+    // WO-O4O-LEGACY-PRODUCTION-SCHEMA-AND-LOCAL-HOUSEKEEPING-FINAL-CLOSURE-V1 (A/B축)
+    //   컬럼은 프로덕션에서 제거됐다. 계약이 "유지"에서 "재추가 금지"로 뒤집혔다.
+    it('users.permissions 컬럼 정의는 엔티티에 다시 추가되지 않는다', () => {
       const src = read('modules', 'auth', 'entities', 'User.ts');
-      expect(src).toContain('permissions!: string[];');
+      expect(src).not.toContain('permissions!: string[];');
     });
   });
 

@@ -446,7 +446,6 @@ export class AuthLoginService {
       isEmailVerified: profile.emailVerified || false,
       provider: provider,
       provider_id: profile.id,
-      permissions: [],
     });
 
     await this.userRepository.save(newUser);

@@ -186,12 +186,6 @@ export function checkRole(user, roles) {
     };
 }
 /**
- * Create a permission guard function for route protection
- */
-export function createPermissionGuard(permission) {
-    return (user) => hasPermission(user, permission);
-}
-/**
  * Create a role guard function for route protection
  */
 export function createRoleGuard(roles) {

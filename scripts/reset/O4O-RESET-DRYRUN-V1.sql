@@ -97,7 +97,6 @@ SELECT 'checkout_orders'         AS tbl, COUNT(*)::int AS cnt FROM checkout_orde
 UNION ALL SELECT 'checkout_payments',    COUNT(*)::int FROM checkout_payments
 UNION ALL SELECT 'checkout_order_logs',  COUNT(*)::int FROM checkout_order_logs
 UNION ALL SELECT 'store_products',       COUNT(*)::int FROM store_products
-UNION ALL SELECT 'store_events',         COUNT(*)::int FROM store_events
 UNION ALL SELECT 'store_local_products', COUNT(*)::int FROM store_local_products;
 
 -- === B. Users & Auth ===
@@ -195,7 +194,6 @@ UNION ALL SELECT 'neture_seller_partner_contracts', COUNT(*)::int FROM neture_se
 -- TRUNCATE TABLE checkout_payments CASCADE;
 -- TRUNCATE TABLE checkout_orders CASCADE;
 -- TRUNCATE TABLE store_local_products CASCADE;
--- TRUNCATE TABLE store_events CASCADE;
 -- TRUNCATE TABLE store_products CASCADE;
 
 -- -----------------------------------------------------------------------
