@@ -1,0 +1,40 @@
+{
+  "phase": "POST-DEPLOY 최종 검증 (main 477352035 / revision o4o-core-api-03532-tfm)",
+  "totalMasters": 272040,
+  "mastersWithActiveLanding": 272040,
+  "mastersWithoutLanding": 0,
+  "activeLandings": 272040,
+  "duplicatePerMaster": 0,
+  "duplicatePublicKey": 0,
+  "orphanLandings": 0,
+  "preexistingFingerprint": "43751c78f065f0b332a5fbe6e2f79cc2",
+  "byProvenance": [
+    {
+      "src": "landing-seed-20260709",
+      "n": 198387
+    },
+    {
+      "src": "product-landing-full-backfill-v1",
+      "n": 73645
+    },
+    {
+      "src": "admin-qr-view",
+      "n": 5
+    },
+    {
+      "src": "admin",
+      "n": 2
+    },
+    {
+      "src": "master-create-barcodeless",
+      "n": 1
+    }
+  ],
+  "onCreateSmoke": {
+    "masterId": "591e2fb6-74cd-4683-9244-84c28a3c8b6b",
+    "publicKey": "22s8dqs3sc9m",
+    "source": "master-create-barcodeless",
+    "status": "active",
+    "createdAt": "2026-09-04 14:30:51.959555+00"
+  }
+}
