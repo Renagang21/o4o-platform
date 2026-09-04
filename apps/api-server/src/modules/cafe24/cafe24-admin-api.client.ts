@@ -84,3 +84,38 @@ export async function fetchProductPage(
 
   return { products, observedKeys: [...keys].sort() };
 }
+
+/**
+ * 상품 품목(variants). WO-O4O-CAFE24-REAL-WHOLESALE-MALL-CENSUS-V1 §6
+ *
+ * 품목 축 식별자(custom_variant_code / gtin)의 실제 보유율을 재기 위한 read-only 조회다.
+ * variant write / 재고 write 는 이 client 에 추가하지 않는다 (WO §3·§14).
+ */
+export interface Cafe24VariantRow {
+  variant_code?: string | null;
+  custom_variant_code?: string | null;
+  gtin?: string | null;
+  options?: unknown;
+  [key: string]: unknown;
+}
+
+export async function fetchProductVariants(
+  cfg: Cafe24OAuthConfig,
+  mallId: string,
+  accessToken: string,
+  productNo: number,
+  shopNo = 1,
+): Promise<{ variants: Cafe24VariantRow[]; observedKeys: string[] }> {
+  const params = new URLSearchParams({ shop_no: String(shopNo) });
+  const url = `${cafe24ApiBase(mallId)}/api/v2/admin/products/${productNo}/variants?${params.toString()}`;
+  const res = await fetch(url, { headers: apiHeaders(accessToken, cfg) });
+  if (!res.ok) throw new Error(`CAFE24_VARIANT_LIST_FAILED_${res.status}`);
+
+  const json = (await res.json()) as { variants?: Cafe24VariantRow[] };
+  const variants = Array.isArray(json?.variants) ? json.variants : [];
+
+  const keys = new Set<string>();
+  for (const v of variants) for (const k of Object.keys(v)) keys.add(k);
+
+  return { variants, observedKeys: [...keys].sort() };
+}

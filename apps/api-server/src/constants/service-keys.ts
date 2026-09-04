@@ -32,6 +32,15 @@ export const SERVICE_KEYS = {
   PHARMACY_HUB: 'pharmacy-hub',
   /** WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1: 약사회 분회 서비스 */
   KPA_BRANCH: 'kpa-branch',
+  /**
+   * WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1 §D2
+   *
+   * Cafe24 B2B 사업자의 거래처 매장 판매지원 서비스.
+   * 기존 `cafe24`(운영자 OAuth 축) · `neture`(공급자 축) 에 편입하지 않는다 —
+   * 이 키의 회원은 O4O 에 직접 가입하지 않고 Cafe24 회원 자격만으로 존재하므로
+   * 다른 서비스의 가입·승인·권한 계약과 섞이면 안 된다.
+   */
+  CAFE24_B2B: 'cafe24-b2b',
 } as const;
 
 export type ServiceKey = typeof SERVICE_KEYS[keyof typeof SERVICE_KEYS];

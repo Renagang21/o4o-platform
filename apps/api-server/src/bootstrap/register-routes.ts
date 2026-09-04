@@ -513,6 +513,18 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Cafe24 OAuth routes:', cafe24Error);
     }
 
+    // 24-e2d-6. Register Cafe24 B2B 거래처 매장 회원 로그인 Pilot
+    //           (WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1 §3 · §8)
+    //           O4O 로그인 밖의 축이다 — 신뢰 경계는 서명 state / 서명 세션 쿠키이며
+    //           `authenticate` 를 걸지 않는다 (컨트롤러 상단 "인증 경계" 참조).
+    try {
+      const { createCafe24B2bMemberController } = await import('../modules/cafe24/controllers/cafe24-b2b-member.controller.js');
+      app.use('/api/v1/cafe24-b2b', createCafe24B2bMemberController(dataSource));
+      logger.info('✅ Cafe24 B2B member routes registered at /api/v1/cafe24-b2b');
+    } catch (cafe24B2bError) {
+      logger.error('Failed to register Cafe24 B2B member routes:', cafe24B2bError);
+    }
+
     // 24-e2e. Register Product Usage Links (read-only) — master 활용 연결 조회
     //         (WO-O4O-ADMIN-O4O-PRODUCT-USAGE-LINKS-READONLY-V1)
     try {

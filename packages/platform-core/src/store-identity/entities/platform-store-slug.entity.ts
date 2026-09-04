@@ -32,7 +32,10 @@ export type StoreSlugServiceKey =
   | 'cosmetics'
   | 'kpa'
   | 'neture'
-  | 'pharmacy-hub';
+  | 'pharmacy-hub'
+  // WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1 §D2:
+  //   Cafe24 거래처 매장도 자신의 slug 축을 갖는다. DB 컬럼은 varchar(50) · CHECK 없음 — 순수 additive.
+  | 'cafe24-b2b';
 
 /**
  * Platform Store Slug Entity
