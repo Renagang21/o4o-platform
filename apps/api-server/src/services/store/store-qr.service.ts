@@ -212,7 +212,8 @@ export async function resolvePublicQrLanding(
          COALESCE(pm.name, pm.regulatory_name, 'Unknown') AS name,
          pm.brand_name AS "brandName",
          spo.price_general::int AS price,
-         pm.specification AS description
+         pm.specification AS description,
+         pm.id AS "masterId"
        FROM supplier_product_offers spo
        LEFT JOIN product_masters pm ON pm.id = spo.master_id
        WHERE spo.id = $1 AND spo.is_active = true
@@ -221,7 +222,8 @@ export async function resolvePublicQrLanding(
          COALESCE(pm.name, pm.regulatory_name, 'Unknown') AS name,
          pm.brand_name AS "brandName",
          spo.price_general::int AS price,
-         pm.specification AS description
+         pm.specification AS description,
+         pm.id AS "masterId"
        FROM organization_product_listings opl
        JOIN supplier_product_offers spo ON spo.id = opl.offer_id
        LEFT JOIN product_masters pm ON pm.id = spo.master_id
@@ -230,6 +232,33 @@ export async function resolvePublicQrLanding(
       [qrData.landingTargetId],
     );
     productDetails = productRows[0] || null;
+
+    // WO-O4O-PHARMACYHUB-DEMO-ACCOUNT-AND-LOGIN-VERIFICATION-V1 (G1):
+    //   제품 QR 이 태블릿 제품 버튼과 **같은 매장 내부용 설명서**를 보여줘야 한다.
+    //   태블릿 버튼은 SPD(STORE/canonical) 를 master_id 로 직접 읽는데(store-public-tablet-content-source),
+    //   QR 랜딩은 이름/브랜드/가격/규격만 내려주고 있어 같은 대상을 가리켜도 화면이 달랐다.
+    //   → 기존 4개 필드는 그대로 두고 **본문만 additive** 로 붙인다.
+    //   description_type='STORE' / status='canonical' 만 사용한다 (B2B·B2C 설명서 혼입 금지).
+    //   언어는 ko 고정 — 공개 랜딩에 언어 선택 축이 아직 없다.
+    if (productDetails?.masterId) {
+      const descriptionRows = await dataSource.query(
+        `SELECT d.content, d.summary
+           FROM shared_product_descriptions d
+          WHERE d.master_id = $1
+            AND d.description_type = 'STORE'
+            AND d.status = 'canonical'
+            AND d.language = 'ko'
+            AND d.deleted_at IS NULL
+          ORDER BY d.updated_at DESC
+          LIMIT 1`,
+        [productDetails.masterId],
+      );
+      const html = typeof descriptionRows?.[0]?.content === 'string' ? descriptionRows[0].content : '';
+      const summary = typeof descriptionRows?.[0]?.summary === 'string' ? descriptionRows[0].summary : '';
+      // 설명서가 없으면 필드를 null 로 둔다 — 기존 카드(이름/브랜드/규격)만 나오는 동작 그대로.
+      productDetails.descriptionHtml = html.trim() ? html : null;
+      productDetails.descriptionSummary = summary.trim() ? summary : null;
+    }
   }
 
   // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1 (+ SUPPLIER-RESOURCE-...-PRESERVE-V1 published 게이트):

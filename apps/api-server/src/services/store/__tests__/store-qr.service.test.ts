@@ -370,4 +370,56 @@ describe('resolvePublicQrLanding', () => {
 
     expect(result.ok).toBe(true);
   });
+
+  // ── WO-O4O-PHARMACYHUB-DEMO-ACCOUNT-AND-LOGIN-VERIFICATION-V1 (G1) ──
+  //   제품 QR 은 태블릿 제품 버튼과 **같은 매장 내부용 설명서**(SPD STORE/canonical/ko)를 보여야 한다.
+  //   기존 이름/브랜드/가격/규격은 그대로 두고 본문만 additive 로 붙는다.
+
+  function productLandingDataSource(descriptionRows: any[]) {
+    return makeDataSource({
+      queryResults: [
+        [{ id: 'q', landingType: 'product', landingTargetId: 'listing-1', isActive: true, organizationId: ORG, slug: 's' }],
+        [], // scan insert
+        [{ slug: 'store-slug' }], // platform_store_slugs
+        [{ name: '데모 제품', brandName: 'B', price: 0, description: '10정', masterId: 'master-1' }],
+        descriptionRows, // shared_product_descriptions
+      ],
+    });
+  }
+
+  it('product QR 랜딩은 STORE/canonical 설명서 본문을 additive 로 함께 내려준다', async () => {
+    const { ds, query } = productLandingDataSource([{ content: '<p>본문</p>', summary: '한 줄 요약' }]);
+
+    const result = await resolvePublicQrLanding(ds, 's', 'pharmacy-hub', scan);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const product = result.data.productDetails as Record<string, unknown>;
+    // 기존 필드 유지
+    expect(product.name).toBe('데모 제품');
+    expect(product.description).toBe('10정');
+    // 본문 additive
+    expect(product.descriptionHtml).toBe('<p>본문</p>');
+    expect(product.descriptionSummary).toBe('한 줄 요약');
+
+    const sql = String(
+      query.mock.calls.find((c: any[]) => String(c[0]).includes('shared_product_descriptions'))?.[0] ?? '',
+    );
+    // B2B/B2C 설명서 혼입 금지 — STORE/canonical/ko 만 읽는다.
+    expect(sql).toContain("d.description_type = 'STORE'");
+    expect(sql).toContain("d.status = 'canonical'");
+    expect(sql).toContain("d.language = 'ko'");
+  });
+
+  it('STORE/canonical 설명서가 없으면 기존 카드 동작 그대로다 (본문 null)', async () => {
+    const { ds } = productLandingDataSource([]);
+
+    const result = await resolvePublicQrLanding(ds, 's', 'kpa', scan);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const product = result.data.productDetails as Record<string, unknown>;
+    expect(product.name).toBe('데모 제품');
+    expect(product.descriptionHtml).toBeNull();
+  });
 });
