@@ -21,7 +21,6 @@ export * from './entities/index.js';
 export * from './services/index.js';
 export * from './controllers/index.js';
 export * from './lifecycle/index.js';
-export * from './guards/index.js';
 export * from './utils/index.js';
 
 // Entity list for TypeORM

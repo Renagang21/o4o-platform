@@ -92,29 +92,6 @@ const hasOrgPermission = await permissionService.hasPermission(
 );
 ```
 
-### 2.2 PermissionGuard 사용
-
-```typescript
-import { PermissionGuard } from '@o4o/organization-core';
-
-const guard = new PermissionGuard(dataSource);
-
-// 권한 검증
-const result = await guard.checkPermission(
-  'user-seoul-admin',
-  {
-    permission: 'organization.manage',
-    extractOrganizationId: (req) => req.params.id,
-    useInheritance: true
-  },
-  request
-);
-
-if (!result.allowed) {
-  throw new Error(result.reason);
-}
-```
-
 ### 2.3 범용 유틸리티 함수 사용
 
 ```typescript
