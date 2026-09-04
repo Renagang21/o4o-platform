@@ -188,6 +188,76 @@ describe('6. canonical 보존 대상이 그대로 존재한다', () => {
   });
 });
 
+describe('7. 후속 은퇴 잔여물 정리 계약 (WO-O4O-POST-LEGACY-EDITOR-API-BUILD-AND-ORPHAN-RESIDUE-CLEANUP-V1)', () => {
+  it('contentApi 에 Posts · Pages 계열 메서드가 없다', () => {
+    const src = read(`${ADMIN_SRC}/api/contentApi.ts`);
+    for (const method of [
+      'getPosts', 'getPost', 'createPost', 'updatePost', 'deletePost', 'clonePost',
+      'bulkUpdatePosts', 'bulkDeletePosts', 'getPostPreview', 'savePostDraft',
+      'getPostRevisions', 'restorePostRevision',
+      'getPages', 'getPage', 'createPage', 'updatePage', 'deletePage', 'clonePage',
+      'bulkUpdatePages', 'bulkDeletePages', 'savePageDraft', 'getPagePreview',
+      'getPageRevisions', 'restorePageRevision', 'getPageTree',
+    ]) {
+      expect(src).not.toContain(`static async ${method}(`);
+    }
+  });
+
+  it('contentApi · unified-client 가 /content/posts · /content/pages 를 호출하지 않는다', () => {
+    for (const rel of [`${ADMIN_SRC}/api/contentApi.ts`, `${ADMIN_SRC}/api/unified-client.ts`]) {
+      const src = stripComments(read(rel));
+      expect(src).not.toContain('/content/posts');
+      expect(src).not.toContain('/content/pages');
+    }
+  });
+
+  it('contentApi 의 media 계열(살아있는 공유 API)은 보존된다', () => {
+    const src = read(`${ADMIN_SRC}/api/contentApi.ts`);
+    for (const method of ['getMediaFiles', 'uploadFiles', 'updateMediaFileContent']) {
+      expect(src).toContain(`static async ${method}(`);
+    }
+  });
+
+  it('vite.config.ts 에 legacy editor manualChunks 분기가 없다', () => {
+    const src = stripComments(read('apps/admin-dashboard/vite.config.ts'));
+    for (const token of [
+      'page-gutenberg', 'page-template-editor',
+      'GutenbergEditor', 'WordPressBlockEditor', 'WordPressEditor', 'TemplatePartEditor',
+    ]) {
+      expect(src).not.toContain(token);
+    }
+  });
+
+  it('admin-dashboard package.json description 에 legacy editor 문구가 없다', () => {
+    const pkg = JSON.parse(read('apps/admin-dashboard/package.json')) as { description?: string };
+    expect(pkg.description ?? '').not.toMatch(/StandaloneEditor|ParagraphTestBlock|WordPress/i);
+  });
+
+  it.each([
+    `${ADMIN_SRC}/components/ag/AGTable.tsx`,
+    `${ADMIN_SRC}/components/ui/scroll-area.tsx`,
+    `${ADMIN_SRC}/components/GlobalStyleInjector.tsx`,
+    `${ADMIN_SRC}/hooks/useCustomizerSettings.ts`,
+    `${ADMIN_SRC}/hooks/useThemeSettings.ts`,
+    `${ADMIN_SRC}/hooks/useThemeTokens.ts`,
+    `${ADMIN_SRC}/utils/permissions.ts`,
+    `${ADMIN_SRC}/utils/token-debug.ts`,
+    `${ADMIN_SRC}/types/dashboard.ts`,
+  ])('%s — orphan 으로 제거돼 존재하지 않는다', (rel) => {
+    expect(exists(rel)).toBe(false);
+  });
+
+  it('side-effect import 로 살아있는 utils/aiMigration.ts 는 보존된다', () => {
+    expect(exists(`${ADMIN_SRC}/utils/aiMigration.ts`)).toBe(true);
+    expect(read(`${ADMIN_SRC}/App.tsx`)).toContain("import '@/utils/aiMigration'");
+  });
+});
+
+/** 주석을 제거한다 — 은퇴 설명 주석이 계약 단언을 오탐시키지 않도록 한다. */
+function stripComments(src: string): string {
+  return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*/g, '');
+}
+
 /** 디렉터리 재귀 순회 — 테스트 전용 헬퍼. */
 function walk(dir: string, out: string[] = []): string[] {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {

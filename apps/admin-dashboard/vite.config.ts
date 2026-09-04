@@ -139,8 +139,9 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       resolveDependencies: (filename: string, deps: string[], { hostId, hostType }: { hostId: string; hostType: string }) => {
         // WordPress 관련 청크는 modulepreload에서 제외
         return deps.filter((dep: string) =>
+          // (제거됨) `page-gutenberg` — 대응 manualChunks 분기가 은퇴해 생성되지 않는 chunk 이다.
+          //   WO-O4O-POST-LEGACY-EDITOR-API-BUILD-AND-ORPHAN-RESIDUE-CLEANUP-V1
           !dep.includes('wp-') &&
-          !dep.includes('page-gutenberg') &&
           !dep.includes('@wordpress')
         )
       }
@@ -179,16 +180,14 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
           const sharedChunk = typeof output?.manualChunks === 'function' ? output.manualChunks(id) : undefined;
           if (sharedChunk) return sharedChunk;
 
-          // WordPress 관련 모듈
-          if (id.includes('@wordpress') ||
-              id.includes('wordpress-initializer') ||
-              id.includes('wordpress-dynamic-loader') ||
-              id.includes('WordPressBlockEditor') ||
-              id.includes('WordPressEditor') ||
-              id.includes('GutenbergEditor')) {
-            if (id.includes('@wordpress')) {
-              return 'wp-all';
-            }
+          // WordPress 패키지 모듈
+          //   WO-O4O-POST-LEGACY-EDITOR-API-BUILD-AND-ORPHAN-RESIDUE-CLEANUP-V1:
+          //   조건에 함께 있던 legacy editor 식별자(`WordPressBlockEditor` ·
+          //   `WordPressEditor` · `GutenbergEditor`)를 제거했다. 어차피 내부 분기가
+          //   `@wordpress` 일 때만 chunk 를 반환해 동작에 영향이 없고, 해당 파일들은
+          //   `WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1` 에서 은퇴했다.
+          if (id.includes('@wordpress')) {
+            return 'wp-all';
           }
 
           // 나머지 node_modules
@@ -201,16 +200,12 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
           // 블록 청크는 제거 - 너무 크고 React 의존성 문제 발생
           // 대신 메인 번들에 포함되도록 함
 
-          // 페이지 청크
-          if (!id.includes('node_modules')) {
-            // TemplatePartEditor 청크 제거 - React Context 초기화 문제 방지
-            // if (id.includes('TemplatePartEditor')) {
-            //   return 'page-template-editor';
-            // }
-            if (id.includes('GutenbergEditor') || id.includes('WordPressBlockEditor')) {
-              return 'page-gutenberg';
-            }
-          }
+          // (제거됨) 페이지 청크 — legacy editor 전용 분기
+          //   WO-O4O-POST-LEGACY-EDITOR-API-BUILD-AND-ORPHAN-RESIDUE-CLEANUP-V1
+          //   주석 처리돼 있던 `page-template-editor`(TemplatePartEditor) 분기와
+          //   살아 있던 `page-gutenberg`(GutenbergEditor · WordPressBlockEditor) 분기를
+          //   함께 제거했다. 세 파일 모두 legacy editor 은퇴로 저장소에 존재하지 않아
+          //   은퇴 직후 빌드에서도 매칭된 chunk 는 0 이었다.
         }
       }
     }

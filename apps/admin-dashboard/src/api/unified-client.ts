@@ -212,13 +212,11 @@ class UnifiedApiClient {
 
   // Content API
   content = {
-    posts: {
-      list: (params?: any) => this.client.get(this.v1('/content/posts'), { params }),
-      get: (id: string) => this.client.get(this.v1(`/content/posts/${id}`)),
-      create: (data: any) => this.client.post(this.v1('/content/posts'), data),
-      update: (id: string, data: any) => this.client.put(this.v1(`/content/posts/${id}`), data),
-      delete: (id: string) => this.client.delete(this.v1(`/content/posts/${id}`)),
-    },
+    // (제거됨) content.posts — WO-O4O-POST-LEGACY-EDITOR-API-BUILD-AND-ORPHAN-RESIDUE-CLEANUP-V1
+    //   판정 `DEAD_FRONTEND_API_RESIDUE`. 유일한 소비처였던 `ContentApi` 의 Posts 계열이
+    //   같은 WO 에서 제거돼 소비처 0 이 됐고, 서버에도 `/api/v1/content/posts` mount 가 없다
+    //   (`/api/v1/content/*` = assets · templates 만). 재추가 금지 — canonical 콘텐츠 축은
+    //   `cms_contents` + RichTextEditor 다.
     categories: {
       list: (params?: any) => this.client.get(this.v1('/content/categories'), { params }),
       get: (id: string) => this.client.get(this.v1(`/content/categories/${id}`)),

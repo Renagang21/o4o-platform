@@ -1,6 +1,5 @@
 import { 
   Post, 
-  Page, 
   Category, 
   Tag, 
   MediaFile, 
@@ -9,160 +8,30 @@ import {
   Template,
   Menu,
   ApiResponse,
-  ContentFilters,
   PostType,
-  PostStatus,
-  TipTapJSONContent
+  PostStatus
 } from '@/types/content'
 import { unifiedApi } from './unified-client'
 
 export class ContentApi {
-  // Posts Management
-  static async getPosts(
-    page: number = 1, 
-    pageSize: number = 20, 
-    filters?: ContentFilters
-  ): Promise<ApiResponse<Post[]>> {
-    const params = {
-      page,
-      pageSize,
-      ...filters
-    }
-    
-    const response = await unifiedApi.content.posts.list(params)
-    return response.data
-  }
+  /*
+    (제거됨) Posts · Pages 계열 25개 메서드
+    WO-O4O-POST-LEGACY-EDITOR-API-BUILD-AND-ORPHAN-RESIDUE-CLEANUP-V1
 
-  static async getPost(id: string): Promise<ApiResponse<Post>> {
-    const response = await unifiedApi.content.posts.get(id)
-    return response.data
-  }
+    판정 `DEAD_FRONTEND_API_RESIDUE` — 두 조건을 모두 만족한다.
+      (a) 프론트 소비처 0. `ContentApi.` 호출은 저장소 전체에서 media 계열 3종뿐이다
+          (getMediaFiles · uploadFiles · updateMediaFileContent).
+      (b) 대응 backend endpoint 미마운트. `/api/v1/content/*` 에는 assets · templates 만
+          등록돼 있고 `/content/posts` · `/content/pages` 라우터는 존재하지 않는다
+          (backend Post/Page 엔티티 제거 `6354e8755` 이후).
 
-  static async createPost(post: Partial<Post>): Promise<ApiResponse<Post>> {
-    const response = await unifiedApi.content.posts.create(post)
-    return response.data
-  }
+    legacy WordPress block editor 은퇴(`WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1`)
+    로 마지막 소비처가 사라진 잔여물이다. canonical 콘텐츠 축은 `cms_contents` +
+    RichTextEditor 이며 호환 shim 은 만들지 않는다.
 
-  static async updatePost(id: string, post: Partial<Post>): Promise<ApiResponse<Post>> {
-    const response = await unifiedApi.content.posts.update(id, post)
-    return response.data
-  }
-
-  static async deletePost(id: string): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.content.posts.delete(id)
-    return response.data
-  }
-
-  static async clonePost(id: string): Promise<ApiResponse<Post>> {
-    const response = await unifiedApi.raw.post(`/content/posts/${id}/clone`)
-    return response.data
-  }
-
-  static async bulkUpdatePosts(ids: string[], data: Partial<Post>): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.patch('/content/posts/bulk', { ids, data })
-    return response.data
-  }
-
-  static async bulkDeletePosts(ids: string[]): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.delete('/content/posts/bulk', { data: { ids } })
-    return response.data
-  }
-
-  static async getPostPreview(id: string): Promise<ApiResponse<{ url: string }>> {
-    const response = await unifiedApi.raw.get(`/content/posts/${id}/preview`)
-    return response.data
-  }
-
-  static async savePostDraft(id: string, content: TipTapJSONContent): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.post(`/content/posts/${id}/autosave`, { content })
-    return response.data
-  }
-
-  static async getPostRevisions(id: string): Promise<ApiResponse<Post[]>> {
-    const response = await unifiedApi.raw.get(`/content/posts/${id}/revisions`)
-    return response.data
-  }
-
-  static async restorePostRevision(postId: string, revisionId: string): Promise<ApiResponse<Post>> {
-    const response = await unifiedApi.raw.post(`/content/posts/${postId}/revisions/${revisionId}/restore`)
-    return response.data
-  }
-
-  // Pages Management
-  static async getPages(
-    page: number = 1, 
-    pageSize: number = 20, 
-    filters?: ContentFilters
-  ): Promise<ApiResponse<Page[]>> {
-    const params = {
-      page,
-      pageSize,
-      ...filters
-    }
-    
-    const response = await unifiedApi.raw.get('/content/pages', { params })
-    return response.data
-  }
-
-  static async getPage(id: string): Promise<ApiResponse<Page>> {
-    const response = await unifiedApi.raw.get(`/content/pages/${id}`)
-    return response.data
-  }
-
-  static async createPage(page: Partial<Page>): Promise<ApiResponse<Page>> {
-    const response = await unifiedApi.raw.post('/content/pages', page)
-    return response.data
-  }
-
-  static async updatePage(id: string, page: Partial<Page>): Promise<ApiResponse<Page>> {
-    const response = await unifiedApi.raw.put(`/content/pages/${id}`, page)
-    return response.data
-  }
-
-  static async deletePage(id: string): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.delete(`/content/pages/${id}`)
-    return response.data
-  }
-
-  static async clonePage(id: string): Promise<ApiResponse<Page>> {
-    const response = await unifiedApi.raw.post(`/content/pages/${id}/clone`)
-    return response.data
-  }
-
-  static async bulkUpdatePages(ids: string[], data: Partial<Page>): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.patch('/content/pages/bulk', { ids, data })
-    return response.data
-  }
-
-  static async bulkDeletePages(ids: string[]): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.delete('/content/pages/bulk', { data: { ids } })
-    return response.data
-  }
-
-  static async savePageDraft(id: string, content: TipTapJSONContent): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.post(`/content/pages/${id}/autosave`, { content })
-    return response.data
-  }
-
-  static async getPagePreview(id: string): Promise<ApiResponse<{ url: string }>> {
-    const response = await unifiedApi.raw.get(`/content/pages/${id}/preview`)
-    return response.data
-  }
-
-  static async getPageRevisions(id: string): Promise<ApiResponse<Page[]>> {
-    const response = await unifiedApi.raw.get(`/content/pages/${id}/revisions`)
-    return response.data
-  }
-
-  static async restorePageRevision(pageId: string, revisionId: string): Promise<ApiResponse<Page>> {
-    const response = await unifiedApi.raw.post(`/content/pages/${pageId}/revisions/${revisionId}/restore`)
-    return response.data
-  }
-
-  static async getPageTree(): Promise<ApiResponse<Page[]>> {
-    const response = await unifiedApi.raw.get('/content/pages/tree')
-    return response.data
-  }
+    media · category · tag · menu · template · field-group 계열은 이 판정 대상이 아니라
+    보존한다.
+  */
 
   // Categories Management
   static async getCategories(hierarchical: boolean = true): Promise<ApiResponse<Category[]>> {
