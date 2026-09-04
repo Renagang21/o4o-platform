@@ -29,6 +29,11 @@ const API_SERVER_SRC = path.resolve(__dirname, '..');
  *   승인 경로에서 slug 예약이 아예 빠져 있던 2곳을 보강했다
  *   (cosmetics `linkOwnerToStore`, glycopharm `approveMember`).
  *   두 보강 모두 organization id 축을 그대로 따른다.
+ *
+ * WO-O4O-STORE-SLUG-RESERVESLUG-CENSUS-DRIFT-CLOSURE-V1
+ *   WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1 이 Cafe24 매장 provisioning 에
+ *   9번째 호출부를 추가했다. `ensureOrganizationWithOwnerAndService` 가 돌려준
+ *   organizations.id 를 그대로 쓰므로 축은 canonical 이다 (PharmacyHub 와 동형).
  */
 const EXPECTED: Record<string, string[]> = {
   'routes/cosmetics/services/cosmetics-store.service.ts': ['orgId', 'organizationId'],
@@ -38,6 +43,7 @@ const EXPECTED: Record<string, string[]> = {
   'routes/glycopharm/services/glycopharm.service.ts': ['org.id'],
   'routes/kpa/controllers/organization.controller.ts': ['saved.id'],
   'routes/kpa/services/kpa-store-organization.provisioning.ts': ['orgResult.id'],
+  'services/cafe24-b2b/Cafe24B2bStoreProvisioningService.ts': ['organizationId'],
   'services/pharmacy-hub/PharmacyHubStoreProvisioningService.ts': ['organizationId'],
 };
 
@@ -85,7 +91,7 @@ describe('§6 platform_store_slugs.store_id 축 census', () => {
     if (ids.length > 0) actual[rel] = ids;
   }
 
-  it('reserveSlug 호출부 집합이 문서화된 8곳뿐이다', () => {
+  it('reserveSlug 호출부 집합이 문서화된 9곳뿐이다', () => {
     expect(Object.keys(actual).sort()).toEqual(Object.keys(EXPECTED).sort());
   });
 
