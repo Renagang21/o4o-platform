@@ -191,29 +191,9 @@ export interface AuthUser {
   permissions: string[]
 }
 
-// Phase PD-7: Notification types
-export type NotificationChannel = 'in_app' | 'email'
-
-export type NotificationType =
-  | 'order.new'
-  | 'order.status_changed'
-  | 'settlement.new_pending'
-  | 'settlement.paid'
-  | 'price.changed'
-  | 'stock.low'
-  | 'role.approved'
-  | 'role.application_submitted'
-  | 'custom'
-
-export interface Notification {
-  id: string
-  userId: string
-  channel: NotificationChannel
-  type: NotificationType
-  title: string
-  message?: string
-  metadata?: Record<string, any>
-  isRead: boolean
-  createdAt: string
-  readAt?: string
-}
+// WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (B축):
+//   Phase PD-7 의 NotificationChannel · NotificationType · Notification 3종을 제거했다.
+//   소비처 0건이었고(전수 확인), 화면에서 실제로 쓰는 알림 타입은
+//   pages/dashboard/unified/types.ts 의 별도 union
+//   ('system' | 'business' | 'organization' | 'information') 이다.
+//   백엔드 entities/Notification.ts 와의 "mirror 계약" 도 실재하지 않았다.

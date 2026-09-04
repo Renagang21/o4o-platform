@@ -21,23 +21,22 @@ import type { User } from './User.js';
 export type NotificationChannel = 'in_app' | 'email';
 
 // Notification event types
+// WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (B축):
+//   dead member 18개를 제거했다. 판정 근거(current main 전수 census):
+//     - producer 0 / consumer 0 (src 기준. dist/ 는 빌드 산출물이라 제외)
+//     - 프로덕션 notifications.type distinct 16종 중 해당 18종 row 0건 → serialized contract 0
+//   제거 목록:
+//     order.new · order.status_changed · price.changed · stock.low ·
+//     role.approved · role.application_submitted · settlement.new_pending ·
+//     member.license_expiring · member.license_expired · member.verification_expired ·
+//     member.fee_overdue_warning · member.fee_overdue · member.report_rejected ·
+//     member.education_deadline ·
+//     pharmacy.request_submitted · pharmacy.request_approved · pharmacy.request_rejected ·
+//     store.online_sales_order_created
+//   'settlement.paid' 는 §11 에 따라 canonical 정산 완료 이벤트로 활성화해 유지한다
+//   (producer: neture-settlement.service.ts).
 export type NotificationType =
-  | 'order.new'
-  | 'order.status_changed'
-  | 'settlement.new_pending'
   | 'settlement.paid'
-  | 'price.changed'
-  | 'stock.low'
-  | 'role.approved'
-  | 'role.application_submitted'
-  // Phase 20-B: Member notification types
-  | 'member.license_expiring'
-  | 'member.license_expired'
-  | 'member.verification_expired'
-  | 'member.fee_overdue_warning'
-  | 'member.fee_overdue'
-  | 'member.report_rejected'
-  | 'member.education_deadline'
   // WO-O4O-LMS-NOTIFICATION-INTEGRATION-V1: LMS course lifecycle events
   | 'lms.course_submitted'
   | 'lms.course_approved'
@@ -57,20 +56,12 @@ export type NotificationType =
   | 'member.registration_pending'    // 운영자: 신규 회원가입 신청 접수
   | 'member.registration_approved'   // 신청자: 회원가입 승인
   | 'member.registration_rejected'   // 신청자: 회원가입 반려
-  // WO-O4O-KPA-PHARMACY-REQUEST-NOTIFICATION-P1-V1
-  // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
-  //   약국 서비스 별도 신청 폐지로 신규 emit 없음(emitter 제거됨). 과거 알림 row 판독 위해 union 유지 — deprecated.
-  | 'pharmacy.request_submitted'     // [deprecated] 운영자: 약국 개설 신청 접수
-  | 'pharmacy.request_approved'      // [deprecated] 신청자: 약국 개설 신청 승인
-  | 'pharmacy.request_rejected'      // [deprecated] 신청자: 약국 개설 신청 반려
   // WO-O4O-SELLER-RECRUITMENT-SELLER-NOTIFICATION-V1: 판매자 모집 신청자 알림
   | 'recruitment.application_approved'     // 판매자: 모집 신청 승인
   | 'recruitment.application_rejected'     // 판매자: 모집 신청 반려
   | 'recruitment.participation_terminated' // 판매자: 모집 참여 해지
   // WO-O4O-KPA-STORE-CONSULTATION-REQUEST-NOTIFICATION-WIRING-V1
   | 'store.consultation_requested'   // 매장 사용자: 신규 상담(태블릿 관심) 요청 접수
-  // WO-O4O-KPA-ONLINE-SALES-ORDER-NOTIFICATION-V1
-  | 'store.online_sales_order_created' // 매장 사용자: 온라인 스토어 신규 판매 주문 접수
   // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P3): 매장 신규 상품 등록 요청
   | 'store.product_request_submitted'         // 운영자/관리자: 신규 상품 등록 요청 접수
   | 'store.product_request_revision_requested' // 요청 매장: 보완 요청

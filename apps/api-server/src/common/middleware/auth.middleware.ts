@@ -33,12 +33,12 @@ export {
   authenticateCookie,
 } from './auth/authentication.middleware.js';
 
-// Role & permission guards
+// Role guards
+// WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (A축):
+//   permission 스냅샷 guard 2종의 재수출 제거 (원본 미들웨어 은퇴 · route mount 0건).
 export {
   requireAdmin,
   requireRole,
-  requirePermission,
-  requireAnyPermission,
 } from './auth/authorization.middleware.js';
 
 // Service & Guest user authentication

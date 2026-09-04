@@ -223,7 +223,10 @@ viewComponentRegistry.register(
 // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
 //   'sellerops.router' / 'supplierops.router' 등록 제거.
 //   두 appId 가 appsCatalog 에서 삭제되어 resolve 될 수 없다.
-//   admin 로컬 pages/{sellerops,supplierops} 자산 자체는 감사 §5-4 판정에 따라 보존한다.
+//   admin 로컬 pages/{sellerops,supplierops} 자산 자체는 감사 §5-4 판정에 따라 보존했었다.
+// WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (C축):
+//   pages/sellerops 는 도달 불가(app_registry 미등록) + 데모 데이터 확인으로 제거했다.
+//   pages/supplierops 는 canonical backend 를 호출하는 화면이 남아 있어 유지한다.
 // ============================================================================
 
 // ============================================================================

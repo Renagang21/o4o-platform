@@ -2,7 +2,7 @@
  * Authorization Middleware — Role & Permission Guards
  *
  * Extracted from auth.middleware.ts (WO-O4O-AUTH-MIDDLEWARE-SPLIT-V1)
- * Contains: requireAdmin, requireRole, requirePermission, requireAnyPermission
+ * Contains: requireAdmin, requireRole
  */
 import { Response, NextFunction } from 'express';
 import { User } from '../../../modules/auth/entities/User.js';
@@ -177,144 +177,19 @@ export const requireRole = (roles: string | string[]) => {
   };
 };
 
-/**
- * Require Permission Middleware
- *
- * Requires the user to have a specific permission.
- * Uses RoleAssignmentService to check user's roles against permissions.
- *
- * @param permission - Permission key (e.g., 'cms.templates.edit')
- *
- * @example
- * ```typescript
- * router.put('/templates/:id', requirePermission('cms.templates.edit'), TemplateController.update);
- * ```
- */
-export const requirePermission = (permission: string) => {
-  return async (
-    req: AuthRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void | Response> => {
-    // 인증 확인 → 역할/권한 확인까지 이 미들웨어 안에서 완결한다 (단독 사용 안전).
-    if (!(await ensureAuthenticated(req, res))) return;
-
-    const user = req.user as User;
-
-    try {
-      // Check direct permissions on user
-      if (user.permissions?.includes(permission)) {
-        return next();
-      }
-
-      // P0 RBAC: Check permissions using RoleAssignment service
-      const hasPermission = await roleAssignmentService.hasPermission(user.id, permission);
-
-      if (hasPermission) {
-        return next();
-      }
-
-      // No permission found
-      logger.warn('[requirePermission] Permission denied', {
-        userId: user.id,
-        email: user.email,
-        permission,
-        path: req.path,
-        method: req.method,
-      });
-
-      return res.status(403).json({
-        success: false,
-        error: `Permission denied: ${permission}`,
-        code: 'PERMISSION_DENIED',
-        details: {
-          requiredPermission: permission,
-        },
-      });
-    } catch (error) {
-      logger.error('[requirePermission] Error checking permission', {
-        error: error instanceof Error ? error.message : String(error),
-        userId: user.id,
-        permission,
-      });
-
-      return res.status(500).json({
-        success: false,
-        error: 'Error verifying permission',
-        code: 'INTERNAL_ERROR',
-      });
-    }
-  };
-};
-
-/**
- * Require Any Permission Middleware
- *
- * Requires the user to have at least one of the specified permissions.
- * Uses RoleAssignmentService to check user's roles against permissions.
- *
- * @param permissions - Array of permission keys
- *
- * @example
- * ```typescript
- * router.get('/reports', requireAnyPermission(['analytics.view', 'reports.view']), ReportController.list);
- * ```
- */
-export const requireAnyPermission = (permissions: string[]) => {
-  return async (
-    req: AuthRequest,
-    res: Response,
-    next: NextFunction
-  ): Promise<void | Response> => {
-    // 인증 확인 → 권한 확인까지 이 미들웨어 안에서 완결한다 (단독 사용 안전).
-    if (!(await ensureAuthenticated(req, res))) return;
-
-    const user = req.user as User;
-
-    try {
-      // Check direct permissions
-      for (const permission of permissions) {
-        if (user.permissions?.includes(permission)) {
-          return next();
-        }
-      }
-
-      // P0 RBAC: Check permissions using RoleAssignment service
-      const hasAnyPermission = await roleAssignmentService.hasAnyPermission(user.id, permissions);
-
-      if (hasAnyPermission) {
-        return next();
-      }
-
-      // No permission found
-      logger.warn('[requireAnyPermission] Permission denied', {
-        userId: user.id,
-        email: user.email,
-        permissions,
-        path: req.path,
-        method: req.method,
-      });
-
-      return res.status(403).json({
-        success: false,
-        error: 'Permission denied',
-        code: 'PERMISSION_DENIED',
-        details: {
-          requiredPermissions: permissions,
-        },
-      });
-    } catch (error) {
-      logger.error('[requireAnyPermission] Error checking permissions', {
-        error: error instanceof Error ? error.message : String(error),
-        userId: user.id,
-        permissions,
-      });
-
-      return res.status(500).json({
-        success: false,
-        error: 'Error verifying permissions',
-        code: 'INTERNAL_ERROR',
-      });
-    }
-  };
-};
+// ============================================================================
+// WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (A축):
+//   `requirePermission` / `requireAnyPermission` 두 미들웨어를 제거했다.
+//
+//   - api-server 전체에서 route mount 0건이었다 (DEAD_UNMOUNTED).
+//   - 두 미들웨어의 1차 판정은 users.permissions 컬럼 스냅샷 포함 검사였고,
+//     프로덕션 users 57행 중 permissions 가 비어 있지 않은 행은 0건이다.
+//     즉 grant-only 우회 분기는 실행된 적이 없다.
+//   - RBAC canonical 경로는 `roleAssignmentService.hasPermission` /
+//     `hasAnyRole` 이며, 실제 라우트는 `requireAuth` + `require{Service}Scope`
+//     조합을 사용한다. 새 RBAC framework 를 만들지 않는다.
+//
+//   users.permissions 컬럼 · JWT `permissions` claim · account-linking 병합 ·
+//   @o4o/organization-core 의 PermissionGuard 는 이번 WO 범위 밖으로 남긴다
+//   (DB schema / 동결 Core §3 / 프론트 fallback 계약).
+// ============================================================================

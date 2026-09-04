@@ -88,10 +88,9 @@ export function hasSignageAdminPermission(user: any): boolean {
     return true;
   }
 
-  // Check for specific signage admin permission
-  if (user.permissions?.includes('signage:admin')) {
-    return true;
-  }
+  // WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (A축):
+  //   user.permissions 스냅샷 grant 분기 제거 — 프로덕션 users 중 permissions 가 비어
+  //   있지 않은 행이 0건이라 실행된 적이 없다. 권한 판정은 role 축을 따른다.
 
   // Check database roles for signage-specific admin
   if (user.dbRoles?.some((r: any) => r.name === 'signage-admin')) {
@@ -172,11 +171,10 @@ export function hasSignageOperatorPermission(user: any, serviceKey: string): boo
     return true;
   }
 
-  // Check for specific service operator permission
+  // WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (A축):
+  //   user.permissions 스냅샷 grant 분기 제거 — 프로덕션 users 중 permissions 가 비어
+  //   있지 않은 행이 0건이라 실행된 적이 없다. 권한 판정은 role 축을 따른다.
   const operatorPermission = `signage:${serviceKey}:operator`;
-  if (user.permissions?.includes(operatorPermission)) {
-    return true;
-  }
 
   // Check database roles for operator role
   if (user.dbRoles?.some((r: any) =>
@@ -269,11 +267,9 @@ export function hasSignageStorePermission(
     return true;
   }
 
-  // Check for specific store permission
-  const storePermission = `signage:store:${organizationId}`;
-  if (user.permissions?.includes(storePermission)) {
-    return true;
-  }
+  // WO-O4O-LEGACY-FOLLOWUP-AUTH-NOTIFICATION-CATALOG-AND-DB-FINAL-CLOSURE-V1 (A축):
+  //   user.permissions 스냅샷 grant 분기 제거 — 프로덕션 users 중 permissions 가 비어
+  //   있지 않은 행이 0건이라 실행된 적이 없다. 권한 판정은 role 축을 따른다.
 
   return false;
 }
