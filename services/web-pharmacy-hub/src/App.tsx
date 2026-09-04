@@ -113,6 +113,8 @@ import {
 } from '@o4o/shared-space-ui';
 import { MembershipGate } from './components/MembershipGate';
 import LoginPage from './pages/LoginPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import JoinPage from './pages/JoinPage';
 import JoinStatusPage from './pages/JoinStatusPage';
 import OperatorDashboardPage from './pages/operator/OperatorDashboardPage';
@@ -276,6 +278,15 @@ export default function App() {
           */}
           <Route path="/" element={<CommunityHomePage />} />
           <Route path="/login" element={<LoginPage />} />
+
+          {/*
+            WO-O4O-PHARMACYHUB-PASSWORD-RECOVERY-UI-FIX-V1
+            비밀번호 찾기·재설정 공개 화면. 백엔드는 공통 /api/v1/auth/{forgot,reset}-password
+            를 그대로 사용하며, `/reset-password` 는 재설정 메일 링크의 착지 경로다
+            (mail-core: `${serviceUrl}/reset-password?token=...`).
+          */}
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/join" element={<JoinPage />} />
           <Route path="/join/status" element={<JoinStatusPage />} />
 

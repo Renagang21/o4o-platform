@@ -148,6 +148,12 @@ export default function LoginPage() {
       </form>
 
       <p className="mt-4 text-center text-sm">
+        <Link to="/forgot-password" className="text-primary-600 underline">
+          비밀번호를 잊으셨나요?
+        </Link>
+      </p>
+
+      <p className="mt-2 text-center text-sm">
         <Link to="/join" className="text-primary-600 underline">
           가입 신청
         </Link>
