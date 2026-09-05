@@ -39,7 +39,16 @@ import { tmpdir } from 'node:os';
 // WO-O4O-SIGNAGE-LEGACY-STACK-SIMPLIFICATION-AND-TABLET-AUTHORING-CLOSURE-V1:
 //   main(65) 과 본 브랜치(63) 가 같은 줄을 각각 낮춰 merge 충돌 → 병합 트리에서 실측 재산출.
 //   실측 64 (44 파일, 전부 본 작업과 무관한 기존 오류). 추정값을 쓰지 않는다.
-const ERROR_BASELINE = 55;
+//
+// WO-O4O-CI-LINT-RATCHET-BASELINE-DESYNC-CLOSURE-V1 (2026-09-05):
+//   ee629917a 가 이 값을 55 로 내렸으나 병합 트리 실측은 57 이었다 (또 같은 merge 함정).
+//   그 시점부터 main 의 모든 커밋이 `57 > 55` 로 CI RED 였다 — 신규 오류가 아니라
+//   baseline 이 실측보다 낮게 박힌 desync 였다(오류 파일 최종 수정일 전부 09-04 15:02 이전).
+//   baseline 을 올리지 않고(스크립트 규칙) 무해한 기존 오류 6건을 실제로 제거해 해소한다:
+//     no-useless-catch 5 (web-neture admin.ts 3 · partner.ts 2 — `catch(e){throw e}` 제거)
+//     no-useless-escape 1 (pharmacy-hub-parity-contract.test.ts — 문자클래스 내 불필요 escape)
+//   실측 51 로 재산출.
+const ERROR_BASELINE = 51;
 
 const baseline = Number(process.env.LINT_ERROR_BASELINE ?? ERROR_BASELINE);
 const reportPath = join(tmpdir(), `eslint-ratchet-${process.pid}.json`);

@@ -71,7 +71,7 @@ describe('§6 회원 Content write — 원장-바인딩 capability 등록표', (
   it('서비스 분기가 아니라 등록표로만 켜진다', () => {
     const code = readCode(MEMBER_AUTHORING);
     // `if (serviceKey === '...')` 류의 서비스 분기 금지 (WO §2 금지 항목)
-    expect(code).not.toMatch(/serviceKey\s*===\s*['\`"]/);
+    expect(code).not.toMatch(/serviceKey\s*===\s*['`"]/);
     expect(code).toContain('CMS_MEMBER_AUTHORING_LEDGERS');
   });
 

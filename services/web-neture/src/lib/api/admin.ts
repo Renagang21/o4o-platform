@@ -182,12 +182,8 @@ export const adminSupplierApi = {
 
   // WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1
   async listRegulatedCategories(id: string): Promise<SupplierRegulatedCategory[]> {
-    try {
-      const response = await api.get(`/neture/admin/suppliers/${id}/regulated-categories`);
-      return response.data?.data ?? [];
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get(`/neture/admin/suppliers/${id}/regulated-categories`);
+    return response.data?.data ?? [];
   },
 
   async reviewRegulatedCategory(
@@ -357,12 +353,8 @@ export const operatorSupplierApi = {
 
   // WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1
   async listRegulatedCategories(id: string): Promise<SupplierRegulatedCategory[]> {
-    try {
-      const response = await api.get(`/neture/operator/suppliers/${id}/regulated-categories`);
-      return response.data?.data ?? [];
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get(`/neture/operator/suppliers/${id}/regulated-categories`);
+    return response.data?.data ?? [];
   },
 
   async reviewRegulatedCategory(
@@ -645,19 +637,15 @@ export const adminCommissionApi = {
   async getCommissions(
     params?: { page?: number; limit?: number; status?: CommissionStatus }
   ): Promise<CommissionsResponse> {
-    try {
-      const sp = new URLSearchParams();
-      if (params?.page) sp.append('page', String(params.page));
-      if (params?.limit) sp.append('limit', String(params.limit));
-      if (params?.status) sp.append('status', params.status);
-      const qs = sp.toString() ? `?${sp}` : '';
+    const sp = new URLSearchParams();
+    if (params?.page) sp.append('page', String(params.page));
+    if (params?.limit) sp.append('limit', String(params.limit));
+    if (params?.status) sp.append('status', params.status);
+    const qs = sp.toString() ? `?${sp}` : '';
 
-      const response = await api.get(`/neture/admin/commissions${qs}`);
-      const result = response.data;
-      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get(`/neture/admin/commissions${qs}`);
+    const result = response.data;
+    return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
   },
 
   async getKpi(): Promise<AdminCommissionKpi> {

@@ -292,19 +292,15 @@ export const partnerCommissionApi = {
   async getCommissions(
     params?: { page?: number; limit?: number; status?: CommissionStatus }
   ): Promise<CommissionsResponse> {
-    try {
-      const sp = new URLSearchParams();
-      if (params?.page) sp.append('page', String(params.page));
-      if (params?.limit) sp.append('limit', String(params.limit));
-      if (params?.status) sp.append('status', params.status);
-      const qs = sp.toString() ? `?${sp}` : '';
+    const sp = new URLSearchParams();
+    if (params?.page) sp.append('page', String(params.page));
+    if (params?.limit) sp.append('limit', String(params.limit));
+    if (params?.status) sp.append('status', params.status);
+    const qs = sp.toString() ? `?${sp}` : '';
 
-      const response = await api.get(`/neture/partner/commissions${qs}`);
-      const result = response.data;
-      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get(`/neture/partner/commissions${qs}`);
+    const result = response.data;
+    return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
   },
 
   /** GET /api/v1/neture/partner/commissions/:id */
@@ -412,17 +408,13 @@ export const partnerSettlementApi = {
     data: PartnerSettlementSummary[];
     meta: { page: number; limit: number; total: number; totalPages: number };
   }> {
-    try {
-      const sp = new URLSearchParams();
-      if (params?.page) sp.append('page', String(params.page));
-      if (params?.limit) sp.append('limit', String(params.limit));
-      const qs = sp.toString() ? `?${sp}` : '';
-      const response = await api.get(`/neture/partner/settlements${qs}`);
-      const result = response.data;
-      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
-    } catch (error) {
-      throw error;
-    }
+    const sp = new URLSearchParams();
+    if (params?.page) sp.append('page', String(params.page));
+    if (params?.limit) sp.append('limit', String(params.limit));
+    const qs = sp.toString() ? `?${sp}` : '';
+    const response = await api.get(`/neture/partner/settlements${qs}`);
+    const result = response.data;
+    return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
   },
 
   /** GET /api/v1/neture/partner/settlements/:id */
