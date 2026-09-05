@@ -68,6 +68,14 @@ RUN npm install -g serve
 
 COPY --from=builder /app/services/web-kpa-branch/dist ./dist
 
+# WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1
+#   번들 asset 은 vite `base: '/kpa/'` 때문에 항상 `/kpa/assets/*` 로 요청된다.
+#   같은 이미지가 두 진입 방식을 서빙해야 하므로 dist 를 `/kpa` 아래에도 둔다.
+#     공용 경로  kpa-society.co.kr/kpa/{slug} → LB 가 `/kpa/...` 그대로 전달 → dist/kpa/assets/*
+#     자체 도메인 {branch domain}/           → index.html 은 root, asset 은 /kpa/assets/*
+#   HTML 자체는 `serve -s` 의 SPA fallback(dist/index.html)이 두 경우 모두 처리한다.
+RUN cp -r ./dist ./dist-public-base && mv ./dist-public-base ./dist/kpa
+
 EXPOSE 8080
 
 CMD ["serve", "-s", "dist", "-l", "8080"]

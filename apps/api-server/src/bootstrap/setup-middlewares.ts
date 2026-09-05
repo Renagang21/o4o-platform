@@ -72,7 +72,12 @@ export const getAllowedOrigins = (): string[] => {
     //   209개 분회가 각자 도메인을 붙이면 정적 allowlist 로는 확장되지 않으므로,
     //   custom-domain onboarding 시 branch_domains(status='active') 기반 동적 origin
     //   판정을 별도 WO 로 도입한다.
-    "https://branch.kpa-society.co.kr",
+    //
+    //   WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
+    //     공용 진입이 서브도메인(branch.kpa-society.co.kr, DNS 미연결)에서
+    //     kpa-society.co.kr 의 `/kpa` path 로 바뀌었다. origin 은 host 축이므로
+    //     이미 위에 등록된 "https://kpa-society.co.kr" / "https://www.kpa-society.co.kr"
+    //     가 그대로 분회 앱의 origin 이 된다 — 별도 항목을 추가하지 않는다.
     "https://kpa-branch-web-3e3aws7zqa-du.a.run.app",
     // WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1:
     //   signage-player-web(Cloud Run) 은 익명 단말 런타임으로 api.neture.co.kr 을

@@ -24,6 +24,16 @@ export interface O4OService {
   nameKo?: string;
   /** 서비스 도메인 */
   domain: string;
+  /**
+   * 공개 진입 경로 prefix (optional — 미지정 시 host 루트).
+   *
+   * WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
+   *   kpa-branch 처럼 **자기 host 를 갖지 않고 다른 서비스 host 의 path 아래에서**
+   *   서빙되는 서비스를 표현한다. `domain` 은 언제나 순수 hostname 으로 유지하고
+   *   (CORS origin·쿠키 도메인 판정이 hostname 을 전제한다), 경로는 여기에만 둔다.
+   *   반드시 '/' 로 시작하고 trailing '/' 는 두지 않는다.
+   */
+  basePath?: string;
   /** 서비스 설명 */
   description: string;
   /** 가입 가능 여부 */
@@ -83,6 +93,12 @@ export const O4O_SERVICES: O4OService[] = [
    * KPA Branch (약사회 분회) — 209개 분회를 동급 tenant 로 두는 분회 홈페이지 SaaS.
    * domain 은 플랫폼 기본 호스트다. 분회 자체 도메인은 branch_domains 로 연결하며
    * 분회별 별도 배포·별도 백엔드는 만들지 않는다.
+   *
+   * WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
+   *   공용 공개 URL 은 별도 서브도메인이 아니라 `https://kpa-society.co.kr/kpa/{branchSlug}` 다
+   *   (LB `o4o-global-lb` / path-matcher-kpa-society 의 `/kpa`·`/kpa/*` pathRule).
+   *   따라서 domain=kpa-society.co.kr + basePath=/kpa 로 표현한다.
+   *   `/kpa` 는 URL prefix 일 뿐 tenant 가 아니다 — 분회는 slug 또는 Host 로만 해석한다.
    * platform_services row 는 20270305000000-SeedKpaBranchServiceAndRoles 에서 seed 한다.
    * joinEnabled=false — 분회 소속은 자가 신청이 아니라 분회 운영자 승인 경로로만 생성된다.
    */
@@ -90,7 +106,8 @@ export const O4O_SERVICES: O4OService[] = [
     key: 'kpa-branch',
     name: 'KPA Branch',
     nameKo: '약사회 분회',
-    domain: 'branch.kpa-society.co.kr',
+    domain: 'kpa-society.co.kr',
+    basePath: '/kpa',
     description: '약사회 분회 홈페이지 및 분회 회원 관리 서비스',
     joinEnabled: false,
   },
@@ -136,9 +153,14 @@ export function getAllServiceKeys(): string[] {
   return O4O_SERVICES.map(s => s.key);
 }
 
-/** 모든 서비스의 공식 origin (https://domain) 목록 — WO-O4O-DOMAIN-SSOT-CANONICALIZATION-V1 */
+/**
+ * 모든 서비스의 공식 origin (https://domain) 목록 — WO-O4O-DOMAIN-SSOT-CANONICALIZATION-V1
+ *
+ * origin 은 scheme+host 다. basePath 는 origin 의 일부가 아니므로 여기에 붙이지 않는다
+ * (CORS / 화이트리스트 판정 축). base URL 이 필요하면 `getServiceOrigin` 을 쓴다.
+ */
 export function getServiceOrigins(): string[] {
-  return O4O_SERVICES.map(s => `https://${s.domain}`);
+  return Array.from(new Set(O4O_SERVICES.map(s => `https://${s.domain}`)));
 }
 
 /**
@@ -151,5 +173,9 @@ export function getServiceOrigins(): string[] {
  */
 export function getServiceOrigin(key: string): string | undefined {
   const svc = serviceMap.get(key);
-  return svc ? `https://${svc.domain}` : undefined;
+  if (!svc) return undefined;
+  // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
+  //   basePath 를 가진 서비스(kpa-branch)는 host 루트가 다른 서비스이므로
+  //   base URL 에 prefix 를 포함해야 링크가 자기 앱으로 떨어진다.
+  return `https://${svc.domain}${svc.basePath ?? ''}`;
 }

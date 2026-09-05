@@ -74,6 +74,9 @@ export function createKpaBranchRoutes(): Router {
         name: svc.name,
         nameKo: svc.nameKo ?? svc.name,
         domain: svc.domain,
+        // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
+        //   공용 공개 URL = https://{domain}{basePath}/{branchSlug}
+        basePath: svc.basePath ?? '',
         description: svc.description,
         joinEnabled: svc.joinEnabled,
       },

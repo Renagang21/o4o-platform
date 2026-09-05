@@ -27,7 +27,7 @@ import { roleAssignmentService } from '../services/role-assignment.service.js';
 import * as tokenUtils from '../../../utils/token.utils.js';
 import { persistRefreshTokenFamily } from '../../../services/auth/auth-context.helper.js';
 import { setAuthCookies } from '../../../utils/cookie.utils.js';
-import { getService, O4O_SERVICES } from '../../../config/service-catalog.js';
+import { getService, getServiceOrigin, O4O_SERVICES } from '../../../config/service-catalog.js';
 import logger from '../../../utils/logger.js';
 
 export class HandoffController extends BaseController {
@@ -127,7 +127,11 @@ export class HandoffController extends BaseController {
         targetServiceKey,
       );
 
-      const targetUrl = `https://${targetService.domain}/handoff?token=${handoffToken}`;
+      // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
+      //   basePath 를 가진 서비스(kpa-branch = kpa-society.co.kr/kpa)는 host 루트가
+      //   다른 서비스이므로 origin helper 로 base URL 을 만든다.
+      const targetOrigin = getServiceOrigin(targetService.key) ?? `https://${targetService.domain}`;
+      const targetUrl = `${targetOrigin}/handoff?token=${handoffToken}`;
 
       return BaseController.ok(res, {
         handoffToken,
