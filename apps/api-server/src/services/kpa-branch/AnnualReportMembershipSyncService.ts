@@ -48,7 +48,8 @@ export type SyncFailureCode =
   | 'REPORT_NOT_SUBMITTED'
   | 'TEMPLATE_NOT_FOUND'
   | 'MEMBER_LEDGER_NOT_FOUND'
-  | 'SYNC_VALUE_INVALID';
+  | 'SYNC_VALUE_INVALID'
+  | 'SYNC_CONFLICT';
 
 export class AnnualReportSyncError extends Error {
   constructor(
@@ -203,10 +204,40 @@ export class AnnualReportMembershipSyncService {
       skipped,
     };
 
-    /**
-     * 원장 update 와 신고서 플래그를 **하나의 트랜잭션**으로 묶는다.
-     * 원장 쓰기가 실패하면 `synced_to_membership` 도 서지 않는다 (원칙 8 — 부분 반영 금지).
-     */
+    try {
+      await this.applyInTransaction(report.id, report.user_id, organizationId, changes, record);
+    } catch (err) {
+      /**
+       * 원장 제약 위반은 서버 결함이 아니라 운영상의 충돌이다.
+       * 대표적으로 `IDX_kpa_members_license_number_unique` — 이미 다른 회원이 쓰는
+       * 면허번호를 제출한 경우다. 500 이 아니라 409 로 돌려 원인을 드러낸다.
+       * 트랜잭션이 롤백됐으므로 원장도 신고서 플래그도 그대로다.
+       */
+      if ((err as { code?: string })?.code === '23505') {
+        throw new AnnualReportSyncError(
+          'SYNC_CONFLICT',
+          '이미 다른 회원이 사용 중인 값이 있어 회원정보에 반영할 수 없습니다.',
+          409,
+          { constraint: (err as { constraint?: string }).constraint ?? null },
+        );
+      }
+      throw err;
+    }
+
+    return { reportId: report.id, applied: true, alreadySynced: false, record };
+  }
+
+  /**
+   * 원장 update 와 신고서 플래그를 **하나의 트랜잭션**으로 묶는다.
+   * 원장 쓰기가 실패하면 `synced_to_membership` 도 서지 않는다 (원칙 8 — 부분 반영 금지).
+   */
+  private static async applyInTransaction(
+    reportId: string,
+    reportUserId: string,
+    organizationId: string,
+    changes: AnnualReportSyncChange[],
+    record: AnnualReportSyncRecord,
+  ): Promise<void> {
     await AppDataSource.transaction(async (manager: EntityManager) => {
       if (changes.length) {
         const sets: string[] = [];
@@ -216,7 +247,7 @@ export class AnnualReportMembershipSyncService {
           args.push(c.after);
           sets.push(`"${col}" = $${args.length}`);
         }
-        args.push(report.user_id);
+        args.push(reportUserId);
         // 대상은 언제나 신고서 주인이다. 요청자(운영자) id 를 쓰지 않는다.
         await manager.query(
           `UPDATE kpa_members SET ${sets.join(', ')}, updated_at = now() WHERE user_id = $${args.length}`,
@@ -229,11 +260,9 @@ export class AnnualReportMembershipSyncService {
         `UPDATE annual_reports
             SET synced_to_membership = true, synced_changes = $1::jsonb, updated_at = now()
           WHERE id = $2 AND organization_id = $3`,
-        [JSON.stringify(record), report.id, organizationId],
+        [JSON.stringify(record), reportId, organizationId],
       );
     });
-
-    return { reportId: report.id, applied: true, alreadySynced: false, record };
   }
 
   /** Template 이 선택지를 정의한 필드는 그 선택지 안의 값만 원장에 넘긴다. */
