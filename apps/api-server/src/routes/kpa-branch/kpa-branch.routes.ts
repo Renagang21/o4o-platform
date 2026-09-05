@@ -16,6 +16,7 @@
  *   *      /api/v1/kpa-branch/branches/:branchSlug/operator/**               (operator scope + 분회 경계)
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/annual-report-templates       신상신고 양식 목록
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/annual-report-templates/:year 연도별 양식 (schema 전문)
+ *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/annual-reports/:reportId/sync   제출본 → 회원 원장 반영
  *   *      /api/v1/kpa-branch/admin/domains/**                               (admin scope)
  *   *      /api/v1/kpa-branch/admin/service-members/**                        (admin scope)  가입 승인
  *
@@ -43,6 +44,7 @@ import { BranchDomainController } from '../../controllers/kpa-branch/BranchDomai
 import { BranchJoinController } from '../../controllers/kpa-branch/BranchJoinController.js';
 import { BranchServiceMembershipController } from '../../controllers/kpa-branch/BranchServiceMembershipController.js';
 import { AnnualReportTemplateController } from '../../controllers/kpa-branch/AnnualReportTemplateController.js';
+import { OperatorAnnualReportController } from '../../controllers/kpa-branch/OperatorAnnualReportController.js';
 import { MemberAnnualReportController } from '../../controllers/kpa-branch/MemberAnnualReportController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
@@ -227,6 +229,16 @@ export function createKpaBranchRoutes(): Router {
     '/branches/:branchSlug/operator/annual-report-templates/:year',
     ...operatorGuards,
     wrap(AnnualReportTemplateController.byYear),
+  );
+
+  // 제출본 → 회원 원장(kpa_members) 반영 (WO-O4O-KPA-BRANCH-ANNUAL-REPORT-MEMBERSHIP-SYNC-V1)
+  //
+  // 회원 제출 시 자동 반영하지 않는다. 운영자가 명시적으로 실행하며,
+  // 조회는 (reportId, organization_id) 복합 조건이라 다른 분회 신고서에 닿을 수 없다.
+  router.post(
+    '/branches/:branchSlug/operator/annual-reports/:reportId/sync',
+    ...operatorGuards,
+    wrap(OperatorAnnualReportController.sync),
   );
 
   router.get('/branches/:branchSlug/operator/domains', ...operatorGuards, wrap(BranchDomainController.list));
