@@ -5,6 +5,14 @@
 > **판정**: `CLOUD_SQL_STOP_OPERATION_HOLD`
 > **작성일**: 2026-09-05
 
+> ⚠️ **정정 (2026-09-05)**: 본 문서 **§4 의 원인 귀인은 틀렸다.**
+> 500 발생을 `minScale=0` cold start 부작용으로 판단했으나, 후속 전수 조사 결과
+> **CORS 정책 거부(`http://localhost:4321` 차단)** 가 단독 원인임이 확정되었다
+> (해당 referer 요청 38건 전부 500 / 같은 기간 500 전부 해당 referer).
+> 당시 근거는 인스턴스 기동과의 시간적 인접성뿐이었고 요청 `referer` 를 확인하지 않았다.
+> **§3 (STOP 보류 판단) 과 그 밖의 기록은 유효하다.**
+> 정정 근거: [`WO-O4O-CORE-API-COLD-START-READINESS-AND-BURST-SAFETY-V1-CHECK.md`](WO-O4O-CORE-API-COLD-START-READINESS-AND-BURST-SAFETY-V1-CHECK.md)
+
 ---
 
 ## 1. 기준선 (WO §3)
