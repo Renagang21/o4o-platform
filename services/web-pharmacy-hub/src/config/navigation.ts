@@ -95,6 +95,9 @@ export const PH_FOOTER_SECTIONS: { title: string; links: GlobalHeaderNavItem[] }
     title: '서비스',
     links: [
       { label: '커뮤니티', href: '/' },
+      // WO-O4O-PHARMACYHUB-HOME-NEWS-AND-USAGE-GUIDE-REALIGNMENT-V1 §3:
+      //   홈 뉴스 카드 외의 상시 진입점. route 는 App.tsx `/news` 로 실재한다.
+      { label: '뉴스', href: '/news' },
       { label: '포럼', href: '/forum' },
       // WO-O4O-PHARMACYHUB-COMMUNITY-CONTENT-RESOURCE-TABLE-AND-ADOPTION-V1 §12
       { label: '자료실', href: '/resources' },

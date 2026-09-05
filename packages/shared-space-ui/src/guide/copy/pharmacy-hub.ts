@@ -101,6 +101,45 @@ export const pharmacyHubGuideIntroProps: GuideIntroPageProps = {
         { label: '실행까지 연결', detail: '자료를 보관만 하지 않고 QR · POP · 사이니지로 바로 씁니다.' },
       ],
     },
+    /*
+     * WO-O4O-PHARMACYHUB-HOME-NEWS-AND-USAGE-GUIDE-REALIGNMENT-V1 §1·§2:
+     *   커뮤니티 홈 우측의 `커뮤니티 이용 안내` 카드(포럼 글쓰기 / 교육 콘텐츠 /
+     *   내가 쓴 글 / 콘텐츠 공개·검토 4줄)를 홈에서 제거하고 이 이용 가이드로 옮겼다.
+     *   홈은 최신 정보 소비(공지 + 뉴스 + 최신글), 이용 방법은 이용 안내가 설명한다.
+     *   문구는 그대로 보존하고 각 항목에 실제 route 를 연결해 안내에서 실행으로
+     *   바로 이어지게 한다(신규 page·route 신설 0 — 기존 이용 안내 구조 재사용).
+     *
+     *   append-only 로 추가한다 — GuideIntroPage 의 편집 sectionKey 가 index 기반
+     *   (`section-{idx}-desc`)이라 기존 섹션 순서를 바꾸면 키가 밀린다.
+     */
+    {
+      title: '커뮤니티 이용 방법',
+      href: '/guide/features',
+      description:
+        '포럼 · 교육 · 내 글 · 콘텐츠 공개 절차를 정리했습니다. 각 항목을 누르면 해당 기능 또는 기능별 매뉴얼로 이동합니다.',
+      items: [
+        {
+          label: '포럼 이용 방법',
+          detail: '포럼 글쓰기는 PharmacyHub 가입 승인 후 가능합니다.',
+          href: '/guide/features/forum',
+        },
+        {
+          label: '교육 콘텐츠 이용 방법',
+          detail: '교육 콘텐츠는 PharmacyHub 에 등록된 강의만 표시됩니다.',
+          href: '/education',
+        },
+        {
+          label: '내가 쓴 글 확인',
+          detail: '내가 쓴 글은 커뮤니티 메뉴의 [내 글]에서 확인할 수 있습니다.',
+          href: '/forum/my-posts',
+        },
+        {
+          label: '콘텐츠 공개/검토 방식',
+          detail: '콘텐츠는 작성 후 운영자 검토를 거쳐 공개됩니다.',
+          href: '/guide/features/content',
+        },
+      ],
+    },
   ],
   bottomNav: {
     home: { label: '← 홈으로', to: '/' },

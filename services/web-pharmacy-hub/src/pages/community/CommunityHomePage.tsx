@@ -23,6 +23,12 @@
  *   진입 카드를 노출한다. `/pharmacy-hub/home/latest` 도 같은 WO 에서 두 축을 공급한다 —
  *   빈 탭(placeholder)을 만드는 것이 아니라 실제 축을 붙이는 것이다.
  *   홈 구조 자체는 재설계하지 않는다(§7: Home/Menu 는 회귀 확인만).
+ *
+ * WO-O4O-PHARMACYHUB-HOME-NEWS-AND-USAGE-GUIDE-REALIGNMENT-V1:
+ *   홈 우측 `커뮤니티 이용 안내` 카드를 제거하고 `뉴스` 카드로 교체했다.
+ *   홈 = 공지 + 뉴스 + 최신글(정보 소비), 이용 방법 = 이용 안내(`/guide/intro`).
+ *   안내 4줄은 소실되지 않고 pharmacyHubGuideIntroProps 의
+ *   '커뮤니티 이용 방법' 섹션으로 이동했다.
  */
 
 import { useCallback } from 'react';
@@ -33,6 +39,7 @@ import {
   type LatestActivityTab,
   type NoticeItem,
 } from '@o4o/shared-space-ui';
+import { HomeNewsCard } from '../../components/HomeNewsCard';
 import { homeApi } from '../../api/home';
 import { fetchPharmacyHubForumPosts } from '../../services/forumApi';
 import { BRAND } from '../../config/service';
@@ -123,17 +130,14 @@ export default function CommunityHomePage() {
       }
       noticesTitle="공지"
       noticesViewAllHref="/forum/posts"
-      noticesRightSlot={
-        <div className="flex-1 rounded-lg border border-slate-200 bg-white p-5">
-          <h3 className="m-0 text-base font-semibold text-slate-900">커뮤니티 이용 안내</h3>
-          <ul className="mt-3 space-y-2 text-sm text-slate-600">
-            <li>· 포럼 글쓰기는 PharmacyHub 가입 승인 후 가능합니다.</li>
-            <li>· 교육 콘텐츠는 PharmacyHub 에 등록된 강의만 표시됩니다.</li>
-            <li>· 내가 쓴 글은 커뮤니티 메뉴의 [내 글]에서 확인할 수 있습니다.</li>
-            <li>· 콘텐츠는 작성 후 검토를 거쳐 공개됩니다.</li>
-          </ul>
-        </div>
-      }
+      /*
+       * WO-O4O-PHARMACYHUB-HOME-NEWS-AND-USAGE-GUIDE-REALIGNMENT-V1 §1·§3:
+       *   이 슬롯에 있던 `커뮤니티 이용 안내`(사용법 4줄)를 제거하고 `뉴스` 로 교체한다.
+       *   홈은 최신 정보 소비(공지 + 뉴스 + 최신글)에 집중하고, 이용 방법은
+       *   이용 안내(`/guide/intro` 의 '커뮤니티 이용 방법' 섹션)가 설명한다.
+       *   공통 StandardHomeTemplate 이 이 슬롯을 정의한 용도(서비스별 뉴스)와도 일치한다.
+       */
+      noticesRightSlot={<HomeNewsCard />}
       appEntryCards={[
         { title: '포럼', description: '약국·공급자 정보 교류 게시판', href: '/forum' },
         { title: '교육', description: '매장 운영·상품 이해 교육 콘텐츠', href: '/education' },

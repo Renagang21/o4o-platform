@@ -23,6 +23,8 @@
  *   /                            커뮤니티 홈 (canonical · 공통 CommunityServiceHome)
  *   /community                   → `/` redirect (기존 링크 보존)
  *   /community/search            커뮤니티 검색 (동일 WO §6 — forum 중심)
+ *   /news                        뉴스 목록 (public · 공통 cms_contents type='news')
+ *   /news/:id                    뉴스 상세 (WO-O4O-PHARMACYHUB-HOME-NEWS-AND-USAGE-GUIDE-REALIGNMENT-V1 §3)
  *   /education                   교육 허브 (동일 WO §7 — 공통 LmsHubTemplate)
  *   /education/course/:id        강의 상세 (공통 CourseDetailView · 수강신청 활성 — LMS learner adoption WO §6)
  *   /education/course/:courseId/lesson/:lessonId  레슨 (공통 LessonPlayerView)
@@ -117,6 +119,9 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import JoinPage from './pages/JoinPage';
 import JoinStatusPage from './pages/JoinStatusPage';
+// WO-O4O-PHARMACYHUB-HOME-NEWS-AND-USAGE-GUIDE-REALIGNMENT-V1 §3 — 홈 뉴스 카드의 착지 경로
+import PharmacyHubNewsListPage from './pages/news/PharmacyHubNewsListPage';
+import PharmacyHubNewsDetailPage from './pages/news/PharmacyHubNewsDetailPage';
 import OperatorDashboardPage from './pages/operator/OperatorDashboardPage';
 import ForumHubPage from './pages/forum/ForumHubPage';
 import ForumListPage from './pages/forum/ForumListPage';
@@ -289,6 +294,21 @@ export default function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/join" element={<JoinPage />} />
           <Route path="/join/status" element={<JoinStatusPage />} />
+
+          {/*
+            WO-O4O-PHARMACYHUB-HOME-NEWS-AND-USAGE-GUIDE-REALIGNMENT-V1 §3·§5
+
+            뉴스 — 홈 우측 카드의 `전체 보기` · 항목 착지 경로.
+            원장은 **이미 마운트된 공통** `/api/v1/pharmacy-hub/news/*`
+            (cms_contents · serviceKey='pharmacy-hub' · type='news') 다 —
+            신규 table 0 / migration 0 / 신규 backend API 0. 등록은 운영자
+            `/operator/content`(공통 CmsContentManager)가 이미 담당한다.
+
+            공개 화면이다 — backend 가 optionalAuth 이고 published 만 반환하므로
+            MembershipGate 를 걸지 않는다(홈이 공개인 것과 같은 축).
+          */}
+          <Route path="/news" element={<PharmacyHubNewsListPage />} />
+          <Route path="/news/:id" element={<PharmacyHubNewsDetailPage />} />
 
           {/*
             내 프로필 (WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1 — production 잔여 결함)
