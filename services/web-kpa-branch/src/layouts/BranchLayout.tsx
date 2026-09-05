@@ -11,12 +11,19 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { getPublicSite, getOperatorSite, type BranchSite } from '../lib/api/branch';
 import { useAuth } from '../contexts/AuthContext';
 import { ROLES, satisfiesRole } from '../config/service';
+import NotFoundPage from '../pages/NotFoundPage';
 
 export function BranchLayout({ slug, basePath }: { slug: string; basePath: string }) {
   const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const [site, setSite] = useState<BranchSite | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-KPA-BRANCH-PUBLIC-PATH-ROUTING-AND-CUSTOM-DOMAIN-BASELINE-V1:
+  //   `/kpa/{존재하지 않는 slug}` 를 "미게시 분회" 로 뭉개지 않는다.
+  //   backend 는 두 상황을 다른 code 로 구분해 준다 —
+  //     BRANCH_NOT_FOUND         : slug 자체가 없다        → 404 화면
+  //     BRANCH_SITE_NOT_PUBLISHED: 분회는 있고 미게시다     → 셸 + 안내
+  const [branchMissing, setBranchMissing] = useState(false);
 
   const roles: string[] = (user?.roles as string[] | undefined) ?? [];
   const canOperate = satisfiesRole(roles, ROLES.operator);
@@ -25,14 +32,19 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
   useEffect(() => {
     let alive = true;
     setError(null);
+    setBranchMissing(false);
     // 운영자 영역에서는 미게시 상태도 보여야 하므로 운영자 조회를 쓴다.
     const load = isOperatorArea && canOperate ? getOperatorSite(slug) : getPublicSite(slug);
     load
       .then((s) => alive && setSite(s))
       .catch((e: unknown) => {
         if (!alive) return;
-        const status = (e as { response?: { status?: number } })?.response?.status;
-        setError(status === 404 ? '아직 공개되지 않은 분회 홈페이지입니다.' : '분회 정보를 불러오지 못했습니다.');
+        const res = (e as { response?: { status?: number; data?: { code?: string } } })?.response;
+        if (res?.data?.code === 'BRANCH_NOT_FOUND') {
+          setBranchMissing(true);
+          return;
+        }
+        setError(res?.status === 404 ? '아직 공개되지 않은 분회 홈페이지입니다.' : '분회 정보를 불러오지 못했습니다.');
       });
     return () => {
       alive = false;
@@ -55,6 +67,11 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
     { to: `${basePath}/operator/posts`, label: '글 관리' },
     { to: `${basePath}/operator/domains`, label: '도메인 연결' },
   ];
+
+  // 존재하지 않는 분회는 셸(헤더·메뉴·푸터)을 그리지 않는다 — 유효한 분회처럼 보이면 안 된다.
+  if (branchMissing) {
+    return <NotFoundPage />;
+  }
 
   return (
     <div className="min-h-screen bg-white">
