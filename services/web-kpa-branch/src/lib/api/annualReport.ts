@@ -92,7 +92,8 @@ export interface AnnualReportState {
   associationLinkStatus: Record<string, 'resolved' | 'not_linked'>;
   /** 평가할 수 없는 rule (근거 원장 부재). 있는 것처럼 차단하지 않는다 */
   notEvaluableRules: string[];
-  period: { status: 'before' | 'open' | 'closed'; canSubmit: boolean; bypassReason: string | null };
+  /** 신고 기간. canSubmit 은 역할과 무관하게 status==='open' 일 때만 true 다. */
+  period: { status: 'before' | 'open' | 'closed'; canSubmit: boolean };
   readonly: boolean;
 }
 

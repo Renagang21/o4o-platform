@@ -21,15 +21,14 @@ import type { AnnualReportTemplate } from '../../routes/kpa-branch/entities/annu
 const TARGET_YEAR = Number(process.env.KPA_BRANCH_ANNUAL_REPORT_YEAR ?? 2026);
 
 /**
- * 신고 기간 밖 제출 허용 여부.
- * 회원은 기간 내에만 제출할 수 있다. 운영자·관리자는 기간 밖에도 제출할 수 있다 —
- * 분회 실무상 기간 외 대리 처리·검증이 필요하고, 예외가 없으면 연중 대부분 기간에
- * 이 경로를 점검조차 할 수 없다.
+ * 신고 기간 정책 — 역할과 무관하다.
+ *
+ * WO-O4O-KPA-BRANCH-ANNUAL-REPORT-SUBMISSION-PRODUCTION-E2E-CLOSURE-V1 §5:
+ *   `/me/annual-report/*` 는 **본인 신고** 경로다. 누가 요청하든 신고 주체는 요청자
+ *   자신이므로 member / operator / admin 에 같은 기간 정책을 적용한다.
+ *   (이전의 `canBypassPeriod` 운영자 예외는 제거했다 — 운영자가 기간 밖에 회원 신고를
+ *   대신 처리하는 기능은 이 경로가 아니라 별도 운영자 경로의 문제다.)
  */
-function canBypassPeriod(req: Request): boolean {
-  const roles: string[] = Array.isArray((req as any).user?.roles) ? (req as any).user.roles : [];
-  return roles.includes('kpa-branch:operator') || roles.includes('kpa-branch:admin');
-}
 
 function templateSummary(t: AnnualReportTemplate) {
   return {
@@ -107,8 +106,7 @@ export class MemberAnnualReportController {
         notEvaluableRules,
         period: {
           status: period,
-          canSubmit: period === 'open' || canBypassPeriod(req),
-          bypassReason: period !== 'open' && canBypassPeriod(req) ? 'OPERATOR_BYPASS' : null,
+          canSubmit: period === 'open',
         },
         readonly: existing?.status === 'submitted',
       },
@@ -196,7 +194,7 @@ export class MemberAnnualReportController {
     }
 
     const period = AnnualReportService.periodStatus(template);
-    if (period !== 'open' && !canBypassPeriod(req)) {
+    if (period !== 'open') {
       return res.status(403).json({
         success: false,
         error:
