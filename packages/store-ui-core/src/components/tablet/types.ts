@@ -79,6 +79,38 @@ export interface StoreTabletPoolSupplierProductRow {
   tabletVisibilityReason?: TabletVisibilityReason | string;
 }
 
+/**
+ * 태블릿 관리 API client 가 다루는 태블릿 행 — `/{service}/store/tablets` 응답 그대로.
+ * `StoreTabletSummary` 는 Core 화면이 요구하는 최소 형태이고, 이쪽은 client 전체 계약이다.
+ */
+export interface StoreTabletRow {
+  id: string;
+  name: string;
+  location: string | null;
+  is_active: boolean;
+  created_at: string;
+}
+
+/** 진열 항목 행 — `/{service}/store/tablets/:id/displays` 응답·요청 계약 */
+export interface StoreTabletDisplayRow {
+  id?: string;
+  product_type: 'supplier' | 'local';
+  product_id: string;
+  sort_order: number;
+  is_visible: boolean;
+  created_at?: string;
+}
+
+/**
+ * `/{service}/store/product-pool` 응답 전체.
+ * 자체 상품(LocalProduct)은 서비스 소유 타입이라 제네릭으로 받는다.
+ */
+export interface StoreTabletProductPoolResponse<TLocalProduct> {
+  supplierProducts: StoreTabletPoolSupplierProductRow[];
+  localProducts: TLocalProduct[];
+  tabletChannel?: StoreTabletChannelState | null;
+}
+
 export interface StoreTabletPoolLocalProduct {
   id: string;
   name: string;
