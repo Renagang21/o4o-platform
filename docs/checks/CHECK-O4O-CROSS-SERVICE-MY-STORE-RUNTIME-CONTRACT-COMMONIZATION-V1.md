@@ -170,6 +170,36 @@ StoreOwnerGuard (판정 흐름)                   labels / accent / renderDenied
 
 재검증: 두 spec **21건 PASS** · KCos/GP `tsc --noEmit` 0 errors · api-server 전체 Jest 재실행 결과는 아래 표와 동일.
 
+#### 6-1-1. 2차 — 14.6% → 4.0% → 2.7%
+
+1차 정리 후에도 `new_duplicated_lines_density` 가 **4.0%** (중복 42줄 / 신규 1,047줄) 로 임계를 넘었다.
+남은 중복 블록은 두 쌍뿐이었다 (Sonar `api/duplications/show` 로 확인).
+
+| 블록 | 판단 |
+|---|---|
+| `tabletDisplayApi.ts:20-55` ↔ `tabletDisplays.ts:20-55` (14줄) | **제거** — 이번 PR 이 두 파일에 **같은 문구·같은 선언**을 넣은 것이 원인이다 |
+| `cross-service-...spec.ts:57-70` ↔ `kpa-my-store-...spec.ts:51-64` (14줄) | **유지** — 서로 다른 서비스·다른 조직을 단언하는 실제 테스트 본문이다. 공통화하면 무엇을 단언하는지가 가려진다 |
+
+client 쪽 조치: `@o4o/store-ui-core` 에 client 전체 계약 3개를 추가하고 두 서비스는 별칭만 남겼다.
+
+| 추가 타입 | 대체한 중복 선언 |
+|---|---|
+| `StoreTabletRow` | 두 client 의 `interface Tablet` |
+| `StoreTabletDisplayRow` | 두 client 의 `interface DisplayItem` |
+| `StoreTabletProductPoolResponse<TLocalProduct>` | 두 client 의 `interface ProductPool` — `LocalProduct` 는 서비스 소유이므로 제네릭으로 받는다 |
+
+```ts
+export type Tablet = StoreTabletRow;
+export type DisplayItem = StoreTabletDisplayRow;
+export type PoolSupplierProduct = StoreTabletPoolSupplierProductRow;
+export type ProductPool = StoreTabletProductPoolResponse<LocalProduct>;
+```
+
+`const BASE = '/cosmetics/store'` · `'/glycopharm/store'` 는 그대로다 (raw-source spec H 계약).
+
+재검증: 두 spec **21건 PASS** · KCos `tsc --noEmit` 0 · GP `tsc --noEmit` 0.
+예상 중복도 = 28줄 / 신규 라인 ≈ **2.7%** (임계 3% 이하). 여기서도 임계 완화·`NOSONAR` 는 쓰지 않았다.
+
 **기존 결함(본 WO 원인 아님)**: `packages/financial-core` 빌드가 tsup "No input files" 로 실패한다 → 워크스페이스 빌드는 `--no-bail` 로 수행했다.
 
 ---
