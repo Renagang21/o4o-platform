@@ -13,42 +13,26 @@
 import { api } from '@/lib/apiClient';
 import type { LocalProduct } from './localProducts';
 import type {
-  StoreTabletChannelState,
+  StoreTabletDisplayRow,
   StoreTabletPoolSupplierProductRow,
+  StoreTabletProductPoolResponse,
+  StoreTabletRow,
 } from '@o4o/store-ui-core';
 
 const BASE = '/glycopharm/store';
 
 // ==================== Types ====================
 
-export interface Tablet {
-  id: string;
-  name: string;
-  location: string | null;
-  is_active: boolean;
-  created_at: string;
-}
-
-export interface DisplayItem {
-  id?: string;
-  product_type: 'supplier' | 'local';
-  product_id: string;
-  sort_order: number;
-  is_visible: boolean;
-  created_at?: string;
-}
-
 /**
- * 공급 상품 행 · 채널 상태 계약은 `@o4o/store-ui-core` 가 정본이다.
- * WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 (축 B)
+ * 태블릿 · 진열 항목 · 상품 풀 응답 계약은 `@o4o/store-ui-core` 가 정본이다.
+ * 두 서비스가 같은 선언을 각자 들고 있던 것을 계약 하나로 모았다 —
+ * WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 (축 B).
+ * 자체 상품(LocalProduct)만 서비스 소유라 제네릭 인자로 넘긴다.
  */
+export type Tablet = StoreTabletRow;
+export type DisplayItem = StoreTabletDisplayRow;
 export type PoolSupplierProduct = StoreTabletPoolSupplierProductRow;
-
-export interface ProductPool {
-  supplierProducts: PoolSupplierProduct[];
-  localProducts: LocalProduct[];
-  tabletChannel?: StoreTabletChannelState | null;
-}
+export type ProductPool = StoreTabletProductPoolResponse<LocalProduct>;
 
 // ==================== API ====================
 
