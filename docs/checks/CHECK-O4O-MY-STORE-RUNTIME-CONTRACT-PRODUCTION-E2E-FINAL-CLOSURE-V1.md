@@ -456,3 +456,150 @@ Cafe24 파일럿 확대  : 0
 2. PH 다중 org 연결 fixture — `AMBIGUOUS_STORE_CONNECTION` 실측용 (§10-2)
 3. GlycoPharm store-owner fixture 정식 확보 — GP tablet 전 경로 완주용 (§7-3).
    이번에는 우회 조성하지 않고 coverage limitation 으로 남겼다.
+
+---
+
+# Addendum — 최종 종결 (2026-09-07)
+
+## A-1. 선행 PR 상태
+
+| PR | 내용 | 상태 |
+|---|---|---|
+| #207 | `WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1` 본체 | **MERGED** 2026-09-04T13:49:41Z · head `98bbd4a23` · merge commit `30ba6dfe9` |
+| #208 | `reserveSlug` census drift closure (main green 복구) | **MERGED** 2026-09-07T00:08:51Z |
+| #211 | 태블릿 client 계약 중복 해소 (타입 전용) | **MERGED** · merge commit **`6322f360d18c6d630aab16cfc359a6d7b2d7397e`** |
+
+> #207 은 본 세션의 main merge push(`7d7d00a98`) · dedup push(`26c7e0eb1`) **이전에** 이미 merge 되어
+> 두 push 는 main 에 도달하지 못했다. dedup 커밋을 `origin/main` 기준 새 브랜치로 옮겨 #211 로 재제출했다.
+
+**#211 범위**: `@o4o/store-ui-core` 에 `StoreTabletRow` · `StoreTabletDisplayRow` ·
+`StoreTabletProductPoolResponse<TLocalProduct>` 추가, KCos/GP client 는 **타입 alias 만** 사용.
+`BASE` 경로 · 함수 본문 · runtime 동작 변경 0. 임계 완화 · `NOSONAR` · 테스트 삭제 · gate 우회 없음.
+service tablet spec 의 병렬 테스트 본문 중복은 **의도적으로 유지**(추상화하면 무엇을 단언하는지 가려진다).
+
+## A-2. Production 배포
+
+```text
+main SHA            : 6322f360d
+API revision        : o4o-core-api-03543-ddr   (2026-09-07T02:12:18Z)
+image digest        : sha256:cd94e232ee45678cd7aefb7af3a27a1d4904e0394baa12d99e2124b107ac36ab
+web revisions       : kpa-society-web-01921-5m2 · k-cosmetics-web-01092-vqv
+                      glycopharm-web-01349-zrs · pharmacy-hub-web-00182-sgl · neture-web-01547-5v9
+                      (모두 2026-09-07T02:08~02:09Z)
+health              : https://api.neture.co.kr/health → alive / production / 0.5.0
+```
+
+Deploy API Server · Deploy Web Services · Deploy Admin Dashboard · CodeQL 모두 `success`.
+
+## A-3. 인증 — 우회 조성 없음
+
+계정 `renagang21@gmail.com` (기존 승인된 검증 계정, `docs/local/TEST-ACCOUNTS.local.md`).
+**임시 계정 생성 0 · self-grant 0 · role 변경 0 · membership 생성 0 · DB 직접 수정 0.**
+
+발급 토큰의 roles 에 `kpa:store_owner` · `cosmetics:store_owner` · `glycopharm:store_owner` ·
+`pharmacy-hub:store_owner` 가 이미 모두 포함되어 있고 4개 membership 이 전부 `active` 다.
+
+로그인 실측 (`serviceKey` 필수):
+
+| serviceKey | 결과 |
+|---|---|
+| `kpa-society` | 200 |
+| `k-cosmetics` | 200 |
+| `glycopharm` | 200 |
+| `cosmetics` | 401 `SERVICE_NOT_MEMBER` — **문서 표기 오류**. 실제 membership serviceKey 는 `k-cosmetics` |
+| `pharmacy-hub` | 401 `INVALID_CREDENTIALS` — 서비스 credential 이 문서와 불일치 (fixture drift) |
+
+PH 는 위 계정이 정상 발급받은 토큰(`pharmacy-hub:store_owner` 보유)으로 검증했다.
+**PH 로그인 credential 문서 drift 는 인증 fixture 문제이며 My Store runtime 계약의 결함이 아니다.**
+
+## A-4. Production E2E 결과
+
+### 서비스별 mount 응답 (모두 200)
+
+| 서비스 | mount | tablets | product-pool | display-settings |
+|---|---|:---:|:---:|:---:|
+| KPA | `/api/v1/kpa/store` | 200 | 200 | 200 |
+| K-Cosmetics | `/api/v1/cosmetics/store` | 200 | 200 | 200 |
+| GlycoPharm | `/api/v1/glycopharm/store` | 200 | 200 | 200 |
+| PharmacyHub | `/api/v1/pharmacy-hub/store-owner` | 200 | 200 | — |
+
+### 축 A — 조직 해석 스코프 (핵심 회귀 대상)
+
+`product-pool` supplier product row id 집합의 **쌍별 교집합 = 전부 0**:
+
+```text
+rows : kpa=31  kcos=1  gp=1  ph=19   neutral(/api/v1/store)=0
+overlap : kpa∩ph=0  kcos∩kpa=0  kcos∩ph=0  gp∩kpa=0  gp∩kcos=0  gp∩ph=0
+```
+
+→ 네 mount 가 각각 **서로 다른 조직**을 해석한다. 타 서비스 조직 유출 없음.
+서비스 중립 back-compat mount `/api/v1/store/product-pool` 은 Neture(공급자) 조직을 골라 0행 —
+KCos/GP 를 서비스 축으로 재스코프한 축 A 설계와 일치한다.
+
+행 수준 격리도 확인: KPA 태블릿 id 를 PH · KCos mount 로 조회 → **404 `NOT_FOUND`** (200 유출 아님).
+
+### 축 B — runtime 계약 필드 실측
+
+`/tablets` 응답이 `StoreTabletRow` 와 일치: `id · name · location · is_active · created_at`.
+`/tablets/:id/displays` 응답이 `StoreTabletDisplayRow` 와 일치:
+
+```json
+{"id":"9932c00a-…","product_type":"local","product_id":"cd3a2b29-…",
+ "sort_order":0,"is_visible":true,"created_at":"2026-07-17T03:04:01.586Z"}
+```
+
+`/product-pool` 응답이 `StoreTabletProductPoolResponse` 와 일치:
+`supplierProducts` · `localProducts` · `tabletChannel{hasTabletChannel,hasApprovedTabletChannel,tabletChannelStatus}`.
+`/tablets/:id/idle-playlist` → `{items:[]}` 정상.
+
+### deep link · 새로고침
+
+| 경로 | 결과 |
+|---|---|
+| `kpa-society.co.kr/store/tablets` | 200 |
+| `k-cosmetics.site/store/tablets` | 200 |
+| `glycopharm.co.kr/store/tablets` | 200 |
+| `pharmacyhub.co.kr/store-owner/tablets` | 200 (`pharmacy-hub.co.kr` 은 미매핑 — 정본 도메인은 하이픈 없음) |
+| `POST /auth/refresh` → 재조회 | 200 → `/kpa/store/tablets` 200 |
+
+> 중간에 관측한 refresh 401 `TOKEN_FAMILY_MISMATCH` 는 **검증 절차 자체가 만든 현상**이다
+> (같은 계정으로 4회 연속 로그인 → token family 회전). 단일 로그인 후 refresh 는 200 이다. 결함 아님.
+> `POST /auth/refresh` 를 body 없이 호출하면 LB 가 411 을 돌려준다 — 앱 도달 전 단계이며 결함 아님.
+
+## A-5. 판정
+
+```text
+KPA          : PASS
+PharmacyHub  : PASS
+K-Cosmetics  : PASS
+GlycoPharm   : PASS
+
+MY STORE RUNTIME CONTRACT PRODUCTION E2E = CLOSED
+```
+
+발견된 코드 결함: **0건**. 발견된 문서 fixture drift: 2건 (A-6).
+
+## A-6. 잔여 — 문서 fixture drift (코드 아님)
+
+`docs/local/TEST-ACCOUNTS.local.md` (gitignored) 실측 불일치 2건. **본 WO 범위 밖이라 수정하지 않고 보고만 한다.**
+
+1. K-Cosmetics serviceKey 표기가 `cosmetics` 로 되어 있으나 실제 membership 은 `k-cosmetics`.
+2. `renagang21@gmail.com` 의 pharmacy-hub 서비스 credential 이 문서 값과 불일치 (401).
+
+## A-7. production DB 순변화
+
+```text
+쓰기 목적 작업     : 0 (모든 검증 호출은 GET)
+role / membership  : 0
+schema / migration : 0
+테스트 조건 조성   : 0
+부수 효과          : 로그인에 따른 users.lastLoginAt 갱신 · refresh token family 발급
+                     (정상 인증 경로의 부수 효과이며 검증 조건 조성이 아니다)
+
+production DB net change = 0
+```
+
+## 문서 정합
+
+발견 2건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건
+→ `TEST-ACCOUNTS.local.md` fixture 정정 (A-6). gitignored 로컬 문서이므로 별도 항목으로 남긴다.
