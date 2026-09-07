@@ -24,7 +24,7 @@ const BASE = '/glycopharm/store';
 // ==================== Types ====================
 
 /**
- * 태블릿 · 진열 · 상품 풀 · 채널 상태 계약은 `@o4o/store-ui-core` 가 정본이다.
+ * 태블릿 · 진열 항목 · 상품 풀 응답 계약은 `@o4o/store-ui-core` 가 정본이다.
  * 두 서비스가 같은 선언을 각자 들고 있던 것을 계약 하나로 모았다 —
  * WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 (축 B).
  * 자체 상품(LocalProduct)만 서비스 소유라 제네릭 인자로 넘긴다.
