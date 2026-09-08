@@ -301,3 +301,61 @@ CORE_API_MINSCALE_ZERO_CANONICALIZED
 ```text
 문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 3건
 ```
+
+---
+
+## 12. 재검증 (2026-09-08)
+
+동일 WO 재요청에 따라 **현재 시점 상태를 재확인**했다. 코드·설정 변경 0건.
+
+**workflow (SSOT)**
+
+```text
+.github/workflows/deploy-api.yml:286    --min-instances=0
+```
+
+`min-instances` / `minScale` / `minInstance` 전수 재검색 — `o4o-core-api` 를 배포하는 writer 는
+`deploy-api.yml` 1개뿐(불변). `apps/api-server/deploy-cloudrun.sh:129` 는 `--min-instances=0`,
+web·admin 워크플로도 전부 `0` 이라 충돌 writer 없음.
+
+**Cloud Run 실측**
+
+| 항목 | 값 |
+|---|---|
+| latestReadyRevision | `o4o-core-api-03544-qhp` |
+| traffic | 100% |
+| `autoscaling.knative.dev/minScale` | **annotation 부재 = 0** |
+| `autoscaling.knative.dev/maxScale` | 10 (불변) |
+| `run.googleapis.com/startup-cpu-boost` | true (불변) |
+
+**지속성 — 후속 배포 6회로 확장**
+
+| revision | minScale |
+|---|:---:|
+| `03537-r8x` | 1 (정책 변경 전 마지막) |
+| `03538-6zt` | **0** (본 WO 배포) |
+| `03539-clb` · `03540-9rq` · `03541-2n9` | **0** |
+| `03542-dp9` · `03543-ddr` · `03544-qhp` | **0** (CHECK 작성 이후 추가 3회) |
+
+```text
+정책 변경 이후 배포 7개 revision 전부 minScale=0
+독립 후속 배포 6회 유지 → §5-2 의 3회에서 확장 실증
+```
+
+**health smoke**
+
+| 요청 | 결과 |
+|---|---|
+| `GET https://api.neture.co.kr/health` #1 | **200** (0.304s) |
+| `GET https://api.neture.co.kr/health` #2 | **200** (0.090s) |
+
+cold latency 는 §6-2 와 동일한 사유로 이번에도 측정하지 못했다 —
+`minScale=0` 임에도 실사용 트래픽이 인스턴스를 warm 하게 유지한다(첫 요청 0.3s).
+**이는 실운영에서 cold start 노출 빈도가 낮다는 방증**이며 5xx 는 0건이다.
+
+```text
+재검증 판정: CORE_API_MINSCALE_ZERO_CANONICALIZED — 유효 (유지 중)
+변경 파일 0건 · Cloud Run 설정 변경 0건 · UNKNOWN 0건
+```
+
+**다음 단계**: §10 의 1번 — Cloud SQL STOP 운영 전환 재시도.
