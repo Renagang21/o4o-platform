@@ -1,7 +1,7 @@
 # CHECK — WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1
 
-> **상태**: 코드 단계 완료 · 배포/DB/GCP 단계 대기
-> **작성일**: 2026-09-08
+> **상태**: GCP 삭제 완료 · 등록기관(DNS·도메인) 소유자 조치 대기
+> **작성일**: 2026-09-08 · **갱신**: 2026-09-09
 > **기준선**: `origin/main` = `7971407f0` (CI green anchor `a7914fd12`)
 > **작업 격리**: worktree `C:/tmp/o4o-gp-erasure` · branch `work/glycopharm-complete-erasure-v1`
 
@@ -220,34 +220,94 @@ GlycoPharm 과 무관한 선행 갭이라 이번 범위에서 건드리지 않�
 
 ---
 
+## 9-A. 실행 결과 (2026-09-09)
+
+### 배포
+
+| 커밋 | 내용 |
+|---|---|
+| `83853d8d3` | 코드 삭제 본체 |
+| `7a9d574da` | 마이그레이션 role 재귀속 충돌 수정 |
+
+1차 배포에서 마이그레이션이 실패했다:
+`duplicate key value violates unique constraint "idx_roles_service_role"`.
+`roles` 의 unique index 는 `(service_key, role_key)` 인데 bare role `supplier`/`partner` 를
+`neture` 로 옮기면 Neture 의 canonical row(`neture:supplier` → role_key `supplier`)와 충돌한다.
+**트랜잭션 롤백으로 DB 는 무변경**이었고(실측 확인), `platform` 축 재귀속으로 수정해 재배포했다.
+roles 삭제도 `service_key` 기준 → `name LIKE 'glycopharm:%'` 로 좁혔다.
+
+전 워크플로 결과: CI Pipeline ✅ / Deploy API ✅ / Deploy Web Services ✅ /
+Deploy Admin ✅ / CodeQL ✅ / E2E ❌(**선행 실패** — 모든 서비스 E2E secret 미설정,
+이 워크플로는 이전 6회 연속 동일 사유로 실패해 왔다)
+
+### DB (마이그레이션 적용 후 실측)
+
+```text
+glycopharm_* 테이블      0      glycopharm view            0
+roles(service_key=gp)    0      role_assignments(gp:*)     0
+service_memberships      0      service_credentials        0
+platform_services        0      organization_enrollments   0
+cms_contents             0      action_logs                0
+
+users                   57  (불변)
+bare role 4종            4  (보존)   bare 배정               15  (보존)
+```
+
+### GCP
+
+| 자원 | 결과 |
+|---|---|
+| Cloud Run `glycopharm-web` | 삭제 |
+| NEG `neg-glycopharm-web` | 삭제 |
+| Backend `backend-glycopharm-web` | 삭제 |
+| URL map hostRule + `path-matcher-glycopharm` + `api.glycopharm.co.kr` | 제거 |
+| 컨테이너 이미지 130 태그 | 전량 삭제 |
+| Certificate Manager 엔트리 3 | 삭제 |
+| DNS authorization 3 | 삭제 |
+
+### 인증서 — 조사 시 판단 정정
+
+**조사 단계의 인증서 판단은 틀렸다.** `cert-final-neture-v3`(classic)는
+`PROVISIONING_FAILED_PERMANENTLY` 인 **죽은 잔재**였고 실제 TLS 는 Certificate Manager
+`o4o-main-cert-map` → `cm-cert-neture`(ACTIVE) 가 제공하고 있었다.
+
+실제 수행:
+
+```text
+1. glycopharm 매핑 엔트리 3개 삭제 (공유 인증서 무접촉)
+2. cm-cert-neture-v2 생성 — GlycoPharm 3개 제외한 13 도메인, DNS authz 기반
+3. ACTIVE 확인 후 13개 엔트리를 v2 로 전환
+4. 실측: 전 도메인 SAN 13개 · glycopharm 0 · HTTPS 14/14 = 200
+5. proxy 에서 죽은 classic cert 분리 → 재실측 14/14 = 200
+6. cert-final-neture-v3 · cm-cert-neture 삭제
+```
+
+무중단으로 완료했다 (중단 창 불필요).
+
+### 프로덕션 실측
+
+```text
+/api/v1/glycopharm/**        404      /api/v1/home/preview        404
+/api/v1/store-hub/ai/health  404      api /health · /auth/status  200
+
+neture · www · admin · api / kpa-society · www / k-cosmetics · www /
+glucoseview · www / pharmacyhub · www / siteguide · www   → 14/14 200
+
+glycopharm.co.kr · www · api  → TLS 인증서 없음 (no peer certificate)
+```
+
+### 남은 관측 — DNS 의존
+
+`glycopharm.co.kr` 은 **등록기관 DNS 가 아직 LB 를 가리키고 있어** 평문 HTTP 로는
+LB 기본 백엔드(Neture)가 응답한다. hostRule 이 사라졌으므로 GlycoPharm 콘텐츠는 아니며,
+HTTPS 는 인증서가 없어 성립하지 않는다. **종료 안내·리다이렉트를 만들지 않는다는 계약에 따라
+LB 규칙을 추가하지 않았다.** 소유자가 DNS 를 삭제하면 해소된다.
+
+---
+
 ## 10. 미완 — 소유자 조치 필요
 
-### 10-1. GCP (작업자 범위, 코드 배포 후 수행)
-
-```text
-Cloud Run          glycopharm-web 삭제
-NEG                neg-glycopharm-web 삭제
-Backend service    backend-glycopharm-web 삭제
-URL map            o4o-global-lb — hostRule(glycopharm.co.kr·www) + path-matcher-glycopharm 제거
-                   path-matcher-api hostRule 에서 api.glycopharm.co.kr 제거
-컨테이너 이미지     gcr.io/netureyoutube/glycopharm-web 삭제
-SSL 인증서         cert-final-neture-v3 → GlycoPharm SAN 제외한 새 인증서로 교체
-```
-
-**인증서 교체 주의**: `cert-final-neture-v3` 는 프로젝트 내 **유일한 인증서**이며
-유일한 HTTPS proxy(`o4o-global-lb-target-proxy-2`)에 연결돼 있고 상태가
-`PROVISIONING_FAILED_PERMANENTLY` 다. 새 인증서가 **ACTIVE 가 된 뒤에만** proxy 를 교체하고,
-Neture · KPA · K-Cosmetics · GlucoseView HTTPS 실측 후에만 기존 인증서를 분리·삭제한다.
-새 인증서가 활성화되지 않으면 **기존 인증서를 제거하지 말고 중단 보고**한다.
-
-새 인증서 SAN (GlycoPharm 3개 제외):
-
-```text
-neture.co.kr · www.neture.co.kr · admin.neture.co.kr · api.neture.co.kr
-glucoseview.co.kr · www.glucoseview.co.kr · api.glucoseview.co.kr
-kpa-society.co.kr · www.kpa-society.co.kr · api.kpa-society.co.kr
-k-cosmetics.site · www.k-cosmetics.site · api.k-cosmetics.site
-```
+### 10-1. GCP — 완료 (§9-A 참조)
 
 ### 10-2. 등록기관 (소유자 직접 — 작업자 권한 밖)
 
@@ -270,15 +330,16 @@ k-cosmetics.site · www.k-cosmetics.site · api.k-cosmetics.site
 GLYCOPHARM_APPLICATION            = ABSENT
 GLYCOPHARM_ACTIVE_ROUTES          = 0
 GLYCOPHARM_SERVICE_CONTRACT       = 0
+GLYCOPHARM_ACTIVE_DATA            = 0
 GLYCOPHARM_DEPLOY_TARGETS         = 0
+GLYCOPHARM_CLOUD_RESOURCES        = 0
+GLYCOPHARM_TLS                    = 0
+OTHER_SERVICE_DATA_CHANGE         = 0
 OTHER_SERVICE_REGRESSION          = PASS
 
-GLYCOPHARM_ACTIVE_DATA            = PENDING_MIGRATION   (배포 후 실행)
-GLYCOPHARM_CLOUD_RESOURCES        = PENDING             (배포 후 수행)
+GLYCOPHARM_GCP_ERASURE            = CLOSED
 GLYCOPHARM_DNS_RECORDS            = PENDING_OWNER_ACTION
 GLYCOPHARM_DOMAIN_AUTORENEW       = PENDING_OWNER_ACTION
-
-GLYCOPHARM_GCP_ERASURE            = IN_PROGRESS
 GLYCOPHARM_DOMAIN_ERASURE         = PENDING_OWNER_ACTION
 GLYCOPHARM_COMPLETE_ERASURE       = OPEN
 ```
