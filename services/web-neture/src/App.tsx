@@ -49,6 +49,8 @@ import { ADMIN_ROLES } from './lib/role-constants';
 import HandoffPage from './pages/HandoffPage';
 import { TermsPage, PrivacyPage } from './pages/legal/PolicyDocumentPage';
 import CommunityPage from './pages/CommunityPage';
+// WO-O4O-COMMON-HOME-PHASE1-V1: O4O 전체 대표 진입점 (`/`)
+import O4OHomePage from './pages/O4OHomePage';
 import {
   CommunityAnnouncementsPage,
   CommunityAnnouncementDetailPage,
@@ -586,7 +588,7 @@ const LOGIN_EXPLICIT_NAV_KEY = 'neture_login_explicit_nav';
 
 // WO-O4O-NETURE-POSTLOGINREDIRECT-CANONICAL-ALIGNMENT-V1:
 // 로그인 직후 1회 역할 기반 redirect 수행.
-// / 또는 /login 경로에서만 동작. workspace 경로 early-exit.
+// WO-O4O-COMMON-HOME-PHASE1-V1: `/` 제외 — /login 경로에서만 동작. workspace 경로 early-exit.
 // returnUrl은 LoginModal에서 처리하므로 여기서는 미개입.
 function PostLoginRedirect() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -617,8 +619,11 @@ function PostLoginRedirect() {
       return;
     }
 
-    // / 또는 /login 경로에서만 동작
-    if (location.pathname !== '/' && location.pathname !== '/login') {
+    // WO-O4O-COMMON-HOME-PHASE1-V1:
+    //   `/` 는 O4O 공통 Home 이 되었으므로 역할 기반 자동 redirect 대상에서 제외한다.
+    //   로그인 사용자도 `/` 에 머문다. explicit returnUrl(LoginModal) · protected deep link
+    //   복귀(RoleGuard state.from) 계약은 위 가드가 그대로 담당한다.
+    if (location.pathname !== '/login') {
       didRedirectRef.current = true;
       return;
     }
@@ -730,11 +735,21 @@ function App() {
             <Route path="/cafe24" element={<Cafe24AppEntryPage />} />
 
             {/* ================================================================
+                O4O 공통 Home (WO-O4O-COMMON-HOME-PHASE1-V1)
+                `/` 는 O4O 전체 서비스의 대표 진입점이다. Neture 전용 chrome
+                (NetureGlobalHeader/Footer/BottomNav)을 씌우지 않으므로
+                NetureLayout 밖에 배치한다. 기존 Neture 커뮤니티 홈은 /community.
+            ================================================================ */}
+            <Route path="/" element={<O4OHomePage />} />
+
+            {/* ================================================================
                 Neture 메인 (NetureLayout)
                 WO-O4O-NETURE-UI-REFACTORING-V1
             ================================================================ */}
             <Route element={<NetureLayout />}>
-              <Route path="/" element={<CommunityPage />} />
+              {/* WO-O4O-COMMON-HOME-PHASE1-V1: `/` 에 있던 CommunityPage 를 이동.
+                  페이지 자체는 복제하지 않고 같은 컴포넌트를 그대로 사용한다. */}
+              <Route path="/community" element={<CommunityPage />} />
               {/* MyPage 3-split (WO-O4O-NETURE-MYPAGE-SPLIT-V1) */}
               <Route path="/mypage" element={<MyPageHub />} />
               <Route path="/mypage/profile" element={<MyProfilePage />} />

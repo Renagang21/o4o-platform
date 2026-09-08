@@ -16,8 +16,12 @@ import type { ContextualNavItem, GlobalHeaderNavItem } from '@o4o/ui';
 // WO-O4O-NETURE-HEADER-AND-GUIDE-CONSOLIDATION-V1
 // 상단 메뉴 3개로 단순화.
 // Supplier / Partner / 유통참여형 펀딩 / O4O 소개는 /guide(이용 안내) 허브 안에서 진입.
+// WO-O4O-COMMON-HOME-PHASE1-V1:
+//   `/` 가 O4O 공통 Home 으로 바뀌면서 기존 Neture 커뮤니티 홈은 `/community` 로 이동했다.
+//   route 있는 실기능을 nav 에서 숨기지 않는다(CLAUDE.md Shared Module Change Rule) → 항목 추가.
 export const NETURE_PUBLIC_NAV: GlobalHeaderNavItem[] = [
   { label: 'Home', href: '/' },
+  { label: '커뮤니티', href: '/community' },
   { label: '이용 안내', href: '/guide' },
   { label: 'Contact Us', href: '/contact' },
 ];

@@ -20,7 +20,15 @@ export const NETURE_SEO_DEFAULTS: PageSeoConfig = {
 };
 
 export const netureSeoRegistry: SeoRegistry = {
+  // WO-O4O-COMMON-HOME-PHASE1-V1: `/` 는 O4O 전체 서비스 대표 진입점.
+  //   아직 구현되지 않은 기능(AI 자동업무 · Local Work Agent 등)은 표기하지 않는다.
   '/': {
+    title: 'O4O — 전문 매장 업무 플랫폼',
+    description: '약국, 화장품 매장, 공급자와 파트너를 위한 O4O 서비스 통합 진입점',
+    ogType: 'website',
+  },
+  // 기존 `/` 의 Neture 커뮤니티 홈 SEO 는 이동한 경로로 유지한다.
+  '/community': {
     title: 'Neture — O4O 유통·협업 플랫폼',
     description: '공급자와 매장을 연결하는 O4O 유통·협업 플랫폼입니다.',
     ogType: 'website',
