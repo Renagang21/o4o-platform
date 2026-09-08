@@ -54,31 +54,46 @@ DB · migration · API · auth · membership · package.json · workflow 변경 
 
 ---
 
-## 4. Home shell 처리
+## 4. Home shell 처리 / 화면 구성
 
 WO §6 의 **A안**(`/` 만 `NetureLayout` 밖에 배치)을 선택했다. 신규 layout 파일을 만들지 않고
-`O4OHomePage` 가 자체 최소 shell(상단 O4O 바 + 본문 + 최소 푸터)을 직접 렌더한다.
+`O4OHomePage` 가 자체 최소 shell 을 직접 렌더한다.
 
-- `NetureLayout` · `NetureGlobalHeader` · `Footer` · `NetureBottomNav` **무수정**
-- 로그인/회원가입은 전역 `ModalRenderer` + `useLoginModal()` 재사용 (신규 인증 경로 없음)
-- 역할 판정은 `useNetureUserRoles()` SSOT 재사용, 업무 공간 링크는 `NetureUserMenuItems` 재사용
-- hero 아래를 단순 세로 흐름으로 두어 후속 Phase 3(공통 AI 입력창) 삽입 지점을 남겼다
+**추가 UI 지침(검색엔진 초기 화면형) 반영** — 포털형 홈이 아니라 향후 AI / Local Work Agent
+작업 시작 화면의 기준 화면으로 구성했다.
 
-**서비스/업무 카드** — 신규 도메인·route 를 만들지 않았다.
+```text
+(우상단)                                  [계정 아이콘] 로그인 / 이름
+                       O4O
+                무엇을 도와드릴까요?
+        [        준비 중입니다 (비활성)        ]
+  [약국][약국 경영][화장품][혈당 관리][공급자][파트너][커뮤니티]
+                이용약관 · 개인정보처리방침 · Contact
+```
 
-| 구분 | 항목 | 진입 |
+- 상단 대형 navigation · Neture 전용 메뉴 · 서비스 메뉴바 **없음**. 우상단 최소 계정 영역만
+  (비로그인 = 로그인 버튼 → 전역 LoginModal / 로그인 = 아이콘 + 이름 → `/mypage`)
+- `NetureLayout` · `NetureGlobalHeader` · `Footer` · `NetureBottomNav` **무수정 · 미사용**
+- 중앙 입력창은 `disabled` placeholder — **AI API 호출 · Work Scope · Agent 미구현**(Phase 3~4 자리)
+- 서비스는 큰 카드가 아니라 작은 pill 배너. 홍보 · 뉴스 · 통계 · 광고 섹션 없음, 푸터는 법정 고지 링크만
+- 넓은 여백 · 중앙 집중 · `flex-wrap` 으로 모바일 대응
+
+**진입 대상** — 신규 도메인·route 를 만들지 않았다.
+
+| 라벨 | 진입 | 비고 |
 |---|---|---|
-| 서비스(외부) | KPA Society | `https://kpa-society.co.kr/` |
-| 서비스(외부) | PharmacyHub | `https://pharmacyhub.co.kr` |
-| 서비스(외부) | K-Cosmetics | `https://www.k-cosmetics.site/` |
-| 서비스(외부) | GlycoPharm | `https://www.glycopharm.co.kr` |
-| 업무(내부) | 공급자 / 파트너 / 커뮤니티 / 이용 안내 | `/supplier` · `/partner` · `/community` · `/guide` |
+| 약국 | `https://kpa-society.co.kr/` | 외부 |
+| 약국 경영 | `https://pharmacyhub.co.kr` | 외부 |
+| 화장품 | `https://www.k-cosmetics.site/` | 외부 |
+| 혈당 관리 | `https://www.glycopharm.co.kr` | 외부 |
+| 공급자 | `/supplier` | 내부 canonical |
+| 파트너 | `/partner` | 내부 canonical |
+| 커뮤니티 | `/community` | 내부 canonical |
 
-외부 URL 값은 `packages/shared-space-ui/src/O4OHelpSection.tsx` 의 cross-service 카탈로그와 동일하다
-(해당 상수는 export 되지 않아 공유 패키지를 수정하지 않고 web-neture 안에 두었다 — 공유 패키지 변경 시
-전 서비스 재빌드 + Shared Module Change Protocol 대상이 되므로 범위 밖).
-
----
+지침의 "공급자·파트너" 는 진입 route 가 `/supplier` · `/partner` 둘이므로 각각 노출했다
+(데드링크 0 / 기능 은폐 0). 외부 URL 값은 `packages/shared-space-ui/src/O4OHelpSection.tsx` 의
+cross-service 카탈로그와 동일하다 — 해당 상수는 export 되지 않아 공유 패키지를 수정하지 않고
+web-neture 안에 두었다(공유 패키지 변경은 전 서비스 재빌드 + Shared Module Change Protocol 대상 → 범위 밖).
 
 ## 5. PostLoginRedirect 변경
 
@@ -128,7 +143,7 @@ WO §6 의 **A안**(`/` 만 `NetureLayout` 밖에 배치)을 선택했다. 신�
 ### 로컬 브라우저 smoke (`vite preview`, 비로그인)
 | 경로 | 결과 |
 |---|---|
-| `/` | **PASS** — O4O Home. title `O4O — 전문 매장 업무 플랫폼`, 서비스 4 + 업무 4 카드, Neture 크롬 미노출 |
+| `/` | **PASS** — O4O Home. title `O4O — 전문 매장 업무 플랫폼`, 중앙 워드마크 + 안내 문구 + 비활성 입력창 + 진입 pill 7, Neture 크롬 미노출 |
 | `/community` | **PASS** — `NetureLayout` + CommunityPage(공지/포럼 최신글/역할 시작/서비스 바로가기 전 섹션 렌더), title `Neture — O4O 유통·협업 플랫폼` |
 | `/supplier` | **PASS** — SupplierLandingPage 정상, 헤더 nav 4항목 |
 
