@@ -1,6 +1,7 @@
 /**
- * 신상신고 API 클라이언트
+ * 신상신고 API 클라이언트 (회원 본인)
  * WO-O4O-KPA-BRANCH-ANNUAL-REPORT-SUBMISSION-V1
+ * WO-O4O-KPA-BRANCH-ANNUAL-REPORT-REVIEW-V1 §8 (보완요청 상태 노출)
  *
  * 필드 목록·활동유형·미활동 사유를 **여기에 복제하지 않는다.**
  * 서버가 준 schema 만으로 화면을 만든다. 프런트가 아는 고정 목록은 renderer type 뿐이다.
@@ -75,6 +76,33 @@ export interface TemplateSchema {
 
 export type ReportValues = Record<string, unknown>;
 
+/**
+ * 신고서 상태 (서버 계약과 동일한 4종).
+ *   draft → submitted → (revision_requested → submitted)* → approved
+ * 역방향 전이는 없다. 회원이 값을 고칠 수 있는 상태는 draft / revision_requested 뿐이다.
+ */
+export type ReportStatus = 'draft' | 'submitted' | 'revision_requested' | 'approved';
+
+export const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
+  draft: '작성중',
+  submitted: '제출완료 · 검수대기',
+  revision_requested: '보완요청',
+  approved: '승인완료',
+};
+
+export interface MemberReportMeta {
+  id: string;
+  status: ReportStatus;
+  submittedAt: string | null;
+  updatedAt: string;
+  /** 보완요청 사유 — 재제출하면 서버가 비운다 */
+  revisionReason: string | null;
+  revisionRequestedAt: string | null;
+  approvedAt: string | null;
+  /** 지금까지 받은 보완요청 횟수 */
+  revisionRound: number;
+}
+
 export interface AnnualReportState {
   template: {
     id: string;
@@ -86,13 +114,16 @@ export interface AnnualReportState {
     periodEnd: string | null;
   };
   schema: TemplateSchema;
-  report: { id: string; status: 'draft' | 'submitted'; submittedAt: string | null; updatedAt: string } | null;
+  report: MemberReportMeta | null;
   values: ReportValues;
   visible: Record<string, boolean>;
   associationLinkStatus: Record<string, 'resolved' | 'not_linked'>;
   /** 평가할 수 없는 rule (근거 원장 부재). 있는 것처럼 차단하지 않는다 */
   notEvaluableRules: string[];
-  /** 신고 기간. canSubmit 은 역할과 무관하게 status==='open' 일 때만 true 다. */
+  /**
+   * 신고 기간. canSubmit 은 역할과 무관하다.
+   * 기간이 open 이거나, **보완요청 상태**면 true (운영자가 다시 열어준 건이므로 기간 밖에도 재제출 가능).
+   */
   period: { status: 'before' | 'open' | 'closed'; canSubmit: boolean };
   readonly: boolean;
 }

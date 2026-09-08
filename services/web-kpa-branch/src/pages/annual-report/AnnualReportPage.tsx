@@ -1,6 +1,7 @@
 /**
  * AnnualReportPage — 회원 신상신고 4 STEP 작성
  * WO-O4O-KPA-BRANCH-ANNUAL-REPORT-SUBMISSION-V1 §3
+ * WO-O4O-KPA-BRANCH-ANNUAL-REPORT-REVIEW-V1     §8 (보완요청 표시·재제출·승인 후 읽기전용)
  *
  * 기존 web-kpa-society 의 AnnualReportFormPage 를 복원하지 않는다.
  * 이 화면은 필드를 하나도 모르고, 서버가 준 Template schema 만으로 그린다.
@@ -14,6 +15,7 @@ import {
   submitAnnualReport,
   computeVisibility,
   writableValues,
+  REPORT_STATUS_LABEL,
   type AnnualReportState,
   type FieldIssue,
   type ReportValues,
@@ -66,7 +68,10 @@ export default function AnnualReportPage({ slug }: { slug: string }) {
   if (error && !state) return <p className="text-sm text-red-600">{error}</p>;
   if (!state) return <p className="text-sm text-gray-500">불러오는 중입니다…</p>;
 
+  // 회원이 값을 고칠 수 있는 상태는 draft / revision_requested 뿐이다 (판정은 서버가 내려준다)
   const locked = state.readonly;
+  const status = state.report?.status ?? 'draft';
+  const isRevision = status === 'revision_requested';
   const issueOf = (key: string) => issues.find((i) => i.key === key)?.message;
 
   function change(key: string, value: unknown) {
@@ -100,7 +105,7 @@ export default function AnnualReportPage({ slug }: { slug: string }) {
       const fresh = await getAnnualReport(slug);
       setState(fresh);
       setValues(fresh.values ?? {});
-      setMessage('신고서를 제출했습니다.');
+      setMessage(isRevision ? '보완한 신고서를 다시 제출했습니다.' : '신고서를 제출했습니다.');
     } catch (e) {
       const raw = (e as { response?: { data?: { data?: { issues?: FieldIssue[] } } } })?.response?.data?.data;
       if (raw?.issues?.length) {
@@ -129,17 +134,27 @@ export default function AnnualReportPage({ slug }: { slug: string }) {
         신고기간 {state.template.periodStart} ~ {state.template.periodEnd}
         {state.report && (
           <span className="ml-2">
-            · 현재 상태 <strong>{state.report.status === 'submitted' ? '제출완료' : '작성중'}</strong>
+            · 현재 상태 <strong>{REPORT_STATUS_LABEL[state.report.status]}</strong>
+            {state.report.revisionRound > 0 && <span className="ml-1">(보완 {state.report.revisionRound}회)</span>}
           </span>
         )}
       </p>
 
       {locked && (
         <p className="mt-3 rounded bg-green-50 px-3 py-2 text-sm text-green-800">
-          제출이 완료되어 읽기 전용입니다. 수정이 필요하면 분회 사무국에 문의해 주세요.
+          {status === 'approved'
+            ? '분회에서 승인이 완료되어 읽기 전용입니다.'
+            : '제출이 완료되어 검수를 기다리는 중입니다. 수정이 필요하면 분회 사무국에 문의해 주세요.'}
         </p>
       )}
-      {!locked && state.period.status !== 'open' && (
+      {isRevision && (
+        <div className="mt-3 rounded bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          <p className="font-medium">분회에서 보완을 요청했습니다.</p>
+          <p className="mt-1 whitespace-pre-wrap">{state.report?.revisionReason}</p>
+          <p className="mt-1 text-amber-700">내용을 수정한 뒤 다시 제출해 주세요.</p>
+        </div>
+      )}
+      {!locked && !isRevision && state.period.status !== 'open' && (
         <p className="mt-3 rounded bg-amber-50 px-3 py-2 text-sm text-amber-800">
           {state.period.status === 'before' ? '신고 기간이 시작되기 전입니다.' : '신고 기간이 종료되었습니다.'}
           {' 임시저장은 가능하지만 제출은 할 수 없습니다.'}
@@ -221,7 +236,7 @@ export default function AnnualReportPage({ slug }: { slug: string }) {
             onClick={() => void submit()}
             className="rounded bg-primary-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
           >
-            제출
+            {isRevision ? '재제출' : '제출'}
           </button>
         )}
 

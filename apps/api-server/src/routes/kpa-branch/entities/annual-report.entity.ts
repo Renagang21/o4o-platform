@@ -15,12 +15,21 @@
  *   user_id 단독 조회를 금지한다. 모든 조회·수정에 organization_id 를 함께 건다.
  *   UNIQUE(user_id, year) 는 "한 해에 한 번"을 보장할 뿐 경계가 아니다.
  *
- * 상태는 draft / submitted 2종만 둔다. 검수 상태(revision_requested·approved·rejected)는
- * W4 에서 확장한다 — 쓰지 않을 상태를 미리 만들지 않는다.
+ * 상태 (W4 확장 — WO-O4O-KPA-BRANCH-ANNUAL-REPORT-REVIEW-V1):
+ *   draft → submitted → (revision_requested → submitted)* → approved
+ *   역전이는 없고 approved 가 종착이다. `rejected` 는 만들지 않았다 —
+ *   분회 신상신고에는 "반려 후 종료"가 없고 전부 보완요청 후 재제출로 수렴하므로
+ *   보완요청과 의미가 겹친다(WO §1).
  */
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
-export type AnnualReportStatus = 'draft' | 'submitted';
+export type AnnualReportStatus = 'draft' | 'submitted' | 'revision_requested' | 'approved';
+
+/** 회원이 값을 고칠 수 있는 상태 — 이 목록이 write 게이트의 단일 기준이다 */
+export const MEMBER_EDITABLE_STATUSES: readonly AnnualReportStatus[] = ['draft', 'revision_requested'];
+
+/** 운영자가 검수할 수 있는 상태 */
+export const REVIEWABLE_STATUSES: readonly AnnualReportStatus[] = ['submitted'];
 
 /** field.key → 값. 키 목록은 Template 이 정하며 여기서 고정하지 않는다. */
 export type AnnualReportValues = Record<string, unknown>;
@@ -40,6 +49,24 @@ export interface AnnualReportSyncSkip {
   key: string;
   target: string;
   reason: 'UNCHANGED' | 'EMPTY_VALUE' | 'TARGET_NOT_ALLOWED';
+}
+
+/**
+ * 보완요청으로 재작성을 열 때 보존하는 **검수 대상이던 제출 스냅샷** 1건.
+ * 회원이 `values` 를 고쳐도 운영자가 봤던 내용은 여기 남는다 (WO §5).
+ */
+export interface AnnualReportRevisionRound {
+  /** 1부터. 몇 번째 보완요청인가 */
+  round: number;
+  /** 이 스냅샷이 제출된 시각 */
+  submittedAt: string | null;
+  /** 보완요청 시점에 보존한 제출 값 전체 */
+  values: AnnualReportValues;
+  /** 그때 적용된 양식 */
+  templateId: string;
+  reason: string;
+  requestedBy: string;
+  requestedAt: string;
 }
 
 /** `annual_reports.synced_changes` 의 구조 */
@@ -91,8 +118,9 @@ export class AnnualReport {
    * WO-O4O-KPA-BRANCH-ANNUAL-REPORT-MEMBERSHIP-SYNC-V1
    *
    * 재실행 멱등성의 기준이다 — true 인 신고서는 다시 반영하지 않는다.
-   * DB 가 `status='submitted'` 일 때만 true 를 허용한다
-   * (CHK_annual_reports_synced_submitted). draft 는 반영 대상이 아니다.
+   * DB 가 `status='approved'` 일 때만 true 를 허용한다
+   * (CHK_annual_reports_synced_approved — W4 에서 submitted → approved 로 좁혔다).
+   * 검수하지 않은 신고서로 회원 원장이 바뀌지 않는다.
    */
   @Column({ type: 'boolean', default: false })
   synced_to_membership: boolean;
@@ -103,6 +131,33 @@ export class AnnualReport {
    */
   @Column({ type: 'jsonb', nullable: true })
   synced_changes: AnnualReportSyncRecord | null;
+
+  // ── 검수 (WO-O4O-KPA-BRANCH-ANNUAL-REPORT-REVIEW-V1) ─────────────────────
+
+  /** 최근 보완요청 사유. 회원 화면에 그대로 보인다 */
+  @Column({ type: 'text', nullable: true })
+  revision_reason: string | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  revision_requested_at: Date | null;
+
+  /** 보완을 요청한 운영자 */
+  @Column({ type: 'uuid', nullable: true })
+  revision_requested_by: string | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  approved_at: Date | null;
+
+  /** 승인한 운영자. 승인은 원장을 바꾸지 않는다 — 반영은 별도 sync 행위다 */
+  @Column({ type: 'uuid', nullable: true })
+  approved_by: string | null;
+
+  /**
+   * 보완요청으로 폐기되지 않고 보존된 과거 제출 스냅샷들.
+   * append 만 한다 — 기존 항목을 고치거나 지우지 않는다.
+   */
+  @Column({ type: 'jsonb', default: () => `'[]'::jsonb` })
+  revision_history: AnnualReportRevisionRound[];
 
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;

@@ -28,7 +28,10 @@ import type {
   AnnualReportSyncSkip,
 } from '../../routes/kpa-branch/entities/annual-report.entity.js';
 import { AnnualReportService } from './AnnualReportService.js';
-import type { AnnualReportFieldDefinition } from '../../routes/kpa-branch/entities/annual-report-template.entity.js';
+import type {
+  AnnualReportFieldDefinition,
+  AnnualReportTemplate,
+} from '../../routes/kpa-branch/entities/annual-report-template.entity.js';
 
 /**
  * 쓰기 허용 컬럼 — `kpa_members` 의 4개뿐이다.
@@ -45,7 +48,7 @@ const SYNC_TARGET_ALLOWLIST: Record<string, { column: string; maxLength: number 
 
 export type SyncFailureCode =
   | 'REPORT_NOT_FOUND'
-  | 'REPORT_NOT_SUBMITTED'
+  | 'REPORT_NOT_APPROVED'
   | 'TEMPLATE_NOT_FOUND'
   | 'MEMBER_LEDGER_NOT_FOUND'
   | 'SYNC_VALUE_INVALID'
@@ -99,11 +102,12 @@ export class AnnualReportMembershipSyncService {
     if (!report) {
       throw new AnnualReportSyncError('REPORT_NOT_FOUND', '신고서를 찾을 수 없습니다.', 404);
     }
-    if (report.status !== 'submitted') {
+    if (report.status !== 'approved') {
       throw new AnnualReportSyncError(
-        'REPORT_NOT_SUBMITTED',
-        '제출 완료된 신고서만 회원정보에 반영할 수 있습니다.',
+        'REPORT_NOT_APPROVED',
+        '승인된 신고서만 회원정보에 반영할 수 있습니다.',
         409,
+        { status: report.status },
       );
     }
 
@@ -118,16 +122,7 @@ export class AnnualReportMembershipSyncService {
       throw new AnnualReportSyncError('TEMPLATE_NOT_FOUND', '제출 당시 양식을 찾을 수 없습니다.', 404);
     }
 
-    const syncFields = AnnualReportService.fields(template).filter(
-      (f) => f.syncToMembership === true && typeof f.syncTarget === 'string' && f.syncTarget.length > 0,
-    );
-
-    const rows: Array<Record<string, unknown>> = await AppDataSource.query(
-      `SELECT id, user_id, license_number, activity_type, pharmacy_name, pharmacy_address
-         FROM kpa_members WHERE user_id = $1 LIMIT 1`,
-      [report.user_id],
-    );
-    const member = rows[0];
+    const member = await this.loadMemberLedger(report.user_id);
     if (!member) {
       throw new AnnualReportSyncError(
         'MEMBER_LEDGER_NOT_FOUND',
@@ -136,56 +131,7 @@ export class AnnualReportMembershipSyncService {
       );
     }
 
-    const changes: AnnualReportSyncChange[] = [];
-    const skipped: AnnualReportSyncSkip[] = [];
-    const invalid: Array<{ key: string; reason: string; message: string }> = [];
-
-    for (const f of syncFields) {
-      const target = f.syncTarget as string;
-      const allowed = SYNC_TARGET_ALLOWLIST[target];
-
-      // Template 이 허용되지 않은 대상을 가리키면 **쓰지 않는다**. 조용히 넘기되 기록은 남긴다.
-      if (!allowed) {
-        skipped.push({ key: f.key, target, reason: 'TARGET_NOT_ALLOWED' });
-        continue;
-      }
-
-      const after = this.norm(report.values[f.key]);
-
-      // 빈 값으로 원장을 지우지 않는다. sync 대상 4필드는 모두 required 라
-      // 정상 제출본에서는 발생하지 않는다.
-      if (after === null) {
-        skipped.push({ key: f.key, target, reason: 'EMPTY_VALUE' });
-        continue;
-      }
-
-      // 원장이 받을 수 없는 값이면 조용히 버리지 않고 전체를 실패시킨다 —
-      // 제출된 값이 소리 없이 사라지는 편이 더 위험하다.
-      if (after.length > allowed.maxLength) {
-        invalid.push({
-          key: f.key,
-          reason: 'TOO_LONG',
-          message: `${f.label}이(가) 회원정보 저장 한도(${allowed.maxLength}자)를 초과합니다.`,
-        });
-        continue;
-      }
-      if (this.violatesOptions(f, after)) {
-        invalid.push({
-          key: f.key,
-          reason: 'NOT_IN_OPTIONS',
-          message: `${f.label}의 값이 회원정보가 허용하는 선택지가 아닙니다.`,
-        });
-        continue;
-      }
-
-      const before = this.norm(member[allowed.column]);
-      if (before === after) {
-        skipped.push({ key: f.key, target, reason: 'UNCHANGED' });
-        continue;
-      }
-
-      changes.push({ key: f.key, target, before, after });
-    }
+    const { changes, skipped, invalid } = this.diffAgainstLedger(template, report.values, member);
 
     if (invalid.length) {
       throw new AnnualReportSyncError(
@@ -263,6 +209,92 @@ export class AnnualReportMembershipSyncService {
         [JSON.stringify(record), reportId, organizationId],
       );
     });
+  }
+
+  /**
+   * 원장 1행을 읽는다. allowlist 가 가리키는 컬럼만 SELECT 한다 —
+   * 검수 화면이 회원 원장 전체를 끌어오지 않게 하기 위해서다.
+   */
+  static async loadMemberLedger(userId: string): Promise<Record<string, unknown> | null> {
+    const rows: Array<Record<string, unknown>> = await AppDataSource.query(
+      `SELECT id, user_id, license_number, activity_type, pharmacy_name, pharmacy_address
+         FROM kpa_members WHERE user_id = $1 LIMIT 1`,
+      [userId],
+    );
+    return rows[0] ?? null;
+  }
+
+  /**
+   * 제출값과 현재 원장을 비교한다. **읽기 전용**이며 아무것도 쓰지 않는다.
+   *
+   * 검수 화면(W4)과 실제 반영(W3)이 **같은 판정**을 쓰게 하려고 분리했다.
+   * 화면이 따로 계산하면 "화면엔 2건 변경인데 반영은 1건" 같은 어긋남이 생긴다.
+   */
+  static diffAgainstLedger(
+    template: AnnualReportTemplate,
+    values: Record<string, unknown>,
+    member: Record<string, unknown>,
+  ): {
+    changes: AnnualReportSyncChange[];
+    skipped: AnnualReportSyncSkip[];
+    invalid: Array<{ key: string; reason: string; message: string }>;
+  } {
+    const syncFields = AnnualReportService.fields(template).filter(
+      (f) => f.syncToMembership === true && typeof f.syncTarget === 'string' && f.syncTarget.length > 0,
+    );
+
+    const changes: AnnualReportSyncChange[] = [];
+    const skipped: AnnualReportSyncSkip[] = [];
+    const invalid: Array<{ key: string; reason: string; message: string }> = [];
+
+    for (const f of syncFields) {
+      const target = f.syncTarget as string;
+      const allowed = SYNC_TARGET_ALLOWLIST[target];
+
+      // Template 이 허용되지 않은 대상을 가리키면 **쓰지 않는다**. 조용히 넘기되 기록은 남긴다.
+      if (!allowed) {
+        skipped.push({ key: f.key, target, reason: 'TARGET_NOT_ALLOWED' });
+        continue;
+      }
+
+      const after = this.norm(values[f.key]);
+
+      // 빈 값으로 원장을 지우지 않는다. sync 대상 4필드는 모두 required 라
+      // 정상 제출본에서는 발생하지 않는다.
+      if (after === null) {
+        skipped.push({ key: f.key, target, reason: 'EMPTY_VALUE' });
+        continue;
+      }
+
+      // 원장이 받을 수 없는 값이면 조용히 버리지 않고 전체를 실패시킨다 —
+      // 제출된 값이 소리 없이 사라지는 편이 더 위험하다.
+      if (after.length > allowed.maxLength) {
+        invalid.push({
+          key: f.key,
+          reason: 'TOO_LONG',
+          message: `${f.label}이(가) 회원정보 저장 한도(${allowed.maxLength}자)를 초과합니다.`,
+        });
+        continue;
+      }
+      if (this.violatesOptions(f, after)) {
+        invalid.push({
+          key: f.key,
+          reason: 'NOT_IN_OPTIONS',
+          message: `${f.label}의 값이 회원정보가 허용하는 선택지가 아닙니다.`,
+        });
+        continue;
+      }
+
+      const before = this.norm(member[allowed.column]);
+      if (before === after) {
+        skipped.push({ key: f.key, target, reason: 'UNCHANGED' });
+        continue;
+      }
+
+      changes.push({ key: f.key, target, before, after });
+    }
+
+    return { changes, skipped, invalid };
   }
 
   /** Template 이 선택지를 정의한 필드는 그 선택지 안의 값만 원장에 넘긴다. */

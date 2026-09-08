@@ -66,6 +66,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
     { to: `${basePath}/operator/site`, label: '홈페이지 설정' },
     { to: `${basePath}/operator/posts`, label: '글 관리' },
     { to: `${basePath}/operator/domains`, label: '도메인 연결' },
+    { to: `${basePath}/operator/annual-reports`, label: '신상신고 검수' },
   ];
 
   // 존재하지 않는 분회는 셸(헤더·메뉴·푸터)을 그리지 않는다 — 유효한 분회처럼 보이면 안 된다.

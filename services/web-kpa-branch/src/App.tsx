@@ -14,6 +14,7 @@
  *   /:branchSlug/operator/site        홈페이지 설정 (운영자)
  *   /:branchSlug/operator/posts       글쓰기·글 관리 (운영자)
  *   /:branchSlug/operator/domains     자체 도메인 연결 (운영자)
+ *   /:branchSlug/operator/annual-reports 신상신고 검수·승인 (운영자)
  *
  * 자체 도메인으로 들어오면 같은 트리를 slug 세그먼트 없이 루트에 붙인다
  * (분회별 별도 배포·별도 백엔드 없음 — 번들 하나가 두 진입 방식을 모두 처리한다).
@@ -38,6 +39,7 @@ import BranchPostsPage from './pages/BranchPostsPage';
 import SiteSettingsPage from './pages/operator/SiteSettingsPage';
 import PostsAdminPage from './pages/operator/PostsAdminPage';
 import DomainsPage from './pages/operator/DomainsPage';
+import AnnualReportsReviewPage from './pages/operator/AnnualReportsReviewPage';
 import AnnualReportPage from './pages/annual-report/AnnualReportPage';
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -53,6 +55,7 @@ function BranchSection({ slug, basePath }: { slug: string; basePath: string }) {
         <Route path="operator/site" element={<SiteSettingsPage slug={slug} />} />
         <Route path="operator/posts" element={<PostsAdminPage slug={slug} />} />
         <Route path="operator/domains" element={<DomainsPage slug={slug} />} />
+        <Route path="operator/annual-reports" element={<AnnualReportsReviewPage slug={slug} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

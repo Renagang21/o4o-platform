@@ -1,5 +1,5 @@
 /**
- * MemberAnnualReportController — 회원 본인의 신상신고 작성·임시저장·제출
+ * MemberAnnualReportController — 회원 본인의 신상신고 작성·임시저장·제출·보완 재제출
  * WO-O4O-KPA-BRANCH-ANNUAL-REPORT-SUBMISSION-V1 §7 §8 §9
  *
  * 신뢰 경계:
@@ -13,7 +13,11 @@
  */
 import type { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
-import { AnnualReport } from '../../routes/kpa-branch/entities/annual-report.entity.js';
+import {
+  AnnualReport,
+  MEMBER_EDITABLE_STATUSES,
+} from '../../routes/kpa-branch/entities/annual-report.entity.js';
+import type { AnnualReportStatus } from '../../routes/kpa-branch/entities/annual-report.entity.js';
 import { AnnualReportService } from '../../services/kpa-branch/AnnualReportService.js';
 import type { AnnualReportTemplate } from '../../routes/kpa-branch/entities/annual-report-template.entity.js';
 
@@ -29,6 +33,38 @@ const TARGET_YEAR = Number(process.env.KPA_BRANCH_ANNUAL_REPORT_YEAR ?? 2026);
  *   (이전의 `canBypassPeriod` 운영자 예외는 제거했다 — 운영자가 기간 밖에 회원 신고를
  *   대신 처리하는 기능은 이 경로가 아니라 별도 운영자 경로의 문제다.)
  */
+
+/**
+ * W4 §8 — 보완요청 재제출은 신고 기간 제한을 받지 않는다.
+ *
+ * 운영자가 `revision_requested` 로 되돌린 신고서는 이미 기간 안에 제출된 것이고,
+ * 재제출은 그 검수를 마무리하는 행위다. 기간으로 막으면 "보완하라고 열어놓고
+ * 고칠 수는 없는" 막다른 길이 생긴다. 이 예외는 요청자의 역할과 무관하게
+ * **신고서 상태에만** 걸리므로, W2 가 정리한 "기간 정책은 role 무관" 원칙과 충돌하지 않는다.
+ */
+function canSubmitNow(period: 'before' | 'open' | 'closed', status: AnnualReportStatus | null): boolean {
+  return period === 'open' || status === 'revision_requested';
+}
+
+/**
+ * 회원이 고칠 수 없는 상태면 409 payload 를, 고칠 수 있으면 null 을 돌려준다.
+ * 임시저장과 제출이 **같은 판정**을 쓰도록 한 곳에 둔다.
+ */
+function editableOrConflict(status: AnnualReportStatus | null) {
+  if (status === null || MEMBER_EDITABLE_STATUSES.includes(status)) return null;
+  if (status === 'approved') {
+    return {
+      success: false,
+      error: '승인이 완료된 신고서는 수정할 수 없습니다.',
+      code: 'ALREADY_APPROVED',
+    };
+  }
+  return {
+    success: false,
+    error: '이미 제출한 신고서입니다. 수정이 필요하면 분회 사무국에 보완요청을 문의해 주세요.',
+    code: 'ALREADY_SUBMITTED',
+  };
+}
 
 function templateSummary(t: AnnualReportTemplate) {
   return {
@@ -76,7 +112,7 @@ export class MemberAnnualReportController {
      * 회원이 전출하면 현재 분회가 달라지는데, 과거 신고서의 소속이 그때 값으로
      * 바뀌어 보이면 제출 기록이 훼손된다 (WO §8 스냅샷 보존).
      */
-    const values = existing?.status === 'submitted'
+    const values = existing && existing.status !== 'draft'
       ? { ...existing.values }
       : { ...prefill, ...(existing?.values ?? {}), ...association.values };
 
@@ -94,6 +130,11 @@ export class MemberAnnualReportController {
               status: existing.status,
               submittedAt: existing.submitted_at,
               updatedAt: existing.updated_at,
+              /** 보완요청 사유는 회원에게 그대로 보인다 (W4 §8) */
+              revisionReason: existing.revision_reason,
+              revisionRequestedAt: existing.revision_requested_at,
+              approvedAt: existing.approved_at,
+              revisionRound: Array.isArray(existing.revision_history) ? existing.revision_history.length : 0,
             }
           : null,
         values,
@@ -106,9 +147,10 @@ export class MemberAnnualReportController {
         notEvaluableRules,
         period: {
           status: period,
-          canSubmit: period === 'open',
+          canSubmit: canSubmitNow(period, existing?.status ?? null),
         },
-        readonly: existing?.status === 'submitted',
+        /** 회원이 값을 고칠 수 있는 상태는 draft / revision_requested 뿐이다 */
+        readonly: existing ? !MEMBER_EDITABLE_STATUSES.includes(existing.status) : false,
       },
     });
   }
@@ -132,13 +174,8 @@ export class MemberAnnualReportController {
       where: { user_id: userId, organization_id: organizationId, year: template.year },
     });
 
-    if (existing?.status === 'submitted') {
-      return res.status(409).json({
-        success: false,
-        error: '이미 제출한 신고서는 수정할 수 없습니다.',
-        code: 'ALREADY_SUBMITTED',
-      });
-    }
+    const editGate = editableOrConflict(existing?.status ?? null);
+    if (editGate) return res.status(409).json(editGate);
 
     const { accepted, dropped } = AnnualReportService.sanitizeIncoming(template, req.body?.values);
     const association = await AnnualReportService.resolveAssociationValues(template, {
@@ -193,8 +230,17 @@ export class MemberAnnualReportController {
       return res.status(404).json({ success: false, error: '양식이 없습니다.', code: 'TEMPLATE_NOT_FOUND' });
     }
 
+    // 기간 게이트는 신고서 상태를 읽은 뒤에 판정한다 (보완 재제출 예외 — canSubmitNow 주석)
+    const repo = AppDataSource.getRepository(AnnualReport);
+    const existing = await repo.findOne({
+      where: { user_id: userId, organization_id: organizationId, year: template.year },
+    });
+
+    const submitGate = editableOrConflict(existing?.status ?? null);
+    if (submitGate) return res.status(409).json(submitGate);
+
     const period = AnnualReportService.periodStatus(template);
-    if (period !== 'open') {
+    if (!canSubmitNow(period, existing?.status ?? null)) {
       return res.status(403).json({
         success: false,
         error:
@@ -202,19 +248,6 @@ export class MemberAnnualReportController {
             ? `신고 기간이 아직 시작되지 않았습니다. (${template.period_start} 부터)`
             : `신고 기간이 종료되었습니다. (${template.period_end} 까지)`,
         code: 'REPORT_PERIOD_CLOSED',
-      });
-    }
-
-    const repo = AppDataSource.getRepository(AnnualReport);
-    const existing = await repo.findOne({
-      where: { user_id: userId, organization_id: organizationId, year: template.year },
-    });
-
-    if (existing?.status === 'submitted') {
-      return res.status(409).json({
-        success: false,
-        error: '이미 제출한 신고서입니다.',
-        code: 'ALREADY_SUBMITTED',
       });
     }
 
@@ -244,10 +277,21 @@ export class MemberAnnualReportController {
 
     let saved: AnnualReport;
     if (existing) {
+      const wasRevision = existing.status === 'revision_requested';
       existing.values = values;
       existing.template_id = template.id;
       existing.status = 'submitted';
       existing.submitted_at = now;
+      if (wasRevision) {
+        /**
+         * 재제출로 보완요청은 해소된다. 사유·시각·요청자는 비우되
+         * **`revision_history` 는 건드리지 않는다** — 지난 요청과 그때의 제출 내용이
+         * 남아야 검수 이력이 성립한다 (W4 §5).
+         */
+        existing.revision_reason = null;
+        existing.revision_requested_at = null;
+        existing.revision_requested_by = null;
+      }
       saved = await repo.save(existing);
     } else {
       saved = await repo.save(
