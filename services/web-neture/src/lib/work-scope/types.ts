@@ -76,11 +76,22 @@ export type WorkScopeReason =
   /** service_memberships(neture) 가 active 아님 */
   | 'MEMBERSHIP_NOT_ACTIVE'
   /**
-   * 매장 식별자를 클라이언트에서 확정할 수 없음.
-   * Neture 는 organization 미연결 서비스이며(docs/architecture/O4O-ORGANIZATION-ROLE-STANDARD-V1.md §4.4),
+   * 매장 식별자를 클라이언트에서 확정할 수 없음 — 서버 해석 대기/미수행 상태.
    * 매장 식별의 canonical 판정은 서버(store-organization.resolver.ts)에만 존재한다.
    */
-  | 'STORE_IDENTITY_SERVER_ONLY';
+  | 'STORE_IDENTITY_SERVER_ONLY'
+  // ── 아래는 서버 scope resolution 이 돌려준 사유 (WO-O4O-WORK-SCOPE-STORE-RESOLUTION-V0).
+  //    프런트에서 만들어내지 않고 API 응답을 그대로 옮긴다.
+  /** 해당 서비스의 active membership 없음. */
+  | 'NO_SERVICE_MEMBERSHIP'
+  /** 접근 가능한 매장 0개. */
+  | 'NO_ACCESSIBLE_STORE'
+  /** 접근 가능한 매장 2개 이상 — 자동 선택 금지(후속 Selector V1). */
+  | 'MULTIPLE_ACCESSIBLE_STORES'
+  /** 이 서비스는 매장 identity 축이 없다(예: neture). */
+  | 'STORE_IDENTITY_NOT_SUPPORTED'
+  /** store 의미가 없는 workspace. */
+  | 'WORKSPACE_NOT_STORE_SCOPED';
 
 // ─── Capability ──────────────────────────────────────────────────────────────
 
@@ -119,19 +130,19 @@ export interface WorkScope {
   workspace: Workspace;
 
   /**
-   * 조직 식별자. **V0 에서 항상 undefined 다.**
-   * Neture 는 organization 미연결 서비스라 클라이언트가 확정할 근거가 없다.
+   * 조직 식별자. **서버 해석이 `resolved` 일 때만 채워진다** (STORE-RESOLUTION-V0).
+   * 프런트가 만들어내지 않는다 — `GET /api/v1/work-scope/store-resolution` 응답만 쓴다.
    */
   organizationId?: string;
 
   /**
-   * 매장 식별자. **V0 에서 항상 undefined 다.**
+   * 매장 식별자. **서버 해석이 `resolved` 일 때만 채워진다.**
    *
    * canonical 축에서 storeId 는 `organizations.id` 와 **같은 값**이다
    * (`OrganizationStore` 는 `@Entity('organizations')` 확장 뷰).
    * 다만 Boundary Policy(F6)상 도메인별 경계 이름이 다르므로
    * (Store Ops=organizationId / Commerce=storeId) 필드는 분리해 둔다.
-   * 확정은 서버 resolver 소관이며 클라이언트가 보낸 값은 신뢰되지 않는다.
+   * 값을 동일시하는 판단은 **서버가 canonical 데이터를 근거로** 내린다.
    */
   storeId?: string;
 
@@ -212,3 +223,12 @@ export const WORKSPACE_ACCESS: Readonly<Record<Workspace, WorkspaceAccessRule>> 
     requiresStoreIdentity: false,
   },
 });
+
+/**
+ * store identity 가 의미를 갖는 workspace.
+ *
+ * WO-O4O-WORK-SCOPE-STORE-RESOLUTION-V0 §10 — 서버
+ * `apps/api-server/src/utils/work-scope-store-resolution.ts` 의 `STORE_SCOPED_WORKSPACES`
+ * 와 같은 값이어야 한다. 여기 없는 축에서는 서버 해석을 **호출하지 않는다**.
+ */
+export const STORE_SCOPED_WORKSPACES: readonly Workspace[] = ['store'];
