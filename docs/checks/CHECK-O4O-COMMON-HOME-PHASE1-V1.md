@@ -154,7 +154,36 @@ web-neture 안에 두었다(공유 패키지 변경은 전 서비스 재빌드 +
 
 ## 9. Production deploy / smoke
 
-(배포 후 기록)
+### 배포
+
+| 항목 | 값 |
+|---|---|
+| Workflow | `.github/workflows/deploy-web-services.yml` |
+| Run | `34195912966` (df80f0638, deploy-neture success) / `34196443286` (03acb7c06, deploy-neture success) |
+| Cloud Run service | `neture-web` (asia-northeast3 / netureyoutube) |
+| 배포 revision | `neture-web-01549-pc4` |
+| 이미지 태그 | `gcr.io/netureyoutube/neture-web:03acb7c06b77147cef39d8631b9864d9f0b3cde9` |
+
+`detect-changes` skip 사고 재발 여부를 확인하기 위해 CI green 만으로 끝내지 않고
+**deploy-neture job 실행 → revision → 이미지 태그 == push 한 commit SHA** 까지 대조했다. 일치.
+
+### 실브라우저 smoke (`https://neture.co.kr`)
+
+| # | 시나리오 | 결과 |
+|:--:|---|:--:|
+| 1 | 미인증 `/` | PASS — 새 O4O Home(타이틀 `O4O — 전문 매장 업무 플랫폼`, 워드마크 · `무엇을 도와드릴까요?` · 비활성 입력창 `준비 중입니다` · 진입 pill 7 · 법정 링크 footer). Neture Header/Footer 미노출 |
+| 2 | 미인증 `/operator` (protected deep link) | PASS — `/` 로 이동 + 로그인 모달. 로그인 후 **`/operator` 로 복귀**(역할 대시보드로 덮어쓰지 않음), Operator 대시보드 정상 렌더 |
+| 3 | 로그인 상태 `/` | PASS — **`/` 에 머무름**. 역할 대시보드 자동 이동 없음. 우상단 최소 계정 링크만 표시 |
+| 4 | `/community` | PASS — `NetureLayout` + 기존 `CommunityPage` 그대로. SEO 타이틀 `Neture — O4O 유통·협업 플랫폼` 유지. Header nav 에 `커뮤니티` 노출 |
+| 5 | `/supplier` | PASS — `Supplier — Neture` |
+| 6 | `/partner` | PASS — `Partner — Neture` |
+| 7 | `/mypage` · `/mypage/profile` | PASS — `마이페이지` / `프로필` |
+| 8 | `/admin` | PASS — `관리자 대시보드` |
+| 9 | `/operator/suppliers` (하위 route) | PASS — `공급자 승인` |
+| 10 | `/supplier/products` (하위 route) | PASS — `접근 권한이 없습니다`. smoke 계정이 supplier 역할이 아니어서 나오는 **기존 역할 가드 동작**이며 `/` 로 튕기지 않음 |
+| 11 | `/handoff` | PASS — `/handoff` 유지(외부 복귀 처리 화면), `/` 로 덮어쓰지 않음 |
+
+smoke 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 Neture admin/operator 계정 (자격정보 본 문서 미기재).
 
 ---
 
