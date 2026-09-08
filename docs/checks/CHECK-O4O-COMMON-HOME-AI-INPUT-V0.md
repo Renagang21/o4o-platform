@@ -195,9 +195,58 @@ api-server 잔여 63건은 **직전 WO 와 동일한 baseline** 이다 — 62건
 
 ---
 
-## 10. production smoke
+## 10. production smoke — **PARTIAL (AI 응답 미검증 · 환경 차단)**
 
-(배포 후 기록 — 아래 §12 참조)
+배포: `Deploy API Server` success · `Deploy Web Services` success · CodeQL success (commit `a0badd0b6`).
+프런트 배포 확인: `https://neture.co.kr` 번들 `/assets/index-CYnFa4Jl.js` 에 신규 입력창 문자열 존재.
+
+| 케이스 | 결과 | 판정 |
+|---|---|:---:|
+| 미인증 POST | HTTP 401 | ✅ |
+| 공백 message | 400 `EMPTY_MESSAGE` "질문을 입력해 주세요." | ✅ |
+| 2001자 message | 400 `MESSAGE_TOO_LONG` "질문은 2000자 이내로…" | ✅ |
+| `message: 42` (비문자열) | 400 `INVALID_MESSAGE` | ✅ |
+| home scope 일반 질문 | 502 `AI_UNAVAILABLE` | ❌ **아래 차단** |
+| store scope + **위조 storeId** | 502 `AI_UNAVAILABLE` (동일 지점 도달) | ⚠️ 부분 |
+
+### 차단 원인 — 프로덕션 Gemini API 키가 무효 (이번 변경과 무관)
+
+서버 로그 실측:
+
+```text
+home-chat error → Gemini API error 400:
+  "API key not valid. Please pass a valid API key." (INVALID_ARGUMENT)
+```
+
+- `ai_settings` 조회는 **성공**했고(경고 로그 없음) enabled row 가 없어 env 로 fallback 했다.
+- Cloud Run `o4o-core-api` 에 `GEMINI_API_KEY` 가 literal 로 설정돼 있으나(길이 39) Gemini 가 무효로 거부한다.
+- **플랫폼 전체 문제다.** 기존 `POST /api/ai/query` 도 지금 프로덕션에서 실패한다 —
+  다만 그쪽은 다른 이유로 먼저 깨진다: `column AiSettings.apikey does not exist` (HTTP 500).
+  이는 `ai-key.util.ts` 헤더 주석이 이미 경고한 entity/운영스키마 drift 이며 **선행 결함**이다.
+  (내 경로는 raw SQL 로 `"apiKey"` 를 정확히 쓰므로 이 오류를 겪지 않고 env fallback 까지 진행한다.)
+
+키 교체는 자격증명 작업이라 CLAUDE.md 중지 조건(**실제 계정·자격정보·외부 서비스 승인 필요**)에 해당해
+임의로 수행하지 않았다.
+
+### 그럼에도 확인된 것
+
+- 인증·검증·라우팅·rate limiter 경로 정상.
+- **서버측 scope 재검증이 실제로 동작한다** — store workspace 요청이 `resolveWorkScopeStore` 를
+  통과해 LLM 호출 지점까지 도달했다(실패 지점이 provider 호출임이 로그로 확인됨).
+- **오류 sanitization 이 프로덕션에서 실증됐다** — provider 가 "API key not valid" 를 돌려줬음에도
+  클라이언트 응답에는 키·provider·모델·상태코드가 일절 없고 `"AI 기능을 사용할 수 없습니다."` 만 나갔다(§22).
+- 위조 `organizationId`/`storeId` 를 보낸 요청도 서버가 이를 읽지 않고 세션 기준으로 재확정했다.
+
+### 남은 검증 (키 교체 후 재개)
+
+```text
+1. home scope 일반 질문 → 200 + 텍스트 응답
+2. store resolved scope → data.scope.storeStatus='resolved'
+3. 브라우저에서 입력→로딩→응답 표시, 2번째 질문, 새로고침 시 초기화
+4. 무한 retry·중복 요청 없음 확인 (§40)
+```
+
+`retry.maxAttempts = 1` 이라 키 무효 상태에서도 재시도 폭주는 발생하지 않는다(로그상 요청당 1회 호출).
 
 ---
 
@@ -238,7 +287,12 @@ DB write            0   — execute() 는 저장 side-effect 가 없다
 4. **`O4O-AI-USAGE-FLOW-BASELINE-V1` 갱신 필요 (아래 §14)**.
 5. **대화 맥락(multi-turn)** — 현재 1문 1답. 이전 문답을 프롬프트에 싣는 것은 저장 없이도 가능하나 이번 범위 밖.
 6. **프런트 테스트 러너 도입** — 별도 WO(§36). 도입되면 Home 입력/로그인 분기/오류 표시를 테스트로 고정.
-7. **`/api/ai/query` 와의 관계 정리** — 자유질의 표면이 둘이 됐다. 장기적으로 수렴 검토(기존 응답 계약 변경을 수반하므로 별도 WO).
+7. **프로덕션 Gemini API 키 교체 (선행 차단 해소)** — 현재 플랫폼 AI 전체가 무효 키로 동작 불가.
+   교체 후 §10 "남은 검증" 4항목을 재개해야 이번 WO 의 §45-15 가 충족된다.
+8. **`AiSettings` entity ↔ 운영 스키마 drift** — `column AiSettings.apikey does not exist` 로
+   `POST /api/ai/query` 가 프로덕션에서 500. `ai-key.util.ts` 주석이 이미 경고한 선행 결함이며
+   이번 범위 밖이라 손대지 않았다. 별도 WO 필요.
+9. **`/api/ai/query` 와의 관계 정리** — 자유질의 표면이 둘이 됐다. 장기적으로 수렴 검토(기존 응답 계약 변경을 수반하므로 별도 WO).
 
 ---
 
@@ -281,5 +335,5 @@ Home AI 진입점을 정식 기준으로 반영하려면 별도 WO 로 baseline 
 | 10. DB write 0 | 충족 |
 | 11. credential frontend 노출 0 | 충족 |
 | 12~14. type-check / build / lint PASS | 충족 (§9 baseline 단서 포함) |
-| 15. production AI smoke PASS | §10 참조 |
+| 15. production AI smoke PASS | **미충족(환경 차단)** — 인증·검증·scope·sanitization 은 실측 PASS, AI 응답은 프로덕션 Gemini 키 무효로 미검증. §10 참조 |
 | 16. 기존 route/auth 회귀 없음 | 충족 (auth 계약 무변경) |
