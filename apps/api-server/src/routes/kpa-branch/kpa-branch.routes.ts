@@ -31,6 +31,8 @@
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/education-credits?year=&status=    연수교육 평점 목록
  *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/education-credits/open             연도 개설 (멱등)
  *   PATCH  /api/v1/kpa-branch/branches/:branchSlug/operator/education-credits/:ledgerId        평점·면제 개별 수정
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/members?year=&status=&attention=&q=  회원 업무 콘솔 목록
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/members/:userId?year=               회원 통합 상세 (4영역)
  *   *      /api/v1/kpa-branch/admin/domains/**                               (admin scope)
  *   *      /api/v1/kpa-branch/admin/service-members/**                        (admin scope)  가입 승인
  *
@@ -226,7 +228,17 @@ export function createKpaBranchRoutes(): Router {
     requireBranchScope,
   ];
 
+  // 회원 업무 콘솔 (WO-O4O-KPA-BRANCH-MEMBER-OPERATIONS-CONSOLE-V1)
+  //
+  // 목록·상세 모두 **서버가 4개 원장을 합쳐서** 낸다. 프런트가 신상신고/회비/연수교육
+  // API 를 회원마다 각각 부르는 구조를 만들지 않는다 (WO §1·§2).
+  // 상세 라우트는 `/:userId/leave`(POST) 보다 먼저 선언해도 method 가 달라 충돌하지 않는다.
   router.get('/branches/:branchSlug/operator/members', ...operatorGuards, wrap(BranchMemberController.list));
+  router.get(
+    '/branches/:branchSlug/operator/members/:userId',
+    ...operatorGuards,
+    wrap(BranchMemberController.detail),
+  );
   router.post('/branches/:branchSlug/operator/members', ...operatorGuards, wrap(BranchMemberController.join));
   router.post(
     '/branches/:branchSlug/operator/members/:userId/leave',

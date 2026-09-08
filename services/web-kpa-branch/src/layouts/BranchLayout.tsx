@@ -67,6 +67,8 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
   ];
 
   const operatorNav = [
+    // 회원 업무 콘솔이 운영자의 진입점이다 — 개별 전문화면보다 앞에 둔다
+    { to: `${basePath}/operator/members`, label: '회원 현황' },
     { to: `${basePath}/operator/site`, label: '홈페이지 설정' },
     { to: `${basePath}/operator/posts`, label: '글 관리' },
     { to: `${basePath}/operator/domains`, label: '도메인 연결' },
