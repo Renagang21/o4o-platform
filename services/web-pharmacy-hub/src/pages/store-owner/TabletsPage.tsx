@@ -224,35 +224,44 @@ export default function StoreOwnerTabletsPage() {
               labels={{ preview: '실제 화면 열기' }}
             />
             {tablets.length > 0 && (
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {tablets.map((t) => (
-                  <li key={t.id} className="flex items-center gap-1 text-xs text-gray-400">
-                    <span className="truncate">{cornerPrimaryLabel(t)}</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const name = window.prompt('태블릿 이름', t.name);
-                        if (name && name.trim()) act(() => updateTablet(t.id, { name: name.trim() }));
-                      }}
-                      className="rounded border border-gray-200 px-2 py-0.5 text-gray-600 hover:bg-gray-50"
-                    >
-                      이름 수정
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        act(
-                          () => deactivateTablet(t.id),
-                          `"${t.name}" 태블릿을 목록에서 내릴까요? 저장된 화면 세트는 남습니다.`,
-                        )
-                      }
-                      className="rounded border border-gray-200 px-2 py-0.5 text-red-600 hover:bg-red-50"
-                    >
-                      내리기
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              /* 태블릿 자체 관리(이름·내리기). PH 에는 KPA 같은 코너 상세 축이 없어
+                 현황판 아래 별도 줄로 둔다 — 카드 액션(화면 바꾸기/실제 화면 열기)과 섞지 않는다. */
+              <details className="mt-4 rounded-lg border border-gray-200 bg-white">
+                <summary className="cursor-pointer px-4 py-2.5 text-sm font-medium text-gray-700">
+                  태블릿 관리 (이름 수정 · 내리기)
+                </summary>
+                <ul className="divide-y divide-gray-100 border-t border-gray-100">
+                  {tablets.map((t) => (
+                    <li key={t.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5">
+                      <span className="min-w-0 truncate text-sm text-gray-700">{cornerPrimaryLabel(t)}</span>
+                      <span className="flex flex-shrink-0 items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const name = window.prompt('태블릿 이름', t.name);
+                            if (name && name.trim()) act(() => updateTablet(t.id, { name: name.trim() }));
+                          }}
+                          className="rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
+                        >
+                          이름 수정
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            act(
+                              () => deactivateTablet(t.id),
+                              `"${t.name}" 태블릿을 목록에서 내릴까요? 저장된 화면 세트는 남습니다.`,
+                            )
+                          }
+                          className="rounded-md border border-gray-200 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50"
+                        >
+                          내리기
+                        </button>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
             )}
           </section>
 
