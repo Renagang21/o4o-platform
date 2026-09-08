@@ -257,12 +257,15 @@ eslint (신규 6파일)                     PASS (0)
 내가 만든 파일에는 오류가 0건이다. CLAUDE.md 중지 조건("현재 변경과 무관한 build/test 실패")에 따라
 고치지 않고 보고만 한다.
 
-**api-server 전체 jest 로컬 완주 실패 — 환경 한계**: `--maxWorkers=1` 에서도
-`JavaScript heap out of memory` 로 중단된다(내 변경 이전부터의 로컬 메모리 한계이며,
-실패한 suite 는 0건 — OOM 으로 러너가 죽는다). CI(`ci-pipeline.yml` quality-check)가 전체를 돌린다.
-로컬에서는 관련 3 suites / 35 tests 를 완주시켜 확인했다.
+기본 heap 으로는 `JavaScript heap out of memory` 로 러너가 죽어 완주하지 못한다 —
+`--max-old-space-size=8192` 를 주면 완주한다(위 결과). CI(`ci-pipeline.yml` quality-check)가 전체를 돌린다.
 
-**production smoke**: 미수행 — 아래 §10 참조.
+**production smoke**: 수행 완료 — 아래 §10 참조 (전 케이스 기대값 일치).
+
+**api-server 전체 jest (로컬, `--max-old-space-size=8192`)**: `234 suites / 3,895 tests PASS`.
+실패 1 suite(9 tests) = `typeorm-entity-registry-guard.spec.ts` — Windows 임시 디렉터리
+`ENOENT` 로, **단독 실행 시 10/10 PASS**. 이번 변경은 entity 를 추가하지 않으며 해당 영역을
+건드리지 않았다. 장시간 직렬 실행 시의 로컬 환경 flake 로 판정하고 수정하지 않았다.
 
 ---
 
@@ -279,24 +282,31 @@ package.json 변경 0   (신규 dependency 0)
 `@o4o/security-core` 는 **api-server 에서만** import 한다(이미 dependency 로 등재됨).
 web-neture 에는 넣지 않았다(§22).
 
-**production smoke 미수행 사유**: 이 endpoint 는 배포 전에는 프로덕션에 존재하지 않는다.
-push → CI/CD 배포 후에야 §23 의 read-only smoke 가 가능하다. 배포 후 확인 절차는 다음과 같다.
+### production smoke (§23) — 수행 완료
 
-```text
-GET https://api.neture.co.kr/api/v1/work-scope/store-resolution?serviceKey=kpa-society&workspace=store
-  (인증 쿠키 필요 — docs/local/TEST-ACCOUNTS.local.md 의 약국 계정)
-기대: 200 { success:true, data:{ status:'resolved'|'none'|'ambiguous', ... } }
+- 배포: `Deploy API Server (Cloud Run)` success · `Deploy Web Services (Cloud Run)` success · CodeQL success (commit `fe5dced51`)
+- 대상: `https://api.neture.co.kr/api/v1/work-scope/store-resolution`
+- 계정: `docs/local/TEST-ACCOUNTS.local.md` 의 L1 자격 (`kpa:store_owner` 보유). 자격증명은 env 주입, 문서·로그에 기록하지 않는다.
+- **전부 read-only GET. DB write 0.**
 
-GET .../store-resolution?serviceKey=neture&workspace=store
-기대: 200 status='none', reason='STORE_IDENTITY_NOT_SUPPORTED'
+| 요청 | 응답 | 기대 일치 |
+|---|---|:---:|
+| `serviceKey=kpa-society&workspace=store` | `resolved` · organizationId=storeId=`c9beb4a2…` | ✅ |
+| `serviceKey=kpa&workspace=store` (role prefix) | `resolved` · **serviceKey 가 `kpa-society` 로 정규화** · 동일 org | ✅ |
+| `serviceKey=neture&workspace=store` | `none` · `STORE_IDENTITY_NOT_SUPPORTED` | ✅ |
+| `serviceKey=kpa-society&workspace=home` | `none` · `WORKSPACE_NOT_STORE_SCOPED` | ✅ |
+| `serviceKey=k-cosmetics&workspace=store` | `none` · `NO_ACCESSIBLE_STORE` | ✅ |
+| `serviceKey=glycopharm&workspace=store` | `none` · `NO_ACCESSIBLE_STORE` | ✅ |
+| `serviceKey=pharmacy-hub&workspace=store` | `none` · `NO_ACCESSIBLE_STORE` | ✅ |
+| `serviceKey=not-a-real-service&workspace=store` | `none` · `NO_SERVICE_MEMBERSHIP` (fail-closed) | ✅ |
+| 미인증 (헤더 없음) | HTTP 401 `AUTH_REQUIRED` | ✅ |
 
-GET .../store-resolution?serviceKey=kpa-society&workspace=home
-기대: 200 status='none', reason='WORKSPACE_NOT_STORE_SCOPED'
+**cross-service leakage 0 이 프로덕션 실데이터로 입증됐다.** 같은 사용자가
+kpa-society 에서는 매장이 `resolved` 인데, k-cosmetics · glycopharm · pharmacy-hub
+(모두 membership 보유 서비스)에서는 `NO_ACCESSIBLE_STORE` 로 **KPA 매장이 새어나오지 않았다**.
+서비스 조건 없는 후보 함수를 썼다면 세 서비스 모두 KPA 매장을 돌려줬을 것이다.
 
-미인증 호출 → 401
-```
-
-DB write 는 어느 경로에서도 발생하지 않는다(SELECT 전용).
+응답에 조직 메타데이터(사업자번호·주소·대표자·전화번호·조직명)가 포함되지 않은 것도 함께 확인했다(§15).
 
 ---
 
@@ -340,4 +350,4 @@ DB write 는 어느 경로에서도 발생하지 않는다(SELECT 전용).
 | 10. 신규 권한체계 0 | 충족 |
 | 11. DB migration 0 | 충족 |
 | 12. DB write 0 | 충족 (테스트로 고정) |
-| 13. tests / type-check / build PASS | 충족 (단 §9 의 baseline·OOM 단서 포함) |
+| 13. tests / type-check / build PASS | 충족 (단 §9 의 baseline TS2307·무관 flake 단서 포함) |
