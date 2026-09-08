@@ -31,7 +31,7 @@ export class NeturePartnerDashboardItem {
   @Column({ type: 'uuid', name: 'product_id' })
   productId!: string;
 
-  @Column({ type: 'varchar', length: 50, name: 'service_id', default: 'glycopharm' })
+  @Column({ type: 'varchar', length: 50, name: 'service_id', default: 'k-cosmetics' })
   serviceId!: string;
 
   @Column({ type: 'varchar', length: 20, default: 'active' })

@@ -59,10 +59,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '상품 관리', path: '/operator/all-registered-products' },
     // WO-O4O-OPERATOR-PRODUCT-CANDIDATE-REVIEW-UI-V1 (Phase 5): 모바일·공급자·import 후보 검토
     { label: '상품 후보 검토', path: '/operator/product-candidates' },
-    // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
-    //   판매자 모집 상품 Overview — backend `/neture/operator/recruiting-products/*` 실기능인데
-    //   메뉴 진입점이 없어 URL 직접 입력으로만 도달 가능했다 (기능 은폐).
-    { label: '판매자 모집 상품', path: '/operator/recruiting-products' },
     // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: 큐레이션 메뉴 비노출 (운영자 통제 최소화)
     { label: '카테고리 관리', path: '/admin/categories', adminOnly: true },
     { label: '브랜드 관리', path: '/admin/brands', adminOnly: true },

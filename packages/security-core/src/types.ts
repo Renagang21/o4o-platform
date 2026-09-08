@@ -8,7 +8,6 @@
 export type ServiceKey =
   | 'kpa'
   | 'neture'
-  | 'glycopharm'
   | 'cosmetics'
   | 'platform'
   // WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1: Pharmacy-Hub (파머시 허브).
@@ -35,7 +34,7 @@ export type PrefixedRole = `${ServiceKey}:${string}`;
  * - Which other service prefixes to block
  */
 export interface ServiceScopeGuardConfig {
-  /** Service identifier (e.g., 'kpa', 'neture', 'glycopharm') */
+  /** Service identifier (e.g., 'kpa', 'neture', 'cosmetics') */
   serviceKey: ServiceKey;
 
   /**
@@ -60,7 +59,7 @@ export interface ServiceScopeGuardConfig {
 
   /**
    * Other service prefixes to explicitly block.
-   * e.g., ['neture', 'glycopharm', 'cosmetics'] for KPA service
+   * e.g., ['neture', 'cosmetics'] for KPA service
    */
   blockedServicePrefixes: string[];
 

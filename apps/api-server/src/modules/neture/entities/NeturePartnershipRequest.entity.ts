@@ -25,7 +25,7 @@ export class NeturePartnershipRequest {
   sellerName: string;
 
   @Column({ name: 'seller_service_type', nullable: true })
-  sellerServiceType: string; // 'glycopharm', 'k-cosmetics', etc.
+  sellerServiceType: string; // 'k-cosmetics', etc.
 
   @Column({ name: 'seller_store_url', type: 'text', nullable: true })
   sellerStoreUrl: string;

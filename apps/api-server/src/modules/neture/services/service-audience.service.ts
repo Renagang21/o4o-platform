@@ -14,7 +14,7 @@ import logger from '../../../utils/logger.js';
 
 // row 부재 시 fallback — 레거시 하드코딩(offer.service.ts PHARMACY_ALLOWED_SERVICE_KEYS)과 동일.
 // 본 정책 테이블이 이를 대체하며, seed 미적용/신규 서비스에 대한 안전 기본값으로만 사용한다.
-const DEFAULT_PHARMACY_SERVICE_KEYS: readonly string[] = ['glycopharm', 'kpa-society'];
+const DEFAULT_PHARMACY_SERVICE_KEYS: readonly string[] = ['kpa-society'];
 
 export interface ServiceAudiencePolicyDto {
   serviceKey: string;

@@ -2,7 +2,7 @@
  * 공통 View adoption 고정 테스트 (정적 검사)
  *
  * WO-O4O-COMMUNITY-OPERATOR-CONSOLE-VIEW-CONVERGENCE-V1 §12
- *   B21 운영자 커뮤니티 콘솔(KPA/GlycoPharm/Neture) 과 C7 운영자 콘텐츠 허브(KPA/GlycoPharm)
+ *   B21 운영자 커뮤니티 콘솔(KPA/Neture) 과 C7 운영자 콘텐츠 허브(KPA)
  *   wrapper 가 공통 View 를 소비하는 상태를 고정한다. 자체 구현으로 되돌아가면 실패한다.
  */
 
@@ -13,13 +13,11 @@ const read = (p: string) => readFileSync(p, 'utf-8');
 
 const B21_WRAPPERS = [
   'services/web-kpa-society/src/pages/operator/CommunityManagementPage.tsx',
-  'services/web-glycopharm/src/pages/operator/CommunityManagementPage.tsx',
   'services/web-neture/src/pages/admin/CommunityManagementPage.tsx',
 ];
 
 const C7_WRAPPERS = [
   'services/web-kpa-society/src/pages/operator/OperatorContentHubPage.tsx',
-  'services/web-glycopharm/src/pages/operator/OperatorContentHubPage.tsx',
 ];
 
 const SHARED_VIEWS = [

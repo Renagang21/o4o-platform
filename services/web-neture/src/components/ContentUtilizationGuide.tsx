@@ -28,13 +28,6 @@ interface ServiceUsageInfo {
 // 지원 서비스 목록 (정적 데이터)
 const SUPPORTED_SERVICES: ServiceUsageInfo[] = [
   {
-    id: 'glycopharm',
-    name: 'GlycoPharm',
-    icon: '🏥',
-    description: '약국 공급 플랫폼',
-    usageAreas: ['상품 상세 페이지', '약국 매장 콘텐츠'],
-  },
-  {
     id: 'k-cosmetics',
     name: 'K-Cosmetics',
     icon: '💄',

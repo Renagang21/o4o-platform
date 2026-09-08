@@ -1,6 +1,6 @@
 name: E2E — Auth Runtime Regression
 
-# 4개 배포 서비스(Neture / GlycoPharm / KPA-Society / K-Cosmetics) auth runtime 검증
+# 3개 배포 서비스(Neture / KPA-Society / K-Cosmetics) auth runtime 검증
 # 실제 운영 URL을 대상으로 하므로 과도한 자동 실행 방지:
 #   - workflow_dispatch: 주 실행 방법 (배포 후 수동 검증)
 #   - push to main (e2e/auth-runtime/** 변경 시): E2E 코드 자체 변경에 한해 자동 실행
@@ -27,7 +27,6 @@ on:
       # 서비스별 AuthContext (login/token 흐름 직접 제어)
       - 'services/web-kpa-society/src/contexts/AuthContext.tsx'
       - 'services/web-neture/src/contexts/AuthContext.tsx'
-      - 'services/web-glycopharm/src/contexts/AuthContext.tsx'
       - 'services/web-k-cosmetics/src/contexts/AuthContext.tsx'
       # Auth guard 컴포넌트 (RoleGuard, MembershipGate, AuthGate 등)
       - 'services/web-*/src/components/auth/**'
@@ -103,10 +102,9 @@ jobs:
             echo "  kpa-society  → E2E_KPA_ADMIN_EMAIL    / E2E_KPA_ADMIN_PASSWORD"
             echo "  k-cosmetics  → E2E_KCOS_ADMIN_EMAIL   / E2E_KCOS_ADMIN_PASSWORD"
             echo "  neture       → E2E_NETURE_ADMIN_EMAIL / E2E_NETURE_ADMIN_PASSWORD"
-            echo "  glycopharm   → E2E_GLYCO_ADMIN_EMAIL  / E2E_GLYCO_ADMIN_PASSWORD"
             exit 1
           fi
-          echo "✅ 4개 서비스 credential 모두 설정됨"
+          echo "✅ 3개 서비스 credential 모두 설정됨"
 
       - name: Run Auth Runtime E2E
         env:

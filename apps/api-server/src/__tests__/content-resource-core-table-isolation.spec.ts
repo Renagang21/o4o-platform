@@ -17,7 +17,6 @@ import {
   sanitizeContentTags,
   type ContentResourceConfig,
 } from '../routes/common/content-resource/content-resource-core.js';
-import { GLYCOPHARM_CONTENT_CONFIG } from '../routes/glycopharm/controllers/resources.controller.js';
 import { COSMETICS_CONTENT_CONFIG } from '../routes/cosmetics/controllers/resources.controller.js';
 import { createKpaContentResourceConfig, resolveKpaListVisibility } from '../routes/kpa/controllers/kpa-content-resource.config.js';
 
@@ -70,12 +69,11 @@ const KPA_CONFIG = createKpaContentResourceConfig({
 });
 
 const SERVICE_CASES: Array<{ name: string; config: ContentResourceConfig; table: string }> = [
-  { name: 'GlycoPharm', config: GLYCOPHARM_CONTENT_CONFIG, table: 'glycopharm_contents' },
   { name: 'K-Cosmetics', config: COSMETICS_CONTENT_CONFIG, table: 'cosmetics_contents' },
   { name: 'KPA-Society', config: KPA_CONFIG, table: 'kpa_contents' },
 ];
 
-const OTHER_TABLES = ['glycopharm_contents', 'cosmetics_contents', 'kpa_contents'];
+const OTHER_TABLES = ['cosmetics_contents', 'kpa_contents'];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. tableName 안전 계약
@@ -90,19 +88,19 @@ describe('tableName 안전 계약 (WO §4)', () => {
   it('Core 생성 시 즉시 검증한다 — 첫 요청까지 미루지 않는다', () => {
     const ds = createSpyDataSource();
     expect(() =>
-      createContentResourceCore(ds, { ...GLYCOPHARM_CONTENT_CONFIG, tableName: undefined as any }),
+      createContentResourceCore(ds, { ...COSMETICS_CONTENT_CONFIG, tableName: undefined as any }),
     ).toThrow(/tableName 은 필수/);
   });
 
   it('식별자 패턴을 벗어나면 거부한다 (동적 SQL 안전)', () => {
     for (const bad of [
-      'glycopharm_contents; DROP TABLE users',
-      'glycopharm_contents--',
-      'GlycopharmContents',
-      'public.glycopharm_contents',
-      '"glycopharm_contents"',
+      'cosmetics_contents; DROP TABLE users',
+      'cosmetics_contents--',
+      'CosmeticsContents',
+      'public.cosmetics_contents',
+      '"cosmetics_contents"',
       '1_contents',
-      'glycopharm contents',
+      'cosmetics contents',
     ]) {
       expect(() => assertSafeTableName(bad)).toThrow(/안전하지 않은 tableName/);
     }
@@ -144,7 +142,7 @@ describe('cross-service table isolation', () => {
 
   it('요청 입력으로 테이블을 바꿀 수 없다', async () => {
     const ds = createSpyDataSource();
-    const core = createContentResourceCore(ds, GLYCOPHARM_CONTENT_CONFIG);
+    const core = createContentResourceCore(ds, COSMETICS_CONTENT_CONFIG);
 
     // query/body/params 에 테이블명을 심어도 무시돼야 한다
     await core.list(
@@ -156,7 +154,7 @@ describe('cross-service table isolation', () => {
       createRes(),
     );
 
-    expect(touchedTables(ds.queries)).toEqual(['glycopharm_contents']);
+    expect(touchedTables(ds.queries)).toEqual(['cosmetics_contents']);
   });
 });
 
@@ -177,7 +175,7 @@ describe('목록 가시성 (계약 보존)', () => {
 
   it('가시성 절과 status 필터는 독립이다 (my=true & status=draft)', async () => {
     const ds = createSpyDataSource();
-    const core = createContentResourceCore(ds, GLYCOPHARM_CONTENT_CONFIG);
+    const core = createContentResourceCore(ds, COSMETICS_CONTENT_CONFIG);
     await core.list(req({ query: { my: 'true', status: 'draft' }, user: { id: 'u1' } }), createRes());
     const listSql = ds.queries.find((q) => /SELECT c\.id/.test(q)) ?? '';
     expect(listSql).toContain('c.created_by =');
@@ -215,13 +213,13 @@ describe('필터 계약', () => {
     expect(KPA_CONFIG.listFilters.map((f) => f.param).sort()).toEqual(['content_type', 'sub_type']);
   });
 
-  it('GP/KCos 회원 목록은 sub_type/usage_type/source_type 을 읽는다', () => {
-    for (const config of [GLYCOPHARM_CONTENT_CONFIG, COSMETICS_CONTENT_CONFIG]) {
+  it('KCos 회원 목록은 sub_type/usage_type/source_type 을 읽는다', () => {
+    for (const config of [COSMETICS_CONTENT_CONFIG]) {
       expect(config.listFilters.map((f) => f.param).sort()).toEqual(['source_type', 'sub_type', 'usage_type']);
     }
   });
 
-  it('운영자 목록 필터는 3서비스 동일 (source_type/usage_type)', () => {
+  it('운영자 목록 필터는 2서비스 동일 (source_type/usage_type)', () => {
     for (const { config } of SERVICE_CASES) {
       expect(config.operatorListFilters.map((f) => f.param).sort()).toEqual(['source_type', 'usage_type']);
     }
@@ -229,7 +227,7 @@ describe('필터 계약', () => {
 
   it('KPA 목록 select 는 content_type 을 포함한다 (KPA 전용 컬럼)', () => {
     expect(KPA_CONFIG.listColumns).toContain('c.content_type');
-    expect(GLYCOPHARM_CONTENT_CONFIG.listColumns).not.toContain('c.content_type');
+    expect(COSMETICS_CONTENT_CONFIG.listColumns).not.toContain('c.content_type');
   });
 });
 
@@ -253,12 +251,11 @@ describe('공통 유틸', () => {
 
   it('operator 판정은 config 의 role 목록만 본다', () => {
     const ds = createSpyDataSource();
-    const gp = createContentResourceCore(ds, GLYCOPHARM_CONTENT_CONFIG);
-    expect(gp.isOperatorOrAdmin({ roles: ['glycopharm:operator'] })).toBe(true);
-    expect(gp.isOperatorOrAdmin({ roles: ['platform:super_admin'] })).toBe(true);
+    const cos = createContentResourceCore(ds, COSMETICS_CONTENT_CONFIG);
+    expect(cos.isOperatorOrAdmin({ roles: ['cosmetics:operator'] })).toBe(true);
+    expect(cos.isOperatorOrAdmin({ roles: ['platform:super_admin'] })).toBe(true);
     // 타 서비스 운영자 역할로는 통과하지 못한다
-    expect(gp.isOperatorOrAdmin({ roles: ['cosmetics:operator'] })).toBe(false);
-    expect(gp.isOperatorOrAdmin({ roles: ['kpa:operator'] })).toBe(false);
-    expect(gp.isOperatorOrAdmin({})).toBe(false);
+    expect(cos.isOperatorOrAdmin({ roles: ['kpa:operator'] })).toBe(false);
+    expect(cos.isOperatorOrAdmin({})).toBe(false);
   });
 });

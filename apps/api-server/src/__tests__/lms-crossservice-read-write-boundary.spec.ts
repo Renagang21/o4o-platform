@@ -54,7 +54,7 @@ function fakeRes() {
 }
 
 const kpaReq = () => ({ lmsContext: { serviceCode: 'kpa' }, query: {}, params: {} } as any);
-const gpReq = () => ({ query: { serviceKey: 'glycopharm' }, params: {} } as any);
+const gpReq = () => ({ query: { serviceKey: 'k-cosmetics' }, params: {} } as any);
 const openReq = () => ({ query: {}, params: {} } as any);
 
 beforeEach(() => {
@@ -72,12 +72,12 @@ describe('resolveScopeOrRespond', () => {
   });
 
   it('컨텍스트 없으면 명시 serviceKey 를 쓴다', () => {
-    expect(resolveScopeOrRespond(gpReq(), fakeRes())).toEqual({ ok: true, scope: 'glycopharm' });
+    expect(resolveScopeOrRespond(gpReq(), fakeRes())).toEqual({ ok: true, scope: 'k-cosmetics' });
   });
 
   it('중복 전달된 serviceKey(배열)도 scope 가 사라지지 않는다', () => {
-    const req: any = { query: { serviceKey: ['glycopharm', 'glycopharm'] } };
-    expect(resolveScopeOrRespond(req, fakeRes())).toEqual({ ok: true, scope: 'glycopharm' });
+    const req: any = { query: { serviceKey: ['k-cosmetics', 'k-cosmetics'] } };
+    expect(resolveScopeOrRespond(req, fakeRes())).toEqual({ ok: true, scope: 'k-cosmetics' });
   });
 
   it('알 수 없는 serviceKey 는 400 을 보내고 ok:false', () => {
@@ -94,7 +94,7 @@ describe('resolveScopeOrRespond', () => {
 
 describe('guardCourseScope — enrollment write(enroll) 경계', () => {
   it('동일 서비스 course 는 통과한다', async () => {
-    dbQuery.mockResolvedValue([{ service_key: 'glycopharm' }]);
+    dbQuery.mockResolvedValue([{ service_key: 'k-cosmetics' }]);
     const res = fakeRes();
     await expect(guardCourseScope(gpReq(), res, 'course-1')).resolves.toBe(true);
     expect(res.state.statusCode).toBe(0);
@@ -127,7 +127,7 @@ describe('guardCourseScope — enrollment write(enroll) 경계', () => {
   });
 
   it('raw SQL 은 parameter binding 만 사용한다 (Guard Rule 2)', async () => {
-    dbQuery.mockResolvedValue([{ service_key: 'glycopharm' }]);
+    dbQuery.mockResolvedValue([{ service_key: 'k-cosmetics' }]);
     await guardCourseScope(gpReq(), fakeRes(), "x' OR 1=1 --");
     const [sql, params] = dbQuery.mock.calls[0];
     expect(sql).toContain('$1');
@@ -153,7 +153,7 @@ describe('guardLessonScope / guardQuizScope / guardAssignmentScope — course �
   });
 
   it('assignment 는 lesson → course 로 판정한다', async () => {
-    dbQuery.mockResolvedValue([{ service_key: 'glycopharm' }]);
+    dbQuery.mockResolvedValue([{ service_key: 'k-cosmetics' }]);
     const res = fakeRes();
     await expect(guardAssignmentScope(kpaReq(), res, 'a-1')).resolves.toBe(false);
     expect(res.state.body).toMatchObject({ error: 'Assignment not found' });
@@ -172,7 +172,7 @@ describe('guardLoadedCourseScope — enrollment / certificate 단건', () => {
   });
 
   it('동일 서비스면 통과한다', () => {
-    expect(guardLoadedCourseScope(gpReq(), fakeRes(), 'glycopharm', 'Certificate not found')).toBe(true);
+    expect(guardLoadedCourseScope(gpReq(), fakeRes(), 'k-cosmetics', 'Certificate not found')).toBe(true);
   });
 
   it('무경계 요청은 통과한다', () => {
@@ -198,9 +198,9 @@ describe('applyCourseScopeToQuery — 목록(enrollment / certificate) SQL 필�
 
   it('타 서비스 scope 는 정확 일치만 허용한다', () => {
     const q = fakeQuery();
-    applyCourseScopeToQuery(q, 'course', 'glycopharm');
+    applyCourseScopeToQuery(q, 'course', 'k-cosmetics');
     expect(q.calls[0][0]).toBe('course.serviceKey = :lmsScopeKey');
-    expect(q.calls[0][1]).toEqual({ lmsScopeKey: 'glycopharm' });
+    expect(q.calls[0][1]).toEqual({ lmsScopeKey: 'k-cosmetics' });
   });
 
   it('무경계 요청은 조건을 걸지 않는다', () => {
@@ -288,21 +288,9 @@ describe('정적 회귀 — KPA remount 계약', () => {
 });
 
 describe('정적 회귀 — 프런트 serviceKey 주입 (generic LMS 소비 서비스)', () => {
-  it('GlycoPharm 은 /lms/* 요청에 canonical serviceKey 를 붙인다', () => {
-    const src = read('services/web-glycopharm/src/lib/apiClient.ts');
-    expect(src).toContain("const LMS_SERVICE_KEY = 'glycopharm'");
-    expect(src).toContain("url.startsWith('/lms/')");
-  });
-
   it('K-Cosmetics 는 /lms/* 요청에 canonical serviceKey 를 붙인다', () => {
     const src = read('services/web-k-cosmetics/src/lib/apiClient.ts');
     expect(src).toContain("const LMS_SERVICE_KEY = 'k-cosmetics'");
     expect(src).toContain("url.startsWith('/lms/')");
-  });
-
-  it('GlycoPharm 수료증 다운로드는 canonical /pdf 경로를 쓴다', () => {
-    const src = read('services/web-glycopharm/src/api/lms.ts');
-    expect(src).toContain('`/lms/certificates/${certificateId}/pdf`');
-    expect(src).not.toContain('`/lms/certificates/${certificateId}/download`');
   });
 });

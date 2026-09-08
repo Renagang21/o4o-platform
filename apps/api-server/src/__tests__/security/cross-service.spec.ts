@@ -8,21 +8,16 @@
  *
  * Matrix:
  *   kpa:admin    → neture guard = 403
- *   kpa:admin    → glycopharm guard = 403
  *   neture:admin → kpa guard = 403
- *   neture:admin → glycopharm guard = 403
- *   glycopharm:admin → kpa guard = 403
- *   glycopharm:admin → neture guard = 403
  *   cosmetics:admin → all 3 guards = 403
  *   nonexistent-service:admin → all 3 guards = 403
  */
 
-import { createServiceScopeGuard, KPA_SCOPE_CONFIG, NETURE_SCOPE_CONFIG, GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
+import { createServiceScopeGuard, KPA_SCOPE_CONFIG, NETURE_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMockUser, executeGuard } from './test-utils';
 
 const requireKpaScope = createServiceScopeGuard(KPA_SCOPE_CONFIG);
 const requireNetureScope = createServiceScopeGuard(NETURE_SCOPE_CONFIG);
-const requireGlycopharmScope = createServiceScopeGuard(GLYCOPHARM_SCOPE_CONFIG);
 
 // ─────────────────────────────────────────────────────
 // Cross-Service Denial Matrix
@@ -35,8 +30,6 @@ describe('Cross-Service Access Blocking', () => {
     const blockedRoles = [
       'neture:admin',
       'neture:operator',
-      'glycopharm:admin',
-      'glycopharm:operator',
       'cosmetics:admin',
       'nonexistent-service:admin',
       // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
@@ -61,8 +54,6 @@ describe('Cross-Service Access Blocking', () => {
       'kpa:admin',
       'kpa:operator',
       'kpa:store_owner',
-      'glycopharm:admin',
-      'glycopharm:operator',
       'cosmetics:admin',
       'nonexistent-service:admin',
     ];
@@ -75,25 +66,6 @@ describe('Cross-Service Access Blocking', () => {
     });
   });
 
-  describe('GlycoPharm guard blocks other services', () => {
-    const guard = requireGlycopharmScope('glycopharm:admin');
-
-    const blockedRoles = [
-      'kpa:admin',
-      'kpa:operator',
-      'neture:admin',
-      'neture:operator',
-      'cosmetics:admin',
-      'nonexistent-service:admin',
-    ];
-
-    it.each(blockedRoles)('%s → GlycoPharm guard = 403', async (role) => {
-      const user = createMockUser({ roles: [role] });
-      const result = await executeGuard(guard, user);
-      expect(result.allowed).toBe(false);
-      expect(result.statusCode).toBe(403);
-    });
-  });
 
   // ─────────────────────────────────────────────────────
   // Verify error message contains service context
@@ -114,12 +86,6 @@ describe('Cross-Service Access Blocking', () => {
       expect(result.body.error.message).toContain('neture');
     });
 
-    it('GlycoPharm guard error mentions glycopharm:* requirement', async () => {
-      const guard = requireGlycopharmScope('glycopharm:admin');
-      const user = createMockUser({ roles: ['kpa:admin'] });
-      const result = await executeGuard(guard, user);
-      expect(result.body.error.message).toContain('glycopharm');
-    });
   });
 
   // ─────────────────────────────────────────────────────
@@ -134,18 +100,5 @@ describe('Cross-Service Access Blocking', () => {
       expect(result.allowed).toBe(false);
     });
 
-    it('user with [kpa:admin, glycopharm:admin] → Neture guard denied', async () => {
-      const guard = requireNetureScope('neture:admin');
-      const user = createMockUser({ roles: ['kpa:admin', 'glycopharm:admin'] });
-      const result = await executeGuard(guard, user);
-      expect(result.allowed).toBe(false);
-    });
-
-    it('user with [kpa:admin, neture:admin] → GlycoPharm guard denied', async () => {
-      const guard = requireGlycopharmScope('glycopharm:admin');
-      const user = createMockUser({ roles: ['kpa:admin', 'neture:admin'] });
-      const result = await executeGuard(guard, user);
-      expect(result.allowed).toBe(false);
-    });
   });
 });

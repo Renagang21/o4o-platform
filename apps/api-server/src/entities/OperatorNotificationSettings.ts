@@ -31,7 +31,7 @@ export class OperatorNotificationSettings {
 
   /**
    * 서비스 코드 (서비스별 고유 설정)
-   * 예: 'neture', 'glycopharm', 'k-cosmetics', 'kpa-society'
+   * 예: 'neture', 'k-cosmetics', 'kpa-society'
    */
   @Column({ type: 'varchar', length: 50, name: 'service_code' })
   serviceCode!: string;

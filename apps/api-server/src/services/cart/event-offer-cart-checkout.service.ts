@@ -37,7 +37,6 @@ import { SERVICE_KEYS } from '../../constants/service-keys.js';
  */
 const CART_TO_EVENT_OFFER_SERVICE_KEY: Record<string, string> = {
   [SERVICE_KEYS.KPA_SOCIETY]: SERVICE_KEYS.KPA_GROUPBUY, // 'kpa-society' → 'kpa-groupbuy'
-  [SERVICE_KEYS.GLYCOPHARM]: SERVICE_KEYS.GLYCOPHARM_EVENT_OFFER, // 'glycopharm' → 'glycopharm-event-offer'
   [SERVICE_KEYS.K_COSMETICS]: SERVICE_KEYS.K_COSMETICS_EVENT_OFFER, // 'k-cosmetics' → 'k-cosmetics-event-offer'
 };
 

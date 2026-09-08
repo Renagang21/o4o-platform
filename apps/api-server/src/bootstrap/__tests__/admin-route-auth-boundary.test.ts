@@ -178,9 +178,10 @@ describe('가드 배선 회귀 (source scan)', () => {
       const roles = [...(s.match(/const ADMIN_ROLES = \[([^\]]+)\]/)?.[1] ?? '').matchAll(/'([^']+)'/g)].map(
         (m) => m[1],
       );
-      // 계약: platform 전역 + 4개 서비스의 admin/operator
+      // 계약: platform 전역 + 3개 서비스의 admin/operator
+      //   WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: glycopharm:admin/operator 제거로 8 → 6.
       expect(roles).toContain('platform:super_admin');
-      expect(roles.filter((r) => /:(admin|operator)$/.test(r) && !r.startsWith('platform:')).length).toBe(8);
+      expect(roles.filter((r) => /:(admin|operator)$/.test(r) && !r.startsWith('platform:')).length).toBe(6);
     },
   );
 });

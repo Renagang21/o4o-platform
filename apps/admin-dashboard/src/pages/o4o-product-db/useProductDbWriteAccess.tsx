@@ -3,7 +3,7 @@
  *
  * 공통 Product DB 화면의 write action 노출 판정.
  *
- * 서비스 운영자(kpa-society · k-cosmetics · glycopharm 등)는 이 화면을 계속
+ * 서비스 운영자(kpa-society · k-cosmetics 등)는 이 화면을 계속
  * **조회·검색·상세 확인**할 수 있다. 막는 것은 접근이 아니라 수정이다.
  * 판정 집합은 백엔드 `product-db-write-authority.ts` 의 `PRODUCT_DB_WRITE_ROLES`
  * 와 동일하며, 프런트는 표시만 담당한다 — 실제 경계는 백엔드 guard 다.

@@ -136,7 +136,6 @@ describe('§6 공개 조회의 service 귀속 검증', () => {
   it('서비스별 mount 는 slug 축 serviceKey 를 주입한다', () => {
     const mounts: Array<[string, string]> = [
       ['routes/cosmetics/cosmetics.routes.ts', 'cosmetics'],
-      ['routes/glycopharm/glycopharm.routes.ts', 'glycopharm'],
       ['routes/kpa/kpa.routes.ts', 'kpa'],
     ];
     for (const [rel, key] of mounts) {

@@ -14,7 +14,6 @@
 import type { RequestHandler } from 'express';
 import {
   NETURE_SCOPE_CONFIG,
-  GLYCOPHARM_SCOPE_CONFIG,
   KPA_SCOPE_CONFIG,
   COSMETICS_SCOPE_CONFIG,
 } from '@o4o/security-core';
@@ -29,7 +28,6 @@ import { createMembershipScopeGuard } from '../../common/middleware/membership-g
 /** 본 기능이 관리하는 canonical serviceKey (service-catalog 기준). */
 export const SUPPORTED_LEGAL_SERVICE_KEYS = [
   'neture',
-  'glycopharm',
   'kpa-society',
   'k-cosmetics',
   // WO-O4O-PHARMACY-HUB-LEGAL-SERVICE-SCOPE-AND-FOOTER-404-FIX-V1:
@@ -67,12 +65,11 @@ export function isSupportedPolicyDocumentType(t: string): boolean {
 
 /**
  * canonical serviceKey → { membership scope guard factory, role prefix }.
- * role prefix 는 config.serviceKey (kpa / cosmetics / neture / glycopharm) 이며
+ * role prefix 는 config.serviceKey (kpa / cosmetics / neture) 이며
  * 실제 role 은 `${prefix}:admin` · `${prefix}:operator` 형태다.
  */
 const CONFIG_BY_SERVICE_KEY: Record<LegalServiceKey, ServiceScopeGuardConfig> = {
   neture: NETURE_SCOPE_CONFIG,
-  glycopharm: GLYCOPHARM_SCOPE_CONFIG,
   'kpa-society': KPA_SCOPE_CONFIG,
   'k-cosmetics': COSMETICS_SCOPE_CONFIG,
   // rolePrefix 가 'pharmacy-hub' 로 self-map 인 유일한 서비스다 (kpa→kpa-society 같은 축 분리 없음).

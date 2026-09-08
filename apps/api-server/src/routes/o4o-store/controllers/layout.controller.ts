@@ -14,7 +14,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
-import type { StoreBlockType, StoreBlock, TemplateProfile } from '../../glycopharm/entities/glycopharm-pharmacy.entity.js';
+import type { StoreBlockType, StoreBlock, TemplateProfile } from '../../../modules/store/types/store-template.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
@@ -45,7 +45,7 @@ const BLOCK_CONFIG_VALIDATORS: Partial<Record<StoreBlockType, (config: Record<st
     if (c.mode !== undefined && c.mode !== 'single' && c.mode !== 'multi') return false;
     // services validation (required for multi mode)
     if (c.mode === 'multi') {
-      const ALLOWED = ['glycopharm', 'kpa', 'cosmetics'];
+      const ALLOWED = ['kpa', 'cosmetics'];
       if (!Array.isArray(c.services) || c.services.length === 0) return false;
       if (!c.services.every((s: any) => typeof s === 'string' && ALLOWED.includes(s))) return false;
     }

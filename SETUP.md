@@ -279,7 +279,7 @@ https://github.com/GoogleCloudPlatform/cloud-sql-proxy/releases 에서 **v2** Wi
 |---|---|
 | API Server | `o4o-core-api` |
 | Admin Dashboard | `o4o-admin-dashboard` |
-| Neture / GlycoPharm / K-Cosmetics / KPA-Society | `*-web` |
+| Neture / K-Cosmetics / KPA-Society | `*-web` |
 
 - Cloud Run: https://console.cloud.google.com/run?project=netureyoutube
 - Cloud SQL: https://console.cloud.google.com/sql?project=netureyoutube

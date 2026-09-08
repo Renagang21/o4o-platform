@@ -43,8 +43,6 @@ const STORE_SERVICE_KEY_MAP: Record<string, string> = {
   [SERVICE_KEYS.KPA_GROUPBUY]: SERVICE_KEYS.KPA_SOCIETY,
   // WO-O4O-EVENT-OFFER-KCOS-ADOPTION-V1: K-Cosmetics 적용
   [SERVICE_KEYS.K_COSMETICS_EVENT_OFFER]: SERVICE_KEYS.K_COSMETICS,
-  // WO-O4O-GLYCOPHARM-EVENT-OFFERS-BACKEND-CANONICAL-ALIGNMENT-V1
-  [SERVICE_KEYS.GLYCOPHARM_EVENT_OFFER]: SERVICE_KEYS.GLYCOPHARM,
   // [SERVICE_KEYS.EVENT_OFFER_NETURE]: ?,  // Neture는 적용 제외 (지원 허브)
 };
 
@@ -1433,7 +1431,7 @@ export class EventOfferService {
   //   offer_not_found    — SPO 없음
   //   offer_not_owned    — supplier 소유권 없음
   //   org_unavailable    — 해당 service에 매핑 가능한 organization 없음
-  //   unsupported        — TARGET_TO_EVENT_OFFER_KEY 미등록 (예: glycopharm 미지원)
+  //   unsupported        — TARGET_TO_EVENT_OFFER_KEY 미등록
   //   internal_error     — 기타
 
   async createMultiServiceProposal(input: {

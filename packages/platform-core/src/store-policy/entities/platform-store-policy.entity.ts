@@ -28,7 +28,6 @@ import {
 //   store-policy.routes.ts 가 slugRecord.serviceKey 를 그대로 getActivePolicy 에 넘긴다.
 //   한쪽만 넓히면 그 지점이 타입 오류가 난다. DB 컬럼은 varchar(50) 이라 migration 불필요.
 export type StorePolicyServiceKey =
-  | 'glycopharm'
   | 'cosmetics'
   | 'kpa'
   | 'neture'

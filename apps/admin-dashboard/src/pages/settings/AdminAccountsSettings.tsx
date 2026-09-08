@@ -375,7 +375,7 @@ export default function AdminAccountsSettings() {
 
       {/* 두 화면의 역할 경계를 화면에서 분명히 한다 — 어디서 무엇을 만드는지 헷갈리지 않게. */}
       <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-        서비스 운영자(KPA · Neture · GlycoPharm · K-Cosmetics · Pharmacy-Hub) 계정 등록과 서비스별 로그인
+        서비스 운영자(KPA · Neture · K-Cosmetics · Pharmacy-Hub) 계정 등록과 서비스별 로그인
         비밀번호는 이 화면이 아니라 <b>서비스 운영자 관리</b> 화면에서 처리합니다.
       </div>
 

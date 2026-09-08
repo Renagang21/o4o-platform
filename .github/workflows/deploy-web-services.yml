@@ -17,7 +17,6 @@ on:
       - 'services/web-neture/**'
       - 'services/web-k-cosmetics/**'
       - 'services/web-kpa-society/**'
-      - 'services/web-glycopharm/**'
       - 'services/web-pharmacy-hub/**'
       - 'services/web-kpa-branch/**'
       # WO-O4O-SIGNAGE-PLAYER-WEB-DEPLOYMENT-ADOPTION-AND-PRODUCTION-SMOKE-V1
@@ -27,7 +26,7 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, glycopharm, pharmacy-hub, kpa-branch, signage-player)'
+        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, pharmacy-hub, kpa-branch, signage-player)'
         required: false
         default: 'all'
 
@@ -37,14 +36,12 @@ env:
   # Default API URL (neture uses this)
   VITE_API_BASE_URL: https://api.neture.co.kr
   # Service-specific API URLs (same-origin for cookie auth)
-  VITE_API_URL_GLYCOPHARM: https://api.neture.co.kr
   VITE_API_URL_KPA_SOCIETY: https://api.neture.co.kr
   VITE_API_URL_K_COSMETICS: https://api.neture.co.kr
   VITE_KPA_URL: https://kpa-society-web-3e3aws7zqa-du.a.run.app
   # WO-O4O-DOMAIN-SSOT-CANONICALIZATION-V1: per-service canonical URL injected as build-arg.
   # Values mirror apps/api-server/src/config/service-catalog.ts O4O_SERVICES[].domain.
   VITE_SERVICE_URL_NETURE: https://neture.co.kr
-  VITE_SERVICE_URL_GLYCOPHARM: https://glycopharm.co.kr
   VITE_SERVICE_URL_KPA_SOCIETY: https://kpa-society.co.kr
   VITE_SERVICE_URL_K_COSMETICS: https://k-cosmetics.site
   # WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1
@@ -66,7 +63,6 @@ jobs:
       neture: ${{ steps.changes.outputs.neture }}
       k-cosmetics: ${{ steps.changes.outputs.k-cosmetics }}
       kpa-society: ${{ steps.changes.outputs.kpa-society }}
-      glycopharm: ${{ steps.changes.outputs.glycopharm }}
       pharmacy-hub: ${{ steps.changes.outputs.pharmacy-hub }}
       kpa-branch: ${{ steps.changes.outputs.kpa-branch }}
       signage-player: ${{ steps.changes.outputs.signage-player }}
@@ -88,7 +84,6 @@ jobs:
               echo "neture=true" >> $GITHUB_OUTPUT
               echo "k-cosmetics=true" >> $GITHUB_OUTPUT
               echo "kpa-society=true" >> $GITHUB_OUTPUT
-              echo "glycopharm=true" >> $GITHUB_OUTPUT
               echo "pharmacy-hub=true" >> $GITHUB_OUTPUT
               echo "kpa-branch=true" >> $GITHUB_OUTPUT
               echo "signage-player=true" >> $GITHUB_OUTPUT
@@ -96,7 +91,6 @@ jobs:
               echo "neture=$( [ "$SERVICE" = 'neture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "k-cosmetics=$( [ "$SERVICE" = 'k-cosmetics' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "kpa-society=$( [ "$SERVICE" = 'kpa-society' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
-              echo "glycopharm=$( [ "$SERVICE" = 'glycopharm' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "pharmacy-hub=$( [ "$SERVICE" = 'pharmacy-hub' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "kpa-branch=$( [ "$SERVICE" = 'kpa-branch' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "signage-player=$( [ "$SERVICE" = 'signage-player' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
@@ -139,7 +133,6 @@ jobs:
             echo "neture=true" >> $GITHUB_OUTPUT
             echo "k-cosmetics=true" >> $GITHUB_OUTPUT
             echo "kpa-society=true" >> $GITHUB_OUTPUT
-            echo "glycopharm=true" >> $GITHUB_OUTPUT
             echo "pharmacy-hub=true" >> $GITHUB_OUTPUT
             echo "kpa-branch=true" >> $GITHUB_OUTPUT
             echo "signage-player=true" >> $GITHUB_OUTPUT
@@ -160,7 +153,6 @@ jobs:
           decide "neture" "services/web-neture/"
           decide "k-cosmetics" "services/web-k-cosmetics/"
           decide "kpa-society" "services/web-kpa-society/"
-          decide "glycopharm" "services/web-glycopharm/"
           decide "pharmacy-hub" "services/web-pharmacy-hub/"
           decide "kpa-branch" "services/web-kpa-branch/"
           decide "signage-player" "services/signage-player-web/"
@@ -378,75 +370,6 @@ jobs:
 
           echo "Service URL: ${SERVICE_URL}"
 
-  deploy-glycopharm:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.glycopharm == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.PROJECT_ID }}
-
-      - name: Configure Docker for GCR
-        run: gcloud auth configure-docker gcr.io --quiet
-
-      - name: Build and push Docker image
-        run: |
-          echo "Building glycopharm-web Docker image..."
-          IMAGE_TAG="${{ github.sha }}"
-
-          # Build from repo root with Dockerfile path (for workspace packages)
-          docker build \
-            --platform linux/amd64 \
-            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_GLYCOPHARM }} \
-            --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_GLYCOPHARM }} \
-            -f services/web-glycopharm/Dockerfile \
-            -t gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:${IMAGE_TAG} \
-            -t gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:latest \
-            .
-
-          docker push gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:${IMAGE_TAG}
-          docker push gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:latest
-
-      - name: Deploy to Cloud Run
-        run: |
-          echo "Deploying glycopharm-web to Cloud Run..."
-
-          gcloud run deploy glycopharm-web \
-            --image=gcr.io/${{ env.PROJECT_ID }}/glycopharm-web:${{ github.sha }} \
-            --region=${{ env.REGION }} \
-            --project=${{ env.PROJECT_ID }} \
-            --platform=managed \
-            --allow-unauthenticated \
-            --port=8080 \
-            --memory=256Mi \
-            --cpu=1 \
-            --min-instances=0 \
-            --max-instances=5
-
-          echo "glycopharm-web deployed successfully!"
-
-      - name: Verify deployment
-        run: |
-          SERVICE_URL=$(gcloud run services describe glycopharm-web \
-            --region=${{ env.REGION }} \
-            --project=${{ env.PROJECT_ID }} \
-            --format="value(status.url)")
-
-          echo "Service URL: ${SERVICE_URL}"
-
   # WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1
   #   기존 4개 서비스 job 과 동일 구조. DNS(pharmacyhub.co.kr) 매핑은 이 WO 범위 밖 —
   #   임시 Cloud Run URL 로 가입·승인 E2E 검증까지만 수행한다.
@@ -650,7 +573,7 @@ jobs:
           fi
 
   summary:
-    needs: [detect-changes, deploy-neture, deploy-k-cosmetics, deploy-kpa-society, deploy-glycopharm, deploy-pharmacy-hub, deploy-kpa-branch, deploy-signage-player]
+    needs: [detect-changes, deploy-neture, deploy-k-cosmetics, deploy-kpa-society, deploy-pharmacy-hub, deploy-kpa-branch, deploy-signage-player]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -664,7 +587,6 @@ jobs:
           echo "  - neture-web: ${{ needs.detect-changes.outputs.neture }}"
           echo "  - k-cosmetics-web: ${{ needs.detect-changes.outputs.k-cosmetics }}"
           echo "  - kpa-society-web: ${{ needs.detect-changes.outputs.kpa-society }}"
-          echo "  - glycopharm-web: ${{ needs.detect-changes.outputs.glycopharm }}"
           echo "  - pharmacy-hub-web: ${{ needs.detect-changes.outputs.pharmacy-hub }}"
           echo "  - kpa-branch-web: ${{ needs.detect-changes.outputs.kpa-branch }}"
           echo "  - signage-player-web: ${{ needs.detect-changes.outputs.signage-player }}"

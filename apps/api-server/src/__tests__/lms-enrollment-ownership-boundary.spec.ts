@@ -154,7 +154,7 @@ describe('same-service horizontal authorization — 타인 enrollment 차단', (
 describe('cross-service 차단 회귀', () => {
   for (const m of MUTATIONS) {
     it(`${m.name}: 타 서비스 enrollment 는 소유자여도 404`, async () => {
-      mockEnrollmentService.getEnrollment.mockResolvedValue(enrollmentOf(USER_A, 'glycopharm'));
+      mockEnrollmentService.getEnrollment.mockResolvedValue(enrollmentOf(USER_A, 'k-cosmetics'));
       const res = fakeRes();
       await m.call(
         fakeReq({ userId: USER_A, params: { id: ENROLLMENT_ID }, query: { serviceKey: 'kpa-society' } }),

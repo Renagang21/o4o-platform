@@ -8,10 +8,10 @@
  * 구조(메뉴/기능/컴포넌트) 제어는 이 config의 범위가 아님.
  */
 
-export type ServiceKey = 'kpa-society' | 'glycopharm' | 'k-cosmetics';
+export type ServiceKey = 'kpa-society' | 'k-cosmetics';
 
 /** @o4o/shared-space-ui의 TemplateKey와 구조적으로 호환 */
-export type ServiceTemplateKey = 'kpa' | 'glycopharm' | 'kcosmetics' | 'referenceA';
+export type ServiceTemplateKey = 'kpa' | 'kcosmetics' | 'referenceA';
 
 export interface ServiceConfig {
   key: ServiceKey;

@@ -27,7 +27,7 @@ const CONSOLE = 'packages/operator-core-ui/src/modules/resources/OperatorResourc
 
 describe('공통 console 은 service 분기를 두지 않는다 (§3)', () => {
   const src = stripComments(read(CONSOLE));
-  for (const forbidden of ['pharmacy-hub', 'kpa-society', 'glycopharm', 'k-cosmetics', 'serviceKey ===']) {
+  for (const forbidden of ['pharmacy-hub', 'kpa-society', 'k-cosmetics', 'serviceKey ===']) {
     it(`console 에 "${forbidden}" 분기가 없다`, () => {
       expect(src).not.toContain(forbidden);
     });
@@ -65,7 +65,6 @@ describe('default lifecycle = 기존 3 service 현행 behavior (§5)', () => {
 
   for (const [name, path] of [
     ['KPA-Society', 'services/web-kpa-society/src/pages/operator/OperatorResourcesPage.tsx'],
-    ['GlycoPharm', 'services/web-glycopharm/src/pages/operator/OperatorResourcesPage.tsx'],
     ['K-Cosmetics', 'services/web-k-cosmetics/src/pages/operator/OperatorResourcesPage.tsx'],
   ] as const) {
     it(`${name} wrapper 는 lifecycle 을 지정하지 않는다 (default 유지)`, () => {

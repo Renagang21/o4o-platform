@@ -8,10 +8,10 @@
  * Store Hub 장바구니의 `POST /cart/:serviceKey/checkout-confirm` 은
  * `EventOfferCartCheckoutService` 를 통해 주문을 만들면서
  * `checkout_orders.metadata.serviceKey` 에 **event-offer(OPL) 키**를 기록한다
- * (`kpa-groupbuy` · `glycopharm-event-offer` · `k-cosmetics-event-offer`).
+ * (`kpa-groupbuy` · `k-cosmetics-event-offer`).
  *
  * 반면 각 서비스의 구매자 주문 목록/상세(`GET /{svc}/checkout/orders[...]`)는
- * **retail 축 키**만으로 필터한다(`kpa-society`/`kpa` · `glycopharm` · `cosmetics`).
+ * **retail 축 키**만으로 필터한다(`kpa-society`/`kpa` · `cosmetics`).
  * 그 결과 이벤트 오퍼로 생성된 주문이 매장측 주문 목록에서 조회되지 않고
  * 단건 조회도 404 `ORDER_NOT_FOUND` 가 된다.
  *
@@ -36,12 +36,10 @@ import { TARGET_TO_EVENT_OFFER_KEY, type TargetServiceKey } from './event-offer-
  *
  * 각 checkout 컨트롤러가 기존에 하드코딩하던 값을 그대로 옮긴 것이다(동작 동일).
  *   - KPA  : 'kpa-society' + 레거시 'kpa'
- *   - GP   : 'glycopharm'
  *   - KCos : 'cosmetics'  ※ 플랫폼 키('k-cosmetics')와 다르다 — 주문 metadata 는 'cosmetics' 를 쓴다
  */
 const RETAIL_ORDER_SERVICE_KEYS: Record<TargetServiceKey, readonly string[]> = {
   [SERVICE_KEYS.KPA_SOCIETY]: [SERVICE_KEYS.KPA_SOCIETY, SERVICE_KEYS.KPA],
-  [SERVICE_KEYS.GLYCOPHARM]: [SERVICE_KEYS.GLYCOPHARM],
   [SERVICE_KEYS.K_COSMETICS]: [SERVICE_KEYS.COSMETICS],
 };
 
@@ -51,7 +49,7 @@ const RETAIL_ORDER_SERVICE_KEYS: Record<TargetServiceKey, readonly string[]> = {
  *
  * @example
  *   getBuyerOrderServiceKeys('kpa-society')  // ['kpa-society', 'kpa', 'kpa-groupbuy']
- *   getBuyerOrderServiceKeys('glycopharm')   // ['glycopharm', 'glycopharm-event-offer']
+ *   getBuyerOrderServiceKeys('k-cosmetics') // ['cosmetics', 'k-cosmetics-event-offer']
  *   getBuyerOrderServiceKeys('k-cosmetics')  // ['cosmetics', 'k-cosmetics-event-offer']
  */
 export function getBuyerOrderServiceKeys(platformServiceKey: TargetServiceKey): string[] {

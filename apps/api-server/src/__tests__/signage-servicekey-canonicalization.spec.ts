@@ -2,7 +2,7 @@
  * WO-O4O-KCOS-SIGNAGE-SERVICEKEY-CANONICALIZATION-V1
  *
  * Signage API 의 `:serviceKey` 는 canonical service key
- * ('kpa-society' · 'k-cosmetics' · 'glycopharm' · 'neture') 를 정본으로 한다.
+ * ('kpa-society' · 'k-cosmetics' · 'neture') 를 정본으로 한다.
  * 역할 prefix alias('kpa' · 'cosmetics')는 `@o4o/security-core` canonical SSOT 를
  * 통해 **하나의 내부 key 로 수렴**한다 (둘 다 무조건 허용하는 것이 아니다).
  *
@@ -66,7 +66,6 @@ describe('canonicalizeSignageServiceKey — security-core SSOT 만 사용', () =
   it('canonical key 는 그대로 유지된다 (self-map)', () => {
     expect(canonicalizeSignageServiceKey('k-cosmetics')).toBe('k-cosmetics');
     expect(canonicalizeSignageServiceKey('kpa-society')).toBe('kpa-society');
-    expect(canonicalizeSignageServiceKey('glycopharm')).toBe('glycopharm');
     expect(canonicalizeSignageServiceKey('neture')).toBe('neture');
     expect(canonicalizeSignageServiceKey('pharmacy')).toBe('pharmacy');
   });
@@ -98,8 +97,8 @@ describe('validateServiceKey — canonical 허용 + alias 수렴', () => {
     expect(res.status).not.toHaveBeenCalled();
   });
 
-  it('KPA / GlycoPharm / Neture canonical key 회귀 없음', () => {
-    for (const sk of ['kpa-society', 'glycopharm', 'neture']) {
+  it('KPA / Neture canonical key 회귀 없음', () => {
+    for (const sk of ['kpa-society', 'neture']) {
       const { res, next } = run(sk);
       expect(next).toHaveBeenCalled();
       expect(res.status).not.toHaveBeenCalled();
@@ -153,7 +152,7 @@ describe('canonical key → 역할 스코프 / 귀속 축 변환', () => {
 
   it('role scope: kpa-society 는 kpa: 역할로 판정된다 (회귀 없음)', () => {
     expect(hasSignageOperatorPermission({ id: 'op', roles: ['kpa:operator'] }, 'kpa-society')).toBe(true);
-    expect(hasSignageOperatorPermission({ id: 'op', roles: ['glycopharm:admin'] }, 'glycopharm')).toBe(true);
+    expect(hasSignageOperatorPermission({ id: 'op', roles: ['cosmetics:admin'] }, 'cosmetics')).toBe(true);
   });
 
   it('타 서비스 역할로는 통과하지 못한다', () => {

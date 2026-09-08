@@ -9,7 +9,6 @@
  * Entities used:
  * - User (users table) - user growth
  * - NetureOrder (neture.neture_orders) - order/sales data
- * - GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
  * - NeturePartner (neture.neture_partners) - partner data
  * - CosmeticsProduct - cosmetics metrics
  */
@@ -19,7 +18,6 @@ import { AppDataSource, checkDatabaseHealth } from '../../database/connection.js
 import { User } from '../../modules/auth/entities/User.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { NetureOrder } from '../../routes/neture/entities/neture-order.entity.js';
-// GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 import { NeturePartner } from '../../routes/neture/entities/neture-partner.entity.js';
 import { CosmeticsProduct, CosmeticsBrand, CosmeticsProductStatus } from '../../routes/cosmetics/entities/index.js';
 
@@ -63,12 +61,9 @@ export class AdminDashboardController {
         .andWhere('order.createdAt >= :startDate', { startDate })
         .getRawOne();
 
-      // Phase 4-A: GlycopharmOrder removed - returns 0 until E-commerce Core integration
-      const glycopharmResult = { totalAmount: 0, orderCount: 0 };
-
-      // Combine results
-      const totalRevenue = Number(netureResult?.totalAmount || 0) + Number(glycopharmResult?.totalAmount || 0);
-      const totalOrders = Number(netureResult?.orderCount || 0) + Number(glycopharmResult?.orderCount || 0);
+      // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: glycopharm 집계 제거 (서비스 삭제).
+      const totalRevenue = Number(netureResult?.totalAmount || 0);
+      const totalOrders = Number(netureResult?.orderCount || 0);
       const averageOrderValue = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
 
       res.json({
@@ -82,10 +77,6 @@ export class AdminDashboardController {
             neture: {
               revenue: Number(netureResult?.totalAmount || 0),
               orders: Number(netureResult?.orderCount || 0)
-            },
-            glycopharm: {
-              revenue: Number(glycopharmResult?.totalAmount || 0),
-              orders: Number(glycopharmResult?.orderCount || 0)
             }
           }
         }
@@ -117,9 +108,6 @@ export class AdminDashboardController {
         .groupBy('order.status')
         .getRawMany();
 
-      // Phase 4-A: GlycopharmOrder removed - returns empty array until E-commerce Core integration
-      const glycopharmStatusCounts: any[] = [];
-
       // Map status to display names
       const statusMap: Record<string, { label: string; color: string }> = {
         'created': { label: '생성됨', color: '#6b7280' },
@@ -143,10 +131,6 @@ export class AdminDashboardController {
         aggregatedCounts[status] = (aggregatedCounts[status] || 0) + Number(row.count);
       });
 
-      glycopharmStatusCounts.forEach((row: any) => {
-        const status = row.status;
-        aggregatedCounts[status] = (aggregatedCounts[status] || 0) + Number(row.count);
-      });
 
       // Format response
       const statusData = Object.entries(aggregatedCounts).map(([status, count]) => ({

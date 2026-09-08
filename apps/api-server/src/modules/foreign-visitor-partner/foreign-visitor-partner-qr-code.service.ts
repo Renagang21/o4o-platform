@@ -15,7 +15,6 @@ import {
 /** 서비스별 public web origin (landing 도메인). multilingual landing 과 동일 정책. */
 const PUBLIC_WEB_ORIGIN_BY_SERVICE: Record<string, string> = {
   kpa: 'https://kpa-society.co.kr',
-  glycopharm: 'https://glycopharm.co.kr',
   cosmetics: 'https://cosmetics.neture.co.kr',
   // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#79):
   //   PH 를 allowlist 에 넣으면서 origin 을 등록하지 않으면 PH 매장의 제휴 QR 이

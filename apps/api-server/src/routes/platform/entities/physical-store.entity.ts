@@ -4,7 +4,7 @@
  * WO-O4O-CROSS-SERVICE-STORE-LINKING-V1
  *
  * Represents a physical store location identified by business_number.
- * Links to service-specific stores (cosmetics, glycopharm) via PhysicalStoreLink.
+ * Links to service-specific stores (cosmetics) via PhysicalStoreLink.
  */
 
 import {

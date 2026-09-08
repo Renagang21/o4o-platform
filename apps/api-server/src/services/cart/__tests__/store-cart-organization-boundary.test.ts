@@ -36,7 +36,7 @@ function makeService() {
   return { service: new StoreCartService(dataSource), saved };
 }
 
-const scope = { buyerId: 'buyer-1', serviceKey: 'glycopharm' };
+const scope = { buyerId: 'buyer-1', serviceKey: 'kpa-society' };
 const input = {
   productName: '공급상품 A',
   sourceType: 'b2b' as const,

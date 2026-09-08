@@ -111,18 +111,6 @@ describe('K-Cos enrollment canonical key', () => {
     expect(calls[0].params[0]).toContain('k-cosmetics');
   });
 
-  it('타 서비스(GlycoPharm) Event Offer 는 K-Cos 별칭 집합을 쓰지 않는다', async () => {
-    const { ds, calls } = makeDs([{ organization_id: 'gp-org' }]);
-    await resolveOrganizationForEventOffer({
-      dataSource: ds,
-      userId: 'u1',
-      roleType: 'supplier',
-      serviceKey: 'glycopharm-event-offer',
-    });
-    expect(JSON.stringify(calls[0].params)).not.toContain('k-cosmetics');
-    expect(JSON.stringify(calls[0].params)).toContain('glycopharm');
-  });
-
   // ── READ 경로: dual-key 조직에서 결정적 canonical 선택 ─────────────
   it('dual-key 조직의 serviceKey 해석은 canonical 을 선택한다', async () => {
     const captured: any[] = [];

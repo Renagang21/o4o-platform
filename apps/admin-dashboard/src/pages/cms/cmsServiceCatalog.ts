@@ -20,7 +20,6 @@ export interface CmsServiceOption {
 
 /** canonical ledger key 만 담는다. role prefix('kpa','cosmetics')를 넣지 않는다. */
 export const CMS_SERVICE_OPTIONS: CmsServiceOption[] = [
-  { value: 'glycopharm', label: 'Glycopharm' },
   { value: 'kpa-society', label: 'KPA Society' },
   { value: 'neture', label: 'Neture' },
   { value: 'k-cosmetics', label: 'K-Cosmetics' },

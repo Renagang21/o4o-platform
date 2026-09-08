@@ -38,7 +38,6 @@ function walk(root: string): string[] {
 // api-server 밖에 있었다. dist/ 는 SKIP_DIR 에서 걸러진다.
 const WEB_SERVICES = [
   'web-kpa-society',
-  'web-glycopharm',
   'web-k-cosmetics',
   'web-pharmacy-hub',
   'web-neture',
@@ -111,7 +110,6 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
     it('구매자 주문 조회는 buyerId + serviceKey 집합을 항상 함께 건다', () => {
       const controllers = [
         'routes/kpa/controllers/kpa-checkout.controller.ts',
-        'routes/glycopharm/controllers/checkout.controller.ts',
         'routes/cosmetics/controllers/cosmetics-order.controller.ts',
       ];
       for (const c of controllers) {
@@ -182,7 +180,6 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
     it('서비스별 주문 생성 producer(POST /)는 410 으로 은퇴 상태를 유지한다', () => {
       for (const c of [
         'routes/kpa/controllers/kpa-checkout.controller.ts',
-        'routes/glycopharm/controllers/checkout.controller.ts',
         'routes/cosmetics/controllers/cosmetics-order.controller.ts',
       ]) {
         expect(read(c)).toContain('410');
@@ -225,20 +222,5 @@ describe('WO-O4O-CROSSSERVICE-B2B-SUPPLIER-TO-STORE-ORDER-CANONICAL-CONTRACT-V1'
       expect(live.map(rel)).toEqual([]);
     });
 
-    it('GlycoPharm 에 공급자(seller) 화면 축이 되살아나지 않는다 (결함 D3 회귀 가드)', () => {
-      // GlycoPharm 은 공급자 역할 화면을 제공하지 않는다 — `/supplier`, `/supplier/*` 는
-      // `RoleNotAvailablePage` 로 명시 처리돼 있다(= 확정된 계약). 사이드바에 공급자 메뉴가
-      // 되살아나면 "역할 없음" 페이지로 가는 메뉴가 된다.
-      // 공급자 B2B 주문 화면은 Neture 축(`/supplier/orders*`)이 canonical.
-      const gp = path.join(REPO, 'services', 'web-glycopharm', 'src');
-      const layout = path.join(gp, 'components', 'layouts', 'DashboardLayout.tsx');
-      expect(fs.existsSync(layout)).toBe(true);
-      expect(stripComments(fs.readFileSync(layout, 'utf-8'))).not.toMatch(
-        /GLYCOPHARM_ROLES\.SUPPLIER/,
-      );
-      // 메뉴를 두면 안 되는 근거: 라우트가 RoleNotAvailablePage 로 고정돼 있다.
-      const app = fs.readFileSync(path.join(gp, 'App.tsx'), 'utf-8');
-      expect(app).toMatch(/path="supplier\/\*"[\s\S]{0,120}RoleNotAvailablePage/);
-    });
   });
 });

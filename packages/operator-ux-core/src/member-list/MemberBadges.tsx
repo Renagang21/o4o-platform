@@ -28,7 +28,6 @@ export function StatusBadge({ status }: { status: string }) {
 // ── Role Badge ──
 
 const ROLE_STYLES: Record<string, { label: string; color: string; bg: string }> = {
-  // GlycoPharm
   pharmacy:    { label: '약국',   color: 'text-teal-700',   bg: 'bg-teal-50 border-teal-200' },
   // Neture
   supplier:    { label: '공급자', color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200' },
@@ -40,8 +39,6 @@ const ROLE_STYLES: Record<string, { label: string; color: string; bg: string }> 
   pharmacist:  { label: '약사',   color: 'text-teal-700',   bg: 'bg-teal-50 border-teal-200' },
   student:     { label: '학생',   color: 'text-sky-700',    bg: 'bg-sky-50 border-sky-200' },
   // Admin
-  'glycopharm:admin':     { label: '관리자',   color: 'text-rose-700', bg: 'bg-rose-50 border-rose-200' },
-  'glycopharm:operator':  { label: '운영자',   color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200' },
   'neture:admin':         { label: '관리자',   color: 'text-rose-700', bg: 'bg-rose-50 border-rose-200' },
   'neture:operator':      { label: '운영자',   color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200' },
   'neture:supplier':      { label: '공급자', color: 'text-purple-700', bg: 'bg-purple-50 border-purple-200' },
@@ -52,8 +49,6 @@ const ROLE_STYLES: Record<string, { label: string; color: string; bg: string }> 
   'kpa:admin':            { label: '관리자',   color: 'text-rose-700', bg: 'bg-rose-50 border-rose-200' },
   'kpa:operator':         { label: '운영자',   color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200' },
   'platform:super_admin': { label: '슈퍼관리자', color: 'text-rose-700', bg: 'bg-rose-50 border-rose-200' },
-  'glycopharm:pharmacy':  { label: '약국',   color: 'text-teal-700',   bg: 'bg-teal-50 border-teal-200' },
-  'glycopharm:pharmacist':{ label: '약국',   color: 'text-teal-700',   bg: 'bg-teal-50 border-teal-200' },
 };
 
 export function RoleBadge({ role }: { role: string }) {
@@ -68,7 +63,6 @@ export function RoleBadge({ role }: { role: string }) {
 // ── Service Badge ──
 
 const SERVICE_LABELS: Record<string, string> = {
-  glycopharm: 'GlycoPharm',
   'k-cosmetics': 'K-Cosmetics',
   neture: 'Neture',
   'kpa-society': 'KPA',

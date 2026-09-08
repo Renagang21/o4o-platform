@@ -48,11 +48,6 @@ export type { StoreOwnerServiceKey } from './store-organization.resolver.js';
  * 서비스별 store_owner 권한을 가지는 role 목록.
  *
  * - kpa        : `kpa:store_owner` (약사회 가맹 약국 개설자)
- * - glycopharm : `glycopharm:store_owner` (약국 경영자)
- *                WO-O4O-GLYCOPHARM-ROLE-VALUE-NORMALIZATION:
- *                `glycopharm:pharmacist`(일반 약사/근무약사)는 매장 접근 권한 없음.
- *                pharmacy_owner 승인 시 store_owner + pharmacist 둘 다 부여되므로
- *                경영자 판단은 store_owner role 단독 기준 — glycopharm-member.service.ts 참조.
  * - cosmetics  : `cosmetics:store_owner`
  * - pharmacy-hub : `pharmacy-hub:store_owner` (약국 경영자)
  *                WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1:
@@ -64,7 +59,6 @@ export type { StoreOwnerServiceKey } from './store-organization.resolver.js';
  */
 const STORE_OWNER_ROLES_BY_SERVICE = {
   kpa: ['kpa:store_owner'],
-  glycopharm: ['glycopharm:store_owner'],
   cosmetics: ['cosmetics:store_owner'],
   'pharmacy-hub': ['pharmacy-hub:store_owner'],
 } as const;
@@ -73,7 +67,7 @@ const STORE_OWNER_ROLES_BY_SERVICE = {
  * WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
  *   StoreOwnerServiceKey(role prefix) → service_memberships.service_key 매핑은
  *   @o4o/security-core 의 resolveCanonicalServiceKey() 가 SSOT 다
- *   (kpa→kpa-society, cosmetics→k-cosmetics, glycopharm/pharmacy-hub self-map).
+ *   (kpa→kpa-society, cosmetics→k-cosmetics, pharmacy-hub self-map).
  *   membership-guard.middleware / utils/serviceScope 와 같은 함수를 쓴다 — 로컬 맵 금지.
  */
 /**
@@ -87,7 +81,7 @@ const ALL_STORE_OWNER_ROLES: readonly string[] = Object.values(
 /**
  * Service-aware store_owner 체크.
  *
- * @param serviceKey  지정 시 해당 서비스 role 만 허용 (예: 'glycopharm' → glycopharm:store_owner / glycopharm:pharmacist).
+ * @param serviceKey  지정 시 해당 서비스 role 만 허용 (예: 'kpa' → kpa:store_owner).
  *                    미지정 시 모든 서비스 role 허용 (back-compat).
  */
 export interface StoreOwnerCheckResult {
@@ -112,7 +106,7 @@ export async function isStoreOwner(
   //   할 수 있느냐. 그런데 이 함수는 role_assignments 만 보고 있어서, 이 함수를 통과 지점으로
   //   쓰는 경로 전부가 role-only 였다:
   //     - auth-context.middleware 의 requireStoreAuth / optionalStoreAuth
-  //       (store-hub 공개 GET 4개 — kpa/glycopharm/cosmetics)
+  //       (store-hub 공개 GET — kpa/cosmetics)
   //     - resolveStoreAccess() 를 직접 부르는 store-playlist / store-handled-products /
   //       store-local-product / event-offer / seller 경로
   //   createRequireStoreOwner 만 JWT memberships 로 별도 검사하고 있었다(3-way drift).
@@ -123,7 +117,7 @@ export async function isStoreOwner(
   //   createRequireStoreOwner 와 같은 정책(active membership 최소 1개, fail-closed)을 쓴다.
   //
   //   2026-08-24 프로덕션 실측: 활성 store_owner role 보유자 18명 전원이 같은 서비스의
-  //   active membership 을 보유(kpa 5/5 · cosmetics 4/4 · glycopharm 3/3 · pharmacy-hub 6/6),
+  //   active membership 을 보유(kpa 5/5 · cosmetics 4/4 · pharmacy-hub 6/6),
   //   suspended/withdrawn membership 0건 → 현행 사용자 동작 변화 0.
   const membershipKey = serviceKey ? resolveCanonicalServiceKey(serviceKey) : null;
   const [membershipRecord] = membershipKey
@@ -266,7 +260,7 @@ export function createRequireStoreOwner(
     //   기존에는 role 만 있으면 통과 후 req.organizationId = null 이 되어 하위 핸들러가
     //   organization_id IS NULL 로 조회(0건)하거나 NOT NULL 위반으로 500 을 냈다.
     //   auth-context.middleware 의 requireStoreAuth 는 이미 동일 정책(`!isOwner || !organizationId`)이며
-    //   이쪽만 어긋나 있었다. 프로덕션 실측상 kpa/glycopharm/cosmetics 의 active store_owner 는
+    //   이쪽만 어긋나 있었다. 프로덕션 실측상 kpa/cosmetics 의 active store_owner 는
     //   전원 조직을 보유하므로(각 5/1/2, 미보유 0) 기존 서비스 동작 변화 0.
     if (!isOwner || !organizationId) {
       res.status(403).json({

@@ -128,7 +128,7 @@ export default function SupplierServiceDeliveryPage() {
       <div className="max-w-3xl">
         <h1 className="text-2xl font-bold text-slate-900">서비스 제공 설정</h1>
         <p className="mt-2 text-sm text-slate-600">
-          공급자가 직접 제공 설정을 할 수 있는 서비스가 아닙니다. KPA Society · GlycoPharm ·
+          공급자가 직접 제공 설정을 할 수 있는 서비스가 아닙니다. KPA Society ·
           K-Cosmetics 는 운영자 승인 축이므로 제품 목록의 유통 정책에서 신청합니다.
         </p>
         <Link

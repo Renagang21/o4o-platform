@@ -104,18 +104,6 @@ describe('Service Scope Guards use @o4o/security-core', () => {
     expect(content).toContain('NETURE_SCOPE_CONFIG');
     expect(content).toContain('createMembershipScopeGuard');
   });
-
-  it('GlycoPharm routes use createMembershipScopeGuard with GLYCOPHARM_SCOPE_CONFIG', () => {
-    const filePath = path.resolve(
-      __dirname,
-      '../../routes/glycopharm/glycopharm.routes.ts'
-    );
-    const content = fs.readFileSync(filePath, 'utf8');
-
-    expect(content).toContain('@o4o/security-core');
-    expect(content).toContain('GLYCOPHARM_SCOPE_CONFIG');
-    expect(content).toContain('createMembershipScopeGuard');
-  });
 });
 
 // ─────────────────────────────────────────────────────
@@ -151,21 +139,6 @@ describe('Service Config Freeze Verification', () => {
     const netureBlock = content.slice(netureStart, netureEnd);
 
     expect(netureBlock).toContain('platformBypass: true');
-  });
-
-  it('service-configs.ts GlycoPharm platformBypass = true', () => {
-    const filePath = path.resolve(
-      __dirname,
-      '../../../../../packages/security-core/src/service-configs.ts'
-    );
-    const content = fs.readFileSync(filePath, 'utf8');
-
-    // Extract GlycoPharm config block
-    const glycoStart = content.indexOf('GLYCOPHARM_SCOPE_CONFIG');
-    const glycoEnd = content.indexOf('};', glycoStart);
-    const glycoBlock = content.slice(glycoStart, glycoEnd);
-
-    expect(glycoBlock).toContain('platformBypass: true');
   });
 });
 

@@ -81,7 +81,6 @@ const SERVICE_OPTIONS = [
   { value: '', label: '전체' },
   { value: 'platform', label: 'Platform' },
   { value: 'neture', label: 'Neture' },
-  { value: 'glycopharm', label: 'GlycoPharm' },
   { value: 'kpa-society', label: 'KPA' },
   { value: 'k-cosmetics', label: 'K-Cosmetics' },
   { value: 'pharmacy-hub', label: 'Pharmacy-Hub' },

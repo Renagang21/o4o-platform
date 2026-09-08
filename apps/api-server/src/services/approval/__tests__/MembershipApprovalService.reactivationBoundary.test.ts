@@ -122,7 +122,7 @@ const service = new MembershipApprovalService();
 function seed(userStatus: string) {
   db = {
     memberships: [
-      { id: 'm-glyco', user_id: 'u1', service_key: 'glycopharm', role: 'pharmacy', status: 'suspended' },
+      { id: 'm-ph', user_id: 'u1', service_key: 'pharmacy-hub', role: 'pharmacy', status: 'suspended' },
       { id: 'm-kpa', user_id: 'u1', service_key: 'kpa-society', role: 'member', status: 'suspended' },
     ],
     roles: [{ id: 'ra-1', user_id: 'u1', role: 'member', is_active: false }],
@@ -139,7 +139,7 @@ const reactivateAsOperator = () =>
     userId: 'u1',
     reactivatedBy: 'op-1',
     isPlatformAdmin: false,
-    serviceKeys: ['glycopharm'],
+    serviceKeys: ['pharmacy-hub'],
   });
 
 const reactivateAsPlatformAdmin = () =>
@@ -172,7 +172,7 @@ describe('reactivateMembership — 플랫폼 정지 경계', () => {
 
       await reactivateAsOperator();
 
-      expect(db.memberships.find((m) => m.id === 'm-glyco')!.status).toBe('active');
+      expect(db.memberships.find((m) => m.id === 'm-ph')!.status).toBe('active');
     });
 
     it('다른 서비스 membership 은 건드리지 않는다', async () => {
@@ -229,7 +229,7 @@ describe('reactivateMembership — 플랫폼 정지 경계', () => {
 
       await reactivateAsPlatformAdmin();
 
-      expect(db.memberships.find((m) => m.id === 'm-glyco')!.status).toBe('active');
+      expect(db.memberships.find((m) => m.id === 'm-ph')!.status).toBe('active');
       expect(db.memberships.find((m) => m.id === 'm-kpa')!.status).toBe('active');
     });
   });

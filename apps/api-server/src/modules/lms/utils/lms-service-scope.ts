@@ -24,7 +24,7 @@ import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 
 /** 라우트가 주입하는 LMS 서비스 컨텍스트 (serviceCode = RBAC role prefix) */
 export interface LmsContext {
-  /** RBAC role prefix ('kpa' | 'cosmetics' | 'glycopharm' | 'neture' | 'pharmacy-hub' | 'kpa-branch') */
+  /** RBAC role prefix ('kpa' | 'cosmetics' | 'neture' | 'pharmacy-hub' | 'kpa-branch') */
   serviceCode?: string;
 }
 
@@ -57,7 +57,6 @@ export function lmsContextMiddleware(context: LmsContext): RequestHandler {
 const LMS_SCOPED_SERVICE_KEYS: ReadonlySet<string> = new Set<string>([
   SERVICE_KEYS.KPA_SOCIETY,
   SERVICE_KEYS.K_COSMETICS,
-  SERVICE_KEYS.GLYCOPHARM,
   SERVICE_KEYS.NETURE,
   SERVICE_KEYS.PHARMACY_HUB,
   SERVICE_KEYS.KPA_BRANCH,

@@ -178,10 +178,10 @@ describe('WO-O4O-SIGNAGE-CAMPAIGN-FORCED-CONTENT-TABLET-SURFACE-DELIVERY-FIX-V1'
     it('targetServices 개수만큼 row 를 만들고 service_key 를 각각 저장한다', async () => {
       const captured = await approveCampaign({
         ...basePayload,
-        targetServices: ['kpa-society', 'glycopharm'],
+        targetServices: ['kpa-society', 'k-cosmetics'],
       });
       expect(captured).toHaveLength(2);
-      expect(captured.map((c) => columnMap(c).service_key)).toEqual(['kpa-society', 'glycopharm']);
+      expect(captured.map((c) => columnMap(c).service_key)).toEqual(['kpa-society', 'k-cosmetics']);
       // 서비스가 늘어도 surface 계약은 동일
       for (const c of captured) expect(columnMap(c).target_surface).toBe('both');
     });
@@ -220,8 +220,8 @@ describe('WO-O4O-SIGNAGE-CAMPAIGN-FORCED-CONTENT-TABLET-SURFACE-DELIVERY-FIX-V1'
     });
 
     it('negative — 다른 서비스를 대상으로 한 캠페인은 해당 service_key 로만 저장된다', async () => {
-      const captured = await approveCampaign({ ...basePayload, targetServices: ['glycopharm'] });
-      expect(captured.map((c) => columnMap(c).service_key)).toEqual(['glycopharm']);
+      const captured = await approveCampaign({ ...basePayload, targetServices: ['k-cosmetics'] });
+      expect(captured.map((c) => columnMap(c).service_key)).toEqual(['k-cosmetics']);
       // kpa-society 태블릿(resolveServiceKeys → ['kpa','kpa-society'])에는 매칭되지 않는다
       expect(captured.map((c) => columnMap(c).service_key)).not.toContain('kpa-society');
     });

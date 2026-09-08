@@ -26,7 +26,6 @@
 /** O4O 서비스 키 (service-catalog.ts 기준 5개) */
 export type ContentServiceKey =
   | 'neture'
-  | 'glycopharm'
   | 'kpa-society'
   | 'k-cosmetics';
 

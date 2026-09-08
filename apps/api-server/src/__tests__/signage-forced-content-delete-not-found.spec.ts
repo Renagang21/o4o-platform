@@ -258,9 +258,8 @@ describe('serviceKey canonicalization 회귀', () => {
     ['kpa', 'kpa-society'],
     ['k-cosmetics', 'k-cosmetics'],
     ['cosmetics', 'k-cosmetics'],
-    ['glycopharm', 'glycopharm'],
   ])('%s → canonical %s 로 scope 되고 대상 없음이면 404', async (raw, canonical) => {
-    currentRoles = ['kpa:operator', 'cosmetics:operator', 'glycopharm:operator'];
+    currentRoles = ['kpa:operator', 'cosmetics:operator'];
     query.mockResolvedValue(pgWriteResult([]));
 
     const res = await authed(request(app).delete(`/api/signage/${raw}/hq/forced-content/${MISSING}`));

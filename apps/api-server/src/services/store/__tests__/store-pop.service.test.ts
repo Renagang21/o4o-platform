@@ -3,7 +3,7 @@
  *
  * WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1
  *
- * 이 service 는 KPA · GlycoPharm · K-Cosmetics · Pharmacy-Hub 가 공유한다.
+ * 이 service 는 KPA · K-Cosmetics · Pharmacy-Hub 가 공유한다.
  * pop.controller.ts 를 위임 전환하면서 계약이 바뀌지 않았음을 고정한다.
  *
  * 특히 지키려는 불변식:

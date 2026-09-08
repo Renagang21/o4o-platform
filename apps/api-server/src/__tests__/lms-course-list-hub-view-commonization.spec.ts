@@ -200,7 +200,6 @@ describe('/lms 목록 hub — 3서비스 공통 템플릿 유지', () => {
   const cases: Array<[string, string]> = [
     ['services/web-kpa-society/src/pages/lms/LmsCoursesPage.tsx', 'kpa-society'],
     ['services/web-k-cosmetics/src/pages/lms/EducationPage.tsx', 'k-cosmetics'],
-    ['services/web-glycopharm/src/pages/education/EducationPage.tsx', 'glycopharm'],
   ];
 
   it.each(cases)('%s 는 LmsHubTemplate + serviceKey / 상세경로 계약을 유지한다', (rel, serviceKey) => {

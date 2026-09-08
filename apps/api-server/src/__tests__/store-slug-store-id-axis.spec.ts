@@ -27,7 +27,7 @@ const API_SERVER_SRC = path.resolve(__dirname, '..');
  *
  * WO-O4O-KCOS-GP-MISSING-STORE-SLUG-CANONICALIZATION-V1 §5
  *   승인 경로에서 slug 예약이 아예 빠져 있던 2곳을 보강했다
- *   (cosmetics `linkOwnerToStore`, glycopharm `approveMember`).
+ *   (cosmetics `linkOwnerToStore`).
  *   두 보강 모두 organization id 축을 그대로 따른다.
  *
  * WO-O4O-STORE-SLUG-RESERVESLUG-CENSUS-DRIFT-CLOSURE-V1
@@ -37,10 +37,6 @@ const API_SERVER_SRC = path.resolve(__dirname, '..');
  */
 const EXPECTED: Record<string, string[]> = {
   'routes/cosmetics/services/cosmetics-store.service.ts': ['orgId', 'organizationId'],
-  'routes/glycopharm/services/glycopharm-member.service.ts': ['organizationId'],
-  'routes/glycopharm/controllers/admin.controller.ts': ['createdOrg.id'],
-  'routes/glycopharm/controllers/store-applications.controller.ts': ['createdOrg.id'],
-  'routes/glycopharm/services/glycopharm.service.ts': ['org.id'],
   'routes/kpa/controllers/organization.controller.ts': ['saved.id'],
   'routes/kpa/services/kpa-store-organization.provisioning.ts': ['orgResult.id'],
   'services/cafe24-b2b/Cafe24B2bStoreProvisioningService.ts': ['organizationId'],
@@ -132,15 +128,6 @@ describe('§6 platform_store_slugs.store_id 축 census', () => {
       'utf-8',
     );
     expect(src).toMatch(/linkOwnerToStore[\s\S]{0,1200}ensureCosmeticsStoreSlug\(/);
-  });
-
-  it('GP 약국경영자 승인 경로가 두 분기 모두 slug 를 보강한다', () => {
-    const src = fs.readFileSync(
-      path.join(API_SERVER_SRC, 'routes/glycopharm/services/glycopharm-member.service.ts'),
-      'utf-8',
-    );
-    const calls = src.match(/this\.ensureGlycopharmStoreSlug\(/g) ?? [];
-    expect(calls.length).toBe(2);
   });
 
   it('공개 조회는 slug.storeId 를 organizations 로 해석한다 (축의 근거)', () => {

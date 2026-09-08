@@ -217,8 +217,8 @@ describe('dispatch — 실제 진입 handler', () => {
     expect(deleted.body.handler).toBe('deleteSchedule');
   });
 
-  it('k-cosmetics / glycopharm 에서도 calendar handler 로 간다', async () => {
-    for (const svc of ['k-cosmetics', 'glycopharm']) {
+  it('k-cosmetics 에서도 calendar handler 로 간다', async () => {
+    for (const svc of ['k-cosmetics']) {
       allowStore();
       entered.length = 0;
       const res = await request(buildApp())

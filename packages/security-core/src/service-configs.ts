@@ -31,7 +31,6 @@ import type { ServiceScopeGuardConfig } from './types.js';
  *
  * Self-mapped services (prefix === canonical key):
  *   - neture   (no entry — fallback returns 'neture')
- *   - glycopharm (no entry — fallback returns 'glycopharm')
  *   - platform (no entry — fallback returns 'platform')
  *
  * Mapped (drift-prone) services:
@@ -50,7 +49,6 @@ export const ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY: Readonly<Record<string, strin
  *   resolveCanonicalServiceKey('kpa')        // 'kpa-society'
  *   resolveCanonicalServiceKey('cosmetics')  // 'k-cosmetics'
  *   resolveCanonicalServiceKey('neture')     // 'neture'   (self-map fallback)
- *   resolveCanonicalServiceKey('glycopharm') // 'glycopharm'(self-map fallback)
  *
  * Use this anywhere that derives membership key from a role prefix — never inline
  * `SPLIT_PART(role, ':', 1)` for service_memberships writes. See
@@ -66,7 +64,7 @@ export function resolveCanonicalServiceKey(rolePrefix: string): string {
  * WO-O4O-CANONICAL-SERVICE-KEY-REVERSE-MAP-V1
  *
  * Derived (Object.fromEntries) from {@link ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY} so
- * the two directions can never drift. Self-mapped services (neture/glycopharm) are
+ * the two directions can never drift. Self-mapped services (neture) are
  * resolved via fallback in {@link resolveRolePrefixFromCanonicalServiceKey} since they
  * have no entry in the forward map.
  *
@@ -96,7 +94,6 @@ export const CANONICAL_SERVICE_KEY_TO_ROLE_PREFIX: Readonly<Record<string, strin
  *   resolveRolePrefixFromCanonicalServiceKey('kpa-society') // 'kpa'
  *   resolveRolePrefixFromCanonicalServiceKey('k-cosmetics') // 'cosmetics'
  *   resolveRolePrefixFromCanonicalServiceKey('neture')      // 'neture'    (self-map fallback)
- *   resolveRolePrefixFromCanonicalServiceKey('glycopharm')  // 'glycopharm'(self-map fallback)
  */
 export function resolveRolePrefixFromCanonicalServiceKey(serviceKey: string): string {
   return CANONICAL_SERVICE_KEY_TO_ROLE_PREFIX[serviceKey] || serviceKey;
@@ -121,7 +118,7 @@ export const KPA_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   ],
   platformBypass: false,
   legacyRoles: [],
-  blockedServicePrefixes: ['platform', 'neture', 'glycopharm', 'cosmetics'],
+  blockedServicePrefixes: ['platform', 'neture', 'cosmetics'],
   // WO-KPA-SCOPE-HIERARCHY-FIX-V1: kpa:admin ⊃ kpa:operator (admin covers operator, not vice versa)
   scopeRoleMapping: {
     'kpa:admin': ['kpa:admin'],
@@ -145,7 +142,7 @@ export const NETURE_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   ],
   platformBypass: true,
   legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'glycopharm', 'cosmetics'],
+  blockedServicePrefixes: ['kpa', 'cosmetics'],
   scopeRoleMapping: {
     'neture:admin': ['neture:admin'],
     'neture:operator': ['neture:operator', 'neture:admin'],
@@ -168,35 +165,10 @@ export const PLATFORM_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   ],
   platformBypass: false,
   legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'cosmetics'],
+  blockedServicePrefixes: ['kpa', 'neture', 'cosmetics'],
 };
 
-/**
- * GlycoPharm Service Configuration
- *
- * Platform bypass enabled: platform:super_admin can access.
- * Medical data service with pharmacy-level isolation.
- */
-export const GLYCOPHARM_SCOPE_CONFIG: ServiceScopeGuardConfig = {
-  serviceKey: 'glycopharm',
-  allowedRoles: [
-    'glycopharm:admin',
-    'glycopharm:operator',
-  ],
-  platformBypass: true,
-  legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'cosmetics'],
-  // WO-O4O-GLYCOPHARM-AUTHORIZATION-HIERARCHY-AUDIT-AND-FIX-V1:
-  //   mapping 부재 시 guard 는 allowedRoles 전체로 fallback 하므로 'glycopharm:admin'
-  //   scope 가 glycopharm:operator 에게도 열려 admin/operator 계층이 무너져 있었다.
-  //   frontend 는 이미 /admin/* = admin 전용, /operator/* = operator 이상으로 분리돼 있어
-  //   backend 만 어긋난 상태였다. KPA · Neture · K-Cosmetics · Pharmacy-Hub 와 동일한
-  //   admin ⊃ operator 계층을 명시한다 (fallback 의존 제거).
-  scopeRoleMapping: {
-    'glycopharm:admin': ['glycopharm:admin'],
-    'glycopharm:operator': ['glycopharm:operator', 'glycopharm:admin'],
-  },
-};
+// GLYCOPHARM_SCOPE_CONFIG — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
 /**
  * K-Cosmetics Service Configuration
@@ -214,7 +186,7 @@ export const COSMETICS_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   ],
   platformBypass: true,
   legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm'],
+  blockedServicePrefixes: ['kpa', 'neture'],
   scopeRoleMapping: {
     'cosmetics:admin': ['cosmetics:admin'],
     'cosmetics:operator': ['cosmetics:operator', 'cosmetics:admin'],

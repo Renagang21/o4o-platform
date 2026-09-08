@@ -155,7 +155,6 @@ function pct(ratio: number): string {
 function serviceLabel(type: string): string {
   const labels: Record<string, string> = {
     cosmetics: 'K-Cosmetics',
-    glycopharm: 'GlycoPharm',
   };
   return labels[type] || type;
 }

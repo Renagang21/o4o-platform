@@ -29,7 +29,7 @@
 
 // ─── Token Types ────────────────────────────────────────────
 
-export type TemplateKey = 'kpa' | 'glycopharm' | 'kcosmetics' | 'referenceA';
+export type TemplateKey = 'kpa' | 'kcosmetics' | 'referenceA';
 
 export interface TemplateTokens {
   hero: {
@@ -106,39 +106,6 @@ export const templatePresets: Record<TemplateKey, TemplatePreset> = {
         container: 'max-w-5xl',
         grid: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
         gap: 'gap-4',
-      },
-    },
-  },
-
-  glycopharm: {
-    key: 'glycopharm',
-    name: 'Health Dashboard',
-    description: '데이터 중심 관리형 — 가벼운 그림자, 아이콘 래퍼, 컴팩트 간격',
-    category: 'dashboard',
-    tokens: {
-      hero: {
-        bg: 'bg-primary-50',
-        border: 'border-b border-border',
-        padding: 'py-10',
-      },
-      card: {
-        radius: 'rounded-lg',
-        shadow: 'shadow-sm',
-      },
-      section: {
-        spacing: 'mb-12',
-      },
-      button: {
-        radius: 'rounded-lg',
-      },
-      icon: {
-        wrapper: 'bg-primary-50 rounded-lg w-9 h-9',
-        icon: 'text-primary',
-      },
-      layout: {
-        container: 'max-w-5xl',
-        grid: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
-        gap: 'gap-3',
       },
     },
   },

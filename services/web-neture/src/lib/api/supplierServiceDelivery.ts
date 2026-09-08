@@ -4,7 +4,7 @@
  * WO-O4O-PHARMACYHUB-SERVICE-MODEL-REALIGNMENT-AND-SUPPLIER-ROLE-REMOVAL-V1
  *
  * 공급자가 **운영자 승인 없이** 직접 켜고 끄는 서비스(현재 Pharmacy-Hub)의 제공 설정.
- * 승인 축 서비스(KPA Society · GlycoPharm · K-Cosmetics)는 이 경로가 아니라
+ * 승인 축 서비스(KPA Society · K-Cosmetics)는 이 경로가 아니라
  * `supplierApi.updateDistribution()` / 승인 신청 흐름을 쓴다.
  *
  * 백엔드: apps/api-server/src/modules/neture/controllers/supplier-service-delivery.controller.ts

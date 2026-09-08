@@ -51,7 +51,7 @@ export class StorePaidFeatureEntitlement {
   organizationId!: string;
 
   @Column({ type: 'varchar', length: 50, name: 'service_key' })
-  serviceKey!: string; // 'neture' | 'glycopharm' | 'kpa-society' | 'k-cosmetics' | ...
+  serviceKey!: string; // 'neture' | 'kpa-society' | 'k-cosmetics' | ...
 
   @Column({ type: 'varchar', length: 100, name: 'plan_code' })
   planCode!: StorePaidFeaturePlanCode;

@@ -187,7 +187,6 @@ export default function PartnershipRequestCreatePage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="">선택해 주세요</option>
-                <option value="glycopharm">GlycoPharm (약국)</option>
                 <option value="k-cosmetics">K-Cosmetics (화장품)</option>
                 <option value="other">기타</option>
               </select>

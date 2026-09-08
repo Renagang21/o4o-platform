@@ -45,9 +45,9 @@ const login = async (
 };
 
 const PLATFORM_PW = 'PlatformPw12345!';
-const GLYCO_OLD = 'GlycoOld12345!';
+const PH_OLD = 'PhOld12345!';
 const KPA_PW = 'KpaPw12345!';
-const GLYCO_NEW = 'GlycoNew98765!';
+const PH_NEW = 'PhNew98765!';
 
 describe('서비스 credential 변경이 로그인에 미치는 영향', () => {
   // bcrypt 실해싱이라 넉넉히 잡는다.
@@ -59,22 +59,22 @@ describe('서비스 credential 변경이 로그인에 미치는 영향', () => {
     state = {
       usersPassword: await hashPassword(PLATFORM_PW),
       credentials: {
-        glycopharm: await hashPassword(GLYCO_OLD),
+        'pharmacy-hub': await hashPassword(PH_OLD),
         'kpa-society': await hashPassword(KPA_PW),
       },
     };
   });
 
   it('변경 전 — 각 서비스는 자기 credential 로 로그인한다', async () => {
-    await expect(login(GLYCO_OLD, { ...state, serviceKey: 'glycopharm' })).resolves.toBe(true);
+    await expect(login(PH_OLD, { ...state, serviceKey: 'pharmacy-hub' })).resolves.toBe(true);
     await expect(login(KPA_PW, { ...state, serviceKey: 'kpa-society' })).resolves.toBe(true);
   });
 
   it('변경 전 — credential 이 있으면 users.password 로는 그 서비스에 로그인할 수 없다', async () => {
-    await expect(login(PLATFORM_PW, { ...state, serviceKey: 'glycopharm' })).resolves.toBe(false);
+    await expect(login(PLATFORM_PW, { ...state, serviceKey: 'pharmacy-hub' })).resolves.toBe(false);
   });
 
-  describe('운영자가 glycopharm credential 만 새 비밀번호로 교체한 뒤', () => {
+  describe('운영자가 pharmacy-hub credential 만 새 비밀번호로 교체한 뒤', () => {
     let after: typeof state;
 
     beforeAll(async () => {
@@ -83,22 +83,22 @@ describe('서비스 credential 변경이 로그인에 미치는 영향', () => {
         usersPassword: state.usersPassword,
         credentials: {
           ...state.credentials,
-          glycopharm: await hashPassword(GLYCO_NEW),
+          'pharmacy-hub': await hashPassword(PH_NEW),
         },
       };
     });
 
-    it('새 비밀번호로 glycopharm 로그인에 성공한다', async () => {
-      await expect(login(GLYCO_NEW, { ...after, serviceKey: 'glycopharm' })).resolves.toBe(true);
+    it('새 비밀번호로 pharmacy-hub 로그인에 성공한다', async () => {
+      await expect(login(PH_NEW, { ...after, serviceKey: 'pharmacy-hub' })).resolves.toBe(true);
     });
 
-    it('옛 비밀번호로는 glycopharm 로그인에 실패한다', async () => {
-      await expect(login(GLYCO_OLD, { ...after, serviceKey: 'glycopharm' })).resolves.toBe(false);
+    it('옛 비밀번호로는 pharmacy-hub 로그인에 실패한다', async () => {
+      await expect(login(PH_OLD, { ...after, serviceKey: 'pharmacy-hub' })).resolves.toBe(false);
     });
 
     it('같은 사용자의 kpa-society 는 기존 비밀번호로 계속 로그인된다', async () => {
       await expect(login(KPA_PW, { ...after, serviceKey: 'kpa-society' })).resolves.toBe(true);
-      await expect(login(GLYCO_NEW, { ...after, serviceKey: 'kpa-society' })).resolves.toBe(false);
+      await expect(login(PH_NEW, { ...after, serviceKey: 'kpa-society' })).resolves.toBe(false);
     });
 
     it('users.password 는 그대로라 serviceKey 없는 로그인이 계속 동작한다', async () => {
@@ -119,9 +119,9 @@ describe('서비스 credential 변경이 로그인에 미치는 영향', () => {
     it('운영자가 그 서비스 credential 을 만들면 이후로는 fallback 하지 않는다', async () => {
       const withNew = {
         usersPassword: state.usersPassword,
-        credentials: { ...state.credentials, neture: await hashPassword(GLYCO_NEW) },
+        credentials: { ...state.credentials, neture: await hashPassword(PH_NEW) },
       };
-      await expect(login(GLYCO_NEW, { ...withNew, serviceKey: 'neture' })).resolves.toBe(true);
+      await expect(login(PH_NEW, { ...withNew, serviceKey: 'neture' })).resolves.toBe(true);
       await expect(login(PLATFORM_PW, { ...withNew, serviceKey: 'neture' })).resolves.toBe(false);
     });
   });

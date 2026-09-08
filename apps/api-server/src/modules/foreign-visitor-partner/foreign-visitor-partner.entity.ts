@@ -45,7 +45,7 @@ export class ForeignVisitorPartner {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  /** store_owner role-prefix 축 ('kpa' | 'glycopharm' | 'cosmetics'). /me/check 와 동일 키. */
+  /** store_owner role-prefix 축 ('kpa' | 'cosmetics'). /me/check 와 동일 키. */
   @Column({ type: 'varchar', length: 50, name: 'service_key' })
   serviceKey!: string;
 

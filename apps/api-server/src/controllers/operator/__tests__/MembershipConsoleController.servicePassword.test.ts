@@ -59,7 +59,7 @@ interface Prime {
   targetRoles?: string[];
 }
 
-function primeQuery({ memberOf = ['glycopharm'], targetRoles = [] }: Prime = {}) {
+function primeQuery({ memberOf = ['pharmacy-hub'], targetRoles = [] }: Prime = {}) {
   mockQuery.mockImplementation((sql: string, params: any[] = []) => {
     const s = String(sql).replace(/\s+/g, ' ').trim();
     // checkServiceBoundary
@@ -78,14 +78,14 @@ function primeQuery({ memberOf = ['glycopharm'], targetRoles = [] }: Prime = {})
   });
 }
 
-function makeReq(body: Record<string, any>, scope: Partial<{ isPlatformAdmin: boolean; serviceKeys: string[] }> = {}, callerRoles: string[] = ['glycopharm:operator']) {
+function makeReq(body: Record<string, any>, scope: Partial<{ isPlatformAdmin: boolean; serviceKeys: string[] }> = {}, callerRoles: string[] = ['pharmacy-hub:operator']) {
   return {
     params: { userId: TARGET },
     body,
     user: { id: CALLER, roles: callerRoles },
     serviceScope: {
       isPlatformAdmin: scope.isPlatformAdmin ?? false,
-      serviceKeys: scope.serviceKeys ?? ['glycopharm'],
+      serviceKeys: scope.serviceKeys ?? ['pharmacy-hub'],
       rolePrefixes: [],
     },
   } as any;
@@ -134,7 +134,7 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
 
       const writes = credentialWrites();
       expect(writes).toHaveLength(1);
-      expect(writes[0].params).toEqual([TARGET, 'glycopharm', 'hashed:NewPw12345!']);
+      expect(writes[0].params).toEqual([TARGET, 'pharmacy-hub', 'hashed:NewPw12345!']);
       // credential row 가 없어도 생성되도록 upsert
       expect(writes[0].sql).toContain('ON CONFLICT ON CONSTRAINT "uq_service_credentials_user_service"');
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
@@ -145,29 +145,29 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
     it('운영 서비스가 하나면 그 서비스로 확정한다', async () => {
       primeQuery();
       await controller.updateMember(makeReq({ password: 'NewPw12345!' }), makeRes());
-      expect(credentialWrites()[0].params[1]).toBe('glycopharm');
+      expect(credentialWrites()[0].params[1]).toBe('pharmacy-hub');
     });
 
     it('복수 서비스 운영자여도 후보가 1개면(대상이 한 서비스에만 속함) 자동 확정한다', async () => {
-      // 운영자는 glycopharm·kpa-society 둘 다 관리하지만 대상은 glycopharm 회원만이다.
-      primeQuery({ memberOf: ['glycopharm'] });
+      // 운영자는 pharmacy-hub·kpa-society 둘 다 관리하지만 대상은 pharmacy-hub 회원만이다.
+      primeQuery({ memberOf: ['pharmacy-hub'] });
       const res = makeRes();
 
       await controller.updateMember(
-        makeReq({ password: 'NewPw12345!' }, { serviceKeys: ['glycopharm', 'kpa-society'] }),
+        makeReq({ password: 'NewPw12345!' }, { serviceKeys: ['pharmacy-hub', 'kpa-society'] }),
         res,
       );
 
       expect(credentialWrites()).toHaveLength(1);
-      expect(credentialWrites()[0].params[1]).toBe('glycopharm');
+      expect(credentialWrites()[0].params[1]).toBe('pharmacy-hub');
     });
 
     it('후보가 복수면 serviceKey 없이는 400 으로 거절한다 (전역 변경 금지)', async () => {
-      primeQuery({ memberOf: ['glycopharm', 'kpa-society'] });
+      primeQuery({ memberOf: ['pharmacy-hub', 'kpa-society'] });
       const res = makeRes();
 
       await controller.updateMember(
-        makeReq({ password: 'NewPw12345!' }, { serviceKeys: ['glycopharm', 'kpa-society'] }),
+        makeReq({ password: 'NewPw12345!' }, { serviceKeys: ['pharmacy-hub', 'kpa-society'] }),
         res,
       );
 
@@ -178,7 +178,7 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
     });
 
     it('운영자 관리 범위 밖 회원은 진입 자체가 404 다 (checkServiceBoundary 선행 차단)', async () => {
-      // 운영자는 glycopharm 만 관리, 대상은 kpa-society 회원만 →
+      // 운영자는 pharmacy-hub 만 관리, 대상은 kpa-society 회원만 →
       // updateMember 최상단 boundary check 에서 이미 막힌다. 비밀번호 로직까지 가지 않는다.
       primeQuery({ memberOf: ['kpa-society'] });
       const res = makeRes();
@@ -197,7 +197,7 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
 
       await controller.updateMember(
         makeReq(
-          { password: 'NewPw12345!', serviceKey: 'glycopharm' },
+          { password: 'NewPw12345!', serviceKey: 'pharmacy-hub' },
           { isPlatformAdmin: true, serviceKeys: [] },
           ['platform:super_admin'],
         ),
@@ -223,7 +223,7 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
     });
 
     it('운영자가 자기 스코프 밖 serviceKey 를 지정하면 403 이다', async () => {
-      primeQuery({ memberOf: ['glycopharm', 'kpa-society'] });
+      primeQuery({ memberOf: ['pharmacy-hub', 'kpa-society'] });
       const res = makeRes();
 
       await controller.updateMember(makeReq({ password: 'NewPw12345!', serviceKey: 'kpa-society' }), res);
@@ -234,7 +234,7 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
     });
 
     it('대상이 그 서비스 회원이 아니면 404 이다', async () => {
-      primeQuery({ memberOf: ['glycopharm'] });
+      primeQuery({ memberOf: ['pharmacy-hub'] });
       const res = makeRes();
 
       await controller.updateMember(
@@ -250,7 +250,7 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
 
   describe('운영 계층 권한', () => {
     it('operator → 일반 회원: 허용', async () => {
-      primeQuery({ targetRoles: ['glycopharm:pharmacy'] });
+      primeQuery({ targetRoles: ['pharmacy-hub:pharmacy'] });
       const res = makeRes();
 
       await controller.updateMember(makeReq({ password: 'NewPw12345!' }), res);
@@ -259,7 +259,7 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
     });
 
     it('operator → 다른 operator: 차단', async () => {
-      primeQuery({ targetRoles: ['glycopharm:operator'] });
+      primeQuery({ targetRoles: ['pharmacy-hub:operator'] });
       const res = makeRes();
 
       await controller.updateMember(makeReq({ password: 'NewPw12345!' }), res);
@@ -270,7 +270,7 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
     });
 
     it('operator → admin: 차단', async () => {
-      primeQuery({ targetRoles: ['glycopharm:admin'] });
+      primeQuery({ targetRoles: ['pharmacy-hub:admin'] });
       const res = makeRes();
 
       await controller.updateMember(makeReq({ password: 'NewPw12345!' }), res);
@@ -280,25 +280,25 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
     });
 
     it('admin → 자기 서비스 operator: 허용', async () => {
-      primeQuery({ targetRoles: ['glycopharm:operator'] });
+      primeQuery({ targetRoles: ['pharmacy-hub:operator'] });
       const res = makeRes();
 
       await controller.updateMember(
-        makeReq({ password: 'NewPw12345!' }, {}, ['glycopharm:admin']),
+        makeReq({ password: 'NewPw12345!' }, {}, ['pharmacy-hub:admin']),
         res,
       );
 
       expect(credentialWrites()).toHaveLength(1);
-      expect(credentialWrites()[0].params[1]).toBe('glycopharm');
+      expect(credentialWrites()[0].params[1]).toBe('pharmacy-hub');
     });
 
     it('플랫폼 관리자 → 서비스 admin: 허용', async () => {
-      primeQuery({ targetRoles: ['glycopharm:admin'] });
+      primeQuery({ targetRoles: ['pharmacy-hub:admin'] });
       const res = makeRes();
 
       await controller.updateMember(
         makeReq(
-          { password: 'NewPw12345!', serviceKey: 'glycopharm' },
+          { password: 'NewPw12345!', serviceKey: 'pharmacy-hub' },
           { isPlatformAdmin: true, serviceKeys: [] },
           ['platform:super_admin'],
         ),
@@ -314,7 +314,7 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
 
       await controller.updateMember(
         makeReq(
-          { password: 'NewPw12345!', serviceKey: 'glycopharm' },
+          { password: 'NewPw12345!', serviceKey: 'pharmacy-hub' },
           { isPlatformAdmin: true, serviceKeys: [] },
           ['platform:super_admin'],
         ),
@@ -378,11 +378,11 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
 
     it('serviceKey 를 명시해도 8자 미만이면 서비스 판정 이전에 거절한다', async () => {
       // 후보가 복수여도 SERVICE_KEY_REQUIRED 가 아니라 WEAK_PASSWORD 가 먼저다.
-      primeQuery({ memberOf: ['glycopharm', 'kpa-society'] });
+      primeQuery({ memberOf: ['pharmacy-hub', 'kpa-society'] });
       const res = makeRes();
 
       await controller.updateMember(
-        makeReq({ password: 'short' }, { serviceKeys: ['glycopharm', 'kpa-society'] }),
+        makeReq({ password: 'short' }, { serviceKeys: ['pharmacy-hub', 'kpa-society'] }),
         res,
       );
 

@@ -32,15 +32,7 @@ export const ACTION_KEYS = {
   NETURE_MANAGE_PARTNERSHIP: 'neture.trigger.manage_partnership',
   NETURE_AUDIT_REVIEW: 'neture.trigger.audit_review',
 
-  // GlycoPharm Care Operations
-  GLYCOPHARM_CARE_REVIEW: 'glycopharm.trigger.care_review',
-  GLYCOPHARM_CREATE_SESSION: 'glycopharm.trigger.create_session',
-  GLYCOPHARM_REFRESH_ANALYSIS: 'glycopharm.trigger.refresh_analysis',
-  GLYCOPHARM_REFRESH_AI: 'glycopharm.trigger.refresh_ai',
-  GLYCOPHARM_REFRESH_REVENUE: 'glycopharm.trigger.refresh_revenue',
-  GLYCOPHARM_REVIEW_REQUESTS: 'glycopharm.trigger.review_requests',
-  GLYCOPHARM_SYNC_SIGNAGE: 'glycopharm.trigger.sync_signage',
-  GLYCOPHARM_APPROVE_PHARMACY: 'glycopharm.trigger.approve_pharmacy',
+  // GlycoPharm Care Operations — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
   // Platform Hub Operations (WO-PLATFORM-GLOBAL-HUB-V1)
   PLATFORM_CROSS_SERVICE_TRIGGER: 'platform.trigger.execute_cross_service',

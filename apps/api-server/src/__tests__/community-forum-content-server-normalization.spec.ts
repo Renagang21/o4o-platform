@@ -6,7 +6,7 @@
  * 닫으려는 결함: 공통 write 계약(`POST/PUT /forum/posts`)은 HTML string content 를
  * 허용하는데, 백엔드가 `@o4o/forum-core.normalizeContent()` (브라우저 `DOMParser` 의존)
  * 를 호출해 Node 런타임에서 `DOMParser is not defined` 500 이 났다.
- * → KPA/K-Cosmetics/GlycoPharm 처럼 HTML 을 그대로 보내는 서비스에서 글쓰기가 실패했다.
+ * → KPA/K-Cosmetics 처럼 HTML 을 그대로 보내는 서비스에서 글쓰기가 실패했다.
  *
  * 저장 포맷(Block[]) 은 바뀌지 않는다. 같은 매핑을 서버에서 수행하는지 고정한다.
  */

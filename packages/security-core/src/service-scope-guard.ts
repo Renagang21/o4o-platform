@@ -29,7 +29,7 @@ import type { ServiceScopeGuardConfig, SecurityUser } from './types.js';
  *   allowedRoles: ['kpa:admin', 'kpa:operator'],
  *   platformBypass: false,
  *   legacyRoles: [],
- *   blockedServicePrefixes: ['neture', 'glycopharm', 'cosmetics'],
+ *   blockedServicePrefixes: ['neture', 'cosmetics'],
  * });
  *
  * router.get('/admin', authenticate, requireKpaScope('kpa:admin'), handler);

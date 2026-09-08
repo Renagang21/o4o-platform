@@ -20,8 +20,7 @@ describe('deriveListingServiceKeyFromMemberships', () => {
     expect(deriveListingServiceKeyFromMemberships([active('k-cosmetics')])).toBe('k-cosmetics');
   });
 
-  it('GlycoPharm / Neture 는 종전과 동일한 값 (회귀 없음)', () => {
-    expect(deriveListingServiceKeyFromMemberships([active('glycopharm')])).toBe('glycopharm');
+  it('Neture 는 종전과 동일한 값 (회귀 없음)', () => {
     expect(deriveListingServiceKeyFromMemberships([active('neture')])).toBe('neture');
   });
 
@@ -43,13 +42,13 @@ describe('deriveListingServiceKeyFromMemberships', () => {
       deriveListingServiceKeyFromMemberships([active('kpa-society'), active('neture')]),
     ).toBe('neture');
     expect(
-      deriveListingServiceKeyFromMemberships([active('glycopharm'), active('kpa-society')]),
+      deriveListingServiceKeyFromMemberships([active('k-cosmetics'), active('kpa-society')]),
     ).toBe('kpa-society');
   });
 
-  it('진열 대상 키 집합은 canonical 4개로 고정', () => {
+  it('진열 대상 키 집합은 canonical 3개로 고정', () => {
     expect([...LISTING_SERVICE_KEYS].sort()).toEqual(
-      ['glycopharm', 'k-cosmetics', 'kpa-society', 'neture'],
+      ['k-cosmetics', 'kpa-society', 'neture'],
     );
   });
 });

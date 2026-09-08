@@ -199,7 +199,7 @@ export function MarketTrialHubPage() {
         <div style={s.footerNote}>
           <p style={{ fontSize: '0.75rem', color: '#9CA3AF', margin: 0, lineHeight: 1.5 }}>
             이 공간은 Neture 통합 유통참여형 펀딩 허브입니다.
-            서비스(GlycoPharm / K-Cosmetics / KPA-a 등)에서 노출되는 유통참여형 펀딩도 이곳에서 통합 운영됩니다.
+            서비스(K-Cosmetics / KPA-a 등)에서 노출되는 유통참여형 펀딩도 이곳에서 통합 운영됩니다.
           </p>
         </div>
       </footer>

@@ -19,7 +19,6 @@
 | `neture-web` | neture.co.kr | 네처 서비스 웹 | `deploy-web-services.yml` |
 | `k-cosmetics-web` | k-cosmetics.site | K-화장품 | `deploy-web-services.yml` |
 | `kpa-society-web` | kpa-society.co.kr | 약사회 SaaS | `deploy-web-services.yml` |
-| `glycopharm-web` | glycopharm.co.kr | 글라이코팜 | `deploy-web-services.yml` |
 | `pharmacy-hub-web` | pharmacyhub.co.kr | 약국 허브 | `deploy-web-services.yml` |
 
 ### GitHub Actions Workflows

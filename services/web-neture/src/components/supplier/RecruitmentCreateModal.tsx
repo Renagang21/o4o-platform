@@ -12,7 +12,6 @@ import { supplierRecruitmentApi } from '../../lib/api/supplier';
 
 // 모집 대상 서비스 후보 (약국 대상은 의약품/규제 상품 시 backend 가 gate)
 const SERVICE_OPTIONS: Array<{ key: string; label: string; pharmacy: boolean }> = [
-  { key: 'glycopharm', label: 'GlycoPharm (약국)', pharmacy: true },
   { key: 'kpa-society', label: 'KPA Society (약국)', pharmacy: true },
   { key: 'k-cosmetics', label: 'K-Cosmetics', pharmacy: false },
   { key: 'neture', label: 'Neture', pharmacy: false },
@@ -120,7 +119,7 @@ export default function RecruitmentCreateModal({ product, onClose, onCreated }: 
             </div>
             <p className="mt-1 text-xs text-slate-400">
               {isRegulated
-                ? '의약품·규제 상품은 약국 대상 서비스(GlycoPharm / KPA)에만 모집할 수 있습니다.'
+                ? '의약품·규제 상품은 약국 대상 서비스(KPA)에만 모집할 수 있습니다.'
                 : '여러 서비스를 선택하면 서비스별로 모집이 생성되며, 운영자 노출 승인도 서비스별로 진행됩니다.'}
             </p>
           </div>

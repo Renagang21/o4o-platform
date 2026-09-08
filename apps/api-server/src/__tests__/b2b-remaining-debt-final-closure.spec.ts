@@ -16,7 +16,7 @@
  *   ⑦ frontend 가격 조작 무시 (서버 가격 권위)
  *   ⑧ 소비자 commerce 재유입 차단 · 제거된 dead API 비존재
  */
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { B2B_ORDERABLE_SOURCE_TYPES } from '../services/cart/b2b-checkout-confirm.core.js';
 import {
@@ -106,7 +106,7 @@ const offerRow = (over: Partial<ExposureOfferRow> = {}): ExposureOfferRow =>
 describe('① soft-delete 된 offer 는 어떤 공급 축에서도 주문되지 않는다 (DF-6)', () => {
   const cases: Array<[string, string, (ds: any) => { confirm: (s: any, i?: any) => Promise<any> }]> = [
     ['neture', 'neture', (ds) => new NetureB2BCartCheckoutService(ds)],
-    ['glycopharm (approval)', 'glycopharm', (ds) => new StoreB2BCartCheckoutService(ds)],
+    ['kpa-society (approval)', 'kpa-society', (ds) => new StoreB2BCartCheckoutService(ds)],
     ['pharmacy-hub (optin)', 'pharmacy-hub', (ds) => new PharmacyHubCartCheckoutService(ds) as any],
   ];
 
@@ -145,7 +145,7 @@ describe('② catalog · orderable · 신청 자격도 같은 soft-delete 게이
 
 describe('③ 공급 노출 게이트', () => {
   it('승인 축은 offer_service_approvals 소문자 approved 만 인정한다', () => {
-    const s = resolveOfferExposureStrategy('glycopharm')!;
+    const s = resolveOfferExposureStrategy('kpa-society')!;
     expect(s.key).toBe('approval');
     expect(s.offerWhereSql).toMatch(/osa\.approval_status\s*=\s*'approved'/);
   });
@@ -232,7 +232,6 @@ describe('⑤ 경계 — serviceKey · buyer organization · membership', () => 
   //   조회(목록·상세)에는 붙이지 않는다 — 자기 주문 열람은 write 가 아니다.
   it.each([
     ['routes/kpa/controllers/kpa-checkout.controller.ts', 'SERVICE_KEYS.KPA_SOCIETY'],
-    ['routes/glycopharm/controllers/checkout.controller.ts', 'SERVICE_KEYS.GLYCOPHARM'],
     ['routes/cosmetics/controllers/cosmetics-order.controller.ts', 'SERVICE_KEYS.K_COSMETICS'],
   ])('%s 의 주문 취소는 active membership 을 요구한다', (rel, key) => {
     const src = read(rel);
@@ -279,11 +278,10 @@ describe('⑧ 소비자 commerce 재유입 차단 · dead API 비존재', () => 
     expect(kpa).toContain('410');
   });
 
-  it('GET /api/v1/glycopharm/b2b/products (legacy glycopharm_products) 는 존재하지 않는다', () => {
-    const routes = read('routes/glycopharm/glycopharm.routes.ts');
-    const controller = read('routes/glycopharm/controllers/pharmacy.controller.ts');
-    expect(routes).not.toContain('createB2BController');
-    expect(routes).not.toMatch(/router\.use\('\/b2b'/);
-    expect(controller).not.toContain('export function createB2BController');
+  // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1:
+  //   `GET /api/v1/glycopharm/b2b/products` 비존재 단언은 GlycoPharm 서비스 전체가
+  //   삭제되어 대상 파일이 사라졌다. 아래 census 가 상위 계약(라우트 0)을 대신 고정한다.
+  it('glycopharm 라우트 축이 저장소에 존재하지 않는다', () => {
+    expect(existsSync(join(SRC, 'routes', 'glycopharm'))).toBe(false);
   });
 });

@@ -4,7 +4,7 @@
  * WO-O4O-STORE-NETWORK-DASHBOARD-V1
  * WO-O4O-STORE-NETWORK-AI-HYBRID-V1 (last month stats for insights)
  *
- * Aggregates KPI data across all store services (K-Cosmetics, GlycoPharm)
+ * Aggregates KPI data across all store services (K-Cosmetics)
  * for platform admin network-level dashboard.
  *
  * Uses bulk SQL queries per service (not per-store adapter calls) for performance.
@@ -21,7 +21,6 @@
  *     채워졌다고 가정 — 신규 주문 생성 시점 보장 책임은 checkout flow.
  *     · Cosmetics: cosmetics_stores 의 organization_id 가 NULL 인 store 는
  *       Top stores 목록에 자동 제외 (organization bridge 부재 시 결과 누락).
- *     · GlycoPharm: organizations.id 직접 매핑 ✅.
  *   - 매출 인정 양성 조건: `status = 'paid'`.
  *   - functional index 권장: idx_checkout_orders_servicekey_status_createdat
  *     ((metadata->>'serviceKey'), status, "createdAt") — 별도 migration WO.
@@ -70,10 +69,7 @@ export class StoreNetworkService {
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthStartISO = monthStart.toISOString();
 
-    const [cosmetics, glycopharm] = await Promise.all([
-      this.getCosmeticsServiceStats(monthStartISO),
-      this.getGlycopharmServiceStats(monthStartISO),
-    ]);
+    const cosmetics = await this.getCosmeticsServiceStats(monthStartISO);
 
     const serviceBreakdown: ServiceBreakdown[] = [
       {
@@ -82,18 +78,12 @@ export class StoreNetworkService {
         monthlyRevenue: cosmetics.monthlyRevenue,
         monthlyOrders: cosmetics.monthlyOrders,
       },
-      {
-        serviceType: 'glycopharm',
-        storeCount: glycopharm.storeCount,
-        monthlyRevenue: glycopharm.monthlyRevenue,
-        monthlyOrders: glycopharm.monthlyOrders,
-      },
     ];
 
     return {
-      totalStores: cosmetics.storeCount + glycopharm.storeCount,
-      monthlyRevenue: cosmetics.monthlyRevenue + glycopharm.monthlyRevenue,
-      monthlyOrders: cosmetics.monthlyOrders + glycopharm.monthlyOrders,
+      totalStores: cosmetics.storeCount,
+      monthlyRevenue: cosmetics.monthlyRevenue,
+      monthlyOrders: cosmetics.monthlyOrders,
       serviceBreakdown,
     };
   }
@@ -104,23 +94,19 @@ export class StoreNetworkService {
     const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const [cosmetics, glycopharm] = await Promise.all([
-      this.getServiceOrdersBetween('cosmetics', lastMonthStart.toISOString(), thisMonthStart.toISOString()),
-      this.getServiceOrdersBetween('glycopharm', lastMonthStart.toISOString(), thisMonthStart.toISOString()),
-    ]);
+    const cosmetics = await this.getServiceOrdersBetween('cosmetics', lastMonthStart.toISOString(), thisMonthStart.toISOString());
 
     return {
-      totalRevenue: cosmetics.revenue + glycopharm.revenue,
-      totalOrders: cosmetics.orders + glycopharm.orders,
+      totalRevenue: cosmetics.revenue,
+      totalOrders: cosmetics.orders,
       serviceBreakdown: [
         { serviceType: 'cosmetics', revenue: cosmetics.revenue, orders: cosmetics.orders },
-        { serviceType: 'glycopharm', revenue: glycopharm.revenue, orders: glycopharm.orders },
       ],
     };
   }
 
   private async getServiceOrdersBetween(
-    service: 'cosmetics' | 'glycopharm',
+    service: 'cosmetics',
     fromISO: string,
     toISO: string,
   ): Promise<{ revenue: number; orders: number }> {
@@ -149,13 +135,10 @@ export class StoreNetworkService {
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthStartISO = monthStart.toISOString();
 
-    const [cosmeticsStores, glycopharmStores] = await Promise.all([
-      this.getCosmeticsTopStores(monthStartISO, limit),
-      this.getGlycopharmTopStores(monthStartISO, limit),
-    ]);
+    const cosmeticsStores = await this.getCosmeticsTopStores(monthStartISO, limit);
 
     // Merge and sort by revenue descending, take top N
-    const merged = [...cosmeticsStores, ...glycopharmStores];
+    const merged = [...cosmeticsStores];
     merged.sort((a, b) => b.monthlyRevenue - a.monthlyRevenue);
     return merged.slice(0, limit);
   }
@@ -191,35 +174,7 @@ export class StoreNetworkService {
     };
   }
 
-  private async getGlycopharmServiceStats(monthStartISO: string) {
-    // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1: 동일 패턴.
-    const [storeResult, orderResult] = await Promise.all([
-      this.dataSource.query(
-        `SELECT COUNT(*)::int as count
-         FROM organizations o
-         JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
-         WHERE o."isActive" = true`,
-      ),
-      this.dataSource.query(
-        `SELECT
-           COUNT(*)::int as "orderCount",
-           COALESCE(SUM(co."totalAmount"), 0)::numeric as revenue
-         FROM checkout_orders co
-         WHERE co.metadata->>'serviceKey' = 'glycopharm'
-           AND co."createdAt" >= $1
-           AND co.status = 'paid'`,
-        [monthStartISO],
-      ),
-    ]);
-
-    return {
-      storeCount: storeResult[0]?.count || 0,
-      monthlyRevenue: Number(orderResult[0]?.revenue || 0),
-      monthlyOrders: orderResult[0]?.orderCount || 0,
-    };
-  }
-
-  // ---- Top stores per service ----
+  // getGlycopharmServiceStats() — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
   private async getCosmeticsTopStores(monthStartISO: string, limit: number): Promise<TopStore[]> {
     // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
@@ -252,33 +207,5 @@ export class StoreNetworkService {
     }));
   }
 
-  private async getGlycopharmTopStores(monthStartISO: string, limit: number): Promise<TopStore[]> {
-    // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
-    // GlycoPharm pharmacy.id == organizations.id == sellerOrganizationId 직접 매핑.
-    const rows = await this.dataSource.query(
-      `SELECT
-         co."sellerOrganizationId" as "storeId",
-         p.name as "storeName",
-         COUNT(*)::int as "monthlyOrders",
-         COALESCE(SUM(co."totalAmount"), 0)::numeric as "monthlyRevenue"
-       FROM checkout_orders co
-       INNER JOIN organizations p ON p.id = co."sellerOrganizationId"
-       WHERE co.metadata->>'serviceKey' = 'glycopharm'
-         AND co."createdAt" >= $1
-         AND co.status = 'paid'
-         AND co."sellerOrganizationId" IS NOT NULL
-       GROUP BY co."sellerOrganizationId", p.name
-       ORDER BY "monthlyRevenue" DESC
-       LIMIT $2`,
-      [monthStartISO, limit],
-    );
-
-    return rows.map((row: any) => ({
-      storeId: row.storeId,
-      storeName: row.storeName || 'Unknown Pharmacy',
-      serviceType: 'glycopharm' as const,
-      monthlyRevenue: Number(row.monthlyRevenue),
-      monthlyOrders: row.monthlyOrders,
-    }));
-  }
+  // getGlycopharmTopStores() — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 }

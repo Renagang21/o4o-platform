@@ -81,16 +81,8 @@ export async function isStoreOwner(
     }
   }
 
-  // Legacy(조직 생성자) 축 — glycopharm 기존 허용 범위를 좁히지 않기 위해 유지한다.
-  // organizations.id 축이므로 id 축 혼용은 아니다. cosmetics 의 (존재하지 않는 컬럼을
-  // 매장 PK 로 조회하던) 레거시 분기는 제거한다.
-  if (serviceKey === 'glycopharm') {
-    const rows = await dataSource.query(
-      `SELECT 1 FROM organizations WHERE id = $1 AND created_by_user_id = $2 LIMIT 1`,
-      [storeId, userId],
-    );
-    return rows.length > 0;
-  }
+  // Legacy(조직 생성자) 축 — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
+  //   serviceKey='glycopharm' 전용 분기였다. 서비스 삭제로 도달 불가.
 
   return false;
 }

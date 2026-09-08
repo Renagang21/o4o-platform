@@ -35,7 +35,6 @@ export type PaymentMode = 'test' | 'live';
  * Service keys (same as slug/policy)
  */
 export type PaymentConfigServiceKey =
-  | 'glycopharm'
   | 'cosmetics'
   | 'kpa'
   | 'neture';

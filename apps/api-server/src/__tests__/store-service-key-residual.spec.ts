@@ -25,7 +25,8 @@ describe('Store service-key residual integrity', () => {
     expect(block).toBeTruthy();
 
     const targets = [...block!.matchAll(/\]:\s*SERVICE_KEYS\.([A-Z_]+),/g)].map((m) => m[1]);
-    expect(targets.length).toBeGreaterThanOrEqual(3);
+    // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: glycopharm-event-offer 축 제거로 3 → 2.
+    expect(targets.length).toBeGreaterThanOrEqual(2);
     for (const t of targets) {
       expect(LISTING_SERVICE_KEYS).toContain((SERVICE_KEYS as Record<string, string>)[t]);
     }

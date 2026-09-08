@@ -10,12 +10,6 @@ import type { AIContext, AIOrchestrationRequest, AIServiceId } from './types.js'
 
 /** Service-specific constraint sets */
 const SERVICE_CONSTRAINTS: Record<AIServiceId, string[]> = {
-  glycopharm: [
-    '의료적 진단이나 처방을 제공하지 마세요.',
-    '관찰된 데이터 패턴만 설명하세요.',
-    '구체적인 약품명 대신 제품 유형을 언급하세요.',
-    '항상 "~경향이 관찰됩니다" 형태로 표현하세요.',
-  ],
   neture: [
     '매출 데이터를 정확한 숫자로 인용하세요.',
     '성장률은 전주 대비로 계산하세요.',

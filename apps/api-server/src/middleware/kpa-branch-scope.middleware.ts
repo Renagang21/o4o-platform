@@ -45,7 +45,7 @@ export const KPA_BRANCH_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   allowedRoles: ['kpa-branch:admin', 'kpa-branch:operator', 'kpa-branch:member'],
   platformBypass: true,
   legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'cosmetics', 'pharmacy-hub'],
+  blockedServicePrefixes: ['kpa', 'neture', 'cosmetics', 'pharmacy-hub'],
   scopeRoleMapping: {
     'kpa-branch:admin': ['kpa-branch:admin'],
     'kpa-branch:operator': ['kpa-branch:operator', 'kpa-branch:admin'],

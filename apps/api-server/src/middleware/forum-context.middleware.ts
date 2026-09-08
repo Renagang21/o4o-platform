@@ -22,7 +22,7 @@ export interface ForumContext {
    *
    * WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
    *
-   * RBAC role prefix ('kpa' | 'cosmetics' | 'pharmacy-hub' | 'neture' | 'glycopharm').
+   * RBAC role prefix ('kpa' | 'cosmetics' | 'pharmacy-hub' | 'neture').
    * ForumControllerBase converts it with resolveCanonicalServiceKey() and matches
    * forum_category_requests.service_code, so this value decides which service's
    * forums/posts are readable and writable. 값이 없으면 격리가 적용되지 않는다.
@@ -59,7 +59,7 @@ declare global {
  * in a given route group.
  *
  * Usage:
- *   forumRouter.use(forumContextMiddleware({ serviceCode: 'glycopharm', organizationId: '...' }));
+ *   forumRouter.use(forumContextMiddleware({ serviceCode: 'cosmetics', organizationId: '...' }));
  *
  * When organizationId is null the controller shows only non-exclusive content.
  * When organizationId is set the controller shows non-exclusive + matching exclusive content.

@@ -1,7 +1,7 @@
 /**
  * WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1 (§18 · §19 · §28 · §29)
  *
- * `StoreB2BCartCheckoutService` — 승인축 서비스(glycopharm / kpa-society / k-cosmetics)의
+ * `StoreB2BCartCheckoutService` — 승인축 서비스(kpa-society / k-cosmetics)의
  * B2B 주문 확정. 두 가지가 이 스펙의 핵심이다:
  *   1. 공급 노출은 `offer_service_approvals` 승인이 권위다 — opt-in 으로 우회되지 않는다.
  *   2. 매장 조직은 **서버가 확정**한다 — 클라이언트 값은 선택값이다 (결함 O1).
@@ -86,7 +86,7 @@ const cart = (over: Partial<Row> = {}): Row => ({
   ...over,
 });
 
-const scope = { buyerId: 'buyer-1', serviceKey: 'glycopharm' };
+const scope = { buyerId: 'buyer-1', serviceKey: 'kpa-society' };
 
 beforeEach(() => {
   createOrderCalls.length = 0;
@@ -100,25 +100,25 @@ describe('승인 게이트 (§18 · §19)', () => {
     await service.confirm(scope);
 
     expect(queries[0].sql).toContain('offer_service_approvals');
-    // WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1 (§19):
+    // WO-O4O-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION (§19):
     //   junction 승인 상태는 소문자 도메인('approved')이다. 대문자는
     //   supplier_product_offers 축이며, 섞으면 승인 offer 가 0건으로 매칭된다.
     expect(queries[0].sql).toContain("osa.approval_status = 'approved'");
     expect(queries[0].sql).not.toContain("osa.approval_status = 'APPROVED'");
     // PharmacyHub 식 opt-in 축은 이 서비스의 노출 근거가 아니다
     expect(queries[0].sql).not.toContain('service_keys');
-    expect(queries[0].params[1]).toBe('glycopharm');
+    expect(queries[0].params[1]).toBe('kpa-society');
   });
 
   it('승인된 offer 는 주문으로 확정된다', async () => {
     const { service, deleted } = makeService([cart({ quantity: 2 })], [offer()]);
     const out = await service.confirm(scope);
 
-    expect(out.serviceKey).toBe('glycopharm');
+    expect(out.serviceKey).toBe('kpa-society');
     expect(out.orderCount).toBe(1);
     expect(out.groupTotalAmount).toBe(60000);
     expect(out.removedCartItemIds).toEqual(['cart-1']);
-    expect(deleted[0]).toMatchObject({ buyerId: 'buyer-1', serviceKey: 'glycopharm' });
+    expect(deleted[0]).toMatchObject({ buyerId: 'buyer-1', serviceKey: 'kpa-society' });
   });
 
   it('승인 행이 없으면(쿼리 미조회) 주문 불가 — OFFER_NOT_APPROVED', async () => {
@@ -136,7 +136,7 @@ describe('승인 게이트 (§18 · §19)', () => {
 
     const md = createOrderCalls[0].metadata;
     expect(md.source).toBe('store_b2b_cart');
-    expect(md.serviceKey).toBe('glycopharm');
+    expect(md.serviceKey).toBe('kpa-society');
     expect(md.orderType).toBe('STORE_RESTOCK');
     expect(md.fulfillmentVisibility).toBe('hidden_until_paid');
     // payment-first
@@ -151,7 +151,7 @@ describe('승인 게이트 (§18 · §19)', () => {
     expect(createOrderCalls[0].items[0].metadata).toMatchObject({
       supplierProductOfferId: 'offer-1',
       masterId: 'master-1',
-      serviceKey: 'glycopharm',
+      serviceKey: 'kpa-society',
       unitPriceSource: 'price_general',
     });
   });

@@ -7,24 +7,20 @@
  * WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1:
  *   KPA 자체 storefront 종료 — 자체몰 렌더링 전용 endpoint 4건 제거.
  *   `/layout`(KPA-only) · `/template` · `/storefront-config` · `/hero`(3건 소비처 0)
- *   GlycoPharm 은 `/api/v1/glycopharm/stores/*` 자체 controller 를 쓰므로 영향 없다.
  *
  * Endpoints:
- *   GET /:slug — Store info (CROSS-SERVICE: KPA·GlycoPharm·K-Cosmetics 블로그 공개층 공통)
+ *   GET /:slug — Store info (CROSS-SERVICE: KPA·K-Cosmetics 블로그 공개층 공통)
  */
 
 import { Router, Request, Response } from 'express';
-import type { DataSource, Repository } from 'typeorm';
-import { GlycopharmPharmacyExtension } from '../../glycopharm/entities/glycopharm-pharmacy-extension.entity.js';
-import { GlycopharmProduct } from '../../glycopharm/entities/glycopharm-product.entity.js';
+import type { DataSource } from 'typeorm';
 import { resolvePublicStore } from './store-public-utils.js';
 
 export function createStorePublicHomeRoutes(deps: {
   dataSource: DataSource;
-  productRepo: Repository<GlycopharmProduct>;
 }): Router {
   const router = Router();
-  const { dataSource, productRepo } = deps;
+  const { dataSource } = deps;
 
   // GET /:slug — Store info
   router.get('/:slug', async (req: Request, res: Response): Promise<void> => {
@@ -33,13 +29,14 @@ export function createStorePublicHomeRoutes(deps: {
       if (!resolved) return;
 
       const { pharmacy } = resolved;
-      const productCount = await productRepo.count({
-        where: { pharmacy_id: pharmacy.id, status: 'active' },
-      });
 
-      // Load extension for glycopharm-specific fields (logo, hero_image)
-      const extRepo = dataSource.getRepository(GlycopharmPharmacyExtension);
-      const extension = await extRepo.findOne({ where: { organization_id: pharmacy.id } });
+      // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1:
+      //   `productCount` 는 glycopharm_products, `logo`/`hero_image` 는
+      //   glycopharm_pharmacy_extensions 가 유일한 출처였다 (둘 다 프로덕션 0행 —
+      //   이 엔드포인트는 이미 모든 매장에 대해 0/null 을 반환하고 있었다).
+      //   GlycoPharm 삭제로 출처가 사라졌다. 소비처(KPA·K-Cos 블로그 og:image)의
+      //   응답 shape 를 깨지 않기 위해 키는 유지하고 값은 상수로 둔다.
+      //   대체 데이터원은 이번 범위에서 만들지 않는다.
 
       res.json({
         success: true,
@@ -51,10 +48,10 @@ export function createStorePublicHomeRoutes(deps: {
           address: pharmacy.address,
           addressDetail: (pharmacy as any).address_detail || null,
           phone: pharmacy.phone,
-          logo: extension?.logo || null,
-          hero_image: extension?.hero_image || null,
+          logo: null,
+          hero_image: null,
           status: pharmacy.isActive ? 'active' : 'inactive',
-          productCount,
+          productCount: 0,
         },
       });
     } catch (error: any) {

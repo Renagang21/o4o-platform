@@ -20,8 +20,8 @@
  */
 
 import type { DataSource } from 'typeorm';
-import { StoreBlogPost } from '../../routes/glycopharm/entities/store-blog-post.entity.js';
-import type { StoreBlogPostStatus } from '../../routes/glycopharm/entities/store-blog-post.entity.js';
+import { StoreBlogPost } from '../../modules/store/entities/store-blog-post.entity.js';
+import type { StoreBlogPostStatus } from '../../modules/store/entities/store-blog-post.entity.js';
 import { recordDerivations } from '../../routes/o4o-store/services/store-asset-derivation.service.js';
 
 export interface BlogFailure {

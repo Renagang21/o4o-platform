@@ -24,7 +24,6 @@ import {
   createServiceScopeGuard,
   KPA_SCOPE_CONFIG,
   NETURE_SCOPE_CONFIG,
-  GLYCOPHARM_SCOPE_CONFIG,
   COSMETICS_SCOPE_CONFIG,
 } from '@o4o/security-core';
 import { PHARMACY_HUB_SCOPE_CONFIG } from '../../middleware/pharmacy-hub-scope.middleware';
@@ -105,7 +104,7 @@ describe('Pharmacy-Hub Scope Guard', () => {
   });
 
   describe('타 서비스 역할 · platform bypass', () => {
-    it.each(['kpa:admin', 'neture:admin', 'glycopharm:admin', 'cosmetics:admin'])(
+    it.each(['kpa:admin', 'neture:admin', 'cosmetics:admin'])(
       '%s → denied for pharmacy-hub:admin scope (403)',
       async (role) => {
         const result = await check(ADMIN, [role]);
@@ -133,7 +132,6 @@ describe('Pharmacy-Hub Scope Guard', () => {
     const OTHERS: Array<[string, Parameters<typeof createServiceScopeGuard>[0]]> = [
       ['kpa', KPA_SCOPE_CONFIG],
       ['neture', NETURE_SCOPE_CONFIG],
-      ['glycopharm', GLYCOPHARM_SCOPE_CONFIG],
       ['cosmetics', COSMETICS_SCOPE_CONFIG],
     ];
 
@@ -188,7 +186,7 @@ describe('Pharmacy-Hub Scope Guard', () => {
 
     it('scopeRoleMapping 이 모든 scope 에 명시돼 있다 (fallback 의존 금지)', () => {
       // mapping 이 비면 allowedRoles 전체가 허용되어 계층이 무너진다.
-      // (GlycoPharm 이 그 상태였고 WO-O4O-GLYCOPHARM-AUTHORIZATION-HIERARCHY-AUDIT-AND-FIX-V1
+      // (과거 GlycoPharm 이 그 상태였고 WO-O4O-GLYCOPHARM-AUTHORIZATION-HIERARCHY-AUDIT-AND-FIX-V1
       //  에서 해소됐다 — 이제 5개 서비스 모두 mapping 을 명시한다.)
       const mapping = PHARMACY_HUB_SCOPE_CONFIG.scopeRoleMapping ?? {};
       expect(Object.keys(mapping).sort()).toEqual([ADMIN, OPERATOR, STORE_OWNER].sort());

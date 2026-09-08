@@ -17,7 +17,6 @@ export type ServiceKey =
   | 'platform'      // Platform-wide roles
   | 'kpa'          // KPA 커뮤니티 서비스
   | 'neture'       // Neture service
-  | 'glycopharm'   // GlycoPharm service
   | 'cosmetics'    // K-Cosmetics service
   | 'lms'          // LMS service
   | 'pharmacy-hub'; // Pharmacy-Hub (파머시 허브) — WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
@@ -66,14 +65,15 @@ export type NetureRole =
   | 'neture:user';    // Neture user
 
 /**
- * GlycoPharm service roles
+ * 서비스 접두사 없는 legacy bare roles.
+ *
+ * WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1:
+ *   과거 GlycoPharm 경계 안에 잘못 등록돼 있던 공용 역할이다.
+ *   `glycopharm:*` 접두 역할은 서비스 삭제와 함께 제거했으나, 아래 bare role 은
+ *   Neture(supplier/partner)·플랫폼 전반이 실제 보유 중이므로 유지한다.
  */
-export type GlycoPharmRole =
-  | 'glycopharm:admin'        // GlycoPharm admin
-  | 'glycopharm:operator'     // GlycoPharm operator
-  | 'glycopharm:pharmacist'   // GlycoPharm 약사 (WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1)
-  | 'glycopharm:store_owner'  // GlycoPharm pharmacy store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)
-  | 'pharmacy'                // DEPRECATED → glycopharm:pharmacist (호환용 유지)
+export type LegacyBareRole =
+  | 'pharmacy'                // 약국 (legacy bare role)
   | 'supplier'                // 공급자
   | 'partner'                 // 파트너
   | 'customer';               // 당뇨인 (정규)
@@ -128,7 +128,7 @@ export type PrefixedRole =
   | PlatformRole
   | KpaRole
   | NetureRole
-  | GlycoPharmRole
+  | LegacyBareRole
   | CosmeticsRole
   | LmsRole
   | PharmacyHubRole;
@@ -203,7 +203,7 @@ export function isKpaRoleType(role: string): role is KpaRole {
 /**
  * 운영 권한(operator / admin / super_admin) 성격의 role 인지 판정한다.
  * bare('operator', 'admin') 와 namespaced('neture:operator', 'platform:super_admin',
- * 'glycopharm:admin', 'cosmetics:operator') 를 모두 인식한다(마지막 세그먼트 기준).
+ * 'kpa:admin', 'cosmetics:operator') 를 모두 인식한다(마지막 세그먼트 기준).
  *
  * WO-O4O-MEMBER-ROLE-WRITE-PATH-HARDENING-V1:
  *   운영 권한은 role_assignments(canonical) 축에서만 관리한다. 참여 유형 축인
@@ -214,7 +214,7 @@ export function isKpaRoleType(role: string): role is KpaRole {
  * isOperationalRole('neture:operator')    // true
  * isOperationalRole('platform:super_admin') // true
  * isOperationalRole('supplier')           // false
- * isOperationalRole('glycopharm:store_owner') // false
+ * isOperationalRole('kpa:store_owner') // false
  */
 export function isOperationalRole(role: string): boolean {
   if (!role) return false;
@@ -376,68 +376,37 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     deprecated: false
   },
 
-  // GlycoPharm roles
-  'glycopharm:admin': {
-    role: 'glycopharm:admin',
-    label: 'GlycoPharm Admin',
-    description: 'GlycoPharm administrator',
-    service: 'glycopharm',
-    category: 'service',
-    deprecated: false
-  },
-  'glycopharm:operator': {
-    role: 'glycopharm:operator',
-    label: 'GlycoPharm Operator',
-    description: 'GlycoPharm operator',
-    service: 'glycopharm',
-    category: 'service',
-    deprecated: false
-  },
-  'glycopharm:pharmacist': {
-    role: 'glycopharm:pharmacist',
-    label: '약사',
-    description: 'GlycoPharm 약사 (WO-GLYCOPHARM-ROLE-PREFIX-MIGRATION-V1)',
-    service: 'glycopharm',
-    category: 'service',
-    deprecated: false
-  },
-  'glycopharm:store_owner': {
-    role: 'glycopharm:store_owner',
-    label: 'GlycoPharm Store Owner',
-    description: 'GlycoPharm pharmacy store owner (WO-O4O-STORE-OWNER-ROLE-BASED-ACCESS-UNIFICATION-V1)',
-    service: 'glycopharm',
-    category: 'commerce',
-    deprecated: false
-  },
+  // GlycoPharm roles — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
+  //   아래 bare role 은 GlycoPharm 전용이 아니라 플랫폼 공용이므로 유지한다.
   'pharmacy': {
     role: 'pharmacy',
     label: '약국',
-    description: 'GlycoPharm 약국 — DEPRECATED → glycopharm:pharmacist',
-    service: 'glycopharm',
+    description: '약국 (legacy bare role)',
+    service: 'platform',
     category: 'service',
     deprecated: true
   },
   'customer': {
     role: 'customer',
-    label: '당뇨인',
-    description: '당뇨인 (정규)',
-    service: 'glycopharm',
+    label: '고객',
+    description: '고객 (legacy bare role)',
+    service: 'platform',
     category: 'service',
     deprecated: false
   },
   'supplier': {
     role: 'supplier',
     label: '공급자',
-    description: 'Neture/GlycoPharm 공급자',
-    service: 'glycopharm',
+    description: 'Neture 공급자',
+    service: 'neture',
     category: 'commerce',
     deprecated: false
   },
   'partner': {
     role: 'partner',
     label: '파트너',
-    description: 'Neture/GlycoPharm 파트너',
-    service: 'glycopharm',
+    description: 'Neture 파트너',
+    service: 'neture',
     category: 'commerce',
     deprecated: false
   },

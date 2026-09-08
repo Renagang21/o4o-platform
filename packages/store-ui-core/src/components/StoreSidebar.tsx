@@ -101,9 +101,7 @@ const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   'layout-builder': PanelLeft,
   template: Palette,
   billing: Receipt,
-  // GlycoPharm 전용 섹션 키 (WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1)
-  // 'b2b-order' 아이콘 제거: WO-O4O-GLYCOPHARM-LEGACY-B2B-ORDER-PAGE-RETIREMENT-V1 에서
-  // 해당 메뉴 행이 은퇴해 참조하는 config 가 없다(Truck 은 'suppliers' 가 계속 사용).
+  // 매장 섹션 키 (구 GlycoPharm 전용 → 공통 유지)
   'funnel': TrendingUp,
   'management': Briefcase,
   'management-b2b': Package,

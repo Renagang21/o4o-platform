@@ -58,7 +58,7 @@
 
 ## 대표 레퍼런스
 
-- `apps/glycopharm-web/src/pages/store/`
+- `services/web-k-cosmetics/src/pages/store/`
 - `apps/main-site/`
 - 상품 카드 그리드 + Hero 섹션 + CTA 버튼 패턴
 

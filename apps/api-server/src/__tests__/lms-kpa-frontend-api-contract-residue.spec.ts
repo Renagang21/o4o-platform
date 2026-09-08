@@ -4,7 +4,7 @@
  * WO-O4O-LMS-KPA-FRONTEND-API-CONTRACT-RESIDUE-CLEANUP-V1
  *
  * 닫으려는 결함 3건:
- *   (1) GlycoPharm `getMyCertificate` 가 backend 에 없는 `/lms/certificates/course/:id` 호출
+ *   (1) 서비스 프런트 `getMyCertificate` 가 backend 에 없는 `/lms/certificates/course/:id` 호출
  *   (2) KPA `downloadCertificate` 가 없는 `/lms/certificates/:id/download` 호출 (canonical=`/pdf`)
  *   (3) KPA appreciation client 가 `/api/v1/kpa/appreciation/*` 호출 (canonical=`/api/v1/appreciation/*`)
  *
@@ -98,39 +98,9 @@ describe('backend appreciation mount — 단일 canonical', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('certificate 프런트 계약 — dead path 0', () => {
-  it('GlycoPharm getMyCertificate 는 canonical 목록 endpoint 를 courseId 로 재사용한다', () => {
-    const src = read('services/web-glycopharm/src/api/lms.ts');
-    expect(src).not.toContain('/lms/certificates/course/');
-    const idx = src.indexOf('getMyCertificate:');
-    expect(idx).toBeGreaterThan(-1);
-    const slice = src.slice(idx, idx + 700);
-    expect(slice).toContain("'/lms/certificates'");
-    expect(slice).toContain('courseId');
-  });
-
-  it('GlycoPharm 수료증 다운로드는 canonical `/pdf` 를 유지한다', () => {
-    const src = read('services/web-glycopharm/src/api/lms.ts');
-    expect(src).toContain('`/lms/certificates/${certificateId}/pdf`');
-    expect(src).not.toContain('${certificateId}/download');
-  });
-
-  it('KPA lms client 에 dead `/download` 호출이 남아 있지 않다', () => {
-    const src = read('services/web-kpa-society/src/api/lms.ts');
-    expect(src).not.toContain('/lms/certificates/${id}/download');
-    expect(src).not.toContain('downloadCertificate:');
-  });
-
-  it('KPA 수료증 화면은 canonical `/api/v1/lms/certificates/:id/pdf` 를 쓴다', () => {
-    const src = read('services/web-kpa-society/src/pages/mypage/MyCertificatesPage.tsx');
-    expect(src).toContain('/api/v1/lms/certificates/');
-    expect(src).toContain('/pdf');
-    expect(src).not.toContain('/download');
-  });
-
-  it('K-Cosmetics / GlycoPharm 수료증 화면도 `/pdf` 계약을 유지한다', () => {
+  it('K-Cosmetics 수료증 화면도 `/pdf` 계약을 유지한다', () => {
     for (const rel of [
       'services/web-k-cosmetics/src/pages/mypage/MyCertificatesPage.tsx',
-      'services/web-glycopharm/src/pages/mypage/MyCertificatesPage.tsx',
     ]) {
       const src = read(rel);
       expect(src).toContain('/lms/certificates/${cert.id}/pdf');

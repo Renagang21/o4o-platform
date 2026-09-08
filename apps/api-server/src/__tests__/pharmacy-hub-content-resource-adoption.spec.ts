@@ -158,7 +158,7 @@ describe('§7 서비스 경계 — cross-service mixing 0', () => {
   });
 
   it('PH client 는 다른 서비스 base 를 호출하지 않는다', () => {
-    for (const other of ['/kpa/', '/cosmetics/', '/glycopharm/', '/neture/']) {
+    for (const other of ['/kpa/', '/cosmetics/', '/neture/']) {
       expect(resourcesApiCode).not.toContain(other);
     }
   });

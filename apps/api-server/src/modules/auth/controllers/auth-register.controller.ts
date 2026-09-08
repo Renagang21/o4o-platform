@@ -37,7 +37,7 @@ export class AuthRegisterController extends BaseController {
       }
 
       // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Normalize consent fields
-      // KPA/GlycoPharm use tos/privacyAccepted/marketingAccepted
+      // KPA use tos/privacyAccepted/marketingAccepted
       // Neture/K-Cosmetics use agreeTerms/agreePrivacy/agreeMarketing
       const tosAccepted = data.tos === true || data.agreeTerms === true;
       const privacyAccepted = data.privacyAccepted === true || data.agreePrivacy === true;
@@ -68,7 +68,7 @@ export class AuthRegisterController extends BaseController {
       //    Market Trial 의 ParticipantType.STORE_OWNER 는 별개 도메인 — 본 변경과 무관.)
       //   기존 store_owner 회원 데이터는 그대로 잔존(legacy) — migration 없음.
       // 허용 신청 role: supplier / partner. (admin/operator 는 가입 신청 경로 미지원)
-      // 다른 서비스(KPA / GlycoPharm / K-Cosmetics)의 가입 흐름은 영향 없음 — 기존 fallback 유지.
+      // 다른 서비스(KPA / K-Cosmetics)의 가입 흐름은 영향 없음 — 기존 fallback 유지.
       const NETURE_ALLOWED_SIGNUP_ROLES = ['supplier', 'partner'];
       if (serviceKey === 'neture') {
         if (!data.role || !NETURE_ALLOWED_SIGNUP_ROLES.includes(data.role)) {
@@ -86,7 +86,7 @@ export class AuthRegisterController extends BaseController {
       //   회사명 / 대표자명 / 담당자명 / 담당자 연락처(숫자 10자리 이상) / 사업장 주소.
       //   사업자등록번호·세금계산서·정산·증빙 서류는 가입신청 필수 아님 — 온보딩/ACTIVE 전환 게이트 유지
       //   (IR-O4O-NETURE-SUPPLIER-SIGNUP-REQUIRED-FIELDS-AUDIT-V1 §6 정책 결정).
-      //   canonical + legacy fallback 모두 허용. KPA/GlycoPharm/K-Cosmetics 무관(serviceKey/role 한정).
+      //   canonical + legacy fallback 모두 허용. KPA/K-Cosmetics 무관(serviceKey/role 한정).
       if (serviceKey === 'neture' && data.role === 'supplier') {
         const trimmed = (v: unknown) => String(v ?? '').trim();
         const digitsLen = (v: unknown) => String(v ?? '').replace(/\D/g, '').length;
@@ -240,7 +240,7 @@ export class AuthRegisterController extends BaseController {
             ['userId', 'serviceKey'],
           );
 
-          // WO-O4O-GLYCOPHARM-SIGNUP-REFORM-V1: businessInfo 머지 (기존 정보 보존 + 신규 추가)
+          // businessInfo 머지 (기존 정보 보존 + 신규 추가)
           // WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1: canonical fields
           const newBiz: Record<string, any> = {};
           const effectiveBusinessName = data.businessName || data.companyName;
@@ -282,9 +282,6 @@ export class AuthRegisterController extends BaseController {
           // KPA Society: auto-create KPA member
           await AuthRegisterController.createKpaRecords(manager, existingUser.id, data);
 
-          // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-AND-APPROVAL-FLOW-ALIGNMENT-V1:
-          // GlycoPharm 약국 경영자 가입 시 glycopharm_applications 자동 생성
-          await AuthRegisterController.createGlycopharmApplication(manager, existingUser.id, data, effectiveRole);
 
           // WO-O4O-NETURE-SUPPLIER-REGISTRATION-PROFILE-CREATION-V1:
           //   Neture 공급자 가입 시점에 neture_suppliers row(PENDING) 즉시 생성.
@@ -331,45 +328,11 @@ export class AuthRegisterController extends BaseController {
           }
         }
 
-        // WO-O4O-GLYCOPHARM-MEMBERSHIP-APPROVAL-NOTIFICATION-V1:
-        //   기존 계정 GlycoPharm 가입 신청 시 운영자(glycopharm:operator / glycopharm:admin) 알림.
-        //   KPA / K-Cosmetics 패턴과 동일 — best-effort.
-        if (serviceKey === 'glycopharm') {
-          try {
-            const operators: { userId: string }[] = await AppDataSource.query(
-              `SELECT DISTINCT user_id AS "userId"
-                 FROM role_assignments
-                WHERE role IN ('glycopharm:operator','glycopharm:admin')
-                  AND is_active = true
-                LIMIT 20`,
-            );
-            await Promise.allSettled(
-              operators.map((op) =>
-                notificationService.createNotification({
-                  userId: op.userId,
-                  type: 'member.registration_pending',
-                  title: 'GlycoPharm 신규 회원 승인 대기',
-                  message: '신규 회원 가입 신청이 접수되었습니다. 회원관리에서 승인 여부를 확인해 주세요.',
-                  serviceKey: 'glycopharm',
-                  actorId: existingUser.id,
-                  metadata: {
-                    userId: existingUser.id,
-                    targetUrl: '/operator/members?tab=status-pending',
-                  },
-                }),
-              ),
-            );
-          } catch (notifyError) {
-            logger.warn('[AuthRegisterController.register] GlycoPharm operator notification failed (best-effort)', {
-              error: notifyError instanceof Error ? notifyError.message : String(notifyError),
-              userId: existingUser.id,
-            });
-          }
-        }
+        // GlycoPharm 운영자 알림 — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
         // WO-O4O-NETURE-MEMBERSHIP-OPERATOR-NOTIFICATION-V1:
         //   기존 계정 Neture 가입 신청(supplier/partner) 시 운영자(neture:operator / neture:admin) 알림.
-        //   KPA / K-Cosmetics / GlycoPharm 패턴과 동일 — best-effort.
+        //   KPA / K-Cosmetics 패턴과 동일 — best-effort.
         if (serviceKey === 'neture') {
           try {
             const roleLabel = effectiveRole === 'supplier' ? '공급자' : '파트너';
@@ -551,9 +514,6 @@ export class AuthRegisterController extends BaseController {
         // KPA Society: auto-create KPA member
         await AuthRegisterController.createKpaRecords(manager, newUser.id, data);
 
-        // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-AND-APPROVAL-FLOW-ALIGNMENT-V1:
-        // GlycoPharm 약국 경영자 가입 시 glycopharm_applications 자동 생성
-        await AuthRegisterController.createGlycopharmApplication(manager, newUser.id, data, effectiveRole);
 
         // WO-O4O-NETURE-SUPPLIER-REGISTRATION-PROFILE-CREATION-V1:
         //   Neture 공급자 가입 시점에 neture_suppliers row(PENDING) 즉시 생성.
@@ -657,45 +617,11 @@ export class AuthRegisterController extends BaseController {
         }
       }
 
-      // WO-O4O-GLYCOPHARM-MEMBERSHIP-APPROVAL-NOTIFICATION-V1:
-      //   신규 계정 GlycoPharm 가입 신청 시 운영자(glycopharm:operator / glycopharm:admin) 알림.
-      //   KPA / K-Cosmetics 패턴과 동일 — best-effort.
-      if (serviceKey === 'glycopharm') {
-        try {
-          const operators: { userId: string }[] = await AppDataSource.query(
-            `SELECT DISTINCT user_id AS "userId"
-               FROM role_assignments
-              WHERE role IN ('glycopharm:operator','glycopharm:admin')
-                AND is_active = true
-              LIMIT 20`,
-          );
-          await Promise.allSettled(
-            operators.map((op) =>
-              notificationService.createNotification({
-                userId: op.userId,
-                type: 'member.registration_pending',
-                title: 'GlycoPharm 신규 회원 승인 대기',
-                message: '신규 회원 가입 신청이 접수되었습니다. 회원관리에서 승인 여부를 확인해 주세요.',
-                serviceKey: 'glycopharm',
-                actorId: user.id,
-                metadata: {
-                  userId: user.id,
-                  targetUrl: '/operator/members?tab=status-pending',
-                },
-              }),
-            ),
-          );
-        } catch (notifyError) {
-          logger.warn('[AuthRegisterController.register] GlycoPharm operator notification failed (best-effort)', {
-            error: notifyError instanceof Error ? notifyError.message : String(notifyError),
-            userId: user.id,
-          });
-        }
-      }
+      // GlycoPharm 운영자 알림 — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
       // WO-O4O-NETURE-MEMBERSHIP-OPERATOR-NOTIFICATION-V1:
       //   신규 계정 Neture 가입 신청(supplier/partner) 시 운영자(neture:operator / neture:admin) 알림.
-      //   KPA / K-Cosmetics / GlycoPharm 패턴과 동일 — best-effort.
+      //   KPA / K-Cosmetics 패턴과 동일 — best-effort.
       if (serviceKey === 'neture') {
         try {
           const roleLabel = effectiveRole === 'supplier' ? '공급자' : '파트너';
@@ -935,88 +861,8 @@ export class AuthRegisterController extends BaseController {
     }
   }
 
-  /**
-   * WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-AND-APPROVAL-FLOW-ALIGNMENT-V1
-   *
-   * GlycoPharm 약국 경영자 가입 시 glycopharm_applications 레코드 자동 생성.
-   * 이를 통해 운영자가 GlycoPharm 신청 화면에서 검토/승인 가능.
-   * 승인 시 organization_store + organization_service_enrollments + 환자 검색 노출까지 자동 연결됨.
-   *
-   * 조건:
-   * - service === 'glycopharm'
-   * - role === 'pharmacy' (약국 경영자)
-   * - businessName 있음 (약국 신청 최소 정보)
-   *
-   * 멱등: ON CONFLICT DO NOTHING (user_id 기준 중복 방지)
-   */
-  private static async createGlycopharmApplication(
-    manager: import('typeorm').EntityManager,
-    userId: string,
-    data: RegisterRequestDto,
-    effectiveRole: string,
-  ): Promise<void> {
-    if (data.service !== 'glycopharm') return;
-
-    // WO-O4O-GLYCOPHARM-REGISTRATION-ROLE-TYPE-ALIGNMENT-V1:
-    // 약사/근무약사 신규 가입 시 glycopharm_members 레코드 생성 (pending)
-    if (data.subRole === 'staff_pharmacist') {
-      const existingMember = await manager.query(
-        `SELECT id FROM glycopharm_members WHERE user_id = $1 LIMIT 1`,
-        [userId],
-      );
-      if (existingMember.length > 0) return;
-
-      await manager.query(
-        `INSERT INTO glycopharm_members (id, user_id, membership_type, sub_role, status, metadata, created_at, updated_at)
-         VALUES (gen_random_uuid(), $1, 'pharmacist', 'staff_pharmacist', 'pending', $2::jsonb, NOW(), NOW())`,
-        [userId, JSON.stringify({ licenseNumber: data.licenseNumber || null })],
-      );
-      return;
-    }
-
-    if (effectiveRole !== 'pharmacy') return;
-
-    const businessName = data.businessName || data.companyName;
-    if (!businessName) return;
-
-    // 멱등 INSERT — 이미 application이 있으면 스킵
-    const existing = await manager.query(
-      `SELECT id FROM glycopharm_applications WHERE user_id = $1 LIMIT 1`,
-      [userId],
-    );
-    if (existing.length > 0) return;
-
-    // 약국 경영자 신청 metadata snapshot — WO-O4O-KPA-BUSINESSINFO-CANONICAL-FORM-ALIGNMENT-V1: ceoName/taxInvoiceEmail canonical.
-    const metadata: Record<string, any> = {};
-    const metaCeoName = data.ceoName ?? data.representativeName;
-    if (metaCeoName) metadata.ceoName = metaCeoName;
-    if (data.licenseNumber) metadata.licenseNumber = data.licenseNumber;
-    const metaTaxInvoiceEmail = data.taxInvoiceEmail ?? data.taxEmail;
-    if (metaTaxInvoiceEmail) metadata.taxInvoiceEmail = metaTaxInvoiceEmail;
-    if (data.businessType) metadata.businessType = data.businessType;
-    if (data.businessCategory) metadata.businessCategory = data.businessCategory;
-    if (data.managerPhone) metadata.managerPhone = data.managerPhone;
-    if (data.zipCode) metadata.zipCode = data.zipCode;
-    if (data.address1) metadata.address = data.address1;
-    if (data.address2) metadata.addressDetail = data.address2;
-    if (data.phone) metadata.phone = data.phone;
-
-    await manager.query(
-      `INSERT INTO glycopharm_applications (
-        id, user_id, organization_type, organization_name, business_number,
-        service_types, status, submitted_at, metadata, created_at, updated_at
-      ) VALUES (
-        gen_random_uuid(), $1, 'pharmacy', $2, $3,
-        '["dropshipping"]'::jsonb, 'submitted', NOW(), $4::jsonb, NOW(), NOW()
-      )`,
-      [
-        userId,
-        businessName,
-        data.businessNumber || null,
-        JSON.stringify(metadata),
-      ],
-    );
-  }
+  // createGlycopharmApplication() — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
+  //   glycopharm_applications / glycopharm_members 자동 생성 경로였다.
 
   /**
    * WO-O4O-NETURE-SUPPLIER-REGISTRATION-PROFILE-CREATION-V1

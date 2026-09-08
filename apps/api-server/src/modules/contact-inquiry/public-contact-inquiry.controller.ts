@@ -39,7 +39,6 @@ function esc(s: string): string {
 
 /** 본 공통 문의 API 가 받는 serviceKey → role prefix. (Neture/KPA 는 자체 경로 사용 → 제외) */
 const SERVICE_ROLE_PREFIX: Record<string, string> = {
-  glycopharm: 'glycopharm',
   'k-cosmetics': 'cosmetics',
 };
 

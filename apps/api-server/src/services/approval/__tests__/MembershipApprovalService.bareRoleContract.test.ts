@@ -124,9 +124,8 @@ const service = new MembershipApprovalService();
 const SERVICES: Array<{ serviceKey: string; prefix: string }> = [
   { serviceKey: 'kpa-society', prefix: 'kpa' },
   { serviceKey: 'k-cosmetics', prefix: 'cosmetics' },
-  { serviceKey: 'glycopharm', prefix: 'glycopharm' },
-  { serviceKey: 'neture', prefix: 'neture' },
   { serviceKey: 'pharmacy-hub', prefix: 'pharmacy-hub' },
+  { serviceKey: 'neture', prefix: 'neture' },
 ];
 
 /**

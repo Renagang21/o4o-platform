@@ -97,7 +97,6 @@ import { createCosmeticsRoutes } from '../routes/cosmetics/cosmetics.routes.js';
 // WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1:
 //   legacy `/api/v1/yaksa/*` (createYaksaRoutes) 제거. 소비처·운영 데이터 0으로 확정된 dead route 였다.
 //   (`/api/v1/membership`·`@o4o/lms-yaksa` 도 이후 WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1 에서 제거됨)
-import { createGlycopharmRoutes } from '../routes/glycopharm/glycopharm.routes.js';
 // WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
 import { createPharmacyHubRoutes } from '../routes/pharmacy-hub/pharmacy-hub.routes.js';
 // WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
@@ -689,17 +688,8 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     //   확정되어(WO-O4O-LEGACY-YAKSA-API-ROUTE-USAGE-AND-DISPOSITION-AUDIT-V1) mount 를 제거했다.
     //   DB 테이블(yaksa_posts / yaksa_categories / yaksa_post_logs)은 보존한다.
 
-    // 27. Register Glycopharm routes (Phase B-1)
-    try {
-      const glycopharmRoutes = createGlycopharmRoutes(dataSource);
-      app.use('/api/v1/glycopharm', glycopharmRoutes);
-      logger.info('✅ Glycopharm routes registered at /api/v1/glycopharm');
-
-      // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
-      //   GlycopharmPaymentEventHandler 제거 — serviceKey='glycopharm' producer 0건.
-    } catch (glycopharmError) {
-      logger.error('Failed to register Glycopharm routes:', glycopharmError);
-    }
+    // 27. Glycopharm routes — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
+    //   GlycoPharm 서비스 전체를 플랫폼에서 삭제했다. `/api/v1/glycopharm/*` 는 더 이상 존재하지 않는다.
 
     // 27b. Register Pharmacy-Hub routes (WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1)
     //      Foundation 범위: service-info / me-access / 역할별 scope ping 만.
@@ -729,14 +719,11 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register KPA Branch routes:', kpaBranchError);
     }
 
-    // 28g. Register Store AI routes (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
-    try {
-      const { createStoreAiRouter } = await import('../modules/store-ai/controllers/store-ai.controller.js');
-      app.use('/api/v1/store-hub/ai', createStoreAiRouter(dataSource));
-      logger.info('✅ Store AI routes registered at /api/v1/store-hub/ai');
-    } catch (storeAiError) {
-      logger.error('Failed to register Store AI routes:', storeAiError);
-    }
+    // 28g. Store AI routes (`/api/v1/store-hub/ai`) — REMOVED
+    //   WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: 이 라우터의 store_owner 가드는
+    //   serviceKey='glycopharm' 고정이었고 유일한 소비처가 services/web-glycopharm 이었다.
+    //   GlycoPharm 삭제로 소비처 0 — 라우터를 제거한다.
+    //   (modules/store-ai 의 product-ai-* 계열은 Neture 상품 DB 가 사용하므로 유지한다.)
 
     // 28f. Register Product AI Recommendation routes (WO-O4O-AI-PRODUCT-RECOMMENDATION-V1)
     try {
@@ -783,14 +770,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product POP PDF routes:', productPopPdfError);
     }
 
-    // 28-d. Home Preview (WO-HOME-LIVE-PREVIEW-V1: public aggregate API)
-    try {
-      const { createHomePreviewRouter } = await import('../modules/home/home-preview.controller.js');
-      app.use('/api/v1/home', createHomePreviewRouter(dataSource));
-      logger.info('✅ Home Preview routes registered at /api/v1/home/preview');
-    } catch (homeError) {
-      logger.error('Failed to register Home Preview routes:', homeError);
-    }
+    // 28-d. Home Preview — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
+    //   `/api/v1/home/preview` 는 glycopharm 조직 해석 + glycopharm_products 집계를 전제로 한
+    //   GlycoPharm 종속 API 였고 프런트 소비처가 0 이었다. GlycoPharm 삭제와 함께 제거한다.
 
     // 28b. Register Store Paid Feature Entitlement routes (WO-O4O-STORE-PAID-FEATURE-ENTITLEMENT-V1)
     try {

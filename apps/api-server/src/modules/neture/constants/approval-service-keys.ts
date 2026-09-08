@@ -16,7 +16,6 @@
  * neture 등은 정책상 승인 대상이 아니다.
  */
 export const APPROVAL_ELIGIBLE_SERVICE_KEYS = [
-  'glycopharm',
   'kpa-society',
   'k-cosmetics',
 ] as const;

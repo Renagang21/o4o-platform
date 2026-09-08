@@ -33,7 +33,6 @@ const ORDER_STATUS_LABEL: Record<string, string> = {
 };
 
 const SERVICE_ICONS: Record<string, string> = {
-  glycopharm: '🏥',
   'k-cosmetics': '💄',
 };
 

@@ -38,11 +38,11 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { StoreBlogPost } from '../../glycopharm/entities/store-blog-post.entity.js';
+import { StoreBlogPost } from '../../../modules/store/entities/store-blog-post.entity.js';
 import type {
   StoreBlogPostStatus,
   StoreBlogPostAuthorRole,
-} from '../../glycopharm/entities/store-blog-post.entity.js';
+} from '../../../modules/store/entities/store-blog-post.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { hasAnyServiceRole } from '../../../utils/role.utils.js';
 import type { PrefixedRole } from '../../../types/roles.js';

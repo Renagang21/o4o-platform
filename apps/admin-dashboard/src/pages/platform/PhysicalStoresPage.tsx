@@ -91,12 +91,10 @@ interface StoreInsightsResult {
 
 const SERVICE_LABELS: Record<string, string> = {
   cosmetics: 'K-Cosmetics',
-  glycopharm: 'GlycoPharm',
 };
 
 const SERVICE_COLORS: Record<string, string> = {
   cosmetics: 'bg-pink-100 text-pink-800',
-  glycopharm: 'bg-blue-100 text-blue-800',
 };
 
 function formatCurrency(value: number): string {

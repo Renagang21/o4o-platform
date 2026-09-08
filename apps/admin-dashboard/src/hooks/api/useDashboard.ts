@@ -16,7 +16,6 @@ interface SalesSummary {
   averageOrderValue: number;
   breakdown: {
     neture: { revenue: number; orders: number };
-    glycopharm: { revenue: number; orders: number };
   };
 }
 

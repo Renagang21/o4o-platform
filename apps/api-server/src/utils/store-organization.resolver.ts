@@ -59,7 +59,7 @@ import logger from './logger.js';
 export const STORE_MEMBER_ROLES: readonly string[] = ['owner', 'admin', 'manager'];
 
 /** 서비스별 store_owner role prefix (role_assignments 접두사 기준) */
-export type StoreOwnerServiceKey = 'kpa' | 'glycopharm' | 'cosmetics' | 'pharmacy-hub' | 'cafe24-b2b';
+export type StoreOwnerServiceKey = 'kpa' | 'cosmetics' | 'pharmacy-hub' | 'cafe24-b2b';
 
 /**
  * 서비스 → organization 연결 근거.
@@ -74,7 +74,6 @@ export const STORE_SERVICE_ORG_LINKAGE: Readonly<
   Record<StoreOwnerServiceKey, { enrollmentCodes: readonly string[]; slugKeys: readonly string[] }>
 > = Object.freeze({
   kpa: { enrollmentCodes: ['kpa-society', 'kpa'], slugKeys: ['kpa'] },
-  glycopharm: { enrollmentCodes: ['glycopharm'], slugKeys: ['glycopharm'] },
   cosmetics: { enrollmentCodes: ['k-cosmetics', 'cosmetics'], slugKeys: ['k-cosmetics', 'cosmetics'] },
   'pharmacy-hub': { enrollmentCodes: ['pharmacy-hub'], slugKeys: ['pharmacy-hub'] },
   // WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1:

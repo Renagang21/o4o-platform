@@ -66,7 +66,7 @@ function resolveRegulatoryType(raw?: string): RegulatoryType | null {
  * 약국 대상 서비스 판정은 DB 정책(service_audience_policies)을 SSOT 로 사용한다.
  *  - WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1 에서 admin 설정 소스 도입.
  *  - WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1 에서 본 함수가 ServiceAudienceService 를 참조하도록 전환
- *    (기존 하드코딩 ['glycopharm','kpa-society'] 는 ServiceAudienceService 의 fallback 으로 이전됨).
+ *    (기존 하드코딩 ['kpa-society'] 는 ServiceAudienceService 의 fallback 으로 이전됨).
  *  - 카테고리 정의 / 규제 판정 기준(isRegulated) 자체는 변경하지 않는다.
  */
 

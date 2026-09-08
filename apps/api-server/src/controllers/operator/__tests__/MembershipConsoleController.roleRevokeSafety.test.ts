@@ -248,11 +248,11 @@ describe('마지막 활성 서비스 admin 해제 차단', () => {
   });
 
   it('동시 해제를 막기 위해 활성 보유자를 FOR UPDATE 로 잠그고 같은 트랜잭션에서 UPDATE 한다', async () => {
-    primeRole('glycopharm:admin');
-    activeHolders['glycopharm:admin'] = [TARGET_ID, OTHER_ID];
+    primeRole('pharmacy-hub:admin');
+    activeHolders['pharmacy-hub:admin'] = [TARGET_ID, OTHER_ID];
     const res = makeRes();
 
-    await controller.removeMemberRole(makeReq(TARGET_ID, 'glycopharm:admin'), res);
+    await controller.removeMemberRole(makeReq(TARGET_ID, 'pharmacy-hub:admin'), res);
 
     const select = txQueries.find((q) => /SELECT user_id FROM role_assignments/i.test(q.sql));
     expect(select!.sql).toMatch(/FOR UPDATE/);

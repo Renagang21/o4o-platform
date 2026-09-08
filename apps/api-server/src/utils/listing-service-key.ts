@@ -29,7 +29,6 @@ import { SERVICE_KEYS } from '../constants/service-keys.js';
 /** OPL service_key 로 인정되는 canonical membership key (platform-level). */
 export const LISTING_SERVICE_KEYS: readonly string[] = [
   SERVICE_KEYS.KPA_SOCIETY,
-  SERVICE_KEYS.GLYCOPHARM,
   SERVICE_KEYS.NETURE,
   SERVICE_KEYS.K_COSMETICS,
 ];
@@ -41,7 +40,6 @@ export const LISTING_SERVICE_KEYS: readonly string[] = [
 export const MULTI_MEMBERSHIP_PRIORITY: readonly string[] = [
   SERVICE_KEYS.NETURE,
   SERVICE_KEYS.KPA_SOCIETY,
-  SERVICE_KEYS.GLYCOPHARM,
   SERVICE_KEYS.K_COSMETICS,
 ];
 

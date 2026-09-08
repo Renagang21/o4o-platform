@@ -18,8 +18,6 @@ const ROLE_LABELS: Record<string, string> = {
   'kpa-society:operator': 'KPA 운영자',
   'k-cosmetics:admin': 'K-Cosmetics 관리자',
   'k-cosmetics:operator': 'K-Cosmetics 운영자',
-  'glycopharm:admin': 'GlycoPharm 관리자',
-  'glycopharm:operator': 'GlycoPharm 운영자',
   user: '사용자',
 };
 

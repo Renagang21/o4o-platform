@@ -184,8 +184,8 @@ describe('drug-commerce.guard — 의약품 거래 절대 차단', () => {
     expect(r.code).toBe(DrugCommerceErrorCode.DRUG_COMMERCE_FORBIDDEN);
   });
 
-  it('[6] 약국 대상 서비스(kpa-society · pharmacy-hub · glycopharm)에서도 거부된다 — 서비스 예외 없음', async () => {
-    for (const serviceKey of ['kpa-society', 'pharmacy-hub', 'glycopharm']) {
+  it('[6] 약국 대상 서비스(kpa-society · pharmacy-hub)에서도 거부된다 — 서비스 예외 없음', async () => {
+    for (const serviceKey of ['kpa-society', 'pharmacy-hub']) {
       const { service } = makeCartService();
       await expect(
         service.add(

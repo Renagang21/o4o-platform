@@ -1,7 +1,7 @@
 /**
  * Forum Write Shell adoption 정적 고정 — WO-O4O-COMMUNITY-FORUM-WRITE-SHELL-TEMPLATE-V1 §14
  *
- * K-Cosmetics / GlycoPharm wrapper 가 공통 셸을 소비하고, 로컬 중복 셸이 되살아나지 않도록 고정한다.
+ * K-Cosmetics wrapper 가 공통 셸을 소비하고, 로컬 중복 셸이 되살아나지 않도록 고정한다.
  * (서비스 API URL · serviceKey/forum context 는 wrapper 소유로 유지)
  */
 import { describe, expect, it } from 'vitest';
@@ -15,7 +15,6 @@ const stripComments = (src: string) =>
 
 const WRAPPERS = [
   { name: 'K-Cosmetics', path: 'services/web-k-cosmetics/src/pages/forum/ForumWritePage.tsx', selectId: 'kcos-forum-select' },
-  { name: 'GlycoPharm', path: 'services/web-glycopharm/src/pages/forum/ForumWritePage.tsx', selectId: 'gp-forum-select' },
 ];
 
 describe('forum write shell adoption', () => {
@@ -47,9 +46,8 @@ describe('forum write shell adoption', () => {
     });
   }
 
-  it('K-Cosmetics 와 GlycoPharm 의 상세 route 는 각각 유지된다', () => {
+  it('K-Cosmetics 의 상세 route 는 유지된다', () => {
     expect(read(WRAPPERS[0].path)).toContain('/forum/post/');
-    expect(read(WRAPPERS[1].path)).toContain('/forum/posts/');
   });
 
   it('공통 셸은 service-neutral 이다 (fetch/axios/서비스 분기 없음)', () => {

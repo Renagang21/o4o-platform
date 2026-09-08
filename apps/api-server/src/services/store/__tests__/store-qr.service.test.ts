@@ -3,7 +3,7 @@
  *
  * WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1
  *
- * 이 service 는 KPA · GlycoPharm · K-Cosmetics · Pharmacy-Hub **4개 서비스**가 공유한다.
+ * 이 service 는 KPA · K-Cosmetics · Pharmacy-Hub **3개 서비스**가 공유한다.
  * 기존 controller 구현을 위임 전환하면서 계약이 바뀌지 않았음을 고정하는 것이 목적이다.
  * (배포 전 회귀 근거 — 이 축에는 그동안 테스트가 없었다.)
  *

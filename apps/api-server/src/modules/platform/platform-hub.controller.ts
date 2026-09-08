@@ -136,36 +136,7 @@ async function getNetureSummary(ds: DataSource): Promise<Record<string, any>> {
   }
 }
 
-async function getGlycopharmSummary(ds: DataSource): Promise<Record<string, any>> {
-  try {
-    const [pharmacyStats] = await ds.query(`
-      SELECT
-        COUNT(*) as "totalPharmacies",
-        COUNT(*) FILTER (WHERE o."isActive" = true) as "activePharmacies"
-      FROM organizations o
-      JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
-    `);
-
-    // WO-O4O-GLYCO-CARE-BACKEND-CLEANUP-V1: Care KPI 블록 제거.
-    //   care_kpi_snapshots 테이블이 20260601000000-DropCareTables 마이그레이션에서 DROP 됨.
-    //   GlycoPharm canonical 구조에서는 환자 risk 추적 미사용.
-    const totalPharmacies = parseInt(pharmacyStats?.totalPharmacies || '0');
-    const activePharmacies = parseInt(pharmacyStats?.activePharmacies || '0');
-
-    return {
-      service: 'glycopharm',
-      label: 'GlycoPharm (의료)',
-      pharmacies: {
-        total: totalPharmacies,
-        active: activePharmacies,
-      },
-      riskLevel: 'healthy',
-    };
-  } catch (error) {
-    logger.warn('[Platform Hub] GlycoPharm summary failed:', error);
-    return { service: 'glycopharm', label: 'GlycoPharm (의료)', error: 'unavailable', riskLevel: 'unknown' };
-  }
-}
+// getGlycopharmSummary() — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
 // ─── Trigger Proxy ───
 
@@ -180,16 +151,10 @@ const TRIGGER_WHITELIST: Record<string, Record<string, string>> = {
     'neture.trigger.manage_partnership': 'manage-partnership',
     'neture.trigger.audit_review': 'audit-review',
   },
-  glycopharm: {
-    'glycopharm.trigger.care_review': 'care-review',
-    'glycopharm.trigger.create_session': 'coaching-auto-create',
-    'glycopharm.trigger.refresh_ai': 'ai-refresh',
-  },
 };
 
 const SERVICE_TRIGGER_PATHS: Record<string, string> = {
   neture: '/api/v1/neture/hub/trigger',
-  glycopharm: '/api/v1/glycopharm/pharmacy/hub/trigger',
 };
 
 // ─── Controller Factory ───
@@ -204,37 +169,23 @@ export function createPlatformHubController(dataSource: DataSource): ExpressRout
    */
   router.get('/summary', requireAuth, requirePlatformAdmin, async (_req: Request, res: Response) => {
     try {
-      const [kpaResult, netureResult, glycopharmResult] = await Promise.allSettled([
+      const [kpaResult, netureResult] = await Promise.allSettled([
         getKpaSummary(dataSource),
         getNetureSummary(dataSource),
-        getGlycopharmSummary(dataSource),
       ]);
 
       const kpa = kpaResult.status === 'fulfilled' ? kpaResult.value
         : { service: 'kpa', label: 'KPA (약사회)', error: 'unavailable', riskLevel: 'unknown' };
       const neture = netureResult.status === 'fulfilled' ? netureResult.value
         : { service: 'neture', label: 'Neture (공급자)', error: 'unavailable', riskLevel: 'unknown' };
-      const glycopharm = glycopharmResult.status === 'fulfilled' ? glycopharmResult.value
-        : { service: 'glycopharm', label: 'GlycoPharm (의료)', error: 'unavailable', riskLevel: 'unknown' };
-
       // Compute global risk level
-      const riskLevels = [kpa.riskLevel, neture.riskLevel, glycopharm.riskLevel];
+      const riskLevels = [kpa.riskLevel, neture.riskLevel];
       const globalRisk = riskLevels.includes('critical') ? 'critical'
         : riskLevels.includes('warning') ? 'warning'
         : riskLevels.includes('unknown') ? 'partial' : 'healthy';
 
       // Build top action queue (priority-sorted)
       const actions: Array<{ service: string; actionKey: string; priority: number; label: string }> = [];
-
-      // GlycoPharm high-risk patients
-      if (glycopharm.care?.highRisk > 0) {
-        actions.push({
-          service: 'glycopharm',
-          actionKey: 'glycopharm.trigger.care_review',
-          priority: 0.95,
-          label: `고위험 환자 ${glycopharm.care.highRisk}명 — Care 리뷰 필요`,
-        });
-      }
 
       // Neture pending requests
       if (neture.requests?.pending > 0) {
@@ -283,7 +234,7 @@ export function createPlatformHubController(dataSource: DataSource): ExpressRout
         success: true,
         data: {
           globalRisk,
-          services: { kpa, neture, glycopharm },
+          services: { kpa, neture },
           topActions: actions.slice(0, 5),
           timestamp: new Date().toISOString(),
         },

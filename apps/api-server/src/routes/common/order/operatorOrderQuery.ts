@@ -72,7 +72,7 @@ const EMPTY_STATS: OperatorOrderStats = {
  * checkout_orders 를 serviceKey 로 고정 조회 (view-only).
  *
  * @param dataSource  api-server DataSource
- * @param serviceKey  서버 고정 serviceKey ('glycopharm' | 'cosmetics' 등). client 값 신뢰 금지.
+ * @param serviceKey  서버 고정 serviceKey ('cosmetics' 등). client 값 신뢰 금지.
  *                    복수 허용 (예: KPA = ['kpa-society','kpa']) — 동일 서비스의 legacy/canonical
  *                    serviceKey 가 공존할 때 배열로 전달하면 ANY 로 매칭한다.
  * @param params      pagination / filter

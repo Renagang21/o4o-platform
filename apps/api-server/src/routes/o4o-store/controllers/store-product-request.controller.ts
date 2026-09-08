@@ -39,11 +39,10 @@ const STORE_REQUEST_SOURCE_LABEL = 'kpa-store-product-request';
 // store-product-library.controller.ts 의 deriveListingServiceKey 와 정합.
 const MEMBERSHIP_KEY_TO_SERVICE_KEY: Record<string, string> = {
   'kpa-society': 'kpa',
-  'glycopharm': 'glycopharm',
   'neture': 'neture',
   'k-cosmetics': 'cosmetics',
 };
-const MULTI_MEMBERSHIP_PRIORITY = ['neture', 'kpa-society', 'glycopharm', 'k-cosmetics'];
+const MULTI_MEMBERSHIP_PRIORITY = ['neture', 'kpa-society', 'k-cosmetics'];
 
 interface MembershipLike { serviceKey: string; status: string }
 

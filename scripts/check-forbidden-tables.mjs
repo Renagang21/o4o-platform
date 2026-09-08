@@ -61,7 +61,6 @@ const CONFIG = {
     // 특정 금지 테이블
     { pattern: /@Entity\s*\(\s*['"`]cosmetics_orders['"`]\s*\)/, name: 'cosmetics_orders' },
     { pattern: /@Entity\s*\(\s*['"`]tourism_orders['"`]\s*\)/, name: 'tourism_orders' },
-    { pattern: /@Entity\s*\(\s*['"`]glycopharm_orders['"`]\s*\)/, name: 'glycopharm_orders' },
     { pattern: /@Entity\s*\(\s*['"`]yaksa_orders['"`]\s*\)/, name: 'yaksa_orders' },
     { pattern: /@Entity\s*\(\s*['"`]neture_orders['"`]\s*\)/, name: 'neture_orders' },
   ],
@@ -75,7 +74,7 @@ const CONFIG = {
   // 레거시 예외 (Phase 5 이전 코드, 향후 제거 예정)
   legacyExceptions: [
     // ecommerce-core 는 WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1 에서 package 째 제거되어 예외가 필요 없다.
-    // pharmaceutical-core (GlycoPharm 레거시, Phase 5-A에서 차단됨)
+    // pharmaceutical-core (레거시, Phase 5-A에서 차단됨)
     'packages/pharmaceutical-core/src/entities/PharmaOrder.entity.ts',
   ],
 };

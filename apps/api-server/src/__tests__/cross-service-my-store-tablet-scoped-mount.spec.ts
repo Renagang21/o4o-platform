@@ -1,7 +1,7 @@
 /**
  * WO-O4O-CROSS-SERVICE-MY-STORE-RUNTIME-CONTRACT-COMMONIZATION-V1 §18
  *
- * 축 A(조직 해석 스코프) — K-Cosmetics / GlycoPharm 의 태블릿 진열 화면이
+ * 축 A(조직 해석 스코프) — K-Cosmetics / Pharmacy-Hub 의 태블릿 진열 화면이
  * 서비스 중립 `/api/v1/store/tablets` 를 호출해 **타 서비스 조직**을 고르던 결함.
  * KPA(`storeOwnerServiceKey: 'kpa'`) · PharmacyHub(`resolveOrganizationId`) 와 같은
  * seam 을 재사용해 서비스 축으로 스코프한다 — 새 resolver 를 만들지 않는다.
@@ -25,16 +25,16 @@ jest.mock('../middleware/auth.middleware.js', () => ({
 }));
 
 import {
-  ORG_COS, ORG_GP, ORG_NETURE,
-  NETURE_PRIMARY_MEMBERSHIP, KPA_MEMBERSHIP, COS_MEMBERSHIP, GP_MEMBERSHIP,
+  ORG_COS, ORG_PH, ORG_NETURE,
+  NETURE_PRIMARY_MEMBERSHIP, KPA_MEMBERSHIP, COS_MEMBERSHIP, PH_MEMBERSHIP,
   makeStoreTabletDataSource, makeStoreTabletApp,
 } from './helpers/store-tablet-org-stub.js';
 
-const ACTIVE_ROLES = ['kpa:store_owner', 'cosmetics:store_owner', 'glycopharm:store_owner'];
+const ACTIVE_ROLES = ['kpa:store_owner', 'cosmetics:store_owner', 'pharmacy-hub:store_owner'];
 const ACTIVE_MEMBERSHIPS = [
   { serviceKey: 'kpa-society', status: 'active' },
   { serviceKey: 'k-cosmetics', status: 'active' },
-  { serviceKey: 'glycopharm', status: 'active' },
+  { serviceKey: 'pharmacy-hub', status: 'active' },
 ];
 
 let CURRENT_ROLES: string[] = [...ACTIVE_ROLES];
@@ -42,7 +42,7 @@ let CURRENT_MEMBERSHIPS: Array<{ serviceKey: string; status: string }> = [...ACT
 
 /** 4서비스 시나리오: 매장 slug 없음 · TABLET 채널 미승인 → 노출 사유가 실려야 한다 */
 const makeDataSource = () => makeStoreTabletDataSource({
-  memberships: [NETURE_PRIMARY_MEMBERSHIP, KPA_MEMBERSHIP, COS_MEMBERSHIP, GP_MEMBERSHIP],
+  memberships: [NETURE_PRIMARY_MEMBERSHIP, KPA_MEMBERSHIP, COS_MEMBERSHIP, PH_MEMBERSHIP],
   currentRoles: () => CURRENT_ROLES,
   channelRows: [{ status: 'PENDING' }],
   productFlags: { service_ok: true, offer_ok: true, linked_approved: false, linked_any: true },
@@ -71,11 +71,11 @@ describe('축 A — KCos / GP 태블릿 라우트의 서비스 스코프 조직 
     expect(poolOrgParams[0]).toBe(ORG_COS);
   });
 
-  it('C. glycopharm mount 는 GP 조직을 고른다', async () => {
+  it('C. pharmacy-hub mount 는 PH 조직을 고른다', async () => {
     const { dataSource, poolOrgParams } = makeDataSource();
-    const res = await request(makeApp(dataSource, 'glycopharm')).get('/store/product-pool');
+    const res = await request(makeApp(dataSource, 'pharmacy-hub')).get('/store/product-pool');
     expect(res.status).toBe(200);
-    expect(poolOrgParams[0]).toBe(ORG_GP);
+    expect(poolOrgParams[0]).toBe(ORG_PH);
   });
 
   it('D. 해당 서비스 store_owner role 이 없으면 403 (게이트 완화 없음)', async () => {
@@ -113,10 +113,9 @@ describe('mount · client 계약 (raw source)', () => {
   const repo = path.resolve(__dirname, '..', '..', '..', '..');
   const read = (p: string) => fs.readFileSync(p, 'utf8');
 
-  it('F. KCos / GP 서비스 라우터가 태블릿 라우트를 서비스 축으로 mount 한다', () => {
+  it('F. KCos 서비스 라우터가 태블릿 라우트를 서비스 축으로 mount 한다', () => {
     for (const [file, key] of [
       ['routes/cosmetics/cosmetics.routes.ts', 'cosmetics'],
-      ['routes/glycopharm/glycopharm.routes.ts', 'glycopharm'],
     ]) {
       const text = read(path.join(apiSrc, file));
       expect(text).toContain('createStoreTabletRoutes(dataSource, {');
@@ -131,14 +130,10 @@ describe('mount · client 계약 (raw source)', () => {
       .toContain('createStoreTabletRoutes(dataSource)');
   });
 
-  it('H. KCos / GP 프론트 태블릿 client 는 서비스 스코프 경로를 쓴다', () => {
+  it('H. KCos 프론트 태블릿 client 는 서비스 스코프 경로를 쓴다', () => {
     const kcos = read(path.join(repo, 'services/web-k-cosmetics/src/services/tabletDisplayApi.ts'));
     expect(kcos).toContain("const BASE = '/cosmetics/store';");
-    const gp = read(path.join(repo, 'services/web-glycopharm/src/api/tabletDisplays.ts'));
-    expect(gp).toContain("const BASE = '/glycopharm/store';");
-    const gpInterest = read(path.join(repo, 'services/web-glycopharm/src/api/tabletInterest.ts'));
-    expect(gpInterest).toContain('/glycopharm/store/interest/');
-    for (const text of [kcos, gp, gpInterest]) {
+    for (const text of [kcos]) {
       expect(text).not.toMatch(/['"`]\/store\/(tablets|interest)/);
     }
   });

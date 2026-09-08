@@ -91,11 +91,11 @@ export interface StoresApi<T extends OperatorStoreBase = OperatorStoreBase> {
 
 /**
  * 서비스별 표현(text/colors) 설정.
- * 기존 @o4o/operator-ux-core 의 kpaConfig / glycopharmConfig / kcosmeticsConfig 와
+ * 기존 @o4o/operator-ux-core 의 kpaConfig / kcosmeticsConfig 와
  * 동일 컨셉. 표현 제어만 책임 — 데이터 로직은 Adapter 가 담당한다.
  */
 export interface StoresConfig {
-  serviceKey: 'kpa-society' | 'glycopharm' | 'k-cosmetics' | 'neture';
+  serviceKey: 'kpa-society' | 'k-cosmetics' | 'neture';
   terminology: {
     /** 단일 매장 라벨 (예: "약국" / "매장") */
     storeLabel: string;

@@ -18,7 +18,6 @@ import { getService } from '../../config/service-catalog.js';
 const SVC_TO_CATALOG: Record<string, string> = {
   kpa: 'kpa-society',
   'kpa-society': 'kpa-society',
-  glycopharm: 'glycopharm',
   cosmetics: 'k-cosmetics',
   'k-cosmetics': 'k-cosmetics',
 };

@@ -5,7 +5,7 @@
  *
  * Home 하단에 위치하여 두 가지 역할을 수행한다:
  * 1. 사용 방법 안내 — 주요 기능 진입 안내 (매장 등록, 상품 등록, 콘텐츠 활용)
- * 2. 다른 서비스 보기 — GlycoPharm, K-Cosmetics, Market Trial
+ * 2. 다른 서비스 보기 — K-Cosmetics, Market Trial
  *
  * props로 overrides 가능. 기본값은 O4O 표준 항목.
  */
@@ -29,13 +29,6 @@ const ALL_SERVICE_ITEMS: O4OHelpServiceItem[] = [
     title: 'KPA Society',
     description: '약사회 회원을 위한 커뮤니티·학술·서비스 통합 플랫폼입니다',
     href: 'https://kpa-society.co.kr/',
-    external: true,
-  },
-  {
-    serviceKey: 'glycopharm',
-    title: 'GlycoPharm',
-    description: '약국 고객의 혈당 관리와 상담을 체계적으로 지원하는 서비스입니다',
-    href: 'https://www.glycopharm.co.kr',
     external: true,
   },
   {

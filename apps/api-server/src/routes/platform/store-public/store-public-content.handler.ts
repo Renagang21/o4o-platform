@@ -17,10 +17,10 @@
 import { Router, Request, Response } from 'express';
 import type { DataSource, Repository } from 'typeorm';
 import { LessThanOrEqual } from 'typeorm';
-import { StoreBlogPost } from '../../glycopharm/entities/store-blog-post.entity.js';
-import type { StoreBlogPostStatus } from '../../glycopharm/entities/store-blog-post.entity.js';
+import { StoreBlogPost } from '../../../modules/store/entities/store-blog-post.entity.js';
+import type { StoreBlogPostStatus } from '../../../modules/store/entities/store-blog-post.entity.js';
 // WO-O4O-NETURE-BLOG-CANONICAL-ALIGN-V1
-import { StoreBlogSettings } from '../../glycopharm/entities/store-blog-settings.entity.js';
+import { StoreBlogSettings } from '../../../modules/store/entities/store-blog-settings.entity.js';
 import { resolvePublicStore } from './store-public-utils.js';
 
 export function createStorePublicContentRoutes(deps: {

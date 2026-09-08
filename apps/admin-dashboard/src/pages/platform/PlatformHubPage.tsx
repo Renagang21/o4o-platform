@@ -3,7 +3,7 @@
  *
  * WO-PLATFORM-GLOBAL-HUB-V1
  *
- * 플랫폼 통합 허브. 모든 서비스(KPA, Neture, GlycoPharm) 데이터를
+ * 플랫폼 통합 허브. 모든 서비스(KPA, Neture) 데이터를
  * 한 화면에서 집계하고, cross-service 트리거를 실행한다.
  *
  * Sections:
@@ -17,14 +17,11 @@ import {
   Activity,
   AlertTriangle,
   CheckCircle,
-  Heart,
   Users,
   ShieldAlert,
-  TrendingDown,
   RefreshCw,
   Zap,
   Building2,
-  Stethoscope,
   Package,
   Loader2,
 } from 'lucide-react';
@@ -53,7 +50,6 @@ interface PlatformSummaryData {
   services: {
     kpa: ServiceSummary;
     neture: ServiceSummary;
-    glycopharm: ServiceSummary;
   };
   topActions: TopAction[];
   timestamp: string;
@@ -80,7 +76,6 @@ const RISK_LABELS: Record<string, string> = {
 const SERVICE_ICONS: Record<string, typeof Building2> = {
   kpa: Users,
   neture: Package,
-  glycopharm: Stethoscope,
 };
 
 function riskStyle(level: string) {
@@ -193,15 +188,6 @@ export default function PlatformHubPage() {
 
   const riskCards = [
     {
-      label: '의료 위험',
-      icon: Heart,
-      level: services.glycopharm.care?.highRisk > 0 ? 'critical'
-        : services.glycopharm.care?.moderate > 3 ? 'warning' : 'healthy',
-      detail: services.glycopharm.error
-        ? '서비스 연결 불가'
-        : `고위험 ${services.glycopharm.care?.highRisk ?? 0}명 / 중위험 ${services.glycopharm.care?.moderate ?? 0}명`,
-    },
-    {
       label: '승인 위험',
       icon: ShieldAlert,
       level: (services.neture.requests?.approvalRate ?? 100) < 50 ? 'critical'
@@ -218,12 +204,6 @@ export default function PlatformHubPage() {
       detail: services.kpa.error
         ? '서비스 연결 불가'
         : `대기 회원 ${services.kpa.members?.pending ?? 0}명 / 신청 ${services.kpa.applications?.pending ?? 0}건`,
-    },
-    {
-      label: '매출 추세',
-      icon: TrendingDown,
-      level: 'healthy',
-      detail: `약국 ${services.glycopharm.pharmacies?.active ?? 0}개 활성`,
     },
   ];
 
@@ -308,16 +288,6 @@ export default function PlatformHubPage() {
             ]}
           />
 
-          {/* GlycoPharm */}
-          <ServiceHealthCard
-            service={services.glycopharm}
-            metrics={[
-              { label: '약국', value: `${services.glycopharm.pharmacies?.active ?? 0}/${services.glycopharm.pharmacies?.total ?? 0}` },
-              { label: '고위험', value: services.glycopharm.care?.highRisk ?? 0, highlight: true },
-              { label: '중위험', value: services.glycopharm.care?.moderate ?? 0 },
-              { label: '저위험', value: services.glycopharm.care?.low ?? 0 },
-            ]}
-          />
         </div>
       </section>
 

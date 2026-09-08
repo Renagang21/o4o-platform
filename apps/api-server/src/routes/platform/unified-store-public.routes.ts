@@ -29,8 +29,7 @@
 
 import { Router } from 'express';
 import { DataSource } from 'typeorm';
-import { GlycopharmProduct } from '../glycopharm/entities/glycopharm-product.entity.js';
-import { StoreBlogPost } from '../glycopharm/entities/store-blog-post.entity.js';
+import { StoreBlogPost } from '../../modules/store/entities/store-blog-post.entity.js';
 import { createStorePublicHomeRoutes } from './store-public/store-public-home.handler.js';
 import { createStorePublicProductRoutes } from './store-public/store-public-product.handler.js';
 import { createStorePublicContentRoutes } from './store-public/store-public-content.handler.js';
@@ -38,10 +37,9 @@ import { createStorePublicTabletRoutes } from './store-public/store-public-table
 
 export function createUnifiedStorePublicRoutes(dataSource: DataSource): Router {
   const router = Router();
-  const productRepo = dataSource.getRepository(GlycopharmProduct);
   const blogRepo = dataSource.getRepository(StoreBlogPost);
 
-  router.use('/', createStorePublicHomeRoutes({ dataSource, productRepo }));
+  router.use('/', createStorePublicHomeRoutes({ dataSource }));
   router.use('/', createStorePublicProductRoutes({ dataSource }));
   router.use('/', createStorePublicContentRoutes({ dataSource, blogRepo }));
   router.use('/', createStorePublicTabletRoutes({ dataSource }));

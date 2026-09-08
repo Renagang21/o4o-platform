@@ -189,8 +189,8 @@ Core → Extension → Feature → Service
 
 공통 모듈, 공통 config, 공통 sidebar/menu, 공통 layout, 공통 capability/permission map, core+extension contract를 수정할 때는 **단일 서비스 기준으로 완료 판단하지 않는다.**
 
-- 반드시 해당 모듈의 **모든 소비처를 먼저 식별**하고, KPA-Society / GlycoPharm / K-Cosmetics / Neture 및 관련 admin/operator/store/forum/store-hub/mypage 소비 영역에 미치는 영향을 확인한다.
-- KPA-only / GlycoPharm-only / K-Cosmetics-only / Neture-only 임시 예외로 해결하지 말고, **공통 정책 문제인지 먼저 판단**한다.
+- 반드시 해당 모듈의 **모든 소비처를 먼저 식별**하고, KPA-Society / K-Cosmetics / Neture / Pharmacy-Hub 및 관련 admin/operator/store/forum/store-hub/mypage 소비 영역에 미치는 영향을 확인한다.
+- KPA-only / K-Cosmetics-only / Neture-only 임시 예외로 해결하지 말고, **공통 정책 문제인지 먼저 판단**한다.
 - route, role, capability, visibility, feature flag, extension contract 필터를 함께 검증한다 (빈 그룹/빈 block 제거로 화면에서 사라질 가능성 포함).
 - DB backfill / migration / capability 주입으로 UI 정책 문제를 임시 해결하지 않는다. route 없는 메뉴는 노출하지 않고, route 있는 실기능 메뉴는 숨기지 않는다 (데드링크 0 / 기능 은폐 0).
 
@@ -235,7 +235,8 @@ import type { RelatedEntity } from './related.entity.js';
 | OrderType 불변 | 생성 시 결정, 이후 변경 금지 |
 | 금지 테이블 | `*_orders`, `*_payments` 생성 금지 |
 
-**OrderType**: DROPSHIPPING ✅ / COSMETICS ✅ / TOURISM ✅ / GLYCOPHARM ❌ BLOCKED
+**OrderType**: DROPSHIPPING ✅ / COSMETICS ✅ / TOURISM ✅
+> GLYCOPHARM OrderType 은 WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1 에서 서비스와 함께 제거되었다.
 
 > 📄 상세: `docs/baseline/E-COMMERCE-ORDER-CONTRACT.md`
 
@@ -253,7 +254,7 @@ import type { RelatedEntity } from './related.entity.js';
 ### Store Production Material (Canonical)
 
 - **Store Production Material 관련 작업 전 `docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md` 를 우선 참조한다.**
-- `kpa_store_contents` 는 현재 **legacy physical table name** 으로 간주한다 (KPA / GlycoPharm / Cosmetics 3 서비스 공통 사용 중).
+- `kpa_store_contents` 는 현재 **legacy physical table name** 으로 간주한다 (KPA / Cosmetics 공통 사용 중).
 - logical canonical 개념은 service-neutral **Store Production Material** 이다.
 - 단순 prefix 제거 또는 성급한 table rename 제안 금지. rename 판단은 canonical 문서 기준으로 수행한다.
 
@@ -267,7 +268,6 @@ import type { RelatedEntity } from './related.entity.js';
 |--------|------|
 | `o4o-core-api` | API 서버 |
 | `neture-web` | 네처 메인 |
-| `glycopharm-web` | 글라이코팜 |
 | `k-cosmetics-web` | K-화장품 |
 | `kpa-society-web` | 약사회 SaaS |
 

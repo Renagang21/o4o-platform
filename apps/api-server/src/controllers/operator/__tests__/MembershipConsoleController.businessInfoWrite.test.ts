@@ -71,8 +71,8 @@ function makeReq(body: Record<string, any>) {
   return {
     params: { userId: TARGET },
     body,
-    user: { id: CALLER, roles: ['glycopharm:operator'] },
-    serviceScope: { isPlatformAdmin: false, serviceKeys: ['glycopharm'], rolePrefixes: [] },
+    user: { id: CALLER, roles: ['pharmacy-hub:operator'] },
+    serviceScope: { isPlatformAdmin: false, serviceKeys: ['pharmacy-hub'], rolePrefixes: [] },
   } as any;
 }
 

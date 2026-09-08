@@ -26,7 +26,6 @@ const read = (rel: string) => fs.readFileSync(path.join(SRC, rel), 'utf-8');
 
 const WRAPPERS = [
   'routes/kpa/controllers/kpa-checkout.controller.ts',
-  'routes/glycopharm/controllers/checkout.controller.ts',
   'routes/cosmetics/controllers/cosmetics-order.controller.ts',
 ];
 
@@ -165,7 +164,7 @@ describe('A. Buyer order read Core — 조회 의미·경계', () => {
     const b = await getBuyerOrderDetail(fakeDataSource([[]]).ds, {
       orderId: ORDER,
       buyerId: BUYER,
-      serviceKeys: ['glycopharm'],
+      serviceKeys: ['kpa-society'],
     });
     expect(a).toEqual(b);
   });

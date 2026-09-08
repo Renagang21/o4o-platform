@@ -3,7 +3,7 @@
  *
  * WO-O4O-CROSS-SERVICE-STORE-LINKING-V1
  *
- * Links Cosmetics stores and GlycoPharm pharmacies by normalized business_number
+ * Links Cosmetics stores by normalized business_number
  * into unified "Physical Stores" for cross-service KPI aggregation.
  *
  * WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1 (Track A):
@@ -12,11 +12,9 @@
  * 정렬 정책:
  *   - `physical_store_links.service_store_id` 는 service-specific PK:
  *     · cosmetics: `cosmetics_stores.id`
- *     · glycopharm: `organizations.id`
  *   - canonical `checkout_orders.sellerOrganizationId` = `organizations.id`.
  *   - bridge inline CASE:
  *     · cosmetics: subquery `cosmetics_stores.organization_id` lookup
- *     · glycopharm: 직접 cast
  *   - cosmetics_stores.organization_id 가 NULL 이면 매칭 실패 → 0 orders (정상).
  *   - 매출 인정 양성 조건: `status = 'paid'`.
  *   - safe-fallback (route-level) 보존.
@@ -74,7 +72,7 @@ export class PhysicalStoreService {
   constructor(private dataSource: DataSource) {}
 
   /**
-   * Full sync: scan cosmetics + glycopharm stores, upsert physical_stores,
+   * Full sync: scan cosmetics stores, upsert physical_stores,
    * and link them via physical_store_links.
    */
   async syncLinks(): Promise<SyncResult> {
@@ -82,20 +80,13 @@ export class PhysicalStoreService {
     let updated = 0;
     let linked = 0;
 
-    // 1. Fetch all stores with business_number from both services
-    const [cosmeticsRows, glycopharmRows] = await Promise.all([
-      this.dataSource.query(
-        `SELECT id, business_number, name, region
-         FROM cosmetics.cosmetics_stores
-         WHERE business_number IS NOT NULL AND business_number != ''`,
-      ),
-      this.dataSource.query(
-        `SELECT o.id, o.business_number, o.name
-         FROM organizations o
-         JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
-         WHERE o.business_number IS NOT NULL AND o.business_number != ''`,
-      ),
-    ]);
+    // 1. Fetch all stores with business_number
+    //    WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: glycopharm 링크 소스 제거 (서비스 삭제).
+    const cosmeticsRows = await this.dataSource.query(
+      `SELECT id, business_number, name, region
+       FROM cosmetics.cosmetics_stores
+       WHERE business_number IS NOT NULL AND business_number != ''`,
+    );
 
     // 2. Group by normalized business_number
     const bnMap = new Map<string, {
@@ -116,22 +107,6 @@ export class PhysicalStoreService {
         });
       }
       bnMap.get(bn)!.links.push({ serviceType: 'cosmetics', serviceStoreId: row.id });
-    }
-
-    for (const row of glycopharmRows) {
-      const bn = normalizeBusinessNumber(row.business_number);
-      if (!bn) continue;
-
-      if (!bnMap.has(bn)) {
-        bnMap.set(bn, {
-          storeName: row.name,
-          region: null,
-          links: [],
-        });
-      } else {
-        // If cosmetics already set the name, keep it; glycopharm is secondary
-      }
-      bnMap.get(bn)!.links.push({ serviceType: 'glycopharm', serviceStoreId: row.id });
     }
 
     // 3. Upsert physical_stores and insert links
@@ -191,8 +166,8 @@ export class PhysicalStoreService {
 
     // WO-O4O-STORE-KPI-DASHBOARD-CHECKOUT-ORDERS-ALIGNMENT-V1:
     // checkout_orders.sellerOrganizationId 와 physical_store_links.service_store_id 간
-    // bridge: cosmetics 인 경우 cosmetics_stores.organization_id, glycopharm 인 경우
-    // service_store_id 자체 (organizations.id 직접).
+    // bridge: cosmetics 인 경우 cosmetics_stores.organization_id.
+    // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: glycopharm 분기 제거.
     const rows = await this.dataSource.query(
       `SELECT
          ps.id as "physicalStoreId",
@@ -213,8 +188,6 @@ export class PhysicalStoreService {
                 CASE
                   WHEN psl.service_type = 'cosmetics'
                     THEN (SELECT organization_id FROM cosmetics.cosmetics_stores WHERE id = psl.service_store_id)
-                  WHEN psl.service_type = 'glycopharm'
-                    THEN psl.service_store_id::uuid
                   ELSE NULL
                 END
               )
@@ -231,8 +204,6 @@ export class PhysicalStoreService {
                 CASE
                   WHEN psl.service_type = 'cosmetics'
                     THEN (SELECT organization_id FROM cosmetics.cosmetics_stores WHERE id = psl.service_store_id)
-                  WHEN psl.service_type = 'glycopharm'
-                    THEN psl.service_store_id::uuid
                   ELSE NULL
                 END
               )
@@ -287,8 +258,6 @@ export class PhysicalStoreService {
          CASE
            WHEN psl.service_type = 'cosmetics'
              THEN (SELECT name FROM cosmetics.cosmetics_stores WHERE id = psl.service_store_id)
-           WHEN psl.service_type = 'glycopharm'
-             THEN (SELECT name FROM organizations WHERE id = psl.service_store_id)
            ELSE 'Unknown'
          END as "storeName",
          COALESCE(
@@ -298,8 +267,6 @@ export class PhysicalStoreService {
               CASE
                 WHEN psl.service_type = 'cosmetics'
                   THEN (SELECT organization_id FROM cosmetics.cosmetics_stores WHERE id = psl.service_store_id)
-                WHEN psl.service_type = 'glycopharm'
-                  THEN psl.service_store_id::uuid
                 ELSE NULL
               END
             )
@@ -314,8 +281,6 @@ export class PhysicalStoreService {
               CASE
                 WHEN psl.service_type = 'cosmetics'
                   THEN (SELECT organization_id FROM cosmetics.cosmetics_stores WHERE id = psl.service_store_id)
-                WHEN psl.service_type = 'glycopharm'
-                  THEN psl.service_store_id::uuid
                 ELSE NULL
               END
             )
@@ -372,8 +337,6 @@ export class PhysicalStoreService {
            CASE
              WHEN psl.service_type = 'cosmetics'
                THEN (SELECT organization_id FROM cosmetics.cosmetics_stores WHERE id = psl.service_store_id)
-             WHEN psl.service_type = 'glycopharm'
-               THEN psl.service_store_id::uuid
              ELSE NULL
            END
          )

@@ -49,14 +49,15 @@ function extractServiceId(req: Request): string {
   }
 
   // Default service (can be configured per deployment)
-  return 'glycopharm';
+  // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: 기본값 glycopharm → k-cosmetics (유일한 허용 서비스)
+  return 'k-cosmetics';
 }
 
 /**
  * Validates service ID is one of the allowed services
  */
 function isValidServiceId(serviceId: string): boolean {
-  const allowedServices = ['glycopharm', 'k-cosmetics'];
+  const allowedServices = ['k-cosmetics'];
   return allowedServices.includes(serviceId.toLowerCase());
 }
 

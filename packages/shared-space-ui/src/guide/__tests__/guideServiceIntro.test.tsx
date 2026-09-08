@@ -4,7 +4,7 @@
  * WO-O4O-GUIDE-ENTRY-AND-LANDING-COMMONIZATION-V1 §15
  *
  * 1) Shared landing 렌더 계약 (제목/lead · 카드 · 선택 섹션 · 링크)
- * 2) Adoption 정적 고정 — KPA / K-Cosmetics / GlycoPharm wrapper 가 공통 View 를 쓰는지
+ * 2) Adoption 정적 고정 — KPA / K-Cosmetics wrapper 가 공통 View 를 쓰는지
  * 3) Route contract — /guide · /guide/intro · /guide/usage · /guide/features · /service-guide 관계 유지
  */
 import { readFileSync } from 'node:fs';
@@ -15,7 +15,6 @@ import { MemoryRouter } from 'react-router-dom';
 import { GuideServiceIntroPage } from '../GuideServiceIntroPage.js';
 import { kpaServiceIntroProps } from '../copy/kpa.js';
 import { kCosmeticsServiceIntroProps } from '../copy/k-cosmetics.js';
-import { glycopharmServiceIntroProps } from '../copy/glycopharm.js';
 import { pharmacyHubServiceIntroProps } from '../copy/pharmacy-hub.js';
 import type { GuideServiceIntroPageProps } from '../types.js';
 
@@ -35,7 +34,6 @@ function renderPage(props: GuideServiceIntroPageProps) {
 const SERVICES: [string, GuideServiceIntroPageProps][] = [
   ['KPA', kpaServiceIntroProps],
   ['K-Cosmetics', kCosmeticsServiceIntroProps],
-  ['GlycoPharm', glycopharmServiceIntroProps],
   // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
   ['PharmacyHub', pharmacyHubServiceIntroProps],
 ];
@@ -100,11 +98,10 @@ describe('GuideServiceIntroPage — 렌더 계약', () => {
   });
 });
 
-describe('Adoption — 3 서비스 wrapper 가 공통 View 를 쓴다', () => {
+describe('Adoption — 2 서비스 wrapper 가 공통 View 를 쓴다', () => {
   const WRAPPERS: [string, string, string][] = [
     ['KPA', 'services/web-kpa-society/src/pages/service-guide/ServiceGuidePage.tsx', 'kpaServiceIntroProps'],
     ['K-Cosmetics', 'services/web-k-cosmetics/src/pages/ServiceGuidePage.tsx', 'kCosmeticsServiceIntroProps'],
-    ['GlycoPharm', 'services/web-glycopharm/src/pages/ServiceGuidePage.tsx', 'glycopharmServiceIntroProps'],
   ];
 
   it.each(WRAPPERS)('%s wrapper 는 GuideServiceIntroPage + copy config 만 사용한다', (_n, path, props) => {
@@ -123,7 +120,6 @@ describe('Route contract — /service-guide 와 /guide 관계 유지', () => {
   const APPS: [string, string][] = [
     ['KPA', 'services/web-kpa-society/src/App.tsx'],
     ['K-Cosmetics', 'services/web-k-cosmetics/src/App.tsx'],
-    ['GlycoPharm', 'services/web-glycopharm/src/App.tsx'],
   ];
 
   it.each(APPS)('%s: /service-guide 와 기존 guide deep-link 가 모두 유지된다', (_n, path) => {
@@ -144,8 +140,8 @@ describe('Route contract — /service-guide 와 /guide 관계 유지', () => {
     expect(src).not.toMatch(/path="\/guide"\s+element=\{<Navigate/);
   });
 
-  it('3 서비스 guide intro 하단에 서비스 소개(/service-guide) 상호 연결이 있다', () => {
-    for (const f of ['kpa.ts', 'k-cosmetics.ts', 'glycopharm.ts']) {
+  it('2 서비스 guide intro 하단에 서비스 소개(/service-guide) 상호 연결이 있다', () => {
+    for (const f of ['kpa.ts', 'k-cosmetics.ts']) {
       const src = read(`packages/shared-space-ui/src/guide/copy/${f}`);
       expect(src).toContain("serviceGuide: { label: '서비스 소개', to: '/service-guide' }");
     }

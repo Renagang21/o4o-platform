@@ -60,7 +60,7 @@ export const PHARMACY_HUB_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   ],
   platformBypass: true,
   legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'cosmetics'],
+  blockedServicePrefixes: ['kpa', 'neture', 'cosmetics'],
   scopeRoleMapping: {
     'pharmacy-hub:admin': ['pharmacy-hub:admin'],
     'pharmacy-hub:operator': ['pharmacy-hub:operator', 'pharmacy-hub:admin'],

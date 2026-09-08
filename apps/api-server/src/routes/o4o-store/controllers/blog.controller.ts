@@ -22,13 +22,13 @@ import { DataSource, LessThanOrEqual } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 // WO-O4O-KPA-APPROVED-STORE-OWNER-AUTO-AUTHORIZATION-FIX-V1
 import { kpaStoreOwnerOwnsStore } from '../utils/kpa-store-owner.util.js';
-import { StoreBlogPost } from '../../glycopharm/entities/store-blog-post.entity.js';
+import { StoreBlogPost } from '../../../modules/store/entities/store-blog-post.entity.js';
 import type {
   StoreBlogPostStatus,
   StoreBlogPostAuthorRole,
-} from '../../glycopharm/entities/store-blog-post.entity.js';
+} from '../../../modules/store/entities/store-blog-post.entity.js';
 // WO-O4O-KPA-STORE-BLOG-META-V1
-import { StoreBlogSettings } from '../../glycopharm/entities/store-blog-settings.entity.js';
+import { StoreBlogSettings } from '../../../modules/store/entities/store-blog-settings.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1: 원본(source)→blog_post 관계 기록
@@ -46,8 +46,6 @@ import {
   type BlogFailure,
   type BlogResult,
 } from '../../../services/store/store-blog.service.js';
-
-const DEFAULT_SERVICE_KEY = 'glycopharm';
 
 /**
  * \uC2E4\uD328 \uACB0\uACFC\uB97C \uC6D0\uBCF8\uACFC \uB3D9\uC77C\uD55C nested envelope \uC73C\uB85C \uB0B4\uB824\uBCF4\uB0B8\uB2E4.
@@ -68,7 +66,7 @@ function sendBlogFailure(res: Response, result: BlogResult<unknown>): void {
 export function createBlogController(
   dataSource: DataSource,
   requireAuth: RequestHandler,
-  serviceKey: string = DEFAULT_SERVICE_KEY,
+  serviceKey: string,
 ): Router {
   const router = Router();
   const orgRepo = dataSource.getRepository(OrganizationStore);
@@ -94,7 +92,7 @@ export function createBlogController(
     // WO-O4O-STORE-SLUG-CANONICAL-CONTRACT-HARDENING-V1 §6:
     //   공개 조회는 slug 만 맞는다고 끝내지 않고 **service 귀속까지 일치**해야 한다.
     //   이 컨트롤러는 서비스별 mount(`/api/v1/{service}/stores/:slug/...`)이고
-    //   `serviceKey` 는 slug 축(kpa / glycopharm / cosmetics)과 같은 값이 주입된다.
+    //   `serviceKey` 는 slug 축(kpa / cosmetics)과 같은 값이 주입된다.
     //   slug row 의 service_key 가 다르면 이 서비스의 공개 매장이 아니다
     //   (다서비스 enrollment 조직이 다른 서비스 slug 로 열리던 결함).
     if (record.serviceKey !== serviceKey) return null;
@@ -106,7 +104,7 @@ export function createBlogController(
   // KPA 는 승인된 매장 경영자(role_assignments.kpa:store_owner, RBAC SSOT)면 소유자다.
   // created_by 는 생성자일 뿐 권한 SSOT 가 아니므로, 승인 경영자가 차단되던 결함을 수정.
   // 교차 매장 차단은 kpaStoreOwnerOwnsStore 내부(resolved org === store.id)에서 보장.
-  // GlycoPharm / K-Cosmetics 는 기존 created_by 유지 — 별도 parity WO.
+  // K-Cosmetics 는 기존 created_by 유지 — 별도 parity WO.
   async function verifyOwner(pharmacy: OrganizationStore, userId: string): Promise<boolean> {
     if (serviceKey === 'kpa') {
       return kpaStoreOwnerOwnsStore(dataSource, userId, pharmacy.id);

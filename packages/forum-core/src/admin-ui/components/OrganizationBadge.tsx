@@ -8,8 +8,7 @@ import { FC } from 'react';
  */
 
 // WO-O4O-FORUM-ORGS-INVALID-UUID-HOTFIX-V1: invalid UUID 'forum00000001' → valid hex.
-// Keep in sync with apps/api-server/src/controllers/forum/forum-organizations.ts (FORUM_ORGS.GLYCOPHARM).
-const GLYCOPHARM_ORG_ID = 'a1b2c3d4-0001-4000-a000-91c0fa800001';
+// WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: GlycoPharm 포럼 조직 배지 제거 (서비스 삭제).
 
 interface OrganizationBadgeProps {
   organizationId?: string | null;
@@ -38,9 +37,6 @@ const OrganizationBadge: FC<OrganizationBadgeProps> = ({
 function getOrgDisplay(organizationId?: string | null): { label: string; className: string } {
   if (!organizationId) {
     return { label: 'Global', className: 'bg-gray-100 text-gray-600' };
-  }
-  if (organizationId === GLYCOPHARM_ORG_ID) {
-    return { label: 'GlycoPharm', className: 'bg-teal-100 text-teal-700' };
   }
   // Any other org ID is a KPA branch
   return { label: 'KPA', className: 'bg-purple-100 text-purple-700' };

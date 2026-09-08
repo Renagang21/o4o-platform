@@ -61,12 +61,11 @@ function resolveServiceKeyFromBody(body: any): string {
 }
 
 // WO-O4O-SERVICE-OFFER-HUB-EXPOSURE-APPROVAL-GATE-FIX-V1:
-//   catalog 팩토리 serviceKey(role-prefix: kpa/glycopharm/cosmetics) →
-//   offer_service_approvals.service_key(platform-level: kpa-society/glycopharm/k-cosmetics) 매핑.
+//   catalog 팩토리 serviceKey(role-prefix: kpa/cosmetics) →
+//   offer_service_approvals.service_key(platform-level: kpa-society/k-cosmetics) 매핑.
 //   (store-owner.utils.ts 의 STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY 와 동일 의미 — 정책 SSOT 정합)
 const STORE_SERVICE_KEY_TO_APPROVAL_KEY: Record<string, string> = {
   kpa: 'kpa-society',
-  glycopharm: 'glycopharm',
   cosmetics: 'k-cosmetics',
 };
 
@@ -101,7 +100,6 @@ function buildServiceApprovalGateSql(paramIndex: number): string {
 //
 // 계약은 기존 checkout 3곳에서 그대로 가져왔다(새로 정하지 않았다). 세 곳 모두 동일 술어다:
 //   kpa-checkout.controller.ts        `!allowed_seller_ids || !includes(organization.id)` → 403
-//   glycopharm/checkout.controller.ts `!allowed_seller_ids || !includes(pharmacy.id)`     → 403
 //   neture-b2b-cart-checkout.service  `!allowed_seller_ids || !includes(scope.buyerId)`   → DISTRIBUTION_DENIED
 //   ⇒ NULL 차단 · 빈 배열 차단 · 포함될 때만 허용
 //
@@ -394,7 +392,6 @@ export function createPharmacyProductsController(
     //
     // 이제 마운트 serviceKey 에서 서버가 도출한다. 도출값은 현행 저장값과 **완전히 동일**하다:
     //   kpa        → 'kpa-society'  (KPA 프론트는 service_key 미전송 → 종전 기본값과 동일)
-    //   glycopharm → 'glycopharm'   (GP 프론트 전송값과 동일)
     //   cosmetics  → 'k-cosmetics'  (KCos 프론트 전송값과 동일)
     // → 신규/기존 row 의 service_key 축이 갈라지지 않으므로 migration·회귀가 없다.
     //

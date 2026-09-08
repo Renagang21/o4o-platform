@@ -54,7 +54,7 @@ export const VALID_CONTENT_TYPES = ['hero', 'notice', 'guide', 'knowledge'] as c
  *
  *   'kpa' | 'kpa-society'         → ['kpa-society', 'kpa']
  *   'cosmetics' | 'k-cosmetics'   → ['k-cosmetics', 'cosmetics']
- *   'neture' | 'glycopharm' | 'pharmacy-hub' → 자기 자신 1개 (self-map)
+ *   'neture' | 'pharmacy-hub' → 자기 자신 1개 (self-map)
  */
 export function resolveCmsServiceKeys(serviceKey: string): string[] {
   const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(serviceKey);
@@ -71,7 +71,7 @@ export function resolveCmsServiceKeys(serviceKey: string): string[] {
  *
  *   'kpa' | 'kpa-society'       → 'kpa-society'
  *   'cosmetics' | 'k-cosmetics' → 'k-cosmetics'
- *   'glycopharm' | 'pharmacy-hub' | 'neture' → 자기 자신 (self-map)
+ *   'pharmacy-hub' | 'neture' → 자기 자신 (self-map)
  */
 export function canonicalizeCmsServiceKey(serviceKey: string): string {
   return resolveCanonicalServiceKey(resolveRolePrefixFromCanonicalServiceKey(serviceKey));

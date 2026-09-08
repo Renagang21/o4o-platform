@@ -1,7 +1,7 @@
 /**
  * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §10·§12·§14
  *
- * "내가 쓴 글"(My Posts) 은 5서비스(KPA-Society / K-Cosmetics / GlycoPharm /
+ * "내가 쓴 글"(My Posts) 은 4서비스(KPA-Society / K-Cosmetics /
  * PharmacyHub / Neture) 공통 query contract 로 수렴한다.
  *
  *   인증(uid) + route 의 canonical service scope + `author=me` → 본인 글만
@@ -21,7 +21,6 @@ const POST_CONTROLLER = fs.readFileSync(
 const SERVICE_FORUM_MOUNTS = [
   { service: 'kpa-society', file: '../routes/kpa/kpa.routes.ts' },
   { service: 'k-cosmetics', file: '../routes/cosmetics/cosmetics.routes.ts' },
-  { service: 'glycopharm', file: '../routes/glycopharm/glycopharm.routes.ts' },
   { service: 'neture', file: '../routes/neture/neture.routes.ts' },
   { service: 'pharmacy-hub', file: '../routes/pharmacy-hub/pharmacy-hub.routes.ts' },
 ];

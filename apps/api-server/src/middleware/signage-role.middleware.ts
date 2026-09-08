@@ -55,7 +55,7 @@ declare module 'express' {
  * WO-O4O-KCOS-SIGNAGE-SERVICEKEY-CANONICALIZATION-V1
  *
  * Signage API 의 `:serviceKey` 정본은 `@o4o/security-core` 의 canonical service key
- * ('kpa-society' · 'k-cosmetics' · 'glycopharm' · 'neture') 다. 역할 prefix
+ * ('kpa-society' · 'k-cosmetics' · 'neture') 다. 역할 prefix
  * ('kpa' · 'cosmetics') 로 들어온 legacy alias 는 canonical SSOT
  * (`resolveCanonicalServiceKey`) 를 통해 **하나의 내부 key 로 수렴**시킨다.
  *
@@ -111,7 +111,6 @@ export function hasSignageAdminPermission(user: any): boolean {
 const MEMBERSHIP_BACKED_SIGNAGE_SERVICE_KEYS = new Set([
   'kpa-society',
   'k-cosmetics',
-  'glycopharm',
   'neture',
   // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8:
   //   pharmacy-hub 도 service_memberships 축을 가진 canonical service 다. 빠져 있으면
@@ -816,7 +815,7 @@ export const validateServiceKey = (
   //   수렴된 뒤 판정된다 (둘 다 무조건 허용하는 것이 아니라, 하나의 key 로 정규화된다).
   //   'pharmacy' / 'tourism' / 'common' 은 canonical 대응이 없는 legacy key 이며
   //   본 WO 범위 밖이라 기존 동작을 그대로 유지한다.
-  const validServiceKeys = ['pharmacy', 'k-cosmetics', 'tourism', 'common', 'kpa-society', 'neture', 'glycopharm'];
+  const validServiceKeys = ['pharmacy', 'k-cosmetics', 'tourism', 'common', 'kpa-society', 'neture'];
   if (!validServiceKeys.includes(canonical) && canonical !== 'test') {
     return res.status(400).json({
       success: false,

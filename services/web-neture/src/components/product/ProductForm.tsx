@@ -75,7 +75,6 @@ export function deriveDistributionType(isPublic: boolean, serviceKeys: string[])
 // ─── Constants ───
 
 const AVAILABLE_SERVICES = [
-  { key: 'glycopharm', name: 'GlycoPharm' },
   { key: 'kpa-society', name: 'KPA Society' },
   { key: 'k-cosmetics', name: 'K-Cosmetics' },
 ];

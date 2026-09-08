@@ -13,7 +13,6 @@ import { Package, Building2, Calendar, Tag, Layers, AlertCircle, Loader2 } from 
 import { sellerApi, type SellerApprovedProduct } from '../../lib/api';
 
 const SERVICE_ICONS: Record<string, string> = {
-  glycopharm: '🏥',
   'k-cosmetics': '💄',
 };
 

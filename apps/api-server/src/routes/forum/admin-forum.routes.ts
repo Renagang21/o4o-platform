@@ -35,7 +35,6 @@ import logger from '../../utils/logger.js';
  * 공통 operator 라우터 동작을 건드리지 않기 위해 admin 라우터에 최소 복제.
  */
 const SERVICE_CODE_TO_RBAC_KEY: Record<string, ServiceKey> = {
-  glycopharm: 'glycopharm',
   neture: 'neture',
   'k-cosmetics': 'cosmetics',
   'kpa-society': 'kpa',

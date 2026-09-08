@@ -102,17 +102,8 @@ describe('store-policy ownership — canonical axis', () => {
     }
   });
 
-  it('G. glycopharm 은 기존 legacy(조직 생성자) 허용 범위를 유지한다', async () => {
-    const { dataSource } = makeDataSource({
-      hasRole: false,
-      candidateOrgIds: [],
-      orgCreators: [`${ORG_ID}:user-1`],
-    });
-    await expect(isStoreOwner(dataSource, ORG_ID, 'glycopharm', 'user-1')).resolves.toBe(true);
-
-    const nonOwner = makeDataSource({ hasRole: false, candidateOrgIds: [], orgCreators: [] });
-    await expect(isStoreOwner(nonOwner.dataSource, ORG_ID, 'glycopharm', 'user-2')).resolves.toBe(false);
-  });
+  // G. glycopharm legacy(조직 생성자) 허용 범위 — REMOVED
+  //    WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: 해당 분기가 서비스와 함께 제거되었다.
 
   it('H. 매장 소유 축이 없는 서비스(neture)는 판정 대상이 아니다', async () => {
     const { dataSource, calls } = makeDataSource({ hasRole: true, candidateOrgIds: [ORG_ID] });

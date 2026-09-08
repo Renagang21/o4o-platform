@@ -131,7 +131,7 @@ export interface ContentResourceConfig {
   tableName: string;
   /** console.error 접두어 (예: 'GlycoPharm') */
   logPrefix: string;
-  /** operator/admin 판정에 쓰는 role 목록 (예: ['glycopharm:operator', ...]) */
+  /** operator/admin 판정에 쓰는 role 목록 (예: ['cosmetics:operator', ...]) */
   operatorRoles: string[];
   /** 목록 SELECT 컬럼 — 서비스별 응답 필드가 달라 그대로 보존한다 */
   listColumns: string;

@@ -9,7 +9,6 @@ import { AuthTokens } from '../types/auth.js';
  *
  * Supports multiple service domains:
  * - neture.co.kr (and subdomains)
- * - glycopharm.co.kr
  * - kpa-society.co.kr
  * - k-cosmetics.site
  */
@@ -20,7 +19,6 @@ import { AuthTokens } from '../types/auth.js';
  */
 const SERVICE_DOMAINS = [
   '.neture.co.kr',
-  '.glycopharm.co.kr',
   '.kpa-society.co.kr',
   '.k-cosmetics.site',
 ];

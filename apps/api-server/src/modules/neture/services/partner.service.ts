@@ -99,7 +99,7 @@ export class PartnerService {
       `SELECT id, title, summary, type, image_url, created_at
        FROM cms_contents
        WHERE status = 'published'
-         AND (service_key IN ('neture', 'glycopharm') OR service_key IS NULL)
+         AND (service_key IN ('neture') OR service_key IS NULL)
        ORDER BY created_at DESC
        LIMIT 100`,
     );

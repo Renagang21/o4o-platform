@@ -12,7 +12,6 @@ import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierRecruitmentApi, type SupplierRecruitment } from '../../lib/api/supplier';
 
 const SERVICE_LABELS: Record<string, string> = {
-  glycopharm: 'GlycoPharm',
   'kpa-society': 'KPA Society',
   'k-cosmetics': 'K-Cosmetics',
   neture: 'Neture',

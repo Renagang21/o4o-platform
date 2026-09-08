@@ -21,8 +21,6 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import type { AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import type { PartnerService } from '../services/partner.service.js';
 import type { NetureService } from '../neture.service.js';
-import { GlycopharmRepository } from '../../../routes/glycopharm/repositories/glycopharm.repository.js';
-import type { GlycopharmProduct } from '../../../routes/glycopharm/entities/glycopharm-product.entity.js';
 import { NeturePartnerDashboardItem } from '../entities/NeturePartnerDashboardItem.entity.js';
 import { NeturePartnerDashboardItemContent } from '../entities/NeturePartnerDashboardItemContent.entity.js';
 import logger from '../../../utils/logger.js';
@@ -69,7 +67,7 @@ export function createPartnerDashboardController(deps: {
       const item = repo.create({
         partnerUserId: userId,
         productId,
-        serviceId: serviceId || 'glycopharm',
+        serviceId,
         status: 'active',
       });
 
@@ -103,17 +101,8 @@ export function createPartnerDashboardController(deps: {
         return res.json({ success: true, data: [] });
       }
 
-      // Batch-fetch product details
-      const productIds = items.map((item) => item.productId);
-      const glycopharmRepo = new GlycopharmRepository(dataSource);
-      const productMap = new Map<string, GlycopharmProduct>();
-
-      for (const id of productIds) {
-        const product = await glycopharmRepo.findProductById(id);
-        if (product) {
-          productMap.set(id, product);
-        }
-      }
+      // 상품 상세 enrichment — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
+      //   glycopharm_products 기반이었다. 대체 데이터원은 이번 범위에서 만들지 않는다.
 
       // Batch-fetch content link counts (WO-PARTNER-CONTENT-LINK-PHASE1-V1)
       const itemIds = items.map((item) => item.id);
@@ -123,15 +112,10 @@ export function createPartnerDashboardController(deps: {
       const primaryContentMap = await partnerService.getDashboardItemPrimaryContents(itemIds);
 
       const data = items.map((item) => {
-        const product = productMap.get(item.productId);
         const primaryContent = primaryContentMap.get(item.id) || null;
         return {
           id: item.id,
           productId: item.productId,
-          productName: product?.name || '(삭제된 제품)',
-          category: product?.category || 'other',
-          price: product ? Number(product.price) : 0,
-          pharmacyName: product?.pharmacy?.name,
           serviceId: item.serviceId,
           status: item.status,
           contentCount: contentCountMap.get(item.id) || 0,

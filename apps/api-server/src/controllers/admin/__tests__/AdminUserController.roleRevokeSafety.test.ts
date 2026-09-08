@@ -219,10 +219,10 @@ describe('마지막 활성 서비스 admin 해제 차단', () => {
   });
 
   it('동시 해제로 보호가 우회되지 않도록 활성 보유자를 FOR UPDATE 로 잠근다', async () => {
-    activeHolders['glycopharm:admin'] = [TARGET_ID, OTHER_ID];
+    activeHolders['pharmacy-hub:admin'] = [TARGET_ID, OTHER_ID];
     const res = makeRes();
 
-    await controller.revokeRoleAssignment(makeReq(TARGET_ID, 'glycopharm:admin'), res);
+    await controller.revokeRoleAssignment(makeReq(TARGET_ID, 'pharmacy-hub:admin'), res);
 
     expect(selectQuery()!.sql).toMatch(/FOR UPDATE/);
     // 판정과 UPDATE 가 같은 트랜잭션 매니저에서 실행된다.

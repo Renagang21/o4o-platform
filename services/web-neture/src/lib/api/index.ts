@@ -23,11 +23,9 @@ export {
 
 // Partner APIs
 export {
-  recruitingApi,
   partnerDashboardApi,
   partnerRecruitmentApi,
   partnerCommissionApi,
-  type RecruitingProduct,
   type PartnerDashboardItem,
   type BrowsableContent,
   type LinkedContent,

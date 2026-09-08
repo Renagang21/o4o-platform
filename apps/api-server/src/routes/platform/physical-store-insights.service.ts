@@ -78,30 +78,33 @@ export function generatePhysicalStoreInsights(ctx: StoreInsightContext): StoreIn
   }
 
   // ---- Rule 2: 겸업 시너지 분석 ----
+  //   WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: 서비스명을 문구에 고정하지 않는다
+  //   (기존에는 K-Cosmetics × GlycoPharm 쌍을 전제했다). 시너지 판정은 서비스 수 기준 generic 이다.
   const synergyScore = computeSynergyScore(ctx);
   if (synergyScore !== null) {
-    const cosGrowth = getServiceGrowth(ctx, 'cosmetics');
-    const glyGrowth = getServiceGrowth(ctx, 'glycopharm');
-    const bothGrowing = cosGrowth !== null && cosGrowth > 0 && glyGrowth !== null && glyGrowth > 0;
-    const bothDeclining = cosGrowth !== null && cosGrowth < 0 && glyGrowth !== null && glyGrowth < 0;
+    const growths = ctx.current.services
+      .map((svc) => ({ serviceType: svc.serviceType, growth: getServiceGrowth(ctx, svc.serviceType) }))
+      .filter((g): g is { serviceType: string; growth: number } => g.growth !== null);
 
-    if (bothGrowing) {
-      insights.push({
-        level: 'positive',
-        message: `K-Cosmetics와 GlycoPharm 모두 성장 중입니다. 겸업 시너지가 나타나고 있습니다.`,
-      });
-    } else if (bothDeclining) {
-      insights.push({
-        level: 'warning',
-        message: `K-Cosmetics와 GlycoPharm 모두 매출이 감소하고 있습니다.`,
-      });
-    } else {
-      // One up, one down
-      const growing = cosGrowth !== null && cosGrowth > 0 ? 'K-Cosmetics' : 'GlycoPharm';
-      insights.push({
-        level: 'info',
-        message: `${growing} 매출이 증가하는 반면 다른 서비스는 감소 추세입니다.`,
-      });
+    if (growths.length >= 2) {
+      const growing = growths.filter((g) => g.growth > 0);
+      if (growing.length === growths.length) {
+        insights.push({
+          level: 'positive',
+          message: `겸업 서비스가 모두 성장 중입니다. 겸업 시너지가 나타나고 있습니다.`,
+        });
+      } else if (growing.length === 0) {
+        insights.push({
+          level: 'warning',
+          message: `겸업 서비스 매출이 모두 감소하고 있습니다.`,
+        });
+      } else {
+        const label = growing.map((g) => serviceLabel(g.serviceType)).join(", ");
+        insights.push({
+          level: 'info',
+          message: `${label} 매출이 증가하는 반면 다른 서비스는 감소 추세입니다.`,
+        });
+      }
     }
   }
 
@@ -174,7 +177,6 @@ function pct(ratio: number): string {
 function serviceLabel(type: string): string {
   const labels: Record<string, string> = {
     cosmetics: 'K-Cosmetics',
-    glycopharm: 'GlycoPharm',
   };
   return labels[type] || type;
 }

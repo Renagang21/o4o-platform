@@ -28,19 +28,19 @@ import type {
 
 describe('Context Builder', () => {
   const baseRequest: AIOrchestrationRequest = {
-    service: 'glycopharm',
+    service: 'neture',
     insightType: 'store-summary',
     contextData: { revenue: 1500000, patientCount: 42 },
-    user: { id: 'user-1', role: 'glycopharm:operator' },
+    user: { id: 'user-1', role: 'neture:operator' },
   };
 
   it('builds context with service-specific constraints', () => {
     const ctx = buildContext(baseRequest);
 
-    expect(ctx.service).toBe('glycopharm');
+    expect(ctx.service).toBe('neture');
     expect(ctx.insightType).toBe('store-summary');
     expect(ctx.constraints.length).toBeGreaterThan(0);
-    expect(ctx.constraints[0]).toContain('의료적 진단');
+    expect(ctx.constraints[0]).toContain('매출 데이터');
     expect(ctx.generatedAt).toBeDefined();
   });
 
@@ -106,17 +106,17 @@ describe('Context Builder', () => {
 describe('Prompt Composer', () => {
   it('generates system prompt with role and constraints', () => {
     const ctx = buildContext({
-      service: 'glycopharm',
+      service: 'neture',
       insightType: 'store-summary',
       contextData: { revenue: 100 },
-      user: { id: 'u1', role: 'glycopharm:operator' },
+      user: { id: 'u1', role: 'neture:operator' },
     });
 
     const prompt = composePrompt(ctx);
 
-    expect(prompt.systemPrompt).toContain('glycopharm');
+    expect(prompt.systemPrompt).toContain('neture');
     expect(prompt.systemPrompt).toContain('JSON');
-    expect(prompt.systemPrompt).toContain('의료적 진단');
+    expect(prompt.systemPrompt).toContain('매출 데이터');
   });
 
   it('generates user prompt with data', () => {
@@ -234,24 +234,6 @@ describe('Response Normalizer', () => {
 // ─────────────────────────────────────────────────────
 
 describe('Action Mapper', () => {
-  it('maps known glycopharm recommendations to triggers', () => {
-    const insight: AIInsight = {
-      summary: 'test',
-      riskLevel: 'high',
-      recommendedActions: ['고위험 환자 알림', '코칭 세션 권장'],
-      confidenceScore: 0.9,
-    };
-
-    const mappings = mapActions('glycopharm', insight);
-
-    expect(mappings).toHaveLength(2);
-    expect(mappings[0].triggerId).toBe('glycopharm.alert.high_risk_patient');
-    expect(mappings[0].requiresApproval).toBe(false);
-    expect(mappings[0].priority).toBe(1); // high risk + first item
-    expect(mappings[1].triggerId).toBe('glycopharm.suggest.coaching_session');
-    expect(mappings[1].requiresApproval).toBe(true);
-  });
-
   it('maps known neture recommendations to triggers', () => {
     const insight: AIInsight = {
       summary: 'test',
@@ -272,7 +254,7 @@ describe('Action Mapper', () => {
       confidenceScore: 0.5,
     };
 
-    const mappings = mapActions('glycopharm', insight);
+    const mappings = mapActions('neture', insight);
 
     expect(mappings).toHaveLength(1);
     expect(mappings[0].triggerId).toBeUndefined();

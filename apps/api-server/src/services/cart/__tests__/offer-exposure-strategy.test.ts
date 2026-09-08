@@ -35,7 +35,7 @@ const row = (over: Partial<ExposureOfferRow> = {}): ExposureOfferRow => ({
 
 const ctx = (over: Partial<{ buyerId: string; serviceKey: string; organizationId: string | null }> = {}) => ({
   buyerId: 'buyer-1',
-  serviceKey: 'glycopharm',
+  serviceKey: 'kpa-society',
   organizationId: 'org-1' as string | null,
   ...over,
 });
@@ -70,10 +70,10 @@ describe('approval strategy (§30)', () => {
     expect(s.offerWhereSql).not.toContain('service_keys');
   });
 
-  // WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1 (§19)
+  // WO-O4O-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION (§19)
   //   `offer_service_approvals.approval_status` 는 **소문자** 도메인이다. 대문자
   //   'APPROVED' 로 비교하면 EXISTS 가 항상 거짓이 되어 승인축 서비스 전체
-  //   (glycopharm / kpa-society / k-cosmetics)의 B2B confirm 이 조용히 0건이 된다.
+  //   (kpa-society / k-cosmetics)의 B2B confirm 이 조용히 0건이 된다.
   //   게이트 완화가 아니라 **같은 축을 같은 표기로 비교**하는 정합 회귀 테스트다.
   it("승인 junction 비교는 카탈로그 SSOT 와 같은 소문자 'approved' 를 쓴다", () => {
     expect(s.offerWhereSql).not.toContain("osa.approval_status = 'APPROVED'");

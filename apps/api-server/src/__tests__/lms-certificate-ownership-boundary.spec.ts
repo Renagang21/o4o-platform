@@ -131,7 +131,7 @@ describe('private read — GET /certificates/:id', () => {
   });
 
   it('cross-service certificate 는 소유자여도 404 (scope 가 먼저다)', async () => {
-    mockCertificateService.getCertificate.mockResolvedValue(certificateOf(USER_A, 'glycopharm'));
+    mockCertificateService.getCertificate.mockResolvedValue(certificateOf(USER_A, 'k-cosmetics'));
     const res = fakeRes();
     await CertificateController.getCertificate(
       fakeReq({ userId: USER_A, params: { id: CERT_ID }, query: { serviceKey: 'kpa-society' } }),
@@ -244,7 +244,7 @@ describe('download / PDF — GET /certificates/:id/pdf', () => {
   });
 
   it('cross-service 수료증 PDF 는 소유자여도 차단된다', async () => {
-    mockCertificateService.getCertificate.mockResolvedValue(certificateOf(USER_A, 'glycopharm'));
+    mockCertificateService.getCertificate.mockResolvedValue(certificateOf(USER_A, 'k-cosmetics'));
     const res = fakeRes();
     await CertificateController.downloadPdf(
       fakeReq({ userId: USER_A, params: { id: CERT_ID }, query: { serviceKey: 'kpa-society' } }),
@@ -357,7 +357,7 @@ describe('public verify — 공개 계약 유지 + 개인정보 최소화', () =
   });
 
   it('verificationCode 진위확인도 cross-service 는 차단된다 (기존 계약 유지)', async () => {
-    mockCertificateService.verifyCertificate.mockResolvedValue(certificateOf(USER_B, 'glycopharm'));
+    mockCertificateService.verifyCertificate.mockResolvedValue(certificateOf(USER_B, 'k-cosmetics'));
     const res = fakeRes();
     await CertificateController.verifyCertificate(
       fakeReq({ userId: USER_A, params: { verificationCode: 'VC-1234' }, query: { serviceKey: 'kpa-society' } }),

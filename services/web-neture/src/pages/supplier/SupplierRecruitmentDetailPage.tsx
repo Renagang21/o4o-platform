@@ -12,7 +12,6 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { supplierRecruitmentApi, SUPPLIER_RECRUITMENT_NOT_FOUND, type RecruitmentDetail } from '../../lib/api/supplier';
 
 const SERVICE_LABELS: Record<string, string> = {
-  glycopharm: 'GlycoPharm',
   'kpa-society': 'KPA Society',
   'k-cosmetics': 'K-Cosmetics',
   neture: 'Neture',

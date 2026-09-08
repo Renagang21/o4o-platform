@@ -16,7 +16,6 @@
  *   E2E_KPA_ADMIN_EMAIL    / E2E_KPA_ADMIN_PASSWORD      (kpa-society)
  *   E2E_KCOS_ADMIN_EMAIL   / E2E_KCOS_ADMIN_PASSWORD     (k-cosmetics)
  *   E2E_NETURE_ADMIN_EMAIL / E2E_NETURE_ADMIN_PASSWORD   (neture)
- *   E2E_GLYCO_ADMIN_EMAIL  / E2E_GLYCO_ADMIN_PASSWORD    (glycopharm)
  *
  * 가능하면 **E2E 전용 계정**을 쓴다. 운영자 개인 계정을 CI 인증 fixture 로 쓰면
  * 정상적인 비밀번호 변경이 다시 CI 장애로 보인다.
@@ -54,16 +53,6 @@ export const SERVICES: Record<string, ServiceConfig> = {
     dashboardPrefix: '/admin',
     emailEnv: 'E2E_NETURE_ADMIN_EMAIL',
     passwordEnv: 'E2E_NETURE_ADMIN_PASSWORD',
-  },
-  glycopharm: {
-    name: 'GlycoPharm',
-    serviceKey: 'glycopharm',
-    baseUrl: 'https://glycopharm.co.kr',
-    loginPath: '/login',
-    protectedPath: '/operator',
-    dashboardPrefix: '/operator',
-    emailEnv: 'E2E_GLYCO_ADMIN_EMAIL',
-    passwordEnv: 'E2E_GLYCO_ADMIN_PASSWORD',
   },
   kpa: {
     name: 'KPA-Society',
@@ -283,7 +272,7 @@ export async function logoutViaApi(page: Page, baseUrl: string): Promise<void> {
  * WO-O4O-AUTH-LOGOUT-SELECTOR-STABILIZATION-V1
  *
  * 지원 컴포넌트:
- *   GlobalHeader (@o4o/ui, KPA / GlycoPharm / K-Cosmetics) — aria-label="사용자 메뉴"
+ *   GlobalHeader (@o4o/ui, KPA / K-Cosmetics) — aria-label="사용자 메뉴"
  *   GlobalUserProfileDropdown (@o4o/account-ui, Neture)     — aria-label="계정 메뉴"
  *
  * 실패 시 숨기지 않고 어느 단계에서 실패했는지 console.error로 보고한다.
@@ -407,12 +396,12 @@ export async function waitForLoadingComplete(page: Page, maxMs = 8000): Promise<
 //
 // "URL 이 /login 이 아니다" 는 로그인 성공의 증거가 아니다. 실측 결과 4개 중 3개
 // 서비스가 **로그아웃 상태에서도** 그 조건을 만족했다 (KPA `/admin` 은 redirect 없이
-// 인라인 거부 화면을 렌더하고, Neture·GlycoPharm 은 `/` 로 착지한다).
+// 인라인 거부 화면을 렌더하고, Neture 는 `/` 로 착지한다).
 // 그래서 판정을 **인증 상태 신호**로 바꾼다.
 
 /** 로그인 상태에서만 렌더되는 사용자 메뉴 트리거 (GlobalHeader / GlobalUserProfileDropdown) */
 export const USER_MENU_TRIGGER_SELECTORS = [
-  'button[aria-label="사용자 메뉴"]',  // GlobalHeader (KPA / GlycoPharm / K-Cosmetics)
+  'button[aria-label="사용자 메뉴"]',  // GlobalHeader (KPA / K-Cosmetics)
   'button[aria-label="계정 메뉴"]',    // GlobalUserProfileDropdown (Neture)
   'button[aria-label*="사용자"]',
   'button[aria-label*="계정"]',

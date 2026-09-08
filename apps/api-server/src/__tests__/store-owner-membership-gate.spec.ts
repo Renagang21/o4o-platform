@@ -65,7 +65,7 @@ describe('isStoreOwner — membership 이 접근 게이트다', () => {
   });
 
   it('타 서비스 membership 만 active → 차단 (cross-service 침투 금지)', async () => {
-    const ds = makeDataSource([{ service_key: 'glycopharm', status: 'active' }], ['kpa:store_owner']);
+    const ds = makeDataSource([{ service_key: 'k-cosmetics', status: 'active' }], ['kpa:store_owner']);
     expect((await isStoreOwner(ds, 'u1', 'kpa')).isOwner).toBe(false);
   });
 

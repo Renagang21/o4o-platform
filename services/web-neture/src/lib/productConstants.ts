@@ -132,7 +132,6 @@ export function getSupplyPolicyBadges(product: {
 // KPA 우선 서비스 표기명 매핑
 const SERVICE_DISPLAY: Record<string, string> = {
   'kpa-society': 'KPA',
-  'glycopharm': 'GlycoPharm',
   'k-cosmetics': 'K-Cosmetics',
 };
 

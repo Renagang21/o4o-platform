@@ -41,7 +41,7 @@ Work Order 작성 시 Design Reference 섹션에 Theme Profile 명칭을 기재�
 ```markdown
 ## Design Reference
 - Theme Profile: `Service.Professional`
-- 참고 화면: apps/glycopharm-web/src/pages/pharmacy/
+- 참고 화면: services/web-kpa-society/src/pages/pharmacy/
 ```
 
 ### 3. 작업 중 판단 기준으로 활용

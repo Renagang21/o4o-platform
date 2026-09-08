@@ -24,4 +24,4 @@ export interface CapabilityMeta {
   sortOrder: number;
 }
 
-export type ServiceKey = 'kpa' | 'cosmetics' | 'glycopharm';
+export type ServiceKey = 'kpa' | 'cosmetics';

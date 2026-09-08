@@ -47,7 +47,6 @@ import {
  * **허용 집합을 넓히지 않기 위해** 조직 소속 자체(organization_members)는 반드시 확인한다.
  */
 const CART_SERVICE_TO_STORE_ORG_KEY: Readonly<Record<string, StoreOwnerServiceKey>> = Object.freeze({
-  glycopharm: 'glycopharm',
   'kpa-society': 'kpa',
   kpa: 'kpa',
   'k-cosmetics': 'cosmetics',

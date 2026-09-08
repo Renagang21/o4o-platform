@@ -49,7 +49,6 @@ type AuthMiddleware = RequestHandler;
 //   (store-qr-landing.controller 의 qrPublicOrigin 과 동일 정책 — 도메인 출처는 service-catalog 단일.)
 const POP_SERVICE_TO_CATALOG_KEY: Record<StoreOwnerServiceKey, string> = {
   kpa: 'kpa-society',
-  glycopharm: 'glycopharm',
   cosmetics: 'k-cosmetics',
   // WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1: role prefix 와 catalog key 동일.
   // 본 controller 는 서비스별 명시 serviceKey 로만 mount 되며 pharmacy-hub mount 는 아직 없다.

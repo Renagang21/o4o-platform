@@ -46,7 +46,7 @@ export default function SupplierSupplyOffersPage() {
             <h2 className="font-semibold text-slate-800">서비스별 공급 상태</h2>
           </div>
           <p className="text-sm text-slate-600 mb-3">
-            각 제품이 어느 서비스(KPA Society·GlycoPharm·K-Cosmetics)에 공급/승인되었는지는 제품 목록의 서비스·승인 상태로 확인합니다.
+            각 제품이 어느 서비스(KPA Society·K-Cosmetics)에 공급/승인되었는지는 제품 목록의 서비스·승인 상태로 확인합니다.
             이 세 서비스는 운영자 공급 승인 축이므로 신청 후 승인이 필요합니다.
           </p>
           <Link

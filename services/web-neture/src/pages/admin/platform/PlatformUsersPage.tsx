@@ -23,8 +23,6 @@ const ROLE_LABEL: Record<string, string> = {
   'platform:super_admin': '슈퍼관리자',
   'neture:admin': 'Neture 관리자',
   'neture:operator': 'Neture 운영자',
-  'glycopharm:admin': 'GlycoPharm 관리자',
-  'glycopharm:operator': 'GlycoPharm 운영자',
   'cosmetics:admin': 'K-Cosmetics 관리자',
   'cosmetics:operator': 'K-Cosmetics 운영자',
   'kpa-society:admin': 'KPA 관리자',

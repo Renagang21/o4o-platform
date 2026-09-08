@@ -46,7 +46,7 @@ export const MIXED_CART_AXIS_MESSAGE =
 
 export interface UseStoreCartOptions {
   api: StoreCartApi;
-  /** cart 경계 키 (URL 경로 파라미터). 예: 'kpa-society' · 'k-cosmetics' · 'glycopharm' */
+  /** cart 경계 키 (URL 경로 파라미터). 예: 'kpa-society' · 'k-cosmetics' */
   serviceKey: string;
 }
 

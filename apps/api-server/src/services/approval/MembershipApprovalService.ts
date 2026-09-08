@@ -1355,7 +1355,7 @@ export class MembershipApprovalService {
 
         // STEP H2: role_assignments — 해당 서비스 prefix 역할만 삭제
         // 플랫폼 역할(super_admin, admin, operator)은 절대 건드리지 않음
-        const ALL_SERVICE_KEYS_H = ['kpa-society', 'k-cosmetics', 'glycopharm', 'neture'] as const;
+        const ALL_SERVICE_KEYS_H = ['kpa-society', 'k-cosmetics', 'neture'] as const;
         const hardPrefixes = isPlatformAdmin
           ? ALL_SERVICE_KEYS_H.map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)
           : serviceKeys
@@ -1448,7 +1448,7 @@ export class MembershipApprovalService {
         // isPlatformAdmin: 전체 서비스 prefix 정리 / 서비스 operator: 해당 서비스 prefix만 정리.
         // WO-O4O-CANONICAL-SERVICE-KEY-REVERSE-MAP-V1: canonical service_key → role prefix 는
         //   @o4o/security-core SSOT 위임. SQL LIKE 패턴의 ':' 는 호출처에서 조립.
-        const ALL_SERVICE_KEYS = ['kpa-society', 'k-cosmetics', 'glycopharm', 'neture'] as const;
+        const ALL_SERVICE_KEYS = ['kpa-society', 'k-cosmetics', 'neture'] as const;
 
         const prefixesToClean = isPlatformAdmin
           ? ALL_SERVICE_KEYS.map((k) => `${resolveRolePrefixFromCanonicalServiceKey(k)}:`)

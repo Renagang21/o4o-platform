@@ -35,7 +35,6 @@ const STATUS_TABS = [
 
 const SERVICE_OPTIONS = [
   { key: '', label: '전체 서비스' },
-  { key: 'glycopharm', label: 'GlycoPharm' },
   { key: 'k-cosmetics', label: 'K-Cosmetics' },
   { key: 'kpa-society', label: 'KPA Society' },
 ];

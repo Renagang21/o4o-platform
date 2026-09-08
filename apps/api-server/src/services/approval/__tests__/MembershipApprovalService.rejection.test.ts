@@ -178,7 +178,7 @@ import { MembershipApprovalService } from '../MembershipApprovalService.js';
 
 const service = new MembershipApprovalService();
 
-const ALL_KEYS = ['pharmacy-hub', 'kpa-society', 'neture', 'k-cosmetics', 'glycopharm'];
+const ALL_KEYS = ['pharmacy-hub', 'kpa-society', 'neture', 'k-cosmetics'];
 
 beforeEach(() => {
   committed = false;

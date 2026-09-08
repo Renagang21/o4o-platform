@@ -37,7 +37,6 @@ const requireKpaAdmin = createMembershipScopeGuard(KPA_SCOPE_CONFIG)('kpa:admin'
 const requireLmsOperator = requireRole([
   'admin', 'super_admin', 'platform:super_admin',
   'cosmetics:admin', 'cosmetics:operator',
-  'glycopharm:admin', 'glycopharm:operator',
   'pharmacy-hub:admin', 'pharmacy-hub:operator',
 ]);
 

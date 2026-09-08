@@ -14,7 +14,7 @@
  *   - 상품 유형을 확정할 수 없으면(마스터 미존재 등) DRUG 쓰기를 거부한다.
  *   - 서비스 문맥(serviceKey)이 없으면 거부한다.
  *   - `service_audience_policies` 행이 없거나 조회에 실패하면 **거부**한다.
- *     ServiceAudienceService 의 하드코딩 fallback(`['glycopharm','kpa-society']`)은
+ *     ServiceAudienceService 의 하드코딩 fallback(`['kpa-society']`)은
  *     **DRUG 쓰기 판정에 사용하지 않는다** — fallback 으로 DRUG 쓰기가 허용되면 안 되기 때문이다.
  *     (fallback 전면 제거는 WO-O4O-DRUG-POLICY-LIFECYCLE 로 분리)
  *   - organizationId 가 함께 주어지면 해당 조직이 그 serviceKey 에 실제로 소속돼 있는지 서버에서 확인한다.

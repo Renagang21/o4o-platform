@@ -42,11 +42,6 @@ const SERVICE_LINKS: Record<AIServiceId, Record<string, string>> = {
     products: '/operator/product-service-approvals?status=pending',
     orders: '/operator/orders',
   },
-  glycopharm: {
-    applications: '/operator/applications',
-    products: '/operator/products?status=draft',
-    pharmacies: '/operator/stores',
-  },
   cosmetics: {
     products: '/operator/products?status=PENDING',
     orders: '/operator/orders',
@@ -83,12 +78,6 @@ function checkApprovalBacklog(
         { path: 'suppliers.pending', label: '공급사 승인 대기', linkKey: 'suppliers' },
         { path: 'registrations.pending', label: '가입 승인 대기', linkKey: 'registrations' },
         { path: 'products.pending', label: '상품 승인 대기', linkKey: 'products' },
-      );
-      break;
-    case 'glycopharm':
-      pendingPaths.push(
-        { path: 'applications.pending', label: '입점 신청 대기', linkKey: 'applications' },
-        { path: 'products.draft', label: '임시저장 상품', linkKey: 'products' },
       );
       break;
     case 'cosmetics':

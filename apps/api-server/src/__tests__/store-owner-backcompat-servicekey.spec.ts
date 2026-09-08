@@ -50,7 +50,6 @@ const MEMBERSHIP_ROW = [{ '?column?': 1 }];
 const CANONICAL: Record<StoreOwnerServiceKey, string> = {
   kpa: 'kpa-society',
   cosmetics: 'k-cosmetics',
-  glycopharm: 'glycopharm',
   'pharmacy-hub': 'pharmacy-hub',
 };
 
@@ -92,14 +91,14 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
   });
 
   it('multi-service 계정이라도 현재 route 의 serviceKey 조직만 후보로 조회한다', async () => {
-    const dataSource = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, [{ organization_id: 'org-gp', role: 'owner' }]]);
-    const guard = createRequireStoreOwner(dataSource, 'glycopharm');
+    const dataSource = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, [{ organization_id: 'org-ph', role: 'owner' }]]);
+    const guard = createRequireStoreOwner(dataSource, 'pharmacy-hub');
     const req: any = {
       user: {
         id: 'u1',
         memberships: [
           { serviceKey: 'kpa-society', status: 'active' },
-          { serviceKey: 'glycopharm', status: 'active' },
+          { serviceKey: 'pharmacy-hub', status: 'active' },
           { serviceKey: 'k-cosmetics', status: 'active' },
         ],
       },
@@ -107,11 +106,11 @@ describe('§6 서비스별 store_owner 가드 — 일치 membership 만 통과�
 
     await guard(req, makeRes(), jest.fn());
 
-    expect(req.organizationId).toBe('org-gp');
-    // 조직 후보 조회 SQL 에 glycopharm linkage 만 들어간다 (타 서비스 조직 fallback 금지)
+    expect(req.organizationId).toBe('org-ph');
+    // 조직 후보 조회 SQL 에 pharmacy-hub linkage 만 들어간다 (타 서비스 조직 fallback 금지)
     const orgCall = dataSource.query.mock.calls[2];
     expect(orgCall[0]).toContain('organization_service_enrollments');
-    expect(JSON.stringify(orgCall[1])).toContain('glycopharm');
+    expect(JSON.stringify(orgCall[1])).toContain('pharmacy-hub');
     expect(JSON.stringify(orgCall[1])).not.toContain('kpa');
   });
 
@@ -139,12 +138,6 @@ function read(rel: string): string {
 }
 
 describe('§9 census — 전환한 호출부는 back-compat 로 돌아가지 않는다', () => {
-  it('store-ai.controller 는 glycopharm 으로 가드한다', () => {
-    const src = read('modules/store-ai/controllers/store-ai.controller.ts');
-    expect(src).toContain("createRequireStoreOwner(dataSource, 'glycopharm')");
-    expect(src).not.toMatch(/createRequireStoreOwner\(\s*dataSource\s*\)/);
-  });
-
   it('store-product-request.controller 는 kpa 로 가드한다', () => {
     const src = read('routes/o4o-store/controllers/store-product-request.controller.ts');
     expect(src).toContain("createRequireStoreOwner(dataSource, 'kpa')");

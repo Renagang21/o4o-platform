@@ -79,10 +79,6 @@ const ASSIGNABLE_ROLES: Record<string, { value: string; label: string; descripti
     { value: 'pharmacy-hub:admin', label: 'Admin', description: 'Pharmacy-Hub 관리자 (운영 권한 포함)' },
     { value: 'pharmacy-hub:operator', label: 'Operator', description: 'Pharmacy-Hub 운영자' },
   ],
-  glycopharm: [
-    { value: 'glycopharm:admin', label: 'Admin', description: 'GlycoPharm 관리자' },
-    { value: 'glycopharm:operator', label: 'Operator', description: 'GlycoPharm 운영자' },
-  ],
   cosmetics: [
     { value: 'cosmetics:admin', label: 'Admin', description: 'K-Cosmetics 관리자' },
     { value: 'cosmetics:operator', label: 'Operator', description: 'K-Cosmetics 운영자' },

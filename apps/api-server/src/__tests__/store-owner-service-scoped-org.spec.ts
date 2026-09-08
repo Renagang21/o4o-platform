@@ -111,7 +111,7 @@ describe('store organization resolution — service scoped', () => {
 
   it('isStoreOwner: role 은 있으나 서비스 조직이 없으면 organizationId=null', async () => {
     const { dataSource } = makeDataSource([MEMBERSHIP_ROW, ROLE_ROW, []]);
-    const result = await isStoreOwner(dataSource, 'user-1', 'glycopharm');
+    const result = await isStoreOwner(dataSource, 'user-1', 'pharmacy-hub');
     expect(result.isOwner).toBe(true);
     expect(result.organizationId).toBeNull();
     expect(result.resolution.status).toBe('none');

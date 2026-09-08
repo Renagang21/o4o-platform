@@ -11,7 +11,7 @@
  *   공급자 A  — 자기 offer master        → 통과 (403 아님)
  *   공급자 A  — 공급자 B 의 master        → 403
  *   공급자 A  — offer 없는 master         → 403
- *   서비스 운영자(kpa/cosmetics/glycopharm/neture) → 403 (역할만으로 전역 write 없음)
+ *   서비스 운영자(kpa/cosmetics/neture) → 403 (역할만으로 전역 write 없음)
  *   일반 인증 사용자                      → 403
  *   platform:super_admin                 → 통과
  *   미인증                                → 401
@@ -30,7 +30,6 @@ const FIXTURE = {
     'kpa-operator': ['kpa-society:operator'],
     'kpa-admin': ['kpa-society:admin'],
     'cosmetics-operator': ['cosmetics:operator'],
-    'glycopharm-admin': ['glycopharm:admin'],
     'neture-operator': ['neture:operator', 'neture:admin'],
     plain: [],
   } as Record<string, string[]>,
@@ -165,7 +164,7 @@ describe('WO-O4O-PRODUCT-AI-TAGS-SUPPLIER-OWNERSHIP-GUARD-V1 — route 배선', 
   });
 
   describe('서비스 운영자 / 일반 사용자 — 역할만으로 전역 write 없음', () => {
-    const NON_OWNERS = ['kpa-operator', 'kpa-admin', 'cosmetics-operator', 'glycopharm-admin', 'neture-operator', 'plain'];
+    const NON_OWNERS = ['kpa-operator', 'kpa-admin', 'cosmetics-operator', 'neture-operator', 'plain'];
 
     it.each(NON_OWNERS)('%s 의 수동 태그 추가는 403', async (user) => {
       const res = await post(user, `/api/v1/products/${MASTER_A}/ai-tags/manual`, { tag: 'x' });

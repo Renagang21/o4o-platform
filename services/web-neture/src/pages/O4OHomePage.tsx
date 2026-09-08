@@ -44,7 +44,6 @@ const ENTRIES: HomeEntry[] = [
   { label: '약국', href: 'https://kpa-society.co.kr/', external: true },
   { label: '약국 경영', href: 'https://pharmacyhub.co.kr', external: true },
   { label: '화장품', href: 'https://www.k-cosmetics.site/', external: true },
-  { label: '혈당 관리', href: 'https://www.glycopharm.co.kr', external: true },
   // '공급자·파트너' 는 진입 route 가 둘이므로 각각 노출한다(데드링크 0 / 기능 은폐 0).
   { label: '공급자', href: '/supplier' },
   { label: '파트너', href: '/partner' },

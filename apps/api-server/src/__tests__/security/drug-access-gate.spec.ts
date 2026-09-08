@@ -33,7 +33,6 @@ const ORG_GENERAL = '77777777-7777-4777-8777-777777777777';
 /** 운영 실측과 동일한 정책 세트 (U1) */
 const POLICY: Record<string, boolean> = {
   'kpa-society': true,
-  glycopharm: true,
   'pharmacy-hub': true,
   neture: false,
   'k-cosmetics': false,
@@ -327,10 +326,10 @@ describe('drug-access.guard — 자동확산 대상 축소', () => {
     const kept = await filterPharmacyAudienceServiceKeys(makeExecutor(), [
       'kpa-society',
       'neture',
-      'glycopharm',
+      'pharmacy-hub',
       'k-cosmetics',
     ]);
-    expect(kept.sort()).toEqual(['glycopharm', 'kpa-society']);
+    expect(kept.sort()).toEqual(['kpa-society', 'pharmacy-hub']);
   });
 
   it('[19] 정책 행이 없는 키는 확산 대상에서 제외된다', async () => {

@@ -7,7 +7,6 @@
  * 해당 서비스의 실제 <Route> 정의와 일치해야 한다.
  *
  * 회귀 방지 대상:
- *   1) GlycoPharm 에 존재하지 않는 /store/commerce/products/b2c 참조 0
  *      (param route /store/:pharmacyId/products/:productId 에 흡수돼 오류 화면으로 떨어진다)
  *   2) K-Cosmetics legacy alias(/store/signage/playlist · /store/qr) 참조 0 — canonical 사용
  *   3) canonical signage route 문자열 존재
@@ -88,7 +87,6 @@ const SERVICES: Svc[] = [
     extra: [['services/web-kpa-society/src/routes/OperatorRoutes.tsx', '/operator']],
   },
   { key: 'k-cosmetics', dir: 'services/web-k-cosmetics', copy: 'k-cosmetics.ts' },
-  { key: 'glycopharm', dir: 'services/web-glycopharm', copy: 'glycopharm.ts' },
   { key: 'neture', dir: 'services/web-neture', copy: 'neture.ts' },
   // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
   { key: 'pharmacy-hub', dir: 'services/web-pharmacy-hub', copy: 'pharmacy-hub.ts' },
@@ -158,19 +156,6 @@ describe('Guide route contract', () => {
       expect(unresolved).toEqual([]);
     },
   );
-
-  it('GlycoPharm Guide 는 존재하지 않는 /store/commerce/products/b2c 를 참조하지 않는다', () => {
-    const gp = copySource(SERVICES[2]);
-    expect(gp).not.toContain('/store/commerce/products/b2c');
-    // 대체 canonical: 채널 진열
-    expect(gp).toContain('/store/channels');
-  });
-
-  it('GlycoPharm Guide 의 태블릿 경로는 canonical /store/:pharmacyId/tablet 이다', () => {
-    const gp = copySource(SERVICES[2]);
-    expect(gp).not.toContain('/tablet/:slug');
-    expect(gp).toContain('/store/:pharmacyId/tablet');
-  });
 
   it('K-Cosmetics Guide 는 legacy alias 대신 canonical store 경로를 사용한다', () => {
     const kc = copySource(SERVICES[1]);

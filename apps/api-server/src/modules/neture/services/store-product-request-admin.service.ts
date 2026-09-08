@@ -74,7 +74,7 @@ export class StoreProductRequestAdminService {
    *
    * sourceType/sourceLabel 로 일반 candidate·타 소스를 store request 액션에서 차단한다.
    * allowedServiceKeys(=운영자 role-prefix 스코프, null=platform admin)가 주어지면 candidate.serviceKey
-   * (role-prefix 형식: 'kpa'/'glycopharm'/'neture'/'cosmetics')가 스코프에 포함될 때만 허용한다
+   * (role-prefix 형식: 'kpa'/'neture'/'cosmetics')가 스코프에 포함될 때만 허용한다
    * (P3 service-scope hardening — 타 서비스 요청을 다른 서비스 운영자가 처리하지 못하게 차단).
    */
   private async loadStoreRequest(candidateId: string, allowedServiceKeys?: string[] | null): Promise<ProductCandidate> {

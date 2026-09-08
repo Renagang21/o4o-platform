@@ -14,7 +14,7 @@
  *
  * 대상:
  *   1) createMembershipScopeGuard  (common/middleware/membership-guard.middleware.ts)
- *      — 모든 서비스 scope guard(kpa / neture / glycopharm / cosmetics /
+ *      — 모든 서비스 scope guard(kpa / neture / pharmacy-hub / cosmetics /
  *        pharmacy-hub / kpa-branch / lms / service-legal)가 이 팩토리를 쓴다.
  *   2) createRequireStoreOwner     (utils/store-owner.utils.ts) — 매장 진입 guard
  *      · serviceKey 지정 경로 (서비스 단위 판정)
@@ -238,7 +238,7 @@ describe('WO-O4O-SERVICE-MEMBERSHIP-UPSERT-STATUS-PRESERVATION-V1 — read/guard
         roles: ['kpa:store_owner'],
         memberships: [
           { serviceKey: 'kpa-society', status: 'active' },
-          { serviceKey: 'glycopharm', status: 'suspended' },
+          { serviceKey: 'pharmacy-hub', status: 'suspended' },
         ],
       });
       const res = makeRes();

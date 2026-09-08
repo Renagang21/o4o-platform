@@ -1,5 +1,5 @@
 /**
- * Guide barrel — WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1
+ * Guide barrel — WO-O4O-GUIDE-COMMON-HOME-V1
  */
 
 // Types
@@ -70,26 +70,7 @@ export {
   kpaGuideForMemberProps,
 } from './copy/kpa.js';
 
-export {
-  glycopharmGuideIntroProps,
-  glycopharmGuideIntroStructureProps,
-  glycopharmGuideIntroKpaProps,
-  glycopharmGuideIntroOperationProps,
-  glycopharmGuideIntroConceptProps,
-  glycopharmGuideUsageProps,
-  glycopharmGuideFeaturesProps,
-  glycopharmGuideFeatureForumProps,
-  glycopharmGuideFeatureResourcesProps,
-  glycopharmGuideFeatureContentProps,
-  glycopharmGuideFeatureSignageProps,
-  glycopharmGuideFeaturePopProps,
-  glycopharmGuideFeatureBlogProps,
-  glycopharmGuideFeatureProductionMaterialsProps,
-  // WO-O4O-GUIDE-CROSSSERVICE-COVERAGE-GAP-CLOSURE-V1 (A형 gap 해소)
-  glycopharmGuideFeatureLmsProps,
-  glycopharmGuideFeatureStoreProps,
-  glycopharmGuideFeatureQrProps,
-} from './copy/glycopharm.js';
+// GlycoPharm guide copy — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
 // WO-O4O-NETURE-GUIDE-IA-AND-WRAPPER-PAGES-V1
 export {
@@ -134,7 +115,6 @@ export {
   // WO-O4O-NETURE-BUSINESS-GUIDE-HUB-V1
   netureGuideBusinessHubProps,
   netureGuideServiceKpaSocietyProps,
-  netureGuideServiceGlycopharmProps,
   netureGuideServiceKcosmeticsProps,
 } from './copy/neture.js';
 
@@ -165,7 +145,6 @@ export {
 export { GuideServiceIntroPage } from './GuideServiceIntroPage.js';
 export { kpaServiceIntroProps } from './copy/kpa.js';
 export { kCosmeticsServiceIntroProps } from './copy/k-cosmetics.js';
-export { glycopharmServiceIntroProps } from './copy/glycopharm.js';
 
 // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1
 //   PharmacyHub 는 공통 Guide View 를 그대로 채택하고 copy/config 만 주입한다.

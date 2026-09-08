@@ -30,7 +30,6 @@ import logger from '../../../utils/logger.js';
 const OPERATOR_ROLES = [
   'platform:super_admin',
   'neture:admin', 'neture:operator',
-  'glycopharm:admin', 'glycopharm:operator',
   'cosmetics:admin', 'cosmetics:operator',
   'kpa-society:admin', 'kpa-society:operator',
 ];
@@ -60,7 +59,7 @@ function userId(req: Request): string | null {
 }
 
 /**
- * 운영자 스코프(role-prefix 형식: 'kpa'/'glycopharm'/'neture'/'cosmetics') → candidate.serviceKey 검증용.
+ * 운영자 스코프(role-prefix 형식: 'kpa'/'neture'/'cosmetics') → candidate.serviceKey 검증용.
  * platform admin = null(무제한). candidate.serviceKey 는 role-prefix 형식으로 저장되므로 rolePrefixes 로 비교한다
  * (scope.serviceKeys 는 canonical 'kpa-society' 라 candidate 와 불일치 — P3 hardening).
  */

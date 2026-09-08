@@ -165,7 +165,6 @@ function generatePublicKey(): string {
 // Public web origin per store service — landing page lives on the service's own domain.
 const PUBLIC_WEB_ORIGIN_BY_SERVICE: Record<string, string> = {
   kpa: 'https://kpa-society.co.kr',
-  glycopharm: 'https://glycopharm.co.kr',
   cosmetics: 'https://cosmetics.neture.co.kr',
   // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#76):
   //   PH 마운트를 추가하면서 origin 을 등록하지 않으면 PH 매장의 QR 이 fallback 으로

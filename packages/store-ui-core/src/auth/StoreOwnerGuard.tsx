@@ -7,7 +7,7 @@
  *
  * 정책:
  *   - 구조: KPA canonical (`PharmacyGuard`) — 단계적 평가.
- *   - Guard semantics: GlycoPharm canonical (`PharmacyStoreGuard` — WO-O4O-GLYCOPHARM-
+ *   - Guard semantics: canonical store-owner guard (원본: `PharmacyStoreGuard` — WO-O4O-GLYCOPHARM-
  *     MY-STORE-MENU-MEMBERSHIP-GUARD-V1) — 3-way OR (role / membership / operator-or-above).
  *   - KPA stale JWT recovery 는 optional `staleRecovery` prop 으로 보존.
  *   - 서비스별 platform-only 차단 카드 등은 호출 측 wrapper 에서 처리 (본 Guard 는
@@ -38,7 +38,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 
 // ─── Service-specific canonical role config (internal SSOT) ───────────────
 
-export type StoreOwnerServiceKey = 'kpa' | 'glycopharm' | 'cosmetics' | 'pharmacy-hub';
+export type StoreOwnerServiceKey = 'kpa' | 'cosmetics' | 'pharmacy-hub';
 
 interface ServiceRoleConfig {
   storeOwner: string;
@@ -60,13 +60,6 @@ const SERVICE_ROLES: Record<StoreOwnerServiceKey, ServiceRoleConfig> = {
     operator: 'kpa:operator',
     membershipServiceKey: 'kpa-society',
     membershipStoreOwnerRole: null,
-  },
-  glycopharm: {
-    storeOwner: 'glycopharm:store_owner',
-    admin: 'glycopharm:admin',
-    operator: 'glycopharm:operator',
-    membershipServiceKey: 'glycopharm',
-    membershipStoreOwnerRole: 'pharmacy',
   },
   cosmetics: {
     storeOwner: 'cosmetics:store_owner',
@@ -135,7 +128,7 @@ export interface StoreOwnerGuardProps {
   isLoading: boolean;
   children: ReactNode;
   /**
-   * 서비스별 추가 role 별칭 매처. e.g. GlycoPharm `isPharmacistRole`.
+   * 서비스별 추가 role 별칭 매처.
    * roles.some(extraRoleMatcher) === true 면 매장 경영자 통과로 인정.
    */
   extraRoleMatcher?: (role: string) => boolean;

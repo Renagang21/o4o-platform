@@ -67,7 +67,7 @@ describe('A. canonical alias 쌍이 모두 해석된다', () => {
 });
 
 describe('B. self-map 서비스는 동작이 바뀌지 않는다', () => {
-  it.each([['neture'], ['glycopharm'], ['pharmacy-hub'], ['cafe24-b2b']])(
+  it.each([['neture'], ['pharmacy-hub'], ['cafe24-b2b']])(
     "'%s' 는 자기 키 하나만 반환한다",
     (key) => {
       expect(resolveServiceKeys(key)).toEqual([key]);
@@ -78,9 +78,9 @@ describe('B. self-map 서비스는 동작이 바뀌지 않는다', () => {
 describe('C. 게이트를 넓히지 않는다 — 다른 축의 파생 키는 포함하지 않는다', () => {
   // event-offer / groupbuy 는 별도 사업 축이다. 태블릿 노출 게이트가
   // 이 키들을 끌어들이면 의도치 않은 상품이 매장 화면에 노출된다.
-  const OTHER_AXIS_KEYS = ['kpa-groupbuy', 'k-cosmetics-event-offer', 'glycopharm-event-offer'];
+  const OTHER_AXIS_KEYS = ['kpa-groupbuy', 'k-cosmetics-event-offer'];
 
-  it.each([['kpa'], ['cosmetics'], ['glycopharm']])(
+  it.each([['kpa'], ['cosmetics']])(
     "'%s' 해석 결과에 다른 축 파생 키가 섞이지 않는다",
     (slugKey) => {
       const keys = resolveServiceKeys(slugKey);
@@ -91,13 +91,13 @@ describe('C. 게이트를 넓히지 않는다 — 다른 축의 파생 키는 �
   );
 
   it('반환 집합은 최대 2개다 (slug 표기 + canonical 표기)', () => {
-    for (const key of ['kpa', 'cosmetics', 'neture', 'glycopharm', 'pharmacy-hub']) {
+    for (const key of ['kpa', 'cosmetics', 'neture', 'pharmacy-hub']) {
       expect(resolveServiceKeys(key).length).toBeLessThanOrEqual(2);
     }
   });
 
   it('중복을 만들지 않는다', () => {
-    for (const key of ['kpa', 'cosmetics', 'neture', 'glycopharm', 'pharmacy-hub']) {
+    for (const key of ['kpa', 'cosmetics', 'neture', 'pharmacy-hub']) {
       const keys = resolveServiceKeys(key);
       expect(new Set(keys).size).toBe(keys.length);
     }

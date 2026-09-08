@@ -153,7 +153,7 @@ async function postVerify(): Promise<void> {
             u.email,
             -- WO-O4O-PHARMACYHUB-STORE-ORGANIZATION-SERVICE-SCOPED-RESOLUTION-V1:
             --   provisioning 이 PH 로 스코프되므로 검증도 PH 조직만 센다.
-            --   (전 서비스로 세면 KPA/GlycoPharm 조직을 함께 가진 멀티서비스 사용자가
+            --   (전 서비스로 세면 KPA 조직을 함께 가진 멀티서비스 사용자가
             --    정상 provisioning 직후에도 member_orgs>1 로 거짓 실패한다.)
             (SELECT COUNT(*) FROM organization_members om
               JOIN organization_service_enrollments e

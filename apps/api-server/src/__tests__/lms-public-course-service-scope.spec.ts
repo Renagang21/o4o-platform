@@ -7,10 +7,10 @@
  * 닫으려는 결함:
  *   공개 강의 목록 `GET /api/v1/lms/courses` 가 service boundary 없이 전 서비스 강의를
  *   반환했다. `CourseService.listCourses` 에 service 조건이 없어 KPA-Society 강의가
- *   K-Cosmetics / GlycoPharm 화면에 그대로 노출됐다 (production 실측: lms_courses 7건 전량
+ *   K-Cosmetics 화면에 그대로 노출됐다 (production 실측: lms_courses 7건 전량
  *   service_key='kpa-society', public+published+lecture 3건이 타 서비스에 노출).
  *
- * 본 스펙은 GlycoPharm Forum boundary 스펙(glycopharm-forum-service-boundary.spec.ts)과
+ * 본 스펙은 Forum boundary 스펙과
  * 동일하게 2계층으로 검증한다.
  *   (A) 동작 검증 — resolveLmsServiceScope / isCourseInServiceScope / listCourses 가 만드는
  *       SQL 조건을 fake QueryBuilder 로 실측한다. DB 불필요.
@@ -63,13 +63,12 @@ const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf-8'
 
 describe('resolveLmsServiceScope — 우선순위 계약', () => {
   it('service prefix 라우트 컨텍스트가 최우선이며 canonical 로 변환된다', () => {
-    const req: any = { lmsContext: { serviceCode: 'kpa' }, query: { serviceKey: 'glycopharm' } };
+    const req: any = { lmsContext: { serviceCode: 'kpa' }, query: { serviceKey: 'k-cosmetics' } };
     // 라우트 컨텍스트가 있으면 client 가 보낸 serviceKey 는 무시된다 (스푸핑 차단)
     expect(resolveLmsServiceScope(req)).toBe('kpa-society');
   });
 
   it('컨텍스트가 없으면 명시 serviceKey 를 canonical 로 해석한다', () => {
-    expect(resolveLmsServiceScope({ query: { serviceKey: 'glycopharm' } } as any)).toBe('glycopharm');
     expect(resolveLmsServiceScope({ query: { serviceKey: 'k-cosmetics' } } as any)).toBe('k-cosmetics');
     // role prefix 별칭도 canonical SSOT 를 통해 동일 결과가 된다
     expect(resolveLmsServiceScope({ query: { serviceKey: 'cosmetics' } } as any)).toBe('k-cosmetics');
@@ -108,19 +107,18 @@ describe('isCourseInServiceScope — 단건 경계', () => {
   });
 
   it('타 서비스 강의는 차단된다', () => {
-    expect(isCourseInServiceScope('kpa-society', 'glycopharm')).toBe(false);
     expect(isCourseInServiceScope('kpa-society', 'k-cosmetics')).toBe(false);
-    expect(isCourseInServiceScope('glycopharm', 'kpa-society')).toBe(false);
+    expect(isCourseInServiceScope('k-cosmetics', 'kpa-society')).toBe(false);
   });
 
   it('같은 서비스 강의는 통과한다', () => {
-    expect(isCourseInServiceScope('glycopharm', 'glycopharm')).toBe(true);
+    expect(isCourseInServiceScope('k-cosmetics', 'k-cosmetics')).toBe(true);
   });
 
   it('legacy null serviceKey 는 KPA-Society 로 간주된다 (기존 fallback 과 동일)', () => {
     expect(isCourseInServiceScope(null, 'kpa-society')).toBe(true);
     expect(isCourseInServiceScope(undefined, 'kpa-society')).toBe(true);
-    expect(isCourseInServiceScope(null, 'glycopharm')).toBe(false);
+    expect(isCourseInServiceScope(null, 'k-cosmetics')).toBe(false);
   });
 });
 
@@ -166,12 +164,12 @@ describe('CourseService.listCourses — service boundary SQL', () => {
   });
 
   it('타 서비스 scope 는 정확 일치 조건 1개를 건다', async () => {
-    const conds = serviceConds(await runListCourses({ serviceKey: 'glycopharm' }));
+    const conds = serviceConds(await runListCourses({ serviceKey: 'k-cosmetics' }));
     expect(conds).toHaveLength(1);
     expect(conds[0].condition).toBe('course.serviceKey = :svcKey');
-    expect(conds[0].params).toEqual({ svcKey: 'glycopharm' });
+    expect(conds[0].params).toEqual({ svcKey: 'k-cosmetics' });
     // parameter binding 필수 — string interpolation 금지 (Boundary Policy Guard Rule 2)
-    expect(conds[0].condition).not.toContain('glycopharm');
+    expect(conds[0].condition).not.toContain('k-cosmetics');
   });
 
   it('KPA scope 는 legacy null 을 함께 포함한다', async () => {
@@ -224,8 +222,6 @@ describe('정적 회귀 가드 — mount 계약 / 프런트 소비', () => {
   });
 
   it('generic route 를 쓰는 서비스 프런트는 canonical serviceKey 를 주입한다', () => {
-    expect(read('services/web-glycopharm/src/api/lms.ts'))
-      .toMatch(/createLmsLearnerClient\(lmsHttp,\s*\{\s*serviceKey:\s*'glycopharm'\s*\}\)/);
     expect(read('services/web-k-cosmetics/src/api/lms.ts'))
       .toMatch(/createLmsLearnerClient\(lmsHttp,\s*\{\s*serviceKey:\s*'k-cosmetics'\s*\}\)/);
   });
@@ -242,7 +238,7 @@ describe('정적 회귀 가드 — mount 계약 / 프런트 소비', () => {
     //   `/operator/lms` 가 실제로 렌더하는 화면은 공통 `OperatorLmsCoursesManager` 를 쓰는
     //   `OperatorLmsCoursesPage.tsx` 이므로 가드 대상을 실렌더 경로로 옮긴다 (가드 의미 동일).
     const pages = [
-      'services/web-glycopharm/src/pages/operator/OperatorLmsCoursesPage.tsx',
+      'services/web-k-cosmetics/src/pages/operator/OperatorLmsCoursesPage.tsx',
     ];
     for (const rel of pages) {
       const src = read(rel);

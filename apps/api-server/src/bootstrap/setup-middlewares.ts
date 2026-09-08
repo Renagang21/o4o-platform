@@ -53,7 +53,6 @@ export const getAllowedOrigins = (): string[] => {
     "https://neture.co.kr", "https://www.neture.co.kr", "https://admin.neture.co.kr", "https://dev-admin.neture.co.kr",
     "https://shop.neture.co.kr", "https://forum.neture.co.kr", "https://signage.neture.co.kr",
     "https://funding.neture.co.kr", "https://auth.neture.co.kr", "https://api.neture.co.kr",
-    "https://glycopharm.co.kr", "https://www.glycopharm.co.kr",
     "https://kpa-society.co.kr", "https://www.kpa-society.co.kr",
     "https://k-cosmetics.site", "https://www.k-cosmetics.site",
     // WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1:

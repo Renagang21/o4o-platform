@@ -107,12 +107,12 @@ const service = new MembershipApprovalService();
 function seed() {
   db = {
     memberships: [
-      { id: 'm-glyco', user_id: 'u1', service_key: 'glycopharm', role: 'pharmacy', status: 'active' },
+      { id: 'm-kcos2', user_id: 'u1', service_key: 'k-cosmetics', role: 'pharmacy', status: 'active' },
       { id: 'm-kpa', user_id: 'u1', service_key: 'kpa-society', role: 'member', status: 'active' },
       { id: 'm-neture', user_id: 'u1', service_key: 'neture', role: 'supplier', status: 'active' },
     ],
     roles: [
-      { id: 'ra-1', user_id: 'u1', role: 'glycopharm:pharmacy', is_active: true },
+      { id: 'ra-1', user_id: 'u1', role: 'cosmetics:pharmacy', is_active: true },
       { id: 'ra-2', user_id: 'u1', role: 'kpa:member', is_active: true },
       { id: 'ra-3', user_id: 'u1', role: 'neture:supplier', is_active: true },
       // 플랫폼 역할 — 어떤 경우에도 자동 비활성화 금지
@@ -134,7 +134,7 @@ const softDeleteAsOperator = () =>
     userId: 'u1',
     deletedBy: 'op-1',
     isPlatformAdmin: false,
-    serviceKeys: ['glycopharm'],
+    serviceKeys: ['k-cosmetics'],
     mode: 'soft',
   });
 
@@ -165,7 +165,7 @@ describe('deleteMember(soft) — 서비스 탈퇴의 cross-service 격리', () =
 
       await softDeleteAsOperator();
 
-      expect(membership('m-glyco').status).toBe('withdrawn');
+      expect(membership('m-kcos2').status).toBe('withdrawn');
       expect(membership('m-kpa').status).toBe('active');
       expect(membership('m-neture').status).toBe('active');
     });
@@ -178,7 +178,7 @@ describe('deleteMember(soft) — 서비스 탈퇴의 cross-service 격리', () =
       const smUpdates = queries.filter((q) => /^UPDATE service_memberships/i.test(q.sql));
       expect(smUpdates).toHaveLength(1);
       expect(smUpdates[0].sql).toContain('service_key = ANY($2)');
-      expect(smUpdates[0].params).toEqual(['u1', ['glycopharm']]);
+      expect(smUpdates[0].params).toEqual(['u1', ['k-cosmetics']]);
     });
 
     it('대상 서비스 Role 만 비활성화하고 다른 서비스·플랫폼 Role 은 보존한다', async () => {
@@ -186,7 +186,7 @@ describe('deleteMember(soft) — 서비스 탈퇴의 cross-service 격리', () =
 
       await softDeleteAsOperator();
 
-      expect(role('ra-1').is_active).toBe(false); // glycopharm:*
+      expect(role('ra-1').is_active).toBe(false); // pharmacy-hub:*
       expect(role('ra-2').is_active).toBe(true); // kpa:*
       expect(role('ra-3').is_active).toBe(true); // neture:*
       expect(role('ra-plat').is_active).toBe(true); // platform:*
@@ -194,7 +194,7 @@ describe('deleteMember(soft) — 서비스 탈퇴의 cross-service 격리', () =
 
     it('스코프 밖 사용자는 boundary check 에서 차단된다', async () => {
       seed();
-      db.memberships = db.memberships.filter((m) => m.service_key !== 'glycopharm');
+      db.memberships = db.memberships.filter((m) => m.service_key !== 'k-cosmetics');
 
       const ok = await softDeleteAsOperator();
 
@@ -220,7 +220,7 @@ describe('deleteMember(soft) — 서비스 탈퇴의 cross-service 격리', () =
 
       await softDeleteAsPlatformAdmin();
 
-      expect(membership('m-glyco').status).toBe('withdrawn');
+      expect(membership('m-kcos2').status).toBe('withdrawn');
       expect(membership('m-kpa').status).toBe('withdrawn');
       expect(membership('m-neture').status).toBe('withdrawn');
     });

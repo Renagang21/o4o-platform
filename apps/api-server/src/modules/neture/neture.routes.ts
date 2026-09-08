@@ -51,7 +51,6 @@ import { createAdminDashboardController } from './controllers/admin-dashboard.co
 // WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:
 // createOperatorSupplierQualityController 은퇴 — CSV import 품질 리포트 endpoint(소비처 0, redirect-only frontend).
 import { createOperatorCategoryMappingController } from './controllers/operator-category-mapping.controller.js';
-import { createOperatorRecruitingController } from './controllers/operator-recruiting.controller.js';
 import { createOperatorRecruitmentExposureController } from './controllers/operator-recruitment-exposure.controller.js';
 import { createOperatorSupplierController } from './controllers/operator-supplier.controller.js';
 import { createOperatorContactController } from './controllers/operator-contact.controller.js';
@@ -185,8 +184,6 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   // BulkImportPage 가 upload endpoint 를 여전히 소비하므로 HOLD_EXTERNAL_CONSUMER 로 보존.
   // WO-NETURE-CATEGORY-MAPPING-RULE-SYSTEM-V1
   router.use('/operator', createOperatorCategoryMappingController());
-  // WO-NETURE-RECRUITING-PRODUCTS-OPERATOR-MUTATION-API-V1
-  router.use('/operator', createOperatorRecruitingController(dataSource));
   // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 판매자 모집 노출 승인 큐 (neture:operator)
   router.use('/operator', createOperatorRecruitmentExposureController(dataSource));
   // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1

@@ -25,7 +25,7 @@ import { requireServiceLegalScope } from '../service-legal/service-legal-scope.j
 import { authenticate } from '../../middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
 
-const CONTACT_SETTINGS_SERVICE_KEYS = ['glycopharm', 'k-cosmetics', 'neture', 'kpa-society'] as const;
+const CONTACT_SETTINGS_SERVICE_KEYS = ['k-cosmetics', 'neture', 'kpa-society'] as const;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_RECIPIENTS = 20;
 

@@ -113,45 +113,8 @@ export async function resolveOrganizationForEventOffer(
     return null;
   }
 
-  // ── GlycoPharm Event Offer (glycopharm-event-offer) ──────────────────────
-  // WO-O4O-GLYCOPHARM-EVENT-OFFER-SUPPLIER-PROPOSAL-MAPPING-V1
-  // K-Cos 패턴 그대로: organization_service_enrollments.service_code='glycopharm' active 조직 사용.
-  if (serviceKey === SERVICE_KEYS.GLYCOPHARM_EVENT_OFFER) {
-    if (roleType === 'operator') {
-      // 사용자가 멤버인 organization 중 GlycoPharm에 enroll된 active 조직.
-      const rows = await dataSource.query(
-        `SELECT om.organization_id
-         FROM organization_members om
-         JOIN organization_service_enrollments ose
-           ON ose.organization_id = om.organization_id
-          AND ose.service_code = $2
-          AND ose.status = 'active'
-         WHERE om.user_id = $1
-           AND om.role IN ('owner','admin','manager')
-           AND om.left_at IS NULL
-         -- WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1:
-         -- 허용 집합(서비스 enroll 조건)은 그대로, 선택만 결정적으로 만든다.
-         ORDER BY om.is_primary DESC NULLS LAST, om.joined_at ASC, om.organization_id ASC
-         LIMIT 1`,
-        [userId, SERVICE_KEYS.GLYCOPHARM],
-      );
-      return rows[0]?.organization_id ?? null;
-    }
-    if (roleType === 'supplier') {
-      // GlycoPharm supplier 제안: GlycoPharm에 enroll된 첫 active 조직 = "GlycoPharm 공통 운영 조직"
-      const rows = await dataSource.query(
-        `SELECT ose.organization_id
-         FROM organization_service_enrollments ose
-         WHERE ose.service_code = $1
-           AND ose.status = 'active'
-         ORDER BY ose.created_at ASC NULLS LAST
-         LIMIT 1`,
-        [SERVICE_KEYS.GLYCOPHARM],
-      );
-      return rows[0]?.organization_id ?? null;
-    }
-    return null;
-  }
+  // GlycoPharm Event Offer — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
+
 
   // ── 향후 추가 ─────────────────────────────────────────────────────────────
   // if (serviceKey === SERVICE_KEYS.EVENT_OFFER_NETURE) { ... }

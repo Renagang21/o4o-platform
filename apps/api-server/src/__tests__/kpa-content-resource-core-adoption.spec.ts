@@ -285,7 +285,7 @@ describe('KPA table isolation', () => {
       }
     }
     expect([...tables]).toEqual(['kpa_contents']);
-    for (const other of ['glycopharm_contents', 'cosmetics_contents']) {
+    for (const other of ['cosmetics_contents']) {
       expect(`${other}:${(ds.queries as string[]).some((q) => q.includes(other))}`).toBe(`${other}:false`);
     }
   });

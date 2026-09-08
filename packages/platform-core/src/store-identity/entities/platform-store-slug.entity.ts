@@ -28,7 +28,6 @@ import {
 //   소비처(store-hub.controller / foreign-visitor-partner-qr-code.routes)는 전부 pass-through
 //   cast 라 exhaustive switch 회귀가 없다.
 export type StoreSlugServiceKey =
-  | 'glycopharm'
   | 'cosmetics'
   | 'kpa'
   | 'neture'

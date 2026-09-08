@@ -13,13 +13,6 @@ import { Suspense, lazy } from 'react';
 // Cosmetics Products Pages (Phase 7-H)
 const CosmeticsProductsRouter = lazy(() => import('@/pages/cosmetics-products/CosmeticsProductsRouter'));
 
-// Glycopharm Pages (Phase B-3)
-const GlycopharmRouter = lazy(() => import('@/pages/glycopharm/GlycopharmRouter'));
-
-// Service Applications Admin Pages (Phase C-4)
-const ServiceApplicationsPage = lazy(() => import('@/pages/service-applications/ServiceApplicationsPage'));
-const ServiceApplicationDetailPage = lazy(() => import('@/pages/service-applications/ServiceApplicationDetailPage'));
-
 // Neture Pages (Phase D-3)
 const NetureRouter = lazy(() => import('@/pages/neture/NetureRouter'));
 
@@ -31,7 +24,7 @@ const PageLoader = () => (
 );
 
 /**
- * Service domain routes — cosmetics, glycopharm, neture, service applications
+ * Service domain routes — cosmetics, neture
  */
 export function ServiceRoutes() {
   return [
@@ -44,30 +37,8 @@ export function ServiceRoutes() {
       </AdminProtectedRoute>
     } />,
 
-    // Glycopharm - Pharmacy Blood Glucose Products (Phase B-3)
-    <Route key="/glycopharm/*" path="/glycopharm/*" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <GlycopharmRouter />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // Service Applications Admin (Phase C-4)
-    <Route key="/admin/service-applications/:service" path="/admin/service-applications/:service" element={
-      <AdminProtectedRoute requiredRoles={['admin', 'operator']}>
-        <Suspense fallback={<PageLoader />}>
-          <ServiceApplicationsPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/service-applications/:service/:id" path="/admin/service-applications/:service/:id" element={
-      <AdminProtectedRoute requiredRoles={['admin', 'operator']}>
-        <Suspense fallback={<PageLoader />}>
-          <ServiceApplicationDetailPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
+    // Service Applications Admin — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
+    //   ServiceType = 'glycopharm' 단일 멤버였다. GlycoPharm 삭제로 모듈 전체가 소멸한다.
 
     // Neture - B2C Reference Service Management (Phase D-3)
     <Route key="/neture/*" path="/neture/*" element={

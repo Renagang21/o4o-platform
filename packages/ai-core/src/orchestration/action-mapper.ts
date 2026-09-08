@@ -13,12 +13,6 @@ import type { AIInsight, ActionMapping, AIServiceId } from './types.js';
  * These map common recommendation patterns to Operator Engine trigger IDs.
  */
 const TRIGGER_CATALOG: Record<AIServiceId, Record<string, { triggerId: string; requiresApproval: boolean }>> = {
-  glycopharm: {
-    '고위험 환자 알림': { triggerId: 'glycopharm.alert.high_risk_patient', requiresApproval: false },
-    '코칭 세션 권장': { triggerId: 'glycopharm.suggest.coaching_session', requiresApproval: true },
-    '재고 확인': { triggerId: 'glycopharm.check.inventory', requiresApproval: false },
-    'KPI 리포트 생성': { triggerId: 'glycopharm.report.kpi', requiresApproval: false },
-  },
   neture: {
     '캠페인 제안': { triggerId: 'neture.suggest.campaign', requiresApproval: true },
     '상품 재고 알림': { triggerId: 'neture.alert.low_stock', requiresApproval: false },

@@ -7,7 +7,7 @@
  * UNKNOWN_SERVICE 404 였던 원인은 이 집합에 'pharmacy-hub' 가 없었던 것 하나다.
  * 여기서 고정하는 계약:
  *   - pharmacy-hub 는 legal scope 대상이다 (404 재발 방지)
- *   - 기존 4서비스는 그대로 accept (회귀 방지)
+ *   - 기존 3서비스는 그대로 accept (회귀 방지)
  *   - 미지원/role-prefix 축 문자열은 여전히 reject (계약을 넓히지 않았다)
  */
 
@@ -21,8 +21,8 @@ describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
     expect(isSupportedLegalServiceKey('pharmacy-hub')).toBe(true);
   });
 
-  it('기존 4서비스는 그대로 accept 된다 (회귀 없음)', () => {
-    for (const key of ['neture', 'glycopharm', 'kpa-society', 'k-cosmetics']) {
+  it('기존 3서비스는 그대로 accept 된다 (회귀 없음)', () => {
+    for (const key of ['neture', 'kpa-society', 'k-cosmetics']) {
       expect(isSupportedLegalServiceKey(key)).toBe(true);
     }
   });
@@ -39,9 +39,8 @@ describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
     expect(isSupportedLegalServiceKey('cosmetics')).toBe(false);
   });
 
-  it('집합은 정확히 5개 canonical key 다 (의도치 않은 확장 감지)', () => {
+  it('집합은 정확히 4개 canonical key 다 (의도치 않은 확장 감지)', () => {
     expect([...SUPPORTED_LEGAL_SERVICE_KEYS].sort()).toEqual([
-      'glycopharm',
       'k-cosmetics',
       'kpa-society',
       'neture',

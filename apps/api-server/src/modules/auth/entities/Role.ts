@@ -25,7 +25,7 @@ export class Role {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  // Full prefixed role name (e.g., 'kpa:admin', 'glycopharm:pharmacy')
+  // Full prefixed role name (e.g., 'kpa:admin', 'cosmetics:operator')
   @Column({ type: 'varchar', length: 100, unique: true })
   name!: string;
 
@@ -37,7 +37,7 @@ export class Role {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
-  // Service key (e.g., 'kpa', 'neture', 'glycopharm')
+  // Service key (e.g., 'kpa', 'neture', 'k-cosmetics')
   @Column({ name: 'service_key', type: 'varchar', length: 50, nullable: true })
   serviceKey?: string;
 

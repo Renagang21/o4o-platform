@@ -13,7 +13,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
-import type { TemplateProfile } from '../../glycopharm/entities/glycopharm-pharmacy.entity.js';
+import type { TemplateProfile } from '../../../modules/store/types/store-template.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 

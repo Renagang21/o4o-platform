@@ -23,7 +23,6 @@ router.use(authenticate);
 router.use(requireRole([
   'platform:super_admin',
   'neture:admin', 'neture:operator',
-  'glycopharm:admin', 'glycopharm:operator',
   'cosmetics:admin', 'cosmetics:operator',
   'kpa:admin', 'kpa:operator',
   // WO-O4O-PHARMACYHUB-OPERATOR-COMMUNITY-AND-COMMON-CAPABILITY-FULL-ADOPTION-V1:

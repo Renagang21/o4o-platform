@@ -35,41 +35,14 @@ export interface ServiceScopes {
  * 전체 서비스 스코프 레지스트리
  *
  * Hard Cleanup v1: Service Registry에 등록된 서비스만 포함
- * - glycopharm, neture, kpa-society, cosmetics
+ * - neture, kpa-society, cosmetics
  *
  * 제거됨:
  * - k-cosmetics (API 없음)
  * - k-shopping (전면 제거)
  */
 export const SERVICE_SCOPES: Record<string, ServiceScopes> = {
-  /**
-   * 글라이코팜 스코프
-   */
-  glycopharm: {
-    public: [
-      'glycopharm:products:read',
-      'glycopharm:display:read',
-    ],
-    member: [
-      'glycopharm:forum:read',
-      'glycopharm:forum:write',
-      'glycopharm:application:submit',
-    ],
-    operator: [
-      'glycopharm:products:read',
-      'glycopharm:display:read',
-      'glycopharm:forum:read',
-      'glycopharm:forum:write',
-      'glycopharm:forum:moderate',
-      'glycopharm:application:manage',
-    ],
-    admin: [
-      'glycopharm:products:write',
-      'glycopharm:display:write',
-      'glycopharm:forum:moderate',
-      'glycopharm:application:manage',
-    ],
-  },
+  // 글라이코팜 스코프 — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
   /**
 

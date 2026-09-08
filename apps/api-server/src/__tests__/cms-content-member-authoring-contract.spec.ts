@@ -28,7 +28,7 @@ const member = (serviceKey: string, status = 'active', id = 'user-1') => ({
 const phMember = member('pharmacy-hub');
 
 describe('§6-A. 기존 서비스 정책 무변화', () => {
-  it.each(['kpa-society', 'kpa', 'glycopharm', 'cosmetics', 'k-cosmetics', 'neture'])(
+  it.each(['kpa-society', 'kpa', 'cosmetics', 'k-cosmetics', 'neture'])(
     '%s 는 회원 저작 capability 를 갖지 않는다 (cms_contents write 는 종전대로 operator/admin 전용)',
     (serviceKey) => {
       expect(resolveCmsMemberAuthoring(serviceKey)).toBeNull();

@@ -128,7 +128,7 @@ describe('service_credentials 수명주기 — hard delete', () => {
       userId: USER,
       deletedBy: 'admin-1',
       isPlatformAdmin: false,
-      serviceKeys: ['glycopharm'],
+      serviceKeys: ['pharmacy-hub'],
       mode: 'hard',
     });
 

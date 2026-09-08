@@ -215,8 +215,8 @@ describe('dispatch — 실제 진입 handler', () => {
     expect(deleted.body.handler).toBe('deleteMedia');
   });
 
-  it('k-cosmetics / glycopharm 및 legacy alias 에서도 library handler 로 간다', async () => {
-    for (const svc of ['k-cosmetics', 'glycopharm', 'cosmetics', 'kpa']) {
+  it('k-cosmetics 및 legacy alias 에서도 library handler 로 간다', async () => {
+    for (const svc of ['k-cosmetics', 'cosmetics', 'kpa']) {
       allowStore();
       entered.length = 0;
       const res = await request(buildApp())

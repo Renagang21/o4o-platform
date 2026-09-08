@@ -4,7 +4,8 @@
  * WO-O4O-COMMUNITY-FORUM-OWNER-AREA-COMMONIZATION-V1
  * 선행 census: IR-O4O-COMMUNITY-CROSSSERVICE-FULL-CENSUS-V1 (F31 · F34 = VIEW_DUPLICATED)
  *
- * census 기준 이 축은 4서비스에 3,103줄로 복제돼 있었고 GlycoPharm ↔ K-Cosmetics 는
+ * census 기준 이 축은 4서비스에 3,103줄로 복제돼 있었고(GlycoPharm 926줄은
+ * WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1 에서 서비스와 함께 삭제) K-Cosmetics 는
  * 실질 차이가 accent 색과 이모지 placeholder 1줄뿐이었다. 공통 View 로 수렴한 뒤
  * **다시 복제로 돌아가지 못하게** 정적으로 고정한다.
  *
@@ -17,7 +18,7 @@
  *      shared-space-ui 를 스캔한다 (조각 결합·purge 로 색이 사라지는 회귀 방지)
  *
  * 이 저장소에서 실행이 검증된 러너가 api-server jest 뿐이라 여기에 둔다
- * (kpa-boundary-regression.spec.ts · glycopharm-forum-service-boundary.spec.ts 와 같은 패턴).
+ * (kpa-boundary-regression.spec.ts 와 같은 패턴).
  */
 
 import * as fs from 'fs';
@@ -65,14 +66,12 @@ interface OwnerPage {
 
 const DASHBOARD_PAGES: OwnerPage[] = [
   { service: 'KPA-Society', file: 'services/web-kpa-society/src/pages/mypage/MyForumDashboardPage.tsx', component: 'ForumOwnerDashboard', before: 285 },
-  { service: 'GlycoPharm', file: 'services/web-glycopharm/src/pages/forum/MyForumDashboardPage.tsx', component: 'ForumOwnerDashboard', before: 572 },
   { service: 'K-Cosmetics', file: 'services/web-k-cosmetics/src/pages/forum/MyForumDashboardPage.tsx', component: 'ForumOwnerDashboard', before: 581 },
   { service: 'Neture', file: 'services/web-neture/src/pages/supplier/MyForumDashboardPage.tsx', component: 'ForumOwnerDashboard', before: 576 },
 ];
 
 const MEMBER_PAGES: OwnerPage[] = [
   { service: 'KPA-Society', file: 'services/web-kpa-society/src/pages/mypage/ForumMemberManagementPage.tsx', component: 'ForumOwnerMemberManagement', before: 381 },
-  { service: 'GlycoPharm', file: 'services/web-glycopharm/src/pages/forum/ForumMemberManagementPage.tsx', component: 'ForumOwnerMemberManagement', before: 354 },
   { service: 'K-Cosmetics', file: 'services/web-k-cosmetics/src/pages/forum/ForumMemberManagementPage.tsx', component: 'ForumOwnerMemberManagement', before: 354 },
 ];
 
@@ -106,7 +105,6 @@ const ALL_PAGES = [...CENSUS_PAGES, ...ADOPTED_PAGES];
 /** 서비스 어댑터 (endpoint 배선 + accent 만 담당) */
 const ADAPTERS: Array<{ service: string; file: string }> = [
   { service: 'KPA-Society', file: 'services/web-kpa-society/src/api/forumOwnerAdapter.ts' },
-  { service: 'GlycoPharm', file: 'services/web-glycopharm/src/services/forumOwnerAdapter.ts' },
   { service: 'K-Cosmetics', file: 'services/web-k-cosmetics/src/services/forumOwnerAdapter.ts' },
   { service: 'Neture', file: 'services/web-neture/src/services/forumOwnerAdapter.ts' },
   // WO-O4O-PHARMACYHUB-COMMUNITY-CAPABILITY-FULL-ADOPTION-V1 §7·§8 채택분
@@ -185,10 +183,10 @@ describe('서비스 파일에 복제 마크업이 남아 있지 않다', () => {
     expect(loc(file)).toBeLessThanOrEqual(80);
   });
 
-  it('소유자 화면 총 LOC 가 census 기준(3,103) 대비 1/5 미만이다', () => {
+  it('소유자 화면 총 LOC 가 census 기준 대비 1/5 미만이다', () => {
     const beforeTotal = CENSUS_PAGES.reduce((sum, p) => sum + p.before, 0);
     const afterTotal = CENSUS_PAGES.reduce((sum, p) => sum + loc(p.file), 0);
-    expect(beforeTotal).toBe(3103);
+    expect(beforeTotal).toBe(2177);
     expect(afterTotal).toBeLessThan(beforeTotal / 5);
   });
 });
@@ -199,8 +197,6 @@ describe('서비스 파일에 복제 마크업이 남아 있지 않다', () => {
 
 describe('공통 컴포넌트는 서비스를 모른다', () => {
   const SERVICE_TOKENS = [
-    'glycopharm',
-    'GlycoPharm',
     'k-cosmetics',
     'K-Cosmetics',
     'kcosmetics',
@@ -273,8 +269,8 @@ describe('서비스 고유 정책이 보존된다', () => {
     expect(members).toContain("backHref=\"/mypage/my-forums\"");
   });
 
-  it('GlycoPharm / K-Cosmetics — 회원 관리 동선과 basePath 유지', () => {
-    for (const svc of ['glycopharm', 'k-cosmetics']) {
+  it('K-Cosmetics — 회원 관리 동선과 basePath 유지', () => {
+    for (const svc of ['k-cosmetics']) {
       const page = read(`services/web-${svc}/src/pages/forum/MyForumDashboardPage.tsx`);
       expect(page).toContain('memberManageHref');
       expect(page).toContain("forumHomeHref: '/forum'");
@@ -282,8 +278,7 @@ describe('서비스 고유 정책이 보존된다', () => {
     }
   });
 
-  it('서비스별 이모지 예시가 유지된다 (GP 💊 / KCos 💄)', () => {
-    expect(read('services/web-glycopharm/src/pages/forum/MyForumDashboardPage.tsx')).toContain('💊');
+  it('서비스별 이모지 예시가 유지된다 (KCos 💄)', () => {
     expect(read('services/web-k-cosmetics/src/pages/forum/MyForumDashboardPage.tsx')).toContain('💄');
   });
 
@@ -348,8 +343,8 @@ describe('accent 주입과 Tailwind 스캔', () => {
     expect(source).not.toMatch(/['"`](?:text|bg|border|ring|hover:[a-z-]+)-\$\{/);
   });
 
-  it('소유 서비스 5곳의 tailwind content 가 shared-space-ui 를 스캔한다', () => {
-    for (const svc of ['web-kpa-society', 'web-glycopharm', 'web-k-cosmetics', 'web-neture', 'web-pharmacy-hub']) {
+  it('소유 서비스 4곳의 tailwind content 가 shared-space-ui 를 스캔한다', () => {
+    for (const svc of ['web-kpa-society', 'web-k-cosmetics', 'web-neture', 'web-pharmacy-hub']) {
       const config = read(`services/${svc}/tailwind.config.js`);
       expect(`${svc}:${config.includes('packages/shared-space-ui/src')}`).toBe(`${svc}:true`);
     }

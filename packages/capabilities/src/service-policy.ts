@@ -14,7 +14,6 @@ const ALL_CAPABILITIES = Object.values(StoreCapability) as readonly StoreCapabil
 export const SERVICE_CAPABILITIES: Record<ServiceKey, readonly StoreCapabilityKey[]> = {
   kpa: ALL_CAPABILITIES,
   cosmetics: ALL_CAPABILITIES,
-  glycopharm: ALL_CAPABILITIES,
 };
 
 export function isCapabilityAvailable(serviceKey: ServiceKey, capKey: string): boolean {

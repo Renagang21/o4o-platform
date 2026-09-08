@@ -77,7 +77,6 @@ describe('requireKpaScope role matrix (KPA-a)', () => {
       'platform:admin',
       'platform:super_admin',
       'neture:admin',
-      'glycopharm:admin',
       'cosmetics:admin',
       'nonexistent-service:admin', // 미등록 service key — 음성 대조군
       'admin',                 // legacy
@@ -119,7 +118,7 @@ describe('requireKpaScope role matrix (KPA-a)', () => {
     expect(KPA_SCOPE_CONFIG.platformBypass).toBe(false);
 
     // Blocked service prefixes must include other services
-    const expectedBlocked = ['neture', 'glycopharm', 'cosmetics'];
+    const expectedBlocked = ['neture', 'cosmetics'];
     for (const prefix of expectedBlocked) {
       expect(KPA_SCOPE_CONFIG.blockedServicePrefixes).toContain(prefix);
     }

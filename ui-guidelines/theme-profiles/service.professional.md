@@ -56,7 +56,7 @@
 
 ## 대표 레퍼런스
 
-- `apps/glycopharm-web/src/pages/pharmacy/`
+- `services/web-kpa-society/src/pages/pharmacy/`
 - `services/web-kpa-society/`
 - 카드 + 통계 요약 + 액션 버튼 패턴
 

@@ -12,7 +12,6 @@ export const SERVICE_KEYS = [
   'platform',
   'kpa',
   'neture',
-  'glycopharm',
   'cosmetics',
   // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
   //   role prefix 이자 canonical service_key 가 동일한 서비스('pharmacy-hub').
@@ -32,7 +31,6 @@ export const SERVICES: Record<ServiceKey, ServiceMeta> = {
   platform: { key: 'platform', label: 'Platform', badgeClass: 'text-red-700 bg-red-50' },
   kpa: { key: 'kpa', label: 'KPA', badgeClass: 'text-blue-700 bg-blue-50' },
   neture: { key: 'neture', label: 'Neture', badgeClass: 'text-orange-700 bg-orange-50' },
-  glycopharm: { key: 'glycopharm', label: 'GlycoPharm', badgeClass: 'text-green-700 bg-green-50' },
   cosmetics: { key: 'cosmetics', label: 'K-Cosmetics', badgeClass: 'text-pink-700 bg-pink-50' },
   'pharmacy-hub': { key: 'pharmacy-hub', label: 'Pharmacy-Hub', badgeClass: 'text-teal-700 bg-teal-50' },
 };
@@ -133,7 +131,7 @@ export function isOperatorRole(raw: string): boolean {
  *
  * WO-O4O-ADMIN-OPERATORS-LEGACY-SERVICE-TABS-CLEANUP-V1:
  *   - Platform 은 super_admin role 의 namespace 로만 의미가 있어 운영자 필터 옵션에서 제외.
- *   - canonical 운영 서비스: KPA / Neture / GlycoPharm / K-Cosmetics
+ *   - canonical 운영 서비스: KPA / Neture / K-Cosmetics
  *
  */
 const EXCLUDED_FROM_FACET: ReadonlySet<ServiceKey> = new Set(['platform']);

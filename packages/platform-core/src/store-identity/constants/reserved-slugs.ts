@@ -57,7 +57,6 @@ export const RESERVED_SLUGS = [
   'instructor',
 
   // Service paths
-  'glycopharm',
   'cosmetics',
   'kpa',
   'neture',

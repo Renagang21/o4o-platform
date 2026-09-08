@@ -13,7 +13,6 @@ import { resolve } from 'node:path';
 
 import {
   COSMETICS_STORE_CONFIG,
-  GLYCOPHARM_STORE_CONFIG,
   KPA_SOCIETY_STORE_CONFIG,
   PHARMACY_HUB_STORE_CONFIG,
   type StoreDashboardConfig,
@@ -42,7 +41,7 @@ describe('공통 My Store View — serviceKey 분기 금지', () => {
   for (const file of [PLAYER_VIEW, DESCRIPTIONS_VIEW, ANALYTICS_VIEW]) {
     it(`${file} 는 서비스 식별자로 분기하지 않는다`, () => {
       const src = readCode(file);
-      for (const token of ['pharmacy-hub', 'kpa-society', 'k-cosmetics', 'glycopharm', 'serviceKey']) {
+      for (const token of ['pharmacy-hub', 'kpa-society', 'k-cosmetics', 'serviceKey']) {
         expect(src).not.toContain(token);
       }
     });
@@ -80,7 +79,6 @@ describe('StoreProductDescriptionsView — links 기본값 = 기존 동작', () 
 describe('기존 3서비스 메뉴 회귀 0', () => {
   const cases: Array<[string, StoreDashboardConfig]> = [
     ['KPA', KPA_SOCIETY_STORE_CONFIG],
-    ['GlycoPharm', GLYCOPHARM_STORE_CONFIG],
     ['K-Cosmetics', COSMETICS_STORE_CONFIG],
   ];
 
@@ -111,7 +109,7 @@ describe('기존 3서비스 메뉴 회귀 0', () => {
 
   it('판매자 모집 탐색은 KPA 에만 있다 (backend proxy 가 kpa-society 고정)', () => {
     expect(keys(KPA_SOCIETY_STORE_CONFIG)).toContain('seller-recruitments');
-    for (const c of [GLYCOPHARM_STORE_CONFIG, COSMETICS_STORE_CONFIG, PHARMACY_HUB_STORE_CONFIG]) {
+    for (const c of [COSMETICS_STORE_CONFIG, PHARMACY_HUB_STORE_CONFIG]) {
       expect(keys(c)).not.toContain('seller-recruitments');
     }
   });

@@ -5,46 +5,14 @@
  */
 import { api } from '../apiClient';
 
-// ==================== Recruiting Products ====================
-
-export interface RecruitingProduct {
-  id: string;
-  pharmacy_id?: string;
-  pharmacy_name?: string;
-  name: string;
-  sku: string;
-  category: string;
-  price: number;
-  sale_price?: number;
-  stock_quantity: number;
-  status: string;
-  is_featured: boolean;
-  is_partner_recruiting: boolean;
-  created_at: string;
-}
-
-export const recruitingApi = {
-  async getRecruitingProducts(): Promise<RecruitingProduct[]> {
-    try {
-      const response = await api.get('/neture/partner/recruiting-products');
-      const result = response.data;
-      return result.data || [];
-    } catch (error) {
-      console.warn('[Neture API] Failed to fetch recruiting products:', error);
-      throw error;
-    }
-  },
-};
+// Recruiting Products — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
+//   glycopharm_products 기반 모집상품 API 였다. GlycoPharm 삭제와 함께 제거한다.
 
 // ==================== Partner Dashboard ====================
 
 export interface PartnerDashboardItem {
   id: string;
   productId: string;
-  productName: string;
-  category: string;
-  price: number;
-  pharmacyName?: string;
   serviceId: string;
   status: string;
   contentCount: number;

@@ -49,13 +49,6 @@ export const O4O_SERVICES: O4OService[] = [
     joinEnabled: true,
   },
   {
-    key: 'glycopharm',
-    name: 'GlycoPharm',
-    domain: 'glycopharm.co.kr',
-    description: '약국 혈당 관리 서비스',
-    joinEnabled: true,
-  },
-  {
     key: 'kpa-society',
     name: 'KPA Society',
     domain: 'kpa-society.co.kr',

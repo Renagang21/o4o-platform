@@ -80,7 +80,6 @@ export const UNREGISTERED_INVENTORY = new Map([
   // --- module / route 하위 legacy 정의 ---
   ['OfferServicePrice', { file: 'apps/api-server/src/modules/neture/entities/OfferServicePrice.entity.ts', reason: DEAD }],
   ['CosmeticsContent', { file: 'apps/api-server/src/routes/cosmetics/entities/cosmetics-content.entity.ts', reason: DEAD }],
-  ['GlycopharmPharmacy', { file: 'apps/api-server/src/routes/glycopharm/entities/glycopharm-pharmacy.entity.ts', reason: DEAD }],
   ['KpaCourseRequest', { file: 'apps/api-server/src/routes/kpa/entities/kpa-course-request.entity.ts', reason: DEAD }],
   ['KpaInstructorQualification', { file: 'apps/api-server/src/routes/kpa/entities/kpa-instructor-qualification.entity.ts', reason: DEAD }],
 

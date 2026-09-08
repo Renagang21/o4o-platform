@@ -35,7 +35,6 @@ type TopChoice = 'drug' | 'non_drug';
 /* ------------------------------------------------------------------ */
 
 const O4O_SERVICES = [
-  { key: 'glycopharm', name: 'GlycoPharm' },
   { key: 'kpa-society', name: 'KPA Society' },
   { key: 'k-cosmetics', name: 'K-Cosmetics' },
 ];

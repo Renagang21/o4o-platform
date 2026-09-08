@@ -3,7 +3,7 @@
 O4O Platform은 이커머스·커뮤니티·매장 운영을 통합한 멀티 서비스 플랫폼 모노레포입니다.
 
 하나의 공통 플랫폼 계층(Content / Forum / LMS / Signage / Commerce) 위에서
-KPA-Society · Neture · GlycoPharm · K-Cosmetics · Pharmacy-Hub 등 여러 서비스가
+KPA-Society · Neture · K-Cosmetics · Pharmacy-Hub 등 여러 서비스가
 `serviceKey` 기준으로 데이터를 분리한 채 동작합니다.
 
 ## 기술 스택
@@ -25,7 +25,7 @@ pnpm workspace 기준이며, 대상 범위는 `pnpm-workspace.yaml`에 정의되
 ```
 o4o-platform/
 ├── apps/          # 애플리케이션 (admin-dashboard, api-server, main-site, ...)
-├── services/      # 서비스별 웹 (web-kpa-society, web-neture, web-glycopharm,
+├── services/      # 서비스별 웹 (web-kpa-society, web-neture,
 │                  #               web-k-cosmetics, web-pharmacy-hub, web-account, ...)
 ├── packages/      # 공유 패키지 (types, ui, auth-client, *-core 등)
 ├── extensions/    # 확장 모듈

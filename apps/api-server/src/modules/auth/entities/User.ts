@@ -236,7 +236,7 @@ export class User {
     const roleStr = role as string;
     if (!this.roles || this.roles.length === 0) return false;
     // Direct match, platform-prefixed match, or service-prefixed match
-    // e.g., 'admin' matches 'glycopharm:admin', 'kpa:admin'; 'super_admin' matches 'platform:super_admin'
+    // e.g., 'admin' matches 'cosmetics:admin', 'kpa:admin'; 'super_admin' matches 'platform:super_admin'
     // WO-O4O-MEMBERSHIP-APPROVAL-API-403-FIX-V1
     return this.roles.some(r => r === roleStr || r === `platform:${roleStr}` || r.endsWith(`:${roleStr}`));
   }

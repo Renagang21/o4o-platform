@@ -67,11 +67,6 @@ export const DEFAULT_AI_POLICIES: Record<string, AiPolicy> = {
     enabled: true,
     allowedFeatures: ['preview'],
   },
-  'glycopharm': {
-    serviceId: 'glycopharm',
-    enabled: true,
-    allowedFeatures: ['preview'],
-  },
   'k-cosmetics': {
     serviceId: 'k-cosmetics',
     enabled: true,

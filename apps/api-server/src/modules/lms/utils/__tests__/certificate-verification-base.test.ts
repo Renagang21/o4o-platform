@@ -6,7 +6,6 @@ import { resolveVerificationBase } from '../certificate-verification-base';
 
 const ENV_KEYS = [
   'KCOSMETICS_FRONTEND_URL',
-  'GLYCOPHARM_FRONTEND_URL',
   'KPA_FRONTEND_URL',
   'PHARMACY_HUB_FRONTEND_URL',
   'FRONTEND_URL',
@@ -45,8 +44,7 @@ describe('resolveVerificationBase — 수료증 검증 링크 base URL 계약', 
     expect(resolveVerificationBase('k-cosmetics')).not.toContain('k-cosmetics.co.kr');
   });
 
-  it('case 4: 다른 서비스 fallback 회귀 없음 (glycopharm / kpa-society / legacy null / unknown)', () => {
-    expect(resolveVerificationBase('glycopharm')).toBe('https://glycopharm.co.kr');
+  it('case 4: 다른 서비스 fallback 회귀 없음 (kpa-society / legacy null / unknown)', () => {
     expect(resolveVerificationBase('kpa-society')).toBe('https://kpa-society.co.kr');
     expect(resolveVerificationBase(null)).toBe('https://kpa-society.co.kr');
     expect(resolveVerificationBase(undefined)).toBe('https://kpa-society.co.kr');
@@ -63,7 +61,7 @@ describe('resolveVerificationBase — 수료증 검증 링크 base URL 계약', 
 
   it('case 4-b: 서비스별 env 는 다른 서비스에 새지 않는다', () => {
     process.env.KCOSMETICS_FRONTEND_URL = 'https://kcos.example';
-    expect(resolveVerificationBase('glycopharm')).toBe('https://glycopharm.co.kr');
+    expect(resolveVerificationBase('pharmacy-hub')).toBe('https://pharmacyhub.co.kr');
     expect(resolveVerificationBase('kpa-society')).toBe('https://kpa-society.co.kr');
   });
 

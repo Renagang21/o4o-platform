@@ -21,14 +21,13 @@ const ROLES: Record<string, string[]> = {
   'cosmetics-admin': ['cosmetics:admin'],
   'kpa-admin': ['kpa-society:admin'],
   'kpa-operator': ['kpa-society:operator'],
-  'glycopharm-admin': ['glycopharm:admin'],
   plain: [],
 };
 
 /** write 가 허용돼야 하는 역할 (O4O 전체 관리자) */
 const WRITERS = ['superadmin', 'neture-admin', 'neture-operator'];
 /** 조회는 되지만 write 는 403 이어야 하는 역할 (서비스 admin/operator) */
-const READERS = ['cosmetics-operator', 'cosmetics-admin', 'kpa-admin', 'kpa-operator', 'glycopharm-admin'];
+const READERS = ['cosmetics-operator', 'cosmetics-admin', 'kpa-admin', 'kpa-operator'];
 
 jest.mock('../../common/middleware/auth/authentication.middleware.js', () => {
   const stub = (req: express.Request, res: express.Response, next: express.NextFunction) => {

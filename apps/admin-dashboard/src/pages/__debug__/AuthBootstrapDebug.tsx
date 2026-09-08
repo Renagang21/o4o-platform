@@ -221,9 +221,8 @@ const AuthBootstrapDebug: React.FC = () => {
       }, meResponse.ok ? undefined : `Status ${meResponse.status}`, meDuration);
 
       // Step 5: 후속 API 호출 테스트 (Cockpit APIs)
-      const postLoginApis = [
-        '/api/v1/glycopharm/pharmacy/cockpit/status',
-        '/api/v1/glycopharm/pharmacy/cockpit/today-actions',
+      const postLoginApis: string[] = [
+        // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: glycopharm cockpit probe 제거 (서비스 삭제).
       ];
 
       for (const apiPath of postLoginApis) {

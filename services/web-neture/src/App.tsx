@@ -287,7 +287,6 @@ const PartnerStoresPage = lazy(() =>
 );
 
 // Partner Dashboard
-const RecruitingProductsPage = lazy(() => import('./pages/partner/RecruitingProductsPage'));
 // WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
 const PartnerRecruitmentApplicationsPage = lazy(() => import('./pages/partner/PartnerRecruitmentApplicationsPage'));
 const PartnerOverviewPage = lazy(() =>
@@ -433,7 +432,6 @@ const ForumAnalyticsPage = lazy(() =>
 );
 // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: Products 영역 단일 통합
 const AllRegisteredProductsPage = lazy(() => import('./pages/operator/AllRegisteredProductsPage'));
-const RecruitingProductsOverviewPage = lazy(() => import('./pages/operator/RecruitingProductsOverviewPage'));
 
 // WO-NETURE-OPERATOR-DASHBOARD-IMPLEMENTATION-V1
 const UsersManagementPage = lazy(() =>
@@ -569,7 +567,6 @@ const GuideBusinessWarehousePharmacyPage = lazy(() => import('./pages/guide').th
 const GuideForeignCustomerSupportPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideForeignCustomerSupportPage })));
 // WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1: 운영 중인 O4O 서비스 소개 페이지
 const GuideServiceKpaSocietyPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideServiceKpaSocietyPage })));
-const GuideServiceGlycoPharmPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideServiceGlycoPharmPage })));
 const GuideServiceKCosmeticsPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideServiceKCosmeticsPage })));
 
 // Loading fallback
@@ -829,7 +826,6 @@ function App() {
               <Route path="/guide/foreign-customer-support" element={<GuideForeignCustomerSupportPage />} />
               {/* WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1: 운영 중인 O4O 서비스 소개 */}
               <Route path="/guide/services/kpa-society" element={<GuideServiceKpaSocietyPage />} />
-              <Route path="/guide/services/glycopharm" element={<GuideServiceGlycoPharmPage />} />
               <Route path="/guide/services/k-cosmetics" element={<GuideServiceKCosmeticsPage />} />
               <Route path="/guide/intro" element={<GuideIntroPage />} />
               <Route path="/guide/intro/structure" element={<GuideIntroStructurePage />} />
@@ -978,7 +974,6 @@ function App() {
               <Route path="/partner/overview" element={<PartnerOverviewPage />} />
               <Route path="/partner/contents" element={<ContentListPage />} />
               <Route path="/partner/contents/:id" element={<ContentDetailPage />} />
-              <Route path="/partner/stores" element={<RecruitingProductsPage />} />
               <Route path="/partner/commissions" element={<SettlementsPage />} />
               <Route path="/partner/promotions" element={<PromotionsPage />} />
               <Route path="/partner/forum" element={<ForumPage title="파트너 포럼" description="파트너 간 소통 공간" basePath="/partner/forum" />} />
@@ -1100,7 +1095,6 @@ function App() {
               <Route path="/admin/forum-analytics" element={<ForumAnalyticsPage />} />
               {/* WO-NETURE-OPERATOR-SUPPLY-MENU-REMOVE-V1: /admin/supply 제거 */}
               <Route path="/admin/all-products" element={<Navigate to="/operator/all-registered-products" replace />} />
-              <Route path="/admin/recruiting-products" element={<RecruitingProductsOverviewPage />} />
               <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/admin/ai-operations" element={<AiOperationsPage />} />
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /admin/signage/* 제거 (Neture signage 미대상) */}
@@ -1216,7 +1210,6 @@ function App() {
               <Route path="/operator/supply" element={<Navigate to="/operator/all-registered-products" replace />} />
               <Route path="/operator/all-products" element={<Navigate to="/operator/all-registered-products" replace />} />
               <Route path="/operator/all-registered-products" element={<AllRegisteredProductsPage />} />
-              <Route path="/operator/recruiting-products" element={<RecruitingProductsOverviewPage />} />
               {/* WO-O4O-NETURE-OPERATOR-AI-GUARD-AND-MENU-VISIBILITY-FINAL-CLOSURE-V1 §3-B:
                   두 화면의 API(/api/ai/card-report, /api/ai/operations)는 requireAdmin
                   (= platform:super_admin) 이라 operator 축 route 는 진입점 없는 중복 alias 였다.
@@ -1270,7 +1263,6 @@ function App() {
             <Route path="/workspace/partner/collaboration" element={<Navigate to="/partner/links" replace />} />
             <Route path="/workspace/partner/promotions" element={<Navigate to="/partner/promotions" replace />} />
             <Route path="/workspace/partner/settlements" element={<Navigate to="/partner/settlements" replace />} />
-            <Route path="/workspace/partner/recruiting-products" element={<Navigate to="/partner/stores" replace />} />
             <Route path="/workspace/partner/*" element={<Navigate to="/partner/dashboard" replace />} />
 
             {/* 기존 최상위 경로 리다이렉트 */}

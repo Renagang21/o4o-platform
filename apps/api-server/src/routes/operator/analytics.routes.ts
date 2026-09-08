@@ -40,7 +40,6 @@ const ACTION_STATUS_FAILED = 'failed';
 const requireOperatorOrAdmin = requireRole([
   'platform:super_admin',
   'neture:admin', 'neture:operator',
-  'glycopharm:admin', 'glycopharm:operator',
   'kpa:admin', 'kpa:operator',
   // WO-O4O-PHARMACYHUB-OPERATOR-COMMUNITY-AND-COMMON-CAPABILITY-FULL-ADOPTION-V1:
   //   공통 API 는 이미 service scope 로 격리되는데 allowlist 에만 pharmacy-hub 가 빠져 있었다.

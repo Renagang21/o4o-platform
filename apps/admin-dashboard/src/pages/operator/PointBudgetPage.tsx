@@ -61,7 +61,6 @@ interface TransactionsResponse {
 
 const SERVICE_LABELS: Record<string, string> = {
   'kpa-society': 'KPA 약사회',
-  'glycopharm': '글라이코팜',
   'neture': '네처',
   'k-cosmetics': 'K-화장품',
 };

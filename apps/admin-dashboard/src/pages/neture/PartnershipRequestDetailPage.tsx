@@ -133,7 +133,7 @@ export default function PartnershipRequestDetailPage() {
             <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
                 <p className="text-sm text-slate-700">
                     <strong>조회 전용:</strong> Neture는 신청 정보를 표시만 합니다.
-                    승인/거절은 각 서비스(예: Glycopharm, Cosmetics)에서 직접 처리합니다.
+                    승인/거절은 각 서비스(예: Cosmetics)에서 직접 처리합니다.
                 </p>
                 {request.sellerStoreUrl && (
                     <a

@@ -8,7 +8,6 @@
  * endpoint · 응답 형상 · 기본값(fallback)은 세 사본이 동일했고 차이는 **전송 계층**뿐이다:
  *   - KPA  : `apiClient` (base `/api/v1/kpa`, 이미 body 반환)
  *   - KCos : `authClient.api` (axios) + `/cosmetics` prefix + `.data` 언랩
- *   - GP   : `authClient.api` (axios) + `/glycopharm` prefix + `.data` 언랩
  * → 경로 prefix 와 언랩은 서비스가 주입하는 `StoreHubHttp` 가 소유하고,
  *   endpoint 목록과 응답 계약은 여기 한 곳으로 모은다. API 계약은 무변경이다.
  *
@@ -40,7 +39,6 @@ export interface StoreHubOverview {
   organizationId: string;
   organizationName: string | null;
   products: {
-    glycopharm: { totalCount: number; link: string };
     /** KPA 만 내려주는 화장품 진열 수. 다른 서비스에서는 없다. */
     cosmetics?: { listedCount: number; link: string };
   };

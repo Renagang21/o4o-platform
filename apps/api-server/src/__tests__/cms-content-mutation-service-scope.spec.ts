@@ -50,7 +50,7 @@ import { createCmsContentMutationRoutes } from '../routes/cms-content/cms-conten
 const BASE_ROWS = [
   { id: 'kpa-canon', serviceKey: 'kpa-society', type: 'notice', title: 'KPA' },
   { id: 'kpa-legacy', serviceKey: 'kpa', type: 'notice', title: 'KPA legacy' },
-  { id: 'gp', serviceKey: 'glycopharm', type: 'notice', title: 'GP' },
+  { id: 'gp', serviceKey: 'pharmacy-hub', type: 'notice', title: 'GP' },
   { id: 'ph', serviceKey: 'pharmacy-hub', type: 'notice', title: 'PH' },
   { id: 'kcos-canon', serviceKey: 'k-cosmetics', type: 'notice', title: 'KCos' },
   { id: 'kcos-legacy', serviceKey: 'cosmetics', type: 'notice', title: 'KCos legacy' },
@@ -88,7 +88,7 @@ function makeApp() {
 
 const KPA_OP = 'kpa:operator';
 const KPA_ADMIN = 'kpa:admin';
-const GP_OP = 'glycopharm:operator';
+const GP_OP = 'pharmacy-hub:operator';
 const KCOS_OP = 'cosmetics:operator';
 const PH_OP = 'pharmacy-hub:operator';
 const PLATFORM_ADMIN = 'platform:super_admin';
@@ -139,7 +139,7 @@ describe('KPA operator — role scope(kpa) 와 CMS service key(kpa-society) 는 
 
 describe('KPA operator — 타 서비스 콘텐츠는 계속 차단된다', () => {
   it.each([
-    ['glycopharm', 'gp'],
+    ['pharmacy-hub', 'gp'],
     ['pharmacy-hub', 'ph'],
     ['k-cosmetics', 'kcos-canon'],
     ['cosmetics(legacy)', 'kcos-legacy'],
@@ -153,7 +153,7 @@ describe('KPA operator — 타 서비스 콘텐츠는 계속 차단된다', () =
   });
 
   it('POST: 타 서비스 serviceKey 로는 생성할 수 없다', async () => {
-    expect((await post(KPA_OP, { serviceKey: 'glycopharm', type: 'notice', title: 't' })).status).toBe(403);
+    expect((await post(KPA_OP, { serviceKey: 'pharmacy-hub', type: 'notice', title: 't' })).status).toBe(403);
   });
 
   it('serviceKey=null(global) row 는 service operator 가 수정할 수 없다', async () => {
@@ -185,8 +185,8 @@ describe('§10 create 계약 — 신규 row 는 canonical service key 로 저장
   });
 
   it('self-map 서비스(GP/PH)는 그대로 저장된다 (회귀 0)', async () => {
-    expect((await post(GP_OP, { serviceKey: 'glycopharm', type: 'notice', title: 't' })).status).toBe(201);
-    expect(saved.serviceKey).toBe('glycopharm');
+    expect((await post(GP_OP, { serviceKey: 'pharmacy-hub', type: 'notice', title: 't' })).status).toBe(201);
+    expect(saved.serviceKey).toBe('pharmacy-hub');
     expect((await post(PH_OP, { serviceKey: 'pharmacy-hub', type: 'knowledge', title: 't' })).status).toBe(201);
     expect(saved.serviceKey).toBe('pharmacy-hub');
   });
@@ -225,7 +225,7 @@ describe('K-Cosmetics operator — cosmetics role scope 와 k-cosmetics service 
 // ============================================================================
 describe('§11 service ownership 이전', () => {
   it('일반 operator 는 content 의 serviceKey 를 타 서비스로 바꿀 수 없다', async () => {
-    const res = await put('kpa-canon', KPA_OP, { title: 't', serviceKey: 'glycopharm' });
+    const res = await put('kpa-canon', KPA_OP, { title: 't', serviceKey: 'pharmacy-hub' });
     expect(res.status).toBe(403);
     expect(res.body?.error?.message).toMatch(/Cannot change serviceKey/);
   });

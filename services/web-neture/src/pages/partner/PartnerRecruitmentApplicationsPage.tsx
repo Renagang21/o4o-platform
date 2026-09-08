@@ -11,7 +11,6 @@ import { ClipboardList } from 'lucide-react';
 import { partnerRecruitmentApi, type PartnerApplication } from '../../lib/api/partner';
 
 const SERVICE_LABELS: Record<string, string> = {
-  glycopharm: 'GlycoPharm',
   'kpa-society': 'KPA Society',
   'k-cosmetics': 'K-Cosmetics',
   neture: 'Neture',

@@ -74,7 +74,6 @@ const homeProps: GuideFeaturesPageProps = {
     ],
     cards: [
       { title: 'KPA Society', audience: '약국 · 약사', summary: '약국과 약사 커뮤니티를 기반으로 콘텐츠 · 교육 · 매장 활용 자료를 운영하는 O4O 서비스입니다.', to: '/guide/services/kpa-society' },
-      { title: 'GlycoPharm', audience: '약국', summary: '혈당관리 약국을 중심으로 상품 · 콘텐츠 · 고객 안내 자료를 연결하는 약국 O4O 서비스입니다.', to: '/guide/services/glycopharm' },
       { title: 'K-Cosmetics', audience: '화장품 매장', summary: '화장품 매장에서 상품 설명 · 콘텐츠 · QR · POP · 사이니지 · 타블렛을 활용하도록 돕는 O4O 서비스입니다.', to: '/guide/services/k-cosmetics' },
     ],
   },

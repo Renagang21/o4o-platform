@@ -1,7 +1,7 @@
 /**
  * WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 §10·§11·§12
  *
- * 5개 서비스의 `active → suspended → active` 를 **하나의 계약**으로 고정한다.
+ * 4개 서비스의 `active → suspended → active` 를 **하나의 계약**으로 고정한다.
  *
  * canonical contract (§7):
  *   - membership = "그 서비스에 들어갈 수 있느냐" — 접근 차단의 정본.
@@ -11,7 +11,7 @@
  * 여기서 고정하는 것 (서비스별 예외 없음):
  *   1. 정지는 대상 서비스 membership 만 suspended 로 바꾼다 (cross-service fan-out 0).
  *   2. 정지는 그 서비스의 역할만 내린다. 다른 서비스 · 전역 · platform 역할은 불변.
- *   3. `{prefix}:store_owner` 회수는 5개 서비스 대칭이다 (기존 kpa 전용 분기 제거).
+ *   3. `{prefix}:store_owner` 회수는 4개 서비스 대칭이다 (기존 kpa 전용 분기 제거).
  *   4. 복구는 내려간 역할을 되살리기만 한다. 신규 bare role 0 · 신규 platform role 0.
  *   5. users.status 는 정지에서 절대 바뀌지 않는다.
  */
@@ -135,9 +135,8 @@ const service = new MembershipApprovalService();
 const SERVICES: Array<{ serviceKey: string; prefix: string }> = [
   { serviceKey: 'kpa-society', prefix: 'kpa' },
   { serviceKey: 'k-cosmetics', prefix: 'cosmetics' },
-  { serviceKey: 'glycopharm', prefix: 'glycopharm' },
-  { serviceKey: 'neture', prefix: 'neture' },
   { serviceKey: 'pharmacy-hub', prefix: 'pharmacy-hub' },
+  { serviceKey: 'neture', prefix: 'neture' },
 ];
 
 const activeRoles = () => db.roles.filter((r) => r.is_active).map((r) => r.role).sort();
@@ -160,7 +159,7 @@ const reactivate = (serviceKeys: string[]) =>
     serviceKeys,
   } as any);
 
-/** 5개 서비스 전부에 active membership 을 가진 계정 (§10 fan-out fixture) */
+/** 4개 서비스 전부에 active membership 을 가진 계정 (§10 fan-out fixture) */
 function seedAllFive(opts: { membershipRole?: string; extraRoles?: string[]; pharmacyOwner?: boolean } = {}) {
   const membershipRole = opts.membershipRole ?? 'member';
   db = {
@@ -252,12 +251,12 @@ describe('§12 active → suspended → active 왕복', () => {
 
   it('membership.role 과 별개로 붙어 있는 store_owner 도 대칭 처리된다 (기존 kpa 전용 분기 제거)', async () => {
     // membership.role='member' 인데 capability role 로 store_owner 를 별도 보유한 계정
-    seedAllFive({ extraRoles: ['cosmetics:store_owner', 'glycopharm:store_owner'] });
+    seedAllFive({ extraRoles: ['cosmetics:store_owner', 'pharmacy-hub:store_owner'] });
 
     await suspend(['k-cosmetics']);
     expect(activeRoles()).not.toContain('cosmetics:store_owner');
     // 정지하지 않은 서비스의 store_owner 는 그대로다
-    expect(activeRoles()).toContain('glycopharm:store_owner');
+    expect(activeRoles()).toContain('pharmacy-hub:store_owner');
 
     await reactivate(['k-cosmetics']);
     expect(activeRoles()).toContain('cosmetics:store_owner');

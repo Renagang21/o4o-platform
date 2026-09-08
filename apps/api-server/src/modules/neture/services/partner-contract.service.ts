@@ -37,7 +37,6 @@ const NETURE_RECRUITMENT_APPLICATIONS_ROUTE = '/partner/recruitment-applications
 export function resolveRecruitmentApplicationTargetUrl(serviceKey?: string): string {
   switch (serviceKey) {
     case 'kpa-society':
-    case 'glycopharm':
     case 'k-cosmetics':
     case 'cosmetics': // service-catalog canonical 은 'k-cosmetics' 이나 일부 경로가 'cosmetics' 사용
       return STORE_RECRUITMENT_APPLICATIONS_ROUTE;
@@ -742,7 +741,7 @@ export class NeturePartnerContractService {
           const item = txDashboardRepo.create({
             partnerUserId: application.partnerId,
             productId: recruitment.productId,
-            serviceId: recruitment.serviceId || 'glycopharm',
+            serviceId: recruitment.serviceId,
             status: 'active',
           });
           await txDashboardRepo.save(item);

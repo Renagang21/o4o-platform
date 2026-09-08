@@ -38,7 +38,7 @@ import {
 // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: Primary tabs
 type PrimaryTab = 'all' | 'approval' | 'supply';
 type SupplySubTab = 'all' | 'service' | 'recruiting';
-type ServiceTab = 'kpa-society' | 'glycopharm' | 'k-cosmetics';
+type ServiceTab = 'kpa-society' | 'k-cosmetics';
 
 const PRIMARY_TABS: { key: PrimaryTab; label: string }[] = [
   { key: 'all', label: '전체' },
@@ -54,7 +54,6 @@ const SUPPLY_SUB_TABS: { key: SupplySubTab; label: string }[] = [
 
 const SERVICE_TABS: { key: ServiceTab; label: string }[] = [
   { key: 'kpa-society', label: 'KPA' },
-  { key: 'glycopharm', label: 'GlycoPharm' },
   { key: 'k-cosmetics', label: 'Cosmetics' },
 ];
 

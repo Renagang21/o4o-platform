@@ -6,10 +6,10 @@
  * import { runAIInsight, onAudit } from '@o4o/ai-core/orchestration';
  *
  * const result = await runAIInsight({
- *   service: 'glycopharm',
+ *   service: 'neture',
  *   insightType: 'store-summary',
  *   contextData: { ... },
- *   user: { id: 'u1', role: 'glycopharm:operator' },
+ *   user: { id: 'u1', role: 'neture:operator' },
  * });
  * ```
  */

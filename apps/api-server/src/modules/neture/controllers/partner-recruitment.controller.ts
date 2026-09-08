@@ -3,7 +3,6 @@
  * Extracted from partner.controller.ts
  *
  * Routes:
- *   GET  /partner/recruiting-products
  *   GET  /partner/recruitments
  *   POST /partner/applications
  *   POST /partner/applications/:id/approve
@@ -15,7 +14,6 @@ import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import type { AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import type { NetureService } from '../neture.service.js';
-import { GlycopharmRepository } from '../../../routes/glycopharm/repositories/glycopharm.repository.js';
 import { RecruitmentStatus, ExposureStatus } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
 
@@ -27,46 +25,9 @@ export function createPartnerRecruitmentController(deps: {
   const router = Router();
   const { dataSource, netureService, requireActiveSupplier } = deps;
 
-  // ==================== Recruiting Products (WO-PARTNER-RECRUIT-PHASE1-V1) ====================
-
-  /**
-   * GET /partner/recruiting-products
-   * Get products marked for partner recruiting (public, no auth)
-   */
-  router.get('/partner/recruiting-products', async (_req: Request, res: Response) => {
-    try {
-      const glycopharmRepo = new GlycopharmRepository(dataSource);
-      const products = await glycopharmRepo.findPartnerRecruitingProducts();
-
-      const data = products.map((p) => ({
-        id: p.id,
-        pharmacy_id: p.pharmacy_id,
-        pharmacy_name: p.pharmacy?.name,
-        name: p.name,
-        sku: p.sku,
-        category: p.category,
-        price: Number(p.price),
-        sale_price: p.sale_price ? Number(p.sale_price) : undefined,
-        stock_quantity: p.stock_quantity,
-        status: p.status,
-        is_featured: p.is_featured,
-        is_partner_recruiting: p.is_partner_recruiting,
-        created_at: p.created_at.toISOString(),
-      }));
-
-      res.json({
-        success: true,
-        data,
-      });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching recruiting products:', error);
-      res.status(500).json({
-        success: false,
-        error: 'INTERNAL_ERROR',
-        message: 'Failed to fetch recruiting products',
-      });
-    }
-  });
+  // Recruiting Products (GET /partner/recruiting-products) — REMOVED
+  //   WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: glycopharm_products 기반 모집상품 조회였다.
+  //   GlycoPharm 삭제와 함께 제거한다. 대체 데이터원은 이번 범위에서 만들지 않는다.
 
   // ==================== Partner Recruitment API (WO-O4O-PARTNER-RECRUITMENT-API-IMPLEMENTATION-V1) ====================
 

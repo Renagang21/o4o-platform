@@ -125,10 +125,7 @@ UNION ALL SELECT 'credit_transactions',     COUNT(*)::int FROM credit_transactio
 SELECT 'neture.neture_products'      AS tbl, COUNT(*)::int AS cnt FROM neture.neture_products
 UNION ALL SELECT 'neture.neture_order_items', COUNT(*)::int FROM neture.neture_order_items;
 
--- === E. GlycoPharm Domain ===
-SELECT 'glycopharm_members'      AS tbl, COUNT(*)::int AS cnt FROM glycopharm_members
-UNION ALL SELECT 'glycopharm_products',    COUNT(*)::int FROM glycopharm_products
-UNION ALL SELECT 'glycopharm_pharmacies',  COUNT(*)::int FROM glycopharm_pharmacies;
+-- === E. GlycoPharm Domain — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1) ===
 
 -- === F. K-Cosmetics (cosmetics schema) ===
 SELECT 'cosmetics.cosmetics_products'      AS tbl, COUNT(*)::int AS cnt FROM cosmetics.cosmetics_products
@@ -230,12 +227,9 @@ UNION ALL SELECT 'neture_seller_partner_contracts', COUNT(*)::int FROM neture_se
 -- DELETE FROM neture_suppliers;
 
 -- -----------------------------------------------------------------------
--- GROUP 5: GlycoPharm Domain
+-- GROUP 5: GlycoPharm Domain — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 -- -----------------------------------------------------------------------
 
--- DELETE FROM glycopharm_products;
--- DELETE FROM glycopharm_pharmacies;
--- DELETE FROM glycopharm_members;
 
 -- -----------------------------------------------------------------------
 -- GROUP 6: K-Cosmetics (cosmetics schema)

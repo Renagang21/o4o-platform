@@ -82,7 +82,7 @@ export function PartnerInfoPage() {
             공급자, 파트너, 협력사로 네뚜레에 참여할 수 있습니다.
           </p>
           <p style={styles.noticeText}>
-            등록된 정보는 K-Cosmetics, GlycoPharm 등 연결된 서비스에 노출됩니다.
+            등록된 정보는 K-Cosmetics 등 연결된 서비스에 노출됩니다.
           </p>
         </div>
       </header>

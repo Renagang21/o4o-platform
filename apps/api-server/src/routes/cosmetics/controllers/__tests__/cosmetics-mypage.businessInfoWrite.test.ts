@@ -2,11 +2,10 @@
  * WO-O4O-BUSINESSINFO-JSON-COLUMN-CONCAT-RUNTIME-FAILURE-FIX-V1
  *
  * K-Cosmetics 마이페이지 사업자 정보 수정의 `users."businessInfo"` write 고정.
- * 회귀 대상·판정 계약은 GlycoPharm 쌍둥이 테스트와 동일하다
- * (`routes/glycopharm/controllers/__tests__/mypage.businessInfoWrite.test.ts`).
+ * 회귀 대상·판정 계약은 공통 businessInfo write 계약을 따른다.
  *
  * 추가 판정: 두 서비스는 서로의 고유 키를 쓰지 않는다
- *   GlycoPharm = `pharmacyName` / K-Cosmetics = `storeName`.
+ *   K-Cosmetics = `storeName` (약국 축은 `pharmacyName`).
  */
 
 const mockIsStoreOwner = jest.fn();
@@ -96,7 +95,7 @@ describe('PATCH /cosmetics/mypage/business-info — json 컬럼 안전 갱신', 
     expect(w.payloads[0]).not.toHaveProperty('sentinelRoot');
   });
 
-  it('서비스 경계: K-Cosmetics 는 storeName 을 쓰고 GlycoPharm 의 pharmacyName 을 쓰지 않는다', async () => {
+  it('서비스 경계: K-Cosmetics 는 storeName 을 쓰고 pharmacyName 을 쓰지 않는다', async () => {
     const h = makeHarness();
     await h.handler(req({ storeName: 'S', pharmacyName: '약국이름' }), makeRes());
 

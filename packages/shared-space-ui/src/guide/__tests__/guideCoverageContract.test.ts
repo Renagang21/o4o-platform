@@ -77,7 +77,6 @@ type Svc = { key: string; dir: string; copy: string };
 const SERVICES: Svc[] = [
   { key: 'kpa', dir: 'services/web-kpa-society', copy: 'kpa.ts' },
   { key: 'k-cosmetics', dir: 'services/web-k-cosmetics', copy: 'k-cosmetics.ts' },
-  { key: 'glycopharm', dir: 'services/web-glycopharm', copy: 'glycopharm.ts' },
   { key: 'neture', dir: 'services/web-neture', copy: 'neture.ts' },
   { key: 'pharmacy-hub', dir: 'services/web-pharmacy-hub', copy: 'pharmacy-hub.ts' },
 ];
@@ -149,18 +148,6 @@ describe('Guide coverage contract', () => {
     },
   );
 
-  it('GlycoPharm — 강의(LMS) · 매장 운영 · QR Guide 가 존재하고 기능 index 에서 진입 가능하다', () => {
-    const mounted = new Set(guideRoutesOf(SERVICES[2]));
-    for (const r of ['/guide/features/lms', '/guide/features/store', '/guide/features/qr']) {
-      expect(mounted.has(r)).toBe(true);
-    }
-    const copy = copySource(SERVICES[2]);
-    const index = copy.slice(copy.indexOf('glycopharmGuideFeaturesProps'), copy.indexOf('glycopharmGuideFeatureSignageProps'));
-    expect(index).toContain('/guide/features/lms');
-    expect(index).toContain('/guide/features/store');
-    expect(index).toContain('/guide/features/qr');
-  });
-
   it('K-Cosmetics — 매장 운영 · QR·태블릿 Guide 가 존재하고 기능 index 에서 진입 가능하다', () => {
     const mounted = new Set(guideRoutesOf(SERVICES[1]));
     for (const r of ['/guide/features/store', '/guide/features/qr']) {
@@ -173,7 +160,7 @@ describe('Guide coverage contract', () => {
   });
 
   it('PharmacyHub — 기존 Guide route 세트가 유지된다(회귀 방지)', () => {
-    const mounted = new Set(guideRoutesOf(SERVICES[4]));
+    const mounted = new Set(guideRoutesOf(SERVICES[3]));
     for (const r of ['/service-guide', '/guide', '/guide/intro', '/guide/usage', '/guide/features']) {
       expect(mounted.has(r)).toBe(true);
     }

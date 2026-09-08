@@ -32,12 +32,11 @@ interface QueryCall { sql: string; params: any[]; }
 /** 마운트 serviceKey → service_memberships / offer_service_approvals 키 (프로덕션 매핑과 동일) */
 const MEMBERSHIP_KEY: Record<string, string> = {
   kpa: 'kpa-society',
-  glycopharm: 'glycopharm',
   cosmetics: 'k-cosmetics',
 };
 
 function buildApp(opts: {
-  serviceKey?: 'kpa' | 'glycopharm' | 'cosmetics';
+  serviceKey?: 'kpa' | 'cosmetics';
   offerRows: any[];
   calls: QueryCall[];
 }) {
@@ -123,7 +122,6 @@ describe('POST /apply — service approval gate (HUB-P0-01)', () => {
   });
 
   it.each([
-    ['glycopharm', 'glycopharm'],
     ['cosmetics', 'k-cosmetics'],
   ] as const)('%s 마운트는 승인키 %s 로 게이트한다', async (mount, approvalKey) => {
     const calls: QueryCall[] = [];
@@ -164,9 +162,8 @@ describe('POST /apply — service approval gate (HUB-P0-01)', () => {
 
 describe('POST /apply — serviceKey spoofing (HUB-P0-04)', () => {
   it.each([
-    ['kpa', 'glycopharm'],
-    ['glycopharm', 'kpa-society'],
-    ['cosmetics', 'glycopharm'],
+    ['kpa', 'k-cosmetics'],
+    ['cosmetics', 'kpa-society'],
   ] as const)('%s 경로에 타 서비스 service_key(%s) 전송 시 400 SERVICE_KEY_MISMATCH', async (mount, spoofed) => {
     const calls: QueryCall[] = [];
     const app = buildApp({ serviceKey: mount, offerRows: [{ distribution_type: 'PUBLIC' }], calls });
@@ -183,7 +180,6 @@ describe('POST /apply — serviceKey spoofing (HUB-P0-04)', () => {
 
   it.each([
     ['kpa', 'kpa-society'],
-    ['glycopharm', 'glycopharm'],
     ['cosmetics', 'k-cosmetics'],
   ] as const)('%s 경로에 도출값과 동일한 service_key(%s)는 허용된다 (기존 프론트 회귀 방지)', async (mount, derived) => {
     const calls: QueryCall[] = [];
@@ -344,13 +340,12 @@ describe('PRIVATE seller scope (HUB-P0-02)', () => {
 describe('GET /applications · /approved — read axis derived from mount (HUB-P0-04)', () => {
   it.each([
     ['kpa', 'kpa-society'],
-    ['glycopharm', 'glycopharm'],
     ['cosmetics', 'k-cosmetics'],
   ] as const)('%s: query.service_key 를 무시하고 %s 로 조회한다', async (mount, derived) => {
     const calls: QueryCall[] = [];
     const app = buildApp({ serviceKey: mount, offerRows: [], calls });
 
-    await request(app).get('/pharmacy/products/approved?service_key=glycopharm');
+    await request(app).get('/pharmacy/products/approved?service_key=neture');
 
     const call = calls.find(c => /FROM product_approvals/i.test(c.sql));
     expect(call).toBeDefined();

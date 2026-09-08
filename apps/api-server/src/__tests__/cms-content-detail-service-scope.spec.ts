@@ -60,12 +60,12 @@ import { createCmsContentQueryRoutes } from '../routes/cms-content/cms-content-q
 const ROWS = [
   { id: '11111111-1111-4111-8111-111111111111', serviceKey: 'pharmacy-hub', status: 'published', title: 'PH', organizationId: null },
   { id: '22222222-2222-4222-8222-222222222222', serviceKey: 'kpa-society', status: 'published', title: 'KPA', organizationId: null },
-  { id: '33333333-3333-4333-8333-333333333333', serviceKey: 'glycopharm', status: 'published', title: 'GP', organizationId: null },
+  { id: '33333333-3333-4333-8333-333333333333', serviceKey: 'neture', status: 'published', title: 'NET', organizationId: null },
   { id: '44444444-4444-4444-8444-444444444444', serviceKey: 'kpa-society', status: 'draft', title: 'KPA draft', organizationId: null },
   { id: '55555555-5555-4555-8555-555555555555', serviceKey: 'k-cosmetics', status: 'published', title: 'KCos', organizationId: null },
   { id: '66666666-6666-4666-8666-666666666666', serviceKey: 'cosmetics', status: 'published', title: 'KCos legacy', organizationId: null },
   // §11: visibilityScope='platform' 은 cross-service 공개가 **아니다** (제작 주체 축)
-  { id: '77777777-7777-4777-8777-777777777777', serviceKey: 'glycopharm', status: 'published', title: 'GP platform-visibility', organizationId: null, visibilityScope: 'platform' },
+  { id: '77777777-7777-4777-8777-777777777777', serviceKey: 'neture', status: 'published', title: 'NET platform-visibility', organizationId: null, visibilityScope: 'platform' },
 ];
 
 /** where.serviceKey 는 alias 집합이라 `In([...])` FindOperator 로 들어온다 */
@@ -122,7 +122,7 @@ describe('§17 list/detail 정합 — 목록에 없는 타 서비스 row 는 상
     expect(res.body?.error?.code).toBe('NOT_FOUND');
   });
 
-  it('pharmacy-hub context 로 GlycoPharm content UUID → 404', async () => {
+  it('pharmacy-hub context 로 Neture content UUID → 404', async () => {
     const res = await request(makeApp()).get(`/cms/contents/${GP}?serviceKey=pharmacy-hub`);
     expect(res.status).toBe(404);
   });
@@ -247,13 +247,13 @@ describe('§7 list/detail invariant — 목록·집계도 같은 경계로 닫�
 });
 
 describe("§11 visibilityScope='platform' 은 cross-service global 이 아니다", () => {
-  it('GP platform-visibility row 는 KPA context 에서 보이지 않는다', async () => {
+  it('NET platform-visibility row 는 KPA context 에서 보이지 않는다', async () => {
     const res = await request(makeApp()).get(`/cms/contents/${GP_PLATFORM}?serviceKey=kpa-society`);
     expect(res.status).toBe(404);
   });
 
-  it('GP platform-visibility row 는 자기 서비스에서는 정상 조회된다', async () => {
-    const res = await request(makeApp()).get(`/cms/contents/${GP_PLATFORM}?serviceKey=glycopharm`);
+  it('NET platform-visibility row 는 자기 서비스에서는 정상 조회된다', async () => {
+    const res = await request(makeApp()).get(`/cms/contents/${GP_PLATFORM}?serviceKey=neture`);
     expect(res.status).toBe(200);
     expect(res.body.data.id).toBe(GP_PLATFORM);
   });

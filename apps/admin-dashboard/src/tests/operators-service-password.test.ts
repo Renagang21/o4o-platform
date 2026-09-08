@@ -78,7 +78,7 @@ describe('OperatorsPage — 비밀번호 write 계약', () => {
         SRC.indexOf('const ASSIGNABLE_ROLES'),
         SRC.indexOf('CATALOG_ROLE_VALUES'),
       );
-      for (const key of ['kpa', 'neture', 'pharmacy-hub', 'glycopharm', 'cosmetics']) {
+      for (const key of ['kpa', 'neture', 'pharmacy-hub', 'cosmetics']) {
         expect(catalog).toMatch(new RegExp(`${key}:`));
       }
     });

@@ -30,7 +30,7 @@ import { resolveStoreAccess } from '../utils/store-owner.utils.js';
 import type { StoreOwnerServiceKey } from '../utils/store-organization.resolver.js';
 
 let CURRENT_USER = 'user-multi';
-let CURRENT_ROLES: string[] = ['kpa:store_owner', 'cosmetics:store_owner', 'glycopharm:store_owner'];
+let CURRENT_ROLES: string[] = ['kpa:store_owner', 'cosmetics:store_owner'];
 
 const ORG_KPA = 'org-kpa';
 const ORG_COS = 'org-cos';
@@ -82,7 +82,7 @@ const MEMBERSHIPS: Membership[] = [
     role: 'owner',
     isPrimary: false,
     joinedAt: '2025-05-01',
-    enrollments: ['glycopharm'],
+    enrollments: ['neture'],
     slugKeys: [],
   },
 ];
@@ -164,12 +164,11 @@ function makeApp(dataSource: any, serviceKey?: StoreOwnerServiceKey) {
 
 beforeEach(() => {
   CURRENT_USER = 'user-multi';
-  CURRENT_ROLES = ['kpa:store_owner', 'cosmetics:store_owner', 'glycopharm:store_owner'];
+  CURRENT_ROLES = ['kpa:store_owner', 'cosmetics:store_owner'];
   memberships = MEMBERSHIPS;
   activeRoles = [
     'kpa:store_owner',
     'cosmetics:store_owner',
-    'glycopharm:store_owner',
     'pharmacy-hub:store_owner',
   ];
 });
@@ -206,10 +205,9 @@ describe('local-products — service-scoped organization resolution', () => {
     expect(localOrg).toBe(handledOrg);
   });
 
-  it('D. KCos / GP mount 는 각자 서비스 조직을 고른다 (타 서비스 조직 fallback 0)', async () => {
+  it('D. KCos mount 는 자기 서비스 조직을 고른다 (타 서비스 조직 fallback 0)', async () => {
     for (const [serviceKey, expected] of [
       ['cosmetics', ORG_COS],
-      ['glycopharm', ORG_GP],
     ] as Array<[StoreOwnerServiceKey, string]>) {
       const { dataSource, listOrgParams } = makeDataSource();
       await request(makeApp(dataSource, serviceKey)).get('/store/local-products');
@@ -271,7 +269,6 @@ describe('local-products — mount 계약', () => {
     for (const [file, key] of [
       ['routes/kpa/kpa.routes.ts', 'kpa'],
       ['routes/cosmetics/cosmetics.routes.ts', 'cosmetics'],
-      ['routes/glycopharm/glycopharm.routes.ts', 'glycopharm'],
     ]) {
       const text = fs.readFileSync(path.join(src, file), 'utf8');
       expect(text).toContain(`createStoreLocalProductRoutes(dataSource, '${key}')`);

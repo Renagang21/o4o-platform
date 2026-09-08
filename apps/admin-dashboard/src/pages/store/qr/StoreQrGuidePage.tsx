@@ -7,7 +7,7 @@
  *
  * 왜 생성 화면이 아니라 안내 화면인가
  *   기존 `QrListPage` · `QrCreatePage` 는 `/api/v1/pharmacy/qr/*` 를 호출했다.
- *   그 route 는 service router 안에만 마운트돼 있어(`/api/v1/{kpa|glycopharm|cosmetics}/pharmacy/qr/*`)
+ *   그 route 는 service router 안에만 마운트돼 있어(`/api/v1/{kpa|cosmetics}/pharmacy/qr/*`)
  *   admin-dashboard 의 호출은 생성 시점부터 계속 404 였다 — 한 번도 동작한 적이 없다.
  *   판정 근거: docs/investigations/IR-O4O-ADMIN-QR-SOURCE-PRODUCTS-LEGACY-ROUTE-AUDIT-V1.md (REPLACE)
  *
@@ -29,11 +29,6 @@ const STORE_QR_ENTRIES: { service: string; url: string; note: string }[] = [
     service: 'KPA-Society',
     url: 'https://kpa-society.co.kr/store/marketing/qr',
     note: '약국 매장 QR 관리',
-  },
-  {
-    service: 'GlycoPharm',
-    url: 'https://glycopharm.co.kr/store/marketing/qr',
-    note: '매장 QR 관리',
   },
   {
     service: 'K-Cosmetics',

@@ -5,7 +5,7 @@
  * 대조하는지 검증한다.
  *
  * 결함: 소유(organization_members)만 보고 서비스 귀속을 보지 않아
- *       KPA signage 요청에 K-Cosmetics / GlycoPharm / Neture 매장 org id 가 통과했다.
+ *       KPA signage 요청에 K-Cosmetics / Neture 매장 org id 가 통과했다.
  *
  * DB 는 붙이지 않는다 — AppDataSource.query 를 stub 으로 대체한다.
  */
@@ -57,10 +57,9 @@ const OWNED: Row[] = [{ one: 1 }];
 const LINKED: Row[] = [{ one: 1 }];
 
 describe('toStoreOwnerServiceKey — canonical SSOT 만 사용', () => {
-  it('kpa-society → kpa, cosmetics → cosmetics, glycopharm → glycopharm', () => {
+  it('kpa-society → kpa, cosmetics → cosmetics', () => {
     expect(toStoreOwnerServiceKey('kpa-society')).toBe('kpa');
     expect(toStoreOwnerServiceKey('cosmetics')).toBe('cosmetics');
-    expect(toStoreOwnerServiceKey('glycopharm')).toBe('glycopharm');
   });
 
   it('귀속 SSOT 가 없는 serviceKey 는 null (추정 차단 금지)', () => {
@@ -117,7 +116,7 @@ describe('requireSignageStore — 권한 회귀 매트릭스', () => {
   });
 
   it('D/E/F. 소유하지만 타 서비스 매장 org → 403 (본 WO 결함)', async () => {
-    for (const sk of ['kpa-society', 'cosmetics', 'glycopharm']) {
+    for (const sk of ['kpa-society', 'cosmetics']) {
       queueResponses([OWNED, []]); // 소유 O / 귀속 X
       const res = makeRes();
       const next = jest.fn();

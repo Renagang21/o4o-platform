@@ -23,13 +23,11 @@ import { LoadError } from '@o4o/ui';
 
 // 서비스 URL 설정
 const SERVICE_URLS: Record<string, string> = {
-  glycopharm: 'https://glycopharm.co.kr/partner',
   'k-cosmetics': 'https://k-cosmetics.site/partner',
 };
 
 // 서비스 아이콘 설정
 const SERVICE_ICONS: Record<string, string> = {
-  glycopharm: '🏥',
   'k-cosmetics': '💄',
 };
 
@@ -43,17 +41,7 @@ function EmptyState({ message }: { message: string }) {
   );
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  cgm_device: 'CGM 기기',
-  test_strip: '시험지',
-  lancet: '란셋',
-  meter: '측정기',
-  accessory: '액세서리',
-  other: '기타',
-};
-
 const SERVICE_LABELS: Record<string, string> = {
-  glycopharm: 'GlycoPharm',
   'k-cosmetics': 'K-Cosmetics',
 };
 
@@ -105,7 +93,7 @@ export function PartnerOverviewPage() {
         case 'oldest':
           return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
         case 'name':
-          return a.productName.localeCompare(b.productName, 'ko');
+          return a.productId.localeCompare(b.productId, 'ko');
         default: // recent
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
@@ -475,7 +463,7 @@ export function PartnerOverviewPage() {
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                           <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: item.status === 'inactive' ? '#94a3b8' : '#1e293b' }}>
-                            {item.productName}
+                            {item.productId}
                           </h4>
                           <span style={{
                             fontSize: '11px',
@@ -488,13 +476,9 @@ export function PartnerOverviewPage() {
                             {item.status === 'active' ? '활성' : '비활성'}
                           </span>
                         </div>
-                        <div style={{ display: 'flex', gap: '12px', fontSize: '13px', color: '#64748b' }}>
-                          <span>{CATEGORY_LABELS[item.category] || item.category}</span>
-                          <span>{item.price.toLocaleString()}원</span>
-                        </div>
-                        {item.pharmacyName && (
-                          <span style={{ fontSize: '12px', color: '#94a3b8' }}>공급: {item.pharmacyName}</span>
-                        )}
+                        {/* WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1:
+                            상품명·카테고리·가격·공급 매장 표기는 glycopharm_products enrichment 가
+                            유일한 출처였다. 대체 데이터원은 이번 범위에서 만들지 않는다. */}
                         {/* Primary content summary (WO-PARTNER-CONTENT-PRESENTATION-PHASE3-V1) */}
                         {item.primaryContent && (
                           <div

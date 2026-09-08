@@ -38,7 +38,7 @@ type ScopeMiddleware = (scope: string) => RequestHandler;
  *     격리(cross-service 누수/변조 차단, CLAUDE.md §7 Boundary). 미지정(KPA)이면 기존대로 전체(현행 동작 보존).
  */
 export interface OperatorProductApplicationsOptions {
-  /** require 할 operator scope. 기본 'kpa:operator'. (GP='glycopharm:operator', KCos='cosmetics:operator') */
+  /** require 할 operator scope. 기본 'kpa:operator'. (KCos='cosmetics:operator') */
   scope?: string;
   /** product_approvals.service_key 격리 필터. 지정 시 해당 serviceKey 만 조회/변경. 미지정(KPA)=전체. */
   serviceKey?: string;

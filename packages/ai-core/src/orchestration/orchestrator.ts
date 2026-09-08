@@ -65,10 +65,10 @@ export function onAudit(callback: AuditCallback): void {
  * @example
  * ```ts
  * const result = await runAIInsight({
- *   service: 'glycopharm',
+ *   service: 'neture',
  *   insightType: 'store-summary',
  *   contextData: { kpiData, patientCount, revenue },
- *   user: { id: 'user-1', role: 'glycopharm:operator' },
+ *   user: { id: 'user-1', role: 'neture:operator' },
  * });
  *
  * if (result.success) {

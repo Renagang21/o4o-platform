@@ -51,5 +51,4 @@ export { GuideBusinessWarehousePharmacyPage } from './GuideBusinessWarehousePhar
 // WO-O4O-NETURE-GUIDE-FOREIGN-CUSTOMER-SUPPORT-V1: 외국인 고객 응대 운영 매뉴얼
 export { GuideForeignCustomerSupportPage } from './GuideForeignCustomerSupportPage';
 export { GuideServiceKpaSocietyPage } from './GuideServiceKpaSocietyPage';
-export { GuideServiceGlycoPharmPage } from './GuideServiceGlycoPharmPage';
 export { GuideServiceKCosmeticsPage } from './GuideServiceKCosmeticsPage';

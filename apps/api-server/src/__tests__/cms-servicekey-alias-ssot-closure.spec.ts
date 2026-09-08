@@ -80,7 +80,7 @@ describe('CMS alias 집합은 security-core resolver 파생이다', () => {
     },
   );
 
-  it.each(['neture', 'glycopharm', 'pharmacy-hub'])(
+  it.each(['neture', 'pharmacy-hub'])(
     'self-map 서비스 %s 는 alias 가 하나뿐이다',
     (input) => {
       expect(resolveCmsServiceKeys(input)).toEqual([input]);
@@ -92,7 +92,7 @@ describe('CMS alias 집합은 security-core resolver 파생이다', () => {
     expect(isSameCmsService('kpa', 'kpa-society')).toBe(true);
     expect(isSameCmsService('cosmetics', 'k-cosmetics')).toBe(true);
     expect(isSameCmsService('kpa', 'k-cosmetics')).toBe(false);
-    expect(isSameCmsService('glycopharm', 'pharmacy-hub')).toBe(false);
+    expect(isSameCmsService('neture', 'pharmacy-hub')).toBe(false);
   });
 });
 
@@ -157,7 +157,7 @@ describe('CMS 영역에 로컬 alias table 을 다시 만들지 않는다', () =
 const SLOT_ROWS = [
   { id: 's-canon', slotKey: 'kpa-main-hero', serviceKey: 'kpa-society', isActive: true, sortOrder: 1, contentId: 'c-1', content: null },
   { id: 's-legacy', slotKey: 'intranet-hero', serviceKey: 'kpa', isActive: true, sortOrder: 0, contentId: 'c-legacy', content: null },
-  { id: 's-gp', slotKey: 'gp-hero', serviceKey: 'glycopharm', isActive: true, sortOrder: 0, contentId: 'c-gp', content: null },
+  { id: 's-gp', slotKey: 'ph-hero', serviceKey: 'pharmacy-hub', isActive: true, sortOrder: 0, contentId: 'c-gp', content: null },
 ];
 
 function unwrapIn(value: any): string[] | undefined {
@@ -235,7 +235,7 @@ describe('slot 목록은 alias 를 고립시키지 않는다 (WO §12)', () => {
   it('타 서비스 operator 는 KPA slot 을 필터할 수 없다', async () => {
     const res = await request(makeApp())
       .get('/cms/slots?serviceKey=kpa-society')
-      .set('x-test-roles', 'glycopharm:operator');
+      .set('x-test-roles', 'cosmetics:operator');
     expect(res.status).toBe(403);
     expect(res.body?.error?.code).toBe('SERVICE_SCOPE_DENIED');
   });
@@ -308,7 +308,7 @@ describe('legacy slot 은 수정 가능하되 조용히 migration 되지 않는�
     const res = await request(makeApp())
       .put('/cms/slots/s-canon')
       .set('x-test-roles', 'kpa:operator')
-      .send({ serviceKey: 'glycopharm' });
+      .send({ serviceKey: 'pharmacy-hub' });
     expect(res.status).toBe(403);
     expect(res.body?.error?.code).toBe('SERVICE_KEY_IMMUTABLE');
   });

@@ -293,7 +293,6 @@ export class ForumRecommendationController {
     if (
       req.query.isPharmacy === 'true' ||
       req.query.isPharmacist === 'true' ||
-      user?.roles?.includes('glycopharm:pharmacist') ||
       user?.roles?.includes('pharmacy')
     ) {
       context.isPharmacy = true;

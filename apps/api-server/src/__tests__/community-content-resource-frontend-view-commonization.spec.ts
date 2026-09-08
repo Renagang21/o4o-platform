@@ -232,10 +232,9 @@ describe('공통 View 순수성', () => {
   });
 });
 
-describe('K-Cosmetics / GlycoPharm wrapper — 콘텐츠 목록·상세', () => {
+describe('K-Cosmetics wrapper — 콘텐츠 목록·상세', () => {
   const cases: Array<[string, string]> = [
     ['services/web-k-cosmetics/src/pages/contents', '/cosmetics/contents'],
-    ['services/web-glycopharm/src/pages/contents', '/glycopharm/contents'],
   ];
 
   it.each(cases)('%s 목록은 공통 Template 을 소비하고 자체 카드/상태 JSX 를 갖지 않는다', (dir) => {
@@ -302,7 +301,6 @@ describe('KPA — 서비스 고유 View 유지 (공통 primitive 소비)', () =>
 describe('자료실 축 — 3서비스 공통 Template 유지', () => {
   const cases: Array<[string, string]> = [
     ['services/web-k-cosmetics/src/pages/resources/ResourcesPage.tsx', 'k-cosmetics'],
-    ['services/web-glycopharm/src/pages/resources/ResourcesPage.tsx', 'glycopharm'],
     ['services/web-neture/src/pages/resources/NetureResourcesPage.tsx', 'neture'],
   ];
 

@@ -10,7 +10,6 @@
  *   필수 env vars:
  *     E2E_TEST_USER_EMAIL / E2E_TEST_USER_PASSWORD          (가입할 사용자)
  *     E2E_OPERATOR_NETURE_EMAIL / E2E_OPERATOR_NETURE_PASSWORD
- *     E2E_OPERATOR_GLYCOPHARM_EMAIL / E2E_OPERATOR_GLYCOPHARM_PASSWORD
  *     E2E_OPERATOR_KPA_EMAIL / E2E_OPERATOR_KPA_PASSWORD
  *     E2E_OPERATOR_KCOSMETICS_EMAIL / E2E_OPERATOR_KCOSMETICS_PASSWORD
  */
@@ -36,7 +35,6 @@ const TEST_USER = {
 };
 const OPS = {
   NETURE: { email: requireEnv('E2E_OPERATOR_NETURE_EMAIL'), password: requireEnv('E2E_OPERATOR_NETURE_PASSWORD') },
-  GLYCOPHARM: { email: requireEnv('E2E_OPERATOR_GLYCOPHARM_EMAIL'), password: requireEnv('E2E_OPERATOR_GLYCOPHARM_PASSWORD') },
   KPA: { email: requireEnv('E2E_OPERATOR_KPA_EMAIL'), password: requireEnv('E2E_OPERATOR_KPA_PASSWORD') },
   KCOSMETICS: { email: requireEnv('E2E_OPERATOR_KCOSMETICS_EMAIL'), password: requireEnv('E2E_OPERATOR_KCOSMETICS_PASSWORD') },
 };
@@ -173,66 +171,6 @@ const services: ServiceConfig[] = [
       const approveBtn = page.locator('button:has-text("승인")').first();
       if (await approveBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
         await approveBtn.click();
-        await page.waitForTimeout(2000);
-        return true;
-      }
-      return false;
-    },
-  },
-
-  // 2. GlycoPharm
-  {
-    name: 'GlycoPharm',
-    url: 'https://glycopharm.co.kr',
-    registerPath: '/register',
-    loginPath: '/login',
-    operatorEmail: OPS.GLYCOPHARM.email,
-    operatorPassword: OPS.GLYCOPHARM.password,
-    approvalPath: '/operator/users',
-    fillRegister: async (page: Page) => {
-      await fillField(page, 'input[type="email"], input[name="email"]', TEST_USER.email);
-      const pwFields = page.locator('input[type="password"]');
-      if (await pwFields.count() >= 1) await pwFields.nth(0).fill(TEST_USER.password);
-      if (await pwFields.count() >= 2) await pwFields.nth(1).fill(TEST_USER.password);
-      await fillField(page, 'input[name="lastName"], input[placeholder*="성"]', '테스트');
-      await fillField(page, 'input[name="firstName"], input[placeholder*="이름"]', '사용자');
-      await fillField(page, 'input[name="phone"], input[type="tel"]', '01012345678');
-      await fillField(page, 'input[name="licenseNumber"], input[placeholder*="면허"]', '12345');
-      // Check all checkboxes
-      const checkboxes = page.locator('input[type="checkbox"]');
-      const count = await checkboxes.count();
-      for (let i = 0; i < count; i++) {
-        if (!(await checkboxes.nth(i).isChecked())) {
-          await checkboxes.nth(i).check().catch(() => {});
-        }
-      }
-    },
-    navigateToApproval: async (page: Page) => {
-      await page.goto('https://glycopharm.co.kr/operator/users', { waitUntil: 'networkidle', timeout: 30000 });
-      await page.waitForTimeout(3000);
-      // Click "가입 신청" tab
-      const pendingTab = page.locator('button:has-text("가입 신청")');
-      if (await pendingTab.isVisible({ timeout: 5000 }).catch(() => false)) {
-        await pendingTab.click();
-        await page.waitForTimeout(2000);
-      }
-    },
-    approveUser: async (page: Page, email: string) => {
-      const searchInput = page.locator('input[placeholder*="검색"]').first();
-      if (await searchInput.isVisible({ timeout: 5000 }).catch(() => false)) {
-        await searchInput.fill(email);
-        await page.keyboard.press('Enter');
-        await page.waitForTimeout(2000);
-      }
-      const approveBtn = page.locator('button:has-text("승인")').first();
-      if (await approveBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
-        await approveBtn.click();
-        await page.waitForTimeout(1000);
-        // Confirm dialog
-        const confirmBtn = page.locator('button:has-text("확인"), button:has-text("예")').first();
-        if (await confirmBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-          await confirmBtn.click();
-        }
         await page.waitForTimeout(2000);
         return true;
       }

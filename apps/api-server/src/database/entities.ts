@@ -146,28 +146,14 @@ import {
 //   DB 테이블 자체는 보존하며, DROP 여부는 별도 보존·아카이브 판단 감사에서 결정한다.
 // ============================================================================
 
-// ============================================================================
-// GLYCOPHARM ENTITIES (Phase B-1)
-// ============================================================================
-import {
-  // GlycopharmPharmacy - REMOVED (WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase C)
-  GlycopharmProduct,
-  GlycopharmProductLog,
-  GlycopharmApplication,
-  GlycopharmFeaturedProduct,
-  GlycopharmCustomerRequest,
-  GlycopharmEvent,
-  GlycopharmRequestActionLog,
-  GlycopharmBillingInvoice, // Phase 3-D: Invoice Finalization
-  // GlycopharmForumCategoryRequest — REMOVED (WO-O4O-FORUM-CATEGORY-DEAD-CODE-REMOVAL-V1)
-  // GlycopharmOrder, GlycopharmOrderItem - REMOVED (Phase 4-A: Legacy Order System Deprecation)
-  // TabletServiceRequest — REMOVED (WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1)
-  StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
-  StoreBlogSettings, // WO-O4O-KPA-STORE-BLOG-META-V1
-  GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
-  GlycopharmMember, // WO-GLYCOPHARM-MEMBER-TABLE-CREATION-V1
-  GlycopharmContent, // WO-O4O-GLYCOPHARM-RESOURCES-BACKEND-V1
-} from '../routes/glycopharm/entities/index.js';
+// GLYCOPHARM ENTITIES — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
+//   GlycoPharm 서비스 전체 삭제. glycopharm_* 테이블은 DROP migration 으로 제거한다.
+
+// STORE BLOG ENTITIES (공통 Store 도메인 — GlycoPharm 전용 자산이 아니다)
+// WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: routes/glycopharm/entities → modules/store/entities relocate.
+// 테이블명(store_blog_posts / store_blog_settings)·스키마·데이터는 변경하지 않는다.
+import { StoreBlogPost } from '../modules/store/entities/store-blog-post.entity.js';
+import { StoreBlogSettings } from '../modules/store/entities/store-blog-settings.entity.js';
 
 // STORE AI ENTITIES (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
 import { StoreAiSnapshot } from '../modules/store-ai/entities/store-ai-snapshot.entity.js';
@@ -697,25 +683,11 @@ export const entities = [
   // YAKSA ENTITIES (Phase A-1) — REMOVED
   // WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1: legacy route 제거와 함께 등록 해제
   // ============================================================================
-  // GLYCOPHARM ENTITIES (Phase B-1)
-  // Note: GlycopharmPharmacy REMOVED (WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase C)
-  // Note: GlycopharmOrder, GlycopharmOrderItem REMOVED (Phase 4-A Legacy Deprecation)
+  // STORE BLOG ENTITIES (공통 Store 도메인)
+  // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: GLYCOPHARM ENTITIES 등록 전부 제거.
   // ============================================================================
-  GlycopharmProduct,
-  GlycopharmProductLog,
-  GlycopharmApplication,
-  GlycopharmFeaturedProduct,
-  GlycopharmCustomerRequest,
-  GlycopharmEvent,
-  GlycopharmRequestActionLog,
-  GlycopharmBillingInvoice, // Phase 3-D: Invoice Finalization
-  // GlycopharmForumCategoryRequest — REMOVED (WO-O4O-FORUM-CATEGORY-DEAD-CODE-REMOVAL-V1)
-  // TabletServiceRequest — REMOVED (WO-O4O-STORE-TABLET-LEGACY-CLEANUP-V1)
   StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
   StoreBlogSettings, // WO-O4O-KPA-STORE-BLOG-META-V1
-  GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
-  GlycopharmMember, // WO-GLYCOPHARM-MEMBER-TABLE-CREATION-V1
-  GlycopharmContent, // WO-O4O-GLYCOPHARM-RESOURCES-BACKEND-V1
   // ============================================================================
   // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
   // ============================================================================

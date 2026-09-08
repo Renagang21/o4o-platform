@@ -709,7 +709,6 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       {distMgmtOpen && product && (() => {
         const SERVICES = [
           { key: 'kpa-society', label: 'KPA Society' },
-          { key: 'glycopharm', label: 'GlycoPharm' },
           { key: 'k-cosmetics', label: 'K-Cosmetics' },
         ];
         const currentKeys = (product.serviceKeys || []).filter((k) => k !== 'neture');
@@ -794,7 +793,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
 
       {/* WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: 서비스별 공급가 설정 모달 */}
       {svcPriceOpen && product && (() => {
-        const SERVICE_LABELS: Record<string, string> = { 'kpa-society': 'KPA Society', 'glycopharm': 'GlycoPharm', 'k-cosmetics': 'K-Cosmetics' };
+        const SERVICE_LABELS: Record<string, string> = { 'kpa-society': 'KPA Society', 'k-cosmetics': 'K-Cosmetics' };
         const supplyKeys = (product.serviceKeys || []).filter((k) => k !== 'neture');
         const priceGeneral = Number(svcPrices?.priceGeneral ?? product.priceGeneral ?? 0);
         const doSave = async () => {

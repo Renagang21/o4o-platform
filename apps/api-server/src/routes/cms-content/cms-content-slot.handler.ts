@@ -46,7 +46,7 @@ import {
  *   로 만든다. read 경계와 slot 관리 경계가 같은 alias 집합을 쓰게 된다.
  *   prefix 목록만 여기서 유지한다 (어떤 서비스가 slot 관리 축을 갖는지는 별개 관심사).
  */
-const KNOWN_PREFIXES = ['kpa', 'cosmetics', 'neture', 'glycopharm'];
+const KNOWN_PREFIXES = ['kpa', 'cosmetics', 'neture'];
 
 const SCOPE_TO_CMS_KEYS: Record<string, string[]> = Object.fromEntries(
   KNOWN_PREFIXES.map((prefix) => [prefix, resolveCmsServiceKeys(prefix)]),

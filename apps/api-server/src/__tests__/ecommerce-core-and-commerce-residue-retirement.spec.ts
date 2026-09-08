@@ -16,7 +16,7 @@
  *   (order-metrics-fallback 의 42P01 not_ready 가드가 이를 전제로 한다).
  *
  * 판정 2: DEAD_PAYMENT_EVENT_HANDLERS
- *   serviceKey 'cosmetics' / 'glycopharm' / 'kpa' / 'lms' / 'neture' 의
+ *   serviceKey 'cosmetics' / 'kpa' / 'lms' / 'neture' 의
  *   payment.completed producer 가 저장소 전체에 0건이었다. (해당 checkout·payment
  *   controller 는 모두 410 으로 은퇴 완료.) 살아 있는 producer 는
  *   'pharmacy-hub' · 'neture-b2b' · 'store-service-subscription' 3종뿐이다.

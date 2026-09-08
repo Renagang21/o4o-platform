@@ -37,7 +37,6 @@ export interface StoreRecruitmentApplicationsViewProps {
 }
 
 const SERVICE_LABELS: Record<string, string> = {
-  glycopharm: 'GlycoPharm',
   'kpa-society': 'KPA Society',
   'k-cosmetics': 'K-Cosmetics',
   neture: 'Neture',

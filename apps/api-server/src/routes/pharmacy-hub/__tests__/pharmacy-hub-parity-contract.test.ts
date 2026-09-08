@@ -4,9 +4,9 @@
  * 회원 Content write 정책과 PharmacyHub 채택 mount 를 **정적으로** 고정한다.
  *
  * §6 최종 판정 (이전 잠정 판정을 뒤집는다):
- *   앞선 판정은 "회원 Content write 는 어느 서비스에도 없다" 였으나, 실제 KPA/GlycoPharm/
+ *   앞선 판정은 "회원 Content write 는 어느 서비스에도 없다" 였으나, 실제 KPA/
  *   K-Cosmetics 라우터를 읽으면 셋 다 `POST /contents` 가 `authenticate` 만 걸린
- *   **회원 작성 경로**를 갖고 있다(kpa.routes.ts 의 contentRouter, cosmetics/glycopharm 의
+ *   **회원 작성 경로**를 갖고 있다(kpa.routes.ts 의 contentRouter, cosmetics 의
  *   `createMemberWriteHandlers`). 즉 회원 작성은 3원장 서비스의 공통 회원 capability 이고,
  *   PH 에 없는 것은 MISSING_ADOPTION 이다 — INTENTIONAL_DIFFERENCE 가 아니다.
  *
@@ -54,7 +54,7 @@ describe('§6 운영자 Content write — cms_contents 권한 계약(무변화)'
   it('특정 서비스만 예외 허용하는 하드코딩 분기가 없다', () => {
     for (const rel of [MUTATION, CMS_UTILS]) {
       const code = readCode(rel);
-      for (const key of ['pharmacy-hub', 'kpa-society', 'k-cosmetics', 'glycopharm']) {
+      for (const key of ['pharmacy-hub', 'kpa-society', 'k-cosmetics']) {
         expect(code).not.toContain(key);
       }
     }

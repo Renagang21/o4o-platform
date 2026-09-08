@@ -70,7 +70,6 @@ async function safeAudit(
  * DB stores 'k-cosmetics' / 'kpa-society' but RBAC uses 'cosmetics' / 'kpa'.
  */
 const SERVICE_CODE_TO_RBAC_KEY: Record<string, ServiceKey> = {
-  glycopharm: 'glycopharm',
   neture: 'neture',
   'k-cosmetics': 'cosmetics',
   'kpa-society': 'kpa',

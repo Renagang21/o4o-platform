@@ -16,7 +16,7 @@ import type { StoreOwnerServiceKey } from '../../utils/store-organization.resolv
 
 export const ORG_KPA = 'org-kpa';
 export const ORG_COS = 'org-cos';
-export const ORG_GP = 'org-gp';
+export const ORG_PH = 'org-ph';
 /** Neture 공급자 조직 — is_primary + 최초 가입이라 서비스 중립 정렬에서 1순위가 된다. */
 export const ORG_NETURE = 'org-neture';
 
@@ -41,9 +41,9 @@ export const COS_MEMBERSHIP: StubMembership = {
   organizationId: ORG_COS, role: 'owner', isPrimary: false, joinedAt: '2025-04-01',
   enrollments: ['k-cosmetics'], slugKeys: [],
 };
-export const GP_MEMBERSHIP: StubMembership = {
-  organizationId: ORG_GP, role: 'owner', isPrimary: false, joinedAt: '2025-05-01',
-  enrollments: ['glycopharm'], slugKeys: [],
+export const PH_MEMBERSHIP: StubMembership = {
+  organizationId: ORG_PH, role: 'owner', isPrimary: false, joinedAt: '2025-05-01',
+  enrollments: ['pharmacy-hub'], slugKeys: [],
 };
 
 export interface StoreTabletStubOptions {

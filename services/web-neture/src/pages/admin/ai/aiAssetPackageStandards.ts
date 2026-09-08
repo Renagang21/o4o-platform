@@ -103,42 +103,6 @@ export const AI_ASSET_PACKAGE_STANDARDS: ServicePackage[] = [
     ],
   },
   {
-    serviceSlug: 'glycopharm',
-    serviceName: 'GlycoPharm',
-    description: '건강기능식품/의약품 플랫폼 - 비상품 정보 중심',
-    requirements: [
-      {
-        type: 'brand',
-        label: '브랜드',
-        minCount: 3,
-        description: '제조사/브랜드 정보',
-      },
-      {
-        type: 'product',
-        label: '상품',
-        minCount: 15,
-        description: '건강기능식품/의약품 정보',
-      },
-      {
-        type: 'non_product',
-        label: '비상품',
-        minCount: 10,
-        description: '복용법, 주의사항, 상호작용 정보',
-      },
-      {
-        type: 'content',
-        label: '콘텐츠',
-        minCount: 5,
-        description: '건강 가이드, 영양 정보',
-      },
-    ],
-    totalMinAssets: 33,
-    notes: [
-      '의약/건강 도메인 특성상 Non-Product(안전 정보) 비중 높음',
-      '전문성 있는 콘텐츠로 신뢰도 확보 필요',
-    ],
-  },
-  {
     serviceSlug: 'kpa-society',
     serviceName: 'KPA Society',
     description: '약사회 SaaS - 교육/회원 정보 중심',

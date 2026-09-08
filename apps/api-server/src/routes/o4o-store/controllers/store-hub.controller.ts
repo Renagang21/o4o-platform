@@ -32,7 +32,6 @@ interface StoreHubOverview {
   organizationId: string;
   organizationName: string | null;
   products: {
-    glycopharm: { totalCount: number; link: string };
     cosmetics: { listedCount: number; link: string };
   };
   contents: {
@@ -103,10 +102,6 @@ export function createStoreHubController(
         // StoreLocalProduct(store_local_products)는 Display Domain이며
         // 이 KPI 집계에 포함되지 않는다. (별도 Display 관리 API로 조회)
         const products = {
-          glycopharm: {
-            totalCount: 0,
-            link: '/glycopharm/store',
-          },
           cosmetics: {
             listedCount: 0,
             link: '/k-cosmetics/store',
@@ -748,23 +743,9 @@ export function createStoreHubController(
           } catch { /* table may not exist */ }
         }
 
-        // 3. Pending customer requests — sales + survey (via pharmacy ownership)
-        if (userId) {
-          try {
-            const rows = await dataSource.query(
-              `SELECT
-                 COUNT(*) FILTER (WHERE purpose = 'order')::int AS "salesCount",
-                 COUNT(*) FILTER (WHERE purpose = 'survey_followup')::int AS "surveyCount"
-               FROM glycopharm_customer_requests gcr
-               JOIN glycopharm_pharmacies gp ON gp.id = gcr.pharmacy_id
-               WHERE gp.created_by_user_id = $1
-                 AND gcr.status = 'pending'`,
-              [userId]
-            );
-            signals.pendingSalesRequests = rows[0]?.salesCount || 0;
-            signals.surveyRequests = rows[0]?.surveyCount || 0;
-          } catch { /* table may not exist */ }
-        }
+        // 3. Pending customer requests — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
+        //    glycopharm_customer_requests / glycopharm_pharmacies 가 유일한 출처였다.
+        //    signals.pendingSalesRequests · surveyRequests 는 기본값(0)을 유지한다.
 
         res.json({ success: true, data: signals });
       } catch (error: any) {

@@ -64,7 +64,7 @@ describe('§4·§21·§22 공통 LMS 계약 채택 — PH 전용 backend 신설 
   });
 
   it('PH client 는 다른 서비스 LMS base 를 호출하지 않는다 (§19)', () => {
-    for (const other of ['/kpa/lms', '/cosmetics/lms', '/glycopharm/lms', '/neture/lms']) {
+    for (const other of ['/kpa/lms', '/cosmetics/lms', '/neture/lms']) {
       expect(phLmsApiCode).not.toContain(other);
     }
   });

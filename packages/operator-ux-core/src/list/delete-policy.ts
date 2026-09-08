@@ -73,9 +73,6 @@ export const DOMAIN_DELETE_POLICIES: Record<string, DeletePolicy> = {
   'neture:product': DELETE_POLICIES.SOFT_THEN_HARD,
   'neture:brand': DELETE_POLICIES.NONE,
   'neture:member': DELETE_POLICIES.SOFT_THEN_HARD,
-  // GlycoPharm
-  'glycopharm:ads': DELETE_POLICIES.HARD_ONLY,
-  'glycopharm:sponsors': DELETE_POLICIES.HARD_ONLY,
 };
 
 /**

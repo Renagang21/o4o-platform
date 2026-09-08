@@ -37,7 +37,7 @@ export * from './form/index';
 
 // Service Config (WO-O4O-SERVICE-CONFIG-INTRODUCTION-V1)
 export type { ServiceKey, ServiceConfig, ServiceTemplateKey } from './config/index.js';
-export { kpaConfig, glycopharmConfig, kcosmeticsConfig, serviceConfigMap } from './config/index.js';
+export { kpaConfig, kcosmeticsConfig, serviceConfigMap } from './config/index.js';
 export { useServiceConfig } from './hooks/useServiceConfig.js';
 
 // Nav helpers (WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1)

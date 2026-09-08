@@ -62,7 +62,7 @@ function makeReq(status: string, overrides: Record<string, any> = {}) {
     params: { userId: USER_ID },
     body: { status, ...(overrides.body ?? {}) },
     user: { id: OPERATOR_ID },
-    serviceScope: { isPlatformAdmin: false, serviceKeys: ['glycopharm'] },
+    serviceScope: { isPlatformAdmin: false, serviceKeys: ['pharmacy-hub'] },
     ...overrides,
   } as any;
 }
@@ -95,9 +95,9 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
   beforeEach(() => {
     jest.clearAllMocks();
     controller = new MembershipConsoleController();
-    mockApprovalService.rejectMembership.mockResolvedValue({ id: 'm1', service_key: 'glycopharm' });
+    mockApprovalService.rejectMembership.mockResolvedValue({ id: 'm1', service_key: 'pharmacy-hub' });
     mockApprovalService.suspendMembership.mockResolvedValue({ suspended: 1 });
-    mockApprovalService.approveMembership.mockResolvedValue({ id: 'm1', service_key: 'glycopharm' });
+    mockApprovalService.approveMembership.mockResolvedValue({ id: 'm1', service_key: 'pharmacy-hub' });
     // 기본값 = 되살릴 suspended/withdrawn membership 없음
     mockApprovalService.reactivateMembership.mockResolvedValue(null);
   });
@@ -111,7 +111,7 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
 
       expect(mockApprovalService.rejectMembership).toHaveBeenCalledTimes(1);
       expect(mockApprovalService.rejectMembership).toHaveBeenCalledWith(
-        expect.objectContaining({ membershipId: 'm1', isPlatformAdmin: false, serviceKeys: ['glycopharm'] }),
+        expect.objectContaining({ membershipId: 'm1', isPlatformAdmin: false, serviceKeys: ['pharmacy-hub'] }),
       );
       // 회귀 핵심: users 전역 write 0건
       expect(usersWrites()).toEqual([]);
@@ -128,7 +128,7 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
 
       expect(selects).toHaveLength(1);
       expect(selects[0].sql).toContain('service_key = ANY($2)');
-      expect(selects[0].params).toEqual([USER_ID, ['glycopharm']]);
+      expect(selects[0].params).toEqual([USER_ID, ['pharmacy-hub']]);
     });
 
     it('스코프 안에 반려 대상이 없으면 404 이며 users 를 건드리지 않는다', async () => {
@@ -176,7 +176,7 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
           .filter((c) => /^UPDATE service_memberships/i.test(c.sql.trim()));
         expect(membershipWrites).toHaveLength(1);
         expect(membershipWrites[0].sql).toContain('service_key = ANY($3)');
-        expect(membershipWrites[0].params).toEqual([target, USER_ID, ['glycopharm']]);
+        expect(membershipWrites[0].params).toEqual([target, USER_ID, ['pharmacy-hub']]);
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
       },
     );
@@ -231,14 +231,14 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
       //   회귀 대상: suspended → active 가 200 을 주면서 아무것도 바꾸지 않던 결함.
       primeQuery([]);
       mockApprovalService.reactivateMembership.mockResolvedValue({
-        reactivatedMemberships: 1, reactivatedRoles: ['glycopharm:pharmacy'], userId: USER_ID,
+        reactivatedMemberships: 1, reactivatedRoles: ['pharmacy-hub:pharmacy'], userId: USER_ID,
       });
       const res = makeRes();
 
       await controller.updateMemberStatus(makeReq('approved'), res);
 
       expect(mockApprovalService.reactivateMembership).toHaveBeenCalledWith(
-        expect.objectContaining({ userId: USER_ID, isPlatformAdmin: false, serviceKeys: ['glycopharm'] }),
+        expect.objectContaining({ userId: USER_ID, isPlatformAdmin: false, serviceKeys: ['pharmacy-hub'] }),
       );
       // canonical 경로가 처리했으므로 컨트롤러가 users 를 직접 쓰지 않는다
       expect(usersWrites()).toEqual([]);
@@ -268,7 +268,7 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
       const req = {
         body: { ids: [USER_ID], status: 'rejected' },
         user: { id: OPERATOR_ID },
-        serviceScope: { isPlatformAdmin: false, serviceKeys: ['glycopharm'] },
+        serviceScope: { isPlatformAdmin: false, serviceKeys: ['pharmacy-hub'] },
       } as any;
 
       await controller.batchUpdateStatus(req, res);
@@ -283,7 +283,7 @@ describe('MembershipConsoleController — 서비스 운영자 조치의 users �
       const req = {
         body: { ids: [USER_ID], status: 'rejected' },
         user: { id: OPERATOR_ID },
-        serviceScope: { isPlatformAdmin: false, serviceKeys: ['glycopharm'] },
+        serviceScope: { isPlatformAdmin: false, serviceKeys: ['pharmacy-hub'] },
       } as any;
 
       await controller.batchUpdateStatus(req, res);

@@ -191,7 +191,7 @@ describe('§14 navigation — 기능 존재 + 진입점 없음 상태를 남기�
 
 describe('§15 서비스 경계 — cross-service mixing 0', () => {
   it('PH forum client 는 다른 서비스 base 를 호출하지 않는다', () => {
-    for (const other of ['/kpa/forum', '/cosmetics/forum', '/glycopharm/forum', '/neture/forum']) {
+    for (const other of ['/kpa/forum', '/cosmetics/forum', '/neture/forum']) {
       expect(forumApiCode).not.toContain(other);
     }
   });

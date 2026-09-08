@@ -104,7 +104,6 @@ describe('checkout refund — canonical authority (platform:super_admin)', () =>
     const roles = [
       'kpa:admin',
       'kpa:operator',
-      'glycopharm:operator',
       'cosmetics:admin',
       'neture:operator',
       'pharmacy-hub:store_owner',
@@ -201,7 +200,7 @@ describe('checkout order 조회 — 구매자 본인 또는 플랫폼 운영자'
     mockFindById.mockResolvedValue(order);
     const res = makeRes();
     await CheckoutController.getOrder(
-      makeReq({ id: 'other', roles: ['kpa:admin', 'glycopharm:operator'] }, { params: { id: 'o1' } }),
+      makeReq({ id: 'other', roles: ['kpa:admin', 'cosmetics:operator'] }, { params: { id: 'o1' } }),
       res,
     );
     expect(res.statusCode).toBe(403);
@@ -239,24 +238,8 @@ describe('refund/cancel 경로의 소스 계약 (raw-source)', () => {
     expect(src).toContain('isPlatformAdmin');
   });
 
-  it('GlycoPharm /cleanup-expired 는 operator scope guard 뒤에 있다', () => {
-    const src = readFileSync(
-      join(SRC, 'routes/glycopharm/controllers/checkout.controller.ts'),
-      'utf-8',
-    );
-    const i = src.indexOf("'/cleanup-expired'");
-    expect(i).toBeGreaterThan(-1);
-    const seg = src.slice(i, i + 220);
-    expect(seg).toContain('requireAuth');
-    expect(seg).toContain('requireGlycopharmOperator');
-  });
-
-  it('GlycoPharm 라우터가 실제로 operator scope guard 를 주입한다', () => {
-    const src = readFileSync(join(SRC, 'routes/glycopharm/glycopharm.routes.ts'), 'utf-8');
-    const i = src.indexOf('createCheckoutController(');
-    expect(i).toBeGreaterThan(-1);
-    expect(src.slice(i, i + 400)).toContain("requireGlycopharmScope('glycopharm:operator')");
-  });
+  // GlycoPharm /cleanup-expired · 라우터 scope guard 단언 — REMOVED
+  //   WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: 대상 파일이 서비스와 함께 삭제되었다.
 
   it('구매자 취소 경로는 buyerId + serviceKey 로만 주문을 특정한다 (운영자 role 요구 없음)', () => {
     const src = readFileSync(join(SRC, 'services/checkout/store-order-cancel.service.ts'), 'utf-8');
