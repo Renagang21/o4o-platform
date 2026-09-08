@@ -1637,3 +1637,22 @@ export function TabletContentStepBuilder({
     </div>
   );
 }
+
+// ── 운영(B) 공통 Core ──────────────────────────────────────────────────────────
+// WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §5:
+//   저작(A)만 공통이던 이 패키지에 **운영(B)** 을 더한다. 정본 §4 의 A·B·C 중 B 가 빈 칸이었다.
+export {
+  TabletCornerBoard,
+  cornerPrimaryLabel,
+  cornerSecondaryLabel,
+  sortTabletCorners,
+  DEFAULT_TABLET_CORNER_BOARD_LABELS,
+  TABLET_CORNER_BOARD_TEAL,
+} from './TabletCornerBoard';
+export type {
+  TabletCornerBoardProps,
+  TabletCornerItem,
+  TabletCornerScreenSetInfo,
+  TabletCornerBoardLabels,
+  TabletCornerBoardAccent,
+} from './TabletCornerBoard';

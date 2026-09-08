@@ -21,6 +21,12 @@ import { queryTabletVisibleProducts, resolveServiceKeys } from './store-public-u
 import { resolveTabletIdleItems } from './store-public-tablet-idle-resolve.js';
 import { resolveTemplateKey, shapeStaticBlock } from './store-public-tablet-screen.js';
 import { resolveContentListItems } from './store-public-tablet-content-resolve.js';
+// WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §3: product_list 단일 resolver.
+import {
+  EMPTY_PRODUCT_LIST_SECTION,
+  resolveCornerProducts,
+  resolveScreenSetAppliedTablet,
+} from './store-public-product-list-resolve.js';
 // WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1: content_list 원본 조회는 주입된 adapter 로 위임.
 import type { ContentSourceAdapter } from './store-public-tablet-content-source.js';
 // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: qr_guide URL 을 Screen Set QR(public_qr_slug)로 서버 도출.
@@ -87,23 +93,17 @@ export interface ResolvedScreenSet {
   sections: ScreenSection[];
 }
 
-/**
- * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §5:
- *   공개 QR(모바일) 경로의 상품 노출은 **Screen Set 에 직접 선택된 상품만**이다.
- *   과거에는 명시 선택이 없으면(legacy config) 매장 org 전체 supplier 상품 + 매장 전체 활성 로컬 상품으로
- *   폴백해, 이 코너와 무관한 상품이 코너 QR 화면에 유입됐다(다른 코너 상품·미적용 세트 포함).
- *   → 선택이 없으면 상품 0건(빈 섹션 데이터)로 내려보내고, 매장 전체 폴백 조회를 하지 않는다.
- *   (`resolveScreenSetLocalProducts` 매장 전체 로컬 폴백 헬퍼는 이 계약에 따라 제거됐다.)
- *   태블릿 runtime(tabletContext 있음)은 기존 코너 진열 기준을 그대로 유지한다 — 이 계약은 QR 경로 전용.
+/*
+ * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §5 (계승):
+ *   과거 QR 경로는 명시 선택이 없으면 **매장 org 전체** supplier + local 로 폴백해,
+ *   이 코너와 무관한 상품이 코너 QR 에 유입됐다(다른 코너 상품 · 미적용 세트 포함).
+ *
+ * WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §2 (현행):
+ *   그 금지선은 유지하되, "선택 없음 = 무조건 0건" 대신 **코너를 특정할 수 있으면 그 코너와
+ *   똑같이** 보여준다(`resolveScreenSetAppliedTablet`). 미적용 세트는 코너가 없어 여전히 0건이다.
+ *   빈 섹션 상수는 `EMPTY_PRODUCT_LIST_SECTION`(selectionMode='none') 으로 이관했다 —
+ *   소비처가 "서버가 확정하지 못했다" 를 'selected'(0건) 와 구분할 수 있어야 하기 때문이다.
  */
-const EMPTY_QR_PRODUCT_SECTION: SelectedProductListSectionData = {
-  products: [],
-  // kiosk/미리보기가 자체 상품 조회(/tablet/products)로 되돌아가지 않도록 '선택 결과' 표식을 유지한다.
-  selectionMode: 'selected',
-  localProductsEndpoint: null,
-  selectedCount: 0,
-  excludedCount: 0,
-};
 
 /**
  * WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
@@ -353,45 +353,44 @@ export async function resolveScreenSetSections(
           sections.push({ blockType: 'product_list', sortOrder: b.sortOrder, data: selectedData });
           continue;
         }
-        // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §5:
-        //   QR/모바일 경로(tabletContext 없음)는 **직접 선택한 상품만** 노출한다.
-        //   명시 선택이 없으면 매장 전체 상품으로 폴백하지 않고 상품 0건으로 내려간다
-        //   (뷰어는 상품 섹션을 렌더하지 않고 코너 콘텐츠만 표시).
-        if (!tabletContext) {
-          sections.push({ blockType: 'product_list', sortOrder: b.sortOrder, data: { ...EMPTY_QR_PRODUCT_SECTION } });
+        // WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §2·§3
+        //   ① 이 비었을 때의 처리가 preview·tablet·QR 에 **따로** 있어서 같은 세트가
+        //   0 / 3 / 0 건으로 갈렸다. 아래 한 곳으로 모은다(계약·구현 모두 단일).
+        //
+        //   ② 코너 확정 + 진열 있음   → 진열 상품(supplier+local)      'corner_display'
+        //   ③ 코너 확정 + 진열 없음   → 그 코너의 legacy 집합          'corner_legacy_all'  [compatibility]
+        //   ④ 코너 미확정             → 상품 없음                      'none'
+        //
+        //   코너 도출은 세 경로가 같다: tablet 은 자기 tabletContext, QR·preview 는
+        //   **이 세트를 적용 중인 태블릿 역참조**(`resolveScreenSetAppliedTablet`, 정확히 1대일 때만).
+        //   → QR 이 매장 전체로 자동 확장되는 것이 아니라 **자기 코너 태블릿과 똑같이** 보인다.
+        //     미적용 세트의 QR 은 코너가 없어 ④ 로 0건 — 기존 금지선은 그대로 유지된다.
+        const effectiveTablet =
+          tabletContext ?? (await resolveScreenSetAppliedTablet(dataSource, set.id, input.organizationId));
+        if (!effectiveTablet) {
+          sections.push({ blockType: 'product_list', sortOrder: b.sortOrder, data: { ...EMPTY_PRODUCT_LIST_SECTION } });
           continue;
         }
-        // WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §6 — product_list 3단 계약
-        //
-        //   ① 명시 선택(config.products)        → 그 목록·순서 그대로            selectionMode='selected'
-        //   ② (태블릿 문맥 한정) 코너 진열       → store_tablet_displays 기준     selectionMode='corner_display'
-        //   ③ 그 외                              → 상품 없음                      selectionMode='selected'(0건)
-        //
-        //   ②는 1세대(`store_tablet_displays`)에 남은 **유일한 살아 있는 읽기 경로**다.
-        //   프로덕션 실측(2026-09-08): 진열 6행 / 태블릿 2대 — 둘 다 ①이 비어 있어 ②로 내려온다.
-        //   → 진열 테이블을 지우면 이 2대의 상품 화면이 빈다. 삭제하지 않는다(WO 중지 조건).
-        //   ②는 태블릿 문맥에서만 성립한다(QR·모바일은 위 ③에서 이미 차단 — 코너 무관 상품 유입 방지).
-        //
-        //   `selectionMode` 를 ②에도 부여해 소비처가 **어느 단을 통해 온 목록인지** 구분할 수 있게 한다
-        //   (기존 소비처는 'selected' 만 인식 → 미인식 값은 무시되어 기존 동작 유지 · additive).
-        //
-        // 태블릿 runtime(tabletContext 있음) 전용 legacy 경로 — 코너 진열 기준 유지(회귀 0).
-        //   태블릿은 supplier 를 코너 진열(store_tablet_displays)로 제한(configured=true)한다.
-        //   kiosk 는 section.products 를 쓰지 않고 fetchProducts(/tablet/products)로 상품을 그리므로
-        //   여기 products 는 하위 호환 payload 이다.
-        const supplierResult: any = await queryTabletVisibleProducts(dataSource, input.storeId, resolveServiceKeys(input.serviceKey), {
-          page: 1, limit: 50, sort: 'sort_order', order: 'asc',
-          firstTabletId: tabletContext.tabletId,
-          configured: tabletContext.configured,
-        });
+        const cornerProducts = await resolveCornerProducts(
+          dataSource,
+          {
+            organizationId: input.organizationId,
+            storeId: input.storeId,
+            serviceKey: input.serviceKey,
+            storeSlug: input.storeSlug,
+          },
+          effectiveTablet.tabletId,
+          effectiveTablet.configured,
+        );
         sections.push({
           blockType: 'product_list',
           sortOrder: b.sortOrder,
           data: {
-            products: supplierResult?.data ?? [],
-            // §6 ② — 이 목록의 출처가 코너 진열임을 표식으로 남긴다(additive · 미인식 소비처는 무시).
-            selectionMode: 'corner_display',
+            products: cornerProducts,
+            selectionMode: effectiveTablet.configured ? 'corner_display' : 'corner_legacy_all',
             localProductsEndpoint: input.storeSlug ? `/${input.storeSlug}/tablet/products` : null,
+            selectedCount: 0,
+            excludedCount: 0,
           },
         });
       } else if (b.blockType === 'content_list') {

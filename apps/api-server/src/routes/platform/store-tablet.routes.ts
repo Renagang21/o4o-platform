@@ -54,6 +54,13 @@ import { createStoreContentSourceAdapter } from './store-public/store-public-tab
 import { shapeStaticBlock, resolveTemplateKey } from './store-public/store-public-tablet-screen.js';
 // WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1: 미리보기도 실제 태블릿과 **같은** 선택 상품 resolver 를 재사용(복제 금지).
 import { resolveSelectedProductListSection } from './store-public/store-public-screen-set-resolve.js';
+// WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §3:
+//   미리보기가 공개 경로와 같은 product_list 4단 계약을 쓰도록 같은 resolver 를 소비한다.
+import {
+  EMPTY_PRODUCT_LIST_SECTION,
+  resolveCornerProducts,
+  resolveScreenSetAppliedTablet,
+} from './store-public/store-public-product-list-resolve.js';
 // WO-O4O-KPA-MY-STORE-RUNTIME-CONTRACT-QUALITY-CLOSURE-V1 (축 A):
 //   편집기 상품 풀에 **런타임 노출 가능 여부**를 additive 로 덧붙인다(런타임 게이트는 불변).
 import {
@@ -1758,6 +1765,12 @@ export function createStoreTabletRoutes(
       //   공개 경로는 platform_store_slugs 의 service_key 를 사용 → 미리보기도 같은 행에서 도출(없으면 기본 kpa).
       let previewServiceKey = qrServiceKey;
       let previewStoreSlug: string | null = null;
+      // WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §2:
+      //   미리보기도 공개 경로와 **같은 방식**으로 코너를 도출한다.
+      //   - body.screenSetId 가 있으면(저장된 세트 편집·코너 미리보기) 그 세트를 적용 중인 태블릿 역참조
+      //   - 미저장 draft 는 적용 코너가 없다 → 코너 미확정(상품 없음)
+      //   과거처럼 "미리보기만 섹션 생략" 하지 않는다.
+      let previewTablet: { tabletId: string; configured: boolean } | null = null;
       if (visible.some(({ b }: any) => b.blockType === 'product_list')) {
         try {
           const slugRows = await dataSource.query(
@@ -1770,6 +1783,14 @@ export function createStoreTabletRoutes(
           if (slugRows?.[0]?.slug) previewStoreSlug = String(slugRows[0].slug);
         } catch (slugErr) {
           console.warn('[StoreTablet] preview store slug resolve skipped:', (slugErr as any)?.message);
+        }
+        const previewSetId = typeof req.body?.screenSetId === 'string' ? req.body.screenSetId : null;
+        if (previewSetId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(previewSetId)) {
+          try {
+            previewTablet = await resolveScreenSetAppliedTablet(dataSource, previewSetId, organizationId);
+          } catch (ctxErr) {
+            console.warn('[StoreTablet] preview corner resolve skipped:', (ctxErr as any)?.message);
+          }
         }
       }
       for (const { b } of visible) {
@@ -1796,12 +1817,40 @@ export function createStoreTabletRoutes(
                 storeId: organizationId, // KPA: store id = organization id (공개 경로와 동일)
                 serviceKey: previewServiceKey,
                 storeSlug: previewStoreSlug,
-                tabletId: null, // draft 는 적용 코너가 없다 — 선택 모드는 진열로 집합을 좁히지 않는다.
+                tabletId: previewTablet?.tabletId ?? null,
               },
               config,
             );
-            // 명시 선택이 없으면(legacy) 기존대로 생략 → 뷰어가 fetchProducts 로 표시(회귀 0).
-            if (selectedData) sections.push({ blockType: bt, sortOrder: order++, data: selectedData });
+            if (selectedData) {
+              sections.push({ blockType: bt, sortOrder: order++, data: selectedData });
+              continue;
+            }
+            // WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §2·§3:
+            //   기존에는 명시 선택이 없으면 **섹션 자체를 생략**해, 같은 세트가
+            //   preview 0 / tablet 3 / QR 0 건으로 갈렸다(CONTRACT_DRIFT).
+            //   이제 공개 경로와 **같은 4단 계약**을 쓴다 — 코너를 특정할 수 있으면 그 코너와 동일,
+            //   특정할 수 없으면(미저장 draft·미적용 세트) 상품 없음.
+            if (!previewTablet) {
+              sections.push({ blockType: bt, sortOrder: order++, data: { ...EMPTY_PRODUCT_LIST_SECTION } });
+              continue;
+            }
+            const previewProducts = await resolveCornerProducts(
+              dataSource,
+              { organizationId, storeId: organizationId, serviceKey: previewServiceKey, storeSlug: previewStoreSlug },
+              previewTablet.tabletId,
+              previewTablet.configured,
+            );
+            sections.push({
+              blockType: bt,
+              sortOrder: order++,
+              data: {
+                products: previewProducts,
+                selectionMode: previewTablet.configured ? 'corner_display' : 'corner_legacy_all',
+                localProductsEndpoint: previewStoreSlug ? `/${previewStoreSlug}/tablet/products` : null,
+                selectedCount: 0,
+                excludedCount: 0,
+              },
+            });
           } else {
             const data = shapeStaticBlock(bt, config);
             if (data) sections.push({ blockType: bt, sortOrder: order++, data });

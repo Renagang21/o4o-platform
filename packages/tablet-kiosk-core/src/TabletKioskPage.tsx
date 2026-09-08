@@ -313,13 +313,26 @@ function mapSectionProduct(p: any): DisplayProduct {
   // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: resolver 가 상품별로 실어 준 QR 공개 URL 을 그대로 전달.
   const qrUrl: string | null = typeof p?.qrUrl === 'string' && p.qrUrl ? p.qrUrl : null;
   if (p?.type === 'local') {
+    // WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §3:
+    //   local 행은 두 shape 로 들어온다.
+    //     ① 명시 선택 tier — resolver 가 평탄화한 camelCase `{price, priceDisplay, imageUrl}`
+    //     ②③ 코너 tier    — `/tablet/products` 와 **같은 원형** snake_case
+    //                        `{price_display, thumbnail_url, images, description, summary, category, selectedContent*}`
+    //   둘 다 받아 같은 DisplayProduct 로 만든다. 과거에는 camelCase 만 읽어 코너 tier 의
+    //   설명·요약·매장 선택 콘텐츠가 조용히 사라졌다(같은 상품인데 경로에 따라 내용이 다름).
     return {
       id: String(p.id),
       type: 'local',
       name: p.name,
       price: typeof p.price === 'number' ? p.price : undefined,
-      priceDisplay: typeof p.priceDisplay === 'string' ? p.priceDisplay : undefined,
-      imageUrl: p.imageUrl ?? undefined,
+      priceDisplay: typeof p.priceDisplay === 'string' ? p.priceDisplay : p.price_display,
+      description: p.description,
+      summary: p.summary,
+      category: p.category,
+      imageUrl: p.imageUrl ?? p.thumbnail_url ?? p.images?.[0],
+      selectedContentTitle: p.selectedContentTitle,
+      selectedContentHtml: p.selectedContentHtml,
+      selectedContentTranslations: p.selectedContentTranslations,
       qrUrl,
     };
   }
@@ -503,9 +516,17 @@ export function TabletKioskPage({
   // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
   //   product_list 에 **명시 선택**이 저장되면 서버가 selectionMode='selected' + 선택 순서의 products 를 내려준다.
   //   그때만 kiosk 는 자체 조회(/tablet/products) 대신 이 목록을 쓴다. 표식이 없으면(legacy) 기존 조회 그대로(회귀 0).
+  //
+  // WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §3:
+  //   서버가 product_list 4단 계약을 단일 resolver 로 확정하게 되면서, 'selected' 외에
+  //   'corner_display'(코너 진열) · 'corner_legacy_all'(코너 legacy 집합) 도 **서버가 확정한 목록**이다.
+  //   셋 다 자체 조회 대신 이 목록을 쓴다 — 그래야 kiosk 가 preview·QR 과 같은 집합·순서를 본다.
+  //   서버 집합은 `/tablet/products` 와 같은 소스·필터·정렬(supplier→local)이라 결과가 동일하다.
+  //   'none'(코너 미확정) 과 표식 없음(legacy·세트 미적용) 은 기존대로 자체 조회한다(회귀 0).
   const selectedSectionProducts = (() => {
     const d = (screen?.sections ?? []).find((x) => x.blockType === 'product_list')?.data as any;
-    if (!d || d.selectionMode !== 'selected') return null;
+    const mode = d?.selectionMode;
+    if (mode !== 'selected' && mode !== 'corner_display' && mode !== 'corner_legacy_all') return null;
     return Array.isArray(d.products) ? (d.products as any[]).map(mapSectionProduct) : [];
   })();
 

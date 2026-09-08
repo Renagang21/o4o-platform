@@ -37,6 +37,7 @@ const OPERATOR_SET = 'apps/api-server/src/routes/o4o-store/controllers/operator-
 const SUPPLIER_SET = 'apps/api-server/src/routes/o4o-store/controllers/supplier-screen-set.controller.ts';
 const KPA_VIEWER = 'services/web-kpa-society/src/pages/qr/PublicScreenSetViewer.tsx';
 const KPA_TABLET_API = 'services/web-kpa-society/src/api/tabletDisplays.ts';
+const PRODUCT_LIST_RESOLVE = 'apps/api-server/src/routes/platform/store-public/store-public-product-list-resolve.ts';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // §2 product_content 은퇴
@@ -164,21 +165,41 @@ describe('§6·§9 product_list 계약과 세 경로 동일성', () => {
     expect(stripComments(read(PUBLIC_RESOLVE))).toContain('resolveSelectedProductListSection');
   });
 
-  it('QR·모바일(태블릿 문맥 없음)은 매장 전체 상품으로 폴백하지 않는다', () => {
+  /*
+   * 아래 3건은 `WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1` 에서
+   * **의도적으로 계약이 바뀌어** 표현이 달라졌다(회귀가 아니다).
+   *   - 코너 도출이 `tabletContext` 단독 → `effectiveTablet`(tabletContext ?? 세트 역참조)
+   *   - 빈 섹션 상수가 `EMPTY_QR_PRODUCT_SECTION`('selected' 0건) → `EMPTY_PRODUCT_LIST_SECTION`('none')
+   * 검사 의도(= 지켜야 할 불변식)는 그대로 두고 표현만 현행에 맞춘다.
+   */
+
+  it('코너를 특정할 수 없으면 매장 전체 상품으로 폴백하지 않는다 (미적용 세트 QR = 0건)', () => {
     const src = stripComments(read(PUBLIC_RESOLVE));
-    expect(src).toContain('EMPTY_QR_PRODUCT_SECTION');
-    expect(src).toContain('if (!tabletContext)');
+    expect(src).toContain('EMPTY_PRODUCT_LIST_SECTION');
+    expect(src).toContain('if (!effectiveTablet)');
+    // 코너 미확정 상태에서 매장 전체 조회로 새는 경로가 없어야 한다.
+    expect(src).not.toMatch(/if\s*\(\s*!effectiveTablet\s*\)\s*\{[^}]*queryTabletVisibleProducts/);
   });
 
-  it('코너 진열 경로는 selectionMode 로 출처를 표시한다 (어느 단을 통해 왔는지 구분 가능)', () => {
+  it('코너 tier 는 selectionMode 로 출처를 표시한다 (어느 단을 통해 왔는지 구분 가능)', () => {
     const src = stripComments(read(PUBLIC_RESOLVE));
-    expect(src).toContain("selectionMode: 'corner_display'");
-    expect(src).toContain("selectionMode: 'selected'");
+    expect(src).toContain("'corner_display'");
+    expect(src).toContain("'corner_legacy_all'");
+    // 명시 선택 tier 는 공용 함수가 'selected' 를 부여한다.
+    expect(stripComments(read(PUBLIC_RESOLVE))).toContain('resolveSelectedProductListSection');
   });
 
-  it('1세대 진열은 태블릿 문맥에서만 읽힌다 — 삭제되지 않았다(살아 있는 2대가 의존)', () => {
+  it('1세대 진열은 읽기 경로에 살아 있다 — 삭제되지 않았다(살아 있는 2대가 의존)', () => {
     const src = stripComments(read(PUBLIC_RESOLVE));
-    expect(src).toContain('queryTabletVisibleProducts');
-    expect(src).toContain('tabletContext.configured');
+    // 코너 상품 resolve 는 공용 resolver 로 이관됐고, 그 안에서 진열/가시성 게이트를 쓴다.
+    expect(src).toContain('resolveCornerProducts');
+    expect(src).toContain('effectiveTablet.configured');
+    expect(stripComments(read(PRODUCT_LIST_RESOLVE))).toContain('store_tablet_displays');
+    expect(stripComments(read(PRODUCT_LIST_RESOLVE))).toContain('queryTabletVisibleProducts');
+  });
+
+  it('세 경로가 같은 코너 도출 규칙을 쓴다 (preview·QR 이 세트 역참조로 tablet 과 맞춰진다)', () => {
+    expect(stripComments(read(PUBLIC_RESOLVE))).toContain('resolveScreenSetAppliedTablet');
+    expect(stripComments(read(STORE_TABLET_ROUTES))).toContain('resolveScreenSetAppliedTablet');
   });
 });

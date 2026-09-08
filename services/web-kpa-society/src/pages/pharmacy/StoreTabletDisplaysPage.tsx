@@ -57,7 +57,8 @@ import {
 import type { Tablet as TabletType, ProductPool, TabletDisplaySettings } from '../../api/tabletDisplays';
 // WO-O4O-KPA-TABLET-SCREEN-SET-BLOCK-EDITOR-UX-V1: 화면 세트 관리 UI
 import TabletScreenSetManager from './TabletScreenSetManager';
-import { templateLabel } from '@o4o/tablet-screen-set-editor';
+// WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §5: 운영(B) 공통 Core 채택.
+import { templateLabel, TabletCornerBoard, cornerPrimaryLabel } from '@o4o/tablet-screen-set-editor';
 // WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1: 코너별 운영 = 코너×콘텐츠 연결 패널(링크 전용)
 import TabletCornerContentsPanel from './TabletCornerContentsPanel';
 // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §2: 코너 카드에서 바로 여는 '화면 바꾸기'(1동작 교체).
@@ -971,21 +972,6 @@ export default function StoreTabletDisplaysPage() {
       )}
 
       {/* No tablets (코너별 운영 탭 전용) */}
-      {activeTab === 'corners' && !loadingTablets && tablets.length === 0 && !showRegisterForm && (
-        <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
-          <Tablet className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-slate-800 mb-2">아직 등록된 태블릿이 없습니다</h3>
-          <p className="text-slate-500 mb-4">태블릿을 추가하면 설치 코너별로 화면을 준비하고 적용할 수 있습니다.</p>
-          <button
-            onClick={() => setShowRegisterForm(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            태블릿 추가
-          </button>
-        </div>
-      )}
-
       {/* Error */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
@@ -994,75 +980,26 @@ export default function StoreTabletDisplaysPage() {
         </div>
       )}
 
-      {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: 첫 화면 = 코너 카드 홈(태블릿 목록 아님).
-          코너 = store_tablets(location||name). 카드 선택 시 기존 상세/편집기(아래) 재사용.
-          미선택(selectedTabletId=null) 상태에서만 홈을 표시한다. */}
-      {activeTab === 'corners' && !loadingTablets && tablets.length > 0 && !selectedTabletId && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
-              <Tablet className="w-5 h-5 text-teal-600" /> 태블릿
-              <span className="text-sm font-normal text-slate-400">({tablets.length})</span>
-            </h2>
-            <button
-              onClick={() => setShowRegisterForm(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-700 bg-white border border-teal-200 rounded-xl hover:bg-teal-50"
-            >
-              <Plus className="w-4 h-4" /> 태블릿 추가
-            </button>
-          </div>
-          <p className="text-xs text-slate-400">카드 하나가 태블릿 1대이며, 카드 제목은 그 태블릿의 <b className="font-semibold text-slate-500">설치 코너</b>(위치)입니다. 지금 나오는 화면을 보고 바로 바꿀 수 있고, 카드를 누르면 상세 설정으로 들어갑니다.</p>
-          {/* WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1: 코너 현황판 —
-              각 카드 = 코너명 · 지금 나오는 화면 · 대표 미리보기(경량, kiosk 상시 렌더 아님) · [화면 바꾸기]·[미리보기].
-              내부 용어(화면 세트/블록 수/연결/current) 미노출. 카드 본문 클릭 = 상세 설정. */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-            {sortedTablets.map((t) => {
-              const set = t.currentScreenSetId ? screenSetIndex[t.currentScreenSetId] : null;
-              const nowName = set ? set.name : '기본 화면';
-              return (
-                <div
-                  key={t.id}
-                  className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 flex flex-col gap-3 hover:border-teal-200 hover:shadow-md transition"
-                >
-                  <div
-                    onClick={() => setSelectedTabletId(t.id)}
-                    className="min-w-0 cursor-pointer"
-                    role="button"
-                    title="상세 설정 열기"
-                  >
-                    <div className="text-base font-bold text-slate-900 truncate">{cornerPrimary(t)}</div>
-                    {cornerSecondary(t) && <div className="text-xs text-slate-400 truncate mt-0.5">{cornerSecondary(t)}</div>}
-                  </div>
-                  {/* 대표 미리보기(경량 · 기존 데이터로 구성): 지금 나오는 화면을 알아볼 수 있게 이름 + 화면 유형을 크게. */}
-                  <div
-                    onClick={() => setSelectedTabletId(t.id)}
-                    className="cursor-pointer rounded-xl border border-slate-100 bg-gradient-to-br from-slate-50 to-teal-50/40 px-3 py-4 min-h-[76px] flex flex-col justify-center"
-                    title="상세 설정 열기"
-                  >
-                    <div className="text-[11px] text-slate-400">지금 나오는 화면</div>
-                    <div className="text-sm font-bold text-slate-800 truncate mt-0.5">{nowName}</div>
-                    {set && <div className="text-[11px] text-teal-600 mt-0.5">{templateLabel(set.templateKey)}</div>}
-                  </div>
-                  <div className="flex gap-2 mt-auto">
-                    <button
-                      onClick={() => setSwapCorner({ tabletId: t.id, name: cornerPrimary(t) })}
-                      className="flex-1 min-h-[44px] px-3 py-2 text-sm font-semibold text-white bg-teal-600 rounded-xl hover:bg-teal-700"
-                    >
-                      화면 바꾸기
-                    </button>
-                    <button
-                      onClick={() => handleOpenPreview(t.id)}
-                      disabled={previewLoading}
-                      className="flex-1 min-h-[44px] px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50"
-                    >
-                      미리보기
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+      {/* WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §5·§7:
+          코너 현황판(운영 B)을 공통 Core `TabletCornerBoard`(@o4o/tablet-screen-set-editor) 소비로 전환.
+          기존 카드 마크업·동선·문구는 Core 의 기본값으로 그대로 옮겼다(표시 회귀 0).
+          KPA 에 남는 것은 adapter 축뿐 — 데이터 조회·콜백·아이콘·accent.
+          빈 상태(태블릿 0대)도 Core 가 담당한다. 단 등록 폼이 열려 있는 동안에는 감춘다(기존 동작). */}
+      {activeTab === 'corners' && !selectedTabletId && !showRegisterForm && (
+        <TabletCornerBoard
+          tablets={tablets}
+          loading={loadingTablets}
+          screenSetInfo={(setId) => {
+            const s = screenSetIndex[setId];
+            return s ? { name: s.name, templateLabel: templateLabel(s.templateKey) } : null;
+          }}
+          onOpenDetail={(id) => setSelectedTabletId(id)}
+          onSwap={(t) => setSwapCorner({ tabletId: t.id, name: cornerPrimaryLabel(t) })}
+          onPreview={(id) => handleOpenPreview(id)}
+          onAddTablet={() => setShowRegisterForm(true)}
+          previewDisabled={previewLoading}
+          icons={{ tablet: <Tablet className="w-5 h-5" />, add: <Plus className="w-4 h-4" /> }}
+        />
       )}
 
       {/* Tablet list DataTable + editor (선택 코너 상세 — 기존 2단 레이아웃 재사용, 코너별 운영 탭 전용) */}
