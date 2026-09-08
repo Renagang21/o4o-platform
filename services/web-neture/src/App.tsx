@@ -22,7 +22,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
 });
-import { AuthProvider, LoginModalProvider, useLoginModal, useAuth, getNetureDashboardRoute } from './contexts';
+import { AuthProvider, LoginModalProvider, useLoginModal, useAuth, getNetureDashboardRoute, WorkScopeProvider } from './contexts';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
@@ -712,6 +712,10 @@ function App() {
     <AuthProvider>
       <LoginModalProvider>
         <BrowserRouter>
+          {/* WO-O4O-WORK-SCOPE-CONTRACT-V0: active Work Scope(route+인증 파생) 제공.
+              useLocation/useAuth 를 쓰므로 BrowserRouter 안 · AuthProvider 아래에 둔다.
+              화면·route 동작은 바꾸지 않는다 — Phase 3 중앙 AI 입력의 연결점이다. */}
+          <WorkScopeProvider>
           <SeoWatcher />
           <O4OToastProvider />
           <PostLoginRedirect />
@@ -1299,6 +1303,7 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>
+          </WorkScopeProvider>
         </BrowserRouter>
       </LoginModalProvider>
     </AuthProvider>
