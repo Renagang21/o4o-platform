@@ -35,3 +35,6 @@ export type { AnnualReportStatus, AnnualReportValues } from './annual-report.ent
 export { BranchFeePolicy } from './branch-fee-policy.entity.js';
 export { BranchFeeLedger, OPERATOR_SETTABLE_FEE_STATUSES } from './branch-fee-ledger.entity.js';
 export type { BranchFeeStatus } from './branch-fee-ledger.entity.js';
+// WO-O4O-KPA-BRANCH-CONTINUING-EDUCATION-CREDIT-LEDGER-V1
+export { BranchEducationCreditLedger, EXEMPTION_TYPES } from './branch-education-credit-ledger.entity.js';
+export type { EducationCreditStatus, EducationExemptionType } from './branch-education-credit-ledger.entity.js';

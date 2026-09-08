@@ -22,6 +22,8 @@ import type {
 import { KpaOrganization } from '../../routes/kpa-branch/entities/kpa-organization.entity.js';
 // WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1: 회비구분의 연결 원장
 import { BranchFeeService } from './BranchFeeService.js';
+// WO-O4O-KPA-BRANCH-CONTINUING-EDUCATION-CREDIT-LEDGER-V1: 연수교육 평점의 연결 원장
+import { BranchEducationCreditService } from './BranchEducationCreditService.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
@@ -198,6 +200,12 @@ export class AnnualReportService {
     const branch = await orgRepo.findOne({ where: { id: ctx.organizationId } });
     const parent = branch?.parent_id ? await orgRepo.findOne({ where: { id: branch.parent_id } }) : null;
 
+    /**
+     * 연수교육 3필드가 같은 원장 한 줄에서 나오므로 조회를 한 번만 한다.
+     * `undefined` = 아직 조회 안 함 · `null` = 조회했으나 그 해 원장이 없음.
+     */
+    let education: Awaited<ReturnType<typeof BranchEducationCreditService.resolveForReport>> | undefined;
+
     for (const f of this.fields(t)) {
       if (f.ownership !== 'association' && f.readonly !== true) continue;
 
@@ -242,9 +250,46 @@ export class AnnualReportService {
           linkStatus[f.key] = code ? 'resolved' : 'not_linked';
           break;
         }
+        case 'training.creditYear':
+        case 'training.requiredCredits':
+        case 'training.completedCredits': {
+          /**
+           * WO-O4O-KPA-BRANCH-CONTINUING-EDUCATION-CREDIT-LEDGER-V1:
+           * 연수교육 평점이 연결 원장을 얻었다 (W1 CHECK F2 해소).
+           *
+           * 그 해 원장이 없으면 **의무평점 기본값을 지어내지 않는다** —
+           * 분회가 아직 연도를 개설하지 않았는데 "8평점"을 보여주면 그것은 추측이다.
+           * 3개 필드를 한 번의 조회로 함께 채운다.
+           */
+          if (!ctx.userId) {
+            values[f.key] = null;
+            linkStatus[f.key] = 'not_linked';
+            break;
+          }
+          if (education === undefined) {
+            education = await BranchEducationCreditService.resolveForReport({
+              organizationId: ctx.organizationId,
+              userId: ctx.userId,
+              year: ctx.year,
+            });
+          }
+          if (!education) {
+            values[f.key] = null;
+            linkStatus[f.key] = 'not_linked';
+            break;
+          }
+          values[f.key] =
+            f.key === 'training.creditYear'
+              ? education.year
+              : f.key === 'training.requiredCredits'
+                ? education.requiredCredits
+                : education.completedCredits;
+          linkStatus[f.key] = 'resolved';
+          break;
+        }
         default:
           if (f.ownership === 'association') {
-            // 연수교육 평점 — 연결 원장이 아직 없다 (W1 CHECK F2).
+            // 남은 association 필드는 연결 원장이 없다 (예: fee.exemptionType — 면제 사유 구분).
             values[f.key] = null;
             linkStatus[f.key] = 'not_linked';
           }

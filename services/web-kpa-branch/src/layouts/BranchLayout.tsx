@@ -61,6 +61,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
       ? [
           { to: `${basePath}/mypage/annual-report`, label: '신상신고', end: false },
           { to: `${basePath}/mypage/fees`, label: '내 회비', end: false },
+          { to: `${basePath}/mypage/education`, label: '내 연수교육', end: false },
         ]
       : []),
   ];
@@ -71,6 +72,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
     { to: `${basePath}/operator/domains`, label: '도메인 연결' },
     { to: `${basePath}/operator/annual-reports`, label: '신상신고 검수' },
     { to: `${basePath}/operator/fees`, label: '회비 관리' },
+    { to: `${basePath}/operator/education`, label: '연수교육' },
   ];
 
   // 존재하지 않는 분회는 셸(헤더·메뉴·푸터)을 그리지 않는다 — 유효한 분회처럼 보이면 안 된다.

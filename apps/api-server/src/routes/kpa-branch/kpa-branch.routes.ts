@@ -27,6 +27,10 @@
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/fee-ledgers?year=&status=          회비 원장 목록
  *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/fee-ledgers/assess                 연도 일괄 부과 (멱등)
  *   PATCH  /api/v1/kpa-branch/branches/:branchSlug/operator/fee-ledgers/:ledgerId              부과·납부 개별 수정
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/me/education-credits                        내 연수교육 (회원)
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/education-credits?year=&status=    연수교육 평점 목록
+ *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/education-credits/open             연도 개설 (멱등)
+ *   PATCH  /api/v1/kpa-branch/branches/:branchSlug/operator/education-credits/:ledgerId        평점·면제 개별 수정
  *   *      /api/v1/kpa-branch/admin/domains/**                               (admin scope)
  *   *      /api/v1/kpa-branch/admin/service-members/**                        (admin scope)  가입 승인
  *
@@ -57,6 +61,7 @@ import { AnnualReportTemplateController } from '../../controllers/kpa-branch/Ann
 import { OperatorAnnualReportController } from '../../controllers/kpa-branch/OperatorAnnualReportController.js';
 import { MemberAnnualReportController } from '../../controllers/kpa-branch/MemberAnnualReportController.js';
 import { BranchFeeController } from '../../controllers/kpa-branch/BranchFeeController.js';
+import { BranchEducationCreditController } from '../../controllers/kpa-branch/BranchEducationCreditController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
@@ -202,6 +207,16 @@ export function createKpaBranchRoutes(): Router {
     wrap(BranchFeeController.myLedgers),
   );
 
+  // 내 연수교육 (WO-O4O-KPA-BRANCH-CONTINUING-EDUCATION-CREDIT-LEDGER-V1)
+  //
+  // 조회 전용이다. 평점은 분회가 확인해 기록하는 사실이므로 회원이 자기
+  // 인정평점을 올리는 경로를 만들지 않는다.
+  router.get(
+    '/branches/:branchSlug/me/education-credits',
+    ...memberReportGuards,
+    wrap(BranchEducationCreditController.mine),
+  );
+
   // ── operator (서비스 축 + 분회 축 이중 가드) ──────────────────────────────
 
   const operatorGuards = [
@@ -317,6 +332,27 @@ export function createKpaBranchRoutes(): Router {
     '/branches/:branchSlug/operator/fee-ledgers/:ledgerId',
     ...operatorGuards,
     wrap(BranchFeeController.updateLedger),
+  );
+
+  // 연수교육 평점 원장 (WO-O4O-KPA-BRANCH-CONTINUING-EDUCATION-CREDIT-LEDGER-V1)
+  //
+  // LMS 가 아니다 — 강좌·수강신청·출결 경로를 만들지 않는다.
+  // 개설(open)은 연도 단위 멱등 작업이고, 개별 조정은 PATCH 다.
+  // PATCH 는 status 를 받지 않는다 (DB generated column 이 정한다).
+  router.get(
+    '/branches/:branchSlug/operator/education-credits',
+    ...operatorGuards,
+    wrap(BranchEducationCreditController.list),
+  );
+  router.post(
+    '/branches/:branchSlug/operator/education-credits/open',
+    ...operatorGuards,
+    wrap(BranchEducationCreditController.openYear),
+  );
+  router.patch(
+    '/branches/:branchSlug/operator/education-credits/:ledgerId',
+    ...operatorGuards,
+    wrap(BranchEducationCreditController.update),
   );
 
   router.get('/branches/:branchSlug/operator/domains', ...operatorGuards, wrap(BranchDomainController.list));

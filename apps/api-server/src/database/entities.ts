@@ -352,6 +352,8 @@ import {
   // WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1
   BranchFeePolicy,
   BranchFeeLedger,
+  // WO-O4O-KPA-BRANCH-CONTINUING-EDUCATION-CREDIT-LEDGER-V1
+  BranchEducationCreditLedger,
 } from '../routes/kpa-branch/entities/index.js';
 
 // ============================================================================
@@ -857,6 +859,8 @@ export const entities = [
   // WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1
   BranchFeePolicy,
   BranchFeeLedger,
+  // WO-O4O-KPA-BRANCH-CONTINUING-EDUCATION-CREDIT-LEDGER-V1
+  BranchEducationCreditLedger,
   // ============================================================================
   // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
   // ============================================================================
