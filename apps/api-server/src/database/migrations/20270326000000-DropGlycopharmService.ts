@@ -31,22 +31,27 @@ export class DropGlycopharmService20270326000000 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // ── 1) 공용 역할 재귀속 (삭제 금지 — 타 서비스가 보유 중) ──────────────
-    //    roles.service_key='glycopharm' 인 bare role 을 서비스 중립 축으로 옮긴다.
-    await queryRunner.query(`
-      UPDATE roles SET service_key = 'neture'
-       WHERE service_key = 'glycopharm' AND name IN ('supplier', 'partner')
-    `);
+    //    roles.service_key='glycopharm' 인 bare role 을 서비스 중립 축(platform)으로 옮긴다.
+    //
+    //    'neture' 로 옮기지 않는다: roles 의 unique index 는 (service_key, role_key) 이고
+    //    Neture 는 이미 자기 canonical row(neture:supplier=role_key 'supplier',
+    //    neture:partner=role_key 'partner')를 갖고 있어 충돌한다.
+    //    bare role 은 특정 서비스 소유가 아니라 접두사 없는 legacy 축이므로 platform 이 맞다.
+    //    (platform 에 role_key supplier/partner/pharmacy/customer 는 없음 — 프로덕션 실측)
     await queryRunner.query(`
       UPDATE roles SET service_key = 'platform'
-       WHERE service_key = 'glycopharm' AND name IN ('pharmacy', 'customer')
+       WHERE service_key = 'glycopharm'
+         AND name IN ('supplier', 'partner', 'pharmacy', 'customer')
     `);
 
-    // ── 2) glycopharm:* 접두 role assignment → role → 나머지 role row ──────
+    // ── 2) glycopharm:* 접두 role assignment → 접두 role row ───────────────
+    //    삭제는 **접두 이름 패턴으로만** 한다. service_key 로 지우면 위 1) 이 어떤
+    //    이유로 건너뛰었을 때 공용 bare role 이 조용히 사라진다.
     await queryRunner.query(`
       DELETE FROM role_assignments WHERE role LIKE 'glycopharm:%'
     `);
     await queryRunner.query(`
-      DELETE FROM roles WHERE service_key = 'glycopharm'
+      DELETE FROM roles WHERE name LIKE 'glycopharm:%'
     `);
 
     // ── 3) 공유 테이블의 glycopharm 축 행 삭제 ────────────────────────────

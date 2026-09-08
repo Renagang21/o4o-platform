@@ -43,7 +43,7 @@ env:
 
 jobs:
   e2e-auth-runtime:
-    name: Auth Runtime E2E (4 Services)
+    name: Auth Runtime E2E (3 Services)
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -91,8 +91,6 @@ jobs:
           check E2E_KCOS_ADMIN_PASSWORD  "${{ secrets.E2E_KCOS_ADMIN_PASSWORD }}"
           check E2E_NETURE_ADMIN_EMAIL   "${{ secrets.E2E_NETURE_ADMIN_EMAIL }}"
           check E2E_NETURE_ADMIN_PASSWORD "${{ secrets.E2E_NETURE_ADMIN_PASSWORD }}"
-          check E2E_GLYCO_ADMIN_EMAIL    "${{ secrets.E2E_GLYCO_ADMIN_EMAIL }}"
-          check E2E_GLYCO_ADMIN_PASSWORD "${{ secrets.E2E_GLYCO_ADMIN_PASSWORD }}"
 
           if [ -n "$MISSING" ]; then
             echo "::error::서비스별 E2E Secret 미설정:$MISSING"
@@ -114,8 +112,6 @@ jobs:
           E2E_KCOS_ADMIN_PASSWORD: ${{ secrets.E2E_KCOS_ADMIN_PASSWORD }}
           E2E_NETURE_ADMIN_EMAIL: ${{ secrets.E2E_NETURE_ADMIN_EMAIL }}
           E2E_NETURE_ADMIN_PASSWORD: ${{ secrets.E2E_NETURE_ADMIN_PASSWORD }}
-          E2E_GLYCO_ADMIN_EMAIL: ${{ secrets.E2E_GLYCO_ADMIN_EMAIL }}
-          E2E_GLYCO_ADMIN_PASSWORD: ${{ secrets.E2E_GLYCO_ADMIN_PASSWORD }}
           CI: 'true'
         run: npx playwright test --config=e2e/auth-runtime/playwright.config.ts
 

@@ -397,16 +397,16 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
   'supplier': {
     role: 'supplier',
     label: '공급자',
-    description: 'Neture 공급자',
-    service: 'neture',
+    description: '공급자 (legacy bare role — Neture 는 neture:supplier 가 canonical)',
+    service: 'platform',
     category: 'commerce',
     deprecated: false
   },
   'partner': {
     role: 'partner',
     label: '파트너',
-    description: 'Neture 파트너',
-    service: 'neture',
+    description: '파트너 (legacy bare role — Neture 는 neture:partner 가 canonical)',
+    service: 'platform',
     category: 'commerce',
     deprecated: false
   },
