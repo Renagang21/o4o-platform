@@ -187,8 +187,10 @@ export async function fetchTablets(): Promise<Tablet[]> {
 // isEnabled(DTO) ↔ is_visible(API 내부) 매핑은 서버가 처리. public runtime 미반영.
 
 export type ScreenSetStatus = 'draft' | 'active' | 'archived' | 'operator_template';
+// WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §2:
+//   product_content 은퇴 — 서버 쓰기 허용 목록·resolver·뷰어에서 모두 제거됐다.
 export type ScreenBlockType =
-  | 'idle_media' | 'product_list' | 'product_content'
+  | 'idle_media' | 'product_list'
   | 'corner_description' | 'health_info' | 'staff_inquiry' | 'qr_guide'
   // WO-O4O-KPA-TABLET-CONTENT-LIST-PICKER-UI-V1: 코너 콘텐츠 카드 목록
   | 'content_list';

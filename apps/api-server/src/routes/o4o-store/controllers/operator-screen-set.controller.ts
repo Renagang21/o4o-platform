@@ -44,7 +44,9 @@ import { createOperatorContentSourceAdapter } from '../../platform/store-public/
 import { shapeStaticBlock, resolveTemplateKey } from '../../platform/store-public/store-public-tablet-screen.js';
 
 // 저장 허용 block_type — 매장 API 와 동일(배포 CHECK 8종). product_list 는 배치 placeholder(운영자 원본엔 실상품 없음).
-const OPERATOR_SET_BLOCK_TYPES = ['idle_media', 'product_list', 'product_content', 'corner_description', 'health_info', 'staff_inquiry', 'qr_guide', 'content_list'];
+// WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §2:
+//   `product_content` 은퇴(프로덕션 0행 · 렌더 불가 dormant). content_list 가 대체한다.
+const OPERATOR_SET_BLOCK_TYPES = ['idle_media', 'product_list', 'corner_description', 'health_info', 'staff_inquiry', 'qr_guide', 'content_list'];
 // 신규 선택 가능 템플릿 4종(WO). legacy idle_touch_video 는 신규 선택 제외(WO 제외 조건).
 const OPERATOR_TEMPLATE_KEYS_ALLOWED = [
   'corner_information_basic_v1', // 기본 코너 안내형
@@ -243,15 +245,6 @@ export function createOperatorScreenSetController(dataSource: DataSource, requir
                   data: { items },
                 });
             }
-          } else if (bt === 'product_content') {
-            sections.push({
-              blockType: bt,
-              sortOrder: order++,
-              data: {
-                productRef: config.productRef ?? null,
-                contentId: config.contentId ?? null,
-              },
-            });
           } else if (bt === 'product_list') {
             // 운영자 원본엔 실상품 없음 — 뷰어 상품은 매장 적용 시점에 결정. preview 에서 생략(매장 preview 와 동일).
             continue;

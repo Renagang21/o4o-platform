@@ -13,10 +13,19 @@
  */
 
 // ── 타입(순수 계약) — API DTO 와 구조적으로 동일. 소비처는 구조적 타이핑으로 그대로 전달한다. ──
+/**
+ * WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §2:
+ *   `product_content` 를 계약에서 제거했다. 근거(프로덕션 실측 2026-09-08):
+ *     - `store_tablet_screen_blocks` 에 `product_content` 행 **0건** (전체 199 블록 중 0).
+ *     - 편집기가 만들지 않았다 — `AUTO_BLOCK_TYPES` 미포함 · 에디터 패키지에 처리 코드 0.
+ *     - resolver 는 참조(productRef/contentId)만 통과시켜 뷰어가 항상 미표시(dormant 실패).
+ *   같은 목적은 `content_list` 가 서버 resolve 로 이미 대체했다(정본 §1-3-③).
+ *   ⚠️ DB CHECK 제약에는 아직 남아 있다(축소 migration 은 본 WO 범위 밖 — CHECK 문서 참조).
+ *   따라서 **쓰기·렌더 경로에서만** 제거하고, 읽기 방어(의약품 가드)는 문자열 비교로 보존한다.
+ */
 export type ScreenBlockType =
   | 'idle_media'
   | 'product_list'
-  | 'product_content'
   | 'corner_description'
   | 'health_info'
   | 'staff_inquiry'

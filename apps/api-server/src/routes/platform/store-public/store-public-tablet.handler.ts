@@ -96,16 +96,27 @@ export function createStorePublicTabletRoutes(deps: {
       let localOrder = 'ORDER BY lp.sort_order ASC, lp.name ASC';
       if (firstTabletId) {
         localParams.push(firstTabletId); // $2
+        // WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §5 — 1순위 단일화
+        //   supplier 경로(store-public-utils queryTabletVisibleProducts)와 **같은 계약**을 쓴다:
+        //   1순위 근거는 링크 원장(kpa_store_content_product_links) 자체이며,
+        //   1세대 `disp.content_id` 는 값이 있을 때 우선하는 정렬 키로만 남는다.
+        //   LATERAL + LIMIT 1 — local 쿼리는 DISTINCT 가 없어 링크 다중 시 행이 증식하므로 필수.
         localDispJoin = `
          LEFT JOIN store_tablet_displays disp
            ON disp.product_id = lp.id AND disp.product_type = 'local'
            AND disp.tablet_id = $2 AND disp.is_visible = true
-         LEFT JOIN kpa_store_content_product_links scl
-           ON scl.organization_id = $1 AND scl.content_id = disp.content_id
-           AND scl.link_type = 'product_description'
-           AND scl.product_source_type = 'local' AND scl.product_source_id = lp.id
-         LEFT JOIN kpa_store_contents tc
-           ON tc.id = scl.content_id AND tc.organization_id = $1`;
+         LEFT JOIN LATERAL (
+           SELECT c.id, c.title, c.content_json
+             FROM kpa_store_content_product_links l
+             JOIN kpa_store_contents c
+               ON c.id = l.content_id AND c.organization_id = $1
+            WHERE l.organization_id = $1
+              AND l.link_type = 'product_description'
+              AND l.product_source_type = 'local'
+              AND l.product_source_id = lp.id
+            ORDER BY (l.content_id = disp.content_id) DESC, c.updated_at DESC
+            LIMIT 1
+         ) tc ON true`;
         localContentSelect =
           `tc.id AS "selectedContentId", tc.title AS "selectedContentTitle",
            COALESCE(tc.content_json->>'html', tc.content_json->>'body', '') AS "selectedContentHtml",

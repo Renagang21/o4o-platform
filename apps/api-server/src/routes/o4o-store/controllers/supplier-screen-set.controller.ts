@@ -43,8 +43,9 @@ import { createSupplierContentSourceAdapter } from '../../platform/store-public/
 import { shapeStaticBlock, resolveTemplateKey } from '../../platform/store-public/store-public-tablet-screen.js';
 import { analyzeScreenSetMedication, medicationPublishTargetAllowed } from '../../platform/store-tablet-medication-guard.js';
 
+// WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §2: product_content 은퇴.
 const SUPPLIER_SET_BLOCK_TYPES = [
-  'idle_media', 'product_list', 'product_content',
+  'idle_media', 'product_list',
   'corner_description', 'health_info', 'staff_inquiry', 'qr_guide', 'content_list',
 ];
 const SUPPLIER_TEMPLATE_KEYS_ALLOWED = [
@@ -182,8 +183,6 @@ export function createSupplierScreenSetController(
               const items = resolved.map((it) => ({ type: it.mediaType, url: it.url, ...(it.durationMs !== undefined ? { durationMs: it.durationMs } : {}) }));
               if (items.length > 0) sections.push({ blockType: bt, sortOrder: order++, data: { items } });
             }
-          } else if (bt === 'product_content') {
-            sections.push({ blockType: bt, sortOrder: order++, data: { productRef: config.productRef ?? null, contentId: config.contentId ?? null } });
           } else if (bt === 'product_list') {
             continue;
           } else {

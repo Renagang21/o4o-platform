@@ -37,6 +37,10 @@ export function collectScreenSetMasterIds(blocks: Array<{ blockType?: string; co
           ids.add(it.masterId);
         }
       }
+      // WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §2:
+      //   `product_content` 는 쓰기·resolver·뷰어에서 은퇴했다. 그러나 **DB CHECK 제약에는 남아 있어**
+      //   직접 INSERT 로 존재할 수 있으므로, 의약품 판정은 방어적으로 계속 수집한다
+      //   (가드를 좁히는 것은 안전을 낮추는 방향이라 은퇴 대상에서 제외).
     } else if (b?.blockType === 'product_content') {
       const ref = (cfg as any).productRef;
       if (typeof ref === 'string' && UUID_RE.test(ref)) ids.add(ref);

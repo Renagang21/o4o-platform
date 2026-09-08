@@ -361,6 +361,20 @@ export async function resolveScreenSetSections(
           sections.push({ blockType: 'product_list', sortOrder: b.sortOrder, data: { ...EMPTY_QR_PRODUCT_SECTION } });
           continue;
         }
+        // WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §6 — product_list 3단 계약
+        //
+        //   ① 명시 선택(config.products)        → 그 목록·순서 그대로            selectionMode='selected'
+        //   ② (태블릿 문맥 한정) 코너 진열       → store_tablet_displays 기준     selectionMode='corner_display'
+        //   ③ 그 외                              → 상품 없음                      selectionMode='selected'(0건)
+        //
+        //   ②는 1세대(`store_tablet_displays`)에 남은 **유일한 살아 있는 읽기 경로**다.
+        //   프로덕션 실측(2026-09-08): 진열 6행 / 태블릿 2대 — 둘 다 ①이 비어 있어 ②로 내려온다.
+        //   → 진열 테이블을 지우면 이 2대의 상품 화면이 빈다. 삭제하지 않는다(WO 중지 조건).
+        //   ②는 태블릿 문맥에서만 성립한다(QR·모바일은 위 ③에서 이미 차단 — 코너 무관 상품 유입 방지).
+        //
+        //   `selectionMode` 를 ②에도 부여해 소비처가 **어느 단을 통해 온 목록인지** 구분할 수 있게 한다
+        //   (기존 소비처는 'selected' 만 인식 → 미인식 값은 무시되어 기존 동작 유지 · additive).
+        //
         // 태블릿 runtime(tabletContext 있음) 전용 legacy 경로 — 코너 진열 기준 유지(회귀 0).
         //   태블릿은 supplier 를 코너 진열(store_tablet_displays)로 제한(configured=true)한다.
         //   kiosk 는 section.products 를 쓰지 않고 fetchProducts(/tablet/products)로 상품을 그리므로
@@ -375,12 +389,11 @@ export async function resolveScreenSetSections(
           sortOrder: b.sortOrder,
           data: {
             products: supplierResult?.data ?? [],
+            // §6 ② — 이 목록의 출처가 코너 진열임을 표식으로 남긴다(additive · 미인식 소비처는 무시).
+            selectionMode: 'corner_display',
             localProductsEndpoint: input.storeSlug ? `/${input.storeSlug}/tablet/products` : null,
           },
         });
-      } else if (b.blockType === 'product_content') {
-        const cfg = (b.config && typeof b.config === 'object' && !Array.isArray(b.config)) ? b.config : {};
-        sections.push({ blockType: 'product_content', sortOrder: b.sortOrder, data: { productRef: cfg.productRef ?? null, contentId: cfg.contentId ?? null } });
       } else if (b.blockType === 'content_list') {
         const cards = await resolveContentListItems(contentSource, input.storeId, b.config, input.viewerLanguage);
         sections.push({ blockType: 'content_list', sortOrder: b.sortOrder, data: { items: cards } });

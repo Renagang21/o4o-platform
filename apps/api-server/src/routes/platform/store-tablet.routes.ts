@@ -1386,8 +1386,10 @@ export function createStoreTabletRoutes(
   //   - block_type = 배포 CHECK 7종만(notice/qr_link 미지원 — 배포 스키마 정본).
   //   - description(WO §5)은 배포 스키마에 컬럼 없어 미지원(name만). current_screen_set_id NULL = legacy.
   //   - 경로 top-level /store/screen-sets (/tablets/:id 포획 회피). public runtime 미접촉.
+  // WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §2:
+  //   product_content 은퇴 — 쓰기 허용 목록에서 제거(프로덕션 0행 · 렌더 불가). DB CHECK 는 유지.
   const SET_BLOCK_TYPES = [
-    'idle_media', 'product_list', 'product_content',
+    'idle_media', 'product_list',
     'corner_description', 'health_info', 'staff_inquiry', 'qr_guide',
     // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-SCHEMA-CONTRACT-V1: 코너 콘텐츠 카드 목록(신규).
     'content_list',
@@ -1785,8 +1787,6 @@ export function createStoreTabletRoutes(
               const items = resolved.map((it) => ({ type: it.mediaType, url: it.url, ...(it.durationMs !== undefined ? { durationMs: it.durationMs } : {}) }));
               if (items.length > 0) sections.push({ blockType: bt, sortOrder: order++, data: { items } });
             }
-          } else if (bt === 'product_content') {
-            sections.push({ blockType: bt, sortOrder: order++, data: { productRef: config.productRef ?? null, contentId: config.contentId ?? null } });
           } else if (bt === 'product_list') {
             // 실제 태블릿/모바일과 동일한 resolver 재사용(선택 상품·순서·활성 QR). read-only.
             const selectedData = await resolveSelectedProductListSection(

@@ -293,6 +293,27 @@ export function sanitizePublishableTranslations(
 //   device pairing 없는 V1 이므로 공개 URL 은 first active tablet 기준(관리 화면에 안내).
 // ============================================================================
 
+/**
+ * WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §4 — `first_active` 존치 판정
+ *
+ * 판정: **존치**(제거 불가). 근거는 추정이 아니라 프로덕션 실측(2026-09-08)이다.
+ *
+ *   ① 공개 kiosk URL `/{slug}/tablet*` 은 `?tabletId=` 없이 열리는 경로가 정상 사용이다
+ *      (device pairing 부재 — 태블릿이 자기 id 를 모른다). 이 fallback 을 없애면
+ *      products·idle·screen 세 endpoint 가 모두 태블릿을 못 고르고 빈 화면이 된다.
+ *   ② 조직별 active 태블릿 수 실측:
+ *        e3d14288… 3대(전부 active) · 9c87f46b… 2대 active · 68e1291f… 0대
+ *      → 다태블릿 매장에서 `ORDER BY created_at ASC LIMIT 1` 은 **가장 오래된 1대로 고정**된다.
+ *        즉 fallback 은 "임의"가 아니라 결정적이지만, 코너별 화면을 구분하지는 못한다.
+ *   ③ QR 공개 URL 은 이 fallback 에 의존하지 않는다 — screen set 의 `public_qr_slug`
+ *      (active set 15개 전부 보유 · `store_qr_codes.landing_type='screen_set'` 39건)로
+ *      **세트 자체를 직접 지목**한다. 따라서 QR 축은 §4 판정의 영향을 받지 않는다.
+ *
+ * 결론: 코너별 정확도가 필요한 경로는 이미 `?tabletId=`(북마크) 와 screen-set QR 이 담당한다.
+ *       `first_active` 는 그 둘이 없을 때의 **매장 단위 기본 태블릿** 계약으로 유지한다.
+ *       device pairing 이 도입되면 이 함수 하나만 교체하면 된다(호출부 3곳 모두 이 함수 경유).
+ *       응답의 `tabletSource` 필드가 어느 경로로 결정됐는지를 이미 노출한다.
+ */
 export async function resolveTabletDisplaySource(
   dataSource: DataSource,
   organizationId: string,
@@ -465,16 +486,36 @@ export async function queryTabletVisibleProducts(
          '' AS "selectedContentHtml",
          NULL AS "selectedContentTranslationsRaw",
          NULL::int AS display_sort_order`;
+    // WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §5 — 1순위 단일화
+    //
+    //   정본(O4O-STORE-CONTENT-AND-EXECUTION-MODEL-V1 §2) 1순위는
+    //   "매장이 **해당 상품에** 명시적으로 연결한 내 매장 콘텐츠" 다. 그 연결의 원장은
+    //   `kpa_store_content_product_links`(organization × content × product) 이다.
+    //
+    //   기존 구현은 그 링크를 **1세대 진열 컬럼 `disp.content_id` 를 경유해서만** 찾았다
+    //   (`scl.content_id = disp.content_id`). 프로덕션 실측(2026-09-08):
+    //     store_tablet_displays.content_id 채워진 행 = 0 / 6
+    //   → 1순위가 **구조적으로 발화 불가능**했고, 사실상 2순위(SPD)부터 시작하고 있었다.
+    //
+    //   여기서는 링크 원장을 **직접** 1순위 근거로 삼는다. `disp.content_id` 는 값이 있을 때
+    //   우선하도록 정렬 키로만 남긴다(과거 데이터 호환 — 진열에 붙인 콘텐츠가 있으면 그것이 먼저).
+    //   LATERAL + LIMIT 1 로 링크 다중 시 행 증식·비결정성을 막는다(SPD 조인과 동일 패턴).
     const dispJoins = hasTablet
       ? `LEFT JOIN store_tablet_displays disp
            ON disp.product_id = opl.id AND disp.product_type = 'supplier'
            AND disp.tablet_id = $${ftIdx} AND disp.is_visible = true
-         LEFT JOIN kpa_store_content_product_links scl
-           ON scl.organization_id = $1 AND scl.content_id = disp.content_id
-           AND scl.link_type = 'product_description'
-           AND scl.product_source_type = 'listing' AND scl.product_source_id = opl.id
-         LEFT JOIN kpa_store_contents tc
-           ON tc.id = scl.content_id AND tc.organization_id = $1`
+         LEFT JOIN LATERAL (
+           SELECT c.id, c.title, c.content_json
+             FROM kpa_store_content_product_links l
+             JOIN kpa_store_contents c
+               ON c.id = l.content_id AND c.organization_id = $1
+            WHERE l.organization_id = $1
+              AND l.link_type = 'product_description'
+              AND l.product_source_type = 'listing'
+              AND l.product_source_id = opl.id
+            ORDER BY (l.content_id = disp.content_id) DESC, c.updated_at DESC
+            LIMIT 1
+         ) tc ON true`
       : '';
     // configured: visible display row 있는 supplier 만(집합 제한) + 편성 순서(disp.sort_order).
     const configuredFilter = configured ? 'AND disp.id IS NOT NULL' : '';

@@ -14,8 +14,11 @@
  *   같은 Screen Set 원본은 콘텐츠 누락 없이 소비한다. 채널 차이는 콘텐츠 유무가 아니라 배치·이용 방식.
  *   - idle_media(대기 영상)는 **모바일에서도 표시**(상단 안내 미디어). 단 태블릿과 달리 "터치해서 진입"이
  *     아니라 영상 아래 본문을 바로 스크롤한다("화면을 터치하세요" 문구 미사용).
- *   - product_content 도 공통 원본의 일부 → 제외하지 않는다(산출 데이터 있을 때 ContentRenderer/카드 렌더).
  *   - **qr_guide 만 제외**(모바일에서 자기 자신 QR 중복 표시 방지).
+ *
+ * WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §2:
+ *   `product_content` 은퇴로 위 parity 목록에서 제외됐다. 이 블록은 한 번도 렌더된 적이 없고
+ *   (resolver 가 참조만 통과 · 프로덕션 0행), 같은 목적은 `content_list` 가 서버 resolve 로 수행한다.
  * - 무인증 접근. 콘텐츠 원본을 복사/재작성하지 않는다.
  */
 
@@ -184,28 +187,9 @@ function SectionBlock({
   // corner_description 은 header 에서 이미 렌더 → 본문 반복 안 함.
   if (section.blockType === 'corner_description') return null;
 
-  // WO-...-CONTENT-PARITY-FIX-V1: product_content 도 공통 원본의 일부 → 제외하지 않는다.
-  //   공용 resolver 산출(data)에 표시 가능한 본문/제목이 있으면 기존 ContentRenderer/카드로 렌더한다.
-  //   (현재 resolver 는 productRef/contentId 참조만 산출 → 표시 본문 없으면 태블릿과 동일하게 미표시.
-  //    resolver 변경 없이 데이터가 채워지면 자동 렌더되도록 방어적으로 처리.)
-  if (section.blockType === 'product_content') {
-    const d = (section.data ?? {}) as { title?: string; summary?: string; html?: string; body?: string };
-    const html = (d.html || d.body || '').trim();
-    const title = (d.title || '').trim();
-    const summary = (d.summary || '').trim();
-    if (!html && !title && !summary) return null; // 참조만 있고 표시 본문 없음 → 태블릿과 동일 미표시
-    return (
-      <section style={styles.section}>
-        {title && <h2 style={styles.sectionLabel}>{title}</h2>}
-        {summary && <p style={styles.cardSummary}>{summary}</p>}
-        {html && (
-          <div style={{ marginTop: title || summary ? 12 : 0 }}>
-            <ContentRenderer html={html} variant="guide" />
-          </div>
-        )}
-      </section>
-    );
-  }
+  // WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §2:
+  //   `product_content` 렌더 분기를 제거했다. 서버 resolver 가 더 이상 이 섹션을 내보내지 않는다
+  //   (프로덕션 0행 · 참조만 통과시켜 항상 미표시였던 dormant 블록). 코너 콘텐츠는 content_list 가 정본이다.
 
   if (section.blockType === 'content_list') {
     const items = (section.data?.items as ContentCard[] | undefined) ?? [];

@@ -1346,6 +1346,20 @@ export default function StoreTabletDisplaysPage() {
                   매장이 일정 시간 사용되지 않을 때 태블릿이 자동으로 보여줄 이미지/영상 목록입니다.
                   고객이 화면을 터치하면 즉시 상품 안내 화면으로 돌아갑니다.
                 </p>
+                {/* WO-O4O-KPA-TABLET-GENERATION-CONSOLIDATION-AND-CANONICAL-REFERENCE-V1 §8:
+                    이 편집기는 태블릿 원장(store_tablets.idle_playlist_items)을 직접 편집하는 이전 세대
+                    경로다. 실제 재생 목록은 **적용된 화면 세트의 '대기 화면' 블록이 어떤 소스를
+                    가리키는지**에 따라 결정된다(서버 단일 계약 — store-public-tablet-idle-resolve).
+                    어느 쪽이 쓰이는지 화면에서 알 수 없어 "저장했는데 안 나온다" 가 반복됐다.
+                    설정 위치와 우선순위를 명시한다. 데이터·저장 동작은 바꾸지 않는다. */}
+                <div className="mb-3 rounded-lg border border-sky-100 bg-sky-50 px-3 py-2 text-[11px] leading-relaxed text-sky-900">
+                  <span className="font-semibold">어떤 목록이 재생되나요?</span>{' '}
+                  이 코너에 적용된 화면 세트의 <span className="font-medium">대기 화면</span> 설정이 우선합니다.
+                  세트가 <span className="font-medium">직접 선택한 미디어</span>를 쓰도록 설정돼 있으면 아래 목록 대신 그 미디어가 재생되고,
+                  <span className="font-medium">매장 대기 목록 사용</span>으로 돼 있으면 아래 목록이 재생됩니다.
+                  세트의 대기 화면 설정은 상단 <span className="font-medium">[태블릿 콘텐츠]</span> 탭에서 편집합니다.
+                  서비스 공통 영상은 두 경우 모두 맨 앞에 함께 재생됩니다.
+                </div>
                 <IdlePlaylistEditor
                   items={idleItems}
                   onChange={setIdleItems}
