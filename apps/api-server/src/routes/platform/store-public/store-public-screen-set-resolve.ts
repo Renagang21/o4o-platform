@@ -358,8 +358,11 @@ export async function resolveScreenSetSections(
         //   0 / 3 / 0 건으로 갈렸다. 아래 한 곳으로 모은다(계약·구현 모두 단일).
         //
         //   ② 코너 확정 + 진열 있음   → 진열 상품(supplier+local)      'corner_display'
-        //   ③ 코너 확정 + 진열 없음   → 그 코너의 legacy 집합          'corner_legacy_all'  [compatibility]
-        //   ④ 코너 미확정             → 상품 없음                      'none'
+        //   ③ 그 외(코너 미확정 · 진열 0행) → 상품 없음                 'none'
+        //
+        // WO-O4O-PHARMACYHUB-TABLET-CANONICAL-ADOPTION-AND-PUBLIC-KIOSK-CLOSURE-V1 §2:
+        //   진열 0행을 "매장 전체" 로 해석하던 compatibility 단(`corner_legacy_all`)을 폐기했다.
+        //   진열 0행 = 이 코너에 선택된 상품이 없음. 빈 설정을 암묵적 전체로 읽지 않는다.
         //
         //   코너 도출은 세 경로가 같다: tablet 은 자기 tabletContext, QR·preview 는
         //   **이 세트를 적용 중인 태블릿 역참조**(`resolveScreenSetAppliedTablet`, 정확히 1대일 때만).
@@ -367,7 +370,7 @@ export async function resolveScreenSetSections(
         //     미적용 세트의 QR 은 코너가 없어 ④ 로 0건 — 기존 금지선은 그대로 유지된다.
         const effectiveTablet =
           tabletContext ?? (await resolveScreenSetAppliedTablet(dataSource, set.id, input.organizationId));
-        if (!effectiveTablet) {
+        if (!effectiveTablet || !effectiveTablet.configured) {
           sections.push({ blockType: 'product_list', sortOrder: b.sortOrder, data: { ...EMPTY_PRODUCT_LIST_SECTION } });
           continue;
         }
@@ -380,14 +383,13 @@ export async function resolveScreenSetSections(
             storeSlug: input.storeSlug,
           },
           effectiveTablet.tabletId,
-          effectiveTablet.configured,
         );
         sections.push({
           blockType: 'product_list',
           sortOrder: b.sortOrder,
           data: {
             products: cornerProducts,
-            selectionMode: effectiveTablet.configured ? 'corner_display' : 'corner_legacy_all',
+            selectionMode: 'corner_display',
             localProductsEndpoint: input.storeSlug ? `/${input.storeSlug}/tablet/products` : null,
             selectedCount: 0,
             excludedCount: 0,

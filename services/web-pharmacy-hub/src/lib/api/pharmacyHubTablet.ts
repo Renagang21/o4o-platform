@@ -59,6 +59,21 @@ export function isTabletActive(t: StoreTablet): boolean {
   return t.is_active !== false;
 }
 
+/**
+ * WO-O4O-PHARMACYHUB-TABLET-CANONICAL-ADOPTION-AND-PUBLIC-KIOSK-CLOSURE-V1 §6:
+ *   공개 kiosk URL 을 만들기 위한 매장 slug. 공통 라우터의 service-neutral endpoint 를 쓴다
+ *   (`platform_store_slugs` 기준 — 공개 런타임·미리보기와 같은 출처).
+ *   slug 가 없으면 null → 호출부가 "실행 주소를 만들 수 없음" 으로 표시한다.
+ */
+export async function fetchStoreRuntimeInfo(): Promise<{ slug: string | null; serviceKey: string | null }> {
+  const res = await api.get(`${BASE}/store-runtime-info`);
+  const data = unwrap<{ slug: string | null; serviceKey: string | null }>(
+    res.data,
+    '매장 실행 정보를 불러오지 못했습니다.',
+  );
+  return { slug: data?.slug ?? null, serviceKey: data?.serviceKey ?? null };
+}
+
 export async function fetchTablets(): Promise<StoreTablet[]> {
   const res = await api.get(`${BASE}/tablets`);
   const data = unwrap<any>(res.data, '태블릿 목록을 불러오지 못했습니다.');

@@ -519,14 +519,19 @@ export function TabletKioskPage({
   //
   // WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §3:
   //   서버가 product_list 4단 계약을 단일 resolver 로 확정하게 되면서, 'selected' 외에
-  //   'corner_display'(코너 진열) · 'corner_legacy_all'(코너 legacy 집합) 도 **서버가 확정한 목록**이다.
-  //   셋 다 자체 조회 대신 이 목록을 쓴다 — 그래야 kiosk 가 preview·QR 과 같은 집합·순서를 본다.
+  //   'corner_display'(코너 진열) 도 **서버가 확정한 목록**이다.
   //   서버 집합은 `/tablet/products` 와 같은 소스·필터·정렬(supplier→local)이라 결과가 동일하다.
-  //   'none'(코너 미확정) 과 표식 없음(legacy·세트 미적용) 은 기존대로 자체 조회한다(회귀 0).
+  //
+  // WO-O4O-PHARMACYHUB-TABLET-CANONICAL-ADOPTION-AND-PUBLIC-KIOSK-CLOSURE-V1 §2:
+  //   `'none'`(0건) 도 **서버가 확정한 결과**로 신뢰한다. 여기서 자체 조회로 되돌아가면
+  //   폐기한 "진열 0행 → 매장 전체" 암묵적 fallback 이 클라이언트에서 되살아난다.
+  //   자체 조회는 **product_list 섹션 자체가 없을 때**(세트 미적용 legacy 태블릿)로만 남는다.
   const selectedSectionProducts = (() => {
-    const d = (screen?.sections ?? []).find((x) => x.blockType === 'product_list')?.data as any;
+    const section = (screen?.sections ?? []).find((x) => x.blockType === 'product_list');
+    if (!section) return null;
+    const d = section.data as any;
     const mode = d?.selectionMode;
-    if (mode !== 'selected' && mode !== 'corner_display' && mode !== 'corner_legacy_all') return null;
+    if (mode !== 'selected' && mode !== 'corner_display' && mode !== 'none') return null;
     return Array.isArray(d.products) ? (d.products as any[]).map(mapSectionProduct) : [];
   })();
 

@@ -15,30 +15,32 @@
  *   이 파일은 그 분기를 하나로 모은다.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * canonical 계약 (4단) — 세 경로가 **같은 순서로 같은 집합**을 얻는다
+ * canonical 계약 (3단) — 세 경로가 **같은 순서로 같은 집합**을 얻는다
  *
- *   ① 명시 선택(config.products)               → 저장된 목록·순서          selectionMode='selected'
- *   ② 코너 확정 + 진열 있음                     → store_tablet_displays 순서 selectionMode='corner_display'
- *   ③ 코너 확정 + 진열 없음 (COMPATIBILITY)     → 그 코너의 legacy 집합      selectionMode='corner_legacy_all'
- *   ④ 코너 미확정                               → 상품 없음                 selectionMode='none'
+ *   ① 명시 선택(config.products)   → 저장된 목록·순서          selectionMode='selected'
+ *   ② 코너 확정 + 진열 있음         → store_tablet_displays 순서 selectionMode='corner_display'
+ *   ③ 그 외                         → 상품 없음                 selectionMode='none'
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * ③ 은 canonical 이 아니라 **명시적 compatibility 단**이다 (실측 기반 결정)
+ * 암묵적 "매장 전체" fallback 폐기 (WO-O4O-PHARMACYHUB-...-PUBLIC-KIOSK-CLOSURE-V1 §2)
  *
- *   프로덕션(2026-09-08): 세트가 적용된 코너 5개 중 3개가 진열 0행이며,
- *   현재 그 3개는 태블릿에서 **매장 전체 supplier 18건**을 그대로 보여주고 있다
- *   (`queryTabletVisibleProducts(configured:false)` = legacy fallback).
+ *   직전 회차는 진열 0행 코너를 `corner_legacy_all`(그 코너의 매장 전체 집합)로 두어
+ *   드리프트만 없앴다. 이번 회차에서 그 단을 **폐기**한다. 확정 근거:
  *
- *   여기서 ③ 을 없애면 그 3개 코너의 상품이 18 → 0 으로 **운영 화면이 즉시 바뀐다**.
- *   그래서 제거하지 않고, 대신 **세 경로에 똑같이 적용**해 드리프트만 없앤다.
- *   즉 "QR 이 매장 전체로 자동 확장" 하는 것이 아니라 **QR 이 자기 코너 태블릿과 똑같이** 보인다.
+ *     진열 0행 ≠ "매장 전체 상품을 보여달라" 는 의사표시
+ *     진열 0행 = 이 코너에 명시적으로 선택된 상품이 없음
  *
- *   `WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1` §5 가 막은 두 가지 유입은 그대로 막힌다:
- *     - 미적용 세트의 QR → 코너 미확정 → ④ 상품 0건
+ *   빈 설정을 암묵적으로 전체 상품으로 해석하면 preview/tablet/QR 에 숨은 fallback 이 다시 생긴다.
+ *   현재 문제의 상당 부분이 그런 과거 fallback 에서 나왔다.
+ *   "매장 전체" 가 실제로 필요해지면 **명시적 selection mode**(예: `all_products`)로만 표현한다 —
+ *   지금은 필요성이 확인되지 않아 신설하지 않는다.
+ *
+ *   `WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1` §5 가 막은 유입은 그대로 막힌다:
+ *     - 미적용 세트의 QR → 코너 미확정 → ③ 상품 0건
  *     - 다른 코너의 상품 → 코너별 진열/문맥으로만 해석
  *
- *   ③ 의 퇴장 조건: 해당 코너에 진열을 채우거나 세트에 상품을 명시 선택하면 자동으로 ①·② 로 올라간다.
- *   ③ 을 canonical 로 승격하지 않는다(코너 구분이 상품에 반영되지 않는 상태이므로).
+ *   ⚠️ 공개 `/tablet/products` 는 **Screen Set 이전 세대**(세트 미적용 태블릿·KCos/GP kiosk)의
+ *      계약이라 이 폐기 대상이 아니다. 여기서 정하는 것은 **Screen Set product_list 계약**이다.
  *
  *   ②의 코너는 세 경로가 **같은 방식**으로 도출한다(`resolveScreenSetAppliedTablet`):
  *     - tablet runtime : URL 의 tabletId · 없으면 first_active (기존 계약 유지)
@@ -59,11 +61,17 @@
 import type { DataSource } from 'typeorm';
 import { queryTabletVisibleProducts, resolveServiceKeys, sanitizePublishableTranslations } from './store-public-utils.js';
 
-export type ProductListSelectionMode = 'selected' | 'corner_display' | 'corner_legacy_all' | 'none';
+export type ProductListSelectionMode = 'selected' | 'corner_display' | 'none';
 
-/** 소비처가 "서버가 이미 상품을 확정했는가" 를 판정하는 단일 술어. */
+/**
+ * 소비처가 "서버가 이미 상품을 확정했는가" 를 판정하는 단일 술어.
+ *
+ * `'none'` 도 **서버가 확정한 결과(0건)** 다 — 소비처가 자체 조회로 되돌아가면
+ * 폐기한 암묵적 fallback 이 클라이언트 쪽에서 되살아난다.
+ * 자체 조회는 product_list 섹션 자체가 없을 때(=세트 미적용 legacy 태블릿)로만 남는다.
+ */
 export function isServerResolvedProductList(mode: unknown): boolean {
-  return mode === 'selected' || mode === 'corner_display' || mode === 'corner_legacy_all';
+  return mode === 'selected' || mode === 'corner_display' || mode === 'none';
 }
 
 export interface ProductListSectionData extends Record<string, unknown> {
@@ -128,27 +136,25 @@ export async function resolveScreenSetAppliedTablet(
 }
 
 /**
- * ②·③ 코너 기준 상품 — supplier(게이트 통과분) + local.
+ * ② 코너 진열 상품 — supplier(게이트 통과분) + local, **진열 순서**.
  *
- * `configured=true`  → 그 코너 진열(`store_tablet_displays`)만, 진열 순서.
- * `configured=false` → 그 코너의 legacy 집합(매장 전체), 기본 순서. **compatibility 단(③)**.
+ * 진열(`store_tablet_displays`)에 있는 것만 담는다. 진열이 비면 호출부가 ③(0건)으로 간다 —
+ * 이 함수는 "매장 전체" 를 만들 수 있는 경로를 갖지 않는다(암묵적 fallback 구조적 차단).
  *
- * 두 경우 모두 공개 `/tablet/products` 와 **같은 소스·같은 필터·같은 정렬**을 쓴다.
- * kiosk 가 이 섹션을 쓰든 자체 조회를 하든 결과가 같아야 회귀 0 이다.
+ * 공개 `/tablet/products` 의 configured 분기와 **같은 소스·필터·정렬**을 쓰고,
  * 병합 순서도 kiosk 와 동일하게 **supplier → local**.
  */
 export async function resolveCornerProducts(
   dataSource: DataSource,
   ctx: ProductListResolveContext,
   tabletId: string,
-  configured: boolean,
 ): Promise<any[]> {
   // supplier — 기존 공개 목록 쿼리 그대로(4중 가시성 게이트 · configured 진열 제한 · disp.sort_order).
   const supplierResult: any = await queryTabletVisibleProducts(
     dataSource,
     ctx.storeId,
     resolveServiceKeys(ctx.serviceKey),
-    { page: 1, limit: 50, sort: 'sort_order', order: 'asc', firstTabletId: tabletId, configured },
+    { page: 1, limit: 50, sort: 'sort_order', order: 'asc', firstTabletId: tabletId, configured: true },
   );
   const suppliers = supplierResult?.data ?? [];
 
@@ -177,8 +183,8 @@ export async function resolveCornerProducts(
           LIMIT 1
        ) tc ON true
       WHERE lp.organization_id = $1 AND lp.is_active = true
-        ${configured ? 'AND disp.id IS NOT NULL' : ''}
-      ORDER BY ${configured ? 'disp.sort_order ASC NULLS LAST, lp.name ASC' : 'lp.sort_order ASC, lp.name ASC'}`,
+        AND disp.id IS NOT NULL
+      ORDER BY disp.sort_order ASC NULLS LAST, lp.name ASC`,
     [ctx.organizationId, tabletId],
   );
   for (const row of locals) {

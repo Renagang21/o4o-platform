@@ -176,15 +176,20 @@ describe('§6·§9 product_list 계약과 세 경로 동일성', () => {
   it('코너를 특정할 수 없으면 매장 전체 상품으로 폴백하지 않는다 (미적용 세트 QR = 0건)', () => {
     const src = stripComments(read(PUBLIC_RESOLVE));
     expect(src).toContain('EMPTY_PRODUCT_LIST_SECTION');
-    expect(src).toContain('if (!effectiveTablet)');
+    // WO-O4O-PHARMACYHUB-...-PUBLIC-KIOSK-CLOSURE-V1 §2:
+    //   코너 미확정 **또는 진열 0행** 이면 상품 0건. 조건이 둘 다 들어가야 한다.
+    expect(src).toContain('!effectiveTablet || !effectiveTablet.configured');
     // 코너 미확정 상태에서 매장 전체 조회로 새는 경로가 없어야 한다.
-    expect(src).not.toMatch(/if\s*\(\s*!effectiveTablet\s*\)\s*\{[^}]*queryTabletVisibleProducts/);
+    expect(src).not.toMatch(/if\s*\(\s*!effectiveTablet[^)]*\)\s*\{[^}]*queryTabletVisibleProducts/);
   });
 
   it('코너 tier 는 selectionMode 로 출처를 표시한다 (어느 단을 통해 왔는지 구분 가능)', () => {
     const src = stripComments(read(PUBLIC_RESOLVE));
     expect(src).toContain("'corner_display'");
-    expect(src).toContain("'corner_legacy_all'");
+    // WO-O4O-PHARMACYHUB-...-PUBLIC-KIOSK-CLOSURE-V1 §2: 진열 0행은 'none'(0건) 이다.
+    //   `corner_legacy_all`(암묵적 매장 전체)은 폐기됐고 되살아나면 안 된다.
+    expect(src).toContain('EMPTY_PRODUCT_LIST_SECTION');
+    expect(src).not.toContain("selectionMode: 'corner_legacy_all'");
     // 명시 선택 tier 는 공용 함수가 'selected' 를 부여한다.
     expect(stripComments(read(PUBLIC_RESOLVE))).toContain('resolveSelectedProductListSection');
   });

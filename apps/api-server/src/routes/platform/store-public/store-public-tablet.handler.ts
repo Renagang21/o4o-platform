@@ -538,7 +538,17 @@ export function createStorePublicTabletRoutes(deps: {
         viewerLanguage,
       }, createStoreContentSourceAdapter(dataSource));
       if (!resolvedSet) {
-        res.json({ success: true, data: { mode: 'legacy', tabletId, tabletSource: displaySource.source, note: 'applied screen set unavailable → legacy fallback' } });
+        res.json({
+          success: true,
+          data: {
+            mode: 'legacy',
+            tabletId,
+            tabletSource: displaySource.source,
+            // WO-O4O-PHARMACYHUB-...-PUBLIC-KIOSK-CLOSURE-V1 §7: 아래 screen_set 응답과 같은 격리 축.
+            serviceKey: resolved.serviceKey,
+            note: 'applied screen set unavailable → legacy fallback',
+          },
+        });
         return;
       }
 
@@ -546,6 +556,11 @@ export function createStorePublicTabletRoutes(deps: {
         success: true,
         data: {
           mode: 'screen_set',
+          // WO-O4O-PHARMACYHUB-TABLET-CANONICAL-ADOPTION-AND-PUBLIC-KIOSK-CLOSURE-V1 §7:
+          //   이 공개 endpoint 는 service-neutral 이라 slug 만 맞으면 어떤 서비스의 매장도 해석된다.
+          //   서비스별 kiosk 셸이 **자기 서비스 매장인지 확인**할 수 있도록 slug 의 service_key 를
+          //   additive 로 함께 내려준다(기존 소비처는 무시 → 동작 불변).
+          serviceKey: resolved.serviceKey,
           templateKey: resolvedSet.set.templateKey,
           screenSet: { id: resolvedSet.set.id, name: resolvedSet.set.name },
           // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: 코너 화면(대기/메인)의 상시 QR 표시용.

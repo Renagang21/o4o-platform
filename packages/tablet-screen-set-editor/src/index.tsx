@@ -1656,3 +1656,15 @@ export type {
   TabletCornerBoardLabels,
   TabletCornerBoardAccent,
 } from './TabletCornerBoard';
+
+// WO-O4O-PHARMACYHUB-TABLET-CANONICAL-ADOPTION-AND-PUBLIC-KIOSK-CLOSURE-V1 §3:
+//   코너 화면 교체 다이얼로그(운영 B). 순수 표시 — 적용 실행은 호출부 adapter 가 한다.
+export {
+  TabletScreenSetSwapDialog,
+  DEFAULT_SWAP_DIALOG_LABELS,
+} from './TabletScreenSetSwapDialog';
+export type {
+  TabletScreenSetSwapDialogProps,
+  SwapDialogScreenSet,
+  TabletScreenSetSwapDialogLabels,
+} from './TabletScreenSetSwapDialog';

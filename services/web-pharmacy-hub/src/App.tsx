@@ -252,6 +252,8 @@ import SignagePlaybackPage from './pages/store-owner/SignagePlaybackPage';
 import ManualsPage from './pages/store-owner/ManualsPage';
 import ManualDetailPage from './pages/store-owner/ManualDetailPage';
 import QrLandingPage from './pages/QrLandingPage';
+// WO-O4O-PHARMACYHUB-TABLET-CANONICAL-ADOPTION-AND-PUBLIC-KIOSK-CLOSURE-V1 §6: 공개 태블릿 runtime
+import TabletStorePage from './pages/tablet/TabletStorePage';
 // WO-O4O-WEB-CATCH-ALL-ROUTE-CROSS-SERVICE-V1 — 없는 경로 404 안내 (redirect 아님)
 import NotFoundPage from './pages/NotFoundPage';
 // WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1 — 태블릿 · 화면 세트
@@ -814,6 +816,21 @@ export default function App() {
             로그인·매장 셸을 요구하지 않는다.
           */}
           <Route path="/qr/:slug" element={<QrLandingPage />} />
+
+          {/*
+            WO-O4O-PHARMACYHUB-TABLET-CANONICAL-ADOPTION-AND-PUBLIC-KIOSK-CLOSURE-V1 §6
+
+            공개 태블릿 runtime(kiosk). PH 최대 adoption gap 이었다 —
+            화면 세트를 만들고 코너에 적용해도 **재생할 URL 이 없었다**.
+
+            canonical URL 계약(KPA 와 같은 의미):
+              /tablet/:slug              → 그 매장 태블릿 (tabletId 없음 = first_active)
+              /tablet/:slug?tabletId=…   → 그 코너 태블릿
+
+            무인증·매장 셸 없음(소비자/매장 기기가 그대로 여는 화면).
+            화면 본체는 공통 @o4o/tablet-kiosk-core, 데이터는 공통 공개 endpoint 를 쓴다.
+          */}
+          <Route path="/tablet/:slug" element={<TabletStorePage />} />
 
           {/*
             공개 다국어 상품 안내 랜딩 (WO-O4O-PHARMACYHUB-...-PARITY-CLOSURE-V1 §8 #76)

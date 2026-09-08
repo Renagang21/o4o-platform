@@ -342,6 +342,36 @@ export function createStoreTabletRoutes(
     };
   }
 
+  // ─── Store runtime info ────────────────────────────
+
+  /**
+   * GET /store-runtime-info
+   *
+   * WO-O4O-PHARMACYHUB-TABLET-CANONICAL-ADOPTION-AND-PUBLIC-KIOSK-CLOSURE-V1 §3·§6
+   *   태블릿 **실행 주소**(공개 kiosk URL)를 만들려면 매장 slug 가 필요하다.
+   *   KPA 는 서비스 전용 `/pharmacy/info` 에서 얻고 있었는데, 그건 KPA 에만 있는 경로다.
+   *   공통 라우터에 service-neutral 한 조회를 두어 어느 서비스든 같은 방식으로 얻게 한다.
+   *
+   *   공개 태블릿 런타임·미리보기와 **같은 기준**(`platform_store_slugs`)을 쓴다 —
+   *   slug 가 없으면 null 로 내려 호출부가 "실행 주소를 만들 수 없음" 을 정확히 표시한다.
+   *   read-only. 신규 테이블·migration 0.
+   */
+  router.get('/store-runtime-info', withStoreAuth(async (_req, res, organizationId) => {
+    const rows = await dataSource.query(
+      `SELECT slug, service_key AS "serviceKey" FROM platform_store_slugs
+        WHERE store_id = $1 AND is_active = true
+        ORDER BY updated_at DESC NULLS LAST LIMIT 1`,
+      [organizationId],
+    );
+    res.json({
+      success: true,
+      data: {
+        slug: rows?.[0]?.slug ?? null,
+        serviceKey: rows?.[0]?.serviceKey ?? null,
+      },
+    });
+  }));
+
   // ─── Tablet CRUD ───────────────────────────────────
 
   /**
@@ -1830,7 +1860,8 @@ export function createStoreTabletRoutes(
             //   preview 0 / tablet 3 / QR 0 건으로 갈렸다(CONTRACT_DRIFT).
             //   이제 공개 경로와 **같은 4단 계약**을 쓴다 — 코너를 특정할 수 있으면 그 코너와 동일,
             //   특정할 수 없으면(미저장 draft·미적용 세트) 상품 없음.
-            if (!previewTablet) {
+            // §2: 진열 0행 코너도 상품 0 — 미리보기가 실제 화면보다 많이 보여주지 않는다.
+            if (!previewTablet || !previewTablet.configured) {
               sections.push({ blockType: bt, sortOrder: order++, data: { ...EMPTY_PRODUCT_LIST_SECTION } });
               continue;
             }
@@ -1838,14 +1869,13 @@ export function createStoreTabletRoutes(
               dataSource,
               { organizationId, storeId: organizationId, serviceKey: previewServiceKey, storeSlug: previewStoreSlug },
               previewTablet.tabletId,
-              previewTablet.configured,
             );
             sections.push({
               blockType: bt,
               sortOrder: order++,
               data: {
                 products: previewProducts,
-                selectionMode: previewTablet.configured ? 'corner_display' : 'corner_legacy_all',
+                selectionMode: 'corner_display',
                 localProductsEndpoint: previewStoreSlug ? `/${previewStoreSlug}/tablet/products` : null,
                 selectedCount: 0,
                 excludedCount: 0,

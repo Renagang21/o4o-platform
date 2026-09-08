@@ -12,7 +12,18 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { TabletContentStepBuilder, type ScreenSet, type ScreenSetDetail } from '@o4o/tablet-screen-set-editor';
+// WO-O4O-PHARMACYHUB-TABLET-CANONICAL-ADOPTION-AND-PUBLIC-KIOSK-CLOSURE-V1 §3:
+//   저작(A)에 이어 **운영(B)** 도 공통 Core 를 그대로 채택한다. PH 전용 Tablet Core 를 만들지 않는다.
+import {
+  TabletContentStepBuilder,
+  TabletCornerBoard,
+  TabletScreenSetSwapDialog,
+  cornerPrimaryLabel,
+  templateLabel,
+  type ScreenSet,
+  type ScreenSetDetail,
+} from '@o4o/tablet-screen-set-editor';
+import { buildPharmacyHubKioskUrl } from '../../lib/tabletKioskUrl';
 import {
   fetchTablets,
   createTablet,
@@ -24,11 +35,22 @@ import {
   fetchScreenSetDetail,
   archiveScreenSet,
   fetchScreenSetProductPool,
+  fetchStoreRuntimeInfo,
   pharmacyHubScreenSetApi,
   isTabletActive,
   type StoreTablet,
 } from '../../lib/api/pharmacyHubTablet';
 import { StoreConnectionNotice, type StoreConnectionState } from '../../components/store-owner/StoreConnectionNotice';
+
+/** PH 브랜드 accent — Core 는 색을 모른다(§6 Core/Adapter 경계). */
+const PH_TABLET_ACCENT = {
+  icon: 'text-blue-600',
+  addButton: 'text-blue-700 border-blue-200 hover:bg-blue-50',
+  cardHover: 'hover:border-blue-200',
+  swapButton: 'bg-blue-600 hover:bg-blue-700',
+  templateText: 'text-blue-600',
+  emptyButton: 'bg-blue-600 hover:bg-blue-700',
+};
 
 /** 매장 미연결·모호는 공통 라우터가 409 로 내려준다 — 그 코드로 안내 상태를 만든다. */
 function connectionFromError(e: any): StoreConnectionState | null {
@@ -46,6 +68,10 @@ export default function StoreOwnerTabletsPage() {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<{ detail: ScreenSetDetail | null } | null>(null);
   const [creatingTablet, setCreatingTablet] = useState(false);
+  /** 코너 화면 교체 — 공통 다이얼로그(운영 B). */
+  const [swapTarget, setSwapTarget] = useState<{ id: string; name: string; currentSetId: string | null } | null>(null);
+  /** §6: 공개 kiosk 실행 주소용 매장 slug. 없으면 '실제 화면 열기' 를 잠근다. */
+  const [storeSlug, setStoreSlug] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -75,12 +101,23 @@ export default function StoreOwnerTabletsPage() {
     load();
   }, [load]);
 
-  /**
+  useEffect(() => {
+    let cancelled = false;
+    fetchStoreRuntimeInfo()
+      .then((info) => { if (!cancelled) setStoreSlug(info.slug); })
+      .catch(() => { /* 실행 주소만 못 만든다 — 목록·편집은 계속 동작한다. */ });
+    return () => { cancelled = true; };
+  }, []);
+
+  /*
    * 적용 가능한 화면 세트 = status 'active' 만.
    * 서버가 draft 적용을 409(SCREEN_SET_NOT_ACTIVE)로 막으므로, 고를 수 없는 것을 목록에
    * 올려두고 실패시키지 않는다(실측으로 확인한 제약).
+   *
+   * WO-O4O-PHARMACYHUB-TABLET-CANONICAL-ADOPTION-AND-PUBLIC-KIOSK-CLOSURE-V1 §3:
+   *   이 필터는 인라인 select 를 없애면서 공통 교체 다이얼로그의 `disabledReason` 으로 옮겼다 —
+   *   목록에서 감추는 대신 "제작을 마치면 적용할 수 있습니다" 사유를 보여준다(정보 손실 0).
    */
-  const applicableSets = screenSets.filter((s) => s.status === 'active');
 
   const act = async (fn: () => Promise<unknown>, confirmMessage?: string) => {
     if (confirmMessage && !window.confirm(confirmMessage)) return;
@@ -159,78 +196,60 @@ export default function StoreOwnerTabletsPage() {
         <p className="text-sm text-gray-500">불러오는 중…</p>
       ) : (
         <>
-          {/* ── 태블릿 ── */}
+          {/* ── 태블릿(코너) ── 공통 운영 Core 채택 (§3)
+              KPA 와 같은 코너 현황판을 쓴다. PH 는 adapter(데이터·콜백·라벨·accent)만 준다.
+              기존 인라인 목록(li + select + 이름수정/내리기)은 Core 카드 + 교체 다이얼로그로 대체했다.
+              태블릿 이름 수정·내리기는 코너 상세 축이 없는 PH 에서 카드 하단 보조 액션으로 남긴다. */}
           <section className="mb-8">
-            <h2 className="mb-2 text-sm font-semibold text-gray-700">등록된 태블릿</h2>
-            {tablets.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-gray-300 px-6 py-10 text-center">
-                <p className="text-sm font-medium text-gray-600">등록된 태블릿이 없습니다.</p>
-                <p className="mt-2 text-sm text-gray-400">
-                  "태블릿 등록" 으로 매장에 둘 기기를 위치별로 추가하세요.
-                </p>
-              </div>
-            ) : (
-              <ul className="divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white">
+            <TabletCornerBoard
+              tablets={tablets}
+              screenSetInfo={(setId) => {
+                const s = screenSets.find((x) => x.id === setId);
+                return s ? { name: s.name, templateLabel: templateLabel(s.templateKey) } : null;
+              }}
+              onOpenDetail={(id) => {
+                const t = tablets.find((x) => x.id === id);
+                if (t) setSwapTarget({ id: t.id, name: cornerPrimaryLabel(t), currentSetId: t.currentScreenSetId ?? null });
+              }}
+              onSwap={(t) =>
+                setSwapTarget({ id: t.id, name: cornerPrimaryLabel(t), currentSetId: t.currentScreenSetId ?? null })
+              }
+              onPreview={(id) => {
+                // §6: PH public kiosk 가 개통돼 "실제 화면 열기" 가 곧 미리보기다.
+                window.open(buildPharmacyHubKioskUrl(storeSlug, id), '_blank', 'noopener');
+              }}
+              previewDisabled={!storeSlug}
+              onAddTablet={() => setCreatingTablet(true)}
+              accent={PH_TABLET_ACCENT}
+              labels={{ preview: '실제 화면 열기' }}
+            />
+            {tablets.length > 0 && (
+              <ul className="mt-3 flex flex-wrap gap-2">
                 {tablets.map((t) => (
-                  <li key={t.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-gray-900">{t.name}</p>
-                      <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-400">
-                        {t.location && <span>{t.location}</span>}
-                        {t.currentScreenSetId ? (
-                          <span className="rounded bg-green-50 px-1.5 py-0.5 text-green-700">
-                            적용 중: {screenSets.find((s) => s.id === t.currentScreenSetId)?.name ?? '화면 세트'}
-                          </span>
-                        ) : (
-                          <span className="rounded bg-gray-100 px-1.5 py-0.5 text-gray-600">미적용</span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
-                      {applicableSets.length > 0 && (
-                        <select
-                          aria-label={`${t.name} 화면 세트 적용`}
-                          value={t.currentScreenSetId ?? ''}
-                          onChange={(e) =>
-                            act(() =>
-                              e.target.value
-                                ? applyCurrentScreenSet(t.id, e.target.value)
-                                : clearCurrentScreenSet(t.id),
-                            )
-                          }
-                          className="rounded-md border border-gray-200 px-2 py-1.5 text-xs"
-                        >
-                          <option value="">— 적용 안 함 —</option>
-                          {applicableSets.map((s) => (
-                            <option key={s.id} value={s.id}>
-                              {s.name}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const name = window.prompt('태블릿 이름', t.name);
-                          if (name && name.trim()) act(() => updateTablet(t.id, { name: name.trim() }));
-                        }}
-                        className="rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
-                      >
-                        이름 수정
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          act(
-                            () => deactivateTablet(t.id),
-                            `"${t.name}" 태블릿을 목록에서 내릴까요? 저장된 화면 세트는 남습니다.`,
-                          )
-                        }
-                        className="rounded-md border border-gray-200 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50"
-                      >
-                        내리기
-                      </button>
-                    </div>
+                  <li key={t.id} className="flex items-center gap-1 text-xs text-gray-400">
+                    <span className="truncate">{cornerPrimaryLabel(t)}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const name = window.prompt('태블릿 이름', t.name);
+                        if (name && name.trim()) act(() => updateTablet(t.id, { name: name.trim() }));
+                      }}
+                      className="rounded border border-gray-200 px-2 py-0.5 text-gray-600 hover:bg-gray-50"
+                    >
+                      이름 수정
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        act(
+                          () => deactivateTablet(t.id),
+                          `"${t.name}" 태블릿을 목록에서 내릴까요? 저장된 화면 세트는 남습니다.`,
+                        )
+                      }
+                      className="rounded border border-gray-200 px-2 py-0.5 text-red-600 hover:bg-red-50"
+                    >
+                      내리기
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -297,6 +316,27 @@ export default function StoreOwnerTabletsPage() {
             )}
           </section>
         </>
+      )}
+
+      {/* §3: 코너 화면 교체 — 공통 다이얼로그. 적용/해제 실행만 PH adapter 가 한다. */}
+      {swapTarget && (
+        <TabletScreenSetSwapDialog
+          cornerName={swapTarget.name}
+          currentSetId={swapTarget.currentSetId}
+          accentButton="bg-blue-600 hover:bg-blue-700"
+          sets={screenSets.map((s) => ({
+            id: s.id,
+            name: s.name,
+            templateLabel: templateLabel(s.templateKey),
+            disabledReason: s.status === 'active' ? null : '제작을 마치면 적용할 수 있습니다.',
+          }))}
+          onApply={async (setId) => {
+            const target = swapTarget;
+            setSwapTarget(null);
+            await act(() => (setId ? applyCurrentScreenSet(target.id, setId) : clearCurrentScreenSet(target.id)));
+          }}
+          onClose={() => setSwapTarget(null)}
+        />
       )}
 
       {creatingTablet && (
