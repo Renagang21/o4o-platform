@@ -20,3 +20,8 @@ export {
   DEFAULT_WORKSPACE,
 } from './routeWorkspaceMap';
 export { resolveWorkScope, type ResolveWorkScopeInput } from './resolveWorkScope';
+
+// WO-O4O-WORK-SCOPE-STORE-RESOLUTION-V0
+export { STORE_SCOPED_WORKSPACES } from './types';
+export { fetchStoreResolution, type StoreResolutionResult } from './storeResolutionApi';
+export { mergeStoreResolution, shouldResolveStore } from './mergeStoreResolution';

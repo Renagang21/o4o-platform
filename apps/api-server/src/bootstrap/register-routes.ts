@@ -953,6 +953,18 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Store Library routes:', storeLibraryError);
     }
 
+    // 31-d-2. Register Work Scope routes (WO-O4O-WORK-SCOPE-STORE-RESOLUTION-V0)
+    //   cross-service read-only scope 해석. serviceKey 가 파라미터라 특정 서비스
+    //   membership 가드를 걸지 않고 핸들러가 요청 serviceKey 로 직접 확인한다.
+    try {
+      const { createWorkScopeRoutes } = await import('../routes/work-scope.routes.js');
+      const { requireAuth: workScopeAuth } = await import('../middleware/auth.middleware.js');
+      app.use('/api/v1/work-scope', createWorkScopeRoutes(dataSource, workScopeAuth as any));
+      logger.info('✅ Work Scope routes registered at /api/v1/work-scope');
+    } catch (workScopeError) {
+      logger.error('Failed to register Work Scope routes:', workScopeError);
+    }
+
     // 31-e. Register Store Product Library routes (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1)
     try {
       const { createStoreProductLibraryController } = await import(
