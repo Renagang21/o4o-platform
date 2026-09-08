@@ -58,7 +58,10 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
     // 신상신고는 로그인 회원만 쓸 수 있다. 메뉴 노출은 UX 안내일 뿐이고
     // 실제 경계는 backend 의 member 스코프 + 분회 축 가드가 판정한다.
     ...(isAuthenticated
-      ? [{ to: `${basePath}/mypage/annual-report`, label: '신상신고', end: false }]
+      ? [
+          { to: `${basePath}/mypage/annual-report`, label: '신상신고', end: false },
+          { to: `${basePath}/mypage/fees`, label: '내 회비', end: false },
+        ]
       : []),
   ];
 
@@ -67,6 +70,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
     { to: `${basePath}/operator/posts`, label: '글 관리' },
     { to: `${basePath}/operator/domains`, label: '도메인 연결' },
     { to: `${basePath}/operator/annual-reports`, label: '신상신고 검수' },
+    { to: `${basePath}/operator/fees`, label: '회비 관리' },
   ];
 
   // 존재하지 않는 분회는 셸(헤더·메뉴·푸터)을 그리지 않는다 — 유효한 분회처럼 보이면 안 된다.

@@ -105,6 +105,8 @@ export class MemberAnnualReportController {
     const association = await AnnualReportService.resolveAssociationValues(template, {
       organizationId,
       year: template.year,
+      // 회비구분은 회원별 원장에서 읽는다 (WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1)
+      userId,
     });
 
     /**
@@ -181,6 +183,8 @@ export class MemberAnnualReportController {
     const association = await AnnualReportService.resolveAssociationValues(template, {
       organizationId,
       year: template.year,
+      // 회비구분은 회원별 원장에서 읽는다 (WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1)
+      userId,
     });
 
     const values = { ...(existing?.values ?? {}), ...accepted, ...association.values };
@@ -255,6 +259,8 @@ export class MemberAnnualReportController {
     const association = await AnnualReportService.resolveAssociationValues(template, {
       organizationId,
       year: template.year,
+      // 회비구분은 회원별 원장에서 읽는다 (WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1)
+      userId,
     });
 
     const now = new Date();

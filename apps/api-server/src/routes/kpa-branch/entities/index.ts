@@ -31,3 +31,7 @@ export type {
 // WO-O4O-KPA-BRANCH-ANNUAL-REPORT-SUBMISSION-V1
 export { AnnualReport } from './annual-report.entity.js';
 export type { AnnualReportStatus, AnnualReportValues } from './annual-report.entity.js';
+// WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1
+export { BranchFeePolicy } from './branch-fee-policy.entity.js';
+export { BranchFeeLedger, OPERATOR_SETTABLE_FEE_STATUSES } from './branch-fee-ledger.entity.js';
+export type { BranchFeeStatus } from './branch-fee-ledger.entity.js';

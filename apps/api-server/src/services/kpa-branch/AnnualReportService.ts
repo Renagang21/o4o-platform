@@ -20,6 +20,8 @@ import type {
   AnnualReportRule,
 } from '../../routes/kpa-branch/entities/annual-report-template.entity.js';
 import { KpaOrganization } from '../../routes/kpa-branch/entities/kpa-organization.entity.js';
+// WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1: 회비구분의 연결 원장
+import { BranchFeeService } from './BranchFeeService.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
@@ -187,7 +189,7 @@ export class AnnualReportService {
    */
   static async resolveAssociationValues(
     t: AnnualReportTemplate,
-    ctx: { organizationId: string; year: number },
+    ctx: { organizationId: string; year: number; userId?: string },
   ): Promise<{ values: AnnualReportValues; linkStatus: Record<string, AssociationLinkStatus> }> {
     const values: AnnualReportValues = {};
     const linkStatus: Record<string, AssociationLinkStatus> = {};
@@ -215,9 +217,34 @@ export class AnnualReportService {
         case 'submission.declaredAt':
           // 제출 시점에만 채운다 (draft 에서는 비운다)
           break;
+        case 'fee.category': {
+          /**
+           * WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1: 회비구분이 연결 원장을 얻었다.
+           *
+           * 원장 코드(A1_pharmacy_owner …)를 양식의 대분류 코드(A/B/C/D)로 옮긴다.
+           * 매핑이 성립하지 않으면 **추정하지 않고 미연결로 남긴다** — 갑/을/병/정 중
+           * 아무거나 고르는 것보다 비어 있는 편이 안전하다 (§4 가짜 값 금지).
+           *
+           * userId 가 없는 호출(양식 미리보기 등)에서는 조회하지 않는다.
+           */
+          if (!ctx.userId) {
+            values[f.key] = null;
+            linkStatus[f.key] = 'not_linked';
+            break;
+          }
+          const resolved = await BranchFeeService.resolveMemberFeeCategory({
+            organizationId: ctx.organizationId,
+            userId: ctx.userId,
+            year: ctx.year,
+          });
+          const code = BranchFeeService.toReportFeeCode(resolved.feeCategory);
+          values[f.key] = code;
+          linkStatus[f.key] = code ? 'resolved' : 'not_linked';
+          break;
+        }
         default:
           if (f.ownership === 'association') {
-            // 연수교육 평점·회비구분 — 연결 원장이 아직 없다 (W1 CHECK F2).
+            // 연수교육 평점 — 연결 원장이 아직 없다 (W1 CHECK F2).
             values[f.key] = null;
             linkStatus[f.key] = 'not_linked';
           }

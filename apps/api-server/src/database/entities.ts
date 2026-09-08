@@ -349,6 +349,9 @@ import {
   AnnualReportTemplate,
   // WO-O4O-KPA-BRANCH-ANNUAL-REPORT-SUBMISSION-V1
   AnnualReport,
+  // WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1
+  BranchFeePolicy,
+  BranchFeeLedger,
 } from '../routes/kpa-branch/entities/index.js';
 
 // ============================================================================
@@ -851,6 +854,9 @@ export const entities = [
   AnnualReportTemplate,
   // WO-O4O-KPA-BRANCH-ANNUAL-REPORT-SUBMISSION-V1
   AnnualReport,
+  // WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1
+  BranchFeePolicy,
+  BranchFeeLedger,
   // ============================================================================
   // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
   // ============================================================================

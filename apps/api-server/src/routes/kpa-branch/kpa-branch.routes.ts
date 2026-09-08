@@ -21,6 +21,12 @@
  *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/annual-reports/:reportId/approve            승인
  *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/annual-reports/:reportId/request-revision   보완요청
  *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/annual-reports/:reportId/sync   승인본 → 회원 원장 반영
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/me/fees                                     내 회비 원장 (회원)
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/fee-policies?year=                 연도 회비 정책
+ *   PUT    /api/v1/kpa-branch/branches/:branchSlug/operator/fee-policies/:year                 연도 정책 일괄 저장
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/fee-ledgers?year=&status=          회비 원장 목록
+ *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/fee-ledgers/assess                 연도 일괄 부과 (멱등)
+ *   PATCH  /api/v1/kpa-branch/branches/:branchSlug/operator/fee-ledgers/:ledgerId              부과·납부 개별 수정
  *   *      /api/v1/kpa-branch/admin/domains/**                               (admin scope)
  *   *      /api/v1/kpa-branch/admin/service-members/**                        (admin scope)  가입 승인
  *
@@ -50,6 +56,7 @@ import { BranchServiceMembershipController } from '../../controllers/kpa-branch/
 import { AnnualReportTemplateController } from '../../controllers/kpa-branch/AnnualReportTemplateController.js';
 import { OperatorAnnualReportController } from '../../controllers/kpa-branch/OperatorAnnualReportController.js';
 import { MemberAnnualReportController } from '../../controllers/kpa-branch/MemberAnnualReportController.js';
+import { BranchFeeController } from '../../controllers/kpa-branch/BranchFeeController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
@@ -185,6 +192,16 @@ export function createKpaBranchRoutes(): Router {
     wrap(MemberAnnualReportController.submit),
   );
 
+  // 내 회비 (WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1)
+  //
+  // 조회 전용이다. 회원이 자기 납부 상태를 바꿀 수 있는 경로는 만들지 않는다 —
+  // 납부 기록은 운영자가 확인한 사실이지 회원의 신고가 아니다.
+  router.get(
+    '/branches/:branchSlug/me/fees',
+    ...memberReportGuards,
+    wrap(BranchFeeController.myLedgers),
+  );
+
   // ── operator (서비스 축 + 분회 축 이중 가드) ──────────────────────────────
 
   const operatorGuards = [
@@ -269,6 +286,37 @@ export function createKpaBranchRoutes(): Router {
     '/branches/:branchSlug/operator/annual-reports/:reportId/sync',
     ...operatorGuards,
     wrap(OperatorAnnualReportController.sync),
+  );
+
+  // 연회비 정책 · 원장 (WO-O4O-KPA-BRANCH-ANNUAL-FEE-LEDGER-V1)
+  //
+  // 정책은 연도 단위 일괄 저장(PUT)이다. 항목 PATCH 를 만들지 않는다 — 정책은 표 한 장이고
+  // 부분 수정하면 화면과 DB 가 조용히 어긋난다.
+  // 원장 수정은 개별 PATCH 이며 status 를 받지 않는다 (금액에서 서버가 파생).
+  router.get(
+    '/branches/:branchSlug/operator/fee-policies',
+    ...operatorGuards,
+    wrap(BranchFeeController.listPolicies),
+  );
+  router.put(
+    '/branches/:branchSlug/operator/fee-policies/:year',
+    ...operatorGuards,
+    wrap(BranchFeeController.replacePolicies),
+  );
+  router.get(
+    '/branches/:branchSlug/operator/fee-ledgers',
+    ...operatorGuards,
+    wrap(BranchFeeController.listLedgers),
+  );
+  router.post(
+    '/branches/:branchSlug/operator/fee-ledgers/assess',
+    ...operatorGuards,
+    wrap(BranchFeeController.assess),
+  );
+  router.patch(
+    '/branches/:branchSlug/operator/fee-ledgers/:ledgerId',
+    ...operatorGuards,
+    wrap(BranchFeeController.updateLedger),
   );
 
   router.get('/branches/:branchSlug/operator/domains', ...operatorGuards, wrap(BranchDomainController.list));
