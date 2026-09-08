@@ -42,6 +42,19 @@ import {
 } from '../services/ai-prompts/qrDescription.js';
 // WO-O4O-AI-URL-TO-BLOCKS-YOUTUBE-SUPPORT-V1
 import { isYouTubeUrl, fetchYouTubeContent, fetchYouTubeOEmbed } from './ai-proxy/youtube-fetcher.js';
+// WO-O4O-COMMON-HOME-AI-INPUT-V0: O4O 공통 Home 중앙 입력 — 텍스트 질의응답 전용
+import { execute } from '@o4o/ai-core';
+import { dynamicLimiter } from '../middleware/rateLimiter.js';
+import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
+import {
+  validateHomeChatMessage,
+  homeChatValidationMessage,
+  buildHomeChatSystemPrompt,
+  buildHomeChatUserPrompt,
+  extractHomeChatAnswer,
+  sanitizeHomeChatError,
+  type VerifiedScopeFacts,
+} from '../services/ai-prompts/homeChat.js';
 
 const router: Router = Router();
 
@@ -1795,6 +1808,111 @@ router.post('/lesson-body', authenticate, async (req, res: Response) => {
       error: error.message || '레슨 본문 생성 중 오류가 발생했습니다.',
       requestId,
     });
+  }
+});
+
+// ===========================================
+// POST /api/ai/home-chat — O4O 공통 Home 중앙 입력 (텍스트 질의응답)
+// WO-O4O-COMMON-HOME-AI-INPUT-V0
+//
+// 계약:
+//   - TEXT RESPONSE ONLY. tool/function calling 없음, 실행 없음.
+//   - **DB write 0.** @o4o/ai-core execute() 는 저장 side-effect 가 없다.
+//     대화 내용은 서버에 남기지 않는다(§9·§41 conversation persistence 금지).
+//   - 클라이언트가 보낸 workScope 는 **요청 컨텍스트 힌트**일 뿐 권한 근거가 아니다.
+//     serviceKey/workspace 만 받아 서버가 membership·store 를 다시 확정한다.
+//     클라이언트의 organizationId/storeId 는 읽지도, 프롬프트에 넣지도 않는다.
+// ===========================================
+router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
+  const authReq = req as AuthRequest;
+  const userId = authReq.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, error: '로그인이 필요합니다.', code: 'UNAUTHENTICATED' });
+  }
+
+  const validation = validateHomeChatMessage(req.body?.message);
+  if (!validation.ok || !validation.message) {
+    const code = validation.error ?? 'INVALID_MESSAGE';
+    return res.status(400).json({ success: false, error: homeChatValidationMessage(code), code });
+  }
+  const message = validation.message;
+
+  // ── 신뢰 경계: 클라이언트 workScope 에서 **축 힌트만** 취한다 ──────────────
+  const clientScope = (req.body?.workScope ?? {}) as Record<string, unknown>;
+  const workspace = typeof clientScope.workspace === 'string' ? clientScope.workspace : 'home';
+  const requestedServiceKey = typeof clientScope.serviceKey === 'string' ? clientScope.serviceKey : '';
+  const capabilities = Array.isArray(clientScope.capabilities)
+    ? (clientScope.capabilities as unknown[]).filter((c): c is string => typeof c === 'string').slice(0, 10)
+    : [];
+
+  const requestId = crypto.randomUUID();
+
+  try {
+    // ── 서버측 scope 재검증 ────────────────────────────────────────────────
+    // store 축일 때만 매장을 확정한다. resolveWorkScopeStore 가 membership →
+    // 매장 축 보유 → serviceKey 스코프 후보 순으로 판정하며, ambiguous 에서
+    // 임의 매장을 고르지 않는다(WO-O4O-WORK-SCOPE-STORE-RESOLUTION-V0).
+    const facts: VerifiedScopeFacts = { workspace, capabilities };
+
+    if (STORE_SCOPED_WORKSPACES.includes(workspace)) {
+      const resolution = await resolveWorkScopeStore(AppDataSource, {
+        userId,
+        serviceKey: requestedServiceKey,
+        workspace,
+      });
+      facts.storeStatus = resolution.status;
+      // 서버가 정규화한 canonical key 만 쓴다(클라이언트 값 그대로 쓰지 않는다).
+      facts.serviceKey = resolution.serviceKey || undefined;
+    } else if (requestedServiceKey) {
+      // 비-store 축: 식별자를 확정할 필요가 없으므로 서비스 표기만 정규화해 싣는다.
+      facts.serviceKey = requestedServiceKey;
+    }
+
+    const model = await resolveEditingModel();
+    const apiKey = await resolveAiApiKey(AppDataSource, 'gemini');
+
+    const result = await execute({
+      systemPrompt: buildHomeChatSystemPrompt(facts),
+      userPrompt: buildHomeChatUserPrompt(message),
+      provider: 'gemini',
+      responseMode: 'text',
+      config: { apiKey, model, temperature: 0.5, maxTokens: 2048, responseMode: 'text' },
+      retry: { maxAttempts: 1 },
+      meta: { service: 'o4o-home', callerName: 'home-chat' },
+    });
+
+    const answer = extractHomeChatAnswer(result.content);
+    if (!answer) {
+      logger.warn('home-chat empty answer', { requestId, userId, model: result.model });
+      return res.status(502).json({
+        success: false,
+        error: '응답을 생성하지 못했습니다. 다시 시도해 주세요.',
+        code: 'AI_ERROR',
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        message: answer,
+        scope: {
+          workspace: facts.workspace,
+          serviceKey: facts.serviceKey ?? null,
+          storeStatus: facts.storeStatus ?? null,
+        },
+        requestId,
+      },
+    });
+  } catch (error: unknown) {
+    // 원문 오류는 서버 로그에만. 사용자 응답에는 provider/model/key 세부를 싣지 않는다.
+    logger.error('home-chat error', {
+      requestId,
+      userId,
+      error: (error as { message?: string })?.message,
+    });
+    const sanitized = sanitizeHomeChatError(error);
+    return res.status(502).json({ success: false, error: sanitized.message, code: sanitized.code });
   }
 });
 

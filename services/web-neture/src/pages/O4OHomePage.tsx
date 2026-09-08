@@ -8,20 +8,26 @@
  *   중앙  O4O 워드마크 → 안내 문구 → 중앙 입력 영역
  *   하단  작은 서비스 진입 배너(pill)
  *
- * 이 화면은 향후 AI / Local Work Agent 작업 시작 화면의 기준이다.
- *   AI 입력 → Work Scope → Local Work Agent
- * 중앙 입력창은 그 자리를 미리 잡아둔 **비활성 placeholder** 다.
- * Phase 1 에서 AI API 호출 · Work Scope · Agent 는 구현하지 않는다.
+ * 이 화면은 AI / Local Work Agent 작업 시작 화면의 기준이다.
+ *   AI 입력 → Work Scope → (후속) Local Work Agent
+ *
+ * WO-O4O-COMMON-HOME-AI-INPUT-V0:
+ *   중앙 입력창을 실제 AI 질의응답 진입점으로 활성화했다.
+ *   **텍스트 응답 전용** — tool 실행 · Local Agent · 브라우저 조작은 하지 않는다.
+ *   대화는 저장하지 않는다(새로고침하면 사라진다). 화면은 검색 초기화면형을 유지하며
+ *   답변이 있을 때만 입력창 아래에 영역이 나타난다(대기 상태 레이아웃 불변).
  *
  * Neture 전용 chrome(NetureGlobalHeader / Footer / NetureBottomNav)은 쓰지 않는다 —
  * `/` 는 App.tsx 에서 NetureLayout 밖에 배치되어 있고, 기존 Neture 영역
  * (`/community`, `/mypage`, `/market-trial` 등)은 NetureLayout 을 그대로 유지한다.
  */
 
+import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { UserCircle } from 'lucide-react';
-import { useAuth, useLoginModal } from '../contexts';
+import { UserCircle, Loader2, ArrowUp } from 'lucide-react';
+import { useAuth, useLoginModal, useWorkScope } from '../contexts';
 import { getUserDisplayName } from '@o4o/account-ui';
+import { sendHomeChat, HomeChatError, HOME_CHAT_MAX_MESSAGE_LENGTH } from '../lib/ai/home-chat';
 
 // ─── 서비스 진입 ──────────────────────────────────────────────────────────────
 // 신규 도메인·route 를 만들지 않는다.
@@ -69,6 +75,52 @@ function EntryPill({ entry }: { entry: HomeEntry }) {
 export default function O4OHomePage() {
   const { user, isAuthenticated } = useAuth();
   const { openLoginModal } = useLoginModal();
+  // Phase 3 연결점 — 현재 업무 컨텍스트를 그대로 AI 요청에 싣는다.
+  // 서버가 membership·매장을 다시 확정하므로 여기 값은 권한 근거가 아니다.
+  const { workScope, isResolvingStore } = useWorkScope();
+
+  const [input, setInput] = useState('');
+  const [question, setQuestion] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  const trimmed = input.trim();
+  // 매장 scope 해석 중에는 불완전한 컨텍스트로 보내지 않는다(§12).
+  const blocked = pending || isResolvingStore;
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!trimmed || blocked) return;
+
+    // 비로그인은 기존 로그인 모달로 보낸다. 입력은 state 에 남아 있으므로
+    // 로그인 후 그대로 다시 보낼 수 있다(§30 — auth/redirect 계약은 건드리지 않는다).
+    if (!isAuthenticated) {
+      openLoginModal();
+      return;
+    }
+
+    setPending(true);
+    setError(null);
+    setQuestion(trimmed);
+    setAnswer(null);
+    try {
+      const result = await sendHomeChat(trimmed, workScope);
+      setAnswer(result.message);
+      setInput('');
+    } catch (err) {
+      setAnswer(null);
+      setError(
+        err instanceof HomeChatError
+          ? err.message
+          : '응답을 생성하지 못했습니다. 다시 시도해 주세요.',
+      );
+    } finally {
+      setPending(false);
+    }
+  };
+
+  const hasThread = question !== null || answer !== null || error !== null;
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
@@ -101,16 +153,64 @@ export default function O4OHomePage() {
 
         <p className="mt-6 mb-0 text-base text-slate-500">무엇을 도와드릴까요?</p>
 
-        {/* Phase 1: 비활성 placeholder. 후속 Phase 3 에서 실제 AI 입력으로 대체된다. */}
-        <div className="mt-5 w-full max-w-xl">
-          <input
-            type="text"
-            disabled
-            aria-label="작업 입력 (준비 중)"
-            placeholder="준비 중입니다"
-            className="w-full cursor-not-allowed rounded-full border border-slate-200 bg-slate-50 px-6 py-4 text-base text-slate-400 shadow-sm outline-none placeholder:text-slate-400"
-          />
-        </div>
+        {/* AI 입력 (WO-O4O-COMMON-HOME-AI-INPUT-V0). 단일 행 입력이라 Enter 전송이 곧 submit 이다. */}
+        <form onSubmit={handleSubmit} className="mt-5 w-full max-w-xl">
+          <div className="relative">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              maxLength={HOME_CHAT_MAX_MESSAGE_LENGTH}
+              disabled={pending}
+              aria-label="무엇을 도와드릴까요?"
+              placeholder="무엇이든 물어보세요"
+              className="w-full rounded-full border border-slate-200 bg-white py-4 pl-6 pr-14 text-base text-slate-900 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400"
+            />
+            <button
+              type="submit"
+              disabled={!trimmed || blocked}
+              aria-label="전송"
+              className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-900 text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:bg-slate-200"
+            >
+              {pending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ArrowUp className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+        </form>
+
+        {/*
+          답변 영역 — 있을 때만 렌더한다. 항상 존재하는 빈 컨테이너를 두면
+          justify-center 때문에 대기 상태에서 워드마크가 밀린다.
+          Markdown 렌더러는 web-neture 에 없으므로(의존성 추가 금지) 줄 단위 문단으로 표시한다.
+        */}
+        {hasThread && (
+          <div className="mt-6 w-full max-w-xl text-left">
+            {question && (
+              <p className="m-0 mb-3 text-sm font-medium text-slate-500">{question}</p>
+            )}
+            {pending && (
+              <p className="m-0 flex items-center gap-2 text-sm text-slate-400">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                응답 생성 중...
+              </p>
+            )}
+            {error && !pending && (
+              <p className="m-0 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
+            )}
+            {answer && !pending && (
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-[0.95rem] leading-relaxed text-slate-800">
+                {answer.split('\n').map((line, i) => (
+                  <p key={i} className="m-0 whitespace-pre-wrap">
+                    {line || <br />}
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <nav className="mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-2">
           {ENTRIES.map((entry) => (
