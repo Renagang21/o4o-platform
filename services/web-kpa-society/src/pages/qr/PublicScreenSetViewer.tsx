@@ -59,10 +59,20 @@ interface ProductCard {
 }
 
 
+/**
+ * WO-O4O-TABLET-PRODUCT-LIST-CONTRACT-AND-OPERATION-CORE-KPA-ADOPTION-V1 §10:
+ *   product_list 계약이 단일화되면서 QR 에도 코너 상품(local 포함)이 실리게 됐고,
+ *   그때 `price_display` 원시 문자열("6500.00")이 그대로 노출됐다.
+ *   태블릿(kiosk)은 이미 같은 문제를 정규화해 "6,500원" 으로 보여준다 —
+ *   **같은 상품이 두 화면에서 다르게 보이지 않도록 같은 규칙을 쓴다.**
+ *   숫자로 읽히면 천단위+'원', 아니면(예: "1+1 행사") 원문 라벨 그대로.
+ */
 function formatPrice(p: ProductCard): string | null {
-  if (typeof p.price === 'number' && p.price > 0) return `${p.price.toLocaleString('ko-KR')}원`;
-  if (p.priceDisplay && p.priceDisplay.trim()) return p.priceDisplay;
-  return null;
+  const raw = typeof p.price === 'number' && p.price > 0 ? p.price : p.priceDisplay;
+  if (raw == null) return null;
+  const n = typeof raw === 'string' ? Number(raw.replace(/[^0-9.-]/g, '')) : raw;
+  if (Number.isFinite(n)) return `${Math.round(n as number).toLocaleString('ko-KR')}원`;
+  return p.priceDisplay && p.priceDisplay.trim() ? p.priceDisplay : null;
 }
 
 export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet }) {
