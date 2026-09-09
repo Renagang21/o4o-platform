@@ -92,6 +92,25 @@ export class BranchOfficerService {
     return s;
   }
 
+  /**
+   * `date` 컬럼 정규화 — **pg 는 date 를 JS `Date` 객체로 돌려준다.**
+   *
+   * 이것을 그대로 `String()` 하면 `"Wed Dec 31 2027 …"` 이 되어
+   *   (a) 날짜 비교가 요일 이름 사전순 비교로 바뀌고
+   *   (b) 응답에 `2028-01-01T00:00:00.000Z` 같은 시각이 섞인다.
+   * 읽는 경계에서 한 번만 `YYYY-MM-DD` 로 되돌린다 (W6 numeric→Number 와 같은 처리).
+   */
+  private static toDay(v: unknown): string | null {
+    if (v === null || v === undefined || v === '') return null;
+    if (v instanceof Date) {
+      const pad = (n: number) => String(n).padStart(2, '0');
+      return `${v.getFullYear()}-${pad(v.getMonth() + 1)}-${pad(v.getDate())}`;
+    }
+    const s = String(v);
+    // 'YYYY-MM-DD' 이거나 ISO 문자열이면 앞 10자가 날짜다
+    return /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(0, 10) : s;
+  }
+
   private static today(): string {
     const d = new Date();
     const pad = (n: number) => String(n).padStart(2, '0');
@@ -106,13 +125,13 @@ export class BranchOfficerService {
       name: r.name,
       position: r.position,
       groupName: r.group_name ?? null,
-      termStart: r.term_start,
-      termEnd: r.term_end ?? null,
+      termStart: this.toDay(r.term_start)!,
+      termEnd: this.toDay(r.term_end),
       displayOrder: Number(r.display_order ?? 0),
       status: r.status,
       visibility: r.visibility,
       // 상태와 임기를 함께 본다 — 저장은 active 인데 종료일이 지난 행을 현직으로 내지 않는다
-      current: r.status === 'active' && (!r.term_end || String(r.term_end) >= today),
+      current: r.status === 'active' && (!r.term_end || this.toDay(r.term_end)! >= today),
       linkedMember: r.user_id ? { name: r.linked_name ?? null, email: r.linked_email ?? null } : null,
       createdAt: r.created_at,
       updatedAt: r.updated_at,
@@ -219,11 +238,17 @@ export class BranchOfficerService {
       p.position === undefined && base ? base.position : this.text(p.position, POSITION_MAX, '직책', true)!;
     const groupName =
       p.groupName === undefined && base ? base.group_name : this.text(p.groupName, GROUP_MAX, '소속', false);
+    // 기존 행에서 읽은 값은 Date 객체이므로 반드시 toDay 로 정규화한다 (§toDay)
     const termStart =
-      p.termStart === undefined && base ? base.term_start : this.day(p.termStart, '임기 시작일', true)!;
-    const termEnd = p.termEnd === undefined && base ? base.term_end : this.day(p.termEnd, '임기 종료일', false);
+      p.termStart === undefined && base
+        ? this.toDay(base.term_start)!
+        : this.day(p.termStart, '임기 시작일', true)!;
+    const termEnd =
+      p.termEnd === undefined && base
+        ? this.toDay(base.term_end)
+        : this.day(p.termEnd, '임기 종료일', false);
 
-    if (termEnd && String(termEnd) < String(termStart)) {
+    if (termEnd && termEnd < termStart) {
       throw new BranchOfficerError('OFFICER_VALUE_INVALID', '임기 종료일이 시작일보다 빠를 수 없습니다.', 422);
     }
 
