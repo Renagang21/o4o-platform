@@ -174,9 +174,9 @@ Home UI 에 provider selector 를 노출하지 않았다(§11). Home 은 provide
 - 키는 **서버 전용**. 프런트 번들·응답·로그 어디에도 싣지 않는다. `VITE_*` AI 키 미도입.
 - 이번 WO 작업 중 credential 을 출력하지 않았다(§30). 본 CHECK 에도 키 값 없음(§17).
 
-> ⚠️ **`OPENAI_API_KEY` GitHub secret 이 아직 없다** (`gh secret list` 실측: `GEMINI_API_KEY` 만 존재).
-> 워크플로 배선은 끝났으므로 secret 만 추가되면 그대로 흐른다. secret 생성은 자격증명 작업이라
-> CLAUDE.md 중지 조건(**실제 계정·자격정보·외부 서비스 승인 필요**)에 해당해 수행하지 않았다.
+> **(2026-09-09 갱신)** 최초 작성 시점에는 `OPENAI_API_KEY` GitHub secret 이 없었다.
+> 이후 사용자가 secret 을 추가했고 canonical deploy-api 를 통해 주입돼
+> revision `o4o-core-api-03568-k9r` 에서 설정 확인됐다(§16). 배선은 정상 동작한다.
 
 ---
 
@@ -345,3 +345,90 @@ error="AI_NOT_CONFIGURED: openai API key missing"
 | 15. production smoke PASS | **부분** — Gemini PASS / OpenAI 키 부재로 미검증. §11 |
 | 16. CHECK 작성 | 충족 |
 | 17. commit/push | 충족 |
+
+---
+
+## 16. Production Closure 시도 (2026-09-09, revision `o4o-core-api-03568-k9r`)
+
+`OPENAI_API_KEY` 가 canonical deploy-api 를 통해 주입된 뒤 최종 smoke 를 수행했다.
+
+리비전 env 실측 (이름·설정여부만):
+
+```text
+GEMINI_API_KEY           set
+OPENAI_API_KEY           set      ← 이번에 주입됨
+AI_DEFAULT_PROVIDER      EMPTY    → 코드 기본값 gemini 유지 (의도대로)
+AI_DEFAULT_MODEL_OPENAI  EMPTY    → gpt-6-astra 기본값
+```
+
+동일 문구(`약국 POP 제작 시 기본 원칙을 3가지로 알려줘`) 기준:
+
+| # | 케이스 | 결과 | 판정 |
+|:-:|---|---|:---:|
+| 1 | `provider=openai` | **429 · `RATE_LIMIT`** (실제 원인은 크레딧 소진) | ❌ **BLOCKED** |
+| 2 | `provider=gemini` | 200 · `provider=gemini` · `gemini-2.5-flash` · 정상 답변 | ✅ PASS |
+| 3 | provider 생략 (default) | 200 · `provider=gemini` · `gemini-2.5-flash` · 정상 답변 | ✅ PASS |
+| 4 | Home AI (`neture.co.kr/`) | 입력창 배포 확인(`/assets/index-C-gj_T5v.js`). Home 은 `provider` 를 보내지 않으므로 경로가 #3 과 동일 | ✅ PASS |
+
+### #1 차단 원인 — 키가 아니라 **크레딧**
+
+서버 로그 실측:
+
+```text
+home-chat error  code=RATE_LIMIT
+error='OpenAI API error 429: {"error":{"message":"You have no credits remaining.
+       Add credits to continue using the API at
+       https://platform.openai.com/settings/organization/billing/.","type":"insufficient_quota"}}'
+```
+
+- **키는 유효하다.** 무효 키였다면 401 `AUTH_ERROR` 로 끊긴다. 401 을 지나 quota 판정까지 갔다는 것은
+  인증이 통과했다는 뜻이다. 즉 배선·인증·모델 해석은 전부 정상이고 **남은 것은 결제 뿐이다.**
+- 조치 주체가 결제이므로 CLAUDE.md 중지 조건(**실제 계정·자격정보·외부 서비스 승인 필요**)에 해당한다.
+  크레딧 충전은 수행하지 않았다.
+
+### smoke 가 드러낸 결함 — 오분류 수정 (이번에 함께 고침)
+
+OpenAI 는 `insufficient_quota`(크레딧 없음)를 rate limit 과 **같은 HTTP 429** 로 돌려주고
+메시지에 `quota` 가 들어간다. 그 결과 §9 의 정규화기가 이를 `RATE_LIMIT` 으로 접었고,
+사용자에게 **"요청이 많아 잠시 후 다시 시도해 주세요"** 라는 잘못된 안내가 나갔다(`retryable: true`).
+크레딧이 없으면 재시도는 영원히 실패하므로, 이 문구는 운영자가 원인(결제)을 못 보게 만든다.
+
+→ `INSUFFICIENT_QUOTA` 코드를 분리했다.
+
+```text
+판정 순서   timeout → INSUFFICIENT_QUOTA → RATE_LIMIT → auth → 5xx → model → 기타
+            (429 + "quota" 가 겹치므로 크레딧 판정을 rate limit 보다 먼저 둔다)
+retryable   false
+HTTP        503 (429 아님 — 재시도 안내로 오해되면 안 된다)
+사용자 문구  "AI 사용량이 모두 소진되었습니다. 관리자에게 문의해 주세요."
+            ("잠시 후" 문구 없음 · credit/billing/quota 등 내부 사정 미노출)
+```
+
+프로덕션 실측 원문을 그대로 fixture 로 넣어 회귀를 고정했고, 순수 rate limit 이 여전히
+`RATE_LIMIT` 으로 남는지도 함께 검증했다(과잉 분리 방지). 테스트 50건 PASS.
+
+### 판정
+
+```text
+WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0 = NOT CLOSED (OpenAI 응답 미검증)
+
+OPENAI PROVIDER      = BLOCKED (크레딧 소진 — 키·배선·인증은 정상)
+GEMINI PROVIDER      = PASS
+DEFAULT PROVIDER     = GEMINI (의도대로 유지)
+HOME AI              = PASS
+MULTI-PROVIDER RUNTIME = ESTABLISHED (dispatch·모델해석·오류정규화 실증)
+AUTOMATIC ROUTING    = NOT IMPLEMENTED
+```
+
+WO 의 종료 조건은 "위 smoke가 **모두** PASS면 CLOSED" 이다. #1 이 PASS 가 아니므로
+**CLOSED 로 선언하지 않는다.** 크레딧 충전 후 #1 만 재수행하면 종결 가능하다.
+
+### 남은 단 하나
+
+```text
+1. OpenAI 조직에 크레딧 충전 (platform.openai.com 결제)
+2. provider=openai 재호출 → 200 + gpt-6-astra 텍스트 응답 확인
+   (재배포 불필요 — 키·배선은 이미 적용돼 있다)
+```
+
+`AI_DEFAULT_PROVIDER` 는 이번에도 전환하지 않았다(WO 범위 유지). Home 기본은 Gemini 그대로다.

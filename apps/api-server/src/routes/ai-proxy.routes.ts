@@ -1936,7 +1936,12 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
       retryable: normalized.retryable,
       error: (error as { message?: string })?.message,
     });
-    const status = normalized.code === 'RATE_LIMIT' ? 429 : normalized.code === 'TIMEOUT' ? 504 : 502;
+    // INSUFFICIENT_QUOTA 는 429 로 보내지 않는다 — 재시도 안내로 오해되면 안 된다.
+    const status =
+      normalized.code === 'RATE_LIMIT' ? 429
+      : normalized.code === 'TIMEOUT' ? 504
+      : normalized.code === 'INSUFFICIENT_QUOTA' ? 503
+      : 502;
     return res.status(status).json({
       success: false,
       error: aiErrorUserMessage(normalized.code),

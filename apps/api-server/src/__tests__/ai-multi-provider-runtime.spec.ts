@@ -206,6 +206,9 @@ describe('오류 정규화 — provider 무관 공통 코드', () => {
     ['6. gemini auth', 'Gemini API error 400: API key not valid. Please pass a valid API key.', 'AUTH_ERROR'],
     ['7. openai rate limit', 'OpenAI API error 429: {"error":{"message":"Rate limit reached"}}', 'RATE_LIMIT'],
     ['7. gemini quota', 'Gemini API error 429: RESOURCE_EXHAUSTED quota exceeded', 'RATE_LIMIT'],
+    // 2026-09-09 프로덕션 실측 원문. 429 + "quota" 인데 rate limit 이 아니다.
+    ['크레딧 소진(실측)', 'OpenAI API error 429: {"error":{"message":"You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.","type":"insufficient_quota"}}', 'INSUFFICIENT_QUOTA'],
+    ['크레딧 소진(문구 변형)', 'You exceeded your current quota, please check your plan and billing details', 'INSUFFICIENT_QUOTA'],
     ['8. openai timeout', 'OpenAI API timeout after 90000ms', 'TIMEOUT'],
     ['8. gemini timeout', 'Gemini API timeout after 90000ms', 'TIMEOUT'],
     ['provider 5xx', 'OpenAI API error 503: service unavailable', 'PROVIDER_UNAVAILABLE'],
@@ -245,9 +248,30 @@ describe('오류 정규화 — provider 무관 공통 코드', () => {
     expect(msg).toBe('AI 기능을 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.');
   });
 
+  it('크레딧 소진을 rate limit 으로 접지 않는다 (재시도 안내 금지)', () => {
+    const quota = new Error(
+      'OpenAI API error 429: {"error":{"message":"You have no credits remaining.","type":"insufficient_quota"}}',
+    );
+    const n = normalizeAiError(quota);
+    expect(n.code).toBe('INSUFFICIENT_QUOTA');
+    // 재시도로 해결되지 않는다 → retryable false, 그리고 "잠시 후" 문구가 아니어야 한다.
+    expect(n.retryable).toBe(false);
+    const msg = aiErrorUserMessage(n.code);
+    expect(msg).not.toMatch(/잠시 후/);
+    expect(msg).toMatch(/소진/);
+    // 결제·크레딧 같은 내부 사정은 노출하지 않는다.
+    expect(msg).not.toMatch(/credit|billing|quota|openai|결제/i);
+  });
+
+  it('순수 rate limit 은 여전히 RATE_LIMIT 이다 (분리가 과잉되지 않았다)', () => {
+    const rl = normalizeAiError(new Error('OpenAI API error 429: Rate limit reached for gpt-6-astra'));
+    expect(rl.code).toBe('RATE_LIMIT');
+    expect(rl.retryable).toBe(true);
+  });
+
   it('모든 코드가 사용자 문구를 갖는다 (미정의 코드로 빈 응답이 나가지 않는다)', () => {
     const codes: AiErrorCode[] = [
-      'AI_NOT_CONFIGURED', 'INVALID_PROVIDER', 'AUTH_ERROR', 'RATE_LIMIT',
+      'AI_NOT_CONFIGURED', 'INVALID_PROVIDER', 'AUTH_ERROR', 'RATE_LIMIT', 'INSUFFICIENT_QUOTA',
       'TIMEOUT', 'PROVIDER_UNAVAILABLE', 'INVALID_MODEL', 'PROVIDER_ERROR',
     ];
     for (const c of codes) {
