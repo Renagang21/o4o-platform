@@ -429,7 +429,23 @@ node scripts/quality/check-literal-consumers.mjs --source <각 파일>
 | `packages/operator-core-ui` vitest | 4 files / 47 tests PASS |
 | raw-source 소비처 (`check-literal-consumers.mjs`) | 5개 파일 전부 살아있는 소비처 0건 |
 
-> CI Pipeline · CodeQL · 배포 워크플로 결과는 이 커밋에 대해 별도로 확인해 아래 §10-4-C 에 기록한다.
+#### 10-4-C. CI · CodeQL · 배포 실측 — `601cd98c2`
+
+| 워크플로 | 결과 |
+|---|---|
+| CI Pipeline | ✅ success |
+| CodeQL Security Analysis | ✅ success |
+| Deploy API Server | ✅ success |
+| Deploy Web Services | ✅ success |
+| Deploy Admin Dashboard | ✅ success |
+
+필수 워크플로 5개 전부 성공. 이로써 §11 판정을 로컬 검증 기준이 아닌 **CI 기준 최종 판정**으로 확정한다.
+
+**범위 밖으로 남긴 2건은 종결을 막지 않는다** (GlycoPharm 런타임도 서비스 계약도 아니다).
+추후 일반 dead script · 문구 정비 때 함께 제거할 수 있으며, 이를 위해 본 작업을 다시 열지 않는다.
+
+- `apps/api-server/scripts/delete-seed-data.sql` — 이미 DROP 된 테이블 대상 수동 dead script
+- `packages/lms-ui/package.json` `description` — 설명 문구
 
 ---
 
@@ -446,6 +462,8 @@ GLYCOPHARM_TLS                    = 0
 OTHER_SERVICE_DATA_CHANGE         = 0
 OTHER_SERVICE_REGRESSION          = PASS
 
+GLYCOPHARM_ACTIVE_RUNTIME_CONFIG    = 0
+GLYCOPHARM_ACTIVE_SERVICE_CONTRACT  = 0
 GLYCOPHARM_ACTIVE_ALLOWLISTS        = 0   (account-access.policy — 제거 완료 §10-4)
 GLYCOPHARM_ACTIVE_SERVICE_KEYS      = 0
 GLYCOPHARM_ACTIVE_BRANDING          = 0   (SERVICE_BRANDING · 표시명 맵 3종 — 제거 완료)
@@ -462,7 +480,11 @@ GLYCOPHARM_DOMAIN_RENEWAL         = NOT_PLANNED
 GLYCOPHARM_DOMAIN                 = EXPIRES_NATURALLY_ON_2026-12-26
 GLYCOPHARM_DOMAIN_ERASURE         = CLOSED
 
-GLYCOPHARM_COMPLETE_ERASURE       = CLOSED
+CI_PIPELINE                       = SUCCESS  (601cd98c2)
+CODEQL                            = SUCCESS  (601cd98c2)
+DEPLOY_WORKFLOWS                  = SUCCESS  (API · Web · Admin — 601cd98c2)
+
+GLYCOPHARM_COMPLETE_ERASURE       = CLOSED   (CI 기준 최종 확정 — §10-4-C)
   └ 서비스 · 라우트 · 데이터 · 배포 · GCP · TLS · DNS · 런타임 설정 맵 전 축.
     남은 문자열은 회귀 가드 테스트 · 주석 · 과거 migration · 기록물뿐이며 실행 의미가 없다.
 ```
