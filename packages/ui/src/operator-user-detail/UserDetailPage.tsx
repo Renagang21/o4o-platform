@@ -61,7 +61,6 @@ const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> =
 };
 
 const SERVICE_LABELS: Record<string, string> = {
-  glycopharm: 'GlycoPharm',
   'k-cosmetics': 'K-Cosmetics',
   neture: 'Neture',
   'kpa-society': 'KPA Society',

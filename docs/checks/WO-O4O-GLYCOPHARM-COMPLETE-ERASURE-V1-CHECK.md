@@ -351,11 +351,12 @@ DNS 종결 후 독립 점검에서 **실행되는 설정에 남은 GlycoPharm �
 **범위 밖으로 두어 손대지 않은 것** (§7 잔류 문자열 분류 그대로): 과거 migration ·
 기록물 문서 · 공통화 출처 주석 · `REMOVED` 주석 · git history.
 
-#### 10-3-A. 재검색에서 추가로 드러난 동종 잔재 5건 — **미처리 · 별도 WO 필요**
+#### 10-3-A. 재검색에서 추가로 드러난 동종 잔재 5건 — **처리 완료 (§10-4)**
 
 위 2건을 제거한 뒤 `git grep` 으로 **주석·문서·migration 을 제외한 활성 소스**를 재검색한 결과,
 같은 성격(런타임에 평가되는 표시명 · 설정 맵)의 잔재가 **5건 더** 확인되었다.
-후속 WO 가 지시한 수정 대상 3파일 밖이라 **이번 범위에서 고치지 않았다** (CLAUDE.md 실행 원칙 — 범위 외 수정 금지).
+후속 WO 가 지시한 수정 대상 3파일 밖이라 **그 시점에는 고치지 않고 보고만 했다** (CLAUDE.md 실행 원칙 — 범위 외 수정 금지).
+이후 `WO-O4O-GLYCOPHARM-RUNTIME-MAP-RESIDUAL-FINAL-CLOSURE-V1` 로 5건 전부 제거했다 — **§10-4**.
 
 | # | 위치 | 잔재 | 성격 |
 |---|---|---|---|
@@ -374,7 +375,61 @@ DNS 종결 후 독립 점검에서 **실행되는 설정에 남은 GlycoPharm �
 `#4` 는 이미 별도 CHECK 에 잔여로 기록돼 있던 항목이다 —
 `docs/checks/CHECK-O4O-OPERATOR-USER-DETAIL-PASSWORD-SERVICEKEY-SELECTION-V1.md` §7 잔여 3
 ("`SERVICE_LABELS` 하드코딩 → `getServiceDisplayName` 정렬"). 이번 `SERVICE_BRANDING` 정리와
-같은 축이므로 후속 WO 에서 함께 처리하는 편이 맞다.
+같은 축이므로 후속 WO 에서 함께 처리했다 (§10-4).
+
+---
+
+### 10-4. 런타임 맵 잔재 5건 제거 — WO-O4O-GLYCOPHARM-RUNTIME-MAP-RESIDUAL-FINAL-CLOSURE-V1
+
+§10-3-A 의 5건을 **한 커밋에서 전부 제거**했다. 대체 설정·대체 fallback 은 만들지 않았다.
+
+| # | 파일 | 제거한 것 | 제거 후 동작 |
+|---|---|---|---|
+| 1 | `apps/api-server/src/common/auth/account-access.policy.ts` | allowlist 항목 `'GET /api/v1/glycopharm/members/me'` 1줄 | 라우트 자체가 없으므로 도달 경로 변화 0. 공용 인증 정책이 삭제된 경로를 특별 취급하지 않는다 |
+| 2 | `apps/api-server/src/modules/contact-inquiry/public-contact-inquiry.controller.ts` | `SERVICE_DISPLAY_NAME.glycopharm` | 맵은 `?? serviceKey` 성격의 미스 처리를 이미 갖고 있어 다른 서비스 제목 불변 |
+| 3 | `apps/api-server/src/modules/neture/services/neture-dashboard.service.ts` | `serviceConfig.glycopharm` 전체 (`url` · `ordersPath` · `supportEmail` · `features`) | 기존 `defaultConfig` 가 그대로 미스를 받는다. **신규 fallback 추가 없음** |
+| 4 | `packages/ui/src/operator-user-detail/UserDetailPage.tsx` | `SERVICE_LABELS.glycopharm` | 미등록 키는 원문 `serviceKey` 로 표기 |
+| 5 | `services/web-kpa-society/src/pages/pharmacy/PharmacySellPage.tsx` | `SERVICE_KEY_LABELS.glycopharm` | 미등록 키는 뱃지 미표기 |
+
+**소비처 안전 확인** — 5개 파일 모두 프로토콜 §3-A 의 raw-source 조사를 함께 수행했다.
+
+```text
+node scripts/quality/check-literal-consumers.mjs --source <각 파일>
+→ 5개 파일 전부 "살아있는 소비처 합계: 0건" (검출된 참조는 전부 HISTORICAL_DOC)
+```
+
+#### 10-4-A. 활성 소스 전수 재검색 결과 (분류)
+
+대상 `apps/** packages/** services/** .github/** scripts/**`,
+검색어 `glycopharm` · `GlycoPharm` · `GLYCOPHARM` · `glycopharm-web` · `glycopharm.co.kr` · `api/v1/glycopharm`.
+
+| 분류 | 건수 | 처리 |
+|---|:---:|---|
+| `ACTIVE_RUNTIME_CONFIG` | **0** | §10-4 에서 5건 전부 제거 |
+| `ACTIVE_SERVICE_CONTRACT` | **0** | 라우트 · scope · serviceKey 상수 · CORS · 브랜딩 전부 이전 단계에서 제거됨 |
+| `ACTIVE_TEST_CONTRACT` | 유지 | GlycoPharm **부재를 단언**하는 회귀 테스트 (`b2b-remaining-debt-final-closure` · `cosmetics-product-query` · `ecommerce-core-and-commerce-residue-retirement`) 와 과거 계약을 재현한 단위 테스트 fixture (`createRouteGuard.test` · `UserDetailPasswordModal.test` · `getUserDisplayName.test`). 삭제하면 재유입 가드가 사라지므로 **손대지 않는다** |
+| `HISTORICAL_COMMENT` | 유지 | `REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)` 주석 · 공통화 출처 주석 · JSDoc 서비스 열거 |
+| `APPLIED_MIGRATION` | 유지 | `migrations/**` · `migrations-sql/**` 과거 적용 산출물 |
+| `AUDIT_DOCUMENT` | 유지 | `docs/**` 기록물 (CLAUDE.md §16-1 대상 아님) |
+
+**범위 밖으로 판정해 손대지 않은 실행 파일 2건** (동종이 아니라 보고만 한다):
+
+- `apps/api-server/scripts/delete-seed-data.sql` — 이미 DROP 된 `glycopharm_products` 를 지우는 **1회성 seed 정리 SQL**. 런타임 설정이 아니고 자동 실행 경로도 없다 (dead script).
+- `packages/lms-ui/package.json` `description` — 패키지 설명 문구의 서비스 열거. 실행 의미 없음.
+
+#### 10-4-B. 검증 실측 (로컬)
+
+| 항목 | 결과 |
+|---|---|
+| `pnpm run build:packages` | PASS |
+| api-server `tsc --noEmit` | PASS · 0 errors |
+| `npm run type-check:frontend` | PASS (`type-check:frontend: OK`) |
+| api-server Jest 전체 | **237 suites / 3,802 tests PASS** |
+| `packages/ui` vitest | 2 files / 19 tests PASS |
+| `packages/operator-core-ui` vitest | 4 files / 47 tests PASS |
+| raw-source 소비처 (`check-literal-consumers.mjs`) | 5개 파일 전부 살아있는 소비처 0건 |
+
+> CI Pipeline · CodeQL · 배포 워크플로 결과는 이 커밋에 대해 별도로 확인해 아래 §10-4-C 에 기록한다.
 
 ---
 
@@ -391,19 +446,25 @@ GLYCOPHARM_TLS                    = 0
 OTHER_SERVICE_DATA_CHANGE         = 0
 OTHER_SERVICE_REGRESSION          = PASS
 
-GLYCOPHARM_ACTIVE_BRANDING_REGISTRY = 0   (SERVICE_BRANDING — 제거 완료)
+GLYCOPHARM_ACTIVE_ALLOWLISTS        = 0   (account-access.policy — 제거 완료 §10-4)
+GLYCOPHARM_ACTIVE_SERVICE_KEYS      = 0
+GLYCOPHARM_ACTIVE_BRANDING          = 0   (SERVICE_BRANDING · 표시명 맵 3종 — 제거 완료)
+GLYCOPHARM_ACTIVE_SERVICE_CONFIG    = 0   (neture-dashboard serviceConfig — 제거 완료 §10-4)
 GLYCOPHARM_ACTIVE_CORS_ORIGIN       = 0   (제거 완료)
-GLYCOPHARM_RESIDUAL_DISPLAY_CONFIG  = 5   (§10-3-A — 미처리 · 별도 WO)
+GLYCOPHARM_RESIDUAL_DISPLAY_CONFIG  = 0   (§10-4 — 5건 전부 제거)
 
+GLYCOPHARM_SERVICE_ERASURE        = CLOSED
+GLYCOPHARM_INFRA_ERASURE          = CLOSED
 GLYCOPHARM_GCP_ERASURE            = CLOSED
 GLYCOPHARM_DNS_RECORDS            = 0
+GLYCOPHARM_DNS_ERASURE            = CLOSED
 GLYCOPHARM_DOMAIN_RENEWAL         = NOT_PLANNED
 GLYCOPHARM_DOMAIN                 = EXPIRES_NATURALLY_ON_2026-12-26
 GLYCOPHARM_DOMAIN_ERASURE         = CLOSED
 
 GLYCOPHARM_COMPLETE_ERASURE       = CLOSED
-  └ 서비스 · 라우트 · 데이터 · 배포 · GCP · TLS · DNS 축 기준.
-    §10-3-A 표시명·설정 맵 5건은 기능이 아닌 표기 잔재이며 별도 WO 로 분리한다.
+  └ 서비스 · 라우트 · 데이터 · 배포 · GCP · TLS · DNS · 런타임 설정 맵 전 축.
+    남은 문자열은 회귀 가드 테스트 · 주석 · 과거 migration · 기록물뿐이며 실행 의미가 없다.
 ```
 
 ---

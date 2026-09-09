@@ -32,7 +32,6 @@ const SERVICE_KEY_LABELS: Record<string, { text: string; color: string; bg: stri
   kpa: { text: 'B2B', color: '#2563EB', bg: '#DBEAFE' },
   'kpa-groupbuy': { text: '이벤트', color: '#7C3AED', bg: '#EDE9FE' },
   cosmetics: { text: '화장품', color: '#DB2777', bg: '#FCE7F3' },
-  glycopharm: { text: '혈당관리', color: '#059669', bg: '#D1FAE5' },
 };
 
 // WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1:

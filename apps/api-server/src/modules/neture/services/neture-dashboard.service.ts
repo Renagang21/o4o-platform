@@ -72,12 +72,6 @@ export class NetureDashboardService {
         supportEmail?: string;
         features: string[];
       }> = {
-        glycopharm: {
-          url: 'https://glycopharm.neture.co.kr',
-          ordersPath: '/supplier/orders',
-          supportEmail: 'support@glycopharm.kr',
-          features: ['주문관리', '배송조회', '반품처리'],
-        },
         'k-cosmetics': {
           url: 'https://k-cosmetics.neture.co.kr',
           ordersPath: '/supplier/orders',

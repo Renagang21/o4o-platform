@@ -111,7 +111,6 @@ export const RESTRICTED_ALLOWLIST: ReadonlySet<string> = new Set([
   'GET /api/v1/pharmacy-hub/join/status',
   'GET /api/v1/pharmacy-hub/me/access',
   'GET /api/v1/kpa/me/membership',
-  'GET /api/v1/glycopharm/members/me',
   'GET /api/v1/cosmetics/members/me',
 ]);
 

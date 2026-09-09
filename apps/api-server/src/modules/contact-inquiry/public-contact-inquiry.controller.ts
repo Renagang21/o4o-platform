@@ -28,7 +28,6 @@ import logger from '../../utils/logger.js';
 
 /** serviceKey → 표시 이름 (이메일 제목용). */
 const SERVICE_DISPLAY_NAME: Record<string, string> = {
-  glycopharm: 'GlycoPharm',
   'k-cosmetics': 'K-Cosmetics',
 };
 
