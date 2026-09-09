@@ -14,7 +14,7 @@ import { ROLES, satisfiesRole } from '../config/service';
 import NotFoundPage from '../pages/NotFoundPage';
 
 export function BranchLayout({ slug, basePath }: { slug: string; basePath: string }) {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading, logout } = useAuth();
   const location = useLocation();
   const [site, setSite] = useState<BranchSite | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +33,12 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
     let alive = true;
     setError(null);
     setBranchMissing(false);
+    // WO-O4O-KPA-BRANCH-BRANCHLAYOUT-SITE-PREFETCH-404-CLOSURE-V1:
+    //   세션 복구가 끝나기 전에는 운영자 여부(canOperate)를 알 수 없다. 그 사이에 public 조회를
+    //   먼저 쏘면 미게시 분회에서 곧바로 버려질 404 가 난다 — 어차피 직후 운영자 조회로 다시 받는다.
+    //   요청 자체를 미룬다(404 를 숨기는 것이 아니다). 비로그인 방문자는 isLoading 이 처음부터
+    //   false 이므로 공개 조회가 지연 없이 나간다.
+    if (isOperatorArea && isAuthLoading) return;
     // 운영자 영역에서는 미게시 상태도 보여야 하므로 운영자 조회를 쓴다.
     const load = isOperatorArea && canOperate ? getOperatorSite(slug) : getPublicSite(slug);
     load
@@ -49,7 +55,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
     return () => {
       alive = false;
     };
-  }, [slug, isOperatorArea, canOperate]);
+  }, [slug, isOperatorArea, canOperate, isAuthLoading]);
 
   const nav = [
     { to: basePath || '/', label: '홈', end: true },
