@@ -158,6 +158,15 @@ export type AiErrorCode =
   | 'INVALID_PROVIDER'
   | 'AUTH_ERROR'
   | 'RATE_LIMIT'
+  /**
+   * 크레딧·결제 한도 소진. **RATE_LIMIT 과 반드시 구분한다.**
+   *
+   * OpenAI 는 `insufficient_quota`(크레딧 없음)를 rate limit 과 **같은 HTTP 429** 로 돌려주고
+   * 메시지에 "quota" 가 들어간다. 이를 RATE_LIMIT 으로 접으면 "잠시 후 재시도" 안내가 나가는데,
+   * 크레딧이 없으면 재시도는 영원히 실패한다 — 운영자가 원인(결제)을 못 보게 된다.
+   * (2026-09-09 프로덕션 smoke 에서 실제로 이 오분류가 관측돼 코드를 분리했다.)
+   */
+  | 'INSUFFICIENT_QUOTA'
   | 'TIMEOUT'
   | 'PROVIDER_UNAVAILABLE'
   | 'INVALID_MODEL'
@@ -191,6 +200,11 @@ export function normalizeAiError(error: unknown): NormalizedAiError {
   if (/timeout|timed out|ETIMEDOUT|AbortError/i.test(raw)) {
     return { code: 'TIMEOUT', retryable: true };
   }
+  // 크레딧/결제 소진을 rate limit 보다 **먼저** 본다 — 둘 다 429 + "quota" 로 오기 때문에
+  // 순서를 바꾸면 결제 문제가 일시적 혼잡으로 잘못 보고된다.
+  if (/insufficient_quota|no credits|out of credits|billing|exceeded your current quota|credit balance/i.test(raw)) {
+    return { code: 'INSUFFICIENT_QUOTA', retryable: false };
+  }
   // 429 는 인증(401/403)보다 먼저 본다 — 두 패턴이 한 메시지에 같이 나오는 경우가 있다.
   if (/\b429\b|rate.?limit|quota|RESOURCE_EXHAUSTED|too many requests/i.test(raw)) {
     return { code: 'RATE_LIMIT', retryable: true };
@@ -212,6 +226,10 @@ export function aiErrorUserMessage(code: AiErrorCode): string {
   switch (code) {
     case 'RATE_LIMIT':
       return '요청이 많아 잠시 후 다시 시도해 주세요.';
+    case 'INSUFFICIENT_QUOTA':
+      // "잠시 후 재시도" 라고 하지 않는다 — 재시도로 해결되지 않는 상태다.
+      // 결제·크레딧 같은 내부 사정은 드러내지 않고 관리자 확인만 안내한다.
+      return 'AI 사용량이 모두 소진되었습니다. 관리자에게 문의해 주세요.';
     case 'TIMEOUT':
       return '응답이 지연되고 있습니다. 다시 시도해 주세요.';
     case 'AI_NOT_CONFIGURED':
