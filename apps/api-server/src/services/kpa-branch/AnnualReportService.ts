@@ -287,9 +287,33 @@ export class AnnualReportService {
           linkStatus[f.key] = 'resolved';
           break;
         }
+        case 'fee.exemptionType': {
+          /**
+           * WO-O4O-KPA-BRANCH-FEE-EXEMPTION-REASON-LEDGER-V1: 면제 사유가 원장을 얻었다.
+           *
+           * 회비 원장이 `status='exempt'` 이고 사유 구분이 **양식 option 에 있는 값**
+           * (unemployed / exempted)일 때만 채운다. `other` 는 양식에 option 이 없으므로
+           * 추정하지 않고 미연결로 둔다 (§4 가짜 값 금지).
+           *
+           * 자유 사유(`exemption_reason`)는 내보내지 않는다 — 운영자 기록이다.
+           */
+          if (!ctx.userId) {
+            values[f.key] = null;
+            linkStatus[f.key] = 'not_linked';
+            break;
+          }
+          const exemptionType = await BranchFeeService.resolveMemberFeeExemptionType({
+            organizationId: ctx.organizationId,
+            userId: ctx.userId,
+            year: ctx.year,
+          });
+          values[f.key] = exemptionType;
+          linkStatus[f.key] = exemptionType ? 'resolved' : 'not_linked';
+          break;
+        }
         default:
           if (f.ownership === 'association') {
-            // 남은 association 필드는 연결 원장이 없다 (예: fee.exemptionType — 면제 사유 구분).
+            // 남은 association 필드는 연결 원장이 없다.
             values[f.key] = null;
             linkStatus[f.key] = 'not_linked';
           }

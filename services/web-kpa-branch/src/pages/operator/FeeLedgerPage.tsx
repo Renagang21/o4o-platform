@@ -21,11 +21,14 @@ import {
   feeCategoryLabel,
   FEE_CATEGORIES,
   FEE_STATUS_LABEL,
+  FEE_EXEMPTION_LABEL,
+  FEE_EXEMPTION_OPTIONS,
   ASSESS_SKIP_LABEL,
   type FeePolicyItem,
   type FeeLedgerItem,
   type FeeLedgerSummary,
   type FeeStatus,
+  type FeeExemptionType,
 } from '../../lib/api/branchFee';
 import { describeApiError as describe } from '../../lib/errors';
 
@@ -102,6 +105,8 @@ export default function FeeLedgerPage({ slug }: { slug: string }) {
     paidAmount: string;
     paidAt: string;
     exempt: boolean;
+    exemptionType: '' | FeeExemptionType;
+    exemptionReason: string;
     memo: string;
   } | null>(null);
 
@@ -202,6 +207,8 @@ export default function FeeLedgerPage({ slug }: { slug: string }) {
       paidAmount: String(row.paidAmount),
       paidAt: toDateInput(row.paidAt),
       exempt: row.status === 'exempt',
+      exemptionType: row.exemptionType ?? '',
+      exemptionReason: row.exemptionReason ?? '',
       memo: row.memo ?? '',
     });
   }
@@ -219,6 +226,14 @@ export default function FeeLedgerPage({ slug }: { slug: string }) {
         // 납부액이 0 이면 납부일은 서버가 지운다 — 보내지 않는다
         ...(paid > 0 ? { paidAt: editDraft.paidAt || null } : {}),
         exempt: editDraft.exempt,
+        // 면제가 아니면 사유를 보내지 않는다 — 서버가 지운다 (WO §3)
+        ...(editDraft.exempt
+          ? {
+              exemptionType: editDraft.exemptionType || null,
+              exemptionReason:
+                editDraft.exemptionType === 'other' ? editDraft.exemptionReason : null,
+            }
+          : {}),
         memo: editDraft.memo,
       });
       setEditId(null);
@@ -482,10 +497,52 @@ export default function FeeLedgerPage({ slug }: { slug: string }) {
                             <input
                               type="checkbox"
                               checked={editDraft.exempt}
-                              onChange={(e) => setEditDraft({ ...editDraft, exempt: e.target.checked })}
+                              onChange={(e) =>
+                                setEditDraft({
+                                  ...editDraft,
+                                  exempt: e.target.checked,
+                                  // 면제를 풀면 사유도 함께 비운다 (서버·DB 계약과 같은 방향)
+                                  ...(e.target.checked ? {} : { exemptionType: '' as const, exemptionReason: '' }),
+                                })
+                              }
                             />
                             면제
                           </label>
+                          {/* 면제 사유는 면제일 때만 묻는다 (WO §4) */}
+                          {editDraft.exempt && (
+                            <div className="mt-1 flex flex-col gap-1">
+                              <select
+                                value={editDraft.exemptionType}
+                                onChange={(e) =>
+                                  setEditDraft({
+                                    ...editDraft,
+                                    exemptionType: e.target.value as '' | FeeExemptionType,
+                                    // 기타가 아니면 자유 사유는 저장되지 않는다
+                                    ...(e.target.value === 'other' ? {} : { exemptionReason: '' }),
+                                  })
+                                }
+                                className="rounded border border-gray-300 px-1 py-1 text-xs"
+                              >
+                                <option value="">사유 선택</option>
+                                {FEE_EXEMPTION_OPTIONS.map((o) => (
+                                  <option key={o.value} value={o.value}>
+                                    {o.label}
+                                  </option>
+                                ))}
+                              </select>
+                              {editDraft.exemptionType === 'other' && (
+                                <input
+                                  type="text"
+                                  value={editDraft.exemptionReason}
+                                  onChange={(e) =>
+                                    setEditDraft({ ...editDraft, exemptionReason: e.target.value })
+                                  }
+                                  placeholder="기타 사유"
+                                  className="w-32 rounded border border-gray-300 px-1 py-1 text-xs"
+                                />
+                              )}
+                            </div>
+                          )}
                         </td>
                         <td className="py-2 text-right">
                           <div className="flex flex-col items-end gap-1">
@@ -532,6 +589,14 @@ export default function FeeLedgerPage({ slug }: { slug: string }) {
                         <td className="py-2 text-gray-600">{fmtDate(row.paidAt)}</td>
                         <td className="py-2">
                           <StatusBadge status={row.status} />
+                          {row.status === 'exempt' && row.exemptionType && (
+                            <div className="mt-1 text-xs text-gray-600">
+                              {FEE_EXEMPTION_LABEL[row.exemptionType]}
+                              {row.exemptionType === 'other' && row.exemptionReason
+                                ? ` · ${row.exemptionReason}`
+                                : ''}
+                            </div>
+                          )}
                           {row.memo && <div className="mt-1 text-xs text-gray-500">{row.memo}</div>}
                         </td>
                         <td className="py-2 text-right">

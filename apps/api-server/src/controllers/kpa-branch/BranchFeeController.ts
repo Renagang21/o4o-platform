@@ -134,7 +134,12 @@ export class BranchFeeController {
 
   /**
    * PATCH /branches/:branchSlug/operator/fee-ledgers/:ledgerId
-   * body: { assessedAmount?, paidAmount?, paidAt?, exempt?, memo?, feeCategory? }
+   * body: { assessedAmount?, paidAmount?, paidAt?, exempt?, memo?, feeCategory?,
+   *         exemptionType?, exemptionReason? }
+   *
+   * 면제 사유(WO-O4O-KPA-BRANCH-FEE-EXEMPTION-REASON-LEDGER-V1):
+   *   exempt=true  → exemptionType 필수. 'other' 면 exemptionReason 필수.
+   *   exempt=false → 서버가 사유를 지운다 (요청 본문과 무관).
    *
    * status 는 받지 않는다 — 금액과 면제 여부에서 서버가 파생한다.
    */

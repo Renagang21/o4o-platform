@@ -14,6 +14,24 @@ const branch = (slug: string) => `${BASE}/branches/${encodeURIComponent(slug)}`;
 
 export type FeeStatus = 'unpaid' | 'partial' | 'paid' | 'exempt';
 
+/**
+ * 면제 사유 구분 (WO-O4O-KPA-BRANCH-FEE-EXEMPTION-REASON-LEDGER-V1).
+ * `unemployed` / `exempted` 는 신상신고 양식의 `fee.exemptionType` option 과 같은 값이다.
+ */
+export type FeeExemptionType = 'unemployed' | 'exempted' | 'other';
+
+export const FEE_EXEMPTION_LABEL: Record<FeeExemptionType, string> = {
+  unemployed: '미취업자',
+  exempted: '회비면제자',
+  other: '기타',
+};
+
+export const FEE_EXEMPTION_OPTIONS: Array<{ value: FeeExemptionType; label: string }> = [
+  { value: 'unemployed', label: '미취업자' },
+  { value: 'exempted', label: '회비면제자' },
+  { value: 'other', label: '기타 (사유 입력)' },
+];
+
 export const FEE_STATUS_LABEL: Record<FeeStatus, string> = {
   unpaid: '미납',
   partial: '일부납부',
@@ -59,6 +77,10 @@ export interface FeeLedgerItem {
   outstanding: number;
   paidAt: string | null;
   status: FeeStatus;
+  /** 면제 사유 구분. status='exempt' 일 때만 값이 있다 */
+  exemptionType: FeeExemptionType | null;
+  /** 자유 사유 — `other` 일 때만. **회원 조회에서는 항상 null** (운영자 기록) */
+  exemptionReason: string | null;
   memo: string | null;
   updatedAt: string;
 }
@@ -130,6 +152,10 @@ export async function updateFeeLedger(
     paidAmount?: number;
     paidAt?: string | null;
     exempt?: boolean;
+    /** exempt=true 일 때 필수. exempt=false 면 서버가 사유를 지운다 */
+    exemptionType?: FeeExemptionType | null;
+    /** exemptionType='other' 일 때 필수 */
+    exemptionReason?: string | null;
     memo?: string | null;
     feeCategory?: string | null;
   },

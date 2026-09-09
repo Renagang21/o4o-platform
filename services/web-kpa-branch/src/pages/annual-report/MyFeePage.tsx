@@ -7,7 +7,14 @@
  * 온라인 납부(PG) 버튼도 두지 않는다 (WO 원칙: 결제 기능 없음).
  */
 import { useEffect, useState } from 'react';
-import { listMyFees, feeCategoryLabel, FEE_STATUS_LABEL, type FeeLedgerItem, type FeeStatus } from '../../lib/api/branchFee';
+import {
+  listMyFees,
+  feeCategoryLabel,
+  FEE_STATUS_LABEL,
+  FEE_EXEMPTION_LABEL,
+  type FeeLedgerItem,
+  type FeeStatus,
+} from '../../lib/api/branchFee';
 import { describeApiError as describe } from '../../lib/errors';
 
 const STATUS_CLASS: Record<FeeStatus, string> = {
@@ -88,6 +95,15 @@ export default function MyFeePage({ slug }: { slug: string }) {
                     >
                       {FEE_STATUS_LABEL[row.status]}
                     </span>
+                    {/*
+                      면제 '유형'만 보여준다. 자유 사유(exemptionReason)는 운영자 기록이라
+                      서버가 회원 응답에 담지 않는다 (WO §5).
+                    */}
+                    {row.status === 'exempt' && row.exemptionType && (
+                      <div className="mt-1 text-xs text-gray-600">
+                        {FEE_EXEMPTION_LABEL[row.exemptionType]}
+                      </div>
+                    )}
                     {row.memo && <div className="mt-1 text-xs text-gray-500">{row.memo}</div>}
                   </td>
                 </tr>

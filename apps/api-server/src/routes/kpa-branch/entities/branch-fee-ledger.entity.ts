@@ -29,6 +29,30 @@ import type { KpaFeeCategory } from '../../kpa/entities/kpa-member.entity.js';
 
 export type BranchFeeStatus = 'unpaid' | 'partial' | 'paid' | 'exempt';
 
+/**
+ * 면제 사유 구분 (WO-O4O-KPA-BRANCH-FEE-EXEMPTION-REASON-LEDGER-V1).
+ *
+ * `unemployed` / `exempted` 는 **신상신고 2026 양식의 `fee.exemptionType` option 을
+ * 그대로 쓴 값**이다. 새 코드계를 만들지 않는다.
+ * `other` 는 양식에 없는 분회 실무 사유이며 자유 사유(`exemption_reason`)가 필수다.
+ *
+ * 회비구분(`fee_category`)과 혼동하지 않는다 — 구분은 "얼마를 내는 사람인가",
+ * 면제사유는 "왜 안 내는가" 다.
+ */
+export type BranchFeeExemptionType = 'unemployed' | 'exempted' | 'other';
+
+export const FEE_EXEMPTION_TYPES: readonly BranchFeeExemptionType[] = [
+  'unemployed',
+  'exempted',
+  'other',
+];
+
+/** 신상신고 양식이 표시할 수 있는 코드. `other` 는 양식에 option 이 없다 */
+export const REPORTABLE_FEE_EXEMPTION_TYPES: readonly BranchFeeExemptionType[] = [
+  'unemployed',
+  'exempted',
+];
+
 /** 운영자가 직접 지정할 수 있는 상태. 나머지는 금액에서 파생된다 */
 export const OPERATOR_SETTABLE_FEE_STATUSES: readonly BranchFeeStatus[] = ['exempt'];
 
@@ -67,6 +91,23 @@ export class BranchFeeLedger {
   @Column({ type: 'varchar', length: 20, default: 'unpaid' })
   status: BranchFeeStatus;
 
+  /**
+   * 면제 사유 구분. `status='exempt'` 일 때만 값이 있다
+   * (CHK_branch_fee_ledgers_exemption_status 가 강제).
+   */
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  exemption_type: BranchFeeExemptionType | null;
+
+  /**
+   * 자유 사유. `exemption_type='other'` 일 때만 값이 있고, 그때는 반드시 있다
+   * (CHK_branch_fee_ledgers_exemption_reason).
+   *
+   * 운영자 기록용이다 — 회원 조회 응답에는 포함하지 않는다 (WO §5).
+   */
+  @Column({ type: 'text', nullable: true })
+  exemption_reason: string | null;
+
+  /** 일반 운영 메모. 면제 사유와 용도가 다르다 */
   @Column({ type: 'text', nullable: true })
   memo: string | null;
 

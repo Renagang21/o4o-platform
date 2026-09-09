@@ -21,7 +21,14 @@
 import { AppDataSource } from '../../database/connection.js';
 import { BranchFeePolicy } from '../../routes/kpa-branch/entities/branch-fee-policy.entity.js';
 import { BranchFeeLedger } from '../../routes/kpa-branch/entities/branch-fee-ledger.entity.js';
-import type { BranchFeeStatus } from '../../routes/kpa-branch/entities/branch-fee-ledger.entity.js';
+import {
+  FEE_EXEMPTION_TYPES,
+  REPORTABLE_FEE_EXEMPTION_TYPES,
+} from '../../routes/kpa-branch/entities/branch-fee-ledger.entity.js';
+import type {
+  BranchFeeStatus,
+  BranchFeeExemptionType,
+} from '../../routes/kpa-branch/entities/branch-fee-ledger.entity.js';
 import type { KpaFeeCategory } from '../../routes/kpa/entities/kpa-member.entity.js';
 
 export type FeeFailureCode =
@@ -50,6 +57,9 @@ const AMOUNT_MAX = 10_000_000;
 /** 회비구분 코드 최대 길이 — 컬럼 정의와 같은 값 */
 const FEE_CATEGORY_MAX = 50;
 
+/** 자유 면제사유 최대 길이 — 원장 기록이지 서술문이 아니다 */
+const EXEMPTION_REASON_MAX = 500;
+
 export interface FeePolicyItem {
   feeCategory: string;
   amount: number;
@@ -68,6 +78,13 @@ export interface FeeLedgerItem {
   outstanding: number;
   paidAt: Date | null;
   status: BranchFeeStatus;
+  /** 면제 사유 구분. status='exempt' 일 때만 값이 있다 */
+  exemptionType: BranchFeeExemptionType | null;
+  /**
+   * 자유 사유 — `other` 일 때만. **운영자 응답에만 채운다.**
+   * 회원 조회에서는 항상 null 이다 (WO §5 — 운영자 기록을 그대로 노출하지 않는다).
+   */
+  exemptionReason: string | null;
   memo: string | null;
   updatedAt: Date;
 }
@@ -213,7 +230,7 @@ export class BranchFeeService {
 
     const rows: Array<Record<string, any>> = await AppDataSource.query(
       `SELECT l.id, l.year, l.user_id, l.fee_category, l.assessed_amount, l.paid_amount,
-              l.paid_at, l.status, l.memo, l.updated_at,
+              l.paid_at, l.status, l.exemption_type, l.exemption_reason, l.memo, l.updated_at,
               u.name AS user_name, u.email AS user_email
          FROM branch_fee_ledgers l
          JOIN users u ON u.id = l.user_id
@@ -240,7 +257,7 @@ export class BranchFeeService {
   static async listMyLedgers(params: { organizationId: string; userId: string }): Promise<FeeLedgerItem[]> {
     const rows: Array<Record<string, any>> = await AppDataSource.query(
       `SELECT l.id, l.year, l.user_id, l.fee_category, l.assessed_amount, l.paid_amount,
-              l.paid_at, l.status, l.memo, l.updated_at,
+              l.paid_at, l.status, l.exemption_type, l.exemption_reason, l.memo, l.updated_at,
               u.name AS user_name, u.email AS user_email
          FROM branch_fee_ledgers l
          JOIN users u ON u.id = l.user_id
@@ -248,10 +265,14 @@ export class BranchFeeService {
         ORDER BY l.year DESC`,
       [params.userId, params.organizationId],
     );
-    return rows.map((r) => this.serialize(r));
+    // 회원에게는 사유 '구분'까지만 낸다 — 자유 사유는 운영자 기록이다 (WO §5)
+    return rows.map((r) => this.serialize(r, 'member'));
   }
 
-  private static serialize(r: Record<string, any>): FeeLedgerItem {
+  /**
+   * @param audience 'operator' 만 자유 사유를 받는다. 회원에게는 사유 구분까지만 낸다 (WO §5).
+   */
+  private static serialize(r: Record<string, any>, audience: 'operator' | 'member' = 'operator'): FeeLedgerItem {
     const assessed = Number(r.assessed_amount ?? 0);
     const paid = Number(r.paid_amount ?? 0);
     return {
@@ -267,6 +288,8 @@ export class BranchFeeService {
       outstanding: r.status === 'exempt' ? 0 : Math.max(assessed - paid, 0),
       paidAt: r.paid_at ?? null,
       status: r.status,
+      exemptionType: r.exemption_type ?? null,
+      exemptionReason: audience === 'operator' ? (r.exemption_reason ?? null) : null,
       memo: r.memo ?? null,
       updatedAt: r.updated_at,
     };
@@ -342,14 +365,26 @@ export class BranchFeeService {
            * 미납 목록에 남기지 않는 편이 운영 실무에 맞다.
            */
           const status: BranchFeeStatus = c.amount > 0 ? 'unpaid' : 'exempt';
+          /**
+           * WO-O4O-KPA-BRANCH-FEE-EXEMPTION-REASON-LEDGER-V1:
+           * exempt 행은 이제 사유가 필수다(CHK_branch_fee_ledgers_exemption_status).
+           * 0원 정책 자동 부과는 미취업자도 회비면제자도 아니므로 `other` + 사실 그대로의
+           * 사유를 남긴다. 운영자가 나중에 실제 사유로 바꿀 수 있다.
+           */
+          const exemptionType: BranchFeeExemptionType | null = status === 'exempt' ? 'other' : null;
+          const exemptionReason = status === 'exempt' ? '정책 부과액 0원 (일괄 부과 자동 기록)' : null;
           // 동시 실행 대비 — UNIQUE 충돌은 "이미 부과됨"이므로 조용히 넘긴다
           const res = await manager.query(
             `INSERT INTO branch_fee_ledgers
-               (organization_id, user_id, year, fee_category, assessed_amount, paid_amount, status, updated_by)
-             VALUES ($1, $2, $3, $4, $5, 0, $6, $7)
+               (organization_id, user_id, year, fee_category, assessed_amount, paid_amount, status,
+                exemption_type, exemption_reason, updated_by)
+             VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9)
              ON CONFLICT (organization_id, user_id, year) DO NOTHING
              RETURNING id`,
-            [params.organizationId, c.userId, year, c.feeCategory, c.amount, status, params.actorUserId],
+            [
+              params.organizationId, c.userId, year, c.feeCategory, c.amount, status,
+              exemptionType, exemptionReason, params.actorUserId,
+            ],
           );
           if (Array.isArray(res) && res.length) created += 1;
         }
@@ -433,17 +468,73 @@ export class BranchFeeService {
       memo = v || null;
     }
 
+    /**
+     * 면제 사유 (WO-O4O-KPA-BRANCH-FEE-EXEMPTION-REASON-LEDGER-V1).
+     *
+     * 면제가 아니면 **사유를 남기지 않고 지운다.** 면제를 해제했는데 "미취업 면제" 가
+     * 남아 있으면 원장이 스스로 모순된다 (DB CHECK 도 같은 것을 강제한다).
+     */
+    let exemptionType: BranchFeeExemptionType | null = row.exemption_type;
+    let exemptionReason: string | null = row.exemption_reason;
+
+    if (!exempt) {
+      exemptionType = null;
+      exemptionReason = null;
+    } else {
+      if (p.exemptionType !== undefined) {
+        const v = typeof p.exemptionType === 'string' ? p.exemptionType.trim() : '';
+        if (!FEE_EXEMPTION_TYPES.includes(v as BranchFeeExemptionType)) {
+          throw new BranchFeeError(
+            'FEE_VALUE_INVALID',
+            '면제 사유 구분은 미취업자(unemployed) · 회비면제자(exempted) · 기타(other) 중 하나여야 합니다.',
+            422,
+          );
+        }
+        exemptionType = v as BranchFeeExemptionType;
+      }
+      if (!exemptionType) {
+        // 면제로 전환하는데 사유가 없다 — DB 가 거부하기 전에 422 로 알려준다
+        throw new BranchFeeError('FEE_VALUE_INVALID', '면제로 지정하려면 면제 사유 구분을 선택해 주세요.', 422);
+      }
+
+      if (p.exemptionReason !== undefined) {
+        const v = typeof p.exemptionReason === 'string' ? p.exemptionReason.trim() : '';
+        exemptionReason = v || null;
+      }
+      if (exemptionType === 'other') {
+        if (!exemptionReason) {
+          throw new BranchFeeError('FEE_VALUE_INVALID', '기타 면제는 사유를 입력해 주세요.', 422);
+        }
+        if (exemptionReason.length > EXEMPTION_REASON_MAX) {
+          throw new BranchFeeError(
+            'FEE_VALUE_INVALID',
+            `면제 사유는 ${EXEMPTION_REASON_MAX}자를 넘을 수 없습니다.`,
+            422,
+          );
+        }
+      } else {
+        // 자유 사유는 other 전용이다 (CHK_branch_fee_ledgers_exemption_reason)
+        exemptionReason = null;
+      }
+    }
+
     await AppDataSource.query(
       `UPDATE branch_fee_ledgers
           SET fee_category = $1, assessed_amount = $2, paid_amount = $3,
-              paid_at = $4, status = $5, memo = $6, updated_by = $7, updated_at = now()
-        WHERE id = $8 AND organization_id = $9`,
-      [feeCategory, assessed, paid, paidAt, status, memo, params.actorUserId, params.ledgerId, params.organizationId],
+              paid_at = $4, status = $5, memo = $6,
+              exemption_type = $7, exemption_reason = $8,
+              updated_by = $9, updated_at = now()
+        WHERE id = $10 AND organization_id = $11`,
+      [
+        feeCategory, assessed, paid, paidAt, status, memo,
+        exemptionType, exemptionReason,
+        params.actorUserId, params.ledgerId, params.organizationId,
+      ],
     );
 
     const rows: Array<Record<string, any>> = await AppDataSource.query(
       `SELECT l.id, l.year, l.user_id, l.fee_category, l.assessed_amount, l.paid_amount,
-              l.paid_at, l.status, l.memo, l.updated_at,
+              l.paid_at, l.status, l.exemption_type, l.exemption_reason, l.memo, l.updated_at,
               u.name AS user_name, u.email AS user_email
          FROM branch_fee_ledgers l
          JOIN users u ON u.id = l.user_id
@@ -451,6 +542,35 @@ export class BranchFeeService {
       [params.ledgerId, params.organizationId],
     );
     return this.serialize(rows[0]);
+  }
+
+  /**
+   * 신상신고 `fee.exemptionType` 연동용 — 이 회원의 그 해 면제 사유 구분.
+   * WO-O4O-KPA-BRANCH-FEE-EXEMPTION-REASON-LEDGER-V1
+   *
+   * 면제가 아니면 null 이다. 자유 사유(`exemption_reason`)는 **양식에 내보내지 않는다** —
+   * 운영자 기록이지 신고 항목이 아니다.
+   */
+  static async resolveMemberFeeExemptionType(params: {
+    organizationId: string;
+    userId: string;
+    year: number;
+  }): Promise<BranchFeeExemptionType | null> {
+    const rows: Array<Record<string, any>> = await AppDataSource.query(
+      `SELECT status, exemption_type FROM branch_fee_ledgers
+        WHERE organization_id = $1 AND user_id = $2 AND year = $3 LIMIT 1`,
+      [params.organizationId, params.userId, params.year],
+    );
+    const r = rows[0];
+    if (!r || r.status !== 'exempt' || !r.exemption_type) return null;
+    /**
+     * 양식(`fee.exemptionType`)에 option 이 있는 코드만 낸다.
+     * `other` 는 양식에 없으므로 **추정해서 다른 값으로 바꾸지 않고** 미연결로 둔다
+     * (§4 가짜 값 금지 — `toReportFeeCode` 와 같은 판단).
+     */
+    return REPORTABLE_FEE_EXEMPTION_TYPES.includes(r.exemption_type as BranchFeeExemptionType)
+      ? (r.exemption_type as BranchFeeExemptionType)
+      : null;
   }
 
   /**
