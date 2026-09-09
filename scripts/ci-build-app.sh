@@ -38,10 +38,6 @@ build_app() {
             fi
             pnpm --filter=@o4o/admin-dashboard run build
             ;;
-        "storefront")
-            echo "Building Storefront..."
-            pnpm --fail-if-no-match --filter=@o4o/storefront run build
-            ;;
         "api"|"api-server")
             echo "Building API Server..."
             cd apps/api-server
@@ -70,7 +66,7 @@ build_app() {
             ;;
         *)
             echo "⚠️ Unknown app: $app"
-            echo "Valid options: admin, storefront, api, main, forum, ecommerce, signage/digital-signage, affiliate, vendors, all"
+            echo "Valid options: admin, api, main, forum, ecommerce, signage/digital-signage, affiliate, vendors, all"
             exit 1
             ;;
     esac
