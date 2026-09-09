@@ -45,6 +45,23 @@ function requirePlatformAdmin(req: Request, res: Response, next: () => void) {
 
 // ─── Service Summary Collectors ───
 
+/**
+ * WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 테이블명 교정
+ *
+ * 기존 쿼리는 `FROM kpa_member` · `FROM kpa_application` (**단수**) 였다. 실제 canonical 테이블은
+ * `kpa_members` · `kpa_applications` (복수) 이며, 단수형은 저장소 전체에서 이 파일에만 존재했다
+ * (`20260206190000-CreateKpaFoundationTables.ts` 가 생성하는 이름이 정본).
+ *
+ * 그 결과 **첫 쿼리에서 곧바로 throw** → 아래 catch → KPA 카드가 영구히
+ * `error: 'unavailable'` · `riskLevel: 'unknown'` 으로 렌더됐다. 플랫폼 HUB 화면의 KPA 요약은
+ * 한 번도 동작한 적이 없다.
+ *
+ * ⚠ **HTTP 는 200 이었다** — 서비스별 수집 실패를 카드 단위로 흡수하는 구조이기 때문이다.
+ *   그래서 과거의 "조회 API 2xx 확인" 검증(WO-O4O-ADMIN-MENU-CONNECT-READY-ONLY-V1)을 그대로
+ *   통과했다. 이 화면 계열은 **status code 가 아니라 카드별 `error` 필드로 검증**해야 한다.
+ *
+ * 근거: docs/investigations/IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1.md §5-4 #1
+ */
 async function getKpaSummary(ds: DataSource): Promise<Record<string, any>> {
   try {
     const [memberStats] = await ds.query(`
@@ -52,14 +69,14 @@ async function getKpaSummary(ds: DataSource): Promise<Record<string, any>> {
         COUNT(*) FILTER (WHERE status = 'active') as "activeMembers",
         COUNT(*) FILTER (WHERE status = 'pending') as "pendingMembers",
         COUNT(*) as "totalMembers"
-      FROM kpa_member
+      FROM kpa_members
     `);
 
     const [appStats] = await ds.query(`
       SELECT
         COUNT(*) FILTER (WHERE status = 'submitted') as "pendingApplications",
         COUNT(*) as "totalApplications"
-      FROM kpa_application
+      FROM kpa_applications
     `);
 
     const [forumStats] = await ds.query(`

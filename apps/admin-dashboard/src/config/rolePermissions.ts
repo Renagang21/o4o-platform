@@ -61,6 +61,48 @@ export const menuPermissions: MenuPermission[] = [
     roles: [...PLATFORM_ADMIN_ROLES]
   },
 
+  // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1
+  //   `/operators` 는 `/users` 와 **같은 endpoint**(`/api/v1/admin/users`)를 소비하므로
+  //   같은 경계를 선언한다. 무게이트로 두면 "설정 없음 = 허용" 정책에 따라
+  //   서비스 접두 역할(kpa:operator 등)에게도 노출되는데, 백엔드는 그들을 403 으로 거부한다.
+  {
+    menuId: 'core-operators',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+
+  // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 백엔드 경계 복제
+  //
+  //   아래 3건은 백엔드가 `platform:super_admin` 만 허용하는 화면이다. 무게이트로 두면
+  //   "설정 없음 = 허용" 정책 + App.tsx floor(`['admin']`)의 서비스 접두 역할 수용 때문에
+  //   `kpa:operator`·`neture:operator` 등에게도 메뉴가 보이지만, 클릭하면 API 가 403 이다.
+  //   **쓸 수 없는 메뉴를 보여주지 않는다.**
+  //
+  //   | 메뉴 | 백엔드 | 가드 |
+  //   |---|---|---|
+  //   | core-points     | `/api/v1/points/admin/*`      | `requireAuth` + `requireAdmin` |
+  //   | platform-hub    | `/api/v1/platform/hub/*`      | `requireAuth` + `requirePlatformAdmin` |
+  //   | ops-metrics     | `/api/v1/admin/ops/metrics`   | `authenticate` + `requireAdmin` |
+  //   | appstore-browse | `/api/v1/admin/apps`          | `requireAdmin` |
+  //
+  //   `requireAdmin` 은 WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1 이후 `platform:super_admin` 전용이다
+  //   (legacy `admin`·`super_admin` 거부).
+  {
+    menuId: 'core-points',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'platform-hub',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'ops-metrics',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'appstore-browse',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+
   // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
   //   회원 관리(core-membership*) 메뉴 4건의 권한 설정은 메뉴·화면·`/api/v1/membership/*`
   //   백엔드 subtree 가 함께 제거되면서 평가 대상이 사라져 삭제했다.

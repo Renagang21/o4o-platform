@@ -3,12 +3,6 @@ import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
 import { AppRouteGuard } from '@/components/AppRouteGuard';
 
-// Forum Pages (from @o4o/forum-core package - source imports)
-const ForumDashboard = lazy(() => import('@/pages/forum'));
-const ForumBoardList = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumBoardList'));
-const ForumCategories = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumCategories'));
-const ForumPostDetail = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumPostDetail'));
-const ForumPostForm = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumPostForm'));
 
 // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
 //   Yaksa Community 화면 3건(`@o4o/forum-core-yaksa/src/admin-ui/pages/*`) 의 동적 import 제거.
@@ -32,65 +26,30 @@ const PageLoader = () => (
  */
 export function AppRoutes() {
   return [
-    // 포럼 — 플랫폼 기본 커뮤니티 기능 (설치형 앱 아님)
+    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
+    //   Forum 관리자 화면 6개 라우트(/forum · /forum/boards · /forum/categories ·
+    //   /forum/posts/:id · /forum/posts/new · /forum/posts/:id/edit) 와 admin 로컬
+    //   `pages/forum` 을 제거했다.
     //
-    // WO-O4O-ADMIN-FORUM-BASE-FEATURE-GUARD-ALIGNMENT-V1:
-    //   기존에는 <AppRouteGuard appId="forum"> 로 앱 availability 게이팅을 했으나,
-    //   평문 appId 'forum' 은 app_registry / seed / appsCatalog 어디에도 존재하지 않는다
-    //   (카탈로그의 forum 계열은 forum-core / organization-forum 등 별도 확장 앱).
-    //   그 결과 availability 조회가 정상이어도 항상 비활성으로 판정되어
-    //   모든 사용자가 /error/app-disabled 로 튕겼다.
-    //   Forum 은 전 서비스 공통 기본 기능이므로 설치형 앱 게이팅 대상이 아니다 → 게이팅만 제거.
+    //   판정 근거 (IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1 §5-2):
+    //     - Dashboard/Boards/Categories 는 **서비스 커뮤니티의 일상 운영** 기능이며
+    //       플랫폼 구조 관리가 아니다.
+    //     - 각 서비스 operator 콘솔에 이미 정본이 있다 — KPA Society 는 포럼 5개 메뉴
+    //       (포럼 운영 / 신청 관리 / 목록 관리 / 삭제 요청 / 분석,
+    //        `services/web-kpa-society/src/config/operatorMenuGroups.ts` forum 그룹).
+    //     - 관리자 사이트발 프로덕션 호출은 30일간 `/api/v1/forum/categories` 2건뿐이었다
+    //       (같은 기간 서비스 프런트발 `/api/v1/forum*` 은 400건+).
+    //     - Dashboard 화면은 `/forum/users` · `/forum/moderation` 로 이동하는
+    //       **데드링크 2건**을 갖고 있었다(라우트 미정의 → catch-all).
     //
-    //   접근 통제는 그대로 유지된다:
-    //     - 프론트: AdminProtectedRoute (forum:read / forum:write)
-    //     - 백엔드: /api/v1/forum 목록·조회 optionalAuth, 작성·수정·삭제 authenticate,
-    //               운영자 관리(admin-forum.routes) router.use(authenticate)
-    //   앱 availability 는 권한 검사를 대신하지 않는다.
-    //
-    //   서비스별 확장 앱(pharmacy-ai-insight / partnerops 등)의 가드는 그대로 둔다.
-    <Route key="/forum" path="/forum" element={
-      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <ForumDashboard />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/forum/boards" path="/forum/boards" element={
-      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <ForumBoardList />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/forum/categories" path="/forum/categories" element={
-      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <ForumCategories />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/forum/posts/:id" path="/forum/posts/:id" element={
-      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <ForumPostDetail />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/forum/posts/new" path="/forum/posts/new" element={
-      <AdminProtectedRoute requiredPermissions={['forum:write']}>
-        <Suspense fallback={<PageLoader />}>
-          <ForumPostForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/forum/posts/:id/edit" path="/forum/posts/:id/edit" element={
-      <AdminProtectedRoute requiredPermissions={['forum:write']}>
-        <Suspense fallback={<PageLoader />}>
-          <ForumPostForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
+    //   ⚠ 공용 자산은 건드리지 않는다:
+    //     - `@o4o/forum-core` 패키지(admin-ui 포함) 와 `packages/forum-core/src/index.ts`
+    //       재수출은 그대로 둔다. 공용 모듈이며 이 WO 의 범위가 아니다.
+    //     - 백엔드 `/api/v1/forum` · `/api/v1/kpa/forum` 도 그대로 둔다 —
+    //       서비스 프런트가 실사용 중이다.
+    //     - `components/routing/ViewComponentRegistry.ts` 의 forum view 4건은
+    //       manifest 기반 동적 라우팅용 등록이며 사이드바·라우트와 별개다 → 보존.
+
 
     // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
     //   /yaksa/communities 계열 3개 라우트 제거.

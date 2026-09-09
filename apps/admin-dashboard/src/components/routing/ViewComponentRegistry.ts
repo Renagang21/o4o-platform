@@ -117,66 +117,20 @@ export const viewComponentRegistry = new ViewComponentRegistryClass();
 // REGISTER CMS-CORE COMPONENTS
 // ============================================================================
 
-// CMS V2 Pages
-viewComponentRegistry.register(
-  'cms-core.templates-list',
-  lazy(() => import('@/pages/cms/cpts/CMSCPTList')), // TODO: Replace with actual templates list
-  { appId: 'cms-core', description: 'Templates List' }
-);
-
-viewComponentRegistry.register(
-  'cms-core.cpt-list',
-  lazy(() => import('@/pages/cms/cpts/CMSCPTList')),
-  { appId: 'cms-core', description: 'CPT List' }
-);
-
-viewComponentRegistry.register(
-  'cms-core.cpt-form',
-  lazy(() => import('@/pages/cms/cpts/CPTForm')),
-  { appId: 'cms-core', description: 'CPT Form' }
-);
-
-viewComponentRegistry.register(
-  'cms-core.acf-list',
-  lazy(() => import('@/pages/cms/fields/CMSFieldList')),
-  { appId: 'cms-core', description: 'ACF Fields List' }
-);
-
-viewComponentRegistry.register(
-  'cms-core.acf-form',
-  lazy(() => import('@/pages/cms/fields/FieldForm')),
-  { appId: 'cms-core', description: 'ACF Field Form' }
-);
-
-viewComponentRegistry.register(
-  'cms-core.views-list',
-  lazy(() => import('@/pages/cms/views/CMSViewList')),
-  { appId: 'cms-core', description: 'Views List' }
-);
-
-viewComponentRegistry.register(
-  'cms-core.views-form',
-  lazy(() => import('@/pages/cms/views/ViewForm')),
-  { appId: 'cms-core', description: 'View Form' }
-);
-
-viewComponentRegistry.register(
-  'cms-core.pages-list',
-  lazy(() => import('@/pages/cms/pages/CMSPageList')),
-  { appId: 'cms-core', description: 'CMS Pages List' }
-);
-
-viewComponentRegistry.register(
-  'cms-core.pages-form',
-  lazy(() => import('@/pages/cms/pages/PageForm')),
-  { appId: 'cms-core', description: 'CMS Page Form' }
-);
-
-viewComponentRegistry.register(
-  'cms-core.view-designer',
-  lazy(() => import('@/pages/cms/designer/ViewDesigner')),
-  { appId: 'cms-core', description: 'Visual View Designer' }
-);
+// WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
+//   CMS V2 view 등록 10건(templates-list / cpt-list / cpt-form / acf-list / acf-form /
+//   views-list / views-form / pages-list / pages-form / view-designer) 제거.
+//
+//   근거: 이 등록들이 가리키던 화면은 `/api/v1/cms/{cpts,fields,views,pages}` 를 호출했고
+//   그 백엔드는 **존재하지 않는다** — `apps/api-server/src/modules/cms/` 에는 entity 만 있고
+//   라우트·컨트롤러가 0건이며 `register-routes.ts` 에 등록된 적도 없다.
+//   프로덕션 실측 404 (2026-08-10, `/api/v1/cms/fields` · `/api/v1/cms/cpts`).
+//   화면 파일(`pages/cms/{cpts,fields,views,pages,designer}`)을 함께 제거했으므로
+//   등록만 남기면 lazy import 가 깨진다.
+//
+//   entity(`modules/cms/entities`) 와 테이블(`cms_cpts` 등)은 **보존**한다 —
+//   삭제는 소비처·데이터 조사 후 별도 판정.
+//   조사 정본: docs/investigations/IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1.md
 
 // Media Library
 viewComponentRegistry.register(

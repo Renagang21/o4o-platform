@@ -31,102 +31,28 @@ const PageLoader = () => (
   </div>
 );
 
-/**
- * Redirect component for removed routes
- * Shows a message and redirects to the appropriate location
- */
-const RemovedRouteRedirect = ({ message }: { message: string }) => (
-  <div className="p-6 space-y-4">
-    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-      <h3 className="font-medium text-yellow-800">Route Relocated</h3>
-      <p className="text-yellow-700 mt-1">{message}</p>
-      <p className="text-sm text-yellow-600 mt-2">
-        This route has been moved as part of Role Reform.
-        Please access it from the appropriate service frontend.
-      </p>
-    </div>
-  </div>
-);
-
 export default function DigitalSignageRouter() {
   return (
     <AppGuard appId="digital-signage-core" appName="Digital Signage">
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* ========== Admin Dashboard Root ========== */}
+          {/* Admin Dashboard Root → canonical Content Hub */}
           <Route path="/" element={<Navigate to="content" replace />} />
 
-          {/* ========== Admin: Content Hub (canonical) ========== */}
+          {/* Admin: Content Hub (canonical · browse-only) */}
           <Route path="content" element={<ContentHub />} />
 
-          {/* ========== Removed Routes (Role Reform) ========== */}
-          {/* These routes have been moved to Service Frontend */}
+          {/* WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
+              `RemovedRouteRedirect` 안내 화면 9건(preview/hq · v2/hq · preview/store/* ·
+              v2/store · templates/* · v2/templates/* · content-blocks · layout-presets · v2/*)
+              과 그 컴포넌트를 제거했다.
 
-          {/* HQ routes → Service Frontend /signage/hq/* */}
-          <Route
-            path="preview/hq"
-            element={
-              <RemovedRouteRedirect message="HQ Content Manager has been moved to Service Frontend at /signage/hq" />
-            }
-          />
-          <Route
-            path="v2/hq"
-            element={
-              <RemovedRouteRedirect message="HQ Content Manager has been moved to Service Frontend at /signage/hq" />
-            }
-          />
+              이 화면들은 노란 "Route Relocated" 박스만 렌더하는 이전 완료 안내였다.
+              Role Reform 이전은 이미 끝났고(HQ → 서비스 프런트 /signage/hq/*,
+              Store → /signage/store/*), 안내를 무기한 유지하면 관리자 사이트에
+              "이동됨" 화면만 쌓인다. 아래 catch-all 이 canonical 진입점으로 보낸다. */}
 
-          {/* Store routes → Service Frontend /signage/store/* */}
-          <Route
-            path="preview/store/*"
-            element={
-              <RemovedRouteRedirect message="Store Dashboard has been moved to Service Frontend at /signage/store" />
-            }
-          />
-          <Route
-            path="v2/store"
-            element={
-              <RemovedRouteRedirect message="Store Dashboard has been moved to Service Frontend at /signage/store" />
-            }
-          />
-
-          {/* Template routes → Operator or Extension */}
-          <Route
-            path="templates/*"
-            element={
-              <RemovedRouteRedirect message="Templates are now managed by HQ Operators at /signage/hq/templates" />
-            }
-          />
-          <Route
-            path="v2/templates/*"
-            element={
-              <RemovedRouteRedirect message="Templates are now managed by HQ Operators at /signage/hq/templates" />
-            }
-          />
-
-          {/* Content blocks → Operator or Extension */}
-          <Route
-            path="content-blocks"
-            element={
-              <RemovedRouteRedirect message="Content Blocks are now managed by HQ Operators" />
-            }
-          />
-          <Route
-            path="layout-presets"
-            element={
-              <RemovedRouteRedirect message="Layout Presets are now managed by HQ Operators" />
-            }
-          />
-
-          {/* Legacy V2 redirects → Removed */}
-          <Route
-            path="v2/*"
-            element={
-              <RemovedRouteRedirect message="V2 routes have been reorganized. Please use the new navigation." />
-            }
-          />
-
-          {/* Catch-all for unknown routes */}
+          {/* 알 수 없는 경로는 canonical 진입점으로 */}
           <Route path="*" element={<Navigate to="content" replace />} />
         </Routes>
       </Suspense>

@@ -1,20 +1,67 @@
 /**
- * Admin Menu Static Config
+ * Admin Menu — O4O 플랫폼 관리자 사이트 메뉴 정본
  *
- * WO-ADMIN-MENU-FALLBACK-STATIC-V1
- * Static fallback menu for when Navigation API is unavailable.
+ * **이 파일이 `admin.neture.co.kr` 사이드바의 유일한 SSOT 다.**
  *
- * Structure: Overview / Core / Content / Services / Insights
- * This file replaces the deprecated wordpressMenuFinal.tsx
+ * WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 (3단계)
+ *   전수조사 결과에 따라 정보구조를 재편했다.
+ *   조사 정본: `docs/investigations/IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1.md`
  *
- * @see docs/architecture/admin-goal-state-definition.md
+ * 파일명의 `static` 은 역사적 이름이다. 과거에는 `/api/v1/navigation/admin` 이 정본이고 이 파일이
+ * fallback 이었으나, 그 endpoint 는 Phase R1 이후 **영구 stub**(`data: []`)이다
+ * (`apps/api-server/src/routes/navigation.routes.ts:18`). 따라서 `useAdminMenu` 의 API 분기는
+ * 도달할 수 없고 이 파일이 실제 정본이다.
+ *
+ * ## 사이트의 역할 (2026-09-09 확정)
+ *
+ * `admin.neture.co.kr` = **O4O 플랫폼 전체 관리자 사이트**.
+ *   - 플랫폼 전역 사용자·역할·권한
+ *   - 공통 상품/기준 데이터
+ *   - 전 서비스 공통 콘텐츠·CMS 정책
+ *   - 공통 AppStore
+ *   - 플랫폼 차원 집계
+ *
+ * 다음은 이 사이트의 대상이 **아니다** — 각 서비스의 `/operator` 콘솔이 정본이다.
+ *   - 특정 서비스 전용 업무 (KPA·K-Cosmetics·PharmacyHub·Neture)
+ *   - 서비스별 게시판·콘텐츠 일상 운영
+ *   - 개별 매장 업무 / 매장 실행 자산 제작
+ *
+ * ## 이번 재편에서 제거한 항목과 근거 (IR §5-2)
+ *
+ * | 제거 | 근거 |
+ * |---|---|
+ * | `Forum` 그룹 3항목 | 서비스 커뮤니티 일상 운영. KPA operator 콘솔에 포럼 5개 메뉴가 이미 정본으로 존재 |
+ * | `Yaksa (KPA)` 그룹 4항목 | KPA 전용. `KPA_SCOPE_CONFIG.platformBypass=false` + `blockedServicePrefixes:['platform',…]` → **플랫폼 관리자는 구조적으로 403** |
+ * | `CMS > Post Types·Fields·Views·Pages` | **백엔드 부재.** `modules/cms/` 는 entities 만 있고 라우트 0건·미등록 → 프로덕션 404 실측 |
+ * | `Content > Collections` | 화면 주석에 "기능 미구현 · DB 미구현" 명시 |
+ * | `매장 네트워크` · `오프라인 매장` | 이름과 달리 **Cosmetics 단일 서비스** 집계(`cosmetics_stores` + `checkout_orders`). K-Cosmetics operator 에 매장 관리·주문 현황이 이미 존재 |
+ * | `Content Manager` | 748줄 **목업** — API 호출 0건, 하드코딩 샘플 데이터 |
+ * | `Insights` 구분선 | 하위 항목이 재배치되어 그룹이 소멸 |
+ *
+ * 제거는 **관리자 진입점 기준**이다. 백엔드 API·엔티티·테이블은 이 WO 에서 삭제하지 않는다
+ * (`checkout_orders` = 공급자→매장 B2B 주문 정본 · `physical_stores` · `/api/v1/cpt/*` 포함).
+ *
+ * ## 이름을 실제 범위에 맞춘 항목
+ *
+ * - `Ops Metrics` → `CMS 그룹 > 운영 상태`.
+ *   응답의 `channels`·`services`·`opsStatus` 는 Channel 축 은퇴로 **하드코딩 0** 이고, 실데이터는
+ *   `lockedSlots`·`emptyCriticalSlots`·`expiredContents` **셋 뿐**이다. 즉 CMS 콘텐츠·슬롯 상태
+ *   지표이므로 CMS 그룹이 정확한 위치다. `Ops`/`Insights` 라는 이름은 실제 범위를 과장했다.
+ * - `Digital Signage > Content Hub` → `사이니지 콘텐츠 조회`.
+ *   browse-only 이고 `serviceKey` 가 `'neture'` **하드코딩**이다(`v2/ContentHub.tsx`).
+ *   전 서비스 공통 자산 통제 기능이 아니므로 이름에서 그 함의를 뺀다.
+ *
+ * ## 메뉴 가시성은 인가 경계가 아니다
+ *
+ * 실제 인가는 route guard(`AdminProtectedRoute`)와 백엔드가 담당한다. 다만 백엔드가
+ * `platform:super_admin` 만 허용하는 화면은 `config/rolePermissions.ts` 에서 같은 경계를 선언해
+ * **쓸 수 없는 메뉴를 보여주지 않는다** (`admin-menu-route-backend-alignment.test.ts` 가 고정).
  */
 
 import { ReactElement } from 'react';
 import {
   LayoutDashboard,
   Database,
-  Palette,
   Package,
   Settings,
   Users,
@@ -24,11 +71,8 @@ import {
   Activity,
   Monitor,
   Image,
-  TrendingUp,
-  MessageSquare,
   Layers,
   Shield,
-  Briefcase,
   Coins,
 } from 'lucide-react';
 
@@ -46,17 +90,18 @@ export interface MenuItem {
 }
 
 /**
- * Static fallback menu items
+ * 관리자 메뉴 트리
  *
- * Structure:
- * +-- Overview (Dashboard)
- * +-- Core (Users, Operators, Membership, Settings)
- * +-- Content
- * +-- CMS
- * +-- AppStore
- * +-- Forum
- * +-- Services (Yaksa, Digital Signage)
- * +-- Insights (Ops Metrics, Content Manager, Reports)
+ * ```text
+ * Overview                  /admin
+ * 플랫폼 HUB                 /admin/platform/hub
+ * Core                      RBAC · 운영자 · 포인트 · 설정
+ * O4O 상품 DB                공통 기준 상품 데이터 (화면 내 탭과 1:1)
+ * Content                   공통 콘텐츠 자산·정책
+ * CMS                       Contents · Slots · 운영 상태
+ * AppStore                  Browse Apps
+ * 사이니지 콘텐츠 조회        /admin/digital-signage/content
+ * ```
  */
 export const adminMenuStatic: MenuItem[] = [
   // ============================================
@@ -70,7 +115,20 @@ export const adminMenuStatic: MenuItem[] = [
   },
 
   // ============================================
-  // CORE
+  // PLATFORM HUB — 유일한 진짜 플랫폼 전역 집계 화면
+  //   KPA(kpa_members / kpa_applications / forum_post) + Neture(neture_suppliers /
+  //   product_approvals) 를 한 화면에 모은다. 백엔드 guard = platform:super_admin.
+  // ============================================
+  {
+    id: 'platform-hub',
+    label: '플랫폼 HUB',
+    icon: <Layers className="w-5 h-5" />,
+    path: '/admin/platform/hub',
+  },
+
+  // ============================================
+  // CORE — 사람 · 권한 · 금융 · 설정 (Admin 거버넌스)
+  //   CLAUDE.md §11 — Admin = 구조 + 정책 + 거버넌스 + 금융
   // ============================================
   {
     id: 'core',
@@ -79,8 +137,9 @@ export const adminMenuStatic: MenuItem[] = [
     children: [
       // WO-O4O-ADMIN-ASSIGNMENT-ROW-LIST-CANONICALIZATION-V1 / WO-O4O-ADMIN-USERS-RBAC-CONSOLE-REPOSITIONING-V1
       // 두 entry 는 동일 RBAC SSOT (`role_assignments`) 위의 다른 facet preset:
-      //   /users     — 전체 권한 할당 (assignment-row, 모든 role) · platform super_admin 전용
+      //   /users     — 전체 권한 할당 (assignment-row, 모든 role)
       //   /operators — 운영 권한(admin/operator/super_admin) preset 적용 + Add/Revoke
+      // 둘 다 `/api/v1/admin/users` 를 소비하므로 같은 경계(platform:super_admin)를 쓴다.
       {
         id: 'core-users',
         label: 'RBAC Role Assignments',
@@ -93,16 +152,9 @@ export const adminMenuStatic: MenuItem[] = [
         icon: <Shield className="w-4 h-4" />,
         path: '/operators',
       },
-      // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
-      //   약사회 전용 Membership 4개 메뉴(dashboard/members/verifications/categories)는
-      //   @o4o/membership-yaksa 패키지 제거와 함께 삭제되었다. 향후 약사회 기능은
-      //   중앙 O4O 관리자가 아닌 별도 서비스에서 새로 설계한다.
       // WO-O4O-ADMIN-MENU-CONNECT-BATCH-2-V1
-      //   포인트 운영은 금액성 write(지급/차감) 를 가진 화면이라 Admin 영역에 배치한다
-      //   (CLAUDE.md §11 — Admin = 구조 + 정책 + 거버넌스 + **금융**).
-      //   이 메뉴에 'Admin' 이라는 별도 그룹은 없고, RBAC·Operators·Membership·Platform Settings 를
-      //   담은 `Core` 그룹이 Admin 거버넌스 그룹에 해당하므로 여기에 넣는다(신규 그룹 생성 없음).
-      //   화면 자체 guard 는 admin·super_admin 이며 변경하지 않는다.
+      //   포인트 운영은 금액성 write(지급/차감)를 가진 화면이라 Admin 거버넌스 그룹에 둔다.
+      //   백엔드 `/api/v1/points/admin/*` = requireAuth + requireAdmin(platform:super_admin).
       {
         id: 'core-points',
         label: '포인트 운영',
@@ -119,8 +171,13 @@ export const adminMenuStatic: MenuItem[] = [
   },
 
   // ============================================
-  // O4O PRODUCT DB (공공/공통 기본 상품 DB — read-only)
+  // O4O PRODUCT DB (공공/공통 기본 상품 DB)
   // WO-O4O-ADMIN-PUBLIC-PRODUCT-DB-READONLY-SKELETON-V1
+  //
+  // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
+  //   사이드바 5항목 ↔ 화면 내 탭 7항목이 어긋나 있었다(`ProductDbLayout.tsx` TABS).
+  //   누락된 `설명서 검수`(프로덕션 쓰기 실사용) · `이미지 상태` 를 등재해 **1:1 로 정합**시킨다.
+  //   route 는 이미 존재하며(`o4o-product-db.routes.tsx`) 신규 화면·API 는 없다.
   // ============================================
   {
     id: 'o4o-product-db',
@@ -153,6 +210,19 @@ export const adminMenuStatic: MenuItem[] = [
         path: '/admin/o4o-product-db/masters',
       },
       {
+        // WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-DRAFT-SAVE-AND-REVIEW-QUEUE-V1
+        id: 'o4o-product-db-supplier-store-descriptions',
+        label: '설명서 검수',
+        icon: <ClipboardList className="w-4 h-4" />,
+        path: '/admin/o4o-product-db/supplier-store-descriptions',
+      },
+      {
+        id: 'o4o-product-db-image-quality',
+        label: '이미지 상태',
+        icon: <Image className="w-4 h-4" />,
+        path: '/admin/o4o-product-db/image-quality',
+      },
+      {
         id: 'o4o-product-db-maintenance',
         label: '데이터 정비',
         icon: <Settings className="w-4 h-4" />,
@@ -161,7 +231,11 @@ export const adminMenuStatic: MenuItem[] = [
     ],
   },
 
-  // Content
+  // ============================================
+  // CONTENT — 공통 콘텐츠 자산 · 정책
+  //   `Collections` 제거(기능 미구현 명시). `Policies` 는 데이터 화면이 아니라
+  //   content-core 의 Owner/Status/Visibility 정책 **안내 문서** 화면이므로 이름을 맞춘다.
+  // ============================================
   {
     id: 'content',
     label: 'Content',
@@ -180,14 +254,8 @@ export const adminMenuStatic: MenuItem[] = [
         path: '/content/assets',
       },
       {
-        id: 'content-collections',
-        label: 'Collections',
-        icon: <Layers className="w-4 h-4" />,
-        path: '/content/collections',
-      },
-      {
         id: 'content-policies',
-        label: 'Policies',
+        label: '정책 안내',
         icon: <Shield className="w-4 h-4" />,
         path: '/content/policies',
       },
@@ -200,8 +268,14 @@ export const adminMenuStatic: MenuItem[] = [
     ],
   },
 
-
+  // ============================================
   // CMS
+  //   실동작 축은 `cms_contents` · `cms_content_slots` 둘이다.
+  //   [REMOVED] Post Types / Fields / Views / Pages —
+  //     `/api/v1/cms/{cpts,fields,views,pages}` 백엔드가 존재하지 않아 프로덕션 404 였다.
+  //     entity(`modules/cms/entities`)와 테이블은 보존한다(삭제는 별도 판정).
+  //   [RETIRED] cms-channels / cms-channel-ops — WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-...-V1
+  // ============================================
   {
     id: 'cms',
     label: 'CMS',
@@ -219,35 +293,20 @@ export const adminMenuStatic: MenuItem[] = [
         icon: <Layers className="w-4 h-4" />,
         path: '/admin/cms/slots',
       },
-      // [RETIRED] cms-channels / cms-channel-ops — WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1
       {
-        id: 'cms-cpts',
-        label: 'Post Types',
-        icon: <FileText className="w-4 h-4" />,
-        path: '/admin/cms/cpts',
-      },
-      {
-        id: 'cms-fields',
-        label: 'Fields',
-        icon: <FileText className="w-4 h-4" />,
-        path: '/admin/cms/fields',
-      },
-      {
-        id: 'cms-views',
-        label: 'Views',
-        icon: <Palette className="w-4 h-4" />,
-        path: '/admin/cms/views',
-      },
-      {
-        id: 'cms-pages',
-        label: 'Pages',
-        icon: <FileText className="w-4 h-4" />,
-        path: '/admin/cms/pages',
+        // 구 `Ops Metrics`. 실데이터가 CMS 슬롯·콘텐츠 상태 3개(lockedSlots /
+        // emptyCriticalSlots / expiredContents)뿐이므로 CMS 그룹이 정확한 위치다.
+        id: 'ops-metrics',
+        label: '운영 상태',
+        icon: <Activity className="w-4 h-4" />,
+        path: '/admin/ops/metrics',
       },
     ],
   },
 
-  // AppStore
+  // ============================================
+  // APPSTORE — 공통 앱 카탈로그 (`app_registry`)
+  // ============================================
   {
     id: 'appstore',
     label: 'AppStore',
@@ -262,152 +321,22 @@ export const adminMenuStatic: MenuItem[] = [
     ],
   },
 
-  // Forum
-  {
-    id: 'forum',
-    label: 'Forum',
-    icon: <MessageSquare className="w-5 h-5" />,
-    children: [
-      {
-        id: 'forum-dashboard',
-        label: 'Dashboard',
-        icon: <LayoutDashboard className="w-4 h-4" />,
-        path: '/forum',
-      },
-      {
-        id: 'forum-boards',
-        label: 'Boards',
-        icon: <MessageSquare className="w-4 h-4" />,
-        path: '/forum/boards',
-      },
-      {
-        id: 'forum-categories',
-        label: 'Categories',
-        icon: <Layers className="w-4 h-4" />,
-        path: '/forum/categories',
-      },
-    ],
-  },
-
   // ============================================
-  // SERVICES
+  // 사이니지 콘텐츠 조회 (browse-only)
+  //   그룹에 자식이 하나뿐이라 최상위 leaf 로 평탄화했다.
+  //   `serviceKey='neture'` 하드코딩 상태이므로 플랫폼 전역 자산 통제 기능이 아니다.
+  //   전 서비스 공통 사이니지 정책 화면은 현재 존재하지 않는다(신설 시 별도 WO).
   // ============================================
   {
-    id: 'services-separator',
-    label: 'Services',
-    icon: <Briefcase className="w-5 h-5" />,
-    separator: true,
-  },
-
-  // Yaksa (KPA)
-  {
-    id: 'yaksa',
-    label: 'Yaksa (KPA)',
-    icon: <Activity className="w-5 h-5" />,
-    children: [
-      // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
-      //   `지부/분회 관리자 센터 → /admin/yaksa` 는 약사회 전용 관리자 화면이라 제거했다.
-      //   아래 4개 항목은 현재 운영 중인 KPA Society operator 화면이므로 보존한다.
-      {
-        id: 'yaksa-hub-contents',
-        label: 'HUB 콘텐츠',
-        icon: <FileText className="w-4 h-4" />,
-        path: '/operator/hub-contents',
-      },
-      {
-        id: 'yaksa-content-approvals',
-        label: '콘텐츠 승인',
-        icon: <ClipboardList className="w-4 h-4" />,
-        path: '/operator/approvals',
-      },
-      // WO-O4O-KPA-ADMIN-SNAPSHOT-BROWSE-V1
-      {
-        id: 'yaksa-snapshots',
-        label: '공급 자산 조회',
-        icon: <Layers className="w-4 h-4" />,
-        path: '/operator/kpa/snapshots',
-      },
-      {
-        id: 'yaksa-force-assets',
-        label: 'Force Asset 관리',
-        icon: <Shield className="w-4 h-4" />,
-        path: '/operator/kpa/force-assets',
-      },
-    ],
-  },
-
-
-
-  // Digital Signage
-  {
-    id: 'digital-signage',
-    label: 'Digital Signage',
+    id: 'digital-signage-content',
+    label: '사이니지 콘텐츠 조회',
     icon: <Monitor className="w-5 h-5" />,
-    children: [
-      {
-        id: 'signage-content-hub',
-        label: 'Content Hub',
-        icon: <Image className="w-4 h-4" />,
-        path: '/admin/digital-signage/content',
-      },
-    ],
+    path: '/admin/digital-signage/content',
   },
-
-
-  // ============================================
-  // INSIGHTS
-  // ============================================
-  {
-    id: 'insights-separator',
-    label: 'Insights',
-    icon: <TrendingUp className="w-5 h-5" />,
-    separator: true,
-  },
-
-  {
-    id: 'ops-metrics',
-    label: 'Ops Metrics',
-    icon: <Activity className="w-5 h-5" />,
-    path: '/admin/ops/metrics',
-  },
-
-  // WO-O4O-ADMIN-MENU-CONNECT-READY-ONLY-V1:
-  //   메뉴 진입선이 없던 기존 화면 3개를 연결한다(신규 화면·route·API 없음).
-  //   선행 검증: WO-O4O-ADMIN-API-DOUBLE-PREFIX-FIX-V1 CHECK — 배포 후 프로덕션 read-only 로
-  //   조회 API 2xx · 실데이터 렌더 · 콘솔 오류 0 확인된 READY 3건.
-  //   Insights 섹션에 배치한 이유: 세 화면 모두 서비스 경계를 가로지르는 **운영 현황**이며
-  //   같은 섹션의 Ops Metrics 와 성격이 같다. Core 는 사람·권한·설정 축이라 맞지 않는다.
-  //   route guard 는 셋 다 requiredRoles={['admin']} 로, 이미 메뉴에 연결된
-  //   Ops Metrics(/admin/ops/metrics) 와 동일하다 → 기존 권한 경계를 그대로 따른다.
-  //   (menuPermissions 별도 항목 없음 = "설정 없음 = 허용" 관례. Ops Metrics 와 동일.)
-  {
-    id: 'platform-hub',
-    label: '플랫폼 HUB',
-    icon: <Layers className="w-5 h-5" />,
-    path: '/admin/platform/hub',
-  },
-  {
-    id: 'store-network',
-    label: '매장 네트워크',
-    icon: <BarChart2 className="w-5 h-5" />,
-    path: '/admin/store-network',
-  },
-  {
-    id: 'physical-stores',
-    label: '오프라인 매장',
-    icon: <Briefcase className="w-5 h-5" />,
-    path: '/admin/physical-stores',
-  },
-
-  {
-    id: 'service-content-manager',
-    label: 'Content Manager',
-    icon: <Layers className="w-5 h-5" />,
-    path: '/admin/service-content-manager',
-  },
-
-  // WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1
-  //   'Reports'(신상신고) 메뉴 그룹 3개 leaf 제거 —
-  //   Overview / Submissions / Templates 화면이 호출하는 `/reporting/*` API 는
-  //   백엔드에 mount 된 적이 없어 전부 404 였다(죽은 링크).
 ];
+
+// WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1
+//   'Reports'(신상신고) 메뉴 그룹 3개 leaf 제거 — `/reporting/*` API 가 백엔드에 mount 된 적이 없다.
+//
+// WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
+//   약사회 전용 Membership 4개 메뉴 제거(@o4o/membership-yaksa 패키지와 함께).

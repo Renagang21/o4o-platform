@@ -3,17 +3,13 @@ import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
 
 // Store Network Dashboard (WO-O4O-STORE-NETWORK-DASHBOARD-V1)
-const StoreNetworkPage = lazy(() => import('@/pages/platform/StoreNetworkPage'));
 
 // Physical Stores (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
-const PhysicalStoresPage = lazy(() => import('@/pages/platform/PhysicalStoresPage'));
 
 // Platform Hub — Global Operations (WO-PLATFORM-GLOBAL-HUB-V1)
 const PlatformHubPage = lazy(() => import('@/pages/platform/PlatformHubPage'));
 
 // Monitoring
-const IntegratedMonitoring = lazy(() => import('@/pages/monitoring/IntegratedMonitoring'));
-const PerformanceDashboard = lazy(() => import('@/pages/monitoring/PerformanceDashboard'));
 const OperationsDashboard = lazy(() => import('@/pages/dashboard/phase2.4'));
 
 
@@ -21,7 +17,6 @@ const OperationsDashboard = lazy(() => import('@/pages/dashboard/phase2.4'));
 const AuthAnalyticsPage = lazy(() => import('@/pages/operator/AuthAnalyticsPage'));
 
 // Content Approvals (WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1)
-const ContentApprovalsPage = lazy(() => import('@/pages/operator/ContentApprovalsPage'));
 
 // Point Spend (WO-O4O-POINT-OPERATOR-UI-V1)
 const PointSpendPage = lazy(() => import('@/pages/operator/PointSpendPage'));
@@ -57,27 +52,51 @@ const PageLoader = () => (
  */
 export function PlatformRoutes() {
   return [
+    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 제거 내역
+    //
+    //   조사 정본: docs/investigations/IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1.md
+    //
+    //   [1] `/admin/store-network` · `/admin/physical-stores` (+ 두 화면 파일)
+    //       이름은 플랫폼 전체 매장망이지만 실제로는 **Cosmetics 단일 서비스** 집계였다:
+    //         · store-network.service.ts → `getCosmeticsServiceStats` 하나만 호출,
+    //           `serviceBreakdown` 에 `'cosmetics'` 만 넣는다
+    //         · physical-store.service.ts → **cosmetics 매장만 스캔**해 `physical_stores` 를 채운다
+    //       KPA·PharmacyHub·Neture 매장은 두 화면 모두에 나타나지 않는다.
+    //       또한 '월 매출 / 월 주문 / 상위 매장' 표현은 O4O 가 매장의 소비자 판매를 관리하는
+    //       것처럼 읽히는데, `checkout_orders` 는 **공급자→매장 B2B 주문 축**이다
+    //       (CLAUDE.md Priority Chain 3 · 3-A). 단일 서비스 운영 현황은 해당 서비스
+    //       operator 영역이 적절하며, K-Cosmetics operator 에 이미 `매장 관리`·`주문 현황`이 있다.
+    //       ⚠ 백엔드(`/api/v1/admin/store-network` · `/api/v1/admin/physical-stores`),
+    //         `physical_stores`·`physical_store_links` 테이블, `checkout_orders` 는
+    //         **삭제하지 않았다** — 소비처·데이터 관계 조사 후 별도 판정.
+    //
+    //   [2] `/monitoring` · `/monitoring/performance` · `/monitoring/security` (+ pages/monitoring)
+    //       `/api/v1/monitoring/*` 는 `register-routes.ts` 에 마운트된 적이 없다 →
+    //       프로덕션 실측 404. 995줄이 한 번도 동작하지 않았고 메뉴 진입점도 0건이었다.
+    //
+    //   [3] `/operator/approvals` (+ pages/operator/ContentApprovalsPage)
+    //       KPA Society operator 콘솔의 `공급자 콘텐츠 승인`(`/operator/approvals`)과
+    //       **같은 경로·같은 백엔드**(`/api/v1/kpa/operator/approvals`)를 쓰는 중복 진입점이었다.
+    //       그 백엔드는 `requireKpaScope('kpa:operator')` 이고 `KPA_SCOPE_CONFIG` 는
+    //       `platformBypass: false` + `blockedServicePrefixes:['platform',…]` 이므로
+    //       **플랫폼 관리자는 구조적으로 403** 이다. 정본은 서비스 operator 콘솔이다.
+    //
+    //   ⓘ 아래 KPA 화면 3건(`/operator/hub-contents` · `/operator/kpa/snapshots` ·
+    //     `/operator/kpa/force-assets`)은 **메뉴에서만 제거하고 라우트·화면은 보존**한다.
+    //     KPA operator 콘솔에 대응 화면이 없고, 이번 WO 는 신규 operator 화면을 만들지 않는다.
+    //     (Force Asset 관리는 `kpa:admin` 보유자가 실제로 사용할 수 있는 기능이다.)
+    //     이관은 별도 WO 로 판정한다 — 기능을 삭제하지 않기 위한 의도적 보존이다.
     // Store Network Dashboard (WO-O4O-STORE-NETWORK-DASHBOARD-V1)
-    <Route key="/admin/store-network" path="/admin/store-network" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <StoreNetworkPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // Physical Stores (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
-    <Route key="/admin/physical-stores" path="/admin/physical-stores" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <PhysicalStoresPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // Platform Hub — Global Operations (WO-PLATFORM-GLOBAL-HUB-V1)
+    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 백엔드 경계로 정렬
+    //   `/api/v1/platform/hub/*` 는 `requireAuth + requirePlatformAdmin`(= `isPlatformAdmin`,
+    //   `platform:super_admin` 전용) 이다. `['admin']` 선언은 서비스 접두 역할까지 통과시켜
+    //   (adminRouteAccess.matchesRequiredRole) 진입 후 403 을 받게 했다.
     <Route key="/admin/platform/hub" path="/admin/platform/hub" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
+      <AdminProtectedRoute requiredRoles={['platform:super_admin']}>
         <Suspense fallback={<PageLoader />}>
           <PlatformHubPage />
         </Suspense>
@@ -85,27 +104,6 @@ export function PlatformRoutes() {
     } />,
 
     // System Monitoring
-    <Route key="/monitoring" path="/monitoring" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <IntegratedMonitoring />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/monitoring/performance" path="/monitoring/performance" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <PerformanceDashboard />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/monitoring/security" path="/monitoring/security" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <IntegratedMonitoring />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // Phase 2.4 - Operations Dashboard
     <Route key="/admin/dashboard/operations" path="/admin/dashboard/operations" element={
@@ -131,18 +129,15 @@ export function PlatformRoutes() {
     } />,
 
     // Content Approvals (WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1)
-    <Route key="/operator/approvals" path="/operator/approvals" element={
-      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'operator']}>
-        <Suspense fallback={<PageLoader />}>
-          <ContentApprovalsPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // Point Spend (WO-O4O-POINT-OPERATOR-UI-V1)
     // 백엔드 /api/v1/points/admin/spend 가 requireAdmin 가드이므로 admin/super_admin만 허용
+    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 백엔드 경계로 정렬
+    //   `/api/v1/points/admin/{grant,spend,transactions}` 는 `requireAuth + requireAdmin` 이고,
+    //   `requireAdmin` 은 WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1 이후 `platform:super_admin` 전용이다.
+    //   legacy `admin`·`super_admin` 을 통과시키면 금액성 화면에 진입한 뒤 전 API 가 403 이 된다.
     <Route key="/operator/points" path="/operator/points" element={
-      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+      <AdminProtectedRoute requiredRoles={['platform:super_admin']}>
         <Suspense fallback={<PageLoader />}>
           <PointSpendPage />
         </Suspense>
@@ -151,7 +146,7 @@ export function PlatformRoutes() {
 
     // Point Budget (WO-O4O-SERVICE-OPERATOR-POINT-BUDGET-PHASE1-V1)
     <Route key="/operator/points/budget" path="/operator/points/budget" element={
-      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+      <AdminProtectedRoute requiredRoles={['platform:super_admin']}>
         <Suspense fallback={<PageLoader />}>
           <PointBudgetPage />
         </Suspense>

@@ -47,6 +47,10 @@ const readBackendRoles = (source: string, constName: string): string[] => {
 /** 플랫폼 전역 경계를 쓰는 화면: 메뉴 id ↔ route 경로 ↔ route 소스. */
 const PLATFORM_SCOPED_SCREENS = [
   { menuId: 'core-users', path: '/users', source: USERS_ROUTES },
+  // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1
+  //   `/operators` 도 같은 `/api/v1/admin/users` 를 소비한다. 선행 정렬 WO 가 이 화면을
+  //   빠뜨려 legacy 역할이 진입 후 전 API 403 을 받고 있었다 → 같은 계약으로 등재한다.
+  { menuId: 'core-operators', path: '/operators', source: USERS_ROUTES },
 ];
 
 describe('계층 3 — 백엔드 경계가 프런트 상수와 일치한다', () => {

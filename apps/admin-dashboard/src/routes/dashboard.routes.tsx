@@ -6,7 +6,6 @@ const AdminHome = lazy(() => import('@/pages/AdminHome'));
 const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
 const UnifiedDashboard = lazy(() => import('@/pages/dashboard/unified/UnifiedDashboard'));
 const BusinessDashboard = lazy(() => import('@/pages/dashboard/business/BusinessDashboard'));
-const ServiceContentManagerPage = lazy(() => import('@/pages/service-content-manager/ServiceContentManagerPage'));
 const AppDisabled = lazy(() => import('@/pages/error/AppDisabled'));
 
 // WO-O4O-LEGACY-RESIDUAL-RUNTIME-AND-DEFERRED-FINAL-CLOSURE-V1 (Axis D):
@@ -30,6 +29,19 @@ const PageLoader = () => (
  */
 export function DashboardRoutes() {
   return [
+    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
+    //   `/admin/service-content-manager` route + `pages/service-content-manager` (748줄 + types.ts) 제거.
+    //
+    //   판정 REMOVE_DEAD_RUNTIME — 화면이 **API 를 한 번도 호출하지 않았다**:
+    //     · `authClient`/`fetch`/`useQuery` 참조 0건
+    //     · 각 탭이 하드코딩 리터럴을 렌더 (`// 샘플 데이터 - 실제로는 API에서 가져옴`)
+    //     · `MANAGED_SERVICES` 에 서비스 1개만 하드코딩, 나머지는 주석
+    //     · inline style 기반이라 Design Core 위반 (docs/rules/DESIGN-CORE-GOVERNANCE.md)
+    //   프로덕션 호출 0건. 슬롯 관리의 실동작 정본은 `/admin/cms/slots` 다.
+    //
+    //   ⓘ `/home` · `/dashboard` 는 `/admin`(Overview)과 함께 **대시보드 3중** 상태로 남아 있다.
+    //     메뉴 진입점은 `/admin` 하나뿐이다. 통합은 화면 내용 비교가 선행돼야 해
+    //     이번 WO 에서 손대지 않고 별도 WO 로 분리한다(IR §5-3).
     // Error Pages - No permission required
     <Route key="/error/app-disabled" path="/error/app-disabled" element={
       <Suspense fallback={<PageLoader />}>
@@ -67,12 +79,5 @@ export function DashboardRoutes() {
     } />,
 
     // WO-ADMIN-CONTENT-SLOT-V1: Service Content Manager
-    <Route key="/admin/service-content-manager" path="/admin/service-content-manager" element={
-      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <ServiceContentManagerPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
   ];
 }

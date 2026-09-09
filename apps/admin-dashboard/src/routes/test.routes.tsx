@@ -17,9 +17,6 @@ const AuthDebug = lazy(() => import('@/pages/test/AuthDebug'));
 const UserEditTest = lazy(() => import('@/pages/test/UserEditTest'));
 const ApiResponseChecker = lazy(() => import('@/pages/test/ApiResponseChecker'));
 const MenuDebug = lazy(() => import('@/pages/test/MenuDebug'));
-const CMSFieldsDebug = lazy(() => import('@/pages/test/CMSFieldsDebug'));
-const CMSViewCreateTest = lazy(() => import('@/pages/test/CMSViewCreateTest'));
-const CMSViewListDebug = lazy(() => import('@/pages/test/CMSViewListDebug'));
 
 // Loading component
 const PageLoader = () => (
@@ -36,6 +33,21 @@ const PageLoader = () => (
  * 프로덕션에 노출돼 있었다. legacy editor 축 전체와 함께 은퇴했다.
  */
 export function TestRoutes() {
+  // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 프로덕션 미등록
+  //
+  //   CLAUDE.md §8 「진단·seed·복구 경로 규칙」 3: **debug / test 성격 route 는
+  //   프로덕션에 등록하지 않는다.** 기존에는 `AdminProtectedRoute` 가드는 있었지만
+  //   프로덕션 번들에 그대로 등록돼 있었다(테스트 화면 12건 + UI showcase).
+  //
+  //   가드가 있다는 사실이 등록의 근거가 되지 않는다 — 진단 화면은 공격 표면이자
+  //   운영 화면과 혼동되는 잔재다. 빌드 시점에 제외한다.
+  //
+  //   또한 CMS V2 디버그 화면 3건(cms-fields / cms-view-test / cms-view-list-debug)은
+  //   백엔드가 없는 `/api/v1/cms/{fields,views}` 를 호출하던 화면이라 함께 제거했다.
+  if (import.meta.env.PROD) {
+    return [];
+  }
+
   return [
     // UI Showcase
     <Route key="/ui-showcase" path="/ui-showcase" element={
@@ -112,22 +124,7 @@ export function TestRoutes() {
       </Suspense>
     } />,
     // Test - CMS Fields Debug
-    <Route key="/admin/test/cms-fields" path="/admin/test/cms-fields" element={
-      <Suspense fallback={<PageLoader />}>
-        <CMSFieldsDebug />
-      </Suspense>
-    } />,
     // Test - CMS View Create
-    <Route key="/admin/test/cms-view-test" path="/admin/test/cms-view-test" element={
-      <Suspense fallback={<PageLoader />}>
-        <CMSViewCreateTest />
-      </Suspense>
-    } />,
     // Test - CMS View List Debug
-    <Route key="/admin/test/cms-view-list-debug" path="/admin/test/cms-view-list-debug" element={
-      <Suspense fallback={<PageLoader />}>
-        <CMSViewListDebug />
-      </Suspense>
-    } />,
   ];
 }

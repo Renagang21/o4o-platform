@@ -38,8 +38,21 @@ export function UserRoutes() {
     } />,
 
     // 운영자 관리 (관리자/서비스 운영자)
+    //
+    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 백엔드 경계로 정렬
+    //   이 화면도 `/users` 와 **같은 endpoint** `/api/v1/admin/users` 를 소비한다
+    //   (OperatorsPage.tsx — 목록 조회 + role-assignments grant/revoke).
+    //   그 guard 는 `ADMIN_ROLES = ['platform:super_admin']` 이다(routes/admin/users.routes.ts:34).
+    //
+    //   기존 선언 `['admin','super_admin','platform:super_admin']` 은 백엔드가 거부하는
+    //   legacy 역할을 통과시켜, 해당 사용자가 **화면에 진입한 뒤 모든 API 가 403** 이 됐다.
+    //   선행 WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1 이 `/users` 와
+    //   `menuPermissions['core-users']` 만 정렬하고 이 route 를 남긴 누락이다.
+    //
+    //   `admin-menu-route-backend-alignment.test.ts` 의 `PLATFORM_SCOPED_SCREENS` 에
+    //   `core-operators` 를 등재해 세 계층을 함께 고정한다.
     <Route key="/operators" path="/operators" element={
-      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'platform:super_admin']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]}>
         <Suspense fallback={<PageLoader />}>
           <OperatorsPage />
         </Suspense>

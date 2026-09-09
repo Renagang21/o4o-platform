@@ -36,13 +36,28 @@ const ids = [...CODE.matchAll(/id:\s*'([^']+)'/g)].map((m) => m[1]);
 
 const pathOf = (label: string) => leaves.find((l) => l.label === label)?.path;
 
-describe('배치 2 — 추가한 메뉴 3건', () => {
-  it.each([
-    ['HUB 콘텐츠', '/operator/hub-contents'],
-    ['콘텐츠 승인', '/operator/approvals'],
-    ['포인트 운영', '/operator/points'],
-  ])('%s → %s', (label, path) => {
-    expect(pathOf(label)).toBe(path);
+describe('배치 2 — 추가한 메뉴 (정보구조 재편 반영)', () => {
+  // ── 2026-09-09 갱신 ────────────────────────────────────────────────────────
+  // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 이
+  // `admin.neture.co.kr` 를 **플랫폼 전체 관리자 사이트**로 확정하면서
+  // 이 배치가 연결했던 KPA 전용 항목 2건이 메뉴에서 제거됐다.
+  //
+  //   · `HUB 콘텐츠`(/operator/hub-contents) · `콘텐츠 승인`(/operator/approvals)
+  //     → KPA 전용 업무. `KPA_SCOPE_CONFIG` 는 `platformBypass: false` +
+  //       `blockedServicePrefixes:['platform',…]` 이라 **플랫폼 관리자는 구조적으로 403** 이다.
+  //       `콘텐츠 승인` 은 KPA Society operator 콘솔의 `공급자 콘텐츠 승인` 과
+  //       같은 경로·같은 백엔드를 쓰는 중복 진입점이었다 → route·화면까지 제거.
+  //       `HUB 콘텐츠` 는 대응 operator 화면이 없어 route·화면은 보존하고 메뉴만 제거했다.
+  //
+  // `포인트 운영` 은 금액성 write 화면이고 백엔드가 `platform:super_admin` 전용이므로
+  // 플랫폼 관리자 사이트에 남는다 — 이 배치의 유효한 계약으로 계속 고정한다.
+  it('포인트 운영 → /operator/points', () => {
+    expect(pathOf('포인트 운영')).toBe('/operator/points');
+  });
+
+  it('KPA 전용 항목 2건은 메뉴에서 제거됐다', () => {
+    expect(leaves.some((l) => l.path === '/operator/hub-contents')).toBe(false);
+    expect(leaves.some((l) => l.path === '/operator/approvals')).toBe(false);
   });
 });
 
@@ -84,26 +99,27 @@ describe('배치 2 — 포인트 운영 배치', () => {
     );
   });
 
-  it('Yaksa 그룹에는 들어가지 않는다', () => {
-    const yaksaStart = CODE.indexOf("id: 'yaksa'");
-    const yaksaEnd = CODE.indexOf("id: 'digital-signage'");
-    expect(CODE.slice(yaksaStart, yaksaEnd)).not.toContain('/operator/points');
+  it('Yaksa 그룹 자체가 메뉴에 없다', () => {
+    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
+    //   `Yaksa (KPA)` 그룹 4항목을 제거했다(위 describe 주석 참조).
+    //   그룹이 다시 생기면 KPA 전용 업무가 플랫폼 관리자 사이트로 되돌아온 것이다.
+    expect(ids).not.toContain('yaksa');
+    expect(leaves.filter((l) => /^\/operator\/kpa\//.test(l.path))).toHaveLength(0);
   });
 });
 
 describe('배치 2 — 기존 메뉴 보존 및 무결성', () => {
   it('기존 주요 메뉴가 그대로 유지된다', () => {
+    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 로 목록을 갱신했다.
+    //   제거: 공급 자산 조회 · Force Asset 관리 (KPA 전용 → 메뉴만 제거, route 보존)
+    //         매장 네트워크 · 오프라인 매장 (Cosmetics 단일 서비스 집계 → 메뉴·화면 제거)
     for (const [label, path] of [
       ['RBAC Role Assignments', '/users'],
       ['Service Operators', '/operators'],
       // 'Membership → /admin/membership/dashboard' 는 레거시 약사회 도메인 전면 제거
       // (ab5570573)로 메뉴·route 가 함께 사라져 단언 대상에서 제외한다.
       ['Platform Settings', '/settings'],
-      ['공급 자산 조회', '/operator/kpa/snapshots'],
-      ['Force Asset 관리', '/operator/kpa/force-assets'],
       ['플랫폼 HUB', '/admin/platform/hub'],
-      ['매장 네트워크', '/admin/store-network'],
-      ['오프라인 매장', '/admin/physical-stores'],
     ] as const) {
       expect(pathOf(label)).toBe(path);
     }
@@ -118,7 +134,7 @@ describe('배치 2 — 기존 메뉴 보존 및 무결성', () => {
   it('이번 배치에서 추가·교체한 라벨은 각각 1개뿐이다', () => {
     // label 자체는 그룹이 다르면 중복될 수 있다(기존 'Overview' 는 3개 그룹에 존재).
     // 따라서 전역 유일성 대신 이번 배치 항목의 유일성만 고정한다.
-    for (const label of ['HUB 콘텐츠', '콘텐츠 승인', '포인트 운영']) {
+    for (const label of ['포인트 운영']) {
       expect(leaves.filter((l) => l.label === label)).toHaveLength(1);
     }
   });
@@ -133,7 +149,7 @@ describe('배치 2 — 기존 메뉴 보존 및 무결성', () => {
       expect(leaf.path.startsWith('/')).toBe(true);
       expect(leaf.label.length).toBeGreaterThan(0);
     }
-    for (const path of ['/operator/hub-contents', '/operator/approvals', '/operator/points']) {
+    for (const path of ['/operator/points']) {
       expect(leaves.some((l) => l.path === path)).toBe(true);
     }
   });

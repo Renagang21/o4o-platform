@@ -61,33 +61,45 @@ export function PublicRoutes() {
       </Suspense>
     } />,
 
-    // Auth Inspector - Public test page for debugging auth issues
-    <Route key="/auth-inspector" path="/auth-inspector" element={
-      <Suspense fallback={<PageLoader />}>
-        <AuthInspector />
-      </Suspense>
-    } />,
+    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 프로덕션 미등록
+    //
+    //   CLAUDE.md §8 「진단·seed·복구 경로 규칙」 3: **debug / test 성격 route 는
+    //   프로덕션에 등록하지 않는다** (`NODE_ENV !== 'production'` 게이트).
+    //
+    //   아래 4건은 **인증 게이트 없이 공개 라우트로** 프로덕션 admin-dashboard 에
+    //   배포돼 있었다 — 규칙 2(진단 HTTP 는 requireAuth + role guard 필수)와
+    //   규칙 3을 동시에 위반한다. 2026-08-08 `/__debug__/**` 사고와 같은 계열이다.
+    //
+    //   화면 자체는 로컬 진단에 유용하므로 삭제하지 않고 **빌드 시점에 제외**한다.
+    //     /auth-inspector           — 인증 상태 점검
+    //     /__debug__/auth-bootstrap — 부트스트랩 진단
+    //     /debug/auth               — 인증 상태 JSON
+    //     /__debug__/login          — CORS/연결 진단
+    ...(import.meta.env.PROD ? [] : [
+      <Route key="/auth-inspector" path="/auth-inspector" element={
+        <Suspense fallback={<PageLoader />}>
+          <AuthInspector />
+        </Suspense>
+      } />,
 
-    // Auth Bootstrap Debug - WO-DEBUG-ADMIN-AUTH-BOOTSTRAP-001
-    <Route key="/__debug__/auth-bootstrap" path="/__debug__/auth-bootstrap" element={
-      <Suspense fallback={<PageLoader />}>
-        <AuthBootstrapDebug />
-      </Suspense>
-    } />,
+      <Route key="/__debug__/auth-bootstrap" path="/__debug__/auth-bootstrap" element={
+        <Suspense fallback={<PageLoader />}>
+          <AuthBootstrapDebug />
+        </Suspense>
+      } />,
 
-    // Auth State JSON Debug - WO-DEBUG-ADMIN-AUTH-STATE-JSON-001
-    <Route key="/debug/auth" path="/debug/auth" element={
-      <Suspense fallback={<PageLoader />}>
-        <AuthStateJsonDebug />
-      </Suspense>
-    } />,
+      <Route key="/debug/auth" path="/debug/auth" element={
+        <Suspense fallback={<PageLoader />}>
+          <AuthStateJsonDebug />
+        </Suspense>
+      } />,
 
-    // Login Diagnostic - CORS/API connectivity debug
-    <Route key="/__debug__/login" path="/__debug__/login" element={
-      <Suspense fallback={<PageLoader />}>
-        <LoginDiagnostic />
-      </Suspense>
-    } />,
+      <Route key="/__debug__/login" path="/__debug__/login" element={
+        <Suspense fallback={<PageLoader />}>
+          <LoginDiagnostic />
+        </Suspense>
+      } />,
+    ]),
 
     // (제거됨) /__debug__/neture-tier1 — WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1
     // 공개 라우트로 프로덕션 admin-dashboard 에 배포돼 있던 JSON 테스트 콘솔.

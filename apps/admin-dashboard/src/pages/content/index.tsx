@@ -23,16 +23,14 @@ export default function ContentOverviewPage() {
       description: '콘텐츠 자산 관리 (동영상, 이미지, 문서, 블록)',
       path: '/content/assets',
     },
-    {
-      id: 'collections',
-      label: 'Collections',
-      description: '콘텐츠 컬렉션 및 그룹 관리',
-      path: '/content/collections',
-    },
+    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
+    //   `Collections` 타일 제거 — 화면 주석에 "기능 미구현 · DB 미구현 · Mock 없음" 이
+    //   명시돼 있었고 메뉴·라우트·화면을 함께 제거했다. 여기 남기면 데드링크가 된다.
     {
       id: 'policies',
-      label: 'Policies',
-      description: '콘텐츠 접근 정책 및 권한 관리',
+      label: '정책 안내',
+      // 데이터 화면이 아니라 content-core 의 Owner/Status/Visibility 정책 **안내 문서** 화면이다.
+      description: '콘텐츠 소유·상태·공개 범위 정책 안내',
       path: '/content/policies',
     },
     {

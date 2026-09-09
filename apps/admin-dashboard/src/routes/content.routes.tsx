@@ -26,22 +26,12 @@ const LEGACY_CONTENT_REDIRECT = '/admin/cms/contents';
 const ContentOverviewPage = lazy(() => import('@/pages/content'));
 const ContentAssetsPage = lazy(() => import('@/pages/content/assets'));
 const ContentAssetDetailPage = lazy(() => import('@/pages/content/assets/[assetId]'));
-const ContentCollectionsPage = lazy(() => import('@/pages/content/collections'));
 const ContentPoliciesPage = lazy(() => import('@/pages/content/policies'));
 const ContentAnalyticsPage = lazy(() => import('@/pages/content/analytics'));
 
 // CMS V2 Pages (Phase C-2.5 & C-3)
-const CMSCPTList = lazy(() => import('@/pages/cms/cpts/CMSCPTList'));
-const CMSCPTForm = lazy(() => import('@/pages/cms/cpts/CPTForm'));
-const CMSFieldList = lazy(() => import('@/pages/cms/fields/CMSFieldList'));
-const CMSFieldForm = lazy(() => import('@/pages/cms/fields/FieldForm'));
-const CMSViewList = lazy(() => import('@/pages/cms/views/CMSViewList'));
-const CMSViewForm = lazy(() => import('@/pages/cms/views/ViewForm'));
-const CMSPageList = lazy(() => import('@/pages/cms/pages/CMSPageList'));
-const CMSPageForm = lazy(() => import('@/pages/cms/pages/PageForm'));
 
 // CMS V2 Visual Designer (Phase C-3)
-const ViewDesigner = lazy(() => import('@/pages/cms/designer/ViewDesigner'));
 
 // CMS Content Admin (P3: WO-P3-CMS-ADMIN-CRUD-P0)
 const CMSContentList = lazy(() => import('@/pages/cms/contents/CMSContentList'));
@@ -63,14 +53,11 @@ const ViewPresets = lazy(() => import('@/pages/cpt-engine/presets/ViewPresets'))
 const TemplatePresets = lazy(() => import('@/pages/cpt-engine/presets/TemplatePresets'));
 
 // CPT/ACF Router
-const CPTACFRouter = lazy(() => import('@/pages/cpt-acf/CPTACFRouter'));
 
 // Media & Custom Fields
 const MediaLibrary = lazy(() => import('@/pages/media/Media'));
 // Content Resource — media_assets 관리 (WO-O4O-CONTENT-RESOURCE-METADATA-STANDARDIZATION-V1)
 const ContentResourceMediaAssets = lazy(() => import('@/pages/content-resource/MediaAssetsPage'));
-const CustomFields = lazy(() => import('@/pages/custom-fields/CustomFields'));
-const Analytics = lazy(() => import('@/pages/analytics/Analytics'));
 
 // Loading component
 const PageLoader = () => (
@@ -84,6 +71,31 @@ const PageLoader = () => (
  */
 export function ContentRoutes() {
   return [
+    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 제거 내역
+    //
+    //   조사 정본: docs/investigations/IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1.md
+    //
+    //   [1] CMS V2 13 routes — `/admin/cms/{cpts,fields,views,pages}` 계열 + `views/:id/designer`
+    //       **백엔드가 없다.** `apps/api-server/src/modules/cms/` 에는 entity 만 있고
+    //       라우트·컨트롤러 0건, `register-routes.ts` 미등록이다. `/api/v1/cms` 에 마운트되는 것은
+    //       `cms-content.routes.ts`(contents · slots · stats) 뿐이다.
+    //       프로덕션 실측 404 — 2026-08-10 `/api/v1/cms/fields` · `/api/v1/cms/cpts`.
+    //       화면 5개 디렉터리 · ViewComponentRegistry 등록 10건 · `lib/cms.ts` dead 메서드도 함께 제거.
+    //       ⚠ entity 와 `cms_cpts`·`cms_fields`·`cms_views`·`cms_pages` 테이블은 **보존**한다.
+    //
+    //   [2] `/content/collections` — 화면 주석에 "기능 미구현 · DB 미구현 · Mock 데이터 없음" 명시.
+    //       `/content` shell 의 Collections 타일도 함께 제거해 데드링크를 남기지 않았다.
+    //
+    //   [3] `/analytics/*` — 21줄 "분석 페이지는 개발 중입니다" 플레이스홀더. 메뉴 진입점 0건.
+    //
+    //   [4] `/acf/*` · `/acf/groups` — `/admin/custom-field-groups` 를 호출하는데 그 백엔드는
+    //       저장소 전체에 **0 refs** 다. 프로덕션 호출 0건.
+    //
+    //   [5] `/admin/cpt-acf/*` — 하위 16 routes 전부가 14줄
+    //       "Temporarily disabled for CI/CD compatibility" 스텁 컴포넌트(9개)였다.
+    //
+    //   ⓘ `/cpt-engine/*` 는 **유지**한다. 백엔드 `/api/v1/cpt/*` 는 41 endpoint 가 실재하며
+    //     삭제 판정에는 외부 소비처 전수조사가 선행돼야 한다(별도 WO). 메뉴 미연결 상태 유지.
     // 글 관리 · 카테고리 & 태그 — legacy redirect (WO-O4O-ADMIN-POSTS-CATEGORIES-TAGS-LEGACY-REDIRECT-V1)
     //   guard 를 두지 않는다. 이동 대상 /admin/cms/contents 가 자체 guard 를 갖고 있고,
     //   dead 화면 접근을 권한 오류로 막는 것보다 현재 화면으로 보내는 편이 목적에 맞다.
@@ -133,13 +145,6 @@ export function ContentRoutes() {
         </Suspense>
       </AdminProtectedRoute>
     } />,
-    <Route key="/content/collections" path="/content/collections" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <ContentCollectionsPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
     <Route key="/content/policies" path="/content/policies" element={
       <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
@@ -157,105 +162,14 @@ export function ContentRoutes() {
 
     // CMS V2 관리 (Phase C-2.5)
     // CPT Routes
-    <Route key="/admin/cms/cpts" path="/admin/cms/cpts" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CMSCPTList />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/cms/cpts/new" path="/admin/cms/cpts/new" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CMSCPTForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/cms/cpts/:id/edit" path="/admin/cms/cpts/:id/edit" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CMSCPTForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // Field Routes
-    <Route key="/admin/cms/fields" path="/admin/cms/fields" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CMSFieldList />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/cms/fields/new" path="/admin/cms/fields/new" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CMSFieldForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/cms/fields/:id/edit" path="/admin/cms/fields/:id/edit" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CMSFieldForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // View Routes
-    <Route key="/admin/cms/views" path="/admin/cms/views" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CMSViewList />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/cms/views/new" path="/admin/cms/views/new" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CMSViewForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/cms/views/:id/edit" path="/admin/cms/views/:id/edit" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CMSViewForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // Visual Designer Route (Phase C-3)
-    <Route key="/admin/cms/views/:id/designer" path="/admin/cms/views/:id/designer" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <ViewDesigner />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // Page Routes
-    <Route key="/admin/cms/pages" path="/admin/cms/pages" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CMSPageList />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/cms/pages/new" path="/admin/cms/pages/new" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CMSPageForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/cms/pages/:id/edit" path="/admin/cms/pages/:id/edit" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <CMSPageForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // CMS Content Routes (P3: WO-P3-CMS-ADMIN-CRUD-P0)
     <Route key="/admin/cms/contents" path="/admin/cms/contents" element={
@@ -281,8 +195,13 @@ export function ContentRoutes() {
     //   (여기의 'channels' 는 CMS 방송 채널이며, 매장 판매채널 organization_channels 와 무관하다.)
 
     // Ops Metrics Dashboard (NEXT: WO-NEXT-OPS-METRICS-P0)
+    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 백엔드 경계로 정렬
+    //   `/api/v1/admin/ops/metrics` = `authenticate` + `requireAdmin`(platform:super_admin 전용).
+    //   메뉴에서는 CMS 그룹의 `운영 상태` 로 재배치했다 — 응답의 실데이터가
+    //   `lockedSlots`·`emptyCriticalSlots`·`expiredContents` 세 개뿐이고
+    //   `channels`·`services`·`opsStatus` 는 Channel 축 은퇴로 하드코딩 0 이기 때문이다.
     <Route key="/admin/ops/metrics" path="/admin/ops/metrics" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
+      <AdminProtectedRoute requiredRoles={['platform:super_admin']}>
         <Suspense fallback={<PageLoader />}>
           <OpsMetricsDashboard />
         </Suspense>
@@ -309,13 +228,6 @@ export function ContentRoutes() {
     } />,
 
     // 분석
-    <Route key="/analytics/*" path="/analytics/*" element={
-      <AdminProtectedRoute requiredPermissions={['analytics:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <Analytics />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // CPT Engine - New Unified Dashboard
     <Route key="/cpt-engine/*" path="/cpt-engine/*" element={
@@ -350,28 +262,7 @@ export function ContentRoutes() {
     } />,
 
     // CPT/ACF Archive & Forms
-    <Route key="/admin/cpt-acf/*" path="/admin/cpt-acf/*" element={
-      <AdminProtectedRoute requiredPermissions={['content:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <CPTACFRouter />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
 
     // ACF Legacy Routes
-    <Route key="/acf/*" path="/acf/*" element={
-      <AdminProtectedRoute requiredPermissions={['custom_fields:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <CustomFields />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/acf/groups" path="/acf/groups" element={
-      <AdminProtectedRoute requiredPermissions={['custom_fields:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <CustomFields />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
   ];
 }
