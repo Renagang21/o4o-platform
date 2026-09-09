@@ -60,7 +60,6 @@ export const getAllowedOrigins = (): string[] => {
     //   DNS 연결 전이라도 등록해 두면 이후 DNS 작업에서 API 재배포가 불필요하다.
     "https://pharmacyhub.co.kr", "https://www.pharmacyhub.co.kr",
     // Cloud Run service URLs (GCP asia-northeast3)
-    "https://glycopharm-web-3e3aws7zqa-du.a.run.app",
     "https://neture-web-3e3aws7zqa-du.a.run.app",
     "https://kpa-society-web-3e3aws7zqa-du.a.run.app",
     "https://k-cosmetics-web-3e3aws7zqa-du.a.run.app",

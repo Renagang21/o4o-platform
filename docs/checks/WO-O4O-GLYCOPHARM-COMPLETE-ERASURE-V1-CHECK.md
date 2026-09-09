@@ -319,7 +319,7 @@ LB 규칙을 추가하지 않았다.** 소유자가 DNS 를 삭제하면 해소�
 | 등록기관 | 가비아 |
 | 삭제한 DNS 레코드 | 6건 — `glycopharm.co.kr` · `www` · `api` 의 A 레코드 + `_acme-challenge` CNAME 포함 |
 | 잔여 레코드 | 0 (MX · TXT 포함) |
-| 도메인 자동갱신 | 해제 — 2026-12-26 만료 시 연장하지 않음 |
+| 도메인 갱신 | **연장하지 않기로 확정** — 2026-12-26 자연 만료 예정 (등록기관 자동갱신 설정 화면은 작업자가 직접 확인하지 않았으므로 `AUTORENEW=OFF` 로 단정하지 않는다) |
 | 주차(파킹) 페이지 | 없음 |
 
 외부 DNS 실측 (소유자 보고):
@@ -332,6 +332,49 @@ api.glycopharm.co.kr   → DNS 응답 없음
 
 이로써 §9-A 의 "남은 관측 — DNS 의존"(평문 HTTP 가 LB 기본 백엔드로 유입되던 현상)은 해소되었다.
 종료 안내 · 리다이렉트 · 주차 페이지를 남기지 않는다는 계약을 그대로 만족한다.
+
+### 10-3. 저장소 활성 설정 잔재 정리 (2026-09-09 · 독립 점검 후속)
+
+DNS 종결 후 독립 점검에서 **실행되는 설정에 남은 GlycoPharm 등록 정보 2건**이 확인되어 제거했다.
+주석 · 문서 · 과거 migration 이 아니라 런타임에 평가되는 값이므로 §11 의
+`GLYCOPHARM_SERVICE_CONTRACT = 0` 판정과 어긋나 있었다.
+
+| 대상 | 잔재 | 처분 | 소비처 실측 |
+|---|---|---|---|
+| `packages/types/src/service-branding.ts` | `SERVICE_BRANDING.glycopharm` (`displayName` · `subtitle`) | 삭제 | `SERVICE_BRANDING` 직접 소비 0 (barrel `types/index.ts` re-export 만). 래퍼 `getServiceDisplayName` 은 `packages/ui` · `packages/operator-core-ui` 2곳이 쓰지만 **미등록 키는 serviceKey 를 그대로 반환**하는 fallback 이라 동작 불변 |
+| `apps/api-server/src/bootstrap/setup-middlewares.ts` | CORS allowlist 의 `https://glycopharm-web-3e3aws7zqa-du.a.run.app` | 삭제 | Cloud Run 서비스가 이미 없어 도달 불가. raw-source 계약 spec(`signage-player-web-deployment-contract`)은 signage-player origin 존재만 단언하고 allowlist 개수는 단언하지 않는다 |
+
+`node scripts/quality/check-literal-consumers.mjs` 로 두 파일의 raw-source 소비처를 함께 조사했다
+(프로토콜 §3-A). `service-branding.ts` = 0건, `setup-middlewares.ts` = RAW_SOURCE_CONTRACT 1건이며
+그 spec 은 이번 변경과 무관하다.
+
+**범위 밖으로 두어 손대지 않은 것** (§7 잔류 문자열 분류 그대로): 과거 migration ·
+기록물 문서 · 공통화 출처 주석 · `REMOVED` 주석 · git history.
+
+#### 10-3-A. 재검색에서 추가로 드러난 동종 잔재 5건 — **미처리 · 별도 WO 필요**
+
+위 2건을 제거한 뒤 `git grep` 으로 **주석·문서·migration 을 제외한 활성 소스**를 재검색한 결과,
+같은 성격(런타임에 평가되는 표시명 · 설정 맵)의 잔재가 **5건 더** 확인되었다.
+후속 WO 가 지시한 수정 대상 3파일 밖이라 **이번 범위에서 고치지 않았다** (CLAUDE.md 실행 원칙 — 범위 외 수정 금지).
+
+| # | 위치 | 잔재 | 성격 |
+|---|---|---|---|
+| 1 | `apps/api-server/src/common/auth/account-access.policy.ts:114` | allowlist 항목 `'GET /api/v1/glycopharm/members/me'` | 존재하지 않는 라우트에 대한 접근 허용 항목. 라우트가 없어 도달 불가 |
+| 2 | `apps/api-server/src/modules/contact-inquiry/public-contact-inquiry.controller.ts:31` | `SERVICE_DISPLAY_NAME.glycopharm = 'GlycoPharm'` | 문의 이메일 제목용 표시명 맵 |
+| 3 | `apps/api-server/src/modules/neture/services/neture-dashboard.service.ts:75-79` | `serviceConfig.glycopharm` — `url` · `ordersPath` · `supportEmail` · `features` | 공급자 대시보드용 서비스 설정. `https://glycopharm.neture.co.kr` · `support@glycopharm.kr` 포함 |
+| 4 | `packages/ui/src/operator-user-detail/UserDetailPage.tsx:64` | `SERVICE_LABELS.glycopharm = 'GlycoPharm'` | 가입 서비스 표의 하드코딩 표시명 맵 |
+| 5 | `services/web-kpa-society/src/pages/pharmacy/PharmacySellPage.tsx:35` | `SERVICE_KEY_LABELS.glycopharm = { text: '혈당관리', ... }` | 진열 뱃지 표시명 맵 |
+
+**공통 성격**: 전부 `serviceKey` 를 키로 하는 **조회 맵 또는 allowlist** 이고, `glycopharm` 키를 가진
+데이터·라우트·membership 이 전부 0 이라 **현재 어떤 요청도 이 항목에 도달하지 않는다.**
+따라서 기능·데이터·보안 영향은 없다. 그러나 §11 의 "활성 계약 0" 을 문자 그대로 만족시키려면
+제거해야 하며, 이번 WO 의 완료 조건 `GLYCOPHARM_ACTIVE_BRANDING = 0` 은
+**3파일 범위만으로는 성립하지 않는다** (2 · 4 · 5 가 표시명 맵이다).
+
+`#4` 는 이미 별도 CHECK 에 잔여로 기록돼 있던 항목이다 —
+`docs/checks/CHECK-O4O-OPERATOR-USER-DETAIL-PASSWORD-SERVICEKEY-SELECTION-V1.md` §7 잔여 3
+("`SERVICE_LABELS` 하드코딩 → `getServiceDisplayName` 정렬"). 이번 `SERVICE_BRANDING` 정리와
+같은 축이므로 후속 WO 에서 함께 처리하는 편이 맞다.
 
 ---
 
@@ -348,12 +391,19 @@ GLYCOPHARM_TLS                    = 0
 OTHER_SERVICE_DATA_CHANGE         = 0
 OTHER_SERVICE_REGRESSION          = PASS
 
+GLYCOPHARM_ACTIVE_BRANDING_REGISTRY = 0   (SERVICE_BRANDING — 제거 완료)
+GLYCOPHARM_ACTIVE_CORS_ORIGIN       = 0   (제거 완료)
+GLYCOPHARM_RESIDUAL_DISPLAY_CONFIG  = 5   (§10-3-A — 미처리 · 별도 WO)
+
 GLYCOPHARM_GCP_ERASURE            = CLOSED
 GLYCOPHARM_DNS_RECORDS            = 0
-GLYCOPHARM_DOMAIN_AUTORENEW       = OFF
-GLYCOPHARM_DOMAIN_RENEWAL         = NOT_PLANNED   (만료 2026-12-26)
+GLYCOPHARM_DOMAIN_RENEWAL         = NOT_PLANNED
+GLYCOPHARM_DOMAIN                 = EXPIRES_NATURALLY_ON_2026-12-26
 GLYCOPHARM_DOMAIN_ERASURE         = CLOSED
+
 GLYCOPHARM_COMPLETE_ERASURE       = CLOSED
+  └ 서비스 · 라우트 · 데이터 · 배포 · GCP · TLS · DNS 축 기준.
+    §10-3-A 표시명·설정 맵 5건은 기능이 아닌 표기 잔재이며 별도 WO 로 분리한다.
 ```
 
 ---
