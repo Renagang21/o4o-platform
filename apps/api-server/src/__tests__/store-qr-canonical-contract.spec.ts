@@ -211,12 +211,34 @@ describe('§5 안정 식별축 불변 — migration', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('§6 범위 경계', () => {
-  it.each([CONTRACT, QR_SERVICE, CONTENT_SOURCE_MIGRATION])(
-    '%s 가 Placement 원장을 도입하지 않는다 (설계상 Phase 2)',
+  /*
+   * WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1:
+   *   이 가드는 Phase 1 의 "Placement 를 아직 만들지 않는다" 범위 제한이었다.
+   *   Phase 2 에서 Placement 를 실제로 구현했으므로 **금지 → 경계 검사**로 바꾼다.
+   *
+   *   지켜야 할 것은 "Placement 를 만들지 않는다" 가 아니라
+   *   **target 축 계약(`store-qr-target.contract.ts`)과 과거 migration 이 Placement 를 모른다** 는 것이다.
+   *   Placement 는 별도 원장·별도 service 이며 target 판정에 끼어들지 않는다.
+   */
+  it.each([CONTRACT, CONTENT_SOURCE_MIGRATION])(
+    '%s 는 Placement 원장을 알지 않는다 (target 축과 배치 축 분리)',
     (file) => {
       expect(stripComments(read(file))).not.toContain('store_qr_placements');
     },
   );
+
+  it('QR 서비스의 Placement 접촉은 목록 표시용 집계뿐이다 (lifecycle 은 별도 service)', () => {
+    const src = stripComments(read(QR_SERVICE));
+    // 목록에 활성 배치 수를 실어주는 LEFT JOIN 하나만 허용한다.
+    //   ⚠️ stripComments 는 JS/TS 주석만 지운다 — 템플릿 문자열 안의 SQL `--` 주석은 남는다.
+    //      단순 문자열 카운트는 주석까지 세어 오탐한다. **실제 참조(FROM 절)** 만 센다.
+    const occurrences = (src.match(/FROM\s+store_qr_placements/gi) ?? []).length;
+    expect(occurrences).toBe(1);
+    // 생성·수정·종료 같은 write 는 이 파일에 없다.
+    expect(src).not.toMatch(/INSERT INTO store_qr_placements/i);
+    expect(src).not.toMatch(/UPDATE store_qr_placements/i);
+    expect(src).not.toMatch(/DELETE\s+FROM\s+store_qr_placements/i);
+  });
 
   it('Store QR 서비스가 ProductMaster 대표 QR 경로 `/p/` 를 만들지 않는다', () => {
     const src = stripComments(read(QR_SERVICE));

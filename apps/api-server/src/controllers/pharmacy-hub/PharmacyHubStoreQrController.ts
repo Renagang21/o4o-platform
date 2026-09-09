@@ -56,9 +56,20 @@ import {
   updateStoreQrCode,
   deactivateStoreQrCode,
   reactivateStoreQrCode,
+  cloneStoreQrCode,
   type QrResult,
   type QrFailure,
 } from '../../services/store/store-qr.service.js';
+// WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §7·§15:
+//   KPA 와 **같은 공통 service** 를 그대로 소비한다. PH 전용 placement 구현을 만들지 않는다.
+import {
+  listQrPlacements,
+  startQrPlacement,
+  updateQrPlacement,
+  endQrPlacement,
+  getQrPlacementScanBreakdown,
+  getOrganizationPlacementAnalytics,
+} from '../../services/store/store-qr-placement.service.js';
 import {
   generateQrPng,
   generateQrSvg,
@@ -622,6 +633,129 @@ export class PharmacyHubStoreQrController {
       return res.send(png);
     } catch (error) {
       return fail(res, userId, 'export', error, 'QR 파일을 만들지 못했습니다.', 'QR_EXPORT_FAILED');
+    }
+  }
+
+  // ─── QR 사용처(Placement) — KPA 와 동일 계약 (§7·§15) ─────────
+
+  /** GET /store-owner/qr/:id/placements */
+  static async listPlacements(req: Request, res: Response): Promise<any> {
+    const userId = getUserId(req, res);
+    if (!userId) return;
+    if (rejectsMalformedId(req, res)) return;
+    try {
+      const resolution = await resolvePharmacyHubStoreOrganization(userId);
+      if (resolution.status !== 'connected') return sendWriteBlocked(res, resolution);
+      const result = await listQrPlacements(AppDataSource, resolution.organizationId, req.params.id);
+      if (!result.ok) return sendFailure(res, result);
+      return res.json({ success: true, data: result.data });
+    } catch (error) {
+      return fail(res, userId, 'listPlacements', error, '사용처를 불러오지 못했습니다.', 'QR_PLACEMENT_LIST_FAILED');
+    }
+  }
+
+  /** POST /store-owner/qr/:id/placements — 배치 시작(endOthers=true 면 이동) */
+  static async startPlacement(req: Request, res: Response): Promise<any> {
+    const userId = getUserId(req, res);
+    if (!userId) return;
+    if (rejectsMalformedId(req, res)) return;
+    try {
+      const resolution = await resolvePharmacyHubStoreOrganization(userId);
+      if (resolution.status !== 'connected') return sendWriteBlocked(res, resolution);
+      const result = await startQrPlacement(AppDataSource, resolution.organizationId, req.params.id, req.body ?? {});
+      if (!result.ok) return sendFailure(res, result);
+      return res.status(201).json({ success: true, data: result.data });
+    } catch (error) {
+      return fail(res, userId, 'startPlacement', error, '배치를 시작하지 못했습니다.', 'QR_PLACEMENT_START_FAILED');
+    }
+  }
+
+  /** PATCH /store-owner/qr/:id/placements/:placementId */
+  static async updatePlacement(req: Request, res: Response): Promise<any> {
+    const userId = getUserId(req, res);
+    if (!userId) return;
+    if (rejectsMalformedId(req, res)) return;
+    try {
+      const resolution = await resolvePharmacyHubStoreOrganization(userId);
+      if (resolution.status !== 'connected') return sendWriteBlocked(res, resolution);
+      const result = await updateQrPlacement(
+        AppDataSource, resolution.organizationId, req.params.id, req.params.placementId, req.body ?? {},
+      );
+      if (!result.ok) return sendFailure(res, result);
+      return res.json({ success: true, data: result.data });
+    } catch (error) {
+      return fail(res, userId, 'updatePlacement', error, '배치를 수정하지 못했습니다.', 'QR_PLACEMENT_UPDATE_FAILED');
+    }
+  }
+
+  /** POST /store-owner/qr/:id/placements/:placementId/end — QR 은 건드리지 않는다 */
+  static async endPlacement(req: Request, res: Response): Promise<any> {
+    const userId = getUserId(req, res);
+    if (!userId) return;
+    if (rejectsMalformedId(req, res)) return;
+    try {
+      const resolution = await resolvePharmacyHubStoreOrganization(userId);
+      if (resolution.status !== 'connected') return sendWriteBlocked(res, resolution);
+      const result = await endQrPlacement(
+        AppDataSource, resolution.organizationId, req.params.id, req.params.placementId,
+      );
+      if (!result.ok) return sendFailure(res, result);
+      return res.json({ success: true, data: result.data });
+    } catch (error) {
+      return fail(res, userId, 'endPlacement', error, '배치를 종료하지 못했습니다.', 'QR_PLACEMENT_END_FAILED');
+    }
+  }
+
+  /** GET /store-owner/qr/:id/placement-analytics — 기존 analytics 응답은 불변(additive) */
+  static async placementAnalytics(req: Request, res: Response): Promise<any> {
+    const userId = getUserId(req, res);
+    if (!userId) return;
+    if (rejectsMalformedId(req, res)) return;
+    try {
+      const resolution = await resolvePharmacyHubStoreOrganization(userId);
+      if (resolution.status !== 'connected') return sendWriteBlocked(res, resolution);
+      const result = await getQrPlacementScanBreakdown(AppDataSource, resolution.organizationId, req.params.id);
+      if (!result.ok) return sendFailure(res, result);
+      return res.json({ success: true, data: { byPlacement: result.data } });
+    } catch (error) {
+      return fail(res, userId, 'placementAnalytics', error, '사용처 통계를 불러오지 못했습니다.', 'QR_PLACEMENT_ANALYTICS_FAILED');
+    }
+  }
+
+  /** GET /store-owner/qr-analytics/placements — 매장 전체 분포 */
+  static async organizationPlacementAnalytics(req: Request, res: Response): Promise<any> {
+    const userId = getUserId(req, res);
+    if (!userId) return;
+    try {
+      const resolution = await resolvePharmacyHubStoreOrganization(userId);
+      if (resolution.status !== 'connected') return sendWriteBlocked(res, resolution);
+      const data = await getOrganizationPlacementAnalytics(AppDataSource, resolution.organizationId, {
+        days: req.query.days ? Number(req.query.days) : undefined,
+      });
+      return res.json({ success: true, data });
+    } catch (error) {
+      return fail(res, userId, 'organizationPlacementAnalytics', error, '사용처 통계를 불러오지 못했습니다.', 'QR_PLACEMENT_ANALYTICS_FAILED');
+    }
+  }
+
+  /** POST /store-owner/qr/:id/clone — 같은 콘텐츠로 QR 추가 (§8) */
+  static async clone(req: Request, res: Response): Promise<any> {
+    const userId = getUserId(req, res);
+    if (!userId) return;
+    if (rejectsMalformedId(req, res)) return;
+    try {
+      const resolution = await resolvePharmacyHubStoreOrganization(userId);
+      if (resolution.status !== 'connected') return sendWriteBlocked(res, resolution);
+      const result = await cloneStoreQrCode(AppDataSource, resolution.organizationId, req.params.id, req.body ?? {});
+      if (!result.ok) return sendFailure(res, result);
+      let placement = null;
+      if (req.body?.placement) {
+        const started = await startQrPlacement(AppDataSource, resolution.organizationId, result.data.qr.id, req.body);
+        if (started.ok) placement = started.data.placement;
+      }
+      return res.status(201).json({ success: true, data: { qr: result.data.qr, placement } });
+    } catch (error) {
+      return fail(res, userId, 'clone', error, 'QR 을 추가하지 못했습니다.', 'QR_CLONE_FAILED');
     }
   }
 }

@@ -17,6 +17,9 @@ export { StoreExecutionAsset } from './store-execution-asset.entity.js';
 export { StoreAssetDerivation } from './store-asset-derivation.entity.js';
 export { StoreQrCode } from './store-qr-code.entity.js';
 export { StoreQrScanEvent } from './store-qr-scan-event.entity.js';
+// WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §3
+export { StoreQrPlacement } from './store-qr-placement.entity.js';
+export type { StoreQrPlacementStatus } from './store-qr-placement.entity.js';
 export { ProductMarketingAsset } from './product-marketing-asset.entity.js';
 // WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-STORAGE-V1
 export {

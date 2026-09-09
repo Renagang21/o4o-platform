@@ -361,6 +361,16 @@ export function createPharmacyHubRoutes(): Router {
   // 내린 QR 을 다시 올린다. 상태 변경이므로 GET 이 아닌 POST 다 (CLAUDE.md §8).
   router.post('/store-owner/qr/:id/reactivate', ...storeOwnerGuards, PharmacyHubStoreQrController.reactivate);
 
+  // WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §7·§15:
+  //   KPA(`/pharmacy/qr/*`) 와 **같은 계약**을 PH 경로에 그대로 연다. 공통 service 하나가 SSOT 다.
+  router.get('/store-owner/qr-analytics/placements', ...storeOwnerGuards, PharmacyHubStoreQrController.organizationPlacementAnalytics);
+  router.get('/store-owner/qr/:id/placements', ...storeOwnerGuards, PharmacyHubStoreQrController.listPlacements);
+  router.post('/store-owner/qr/:id/placements', ...storeOwnerGuards, PharmacyHubStoreQrController.startPlacement);
+  router.patch('/store-owner/qr/:id/placements/:placementId', ...storeOwnerGuards, PharmacyHubStoreQrController.updatePlacement);
+  router.post('/store-owner/qr/:id/placements/:placementId/end', ...storeOwnerGuards, PharmacyHubStoreQrController.endPlacement);
+  router.get('/store-owner/qr/:id/placement-analytics', ...storeOwnerGuards, PharmacyHubStoreQrController.placementAnalytics);
+  router.post('/store-owner/qr/:id/clone', ...storeOwnerGuards, PharmacyHubStoreQrController.clone);
+
   /**
    * 공개 QR 랜딩 (인증 없음) — QR payload 가 https://pharmacyhub.co.kr/qr/{slug} 이므로
    * Pharmacy-Hub 도메인에서 스캔이 해석되어야 한다. 해석·스캔 기록은 위와 같은 공통 service 다.

@@ -153,6 +153,58 @@ export interface StoreQrOperationItem {
   screenSetStatus?: string | null;
   /** 백엔드가 계산해 내려주는 "지금 열리는가" 판정. 없으면 프론트가 보수적으로 추정한다. */
   landable?: boolean;
+
+  // ── 사용처(Placement) — WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §9 ──
+  /**
+   * 대표 사용처 캐시. SSOT 는 `store_qr_placements` 다.
+   *   값     활성 배치가 정확히 1개
+   *   null   활성 0개 (배치 미지정)
+   *   'MULTIPLE'  활성 2개 이상 → 위치별 스캔 귀속 불가(§9-3 고지 대상)
+   */
+  primaryPlacement?: string | null;
+  /** 활성 배치 수. 표시·경고 판정에 쓴다. */
+  activePlacementCount?: number;
+}
+
+/** 활성 배치가 2개 이상임을 나타내는 대표값 표식(백엔드와 같은 문자열). */
+export const QR_PRIMARY_PLACEMENT_MULTIPLE = 'MULTIPLE';
+
+/** UI preset — DB 제약이 아니다. 서버는 목록 밖의 값도 저장한다(개방형). */
+export const STORE_QR_PLACEMENT_PRESETS = [
+  { value: 'TABLET', label: '태블릿 화면' },
+  { value: 'SHELF', label: '매대 · 진열대' },
+  { value: 'ESL', label: '전자 가격표(ESL)' },
+  { value: 'POP', label: 'POP 물' },
+  { value: 'POSTER', label: '포스터 · 쇼윈도' },
+  { value: 'COUNSELING_TABLE', label: '상담대' },
+  { value: 'ENTRANCE', label: '출입구' },
+  { value: 'PRINT', label: '기타 출력물' },
+  { value: 'OTHER', label: '기타' },
+] as const;
+
+const PLACEMENT_LABEL = new Map<string, string>(
+  STORE_QR_PLACEMENT_PRESETS.map((p) => [p.value, p.label]),
+);
+
+/**
+ * 사용처 코드 → 사람이 읽는 라벨.
+ * preset 밖의 값(미래 확장·자유 입력)은 코드를 그대로 보여준다 — 임의로 '기타' 로 접지 않는다.
+ */
+export function storeQrPlacementLabel(code?: string | null): string | null {
+  if (!code) return null;
+  if (code === QR_PRIMARY_PLACEMENT_MULTIPLE) return '여러 곳';
+  if (code === 'UNPLACED') return '배치 없음';
+  if (code === 'AMBIGUOUS') return '구분 불가';
+  return PLACEMENT_LABEL.get(code) ?? code;
+}
+
+/**
+ * 이 QR 이 "여러 곳에 동시 배치" 상태인가.
+ * 그렇다면 위치별 스캔 귀속이 **불가능**하며 UI 가 그 사실을 반드시 고지해야 한다(§9-3).
+ */
+export function hasAmbiguousPlacement(item: StoreQrOperationItem): boolean {
+  if (item.primaryPlacement === QR_PRIMARY_PLACEMENT_MULTIPLE) return true;
+  return (item.activePlacementCount ?? 0) > 1;
 }
 
 /**

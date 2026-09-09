@@ -37,6 +37,13 @@ import {
   deleteStoreQrCode,
   reactivateStoreQrCode,
   getQrAnalytics,
+  listQrPlacements,
+  startQrPlacement,
+  endQrPlacement,
+  getQrPlacementAnalytics,
+  cloneQrCode,
+  type StoreQrPlacementDto,
+  type QrPlacementScanRow,
   // WO-O4O-KPA-STORE-QR-PRINT-EXPORT-UI-WIRING-V1: export foundation 연결
   downloadQrExport,
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 설정 모달 저장
@@ -49,6 +56,7 @@ import { getAccessToken } from '../../contexts/AuthContext';
 import {
   GuideBackLink,
   StoreQrOperationBoard,
+  StoreQrPlacementPanel,
   isArchivedCornerQr,
 } from '@o4o/store-ui-core';
 
@@ -387,6 +395,54 @@ export function StoreQRPage() {
     navigator.clipboard.writeText(url);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  // ── 사용처(Placement) — WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §9 ──
+  //   표시·경고·폼은 공통 Core(StoreQrPlacementPanel)가 담당한다. 여기는 adapter 축뿐이다.
+  const [placementId, setPlacementId] = useState<string | null>(null);
+  const [placementItems, setPlacementItems] = useState<StoreQrPlacementDto[]>([]);
+  const [placementScans, setPlacementScans] = useState<QrPlacementScanRow[]>([]);
+  const [placementLoading, setPlacementLoading] = useState(false);
+  const [placementBusy, setPlacementBusy] = useState(false);
+  const [placementError, setPlacementError] = useState<string | null>(null);
+
+  const loadPlacements = async (id: string) => {
+    setPlacementLoading(true);
+    setPlacementError(null);
+    try {
+      const [list, scans] = await Promise.all([listQrPlacements(id), getQrPlacementAnalytics(id)]);
+      setPlacementItems(list?.data?.items ?? []);
+      setPlacementScans(scans?.data?.byPlacement ?? []);
+    } catch (e: any) {
+      setPlacementError(e?.response?.data?.error?.message || e?.message || '사용처를 불러오지 못했습니다.');
+    } finally {
+      setPlacementLoading(false);
+    }
+  };
+
+  const handleShowPlacements = async (id: string) => {
+    if (placementId === id) {
+      setPlacementId(null);
+      setPlacementItems([]);
+      setPlacementScans([]);
+      return;
+    }
+    setPlacementId(id);
+    await loadPlacements(id);
+  };
+
+  const runPlacementAction = async (id: string, fn: () => Promise<unknown>) => {
+    setPlacementBusy(true);
+    setPlacementError(null);
+    try {
+      await fn();
+      await loadPlacements(id);
+      await fetchItems();
+    } catch (e: any) {
+      setPlacementError(e?.response?.data?.error?.message || e?.message || '처리하지 못했습니다.');
+    } finally {
+      setPlacementBusy(false);
+    }
   };
 
   const handleShowAnalytics = async (id: string) => {
@@ -996,6 +1052,29 @@ export function StoreQRPage() {
               onOpenSettings={(item) => setSettingsQr(item)}
               onShowAnalytics={(item) => handleShowAnalytics(item.id)}
               analyticsId={analyticsId}
+              onShowPlacements={(item) => handleShowPlacements(item.id)}
+              placementId={placementId}
+              placementPanel={
+                placementId ? (
+                  <div style={{ marginTop: 12 }}>
+                    <StoreQrPlacementPanel
+                      qrTitle={items.find((i) => i.id === placementId)?.title ?? 'QR'}
+                      placements={placementItems}
+                      scanBreakdown={placementScans}
+                      loading={placementLoading}
+                      busy={placementBusy}
+                      error={placementError}
+                      onStart={(input) =>
+                        runPlacementAction(placementId, () => startQrPlacement(placementId, input))
+                      }
+                      onEnd={(pid) => runPlacementAction(placementId, () => endQrPlacement(placementId, pid))}
+                      onCloneForPlacement={() =>
+                        runPlacementAction(placementId, () => cloneQrCode(placementId))
+                      }
+                    />
+                  </div>
+                ) : null
+              }
               onCopyUrl={(item) => handleCopyUrl(item.slug, item.id)}
               copiedId={copiedId}
               onDeactivate={(item) => handleDeactivate(item.id)}

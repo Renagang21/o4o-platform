@@ -51,3 +51,17 @@ export type {
   StoreQrLandingType,
   StoreQrTemplate,
 } from './StoreQrConsoleView';
+
+// ── 사용처(Placement) — WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §9 ──
+export { StoreQrPlacementPanel } from './StoreQrPlacementPanel';
+export type {
+  StoreQrPlacementPanelProps,
+  StoreQrPlacementRow,
+  StoreQrPlacementScanRow,
+} from './StoreQrPlacementPanel';
+export {
+  STORE_QR_PLACEMENT_PRESETS,
+  QR_PRIMARY_PLACEMENT_MULTIPLE,
+  storeQrPlacementLabel,
+  hasAmbiguousPlacement,
+} from './storeQrOperationModel';

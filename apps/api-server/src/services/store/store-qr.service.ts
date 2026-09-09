@@ -505,7 +505,12 @@ export async function listStoreQrCodes(
            WHEN qs.deleted_at IS NOT NULL OR qs.status = 'archived' THEN 'archived'
            ELSE 'active'
          END AS "screenSetStatus",
-         ${QR_LANDABLE_CONDITION} AS "landable"
+         ${QR_LANDABLE_CONDITION} AS "landable",
+         -- WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §4·§9:
+         --   대표 사용처(캐시) + 활성 배치 수. SSOT 는 store_qr_placements 다.
+         --   additive — 기존 소비처는 이 두 필드를 무시한다(응답 shape breaking 0).
+         qr.primary_placement AS "primaryPlacement",
+         COALESCE(pl.active_count, 0)::int AS "activePlacementCount"
        FROM store_qr_codes qr
        LEFT JOIN (
          SELECT qr_code_id, COUNT(*) AS scan_count
@@ -517,6 +522,12 @@ export async function listStoreQrCodes(
          ON dc.id::text = qr.landing_target_id
          AND dc.organization_id = qr.organization_id
          AND dc.source_type = 'direct'
+       LEFT JOIN (
+         SELECT qr_code_id, COUNT(*) AS active_count
+         FROM store_qr_placements
+         WHERE organization_id = $1 AND status = 'active'
+         GROUP BY qr_code_id
+       ) pl ON pl.qr_code_id = qr.id
        ${SCREEN_SET_QR_JOIN}
        WHERE qr.organization_id = $1
          ${activityFilter}
@@ -857,6 +868,75 @@ export async function createStoreQrCode(
   }
 
   return { ok: true, data: { qr: saved, reused: false } };
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 같은 대상으로 QR 인스턴스 추가 (WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §8)
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * "같은 콘텐츠로 QR 추가" — 기존 QR 의 **Target 축을 그대로 복제**해 새 인스턴스를 만든다.
+ *
+ * 왜 필요한가 (DESIGN §9-2)
+ *   위치별 분석은 **위치별 QR Instance** 가 있어야 성립한다. 이 동선이 없으면 매장은
+ *   같은 QR 이미지를 복사해 여러 곳에 붙이고, 그러면 스캔 귀속이 영구히 불가능해진다.
+ *
+ * 복제하는 것 : landing_type · landing_target_id · library_item_id · content_source · 상담 CTA
+ * 복제하지 않는 것 : slug(신규 발급) · is_active(항상 true) · 스캔 이력 · placement
+ *
+ * screen_set 은 복제 대상이 아니다 — Screen Set 당 QR 1개라는 partial UNIQUE
+ * (20270207000000)를 유지한다. 태블릿 1대에 대응하므로 위치별 다중 발급 요구가 없다.
+ */
+export async function cloneStoreQrCode(
+  dataSource: DataSource,
+  organizationId: string,
+  sourceId: string,
+  body: { title?: unknown } = {},
+): Promise<QrResult<{ qr: StoreQrCode }>> {
+  const qrRepo = dataSource.getRepository(StoreQrCode);
+  const source = await qrRepo.findOne({ where: { id: sourceId, organizationId } });
+  if (!source) return NOT_FOUND;
+
+  if (source.landingType === 'screen_set') {
+    return failure(
+      409,
+      'SCREEN_SET_QR_NOT_CLONEABLE',
+      '코너 화면 QR 은 화면당 1개입니다. 사용처를 추가하려면 배치를 추가해 주세요.',
+    );
+  }
+
+  const rawTitle = typeof body.title === 'string' ? body.title.trim() : '';
+  const title = (rawTitle || `${source.title} (추가)`).slice(0, 200);
+
+  // slug 는 전역 unique 다 — 서버가 발급한다. 충돌 시 재시도한다.
+  let saved: StoreQrCode | null = null;
+  for (let attempt = 0; attempt < 5 && !saved; attempt += 1) {
+    const candidate = `${(source.slug || 'qr').slice(0, 40)}-${Date.now().toString(36)}${
+      attempt > 0 ? `-${attempt}` : ''
+    }`;
+    const clash = await qrRepo.findOne({ where: { slug: candidate } });
+    if (clash) continue;
+    saved = await qrRepo.save(
+      qrRepo.create({
+        organizationId,
+        contentSource: source.contentSource ?? null,
+        title,
+        description: source.description ?? null,
+        libraryItemId: source.libraryItemId ?? null,
+        landingType: source.landingType,
+        landingTargetId: source.landingTargetId ?? null,
+        slug: candidate,
+        isActive: true,
+        consultationCtaEnabled: source.consultationCtaEnabled ?? false,
+        consultationCtaLabel: source.consultationCtaLabel ?? null,
+      }),
+    );
+  }
+  if (!saved) {
+    return failure(409, 'SLUG_CONFLICT', 'QR 주소를 발급하지 못했습니다. 다시 시도해 주세요.');
+  }
+
+  return { ok: true, data: { qr: saved } };
 }
 
 // ────────────────────────────────────────────────────────────────────────────

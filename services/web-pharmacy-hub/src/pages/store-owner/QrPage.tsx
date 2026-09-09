@@ -24,6 +24,13 @@ import {
   deactivateStoreQrCode,
   reactivateStoreQrCode,
   fetchQrAnalytics,
+  listQrPlacements,
+  startQrPlacement,
+  endQrPlacement,
+  fetchQrPlacementAnalytics,
+  cloneQrCode,
+  type StoreQrPlacementDto,
+  type QrPlacementScanRow,
   downloadQrExport,
   type StoreQrCode,
   type QrSources,
@@ -31,7 +38,7 @@ import {
   type QrLandingType,
   type CreateQrInput,
 } from '../../lib/api/pharmacyHubStoreQr';
-import { StoreQrOperationBoard } from '@o4o/store-ui-core';
+import { StoreQrOperationBoard, StoreQrPlacementPanel } from '@o4o/store-ui-core';
 import { StoreConnectionNotice, type StoreConnectionState } from '../../components/store-owner/StoreConnectionNotice';
 
 /**
@@ -82,6 +89,54 @@ export default function StoreOwnerQrPage() {
       load();
     } catch (e: any) {
       window.alert(e?.message || '처리하지 못했습니다.');
+    }
+  };
+
+  // ── 사용처(Placement) — WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §9·§15 ──
+  //   KPA 와 **같은 공통 패널**을 쓴다. PH 는 adapter(endpoint·문구·accent)만 준다.
+  const [placementId, setPlacementId] = useState<string | null>(null);
+  const [placementItems, setPlacementItems] = useState<StoreQrPlacementDto[]>([]);
+  const [placementScans, setPlacementScans] = useState<QrPlacementScanRow[]>([]);
+  const [placementLoading, setPlacementLoading] = useState(false);
+  const [placementBusy, setPlacementBusy] = useState(false);
+  const [placementError, setPlacementError] = useState<string | null>(null);
+
+  const loadPlacements = async (id: string) => {
+    setPlacementLoading(true);
+    setPlacementError(null);
+    try {
+      const [list, scans] = await Promise.all([listQrPlacements(id), fetchQrPlacementAnalytics(id)]);
+      setPlacementItems(list.items ?? []);
+      setPlacementScans(scans.byPlacement ?? []);
+    } catch (e: any) {
+      setPlacementError(e?.message || '사용처를 불러오지 못했습니다.');
+    } finally {
+      setPlacementLoading(false);
+    }
+  };
+
+  const handleShowPlacements = async (qr: StoreQrCode) => {
+    if (placementId === qr.id) {
+      setPlacementId(null);
+      setPlacementItems([]);
+      setPlacementScans([]);
+      return;
+    }
+    setPlacementId(qr.id);
+    await loadPlacements(qr.id);
+  };
+
+  const runPlacementAction = async (id: string, fn: () => Promise<unknown>) => {
+    setPlacementBusy(true);
+    setPlacementError(null);
+    try {
+      await fn();
+      await loadPlacements(id);
+      await load();
+    } catch (e: any) {
+      setPlacementError(e?.message || '처리하지 못했습니다.');
+    } finally {
+      setPlacementBusy(false);
     }
   };
 
@@ -187,6 +242,26 @@ export default function StoreOwnerQrPage() {
           exportingId={exportingId}
           onOpenSettings={(qr) => setEditing(qr)}
           onShowAnalytics={handleAnalytics}
+          onShowPlacements={handleShowPlacements}
+          placementId={placementId}
+          placementPanel={
+            placementId ? (
+              <div className="mt-3">
+                <StoreQrPlacementPanel
+                  qrTitle={items.find((i) => i.id === placementId)?.title ?? 'QR'}
+                  placements={placementItems}
+                  scanBreakdown={placementScans}
+                  loading={placementLoading}
+                  busy={placementBusy}
+                  error={placementError}
+                  accentButton="bg-blue-600 hover:bg-blue-700"
+                  onStart={(input) => runPlacementAction(placementId, () => startQrPlacement(placementId, input))}
+                  onEnd={(pid) => runPlacementAction(placementId, () => endQrPlacement(placementId, pid))}
+                  onCloneForPlacement={() => runPlacementAction(placementId, () => cloneQrCode(placementId))}
+                />
+              </div>
+            ) : null
+          }
           onCopyUrl={handleCopyUrl}
           copiedId={copiedId}
           onDeactivate={handleDeactivate}

@@ -276,3 +276,53 @@ export async function downloadQrExport(
     URL.revokeObjectURL(url);
   }
 }
+
+// ── QR 사용처(Placement) — WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §7 ──
+//   백엔드 계약은 PharmacyHub 와 **동일**하다. 경로 prefix 만 서비스가 정한다(adapter 축).
+
+export interface StoreQrPlacementDto {
+  id: string;
+  qrCodeId: string;
+  placement: string;
+  label: string | null;
+  cornerRef: string | null;
+  status: 'active' | 'ended';
+  startedAt: string;
+  endedAt: string | null;
+}
+
+export async function listQrPlacements(
+  qrId: string,
+): Promise<{ success: boolean; data: { items: StoreQrPlacementDto[]; activeCount: number } }> {
+  return apiClient.get(`/pharmacy/qr/${qrId}/placements`);
+}
+
+export async function startQrPlacement(
+  qrId: string,
+  body: { placement: string; label?: string; cornerRef?: string; endOthers?: boolean },
+): Promise<{ success: boolean; data: { placement: StoreQrPlacementDto; primaryPlacement: string | null } }> {
+  return apiClient.post(`/pharmacy/qr/${qrId}/placements`, body);
+}
+
+export async function endQrPlacement(
+  qrId: string,
+  placementId: string,
+): Promise<{ success: boolean; data: { placement: StoreQrPlacementDto; primaryPlacement: string | null } }> {
+  return apiClient.post(`/pharmacy/qr/${qrId}/placements/${placementId}/end`, {});
+}
+
+export interface QrPlacementScanRow { placement: string; label: string | null; scans: number }
+
+export async function getQrPlacementAnalytics(
+  qrId: string,
+): Promise<{ success: boolean; data: { byPlacement: QrPlacementScanRow[] } }> {
+  return apiClient.get(`/pharmacy/qr/${qrId}/placement-analytics`);
+}
+
+/** 같은 콘텐츠로 QR 추가 — target 축 복제 + 새 slug. 위치별 분석의 전제 동선(§8). */
+export async function cloneQrCode(
+  qrId: string,
+  body?: { title?: string; placement?: string; label?: string },
+): Promise<{ success: boolean; data: { qr: StoreQrCode; placement: StoreQrPlacementDto | null } }> {
+  return apiClient.post(`/pharmacy/qr/${qrId}/clone`, body ?? {});
+}

@@ -149,6 +149,61 @@ export async function fetchQrAnalytics(id: string): Promise<QrAnalytics> {
   return unwrap<QrAnalytics>(res.data, '스캔 통계를 불러오지 못했습니다.');
 }
 
+// ── QR 사용처(Placement) — WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §7·§15 ──
+//   KPA 와 **동일 계약**이다. 다른 것은 경로 prefix 뿐(유일한 정당한 서비스 차이).
+
+export interface StoreQrPlacementDto {
+  id: string;
+  qrCodeId: string;
+  placement: string;
+  label: string | null;
+  cornerRef: string | null;
+  status: 'active' | 'ended';
+  startedAt: string;
+  endedAt: string | null;
+}
+
+export interface QrPlacementScanRow { placement: string; label: string | null; scans: number }
+
+export async function listQrPlacements(
+  qrId: string,
+): Promise<{ items: StoreQrPlacementDto[]; activeCount: number }> {
+  const res = await api.get(`${BASE}/${qrId}/placements`);
+  return unwrap<{ items: StoreQrPlacementDto[]; activeCount: number }>(res.data, '사용처를 불러오지 못했습니다.');
+}
+
+export async function startQrPlacement(
+  qrId: string,
+  body: { placement: string; label?: string; cornerRef?: string; endOthers?: boolean },
+): Promise<{ placement: StoreQrPlacementDto; primaryPlacement: string | null }> {
+  const res = await api.post(`${BASE}/${qrId}/placements`, body);
+  return unwrap(res.data, '배치를 시작하지 못했습니다.');
+}
+
+export async function endQrPlacement(
+  qrId: string,
+  placementId: string,
+): Promise<{ placement: StoreQrPlacementDto; primaryPlacement: string | null }> {
+  const res = await api.post(`${BASE}/${qrId}/placements/${placementId}/end`, {});
+  return unwrap(res.data, '배치를 종료하지 못했습니다.');
+}
+
+export async function fetchQrPlacementAnalytics(
+  qrId: string,
+): Promise<{ byPlacement: QrPlacementScanRow[] }> {
+  const res = await api.get(`${BASE}/${qrId}/placement-analytics`);
+  return unwrap(res.data, '사용처 통계를 불러오지 못했습니다.');
+}
+
+/** 같은 콘텐츠로 QR 추가 — target 축 복제 + 새 slug (§8). */
+export async function cloneQrCode(
+  qrId: string,
+  body?: { title?: string; placement?: string; label?: string },
+): Promise<{ qr: StoreQrCode; placement: StoreQrPlacementDto | null }> {
+  const res = await api.post(`${BASE}/${qrId}/clone`, body ?? {});
+  return unwrap(res.data, 'QR 을 추가하지 못했습니다.');
+}
+
 export type QrExportFormat = 'png' | 'svg' | 'pdf';
 export type QrExportPreset = 'small' | 'medium' | 'large' | 'a4' | 'a4_4up';
 

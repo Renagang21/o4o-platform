@@ -32,6 +32,7 @@ import {
   Copy,
   Download,
   ExternalLink,
+  MapPin,
   QrCode,
   RotateCcw,
   Settings,
@@ -97,6 +98,8 @@ export interface StoreQrOperationBoardLabels {
   settings: string;
   analytics: string;
   analyticsClose: string;
+  placements: string;
+  placementsClose: string;
   copyUrl: string;
   openPage: string;
   deactivate: string;
@@ -121,6 +124,8 @@ export const DEFAULT_STORE_QR_OPERATION_BOARD_LABELS: StoreQrOperationBoardLabel
   settings: 'QR 설정',
   analytics: '스캔 통계',
   analyticsClose: '통계 닫기',
+  placements: '사용처 관리',
+  placementsClose: '사용처 닫기',
   copyUrl: 'QR URL 복사',
   openPage: 'QR 페이지 열기',
   deactivate: 'QR 내리기',
@@ -148,6 +153,14 @@ export interface StoreQrOperationBoardProps<T extends StoreQrOperationItem = Sto
   analyticsId?: string | null;
   /** 표 아래에 펼치는 통계 패널. DataTable 이 행 아래 펼침을 직접 지원하지 않는다. */
   analyticsPanel?: ReactNode;
+
+  // ── 사용처(Placement) — WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §9 ──
+  //   전부 optional 이다. 미전달 서비스(K-Cosmetics 등)는 기존 화면 그대로다.
+  /** 행의 '사용처' 액션. 미전달이면 버튼을 그리지 않는다. */
+  onShowPlacements?: (item: T) => void;
+  placementId?: string | null;
+  /** 표 아래에 펼치는 사용처 패널(analyticsPanel 과 같은 자리). */
+  placementPanel?: ReactNode;
 
   onCopyUrl?: (item: T) => void;
   copiedId?: string | null;
@@ -322,6 +335,9 @@ export function StoreQrOperationBoard<T extends StoreQrOperationItem = StoreQrOp
   onShowAnalytics,
   analyticsId,
   analyticsPanel,
+  onShowPlacements,
+  placementId,
+  placementPanel,
   onCopyUrl,
   copiedId,
   onDeactivate,
@@ -534,6 +550,20 @@ export function StoreQrOperationBoard<T extends StoreQrOperationItem = StoreQrOp
                 </button>
               ))}
 
+            {onShowPlacements && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onShowPlacements(item);
+                }}
+                style={{ ...iconBtn, color: placementId === item.id ? palette.primary : palette.neutral500 }}
+                title={placementId === item.id ? labels.placementsClose : labels.placements}
+              >
+                {placementId === item.id ? <X size={16} /> : <MapPin size={16} />}
+              </button>
+            )}
+
             {onShowAnalytics && (
               <button
                 type="button"
@@ -621,6 +651,7 @@ export function StoreQrOperationBoard<T extends StoreQrOperationItem = StoreQrOp
           : {})}
       />
       {analyticsPanel}
+      {placementPanel}
     </>
   );
 }

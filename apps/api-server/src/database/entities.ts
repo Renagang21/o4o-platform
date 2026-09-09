@@ -383,6 +383,7 @@ import {
   StoreAssetDerivation, // WO-KPA-STORE-ASSET-DERIVATION-TABLE-V1
   StoreQrCode,
   StoreQrScanEvent,
+  StoreQrPlacement,
   ProductMarketingAsset,
   // WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1
   StoreMultilingualProductContentGroup,
@@ -997,6 +998,7 @@ export const entities = [
   // QR SCAN EVENT ENTITY (WO-O4O-QR-SCAN-ANALYTICS-V1)
   // ============================================================================
   StoreQrScanEvent,
+  StoreQrPlacement,
   // PRODUCT MARKETING ASSET ENTITY (WO-O4O-PRODUCT-MARKETING-GRAPH-V1)
   // ============================================================================
   ProductMarketingAsset,
