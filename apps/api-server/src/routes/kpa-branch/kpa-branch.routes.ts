@@ -42,6 +42,12 @@
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/events/:eventId               행사 상세
  *   PATCH  /api/v1/kpa-branch/branches/:branchSlug/operator/events/:eventId               수정·게시·취소
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/events/:eventId/rsvps         참가 명단
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/officers                     (public)  공개 임원 명부
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/me/officers                            회원 임원 명부
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/officers?status=              임원 명부 (종료 포함)
+ *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/officers                      임원 등록
+ *   PUT    /api/v1/kpa-branch/branches/:branchSlug/operator/officers/order                표시순서 일괄 변경
+ *   PATCH  /api/v1/kpa-branch/branches/:branchSlug/operator/officers/:officerId           수정·임기종료·공개범위
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/members/:userId/history             소속 이력 (전입·전출 append-only)
  *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/members                             신규 소속 / 전입 (userId | email)
  *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/members/:userId/leave               전출
@@ -77,6 +83,7 @@ import { MemberAnnualReportController } from '../../controllers/kpa-branch/Membe
 import { BranchFeeController } from '../../controllers/kpa-branch/BranchFeeController.js';
 import { BranchEducationCreditController } from '../../controllers/kpa-branch/BranchEducationCreditController.js';
 import { BranchEventController } from '../../controllers/kpa-branch/BranchEventController.js';
+import { BranchOfficerController } from '../../controllers/kpa-branch/BranchOfficerController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
@@ -139,6 +146,11 @@ export function createKpaBranchRoutes(): Router {
   //
   // `visibility='public'` 이고 게시된 행사만 나온다. 기본값은 members_only 이므로
   // 운영자가 명시적으로 공개를 고른 행사만 비로그인에게 보인다.
+  // 공개 임원 명부 (WO-O4O-KPA-BRANCH-OFFICER-ROSTER-V1)
+  //
+  // visibility='public' 이고 **현직인** 임원만 나온다. 상태와 임기 날짜를 함께 본다 —
+  // 상태만 믿으면 종료일이 지난 임원이 홈페이지에 남는다.
+  router.get('/branches/:branchSlug/officers', resolveBranch, wrap(BranchOfficerController.publicList));
   router.get('/branches/:branchSlug/events', resolveBranch, wrap(BranchEventController.publicList));
   router.get(
     '/branches/:branchSlug/events/:eventId',
@@ -251,6 +263,13 @@ export function createKpaBranchRoutes(): Router {
     '/branches/:branchSlug/me/events',
     ...memberReportGuards,
     wrap(BranchEventController.memberList),
+  );
+
+  // 회원 임원 명부 — public + members_only, 현직만
+  router.get(
+    '/branches/:branchSlug/me/officers',
+    ...memberReportGuards,
+    wrap(BranchOfficerController.memberList),
   );
   router.post(
     '/branches/:branchSlug/me/events/:eventId/rsvp',
@@ -431,6 +450,24 @@ export function createKpaBranchRoutes(): Router {
     '/branches/:branchSlug/operator/events/:eventId/rsvps',
     ...operatorGuards,
     wrap(BranchEventController.rsvps),
+  );
+
+  // 임원 명부 (WO-O4O-KPA-BRANCH-OFFICER-ROSTER-V1)
+  //
+  // 직책은 RBAC 이 아니다 — 이 경로들은 role_assignments 를 읽지도 쓰지도 않는다.
+  // 임기 종료·공개범위도 PATCH 로 한다. 삭제 경로가 없다: 종료는 상태이고 이력은 남는다.
+  // 정렬은 PUT .../order 로 한 트랜잭션에 끝낸다 (행마다 PATCH 하면 중간 상태가 보인다).
+  router.get('/branches/:branchSlug/operator/officers', ...operatorGuards, wrap(BranchOfficerController.list));
+  router.post('/branches/:branchSlug/operator/officers', ...operatorGuards, wrap(BranchOfficerController.create));
+  router.put(
+    '/branches/:branchSlug/operator/officers/order',
+    ...operatorGuards,
+    wrap(BranchOfficerController.reorder),
+  );
+  router.patch(
+    '/branches/:branchSlug/operator/officers/:officerId',
+    ...operatorGuards,
+    wrap(BranchOfficerController.update),
   );
 
   router.get('/branches/:branchSlug/operator/domains', ...operatorGuards, wrap(BranchDomainController.list));

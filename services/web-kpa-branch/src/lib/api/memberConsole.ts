@@ -88,6 +88,8 @@ export interface MemberConsoleListItem {
     completedCredits: number | null;
   };
   attention: AttentionCode[];
+  /** 현재 직책 (WO-O4O-KPA-BRANCH-OFFICER-ROSTER-V1). 임원 명부에 연결된 현직만 */
+  positions: string[];
 }
 
 export interface MemberConsoleDetail {
@@ -99,6 +101,8 @@ export interface MemberConsoleDetail {
     licenseNumber: string | null;
     activityType: string | null;
     feeCategory: string | null;
+    /** 현재 직책 — 읽기 전용 표시 */
+    positions?: string[];
   };
   affiliation: {
     membershipId: string;

@@ -385,7 +385,18 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
               {(items ?? []).map((m) => (
                 <tr key={m.id} className={`border-b border-gray-100 ${selected === m.userId ? 'bg-primary-50/40' : ''}`}>
                   <td className="py-2">
-                    <div className="font-medium text-gray-900">{m.name ?? '-'}</div>
+                    <div className="flex items-center gap-1">
+                      <span className="font-medium text-gray-900">{m.name ?? '-'}</span>
+                      {/* 현재 직책 — 읽기 전용 표시. 직책은 권한이 아니다 (W11-A) */}
+                      {(m.positions ?? []).map((p) => (
+                        <span
+                          key={p}
+                          className="rounded bg-indigo-50 px-1.5 py-0.5 text-[11px] font-medium text-indigo-700"
+                        >
+                          {p}
+                        </span>
+                      ))}
+                    </div>
                     <div className="text-xs text-gray-500">{m.email ?? ''}</div>
                   </td>
                   <td className="py-2 text-gray-700">{m.licenseNumber ?? '-'}</td>
@@ -440,6 +451,14 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
               <Section title={`${detail.member.name ?? '회원'} · ${detail.year}년`}>
                 <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <Field label="면허번호" value={detail.member.licenseNumber ?? '-'} />
+                  <Field
+                    label="현재 직책"
+                    value={
+                      (detail.member.positions ?? []).length
+                        ? (detail.member.positions ?? []).join(' · ')
+                        : '-'
+                    }
+                  />
                   <Field label="이메일" value={detail.member.email ?? '-'} />
                   <Field label="회비구분" value={detail.member.feeCategory ?? '-'} />
                   <Field

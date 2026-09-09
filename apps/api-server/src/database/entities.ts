@@ -343,6 +343,8 @@ import {
   // WO-O4O-KPA-BRANCH-EVENTS-AND-RSVP-V1
   BranchEvent,
   BranchEventRsvp,
+  // WO-O4O-KPA-BRANCH-OFFICER-ROSTER-V1
+  BranchOfficer,
 } from '../routes/kpa-branch/entities/index.js';
 
 // ============================================================================
@@ -840,6 +842,8 @@ export const entities = [
   // WO-O4O-KPA-BRANCH-EVENTS-AND-RSVP-V1
   BranchEvent,
   BranchEventRsvp,
+  // WO-O4O-KPA-BRANCH-OFFICER-ROSTER-V1
+  BranchOfficer,
   // ============================================================================
   // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
   // ============================================================================

@@ -37,6 +37,8 @@
 import { AppDataSource } from '../../database/connection.js';
 import { AnnualReportService } from './AnnualReportService.js';
 import { AnnualReportMembershipSyncService } from './AnnualReportMembershipSyncService.js';
+// WO-O4O-KPA-BRANCH-OFFICER-ROSTER-V1: 현재 직책 표시 (읽기 전용)
+import { BranchOfficerService } from './BranchOfficerService.js';
 
 export type ConsoleFailureCode = 'MEMBER_NOT_FOUND' | 'YEAR_INVALID';
 
@@ -99,6 +101,12 @@ export interface MemberConsoleListItem {
     completedCredits: number | null;
   };
   attention: AttentionCode[];
+  /**
+   * 이 회원의 **현재 직책** (WO-O4O-KPA-BRANCH-OFFICER-ROSTER-V1).
+   * 임원 명부에서 `user_id` 로 연결된 현직만 들어온다. 외부 인사(연결 없음)는 대상이 아니다.
+   * 읽기 전용 표시이며 권한과 무관하다 — 직책은 RBAC 이 아니다.
+   */
+  positions: string[];
 }
 
 /** 목록·상세가 같은 조인을 쓰도록 한 곳에 둔다 — 두 화면이 다른 판정을 내지 않게 한다 */
@@ -195,6 +203,8 @@ export class BranchMemberConsoleService {
         completedCredits: r.edu_id ? this.num(r.completed_credits) : null,
       },
       attention: this.attentionOf(r),
+      // 직책은 목록·상세에서 배치 조회로 채운다 (serialize 는 행 단위라 여기서 비워 둔다)
+      positions: [],
     };
   }
 
@@ -249,6 +259,18 @@ export class BranchMemberConsoleService {
      */
     if (params.attention) {
       items = items.filter((i) => i.attention.includes(params.attention as AttentionCode));
+    }
+
+    /**
+     * 현재 직책을 붙인다 — **쿼리 1회**다 (WO §W7 연동 "N+1 로 만들지 않는다").
+     * 회원마다 조회하면 목록의 1-query 계약이 깨진다. userId 를 모아 한 번에 읽고 Map 으로 붙인다.
+     */
+    if (items.length) {
+      const positions = await BranchOfficerService.currentPositionsByUsers({
+        organizationId: params.organizationId,
+        userIds: items.map((i) => i.userId),
+      });
+      items = items.map((i) => ({ ...i, positions: positions.get(i.userId) ?? [] }));
     }
 
     return { items, total: items.length, year };
@@ -308,6 +330,11 @@ export class BranchMemberConsoleService {
       reportDiffUnavailable = '해당 연도 신고서가 없습니다.';
     }
 
+    const officerPositions = await BranchOfficerService.currentPositionsByUsers({
+      organizationId: params.organizationId,
+      userIds: [r.user_id],
+    });
+
     const revisionHistory: unknown[] = Array.isArray(r.report_revision_history)
       ? r.report_revision_history
       : [];
@@ -322,6 +349,8 @@ export class BranchMemberConsoleService {
         licenseNumber: r.license_number ?? null,
         activityType: r.activity_type ?? null,
         feeCategory: summary.feeCategory,
+        /** 현재 직책 — 회원 1명 기준이라 상수 회수다 */
+        positions: officerPositions.get(r.user_id) ?? [],
       },
       affiliation: {
         membershipId: r.id,

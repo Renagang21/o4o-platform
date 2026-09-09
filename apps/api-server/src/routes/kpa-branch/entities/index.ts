@@ -46,3 +46,6 @@ export { BranchEvent, EVENT_STATUSES, EVENT_VISIBILITIES } from './branch-event.
 export type { BranchEventStatus, BranchEventVisibility } from './branch-event.entity.js';
 export { BranchEventRsvp, RSVP_STATUSES } from './branch-event-rsvp.entity.js';
 export type { BranchEventRsvpStatus } from './branch-event-rsvp.entity.js';
+// WO-O4O-KPA-BRANCH-OFFICER-ROSTER-V1
+export { BranchOfficer, OFFICER_STATUSES, OFFICER_VISIBILITIES } from './branch-officer.entity.js';
+export type { BranchOfficerStatus, BranchOfficerVisibility } from './branch-officer.entity.js';

@@ -10,6 +10,7 @@
  *   /:branchSlug                      분회 홈 (고정 템플릿)
  *   /:branchSlug/notices              공지
  *   /:branchSlug/resources            자료실
+ *   /:branchSlug/officers             임원·위원회 명부 (공개/회원)
  *   /:branchSlug/mypage/annual-report 신상신고 작성·제출 (회원)
  *   /:branchSlug/mypage/fees          내 회비 조회 (회원)
  *   /:branchSlug/mypage/education     내 연수교육 조회 (회원)
@@ -22,6 +23,7 @@
  *   /:branchSlug/operator/education   연수교육 평점 원장 (운영자)
  *   /:branchSlug/operator/members     회원 업무 콘솔 (운영자)
  *   /:branchSlug/operator/events      행사 관리 (운영자)
+ *   /:branchSlug/operator/officers    임원 명부 관리 (운영자)
  *
  * 자체 도메인으로 들어오면 같은 트리를 slug 세그먼트 없이 루트에 붙인다
  * (분회별 별도 배포·별도 백엔드 없음 — 번들 하나가 두 진입 방식을 모두 처리한다).
@@ -54,6 +56,8 @@ import MyEducationPage from './pages/annual-report/MyEducationPage';
 import EducationCreditsPage from './pages/operator/EducationCreditsPage';
 import MembersConsolePage from './pages/operator/MembersConsolePage';
 import EventsPage from './pages/operator/EventsPage';
+import OfficersPage from './pages/operator/OfficersPage';
+import BranchOfficersPage from './pages/BranchOfficersPage';
 import MyEventsPage from './pages/annual-report/MyEventsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -65,6 +69,7 @@ function BranchSection({ slug, basePath }: { slug: string; basePath: string }) {
         <Route index element={<BranchHomePage slug={slug} basePath={basePath} />} />
         <Route path="notices" element={<BranchPostsPage slug={slug} category="notice" />} />
         <Route path="resources" element={<BranchPostsPage slug={slug} category="resource" />} />
+        <Route path="officers" element={<BranchOfficersPage slug={slug} />} />
         <Route path="mypage/annual-report" element={<AnnualReportPage slug={slug} />} />
         <Route path="mypage/fees" element={<MyFeePage slug={slug} />} />
         <Route path="mypage/education" element={<MyEducationPage slug={slug} />} />
@@ -77,6 +82,7 @@ function BranchSection({ slug, basePath }: { slug: string; basePath: string }) {
         <Route path="operator/education" element={<EducationCreditsPage slug={slug} />} />
         <Route path="operator/members" element={<MembersConsolePage slug={slug} basePath={basePath} />} />
         <Route path="operator/events" element={<EventsPage slug={slug} />} />
+        <Route path="operator/officers" element={<OfficersPage slug={slug} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
