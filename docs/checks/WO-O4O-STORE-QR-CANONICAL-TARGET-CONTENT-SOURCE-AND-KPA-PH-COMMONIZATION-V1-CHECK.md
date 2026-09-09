@@ -15,6 +15,7 @@ CONTENT SOURCE        = PASS
 KPA / PH QR PARITY    = PASS
 PUBLIC QR REGRESSION  = PASS
 PLACEMENT             = NOT_STARTED   (설계대로 이번 회차 범위 밖)
+PRODUCTION E2E        = PASS (PH 공개 screen_set 뷰어 1건은 선재 결함 — §9)
 ```
 
 ---
@@ -158,6 +159,32 @@ PH 가 Board 를 채택하면서 자동으로 확보됐다. 백엔드 목록은 
 생성 폼의 landing type 선택지는 KPA/PH 모두 product/page/link 3종으로 **이미 동일**했다.
 `screen_set` QR 은 어느 서비스에서도 QR 화면에서 만들지 않는다 — 태블릿 코너에서 자동 생성된다.
 
+### 운영 화면 parity 는 PASS — 공개 뷰어는 PH 만 FAIL (선재 결함)
+
+production E2E 중 확정한 결함이다. **매장 경영자 운영 화면**의 screen_set QR parity 는
+KPA/PH 동일하지만, **공개 `/qr/{slug}` 뷰어**는 다르다.
+
+```text
+KPA  /qr/tablet-corner-5              -> PublicScreenSetViewer 정상 렌더                PASS
+PH   /qr/a-2-2 · /qr/c-2 · /qr/f-2    -> "표시할 내용이 아직 준비되지 않았습니다."      FAIL
+```
+
+원인 (코드 확인):
+
+- `PharmacyHubStoreQrController.publicLanding` 이 응답에 `screenSet` payload 를 넣지 않는다
+  (해당 파일 주석 "video / screen_set 은 … 축이 Pharmacy-Hub 에 생긴 뒤 연다" 는 stale — 데이터는 이미 있다)
+- `services/web-pharmacy-hub/src/pages/QrLandingPage.tsx` 에 `screen_set` 분기가 없다
+  (`pageContent` / `productDetails` / `link` 만 처리하고 나머지는 placeholder)
+- `PublicScreenSetViewer` 는 `services/web-kpa-society/src/pages/qr/` 안의 **KPA 로컬** 컴포넌트다
+
+데이터는 정상이다(read-only SQL: 4건 모두 `status=active` · `deleted_at IS NULL` ·
+blocks 5 · corner_contents 1 — KPA `tablet-corner-5` 와 동일 구조).
+
+**이번 회차 회귀가 아니다.** `git show --stat 0ee65c9fd` 로 이번 커밋이 공개 QR 뷰어 파일을
+전혀 건드리지 않았음을 확인했다. 수정하려면 PH 백엔드 resolver 확장 + `PublicScreenSetViewer`
+공유 패키지 승격이 필요해 새로운 축이므로, CLAUDE.md 실행 원칙(범위 외 수정 금지)에 따라
+**고치지 않고 §16 에 별도 WO 로 제안**한다.
+
 ---
 
 ## 10. Analytics 준비 상태 (⑪)
@@ -253,6 +280,77 @@ services/web-k-cosmetics   vite build → built in 28.82s (exit 0)
 주의: `npx vite build --config <service>/vite.config.ts` 는 root 가 워크스페이스 루트로 잡혀
 `Could not resolve entry module "index.html"` 로 실패한다. 서비스 디렉터리에서 실행해야 한다.
 
+## 14-A. Production E2E (⑰)
+
+2026-09-09 · 프로덕션 실브라우저(Playwright MCP) · 테스트 매장 경영자 계정.
+
+### KPA (`/pharmacy/store/qr`)
+
+```text
+목록 렌더            총 52행 (활성 22 · 보관 30) · 공통 Board                     PASS
+필터 칩              콘텐츠 연결 12 / AI 설명 2 / 태블릿 코너 33                  PASS
+QR 생성              다국어 콘텐츠 기반 -> targetKind "외부 링크" +
+                     contentSource "다국어 제품 설명"(MULTILINGUAL_PRODUCT)       PASS
+export preset        PNG · PNG 고해상도 · SVG · A4 1장 PDF · A4 4분할 PDF         PASS (5종)
+PNG 다운로드         파일 저장 확인                                               PASS
+스캔 통계            인라인 패널 · 카운터 실시간 증가(0->1 · 3->4 · 2->3)         PASS
+URL 복사 / 이름 수정 저장 반영                                                    PASS
+deactivate -> reactivate   "내림" 배지 -> 복구                                    PASS
+공개 라우트          /qr/qr-1788937224442 (다국어) · /qr/tablet-corner-5
+                     (SCREEN_SET) · /qr/type-3 (CONTENT)                          PASS
+console error 0 / white screen 0 / dead link 0
+```
+
+`resolveQrContentSource()` 가 `landing_type='link'` 인 행에서도 **실제 참조 관계**로
+`MULTILINGUAL_PRODUCT` 를 판정한 것이 핵심 실증이다 — landing_type 은 target 축,
+contentSource 는 원천 축으로 분리돼 동작한다.
+
+KPA 조직에는 `PRODUCT` targetKind QR 이 0건이다(프로덕션 `landing_type='product'` 18건은
+전부 PharmacyHub 조직 소유). 따라서 PRODUCT 시나리오는 PH 에서 실증했다.
+
+### PharmacyHub (`/store-owner/qr`)
+
+```text
+목록 렌더            21행 (PRODUCT 18 + SCREEN_SET 3) · 동일 Board                PASS
+액션 6종             KPA 와 동일 (라벨만 '이름 수정')                             PASS
+export preset        동일 5종 · PNG 다운로드                                      PASS
+스캔 통계            AnalyticsDialog 모달 (전체 2 / 오늘 0 / 최근7일 2 ·
+                     기기별 PC 2)                                                 PASS
+URL 복사 / 이름 수정 저장 반영                                                    PASS
+deactivate -> reactivate                                                          PASS
+QR 생성              연결 유형 3종(매장 콘텐츠·자료 / 매장 경영활용 제품 /
+                     외부 링크) = KPA parity. 외부 링크 신규 생성 ->
+                     /qr/e2e-qr-mttrdan3 · targetKind "외부 링크" +
+                     contentSource "외부 주소"(EXTERNAL_URL)                      PASS
+공개 PRODUCT 라우트  /qr/f6-mtmea9ml                                              PASS
+공개 SCREEN_SET      /qr/a-2-2 · /qr/c-2 · /qr/f-2                                FAIL (§9 · 선재 결함)
+console error 0 (로그인 전 401 2건은 미인증 정상 동작)
+```
+
+### 교차 확인
+
+```text
+KPA/PH 동일 target/source 의미      PASS (같은 계약 모듈 · 같은 라벨 맵)
+Tablet ScreenSet QR 동일성          운영 화면 PASS / PH 공개 뷰어 FAIL
+STORE canonical fallback            PASS
+product-linked content 우선         PASS (KPA 다국어 QR 로 실증)
+```
+
+### 검증 잔여물
+
+E2E 도중 브라우저 프로필이 다른 Chrome 인스턴스에 점유되어 컨텍스트가 종료됐고,
+마지막 정리 동작 2건을 끝내지 못했다. 프로덕션 데이터 write 는 승인 대상이므로 SQL 로
+직접 되돌리지 않았다.
+
+```text
+PH  slug=e2e-qr-mttrdan3  "[E2E] 외부 링크 QR 검증"           — 활성 상태로 남음 (내리기 미완)
+KPA slug=qr-1788937224442 제목 "뇌선 다국어 안내 (E2E 확인)"  — 원제목 미복원
+```
+
+둘 다 검증용으로 만든 QR 이며 기존 운영 QR 에는 영향이 없다. 화면에서 1분 내 정리 가능하다.
+
+---
+
 ## 15. Placement
 
 **NOT_STARTED.** 설계(§Placement)대로 이번 회차에서 구현하지 않았다.
@@ -263,7 +361,7 @@ services/web-k-cosmetics   vite build → built in 28.82s (exit 0)
 ## 16. 문서 정합
 
 ```text
-문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건
+문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 3건
 ```
 
 별도 WO 제안:
@@ -271,3 +369,6 @@ services/web-k-cosmetics   vite build → built in 28.82s (exit 0)
 1. K-Cosmetics `/qr/:slug` 공개 라우트 부재 (defect 후보 · 이번에도 미해결 유지)
 2. `store_qr_codes.type` 컬럼 DROP schema housekeeping (read/write 의존은 이번에 전부 제거됨 —
    production 관측 기간을 둔 뒤 별도 회차)
+3. **PharmacyHub 공개 `/qr/{slug}` screen_set 뷰어 부재** (§9 · production E2E 로 확정한 선재 결함)
+   — `PharmacyHubStoreQrController.publicLanding` 에 screenSet payload 추가 +
+   `PublicScreenSetViewer` 공유 패키지 승격 + PH adoption
