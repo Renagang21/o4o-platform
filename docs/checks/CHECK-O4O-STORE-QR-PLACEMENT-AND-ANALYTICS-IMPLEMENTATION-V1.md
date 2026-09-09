@@ -253,11 +253,79 @@ KPA/PH 는 endpoint · accent 색 · 문구만 주입한다. 두 화면의 UX �
 
 ---
 
+## 10-A. 프로덕션 E2E (§19) — 배포 후 실측
+
+배포 `563c4b134` · migration `CreateStoreQrPlacements20270330000000` 적용 확인
+(`typeorm_migrations` 등재 · 테이블 11컬럼 · index 3 + pkey).
+**운영 SQL 직접 수정 0건** — 쓰기는 전부 canonical API, DB 접근은 read-only 검증뿐.
+
+### 10-A-1. 배포 직후 초기 상태 (backfill 0 실측)
+
+```text
+store_qr_placements      0 행
+store_qr_codes           90 행 / primary_placement 채워진 행 0
+```
+
+§5 계약대로 기존 90건은 건드리지 않았다.
+
+### 10-A-2. 생애주기 · 대표값 (검증용 QR `e2e-canonical-closure-…`)
+
+| # | 동작 | 결과 |
+|---|---|---|
+| A | 초기 목록 | `items: []` · `activeCount: 0` |
+| B | `SHELF` 시작 | 201 · `primaryPlacement: SHELF` |
+| C | `"counseling table"` 추가(endOthers 없이) | 201 · **정규화 `COUNSELING_TABLE`** · `primaryPlacement: MULTIPLE` |
+| D | 목록 | `activeCount: 2` — 임의로 하나를 고르지 않았다 |
+| F | QR 목록 응답 | `primaryPlacement: MULTIPLE` · `activePlacementCount: 2` (배지 필드 실측) |
+| — | 종료 1건 | `MULTIPLE → SHELF` |
+| — | 종료 나머지 | `SHELF → null` · 이력 3행 **보존**(status=ended, ended_at 채워짐) |
+
+`0 / 1 / 2+` 세 상태의 전이가 프로덕션에서 그대로 재현됐다.
+
+### 10-A-3. clone · 스캔 귀속
+
+| # | 동작 | 결과 |
+|---|---|---|
+| G | `screen_set` clone | **409 `SCREEN_SET_QR_NOT_CLONEABLE`** — 화면당 QR 1개 UNIQUE 보호 |
+| H | `page` QR clone | 201 · 새 slug `smoke-guard-0626-mtu3ruex`(원본과 다름) · `landingType`·`contentSource` 복제 · `ESL` 배치 동시 시작 |
+| I | 공개 랜딩 `/qr/{new-slug}` | **200** — 복제본이 실제로 열린다 |
+| J | 사용처별 스캔 | `[{placement: ESL, scans: 1}]` — 구간 귀속 성립 |
+| K | 기존 analytics | `['deviceStats','todayScans','totalScans','weeklyScans']` — **shape 무변경(§17)** |
+
+### 10-A-4. 매장 전체 분포 (§13)
+
+```text
+totalScans 41
+byPlacement      UNPLACED 40 · ESL 1        ← 축 합 == total (41)
+byContentSource  TABLET_SCREEN_SET 26 · STORE_DIRECT 7 · EXECUTION_ASSET 4 · MULTILINGUAL_PRODUCT 4
+byTargetKind     screen_set 26 · page 11 · link 4
+days=30          totalScans 40 (기간 바인딩 경로 동작)
+```
+
+**`UNPLACED 40` 이 이 회차의 정상 결과다.** backfill 을 하지 않았으므로(§5)
+배치를 등록하기 전의 스캔은 전부 여기로 모인다. 이 숫자를 줄이는 방법은
+과거를 추정해 채우는 것이 아니라 **앞으로 배치를 등록하는 것**이다.
+
+### 10-A-5. 정리
+
+배치 4건 전부 종료(`activeCount: 0`), 복제 QR 은 canonical `DELETE`(비활성화)로 내렸다.
+검증용 QR 의 종료된 배치 이력 3행은 남는다 — placement 는 **이력 원장이라 삭제 API 가 없고**,
+운영 SQL 직접 삭제는 금지이기 때문이다(폐기 표식이 붙은 검증 QR 에만 존재).
+
+### 10-A-6. E2E 중 발견한 것 — 제품 결함 아님
+
+첫 시도에서 한글 label 이 깨져 저장됐다(`혈당관리 매대` → 30 bytes/11 chars).
+**원인은 내 curl 셸의 명령행 인코딩(CP949)이고 API 가 아니다.**
+UTF-8 로 인코딩한 파일을 `--data-binary` 로 보내 재검증한 결과
+`octet_length 19 · char_length 7 · label = '혈당관리 매대' → t` 로 **정확히 왕복**했다.
+검증 도구의 문제를 제품 결함으로 적지 않기 위해 근거를 남긴다.
+
+---
+
 ## 11. 남은 것
 
 | 항목 | 상태 |
 |---|---|
-| 프로덕션 E2E (§19 A–L) | 배포 후 수행 — 검증용 QR 한정, canonical API/UI 경로로만, 운영 SQL 직접 수정 금지 |
 | `store_qr_codes.type` DROP | 범위 밖 (후순위 정비) |
 | K-Cosmetics 공개 QR route | 범위 밖 (후순위) |
 | ESL 실제 연동 | `placement='ESL'` 은 값으로만 존재. 기기 연동은 별도 WO |
