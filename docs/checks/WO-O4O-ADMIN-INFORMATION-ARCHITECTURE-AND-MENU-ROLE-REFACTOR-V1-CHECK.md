@@ -1,11 +1,11 @@
 # WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — CHECK
 
 > **상태**: **CLOSED** (사용자 승인 2026-09-09) · 프로덕션 배포 검증 PASS (§5)
-> **종결 범위**: `ADMIN_IA_AND_MENU_REFACTOR = CLOSED` / `ADMIN_PLATFORM_ONLY_ACCESS = PENDING` / `POST_REFACTOR_RESIDUALS = OPEN` — 상세 §6-0
+> **종결 범위**: `ADMIN_IA_AND_MENU_REFACTOR = CLOSED` / `ADMIN_PRODUCTION_ADOPTION = PASS` / `ADMIN_PLATFORM_ONLY_ACCESS = PENDING` / `POST_REFACTOR_RESIDUALS = OPEN` — 상세 §6-0
 > **작성일**: 2026-09-09
 > **대상**: `admin.neture.co.kr` (`apps/admin-dashboard`) + `platform-hub` 백엔드 1건
 > **조사 정본**: [`IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1`](../investigations/IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1.md)
-> **커밋**: `481ecb0c3` (1단계 IR) · `61f772d0c` (3단계 구현) · `b7789b543` (platform-hub 2차 수정 + IA 회귀 가드)
+> **커밋**: `481ecb0c3` (1단계 IR) · `61f772d0c` (3단계 구현) · `b7789b543` (platform-hub 2차 수정 + IA 회귀 가드) · `d1a956c45` (검증 종결) · `9443a43ea` (종결 범위) — 전체 §8
 
 ---
 
@@ -330,11 +330,21 @@ BEFORE / AFTER 대조:
 
 ```text
 ADMIN_IA_AND_MENU_REFACTOR = CLOSED     ← 본 WO. 되돌리거나 재작업하지 않는다.
+ADMIN_PRODUCTION_ADOPTION  = PASS       ← 배포 + 브라우저 검증 + HUB 집계 복구 확인 (§5)
 ADMIN_PLATFORM_ONLY_ACCESS = PENDING    ← 프로덕션 DB 자격정보 확보 후 착수
 POST_REFACTOR_RESIDUALS    = OPEN       ← 아래 후속 통합 WO 로 묶어 진행
 ```
 
-기준 커밋: `d1a956c45` (본 CHECK) / 구현 `61f772d0c` · `b7789b543`.
+기준 커밋: `9443a43ea` (종결) / 검증 `d1a956c45` / 구현 `61f772d0c` · `b7789b543`.
+
+`ADMIN_PRODUCTION_ADOPTION = PASS` 의 근거 6가지:
+
+1. 코드가 포함된 `563c4b134` 의 CI Pipeline 성공 (§8-1)
+2. Admin · API 프로덕션 배포 완료 (§5-0)
+3. 실계정 브라우저 검증 통과 (§5-1)
+4. 사이드바 22항목 · API 4xx/5xx 0 · 콘솔 오류 0 (§5-1)
+5. 플랫폼 HUB KPA 집계 복구 확인 — BEFORE/AFTER 3단 대조 (§5-4)
+6. `HEAD == origin/main` · 이번 WO 범위 미커밋 0건 (§8)
 
 ### 6-1. 후속 통합 WO — 착수 조건과 순서 (사용자 지시 2026-09-09)
 
@@ -399,11 +409,47 @@ POST_REFACTOR_RESIDUALS    = OPEN       ← 아래 후속 통합 WO 로 묶어 �
 
 ---
 
-## 8. Git
+## 8. Git · CI 관측 상태
 
 | 항목 | 값 |
 |---|---|
 | 1단계 IR | `481ecb0c3` |
 | 3단계 구현 | `61f772d0c` (파일 120: 수정 17 · 삭제 103) |
+| platform-hub 2차 수정 + IA 회귀 가드 | `b7789b543` |
+| 검증 종결 CHECK | `d1a956c45` |
+| 종결 범위·후속 순서 확정 | `9443a43ea` |
 | 브랜치 | `main` 직접 (CLAUDE.md §1) |
-| stage 방식 | path-specific · `check-staged-scope.mjs` 로 120건 범위 확인 |
+| stage 방식 | path-specific · `check-staged-scope.mjs` 로 매 커밋 범위 확인 |
+
+### 8-1. CI 관측 상태 (추적 종료 시점 기준)
+
+```text
+563c4b134  CI Pipeline = SUCCESS                          ← 코드 검증 정본
+                                                            (b7789b543 이 조상)
+b7789b543  Deploy Admin Dashboard = SUCCESS
+b7789b543  Deploy API Server      = SUCCESS
+9443a43ea  CI Pipeline = IN_PROGRESS_AT_LAST_OBSERVATION  ← 성공으로 기록하지 않는다
+
+추적 종료 사유 = 문서 전용 커밋이며 선행 코드 커밋 563c4b134 검증 완료
+```
+
+`b7789b543` 의 CI Pipeline 은 후속 커밋에 의해 **cancelled** 됐다. 그 코드를 검증한 완주 런은
+`563c4b134`(문서 전용, `b7789b543` 을 조상으로 포함) 의 **success** 다. 이후 커밋은 모두 문서 전용이므로
+코드 게이트에 영향을 주지 않는다.
+
+> `9443a43ea` 를 "성공" 으로 적지 않는다. 관측 시점에 진행 중이었고, 그 뒤 문서 커밋이
+> 그 런을 대체할 수 있다. 마지막 관측 상태를 그대로 남긴다.
+
+### 8-2. 향후 CI 실패 알림이 오면
+
+**먼저 실패 원인을 확인한다.** 그 다음:
+
+| 원인 | 조치 |
+|---|---|
+| 문서 링크 검사 · Markdown 검사 등 **이번 문서 변경이 직접 영향을 주는 단계** | **문서만 보정한다.** 코드·관리자 IA 작업을 다시 열지 않는다 |
+| 그 밖의 단계 | 이번 WO 범위와 무관하다 — 원인 커밋을 찾아 별도로 처리한다 |
+
+이번 WO 의 코드 변경은 `563c4b134` 의 완주 성공으로 이미 검증됐다.
+`ADMIN_IA_AND_MENU_REFACTOR` 를 재개할 근거가 되는 실패는 **관리자 메뉴·라우트·권한 게이트를
+직접 검사하는 단계의 실패뿐**이다(해당 계약은 `admin-information-architecture.test.ts` 28건 ·
+`admin-menu-route-backend-alignment.test.ts` 16건이 고정한다).
