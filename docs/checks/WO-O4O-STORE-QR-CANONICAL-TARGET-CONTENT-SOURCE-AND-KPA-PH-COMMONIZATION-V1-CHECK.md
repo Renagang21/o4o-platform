@@ -12,11 +12,31 @@
 ```text
 QR CANONICAL TARGET   = PASS
 CONTENT SOURCE        = PASS
-KPA / PH QR PARITY    = PASS
 PUBLIC QR REGRESSION  = PASS
 PLACEMENT             = NOT_STARTED   (설계대로 이번 회차 범위 밖)
-PRODUCTION E2E        = PASS (PH 공개 screen_set 뷰어 1건은 선재 결함 — §9)
+
+KPA / PH QR PARITY    = PARTIAL       (운영 화면 PASS · PH 공개 screen_set 뷰어 FAIL — §9)
 ```
+
+WO 판정:
+
+```text
+WO IMPLEMENTATION SCOPE = COMPLETED
+QR CANONICALIZATION     = CLOSED
+KPA/PH COMMON OPERATION = CLOSED
+
+PH SCREEN_SET PUBLIC QR = OPEN
+FINAL KPA/PH QR PARITY  = NOT_YET_CLOSED
+```
+
+`PH SCREEN_SET PUBLIC QR` 이 이번 커밋의 **회귀가 아니라는 판정(§9)** 과, **KPA/PH parity 가
+닫혔는가** 는 별개 문제다. KPA 에서는 `screen_set` QR 이 실제 내용을 보여주고 PH 에서는 빈
+화면을 보여주므로, **사용자 경험 기준 parity 는 아직 닫히지 않았다.** 따라서 최종 parity 는
+후속 WO(`WO-O4O-PHARMACYHUB-SCREENSET-QR-PUBLIC-VIEWER-AND-QR-PARITY-FINAL-CLOSURE-V1`)
+에서 production E2E 로 CLOSED 한다.
+
+검증용 QR 2건(§14-A 잔여물)도 그 회차에서 canonical UI/API 경로로 정리한다 — 운영 데이터이므로
+직접 SQL 로 되돌리지 않는다.
 
 ---
 
