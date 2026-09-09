@@ -72,12 +72,19 @@ async function getKpaSummary(ds: DataSource): Promise<Record<string, any>> {
       FROM kpa_members
     `);
 
-    const [appStats] = await ds.query(`
-      SELECT
-        COUNT(*) FILTER (WHERE status = 'submitted') as "pendingApplications",
-        COUNT(*) as "totalApplications"
-      FROM kpa_applications
-    `);
+    // [RETIRED] kpa_applications — WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1
+    //   그 WO 가 `KpaApplication` entity 와 `kpa_applications` **테이블을 은퇴**시켰다
+    //   (판정: 0행 · 소비처 0 — `routes/kpa/entities/index.ts:7`).
+    //   이 컨트롤러가 그 축을 계속 조회하던 **유일한 잔존 호출부**였다.
+    //   프로덕션 로그 실측(2026-09-09 12:24 UTC):
+    //     `[Platform Hub] KPA summary failed: relation "kpa_applications" does not exist`
+    //
+    //   canonical 대체는 이미 위 `pendingMembers`(`kpa_members.status='pending'`) 다 —
+    //   `WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1` 이 승인 대기 source 를 그것으로 재정합했고
+    //   `operator-summary.controller.ts` 도 같은 축을 쓴다. 따라서 이 쿼리는 중복이자 파괴 요인이었다.
+    //
+    //   응답에서 `applications` 키를 뺀다. 소비 화면(`PlatformHubPage.tsx`)은
+    //   `services.kpa.applications?.pending ?? 0` 로 읽어 shape 호환된다.
 
     const [forumStats] = await ds.query(`
       SELECT COUNT(*) as "totalPosts"
@@ -93,15 +100,11 @@ async function getKpaSummary(ds: DataSource): Promise<Record<string, any>> {
         active: parseInt(memberStats?.activeMembers || '0'),
         pending: parseInt(memberStats?.pendingMembers || '0'),
       },
-      applications: {
-        total: parseInt(appStats?.totalApplications || '0'),
-        pending: parseInt(appStats?.pendingApplications || '0'),
-      },
       forum: {
         totalPosts: parseInt(forumStats?.totalPosts || '0'),
       },
-      riskLevel: parseInt(memberStats?.pendingMembers || '0') > 10 ? 'warning'
-        : parseInt(appStats?.pendingApplications || '0') > 5 ? 'warning' : 'healthy',
+      // 은퇴한 applications 축을 뺐으므로 risk 는 가입 대기 회원 수 단일 기준이다.
+      riskLevel: parseInt(memberStats?.pendingMembers || '0') > 10 ? 'warning' : 'healthy',
     };
   } catch (error) {
     logger.warn('[Platform Hub] KPA summary failed:', error);
@@ -214,15 +217,9 @@ export function createPlatformHubController(dataSource: DataSource): ExpressRout
         });
       }
 
-      // KPA pending applications
-      if (kpa.applications?.pending > 0) {
-        actions.push({
-          service: 'kpa',
-          actionKey: 'kpa.process.pending_approvals',
-          priority: 0.80 + Math.min(kpa.applications.pending * 0.01, 0.1),
-          label: `회원 신청 ${kpa.applications.pending}건 — 승인 필요`,
-        });
-      }
+      // [RETIRED] KPA pending applications — `kpa_applications` 테이블 은퇴로 출처가 없다.
+      //   아래 "KPA pending members"(`kpa_members.status='pending'`) 가 canonical 승인 대기 축이며
+      //   같은 `actionKey: 'kpa.process.pending_approvals'` 를 이미 발행한다 → 중복 제거.
 
       // KPA pending members
       if (kpa.members?.pending > 0) {

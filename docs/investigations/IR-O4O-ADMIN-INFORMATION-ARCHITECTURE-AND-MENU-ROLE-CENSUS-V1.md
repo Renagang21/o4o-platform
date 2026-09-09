@@ -112,7 +112,7 @@ ADMIN_ROUTE_TOTAL = 151 (routes/*.tsx 선언) + 약 75 (wildcard 하위 라우�
 | `/api/v1/auth/login` · `refresh` | 77 | bootstrap |
 | **`/api/v1/cms/contents`** | **21** | **유일한 실질 업무 사용** |
 | `/api/v1/settings/*` | 9 | 설정 |
-| `/api/v1/partnerops/*` | 8 | **메뉴 없음** · 실사용 |
+| `/api/v1/partnerops/*` | 8 | **메뉴 없음** · ⚠️ **정정: 8건 전부 404** (백엔드 부재 — 실사용 아님) |
 | `/api/v1/admin/o4o-product-db/supplier-store-descriptions*` | 5 | **사이드바 없음**(탭) · **쓰기 포함** |
 | `/api/v1/admin/apps/*` | 4 | AppStore |
 | `/api/v1/admin/platform-accounts*` | 4 | 설정 탭 · 쓰기 포함 |
@@ -190,7 +190,7 @@ NEEDS_BUSINESS_DECISION  =  3
 | 라우트 | 상태 | 판정 |
 |---|---|---|
 | `/home` · `/dashboard` | 각기 다른 대시보드 구현 (Overview 와 3중) | **MERGE_DUPLICATE** |
-| `/partnerops/*` | **프로덕션 실사용 8회** · 메뉴 없음 | **기능 은폐** → 진입점 판단 필요 |
+| `/partnerops/*` | 호출 8회가 **전부 404** (백엔드 부재) · 메뉴 없음 | ⚠️ **정정** — 기능 은폐가 아니라 **REMOVE_DEAD_RUNTIME** 후보 |
 | `/admin/o4o-product-db/supplier-store-descriptions` | **쓰기 포함 실사용** · 사이드바 없음(탭만) | **REGROUP** |
 | `/cpt-engine/*` (17 routes) | 백엔드 `/api/v1/cpt/*` **41 endpoint 실재** · 메뉴 없음 · 관리자발 호출 0 | **NEEDS_BUSINESS_DECISION** (CMS V2 와 중복 축) |
 | `/acf/*` · `/acf/groups` | `/admin/custom-field-groups` **백엔드 0 refs** | **REMOVE_DEAD_RUNTIME** |

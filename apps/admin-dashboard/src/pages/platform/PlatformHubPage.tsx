@@ -199,11 +199,15 @@ export default function PlatformHubPage() {
     {
       label: '커뮤니티',
       icon: Users,
-      level: (services.kpa.members?.pending ?? 0) > 10 ? 'warning'
-        : (services.kpa.applications?.pending ?? 0) > 5 ? 'warning' : 'healthy',
+      // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
+      //   `applications` 축 제거. `kpa_applications` 테이블은
+      //   WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1 에서 은퇴했고
+      //   canonical 승인 대기 축은 `kpa_members.status='pending'`(= `members.pending`) 이다.
+      //   유지하면 항상 "신청 0건" 을 보여 실제 대기 건수를 오해하게 만든다.
+      level: (services.kpa.members?.pending ?? 0) > 10 ? 'warning' : 'healthy',
       detail: services.kpa.error
         ? '서비스 연결 불가'
-        : `대기 회원 ${services.kpa.members?.pending ?? 0}명 / 신청 ${services.kpa.applications?.pending ?? 0}건`,
+        : `대기 회원 ${services.kpa.members?.pending ?? 0}명 / 커뮤니티 글 ${services.kpa.forum?.totalPosts ?? 0}건`,
     },
   ];
 
