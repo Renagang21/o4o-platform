@@ -41,3 +41,8 @@ export type { BranchFeeExemptionType } from './branch-fee-ledger.entity.js';
 // WO-O4O-KPA-BRANCH-CONTINUING-EDUCATION-CREDIT-LEDGER-V1
 export { BranchEducationCreditLedger, EXEMPTION_TYPES } from './branch-education-credit-ledger.entity.js';
 export type { EducationCreditStatus, EducationExemptionType } from './branch-education-credit-ledger.entity.js';
+// WO-O4O-KPA-BRANCH-EVENTS-AND-RSVP-V1
+export { BranchEvent, EVENT_STATUSES, EVENT_VISIBILITIES } from './branch-event.entity.js';
+export type { BranchEventStatus, BranchEventVisibility } from './branch-event.entity.js';
+export { BranchEventRsvp, RSVP_STATUSES } from './branch-event-rsvp.entity.js';
+export type { BranchEventRsvpStatus } from './branch-event-rsvp.entity.js';

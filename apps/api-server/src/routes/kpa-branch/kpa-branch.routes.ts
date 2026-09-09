@@ -33,6 +33,15 @@
  *   PATCH  /api/v1/kpa-branch/branches/:branchSlug/operator/education-credits/:ledgerId        평점·면제 개별 수정
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/members?year=&status=&attention=&q=  회원 업무 콘솔 목록
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/members/:userId?year=               회원 통합 상세 (4영역)
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/events                       (public)  공개 행사 목록
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/events/:eventId              (public)  공개 행사 상세
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/me/events                              내 행사 목록 + 내 응답
+ *   POST   /api/v1/kpa-branch/branches/:branchSlug/me/events/:eventId/rsvp                참가/불참 응답
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/events?status=                행사 목록 (draft 포함)
+ *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/events                        행사 생성
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/events/:eventId               행사 상세
+ *   PATCH  /api/v1/kpa-branch/branches/:branchSlug/operator/events/:eventId               수정·게시·취소
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/events/:eventId/rsvps         참가 명단
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/members/:userId/history             소속 이력 (전입·전출 append-only)
  *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/members                             신규 소속 / 전입 (userId | email)
  *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/members/:userId/leave               전출
@@ -67,6 +76,7 @@ import { OperatorAnnualReportController } from '../../controllers/kpa-branch/Ope
 import { MemberAnnualReportController } from '../../controllers/kpa-branch/MemberAnnualReportController.js';
 import { BranchFeeController } from '../../controllers/kpa-branch/BranchFeeController.js';
 import { BranchEducationCreditController } from '../../controllers/kpa-branch/BranchEducationCreditController.js';
+import { BranchEventController } from '../../controllers/kpa-branch/BranchEventController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
@@ -124,6 +134,17 @@ export function createKpaBranchRoutes(): Router {
   router.get('/branches/:branchSlug', resolveBranch, wrap(BranchDirectoryController.detail));
   router.get('/branches/:branchSlug/site', resolveBranch, wrap(BranchSiteController.publicSite));
   router.get('/branches/:branchSlug/posts', resolveBranch, wrap(BranchSiteController.publicPosts));
+
+  // 공개 행사 (WO-O4O-KPA-BRANCH-EVENTS-AND-RSVP-V1)
+  //
+  // `visibility='public'` 이고 게시된 행사만 나온다. 기본값은 members_only 이므로
+  // 운영자가 명시적으로 공개를 고른 행사만 비로그인에게 보인다.
+  router.get('/branches/:branchSlug/events', resolveBranch, wrap(BranchEventController.publicList));
+  router.get(
+    '/branches/:branchSlug/events/:eventId',
+    resolveBranch,
+    wrap(BranchEventController.publicDetail),
+  );
 
   // ── 서비스 가입 (Identity V2 canonical write-path 위임) ───────────────────
   //
@@ -220,6 +241,21 @@ export function createKpaBranchRoutes(): Router {
     '/branches/:branchSlug/me/education-credits',
     ...memberReportGuards,
     wrap(BranchEducationCreditController.mine),
+  );
+
+  // 회원 행사 · 참가 응답 (WO-O4O-KPA-BRANCH-EVENTS-AND-RSVP-V1)
+  //
+  // 응답 주체는 언제나 로그인한 본인이다 — 대리 응답 경로를 만들지 않는다.
+  // 응답 가능 여부(게시·신청사용·마감)는 서버가 판정한다.
+  router.get(
+    '/branches/:branchSlug/me/events',
+    ...memberReportGuards,
+    wrap(BranchEventController.memberList),
+  );
+  router.post(
+    '/branches/:branchSlug/me/events/:eventId/rsvp',
+    ...memberReportGuards,
+    wrap(BranchEventController.respond),
   );
 
   // ── operator (서비스 축 + 분회 축 이중 가드) ──────────────────────────────
@@ -373,6 +409,28 @@ export function createKpaBranchRoutes(): Router {
     '/branches/:branchSlug/operator/education-credits/:ledgerId',
     ...operatorGuards,
     wrap(BranchEducationCreditController.update),
+  );
+
+  // 행사 (WO-O4O-KPA-BRANCH-EVENTS-AND-RSVP-V1)
+  //
+  // 게시·취소도 PATCH 로 한다 — 상태 전용 endpoint 를 따로 만들지 않는다.
+  // 삭제 경로가 없다: 취소는 상태이지 삭제가 아니고, 참가 응답이 딸려 있다.
+  router.get('/branches/:branchSlug/operator/events', ...operatorGuards, wrap(BranchEventController.list));
+  router.post('/branches/:branchSlug/operator/events', ...operatorGuards, wrap(BranchEventController.create));
+  router.get(
+    '/branches/:branchSlug/operator/events/:eventId',
+    ...operatorGuards,
+    wrap(BranchEventController.detail),
+  );
+  router.patch(
+    '/branches/:branchSlug/operator/events/:eventId',
+    ...operatorGuards,
+    wrap(BranchEventController.update),
+  );
+  router.get(
+    '/branches/:branchSlug/operator/events/:eventId/rsvps',
+    ...operatorGuards,
+    wrap(BranchEventController.rsvps),
   );
 
   router.get('/branches/:branchSlug/operator/domains', ...operatorGuards, wrap(BranchDomainController.list));

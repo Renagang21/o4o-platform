@@ -13,6 +13,7 @@
  *   /:branchSlug/mypage/annual-report 신상신고 작성·제출 (회원)
  *   /:branchSlug/mypage/fees          내 회비 조회 (회원)
  *   /:branchSlug/mypage/education     내 연수교육 조회 (회원)
+ *   /:branchSlug/mypage/events        분회 행사·참가 응답 (회원)
  *   /:branchSlug/operator/site        홈페이지 설정 (운영자)
  *   /:branchSlug/operator/posts       글쓰기·글 관리 (운영자)
  *   /:branchSlug/operator/domains     자체 도메인 연결 (운영자)
@@ -20,6 +21,7 @@
  *   /:branchSlug/operator/fees        연회비 정책·원장 (운영자)
  *   /:branchSlug/operator/education   연수교육 평점 원장 (운영자)
  *   /:branchSlug/operator/members     회원 업무 콘솔 (운영자)
+ *   /:branchSlug/operator/events      행사 관리 (운영자)
  *
  * 자체 도메인으로 들어오면 같은 트리를 slug 세그먼트 없이 루트에 붙인다
  * (분회별 별도 배포·별도 백엔드 없음 — 번들 하나가 두 진입 방식을 모두 처리한다).
@@ -51,6 +53,8 @@ import FeeLedgerPage from './pages/operator/FeeLedgerPage';
 import MyEducationPage from './pages/annual-report/MyEducationPage';
 import EducationCreditsPage from './pages/operator/EducationCreditsPage';
 import MembersConsolePage from './pages/operator/MembersConsolePage';
+import EventsPage from './pages/operator/EventsPage';
+import MyEventsPage from './pages/annual-report/MyEventsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 /** 분회 하위 화면 — slug 는 상위(URL 또는 Host)에서 결정되어 내려온다. */
@@ -64,6 +68,7 @@ function BranchSection({ slug, basePath }: { slug: string; basePath: string }) {
         <Route path="mypage/annual-report" element={<AnnualReportPage slug={slug} />} />
         <Route path="mypage/fees" element={<MyFeePage slug={slug} />} />
         <Route path="mypage/education" element={<MyEducationPage slug={slug} />} />
+        <Route path="mypage/events" element={<MyEventsPage slug={slug} />} />
         <Route path="operator/site" element={<SiteSettingsPage slug={slug} />} />
         <Route path="operator/posts" element={<PostsAdminPage slug={slug} />} />
         <Route path="operator/domains" element={<DomainsPage slug={slug} />} />
@@ -71,6 +76,7 @@ function BranchSection({ slug, basePath }: { slug: string; basePath: string }) {
         <Route path="operator/fees" element={<FeeLedgerPage slug={slug} />} />
         <Route path="operator/education" element={<EducationCreditsPage slug={slug} />} />
         <Route path="operator/members" element={<MembersConsolePage slug={slug} basePath={basePath} />} />
+        <Route path="operator/events" element={<EventsPage slug={slug} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
