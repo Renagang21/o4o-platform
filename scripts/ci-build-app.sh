@@ -18,9 +18,15 @@ echo "📦 Building packages..."
 pnpm run build:packages
 echo "✅ Packages built successfully"
 echo ""
-echo "🔗 Reinstalling to pick up updated package.json..."
-pnpm install
-echo "✅ Workspace dependencies updated"
+# WO-O4O-CI-INSTALL-LOCKFILE-DRIFT-REPRODUCIBILITY-CLOSURE-V1
+# 과거에는 비-frozen `pnpm install` 이었다. 그 경우 lockfile 이 워크스페이스와
+# 어긋나 있으면(예: 삭제된 서비스의 stale importer) pnpm 이 전면 재해석을 수행해
+# 추적 파일 `pnpm-lock.yaml` 을 빌드 도중 말없이 고쳐 썼다.
+# CI 에서는 커밋되지 않아 보이지 않고, 로컬에서는 무관한 diff 로 남는다.
+# 설치가 필요한 standalone 실행은 계속 지원하되 lockfile 은 절대 갱신하지 않는다.
+echo "🔗 Verifying workspace dependencies (frozen)..."
+pnpm install --frozen-lockfile
+echo "✅ Workspace dependencies verified"
 echo ""
 
 # Function to build specific app
