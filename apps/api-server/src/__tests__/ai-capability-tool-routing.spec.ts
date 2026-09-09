@@ -1,0 +1,267 @@
+/**
+ * WO-O4O-AI-CAPABILITY-TOOL-ROUTING-V0
+ *
+ * capability → tool 자격 → 실행 경계를 고정한다. LLM 호출 없음.
+ * DB 는 `dataSource.query` stub 으로 대체해 **실제로 나가는 SQL 과 파라미터**를 검사한다.
+ *
+ * 특히 고정하려는 것:
+ *   - capability 는 **서버가 파생**한다. 클라이언트가 보낸 값은 어디에도 쓰이지 않는다.
+ *   - 자격 없는 tool 은 목록에 나타나지도, 실행되지도 않는다(이중 차단).
+ *   - 위조된 storeId / capability 가 실행 경로를 열지 못한다.
+ *   - read-only executor 가 write SQL 을 만들지 않는다.
+ *   - store 미확정(none/ambiguous)에서 매장 tool 이 열리지 않는다.
+ */
+
+jest.mock('../utils/logger.js', () => ({
+  __esModule: true,
+  default: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), debug: jest.fn() },
+}));
+
+import {
+  AiCapability,
+  AI_TOOL_NAMES,
+  AI_TOOL_REGISTRY,
+  assertToolAllowed,
+  deriveAiCapabilities,
+  resolveAvailableTools,
+  validateToolArguments,
+  type VerifiedToolContext,
+} from '../services/ai-tools/ai-tool-contract.js';
+import {
+  executeAiTool,
+  looksLikeStoreScopedRequest,
+  renderToolContext,
+  selectToolForRequest,
+} from '../services/ai-tools/ai-tool-router.js';
+
+const homeCtx = (over: Partial<VerifiedToolContext> = {}): VerifiedToolContext => ({
+  userId: 'user-1',
+  workspace: 'home',
+  ...over,
+});
+
+const storeResolvedCtx = (): VerifiedToolContext => ({
+  userId: 'user-1',
+  workspace: 'store',
+  serviceKey: 'kpa-society',
+  storeStatus: 'resolved',
+  organizationId: 'org-1',
+});
+
+function makeDataSource(rows: Array<{ capability_key: string; enabled: boolean }>) {
+  const calls: Array<{ sql: string; params: unknown[] }> = [];
+  const dataSource: any = {
+    query: jest.fn(async (sql: string, params: unknown[] = []) => {
+      calls.push({ sql, params });
+      return rows;
+    }),
+  };
+  return { dataSource, calls };
+}
+
+// ─── capability 파생 ─────────────────────────────────────────────────────────
+
+describe('capability 파생 — 서버 사실만 입력', () => {
+  it('1. 인증만 되면 AI context capability 를 갖는다', () => {
+    expect(deriveAiCapabilities(homeCtx())).toEqual([AiCapability.READ_ONLY_AI_CONTEXT]);
+  });
+
+  it('3. store resolved 면 store context capability 가 추가된다', () => {
+    expect(deriveAiCapabilities(storeResolvedCtx())).toEqual([
+      AiCapability.READ_ONLY_AI_CONTEXT,
+      AiCapability.READ_ONLY_STORE_CONTEXT,
+    ]);
+  });
+
+  it('4. store 가 none / ambiguous 면 store capability 를 주지 않는다', () => {
+    for (const status of ['none', 'ambiguous'] as const) {
+      const caps = deriveAiCapabilities(homeCtx({ workspace: 'store', storeStatus: status, organizationId: undefined }));
+      expect(caps).not.toContain(AiCapability.READ_ONLY_STORE_CONTEXT);
+    }
+  });
+
+  it('status 가 resolved 여도 organizationId 가 없으면 주지 않는다 (반쪽 상태 방지)', () => {
+    const caps = deriveAiCapabilities(homeCtx({ workspace: 'store', storeStatus: 'resolved' }));
+    expect(caps).not.toContain(AiCapability.READ_ONLY_STORE_CONTEXT);
+  });
+});
+
+// ─── eligibility (노출 차단) ─────────────────────────────────────────────────
+
+describe('tool eligibility — 자격 없는 tool 은 노출되지 않는다', () => {
+  it('1·2. home scope 에서는 workscope tool 만 보인다', () => {
+    const names = resolveAvailableTools(homeCtx()).map((t) => t.name);
+    expect(names).toEqual([AI_TOOL_NAMES.GET_WORK_SCOPE_CONTEXT]);
+    expect(names).not.toContain(AI_TOOL_NAMES.GET_STORE_CONTEXT);
+  });
+
+  it('3. store resolved 에서는 두 tool 모두 보인다', () => {
+    const names = resolveAvailableTools(storeResolvedCtx()).map((t) => t.name);
+    expect(names).toContain(AI_TOOL_NAMES.GET_WORK_SCOPE_CONTEXT);
+    expect(names).toContain(AI_TOOL_NAMES.GET_STORE_CONTEXT);
+  });
+
+  it('registry 는 server·read-only tool 만 담는다 (local/browser 0)', () => {
+    for (const t of AI_TOOL_REGISTRY) {
+      expect(t.executionMode).toBe('server');
+      expect(t.readOnly).toBe(true);
+    }
+  });
+});
+
+// ─── 실행 직전 재검증 (이중 차단) ────────────────────────────────────────────
+
+describe('실행 직전 재검증', () => {
+  it('2. 자격 없는 tool 은 실행 단계에서도 차단된다', () => {
+    const auth = assertToolAllowed(AI_TOOL_NAMES.GET_STORE_CONTEXT, homeCtx());
+    expect(auth.allowed).toBe(false);
+    expect(auth).toMatchObject({ reason: 'CAPABILITY_MISSING' });
+  });
+
+  it('8. 등록부에 없는 tool 이름은 차단된다 (모델이 지어내도 실행 불가)', () => {
+    for (const bogus of ['store.delete_all', 'local.file_read', 'browser.navigate', '']) {
+      const auth = assertToolAllowed(bogus, storeResolvedCtx());
+      expect(auth.allowed).toBe(false);
+      expect(auth).toMatchObject({ reason: 'UNKNOWN_TOOL' });
+    }
+  });
+
+  it('자격이 충족되면 통과한다', () => {
+    const auth = assertToolAllowed(AI_TOOL_NAMES.GET_STORE_CONTEXT, storeResolvedCtx());
+    expect(auth.allowed).toBe(true);
+  });
+});
+
+// ─── 인자 검증 ───────────────────────────────────────────────────────────────
+
+describe('9. tool 인자 검증 — 식별자 주입 차단', () => {
+  it('빈 인자만 허용한다', () => {
+    expect(validateToolArguments({}).ok).toBe(true);
+    expect(validateToolArguments(undefined).ok).toBe(true);
+    expect(validateToolArguments(null).ok).toBe(true);
+  });
+
+  it('6. 위조 storeId/organizationId 를 인자로 넘기면 거부한다', () => {
+    for (const bad of [
+      { storeId: '00000000-0000-0000-0000-000000000001' },
+      { organizationId: 'org-victim' },
+      { serviceKey: 'kpa-society' },
+    ]) {
+      const r = validateToolArguments(bad);
+      expect(r.ok).toBe(false);
+      expect(r.reason).toBe('INVALID_ARGUMENTS');
+    }
+  });
+
+  it('배열·원시값도 거부한다', () => {
+    for (const bad of [[], ['x'], 'str', 42, true]) {
+      expect(validateToolArguments(bad).ok).toBe(false);
+    }
+  });
+});
+
+// ─── executor ────────────────────────────────────────────────────────────────
+
+describe('executor — read-only · 식별자 미노출', () => {
+  it('workscope tool 은 UUID 를 반환하지 않는다', async () => {
+    const { dataSource, calls } = makeDataSource([]);
+    const r = await executeAiTool(dataSource, AI_TOOL_NAMES.GET_WORK_SCOPE_CONTEXT, {}, storeResolvedCtx());
+    expect(r.ok).toBe(true);
+    const json = JSON.stringify(r);
+    expect(json).not.toContain('org-1');
+    expect(json).not.toContain('user-1');
+    // DB 를 건드리지 않는다.
+    expect(calls).toHaveLength(0);
+  });
+
+  it('3·10. store tool 은 확정된 organizationId 로만 조회하고 write 를 하지 않는다', async () => {
+    const { dataSource, calls } = makeDataSource([
+      { capability_key: 'TABLET', enabled: true },
+      { capability_key: 'SIGNAGE', enabled: true },
+      { capability_key: 'KIOSK', enabled: false },
+    ]);
+    const r = await executeAiTool(dataSource, AI_TOOL_NAMES.GET_STORE_CONTEXT, {}, storeResolvedCtx());
+
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      // 비활성 기능은 제외된다.
+      expect(r.data.enabledFeatureCount).toBe(2);
+      expect(r.data.enabledFeatures).toEqual(['태블릿 주문', '사이니지']);
+    }
+    // 세션에서 확정한 org 로만 조회한다.
+    expect(calls).toHaveLength(1);
+    expect(calls[0].params).toEqual(['org-1']);
+    // read-only 고정.
+    expect(calls[0].sql).toMatch(/^\s*SELECT/i);
+    expect(calls[0].sql).not.toMatch(/\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE)\b/i);
+  });
+
+  it('4·5. store 미확정이면 executor 가 스스로 막고 DB 를 조회하지 않는다', async () => {
+    const { dataSource, calls } = makeDataSource([{ capability_key: 'TABLET', enabled: true }]);
+    const r = await executeAiTool(
+      dataSource,
+      AI_TOOL_NAMES.GET_STORE_CONTEXT,
+      {},
+      homeCtx({ workspace: 'store', storeStatus: 'ambiguous' }),
+    );
+    expect(r.ok).toBe(false);
+    expect(r).toMatchObject({ reason: 'CAPABILITY_MISSING' });
+    // 다른 매장 데이터가 새어나갈 질의 자체가 없다.
+    expect(calls).toHaveLength(0);
+  });
+
+  it('7. 클라이언트가 보낸 capability 는 판정에 쓰이지 않는다', async () => {
+    const { dataSource, calls } = makeDataSource([{ capability_key: 'TABLET', enabled: true }]);
+    // 컨텍스트에 클라이언트발 capability 를 억지로 끼워넣어도 타입 밖이라 판정에 닿지 않는다.
+    const forged = { ...homeCtx(), capabilities: ['READ_ONLY_STORE_CONTEXT'] } as unknown as VerifiedToolContext;
+    const r = await executeAiTool(dataSource, AI_TOOL_NAMES.GET_STORE_CONTEXT, {}, forged);
+    expect(r.ok).toBe(false);
+    expect(calls).toHaveLength(0);
+  });
+});
+
+// ─── 결정론적 선택 ───────────────────────────────────────────────────────────
+
+describe('12. 결정론적 tool 선택 (agent loop 없음)', () => {
+  it('매장 지시어를 인식한다', () => {
+    for (const m of ['내 매장 기준으로 알려줘', '우리 약국에 맞게', 'my store setup']) {
+      expect(looksLikeStoreScopedRequest(m)).toBe(true);
+    }
+    for (const m of ['약국 POP 원칙 알려줘', '안녕하세요']) {
+      expect(looksLikeStoreScopedRequest(m)).toBe(false);
+    }
+  });
+
+  it('자격이 있을 때만 매장 tool 을 고른다', () => {
+    expect(selectToolForRequest('내 매장 기준으로 알려줘', storeResolvedCtx()))
+      .toBe(AI_TOOL_NAMES.GET_STORE_CONTEXT);
+  });
+
+  it('4. 자격이 없으면 tool 을 고르지 않는다 (텍스트 응답으로 간다)', () => {
+    expect(selectToolForRequest('내 매장 기준으로 알려줘', homeCtx())).toBeNull();
+    expect(
+      selectToolForRequest('내 매장 기준으로', homeCtx({ workspace: 'store', storeStatus: 'none' })),
+    ).toBeNull();
+  });
+
+  it('매장 지시어가 없으면 tool 을 고르지 않는다', () => {
+    expect(selectToolForRequest('약국 POP 원칙 3가지', storeResolvedCtx())).toBeNull();
+  });
+});
+
+// ─── 프롬프트 주입 형태 ──────────────────────────────────────────────────────
+
+describe('tool 결과 → 프롬프트 컨텍스트', () => {
+  it('구조체가 아니라 요약 문장으로 변환된다', async () => {
+    const { dataSource } = makeDataSource([{ capability_key: 'POP_PRINT', enabled: true }]);
+    const r = await executeAiTool(dataSource, AI_TOOL_NAMES.GET_STORE_CONTEXT, {}, storeResolvedCtx());
+    const block = renderToolContext(r);
+    expect(block).toContain('POP 출력');
+    expect(block).not.toContain('org-1');
+    expect(block).not.toContain('{');
+  });
+
+  it('차단된 결과는 프롬프트에 아무것도 넣지 않는다', () => {
+    expect(renderToolContext({ ok: false, tool: 'x', reason: 'CAPABILITY_MISSING' })).toBeNull();
+  });
+});

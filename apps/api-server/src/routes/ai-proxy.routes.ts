@@ -47,6 +47,12 @@ import { execute } from '@o4o/ai-core';
 import { dynamicLimiter } from '../middleware/rateLimiter.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
 import {
+  selectToolForRequest,
+  executeAiTool,
+  renderToolContext,
+} from '../services/ai-tools/ai-tool-router.js';
+import type { VerifiedToolContext } from '../services/ai-tools/ai-tool-contract.js';
+import {
   resolveAiTarget,
   normalizeAiError,
   aiErrorUserMessage,
@@ -1861,6 +1867,10 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
     // 임의 매장을 고르지 않는다(WO-O4O-WORK-SCOPE-STORE-RESOLUTION-V0).
     const facts: VerifiedScopeFacts = { workspace, capabilities };
 
+    // WO-O4O-AI-CAPABILITY-TOOL-ROUTING-V0: tool 판정의 유일한 입력.
+    // 클라이언트 workScope 가 아니라 **서버가 확정한 사실**만 담는다.
+    const toolCtx: VerifiedToolContext = { userId, workspace };
+
     if (STORE_SCOPED_WORKSPACES.includes(workspace)) {
       const resolution = await resolveWorkScopeStore(AppDataSource, {
         userId,
@@ -1870,9 +1880,27 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
       facts.storeStatus = resolution.status;
       // 서버가 정규화한 canonical key 만 쓴다(클라이언트 값 그대로 쓰지 않는다).
       facts.serviceKey = resolution.serviceKey || undefined;
+
+      toolCtx.storeStatus = resolution.status;
+      toolCtx.serviceKey = resolution.serviceKey || undefined;
+      // organizationId 는 executor 내부 조회에만 쓰고 프롬프트·응답에는 싣지 않는다.
+      toolCtx.organizationId = resolution.organizationId ?? undefined;
     } else if (requestedServiceKey) {
       // 비-store 축: 식별자를 확정할 필요가 없으므로 서비스 표기만 정규화해 싣는다.
       facts.serviceKey = requestedServiceKey;
+      toolCtx.serviceKey = requestedServiceKey;
+    }
+
+    // ── Tool routing (결정론적, 최대 1회 — agent loop 없음) ──────────────────
+    let toolContextBlock: string | null = null;
+    let executedTool: string | null = null;
+    let toolOutcome: string | null = null;
+    const selectedTool = selectToolForRequest(message, toolCtx);
+    if (selectedTool) {
+      const toolResult = await executeAiTool(AppDataSource, selectedTool, {}, toolCtx);
+      executedTool = selectedTool;
+      toolOutcome = toolResult.ok ? 'allowed' : toolResult.reason;
+      toolContextBlock = renderToolContext(toolResult);
     }
 
     // WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0:
@@ -1880,8 +1908,12 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
     //   Home UI 는 provider 를 보내지 않으므로 실사용에서는 env/기본값이 쓰인다(§11 selector 미노출).
     const { provider, model, apiKey } = await resolveAiTarget(AppDataSource, req.body?.provider);
 
+    // tool 결과는 system prompt 뒤에 **요약 문장으로만** 덧붙인다(구조체 통째 전달 금지).
+    const basePrompt = buildHomeChatSystemPrompt(facts);
+    const systemPrompt = toolContextBlock ? `${basePrompt}\n\n${toolContextBlock}` : basePrompt;
+
     const result = await execute({
-      systemPrompt: buildHomeChatSystemPrompt(facts),
+      systemPrompt,
       userPrompt: buildHomeChatUserPrompt(message),
       provider,
       responseMode: 'text',
@@ -1922,6 +1954,9 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
         // multi-provider 전환 검증에 필요하다(§20 smoke 가 이 값을 본다).
         provider,
         model: result.model,
+        // 어떤 tool 이 실행/차단됐는지. 이름과 판정뿐이라 비민감이며 smoke 검증에 필요하다.
+        tool: executedTool,
+        toolOutcome,
         requestId,
       },
     });
