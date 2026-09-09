@@ -1,10 +1,10 @@
 # WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — CHECK
 
-> **상태**: 3단계 구현 완료 · 프로덕션 배포 검증 대기
+> **상태**: 3단계 구현 완료 · **프로덕션 배포 검증 PASS** (§5)
 > **작성일**: 2026-09-09
 > **대상**: `admin.neture.co.kr` (`apps/admin-dashboard`) + `platform-hub` 백엔드 1건
 > **조사 정본**: [`IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1`](../investigations/IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1.md)
-> **커밋**: `481ecb0c3` (1단계 IR) · `61f772d0c` (3단계 구현)
+> **커밋**: `481ecb0c3` (1단계 IR) · `61f772d0c` (3단계 구현) · `b7789b543` (platform-hub 2차 수정 + IA 회귀 가드)
 
 ---
 
@@ -284,9 +284,42 @@ action queue 의 중복 항목(같은 `actionKey: 'kpa.process.pending_approvals
 > **재발 방지 교훈**: 이 화면 계열은 서비스별 수집 실패를 카드 단위로 흡수해 **항상 HTTP 200** 이다.
 > 검증은 status code 가 아니라 ① 카드별 `error` 필드 ② `[Platform Hub] * failed` 로그 로 한다.
 
-### 5-4. 2차 AFTER 검증 — 대기 (§6 #11)
+### 5-4. 2차 AFTER — **PASS** (2026-09-09 · revision `o4o-core-api-03571-c4n`)
 
-2차 수정 배포 후 동일 요청으로 `kpa.error == null` · `members`/`forum` 수치 · `globalRisk != 'partial'` 확인.
+`b7789b543` Deploy API Server 성공 후 동일 요청:
+
+```text
+AFTER-2  globalRisk = healthy          (BEFORE: partial)
+AFTER-2  kpa     → error=null  risk=healthy
+                   members = {total: 7, active: 5, pending: 0}
+                   forum   = {totalPosts: 4}
+AFTER-2  neture  → error=null  risk=healthy
+                   suppliers = {total: 3, active: 2}
+                   requests  = {total: 0, pending: 0, approvalRate: 100}
+```
+
+**플랫폼 HUB 의 KPA 카드가 처음으로 실데이터를 반환한다.**
+
+BEFORE / AFTER 대조:
+
+| 항목 | BEFORE | AFTER-1 (테이블명만 교정) | AFTER-2 (은퇴 축 제거) |
+|---|---|---|---|
+| `kpa.error` | `unavailable` | `unavailable` | **`null`** |
+| `kpa.riskLevel` | `unknown` | `unknown` | **`healthy`** |
+| `kpa.members` | — | — | **`{7, 5, 0}`** |
+| `kpa.forum` | — | — | **`{totalPosts: 4}`** |
+| `globalRisk` | `partial` | `partial` | **`healthy`** |
+| 실패 로그 | `kpa_member` 부재 | `kpa_applications` 부재 | **0건** |
+
+부가 검증:
+
+- `[Platform Hub] KPA summary failed` 로그 — 수정 배포 후 **15분간 0건**
+- 브라우저 재검증 (`renariver21`): `HUB_KPA_VERDICT = ok` · `HUB_GLOBAL_RISK = healthy` ·
+  사이드바 22 유지 · **콘솔 오류 0 · API 4xx/5xx 0**
+- `applications` 키는 응답에서 사라졌고 소비 화면은 `?? 0` fallback 으로 shape 호환 확인
+
+> **MUST_FIX #1 종결.** 검증 기준을 status code → 카드별 `error` + 로그 로 바꾼 것이 결정적이었다.
+> 2xx 만 봤다면 AFTER-1 에서 "고쳤다"고 오판할 수 있었다.
 
 ---
 
@@ -294,7 +327,7 @@ action queue 의 중복 항목(같은 `actionKey: 'kpa.process.pending_approvals
 
 | # | 항목 | 사유 |
 |:-:|---|---|
-| 1 | **`App.tsx` 진입 floor 축소** | **주 운영자 계정(`sohae2100`)이 `platform:super_admin` 을 갖지 않아** 지금 좁히면 관리자 사이트에서 잠긴다(§2-3). 선행 조건: ① `role_assignments` 실 보유자 전수 확인 ② legacy 역할 보유자 정리 방침. 프로덕션 DB `o4o_api` 자격정보가 `apps/api-server/.env` 와 불일치(터널 성공, password authentication failed) → **자격정보 = CLAUDE.md 중지 조건** |
+| 1 | **`App.tsx` 진입 floor 축소** (유일한 잔여 권한 작업) | **주 운영자 계정(`sohae2100`)이 `platform:super_admin` 을 갖지 않아** 지금 좁히면 관리자 사이트에서 잠긴다(§2-3). 선행 조건: ① `role_assignments` 실 보유자 전수 확인 ② legacy 역할 보유자 정리 방침. 프로덕션 DB `o4o_api` 자격정보가 `apps/api-server/.env` 와 불일치(터널 성공, password authentication failed) → **자격정보 = CLAUDE.md 중지 조건** |
 | 2 | KPA 화면 3건 이관 | 대응 operator 화면 부재. 신규 화면 생성은 이번 WO 범위 밖 |
 | 3 | `/api/v1/cpt/*` · CPT entity·table 판정 | 외부 소비처 전수조사 선행 |
 | 4 | `cms_*` 테이블·entity 삭제 판정 | 데이터 존재 여부 확인 선행(DB 접근 필요) |
