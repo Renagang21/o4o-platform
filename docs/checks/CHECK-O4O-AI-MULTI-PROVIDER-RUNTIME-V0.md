@@ -233,9 +233,55 @@ eslint (변경 6파일)                   → PASS (0)
 
 ---
 
-## 11. production smoke
+## 11. production smoke — Gemini PASS · OpenAI 키 부재로 미검증
 
-(배포 후 기록 — §13 참조)
+배포: `Deploy API Server` success · `Deploy Web Services` success · CodeQL success (commit `1c234382e`).
+
+배포 리비전 env 실측 (이름·설정여부만, 값 미조회):
+
+```text
+GEMINI_API_KEY           set
+OPENAI_API_KEY           EMPTY   ← GitHub secret 미존재
+AI_DEFAULT_PROVIDER      EMPTY   → 코드 기본값 gemini 적용
+AI_DEFAULT_MODEL_OPENAI  EMPTY   → 미사용
+```
+
+동일 문구(`약국 POP 제작 시 기본 원칙을 3가지로 알려줘`)로 실측:
+
+| 케이스 | 결과 | 판정 |
+|---|---|:---:|
+| default (env 전부 비어있음) | 200 · `provider=gemini` · `model=gemini-2.5-flash` · 정상 답변 | ✅ |
+| explicit `provider=gemini` | 200 · `provider=gemini` · `model=gemini-2.5-flash` · 정상 답변 | ✅ |
+| explicit `provider=openai` | 502 · `code=AI_NOT_CONFIGURED` · 사용자 문구만 | ⚠️ 키 부재 |
+| invalid `provider=claude` | 200 · `provider=gemini` 로 안전 대체 (500 아님) | ✅ |
+
+**§21 Home AI 기본 provider smoke**: default 경로가 곧 Home 이 쓰는 경로다(Home 은 provider 를 보내지 않는다).
+위 1행이 그 검증이며 정상이다. **기존 Gemini 경로 회귀 0.**
+
+### OpenAI 경로가 "배선되어 있음"은 실증됐다
+
+응답은 sanitize 되어 내부를 볼 수 없으므로 서버 로그로 확인했다:
+
+```text
+home-chat error  code=AI_NOT_CONFIGURED  retryable=False
+error="AI_NOT_CONFIGURED: openai API key missing"
+```
+
+즉 `execute()` 가 **openai provider 로 dispatch** 했고(gemini 로 새지 않았다), config 해석까지 도달한 뒤
+키가 없어서 멈췄다. provider 선택·모델 해석·오류 정규화 경로는 전부 동작한다.
+**남은 것은 키 하나뿐이다.**
+
+부수 실증: 사용자 응답에 provider·model·키·원문이 일절 나가지 않았고(§14), 잘못된 provider 값이
+500 이 아니라 기본값 대체로 흡수됐다(§16).
+
+### 남은 검증 (키 추가 후 재개)
+
+```text
+1. OPENAI_API_KEY GitHub secret 추가 → deploy-api 재배포
+2. provider=openai → 200 + gpt-6-astra 텍스트 응답 (§20)
+3. temperature 미전송 / max_completion_tokens 계약이 실제 API 에서 수용되는지 확인
+4. 필요 시 AI_DEFAULT_PROVIDER=openai 로 전환 후 Home 기본 경로 재확인 (§21)
+```
 
 ---
 
@@ -282,12 +328,12 @@ eslint (변경 6파일)                   → PASS (0)
 
 | 기준 | 결과 |
 |---|---|
-| 1. OpenAI provider 호출 가능 | 코드/테스트 충족 · **프로덕션 미검증**(키 부재) |
+| 1. OpenAI provider 호출 가능 | 코드·테스트 충족 · dispatch 실증(로그) · **프로덕션 응답 미검증**(키 부재) |
 | 2. Gemini provider 호출 가능 | 충족 |
 | 3. 동일 공통 execute contract | 충족 (기존 계약 그대로) |
 | 4. caller provider 명시 가능 | 충족 |
 | 5. default provider 존재 | 충족 (env + 코드 기본값) |
-| 6. Home AI 기본 provider 정상 | §11 참조 |
+| 6. Home AI 기본 provider 정상 | 충족 (프로덕션 200) |
 | 7. WorkScope 회귀 없음 | 충족 (테스트 포함) |
 | 8. tool calling 0 | 충족 |
 | 9. 자동 routing 0 | 충족 |
@@ -296,6 +342,6 @@ eslint (변경 6파일)                   → PASS (0)
 | 12. secret leakage 0 | 충족 |
 | 13. tests PASS | 충족 (84) |
 | 14. type-check/build PASS | 충족 (baseline 단서 포함) |
-| 15. production smoke PASS | §11 참조 |
+| 15. production smoke PASS | **부분** — Gemini PASS / OpenAI 키 부재로 미검증. §11 |
 | 16. CHECK 작성 | 충족 |
 | 17. commit/push | 충족 |
