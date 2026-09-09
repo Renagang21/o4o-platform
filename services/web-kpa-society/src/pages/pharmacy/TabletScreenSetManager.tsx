@@ -30,7 +30,7 @@ import type { TabletKioskApi } from '@o4o/tablet-kiosk-core';
 // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4:
 //   'QR 모바일 화면' 미리보기 = 실제 /qr/:slug 랜딩과 **같은 컴포넌트**.
 //   공유 편집기는 서비스 계층을 import 하지 않으므로(계층 역전 금지) 매장 소비처가 렌더러를 주입한다.
-import PublicScreenSetViewer from '../qr/PublicScreenSetViewer';
+import { PublicScreenSetViewer } from '@o4o/tablet-kiosk-core';
 import type { QrScreenSet } from '../../api/storeQr';
 // 공유 편집기 + 라벨/상수/계약을 패키지에서 소비.
 import {

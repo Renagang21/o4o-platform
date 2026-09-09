@@ -18,6 +18,7 @@
  *
  * 원장은 공통 `store_qr_codes` 다 — 신규 테이블 0.
  */
+import type { QrScreenSet } from '@o4o/tablet-kiosk-core';
 import { api } from '../apiClient';
 import type { StoreConnectionState } from '../../components/store-owner/StoreConnectionNotice';
 
@@ -207,7 +208,16 @@ export interface PublicQrLanding {
     body: string | null;
     items: Array<{ key: string; name: string; descriptionHtml: string }>;
   } | null;
+  /**
+   * WO-O4O-STORE-QR-CANONICAL-ADOPTED-IMPLEMENTATION-GAP-AUDIT-AND-PH-SCREENSET-FINAL-CLOSURE-V1:
+   *   landingType='screen_set' (targetKind=SCREEN_SET · contentSource=TABLET_SCREEN_SET) 일 때
+   *   공용 `resolvePublicQrLanding` 이 태블릿과 **같은 원본 sections** 를 내려준다.
+   *   백엔드는 처음부터 이 payload 를 보내고 있었고, 빠져 있던 것은 PH 프론트의 소비뿐이었다.
+   */
+  screenSet?: QrScreenSet | null;
 }
+
+export type { QrScreenSet };
 
 /** 공개 QR 랜딩 조회. 스캔 이벤트는 서버가 이 호출로 기록한다. */
 export async function fetchPublicQrLanding(slug: string): Promise<PublicQrLanding> {

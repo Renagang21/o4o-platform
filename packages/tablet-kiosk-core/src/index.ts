@@ -10,6 +10,11 @@ export type { TabletKioskPageProps, TabletKioskDisplaySettings } from './TabletK
 // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 공개 모바일 코너 화면이 태블릿과 동일한 QR 렌더를 재사용.
 export { QrImage } from './TabletKioskPage';
 
+// WO-O4O-STORE-QR-CANONICAL-ADOPTED-IMPLEMENTATION-GAP-AUDIT-AND-PH-SCREENSET-FINAL-CLOSURE-V1:
+//   screen_set QR 모바일 공개 뷰어. KPA 로컬 컴포넌트였던 것을 승격했다 —
+//   KPA 와 PharmacyHub 가 복사본이 아니라 **같은 renderer** 를 쓴다.
+export { PublicScreenSetViewer } from './PublicScreenSetViewer';
+
 // WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1
 export { IdlePlaylistEditor } from './IdlePlaylistEditor';
 export type { IdlePlaylistEditorProps } from './IdlePlaylistEditor';
@@ -34,4 +39,7 @@ export type {
   TabletScreenSection,
   // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-RUNTIME-V1
   TabletContentCard,
+  // WO-O4O-STORE-QR-CANONICAL-…-PH-SCREENSET-FINAL-CLOSURE-V1
+  QrScreenSet,
+  QrScreenSetSection,
 } from './types';

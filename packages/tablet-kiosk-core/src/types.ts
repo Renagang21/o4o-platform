@@ -191,3 +191,22 @@ export interface TabletContentCard {
   relatedProductName?: string | null;
   detail?: { html?: string };
 }
+
+/**
+ * WO-O4O-STORE-QR-CANONICAL-ADOPTED-IMPLEMENTATION-GAP-AUDIT-AND-PH-SCREENSET-FINAL-CLOSURE-V1:
+ *   screen_set QR 공개 랜딩 payload — 백엔드 공용 `resolvePublicQrLanding` 산출물의 계약이다.
+ *   KPA 와 PharmacyHub 가 **같은 정의**를 소비한다(서비스별 재선언 금지).
+ */
+export interface QrScreenSetSection {
+  blockType: string;
+  sortOrder: number;
+  data: Record<string, unknown>;
+}
+
+export interface QrScreenSet {
+  landingType: 'screen_set';
+  slug: string;
+  name: string;
+  templateKey: string;
+  sections: QrScreenSetSection[];
+}

@@ -14,6 +14,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ContentRenderer, hasStoreDescriptionMarkup } from '@o4o/content-editor';
+// WO-O4O-STORE-QR-CANONICAL-ADOPTED-IMPLEMENTATION-GAP-AUDIT-AND-PH-SCREENSET-FINAL-CLOSURE-V1:
+//   KPA 와 **같은** 공개 Screen Set renderer 를 쓴다(복사본 아님 — @o4o/tablet-kiosk-core 승격본).
+import { PublicScreenSetViewer } from '@o4o/tablet-kiosk-core';
 import { fetchPublicQrLanding, type PublicQrLanding } from '../lib/api/pharmacyHubStoreQr';
 
 export default function QrLandingPage() {
@@ -64,6 +67,13 @@ export default function QrLandingPage() {
 
   const page = landing.pageContent;
   const product = landing.productDetails;
+
+  // WO-O4O-STORE-QR-CANONICAL-ADOPTED-IMPLEMENTATION-GAP-AUDIT-AND-PH-SCREENSET-FINAL-CLOSURE-V1:
+  //   screen_set QR 은 매장 셸·요약 카드가 아니라 태블릿과 같은 원본을 세로형 전체 화면으로 보여준다.
+  //   KPA QrLandingPage 와 동일한 위임 구조 — 두 서비스의 표시 계약이 한 컴포넌트에서 나온다.
+  if (landing.landingType === 'screen_set' && landing.screenSet) {
+    return <PublicScreenSetViewer screenSet={landing.screenSet} />;
+  }
 
   return (
     <Shell>

@@ -38,7 +38,11 @@ import {
 import { toast } from '@o4o/error-handling';
 import { parseProductionRouterState } from '../../utils/productionUtils';
 
-export type StoreQrLandingType = 'link' | 'product' | 'promotion' | 'page';
+// WO-O4O-STORE-QR-CANONICAL-ADOPTED-IMPLEMENTATION-GAP-AUDIT-AND-PH-SCREENSET-FINAL-CLOSURE-V1 §2-C:
+//   'promotion' 은 백엔드 생성 허용 목록에서 빠졌다(프로덕션 0 건 · content_source 판정 분기 없음).
+//   이 타입은 **생성 폼의 선택지**를 좌우하므로 함께 좁힌다 — 남겨두면 400 을 내는 버튼이 된다.
+//   기존 행 표시는 아래 목록 조회 경로가 fallback 라벨로 처리하므로 영향이 없다.
+export type StoreQrLandingType = 'link' | 'product' | 'page';
 
 export interface StoreQrItem {
   id: string;
@@ -127,7 +131,6 @@ function formatDate(iso: string): string {
 const LANDING_TYPE_CONFIG: Record<StoreQrLandingType, { label: string; cls: string; placeholder: string }> = {
   link:      { label: '링크', cls: 'bg-blue-50 text-blue-700', placeholder: 'https://example.com' },
   product:   { label: '상품', cls: 'bg-purple-50 text-purple-700', placeholder: '상품 ID 또는 URL' },
-  promotion: { label: '프로모션', cls: 'bg-amber-50 text-amber-600', placeholder: '프로모션 ID 또는 URL' },
   page:      { label: '페이지', cls: 'bg-green-50 text-green-700', placeholder: '/store/... 경로 또는 URL' },
 };
 

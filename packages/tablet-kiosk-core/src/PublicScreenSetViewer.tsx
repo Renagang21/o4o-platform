@@ -23,12 +23,60 @@
  */
 
 import { useState } from 'react';
-import { QrCode } from 'lucide-react';
-import { colors } from '../../styles/theme';
 import { ContentRenderer } from '@o4o/content-editor';
 // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 태블릿과 동일한 QR 렌더를 재사용(qrcode.react 재도입 없음).
-import { QrImage } from '@o4o/tablet-kiosk-core';
-import type { QrScreenSet, QrScreenSetSection } from '../../api/storeQr';
+import { QrImage } from './TabletKioskPage';
+import type { QrScreenSet, QrScreenSetSection } from './types';
+
+/**
+ * WO-O4O-STORE-QR-CANONICAL-ADOPTED-IMPLEMENTATION-GAP-AUDIT-AND-PH-SCREENSET-FINAL-CLOSURE-V1:
+ *   KPA 로컬 `styles/theme` 의존을 끊기 위해 이 뷰어가 쓰는 색만 패키지 안으로 가져왔다.
+ *   값은 KPA Design System Alpha v1(Tailwind Slate + Blue 600)과 **동일**하다 — 렌더 결과 불변.
+ *   서비스별 테마 주입은 이번 범위가 아니다(뷰어 공통화만).
+ */
+const colors = {
+  primary: '#2563EB',
+  neutral800: '#1E293B',
+  neutral700: '#334155',
+  neutral600: '#475569',
+  neutral500: '#64748B',
+  neutral400: '#94A3B8',
+  neutral200: '#E2E8F0',
+  neutral100: '#F1F5F9',
+} as const;
+
+/**
+ * 패키지 관례상 아이콘 라이브러리 의존을 추가하지 않는다(IdlePlaylistEditor 와 동일 — inline SVG).
+ * lucide-react `QrCode` 와 같은 24x24 viewBox·stroke 형태.
+ */
+function QrCodeIcon({ size = 14, color }: { size?: number; color?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color || 'currentColor'}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="5" height="5" rx="1" />
+      <rect x="16" y="3" width="5" height="5" rx="1" />
+      <rect x="3" y="16" width="5" height="5" rx="1" />
+      <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
+      <path d="M21 21v.01" />
+      <path d="M12 7v3a2 2 0 0 1-2 2H7" />
+      <path d="M3 12h.01" />
+      <path d="M12 3h.01" />
+      <path d="M12 16v.01" />
+      <path d="M16 12h1" />
+      <path d="M21 12v.01" />
+      <path d="M12 21v-1" />
+    </svg>
+  );
+}
 
 interface ContentCard {
   itemId: string;
@@ -75,7 +123,7 @@ function formatPrice(p: ProductCard): string | null {
   return p.priceDisplay && p.priceDisplay.trim() ? p.priceDisplay : null;
 }
 
-export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet }) {
+export function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet }) {
   const [openCard, setOpenCard] = useState<ContentCard | null>(null);
   // WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1: 상품 상세(이미지 없음) 진입.
   const [openProduct, setOpenProduct] = useState<ProductCard | null>(null);
@@ -117,7 +165,7 @@ export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScre
         ))}
 
         <footer style={styles.footer}>
-          <QrCode size={14} style={{ color: colors.neutral400 }} />
+          <QrCodeIcon size={14} color={colors.neutral400} />
           <span style={styles.footerText}>O4O Platform</span>
         </footer>
       </div>
@@ -504,3 +552,5 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.7,
   },
 };
+
+export default PublicScreenSetViewer;

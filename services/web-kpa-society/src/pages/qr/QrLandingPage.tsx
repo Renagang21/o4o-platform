@@ -19,7 +19,7 @@ import { submitQrPageConsultation } from '../../api/tablet';
 // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 동영상 전용 공개 뷰어
 import PublicVideoViewer from './PublicVideoViewer';
 // WO-O4O-KPA-TABLET-QR-LANDING-CONTRACT-V1/WO-B: screen_set 모바일 세로 뷰어(대기영상 제외)
-import PublicScreenSetViewer from './PublicScreenSetViewer';
+import { PublicScreenSetViewer } from '@o4o/tablet-kiosk-core';
 // WO-O4O-KPA-QR-PAGE-LANDING-RENDER-V1: page 콘텐츠 inline 렌더 (body 우선 / legacy blocks 폴백)
 import { ContentRenderer } from '@o4o/content-editor';
 import { BlockRenderer } from '@o4o/block-renderer';

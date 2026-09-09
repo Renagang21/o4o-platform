@@ -75,19 +75,11 @@ export interface QrLandingData {
 }
 
 // WO-O4O-KPA-TABLET-QR-LANDING-CONTRACT-V1: screen_set landing sections(공용 resolver 산출).
-export interface QrScreenSetSection {
-  blockType: string;
-  sortOrder: number;
-  data: Record<string, unknown>;
-}
-
-export interface QrScreenSet {
-  landingType: 'screen_set';
-  slug: string;
-  name: string;
-  templateKey: string;
-  sections: QrScreenSetSection[];
-}
+// WO-O4O-STORE-QR-CANONICAL-ADOPTED-IMPLEMENTATION-GAP-AUDIT-AND-PH-SCREENSET-FINAL-CLOSURE-V1:
+//   공통 뷰어 승격에 따라 정의를 @o4o/tablet-kiosk-core 로 옮기고 여기서는 재수출만 한다
+//   (KPA · PharmacyHub 가 같은 타입을 소비 — 서비스별 재선언 금지).
+import type { QrScreenSet, QrScreenSetSection } from '@o4o/tablet-kiosk-core';
+export type { QrScreenSet, QrScreenSetSection };
 
 export type QrPageContent =
   | { available: false; reason: 'unpublished' }

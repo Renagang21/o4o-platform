@@ -49,15 +49,22 @@ import {
 /**
  * QR 연결(landing) 타입.
  *   product    : supplier_product_offers / organization_product_listings
- *   promotion  : 매장 프로모션
+ *   promotion  : 매장 프로모션 — 신규 생성 불가(아래 §2-C). 과거 행 표시 의미만 남는다.
  *   page       : 매장 소유 콘텐츠 사본 (store_execution_assets / kpa_store_contents direct)
  *   link       : 외부 URL
  *   video      : store_videos 매장 사본
  *   screen_set : store_tablet_screen_sets (태블릿과 같은 화면을 모바일로 연다)
  */
+/**
+ * WO-O4O-STORE-QR-CANONICAL-ADOPTED-IMPLEMENTATION-GAP-AUDIT-AND-PH-SCREENSET-FINAL-CLOSURE-V1 §2-C:
+ *   이 목록은 **신규 생성 허용 목록**이다(표시 목록이 아니다).
+ *   `promotion` 을 여기서 뺀다 — 프로덕션 실측 0 건이고, `resolveQrContentSource` 에 대응 분기가
+ *   없어 새로 만들면 canonical 원천 축(content_source)이 영구 NULL(HOLD) 인 행이 생긴다.
+ *   **표시 축은 그대로 둔다** — `LANDING_TYPE_TO_TARGET_KIND.promotion`(CONTENT) 과 각 서비스
+ *   공개 랜딩의 promotion 분기는 과거 행 호환용으로 유지한다. 여기서 막는 것은 생성뿐이다.
+ */
 export const VALID_QR_LANDING_TYPES = [
   'product',
-  'promotion',
   'page',
   'link',
   'video',
