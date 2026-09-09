@@ -33,6 +33,9 @@
  *   PATCH  /api/v1/kpa-branch/branches/:branchSlug/operator/education-credits/:ledgerId        평점·면제 개별 수정
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/members?year=&status=&attention=&q=  회원 업무 콘솔 목록
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/members/:userId?year=               회원 통합 상세 (4영역)
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/members/:userId/history             소속 이력 (전입·전출 append-only)
+ *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/members                             신규 소속 / 전입 (userId | email)
+ *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/members/:userId/leave               전출
  *   *      /api/v1/kpa-branch/admin/domains/**                               (admin scope)
  *   *      /api/v1/kpa-branch/admin/service-members/**                        (admin scope)  가입 승인
  *
@@ -238,6 +241,11 @@ export function createKpaBranchRoutes(): Router {
     '/branches/:branchSlug/operator/members/:userId',
     ...operatorGuards,
     wrap(BranchMemberController.detail),
+  );
+  router.get(
+    '/branches/:branchSlug/operator/members/:userId/history',
+    ...operatorGuards,
+    wrap(BranchMemberController.history),
   );
   router.post('/branches/:branchSlug/operator/members', ...operatorGuards, wrap(BranchMemberController.join));
   router.post(

@@ -66,7 +66,10 @@ export class BranchMembershipService {
     organizationId: string;
     reason?: string | null;
     note?: string | null;
+    /** 발령일. 미지정이면 처리 시각. 전출 마감일과 전입일이 같은 값으로 기록된다. */
+    effectiveDate?: Date | null;
   }): Promise<BranchMembership> {
+    const effectiveAt = params.effectiveDate ?? new Date();
     return this.ds.transaction(async (manager: EntityManager) => {
       const repo = manager.getRepository(BranchMembership);
       const current = await repo
@@ -82,9 +85,12 @@ export class BranchMembershipService {
         if (current.organization_id === params.organizationId) {
           throw new BranchMembershipConflictError('이미 해당 분회 소속입니다.');
         }
+        if (effectiveAt.getTime() < new Date(current.joined_at).getTime()) {
+          throw new BranchMembershipConflictError('발령일이 직전 소속의 가입일보다 앞설 수 없습니다.');
+        }
         await repo.update(current.id, {
           status: 'left',
-          left_at: new Date(),
+          left_at: effectiveAt,
           transfer_reason: params.reason ?? '분회 이동',
         });
       }
@@ -93,7 +99,7 @@ export class BranchMembershipService {
         user_id: params.userId,
         organization_id: params.organizationId,
         status: 'active',
-        joined_at: new Date(),
+        joined_at: effectiveAt,
         left_at: null,
         transfer_reason: params.reason ?? null,
         note: params.note ?? null,
@@ -110,20 +116,61 @@ export class BranchMembershipService {
     userId: string;
     organizationId: string;
     reason?: string | null;
+    /** 전출일. 미지정이면 처리 시각. */
+    effectiveDate?: Date | null;
   }): Promise<BranchMembership> {
-    const repo = this.ds.getRepository(BranchMembership);
-    const current = await repo.findOne({
-      where: { user_id: params.userId, organization_id: params.organizationId, status: 'active' },
+    const effectiveAt = params.effectiveDate ?? new Date();
+    return this.ds.transaction(async (manager: EntityManager) => {
+      const repo = manager.getRepository(BranchMembership);
+      const current = await repo
+        .createQueryBuilder('bm')
+        .setLock('pessimistic_write')
+        .where('bm.user_id = :userId AND bm.organization_id = :organizationId AND bm.status = :status', {
+          userId: params.userId,
+          organizationId: params.organizationId,
+          status: 'active',
+        })
+        .getOne();
+      if (!current) {
+        throw new BranchMembershipConflictError('해당 분회의 활성 소속이 없습니다.');
+      }
+      if (effectiveAt.getTime() < new Date(current.joined_at).getTime()) {
+        throw new BranchMembershipConflictError('전출일이 가입일보다 앞설 수 없습니다.');
+      }
+      await repo.update(current.id, {
+        status: 'left',
+        left_at: effectiveAt,
+        transfer_reason: params.reason ?? null,
+      });
+      return repo.findOneOrFail({ where: { id: current.id } });
     });
-    if (!current) {
-      throw new BranchMembershipConflictError('해당 분회의 활성 소속이 없습니다.');
-    }
-    await repo.update(current.id, {
-      status: 'left',
-      left_at: new Date(),
-      transfer_reason: params.reason ?? null,
+  }
+
+  /**
+   * 운영자용 소속 이력.
+   *
+   * **tenant 경계**: 요청 분회에 (현재든 과거든) 소속 행이 있는 회원만 열람할 수 있다.
+   * 그 조건을 통과하면 이력 전체(타 분회 구간 포함)를 준다 — 전출입 판단에 직전·다음
+   * 소속이 필요하기 때문이다. 아무 userId 나 넣어 전국 이력을 조회하는 경로가 되지 않도록
+   * 소속 확인을 먼저 하고, 없으면 존재 여부를 알려주지 않는 404 로 끝낸다.
+   */
+  async getHistoryForBranch(
+    userId: string,
+    organizationId: string,
+  ): Promise<Array<BranchMembership & { organization_name: string | null; organization_slug: string | null }>> {
+    const belongs = await this.ds.getRepository(BranchMembership).findOne({
+      where: { user_id: userId, organization_id: organizationId },
     });
-    return repo.findOneOrFail({ where: { id: current.id } });
+    if (!belongs) return [];
+
+    return this.ds.query(
+      `SELECT bm.*, o.name AS organization_name, o.slug AS organization_slug
+         FROM branch_memberships bm
+         LEFT JOIN kpa_organizations o ON o.id = bm.organization_id
+        WHERE bm.user_id = $1
+        ORDER BY bm.joined_at ASC, bm.created_at ASC`,
+      [userId],
+    );
   }
 }
 

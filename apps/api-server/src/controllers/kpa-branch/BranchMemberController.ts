@@ -7,6 +7,7 @@
  * (분회 스푸핑 차단 — Boundary Guard Rule 4 와 동일한 사고).
  */
 import type { Request, Response } from 'express';
+import { AppDataSource } from '../../database/connection.js';
 import {
   branchMembershipService,
   BranchMembershipConflictError,
@@ -31,6 +32,18 @@ function serialize(m: {
     transferReason: m.transfer_reason,
     note: m.note,
   };
+}
+
+/**
+ * 발령일 파싱. 미지정이면 null(=처리 시각). 형식이 틀리면 조용히 오늘로 넘기지 않고 거절한다.
+ * 날짜만 온 경우('2026-03-01')를 그대로 Date 로 넘기면 UTC 자정이 되는데, 소속 구간 경계는
+ * 일 단위 업무 개념이라 그대로 둔다 (기존 joined_at 도 timestamptz 다).
+ */
+function parseEffectiveDate(raw: unknown): Date | null | 'invalid' {
+  if (raw === undefined || raw === null || raw === '') return null;
+  if (typeof raw !== 'string') return 'invalid';
+  const d = new Date(raw);
+  return Number.isNaN(d.getTime()) ? 'invalid' : d;
 }
 
 /** 콘솔 오류를 표준 JSON 으로. 알 수 없는 오류는 그대로 올려 상위 핸들러가 처리한다 */
@@ -114,15 +127,74 @@ export class BranchMemberController {
     }
   }
 
-  /** POST /branches/:branchSlug/operator/members — 전입 (다른 분회 소속이면 자동 전출 후 전입) */
-  static async join(req: Request, res: Response) {
-    const { userId, reason, note } = req.body ?? {};
-    if (!userId) {
-      return res.status(400).json({ success: false, error: 'userId는 필수입니다.', code: 'INVALID_INPUT' });
+  /**
+   * GET /branches/:branchSlug/operator/members/:userId/history — 소속 이력
+   *
+   * 대상 분회에 소속 행이 있는 회원만 열람된다. 그렇지 않으면 404 이며,
+   * 해당 userId 의 존재 여부는 알려주지 않는다 (다른 분회 회원 탐색 차단).
+   */
+  static async history(req: Request, res: Response) {
+    const rows = await branchMembershipService.getHistoryForBranch(
+      req.params.userId,
+      req.branch!.id,
+    );
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, error: '이 분회의 회원을 찾을 수 없습니다.', code: 'MEMBER_NOT_FOUND' });
     }
+    return res.json({
+      success: true,
+      data: {
+        items: rows.map((r) => ({
+          ...serialize(r),
+          organizationName: r.organization_name,
+          organizationSlug: r.organization_slug,
+          isCurrentBranch: r.organization_id === req.branch!.id,
+        })),
+      },
+    });
+  }
+
+  /**
+   * POST /branches/:branchSlug/operator/members — 신규 소속 / 전입
+   *
+   * 대상 분회는 언제나 `req.branch.id` 다. body 의 organizationId·
+   * sourceOrganizationId·targetOrganizationId 는 읽지 않는다.
+   * 회원이 다른 분회에 active 면 서비스가 같은 트랜잭션에서 전출 후 전입한다.
+   */
+  static async join(req: Request, res: Response) {
+    const { userId, email, reason, note } = req.body ?? {};
+    if (!userId && !email) {
+      return res
+        .status(400)
+        .json({ success: false, error: 'userId 또는 email 이 필요합니다.', code: 'INVALID_INPUT' });
+    }
+    const effectiveDate = parseEffectiveDate(req.body?.effectiveDate);
+    if (effectiveDate === 'invalid') {
+      return res
+        .status(422)
+        .json({ success: false, error: '발령일이 올바르지 않습니다.', code: 'INVALID_EFFECTIVE_DATE' });
+    }
+
+    let targetUserId: string | undefined = userId;
+    if (!targetUserId) {
+      // 정확일치 1건만 해석한다. 목록·부분검색을 제공하지 않는다 (WO §12 전국 회원 검색 제외).
+      const found: Array<{ id: string }> = await AppDataSource.query(
+        'SELECT id FROM users WHERE lower(email) = lower($1) LIMIT 1',
+        [String(email).trim()],
+      );
+      if (found.length === 0) {
+        return res
+          .status(404)
+          .json({ success: false, error: '해당 이메일의 사용자를 찾을 수 없습니다.', code: 'USER_NOT_FOUND' });
+      }
+      targetUserId = found[0].id;
+    }
+
     try {
       const created = await branchMembershipService.join({
-        userId, organizationId: req.branch!.id, reason, note,
+        userId: targetUserId, organizationId: req.branch!.id, reason, note, effectiveDate,
       });
       return res.status(201).json({ success: true, data: serialize(created) });
     } catch (error) {
@@ -133,12 +205,18 @@ export class BranchMemberController {
     }
   }
 
-  /** POST /branches/:branchSlug/operator/members/:userId/leave — 전출 */
+  /** POST /branches/:branchSlug/operator/members/:userId/leave — 전출 (현 분회 active 만) */
   static async leave(req: Request, res: Response) {
     const { userId } = req.params;
+    const effectiveDate = parseEffectiveDate(req.body?.effectiveDate);
+    if (effectiveDate === 'invalid') {
+      return res
+        .status(422)
+        .json({ success: false, error: '전출일이 올바르지 않습니다.', code: 'INVALID_EFFECTIVE_DATE' });
+    }
     try {
       const left = await branchMembershipService.leave({
-        userId, organizationId: req.branch!.id, reason: req.body?.reason,
+        userId, organizationId: req.branch!.id, reason: req.body?.reason, effectiveDate,
       });
       return res.json({ success: true, data: serialize(left) });
     } catch (error) {

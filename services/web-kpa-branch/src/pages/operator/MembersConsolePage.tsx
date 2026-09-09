@@ -13,12 +13,16 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   listMemberConsole,
   getMemberConsoleDetail,
+  getAffiliationHistory,
+  joinMember,
+  leaveMember,
   REPORT_LABEL,
   FEE_LABEL,
   EDUCATION_LABEL,
   ATTENTION_LABEL,
   type MemberConsoleListItem,
   type MemberConsoleDetail,
+  type AffiliationHistoryItem,
   type AttentionCode,
   type ReportSummaryStatus,
   type FeeSummaryStatus,
@@ -55,6 +59,12 @@ const ATTENTION_FILTERS: Array<{ value: '' | AttentionCode; label: string }> = [
   { value: 'REPORT_REVISION_OPEN', label: '보완 대기' },
   { value: 'FEE_OUTSTANDING', label: '회비 미수' },
   { value: 'EDUCATION_INCOMPLETE', label: '교육 미이수' },
+];
+
+const STATUS_FILTERS: Array<{ value: 'active' | 'left' | 'all'; label: string }> = [
+  { value: 'active', label: '재적' },
+  { value: 'left', label: '전출' },
+  { value: 'all', label: '전체' },
 ];
 
 function Badge({ label, cls }: { label: string; cls: string }) {
@@ -108,6 +118,7 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
   const thisYear = new Date().getFullYear();
   const [year, setYear] = useState<number>(thisYear);
   const [attention, setAttention] = useState<'' | AttentionCode>('');
+  const [status, setStatus] = useState<'active' | 'left' | 'all'>('active');
   const [q, setQ] = useState('');
   const [query, setQuery] = useState('');
 
@@ -117,17 +128,26 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
   const [selected, setSelected] = useState<string | null>(null);
   const [detail, setDetail] = useState<MemberConsoleDetail | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
+  /** 전입·전출 후 목록과 상세를 같이 다시 읽기 위한 트리거 (WO §10) */
+  const [nonce, setNonce] = useState(0);
+
+  const [history, setHistory] = useState<AffiliationHistoryItem[] | null>(null);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [joinOpen, setJoinOpen] = useState(false);
+  const [joinForm, setJoinForm] = useState({ email: '', effectiveDate: '', reason: '' });
+  const [affError, setAffError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   const reload = useCallback(async () => {
     setListError(null);
     try {
-      const res = await listMemberConsole(slug, { year, attention: attention || null, q: query });
+      const res = await listMemberConsole(slug, { year, status, attention: attention || null, q: query });
       setItems(res.items);
     } catch (e) {
       setItems(null);
       setListError(describe(e));
     }
-  }, [slug, year, attention, query]);
+  }, [slug, year, status, attention, query]);
 
   useEffect(() => {
     void reload();
@@ -136,6 +156,7 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
   useEffect(() => {
     if (!selected) {
       setDetail(null);
+      setHistory(null);
       return;
     }
     let alive = true;
@@ -147,7 +168,63 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
     return () => {
       alive = false;
     };
-  }, [slug, selected, year]);
+  }, [slug, selected, year, nonce]);
+
+  /** 전입·전출 후 목록·상세를 함께 갱신한다. 화면이 낡은 소속을 보여주지 않게 하는 계약 (WO §10). */
+  const refreshAll = useCallback(() => {
+    setNonce((n) => n + 1);
+    void reload();
+  }, [reload]);
+
+  const loadHistory = useCallback(async () => {
+    if (!selected) return;
+    setHistoryError(null);
+    try {
+      const res = await getAffiliationHistory(slug, selected);
+      setHistory(res.items);
+    } catch (e) {
+      setHistory(null);
+      setHistoryError(describe(e));
+    }
+  }, [slug, selected]);
+
+  const onLeave = useCallback(async () => {
+    if (!selected) return;
+    const raw = window.prompt('전출일을 입력하세요 (YYYY-MM-DD, 비우면 오늘).', '');
+    if (raw === null) return;
+    setAffError(null);
+    setBusy(true);
+    try {
+      await leaveMember(slug, selected, { effectiveDate: raw.trim() || undefined });
+      setHistory(null);
+      refreshAll();
+    } catch (e) {
+      setAffError(describe(e));
+    } finally {
+      setBusy(false);
+    }
+  }, [slug, selected, refreshAll]);
+
+  const onJoin = useCallback(async () => {
+    setAffError(null);
+    setBusy(true);
+    try {
+      const created = await joinMember(slug, {
+        email: joinForm.email.trim(),
+        effectiveDate: joinForm.effectiveDate.trim() || undefined,
+        reason: joinForm.reason.trim() || undefined,
+      });
+      setJoinOpen(false);
+      setJoinForm({ email: '', effectiveDate: '', reason: '' });
+      setHistory(null);
+      setSelected(created.userId);
+      refreshAll();
+    } catch (e) {
+      setAffError(describe(e));
+    } finally {
+      setBusy(false);
+    }
+  }, [slug, joinForm, refreshAll]);
 
   const yearOptions = useMemo(
     () => [thisYear + 1, thisYear, thisYear - 1, thisYear - 2, thisYear - 3],
@@ -173,6 +250,17 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
             {yearOptions.map((y) => (
               <option key={y} value={y}>
                 {y}년
+              </option>
+            ))}
+          </select>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value as 'active' | 'left' | 'all')}
+            className="rounded border border-gray-300 px-2 py-1 text-sm"
+          >
+            {STATUS_FILTERS.map((f) => (
+              <option key={f.value} value={f.value}>
+                {f.label}
               </option>
             ))}
           </select>
@@ -205,8 +293,71 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
               검색
             </button>
           </form>
+          <button
+            type="button"
+            onClick={() => {
+              setAffError(null);
+              setJoinOpen((v) => !v);
+            }}
+            className="rounded bg-primary-600 px-3 py-1 text-sm text-white"
+          >
+            전입·소속 등록
+          </button>
         </div>
       </header>
+
+      {affError && <p className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{affError}</p>}
+
+      {/* 전입·신규 소속 — 대상 분회는 URL 의 분회로 서버가 확정한다 (organizationId 를 보내지 않는다) */}
+      {joinOpen && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void onJoin();
+          }}
+          className="flex flex-wrap items-end gap-3 rounded border border-gray-200 bg-gray-50 p-4"
+        >
+          <label className="text-xs text-gray-600">
+            회원 이메일
+            <input
+              type="email"
+              required
+              value={joinForm.email}
+              onChange={(e) => setJoinForm((f) => ({ ...f, email: e.target.value }))}
+              placeholder="정확히 일치하는 이메일"
+              className="mt-1 block w-64 rounded border border-gray-300 px-2 py-1 text-sm"
+            />
+          </label>
+          <label className="text-xs text-gray-600">
+            발령일
+            <input
+              type="date"
+              value={joinForm.effectiveDate}
+              onChange={(e) => setJoinForm((f) => ({ ...f, effectiveDate: e.target.value }))}
+              className="mt-1 block rounded border border-gray-300 px-2 py-1 text-sm"
+            />
+          </label>
+          <label className="text-xs text-gray-600">
+            사유
+            <input
+              type="text"
+              value={joinForm.reason}
+              onChange={(e) => setJoinForm((f) => ({ ...f, reason: e.target.value }))}
+              className="mt-1 block w-48 rounded border border-gray-300 px-2 py-1 text-sm"
+            />
+          </label>
+          <button
+            type="submit"
+            disabled={busy}
+            className="rounded bg-primary-600 px-3 py-1 text-sm text-white disabled:opacity-50"
+          >
+            {busy ? '처리 중…' : '등록'}
+          </button>
+          <p className="w-full text-xs text-gray-500">
+            다른 분회에 재적 중이면 서버가 같은 트랜잭션에서 전출 처리 후 이 분회로 전입합니다.
+          </p>
+        </form>
+      )}
 
       {listError && <p className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{listError}</p>}
 
@@ -296,6 +447,76 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
                     value={`${detail.affiliation.status === 'active' ? '재적' : '전출'} · ${fmtDate(detail.affiliation.joinedAt)}~`}
                   />
                 </dl>
+              </Section>
+
+              <Section
+                title="소속"
+                action={
+                  <span className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void loadHistory()}
+                      className="text-xs text-primary-700 hover:underline"
+                    >
+                      소속 이력 보기
+                    </button>
+                    {detail.affiliation.status === 'active' && (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void onLeave()}
+                        className="text-xs text-red-700 hover:underline disabled:opacity-50"
+                      >
+                        전출 처리
+                      </button>
+                    )}
+                  </span>
+                }
+              >
+                <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <Field label="분회" value={slug} />
+                  <Field label="상태" value={detail.affiliation.status === 'active' ? '재적' : '전출'} />
+                  <Field label="가입일" value={fmtDate(detail.affiliation.joinedAt)} />
+                  <Field label="전출일" value={fmtDate(detail.affiliation.leftAt)} />
+                </dl>
+                {detail.affiliation.transferReason && (
+                  <p className="mt-3 text-xs text-gray-500">사유: {detail.affiliation.transferReason}</p>
+                )}
+                {historyError && <p className="mt-3 text-sm text-red-700">{historyError}</p>}
+                {history && (
+                  <div className="mt-4 overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-200 text-left text-xs text-gray-500">
+                          <th className="py-1">순서</th>
+                          <th className="py-1">분회</th>
+                          <th className="py-1">가입일</th>
+                          <th className="py-1">전출일</th>
+                          <th className="py-1">상태</th>
+                          <th className="py-1">사유</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {history.map((h, i) => (
+                          <tr key={h.id} className="border-b border-gray-100">
+                            <td className="py-1 text-gray-500">{i + 1}</td>
+                            <td className="py-1 text-gray-900">
+                              {h.organizationName ?? h.organizationSlug ?? '-'}
+                              {h.isCurrentBranch && <span className="ml-1 text-xs text-gray-400">(현재 분회)</span>}
+                            </td>
+                            <td className="py-1 text-gray-700">{fmtDate(h.joinedAt)}</td>
+                            <td className="py-1 text-gray-700">{fmtDate(h.leftAt)}</td>
+                            <td className="py-1">{h.status === 'active' ? '재적' : '전출'}</td>
+                            <td className="py-1 text-gray-500">{h.transferReason ?? '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p className="mt-2 text-xs text-gray-400">
+                      이력은 추가만 됩니다 — 재전입해도 과거 행을 되살리지 않고 새 행이 쌓입니다.
+                    </p>
+                  </div>
+                )}
               </Section>
 
               <Section
