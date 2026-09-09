@@ -47,12 +47,18 @@ import { execute } from '@o4o/ai-core';
 import { dynamicLimiter } from '../middleware/rateLimiter.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
 import {
+  resolveAiTarget,
+  normalizeAiError,
+  aiErrorUserMessage,
+} from '../utils/ai-provider-runtime.js';
+/** Home AI 타임아웃 — reasoning 계열은 provider 기본 10s 로는 끊긴다. */
+const HOME_CHAT_TIMEOUT_MS = 90_000;
+import {
   validateHomeChatMessage,
   homeChatValidationMessage,
   buildHomeChatSystemPrompt,
   buildHomeChatUserPrompt,
   extractHomeChatAnswer,
-  sanitizeHomeChatError,
   type VerifiedScopeFacts,
 } from '../services/ai-prompts/homeChat.js';
 
@@ -1869,15 +1875,26 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
       facts.serviceKey = requestedServiceKey;
     }
 
-    const model = await resolveEditingModel();
-    const apiKey = await resolveAiApiKey(AppDataSource, 'gemini');
+    // WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0:
+    //   provider 는 (요청 body 명시) → (AI_DEFAULT_PROVIDER env) → (코드 기본값) 순으로 정한다.
+    //   Home UI 는 provider 를 보내지 않으므로 실사용에서는 env/기본값이 쓰인다(§11 selector 미노출).
+    const { provider, model, apiKey } = await resolveAiTarget(AppDataSource, req.body?.provider);
 
     const result = await execute({
       systemPrompt: buildHomeChatSystemPrompt(facts),
       userPrompt: buildHomeChatUserPrompt(message),
-      provider: 'gemini',
+      provider,
       responseMode: 'text',
-      config: { apiKey, model, temperature: 0.5, maxTokens: 2048, responseMode: 'text' },
+      config: {
+        apiKey,
+        model,
+        // temperature 는 gemini 용이다. OpenAI 현행 세대는 provider adapter 가 생략한다.
+        temperature: 0.5,
+        maxTokens: 2048,
+        responseMode: 'text',
+        // reasoning 계열은 10s 기본 타임아웃으로는 끊긴다. 넉넉히 준다.
+        timeoutMs: HOME_CHAT_TIMEOUT_MS,
+      },
       retry: { maxAttempts: 1 },
       meta: { service: 'o4o-home', callerName: 'home-chat' },
     });
@@ -1901,18 +1918,30 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
           serviceKey: facts.serviceKey ?? null,
           storeStatus: facts.storeStatus ?? null,
         },
+        // 어느 provider/model 이 응답했는지. 키·프롬프트가 아니라 식별자뿐이라 비민감이며,
+        // multi-provider 전환 검증에 필요하다(§20 smoke 가 이 값을 본다).
+        provider,
+        model: result.model,
         requestId,
       },
     });
   } catch (error: unknown) {
-    // 원문 오류는 서버 로그에만. 사용자 응답에는 provider/model/key 세부를 싣지 않는다.
+    // WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0: provider 마다 다른 원문을 공통 코드로 접는다.
+    // 원문(키·모델·상태코드 포함 가능)은 **서버 로그에만** 남기고 응답에는 코드만 싣는다.
+    const normalized = normalizeAiError(error);
     logger.error('home-chat error', {
       requestId,
       userId,
+      code: normalized.code,
+      retryable: normalized.retryable,
       error: (error as { message?: string })?.message,
     });
-    const sanitized = sanitizeHomeChatError(error);
-    return res.status(502).json({ success: false, error: sanitized.message, code: sanitized.code });
+    const status = normalized.code === 'RATE_LIMIT' ? 429 : normalized.code === 'TIMEOUT' ? 504 : 502;
+    return res.status(status).json({
+      success: false,
+      error: aiErrorUserMessage(normalized.code),
+      code: normalized.code,
+    });
   }
 });
 

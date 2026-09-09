@@ -18,7 +18,6 @@ import {
   buildHomeChatSystemPrompt,
   buildHomeChatUserPrompt,
   extractHomeChatAnswer,
-  sanitizeHomeChatError,
   type VerifiedScopeFacts,
 } from '../services/ai-prompts/homeChat.js';
 
@@ -142,30 +141,5 @@ describe('home-chat 응답 처리', () => {
   });
 });
 
-describe('home-chat 오류 sanitization (§22 · §35-9 · §35-10)', () => {
-  it('9. provider 오류 원문을 사용자 응답에 싣지 않는다', () => {
-    const s = sanitizeHomeChatError(
-      new Error('Gemini API error 500: model gemini-2.5-flash quota exceeded at generativelanguage.googleapis.com'),
-    );
-    expect(s.code).toBe('AI_ERROR');
-    expect(s.message).toBe('응답을 생성하지 못했습니다. 다시 시도해 주세요.');
-    expect(s.message).not.toMatch(/gemini|google|quota|500/i);
-  });
-
-  it('10. API key / 인증 오류가 응답으로 새지 않는다', () => {
-    const leaky = new Error('Invalid API key: AIzaSyEXAMPLEKEYVALUE123 (401 Unauthorized)');
-    const s = sanitizeHomeChatError(leaky);
-    expect(s.code).toBe('AI_UNAVAILABLE');
-    expect(s.message).not.toMatch(/AIza|key|401|Unauthorized/i);
-    expect(s.message).toBe('AI 기능을 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.');
-  });
-
-  it('알 수 없는 형태의 오류도 안전한 기본 문구로 접힌다', () => {
-    for (const e of [undefined, null, 'string error', { weird: true }]) {
-      const s = sanitizeHomeChatError(e);
-      expect(['AI_ERROR', 'AI_UNAVAILABLE']).toContain(s.code);
-      expect(typeof s.message).toBe('string');
-      expect(s.message.length).toBeGreaterThan(0);
-    }
-  });
-});
+// 오류 정규화 테스트는 provider 무관 계층으로 이관했다 —
+// `ai-multi-provider-runtime.spec.ts` (WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0).

@@ -305,6 +305,9 @@ jobs:
           --set-env-vars="JWT_SECRET=${{ secrets.GCP_JWT_SECRET }}" \
           --set-env-vars="JWT_REFRESH_SECRET=${{ secrets.GCP_JWT_SECRET }}" \
           --set-env-vars="GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" \
+          --set-env-vars="OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" \
+          --set-env-vars="AI_DEFAULT_PROVIDER=${{ vars.AI_DEFAULT_PROVIDER }}" \
+          --set-env-vars="AI_DEFAULT_MODEL_OPENAI=${{ vars.AI_DEFAULT_MODEL_OPENAI }}" \
           --set-env-vars="TOSS_PAYMENTS_CLIENT_KEY=${{ secrets.TOSS_PAYMENTS_CLIENT_KEY }}" \
           --set-env-vars="TOSS_PAYMENTS_SECRET_KEY=${{ secrets.TOSS_PAYMENTS_SECRET_KEY }}" \
           --set-env-vars="CAFE24_REDIRECT_URI=https://api.neture.co.kr/api/v1/admin/cafe24/callback" \

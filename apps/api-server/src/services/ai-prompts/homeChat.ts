@@ -166,32 +166,13 @@ export function extractHomeChatAnswer(content: string): string {
   return text;
 }
 
-export type HomeChatErrorCode =
-  | 'UNAUTHENTICATED'
-  | 'EMPTY_MESSAGE'
-  | 'MESSAGE_TOO_LONG'
-  | 'INVALID_MESSAGE'
-  | 'AI_UNAVAILABLE'
-  | 'AI_ERROR';
-
 /**
- * provider 오류를 **사용자에게 보여줄 수 있는 형태로만** 축약한다 (§22).
+ * provider 오류 정규화는 이 파일에 두지 않는다.
  *
- * provider 이름 · 모델명 · API key · 원문 스택 · 상태코드 세부는 응답에 싣지 않는다.
- * 진단은 서버 로그에만 남긴다.
+ * WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0: provider 가 둘 이상이 되면서 오류 문자열 해석을
+ * Home 전용 계층에 두면 provider 마다 갈라진다. `utils/ai-provider-runtime.ts` 의
+ * `normalizeAiError()` / `aiErrorUserMessage()` 가 **유일한** 정규화 지점이다.
  */
-export function sanitizeHomeChatError(error: unknown): { code: HomeChatErrorCode; message: string } {
-  const raw = typeof (error as { message?: unknown })?.message === 'string'
-    ? ((error as { message: string }).message)
-    : '';
-
-  // 키 미설정·인증 실패는 "일시적 오류" 가 아니라 설정 문제지만,
-  // 사용자에게는 동일하게 일반 문구로만 알린다(내부 사정 비노출).
-  if (/api key|apikey|unauthorized|401|permission/i.test(raw)) {
-    return { code: 'AI_UNAVAILABLE', message: 'AI 기능을 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.' };
-  }
-  return { code: 'AI_ERROR', message: '응답을 생성하지 못했습니다. 다시 시도해 주세요.' };
-}
 
 /** 검증 오류 → 사용자 문구. */
 export function homeChatValidationMessage(code: HomeChatValidationError): string {

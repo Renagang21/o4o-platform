@@ -12,6 +12,13 @@ export type AIProvider = 'openai' | 'gemini' | 'claude';
 // Canonical Gemini model: gemini-2.5-flash.
 export const MODEL_WHITELIST = {
   openai: [
+    // WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0: 2026-09 공식 문서 기준 현행 라인업.
+    // 단가 차이가 크므로(입력/출력 per 1M) 선택은 env 로 바꿀 수 있게 둔다.
+    'gpt-6-astra',   // 플래그십  $10 / $50
+    'gpt-5.6-sol',   //           $4  / $20
+    'gpt-5.6-terra', //           $2  / $12
+    'gpt-5.6-luna',  // 경제형    $0.20 / $1.20
+    // 구세대 — 기존 호출부 호환을 위해 남긴다(파라미터 계약이 다르다: max_tokens + temperature).
     'gpt-5',
     'gpt-5-mini',
     'gpt-5-nano',
