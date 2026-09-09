@@ -73,10 +73,15 @@ ALTER TABLE store_qr_codes ADD COLUMN IF NOT EXISTS primary_placement VARCHAR(40
 ### 2-2. migration 타임스탬프 충돌 정정
 
 작업 중 `origin/main` 에 `20270329000000-CreateBranchEvents.ts` 가 들어와
-내 migration 과 **타임스탬프가 같아졌다**. rebase 는 충돌 없이 통과했지만
-같은 타임스탬프 2개는 실행 순서가 파일 나열 순서에 의존하게 된다.
-`20270330000000-CreateStoreQrPlacements.ts` 로 옮기고 클래스명·`name` 을 함께 바꿨다.
-(참조처는 자기 자신 1곳뿐 — migration 은 glob 으로 로드된다.)
+내 migration 과 타임스탬프가 같아졌다. rebase 는 충돌 없이 통과했고,
+`20270330000000-CreateStoreQrPlacements.ts` 로 옮겼다(클래스명·`name` 동반 변경,
+참조처는 자기 자신 1곳뿐 — migration 은 glob 으로 로드된다).
+
+**다만 이것을 결함 수정으로 적지 않는다.** 이 저장소에는 이미 타임스탬프가 겹치는
+migration 쌍이 40건 있다(`ls migrations | sed 's/-.*//' | sort | uniq -d`).
+동일 타임스탬프는 이 저장소에서 예외가 아니라 통상 상태이고, 실행은 정상적으로 돌고 있었다.
+따라서 이번 rename 은 **정리**이지 사고를 막은 조치가 아니다.
+두 migration 은 서로 다른 테이블을 만들어 순서 의존도 없다.
 
 ---
 
