@@ -34,11 +34,11 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
     setError(null);
     setBranchMissing(false);
     // WO-O4O-KPA-BRANCH-BRANCHLAYOUT-SITE-PREFETCH-404-CLOSURE-V1:
-    //   세션 복구가 끝나기 전에는 운영자 여부(canOperate)를 알 수 없다. 그 사이에 public 조회를
-    //   먼저 쏘면 미게시 분회에서 곧바로 버려질 404 가 난다 — 어차피 직후 운영자 조회로 다시 받는다.
-    //   요청 자체를 미룬다(404 를 숨기는 것이 아니다). 비로그인 방문자는 isLoading 이 처음부터
-    //   false 이므로 공개 조회가 지연 없이 나간다.
-    if (isOperatorArea && isAuthLoading) return;
+    //   세션 복구가 끝나기 전에는 운영자 여부(canOperate)를 알 수 없다. 그 사이에 조회를 먼저 쏘면
+    //   auth 확정 뒤 effect 가 다시 돌면서 같은 조회를 한 번 더 하게 되고, 미게시 분회에서는 그
+    //   버려지는 요청이 그대로 404 로 남는다. 요청 자체를 미룬다(404 를 숨기는 것이 아니다).
+    //   비로그인 방문자는 isLoading 이 처음부터 false 이므로 공개 조회가 지연 없이 나간다.
+    if (isAuthLoading) return;
     // 운영자 영역에서는 미게시 상태도 보여야 하므로 운영자 조회를 쓴다.
     const load = isOperatorArea && canOperate ? getOperatorSite(slug) : getPublicSite(slug);
     load
