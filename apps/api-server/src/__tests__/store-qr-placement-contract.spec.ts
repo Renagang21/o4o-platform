@@ -20,6 +20,7 @@ import {
   endQrPlacement,
   updateQrPlacement,
   getQrPlacementScanBreakdown,
+  getOrganizationPlacementAnalytics,
 } from '../services/store/store-qr-placement.service.js';
 
 const ORG = '9c87f46b-57a1-4afe-80bd-60782c49ce96';
@@ -244,5 +245,73 @@ describe('§12 scan 귀속 — 구간 조인 · UNPLACED · AMBIGUOUS', () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.data).toEqual(rows);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// §13 매장 전체 분포 — 사용처 / 콘텐츠 출처 / 대상 3축
+// ─────────────────────────────────────────────────────────────────────────────
+describe('§13 조직 단위 스캔 분포', () => {
+  it('세 축 모두 organization_id 를 필터로 건다 (Guard Rule 3)', async () => {
+    const ds = makeDs({});
+    await getOrganizationPlacementAnalytics(ds, ORG);
+    const qs = sqlOf(ds);
+    expect(qs.length).toBe(4);
+    for (const q of qs) expect(q).toContain('e.organization_id = $1');
+    // 대상/출처 축은 QR 조인에도 조직 경계를 건다 — UUID 단독 조인 금지(Guard Rule 1).
+    const joined = qs.filter((q: string) => q.includes('JOIN store_qr_codes q'));
+    expect(joined.length).toBe(2);
+    for (const q of joined) expect(q).toContain('q.organization_id = e.organization_id');
+  });
+
+  it('기간은 SQL 문자열에 끼워 넣지 않고 바인딩한다 (Guard Rule 2)', async () => {
+    const ds = makeDs({});
+    await getOrganizationPlacementAnalytics(ds, ORG, { days: 30 });
+    for (const c of ds.calls) {
+      expect(c.sql).not.toContain("INTERVAL '30 days'");
+      expect(c.sql).toContain("$2::int * INTERVAL '1 day'");
+      expect(c.params).toEqual([ORG, 30]);
+    }
+  });
+
+  it('기간 미지정이면 기간 조건 자체를 붙이지 않는다', async () => {
+    const ds = makeDs({});
+    await getOrganizationPlacementAnalytics(ds, ORG);
+    for (const c of ds.calls) {
+      expect(c.sql).not.toContain('INTERVAL');
+      expect(c.params).toEqual([ORG]);
+    }
+  });
+
+  it('days 는 1~365 로 정규화한다', async () => {
+    const over = makeDs({});
+    await getOrganizationPlacementAnalytics(over, ORG, { days: 99999 });
+    expect(over.calls[0].params).toEqual([ORG, 365]);
+
+    const under = makeDs({});
+    await getOrganizationPlacementAnalytics(under, ORG, { days: 0 });
+    expect(under.calls[0].params).toEqual([ORG, 1]);
+  });
+
+  it('사용처 축도 UNPLACED / AMBIGUOUS 를 접어 내려준다 (숨기지 않는다)', async () => {
+    const ds = makeDs({});
+    await getOrganizationPlacementAnalytics(ds, ORG);
+    const q = sqlOf(ds).find((x: string) => x.includes('WITH matched AS'));
+    expect(q).toContain("WHEN match_count = 0 THEN 'UNPLACED'");
+    expect(q).toContain("WHEN match_count > 1 THEN 'AMBIGUOUS'");
+  });
+
+  it('totalScans 는 스캔 이벤트에서 직접 센다 (축 합산으로 만들지 않는다)', async () => {
+    const ds: any = {
+      calls: [],
+      query: jest.fn(async (sql: string, params: any[] = []) => {
+        ds.calls.push({ sql: sql.replace(/\s+/g, ' ').trim(), params });
+        if (sql.includes('COUNT(*)::int AS total')) return [{ total: 41 }];
+        return [];
+      }),
+    };
+    const r = await getOrganizationPlacementAnalytics(ds, ORG);
+    expect(r.totalScans).toBe(41);
+    expect(r.byPlacement).toEqual([]);
   });
 });

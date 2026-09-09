@@ -319,6 +319,21 @@ export async function getQrPlacementAnalytics(
   return apiClient.get(`/pharmacy/qr/${qrId}/placement-analytics`);
 }
 
+export interface StoreQrPlacementAnalyticsDto {
+  byPlacement: QrPlacementScanRow[];
+  byContentSource: Array<{ contentSource: string | null; scans: number }>;
+  byTargetKind: Array<{ landingType: string | null; scans: number }>;
+  totalScans: number;
+}
+
+/** 매장 전체 스캔 분포(사용처/콘텐츠 출처/대상 3축) — §13. */
+export async function getStorePlacementAnalytics(
+  days?: number | null,
+): Promise<{ success: boolean; data: StoreQrPlacementAnalyticsDto }> {
+  const qs = days ? `?days=${days}` : '';
+  return apiClient.get(`/pharmacy/qr-analytics/placements${qs}`);
+}
+
 /** 같은 콘텐츠로 QR 추가 — target 축 복제 + 새 slug. 위치별 분석의 전제 동선(§8). */
 export async function cloneQrCode(
   qrId: string,

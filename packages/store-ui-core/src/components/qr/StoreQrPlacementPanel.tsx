@@ -175,7 +175,7 @@ export function StoreQrPlacementPanel({
             <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5">
               <div className="min-w-0">
                 <p className="m-0 truncate text-sm font-medium text-slate-800">
-                  {storeQrPlacementLabel(p.placement)}
+                  {storeQrPlacementLabel(p.placement) ?? p.placement}
                   {p.label && <span className="ml-1.5 font-normal text-slate-400">· {p.label}</span>}
                 </p>
                 <p className="m-0 mt-0.5 text-[11px] text-slate-400">
@@ -213,7 +213,7 @@ export function StoreQrPlacementPanel({
             {scanBreakdown.map((r) => (
               <li key={`${r.placement}-${r.label ?? ''}`} className="flex items-center justify-between text-xs">
                 <span className="text-slate-600">
-                  {storeQrPlacementLabel(r.placement)}
+                  {storeQrPlacementLabel(r.placement) ?? r.placement}
                   {r.label && <span className="text-slate-400"> · {r.label}</span>}
                 </span>
                 <span className="font-semibold text-slate-800">{r.scans}</span>

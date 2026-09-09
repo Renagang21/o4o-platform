@@ -45,7 +45,9 @@ import {
   isArchivedCornerQr,
   isQrExportable,
   storeQrContentSourceLabel,
+  storeQrPlacementLabel,
   storeQrTargetLabel,
+  hasAmbiguousPlacement,
   type StoreQrExportFormat,
   type StoreQrExportPreset,
   type StoreQrOperationItem,
@@ -65,6 +67,9 @@ export interface StoreQrBoardPalette {
   neutral700: string;
   neutral800: string;
   badgeBg: string;
+  /** 위치별 귀속이 불가능한 상태를 눈에 띄게 표시하기 위한 경고색(§9-3). */
+  warnBg: string;
+  warnFg: string;
   surface: string;
   border: string;
 }
@@ -80,6 +85,8 @@ export const DEFAULT_STORE_QR_BOARD_PALETTE: StoreQrBoardPalette = {
   neutral700: '#374151',
   neutral800: '#1F2937',
   badgeBg: '#F3F4F6',
+  warnBg: '#FEF3C7',
+  warnFg: '#92400E',
   surface: '#FFFFFF',
   border: '#E5E7EB',
 };
@@ -100,6 +107,7 @@ export interface StoreQrOperationBoardLabels {
   analyticsClose: string;
   placements: string;
   placementsClose: string;
+  placementAmbiguousHint: string;
   copyUrl: string;
   openPage: string;
   deactivate: string;
@@ -126,6 +134,7 @@ export const DEFAULT_STORE_QR_OPERATION_BOARD_LABELS: StoreQrOperationBoardLabel
   analyticsClose: '통계 닫기',
   placements: '사용처 관리',
   placementsClose: '사용처 닫기',
+  placementAmbiguousHint: '여러 곳에 동시 배치되어 있어 스캔 위치를 구분할 수 없습니다.',
   copyUrl: 'QR URL 복사',
   openPage: 'QR 페이지 열기',
   deactivate: 'QR 내리기',
@@ -416,6 +425,28 @@ export function StoreQrOperationBoard<T extends StoreQrOperationItem = StoreQrOp
               >
                 {item.title}
                 {renderTitleBadges?.(item)}
+                {/* 사용처 배지 — WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §9.
+                    `primaryPlacement` 를 안 내려주는 서비스(K-Cosmetics 등)에서는 아무것도 그리지 않는다.
+                    여러 곳에 동시 배치된 QR 은 위치별 귀속이 불가능하므로 목록에서부터 구분해 보여준다. */}
+                {item.primaryPlacement && (
+                  <span
+                    style={
+                      hasAmbiguousPlacement(item)
+                        ? badge(palette.warnBg, palette.warnFg)
+                        : badge(palette.neutral100, palette.neutral600)
+                    }
+                    title={
+                      hasAmbiguousPlacement(item)
+                        ? labels.placementAmbiguousHint
+                        : labels.placements
+                    }
+                  >
+                    {storeQrPlacementLabel(item.primaryPlacement) ?? item.primaryPlacement}
+                    {hasAmbiguousPlacement(item) && (item.activePlacementCount ?? 0) > 1
+                      ? ` ${item.activePlacementCount}`
+                      : ''}
+                  </span>
+                )}
                 {archived && <span style={badge(palette.neutral200, palette.neutral600)}>{labels.archivedBadge}</span>}
                 {inactive && !archived && (
                   <span style={badge(palette.neutral200, palette.neutral600)}>{labels.inactiveBadge}</span>

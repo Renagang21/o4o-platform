@@ -54,6 +54,11 @@ export type {
 
 // ── 사용처(Placement) — WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §9 ──
 export { StoreQrPlacementPanel } from './StoreQrPlacementPanel';
+export { StoreQrPlacementAnalyticsPanel } from './StoreQrPlacementAnalyticsPanel';
+export type {
+  StoreQrPlacementAnalyticsPanelProps,
+  StoreQrPlacementAnalyticsData,
+} from './StoreQrPlacementAnalyticsPanel';
 export type {
   StoreQrPlacementPanelProps,
   StoreQrPlacementRow,

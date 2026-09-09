@@ -28,9 +28,11 @@ import {
   startQrPlacement,
   endQrPlacement,
   fetchQrPlacementAnalytics,
+  fetchStorePlacementAnalytics,
   cloneQrCode,
   type StoreQrPlacementDto,
   type QrPlacementScanRow,
+  type StoreQrPlacementAnalyticsDto,
   downloadQrExport,
   type StoreQrCode,
   type QrSources,
@@ -38,7 +40,11 @@ import {
   type QrLandingType,
   type CreateQrInput,
 } from '../../lib/api/pharmacyHubStoreQr';
-import { StoreQrOperationBoard, StoreQrPlacementPanel } from '@o4o/store-ui-core';
+import {
+  StoreQrOperationBoard,
+  StoreQrPlacementPanel,
+  StoreQrPlacementAnalyticsPanel,
+} from '@o4o/store-ui-core';
 import { StoreConnectionNotice, type StoreConnectionState } from '../../components/store-owner/StoreConnectionNotice';
 
 /**
@@ -140,6 +146,41 @@ export default function StoreOwnerQrPage() {
     }
   };
 
+  // ── 매장 전체 스캔 분포(§13) ────────────────────────────────────────────────
+  //   QR 1건 통계와 다른 질문이다 — 매장 스캔이 어느 사용처/출처/대상에 몰려 있나.
+  //   KPA 와 같은 공통 패널을 쓴다(문구·계산 중복 0).
+  const [distOpen, setDistOpen] = useState(false);
+  const [distDays, setDistDays] = useState<number | null>(30);
+  const [distData, setDistData] = useState<StoreQrPlacementAnalyticsDto | null>(null);
+  const [distLoading, setDistLoading] = useState(false);
+  const [distError, setDistError] = useState<string | null>(null);
+
+  const loadDistribution = async (days: number | null) => {
+    setDistLoading(true);
+    setDistError(null);
+    try {
+      setDistData(await fetchStorePlacementAnalytics(days));
+    } catch (e: any) {
+      setDistError(e?.message || '분포를 불러오지 못했습니다.');
+    } finally {
+      setDistLoading(false);
+    }
+  };
+
+  const handleToggleDistribution = async () => {
+    if (distOpen) {
+      setDistOpen(false);
+      return;
+    }
+    setDistOpen(true);
+    await loadDistribution(distDays);
+  };
+
+  const handleChangeDistDays = async (days: number | null) => {
+    setDistDays(days);
+    await loadDistribution(days);
+  };
+
   const handleAnalytics = async (qr: StoreQrCode) => {
     try {
       const data = await fetchQrAnalytics(qr.id);
@@ -235,6 +276,28 @@ export default function StoreOwnerQrPage() {
           </p>
         </div>
       ) : (
+        <>
+        {/* WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §13 */}
+        <div className="mb-3">
+          <button
+            type="button"
+            onClick={handleToggleDistribution}
+            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+          >
+            {distOpen ? '스캔 분포 닫기' : '매장 전체 QR 스캔 분포'}
+          </button>
+          {distOpen && (
+            <div className="mt-2.5">
+              <StoreQrPlacementAnalyticsPanel
+                data={distData}
+                loading={distLoading}
+                error={distError}
+                days={distDays}
+                onChangeDays={handleChangeDistDays}
+              />
+            </div>
+          )}
+        </div>
         <StoreQrOperationBoard<StoreQrCode>
           items={items}
           publicUrl={(qr) => `${publicOrigin}/qr/${qr.slug}`}
@@ -268,6 +331,7 @@ export default function StoreOwnerQrPage() {
           onReactivate={handleReactivate}
           labels={{ settings: '이름 수정' }}
         />
+        </>
       )}
 
       {editing && (

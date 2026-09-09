@@ -13,7 +13,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { QrCode, ExternalLink, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil } from 'lucide-react';
+import { QrCode, ExternalLink, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil, BarChart3 } from 'lucide-react';
 // WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1 §9:
 //   QR 목록·행 액션·출력 메뉴는 공통 Core 로 옮겼다(PharmacyHub 와 같은 화면을 쓴다).
 //   여기 남는 것은 KPA 고유 진입점(AI 설명 편집 · 화면 세트 열기)과 일괄 출력뿐이다.
@@ -48,8 +48,15 @@ import {
   downloadQrExport,
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 설정 모달 저장
   updateStoreQrCode,
+  getStorePlacementAnalytics,
 } from '../../api/storeQr';
-import type { StoreQrCode, QrAnalyticsData, QrExportFormat, QrExportPreset } from '../../api/storeQr';
+import type {
+  StoreQrCode,
+  QrAnalyticsData,
+  QrExportFormat,
+  QrExportPreset,
+  StoreQrPlacementAnalyticsDto,
+} from '../../api/storeQr';
 import { getListings } from '../../api/pharmacyProducts';
 import { fetchLocalProducts } from '../../api/localProducts';
 import { getAccessToken } from '../../contexts/AuthContext';
@@ -57,6 +64,7 @@ import {
   GuideBackLink,
   StoreQrOperationBoard,
   StoreQrPlacementPanel,
+  StoreQrPlacementAnalyticsPanel,
   isArchivedCornerQr,
 } from '@o4o/store-ui-core';
 
@@ -443,6 +451,42 @@ export function StoreQRPage() {
     } finally {
       setPlacementBusy(false);
     }
+  };
+
+  // ── 매장 전체 스캔 분포(§13) ────────────────────────────────────────────────
+  //   QR 1건 단위 통계와 다른 질문이다. "이 QR 이 몇 번 찍혔나" 가 아니라
+  //   "우리 매장 스캔이 어느 사용처/출처/대상에 몰려 있나" 를 본다.
+  const [distOpen, setDistOpen] = useState(false);
+  const [distDays, setDistDays] = useState<number | null>(30);
+  const [distData, setDistData] = useState<StoreQrPlacementAnalyticsDto | null>(null);
+  const [distLoading, setDistLoading] = useState(false);
+  const [distError, setDistError] = useState<string | null>(null);
+
+  const loadDistribution = async (days: number | null) => {
+    setDistLoading(true);
+    setDistError(null);
+    try {
+      const res = await getStorePlacementAnalytics(days);
+      setDistData(res?.data ?? null);
+    } catch (e: any) {
+      setDistError(e?.response?.data?.error?.message || e?.message || '분포를 불러오지 못했습니다.');
+    } finally {
+      setDistLoading(false);
+    }
+  };
+
+  const handleToggleDistribution = async () => {
+    if (distOpen) {
+      setDistOpen(false);
+      return;
+    }
+    setDistOpen(true);
+    await loadDistribution(distDays);
+  };
+
+  const handleChangeDistDays = async (days: number | null) => {
+    setDistDays(days);
+    await loadDistribution(days);
   };
 
   const handleShowAnalytics = async (id: string) => {
@@ -1037,6 +1081,29 @@ export function StoreQRPage() {
               {archivedCount > 0 && <> · 보관 {archivedCount}건</>}
               <span style={{ color: colors.neutral400 }}> — 홈의 ‘활성 QR’ 숫자와 같은 기준입니다.</span>
             </p>
+            {/* WO-O4O-STORE-QR-PLACEMENT-AND-ANALYTICS-IMPLEMENTATION-V1 §13:
+                매장 전체 분포는 행 단위 통계와 다른 질문이라 목록 위에 따로 둔다. */}
+            <div style={{ margin: '0 0 12px' }}>
+              <button
+                type="button"
+                onClick={handleToggleDistribution}
+                style={styles.emptyStateBtn}
+              >
+                <BarChart3 size={14} />
+                {distOpen ? '스캔 분포 닫기' : '매장 전체 QR 스캔 분포'}
+              </button>
+              {distOpen && (
+                <div style={{ marginTop: 10 }}>
+                  <StoreQrPlacementAnalyticsPanel
+                    data={distData}
+                    loading={distLoading}
+                    error={distError}
+                    days={distDays}
+                    onChangeDays={handleChangeDistDays}
+                  />
+                </div>
+              )}
+            </div>
             {/* WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1 §9:
                 목록·대상/원천 배지·행 액션·출력 메뉴·내리기/다시 올리기는 공통 Core 가 그린다.
                 KPA 고유 진입점(AI 설명 편집 · 화면 세트 열기)만 renderRowActionsBefore 로 주입한다.

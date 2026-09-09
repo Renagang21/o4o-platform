@@ -28,8 +28,8 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  *   기존 QR 계열 테이블(`store_qr_scan_events`)이 물리 FK 없이 논리 참조를 쓰므로 같은 관행을 따른다.
  *   대신 (organization_id, qr_code_id) 복합 index 로 테넌트 경계 조회를 보장한다(Boundary Guard Rule 3).
  */
-export class CreateStoreQrPlacements20270329000000 implements MigrationInterface {
-  name = 'CreateStoreQrPlacements20270329000000';
+export class CreateStoreQrPlacements20270330000000 implements MigrationInterface {
+  name = 'CreateStoreQrPlacements20270330000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`

@@ -356,7 +356,10 @@ export async function getOrganizationPlacementAnalytics(
   totalScans: number;
 }> {
   const days = Number.isFinite(Number(params?.days)) ? Math.max(1, Math.min(365, Number(params?.days))) : null;
-  const since = days ? `AND e.created_at >= CURRENT_DATE - INTERVAL '${days} days'` : '';
+  // 기간은 **바인딩**한다. 값이 서버에서 정규화된 정수라도 SQL 문자열에 끼워 넣지 않는다
+  // (CLAUDE.md §7 Guard Rule 2 — 예외를 한 번 열면 다음 사람이 그 자리에 문자열을 넣는다).
+  const since = days ? `AND e.created_at >= CURRENT_DATE - ($2::int * INTERVAL '1 day')` : '';
+  const args = days ? [organizationId, days] : [organizationId];
 
   const [byPlacement, byContentSource, byTargetKind, totals] = await Promise.all([
     dataSource.query(
@@ -377,7 +380,7 @@ export async function getOrganizationPlacementAnalytics(
               NULL::text AS label,
               COUNT(*)::int AS scans
          FROM matched GROUP BY 1 ORDER BY scans DESC, placement ASC`,
-      [organizationId],
+      args,
     ),
     dataSource.query(
       `SELECT q.content_source AS "contentSource", COUNT(*)::int AS scans
@@ -385,7 +388,7 @@ export async function getOrganizationPlacementAnalytics(
          JOIN store_qr_codes q ON q.id = e.qr_code_id AND q.organization_id = e.organization_id
         WHERE e.organization_id = $1 ${since}
         GROUP BY 1 ORDER BY scans DESC`,
-      [organizationId],
+      args,
     ),
     dataSource.query(
       `SELECT q.landing_type AS "landingType", COUNT(*)::int AS scans
@@ -393,12 +396,12 @@ export async function getOrganizationPlacementAnalytics(
          JOIN store_qr_codes q ON q.id = e.qr_code_id AND q.organization_id = e.organization_id
         WHERE e.organization_id = $1 ${since}
         GROUP BY 1 ORDER BY scans DESC`,
-      [organizationId],
+      args,
     ),
     dataSource.query(
       `SELECT COUNT(*)::int AS total FROM store_qr_scan_events e
         WHERE e.organization_id = $1 ${since}`,
-      [organizationId],
+      args,
     ),
   ]);
 

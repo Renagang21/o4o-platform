@@ -195,6 +195,21 @@ export async function fetchQrPlacementAnalytics(
   return unwrap(res.data, '사용처 통계를 불러오지 못했습니다.');
 }
 
+export interface StoreQrPlacementAnalyticsDto {
+  byPlacement: QrPlacementScanRow[];
+  byContentSource: Array<{ contentSource: string | null; scans: number }>;
+  byTargetKind: Array<{ landingType: string | null; scans: number }>;
+  totalScans: number;
+}
+
+/** 매장 전체 스캔 분포(사용처/콘텐츠 출처/대상 3축) — §13. */
+export async function fetchStorePlacementAnalytics(
+  days?: number | null,
+): Promise<StoreQrPlacementAnalyticsDto> {
+  const res = await api.get(`/pharmacy-hub/store-owner/qr-analytics/placements${days ? `?days=${days}` : ''}`);
+  return unwrap(res.data, '스캔 분포를 불러오지 못했습니다.');
+}
+
 /** 같은 콘텐츠로 QR 추가 — target 축 복제 + 새 slug (§8). */
 export async function cloneQrCode(
   qrId: string,
