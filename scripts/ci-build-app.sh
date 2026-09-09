@@ -40,7 +40,7 @@ build_app() {
             ;;
         "storefront")
             echo "Building Storefront..."
-            pnpm --filter=@o4o/storefront run build
+            pnpm --fail-if-no-match --filter=@o4o/storefront run build
             ;;
         "api"|"api-server")
             echo "Building API Server..."
