@@ -154,7 +154,7 @@ Screen Set 편집기 · Tablet 운영 UI · Placement 로 범위를 넓히지 �
 | `pnpm install --frozen-lockfile` | PASS |
 | `pnpm run build:packages` | exit 0 |
 | api-server `tsc --noEmit` | exit 0 |
-| api-server 전체 Jest | (아래 6-1) |
+| api-server 전체 Jest | 238 suite / 3833 test 전부 passed |
 | KPA type-check / build | exit 0 / exit 0 |
 | PharmacyHub type-check / build | exit 0 / exit 0 |
 | K-Cosmetics type-check / build | exit 0 / exit 0 |
@@ -181,7 +181,60 @@ DB 없이 raw-source + 순수함수만으로 단언한다 (7절 31 test).
 
 ## 7. 프로덕션 E2E
 
-(본 절은 배포 후 실측으로 채운다)
+- **배포 커밋**: `ca5b6e8ff`
+- **CI (전부 success)**: CI Pipeline `34327457550` / Deploy API Server `34327457486` /
+  Deploy Web Services `34327457484` / Deploy Admin Dashboard `34327457526` /
+  CodeQL Security Analysis `34327457508`
+- **관측**: 실제 브라우저(Playwright), 모바일 뷰포트 390×844, 비로그인 방문자
+
+### 7-1. PharmacyHub Screen Set QR 3건
+
+| slug | 결과 |
+|---|---|
+| `/qr/a-2-2` | `A-2 의약품 안내 (기본 코너 안내형)` + 제품 6종(각 QR 이미지·"자세히 보기") 렌더 |
+| `/qr/c-2` | `C-2 건강기능식품 안내 (제품 진열형)` + 제품 6종 렌더 |
+| `/qr/f-2` | `F-2 화장품 안내 (상품 집중형)` + 제품 6종 렌더 |
+
+"표시할 내용이 아직 준비되지 않았습니다" 는 **3건 모두에서 사라졌다.**
+
+section 순서·표시 범위는 KPA 와 동일한 canonical 계약 그대로다 (뷰어 코드 미변경):
+
+```text
+sort 1 corner_description → 헤더에서 렌더. 3건 모두 body 가 빈 문자열이라 본문 없음(정상)
+sort 2 content_list       → items 0 건 → 미표시(정상)
+sort 3 product_list       → 렌더됨 (제품 6종 · QR 이미지 · 상세 열기)
+sort 4 qr_guide           → 모바일 랜딩에서 의도적 제외(자기 QR 중복 방지 · 기존 계약)
+```
+
+- 모바일 화면: 2열 제품 그리드로 정상 표시 (스크린샷 확인)
+- deep link: 3건 모두 URL 직접 진입으로 렌더 (셸 경유 아님)
+- 새로고침: `a-2-2` 재진입 정상 렌더
+
+### 7-2. 회귀
+
+| 대상 | 결과 |
+|---|---|
+| KPA screen_set `/qr/tablet-corner` | PASS — corner_description 본문·content_list 5건 정상 |
+| PharmacyHub product `/qr/a1-150-mtmea71g` | PASS — 제품 설명서 전문 렌더 |
+| KPA page `/qr/4` | PASS — `landingType: page` · `contentSource: EXECUTION_ASSET` |
+| KPA link `/qr/qr-1788937224442` | PASS — `landingType: link` · `contentSource: MULTILINGUAL_PRODUCT` |
+| KPA page `/qr/1` (화면) | PASS — 다국어 실행 자산 페이지 정상 렌더 |
+
+### 7-3. 안정 식별축 · scan history
+
+| slug | landing_type | content_source | organization_id | landing_target_id | is_active | scan_events |
+|---|---|---|---|---|---|---|
+| a-2-2 | screen_set | TABLET_SCREEN_SET | e3d14288… | ad459cad… | true | 7 → 9 (방문 2회) |
+| c-2 | screen_set | TABLET_SCREEN_SET | e3d14288… | 3389dda9… | true | 4 → 5 (방문 1회) |
+| f-2 | screen_set | TABLET_SCREEN_SET | e3d14288… | ce7f474a… | true | 4 → 5 (방문 1회) |
+
+- scan 이력 테이블 정본명은 `store_qr_scan_events` 다 (`store_qr_scans` 는 존재하지 않는다).
+- 방문 횟수만큼 정확히 증가했다 — 집계 경로 정상.
+- `slug` · `organization_id` · `landing_target_id` · `is_active` · `type` 전부 **불변**.
+- `store_qr_codes` 총 행수 90 → 90. **검증 과정에서 생성·수정한 프로덕션 데이터 0 건**이므로 원복 대상이 없다.
+  (scan_events 증가는 QR 을 보면 남는 정상 열람 기록이며 훼손이 아니다.)
+- `promotion` 행: 감사 전후 모두 **0 건**.
+
 
 ---
 
@@ -192,14 +245,24 @@ ADOPTED_23_FILE_IMPLEMENTATION = PRESERVED
 DISCARDED_PATCH_APPLIED        = 0
 PATCH_ONLY_ACTIVE_GAPS         = 0
 PH_SCREENSET_PAYLOAD           = PASS
-PH_SCREENSET_PUBLIC_VIEW       = (E2E)
+PH_SCREENSET_PUBLIC_VIEW       = PASS
 SHARED_SCREENSET_VIEWER        = PASS
-KPA_SCREENSET_REGRESSION       = (E2E)
-STORE_QR_OTHER_TYPES           = (E2E)
+KPA_SCREENSET_REGRESSION       = PASS
+STORE_QR_OTHER_TYPES           = PASS
 PRODUCTMASTER_QR_SEPARATION    = PASS
 IMMUTABLE_AXIS_MUTATION        = 0
 PLACEMENT_IMPLEMENTATION       = 0
-CI                             = (배포 후)
-PRODUCTION_E2E                 = (배포 후)
-HEAD_EQUALS_ORIGIN_MAIN        = (push 후)
+CI                             = PASS
+PRODUCTION_E2E                 = PASS
+HEAD_EQUALS_ORIGIN_MAIN        = PASS
 ```
+
+**최종 판정: `CLOSED`**
+
+선행 WO(WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1)의
+유일한 잔여 결함이었던 PharmacyHub Screen Set 공개 랜딩이 프로덕션에서 실제 payload 로
+표시되는 것을 확인했다. 폐기 patch 대비 ACTIVE_GAP 은 0 이다.
+
+문서 정합: 발견 1건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건
+— 선행 CHECK 문서 §9 의 원인 서술(백엔드 payload 누락)이 사실과 다르나, 기록물이므로
+   수정하지 않고 본 문서 §3-1 에 정정 사실을 남겼다 (CLAUDE.md §16-1).
