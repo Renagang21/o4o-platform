@@ -1,6 +1,7 @@
 # WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — CHECK
 
-> **상태**: 3단계 구현 완료 · **프로덕션 배포 검증 PASS** (§5)
+> **상태**: **CLOSED** (사용자 승인 2026-09-09) · 프로덕션 배포 검증 PASS (§5)
+> **종결 범위**: `ADMIN_IA_AND_MENU_REFACTOR = CLOSED` / `ADMIN_PLATFORM_ONLY_ACCESS = PENDING` / `POST_REFACTOR_RESIDUALS = OPEN` — 상세 §6-0
 > **작성일**: 2026-09-09
 > **대상**: `admin.neture.co.kr` (`apps/admin-dashboard`) + `platform-hub` 백엔드 1건
 > **조사 정본**: [`IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1`](../investigations/IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1.md)
@@ -323,17 +324,56 @@ BEFORE / AFTER 대조:
 
 ---
 
-## 6. 미완 · 후속 판정 대상
+## 6. 종결 범위 · 후속 판정 대상
+
+### 6-0. 종결 범위 (사용자 승인 2026-09-09)
+
+```text
+ADMIN_IA_AND_MENU_REFACTOR = CLOSED     ← 본 WO. 되돌리거나 재작업하지 않는다.
+ADMIN_PLATFORM_ONLY_ACCESS = PENDING    ← 프로덕션 DB 자격정보 확보 후 착수
+POST_REFACTOR_RESIDUALS    = OPEN       ← 아래 후속 통합 WO 로 묶어 진행
+```
+
+기준 커밋: `d1a956c45` (본 CHECK) / 구현 `61f772d0c` · `b7789b543`.
+
+### 6-1. 후속 통합 WO — 착수 조건과 순서 (사용자 지시 2026-09-09)
+
+**착수 조건**: 프로덕션 DB 접속 복구. 그 전에는 진행하지 않는다.
+특히 **`App.tsx` 진입 제한을 먼저 적용해서는 안 된다** — `sohae2100` 계정이 잠긴다(§2-3).
+
+```text
+1. role_assignments 실제 보유자 전수 조회
+2. sohae2100 이 플랫폼 전체 관리자 계정이 맞다면
+   platform:super_admin 을 additive 로 **먼저** 부여
+3. 로그아웃·재로그인하여 22개 관리자 기능 접근 확인
+4. 그 후 admin.neture.co.kr 진입 floor 를 platform:super_admin 으로 제한
+5. 서비스 역할만 가진 테스트 계정의 관리자 사이트 차단 확인
+6. /partnerops/* 8개 dead runtime 제거
+7. insight-rules.ts 의 GlycoPharm 활성 소스 잔재 수정
+8. 해당 오류를 발생시키는 패키지 type-check 가 CI 에서 누락됐는지도 확인
+9. CI · 배포 · 프로덕션 브라우저 검증 후 최종 CHECK 작성
+```
+
+**불변 제약 2가지**
+
+- **기존 서비스 역할은 자동 삭제하지 않는다** (`kpa:admin` 등은 그대로 둔다 — 2번은 additive 부여다).
+- **프로덕션 자격정보·비밀번호는 문서·로그·커밋에 기록하지 않는다.**
+
+> 순서가 계약이다. `2 → 3` 을 건너뛰고 `4` 를 적용하면 주 운영자가 관리자 사이트에서 잠긴다.
+> `8` 은 이번에 발견한 `insight-rules.ts` tsc 오류가 CI 를 통과한 사실(§4 주석) 때문에 추가됐다 —
+> 결함 수정만으로는 재발을 막지 못하고 **게이트 누락 여부**를 함께 봐야 한다.
+
+### 6-2. 후속 판정 대상 목록
 
 | # | 항목 | 사유 |
 |:-:|---|---|
-| 1 | **`App.tsx` 진입 floor 축소** (유일한 잔여 권한 작업) | **주 운영자 계정(`sohae2100`)이 `platform:super_admin` 을 갖지 않아** 지금 좁히면 관리자 사이트에서 잠긴다(§2-3). 선행 조건: ① `role_assignments` 실 보유자 전수 확인 ② legacy 역할 보유자 정리 방침. 프로덕션 DB `o4o_api` 자격정보가 `apps/api-server/.env` 와 불일치(터널 성공, password authentication failed) → **자격정보 = CLAUDE.md 중지 조건** |
+| 1 | **`App.tsx` 진입 floor 축소** (§6-1 단계 1~5) | **주 운영자 계정(`sohae2100`)이 `platform:super_admin` 을 갖지 않아** 지금 좁히면 관리자 사이트에서 잠긴다(§2-3). 선행 조건: ① `role_assignments` 실 보유자 전수 확인 ② legacy 역할 보유자 정리 방침. 프로덕션 DB `o4o_api` 자격정보가 `apps/api-server/.env` 와 불일치(터널 성공, password authentication failed) → **자격정보 = CLAUDE.md 중지 조건** |
 | 2 | KPA 화면 3건 이관 | 대응 operator 화면 부재. 신규 화면 생성은 이번 WO 범위 밖 |
 | 3 | `/api/v1/cpt/*` · CPT entity·table 판정 | 외부 소비처 전수조사 선행 |
 | 4 | `cms_*` 테이블·entity 삭제 판정 | 데이터 존재 여부 확인 선행(DB 접근 필요) |
 | 5 | `physical_stores` 소유 주체 | 데이터 관계 조사 선행 |
 | 6 | `/home` · `/dashboard` 대시보드 3중 통합 | 화면 내용 비교 선행 |
-| 7 | `/partnerops/*` 진입점 판단 | 30일 호출 8건이 **전부 404** 였다(백엔드 부재) → IR §4 의 "실사용" 판정을 **정정**한다 |
+| 7 | `/partnerops/*` 제거 (§6-1 단계 6) | 30일 호출 8건이 **전부 404** 였다(백엔드 부재) → IR §4 의 "실사용" 판정을 **정정**한다 |
 | 8 | `/preview/:slug` (`ViewPreview`) | `/cms/public/*` 백엔드가 없어 동작 여부 미확인 |
 | 9 | "운영 및 보안" 그룹 신설 | 대응 백엔드가 없다(`/api/v1/monitoring/*` 미마운트). 신설 시 별도 WO |
 | 10 | 관리자 정보구조 baseline 문서 신설 | 현행 기준 문서가 저장소에 없다(§7) |
