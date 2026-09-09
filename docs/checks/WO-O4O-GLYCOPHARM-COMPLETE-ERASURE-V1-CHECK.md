@@ -1,6 +1,6 @@
 # CHECK — WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1
 
-> **상태**: GCP 삭제 완료 · 등록기관(DNS·도메인) 소유자 조치 대기
+> **상태**: CLOSED — 코드 · DB · GCP · DNS 전 축 삭제 완료
 > **작성일**: 2026-09-08 · **갱신**: 2026-09-09
 > **기준선**: `origin/main` = `7971407f0` (CI green anchor `a7914fd12`)
 > **작업 격리**: worktree `C:/tmp/o4o-gp-erasure` · branch `work/glycopharm-complete-erasure-v1`
@@ -305,22 +305,33 @@ LB 규칙을 추가하지 않았다.** 소유자가 DNS 를 삭제하면 해소�
 
 ---
 
-## 10. 미완 — 소유자 조치 필요
+## 10. 소유자 조치 영역 — 완료
 
 ### 10-1. GCP — 완료 (§9-A 참조)
 
-### 10-2. 등록기관 (소유자 직접 — 작업자 권한 밖)
+### 10-2. 등록기관 — 완료 (2026-09-09 · 소유자 직접 수행)
 
-`netureyoutube` 프로젝트에 **Cloud DNS 존이 없다.** DNS 는 외부 등록기관에 있다.
+`netureyoutube` 프로젝트에 **Cloud DNS 존이 없다.** DNS 는 외부 등록기관(가비아)에 있어
+소유자가 직접 처리했다. 작업자(AI) 권한 밖이므로 실행 주체는 소유자다.
+
+| 항목 | 결과 |
+|---|---|
+| 등록기관 | 가비아 |
+| 삭제한 DNS 레코드 | 6건 — `glycopharm.co.kr` · `www` · `api` 의 A 레코드 + `_acme-challenge` CNAME 포함 |
+| 잔여 레코드 | 0 (MX · TXT 포함) |
+| 도메인 자동갱신 | 해제 — 2026-12-26 만료 시 연장하지 않음 |
+| 주차(파킹) 페이지 | 없음 |
+
+외부 DNS 실측 (소유자 보고):
 
 ```text
-1. glycopharm.co.kr        A/AAAA 레코드 삭제
-2. www.glycopharm.co.kr    삭제
-3. api.glycopharm.co.kr    삭제
-4. MX · TXT · CNAME 잔여 레코드 확인 후 삭제
-5. 도메인 자동갱신 해제
-6. 즉시 삭제 기능이 있으면 도메인 삭제 / 없으면 만료 처리
+glycopharm.co.kr       → DNS 응답 없음
+www.glycopharm.co.kr   → DNS 응답 없음
+api.glycopharm.co.kr   → DNS 응답 없음
 ```
+
+이로써 §9-A 의 "남은 관측 — DNS 의존"(평문 HTTP 가 LB 기본 백엔드로 유입되던 현상)은 해소되었다.
+종료 안내 · 리다이렉트 · 주차 페이지를 남기지 않는다는 계약을 그대로 만족한다.
 
 ---
 
@@ -338,10 +349,11 @@ OTHER_SERVICE_DATA_CHANGE         = 0
 OTHER_SERVICE_REGRESSION          = PASS
 
 GLYCOPHARM_GCP_ERASURE            = CLOSED
-GLYCOPHARM_DNS_RECORDS            = PENDING_OWNER_ACTION
-GLYCOPHARM_DOMAIN_AUTORENEW       = PENDING_OWNER_ACTION
-GLYCOPHARM_DOMAIN_ERASURE         = PENDING_OWNER_ACTION
-GLYCOPHARM_COMPLETE_ERASURE       = OPEN
+GLYCOPHARM_DNS_RECORDS            = 0
+GLYCOPHARM_DOMAIN_AUTORENEW       = OFF
+GLYCOPHARM_DOMAIN_RENEWAL         = NOT_PLANNED   (만료 2026-12-26)
+GLYCOPHARM_DOMAIN_ERASURE         = CLOSED
+GLYCOPHARM_COMPLETE_ERASURE       = CLOSED
 ```
 
 ---
