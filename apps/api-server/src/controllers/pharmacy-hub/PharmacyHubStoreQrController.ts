@@ -55,6 +55,7 @@ import {
   createStoreQrCode,
   updateStoreQrCode,
   deactivateStoreQrCode,
+  reactivateStoreQrCode,
   type QrResult,
   type QrFailure,
 } from '../../services/store/store-qr.service.js';
@@ -325,6 +326,7 @@ export class PharmacyHubStoreQrController {
       const data = await listStoreQrCodes(AppDataSource, resolution.organizationId, {
         page: req.query.page,
         limit: req.query.limit,
+        includeInactive: req.query.includeInactive,
       });
       return res.json({
         success: true,
@@ -496,6 +498,27 @@ export class PharmacyHubStoreQrController {
       return res.json({ success: true, data: result.data });
     } catch (error) {
       return fail(res, userId, 'deactivate', error, 'QR 을 내리지 못했습니다.', 'QR_DELETE_FAILED');
+    }
+  }
+
+  /**
+   * POST /store-owner/qr/:id/reactivate — 내린 QR 다시 올리기.
+   * `is_active` 만 되돌린다. slug·연결 대상은 불변이라 이미 인쇄된 QR 이 같은 곳을 연다.
+   */
+  static async reactivate(req: Request, res: Response): Promise<any> {
+    const userId = getUserId(req, res);
+    if (!userId) return;
+    if (rejectsMalformedId(req, res)) return;
+
+    try {
+      const resolution = await resolvePharmacyHubStoreOrganization(userId);
+      if (resolution.status !== 'connected') return sendWriteBlocked(res, resolution);
+
+      const result = await reactivateStoreQrCode(AppDataSource, resolution.organizationId, req.params.id);
+      if (!result.ok) return sendFailure(res, result);
+      return res.json({ success: true, data: result.data });
+    } catch (error) {
+      return fail(res, userId, 'reactivate', error, 'QR 을 다시 올리지 못했습니다.', 'QR_REACTIVATE_FAILED');
     }
   }
 

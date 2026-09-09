@@ -85,7 +85,7 @@ export function StoreQrCreateModal({ open, target, onClose, onCreated }: StoreQr
       const isExec = target.origin === 'execution-asset';
       const res = await createStoreQrCode({
         title: title.trim() || target.title,
-        type: 'page',
+        // `type` 은 landing_type 과 완전 중복인 DEAD residue 라 더 이상 보내지 않는다.
         landingType: 'page',
         // execution-asset → 매장 제작 자료 사본 참조(libraryItemId), direct → page 참조(landingTargetId)
         libraryItemId: isExec ? target.id : undefined,

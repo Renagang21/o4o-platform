@@ -19,7 +19,6 @@ function getApiBase(service: string = 'cosmetics'): string {
 export interface ImportedOperatorQr {
   id: string;
   organizationId: string;
-  type: string;
   title: string;
   description: string | null;
   libraryItemId: string | null;

@@ -10,18 +10,26 @@
  * Analytics: /api/v1/kpa/pharmacy/qr/:id/analytics
  */
 
+import { STORE_QR_EXPORT_PRESETS } from '@o4o/store-ui-core';
 import { apiClient } from './client';
 import { getAccessToken } from '../contexts/AuthContext';
 
 export interface StoreQrCode {
   id: string;
   organizationId: string;
-  type: string;
   title: string;
   description: string | null;
   libraryItemId: string | null;
   landingType: string;
   landingTargetId: string | null;
+  /**
+   * WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1:
+   *   canonical 대상 축(PRODUCT|CONTENT|SCREEN_SET|EXTERNAL_LINK) — 서버가 landingType 에서 파생.
+   *   `type` 컬럼은 DEAD residue 라 이 계약에서 제거했다(읽지도 보내지도 않는다).
+   */
+  targetKind?: string | null;
+  /** 내용의 원천(STORE_DIRECT · EXECUTION_ASSET · TABLET_SCREEN_SET …). null = 판정 보류(HOLD). */
+  contentSource?: string | null;
   slug: string;
   isActive: boolean;
   createdAt: string;
@@ -44,7 +52,6 @@ export interface StoreQrCode {
 
 export interface QrLandingData {
   id: string;
-  type: string;
   title: string;
   description: string | null;
   landingType: string;
@@ -123,10 +130,13 @@ export async function getQrLandingData(
 export async function getStoreQrCodes(opts?: {
   page?: number;
   limit?: number;
+  /** 내린(비활성) QR 도 함께 받는다 — 다시 올리려면 목록에 남아 있어야 한다. */
+  includeInactive?: boolean;
 }): Promise<{ success: boolean; data: StoreQrPaginatedResponse }> {
   const params = new URLSearchParams();
   if (opts?.page) params.set('page', String(opts.page));
   if (opts?.limit) params.set('limit', String(opts.limit));
+  if (opts?.includeInactive) params.set('includeInactive', 'true');
   const qs = params.toString();
   return apiClient.get(`/pharmacy/qr${qs ? `?${qs}` : ''}`);
 }
@@ -134,7 +144,6 @@ export async function getStoreQrCodes(opts?: {
 export async function createStoreQrCode(data: {
   title: string;
   description?: string;
-  type?: string;
   libraryItemId?: string;
   landingType: string;
   landingTargetId?: string;
@@ -151,7 +160,6 @@ export async function updateStoreQrCode(
   data: Partial<{
     title: string;
     description: string;
-    type: string;
     libraryItemId: string;
     landingType: string;
     landingTargetId: string;
@@ -167,6 +175,16 @@ export async function deleteStoreQrCode(
   id: string,
 ): Promise<{ success: boolean; message: string }> {
   return apiClient.delete(`/pharmacy/qr/${id}`);
+}
+
+/**
+ * 내린 QR 다시 올리기 (WO-O4O-STORE-QR-CANONICAL-TARGET-…-COMMONIZATION-V1 §17).
+ * slug 와 연결 대상은 그대로다 — 이미 인쇄된 QR 이 같은 곳을 다시 연다.
+ */
+export async function reactivateStoreQrCode(
+  id: string,
+): Promise<{ success: boolean; data: { id: string; reactivated: true } }> {
+  return apiClient.post(`/pharmacy/qr/${id}/reactivate`, {});
 }
 
 // ─── Analytics (WO-O4O-QR-SCAN-ANALYTICS-V1) ────────
@@ -192,19 +210,16 @@ export type QrExportFormat = 'png' | 'svg' | 'pdf';
 export type QrExportPreset = 'small' | 'medium' | 'large' | 'a4' | 'a4_4up';
 
 /** UI 표시용 preset 카탈로그 (후속 StoreQRPage 메뉴 구성에 사용) */
+/**
+ * 출력 규격 5종은 @o4o/store-ui-core 가 정본이다 (KPA/PH 동일 목록).
+ * 기존 소비처를 깨지 않도록 이름만 여기서 재수출한다.
+ */
 export const QR_EXPORT_PRESETS: ReadonlyArray<{
   preset: QrExportPreset;
   format: QrExportFormat;
   label: string;
   hint: string;
-}> = [
-  // WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 선택 기준이 드러나도록 hint 개선
-  { preset: 'medium', format: 'png', label: 'PNG (이미지)', hint: '간단 삽입·공유' },
-  { preset: 'large', format: 'png', label: 'PNG 고해상도', hint: '문서·POP 편집' },
-  { preset: 'medium', format: 'svg', label: 'SVG (벡터)', hint: '전문 출력소·크기 조절' },
-  { preset: 'a4', format: 'pdf', label: 'A4 1장 PDF', hint: '약국에서 바로 출력' },
-  { preset: 'a4_4up', format: 'pdf', label: 'A4 4분할 PDF', hint: '잘라서 여러 곳에 부착' },
-];
+}> = STORE_QR_EXPORT_PRESETS;
 
 // client.ts 와 동일한 base URL 규약 (private 이라 재구성)
 const KPA_API_BASE = import.meta.env.VITE_API_BASE_URL

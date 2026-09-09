@@ -193,8 +193,11 @@ export async function ensureScreenSetQr(
 
   try {
     await dataSource.query(
-      `INSERT INTO store_qr_codes (organization_id, type, title, description, landing_type, landing_target_id, slug, is_active)
-       VALUES ($1, 'screen_set', $2, NULL, 'screen_set', $3, $4, true)`,
+      // WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1:
+      //   canonical target 축은 landing_type 이다. DEAD 컬럼 `type` 은 더 이상 쓰지 않고
+      //   (NOT NULL DEFAULT 라 생략해도 INSERT 는 성립한다) 원천 축 content_source 를 남긴다.
+      `INSERT INTO store_qr_codes (organization_id, title, description, landing_type, landing_target_id, content_source, slug, is_active)
+       VALUES ($1, $2, NULL, 'screen_set', $3, 'TABLET_SCREEN_SET', $4, true)`,
       [organizationId, (set.name || 'Tablet Corner').slice(0, 300), screenSetId, slug],
     );
   } catch (e: unknown) {

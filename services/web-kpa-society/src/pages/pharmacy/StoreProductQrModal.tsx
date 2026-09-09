@@ -197,6 +197,11 @@ export function StoreProductQrModal({ open, target, onClose }: Props) {
               <div style={styles.qrBox} className="store-product-qr-svg" dangerouslySetInnerHTML={{ __html: qr.svg }} />
               <p style={styles.url}>{qr.url}</p>
               <p style={styles.hint}>고객이 스캔하면 상품 안내 페이지가 열립니다.</p>
+              {/* WO-…-COMMONIZATION-V1 §⑥: 상품 대표 QR 과 매장 QR 은 별개 축이다. */}
+              <p style={styles.hint}>
+                이 QR 은 <b>상품 기준 대표 QR</b> 입니다. 상품마다 고정이라 매장에서 따로 만들지 않고,
+                <br />“QR 코드” 목록(매장이 만든 QR)에는 나타나지 않습니다.
+              </p>
             </>
           ) : qr && view === 'size' ? (
             <>

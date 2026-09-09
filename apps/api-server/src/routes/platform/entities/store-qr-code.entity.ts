@@ -28,7 +28,16 @@ export class StoreQrCode {
   @Index('IDX_store_qr_codes_org')
   organizationId!: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  /**
+   * @deprecated DEAD residue — canonical target 축은 `landingType` 이다.
+   *
+   * WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1:
+   *   프로덕션 88/88 행이 landing_type 과 동일하고 이 값으로 분기하는 코드가 0 건이라
+   *   read/write 의존을 모두 제거했다. 컬럼은 `NOT NULL DEFAULT 'product'` 라
+   *   DROP 하지 않는다 — schema housekeeping 은 별도 회차다.
+   *   신규 코드에서 읽지도 쓰지도 않는다.
+   */
+  @Column({ type: 'varchar', length: 50, default: 'product' })
   type!: string;
 
   @Column({ type: 'varchar', length: 300 })
@@ -45,6 +54,19 @@ export class StoreQrCode {
 
   @Column({ name: 'landing_target_id', type: 'varchar', length: 500, nullable: true })
   landingTargetId?: string | null;
+
+  /**
+   * QR 대상 내용의 **원천** 축 (WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-…-V1).
+   *
+   * landingType 이 "무엇을 가리키는가"(target)라면 이 값은 "그 내용이 어디서 오는가"다.
+   * `page` 안에 자료함 사본·매장 직접작성·HUB 공유 콘텐츠가, `link` 안에 매장 블로그·
+   * 다국어 상품 설명이 섞여 있어 분리했다.
+   *
+   * 값 목록·판정식은 services/store/store-qr-target.contract.ts 가 SSOT 다.
+   * **NULL = 판정 보류(HOLD)** — 실제 참조 관계가 확인되지 않으면 추측하지 않는다.
+   */
+  @Column({ name: 'content_source', type: 'varchar', length: 40, nullable: true })
+  contentSource?: string | null;
 
   @Column({ type: 'varchar', length: 200, unique: true })
   @Index('IDX_store_qr_codes_slug', { unique: true })

@@ -33,7 +33,6 @@ function getApiBase(service: string = 'kpa'): string {
 export interface ImportedOperatorQr {
   id: string;
   organizationId: string;
-  type: string;
   title: string;
   description: string | null;
   libraryItemId: string | null;

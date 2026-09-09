@@ -12,11 +12,12 @@
  * 출력: PNG/SVG 개별 다운로드 + 선택 QR A4 PDF 일괄 출력
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { createPortal } from 'react-dom';
-import { QrCode, Trash2, ExternalLink, Copy, Check, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, LayoutTemplate, Info, Sparkles, Settings, Pencil } from 'lucide-react';
-// WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: list rendering 표준 테이블 (자체 selection + bulk print 보존)
-import { DataTable, type Column } from '@o4o/ui';
+import { useState, useEffect, useCallback } from 'react';
+import { QrCode, ExternalLink, X, Smartphone, Monitor, Tablet, Download, Printer, ArrowRight, FolderOpen, LayoutTemplate, Info, Sparkles, Pencil } from 'lucide-react';
+// WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1 §9:
+//   QR 목록·행 액션·출력 메뉴는 공통 Core 로 옮겼다(PharmacyHub 와 같은 화면을 쓴다).
+//   여기 남는 것은 KPA 고유 진입점(AI 설명 편집 · 화면 세트 열기)과 일괄 출력뿐이다.
+//   표 자체는 여전히 @o4o/ui DataTable 이다 — Core 안에서 그대로 쓴다.
 import { getStoreExecutionAsset } from '../../api/storeExecutionAssets';
 import { Link, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
@@ -34,10 +35,10 @@ import {
   getStoreQrCodes,
   createStoreQrCode,
   deleteStoreQrCode,
+  reactivateStoreQrCode,
   getQrAnalytics,
   // WO-O4O-KPA-STORE-QR-PRINT-EXPORT-UI-WIRING-V1: export foundation 연결
   downloadQrExport,
-  QR_EXPORT_PRESETS,
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 설정 모달 저장
   updateStoreQrCode,
 } from '../../api/storeQr';
@@ -45,7 +46,11 @@ import type { StoreQrCode, QrAnalyticsData, QrExportFormat, QrExportPreset } fro
 import { getListings } from '../../api/pharmacyProducts';
 import { fetchLocalProducts } from '../../api/localProducts';
 import { getAccessToken } from '../../contexts/AuthContext';
-import { GuideBackLink } from '@o4o/store-ui-core';
+import {
+  GuideBackLink,
+  StoreQrOperationBoard,
+  isArchivedCornerQr,
+} from '@o4o/store-ui-core';
 
 const LANDING_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: 'product', label: '제품' },
@@ -53,26 +58,11 @@ const LANDING_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: 'link', label: '외부 링크' },
 ];
 
-// WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑥:
-//   표시 전용 유형 라벨. LANDING_TYPE_OPTIONS 는 "직접 만들 수 있는 유형"(생성 폼 select)이므로
-//   자동 생성 전용인 screen_set 은 여기서만 문구를 갖는다(수동 생성 경로 신설 금지).
-const LANDING_TYPE_LABELS: Record<string, string> = {
-  ...Object.fromEntries(LANDING_TYPE_OPTIONS.map((o) => [o.value, o.label])),
-  screen_set: '태블릿 코너',
-  video: '동영상',
-};
 
 // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: QR 목록 필터 키.
 type QrListFilter = 'all' | 'content' | 'ai' | 'screen_set';
 
-/**
- * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1
- * 보관된 화면 세트의 코너 QR — 목록에는 남지만(주소 유지, 복원 시 재개방) 출력·다운로드는 막는다.
- * 서버가 이미 같은 판정으로 export/image 를 409 로 거부하므로, UI 는 그 사실을 미리 알린다(왕복 낭비 방지).
- */
-function isArchivedCornerQr(q: StoreQrCode): boolean {
-  return q.landingType === 'screen_set' && q.screenSetStatus === 'archived';
-}
+// isArchivedCornerQr 판정(보관 코너 QR)은 @o4o/store-ui-core 가 정본이다 — PH 와 같은 판정을 쓴다.
 
 function toSlug(text: string): string {
   return text
@@ -109,88 +99,9 @@ const QR_EXPORT_GUIDE: { situation: string; recommend: string; reason: string }[
   { situation: '임시 확인·간단 공유', recommend: 'PNG (이미지)', reason: '가장 간단하지만 확대 출력에는 적합하지 않습니다' },
 ];
 
-// WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1:
-//   QR 목록은 @o4o/ui DataTable(BaseTable) 을 쓰는데, 내부 wrapper 가 `overflow-x-auto` 라
-//   CSS 규칙상 overflow-y 도 visible 이 아닌 auto 로 계산되어 행 내 position:absolute 출력
-//   메뉴가 세로로 잘린다. BaseTable 은 공통 표준(가로 스크롤 필요)이라 수정하지 않고,
-//   출력 메뉴를 body 로 portal(position:fixed) 하여 클리핑을 우회한다. 화면 하단 공간이
-//   부족하면 위로 펼치고, 바깥 클릭/스크롤/리사이즈 시 닫는다.
-function QrExportMenu({ exporting, onExport }: {
-  exporting: boolean;
-  onExport: (format: QrExportFormat, preset: QrExportPreset) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const btnRef = useRef<HTMLButtonElement | null>(null);
-  const [rect, setRect] = useState<{ top: number; bottom: number; right: number } | null>(null);
-
-  const MENU_W = 200;
-  const MENU_H = 248; // QR_EXPORT_PRESETS 5항목 근사 높이
-
-  const toggle = () => {
-    if (exporting) return;
-    if (open) { setOpen(false); return; }
-    const r = btnRef.current?.getBoundingClientRect();
-    if (r) setRect({ top: r.top, bottom: r.bottom, right: r.right });
-    setOpen(true);
-  };
-
-  useEffect(() => {
-    if (!open) return;
-    const close = () => setOpen(false);
-    window.addEventListener('scroll', close, true);
-    window.addEventListener('resize', close);
-    return () => {
-      window.removeEventListener('scroll', close, true);
-      window.removeEventListener('resize', close);
-    };
-  }, [open]);
-
-  const openUp = rect ? (window.innerHeight - rect.bottom < MENU_H && rect.top > MENU_H) : false;
-  const left = rect ? Math.max(8, rect.right - MENU_W) : 0;
-
-  return (
-    <>
-      <button
-        ref={btnRef}
-        onClick={(e) => { e.stopPropagation(); toggle(); }}
-        style={{ ...styles.downloadBtn, opacity: exporting ? 0.6 : 1, cursor: exporting ? 'wait' : 'pointer' }}
-        disabled={exporting}
-        title="QR 출력/다운로드"
-      >
-        <Download size={14} />
-        {exporting ? '준비 중…' : '출력'}
-      </button>
-      {open && rect && createPortal(
-        <>
-          <div style={{ position: 'fixed', inset: 0, zIndex: 1000 }} onClick={() => setOpen(false)} />
-          <div
-            style={{
-              position: 'fixed',
-              left,
-              ...(openUp ? { bottom: window.innerHeight - rect.top + 4 } : { top: rect.bottom + 4 }),
-              zIndex: 1001,
-              width: MENU_W,
-              ...styles.downloadMenuPortal,
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {QR_EXPORT_PRESETS.map((opt) => (
-              <button
-                key={`${opt.format}-${opt.preset}`}
-                onClick={() => { setOpen(false); onExport(opt.format, opt.preset); }}
-                style={styles.downloadMenuItem}
-              >
-                <span style={{ display: 'block', fontWeight: 600, color: colors.neutral700 }}>{opt.label}</span>
-                <span style={{ display: 'block', fontSize: '11px', color: colors.neutral400, marginTop: '1px' }}>{opt.hint}</span>
-              </button>
-            ))}
-          </div>
-        </>,
-        document.body,
-      )}
-    </>
-  );
-}
+// 출력 메뉴(QR_EXPORT_PRESETS 5종 · DataTable overflow 클리핑을 피하는 portal)는
+// @o4o/store-ui-core 의 StoreQrOperationBoard 안으로 옮겼다
+// (WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1 의 해법을 Core 로 승격).
 
 export function StoreQRPage() {
   const location = useLocation();
@@ -242,7 +153,7 @@ export function StoreQRPage() {
 
   const fetchItems = useCallback(async () => {
     try {
-      const res = await getStoreQrCodes({ limit: 100 });
+      const res = await getStoreQrCodes({ limit: 100, includeInactive: true });
       if (res.success && res.data) {
         setItems(res.data.items);
       }
@@ -351,7 +262,6 @@ export function StoreQRPage() {
       const res = await createStoreQrCode({
         title: formTitle.trim() || videoTarget.title,
         description: formDescription.trim() || undefined,
-        type: 'video',
         landingType: 'video',
         landingTargetId: videoTarget.id,
         slug: formSlug.trim(),
@@ -421,7 +331,6 @@ export function StoreQRPage() {
         // WO-O4O-QR-TEMPLATE-WORKFLOW-V1: AI 생성 제목/설명 우선 사용
         title: formTitle.trim() || selectedLibrary.title,
         description: formDescription.trim() || undefined,
-        type: isPageRef ? 'page' : formLandingType,
         libraryItemId: (isPageRef || isBlogRef) ? undefined : selectedLibrary.id,
         landingType: isPageRef ? 'page' : formLandingType,
         landingTargetId: isPageRef ? selectedLibrary.id : (formLandingTargetId || undefined),
@@ -448,13 +357,28 @@ export function StoreQRPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('이 QR 코드를 삭제하시겠습니까?')) return;
+  /**
+   * QR 내리기 — 물리 삭제가 아니라 is_active=false 다(서버도 soft delete 만 한다).
+   * 목록에서 지우지 않고 '내림' 으로 남긴다 — 그래야 다시 올릴 수 있다.
+   */
+  const handleDeactivate = async (id: string) => {
+    if (!confirm('이 QR을 내리시겠습니까?\n주소(/qr/…)는 그대로 남아 언제든 다시 올릴 수 있습니다.')) return;
     try {
       await deleteStoreQrCode(id);
-      setItems((prev) => prev.filter((q) => q.id !== id));
+      setItems((prev) => prev.map((q) => (q.id === id ? { ...q, isActive: false, landable: false } : q)));
     } catch {
-      // silent
+      toast.error('QR을 내리지 못했습니다.');
+    }
+  };
+
+  const handleReactivate = async (id: string) => {
+    try {
+      await reactivateStoreQrCode(id);
+      setItems((prev) => prev.map((q) => (q.id === id ? { ...q, isActive: true } : q)));
+      // landable 은 화면 세트 상태 등 다른 축에도 달려 있어 서버 판정을 다시 받는다.
+      fetchItems();
+    } catch {
+      toast.error('QR을 다시 올리지 못했습니다.');
     }
   };
 
@@ -637,7 +561,10 @@ export function StoreQRPage() {
             <span style={{ color: colors.neutral600, fontSize: '13px' }}>QR-code</span>
           </div>
           <h1 style={styles.title}>QR 코드</h1>
-          <p style={styles.subtitle}>매장에 부착·재사용할 QR 코드를 모아 출력합니다</p>
+          <p style={styles.subtitle}>
+            매장에 부착·재사용할 QR 코드를 모아 출력합니다 · 상품마다 고정된 <b>상품 대표 QR</b> 은
+            취급제품 화면에서 따로 출력합니다
+          </p>
           <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <GuideBackLink to="/guide/features/qr" label="QR 활용 방법" />
             {/* WO-O4O-KPA-STORE-QR-EXPORT-FILE-GUIDE-V1: 출력 파일 선택 기준 안내 보조 버튼 */}
@@ -1054,205 +981,105 @@ export function StoreQRPage() {
               {archivedCount > 0 && <> · 보관 {archivedCount}건</>}
               <span style={{ color: colors.neutral400 }}> — 홈의 ‘활성 QR’ 숫자와 같은 기준입니다.</span>
             </p>
-            <DataTable<StoreQrCode>
-              rowSelection={{
-                selectedRowKeys: Array.from(selectedIds),
-                onChange: (keys) => setSelectedIds(new Set(keys)),
+            {/* WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1 §9:
+                목록·대상/원천 배지·행 액션·출력 메뉴·내리기/다시 올리기는 공통 Core 가 그린다.
+                KPA 고유 진입점(AI 설명 편집 · 화면 세트 열기)만 renderRowActionsBefore 로 주입한다.
+                자체 selectedIds(Set) ↔ Core 의 string[] 변환만 남는다(일괄 출력 보존). */}
+            <StoreQrOperationBoard<StoreQrCode>
+              items={filteredItems}
+              loading={loading}
+              publicUrl={(item) => `/qr/${item.slug}`}
+              selectedIds={Array.from(selectedIds)}
+              onSelectionChange={(keys) => setSelectedIds(new Set(keys))}
+              onExport={(item, format, preset) => handleExport(item.id, format, preset)}
+              exportingId={exportingId}
+              onOpenSettings={(item) => setSettingsQr(item)}
+              onShowAnalytics={(item) => handleShowAnalytics(item.id)}
+              analyticsId={analyticsId}
+              onCopyUrl={(item) => handleCopyUrl(item.slug, item.id)}
+              copiedId={copiedId}
+              onDeactivate={(item) => handleDeactivate(item.id)}
+              onReactivate={(item) => handleReactivate(item.id)}
+              emptyText={listFilter === 'all' ? '등록된 QR 코드가 없습니다' : '해당 조건의 QR이 없습니다'}
+              palette={{
+                primary: colors.primary,
+                neutral100: colors.neutral100,
+                neutral200: colors.neutral200,
+                neutral400: colors.neutral400,
+                neutral500: colors.neutral500,
+                neutral600: colors.neutral600,
+                neutral700: colors.neutral700,
+                neutral800: colors.neutral800,
+                badgeBg: colors.neutral100,
+                border: colors.neutral200,
               }}
-              columns={[
-                {
-                  key: 'title',
-                  title: 'QR',
-                  render: (_v, item) => (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '6px', backgroundColor: colors.neutral100, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <QrCode size={18} style={{ color: colors.primary }} />
-                      </div>
-                      <div style={{ minWidth: 0 }}>
-                        <p style={{ fontSize: '14px', fontWeight: 600, color: colors.neutral800, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {item.title}
-                          {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 QR 표식 */}
-                          {item.aiDescriptionMode && (
-                            <span style={{ marginLeft: 6, display: 'inline-flex', padding: '1px 7px', borderRadius: '999px', fontSize: '10px', fontWeight: 600, backgroundColor: '#FEF3C7', color: '#B45309', verticalAlign: 'middle' }}>
-                              AI 설명{item.aiDescriptionMode === 'corner' ? '·코너' : ''}
-                            </span>
-                          )}
-                          {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1:
-                              보관된 화면 세트의 코너 QR — 목록에서 사라지지 않고 '보관' 으로 남는다. */}
-                          {isArchivedCornerQr(item) && (
-                            <span style={{ marginLeft: 6, display: 'inline-flex', padding: '1px 7px', borderRadius: '999px', fontSize: '10px', fontWeight: 600, backgroundColor: colors.neutral200, color: colors.neutral600, verticalAlign: 'middle' }}>
-                              보관
-                            </span>
-                          )}
-                        </p>
-                        {isArchivedCornerQr(item) && (
-                          <p style={{ fontSize: '11px', color: colors.neutral500, margin: '2px 0 0 0' }}>
-                            화면 세트가 보관되어 이 QR은 열리지 않습니다 · 주소는 유지되며 보관 해제 시 다시 열립니다
-                          </p>
-                        )}
-                        {item.description && (
-                          <p style={{ fontSize: '12px', color: colors.neutral500, margin: '2px 0 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {item.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ),
-                },
-                {
-                  key: 'landingType',
-                  title: '유형',
-                  align: 'center',
-                  render: (_v, item) => (
-                    <span style={{ display: 'inline-flex', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', backgroundColor: colors.neutral100, color: colors.neutral600 }}>
-                      {LANDING_TYPE_LABELS[item.landingType] || item.landingType}
-                    </span>
-                  ),
-                },
-                {
-                  key: 'slug',
-                  title: 'URL',
-                  render: (_v, item) => (
-                    <span style={{ fontSize: '12px', fontFamily: 'monospace', color: colors.neutral500 }}>
-                      /qr/{item.slug}
-                    </span>
-                  ),
-                },
-                {
-                  key: 'scanCount',
-                  title: '스캔',
-                  align: 'center',
-                  render: (_v, item) => (
-                    (item.scanCount ?? 0) > 0 ? (
-                      <span style={{ fontSize: '12px', color: colors.primary, fontWeight: 600 }}>
-                        {item.scanCount}
-                      </span>
-                    ) : (
-                      <span style={{ fontSize: '12px', color: colors.neutral400 }}>-</span>
-                    )
-                  ),
-                },
-                {
-                  key: 'actions',
-                  title: '액션',
-                  align: 'right',
-                  render: (_v, item) => (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
-                      {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 QR 관리 진입 (내용 수정 / AI 다시 만들기 / QR 설정) */}
-                      {item.aiDescriptionMode && item.landingTargetId && (
-                        <>
-                          <Link
-                            to={`/store/content/direct/${item.landingTargetId}?edit=1`}
-                            onClick={(e) => e.stopPropagation()}
-                            style={styles.iconBtn}
-                            title="내용 수정 (본문 편집)"
-                          >
-                            <Pencil size={16} />
-                          </Link>
-                          <Link
-                            to={`/store/marketing/qr/ai-description?content=${item.landingTargetId}&qr=${encodeURIComponent(item.slug)}`}
-                            onClick={(e) => e.stopPropagation()}
-                            style={styles.iconBtn}
-                            title="AI 입력·다시 만들기"
-                          >
-                            <Sparkles size={16} />
-                          </Link>
-                        </>
-                      )}
-                      {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3:
-                          코너 QR(screen_set)은 QR 자체를 편집하는 대상이 아니라 **화면 세트**가 원본이다.
-                          landingTargetId = store_tablet_screen_sets.id → 그 세트의 편집 화면으로 바로 이동한다
-                          (태블릿 화면 제작 페이지의 '태블릿 콘텐츠' 탭 + 해당 세트 편집기 진입). */}
-                      {item.landingType === 'screen_set' && item.landingTargetId && (
-                        // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §E-1 (E2E 후속 수정):
-                        //   보관된 세트는 상세 조회(GET /screen-sets/:id)가 deleted_at IS NULL 게이트로 404 라
-                        //   편집기를 열 수 없다. 그대로 두면 '화면 세트 열기' 가 토스트만 띄우는 dead action 이 된다.
-                        //   → 보관 행은 편집기 자동 진입 대신 **태블릿 콘텐츠 목록(보관 해제 지점)** 으로 보낸다.
-                        <Link
-                          to="/store/commerce/tablet-displays"
-                          state={
-                            isArchivedCornerQr(item)
-                              ? { tab: 'contents', highlightScreenSetId: item.landingTargetId }
-                              : { tab: 'contents', editScreenSetId: item.landingTargetId, highlightScreenSetId: item.landingTargetId }
-                          }
-                          onClick={(e) => e.stopPropagation()}
-                          style={styles.iconBtn}
-                          title={
-                            isArchivedCornerQr(item)
-                              ? '태블릿 콘텐츠에서 보기 (보관 해제하면 편집·출력이 다시 열립니다)'
-                              : '화면 세트 열기 (코너 화면 편집)'
-                          }
-                        >
-                          <LayoutTemplate size={16} />
-                        </Link>
-                      )}
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setSettingsQr(item); }}
-                        style={styles.iconBtn}
-                        title="QR 설정 (제목·URL·상담 CTA)"
-                      >
-                        <Settings size={16} />
-                      </button>
-                      {/* WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1:
-                          QR_EXPORT_PRESETS 메뉴(A4 PDF/4분할/PNG/SVG)를 portal 로 띄워 DataTable
-                          overflow 클리핑 회피. handleExport 동작은 그대로 유지. */}
-                      {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1:
-                          보관 코너 QR 은 출력·다운로드 차단(서버도 409 로 동일 판정). */}
-                      {isArchivedCornerQr(item) ? (
-                        <button
-                          type="button"
-                          disabled
-                          style={{ ...styles.downloadBtn, opacity: 0.45, cursor: 'not-allowed' }}
-                          title="보관된 화면 세트의 QR은 출력할 수 없습니다. 보관을 해제하면 같은 주소로 다시 출력됩니다."
-                        >
-                          <Download size={14} />
-                          출력 불가
-                        </button>
-                      ) : (
-                        <QrExportMenu
-                          exporting={exportingId === item.id}
-                          onExport={(format, preset) => handleExport(item.id, format, preset)}
-                        />
-                      )}
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleShowAnalytics(item.id); }}
-                        style={{ ...styles.iconBtn, color: analyticsId === item.id ? colors.primary : colors.neutral400 }}
-                        title="스캔 통계"
-                      >
-                        {analyticsId === item.id ? <X size={16} /> : <BarChart3 size={16} />}
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleCopyUrl(item.slug, item.id); }}
-                        style={styles.iconBtn}
-                        title="QR URL 복사"
-                      >
-                        {copiedId === item.id ? <Check size={16} style={{ color: colors.primary }} /> : <Copy size={16} />}
-                      </button>
-                      <a
-                        href={`/qr/${item.slug}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+              renderTitleBadges={(item) =>
+                // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: AI 설명 QR 표식 (KPA 고유)
+                item.aiDescriptionMode ? (
+                  <span
+                    style={{
+                      marginLeft: 6,
+                      display: 'inline-flex',
+                      padding: '1px 7px',
+                      borderRadius: '999px',
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      backgroundColor: '#FEF3C7',
+                      color: '#B45309',
+                      verticalAlign: 'middle',
+                    }}
+                  >
+                    AI 설명{item.aiDescriptionMode === 'corner' ? '·코너' : ''}
+                  </span>
+                ) : null
+              }
+              renderRowActionsBefore={(item) => (
+                <>
+                  {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 내용 수정 / AI 다시 만들기 */}
+                  {item.aiDescriptionMode && item.landingTargetId && (
+                    <>
+                      <Link
+                        to={`/store/content/direct/${item.landingTargetId}?edit=1`}
                         onClick={(e) => e.stopPropagation()}
                         style={styles.iconBtn}
-                        title="QR 페이지 열기"
+                        title="내용 수정 (본문 편집)"
                       >
-                        <ExternalLink size={16} />
-                      </a>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                        <Pencil size={16} />
+                      </Link>
+                      <Link
+                        to={`/store/marketing/qr/ai-description?content=${item.landingTargetId}&qr=${encodeURIComponent(item.slug)}`}
+                        onClick={(e) => e.stopPropagation()}
                         style={styles.iconBtn}
-                        title="삭제"
+                        title="AI 입력·다시 만들기"
                       >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  ),
-                },
-              ] as Column<StoreQrCode>[]}
-              dataSource={filteredItems}
-              rowKey="id"
-              loading={loading}
-              emptyText={listFilter === 'all' ? '등록된 QR 코드가 없습니다' : '해당 조건의 QR이 없습니다'}
+                        <Sparkles size={16} />
+                      </Link>
+                    </>
+                  )}
+                  {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3 · §E-1:
+                      코너 QR 의 원본은 화면 세트다. 보관된 세트는 상세 조회가 404 라 편집기 대신
+                      태블릿 콘텐츠 목록(보관 해제 지점)으로 보낸다 — dead action 을 만들지 않는다. */}
+                  {item.landingType === 'screen_set' && item.landingTargetId && (
+                    <Link
+                      to="/store/commerce/tablet-displays"
+                      state={
+                        isArchivedCornerQr(item)
+                          ? { tab: 'contents', highlightScreenSetId: item.landingTargetId }
+                          : { tab: 'contents', editScreenSetId: item.landingTargetId, highlightScreenSetId: item.landingTargetId }
+                      }
+                      onClick={(e) => e.stopPropagation()}
+                      style={styles.iconBtn}
+                      title={
+                        isArchivedCornerQr(item)
+                          ? '태블릿 콘텐츠에서 보기 (보관 해제하면 편집·출력이 다시 열립니다)'
+                          : '화면 세트 열기 (코너 화면 편집)'
+                      }
+                    >
+                      <LayoutTemplate size={16} />
+                    </Link>
+                  )}
+                </>
+              )}
             />
 
             {/* Analytics Panel — DataTable 행 아래 펼침이 직접 지원 안 되므로 표 하단에 표시 */}

@@ -36,15 +36,27 @@ export type QrLandingType = 'page' | 'product' | 'link';
 export interface StoreQrCode {
   id: string;
   organizationId: string;
-  type: string;
   title: string;
   description: string | null;
   libraryItemId: string | null;
   landingType: string;
   landingTargetId: string | null;
+  /**
+   * WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1:
+   *   canonical 대상 축(PRODUCT|CONTENT|SCREEN_SET|EXTERNAL_LINK). 서버가 landingType 에서 파생한다.
+   *   DEAD residue 이던 `type` 은 이 계약에서 제거했다 — KPA 와 같은 의미만 남긴다.
+   */
+  targetKind?: string | null;
+  /** 내용의 원천. null = 판정 보류(HOLD) — 추측해서 표시하지 않는다. */
+  contentSource?: string | null;
   slug: string;
   isActive: boolean;
   scanCount: number;
+  /** 코너 QR(screen_set) 전용 — 태블릿 축이 자동 발급한 QR 도 같은 목록에 나온다. */
+  screenSetId?: string | null;
+  screenSetStatus?: 'active' | 'archived' | null;
+  /** 공개 /qr/:slug 가 실제로 열리는가(서버 판정). */
+  landable?: boolean;
   createdAt: string;
   updatedAt: string;
   consultationCtaEnabled: boolean;
@@ -87,7 +99,12 @@ export interface CreateQrInput {
   consultationCtaLabel?: string;
 }
 
-export async function fetchStoreQrCodes(params?: { page?: number; limit?: number }): Promise<StoreQrPage> {
+export async function fetchStoreQrCodes(params?: {
+  page?: number;
+  limit?: number;
+  /** 내린 QR 도 함께 받는다 — 목록에 남아야 다시 올릴 수 있다. */
+  includeInactive?: boolean;
+}): Promise<StoreQrPage> {
   const res = await api.get(BASE, { params });
   return unwrap<StoreQrPage>(res.data, 'QR 목록을 불러오지 못했습니다.');
 }
@@ -114,10 +131,16 @@ export async function updateStoreQrCode(
   return unwrap<StoreQrCode>(res.data, 'QR 을 수정하지 못했습니다.');
 }
 
-/** 비활성화(soft delete). 공개 랜딩은 즉시 404 가 된다. */
+/** 내리기(soft). 공개 랜딩은 즉시 404 가 되지만 주소·연결 대상은 그대로 남는다. */
 export async function deactivateStoreQrCode(id: string): Promise<void> {
   const res = await api.delete(`${BASE}/${id}`);
   unwrap<unknown>(res.data, 'QR 을 내리지 못했습니다.');
+}
+
+/** 다시 올리기. is_active 만 되돌린다 — 이미 인쇄된 QR 이 같은 곳을 다시 연다. */
+export async function reactivateStoreQrCode(id: string): Promise<void> {
+  const res = await api.post(`${BASE}/${id}/reactivate`, {});
+  unwrap<unknown>(res.data, 'QR 을 다시 올리지 못했습니다.');
 }
 
 export async function fetchQrAnalytics(id: string): Promise<QrAnalytics> {

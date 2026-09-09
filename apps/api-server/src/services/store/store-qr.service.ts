@@ -39,6 +39,12 @@ import {
   QR_LANDABLE_CONDITION,
   ARCHIVED_SCREEN_SET_QR_CONDITION,
 } from '../../routes/platform/store-screen-set-qr.service.js';
+// WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1:
+//   target(무엇을) 축과 content source(어디서) 축의 정본. `type` 컬럼은 더 이상 읽지도 쓰지도 않는다.
+import {
+  toQrTargetKind,
+  resolveQrContentSource,
+} from './store-qr-target.contract.js';
 
 /**
  * QR 연결(landing) 타입.
@@ -121,11 +127,11 @@ export async function resolvePublicQrLanding(
   const rows = await dataSource.query(
     `SELECT
        qr.id,
-       qr.type,
        qr.title,
        qr.description,
        qr.landing_type AS "landingType",
        qr.landing_target_id AS "landingTargetId",
+       qr.content_source AS "contentSource",
        qr.slug,
        qr.organization_id AS "organizationId",
        qr.consultation_cta_enabled AS "consultationCtaEnabled",
@@ -145,6 +151,10 @@ export async function resolvePublicQrLanding(
   if (rows.length === 0) return NOT_FOUND;
 
   const qrData = rows[0];
+
+  // WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-…-V1: 공개 랜딩 payload 도 canonical 2축을
+  //   그대로 노출한다(추가 조회 0 — landingType 파생 + 저장된 content_source).
+  qrData.targetKind = toQrTargetKind(qrData.landingType);
 
   // WO-O4O-SCREEN-SET-QR-LIFECYCLE-SYNC-V1: 비활성 Screen Set QR 은 archive 로 종료된 화면 →
   //   일반 404 대신 410 Gone + 종료 안내. 일반 QR 비활성은 기존대로 404.
@@ -405,6 +415,18 @@ export async function resolvePublicQrLanding(
 export interface ListQrParams {
   page?: unknown;
   limit?: unknown;
+  /**
+   * WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1 §17:
+   *   내린(비활성) QR 도 함께 보여 준다. 기본값 false 라 기존 호출은 그대로 활성만 받는다.
+   *   내린 QR 이 목록에서 사라지면 **다시 올릴 경로 자체가 없어** deactivate 가 사실상
+   *   되돌릴 수 없는 조작이 된다(주소는 살아 있는데 화면에서만 소실). 이 플래그가 그 구멍을 막는다.
+   */
+  includeInactive?: unknown;
+}
+
+/** 'true' | true | '1' 을 모두 참으로 본다(query string 은 문자열로 온다). */
+function isTruthyFlag(value: unknown): boolean {
+  return value === true || value === 'true' || value === '1';
 }
 
 export interface ListQrResult {
@@ -444,17 +466,23 @@ export async function listStoreQrCodes(
   const limit = Math.min(100, Math.max(1, parseInt(params.limit as string) || 20));
   const offset = (page - 1) * limit;
 
+  // 목록 WHERE 와 total WHERE 는 **반드시 같은 식**이어야 한다(페이지네이션 정합).
+  const activityFilter = isTruthyFlag(params.includeInactive)
+    ? ''
+    : `AND (qr.is_active = true OR ${ARCHIVED_SCREEN_SET_QR_CONDITION})`;
+
   const [items, countResult] = await Promise.all([
     dataSource.query(
       `SELECT
          qr.id,
          qr.organization_id AS "organizationId",
-         qr.type,
          qr.title,
          qr.description,
          qr.library_item_id AS "libraryItemId",
          qr.landing_type AS "landingType",
          qr.landing_target_id AS "landingTargetId",
+         -- WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-…-V1: 원천 축(NULL=판정 보류)
+         qr.content_source AS "contentSource",
          qr.slug,
          qr.is_active AS "isActive",
          qr.created_at AS "createdAt",
@@ -484,7 +512,7 @@ export async function listStoreQrCodes(
          AND dc.source_type = 'direct'
        ${SCREEN_SET_QR_JOIN}
        WHERE qr.organization_id = $1
-         AND (qr.is_active = true OR ${ARCHIVED_SCREEN_SET_QR_CONDITION})
+         ${activityFilter}
        ORDER BY qr.created_at DESC
        LIMIT $2 OFFSET $3`,
       [organizationId, limit, offset],
@@ -495,10 +523,17 @@ export async function listStoreQrCodes(
        FROM store_qr_codes qr
        ${SCREEN_SET_QR_JOIN}
        WHERE qr.organization_id = $1
-         AND (qr.is_active = true OR ${ARCHIVED_SCREEN_SET_QR_CONDITION})`,
+         ${activityFilter}`,
       [organizationId],
     ),
   ]);
+
+  // WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-…-V1:
+  //   targetKind 는 landing_type 에서 파생되는 값이라 저장하지 않고 여기서 붙인다
+  //   (KPA·Pharmacy-Hub 공통 QR 운영 화면이 같은 어휘로 그룹핑·필터링한다).
+  for (const item of items) {
+    item.targetKind = toQrTargetKind(item.landingType);
+  }
 
   return { items, page, limit, total: countResult[0]?.total || 0 };
 }
@@ -634,10 +669,11 @@ export async function createStoreQrCode(
 ): Promise<QrResult<CreateQrResult>> {
   const qrRepo = dataSource.getRepository(StoreQrCode);
 
+  // WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-…-V1:
+  //   `type` 은 더 이상 body 에서 받지 않는다(보내와도 무시). canonical 축은 landingType 이다.
   const {
     title,
     description,
-    type,
     libraryItemId,
     landingType,
     landingTargetId,
@@ -696,7 +732,7 @@ export async function createStoreQrCode(
 
     const createdSet = qrRepo.create({
       organizationId,
-      type: 'screen_set',
+      contentSource: 'TABLET_SCREEN_SET',
       title: title.trim(),
       description: description || null,
       libraryItemId: null,
@@ -752,9 +788,17 @@ export async function createStoreQrCode(
       ? consultationCtaLabel.trim().slice(0, 100)
       : null;
 
+  // 원천 판정은 **실제 참조 관계로만** 한다 — 확인되지 않으면 null(HOLD) 로 남긴다.
+  const contentSource = await resolveQrContentSource(dataSource, {
+    organizationId,
+    landingType,
+    landingTargetId: resolvedLandingTargetId,
+    libraryItemId: resolvedLibraryItemId,
+  });
+
   const item = qrRepo.create({
     organizationId,
-    type: type || landingType,
+    contentSource,
     title: title.trim(),
     description: description || null,
     libraryItemId: resolvedLibraryItemId,
@@ -823,10 +867,10 @@ export async function updateStoreQrCode(
   const item = await qrRepo.findOne({ where: { id, organizationId } });
   if (!item) return NOT_FOUND;
 
+  // `type` 은 수용하지 않는다 (WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-…-V1).
   const {
     title,
     description,
-    type,
     libraryItemId,
     landingType,
     landingTargetId,
@@ -837,10 +881,19 @@ export async function updateStoreQrCode(
 
   if (title !== undefined) item.title = String(title).trim();
   if (description !== undefined) item.description = description;
-  if (type !== undefined) item.type = type;
   if (libraryItemId !== undefined) item.libraryItemId = libraryItemId;
   if (landingType !== undefined) item.landingType = landingType;
   if (landingTargetId !== undefined) item.landingTargetId = landingTargetId;
+
+  // 연결 대상이 바뀌면 원천 축도 같은 규칙으로 다시 판정한다(추측 없음 · 실패 시 null).
+  if (landingType !== undefined || landingTargetId !== undefined || libraryItemId !== undefined) {
+    item.contentSource = await resolveQrContentSource(dataSource, {
+      organizationId,
+      landingType: item.landingType,
+      landingTargetId: item.landingTargetId ?? null,
+      libraryItemId: item.libraryItemId ?? null,
+    });
+  }
 
   // 상담 CTA 는 page 타입에서만 ON 을 허용한다.
   if (consultationCtaEnabled !== undefined) {
@@ -880,4 +933,26 @@ export async function deactivateStoreQrCode(
   item.isActive = false;
   await qrRepo.save(item);
   return { ok: true, data: { id, deactivated: true } };
+}
+
+/**
+ * 다시 올리기 — 내린 QR 을 되살린다.
+ *
+ * WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1 §17.
+ * `is_active` 만 되돌린다. **slug · landing_type · landing_target_id 는 건드리지 않는다** —
+ * 이미 인쇄돼 매장 밖에 나가 있는 QR 이 같은 주소로 같은 곳을 다시 열어야 하기 때문이다.
+ * 대상이 사라진 QR 은 되살려도 공개 랜딩이 열리지 않는다(landable 판정이 별도 축이다).
+ */
+export async function reactivateStoreQrCode(
+  dataSource: DataSource,
+  organizationId: string,
+  id: string,
+): Promise<QrResult<{ id: string; reactivated: true }>> {
+  const qrRepo = dataSource.getRepository(StoreQrCode);
+  const item = await qrRepo.findOne({ where: { id, organizationId } });
+  if (!item) return NOT_FOUND;
+
+  item.isActive = true;
+  await qrRepo.save(item);
+  return { ok: true, data: { id, reactivated: true } };
 }

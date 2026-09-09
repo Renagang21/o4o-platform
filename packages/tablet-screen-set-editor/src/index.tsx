@@ -668,7 +668,7 @@ function poolEntries(pool: ScreenSetProductPool | null): PoolEntry[] {
 export interface ScreenSetQrOption {
   id: string;
   title: string;
-  type?: string | null;
+  /** canonical target 축. `store_qr_codes.type` 은 DEAD residue 라 더 이상 받지 않는다. */
   landingType?: string | null;
   landingTargetId?: string | null;
   slug?: string | null;
@@ -888,7 +888,7 @@ function ProductSelectEditor({ selected, onChange, fetchProductPool, fetchStoreQ
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium text-slate-800 truncate">{o.title || '(제목 없음)'}</div>
                         <div className="text-[11px] text-slate-400 truncate">
-                          {qrTypeLabel(o.type ?? o.landingType)}{o.slug ? ` · /qr/${o.slug}` : ''}
+                          {qrTypeLabel(o.landingType)}{o.slug ? ` · /qr/${o.slug}` : ''}
                         </div>
                       </div>
                       {sel && <span className="text-[11px] font-semibold text-indigo-600 flex-shrink-0">현재 선택</span>}

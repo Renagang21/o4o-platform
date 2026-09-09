@@ -358,6 +358,8 @@ export function createPharmacyHubRoutes(): Router {
   router.get('/store-owner/qr/:id/export', ...storeOwnerGuards, PharmacyHubStoreQrController.exportFile);
   router.put('/store-owner/qr/:id', ...storeOwnerGuards, PharmacyHubStoreQrController.update);
   router.delete('/store-owner/qr/:id', ...storeOwnerGuards, PharmacyHubStoreQrController.deactivate);
+  // 내린 QR 을 다시 올린다. 상태 변경이므로 GET 이 아닌 POST 다 (CLAUDE.md §8).
+  router.post('/store-owner/qr/:id/reactivate', ...storeOwnerGuards, PharmacyHubStoreQrController.reactivate);
 
   /**
    * 공개 QR 랜딩 (인증 없음) — QR payload 가 https://pharmacyhub.co.kr/qr/{slug} 이므로

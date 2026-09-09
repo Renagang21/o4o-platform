@@ -60,7 +60,6 @@ const fetchStoreQrOptions = async () => {
   return (res?.data?.items ?? []).map((q) => ({
     id: q.id,
     title: q.title,
-    type: q.type,
     landingType: q.landingType,
     landingTargetId: q.landingTargetId,
     slug: q.slug,

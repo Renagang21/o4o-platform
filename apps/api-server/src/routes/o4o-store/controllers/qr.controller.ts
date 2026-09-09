@@ -58,6 +58,8 @@ import type { AuthRequest } from '../../../types/auth.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 // WO-O4O-KPA-QR-TARGET-COPY-GUARD-V1: 운영자 템플릿 변환 시 content_hub 원본 → 매장 사본 치환
 import { ensureStoreCopyForPageTarget } from '../services/qr-content-hub-copy.service.js';
+// WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1: 원천 축 단일 resolver.
+import { resolveQrContentSource } from '../../../services/store/store-qr-target.contract.js';
 
 const DEFAULT_SERVICE_KEY = 'kpa';
 
@@ -239,9 +241,18 @@ export function createStoreQrStaffController(
         ? `${ORIGIN_PREFIX}${sourceDescription}`
         : ORIGIN_PREFIX.trim();
 
+      // WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1:
+      //   DEAD 컬럼 `type` 대신 원천 축(content_source)을 실제 참조 관계로 판정해 남긴다.
+      const contentSource = await resolveQrContentSource(dataSource, {
+        organizationId: pharmacy.id,
+        landingType,
+        landingTargetId,
+        libraryItemId: importLibraryItemId,
+      });
+
       const copy = qrRepo.create({
         organizationId: pharmacy.id,
-        type: landingType, // store-qr-landing.controller 의 fallback 패턴 (type ?? landingType)
+        contentSource,
         title: source.title,
         description: copiedDescription,
         libraryItemId: importLibraryItemId,

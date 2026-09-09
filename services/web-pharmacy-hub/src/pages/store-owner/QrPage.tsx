@@ -22,6 +22,7 @@ import {
   createStoreQrCode,
   updateStoreQrCode,
   deactivateStoreQrCode,
+  reactivateStoreQrCode,
   fetchQrAnalytics,
   downloadQrExport,
   type StoreQrCode,
@@ -30,16 +31,14 @@ import {
   type QrLandingType,
   type CreateQrInput,
 } from '../../lib/api/pharmacyHubStoreQr';
+import { StoreQrOperationBoard } from '@o4o/store-ui-core';
 import { StoreConnectionNotice, type StoreConnectionState } from '../../components/store-owner/StoreConnectionNotice';
 
-const LANDING_LABELS: Record<string, string> = {
-  page: '콘텐츠',
-  product: '제품',
-  link: '외부 링크',
-  video: '동영상',
-  screen_set: '태블릿 화면',
-  promotion: '프로모션',
-};
+/**
+ * 목록의 대상 표기는 `@o4o/store-ui-core` 의 targetKind/contentSource 어휘로 통일했다
+ * (KPA 와 같은 의미를 같은 라벨로 보여준다). 아래 생성 폼의 landingType select 는
+ * 사용자가 고르는 축이라 별도 문구를 유지한다.
+ */
 
 export default function StoreOwnerQrPage() {
   const [items, setItems] = useState<StoreQrCode[]>([]);
@@ -50,10 +49,12 @@ export default function StoreOwnerQrPage() {
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<StoreQrCode | null>(null);
   const [analyticsFor, setAnalyticsFor] = useState<{ qr: StoreQrCode; data: QrAnalytics } | null>(null);
+  const [exportingId, setExportingId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
-    fetchStoreQrCodes({ page: 1, limit: 100 })
+    fetchStoreQrCodes({ page: 1, limit: 100, includeInactive: true })
       .then((p) => {
         setConnection(p.storeConnection);
         setItems(p.items);
@@ -93,11 +94,41 @@ export default function StoreOwnerQrPage() {
     }
   };
 
-  const handleDownload = async (qr: StoreQrCode, format: 'png' | 'svg' | 'pdf') => {
+  /**
+   * 다시 올리기 — `is_active` 만 되돌린다. 주소·연결 대상은 그대로라
+   * 이미 인쇄해서 나가 있는 QR 이 같은 곳을 다시 연다.
+   */
+  const handleReactivate = async (qr: StoreQrCode) => {
     try {
-      await downloadQrExport(qr, format, format === 'pdf' ? 'a4' : 'large');
+      await reactivateStoreQrCode(qr.id);
+      load();
+    } catch (e: any) {
+      window.alert(e?.message || '처리하지 못했습니다.');
+    }
+  };
+
+  const handleExport = async (
+    qr: StoreQrCode,
+    format: 'png' | 'svg' | 'pdf',
+    preset: 'small' | 'medium' | 'large' | 'a4' | 'a4_4up',
+  ) => {
+    setExportingId(qr.id);
+    try {
+      await downloadQrExport(qr, format, preset);
     } catch (e: any) {
       window.alert(e?.message || '파일을 만들지 못했습니다.');
+    } finally {
+      setExportingId(null);
+    }
+  };
+
+  const handleCopyUrl = async (qr: StoreQrCode) => {
+    try {
+      await navigator.clipboard.writeText(`${publicOrigin}/qr/${qr.slug}`);
+      setCopiedId(qr.id);
+      window.setTimeout(() => setCopiedId((prev) => (prev === qr.id ? null : prev)), 1500);
+    } catch {
+      window.alert('주소를 복사하지 못했습니다.');
     }
   };
 
@@ -120,6 +151,8 @@ export default function StoreOwnerQrPage() {
           <h1 className="text-xl font-bold">QR</h1>
           <p className="mt-1 text-sm text-gray-500">
             매장 자료·제품·외부 링크로 연결되는 QR 을 만들고 출력합니다. 스캔 횟수도 함께 확인할 수 있습니다.
+            <br />
+            상품마다 고정된 <b>상품 대표 QR</b> 은 취급제품 화면에서 따로 출력하며 이 목록에는 나타나지 않습니다.
           </p>
         </div>
         {connection?.status === 'connected' && (
@@ -147,75 +180,19 @@ export default function StoreOwnerQrPage() {
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white">
-          {items.map((qr) => (
-            <li key={qr.id} className="px-4 py-3">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-gray-900">{qr.title}</p>
-                  <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-400">
-                    <span className="rounded bg-gray-100 px-1.5 py-0.5 text-gray-600">
-                      {LANDING_LABELS[qr.landingType] ?? qr.landingType}
-                    </span>
-                    <span>스캔 {qr.scanCount}회</span>
-                    <a
-                      href={`${publicOrigin}/qr/${qr.slug}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      /qr/{qr.slug}
-                    </a>
-                  </p>
-                </div>
-                <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleDownload(qr, 'png')}
-                    className="rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
-                  >
-                    PNG
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDownload(qr, 'svg')}
-                    className="rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
-                  >
-                    SVG
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDownload(qr, 'pdf')}
-                    className="rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
-                  >
-                    인쇄용 PDF
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleAnalytics(qr)}
-                    className="rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
-                  >
-                    스캔 통계
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditing(qr)}
-                    className="rounded-md border border-gray-200 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
-                  >
-                    이름 수정
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDeactivate(qr)}
-                    className="rounded-md border border-gray-200 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50"
-                  >
-                    내리기
-                  </button>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <StoreQrOperationBoard<StoreQrCode>
+          items={items}
+          publicUrl={(qr) => `${publicOrigin}/qr/${qr.slug}`}
+          onExport={handleExport}
+          exportingId={exportingId}
+          onOpenSettings={(qr) => setEditing(qr)}
+          onShowAnalytics={handleAnalytics}
+          onCopyUrl={handleCopyUrl}
+          copiedId={copiedId}
+          onDeactivate={handleDeactivate}
+          onReactivate={handleReactivate}
+          labels={{ settings: '이름 수정' }}
+        />
       )}
 
       {editing && (
