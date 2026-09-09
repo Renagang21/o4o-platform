@@ -151,18 +151,32 @@ export async function executeAiTool(
  *
  * V0 는 모델이 tool 을 자유 선택하게 하지 않는다. 이 목록에 걸리고 **자격도 통과할 때만**
  * 매장 컨텍스트를 붙인다. 자격이 없으면 tool 을 고르지 않고 그대로 텍스트 응답으로 간다.
+ *
+ * ⚠️ 한글을 **정규식 리터럴에 직접 쓰지 않는다.**
+ *
+ * 2026-09-09 프로덕션 실측: 같은 코드에서 영어 패턴(`my store`)은 매칭됐는데
+ * 한글 패턴(`/내\s*매장/`)은 매칭되지 않았다. 로컬 jest(.ts 직접 실행)에서는 둘 다 통과한다.
+ * 차이는 번들링뿐이다 — esbuild 기본 `charset: 'ascii'` 는 **문자열 리터럴**의 비-ASCII 를
+ * `\uXXXX` 로 이스케이프하지만 **정규식 리터럴**은 그렇게 하지 못한다.
+ * (같은 배포에서 한글 *문자열*(`renderToolContext` 출력)은 모델까지 정상 전달됐다.)
+ *
+ * 그래서 키워드를 `\uXXXX` 이스케이프로 두어 **소스를 순수 ASCII 로** 만든다.
+ * 공백 변형("내 매장" / "내매장" / "내  매장")은 비교 전에 공백을 제거해 흡수한다.
  */
-const STORE_INTENT_PATTERNS: readonly RegExp[] = [
-  /내\s*매장/,
-  /우리\s*매장/,
-  /our\s+store/i,
-  /my\s+store/i,
-  /내\s*약국/,
-  /우리\s*약국/,
+const STORE_INTENT_KEYWORDS_KO: readonly string[] = [
+  '\uB0B4\uB9E4\uC7A5', // 내매장
+  '\uC6B0\uB9AC\uB9E4\uC7A5', // 우리매장
+  '\uB0B4\uC57D\uAD6D', // 내약국
+  '\uC6B0\uB9AC\uC57D\uAD6D', // 우리약국
 ];
 
+/** ASCII 전용이라 번들 영향이 없다. */
+const STORE_INTENT_PATTERNS_EN: readonly RegExp[] = [/my\s+store/i, /our\s+store/i, /my\s+pharmacy/i];
+
 export function looksLikeStoreScopedRequest(message: string): boolean {
-  return STORE_INTENT_PATTERNS.some((re) => re.test(message));
+  const compact = message.replace(/\s+/g, '');
+  if (STORE_INTENT_KEYWORDS_KO.some((k) => compact.includes(k))) return true;
+  return STORE_INTENT_PATTERNS_EN.some((re) => re.test(message));
 }
 
 /**

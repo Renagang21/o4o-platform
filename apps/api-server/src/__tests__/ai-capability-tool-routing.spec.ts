@@ -17,6 +17,8 @@ jest.mock('../utils/logger.js', () => ({
   default: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), debug: jest.fn() },
 }));
 
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import {
   AiCapability,
   AI_TOOL_NAMES,
@@ -223,13 +225,52 @@ describe('executor — read-only · 식별자 미노출', () => {
 // ─── 결정론적 선택 ───────────────────────────────────────────────────────────
 
 describe('12. 결정론적 tool 선택 (agent loop 없음)', () => {
-  it('매장 지시어를 인식한다', () => {
-    for (const m of ['내 매장 기준으로 알려줘', '우리 약국에 맞게', 'my store setup']) {
+  it('매장 지시어를 인식한다 (한글 공백 변형 포함)', () => {
+    for (const m of [
+      '내 매장 기준으로 알려줘',
+      '내매장 기능',       // 공백 없음
+      '내  매장 기능',     // 공백 2칸
+      '우리 약국에 맞게',
+      'my store setup',
+      'List features in MY  STORE',
+    ]) {
       expect(looksLikeStoreScopedRequest(m)).toBe(true);
     }
-    for (const m of ['약국 POP 원칙 알려줘', '안녕하세요']) {
+    for (const m of ['약국 POP 원칙 알려줘', '안녕하세요', 'store hours']) {
       expect(looksLikeStoreScopedRequest(m)).toBe(false);
     }
+  });
+
+  /**
+   * 회귀 고정 — 2026-09-09 프로덕션 실측 결함.
+   *
+   * 한글을 정규식 리터럴(`/내\s*매장/`)로 두면 번들 후 매칭이 실패했다(영어 패턴만 동작).
+   * 소스가 순수 ASCII 로 유지되는지 확인해 같은 실수를 막는다.
+   */
+  it('한글 의도 키워드가 정규식이 아닌 ASCII 이스케이프 문자열로 유지된다', () => {
+    const src = readFileSync(
+      join(__dirname, '..', 'services', 'ai-tools', 'ai-tool-router.ts'),
+      'utf8',
+    );
+    // 키워드 선언부에 한글 원문이 들어가면 안 된다(주석은 허용).
+    const declStart = src.indexOf('STORE_INTENT_KEYWORDS_KO: readonly string[] = [');
+    // 선언 블록만 잘라낸다 — 뒤따르는 주석까지 포함하면 주석 속 한글에 걸린다.
+    const decl = src.slice(declStart, src.indexOf('];', declStart) + 2);
+    const codeOnly = decl
+      .split('\n')
+      .map((l) => l.split('//')[0])
+      .join('\n');
+    expect(codeOnly).not.toMatch(/[가-힣]/);
+    expect(codeOnly).toMatch(/\\u[0-9A-F]{4}/);
+    // 정규식 리터럴에 한글이 다시 들어오지 않았는지도 본다.
+    // 주석에는 설명용으로 옛 패턴이 남아 있으므로 **주석을 먼저 제거**하고 검사한다.
+    const codeWithoutComments = src
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .split('\n')
+      .map((l) => l.replace(/\/\/.*$/, ''))
+      .join('\n');
+    const regexLiterals = codeWithoutComments.match(/\/(?![/*])(?:\\.|[^/\n])+\/[gimsuy]*/g) ?? [];
+    expect(regexLiterals.filter((r) => /[가-힣]/.test(r))).toEqual([]);
   });
 
   it('자격이 있을 때만 매장 tool 을 고른다', () => {
