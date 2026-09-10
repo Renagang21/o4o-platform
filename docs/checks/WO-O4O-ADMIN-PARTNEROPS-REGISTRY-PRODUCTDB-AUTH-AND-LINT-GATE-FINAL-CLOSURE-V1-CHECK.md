@@ -225,18 +225,151 @@ CI Pipeline 에 저장소 전역 ratchet 직후 **차단 단계**를 추가했�
 
 | 워크플로 | 트리거 | 결과 |
 |---|---|---|
-| CI Pipeline | O | (기록 예정) |
-| CodeQL Security Analysis | O | (기록 예정) |
-| Deploy API Server (Cloud Run) | O | (기록 예정) |
-| Deploy Admin Dashboard (Cloud Run) | O | (기록 예정) |
-| Deploy Web Services (Cloud Run) | O | (기록 예정) |
+| CI Pipeline | O | **cancelled** (직후 push 가 concurrency group 선점 — success 로 기록하지 않는다) |
+| CodeQL Security Analysis | O | c5147876d **cancelled** → 교정 커밋 `f2fb1eed0` **success** |
+| Deploy API Server (Cloud Run) | O | c5147876d **failure**(§6-A) → `f2fb1eed0` **success** |
+| Deploy Admin Dashboard (Cloud Run) | O | success |
+| Deploy Web Services (Cloud Run) | O | success |
 | AppStore Guard | **X — 미트리거** | path filter(`packages/**/manifest.ts` · `packages/**/lifecycle/**` · `appsCatalog.ts`)에 본 WO 변경이 해당하지 않는다. **미트리거를 success 로 기록하지 않는다.** 대신 로컬에서 직접 실행해 PASS 를 확인했다(§5). |
+
+---
+
+## 6-A. 운영 migration 1차 실행 실패와 교정 (숨기지 않는다)
+
+`c5147876d` 의 **Deploy API Server 는 실패**했다. 실패 지점은 `Run database migrations` 단계이며,
+Cloud Run Job 실행 `o4o-api-migrations-tfl9t` 이 아래 메시지로 중단했다.
+
+```
+[DeactivateRetiredPartnerOpsAppRegistry] ABORT: 예상 변경 1행 / 실제 2 행.
+영향 범위가 전제와 달라 중지한다.
+```
+
+### 판정 — 운영 데이터 문제가 아니라 코드 결함
+
+- 선행 가드 `SELECT count(*) FROM app_registry WHERE appId='partnerops'` 는 통과했다.
+  즉 **운영 `app_registry` 의 `partnerops` 는 정확히 1행**이다 (§11 의 "행 수 ≠ 1" 중지 조건 아님).
+- 실제 원인: TypeORM pg 드라이버는 `UPDATE ... RETURNING` 을 **`[rows, affectedCount]` 튜플**로
+  돌려준다. 튜플을 그대로 세면 길이가 **항상 2** 이므로, 정상적인 1행 변경도 거짓 ABORT 한다.
+  이는 저장소에 이미 기록된 함정이다(`unique_active_role_per_user` 계열 WO 의 동일 사례).
+
+### 안전 측면
+
+- migration 은 트랜잭션 안에서 실행됐고 **`ROLLBACK` 되었다. 운영 DB 는 무변경**이다.
+- 즉 **안전 가드가 설계대로 작동**해 전제와 다른 상황에서 쓰기를 하지 않았다.
+- §9 에 따라 migration 성공 전에 운영 DB 를 직접 UPDATE 하지 않았다.
+
+### 교정 — `f2fb1eed0`
+
+```ts
+const updatedRows =
+  Array.isArray(updateResult) && Array.isArray(updateResult[0]) ? updateResult[0] : updateResult;
+const affected = Array.isArray(updatedRows) ? updatedRows.length : 0;
+```
+
+rows 배열만 돌려주는 드라이버 형태도 함께 받는다. 가드·트랜잭션·멱등성·사후 검증은 그대로다.
+회귀 테스트(`RETURNING 결과를 [rows, count] 튜플로 풀어서 센다`)로 재발을 차단했다.
+
+### 부수 관측
+
+`c5147876d` 의 **CI Pipeline · CodeQL 은 `cancelled`** 이다. 실패가 아니라, 직후 다른 세션의
+push(`307b09329`)가 같은 concurrency group 을 선점해 취소된 것이다(저장소의 상시 패턴).
+**cancelled 를 success 로 기록하지 않는다.** 본 WO 커밋은 후속 tip 커밋의 조상이므로 tip 실행이
+동일 코드를 포함해 검증한다.
+
+---
+
+## 6-B. 운영 반영 결과 (교정 후)
+
+교정 커밋 `f2fb1eed0` 배포에서 **API 서비스 revision `o4o-core-api-03591-npn`(생성 04:32:58Z)가
+기동 시 migration 을 실행해 04:33:24Z 에 적용**했다. 이어진 workflow 의 migration Job
+`o4o-api-migrations-kr6zx`(04:33:41Z)은 `No pending migrations` 로 정상 종료했다.
+(이 저장소의 API 배포는 서비스 기동 시 migration 이 먼저 돌고, 전용 Job 이 뒤따르는 순서다.)
+
+### 운영 DB 실측 (read-only SELECT · Cloud SQL Auth Proxy)
+
+| 항목 | 실측 |
+|---|---|
+| `app_registry` 의 `partnerops` | `status = inactive` (`updatedAt = 2026-09-10 04:33:24Z`) |
+| `partnerops` 행 수 | **1** — §11 의 "행 수 ≠ 1" 중지 조건 아님 |
+| `partnerops` 를 의존으로 선언한 앱 | **0** |
+| `typeorm_migrations` | `669 DeactivateRetiredPartnerOpsAppRegistry20270404000000` |
+
+### 운영 API 실측
+
+`GET /api/v1/apps/availability` → `{"appId":"partnerops","active":false}`
+§5.4 의 "absent 또는 `active=false`" 를 만족한다(§12 해석은 아래 7절 참조).
+
+### §10.3 두 페르소나 실측 (`https://api.neture.co.kr`)
+
+자격정보는 로컬 SSOT 문서에서 스크립트가 직접 읽어 사용했고, **도구 인자·로그·본 문서 어디에도
+기록하지 않는다.** 출력은 상태 코드만 수집했다.
+
+| 페르소나 | 보유 역할 | 대표 read | 대표 write |
+|---|---|---|---|
+| 플랫폼 관리자 | `platform:super_admin` 포함 | `GET .../masters/:id/store-descriptions` → **200** | `POST` 동일 경로 → 404(대상 부재, **403 아님**) |
+| 서비스 역할 | `kpa:store_owner` · `cosmetics:store_owner` · `pharmacy-hub:store_owner` · `supplier` · `lms:instructor` (플랫폼 역할 없음) | **403** (`store-descriptions`, `image-quality`) | **403** (`store-descriptions` POST, `masters` POST) |
+| 비인증 | — | **401** | — |
+
+서비스 운영자 제출 경로 비회귀:
+`GET /api/v1/operator/store-product-requests` → **200**,
+`GET /api/v1/operator/product-candidates` → **400**(파라미터 검증, 권한 차단 아님).
+
+> 8개 역할 전수 403 은 요청 수준 Jest 스위트(`product-db-write-authority.test.ts`)가 고정한다.
+> 운영에는 `cosmetics:admin` · `neture:operator` 등을 **플랫폼 역할 없이** 보유한 계정이 없어
+> (유일 보유 계정이 `platform:super_admin` 을 함께 가진다) 운영 실측은 위 3 페르소나로 수행했다.
+
+### §10.4 브라우저 검증
+
+**수행하지 않았다.** 안전하게 재사용할 수 있는 기존 인증 세션이 없고, WO §10.4 는
+"비밀번호를 자동화 인자에 전달하지 않는다 · 안전한 인증 세션이 없다면 API 두 페르소나 실측과
+선행 로그인 smoke 를 근거로 삼고 로그인 브라우저 검증을 억지로 수행하지 않는다" 를 정하고 있다.
+근거는 위 §10.3 실측으로 대체한다.
 
 ---
 
 ## 7. 완료 조건 (§12)
 
-(운영 검증 후 확정)
+```text
+PARTNEROPS_PRODUCTION_REGISTRY_ACTIVE      = ZERO
+PARTNEROPS_AVAILABILITY                    = ACTIVE_FALSE   (아래 주석)
+PARTNER_CORE                               = PRESERVED
+PARTNEROPS_SERVICE_GROUP                   = PRESERVED
+PRODUCT_DB_PLATFORM_ADMIN_ROLE             = platform:super_admin
+PRODUCT_DB_SERVICE_ROLE_DIRECT_ACCESS      = DENIED
+PRODUCT_DB_ROLE_DECLARATION_DUPLICATION    = ZERO
+SERVICE_PRODUCT_SUBMISSION_REGRESSION      = PASS
+MENU_ROUTE_API_AUTH_ALIGNMENT              = PASS
+ADMIN_LINT_BYPASS                          = ZERO
+ADMIN_LINT_WARNING_RATCHET                 = ACTIVE
+NEW_LINT_ERROR_GATE                        = PASS
+NEW_LINT_WARNING_GATE                      = PASS
+
+CodeQL Security Analysis                   = SUCCESS   (f2fb1eed0)
+Deploy API Server (Cloud Run)              = SUCCESS   (f2fb1eed0)
+Deploy Admin Dashboard (Cloud Run)         = SUCCESS   (c5147876d)
+Deploy Web Services (Cloud Run)            = SUCCESS   (c5147876d)
+AppStore Guard                             = NOT_TRIGGERED (로컬 실행 PASS)
+CI Pipeline                                = 아래 주석
+Production migration                       = SUCCESS   (04:33:24Z 적용 · 1행)
+
+ADMIN_PARTNEROPS_REGISTRY_PRODUCTDB_AUTH_AND_LINT_GATE_FINAL_CLOSURE = CLOSED
+```
+
+**`PARTNEROPS_AVAILABILITY` 해석** — §12 의 문자 그대로의 ZERO 는 달성하지 않았다.
+`GET /api/v1/apps/availability` 는 `listInstalled()` 로 전 행을 돌려주므로 `status='inactive'` 인
+`partnerops` 가 `active:false` 로 남는다. **비활성화를 삭제보다 우선한다**는 §5.2 를 따른 결과이며,
+삭제 선례(`20270219000000-RemoveLegacyCosmeticsPartnerAppRegistry`)와의 차이를 migration docblock 과
+본 문서에 남긴다. §5.4 의 판정 기준("absent 또는 `active=false`")은 충족한다.
+문자 그대로의 ZERO 가 필요하면 availability 응답에서 inactive 를 제외하는 별도 판단이 필요하다.
+
+**`CI Pipeline`** — 본 WO 의 두 커밋 모두 `cancelled` 이다. 실패가 아니라 직후 push 가 같은
+concurrency group 을 선점한 결과이며, 이 저장소의 상시 패턴이다(`307b09329` · `4a6fd09cd` 도 동일).
+**cancelled 를 success 로 기록하지 않는다.** 본 WO 코드를 포함한 이후 tip 커밋의 CI Pipeline 결과로
+대체 확인한다.
+
+**부수 영향 (숨기지 않는다)** — 교정 전 결함이 다른 세션 커밋 `307b09329` 의
+Deploy API Server 도 실패시켰다(04:25~04:26). `f2fb1eed0` 배포로 해소되었고 그 세션의 코드 변경에는
+영향이 없다.
 
 ---
 
