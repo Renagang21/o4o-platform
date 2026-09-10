@@ -3,7 +3,7 @@
 > **WO**: WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1 — 내 매장 「매장 실행」 홈 (Tablet + QR v1)
 > **일자**: 2026-09-10
 > **브랜치**: `work/store-execution-home-tablet-qr-v1`
-> **판정**: **PASS** (완료 조건 5/5)
+> **판정**: **PASS** (완료 조건 7/7) · **상태: CLOSED** (2026-09-10, 배포 후 프로덕션 확인 완료 — §14 · §15)
 > **선행 정본**: [`DESIGN-O4O-STORE-EXECUTION-MANAGEMENT-CANONICAL-V1`](../design/DESIGN-O4O-STORE-EXECUTION-MANAGEMENT-CANONICAL-V1.md) · [`IR-O4O-STORE-EXECUTION-ASSET-LOCATION-AND-UI-CENSUS-V1`](../investigations/IR-O4O-STORE-EXECUTION-ASSET-LOCATION-AND-UI-CENSUS-V1.md)
 
 ---
@@ -36,6 +36,8 @@ PH 에만 있던 `[매장 실행]` 개념을 공통 Core 로 승격했고, 두 �
 | 3 | KPA / PH PARITY | **PASS** | 동일 Core View. `serviceKey` 분기 **0** (raw-source 테스트로 고정) |
 | 4 | NO FABRICATED ANALYTICS | **PASS** | 노출 수치는 QR scan 뿐. 태블릿 노출수·재생수·도달률 필드 자체가 없음 |
 | 5 | SCHEMA CHANGE = 0 | **PASS** | migration 0 · 신규 table 0 · corner entity 0 · 신규 API 0 (§9) |
+| 6 | PRODUCTION DEPLOYMENT | **PASS** | main FF `e215beca4` · `deploy-kpa-society` · `deploy-pharmacy-hub` success (§14-1 · §14-2) |
+| 7 | PRODUCTION SMOKE | **PASS** | 프로덕션 도메인 desktop·mobile 4종 · console error 0 · dead link 0 (§14-3 ~ §14-5) |
 
 ---
 
@@ -378,3 +380,52 @@ desktop · mobile 양쪽에서 동일하게 dead link 0 이다.
 프로덕션 화면에서도 코너 표현이 KPA 는 한글 명칭(`구강관리 코너` · `피부관리 코너`),
 PH 는 그리드 코드(`A-2` · `C-2` · `F-2`) 로 갈린다는 사실이 재확인됐다.
 QR placement 데이터가 쌓여 두 표현이 어떻게 반복되는지 본 뒤 승격하는 것이 안전하다 — §12 유지.
+
+---
+
+## 15. 최종 판정 — CLOSED
+
+```text
+STORE EXECUTION HOME V1     = PASS
+TABLET / QR OPERATION VIEW  = PASS
+KPA / PH PARITY             = PASS
+NO FABRICATED ANALYTICS     = PASS
+SCHEMA CHANGE               = 0
+PRODUCTION DEPLOYMENT       = PASS
+PRODUCTION SMOKE            = PASS
+
+WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1 = CLOSED
+```
+
+이번 회차에서 남길 결론은 세 가지다.
+
+1. **KPA 와 PH 가 같은 실행 관리 개념으로 수렴했다.** PH 에만 있던 `[매장 실행]` 이 공통 Core 가 됐고
+   두 서비스가 같은 View 파일을 쓴다 (`serviceKey` 분기 0).
+2. **placement 0건이라는 실제 상태를 숨기지 않았다.** 모든 QR 이 「미배치 QR」로 표시된다.
+   보기 좋게 만들기 위한 backfill · 더미 placement 는 만들지 않았다 (프로덕션 write 0).
+3. **검증되지 않은 POP · Signage · ESL 을 끼워 넣지 않았다.** placeholder 행 0.
+
+### 15-1. 다음 작업 — POP 는 "없는 기능" 이 아니라 "배치 축이 없는 기능"
+
+`store_execution_assets(usage_type='pop')` 에 **17행**이 실재한다 (§11). 따라서 다음 단계는
+실행 홈 v2 확장이 아니라, **POP 의 실제 사용 구조를 먼저 조사하는 것**이 순서다.
+
+제안된 후속 (조사 전용 · 코드 변경 없음):
+
+```text
+WO-O4O-STORE-POP-REAL-WORLD-USAGE-AND-PLACEMENT-AUDIT-V1
+
+- POP 가 실제로 어떤 경로로 생성·저장·출력·사용되는지 조사
+- store_pops 0행과 store_execution_assets(pop) 17행의 역할 차이 확정
+- POP 에 QR 처럼 placement 축을 붙일 가치가 있는지 판단
+- 실행 홈에 POP 를 포함할 조건을 확정
+- 코드 변경 없음
+```
+
+그 결과가 나온 뒤 **POP Placement 추가 + Store Execution Home v2** 를 한 번에 묶는 것이 자연스럽다.
+
+### 15-2. Store Corner entity — 승격 보류 확정
+
+KPA 의 한글 코너명(`구강관리 코너`)과 PH 의 코드(`A-2` · `C-2` · `F-2`)가 **실제로 공존**한다.
+placement 데이터가 쌓이기 전에 정규화 모델부터 만들면 잘못된 기준을 고착시킬 위험이 크다.
+따라서 이번 회차에서는 만들지 않는다 (§12 · §14-7 유지).
