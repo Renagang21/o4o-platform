@@ -72,9 +72,6 @@
       "path": "./apps/api-server"
     },
     {
-      "path": "./apps/main-site"
-    },
-    {
       "path": "./apps/admin-dashboard"
     },
     {

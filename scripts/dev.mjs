@@ -425,7 +425,7 @@ function runBuild() {
 
   // Build apps
   log.info('Building apps...');
-  const apps = ['main-site', 'admin-dashboard', 'api-server'];
+  const apps = ['admin-dashboard', 'api-server'];
 
   for (const app of apps) {
     const appPath = join(ROOT_DIR, 'apps', app);

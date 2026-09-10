@@ -514,7 +514,7 @@ router.put('/my-new-section', authenticateToken, checkPermission('settings:write
 
 ### Step 8: Add Frontend Hook (Optional)
 
-Create `apps/main-site/src/hooks/useMyNewSectionSettings.ts`:
+Create the hook in the frontend app that consumes the setting (`<frontend-app>/src/hooks/useMyNewSectionSettings.ts`):
 
 ```typescript
 import { useState, useEffect } from 'react';

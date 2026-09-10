@@ -13,7 +13,6 @@
  */
 
 // TODO: Phase 2 - Migrate tokens from apps/admin/src/lib/appearance/tokens.ts
-// TODO: Phase 2 - Merge with apps/main-site/src/lib/theme/tokens.ts
 // TODO: Phase 2 - Consolidate with apps/api-server widget appearance settings
 
 /**

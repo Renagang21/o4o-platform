@@ -130,8 +130,7 @@ pnpm lint
 This package replaces and consolidates:
 
 1. `apps/admin-dashboard/src/lib/appearance/*`
-2. `apps/main-site/src/utils/css-generator.ts`
-3. `apps/api-server/src/utils/customizer/*`
+2. `apps/api-server/src/utils/customizer/*`
 
 **Do not create new appearance logic in these locations.** All new development should use this package.
 

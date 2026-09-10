@@ -1,3 +1,9 @@
+> **상태 노트 (2026-09-10 · WO-O4O-MAIN-SITE-FULL-SOURCE-DELETION-V1)**
+> 아래 "Frontend" rendering context 로 서술된 은퇴 앱(`apps/main-site`)은 소스째 삭제되었다.
+> 따라서 이 문서의 Frontend 관련 경로·절차는 **과거 구조 기록**이며 현재 존재하지 않는다.
+> Editor · Preview 두 context 서술은 그대로 유효하다.
+> block-renderer 축의 재정리는 후속 WordPress 정비 작업 범위이며 본 작업에서 다루지 않았다.
+
 # Rendering Complexity Documentation
 
 ## Overview
@@ -144,7 +150,7 @@ const handleChange = useCallback((newValue: Descendant[]) => {
 
 ### 3. Data Transformation Pipeline
 
-**Location**: `/apps/main-site/src/utils/wordpress-block-parser.ts`
+**Location (삭제됨)**: `/apps/main-site/src/utils/wordpress-block-parser.ts` — 은퇴 앱과 함께 제거되었다.
 
 **Current flow**:
 ```

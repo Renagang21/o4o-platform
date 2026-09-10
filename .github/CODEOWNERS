@@ -9,11 +9,6 @@
 /apps/api-server/src/entities/ @o4o-platform/database-team
 /apps/api-server/src/routes/ @o4o-platform/api-team
 
-# 프론트엔드 - 메인 사이트
-/apps/main-site/ @o4o-platform/frontend-team
-/apps/main-site/src/components/ @o4o-platform/ui-team
-/apps/main-site/src/pages/ @o4o-platform/frontend-team
-
 # 프론트엔드 - 어드민
 /apps/admin-dashboard/ @o4o-platform/admin-team
 

@@ -11,7 +11,7 @@
  *      라우터가 `lmsContextMiddleware({ serviceCode })` 로 주입한 값.
  *   2) 명시적 `serviceKey` canonical 계약 — generic `/api/v1/lms/*` 를 쓰는 서비스
  *      (K-Cosmetics / GlycoPharm) 가 쿼리 파라미터로 전달.
- *   3) 둘 다 없으면 무필터 — legacy(main-site) / admin / platform 카탈로그 용도.
+ *   3) 둘 다 없으면 무필터 — admin / platform 카탈로그 용도.
  *      Forum 의 `if (!canonical) return;` (generic/admin route 무필터) 와 동일한 판단이다.
  *
  * service key 매핑은 `@o4o/security-core` 의 `resolveCanonicalServiceKey` SSOT 만 사용한다.

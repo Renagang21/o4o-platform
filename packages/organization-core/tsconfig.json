@@ -19,7 +19,7 @@
     "strictNullChecks": false,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["../../apps/admin-dashboard/src/*", "../../apps/main-site/src/*"]
+      "@/*": ["../../apps/admin-dashboard/src/*"]
     }
   },
   "include": [

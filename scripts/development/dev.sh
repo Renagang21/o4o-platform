@@ -62,7 +62,7 @@ run_type_check() {
     
     # Type check apps
     echo "Type checking apps..."
-    for app in api-server main-site admin-dashboard; do
+    for app in api-server admin-dashboard; do
         if [ -d "apps/$app" ]; then
             echo "  - Checking $app"
             (cd "apps/$app" && npx tsc --noEmit 2>/dev/null) || true
@@ -85,7 +85,7 @@ run_type_check_frontend() {
     
     # Type check frontend apps only (skip api-server)
     echo "Type checking frontend apps..."
-    for app in main-site admin-dashboard; do
+    for app in admin-dashboard; do
         if [ -d "apps/$app" ]; then
             echo "  - Checking $app"
             (cd "apps/$app" && npx tsc --noEmit 2>/dev/null) || true
@@ -118,7 +118,7 @@ run_build() {
     
     # Build apps
     echo "Building apps..."
-    for app in api-server main-site admin-dashboard; do
+    for app in api-server admin-dashboard; do
         if [ -d "apps/$app" ]; then
             echo "  - Building $app"
             (cd "apps/$app" && pnpm run build) || true
@@ -154,17 +154,14 @@ start_dev() {
     (cd apps/api-server && pnpm run dev > /tmp/api-server.log 2>&1 &)
     
     echo "Starting web apps..."
-    (cd apps/main-site && pnpm run dev > /tmp/main-site.log 2>&1 &)
     (cd apps/admin-dashboard && pnpm run dev > /tmp/admin-dashboard.log 2>&1 &)
     
     echo -e "${GREEN}✅ Development servers started!${NC}"
     echo "  - API Server: http://localhost:4000"
-    echo "  - Main Site: http://localhost:3000"
     echo "  - Admin Dashboard: http://localhost:3001"
     echo ""
     echo "Logs available at:"
     echo "  - /tmp/api-server.log"
-    echo "  - /tmp/main-site.log"
     echo "  - /tmp/admin-dashboard.log"
 }
 

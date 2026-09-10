@@ -50,12 +50,6 @@ build_app() {
             pnpm run build
             cd ../..
             ;;
-        "main"|"main-site")
-            echo "Building Main Site..."
-            cd apps/main-site
-            pnpm run build
-            cd ../..
-            ;;
         "forum"|"ecommerce"|"signage"|"digital-signage"|"affiliate"|"vendors")
             # All these are part of admin-dashboard
             echo "Building ${app} components (admin-dashboard module)..."
@@ -72,7 +66,7 @@ build_app() {
             ;;
         *)
             echo "⚠️ Unknown app: $app"
-            echo "Valid options: admin, api, main, forum, ecommerce, signage/digital-signage, affiliate, vendors, all"
+            echo "Valid options: admin, api, forum, ecommerce, signage/digital-signage, affiliate, vendors, all"
             exit 1
             ;;
     esac

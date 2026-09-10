@@ -4,7 +4,6 @@
 # Frontend Changes
 frontend:
   - changed-files:
-    - any-glob-to-any-file: 'apps/main-site/**/*'
     - any-glob-to-any-file: 'apps/admin-dashboard/**/*'
 
 # Backend Changes  

@@ -274,7 +274,6 @@ class BackupService {
       '.env',
       'apps/api-server/.env',
       'apps/admin-dashboard/.env',
-      'apps/main-site/.env'
     ];
 
     for (const envFile of envFiles) {

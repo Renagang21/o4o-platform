@@ -75,5 +75,4 @@
 
 - admin-dashboard
 - api-server
-- main-site
 - ecommerce (소비자 프론트엔드)

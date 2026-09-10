@@ -71,22 +71,18 @@ update_package_json "$ADMIN_PKG" "uuid" "9.0.1" "dependencies"
 update_package_json "$ADMIN_PKG" "react" "18.3.1" "dependencies"
 update_package_json "$ADMIN_PKG" "react-dom" "18.3.1" "dependencies"
 
-echo -e "${YELLOW}4. Updating Main Site packages...${NC}"
-MAIN_PKG="apps/main-site/package.json"
-update_engines "$MAIN_PKG"
-
-echo -e "${YELLOW}5. Updating other app packages...${NC}"
+echo -e "${YELLOW}4. Updating other app packages...${NC}"
 for app_dir in apps/*/; do
     if [ -d "$app_dir" ] && [ -f "$app_dir/package.json" ]; then
         app_name=$(basename "$app_dir")
-        if [[ "$app_name" != "api-server" && "$app_name" != "admin-dashboard" && "$app_name" != "main-site" ]]; then
+        if [[ "$app_name" != "api-server" && "$app_name" != "admin-dashboard" ]]; then
             echo -e "${YELLOW}   Updating $app_name...${NC}"
             update_engines "$app_dir/package.json"
         fi
     fi
 done
 
-echo -e "${YELLOW}6. Updating workspace packages...${NC}"
+echo -e "${YELLOW}5. Updating workspace packages...${NC}"
 for pkg_dir in packages/*/; do
     if [ -d "$pkg_dir" ] && [ -f "$pkg_dir/package.json" ]; then
         pkg_name=$(basename "$pkg_dir")

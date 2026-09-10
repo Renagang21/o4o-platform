@@ -30,17 +30,9 @@
     # 간단한 preview 설정만
     previews = {
       enable = true;
-      previews = {
-        # Main Site만 우선
-        web = {
-          command = ["npm" "run" "dev"];
-          manager = "web";
-          cwd = "apps/main-site";
-          env = {
-            PORT = "$PORT";
-          };
-        };
-      };
+      # WO-O4O-MAIN-SITE-FULL-SOURCE-DELETION-V1:
+      # 유일한 preview 대상 앱이 폐기되어 preview 정의를 제거했다.
+      previews = { };
     };
 
     # 자동 실행 스크립트 제거 (수동으로 실행)

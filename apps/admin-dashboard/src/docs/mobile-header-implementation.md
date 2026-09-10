@@ -1,3 +1,8 @@
+> **상태 노트 (2026-09-10 · WO-O4O-MAIN-SITE-FULL-SOURCE-DELETION-V1)**
+> 이 문서는 과거 구현 완료 기록이다. 아래에서 `/apps/main-site/...` 로 표기된 컴포넌트·훅은
+> 은퇴 앱 소스 전체 삭제와 함께 제거되어 현재 존재하지 않는다.
+> `/apps/admin-dashboard/...` 의 customizer 패널 쪽 기록만 현행 코드와 대응한다.
+
 # Mobile Header Implementation Summary
 
 ## ✅ Day 3-5: Mobile Header - COMPLETED
