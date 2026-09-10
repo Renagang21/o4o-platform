@@ -251,7 +251,7 @@ export default function FeeLedgerPage({ slug }: { slug: string }) {
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">연회비 관리</h1>
+          <h1 className="text-xl font-semibold text-gray-900">회비 관리</h1>
           <p className="mt-1 text-sm text-gray-500">
             분회 회원의 연도별 회비를 부과하고 납부 사실을 기록합니다. 결제·정산 기능은 없습니다.
           </p>

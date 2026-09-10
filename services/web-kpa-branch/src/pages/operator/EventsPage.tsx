@@ -200,7 +200,7 @@ export default function EventsPage({ slug }: { slug: string }) {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">행사</h1>
+          <h1 className="text-xl font-semibold text-gray-900">행사 관리</h1>
           <p className="mt-1 text-sm text-gray-500">
             총회·세미나·교육·친목행사를 하나로 관리합니다. 결제·좌석배정·출결 기능은 없습니다.
           </p>

@@ -51,7 +51,7 @@ export default function BranchOfficersPage({ slug }: { slug: string }) {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold text-gray-900">임원 · 위원회</h1>
+        <h1 className="text-xl font-semibold text-gray-900">임원소개</h1>
         <p className="mt-1 text-sm text-gray-500">현재 재임 중인 임원과 위원회 구성입니다.</p>
       </header>
 

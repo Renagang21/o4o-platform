@@ -235,7 +235,7 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">회원 업무 현황</h1>
+          <h1 className="text-xl font-semibold text-gray-900">회원관리</h1>
           <p className="mt-1 text-sm text-gray-500">
             회원 한 명의 소속·신상신고·회비·연수교육 상태를 한 화면에서 확인합니다.
             실제 처리는 각 전문화면에서 합니다.

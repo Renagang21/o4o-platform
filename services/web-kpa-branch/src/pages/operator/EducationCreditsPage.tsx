@@ -152,7 +152,7 @@ export default function EducationCreditsPage({ slug }: { slug: string }) {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">연수교육 평점</h1>
+          <h1 className="text-xl font-semibold text-gray-900">연수교육 원장</h1>
           <p className="mt-1 text-sm text-gray-500">
             분회가 확인한 회원별 연도 인정평점을 기록합니다. 강좌 개설·수강신청 기능은 없습니다.
           </p>
