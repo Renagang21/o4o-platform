@@ -241,18 +241,43 @@ migration 실행 이후 수행해야 한다. 위 PASS 는 (a) 실 migration 을 
 
 ### 8-4. production HTTP E2E — PH (`/api/v1/pharmacy-hub/store-owner/pop-v2`)
 
-**BLOCKED — 코드 문제 아님. 테스트 자격증명 불일치.**
+2026-09-10 `pharmacy-hub` store_owner 테스트 자격증명 갱신 후 재실행 — 전 흐름 **PASS**.
+(직전 BLOCKED 사유는 코드가 아니라 로컬 SSOT 문서의 비밀번호 stale 이었다. 2026-09-04 credential
+교체를 문서가 따라가지 못한 것이며, 문서 갱신 후 동일 스크립트가 그대로 통과했다.)
 
-- `renagang21@gmail.com` 의 `pharmacy-hub` 로그인이 401 `INVALID_CREDENTIALS`.
-- 프로덕션 read-only 확인: 해당 계정의 `service_credentials(service_key='pharmacy-hub')` 행은 **존재**하며
-  `updated_at` 이 **2026-09-04** 로, `docs/local/TEST-ACCOUNTS.local.md` 의 기재 근거일(2026-08-10)보다 뒤다
-  → 이후 비밀번호가 교체되었고 로컬 문서가 stale 하다.
-- `role_assignments` 에 `pharmacy-hub:store_owner`(is_active) 는 정상 보유.
-- `pharmacy-hub:operator/admin` 계정(`sohae2100@gmail.com`)으로는 접근 불가 —
-  `403 STORE_OWNER_REQUIRED` (가드 정상 동작 확인).
-- 엔드포인트 자체는 8-2 대로 배포·마운트 확인됨.
-- PH adapter 는 KPA 와 **동일한 공통 Core factory**(`createPopV2Api` + 공통 View)를 base path 만 바꿔 쓰므로
-  8-3 의 KPA production PASS 가 곧 공통 계약의 production 검증이다. PH 고유 코드 경로는 base path 주입뿐이다.
+| # | 단계 | 결과 |
+|---|---|---|
+| 1 | 로그인(serviceKey='pharmacy-hub') | PASS |
+| 2 | POP V2 진입(목록) | PASS — 200 |
+| 3 | 상품 소스 해석 (3단 fallback) | PASS — `resolvedFrom=store-canonical-description` |
+| 4 | 상품 기반 POP 생성·저장 | PASS — 201 |
+| 5 | 콘텐츠 소스 후보 | PASS — `origin=library` |
+| 6 | 콘텐츠 소스 해석 | PASS — `resolvedFrom=store-content` |
+| 7 | 일반 콘텐츠 기반 POP 생성·저장 | PASS — 201 |
+| 8 | 저장 후 reload | PASS — `status=draft` |
+| 9 | 재편집 (PUT) | PASS |
+| 10 | QR 삽입 | PASS |
+| 11 | PDF 출력 | PASS — assetId 발급 |
+| 12 | PNG 출력 | PASS — assetId 발급 |
+| 13 | 출력 후 상태 승격 + 산출물 포인터 | PASS — `status=ready` + `lastOutputAssetId` |
+| 14 | 복제 | PASS — `(사본)` · `status=draft` |
+| 15 | 보관 + 목록 분리 | PASS — 활성목록 제외 · 보관목록 포함 |
+
+브라우저 검증(`https://pharmacyhub.co.kr/store-owner/pop-v2`, 실제 로그인 세션):
+**console error 0 / pageerror 0 / 4xx·5xx 0**, POP 관리 화면 정상 렌더.
+
+**콘텐츠 후보 0건 → 해소 경위 (데이터 공백이었음의 증명).**
+최초 실행 시 PH 테스트 매장의 `sources/contents` 후보가 0건이었다. 질의 결함이 아니라 해당 매장에
+`kpa_store_contents` · `store_execution_assets` · `store_pops` 가 아직 없었기 때문이다.
+같은 실행에서 상품 POP 을 PDF/PNG 로 출력하자 매장 소유 제작 자료가 생겼고, 곧바로 재조회하니
+후보가 `origin='library'` 2건으로 정상 노출됐다 — 즉 **질의는 정상, 초기 0건은 실제 데이터 공백**이다.
+이후 그 실 후보로 일반 콘텐츠 POP 전 흐름(생성·저장·reload·재편집·QR·PDF·PNG·복제·보관)을 완주했다.
+억지 운영 데이터는 만들지 않았다.
+
+**fallback 단계 교차 검증 (KPA vs PH).**
+KPA 는 `product-basic-info`(2단계), PH 는 `store-canonical-description`(3단계)로 해석되어
+서로 다른 fallback 단계가 프로덕션에서 각각 실증됐다. 1단계 `product-linked-content` 는 두 서비스
+프로덕션 표본에 해당 링크가 없어 로컬 계약 테스트로만 검증했다(§4 · 사용자 승인 범위).
 
 ### 8-5. 원본 Content 불변 · fallback 경계 (프로덕션 read-only)
 
@@ -280,12 +305,20 @@ MAIN MERGE                = PASS
 PRODUCTION MIGRATION      = PASS
 API / WEB DEPLOYMENT      = PASS
 PRODUCTION HTTP E2E (KPA) = PASS  (15/15)
-PRODUCTION HTTP E2E (PH)  = BLOCKED  (테스트 계정 credential stale — 코드 무관)
+PRODUCTION HTTP E2E (PH)  = PASS  (15/15 — credential 갱신 후 재실행)
 CONTENT IMMUTABILITY      = PASS
 B2B/B2C FALLBACK          = PASS  (미발생)
 CONSOLE / 4XX             = PASS  (0 / 0)
 FIXTURE CLEANUP           = PASS
 ```
 
-> PH production HTTP E2E 는 `pharmacy-hub` store_owner 테스트 자격증명이 갱신되면 즉시 재실행 가능하다
-> (동일 스크립트, base path 만 다름). 그 전까지 본 WO 는 **CLOSED_PENDING_PH_CREDENTIAL** 로 둔다.
+```text
+WO STATUS = CLOSED
+```
+
+KPA · PH 양측 production HTTP E2E 가 모두 통과했고, migration · 배포 · 원본 불변 · fallback 경계 ·
+console/4xx · fixture 정리까지 확인됐다. POP Placement 는 §7 대로 본 WO 범위 밖(NOT_STARTED)이며,
+기존 POP retire 와 `resolvePop` placeholder 제거도 별도 정리 WO 로 넘긴다.
+
+검증 자격증명 주의: `docs/local/TEST-ACCOUNTS.local.md` (git 미추적) 의 `pharmacy-hub` 비밀번호를
+2026-09-10 실측값으로 갱신했다. 코드 · 커밋 · 본 문서에는 비밀번호를 남기지 않았다.
