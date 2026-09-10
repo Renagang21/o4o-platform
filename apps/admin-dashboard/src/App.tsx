@@ -170,9 +170,28 @@ function App() {
             {PublicRoutes()}
 
             {/* 보호된 관리자 라우트들 */}
+            {/*
+              WO-O4O-ADMIN-PLATFORM-ONLY-ACCESS-AND-POST-REFACTOR-FINAL-CLOSURE-V1 (A축):
+                admin.neture.co.kr 은 O4O 플랫폼 전체 관리자 전용 사이트다. 진입 floor 를
+                legacy `admin` 에서 canonical `platform:super_admin` 으로 좁힌다.
+
+                `['admin']` 은 `expandRequiredRoles` 로 super_admin·operator·platform:super_admin 까지
+                넓어지고, `SERVICE_PREFIX_ACCEPTING_ROLES` 때문에 `kpa:admin` · `neture:operator` 같은
+                **서비스 단위** 역할까지 관리자 사이트에 들여보냈다. 서비스 역할은 각 서비스의
+                admin/operator 화면에서 쓰는 것이지 플랫폼 관리자 사이트의 자격이 아니다.
+
+                `platform:super_admin` 은 확장 트리거가 아니므로(adminRouteAccess.ts) 이 선언은
+                정확히 플랫폼 전역 관리자만 통과시킨다. 백엔드도 같은 경계다
+                (`routes/admin/platform-users.routes.ts` ADMIN_ACCESS_ROLES).
+
+                잠금 방지: 프로덕션 role_assignments 실측 후 적용했다. 활성 보유자는
+                super-admin@o4o.com · renariver21@gmail.com · sohae2100@gmail.com 3계정이며,
+                서비스 역할만으로 진입하던 계정은 전부 suspended 상태의 e2e/smoke 계정이었다.
+                거부 시 AdminProtectedRoute 는 안내 화면을 렌더한다(redirect loop 없음).
+            */}
             <Route path="/*" element={
               <AdminProtectedRoute
-                requiredRoles={['admin']}
+                requiredRoles={['platform:super_admin']}
                 showContactAdmin={true}
               >
                 <AdminLayout>

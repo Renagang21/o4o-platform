@@ -11,9 +11,6 @@ import { AppRouteGuard } from '@/components/AppRouteGuard';
 // Pharmacy AI Insight (Phase 5 - Active)
 const PharmacyAiInsightSummary = lazy(() => import('@o4o/pharmacy-ai-insight').then(m => ({ default: m.SummaryPage })));
 
-// PartnerOps Pages
-const PartnerOpsRouter = lazy(() => import('@/pages/partnerops/PartnerOpsRouter'));
-
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -22,7 +19,7 @@ const PageLoader = () => (
 );
 
 /**
- * App routes — forum, pharmacy AI, partnerops
+ * App routes — pharmacy AI
  */
 export function AppRoutes() {
   return [
@@ -116,15 +113,21 @@ export function AppRoutes() {
     //   backend(/kpa/supplier/*, /neture/supplier/csv-import/*)는 건드리지 않았다.
     //   serviceGroup id 'supplierops' 는 multi-tenant 소비처가 있어 유지한다.
 
-    // PartnerOps - Partner/Affiliate Operations App
-    <Route key="/partnerops/*" path="/partnerops/*" element={
-      <AdminProtectedRoute requiredRoles={['partner', 'admin']}>
-        <AppRouteGuard appId="partnerops">
-          <Suspense fallback={<PageLoader />}>
-            <PartnerOpsRouter />
-          </Suspense>
-        </AppRouteGuard>
-      </AdminProtectedRoute>
-    } />,
+    // WO-O4O-ADMIN-PLATFORM-ONLY-ACCESS-AND-POST-REFACTOR-FINAL-CLOSURE-V1 (B축):
+    //   /partnerops/* 라우트(8경로)와 admin 로컬 pages/partnerops (PartnerOpsRouter ·
+    //   PartnerOpsGuidePage) 를 제거했다. 판정 LEGACY_DEAD_SURFACE. 근거:
+    //     - `/api/v1/partnerops/*` 8개 엔드포인트 전부 프로덕션 404 실측
+    //       (선행 WO-O4O-PARTNEROPS-AFFILIATE-SURFACE-RETIRE-OR-GUIDE-V1 에서
+    //        `packages/partnerops` 제거 후 백엔드 라우터가 남지 않았다).
+    //     - 8경로가 이미 전부 안내 페이지 1장으로 수렴해 있었다 → 실기능 0.
+    //     - 진입 네비게이션 0건 · ViewComponentRegistry 등록도 함께 제거.
+    //     - 가드가 legacy `partner` role literal 기반이라 canonical RBAC(F9) 계약
+    //       바깥이다 → "파일이 존재한다"는 이유로 재등록하지 않는다.
+    //   유지한 것(제거 금지):
+    //     - serviceGroup id 'partnerops' — appsCatalog 의 살아 있는 항목
+    //       'partner-core' 가 소비한다(sellerops/supplierops 선례와 동일).
+    //     - appsCatalog appId 'partnerops' 항목과 프로덕션 `app_registry` 의
+    //       active 행 — 운영 데이터이므로 WO §6.2 에 따라 손대지 않고 보고한다.
+    //     - Neture 파트너 · partner-core 계약(F7) · partner_* 테이블은 별개 축이다.
   ];
 }

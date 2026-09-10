@@ -73,9 +73,14 @@ export const menuPermissions: MenuPermission[] = [
   // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 백엔드 경계 복제
   //
   //   아래 3건은 백엔드가 `platform:super_admin` 만 허용하는 화면이다. 무게이트로 두면
-  //   "설정 없음 = 허용" 정책 + App.tsx floor(`['admin']`)의 서비스 접두 역할 수용 때문에
-  //   `kpa:operator`·`neture:operator` 등에게도 메뉴가 보이지만, 클릭하면 API 가 403 이다.
+  //   "설정 없음 = 허용" 정책 + 당시 App.tsx floor(`['admin']`)의 서비스 접두 역할 수용 때문에
+  //   `kpa:operator`·`neture:operator` 등에게도 메뉴가 보이지만, 클릭하면 API 가 403 이었다.
   //   **쓸 수 없는 메뉴를 보여주지 않는다.**
+  //
+  //   WO-O4O-ADMIN-PLATFORM-ONLY-ACCESS-AND-POST-REFACTOR-FINAL-CLOSURE-V1 (A축) 이후
+  //   App.tsx floor 자체가 `['platform:super_admin']` 이라 서비스 접두 역할은 관리자 사이트에
+  //   진입하지 못한다. 따라서 이 선언들은 이제 **이중 방어**다. floor 가 유일한 방어선이
+  //   되지 않도록 유지하며, "설정 없음 = 허용" 에 기대는 platform 전용 메뉴는 없다.
   //
   //   | 메뉴 | 백엔드 | 가드 |
   //   |---|---|---|

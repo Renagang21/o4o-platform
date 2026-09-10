@@ -184,14 +184,12 @@ viewComponentRegistry.register(
 // ============================================================================
 
 // ============================================================================
-// REGISTER PARTNEROPS COMPONENTS
+// WO-O4O-ADMIN-PLATFORM-ONLY-ACCESS-AND-POST-REFACTOR-FINAL-CLOSURE-V1 (B축):
+//   'partnerops.router' 등록 제거. `/api/v1/partnerops/*` 8개 엔드포인트가 전부
+//   프로덕션 404 이고 admin 로컬 pages/partnerops 는 안내 페이지 1장뿐이라
+//   라우트와 함께 제거했다. appsCatalog 의 appId 'partnerops' 항목과
+//   프로덕션 app_registry active 행(운영 데이터)은 유지한다.
 // ============================================================================
-
-viewComponentRegistry.register(
-  'partnerops.router',
-  lazy(() => import('@/pages/partnerops/PartnerOpsRouter')),
-  { appId: 'partnerops', description: 'PartnerOps Router' }
-);
 
 // ============================================================================
 // REGISTER DIGITAL SIGNAGE COMPONENTS
