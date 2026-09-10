@@ -10,6 +10,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { getMyBranchHistory, listBranches, type BranchMembership } from '../lib/api/branch';
 import { getAnnualReport, REPORT_STATUS_LABEL } from '../lib/api/annualReport';
 import { listMyFees } from '../lib/api/branchFee';
@@ -27,6 +28,7 @@ const TONE: Record<Cell['tone'], string> = {
 };
 
 export default function MyPageIndexPage({ slug, basePath }: { slug: string; basePath: string }) {
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [affiliation, setAffiliation] = useState<{ membership: BranchMembership; name: string } | null | 'none'>(null);
   const [report, setReport] = useState<Cell | null>(null);
   const [fee, setFee] = useState<Cell | null>(null);
@@ -34,6 +36,8 @@ export default function MyPageIndexPage({ slug, basePath }: { slug: string; base
   const [events, setEvents] = useState<{ cell: Cell; next: BranchEventItem | null } | null>(null);
 
   useEffect(() => {
+    // 비로그인 방문자에게 회원 조회를 쏘지 않는다 — 401 을 '확인 불가' 로 오인하게 만든다.
+    if (isAuthLoading || !isAuthenticated) return;
     let alive = true;
 
     Promise.all([getMyBranchHistory(), listBranches()])
@@ -114,7 +118,17 @@ export default function MyPageIndexPage({ slug, basePath }: { slug: string; base
     return () => {
       alive = false;
     };
-  }, [slug]);
+  }, [slug, isAuthenticated, isAuthLoading]);
+
+  if (isAuthLoading) return <p className="text-sm text-gray-500">확인 중입니다…</p>;
+  if (!isAuthenticated) {
+    return (
+      <div className="py-12 text-sm">
+        <p className="text-gray-700">로그인이 필요합니다.</p>
+        <Link to="/login" className="mt-3 inline-block text-primary-700 hover:underline">로그인하기</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
