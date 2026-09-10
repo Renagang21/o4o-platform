@@ -279,7 +279,47 @@ rollback      = 동일 assignment 를 is_active=false 로 전환
 
 ## 12. 프로덕션 브라우저 실측
 
-§11 의 브라우저 검증은 **배포 완료 후** 수행한다. 결과는 §14 에 추가 기록한다.
+대상 커밋 `428349dab` 의 Deploy Admin Dashboard 성공 후 실측했다 (2026-09-10).
+캐시 스테일 청크를 피하려고 모든 접속에 cache-bust 쿼리를 붙였다.
+
+### 12.1 배포 번들에서 제거 표면 확인 (전수)
+
+`index.html` 에서 시작해 도달 가능한 **JS 청크 188개 전수**를 내려받아 문자열을 검사했다 (fetch 실패 0건).
+
+| 검사 문자열 | 적중 청크 | 판정 |
+|---|---|---|
+| `/dashboard/business` | 0 | 제거 확인 |
+| `BusinessDashboard` | 0 | 제거 확인 |
+| `partnerops` | 1 (`AppStorePage-*.js`) | **의도된 잔존** — serviceGroup id (§6). appId 카탈로그 항목 아님 |
+
+### 12.2 미인증 딥링크 실측
+
+각 경로 접속 후 3.5초 · 추가 2.5초 시점의 URL 을 비교해 redirect loop 여부를 판정했다.
+
+| 딥링크 | 최종 착지 | URL 안정 | 관측된 `/api/v1` 호출 |
+|---|---|---|---|
+| `/dashboard/business` | `/login` | 안정 | `/api/v1/auth/status` |
+| `/partnerops` | `/login` | 안정 | `/api/v1/auth/status` |
+| `/partnerops/settlements` | `/login` | 안정 | `/api/v1/auth/status` |
+| `/admin` | `/login` | 안정 | `/api/v1/auth/status` |
+| `/users` | `/login` | 안정 | `/api/v1/auth/status` |
+| `/apps/store` | `/login` | 안정 | `/api/v1/auth/status` |
+
+- redirect loop **0건**
+- 차단 상태에서 관리자 API 호출 **0건** (`auth/status` 는 인증 판별용 단일 호출)
+
+### 12.3 미수행 — 로그인 세션 기반 브라우저 실측
+
+**플랫폼 관리자 페르소나 · 서비스 역할 전용 페르소나의 로그인 후 화면 실측은 수행하지 못했다.**
+
+사유: 브라우저 자동화에 프로덕션 비밀번호를 전달하려면 값이 도구 인자·터미널 출력에 남는다.
+이는 상위 WO 의 고정 제약(`비밀번호 … 터미널 출력에 기록하지 않는다`)에 어긋난다.
+노출 없이 전달하려고 loopback 자격정보 브로커를 기동하려 했으나 실행 권한이 거부되었고,
+브라우저 자동화 샌드박스에는 파일 접근 수단이 없다(`file:` 차단, Node `fs` 없음).
+
+동일 계약의 **API 레벨 실측은 §5 에서 두 페르소나 모두 통과**했다
+(플랫폼 관리자 200 / 서비스 역할 전용 403 FORBIDDEN · 403 ROLE_REQUIRED).
+화면 레벨 실측은 자격정보 전달 방식에 대한 소유자 승인 후 별도로 수행한다.
 
 API 레벨 실측은 §5 에 기록했다 (배포와 무관하게 현재 프로덕션 백엔드 기준).
 
@@ -304,29 +344,59 @@ GLYCOPHARM_ACTIVE_CONTRACT                = ZERO
 ADMIN_LINT                                = PASS (error 0) · 범위 밖 잔재 = package.json lint 스크립트 무력화 (§10.1)
 PRIMARY_ADMIN_LOCKOUT_RISK                = ZERO   (역할 변경 0건)
 OTHER_SERVICE_REGRESSION                  = PASS   (api-server 3973 tests 통과)
-CI_PIPELINE                               = (§14)
-CODEQL                                    = (§14)
-REQUIRED_DEPLOYMENTS                      = (§14)
+CI_PIPELINE                               = PASS   (428349dab · run 34430062931)
+CODEQL                                    = PASS   (428349dab)
+REQUIRED_DEPLOYMENTS                      = PASS   (Admin Dashboard · API Server 모두 success)
 ADMIN_AUTH_REGISTRY_DEAD_SURFACE_CLOSURE  = CLOSED_WITH_STOPS
 ```
 
 `MENU_ROUTE_API_AUTH_ALIGNMENT` 와 `PARTNEROPS_CATALOG_REGISTRY_ALIGNMENT` 를 PASS 로 적지 않았다.
 둘 다 승인이 필요한 잔여 항목이 있으므로 사실대로 PARTIAL 로 기록한다.
 
+로그인 세션 기반 프로덕션 브라우저 실측은 §12.3 사유로 미수행이며, 이를 수행한 것으로 기록하지 않는다.
+동일 계약의 API 레벨 실측(§5)은 두 페르소나 모두 통과했다.
+
 ---
 
 ## 14. 커밋 · CI · 배포
 
-(배포 확인 후 갱신)
+### 14.1 커밋
+
+| 항목 | 값 |
+|---|---|
+| 커밋 SHA | `428349dab464d944ab438a4c3bce958250af6a92` |
+| 브랜치 | `main` (worktree `work/admin-authorization-registry-and-dead-surface-final-closure-v1` → main push) |
+| push 범위 | `c0b98655f..428349dab` |
+| stage 방식 | path-specific (`git commit -- <paths>`) · `git add .` 미사용 · force-push 없음 |
+
+### 14.2 CI · 배포 결과 (모두 `428349dab` 기준)
+
+| 워크플로 | 결론 |
+|---|---|
+| CI Pipeline | **success** ([run 34430062931](https://github.com/Renagang21/o4o-platform/actions/runs/34430062931)) |
+| CodeQL Security Analysis | **success** |
+| AppStore Guard | **success** |
+| Deploy Admin Dashboard (Cloud Run) | **success** |
+| Deploy API Server (Cloud Run) | **success** |
+
+취소(cancelled)된 실행을 success 로 기록한 항목은 없다.
+5개 워크플로 모두 `428349dab` 를 head SHA 로 직접 실행해 성공했으므로 ancestry 근거는 필요하지 않다.
+
+### 14.3 배포 후 실측
+
+§12 참조. 번들 전수 검사(188 청크) 및 미인증 딥링크 6종 실측 완료.
+로그인 세션 기반 화면 실측은 §12.3 사유로 미수행.
 
 ---
 
 ## 15. 문서 정합
 
 ```
-문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건
+문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 4건
 ```
 
-별도 WO 제안 2건:
+별도 WO 제안 4건:
 1. `apps/admin-dashboard/package.json` 의 lint 스크립트 정상화 (§10.1)
 2. `/admin/o4o-product-db/*` 컨트롤러 13개의 역할 배열 사업 판단 및 정렬 (§2.1)
+3. 운영 `app_registry` 의 `partnerops` 행 retire (§8) — 신규 migration 또는 승인된 직접 write 필요
+4. 로그인 세션 기반 프로덕션 브라우저 실측 (§12.3) — 자격정보 전달 방식 승인 필요
