@@ -194,7 +194,7 @@ export default function OfficersPage({ slug }: { slug: string }) {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">임원 · 위원회</h1>
+          <h1 className="text-xl font-semibold text-gray-900">임원 명부</h1>
           <p className="mt-1 text-sm text-gray-500">
             임원·위원회·TF 명부를 관리합니다. 직책은 권한이 아니며 연락처는 저장하지 않습니다.
           </p>

@@ -3,10 +3,16 @@
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
  *
  * 1차 범위: 로고 / 이름 / 소개 / 연락처 + 공지·자료실 최신 목록.
+ *
+ * WO-O4O-KPA-BRANCH-IA-AND-NAVIGATION-FINALIZATION-V1 §5:
+ *   공개 홈은 소개 · 공지 · 다가오는 행사다. 행사는 기존 공개 API 를 그대로 쓰고
+ *   새 통계 API 를 만들지 않는다. 행사 조회가 실패해도 홈 전체를 죽이지 않는다
+ *   (섹션만 비운다) — 소개·공지는 행사와 무관하게 보여야 한다.
  */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPublicSite, getPublicPosts, type BranchPost, type BranchSite } from '../lib/api/branch';
+import { listPublicEvents, type BranchEventItem } from '../lib/api/branchEvent';
 
 type State =
   | { kind: 'loading' }
@@ -15,6 +21,7 @@ type State =
 
 export default function BranchHomePage({ slug, basePath }: { slug: string; basePath: string }) {
   const [state, setState] = useState<State>({ kind: 'loading' });
+  const [events, setEvents] = useState<BranchEventItem[]>([]);
 
   useEffect(() => {
     let alive = true;
@@ -38,6 +45,19 @@ export default function BranchHomePage({ slug, basePath }: { slug: string; baseP
               : '분회 홈페이지를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.',
         });
       });
+    listPublicEvents(slug)
+      .then((rows) => {
+        if (!alive) return;
+        const now = Date.now();
+        setEvents(
+          rows
+            .filter((e) => new Date(e.startsAt).getTime() >= now)
+            .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+            .slice(0, 5),
+        );
+      })
+      .catch(() => alive && setEvents([]));
+
     return () => {
       alive = false;
     };
@@ -61,6 +81,28 @@ export default function BranchHomePage({ slug, basePath }: { slug: string; baseP
           <p className="whitespace-pre-wrap leading-relaxed text-gray-700">{site.intro}</p>
         </section>
       )}
+
+      <section>
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">다가오는 행사</h2>
+          <Link to={`${basePath}/events`} className="text-sm text-primary-700 hover:underline">더보기</Link>
+        </div>
+        {events.length === 0 ? (
+          <p className="text-sm text-gray-500">예정된 행사가 없습니다.</p>
+        ) : (
+          <ul className="divide-y divide-gray-100 rounded border border-gray-200">
+            {events.map((e) => (
+              <li key={e.id} className="flex items-center gap-2 px-3 py-2 text-sm">
+                <span className="truncate text-gray-800">{e.title}</span>
+                <span className="ml-auto shrink-0 text-xs text-gray-400">
+                  {new Date(e.startsAt).toLocaleDateString('ko-KR')}
+                  {e.location ? ` · ${e.location}` : ''}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <div className="grid gap-8 md:grid-cols-2">
         <PostPreview title="공지" to={`${basePath}/notices`} items={notices} />

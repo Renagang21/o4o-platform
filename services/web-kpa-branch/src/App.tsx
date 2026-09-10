@@ -10,7 +10,9 @@
  *   /:branchSlug                      분회 홈 (고정 템플릿)
  *   /:branchSlug/notices              공지
  *   /:branchSlug/resources            자료실
- *   /:branchSlug/officers             임원·위원회 명부 (공개/회원)
+ *   /:branchSlug/officers             임원소개 명부 (공개/회원)
+ *   /:branchSlug/events               행사 안내 (공개)
+ *   /:branchSlug/mypage               내 정보 · 해야 할 일 (회원)
  *   /:branchSlug/mypage/annual-report 신상신고 작성·제출 (회원)
  *   /:branchSlug/mypage/fees          내 회비 조회 (회원)
  *   /:branchSlug/mypage/education     내 연수교육 조회 (회원)
@@ -20,7 +22,7 @@
  *   /:branchSlug/operator/posts       글쓰기·글 관리 (운영자)
  *   /:branchSlug/operator/domains     자체 도메인 연결 (운영자)
  *   /:branchSlug/operator/annual-reports 신상신고 검수·승인 (운영자)
- *   /:branchSlug/operator/fees        연회비 정책·원장 (운영자)
+ *   /:branchSlug/operator/fees        회비 정책·원장 (운영자)
  *   /:branchSlug/operator/education   연수교육 평점 원장 (운영자)
  *   /:branchSlug/operator/members     회원 업무 콘솔 (운영자)
  *   /:branchSlug/operator/events      행사 관리 (운영자)
@@ -46,6 +48,8 @@ import MyBranchPage from './pages/MyBranchPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import BranchHomePage from './pages/BranchHomePage';
 import BranchPostsPage from './pages/BranchPostsPage';
+import BranchEventsPage from './pages/BranchEventsPage';
+import MyPageIndexPage from './pages/MyPageIndexPage';
 import SiteSettingsPage from './pages/operator/SiteSettingsPage';
 import PostsAdminPage from './pages/operator/PostsAdminPage';
 import DomainsPage from './pages/operator/DomainsPage';
@@ -73,6 +77,8 @@ function BranchSection({ slug, basePath }: { slug: string; basePath: string }) {
         {/* 회의록·회의자료는 회원 축에서만 읽는다 (WO-O4O-KPA-BRANCH-MEETING-POSTS-ADOPTION-V1) */}
         <Route path="meetings" element={<BranchPostsPage slug={slug} category="meeting" scope="member" />} />
         <Route path="officers" element={<BranchOfficersPage slug={slug} />} />
+        <Route path="events" element={<BranchEventsPage slug={slug} basePath={basePath} />} />
+        <Route path="mypage" element={<MyPageIndexPage slug={slug} basePath={basePath} />} />
         <Route path="mypage/annual-report" element={<AnnualReportPage slug={slug} />} />
         <Route path="mypage/fees" element={<MyFeePage slug={slug} />} />
         <Route path="mypage/education" element={<MyEducationPage slug={slug} />} />

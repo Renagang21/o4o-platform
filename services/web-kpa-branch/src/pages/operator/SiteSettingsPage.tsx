@@ -57,7 +57,7 @@ export default function SiteSettingsPage({ slug }: { slug: string }) {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="text-xl font-bold text-gray-900">홈페이지 설정</h1>
+      <h1 className="text-xl font-bold text-gray-900">사이트 정보</h1>
       <p className="mt-1 text-sm text-gray-500">{site.branchName}</p>
 
       <div className="mt-6 space-y-4 text-sm">

@@ -50,7 +50,7 @@ export default function MyFeePage({ slug }: { slug: string }) {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold text-gray-900">내 회비</h1>
+        <h1 className="text-xl font-semibold text-gray-900">회비</h1>
         <p className="mt-1 text-sm text-gray-500">
           분회가 기록한 연도별 회비 부과·납부 내역입니다. 문의는 분회 사무국으로 해주세요.
         </p>

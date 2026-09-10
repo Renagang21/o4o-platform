@@ -79,6 +79,17 @@ function unwrap<T>(res: { data: { success: boolean; data: T } }): T {
   return res.data.data;
 }
 
+// ── 공개 ────────────────────────────────────────────────────────────────────
+
+/**
+ * 공개 행사 목록. 서버가 `status='published' AND visibility='public'` 만 내려준다 —
+ * 화면에서 회원 전용 행사를 다시 걸러내지 않는다(그 판정은 서버 계약이다).
+ */
+export async function listPublicEvents(slug: string): Promise<BranchEventItem[]> {
+  const res = await api.get(`${branch(slug)}/events`);
+  return unwrap<{ items: BranchEventItem[] }>(res).items;
+}
+
 // ── 운영자 ──────────────────────────────────────────────────────────────────
 
 export async function listOperatorEvents(

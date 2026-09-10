@@ -62,7 +62,7 @@ export default function MyEventsPage({ slug }: { slug: string }) {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-xl font-semibold text-gray-900">분회 행사</h1>
+        <h1 className="text-xl font-semibold text-gray-900">행사 참가신청</h1>
         <p className="mt-1 text-sm text-gray-500">
           분회가 게시한 행사입니다. 참가 여부는 마감 전까지 바꿀 수 있습니다.
         </p>
