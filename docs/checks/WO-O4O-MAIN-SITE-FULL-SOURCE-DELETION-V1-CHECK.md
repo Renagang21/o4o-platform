@@ -41,14 +41,18 @@ rebase 는 충돌 0 으로 통과했고 force-push 를 사용하지 않았다.
 | 항목 | 값 |
 |---|---|
 | 기준 SHA 전체 tracked 파일 | 28,174 |
-| 작업 후 전체 tracked 파일 | 28,132 |
-| 순감소 | −42 |
+| 본 커밋 적용 후 tracked 파일 | 28,133 |
+| 순감소 | −41 |
 | `apps/main-site` tracked 파일 (전량 삭제) | 38 |
 | 그중 `apps/main-site/src` | 28 |
 | 회귀 spec 삭제 | 5 |
-| 회귀 spec 신설 | 1 |
+| 신규 파일 (회귀 spec 1 + 본 CHECK 1) | 2 |
+| 수정 파일 | 24 |
 
-38 + 5 − 1 = 42 로 순감소와 일치한다.
+(38 + 5) − 2 = 41 로 순감소와 일치한다. 커밋 통계는 `69 files changed, +579 / −7,279`
+(삭제 43 · 신규 2 · 수정 24) 이다.
+
+저장소 현재 tracked 수(28,136)는 위 28,133 에 다른 세션 커밋 3건이 추가한 파일 3개가 더해진 값이다.
 
 ---
 
@@ -275,21 +279,37 @@ DB · 네트워크 접근 0. `REPO_ROOT` 오지정을 잡는 sanity 단언을 �
 
 ## 10. CI · 배포 결과
 
-<!-- push 후 관측하여 갱신 -->
+푸시 커밋 `a425865ba` 에서 관측한 결과다.
 
-| workflow | 결과 |
-|---|---|
-| CI Pipeline | 관측 중 |
-| CodeQL | 관측 중 |
-| AppStore Guard | 관측 중 |
-| Deploy API Server | 관측 중 |
-| Deploy Admin Dashboard | 관측 중 |
-| Deploy Web Services | 관측 중 |
+| workflow | 결과 | 비고 |
+|---|:-:|---|
+| CodeQL Security Analysis | **SUCCESS** | |
+| Deploy API Server (Cloud Run) | **SUCCESS** | |
+| Deploy Admin Dashboard (Cloud Run) | **SUCCESS** | |
+| Deploy Web Services (Cloud Run) | **SUCCESS** | |
+| Setup Repository Labels | **SUCCESS** | `.github/labeler.yml` 변경으로 트리거 |
+| AppStore Guard | **NOT_TRIGGERED** | 경로 필터가 `packages/**/manifest.ts` · `packages/**/lifecycle/**` · `appsCatalog.ts` 뿐이라 본 변경과 무교집합 |
+| CI Pipeline | **CANCELLED** | 아래 참조 — 실패가 아니다 |
+
+### 10-1. CI Pipeline 이 `CANCELLED` 인 이유 (성공으로 바꾸어 표현하지 않는다)
+
+`ci-pipeline.yml` 의 concurrency 는 `github.ref` (= `main`) 단위이고 `cancel-in-progress: true` 다.
+푸시 직후 다른 세션 커밋이 연달아 `main` 에 올라오면서 앞선 실행이 순차적으로 취소되었다.
+
+```text
+a425865ba (본 작업)                 CI Pipeline = cancelled  ← a4c9eebf0 푸시로 취소
+a4c9eebf0 (WINDOWS-APP-WINDOW-V0)   CI Pipeline = cancelled  ← 034bde31f 푸시로 취소
+034bde31f (POP-HANDOFF-V2 E2E 기록) CI Pipeline = success  ← 본 작업 변경 포함 트리
+```
+
+세 커밋은 선형이며 `034bde31f` 는 `a425865ba` 의 후손이므로, 그 실행은 본 작업의 변경을
+포함한 트리를 검증한다. 다른 세션의 실행을 취소시키지 않기 위해 rerun 을 하지 않고
+후손 커밋의 결과를 관측했으며, **`034bde31f` 의 CI Pipeline · CodeQL 이 모두 SUCCESS** 로
+본 작업의 삭제 결과가 CI 에서 확인되었다.
+
+**로컬에서는 CI Pipeline 이 수행하는 검증(§9 의 6개 명령 + Jest)을 전부 통과했다.**
 
 main-site 자체에 대한 신규 배포 · 브라우저 smoke 는 필요하지 않다 (배포 대상이 아니었고 삭제되었다).
-경로 필터로 배포 workflow 가 트리거되지 않으면 `NOT_TRIGGERED` 로 기록하며 성공으로 바꾸어 표현하지 않는다.
-
----
 
 ## 11. 중지 조건 발생 여부
 
@@ -338,9 +358,9 @@ MAIN_SITE_CI_BUILD_TARGET           = ZERO
 MAIN_SITE_DEPLOY_TARGET             = ZERO
 MAIN_SITE_STALE_ACTIVE_DOC_LINK     = ZERO
 OTHER_SERVICE_REGRESSION            = PASS
-CI_PIPELINE                         = PENDING
-CODEQL                              = PENDING
-MAIN_SITE_FULL_SOURCE_DELETION      = IMPLEMENTATION_COMPLETE / CI_CONFIRMATION_PENDING
+CI_PIPELINE                         = SUCCESS  (후손 커밋 034bde31f 에서 확인 · 본 SHA 는 concurrency CANCELLED)
+CODEQL                              = SUCCESS
+MAIN_SITE_FULL_SOURCE_DELETION      = CLOSED
 ```
 
-CI 성공 확인 전에는 `CLOSED` 로 쓰지 않는다.
+CI 성공을 실제로 확인한 뒤 `CLOSED` 로 확정했다. 확인 근거는 §10 · §10-1 이다.
