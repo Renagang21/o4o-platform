@@ -63,6 +63,20 @@ function hashSecret(value: string): string {
   return createHash('sha256').update(value, 'utf8').digest('hex');
 }
 
+/**
+ * uuid 컬럼에 넣기 전의 형식 검사.
+ *
+ * `local_agent_devices.id` · `local_agent_commands.command_id` 는 Postgres `uuid` 다.
+ * 형식이 아닌 문자열을 그대로 넘기면 드라이버가 아니라 **DB** 가 거절하며, 그 예외는
+ * 라우트의 catch 로 올라가 500 이 된다. 즉 "존재하지 않는 기기" 와 "서버 장애" 가
+ * 같은 응답이 되어 버린다.
+ *
+ * 형식 위반은 장애가 아니라 **거절**이다. 조회 전에 걸러 정상 거절 경로로 보낸다.
+ */
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
 function newSecret(bytes = 32): string {
   return randomBytes(bytes).toString('base64url');
 }
@@ -222,6 +236,8 @@ export async function openAgentSession(
   deviceId: string,
   agentCredential: string,
 ): Promise<OpenSessionOutcome> {
+  // 형식이 틀린 deviceId 는 조회할 것도 없이 "그런 기기 없음" 이다.
+  if (!isUuid(deviceId)) return { ok: false, reason: 'DEVICE_NOT_FOUND' };
   const rows = await dataSource.query(
     `SELECT id, user_id, status, credential_hash FROM local_agent_devices WHERE id = $1 LIMIT 1`,
     [deviceId],
@@ -441,6 +457,8 @@ export async function submitCommandResult(
 ): Promise<SubmitResultOutcome> {
   const commandId = String(result?.commandId ?? '');
   if (!commandId) return { ok: false, errorCode: LOCAL_AGENT_ERROR.EXECUTION_FAILED };
+  // 형식이 틀린 commandId 도 같은 이유로 조회 전에 거절한다 (§32).
+  if (!isUuid(commandId)) return { ok: false, errorCode: LOCAL_AGENT_ERROR.REPLAY_REJECTED };
 
   const rows = await dataSource.query(
     `SELECT command_id, status, expires_at FROM local_agent_commands

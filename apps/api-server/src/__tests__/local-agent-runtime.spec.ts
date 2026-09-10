@@ -365,6 +365,22 @@ describe('4~6. agent 인증 · heartbeat · offline 판정', () => {
     expect(r).toEqual({ ok: false, reason: 'DEVICE_NOT_FOUND' });
   });
 
+  /**
+   * production smoke 에서 발견한 결함의 회귀 테스트.
+   *
+   * `deviceId` 는 Postgres `uuid` 컬럼으로 들어간다. 형식이 아닌 문자열을 그대로
+   * 넘기면 DB 가 예외를 던지고 그것이 라우트의 catch 를 지나 **500** 이 되었다.
+   * 그러면 "그런 기기 없다"(401) 와 "서버가 고장났다"(500) 가 구분되지 않는다.
+   * 형식 위반은 장애가 아니라 거절이다.
+   */
+  it('4. 형식이 uuid 가 아닌 deviceId 는 서버 오류가 아니라 거절이다', async () => {
+    const db = makeDb();
+    for (const bogus of ['', 'not-a-uuid', "' OR 1=1 --", '../../etc/passwd']) {
+      const r = await openAgentSession(db.dataSource, bogus, 'anything');
+      expect(r).toEqual({ ok: false, reason: 'DEVICE_NOT_FOUND' });
+    }
+  });
+
   it('4. 세션 토큰이 신원의 유일한 출처다 — 위조 토큰은 아무 device 도 되지 못한다', async () => {
     const db = makeDb();
     const agent = await connected(db);
@@ -582,6 +598,19 @@ describe('9~12. 명령 왕복', () => {
       data: { osName: '남의 PC' },
     });
     expect(r).toEqual({ ok: false, errorCode: LOCAL_AGENT_ERROR.REPLAY_REJECTED });
+  });
+
+  it('11. 형식이 uuid 가 아닌 commandId 도 서버 오류가 아니라 거절이다', async () => {
+    const db = makeDb();
+    const agent = await connected(db);
+    for (const bogus of ['not-a-uuid', "' OR 1=1 --"]) {
+      const r = await submitCommandResult(db.dataSource, agent.deviceId, {
+        commandId: bogus,
+        status: 'success',
+        data: { osName: 'Windows 11' },
+      });
+      expect(r).toEqual({ ok: false, errorCode: LOCAL_AGENT_ERROR.REPLAY_REJECTED });
+    }
   });
 
   it('12. 만료된 명령의 결과는 받아들이지 않는다', async () => {

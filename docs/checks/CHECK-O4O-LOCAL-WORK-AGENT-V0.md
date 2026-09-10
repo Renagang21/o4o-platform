@@ -309,16 +309,62 @@ discriminated union 결과 타입을 다룰 때는 **`=== false`** 를 쓴다.
 
 ---
 
-## 14. 미실행 항목 (숨기지 않고 기록)
+## 14. 배포 후 확인 (2026-09-10)
+
+`Deploy API Server (Cloud Run)` 이 commit `db140798c` 에 대해 **success** 로 완료되어
+프로덕션 API 에서 직접 확인했다.
+
+### 14-1. Endpoint 6개 생존 확인
+
+`https://api.neture.co.kr` 에 인증 없이 요청한 결과다.
+
+| Endpoint | 응답 | 판정 |
+|---|:--:|---|
+| `POST /pair` | 401 | 사용자 인증 축이 살아 있다 |
+| `GET /devices` | 401 | 같음 |
+| `POST /register` | 400 `INVALID_PAIRING_CODE` | 라우트 도달 · 코드 검증 동작 |
+| `POST /connect` | 401 `DEVICE_NOT_FOUND` | 라우트 도달 · **DB 조회 성공** |
+| `POST /heartbeat` | 401 | agent 인증 축이 살아 있다 |
+| `POST /result` | 401 | 같음 |
+| `POST /nonexistent` (대조군) | 404 | 위 6개의 응답이 라우터 도달의 증거임을 확인 |
+
+`connect` 가 `DEVICE_NOT_FOUND` 를 돌려줬다는 것은 `local_agent_devices` 에 대한
+SELECT 가 실제로 실행됐다는 뜻이다 — **migration 이 프로덕션에 적용되어 있다.**
+
+응답 본문에 평문 pairing code · credential · session token 이 실려 나온 사례 0건.
+
+### 14-2. 이 smoke 에서 발견한 결함 (수정함)
+
+형식이 uuid 가 아닌 `deviceId` 로 `/connect` 를 호출하면 **500** 이 돌아왔다.
+
+```text
+POST /connect  {}                      → 500 {"success":false,"error":"Failed to connect"}
+POST /connect  {"deviceId":"0000…"}    → 401 {"success":false,"code":"DEVICE_NOT_FOUND"}
+```
+
+원인은 서버 장애가 아니라 **형식 검사 부재**다. `deviceId` 는 Postgres `uuid` 컬럼으로
+바로 들어가는데, 형식이 아닌 문자열은 드라이버가 아니라 DB 가 거절하고 그 예외가
+라우트의 catch 를 지나 500 이 된다. 결과적으로 "그런 기기 없다"(401) 와
+"서버가 고장났다"(500) 가 구분되지 않았다.
+
+**형식 위반은 장애가 아니라 거절이다.** `isUuid()` 검사를 조회 앞에 두어 정상 거절
+경로로 보냈다. 같은 경로가 하나 더 있었다 — `submitCommandResult` 의 `commandId` 도
+클라이언트가 주는 값이고 uuid PK 로 들어간다. 함께 막았다.
+
+`resolveTargetDevice(userId)` 는 JWT 에서 오므로 이 부류가 아니다 (수정하지 않음).
+
+회귀 테스트 2건을 추가했다 (빈 문자열 · `not-a-uuid` · `' OR 1=1 --` · 경로 문자열).
+
+### 14-3. 남은 미실행 항목
 
 | 항목 | 상태 | 사유 |
 |---|---|---|
-| §44 Windows 로컬 smoke A~E | **미실행** | 실제 PC 연결 smoke 는 배포된 API 가 필요하다. 배포 후 수행 |
-| §45 프로덕션 smoke | **미실행** | 같음 |
-| CI 결과 | **미확인** | push 후 확인 |
-| migration 프로덕션 실행 | **미실행** | main 배포 시 CI/CD 자동 실행 (PRODUCTION-MIGRATION-STANDARD) |
+| §44 Windows 로컬 smoke A~E | **미실행** | 실제 PC 에서 `pair` → `run` 왕복이 필요하다. 사람이 코드를 옮겨 적는 단계가 있다 |
+| §45 프로덕션 왕복 smoke | **부분** | endpoint · migration · 거절 경로까지 확인. 실제 명령 왕복은 §44 와 함께 수행 |
+| CI Pipeline | **미확인** | main 에 다른 세션 push 가 연달아 들어와 `db140798c` 및 후속 commit 의 run 이 계속 취소됨. 배포 파이프라인(`Deploy API Server`)은 success |
+| migration 프로덕션 실행 | ✅ **완료** | 14-1 의 `DEVICE_NOT_FOUND` 응답이 근거 |
 
-**배포 전 이 WO 를 CLOSED 로 선언하지 않는다.**
+**§44 완료 전까지 이 WO 를 CLOSED 로 선언하지 않는다.**
 
 ---
 
