@@ -19,20 +19,11 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../../common/middleware/auth/authorization.middleware.js';
 import { SharedProductDescriptionService } from '../services/shared-product-description.service.js';
 import logger from '../../../utils/logger.js';
 import { requireProductDbWrite } from './product-db-write-authority.js';
-
-const ADMIN_ROLES = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-  'cosmetics:admin',
-  'cosmetics:operator',
-  'kpa-society:admin',
-  'kpa-society:operator',
-];
 
 function actorId(req: Request): string | null {
   return (req as { user?: { id?: string } }).user?.id ?? null;
@@ -43,7 +34,7 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
   const service = new SharedProductDescriptionService(dataSource);
 
   router.use(authenticate);
-  router.use(requireRole(ADMIN_ROLES));
+  router.use(requireAdmin);
 
   // 만료(수정 요청 후 기한 경과) 자동 삭제 — dry-run / apply.
   // 주의: '/:id' 라우트보다 먼저 등록(경로 충돌 방지).

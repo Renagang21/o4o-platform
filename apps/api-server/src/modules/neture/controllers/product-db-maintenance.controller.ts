@@ -21,20 +21,11 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../../common/middleware/auth/authorization.middleware.js';
 import { ProductCandidate } from '../entities/ProductCandidate.entity.js';
 import logger from '../../../utils/logger.js';
 import { requireProductDbWrite } from './product-db-write-authority.js';
-
-const ADMIN_ROLES = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-  'cosmetics:admin',
-  'cosmetics:operator',
-  'kpa-society:admin',
-  'kpa-society:operator',
-];
 
 /** 등록 완료 계열 상태 (제외 대상 아님 = 이미 처리된 후보) */
 const REGISTERED_STATUSES = ['approved_new_master', 'matched'] as const;
@@ -71,7 +62,7 @@ export function createProductDbMaintenanceController(dataSource: DataSource): Ro
   const router = Router();
 
   router.use(authenticate);
-  router.use(requireRole(ADMIN_ROLES));
+  router.use(requireAdmin);
 
   /**
    * POST /jobs/orphan-registered-candidates/dry-run

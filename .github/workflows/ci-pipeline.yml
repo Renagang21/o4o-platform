@@ -75,6 +75,22 @@ jobs:
     # 검사 범위·rule·baseline 갱신 규칙·제거 조건은 모두 scripts/lint-ratchet.mjs 상단 주석 참조.
     - name: Run ESLint (regression ratchet)
       run: node scripts/lint-ratchet.mjs
+
+    # WO-O4O-ADMIN-PARTNEROPS-REGISTRY-PRODUCTDB-AUTH-AND-LINT-GATE-FINAL-CLOSURE-V1 §7
+    #
+    # admin-dashboard 의 lint 스크립트는 `|| true` 로 끝나 **어떤 결과든 성공**이었고,
+    # 위 저장소 ratchet 은 오류만 보고 warning 은 전혀 막지 않았다.
+    # `|| true` 를 제거하고 warning 기준선 ratchet(--max-warnings 500)을 건 스크립트를
+    # 이 워크스페이스에만 blocking 으로 건다.
+    #   - 신규 error 1건 → 즉시 실패 (ESLint 는 오류가 있으면 max-warnings 와 무관하게 exit 1)
+    #   - warning 이 기준선 500 을 넘으면 실패
+    # 기준선 500 은 실측값이다(545 파일 / 0 errors / 500 warnings —
+    # no-unused-vars 447 · react-hooks/exhaustive-deps 53). rule 완화·범위 축소는 하지 않는다.
+    # 검사 범위를 `src` 로 넘기는 이유: 이전 `src/**/*.{ts,tsx}` 는 shell 이 확장하면
+    # globstar 미적용으로 100 파일(34 warnings)만 검사되어 환경마다 결과가 달랐다.
+    # 다른 워크스페이스는 이 단계의 영향을 받지 않는다.
+    - name: Run ESLint (admin-dashboard warning ratchet)
+      run: pnpm --filter @o4o/admin-dashboard run lint
     
     # WO-O4O-SECURITY-ROUTE-STATIC-GUARD-CI-V1
     # 2026-08-08 사고(/__debug__/** 무인증 노출) 재발 방지. blocking.

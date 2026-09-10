@@ -18,30 +18,21 @@
  *
  * 범위: product_images 에만 write. ProductMaster 본문/설명/후보 무변경.
  * audit_logs 에 image_added / image_primary_changed / image_hidden / image_restored 기록.
- * 권한: ADMIN_ROLES (operator write 금지 — operator scope 는 이 컨트롤러에 없음).
+ * 권한: requireAdmin (platform:super_admin 단독 — 공통 Product DB 정본 계약).
  */
 
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { DataSource, IsNull } from 'typeorm';
 import sharp from 'sharp';
-import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../../common/middleware/auth/authorization.middleware.js';
 import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import { ImageStorageService } from '../services/image-storage.service.js';
 import { ProductImage } from '../entities/ProductImage.entity.js';
 import { AuditLog } from '../../../entities/AuditLog.js';
 import logger from '../../../utils/logger.js';
 import { requireProductDbWrite } from './product-db-write-authority.js';
-
-const ADMIN_ROLES = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-  'cosmetics:admin',
-  'cosmetics:operator',
-  'kpa-society:admin',
-  'kpa-society:operator',
-];
 
 function actorId(req: Request): string | null {
   return (req as any).user?.id ?? null;
@@ -54,7 +45,7 @@ export function createProductMasterImageController(dataSource: DataSource): Rout
   const imageStorageService = new ImageStorageService();
 
   router.use(authenticate);
-  router.use(requireRole(ADMIN_ROLES));
+  router.use(requireAdmin);
 
   // audit 기록 (fire-and-forget — 실패해도 main action 롤백하지 않음)
   async function writeAudit(

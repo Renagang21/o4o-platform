@@ -21,18 +21,9 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../../common/middleware/auth/authorization.middleware.js';
 import logger from '../../../utils/logger.js';
-
-const ADMIN_ROLES = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-  'cosmetics:admin',
-  'cosmetics:operator',
-  'kpa-society:admin',
-  'kpa-society:operator',
-];
 
 const MAX_IDS = 100;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -67,7 +58,7 @@ export function createProductDescriptionQrSummaryController(dataSource: DataSour
   const router = Router();
 
   router.use(authenticate);
-  router.use(requireRole(ADMIN_ROLES));
+  router.use(requireAdmin);
 
   router.get('/description-qr-summary', async (req: Request, res: Response) => {
     try {

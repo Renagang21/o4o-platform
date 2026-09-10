@@ -1,45 +1,39 @@
 /**
- * WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1
- *
  * 공통 Product DB(ProductMaster · ProductIdentifier · shared_product_descriptions ·
- * canonical 승격)의 **write 권한** 경계.
+ * canonical 승격)의 **권한** 경계.
  *
- * 배경: o4o-product-db admin API 는 read/write 구분 없이 `ADMIN_ROLES`(9개 — 4개 서비스의
- * admin/operator 포함)를 허용해 왔다. 공통 Product DB 는 서비스별로 분리되지 않은 단일
- * 원본이므로, 서비스 운영자가 다른 서비스 제품의 원본을 수정할 수 있는 상태였다.
+ * 이력:
+ *   WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1
+ *     — read 는 `ADMIN_ROLES`(7개: 4개 서비스의 admin/operator 포함) 유지, write 만
+ *       `platform:super_admin` + `neture:admin` + `neture:operator` 로 좁혔다.
+ *   WO-O4O-ADMIN-PARTNEROPS-REGISTRY-PRODUCTDB-AUTH-AND-LINT-GATE-FINAL-CLOSURE-V1 §6 (현재)
+ *     — read 까지 `platform:super_admin` 단독으로 정렬했다.
  *
- * 계약:
- *   READ  — 기존 `ADMIN_ROLES` 유지. 서비스 운영자는 계속 조회·검색·상세·활용한다.
- *   WRITE — O4O 전체 관리자만. 새 역할 체계를 만들지 않고 기존 역할 어휘를 재사용한다.
+ * 현재 계약:
+ *   공통 Product DB 정본의 **조회 · 수정 · 승격 · 삭제 · 복원 · 정비 전부 `platform:super_admin`**.
+ *   공통 Product DB 는 서비스별로 분리되지 않은 단일 원본이므로, 특정 서비스의 admin/operator 가
+ *   다른 서비스 제품의 정본을 조회하거나 변경할 수 있어서는 안 된다.
  *
- * `PRODUCT_DB_WRITE_ROLES` 는 신설 역할이 아니라, 이미 공통 Product DB write 권한을 갖고
- * 있던 경로들의 역할 집합이다:
- *   - `platform:super_admin` — 기존 플랫폼 관리자 계약 (`requireAdmin`, 각 scope guard 의 platformBypass)
- *   - `neture:admin`         — `neture.routes.ts` `/admin/masters/:id`, `/admin/masters/resolve`
- *                              (`requireNetureScope('neture:admin')`)
- *   - `neture:operator`      — `operator-product-cleanup.controller.ts` merge-masters / fix-category / fix-brand
- *                              (`requireNetureScope('neture:operator')`)
+ * 구현:
+ *   `/api/v1/admin/o4o-product-db/*` 의 13개 컨트롤러가 각자 선언하던 7-role 배열을 모두 제거하고,
+ *   router floor 로 저장소 정본 미들웨어 `requireAdmin`(platform:super_admin 단독)을 사용한다.
+ *   **역할 목록을 이 파일에서 다시 선언하지 않는다** — 권한 어휘의 정본은 `requireAdmin` 하나다.
  *
- * 범위 밖(기존 계약 유지):
- *   - 공급자 자기 제품 경로 (`/api/v1/neture/supplier/*`) — 별도 계약이므로 섞지 않는다.
- *   - 서비스별 후보(candidate) 큐레이션 — `injectServiceScope` 로 서비스 격리돼 있다.
- *     단 후보를 공통 master 로 승격하는 지점은 이 계약을 따른다.
- *   - 매장 영역(StoreLocalProduct 등) — 이번 WO 범위 밖.
+ * 서비스 운영자 경로는 이 계약의 범위가 아니며 그대로 유지된다:
+ *   - `/api/v1/operator/product-candidates/*`      — 서비스 후보 큐레이션 (OPERATOR_ROLES + service scope)
+ *   - `/api/v1/operator/store-product-requests/*`  — 매장 상품 등록 요청
+ *   - `/api/v1/neture/supplier/*`                  — 공급자 자기 제품 · 설명서 초안 제출
+ *   서비스 운영자는 자기 서비스 API 와 service scope 안에서 제안 · 등록 요청 · 초안 작성을 계속한다.
+ *   공통 정본을 직접 변경하는 경로만 금지된다.
  */
 
-import { requireRole } from '../../../common/middleware/auth.middleware.js';
-
-/** 공통 Product DB write 를 수행할 수 있는 역할 (O4O 전체 관리자) */
-export const PRODUCT_DB_WRITE_ROLES = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-];
+import { requireAdmin } from '../../../common/middleware/auth/authorization.middleware.js';
 
 /**
  * 공통 Product DB write 가드.
  *
- * router-level 인증 + `requireRole(ADMIN_ROLES)`(read floor) 뒤에 **write route 에만**
- * 추가로 건다. read route 의 허용 범위는 바꾸지 않는다.
+ * router floor(`requireAdmin`)와 동일한 정본 가드다. write route 에 계속 명시적으로 붙여
+ * "이 route 는 공통 정본을 변경한다" 는 의도를 코드에 남긴다(다층 방어 · 가독성).
+ * floor 가 완화되더라도 write 는 platform:super_admin 을 유지한다.
  */
-export const requireProductDbWrite = requireRole(PRODUCT_DB_WRITE_ROLES);
+export const requireProductDbWrite = requireAdmin;
