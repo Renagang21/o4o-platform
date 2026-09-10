@@ -51,7 +51,7 @@ import { createStorePopStaffController } from '../o4o-store/controllers/pop.cont
 import { createStoreQrStaffController } from '../o4o-store/controllers/qr.controller.js';
 import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
 import { createMultilingualProductContentController } from '../o4o-store/controllers/multilingual-product-content.controller.js'; // WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1
-import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
+import { createCosmeticsAssetSnapshotController } from '../o4o-store/controllers/cosmetics-asset-snapshot.controller.js'; // WO-O4O-KCOS-LIBRARY-ORGANIZATION-SCOPE-AND-SNAPSHOT-ROUTE-CLOSURE-V1
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
 import { createStoreExecutionAssetsController } from '../o4o-store/controllers/store-execution-assets.controller.js'; // WO-O4O-STORE-EXECUTION-ASSETS-CROSSSERVICE-PHASE2-D-V1
 import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
@@ -175,8 +175,11 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // 판매자 모집 노출 승인 (WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1) — serviceKey 'k-cosmetics' 고정
   router.use(createServiceRecruitmentExposureProxyController(coreRequireAuth as any, requireCosmeticsScope('cosmetics:operator'), 'k-cosmetics'));
 
-  // Asset Snapshot
-  router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));
+  // Asset Snapshot — WO-O4O-KCOS-LIBRARY-ORGANIZATION-SCOPE-AND-SNAPSHOT-ROUTE-CLOSURE-V1:
+  //   KPA 전용 createAssetSnapshotController(kpa:* role · resolveKpaOrgId) 를 그대로 마운트해
+  //   KCos 자료함이 사용자의 **KPA 조직** 스냅샷을 돌려주던 tenant scope 결함을 닫는다.
+  //   KCos request → cosmetics:store_owner → KCos organizationId. KPA fallback 없음.
+  router.use('/assets', createCosmeticsAssetSnapshotController(dataSource, coreRequireAuth as any));
 
   // Store Asset Control
   router.use('/store-assets', createStoreAssetControlController(dataSource, coreRequireAuth as any));
