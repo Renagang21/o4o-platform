@@ -47,7 +47,7 @@ export interface BranchSite {
   isPublished: boolean;
 }
 
-export type BranchPostCategory = 'notice' | 'resource';
+export type BranchPostCategory = 'notice' | 'resource' | 'meeting';
 
 export interface BranchPost {
   id: string;
@@ -111,6 +111,17 @@ export async function getPublicPosts(
   params?: { category?: BranchPostCategory; limit?: number; offset?: number },
 ): Promise<{ items: BranchPost[]; total: number }> {
   return unwrap(await api.get(`${BASE}/branches/${encodeURIComponent(slug)}/posts`, { params }));
+}
+
+/**
+ * 회원 글 목록 — 공지/자료실에 **회의록·회의자료(meeting)** 를 더해서 본다.
+ * 공개 목록(`getPublicPosts`)에는 meeting 이 나오지 않는다.
+ */
+export async function getMemberPosts(
+  slug: string,
+  params?: { category?: BranchPostCategory; limit?: number; offset?: number },
+): Promise<{ items: BranchPost[]; total: number }> {
+  return unwrap(await api.get(`${BASE}/branches/${encodeURIComponent(slug)}/me/posts`, { params }));
 }
 
 // ── auth (본인 축) ──────────────────────────────────────────────────────────

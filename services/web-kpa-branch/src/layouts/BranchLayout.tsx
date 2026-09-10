@@ -70,6 +70,8 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
           { to: `${basePath}/mypage/fees`, label: '내 회비', end: false },
           { to: `${basePath}/mypage/education`, label: '내 연수교육', end: false },
           { to: `${basePath}/mypage/events`, label: '행사', end: false },
+          // 회의록·회의자료는 회원 목록에서만 나온다 — 공개 메뉴에 두지 않는다
+          { to: `${basePath}/meetings`, label: '회의록', end: false },
         ]
       : []),
   ];

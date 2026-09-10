@@ -8,6 +8,7 @@
  *   GET    /api/v1/kpa-branch/branches/:branchSlug                           (public)  분회 단건
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/site                      (public)  게시된 홈페이지
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/posts                     (public)  공지/자료실
+ *   GET    /api/v1/kpa-branch/branches/:branchSlug/me/posts                  (member)  공지/자료실 + 회의
  *   POST   /api/v1/kpa-branch/join                                           (public)  서비스 가입 신청
  *   GET    /api/v1/kpa-branch/join/status                                    (auth)    내 가입 상태
  *   GET    /api/v1/kpa-branch/me/access                                      (auth)
@@ -263,6 +264,16 @@ export function createKpaBranchRoutes(): Router {
     '/branches/:branchSlug/me/events',
     ...memberReportGuards,
     wrap(BranchEventController.memberList),
+  );
+
+  // 회원 글 목록 — 공지/자료실 + **회의록·회의자료**
+  //
+  // `branch_posts` 에는 visibility 컬럼이 없다. 공개 목록은 notice/resource 만 내보내고
+  // meeting 은 이 라우트에서만 나온다 (WO-O4O-KPA-BRANCH-MEETING-POSTS-ADOPTION-V1 §5).
+  router.get(
+    '/branches/:branchSlug/me/posts',
+    ...memberReportGuards,
+    wrap(BranchSiteController.memberPosts),
   );
 
   // 회원 임원 명부 — public + members_only, 현직만

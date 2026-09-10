@@ -16,6 +16,7 @@
  *   /:branchSlug/mypage/education     내 연수교육 조회 (회원)
  *   /:branchSlug/mypage/events        분회 행사·참가 응답 (회원)
  *   /:branchSlug/operator/site        홈페이지 설정 (운영자)
+ *   /:branchSlug/meetings             회의록·회의자료 (회원)
  *   /:branchSlug/operator/posts       글쓰기·글 관리 (운영자)
  *   /:branchSlug/operator/domains     자체 도메인 연결 (운영자)
  *   /:branchSlug/operator/annual-reports 신상신고 검수·승인 (운영자)
@@ -69,6 +70,8 @@ function BranchSection({ slug, basePath }: { slug: string; basePath: string }) {
         <Route index element={<BranchHomePage slug={slug} basePath={basePath} />} />
         <Route path="notices" element={<BranchPostsPage slug={slug} category="notice" />} />
         <Route path="resources" element={<BranchPostsPage slug={slug} category="resource" />} />
+        {/* 회의록·회의자료는 회원 축에서만 읽는다 (WO-O4O-KPA-BRANCH-MEETING-POSTS-ADOPTION-V1) */}
+        <Route path="meetings" element={<BranchPostsPage slug={slug} category="meeting" scope="member" />} />
         <Route path="officers" element={<BranchOfficersPage slug={slug} />} />
         <Route path="mypage/annual-report" element={<AnnualReportPage slug={slug} />} />
         <Route path="mypage/fees" element={<MyFeePage slug={slug} />} />

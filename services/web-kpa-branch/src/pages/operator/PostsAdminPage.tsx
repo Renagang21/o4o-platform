@@ -1,6 +1,7 @@
 /**
- * PostsAdminPage — 분회 공지/자료실 글 관리 (운영자 글쓰기)
+ * PostsAdminPage — 분회 공지/자료실/회의 글 관리 (운영자 글쓰기)
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1 §5
+ * WO-O4O-KPA-BRANCH-MEETING-POSTS-ADOPTION-V1 (회의 분류 추가 — 전용 편집기를 만들지 않는다)
  *
  * 1차 범위는 제목·본문·고정·공개 여부다. 첨부 업로드는 후속 WO 로 분리한다.
  * 대상 분회는 URL(slug)에서만 오고, 본문에 organizationId 를 넣지 않는다.
@@ -17,6 +18,12 @@ import {
 import { describeApiError } from '../../lib/errors';
 
 const EMPTY = { category: 'notice' as BranchPostCategory, title: '', content: '', isPinned: false };
+
+const CATEGORY_LABEL: Record<BranchPostCategory, string> = {
+  notice: '공지',
+  resource: '자료실',
+  meeting: '회의',
+};
 
 export default function PostsAdminPage({ slug }: { slug: string }) {
   const [items, setItems] = useState<BranchPost[] | null>(null);
@@ -95,6 +102,7 @@ export default function PostsAdminPage({ slug }: { slug: string }) {
             >
               <option value="notice">공지</option>
               <option value="resource">자료실</option>
+              <option value="meeting">회의</option>
             </select>
             <input
               value={draft.title}
@@ -103,6 +111,11 @@ export default function PostsAdminPage({ slug }: { slug: string }) {
               className="flex-1 rounded border border-gray-300 px-3 py-2"
             />
           </div>
+          {draft.category === 'meeting' && (
+            <p className="rounded bg-gray-50 px-3 py-2 text-xs text-gray-600">
+              회의 <strong>일정·장소·참석</strong>은 «행사»에서 관리합니다. 여기에는 회의록과 회의자료만 올립니다.
+            </p>
+          )}
           <textarea
             value={draft.content}
             onChange={(e) => setDraft({ ...draft, content: e.target.value })}
@@ -149,7 +162,7 @@ export default function PostsAdminPage({ slug }: { slug: string }) {
           {(items ?? []).map((p) => (
             <li key={p.id} className="flex items-center gap-3 px-4 py-3">
               <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
-                {p.category === 'notice' ? '공지' : '자료실'}
+                {CATEGORY_LABEL[p.category]}
               </span>
               <span className="truncate font-medium text-gray-900">{p.title}</span>
               <span

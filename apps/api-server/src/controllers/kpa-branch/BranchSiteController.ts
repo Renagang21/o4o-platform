@@ -4,11 +4,15 @@
  *
  * 1차 범위: 로고 / 이름 / 소개 / 연락처 / 공지 / 자료실 / 관리자 글쓰기.
  * 페이지 빌더(블록·레이아웃 편집)는 범위 밖이다 — template 은 'classic' 고정이다.
+ *
+ * 회의록·회의자료는 같은 `branch_posts` 를 `category='meeting'` 으로 쓴다
+ * (WO-O4O-KPA-BRANCH-MEETING-POSTS-ADOPTION-V1). 회의 전용 컨트롤러를 만들지 않는다.
  */
 import type { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { BranchSite } from '../../routes/kpa-branch/entities/branch-site.entity.js';
 import { BranchPost } from '../../routes/kpa-branch/entities/branch-post.entity.js';
+import type { BranchPostCategory } from '../../routes/kpa-branch/entities/branch-post.entity.js';
 import { KpaOrganization } from '../../routes/kpa-branch/entities/kpa-organization.entity.js';
 
 function serializeSite(site: BranchSite | null, org: KpaOrganization) {
@@ -24,6 +28,26 @@ function serializeSite(site: BranchSite | null, org: KpaOrganization) {
     template: site?.template ?? 'classic',
     isPublished: site?.is_published ?? false,
   };
+}
+
+/**
+ * 회의록은 회원 축에서 읽는다.
+ *
+ * `branch_posts` 에는 visibility 컬럼이 없다 — 공개 목록은 게시된 글을 전부 내보내는
+ * public-only 구조다. 이번 WO 에서 새 visibility 시스템을 만들지 않는다(WO §5). 대신
+ * **공개 목록은 대외 축(notice/resource)만 내보내고, meeting 은 회원 목록에서만 나온다.**
+ * 컬럼 하나 없이 "회의록은 기본 회원용" 을 지키는 가장 작은 방법이다.
+ */
+const PUBLIC_CATEGORIES: BranchPostCategory[] = ['notice', 'resource'];
+const MEMBER_CATEGORIES: BranchPostCategory[] = ['notice', 'resource', 'meeting'];
+
+/** 쿼리스트링 category 를 화이트리스트로 좁힌다. 밖의 값은 필터 없음으로 떨어뜨리지 않고 거른다. */
+function pickCategory(
+  raw: unknown,
+  allowed: BranchPostCategory[],
+): BranchPostCategory | null | 'INVALID' {
+  if (raw === undefined || raw === '') return null;
+  return allowed.includes(raw as BranchPostCategory) ? (raw as BranchPostCategory) : 'INVALID';
 }
 
 function serializePost(p: BranchPost) {
@@ -61,13 +85,51 @@ export class BranchSiteController {
     return res.json({ success: true, data: serializeSite(site, org) });
   }
 
-  /** GET /branches/:branchSlug/posts?category=notice — 공개 글 목록 */
+  /** GET /branches/:branchSlug/posts?category=notice — 공개 글 목록 (notice/resource 만) */
   static async publicPosts(req: Request, res: Response) {
-    const category = req.query.category as 'notice' | 'resource' | undefined;
+    const category = pickCategory(req.query.category, PUBLIC_CATEGORIES);
+    if (category === 'INVALID') {
+      return res.status(422).json({
+        success: false,
+        error: '공개 목록에서 볼 수 없는 분류입니다.',
+        code: 'INVALID_CATEGORY',
+      });
+    }
     const qb = AppDataSource.getRepository(BranchPost)
       .createQueryBuilder('p')
       .where('p.organization_id = :orgId', { orgId: req.branch!.id })
-      .andWhere('p.status = :status', { status: 'published' });
+      .andWhere('p.status = :status', { status: 'published' })
+      .andWhere('p.category IN (:...allowed)', { allowed: PUBLIC_CATEGORIES });
+    if (category) qb.andWhere('p.category = :category', { category });
+    const [items, total] = await qb
+      .orderBy('p.is_pinned', 'DESC')
+      .addOrderBy('p.published_at', 'DESC')
+      .take(Math.min(Number(req.query.limit ?? 20), 100))
+      .skip(Number(req.query.offset ?? 0))
+      .getManyAndCount();
+    return res.json({ success: true, data: { items: items.map(serializePost), total } });
+  }
+
+  /**
+   * GET /branches/:branchSlug/me/posts?category=meeting — 회원 글 목록
+   *
+   * 공개 목록과 같은 게시글에 **회의(meeting)를 더해서** 낸다. 분회는 URL(slug)에서
+   * 결정되고, 소속 판정은 라우트의 member 가드가 이미 끝냈다.
+   */
+  static async memberPosts(req: Request, res: Response) {
+    const category = pickCategory(req.query.category, MEMBER_CATEGORIES);
+    if (category === 'INVALID') {
+      return res.status(422).json({
+        success: false,
+        error: '알 수 없는 분류입니다.',
+        code: 'INVALID_CATEGORY',
+      });
+    }
+    const qb = AppDataSource.getRepository(BranchPost)
+      .createQueryBuilder('p')
+      .where('p.organization_id = :orgId', { orgId: req.branch!.id })
+      .andWhere('p.status = :status', { status: 'published' })
+      .andWhere('p.category IN (:...allowed)', { allowed: MEMBER_CATEGORIES });
     if (category) qb.andWhere('p.category = :category', { category });
     const [items, total] = await qb
       .orderBy('p.is_pinned', 'DESC')
@@ -113,7 +175,14 @@ export class BranchSiteController {
 
   /** GET /branches/:branchSlug/operator/posts — draft 포함 */
   static async operatorPosts(req: Request, res: Response) {
-    const category = req.query.category as 'notice' | 'resource' | undefined;
+    const category = pickCategory(req.query.category, MEMBER_CATEGORIES);
+    if (category === 'INVALID') {
+      return res.status(422).json({
+        success: false,
+        error: '알 수 없는 분류입니다.',
+        code: 'INVALID_CATEGORY',
+      });
+    }
     const qb = AppDataSource.getRepository(BranchPost)
       .createQueryBuilder('p')
       .where('p.organization_id = :orgId', { orgId: req.branch!.id });
@@ -135,7 +204,7 @@ export class BranchSiteController {
     const repo = AppDataSource.getRepository(BranchPost);
     const post = repo.create({
       organization_id: req.branch!.id,
-      category: category === 'resource' ? 'resource' : 'notice',
+      category: MEMBER_CATEGORIES.includes(category) ? (category as BranchPostCategory) : 'notice',
       title,
       content: content ?? '',
       attachments: Array.isArray(attachments) ? attachments : [],
@@ -159,7 +228,16 @@ export class BranchSiteController {
       return res.status(404).json({ success: false, error: '글을 찾을 수 없습니다.', code: 'BRANCH_POST_NOT_FOUND' });
     }
     const { category, title, content, attachments, isPinned, status } = req.body ?? {};
-    if (category !== undefined) post.category = category === 'resource' ? 'resource' : 'notice';
+    if (category !== undefined) {
+      if (!MEMBER_CATEGORIES.includes(category)) {
+        return res.status(422).json({
+          success: false,
+          error: '알 수 없는 분류입니다.',
+          code: 'INVALID_CATEGORY',
+        });
+      }
+      post.category = category as BranchPostCategory;
+    }
     if (title !== undefined) post.title = title;
     if (content !== undefined) post.content = content;
     if (attachments !== undefined) post.attachments = Array.isArray(attachments) ? attachments : [];

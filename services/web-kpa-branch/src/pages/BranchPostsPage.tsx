@@ -1,15 +1,37 @@
 /**
- * BranchPostsPage — 공지 / 자료실 목록 + 본문
+ * BranchPostsPage — 공지 / 자료실 / 회의록 목록 + 본문
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
+ * WO-O4O-KPA-BRANCH-MEETING-POSTS-ADOPTION-V1 (회의 분류 추가)
  *
  * 공개 API 가 본문까지 함께 내려주므로 목록에서 펼쳐 읽는다 (별도 상세 라우트 없음 — 1차 범위).
+ * 회의록은 공개 목록에 없다 — `scope='member'` 로 회원 라우트에서 읽는다.
  */
 import { useEffect, useState } from 'react';
-import { getPublicPosts, type BranchPost, type BranchPostCategory } from '../lib/api/branch';
+import {
+  getMemberPosts,
+  getPublicPosts,
+  type BranchPost,
+  type BranchPostCategory,
+} from '../lib/api/branch';
 
-const LABEL: Record<BranchPostCategory, string> = { notice: '공지', resource: '자료실' };
+const LABEL: Record<BranchPostCategory, string> = {
+  notice: '공지',
+  resource: '자료실',
+  meeting: '회의록·회의자료',
+};
 
-export default function BranchPostsPage({ slug, category }: { slug: string; category: BranchPostCategory }) {
+/** 목록 행에 붙이는 짧은 분류 배지 */
+const BADGE: Record<BranchPostCategory, string> = { notice: '공지', resource: '자료', meeting: '회의' };
+
+export default function BranchPostsPage({
+  slug,
+  category,
+  scope = 'public',
+}: {
+  slug: string;
+  category: BranchPostCategory;
+  scope?: 'public' | 'member';
+}) {
   const [items, setItems] = useState<BranchPost[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -18,13 +40,14 @@ export default function BranchPostsPage({ slug, category }: { slug: string; cate
     let alive = true;
     setItems(null);
     setError(null);
-    getPublicPosts(slug, { category, limit: 50 })
+    const load = scope === 'member' ? getMemberPosts : getPublicPosts;
+    load(slug, { category, limit: 50 })
       .then((r) => alive && setItems(r.items))
       .catch(() => alive && setError('글 목록을 불러오지 못했습니다.'));
     return () => {
       alive = false;
     };
-  }, [slug, category]);
+  }, [slug, category, scope]);
 
   return (
     <div>
@@ -41,6 +64,9 @@ export default function BranchPostsPage({ slug, category }: { slug: string; cate
               className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm hover:bg-gray-50"
             >
               {p.isPinned && <span className="rounded bg-primary-50 px-1.5 py-0.5 text-xs text-primary-700">고정</span>}
+              <span className="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
+                {BADGE[p.category]}
+              </span>
               <span className="truncate font-medium text-gray-900">{p.title}</span>
               <span className="ml-auto shrink-0 text-xs text-gray-400">
                 {p.publishedAt ? new Date(p.publishedAt).toLocaleDateString('ko-KR') : ''}

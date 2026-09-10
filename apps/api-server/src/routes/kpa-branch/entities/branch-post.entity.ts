@@ -2,12 +2,16 @@
  * BranchPost Entity
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1 §5
  *
- * 분회 홈페이지의 공지 / 자료실 글. 운영자가 쓰고 방문자가 읽는다.
+ * 분회 홈페이지의 공지 / 자료실 / 회의 글. 운영자가 쓰고 방문자·회원이 읽는다.
+ *
+ * `meeting` 은 회의록·회의자료다 (WO-O4O-KPA-BRANCH-MEETING-POSTS-ADOPTION-V1).
+ * 회의 **일정**은 여기 두지 않는다 — `branch_events` 가 담는다. 한 회의를 두 곳에
+ * 나눠 적지 않는다: 일정은 행사 행 하나, 회의록은 글 하나다.
  * forum(커뮤니티) 구조를 분회 축으로 재해석하지 않는다 — migration 주석 참조.
  */
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
 
-export type BranchPostCategory = 'notice' | 'resource';
+export type BranchPostCategory = 'notice' | 'resource' | 'meeting';
 export type BranchPostStatus = 'draft' | 'published';
 
 export interface BranchPostAttachment {
