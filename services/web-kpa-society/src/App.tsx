@@ -230,6 +230,8 @@ const StoreSignagePage = lazy(() => import('./pages/pharmacy/StoreSignagePage').
 // WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 매장 플레이리스트 표준 /new 등록
 const StorePlaylistCreatePage = lazy(() => import('./pages/pharmacy/StorePlaylistCreatePage').then(m => ({ default: m.StorePlaylistCreatePage })));
 const StoreQRPage = lazy(() => import('./pages/pharmacy/StoreQRPage').then(m => ({ default: m.StoreQRPage })));
+// WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1: 매장 실행 홈(태블릿+QR 배치 현황)
+const StoreExecutionPage = lazy(() => import('./pages/pharmacy/StoreExecutionPage'));
 // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1
 const StoreQrAiDescriptionPage = lazy(() => import('./pages/pharmacy/StoreQrAiDescriptionPage'));
 const StorePopPage = lazy(() => import('./pages/pharmacy/StorePopPage').then(m => ({ default: m.StorePopPage })));
@@ -949,6 +951,10 @@ function App() {
 
             {/* Pharmacy Info (WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1) */}
             <Route path="info" element={<PharmacyInfoPage />} />
+
+            {/* WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1 — 매장 실행 홈.
+                Pharmacy-Hub 의 `/store-owner/execution` 과 같은 공통 View 를 쓴다. */}
+            <Route path="execution" element={<StoreExecutionPage />} />
 
             {/* Marketing */}
             <Route path="marketing/qr" element={<StoreQRPage />} />

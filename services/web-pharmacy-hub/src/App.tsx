@@ -228,6 +228,8 @@ import MyCreditsPage from './pages/account/MyCreditsPage';
 import CertificateVerifyPage from './pages/education/CertificateVerifyPage';
 // WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 — 매장 실행 자산 (QR · POP · 사이니지 · 상품 설명서)
 import QrPage from './pages/store-owner/QrPage';
+// WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1: 매장 실행 홈(태블릿+QR 배치 현황)
+import StoreExecutionPage from './pages/store-owner/StoreExecutionPage';
 import PopPage from './pages/store-owner/PopPage';
 import SignagePage from './pages/store-owner/SignagePage';
 // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7·§8 — 공통 View 채택
@@ -748,6 +750,9 @@ export default function App() {
             <Route path="blog" element={<BlogPage />} />
             <Route path="blog/new" element={<BlogEditorPage />} />
             <Route path="blog/:id/edit" element={<BlogEditorPage />} />
+            {/* WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1 — 매장 실행 홈.
+                아래 실행 자산 화면들이 "무엇을 만드는가" 라면 이 화면은 "지금 어디에서 무엇이 쓰이는가" 다. */}
+            <Route path="execution" element={<StoreExecutionPage />} />
             {/* WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 — 매장 실행 자산 (출력·실행) */}
             <Route path="qr" element={<QrPage />} />
             <Route path="pop" element={<PopPage />} />

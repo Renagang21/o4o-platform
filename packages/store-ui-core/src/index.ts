@@ -490,6 +490,10 @@ export * from './components/pop-staff';
 export * from './components/product-descriptions';
 export * from './components/signage';
 
+// 매장 실행 홈 (WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1)
+//   "어디에서 무엇이 지금 사용 중인가" — Tablet + QR 두 표면만. 제작 화면이 아니다.
+export * from './components/execution';
+
 // 채널 콘솔 · QR 콘솔 · 블로그 관리
 // (WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1)
 export * from './components/channels';

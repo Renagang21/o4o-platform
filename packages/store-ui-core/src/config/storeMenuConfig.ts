@@ -233,6 +233,12 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
     //   (공통 태블릿 라우터를 조직 해석기만 갈아 끼워 재사용 — 신규 모델 0).
     //   route 도 기능도 없는 항목은 메뉴를 만들지 않는다 (데드링크 0 / "준비 중" 메뉴 0).
     { label: '매장 실행', items: [
+      // WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1:
+      //   Pharmacy-Hub 가 먼저 갖고 있던 '매장 실행' 개념의 **홈**. KPA 와 같은 공통 View
+      //   (@o4o/store-ui-core `StoreExecutionHomeView`)를 쓴다 — serviceKey 분기 0.
+      //   아래 항목들이 "무엇을 만드는가" 라면 이 항목은 "지금 어디에서 무엇이 쓰이는가" 다.
+      //   v1 표면은 태블릿 + QR 뿐이다(POP·사이니지는 배치 축이 없어 포함하지 않는다).
+      { key: 'store-execution', label: '실행 현황', subPath: '/execution' },
       { key: 'qr',      label: 'QR',           subPath: '/qr' },
       { key: 'pop',     label: 'POP',          subPath: '/pop' },
       { key: 'signage', label: '디지털 사이니지', subPath: '/signage' },
@@ -343,6 +349,14 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       //   라벨만 '태블릿 화면 제작'으로 정비(코너별 화면·대기화면 제작·적용). key/subPath/route/기능 무변경.
       //   신규 메뉴 추가 아님(같은 route 중복 방지). GP/KCos 무영향.
       { key: 'tablet-displays', label: '태블릿 화면 제작', subPath: '/commerce/tablet-displays' },
+    ]},
+    // WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1 (KPA 블록):
+    //   Pharmacy-Hub 에만 있던 '매장 실행' 축을 KPA 로 공통 승격한다.
+    //   바로 위 '약국 경영지원' 은 **제작** 축(무엇을 만드는가)이고, 이 그룹은 **실행** 축
+    //   (지금 어디에서 무엇이 쓰이는가)이다 — 그래서 붙여 두되 합치지 않는다.
+    //   기존 QR·POP·태블릿 항목은 route 변경 없이 제자리에 둔다(이번 회차는 IA 이동을 하지 않는다).
+    { label: '매장 실행', items: [
+      { key: 'store-execution', label: '실행 현황', subPath: '/execution' },
     ]},
     // WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1: KPA 사이드바에서 "매장 제작 자료" 메뉴 숨김.
     //   POP/제작 결과물은 콘텐츠 목록(QR·POP 바로 만들기) + 결과물 메뉴 중심으로 안내한다.

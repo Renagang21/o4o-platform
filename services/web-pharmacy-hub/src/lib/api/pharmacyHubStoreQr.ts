@@ -62,6 +62,13 @@ export interface StoreQrCode {
   updatedAt: string;
   consultationCtaEnabled: boolean;
   consultationCtaLabel: string | null;
+  // WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1 (additive · 백엔드 무변경):
+  //   `store-qr.service.ts` 는 이미 두 값을 내려주고 있었는데 프론트 타입만 비어 있었다.
+  //   배치(placement)는 대상(targetKind)과 **다른 축**이다 — 어디에 붙어 있는지를 말한다.
+  /** 활성 배치의 대표값. null = 배치 0곳, 'MULTIPLE' = 2곳 이상(위치를 단정하지 않는다). */
+  primaryPlacement?: string | null;
+  /** 활성 배치 수. */
+  activePlacementCount?: number;
 }
 
 export interface StoreQrPage {
