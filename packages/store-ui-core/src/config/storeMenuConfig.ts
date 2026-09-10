@@ -121,7 +121,10 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'product-descriptions', label: '상품 설명', subPath: '/library/product-descriptions' },
       // WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: 제품 파생 콘텐츠
       { key: 'content-blog', label: '블로그',  subPath: '/content/blog' },
-      { key: 'pop',          label: 'POP',     subPath: '/marketing/pop' },
+      // WO-O4O-KCOS-POP-V2-CANONICAL-ADOPTION-V1: KCos 매장 POP 진입을 canonical POP V2 로 전환.
+      //   legacy `/marketing/pop`(즉시 PDF 생성) route 는 삭제하지 않는다 — 북마크·HUB 동선 보존(§4).
+      //   KPA 블록(아래) · PH 블록은 건드리지 않는다.
+      { key: 'pop',          label: 'POP',     subPath: '/marketing/pop-v2' },
       { key: 'qr',           label: 'QR 코드', subPath: '/marketing/qr' },
     ]},
     // WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1 / PHASE2-C-V1: 내 자료함
