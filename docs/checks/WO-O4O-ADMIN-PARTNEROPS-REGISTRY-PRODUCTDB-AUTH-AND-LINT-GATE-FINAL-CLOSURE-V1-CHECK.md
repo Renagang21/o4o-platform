@@ -317,6 +317,11 @@ push(`307b09329`)가 같은 concurrency group 을 선점해 취소된 것이다(
 > 8개 역할 전수 403 은 요청 수준 Jest 스위트(`product-db-write-authority.test.ts`)가 고정한다.
 > 운영에는 `cosmetics:admin` · `neture:operator` 등을 **플랫폼 역할 없이** 보유한 계정이 없어
 > (유일 보유 계정이 `platform:super_admin` 을 함께 가진다) 운영 실측은 위 3 페르소나로 수행했다.
+>
+> **검증 전용 운영 계정을 신설하지 않는다 (판정 NOT_REQUIRED).** 8역할은 실제 Express 요청 수준
+> 테스트로 검증되고, 경계는 `requireAdmin` 단일 정본이며, 운영에서도 실제 서비스 역할 계정의 403 을
+> 확인했다. 검증만을 위해 운영 권한 계정을 늘리는 것은 오히려 보안 부담이다. 서비스별 권한 E2E 가
+> 필요해지면 테스트 DB · 비운영 계정으로 별도 마련한다 — 본 WO 의 종결 조건이 아니다.
 
 ### §10.4 브라우저 검증
 
@@ -324,6 +329,10 @@ push(`307b09329`)가 같은 concurrency group 을 선점해 취소된 것이다(
 "비밀번호를 자동화 인자에 전달하지 않는다 · 안전한 인증 세션이 없다면 API 두 페르소나 실측과
 선행 로그인 smoke 를 근거로 삼고 로그인 브라우저 검증을 억지로 수행하지 않는다" 를 정하고 있다.
 근거는 위 §10.3 실측으로 대체한다.
+
+본 WO 의 변경 대상은 **운영 app 상태 · 백엔드 권한 선언 · lint 게이트** 이며 화면 구조나 메뉴를
+바꾸지 않았다. 따라서 API 실측과 선행 로그인 smoke 로 충분하고, 비밀번호 노출 위험을 감수하면서
+브라우저 로그인을 자동화할 이유가 없다 — `NOT_REQUIRED_WITH_JUSTIFICATION`.
 
 ---
 
@@ -349,11 +358,23 @@ Deploy API Server (Cloud Run)              = SUCCESS   (f2fb1eed0)
 Deploy Admin Dashboard (Cloud Run)         = SUCCESS   (c5147876d)
 Deploy Web Services (Cloud Run)            = SUCCESS   (c5147876d)
 AppStore Guard                             = NOT_TRIGGERED (로컬 실행 PASS)
-CI Pipeline                                = 아래 주석
+CI Pipeline                                = PENDING   (아래 주석)
 Production migration                       = SUCCESS   (04:33:24Z 적용 · 1행)
+BROWSER_VERIFICATION                       = NOT_REQUIRED_WITH_JUSTIFICATION (§10.4)
+DEDICATED_ROLE_PERSONA_WO                  = NOT_REQUIRED (§10.3 주석)
+INITIAL_MIGRATION_FAILURE                  = RESOLVED  (§6-A)
+PRODUCTION_DATA_DAMAGE                     = ZERO
+ROLLBACK_GUARD                             = PASS
 
-ADMIN_PARTNEROPS_REGISTRY_PRODUCTDB_AUTH_AND_LINT_GATE_FINAL_CLOSURE = CLOSED
+ADMIN_PARTNEROPS_REGISTRY_PRODUCTDB_AUTH_AND_LINT_GATE_FINAL_CLOSURE
+  = IMPLEMENTATION_COMPLETE / CI_CONFIRMATION_PENDING
 ```
+
+**최종 상태를 `CLOSED` 로 쓰지 않는 이유** — §12 완료 조건에 `CI_PIPELINE = SUCCESS` 가 있으나
+본 WO 변경을 포함한 CI Pipeline 의 **성공 실행이 아직 한 건도 확정되지 않았다**(전부 `cancelled`).
+코드·운영 반영은 끝났으므로 추가 수정은 필요 없고, 본 WO 코드를 포함한 이후 main 커밋의
+CI Pipeline 이 success 로 완료되면 그 SHA 와 run id 를 여기에 한 줄 기록하고 `CLOSED` 로 승격한다.
+실패하면 본 변경과의 관련성부터 분류한다.
 
 **`PARTNEROPS_AVAILABILITY` 해석** — §12 의 문자 그대로의 ZERO 는 달성하지 않았다.
 `GET /api/v1/apps/availability` 는 `listInstalled()` 로 전 행을 돌려주므로 `status='inactive'` 인
