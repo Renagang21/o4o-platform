@@ -28,6 +28,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle, Edit3, Trash2, ArrowLeft, Save, ExternalLink, Printer } from 'lucide-react';
 import { RichTextEditor } from '@o4o/content-editor';
 import { toast } from '@o4o/error-handling';
+import { CANONICAL_STORE_POP_V2_ROUTE, buildPopV2HandoffState } from '@o4o/store-ui-core';
 // WO-O4O-KPA-MY-STORE-COPIES-STANDARD-TABLE-V1: list view 표준 테이블
 import { DataTable, type Column, ActionBar, BulkResultModal } from '@o4o/ui';
 import { useBatchAction } from '@o4o/operator-ux-core';
@@ -300,7 +301,7 @@ export function PharmacyPopPage() {
           <h1 className="text-xl font-bold text-slate-800">내 매장 POP</h1>
           <p className="text-sm text-slate-500 mt-1">
             매장 HUB 에서 가져온 POP 사본 목록입니다. 자유롭게 수정할 수 있으며,
-            PDF 출력은 기존 POP 출력 화면에서 진행합니다.
+            PDF 출력은 POP 제작 화면에서 진행합니다.
           </p>
         </div>
         <div className="flex gap-2 shrink-0">
@@ -312,7 +313,7 @@ export function PharmacyPopPage() {
             매장 HUB POP
           </button>
           <button
-            onClick={() => navigate('/store/marketing/pop')}
+            onClick={() => navigate(CANONICAL_STORE_POP_V2_ROUTE)}
             className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200"
           >
             <Printer className="w-4 h-4" />
@@ -440,12 +441,18 @@ export function PharmacyPopPage() {
                 align: 'right',
                 render: (_v, item) => (
                   <div className="flex items-center justify-end gap-1">
-                    {/* WO-O4O-POP-IMPORT-TO-BUILDER-LINK-V1: 이 POP으로 제작 → builder prefill */}
+                    {/* 이 POP으로 제작 → POP V2 새 문서 (WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1)
+                        본문을 router state 에 싣지 않는다 — 서버가 store_pops 를 다시 읽는다. */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate('/store/marketing/pop', {
-                          state: { prefillPop: { title: item.title, content: item.content, excerpt: item.excerpt } },
+                        navigate(CANONICAL_STORE_POP_V2_ROUTE, {
+                          state: buildPopV2HandoffState({
+                            sourceKind: 'content',
+                            origin: 'store_pop',
+                            sourceId: item.id,
+                            suggestedTitle: item.title,
+                          }),
                         });
                       }}
                       className="p-1.5 rounded hover:bg-blue-50 text-slate-400 hover:text-blue-600"

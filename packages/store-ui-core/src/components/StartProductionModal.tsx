@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 import { X, ArrowRight, Info, Sparkles, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { buildProductionState, type ProductionSource, type ProductionTarget } from '../utils/productionUtils';
+import { buildPopV2HandoffState, popV2HandoffFromProductionItem } from './pop-v2/handoff';
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 
@@ -34,6 +35,14 @@ export interface StartProductionTargetConfig {
   route: string;
   supportsTemplates?: boolean;
   defaultTemplateId?: string;
+  /**
+   * true 면 legacy `ProductionRouterState` 대신 POP V2 handoff 계약으로 진입한다.
+   *   WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1
+   * 선택 항목 중 **첫 번째**만 초기 소스로 제안하며(V2 문서는 소스 1개로 시작),
+   * 템플릿은 V2 adapter 의 defaultTemplateId 를 쓰므로 여기서 넘기지 않는다.
+   * serviceKey 분기가 아니라 **대상 config 값**이다 — Core 에 서비스 조건을 넣지 않는다.
+   */
+  handoffToPopV2?: boolean;
 }
 
 /**
@@ -144,6 +153,15 @@ export function StartProductionModal({
       return;
     }
     if (!selectedTarget || !targetMeta) return;
+    if (targetMeta.handoffToPopV2) {
+      const first = source.items[0];
+      navigate(
+        targetMeta.route,
+        first ? { state: buildPopV2HandoffState(popV2HandoffFromProductionItem(first)) } : undefined,
+      );
+      handleClose();
+      return;
+    }
     navigate(targetMeta.route, {
       state: buildProductionState({
         target: selectedTarget,

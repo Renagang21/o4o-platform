@@ -79,11 +79,13 @@ export function HubPopLibraryPage() {
       footerNote={
         <>
           가져온 POP 은{' '}
+          {/* WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1:
+              사본 수정·발행 화면은 legacy POP 출력기가 아니라 사본 관리 화면이다. */}
           <button
-            onClick={() => navigate('/store/marketing/pop')}
+            onClick={() => navigate('/store/marketing/pop/library')}
             className="text-pink-700 hover:underline font-medium"
           >
-            내 매장 POP
+            내 매장 POP 사본
           </button>{' '}
           에서 수정·발행할 수 있습니다.
         </>

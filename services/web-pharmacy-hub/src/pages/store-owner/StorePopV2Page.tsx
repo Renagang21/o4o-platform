@@ -14,6 +14,7 @@ import { toast } from '@o4o/error-handling';
 import {
   StorePopV2EditorView,
   StorePopV2ListView,
+  usePopV2Handoff,
   type PopV2Document,
   type PopV2TemplateOption,
 } from '@o4o/store-ui-core';
@@ -36,7 +37,10 @@ const notify = {
 type View = { mode: 'list' } | { mode: 'edit'; documentId?: string };
 
 export function StorePopV2Page() {
-  const [view, setView] = useState<View>({ mode: 'list' });
+  // HUB / 자료함 / 상품 화면에서 "POP 만들기" 로 들어오면 곧바로 편집기로 진입한다.
+  //   WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1
+  const handoff = usePopV2Handoff();
+  const [view, setView] = useState<View>(handoff ? { mode: 'edit' } : { mode: 'list' });
 
   if (view.mode === 'edit') {
     return (
@@ -47,6 +51,7 @@ export function StorePopV2Page() {
         templates={TEMPLATES}
         defaultTemplateId={TEMPLATES[0].id}
         documentId={view.documentId}
+        handoff={handoff}
         onBack={() => setView({ mode: 'list' })}
       />
     );

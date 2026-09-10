@@ -54,3 +54,21 @@ export type {
   PopV2AccentTheme,
   PopV2TemplateOption,
 } from './types';
+
+// WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1 — HUB/자료함 → V2 handoff 계약
+export {
+  POP_V2_HANDOFF_STATE_KEY,
+  CANONICAL_STORE_POP_V2_ROUTE,
+  buildPopV2HandoffState,
+  parsePopV2HandoffState,
+  usePopV2Handoff,
+  popV2HandoffFromProductionItem,
+} from './handoff';
+export type {
+  PopV2HandoffInput,
+  PopV2HandoffContentInput,
+  PopV2HandoffProductInput,
+  PopV2HandoffContentOrigin,
+  PopV2HandoffProductOrigin,
+  PopV2HandoffRouterState,
+} from './handoff';

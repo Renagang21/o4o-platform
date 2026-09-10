@@ -1,6 +1,7 @@
 /**
  * POP V2 Source Resolver — 저작 대상(상품 / 일반 콘텐츠)에서 POP 기본 콘텐츠를 만든다.
  * WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1
+ * WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1 — 자료함 origin='snapshot' 해석 추가(읽기 전용)
  *
  * 정본 계약: docs/architecture/O4O-STORE-POP-V2-CANONICAL-MODEL-V1.md
  *
@@ -23,6 +24,7 @@ import { SharedProductDescription } from '../../modules/neture/entities/SharedPr
 import { ProductMaster } from '../../modules/neture/entities/ProductMaster.entity.js';
 import { StorePop } from '../../routes/o4o-store/entities/store-pop.entity.js';
 import { StoreExecutionAsset } from '../../routes/platform/entities/store-execution-asset.entity.js';
+import { AssetSnapshot } from '../../modules/asset-snapshot/entities/asset-snapshot.entity.js';
 import type {
   PopV2Fields,
   PopV2Source,
@@ -266,6 +268,24 @@ export async function listStoreContentSources(
     });
   }
 
+  // HUB / 커뮤니티에서 가져온 매장 사본(o4o_asset_snapshots) — 자료함 '콘텐츠' 탭의 원장.
+  //   WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1: 자료함 handoff 가 이 origin 을 보낸다.
+  const snapshots = await ds.getRepository(AssetSnapshot).find({
+    where: { organizationId, assetType: 'content' },
+    order: { createdAt: 'DESC' },
+    take: limit,
+  });
+  for (const s of snapshots) {
+    const plain = htmlToPlainText(extractHtml(s.contentJson));
+    out.push({
+      origin: 'snapshot',
+      id: s.id,
+      title: s.title,
+      excerpt: plain ? plain.slice(0, 120) : null,
+      updatedAt: toIso(s.createdAt),
+    });
+  }
+
   // 콘텐츠 축 store_pops — V2 의 source 로만 쓴다(원장 재사용이 아니다).
   if (opts.storeId) {
     const pops = await ds.getRepository(StorePop).find({
@@ -316,6 +336,18 @@ export async function resolveContentPopSource(
     return {
       sources: [{ origin, id: a.id, title: a.title }],
       fields: buildFieldsFromHtml(a.title, html, a.fileUrl ?? null),
+      resolvedFrom: 'store-content',
+    };
+  }
+
+  if (origin === 'snapshot') {
+    const s = await ds
+      .getRepository(AssetSnapshot)
+      .findOne({ where: { id, organizationId } });
+    if (!s) return null;
+    return {
+      sources: [{ origin, id: s.id, title: s.title }],
+      fields: buildFieldsFromHtml(s.title, extractHtml(s.contentJson)),
       resolvedFrom: 'store-content',
     };
   }

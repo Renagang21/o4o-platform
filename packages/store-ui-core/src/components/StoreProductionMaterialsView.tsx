@@ -48,9 +48,12 @@ export interface StoreProductionMaterialsViewProps {
   guideLink?: { to: string; label: string } | null;
 }
 
+import { CANONICAL_STORE_POP_V2_ROUTE } from './pop-v2/handoff';
+
 // 제작 자료 기반 교차 진입(기존 제작 화면 route 재사용 — 신규 API/DB 없음, 3서비스 공통 기본값)
 const CROSS_CREATE: StoreProductionMaterialsCrossLink[] = [
-  { key: 'pop', label: 'POP 만들기', icon: Megaphone, to: '/store/marketing/pop' },
+  // WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1: POP 제작 진입은 V2 canonical.
+  { key: 'pop', label: 'POP 만들기', icon: Megaphone, to: CANONICAL_STORE_POP_V2_ROUTE },
   { key: 'qr', label: 'QR-code 만들기', icon: QrCode, to: '/store/marketing/qr' },
   { key: 'blog', label: '블로그 글쓰기', icon: PenLine, to: '/store/content/blog' },
   { key: 'signage', label: '사이니지에 추가', icon: MonitorPlay, to: '/store/marketing/signage/playlist' },

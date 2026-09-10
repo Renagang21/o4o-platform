@@ -91,6 +91,12 @@ export interface ProductionTargetMeta {
    * template 선택 시 template.outputConstraints가 우선한다.
    */
   outputConstraints?: ProductionOutputConstraints;
+  /**
+   * WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1:
+   * true 면 legacy ProductionRouterState 대신 POP V2 handoff 계약으로 진입한다.
+   * 공통 StartProductionModal 의 StartProductionTargetConfig 와 구조 호환.
+   */
+  handoffToPopV2?: boolean;
 }
 
 // ─── Catalog ──────────────────────────────────────────────────────────────────
@@ -102,9 +108,12 @@ export const PRODUCTION_TARGET_CATALOG: ProductionTargetMeta[] = [
     description: '매장 내 게시용 인쇄물 (PDF)',
     Icon: Megaphone,
     iconColor: '#f59e0b',
-    route: '/store/marketing/pop',
+    // WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1: 자료함 → POP 제작은 V2 canonical 로 간다.
+    //   템플릿은 V2 편집기가 직접 고르므로 이 모달의 template step 을 쓰지 않는다.
+    route: '/store/marketing/pop-v2',
+    handoffToPopV2: true,
     templateCategory: 'pop',
-    supportsTemplates: true,
+    supportsTemplates: false,
     defaultTemplateId: 'pop-modern',
     outputConstraints: {
       maxBodyLength: 300,

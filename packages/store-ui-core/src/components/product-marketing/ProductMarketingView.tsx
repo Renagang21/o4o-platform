@@ -25,8 +25,8 @@ import {
   BarChart3,
   FileDown,
 } from 'lucide-react';
-// WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: POP 진입 canonical 정렬
-import { CANONICAL_STORE_POP_ROUTE, buildLocalProductPopState } from '../../utils/productionUtils';
+// WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1: POP 진입은 V2 canonical handoff
+import { CANONICAL_STORE_POP_V2_ROUTE, buildPopV2HandoffState } from '../pop-v2/handoff';
 
 export interface ProductMarketingLink {
   id: string;
@@ -111,31 +111,21 @@ export function ProductMarketingView({
   //   이 화면의 :productId 는 store_local_products.id 이므로 origin='local' source identity 로 전달한다.
   const handleCreatePop = () => {
     if (!productId) return;
+    // 활성 자료함 자료가 있으면 그 콘텐츠를, 없으면 매장 자체 상품을 소스로 제안한다.
+    // 어느 쪽이든 식별자만 넘기고 본문은 V2 source resolver 가 다시 읽는다.
     const targetAsset = data?.libraryAssets.find((a: ProductLibraryAsset) => a.isActive);
-    if (targetAsset) {
-      navigate(CANONICAL_STORE_POP_ROUTE, {
-        state: {
-          production: {
-            source: {
-              fromLibrary: 'resources' as const,
-              items: [
-                {
-                  id: targetAsset.id,
-                  title: targetAsset.title,
-                  description: targetAsset.description ?? null,
-                  origin: 'library' as const,
-                },
-              ],
-            },
-            target: 'pop' as const,
-          },
-        },
-      });
-    } else {
-      navigate(CANONICAL_STORE_POP_ROUTE, {
-        state: buildLocalProductPopState({ id: productId }),
-      });
-    }
+    navigate(CANONICAL_STORE_POP_V2_ROUTE, {
+      state: buildPopV2HandoffState(
+        targetAsset
+          ? {
+              sourceKind: 'content',
+              origin: 'library',
+              sourceId: targetAsset.id,
+              suggestedTitle: targetAsset.title || undefined,
+            }
+          : { sourceKind: 'product', origin: 'local', sourceId: productId },
+      ),
+    });
   };
 
   const fetchData = useCallback(async () => {

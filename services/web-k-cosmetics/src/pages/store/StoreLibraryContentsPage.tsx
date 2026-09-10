@@ -28,8 +28,10 @@ const COSMETICS_PRODUCTION_TARGETS: StartProductionTargetConfig[] = [
     label: 'POP',
     Icon: Megaphone,
     iconColor: '#f59e0b',
-    route: '/store/marketing/pop',
-    supportsTemplates: true,
+    // WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1: 자료함 → POP 제작은 V2 canonical 로 간다.
+    route: '/store/marketing/pop-v2',
+    handoffToPopV2: true,
+    supportsTemplates: false,
     defaultTemplateId: 'kcos-pop-beauty-expert',
   },
   {

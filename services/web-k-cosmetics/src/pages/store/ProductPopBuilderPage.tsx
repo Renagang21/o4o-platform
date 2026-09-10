@@ -18,16 +18,21 @@
  */
 
 import { Navigate, useParams } from 'react-router-dom';
-import { CANONICAL_STORE_POP_ROUTE, buildLocalProductPopState } from '@o4o/store-ui-core';
+// WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1: 수렴 대상이 POP V2 canonical 로 바뀐다.
+import { CANONICAL_STORE_POP_V2_ROUTE, buildPopV2HandoffState } from '@o4o/store-ui-core';
 
 export function ProductPopBuilderPage() {
   const { productId } = useParams<{ productId: string }>();
 
   return (
     <Navigate
-      to={CANONICAL_STORE_POP_ROUTE}
+      to={CANONICAL_STORE_POP_V2_ROUTE}
       replace
-      state={productId ? buildLocalProductPopState({ id: productId }) : undefined}
+      state={
+        productId
+          ? buildPopV2HandoffState({ sourceKind: 'product', origin: 'local', sourceId: productId })
+          : undefined
+      }
     />
   );
 }

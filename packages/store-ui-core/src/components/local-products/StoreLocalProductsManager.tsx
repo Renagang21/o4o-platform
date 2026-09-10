@@ -22,8 +22,8 @@ import {
 } from 'lucide-react';
 import { BaseTable, type O4OColumn } from '@o4o/ui';
 import { LocalProductBadge, LOCAL_PRODUCT_BADGE_OPTIONS, type LocalProductBadgeType } from './LocalProductBadge';
-// WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: POP 진입 canonical 정렬
-import { CANONICAL_STORE_POP_ROUTE, buildLocalProductPopState } from '../../utils/productionUtils';
+// WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1: POP 진입은 V2 canonical handoff
+import { CANONICAL_STORE_POP_V2_ROUTE, buildPopV2HandoffState } from '../pop-v2/handoff';
 
 // ==================== Types (service 공통) ====================
 
@@ -204,7 +204,14 @@ export function StoreLocalProductsManager<
   const onCreatePop =
     actions?.onCreatePop === undefined
       ? (product: T) =>
-          navigate(CANONICAL_STORE_POP_ROUTE, { state: buildLocalProductPopState(product) })
+          navigate(CANONICAL_STORE_POP_V2_ROUTE, {
+            state: buildPopV2HandoffState({
+              sourceKind: 'product',
+              origin: 'local',
+              sourceId: product.id,
+              suggestedTitle: product.name || undefined,
+            }),
+          })
       : actions.onCreatePop;
 
   // Data state

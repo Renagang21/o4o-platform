@@ -29,6 +29,7 @@ import type {
   PopV2Source,
   PopV2SourceOrigin,
 } from './types';
+import type { PopV2HandoffInput } from './handoff';
 
 const EMPTY_FIELDS: PopV2Fields = {
   title: '',
@@ -44,6 +45,13 @@ export interface UsePopV2EditorOptions {
   /** 기존 POP 재편집이면 문서 id, 새 POP 이면 undefined */
   documentId?: string;
   defaultTemplateId: string;
+  /**
+   * HUB / 자료함 / 상품 화면에서 넘어온 초기값 제안 —
+   * WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1.
+   * 식별자만 담고 있으며 본문은 서버 source resolver 가 다시 읽는다.
+   * 새 문서(`documentId` 없음)에서만 적용된다.
+   */
+  handoff?: PopV2HandoffInput;
   onSaved?: (doc: PopV2Document) => void;
 }
 
@@ -232,6 +240,36 @@ export function usePopV2Editor(options: UsePopV2EditorOptions): PopV2EditorState
     },
     [api, notify, applyResolved],
   );
+
+  // ── HUB / 자료함 handoff seed ─────────────────────────────────────────────
+  //   WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1
+  //   새 문서일 때만 1회 적용한다. 저장 전까지는 canonical POP Document 가 아니다.
+  const handoff = options.handoff;
+  const handoffKey = handoff
+    ? `${handoff.sourceKind}:${handoff.origin}:${handoff.sourceId}`
+    : null;
+  useEffect(() => {
+    if (options.documentId || !handoff) return;
+    let alive = true;
+    void (async () => {
+      if (handoff.sourceKind === 'product') {
+        setPopKind('product');
+        void loadProductOptions();
+        await pickProductSource(handoff.sourceId, handoff.origin);
+      } else {
+        setPopKind('content');
+        await pickContentSource(handoff.origin, handoff.sourceId);
+      }
+      if (!alive || !handoff.suggestedTitle) return;
+      // resolver 가 제목을 못 준 경우에만 hint 를 쓴다.
+      setTitle((prev) => prev || handoff.suggestedTitle || '');
+    })();
+    return () => {
+      alive = false;
+    };
+    // handoffKey 가 같으면 같은 handoff — 매 렌더 재실행을 막는다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options.documentId, handoffKey]);
 
   // ── 필드 편집 ─────────────────────────────────────────────────────────────
   const setField = useCallback(

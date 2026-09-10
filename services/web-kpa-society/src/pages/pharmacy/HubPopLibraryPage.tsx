@@ -71,7 +71,9 @@ export function HubPopLibraryPage() {
       headerAction={
         <button
           type="button"
-          onClick={() => navigate('/store/marketing/pop')}
+          /* WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1: 새 POP 은 V2 canonical 로 만든다.
+             소스 없이 진입하므로 handoff state 는 싣지 않는다(편집기에서 콘텐츠를 고른다). */
+          onClick={() => navigate('/store/marketing/pop-v2')}
           className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 shrink-0"
         >
           <Plus className="w-4 h-4" />

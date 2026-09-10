@@ -12,7 +12,7 @@
  *   endpoint 의 유효한 식별자가 아니다 → 독립 저장·렌더 기능을 종료한다.
  *
  * 현재 역할:
- *   북마크·기존 내부 링크 보호용 legacy route. canonical POP 제작 화면으로 1홉 replace 수렴한다.
+ *   북마크·기존 내부 링크 보호용 legacy route. canonical POP 제작 화면(POP V2)으로 1홉 replace 수렴한다.
  *   source identity(store_local_products.id + origin='local')만 router state 로 전달하고,
  *   상품명·문구·대표 이미지는 canonical 화면이 organization-scoped API 로 다시 조회한다.
  *
@@ -21,16 +21,21 @@
  */
 
 import { Navigate, useParams } from 'react-router-dom';
-import { CANONICAL_STORE_POP_ROUTE, buildLocalProductPopState } from '@o4o/store-ui-core';
+// WO-O4O-POP-HUB-LIBRARY-HANDOFF-TO-V2-CANONICAL-V1: 수렴 대상이 POP V2 canonical 로 바뀐다.
+import { CANONICAL_STORE_POP_V2_ROUTE, buildPopV2HandoffState } from '@o4o/store-ui-core';
 
 export function ProductPopBuilderPage() {
   const { productId } = useParams<{ productId: string }>();
 
   return (
     <Navigate
-      to={CANONICAL_STORE_POP_ROUTE}
+      to={CANONICAL_STORE_POP_V2_ROUTE}
       replace
-      state={productId ? buildLocalProductPopState({ id: productId }) : undefined}
+      state={
+        productId
+          ? buildPopV2HandoffState({ sourceKind: 'product', origin: 'local', sourceId: productId })
+          : undefined
+      }
     />
   );
 }
