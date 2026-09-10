@@ -119,6 +119,36 @@ describe('home-chat system prompt — 서버 확정 사실만 반영', () => {
     // capability 가 곧 실행 허가가 되지 않는다.
     expect(prompt).toContain('어떤 작업도 실행하지 않습니다');
   });
+
+  /**
+   * WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0 회귀 고정 — 2026-09-10 프로덕션 실측.
+   *
+   * 창 활성화가 **실제로 수행된** 요청에서도 프롬프트가 "어떤 작업도 실행하지
+   * 않습니다" 라고 단언해, 모델이 수행된 동작을 부인하는 답을 냈다
+   * ("저는 어떤 작업도 실행할 수 없습니다").
+   */
+  it('창 축이 실행된 요청에서는 전면 금지 문장을 세우지 않는다', () => {
+    const activate = buildHomeChatSystemPrompt(
+      baseFacts({ workspace: 'home', windowsAppAction: 'activate' }),
+    );
+    expect(activate).not.toContain('어떤 작업도 실행하지 않습니다');
+    expect(activate).toContain('실제로 수행한 결과');
+    expect(activate).toContain('창을 앞으로 가져오는 것');
+    // 나머지 금지선은 그대로 선다.
+    expect(activate).toContain('프로그램 실행·종료·키보드·마우스·파일 접근은 하지 않습니다');
+    expect(activate).toContain('매장 데이터·주문·재고·고객 정보를 조회할 수 없습니다');
+
+    const inspect = buildHomeChatSystemPrompt(
+      baseFacts({ workspace: 'home', windowsAppAction: 'inspect' }),
+    );
+    expect(inspect).not.toContain('어떤 작업도 실행하지 않습니다');
+    expect(inspect).toContain('O4O 는 프로그램을 대신 실행하지 않습니다');
+
+    // 창 축이 없으면 기존 문장이 그대로다.
+    expect(buildHomeChatSystemPrompt(baseFacts({ workspace: 'home' }))).toContain(
+      '어떤 작업도 실행하지 않습니다',
+    );
+  });
 });
 
 describe('home-chat 응답 처리', () => {

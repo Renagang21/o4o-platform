@@ -53,7 +53,10 @@ import {
   renderToolContext,
   needsLocalDeviceResolution,
 } from '../services/ai-tools/ai-tool-router.js';
-import type { VerifiedToolContext } from '../services/ai-tools/ai-tool-contract.js';
+import {
+  AI_TOOL_NAMES,
+  type VerifiedToolContext,
+} from '../services/ai-tools/ai-tool-contract.js';
 import {
   resolveAiTarget,
   normalizeAiError,
@@ -1920,6 +1923,13 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
       executedTool = selected.tool;
       toolOutcome = toolResult.ok ? 'allowed' : toolResult.reason;
       toolContextBlock = renderToolContext(toolResult);
+      // 프롬프트의 기본 금지 문장("어떤 작업도 실행하지 않습니다")은 창 축이 실행됐을 때
+      // 사실이 아니다. 실제로 수행한 동작을 프롬프트에 반영하지 않으면 모델이 그 동작을
+      // 부인한다 — 2026-09-10 프로덕션 실측.
+      if (toolContextBlock) {
+        if (selected.tool === AI_TOOL_NAMES.ACTIVATE_WINDOW) facts.windowsAppAction = 'activate';
+        else if (selected.tool === AI_TOOL_NAMES.FIND_APPLICATION) facts.windowsAppAction = 'inspect';
+      }
     }
 
     // WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0:

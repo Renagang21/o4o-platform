@@ -64,6 +64,18 @@ export interface VerifiedScopeFacts {
   storeStatus?: 'resolved' | 'none' | 'ambiguous';
   /** WorkScope capabilities (서술용 — 실행 권한이 아니다). */
   capabilities: string[];
+  /**
+   * WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0: 이번 요청에서 서버가 **실제로 수행한**
+   * 창 축 동작. 실행이 없었으면 undefined 이고, 아래 기본 금지 문장이 그대로 선다.
+   *
+   *   'inspect'  — 등재 앱이 실행 중인지 확인 (읽기)
+   *   'activate' — 등재 앱 창을 앞으로 (FOREGROUND_ACTIVATION)
+   *
+   * 이 값을 반영하지 않으면 프롬프트가 "어떤 작업도 실행하지 않습니다" 라고
+   * 단언한 채 tool 결과가 붙어, 모델이 **실제로 수행된 동작을 부인한다**.
+   * 2026-09-10 프로덕션에서 실제로 그렇게 관측됐다.
+   */
+  windowsAppAction?: 'inspect' | 'activate';
 }
 
 const WORKSPACE_LABEL: Record<string, string> = {
@@ -122,10 +134,23 @@ export function buildHomeChatSystemPrompt(facts: VerifiedScopeFacts): string {
   lines.push(
     '',
     '## 반드시 지킬 것',
-    '- 당신은 **답변만** 합니다. 어떤 작업도 실행하지 않습니다.',
+    ...(facts.windowsAppAction
+      ? [
+          '- 아래 "## 프로그램 상태" 는 이 PC의 Local Work Agent가 **실제로 수행한 결과**입니다. ' +
+            '사실로 삼아 그대로 안내하고, 수행하지 못했다고 말하지 마세요.',
+          facts.windowsAppAction === 'activate'
+            ? '- 이번 요청에서 허용된 동작은 등재된 프로그램의 **창을 앞으로 가져오는 것**까지입니다. ' +
+              '프로그램 실행·종료·키보드·마우스·파일 접근은 하지 않습니다.'
+            : '- 이번 요청에서 허용된 동작은 등재된 프로그램이 실행 중인지 **확인**하는 것까지입니다. ' +
+              'O4O 는 프로그램을 대신 실행하지 않습니다.',
+          '- 그 밖에는 파일·브라우저·외부 시스템·POS·약국 프로그램을 조작할 수 없습니다.',
+        ]
+      : [
+          '- 당신은 **답변만** 합니다. 어떤 작업도 실행하지 않습니다.',
+          '- 파일·브라우저·외부 시스템·POS·약국 프로그램을 조작할 수 없습니다.',
+        ]),
     '- 매장 데이터·주문·재고·고객 정보를 조회할 수 없습니다. 조회를 요청받으면 ' +
       '"현재는 매장 데이터를 직접 조회하지 않습니다" 라고 알리고, 대신 방법을 설명하세요.',
-    '- 파일·브라우저·외부 시스템·POS·약국 프로그램을 조작할 수 없습니다.',
     '- 위 컨텍스트에 없는 권한이나 데이터 접근을 가진 것처럼 말하지 마세요.',
     '- 확실하지 않으면 추측하지 말고 모른다고 하세요.',
     '- 의약품 관련 질문에서는 공식 허가사항에 없는 의료 사실을 지어내지 말고, ' +
