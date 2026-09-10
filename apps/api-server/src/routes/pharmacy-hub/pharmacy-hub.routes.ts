@@ -70,6 +70,8 @@ import { createStoreTabletRoutes } from '../platform/store-tablet.routes.js';
 // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (Operator Content 채택)
 import { createNewsController } from '../o4o-store/controllers/news.controller.js';
 import { createStoreAnalyticsController } from '../o4o-store/controllers/store-analytics.controller.js';
+// WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1: KPA 와 공용하는 POP V2 Core
+import { createStorePopV2Controller } from '../o4o-store/controllers/store-pop-v2.controller.js';
 import { createMultilingualProductContentController } from '../o4o-store/controllers/multilingual-product-content.controller.js'; // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#76)
 // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
 import {
@@ -402,6 +404,15 @@ export function createPharmacyHubRoutes(): Router {
   router.patch('/store-owner/pop/:id/publish', ...storeOwnerGuards, PharmacyHubStorePopController.publish);
   router.patch('/store-owner/pop/:id/archive', ...storeOwnerGuards, PharmacyHubStorePopController.archive);
   router.delete('/store-owner/pop/:id', ...storeOwnerGuards, PharmacyHubStorePopController.remove);
+
+  // WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1
+  //   POP V2 (canonical Document 모델) — /store-owner/pop-v2/*
+  //   KPA 와 **동일한 공통 Core factory** 다. PH 전용 본체를 복제하지 않는다.
+  //   위 기존 `/store-owner/pop/*` (store_pops 콘텐츠 축) 는 그대로 둔다.
+  router.use(
+    '/store-owner/pop-v2',
+    createStorePopV2Controller(AppDataSource, requireAuth as any, 'pharmacy-hub'),
+  );
 
   // ───────────────────────────────────────────────────────────────────────────
   // 매장 실행 자산 — 디지털 사이니지 (동일 WO 범위 D)

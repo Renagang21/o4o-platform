@@ -89,6 +89,8 @@ import { createStoreLibraryFeedController } from '../o4o-store/controllers/store
 import { createStoreExecutionAssetsController } from '../o4o-store/controllers/store-execution-assets.controller.js';
 import { createStoreQrLandingController } from '../o4o-store/controllers/store-qr-landing.controller.js';
 import { createStorePopController } from '../o4o-store/controllers/store-pop.controller.js';
+// WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1: 공통 POP V2 Core (KPA/PH 공용)
+import { createStorePopV2Controller } from '../o4o-store/controllers/store-pop-v2.controller.js';
 import { createStoreAnalyticsController } from '../o4o-store/controllers/store-analytics.controller.js';
 import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
 import { createMultilingualProductContentController } from '../o4o-store/controllers/multilingual-product-content.controller.js'; // WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1
@@ -476,6 +478,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Store POP routes (WO-O4O-QR-POP-AUTO-GENERATOR-V1) — internal: /pharmacy/pop/*
   // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='kpa' 전달.
   router.use('/', createStorePopController(dataSource, coreRequireAuth as any, 'kpa'));
+
+  // WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1
+  //   POP V2 (canonical Document 모델) — internal: /pharmacy/pop-v2/*
+  //   PH 와 **같은 공통 Core factory** 를 mount 한다 (서비스별 본체 복제 없음).
+  //   위 기존 createStorePopController 는 그대로 둔다 — 과거 산출물 이력 보존.
+  router.use('/pharmacy/pop-v2', createStorePopV2Controller(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Store Analytics routes (WO-O4O-MARKETING-ANALYTICS-V1) — internal: /pharmacy/analytics/*
   // WO-O4O-STORE-OWNER-BACKCOMPAT-CALLERS-MIGRATION-V1: serviceKey='kpa' 명시 (canonical)

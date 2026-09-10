@@ -231,6 +231,8 @@ import QrPage from './pages/store-owner/QrPage';
 // WO-O4O-STORE-EXECUTION-HOME-TABLET-QR-V1: 매장 실행 홈(태블릿+QR 배치 현황)
 import StoreExecutionPage from './pages/store-owner/StoreExecutionPage';
 import PopPage from './pages/store-owner/PopPage';
+// WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1: 공통 POP V2 Core (KPA 와 같은 화면 본체)
+import StorePopV2Page from './pages/store-owner/StorePopV2Page';
 import SignagePage from './pages/store-owner/SignagePage';
 // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7·§8 — 공통 View 채택
 import StoreProductDescriptionsPage from './pages/store-owner/ProductDescriptionsPage';
@@ -756,6 +758,8 @@ export default function App() {
             {/* WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 — 매장 실행 자산 (출력·실행) */}
             <Route path="qr" element={<QrPage />} />
             <Route path="pop" element={<PopPage />} />
+            {/* WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1 — 신규 canonical POP (기존 pop 은 그대로 둔다) */}
+            <Route path="pop-v2" element={<StorePopV2Page />} />
             <Route path="signage" element={<SignagePage />} />
             {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#69·#70)
                 동영상·편성은 같은 화면의 탭이지만, KPA 와 동일하게 경로를 나눠 사이드바·딥링크가 짝을 이룬다. */}

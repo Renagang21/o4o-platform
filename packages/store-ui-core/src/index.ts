@@ -475,6 +475,8 @@ export type {
 
 // POP Composer (WO-O4O-MY-STORE-POP-COMPOSER-KCOS-GP-COMMONIZATION-V1)
 export * from './components/pop';
+// WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1: POP V2 canonical Core (KPA/PH 공용)
+export * from './components/pop-v2';
 
 // Store Library (WO-O4O-MY-STORE-LIBRARY-RESOURCES-CONTENTS-KCOS-GP-COMMONIZATION-V1)
 export * from './components/library';

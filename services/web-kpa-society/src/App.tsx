@@ -235,6 +235,8 @@ const StoreExecutionPage = lazy(() => import('./pages/pharmacy/StoreExecutionPag
 // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1
 const StoreQrAiDescriptionPage = lazy(() => import('./pages/pharmacy/StoreQrAiDescriptionPage'));
 const StorePopPage = lazy(() => import('./pages/pharmacy/StorePopPage').then(m => ({ default: m.StorePopPage })));
+// WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1: POP V2 (공통 Core adapter)
+const StorePopV2Page = lazy(() => import('./pages/pharmacy/StorePopV2Page').then(m => ({ default: m.StorePopV2Page })));
 const MarketingAnalyticsPage = lazy(() => import('./pages/pharmacy/MarketingAnalyticsPage').then(m => ({ default: m.MarketingAnalyticsPage })));
 const StoreHomePage = lazy(() => import('./pages/pharmacy/StoreHomePage').then(m => ({ default: m.StoreHomePage })));
 const ProductMarketingPage = lazy(() => import('./pages/pharmacy/ProductMarketingPage').then(m => ({ default: m.ProductMarketingPage })));
@@ -961,6 +963,7 @@ function App() {
             {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 전용 AI 설명 만들기 */}
             <Route path="marketing/qr/ai-description" element={<StoreQrAiDescriptionPage />} />
             <Route path="marketing/pop" element={<StorePopPage />} />
+            <Route path="marketing/pop-v2" element={<StorePopV2Page />} />
             <Route path="marketing/signage" element={<Navigate to="playlist" replace />} />
             <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />
             <Route path="marketing/signage/playlist/new" element={<StorePlaylistCreatePage />} />
