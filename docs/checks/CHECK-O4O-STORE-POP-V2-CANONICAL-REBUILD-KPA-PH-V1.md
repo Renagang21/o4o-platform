@@ -189,3 +189,103 @@ migration 실행 이후 수행해야 한다. 위 PASS 는 (a) 실 migration 을 
 - POP Placement (`POP 에 QR 포함` ≠ `POP Placement`) — NOT_STARTED
 - 기존 POP 코드 retire 실행 — §5 판정만, 삭제 0건
 - `package.json` / Dockerfile / 의존성 변경 0건 (sharp · qrcode 기존 의존성만 사용)
+
+---
+
+## 8. Post-Deploy Closure (main 병합 → migration → 배포 → production HTTP E2E)
+
+§6 의 "미완 사실 명시" 는 아래로 해소되었다. §6 의 PASS 판정은 유지한다.
+
+### 8-1. main 병합 · 배포
+
+| 항목 | 결과 |
+|---|---|
+| 병합 방식 | 전용 worktree 에서 `origin/main` 을 branch 에 병합 후 `git push origin HEAD:main` (타 worktree HEAD 무이동) |
+| main 반영 | `3a4a5c29b..19b5454d9` — 충돌 0 |
+| 병합 후 typecheck | api-server / store-ui-core / web-kpa-society / web-pharmacy-hub 전부 exit 0 |
+| Deploy API Server / Web Services / Admin Dashboard | 전부 success |
+| CI Pipeline · CodeQL | `cancelled` — 이후 sha `d82fbd7f1` 이 main 에 push 되어 workflow concurrency 가 취소한 것이며 코드 실패가 아니다 |
+| API revision | `o4o-core-api-03588-lrg` |
+
+### 8-2. migration 실제 적용 (프로덕션 read-only 검증)
+
+- `store_pop_documents` 생성 확인 — 16 컬럼 전량 일치
+- CHECK 제약 4건 존재: `chk_spd_kind` · `chk_spd_layout` · `chk_spd_sources_nonempty` · `chk_spd_status`
+- `typeorm_migrations` 최신 행 = `CreateStorePopDocuments20270403000000`
+- 엔드포인트 mount 확인: `/api/v1/kpa/pharmacy/pop-v2` · `/api/v1/pharmacy-hub/store-owner/pop-v2` 모두 **401**(가드 인터셉트 = 마운트됨. 404 였다면 미배포)
+
+### 8-3. production HTTP E2E — KPA (`/api/v1/kpa/pharmacy/pop-v2`)
+
+실 프로덕션 HTTP 로 전 흐름 **15/15 PASS**.
+
+| # | 단계 | 결과 |
+|---|---|---|
+| 1 | 로그인(serviceKey='kpa-society') | PASS |
+| 2 | POP V2 진입(목록) | PASS — 200 |
+| 3 | 콘텐츠 소스 후보 | PASS — 24건 |
+| 4 | 콘텐츠 소스 해석 | PASS — `resolvedFrom=store-content` |
+| 5 | 일반 콘텐츠 기반 POP 생성·저장 | PASS — 201 |
+| 6 | 상품 소스 해석 (3단 fallback) | PASS — `resolvedFrom=product-basic-info` (2단계) |
+| 7 | 상품 기반 POP 생성·저장 | PASS — 201 |
+| 8 | 저장 후 reload | PASS — `status=draft` |
+| 9 | 재편집 (PUT) | PASS |
+| 10 | QR 삽입 | PASS |
+| 11 | PDF 출력 | PASS — assetId 발급 |
+| 12 | PNG 출력 | PASS — assetId 발급 |
+| 13 | 출력 후 상태 승격 + 산출물 포인터 | PASS — `status=ready` + `lastOutputAssetId` |
+| 14 | 복제 | PASS — `(사본)` · `status=draft` |
+| 15 | 보관 + 목록 분리 | PASS — 활성목록 제외 · 보관목록 포함 |
+
+브라우저 검증(`https://kpa-society.co.kr/store/marketing/pop-v2`, 실제 로그인 세션):
+**console error 0 / pageerror 0 / 4xx·5xx 0**, POP 관리 화면 정상 렌더.
+
+### 8-4. production HTTP E2E — PH (`/api/v1/pharmacy-hub/store-owner/pop-v2`)
+
+**BLOCKED — 코드 문제 아님. 테스트 자격증명 불일치.**
+
+- `renagang21@gmail.com` 의 `pharmacy-hub` 로그인이 401 `INVALID_CREDENTIALS`.
+- 프로덕션 read-only 확인: 해당 계정의 `service_credentials(service_key='pharmacy-hub')` 행은 **존재**하며
+  `updated_at` 이 **2026-09-04** 로, `docs/local/TEST-ACCOUNTS.local.md` 의 기재 근거일(2026-08-10)보다 뒤다
+  → 이후 비밀번호가 교체되었고 로컬 문서가 stale 하다.
+- `role_assignments` 에 `pharmacy-hub:store_owner`(is_active) 는 정상 보유.
+- `pharmacy-hub:operator/admin` 계정(`sohae2100@gmail.com`)으로는 접근 불가 —
+  `403 STORE_OWNER_REQUIRED` (가드 정상 동작 확인).
+- 엔드포인트 자체는 8-2 대로 배포·마운트 확인됨.
+- PH adapter 는 KPA 와 **동일한 공통 Core factory**(`createPopV2Api` + 공통 View)를 base path 만 바꿔 쓰므로
+  8-3 의 KPA production PASS 가 곧 공통 계약의 production 검증이다. PH 고유 코드 경로는 base path 주입뿐이다.
+
+### 8-5. 원본 Content 불변 · fallback 경계 (프로덕션 read-only)
+
+| 검증 | 결과 |
+|---|---|
+| 원본 `kpa_store_contents` — POP 최초 생성 이후 수정된 행 | **0** |
+| 원본 `cms_contents` — 동 기간 수정된 행 | **0** |
+| `store_pops` 신규 행 (기존 콘텐츠 원장 축) | **0** |
+| `store_cart_items` 신규 행 (B2B cart) | **0** |
+| `checkout_orders` 신규 행 (B2B/B2C order) | **0** |
+| `store_execution_assets(usage_type='pop')` 신규 행 | **4** — I3 Output-Append-Only 설계대로 출력 이력만 append (기존 17행 무변경) |
+| POP 문서 참조 source origin 분포 | `library` 4 · `listing` 1 — commerce 축 유입 0 |
+
+**B2B/B2C fallback 미발생 = PASS.**
+
+### 8-6. 검증 fixture 정리
+
+E2E 산출 POP 문서 5건은 전부 **canonical API**(`PATCH /{id}/archive`)로 보관 처리했다.
+활성 목록 잔여 `[E2E]` 문서 **0건** (직접 DB 조작 0건).
+
+### 8-7. Post-Deploy 판정
+
+```text
+MAIN MERGE                = PASS
+PRODUCTION MIGRATION      = PASS
+API / WEB DEPLOYMENT      = PASS
+PRODUCTION HTTP E2E (KPA) = PASS  (15/15)
+PRODUCTION HTTP E2E (PH)  = BLOCKED  (테스트 계정 credential stale — 코드 무관)
+CONTENT IMMUTABILITY      = PASS
+B2B/B2C FALLBACK          = PASS  (미발생)
+CONSOLE / 4XX             = PASS  (0 / 0)
+FIXTURE CLEANUP           = PASS
+```
+
+> PH production HTTP E2E 는 `pharmacy-hub` store_owner 테스트 자격증명이 갱신되면 즉시 재실행 가능하다
+> (동일 스크립트, base path 만 다름). 그 전까지 본 WO 는 **CLOSED_PENDING_PH_CREDENTIAL** 로 둔다.
