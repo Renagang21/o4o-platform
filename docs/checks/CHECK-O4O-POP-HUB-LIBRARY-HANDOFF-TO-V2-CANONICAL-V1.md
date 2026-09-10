@@ -187,16 +187,28 @@ KPA·KCos·PH adapter 3곳의 `StorePopV2Page` 는 `usePopV2Handoff()` 로 hando
 
 ## §17 완료 조건
 
+> **판정 정정 (2026-09-10)** — 최초 기록은 `KCOS HUB/LIBRARY HANDOFF TO V2 = PASS` ·
+> `PRODUCTION E2E = PASS` 로 닫았으나, §14 에서 KCos **자료함** handoff 가 production 에서
+> 404 로 끝까지 성공하지 못한 사실이 있다. 원인이 본 회차 변경이 아니더라도(§14 원인 절),
+> 이번 WO 의 대상이던 경로 하나가 production 에서 완주하지 못했으므로 PASS 로 닫는 것은 과하다.
+> HUB 와 LIBRARY 를 분리해 다시 적는다.
+
 ```text
 KPA HUB/LIBRARY HANDOFF TO V2   = PASS
-KCOS HUB/LIBRARY HANDOFF TO V2  = PASS
+KCOS HUB HANDOFF TO V2          = PASS
+KCOS LIBRARY HANDOFF TO V2      = BLOCKED_BY_PREEXISTING_SCOPE_DEFECT
 V2 HANDOFF CONTRACT             = PASS
 STORE_POPS HUB AXIS             = PRESERVED
 CONTENT ORIGINAL IMMUTABILITY   = PASS
 LEGACY HUB/LIBRARY CALLERS      = 0
 SCHEMA CHANGE                   = 0
-PRODUCTION E2E                  = PASS (§14 — 아래)
+
+WO STATUS = CLOSED_WITH_KNOWN_KCOS_LIBRARY_SCOPE_DEFECT
 ```
+
+후속: `WO-O4O-KCOS-LIBRARY-ORGANIZATION-SCOPE-AND-SNAPSHOT-ROUTE-CLOSURE-V1` 가
+③ `StoreContentsSelector` 이관보다 **먼저** 이 결함을 닫는다 — KPA 조직 스냅샷이 KCos 자료함에
+섞여 보이는 tenant scope 문제라 UI 품질보다 우선순위가 높다.
 
 ## §14 Production E2E (2026-09-10 실행)
 
