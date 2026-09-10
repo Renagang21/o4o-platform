@@ -79,6 +79,7 @@ import marketTrialRoutes from '../routes/market-trial.routes.js';
 import aiQueryRoutes from '../routes/ai-query.routes.js';
 import aiProxyRoutes from '../routes/ai-proxy.routes.js';
 import aiAdminRoutes from '../routes/ai-admin.routes.js';
+import localAgentRoutes from '../routes/local-agent.routes.js';
 import { MarketTrialController } from '../controllers/market-trial/marketTrialController.js';
 import { MarketTrialOperatorController } from '../controllers/market-trial/marketTrialOperatorController.js';
 import { createNetureOperatorTrialRoutes } from '../routes/market-trial-operator.routes.js';
@@ -430,6 +431,12 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     app.use('/api/ai', aiQueryRoutes);
     app.use('/api/ai', aiProxyRoutes);
     logger.info('✅ AI Query + Proxy routes registered at /api/ai');
+
+    // 22-local-agent. Local Work Agent (WO-O4O-LOCAL-WORK-AGENT-V0)
+    //   사용자 축(/pair, /devices)과 agent 축(/register, /connect, /heartbeat, /result)이
+    //   한 라우터에 있지만 인증 미들웨어가 서로 다르다. 상세는 해당 파일 주석 참조.
+    app.use('/api/local-agent', localAgentRoutes);
+    logger.info('✅ Local Work Agent routes registered at /api/local-agent');
 
     // 22-ai-admin. Register AI Admin routes (WO-AI-ADMIN-CONTROL-PLANE-V1)
     app.use('/api/ai/admin', aiAdminRoutes);
