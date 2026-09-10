@@ -195,12 +195,63 @@ STORE_POPS HUB AXIS             = PRESERVED
 CONTENT ORIGINAL IMMUTABILITY   = PASS
 LEGACY HUB/LIBRARY CALLERS      = 0
 SCHEMA CHANGE                   = 0
-PRODUCTION E2E                  = 배포 후 실행 (아래)
+PRODUCTION E2E                  = PASS (§14 — 아래)
 ```
 
-**PRODUCTION E2E (§14)**: 프런트엔드·API 변경이라 배포(CI/CD) 후에만 프로덕션에서 관측할 수 있다.
-push 후 배포가 완료되면 KPA·KCos 각각 HUB·자료함 → "POP 만들기" → V2 → 저장 → 재편집 → 출력을 실행하고
-결과(console error / pageerror / dead link / 4xx·5xx)를 본 문서에 추가 기록한다.
+## §14 Production E2E (2026-09-10 실행)
+
+배포 확인: web deploy success · API deploy success(run `34449986961`, 커밋 `48631bab2` 포함).
+
+### KPA (`https://kpa-society.co.kr`, 매장 "테스트 약국 매장")
+
+| # | caller | 경로 | 결과 |
+|---|---|---|---|
+| 1 | HUB POP 자료함 | `/store-hub/pop` → "POP 만들기" | **PASS** — `/store/marketing/pop-v2` 목록 모드 (handoff state 없음 = 목록) |
+| 2 | 자료함 콘텐츠 | `/store/library/contents` → 커뮤니티(스냅샷) 항목 → "제작 시작" → POP → 다음 | **PASS** — V2 편집 모드 진입, `origin:'snapshot'` resolver 가 제목·핵심 문구·본문 seed |
+| 3 | 매장 자체 상품 | `/store/commerce/local-products` → "POP 만들기" | **PASS** — 상품 탭 + 해당 상품 선택 + "기본 문구 출처: 상품 기본정보"(§7 fallback ③). B2B/B2C 자동 fallback 0 |
+| 4 | legacy POP page | `/store/marketing/pop` | **handoff caller 0** — 남은 진입은 `/store/library/contents` 링크뿐 (§12 KEEP_TEMPORARY 유지) |
+
+저장 → 목록 재로딩 → 재편집 → 출력:
+
+| 단계 | 결과 |
+|---|---|
+| 저장 | **PASS** — "POP 을 저장했습니다." · 헤딩 `새 POP 만들기` → `POP 수정` |
+| 목록 재로딩 | **PASS** — POP 관리 목록에 "출력 완료" 배지로 노출 |
+| 재편집 | **PASS** — 저장 내용(이름·제목·핵심 문구·본문) 그대로 복원 |
+| PDF 출력 | **PASS** — 실제 `.pdf` 산출 |
+| PNG 출력 | 산출은 성공하나 파일이 실제 `.webp` — **범위 밖 기지 결함**(재현 확인) |
+
+console error 0 / pageerror 0 / dead link 0 / 4xx·5xx **0**.
+
+### K-Cosmetics (`https://k-cosmetics.site`, `renagang21@gmail.com` = `cosmetics:store_owner`)
+
+| # | caller | 경로 | 결과 |
+|---|---|---|---|
+| 1 | HUB POP 자료함 | `/store-hub/pop` → "내 매장 POP 사본 관리" → "POP 출력" | **PASS** — `/store/marketing/pop-v2` 진입 |
+| 2 | 자료함 콘텐츠 | `/store/library/contents` → "제작 시작" → POP → 다음 | **라우팅·state 전달 PASS**, source 해석은 404 (원인 아래) |
+
+저장 → 목록 재로딩 → 재편집 → 출력 (KCos org 소유 콘텐츠 기준):
+
+| 단계 | 결과 |
+|---|---|
+| 저장 | **PASS** — `POST /cosmetics/pharmacy/pop-v2` 201 · `PUT` 200 |
+| 목록 재로딩 | **PASS** — "출력 완료" 배지 |
+| 재편집 | **PASS** — 저장 내용 그대로 복원 |
+| PDF 출력 | **PASS** — `POST .../render` 200, 실제 `.pdf` |
+
+console error 0 / pageerror 0 / dead link 0.
+4xx·5xx = **1건** — `GET /cosmetics/pharmacy/pop-v2/sources/content/snapshot/{id}` 404.
+
+### 그 404 의 원인 — 범위 밖 기지 결함(본 회차 변경과 무관)
+
+`apps/api-server/src/routes/cosmetics/cosmetics.routes.ts` 가 `/assets` 에
+**KPA 전용** `createAssetSnapshotController`(`sourceService:'kpa'`, `resolveKpaOrgId`)를 그대로 마운트한다.
+그 결과 KCos 자료함 목록(`GET /cosmetics/assets?type=content`)은 **사용자의 KPA 약국 org 스냅샷**을 돌려주고,
+POP V2 resolver 는 계약대로 **KCos organizationId** 로 조회하므로 그 id 를 찾지 못한다(404).
+
+- V2 handoff 계약 쪽 결함이 아니다. resolver 의 org scope 는 의도대로 동작한다(오히려 cross-org 유출을 막았다).
+- 이 라우트는 본 회차에서 변경하지 않았다(직전 커밋 `066e9545b`).
+- 사용자가 이미 **"KCos library scope/404 문제"** 로 범위 밖 지정한 항목과 같은 축이므로 수정하지 않고 기록만 한다.
 
 ---
 
