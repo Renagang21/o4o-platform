@@ -42,11 +42,22 @@ export type AssociationLinkStatus = 'resolved' | 'not_linked';
 export class AnnualReportService {
   // ── Template ──────────────────────────────────────────────────────────────
 
-  /** 해당 연도의 active 양식. 없으면 null */
-  static async getActiveTemplate(year: number): Promise<AnnualReportTemplate | null> {
-    return AppDataSource.getRepository(AnnualReportTemplate).findOne({
-      where: { service_key: SERVICE_KEY, year, status: 'active' },
+  /**
+   * 지금 회원이 작성할 양식. **연도를 코드나 env 에 박지 않는다.**
+   * WO-O4O-KPA-BRANCH-TENANT-ONBOARDING-AND-MVP-PRODUCTION-E2E-V1 §9
+   *
+   *   1) 오늘이 접수 기간 안인 active 양식 (연도가 여럿 active 여도 지금 받는 것은 하나다)
+   *   2) 없으면 가장 최근 연도의 active 양식 — 기간 판정은 호출부가 periodStatus 로 한다
+   *      (여기서 null 을 내면 "양식이 없다" 와 "기간이 아니다" 를 구분할 수 없게 된다)
+   *
+   * 기간 미설정(NULL)은 periodStatus 와 같은 규칙으로 '접수 중' 으로 본다.
+   */
+  static async getCurrentTemplate(now = new Date()): Promise<AnnualReportTemplate | null> {
+    const actives = await AppDataSource.getRepository(AnnualReportTemplate).find({
+      where: { service_key: SERVICE_KEY, status: 'active' },
+      order: { year: 'DESC' },
     });
+    return actives.find((t) => this.periodStatus(t, now) === 'open') ?? actives[0] ?? null;
   }
 
   static async getTemplateById(id: string): Promise<AnnualReportTemplate | null> {
