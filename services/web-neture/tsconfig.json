@@ -21,5 +21,8 @@
     }
   },
   "include": ["src"],
+  // 테스트는 루트에 설치된 vitest/@testing-library 를 쓴다. 이 서비스의 의존성이 아니므로
+  // 앱 빌드 타입체크 대상에서 뺀다 (WO-O4O-LOCAL-AGENT-LNA-UX-CLOSURE-V1).
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
