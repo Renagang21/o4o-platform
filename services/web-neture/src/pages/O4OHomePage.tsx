@@ -83,6 +83,18 @@ export default function O4OHomePage() {
   const [answer, setAnswer] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  /**
+   * WO-O4O-BROWSER-CONTROL-V0 §5·§19·§41·§42
+   *
+   * 사이트가 열렸을 때만 [로그인 완료] 버튼을 띄운다. 로그인은 사용자가 사이트에서 직접 하고,
+   * 버튼은 **사용자의 명시적 완료 신호**다. O4O 는 로그인 여부를 판정하지 않는다.
+   *
+   * 이 상태는 **React state 뿐**이다 — localStorage · sessionStorage · 서버 어디에도 저장하지
+   * 않는다(§42). 새로고침하면 사라지는 것이 맞다. credential 상태가 아니라 "이번 요청에서
+   * 사용자가 완료를 눌렀다" 는 transient 신호다.
+   */
+  const [openedSite, setOpenedSite] = useState<{ siteId: string; displayName: string } | null>(null);
+  const [loginReady, setLoginReady] = useState(false);
 
   const trimmed = input.trim();
   // 매장 scope 해석 중에는 불완전한 컨텍스트로 보내지 않는다(§12).
@@ -103,9 +115,13 @@ export default function O4OHomePage() {
     setError(null);
     setQuestion(trimmed);
     setAnswer(null);
+    // 새 요청이 시작되면 이전 로그인 완료 신호는 의미가 없다 — 업무 단위 transient(§42).
+    setOpenedSite(null);
+    setLoginReady(false);
     try {
       const result = await sendHomeChat(trimmed, workScope);
       setAnswer(result.message);
+      setOpenedSite(result.browserSiteOpened ?? null);
       setInput('');
     } catch (err) {
       setAnswer(null);
@@ -206,6 +222,28 @@ export default function O4OHomePage() {
                     {line || <br />}
                   </p>
                 ))}
+              </div>
+            )}
+            {/* WO-O4O-BROWSER-CONTROL-V0 §19 — 사이트가 열렸을 때만. 로그인은 사용자가 직접 한다. */}
+            {openedSite && !pending && (
+              <div className="mt-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-700">
+                {loginReady ? (
+                  <p className="m-0">로그인 완료를 확인했습니다.</p>
+                ) : (
+                  <>
+                    <p className="m-0">{openedSite.displayName} 사이트를 열었습니다.</p>
+                    <p className="m-0 mt-1 text-slate-500">
+                      로그인이 필요한 경우 사이트에서 직접 로그인해 주세요. 이미 로그인되어 있으면 바로 눌러 주세요.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setLoginReady(true)}
+                      className="mt-3 rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition-opacity hover:opacity-80"
+                    >
+                      로그인 완료
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>

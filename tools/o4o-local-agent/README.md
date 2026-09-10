@@ -12,13 +12,15 @@
 
 | 없는 것 | 확인 방법 |
 |---|---|
-| 임의 shell / PowerShell / cmd 실행 | 아래 "PowerShell 경계" 참조 — 실행 가능한 것은 저장소에 들어 있는 `.ps1` **2개**뿐입니다 |
-| 임의 프로세스 실행 | 같음 |
-| 프로그램 실행 · 종료 | `Start-Process` · `Stop-Process` · `taskkill` 이 코드에 없습니다 |
+| 임의 shell / PowerShell / cmd 실행 | 아래 "PowerShell 경계" 참조 — 실행 가능한 것은 저장소에 들어 있는 `.ps1` **3개**뿐입니다 |
+| 임의 프로세스 실행 | 같음. **단 하나의 예외**가 "브라우저 경계" 에 있습니다 — 등재된 HTTPS 주소를 OS 기본 handler 에 넘기는 것뿐이며, 실행 파일을 지정할 수 없습니다 |
+| 프로그램 종료 | `Stop-Process` · `taskkill` 이 코드에 없습니다 |
+| 프로그램 실행 | `Start-Process` 는 `windows-browser-open.ps1` **한 곳, 한 번**, `-FilePath $url` 형태로만 존재합니다. `$url` 은 agent 등재부 상수이고 `https://` 정규식을 통과해야 합니다 |
 | 파일 읽기 / 쓰기 도구 | `src/handlers.mjs` 는 `os` 만 import 합니다 — `fs` 가 없습니다 |
 | 레지스트리 접근 | 해당 모듈 없음 |
 | 마우스 · 키보드 · 화면 캡처 | 해당 모듈 없음 |
-| 브라우저 제어 · DOM 자동화 | 해당 모듈 없음 |
+| 브라우저 안 제어 (탭 · DOM · 클릭 · 입력) | 해당 모듈 없음. 할 수 있는 것은 "등재 사이트를 연다" 까지입니다 |
+| 로그인 대행 · 비밀번호 입력 · cookie/프로필 접근 | 해당 코드 없음 — 로그인은 사용자가 사이트에서 직접 합니다 |
 | 약국관리 프로그램 접근 | 해당 코드 없음 |
 
 실행할 수 있는 것은 `src/handlers.mjs` 에 등재된 action 뿐입니다.
@@ -36,18 +38,36 @@
 
 1. `execFile` 만 씁니다. `exec` · `spawn` · `shell: true` 가 없으므로 **셸이 개입하지 않습니다**
    (인용 · `&` · 파이프 해석 자체가 일어나지 않습니다).
-2. 실행 대상은 저장소에 체크인된 `windows-window-census.ps1` · `windows-window-activate.ps1`
-   **2개**뿐입니다. `-Command` 를 쓰지 않고 `-File` 만 쓰므로 스크립트 문자열을 런타임에
-   조립하지 않습니다.
+2. 실행 대상은 저장소에 체크인된 `windows-window-census.ps1` · `windows-window-activate.ps1` ·
+   `windows-browser-open.ps1` **3개**뿐입니다. `-Command` 를 쓰지 않고 `-File` 만 쓰므로
+   스크립트 문자열을 런타임에 조립하지 않습니다.
 3. argv 는 상수 배열이 전부입니다. **호출자가 argv 에 값을 넣을 수 없습니다.**
 4. 유일한 런타임 입력인 창 핸들은 환경변수로 넘기며, 넘기기 전과 스크립트 안에서
    각각 10진 정수인지 확인합니다.
 5. appId · 프로그램 이름 · 창 제목은 이 경계를 넘지 않습니다. 매칭은 전부 JS 안에서 하고,
    PowerShell 은 조건 없는 창 목록만 돌려줍니다.
 
-두 스크립트가 부르는 Win32 함수는 전부 조회 전용이며, 예외는 최소화된 창을 되살리는
+창 스크립트 두 개가 부르는 Win32 함수는 전부 조회 전용이며, 예외는 최소화된 창을 되살리는
 `ShowWindow(SW_RESTORE)` 와 `SetForegroundWindow` 뿐입니다. 키보드 · 마우스 입력을
 만들어 내지 않고, 창을 닫거나 프로세스를 끝내지 않습니다.
+
+## 브라우저 경계 (WO-O4O-BROWSER-CONTROL-V0)
+
+세 번째 스크립트 `windows-browser-open.ps1` 은 **등재된 사이트를 연다.** 그 이상은 없습니다.
+
+- 서버가 보내는 것은 `siteId` 뿐입니다. URL 은 `src/browser-site-registry.mjs` 에만 있고,
+  서버 · AI · 사용자가 URL 을 넘길 칸이 프로토콜에 없습니다. 등재되지 않은 siteId 는
+  `BROWSER_SITE_NOT_REGISTERED` 로 끝납니다.
+- 스크립트는 환경변수 `O4O_SITE_URL` 하나를 받고, `https://` 절대 URL 인지 다시 확인한 뒤
+  `Start-Process -FilePath $url` 로 **Windows 기본 URL handler** 에 넘깁니다. 실행 파일 ·
+  `-ArgumentList` · 브라우저 플래그(remote-debugging 등)를 지정하지 않습니다. 어떤 브라우저가
+  뜨는지는 Windows 사용자 설정이 정합니다.
+- 브라우저가 이미 떠 있으면 그 세션에 새 탭으로 열립니다. 새 프로필을 만들지 않고, cookie ·
+  localStorage · 저장 비밀번호 · 프로필 경로를 읽지 않습니다.
+- **로그인은 하지 않습니다.** 사이트가 로그인 화면을 보여주면 사용자가 직접 로그인하고,
+  O4O 화면의 `[로그인 완료]` 를 눌러 다음 단계로 넘어갑니다. 이 신호는 저장되지 않습니다.
+- 사이트가 열려 있는지(탭)는 판정하지 않습니다. 돌려주는 것은 "브라우저가 떠 있는가 ·
+  어떤 브라우저인가(Chrome/Edge)" 뿐입니다.
 
 ## 개인정보
 

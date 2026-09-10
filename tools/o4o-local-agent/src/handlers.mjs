@@ -23,7 +23,15 @@
 
 import os from 'node:os';
 import { findWindowsApp } from './windows-app-registry.mjs';
-import { activateWindowHandle, censusWindows, matchWindows } from './windows-window-control.mjs';
+import { findBrowserSite } from './browser-site-registry.mjs';
+import {
+  activateWindowHandle,
+  censusWindows,
+  detectRunningBrowser,
+  matchBrowserWindows,
+  matchWindows,
+  openRegisteredSiteUrl,
+} from './windows-window-control.mjs';
 
 export const AGENT_VERSION = '0.1.0';
 
@@ -33,6 +41,9 @@ export const ACTIONS = {
   GET_SYSTEM_INFO: 'local.get_system_info',
   FIND_APPLICATION: 'local.find_application',
   ACTIVATE_WINDOW: 'local.activate_window',
+  // WO-O4O-BROWSER-CONTROL-V0 §13·§14
+  BROWSER_GET_SITE_STATUS: 'local.browser.get_site_status',
+  BROWSER_OPEN_SITE: 'local.browser.open_site',
 };
 
 /**
@@ -178,6 +189,90 @@ const HANDLERS = {
   [ACTIONS.GET_SYSTEM_INFO]: getSystemInfo,
 };
 
+// ─── Browser Control V0 (WO-O4O-BROWSER-CONTROL-V0) ─────────────────────────
+
+/**
+ * `local.browser.get_site_status` — 브라우저가 떠 있는가 (§13).
+ *
+ * 되돌리는 것은 **브라우저 실행 여부와 종류**뿐이다. V0 는 탭을 열거하지 않으므로
+ * "사이트가 열려 있는가" 는 판정하지 않고, 추측해서 true 를 만들지 않는다.
+ * 창 제목 · URL · 탭 목록 · 프로필 경로는 이 함수 밖으로 나가지 않는다(§46).
+ */
+async function getSiteStatus(site) {
+  const browser = detectRunningBrowser(await censusWindows());
+  return {
+    status: 'success',
+    data: {
+      siteId: site.siteId,
+      displayName: site.displayName,
+      browserRunning: browser.running,
+      browserType: browser.browserType,
+      // 탭 열거를 하지 않으므로 알 수 없다. null 이지 false 가 아니다.
+      siteKnownOpen: null,
+    },
+  };
+}
+
+/**
+ * `local.browser.open_site` — 등재 사이트를 기본 브라우저로 연다 (§14·§21·§23·§25).
+ *
+ *   siteId → (agent 등재부) → 고정 HTTPS URL → Windows 기본 URL handler
+ *
+ * 브라우저가 이미 떠 있으면 그 세션에 새 탭으로 열린다(§23 허용). "떠 있었는가 · 어떤
+ * 브라우저인가" 는 **URL 을 실제로 받은 브라우저**(OS https handler) 기준이다 — Chrome 과
+ * Edge 가 같이 떠 있어도 Edge 가 handler 면 Edge 를 답한다. 열린 뒤 그 브라우저 창이
+ * 정확히 1개면 foreground 로 보낸다(기존 창 활성화 재사용, §21). 2개 이상이면 임의로
+ * 고르지 않는다 — OS handler 가 이미 새 탭 쪽을 앞으로 보냈을 가능성이 높다.
+ *
+ * 하지 않는 것: 로그인 · credential 입력 · cookie 접근 · URL 조립 · 브라우저 플래그.
+ */
+async function openSite(site) {
+  const beforeWindows = await censusWindows();
+  const outcome = await openRegisteredSiteUrl(site.url);
+  if (!outcome.opened) {
+    return {
+      status: 'failed',
+      errorCode: 'BROWSER_OPEN_FAILED',
+      data: { siteId: site.siteId, displayName: site.displayName, opened: false },
+    };
+  }
+  // handler 를 모르면(등재 밖 브라우저) 떠 있는 등재 브라우저 아무거나 기준으로 답한다.
+  const handler = outcome.browserType;
+  const before = detectRunningBrowser(beforeWindows, handler);
+
+  // 새로 실행됐다면 창이 뜰 시간을 준다. 이미 떠 있었다면 새 탭이라 바로 있다.
+  if (!before.running) await new Promise((r) => setTimeout(r, 1500));
+
+  const windows = await censusWindows();
+  const after = detectRunningBrowser(windows, handler);
+  const browserWindows = matchBrowserWindows(windows, handler);
+
+  let activated = false;
+  if (browserWindows.length === 1) {
+    const act = await activateWindowHandle(browserWindows[0].hwnd);
+    activated = act.activated === true;
+  }
+
+  return {
+    status: 'success',
+    data: {
+      siteId: site.siteId,
+      displayName: site.displayName,
+      opened: true,
+      browserRunning: after.running,
+      browserType: after.browserType,
+      browserWasRunning: before.running,
+      activated,
+    },
+  };
+}
+
+/** siteId 를 받는 handler. APP_HANDLERS 와 같은 규칙 — 인자 유무가 곧 계약이다. */
+const SITE_HANDLERS = {
+  [ACTIONS.BROWSER_GET_SITE_STATUS]: getSiteStatus,
+  [ACTIONS.BROWSER_OPEN_SITE]: openSite,
+};
+
 /** appId 를 받는 handler. 위 HANDLERS 와 분리해 둔다 — 인자 유무가 곧 계약이다. */
 const APP_HANDLERS = {
   [ACTIONS.FIND_APPLICATION]: findApplication,
@@ -193,6 +288,21 @@ const APP_HANDLERS = {
  */
 export async function runAction(action, context) {
   const { base, appId } = parseAction(action);
+
+  // Browser Control V0: `base#siteId`. 등재되지 않은 siteId 는 서버가 보냈더라도 여기서 끝난다(§44).
+  const siteHandler = SITE_HANDLERS[base];
+  if (siteHandler) {
+    const site = appId ? findBrowserSite(appId) : undefined;
+    if (!site) return { status: 'denied', errorCode: 'BROWSER_SITE_NOT_REGISTERED' };
+    if (process.platform !== 'win32') {
+      return { status: 'failed', errorCode: 'BROWSER_NOT_AVAILABLE' };
+    }
+    try {
+      return await siteHandler(site);
+    } catch {
+      return { status: 'failed', errorCode: 'BROWSER_OPEN_FAILED' };
+    }
+  }
 
   const appHandler = APP_HANDLERS[base];
   if (appHandler) {
@@ -225,5 +335,5 @@ export async function runAction(action, context) {
 
 /** 테스트·감사용. 이 목록 밖의 action 은 존재하지 않는다. */
 export function listAllowedActions() {
-  return [...Object.keys(HANDLERS), ...Object.keys(APP_HANDLERS)];
+  return [...Object.keys(HANDLERS), ...Object.keys(APP_HANDLERS), ...Object.keys(SITE_HANDLERS)];
 }

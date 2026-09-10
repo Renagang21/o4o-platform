@@ -379,6 +379,27 @@ describe('11~14. 실행 · 종료 · 셸 · 파일 접근은 구현 자체가 �
         expect(code).not.toContain(forbidden);
       }
     }
+
+    // WO-O4O-BROWSER-CONTROL-V0 §25·§26·§27 — **의도적으로 한 칸 연 예외**.
+    // `Start-Process` 는 저장소 전체에서 `windows-browser-open.ps1` 한 파일, 한 번만 허용되고,
+    // 그 한 번은 반드시 `-FilePath $raw` 형태여야 한다. `$raw` 는 https 정규식을 통과한
+    // 환경변수(등재부 상수)이고, 실행 파일 경로 · -ArgumentList · -Verb 는 쓸 수 없다.
+    // 즉 이것은 "프로그램 실행" 이 아니라 "등재 URL 을 OS handler 에 넘기는 것" 뿐이다.
+    const opener = readAgent('windows-browser-open.ps1');
+    const openerCode = opener
+      .split('\n')
+      .filter((l) => !l.trim().startsWith('#'))
+      .join('\n');
+    expect((openerCode.match(/Start-Process/g) ?? []).length).toBe(1);
+    expect(openerCode).toContain('Start-Process -FilePath $raw');
+    for (const forbidden of ['-ArgumentList', '-Verb', '.exe', 'ShellExecute', 'CreateProcess', 'chrome', 'msedge']) {
+      expect(openerCode).not.toContain(forbidden);
+    }
+    // 입력은 환경변수 하나뿐이고 https 절대 URL 이어야 한다.
+    expect(openerCode).toContain('$env:O4O_SITE_URL');
+    expect(openerCode).toContain("-notmatch '^https://");
+    expect(openerCode).not.toContain('$args');
+    expect(openerCode).not.toContain('param(');
   });
 
   it('12. 프로그램을 종료 · 강제 종료할 수단이 없다', () => {
@@ -399,7 +420,7 @@ describe('11~14. 실행 · 종료 · 셸 · 파일 접근은 구현 자체가 �
     }
   });
 
-  it('13. 셸은 열려 있지 않다 — child_process 는 한 파일 · 체크인된 .ps1 두 개뿐이다', () => {
+  it('13. 셸은 열려 있지 않다 — child_process 는 한 파일 · 체크인된 .ps1 세 개뿐이다', () => {
     // (a) child_process 를 import 하는 파일은 정확히 하나다.
     const importers = agentFiles.filter((f) => readAgent(f).includes('child_process'));
     expect(importers).toEqual(['windows-window-control.mjs']);
@@ -414,9 +435,14 @@ describe('11~14. 실행 · 종료 · 셸 · 파일 접근은 구현 자체가 �
     // `execFile` 은 허용, 맨 `exec(` · `spawn(` 은 불가 — 앞 글자를 붙여 구분한다.
     expect(controlCode).not.toMatch(/[^A-Za-z]exec[(]/);
     expect(controlCode).not.toMatch(/[^A-Za-z]spawn[(]/);
-    // (c) 실행 대상은 저장소에 체크인된 .ps1 두 개뿐이고, argv 는 상수다.
+    // (c) 실행 대상은 저장소에 체크인된 .ps1 세 개뿐이고, argv 는 상수다.
+    //     (BROWSER-CONTROL-V0 에서 등재 사이트 열기 스크립트가 하나 늘었다.)
     const scripts = [...control.matchAll(/'([\w-]+\.ps1)'/g)].map((m) => m[1]).sort();
-    expect(scripts).toEqual(['windows-window-activate.ps1', 'windows-window-census.ps1']);
+    expect(scripts).toEqual([
+      'windows-browser-open.ps1',
+      'windows-window-activate.ps1',
+      'windows-window-census.ps1',
+    ]);
     expect(control).toContain("'-File'");
     // (d) 유일한 런타임 입력인 창 핸들은 10진 정수 검사를 통과해야 한다.
     expect(control).toContain('Number.isInteger(handle)');
@@ -424,6 +450,9 @@ describe('11~14. 실행 · 종료 · 셸 · 파일 접근은 구현 자체가 �
     // (e) appId · 창 제목은 프로세스 경계를 넘지 않는다 (census 는 인자를 받지 않는다).
     expect(readAgent('windows-window-census.ps1')).not.toContain('$args');
     expect(readAgent('windows-window-census.ps1')).not.toContain('param(');
+    // (f) 사이트 열기의 유일한 입력(URL)도 JS 쪽에서 https 검사를 통과해야 넘어간다.
+    expect(control).toContain('O4O_SITE_URL');
+    expect(controlCode).toMatch(/\^https:\\\/\\\//);
   });
 
   it('14. 임의 파일 접근 수단이 없다 (fs 는 여전히 credentials 한 곳뿐)', () => {
@@ -432,8 +461,9 @@ describe('11~14. 실행 · 종료 · 셸 · 파일 접근은 구현 자체가 �
     expect(readAgent('windows-app-registry.mjs')).not.toContain('node:fs');
     expect(readAgent('index.mjs')).not.toContain("'node:fs'");
     expect(readAgent('credentials.mjs')).toContain("'credentials.json'");
+    expect(readAgent('browser-site-registry.mjs')).not.toContain('node:fs');
     // PowerShell 쪽에도 파일 조작 cmdlet 이 없다.
-    for (const f of ['windows-window-census.ps1', 'windows-window-activate.ps1']) {
+    for (const f of ['windows-window-census.ps1', 'windows-window-activate.ps1', 'windows-browser-open.ps1']) {
       const code = readAgent(f);
       for (const forbidden of ['Get-Content', 'Set-Content', 'Remove-Item', 'Out-File', 'Invoke-']) {
         expect(code).not.toContain(forbidden);

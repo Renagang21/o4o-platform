@@ -1915,6 +1915,9 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
     let toolContextBlock: string | null = null;
     let executedTool: string | null = null;
     let toolOutcome: string | null = null;
+    // BROWSER-CONTROL-V0 §19·§41: 사이트를 실제로 열었을 때만 UI 가 [로그인 완료] 를 띄운다.
+    // 서버는 로그인 여부를 판정하지도 저장하지도 않는다(§5·§42) — 이 값은 "열렸다" 는 사실뿐이다.
+    let browserSiteOpened: { siteId: string; displayName: string } | null = null;
     // 인자(appId)는 라우터가 등재부에서 고른 값이고, 실행 직전 계약 계층이 다시 대조한다.
     // 클라이언트나 모델이 보낸 값이 여기로 들어오는 경로는 없다.
     const selected = selectToolInvocationForRequest(message, toolCtx);
@@ -1929,6 +1932,20 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
       if (toolContextBlock) {
         if (selected.tool === AI_TOOL_NAMES.ACTIVATE_WINDOW) facts.windowsAppAction = 'activate';
         else if (selected.tool === AI_TOOL_NAMES.FIND_APPLICATION) facts.windowsAppAction = 'inspect';
+        // BROWSER-CONTROL-V0: 사이트 축도 같은 이유로 실제 수행 동작을 프롬프트에 반영한다.
+        else if (selected.tool === AI_TOOL_NAMES.BROWSER_OPEN_SITE) facts.browserAction = 'open';
+        else if (selected.tool === AI_TOOL_NAMES.BROWSER_GET_SITE_STATUS) facts.browserAction = 'inspect';
+      }
+      if (
+        selected.tool === AI_TOOL_NAMES.BROWSER_OPEN_SITE &&
+        toolResult.ok &&
+        toolResult.data?.available === true &&
+        toolResult.data?.opened === true
+      ) {
+        browserSiteOpened = {
+          siteId: String(toolResult.data.siteId ?? ''),
+          displayName: String(toolResult.data.displayName ?? ''),
+        };
       }
     }
 
@@ -1986,6 +2003,9 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
         // 어떤 tool 이 실행/차단됐는지. 이름과 판정뿐이라 비민감이며 smoke 검증에 필요하다.
         tool: executedTool,
         toolOutcome,
+        // BROWSER-CONTROL-V0: 열렸을 때만 채워진다. URL·browserType 은 싣지 않는다 — UI 가
+        // 필요한 것은 "[로그인 완료] 버튼을 보여줄 것인가" 뿐이다.
+        browserSiteOpened,
         requestId,
       },
     });

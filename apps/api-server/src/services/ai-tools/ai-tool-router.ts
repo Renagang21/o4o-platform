@@ -44,12 +44,15 @@ import {
 } from './ai-tool-contract.js';
 import {
   composeAppAction,
+  composeSiteAction,
   LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ERROR,
+  pickSafeBrowserInfo,
   pickSafeSystemInfo,
   pickSafeWindowInfo,
 } from '../local-agent/local-agent-protocol.js';
 import { windowsAppDisplayName, WINDOWS_APP_IDS } from '../local-agent/windows-app-registry.js';
+import { browserSiteDisplayName, BROWSER_SITE_IDS } from '../local-agent/browser-site-registry.js';
 import {
   awaitCommandResult,
   issueCommand,
@@ -338,6 +341,99 @@ function executeActivateWindow(
   );
 }
 
+// ─── Browser Control executors (WO-O4O-BROWSER-CONTROL-V0) ───────────────────
+
+/**
+ * 브라우저 축 tool 의 공통 왕복 — 창 축과 **같은 배관**을 쓴다(§43). 새 protocol 없음.
+ *
+ * 다른 점은 하나뿐이다: siteId 가 allowlist 에 등재된 action 문자열 안에 실려 간다.
+ * **URL 은 어디에도 실리지 않는다.** 서버는 URL 을 모른 채 siteId 만 보내고, agent 가
+ * 자기 등재부에서 URL 을 꺼낸다(§14·§44).
+ */
+async function executeBrowserSiteAction(
+  dataSource: DataSource,
+  ctx: VerifiedToolContext,
+  tool: string,
+  baseAction: string,
+  siteId: string,
+): Promise<ToolResult> {
+  const displayName = browserSiteDisplayName(siteId);
+
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
+  if (resolution.status !== 'ok') {
+    const errorCode =
+      resolution.status === 'none'
+        ? LOCAL_AGENT_ERROR.NO_DEVICE
+        : resolution.status === 'ambiguous'
+          ? LOCAL_AGENT_ERROR.AMBIGUOUS
+          : LOCAL_AGENT_ERROR.OFFLINE;
+    return { ok: true, tool, data: { available: false, siteId, displayName, errorCode } };
+  }
+
+  const issued = await issueCommand(dataSource, {
+    userId: ctx.userId,
+    deviceId: resolution.device.id,
+    action: composeSiteAction(baseAction, siteId),
+    toolName: tool,
+  });
+  if (issued.ok === false) {
+    return { ok: true, tool, data: { available: false, siteId, displayName, errorCode: issued.errorCode } };
+  }
+
+  const result = await awaitCommandResult(dataSource, issued.command.commandId);
+  const safe = pickSafeBrowserInfo(result.data);
+
+  // §47 안전 로그 — siteId · action · 성공 여부 · browserType · deviceId 까지만.
+  // URL 은 registry 상수라도 기록하지 않는다(§47). 탭·cookie·프로필은 애초에 값 안에 없다.
+  logger.info('local-agent browser command', {
+    tool,
+    siteId,
+    status: result.status,
+    errorCode: result.errorCode ?? null,
+    browserType: safe.browserType ?? null,
+    deviceId: resolution.device.id,
+  });
+
+  if (result.status !== 'success') {
+    return {
+      ok: true,
+      tool,
+      data: {
+        available: false,
+        siteId,
+        displayName,
+        errorCode: result.errorCode ?? LOCAL_AGENT_ERROR.EXECUTION_FAILED,
+      },
+    };
+  }
+
+  // displayName 은 서버 registry 값으로 덮어쓴다 — agent 주장을 그대로 읽어주지 않는다.
+  return { ok: true, tool, data: { available: true, ...safe, siteId, displayName } };
+}
+
+/** 브라우저가 떠 있는가 (§13). 아무것도 열지 않는다. */
+function executeGetSiteStatus(dataSource: DataSource, ctx: VerifiedToolContext, siteId: string) {
+  return executeBrowserSiteAction(
+    dataSource, ctx,
+    AI_TOOL_NAMES.BROWSER_GET_SITE_STATUS,
+    LOCAL_AGENT_ACTIONS.BROWSER_GET_SITE_STATUS,
+    siteId,
+  );
+}
+
+/**
+ * 등재 사이트를 연다 (§14·§25). **한 요청에서 열기는 최대 1회**다 — 이 호출이 그 한 번이다.
+ * 로그인은 하지 않는다. 열린 뒤의 로그인은 사용자가 사이트 안에서 직접 한다(§4·§18).
+ */
+function executeOpenSite(dataSource: DataSource, ctx: VerifiedToolContext, siteId: string) {
+  return executeBrowserSiteAction(
+    dataSource, ctx,
+    AI_TOOL_NAMES.BROWSER_OPEN_SITE,
+    LOCAL_AGENT_ACTIONS.BROWSER_OPEN_SITE,
+    siteId,
+  );
+}
+
 // ─── Router ──────────────────────────────────────────────────────────────────
 
 /**
@@ -377,6 +473,11 @@ export async function executeAiTool(
       return executeFindApplication(dataSource, ctx, String((args as { appId: string }).appId));
     case AI_TOOL_NAMES.ACTIVATE_WINDOW:
       return executeActivateWindow(dataSource, ctx, String((args as { appId: string }).appId));
+    // siteId 도 `validateToolArguments` 에서 등재부와 대조를 끝낸 값이다(BROWSER-CONTROL-V0 §10).
+    case AI_TOOL_NAMES.BROWSER_GET_SITE_STATUS:
+      return executeGetSiteStatus(dataSource, ctx, String((args as { siteId: string }).siteId));
+    case AI_TOOL_NAMES.BROWSER_OPEN_SITE:
+      return executeOpenSite(dataSource, ctx, String((args as { siteId: string }).siteId));
     default:
       // 등록부에는 있으나 executor 가 없는 경우 — 열려 있는 척하지 않는다.
       return { ok: false, tool: name, reason: 'UNKNOWN_TOOL' };
@@ -507,6 +608,71 @@ export function detectRegisteredApp(message: string): string | null {
 }
 
 /**
+ * 등재 사이트 이름 → siteId (BROWSER-CONTROL-V0 §29·§30).
+ *
+ * 창 축과 같은 규칙이다: 사용자가 말한 사이트 이름을 등재부와 대조해 siteId 를 고른다.
+ * **URL 이 siteId 가 되는 경로는 존재하지 않는다** — "https://... 열어줘" 라고 해도
+ * 그 문자열은 어디로도 흐르지 않고, 등재 이름이 없으면 null 이다(§10·§29).
+ * 한글은 정규식이 아닌 `\uXXXX` 문자열로 둔다(위 esbuild 주석).
+ */
+const SITE_INTENT_KEYWORDS: readonly {
+  siteId: string;
+  ko: readonly string[];
+  en: readonly RegExp[];
+}[] = [
+  {
+    siteId: 'o4o.neture',
+    ko: [
+      '\uB124\uB69C\uB808', // 네뚜레
+      'O4O\uD648', // O4O홈 (공백 제거 후)
+    ],
+    en: [/\bneture\b/i, /\bo4o\s*home\b/i],
+  },
+];
+
+/** 문장에서 등재 사이트를 찾는다. 여러 개가 걸리면 **고르지 않는다**(임의 선택 금지). */
+export function detectRegisteredSite(message: string): string | null {
+  const compact = message.replace(/\s+/g, '');
+  const hits = SITE_INTENT_KEYWORDS.filter(
+    (s) => s.ko.some((k) => compact.includes(k)) || s.en.some((re) => re.test(message)),
+  ).map((s) => s.siteId);
+  const unique = [...new Set(hits)].filter((id) => BROWSER_SITE_IDS.includes(id));
+  return unique.length === 1 ? unique[0] : null;
+}
+
+/**
+ * "열어줘 / 접속 / 이동" 류의 **열기** 지시어 (§30). 없으면 상태 조회로만 간다.
+ * 기본값이 조회인 것이 중요하다 — "네뚜레 열려 있어?" 에 브라우저가 튀어나오면 안 된다.
+ */
+const OPEN_INTENT_KEYWORDS_KO: readonly string[] = [
+  '\uC5F4\uC5B4', // 열어
+  '\uC811\uC18D', // 접속
+  '\uC774\uB3D9', // 이동
+  '\uB744\uC6CC', // 띄워
+  '\uCF1C', // 켜
+];
+const OPEN_INTENT_PATTERNS_EN: readonly RegExp[] = [/\bopen\b/i, /\bgo\s+to\b/i, /\bnavigate\b/i, /\blaunch\b/i];
+
+export function asksForSiteOpen(message: string): boolean {
+  const compact = message.replace(/\s+/g, '');
+  if (OPEN_INTENT_KEYWORDS_KO.some((k) => compact.includes(k))) return true;
+  return OPEN_INTENT_PATTERNS_EN.some((re) => re.test(message));
+}
+
+/**
+ * 로그인 지시어 (§31·§32). **로그인 automation 은 없다.** 이 판정은 tool 을 바꾸지 않는다 —
+ * 열기까지만 수행하고, 프롬프트에 "로그인은 직접 하라" 안내를 넣기 위한 신호일 뿐이다.
+ */
+const LOGIN_INTENT_KEYWORDS_KO: readonly string[] = ['\uB85C\uADF8\uC778']; // 로그인
+const LOGIN_INTENT_PATTERNS_EN: readonly RegExp[] = [/\blog\s*in\b/i, /\bsign\s*in\b/i];
+
+export function asksForLogin(message: string): boolean {
+  const compact = message.replace(/\s+/g, '');
+  if (LOGIN_INTENT_KEYWORDS_KO.some((k) => compact.includes(k))) return true;
+  return LOGIN_INTENT_PATTERNS_EN.some((re) => re.test(message));
+}
+
+/**
  * "앞으로 가져와" 류의 **활성화** 지시어. 없으면 조회(find)로만 간다.
  *
  * 기본값이 조회인 것이 중요하다. "메모장 열려 있어?" 라고 물었을 뿐인데 창이 튀어나와
@@ -558,7 +724,12 @@ export function selectToolForRequest(message: string, ctx: VerifiedToolContext):
  * 고려되지 않았다. **선택 규칙과 같은 판정을 여기서 한 번에 준다.**
  */
 export function needsLocalDeviceResolution(message: string): boolean {
-  return looksLikeLocalScopedRequest(message) || detectRegisteredApp(message) !== null;
+  return (
+    looksLikeLocalScopedRequest(message) ||
+    detectRegisteredApp(message) !== null ||
+    // BROWSER-CONTROL-V0: 사이트 축도 PC 가 있어야 성립한다.
+    detectRegisteredSite(message) !== null
+  );
 }
 
 /** 고른 tool 과 그 인자. 인자를 받지 않는 tool 은 `args` 가 빈 객체다. */
@@ -579,6 +750,25 @@ export function selectToolInvocationForRequest(
   ctx: VerifiedToolContext,
 ): AiToolInvocation | null {
   const available = new Set(resolveAvailableTools(ctx).map((t) => t.name));
+
+  // 사이트 축 (BROWSER-CONTROL-V0 §29·§30). 창 축과 동시에 걸리면 **고르지 않는다** —
+  // "메모장이랑 네뚜레 열어줘" 를 한쪽만 임의로 실행하지 않는다.
+  const siteId = detectRegisteredSite(message);
+  const appIdEarly = detectRegisteredApp(message);
+  if (siteId && appIdEarly) return null;
+  if (siteId) {
+    // 로그인 요청(§31)도 여기로 온다 — 열기까지만 수행한다. 로그인 tool 은 존재하지 않는다(§32).
+    if (asksForSiteOpen(message) || asksForLogin(message)) {
+      if (available.has(AI_TOOL_NAMES.BROWSER_OPEN_SITE)) {
+        return { tool: AI_TOOL_NAMES.BROWSER_OPEN_SITE, args: { siteId } };
+      }
+      return null;
+    }
+    if (available.has(AI_TOOL_NAMES.BROWSER_GET_SITE_STATUS)) {
+      return { tool: AI_TOOL_NAMES.BROWSER_GET_SITE_STATUS, args: { siteId } };
+    }
+    return null;
+  }
 
   // 창 축이 먼저다. "메모장 열려 있어?" 는 로컬 축 키워드("내 PC")가 없어도 성립해야 한다(§37).
   const appId = detectRegisteredApp(message);
@@ -636,7 +826,89 @@ export function renderToolContext(result: ToolResult): string | null {
   if (result.tool === AI_TOOL_NAMES.ACTIVATE_WINDOW) {
     return renderActivateWindow(result.data);
   }
+  if (result.tool === AI_TOOL_NAMES.BROWSER_GET_SITE_STATUS) {
+    return renderSiteStatus(result.data);
+  }
+  if (result.tool === AI_TOOL_NAMES.BROWSER_OPEN_SITE) {
+    return renderOpenSite(result.data);
+  }
   return null;
+}
+
+// ─── Browser Control renderers (WO-O4O-BROWSER-CONTROL-V0 §17·§18·§19·§45) ──
+
+const BROWSER_TYPE_LABEL: Record<string, string> = { chrome: 'Chrome', edge: 'Edge' };
+
+function renderBrowserFailure(data: Record<string, unknown>, displayName: string): string | null {
+  const code = String(data.errorCode ?? '');
+  if (code === LOCAL_AGENT_ERROR.SITE_NOT_REGISTERED) {
+    return '## 사이트 상태\n- 이 사이트는 O4O 가 열 수 있도록 등록되어 있지 않습니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.BROWSER_OPEN_FAILED) {
+    return `## 사이트 상태\n- ${displayName} 을(를) 여는 데 실패했습니다. 사용자가 직접 브라우저에서 열어야 할 수 있습니다.`;
+  }
+  if (code === LOCAL_AGENT_ERROR.BROWSER_NOT_AVAILABLE) {
+    return '## 사이트 상태\n- 이 PC 에서는 브라우저를 열 수 없습니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.AMBIGUOUS) {
+    return '## 사이트 상태\n- 연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.TIMEOUT) {
+    return '## 사이트 상태\n- 이 PC의 에이전트가 제한 시간 안에 응답하지 않았습니다.';
+  }
+  return null;
+}
+
+/**
+ * 브라우저 실행 여부만 말한다. **사이트가 열려 있는지는 말하지 않는다** — V0 는 탭을
+ * 열거하지 않으므로 알 수 없고, 추측해서 "열려 있다" 고 하면 안 된다(§13).
+ */
+function renderSiteStatus(data: Record<string, unknown>): string {
+  const displayName = String(data.displayName ?? '해당 사이트');
+  if (data.available !== true) {
+    return (
+      renderBrowserFailure(data, displayName) ??
+      '## 사이트 상태\n' +
+        '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 확인할 수 없습니다.\n' +
+        '- 추측해서 답하지 마세요.'
+    );
+  }
+  const running = data.browserRunning === true;
+  const type = BROWSER_TYPE_LABEL[String(data.browserType ?? '')] ?? '브라우저';
+  return (
+    '## 사이트 상태\n' +
+    (running ? `- ${type} 브라우저가 실행 중입니다.\n` : '- 지원 브라우저가 실행 중이 아닙니다.\n') +
+    `- ${displayName} 이(가) 지금 열려 있는지는 확인하지 않습니다(탭을 조회하지 않습니다). ` +
+    '열려 있다고 단정하지 마세요.'
+  );
+}
+
+/**
+ * 사이트를 열었다는 **사실**과, 로그인은 사용자가 직접 한다는 **안내**를 함께 준다(§19·§31).
+ * 로그인 여부는 판정하지 않는다(§6). "[로그인 완료]" 버튼 안내가 V0 의 완료 신호다(§5).
+ */
+function renderOpenSite(data: Record<string, unknown>): string {
+  const displayName = String(data.displayName ?? '해당 사이트');
+  if (data.available !== true || data.opened !== true) {
+    return (
+      renderBrowserFailure(data, displayName) ??
+      '## 사이트 상태\n' +
+        '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 사이트를 열 수 없습니다.\n' +
+        '- 추측해서 답하지 마세요.'
+    );
+  }
+  const type = BROWSER_TYPE_LABEL[String(data.browserType ?? '')] ?? '기본 브라우저';
+  const wasRunning = data.browserWasRunning === true;
+  const activated = data.activated === true;
+  return (
+    '## 사이트 상태\n' +
+    `- ${displayName} 을(를) ${type} 에서 열었습니다.` +
+    (wasRunning ? ' (실행 중이던 브라우저에 새 탭으로 열렸습니다)' : ' (브라우저를 새로 실행했습니다)') +
+    (activated ? ' 브라우저 창을 앞으로 가져왔습니다.' : '') +
+    '\n- 로그인이 필요하면 사용자가 사이트에서 **직접** 로그인해야 합니다. O4O 는 로그인을 대신하지 않습니다.\n' +
+    '- 로그인 여부는 확인하지 않습니다. 사용자가 로그인을 마쳤거나 이미 로그인 상태라면 ' +
+    '"[로그인 완료]" 버튼을 누르도록 안내하세요.'
+  );
 }
 
 /**

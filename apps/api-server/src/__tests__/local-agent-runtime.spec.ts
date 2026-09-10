@@ -23,6 +23,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import {
   APP_TARGET_ACTIONS,
+  SITE_TARGET_ACTIONS,
   composeAppAction,
   LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ACTION_ALLOWLIST,
@@ -32,6 +33,7 @@ import {
   pickSafeSystemInfo,
 } from '../services/local-agent/local-agent-protocol.js';
 import { WINDOWS_APP_IDS } from '../services/local-agent/windows-app-registry.js';
+import { BROWSER_SITE_IDS } from '../services/local-agent/browser-site-registry.js';
 import {
   authenticateAgentSession,
   awaitCommandResult,
@@ -522,6 +524,8 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
     // 2개가 아니다. 다만 **열거된 문자열의 집합**이라는 성질은 그대로다 — appId 는 인자가
     // 아니라 allowlist 항목 자체에 박혀 있으므로, 등재되지 않은 대상은 allowlist 밖의
     // 문자열이 되어 애초에 명령이 되지 못한다.
+    // WO-O4O-BROWSER-CONTROL-V0: 사이트 축이 같은 방식(등재 siteId 를 action 문자열에 박음)으로
+    // 추가됐다. URL 은 어떤 항목에도 없다 — allowlist 에 'http' 가 등장하지 않는다.
     expect([...LOCAL_AGENT_ACTION_ALLOWLIST].sort()).toEqual(
       [
         LOCAL_AGENT_ACTIONS.GET_AGENT_STATUS,
@@ -529,8 +533,14 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
         ...APP_TARGET_ACTIONS.flatMap((base) =>
           WINDOWS_APP_IDS.map((appId) => composeAppAction(base, appId)),
         ),
+        ...SITE_TARGET_ACTIONS.flatMap((base) =>
+          BROWSER_SITE_IDS.map((siteId) => composeAppAction(base, siteId)),
+        ),
       ].sort(),
     );
+    for (const action of LOCAL_AGENT_ACTION_ALLOWLIST) {
+      expect(action).not.toMatch(/https?:/i);
+    }
     for (const action of LOCAL_AGENT_ACTION_ALLOWLIST) {
       expect(action.startsWith('local.')).toBe(true);
     }
@@ -538,6 +548,10 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
     expect(isAllowedLocalAction('local.file_read')).toBe(false);
     // 등재 앱이 아닌 대상은 형태가 같아도 통과하지 못한다.
     expect(isAllowedLocalAction('local.activate_window#windows.cmd')).toBe(false);
+    // 등재 사이트가 아닌 대상도, URL 을 직접 실은 형태도 통과하지 못한다(BROWSER-CONTROL-V0 §10·§11).
+    expect(isAllowedLocalAction('local.browser.open_site#evil.example')).toBe(false);
+    expect(isAllowedLocalAction('local.browser.open_site#https://neture.co.kr/')).toBe(false);
+    expect(isAllowedLocalAction('local.browser.open_site')).toBe(false);
   });
 
   it('15. agent handler 는 프로세스 실행 수단을 직접 쓰지 않는다', () => {
@@ -548,10 +562,13 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
       .map((l) => l.replace(/\/\/.*$/, ''))
       .join('\n');
     const imports = [...code.matchAll(/from\s+'([^']+)'/g)].map((m) => m[1]);
-    // 창 제어가 들어오면서 저장소 안 모듈 두 개가 늘었다. node 표준 모듈은 여전히 os 뿐이다.
+    // 창 제어가 들어오면서 저장소 안 모듈 두 개가 늘었고, 브라우저 제어(BROWSER-CONTROL-V0)로
+    // 등재부 하나가 더 늘었다. node 표준 모듈은 여전히 os 뿐이다 — 외부 프로세스 실행은
+    // windows-window-control.mjs 한 파일에만 있다.
     expect(imports).toEqual([
       'node:os',
       './windows-app-registry.mjs',
+      './browser-site-registry.mjs',
       './windows-window-control.mjs',
     ]);
     expect(imports.filter((i) => i.startsWith('node:'))).toEqual(['node:os']);

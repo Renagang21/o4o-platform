@@ -123,19 +123,32 @@ describe('tool eligibility — 자격 없는 tool 은 노출되지 않는다', (
    * 그 effect 는 창 활성화 하나뿐"** 으로 옮긴다 (§13·§19·§25～§28).
    * browser tool 은 여전히 0 이다.
    */
-  it('registry 는 read-only 또는 허용된 effect 만 담고 browser tool 은 0 이다', () => {
+  /**
+   * WO-O4O-BROWSER-CONTROL-V0 에서 두 번째 non-read-only tool 이 들어왔다
+   * (`local.browser.open_site`, effect `BROWSER_SITE_OPEN`).
+   *
+   * `executionMode: 'browser'` 는 여전히 0 이다 — 사이트 열기는 Local Agent 가 OS handler 를
+   * 부르는 **local** 실행이지, 브라우저 안(extension/CDP) 실행이 아니다. 'browser' 슬롯은
+   * 후속 Browser Navigation 의 자리로 비워 둔다(§21·§34·§35).
+   */
+  it('registry 는 read-only 또는 허용된 effect 만 담고 browser-mode tool 은 0 이다', () => {
+    const allowedEffects = ['FOREGROUND_ACTIVATION', 'BROWSER_SITE_OPEN'];
     for (const t of AI_TOOL_REGISTRY) {
       expect(['server', 'local']).toContain(t.executionMode);
       if (!t.readOnly) {
-        expect(t.effect).toBe('FOREGROUND_ACTIVATION');
+        expect(allowedEffects).toContain(t.effect);
       }
     }
     expect(AI_TOOL_REGISTRY.filter((t) => t.executionMode === 'browser')).toEqual([]);
 
-    // 쓰기 쪽은 이 하나가 전부여야 한다. 늘어나면 이 테스트가 먼저 깨진다.
+    // 쓰기 쪽은 이 둘이 전부여야 한다. 늘어나면 이 테스트가 먼저 깨진다.
     expect(AI_TOOL_REGISTRY.filter((t) => !t.readOnly).map((t) => t.name)).toEqual([
       AI_TOOL_NAMES.ACTIVATE_WINDOW,
+      AI_TOOL_NAMES.BROWSER_OPEN_SITE,
     ]);
+    // effect 와 tool 은 1:1 이다 — 같은 effect 를 다른 이름으로 다시 열 수 없다.
+    expect(AI_TOOL_REGISTRY.find((t) => t.name === AI_TOOL_NAMES.BROWSER_OPEN_SITE)?.effect)
+      .toBe('BROWSER_SITE_OPEN');
   });
 });
 

@@ -36,6 +36,7 @@
  */
 
 import { isRegisteredWindowsApp } from '../local-agent/windows-app-registry.js';
+import { isRegisteredBrowserSite } from '../local-agent/browser-site-registry.js';
 
 // ─── Capability ──────────────────────────────────────────────────────────────
 
@@ -76,6 +77,20 @@ export const AiCapability = {
    * 애초에 구현되어 있지 않다(§25·§26·§27·§28).
    */
   LOCAL_WINDOW_ACTIVATE: 'LOCAL_WINDOW_ACTIVATE',
+  /**
+   * 연결된 PC 에서 **등재 사이트 기준으로 브라우저 실행 여부** 조회
+   * (WO-O4O-BROWSER-CONTROL-V0 §13·§28 `local.browser.inspect`).
+   * read-only 다. 탭 목록 · history · cookie 는 이 자격으로 얻을 수 없다(§46).
+   */
+  READ_ONLY_LOCAL_BROWSER_INSPECT: 'READ_ONLY_LOCAL_BROWSER_INSPECT',
+  /**
+   * **등재된 HTTPS 사이트를 기본 브라우저로 여는** 자격 (§14·§25·§28 `local.browser.open`).
+   *
+   * 창 활성화에 이어 두 번째 non-read-only capability 다. 효과는 "등재 URL 하나를
+   * OS 기본 handler 로 연다" 뿐이다. 임의 URL · 임의 프로그램 · 로그인 · 입력은 이 자격으로
+   * 표현할 수 없다(§10·§26·§32).
+   */
+  LOCAL_BROWSER_OPEN: 'LOCAL_BROWSER_OPEN',
 } as const;
 
 /**
@@ -153,6 +168,9 @@ export function deriveAiCapabilities(ctx: VerifiedToolContext): AiCapabilityKey[
     // 창 축도 같은 조건이다. 연결되지 않은 PC 의 창을 찾을 수도, 띄울 수도 없다.
     caps.push(AiCapability.READ_ONLY_LOCAL_APP_INSPECT);
     caps.push(AiCapability.LOCAL_WINDOW_ACTIVATE);
+    // 브라우저 축도 같은 조건이다(BROWSER-CONTROL-V0 §43). 연결된 PC 가 있어야 열 수 있다.
+    caps.push(AiCapability.READ_ONLY_LOCAL_BROWSER_INSPECT);
+    caps.push(AiCapability.LOCAL_BROWSER_OPEN);
   }
   return caps;
 }
@@ -200,7 +218,7 @@ export interface AiToolDefinition {
    * 받는 인자의 형상. 생략하면 **인자 없음**이다(V0 기본).
    * `appId` 는 `{ appId }` 하나만 허용하며, 값은 Windows App Registry 등재분이어야 한다(§9).
    */
-  argumentSchema?: 'none' | 'appId';
+  argumentSchema?: 'none' | 'appId' | 'siteId';
 }
 
 /**
@@ -210,10 +228,20 @@ export interface AiToolDefinition {
  * 그 이상은 없다 — 프로그램 실행 · 종료 · 키보드 · 마우스 · 화면 캡처는 정의조차 하지 않는다.
  * 이름이 없으면 등록할 수도 없다(§25·§26·§27·§28).
  */
-export type ToolEffect = 'FOREGROUND_ACTIVATION';
+export type ToolEffect =
+  | 'FOREGROUND_ACTIVATION'
+  /**
+   * 등재된 HTTPS 사이트 하나를 OS 기본 URL handler 로 연다 (BROWSER-CONTROL-V0 §25).
+   * 브라우저가 꺼져 있으면 OS 가 기본 브라우저를 띄운다 — "임의 process launch" 가 아니라
+   * 등재 URL open 이라는 좁은 효과다(§26). 열리는 주소는 agent 등재부 상수뿐이다.
+   */
+  | 'BROWSER_SITE_OPEN';
 
 /** 실행이 허용된 부작용. **registry 에 무엇이 적혀 있든 이 집합이 최종 게이트다.** */
-const ALLOWED_TOOL_EFFECTS: readonly ToolEffect[] = Object.freeze(['FOREGROUND_ACTIVATION']);
+const ALLOWED_TOOL_EFFECTS: readonly ToolEffect[] = Object.freeze([
+  'FOREGROUND_ACTIVATION',
+  'BROWSER_SITE_OPEN',
+]);
 
 /** read-only 이거나, 허용된 effect 를 선언한 tool 만 실행 후보가 된다. */
 function hasAllowedEffect(tool: AiToolDefinition): boolean {
@@ -228,6 +256,9 @@ export const AI_TOOL_NAMES = {
   GET_LOCAL_SYSTEM_INFO: 'local.get_system_info',
   FIND_APPLICATION: 'local.find_application',
   ACTIVATE_WINDOW: 'local.activate_window',
+  // WO-O4O-BROWSER-CONTROL-V0 §13·§14
+  BROWSER_GET_SITE_STATUS: 'local.browser.get_site_status',
+  BROWSER_OPEN_SITE: 'local.browser.open_site',
 } as const;
 
 export type AiToolName = (typeof AI_TOOL_NAMES)[keyof typeof AI_TOOL_NAMES];
@@ -290,6 +321,25 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
     readOnly: false,
     effect: 'FOREGROUND_ACTIVATION',
     argumentSchema: 'appId',
+  },
+  {
+    name: AI_TOOL_NAMES.BROWSER_GET_SITE_STATUS,
+    description: '등재된 사이트 기준으로 연결된 PC 에 브라우저가 떠 있는지 확인한다.',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_BROWSER_INSPECT],
+    executionMode: 'local',
+    readOnly: true,
+    argumentSchema: 'siteId',
+  },
+  {
+    name: AI_TOOL_NAMES.BROWSER_OPEN_SITE,
+    description: '등재된 사이트를 연결된 PC 의 기본 브라우저로 연다. 로그인은 사용자가 직접 한다.',
+    requiredCapabilities: [AiCapability.LOCAL_BROWSER_OPEN],
+    // local 이다 — 'browser' mode 는 향후 브라우저 안(extension/CDP) 실행기의 자리이며
+    // EXECUTABLE_MODES 에 없다. 이 tool 은 Local Agent 가 OS handler 를 부르는 것이므로 local 이 맞다.
+    executionMode: 'local',
+    readOnly: false,
+    effect: 'BROWSER_SITE_OPEN',
+    argumentSchema: 'siteId',
   },
 ]);
 
@@ -389,6 +439,24 @@ export function validateToolArguments(
     const appId = (args as Record<string, unknown>).appId;
     if (typeof appId !== 'string' || !isRegisteredWindowsApp(appId)) {
       // 등재되지 않은 프로그램은 여기서 끝난다 — 명령이 발행되지 않는다(§10).
+      return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    }
+    return { ok: true };
+  }
+
+  if (schema === 'siteId') {
+    // 브라우저 축 tool 은 **정확히 `{ siteId }` 하나**만 받는다 (BROWSER-CONTROL-V0 §10·§15).
+    // URL 을 넘길 칸이 형상에 없다 — `{ url }` 은 키 개수/이름 검사에서 끝난다.
+    if (!args || typeof args !== 'object' || Array.isArray(args)) {
+      return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    }
+    const keys = Object.keys(args as Record<string, unknown>);
+    if (keys.length !== 1 || keys[0] !== 'siteId') {
+      return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    }
+    const siteId = (args as Record<string, unknown>).siteId;
+    if (typeof siteId !== 'string' || !isRegisteredBrowserSite(siteId)) {
+      // 등재되지 않은 사이트는 여기서 끝난다 — 명령이 발행되지 않는다(§11).
       return { ok: false, reason: 'INVALID_ARGUMENTS' };
     }
     return { ok: true };

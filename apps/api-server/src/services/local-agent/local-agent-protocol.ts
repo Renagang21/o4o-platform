@@ -22,6 +22,7 @@
  */
 
 import { WINDOWS_APP_IDS } from './windows-app-registry.js';
+import { BROWSER_SITE_IDS } from './browser-site-registry.js';
 
 // ─── Action ──────────────────────────────────────────────────────────────────
 
@@ -40,6 +41,10 @@ export const LOCAL_AGENT_ACTIONS = {
   FIND_APPLICATION: 'local.find_application',
   /** 등재된 Windows 앱의 창을 앞으로 가져온다 (동 §13). */
   ACTIVATE_WINDOW: 'local.activate_window',
+  /** 등재 사이트 기준 브라우저 실행 여부 (BROWSER-CONTROL-V0 §13). 탭은 열거하지 않는다. */
+  BROWSER_GET_SITE_STATUS: 'local.browser.get_site_status',
+  /** 등재 사이트를 Windows 기본 URL handler 로 연다 (동 §14·§15·§25). */
+  BROWSER_OPEN_SITE: 'local.browser.open_site',
 } as const;
 
 export type LocalAgentAction = (typeof LOCAL_AGENT_ACTIONS)[keyof typeof LOCAL_AGENT_ACTIONS];
@@ -69,6 +74,24 @@ export function composeAppAction(base: string, appId: string): string {
   return `${base}${LOCAL_APP_ACTION_SEPARATOR}${appId}`;
 }
 
+// ─── Site 대상 action (BROWSER-CONTROL-V0 §10·§11·§44) ───────────────────────
+
+/**
+ * siteId 도 appId 와 **똑같은 방식**으로 action 이름 안에 싣는다.
+ *
+ * URL 은 이 문자열 어디에도 없다. 서버는 siteId 만 보내고, agent 가 자기 등재부에서 URL 을
+ * 꺼낸다. 즉 "AI 가 만든 URL" · "사용자가 말한 URL" · `javascript:`/`file:`/`data:` 는
+ * **프로토콜 레벨에서 표현 불가능**하다(§10). 등재되지 않은 siteId 역시 allowlist 에 없다.
+ */
+export const SITE_TARGET_ACTIONS: readonly string[] = Object.freeze([
+  LOCAL_AGENT_ACTIONS.BROWSER_GET_SITE_STATUS,
+  LOCAL_AGENT_ACTIONS.BROWSER_OPEN_SITE,
+]);
+
+export function composeSiteAction(base: string, siteId: string): string {
+  return composeAppAction(base, siteId);
+}
+
 /** action 문자열을 base 와 appId 로 나눈다. appId 가 없는 action 이면 appId 는 undefined. */
 export function parseLocalAction(action: string): { base: string; appId?: string } {
   const idx = String(action ?? '').indexOf(LOCAL_APP_ACTION_SEPARATOR);
@@ -90,6 +113,10 @@ export const LOCAL_AGENT_ACTION_ALLOWLIST: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.GET_SYSTEM_INFO,
   ...APP_TARGET_ACTIONS.flatMap((base) =>
     WINDOWS_APP_IDS.map((appId) => composeAppAction(base, appId)),
+  ),
+  // BROWSER-CONTROL-V0: 등재 siteId 하나당 한 항목씩. registry 에 없는 사이트는 여기 없다.
+  ...SITE_TARGET_ACTIONS.flatMap((base) =>
+    BROWSER_SITE_IDS.map((siteId) => composeSiteAction(base, siteId)),
   ),
 ]);
 
@@ -160,6 +187,16 @@ export const LOCAL_AGENT_ERROR = {
   APP_WINDOW_AMBIGUOUS: 'WINDOWS_APP_WINDOW_AMBIGUOUS',
   /** 창은 찾았지만 Windows 가 foreground 전환을 받아주지 않았다(§18). */
   WINDOW_ACTIVATION_FAILED: 'WINDOW_ACTIVATION_FAILED',
+
+  // ── Browser Control V0 (§45) ───────────────────────────────────────────────
+  /** registry 에 없는 siteId (§11). */
+  SITE_NOT_REGISTERED: 'BROWSER_SITE_NOT_REGISTERED',
+  /** 기본 URL handler 호출이 실패했다. */
+  BROWSER_OPEN_FAILED: 'BROWSER_OPEN_FAILED',
+  /** 지원 브라우저가 없거나 이 플랫폼에서 열 수 없다. */
+  BROWSER_NOT_AVAILABLE: 'BROWSER_NOT_AVAILABLE',
+  /** 로그인은 사용자가 직접 해야 한다 — O4O 가 대행하지 않는다(§4·§31). */
+  LOGIN_USER_ACTION_REQUIRED: 'LOGIN_USER_ACTION_REQUIRED',
 } as const;
 
 export type LocalAgentErrorCode = (typeof LOCAL_AGENT_ERROR)[keyof typeof LOCAL_AGENT_ERROR];
@@ -245,6 +282,49 @@ export function pickSafeWindowInfo(data: unknown): Record<string, unknown> {
   return out;
 }
 
+// ─── Safe browser info (BROWSER-CONTROL-V0 §46·§47) ─────────────────────────
+
+/**
+ * 브라우저 tool 이 되돌릴 수 있는 **유일한** 필드 집합.
+ *
+ * 금지(§46): 전체 history · 열린 tab 목록 · cookie · session token · saved password ·
+ * profile 경로 · Windows username · URL 전체. `browserType` 은 'chrome'|'edge' 두 값뿐이다.
+ * `displayName` 은 서버 registry 값으로 다시 덮어쓴다(agent 주장을 그대로 읽지 않는다).
+ */
+export const SAFE_BROWSER_INFO_FIELDS: readonly string[] = Object.freeze([
+  'siteId',
+  'displayName',
+  'browserType',
+]);
+
+const SAFE_BROWSER_INFO_BOOLEAN_FIELDS: readonly string[] = Object.freeze([
+  'opened',
+  'browserRunning',
+  'browserWasRunning',
+  'activated',
+]);
+
+const SAFE_BROWSER_TYPES: readonly string[] = Object.freeze(['chrome', 'edge']);
+
+export function pickSafeBrowserInfo(data: unknown): Record<string, unknown> {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return {};
+  const src = data as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  for (const key of SAFE_BROWSER_INFO_FIELDS) {
+    const v = src[key];
+    if (typeof v !== 'string' || v.length === 0) continue;
+    if (key === 'browserType' && !SAFE_BROWSER_TYPES.includes(v)) continue;
+    out[key] = v.slice(0, 60);
+  }
+  for (const key of SAFE_BROWSER_INFO_BOOLEAN_FIELDS) {
+    const v = src[key];
+    if (typeof v === 'boolean') out[key] = v;
+  }
+  // siteKnownOpen 은 V0 에서 null(미판정)만 허용한다. true 를 추측해 싣지 못하게 한다(§13).
+  if (src.siteKnownOpen === null) out.siteKnownOpen = null;
+  return out;
+}
+
 /**
  * action 에 맞는 출력 화이트리스트를 고른다.
  *
@@ -258,6 +338,9 @@ export function pickSafeResultData(action: string, data: unknown): Record<string
   }
   if (APP_TARGET_ACTIONS.includes(base)) {
     return pickSafeWindowInfo(data);
+  }
+  if (SITE_TARGET_ACTIONS.includes(base)) {
+    return pickSafeBrowserInfo(data);
   }
   return {};
 }

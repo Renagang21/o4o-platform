@@ -38,6 +38,11 @@ export interface HomeChatResult {
     serviceKey: string | null;
     storeStatus: 'resolved' | 'none' | 'ambiguous' | null;
   };
+  /**
+   * WO-O4O-BROWSER-CONTROL-V0 §19·§41: 이번 응답에서 등재 사이트가 **실제로 열렸을 때만** 온다.
+   * UI 는 이 값이 있을 때 [로그인 완료] 버튼을 보여준다. URL·browserType 은 오지 않는다.
+   */
+  browserSiteOpened?: { siteId: string; displayName: string } | null;
 }
 
 /**

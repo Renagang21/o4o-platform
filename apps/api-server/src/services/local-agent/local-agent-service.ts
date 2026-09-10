@@ -30,6 +30,7 @@ import { randomUUID, randomBytes, createHash, timingSafeEqual } from 'crypto';
 import type { DataSource } from 'typeorm';
 import {
   APP_TARGET_ACTIONS,
+  SITE_TARGET_ACTIONS,
   LOCAL_AGENT_ERROR,
   SUPPORTED_AGENT_PLATFORMS,
   isAllowedLocalAction,
@@ -573,8 +574,12 @@ export async function submitCommandResult(
   // 예외는 창 대상 action 의 실패뿐이다 — "창이 3개라 확정할 수 없다"(§16) 는 개수 자체가
   // 사용자에게 전해야 하는 답이고, 그 화이트리스트에는 개수·상태 말고 실릴 수 있는 것이 없다.
   const action = String(cmd.action ?? '');
+  // BROWSER-CONTROL-V0: 사이트 대상 action 도 같은 규칙 — 실패 시 siteId·displayName·opened 만
+  // 남는다(pickSafeBrowserInfo 화이트리스트). URL·프로필·탭 정보는 애초에 통과하지 못한다.
+  const failureBase = parseLocalAction(action).base;
   const keepFailureData =
-    status === 'failed' && APP_TARGET_ACTIONS.includes(parseLocalAction(action).base);
+    status === 'failed' &&
+    (APP_TARGET_ACTIONS.includes(failureBase) || SITE_TARGET_ACTIONS.includes(failureBase));
   const safeData =
     status === 'success' || keepFailureData ? pickSafeResultData(action, result.data) : null;
 
