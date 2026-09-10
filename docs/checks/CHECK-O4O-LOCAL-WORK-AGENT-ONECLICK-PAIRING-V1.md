@@ -261,7 +261,7 @@ V0 §16 이 금지한 것은 `cloud → 사용자의 PC 에 inbound port 직접 
 | eslint (변경 TS 파일 전체) | **PASS (0 errors / 0 warnings)** |
 | `node --check` (agent .mjs 2개) | **PASS** |
 | `tsc --noEmit` (web-neture) | 기존 오류 38건 — **전부 미빌드 workspace 패키지(`@o4o/account-ui`·`@o4o/auth-utils`) dist 부재로 인한 신규 worktree 한정 현상.** 신규 파일 2개 관련 오류 **0건** |
-| CI | push 후 확인 |
+| CI Pipeline | **PASS** — run `34432607227` (`893707e11`) success. 본 WO 의 3개 커밋(`fc68e567e`·`2b7590ca7`·`149234416`)이 모두 이 SHA 의 조상임을 `git merge-base --is-ancestor` 로 확인했다. 각 커밋의 개별 run(`34431141760`·`34431155710`)은 다른 세션의 연속 push 로 concurrency cancel 되어 자체 결과를 남기지 못했다. |
 
 ---
 
