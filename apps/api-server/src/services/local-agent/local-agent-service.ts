@@ -18,7 +18,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * 자격증명 (§13)
  *
- *   pairing code     — 단명(5분) · 1회용 · user 소유 · 서비스 무관
+ *   pairing grant    — 단명(2분) · 1회용 · user 소유 · 서비스 무관 · 브라우저가 전달
  *   agent credential — 장기이지만 **agent 만** 보유. 서버는 SHA-256 해시만 저장한다
  *   session token    — 단명(2시간) · 해시 저장 · 명령 수신/결과 제출에만 사용
  *
@@ -40,8 +40,14 @@ import {
 
 // ─── 정책 상수 ────────────────────────────────────────────────────────────────
 
-/** pairing code 유효 시간. 짧을수록 좋다 — 사람이 한 번 옮겨 적을 시간이면 충분하다. */
-const PAIRING_TTL_MS = 5 * 60 * 1000;
+/**
+ * pairing grant 유효 시간 (ONECLICK §7).
+ *
+ * V0 의 5분은 사람이 코드를 옮겨 적는 시간이었다. 이제 브라우저가 곧바로 전달하므로
+ * 그 시간이 필요 없다 — 왕복은 1초 안에 끝난다. 2분은 agent 를 뒤늦게 실행하는
+ * 경우까지 감안한 여유이고, 그 이상 열어 둘 이유가 없다.
+ */
+const GRANT_TTL_MS = 2 * 60 * 1000;
 /** session token 유효 시간. 만료되면 agent 가 credential 로 조용히 갱신한다. */
 const SESSION_TTL_MS = 2 * 60 * 60 * 1000;
 /** 이 시간 안에 heartbeat 가 없으면 offline 로 본다 (§31). */
@@ -81,18 +87,6 @@ function newSecret(bytes = 32): string {
   return randomBytes(bytes).toString('base64url');
 }
 
-/**
- * pairing code 는 사람이 화면에서 옮겨 적는다. 혼동되는 글자(0/O, 1/I)를 뺀 사전으로
- * 10자리를 만든다 — 대략 50 bit. 5분 · 1회용이므로 무차별 대입이 성립하지 않는다.
- */
-const PAIRING_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-function newPairingCode(): string {
-  const buf = randomBytes(10);
-  let out = '';
-  for (let i = 0; i < 10; i += 1) out += PAIRING_ALPHABET[buf[i] % PAIRING_ALPHABET.length];
-  return `${out.slice(0, 5)}-${out.slice(5)}`;
-}
-
 /** 해시 비교는 상수 시간으로. 길이가 다르면 즉시 false (timingSafeEqual 이 던진다). */
 function hashEquals(a: string, b: string): boolean {
   if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
@@ -123,23 +117,28 @@ export type DeviceResolution =
   | { status: 'offline'; device: DeviceRow }
   | { status: 'ambiguous'; count: number };
 
-// ─── 1. Pairing (§11·§12) ─────────────────────────────────────────────────────
+// ─── 1. Pairing — one-click grant (ONECLICK §6·§7·§10) ───────────────────────
 
 /**
- * 로그인한 사용자가 "이 PC 를 연결" 을 누르면 발급된다.
+ * 버튼 한 번으로 끝내기 위한 단명 승인권.
  *
- * 사용자가 장기 API key 를 복사·붙여넣기 하는 구조를 피하기 위한 우회로다(§12).
- * 사용자가 옮기는 것은 **5분짜리 1회용 코드**이고, 실제 장기 자격증명은 agent 가
- * 그 코드를 소모하면서 서버로부터 직접 받는다 — 사람 눈에 띄지 않는다.
+ * 로그인한 브라우저가 [이 PC 연결] 을 누를 때 발급된다. 사람이 이 값을 보거나 옮겨
+ * 적지 않는다 — 브라우저가 그대로 localhost agent 에 전달한다(§6).
+ *
+ * grant 에 들어가는 것은 **난수 문자열 하나뿐**이다(§8). password · refresh token ·
+ * session cookie · 외부 사이트 자격증명은 어느 것도 실리지 않는다. 서버는 그 난수의
+ * **해시만** 보관하므로(§23 raw token 저장 금지), grant 로 역으로 사용자 정보를 꺼낼 수
+ * 있는 경로는 "서버에게 물어보는 것" 뿐이다.
  */
-export async function createPairingCode(
+export async function createPairingGrant(
   dataSource: DataSource,
   userId: string,
-): Promise<{ code: string; expiresAt: string }> {
-  const code = newPairingCode();
-  const expiresAt = new Date(Date.now() + PAIRING_TTL_MS);
+): Promise<{ grant: string; expiresAt: string }> {
+  const grant = newSecret();
+  const expiresAt = new Date(Date.now() + GRANT_TTL_MS);
 
-  // 같은 사용자의 기존 미사용 코드는 무효화한다. 살아 있는 코드는 항상 최대 1개.
+  // 같은 사용자의 기존 미사용 grant 는 무효화한다. 살아 있는 grant 는 항상 최대 1개 —
+  // 버튼을 연달아 눌러도 직전 것은 그 자리에서 죽는다.
   await dataSource.query(
     `UPDATE local_agent_pairings SET consumed_at = now()
       WHERE user_id = $1 AND consumed_at IS NULL`,
@@ -148,62 +147,90 @@ export async function createPairingCode(
   await dataSource.query(
     `INSERT INTO local_agent_pairings (id, user_id, code_hash, expires_at)
      VALUES ($1, $2, $3, $4)`,
-    [randomUUID(), userId, hashSecret(code), expiresAt.toISOString()],
+    [randomUUID(), userId, hashSecret(grant), expiresAt.toISOString()],
   );
 
-  return { code, expiresAt: expiresAt.toISOString() };
+  return { grant, expiresAt: expiresAt.toISOString() };
 }
 
-export interface RegisterDeviceInput {
-  code: string;
+export interface RedeemGrantInput {
+  grant: string;
   deviceName?: string;
   platform: string;
   agentVersion: string;
+  /**
+   * 이미 연결된 적이 있는 agent 는 자신의 신원을 함께 제시한다 (§15·§16).
+   *
+   * 이것은 "나는 이 device 다" 라는 **주장**이 아니라 credential 증명이다. 증명에
+   * 실패하면 주장을 무시하고 새 device 로 취급한다 (§14 — 클라이언트 주장 불신뢰).
+   */
+  claimedDeviceId?: string;
+  claimedCredential?: string;
 }
 
-export type RegisterDeviceOutcome =
-  | { ok: true; deviceId: string; agentCredential: string }
-  | { ok: false; reason: 'INVALID_PAIRING_CODE' | 'PAIRING_EXPIRED' | 'UNSUPPORTED_PLATFORM' };
+export type RedeemGrantOutcome =
+  | { ok: true; status: 'connected'; deviceId: string; agentCredential: string }
+  | { ok: true; status: 'already_connected'; deviceId: string }
+  | {
+      ok: false;
+      reason:
+        | 'INVALID_PAIRING_GRANT'
+        | 'PAIRING_EXPIRED'
+        | 'UNSUPPORTED_PLATFORM'
+        | 'DEVICE_ALREADY_PAIRED';
+    };
 
 /**
- * agent 가 pairing code 를 제시하고 device 로 등록된다.
+ * agent 가 grant 를 제시하고 연결된다.
  *
- * deviceId 는 **서버가 만든 random UUID** 다(§10). agent 가 보낸 값이 아니고,
- * MAC · 디스크 시리얼 · CPU id 같은 hardware fingerprint 에서 파생하지도 않는다.
- * 같은 PC 에 agent 를 재설치하면 새 device 가 되는 편이, 하드웨어를 식별해 두는 것보다 낫다.
+ * deviceId 는 **서버가 만드는 random UUID** 다(§9). agent 가 보낸 값이 아니고,
+ * MAC · 디스크 시리얼 같은 hardware fingerprint 에서 파생하지도 않는다.
+ *
+ * 순서가 중요하다. **이미 남의 PC 로 잡힌 경우 grant 를 소모하지 않는다**(§16) —
+ * 사용자가 어쩔 수 없는 상황에서 승인권까지 태우면, 다음 시도를 위해 버튼을 한 번 더
+ * 누르게 만드는 것뿐이다. 거절 이유는 재시도로 바뀌지 않는다.
  */
-export async function consumePairingAndRegisterDevice(
+export async function redeemPairingGrant(
   dataSource: DataSource,
-  input: RegisterDeviceInput,
-): Promise<RegisterDeviceOutcome> {
+  input: RedeemGrantInput,
+): Promise<RedeemGrantOutcome> {
   if (!SUPPORTED_AGENT_PLATFORMS.includes(input.platform)) {
     return { ok: false, reason: 'UNSUPPORTED_PLATFORM' };
   }
 
-  const codeHash = hashSecret(String(input.code ?? ''));
+  const grantHash = hashSecret(String(input.grant ?? ''));
   const rows = await dataSource.query(
     `SELECT id, user_id, expires_at, consumed_at
        FROM local_agent_pairings
       WHERE code_hash = $1
       LIMIT 1`,
-    [codeHash],
+    [grantHash],
   );
   const pairing = rows?.[0];
-  if (!pairing) return { ok: false, reason: 'INVALID_PAIRING_CODE' };
-  // 이미 쓴 코드는 "만료" 가 아니라 "무효" 다 — 재사용 시도와 정상 만료를 구분해서 알려주지 않는다.
-  if (pairing.consumed_at) return { ok: false, reason: 'INVALID_PAIRING_CODE' };
+  if (!pairing) return { ok: false, reason: 'INVALID_PAIRING_GRANT' };
+  // 이미 쓴 grant 는 "만료" 가 아니라 "무효" 다 — replay 와 정상 만료를 구분해 알려주지 않는다.
+  if (pairing.consumed_at) return { ok: false, reason: 'INVALID_PAIRING_GRANT' };
   if (new Date(pairing.expires_at).getTime() < Date.now()) {
     return { ok: false, reason: 'PAIRING_EXPIRED' };
   }
 
-  // 1회용 보장: consumed_at IS NULL 조건부 UPDATE. 동시 요청 중 하나만 row 를 돌려받는다.
-  const claimed = await dataSource.query(
-    `UPDATE local_agent_pairings SET consumed_at = now()
-      WHERE id = $1 AND consumed_at IS NULL
-      RETURNING id`,
-    [pairing.id],
-  );
-  if (!claimed || claimed.length === 0) return { ok: false, reason: 'INVALID_PAIRING_CODE' };
+  // ─ 이미 연결된 PC 인가? (§15·§16) ──────────────────────────────────────────
+  const existing = await resolveClaimedDevice(dataSource, input);
+  if (existing) {
+    if (existing.userId !== pairing.user_id) {
+      // 임의로 재귀속시키지 않는다(§16). 소유권 이전은 별도 flow 다.
+      return { ok: false, reason: 'DEVICE_ALREADY_PAIRED' };
+    }
+    // 같은 사용자의 이미 연결된 PC — 성공으로 닫는다. duplicate device 를 만들지 않는다.
+    if (!(await claimGrant(dataSource, pairing.id))) {
+      return { ok: false, reason: 'INVALID_PAIRING_GRANT' };
+    }
+    return { ok: true, status: 'already_connected', deviceId: existing.id };
+  }
+
+  if (!(await claimGrant(dataSource, pairing.id))) {
+    return { ok: false, reason: 'INVALID_PAIRING_GRANT' };
+  }
 
   const deviceId = randomUUID();
   const agentCredential = newSecret();
@@ -221,7 +248,46 @@ export async function consumePairingAndRegisterDevice(
     ],
   );
 
-  return { ok: true, deviceId, agentCredential };
+  return { ok: true, status: 'connected', deviceId, agentCredential };
+}
+
+/**
+ * 1회용 보장: `consumed_at IS NULL` 조건부 UPDATE.
+ * 동시에 두 번 도착해도 row 를 돌려받는 쪽은 하나뿐이다 (§21-5 replay).
+ */
+async function claimGrant(dataSource: DataSource, pairingId: string): Promise<boolean> {
+  const claimed = await dataSource.query(
+    `UPDATE local_agent_pairings SET consumed_at = now()
+      WHERE id = $1 AND consumed_at IS NULL
+      RETURNING id`,
+    [pairingId],
+  );
+  return Boolean(claimed && claimed.length > 0);
+}
+
+/**
+ * agent 가 제시한 기존 신원을 **검증**해서 해소한다.
+ *
+ * credential 이 맞지 않으면 null 을 돌려 새 device 로 보낸다. 그래야 "남의 deviceId 를
+ * 적어 보내 DEVICE_ALREADY_PAIRED 를 유발해 존재 여부를 캐는" 길이 막힌다.
+ */
+async function resolveClaimedDevice(
+  dataSource: DataSource,
+  input: RedeemGrantInput,
+): Promise<{ id: string; userId: string } | null> {
+  const deviceId = String(input.claimedDeviceId ?? '');
+  const credential = String(input.claimedCredential ?? '');
+  if (!deviceId || !credential || !isUuid(deviceId)) return null;
+
+  const rows = await dataSource.query(
+    `SELECT id, user_id, status, credential_hash FROM local_agent_devices WHERE id = $1 LIMIT 1`,
+    [deviceId],
+  );
+  const device = rows?.[0];
+  if (!device) return null;
+  if (device.status !== 'active') return null;
+  if (!hashEquals(device.credential_hash, hashSecret(credential))) return null;
+  return { id: device.id, userId: device.user_id };
 }
 
 // ─── 2. Session (§13·§14) ─────────────────────────────────────────────────────

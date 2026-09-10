@@ -1,26 +1,30 @@
 /**
- * O4O Local Work Agent — 진입점 (§8)
+ * O4O Local Work Agent — 진입점
  *
- * WO-O4O-LOCAL-WORK-AGENT-V0
+ * WO-O4O-LOCAL-WORK-AGENT-V0 · WO-O4O-LOCAL-WORK-AGENT-ONECLICK-PAIRING-V1
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * 생명주기
  *
- *   pair  — 1회용 코드로 device 등록 → 자격증명 저장 → 종료
- *   run   — 세션 열기 → (heartbeat + 명령 수령 → 실행 → 결과 제출) 반복
+ *   run — loopback 창구를 열고, 연결되어 있으면 곧바로 폴링을 시작한다.
+ *         아직 연결 전이면 브라우저의 [이 PC 연결] 을 기다린다.
  *
- * GUI 가 없다. 백그라운드 프로세스 하나면 V0 의 목적(연결·인증·명령·허용목록·왕복)에
- * 충분하고, 창을 띄우는 순간 "무엇을 보여줄 것인가" 라는 별개의 설계가 따라온다.
+ * 하위 명령이 `run` 하나다. V0 에 있던 `pair --code` 는 사라졌다 — 사용자가 코드를
+ * 옮겨 적는 단계가 없어졌으므로, 그 단계를 위한 명령도 존재할 이유가 없다.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * 방향 (§16)
+ * 방향
  *
- * 이 프로세스는 **서버에 접속할 뿐, 접속을 받지 않는다.** listen 하는 포트가 없다.
- * 공유기 설정 · 방화벽 인바운드 규칙 · 공인 IP 가 필요 없는 이유다.
+ * 업무 통신은 여전히 **전부 agent → cloud 방향이다.** 명령을 받으러 가는 것도, 결과를
+ * 돌려주는 것도 이쪽에서 건다. cloud 가 이 PC 에 접속하는 경로는 없다.
+ *
+ * 새로 생긴 listen 소켓은 업무 통신용이 아니라 **같은 PC 의 브라우저 전용**이며
+ * 127.0.0.1 에만 묶인다(ONECLICK §4). 외부 네트워크에서는 이 포트가 보이지 않는다.
  */
 
 import { runAction, listAllowedActions, AGENT_VERSION, ACTIONS } from './handlers.mjs';
 import { loadCredentials, saveCredentials, credentialsLocation } from './credentials.mjs';
+import { startLocalServer, LOCAL_AGENT_PORT } from './local-server.mjs';
 
 const API_BASE = process.env.O4O_API_BASE || 'https://api.neture.co.kr';
 /** 명령을 물어보러 가는 주기. 짧으면 반응이 빠르고, 길면 조용하다. */
@@ -28,8 +32,10 @@ const POLL_INTERVAL_MS = 5000;
 /** 연결이 끊겼을 때의 재시도 간격 (§32). 지수 백오프로 늘어난다. */
 const RECONNECT_MIN_MS = 3000;
 const RECONNECT_MAX_MS = 60000;
+/** 아직 연결 전일 때 브라우저를 기다리는 간격. */
+const PAIRING_WAIT_MS = 1000;
 /**
- * 재시도해도 나아지지 않는 거절 사유. 사람이 다시 pair 해야 한다.
+ * 재시도해도 나아지지 않는 거절 사유. 사람이 다시 [이 PC 연결] 을 눌러야 한다.
  * 나머지(네트워크 · 5xx)는 기다리면 회복될 수 있으므로 백오프로 재시도한다.
  */
 const FATAL_CONNECT_CODES = new Set(['BAD_CREDENTIAL', 'DEVICE_REVOKED', 'DEVICE_NOT_FOUND']);
@@ -69,37 +75,42 @@ async function apiPost(pathname, body, sessionToken) {
   return { status: res.status, payload };
 }
 
-// ─── pair ────────────────────────────────────────────────────────────────────
+// ─── one-click pairing ───────────────────────────────────────────────────────
 
-async function commandPair(code) {
-  if (!code) {
-    console.error('사용법: node src/index.mjs pair --code ABCDE-FGHIJ');
-    process.exitCode = 1;
-    return;
-  }
-
-  const { status, payload } = await apiPost('/api/local-agent/register', {
-    code,
+/**
+ * 브라우저가 건네준 승인권을 서버에 제출한다 (ONECLICK §6-4).
+ *
+ * 이미 연결된 PC 라면 이미 가지고 있는 credential 을 **증명으로** 함께 보낸다.
+ * 서버가 그것을 대조해 같은 사용자임을 확인하면 `already_connected` 로 조용히 끝난다 —
+ * 같은 PC 가 device 목록에 두 번 쌓이지 않는다 (§15).
+ */
+async function submitPairingGrant(grant, state) {
+  const { status, payload } = await apiPost('/api/local-agent/pair', {
+    grant,
     // hostname 을 보내지 않는다. 표시 이름은 사람이 알아볼 수 있으면 충분하고,
-    // 실제 PC 이름은 서버가 알 필요가 없다 (§10 · §21).
+    // 실제 PC 이름은 서버가 알 필요가 없다 (V0 §10 · §21).
     deviceName: process.env.O4O_AGENT_DEVICE_NAME || '내 PC',
     platform: 'windows',
     agentVersion: AGENT_VERSION,
+    deviceId: state.creds?.deviceId,
+    agentCredential: state.creds?.agentCredential,
   });
 
   if (status !== 200 || !payload?.success) {
-    console.error(`연결 실패 (${payload?.code ?? status}). 코드가 만료되었거나 이미 사용되었습니다.`);
-    process.exitCode = 1;
-    return;
+    return { ok: false, code: payload?.code ?? String(status) };
   }
 
-  const file = saveCredentials({
-    deviceId: payload.data.deviceId,
-    agentCredential: payload.data.agentCredential,
-  });
-  // 자격증명 값 자체는 출력하지 않는다 (§51 secret 출력 금지). 경로만 알려준다.
-  log(`연결 완료. 자격증명 저장 위치: ${file}`);
-  log('이제 `node src/index.mjs run` 으로 실행하세요.');
+  const data = payload.data ?? {};
+  if (data.status === 'already_connected') {
+    log('이미 이 계정에 연결된 PC 입니다.');
+    return { ok: true, status: data.status };
+  }
+
+  state.creds = { deviceId: data.deviceId, agentCredential: data.agentCredential };
+  // 자격증명 값 자체는 출력하지 않는다 (§28 secret 출력 금지). 경로만 알려준다.
+  const file = saveCredentials(state.creds);
+  log(`이 PC 가 연결되었습니다. 자격증명 저장 위치: ${file}`);
+  return { ok: true, status: data.status ?? 'connected' };
 }
 
 // ─── run ─────────────────────────────────────────────────────────────────────
@@ -151,15 +162,22 @@ async function handleCommand(command, context, sessionToken) {
 }
 
 async function commandRun() {
-  const creds = loadCredentials();
-  if (!creds) {
-    console.error(`연결된 기기가 아닙니다. 먼저 pair 를 실행하세요. (${credentialsLocation()})`);
-    process.exitCode = 1;
-    return;
-  }
+  const state = { creds: loadCredentials() };
 
   log(`시작. 허용된 action: ${listAllowedActions().join(', ')}`);
   log(`API: ${API_BASE}`);
+  log(`자격증명 위치: ${credentialsLocation()}`);
+
+  await startLocalServer({
+    agentVersion: AGENT_VERSION,
+    isConnected: () => Boolean(state.creds),
+    onPair: (grant) => submitPairingGrant(grant, state),
+    log,
+  });
+
+  if (!state.creds) {
+    log('아직 연결되지 않았습니다. O4O 웹에서 [이 PC 연결] 을 눌러 주세요.');
+  }
 
   const context = { deviceName: process.env.O4O_AGENT_DEVICE_NAME || '내 PC' };
   let sessionToken = null;
@@ -170,19 +188,28 @@ async function commandRun() {
     if (!running) return;
     running = false;
     log('종료합니다.');
+    // 창구도 함께 닫는다. listen 소켓이 남으면 프로세스가 끝나지 않는다.
+    process.exit(0);
   };
   process.on('SIGINT', stop);
   process.on('SIGTERM', stop);
 
   while (running) {
+    if (!state.creds) {
+      // 브라우저의 [이 PC 연결] 을 기다린다. 여기서는 서버에 아무것도 묻지 않는다 —
+      // 연결되지 않은 PC 가 cloud 를 두드릴 이유가 없다.
+      await sleep(PAIRING_WAIT_MS);
+      continue;
+    }
+
     if (!sessionToken) {
-      const session = await openSession(creds);
+      const session = await openSession(state.creds);
       if (!session.ok) {
-        // BAD_CREDENTIAL / DEVICE_REVOKED 는 기다려도 낫지 않는다 — 사람이 다시 연결해야 한다.
+        // BAD_CREDENTIAL / DEVICE_REVOKED 는 기다려도 낫지 않는다 — 다시 연결해야 한다.
         if (FATAL_CONNECT_CODES.has(session.code)) {
-          console.error(`이 기기의 연결이 해지되었습니다 (${session.code}). 다시 pair 하세요.`);
-          process.exitCode = 1;
-          return;
+          log(`이 기기의 연결이 해지되었습니다 (${session.code}). 다시 [이 PC 연결] 을 눌러 주세요.`);
+          state.creds = null;
+          continue;
         }
         log(`연결 실패(${session.code}). ${Math.round(backoff / 1000)}초 후 재시도합니다.`);
         await sleep(backoff);
@@ -225,25 +252,13 @@ function sleep(ms) {
 
 // ─── CLI ─────────────────────────────────────────────────────────────────────
 
-function parseArgs(argv) {
-  const out = { command: argv[0] ?? 'run' };
-  for (let i = 1; i < argv.length; i += 1) {
-    if (argv[i] === '--code') out.code = argv[i + 1];
-  }
-  return out;
-}
-
 async function main() {
-  const args = parseArgs(process.argv.slice(2));
-  if (args.command === 'pair') {
-    await commandPair(args.code);
-    return;
-  }
-  if (args.command === 'run') {
+  const command = process.argv[2] ?? 'run';
+  if (command === 'run') {
     await commandRun();
     return;
   }
-  console.error('사용법: node src/index.mjs [pair --code <코드> | run]');
+  console.error('사용법: node src/index.mjs run');
   process.exitCode = 1;
 }
 
@@ -253,4 +268,4 @@ main().catch((error) => {
   process.exitCode = 1;
 });
 
-export { ACTIONS };
+export { ACTIONS, LOCAL_AGENT_PORT };
