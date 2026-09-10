@@ -296,3 +296,85 @@ read-only 로 보이는 것은 결함이 아니라 **정본 테이블이 갈린 
   기준 문서의 내용·판정 변경은 별도 WO).
 - 참고 — `docs/local/TEST-ACCOUNTS.local.md` 의 `pharmacy-hub:store_owner` 행이 드리프트되어
   401 이 난다(§6-2). 로컬 전용 · git 미추적 문서이며 범위 밖이라 **보고만 한다.**
+
+---
+
+## 14. main 병합 · 배포 후 프로덕션 최종 확인 (2026-09-10)
+
+§6 의 E2E 는 **로컬 dev 서버 + 프로덕션 API** 조합이었다. 본 절은 **실제 배포된 프로덕션 도메인**에서
+다시 확인한 결과다.
+
+### 14-1. 병합
+
+`work/store-execution-home-tablet-qr-v1` 을 main 으로 올렸다.
+
+| 항목 | 값 |
+|---|---|
+| 작업 커밋 | `8f73ef002` |
+| 병합 커밋 | `db089510d` (origin/main 을 브랜치로 병합) |
+| main 갱신 | `db140798c` → `db089510d` — **fast-forward** |
+| history rewrite | 없음 (amend · force-push 0) |
+
+병합 직전 origin/main 에 `db140798c` (WO-O4O-LOCAL-WORK-AGENT-V0) 가 들어와 FF 가 깨졌다.
+이미 push 된 브랜치 히스토리를 고쳐쓰지 않기 위해 rebase 대신 **origin/main 을 브랜치로 병합**한 뒤
+main 을 FF 로 올렸다. 병합 커밋은 이번 WO 경로(`packages/store-ui-core`, `services/web-kpa-society`,
+`services/web-pharmacy-hub`)를 **한 줄도 건드리지 않았고** lockfile 변경도 0 이다.
+병합 후 `store-ui-core` vitest **50 passed** 를 재확인했다.
+
+### 14-2. 배포
+
+`Deploy Web Services (Cloud Run)` run `34425097911` — **success**.
+`deploy-kpa-society` · `deploy-pharmacy-hub` 두 job 모두 success 다
+(detect-changes 가 두 서비스를 실제로 잡았음을 job 목록으로 확인).
+
+### 14-3. 프로덕션 화면 확인
+
+| 항목 | KPA `kpa-society.co.kr/store/execution` | PH `pharmacyhub.co.kr/store-owner/execution` |
+|---|---|---|
+| desktop (1400×1000) | PASS | PASS |
+| mobile (390×844) | PASS | PASS |
+| 위치 / 사용 중 태블릿 / 배치된 QR / QR 스캔 | 2 / 2 / 0 / 41 | 3 / 3 / 0 / 70 |
+| 각주 "노출 수를 측정하지 않습니다" | 표시 | 표시 |
+| 「미배치 QR」 묶음 | QR 53건 | QR 22건 |
+| 「위치 미설정」 묶음 | 없음(정상 — 태블릿 2대 모두 위치 있음) | 없음(정상 — A-2 · C-2 · F-2) |
+| 본문 내 POP · 사이니지 · ESL · 노출수 · 재생수 | 0 | 0 |
+| console error | 0 | 0 |
+| page error | 0 | 0 |
+| 4xx · 요청 실패 | 0 | 0 |
+| 백지 | 0 | 0 |
+
+§6 에서 로컬 dev 전용 아티팩트로 판정했던 `favicon.ico` 404 는 프로덕션에서 **재현되지 않았다**.
+
+### 14-4. 메뉴 진입 확인
+
+| 서비스 | 섹션 | 항목 | 클릭 결과 |
+|---|---|---|---|
+| KPA | `[매장 실행]` (신설, `[약국 경영지원]` 뒤) — 기본 접힘 | 「실행 현황」 | `/store/execution` 진입 · 제목 렌더 · console error 0 |
+| PH | `[매장 실행]` (기존) — 기본 펼침 | 「실행 현황」 (**첫 항목**) | `/store-owner/execution` 진입 · 제목·각주 렌더 · console error 0 |
+
+> KPA 는 섹션이 접힌 상태가 기본이라 홈 화면의 anchor 목록에는 `/store/execution` 이 나타나지 않는다.
+> 섹션을 펼치면 링크가 렌더된다 — 아코디언 기본 동작이며 결함이 아니다.
+> PH 는 반대로 기본 펼침이라 처음부터 anchor 로 존재한다.
+
+### 14-5. 그룹 링크 (dead link)
+
+| 서비스 | 링크 | 결과 |
+|---|---|---|
+| KPA | `/store/commerce/tablet-displays` | 정상 · 4xx 0 · 백지 아님 |
+| KPA | `/store/marketing/qr` | 정상 · 4xx 0 · 백지 아님 |
+| PH | `/store-owner/tablets` | 정상 · 4xx 0 · 백지 아님 |
+| PH | `/store-owner/qr` | 정상 · 4xx 0 · 백지 아님 |
+
+desktop · mobile 양쪽에서 동일하게 dead link 0 이다.
+
+### 14-6. QR placement 는 그대로 둔다
+
+배포 확인을 위해 placement 데이터를 만들지 않았다. 프로덕션 write 0 이다.
+활성 배치가 0건인 현실 그대로 **모든 QR 이 「미배치 QR」로** 표시되는 것을 확인했고,
+이것이 §7 에 적은 의도된 결과다.
+
+### 14-7. Store Corner entity — 판단 유지
+
+프로덕션 화면에서도 코너 표현이 KPA 는 한글 명칭(`구강관리 코너` · `피부관리 코너`),
+PH 는 그리드 코드(`A-2` · `C-2` · `F-2`) 로 갈린다는 사실이 재확인됐다.
+QR placement 데이터가 쌓여 두 표현이 어떻게 반복되는지 본 뒤 승격하는 것이 안전하다 — §12 유지.
