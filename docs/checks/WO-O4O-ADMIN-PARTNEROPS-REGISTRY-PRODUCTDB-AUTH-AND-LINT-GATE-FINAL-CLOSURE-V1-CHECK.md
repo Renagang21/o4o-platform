@@ -358,7 +358,7 @@ Deploy API Server (Cloud Run)              = SUCCESS   (f2fb1eed0)
 Deploy Admin Dashboard (Cloud Run)         = SUCCESS   (c5147876d)
 Deploy Web Services (Cloud Run)            = SUCCESS   (c5147876d)
 AppStore Guard                             = NOT_TRIGGERED (로컬 실행 PASS)
-CI Pipeline                                = PENDING   (아래 주석)
+CI Pipeline                                = SUCCESS   (066e9545b · run 34441763770)
 Production migration                       = SUCCESS   (04:33:24Z 적용 · 1행)
 BROWSER_VERIFICATION                       = NOT_REQUIRED_WITH_JUSTIFICATION (§10.4)
 DEDICATED_ROLE_PERSONA_WO                  = NOT_REQUIRED (§10.3 주석)
@@ -366,15 +366,16 @@ INITIAL_MIGRATION_FAILURE                  = RESOLVED  (§6-A)
 PRODUCTION_DATA_DAMAGE                     = ZERO
 ROLLBACK_GUARD                             = PASS
 
-ADMIN_PARTNEROPS_REGISTRY_PRODUCTDB_AUTH_AND_LINT_GATE_FINAL_CLOSURE
-  = IMPLEMENTATION_COMPLETE / CI_CONFIRMATION_PENDING
+ADMIN_PARTNEROPS_REGISTRY_PRODUCTDB_AUTH_AND_LINT_GATE_FINAL_CLOSURE = CLOSED
 ```
 
-**최종 상태를 `CLOSED` 로 쓰지 않는 이유** — §12 완료 조건에 `CI_PIPELINE = SUCCESS` 가 있으나
-본 WO 변경을 포함한 CI Pipeline 의 **성공 실행이 아직 한 건도 확정되지 않았다**(전부 `cancelled`).
-코드·운영 반영은 끝났으므로 추가 수정은 필요 없고, 본 WO 코드를 포함한 이후 main 커밋의
-CI Pipeline 이 success 로 완료되면 그 SHA 와 run id 를 여기에 한 줄 기록하고 `CLOSED` 로 승격한다.
-실패하면 본 변경과의 관련성부터 분류한다.
+**`CLOSED` 승격 근거 (2026-09-10 05:52:30Z)** — 본 WO 의 두 커밋(`f2fb1eed0` · `9af483d7b`)과
+판정 교정 커밋(`3d9ef18b7`)을 모두 포함한 main 커밋 **`066e9545b`** 의 CI Pipeline
+(**run 34441763770**)이 `success` 로 완료되었다(05:36:41Z → 05:52:30Z, `git merge-base --is-ancestor`
+로 세 커밋 모두 포함 확인). 이로써 §12 의 마지막 미충족 항목 `CI_PIPELINE = SUCCESS` 가 해소되었다.
+
+본 WO 의 두 커밋 자체의 CI Pipeline 은 전부 `cancelled` 이었고 그것을 success 로 바꿔 적지 않는다.
+승격은 **동일 코드를 포함한 후속 tip 커밋의 성공 실행**을 근거로 한 것이다.
 
 **`PARTNEROPS_AVAILABILITY` 해석** — §12 의 문자 그대로의 ZERO 는 달성하지 않았다.
 `GET /api/v1/apps/availability` 는 `listInstalled()` 로 전 행을 돌려주므로 `status='inactive'` 인
@@ -386,7 +387,8 @@ CI Pipeline 이 success 로 완료되면 그 SHA 와 run id 를 여기에 한 �
 **`CI Pipeline`** — 본 WO 의 두 커밋 모두 `cancelled` 이다. 실패가 아니라 직후 push 가 같은
 concurrency group 을 선점한 결과이며, 이 저장소의 상시 패턴이다(`307b09329` · `4a6fd09cd` 도 동일).
 **cancelled 를 success 로 기록하지 않는다.** 본 WO 코드를 포함한 이후 tip 커밋의 CI Pipeline 결과로
-대체 확인한다.
+대체 확인했다 — `066e9545b` · run 34441763770 · **success** (05:52:30Z). 그 사이 `3c0545015` ·
+`3d9ef18b7` · `3ce6ce10c` · `cc96fc509` 의 CI Pipeline 은 모두 선점 `cancelled` 이었다.
 
 **부수 영향 (숨기지 않는다)** — 교정 전 결함이 다른 세션 커밋 `307b09329` 의
 Deploy API Server 도 실패시켰다(04:25~04:26). `f2fb1eed0` 배포로 해소되었고 그 세션의 코드 변경에는
