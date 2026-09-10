@@ -37,6 +37,16 @@ export function makeDb() {
 
   const now = () => new Date().toISOString();
 
+  /**
+   * `RETURNING` 이 붙은 UPDATE 의 **프로덕션 반환 형태**.
+   *
+   * TypeORM(postgres) 은 이때 row 배열이 아니라 `[rows, affectedCount]` 를 준다.
+   * stub 이 평범한 배열을 돌려주면 서비스가 그 형태를 오독해도 테스트는 통과해 버린다.
+   * 실제로 그렇게 새어 나간 결함이 있었으므로(heartbeat 500 · 조건부 UPDATE 오독)
+   * 여기서도 같은 형태로 돌려준다.
+   */
+  const returning = (rows: Row[]): any => [rows, rows.length];
+
   const query = async (sql: string, params: any[] = []): Promise<any> => {
     sqlLog.push(sql);
     const s = sql.replace(/\s+/g, ' ').trim();
@@ -64,9 +74,9 @@ export function makeDb() {
     }
     if (s.startsWith('UPDATE local_agent_pairings SET consumed_at = now() WHERE id')) {
       const p = pairings.find((x) => x.id === params[0] && !x.consumed_at);
-      if (!p) return [];
+      if (!p) return returning([]);
       p.consumed_at = now();
-      return [{ id: p.id }];
+      return returning([{ id: p.id }]);
     }
 
     // ── devices
@@ -151,12 +161,14 @@ export function makeDb() {
       picked.forEach((c) => {
         c.status = 'delivered';
       });
-      return picked.map((c) => ({
-        command_id: c.command_id,
-        action: c.action,
-        issued_at: c.issued_at,
-        expires_at: c.expires_at,
-      }));
+      return returning(
+        picked.map((c) => ({
+          command_id: c.command_id,
+          action: c.action,
+          issued_at: c.issued_at,
+          expires_at: c.expires_at,
+        })),
+      );
     }
     if (s.includes('FROM local_agent_commands') && s.includes('AND device_id')) {
       const c = commands.find((x) => x.command_id === params[0] && x.device_id === params[1]);
@@ -190,12 +202,12 @@ export function makeDb() {
         (x) =>
           x.command_id === params[0] && (x.status === 'pending' || x.status === 'delivered'),
       );
-      if (!c) return [];
+      if (!c) return returning([]);
       c.status = params[1];
       c.error_code = params[2];
       c.result_data = params[3];
       c.completed_at = now();
-      return [{ command_id: c.command_id }];
+      return returning([{ command_id: c.command_id }]);
     }
 
     throw new Error(`stub 이 모르는 SQL: ${s.slice(0, 90)}`);

@@ -126,6 +126,34 @@ describe('4~5. 만료된 승인권 · 재사용은 거부된다', () => {
     expect([a.ok, b.ok].filter(Boolean)).toHaveLength(1);
     expect(db.devices).toHaveLength(1);
   });
+
+  /**
+   * 위 두 검사(1회용 · 동시성)는 **조건부 UPDATE 가 돌려주는 row 수**에 전부 기대고 있다.
+   * 그런데 TypeORM 은 `RETURNING` 이 붙은 UPDATE 에 대해 row 배열이 아니라
+   * `[rows, affectedCount]` 를 준다. 이 형태를 stub 이 흉내내지 않으면, 서비스가
+   * "0건인데 length 2" 를 성공으로 오독해도 여기 전부 초록으로 지나간다.
+   * 실제로 그 오독이 프로덕션까지 나갔다(heartbeat 500 · 2026-09-10 smoke).
+   */
+  it('stub 은 RETURNING UPDATE 를 프로덕션과 같은 [rows, count] 로 돌려준다', async () => {
+    const db = makeDb();
+    const { grant } = await createPairingGrant(db.dataSource, 'user-1');
+    const [pairing] = db.pairings;
+
+    const first = await db.dataSource.query(
+      `UPDATE local_agent_pairings SET consumed_at = now() WHERE id = $1 AND consumed_at IS NULL RETURNING id`,
+      [pairing.id],
+    );
+    const second = await db.dataSource.query(
+      `UPDATE local_agent_pairings SET consumed_at = now() WHERE id = $1 AND consumed_at IS NULL RETURNING id`,
+      [pairing.id],
+    );
+
+    expect(first).toEqual([[{ id: pairing.id }], 1]);
+    // 0건도 length 2 다 — 배열 길이로 성패를 읽으면 안 된다는 것이 이 검사의 요점이다.
+    expect(second).toEqual([[], 0]);
+    expect(second).toHaveLength(2);
+    expect(typeof grant).toBe('string');
+  });
 });
 
 // ─── 7·8. 이미 연결된 PC · 남의 PC (§21-7·§21-8) ─────────────────────────────

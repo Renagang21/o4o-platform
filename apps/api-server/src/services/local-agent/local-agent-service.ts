@@ -252,17 +252,34 @@ export async function redeemPairingGrant(
 }
 
 /**
+ * `RETURNING` 이 붙은 UPDATE 의 결과를 row 배열로 되돌린다.
+ *
+ * TypeORM 의 `query()` 는 이 경우 row 배열이 아니라 **`[rows, affectedCount]`** 를 준다.
+ * 그대로 배열로 취급하면 0건일 때도 `length === 2` 가 되어 "갱신된 row 가 있다" 로 읽히고,
+ * `rows[0]` 은 row 가 아니라 빈 배열이 된다. 조건부 UPDATE 의 반환 row 수로
+ * replay·중복 실행을 막는 코드에서는 그 오독이 곧 **잠금이 풀리는 것**과 같다.
+ */
+function returnedRows(raw: unknown): Array<Record<string, unknown>> {
+  if (!Array.isArray(raw)) return [];
+  return Array.isArray(raw[0])
+    ? (raw[0] as Array<Record<string, unknown>>)
+    : (raw as Array<Record<string, unknown>>);
+}
+
+/**
  * 1회용 보장: `consumed_at IS NULL` 조건부 UPDATE.
  * 동시에 두 번 도착해도 row 를 돌려받는 쪽은 하나뿐이다 (§21-5 replay).
  */
 async function claimGrant(dataSource: DataSource, pairingId: string): Promise<boolean> {
-  const claimed = await dataSource.query(
-    `UPDATE local_agent_pairings SET consumed_at = now()
-      WHERE id = $1 AND consumed_at IS NULL
-      RETURNING id`,
-    [pairingId],
+  const claimed = returnedRows(
+    await dataSource.query(
+      `UPDATE local_agent_pairings SET consumed_at = now()
+        WHERE id = $1 AND consumed_at IS NULL
+        RETURNING id`,
+      [pairingId],
+    ),
   );
-  return Boolean(claimed && claimed.length > 0);
+  return claimed.length > 0;
 }
 
 /**
@@ -483,8 +500,9 @@ export async function claimPendingCommands(
   deviceId: string,
   limit = 5,
 ): Promise<LocalCommand[]> {
-  const rows = await dataSource.query(
-    `UPDATE local_agent_commands
+  const rows = returnedRows(
+    await dataSource.query(
+      `UPDATE local_agent_commands
         SET status = 'delivered', delivered_at = now()
       WHERE command_id IN (
         SELECT command_id FROM local_agent_commands
@@ -494,9 +512,10 @@ export async function claimPendingCommands(
          FOR UPDATE SKIP LOCKED
       )
       RETURNING command_id, action, issued_at, expires_at`,
-    [deviceId, limit],
+      [deviceId, limit],
+    ),
   );
-  return (rows ?? []).map((r: Record<string, unknown>) => ({
+  return rows.map((r: Record<string, unknown>) => ({
     commandId: String(r.command_id),
     action: String(r.action) as LocalAgentAction,
     args: {} as Record<string, never>,
@@ -551,19 +570,21 @@ export async function submitCommandResult(
     : 'failed';
   const safeData = status === 'success' ? pickSafeSystemInfo(result.data) : null;
 
-  const updated = await dataSource.query(
-    `UPDATE local_agent_commands
-        SET status = $2, completed_at = now(), error_code = $3, result_data = $4
-      WHERE command_id = $1 AND status IN ('pending','delivered')
-      RETURNING command_id`,
-    [
+  const updated = returnedRows(
+    await dataSource.query(
+      `UPDATE local_agent_commands
+          SET status = $2, completed_at = now(), error_code = $3, result_data = $4
+        WHERE command_id = $1 AND status IN ('pending','delivered')
+        RETURNING command_id`,
+      [
       commandId,
       status,
       result.errorCode ? String(result.errorCode).slice(0, 60) : null,
-      safeData ? JSON.stringify(safeData) : null,
-    ],
+        safeData ? JSON.stringify(safeData) : null,
+      ],
+    ),
   );
-  if (!updated || updated.length === 0) {
+  if (updated.length === 0) {
     return { ok: false, errorCode: LOCAL_AGENT_ERROR.REPLAY_REJECTED };
   }
   await recordHeartbeat(dataSource, deviceId);
