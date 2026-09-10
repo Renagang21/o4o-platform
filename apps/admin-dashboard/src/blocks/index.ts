@@ -51,8 +51,6 @@ import fileBlockDefinition from './definitions/file';
 import formFieldBlockDefinition from './definitions/form-field';
 import formSubmitBlockDefinition from './definitions/form-submit';
 
-// Type declaration is in wordpress-runtime-setup.ts
-
 // Custom block types are dynamically loaded via lazy.ts to improve performance
 
 /**

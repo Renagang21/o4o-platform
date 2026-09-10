@@ -32,7 +32,8 @@ declare global {
     __REDUX_DEVTOOLS_EXTENSION__?: any
     __REACT_DEVTOOLS_GLOBAL_HOOK__?: any
     React?: any;
-    // wp declaration is in wordpress-runtime-setup.ts
+    // (제거됨) `wp` 선언 — wordpress-runtime-setup.ts 는 존재하지 않는 파일이었다
+    //   (WO-O4O-WORDPRESS-COMPAT-FIELD-AND-THEME-CONTRACT-FINAL-DISPOSITION-V1). window.wp runtime = 0.
   }
 }
 

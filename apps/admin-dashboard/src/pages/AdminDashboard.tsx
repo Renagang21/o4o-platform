@@ -38,23 +38,17 @@ const AdminDashboard: FC = () => {
       {/* 페이지 타이틀 */}
       <h1 className="text-2xl font-semibold mb-6">대시보드 - {VERSION_DISPLAY} Updated</h1>
 
-      {/* Welcome Panel - WordPress 스타일 */}
+      {/* Welcome Panel
+          WO-O4O-WORDPRESS-COMPAT-FIELD-AND-THEME-CONTRACT-FINAL-DISPOSITION-V1:
+          라우트가 없는 데드링크 3건 제거 — /themes/customize (테마 커스터마이저 · public/themes/theme.json
+          의 유일한 개념적 소비처였으나 라우트·화면 모두 부재) · /posts/new · /ecommerce/products.
+          남은 링크는 전부 실재 라우트다. */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6 border-4 border-green-500">
         <h2 className="text-lg font-semibold mb-4">O4O 플랫폼에 오신 것을 환영합니다! ({VERSION_DISPLAY})</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <h3 className="font-medium mb-2">시작하기</h3>
             <ul className="space-y-1 text-sm">
-              <li>
-                <Link to="/themes/customize" className="text-blue-600 hover:text-blue-800">
-                  사이트 사용자 정의하기
-                </Link>
-              </li>
-              <li>
-                <Link to="/posts/new" className="text-blue-600 hover:text-blue-800">
-                  첫 블로그 글 작성하기
-                </Link>
-              </li>
               <li>
                 <Link to="/pages/new" className="text-blue-600 hover:text-blue-800">
                   정보 페이지 추가하기
@@ -85,11 +79,6 @@ const AdminDashboard: FC = () => {
           <div>
             <h3 className="font-medium mb-2">더 많은 작업</h3>
             <ul className="space-y-1 text-sm">
-              <li>
-                <Link to="/ecommerce/products" className="text-blue-600 hover:text-blue-800">
-                  제품 관리하기
-                </Link>
-              </li>
               <li>
                 <Link to="/settings" className="text-blue-600 hover:text-blue-800">
                   설정 관리하기
@@ -143,11 +132,11 @@ const AdminDashboard: FC = () => {
                 </div>
               </Link>
             </div>
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <p className="text-sm text-gray-600">
-                WordPress 6.4.2 실행 중 | <Link to="/themes" className="text-blue-600 hover:text-blue-800">테마: O4O Theme</Link>
-              </p>
-            </div>
+            {/* (제거됨) "WordPress 6.4.2 실행 중 | 테마: O4O Theme(/themes)" footer —
+                WO-O4O-WORDPRESS-COMPAT-FIELD-AND-THEME-CONTRACT-FINAL-DISPOSITION-V1.
+                O4O 는 WordPress 위에서 실행되지 않으며 /themes 라우트·테마 화면은 존재하지 않는다.
+                ⚠ 이 위젯의 stats(posts/pages/comments/users)는 하드코딩 상수이고 /comments 도
+                라우트가 없다 — 페이지 전체 정비는 별도 WO(Overview canonicalization) 범위. */}
           </div>
         </div>
 

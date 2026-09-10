@@ -9,7 +9,7 @@
  * - Ordered and Unordered lists
  * - Nested lists support
  * - Tab/Shift+Tab for indent/outdent
- * - HTML serialization for Gutenberg compatibility
+ * - HTML serialization (블록 content 저장 형식 — O4O 블록 계약)
  * - Undo/Redo support
  */
 

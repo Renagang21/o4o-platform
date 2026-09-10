@@ -76,7 +76,10 @@ export interface CoverBlockAttributes {
   innerBlocks: CoverInnerBlock[];
   placeholder?: string;
 
-  // WordPress compatibility
+  // 레거시 top-level 속성 — blocks/definitions/cover.tsx 의 registry 속성 스키마에 선언돼
+  // 저장된 블록 데이터에 존재할 수 있다. 판정 ACTIVE_EXTERNAL_COMPAT(저장 데이터) → 제거 금지.
+  // (WordPress 명칭 유래이지만 계약 주체는 O4O 저장 블록이다 —
+  //  WO-O4O-WORDPRESS-COMPAT-FIELD-AND-THEME-CONTRACT-FINAL-DISPOSITION-V1)
   dimRatio?: number; // Legacy opacity (0-100)
   customOverlayColor?: string; // Legacy color
   overlayColor?: string; // Legacy color

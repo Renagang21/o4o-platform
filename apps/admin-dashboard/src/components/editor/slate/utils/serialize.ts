@@ -1,7 +1,8 @@
 /**
  * HTML Serialization Utilities
  *
- * Converts between Slate.js JSON and HTML for Gutenberg compatibility:
+ * Converts between Slate.js JSON and HTML — 블록 content 의 저장 형식은 HTML 문자열이다
+ * (O4O 블록 계약 · WordPress/Gutenberg 와 무관. WO-O4O-WORDPRESS-COMPAT-FIELD-AND-THEME-CONTRACT-FINAL-DISPOSITION-V1):
  * - serialize: Slate JSON → HTML
  * - deserialize: HTML → Slate JSON
  *

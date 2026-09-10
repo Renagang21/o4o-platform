@@ -107,7 +107,16 @@ export interface Post {
     url: string;
     alt?: string;
   };
-  featured_media?: string; // WordPress-style compatibility
+  // WO-O4O-WORDPRESS-COMPAT-FIELD-AND-THEME-CONTRACT-FINAL-DISPOSITION-V1:
+  //   snake_case WordPress 호환 alias 7건(featured_media · published_at · created_at · updated_at ·
+  //   comment_status · ping_status · sticky)을 제거했다. 판정 DEAD_WORDPRESS_COMPAT —
+  //     · 저장소 전체에서 선언 파일 외 read/write 소비처 0
+  //     · 백엔드 Post 엔티티·컨트롤러는 6354e8755 에서 제거돼 어떤 API 응답에도 실리지 않는다
+  //     · 어떤 migration 도 해당 컬럼을 만든 적 없다 (운영 데이터 0)
+  //   camelCase 정본(featuredImageId · publishedAt · createdAt · updatedAt · commentStatus ·
+  //   pingStatus · isSticky)만 남긴다. 새 alias·fallback 을 추가하지 않는다.
+  //   ※ `published_at` 은 forum_post · store_pops 등 **DB 컬럼 이름**으로는 현행 정본이다 —
+  //     여기서 지운 것은 이 TS 인터페이스의 중복 alias 뿐이다.
 
   // Metadata and SEO
   /**
@@ -123,12 +132,9 @@ export interface Post {
 
   // Timestamps
   publishedAt?: Date;
-  published_at?: Date; // WordPress-style compatibility
   scheduledAt?: Date;
   createdAt: Date;
-  created_at?: Date; // WordPress-style compatibility
   updatedAt: Date;
-  updated_at?: Date; // WordPress-style compatibility
   deletedAt?: Date;
 
   // Additional properties
@@ -136,11 +142,8 @@ export interface Post {
   commentCount?: number;
   viewCount?: number;
   commentStatus?: CommentStatus;
-  comment_status?: CommentStatus; // WordPress-style compatibility
   pingStatus?: PingStatus;
-  ping_status?: PingStatus; // WordPress-style compatibility
   isSticky?: boolean;
-  sticky?: boolean; // WordPress-style compatibility
 
   // Template and layout
   template?: string;
