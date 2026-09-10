@@ -190,7 +190,15 @@ export default function AnnualReportPage({ slug }: { slug: string }) {
                 value={values[f.key]}
                 onChange={change}
                 disabled={locked}
-                notLinked={state.associationLinkStatus?.[f.key] === 'not_linked'}
+                /**
+                 * 미연결 배지는 **현재** 연결 상태를 말한다. 제출 완료본은 그때의
+                 * 스냅샷을 보여주는 화면이므로 현재 상태를 겹쳐 그리지 않는다
+                 * (WO-...-MVP-RESIDUAL-CONTRACT-FINAL-CLOSURE-V1 §B 시점 비대칭).
+                 */
+                notLinked={
+                  state.valuesSource !== 'submitted_snapshot' &&
+                  state.currentAssociationLinkStatus?.[f.key] === 'not_linked'
+                }
                 issue={issueOf(f.key)}
               />
             ))}

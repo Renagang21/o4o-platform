@@ -67,11 +67,13 @@ import { Router } from 'express';
 import { getService } from '../../config/service-catalog.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
+import { AppDataSource } from '../../database/connection.js';
 import {
   requireKpaBranchScope,
   resolveBranch,
   requireBranchScope,
   findBranchByHostname,
+  KPA_BRANCH_SCOPE_CONFIG,
 } from '../../middleware/kpa-branch-scope.middleware.js';
 import { BranchDirectoryController } from '../../controllers/kpa-branch/BranchDirectoryController.js';
 import { BranchMemberController } from '../../controllers/kpa-branch/BranchMemberController.js';
@@ -88,6 +90,44 @@ import { BranchEventController } from '../../controllers/kpa-branch/BranchEventC
 import { BranchOfficerController } from '../../controllers/kpa-branch/BranchOfficerController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
+
+/**
+ * `/me/access` 의 entryPoints 판정 — 실제 가드와 **같은 입력**에서 파생한다.
+ * WO-O4O-KPA-BRANCH-MVP-RESIDUAL-CONTRACT-FINAL-CLOSURE-V1 §A
+ *
+ * 이전에는 `roles.includes('kpa-branch:member')` 같은 정확 문자열 일치였다. 그러나
+ * 실제 접근 판정은 `requireKpaBranchScope` → `createMembershipScopeGuard` →
+ * `createServiceScopeGuard` 이고, 그쪽은 두 가지를 더 본다:
+ *
+ *   1) scopeRoleMapping 계층 — operator 는 member 스코프를, admin 은 둘 다 통과한다.
+ *      → 운영자로 로그인하면 member 화면에 실제로 들어갈 수 있는데 entryPoints.member 는
+ *        false 였다 ("접근 가능한데 빠진" 결함).
+ *   2) active service_membership — role 은 가입 신청 시점에 저장되므로 membership 이
+ *      pending 인 사용자도 role 문자열은 갖는다. 가드는 MEMBERSHIP_NOT_ACTIVE 로 막는데
+ *      entryPoints 는 true 였다 ("접근 불가인데 나오는" 결함).
+ *      단 platformBypass=true 이므로 `platform:super_admin` 은 membership 없이도 통과한다.
+ *
+ * 서버 가드는 그대로 두고 이 계산식만 가드에 맞춘다 — 판정 SSOT 는 여전히 가드다.
+ * scopeRoleMapping 을 여기서 다시 적지 않고 config 를 읽는 이유도 같다(drift 방지).
+ */
+function computeEntryPoints(roles: string[], membershipStatus: string) {
+  const platformBypass =
+    KPA_BRANCH_SCOPE_CONFIG.platformBypass === true && roles.includes('platform:super_admin');
+  const mapping = KPA_BRANCH_SCOPE_CONFIG.scopeRoleMapping ?? {};
+
+  const can = (scope: string) => {
+    if (platformBypass) return true;
+    if (membershipStatus !== 'active') return false;
+    const accepted = mapping[scope] ?? KPA_BRANCH_SCOPE_CONFIG.allowedRoles;
+    return accepted.some((r) => roles.includes(r));
+  };
+
+  return {
+    member: can(`${SERVICE_KEY}:member`),
+    operator: can(`${SERVICE_KEY}:operator`),
+    admin: can(`${SERVICE_KEY}:admin`),
+  };
+}
 
 /** async 핸들러 오류를 express 에 위임 */
 const wrap =
@@ -179,10 +219,21 @@ export function createKpaBranchRoutes(): Router {
     requireAuth as any,
     wrap(async (req, res) => {
       const user = req.user ?? {};
-      const memberships: { serviceKey: string; status: string }[] = user.memberships || [];
-      const membershipStatus = memberships.find((m) => m.serviceKey === SERVICE_KEY)?.status ?? 'none';
       const roles: string[] = Array.isArray(user.roles) ? user.roles : [];
       const serviceRoles = roles.filter((r) => r.startsWith(`${SERVICE_KEY}:`));
+
+      /**
+       * membership 은 JWT 스냅샷이 아니라 DB 에서 읽는다 — 가드(2단계 확정검사)와 같은
+       * 근거를 써야 "화면은 열렸는데 API 는 403" 이 생기지 않는다.
+       * (정지 즉시성 0 문제: JWT 는 로그인/refresh 때만 갱신된다.)
+       */
+      const { getServiceMembershipStatusFromDb } = await import('../../utils/service-membership.js');
+      const membershipStatus = await getServiceMembershipStatusFromDb(
+        AppDataSource,
+        user.id,
+        SERVICE_KEY,
+      );
+
       const { branchMembershipService } = await import('../../services/kpa-branch/BranchMembershipService.js');
       const current = await branchMembershipService.getCurrent(user.id);
 
@@ -195,11 +246,11 @@ export function createKpaBranchRoutes(): Router {
           currentBranch: current
             ? { organizationId: current.organization_id, joinedAt: current.joined_at }
             : null,
-          entryPoints: {
-            member: serviceRoles.includes(`${SERVICE_KEY}:member`),
-            operator: serviceRoles.includes(`${SERVICE_KEY}:operator`),
-            admin: serviceRoles.includes(`${SERVICE_KEY}:admin`),
-          },
+          /**
+           * "지금 이 계정이 실제로 들어갈 수 있는 화면" — 가드와 같은 계산식이다.
+           * 역할 문자열 목록(roles)과는 다른 축이므로 프런트는 이 값만 보고 진입을 판단한다.
+           */
+          entryPoints: computeEntryPoints(roles, membershipStatus),
         },
       });
     }),

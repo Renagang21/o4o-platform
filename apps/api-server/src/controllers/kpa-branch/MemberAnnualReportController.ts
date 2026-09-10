@@ -122,8 +122,9 @@ export class MemberAnnualReportController {
      * 회원이 전출하면 현재 분회가 달라지는데, 과거 신고서의 소속이 그때 값으로
      * 바뀌어 보이면 제출 기록이 훼손된다 (WO §8 스냅샷 보존).
      */
-    const values = existing && existing.status !== 'draft'
-      ? { ...existing.values }
+    const isSubmittedSnapshot = Boolean(existing && existing.status !== 'draft');
+    const values = isSubmittedSnapshot
+      ? { ...existing!.values }
       : { ...prefill, ...(existing?.values ?? {}), ...association.values };
 
     const { visible, notEvaluableRules } = AnnualReportService.computeVisibility(template, values);
@@ -148,8 +149,28 @@ export class MemberAnnualReportController {
             }
           : null,
         values,
+        /**
+         * `values` 가 어느 시점의 값인지 — 두 필드의 시점 비대칭을 응답에서 명시한다.
+         * WO-O4O-KPA-BRANCH-MVP-RESIDUAL-CONTRACT-FINAL-CLOSURE-V1 §B
+         *
+         *   'submitted_snapshot' — 제출 당시 그대로. 회비구분·소속 등 association 값도
+         *                          그때 값이며, 지금 원장이 달라져도 덮어쓰지 않는다.
+         *   'draft_composed'     — prefill + 내 draft + **현재** association 을 합성한 값.
+         */
+        valuesSource: isSubmittedSnapshot ? 'submitted_snapshot' : 'draft_composed',
         visible,
-        associationLinkStatus: association.linkStatus,
+        /**
+         * **현재 시점** 연결 가능 여부다. `values` 와 같은 시점이 아니다.
+         *
+         * 이전 이름은 `associationLinkStatus` 였는데, 제출 완료본(스냅샷)과 나란히 실려
+         * 같은 시점처럼 읽혔다. 실제로 "제출 당시 회비 원장이 없어 values['fee.category']=null
+         * 인데 지금은 원장이 생겨 'resolved'" 인 조합이 나온다 — 값은 비었는데 연결됨으로
+         * 보이는 모순이다. 이름에 시점을 박아 계약을 분명히 한다.
+         *
+         * 과거 제출본의 값을 현재 원장값으로 덮어쓰지 않는다(스냅샷 보존). 소비 측은
+         * valuesSource='submitted_snapshot' 일 때 이 필드를 값의 근거로 쓰지 않는다.
+         */
+        currentAssociationLinkStatus: association.linkStatus,
         /**
          * 평가할 수 없는 rule (예: R9 — 2018~2025 신고이력 원장이 존재하지 않는다).
          * 있는 것처럼 차단하지 않고 상태만 노출한다.
