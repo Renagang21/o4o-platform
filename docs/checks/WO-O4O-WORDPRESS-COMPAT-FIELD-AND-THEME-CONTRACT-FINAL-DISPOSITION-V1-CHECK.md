@@ -1,6 +1,6 @@
 # WO-O4O-WORDPRESS-COMPAT-FIELD-AND-THEME-CONTRACT-FINAL-DISPOSITION-V1 — CHECK
 
-> **상태**: IMPLEMENTATION_COMPLETE_CI_PENDING → §10 갱신 후 확정
+> **상태**: **CLOSED_WITH_STOPS** (CI · 배포 5/5 success · 유보 4건 §7)
 > **작성일**: 2026-09-10
 > **선행 IR**: [`IR-O4O-MAIN-SITE-RETIRED-SOURCE-AND-WORDPRESS-LEGACY-FULL-CENSUS-V1`](../investigations/IR-O4O-MAIN-SITE-RETIRED-SOURCE-AND-WORDPRESS-LEGACY-FULL-CENSUS-V1.md) §3.3 #2 · #12 · §7 #2 — 이 WO 는 그 IR 이 "소비처별 판단 필요"로 넘긴 항목의 최종 처분이다.
 
@@ -222,7 +222,19 @@ A  docs/checks/WO-O4O-WORDPRESS-COMPAT-FIELD-AND-THEME-CONTRACT-FINAL-DISPOSITIO
 
 ## 11. CI · 배포 (§12)
 
-_(push 후 갱신)_
+push 커밋 `795dd95cc` (= 최종 HEAD, 코드 `c47a876cd` + CHECK). **취소·대체 없이 자기 SHA 에서 완주.**
+
+| 워크플로 | 결과 | run ID |
+|---|---|---:|
+| CI Pipeline | ✅ **success** | 34481460375 |
+| CodeQL Security Analysis | ✅ success | 34481460305 |
+| Deploy API Server (Cloud Run) | ✅ success | 34481460489 |
+| Deploy Web Services (Cloud Run) | ✅ success | 34481460400 |
+| Deploy Admin Dashboard (Cloud Run) | ✅ success | 34481460298 |
+| AppStore Guard | `NOT_TRIGGERED` (경로 필터 — 이 WO 변경 경로에 해당 없음) | — |
+
+선행 커밋 `3eb8d7f3a`(다른 PC 세션 · local-agent)의 CI Pipeline 이 완주(success)할 때까지 push 를 보류해
+두 커밋의 판정이 섞이지 않게 했다. ancestor 관계에 기대지 않고 **본 SHA 의 run 으로 직접 판정**한다.
 
 ## 12. 중지 조건 (§13)
 
@@ -261,15 +273,28 @@ BLOCK_RENDERER_CONSUMERS   = PRESERVED
 GENERIC_CMS_CONTRACTS      = PRESERVED
 PRODUCTION_DATA_CHANGE     = ZERO
 OTHER_SERVICE_REGRESSION   = PASS   (type-check:frontend 전 서비스 · admin 308 · api-server tsc 0)
-CI_PIPELINE                = PENDING  → §11
-CODEQL                     = PENDING  → §11
+CI_PIPELINE                = SUCCESS  (run 34481460375 · 자기 SHA 완주)
+CODEQL                     = SUCCESS  (run 34481460305)
 
 WORDPRESS_COMPAT_FIELD_AND_THEME_FINAL_DISPOSITION
-  = IMPLEMENTATION_COMPLETE_CI_PENDING  → CI 확정 후 CLOSED_WITH_STOPS
-    (STOPS = §7 유보 4건: PostQueryParams · post.d.ts · Overview 목업 · Theme 엔티티 —
-     판단 주체: 사용자 / 후속 WO)
+  = CLOSED_WITH_STOPS
+    STOPS (§7 유보 4건 · 판단 주체 = 사용자 / 후속 WO):
+      1. PostQueryParams (cpt/post.ts:252) — WP REST 질의 형태 · 소비 0 · WO 지정 필드 아님
+      2. packages/types/src/post.d.ts — 추적된 빌드 산출물 (위생 항목)
+      3. /admin Overview 나머지 — 하드코딩 stats · /comments 데드링크 · 가짜 뉴스 피드 → Overview canonicalization WO
+      4. Theme 엔티티(themes 테이블) — 등록만 · 소비 0 · 별도 DB 축
 ```
 
 ## 15. Git (§16)
 
-_(push 후 갱신)_
+| 항목 | 값 |
+|---|---|
+| 작업 브랜치 | `work/wordpress-compat-final-disposition-v1` (격리 worktree `C:/tmp/o4o-wp-compat`) |
+| 조사 기준 SHA | `30c9e8cdb` |
+| 코드 커밋 | `c47a876cd` (rebase 전 `9c825d712`) |
+| CHECK 커밋 | `795dd95cc` (rebase 전 `4131564b7`) |
+| rebase | `origin/main` 위 2회 (3eb8d7f3a → 0e5400d2c). 충돌 0 · 내 변경 파일과 겹친 상류 커밋 0 |
+| push | `git push origin HEAD:main` fast-forward · **force-push 0** |
+| stage | path-specific · `check-staged-scope.mjs` 15건 범위 확인 |
+| 다른 세션 변경 포함 | 0 (메인 worktree 의 cosmetics dirty 파일 미접촉) |
+| 완료 조건 | `HEAD == origin/main == 795dd95cc` · 작업 범위 미커밋 0 |
