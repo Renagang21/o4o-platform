@@ -300,7 +300,7 @@ node src\index.mjs run
 
 ## 10. 변경 파일 (§25-13)
 
-**commit**: `<COMMIT_SHA>`
+**commit**: `fc68e567e` (구현·테스트·CHECK) / `<본 커밋>` (SHA 기록)
 
 | 파일 | 변경 |
 |---|---|
