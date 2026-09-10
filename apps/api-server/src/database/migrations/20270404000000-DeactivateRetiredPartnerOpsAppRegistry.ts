@@ -103,13 +103,18 @@ export class DeactivateRetiredPartnerOpsAppRegistry20270404000000 implements Mig
 
     // 대상 1행만 정확히 비활성화. appId 외의 넓은 조건을 쓰지 않는다.
     // RETURNING 으로 실제 변경 행을 돌려받아 개수를 센다(드라이버별 affected 표현에 의존하지 않는다).
-    const updatedRows = await queryRunner.query(
+    const updateResult = await queryRunner.query(
       `UPDATE "app_registry"
           SET "status" = $2, "updatedAt" = NOW()
         WHERE "appId" = $1 AND "status" <> $2
         RETURNING "appId"`,
       [TARGET_APP_ID, RETIRED_STATUS],
     );
+    // TypeORM pg 드라이버는 UPDATE ... RETURNING 을 `[rows, affectedCount]` **튜플**로 돌려준다.
+    // 튜플을 그대로 세면 길이가 항상 2 라서 가드가 거짓 ABORT 한다(2026-09-10 운영 실측).
+    // SELECT 처럼 rows 배열만 오는 드라이버도 함께 지원하도록 두 형태를 모두 받는다.
+    const updatedRows =
+      Array.isArray(updateResult) && Array.isArray(updateResult[0]) ? updateResult[0] : updateResult;
     const affected = Array.isArray(updatedRows) ? updatedRows.length : 0;
     if (affected !== 1) {
       throw new Error(
