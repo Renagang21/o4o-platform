@@ -11,6 +11,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { ROLES, satisfiesRole } from '../config/service';
 import { getMyBranchHistory, listBranches, type BranchMembership } from '../lib/api/branch';
 import { getAnnualReport, REPORT_STATUS_LABEL } from '../lib/api/annualReport';
 import { listMyFees } from '../lib/api/branchFee';
@@ -28,7 +29,10 @@ const TONE: Record<Cell['tone'], string> = {
 };
 
 export default function MyPageIndexPage({ slug, basePath }: { slug: string; basePath: string }) {
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  // 형제 서비스(kpa-society 등) 세션만으로도 isAuthenticated 는 true 다.
+  // kpa-branch 회원이 아니면 `/me/*` 가 전부 403 이므로 조회를 쏘지 않고 안내만 한다.
+  const isBranchMember = satisfiesRole((user?.roles as string[] | undefined) ?? [], ROLES.member);
   const [affiliation, setAffiliation] = useState<{ membership: BranchMembership; name: string } | null | 'none'>(null);
   const [report, setReport] = useState<Cell | null>(null);
   const [fee, setFee] = useState<Cell | null>(null);
@@ -37,7 +41,7 @@ export default function MyPageIndexPage({ slug, basePath }: { slug: string; base
 
   useEffect(() => {
     // 비로그인 방문자에게 회원 조회를 쏘지 않는다 — 401 을 '확인 불가' 로 오인하게 만든다.
-    if (isAuthLoading || !isAuthenticated) return;
+    if (isAuthLoading || !isAuthenticated || !isBranchMember) return;
     let alive = true;
 
     Promise.all([getMyBranchHistory(), listBranches()])
@@ -118,7 +122,7 @@ export default function MyPageIndexPage({ slug, basePath }: { slug: string; base
     return () => {
       alive = false;
     };
-  }, [slug, isAuthenticated, isAuthLoading]);
+  }, [slug, isAuthenticated, isAuthLoading, isBranchMember]);
 
   if (isAuthLoading) return <p className="text-sm text-gray-500">확인 중입니다…</p>;
   if (!isAuthenticated) {
@@ -126,6 +130,14 @@ export default function MyPageIndexPage({ slug, basePath }: { slug: string; base
       <div className="py-12 text-sm">
         <p className="text-gray-700">로그인이 필요합니다.</p>
         <Link to="/login" className="mt-3 inline-block text-primary-700 hover:underline">로그인하기</Link>
+      </div>
+    );
+  }
+  if (!isBranchMember) {
+    return (
+      <div className="py-12 text-sm">
+        <p className="text-gray-700">이 계정은 분회 서비스 회원이 아닙니다.</p>
+        <p className="mt-1 text-gray-500">분회 회원 업무는 분회 가입 후 이용할 수 있습니다.</p>
       </div>
     );
   }

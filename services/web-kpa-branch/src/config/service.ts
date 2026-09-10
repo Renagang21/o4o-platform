@@ -40,15 +40,25 @@ export const ROLE_LABELS: Record<string, string> = {
 };
 
 /**
+ * 플랫폼 전역 관리자.
+ * backend `KPA_BRANCH_SCOPE_CONFIG.platformBypass = true` 와
+ * `isBranchServiceAdmin()` (둘 다 `apps/api-server/src/middleware/kpa-branch-scope.middleware.ts`)
+ * 가 이 역할을 kpa-branch 의 모든 축에서 통과시킨다.
+ * 이 역할 보유자는 `kpa-branch:` prefix 역할을 하나도 갖지 않는 것이 정상이므로,
+ * prefix 만 보면 API 는 열리는데 메뉴만 사라진다(WO-...-IA-AND-NAVIGATION-FINALIZATION-V1 §8 위반).
+ */
+export const PLATFORM_ADMIN_ROLE = 'platform:super_admin' as const;
+
+/**
  * 역할 계층.
  * backend `KPA_BRANCH_SCOPE_CONFIG.scopeRoleMapping`
  * (`apps/api-server/src/middleware/kpa-branch-scope.middleware.ts`) 와 **같은 표**여야 한다.
  * 프론트가 더 넓으면 화면은 열리고 API 는 403, 더 좁으면 권한이 있는데도 막힌다.
  */
 export const ROLE_SCOPE_MAPPING: Record<string, readonly string[]> = {
-  [ROLES.admin]: [ROLES.admin],
-  [ROLES.operator]: [ROLES.operator, ROLES.admin],
-  [ROLES.member]: [ROLES.member, ROLES.operator, ROLES.admin],
+  [ROLES.admin]: [ROLES.admin, PLATFORM_ADMIN_ROLE],
+  [ROLES.operator]: [ROLES.operator, ROLES.admin, PLATFORM_ADMIN_ROLE],
+  [ROLES.member]: [ROLES.member, ROLES.operator, ROLES.admin, PLATFORM_ADMIN_ROLE],
 };
 
 /** 보유 역할이 요구 역할을 만족하는가 (계층 포함) */

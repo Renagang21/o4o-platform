@@ -10,6 +10,8 @@
  *   §8 메뉴는 공개 / 회원 / 운영자 3계층으로 분리한다. **메뉴 숨김은 보안이 아니다** —
  *   서버 guard 는 그대로이고 여기서는 "지금 쓸 수 있는 것" 만 보여준다.
  *   세션 복구가 끝나기 전(isAuthLoading)에는 회원·운영자 그룹을 아예 렌더하지 않는다.
+ *   회원 그룹은 kpa-branch 회원 역할이 있을 때만, 운영자 그룹은 operator 이상일 때만 렌더한다
+ *   (역할 표는 backend `KPA_BRANCH_SCOPE_CONFIG` 와 1:1 — `platform:super_admin` 포함).
  *   익명 메뉴가 잠깐 보였다가 회원 메뉴로 바뀌는 flicker 를 막는다.
  *   §9 모바일에서는 같은 그룹을 접이식 메뉴로 세로 배치한다 — 새 bottom-nav 를 만들지 않는다.
  */
@@ -35,6 +37,11 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
   const [menuOpen, setMenuOpen] = useState(false);
 
   const roles: string[] = (user?.roles as string[] | undefined) ?? [];
+  // 회원 메뉴 게이트는 "로그인했는가"가 아니라 "kpa-branch 회원인가"다.
+  //   kpa-society 등 형제 서비스 세션으로도 isAuthenticated 는 true 가 된다. 그 사용자는
+  //   `/me/*` 가 전부 403 이므로 회원 메뉴를 띄우면 전부 막힌 링크만 보여주는 셈이다.
+  //   판정 근거는 backend scopeRoleMapping 과 같은 표(`config/service.ts`) 뿐이다.
+  const canUseMemberArea = satisfiesRole(roles, ROLES.member);
   const canOperate = satisfiesRole(roles, ROLES.operator);
   const isOperatorArea = location.pathname.includes('/operator/');
 
@@ -135,7 +142,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
   // 세션 복구 중에는 회원·운영자 그룹을 렌더하지 않는다 (flicker 방지).
   const groups: NavGroup[] = [
     publicGroup,
-    ...(!isAuthLoading && isAuthenticated ? [memberGroup] : []),
+    ...(!isAuthLoading && isAuthenticated && canUseMemberArea ? [memberGroup] : []),
     ...(!isAuthLoading && canOperate ? operatorGroups : []),
   ];
 
@@ -161,7 +168,9 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
           <div className="text-sm">
             {isAuthenticated ? (
               <span className="flex items-center gap-3">
-                <Link to={`${basePath}/mypage`} className="text-gray-600 hover:text-gray-900">내 정보</Link>
+                {canUseMemberArea && (
+                  <Link to={`${basePath}/mypage`} className="text-gray-600 hover:text-gray-900">내 정보</Link>
+                )}
                 <button type="button" onClick={logout} className="text-gray-500 hover:text-gray-900">로그아웃</button>
               </span>
             ) : (
