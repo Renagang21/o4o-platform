@@ -17,8 +17,8 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * 두 종류의 호출자
  *
- *   사용자 (브라우저, JWT)  — `/pair`, `/devices`
- *   agent  (세션 토큰)      — `/register`, `/connect`, `/heartbeat`, `/result`
+ *   사용자 (브라우저, JWT)  — `/pairing-grants`, `/devices`
+ *   agent  (자격증명/세션)  — `/pair`, `/connect`, `/heartbeat`, `/result`
  *
  *   agent 경로는 **사용자 JWT 를 쓰지 않는다**(§13). agent 는 사용자의 로그인 토큰을
  *   본 적도 없고 가질 수도 없다. 두 축이 섞이지 않게 미들웨어를 나눠 둔다.
@@ -32,11 +32,11 @@ import logger from '../utils/logger.js';
 import {
   authenticateAgentSession,
   claimPendingCommands,
-  consumePairingAndRegisterDevice,
-  createPairingCode,
+  createPairingGrant,
   listUserDevices,
   openAgentSession,
   recordHeartbeat,
+  redeemPairingGrant,
   submitCommandResult,
   type AgentSessionContext,
 } from '../services/local-agent/local-agent-service.js';
@@ -72,19 +72,23 @@ async function authenticateAgent(
 // ─── 사용자 축 ────────────────────────────────────────────────────────────────
 
 /**
- * POST /api/local-agent/pair — 이 PC 를 연결하기 위한 1회용 코드 발급 (§12).
+ * POST /api/local-agent/pairing-grants — [이 PC 연결] 버튼이 부르는 곳 (ONECLICK §10).
  *
- * 응답의 `code` 는 **이 순간에만 존재한다.** 서버에는 해시만 남고, 다시 조회할 수 없다.
+ * 응답의 `grant` 는 **이 순간에만 존재한다.** 서버에는 해시만 남고 다시 조회할 수 없다.
+ * 사용자는 이 값을 보지 않는다 — 브라우저 스크립트가 곧바로 localhost agent 에 넘긴다.
+ *
+ * 발급 자격은 **이미 성립한 O4O 로그인 세션**이다(§2). 그 세션 자체는 agent 쪽으로
+ * 한 조각도 건너가지 않는다. 건너가는 것은 여기서 새로 만든 난수 하나뿐이다.
  */
-router.post('/pair', authenticate, async (req: AuthRequest, res: Response) => {
+router.post('/pairing-grants', authenticate, async (req: AuthRequest, res: Response) => {
   try {
-    const { code, expiresAt } = await createPairingCode(AppDataSource, req.user.id);
-    // 코드는 사용자에게만 간다. 로그에는 절대 남기지 않는다 (§51 secret 출력 금지).
-    logger.info('local-agent pairing code issued', { userId: req.user.id });
-    res.json({ success: true, data: { code, expiresAt } });
+    const { grant, expiresAt } = await createPairingGrant(AppDataSource, req.user.id);
+    // grant 는 사용자에게만 간다. 로그에는 절대 남기지 않는다 (§28 secret 출력 금지).
+    logger.info('local-agent pairing grant issued', { userId: req.user.id });
+    res.json({ success: true, data: { grant, expiresAt } });
   } catch (error) {
-    logger.error('local-agent pair failed', { error: (error as Error).message });
-    res.status(500).json({ success: false, error: 'Failed to create pairing code' });
+    logger.error('local-agent pairing grant failed', { error: (error as Error).message });
+    res.status(500).json({ success: false, error: 'Failed to create pairing grant' });
   }
 });
 
@@ -112,36 +116,53 @@ router.get('/devices', authenticate, async (req: AuthRequest, res: Response) => 
 // ─── agent 축 ─────────────────────────────────────────────────────────────────
 
 /**
- * POST /api/local-agent/register — pairing code 를 소모하고 device 로 등록한다.
+ * POST /api/local-agent/pair — grant 를 소모하고 이 PC 를 사용자에게 묶는다 (§10).
  *
- * 인증 미들웨어가 없는 유일한 경로다. 인증 대신 **코드 자체가 자격**이다 —
- * 5분 · 1회용 · 특정 사용자 소유. 코드가 틀리면 왜 틀렸는지 구분해 알려주지 않는다.
+ * 인증 미들웨어가 없는 유일한 경로다. 인증 대신 **grant 자체가 자격**이다 —
+ * 단명 · 1회용 · 특정 사용자 소유. 틀렸을 때 왜 틀렸는지 구분해 알려주지 않는다.
+ *
+ * agent 가 함께 보내는 `deviceId`/`agentCredential` 은 주장이 아니라 증명이다.
+ * 서버가 credential 을 대조해 통과할 때만 기존 device 로 인정한다 (§14·§15·§16).
  */
-router.post('/register', async (req: Request, res: Response) => {
+router.post('/pair', async (req: Request, res: Response) => {
   try {
-    const { code, deviceName, platform, agentVersion } = req.body ?? {};
-    const outcome = await consumePairingAndRegisterDevice(AppDataSource, {
-      code: String(code ?? ''),
+    const { grant, deviceName, platform, agentVersion, deviceId, agentCredential } = req.body ?? {};
+    const outcome = await redeemPairingGrant(AppDataSource, {
+      grant: String(grant ?? ''),
       deviceName: deviceName ? String(deviceName) : undefined,
       platform: String(platform ?? ''),
       agentVersion: String(agentVersion ?? ''),
+      claimedDeviceId: deviceId ? String(deviceId) : undefined,
+      claimedCredential: agentCredential ? String(agentCredential) : undefined,
     });
 
     if (outcome.ok === false) {
-      logger.info('local-agent register rejected', { reason: outcome.reason });
-      res.status(400).json({ success: false, error: 'Pairing failed', code: outcome.reason });
+      logger.info('local-agent pair rejected', { reason: outcome.reason });
+      // 이미 남의 PC 로 잡힌 경우는 "요청이 잘못됐다" 가 아니라 "충돌" 이다 (§16).
+      const status = outcome.reason === 'DEVICE_ALREADY_PAIRED' ? 409 : 400;
+      res.status(status).json({ success: false, error: 'Pairing failed', code: outcome.reason });
       return;
     }
 
-    logger.info('local-agent device registered', { deviceId: outcome.deviceId });
+    logger.info('local-agent paired', { deviceId: outcome.deviceId, status: outcome.status });
+    if (outcome.status === 'already_connected') {
+      // 이미 연결된 PC 는 idempotent 성공이다 (§15). 새 credential 을 발급하지 않는다 —
+      // agent 는 이미 쓸 수 있는 것을 가지고 있고, 굳이 다시 실어 보낼 이유가 없다.
+      res.json({ success: true, data: { status: outcome.status, deviceId: outcome.deviceId } });
+      return;
+    }
     // agentCredential 도 이 응답에만 존재한다. 서버는 해시만 보관한다.
     res.json({
       success: true,
-      data: { deviceId: outcome.deviceId, agentCredential: outcome.agentCredential },
+      data: {
+        status: outcome.status,
+        deviceId: outcome.deviceId,
+        agentCredential: outcome.agentCredential,
+      },
     });
   } catch (error) {
-    logger.error('local-agent register failed', { error: (error as Error).message });
-    res.status(500).json({ success: false, error: 'Failed to register device' });
+    logger.error('local-agent pair failed', { error: (error as Error).message });
+    res.status(500).json({ success: false, error: 'Failed to pair device' });
   }
 });
 

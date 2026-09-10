@@ -27,6 +27,7 @@
  *   PUT    /api/v1/kpa-branch/branches/:branchSlug/operator/fee-policies/:year                 연도 정책 일괄 저장
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/fee-ledgers?year=&status=          회비 원장 목록
  *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/fee-ledgers/assess                 연도 일괄 부과 (멱등)
+ *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/fee-ledgers                        개별 부과 (회비구분 지정)
  *   PATCH  /api/v1/kpa-branch/branches/:branchSlug/operator/fee-ledgers/:ledgerId              부과·납부 개별 수정
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/me/education-credits                        내 연수교육 (회원)
  *   GET    /api/v1/kpa-branch/branches/:branchSlug/operator/education-credits?year=&status=    연수교육 평점 목록
@@ -414,6 +415,13 @@ export function createKpaBranchRoutes(): Router {
     ...operatorGuards,
     wrap(BranchFeeController.assess),
   );
+  // 개별 부과 — 일괄 부과가 회비구분이 없어 건너뛴 회원의 정규 처리 경로.
+  // `/assess` 보다 뒤에 두지만 둘 다 고정 경로라 순서에 의존하지 않는다.
+  router.post(
+    '/branches/:branchSlug/operator/fee-ledgers',
+    ...operatorGuards,
+    wrap(BranchFeeController.createLedger),
+  );
   router.patch(
     '/branches/:branchSlug/operator/fee-ledgers/:ledgerId',
     ...operatorGuards,
@@ -497,6 +505,20 @@ export function createKpaBranchRoutes(): Router {
   // ── admin (서비스 전체 축) ────────────────────────────────────────────────
 
   const adminGuards = [requireAuth as any, requireKpaBranchScope(`${SERVICE_KEY}:admin`)];
+
+  // 신상신고 양식 — 연도 개설 · 접수기간 (WO-O4O-KPA-BRANCH-TENANT-ONBOARDING-AND-MVP-PRODUCTION-E2E-V1 §9)
+  //
+  // 양식은 service_key 축 공통 자원이라 분회 경계 가드를 붙이지 않는다. 조회는 운영자도 하지만
+  // **개설·기간 변경은 서비스 관리자 몫이다** — 한 분회가 바꾸면 209개 분회에 모두 적용된다.
+  // 이 경로가 없던 동안에는 migration 이 유일한 write 경로였고, 해가 바뀌면 배포 전까지
+  // 신상신고와 (회비구분이 신고서에서 오므로) 회비 부과가 함께 멈췄다.
+  router.get('/admin/annual-report-templates', ...adminGuards, wrap(AnnualReportTemplateController.list));
+  router.post('/admin/annual-report-templates', ...adminGuards, wrap(AnnualReportTemplateController.openYear));
+  router.patch(
+    '/admin/annual-report-templates/:id',
+    ...adminGuards,
+    wrap(AnnualReportTemplateController.updateTemplate),
+  );
 
   router.get('/admin/domains', ...adminGuards, wrap(BranchDomainController.adminList));
   router.patch('/admin/domains/:domainId/status', ...adminGuards, wrap(BranchDomainController.adminSetStatus));

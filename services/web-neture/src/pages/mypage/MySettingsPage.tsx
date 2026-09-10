@@ -5,6 +5,9 @@
  * WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1:
  *   `@o4o/account-ui` 의 `AccountSecuritySettings` / `MyPageAuthRequired` 채택.
  *
+ * WO-O4O-LOCAL-WORK-AGENT-ONECLICK-PAIRING-V1:
+ *   [ 이 PC 연결 ] 카드를 여기에 둔다. 별도 설정 화면을 만들지 않는다 (§5).
+ *
  * /mypage/settings — 보안 / 계정 관리.
  */
 
@@ -15,6 +18,7 @@ import { useLoginModal } from '../../contexts/LoginModalContext';
 import { api } from '../../lib/apiClient';
 import { MyPageLayout, MyPageAuthRequired, MyPageLoadingState, AccountSecuritySettings } from '@o4o/account-ui';
 import { getNetureMyPageNavItems } from './navItems';
+import LocalAgentCard from '../../components/mypage/LocalAgentCard';
 
 export default function MySettingsPage() {
   const { user, isAuthenticated, isLoading, logoutAll } = useAuth();
@@ -60,6 +64,10 @@ export default function MySettingsPage() {
         { label: '설정' },
       ]}
     >
+      <div className="mb-6">
+        <LocalAgentCard />
+      </div>
+
       <AccountSecuritySettings
         notify={{ success: toast.success, error: toast.error }}
         onLogoutAll={logoutAll}

@@ -3,7 +3,7 @@
  *
  * 여기서 고정하려는 것은 "기능이 동작한다" 가 아니라 **경계가 무너지지 않는다** 이다.
  *
- *   - pairing 은 5분 · 1회용이고, 코드가 서버에 평문으로 남지 않는다 (§12)
+ *   - pairing grant 는 단명 · 1회용이고, 서버에 평문으로 남지 않는다 (§12)
  *   - agent 는 "나는 이 사용자의 PC다" 라고 주장하는 것만으로 신뢰받지 못한다 (§14)
  *   - 서버 allowlist 밖의 action 은 명령이 되지 못하고, PC 쪽에서도 다시 거부된다 (§28·§29)
  *   - 같은 결과를 두 번 제출하거나 만료된 명령을 되돌릴 수 없다 (§18)
@@ -33,12 +33,11 @@ import {
   authenticateAgentSession,
   awaitCommandResult,
   claimPendingCommands,
-  consumePairingAndRegisterDevice,
-  createPairingCode,
+  createPairingGrant,
   issueCommand,
   listUserDevices,
   openAgentSession,
-  recordHeartbeat,
+  redeemPairingGrant,
   resolveTargetDevice,
   submitCommandResult,
 } from '../services/local-agent/local-agent-service.js';
@@ -57,215 +56,7 @@ import {
   selectToolForRequest,
 } from '../services/ai-tools/ai-tool-router.js';
 
-// ─── in-memory DB stub ───────────────────────────────────────────────────────
-
-type Row = Record<string, any>;
-
-/**
- * 4개 테이블만 흉내내는 최소 stub.
- *
- * 실제 SQL 을 파싱하지는 않는다 — 서비스가 내보내는 질의는 개수가 적고 고정되어 있으므로
- * 특징적인 조각으로 분기한다. 대신 **조건절의 의미는 그대로 구현한다**: `consumed_at IS NULL`,
- * `status IN ('pending','delivered')` 처럼 보안이 걸려 있는 조건은 여기서도 검사해야
- * replay·재사용 테스트가 진짜 검사가 된다.
- */
-function makeDb() {
-  const pairings: Row[] = [];
-  const devices: Row[] = [];
-  const sessions: Row[] = [];
-  const commands: Row[] = [];
-  const sqlLog: string[] = [];
-
-  const now = () => new Date().toISOString();
-
-  const query = async (sql: string, params: any[] = []): Promise<any> => {
-    sqlLog.push(sql);
-    const s = sql.replace(/\s+/g, ' ').trim();
-
-    // ── pairings
-    if (s.startsWith('UPDATE local_agent_pairings SET consumed_at = now() WHERE user_id')) {
-      pairings.filter((p) => p.user_id === params[0] && !p.consumed_at).forEach((p) => {
-        p.consumed_at = now();
-      });
-      return [];
-    }
-    if (s.startsWith('INSERT INTO local_agent_pairings')) {
-      pairings.push({
-        id: params[0],
-        user_id: params[1],
-        code_hash: params[2],
-        expires_at: params[3],
-        consumed_at: null,
-      });
-      return [];
-    }
-    if (s.includes('FROM local_agent_pairings') && s.includes('WHERE code_hash')) {
-      const p = pairings.find((x) => x.code_hash === params[0]);
-      return p ? [p] : [];
-    }
-    if (s.startsWith('UPDATE local_agent_pairings SET consumed_at = now() WHERE id')) {
-      const p = pairings.find((x) => x.id === params[0] && !x.consumed_at);
-      if (!p) return [];
-      p.consumed_at = now();
-      return [{ id: p.id }];
-    }
-
-    // ── devices
-    if (s.startsWith('INSERT INTO local_agent_devices')) {
-      devices.push({
-        id: params[0],
-        user_id: params[1],
-        device_name: params[2],
-        platform: params[3],
-        agent_version: params[4],
-        credential_hash: params[5],
-        status: 'active',
-        last_seen_at: null,
-      });
-      return [];
-    }
-    if (s.includes('FROM local_agent_devices WHERE id')) {
-      const d = devices.find((x) => x.id === params[0]);
-      return d ? [d] : [];
-    }
-    if (s.startsWith('UPDATE local_agent_devices SET last_seen_at')) {
-      const d = devices.find((x) => x.id === params[0]);
-      if (d) d.last_seen_at = now();
-      return [];
-    }
-    if (s.includes('FROM local_agent_devices') && s.includes('WHERE user_id')) {
-      return devices
-        .filter((x) => x.user_id === params[0] && x.status === 'active')
-        .sort((a, b) => String(b.last_seen_at ?? '').localeCompare(String(a.last_seen_at ?? '')));
-    }
-
-    // ── sessions
-    if (s.startsWith('INSERT INTO local_agent_sessions')) {
-      sessions.push({
-        id: params[0],
-        device_id: params[1],
-        token_hash: params[2],
-        expires_at: params[3],
-        ended_at: null,
-      });
-      return [];
-    }
-    if (s.includes('FROM local_agent_sessions s')) {
-      const sess = sessions.find(
-        (x) =>
-          x.token_hash === params[0] &&
-          !x.ended_at &&
-          new Date(x.expires_at).getTime() > Date.now(),
-      );
-      if (!sess) return [];
-      const d = devices.find((x) => x.id === sess.device_id && x.status === 'active');
-      if (!d) return [];
-      return [{ session_id: sess.id, device_id: d.id, user_id: d.user_id }];
-    }
-
-    // ── commands
-    if (s.startsWith('INSERT INTO local_agent_commands')) {
-      commands.push({
-        command_id: params[0],
-        device_id: params[1],
-        user_id: params[2],
-        tool_name: params[3],
-        action: params[4],
-        status: 'pending',
-        issued_at: params[5],
-        expires_at: params[6],
-        error_code: null,
-        result_data: null,
-        completed_at: null,
-      });
-      return [];
-    }
-    if (s.startsWith('UPDATE local_agent_commands SET status = \'delivered\'')) {
-      const picked = commands
-        .filter(
-          (c) =>
-            c.device_id === params[0] &&
-            c.status === 'pending' &&
-            new Date(c.expires_at).getTime() > Date.now(),
-        )
-        .slice(0, params[1]);
-      picked.forEach((c) => {
-        c.status = 'delivered';
-      });
-      return picked.map((c) => ({
-        command_id: c.command_id,
-        action: c.action,
-        issued_at: c.issued_at,
-        expires_at: c.expires_at,
-      }));
-    }
-    if (s.includes('FROM local_agent_commands') && s.includes('AND device_id')) {
-      const c = commands.find((x) => x.command_id === params[0] && x.device_id === params[1]);
-      return c ? [c] : [];
-    }
-    if (s.startsWith('SELECT status, error_code, result_data FROM local_agent_commands')) {
-      const c = commands.find((x) => x.command_id === params[0]);
-      // 사본을 돌려준다. 실제 Postgres 도 그러하며,
-      // 호출자가 직후 result_data 를 NULL 로 지우는 것(§37)이
-      // 방금 읽은 row 까지 비우면 테스트가 엉뚱한 것을 본다.
-      return c ? [{ ...c }] : [];
-    }
-    if (s.startsWith('UPDATE local_agent_commands SET result_data = NULL')) {
-      const c = commands.find((x) => x.command_id === params[0]);
-      if (c) c.result_data = null;
-      return [];
-    }
-    if (s.includes("SET status = 'expired'")) {
-      const c = commands.find(
-        (x) =>
-          x.command_id === params[0] && (x.status === 'pending' || x.status === 'delivered'),
-      );
-      if (!c) return [];
-      c.status = 'expired';
-      c.error_code = params[1];
-      c.completed_at = now();
-      return [{ command_id: c.command_id }];
-    }
-    if (s.startsWith('UPDATE local_agent_commands SET status = $2')) {
-      const c = commands.find(
-        (x) =>
-          x.command_id === params[0] && (x.status === 'pending' || x.status === 'delivered'),
-      );
-      if (!c) return [];
-      c.status = params[1];
-      c.error_code = params[2];
-      c.result_data = params[3];
-      c.completed_at = now();
-      return [{ command_id: c.command_id }];
-    }
-
-    throw new Error(`stub 이 모르는 SQL: ${s.slice(0, 90)}`);
-  };
-
-  const dataSource: any = { query: jest.fn(query) };
-  return { dataSource, pairings, devices, sessions, commands, sqlLog };
-}
-
-const REGISTER = {
-  deviceName: '약국 PC',
-  platform: 'windows',
-  agentVersion: '0.1.0',
-};
-
-async function pairAndRegister(db: ReturnType<typeof makeDb>, userId = 'user-1') {
-  const { code } = await createPairingCode(db.dataSource, userId);
-  const outcome = await consumePairingAndRegisterDevice(db.dataSource, { code, ...REGISTER });
-  if (outcome.ok === false) throw new Error(`등록 실패: ${outcome.reason}`);
-  return { code, deviceId: outcome.deviceId, agentCredential: outcome.agentCredential };
-}
-
-async function connected(db: ReturnType<typeof makeDb>, userId = 'user-1') {
-  const reg = await pairAndRegister(db, userId);
-  const session = await openAgentSession(db.dataSource, reg.deviceId, reg.agentCredential);
-  if (session.ok === false) throw new Error('세션 실패');
-  await recordHeartbeat(db.dataSource, reg.deviceId);
-  return { ...reg, sessionToken: session.sessionToken };
-}
+import { makeDb, pairAndRegister, connected, REGISTER } from './helpers/local-agent-db-stub.js';
 
 const localCtx = (over: Partial<VerifiedToolContext> = {}): VerifiedToolContext => ({
   userId: 'user-1',
@@ -273,7 +64,7 @@ const localCtx = (over: Partial<VerifiedToolContext> = {}): VerifiedToolContext 
   ...over,
 });
 
-// ─── 1. Pairing (§12) ─────────────────────────────────────────────────────────
+// ─── 1. Pairing (§12 · ONECLICK §7) ──────────────────────────────────────────
 
 describe('1~3. Pairing — 단명 · 1회용 · 사용자 소유', () => {
   it('1. 정상 pairing 으로 device 가 등록되고 기기 자격증명이 발급된다', async () => {
@@ -285,61 +76,58 @@ describe('1~3. Pairing — 단명 · 1회용 · 사용자 소유', () => {
     expect(db.devices[0].user_id).toBe('user-1');
   });
 
-  it('pairing code 와 credential 은 평문으로 저장되지 않는다 (해시만 남는다)', async () => {
+  it('pairing grant 와 credential 은 평문으로 저장되지 않는다 (해시만 남는다)', async () => {
     const db = makeDb();
     const reg = await pairAndRegister(db);
     const dump = JSON.stringify({ p: db.pairings, d: db.devices, s: db.sessions });
-    expect(dump).not.toContain(reg.code);
+    expect(dump).not.toContain(reg.grant);
     expect(dump).not.toContain(reg.agentCredential);
     // 남아 있는 것은 64자 SHA-256 hex 뿐이다.
     expect(db.pairings[0].code_hash).toMatch(/^[0-9a-f]{64}$/);
     expect(db.devices[0].credential_hash).toMatch(/^[0-9a-f]{64}$/);
   });
 
-  it('2. 잘못된 코드는 거부된다', async () => {
+  it('2. 잘못된 grant 는 거부된다', async () => {
     const db = makeDb();
-    await createPairingCode(db.dataSource, 'user-1');
-    const r = await consumePairingAndRegisterDevice(db.dataSource, {
-      code: 'AAAAA-BBBBB',
-      ...REGISTER,
-    });
-    expect(r).toEqual({ ok: false, reason: 'INVALID_PAIRING_CODE' });
+    await createPairingGrant(db.dataSource, 'user-1');
+    const r = await redeemPairingGrant(db.dataSource, { grant: 'not-a-real-grant', ...REGISTER });
+    expect(r).toEqual({ ok: false, reason: 'INVALID_PAIRING_GRANT' });
     expect(db.devices).toHaveLength(0);
   });
 
-  it('2. 만료된 코드는 거부된다', async () => {
+  it('2. 만료된 grant 는 거부된다', async () => {
     const db = makeDb();
-    const { code } = await createPairingCode(db.dataSource, 'user-1');
+    const { grant } = await createPairingGrant(db.dataSource, 'user-1');
     db.pairings[0].expires_at = new Date(Date.now() - 1000).toISOString();
-    const r = await consumePairingAndRegisterDevice(db.dataSource, { code, ...REGISTER });
+    const r = await redeemPairingGrant(db.dataSource, { grant, ...REGISTER });
     expect(r).toEqual({ ok: false, reason: 'PAIRING_EXPIRED' });
     expect(db.devices).toHaveLength(0);
   });
 
-  it('2. 같은 코드를 두 번 쓸 수 없다 (1회용)', async () => {
+  it('2. 같은 grant 를 두 번 쓸 수 없다 (1회용)', async () => {
     const db = makeDb();
-    const { code } = await createPairingCode(db.dataSource, 'user-1');
-    const first = await consumePairingAndRegisterDevice(db.dataSource, { code, ...REGISTER });
-    const second = await consumePairingAndRegisterDevice(db.dataSource, { code, ...REGISTER });
+    const { grant } = await createPairingGrant(db.dataSource, 'user-1');
+    const first = await redeemPairingGrant(db.dataSource, { grant, ...REGISTER });
+    const second = await redeemPairingGrant(db.dataSource, { grant, ...REGISTER });
     expect(first.ok).toBe(true);
-    expect(second).toEqual({ ok: false, reason: 'INVALID_PAIRING_CODE' });
+    expect(second).toEqual({ ok: false, reason: 'INVALID_PAIRING_GRANT' });
     expect(db.devices).toHaveLength(1);
   });
 
-  it('3. device 는 코드를 발급한 사용자에게 귀속된다 (agent 가 사용자를 고를 수 없다)', async () => {
+  it('3. device 는 grant 를 발급한 사용자에게 귀속된다 (agent 가 사용자를 고를 수 없다)', async () => {
     const db = makeDb();
-    const { code } = await createPairingCode(db.dataSource, 'owner-42');
+    const { grant } = await createPairingGrant(db.dataSource, 'owner-42');
     // agent 가 본문에 다른 userId 를 실어 보낼 방법 자체가 입력 타입에 없다.
-    const r = await consumePairingAndRegisterDevice(db.dataSource, { code, ...REGISTER });
+    const r = await redeemPairingGrant(db.dataSource, { grant, ...REGISTER });
     expect(r.ok).toBe(true);
     expect(db.devices[0].user_id).toBe('owner-42');
   });
 
   it('Windows 외 플랫폼은 V0 에서 등록되지 않는다', async () => {
     const db = makeDb();
-    const { code } = await createPairingCode(db.dataSource, 'user-1');
-    const r = await consumePairingAndRegisterDevice(db.dataSource, {
-      code,
+    const { grant } = await createPairingGrant(db.dataSource, 'user-1');
+    const r = await redeemPairingGrant(db.dataSource, {
+      grant,
       ...REGISTER,
       platform: 'linux',
     });

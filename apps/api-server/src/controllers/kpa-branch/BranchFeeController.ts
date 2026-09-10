@@ -133,6 +133,44 @@ export class BranchFeeController {
   }
 
   /**
+   * POST /branches/:branchSlug/operator/fee-ledgers
+   * body: { userId, year, feeCategory }
+   *
+   * 개별 부과 — 회비구분을 아직 모르는 회원에게 운영자가 구분을 정해 원장을 만든다.
+   * 일괄 부과가 NO_FEE_CATEGORY 로 건너뛴 회원의 정규 처리 경로다 (부과액은 정책에서 파생).
+   * userId 는 body 로 받되 **이 분회 active 소속인지 서비스가 다시 확인한다.**
+   */
+  static async createLedger(req: Request, res: Response) {
+    const organizationId = req.branch!.id;
+    const actorUserId = (req as any).user.id as string;
+    const userId = String(req.body?.userId ?? '').trim();
+
+    if (!userId) {
+      return res.status(400).json({ success: false, error: '회원을 선택해 주세요.', code: 'USER_ID_REQUIRED' });
+    }
+
+    try {
+      const item = await BranchFeeService.createLedger({
+        organizationId,
+        userId,
+        year: parseYear(req.body?.year),
+        feeCategory: String(req.body?.feeCategory ?? ''),
+        actorUserId,
+      });
+      logger.info('[KpaBranch] fee ledger created', {
+        ledgerId: item.id,
+        organizationId,
+        userId,
+        year: item.year,
+        actorUserId,
+      });
+      return res.status(201).json({ success: true, data: item });
+    } catch (err) {
+      return handleFeeError(err, res);
+    }
+  }
+
+  /**
    * PATCH /branches/:branchSlug/operator/fee-ledgers/:ledgerId
    * body: { assessedAmount?, paidAmount?, paidAt?, exempt?, memo?, feeCategory?,
    *         exemptionType?, exemptionReason? }

@@ -21,8 +21,16 @@ import type { AnnualReportStatus } from '../../routes/kpa-branch/entities/annual
 import { AnnualReportService } from '../../services/kpa-branch/AnnualReportService.js';
 import type { AnnualReportTemplate } from '../../routes/kpa-branch/entities/annual-report-template.entity.js';
 
-/** 대상 연도 = 활성 양식의 연도. 클라이언트가 고르지 않는다. */
-const TARGET_YEAR = Number(process.env.KPA_BRANCH_ANNUAL_REPORT_YEAR ?? 2026);
+/**
+ * 대상 연도 = 활성 양식의 연도. 클라이언트가 고르지 않는다.
+ *
+ * WO-O4O-KPA-BRANCH-TENANT-ONBOARDING-AND-MVP-PRODUCTION-E2E-V1 §9:
+ *   이전에는 `KPA_BRANCH_ANNUAL_REPORT_YEAR ?? 2026` 상수였다. 주석은 "활성 양식의 연도"
+ *   라고 적혀 있었지만 실제로는 코드에 박힌 연도였고, 새 연도 양식을 열어도 회원 화면은
+ *   지난 연도에 머물렀다 — 연도 전환에 재배포나 env 변경이 필요했다(MUST_AUTOMATE).
+ *   이제 서버가 DB 의 active 양식에서 판정한다. 클라이언트가 고르지 않는 성질은 그대로다.
+ */
+const currentTemplate = () => AnnualReportService.getCurrentTemplate();
 
 /**
  * 신고 기간 정책 — 역할과 무관하다.
@@ -88,11 +96,11 @@ export class MemberAnnualReportController {
     const userId = (req as any).user.id as string;
     const organizationId = req.branch!.id;
 
-    const template = await AnnualReportService.getActiveTemplate(TARGET_YEAR);
+    const template = await currentTemplate();
     if (!template) {
       return res.status(404).json({
         success: false,
-        error: `${TARGET_YEAR}년도 신고서 양식이 준비되지 않았습니다.`,
+        error: '신고서 양식이 준비되지 않았습니다.',
         code: 'TEMPLATE_NOT_FOUND',
       });
     }
@@ -166,7 +174,7 @@ export class MemberAnnualReportController {
     const userId = (req as any).user.id as string;
     const organizationId = req.branch!.id;
 
-    const template = await AnnualReportService.getActiveTemplate(TARGET_YEAR);
+    const template = await currentTemplate();
     if (!template) {
       return res.status(404).json({ success: false, error: '양식이 없습니다.', code: 'TEMPLATE_NOT_FOUND' });
     }
@@ -229,7 +237,7 @@ export class MemberAnnualReportController {
     const userId = (req as any).user.id as string;
     const organizationId = req.branch!.id;
 
-    const template = await AnnualReportService.getActiveTemplate(TARGET_YEAR);
+    const template = await currentTemplate();
     if (!template) {
       return res.status(404).json({ success: false, error: '양식이 없습니다.', code: 'TEMPLATE_NOT_FOUND' });
     }

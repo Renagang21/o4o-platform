@@ -1,6 +1,6 @@
 # O4O Local Work Agent (V0)
 
-`WO-O4O-LOCAL-WORK-AGENT-V0`
+`WO-O4O-LOCAL-WORK-AGENT-V0` · `WO-O4O-LOCAL-WORK-AGENT-ONECLICK-PAIRING-V1`
 
 사용자의 Windows PC 에서 도는 **최소 실행 에이전트**입니다. O4O AI 가 허용된 로컬 작업을
 요청하면, 이 프로세스가 자기 allowlist 를 확인한 뒤 실행하고 결과만 되돌려 줍니다.
@@ -41,24 +41,43 @@ username · 홈 디렉터리 경로 · IP · MAC · 설치 소프트웨어 목�
 
 ## 네트워크
 
-**바깥에서 이 PC 로 들어오는 연결이 없습니다.** agent 가 O4O API 로 나가는 HTTPS 요청만
-사용합니다. 포트 개방 · 포트 포워딩 · 공인 IP 가 필요 없습니다.
+**바깥에서 이 PC 로 들어오는 연결이 없습니다.** 업무 통신은 agent 가 O4O API 로 나가는
+HTTPS 요청뿐입니다. 포트 개방 · 포트 포워딩 · 공인 IP 가 필요 없습니다.
+
+단 하나의 listen 소켓은 `http://127.0.0.1:47821` 이며, **같은 PC 의 브라우저 전용**입니다.
+`0.0.0.0` 이 아니라 loopback 에만 묶여 있어 같은 공유기 안의 다른 PC 도 접근할 수 없습니다.
+
+여기에 열려 있는 것은 두 개뿐입니다.
+
+| endpoint | 하는 일 |
+|---|---|
+| `GET /health` | 살아 있는지 · 연결되어 있는지 + 1회용 nonce 발급 |
+| `POST /pair` | 브라우저가 건네준 **1회용 승인권**을 받는다 |
+
+명령 실행 · 파일 접근 endpoint 는 브라우저에 노출하지 않습니다. 그리고 이 창구는
+
+- **Origin 허용목록**(wildcard 없음)에 있는 O4O 도메인만 상대하고,
+- `GET /health` 로 받은 **1회용 nonce** 가 있어야 `POST /pair` 가 성립하며,
+- `Access-Control-Allow-Credentials` 를 주지 않아 **브라우저 쿠키가 실릴 수 없습니다.**
 
 ## 설치와 연결
 
 의존성이 없으므로 `npm install` 이 필요 없습니다. Node.js 18 이상이면 됩니다.
 
 ```bash
-# 1. O4O 웹에서 "이 PC 연결" 을 눌러 1회용 코드를 받는다 (5분 유효)
-# 2. 그 코드로 한 번만 등록한다
-node src/index.mjs pair --code ABCDE-FGHIJ
-
-# 3. 이후에는 이것만 실행한다
 node src/index.mjs run
 ```
 
-`pair` 가 성공하면 `%LOCALAPPDATA%\o4o-local-agent\credentials.json` 에 기기 자격증명이
-저장됩니다. 이 파일에는 **사용자의 비밀번호도, 로그인 토큰도 들어 있지 않습니다** — 이
+그 다음 O4O 웹(로그인 상태)에서 **[이 PC 연결]** 을 한 번 누르면 끝입니다.
+**입력할 코드가 없습니다** — 브라우저가 서버에서 받은 1회용 승인권을 위 창구로 직접
+전달하고, agent 가 그것을 서버에 제출해 자기 자격증명을 받아옵니다.
+
+이때 브라우저의 **로그인 쿠키 · 비밀번호 · JWT 는 agent 쪽으로 넘어가지 않습니다.**
+넘어가는 것은 `local-agent-pairing` 용도로 그 자리에서 만들어진 난수 하나뿐이며,
+이 난수는 1회용이고 2분 뒤 만료됩니다.
+
+연결이 끝나면 `%LOCALAPPDATA%\o4o-local-agent\credentials.json` 에 기기 자격증명이
+저장됩니다. 이 파일에도 **사용자의 비밀번호나 로그인 토큰은 들어 있지 않습니다** — 이
 PC 전용으로 발급된 기기 자격증명뿐이며, O4O 웹에서 언제든 해지할 수 있습니다.
 
 연결을 끊으려면 이 파일을 지우면 됩니다.
@@ -69,3 +88,4 @@ PC 전용으로 발급된 기기 자격증명뿐이며, O4O 웹에서 언제든 
 |---|---|---|
 | `O4O_API_BASE` | `https://api.neture.co.kr` | API 주소 |
 | `O4O_AGENT_HOME` | `%LOCALAPPDATA%\o4o-local-agent` | 자격증명 저장 위치 |
+| `O4O_AGENT_DEVICE_NAME` | `내 PC` | 목록에 보일 표시 이름 (PC 이름을 읽지 않습니다) |
