@@ -24,7 +24,7 @@
 | 4 | 임기 만료된 `status='active'` 행 | ✅ `current=false` (커밋 `3497940f0` 실동작 확인) |
 | 5 | 공개(비로그인) 명부 | ✅ **3건** — `members_only`·만료 제외 |
 | 6 | 회원 `/me/officers` | ✅ **4건** — `members_only` 포함 |
-| 7 | 타 분회(`bukgu`) 운영자 접근 | ✅ 403 `BRANCH_SCOPE_MISMATCH` |
+| 7 | 타 분회(`bukgu`) 접근 | ✅ 회원 403 `BRANCH_SCOPE_MISMATCH` · 운영자는 200/**0건**(§3 정정) |
 | 8 | 없는 slug | ✅ 404 `BRANCH_NOT_FOUND` |
 | 9 | 회원이 운영자 POST | ✅ 403 FORBIDDEN (`Required scope: kpa-branch:operator`) |
 | 10 | `PUT .../order` 정렬 | ✅ 200 · 1 트랜잭션 반영 |
@@ -105,7 +105,19 @@ current = status='active' AND (term_end IS NULL OR term_end >= CURRENT_DATE)
 - 분회 결정은 **`req.branch!.id`** 하나만 신뢰한다. 컨트롤러는 body 의 `organizationId` 를 **읽지 않는다.**
 - `officerId` 단독 조회 없음 — 항상 `organization_id` 와 복합 조건 (Boundary Guard 1).
 - Raw SQL 전건 parameter binding (Guard 2).
-- 실측 차단: 타 분회 403 `BRANCH_SCOPE_MISMATCH` / 없는 slug 404 `BRANCH_NOT_FOUND` / 회원의 운영자 write 403 / 미인증 401.
+- 실측 차단: 없는 slug 404 `BRANCH_NOT_FOUND` / 회원의 운영자 write 403 / 미인증 401 /
+  회원의 타 분회 `/me/*` 403 `BRANCH_SCOPE_MISMATCH`.
+
+> **정정 (2026-09-10 · W11-B 검증 중 발견).** 본 CHECK 초판은 표 7행에 "타 분회 운영자 접근 403
+> `BRANCH_SCOPE_MISMATCH`" 라고 적었으나 **사실이 아니다.** 검증에 쓴 운영자 계정은
+> `platform:super_admin` 을 갖고 있고, `requireBranchScope` 는 `kpa-branch:admin` ·
+> `platform:super_admin` 을 통과시킨다(`kpa-branch-scope.middleware.ts:82`). 그래서 타 분회
+> 운영자 경로는 **403 이 아니라 200 에 0건**으로 응답한다 — W11-B 에서 `officers`/`events`/
+> `members`/`posts` 4개 경로 전부 실측했다.
+> 403 `BRANCH_SCOPE_MISMATCH` 는 super_admin 이 아닌 **회원 계정**의 타 분회 접근에서 나온다.
+> **분회 경계 자체는 깨지지 않는다** — 조회는 `organization_id` 로 필터되어 0건이고,
+> 타 분회 경로로 자기 분회 `postId`/`officerId` 를 수정하려 하면 404 다(W11-B 실측).
+> 다만 super_admin 우회는 이 CHECK 의 원문 서술과 다르므로 사실대로 고쳐 적는다.
 - 회원 연결은 자기 분회 `branch_memberships` 안에서만 가능 — 타 분회 회원 지정 시 422 `MEMBER_NOT_IN_BRANCH` (실측).
 
 ## 4. 공개 범위

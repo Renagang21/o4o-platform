@@ -201,10 +201,19 @@ export class BranchSiteController {
     if (!title) {
       return res.status(400).json({ success: false, error: 'title은 필수입니다.', code: 'INVALID_INPUT' });
     }
+    // 모르는 분류를 조용히 notice 로 떨어뜨리지 않는다 — 잘못 분류된 글은 나중에
+    // 찾을 수 없다. 수정·목록과 같은 422 로 거절한다.
+    if (category !== undefined && !MEMBER_CATEGORIES.includes(category)) {
+      return res.status(422).json({
+        success: false,
+        error: '알 수 없는 분류입니다.',
+        code: 'INVALID_CATEGORY',
+      });
+    }
     const repo = AppDataSource.getRepository(BranchPost);
     const post = repo.create({
       organization_id: req.branch!.id,
-      category: MEMBER_CATEGORIES.includes(category) ? (category as BranchPostCategory) : 'notice',
+      category: (category ?? 'notice') as BranchPostCategory,
       title,
       content: content ?? '',
       attachments: Array.isArray(attachments) ? attachments : [],
