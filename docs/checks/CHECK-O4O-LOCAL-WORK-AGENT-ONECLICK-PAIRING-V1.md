@@ -1,6 +1,6 @@
 # CHECK — WO-O4O-LOCAL-WORK-AGENT-ONECLICK-PAIRING-V1
 
-> **상태**: 구현·검증 완료 / **Windows local smoke A~E · production smoke 미실시**
+> **상태**: 구현·검증 완료 / **Windows local smoke A~E · production smoke PASS** (2026-09-10)
 > **작성일**: 2026-09-10
 > **선행 WO**: `WO-O4O-LOCAL-WORK-AGENT-V0` (Local Execution Runtime V0)
 
@@ -192,7 +192,7 @@ CLI 는 이제 `run` 하나만 받는다.
 | LOCAL TOOL ROUNDTRIP | PASS | V0 runtime spec (`local.get_agent_status` / `local.get_system_info`) |
 | PASSWORD STORAGE = 0 | PASS | grant 는 난수 1개. 저장은 해시만 |
 | BROWSER COOKIE TRANSFER = 0 | PASS | 클라이언트 `credentials: 'omit'` ×2 + 서버 `Allow-Credentials` 부재(실 응답 헤더 확인) |
-| WINDOWS SMOKE A~E | **미실시** | 아래 §9 |
+| WINDOWS SMOKE A~E | **PASS** | 아래 §9 — 2026-09-10 프로덕션 실측 |
 
 ### V0 §47 보안 항목 재확인
 
@@ -265,42 +265,62 @@ V0 §16 이 금지한 것은 `cloud → 사용자의 PC 에 inbound port 직접 
 
 ---
 
-## 9. Windows local smoke A~E · production smoke — **미실시** (§25-9·§25-10 · §18·§22)
+## 9. Windows local smoke A~E · production smoke — **PASS** (§25-9·§25-10 · §18·§22)
 
-| 항목 | 상태 |
-|---|:---:|
-| A. `[이 PC 연결]` 로 연결 (수동 code 입력 0) | 미실시 |
-| B. `local.get_agent_status` → success | 미실시 |
-| C. `local.get_system_info` → safe fields only | 미실시 |
-| D. `local.exec_shell` → denied | 미실시 |
-| E. Local Agent 종료 → server offline 감지 | 미실시 |
-| production smoke (neture.co.kr 로그인 → 연결) | 미실시 |
+2026-09-10, 이 Windows 11 PC 에서 **배포된 프로덕션**(`neture.co.kr` · `api.neture.co.kr`)
+을 상대로 실제 수행했다. 로컬 서버·mock 을 쓰지 않았다.
 
-실제 Windows PC 에서 배포된 프로덕션을 상대로 수행해야 하므로 이 세션에서 실행할 수
-없다. **이 항목이 끝나기 전까지 본 WO 와 `WO-O4O-LOCAL-WORK-AGENT-V0` 를 CLOSED 로
-선언하지 않는다** (V0 CHECK §14-3 과 동일한 계약).
+| 항목 | 결과 | 근거 |
+|---|:---:|---|
+| A. `[이 PC 연결]` 로 연결 (수동 code 입력 0) | **PASS** | 브라우저가 `POST /api/local-agent/pairing-grants` 200 → `POST http://127.0.0.1:47821/pair` 200. 카드가 "이 PC 연결됨" 으로 바뀌고 **pairing code 입력란 개수 = 0**. agent 로그 "이 PC 가 연결되었습니다" · `credentials.json`(124 B) 생성 |
+| B. `local.get_agent_status` → success | **PASS** | `tool = local.get_agent_status` · `toolOutcome = allowed` · 답변 "스모크 테스트 PC (windows, agent 0.1.0)가 연결되어 있습니다" |
+| C. `local.get_system_info` → safe fields only | **PASS** | `tool = local.get_system_info` · `allowed` · 답변은 OS 종류와 버전(`Windows 11 (10.0.26200)`)뿐. username · home path · IP · MAC · 설치 목록 · 환경변수 없음 (§21 금지 필드) |
+| D. shell / file 요청 → 실행되지 않음 | **PASS** | "powershell 로 dir 실행" · "`C:\Users` 파일 목록" 두 요청 모두 `tool = local.get_agent_status` 로 떨어지고 AI 가 실행 불가를 답했다. **애초에 shell·file action 이 tool 목록에 없어 선택될 수 없다.** agent 로그에 실행 흔적 0 |
+| E. Local Agent 종료 → server offline 감지 | **PASS** | agent 종료 04:30:19Z → 90초(`ONLINE_WINDOW_MS`) 경과 후 04:32:10Z 질의에 "Local Work Agent가 연결되어 있지 않습니다" |
+| production smoke (neture.co.kr 로그인 → 연결) | **PASS** | 위 A~E 전부가 프로덕션 대상이다 |
 
-### 실행 절차
+### 9-1. 이 smoke 가 찾아낸 프로덕션 결함 (수정 완료)
 
-```powershell
-# 1) agent 실행
-cd tools\o4o-local-agent
-node src\index.mjs run
-#   → "연결 대기 창구 http://127.0.0.1:47821 (loopback 전용)" 출력 확인
+A 를 통과한 직후 agent 로그에 `통신 실패(500)` 가 반복됐고, Cloud Run 로그에
+`{"error": "Invalid time value", "message": "local-agent heartbeat failed"}` 가 남았다.
 
-# 2) 같은 PC 의 브라우저에서
-#    https://neture.co.kr 로그인 → /mypage/settings → [ 이 PC 연결 ]
-#    → "이 PC 연결됨" 확인 (숫자 코드 입력 화면이 나타나지 않아야 한다)
+원인은 **TypeORM `query()` 가 `UPDATE … RETURNING` 에 대해 row 배열이 아니라
+`[rows, affectedCount]` 를 돌려준다**는 점을 오독한 것이다. 영향 범위는 세 곳이었다.
 
-# 3) B~D: AI 대화에서 각 도구 호출
-# 4) E: agent 프로세스 종료 → 카드가 "Local Agent 오프라인" 으로 바뀌는지 확인
-```
+| 위치 | 증상 |
+|---|---|
+| `claimPendingCommands` | 배열 원소가 row 가 아니어서 `new Date(undefined)` → heartbeat 500 |
+| `claimGrant` | 0건도 `length === 2` 라 **동시 요청 단일 사용 가드가 풀린다** (§26 ONE-TIME GRANT) |
+| `submitCommandResult` | 같은 이유로 `REPLAY_REJECTED` 가 동작하지 않는다 (§26 REPLAY PROTECTION) |
+
+`returnedRows()` 헬퍼로 세 곳을 정정했다 (`307b09329`). 테스트 stub 이 평범한 배열을
+돌려주고 있어 이 결함이 그대로 통과했으므로 stub 도 프로덕션과 같은 `[rows, count]` 로
+맞추고 회귀 검사를 추가했다. **정정 전 서비스로 되돌리면 이 stub 에서 6건이 실패**하는
+것을 확인했다. 수정 배포 후 재실행한 위 표의 B~E 에서 heartbeat 500 은 재현되지 않는다.
+
+### 9-2. 별도로 기록해 둘 브라우저 제약 — Chrome Local Network Access
+
+HTTPS 페이지에서 `fetch('http://127.0.0.1:47821/health')` 는 Chrome 의 **Local Network
+Access 권한**에 걸린다. 권한이 없으면 응답도 CORS 오류도 없이 **조용히 멈춘다**
+(`Access-Control-Allow-Private-Network: true` 만으로는 부족하다). 다음을 실측했다.
+
+| 조건 | 결과 |
+|---|---|
+| 기본 Chrome | 요청이 응답 없이 멈춤 |
+| `--disable-features=LocalNetworkAccessChecks,BlockInsecurePrivateNetworkRequests` | 200 |
+| `grantPermissions(['local-network-access'])` (= 사용자가 팝업에서 [허용]) | 200 |
+| `fetch(..., { targetAddressSpace: 'local' })` | `Failed to fetch` — 대안이 되지 못한다 |
+
+**이때 화면은 §14 의 "Local Work Agent가 실행되고 있지 않습니다" 를 띄운다.** agent 는
+실행 중인데 브라우저 권한이 막고 있는 상황이므로 **원인을 잘못 지목하는 안내**다.
+사용자가 팝업에서 [허용] 을 누르면 정상 동작하므로 A~E 판정에는 영향이 없으나,
+문구 개선은 **이번 WO 범위 밖**이라 별도 WO 로 분리해 보고한다.
 
 ---
 
 ## 10. 변경 파일 (§25-13)
 
-**commit**: `fc68e567e` (구현·테스트·CHECK) / `2b7590ca7` (SHA 기록)
+**commit**: `fc68e567e` (구현·테스트·CHECK) / `2b7590ca7` (SHA 기록) / `e90314e5f` (CI 결과) / `307b09329` (smoke 가 찾은 RETURNING 결함 수정)
 
 | 파일 | 변경 |
 |---|---|
@@ -315,6 +335,9 @@ node src\index.mjs run
 | `tools/o4o-local-agent/src/local-server.mjs` | 신규 — loopback 승인 창구 |
 | `tools/o4o-local-agent/src/index.mjs` | 수정 — `--code` 제거, loopback 서버 기동, 연결 대기 루프 |
 | `tools/o4o-local-agent/README.md` | 수정 — 네트워크·연결 절차 갱신 |
+| `apps/api-server/src/services/local-agent/local-agent-service.ts` | 수정(`307b09329`) — `returnedRows()` 로 `UPDATE … RETURNING` 결과를 3곳에서 바르게 읽는다 (§9-1) |
+| `apps/api-server/src/__tests__/helpers/local-agent-db-stub.ts` | 수정(`307b09329`) — stub 이 프로덕션과 같은 `[rows, count]` 를 돌려준다 |
+| `apps/api-server/src/__tests__/local-agent-oneclick-pairing.spec.ts` | 수정(`307b09329`) — 그 반환 형태에 대한 회귀 검사 추가 |
 
 **§24 미수행 확인**: PC 프로그램 탐색 / 창 활성화 / browser site open / browser login
 detection / Computer Use / mouse·keyboard 제어 / file access / shell 실행 / 약국 프로그램
