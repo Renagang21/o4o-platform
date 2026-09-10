@@ -43,10 +43,13 @@ import {
   type VerifiedToolContext,
 } from './ai-tool-contract.js';
 import {
+  composeAppAction,
   LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ERROR,
   pickSafeSystemInfo,
+  pickSafeWindowInfo,
 } from '../local-agent/local-agent-protocol.js';
+import { windowsAppDisplayName, WINDOWS_APP_IDS } from '../local-agent/windows-app-registry.js';
 import {
   awaitCommandResult,
   issueCommand,
@@ -224,6 +227,117 @@ async function executeGetLocalSystemInfo(
   };
 }
 
+// ─── Windows App / Window executors (WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0) ──
+
+/**
+ * 창 축 tool 의 공통 왕복.
+ *
+ * `local.get_system_info` 와 같은 배관을 그대로 쓴다 — 새 protocol 을 만들지 않는다(§32).
+ * 다른 점은 하나뿐이다: appId 가 **allowlist 에 등재된 action 문자열 안에** 실려 간다
+ * (`local.find_application#windows.notepad`). 명령 envelope 에 자유 인자 칸이 없기 때문이고,
+ * 그래서 "허용되지 않은 대상" 은 애초에 표현될 수 없다(§9·§10·§38).
+ *
+ * 돌아온 데이터는 `pickSafeWindowInfo` 를 **두 번** 통과한다 — 서버가 결과를 저장할 때
+ * 한 번(service), 프롬프트로 보내기 전에 여기서 한 번 더. agent 가 무엇을 실어 보내든
+ * 창 제목 · PID · 창 핸들 · 실행 파일 경로는 이 문을 지나지 못한다(§20·§21).
+ */
+async function executeWindowsAppAction(
+  dataSource: DataSource,
+  ctx: VerifiedToolContext,
+  tool: string,
+  baseAction: string,
+  appId: string,
+): Promise<ToolResult> {
+  const displayName = windowsAppDisplayName(appId);
+
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
+  if (resolution.status !== 'ok') {
+    const errorCode =
+      resolution.status === 'none'
+        ? LOCAL_AGENT_ERROR.NO_DEVICE
+        : resolution.status === 'ambiguous'
+          ? LOCAL_AGENT_ERROR.AMBIGUOUS
+          : LOCAL_AGENT_ERROR.OFFLINE;
+    return { ok: true, tool, data: { available: false, appId, displayName, errorCode } };
+  }
+
+  const issued = await issueCommand(dataSource, {
+    userId: ctx.userId,
+    deviceId: resolution.device.id,
+    action: composeAppAction(baseAction, appId),
+    toolName: tool,
+  });
+  // strictNullChecks 가 꺼져 있어 `!issued.ok` 로는 union 이 좁혀지지 않는다.
+  if (issued.ok === false) {
+    return { ok: true, tool, data: { available: false, appId, displayName, errorCode: issued.errorCode } };
+  }
+
+  const result = await awaitCommandResult(dataSource, issued.command.commandId);
+  const safe = pickSafeWindowInfo(result.data);
+
+  // §39 안전 로그 — appId · action · 성공 여부 · 창 개수 · deviceId 까지만 남긴다.
+  // 창 제목 · command line · 실행 파일 경로 · 사용자 경로는 애초에 이 값 안에 없다.
+  logger.info('local-agent window command', {
+    tool,
+    appId,
+    status: result.status,
+    errorCode: result.errorCode ?? null,
+    windowCount: safe.windowCount ?? null,
+    deviceId: resolution.device.id,
+  });
+
+  if (result.status !== 'success') {
+    return {
+      ok: true,
+      tool,
+      data: {
+        available: false,
+        appId,
+        displayName,
+        errorCode: result.errorCode ?? LOCAL_AGENT_ERROR.EXECUTION_FAILED,
+        windowCount: safe.windowCount ?? 0,
+      },
+    };
+  }
+
+  return { ok: true, tool, data: { available: true, appId, displayName, ...safe } };
+}
+
+/** Tool 3 — 등재 앱이 실행 중인가 (§12). 창을 건드리지 않는다. */
+function executeFindApplication(
+  dataSource: DataSource,
+  ctx: VerifiedToolContext,
+  appId: string,
+): Promise<ToolResult> {
+  return executeWindowsAppAction(
+    dataSource,
+    ctx,
+    AI_TOOL_NAMES.FIND_APPLICATION,
+    LOCAL_AGENT_ACTIONS.FIND_APPLICATION,
+    appId,
+  );
+}
+
+/**
+ * Tool 4 — 등재 앱의 창을 앞으로 (§13·§19).
+ *
+ * 한 요청에서 이 executor 는 **최대 1회** 불린다 — 호출부가 tool 을 1개만 고르고(§20),
+ * agent 도 창이 정확히 1개일 때만 전환한다(§16). 즉 foreground 전환은 요청당 최대 1회다.
+ */
+function executeActivateWindow(
+  dataSource: DataSource,
+  ctx: VerifiedToolContext,
+  appId: string,
+): Promise<ToolResult> {
+  return executeWindowsAppAction(
+    dataSource,
+    ctx,
+    AI_TOOL_NAMES.ACTIVATE_WINDOW,
+    LOCAL_AGENT_ACTIONS.ACTIVATE_WINDOW,
+    appId,
+  );
+}
+
 // ─── Router ──────────────────────────────────────────────────────────────────
 
 /**
@@ -243,7 +357,7 @@ export async function executeAiTool(
     return { ok: false, tool: name, reason: auth.reason };
   }
 
-  const argCheck = validateToolArguments(args);
+  const argCheck = validateToolArguments(args, auth.tool);
   if (!argCheck.ok) {
     logger.info('ai-tool denied', { tool: name, reason: argCheck.reason, workspace: ctx.workspace });
     return { ok: false, tool: name, reason: argCheck.reason ?? 'INVALID_ARGUMENTS' };
@@ -258,6 +372,11 @@ export async function executeAiTool(
       return executeGetLocalAgentStatus(dataSource, ctx);
     case AI_TOOL_NAMES.GET_LOCAL_SYSTEM_INFO:
       return executeGetLocalSystemInfo(dataSource, ctx);
+    // appId 는 위 `validateToolArguments` 에서 등재부와 대조를 끝낸 값이다.
+    case AI_TOOL_NAMES.FIND_APPLICATION:
+      return executeFindApplication(dataSource, ctx, String((args as { appId: string }).appId));
+    case AI_TOOL_NAMES.ACTIVATE_WINDOW:
+      return executeActivateWindow(dataSource, ctx, String((args as { appId: string }).appId));
     default:
       // 등록부에는 있으나 executor 가 없는 경우 — 열려 있는 척하지 않는다.
       return { ok: false, tool: name, reason: 'UNKNOWN_TOOL' };
@@ -351,6 +470,70 @@ function asksForSystemInfo(message: string): boolean {
 }
 
 /**
+ * 등재 앱을 가리키는 말 → appId (§9·§10).
+ *
+ * ⚠️ 위 매장·로컬 키워드와 **같은 이유로** 한글을 정규식 리터럴에 쓰지 않는다.
+ * 2026-09-09 프로덕션 실측(한글 정규식이 번들 후 매칭 실패)이 여기서 되풀이되면
+ * "창 도구가 조용히 동작하지 않는" 형태로 똑같이 재현된다.
+ *
+ * 이 표에 없는 프로그램은 **이름을 말해도 tool 이 선택되지 않는다.** 모델이 만들어낸
+ * 프로그램 이름이 appId 가 되는 경로는 존재하지 않는다.
+ */
+const APP_INTENT_KEYWORDS: readonly {
+  appId: string;
+  ko: readonly string[];
+  en: readonly RegExp[];
+}[] = [
+  {
+    appId: 'windows.notepad',
+    ko: ['\uBA54\uBAA8\uC7A5'], // 메모장
+    en: [/\bnotepad\b/i],
+  },
+  {
+    appId: 'windows.calculator',
+    ko: ['\uACC4\uC0B0\uAE30'], // 계산기
+    en: [/\bcalculator\b/i],
+  },
+];
+
+/** 문장에서 등재 앱을 찾는다. 여러 개가 걸리면 **고르지 않는다** — 임의 선택 금지(§16 정신). */
+export function detectRegisteredApp(message: string): string | null {
+  const compact = message.replace(/\s+/g, '');
+  const hits = APP_INTENT_KEYWORDS.filter(
+    (a) => a.ko.some((k) => compact.includes(k)) || a.en.some((re) => re.test(message)),
+  ).map((a) => a.appId);
+  const unique = [...new Set(hits)].filter((id) => WINDOWS_APP_IDS.includes(id));
+  return unique.length === 1 ? unique[0] : null;
+}
+
+/**
+ * "앞으로 가져와" 류의 **활성화** 지시어. 없으면 조회(find)로만 간다.
+ *
+ * 기본값이 조회인 것이 중요하다. "메모장 열려 있어?" 라고 물었을 뿐인데 창이 튀어나와
+ * 사용자의 입력을 가로채면 안 된다(§19).
+ */
+const ACTIVATE_INTENT_KEYWORDS_KO: readonly string[] = [
+  '\uC55E\uC73C\uB85C', // 앞으로
+  '\uC55E\uC5D0', // 앞에
+  '\uD65C\uC131\uD654', // 활성화
+  '\uB744\uC6CC', // 띄워
+  '\uD3EC\uCEE4\uC2A4', // 포커스
+  '\uC804\uD658', // 전환
+];
+const ACTIVATE_INTENT_PATTERNS_EN: readonly RegExp[] = [
+  /bring\s+.*front/i,
+  /\bfocus\b/i,
+  /\bactivate\b/i,
+  /foreground/i,
+];
+
+export function asksForWindowActivation(message: string): boolean {
+  const compact = message.replace(/\s+/g, '');
+  if (ACTIVATE_INTENT_KEYWORDS_KO.some((k) => compact.includes(k))) return true;
+  return ACTIVATE_INTENT_PATTERNS_EN.some((re) => re.test(message));
+}
+
+/**
  * 이번 요청에서 실행할 tool 을 **결정론적으로** 고른다. 없으면 null.
  *
  * 자격 없는 tool 은 후보에 들어오지 않는다(`resolveAvailableTools`).
@@ -361,16 +544,51 @@ function asksForSystemInfo(message: string): boolean {
  * 라고 물었을 뿐인데 PC 를 깨워 정보를 캐는 일이 없도록 하기 위해서다.
  */
 export function selectToolForRequest(message: string, ctx: VerifiedToolContext): AiToolName | null {
+  const invocation = selectToolInvocationForRequest(message, ctx);
+  return invocation ? invocation.tool : null;
+}
+
+/** 고른 tool 과 그 인자. 인자를 받지 않는 tool 은 `args` 가 빈 객체다. */
+export interface AiToolInvocation {
+  tool: AiToolName;
+  args: Record<string, unknown>;
+}
+
+/**
+ * `selectToolForRequest` 의 인자 포함 버전.
+ *
+ * 창 축 tool 은 appId 를 받으므로 이름만으로는 실행할 수 없다. **appId 는 모델이
+ * 만들어내는 값이 아니라** 이 함수가 등재부(`WINDOWS_APP_IDS`)에서 고른 값이고,
+ * 실행 직전 `validateToolArguments` 가 등재부와 다시 대조한다(§9).
+ */
+export function selectToolInvocationForRequest(
+  message: string,
+  ctx: VerifiedToolContext,
+): AiToolInvocation | null {
   const available = new Set(resolveAvailableTools(ctx).map((t) => t.name));
+
+  // 창 축이 먼저다. "메모장 열려 있어?" 는 로컬 축 키워드("내 PC")가 없어도 성립해야 한다(§37).
+  const appId = detectRegisteredApp(message);
+  if (appId) {
+    if (asksForWindowActivation(message) && available.has(AI_TOOL_NAMES.ACTIVATE_WINDOW)) {
+      return { tool: AI_TOOL_NAMES.ACTIVATE_WINDOW, args: { appId } };
+    }
+    if (available.has(AI_TOOL_NAMES.FIND_APPLICATION)) {
+      return { tool: AI_TOOL_NAMES.FIND_APPLICATION, args: { appId } };
+    }
+    // 자격이 없으면 창 축 대신 다른 tool 로 흘러가지 않는다 — 그대로 텍스트 응답이다.
+    return null;
+  }
+
   if (looksLikeStoreScopedRequest(message) && available.has(AI_TOOL_NAMES.GET_STORE_CONTEXT)) {
-    return AI_TOOL_NAMES.GET_STORE_CONTEXT;
+    return { tool: AI_TOOL_NAMES.GET_STORE_CONTEXT, args: {} };
   }
   if (looksLikeLocalScopedRequest(message)) {
     if (asksForSystemInfo(message) && available.has(AI_TOOL_NAMES.GET_LOCAL_SYSTEM_INFO)) {
-      return AI_TOOL_NAMES.GET_LOCAL_SYSTEM_INFO;
+      return { tool: AI_TOOL_NAMES.GET_LOCAL_SYSTEM_INFO, args: {} };
     }
     if (available.has(AI_TOOL_NAMES.GET_LOCAL_AGENT_STATUS)) {
-      return AI_TOOL_NAMES.GET_LOCAL_AGENT_STATUS;
+      return { tool: AI_TOOL_NAMES.GET_LOCAL_AGENT_STATUS, args: {} };
     }
   }
   return null;
@@ -399,15 +617,102 @@ export function renderToolContext(result: ToolResult): string | null {
   if (result.tool === AI_TOOL_NAMES.GET_LOCAL_SYSTEM_INFO) {
     return renderLocalSystemInfo(result.data);
   }
+  if (result.tool === AI_TOOL_NAMES.FIND_APPLICATION) {
+    return renderFindApplication(result.data);
+  }
+  if (result.tool === AI_TOOL_NAMES.ACTIVATE_WINDOW) {
+    return renderActivateWindow(result.data);
+  }
   return null;
 }
 
 /**
- * §41 — **연결되어 있지 않을 때 그 사실을 그대로 말한다.**
+ * 한글 조사 선택 — 받침이 있으면 `이/은`, 없으면 `가/는`.
  *
- * 여기서 빈 문자열이나 null 을 돌려주면 모델은 근거 없이 PC 상태를 지어내게 된다.
- * "모른다" 가 아니라 "연결되어 있지 않다" 는 확정된 사실이므로 문장으로 넣는다.
+ * 등재 앱 표시 이름이 늘어날 때마다 문장을 따로 쓰지 않기 위한 최소 처리다.
+ * 한글이 아니면(예: 영문 이름) 받침 없는 쪽을 쓴다.
  */
+function withSubjectParticle(name: string, hasBatchim: string, noBatchim: string): string {
+  const last = name.charCodeAt(name.length - 1);
+  const isHangul = last >= 0xac00 && last <= 0xd7a3;
+  const batchim = isHangul && (last - 0xac00) % 28 !== 0;
+  return `${name}${batchim ? hasBatchim : noBatchim}`;
+}
+
+/** 미실행 안내 (§14·§37). 오류 코드를 그대로 노출하지 않고 사용자 문장으로 바꾼다. */
+function renderNotRunning(displayName: string): string {
+  return (
+    '## 프로그램 상태\n' +
+    `- ${withSubjectParticle(displayName, '이', '가')} 실행되고 있지 않습니다.\n` +
+    '- 사용자에게 "프로그램을 먼저 실행해 주세요" 라고 안내하세요. ' +
+    'O4O 는 프로그램을 대신 실행하지 않습니다.'
+  );
+}
+
+/**
+ * 창 축 공통 실패 문장.
+ *
+ * 미실행 · 미등재 · 창 다수 · 연결 없음은 **서로 다른 상황**이라 문장을 나눈다.
+ * 여기서 뭉뚱그리면 모델이 "실행해 주세요" 를 엉뚱한 상황에도 말하게 된다.
+ */
+function renderWindowFailure(data: Record<string, unknown>, displayName: string): string | null {
+  const code = String(data.errorCode ?? '');
+  if (code === LOCAL_AGENT_ERROR.APP_NOT_RUNNING) return renderNotRunning(displayName);
+  if (code === LOCAL_AGENT_ERROR.APP_NOT_REGISTERED) {
+    return '## 프로그램 상태\n- 이 프로그램은 O4O 가 다룰 수 있도록 등록되어 있지 않습니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.APP_WINDOW_AMBIGUOUS) {
+    const count = Number(data.windowCount ?? 0);
+    return (
+      '## 프로그램 상태\n' +
+      `- ${displayName} 창이 ${count}개 열려 있어 어느 창인지 확정할 수 없습니다.\n` +
+      '- 어느 창을 사용할지 확인이 필요합니다. 임의로 한 창을 고르지 마세요.'
+    );
+  }
+  if (code === LOCAL_AGENT_ERROR.WINDOW_ACTIVATION_FAILED) {
+    return (
+      '## 프로그램 상태\n' +
+      `- ${displayName} 창을 앞으로 가져오지 못했습니다.\n` +
+      '- 사용자가 직접 창을 선택해야 할 수 있습니다.'
+    );
+  }
+  if (code === LOCAL_AGENT_ERROR.AMBIGUOUS) {
+    return '## 프로그램 상태\n- 연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.TIMEOUT) {
+    return '## 프로그램 상태\n- 이 PC의 에이전트가 제한 시간 안에 응답하지 않았습니다.';
+  }
+  return null;
+}
+
+function renderFindApplication(data: Record<string, unknown>): string {
+  const displayName = String(data.displayName ?? '해당 프로그램');
+  if (data.available !== true) {
+    return (
+      renderWindowFailure(data, displayName) ??
+      '## 프로그램 상태\n' +
+        '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 확인할 수 없습니다.\n' +
+        '- 추측해서 답하지 마세요.'
+    );
+  }
+  const count = Number(data.windowCount ?? 0);
+  return `## 프로그램 상태\n- ${displayName} 실행 중입니다. (창 ${count}개)`;
+}
+
+function renderActivateWindow(data: Record<string, unknown>): string {
+  const displayName = String(data.displayName ?? '해당 프로그램');
+  if (data.available !== true || data.activated !== true) {
+    return (
+      renderWindowFailure(data, displayName) ??
+      '## 프로그램 상태\n' +
+        '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 창을 활성화할 수 없습니다.\n' +
+        '- 추측해서 답하지 마세요.'
+    );
+  }
+  const restored = data.restored === true ? ' (최소화된 창을 복원했습니다)' : '';
+  return `## 프로그램 상태\n- ${displayName} 창을 앞으로 가져왔습니다.${restored}`;
+}
+
 function renderLocalAgentStatus(data: Record<string, unknown>): string {
   const notConnected =
     '## 로컬 에이전트 상태\n- 현재 이 PC의 Local Work Agent가 연결되어 있지 않습니다.\n' +

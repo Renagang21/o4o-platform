@@ -114,16 +114,28 @@ describe('tool eligibility — 자격 없는 tool 은 노출되지 않는다', (
   });
 
   /**
-   * WO-O4O-LOCAL-WORK-AGENT-V0 에서 `local` 이 한 개 추가됐다.
-   * 고정해야 하는 것은 "server 만 있다" 가 아니라
-   * **browser 는 여전히 0 이고 쓰기 tool 은 없다** 는 쪽이다 (§22·§24).
+   * WO-O4O-LOCAL-WORK-AGENT-V0 에서 `local` 이 한 개 추가됐고,
+   * WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0 에서 **처음으로 read-only 가 아닌 tool** 이
+   * 하나 들어왔다 (`local.activate_window`).
+   *
+   * 그래서 고정하는 것을 "전부 read-only" 에서
+   * **"read-only 가 아니면 허용된 effect 를 선언해야 하고,
+   * 그 effect 는 창 활성화 하나뿐"** 으로 옮긴다 (§13·§19·§25～§28).
+   * browser tool 은 여전히 0 이다.
    */
-  it('registry 는 read-only tool 만 담고 browser tool 은 0 이다', () => {
+  it('registry 는 read-only 또는 허용된 effect 만 담고 browser tool 은 0 이다', () => {
     for (const t of AI_TOOL_REGISTRY) {
       expect(['server', 'local']).toContain(t.executionMode);
-      expect(t.readOnly).toBe(true);
+      if (!t.readOnly) {
+        expect(t.effect).toBe('FOREGROUND_ACTIVATION');
+      }
     }
     expect(AI_TOOL_REGISTRY.filter((t) => t.executionMode === 'browser')).toEqual([]);
+
+    // 쓰기 쪽은 이 하나가 전부여야 한다. 늘어나면 이 테스트가 먼저 깨진다.
+    expect(AI_TOOL_REGISTRY.filter((t) => !t.readOnly).map((t) => t.name)).toEqual([
+      AI_TOOL_NAMES.ACTIVATE_WINDOW,
+    ]);
   });
 });
 

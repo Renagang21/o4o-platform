@@ -21,6 +21,8 @@
  *   **프로토콜 레벨에서 표현 불가능**하다. 표현할 수 없는 것은 실수로 열 수도 없다.
  */
 
+import { WINDOWS_APP_IDS } from './windows-app-registry.js';
+
 // ─── Action ──────────────────────────────────────────────────────────────────
 
 /**
@@ -34,17 +36,64 @@ export const LOCAL_AGENT_ACTIONS = {
   GET_AGENT_STATUS: 'local.get_agent_status',
   /** OS 이름·버전·아키텍처 등 **안전 필드만**. §21 금지 목록 참조. */
   GET_SYSTEM_INFO: 'local.get_system_info',
+  /** 등재된 Windows 앱이 실행 중인지 조회 (WINDOWS-APP-WINDOW-CONTROL-V0 §12). */
+  FIND_APPLICATION: 'local.find_application',
+  /** 등재된 Windows 앱의 창을 앞으로 가져온다 (동 §13). */
+  ACTIVATE_WINDOW: 'local.activate_window',
 } as const;
 
 export type LocalAgentAction = (typeof LOCAL_AGENT_ACTIONS)[keyof typeof LOCAL_AGENT_ACTIONS];
 
-/** 서버가 발행을 허용하는 action (§29). agent 쪽 allowlist 와 짝을 이룬다(§28). */
+// ─── App 대상 action (WINDOWS-APP-WINDOW-CONTROL-V0 §9·§32) ──────────────────
+
+/**
+ * appId 를 **action 이름 안에** 싣는다. 인자 칸을 새로 만들지 않기 위해서다.
+ *
+ * `local_agent_commands` 에는 args 컬럼이 없다 — 직전 WO 가 "인자를 담을 칸이 없으면
+ * 나중에 인자를 몰래 실어 보낼 수도 없다" 는 이유로 일부러 그렇게 만들었고,
+ * 이번 WO 는 `DB migration = 0` 이다(§38). 그래서 자유 문자열 인자를 새로 만드는 대신
+ * **appId 까지 포함한 완성된 action 문자열 자체를 allowlist 로 고정**한다.
+ *
+ * 결과적으로 전송 가능한 action 은 아래 `LOCAL_AGENT_ACTION_ALLOWLIST` 의 유한 집합뿐이고,
+ * 등재되지 않은 appId 는 **프로토콜 레벨에서 표현 불가능**하다. envelope 형상은 그대로다.
+ */
+export const LOCAL_APP_ACTION_SEPARATOR = '#';
+
+/** appId 를 필요로 하는 action 들. */
+export const APP_TARGET_ACTIONS: readonly string[] = Object.freeze([
+  LOCAL_AGENT_ACTIONS.FIND_APPLICATION,
+  LOCAL_AGENT_ACTIONS.ACTIVATE_WINDOW,
+]);
+
+export function composeAppAction(base: string, appId: string): string {
+  return `${base}${LOCAL_APP_ACTION_SEPARATOR}${appId}`;
+}
+
+/** action 문자열을 base 와 appId 로 나눈다. appId 가 없는 action 이면 appId 는 undefined. */
+export function parseLocalAction(action: string): { base: string; appId?: string } {
+  const idx = String(action ?? '').indexOf(LOCAL_APP_ACTION_SEPARATOR);
+  if (idx < 0) return { base: String(action ?? '') };
+  return {
+    base: String(action).slice(0, idx),
+    appId: String(action).slice(idx + LOCAL_APP_ACTION_SEPARATOR.length),
+  };
+}
+
+/**
+ * 서버가 발행을 허용하는 action (§29). agent 쪽 allowlist 와 짝을 이룬다(§28).
+ *
+ * app 대상 action 은 **등재된 appId 하나당 한 항목씩** 펼쳐진다. 목록 길이는
+ * `2 + 2 × 등재 앱 수` 로 유한하며, registry 에 없는 앱은 여기에 나타나지 않는다.
+ */
 export const LOCAL_AGENT_ACTION_ALLOWLIST: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.GET_AGENT_STATUS,
   LOCAL_AGENT_ACTIONS.GET_SYSTEM_INFO,
+  ...APP_TARGET_ACTIONS.flatMap((base) =>
+    WINDOWS_APP_IDS.map((appId) => composeAppAction(base, appId)),
+  ),
 ]);
 
-export function isAllowedLocalAction(action: string): action is LocalAgentAction {
+export function isAllowedLocalAction(action: string): boolean {
   return LOCAL_AGENT_ACTION_ALLOWLIST.includes(action);
 }
 
@@ -53,12 +102,16 @@ export function isAllowedLocalAction(action: string): action is LocalAgentAction
 /**
  * 서버 → agent 명령 (§17).
  *
- * `args` 는 형상만 남겨둔 자리다. V0 의 두 action 은 **인자를 받지 않는다** —
- * 직전 WO 가 `validateToolArguments` 로 고정한 판단(식별자를 인자로 넘기지 않는다)과 같다.
+ * `args` 는 **여전히 빈 객체다.** 자유 문자열 인자를 이 envelope 에 새로 열지 않는다 —
+ * appId 는 allowlist 로 고정된 `action` 문자열 안에 들어 있다(위 `composeAppAction`).
+ * 그래서 이번 WO 도 envelope 형상·DB 스키마를 바꾸지 않는다(§32·§38).
+ *
+ * `action` 이 `string` 인 것은 app 대상 action 이 `base#appId` 로 조립되기 때문이다.
+ * 값의 유효성은 타입이 아니라 **`isAllowedLocalAction` 이 판정한다**(양쪽 allowlist).
  */
 export interface LocalCommand {
   commandId: string;
-  action: LocalAgentAction;
+  action: string;
   args: Record<string, never>;
   issuedAt: string;
   expiresAt: string;
@@ -97,6 +150,16 @@ export const LOCAL_AGENT_ERROR = {
   EXPIRED: 'LOCAL_COMMAND_EXPIRED',
   /** agent 내부 실행 실패. */
   EXECUTION_FAILED: 'LOCAL_AGENT_EXECUTION_FAILED',
+
+  // ── Windows App / Window Control V0 (§14·§16·§18) ──────────────────────────
+  /** registry 에 없는 appId (§10). */
+  APP_NOT_REGISTERED: 'WINDOWS_APP_NOT_REGISTERED',
+  /** 등재 앱이지만 지금 실행 중이 아니다 → 사용자가 직접 실행해야 한다(§14). */
+  APP_NOT_RUNNING: 'WINDOWS_APP_NOT_RUNNING',
+  /** 대상 창이 2개 이상이다. **임의로 고르지 않는다**(§16). */
+  APP_WINDOW_AMBIGUOUS: 'WINDOWS_APP_WINDOW_AMBIGUOUS',
+  /** 창은 찾았지만 Windows 가 foreground 전환을 받아주지 않았다(§18). */
+  WINDOW_ACTIVATION_FAILED: 'WINDOW_ACTIVATION_FAILED',
 } as const;
 
 export type LocalAgentErrorCode = (typeof LOCAL_AGENT_ERROR)[keyof typeof LOCAL_AGENT_ERROR];
@@ -130,6 +193,73 @@ export function pickSafeSystemInfo(data: unknown): Record<string, unknown> {
     if (typeof v === 'string' && v.length > 0) out[key] = v.slice(0, 120);
   }
   return out;
+}
+
+// ─── Safe window info (WINDOWS-APP-WINDOW-CONTROL-V0 §20·§21) ───────────────
+
+/**
+ * app / window action 이 되돌릴 수 있는 **유일한** 필드 집합.
+ *
+ * `pickSafeSystemInfo` 와 같은 규칙이다: agent 가 무엇을 실어 보내든 이 목록 밖의 키는
+ * 서버가 버린다. 따라서 아래 값들은 DB 에도 프롬프트에도 **도달할 수 없다**(§20·§21):
+ *
+ *   전체 process 목록 · PID · 창 핸들(HWND) · 창 제목 · executable 전체 경로 ·
+ *   Windows 사용자 경로 · Program Files 설치 경로 · command line 인자
+ *
+ * `displayName` 은 registry 의 표시 이름이고, 서버는 그마저도 자기 registry 값으로
+ * 다시 덮어쓴다(agent 가 주장하는 이름을 그대로 읽어주지 않는다).
+ */
+export const SAFE_WINDOW_INFO_FIELDS: readonly string[] = Object.freeze([
+  'appId',
+  'displayName',
+  'state',
+]);
+
+/** 숫자로 통과시키는 필드 — 창 **개수** 뿐이다. 핸들·PID 는 여기에 없다. */
+const SAFE_WINDOW_INFO_NUMBER_FIELDS: readonly string[] = Object.freeze(['windowCount']);
+
+/** 불리언으로 통과시키는 필드. */
+const SAFE_WINDOW_INFO_BOOLEAN_FIELDS: readonly string[] = Object.freeze([
+  'found',
+  'activated',
+  'restored',
+]);
+
+export function pickSafeWindowInfo(data: unknown): Record<string, unknown> {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return {};
+  const src = data as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  for (const key of SAFE_WINDOW_INFO_FIELDS) {
+    const v = src[key];
+    if (typeof v === 'string' && v.length > 0) out[key] = v.slice(0, 60);
+  }
+  for (const key of SAFE_WINDOW_INFO_NUMBER_FIELDS) {
+    const v = src[key];
+    // 정수 개수만. 큰 값도 잘라낸다 — 창 개수가 수십을 넘을 이유가 없다.
+    if (typeof v === 'number' && Number.isInteger(v) && v >= 0) out[key] = Math.min(v, 99);
+  }
+  for (const key of SAFE_WINDOW_INFO_BOOLEAN_FIELDS) {
+    const v = src[key];
+    if (typeof v === 'boolean') out[key] = v;
+  }
+  return out;
+}
+
+/**
+ * action 에 맞는 출력 화이트리스트를 고른다.
+ *
+ * **모르는 action 은 빈 객체를 돌려준다.** 새 action 을 추가하면서 여기에 등록하지 않으면
+ * 데이터가 새는 것이 아니라 **아무것도 통과하지 못한다**. 실수의 방향을 안전한 쪽으로 둔다.
+ */
+export function pickSafeResultData(action: string, data: unknown): Record<string, unknown> {
+  const { base } = parseLocalAction(action);
+  if (base === LOCAL_AGENT_ACTIONS.GET_SYSTEM_INFO || base === LOCAL_AGENT_ACTIONS.GET_AGENT_STATUS) {
+    return pickSafeSystemInfo(data);
+  }
+  if (APP_TARGET_ACTIONS.includes(base)) {
+    return pickSafeWindowInfo(data);
+  }
+  return {};
 }
 
 // ─── Device identity ─────────────────────────────────────────────────────────

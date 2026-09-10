@@ -22,6 +22,8 @@ jest.mock('../utils/logger.js', () => ({
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import {
+  APP_TARGET_ACTIONS,
+  composeAppAction,
   LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ACTION_ALLOWLIST,
   LOCAL_AGENT_ERROR,
@@ -29,6 +31,7 @@ import {
   isAllowedLocalAction,
   pickSafeSystemInfo,
 } from '../services/local-agent/local-agent-protocol.js';
+import { WINDOWS_APP_IDS } from '../services/local-agent/windows-app-registry.js';
 import {
   authenticateAgentSession,
   awaitCommandResult,
@@ -513,15 +516,30 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
     }
   });
 
-  it('15. allowlist 는 2개뿐이고 전부 local.* read-only 다', () => {
+  it('15. allowlist 는 전부 local.* 이고 열거된 항목이 전부다', () => {
+    // WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0 에서 창 축이 추가되면서 allowlist 는 더 이상
+    // 2개가 아니다. 다만 **열거된 문자열의 집합**이라는 성질은 그대로다 — appId 는 인자가
+    // 아니라 allowlist 항목 자체에 박혀 있으므로, 등재되지 않은 대상은 allowlist 밖의
+    // 문자열이 되어 애초에 명령이 되지 못한다.
     expect([...LOCAL_AGENT_ACTION_ALLOWLIST].sort()).toEqual(
-      [LOCAL_AGENT_ACTIONS.GET_AGENT_STATUS, LOCAL_AGENT_ACTIONS.GET_SYSTEM_INFO].sort(),
+      [
+        LOCAL_AGENT_ACTIONS.GET_AGENT_STATUS,
+        LOCAL_AGENT_ACTIONS.GET_SYSTEM_INFO,
+        ...APP_TARGET_ACTIONS.flatMap((base) =>
+          WINDOWS_APP_IDS.map((appId) => composeAppAction(base, appId)),
+        ),
+      ].sort(),
     );
+    for (const action of LOCAL_AGENT_ACTION_ALLOWLIST) {
+      expect(action.startsWith('local.')).toBe(true);
+    }
     expect(isAllowedLocalAction('local.exec_shell')).toBe(false);
     expect(isAllowedLocalAction('local.file_read')).toBe(false);
+    // 등재 앱이 아닌 대상은 형태가 같아도 통과하지 못한다.
+    expect(isAllowedLocalAction('local.activate_window#windows.cmd')).toBe(false);
   });
 
-  it('15. agent handler 는 프로세스 실행 수단을 import 하지 않는다', () => {
+  it('15. agent handler 는 프로세스 실행 수단을 직접 쓰지 않는다', () => {
     const handlers = readAgent('handlers.mjs');
     const code = handlers
       .replace(/\/\*[\s\S]*?\*\//g, '')
@@ -529,9 +547,14 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
       .map((l) => l.replace(/\/\/.*$/, ''))
       .join('\n');
     const imports = [...code.matchAll(/from\s+'([^']+)'/g)].map((m) => m[1]);
-    // 실행 가능한 것은 os 조회뿐이다.
-    expect(imports).toEqual(['node:os']);
-    for (const forbidden of ['child_process', 'spawn', 'exec', 'execFile', 'vm', 'eval(']) {
+    // 창 제어가 들어오면서 저장소 안 모듈 두 개가 늘었다. node 표준 모듈은 여전히 os 뿐이다.
+    expect(imports).toEqual([
+      'node:os',
+      './windows-app-registry.mjs',
+      './windows-window-control.mjs',
+    ]);
+    expect(imports.filter((i) => i.startsWith('node:'))).toEqual(['node:os']);
+    for (const forbidden of ['child_process', 'spawn(', 'exec(', 'execFile', 'vm', 'eval(']) {
       expect(code).not.toContain(forbidden);
     }
   });

@@ -1,6 +1,7 @@
 # O4O Local Work Agent (V0)
 
 `WO-O4O-LOCAL-WORK-AGENT-V0` · `WO-O4O-LOCAL-WORK-AGENT-ONECLICK-PAIRING-V1`
+· `WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0`
 
 사용자의 Windows PC 에서 도는 **최소 실행 에이전트**입니다. O4O AI 가 허용된 로컬 작업을
 요청하면, 이 프로세스가 자기 allowlist 를 확인한 뒤 실행하고 결과만 되돌려 줍니다.
@@ -11,19 +12,42 @@
 
 | 없는 것 | 확인 방법 |
 |---|---|
-| shell / PowerShell / cmd 실행 | 저장소 어느 파일도 `child_process` 를 import 하지 않습니다 |
+| 임의 shell / PowerShell / cmd 실행 | 아래 "PowerShell 경계" 참조 — 실행 가능한 것은 저장소에 들어 있는 `.ps1` **2개**뿐입니다 |
 | 임의 프로세스 실행 | 같음 |
+| 프로그램 실행 · 종료 | `Start-Process` · `Stop-Process` · `taskkill` 이 코드에 없습니다 |
 | 파일 읽기 / 쓰기 도구 | `src/handlers.mjs` 는 `os` 만 import 합니다 — `fs` 가 없습니다 |
 | 레지스트리 접근 | 해당 모듈 없음 |
 | 마우스 · 키보드 · 화면 캡처 | 해당 모듈 없음 |
 | 브라우저 제어 · DOM 자동화 | 해당 모듈 없음 |
 | 약국관리 프로그램 접근 | 해당 코드 없음 |
 
-실행할 수 있는 것은 `src/handlers.mjs` 의 **2개**뿐입니다.
+실행할 수 있는 것은 `src/handlers.mjs` 에 등재된 action 뿐입니다.
 
 `fs` 는 딱 한 곳, `src/credentials.mjs` 에서만 쓰입니다 — 이 agent 자신의 자격증명
 파일을 읽고 쓰기 위해서입니다. handler 쪽에는 파일 접근 수단이 전달되지 않으므로,
 서버가 무엇을 요청하든 임의 경로를 읽어 보낼 방법이 없습니다.
+
+## PowerShell 경계 (WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0)
+
+창을 찾고 앞으로 가져오는 기능은 Win32 API 호출이 필요합니다. 네이티브 모듈을 새로
+설치하지 않고 이를 하려면 PowerShell helper 외에 방법이 없어, **`src/windows-window-control.mjs`
+한 파일에만** `child_process` 를 열었습니다. "어느 파일도 import 하지 않는다" 는 더 이상
+사실이 아니므로, 대신 다음 5가지로 범위를 묶어 두었습니다.
+
+1. `execFile` 만 씁니다. `exec` · `spawn` · `shell: true` 가 없으므로 **셸이 개입하지 않습니다**
+   (인용 · `&` · 파이프 해석 자체가 일어나지 않습니다).
+2. 실행 대상은 저장소에 체크인된 `windows-window-census.ps1` · `windows-window-activate.ps1`
+   **2개**뿐입니다. `-Command` 를 쓰지 않고 `-File` 만 쓰므로 스크립트 문자열을 런타임에
+   조립하지 않습니다.
+3. argv 는 상수 배열이 전부입니다. **호출자가 argv 에 값을 넣을 수 없습니다.**
+4. 유일한 런타임 입력인 창 핸들은 환경변수로 넘기며, 넘기기 전과 스크립트 안에서
+   각각 10진 정수인지 확인합니다.
+5. appId · 프로그램 이름 · 창 제목은 이 경계를 넘지 않습니다. 매칭은 전부 JS 안에서 하고,
+   PowerShell 은 조건 없는 창 목록만 돌려줍니다.
+
+두 스크립트가 부르는 Win32 함수는 전부 조회 전용이며, 예외는 최소화된 창을 되살리는
+`ShowWindow(SW_RESTORE)` 와 `SetForegroundWindow` 뿐입니다. 키보드 · 마우스 입력을
+만들어 내지 않고, 창을 닫거나 프로세스를 끝내지 않습니다.
 
 ## 개인정보
 
@@ -34,7 +58,11 @@
 
 ```
 osName · osVersion · architecture · agentVersion · deviceName
+appId · displayName · found / not found · windowCount · state · activated · restored
 ```
+
+두 번째 줄이 창 제어에서 나가는 값의 전부입니다. **창 제목 · PID · 창 핸들 ·
+실행 파일 경로 · command line · 전체 프로세스 목록은 나가지 않습니다.**
 
 username · 홈 디렉터리 경로 · IP · MAC · 설치 소프트웨어 목록 · 환경변수 ·
 디스크 내용 · 프로세스 목록은 수집하지도, 전송하지도 않습니다.

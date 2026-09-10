@@ -35,6 +35,8 @@
  *   2번은 tool 판정에 **쓰지 않는다**. 판정에 쓰는 것은 3번뿐이다.
  */
 
+import { isRegisteredWindowsApp } from '../local-agent/windows-app-registry.js';
+
 // ─── Capability ──────────────────────────────────────────────────────────────
 
 /**
@@ -58,6 +60,22 @@ export const AiCapability = {
    * agent 가 실제로 붙어 있을 때만 성립한다.
    */
   READ_ONLY_LOCAL_SYSTEM_INFO: 'READ_ONLY_LOCAL_SYSTEM_INFO',
+  /**
+   * 연결된 PC 에서 **등재된 프로그램이 실행 중인지** 조회
+   * (WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0 §22 `local.app.inspect`).
+   *
+   * read-only 다. 전체 process 목록도, 실행 파일 경로도 이 자격으로 얻을 수 없다 —
+   * 얻을 수 있는 것은 "등재 앱이 실행 중인가 · 창이 몇 개인가" 뿐이다(§20·§21).
+   */
+  READ_ONLY_LOCAL_APP_INSPECT: 'READ_ONLY_LOCAL_APP_INSPECT',
+  /**
+   * 등재된 프로그램의 창을 **앞으로 가져오는** 자격 (§22 `local.window.activate`).
+   *
+   * ⚠️ V0 에서 **유일하게 read-only 가 아닌 capability** 다. 다만 그 효과는
+   * "이미 열려 있는 창의 z-order 를 바꾼다" 하나뿐이고, 실행 · 종료 · 입력 · 캡처는
+   * 애초에 구현되어 있지 않다(§25·§26·§27·§28).
+   */
+  LOCAL_WINDOW_ACTIVATE: 'LOCAL_WINDOW_ACTIVATE',
 } as const;
 
 /**
@@ -66,6 +84,15 @@ export const AiCapability = {
  * `local.read` · `local.write` · `browser` · `desktop` capability 는 **정의하지 않는다.**
  * 위 두 개는 "연결됐는가" 와 "무슨 OS 인가" 뿐이고, 둘 다 파일·프로세스·화면에 닿지 않는다.
  * V0 가 증명하려는 것은 *능력의 범위* 가 아니라 *연결·인증·명령·허용목록·왕복* 이라는 배관이다.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * 2026-09-10 · WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0 에서 **창 축 2개가 추가됐다**
+ *
+ * `READ_ONLY_LOCAL_APP_INSPECT` · `LOCAL_WINDOW_ACTIVATE`.
+ * 위 문단의 "파일·프로세스·화면에 닿지 않는다" 는 여전히 사실이다 — 새 두 자격으로
+ * 얻을 수 있는 것은 **등재 앱의 실행 여부·창 개수**와 **그 창을 앞으로 가져오는 것**뿐이고,
+ * 파일 접근 · 임의 프로세스 실행/종료 · 키보드/마우스 · 화면 캡처는 구현 자체가 없다.
+ * `local.read` · `local.write` · `browser` · `desktop` 은 **여전히 정의하지 않는다.**
  */
 
 export type AiCapabilityKey = (typeof AiCapability)[keyof typeof AiCapability];
@@ -123,6 +150,9 @@ export function deriveAiCapabilities(ctx: VerifiedToolContext): AiCapabilityKey[
   // offline · none · ambiguous 는 부여하지 않는다 — 매장 ambiguous 를 다루는 방식과 같다.
   if (ctx.localAgentStatus === 'connected' && ctx.localDeviceId) {
     caps.push(AiCapability.READ_ONLY_LOCAL_SYSTEM_INFO);
+    // 창 축도 같은 조건이다. 연결되지 않은 PC 의 창을 찾을 수도, 띄울 수도 없다.
+    caps.push(AiCapability.READ_ONLY_LOCAL_APP_INSPECT);
+    caps.push(AiCapability.LOCAL_WINDOW_ACTIVATE);
   }
   return caps;
 }
@@ -156,8 +186,39 @@ export interface AiToolDefinition {
   /** 이 tool 을 쓰려면 **전부** 필요한 capability. */
   requiredCapabilities: AiCapabilityKey[];
   executionMode: ToolExecutionMode;
-  /** V0 registry 는 read-only tool 만 담는다. */
+  /** read-only 가 아니면 아래 `effect` 를 반드시 선언해야 실행 게이트를 통과한다. */
   readOnly: boolean;
+  /**
+   * read-only 가 아닌 tool 이 **일으킬 수 있는 부작용의 종류**
+   * (WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0 §13·§18·§19).
+   *
+   * "readOnly 가 아니면 무엇이든 해도 된다" 가 되지 않도록, 허용 효과를 이름으로 한정한다.
+   * 아래 `ALLOWED_TOOL_EFFECTS` 에 없는 값은 실행되지 않는다.
+   */
+  effect?: ToolEffect;
+  /**
+   * 받는 인자의 형상. 생략하면 **인자 없음**이다(V0 기본).
+   * `appId` 는 `{ appId }` 하나만 허용하며, 값은 Windows App Registry 등재분이어야 한다(§9).
+   */
+  argumentSchema?: 'none' | 'appId';
+}
+
+/**
+ * 부작용 종류.
+ *
+ * `FOREGROUND_ACTIVATION` = 이미 열려 있는 창을 앞으로 가져온다(최소화면 복원 포함).
+ * 그 이상은 없다 — 프로그램 실행 · 종료 · 키보드 · 마우스 · 화면 캡처는 정의조차 하지 않는다.
+ * 이름이 없으면 등록할 수도 없다(§25·§26·§27·§28).
+ */
+export type ToolEffect = 'FOREGROUND_ACTIVATION';
+
+/** 실행이 허용된 부작용. **registry 에 무엇이 적혀 있든 이 집합이 최종 게이트다.** */
+const ALLOWED_TOOL_EFFECTS: readonly ToolEffect[] = Object.freeze(['FOREGROUND_ACTIVATION']);
+
+/** read-only 이거나, 허용된 effect 를 선언한 tool 만 실행 후보가 된다. */
+function hasAllowedEffect(tool: AiToolDefinition): boolean {
+  if (tool.readOnly) return true;
+  return tool.effect !== undefined && ALLOWED_TOOL_EFFECTS.includes(tool.effect);
 }
 
 export const AI_TOOL_NAMES = {
@@ -165,6 +226,8 @@ export const AI_TOOL_NAMES = {
   GET_STORE_CONTEXT: 'store.get_context',
   GET_LOCAL_AGENT_STATUS: 'local.get_agent_status',
   GET_LOCAL_SYSTEM_INFO: 'local.get_system_info',
+  FIND_APPLICATION: 'local.find_application',
+  ACTIVATE_WINDOW: 'local.activate_window',
 } as const;
 
 export type AiToolName = (typeof AI_TOOL_NAMES)[keyof typeof AI_TOOL_NAMES];
@@ -172,7 +235,8 @@ export type AiToolName = (typeof AI_TOOL_NAMES)[keyof typeof AI_TOOL_NAMES];
 /**
  * Tool Registry.
  *
- * 전부 read-only 다. 쓰기 도구를 여기 넣지 않는다.
+ * 기본은 read-only 다. read-only 가 아닌 항목은 `ALLOWED_TOOL_EFFECTS` 에 있는
+ * effect 를 반드시 선언해야 하며, V0 에서 그런 항목은 `local.activate_window` 하나뿐이다.
  *
  * local 두 개의 역할이 다르다는 점에 주의:
  *   - `local.get_agent_status` 는 **서버 DB 의 연결 상태만으로 답한다.** PC 로 명령이 가지 않는다.
@@ -209,6 +273,24 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
     executionMode: 'local',
     readOnly: true,
   },
+  {
+    name: AI_TOOL_NAMES.FIND_APPLICATION,
+    description: '등재된 Windows 프로그램이 지금 실행 중인지 확인한다.',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_APP_INSPECT],
+    executionMode: 'local',
+    readOnly: true,
+    argumentSchema: 'appId',
+  },
+  {
+    name: AI_TOOL_NAMES.ACTIVATE_WINDOW,
+    description: '등재된 Windows 프로그램의 창을 앞으로 가져온다.',
+    requiredCapabilities: [AiCapability.LOCAL_WINDOW_ACTIVATE],
+    executionMode: 'local',
+    // V0 registry 에서 **유일하게** read-only 가 아닌 항목이다.
+    readOnly: false,
+    effect: 'FOREGROUND_ACTIVATION',
+    argumentSchema: 'appId',
+  },
 ]);
 
 export function findToolDefinition(name: string): AiToolDefinition | undefined {
@@ -228,7 +310,7 @@ export function resolveAvailableTools(ctx: VerifiedToolContext): AiToolDefinitio
   const caps = new Set<string>(deriveAiCapabilities(ctx));
   return AI_TOOL_REGISTRY.filter((tool) => {
     // 안전장치: 등록부에 실행 불가 mode 나 쓰기 도구가 섞여 들어와도 후보가 되지 않는다.
-    if (!EXECUTABLE_MODES.includes(tool.executionMode) || !tool.readOnly) return false;
+    if (!EXECUTABLE_MODES.includes(tool.executionMode) || !hasAllowedEffect(tool)) return false;
     return tool.requiredCapabilities.every((c) => caps.has(c));
   });
 }
@@ -264,7 +346,8 @@ export interface ToolAuthorization {
 export function assertToolAllowed(name: string, ctx: VerifiedToolContext): ToolAuthorization {
   const tool = findToolDefinition(name);
   if (!tool) return { allowed: false, reason: 'UNKNOWN_TOOL' };
-  if (!tool.readOnly) return { allowed: false, reason: 'NOT_READ_ONLY' };
+  // read-only 가 아니면서 허용 effect 도 선언하지 않은 tool 은 여기서 끝난다.
+  if (!hasAllowedEffect(tool)) return { allowed: false, reason: 'NOT_READ_ONLY' };
   if (!EXECUTABLE_MODES.includes(tool.executionMode)) {
     return { allowed: false, reason: 'EXECUTION_MODE_NOT_ALLOWED' };
   }
@@ -276,13 +359,41 @@ export function assertToolAllowed(name: string, ctx: VerifiedToolContext): ToolA
 // ─── Arguments ───────────────────────────────────────────────────────────────
 
 /**
- * V0 tool 은 **인자를 받지 않는다**(§15).
+ * 기본은 **인자 없음**이다(§15).
  *
  * 의도적이다. `get_store_context({ storeId })` 처럼 식별자를 모델/클라이언트가 넘기게 하면
  * 그 값을 신뢰하는 순간 권한 우회가 된다. 대신 서버가 세션에서 매장을 확정한다.
- * 따라서 유효한 인자는 **빈 객체뿐**이며, 그 외는 전부 거부한다.
+ * 따라서 기본 스키마에서 유효한 인자는 **빈 객체뿐**이며, 그 외는 전부 거부한다.
+ *
+ * 예외는 창 축 tool 하나뿐이다(WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0 §9).
+ * 그 tool 도 자유 식별자를 받는 것이 아니라 **등재부에 있는 appId 만** 받는다 —
+ * 즉 모델이 넘긴 값을 신뢰하는 것이 아니라 서버가 가진 목록과 대조해 통과시킨다.
  */
-export function validateToolArguments(args: unknown): { ok: boolean; reason?: ToolDenyReason } {
+export function validateToolArguments(
+  args: unknown,
+  tool?: AiToolDefinition,
+): { ok: boolean; reason?: ToolDenyReason } {
+  const schema = tool?.argumentSchema ?? 'none';
+
+  if (schema === 'appId') {
+    // 창 축 tool 은 **정확히 `{ appId }` 하나**만 받는다 (§9).
+    // 값은 모델이 만든 문자열이므로 그대로 믿지 않고 등재부와 대조한다.
+    // processName · exe 경로 · 창 핸들을 넘길 통로는 형상 자체에 없다.
+    if (!args || typeof args !== 'object' || Array.isArray(args)) {
+      return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    }
+    const keys = Object.keys(args as Record<string, unknown>);
+    if (keys.length !== 1 || keys[0] !== 'appId') {
+      return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    }
+    const appId = (args as Record<string, unknown>).appId;
+    if (typeof appId !== 'string' || !isRegisteredWindowsApp(appId)) {
+      // 등재되지 않은 프로그램은 여기서 끝난다 — 명령이 발행되지 않는다(§10).
+      return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    }
+    return { ok: true };
+  }
+
   if (args === undefined || args === null) return { ok: true };
   if (typeof args !== 'object' || Array.isArray(args)) {
     return { ok: false, reason: 'INVALID_ARGUMENTS' };

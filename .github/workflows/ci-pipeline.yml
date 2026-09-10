@@ -211,6 +211,15 @@ jobs:
     - name: Run tests (web-kpa-society Vitest)
       run: npx vitest run --config services/web-kpa-society/vitest.config.mjs
 
+    # WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0 §5 (선행 작업)
+    # services/web-neture 의 Local Work Agent 연결 카드 회귀 테스트는
+    # vitest.config.mjs 만 있고 workflow step 이 없어 로컬 전용이었다.
+    # LNA 미허용 / agent 미실행 / 정상 연결을 구분하는 안내·재시도 UX 는
+    # 조용히 깨지는 축이라 blocking 으로 연결한다.
+    # DB · secret 불필요. 루트에 설치된 vitest/jsdom 을 그대로 쓴다.
+    - name: Run tests (web-neture Vitest)
+      run: npx vitest run --config services/web-neture/vitest.config.mjs
+
   # 2. Build all applications
   build:
     name: Build Applications

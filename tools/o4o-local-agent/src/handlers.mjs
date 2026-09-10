@@ -13,12 +13,17 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * import 목록을 보라
  *
- * 이 파일은 `node:os` 하나만 가져온다. `child_process` 도 `fs` 도 없다.
- * 즉 shell 실행 · 파일 접근이 "금지" 되어 있는 게 아니라 **가능하지 않다.**
- * 정책은 우회할 수 있지만 없는 코드는 우회할 수 없다.
+ * 이 파일은 `node:os` 와 저장소 안의 모듈 두 개만 가져온다. `fs` 는 여전히 없다.
+ * 즉 **임의 파일 접근은 여기서 가능하지 않다.**
+ *
+ * 외부 프로세스 실행은 `windows-window-control.mjs` **한 파일에만** 있고, 그 파일이
+ * 실행할 수 있는 것은 저장소에 체크인된 `.ps1` 두 개뿐이다(그 파일 머리말 참조).
+ * 이 handler 는 그 두 함수만 부를 수 있고, 임의 명령을 만들어 넘길 통로가 없다.
  */
 
 import os from 'node:os';
+import { findWindowsApp } from './windows-app-registry.mjs';
+import { activateWindowHandle, censusWindows, matchWindows } from './windows-window-control.mjs';
 
 export const AGENT_VERSION = '0.1.0';
 
@@ -26,7 +31,22 @@ export const AGENT_VERSION = '0.1.0';
 export const ACTIONS = {
   GET_AGENT_STATUS: 'local.get_agent_status',
   GET_SYSTEM_INFO: 'local.get_system_info',
+  FIND_APPLICATION: 'local.find_application',
+  ACTIVATE_WINDOW: 'local.activate_window',
 };
+
+/**
+ * app 대상 action 은 `base#appId` 형태로 온다 (서버 계약과 동일).
+ * 여기서도 appId 는 **등재 목록에 있어야만** 통과한다 — 이중 allowlist 의 agent 쪽 절반(§24).
+ */
+const APP_ACTION_SEPARATOR = '#';
+
+function parseAction(action) {
+  const raw = String(action ?? '');
+  const idx = raw.indexOf(APP_ACTION_SEPARATOR);
+  if (idx < 0) return { base: raw, appId: undefined };
+  return { base: raw.slice(0, idx), appId: raw.slice(idx + APP_ACTION_SEPARATOR.length) };
+}
 
 /**
  * Windows 빌드 번호를 사람이 읽는 버전으로 바꾼다.
@@ -76,9 +96,92 @@ function getAgentStatus(context) {
   };
 }
 
+/**
+ * `local.find_application` — 등재 앱이 지금 실행 중인가 (§12·§16).
+ *
+ * 되돌리는 것은 **찾았는지 / 창이 몇 개인지 / 표시 이름** 뿐이다.
+ * PID · 창 핸들 · 창 제목 · 실행 파일 경로는 이 함수 밖으로 나가지 않는다(§20·§21).
+ */
+async function findApplication(app) {
+  const windows = matchWindows(await censusWindows(), app);
+  if (windows.length === 0) {
+    return {
+      status: 'failed',
+      errorCode: 'WINDOWS_APP_NOT_RUNNING',
+      data: { appId: app.appId, displayName: app.displayName, found: false, windowCount: 0 },
+    };
+  }
+  return {
+    status: 'success',
+    data: {
+      appId: app.appId,
+      displayName: app.displayName,
+      found: true,
+      windowCount: windows.length,
+      state: 'running',
+    },
+  };
+}
+
+/**
+ * `local.activate_window` — 등재 앱의 창을 앞으로 가져온다 (§13·§16·§18·§19).
+ *
+ * 창이 0개면 실행 안내, 2개 이상이면 **임의로 고르지 않고** ambiguous 로 끝낸다.
+ * 한 요청에서 foreground 전환은 **최대 1회**다 — 아래 호출이 그 한 번이다(§19).
+ */
+async function activateWindow(app) {
+  const windows = matchWindows(await censusWindows(), app);
+  if (windows.length === 0) {
+    return {
+      status: 'failed',
+      errorCode: 'WINDOWS_APP_NOT_RUNNING',
+      data: { appId: app.appId, displayName: app.displayName, found: false, windowCount: 0 },
+    };
+  }
+  if (windows.length > 1) {
+    return {
+      status: 'failed',
+      errorCode: 'WINDOWS_APP_WINDOW_AMBIGUOUS',
+      data: {
+        appId: app.appId,
+        displayName: app.displayName,
+        found: true,
+        windowCount: windows.length,
+      },
+    };
+  }
+
+  const outcome = await activateWindowHandle(windows[0].hwnd);
+  if (!outcome.activated) {
+    return {
+      status: 'failed',
+      errorCode: 'WINDOW_ACTIVATION_FAILED',
+      data: { appId: app.appId, displayName: app.displayName, found: true, windowCount: 1 },
+    };
+  }
+  return {
+    status: 'success',
+    data: {
+      appId: app.appId,
+      displayName: app.displayName,
+      found: true,
+      windowCount: 1,
+      activated: true,
+      restored: outcome.restored === true,
+      state: 'foreground',
+    },
+  };
+}
+
 const HANDLERS = {
   [ACTIONS.GET_AGENT_STATUS]: getAgentStatus,
   [ACTIONS.GET_SYSTEM_INFO]: getSystemInfo,
+};
+
+/** appId 를 받는 handler. 위 HANDLERS 와 분리해 둔다 — 인자 유무가 곧 계약이다. */
+const APP_HANDLERS = {
+  [ACTIONS.FIND_APPLICATION]: findApplication,
+  [ACTIONS.ACTIVATE_WINDOW]: activateWindow,
 };
 
 /**
@@ -88,8 +191,27 @@ const HANDLERS = {
  * handler 가 터졌다는 사실이 스택 트레이스와 함께 cloud 로 올라가면
  * 경로 · 사용자명 같은 것이 새어 나갈 수 있다. 코드만 보낸다.
  */
-export function runAction(action, context) {
-  const handler = HANDLERS[action];
+export async function runAction(action, context) {
+  const { base, appId } = parseAction(action);
+
+  const appHandler = APP_HANDLERS[base];
+  if (appHandler) {
+    // 등재되지 않은 appId 는 서버가 보냈더라도 여기서 끝난다 (§10·§24).
+    const app = appId ? findWindowsApp(appId) : undefined;
+    if (!app) return { status: 'denied', errorCode: 'WINDOWS_APP_NOT_REGISTERED' };
+    // Windows 밖에서는 창 제어를 시도하지 않는다 (§9 V0 = Windows 전용).
+    if (process.platform !== 'win32') {
+      return { status: 'failed', errorCode: 'LOCAL_AGENT_EXECUTION_FAILED' };
+    }
+    try {
+      return await appHandler(app);
+    } catch {
+      return { status: 'failed', errorCode: 'LOCAL_AGENT_EXECUTION_FAILED' };
+    }
+  }
+
+  // 인자 없는 action 은 `base#...` 형태를 허용하지 않는다 — 정확히 일치해야 한다.
+  const handler = appId === undefined ? HANDLERS[base] : undefined;
   if (!handler) {
     // 서버가 뭘 보냈든 이름이 낯설면 여기서 끝난다. 이것이 §28 의 요구사항이다.
     return { status: 'denied', errorCode: 'DENIED_UNKNOWN_ACTION' };
@@ -103,5 +225,5 @@ export function runAction(action, context) {
 
 /** 테스트·감사용. 이 목록 밖의 action 은 존재하지 않는다. */
 export function listAllowedActions() {
-  return Object.keys(HANDLERS);
+  return [...Object.keys(HANDLERS), ...Object.keys(APP_HANDLERS)];
 }

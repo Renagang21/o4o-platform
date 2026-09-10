@@ -29,11 +29,12 @@
 import { randomUUID, randomBytes, createHash, timingSafeEqual } from 'crypto';
 import type { DataSource } from 'typeorm';
 import {
+  APP_TARGET_ACTIONS,
   LOCAL_AGENT_ERROR,
   SUPPORTED_AGENT_PLATFORMS,
   isAllowedLocalAction,
-  pickSafeSystemInfo,
-  type LocalAgentAction,
+  parseLocalAction,
+  pickSafeResultData,
   type LocalCommand,
   type LocalCommandResult,
 } from './local-agent-protocol.js';
@@ -481,7 +482,7 @@ export async function issueCommand(
     ok: true,
     command: {
       commandId,
-      action: params.action as LocalAgentAction,
+      action: params.action,
       args: {},
       issuedAt: issuedAt.toISOString(),
       expiresAt: expiresAt.toISOString(),
@@ -517,7 +518,7 @@ export async function claimPendingCommands(
   );
   return rows.map((r: Record<string, unknown>) => ({
     commandId: String(r.command_id),
-    action: String(r.action) as LocalAgentAction,
+    action: String(r.action),
     args: {} as Record<string, never>,
     issuedAt: new Date(r.issued_at as string).toISOString(),
     expiresAt: new Date(r.expires_at as string).toISOString(),
@@ -532,7 +533,7 @@ export type SubmitResultOutcome = { ok: true } | { ok: false; errorCode: string 
  * status IN ('pending','delivered') 조건부 UPDATE 이므로 **이미 종결된 commandId 로
  * 다시 들어오면 갱신되는 row 가 없고** REPLAY_REJECTED 로 끝난다. 종결 상태가 곧 잠금이다.
  *
- * data 는 pickSafeSystemInfo 로 걸러 저장한다 — agent 가 뭘 실어 보내든
+ * data 는 **action 별 출력 화이트리스트**(pickSafeResultData)로 걸러 저장한다 — agent 가 뭘 실어 보내든
  * 화이트리스트 밖 필드는 **DB 에도, 프롬프트에도 도달하지 않는다**(§21·§36).
  */
 export async function submitCommandResult(
@@ -546,7 +547,7 @@ export async function submitCommandResult(
   if (!isUuid(commandId)) return { ok: false, errorCode: LOCAL_AGENT_ERROR.REPLAY_REJECTED };
 
   const rows = await dataSource.query(
-    `SELECT command_id, status, expires_at FROM local_agent_commands
+    `SELECT command_id, status, expires_at, action FROM local_agent_commands
       WHERE command_id = $1 AND device_id = $2 LIMIT 1`,
     [commandId, deviceId],
   );
@@ -568,7 +569,14 @@ export async function submitCommandResult(
   const status = ['success', 'denied', 'failed', 'expired'].includes(result.status)
     ? result.status
     : 'failed';
-  const safeData = status === 'success' ? pickSafeSystemInfo(result.data) : null;
+  // 실패 결과는 원칙적으로 아무것도 남기지 않는다 (스택 · 경로가 실릴 자리를 만들지 않는다).
+  // 예외는 창 대상 action 의 실패뿐이다 — "창이 3개라 확정할 수 없다"(§16) 는 개수 자체가
+  // 사용자에게 전해야 하는 답이고, 그 화이트리스트에는 개수·상태 말고 실릴 수 있는 것이 없다.
+  const action = String(cmd.action ?? '');
+  const keepFailureData =
+    status === 'failed' && APP_TARGET_ACTIONS.includes(parseLocalAction(action).base);
+  const safeData =
+    status === 'success' || keepFailureData ? pickSafeResultData(action, result.data) : null;
 
   const updated = returnedRows(
     await dataSource.query(

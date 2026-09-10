@@ -48,7 +48,7 @@ import { execute } from '@o4o/ai-core';
 import { dynamicLimiter } from '../middleware/rateLimiter.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
 import {
-  selectToolForRequest,
+  selectToolInvocationForRequest,
   executeAiTool,
   renderToolContext,
   looksLikeLocalScopedRequest,
@@ -1910,10 +1910,12 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
     let toolContextBlock: string | null = null;
     let executedTool: string | null = null;
     let toolOutcome: string | null = null;
-    const selectedTool = selectToolForRequest(message, toolCtx);
-    if (selectedTool) {
-      const toolResult = await executeAiTool(AppDataSource, selectedTool, {}, toolCtx);
-      executedTool = selectedTool;
+    // 인자(appId)는 라우터가 등재부에서 고른 값이고, 실행 직전 계약 계층이 다시 대조한다.
+    // 클라이언트나 모델이 보낸 값이 여기로 들어오는 경로는 없다.
+    const selected = selectToolInvocationForRequest(message, toolCtx);
+    if (selected) {
+      const toolResult = await executeAiTool(AppDataSource, selected.tool, selected.args, toolCtx);
+      executedTool = selected.tool;
       toolOutcome = toolResult.ok ? 'allowed' : toolResult.reason;
       toolContextBlock = renderToolContext(toolResult);
     }
