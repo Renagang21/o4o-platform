@@ -1,7 +1,8 @@
 # CHECK-O4O-AI-CAPABILITY-TOOL-ROUTING-V0
 
 - **WO**: WO-O4O-AI-CAPABILITY-TOOL-ROUTING-V0
-- **일자**: 2026-09-09
+- **일자**: 2026-09-09 (한글 Case B 재확인 2026-09-10)
+- **상태**: **CLOSED** — production smoke 전 Case PASS
 - **선행**: COMMON-HOME-PHASE1 · WORK-SCOPE-V0 · STORE-RESOLUTION-V0 · HOME-AI-INPUT-V0 (전부 CLOSED)
   · MULTI-PROVIDER-RUNTIME-V0 (NOT CLOSED — OpenAI quota 잔여. 런타임은 ESTABLISHED 라 차단 아님)
 - **작업 브랜치**: `work/ai-capability-tool-routing-v0` (AI 전용 worktree `C:/tmp/o4o-work-scope`)
@@ -223,7 +224,7 @@ eslint (신규·변경 4파일)            → PASS (0)
 > 처음 작성한 union 형태(`{allowed:true}|{allowed:false;reason}`)가 호출부에서 TS2339 를 냈다.
 > 저장소 설정에 맞춰 optional field 를 가진 평평한 interface 로 바꿨다(런타임 형상 동일).
 
-## 11. production smoke — Case A PASS · Case B 결함 발견·수정 후 재확인 대기
+## 11. production smoke — 전 Case PASS
 
 배포: `Deploy API Server` success (`ec84246ea`) · CodeQL success. 서빙 revision 이 해당 커밋을 포함함을
 응답 필드(`tool`/`toolOutcome` 키 존재)로 확인했다.
@@ -259,14 +260,29 @@ B′ 에서 tool 은 정상 실행됐으나 `store_capabilities` 에 enabled 행
 `enabledFeatureCount: 0` 을 반환했다. **계약은 동작하고 데이터가 비어 있는 상태**다
 (도구 결함 아님). 기능이 등록된 매장 계정으로는 목록이 채워진다.
 
-### 남은 검증 (배포 완료 후 1회)
+### 재확인 (2026-09-10) — Case B **PASS**
+
+배포: `deploy-api` run `34363463122` (`a2203886f`) **SUCCESS** · 서빙 revision
+`o4o-core-api-03577-87p` · image `a2203886f4d3e33c8f5ca32af820b035ecdef5e9` · traffic 100%.
+
+실브라우저(Chromium, `neture.co.kr` 로그인 세션, store resolved 계정)에서 재호출했다.
+
+| Case | 요청 | HTTP | `tool` | `toolOutcome` | 서버 확정 scope | 판정 |
+|:-:|---|:-:|---|:-:|---|:-:|
+| B | `내 매장 기준으로 알려줘` | 200 | `store.get_context` | `allowed` | `kpa-society` / `resolved` | ✅ **PASS** |
+| B-2 | `우리 약국에서 지금 쓸 수 있는 기능을 알려줘` | 200 | `store.get_context` | `allowed` | `kpa-society` / `resolved` | ✅ PASS |
+| B′ | `List the features available in my store` | 200 | `store.get_context` | `allowed` | `kpa-society` / `resolved` | ✅ PASS (회귀) |
+| A | `약국 POP 제작 시 기본 원칙…` | 200 | `null` | `null` | `neture` / `home` | ✅ PASS (회귀) |
+
+- browser console error **0**.
+- 한글 지시어 2개 변형(`내 매장` / `우리 약국`) 모두 동일하게 tool 을 선택했다.
+- 일반 질문(A)은 여전히 tool 을 고르지 않는다 — 과잉 선택 없음.
+- 클라이언트가 보낸 `serviceKey:"kpa"` 를 서버가 `kpa-society` 로 재확정했다(서버 재검증 유지).
+- B-2 응답은 "현재 약국에서 활성화된 기능이 없습니다" — 위 관측 사실(enabled 0)과 일치한다.
 
 ```text
-a2203886f 배포 완료 → Case B 한글 재호출
-기대: tool=store.get_context · outcome=allowed
+WO-O4O-AI-CAPABILITY-TOOL-ROUTING-V0 = CLOSED
 ```
-
-Case A / B′ 는 이미 PASS 이므로 이 1건만 확인하면 §26 이 닫힌다.
 
 ## 12. DB migration / write
 
@@ -305,7 +321,10 @@ DB write          0   (executor 는 SELECT 전용 — 테스트로 고정)
 2. **provider-native function calling** — ai-core provider 인터페이스에 tools 를 추가하는 **구조 변경**이라 F1 Frozen 해제 WO 가 선행돼야 한다. 그때 이번 `AiToolDefinition` → provider schema 변환 adapter 를 붙인다.
 3. **쓰기 tool** — 기존 `action-queue` `ExecuteHandler` / `TRIGGER_WHITELIST` 가 이미 쓰기 실행기라 그 위에 capability 를 얹는 형태가 자연스럽다. 승인·감사(action-log-core)가 동반돼야 한다.
 4. **tool 호출 감사 로깅** — 위 §13-5.
-5. **비-ASCII 정규식 리터럴 전수 점검 + `tsup charset` 결정** — 위 §13-7. 슬러그 생성 계열 4곳 확인 필요.
+5. **`WO-O4O-API-BUNDLE-NONASCII-REGEX-CENSUS-V1`** (별도 후속, 2026-09-10 사용자 지시) — 위 §13-7.
+   목적: production bundle 의 비-ASCII regex literal 전수 census · 실제 번들 결과 확인 ·
+   한글 slug 경로 smoke · 개별 코드 수정 vs `tsup charset=utf8` 중 canonical 해결책 판정.
+   **이번 WO 범위 밖이며 production defect 로 확인된 것은 아니다** ("동일 원인일 수 있음" 수준).
 5. **OpenAI quota closure** — 직전 WO 잔여(별도 운영 후속).
 
 ## 15. 문서 정합
@@ -324,7 +343,7 @@ DB write          0   (executor 는 SELECT 전용 — 테스트로 고정)
 | TOOL REGISTRY = ESTABLISHED | 충족 (2 tools, server·read-only) |
 | TOOL ELIGIBILITY = PASS | 충족 (이중 차단) |
 | SERVER REVALIDATION = PASS | 충족 |
-| READ-ONLY TOOL = PRODUCTION PASS | **부분** — 영어 경로 PASS(tool 실행 실증). 한글 경로는 번들 결함 수정 후 재확인 대기. §11 |
+| READ-ONLY TOOL = PRODUCTION PASS | **충족** — 한글·영어 경로 모두 tool 실행 실증 (2026-09-10 재확인). §11 |
 | CROSS-SERVICE LEAK = 0 | 충족 |
 | DB MIGRATION = 0 | 충족 |
 | DB WRITE = 0 | 충족 |
@@ -332,5 +351,5 @@ DB write          0   (executor 는 SELECT 전용 — 테스트로 고정)
 | LOCAL EXECUTION = 0 | 충족 |
 | BROWSER EXECUTION = 0 | 충족 |
 | tests / type-check / build / CI | 충족 — 4 suites / 86 tests PASS · type-check 내 파일 0 · eslint 0 |
-| production smoke | **부분** — Case A·B′ PASS / Case B(한글) 재확인 1건 잔여. §11 |
+| production smoke | **충족** — Case A / B / B-2 / B′ 전부 PASS. §11 |
 | CHECK 작성 · commit/push | 충족 |
