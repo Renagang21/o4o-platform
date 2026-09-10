@@ -33,6 +33,8 @@ import type { KpaFeeCategory } from '../../routes/kpa/entities/kpa-member.entity
 
 export type FeeFailureCode =
   | 'LEDGER_NOT_FOUND'
+  | 'LEDGER_EXISTS'
+  | 'MEMBER_NOT_IN_BRANCH'
   | 'POLICY_INVALID'
   | 'FEE_VALUE_INVALID'
   | 'YEAR_INVALID';
@@ -392,6 +394,95 @@ export class BranchFeeService {
     }
 
     return { created, skipped, targetCount: targets.length };
+  }
+
+  /**
+   * 개별 부과 — 한 회원의 그 연도 원장을 회비구분과 함께 만든다 (수기 부과).
+   *
+   * WO-O4O-KPA-BRANCH-TENANT-ONBOARDING-AND-MVP-PRODUCTION-E2E-V1 §9 MUST_AUTOMATE:
+   *   일괄 부과(`assessYear`)는 회비구분을 `kpa_members.fee_category` 에서만 읽는다.
+   *   그런데 분회 서비스로 직접 가입한 회원에게는 KPA 회원 원장 행이 아예 없고,
+   *   신상신고 sync 도 그 행을 **만들지 않는다**(축 경계 — AnnualReportMembershipSyncService).
+   *   그래서 신규 분회는 전원 NO_FEE_CATEGORY 로 걸려 회비 업무를 시작할 수 없었다.
+   *   회비구분은 양식에서도 `ownership: 'association'` — 회원이 아니라 **분회가 정하는 값**이고,
+   *   그 판정을 적을 자리는 이미 있다(entity 주석: "구분이 없던 회원은 null — 수기 부과").
+   *   비어 있던 것은 그 자리를 만드는 경로뿐이므로 그것만 추가한다.
+   *
+   * `kpa_members` 에 되쓰지 않는다 (이 파일 상단 원칙). 쓰는 곳은 분회 원장 한 곳이다.
+   */
+  static async createLedger(params: {
+    organizationId: string;
+    userId: string;
+    year: number;
+    feeCategory: string;
+    actorUserId: string;
+  }): Promise<FeeLedgerItem> {
+    const year = this.assertYear(params.year);
+
+    const category = typeof params.feeCategory === 'string' ? params.feeCategory.trim() : '';
+    if (!category || category.length > FEE_CATEGORY_MAX) {
+      throw new BranchFeeError('FEE_VALUE_INVALID', '회비구분을 선택해 주세요.', 422);
+    }
+
+    /**
+     * 대상은 **이 분회 active 소속 회원**뿐이다. user_id 단독 조회를 하지 않는다
+     * (CLAUDE.md §7 Guard Rule 1) — 다른 분회 회원에게 부과할 수 없다.
+     */
+    const member: Array<Record<string, any>> = await AppDataSource.query(
+      `SELECT 1 FROM branch_memberships
+        WHERE organization_id = $1 AND user_id = $2 AND status = 'active' LIMIT 1`,
+      [params.organizationId, params.userId],
+    );
+    if (!member.length) {
+      throw new BranchFeeError('MEMBER_NOT_IN_BRANCH', '이 분회의 회원이 아닙니다.', 404);
+    }
+
+    // 금액은 언제나 정책에서 파생한다 — 부과액을 직접 받지 않는다 (일괄 부과와 같은 규칙).
+    const policies = await this.listPolicies({ organizationId: params.organizationId, year });
+    const amount = policies.find((p) => p.feeCategory === category)?.amount;
+    if (amount === undefined) {
+      throw new BranchFeeError(
+        'POLICY_INVALID',
+        `${year}년 «${category}» 회비 정책이 없습니다. 먼저 정책을 등록해 주세요.`,
+        409,
+      );
+    }
+
+    const status: BranchFeeStatus = amount > 0 ? 'unpaid' : 'exempt';
+    const exemptionType: BranchFeeExemptionType | null = status === 'exempt' ? 'other' : null;
+    const exemptionReason = status === 'exempt' ? '정책 부과액 0원 (개별 부과 자동 기록)' : null;
+
+    const inserted: Array<Record<string, any>> = await AppDataSource.query(
+      `INSERT INTO branch_fee_ledgers
+         (organization_id, user_id, year, fee_category, assessed_amount, paid_amount, status,
+          exemption_type, exemption_reason, updated_by)
+       VALUES ($1, $2, $3, $4, $5, 0, $6, $7, $8, $9)
+       ON CONFLICT (organization_id, user_id, year) DO NOTHING
+       RETURNING id`,
+      [
+        params.organizationId, params.userId, year, category, amount, status,
+        exemptionType, exemptionReason, params.actorUserId,
+      ],
+    );
+
+    /**
+     * 이미 있는 행을 덮어쓰지 않는다 — 납부 기록 보호(일괄 부과와 같은 원칙).
+     * 구분을 바꾸려면 PATCH 를 쓴다. 그래서 여기서는 409 로 알린다.
+     */
+    if (!inserted.length) {
+      throw new BranchFeeError('LEDGER_EXISTS', `${year}년 회비가 이미 부과되어 있습니다.`, 409);
+    }
+
+    const rows: Array<Record<string, any>> = await AppDataSource.query(
+      `SELECT l.id, l.year, l.user_id, l.fee_category, l.assessed_amount, l.paid_amount,
+              l.paid_at, l.status, l.exemption_type, l.exemption_reason, l.memo, l.updated_at,
+              u.name AS user_name, u.email AS user_email
+         FROM branch_fee_ledgers l
+         JOIN users u ON u.id = l.user_id
+        WHERE l.id = $1 AND l.organization_id = $2`,
+      [inserted[0].id, params.organizationId],
+    );
+    return this.serialize(rows[0]);
   }
 
   /**
