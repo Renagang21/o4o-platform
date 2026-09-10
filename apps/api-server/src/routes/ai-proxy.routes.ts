@@ -17,6 +17,7 @@ import { aiProxyService } from '../services/ai-proxy.service.js';
 // WO-O4O-AI-PROVIDER-ABSTRACTION-CALLPROVIDER-ALIGNMENT-V1: surface→provider guardrail gate
 import { resolveEditingModel, editingSurfaceForOutputType } from '../utils/ai-editing-model-resolver.js';
 import { AppDataSource } from '../database/connection.js';
+import { resolveTargetDevice } from '../services/local-agent/local-agent-service.js';
 import type { AuthRequest } from '../types/auth.js';
 import logger from '../utils/logger.js';
 import { resolveAiApiKey } from '../utils/ai-key.util.js';
@@ -50,6 +51,7 @@ import {
   selectToolForRequest,
   executeAiTool,
   renderToolContext,
+  looksLikeLocalScopedRequest,
 } from '../services/ai-tools/ai-tool-router.js';
 import type { VerifiedToolContext } from '../services/ai-tools/ai-tool-contract.js';
 import {
@@ -1889,6 +1891,19 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
       // 비-store 축: 식별자를 확정할 필요가 없으므로 서비스 표기만 정규화해 싣는다.
       facts.serviceKey = requestedServiceKey;
       toolCtx.serviceKey = requestedServiceKey;
+    }
+
+    // WO-O4O-LOCAL-WORK-AGENT-V0: local 축 연결 상태도 **서버가** 확정한다.
+    //   로컬 지시어가 있는 요청에서만 조회한다 — 모든 home-chat 요청마다
+    //   device 테이블을 읽을 이유가 없고, capability 는 tool 이 고려될 때만 필요하다.
+    if (looksLikeLocalScopedRequest(message)) {
+      const deviceResolution = await resolveTargetDevice(AppDataSource, userId);
+      toolCtx.localAgentStatus =
+        deviceResolution.status === 'ok' ? 'connected' : deviceResolution.status;
+      if (deviceResolution.status === 'ok') {
+        // organizationId 와 같은 규칙: executor 내부에서만 쓰고 응답에 싣지 않는다.
+        toolCtx.localDeviceId = deviceResolution.device.id;
+      }
     }
 
     // ── Tool routing (결정론적, 최대 1회 — agent loop 없음) ──────────────────

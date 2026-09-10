@@ -48,7 +48,25 @@ export const AiCapability = {
   READ_ONLY_AI_CONTEXT: 'READ_ONLY_AI_CONTEXT',
   /** 현재 사용자의 **확정된** 매장 컨텍스트 조회. 매장이 resolved 일 때만 성립한다. */
   READ_ONLY_STORE_CONTEXT: 'READ_ONLY_STORE_CONTEXT',
+  /**
+   * 이 사용자의 Local Work Agent **연결 상태** 조회 (§19 `local.agent.status`).
+   * 인증만 되면 성립한다 — 답이 "연결 안 됨" 일 수 있어야 §41 안내가 가능하다.
+   */
+  READ_ONLY_LOCAL_AGENT_STATUS: 'READ_ONLY_LOCAL_AGENT_STATUS',
+  /**
+   * 연결된 PC 의 **안전 시스템 정보** 조회 (§19 `local.system.info`).
+   * agent 가 실제로 붙어 있을 때만 성립한다.
+   */
+  READ_ONLY_LOCAL_SYSTEM_INFO: 'READ_ONLY_LOCAL_SYSTEM_INFO',
 } as const;
+
+/**
+ * ⚠️ 여기서 멈춘다 (§19·§22·§23·§24).
+ *
+ * `local.read` · `local.write` · `browser` · `desktop` capability 는 **정의하지 않는다.**
+ * 위 두 개는 "연결됐는가" 와 "무슨 OS 인가" 뿐이고, 둘 다 파일·프로세스·화면에 닿지 않는다.
+ * V0 가 증명하려는 것은 *능력의 범위* 가 아니라 *연결·인증·명령·허용목록·왕복* 이라는 배관이다.
+ */
 
 export type AiCapabilityKey = (typeof AiCapability)[keyof typeof AiCapability];
 
@@ -72,6 +90,15 @@ export interface VerifiedToolContext {
    * 이 값은 executor 내부에서만 쓰고 프롬프트·응답에 싣지 않는다.
    */
   organizationId?: string;
+  /**
+   * 이 사용자의 Local Work Agent 연결 상태. **서버가 DB 에서 확정한다**(§14).
+   *
+   * 클라이언트나 agent 가 보낸 값이 아니다. `store` 축에서 클라이언트 serviceKey 를
+   * 서버가 재확정하는 것과 같은 규칙이다. 축이 아니면 undefined.
+   */
+  localAgentStatus?: 'connected' | 'offline' | 'none' | 'ambiguous';
+  /** 확정된 단일 device id. **connected 일 때만** 채워진다(§34). */
+  localDeviceId?: string;
 }
 
 /**
@@ -89,17 +116,37 @@ export function deriveAiCapabilities(ctx: VerifiedToolContext): AiCapabilityKey[
   if (ctx.storeStatus === 'resolved' && ctx.organizationId) {
     caps.push(AiCapability.READ_ONLY_STORE_CONTEXT);
   }
+  // 연결 상태 **조회** 자격은 인증만으로 성립한다. 그래야 "연결 안 됨" 이라는 정확한
+  // 답을 돌려줄 수 있고, AI 가 없는 PC 데이터를 지어내지 않는다(§41).
+  if (ctx.userId) caps.push(AiCapability.READ_ONLY_LOCAL_AGENT_STATUS);
+  // PC 에 실제로 명령을 보내는 자격은 **connected + 단일 device 확정** 일 때만.
+  // offline · none · ambiguous 는 부여하지 않는다 — 매장 ambiguous 를 다루는 방식과 같다.
+  if (ctx.localAgentStatus === 'connected' && ctx.localDeviceId) {
+    caps.push(AiCapability.READ_ONLY_LOCAL_SYSTEM_INFO);
+  }
   return caps;
 }
 
 // ─── Tool 정의 ───────────────────────────────────────────────────────────────
 
 /**
- * 실행 위치. V0 는 **`server` 만 실제로 존재한다.**
- * `local` / `browser` 는 후속 Local Work Agent 를 위한 계약 자리이며,
- * 이번 registry 에 그 값을 가진 tool 을 **등록하지 않는다**(§21·§22·§23).
+ * 실행 위치.
+ *
+ * - `server` — API 서버 안에서 끝난다.
+ * - `local`  — 사용자의 PC 에 있는 Local Work Agent 로 **왕복**한다
+ *              (WO-O4O-LOCAL-WORK-AGENT-V0 에서 열렸다).
+ * - `browser`— 아직 **닫혀 있다.** 등록된 tool 이 없고 아래 게이트도 통과시키지 않는다.
+ *              브라우저 제어 · Computer Use 는 후속 WO 의 판단 대상이다(§24).
  */
 export type ToolExecutionMode = 'server' | 'local' | 'browser';
+
+/**
+ * 실행이 허용된 mode. **registry 에 무엇이 등록돼 있든 이 집합이 최종 게이트다.**
+ *
+ * `browser` 가 빠져 있는 것이 핵심이다 — 누군가 실수로 browser tool 을 등록해도
+ * eligibility 와 실행 판정 양쪽에서 탈락한다.
+ */
+const EXECUTABLE_MODES: readonly ToolExecutionMode[] = Object.freeze(['server', 'local']);
 
 export interface AiToolDefinition {
   /** 도구 이름. `{domain}.{action}` — 기존 ACTION_KEYS 의 점 표기 관행을 따른다. */
@@ -116,14 +163,22 @@ export interface AiToolDefinition {
 export const AI_TOOL_NAMES = {
   GET_WORK_SCOPE_CONTEXT: 'workscope.get_context',
   GET_STORE_CONTEXT: 'store.get_context',
+  GET_LOCAL_AGENT_STATUS: 'local.get_agent_status',
+  GET_LOCAL_SYSTEM_INFO: 'local.get_system_info',
 } as const;
 
 export type AiToolName = (typeof AI_TOOL_NAMES)[keyof typeof AI_TOOL_NAMES];
 
 /**
- * Tool Registry — V0.
+ * Tool Registry.
  *
- * read-only · server 실행 두 개뿐이다. 쓰기 도구를 여기 넣지 않는다.
+ * 전부 read-only 다. 쓰기 도구를 여기 넣지 않는다.
+ *
+ * local 두 개의 역할이 다르다는 점에 주의:
+ *   - `local.get_agent_status` 는 **서버 DB 의 연결 상태만으로 답한다.** PC 로 명령이 가지 않는다.
+ *     "연결됐나?" 를 묻자고 상대 PC 를 깨울 이유가 없고, 꺼져 있을 때 답할 수 있어야 한다.
+ *   - `local.get_system_info` 만이 **실제 왕복**이다. V0 가 검증하려는 배관 전체
+ *     (명령 발행 → 큐 → agent allowlist → 실행 → 결과 회수)를 이 하나가 통과한다.
  */
 export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   {
@@ -138,6 +193,20 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
     description: '현재 사용자의 확정된 매장에서 사용 가능한 기능 목록을 조회한다.',
     requiredCapabilities: [AiCapability.READ_ONLY_STORE_CONTEXT],
     executionMode: 'server',
+    readOnly: true,
+  },
+  {
+    name: AI_TOOL_NAMES.GET_LOCAL_AGENT_STATUS,
+    description: '이 사용자의 PC 에 설치된 Local Work Agent 의 연결 상태를 조회한다.',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_AGENT_STATUS],
+    executionMode: 'server',
+    readOnly: true,
+  },
+  {
+    name: AI_TOOL_NAMES.GET_LOCAL_SYSTEM_INFO,
+    description: '연결된 PC 의 운영체제 이름·버전·아키텍처 등 기본 정보를 조회한다.',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_SYSTEM_INFO],
+    executionMode: 'local',
     readOnly: true,
   },
 ]);
@@ -158,8 +227,8 @@ export function findToolDefinition(name: string): AiToolDefinition | undefined {
 export function resolveAvailableTools(ctx: VerifiedToolContext): AiToolDefinition[] {
   const caps = new Set<string>(deriveAiCapabilities(ctx));
   return AI_TOOL_REGISTRY.filter((tool) => {
-    // V0 안전장치: 등록부에 server·read-only 아닌 것이 섞여 들어와도 실행 후보가 되지 않는다.
-    if (tool.executionMode !== 'server' || !tool.readOnly) return false;
+    // 안전장치: 등록부에 실행 불가 mode 나 쓰기 도구가 섞여 들어와도 후보가 되지 않는다.
+    if (!EXECUTABLE_MODES.includes(tool.executionMode) || !tool.readOnly) return false;
     return tool.requiredCapabilities.every((c) => caps.has(c));
   });
 }
@@ -196,7 +265,7 @@ export function assertToolAllowed(name: string, ctx: VerifiedToolContext): ToolA
   const tool = findToolDefinition(name);
   if (!tool) return { allowed: false, reason: 'UNKNOWN_TOOL' };
   if (!tool.readOnly) return { allowed: false, reason: 'NOT_READ_ONLY' };
-  if (tool.executionMode !== 'server') {
+  if (!EXECUTABLE_MODES.includes(tool.executionMode)) {
     return { allowed: false, reason: 'EXECUTION_MODE_NOT_ALLOWED' };
   }
   const caps = new Set<string>(deriveAiCapabilities(ctx));

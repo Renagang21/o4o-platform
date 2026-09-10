@@ -65,13 +65,18 @@ function makeDataSource(rows: Array<{ capability_key: string; enabled: boolean }
 
 describe('capability 파생 — 서버 사실만 입력', () => {
   it('1. 인증만 되면 AI context capability 를 갖는다', () => {
-    expect(deriveAiCapabilities(homeCtx())).toEqual([AiCapability.READ_ONLY_AI_CONTEXT]);
+    expect(deriveAiCapabilities(homeCtx())).toEqual([
+      AiCapability.READ_ONLY_AI_CONTEXT,
+      // WO-O4O-LOCAL-WORK-AGENT-V0: "내 PC 연결됐나" 는 인증만으로 답할 수 있다.
+      AiCapability.READ_ONLY_LOCAL_AGENT_STATUS,
+    ]);
   });
 
   it('3. store resolved 면 store context capability 가 추가된다', () => {
     expect(deriveAiCapabilities(storeResolvedCtx())).toEqual([
       AiCapability.READ_ONLY_AI_CONTEXT,
       AiCapability.READ_ONLY_STORE_CONTEXT,
+      AiCapability.READ_ONLY_LOCAL_AGENT_STATUS,
     ]);
   });
 
@@ -91,10 +96,15 @@ describe('capability 파생 — 서버 사실만 입력', () => {
 // ─── eligibility (노출 차단) ─────────────────────────────────────────────────
 
 describe('tool eligibility — 자격 없는 tool 은 노출되지 않는다', () => {
-  it('1·2. home scope 에서는 workscope tool 만 보인다', () => {
+  it('1·2. home scope 에서는 매장 tool 이 보이지 않는다', () => {
     const names = resolveAvailableTools(homeCtx()).map((t) => t.name);
-    expect(names).toEqual([AI_TOOL_NAMES.GET_WORK_SCOPE_CONTEXT]);
+    expect(names).toContain(AI_TOOL_NAMES.GET_WORK_SCOPE_CONTEXT);
     expect(names).not.toContain(AI_TOOL_NAMES.GET_STORE_CONTEXT);
+    // WO-O4O-LOCAL-WORK-AGENT-V0 이후: 인증만 되면 "PC 연결됐나" 를 물을 수 있다.
+    // 그것은 서버 DB 만으로 답하는 tool 이므로 home 에서도 열려 있다.
+    expect(names).toContain(AI_TOOL_NAMES.GET_LOCAL_AGENT_STATUS);
+    // 반면 실제 PC 를 깨우는 tool 은 연결된 기기가 없으면 열리지 않는다.
+    expect(names).not.toContain(AI_TOOL_NAMES.GET_LOCAL_SYSTEM_INFO);
   });
 
   it('3. store resolved 에서는 두 tool 모두 보인다', () => {
@@ -103,11 +113,17 @@ describe('tool eligibility — 자격 없는 tool 은 노출되지 않는다', (
     expect(names).toContain(AI_TOOL_NAMES.GET_STORE_CONTEXT);
   });
 
-  it('registry 는 server·read-only tool 만 담는다 (local/browser 0)', () => {
+  /**
+   * WO-O4O-LOCAL-WORK-AGENT-V0 에서 `local` 이 한 개 추가됐다.
+   * 고정해야 하는 것은 "server 만 있다" 가 아니라
+   * **browser 는 여전히 0 이고 쓰기 tool 은 없다** 는 쪽이다 (§22·§24).
+   */
+  it('registry 는 read-only tool 만 담고 browser tool 은 0 이다', () => {
     for (const t of AI_TOOL_REGISTRY) {
-      expect(t.executionMode).toBe('server');
+      expect(['server', 'local']).toContain(t.executionMode);
       expect(t.readOnly).toBe(true);
     }
+    expect(AI_TOOL_REGISTRY.filter((t) => t.executionMode === 'browser')).toEqual([]);
   });
 });
 
