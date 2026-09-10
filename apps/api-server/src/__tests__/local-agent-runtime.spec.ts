@@ -55,6 +55,7 @@ import {
 import {
   executeAiTool,
   looksLikeLocalScopedRequest,
+  needsLocalDeviceResolution,
   renderToolContext,
   selectToolForRequest,
 } from '../services/ai-tools/ai-tool-router.js';
@@ -735,6 +736,33 @@ describe('20. 로컬 의도 인식 — 번들 후에도 살아 있어야 한다'
     for (const m of ['안녕하세요', '약국 POP 원칙', 'store hours']) {
       expect(looksLikeLocalScopedRequest(m)).toBe(false);
     }
+  });
+
+  /**
+   * 회귀 고정 — 2026-09-10 프로덕션 실측 결함의 재발 방지.
+   *
+   * 라우트가 device 조회 여부를 **자기 규칙으로** 판단하면 라우터의 선택 규칙과
+   * 어긋난다. 창 축 문장에는 로컬 지시어("내 PC")가 없어서 device 를 조회하지 않았고,
+   * capability 가 비어 tool 이 하나도 고려되지 않았다(응답 `tool: null`).
+   */
+  it('창 축 문장은 로컬 지시어가 없어도 device 조회 대상이다', () => {
+    for (const m of ['메모장이 실행되고 있는지 확인해 줘', 'is notepad running?']) {
+      expect(looksLikeLocalScopedRequest(m)).toBe(false);
+      expect(needsLocalDeviceResolution(m)).toBe(true);
+    }
+    // 로컬 지시어 쪽도 그대로 살아 있어야 한다.
+    expect(needsLocalDeviceResolution('내 PC 사양 알려줘')).toBe(true);
+    expect(needsLocalDeviceResolution('안녕하세요')).toBe(false);
+  });
+
+  /** 라우트가 그 판정을 다시 자기 손으로 하지 않는지 소스로 고정한다. */
+  it('ai-proxy.routes 는 needsLocalDeviceResolution 만 쓴다', () => {
+    const src = readFileSync(
+      join(__dirname, '..', 'routes', 'ai-proxy.routes.ts'),
+      'utf8',
+    );
+    expect(src).toContain('needsLocalDeviceResolution(message)');
+    expect(src).not.toContain('looksLikeLocalScopedRequest(message)');
   });
 
   /**

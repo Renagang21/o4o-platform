@@ -51,7 +51,7 @@ import {
   selectToolInvocationForRequest,
   executeAiTool,
   renderToolContext,
-  looksLikeLocalScopedRequest,
+  needsLocalDeviceResolution,
 } from '../services/ai-tools/ai-tool-router.js';
 import type { VerifiedToolContext } from '../services/ai-tools/ai-tool-contract.js';
 import {
@@ -1894,9 +1894,11 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
     }
 
     // WO-O4O-LOCAL-WORK-AGENT-V0: local 축 연결 상태도 **서버가** 확정한다.
-    //   로컬 지시어가 있는 요청에서만 조회한다 — 모든 home-chat 요청마다
+    //   로컬 축이 걸리는 요청에서만 조회한다 — 모든 home-chat 요청마다
     //   device 테이블을 읽을 이유가 없고, capability 는 tool 이 고려될 때만 필요하다.
-    if (looksLikeLocalScopedRequest(message)) {
+    //   WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0: 그 판정은 라우터가 준다. 창 축("메모장
+    //   열려 있어?")에는 로컬 지시어가 없어서, 여기서 따로 판단하면 조용히 어긋난다.
+    if (needsLocalDeviceResolution(message)) {
       const deviceResolution = await resolveTargetDevice(AppDataSource, userId);
       toolCtx.localAgentStatus =
         deviceResolution.status === 'ok' ? 'connected' : deviceResolution.status;

@@ -548,6 +548,19 @@ export function selectToolForRequest(message: string, ctx: VerifiedToolContext):
   return invocation ? invocation.tool : null;
 }
 
+/**
+ * 서버가 local device 를 조회해야 하는 요청인가.
+ *
+ * 라우트는 **모든** home-chat 요청마다 device 테이블을 읽지 않는다(§20 정신: 필요한
+ * 때만 본다). 그 판단을 라우트가 자기 나름으로 하면 라우터의 선택 규칙과 어긋난다 —
+ * 실제로 창 축이 그렇게 어긋났다. "메모장 열려 있어?" 에는 로컬 지시어("내 PC")가
+ * 없어서 device 를 조회하지 않았고, 그 결과 창 축 capability 가 비어 tool 이 하나도
+ * 고려되지 않았다. **선택 규칙과 같은 판정을 여기서 한 번에 준다.**
+ */
+export function needsLocalDeviceResolution(message: string): boolean {
+  return looksLikeLocalScopedRequest(message) || detectRegisteredApp(message) !== null;
+}
+
 /** 고른 tool 과 그 인자. 인자를 받지 않는 tool 은 `args` 가 빈 객체다. */
 export interface AiToolInvocation {
   tool: AiToolName;
