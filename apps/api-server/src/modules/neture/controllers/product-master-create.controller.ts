@@ -15,20 +15,11 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../../common/middleware/auth/authorization.middleware.js';
 import { NetureService } from '../neture.service.js';
 import logger from '../../../utils/logger.js';
 import { requireProductDbWrite } from './product-db-write-authority.js';
-
-const ADMIN_ROLES = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-  'cosmetics:admin',
-  'cosmetics:operator',
-  'kpa-society:admin',
-  'kpa-society:operator',
-];
 
 /** 문자열 정규화 — 빈 값이면 undefined */
 function str(v: unknown): string | undefined {
@@ -40,7 +31,7 @@ export function createProductMasterCreateController(_dataSource: DataSource): Ro
   const netureService = new NetureService();
 
   router.use(authenticate);
-  router.use(requireRole(ADMIN_ROLES));
+  router.use(requireAdmin);
 
   // POST / — 신규 상품 등록 (barcode 선택)
   router.post('/', requireProductDbWrite, async (req: Request, res: Response) => {

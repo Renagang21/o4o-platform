@@ -12,7 +12,7 @@
     "build:with-typecheck": "tsc --noEmit && vite build",
     "preview": "npx vite preview",
     "type-check": "tsc --noEmit",
-    "lint": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --report-unused-disable-directives --max-warnings 200 || true",
+    "lint": "eslint --config ../../eslint.config.js src --report-unused-disable-directives --max-warnings 500",
     "lint:fix": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --fix",
     "test": "npx vitest run --passWithNoTests --reporter=verbose",
     "test:coverage": "npx vitest run --coverage",

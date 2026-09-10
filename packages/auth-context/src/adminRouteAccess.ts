@@ -115,15 +115,19 @@ export const collectUserRoles = (user: unknown): string[] => {
 
 /**
  * WO-O4O-PRODUCT-DB-WRITE-AUTHORITY-BOUNDARY-ALIGNMENT-V1
+ * → WO-O4O-ADMIN-PARTNEROPS-REGISTRY-PRODUCTDB-AUTH-AND-LINT-GATE-FINAL-CLOSURE-V1 §6
  *
- * 공통 Product DB(ProductMaster · 공통 설명서 · canonical) 의 **write** 권한.
- * 백엔드 `product-db-write-authority.ts` 의 `PRODUCT_DB_WRITE_ROLES` 와 같은 집합이며,
- * 화면에서 write action 을 숨기거나 비활성화하는 데 쓴다.
+ * 공통 Product DB(ProductMaster · 공통 설명서 · canonical) 의 권한.
+ * 백엔드가 `/api/v1/admin/o4o-product-db/*` 전체를 `requireAdmin`(platform:super_admin 단독)
+ * 으로 정렬했으므로, 프런트 판정 집합도 같은 단일 역할이다.
  *
- * 조회 권한과는 별개다 — 서비스 운영자는 계속 조회·검색·상세 확인이 가능하다.
- * 서비스 prefix 확장(`matchesRequiredRole`)을 적용하지 않는다: 정확히 이 역할만 write 한다.
+ * 이전 계약에서는 조회는 서비스 운영자에게도 열려 있었으나, 공통 Product DB 는 서비스별로
+ * 분리되지 않은 단일 정본이라 조회까지 플랫폼 관리자로 좁혔다. 서비스 운영자의 제안·등록 요청·
+ * 설명서 초안은 각 서비스 operator/supplier API 에서 계속 수행한다.
+ *
+ * 서비스 prefix 확장(`matchesRequiredRole`)을 적용하지 않는다: 정확히 이 역할만 허용한다.
  */
-export const PRODUCT_DB_WRITE_ROLES = ['platform:super_admin', 'neture:admin', 'neture:operator'];
+export const PRODUCT_DB_WRITE_ROLES = ['platform:super_admin'];
 
 /** 사용자가 공통 Product DB 를 수정할 수 있는가 (O4O 전체 관리자). */
 export const canWriteProductDb = (user: unknown): boolean =>

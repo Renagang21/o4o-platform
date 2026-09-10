@@ -13,26 +13,17 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../../common/middleware/auth/authorization.middleware.js';
 import { ProductUsageLinksService } from '../services/product-usage-links.service.js';
 import logger from '../../../utils/logger.js';
-
-const ADMIN_ROLES = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-  'cosmetics:admin',
-  'cosmetics:operator',
-  'kpa-society:admin',
-  'kpa-society:operator',
-];
 
 export function createProductUsageLinksController(dataSource: DataSource): Router {
   const router = Router();
   const service = new ProductUsageLinksService(dataSource);
 
   router.use(authenticate);
-  router.use(requireRole(ADMIN_ROLES));
+  router.use(requireAdmin);
 
   router.get('/:id/usage-links', async (req: Request, res: Response) => {
     try {

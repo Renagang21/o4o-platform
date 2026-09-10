@@ -12,26 +12,17 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../../common/middleware/auth/authorization.middleware.js';
 import { ProductMasterAuditLogService } from '../services/product-master-audit-log.service.js';
 import logger from '../../../utils/logger.js';
-
-const ADMIN_ROLES = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-  'cosmetics:admin',
-  'cosmetics:operator',
-  'kpa-society:admin',
-  'kpa-society:operator',
-];
 
 export function createProductMasterAuditLogController(dataSource: DataSource): Router {
   const router = Router();
   const service = new ProductMasterAuditLogService(dataSource);
 
   router.use(authenticate);
-  router.use(requireRole(ADMIN_ROLES));
+  router.use(requireAdmin);
 
   router.get('/:id/audit-logs', async (req: Request, res: Response) => {
     try {

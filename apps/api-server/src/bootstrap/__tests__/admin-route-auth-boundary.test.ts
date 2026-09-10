@@ -1,9 +1,17 @@
 /**
  * WO-O4O-ADMIN-PRODUCT-DESCRIPTION-ROUTE-AUTH-BOUNDARY-ALIGNMENT-V1
+ * 갱신: WO-O4O-ADMIN-PARTNEROPS-REGISTRY-PRODUCTDB-AUTH-AND-LINT-GATE-FINAL-CLOSURE-V1 §6
  *
- * `/api/v1/admin` 에 mount 된 admin dashboard router 의 router-level guard 가
+ * 원 계약: `/api/v1/admin` 에 mount 된 admin dashboard router 의 router-level guard 가
  * 뒤에 mount 되는 `/api/v1/admin/o4o-product-db/*` 요청까지 가로채
- * 하위 라우터의 자체 권한 계약(requireRole(ADMIN_ROLES))을 무효화하던 문제를 고정한다.
+ * 하위 라우터의 자체 권한 계약을 무효화하던 문제를 고정한다.
+ * 이 "blanket 은 자기 prefix 만 가진다" 계약은 그대로 유효하다.
+ *
+ * 변경된 것은 **하위 라우터의 권한 계약 자체**다.
+ *   before — 하위는 requireRole(ADMIN_ROLES) (platform + 3개 서비스 admin/operator)
+ *   after  — 하위는 requireAdmin (platform:super_admin 단독)
+ * 공통 Product DB 는 서비스별로 분리되지 않은 단일 정본이므로 서비스 admin/operator 는
+ * 조회도 수정도 할 수 없다. 상세 계약은 product-db-write-authority.test.ts 가 고정한다.
  *
  * register-routes.ts 의 **실제 mount 순서**를 실제 router 로 재현한다
  * (blanket `/api/v1/admin` → 이후 `/api/v1/admin/o4o-product-db/...`).
@@ -78,11 +86,12 @@ describe('WO-O4O-ADMIN-PRODUCT-DESCRIPTION-ROUTE-AUTH-BOUNDARY-ALIGNMENT-V1', ()
       expect(res.status).not.toBe(403);
     });
 
+    // §6: 공통 정본은 platform:super_admin 단독 — 서비스 역할은 조회도 403.
     it.each(['cosmetics-operator', 'kpa-admin', 'neture-operator'])(
-      '%s 는 상위 blanket guard 에 막히지 않는다 (하위 ADMIN_ROLES 허용)',
+      '%s 는 하위 requireAdmin 에 막혀 403',
       async (user) => {
         const res = await request(app).get(MASTER).set('x-test-user', user);
-        expect(res.status).not.toBe(403);
+        expect(res.status).toBe(403);
       },
     );
 
@@ -170,18 +179,13 @@ describe('가드 배선 회귀 (source scan)', () => {
   ];
 
   it.each(PRODUCT_DB_CONTROLLERS)(
-    '%s 컨트롤러는 자체 인증 + 역할 가드를 가진다',
+    '%s 컨트롤러는 자체 인증 + requireAdmin floor 를 가진다',
     (name) => {
       const s = read(`modules/neture/controllers/${name}.controller.ts`);
       expect(s).toMatch(/router\.use\(\s*(?:authenticate|requireAuth)\s*\)/);
-      expect(s).toMatch(/router\.use\(\s*requireRole\(ADMIN_ROLES\)\s*\)/);
-      const roles = [...(s.match(/const ADMIN_ROLES = \[([^\]]+)\]/)?.[1] ?? '').matchAll(/'([^']+)'/g)].map(
-        (m) => m[1],
-      );
-      // 계약: platform 전역 + 3개 서비스의 admin/operator
-      //   WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: glycopharm:admin/operator 제거로 8 → 6.
-      expect(roles).toContain('platform:super_admin');
-      expect(roles.filter((r) => /:(admin|operator)$/.test(r) && !r.startsWith('platform:')).length).toBe(6);
+      // §6: 컨트롤러마다 역할 배열을 다시 선언하지 않는다 — floor 는 정본 requireAdmin 하나다.
+      expect(s).toContain('router.use(requireAdmin);');
+      expect(s).not.toMatch(/const\s+\w*ADMIN_ROLES\s*=\s*\[/);
     },
   );
 });

@@ -15,21 +15,12 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate, requireRole, optionalAuth } from '../../../middleware/auth.middleware.js';
+import { authenticate, optionalAuth } from '../../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../../common/middleware/auth/authorization.middleware.js';
 import type { AuthRequest } from '../../../middleware/auth.middleware.js';
 import { ProductLandingService } from '../services/product-landing.service.js';
 import logger from '../../../utils/logger.js';
 import { requireProductDbWrite } from './product-db-write-authority.js';
-
-const ADMIN_ROLES = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-  'cosmetics:admin',
-  'cosmetics:operator',
-  'kpa-society:admin',
-  'kpa-society:operator',
-];
 
 /**
  * 상품 Landing read (로그인 게이트). `optionalAuth` 로 세션이 있으면 req.user 설정, 없어도 통과.
@@ -69,7 +60,7 @@ export function createAdminProductLandingController(dataSource: DataSource): Rou
   const service = new ProductLandingService(dataSource);
 
   router.use(authenticate);
-  router.use(requireRole(ADMIN_ROLES));
+  router.use(requireAdmin);
 
   router.get('/by-master/:masterId', async (req: Request, res: Response) => {
     try {

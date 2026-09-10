@@ -24,22 +24,13 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../../common/middleware/auth/authorization.middleware.js';
 import { SharedProductDescriptionService } from '../services/shared-product-description.service.js';
 import { ProductMaster } from '../entities/ProductMaster.entity.js';
 import type { SharedProductDescriptionType } from '../entities/SharedProductDescription.entity.js';
 import logger from '../../../utils/logger.js';
 import { requireProductDbWrite } from './product-db-write-authority.js';
-
-const ADMIN_ROLES = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-  'cosmetics:admin',
-  'cosmetics:operator',
-  'kpa-society:admin',
-  'kpa-society:operator',
-];
 
 const MAX_CONTENT_LEN = 200_000;
 const ALLOWED_LANG = new Set(['ko', 'zh', 'en', 'ja']);
@@ -62,7 +53,7 @@ export function createProductMasterDescriptionController(dataSource: DataSource)
   const masterRepo = dataSource.getRepository(ProductMaster);
 
   router.use(authenticate);
-  router.use(requireRole(ADMIN_ROLES));
+  router.use(requireAdmin);
 
   // 해당 master 의 설명서 목록 (읽기).
   // ?descriptionType=STORE|B2B|B2C|SUPPLIER_STORE (기본 STORE, 하위호환) 또는 all(전체).

@@ -15,19 +15,11 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate, requireRole } from '../../../middleware/auth.middleware.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import { requireAdmin } from '../../../common/middleware/auth/authorization.middleware.js';
+import { requireProductDbWrite } from './product-db-write-authority.js';
 import { ProductMasterNoteService } from '../services/product-master-note.service.js';
 import logger from '../../../utils/logger.js';
-
-const ADMIN_ROLES = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-  'cosmetics:admin',
-  'cosmetics:operator',
-  'kpa-society:admin',
-  'kpa-society:operator',
-];
 
 const MAX_NOTE_LEN = 4000;
 
@@ -40,7 +32,7 @@ export function createProductMasterNoteController(dataSource: DataSource): Route
   const service = new ProductMasterNoteService(dataSource);
 
   router.use(authenticate);
-  router.use(requireRole(ADMIN_ROLES));
+  router.use(requireAdmin);
 
   router.get('/:id/notes', async (req: Request, res: Response) => {
     try {
@@ -51,7 +43,7 @@ export function createProductMasterNoteController(dataSource: DataSource): Route
     }
   });
 
-  router.post('/:id/notes', async (req: Request, res: Response) => {
+  router.post('/:id/notes', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const actor = actorId(req);
       if (!actor) {
@@ -79,7 +71,7 @@ export function createProductMasterNoteController(dataSource: DataSource): Route
     }
   });
 
-  router.delete('/:id/notes/:noteId', async (req: Request, res: Response) => {
+  router.delete('/:id/notes/:noteId', requireProductDbWrite, async (req: Request, res: Response) => {
     try {
       const actor = actorId(req);
       if (!actor) {
