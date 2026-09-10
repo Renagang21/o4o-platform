@@ -259,7 +259,17 @@ export class BranchSiteController {
     return res.json({ success: true, data: serializePost(saved) });
   }
 
-  /** DELETE /branches/:branchSlug/operator/posts/:postId — soft delete */
+  /**
+   * DELETE /branches/:branchSlug/operator/posts/:postId — **soft delete**
+   *
+   * WO-O4O-KPA-BRANCH-MVP-RESIDUAL-CONTRACT-FINAL-CLOSURE-V1 §C
+   *   이전 응답은 `{ id }` 뿐이라 소비 측에서 물리삭제와 구분할 수 없었다. 실제로는
+   *   `branch_posts.deleted_at` 만 채우고 행은 남는다(카테고리 notice/resource/meeting
+   *   모두 동일). 공개·회원·운영자 목록은 TypeORM 의 soft-delete 필터로 전부 제외되고,
+   *   같은 DELETE 를 다시 보내면 조회 단계에서 걸러져 404 BRANCH_POST_NOT_FOUND 다.
+   *
+   *   물리삭제 의미를 새로 만들지 않는다. 응답에 삭제 방식만 명시한다.
+   */
   static async deletePost(req: Request, res: Response) {
     const repo = AppDataSource.getRepository(BranchPost);
     const post = await repo.findOne({
@@ -269,6 +279,16 @@ export class BranchSiteController {
       return res.status(404).json({ success: false, error: '글을 찾을 수 없습니다.', code: 'BRANCH_POST_NOT_FOUND' });
     }
     await repo.softDelete(post.id);
-    return res.json({ success: true, data: { id: post.id } });
+    const deleted = await repo.findOne({ where: { id: post.id }, withDeleted: true });
+    return res.json({
+      success: true,
+      data: {
+        id: post.id,
+        deleted: true,
+        deletionMode: 'soft' as const,
+        /** 실제로 기록된 삭제 시각. 이 값이 있으면 행은 아직 DB 에 있다. */
+        deletedAt: deleted?.deleted_at ?? null,
+      },
+    });
   }
 }

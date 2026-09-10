@@ -55,6 +55,17 @@ describe('A축 — PartnerOps app_registry 비활성화 migration', () => {
     expect(s).toMatch(/if \(affected !== 1\)[\s\S]*?throw new Error/);
   });
 
+  /**
+   * 2026-09-10 운영 실측 회귀.
+   * TypeORM pg 드라이버는 `UPDATE ... RETURNING` 을 `[rows, affectedCount]` 튜플로 돌려준다.
+   * 튜플을 그대로 세면 길이가 항상 2 라서 정상 1행 변경도 거짓 ABORT 한다.
+   */
+  it('RETURNING 결과를 [rows, count] 튜플로 풀어서 센다', () => {
+    const s = code(MIGRATION);
+    expect(s).toMatch(/Array\.isArray\(updateResult\[0\]\)\s*\?\s*updateResult\[0\]/);
+    expect(s).not.toMatch(/const affected = Array\.isArray\(updateResult\) \? updateResult\.length/);
+  });
+
   it('대상 행이 2건 이상이면 중지한다', () => {
     expect(src()).toMatch(/if \(count > 1\)[\s\S]*?throw new Error/);
   });

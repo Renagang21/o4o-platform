@@ -116,8 +116,18 @@ export interface AnnualReportState {
   schema: TemplateSchema;
   report: MemberReportMeta | null;
   values: ReportValues;
+  /**
+   * `values` 의 시점.
+   *   'submitted_snapshot' — 제출 당시 값 그대로 (현재 원장으로 덮어쓰지 않는다)
+   *   'draft_composed'     — prefill + 내 draft + 현재 association 합성값
+   */
+  valuesSource: 'submitted_snapshot' | 'draft_composed';
   visible: Record<string, boolean>;
-  associationLinkStatus: Record<string, 'resolved' | 'not_linked'>;
+  /**
+   * **현재 시점**의 association 연결 가능 여부. `values` 와 같은 시점이 아니다.
+   * 제출 완료본(valuesSource='submitted_snapshot')에는 값의 근거로 쓰지 않는다.
+   */
+  currentAssociationLinkStatus: Record<string, 'resolved' | 'not_linked'>;
   /** 평가할 수 없는 rule (근거 원장 부재). 있는 것처럼 차단하지 않는다 */
   notEvaluableRules: string[];
   /**

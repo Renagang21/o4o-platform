@@ -2,7 +2,7 @@
 
 > **WO**: `WO-O4O-LOCAL-WORK-AGENT-V0`
 > **작업일**: 2026-09-10
-> **상태**: 구현 완료 · 서버측 검증 PASS · 프로덕션 smoke 미실행(배포 후)
+> **상태**: 구현 완료 · 서버측 검증 PASS · **프로덕션 smoke PASS** (2026-09-10)
 > **범위**: O4O AI ↔ 사용자 로컬 PC 사이의 **최소 Local Execution Runtime V0**
 
 ---
@@ -355,16 +355,16 @@ POST /connect  {"deviceId":"0000…"}    → 401 {"success":false,"code":"DEVICE
 
 회귀 테스트 2건을 추가했다 (빈 문자열 · `not-a-uuid` · `' OR 1=1 --` · 경로 문자열).
 
-### 14-3. 남은 미실행 항목
+### 14-3. 미실행이었던 항목 정산
 
 | 항목 | 상태 | 사유 |
 |---|---|---|
-| §44 Windows 로컬 smoke A~E | **미실행** | 실제 PC 에서 `pair` → `run` 왕복이 필요하다. 사람이 코드를 옮겨 적는 단계가 있다 |
-| §45 프로덕션 왕복 smoke | **부분** | endpoint · migration · 거절 경로까지 확인. 실제 명령 왕복은 §44 와 함께 수행 |
-| CI Pipeline | **미확인** | main 에 다른 세션 push 가 연달아 들어와 `db140798c` 및 후속 commit 의 run 이 계속 취소됨. 배포 파이프라인(`Deploy API Server`)은 success |
+| §44 Windows 로컬 smoke A~E | ✅ **PASS** (2026-09-10) | 이 Windows 11 PC · 배포된 프로덕션 상대로 A~E 전부 수행. 근거는 `CHECK-O4O-LOCAL-WORK-AGENT-ONECLICK-PAIRING-V1 §9`. one-click pairing 이라 “코드를 옮겨 적는 단계” 자체가 없어졌다 |
+| §45 프로덕션 왕복 smoke | ✅ **PASS** (2026-09-10) | `local.get_agent_status` · `local.get_system_info` 가 실제 PC 를 한 바퀴 돌아 응답했다. agent 종료 후 offline 감지까지 확인 |
+| CI Pipeline | ✅ **PASS** | main run `34432607227`(`893707e11`) success. 본 WO 의 commit 이 그 SHA 의 조상임을 `git merge-base --is-ancestor` 로 확인. 개별 run 이 취소된 것은 다른 세션의 연속 push 로 인한 concurrency cancel 이다 |
 | migration 프로덕션 실행 | ✅ **완료** | 14-1 의 `DEVICE_NOT_FOUND` 응답이 근거 |
 
-**§44 완료 전까지 이 WO 를 CLOSED 로 선언하지 않는다.**
+§44 · §45 가 모두 PASS 가 되어 이 조건은 해소됐다. 단, 이 smoke 가 **프로덕션 결함 1건**(`UPDATE … RETURNING` 결과 오독 → heartbeat 500 · 단일 사용 가드·replay 거부 무력화)을 드러냈고 `307b09329` 로 수정했다. 자세한 내용은 `CHECK-O4O-LOCAL-WORK-AGENT-ONECLICK-PAIRING-V1 §9-1`.
 
 ---
 
@@ -385,8 +385,8 @@ POST /connect  {"deviceId":"0000…"}    → 401 {"success":false,"code":"DEVICE
 
 ## 16. 다음 단계 (이번 WO 범위 밖)
 
-1. **배포 후 §44·§45 smoke** — 실제 Windows PC 연결 · 왕복 · unknown action 거부 · offline 감지
-2. **연결 UI** — 현재는 `POST /pair` API 만 있고 화면이 없다. "이 PC 연결" 버튼과 코드 표시
+1. ~~**배포 후 §44·§45 smoke**~~ — 2026-09-10 완료 (§14-3)
+2. ~~**연결 UI**~~ — `WO-O4O-LOCAL-WORK-AGENT-ONECLICK-PAIRING-V1` 에서 코드 없는 one-click 으로 구현됨
 3. **device 해지 UI** — 백엔드는 `status` 컬럼으로 준비되어 있으나 해지 endpoint·화면 미구현
 4. 그 다음에야 실제 파일·약국 프로그램 연동을 논의할 수 있다
 

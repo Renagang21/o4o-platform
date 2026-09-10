@@ -177,7 +177,14 @@ export async function updatePost(slug: string, postId: string, body: Partial<Bra
   return unwrap(await api.patch(`${op(slug)}/posts/${postId}`, body));
 }
 
-export async function deletePost(slug: string, postId: string): Promise<{ id: string }> {
+/**
+ * 글 삭제 — **soft delete** 다. 행은 `deleted_at` 이 채워진 채 남고, 공개·회원·운영자
+ * 목록에서만 사라진다. 같은 글을 다시 삭제하면 404 BRANCH_POST_NOT_FOUND 다.
+ */
+export async function deletePost(
+  slug: string,
+  postId: string,
+): Promise<{ id: string; deleted: true; deletionMode: 'soft'; deletedAt: string | null }> {
   return unwrap(await api.delete(`${op(slug)}/posts/${postId}`));
 }
 
