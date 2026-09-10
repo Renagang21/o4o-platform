@@ -138,7 +138,29 @@ kpa-branch 와 **같은 정확일치 패턴**으로 진입점을 계산한다 (`
 검증 계정 2개(`@o4o-fixture.test`)와 2027 양식·회비 정책·검증 글 3건은 **이번 검증에서 생성**한 것이며,
 원복은 이번에 만든 row id / 이번 사용자 / 2027 연도로만 좁힌 트랜잭션 스크립트로 수행한다
 (`kpa_organizations` 총계 및 분회 글 삭제 건수를 커밋 직전 대조, 이탈 시 ROLLBACK).
-**DB 데이터 변경이므로 사용자 승인 후 실행한다.**
+**DB 데이터 변경이므로 사용자 승인 후 실행했다 (2026-09-10 승인).**
+
+### 원복 실행 결과
+
+| 대상 | 삭제 |
+|---|---|
+| `branch_posts` (검증 글 3건, id 지정) | 3 |
+| `branch_fee_ledgers` / `branch_fee_policies`(2027) | 1 / 2 |
+| `annual_reports` / `annual_report_templates`(2027 검증본) | 1 / 1 |
+| `branch_memberships` | 2 |
+| `account_activities` / `action_logs` / `email_verification_tokens` | 13 / 13 / 1 |
+| `role_assignments` / `service_credentials` / `service_memberships` / `users` | 2 / 2 / 2 / 2 |
+
+단일 트랜잭션 COMMIT. 커밋 직전 대조: `kpa_organizations` **228행 불변**, 분회 글 3→0(검증 3건과 정확히 일치).
+
+### 잔여 0 확인 (read-only, 원복 후)
+
+`@o4o-fixture.test` 계정 · fixture user id 기준 11개 축 전부 0:
+users(이메일 패턴) · users(id) · service_memberships · service_credentials · role_assignments ·
+branch_memberships · annual_reports · annual_report_templates(2027) · branch_fee_ledgers ·
+branch_fee_policies(2027) · branch_posts(`withDeleted` 포함) → **잔여 합계 0**.
+
+불변 확인: `kpa_organizations` 228 · 2026 신상신고 양식 1건 유지 · 실제 분회/실계정/타 서비스 데이터 무변경.
 
 ---
 
