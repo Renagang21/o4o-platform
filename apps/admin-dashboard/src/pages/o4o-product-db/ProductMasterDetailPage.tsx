@@ -756,7 +756,7 @@ function StoreDescriptionPanel({ masterId, canWrite }: { masterId: string; canWr
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
   };
-  useEffect(() => { reload(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [masterId]);
+  useEffect(() => { reload(); }, [masterId]);
 
   const save = async () => {
     if (!content.trim()) { setError('설명서 본문을 입력하세요'); return; }

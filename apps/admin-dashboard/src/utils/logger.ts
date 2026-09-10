@@ -5,14 +5,12 @@
 
 export const devLog = (...args: any[]) => {
   if (import.meta.env.DEV) {
-    // eslint-disable-next-line no-console
     console.log(...args);
   }
 };
 
 export const devWarn = (...args: any[]) => {
   if (import.meta.env.DEV) {
-    // eslint-disable-next-line no-console
     console.warn(...args);
   }
 };

@@ -369,21 +369,21 @@ export const APPS_CATALOG: AppCatalogItem[] = [
 
   // ============================================
   // Partner Operations Apps (partnerops)
-  // Affiliate and partner management
+  //
+  // WO-O4O-ADMIN-AUTHORIZATION-REGISTRY-AND-DEAD-SURFACE-FINAL-CLOSURE-V1 (§7)
+  //   `appId: 'partnerops'` 항목 제거 — 판정 Priority A (완전 은퇴).
+  //     · 실행 패키지 0 (`packages/partnerops` 없음)
+  //     · admin 라우트 0 / admin 화면 0 / ViewComponentRegistry 등록 0
+  //     · backend API 0 (`/api/v1/partnerops*` 마운트 없음)
+  //     · dependencies {} — 이 항목을 참조하는 설치 소비자 0
+  //   선행 사례와 동일한 처리다 (sellerops · supplierops · cosmetics-partner).
+  //
+  //   ⚠ 아래 두 가지는 **살아 있으므로 제거하지 않는다**:
+  //     · `partnerops` **serviceGroup id** — SERVICE_GROUPS 메타 + `partner-core`
+  //       카탈로그 항목(`serviceGroups: ['platform-core','partnerops']`)이 소비한다.
+  //     · `@o4o/partner-core` 패키지 및 그 앱 정의.
+  //   즉 "partnerops 라는 문자열" 을 일괄 삭제하지 않는다 (§7.1).
   // ============================================
-  {
-    appId: 'partnerops',
-    name: 'PartnerOps',
-    version: '1.0.0',
-    description: '파트너/어필리에이트 운영 앱 - 링크 추적, 전환 분석, 커미션 정산',
-    category: 'commerce',
-    tags: ['파트너', 'partner', 'affiliate', 'commission', 'referral'],
-    type: 'feature',
-    // partnerops 본체는 @o4o/partner-core 기반이다.
-    dependencies: {},
-    author: 'O4O Platform',
-    serviceGroups: ['partnerops', 'cosmetics'],
-  },
 
   // ============================================
   // Market Trial App (Experimental)

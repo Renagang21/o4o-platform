@@ -104,9 +104,12 @@ describe('WO-O4O-PUBLIC-APPSTORE-READ-CONTRACT-CENSUS-AND-DISPOSITION-V1', () =>
     //   전용 spec 이 지킨다. 여기서는 "그 외 회귀 없음" 만 본다.)
     // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §21:
     //   cosmetics-seller-extension 카탈로그 항목 제거로 16 → 15.
-    it('카탈로그 항목이 15개로 유지된다', () => {
+    // WO-O4O-ADMIN-AUTHORIZATION-REGISTRY-AND-DEAD-SURFACE-FINAL-CLOSURE-V1 §7:
+    //   partnerops 앱 항목 제거로 15 → 14. (`partnerops` serviceGroup 과
+    //   `partner-core` 앱은 유지된다 — 같은 WO 의 전용 spec 이 고정한다.)
+    it('카탈로그 항목이 14개로 유지된다', () => {
       const entries = catalogSrc.match(/^\s{4}appId:\s*'/gm) ?? [];
-      expect(entries).toHaveLength(15);
+      expect(entries).toHaveLength(14);
     });
 
     it.each([

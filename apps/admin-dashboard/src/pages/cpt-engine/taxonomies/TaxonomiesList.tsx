@@ -7,6 +7,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
+import { devError } from '@/utils/logger';
 import {
   Plus,
   Search,
@@ -131,7 +132,7 @@ export default function TaxonomiesList() {
         await authClient.api.delete(`/cpt/taxonomies/${id}`);
         refetch();
       } catch (error) {
-        
+        devError('[TaxonomiesList] request failed', error);
       }
     }
   };
@@ -147,7 +148,7 @@ export default function TaxonomiesList() {
       });
       refetch();
     } catch (error) {
-      
+      devError('[TaxonomiesList] request failed', error);
     }
   };
 

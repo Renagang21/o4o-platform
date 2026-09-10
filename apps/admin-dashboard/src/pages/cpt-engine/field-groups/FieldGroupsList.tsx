@@ -7,6 +7,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
+import { devError } from '@/utils/logger';
 import {
   Plus,
   Search,
@@ -123,7 +124,7 @@ export default function FieldGroupsList() {
         await authClient.api.delete(`/cpt/field-groups/${id}`);
         refetch();
       } catch (error) {
-        
+        devError('[FieldGroupsList] request failed', error);
       }
     }
   };
@@ -138,7 +139,7 @@ export default function FieldGroupsList() {
       });
       refetch();
     } catch (error) {
-      
+      devError('[FieldGroupsList] request failed', error);
     }
   };
 
@@ -150,7 +151,7 @@ export default function FieldGroupsList() {
       });
       refetch();
     } catch (error) {
-      
+      devError('[FieldGroupsList] request failed', error);
     }
   };
 

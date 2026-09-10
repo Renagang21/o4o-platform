@@ -1,11 +1,9 @@
 import { Route } from 'react-router-dom';
-import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
 
 const AdminHome = lazy(() => import('@/pages/AdminHome'));
 const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
 const UnifiedDashboard = lazy(() => import('@/pages/dashboard/unified/UnifiedDashboard'));
-const BusinessDashboard = lazy(() => import('@/pages/dashboard/business/BusinessDashboard'));
 const AppDisabled = lazy(() => import('@/pages/error/AppDisabled'));
 
 // WO-O4O-LEGACY-RESIDUAL-RUNTIME-AND-DEFERRED-FINAL-CLOSURE-V1 (Axis D):
@@ -69,14 +67,17 @@ export function DashboardRoutes() {
       </Suspense>
     } />,
 
-    // WO-O4O-BUSINESS-DASHBOARD-V1: Business Dashboard
-    <Route key="/dashboard/business" path="/dashboard/business" element={
-      <AdminProtectedRoute requiredRoles={['partner', 'affiliate', 'seller', 'supplier']}>
-        <Suspense fallback={<PageLoader />}>
-          <BusinessDashboard />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
+    // WO-O4O-ADMIN-AUTHORIZATION-REGISTRY-AND-DEAD-SURFACE-FINAL-CLOSURE-V1 (§6):
+    //   `/dashboard/business` route + `pages/dashboard/business/BusinessDashboard.tsx` 제거.
+    //
+    //   판정 DEAD_ROUTE — 도달 가능한 사용자가 0명이었다:
+    //     · 선언 역할 `['partner','affiliate','seller','supplier']` 는 관리자 SPA 진입
+    //       floor(`platform:super_admin`, App.tsx)와 상호 배타적이다 → 플랫폼 관리자도 못 들어간다.
+    //     · 서비스 역할 계열은 floor 에서 이미 차단된다 → 선언 대상자도 못 들어간다.
+    //     · 메뉴 소비처 0 / 직접 링크 소비처 0 / registry 소비처 0 / 테스트 소비처 0.
+    //     · 호출 API(`/content/assets`, `/content/assets/stats`)는 `requireAdmin`
+    //       (= platform:super_admin) 이라 선언 대상자에게는 전부 403 이었다.
+    //   동일 데이터의 살아 있는 정본 = `content-assets` · `content-analytics` 메뉴.
 
     // WO-ADMIN-CONTENT-SLOT-V1: Service Content Manager
   ];

@@ -48,7 +48,6 @@ export const CleanBlockWrapperDebug: React.FC<CleanBlockWrapperDebugProps> = ({
     } as any);
 
     // Also log to console for easier debugging
-    // eslint-disable-next-line no-console
     console.log(`[${id}:${type}] ${stage}:`, detail);
 
     if (onDebugEvent) {

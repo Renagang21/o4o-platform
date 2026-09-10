@@ -5,7 +5,7 @@
  */
 
 import { authClient } from '@o4o/auth-client';
-import { generateCompleteReference } from './block-registry-extractor';
+import { extractBlocksMetadata, generateCompleteReference } from './block-registry-extractor';
 
 interface ServerResponse {
   success: boolean;
@@ -317,7 +317,6 @@ ${error?.message}
    * Phase 1-B: 로컬 Block Registry를 JSON으로 반환
    */
   private fetchLocalBlockRegistryJSON(): any {
-    const { extractBlocksMetadata } = require('./block-registry-extractor');
     const blocks = extractBlocksMetadata();
 
     // 카테고리별로 그룹화

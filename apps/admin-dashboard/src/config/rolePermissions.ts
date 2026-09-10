@@ -42,9 +42,13 @@ export const menuPermissions: MenuPermission[] = [
   //   또한 "설정 없음 = 허용" 정책(아래 hasMenuPermission)이라 제거로 접근이 좁아질 수 없다.
   //
   //   남긴 항목은 정적 메뉴에 실재하는 2건뿐이다: dashboard(무게이트) · core-users(실게이트).
+  //   WO-O4O-ADMIN-AUTHORIZATION-REGISTRY-AND-DEAD-SURFACE-FINAL-CLOSURE-V1 (§4):
+  //   deny-by-default 전환에 따라 'dashboard' 도 명시적인 설정을 갖는다.
+  //   관리자 SPA 진입 floor(App.tsx)가 이미 platform:super_admin 전용이므로
+  //   노출 범위는 변하지 않고 선언만 명시화된다.
   {
     menuId: 'dashboard',
-    // No specific roles - available to all authenticated users
+    roles: [...PLATFORM_ADMIN_ROLES]
   },
 
   // WO-O4O-ADMIN-USERS-RBAC-CONSOLE-REPOSITIONING-V1:
@@ -108,6 +112,115 @@ export const menuPermissions: MenuPermission[] = [
     roles: [...PLATFORM_ADMIN_ROLES]
   },
 
+  // ===========================================================================
+  // WO-O4O-ADMIN-AUTHORIZATION-REGISTRY-AND-DEAD-SURFACE-FINAL-CLOSURE-V1 §4
+  //
+  //   정책을 "설정 없음 = 허용" 에서 **deny-by-default** 로 전환하기 전에,
+  //   정적 메뉴 트리(admin-menu.static.tsx)의 **모든 노드**가 명시적인 설정을
+  //   갖도록 먼저 정렬한다 (§4.1 "반환값만 바꾸지 않는다",
+  //   §4.2 "메뉴가 누락으로 사라지지 않는다").
+  //
+  //   대상 = 클릭 가능 메뉴 22 + 경로 없는 그룹 헤더 5 = 27 노드.
+  //   그룹 헤더도 filterMenuItems 가 hasMenuPermission 을 호출하므로
+  //   (useAdminMenu.ts) 설정이 없으면 자식까지 통째로 사라진다.
+  //
+  //   역할은 전부 PLATFORM_ADMIN_ROLES 로 통일한다. 관리자 SPA 진입 floor 가
+  //   이미 platform:super_admin 전용이므로 실제 노출 범위는 변하지 않으며,
+  //   §4.2 에 따라 platform 이외 역할은 메뉴 설정에 추가하지 않는다.
+  //   (메뉴 권한 ≠ 백엔드 권한 — 백엔드 가드는 각 라우터가 독립적으로 검사한다.)
+  // ===========================================================================
+
+  // 그룹 헤더 (path 없음 — 자식 노출을 위해 반드시 설정이 필요하다)
+  {
+    menuId: 'core',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'o4o-product-db',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'content',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'cms',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'appstore',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+
+  // 클릭 가능 메뉴 (기존 선언된 7건 외 잔여)
+  {
+    menuId: 'core-settings',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'o4o-product-db-overview',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'o4o-product-db-candidates',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'o4o-product-db-store-requests',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'o4o-product-db-masters',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'o4o-product-db-supplier-store-descriptions',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'o4o-product-db-image-quality',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'o4o-product-db-maintenance',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'content-overview',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'content-assets',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'content-policies',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'content-analytics',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'cms-contents',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'cms-slots',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'digital-signage-content',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+
+  // 동적 CPT 메뉴의 부모 그룹 id (useDynamicCPTMenu.tsx) — 'cpt-' 접두사가 아니므로
+  // DYNAMIC_MENU_ID_PREFIXES 가 아닌 명시 항목으로 선언한다.
+  {
+    menuId: 'custom-posts',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+
   // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
   //   회원 관리(core-membership*) 메뉴 4건의 권한 설정은 메뉴·화면·`/api/v1/membership/*`
   //   백엔드 subtree 가 함께 제거되면서 평가 대상이 사라져 삭제했다.
@@ -142,24 +255,55 @@ export const menuPermissions: MenuPermission[] = [
 ];
 
 /**
+ * 런타임에 생성되는 메뉴 id 접두사의 **명시적** 선언.
+ *
+ * **WO-O4O-ADMIN-AUTHORIZATION-REGISTRY-AND-DEAD-SURFACE-FINAL-CLOSURE-V1 §4**
+ *
+ * `useDynamicCPTMenu` 는 CPT slug 로부터 `cpt-{slug}` / `cpt-{slug}-all` /
+ * `cpt-{slug}-new` / `cpt-{slug}-categories` 를 생성하므로 정적 배열에
+ * 열거할 수 없다. deny-by-default 로 전환하면 이 계열이 통째로 사라지므로
+ * 접두사를 **명시적으로 선언**해 동일한 정책(PLATFORM_ADMIN_ROLES)을 적용한다.
+ *
+ * 이것은 "설정 없음 = 허용" fallback 의 부활이 아니다 (§4.2 금지 사항).
+ * 선언된 접두사에 해당하지 않는 미등록 menuId 는 그대로 거부된다.
+ */
+export const DYNAMIC_MENU_ID_PREFIXES: ReadonlyArray<{ prefix: string; roles: string[] }> = [
+  { prefix: 'cpt-', roles: [...PLATFORM_ADMIN_ROLES] }
+];
+
+/**
+ * 선언된 동적 메뉴 접두사에 해당하는 menuId 의 정책을 반환한다.
+ * 해당 없으면 undefined — 호출측에서 deny 로 처리된다.
+ */
+function resolveDynamicMenuPermission(menuId: string): MenuPermission | undefined {
+  const matched = DYNAMIC_MENU_ID_PREFIXES.find(entry => menuId.startsWith(entry.prefix));
+  if (!matched) return undefined;
+  // 선언된 접두사 정책의 역할을 그대로 복사한다 (DYNAMIC_MENU_ID_PREFIXES 가 유일한 출처).
+  return { menuId, roles: matched.roles.slice() };
+}
+
+/**
  * Check if a user has permission for a menu item
  * @param userRoles - User's roles from database
  * @param userPermissions - User's permissions from database
  * @param menuId - Menu item ID to check
  * @returns boolean indicating if user has access
  */
+
 export function hasMenuPermission(
   userRoles: string[],
   userPermissions: string[],
   menuId: string
 ): boolean {
-  const menuConfig = menuPermissions.find(m => m.menuId === menuId);
+  const menuConfig = menuPermissions.find(m => m.menuId === menuId)
+    ?? resolveDynamicMenuPermission(menuId);
 
-  // POLICY: ALLOW BY DEFAULT (Whitelist approach)
-  // Menu not found in configuration - allow by default for backward compatibility
-  // This allows all menus to be visible unless explicitly restricted
+  // POLICY: DENY BY DEFAULT
+  //   WO-O4O-ADMIN-AUTHORIZATION-REGISTRY-AND-DEAD-SURFACE-FINAL-CLOSURE-V1 §4
+  //   명시적으로 등록되지 않은 menuId 는 거부한다.
+  //   전환 전에 정적 트리 27 노드 + 동적 CPT 접두사를 전수 선언했다.
   if (!menuConfig) {
-    return true;
+    return false;
   }
 
   // If no roles or permissions specified, allow all authenticated users
