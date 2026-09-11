@@ -130,9 +130,14 @@ describe('tool eligibility — 자격 없는 tool 은 노출되지 않는다', (
    * `executionMode: 'browser'` 는 여전히 0 이다 — 사이트 열기는 Local Agent 가 OS handler 를
    * 부르는 **local** 실행이지, 브라우저 안(extension/CDP) 실행이 아니다. 'browser' 슬롯은
    * 후속 Browser Navigation 의 자리로 비워 둔다(§21·§34·§35).
+   *
+   * WO-O4O-COMPUTER-USE-V0 에서 세 번째 effect `COMPUTER_INTERACTION` 이 들어왔다 —
+   * click · type_text · key 세 tool 이 **같은 effect 하나**를 공유한다(inspect 는 read-only).
+   * 이 셋은 등재 앱 창 안 · 요청당 1회 · 허용키 3개 뿐이며, 그 밖의 입력(hotkey · 우클릭 ·
+   * 드래그 · 스크롤)은 여기 tool 로 존재하지 않는다(동 WO §5·§22).
    */
   it('registry 는 read-only 또는 허용된 effect 만 담고 browser-mode tool 은 0 이다', () => {
-    const allowedEffects = ['FOREGROUND_ACTIVATION', 'BROWSER_SITE_OPEN'];
+    const allowedEffects = ['FOREGROUND_ACTIVATION', 'BROWSER_SITE_OPEN', 'COMPUTER_INTERACTION'];
     for (const t of AI_TOOL_REGISTRY) {
       expect(['server', 'local']).toContain(t.executionMode);
       if (!t.readOnly) {
@@ -145,10 +150,18 @@ describe('tool eligibility — 자격 없는 tool 은 노출되지 않는다', (
     expect(AI_TOOL_REGISTRY.filter((t) => !t.readOnly).map((t) => t.name)).toEqual([
       AI_TOOL_NAMES.ACTIVATE_WINDOW,
       AI_TOOL_NAMES.BROWSER_OPEN_SITE,
+      AI_TOOL_NAMES.COMPUTER_CLICK,
+      AI_TOOL_NAMES.COMPUTER_TYPE_TEXT,
+      AI_TOOL_NAMES.COMPUTER_KEY,
     ]);
-    // effect 와 tool 은 1:1 이다 — 같은 effect 를 다른 이름으로 다시 열 수 없다.
+    // effect 와 tool 은 고정 대응이다 — 같은 effect 를 다른 이름으로 다시 열 수 없다.
     expect(AI_TOOL_REGISTRY.find((t) => t.name === AI_TOOL_NAMES.BROWSER_OPEN_SITE)?.effect)
       .toBe('BROWSER_SITE_OPEN');
+    // 화면 조작 셋은 effect 하나를 공유하고, inspect 는 read-only 라 effect 가 없다.
+    for (const name of [AI_TOOL_NAMES.COMPUTER_CLICK, AI_TOOL_NAMES.COMPUTER_TYPE_TEXT, AI_TOOL_NAMES.COMPUTER_KEY]) {
+      expect(AI_TOOL_REGISTRY.find((t) => t.name === name)?.effect).toBe('COMPUTER_INTERACTION');
+    }
+    expect(AI_TOOL_REGISTRY.find((t) => t.name === AI_TOOL_NAMES.COMPUTER_INSPECT)?.readOnly).toBe(true);
   });
 });
 
