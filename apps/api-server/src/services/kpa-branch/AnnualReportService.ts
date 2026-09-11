@@ -17,6 +17,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { AnnualReportTemplate } from '../../routes/kpa-branch/entities/annual-report-template.entity.js';
 import type {
   AnnualReportFieldDefinition,
+  AnnualReportReferenceYears,
   AnnualReportRule,
 } from '../../routes/kpa-branch/entities/annual-report-template.entity.js';
 import { KpaOrganization } from '../../routes/kpa-branch/entities/kpa-organization.entity.js';
@@ -70,6 +71,26 @@ export class AnnualReportService {
 
   static rules(t: AnnualReportTemplate): AnnualReportRule[] {
     return Array.isArray(t.schema?.rules) ? t.schema.rules : [];
+  }
+
+  // ── 참조연도 (WO-O4O-KPA-BRANCH-ANNUAL-REPORT-REFERENCE-YEARS-V1) ──────────
+
+  /**
+   * 양식이 저장한 참조연도를 읽는다. **신고연도(`t.year`)로 대체하지 않는다** —
+   * 값이 없거나 정수가 아니면 `null` 을 내고, 호출부는 그 원장을 '미연결'로 둔다.
+   * (Y / Y−1 같은 규칙은 양식 생성 시점에 정수로 저장되고 코드에는 남지 않는다.)
+   */
+  static referenceYear(t: AnnualReportTemplate, kind: 'fee' | 'training'): number | null {
+    const v = t.reference_years?.[kind];
+    return Number.isInteger(v) ? (v as number) : null;
+  }
+
+  /**
+   * 연도 개설 시의 **제안값**. 저장은 항상 명시적인 정수로 한다 (제안 ≠ 규칙 상수 fallback).
+   * 확정 계약: fee = Y, training = Y − 1.
+   */
+  static proposeReferenceYears(year: number): AnnualReportReferenceYears {
+    return { fee: year, training: year - 1 };
   }
 
   // ── 신고 기간 ─────────────────────────────────────────────────────────────
@@ -199,6 +220,11 @@ export class AnnualReportService {
    *
    * 연결 원장이 없는 항목은 **null 로 두고 linkStatus 를 'not_linked'** 로 보고한다.
    * 하드코딩한 평점·회비를 넣지 않는다 (WO §4 — 가짜 숫자 금지).
+   *
+   * 연도 축 (WO-O4O-KPA-BRANCH-ANNUAL-REPORT-REFERENCE-YEARS-V1 §4):
+   *   `ctx.year` 는 **신고연도**이며 `report.year` 에만 쓴다.
+   *   회비(`fee.*`)는 `template.reference_years.fee`, 연수교육(`training.*`)은
+   *   `template.reference_years.training` 으로 원장을 읽는다 — 신고연도로 원장을 읽지 않는다.
    */
   static async resolveAssociationValues(
     t: AnnualReportTemplate,
@@ -251,10 +277,16 @@ export class AnnualReportService {
             linkStatus[f.key] = 'not_linked';
             break;
           }
+          const feeYear = this.referenceYear(t, 'fee');
+          if (feeYear === null) {
+            values[f.key] = null;
+            linkStatus[f.key] = 'not_linked';
+            break;
+          }
           const resolved = await BranchFeeService.resolveMemberFeeCategory({
             organizationId: ctx.organizationId,
             userId: ctx.userId,
-            year: ctx.year,
+            year: feeYear,
           });
           const code = BranchFeeService.toReportFeeCode(resolved.feeCategory);
           values[f.key] = code;
@@ -278,11 +310,16 @@ export class AnnualReportService {
             break;
           }
           if (education === undefined) {
-            education = await BranchEducationCreditService.resolveForReport({
-              organizationId: ctx.organizationId,
-              userId: ctx.userId,
-              year: ctx.year,
-            });
+            // 연수교육은 참조연도(Y−1)로 읽는다. 참조연도가 없으면 조회하지 않는다(null → 미연결).
+            const trainingYear = this.referenceYear(t, 'training');
+            education =
+              trainingYear === null
+                ? null
+                : await BranchEducationCreditService.resolveForReport({
+                    organizationId: ctx.organizationId,
+                    userId: ctx.userId,
+                    year: trainingYear,
+                  });
           }
           if (!education) {
             values[f.key] = null;
@@ -313,10 +350,16 @@ export class AnnualReportService {
             linkStatus[f.key] = 'not_linked';
             break;
           }
+          const feeYear = this.referenceYear(t, 'fee');
+          if (feeYear === null) {
+            values[f.key] = null;
+            linkStatus[f.key] = 'not_linked';
+            break;
+          }
           const exemptionType = await BranchFeeService.resolveMemberFeeExemptionType({
             organizationId: ctx.organizationId,
             userId: ctx.userId,
-            year: ctx.year,
+            year: feeYear,
           });
           values[f.key] = exemptionType;
           linkStatus[f.key] = exemptionType ? 'resolved' : 'not_linked';

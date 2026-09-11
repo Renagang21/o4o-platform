@@ -232,6 +232,8 @@ export class AnnualReportReviewService {
         version: template.version,
         title: template.title,
         status: template.status,
+        /** 제출 당시 양식의 참조연도 — 제출본이 있는 양식은 변경 불가이므로 스냅샷과 같은 의미다 */
+        referenceYears: template.reference_years ?? null,
       },
       schema: template.schema,
       /** 저장된 스냅샷 그대로. association 재주입 없음 */

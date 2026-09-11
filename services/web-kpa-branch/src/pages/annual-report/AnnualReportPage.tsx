@@ -139,6 +139,15 @@ export default function AnnualReportPage({ slug }: { slug: string }) {
           </span>
         )}
       </p>
+      {/* 신고년도 ≠ 기준년도 — 연수교육은 전년도 원장을 참조한다 (WO-O4O-KPA-BRANCH-ANNUAL-REPORT-REFERENCE-YEARS-V1 §6) */}
+      <p className="mt-1 text-sm text-gray-500">
+        {state.template.year}년도 신상신고
+        {state.template.referenceYears && (
+          <>
+            {' '}· 회비: {state.template.referenceYears.fee}년 기준 · 연수교육: {state.template.referenceYears.training}년 기준
+          </>
+        )}
+      </p>
 
       {locked && (
         <p className="mt-3 rounded bg-green-50 px-3 py-2 text-sm text-green-800">

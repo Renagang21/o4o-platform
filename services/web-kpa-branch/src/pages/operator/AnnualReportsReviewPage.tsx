@@ -257,6 +257,12 @@ export default function AnnualReportsReviewPage({ slug }: { slug: string }) {
                 {/* 제출 당시 양식 version — 지금 활성 양식이 아니라 그때 것이다 (WO §4) */}
                 <span className="text-xs text-gray-500">
                   제출 양식 v{detail.template.version} · 제출일 {fmtDate(detail.report.submittedAt)}
+                  {detail.template.referenceYears && (
+                    <>
+                      {' '}· 회비 {detail.template.referenceYears.fee}년 기준 · 연수교육{' '}
+                      {detail.template.referenceYears.training}년 기준
+                    </>
+                  )}
                 </span>
               </div>
 

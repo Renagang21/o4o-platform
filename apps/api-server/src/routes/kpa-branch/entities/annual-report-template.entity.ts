@@ -122,6 +122,20 @@ export interface AnnualReportRule {
   releaseRequiredWhenHidden?: boolean;
 }
 
+/**
+ * 참조연도 — WO-O4O-KPA-BRANCH-ANNUAL-REPORT-REFERENCE-YEARS-V1
+ *
+ *   fee       회비 원장을 읽을 연도 (확정 규칙: 신고연도 Y)
+ *   training  연수교육 원장을 읽을 연도 (확정 규칙: Y − 1)
+ *
+ * **실제 정수 연도**를 저장한다. 상대 규칙("Y−1")이 아니라 값이므로 향후 규칙이 바뀌어도
+ * 과거 양식의 의미가 보존된다. 신고연도(`year`)를 대신 쓰는 코드 fallback 을 두지 않는다.
+ */
+export interface AnnualReportReferenceYears {
+  fee: number;
+  training: number;
+}
+
 export interface AnnualReportTemplateSchema {
   templateVersion: string;
   steps: AnnualReportTemplateStep[];
@@ -157,6 +171,13 @@ export class AnnualReportTemplate {
 
   @Column({ type: 'date', nullable: true })
   period_end: string | null;
+
+  /**
+   * 회비·연수교육 참조연도. 제출본(annual_reports)이 1건이라도 있으면 변경 금지
+   * (AnnualReportTemplateController.updateTemplate → 409 TEMPLATE_IN_USE).
+   */
+  @Column({ type: 'jsonb' })
+  reference_years: AnnualReportReferenceYears;
 
   /** steps / fields / rules. 양식의 단일 진실 */
   @Column({ type: 'jsonb', default: () => `'{}'::jsonb` })

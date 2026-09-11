@@ -112,6 +112,11 @@ export interface AnnualReportState {
     status: string;
     periodStart: string | null;
     periodEnd: string | null;
+    /**
+     * 회비·연수교육 기준년도 (WO-O4O-KPA-BRANCH-ANNUAL-REPORT-REFERENCE-YEARS-V1).
+     * 신고년도(year)와 다를 수 있다 — 연수교육은 전년도(Y−1)를 참조한다.
+     */
+    referenceYears: { fee: number; training: number } | null;
   };
   schema: TemplateSchema;
   report: MemberReportMeta | null;

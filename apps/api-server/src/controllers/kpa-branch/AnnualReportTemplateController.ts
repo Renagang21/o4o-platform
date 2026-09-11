@@ -24,6 +24,9 @@ import type { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { AnnualReportTemplate } from '../../routes/kpa-branch/entities/annual-report-template.entity.js';
+import type { AnnualReportReferenceYears } from '../../routes/kpa-branch/entities/annual-report-template.entity.js';
+import { AnnualReport } from '../../routes/kpa-branch/entities/annual-report.entity.js';
+import { AnnualReportService } from '../../services/kpa-branch/AnnualReportService.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
@@ -43,6 +46,8 @@ function toSummary(t: AnnualReportTemplate) {
     status: t.status,
     periodStart: t.period_start,
     periodEnd: t.period_end,
+    /** 회비·연수교육 참조연도 (WO-O4O-KPA-BRANCH-ANNUAL-REPORT-REFERENCE-YEARS-V1) */
+    referenceYears: t.reference_years ?? null,
     templateVersion: schema.templateVersion ?? null,
     stepCount: steps.length,
     fieldCount: fields.length,
@@ -78,6 +83,32 @@ function normalizePeriod(
     return { error: '신고 시작일이 종료일보다 늦을 수 없습니다.' };
   }
   return { periodStart: periodStart as string | null, periodEnd: periodEnd as string | null };
+}
+
+/**
+ * 참조연도 본문 검증. `{ fee, training }` 둘 다 정수 연도여야 한다.
+ * 상대 규칙("Y-1" 같은 문자열)은 받지 않는다 — 저장값은 항상 실제 연도다.
+ */
+function normalizeReferenceYears(v: unknown): AnnualReportReferenceYears | { error: string } {
+  if (!v || typeof v !== 'object') return { error: 'referenceYears 는 { fee, training } 객체여야 합니다.' };
+  const o = v as Record<string, unknown>;
+  const read = (k: 'fee' | 'training', label: string): number | { error: string } => {
+    const n = typeof o[k] === 'string' ? Number.parseInt(o[k] as string, 10) : o[k];
+    if (!Number.isInteger(n) || (n as number) < 2000 || (n as number) > 2100) {
+      return { error: `${label} 기준년도가 올바르지 않습니다.` };
+    }
+    return n as number;
+  };
+  const fee = read('fee', '회비');
+  if (typeof fee === 'object') return fee;
+  const training = read('training', '연수교육');
+  if (typeof training === 'object') return training;
+  return { fee, training };
+}
+
+/** 이 양식으로 만든 신고서가 1건이라도 있는가 (draft 포함). 있으면 참조연도를 바꿀 수 없다. */
+async function templateInUse(templateId: string): Promise<boolean> {
+  return (await AppDataSource.getRepository(AnnualReport).count({ where: { template_id: templateId } })) > 0;
 }
 
 /** 연도당 active 1개(부분 UNIQUE) 위반을 409 로 옮긴다 — 500 으로 새지 않게 한다. */
@@ -173,14 +204,17 @@ export class AnnualReportTemplateController {
 
   /**
    * POST /api/v1/kpa-branch/admin/annual-report-templates
-   * body: { year, sourceYear?, title?, periodStart?, periodEnd?, status? }
+   * body: { year, sourceYear?, title?, periodStart?, periodEnd?, status?, referenceYears? }
+   *
+   * referenceYears 를 생략하면 확정 규칙(fee = Y, training = Y − 1)을 **제안값**으로 채워
+   * 저장한다. 저장 row 에는 항상 명시적인 정수 연도가 남는다 (규칙을 코드 fallback 으로 두지 않는다).
    *
    * 연도 개설. schema 는 **직전(또는 지정) 연도의 최신본을 그대로 복제**한다 —
    * 여기서 양식 본문을 만들거나 고치지 않는다. 개정은 migration 축에 남긴다.
    * 이미 그 연도 양식이 있으면 만들지 않는다(409) — 같은 요청을 두 번 보내도 늘지 않는다.
    */
   static async openYear(req: Request, res: Response) {
-    const { year, sourceYear, title, periodStart, periodEnd, status } = req.body ?? {};
+    const { year, sourceYear, title, periodStart, periodEnd, status, referenceYears } = req.body ?? {};
 
     const y = Number.parseInt(String(year), 10);
     if (!Number.isInteger(y) || y < 2000 || y > 2100) {
@@ -197,6 +231,13 @@ export class AnnualReportTemplateController {
     const period = normalizePeriod(periodStart, periodEnd);
     if ('error' in period) {
       return res.status(400).json({ success: false, error: period.error, code: 'INVALID_PERIOD' });
+    }
+    const refYears =
+      referenceYears === undefined
+        ? AnnualReportService.proposeReferenceYears(y)
+        : normalizeReferenceYears(referenceYears);
+    if ('error' in refYears) {
+      return res.status(400).json({ success: false, error: refYears.error, code: 'INVALID_REFERENCE_YEARS' });
     }
 
     const repo = AppDataSource.getRepository(AnnualReportTemplate);
@@ -243,6 +284,7 @@ export class AnnualReportTemplateController {
       status: nextStatus as AnnualReportTemplate['status'],
       period_start: period.periodStart,
       period_end: period.periodEnd,
+      reference_years: refYears,
       schema: source.schema,
     });
 
@@ -256,12 +298,14 @@ export class AnnualReportTemplateController {
 
   /**
    * PATCH /api/v1/kpa-branch/admin/annual-report-templates/:id
-   * body: { title?, periodStart?, periodEnd?, status? }
+   * body: { title?, periodStart?, periodEnd?, status?, referenceYears? }
    *
-   * 접수기간 · 상태만 바꾼다. **schema 는 받지 않는다** — 양식 본문 편집 경로를 열지 않는다.
+   * 접수기간 · 상태 · 참조연도만 바꾼다. **schema 는 받지 않는다** — 양식 본문 편집 경로를 열지 않는다.
+   * 참조연도는 이 양식으로 만든 신고서가 1건이라도 있으면 바꿀 수 없다(409 TEMPLATE_IN_USE) —
+   * 제출 스냅샷이 참조한 연도의 의미가 사후에 달라지면 안 된다.
    */
   static async updateTemplate(req: Request, res: Response) {
-    const { title, periodStart, periodEnd, status } = req.body ?? {};
+    const { title, periodStart, periodEnd, status, referenceYears } = req.body ?? {};
 
     const repo = AppDataSource.getRepository(AnnualReportTemplate);
     // service_key 를 함께 조건에 넣는다 — id 를 알아도 타 서비스 양식에는 닿지 않는다
@@ -297,6 +341,23 @@ export class AnnualReportTemplateController {
       }
       template.period_start = period.periodStart;
       template.period_end = period.periodEnd;
+    }
+    if (referenceYears !== undefined) {
+      const refYears = normalizeReferenceYears(referenceYears);
+      if ('error' in refYears) {
+        return res.status(400).json({ success: false, error: refYears.error, code: 'INVALID_REFERENCE_YEARS' });
+      }
+      const unchanged =
+        template.reference_years?.fee === refYears.fee && template.reference_years?.training === refYears.training;
+      if (!unchanged && (await templateInUse(template.id))) {
+        return res.status(409).json({
+          success: false,
+          error: '이 양식으로 작성된 신고서가 있어 기준년도를 변경할 수 없습니다.',
+          code: 'TEMPLATE_IN_USE',
+          data: { referenceYears: template.reference_years },
+        });
+      }
+      template.reference_years = refYears;
     }
 
     try {

@@ -83,6 +83,8 @@ function templateSummary(t: AnnualReportTemplate) {
     status: t.status,
     periodStart: t.period_start,
     periodEnd: t.period_end,
+    /** 회비·연수교육 기준년도 — 화면이 "신고년도 ≠ 연수교육 기준년도"를 혼동 없이 표시한다 */
+    referenceYears: t.reference_years ?? null,
   };
 }
 

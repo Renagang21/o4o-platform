@@ -74,7 +74,15 @@ export interface ReviewDetail {
   };
   member: { userId: string; name: string | null; email: string | null };
   /** 제출 당시 양식. version 을 화면에 그대로 표시한다 (WO §4) */
-  template: { id: string; year: number; version: number; title: string; status: string };
+  template: {
+    id: string;
+    year: number;
+    version: number;
+    title: string;
+    status: string;
+    /** 제출 당시 양식의 회비·연수교육 기준년도 (WO-O4O-KPA-BRANCH-ANNUAL-REPORT-REFERENCE-YEARS-V1) */
+    referenceYears: { fee: number; training: number } | null;
+  };
   schema: TemplateSchema;
   /** 제출 스냅샷 그대로. 현재 회원정보를 재주입한 값이 아니다 */
   values: ReportValues;
