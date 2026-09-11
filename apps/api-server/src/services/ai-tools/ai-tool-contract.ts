@@ -46,6 +46,8 @@ import {
   validateDataGetMetaArgs,
   validateDataSetSettingArgs,
 } from '../local-agent/local-agent-protocol.js';
+import type { AutomationMethod, AutomationRiskLevel } from './automation-execution-contract.js';
+import { isComputerUseMethod, computerUseFallbackAllowed } from './automation-execution-contract.js';
 
 // ─── Capability ──────────────────────────────────────────────────────────────
 
@@ -256,6 +258,19 @@ export interface AiToolDefinition {
   /** 이 tool 을 쓰려면 **전부** 필요한 capability. */
   requiredCapabilities: AiCapabilityKey[];
   executionMode: ToolExecutionMode;
+  /**
+   * 자동화를 **어떻게** 하는가 (WO-O4O-AUTOMATION-EXECUTION-LAYER-REALIGNMENT-V1 §13·§14·§15).
+   * executionMode(WHERE)와 별개의 축(HOW)이다. 모든 tool 이 반드시 선언한다 — 미선언 write action 은
+   * drift 다(§37). V0 현행 tool 은 computer.* 넷만 `computer_use`, 나머지는 전부 `api`(결정적 구조화)다.
+   * browser_dom · windows_uia 는 후속 WO 가 채운다(§27·§28).
+   */
+  automationMethod: AutomationMethod;
+  /**
+   * action 위험 등급 (동 WO §18). readOnly 만으로 구분 못 하는 "되돌릴 수 있는 입력" vs
+   * "결제·주문 확정" 을 나눈다. **불변식: readOnly ⇔ riskLevel==='READ'** (아래 registry 가 강제).
+   * REVIEW_REQUIRED · COMMIT tool 은 V0 에 없다 — 생기면 computer_use 자동 fallback 이 금지된다(§17·§19).
+   */
+  riskLevel: AutomationRiskLevel;
   /** read-only 가 아니면 아래 `effect` 를 반드시 선언해야 실행 게이트를 통과한다. */
   readOnly: boolean;
   /**
@@ -370,6 +385,8 @@ export type AiToolName = (typeof AI_TOOL_NAMES)[keyof typeof AI_TOOL_NAMES];
 export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   {
     name: AI_TOOL_NAMES.GET_WORK_SCOPE_CONTEXT,
+    automationMethod: 'api',
+    riskLevel: 'READ',
     description: '현재 사용자의 업무 공간·서비스·매장 확정 여부를 조회한다.',
     requiredCapabilities: [AiCapability.READ_ONLY_AI_CONTEXT],
     executionMode: 'server',
@@ -377,6 +394,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   },
   {
     name: AI_TOOL_NAMES.GET_STORE_CONTEXT,
+    automationMethod: 'api',
+    riskLevel: 'READ',
     description: '현재 사용자의 확정된 매장에서 사용 가능한 기능 목록을 조회한다.',
     requiredCapabilities: [AiCapability.READ_ONLY_STORE_CONTEXT],
     executionMode: 'server',
@@ -384,6 +403,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   },
   {
     name: AI_TOOL_NAMES.GET_LOCAL_AGENT_STATUS,
+    automationMethod: 'api',
+    riskLevel: 'READ',
     description: '이 사용자의 PC 에 설치된 Local Work Agent 의 연결 상태를 조회한다.',
     requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_AGENT_STATUS],
     executionMode: 'server',
@@ -391,6 +412,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   },
   {
     name: AI_TOOL_NAMES.GET_LOCAL_SYSTEM_INFO,
+    automationMethod: 'api',
+    riskLevel: 'READ',
     description: '연결된 PC 의 운영체제 이름·버전·아키텍처 등 기본 정보를 조회한다.',
     requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_SYSTEM_INFO],
     executionMode: 'local',
@@ -398,6 +421,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   },
   {
     name: AI_TOOL_NAMES.FIND_APPLICATION,
+    automationMethod: 'api',
+    riskLevel: 'READ',
     description: '등재된 Windows 프로그램이 지금 실행 중인지 확인한다.',
     requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_APP_INSPECT],
     executionMode: 'local',
@@ -406,6 +431,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   },
   {
     name: AI_TOOL_NAMES.ACTIVATE_WINDOW,
+    automationMethod: 'api',
+    riskLevel: 'REVERSIBLE',
     description: '등재된 Windows 프로그램의 창을 앞으로 가져온다.',
     requiredCapabilities: [AiCapability.LOCAL_WINDOW_ACTIVATE],
     executionMode: 'local',
@@ -416,6 +443,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   },
   {
     name: AI_TOOL_NAMES.BROWSER_GET_SITE_STATUS,
+    automationMethod: 'api',
+    riskLevel: 'READ',
     description: '등재된 사이트 기준으로 연결된 PC 에 브라우저가 떠 있는지 확인한다.',
     requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_BROWSER_INSPECT],
     executionMode: 'local',
@@ -424,6 +453,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   },
   {
     name: AI_TOOL_NAMES.BROWSER_OPEN_SITE,
+    automationMethod: 'api',
+    riskLevel: 'REVERSIBLE',
     description: '등재된 사이트를 연결된 PC 의 기본 브라우저로 연다. 로그인은 사용자가 직접 한다.',
     requiredCapabilities: [AiCapability.LOCAL_BROWSER_OPEN],
     // local 이다 — 'browser' mode 는 향후 브라우저 안(extension/CDP) 실행기의 자리이며
@@ -436,6 +467,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   // ── Computer Use V0 (§14~§20·§24) — 대상은 등재 appId 하나. HWND · 창 제목은 인자에 없다.
   {
     name: AI_TOOL_NAMES.COMPUTER_INSPECT,
+    automationMethod: 'computer_use',
+    riskLevel: 'READ',
     description: '등재된 프로그램 창이 앞에 있는지 · client 크기 · 화면 확인 가능 여부를 조회한다.',
     requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_COMPUTER_INSPECT],
     executionMode: 'local',
@@ -444,6 +477,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   },
   {
     name: AI_TOOL_NAMES.COMPUTER_CLICK,
+    automationMethod: 'computer_use',
+    riskLevel: 'REVERSIBLE',
     description: '등재된 프로그램 창 client 영역 안 한 점을 왼쪽 클릭 한 번 한다.',
     requiredCapabilities: [AiCapability.LOCAL_COMPUTER_INTERACT],
     executionMode: 'local',
@@ -453,6 +488,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   },
   {
     name: AI_TOOL_NAMES.COMPUTER_TYPE_TEXT,
+    automationMethod: 'computer_use',
+    riskLevel: 'REVERSIBLE',
     description: '등재된 프로그램 창에 짧은 일반 텍스트를 입력한다. 로그인·비밀번호에는 쓰지 않는다.',
     requiredCapabilities: [AiCapability.LOCAL_COMPUTER_INTERACT],
     executionMode: 'local',
@@ -462,6 +499,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   },
   {
     name: AI_TOOL_NAMES.COMPUTER_KEY,
+    automationMethod: 'computer_use',
+    riskLevel: 'REVERSIBLE',
     description: '등재된 프로그램 창에 ENTER · TAB · ESC 중 하나를 한 번 누른다.',
     requiredCapabilities: [AiCapability.LOCAL_COMPUTER_INTERACT],
     executionMode: 'local',
@@ -473,6 +512,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   //    임의 SQL · 임의 row · imported 원자료 · local.db 경로를 얻는 tool 은 없다. tool 별 좁은 인자뿐이다.
   {
     name: AI_TOOL_NAMES.DATA_LOCAL_HEALTH,
+    automationMethod: 'api',
+    riskLevel: 'READ',
     description: '연결된 PC 의 로컬 데이터 저장소가 정상인지 · 스키마 버전을 확인한다. DB 경로는 돌려주지 않는다.',
     requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_DATA],
     executionMode: 'local',
@@ -481,6 +522,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   },
   {
     name: AI_TOOL_NAMES.DATA_GET_LOCAL_META,
+    automationMethod: 'api',
+    riskLevel: 'READ',
     description: '연결된 PC 의 로컬 데이터 저장소에서 허용된 meta 키 하나의 값을 조회한다.',
     requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_DATA],
     executionMode: 'local',
@@ -489,6 +532,8 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
   },
   {
     name: AI_TOOL_NAMES.DATA_SET_LOCAL_SETTING,
+    automationMethod: 'api',
+    riskLevel: 'REVERSIBLE',
     description: '연결된 PC 의 로컬 데이터 저장소에서 허용된 설정 키 하나에 검증된 값을 저장한다.',
     requiredCapabilities: [AiCapability.LOCAL_DATA_SETTING_WRITE],
     executionMode: 'local',
@@ -500,6 +545,46 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
 
 export function findToolDefinition(name: string): AiToolDefinition | undefined {
   return AI_TOOL_REGISTRY.find((t) => t.name === name);
+}
+
+// ─── Automation drift guard (§37) ──────────────────────────────────────────────
+
+export interface AutomationInvariantViolation {
+  tool: string;
+  rule: string;
+}
+
+/**
+ * registry 가 automation 계약 불변식을 지키는지 검사한다(§37 drift 감지).
+ *
+ * 런타임에서 throw 하지 않는다 — 서버 기동을 깨지 않으려고 위반 목록만 돌려주고,
+ * 강제는 테스트(automation-execution-layer.spec)가 "위반 0건" 을 단언해 한다.
+ *
+ * 검사하는 불변식:
+ *   1. readOnly ⇔ riskLevel==='READ' (조회는 READ, 그 외는 READ 가 아니다).
+ *   2. automationMethod==='computer_use' ⇔ tool 이름이 `local.computer.*`
+ *      (화면 좌표 fallback 은 computer.* 넷뿐 — 구조화 tool 이 computer_use 로 표기되면 drift).
+ *   3. computer_use tool 은 자동 fallback 이 허용되는 위험 등급이어야 한다
+ *      (REVIEW_REQUIRED · COMMIT 를 computer_use 로 자동 실행하지 않는다 — §17·§19).
+ */
+export function findAutomationInvariantViolations(
+  tools: readonly AiToolDefinition[] = AI_TOOL_REGISTRY,
+): AutomationInvariantViolation[] {
+  const violations: AutomationInvariantViolation[] = [];
+  for (const tool of tools) {
+    if (tool.readOnly !== (tool.riskLevel === 'READ')) {
+      violations.push({ tool: tool.name, rule: 'readOnly ⇔ riskLevel===READ' });
+    }
+    const methodIsComputer = isComputerUseMethod(tool.automationMethod);
+    const nameIsComputer = tool.name.startsWith('local.computer.');
+    if (methodIsComputer !== nameIsComputer) {
+      violations.push({ tool: tool.name, rule: 'automationMethod===computer_use ⇔ local.computer.* 이름' });
+    }
+    if (methodIsComputer && !computerUseFallbackAllowed(tool.riskLevel)) {
+      violations.push({ tool: tool.name, rule: 'computer_use tool 은 자동 fallback 허용 위험 등급이어야 함(§17·§19)' });
+    }
+  }
+  return violations;
 }
 
 // ─── Eligibility ─────────────────────────────────────────────────────────────
