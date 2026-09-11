@@ -158,52 +158,7 @@ export const taxonomyApi = {
   }
 };
 
-/**
- * Forms Management
- */
-export const formApi = {
-  // Get all forms
-  async getAll(): Promise<CPTApiResponse<any[]>> {
-    const response = await authClient.api.get(`${API_BASE}/forms`);
-    return response.data;
-  },
-
-  // Get single form
-  async getById(id: string): Promise<CPTApiResponse<any>> {
-    const response = await authClient.api.get(`${API_BASE}/forms/${id}`);
-    return response.data;
-  },
-
-  // Create form
-  async create(data: any): Promise<CPTApiResponse<any>> {
-    const response = await authClient.api.post(`${API_BASE}/forms`, data);
-    return response.data;
-  },
-
-  // Update form
-  async update(id: string, data: any): Promise<CPTApiResponse<any>> {
-    const response = await authClient.api.put(`${API_BASE}/forms/${id}`, data);
-    return response.data;
-  },
-
-  // Delete form
-  async delete(id: string): Promise<CPTApiResponse<void>> {
-    const response = await authClient.api.delete(`${API_BASE}/forms/${id}`);
-    return response.data;
-  },
-
-  // Submit form
-  async submit(id: string, data: any): Promise<CPTApiResponse<any>> {
-    const response = await authClient.api.post(`${API_BASE}/forms/${id}/submit`, data);
-    return response.data;
-  },
-
-  // Get form submissions
-  async getSubmissions(id: string): Promise<CPTApiResponse<any[]>> {
-    const response = await authClient.api.get(`${API_BASE}/forms/${id}/submissions`);
-    return response.data;
-  }
-};
+// formApi (Forms Management) retired — WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1 (소비자 0 · 백엔드 /cpt/forms/* 제거)
 
 /**
  * CPT Post Management

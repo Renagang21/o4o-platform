@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { CPTController } from '../modules/cpt-acf/controllers/cpt.controller.js';
 import { FieldGroupsController } from '../controllers/cpt/FieldGroupsController.js';
 import { TaxonomiesController } from '../controllers/cpt/TaxonomiesController.js';
-import { FormsController } from '../controllers/cpt/FormsController.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { requireAdmin } from '../middleware/auth.middleware.js';
 
@@ -134,38 +133,8 @@ router.get('/objects/:objectType/:objectId/terms', authenticate, taxonomiesContr
 // ============= Terms Routes =============
 // Term routes are included in Taxonomies section above
 
-// ============= Forms Routes =============
-const formsController = new FormsController();
-
-// Get all forms
-router.get('/forms', authenticate, formsController.getAllForms.bind(formsController));
-
-// Get single form by ID
-router.get('/forms/:id', authenticate, formsController.getFormById.bind(formsController));
-
-// Get form by name (public access for rendering)
-router.get('/forms/name/:name', formsController.getFormByName.bind(formsController));
-
-// Create new form
-router.post('/forms', authenticate, requireAdmin, formsController.createForm.bind(formsController));
-
-// Update form
-router.put('/forms/:id', authenticate, requireAdmin, formsController.updateForm.bind(formsController));
-
-// Delete form
-router.delete('/forms/:id', authenticate, requireAdmin, formsController.deleteForm.bind(formsController));
-
-// Duplicate form
-router.post('/forms/:id/duplicate', authenticate, requireAdmin, formsController.duplicateForm.bind(formsController));
-
-// Update form status
-router.patch('/forms/:id/status', authenticate, requireAdmin, formsController.updateFormStatus.bind(formsController));
-
-// Get form submissions
-router.get('/forms/:id/submissions', authenticate, requireAdmin, formsController.getFormSubmissions.bind(formsController));
-
-// Submit form (public access)
-router.post('/forms/:id/submit', formsController.submitForm.bind(formsController));
+// Forms Routes retired — WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1
+//   운영 DB 에 forms/form_submissions 테이블이 없고(생성 migration 0) 메뉴·외부 소비자 0 이었다.
 
 // ============= Utility Routes =============
 

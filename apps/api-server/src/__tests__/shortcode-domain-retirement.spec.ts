@@ -260,15 +260,13 @@ describe('9. dead shortcode 잔재 · 권한 계약 (WO-O4O-DEAD-SHORTCODE-RESID
     });
 
     it("공용 권한 상수에 'cms.shortcodes.manage' · SHORTCODES 카테고리가 없다 (소비 0 · 운영 permissions 행 0 근거)", () => {
-      for (const rel of [
-        'packages/types/src/auth/permissions.ts',
-        'packages/types/src/auth/permissions.d.ts',
-        'packages/types/src/auth/permissions.js',
-      ]) {
-        const src = codeOf(rel);
-        expect(src).not.toContain('cms.shortcodes.manage');
-        expect(src).not.toMatch(/SHORTCODES:/);
-      }
+      // 추적되던 permissions.d.ts / .js 산출물은
+      // WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1 에서 untrack 됐다 (정본은 .ts 뿐).
+      const src = codeOf('packages/types/src/auth/permissions.ts');
+      expect(src).not.toContain('cms.shortcodes.manage');
+      expect(src).not.toMatch(/SHORTCODES:/);
+      expect(exists('packages', 'types', 'src', 'auth', 'permissions.d.ts')).toBe(false);
+      expect(exists('packages', 'types', 'src', 'auth', 'permissions.js')).toBe(false);
     });
 
     it("형제 권한 'cms.blocks.manage' · 'cpt.manage' 는 그대로다 (일괄 삭제 아님)", () => {
@@ -277,38 +275,35 @@ describe('9. dead shortcode 잔재 · 권한 계약 (WO-O4O-DEAD-SHORTCODE-RESID
     });
   });
 
-  describe('B축 — Form shortcode', () => {
-    it('Form 엔티티 · FormsController · form-builder 타입에 shortcode 가 없다', () => {
-      for (const rel of [
-        'apps/api-server/src/entities/Form.ts',
-        'apps/api-server/src/controllers/cpt/FormsController.ts',
-        'packages/types/src/form-builder.ts',
-        'packages/types/src/form-builder.d.ts',
+  // B축 · C축 갱신 — WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1:
+  //   Form 축(Form.ts · FormsController.ts · packages/types form-builder) 과 legacy App 축(App.ts) 은
+  //   기능 단위로 완전 제거됐다. 부재 자체가 "shortcode 0" 의 증명이며, 삭제된 기능을 fixture 로 되살리지 않는다.
+  describe('B축 — Form shortcode (Form 축 제거 후)', () => {
+    it('Form 축 파일이 존재하지 않는다 (shortcode 잔재 재발 불가)', () => {
+      for (const seg of [
+        ['apps', 'api-server', 'src', 'entities', 'Form.ts'],
+        ['apps', 'api-server', 'src', 'controllers', 'cpt', 'FormsController.ts'],
+        ['packages', 'types', 'src', 'form-builder.ts'],
+        ['packages', 'types', 'src', 'form-builder.d.ts'],
       ]) {
-        expect(codeOf(rel)).not.toMatch(/shortcode/i);
+        expect(exists(...seg)).toBe(false);
       }
     });
 
     it('`[form name="…"]` 생성 문자열이 api-server 에 없다', () => {
-      expect(codeOf('apps/api-server/src/controllers/cpt/FormsController.ts')).not.toContain('[form ');
-    });
-
-    it('Form 기능 자체(라우트 · FormBuilder 화면)는 삭제하지 않았다', () => {
-      expect(readRoot('apps/api-server/src/routes/cpt.ts')).toContain("router.post('/forms'");
-      expect(exists('apps', 'admin-dashboard', 'src', 'pages', 'cpt-engine', 'forms', 'FormBuilder.tsx')).toBe(true);
+      expect(readRoot('apps/api-server/src/routes/cpt.ts')).not.toContain('[form ');
+      expect(readRoot('apps/api-server/src/routes/cpt.ts')).not.toContain("router.post('/forms'");
     });
   });
 
-  describe('C축 — App metadata · enum', () => {
-    it("App.type 소스 enum 에 'shortcode' 가 없고 manifest.provides.shortcodes 필드도 없다", () => {
-      const src = codeOf('apps/api-server/src/entities/App.ts');
-      expect(src).not.toMatch(/shortcode/i);
-      expect(src).toContain("enum: ['integration', 'block', 'widget', 'workflow']");
+  describe('C축 — App metadata · enum (legacy App 축 제거 후)', () => {
+    it('legacy App 엔티티가 존재하지 않고 startup 은 google-gemini-text 를 등록하지 않는다', () => {
+      expect(exists('apps', 'api-server', 'src', 'entities', 'App.ts')).toBe(false);
+      expect(codeOf('apps/api-server/src/services/startup.service.ts')).not.toContain("slug: 'google-gemini-text'");
     });
 
-    it('App legacy 엔티티 자체는 보존된다 (startup 이 google-gemini-text 를 등록한다)', () => {
-      expect(exists('apps', 'api-server', 'src', 'entities', 'App.ts')).toBe(true);
-      expect(readRoot('apps/api-server/src/services/startup.service.ts')).toContain("slug: 'google-gemini-text'");
+    it('canonical AppRegistry 는 shortcode 를 모른다', () => {
+      expect(codeOf('apps/api-server/src/entities/AppRegistry.ts')).not.toMatch(/shortcode/i);
     });
 
     it('DB enum migration 을 만들지 않았다 (운영 apps.type = varchar · enum 부재)', () => {

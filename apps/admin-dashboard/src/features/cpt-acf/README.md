@@ -14,6 +14,10 @@ Custom Post Type (CPT) & Advanced Custom Fields (ACF) Engine - Complete document
 
 ## Quick Start Guide
 
+> Form Builder (FormBuilder / FormsManager / `/cpt/forms/*`) 는
+> WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1 에서 제거됐다
+> (운영 DB 에 forms 테이블 부재 · 메뉴·소비자 0). 본 문서는 CPT · Field Group · Taxonomy 만 다룬다.
+
 Get started with CPT Engine in 5 minutes.
 
 ### Creating a Custom Post Type
@@ -67,21 +71,6 @@ function MyComponent() {
       ]
     });
   };
-}
-```
-
-### Rendering a Form
-
-```tsx
-import { FormRenderer } from '@/features/cpt-acf/components/FormRenderer';
-
-function ContactPage() {
-  return (
-    <FormRenderer
-      formSlug="contact-form"
-      onSuccess={(data) => console.log('Submitted:', data)}
-    />
-  );
 }
 ```
 
@@ -446,86 +435,6 @@ Combined date and time.
 
 ## API Reference
 
-### Forms API
-
-#### Submit Form
-Submit form data and create post/user.
-
-**Endpoint:**
-```
-POST /api/cpt-engine/forms/submit
-```
-
-**Request Body:**
-```typescript
-{
-  formId: string;
-  values: Record<string, any>;
-}
-```
-
-**Response:**
-```typescript
-{
-  success: boolean;
-  data?: {
-    postId?: string;
-    userId?: string;
-    message?: string;
-  };
-  error?: string;
-}
-```
-
-**Example:**
-```typescript
-const response = await authClient.api.post('/api/cpt-engine/forms/submit', {
-  formId: 'contact-form-123',
-  values: {
-    name: 'John Doe',
-    email: 'john@example.com',
-    message: 'Hello!',
-  }
-});
-```
-
-#### Get Form
-Retrieve form configuration.
-
-**Endpoint:**
-```
-GET /api/cpt-engine/forms/{id}
-GET /api/cpt-engine/forms/slug/{slug}
-```
-
-**Response:**
-```typescript
-{
-  success: boolean;
-  data?: FormData;
-  error?: string;
-}
-
-interface FormData {
-  id: string;
-  name: string;
-  description?: string;
-  type: 'contact' | 'post' | 'user' | 'search' | 'cpt';
-  cptSlug?: string;
-  status: 'active' | 'inactive';
-  fields: FormField[];
-  settings: {
-    submitAction?: 'create_post' | 'create_user' | 'send_email' | 'both';
-    redirectUrl?: string;
-    successMessage?: string;
-    notification?: {
-      enabled: boolean;
-      email?: string;
-    };
-  };
-}
-```
-
 ### Custom Post Types API
 
 #### Create CPT
@@ -598,7 +507,6 @@ GET /api/cpt-engine/field-groups
 ```
 src/features/cpt-acf/
 ├── components/
-│   ├── FormRenderer.tsx           # Front-end form rendering
 │   ├── fields/
 │   │   ├── TextFieldInput.tsx
 │   │   ├── RepeaterFieldInput.tsx
@@ -613,23 +521,6 @@ src/features/cpt-acf/
 └── types/
     └── acf.types.ts               # TypeScript definitions
 ```
-
-### Data Flow
-
-1. **Form Creation:**
-   ```
-   FormBuilder → API → Database
-   ```
-
-2. **Form Rendering:**
-   ```
-   FormRenderer → API (load form) → Render fields → Submit → API
-   ```
-
-3. **Field Value Display:**
-   ```
-   FormRenderer → Get field values → Render by type
-   ```
 
 ### Location Rules
 
@@ -663,41 +554,6 @@ Field groups can be conditionally displayed based on location rules:
 ---
 
 ## Components Reference
-
-### FormRenderer
-
-Render forms created with FormBuilder.
-
-**Props:**
-```typescript
-interface FormRendererProps {
-  formId?: string;                    // Form ID
-  formSlug?: string;                  // Form slug (alternative)
-  formData?: FormData;                // Pre-loaded form data
-  onSubmit?: (values: Record<string, any>) => Promise<void>;
-  onSuccess?: (response: any) => void;
-  onError?: (error: any) => void;
-  className?: string;
-  showTitle?: boolean;                // Show form title
-  showDescription?: boolean;          // Show form description
-}
-```
-
-**Usage:**
-```tsx
-<FormRenderer
-  formSlug="contact-form"
-  showTitle={true}
-  showDescription={true}
-  onSuccess={(data) => {
-    console.log('Form submitted:', data);
-    // Custom success handling
-  }}
-  onError={(error) => {
-    console.error('Submission failed:', error);
-  }}
-/>
-```
 
 ### RepeaterFieldInput
 
@@ -799,15 +655,6 @@ Provide sensible defaults for better UX:
 ---
 
 ## Troubleshooting
-
-### Forms not submitting
-
-**Check:**
-1. Form status is 'active'
-2. Required fields are filled
-3. Validation rules are satisfied
-4. Network requests in browser DevTools
-5. Server logs for errors
 
 ### Field values not saving
 

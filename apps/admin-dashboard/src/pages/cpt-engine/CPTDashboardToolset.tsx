@@ -8,7 +8,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   Plus,
   Settings,
-  FileText,
   Database,
   Tag,
   Edit3,
@@ -166,11 +165,6 @@ const CPTDashboardToolset = () => {
     navigate(`/cpt-engine/taxonomies/new?postType=${cptSlug}`);
   };
 
-  // Handle creating form
-  const handleCreateForm = (cptSlug: string) => {
-    navigate(`/cpt-engine/forms/new?postType=${cptSlug}`);
-  };
-
   // Handle creating archive
   const handleCreateArchive = (cptSlug: string) => {
     navigate(`/cpt-engine/archives/new?postType=${cptSlug}`);
@@ -272,7 +266,7 @@ const CPTDashboardToolset = () => {
           CPT Engine - Toolset Style
         </h1>
         <p style={{ color: '#666', fontSize: '14px' }}>
-          Manage your Custom Post Types, Fields, Taxonomies, and Forms
+          Manage your Custom Post Types, Fields, and Taxonomies
         </p>
       </div>
 
@@ -356,8 +350,7 @@ const CPTDashboardToolset = () => {
                   <th style={{ width: '25%' }}>Post Type</th>
                   <th style={{ width: '20%' }}>Custom Fields</th>
                   <th style={{ width: '20%' }}>Taxonomies</th>
-                  <th style={{ width: '15%' }}>React Template</th>
-                  <th style={{ width: '20%' }}>Forms</th>
+                  <th style={{ width: '35%' }}>React Template</th>
                 </tr>
               </thead>
               <tbody>
@@ -420,15 +413,6 @@ const CPTDashboardToolset = () => {
                           </span>
                         </div>
                       </td>
-                      <td>
-                        <button
-                          className="toolset-btn-small"
-                          onClick={() => handleCreateForm(cpt.slug)}
-                        >
-                          <FileText size={14} />
-                          Create Form
-                        </button>
-                      </td>
                     </tr>
                   );
                 })}
@@ -485,8 +469,7 @@ const CPTDashboardToolset = () => {
                   <th style={{ width: '25%' }}>Post Type</th>
                   <th style={{ width: '20%' }}>Custom Fields</th>
                   <th style={{ width: '20%' }}>Taxonomies</th>
-                  <th style={{ width: '20%' }}>Archive</th>
-                  <th style={{ width: '15%' }}>Forms</th>
+                  <th style={{ width: '35%' }}>Archive</th>
                 </tr>
               </thead>
               <tbody>
@@ -572,15 +555,6 @@ const CPTDashboardToolset = () => {
                             )}
                           </div>
                         )}
-                      </td>
-                      <td>
-                        <button
-                          className="toolset-btn-small"
-                          onClick={() => handleCreateForm(cpt.slug)}
-                        >
-                          <FileText size={14} />
-                          Create
-                        </button>
                       </td>
                     </tr>
                   );

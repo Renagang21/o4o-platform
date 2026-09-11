@@ -61,18 +61,16 @@ import { AiEngine } from '../entities/AiEngine.js';
 import { AiQueryPolicy } from '../entities/AiQueryPolicy.js';
 import { AiQueryLog } from '../entities/AiQueryLog.js';
 // App System entities
-import { App } from '../entities/App.js';
 // AppInstance (app_instances) retired — WO-O4O-APP-INSTANCES-LIFECYCLE-CENSUS-AND-CANONICAL-DISPOSITION-V1
-import { AppUsageLog } from '../entities/AppUsageLog.js';
+// App (apps) · AppUsageLog (app_usage_logs) retired — WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1
+//   앱 설치·활성 정본은 AppRegistry (app_registry) 다.
 import { AppRegistry } from '../entities/AppRegistry.js';
 // Cart/Order/Settlement entities removed - legacy commerce entities
 // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
 //   dropshipping entity 주석 블록 제거. @o4o/dropshipping-core 패키지가 삭제되었고
 //   해당 엔티티는 등록된 적이 없다 (운영 테이블 0). 상품=ProductMaster,
 //   공급 오퍼=SupplierProductOffer, 주문=checkout_orders 가 정본이다.
-// Form entities
-import { Form } from '../entities/Form.js';
-import { FormSubmission } from '../entities/FormSubmission.js';
+// Form (forms) · FormSubmission (form_submissions) retired — WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1 (운영 테이블 부재)
 // Customizer entities
 import { CustomizerPreset } from '../entities/CustomizerPreset.js';
 import { WidgetArea } from '../entities/WidgetArea.js';
@@ -633,14 +631,10 @@ export const entities = [
   AiEngine,
   AiQueryPolicy,
   AiQueryLog,
-  // App System entities
-  App,
-  AppUsageLog,
+  // App System entities (App · AppUsageLog retired)
   AppRegistry,
   // Cart/Order/Settlement entities removed - legacy commerce
-  // Form entities
-  Form,
-  FormSubmission,
+  // Form entities retired
   // Customizer entities
   CustomizerPreset,
   WidgetArea,

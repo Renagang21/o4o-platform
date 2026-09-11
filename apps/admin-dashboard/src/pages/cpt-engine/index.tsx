@@ -7,8 +7,6 @@ import { Routes, Route } from 'react-router-dom';
 import CPTDashboardToolset from './CPTDashboardToolset';
 import CPTBuilderWrapper from './components/CPTBuilderWrapper';
 import CPTContentList from './components/CPTContentList';
-import FormsManager from './forms/FormsManager';
-import FormBuilder from './forms/FormBuilder';
 import FieldGroupsList from './field-groups/FieldGroupsList';
 import FieldGroupEditor from './field-groups/FieldGroupEditor';
 import TaxonomiesList from './taxonomies/TaxonomiesList';
@@ -55,11 +53,6 @@ const CPTEngine = () => {
       <Route path="archives/new" element={<CPTBuilderWrapper />} />
       <Route path="archives/:slug/edit" element={<CPTBuilderWrapper />} />
       
-      {/* Forms Routes */}
-      <Route path="forms" element={<FormsManager />} />
-      <Route path="forms/new" element={<FormBuilder />} />
-      <Route path="forms/:id/edit" element={<FormBuilder />} />
-
       {/* Tools Routes */}
       <Route path="tools" element={<ToolsPage />} />
 

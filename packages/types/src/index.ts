@@ -22,7 +22,6 @@ export * from './advanced-custom-fields.js';
 export * from './media.js';
 export * from './template.js';
 export * from './widget.js';
-export * from './form-builder.js';
 export * from './zone.js';
 export * from './access-control.js';
 

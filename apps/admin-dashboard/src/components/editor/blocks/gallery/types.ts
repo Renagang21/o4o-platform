@@ -157,22 +157,6 @@ export interface GallerySettingsProps {
   className?: string;
 }
 
-// WordPress Gutenberg 호환 타입
-export interface WordPressGalleryShortcode {
-  tag: 'gallery';
-  attrs: {
-    ids?: string;
-    columns?: string;
-    size?: string;
-    link?: string;
-    orderby?: string;
-    order?: string;
-    include?: string;
-    exclude?: string;
-  };
-  type: 'self-closing';
-}
-
 // 에러 타입
 export interface GalleryError {
   type: 'upload' | 'loading' | 'processing' | 'validation';

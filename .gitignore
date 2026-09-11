@@ -61,6 +61,13 @@ dist/
 # 로컬 node_modules 인벤토리 스냅샷 (생성물 · 소스 아님)
 /workspace-packages.json
 
+# @o4o/types 의 tsc 산출물이 src/ 에 추적되던 잔재 (outDir 은 dist/ · 수기 .d.ts 0)
+# WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1
+/packages/types/src/**/*.js
+/packages/types/src/**/*.js.map
+/packages/types/src/**/*.d.ts
+/packages/types/src/**/*.d.ts.map
+
 # TypeScript build cache
 *.tsbuildinfo
 

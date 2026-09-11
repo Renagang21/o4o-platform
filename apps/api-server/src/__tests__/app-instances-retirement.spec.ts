@@ -33,21 +33,13 @@ describe('app_instances retirement contract', () => {
     expect(entities).not.toMatch(/^\s*AppInstance,\s*$/m);
   });
 
-  it('app-registry.service 가 app_instances 계약을 노출하지 않는다', () => {
-    const svc = readFileSync(join(SRC, 'services', 'app-registry.service.ts'), 'utf-8');
-    // 주석의 retire 설명은 허용하고, 실제 코드 심볼만 금지한다.
-    const code = svc
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/^\s*\/\/.*$/gm, '');
-    expect(code).not.toMatch(/AppInstance/);
-    expect(code).not.toMatch(/instanceRepository/);
-    for (const method of ['install(', 'updateConfig(', 'executeAppLogic(']) {
-      expect(code).not.toContain(method);
-    }
-    // `static getInstance()` 는 싱글턴 접근자이므로 명칭 충돌이다 — 금지 대상이 아니다.
-    // app_instances 조회용 `getInstance(appSlug, ...)` 시그니처만 금지한다.
-    expect(code).not.toMatch(/getInstance\s*\(\s*appSlug/);
-    expect(code).toMatch(/static getInstance\(\): AppRegistryService/);
+  it('app-registry.service (legacy `apps` 테이블 서비스) 자체가 존재하지 않는다', () => {
+    // WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1:
+    //   app_instances 계약을 노출하지 않는지 검사하던 대상 파일이 legacy App 축과 함께 제거됐다.
+    //   부재 = app_instances 계약 노출 0.
+    expect(existsSync(join(SRC, 'services', 'app-registry.service.ts'))).toBe(false);
+    expect(existsSync(join(SRC, 'entities', 'App.ts'))).toBe(false);
+    expect(existsSync(join(SRC, 'entities', 'AppUsageLog.ts'))).toBe(false);
   });
 
   it('app_registry 정본은 그대로 유지된다 (회귀 가드)', () => {

@@ -57,7 +57,8 @@ export class StartupService {
     logger.info('Starting initialization sequence...');
 
     await this.initializeDatabase();
-    await this.initializeAppSystem();
+    // initializeAppSystem (legacy `apps` 테이블 · google-gemini-text 자기 seed) retired — WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1
+    //   읽기 소비자 0 · AI 실행 정본은 서버측 AI proxy(@o4o/ai-core) · 앱 정본은 AppRegistry(app_registry).
     await this.initializeMonitoring();
     await this.initializeSchedulers();
     await this.initializeWebhooksAndBatchJobs();
@@ -198,66 +199,6 @@ export class StartupService {
           logger.debug('Seed migration fallback skipped');
         }
       }
-    }
-  }
-
-  /**
-   * Initialize App Registry Service (Google AI, future OpenAI, etc.)
-   */
-  private async initializeAppSystem(): Promise<void> {
-    if (!AppDataSource.isInitialized) {
-      logger.warn('Skipping App System initialization (database not connected)');
-      return;
-    }
-
-    try {
-      const { appRegistry } = await import('./app-registry.service.js');
-
-      appRegistry.initialize(AppDataSource);
-
-      // App registration (WO-O4O-AI-LLM-PATH-CONSOLIDATION: moved from google-ai.service.ts)
-      const geminiApp = await appRegistry.getBySlug('google-gemini-text');
-      if (!geminiApp) {
-        await appRegistry.register({
-          slug: 'google-gemini-text',
-          name: 'Gemini 텍스트 생성',
-          provider: 'google',
-          category: 'text-generation',
-          type: 'integration',
-          description: 'Google Gemini API를 사용한 텍스트 생성',
-          icon: 'sparkles',
-          version: '1.0.0',
-          status: 'active',
-          isSystem: true,
-          manifest: {
-            displayName: 'Gemini Text Generation',
-            category: 'AI Text',
-            provides: {
-              apis: [{ path: '/execute', method: 'POST', description: 'Generate text using Gemini' }],
-            },
-            settingsSchema: {
-              apiKey: { type: 'string', required: true, description: 'Google AI API Key', secret: true },
-              model: {
-                type: 'select',
-                // WO-O4O-AI-MODEL-SETTINGS-CLEANUP-V1: gemini-3.0-* removed (non-existent in Google API).
-                options: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'],
-                default: 'gemini-2.5-flash',
-                description: 'Gemini model to use',
-              },
-              temperature: { type: 'number', default: 0.7, min: 0, max: 2, description: 'Sampling temperature' },
-            },
-          },
-        });
-        logger.info('Gemini app registered');
-      }
-
-      logger.info('✅ App System initialized');
-    } catch (appError) {
-      logger.error('Failed to initialize App System:', appError);
-      // Temporarily non-critical during clean DB reset + app installation
-      // Will be re-enabled after core apps are installed
-      logger.warn('⚠️  Continuing without App System (clean DB mode)');
-      // throw appError; // Critical error - App System is core functionality
     }
   }
 
