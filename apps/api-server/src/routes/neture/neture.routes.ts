@@ -12,7 +12,6 @@ import { createNetureCommunityHubController } from './controllers/neture-communi
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
 // WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1: Store HUB controllers
-import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
 import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
 // WO-O4O-EVENT-OFFER-NETURE-ADOPTION-V1
 import { createNetureEventOfferController } from './controllers/event-offer.controller.js';
@@ -48,11 +47,15 @@ export function createNetureRoutes(dataSource: DataSource): Router {
 
   // ============================================================================
   // Store HUB Controllers — WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1
-  // /api/v1/neture/assets, /store-playlists
+  // /api/v1/neture/store-playlists
   //   (제거) /store-assets — WO-O4O-KCOS-STORE-CONTENTS-WRAPPER-AND-DEAD-ASSET-MOUNT-CLOSURE-V1:
   //   kpa_store_asset_controls 기반 KPA 전용 계층. Neture frontend consumer 0 · 60일 production 요청 0 인 dead mount.
+  //   (제거) /assets — WO-O4O-NETURE-KPA-ASSET-HARDCODING-AND-DEAD-PACKAGE-GENERATED-ARTIFACT-CLOSURE-V1:
+  //   KPA 전용 createAssetSnapshotController(allowedRoles kpa:* · resolveKpaOrgId · KpaAssetResolver) 를 그대로
+  //   마운트해 Neture 전용 사용자는 403, KPA 겸임 사용자는 KPA 조직 스냅샷을 보게 되던 잔재.
+  //   Neture frontend/backend/test consumer 0 · 60일 production 요청 = IR 검증용 Python-urllib 4건뿐.
+  //   Neture 전용 대체 기능을 만들지 않는다 — Neture 는 매장 자료함/스냅샷 축 자체가 없다.
   // ============================================================================
-  router.use('/assets', createAssetSnapshotController(dataSource, requireAuth as any));
   router.use('/store-playlists', createStorePlaylistController(dataSource, requireAuth as any));
 
   // ============================================================================

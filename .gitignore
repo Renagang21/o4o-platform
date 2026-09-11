@@ -68,6 +68,17 @@ dist/
 /packages/types/src/**/*.d.ts
 /packages/types/src/**/*.d.ts.map
 
+# @o4o/forum-core · @o4o/auth-client 의 tsc 산출물이 src/ 에 추적되던 잔재 (outDir 은 dist/ · 위 @o4o/types 와 동일 클래스)
+# WO-O4O-NETURE-KPA-ASSET-HARDCODING-AND-DEAD-PACKAGE-GENERATED-ARTIFACT-CLOSURE-V1
+/packages/forum-core/src/**/*.js
+/packages/forum-core/src/**/*.js.map
+/packages/forum-core/src/**/*.d.ts
+/packages/forum-core/src/**/*.d.ts.map
+/packages/auth-client/src/**/*.js
+/packages/auth-client/src/**/*.js.map
+/packages/auth-client/src/**/*.d.ts
+/packages/auth-client/src/**/*.d.ts.map
+
 # TypeScript build cache
 *.tsbuildinfo
 
