@@ -55,6 +55,8 @@
  *   POST   /api/v1/kpa-branch/branches/:branchSlug/operator/members/:userId/leave               전출
  *   *      /api/v1/kpa-branch/admin/domains/**                               (admin scope)
  *   *      /api/v1/kpa-branch/admin/service-members/**                        (admin scope)  가입 승인
+ *   POST   /api/v1/kpa-branch/admin/branches                                 (platform:super_admin)  신규 분회 생성
+ *   DELETE /api/v1/kpa-branch/admin/branches/:id                             (platform:super_admin)  오생성 분회 정리 (하위 0행일 때만)
  *
  * 가드 2겹 (합치지 않는다):
  *   requireAuth → requireKpaBranchScope(서비스 축) → resolveBranch → requireBranchScope(분회 축)
@@ -66,7 +68,7 @@
 import { Router } from 'express';
 import { getService } from '../../config/service-catalog.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
-import { requireAuth } from '../../middleware/auth.middleware.js';
+import { requireAuth, requireRole } from '../../middleware/auth.middleware.js';
 import { AppDataSource } from '../../database/connection.js';
 import {
   requireKpaBranchScope,
@@ -88,6 +90,7 @@ import { BranchFeeController } from '../../controllers/kpa-branch/BranchFeeContr
 import { BranchEducationCreditController } from '../../controllers/kpa-branch/BranchEducationCreditController.js';
 import { BranchEventController } from '../../controllers/kpa-branch/BranchEventController.js';
 import { BranchOfficerController } from '../../controllers/kpa-branch/BranchOfficerController.js';
+import { BranchAdminController } from '../../controllers/kpa-branch/BranchAdminController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
@@ -587,6 +590,16 @@ export function createKpaBranchRoutes(): Router {
     ...adminGuards,
     wrap(BranchServiceMembershipController.reject),
   );
+
+  // 분회 registry 생성·정리 — WO-O4O-KPA-BRANCH-CANONICAL-BRANCH-CREATION-API-V1
+  //
+  // adminGuards(kpa-branch:admin, platformBypass) 가 아니라 requireRole('platform:super_admin') 이다.
+  // 분회를 새로 만드는 일은 서비스 관리자 권한이 아니라 플랫폼 구조 변경이고, 이전까지는
+  // raw SQL 이 유일한 경로였다. 생성만으로 site/운영자/회원은 만들지 않는다 — 온보딩은
+  // 기존 canonical 경로(operator/members · admin/service-members · operator/site) 를 그대로 쓴다.
+  const superAdminGuards = [requireAuth as any, requireRole('platform:super_admin') as any];
+  router.post('/admin/branches', ...superAdminGuards, wrap(BranchAdminController.create));
+  router.delete('/admin/branches/:id', ...superAdminGuards, wrap(BranchAdminController.remove));
 
   return router;
 }
