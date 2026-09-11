@@ -29,7 +29,6 @@ export const PERMISSION_CATEGORIES = {
   // CMS Features
   CMS: 'cms',
   BLOCKS: 'blocks',
-  SHORTCODES: 'shortcodes',
 
   // Commerce
   PRODUCTS: 'products',
@@ -139,7 +138,8 @@ export const PERMISSIONS = {
   'cms.dashboard.view': 'cms.dashboard.view',
   'cms.templates.edit': 'cms.templates.edit',
   'cms.blocks.manage': 'cms.blocks.manage',
-  'cms.shortcodes.manage': 'cms.shortcodes.manage',
+  // WO-O4O-DEAD-SHORTCODE-RESIDUE-AND-PERMISSION-CONTRACT-FINAL-CLOSURE-V1:
+  //   'cms.shortcodes.manage' 제거 — 직접 참조 0 · role 부여는 Object.values spread 뿐 · 운영 permissions 행 0 (TYPE_ONLY_RESIDUE).
 
   // Products
   'products.view': 'products.view',

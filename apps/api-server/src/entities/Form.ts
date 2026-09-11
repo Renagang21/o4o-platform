@@ -69,8 +69,8 @@ export class Form {
   @Column({ type: 'jsonb', nullable: true })
   fieldIndex: Record<string, number>; // Map field names to indices for quick lookup
 
-  @Column({ type: 'text', nullable: true })
-  shortcode: string; // [form id="form-id"] or [form name="form-name"]
+  // WO-O4O-DEAD-SHORTCODE-RESIDUE-AND-PERMISSION-CONTRACT-FINAL-CLOSURE-V1:
+  //   `shortcode` ([form name="…"]) 컬럼 제거 — parser/renderer 0 · 프론트 read 0 · 운영 forms 테이블 부재.
 
   @Column({ type: 'jsonb', nullable: true })
   metadata: Record<string, any>; // Additional metadata

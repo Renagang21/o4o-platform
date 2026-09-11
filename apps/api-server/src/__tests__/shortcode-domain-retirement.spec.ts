@@ -23,6 +23,11 @@
  *   7. `scripts/audit/check-shortcode-registry.ts` 0
  *   8. cosmetics-seller-extension 패키지 부재
  *      (WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §18 에서 패키지 전체 은퇴)
+ *   9. dead shortcode 잔재 · 권한 계약 최종 마감
+ *      (WO-O4O-DEAD-SHORTCODE-RESIDUE-AND-PERMISSION-CONTRACT-FINAL-CLOSURE-V1)
+ *      — `shortcodes.manage` · `cms.shortcodes.manage` 권한 문자열 0,
+ *        `Form.shortcode` 필드·생성 문자열 0, `App` 의 shortcode enum/manifest 0,
+ *        QR `shortCode` 식별자 · block-renderer · migration 이력은 보존.
  *
  * 스크립트를 실행하지 않고 raw-source 로 단언한다. DB · 네트워크 접근 0.
  */
@@ -237,5 +242,95 @@ describe('8. cosmetics-seller-extension 패키지가 부재한다', () => {
   it('App Store 카탈로그에 항목이 없다', () => {
     const catalog = readRoot('apps/api-server/src/app-manifests/appsCatalog.ts');
     expect(catalog).not.toContain("appId: 'cosmetics-seller-extension'");
+  });
+});
+
+describe('9. dead shortcode 잔재 · 권한 계약 (WO-O4O-DEAD-SHORTCODE-RESIDUE-AND-PERMISSION-CONTRACT-FINAL-CLOSURE-V1)', () => {
+  // 주석 줄은 판정 근거 기록이므로 제외하고 코드 줄만 검사한다.
+  const codeOf = (rel: string) =>
+    readRoot(rel)
+      .split('\n')
+      .filter((line) => !/^\s*(\/\/|\*|\/\*)/.test(line))
+      .join('\n');
+
+  describe('A축 — 권한 잔재', () => {
+    it("구형 'shortcodes.manage' 가 User.getAllPermissions · role-assignment 반환 배열에 없다", () => {
+      expect(codeOf('apps/api-server/src/modules/auth/entities/User.ts')).not.toContain('shortcodes.manage');
+      expect(codeOf('apps/api-server/src/modules/auth/services/role-assignment.service.ts')).not.toContain('shortcodes.manage');
+    });
+
+    it("공용 권한 상수에 'cms.shortcodes.manage' · SHORTCODES 카테고리가 없다 (소비 0 · 운영 permissions 행 0 근거)", () => {
+      for (const rel of [
+        'packages/types/src/auth/permissions.ts',
+        'packages/types/src/auth/permissions.d.ts',
+        'packages/types/src/auth/permissions.js',
+      ]) {
+        const src = codeOf(rel);
+        expect(src).not.toContain('cms.shortcodes.manage');
+        expect(src).not.toMatch(/SHORTCODES:/);
+      }
+    });
+
+    it("형제 권한 'cms.blocks.manage' · 'cpt.manage' 는 그대로다 (일괄 삭제 아님)", () => {
+      expect(codeOf('packages/types/src/auth/permissions.ts')).toContain("'cms.blocks.manage'");
+      expect(codeOf('apps/api-server/src/modules/auth/entities/User.ts')).toContain("'cpt.manage'");
+    });
+  });
+
+  describe('B축 — Form shortcode', () => {
+    it('Form 엔티티 · FormsController · form-builder 타입에 shortcode 가 없다', () => {
+      for (const rel of [
+        'apps/api-server/src/entities/Form.ts',
+        'apps/api-server/src/controllers/cpt/FormsController.ts',
+        'packages/types/src/form-builder.ts',
+        'packages/types/src/form-builder.d.ts',
+      ]) {
+        expect(codeOf(rel)).not.toMatch(/shortcode/i);
+      }
+    });
+
+    it('`[form name="…"]` 생성 문자열이 api-server 에 없다', () => {
+      expect(codeOf('apps/api-server/src/controllers/cpt/FormsController.ts')).not.toContain('[form ');
+    });
+
+    it('Form 기능 자체(라우트 · FormBuilder 화면)는 삭제하지 않았다', () => {
+      expect(readRoot('apps/api-server/src/routes/cpt.ts')).toContain("router.post('/forms'");
+      expect(exists('apps', 'admin-dashboard', 'src', 'pages', 'cpt-engine', 'forms', 'FormBuilder.tsx')).toBe(true);
+    });
+  });
+
+  describe('C축 — App metadata · enum', () => {
+    it("App.type 소스 enum 에 'shortcode' 가 없고 manifest.provides.shortcodes 필드도 없다", () => {
+      const src = codeOf('apps/api-server/src/entities/App.ts');
+      expect(src).not.toMatch(/shortcode/i);
+      expect(src).toContain("enum: ['integration', 'block', 'widget', 'workflow']");
+    });
+
+    it('App legacy 엔티티 자체는 보존된다 (startup 이 google-gemini-text 를 등록한다)', () => {
+      expect(exists('apps', 'api-server', 'src', 'entities', 'App.ts')).toBe(true);
+      expect(readRoot('apps/api-server/src/services/startup.service.ts')).toContain("slug: 'google-gemini-text'");
+    });
+
+    it('DB enum migration 을 만들지 않았다 (운영 apps.type = varchar · enum 부재)', () => {
+      const dir = abs('apps', 'api-server', 'src', 'database', 'migrations');
+      const offenders = fs.readdirSync(dir).filter((f) => /shortcode/i.test(f));
+      expect(offenders).toEqual([]);
+    });
+  });
+
+  describe('보존 계약', () => {
+    it('외국인 관광객 파트너 QR `shortCode` 식별자는 그대로다', () => {
+      expect(readRoot('apps/api-server/src/modules/foreign-visitor-partner/foreign-visitor-partner-qr-code.entity.ts')).toContain('shortCode');
+      expect(readRoot('services/web-kpa-society/src/api/foreignVisitorPartnerQrCodes.ts')).toContain('shortCode');
+    });
+
+    it('block-renderer 패키지와 소비처는 그대로다', () => {
+      expect(exists('packages', 'block-renderer', 'package.json')).toBe(true);
+    });
+
+    it('실행 완료 migration 이력은 그대로다', () => {
+      expect(exists('apps', 'api-server', 'src', 'database', 'migrations', '20270320000000-DropUsersPermissionsColumn.ts')).toBe(true);
+      expect(exists('apps', 'api-server', 'src', 'database', 'migrations', '2026012200001-CreateAppRegistryTable.ts')).toBe(true);
+    });
   });
 });

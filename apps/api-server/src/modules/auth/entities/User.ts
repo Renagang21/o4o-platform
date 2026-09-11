@@ -260,7 +260,9 @@ export class User {
         'content.view', 'content.create', 'content.edit', 'content.delete', 'content.publish', 'content.moderate',
         'categories:write', 'categories:read', 'tags:write', 'tags:read',
         'admin.settings', 'admin.analytics', 'admin.logs', 'admin.backup',
-        'acf.manage', 'cpt.manage', 'shortcodes.manage',
+        // WO-O4O-DEAD-SHORTCODE-RESIDUE-AND-PERMISSION-CONTRACT-FINAL-CLOSURE-V1:
+        //   'shortcodes.manage' 제거 — hasPermission/middleware/프론트 소비 0 · 운영 permissions 행 0 (RETURN_ONLY_RESIDUE).
+        'acf.manage', 'cpt.manage',
         'api.access', 'api.admin'
       ];
     }

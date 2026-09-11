@@ -22,7 +22,6 @@ export declare const PERMISSION_CATEGORIES: {
     readonly CATEGORIES: "categories";
     readonly CMS: "cms";
     readonly BLOCKS: "blocks";
-    readonly SHORTCODES: "shortcodes";
     readonly PRODUCTS: "products";
     readonly ORDERS: "orders";
     readonly CUSTOMERS: "customers";
@@ -97,7 +96,6 @@ export declare const PERMISSIONS: {
     readonly 'cms.dashboard.view': "cms.dashboard.view";
     readonly 'cms.templates.edit': "cms.templates.edit";
     readonly 'cms.blocks.manage': "cms.blocks.manage";
-    readonly 'cms.shortcodes.manage': "cms.shortcodes.manage";
     readonly 'products.view': "products.view";
     readonly 'products.create': "products.create";
     readonly 'products.edit': "products.edit";

@@ -225,7 +225,6 @@ export class FormsController {
         status: 'draft',
         createdBy: user.id,
         fieldIndex,
-        shortcode: `[form name="${name}"]`,
         submissionCount: 0
       });
 
@@ -399,8 +398,7 @@ export class FormsController {
         status: 'draft',
         createdBy: user.id,
         submissionCount: 0,
-        lastSubmission: undefined,
-        shortcode: `[form name="${name}"]`
+        lastSubmission: undefined
       });
 
       const savedForm = await this.formRepo.save(duplicateForm);

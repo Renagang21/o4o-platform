@@ -25,7 +25,6 @@ export const PERMISSION_CATEGORIES = {
     // CMS Features
     CMS: 'cms',
     BLOCKS: 'blocks',
-    SHORTCODES: 'shortcodes',
     // Commerce
     PRODUCTS: 'products',
     ORDERS: 'orders',
@@ -114,7 +113,6 @@ export const PERMISSIONS = {
     'cms.dashboard.view': 'cms.dashboard.view',
     'cms.templates.edit': 'cms.templates.edit',
     'cms.blocks.manage': 'cms.blocks.manage',
-    'cms.shortcodes.manage': 'cms.shortcodes.manage',
     // Products
     'products.view': 'products.view',
     'products.create': 'products.create',

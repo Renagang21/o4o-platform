@@ -349,8 +349,8 @@ export class RoleAssignmentService {
         'acf.manage',
         // CPT
         'cpt.manage',
-        // Shortcodes
-        'shortcodes.manage',
+        // WO-O4O-DEAD-SHORTCODE-RESIDUE-AND-PERMISSION-CONTRACT-FINAL-CLOSURE-V1:
+        //   'shortcodes.manage' 는 반환 배열에만 존재하던 잔재라 제거 (RETURN_ONLY_RESIDUE).
         // API
         'api.access',
         'api.admin',

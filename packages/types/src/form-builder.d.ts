@@ -83,7 +83,6 @@ export interface Form {
     updatedAt: Date;
     submissionCount?: number;
     lastSubmission?: Date;
-    shortcode?: string;
 }
 export interface FormSettings {
     submitButtonText: string;

@@ -1,5 +1,9 @@
 # 백엔드 Role 시스템 조사 보고서
 
+> **역사 기록** (2025-10-12 시점). 현행 권한 SSOT 는 `role_assignments` 이며(`docs/rbac/RBAC-FREEZE-DECLARATION-V1.md`),
+> 아래 `shortcodes.manage` 는 `WO-O4O-DEAD-SHORTCODE-RESIDUE-AND-PERMISSION-CONTRACT-FINAL-CLOSURE-V1` 에서 제거됐다.
+> 본문 수치·목록은 현행이 아니다.
+
 **작성일**: 2025-10-12
 **목적**: 프론트엔드 드랍쉬핑 플랫폼 개발을 위한 백엔드 Role 관리 및 전환 기능 현황 파악
 

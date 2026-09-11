@@ -26,11 +26,6 @@ export interface AppManifest {
       method: string;
       description?: string;
     }>;
-    shortcodes?: Array<{
-      name: string;
-      description?: string;
-      parameters?: Record<string, any>;
-    }>;
     blocks?: Array<{
       name: string;
       title?: string;
@@ -88,7 +83,9 @@ export class App {
 
   @Column({
     type: 'enum',
-    enum: ['integration', 'block', 'shortcode', 'widget', 'workflow'],
+    // WO-O4O-DEAD-SHORTCODE-RESIDUE-AND-PERMISSION-CONTRACT-FINAL-CLOSURE-V1:
+    //   'shortcode' 값 제거 — 운영 `apps.type` 은 varchar(50)(PostgreSQL enum 부재) · row 0 (SOURCE_ONLY_ENUM_RESIDUE).
+    enum: ['integration', 'block', 'widget', 'workflow'],
     default: 'integration'
   })
   type!: string;

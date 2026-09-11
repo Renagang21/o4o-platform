@@ -160,9 +160,6 @@ export interface Form {
   // Stats
   submissionCount?: number;
   lastSubmission?: Date;
-  
-  // Shortcode
-  shortcode?: string;
 }
 
 export interface FormSettings {
