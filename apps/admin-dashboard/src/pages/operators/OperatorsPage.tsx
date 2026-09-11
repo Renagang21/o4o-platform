@@ -66,6 +66,14 @@ import {
 // WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1:
 //   - `pharmacy-hub:admin` 을 정식 도입했다 (admin ⊃ operator — KPA/Neture/K-Cosmetics 와 동일 계층).
 //     store_owner / supplier 는 사업자 신분 역할이라 이 등록 화면(운영 역할 부여)의 대상이 아니다.
+//
+// WO-O4O-ADMIN-OPERATOR-CATALOG-KPA-BRANCH-V1:
+//   - `kpa-branch:operator`(분회 운영자)를 정식 카탈로그에 추가했다. 부여 계약은 다른 서비스와 동일
+//     (role_assignments + service_memberships 재사용). **분회 소속(branch_memberships)은 여기서 만들지 않는다** —
+//     운영자 역할 부여 ≠ 분회 소속 지정. 대상 분회는 분회 운영자 화면(전입)에서 별도로 지정한다.
+//   - `kpa-branch:admin` 은 넣지 않는다. 프로덕션 부여 0건이고 admin 축 API(분회 생성·도메인 승인·양식·
+//     가입 승인)는 전부 platform:super_admin 이 통과하므로 현재 운영 정책상 명확한 필요가 없다.
+//     이미 가진 계정이 있으면 편집 화면의 비카탈로그 role 읽기 전용 보존으로 유지된다.
 const ASSIGNABLE_ROLES: Record<string, { value: string; label: string; description: string }[]> = {
   kpa: [
     { value: 'kpa:admin', label: 'Admin', description: 'KPA 커뮤니티 관리자' },
@@ -82,6 +90,9 @@ const ASSIGNABLE_ROLES: Record<string, { value: string; label: string; descripti
   cosmetics: [
     { value: 'cosmetics:admin', label: 'Admin', description: 'K-Cosmetics 관리자' },
     { value: 'cosmetics:operator', label: 'Operator', description: 'K-Cosmetics 운영자' },
+  ],
+  'kpa-branch': [
+    { value: 'kpa-branch:operator', label: '분회 운영자', description: '약사회 분회 운영자 (대상 분회 소속은 분회 운영자 화면에서 별도 지정)' },
   ],
 };
 

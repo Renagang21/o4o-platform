@@ -98,6 +98,23 @@ describe('OperatorsPage — 비밀번호 write 계약', () => {
       expect(roles).not.toMatch(/pharmacy-hub:store_owner/);
     });
 
+    // WO-O4O-ADMIN-OPERATOR-CATALOG-KPA-BRANCH-V1:
+    //   분회 운영자(kpa-branch:operator)만 assignable. admin 은 운영 정책상 필요가 확인될 때까지 제외,
+    //   member 는 가입 승인 축(BranchServiceMembersPage)의 결과이지 운영자 등록 대상이 아니다.
+    it('kpa-branch 는 operator 한 역할만 제공한다', () => {
+      const catalog = SRC.slice(
+        SRC.indexOf('const ASSIGNABLE_ROLES'),
+        SRC.indexOf('CATALOG_ROLE_VALUES'),
+      );
+      const block = catalog.slice(catalog.indexOf("'kpa-branch': ["));
+      const roles = block.slice(0, block.indexOf('],'));
+      expect(roles).toMatch(/'kpa-branch:operator'/);
+      expect(roles).not.toMatch(/kpa-branch:admin/);
+      expect(roles).not.toMatch(/kpa-branch:member/);
+      // 운영자 역할 부여 ≠ 분회 소속 지정 — 화면이 branch_memberships 를 만들지 않는다.
+      expect(SRC).not.toMatch(/kpa-branch\/branches\//);
+    });
+
     it('대상 서비스에 기본값(KPA 고정)을 두지 않는다', () => {
       expect(SRC).toMatch(/const \[targetServiceKey, setTargetServiceKey\] = useState<string>\(''\)/);
       expect(SRC).toMatch(/const \[targetRole, setTargetRole\] = useState<string>\(''\)/);

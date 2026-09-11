@@ -17,6 +17,10 @@ export const SERVICE_KEYS = [
   //   role prefix 이자 canonical service_key 가 동일한 서비스('pharmacy-hub').
   //   backend 는 이미 role·scope guard·Membership 을 갖추고 있었고 이 카탈로그만 비어 있었다.
   'pharmacy-hub',
+  // WO-O4O-ADMIN-OPERATOR-CATALOG-KPA-BRANCH-V1:
+  //   약사회 분회 서비스. role prefix = canonical service_key = 'kpa-branch' (security-core self-map).
+  //   backend(roles seed · kpa-branch scope guard · Membership) 는 이미 갖춰져 있었고 이 카탈로그만 비어 있었다.
+  'kpa-branch',
 ] as const;
 
 export type ServiceKey = (typeof SERVICE_KEYS)[number];
@@ -33,6 +37,7 @@ export const SERVICES: Record<ServiceKey, ServiceMeta> = {
   neture: { key: 'neture', label: 'Neture', badgeClass: 'text-orange-700 bg-orange-50' },
   cosmetics: { key: 'cosmetics', label: 'K-Cosmetics', badgeClass: 'text-pink-700 bg-pink-50' },
   'pharmacy-hub': { key: 'pharmacy-hub', label: 'Pharmacy-Hub', badgeClass: 'text-teal-700 bg-teal-50' },
+  'kpa-branch': { key: 'kpa-branch', label: '약사회 분회', badgeClass: 'text-sky-700 bg-sky-50' },
 };
 
 export interface RoleMeta {
