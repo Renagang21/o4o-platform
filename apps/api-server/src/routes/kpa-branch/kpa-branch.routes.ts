@@ -56,6 +56,7 @@
  *   *      /api/v1/kpa-branch/admin/domains/**                               (admin scope)
  *   *      /api/v1/kpa-branch/admin/service-members/**                        (admin scope)  가입 승인
  *   POST   /api/v1/kpa-branch/admin/branches                                 (platform:super_admin)  신규 분회 생성
+ *   PATCH  /api/v1/kpa-branch/admin/branches/:id                             (platform:super_admin)  분회 기본정보 수정 (name/parentId/description/address/phone)
  *   DELETE /api/v1/kpa-branch/admin/branches/:id                             (platform:super_admin)  오생성 분회 정리 (하위 0행일 때만)
  *
  * 가드 2겹 (합치지 않는다):
@@ -599,6 +600,7 @@ export function createKpaBranchRoutes(): Router {
   // 기존 canonical 경로(operator/members · admin/service-members · operator/site) 를 그대로 쓴다.
   const superAdminGuards = [requireAuth as any, requireRole('platform:super_admin') as any];
   router.post('/admin/branches', ...superAdminGuards, wrap(BranchAdminController.create));
+  router.patch('/admin/branches/:id', ...superAdminGuards, wrap(BranchAdminController.update));
   router.delete('/admin/branches/:id', ...superAdminGuards, wrap(BranchAdminController.remove));
 
   return router;

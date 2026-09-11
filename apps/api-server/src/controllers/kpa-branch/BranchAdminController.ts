@@ -15,6 +15,10 @@
  *   - organizations(플랫폼 조직) 미러를 만들지 않는다 — 기존 209 분회도 미러 없이 동작한다.
  *   - 삭제는 오생성·취소 정리용 최소 계약이다: type='group' 이고 분회 하위 데이터가 전부 0행일 때만.
  *     cascade 없음. 하위 데이터가 있으면 409 BRANCH_IN_USE (테이블별 카운트 반환).
+ *   - 기본정보 수정(PATCH) 은 name/parentId/description/address/phone 만. slug·type·is_active 는 이 경로로
+ *     바꾸지 않는다 (slug 는 tenant URL 키 — 개통 후 변경은 별도 운영 절차). 대표 이메일은 kpa_organizations 가
+ *     아니라 branch_sites.contact 에 있으므로 operator/site 로 관리한다.
+ *     WO-O4O-KPA-BRANCH-NEW-TENANT-ONBOARDING-OPERATIONS-V1
  */
 import type { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
@@ -29,6 +33,8 @@ const SLUG_MIN = 2;
 const SLUG_MAX = 80;
 const NAME_MAX = 200;
 const DESCRIPTION_MAX = 500;
+const ADDRESS_MAX = 200;
+const PHONE_MAX = 50;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
@@ -61,11 +67,56 @@ function toDto(o: KpaOrganization) {
     type: o.type,
     parentId: o.parent_id,
     description: o.description,
+    address: o.address,
+    phone: o.phone,
     isActive: o.is_active,
     createdAt: o.created_at,
-    // 생성 직후에는 branch_sites row 가 없다 — 명시적으로 미게시임을 알린다.
-    site: { isPublished: false },
+    updatedAt: o.updated_at,
   };
+}
+
+type OrgRepo = ReturnType<typeof AppDataSource.getRepository<KpaOrganization>>;
+
+/** 선택 문자열 필드 검증 — undefined 는 "변경 없음", null/빈 문자열은 "비움". 실패 시 응답을 이미 보냈다. */
+function optionalText(
+  res: Response,
+  body: Record<string, unknown>,
+  key: string,
+  max: number,
+  code: string,
+): { ok: true; value: string | null | undefined } | { ok: false } {
+  const v = body[key];
+  if (v === undefined) return { ok: true, value: undefined };
+  if (v === null) return { ok: true, value: null };
+  if (typeof v !== 'string' || v.length > max) {
+    bad(res, `${key} 은(는) ${max}자 이하 문자열이어야 합니다.`, code);
+    return { ok: false };
+  }
+  return { ok: true, value: v.trim() || null };
+}
+
+/** parentId 검증 — 표시용 상위 조직(지부/약사회). 존재·활성만 확인하고 권한 계산에는 쓰지 않는다. */
+async function resolveParentId(
+  res: Response,
+  raw: unknown,
+  repo: OrgRepo,
+  selfId?: string,
+): Promise<{ ok: true; value: string | null } | { ok: false }> {
+  if (raw === null || raw === '') return { ok: true, value: null };
+  if (typeof raw !== 'string' || !UUID_RE.test(raw)) {
+    bad(res, 'parentId 는 UUID 여야 합니다.', 'INVALID_PARENT_ID');
+    return { ok: false };
+  }
+  if (selfId && raw === selfId) {
+    bad(res, '자기 자신을 상위 조직으로 지정할 수 없습니다.', 'INVALID_PARENT_ID');
+    return { ok: false };
+  }
+  const parent = await repo.findOne({ where: { id: raw, is_active: true }, select: ['id'] });
+  if (!parent) {
+    bad(res, '상위 조직을 찾을 수 없습니다.', 'PARENT_NOT_FOUND');
+    return { ok: false };
+  }
+  return { ok: true, value: parent.id };
 }
 
 export class BranchAdminController {
@@ -90,25 +141,17 @@ export class BranchAdminController {
       );
     }
 
-    let description: string | null = null;
-    if (body.description !== undefined && body.description !== null) {
-      if (typeof body.description !== 'string' || body.description.length > DESCRIPTION_MAX) {
-        return bad(res, `description 은 ${DESCRIPTION_MAX}자 이하 문자열이어야 합니다.`, 'INVALID_DESCRIPTION');
-      }
-      description = body.description.trim() || null;
-    }
+    const desc = optionalText(res, body, 'description', DESCRIPTION_MAX, 'INVALID_DESCRIPTION');
+    if (!desc.ok) return;
+    const description = desc.value ?? null;
 
     const repo = AppDataSource.getRepository(KpaOrganization);
 
     let parentId: string | null = null;
-    if (body.parentId !== undefined && body.parentId !== null && body.parentId !== '') {
-      if (typeof body.parentId !== 'string' || !UUID_RE.test(body.parentId)) {
-        return bad(res, 'parentId 는 UUID 여야 합니다.', 'INVALID_PARENT_ID');
-      }
-      // 표시용 상위 조직(지부/약사회). 존재만 확인하고 권한 계산에는 쓰지 않는다.
-      const parent = await repo.findOne({ where: { id: body.parentId, is_active: true }, select: ['id'] });
-      if (!parent) return bad(res, '상위 조직을 찾을 수 없습니다.', 'PARENT_NOT_FOUND');
-      parentId = parent.id;
+    if (body.parentId !== undefined) {
+      const parent = await resolveParentId(res, body.parentId, repo);
+      if (!parent.ok) return;
+      parentId = parent.value;
     }
 
     const conflict = await repo.findOne({ where: { slug }, select: ['id', 'name', 'type', 'is_active'] });
@@ -119,7 +162,8 @@ export class BranchAdminController {
       const created = await repo.save(
         repo.create({ name, slug, type: BRANCH_ORG_TYPE, parent_id: parentId, description, is_active: true }),
       );
-      return res.status(201).json({ success: true, data: toDto(created) });
+      // 생성 직후에는 branch_sites row 가 없다 — 명시적으로 미게시임을 알린다.
+      return res.status(201).json({ success: true, data: { ...toDto(created), site: { isPublished: false } } });
     } catch (e) {
       // 사전 조회와 INSERT 사이의 경합 — 부분 UNIQUE 위반을 500 으로 새지 않게 한다.
       if ((e as { code?: string })?.code === '23505') {
@@ -128,6 +172,54 @@ export class BranchAdminController {
       }
       throw e;
     }
+  }
+
+  /**
+   * PATCH /api/v1/kpa-branch/admin/branches/:id — 분회 기본정보 수정 (platform:super_admin)
+   * body: { name?, parentId?, description?, address?, phone? } — 보낸 키만 바꾼다(null = 비움).
+   * slug / type / is_active / id 는 무시한다.
+   */
+  static async update(req: Request, res: Response) {
+    const id = String(req.params.id ?? '');
+    if (!UUID_RE.test(id)) return bad(res, 'id 는 UUID 여야 합니다.', 'INVALID_ID');
+
+    const repo = AppDataSource.getRepository(KpaOrganization);
+    const org = await repo.findOne({ where: { id, type: BRANCH_ORG_TYPE } });
+    if (!org) {
+      return res.status(404).json({ success: false, error: '분회를 찾을 수 없습니다.', code: 'BRANCH_NOT_FOUND' });
+    }
+
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    const patch: Partial<KpaOrganization> = {};
+
+    if (body.name !== undefined) {
+      const name = typeof body.name === 'string' ? body.name.trim() : '';
+      if (!name || name.length > NAME_MAX) {
+        return bad(res, `name 은 1~${NAME_MAX}자 문자열이어야 합니다.`, 'INVALID_NAME');
+      }
+      patch.name = name;
+    }
+    if (body.parentId !== undefined) {
+      const parent = await resolveParentId(res, body.parentId, repo, org.id);
+      if (!parent.ok) return;
+      patch.parent_id = parent.value;
+    }
+    const desc = optionalText(res, body, 'description', DESCRIPTION_MAX, 'INVALID_DESCRIPTION');
+    if (!desc.ok) return;
+    if (desc.value !== undefined) patch.description = desc.value;
+    const address = optionalText(res, body, 'address', ADDRESS_MAX, 'INVALID_ADDRESS');
+    if (!address.ok) return;
+    if (address.value !== undefined) patch.address = address.value;
+    const phone = optionalText(res, body, 'phone', PHONE_MAX, 'INVALID_PHONE');
+    if (!phone.ok) return;
+    if (phone.value !== undefined) patch.phone = phone.value;
+
+    if (Object.keys(patch).length === 0) {
+      return bad(res, '수정할 필드가 없습니다 (name/parentId/description/address/phone).', 'NO_FIELDS');
+    }
+
+    const saved = await repo.save(repo.merge(org, patch));
+    return res.json({ success: true, data: toDto(saved) });
   }
 
   /**
