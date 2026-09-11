@@ -10,7 +10,7 @@ import type { PopV2AccentTheme, PopV2Document } from './types';
 import { POP_V2_CONTENT_TYPE_LABELS, POP_V2_STATUS_LABELS } from './types';
 import { usePopV2List } from './usePopV2List';
 import type { UsePopV2ListOptions } from './usePopV2List';
-import { popPageStyle, popSectionStyle } from '../pop/popStyles';
+import { popPageStyle, popSectionStyle } from './popV2Styles';
 
 export interface StorePopV2ListViewProps extends UsePopV2ListOptions {
   accent: PopV2AccentTheme;

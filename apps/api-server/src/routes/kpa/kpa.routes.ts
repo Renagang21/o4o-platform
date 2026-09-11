@@ -88,7 +88,6 @@ import { createStoreContentController } from '../o4o-store/controllers/store-con
 import { createStoreLibraryFeedController } from '../o4o-store/controllers/store-library-feed.controller.js';
 import { createStoreExecutionAssetsController } from '../o4o-store/controllers/store-execution-assets.controller.js';
 import { createStoreQrLandingController } from '../o4o-store/controllers/store-qr-landing.controller.js';
-import { createStorePopController } from '../o4o-store/controllers/store-pop.controller.js';
 // WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1: 공통 POP V2 Core (KPA/PH 공용)
 import { createStorePopV2Controller } from '../o4o-store/controllers/store-pop-v2.controller.js';
 import { createStoreAnalyticsController } from '../o4o-store/controllers/store-analytics.controller.js';
@@ -475,14 +474,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='kpa' 전달 (public route /qr/public/:slug 는 무관).
   router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any, 'kpa'));
 
-  // Store POP routes (WO-O4O-QR-POP-AUTO-GENERATOR-V1) — internal: /pharmacy/pop/*
-  // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='kpa' 전달.
-  router.use('/', createStorePopController(dataSource, coreRequireAuth as any, 'kpa'));
-
   // WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1
   //   POP V2 (canonical Document 모델) — internal: /pharmacy/pop-v2/*
   //   PH 와 **같은 공통 Core factory** 를 mount 한다 (서비스별 본체 복제 없음).
-  //   위 기존 createStorePopController 는 그대로 둔다 — 과거 산출물 이력 보존.
+  //   legacy 즉시 PDF(createStorePopController · POST /pharmacy/pop/generate) 는 WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1 에서 제거 —
+  //   과거 산출물(store_execution_assets usage_type='pop') row 는 보존.
   router.use('/pharmacy/pop-v2', createStorePopV2Controller(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Store Analytics routes (WO-O4O-MARKETING-ANALYTICS-V1) — internal: /pharmacy/analytics/*
@@ -510,7 +506,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-KPA-STORE-HUB-POP-CONTENT-IMPORT-V1: 매장 POP staff CRUD + HUB import
   // /api/v1/kpa/stores/:slug/pop/staff/* (매장 owner가 자기 매장 store_pops 사본 관리)
-  // 기존 createStorePopController (PDF 생성, /pharmacy/pop/generate) 와는 별도 controller.
+  // (legacy createStorePopController 는 WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1 에서 제거됨.)
   const kpaStorePopStaffController = createStorePopStaffController(
     dataSource,
     coreRequireAuth as any,

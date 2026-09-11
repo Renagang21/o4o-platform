@@ -614,11 +614,11 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
     {
       step: '09',
       title: 'POP 제작',
-      primaryRoute: '/store/marketing/pop',
+      primaryRoute: '/store/marketing/pop-v2',
       description: '내 자료함의 자료를 바탕으로 매장 POP 인쇄물을 만들어 진열대·상담대·계산대에 활용합니다.',
       items: [
         { label: 'POP 제작 이용 방법', route: '/guide/features/pop' },
-        { label: 'POP 제작', route: '/store/marketing/pop' },
+        { label: 'POP 제작', route: '/store/marketing/pop-v2' },
         { label: '매장 블로그 이용 방법', route: '/guide/features/blog' },
         { label: '내 자료함(제작 자료)', route: '/guide/features/production-materials' },
       ],
@@ -1126,7 +1126,7 @@ export const kpaGuideFeaturePopProps: GuideFeatureManualPageProps = {
     eyebrow: '기능별 이용 방법',
     title: 'POP 제작 이용 방법',
     description: '내 자료함의 자료를 바탕으로 매장 POP 인쇄물을 만들어 진열대·상담대·계산대·입구에 활용합니다',
-    primaryAction: { label: 'POP 제작으로 이동 →', to: '/store/marketing/pop' },
+    primaryAction: { label: 'POP 제작으로 이동 →', to: '/store/marketing/pop-v2' },
     flowBarTitle: '이용 흐름',
     flowLabels: ['제작 개요', '자료함에서 시작', '자료 선택', '템플릿·AI 문구', 'QR·레이아웃', '출력·저장'],
   },
@@ -1163,7 +1163,7 @@ export const kpaGuideFeaturePopProps: GuideFeatureManualPageProps = {
     {
       step: '03',
       title: 'POP에 넣을 자료 선택',
-      routeLabel: '/store/marketing/pop',
+      routeLabel: '/store/marketing/pop-v2',
       description: 'POP 화면에는 선택한 자료가 카드로 표시됩니다. 자료 유형은 세 가지이며, 필요 없는 자료는 제거할 수 있습니다.',
       items: [
         { label: '자료', detail: '내 자료함에 저장된 파일·자료(library)입니다.' },

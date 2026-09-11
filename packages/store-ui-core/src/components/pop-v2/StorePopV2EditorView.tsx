@@ -17,7 +17,7 @@ import type {
 import { POP_V2_CONTENT_TYPE_LABELS, POP_V2_RESOLVED_FROM_LABELS } from './types';
 import { usePopV2Editor } from './usePopV2Editor';
 import type { UsePopV2EditorOptions } from './usePopV2Editor';
-import { popPageStyle, popSectionStyle, popStepBadgeStyle } from '../pop/popStyles';
+import { popPageStyle, popSectionStyle, popStepBadgeStyle } from './popV2Styles';
 
 export interface StorePopV2EditorViewProps extends UsePopV2EditorOptions {
   accent: PopV2AccentTheme;

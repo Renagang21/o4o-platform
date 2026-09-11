@@ -158,7 +158,6 @@ export type {
 export type { ProductionTarget, ProductionSourceItem, ProductionSource, ProductionRouterState } from './utils/productionUtils';
 export { buildProductionState, composeSourceTextFromItems, parseProductionRouterState, useProductionRouterState } from './utils/productionUtils';
 // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: 매장 자체 상품 POP canonical 진입
-export { CANONICAL_STORE_POP_ROUTE, buildLocalProductPopState } from './utils/productionUtils';
 
 // Buyer Checkout Status 표시 매핑 (WO-O4O-STORE-CHECKOUT-STATUS-LABEL-ALIGNMENT-V1)
 export {
@@ -473,8 +472,6 @@ export type {
   HandledProductBadgeTone,
 } from './components/handled-products/HandledProductsListParts';
 
-// POP Composer (WO-O4O-MY-STORE-POP-COMPOSER-KCOS-GP-COMMONIZATION-V1)
-export * from './components/pop';
 // WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1: POP V2 canonical Core (KPA/PH 공용)
 export * from './components/pop-v2';
 

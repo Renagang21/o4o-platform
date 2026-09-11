@@ -9,12 +9,12 @@
  *   §2 origin   — row origin 3종(direct / execution-asset / snapshot) 이 V2 어휘(direct / library / snapshot) 로
  *                 1:1 변환되고, 그 3종 모두 backend resolveContentPopSource 가 organization 격리로 읽는다.
  *   §3 handoff  — 계약은 식별자만 싣는다(본문 필드 없음). 순수 함수로 실제 변환 결과를 확인한다.
- *   §4 legacy   — KPA 인라인 caller = 0 (import graph). legacy page/API/service 는 KEEP_TEMPORARY 로 그대로.
+ *   §4 legacy   — KPA 인라인 caller = 0 (import graph). (legacy 축은 ④ retirement 에서 제거됨.)
  *   §5 boundary — KCos / PH 화면·공통 Core 는 변경되지 않았다.
  *
  * DB 는 붙이지 않는다.
  */
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
 import {
@@ -123,7 +123,6 @@ describe('§4 legacy — KPA 인라인 caller 0 · legacy 축 KEEP_TEMPORARY', (
     const files = [
       'pages/pharmacy/StoreContentsSelector.tsx',
       'pages/pharmacy/StoreLibraryContentsPage.tsx',
-      'pages/pharmacy/StorePopPage.tsx',
       'pages/pharmacy/StorePopV2Page.tsx',
       'App.tsx',
     ];
@@ -132,16 +131,12 @@ describe('§4 legacy — KPA 인라인 caller 0 · legacy 축 KEEP_TEMPORARY', (
     }
   });
 
-  it('dead 파일 2개는 @deprecated 로 표기되어 남아 있다', () => {
-    expect(read(KPA, 'components', 'store', 'StorePopCreateModal.tsx')).toMatch(/@deprecated WO-O4O-STORE-CONTENTS-SELECTOR-INLINE-POP-TO-V2-MIGRATION-V1/);
-    expect(read(KPA, 'api', 'storePop.ts')).toMatch(/@deprecated WO-O4O-STORE-CONTENTS-SELECTOR-INLINE-POP-TO-V2-MIGRATION-V1/);
-  });
-
-  it('legacy generate route 는 아직 등록되어 있다 (이번 회차는 retirement 아님)', () => {
-    const ctrl = stripComments(read(SRC, 'routes', 'o4o-store', 'controllers', 'store-pop.controller.ts'));
-    expect(ctrl).toMatch(/'\/pharmacy\/pop\/generate'/);
-    const kpaPage = stripComments(read(KPA, 'pages', 'pharmacy', 'StorePopPage.tsx'));
-    expect(kpaPage).toMatch(/pharmacy\/pop\/generate/);
+  // WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1:
+  //   ③ 당시 @deprecated 로 남겨 둔 dead 파일 2개와 legacy generate route 는 ④ 에서 제거됐다.
+  //   최종 상태 단언은 store-pop-legacy-instant-pdf-retirement.spec.ts 가 담당한다.
+  it('dead 파일 2개(StorePopCreateModal · api/storePop) 는 더 이상 존재하지 않는다', () => {
+    expect(existsSync(join(KPA, 'components', 'store', 'StorePopCreateModal.tsx'))).toBe(false);
+    expect(existsSync(join(KPA, 'api', 'storePop.ts'))).toBe(false);
   });
 });
 

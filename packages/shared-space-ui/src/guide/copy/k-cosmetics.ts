@@ -530,11 +530,11 @@ export const kCosmeticsGuideFeaturesProps: GuideFeaturesPageProps = {
     {
       step: '06',
       title: 'POP 제작',
-      primaryRoute: '/store/marketing/pop',
+      primaryRoute: '/store/marketing/pop-v2',
       description: '내 자료함의 자료를 바탕으로 상품 소개 POP를 만들어 진열대·체험대·계산대에 활용합니다.',
       items: [
         { label: 'POP 제작 이용 방법', route: '/guide/features/pop' },
-        { label: 'POP 제작', route: '/store/marketing/pop' },
+        { label: 'POP 제작', route: '/store/marketing/pop-v2' },
         { label: '매장 블로그 이용 방법', route: '/guide/features/blog' },
       ],
       linkTo: '/guide/features/pop',
@@ -946,7 +946,7 @@ export const kCosmeticsGuideFeaturePopProps: GuideFeatureManualPageProps = {
     eyebrow: '기능별 이용 방법',
     title: 'POP 제작 이용 방법',
     description: '내 자료함의 자료를 바탕으로 상품 소개 POP를 만들어 진열대·체험대·계산대 안내에 활용합니다',
-    primaryAction: { label: 'POP 제작으로 이동 →', to: '/store/marketing/pop' },
+    primaryAction: { label: 'POP 제작으로 이동 →', to: '/store/marketing/pop-v2' },
     flowBarTitle: '이용 흐름',
     flowLabels: ['제작 개요', '자료 선택', '템플릿·AI 문구', 'QR·레이아웃', '출력·저장'],
   },

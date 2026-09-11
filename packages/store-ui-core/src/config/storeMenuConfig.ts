@@ -122,7 +122,7 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       // WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: 제품 파생 콘텐츠
       { key: 'content-blog', label: '블로그',  subPath: '/content/blog' },
       // WO-O4O-KCOS-POP-V2-CANONICAL-ADOPTION-V1: KCos 매장 POP 진입을 canonical POP V2 로 전환.
-      //   legacy `/marketing/pop`(즉시 PDF 생성) route 는 삭제하지 않는다 — 북마크·HUB 동선 보존(§4).
+      //   (legacy `/marketing/pop` 은 WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1 에서 V2 redirect 로 은퇴.)
       //   KPA 블록(아래) · PH 블록은 건드리지 않는다.
       { key: 'pop',          label: 'POP',     subPath: '/marketing/pop-v2' },
       { key: 'qr',           label: 'QR 코드', subPath: '/marketing/qr' },
@@ -342,7 +342,8 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       // WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: StoreProductDescriptionsPage
       { key: 'product-descriptions', label: '상품 설명', subPath: '/marketing/product-descriptions' },
       { key: 'content-blog', label: '블로그',   subPath: '/content/blog' },
-      { key: 'pop',          label: 'POP',     subPath: '/marketing/pop' },
+      // WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1: legacy 즉시 PDF 화면 제거 → POP V2 canonical.
+      { key: 'pop',          label: 'POP',     subPath: '/marketing/pop-v2' },
       { key: 'qr',           label: 'QR-code', subPath: '/marketing/qr' },
       // WO-O4O-KPA-STORE-PRODUCT-MENU-IA-REORG-V1:
       //   타블렛 구성은 제품 등록이 아니라 기존 제품을 고객 안내 화면(타블렛)에 노출/구성하는 활용 채널 →

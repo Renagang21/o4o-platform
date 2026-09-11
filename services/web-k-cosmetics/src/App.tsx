@@ -158,7 +158,6 @@ const StoreInfoPage = lazy(() => import('@/pages/store/StoreInfoPage'));
 const StoreBlogPage = lazy(() => import('@/pages/store/StoreBlogPage'));
 const StoreBlogPostPage = lazy(() => import('@/pages/store/StoreBlogPostPage'));
 const StoreBlogManagePage = lazy(() => import('@/pages/store/StoreBlogManagePage'));
-const StorePopPage = lazy(() => import('@/pages/store/StorePopPage'));
 // WO-O4O-POP-STAFF-PAGE-GP-KCOS-PARITY-V1: 내 매장 POP 사본 관리
 const StorePopStaffPage = lazy(() => import('@/pages/store/StorePopStaffPage'));
 // WO-O4O-KCOS-POP-V2-CANONICAL-ADOPTION-V1: canonical POP V2 화면(공통 Core adapter)
@@ -881,9 +880,9 @@ function AppRoutes() {
         {/* WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: Blog / POP / QR */}
         <Route path="content/blog" element={<StoreBlogManagePage />} />
         {/* WO-O4O-KCOSMETICS-STORE-PATH-NESTED-MIGRATION-V1: POP/QR nested canonical (marketing/*) */}
-        <Route path="marketing/pop" element={<StorePopPage />} />
-        {/* WO-O4O-KCOS-POP-V2-CANONICAL-ADOPTION-V1: canonical POP V2.
-            legacy `marketing/pop` 은 삭제하지 않는다 — 북마크·HUB 가져가기 동선 보존(§4). */}
+        {/* WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1: legacy 즉시 PDF 화면 은퇴 — 북마크 보호용 V2 redirect */}
+        <Route path="marketing/pop" element={<Navigate to="/store/marketing/pop-v2" replace />} />
+        {/* WO-O4O-KCOS-POP-V2-CANONICAL-ADOPTION-V1: canonical POP V2. */}
         <Route path="marketing/pop-v2" element={<StorePopV2Page />} />
         <Route path="marketing/pop/library" element={<StorePopStaffPage />} />
         <Route path="marketing/qr" element={<StoreQrPage />} />
@@ -912,7 +911,7 @@ function AppRoutes() {
         <Route path="signage/schedules" element={<Navigate to="/store/marketing/signage/schedules" replace />} />
         <Route path="signage/player"   element={<Navigate to="/store/marketing/signage/player" replace />} />
         <Route path="signage/play/:playlistId" element={<ParamRedirect to="/store/marketing/signage/play/:playlistId" />} />
-        <Route path="pop"              element={<Navigate to="/store/marketing/pop" replace />} />
+        <Route path="pop"              element={<Navigate to="/store/marketing/pop-v2" replace />} />
         <Route path="qr"               element={<Navigate to="/store/marketing/qr" replace />} />
       </Route>
 

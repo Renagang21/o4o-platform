@@ -234,7 +234,6 @@ const StoreQRPage = lazy(() => import('./pages/pharmacy/StoreQRPage').then(m => 
 const StoreExecutionPage = lazy(() => import('./pages/pharmacy/StoreExecutionPage'));
 // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1
 const StoreQrAiDescriptionPage = lazy(() => import('./pages/pharmacy/StoreQrAiDescriptionPage'));
-const StorePopPage = lazy(() => import('./pages/pharmacy/StorePopPage').then(m => ({ default: m.StorePopPage })));
 // WO-O4O-STORE-POP-V2-CANONICAL-REBUILD-KPA-PH-V1: POP V2 (공통 Core adapter)
 const StorePopV2Page = lazy(() => import('./pages/pharmacy/StorePopV2Page').then(m => ({ default: m.StorePopV2Page })));
 const MarketingAnalyticsPage = lazy(() => import('./pages/pharmacy/MarketingAnalyticsPage').then(m => ({ default: m.MarketingAnalyticsPage })));
@@ -962,7 +961,8 @@ function App() {
             <Route path="marketing/qr" element={<StoreQRPage />} />
             {/* WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: QR 전용 AI 설명 만들기 */}
             <Route path="marketing/qr/ai-description" element={<StoreQrAiDescriptionPage />} />
-            <Route path="marketing/pop" element={<StorePopPage />} />
+            {/* WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1: legacy 즉시 PDF 화면 은퇴 — 북마크 보호용 V2 redirect */}
+            <Route path="marketing/pop" element={<Navigate to="/store/marketing/pop-v2" replace />} />
             <Route path="marketing/pop-v2" element={<StorePopV2Page />} />
             <Route path="marketing/signage" element={<Navigate to="playlist" replace />} />
             <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />
@@ -1042,7 +1042,7 @@ function App() {
 
             {/* ── Legacy redirects (기존 URL 호환) ── */}
             <Route path="qr" element={<Navigate to="/store/marketing/qr" replace />} />
-            <Route path="pop" element={<Navigate to="/store/marketing/pop" replace />} />
+            <Route path="pop" element={<Navigate to="/store/marketing/pop-v2" replace />} />
             <Route path="signage" element={<Navigate to="/store/marketing/signage/playlist" replace />} />
             <Route path="analytics" element={<Navigate to="/store/analytics/marketing" replace />} />
             <Route path="products" element={<Navigate to="/store/commerce/products" replace />} />

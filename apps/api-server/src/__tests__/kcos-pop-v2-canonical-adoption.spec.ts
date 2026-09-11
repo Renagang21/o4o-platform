@@ -8,7 +8,8 @@
  * 이 spec 이 고정하는 것
  *   1. KCos 가 **공통 POP V2 Core** 를 serviceKey='cosmetics' 로 mount 한다 (본체 복제 0)
  *   2. 공통 Core(controller · source service)에 **KCos 전용 조건문이 없다** (WO §3 금지 / §14 중지조건 4)
- *   3. legacy 즉시 PDF 축(`POST /pharmacy/pop/generate` · `/store/marketing/pop`)은 **보존**된다 (§4 · §13)
+ *   3. legacy 즉시 PDF 축(`POST /pharmacy/pop/generate` · `/store/marketing/pop`)은 당시 보존됐고,
+ *      WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1 에서 제거·V2 redirect 로 은퇴했다 (아래 단언은 그 최종 상태 기준).
  *   4. KCos 프론트는 `createPopV2Api` / 공통 View 를 주입만 한다 — editor 복제·전용 schema 없음 (§3)
  *   5. 매장 메뉴 POP 진입만 V2 로 전환되고 KPA / PH 블록은 무변경 (§13)
  *
@@ -55,10 +56,8 @@ describe('KCos POP V2 canonical adoption', () => {
     );
   });
 
-  it('legacy 즉시 PDF POP controller mount 는 보존된다 (§7 · §13)', () => {
-    expect(codeOnly(cosmeticsRoutes)).toMatch(
-      /createStorePopController\(dataSource,\s*coreRequireAuth as any,\s*'cosmetics'\)/,
-    );
+  it('legacy 즉시 PDF POP controller 는 은퇴했다 (WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1)', () => {
+    expect(codeOnly(cosmeticsRoutes)).not.toMatch(/createStorePopController/);
   });
 
   it('공통 POP V2 Core 에 KCos 전용 분기가 없다 (§3 금지 / §14 중지조건 4)', () => {
@@ -89,12 +88,13 @@ describe('KCos POP V2 canonical adoption', () => {
     expect(kcosApi).not.toMatch(/interface\s+PopV2Document/);
   });
 
-  it('KCos route 는 V2 를 추가하고 legacy route 를 유지한다 (§4)', () => {
+  it('KCos route 는 V2 가 canonical 이고 legacy `marketing/pop` 은 V2 redirect 다 (§4 → 은퇴)', () => {
     expect(kcosApp).toMatch(/path="marketing\/pop-v2"\s+element=\{<StorePopV2Page \/>\}/);
-    expect(kcosApp).toMatch(/path="marketing\/pop"\s+element=\{<StorePopPage \/>\}/);
+    expect(kcosApp).toMatch(/path="marketing\/pop"\s+element=\{<Navigate to="\/store\/marketing\/pop-v2" replace \/>\}/);
+    expect(kcosApp).not.toMatch(/<StorePopPage \/>/);
   });
 
-  it('매장 메뉴는 KCos 블록만 pop-v2 로 전환되고 KPA / PH 는 무변경 (§13)', () => {
+  it('매장 메뉴는 KCos · KPA 블록이 pop-v2, PH 는 /pop (§13 → KPA 는 은퇴 회차에 전환)', () => {
     const block = (name: string) => {
       const start = menuConfig.indexOf(`export const ${name}`);
       expect(start).toBeGreaterThan(-1);
@@ -106,7 +106,7 @@ describe('KCos POP V2 canonical adoption', () => {
       /key: 'pop',\s*label: 'POP',\s*subPath: '\/marketing\/pop-v2'/,
     );
     expect(codeOnly(block('KPA_SOCIETY_STORE_CONFIG'))).toMatch(
-      /key: 'pop',\s*label: 'POP',\s*subPath: '\/marketing\/pop'/,
+      /key: 'pop',\s*label: 'POP',\s*subPath: '\/marketing\/pop-v2'/,
     );
     expect(codeOnly(block('PHARMACY_HUB_STORE_CONFIG'))).toMatch(
       /key: 'pop',\s*label: 'POP',\s*subPath: '\/pop'/,

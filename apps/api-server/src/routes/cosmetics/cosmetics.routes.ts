@@ -36,7 +36,6 @@ import { createCosmeticsStoreContentController } from '../o4o-store/controllers/
 import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
 import { createStoreLibraryController } from '../o4o-store/controllers/store-library.controller.js';
 import { createStoreQrLandingController } from '../o4o-store/controllers/store-qr-landing.controller.js';
-import { createStorePopController } from '../o4o-store/controllers/store-pop.controller.js';
 import { createStorePopV2Controller } from '../o4o-store/controllers/store-pop-v2.controller.js';
 // WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1: Blog controller
 import { createBlogController } from '../o4o-store/controllers/blog.controller.js';
@@ -203,15 +202,11 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // WO-O4O-STORE-GUARD-PHASE2A-CHANNEL-AND-QR-V1: serviceKey='cosmetics' 전달 (public route 는 무관).
   router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
-  // Store POP (internal: /pharmacy/pop/*)
-  // WO-O4O-STORE-GUARD-PHASE2B-LIBRARY-MARKETING-POP-V1: serviceKey='cosmetics' 전달.
-  router.use('/', createStorePopController(dataSource, coreRequireAuth as any, 'cosmetics'));
-
   // WO-O4O-KCOS-POP-V2-CANONICAL-ADOPTION-V1
   //   POP V2 (canonical Document 모델) — internal: /pharmacy/pop-v2/*
   //   KPA / PH 와 **같은 공통 Core factory** 를 serviceKey='cosmetics' 로 mount 한다.
   //   공통 Core 에 KCos 조건문을 넣지 않는다 (WO §3 금지) — 차이는 mount 와 프론트 adapter 뿐이다.
-  //   위 createStorePopController(legacy 즉시 PDF) 는 그대로 둔다 — 과거 산출물 이력 보존(§7).
+  //   legacy 즉시 PDF(createStorePopController) 는 WO-O4O-STORE-POP-LEGACY-INSTANT-PDF-RETIREMENT-FINAL-CLOSURE-V1 에서 제거 — 과거 산출물 row 는 보존.
   router.use(
     '/pharmacy/pop-v2',
     createStorePopV2Controller(dataSource, coreRequireAuth as any, 'cosmetics'),
