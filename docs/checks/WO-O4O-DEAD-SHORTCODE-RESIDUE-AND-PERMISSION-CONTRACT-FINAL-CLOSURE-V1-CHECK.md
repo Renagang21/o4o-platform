@@ -1,6 +1,6 @@
 # WO-O4O-DEAD-SHORTCODE-RESIDUE-AND-PERMISSION-CONTRACT-FINAL-CLOSURE-V1 — CHECK
 
-> **상태**: IMPLEMENTATION_COMPLETE_CI_PENDING (CI 확인 후 본 문서 §11·§16 갱신)
+> **상태**: CLOSED (CI·배포 확인 완료 — §11)
 > **작성일**: 2026-09-11
 > **작업 성격**: 판정 충돌 해소 → 소비 경계·운영 데이터 실측 → 소스 잔재 제거 (DB 변경 0)
 
@@ -186,16 +186,18 @@ DB · migration · `package.json` · lockfile · CI 변경 0.
 
 ## 11. CI · 배포
 
-> IMPLEMENTATION_COMPLETE_CI_PENDING — push 후 아래 표 갱신.
+구현 커밋 `f62793064` · CHECK 커밋 `2e9d1fb60` (rebase 후 SHA, origin/main 반영).
 
 | Workflow | 상태 | run ID / SHA |
 |---|---|---|
-| CI Pipeline | PENDING | — |
-| CodeQL | PENDING | — |
-| Deploy API Server | PENDING | — |
-| Deploy Admin Dashboard | PENDING | — |
-| Deploy Web Services | PENDING | — |
-| AppStore Guard | PENDING | — |
+| Deploy API Server | **success** | 34546871487 / `2e9d1fb60` |
+| Deploy Admin Dashboard | **success** | 34546871481 / `2e9d1fb60` |
+| Deploy Web Services | **success** | 34546871543 / `2e9d1fb60` |
+| CI Pipeline | `2e9d1fb60` 실행 34546871488 = **cancelled** (concurrency — 다른 세션 push `c874a070d` 가 취소, 그 실행 34546903905 도 `87081e04d` push 로 cancelled). 선형 후손 `87081e04d` 실행 **34547310318 = success** (Code Quality Check / Build admin-dashboard 모두 success) | 34547310318 / `87081e04d` |
+| CodeQL | `2e9d1fb60` 실행 34546871490 = **cancelled** (동일 사유). 선형 후손 `87081e04d` 실행 **34547310167 = success** | 34547310167 / `87081e04d` |
+| AppStore Guard | NOT_TRIGGERED (path filter 미해당) | — |
+
+- 취소된 실행은 성공으로 기재하지 않는다. 후손 근거: `git merge-base --is-ancestor 2e9d1fb60 87081e04d` = true (`2e9d1fb60` → `c874a070d`(docs-only) → `87081e04d`), 본 WO 변경 파일은 후손 커밋에서 되돌려지지 않았다.
 
 ---
 
@@ -229,9 +231,9 @@ BLOCK_RENDERER_CONSUMERS          = PRESERVED
 MIGRATION_HISTORY                 = PRESERVED
 PRODUCTION_DATA_CHANGE            = ZERO
 OTHER_SERVICE_REGRESSION          = PASS
-CI_PIPELINE                       = PENDING
-CODEQL                            = PENDING
+CI_PIPELINE                       = SUCCESS   (linear descendant 87081e04d · run 34547310318)
+CODEQL                            = SUCCESS   (linear descendant 87081e04d · run 34547310167)
 
 DEAD_SHORTCODE_RESIDUE_AND_PERMISSION_FINAL_CLOSURE
-  = IMPLEMENTATION_COMPLETE_CI_PENDING
+  = CLOSED
 ```
