@@ -483,6 +483,24 @@ const APP_HANDLERS = {
 // 만들거나 실행하지 않는다(§36) — 등록된 tool → repository 메서드 → 고정 파라미터 쿼리다.
 // 되돌리는 데이터에 DB 경로·민감정보를 담지 않는다(§33·§38).
 
+// 서버 계약(local-agent-protocol.ts)의 allowlist 를 agent 쪽에서 **다시** 정의한다(§15 이중 방어).
+// agent 는 zero-dependency 런타임이라 TS 서버 모듈을 import 할 수 없다 — 두 쪽이 각자 같은
+// 규칙을 들고 있어야 한다. 서버가 (버그·침해로) 규칙 밖 key/value 를 보내도 여기서 막힌다.
+const DATA_META_KEYS = Object.freeze(['schema_version', 'created_at', 'updated_at']);
+const DATA_SETTING_KEYS = Object.freeze(['locale', 'preferred_export_format', 'selected_source_profile']);
+const DATA_SETTING_LOCALE_VALUES = Object.freeze(['ko', 'en', 'zh', 'ja']);
+const DATA_SETTING_EXPORT_FORMATS = Object.freeze(['csv']);
+const DATA_PROFILE_ID_RE = /^[A-Za-z0-9_.:-]{1,64}$/;
+
+/** setting 키 하나에 대한 값 검증. 서버 isValidLocalSettingValue 와 같은 규칙. */
+function isValidSettingValue(key, value) {
+  if (typeof value !== 'string') return false;
+  if (key === 'locale') return DATA_SETTING_LOCALE_VALUES.includes(value);
+  if (key === 'preferred_export_format') return DATA_SETTING_EXPORT_FORMATS.includes(value);
+  if (key === 'selected_source_profile') return DATA_PROFILE_ID_RE.test(value);
+  return false;
+}
+
 /** `local.data.health` — 로컬 DB 열림/스키마/마이그레이션 상태(§38). 경로는 담지 않는다. */
 function dataHealth() {
   const h = localDbHealth();
@@ -490,9 +508,13 @@ function dataHealth() {
   return { status: 'success', data: h };
 }
 
-/** `local.data.get_meta` — local_meta 의 key/value(§11). 민감정보 없음(local_db_id·schema_version 등). */
-function dataGetMeta() {
-  return { status: 'success', data: { meta: LocalMetaRepository.all() } };
+/**
+ * `local.data.get_meta` — allowlist 된 meta 키 하나의 key/value(§11).
+ * 전체 덤프가 아니라 **요청한 한 키**만 돌려준다. 키가 allowlist 밖이면 검사 단계에서 이미 걸러졌다.
+ */
+function dataGetMeta(args) {
+  const value = LocalMetaRepository.get(args.key);
+  return { status: 'success', data: { key: args.key, value: value ?? null } };
 }
 
 /** `local.data.set_setting` — local_settings 한 건 쓰기(§35). 값 원문은 응답/로그에 담지 않는다. */
@@ -501,24 +523,40 @@ function dataSetSetting(args) {
   return { status: 'success', data: { key: saved.key, saved: true } };
 }
 
-/** set_setting 인자 검사 — key 는 안전 문자·길이 제한, value 는 길이 제한 문자열(§37). */
-function validateSetSettingArgs(args) {
-  if (!args || typeof args !== 'object') return { ok: false };
-  const { key, value } = args;
-  if (typeof key !== 'string' || !/^[A-Za-z0-9_.:-]{1,128}$/.test(key)) return { ok: false };
-  if (value != null && typeof value !== 'string') return { ok: false };
-  if (typeof value === 'string' && value.length > 4096) return { ok: false };
-  return { ok: true, args: { key, value: value ?? '' } };
+/** get_meta 인자 검사 — `{ key }`, key 는 meta allowlist 안이어야 한다. */
+function validateGetMetaArgs(args) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const keys = Object.keys(args);
+  if (keys.length !== 1 || keys[0] !== 'key') return { ok: false };
+  const { key } = args;
+  if (typeof key !== 'string') return { ok: false };
+  if (!DATA_META_KEYS.includes(key)) return { ok: false, reason: 'KEY_NOT_ALLOWED' };
+  return { ok: true, args: { key } };
 }
 
 /**
- * 데이터 tool. 인자 없는 것(health·get_meta)과 인자 받는 것(set_setting)을 한 표에서
+ * set_setting 인자 검사 — `{ key, value }`. generic KV 가 아니다: key 는 setting allowlist,
+ * value 는 키별 값 스키마(서버 isValidLocalSettingValue 와 동일)를 통과해야 한다(§10·§11·§37).
+ */
+function validateSetSettingArgs(args) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const keys = Object.keys(args).sort();
+  if (keys.length !== 2 || keys[0] !== 'key' || keys[1] !== 'value') return { ok: false };
+  const { key, value } = args;
+  if (typeof key !== 'string') return { ok: false };
+  if (!DATA_SETTING_KEYS.includes(key)) return { ok: false, reason: 'KEY_NOT_ALLOWED' };
+  if (!isValidSettingValue(key, value)) return { ok: false };
+  return { ok: true, args: { key, value } };
+}
+
+/**
+ * 데이터 tool. 인자 없는 것(health)과 인자 받는 것(get_meta·set_setting)을 한 표에서
  * validate/run 쌍으로 다룬다. 이 표에 없는 `local.data.*` 는 존재하지 않는다.
  * 특히 `local.sqlite.execute_sql` 같은 임의 SQL tool 은 어디에도 없다(§36).
  */
 const DATA_HANDLERS = {
   [ACTIONS.DATA_HEALTH]: { validate: () => ({ ok: true, args: undefined }), run: () => dataHealth() },
-  [ACTIONS.DATA_GET_META]: { validate: () => ({ ok: true, args: undefined }), run: () => dataGetMeta() },
+  [ACTIONS.DATA_GET_META]: { validate: validateGetMetaArgs, run: (args) => dataGetMeta(args) },
   [ACTIONS.DATA_SET_SETTING]: { validate: validateSetSettingArgs, run: (args) => dataSetSetting(args) },
 };
 
@@ -591,7 +629,12 @@ export async function runAction(action, context, args) {
   const dataHandler = appId === undefined ? DATA_HANDLERS[base] : undefined;
   if (dataHandler) {
     const checked = dataHandler.validate(args);
-    if (!checked.ok) return { status: 'denied', errorCode: 'LOCAL_DATA_INVALID_ARGS' };
+    if (!checked.ok) {
+      // 서버 error code 와 정확히 일치시킨다: 허용 밖 key 는 KEY_NOT_ALLOWED, 그 밖은 INVALID_ARGUMENT.
+      const errorCode =
+        checked.reason === 'KEY_NOT_ALLOWED' ? 'LOCAL_DATA_KEY_NOT_ALLOWED' : 'LOCAL_DATA_INVALID_ARGUMENT';
+      return { status: 'denied', errorCode };
+    }
     try {
       return await dataHandler.run(checked.args);
     } catch {

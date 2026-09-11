@@ -26,6 +26,7 @@ import {
   APP_TARGET_ACTIONS,
   COMPUTER_ARGS_ACTIONS,
   COMPUTER_TARGET_ACTIONS,
+  DATA_TARGET_ACTIONS,
   LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ACTION_ALLOWLIST,
   LOCAL_AGENT_ERROR,
@@ -863,6 +864,7 @@ describe('18~21. 회귀 — replay · 창 축 · 브라우저 축 · pairing/LNA
     const expected = [
       LOCAL_AGENT_ACTIONS.GET_AGENT_STATUS,
       LOCAL_AGENT_ACTIONS.GET_SYSTEM_INFO,
+      ...DATA_TARGET_ACTIONS,
       ...APP_TARGET_ACTIONS.flatMap((b) => WINDOWS_APP_IDS.map((a) => composeAppAction(b, a))),
       ...SITE_TARGET_ACTIONS.map((b) => composeAppAction(b, 'o4o.neture')),
       ...COMPUTER_TARGET_ACTIONS.flatMap((b) => WINDOWS_APP_IDS.map((a) => composeComputerAction(b, a))),

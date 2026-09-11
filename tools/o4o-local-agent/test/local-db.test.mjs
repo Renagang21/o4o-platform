@@ -165,29 +165,46 @@ test('runAction: local.data.health 성공', async () => {
   assert.equal(JSON.stringify(r).includes(tmpHome), false);
 });
 
-test('runAction: local.data.get_meta 는 key/value 만 돌려준다', async () => {
-  const r = await handlers.runAction('local.data.get_meta', {}, undefined);
+test('runAction: local.data.get_meta 는 allowlist 된 key 하나의 key/value 만 돌려준다', async () => {
+  const r = await handlers.runAction('local.data.get_meta', {}, { key: 'schema_version' });
   assert.equal(r.status, 'success');
-  const keys = r.data.meta.map((m) => m.key);
-  assert.ok(keys.includes('local_db_id'));
-  assert.ok(keys.includes('schema_version'));
+  assert.equal(r.data.key, 'schema_version');
+  // 단일 key/value 계약 — 전체 meta 덤프(meta 배열)가 아니다.
+  assert.equal('meta' in r.data, false);
+  assert.ok('value' in r.data);
+});
+
+test('runAction: local.data.get_meta 는 allowlist 밖 key 를 거부한다 (§26)', async () => {
+  // local_db_id 는 상관 지문이라 meta allowlist 에서 일부러 빠졌다(§18).
+  const denied = await handlers.runAction('local.data.get_meta', {}, { key: 'local_db_id' });
+  assert.equal(denied.status, 'denied');
+  assert.equal(denied.errorCode, 'LOCAL_DATA_KEY_NOT_ALLOWED');
+  const noArgs = await handlers.runAction('local.data.get_meta', {}, undefined);
+  assert.equal(noArgs.status, 'denied');
+  assert.equal(noArgs.errorCode, 'LOCAL_DATA_INVALID_ARGUMENT');
 });
 
 test('runAction: local.data.set_setting 성공 (값 원문은 응답에 없음)', async () => {
-  const r = await handlers.runAction('local.data.set_setting', {}, { key: 'ui.lang', value: 'ko' });
+  const r = await handlers.runAction('local.data.set_setting', {}, { key: 'locale', value: 'ko' });
   assert.equal(r.status, 'success');
-  assert.equal(r.data.key, 'ui.lang');
+  assert.equal(r.data.key, 'locale');
   assert.equal(r.data.saved, true);
   assert.equal('value' in r.data, false);
-  assert.equal(db.LocalSettingsRepository.get('ui.lang'), 'ko');
+  assert.equal(db.LocalSettingsRepository.get('locale'), 'ko');
 });
 
 test('8. runAction: 잘못된 set_setting 인자는 거부된다', async () => {
-  const bad = await handlers.runAction('local.data.set_setting', {}, { key: 'bad key!', value: 'x' });
-  assert.equal(bad.status, 'denied');
-  assert.equal(bad.errorCode, 'LOCAL_DATA_INVALID_ARGS');
+  // 허용 밖 key.
+  const badKey = await handlers.runAction('local.data.set_setting', {}, { key: 'ui.lang', value: 'ko' });
+  assert.equal(badKey.status, 'denied');
+  assert.equal(badKey.errorCode, 'LOCAL_DATA_KEY_NOT_ALLOWED');
+  // 허용 key + 허용 밖 value (locale 은 enum).
+  const badValue = await handlers.runAction('local.data.set_setting', {}, { key: 'locale', value: 'de' });
+  assert.equal(badValue.status, 'denied');
+  assert.equal(badValue.errorCode, 'LOCAL_DATA_INVALID_ARGUMENT');
   const noArgs = await handlers.runAction('local.data.set_setting', {}, undefined);
   assert.equal(noArgs.status, 'denied');
+  assert.equal(noArgs.errorCode, 'LOCAL_DATA_INVALID_ARGUMENT');
 });
 
 test('14. runAction: 임의 SQL tool 은 존재하지 않는다 (denied)', async () => {

@@ -48,8 +48,11 @@ import {
   composeSiteAction,
   LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ERROR,
+  LOCAL_DATA_META_KEYS,
+  LOCAL_DATA_SETTING_KEYS,
   pickSafeBrowserInfo,
   pickSafeComputerInfo,
+  pickSafeDataInfo,
   pickSafeSystemInfo,
   pickSafeWindowInfo,
 } from '../local-agent/local-agent-protocol.js';
@@ -437,6 +440,118 @@ function executeOpenSite(dataSource: DataSource, ctx: VerifiedToolContext, siteI
   );
 }
 
+// ─── Local Data executors (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1) ─────────
+
+/**
+ * 로컬 데이터 축 tool 의 공통 왕복 — 창·브라우저 축과 **같은 배관**을 쓴다(§7·§27). 새 protocol 없음.
+ *
+ * 다른 점: action 이 #appId·#siteId 접미사 없는 순수 base action 이고, `local.data.get_meta` ·
+ * `local.data.set_setting` 은 **좁은 structured args**(`{ key }` · `{ key, value }`)를 함께 싣는다.
+ * args 는 Computer Use 와 같은 일회성 채널(result_data)로 실려 claim 시 지워진다 — cloud DB
+ * migration = 0 (§8). issueCommand 가 `validateLocalCommandArgs` 로 args 를 서버에서 한 번 더
+ * 검사하고, agent 도 자기 쪽에서 재검사한다(§14·§15).
+ *
+ * 돌아온 데이터는 `pickSafeDataInfo` 를 **두 번** 통과한다 — service 저장 시 한 번, 여기서 프롬프트로
+ * 보내기 전 한 번 더. agent 가 무엇을 실어 보내든 local.db 경로 · 임의 row · imported 원자료 ·
+ * setting **값 원문** · credential 은 이 문을 지나지 못한다(§18·§19·§20).
+ */
+async function executeLocalDataAction(
+  dataSource: DataSource,
+  ctx: VerifiedToolContext,
+  tool: string,
+  action: string,
+  args: Record<string, unknown>,
+): Promise<ToolResult> {
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
+  if (resolution.status !== 'ok') {
+    const errorCode =
+      resolution.status === 'none'
+        ? LOCAL_AGENT_ERROR.NO_DEVICE
+        : resolution.status === 'ambiguous'
+          ? LOCAL_AGENT_ERROR.AMBIGUOUS
+          : LOCAL_AGENT_ERROR.OFFLINE;
+    return { ok: true, tool, data: { available: false, errorCode } };
+  }
+
+  const issued = await issueCommand(dataSource, {
+    userId: ctx.userId,
+    deviceId: resolution.device.id,
+    action,
+    toolName: tool,
+    args,
+  });
+  // strictNullChecks 가 꺼져 있어 `!issued.ok` 로는 union 이 좁혀지지 않는다.
+  if (issued.ok === false) {
+    return { ok: true, tool, data: { available: false, errorCode: issued.errorCode } };
+  }
+
+  const result = await awaitCommandResult(dataSource, issued.command.commandId);
+  const safe = pickSafeDataInfo(result.data);
+
+  // §20 안전 로그 — tool · action · 상태 · errorCode · deviceId 까지만. setting **값** · local.db
+  // 경로 · imported 원자료 · credential 은 애초에 이 값 안에 없다(pickSafeDataInfo 화이트리스트).
+  // key 는 allowlist 등재분이라 로그에 남겨도 민감하지 않다(값이 아니다).
+  logger.info('local-agent data command', {
+    tool,
+    status: result.status,
+    errorCode: result.errorCode ?? null,
+    key: typeof safe.key === 'string' ? safe.key : null,
+    deviceId: resolution.device.id,
+  });
+
+  if (result.status !== 'success') {
+    return {
+      ok: true,
+      tool,
+      data: { available: false, errorCode: result.errorCode ?? LOCAL_AGENT_ERROR.EXECUTION_FAILED },
+    };
+  }
+  return { ok: true, tool, data: { available: true, ...safe } };
+}
+
+/** 로컬 데이터 저장소 상태 (§5·§19). 인자 없음. DB 경로는 돌려주지 않는다. */
+function executeLocalDataHealth(dataSource: DataSource, ctx: VerifiedToolContext): Promise<ToolResult> {
+  return executeLocalDataAction(
+    dataSource, ctx,
+    AI_TOOL_NAMES.DATA_LOCAL_HEALTH,
+    LOCAL_AGENT_ACTIONS.DATA_HEALTH,
+    {},
+  );
+}
+
+/** allowlist 된 meta 키 하나 조회 (§5·§6). key 는 validateToolArguments 를 통과한 등재분이다. */
+function executeLocalDataGetMeta(
+  dataSource: DataSource,
+  ctx: VerifiedToolContext,
+  key: string,
+): Promise<ToolResult> {
+  return executeLocalDataAction(
+    dataSource, ctx,
+    AI_TOOL_NAMES.DATA_GET_LOCAL_META,
+    LOCAL_AGENT_ACTIONS.DATA_GET_META,
+    { key },
+  );
+}
+
+/**
+ * allowlist 된 setting 키에 검증된 값 저장 (§5·§6·§13). key·value 는 validateToolArguments 를
+ * 통과한 값이고, issueCommand 가 같은 규칙으로 서버에서 한 번 더 검사한다. **명시적 요청일 때만**
+ * 호출된다 — 선택 규칙이 쓰기 지시어를 요구한다(§13).
+ */
+function executeLocalDataSetSetting(
+  dataSource: DataSource,
+  ctx: VerifiedToolContext,
+  key: string,
+  value: unknown,
+): Promise<ToolResult> {
+  return executeLocalDataAction(
+    dataSource, ctx,
+    AI_TOOL_NAMES.DATA_SET_LOCAL_SETTING,
+    LOCAL_AGENT_ACTIONS.DATA_SET_SETTING,
+    { key, value },
+  );
+}
+
 // ─── Router ──────────────────────────────────────────────────────────────────
 
 /**
@@ -593,6 +708,16 @@ export async function executeAiTool(
               ? LOCAL_AGENT_ACTIONS.COMPUTER_TYPE_TEXT
               : LOCAL_AGENT_ACTIONS.COMPUTER_KEY;
       return executeComputerAction(dataSource, ctx, name, base, String(targetId), rest);
+    }
+    // 로컬 데이터 (LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1): key·value 는 validateToolArguments 를
+    // 통과한 값이고, issueCommand 가 같은 규칙(validateLocalCommandArgs)으로 한 번 더 검사한다(§14).
+    case AI_TOOL_NAMES.DATA_LOCAL_HEALTH:
+      return executeLocalDataHealth(dataSource, ctx);
+    case AI_TOOL_NAMES.DATA_GET_LOCAL_META:
+      return executeLocalDataGetMeta(dataSource, ctx, String((args as { key: string }).key));
+    case AI_TOOL_NAMES.DATA_SET_LOCAL_SETTING: {
+      const a = args as { key: string; value: unknown };
+      return executeLocalDataSetSetting(dataSource, ctx, String(a.key), a.value);
     }
     default:
       // 등록부에는 있으나 executor 가 없는 경우 — 열려 있는 척하지 않는다.
@@ -940,6 +1065,140 @@ export function computerRequestGap(message: string): ComputerRequestGap | null {
   return textDenyReason(text) ? 'TEXT_DENIED' : null;
 }
 
+// ─── Local Data intents (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §13) ────────
+
+/**
+ * "로컬 데이터 / 데이터 저장소" 류의 로컬 데이터 도메인 지시어.
+ *
+ * 위 매장·로컬·앱 키워드와 **같은 이유로** 한글을 정규식 리터럴에 두지 않는다(esbuild ascii 함정).
+ * 이 표에 걸려야만 데이터 축 tool 을 고려한다 — 걸리지 않으면 데이터 tool 은 선택되지 않는다.
+ */
+const DATA_INTENT_KEYWORDS_KO: readonly string[] = [
+  '로컬데이터', // 로컬데이터
+  '데이터저장소', // 데이터저장소
+  '로컬디비', // 로컬디비
+];
+/** ASCII 전용이라 번들 영향이 없다. */
+const DATA_INTENT_PATTERNS_EN: readonly RegExp[] = [
+  /local\s+data/i,
+  /local\s+(?:db|database)/i,
+  /data\s+store/i,
+];
+
+export function looksLikeLocalDataRequest(message: string): boolean {
+  const compact = message.replace(/\s+/g, '');
+  if (DATA_INTENT_KEYWORDS_KO.some((k) => compact.includes(k))) return true;
+  return DATA_INTENT_PATTERNS_EN.some((re) => re.test(message));
+}
+
+/** 저장·변경 지시어. 없으면 데이터 축은 **조회(health/meta)로만** 간다 — 쓰기는 명시 요청뿐(§13). */
+const DATA_WRITE_KEYWORDS_KO: readonly string[] = [
+  '설정', // 설정
+  '변경', // 변경
+  '바꿔', // 바꿔
+  '저장', // 저장
+  '지정', // 지정
+];
+const DATA_WRITE_PATTERNS_EN: readonly RegExp[] = [/\bset\b/i, /\bchange\b/i, /\bsave\b/i, /\bupdate\b/i];
+
+export function asksForDataWrite(message: string): boolean {
+  // '데이터저장소'(data storage)는 조회 의도의 명사인데 '저장'(save)을 부분 문자열로 품는다.
+  // 그 명사를 먼저 지워서 "저장소 상태 확인"이 쓰기로 오분류돼 조회가 막히는 일을 없앤다.
+  const compact = message.replace(/\s+/g, '').replace(/저장소/g, '');
+  if (DATA_WRITE_KEYWORDS_KO.some((k) => compact.includes(k))) return true;
+  return DATA_WRITE_PATTERNS_EN.some((re) => re.test(message));
+}
+
+/** 스키마 버전 등 meta 조회 지시어 → 등재 meta 키. 표에 없으면 null(임의 키 없음, §6). */
+const META_INTENT: readonly { key: string; ko: readonly string[]; en: readonly RegExp[] }[] = [
+  {
+    key: 'schema_version',
+    ko: ['스키마', '버전'], // 스키마 · 버전
+    en: [/schema\s*version/i, /\bschema\b/i],
+  },
+];
+
+export function detectDataMetaKey(message: string): string | null {
+  const compact = message.replace(/\s+/g, '');
+  const hits = META_INTENT.filter(
+    (m) => m.ko.some((k) => compact.includes(k)) || m.en.some((re) => re.test(message)),
+  ).map((m) => m.key);
+  const unique = [...new Set(hits)].filter((k) => LOCAL_DATA_META_KEYS.includes(k));
+  return unique.length === 1 ? unique[0] : null;
+}
+
+/**
+ * 명시적 설정 쓰기 → `{ key, value }`. **좁은 표에 있는 것만** 잡는다(§10·§11):
+ *   - locale                  ← 한국어/영어/중국어/일본어 (언어 설정)
+ *   - preferred_export_format ← CSV (내보내기 형식)
+ * selected_source_profile 처럼 자유 식별자 값은 자연어에서 안전하게 뽑을 수 없어 여기서
+ * 고르지 않는다 — 그 키는 tool 을 직접 호출하는 경로(테스트·후속 UI)로만 설정된다.
+ * 여러 개가 동시에 걸리면 **고르지 않는다**(임의 선택 금지).
+ */
+const SETTING_INTENT: readonly {
+  key: string;
+  value: string;
+  ko: readonly string[];
+  en: readonly RegExp[];
+}[] = [
+  { key: 'locale', value: 'ko', ko: ['한국어', '한글'], en: [/\bkorean\b/i] }, // 한국어 · 한글
+  { key: 'locale', value: 'en', ko: ['영어'], en: [/\benglish\b/i] }, // 영어
+  { key: 'locale', value: 'zh', ko: ['중국어'], en: [/\bchinese\b/i] }, // 중국어
+  { key: 'locale', value: 'ja', ko: ['일본어'], en: [/\bjapanese\b/i] }, // 일본어
+  {
+    key: 'preferred_export_format',
+    value: 'csv',
+    ko: ['내보내기', '형식'], // 내보내기 · 형식
+    en: [/export\s*format/i],
+  },
+];
+
+export function detectDataSetting(message: string): { key: string; value: string } | null {
+  const compact = message.replace(/\s+/g, '');
+  const csv = /\bcsv\b/i.test(message);
+  const hits = SETTING_INTENT.filter((s) => {
+    if (s.value === 'csv') {
+      // 내보내기 형식은 CSV 라는 값 자체가 문장에 있어야 확정한다.
+      return csv && (s.ko.some((k) => compact.includes(k)) || s.en.some((re) => re.test(message)));
+    }
+    return s.ko.some((k) => compact.includes(k)) || s.en.some((re) => re.test(message));
+  });
+  const unique = [...new Map(hits.map((h) => [`${h.key}:${h.value}`, h])).values()].filter((h) =>
+    LOCAL_DATA_SETTING_KEYS.includes(h.key),
+  );
+  if (unique.length !== 1) return null;
+  return { key: unique[0].key, value: unique[0].value };
+}
+
+/**
+ * 데이터 축에서 실행할 tool 을 고른다. 순서 = 명시적 쓰기 → meta 조회 → health.
+ *
+ * 자격은 available 로 이미 필터된다(set_setting 은 LOCAL_DATA_SETTING_WRITE 가 있어야 후보).
+ * 쓰기는 **쓰기 지시어 + 확정 가능한 {key,value}** 둘 다 있어야만 선택한다(§13).
+ */
+function selectDataToolInvocation(
+  message: string,
+  available: Set<string>,
+): AiToolInvocation | null {
+  if (asksForDataWrite(message)) {
+    const setting = detectDataSetting(message);
+    if (setting && available.has(AI_TOOL_NAMES.DATA_SET_LOCAL_SETTING)) {
+      return { tool: AI_TOOL_NAMES.DATA_SET_LOCAL_SETTING, args: setting };
+    }
+    // 쓰기를 원했지만 어떤 값인지 확정할 수 없으면 **조회로 흘려보내지 않고** 멈춘다 —
+    // 임의 설정을 저장하지 않는다. 안내는 모델이 한다.
+    return null;
+  }
+  const metaKey = detectDataMetaKey(message);
+  if (metaKey && available.has(AI_TOOL_NAMES.DATA_GET_LOCAL_META)) {
+    return { tool: AI_TOOL_NAMES.DATA_GET_LOCAL_META, args: { key: metaKey } };
+  }
+  if (available.has(AI_TOOL_NAMES.DATA_LOCAL_HEALTH)) {
+    return { tool: AI_TOOL_NAMES.DATA_LOCAL_HEALTH, args: {} };
+  }
+  return null;
+}
+
 /**
  * 이번 요청에서 실행할 tool 을 **결정론적으로** 고른다. 없으면 null.
  *
@@ -969,7 +1228,9 @@ export function needsLocalDeviceResolution(message: string): boolean {
     looksLikeLocalScopedRequest(message) ||
     detectRegisteredApp(message) !== null ||
     // BROWSER-CONTROL-V0: 사이트 축도 PC 가 있어야 성립한다.
-    detectRegisteredSite(message) !== null
+    detectRegisteredSite(message) !== null ||
+    // LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1: 데이터 축도 연결된 PC 의 local.db 가 있어야 성립한다.
+    looksLikeLocalDataRequest(message)
   );
 }
 
@@ -1051,6 +1312,15 @@ export function selectToolInvocationForRequest(
     return null;
   }
 
+  // 로컬 데이터 축 (LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §13). 앱·사이트 축이 아니고
+  // "로컬 데이터/데이터 저장소" 지시어에 걸릴 때만. 데이터 키워드는 앱 이름과 겹치지 않는다.
+  if (looksLikeLocalDataRequest(message)) {
+    const dataInvocation = selectDataToolInvocation(message, available);
+    if (dataInvocation) return dataInvocation;
+    // 데이터 요청인데 자격이 없으면 다른 축으로 새지 않는다 — 그대로 텍스트 응답이다.
+    return null;
+  }
+
   if (looksLikeStoreScopedRequest(message) && available.has(AI_TOOL_NAMES.GET_STORE_CONTEXT)) {
     return { tool: AI_TOOL_NAMES.GET_STORE_CONTEXT, args: {} };
   }
@@ -1108,7 +1378,84 @@ export function renderToolContext(result: ToolResult): string | null {
   ) {
     return renderComputerAction(result.tool, result.data);
   }
+  if (result.tool === AI_TOOL_NAMES.DATA_LOCAL_HEALTH) {
+    return renderDataHealth(result.data);
+  }
+  if (result.tool === AI_TOOL_NAMES.DATA_GET_LOCAL_META) {
+    return renderDataGetMeta(result.data);
+  }
+  if (result.tool === AI_TOOL_NAMES.DATA_SET_LOCAL_SETTING) {
+    return renderDataSetSetting(result.data);
+  }
   return null;
+}
+
+// ─── Local Data renderers (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §19) ──────
+
+const DATA_HEADER = '## 로컬 데이터 상태\n';
+
+/** 데이터 축 공통 실패 문장. local.db 경로 · 값은 애초에 data 안에 없다. */
+function renderDataFailure(data: Record<string, unknown>): string {
+  const code = String(data.errorCode ?? '');
+  if (code === LOCAL_AGENT_ERROR.AMBIGUOUS) {
+    return DATA_HEADER + '- 연결된 PC가 여러 대여서 어느 PC인지 확정할 수 없습니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.TIMEOUT) {
+    return DATA_HEADER + '- 이 PC의 에이전트가 제한 시간 안에 응답하지 않았습니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.DATA_DB_NOT_AVAILABLE) {
+    return DATA_HEADER + '- 이 PC의 로컬 데이터 저장소를 사용할 수 없습니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.DATA_KEY_NOT_ALLOWED) {
+    return DATA_HEADER + '- 요청한 항목은 조회·저장이 허용되지 않은 키입니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.DATA_INVALID_ARGUMENT) {
+    return DATA_HEADER + '- 요청 값이 허용 범위를 벗어나 저장하지 않았습니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.DATA_WRITE_FAILED) {
+    return DATA_HEADER + '- 로컬 데이터 저장소에 값을 저장하지 못했습니다.';
+  }
+  return (
+    DATA_HEADER +
+    '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 로컬 데이터를 확인할 수 없습니다.\n' +
+    '- 추측해서 답하지 마세요.'
+  );
+}
+
+function renderDataHealth(data: Record<string, unknown>): string {
+  if (data.available !== true) return renderDataFailure(data);
+  const ok = data.ok === true;
+  const ver = typeof data.schemaVersion === 'number' ? ` 스키마 버전 ${data.schemaVersion}.` : '';
+  const status =
+    data.migrationStatus === 'current'
+      ? ' 스키마가 최신입니다.'
+      : data.migrationStatus === 'behind'
+        ? ' 스키마 갱신이 필요합니다.'
+        : data.migrationStatus === 'failed'
+          ? ' 스키마 갱신에 실패했습니다.'
+          : '';
+  return (
+    DATA_HEADER +
+    (ok
+      ? `- 로컬 데이터 저장소가 정상입니다.${ver}${status}`
+      : `- 로컬 데이터 저장소에 문제가 있습니다.${ver}${status}`)
+  );
+}
+
+function renderDataGetMeta(data: Record<string, unknown>): string {
+  if (data.available !== true) return renderDataFailure(data);
+  const key = typeof data.key === 'string' ? data.key : null;
+  if (!key) return DATA_HEADER + '- 요청한 항목의 값을 찾지 못했습니다.';
+  const value = typeof data.value === 'string' ? data.value : null;
+  if (value === null) return DATA_HEADER + `- 항목 "${key}" 은(는) 아직 값이 없습니다.`;
+  return DATA_HEADER + `- ${key}: ${value}`;
+}
+
+function renderDataSetSetting(data: Record<string, unknown>): string {
+  if (data.available !== true || data.saved !== true) return renderDataFailure(data);
+  const key = typeof data.key === 'string' ? data.key : '요청한 설정';
+  // 값 원문은 프롬프트에 싣지 않는다(§19) — "저장했다" 는 사실과 키만 말한다.
+  return DATA_HEADER + `- 설정 "${key}" 을(를) 저장했습니다.`;
 }
 
 // ─── Computer Use renderers (WO-O4O-COMPUTER-USE-V0 §38·§41·§42·§45) ────────

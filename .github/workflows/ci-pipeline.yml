@@ -141,6 +141,14 @@ jobs:
     - name: Run tests (api-server Jest, serial to prevent OOM)
       run: cd apps/api-server && npx jest --maxWorkers=1
 
+    # WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §22
+    # Local Work Agent 는 런타임 의존성 0(package.json 없음)이라 jest 대상이 아니다.
+    # 로컬 SQLite 계약(node:sqlite DatabaseSync, key/setting allowlist, 임의 SQL·파일 부재)을
+    # Node 내장 test runner 로 blocking 검증한다. Node 22 내장이라 설치·DB·secret 불필요.
+    # Node 22.18.0 에서 `node --test <dir>` 는 실패하므로 파일을 명시한다(실측 확인).
+    - name: Run tests (o4o-local-agent node:test)
+      run: node --test tools/o4o-local-agent/test/local-db.test.mjs
+
     - name: Run tests (admin-dashboard Vitest, serial to prevent OOM)
       run: cd apps/admin-dashboard && npx vitest run --passWithNoTests --pool=forks --poolOptions.forks.maxForks=1
 

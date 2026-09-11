@@ -24,6 +24,7 @@ import { join } from 'path';
 import {
   APP_TARGET_ACTIONS,
   COMPUTER_TARGET_ACTIONS,
+  DATA_TARGET_ACTIONS,
   SITE_TARGET_ACTIONS,
   composeAppAction,
   LOCAL_AGENT_ACTIONS,
@@ -533,6 +534,8 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
       [
         LOCAL_AGENT_ACTIONS.GET_AGENT_STATUS,
         LOCAL_AGENT_ACTIONS.GET_SYSTEM_INFO,
+        // LOCAL-DATA-TOOL-BRIDGE-V1: 데이터 축 3개는 #appId 조합이 없다(대상이 로컬 DB 하나).
+        ...DATA_TARGET_ACTIONS,
         ...APP_TARGET_ACTIONS.flatMap((base) =>
           WINDOWS_APP_IDS.map((appId) => composeAppAction(base, appId)),
         ),

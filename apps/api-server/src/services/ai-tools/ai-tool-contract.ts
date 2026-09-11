@@ -42,6 +42,10 @@ import {
   validateKeyArgs,
   validateTextArgs,
 } from '../local-agent/computer-use-contract.js';
+import {
+  validateDataGetMetaArgs,
+  validateDataSetSettingArgs,
+} from '../local-agent/local-agent-protocol.js';
 
 // ─── Capability ──────────────────────────────────────────────────────────────
 
@@ -110,6 +114,17 @@ export const AiCapability = {
    * 이 자격으로 표현할 수 없다(§3·§5·§9·§22).
    */
   LOCAL_COMPUTER_INTERACT: 'LOCAL_COMPUTER_INTERACT',
+  /**
+   * 연결된 PC 의 로컬 SQLite **상태·allowlist 된 meta 조회** 자격
+   * (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 `local.data.health`·`local.data.get_meta`).
+   * read-only 다. 임의 row · imported 원자료 · local.db 경로는 이 자격으로 얻을 수 없다(§18·§19).
+   */
+  READ_ONLY_LOCAL_DATA: 'READ_ONLY_LOCAL_DATA',
+  /**
+   * 로컬 SQLite 의 **allowlist 된 setting 키**에 검증된 값을 쓰는 자격 (동 `local.data.set_setting`).
+   * generic KV 쓰기가 아니다 — 키·값 모두 좁은 스키마를 통과해야 하고, 임의 SQL 은 표현 불가다(§10·§11·§16).
+   */
+  LOCAL_DATA_SETTING_WRITE: 'LOCAL_DATA_SETTING_WRITE',
 } as const;
 
 /**
@@ -204,6 +219,10 @@ export function deriveAiCapabilities(ctx: VerifiedToolContext): AiCapabilityKey[
     // 화면 조작 축도 같은 조건이다(COMPUTER-USE-V0 §25). 연결된 단일 PC 가 확정돼야 한다.
     caps.push(AiCapability.READ_ONLY_LOCAL_COMPUTER_INSPECT);
     caps.push(AiCapability.LOCAL_COMPUTER_INTERACT);
+    // 로컬 데이터 축도 같은 조건이다(LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §14). local.db 는 연결된
+    // 그 PC 에 있으므로, 연결된 단일 device 가 확정돼야 상태·meta 조회와 setting 쓰기가 성립한다.
+    caps.push(AiCapability.READ_ONLY_LOCAL_DATA);
+    caps.push(AiCapability.LOCAL_DATA_SETTING_WRITE);
   }
   return caps;
 }
@@ -251,8 +270,16 @@ export interface AiToolDefinition {
    * 받는 인자의 형상. 생략하면 **인자 없음**이다(V0 기본).
    * `appId` 는 `{ appId }` 하나만 허용하며, 값은 Windows App Registry 등재분이어야 한다(§9).
    */
-  argumentSchema?: 'none' | 'appId' | 'siteId' | ComputerArgumentSchema;
+  argumentSchema?: 'none' | 'appId' | 'siteId' | ComputerArgumentSchema | DataArgumentSchema;
 }
+
+/**
+ * LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §6 인자 형상. 자유 args 채널이 아니다 — tool 별로 좁다.
+ *   dataMetaKey → { key }           key 는 allowlist(local_meta) 등재분
+ *   dataSetting → { key, value }    key 는 allowlist(settings) 등재분 · value 는 per-key 스키마
+ * health 는 인자 없음('none')이라 여기 없다.
+ */
+export type DataArgumentSchema = 'dataMetaKey' | 'dataSetting';
 
 /**
  * COMPUTER-USE-V0 §15~§20 인자 형상. 전부 `targetId`(= 등재 appId) 를 포함한다.
@@ -283,13 +310,20 @@ export type ToolEffect =
    * 왼쪽 클릭 1회 · 짧은 텍스트 1건 · 허용키 1회 중 하나. 창이 foreground 가 아니면 agent 가
    * 실행 전에 멈춘다(§9). 파일 저장 · 전송 · 종료 같은 고위험 동작은 이 효과의 이름이 아니다(§39).
    */
-  | 'COMPUTER_INTERACTION';
+  | 'COMPUTER_INTERACTION'
+  /**
+   * 로컬 SQLite 의 **allowlist 된 setting 키 하나**에 검증된 값을 쓴다
+   * (LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §5·§10·§11·§16). generic KV 쓰기도, 임의 SQL 도,
+   * imported 원자료 write 도 아니다 — 키·값 모두 좁은 스키마를 통과해야 하고 그 밖은 이름이 없다.
+   */
+  | 'LOCAL_DATA_WRITE';
 
 /** 실행이 허용된 부작용. **registry 에 무엇이 적혀 있든 이 집합이 최종 게이트다.** */
 const ALLOWED_TOOL_EFFECTS: readonly ToolEffect[] = Object.freeze([
   'FOREGROUND_ACTIVATION',
   'BROWSER_SITE_OPEN',
   'COMPUTER_INTERACTION',
+  'LOCAL_DATA_WRITE',
 ]);
 
 /** read-only 이거나, 허용된 effect 를 선언한 tool 만 실행 후보가 된다. */
@@ -313,6 +347,10 @@ export const AI_TOOL_NAMES = {
   COMPUTER_CLICK: 'local.computer.click',
   COMPUTER_TYPE_TEXT: 'local.computer.type_text',
   COMPUTER_KEY: 'local.computer.key',
+  // WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §5·§12
+  DATA_LOCAL_HEALTH: 'local.data.health',
+  DATA_GET_LOCAL_META: 'local.data.get_meta',
+  DATA_SET_LOCAL_SETTING: 'local.data.set_setting',
 } as const;
 
 export type AiToolName = (typeof AI_TOOL_NAMES)[keyof typeof AI_TOOL_NAMES];
@@ -430,6 +468,33 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
     readOnly: false,
     effect: 'COMPUTER_INTERACTION',
     argumentSchema: 'computerKey',
+  },
+  // ── Local Data V0 (LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §5·§6·§12) — 매장 PC 로컬 SQLite.
+  //    임의 SQL · 임의 row · imported 원자료 · local.db 경로를 얻는 tool 은 없다. tool 별 좁은 인자뿐이다.
+  {
+    name: AI_TOOL_NAMES.DATA_LOCAL_HEALTH,
+    description: '연결된 PC 의 로컬 데이터 저장소가 정상인지 · 스키마 버전을 확인한다. DB 경로는 돌려주지 않는다.',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_DATA],
+    executionMode: 'local',
+    readOnly: true,
+    // 인자 없음.
+  },
+  {
+    name: AI_TOOL_NAMES.DATA_GET_LOCAL_META,
+    description: '연결된 PC 의 로컬 데이터 저장소에서 허용된 meta 키 하나의 값을 조회한다.',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_DATA],
+    executionMode: 'local',
+    readOnly: true,
+    argumentSchema: 'dataMetaKey',
+  },
+  {
+    name: AI_TOOL_NAMES.DATA_SET_LOCAL_SETTING,
+    description: '연결된 PC 의 로컬 데이터 저장소에서 허용된 설정 키 하나에 검증된 값을 저장한다.',
+    requiredCapabilities: [AiCapability.LOCAL_DATA_SETTING_WRITE],
+    executionMode: 'local',
+    readOnly: false,
+    effect: 'LOCAL_DATA_WRITE',
+    argumentSchema: 'dataSetting',
   },
 ]);
 
@@ -576,6 +641,19 @@ export function validateToolArguments(
             ? validateTextArgs(rest).ok
             : validateKeyArgs(rest).ok;
     return restOk ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
+  }
+
+  if (schema === 'dataMetaKey') {
+    // 로컬 데이터 meta 조회(LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §6): **정확히 `{ key }` 하나**.
+    // key 는 서버 protocol 의 meta allowlist 등재분이어야 한다 — 임의 key 를 넘길 통로가 없다.
+    // 검증 논리는 서버 단일 출처(local-agent-protocol)를 재사용한다.
+    return validateDataGetMetaArgs(args).ok ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
+  }
+
+  if (schema === 'dataSetting') {
+    // 로컬 데이터 setting 쓰기(§6·§10·§11): **정확히 `{ key, value }`**. key 는 setting allowlist
+    // 등재분, value 는 per-key 스키마를 통과해야 한다. generic KV 도 임의 SQL 도 표현 불가다.
+    return validateDataSetSettingArgs(args).ok ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
   }
 
   if (args === undefined || args === null) return { ok: true };

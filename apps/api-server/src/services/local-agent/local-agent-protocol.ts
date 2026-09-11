@@ -72,6 +72,13 @@ export const LOCAL_AGENT_ACTIONS = {
   COMPUTER_TYPE_TEXT: 'local.computer.type_text',
   /** ENTER · TAB · ESC 중 하나 (동 §19·§20). 조합키 없음. */
   COMPUTER_KEY: 'local.computer.key',
+  // ── Local Data Runtime bridge (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1) ────
+  /** 매장 PC 로컬 SQLite 의 **상태만** — 스키마 버전·마이그레이션 정상 여부. 경로·행 없음. */
+  DATA_HEALTH: 'local.data.health',
+  /** allowlist 된 meta 키 하나의 값을 읽는다(§13). 임의 SQL·임의 키가 아니다. */
+  DATA_GET_META: 'local.data.get_meta',
+  /** allowlist 된 setting 키에 검증된 값을 쓴다(§10·§11). 범용 KV 저장이 아니다. */
+  DATA_SET_SETTING: 'local.data.set_setting',
 } as const;
 
 export type LocalAgentAction = (typeof LOCAL_AGENT_ACTIONS)[keyof typeof LOCAL_AGENT_ACTIONS];
@@ -131,6 +138,86 @@ export function composeComputerAction(base: string, targetId: string): string {
   return composeAppAction(base, targetId);
 }
 
+// ─── Local Data Runtime bridge 계약 (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1) ─
+
+/**
+ * 데이터 축 action 3개. **`#appId` 를 붙이지 않는다** — 대상은 이 PC 의 단일 local.db 뿐이다.
+ * 그래서 allowlist 에 조합 없이 그대로 들어간다(아래 `LOCAL_AGENT_ACTION_ALLOWLIST`).
+ */
+export const DATA_TARGET_ACTIONS: readonly string[] = Object.freeze([
+  LOCAL_AGENT_ACTIONS.DATA_HEALTH,
+  LOCAL_AGENT_ACTIONS.DATA_GET_META,
+  LOCAL_AGENT_ACTIONS.DATA_SET_SETTING,
+]);
+
+/**
+ * `get_meta` 로 읽을 수 있는 meta 키 — **유한 목록**이다(§13). 임의 키·임의 SQL 이 아니다.
+ *
+ * `local_db_id` 는 **일부러 뺐다.** 매장 PC 마다 고정된 random UUID 라, cloud 로 넘기면
+ * 매장 단말을 상관(correlate)하는 안정 지문이 된다(§18 최소화). 지원에 꼭 필요해지면
+ * 그때 별도 근거로 추가한다 — 없으면 새지도 않는다.
+ */
+export const LOCAL_DATA_META_KEYS: readonly string[] = Object.freeze([
+  'schema_version',
+  'created_at',
+  'updated_at',
+]);
+
+/**
+ * `set_setting` 이 쓸 수 있는 setting 키와 **키별 값 스키마**(§10·§11). generic KV store 가 아니다 —
+ * 여기 없는 키는 저장되지 않고, 값도 키마다 정해진 형식만 통과한다.
+ *
+ * enum 값은 소문자 그대로 비교한다. profile id 는 등재 profile 을 가리키는 좁은 문자열이다.
+ */
+export const LOCAL_DATA_SETTING_KEYS: readonly string[] = Object.freeze([
+  'locale',
+  'preferred_export_format',
+  'selected_source_profile',
+]);
+
+const LOCAL_DATA_SETTING_LOCALE_VALUES: readonly string[] = Object.freeze(['ko', 'en', 'zh', 'ja']);
+const LOCAL_DATA_SETTING_EXPORT_FORMATS: readonly string[] = Object.freeze(['csv']);
+const LOCAL_DATA_PROFILE_ID_RE = /^[A-Za-z0-9_.:-]{1,64}$/;
+
+/** setting 키 하나에 대한 값 검증. 통과하면 true. agent 쪽(handlers.mjs)이 같은 규칙을 다시 본다. */
+export function isValidLocalSettingValue(key: string, value: unknown): boolean {
+  if (typeof value !== 'string') return false;
+  if (key === 'locale') return LOCAL_DATA_SETTING_LOCALE_VALUES.includes(value);
+  if (key === 'preferred_export_format') return LOCAL_DATA_SETTING_EXPORT_FORMATS.includes(value);
+  if (key === 'selected_source_profile') return LOCAL_DATA_PROFILE_ID_RE.test(value);
+  return false;
+}
+
+export interface DataGetMetaArgs {
+  key: string;
+}
+export interface DataSetSettingArgs {
+  key: string;
+  value: string;
+}
+export type DataActionArgs = DataGetMetaArgs | DataSetSettingArgs;
+
+/** `{ key }` — allowlist 된 meta 키 하나. 그 밖의 키·추가 필드는 실패. */
+export function validateDataGetMetaArgs(args: unknown): { ok: boolean; args?: DataGetMetaArgs } {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const keys = Object.keys(args as Record<string, unknown>);
+  if (keys.length !== 1 || keys[0] !== 'key') return { ok: false };
+  const key = (args as Record<string, unknown>).key;
+  if (typeof key !== 'string' || !LOCAL_DATA_META_KEYS.includes(key)) return { ok: false };
+  return { ok: true, args: { key } };
+}
+
+/** `{ key, value }` — allowlist 된 setting 키 + 키별 값 스키마. 그 밖은 실패. */
+export function validateDataSetSettingArgs(args: unknown): { ok: boolean; args?: DataSetSettingArgs } {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const keys = Object.keys(args as Record<string, unknown>).sort();
+  if (keys.length !== 2 || keys[0] !== 'key' || keys[1] !== 'value') return { ok: false };
+  const { key, value } = args as Record<string, unknown>;
+  if (typeof key !== 'string' || !LOCAL_DATA_SETTING_KEYS.includes(key)) return { ok: false };
+  if (!isValidLocalSettingValue(key, value)) return { ok: false };
+  return { ok: true, args: { key, value: value as string } };
+}
+
 /**
  * base action 에 맞는 인자 검증. 통과하면 **정규화된 사본**을 돌려준다(원본 객체를 그대로
  * 흘리지 않는다 — 추가 키가 있으면 여기서 이미 실패한다).
@@ -141,7 +228,15 @@ export function composeComputerAction(base: string, targetId: string): string {
 export function validateLocalCommandArgs(
   base: string,
   args: unknown,
-): { ok: true; args: Record<string, never> | ComputerActionArgs } | { ok: false } {
+): { ok: true; args: Record<string, never> | ComputerActionArgs | DataActionArgs } | { ok: false } {
+  if (base === LOCAL_AGENT_ACTIONS.DATA_GET_META) {
+    const r = validateDataGetMetaArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_SET_SETTING) {
+    const r = validateDataSetSettingArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
   if (base === LOCAL_AGENT_ACTIONS.COMPUTER_CLICK) {
     const r = validateClickArgs(args);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
@@ -193,11 +288,14 @@ export function parseLocalAction(action: string): { base: string; appId?: string
  * 서버가 발행을 허용하는 action (§29). agent 쪽 allowlist 와 짝을 이룬다(§28).
  *
  * app 대상 action 은 **등재된 appId 하나당 한 항목씩** 펼쳐진다. 목록 길이는
- * `2 + 6 × 등재 앱 수 + 2 × 등재 사이트 수` 로 유한하며, registry 에 없는 앱은 여기에 나타나지 않는다.
+ * `2 + 6 × 등재 앱 수 + 2 × 등재 사이트 수 + 3(데이터 축)` 로 유한하며, registry 에 없는 앱은
+ * 여기에 나타나지 않는다. 데이터 축 3개는 `#appId` 조합 없이 그대로 들어간다(대상=단일 local.db).
  */
 export const LOCAL_AGENT_ACTION_ALLOWLIST: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.GET_AGENT_STATUS,
   LOCAL_AGENT_ACTIONS.GET_SYSTEM_INFO,
+  // LOCAL-DATA-TOOL-BRIDGE-V1: 데이터 축 3개(no #appId).
+  ...DATA_TARGET_ACTIONS,
   ...APP_TARGET_ACTIONS.flatMap((base) =>
     WINDOWS_APP_IDS.map((appId) => composeAppAction(base, appId)),
   ),
@@ -231,7 +329,7 @@ export function isAllowedLocalAction(action: string): boolean {
 export interface LocalCommand {
   commandId: string;
   action: string;
-  args: Record<string, never> | ComputerActionArgs;
+  args: Record<string, never> | ComputerActionArgs | DataActionArgs;
   issuedAt: string;
   expiresAt: string;
 }
@@ -303,6 +401,16 @@ export const LOCAL_AGENT_ERROR = {
   COMPUTER_USER_ACTION_REQUIRED: 'COMPUTER_USE_USER_ACTION_REQUIRED',
   /** allowlist 밖 키 · 형상 밖 인자 · 지원하지 않는 상호작용(§20·§26). */
   COMPUTER_UNSUPPORTED_ACTION: 'COMPUTER_USE_UNSUPPORTED_ACTION',
+
+  // ── Local Data Runtime bridge (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1) ────
+  /** 형상 밖 인자 · 키별 값 스키마 위반 · 범위 밖 값(§10·§11·§15). */
+  DATA_INVALID_ARGUMENT: 'LOCAL_DATA_INVALID_ARGUMENT',
+  /** allowlist 밖 meta/setting 키(§10·§26). 값 스키마 위반(INVALID_ARGUMENT)과 구분한다. */
+  DATA_KEY_NOT_ALLOWED: 'LOCAL_DATA_KEY_NOT_ALLOWED',
+  /** 로컬 SQLite 를 열거나 마이그레이션하지 못했다. */
+  DATA_DB_NOT_AVAILABLE: 'LOCAL_DB_NOT_AVAILABLE',
+  /** setting 쓰기가 실패했다. */
+  DATA_WRITE_FAILED: 'LOCAL_DATA_WRITE_FAILED',
 } as const;
 
 export type LocalAgentErrorCode = (typeof LOCAL_AGENT_ERROR)[keyof typeof LOCAL_AGENT_ERROR];
@@ -491,6 +599,44 @@ export function pickSafeComputerInfo(data: unknown): Record<string, unknown> {
   return out;
 }
 
+// ─── Safe data info (LOCAL-DATA-TOOL-BRIDGE-V1 §18·§19·§20) ──────────────────
+
+/**
+ * 데이터 축 tool 이 되돌릴 수 있는 **유일한** 필드 집합.
+ *
+ * 금지(§19·§20): local.db **경로** · 파일 시스템 위치 · 임의 row · imported 원자료 ·
+ * setting **값 원문** · credential. health 는 상태 플래그와 숫자만, get_meta 는 allowlist 된
+ * 키와 그 값(짧게 잘라)만, set_setting 은 키와 저장 여부만 남는다. `value` 원문은 남기지 않는다 —
+ * get_meta 값조차 60자로 자른다(meta 는 버전·시각뿐이라 길 이유가 없다).
+ */
+const SAFE_DATA_INFO_STRING_FIELDS: readonly string[] = Object.freeze(['key', 'value', 'migrationStatus']);
+const SAFE_DATA_INFO_BOOLEAN_FIELDS: readonly string[] = Object.freeze(['ok', 'saved']);
+const SAFE_DATA_INFO_NUMBER_FIELDS: readonly string[] = Object.freeze(['schemaVersion']);
+const SAFE_DATA_MIGRATION_STATUS: readonly string[] = Object.freeze(['current', 'behind', 'failed']);
+
+export function pickSafeDataInfo(data: unknown): Record<string, unknown> {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return {};
+  const src = data as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  for (const key of SAFE_DATA_INFO_STRING_FIELDS) {
+    const v = src[key];
+    if (typeof v !== 'string' || v.length === 0) continue;
+    // key 는 allowlist(meta 또는 setting)에 있는 것만 통과 — agent 가 임의 키 이름을 실어도 버린다.
+    if (key === 'key' && !LOCAL_DATA_META_KEYS.includes(v) && !LOCAL_DATA_SETTING_KEYS.includes(v)) continue;
+    if (key === 'migrationStatus' && !SAFE_DATA_MIGRATION_STATUS.includes(v)) continue;
+    out[key] = v.slice(0, 60);
+  }
+  for (const key of SAFE_DATA_INFO_BOOLEAN_FIELDS) {
+    const v = src[key];
+    if (typeof v === 'boolean') out[key] = v;
+  }
+  for (const key of SAFE_DATA_INFO_NUMBER_FIELDS) {
+    const v = src[key];
+    if (typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 100000) out[key] = v;
+  }
+  return out;
+}
+
 /**
  * action 에 맞는 출력 화이트리스트를 고른다.
  *
@@ -510,6 +656,9 @@ export function pickSafeResultData(action: string, data: unknown): Record<string
   }
   if (COMPUTER_TARGET_ACTIONS.includes(base)) {
     return pickSafeComputerInfo(data);
+  }
+  if (DATA_TARGET_ACTIONS.includes(base)) {
+    return pickSafeDataInfo(data);
   }
   return {};
 }
