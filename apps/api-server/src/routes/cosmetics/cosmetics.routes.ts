@@ -32,7 +32,7 @@ import { createStoreHubController } from '../o4o-store/controllers/store-hub.con
 import { createStoreChannelProductsController } from '../o4o-store/controllers/store-channel-products.controller.js';
 import { createPharmacyProductsController } from '../o4o-store/controllers/pharmacy-products.controller.js';
 import { createStoreAnalyticsController } from '../o4o-store/controllers/store-analytics.controller.js';
-import { createStoreContentController } from '../o4o-store/controllers/store-content.controller.js';
+import { createCosmeticsStoreContentController } from '../o4o-store/controllers/cosmetics-store-content.controller.js'; // WO-O4O-KCOS-STORE-CONTENTS-WRAPPER-AND-DEAD-ASSET-MOUNT-CLOSURE-V1
 import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
 import { createStoreLibraryController } from '../o4o-store/controllers/store-library.controller.js';
 import { createStoreQrLandingController } from '../o4o-store/controllers/store-qr-landing.controller.js';
@@ -54,7 +54,6 @@ import { createMultilingualProductContentController } from '../o4o-store/control
 import { createCosmeticsAssetSnapshotController } from '../o4o-store/controllers/cosmetics-asset-snapshot.controller.js'; // WO-O4O-KCOS-LIBRARY-ORGANIZATION-SCOPE-AND-SNAPSHOT-ROUTE-CLOSURE-V1
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
 import { createStoreExecutionAssetsController } from '../o4o-store/controllers/store-execution-assets.controller.js'; // WO-O4O-STORE-EXECUTION-ASSETS-CROSSSERVICE-PHASE2-D-V1
-import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
 import { createCosmeticsCommunityHubController } from './controllers/cosmetics-community-hub.controller.js';
@@ -187,8 +186,11 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // Store Execution Assets — 제작 자료 (WO-O4O-STORE-EXECUTION-ASSETS-CROSSSERVICE-PHASE2-D-V1)
   router.use('/', createStoreExecutionAssetsController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
-  // Store Content — 콘텐츠 오버라이드
-  router.use('/store-contents', createStoreContentController(dataSource, coreRequireAuth as any));
+  // Store Content — 매장 콘텐츠 (WO-O4O-KCOS-STORE-CONTENTS-WRAPPER-AND-DEAD-ASSET-MOUNT-CLOSURE-V1):
+  //   공통 createStoreContentController 는 isStoreOwner('kpa') + kpa_members fallback 으로 조직을
+  //   구하는 KPA 하드와이어라 KCos 화면에 **KPA 조직** 콘텐츠가 노출되던 tenant scope 결함을 닫는다.
+  //   KCos request → cosmetics:store_owner → KCos organizationId → 공용 store-content.service. KPA fallback 없음.
+  router.use('/store-contents', createCosmeticsStoreContentController(dataSource, coreRequireAuth as any));
 
   // Store Playlist — 사이니지 플레이리스트
   router.use('/store-playlists', createStorePlaylistController(dataSource, coreRequireAuth as any, undefined, 'cosmetics'));
@@ -275,8 +277,9 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // store-owner: /pharmacy/multilingual-product-contents/*
   router.use('/', createMultilingualProductContentController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
-  // Published Assets
-  router.use('/published-assets', createPublishedAssetsController(dataSource));
+  // (제거) /published-assets — WO-O4O-KCOS-STORE-CONTENTS-WRAPPER-AND-DEAD-ASSET-MOUNT-CLOSURE-V1:
+  //   KCos frontend consumer 0 · 60일 production 요청 0 인 dead mount (KPA 전용 공개 렌더 축).
+  //   KPA `/kpa/published-assets` 는 PrintContentPage · PublicContentViewPage 가 소비하므로 유지.
 
   // Community Hub — ads, sponsors (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
   router.use('/', createCosmeticsCommunityHubController(dataSource, coreRequireAuth as any, requireCosmeticsScope as any));

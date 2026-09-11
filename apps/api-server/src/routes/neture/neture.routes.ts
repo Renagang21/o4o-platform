@@ -13,7 +13,6 @@ import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
 // WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1: Store HUB controllers
 import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
-import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
 import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
 // WO-O4O-EVENT-OFFER-NETURE-ADOPTION-V1
 import { createNetureEventOfferController } from './controllers/event-offer.controller.js';
@@ -49,10 +48,11 @@ export function createNetureRoutes(dataSource: DataSource): Router {
 
   // ============================================================================
   // Store HUB Controllers — WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1
-  // /api/v1/neture/assets, /store-assets, /store-playlists
+  // /api/v1/neture/assets, /store-playlists
+  //   (제거) /store-assets — WO-O4O-KCOS-STORE-CONTENTS-WRAPPER-AND-DEAD-ASSET-MOUNT-CLOSURE-V1:
+  //   kpa_store_asset_controls 기반 KPA 전용 계층. Neture frontend consumer 0 · 60일 production 요청 0 인 dead mount.
   // ============================================================================
   router.use('/assets', createAssetSnapshotController(dataSource, requireAuth as any));
-  router.use('/store-assets', createStoreAssetControlController(dataSource, requireAuth as any));
   router.use('/store-playlists', createStorePlaylistController(dataSource, requireAuth as any));
 
   // ============================================================================
