@@ -23,6 +23,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import {
   APP_TARGET_ACTIONS,
+  COMPUTER_TARGET_ACTIONS,
   SITE_TARGET_ACTIONS,
   composeAppAction,
   LOCAL_AGENT_ACTIONS,
@@ -526,6 +527,8 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
     // 문자열이 되어 애초에 명령이 되지 못한다.
     // WO-O4O-BROWSER-CONTROL-V0: 사이트 축이 같은 방식(등재 siteId 를 action 문자열에 박음)으로
     // 추가됐다. URL 은 어떤 항목에도 없다 — allowlist 에 'http' 가 등장하지 않는다.
+    // WO-O4O-COMPUTER-USE-V0: 화면 조작 축(등재 appId 당 4항목). 좌표·텍스트·키는 args 로 가지만
+    // **대상**은 여전히 allowlist 항목에 박힌 등재 appId 뿐이다 — HWND · 임의 창은 표현 불가.
     expect([...LOCAL_AGENT_ACTION_ALLOWLIST].sort()).toEqual(
       [
         LOCAL_AGENT_ACTIONS.GET_AGENT_STATUS,
@@ -535,6 +538,9 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
         ),
         ...SITE_TARGET_ACTIONS.flatMap((base) =>
           BROWSER_SITE_IDS.map((siteId) => composeAppAction(base, siteId)),
+        ),
+        ...COMPUTER_TARGET_ACTIONS.flatMap((base) =>
+          WINDOWS_APP_IDS.map((appId) => composeAppAction(base, appId)),
         ),
       ].sort(),
     );
@@ -563,13 +569,15 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
       .join('\n');
     const imports = [...code.matchAll(/from\s+'([^']+)'/g)].map((m) => m[1]);
     // 창 제어가 들어오면서 저장소 안 모듈 두 개가 늘었고, 브라우저 제어(BROWSER-CONTROL-V0)로
-    // 등재부 하나가 더 늘었다. node 표준 모듈은 여전히 os 뿐이다 — 외부 프로세스 실행은
+    // 등재부 하나가 더 늘었다. 화면 조작(COMPUTER-USE-V0)으로 인자 한도 모듈(순수 함수, import 0)이
+    // 하나 더 늘었다. node 표준 모듈은 여전히 os 뿐이다 — 외부 프로세스 실행은
     // windows-window-control.mjs 한 파일에만 있다.
     expect(imports).toEqual([
       'node:os',
       './windows-app-registry.mjs',
       './browser-site-registry.mjs',
       './windows-window-control.mjs',
+      './computer-use-limits.mjs',
     ]);
     expect(imports.filter((i) => i.startsWith('node:'))).toEqual(['node:os']);
     for (const forbidden of ['child_process', 'spawn(', 'exec(', 'execFile', 'vm', 'eval(']) {

@@ -51,6 +51,7 @@ import {
   selectToolInvocationForRequest,
   executeAiTool,
   renderToolContext,
+  computerRequestGap,
   needsLocalDeviceResolution,
 } from '../services/ai-tools/ai-tool-router.js';
 import {
@@ -1921,6 +1922,12 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
     // 인자(appId)는 라우터가 등재부에서 고른 값이고, 실행 직전 계약 계층이 다시 대조한다.
     // 클라이언트나 모델이 보낸 값이 여기로 들어오는 경로는 없다.
     const selected = selectToolInvocationForRequest(message, toolCtx);
+    // COMPUTER-USE-V0 §32: 화면 조작 요청인데 실행할 수 없는 이유(입력 텍스트 없음 · 금지 내용 ·
+    // 로그인 요청)가 있으면 tool 은 고르지 않고, 그 사유만 프롬프트 사실로 넘겨 모델이 되묻게 한다.
+    if (!selected) {
+      const gap = computerRequestGap(message);
+      if (gap) facts.computerRequestGap = gap;
+    }
     if (selected) {
       const toolResult = await executeAiTool(AppDataSource, selected.tool, selected.args, toolCtx);
       executedTool = selected.tool;
@@ -1935,6 +1942,11 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
         // BROWSER-CONTROL-V0: 사이트 축도 같은 이유로 실제 수행 동작을 프롬프트에 반영한다.
         else if (selected.tool === AI_TOOL_NAMES.BROWSER_OPEN_SITE) facts.browserAction = 'open';
         else if (selected.tool === AI_TOOL_NAMES.BROWSER_GET_SITE_STATUS) facts.browserAction = 'inspect';
+        // COMPUTER-USE-V0 §38: 화면 조작 축도 실제 수행 동작을 프롬프트에 반영한다.
+        else if (selected.tool === AI_TOOL_NAMES.COMPUTER_INSPECT) facts.computerAction = 'inspect';
+        else if (selected.tool === AI_TOOL_NAMES.COMPUTER_CLICK) facts.computerAction = 'click';
+        else if (selected.tool === AI_TOOL_NAMES.COMPUTER_TYPE_TEXT) facts.computerAction = 'type_text';
+        else if (selected.tool === AI_TOOL_NAMES.COMPUTER_KEY) facts.computerAction = 'key';
       }
       if (
         selected.tool === AI_TOOL_NAMES.BROWSER_OPEN_SITE &&

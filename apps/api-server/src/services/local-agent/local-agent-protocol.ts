@@ -17,12 +17,31 @@
  *   값이어야 하고, agent 는 자기 allowlist 에 있는 이름만 실행한다. 서버가 실수로
  *   `local.exec_shell` 을 보내도 agent 가 `DENIED_UNKNOWN_ACTION` 으로 되돌린다(§28).
  *
- *   shell · PowerShell · cmd · 임의 프로세스 · 파일 · 레지스트리 · 브라우저 · 데스크톱 입력은
- *   **프로토콜 레벨에서 표현 불가능**하다. 표현할 수 없는 것은 실수로 열 수도 없다.
+ *   shell · PowerShell · cmd · 임의 프로세스 · 파일 · 레지스트리 · 임의 브라우저 제어 ·
+ *   임의 데스크톱 입력은 **프로토콜 레벨에서 표현 불가능**하다. 표현할 수 없는 것은 실수로
+ *   열 수도 없다.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * COMPUTER-USE-V0 정정 — `args` 는 더 이상 항상 빈 객체가 아니다
+ *
+ *   Computer Use 4개 action(`local.computer.*`)은 **타입이 고정된 인자**를 실어 보낸다:
+ *   click `{x,y}` (0..1) · type_text `{text}` (≤500자) · key `{key}` (ENTER|TAB|ESC).
+ *   자유 문자열 칸이 아니다 — 형상·값 검증은 `computer-use-contract.ts` 가 하고, 서버는
+ *   검증을 통과한 값만 발행하며 agent 는 같은 규칙으로 **다시** 검사한다(§20·§25·§26).
+ *   그 밖의 모든 action 은 여전히 `args = {}` 다. DB 스키마는 바꾸지 않았다(§44) —
+ *   인자는 발행 시 `result_data` 에 잠깐 실려 agent 가 claim 하는 순간 지워진다
+ *   (`local-agent-service.ts` `claimPendingCommands`).
  */
 
 import { WINDOWS_APP_IDS } from './windows-app-registry.js';
 import { BROWSER_SITE_IDS } from './browser-site-registry.js';
+import {
+  COMPUTER_ALLOWED_KEYS,
+  validateClickArgs,
+  validateKeyArgs,
+  validateTextArgs,
+  type ComputerActionArgs,
+} from './computer-use-contract.js';
 
 // ─── Action ──────────────────────────────────────────────────────────────────
 
@@ -45,6 +64,14 @@ export const LOCAL_AGENT_ACTIONS = {
   BROWSER_GET_SITE_STATUS: 'local.browser.get_site_status',
   /** 등재 사이트를 Windows 기본 URL handler 로 연다 (동 §14·§15·§25). */
   BROWSER_OPEN_SITE: 'local.browser.open_site',
+  /** 등재 앱 창의 foreground 여부·client 크기·snapshot 가능 여부 (COMPUTER-USE-V0 §14). */
+  COMPUTER_INSPECT: 'local.computer.inspect',
+  /** 등재 앱 창 client 영역 안 정규화 좌표 한 점을 **왼쪽 단일 클릭** (동 §15·§16·§22). */
+  COMPUTER_CLICK: 'local.computer.click',
+  /** 등재 앱 창에 짧은 일반 텍스트 입력 (동 §17·§18). 로그인 창 앞에서는 실행하지 않는다. */
+  COMPUTER_TYPE_TEXT: 'local.computer.type_text',
+  /** ENTER · TAB · ESC 중 하나 (동 §19·§20). 조합키 없음. */
+  COMPUTER_KEY: 'local.computer.key',
 } as const;
 
 export type LocalAgentAction = (typeof LOCAL_AGENT_ACTIONS)[keyof typeof LOCAL_AGENT_ACTIONS];
@@ -72,6 +99,66 @@ export const APP_TARGET_ACTIONS: readonly string[] = Object.freeze([
 
 export function composeAppAction(base: string, appId: string): string {
   return `${base}${LOCAL_APP_ACTION_SEPARATOR}${appId}`;
+}
+
+// ─── Computer Use 대상 action (COMPUTER-USE-V0 §8·§24) ───────────────────────
+
+/**
+ * targetId = **등재된 appId** 다. AI 는 HWND 를 지정하지 않는다 — appId 만 말하고, agent 가
+ * 자기 registry 로 창을 찾는다(§8). 그래서 appId 를 `base#appId` 로 싣는 방식을 그대로 쓴다.
+ *
+ * `APP_TARGET_ACTIONS` 와 **분리**해 둔 이유: 창 제어 2개는 인자가 없고 출력 화이트리스트도
+ * 다르다. 섞으면 "창 찾기 결과에 클릭 필드가 통과" 같은 교차가 생긴다.
+ *
+ * siteId 는 V0 대상이 아니다. 사이트는 로그인 단계 여부를 화면 없이 판정할 수 없어(§13·§34)
+ * Browser Navigation/Interaction V0 로 미룬다.
+ */
+export const COMPUTER_TARGET_ACTIONS: readonly string[] = Object.freeze([
+  LOCAL_AGENT_ACTIONS.COMPUTER_INSPECT,
+  LOCAL_AGENT_ACTIONS.COMPUTER_CLICK,
+  LOCAL_AGENT_ACTIONS.COMPUTER_TYPE_TEXT,
+  LOCAL_AGENT_ACTIONS.COMPUTER_KEY,
+]);
+
+/** 인자를 필요로 하는 action — inspect 는 없다. 이 셋 밖의 action 에 args 가 있으면 거절한다. */
+export const COMPUTER_ARGS_ACTIONS: readonly string[] = Object.freeze([
+  LOCAL_AGENT_ACTIONS.COMPUTER_CLICK,
+  LOCAL_AGENT_ACTIONS.COMPUTER_TYPE_TEXT,
+  LOCAL_AGENT_ACTIONS.COMPUTER_KEY,
+]);
+
+export function composeComputerAction(base: string, targetId: string): string {
+  return composeAppAction(base, targetId);
+}
+
+/**
+ * base action 에 맞는 인자 검증. 통과하면 **정규화된 사본**을 돌려준다(원본 객체를 그대로
+ * 흘리지 않는다 — 추가 키가 있으면 여기서 이미 실패한다).
+ *
+ * 인자가 없는 action 에 인자를 붙이면 실패다. "inspect 에 text 를 실어 보내면 agent 가
+ * 우연히 타이핑" 같은 경로를 형상 단계에서 끊는다.
+ */
+export function validateLocalCommandArgs(
+  base: string,
+  args: unknown,
+): { ok: true; args: Record<string, never> | ComputerActionArgs } | { ok: false } {
+  if (base === LOCAL_AGENT_ACTIONS.COMPUTER_CLICK) {
+    const r = validateClickArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.COMPUTER_TYPE_TEXT) {
+    const r = validateTextArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.COMPUTER_KEY) {
+    const r = validateKeyArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  // 그 밖의 모든 action: 빈 객체(또는 미지정)만 허용.
+  if (args === undefined || args === null) return { ok: true, args: {} };
+  if (typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  if (Object.keys(args as object).length !== 0) return { ok: false };
+  return { ok: true, args: {} };
 }
 
 // ─── Site 대상 action (BROWSER-CONTROL-V0 §10·§11·§44) ───────────────────────
@@ -106,7 +193,7 @@ export function parseLocalAction(action: string): { base: string; appId?: string
  * 서버가 발행을 허용하는 action (§29). agent 쪽 allowlist 와 짝을 이룬다(§28).
  *
  * app 대상 action 은 **등재된 appId 하나당 한 항목씩** 펼쳐진다. 목록 길이는
- * `2 + 2 × 등재 앱 수` 로 유한하며, registry 에 없는 앱은 여기에 나타나지 않는다.
+ * `2 + 6 × 등재 앱 수 + 2 × 등재 사이트 수` 로 유한하며, registry 에 없는 앱은 여기에 나타나지 않는다.
  */
 export const LOCAL_AGENT_ACTION_ALLOWLIST: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.GET_AGENT_STATUS,
@@ -117,6 +204,10 @@ export const LOCAL_AGENT_ACTION_ALLOWLIST: readonly string[] = Object.freeze([
   // BROWSER-CONTROL-V0: 등재 siteId 하나당 한 항목씩. registry 에 없는 사이트는 여기 없다.
   ...SITE_TARGET_ACTIONS.flatMap((base) =>
     BROWSER_SITE_IDS.map((siteId) => composeSiteAction(base, siteId)),
+  ),
+  // COMPUTER-USE-V0: 등재 appId 하나당 4항목. targetId 는 appId 뿐 — HWND · 임의 창 제목은 표현 불가.
+  ...COMPUTER_TARGET_ACTIONS.flatMap((base) =>
+    WINDOWS_APP_IDS.map((appId) => composeComputerAction(base, appId)),
   ),
 ]);
 
@@ -129,17 +220,18 @@ export function isAllowedLocalAction(action: string): boolean {
 /**
  * 서버 → agent 명령 (§17).
  *
- * `args` 는 **여전히 빈 객체다.** 자유 문자열 인자를 이 envelope 에 새로 열지 않는다 —
- * appId 는 allowlist 로 고정된 `action` 문자열 안에 들어 있다(위 `composeAppAction`).
- * 그래서 이번 WO 도 envelope 형상·DB 스키마를 바꾸지 않는다(§32·§38).
+ * `args` 는 **자유 문자열 칸이 아니다.** Computer Use 3개 action 만 타입 고정 인자를 싣고
+ * (`ComputerActionArgs`), 나머지는 전부 빈 객체다. appId 는 여전히 allowlist 로 고정된
+ * `action` 문자열 안에 들어 있다(위 `composeAppAction`). DB 스키마는 바꾸지 않았다.
  *
  * `action` 이 `string` 인 것은 app 대상 action 이 `base#appId` 로 조립되기 때문이다.
- * 값의 유효성은 타입이 아니라 **`isAllowedLocalAction` 이 판정한다**(양쪽 allowlist).
+ * 값의 유효성은 타입이 아니라 **`isAllowedLocalAction` + `validateLocalCommandArgs` 가
+ * 판정한다**(양쪽 allowlist · 양쪽 인자 검증).
  */
 export interface LocalCommand {
   commandId: string;
   action: string;
-  args: Record<string, never>;
+  args: Record<string, never> | ComputerActionArgs;
   issuedAt: string;
   expiresAt: string;
 }
@@ -197,6 +289,20 @@ export const LOCAL_AGENT_ERROR = {
   BROWSER_NOT_AVAILABLE: 'BROWSER_NOT_AVAILABLE',
   /** 로그인은 사용자가 직접 해야 한다 — O4O 가 대행하지 않는다(§4·§31). */
   LOGIN_USER_ACTION_REQUIRED: 'LOGIN_USER_ACTION_REQUIRED',
+
+  // ── Computer Use V0 (§45) ──────────────────────────────────────────────────
+  /** targetId 가 등재 앱이 아니거나, 등재 앱이 실행 중이 아니다. */
+  COMPUTER_TARGET_NOT_FOUND: 'COMPUTER_USE_TARGET_NOT_FOUND',
+  /** 실행 직전/직후 foreground 가 대상 창이 아니다 — 입력을 보내지 않았다(§9). */
+  COMPUTER_TARGET_LOST: 'COMPUTER_USE_TARGET_LOST',
+  /** 좌표가 client 영역 밖이다(§16). */
+  COMPUTER_OUT_OF_BOUNDS: 'COMPUTER_USE_OUT_OF_BOUNDS',
+  /** OS 입력 API 호출 자체가 실패했다. */
+  COMPUTER_INPUT_FAILED: 'COMPUTER_USE_INPUT_FAILED',
+  /** 로그인 창 · 파일 대화상자 · 팝업 등 사용자가 직접 처리해야 하는 화면이다(§13·§41·§42). */
+  COMPUTER_USER_ACTION_REQUIRED: 'COMPUTER_USE_USER_ACTION_REQUIRED',
+  /** allowlist 밖 키 · 형상 밖 인자 · 지원하지 않는 상호작용(§20·§26). */
+  COMPUTER_UNSUPPORTED_ACTION: 'COMPUTER_USE_UNSUPPORTED_ACTION',
 } as const;
 
 export type LocalAgentErrorCode = (typeof LOCAL_AGENT_ERROR)[keyof typeof LOCAL_AGENT_ERROR];
@@ -325,6 +431,66 @@ export function pickSafeBrowserInfo(data: unknown): Record<string, unknown> {
   return out;
 }
 
+// ─── Safe computer info (COMPUTER-USE-V0 §10·§14·§43) ────────────────────────
+
+/**
+ * `local.computer.*` 결과가 서버에 남을 수 있는 **유일한** 필드 집합.
+ *
+ * 이미지는 없다. `image` · `base64` · 창 제목 · HWND · PID · 좌표 원본은 여기 없으므로
+ * agent 가 실어 보내도 DB · 로그 · 프롬프트 어디에도 닿지 않는다(§12 screenshot 저장 0 ·
+ * §43 window title 전문 기록 금지). snapshot 은 **크기와 시각**만 남는다.
+ */
+export const SAFE_COMPUTER_INFO_STRING_FIELDS: readonly string[] = Object.freeze([
+  'targetId',
+  'capturedAt',
+  'key',
+]);
+export const SAFE_COMPUTER_INFO_BOOLEAN_FIELDS: readonly string[] = Object.freeze([
+  'found',
+  'foreground',
+  'snapshotAvailable',
+  'clicked',
+  'typed',
+  'keyPressed',
+  'verified',
+  'userActionRequired',
+]);
+export const SAFE_COMPUTER_INFO_NUMBER_FIELDS: readonly string[] = Object.freeze([
+  'windowCount',
+  'clientWidth',
+  'clientHeight',
+  'snapshotWidth',
+  'snapshotHeight',
+  'typedLength',
+]);
+
+/** ISO-8601 UTC 시각만. */
+const CAPTURED_AT_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/;
+
+export function pickSafeComputerInfo(data: unknown): Record<string, unknown> {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return {};
+  const src = data as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  for (const key of SAFE_COMPUTER_INFO_STRING_FIELDS) {
+    const v = src[key];
+    if (typeof v !== 'string' || v.length === 0) continue;
+    if (key === 'targetId' && !WINDOWS_APP_IDS.includes(v)) continue;
+    // 문자열 필드는 형식이 고정돼 있다 — 그 밖의 문자열(경로 · 제목 · 임의 키 이름)은 통과하지 않는다.
+    if (key === 'capturedAt' && !CAPTURED_AT_RE.test(v)) continue;
+    if (key === 'key' && !COMPUTER_ALLOWED_KEYS.includes(v)) continue;
+    out[key] = v.slice(0, 60);
+  }
+  for (const key of SAFE_COMPUTER_INFO_BOOLEAN_FIELDS) {
+    const v = src[key];
+    if (typeof v === 'boolean') out[key] = v;
+  }
+  for (const key of SAFE_COMPUTER_INFO_NUMBER_FIELDS) {
+    const v = src[key];
+    if (typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100000) out[key] = Math.trunc(v);
+  }
+  return out;
+}
+
 /**
  * action 에 맞는 출력 화이트리스트를 고른다.
  *
@@ -341,6 +507,9 @@ export function pickSafeResultData(action: string, data: unknown): Record<string
   }
   if (SITE_TARGET_ACTIONS.includes(base)) {
     return pickSafeBrowserInfo(data);
+  }
+  if (COMPUTER_TARGET_ACTIONS.includes(base)) {
+    return pickSafeComputerInfo(data);
   }
   return {};
 }

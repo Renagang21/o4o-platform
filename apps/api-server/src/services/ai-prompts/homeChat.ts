@@ -82,7 +82,44 @@ export interface VerifiedScopeFacts {
    * 'open' 이면 로그인은 사용자가 직접 한다는 안내까지 함께 넣는다. O4O 는 로그인을 대행하지 않는다.
    */
   browserAction?: 'inspect' | 'open';
+  /**
+   * WO-O4O-COMPUTER-USE-V0 §38: 화면 조작 축이 실제로 수행됐을 때. 값은 tool 이름과 1:1 이다.
+   * 어느 값이든 "이번 요청에서 한 일은 그 한 가지" 이고, 다음 동작은 사용자의 다음 문장이다(§30).
+   */
+  computerAction?: 'inspect' | 'click' | 'type_text' | 'key';
+  /**
+   * §32: 화면 조작 요청이었으나 실행하지 않은 이유. tool 이 선택되지 않았을 때만 설정된다.
+   *   TEXT_MISSING  — 무엇을 입력할지 문장에서 찾지 못함 → 되묻는다
+   *   TEXT_DENIED   — 비밀번호 · 인증번호 · 명령어 성격 → 입력하지 않는다고 안내
+   *   LOGIN_REQUEST — 로그인 대행 요청 → 사용자가 직접 로그인하도록 안내
+   */
+  computerRequestGap?: 'TEXT_MISSING' | 'TEXT_DENIED' | 'LOGIN_REQUEST';
 }
+
+const COMPUTER_ACTION_LINE: Record<NonNullable<VerifiedScopeFacts['computerAction']>, string> = {
+  inspect:
+    '- 이번 요청에서 허용된 동작은 등재된 프로그램 창이 **앞에 있는지와 크기를 확인**하는 것까지입니다. ' +
+    '화면 내용을 읽거나 입력하지 않았습니다.',
+  click:
+    '- 이번 요청에서 수행한 동작은 등재된 프로그램 창 안을 **왼쪽 클릭 한 번** 한 것입니다. ' +
+    '그 밖의 입력은 하지 않았습니다.',
+  type_text:
+    '- 이번 요청에서 수행한 동작은 등재된 프로그램 창에 **사용자가 요청한 짧은 텍스트를 입력**한 것입니다. ' +
+    '저장·전송·엔터 등 다른 동작은 하지 않았습니다.',
+  key: '- 이번 요청에서 수행한 동작은 등재된 프로그램 창에 **키 하나(ENTER·TAB·ESC 중 하나)를 누른** 것입니다.',
+};
+
+const COMPUTER_GAP_LINE: Record<NonNullable<VerifiedScopeFacts['computerRequestGap']>, string> = {
+  TEXT_MISSING:
+    '- 사용자가 프로그램에 무언가 입력해 달라고 했지만 **무엇을 입력할지 문장에서 찾지 못해 실행하지 않았습니다.** ' +
+    '입력할 내용을 따옴표로 알려 달라고 짧게 되물으세요. (예: 메모장에 "테스트"라고 써줘)',
+  TEXT_DENIED:
+    '- 요청한 입력 내용이 비밀번호·인증번호·명령어 성격이어서 **입력하지 않았습니다.** ' +
+    'O4O 는 그런 값을 대신 입력하지 않는다고 짧게 안내하세요. 값을 되풀이하지 마세요.',
+  LOGIN_REQUEST:
+    '- 로그인 대행 요청이어서 **아무 동작도 하지 않았습니다.** 로그인은 사용자가 직접 하도록 안내하고, ' +
+    '아이디·비밀번호·OTP 를 요구하지 마세요.',
+};
 
 const WORKSPACE_LABEL: Record<string, string> = {
   home: 'O4O 공통 홈',
@@ -151,7 +188,22 @@ export function buildHomeChatSystemPrompt(facts: VerifiedScopeFacts): string {
               'O4O 는 프로그램을 대신 실행하지 않습니다.',
           '- 그 밖에는 파일·브라우저·외부 시스템·POS·약국 프로그램을 조작할 수 없습니다.',
         ]
-      : facts.browserAction
+      : facts.computerAction
+        ? [
+            '- 아래 "## 화면 조작 상태" 는 이 PC의 Local Work Agent가 **실제로 수행한 결과**입니다. ' +
+              '사실로 삼아 그대로 안내하고, 수행하지 못했다고 말하지 마세요. 실패했다면 그 사유만 전하세요.',
+            COMPUTER_ACTION_LINE[facts.computerAction],
+            '- 한 요청에 한 가지 동작만 합니다. 다음 동작이 필요하면 사용자가 다시 요청하도록 안내하세요.',
+            '- **로그인·비밀번호·인증번호·저장·전송·삭제·종료는 절대 대신하지 않습니다.** 요청받아도 할 수 없다고 하세요.',
+            '- 그 밖에는 파일·브라우저·외부 시스템·POS·약국 프로그램을 조작할 수 없습니다.',
+          ]
+        : facts.computerRequestGap
+          ? [
+              '- 당신은 이번 요청에서 아무 동작도 실행하지 않았습니다.',
+              COMPUTER_GAP_LINE[facts.computerRequestGap],
+              '- 파일·브라우저·외부 시스템·POS·약국 프로그램을 조작할 수 없습니다.',
+            ]
+        : facts.browserAction
         ? [
             '- 아래 "## 사이트 상태" 는 이 PC의 Local Work Agent가 **실제로 수행한 결과**입니다. ' +
               '사실로 삼아 그대로 안내하고, 수행하지 못했다고 말하지 마세요.',

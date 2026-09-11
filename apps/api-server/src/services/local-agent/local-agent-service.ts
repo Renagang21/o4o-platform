@@ -31,11 +31,13 @@ import type { DataSource } from 'typeorm';
 import {
   APP_TARGET_ACTIONS,
   SITE_TARGET_ACTIONS,
+  COMPUTER_TARGET_ACTIONS,
   LOCAL_AGENT_ERROR,
   SUPPORTED_AGENT_PLATFORMS,
   isAllowedLocalAction,
   parseLocalAction,
   pickSafeResultData,
+  validateLocalCommandArgs,
   type LocalCommand,
   type LocalCommandResult,
 } from './local-agent-protocol.js';
@@ -452,22 +454,40 @@ export async function listUserDevices(
 /**
  * 명령을 큐에 넣는다. action 은 여기서 다시 allowlist 검사를 받는다 —
  * 호출자가 이미 검사했더라도 한 번 더 한다(§29 이중 allowlist 의 서버측 절반).
+ *
+ * COMPUTER-USE-V0: `args` 는 `validateLocalCommandArgs` 를 통과한 **정규화 사본**만 실린다.
+ * 인자는 `result_data` 컬럼에 잠깐 실려 간다(§44 migration 0). agent 가 claim 하는 UPDATE 가
+ * 같은 문장에서 NULL 로 지우므로, 타이핑할 텍스트가 DB 에 머무는 시간은 "발행 → claim"
+ * (poll 간격, TTL 20초 상한) 뿐이다. 실패해도 TTL 이 지나면 만료 처리에서 row 는 그대로지만
+ * `awaitCommandResult` 가 만료 시 result_data 를 NULL 로 지운다.
  */
 export async function issueCommand(
   dataSource: DataSource,
-  params: { userId: string; deviceId: string; action: string; toolName: string },
+  params: {
+    userId: string;
+    deviceId: string;
+    action: string;
+    toolName: string;
+    args?: unknown;
+  },
 ): Promise<{ ok: true; command: LocalCommand } | { ok: false; errorCode: string }> {
   if (!isAllowedLocalAction(params.action)) {
     return { ok: false, errorCode: LOCAL_AGENT_ERROR.DENIED_UNKNOWN_ACTION };
   }
+  const validated = validateLocalCommandArgs(parseLocalAction(params.action).base, params.args);
+  if (validated.ok === false) {
+    return { ok: false, errorCode: LOCAL_AGENT_ERROR.COMPUTER_UNSUPPORTED_ACTION };
+  }
+  const args = validated.args;
+  const hasArgs = Object.keys(args).length > 0;
   const commandId = randomUUID();
   const issuedAt = new Date();
   const expiresAt = new Date(issuedAt.getTime() + COMMAND_TTL_MS);
 
   await dataSource.query(
     `INSERT INTO local_agent_commands
-       (command_id, device_id, user_id, tool_name, action, status, issued_at, expires_at)
-     VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7)`,
+       (command_id, device_id, user_id, tool_name, action, status, issued_at, expires_at, result_data)
+     VALUES ($1, $2, $3, $4, $5, 'pending', $6, $7, $8)`,
     [
       commandId,
       params.deviceId,
@@ -476,6 +496,7 @@ export async function issueCommand(
       params.action,
       issuedAt.toISOString(),
       expiresAt.toISOString(),
+      hasArgs ? JSON.stringify(args) : null,
     ],
   );
 
@@ -484,7 +505,7 @@ export async function issueCommand(
     command: {
       commandId,
       action: params.action,
-      args: {},
+      args,
       issuedAt: issuedAt.toISOString(),
       expiresAt: expiresAt.toISOString(),
     },
@@ -502,28 +523,37 @@ export async function claimPendingCommands(
   deviceId: string,
   limit = 5,
 ): Promise<LocalCommand[]> {
+  // COMPUTER-USE-V0: 발행 시 result_data 에 실린 args 를 **집어가는 같은 문장에서 지운다**.
+  // RETURNING 은 FROM 목록의 p.args(갱신 전 값)를 돌려주므로 agent 는 인자를 받고 DB 에는 남지 않는다.
   const rows = returnedRows(
     await dataSource.query(
-      `UPDATE local_agent_commands
-        SET status = 'delivered', delivered_at = now()
-      WHERE command_id IN (
-        SELECT command_id FROM local_agent_commands
+      `UPDATE local_agent_commands c
+        SET status = 'delivered', delivered_at = now(), result_data = NULL
+       FROM (
+        SELECT command_id, result_data AS args FROM local_agent_commands
          WHERE device_id = $1 AND status = 'pending' AND expires_at > now()
          ORDER BY issued_at ASC
          LIMIT $2
          FOR UPDATE SKIP LOCKED
-      )
-      RETURNING command_id, action, issued_at, expires_at`,
+      ) p
+      WHERE c.command_id = p.command_id
+      RETURNING c.command_id, c.action, c.issued_at, c.expires_at, p.args`,
       [deviceId, limit],
     ),
   );
-  return rows.map((r: Record<string, unknown>) => ({
-    commandId: String(r.command_id),
-    action: String(r.action),
-    args: {} as Record<string, never>,
-    issuedAt: new Date(r.issued_at as string).toISOString(),
-    expiresAt: new Date(r.expires_at as string).toISOString(),
-  }));
+  return rows.map((r: Record<string, unknown>) => {
+    const action = String(r.action);
+    const raw = typeof r.args === 'string' ? safeJsonParse(r.args) : r.args;
+    // DB 에서 나온 값도 다시 검증한다. 통과 못 하면 빈 인자로 — agent 가 형상 밖 인자를 거절한다.
+    const validated = validateLocalCommandArgs(parseLocalAction(action).base, raw ?? undefined);
+    return {
+      commandId: String(r.command_id),
+      action,
+      args: validated.ok ? validated.args : {},
+      issuedAt: new Date(r.issued_at as string).toISOString(),
+      expiresAt: new Date(r.expires_at as string).toISOString(),
+    };
+  });
 }
 
 export type SubmitResultOutcome = { ok: true } | { ok: false; errorCode: string };
@@ -577,9 +607,13 @@ export async function submitCommandResult(
   // BROWSER-CONTROL-V0: 사이트 대상 action 도 같은 규칙 — 실패 시 siteId·displayName·opened 만
   // 남는다(pickSafeBrowserInfo 화이트리스트). URL·프로필·탭 정보는 애초에 통과하지 못한다.
   const failureBase = parseLocalAction(action).base;
+  // COMPUTER-USE-V0: 화면 조작 action 도 동일 — 실패 시 found·foreground·windowCount 같은
+  // 상태 플래그만 남는다(pickSafeComputerInfo). 이미지·창 제목·좌표는 화이트리스트에 없다.
   const keepFailureData =
     status === 'failed' &&
-    (APP_TARGET_ACTIONS.includes(failureBase) || SITE_TARGET_ACTIONS.includes(failureBase));
+    (APP_TARGET_ACTIONS.includes(failureBase) ||
+      SITE_TARGET_ACTIONS.includes(failureBase) ||
+      COMPUTER_TARGET_ACTIONS.includes(failureBase));
   const safeData =
     status === 'success' || keepFailureData ? pickSafeResultData(action, result.data) : null;
 
@@ -641,9 +675,10 @@ export async function awaitCommandResult(
 
     if (Date.now() >= deadline) {
       // 시간이 다 됐다. 명령을 만료로 못박아 **뒤늦게 도착한 결과가 쓰이지 못하게** 한다.
+      // COMPUTER-USE-V0: claim 되지 못한 명령의 args(result_data)도 여기서 함께 지운다.
       await dataSource.query(
         `UPDATE local_agent_commands
-            SET status = 'expired', completed_at = now(), error_code = $2
+            SET status = 'expired', completed_at = now(), error_code = $2, result_data = NULL
           WHERE command_id = $1 AND status IN ('pending','delivered')`,
         [commandId, LOCAL_AGENT_ERROR.TIMEOUT],
       );

@@ -13,12 +13,15 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * import 목록을 보라
  *
- * 이 파일은 `node:os` 와 저장소 안의 모듈 두 개만 가져온다. `fs` 는 여전히 없다.
+ * 이 파일은 `node:os` 와 저장소 안의 모듈 네 개만 가져온다. `fs` 는 여전히 없다.
  * 즉 **임의 파일 접근은 여기서 가능하지 않다.**
  *
  * 외부 프로세스 실행은 `windows-window-control.mjs` **한 파일에만** 있고, 그 파일이
- * 실행할 수 있는 것은 저장소에 체크인된 `.ps1` 두 개뿐이다(그 파일 머리말 참조).
- * 이 handler 는 그 두 함수만 부를 수 있고, 임의 명령을 만들어 넘길 통로가 없다.
+ * 실행할 수 있는 것은 저장소에 체크인된 `.ps1` 다섯 개뿐이다(그 파일 머리말 참조).
+ * 이 handler 는 그 파일이 export 한 함수만 부를 수 있고, 임의 명령을 만들어 넘길 통로가 없다.
+ *
+ * WO-O4O-COMPUTER-USE-V0: 서버가 보낸 인자(좌표 · 텍스트 · 키)는 `computer-use-limits.mjs`
+ * 로 **여기서 다시** 검사한다. 통과한 값만 PowerShell 경계를 넘는다(§26).
  */
 
 import os from 'node:os';
@@ -27,11 +30,19 @@ import { findBrowserSite } from './browser-site-registry.mjs';
 import {
   activateWindowHandle,
   censusWindows,
+  deliverComputerInput,
   detectRunningBrowser,
+  inspectComputerWindow,
   matchBrowserWindows,
   matchWindows,
   openRegisteredSiteUrl,
 } from './windows-window-control.mjs';
+import {
+  isUserActionTitle,
+  validateClickArgs,
+  validateKeyArgs,
+  validateTextArgs,
+} from './computer-use-limits.mjs';
 
 export const AGENT_VERSION = '0.1.0';
 
@@ -44,6 +55,11 @@ export const ACTIONS = {
   // WO-O4O-BROWSER-CONTROL-V0 §13·§14
   BROWSER_GET_SITE_STATUS: 'local.browser.get_site_status',
   BROWSER_OPEN_SITE: 'local.browser.open_site',
+  // WO-O4O-COMPUTER-USE-V0 §14~§20·§24
+  COMPUTER_INSPECT: 'local.computer.inspect',
+  COMPUTER_CLICK: 'local.computer.click',
+  COMPUTER_TYPE_TEXT: 'local.computer.type_text',
+  COMPUTER_KEY: 'local.computer.key',
 };
 
 /**
@@ -267,6 +283,183 @@ async function openSite(site) {
   };
 }
 
+// ─── Computer Use V0 (WO-O4O-COMPUTER-USE-V0) ───────────────────────────────
+//
+// 대상은 언제나 **등재 앱의 창 하나**다(§7·§8·§9). 이 섹션의 모든 handler 는
+//   census → 등재 앱 매칭 → 정확히 1개인지 → (상호작용이면) 사용자 처리 창인지 → 스크립트
+// 순서를 밟고, 창 핸들 · 제목 · PID 는 이 파일 밖으로 나가지 않는다(§43).
+//
+// 서버가 보낸 인자는 `computer-use-limits.mjs` 로 **다시** 검사한다(§26). 규칙 밖이면
+// 스크립트를 부르지 않고 UNSUPPORTED 로 끝낸다.
+
+const COMPUTER_ERR = Object.freeze({
+  TARGET_NOT_FOUND: 'COMPUTER_USE_TARGET_NOT_FOUND',
+  TARGET_LOST: 'COMPUTER_USE_TARGET_LOST',
+  OUT_OF_BOUNDS: 'COMPUTER_USE_OUT_OF_BOUNDS',
+  INPUT_FAILED: 'COMPUTER_USE_INPUT_FAILED',
+  USER_ACTION_REQUIRED: 'COMPUTER_USE_USER_ACTION_REQUIRED',
+  UNSUPPORTED_ACTION: 'COMPUTER_USE_UNSUPPORTED_ACTION',
+});
+
+function computerBase(app, extra) {
+  return { targetId: app.appId, displayName: app.displayName, ...extra };
+}
+
+/**
+ * 대상 창 하나를 고른다. 0개 → TARGET_NOT_FOUND, 2개 이상 → AMBIGUOUS(임의로 고르지 않는다, §32).
+ * 반환: `{ window }` 또는 `{ failure }`.
+ */
+async function resolveComputerTarget(app) {
+  const windows = matchWindows(await censusWindows(), app);
+  if (windows.length === 0) {
+    return {
+      failure: {
+        status: 'failed',
+        errorCode: COMPUTER_ERR.TARGET_NOT_FOUND,
+        data: computerBase(app, { found: false, windowCount: 0 }),
+      },
+    };
+  }
+  if (windows.length > 1) {
+    return {
+      failure: {
+        status: 'failed',
+        errorCode: 'WINDOWS_APP_WINDOW_AMBIGUOUS',
+        data: computerBase(app, { found: true, windowCount: windows.length }),
+      },
+    };
+  }
+  return { window: windows[0] };
+}
+
+/**
+ * `local.computer.inspect` — 대상 창의 foreground 여부 · client 크기 · 스냅샷 크기 (§10·§14).
+ *
+ * 이미지는 존재하지 않는다: 스크립트가 메모리에서 한 번 캡처하고 크기만 남긴 채 버린다(§12).
+ * 되돌리는 것은 숫자 · 불리언 · `capturedAt` 뿐이다.
+ */
+async function computerInspect(app) {
+  const target = await resolveComputerTarget(app);
+  if (target.failure) return target.failure;
+  const info = await inspectComputerWindow(target.window.hwnd);
+  if (!info.ok) {
+    return {
+      status: 'failed',
+      errorCode: COMPUTER_ERR.TARGET_NOT_FOUND,
+      data: computerBase(app, { found: false, windowCount: 0 }),
+    };
+  }
+  return {
+    status: 'success',
+    data: computerBase(app, {
+      found: true,
+      windowCount: 1,
+      foreground: info.foreground,
+      clientWidth: info.clientWidth,
+      clientHeight: info.clientHeight,
+      snapshotAvailable: info.captured,
+      snapshotWidth: info.snapshotWidth,
+      snapshotHeight: info.snapshotHeight,
+      userActionRequired: isUserActionTitle(target.window.title),
+      capturedAt: new Date().toISOString(),
+    }),
+  };
+}
+
+/**
+ * 스크립트가 "실행하지 않았다" 고 한 이유를 서버 코드로 옮긴다 (§9·§41·§42·§45).
+ *
+ *   TARGET_LOST + 다른 프로세스가 앞에 있음 → TARGET_LOST
+ *   TARGET_LOST + 같은 프로세스의 다른 창(대화상자·팝업) → USER_ACTION_REQUIRED
+ */
+function classifyNotExecuted(outcome) {
+  if (outcome.reason === 'OUT_OF_BOUNDS') return COMPUTER_ERR.OUT_OF_BOUNDS;
+  if (outcome.reason === 'TARGET_NOT_VISIBLE') return COMPUTER_ERR.TARGET_NOT_FOUND;
+  if (outcome.reason === 'TARGET_LOST') {
+    const samePid = outcome.targetPid > 0 && outcome.foregroundPid === outcome.targetPid;
+    return samePid ? COMPUTER_ERR.USER_ACTION_REQUIRED : COMPUTER_ERR.TARGET_LOST;
+  }
+  return COMPUTER_ERR.INPUT_FAILED;
+}
+
+/**
+ * 상호작용 공통 경로 — 클릭 · 텍스트 · 허용키 모두 여기를 지난다.
+ * 한 번의 호출 = 한 번의 입력이다(§30 "inspect → max 1 interaction").
+ */
+async function computerInteract(app, kind, args, successFields) {
+  const target = await resolveComputerTarget(app);
+  if (target.failure) return target.failure;
+  // §13·§34·§41 — 로그인 · 파일 대화상자 성격의 창에는 어떤 입력도 넣지 않는다.
+  if (isUserActionTitle(target.window.title)) {
+    return {
+      status: 'failed',
+      errorCode: COMPUTER_ERR.USER_ACTION_REQUIRED,
+      data: computerBase(app, { found: true, windowCount: 1, userActionRequired: true }),
+    };
+  }
+  const outcome = await deliverComputerInput(target.window.hwnd, kind, args);
+  if (!outcome.ok) {
+    return {
+      status: 'failed',
+      errorCode: COMPUTER_ERR.INPUT_FAILED,
+      data: computerBase(app, { found: true, windowCount: 1 }),
+    };
+  }
+  if (!outcome.executed) {
+    const errorCode = classifyNotExecuted(outcome);
+    return {
+      status: 'failed',
+      errorCode,
+      data: computerBase(app, {
+        found: true,
+        windowCount: 1,
+        foreground: false,
+        clientWidth: outcome.clientWidth,
+        clientHeight: outcome.clientHeight,
+        userActionRequired: errorCode === COMPUTER_ERR.USER_ACTION_REQUIRED,
+      }),
+    };
+  }
+  return {
+    status: 'success',
+    data: computerBase(app, {
+      found: true,
+      windowCount: 1,
+      foreground: true,
+      clientWidth: outcome.clientWidth,
+      clientHeight: outcome.clientHeight,
+      verified: outcome.verified,
+      ...successFields,
+    }),
+  };
+}
+
+/** `local.computer.click` — 단일 왼쪽 클릭, 정규화 좌표 (§15·§16·§22). */
+function computerClick(app, args) {
+  return computerInteract(app, 'click', args, { clicked: true });
+}
+
+/** `local.computer.type_text` — 텍스트 1건 (§17·§18·§27). 줄바꿈 없음 — ENTER 는 key 로. */
+function computerTypeText(app, args) {
+  return computerInteract(app, 'text', args, { typed: true, typedLength: args.text.length });
+}
+
+/** `local.computer.key` — ENTER · TAB · ESC 중 하나 1회 (§19·§20). */
+function computerKey(app, args) {
+  return computerInteract(app, 'key', args, { keyPressed: true, key: args.key });
+}
+
+/**
+ * 인자 검사 — action 별 규칙. 통과한 **정규화된 인자만** handler 로 간다.
+ * 이 표에 없는 computer action 은 존재하지 않는다.
+ */
+const COMPUTER_HANDLERS = {
+  [ACTIONS.COMPUTER_INSPECT]: { validate: () => ({ ok: true, args: undefined }), run: computerInspect },
+  [ACTIONS.COMPUTER_CLICK]: { validate: validateClickArgs, run: computerClick },
+  [ACTIONS.COMPUTER_TYPE_TEXT]: { validate: validateTextArgs, run: computerTypeText },
+  [ACTIONS.COMPUTER_KEY]: { validate: validateKeyArgs, run: computerKey },
+};
+
 /** siteId 를 받는 handler. APP_HANDLERS 와 같은 규칙 — 인자 유무가 곧 계약이다. */
 const SITE_HANDLERS = {
   [ACTIONS.BROWSER_GET_SITE_STATUS]: getSiteStatus,
@@ -286,8 +479,31 @@ const APP_HANDLERS = {
  * handler 가 터졌다는 사실이 스택 트레이스와 함께 cloud 로 올라가면
  * 경로 · 사용자명 같은 것이 새어 나갈 수 있다. 코드만 보낸다.
  */
-export async function runAction(action, context) {
+export async function runAction(action, context, args) {
   const { base, appId } = parseAction(action);
+
+  // Computer Use V0: `base#appId` + 인자. 등재 밖 appId · 규칙 밖 인자는 스크립트를 부르지 않는다(§25·§26).
+  const computerHandler = COMPUTER_HANDLERS[base];
+  if (computerHandler) {
+    const app = appId ? findWindowsApp(appId) : undefined;
+    if (!app) return { status: 'denied', errorCode: 'WINDOWS_APP_NOT_REGISTERED' };
+    const checked = computerHandler.validate(args);
+    if (!checked.ok) {
+      return {
+        status: 'denied',
+        errorCode: 'COMPUTER_USE_UNSUPPORTED_ACTION',
+        data: { targetId: app.appId, displayName: app.displayName },
+      };
+    }
+    if (process.platform !== 'win32') {
+      return { status: 'failed', errorCode: 'COMPUTER_USE_INPUT_FAILED' };
+    }
+    try {
+      return await computerHandler.run(app, checked.args);
+    } catch {
+      return { status: 'failed', errorCode: 'COMPUTER_USE_INPUT_FAILED' };
+    }
+  }
 
   // Browser Control V0: `base#siteId`. 등재되지 않은 siteId 는 서버가 보냈더라도 여기서 끝난다(§44).
   const siteHandler = SITE_HANDLERS[base];
@@ -335,5 +551,10 @@ export async function runAction(action, context) {
 
 /** 테스트·감사용. 이 목록 밖의 action 은 존재하지 않는다. */
 export function listAllowedActions() {
-  return [...Object.keys(HANDLERS), ...Object.keys(APP_HANDLERS), ...Object.keys(SITE_HANDLERS)];
+  return [
+    ...Object.keys(HANDLERS),
+    ...Object.keys(APP_HANDLERS),
+    ...Object.keys(SITE_HANDLERS),
+    ...Object.keys(COMPUTER_HANDLERS),
+  ];
 }

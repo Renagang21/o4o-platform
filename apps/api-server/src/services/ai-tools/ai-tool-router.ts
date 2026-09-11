@@ -44,13 +44,16 @@ import {
 } from './ai-tool-contract.js';
 import {
   composeAppAction,
+  composeComputerAction,
   composeSiteAction,
   LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ERROR,
   pickSafeBrowserInfo,
+  pickSafeComputerInfo,
   pickSafeSystemInfo,
   pickSafeWindowInfo,
 } from '../local-agent/local-agent-protocol.js';
+import { textDenyReason } from '../local-agent/computer-use-contract.js';
 import { windowsAppDisplayName, WINDOWS_APP_IDS } from '../local-agent/windows-app-registry.js';
 import { browserSiteDisplayName, BROWSER_SITE_IDS } from '../local-agent/browser-site-registry.js';
 import {
@@ -441,6 +444,102 @@ function executeOpenSite(dataSource: DataSource, ctx: VerifiedToolContext, siteI
  *
  * 실행 직전 재검증 순서(§14): 등록부 확인 → capability 재확인 → 인자 검증 → executor.
  */
+// ─── Computer Use executors (WO-O4O-COMPUTER-USE-V0 §7·§9·§30·§31) ────────────
+
+/**
+ * 화면 조작 tool 의 공통 왕복.
+ *
+ * 상호작용(click · type_text · key)은 **두 명령**으로 이뤄진다:
+ *   1. `local.activate_window#targetId` — 대상 창을 앞으로 (§2 "창 탐색/활성화 → Computer Use").
+ *      실행 중이 아니면 여기서 끝난다(§38 "메모장을 먼저 실행해 주세요").
+ *   2. `local.computer.<action>#targetId` — agent 가 실행 직전·직후 foreground 를 다시 확인한다(§9).
+ * inspect 는 읽기이므로 활성화하지 않는다 — "앞에 있는가" 를 그대로 보고한다.
+ *
+ * 한 요청당 명령은 최대 2개, 상호작용은 정확히 1개다(§31). 결과를 보고 다음 행동을 고르는
+ * 루프는 없다 — 다음 행동은 사용자의 다음 문장이다(§30).
+ */
+async function executeComputerAction(
+  dataSource: DataSource,
+  ctx: VerifiedToolContext,
+  tool: string,
+  baseAction: string,
+  targetId: string,
+  args: Record<string, unknown>,
+): Promise<ToolResult> {
+  const displayName = windowsAppDisplayName(targetId);
+  const fail = (errorCode: string, extra: Record<string, unknown> = {}): ToolResult => ({
+    ok: true,
+    tool,
+    data: { available: false, targetId, displayName, errorCode, ...extra },
+  });
+
+  const resolution = await resolveTargetDevice(dataSource, ctx.userId);
+  if (resolution.status !== 'ok') {
+    return fail(
+      resolution.status === 'none'
+        ? LOCAL_AGENT_ERROR.NO_DEVICE
+        : resolution.status === 'ambiguous'
+          ? LOCAL_AGENT_ERROR.AMBIGUOUS
+          : LOCAL_AGENT_ERROR.OFFLINE,
+    );
+  }
+  const deviceId = resolution.device.id;
+
+  if (baseAction !== LOCAL_AGENT_ACTIONS.COMPUTER_INSPECT) {
+    const activate = await issueCommand(dataSource, {
+      userId: ctx.userId,
+      deviceId,
+      action: composeAppAction(LOCAL_AGENT_ACTIONS.ACTIVATE_WINDOW, targetId),
+      toolName: tool,
+    });
+    if (activate.ok === false) return fail(activate.errorCode);
+    const activated = await awaitCommandResult(dataSource, activate.command.commandId);
+    const win = pickSafeWindowInfo(activated.data);
+    logger.info('local-agent computer command', {
+      tool,
+      targetId,
+      step: 'activate',
+      status: activated.status,
+      errorCode: activated.errorCode ?? null,
+      windowCount: win.windowCount ?? null,
+      deviceId,
+    });
+    if (activated.status !== 'success' || win.activated !== true) {
+      return fail(activated.errorCode ?? LOCAL_AGENT_ERROR.WINDOW_ACTIVATION_FAILED, {
+        windowCount: win.windowCount ?? 0,
+      });
+    }
+  }
+
+  const issued = await issueCommand(dataSource, {
+    userId: ctx.userId,
+    deviceId,
+    action: composeComputerAction(baseAction, targetId),
+    toolName: tool,
+    args,
+  });
+  if (issued.ok === false) return fail(issued.errorCode);
+
+  const result = await awaitCommandResult(dataSource, issued.command.commandId);
+  const safe = pickSafeComputerInfo(result.data);
+
+  // §43 안전 로그 — deviceId · targetId · tool · 상태 · 코드 · 시각만. 입력한 텍스트 · 좌표 ·
+  // 창 제목 · 이미지는 이 값 안에 애초에 없다(pickSafeComputerInfo 화이트리스트).
+  logger.info('local-agent computer command', {
+    tool,
+    targetId,
+    step: 'action',
+    status: result.status,
+    errorCode: result.errorCode ?? null,
+    deviceId,
+  });
+
+  if (result.status !== 'success') {
+    return fail(result.errorCode ?? LOCAL_AGENT_ERROR.EXECUTION_FAILED, safe);
+  }
+  return { ok: true, tool, data: { available: true, targetId, displayName, ...safe } };
+}
+
 export async function executeAiTool(
   dataSource: DataSource,
   name: string,
@@ -478,6 +577,23 @@ export async function executeAiTool(
       return executeGetSiteStatus(dataSource, ctx, String((args as { siteId: string }).siteId));
     case AI_TOOL_NAMES.BROWSER_OPEN_SITE:
       return executeOpenSite(dataSource, ctx, String((args as { siteId: string }).siteId));
+    // 화면 조작 (COMPUTER-USE-V0): targetId · 좌표 · 텍스트 · 키는 `validateToolArguments` 를
+    // 통과한 값이고, issueCommand 가 같은 규칙으로 한 번 더 검사한다(§25).
+    case AI_TOOL_NAMES.COMPUTER_INSPECT:
+    case AI_TOOL_NAMES.COMPUTER_CLICK:
+    case AI_TOOL_NAMES.COMPUTER_TYPE_TEXT:
+    case AI_TOOL_NAMES.COMPUTER_KEY: {
+      const { targetId, ...rest } = args as { targetId: string } & Record<string, unknown>;
+      const base =
+        name === AI_TOOL_NAMES.COMPUTER_INSPECT
+          ? LOCAL_AGENT_ACTIONS.COMPUTER_INSPECT
+          : name === AI_TOOL_NAMES.COMPUTER_CLICK
+            ? LOCAL_AGENT_ACTIONS.COMPUTER_CLICK
+            : name === AI_TOOL_NAMES.COMPUTER_TYPE_TEXT
+              ? LOCAL_AGENT_ACTIONS.COMPUTER_TYPE_TEXT
+              : LOCAL_AGENT_ACTIONS.COMPUTER_KEY;
+      return executeComputerAction(dataSource, ctx, name, base, String(targetId), rest);
+    }
     default:
       // 등록부에는 있으나 executor 가 없는 경우 — 열려 있는 척하지 않는다.
       return { ok: false, tool: name, reason: 'UNKNOWN_TOOL' };
@@ -699,6 +815,131 @@ export function asksForWindowActivation(message: string): boolean {
   return ACTIVATE_INTENT_PATTERNS_EN.some((re) => re.test(message));
 }
 
+// ─── Computer Use intents (WO-O4O-COMPUTER-USE-V0 §38) ───────────────────────
+
+/**
+ * 입력할 텍스트를 사용자 문장에서 **그대로** 꺼낸다. AI 가 지어내지 않는다(§25·§32).
+ *
+ *   1) 따옴표 안: '…' "…" ‘…’ “…” 「…」
+ *   2) "…라고 써/입력/적어/쳐" — "라고" 앞의 구절
+ *
+ * 둘 다 없으면 null 이다. 그때는 실행하지 않고 "무엇을 입력할지" 를 되묻는다(§32).
+ * 한글은 정규식 리터럴에 두지 않는다(위 esbuild 주석) — `new RegExp` 로 조립한다.
+ */
+const QUOTE_PAIRS: readonly [string, string][] = [
+  ['"', '"'],
+  ["'", "'"],
+  ['\u201C', '\u201D'], // “ ”
+  ['\u2018', '\u2019'], // ‘ ’
+  ['\u300C', '\u300D'], // 「 」
+];
+const RAGO_RE = new RegExp(
+  '(\\S.*?)\\s*' +
+    '\uB77C\uACE0' + // 라고
+    '\\s*(?:\uC368|\uC4F0|\uC785\uB825|\uC801|\uCCD0|\uCE58|\uD0C0\uC774\uD551)', // 써|쓰|입력|적|쳐|치|타이핑
+);
+
+export function extractTypeText(message: string): string | null {
+  for (const [open, close] of QUOTE_PAIRS) {
+    const start = message.indexOf(open);
+    if (start < 0) continue;
+    const end = message.indexOf(close, start + 1);
+    if (end < 0) continue;
+    const inner = message.slice(start + 1, end).trim();
+    if (inner.length > 0) return inner;
+  }
+  const m = RAGO_RE.exec(message);
+  if (m && m[1]) {
+    // "메모장에 테스트라고 써줘" — 앱 이름과 조사가 앞에 붙어 있으면 떼어낸다.
+    const cleaned = m[1]
+      .replace(
+        // "메모장에" · "메모장에다" · "계산기에서" — 등재 앱 이름 + 조사 까지 떼어낸다
+        new RegExp('^.*?(?:\uBA54\uBAA8\uC7A5|\uACC4\uC0B0\uAE30)(?:\uC5D0\uB2E4|\uC5D0\uC11C|\uC5D0)?\\s*'),
+        '',
+      )
+      .trim();
+    if (cleaned.length > 0) return cleaned;
+  }
+  return null;
+}
+
+const TYPE_INTENT_KEYWORDS_KO: readonly string[] = [
+  '\uC368', // 써
+  '\uC4F0\uACE0', // 쓰고 ("테스트 쓰고 엔터" — 텍스트까지만)
+  '\uC785\uB825', // 입력
+  '\uC801\uC5B4', // 적어
+  '\uD0C0\uC774\uD551', // 타이핑
+  '\uCCD0', // 쳐
+];
+const TYPE_INTENT_PATTERNS_EN: readonly RegExp[] = [/\btype\b/i, /\bwrite\b/i, /\benter\s+text\b/i];
+
+export function asksForTyping(message: string): boolean {
+  const compact = message.replace(/\s+/g, '');
+  if (TYPE_INTENT_KEYWORDS_KO.some((k) => compact.includes(k))) return true;
+  return TYPE_INTENT_PATTERNS_EN.some((re) => re.test(message));
+}
+
+/** 허용키 3개만 이름을 가진다. "F5" · "Ctrl+S" · "윈도우키" 는 여기 없으므로 null 이다(§19·§20). */
+const KEY_INTENT: readonly { key: string; ko: readonly string[]; en: readonly RegExp[] }[] = [
+  { key: 'ENTER', ko: ['\uC5D4\uD130', '\uC904\uBC14\uAFC8'], en: [/\benter\b(?!\s+text)/i, /\breturn\s+key\b/i] }, // 엔터 · 줄바꿈
+  { key: 'TAB', ko: ['\uD0ED\uD0A4', '\uD0ED\uC744', '\uD0ED\uB20C'], en: [/\btab\b/i] }, // 탭키 · 탭을 · 탭눌
+  { key: 'ESC', ko: ['\uC774\uC2A4\uCF00\uC774\uD504'], en: [/\besc(?:ape)?\b/i] }, // 이스케이프
+];
+
+export function detectAllowedKey(message: string): string | null {
+  const compact = message.replace(/\s+/g, '');
+  const hits = KEY_INTENT.filter(
+    (k) => k.ko.some((w) => compact.includes(w)) || k.en.some((re) => re.test(message)),
+  ).map((k) => k.key);
+  const unique = [...new Set(hits)];
+  return unique.length === 1 ? unique[0] : null;
+}
+
+const CLICK_INTENT_KEYWORDS_KO: readonly string[] = ['\uD074\uB9AD']; // 클릭
+const CLICK_INTENT_PATTERNS_EN: readonly RegExp[] = [/\bclick\b/i];
+
+export function asksForClick(message: string): boolean {
+  const compact = message.replace(/\s+/g, '');
+  if (CLICK_INTENT_KEYWORDS_KO.some((k) => compact.includes(k))) return true;
+  return CLICK_INTENT_PATTERNS_EN.some((re) => re.test(message));
+}
+
+const SCREEN_INTENT_KEYWORDS_KO: readonly string[] = [
+  '\uD654\uBA74', // 화면
+  '\uCEA1\uCC98', // 캡처
+  '\uC2A4\uD06C\uB9B0\uC0F7', // 스크린샷
+];
+const SCREEN_INTENT_PATTERNS_EN: readonly RegExp[] = [/\bscreen\b/i, /\bcapture\b/i, /\bsnapshot\b/i];
+
+export function asksForScreenInspect(message: string): boolean {
+  const compact = message.replace(/\s+/g, '');
+  if (SCREEN_INTENT_KEYWORDS_KO.some((k) => compact.includes(k))) return true;
+  return SCREEN_INTENT_PATTERNS_EN.some((re) => re.test(message));
+}
+
+/**
+ * V0 클릭 위치. 화면을 AI 에게 보여주는 경로가 아직 없어(§28 provider 독립 · ai-core F1 동결)
+ * 좌표를 고를 근거가 사용자 문장뿐이다. 그래서 V0 는 **client 영역 중앙 한 점**만 클릭한다 —
+ * 메모장 같은 단일 편집 영역 앱에서 caret focus 를 주기에 충분하고(§35·§36 B), 그 밖의 위치는
+ * 표현하지 않는다. AI 가 좌표를 지어내는 경로는 없다(§25).
+ */
+export const COMPUTER_DEFAULT_CLICK = Object.freeze({ x: 0.5, y: 0.5 });
+
+/**
+ * 화면 조작 요청인데 실행할 수 없는 이유 (§32 "불확실하면 실행하지 않고 안내 후 중지").
+ * 라우트가 이 값을 프롬프트 사실로 넘겨 모델이 되묻게 한다. tool 은 선택되지 않는다.
+ */
+export type ComputerRequestGap = 'TEXT_MISSING' | 'TEXT_DENIED' | 'LOGIN_REQUEST';
+
+export function computerRequestGap(message: string): ComputerRequestGap | null {
+  if (!detectRegisteredApp(message)) return null;
+  if (asksForLogin(message)) return 'LOGIN_REQUEST';
+  if (!asksForTyping(message)) return null;
+  const text = extractTypeText(message);
+  if (text === null) return 'TEXT_MISSING';
+  return textDenyReason(text) ? 'TEXT_DENIED' : null;
+}
+
 /**
  * 이번 요청에서 실행할 tool 을 **결정론적으로** 고른다. 없으면 null.
  *
@@ -773,6 +1014,33 @@ export function selectToolInvocationForRequest(
   // 창 축이 먼저다. "메모장 열려 있어?" 는 로컬 축 키워드("내 PC")가 없어도 성립해야 한다(§37).
   const appId = detectRegisteredApp(message);
   if (appId) {
+    // 화면 조작 축 (COMPUTER-USE-V0 §38). 순서 = 텍스트 → 키 → 클릭 → 화면 확인.
+    // 한 문장에 여럿이 있어도 **하나만** 고른다(§31) — "테스트 쓰고 엔터" 는 텍스트까지다.
+    // 로그인 요청은 화면 조작 tool 을 고르지 않는다(§17 "로그인 단계에서는 type_text 금지" · §34).
+    if (!asksForLogin(message)) {
+      if (asksForTyping(message)) {
+        const text = extractTypeText(message);
+        // 텍스트가 없거나 금지 내용이면 실행하지 않는다 — computerRequestGap 이 사유를 준다(§32).
+        if (text === null || textDenyReason(text) !== null) return null;
+        if (available.has(AI_TOOL_NAMES.COMPUTER_TYPE_TEXT)) {
+          return { tool: AI_TOOL_NAMES.COMPUTER_TYPE_TEXT, args: { targetId: appId, text } };
+        }
+        return null;
+      }
+      const key = detectAllowedKey(message);
+      if (key && available.has(AI_TOOL_NAMES.COMPUTER_KEY)) {
+        return { tool: AI_TOOL_NAMES.COMPUTER_KEY, args: { targetId: appId, key } };
+      }
+      if (asksForClick(message) && available.has(AI_TOOL_NAMES.COMPUTER_CLICK)) {
+        return {
+          tool: AI_TOOL_NAMES.COMPUTER_CLICK,
+          args: { targetId: appId, ...COMPUTER_DEFAULT_CLICK },
+        };
+      }
+      if (asksForScreenInspect(message) && available.has(AI_TOOL_NAMES.COMPUTER_INSPECT)) {
+        return { tool: AI_TOOL_NAMES.COMPUTER_INSPECT, args: { targetId: appId } };
+      }
+    }
     if (asksForWindowActivation(message) && available.has(AI_TOOL_NAMES.ACTIVATE_WINDOW)) {
       return { tool: AI_TOOL_NAMES.ACTIVATE_WINDOW, args: { appId } };
     }
@@ -832,7 +1100,81 @@ export function renderToolContext(result: ToolResult): string | null {
   if (result.tool === AI_TOOL_NAMES.BROWSER_OPEN_SITE) {
     return renderOpenSite(result.data);
   }
+  if (
+    result.tool === AI_TOOL_NAMES.COMPUTER_INSPECT ||
+    result.tool === AI_TOOL_NAMES.COMPUTER_CLICK ||
+    result.tool === AI_TOOL_NAMES.COMPUTER_TYPE_TEXT ||
+    result.tool === AI_TOOL_NAMES.COMPUTER_KEY
+  ) {
+    return renderComputerAction(result.tool, result.data);
+  }
   return null;
+}
+
+// ─── Computer Use renderers (WO-O4O-COMPUTER-USE-V0 §38·§41·§42·§45) ────────
+
+const COMPUTER_HEADER = '## 화면 조작 상태\n';
+
+/** 화면 조작 실패 문장. 창 축 실패(미실행 · 창 다수 · 연결 없음)는 창 축 문장을 그대로 쓴다. */
+function renderComputerFailure(data: Record<string, unknown>, displayName: string): string {
+  const code = String(data.errorCode ?? '');
+  if (code === LOCAL_AGENT_ERROR.COMPUTER_TARGET_NOT_FOUND) return renderNotRunning(displayName);
+  if (code === LOCAL_AGENT_ERROR.COMPUTER_TARGET_LOST) {
+    return (
+      COMPUTER_HEADER +
+      `- ${displayName} 창이 앞에 있지 않아 입력을 보내지 않았습니다. 다른 창이 앞에 있습니다.\n` +
+      '- 사용자에게 해당 창을 앞으로 가져온 뒤 다시 요청해 달라고 안내하세요.'
+    );
+  }
+  if (code === LOCAL_AGENT_ERROR.COMPUTER_OUT_OF_BOUNDS) {
+    return COMPUTER_HEADER + '- 지정한 위치가 창 영역 밖이어서 클릭하지 않았습니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.COMPUTER_USER_ACTION_REQUIRED) {
+    return (
+      COMPUTER_HEADER +
+      '- 로그인 창 · 파일 대화상자 · 팝업처럼 사용자가 직접 처리해야 하는 화면이 앞에 있어 실행을 멈췄습니다.\n' +
+      '- O4O 는 로그인 · 비밀번호 · 저장 · 확인 버튼을 대신 누르지 않습니다. 사용자에게 직접 처리해 달라고 안내하세요.'
+    );
+  }
+  if (code === LOCAL_AGENT_ERROR.COMPUTER_UNSUPPORTED_ACTION) {
+    return COMPUTER_HEADER + '- 요청한 입력은 허용 범위(왼쪽 클릭 · 짧은 텍스트 · ENTER/TAB/ESC) 밖이어서 실행하지 않았습니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.COMPUTER_INPUT_FAILED) {
+    return COMPUTER_HEADER + `- ${displayName} 창에 입력을 보내지 못했습니다. 사용자가 직접 확인해야 합니다.`;
+  }
+  return (
+    renderWindowFailure(data, displayName) ??
+    COMPUTER_HEADER +
+      '- 현재 이 PC의 Local Work Agent가 연결되어 있지 않아 화면을 조작할 수 없습니다.\n' +
+      '- 추측해서 답하지 마세요.'
+  );
+}
+
+function renderComputerAction(tool: string, data: Record<string, unknown>): string {
+  const displayName = String(data.displayName ?? '해당 프로그램');
+  if (data.available !== true) return renderComputerFailure(data, displayName);
+
+  if (tool === AI_TOOL_NAMES.COMPUTER_INSPECT) {
+    if (data.found !== true) return renderNotRunning(displayName);
+    const fg = data.foreground === true ? '앞에 있습니다' : '앞에 있지 않습니다 (다른 창이 앞에 있음)';
+    const size =
+      typeof data.clientWidth === 'number' && typeof data.clientHeight === 'number'
+        ? ` 창 내부 크기 ${data.clientWidth}×${data.clientHeight}.`
+        : '';
+    const snap = data.snapshotAvailable === true ? ' 화면 확인 가능.' : ' 화면 확인 불가(앞에 있을 때만 가능).';
+    return COMPUTER_HEADER + `- ${displayName} 창이 ${fg}.${size}${snap}`;
+  }
+  if (tool === AI_TOOL_NAMES.COMPUTER_CLICK) {
+    if (data.clicked !== true) return renderComputerFailure(data, displayName);
+    return COMPUTER_HEADER + `- ${displayName} 창 안 지정 위치를 클릭했습니다.`;
+  }
+  if (tool === AI_TOOL_NAMES.COMPUTER_TYPE_TEXT) {
+    if (data.typed !== true) return renderComputerFailure(data, displayName);
+    const n = Number(data.typedLength ?? 0);
+    return COMPUTER_HEADER + `- ${displayName} 창에 요청한 텍스트(${n}자)를 입력했습니다.`;
+  }
+  if (data.keyPressed !== true) return renderComputerFailure(data, displayName);
+  return COMPUTER_HEADER + `- ${displayName} 창에 ${String(data.key ?? '')} 키를 눌렀습니다.`;
 }
 
 // ─── Browser Control renderers (WO-O4O-BROWSER-CONTROL-V0 §17·§18·§19·§45) ──

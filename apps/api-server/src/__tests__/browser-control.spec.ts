@@ -312,7 +312,10 @@ describe('10~12. 로그인은 사용자 몫 — credential/cookie 수단 부재'
   it('11. password 입력 tool 이 존재하지 않는다 — 이름도 자격도 없다', () => {
     const names = AI_TOOL_REGISTRY.map((t) => t.name);
     for (const n of names) {
-      expect(n).not.toMatch(/password|login|credential|type|fill|input|submit/i);
+      expect(n).not.toMatch(/password|login|credential|fill|submit/i);
+      // 브라우저 축에는 입력 tool 자체가 없다. (`local.computer.type_text` 는 COMPUTER-USE-V0 의
+      // **등재 앱 창** 축이며, 브라우저 창은 등재 앱이 아니라 대상이 되지 못한다 — computer-use.spec 참조.)
+      if (n.startsWith('local.browser.')) expect(n).not.toMatch(/type|input/i);
     }
     for (const bogus of ['local.browser.login', 'local.browser.type_password', 'local.browser.fill']) {
       expect(assertToolAllowed(bogus, ctx())).toMatchObject({ allowed: false, reason: 'UNKNOWN_TOOL' });
@@ -321,7 +324,9 @@ describe('10~12. 로그인은 사용자 몫 — credential/cookie 수단 부재'
     for (const c of Object.values(AiCapability)) {
       expect(c).not.toMatch(/PASSWORD|LOGIN|CREDENTIAL|INPUT/);
     }
-    // agent 에도 입력을 보내는 경로가 없다.
+    // 브라우저 열기 경로(handlers · window-control · browser-open.ps1)에는 입력을 보내는 코드가 없다.
+    // COMPUTER-USE-V0 이후 입력 API 는 `windows-computer-input.ps1` **한 파일에만** 있고,
+    // 그 파일은 등재 앱 창 핸들로만 호출된다 (computer-use.spec 이 그 파일을 별도로 검사한다).
     const agent = codeOnly(readAgent('handlers.mjs') + readAgent('windows-window-control.mjs') + readAgent('windows-browser-open.ps1'));
     for (const f of ['SendKeys', 'SendInput', 'keybd_event', 'mouse_event', 'SetCursorPos', 'password', 'credential']) {
       expect(agent.toLowerCase()).not.toContain(f.toLowerCase());

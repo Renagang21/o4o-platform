@@ -144,12 +144,13 @@ export function makeDb() {
         issued_at: params[5],
         expires_at: params[6],
         error_code: null,
-        result_data: null,
+        // COMPUTER-USE-V0: 발행 시 args 가 result_data 에 실린다(8번째 파라미터). 없으면 null.
+        result_data: params[7] ?? null,
         completed_at: null,
       });
       return [];
     }
-    if (s.startsWith('UPDATE local_agent_commands SET status = \'delivered\'')) {
+    if (s.startsWith('UPDATE local_agent_commands c') && s.includes("SET status = 'delivered'")) {
       const picked = commands
         .filter(
           (c) =>
@@ -158,17 +159,19 @@ export function makeDb() {
             new Date(c.expires_at).getTime() > Date.now(),
         )
         .slice(0, params[1]);
+      // 프로덕션 문장과 같은 순서: RETURNING 의 p.args 는 갱신 전 값, row 의 result_data 는 NULL.
+      const out = picked.map((c) => ({
+        command_id: c.command_id,
+        action: c.action,
+        issued_at: c.issued_at,
+        expires_at: c.expires_at,
+        args: c.result_data,
+      }));
       picked.forEach((c) => {
         c.status = 'delivered';
+        c.result_data = null;
       });
-      return returning(
-        picked.map((c) => ({
-          command_id: c.command_id,
-          action: c.action,
-          issued_at: c.issued_at,
-          expires_at: c.expires_at,
-        })),
-      );
+      return returning(out);
     }
     if (s.includes('FROM local_agent_commands') && s.includes('AND device_id')) {
       const c = commands.find((x) => x.command_id === params[0] && x.device_id === params[1]);
@@ -194,6 +197,7 @@ export function makeDb() {
       if (!c) return [];
       c.status = 'expired';
       c.error_code = params[1];
+      c.result_data = null;
       c.completed_at = now();
       return [{ command_id: c.command_id }];
     }

@@ -15,8 +15,8 @@
  *
  *   1. `execFile` 만 쓴다. `exec` · `spawn` · `shell: true` 를 쓰지 않으므로
  *      **셸이 개입하지 않는다** (인용·`&`·파이프 해석 자체가 없다).
- *   2. 실행 대상은 **저장소에 체크인된 `.ps1` 파일 3개**뿐이다(창 census · 창 활성화 ·
- *      등재 사이트 열기). 스크립트 문자열을 런타임에 조립하지 않는다 —
+ *   2. 실행 대상은 **저장소에 체크인된 `.ps1` 파일 5개**뿐이다(창 census · 창 활성화 ·
+ *      등재 사이트 열기 · 대상 창 검사 · 대상 창 단일 입력 — 뒤 둘은 COMPUTER-USE-V0, 아래 참조). 스크립트 문자열을 런타임에 조립하지 않는다 —
  *      `-Command` 를 쓰지 않고 `-File` 만 쓴다.
  *   3. argv 는 아래 상수 배열이 전부다. **호출자가 argv 에 값을 넣을 수 없다.**
  *   4. 유일한 입력인 창 핸들은 환경변수로 넘기고, 넘기기 전에 10진 정수인지 확인한다.
@@ -24,7 +24,8 @@
  *      한다. PowerShell 은 조건 없는 창 목록만 돌려준다.
  *
  *   즉 여기서 실행 가능한 것은 "지금 창 목록을 다오" · "이 핸들을 앞으로 보내라" ·
- *   "이 등재 HTTPS 주소를 기본 handler 로 열어라" 세 가지가 전부이고,
+ *   "이 등재 HTTPS 주소를 기본 handler 로 열어라" · "이 핸들의 창을 검사하라" ·
+ *   "이 핸들의 창 안에 클릭 1회 / 텍스트 1건 / ENTER·TAB·ESC 1회를 넣어라" 가 전부이고,
  *   그 밖의 명령은 **표현할 방법이 없다**.
  *
  * ─────────────────────────────────────────────────────────────────────────────
@@ -45,6 +46,9 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CENSUS_SCRIPT = path.join(HERE, 'windows-window-census.ps1');
 const ACTIVATE_SCRIPT = path.join(HERE, 'windows-window-activate.ps1');
 const BROWSER_OPEN_SCRIPT = path.join(HERE, 'windows-browser-open.ps1');
+// COMPUTER-USE-V0 — 아래 "Computer Use V0" 절 참조. 상수는 여기 한곳에 모아 둔다.
+const COMPUTER_INSPECT_SCRIPT = path.join(HERE, 'windows-computer-inspect.ps1');
+const COMPUTER_INPUT_SCRIPT = path.join(HERE, 'windows-computer-input.ps1');
 
 /**
  * 브라우저로 인정할 process 이름 (§24 — Chrome · Edge 만).
@@ -234,4 +238,102 @@ export async function openRegisteredSiteUrl(url) {
   const parsed = parseJson(raw);
   if (!parsed || parsed.opened !== true) return { opened: false, browserType: null };
   return { opened: true, browserType: browserTypeFromProgId(parsed.progId) };
+}
+
+// ─── Computer Use V0 (WO-O4O-COMPUTER-USE-V0) ───────────────────────────────
+//
+// 네 번째 · 다섯 번째 스크립트. 같은 규칙이다 — execFile 지점을 늘리지 않고, argv 는 상수,
+// 입력은 환경변수, 창 핸들은 agent 자신의 census 값이며 10진 정수 검사를 통과해야 넘어간다.
+//
+//   windows-computer-inspect.ps1  foreground 여부 · client 크기 · (foreground 일 때) 메모리 캡처 크기
+//   windows-computer-input.ps1    왼쪽 클릭 1회 | 텍스트 1건 | ENTER/TAB/ESC 1회 — 실행 전후 foreground 확인
+//
+// 이 파일에서 텍스트 · 좌표 · 키는 **형식만** 다시 본다. 내용 규칙(길이 · 금지어 · 허용키)은
+// `computer-use-limits.mjs` 가 handler 단계에서 이미 적용했고, 스크립트가 한 번 더 본다.
+
+/** 정규화 좌표를 스크립트 정규식(`^(0(\.d{1,6})?|1(\.0{1,6})?)$`)에 맞는 고정 소수 문자열로. */
+function formatNormalized(v) {
+  if (typeof v !== 'number' || !Number.isFinite(v) || v < 0 || v > 1) return null;
+  return v.toFixed(6);
+}
+
+function validHandle(hwnd) {
+  const handle = Number(hwnd);
+  return Number.isInteger(handle) && handle > 0 ? handle : null;
+}
+
+/**
+ * 대상 창 검사 (§9·§10·§14).
+ * 반환: `{ ok, foreground, targetPid, foregroundPid, foregroundHwnd, clientWidth, clientHeight,
+ *          captured, snapshotWidth, snapshotHeight }` — 이미지는 없다. 스크립트가 만들지 않는다.
+ */
+export async function inspectComputerWindow(hwnd) {
+  const handle = validHandle(hwnd);
+  if (handle === null) return { ok: false };
+  const raw = await runScript(COMPUTER_INSPECT_SCRIPT, childEnv({ O4O_WINDOW_HANDLE: String(handle) }));
+  const parsed = parseJson(raw);
+  if (!parsed || typeof parsed !== 'object' || parsed.visible !== true) return { ok: false };
+  return {
+    ok: true,
+    foreground: parsed.foreground === true,
+    targetPid: Number(parsed.targetPid) || 0,
+    foregroundPid: Number(parsed.foregroundPid) || 0,
+    foregroundHwnd: Number(parsed.foregroundHwnd) || 0,
+    clientWidth: Math.max(0, Number(parsed.clientWidth) || 0),
+    clientHeight: Math.max(0, Number(parsed.clientHeight) || 0),
+    captured: parsed.captured === true,
+    snapshotWidth: Math.max(0, Number(parsed.snapshotWidth) || 0),
+    snapshotHeight: Math.max(0, Number(parsed.snapshotHeight) || 0),
+  };
+}
+
+/**
+ * 대상 창 안 단일 입력 (§15~§22).
+ *
+ *   kind = 'click' → args { x, y }   (정규화 0..1)
+ *   kind = 'text'  → args { text }
+ *   kind = 'key'   → args { key }    (ENTER | TAB | ESC)
+ *
+ * 반환: `{ ok, executed, reason, verified, targetPid, foregroundPid, foregroundHwnd, clientWidth, clientHeight }`.
+ * `executed=false` 면 스크립트가 **아무 입력도 만들지 않은** 것이고 `reason` 이 그 이유다
+ * (TARGET_LOST · OUT_OF_BOUNDS · INPUT_FAILED · TARGET_NOT_VISIBLE).
+ */
+export async function deliverComputerInput(hwnd, kind, args) {
+  const handle = validHandle(hwnd);
+  if (handle === null) return { ok: false };
+  const env = { O4O_WINDOW_HANDLE: String(handle), O4O_INPUT_KIND: '' };
+  if (kind === 'click') {
+    const x = formatNormalized(args?.x);
+    const y = formatNormalized(args?.y);
+    if (x === null || y === null) return { ok: false };
+    env.O4O_INPUT_KIND = 'click';
+    env.O4O_INPUT_X = x;
+    env.O4O_INPUT_Y = y;
+  } else if (kind === 'text') {
+    const text = args?.text;
+    if (typeof text !== 'string' || text.length === 0 || text.length > 500) return { ok: false };
+    env.O4O_INPUT_KIND = 'text';
+    env.O4O_INPUT_TEXT = text;
+  } else if (kind === 'key') {
+    const key = args?.key;
+    if (key !== 'ENTER' && key !== 'TAB' && key !== 'ESC') return { ok: false };
+    env.O4O_INPUT_KIND = 'key';
+    env.O4O_INPUT_KEY = key;
+  } else {
+    return { ok: false };
+  }
+  const raw = await runScript(COMPUTER_INPUT_SCRIPT, childEnv(env));
+  const parsed = parseJson(raw);
+  if (!parsed || typeof parsed !== 'object') return { ok: false };
+  return {
+    ok: true,
+    executed: parsed.executed === true,
+    reason: String(parsed.reason || ''),
+    verified: parsed.verified === true,
+    targetPid: Number(parsed.targetPid) || 0,
+    foregroundPid: Number(parsed.foregroundPid) || 0,
+    foregroundHwnd: Number(parsed.foregroundHwnd) || 0,
+    clientWidth: Math.max(0, Number(parsed.clientWidth) || 0),
+    clientHeight: Math.max(0, Number(parsed.clientHeight) || 0),
+  };
 }

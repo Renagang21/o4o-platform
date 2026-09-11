@@ -420,7 +420,7 @@ describe('11~14. 실행 · 종료 · 셸 · 파일 접근은 구현 자체가 �
     }
   });
 
-  it('13. 셸은 열려 있지 않다 — child_process 는 한 파일 · 체크인된 .ps1 세 개뿐이다', () => {
+  it('13. 셸은 열려 있지 않다 — child_process 는 한 파일 · 체크인된 .ps1 다섯 개뿐이다', () => {
     // (a) child_process 를 import 하는 파일은 정확히 하나다.
     const importers = agentFiles.filter((f) => readAgent(f).includes('child_process'));
     expect(importers).toEqual(['windows-window-control.mjs']);
@@ -435,11 +435,13 @@ describe('11~14. 실행 · 종료 · 셸 · 파일 접근은 구현 자체가 �
     // `execFile` 은 허용, 맨 `exec(` · `spawn(` 은 불가 — 앞 글자를 붙여 구분한다.
     expect(controlCode).not.toMatch(/[^A-Za-z]exec[(]/);
     expect(controlCode).not.toMatch(/[^A-Za-z]spawn[(]/);
-    // (c) 실행 대상은 저장소에 체크인된 .ps1 세 개뿐이고, argv 는 상수다.
-    //     (BROWSER-CONTROL-V0 에서 등재 사이트 열기 스크립트가 하나 늘었다.)
+    // (c) 실행 대상은 저장소에 체크인된 .ps1 다섯 개뿐이고, argv 는 상수다.
+    //     (BROWSER-CONTROL-V0 에서 등재 사이트 열기 1개, COMPUTER-USE-V0 에서 창 검사 · 창 입력 2개가 늘었다.)
     const scripts = [...control.matchAll(/'([\w-]+\.ps1)'/g)].map((m) => m[1]).sort();
     expect(scripts).toEqual([
       'windows-browser-open.ps1',
+      'windows-computer-input.ps1',
+      'windows-computer-inspect.ps1',
       'windows-window-activate.ps1',
       'windows-window-census.ps1',
     ]);
@@ -463,7 +465,13 @@ describe('11~14. 실행 · 종료 · 셸 · 파일 접근은 구현 자체가 �
     expect(readAgent('credentials.mjs')).toContain("'credentials.json'");
     expect(readAgent('browser-site-registry.mjs')).not.toContain('node:fs');
     // PowerShell 쪽에도 파일 조작 cmdlet 이 없다.
-    for (const f of ['windows-window-census.ps1', 'windows-window-activate.ps1', 'windows-browser-open.ps1']) {
+    for (const f of [
+      'windows-window-census.ps1',
+      'windows-window-activate.ps1',
+      'windows-browser-open.ps1',
+      'windows-computer-inspect.ps1',
+      'windows-computer-input.ps1',
+    ]) {
       const code = readAgent(f);
       for (const forbidden of ['Get-Content', 'Set-Content', 'Remove-Item', 'Out-File', 'Invoke-']) {
         expect(code).not.toContain(forbidden);

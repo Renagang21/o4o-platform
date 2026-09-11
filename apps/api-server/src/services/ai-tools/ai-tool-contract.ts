@@ -37,6 +37,11 @@
 
 import { isRegisteredWindowsApp } from '../local-agent/windows-app-registry.js';
 import { isRegisteredBrowserSite } from '../local-agent/browser-site-registry.js';
+import {
+  validateClickArgs,
+  validateKeyArgs,
+  validateTextArgs,
+} from '../local-agent/computer-use-contract.js';
 
 // ─── Capability ──────────────────────────────────────────────────────────────
 
@@ -91,6 +96,20 @@ export const AiCapability = {
    * 표현할 수 없다(§10·§26·§32).
    */
   LOCAL_BROWSER_OPEN: 'LOCAL_BROWSER_OPEN',
+  /**
+   * 연결된 PC 의 **등재 앱 창 하나**에 대해 foreground 여부 · client 크기 · snapshot 가능 여부를
+   * 조회 (WO-O4O-COMPUTER-USE-V0 §14·§23 `local.computer.inspect`).
+   * read-only 다. 이미지 · 창 제목 · 다른 창 목록은 이 자격으로 얻을 수 없다(§10·§43).
+   */
+  READ_ONLY_LOCAL_COMPUTER_INSPECT: 'READ_ONLY_LOCAL_COMPUTER_INSPECT',
+  /**
+   * 등재 앱 창 **client 영역 안**에 한정된 상호작용 자격 (§15~§20·§23 `local.computer.interact`):
+   * 왼쪽 단일 클릭 · 짧은 일반 텍스트 · ENTER/TAB/ESC. 한 요청당 1회.
+   *
+   * 로그인 대행 · 비밀번호 · OTP · 임의 hotkey · 드래그 · 우클릭 · 다른 창 · 바탕화면은
+   * 이 자격으로 표현할 수 없다(§3·§5·§9·§22).
+   */
+  LOCAL_COMPUTER_INTERACT: 'LOCAL_COMPUTER_INTERACT',
 } as const;
 
 /**
@@ -108,6 +127,17 @@ export const AiCapability = {
  * 얻을 수 있는 것은 **등재 앱의 실행 여부·창 개수**와 **그 창을 앞으로 가져오는 것**뿐이고,
  * 파일 접근 · 임의 프로세스 실행/종료 · 키보드/마우스 · 화면 캡처는 구현 자체가 없다.
  * `local.read` · `local.write` · `browser` · `desktop` 은 **여전히 정의하지 않는다.**
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * 2026-09-11 · WO-O4O-COMPUTER-USE-V0 정정 — 위 "키보드/마우스 · 화면 캡처는 구현 자체가
+ * 없다" 는 **더 이상 사실이 아니다.**
+ *
+ * `READ_ONLY_LOCAL_COMPUTER_INSPECT` · `LOCAL_COMPUTER_INTERACT` 가 추가됐다. agent 에는
+ * 등재 앱 창의 client 영역을 **메모리에서 캡처해 크기만 돌려주고 버리는** 검사기와, 그 창이
+ * foreground 일 때만 **왼쪽 단일 클릭 · 500자 이하 텍스트 · ENTER/TAB/ESC** 를 넣는 입력기가
+ * 생겼다. 이미지는 서버에 오지 않는다(§12 저장 0). 다른 창 · 바탕화면 · 임의 키 조합 ·
+ * 로그인 폼은 여전히 표현 불가이며, `desktop`(전체 데스크톱 제어) capability 는 **정의하지
+ * 않는다**(§7 "AI 가 Windows 전체 desktop 을 자유롭게 제어하면 안 된다").
  */
 
 export type AiCapabilityKey = (typeof AiCapability)[keyof typeof AiCapability];
@@ -171,6 +201,9 @@ export function deriveAiCapabilities(ctx: VerifiedToolContext): AiCapabilityKey[
     // 브라우저 축도 같은 조건이다(BROWSER-CONTROL-V0 §43). 연결된 PC 가 있어야 열 수 있다.
     caps.push(AiCapability.READ_ONLY_LOCAL_BROWSER_INSPECT);
     caps.push(AiCapability.LOCAL_BROWSER_OPEN);
+    // 화면 조작 축도 같은 조건이다(COMPUTER-USE-V0 §25). 연결된 단일 PC 가 확정돼야 한다.
+    caps.push(AiCapability.READ_ONLY_LOCAL_COMPUTER_INSPECT);
+    caps.push(AiCapability.LOCAL_COMPUTER_INTERACT);
   }
   return caps;
 }
@@ -218,8 +251,17 @@ export interface AiToolDefinition {
    * 받는 인자의 형상. 생략하면 **인자 없음**이다(V0 기본).
    * `appId` 는 `{ appId }` 하나만 허용하며, 값은 Windows App Registry 등재분이어야 한다(§9).
    */
-  argumentSchema?: 'none' | 'appId' | 'siteId';
+  argumentSchema?: 'none' | 'appId' | 'siteId' | ComputerArgumentSchema;
 }
+
+/**
+ * COMPUTER-USE-V0 §15~§20 인자 형상. 전부 `targetId`(= 등재 appId) 를 포함한다.
+ *   computerTarget → { targetId }
+ *   computerClick  → { targetId, x, y }        x·y 는 client 영역 정규화 0..1
+ *   computerText   → { targetId, text }        1~500자, 제어문자 · credential · shell 문자열 거절
+ *   computerKey    → { targetId, key }         ENTER | TAB | ESC
+ */
+export type ComputerArgumentSchema = 'computerTarget' | 'computerClick' | 'computerText' | 'computerKey';
 
 /**
  * 부작용 종류.
@@ -235,12 +277,19 @@ export type ToolEffect =
    * 브라우저가 꺼져 있으면 OS 가 기본 브라우저를 띄운다 — "임의 process launch" 가 아니라
    * 등재 URL open 이라는 좁은 효과다(§26). 열리는 주소는 agent 등재부 상수뿐이다.
    */
-  | 'BROWSER_SITE_OPEN';
+  | 'BROWSER_SITE_OPEN'
+  /**
+   * 등재 앱 창 client 영역 안에서의 **단일 상호작용** 한 번 (COMPUTER-USE-V0 §15~§22·§31):
+   * 왼쪽 클릭 1회 · 짧은 텍스트 1건 · 허용키 1회 중 하나. 창이 foreground 가 아니면 agent 가
+   * 실행 전에 멈춘다(§9). 파일 저장 · 전송 · 종료 같은 고위험 동작은 이 효과의 이름이 아니다(§39).
+   */
+  | 'COMPUTER_INTERACTION';
 
 /** 실행이 허용된 부작용. **registry 에 무엇이 적혀 있든 이 집합이 최종 게이트다.** */
 const ALLOWED_TOOL_EFFECTS: readonly ToolEffect[] = Object.freeze([
   'FOREGROUND_ACTIVATION',
   'BROWSER_SITE_OPEN',
+  'COMPUTER_INTERACTION',
 ]);
 
 /** read-only 이거나, 허용된 effect 를 선언한 tool 만 실행 후보가 된다. */
@@ -259,6 +308,11 @@ export const AI_TOOL_NAMES = {
   // WO-O4O-BROWSER-CONTROL-V0 §13·§14
   BROWSER_GET_SITE_STATUS: 'local.browser.get_site_status',
   BROWSER_OPEN_SITE: 'local.browser.open_site',
+  // WO-O4O-COMPUTER-USE-V0 §24
+  COMPUTER_INSPECT: 'local.computer.inspect',
+  COMPUTER_CLICK: 'local.computer.click',
+  COMPUTER_TYPE_TEXT: 'local.computer.type_text',
+  COMPUTER_KEY: 'local.computer.key',
 } as const;
 
 export type AiToolName = (typeof AI_TOOL_NAMES)[keyof typeof AI_TOOL_NAMES];
@@ -340,6 +394,42 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
     readOnly: false,
     effect: 'BROWSER_SITE_OPEN',
     argumentSchema: 'siteId',
+  },
+  // ── Computer Use V0 (§14~§20·§24) — 대상은 등재 appId 하나. HWND · 창 제목은 인자에 없다.
+  {
+    name: AI_TOOL_NAMES.COMPUTER_INSPECT,
+    description: '등재된 프로그램 창이 앞에 있는지 · client 크기 · 화면 확인 가능 여부를 조회한다.',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_COMPUTER_INSPECT],
+    executionMode: 'local',
+    readOnly: true,
+    argumentSchema: 'computerTarget',
+  },
+  {
+    name: AI_TOOL_NAMES.COMPUTER_CLICK,
+    description: '등재된 프로그램 창 client 영역 안 한 점을 왼쪽 클릭 한 번 한다.',
+    requiredCapabilities: [AiCapability.LOCAL_COMPUTER_INTERACT],
+    executionMode: 'local',
+    readOnly: false,
+    effect: 'COMPUTER_INTERACTION',
+    argumentSchema: 'computerClick',
+  },
+  {
+    name: AI_TOOL_NAMES.COMPUTER_TYPE_TEXT,
+    description: '등재된 프로그램 창에 짧은 일반 텍스트를 입력한다. 로그인·비밀번호에는 쓰지 않는다.',
+    requiredCapabilities: [AiCapability.LOCAL_COMPUTER_INTERACT],
+    executionMode: 'local',
+    readOnly: false,
+    effect: 'COMPUTER_INTERACTION',
+    argumentSchema: 'computerText',
+  },
+  {
+    name: AI_TOOL_NAMES.COMPUTER_KEY,
+    description: '등재된 프로그램 창에 ENTER · TAB · ESC 중 하나를 한 번 누른다.',
+    requiredCapabilities: [AiCapability.LOCAL_COMPUTER_INTERACT],
+    executionMode: 'local',
+    readOnly: false,
+    effect: 'COMPUTER_INTERACTION',
+    argumentSchema: 'computerKey',
   },
 ]);
 
@@ -460,6 +550,32 @@ export function validateToolArguments(
       return { ok: false, reason: 'INVALID_ARGUMENTS' };
     }
     return { ok: true };
+  }
+
+  if (
+    schema === 'computerTarget' ||
+    schema === 'computerClick' ||
+    schema === 'computerText' ||
+    schema === 'computerKey'
+  ) {
+    // 화면 조작 tool (COMPUTER-USE-V0 §25): AI 가 만든 좌표·텍스트·키를 **그대로 믿지 않는다**.
+    // targetId 는 등재 appId 여야 하고, 나머지 키는 형상별로 정확히 그 키만 허용된다.
+    if (!args || typeof args !== 'object' || Array.isArray(args)) {
+      return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    }
+    const { targetId, ...rest } = args as Record<string, unknown>;
+    if (typeof targetId !== 'string' || !isRegisteredWindowsApp(targetId)) {
+      return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    }
+    const restOk =
+      schema === 'computerTarget'
+        ? Object.keys(rest).length === 0
+        : schema === 'computerClick'
+          ? validateClickArgs(rest).ok
+          : schema === 'computerText'
+            ? validateTextArgs(rest).ok
+            : validateKeyArgs(rest).ok;
+    return restOk ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
   }
 
   if (args === undefined || args === null) return { ok: true };
