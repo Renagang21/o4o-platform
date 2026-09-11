@@ -1,7 +1,8 @@
 # CHECK-O4O-KCOS-STORE-CONTENTS-WRAPPER-AND-DEAD-ASSET-MOUNT-CLOSURE-V1
 
 > **WO**: `WO-O4O-KCOS-STORE-CONTENTS-WRAPPER-AND-DEAD-ASSET-MOUNT-CLOSURE-V1`
-> **상태**: IMPLEMENTED · LOCAL PASS · PRODUCTION E2E 대기 (배포 후 §8 갱신)
+> **상태**: CLOSED_WITH_REPORT · PRODUCTION E2E PASS (`/store-assets` = PRESERVED_WITH_REASON)
+> **구현 commit**: `75e478747` · 배포 run `34546276830` success · revision `o4o-core-api-03601-rpl`
 > **기준 commit**: `origin/main` = `60bfb79ff` (worktree `work/kcos-store-contents-wrapper-dead-mount-v1`)
 > **작성일**: 2026-09-11
 > **선행**: `CHECK-O4O-KCOS-LIBRARY-ORGANIZATION-SCOPE-AND-SNAPSHOT-ROUTE-CLOSURE-V1` (`/assets` 축 · 같은 계열 결함) ·
@@ -136,23 +137,59 @@ WO 중지 조건: "consumer 가 남아 있는데 route 제거가 필요함".
 
 ---
 
-## 8. Production E2E
+## 8. Production E2E (2026-09-11 · `api.neture.co.kr` · 배포 전 baseline vs 배포 후)
 
-_(배포 후 갱신)_
+계정은 `docs/local/TEST-ACCOUNTS.local.md` 에서 런타임에만 읽었다 (코드·문서·커밋 기록 0). 응답은 status · error code · 건수만 기록.
+
+### 8-1. 같은 계정 cross-service tenant 테스트 — `renagang21` (KPA 약국 + PH 약국 + KCos 뷰티샵 + Neture 공급자 조직 보유)
+
+| 요청 | 배포 전 (`60bfb79ff`) | 배포 후 (`75e478747`) |
+|---|---|---|
+| KPA `GET /kpa/store-contents` | 200 n=15 | 200 n=15 (불변) |
+| PH `GET /pharmacy-hub/store-owner/content` | 200 n=0 | 200 n=0 (불변) |
+| **KCos `GET /cosmetics/store-contents`** | **200 n=15 — KPA 조직 15건이 그대로 노출 (KPA∩KCos = 15)** | **200 n=0 · KPA∩KCos = 0** |
+| KCos `GET /cosmetics/store/assets` (execution assets) | 200 n=5 | 200 n=5 (불변) |
+| KCos `GET /cosmetics/assets` (own snapshots) | 200 n=0 | 200 n=0 (불변) |
+| KCos `GET /cosmetics/store-assets` (PRESERVED) | 200 n=2 | 200 n=2 (불변 — §3 잔여) |
+| KCos `GET /cosmetics/published-assets/<uuid>` | 200 | **404** |
+| KCos `GET /cosmetics/store-contents/by-product` (KPA 전용 흐름) | 400 VALIDATION_ERROR (라우트 존재) | **404** (비노출) |
+| Neture `GET /neture/store-assets` | 200 n=2 | **404** |
+| Neture `GET /neture/assets` (범위 밖 · 불변) | 200 n=7 | 200 n=7 |
+| KPA `GET /kpa/store-assets` · `/kpa/published-assets/*` | 200 | 200 (불변) |
+
+read-only DB 확인 (COUNT 만): 해당 계정의 조직별 `kpa_store_contents` 건수 = pharmacy 15 · store(KCos) **0** · supplier 0
+→ 배포 후 KCos n=0 은 **KCos 조직의 실제 건수**이며, 배포 전 15 는 KPA 조직 데이터 누출이었음이 확정.
+
+### 8-2. KCos 매장 조직이 없는 계정 — `sohae2100` (KPA store_owner · cosmetics admin/operator · KCos store_owner 아님)
+
+| 요청 | 배포 전 | 배포 후 |
+|---|---|---|
+| KCos `GET /cosmetics/store-contents` | 200 n=0 (KPA 조직으로 해석 — 우연히 0건) | **403 NO_ORG** (KPA 대체 없음) |
+| KCos `/store/assets` · `/assets` | 403 STORE_OWNER_REQUIRED · 403 NO_ORGANIZATION | 동일 (불변) |
+| KPA `/kpa/store-contents` · `/kpa/store-assets` | 200 n=0 · 200 n=4 | 동일 (불변) |
+| PH `/pharmacy-hub/store-owner/content` | 200 n=0 | 동일 |
+| 제거 마운트 3종 | 200 | 404 |
+
+### 8-3. 판정
+
+- KCos `/store-contents` tenant scope = **PASS** (KPA 데이터 노출 0 · KCos own execution assets/snapshots 정상)
+- KPA / PH 회귀 = **PASS** (양 계정 · 전 경로 배포 전후 동일)
+- dead mount 3종(KCos `/published-assets` · KCos `/store-contents` KPA 전용 하위 경로 · Neture `/store-assets`) = 404
+- production DB write 0 · 5xx 0
 
 ---
 
 ## 9. 완료 조건
 
 ```text
-KCOS STORE-CONTENTS TENANT SCOPE = PASS (로컬) · production E2E 대기
+KCOS STORE-CONTENTS TENANT SCOPE = PASS
 KCOS KPA-ASSET MOUNT             = PRESERVED_WITH_REASON (중지 조건 — §3)
 PUBLISHED-ASSET DEAD MOUNT       = REMOVED (KCos) · KPA 유지
 NETURE DEAD STORE-ASSET MOUNT    = REMOVED
 KPA_STORE_ASSET_CONTROLS         = PRESERVED
-KPA / PH REGRESSION              = PASS (로컬) · production E2E 대기
+KPA / PH REGRESSION              = PASS
 SCHEMA CHANGE                    = 0
-PRODUCTION E2E                   = 대기
+PRODUCTION E2E                   = PASS
 ```
 
 ---
