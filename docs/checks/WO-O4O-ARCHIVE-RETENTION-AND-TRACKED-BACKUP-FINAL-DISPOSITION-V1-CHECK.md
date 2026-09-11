@@ -1,8 +1,9 @@
 # CHECK — WO-O4O-ARCHIVE-RETENTION-AND-TRACKED-BACKUP-FINAL-DISPOSITION-V1
 
-> 상태: IMPLEMENTATION_COMPLETE_CI_PENDING (§10 에서 CI 확정 후 갱신)
+> 상태: CLOSED (CI 4/4 success · 2026-09-11)
 > 작성일: 2026-09-11
-> 기준 origin/main: `6ae74cbd6` (worktree `work/o4o-archive-disposition-v1`)
+> 기준 origin/main: `6ae74cbd6` → rebase `d0eaa24a4` (worktree `work/o4o-archive-disposition-v1`)
+> 구현 커밋: `202b852ca` · CHECK: `fb4373641` (push 후 HEAD == origin/main)
 > 정책 정본: [`docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md §8`](../rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md) (본 WO 에서 추가)
 
 ---
@@ -168,7 +169,15 @@
 
 ## 10. CI (§13)
 
-(push 후 갱신)
+push SHA `fb4373641` (구현 `202b852ca` + CHECK). 모든 run 이 본 SHA 에서 직접 완주 (concurrency 취소 없음).
+
+| Workflow | run | SHA | 결과 |
+|---|---|---|---|
+| CI Pipeline | 34561225523 | `fb4373641` | success |
+| CodeQL Security Analysis | 34561225165 | `fb4373641` | success |
+| Deploy API Server (Cloud Run) | 34561225185 | `fb4373641` | success |
+| Deploy Admin Dashboard (Cloud Run) | 34561225100 | `fb4373641` | success |
+| Deploy Web (Cloud Run) · AppStore Guard · 문서/링크 · secret scanning | — | — | NOT_TRIGGERED (path filter — 변경 파일이 트리거 경로 밖) |
 
 ---
 
@@ -201,11 +210,11 @@ MIGRATION_HISTORY                = PRESERVED
 ARCHIVE_SECRET_EXPOSURE          = ZERO
 BROKEN_ACTIVE_ARCHIVE_LINKS      = ZERO
 OTHER_SERVICE_REGRESSION         = PASS
-CI_PIPELINE                      = PENDING
-CODEQL                           = PENDING
+CI_PIPELINE                      = SUCCESS
+CODEQL                           = SUCCESS
 
 ARCHIVE_RETENTION_AND_TRACKED_BACKUP_FINAL_DISPOSITION
-  = IMPLEMENTATION_COMPLETE_CI_PENDING
+  = CLOSED
 ```
 
 `TRACKED_GENERATED_ARCHIVES = ZERO` 주석: §3 범위(`archive/**` · `docs/archive/**` · backup 패턴) 안의 생성 산출물은 0. 범위 밖 `tmp/**` 는 §11-1 로 인계.
