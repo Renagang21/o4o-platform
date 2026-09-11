@@ -53,8 +53,6 @@ import adminSecurityBlockedIpsRoutes from '../routes/admin/security-blocked-ips.
 // DOMAIN ROUTE IMPORTS (registered after DB init)
 // ============================================================================
 
-import navigationRoutes from '../routes/navigation.routes.js';
-import routesRoutes from '../routes/routes.routes.js';
 import publicRoutes from '../routes/public.routes.js';
 import platformInquiryRoutes, { adminRouter as platformInquiryAdminRoutes } from '../routes/v1/platformInquiry.routes.js';
 import { createPlatformServicesRoutes } from '../routes/platform-services/platform-services.routes.js';
@@ -247,13 +245,11 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     //     CI AppStore Guard · multi-tenant 스펙이 계속 소비한다.
     // ========================================================================
 
-    // 4.1 Register Navigation routes (Phase P0 Task A - Dynamic Navigation)
-    app.use('/api/v1/navigation', navigationRoutes);
-    logger.info('✅ Navigation routes registered at /api/v1/navigation');
-
-    // 4.2 Register Routes API (Phase P0 Task B - Dynamic Routing)
-    app.use('/api/v1/routes', routesRoutes);
-    logger.info('✅ Routes API registered at /api/v1/routes');
+    // 4.1 / 4.2 (제거됨) /api/v1/navigation · /api/v1/routes — WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1
+    //   Phase P0 Task A/B 의 "Dynamic Navigation / Dynamic Routing" stub. 두 라우트 모두
+    //   Phase R1 이후 항상 `data: []` 를 반환하는 인증 없는 영구 stub 이었고, 유일한 소비처
+    //   (admin-dashboard useAdminMenu · DynamicRouteLoader) 를 같은 WO 에서 제거했다
+    //   (DEAD_ABSTRACTION / STUB_NAVIGATION_DEPENDENCY). 30일 호출 = useAdminMenu 자동 호출뿐.
 
     // 5–7. WO-O4O-SERVICE-PROVISIONING-CANONICAL-CONTRACT-AND-LEGACY-API-CLOSURE-V1
     //   (판정 SERVICE_PROVISIONING_LEGACY_RETIRE — 전 축)

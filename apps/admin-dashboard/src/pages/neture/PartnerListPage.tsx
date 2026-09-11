@@ -2,10 +2,15 @@
  * Neture Admin Partner List Page
  *
  * Phase D-3: Admin Dashboard에 Neture 서비스 등록
+ *
+ * WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+ *   상태 변경(PATCH /neture/admin/partners/:id/status) · 삭제(DELETE /neture/admin/partners/:id) 는
+ *   backend 계약이 없어(admin-partner.controller 는 GET 2건만) 항상 404 였다 → 두 액션을 제거하고
+ *   NetureRouter 헤더 문서대로 조회 전용으로 맞췄다. 편집 화면(PartnerDetailPage) 진입은 유지.
  */
 
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 
@@ -100,16 +105,7 @@ async function fetchPartners(params: {
   return response.data;
 }
 
-async function deletePartner(id: string): Promise<void> {
-  await authClient.api.delete(`/neture/admin/partners/${id}`);
-}
-
-async function updatePartnerStatus(id: string, status: string): Promise<void> {
-  await authClient.api.patch(`/neture/admin/partners/${id}/status`, { status });
-}
-
 const PartnerListPage: React.FC = () => {
-  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [type, setType] = useState('');
   const [status, setStatus] = useState('');
@@ -118,32 +114,6 @@ const PartnerListPage: React.FC = () => {
     queryKey: ['neture', 'admin', 'partners', { page, type, status }],
     queryFn: () => fetchPartners({ page, limit: 20, type: type || undefined, status: status || undefined }),
   });
-
-  const deleteMutation = useMutation({
-    mutationFn: deletePartner,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['neture', 'admin', 'partners'] });
-    },
-  });
-
-  const statusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) => updatePartnerStatus(id, status),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['neture', 'admin', 'partners'] });
-    },
-  });
-
-  const handleDelete = (partner: Partner) => {
-    if (window.confirm(`"${partner.name}" 파트너를 삭제하시겠습니까?`)) {
-      deleteMutation.mutate(partner.id);
-    }
-  };
-
-  const handleStatusChange = (partner: Partner, newStatus: string) => {
-    if (newStatus !== partner.status) {
-      statusMutation.mutate({ id: partner.id, status: newStatus });
-    }
-  };
 
   if (error) {
     return (
@@ -262,15 +232,9 @@ const PartnerListPage: React.FC = () => {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <select
-                        value={partner.status}
-                        onChange={(e) => handleStatusChange(partner, e.target.value)}
-                        className={`px-2 py-1 text-xs rounded border-0 ${STATUS_COLORS[partner.status] || 'bg-gray-100'}`}
-                      >
-                        {STATUS_OPTIONS.filter((s) => s.value).map((s) => (
-                          <option key={s.value} value={s.value}>{s.label}</option>
-                        ))}
-                      </select>
+                      <span className={`px-2 py-1 text-xs rounded ${STATUS_COLORS[partner.status] || 'bg-gray-100 text-gray-700'}`}>
+                        {STATUS_OPTIONS.find((s) => s.value === partner.status)?.label || partner.status}
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500">
                       {new Date(partner.created_at).toLocaleDateString('ko-KR')}
@@ -283,13 +247,6 @@ const PartnerListPage: React.FC = () => {
                         >
                           편집
                         </Link>
-                        <button
-                          onClick={() => handleDelete(partner)}
-                          disabled={deleteMutation.isPending}
-                          className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"
-                        >
-                          삭제
-                        </button>
                       </div>
                     </td>
                   </tr>

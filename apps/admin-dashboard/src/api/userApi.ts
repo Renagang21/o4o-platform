@@ -65,26 +65,19 @@ export class UserApi {
     return response.data
   }
 
+  // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+  //   approve/reject 는 `/admin/users/*` (backend 없음, /api/admin/… 404) 를 호출하고 있었다.
+  //   backend 계약은 `POST /api/v1/users/:id/approve|reject` (users.routes.ts) → prefix 수정.
+  //   suspend/reactivate 주석 코드 · migrateUserRoles(`/admin/users/migrate-roles`, backend 없음·소비처 0) 제거.
   static async approveUser(userId: string, notes?: string): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.post(`/admin/users/${userId}/approve`, { notes })
+    const response = await unifiedApi.raw.post(`/v1/users/${userId}/approve`, { notes })
     return response.data
   }
 
   static async rejectUser(userId: string, reason: string): Promise<ApiResponse<User>> {
-    const response = await unifiedApi.raw.post(`/admin/users/${userId}/reject`, { notes: reason })
+    const response = await unifiedApi.raw.post(`/v1/users/${userId}/reject`, { notes: reason })
     return response.data
   }
-
-  // TODO: Implement suspend/reactivate endpoints in backend
-  // static async suspendUser(userId: string, reason: string): Promise<ApiResponse<User>> {
-  //   const response = await apiClient.post(`/users/${userId}/suspend`, { reason })
-  //   return response.data
-  // }
-
-  // static async reactivateUser(userId: string): Promise<ApiResponse<User>> {
-  //   const response = await apiClient.post(`/users/${userId}/reactivate`)
-  //   return response.data
-  // }
 
   static async deleteUser(userId: string): Promise<ApiResponse<void>> {
     const response = await unifiedApi.raw.delete(`/v1/users/${userId}`)
@@ -120,9 +113,4 @@ export class UserApi {
     return response.data
   }
 
-  // Legacy role migration helper
-  static async migrateUserRoles(): Promise<ApiResponse<void>> {
-    const response = await unifiedApi.raw.post('/admin/users/migrate-roles')
-    return response.data
-  }
 }

@@ -1,34 +1,19 @@
 /**
- * useAdminMenu - Dynamic Admin Navigation Hook
+ * useAdminMenu - Admin Navigation Hook
  *
- * Phase P0 Task A: Dynamic Navigation System
+ * 메뉴 SSOT 는 `@/admin/menu/admin-menu.static` 이다. 이 hook 은
+ * 1. 정적 메뉴에 CPT 메뉴를 주입하고
+ * 2. 사용자 권한(`/v1/userRole/:id/permissions`) · app 상태로 노출을 필터한다.
  *
- * This hook provides admin menu items by:
- * 1. Fetching from Navigation API (NavigationRegistry)
- * 2. Falling back to hardcoded menu if API fails
- * 3. Injecting CPT menus dynamically
- * 4. Filtering based on app status and permissions
+ * WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+ *   과거 "Phase P0 Task A: Dynamic Navigation System" 의 `/v1/navigation/admin`
+ *   fetch 분기(NavigationRegistry)는 backend 가 영구 stub(`data: []`)이라 단 한 번도
+ *   메뉴를 공급한 적이 없다 → STUB_NAVIGATION_DEPENDENCY 로 판정하고 제거했다.
+ *   backend `/api/v1/navigation` · `/api/v1/routes` stub 도 같은 WO 에서 함께 제거됐다.
+ *   메뉴 노출은 인가 경계가 아니다 — 실제 권한 검사는 backend 계약이 담당한다.
  */
 
-import React from 'react';
 import { useEffect, useState, useCallback } from 'react';
-import {
-  LayoutDashboard as LayoutDashboardIcon,
-  Database as DatabaseIcon,
-  FileText as FileTextIcon,
-  Package as PackageIcon,
-  Settings as SettingsIcon,
-  Menu as MenuIcon,
-  Image as ImageIcon,
-  Users as UsersIcon,
-  Globe as GlobeIcon,
-  Truck as TruckIcon,
-  Activity as ActivityIcon,
-  Monitor as MonitorIcon,
-  Calendar as CalendarIcon,
-  BarChart2 as BarChart2Icon,
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { adminMenuStatic, MenuItem } from '@/admin/menu/admin-menu.static';
 import { useDynamicCPTMenu, injectCPTMenuItems } from './useDynamicCPTMenu';
 import { useAuth } from '@o4o/auth-context';
@@ -36,25 +21,6 @@ import { hasMenuPermission } from '@/config/rolePermissions';
 import { unifiedApi } from '@/api/unified-client';
 import { useAppStatus } from './useAppStatus';
 
-interface NavigationApiResponse {
-  success: boolean;
-  data: MenuItem[];
-  total: number;
-  context?: {
-    serviceGroup?: string;
-    tenantId?: string;
-    userRoles?: string[];
-    authenticated?: boolean;
-  };
-}
-
-/**
- * Admin menu hook that provides dynamic navigation
- * - Fetches from NavigationRegistry API
- * - Falls back to hardcoded menu during transition
- * - Injects CPT menus
- * - Filters by app status and permissions
- */
 export const useAdminMenu = () => {
   const { user } = useAuth();
   const { cptMenuItems, isLoading: cptLoading } = useDynamicCPTMenu();
@@ -64,7 +30,6 @@ export const useAdminMenu = () => {
     isUnavailable: appStatusUnavailable,
   } = useAppStatus();
 
-  const [dynamicMenuItems, setDynamicMenuItems] = useState<MenuItem[] | null>(null);
   const [apiLoading, setApiLoading] = useState(true);
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
 
@@ -72,11 +37,9 @@ export const useAdminMenu = () => {
   const rawRoles = (user as any)?.roles || (user?.role ? [{ name: user.role }] : []);
   const userRoles: string[] = rawRoles.map((r: any) => typeof r === 'string' ? r : r.name).filter(Boolean);
 
-  // Optimized: Fetch navigation AND permissions in PARALLEL
   useEffect(() => {
-    const fetchMenuData = async () => {
+    const fetchPermissions = async () => {
       if (!user?.id) {
-        setDynamicMenuItems(null);
         setUserPermissions([]);
         setApiLoading(false);
         return;
@@ -84,43 +47,14 @@ export const useAdminMenu = () => {
 
       setApiLoading(true);
 
-      // Parallel fetch: navigation + permissions
-      const [navigationResult, permissionsResult] = await Promise.allSettled([
-        unifiedApi.raw.get<NavigationApiResponse>('/v1/navigation/admin'),
-        unifiedApi.raw.get(`/v1/userRole/${user.id}/permissions`)
-      ]);
-
-      // Process navigation result
-      if (navigationResult.status === 'fulfilled') {
-        const response = navigationResult.value;
-        if (response.data?.success && response.data.data?.length > 0) {
-          const menuItems = transformApiMenuItems(response.data.data);
-          setDynamicMenuItems(menuItems);
-          if (process.env.NODE_ENV === 'development') {
-            console.debug('[useAdminMenu] Loaded from API:', menuItems.length, 'items');
-          }
-        } else {
-          setDynamicMenuItems(null);
-          if (process.env.NODE_ENV === 'development') {
-            console.debug('[useAdminMenu] API returned empty, using fallback menu');
-          }
-        }
-      } else {
-        setDynamicMenuItems(null);
-        if (process.env.NODE_ENV === 'development') {
-          console.debug('[useAdminMenu] API failed, using fallback menu:', navigationResult.reason);
-        }
-      }
-
-      // Process permissions result
-      if (permissionsResult.status === 'fulfilled') {
-        const response = permissionsResult.value;
+      try {
+        const response = await unifiedApi.raw.get(`/v1/userRole/${user.id}/permissions`);
         if (response.data?.success) {
           setUserPermissions(response.data.data?.permissions || []);
         } else {
           setUserPermissions(user.permissions || []);
         }
-      } else {
+      } catch {
         // Use fallback permissions
         const fallbackPermissions = user.permissions?.length
           ? user.permissions
@@ -131,14 +65,11 @@ export const useAdminMenu = () => {
       setApiLoading(false);
     };
 
-    fetchMenuData();
+    fetchPermissions();
   }, [user?.id]);
 
-  // Determine base menu items - API or fallback
-  const baseMenuItems = dynamicMenuItems || [...adminMenuStatic];
-
-  // Inject CPT menus into base menu
-  const allMenuItems = injectCPTMenuItems(baseMenuItems, cptMenuItems);
+  // Inject CPT menus into the static menu
+  const allMenuItems = injectCPTMenuItems([...adminMenuStatic], cptMenuItems);
 
   // Filter menu items based on permissions and app status
   const filterMenuItems = useCallback((items: MenuItem[]): MenuItem[] => {
@@ -171,17 +102,12 @@ export const useAdminMenu = () => {
       }
 
       // Check if user has permission for this menu item
-      // Only apply local permission filtering if using fallback menu
-      // API-sourced menus are already filtered by the server
-      if (!dynamicMenuItems) {
-        const hasAccess = hasMenuPermission(userRoles, userPermissions, item.id);
-
-        if (!hasAccess) {
-          if (process.env.NODE_ENV === 'development') {
-            console.debug(`[Menu Filter] No permission: ${item.id}`);
-          }
-          return null as unknown as MenuItem;
+      const hasAccess = hasMenuPermission(userRoles, userPermissions, item.id);
+      if (!hasAccess) {
+        if (process.env.NODE_ENV === 'development') {
+          console.debug(`[Menu Filter] No permission: ${item.id}`);
         }
+        return null as unknown as MenuItem;
       }
 
       // Recursively filter children
@@ -196,79 +122,14 @@ export const useAdminMenu = () => {
       return item;
     }).filter(Boolean);
     // WO-O4O-ADMIN-APP-AVAILABILITY-READ-CONTRACT-FIX-V1: 상태 확정 여부도 의존성에 포함
-  }, [isAppActive, appStatusLoading, appStatusUnavailable, userRoles, userPermissions, dynamicMenuItems]);
+  }, [isAppActive, appStatusLoading, appStatusUnavailable, userRoles, userPermissions]);
 
   const filteredMenuItems = filterMenuItems([...allMenuItems]);
-
-  // Debug log
-  if (process.env.NODE_ENV === 'development') {
-    console.debug(
-      `[Menu] Source: ${dynamicMenuItems ? 'API' : 'Fallback'}, ` +
-      `Showing ${filteredMenuItems.length}/${allMenuItems.length} items`
-    );
-  }
 
   return {
     menuItems: filteredMenuItems,
     isLoading: apiLoading || cptLoading || appStatusLoading,
     userRoles,
     userPermissions,
-    isUsingFallback: !dynamicMenuItems
   };
 };
-
-/**
- * Transform API menu items to MenuItem format with React icons
- * API returns icon as string name, needs to be converted to React element
- */
-function transformApiMenuItems(items: any[]): MenuItem[] {
-  return items.map(item => {
-    const menuItem: MenuItem = {
-      id: item.id,
-      label: item.label,
-      icon: getIconComponent(item.icon),
-      path: item.path,
-      // WO-O4O-ADMIN-RBAC-LEGACY-AND-NAVIGATION-CLEANUP-CONSOLIDATED-V1:
-      //   MenuItem.roles 는 어디에서도 읽히지 않는 dead metadata 라 제거했다.
-      //   메뉴 가시성 게이트는 hasMenuPermission(menuId) 이 담당한다.
-      children: item.children ? transformApiMenuItems(item.children) : undefined
-    };
-
-    // Preserve appId for app status filtering
-    if (item.appId) {
-      (menuItem as any).appId = item.appId;
-    }
-
-    return menuItem;
-  });
-}
-
-/**
- * Convert icon string name to Lucide React icon component
- * Falls back to a default icon if not found
- */
-function getIconComponent(iconName?: string): React.ReactElement {
-  // Icon map using React.createElement (no JSX in .ts file)
-  const iconMap: Record<string, LucideIcon> = {
-    'layout': LayoutDashboardIcon,
-    'dashboard': LayoutDashboardIcon,
-    'database': DatabaseIcon,
-    'document': FileTextIcon,
-    'collection': PackageIcon,
-    'adjustments': SettingsIcon,
-    'menu': MenuIcon,
-    'photograph': ImageIcon,
-    'users': UsersIcon,
-    'settings': SettingsIcon,
-    'package': PackageIcon,
-    'globe': GlobeIcon,
-    'truck': TruckIcon,
-    'activity': ActivityIcon,
-    'monitor': MonitorIcon,
-    'calendar': CalendarIcon,
-    'chart': BarChart2Icon,
-  };
-
-  const IconComponent = iconMap[iconName || ''] || FileTextIcon;
-  return React.createElement(IconComponent, { className: 'w-5 h-5' });
-}

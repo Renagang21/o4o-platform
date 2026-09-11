@@ -1,7 +1,6 @@
 // Role-based menu permissions configuration
 // Dynamically handles roles from database
 
-import { authClient } from '@o4o/auth-client';
 
 export interface MenuPermission {
   menuId: string;
@@ -373,48 +372,9 @@ export function getAccessibleMenus(
     .map(menu => menu.menuId);
 }
 
-/**
- * Role configuration should be fetched from API
- * This is a placeholder for the actual API call
- */
-export interface RoleConfig {
-  id: string;
-  name: string;
-  displayName: string;
-  permissions: string[];
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * Fetch roles from database
- * This should be replaced with actual API call
- */
-export async function fetchRolesFromDatabase(): Promise<RoleConfig[]> {
-  try {
-    const response = await authClient.api.get('/roles');
-    return response.data || [];
-  } catch (error) {
-    console.error('Error fetching roles:', error);
-    // Return empty array as fallback
-    return [];
-  }
-}
-
-/**
- * Fetch user's permissions from database
- * This should be replaced with actual API call
- */
-export async function fetchUserPermissions(userId: string): Promise<string[]> {
-  try {
-    const response = await authClient.api.get(`/userRole/${userId}/permissions`);
-    return response.data?.permissions || [];
-  } catch (error) {
-    console.error('Failed to fetch user permissions:', error);
-    return [];
-  }
-}
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+//   RoleConfig / fetchRolesFromDatabase(`/roles`, backend 없음) / fetchUserPermissions 는
+//   소비처 0 인 placeholder 라 제거했다. 권한 조회는 useAdminMenu 가 담당한다.
 
 // Export for backward compatibility
 export default menuPermissions;

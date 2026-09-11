@@ -9,10 +9,15 @@ const UserDetail = lazy(() => import('@/pages/users/UserDetail'));
 const ActiveUsers = lazy(() => import('@/pages/users/ActiveUsers'));
 // Operators Management (admin.neture.co.kr)
 const OperatorsPage = lazy(() => import('@/pages/operators'));
-// P0 RBAC: Enrollment Management
-const EnrollmentManagement = lazy(() => import('@/pages/enrollments/EnrollmentManagement'));
-// P4-Admin: Role Applications Management
-const RoleApplicationsAdminPage = lazy(() => import('@/pages/RoleApplicationsAdminPage'));
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1 (§8 · §9):
+//   `/enrollments` · `/admin/enrollments` (pages/enrollments/EnrollmentManagement) 와
+//   `/admin/role-applications` (pages/RoleApplicationsAdminPage + PendingApplicationsWidget +
+//   useRoleApplicationsCount) 제거 — 판정 REMOVE_BROKEN_UI.
+//     · backend `/api/v1/admin/enrollments*` · `/api/v1/admin/roles/applications*` 부재
+//       (backend 에 있는 것은 `/api/v2/roles/applications/my` 뿐 — 신청자 본인 조회).
+//     · 메뉴 노출 0 · 프로덕션 30일 호출 0 · 위젯 hook 은 `count: 0` 영구 stub.
+//   역할 신청 승인의 살아 있는 정본은 서비스별 admin 화면
+//   (`/admin/kpa-branch/service-members` 등)이다.
 // WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1: kpa-branch 서비스 가입 승인
 const BranchServiceMembersPage = lazy(() => import('@/pages/kpa/BranchServiceMembersPage'));
 // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: Operator Policy
@@ -26,7 +31,7 @@ const PageLoader = () => (
 );
 
 /**
- * User management routes — users, operators, enrollments, role applications
+ * User management routes — users, operators, kpa-branch service members, operator policy
  */
 export function UserRoutes() {
   return [
@@ -100,31 +105,6 @@ export function UserRoutes() {
       <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['users:update']}>
         <Suspense fallback={<PageLoader />}>
           <UserForm />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // P0 RBAC: 역할 신청 관리
-    <Route key="/enrollments" path="/enrollments" element={
-      <AdminProtectedRoute requiredPermissions={['users:update']}>
-        <Suspense fallback={<PageLoader />}>
-          <EnrollmentManagement />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/enrollments" path="/admin/enrollments" element={
-      <AdminProtectedRoute requiredPermissions={['users:update']}>
-        <Suspense fallback={<PageLoader />}>
-          <EnrollmentManagement />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // P4-Admin: 역할 신청 관리
-    <Route key="/admin/role-applications" path="/admin/role-applications" element={
-      <AdminProtectedRoute requiredPermissions={['users:update']}>
-        <Suspense fallback={<PageLoader />}>
-          <RoleApplicationsAdminPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,

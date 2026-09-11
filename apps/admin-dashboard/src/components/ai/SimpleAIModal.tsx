@@ -237,7 +237,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
                 <span className="font-medium text-blue-900">Google Gemini AI 사용</span>
               </div>
               <p className="text-xs text-blue-700 mt-1">
-                💡 <a href="/admin/settings/app-services" target="_blank" className="underline hover:no-underline">
+                💡 <a href="/settings/app-services" target="_blank" className="underline hover:no-underline">
                   AI Services 설정
                 </a>에서 Gemini 앱을 먼저 설치하세요.
               </p>
@@ -278,7 +278,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
                 <p>Google AI Studio에서 발급받은 API 키를 입력하세요</p>
                 {!apiKey && (
                   <p className="text-blue-600">
-                    💡 <a href="/admin/settings/app-services" target="_blank" className="underline hover:no-underline">
+                    💡 <a href="/settings/app-services" target="_blank" className="underline hover:no-underline">
                       AI Services 설정
                     </a>에서 API 키를 미리 저장하면 자동으로 입력됩니다.
                   </p>

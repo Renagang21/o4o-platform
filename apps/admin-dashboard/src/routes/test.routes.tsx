@@ -10,8 +10,7 @@ const EditorTest = lazy(() => import('@/pages/test/MinimalEditor'));
 const AIPageGeneratorTest = lazy(() => import('@/pages/test/AIPageGeneratorTest'));
 const FocusRestorationTest = lazy(() => import('@/pages/test/FocusRestorationTest'));
 const AIBlockDebug = lazy(() => import('@/pages/test/AIBlockDebug'));
-const SeedPresets = lazy(() => import('@/pages/test/SeedPresets'));
-const PresetIntegrationTest = lazy(() => import('@/pages/test/PresetIntegrationTest'));
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1: seed-presets · preset-integration 은 backend 없는 /api/v1/presets 소비 화면이라 제거.
 const DeleteCustomizerTest = lazy(() => import('@/pages/test/DeleteCustomizerTest'));
 const AuthDebug = lazy(() => import('@/pages/test/AuthDebug'));
 const UserEditTest = lazy(() => import('@/pages/test/UserEditTest'));
@@ -80,18 +79,6 @@ export function TestRoutes() {
     <Route key="/admin/test/ai-block-debug" path="/admin/test/ai-block-debug" element={
       <Suspense fallback={<PageLoader />}>
         <AIBlockDebug />
-      </Suspense>
-    } />,
-    // Test - Seed Presets
-    <Route key="/admin/test/seed-presets" path="/admin/test/seed-presets" element={
-      <Suspense fallback={<PageLoader />}>
-        <SeedPresets />
-      </Suspense>
-    } />,
-    // Test - Preset Integration
-    <Route key="/admin/test/preset-integration" path="/admin/test/preset-integration" element={
-      <Suspense fallback={<PageLoader />}>
-        <PresetIntegrationTest />
       </Suspense>
     } />,
     // Test - Delete Customizer

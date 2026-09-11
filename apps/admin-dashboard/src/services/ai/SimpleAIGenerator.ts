@@ -8,7 +8,10 @@
  * - Server handles authentication, rate limiting, and key injection
  */
 
-import { authClient } from '@o4o/auth-client';
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+//   backend 는 `/api/ai/generate` (ai-proxy.routes, /api/ai mount) 이다. authClient.api 의 base 는
+//   `/api/v1` 이라 `/api/v1/ai/generate` → 404 였다 → base `/api` 인 unifiedApi.raw 로 호출한다.
+import { unifiedApi } from '@/api/unified-client';
 import {
   buildSimpleGeneratorV2,
   buildSimpleGeneratorLegacy,
@@ -211,7 +214,7 @@ export class SimpleAIGenerator {
     updateProgress?: (progress: number, message: string) => void
   ): Promise<any> {
     try {
-      const response = await authClient.api.post('/ai/generate', {
+      const response = await unifiedApi.raw.post('/ai/generate', {
         provider: config.provider,
         model: config.model,
         systemPrompt,
@@ -239,7 +242,7 @@ export class SimpleAIGenerator {
       // Return the result object (not just blocks array) for validation
       return successData.result || { blocks: [] };
     } catch (error: any) {
-      // Handle authClient errors
+      // Handle axios errors
       if (error.response) {
         const status = error.response.status;
 

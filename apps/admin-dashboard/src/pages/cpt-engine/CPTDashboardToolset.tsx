@@ -25,8 +25,10 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { cptApi } from '@/features/cpt-acf/services/cpt.api';
-import { acfGroupApi } from '@/features/cpt-acf/services/acf.api';
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+//   field group 목록은 backend 없는 `/api/v1/acf/custom-field-groups` (acfGroupApi) 대신
+//   실존 계약 `GET /api/v1/cpt/field-groups` (fieldGroupApi) 로 읽는다.
+import { cptApi, fieldGroupApi } from '@/features/cpt-acf/services/cpt.api';
 import { useAdminNotices } from '@/hooks/useAdminNotices';
 import type { ACFFieldGroup } from '@o4o/types/cpt';
 
@@ -83,7 +85,7 @@ const CPTDashboardToolset = () => {
   const { data: fieldGroups = [], isLoading: fieldsLoading } = useQuery({
     queryKey: ['acf-field-groups'],
     queryFn: async () => {
-      const response = await acfGroupApi.getAllGroups();
+      const response = await fieldGroupApi.getAll();
       return response.data || [];
     }
   });

@@ -54,30 +54,7 @@ export async function getRoleLabel(role: string): Promise<string> {
   return role;
 }
 
-/**
- * Fetch all available roles from database
- */
-export interface RoleDefinition {
-  id: string;
-  name: string;
-  displayName: string;
-  description?: string;
-  permissions: string[];
-  isActive: boolean;
-}
-
-export async function fetchAvailableRoles(): Promise<RoleDefinition[]> {
-  try {
-    const response = await fetch('/api/v1/roles');
-    if (!response.ok) {
-      throw new Error('Failed to fetch roles');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching roles:', error);
-    return [];
-  }
-}
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1: RoleDefinition / fetchAvailableRoles(`/api/v1/roles`, backend 없음 · 소비처 0) 제거.
 
 export const roleDisplayNames: Record<UserRole, string> = ROLE_LABELS;
 

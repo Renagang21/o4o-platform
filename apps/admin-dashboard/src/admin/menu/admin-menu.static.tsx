@@ -8,9 +8,9 @@
  *   조사 정본: `docs/investigations/IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1.md`
  *
  * 파일명의 `static` 은 역사적 이름이다. 과거에는 `/api/v1/navigation/admin` 이 정본이고 이 파일이
- * fallback 이었으나, 그 endpoint 는 Phase R1 이후 **영구 stub**(`data: []`)이다
- * (`apps/api-server/src/routes/navigation.routes.ts:18`). 따라서 `useAdminMenu` 의 API 분기는
- * 도달할 수 없고 이 파일이 실제 정본이다.
+ * fallback 이었으나, 그 endpoint 는 Phase R1 이후 영구 stub(`data: []`)이었고
+ * WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1 에서 backend stub 과
+ * `useAdminMenu` 의 API 분기를 모두 제거했다. 이 파일이 유일한 메뉴 정본이다.
  *
  * ## 사이트의 역할 (2026-09-09 확정)
  *

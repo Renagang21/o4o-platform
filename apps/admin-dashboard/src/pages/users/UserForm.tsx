@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import BusinessInfoSection from './components/BusinessInfoSection';
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1: BusinessInfoSection (backend 없는 /users/:id/business-info 전용) 제거.
 import toast from 'react-hot-toast';
 import { UserApi } from '@/api/userApi';
 import { ROLES } from '@/lib/rbac-catalog';
@@ -316,11 +316,6 @@ export default function UserForm() {
               </Button>
             </div>
           </div>
-          
-          {/* Business Information (for business users) */}
-          {isEdit && selectedRoles?.some(role => ['business', 'vendor', 'seller'].includes(role)) && (
-            <BusinessInfoSection userId={id!} userRole={selectedRoles[0]} />
-          )}
         </div>
       </form>
     </div>

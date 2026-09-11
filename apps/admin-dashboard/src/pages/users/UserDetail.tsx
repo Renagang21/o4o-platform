@@ -5,7 +5,9 @@ import { ArrowLeft, Edit, UserCheck, UserX, Clock, Shield, Mail, Calendar, Activ
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import UserActivityLog from './components/UserActivityLog';
-import BusinessInfoSection from './components/BusinessInfoSection';
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+//   BusinessInfoSection 은 backend 없는 `/users/:id/business-info` GET/PUT/POST 만 호출했고
+//   legacy role(business/vendor/seller) 에서만 열리는 dead 화면이라 제거했다.
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import toast from 'react-hot-toast';
@@ -198,12 +200,6 @@ export default function UserDetail() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          {/* Business Information (for business users) */}
-          <BusinessInfoSection 
-            userId={id!} 
-            userRole={user?.role}
-          />
-          
           {/* User Information */}
           <Card>
             <CardHeader>

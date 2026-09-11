@@ -53,10 +53,5 @@ export {
   getNotOperatorMessage,
 } from './policy-notice-messages';
 
-// WO-KPA-SCOPE-AWARE-UX-NOTICES-V1: Glucosecare Program Notice
-export {
-  GlucosecareParticipationNotice,
-  GlucosecareGuardedContent,
-  type GlucosecareParticipationNoticeProps,
-  type GlucosecareGuardedContentProps,
-} from './GlucosecareParticipationNotice';
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+//   GlucosecareParticipationNotice (WO-KPA-SCOPE-AWARE-UX-NOTICES-V1) 는 소비처 0 이라 제거.

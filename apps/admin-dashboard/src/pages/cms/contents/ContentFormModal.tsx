@@ -9,7 +9,11 @@
 import { useState, useRef } from 'react';
 import { X, Upload, FileText, Trash2 } from 'lucide-react';
 import cmsAPI, { CmsContent, ContentType } from '@/lib/cms';
-import { mediaApi } from '@/services/api/postApi';
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+//   첨부 업로드는 backend 없는 `mediaApi.upload` (`/api/v1/content/media/upload`, 404) 를 호출하고
+//   있었다 → 실존 계약 `POST /api/v1/platform/media-library/upload` (uploadImageForEditor) 로 연결.
+//   backend 허용 MIME 에 zip 이 없어 accept 목록에서 `.zip` 을 뺐다.
+//   (`uploadImageForEditor` 는 아래 에디터 이미지 업로드용 import 를 그대로 재사용한다.)
 import toast from 'react-hot-toast';
 import { RichTextEditor } from '@o4o/content-editor';
 // WO-O4O-ADMIN-CMS-BROWSER-IMPORT-CRASH-FIX-V1:
@@ -140,22 +144,20 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
     setUploading(true);
     try {
       for (const file of Array.from(files)) {
-        const result = await mediaApi.upload(file);
-        if (result.success && result.data) {
-          const ext = file.name.split('.').pop()?.toLowerCase() || '';
-          setFormData((prev) => ({
-            ...prev,
-            attachments: [
-              ...prev.attachments,
-              {
-                name: file.name,
-                url: result.data!.url,
-                type: ext,
-                size: file.size,
-              },
-            ],
-          }));
-        }
+        const url = await uploadImageForEditor(file, 'cms');
+        const ext = file.name.split('.').pop()?.toLowerCase() || '';
+        setFormData((prev) => ({
+          ...prev,
+          attachments: [
+            ...prev.attachments,
+            {
+              name: file.name,
+              url,
+              type: ext,
+              size: file.size,
+            },
+          ],
+        }));
       }
       toast.success('파일 업로드 완료');
     } catch (error) {
@@ -458,7 +460,7 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
                     multiple
                     onChange={handleFileUpload}
                     className="hidden"
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.jpg,.jpeg,.png,.gif"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif"
                   />
                   <button
                     type="button"

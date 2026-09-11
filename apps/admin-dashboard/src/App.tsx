@@ -21,26 +21,12 @@ import '@/utils/aiMigration';
 // Layout Components
 import AdminLayout from '@/components/layout/AdminLayout';
 
-/**
- * Phase P0 Task B: Dynamic Routing Infrastructure
- *
- * DynamicRouteLoader and ViewComponentRegistry provide the foundation for
- * manifest-based dynamic routing. Routes defined in app manifests (viewTemplates)
- * can be automatically loaded via the Routes API.
- *
- * MIGRATION PATH:
- * 1. Apps define routes in manifest.viewTemplates
- * 2. Components are registered in ViewComponentRegistry
- * 3. DynamicRouteLoader fetches and renders routes
- * 4. Gradually move hardcoded routes below to dynamic
- * 5. Eventually remove hardcoded routes when migration complete
- *
- * @see apps/api-server/src/routes/routes.routes.ts - Routes API
- * @see apps/admin-dashboard/src/components/routing/ViewComponentRegistry.ts
- * @see apps/admin-dashboard/src/components/routing/DynamicRouteLoader.tsx
- */
-// Dynamic Routing exports (for future use when migrating routes)
-export { viewComponentRegistry, DynamicRouteLoader, useDynamicRoutes } from '@/components/routing';
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1 (§6):
+//   "Phase P0 Task B: Dynamic Routing Infrastructure" (components/routing/DynamicRouteLoader ·
+//   ViewComponentRegistry · useDynamicRoutes) 제거 — 판정 DEAD_ABSTRACTION.
+//   App 에서 re-export 만 되고 어디에도 mount 되지 않았으며, 소비하던 backend
+//   `/api/v1/routes/*` 는 Phase R1 이후 영구 빈 배열 stub 이었다(함께 제거).
+//   새 동적 route 시스템을 만들지 않는다 — 라우트 정본은 아래 route 모듈들이다.
 
 // Route modules (WO-O4O-ADMIN-APP-ROUTING-SPLIT-V1)
 import { PublicRoutes } from '@/routes/public.routes';
@@ -48,7 +34,10 @@ import { DashboardRoutes } from '@/routes/dashboard.routes';
 import { UserRoutes } from '@/routes/users.routes';
 import { ContentRoutes } from '@/routes/content.routes';
 import { AppearanceRoutes } from '@/routes/appearance.routes';
-import { CommerceRoutes } from '@/routes/commerce.routes';
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+//   commerce.routes (/admin/orders*) 는 backend `/api/admin/orders` 와 짝인 소비자
+//   주문 화면이었고 메뉴 진입점 0 · 30일 호출 0 · Store Commerce Boundary 상 legacy 라
+//   REMOVE_BROKEN_UI 로 제거했다. backend `/api/admin/orders` 처분은 commerce 경계 별도 WO.
 import { ServiceRoutes } from '@/routes/services.routes';
 import { AppRoutes } from '@/routes/apps.routes';
 import { LmsMarketingRoutes } from '@/routes/lms-marketing.routes';
@@ -99,17 +88,16 @@ function AuthStoreSync() {
  * SSO 인증 시스템 통합
  */
 function App() {
-  // Initialize blocks and widgets after first render (performance optimization)
+  // Initialize blocks after first render (performance optimization)
+  // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+  //   `lib/widgets/registerWidgets` 제거 — 등록만 되고 소비처(위젯 렌더러)가 0 이었고
+  //   backend 없는 `/orders*` · `/products/low-stock` · `/admin/enrollments/stats` 를 호출했다.
   useEffect(() => {
     // Defer non-critical initialization to after render
     const initializeFeatures = async () => {
       // Dynamic imports to reduce initial bundle
       const { registerAllBlocks } = await import('@/blocks');
-      const { registerAllWidgets } = await import('@/lib/widgets/registerWidgets');
-
-      // Register blocks and widgets
       registerAllBlocks();
-      registerAllWidgets();
     };
 
     // Use requestIdleCallback for non-critical work, fallback to setTimeout
@@ -200,7 +188,6 @@ function App() {
                     {UserRoutes()}
                     {ContentRoutes()}
                     {AppearanceRoutes()}
-                    {CommerceRoutes()}
                     {ServiceRoutes()}
                     {AppRoutes()}
                     {LmsMarketingRoutes()}

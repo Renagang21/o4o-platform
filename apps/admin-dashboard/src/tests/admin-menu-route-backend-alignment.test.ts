@@ -114,7 +114,7 @@ describe('실제 판정 — 세 계층이 같은 사용자를 통과시킨다', 
 
 describe('선언 위생 — 역할 문자열과 permission 문자열을 섞지 않는다', () => {
   const ROUTE_FILES = [
-    'appearance', 'apps', 'commerce', 'content', 'dashboard', 'lms-marketing',
+    'appearance', 'apps', 'content', 'dashboard', 'lms-marketing',
     'platform', 'public', 'test', 'users',
   ];
   const ALL_ROUTES = ROUTE_FILES.map((f) => {

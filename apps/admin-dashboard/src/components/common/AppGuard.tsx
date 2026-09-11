@@ -48,8 +48,9 @@ const NotInstalledState: FC<NotInstalledStateProps> = ({ appName }) => (
       이 기능을 사용하려면 {appName} 앱을 먼저 설치해야 합니다.
       앱스토어에서 설치할 수 있습니다.
     </p>
+    {/* WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1: 앱스토어 route 는 /apps/store (/admin/appstore 는 dead link 였다) */}
     <Link
-      to="/admin/appstore"
+      to="/apps/store"
       className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
     >
       앱스토어로 이동
@@ -78,7 +79,7 @@ const InactiveState: FC<InactiveStateProps> = ({ appName, appId }) => (
       이 기능을 사용하려면 {appName} 앱을 활성화해야 합니다.
     </p>
     <Link
-      to={`/admin/appstore?activate=${appId}`}
+      to={`/apps/store?activate=${appId}`}
       className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
     >
       앱 활성화하기

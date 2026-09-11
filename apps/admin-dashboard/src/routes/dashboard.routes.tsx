@@ -1,19 +1,33 @@
-import { Route } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 
-const AdminHome = lazy(() => import('@/pages/AdminHome'));
 const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
-const UnifiedDashboard = lazy(() => import('@/pages/dashboard/unified/UnifiedDashboard'));
 const AppDisabled = lazy(() => import('@/pages/error/AppDisabled'));
 
-// WO-O4O-LEGACY-RESIDUAL-RUNTIME-AND-DEFERRED-FINAL-CLOSURE-V1 (Axis D):
-// PD-3/PD-4/PD-5 seller·supplier 대시보드 6화면을 은퇴했다. 6화면 모두
-// 존재하지 않는 backend(`/api/v2/seller/*`, `/api/v2/supplier/*`,
-// `/api/v1/seller/settlements`, `/api/v1/supplier/settlements`)를 호출했고,
-// 진입 네비게이션도 0건이었다 (DEAD_CROSSLINK).
-// canonical: 공급자 정산 = web-neture `/supplier/settlements`
-//            (backend `/api/v1/neture/supplier/settlements`).
-// seller(플랫폼 직접판매) 축은 PLATFORM_DIRECT_SALE_BUSINESS_CONTRACT = NONE.
+/**
+ * WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1 (§4 · §11):
+ *   `CANONICAL_ADMIN_HOME = /admin`.
+ *
+ *   대시보드 3중(`/admin` · `/home` · `/dashboard`)을 하나로 수렴했다.
+ *     · `/home`      (pages/AdminHome.tsx 348줄) — 전부 하드코딩(₩12,345,000 / 배포 배너 /
+ *                     dead link 20여 건). 제거 → `/admin` redirect.
+ *     · `/dashboard` (pages/dashboard/unified/** 15파일) — CARD_REGISTRY 의 모든 데이터
+ *                     소스가 "현재 기능 미구현 - 빈 데이터 반환" stub(0 고정) 이었고
+ *                     backend(`/dashboard/overview` · `/executive/*` · `/{seller,supplier,
+ *                     partner,operator}/stats`)가 존재하지 않았다. 제거 → `/admin` redirect.
+ *     · `/admin/dashboard/operations` (pages/dashboard/phase2.4/** · hooks/api/useDashboard)
+ *                     — backend `/admin/dashboard/operations*` 없음 · 프로덕션 30일 호출 0.
+ *                     제거 (platform.routes 에서 함께 제거).
+ *   같은 기능의 대시보드를 새로 만들지 않는다. 남는 것은 `/admin` 하나뿐이다.
+ *
+ * WO-O4O-LEGACY-RESIDUAL-RUNTIME-AND-DEFERRED-FINAL-CLOSURE-V1 (Axis D):
+ *   PD-3/PD-4/PD-5 seller·supplier 대시보드 6화면 은퇴 (`/api/v2/seller/*` 등 backend 부재).
+ *   canonical: 공급자 정산 = web-neture `/supplier/settlements`.
+ * WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
+ *   `/admin/service-content-manager` 제거 (API 호출 0 · 하드코딩 샘플). 정본 = `/admin/cms/slots`.
+ * WO-O4O-ADMIN-AUTHORIZATION-REGISTRY-AND-DEAD-SURFACE-FINAL-CLOSURE-V1 (§6):
+ *   `/dashboard/business` 제거 (도달 가능한 사용자 0). 정본 = `content-assets` · `content-analytics`.
+ */
 
 // Loading component
 const PageLoader = () => (
@@ -22,24 +36,13 @@ const PageLoader = () => (
   </div>
 );
 
+export const CANONICAL_ADMIN_HOME = '/admin';
+
 /**
- * Dashboard routes — admin home, unified dashboard, seller/supplier dashboards
+ * Dashboard routes — canonical admin home + legacy home redirects
  */
 export function DashboardRoutes() {
   return [
-    // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
-    //   `/admin/service-content-manager` route + `pages/service-content-manager` (748줄 + types.ts) 제거.
-    //
-    //   판정 REMOVE_DEAD_RUNTIME — 화면이 **API 를 한 번도 호출하지 않았다**:
-    //     · `authClient`/`fetch`/`useQuery` 참조 0건
-    //     · 각 탭이 하드코딩 리터럴을 렌더 (`// 샘플 데이터 - 실제로는 API에서 가져옴`)
-    //     · `MANAGED_SERVICES` 에 서비스 1개만 하드코딩, 나머지는 주석
-    //     · inline style 기반이라 Design Core 위반 (docs/rules/DESIGN-CORE-GOVERNANCE.md)
-    //   프로덕션 호출 0건. 슬롯 관리의 실동작 정본은 `/admin/cms/slots` 다.
-    //
-    //   ⓘ `/home` · `/dashboard` 는 `/admin`(Overview)과 함께 **대시보드 3중** 상태로 남아 있다.
-    //     메뉴 진입점은 `/admin` 하나뿐이다. 통합은 화면 내용 비교가 선행돼야 해
-    //     이번 WO 에서 손대지 않고 별도 WO 로 분리한다(IR §5-3).
     // Error Pages - No permission required
     <Route key="/error/app-disabled" path="/error/app-disabled" element={
       <Suspense fallback={<PageLoader />}>
@@ -47,38 +50,15 @@ export function DashboardRoutes() {
       </Suspense>
     } />,
 
-    // 관리자 메인 대시보드
+    // 관리자 canonical home
     <Route key="/admin" path="/admin" element={
       <Suspense fallback={<PageLoader />}>
         <AdminDashboard />
       </Suspense>
     } />,
 
-    <Route key="/home" path="/home" element={
-      <Suspense fallback={<PageLoader />}>
-        <AdminHome />
-      </Suspense>
-    } />,
-
-    // Unified Dashboard v1 - Primary entry point
-    <Route key="/dashboard" path="/dashboard" element={
-      <Suspense fallback={<PageLoader />}>
-        <UnifiedDashboard />
-      </Suspense>
-    } />,
-
-    // WO-O4O-ADMIN-AUTHORIZATION-REGISTRY-AND-DEAD-SURFACE-FINAL-CLOSURE-V1 (§6):
-    //   `/dashboard/business` route + `pages/dashboard/business/BusinessDashboard.tsx` 제거.
-    //
-    //   판정 DEAD_ROUTE — 도달 가능한 사용자가 0명이었다:
-    //     · 선언 역할 `['partner','affiliate','seller','supplier']` 는 관리자 SPA 진입
-    //       floor(`platform:super_admin`, App.tsx)와 상호 배타적이다 → 플랫폼 관리자도 못 들어간다.
-    //     · 서비스 역할 계열은 floor 에서 이미 차단된다 → 선언 대상자도 못 들어간다.
-    //     · 메뉴 소비처 0 / 직접 링크 소비처 0 / registry 소비처 0 / 테스트 소비처 0.
-    //     · 호출 API(`/content/assets`, `/content/assets/stats`)는 `requireAdmin`
-    //       (= platform:super_admin) 이라 선언 대상자에게는 전부 403 이었다.
-    //   동일 데이터의 살아 있는 정본 = `content-assets` · `content-analytics` 메뉴.
-
-    // WO-ADMIN-CONTENT-SLOT-V1: Service Content Manager
+    // legacy home 진입점 → canonical
+    <Route key="/home" path="/home" element={<Navigate to={CANONICAL_ADMIN_HOME} replace />} />,
+    <Route key="/dashboard" path="/dashboard" element={<Navigate to={CANONICAL_ADMIN_HOME} replace />} />,
   ];
 }

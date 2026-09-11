@@ -20,7 +20,9 @@ const Login = lazy(() => import('@/pages/auth/Login'));
 const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
 const ViewPreview = lazy(() => import('@/pages/preview/ViewPreview'));
-const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'));
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+//   /storefront/* (pages/storefront, Phase 7-I 소비자 storefront) 는 O4O 자체 소비자
+//   commerce 없음(Store Commerce Boundary) 에 따라 REMOVE_BROKEN_UI 로 제거했다.
 
 // Debug Pages
 const AuthBootstrapDebug = lazy(() => import('@/pages/__debug__/AuthBootstrapDebug'));
@@ -37,7 +39,7 @@ const PageLoader = () => (
 
 /**
  * Public routes — outside AdminLayout
- * Login, password reset, preview, editor, storefront, debug pages
+ * Login, password reset, preview, editor, debug pages
  */
 export function PublicRoutes() {
   return [
@@ -116,11 +118,5 @@ export function PublicRoutes() {
       </Suspense>
     } />,
 
-    // Storefront Routes (Phase 7-I) - Consumer-facing, no auth required
-    <Route key="/storefront/*" path="/storefront/*" element={
-      <Suspense fallback={<PageLoader />}>
-        <StorefrontRouter />
-      </Suspense>
-    } />,
   ];
 }

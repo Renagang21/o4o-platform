@@ -260,10 +260,7 @@ class SettingsService {
     await unifiedApi.raw.post(endpoint);
   }
 
-  // Cache management
-  async clearCache(type?: 'all' | 'settings' | 'content' | 'users'): Promise<void> {
-    await unifiedApi.raw.post('/settings/cache/clear', { type: type || 'all' });
-  }
+  // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1: clearCache(`/settings/cache/clear`) 는 backend 없음 · 소비처 0 이라 제거.
 }
 
 export const settingsService = new SettingsService();

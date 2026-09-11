@@ -80,7 +80,8 @@ describe('접두 중복(/api/v1/api/...) 무증식', () => {
   //   목록 10건 중 9건은 후속 WO 들에서 파일 자체가 삭제돼 stale 이었다.
   //   존재하지 않는 파일이 allowlist 에 남아 있으면 같은 경로가 되살아나도
   //   가드가 통과한다. 실재하는 항목만 남기고, 아래 stale 방지 케이스를 함께 둔다.
-  const KNOWN = ['pages/dashboard/unified/cards/OverviewCard.tsx'];
+  // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1: 마지막 항목(pages/dashboard/unified) 도 제거돼 목록은 비었다.
+  const KNOWN: string[] = [];
 
   const offenders = (): string[] => {
     const out: string[] = [];

@@ -34,7 +34,7 @@ const menuPaths = [...MENU_CODE.matchAll(/path:\s*'([^']+)'/g)].map((m) => m[1])
 const menuIds = [...MENU_CODE.matchAll(/id:\s*'([^']+)'/g)].map((m) => m[1]);
 
 const ROUTE_FILES = [
-  'appearance', 'apps', 'commerce', 'content', 'dashboard',
+  'appearance', 'apps', 'content', 'dashboard',
   'lms-marketing', 'platform', 'public', 'test', 'users',
 ];
 const ALL_ROUTES = ROUTE_FILES.map((f) => stripAllComments(read(`routes/${f}.routes.tsx`))).join('\n');
@@ -163,11 +163,10 @@ describe('백엔드 없는 화면이 되살아나지 않는다', () => {
     expect(lib).toContain('/cms/slots');
   });
 
-  it('ViewComponentRegistry 에 삭제된 CMS 화면 등록이 없다', () => {
-    const reg = stripAllComments(read('components/routing/ViewComponentRegistry.ts'));
-    for (const seg of ['cpts', 'fields', 'views', 'pages', 'designer']) {
-      expect(reg).not.toContain(`pages/cms/${seg}/`);
-    }
+  // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+  //   ViewComponentRegistry(components/routing) 는 DEAD_ABSTRACTION 으로 디렉터리째 제거됐다.
+  it('components/routing (ViewComponentRegistry) 이 존재하지 않는다', () => {
+    expect(existsSync(join(SRC, 'components', 'routing'))).toBe(false);
   });
 
   it('dead 화면 디렉터리·라우트가 제거된 상태다', () => {

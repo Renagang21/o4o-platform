@@ -48,14 +48,20 @@ const OpsMetricsDashboard = lazy(() => import('@/pages/ops/OpsMetricsDashboard')
 
 // CPT Engine
 const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
-const FormPresets = lazy(() => import('@/pages/cpt-engine/presets/FormPresets'));
-const ViewPresets = lazy(() => import('@/pages/cpt-engine/presets/ViewPresets'));
-const TemplatePresets = lazy(() => import('@/pages/cpt-engine/presets/TemplatePresets'));
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1 (§8):
+//   `/cpt-engine/presets/{forms,views,templates}` (pages/cpt-engine/presets · components/presets ·
+//   api/presets · utils/seedPresets · test/SeedPresets · test/PresetIntegrationTest) 제거 —
+//   판정 REMOVE_BROKEN_UI. backend `/api/v1/presets/*` 부재 · 프로덕션 30일 호출 0 · 메뉴 노출 0.
+//   cpt-engine 본체(`/api/v1/cpt/*` 실재)는 유지한다.
 
 // CPT/ACF Router
 
-// Media & Custom Fields
-const MediaLibrary = lazy(() => import('@/pages/media/Media'));
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1 (§9):
+//   `/media/*` (pages/media/{Media,MediaLibraryAdmin,MediaUpload}) 제거 → canonical redirect.
+//   화면이 호출하던 `/api/v1/content/media*` · `/api/v1/media*` 는 backend 부재였다.
+//   media_assets 의 살아 있는 정본 화면은 `/content-resource/media-assets`
+//   (backend `/api/v1/platform/media-library*`) 이다.
+const LEGACY_MEDIA_REDIRECT = '/content-resource/media-assets';
 // Content Resource — media_assets 관리 (WO-O4O-CONTENT-RESOURCE-METADATA-STANDARDIZATION-V1)
 const ContentResourceMediaAssets = lazy(() => import('@/pages/content-resource/MediaAssetsPage'));
 
@@ -208,17 +214,11 @@ export function ContentRoutes() {
       </AdminProtectedRoute>
     } />,
 
-    // 미디어 관리
-    <Route key="/media/*" path="/media/*" element={
-      <AdminProtectedRoute requiredPermissions={['media:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <MediaLibrary />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
+    // 레거시 미디어 관리 → canonical (content-resource/media-assets)
+    <Route key="/media/*" path="/media/*" element={<Navigate to={LEGACY_MEDIA_REDIRECT} replace />} />,
 
     // Content Resource — Media Assets 관리 (WO-O4O-CONTENT-RESOURCE-METADATA-STANDARDIZATION-V1)
-    //   media_assets(/platform/media-library) metadata 조회·수정. 레거시 /media(/content/media)와 별개.
+    //   media_assets(/platform/media-library) metadata 조회·수정. 레거시 /media 는 이 화면으로 redirect 된다.
     <Route key="/content-resource/media-assets" path="/content-resource/media-assets" element={
       <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
@@ -234,29 +234,6 @@ export function ContentRoutes() {
       <AdminProtectedRoute requiredPermissions={['content:read']}>
         <Suspense fallback={<PageLoader />}>
           <CPTEngine />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // CPT Presets
-    <Route key="/cpt-engine/presets/forms" path="/cpt-engine/presets/forms" element={
-      <AdminProtectedRoute requiredPermissions={['content:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <FormPresets />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/cpt-engine/presets/views" path="/cpt-engine/presets/views" element={
-      <AdminProtectedRoute requiredPermissions={['content:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <ViewPresets />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/cpt-engine/presets/templates" path="/cpt-engine/presets/templates" element={
-      <AdminProtectedRoute requiredPermissions={['content:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <TemplatePresets />
         </Suspense>
       </AdminProtectedRoute>
     } />,

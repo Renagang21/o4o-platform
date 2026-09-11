@@ -190,7 +190,8 @@ export const acfLocationApi = {
 
   // Get post types for location rules
   async getPostTypes(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
-    const response = await authClient.api.get('/cpt/custom-post-types');
+    // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1: backend 계약은 `/cpt/types` (`/cpt/custom-post-types` 는 404 였다)
+    const response = await authClient.api.get('/cpt/types');
     const types = response.data?.data || response.data || [];
     return {
       success: true,
@@ -203,7 +204,8 @@ export const acfLocationApi = {
 
   // Get taxonomies for location rules
   async getTaxonomies(): Promise<ACFApiResponse<Array<{ value: string; label: string }>>> {
-    const response = await authClient.api.get('/taxonomies');
+    // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1: backend 계약은 `/cpt/taxonomies` (`/taxonomies` 는 404 였다)
+    const response = await authClient.api.get('/cpt/taxonomies');
     const taxonomies = response.data?.data || response.data || [];
     return {
       success: true,

@@ -380,21 +380,10 @@ class StoreContentApi {
     }
   }
 
-  async trackEvent(
-    storeContentId: string,
-    eventType: string,
-    metadata?: Record<string, any>,
-  ): Promise<void> {
-    try {
-      await authClient.api.post('/lms/content-analytics/track', {
-        storeContentId,
-        eventType,
-        metadata,
-      });
-    } catch (error) {
-      console.error('Error tracking analytics event:', error);
-    }
-  }
+  // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+  //   trackEvent(`/lms/content-analytics/track`) 는 backend 없음 · 소비처 0 이라 제거.
+  //   getContentAnalytics 도 backend 가 없어 항상 null 이지만(화면은 null 이면 숨김) lms-marketing
+  //   도메인 처분은 별도 WO 로 DEFER 한다.
 }
 
 export const storeContentApi = new StoreContentApi();

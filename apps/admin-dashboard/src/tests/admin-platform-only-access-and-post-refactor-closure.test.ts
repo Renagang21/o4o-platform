@@ -189,7 +189,7 @@ describe('A축 · 메뉴는 "설정 없음 = 허용" 에 기대지 않는다', (
 
 describe('B축 · /partnerops/* 프런트 잔재 0', () => {
   const ROUTE_FILES = [
-    'appearance', 'apps', 'commerce', 'content', 'dashboard',
+    'appearance', 'apps', 'content', 'dashboard',
     'lms-marketing', 'platform', 'public', 'test', 'users',
   ];
   const ALL_ROUTES = ROUTE_FILES
@@ -205,9 +205,9 @@ describe('B축 · /partnerops/* 프런트 잔재 0', () => {
     expect(existsSync(join(SRC, 'pages/partnerops'))).toBe(false);
   });
 
-  it('ViewComponentRegistry 에 partnerops 등록이 0건이다', () => {
-    const REG = stripAllComments(read('components/routing/ViewComponentRegistry.ts'));
-    expect(REG).not.toContain('partnerops');
+  // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1: ViewComponentRegistry 는 디렉터리째 제거됐다.
+  it('components/routing (ViewComponentRegistry) 이 존재하지 않는다', () => {
+    expect(existsSync(join(SRC, 'components/routing'))).toBe(false);
   });
 
   it('활성 소스 어디에도 pages/partnerops import 가 없다', () => {

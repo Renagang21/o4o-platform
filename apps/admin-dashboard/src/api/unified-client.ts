@@ -98,7 +98,7 @@ class UnifiedApiClient {
         //   이 클라이언트는 canonical authClient 와 달리 refresh 절차가 없어,
         //   하드 이동(window.location) 직후 access token 만 만료된 상태에서도
         //   즉시 localStorage 를 비우고 /login 으로 튕겼다.
-        //   (useAdminMenu / DynamicRouteLoader 가 매 페이지 로드마다 이 클라이언트를 호출한다.)
+        //   (useAdminMenu 가 매 페이지 로드마다 이 클라이언트를 호출한다.)
         //   → cookie 기반 refresh 를 1회 시도하고, 실패했을 때만 기존 처리로 넘긴다.
         const originalRequest = error.config as any;
         if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {

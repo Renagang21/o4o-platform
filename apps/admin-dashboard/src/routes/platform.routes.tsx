@@ -9,8 +9,9 @@ import { Suspense, lazy } from 'react';
 // Platform Hub — Global Operations (WO-PLATFORM-GLOBAL-HUB-V1)
 const PlatformHubPage = lazy(() => import('@/pages/platform/PlatformHubPage'));
 
-// Monitoring
-const OperationsDashboard = lazy(() => import('@/pages/dashboard/phase2.4'));
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+//   /admin/dashboard/operations (pages/dashboard/phase2.4) 는 하드코딩 통계·가짜 알림만
+//   렌더하던 중복 dashboard 라 MERGE_DUPLICATED_DASHBOARD → 제거. canonical home = /admin.
 
 
 // Auth Analytics (WO-O4O-AUTH-ANALYTICS-UI-V1)
@@ -99,17 +100,6 @@ export function PlatformRoutes() {
       <AdminProtectedRoute requiredRoles={['platform:super_admin']}>
         <Suspense fallback={<PageLoader />}>
           <PlatformHubPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // System Monitoring
-
-    // Phase 2.4 - Operations Dashboard
-    <Route key="/admin/dashboard/operations" path="/admin/dashboard/operations" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <OperationsDashboard />
         </Suspense>
       </AdminProtectedRoute>
     } />,

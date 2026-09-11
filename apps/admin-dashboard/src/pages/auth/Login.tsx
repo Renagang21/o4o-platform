@@ -15,7 +15,7 @@ const Login: FC = () => {
   const [searchParams] = useSearchParams();
 
   // 리다이렉트 URL 처리
-  const redirectUrl = searchParams.get('redirect') || '/home';
+  const redirectUrl = searchParams.get('redirect') || '/admin';
   const fromLocation = (location.state as any)?.from || redirectUrl;
 
   // 이미 인증된 관리자는 홈으로 리다이렉트

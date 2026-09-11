@@ -44,8 +44,8 @@ export function AppRoutes() {
     //       재수출은 그대로 둔다. 공용 모듈이며 이 WO 의 범위가 아니다.
     //     - 백엔드 `/api/v1/forum` · `/api/v1/kpa/forum` 도 그대로 둔다 —
     //       서비스 프런트가 실사용 중이다.
-    //     - `components/routing/ViewComponentRegistry.ts` 의 forum view 4건은
-    //       manifest 기반 동적 라우팅용 등록이며 사이드바·라우트와 별개다 → 보존.
+    //     - (후속) `components/routing/ViewComponentRegistry.ts` 는 WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1
+    //       에서 DEAD_ABSTRACTION 으로 디렉터리째 제거됐다.
 
 
     // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:

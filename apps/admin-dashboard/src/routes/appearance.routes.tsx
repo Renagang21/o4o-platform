@@ -1,4 +1,4 @@
-import { Route } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
 
@@ -6,16 +6,22 @@ import { Suspense, lazy } from 'react';
 const SiteThemeSettings = lazy(() => import('@/pages/appearance/SiteThemeSettings'));
 const GeneralSettings = lazy(() => import('@/pages/settings/GeneralSettings'));
 const HeaderBuilder = lazy(() => import('@/pages/appearance/header-builder/HeaderBuilderPage'));
-const NavigationMenus = lazy(() => import('@/pages/menus/Menus'));
-const TemplateParts = lazy(() => import('@/pages/appearance/TemplateParts'));
+
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1 (§8 · §9 · §10) — 제거 목록
+//   판정 REMOVE_BROKEN_UI (backend 부재 · 메뉴 노출 0 · 프로덕션 30일 호출 0):
+//     · `/appearance/menus/*`        pages/menus/** + api/menuApi  → backend `/api/v1/menus*` 부재
+//     · `/appearance/template-parts` pages/appearance/TemplateParts → `/api/v1/template-parts*` 부재
+//     · `/tools` · `/tools/media-replace` pages/ToolsPage(핸들러 없는 버튼) · tools/MediaFileReplace
+//                                    → `/api/v1/media/:id/replace` 부재
+//     · `/reusable-blocks`           inline "Coming Soon" placeholder (404 를 가리는 화면 금지, §9)
+//   판정 REMOVE_FAKE_DATA:
+//     · `/mail/templates` · `/mail/logs` pages/mail/{EmailTemplates,EmailLogs} → 하드코딩 sample
+//       배열(`sampleLogs` · `defaultTemplates`)만 렌더. `/mail/smtp` 는 `/settings/email` 과
+//       동일 컴포넌트(EmailSettings · backend `/api/v1/settings/:type` 실재)라 그쪽으로 redirect.
+const LEGACY_MAIL_REDIRECT = '/settings/email';
 
 // Settings
 const Settings = lazy(() => import('@/pages/settings/Settings'));
-const EmailSettings = lazy(() => import('@/pages/mail/MailManagement'));
-
-// Tools
-const ToolsPage = lazy(() => import('@/pages/ToolsPage'));
-const FileReplaceTools = lazy(() => import('@/pages/tools/MediaFileReplace'));
 
 // App Store
 const AppStorePage = lazy(() => import('@/pages/apps/AppStorePage'));
@@ -28,19 +34,10 @@ const PageLoader = () => (
 );
 
 /**
- * Appearance routes — theme, settings, menus, template parts, tools, app store
+ * Appearance routes — theme, settings, header builder, app store
  */
 export function AppearanceRoutes() {
   return [
-    // 재사용 블록 관리
-    <Route key="/reusable-blocks" path="/reusable-blocks" element={
-      <AdminProtectedRoute requiredPermissions={['content:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <div>Reusable Blocks - Coming Soon</div>
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
     // 외모 관리 (WordPress Style)
     <Route key="/appearance/theme" path="/appearance/theme" element={
       <AdminProtectedRoute requiredPermissions={['settings:read']}>
@@ -63,51 +60,8 @@ export function AppearanceRoutes() {
         </Suspense>
       </AdminProtectedRoute>
     } />,
-    <Route key="/appearance/menus/*" path="/appearance/menus/*" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <NavigationMenus />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // Appearance - Template Parts
-    <Route key="/appearance/template-parts" path="/appearance/template-parts" element={
-      <AdminProtectedRoute requiredPermissions={['templates:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <TemplateParts />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    // (제거됨) /appearance/template-parts/new · /:id/edit — TemplatePartEditor
-    // WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1
-    // legacy block editor 기반 편집기이며 백엔드 `/template-parts` 는 프로덕션에서 404,
-    // `content_templates` row 0, 메뉴 진입점 0 이었다. 목록 화면(TemplateParts)은 유지한다.
-
-    // 메일 관리
-    <Route key="/mail/*" path="/mail/*" element={
-      <AdminProtectedRoute requiredPermissions={['settings:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <EmailSettings />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // 도구
-    <Route key="/tools" path="/tools" element={
-      <AdminProtectedRoute requiredPermissions={['tools:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <ToolsPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/tools/media-replace" path="/tools/media-replace" element={
-      <AdminProtectedRoute requiredPermissions={['tools:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <FileReplaceTools />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
+    // 레거시 메일 관리 → 설정/이메일
+    <Route key="/mail/*" path="/mail/*" element={<Navigate to={LEGACY_MAIL_REDIRECT} replace />} />,
 
     // 앱 장터
     // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 백엔드 경계로 정렬

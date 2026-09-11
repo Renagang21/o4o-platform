@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Save, Copy, Check, AlertCircle, ExternalLink, TestTube, Eye, EyeOff } from 'lucide-react';
+import { Save, Copy, Check, AlertCircle, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,9 +16,7 @@ import {
   OAuthConfig, 
   OAuthSettingsResponse,
   OAuthUpdateRequest,
-  OAuthUpdateResponse,
-  OAuthTestRequest,
-  OAuthTestResponse
+  OAuthUpdateResponse
 } from '@/types/oauth';
 import { OAUTH_PROVIDERS } from '@/constants/oauth';
 
@@ -121,25 +119,7 @@ const OAuthSettings = () => {
     }
   });
 
-  // Test OAuth connection mutation (temporarily disabled - endpoint not implemented)
-  // const testMutation = useMutation<OAuthTestResponse, Error, OAuthTestRequest>({
-  //   mutationFn: async (data: OAuthTestRequest) => {
-  //     const response = await authClient.api.post('/settings/oauth/test', data);
-  //     return response.data;
-  //   },
-  //   onSuccess: (data, _variables) => {
-  //     addNotice({
-  //       type: data.success ? 'success' : 'error',
-  //       message: data.message
-  //     });
-  //   },
-  //   onError: (error: Error) => {
-  //     addNotice({
-  //       type: 'error',
-  //       message: `연결 테스트 실패: ${error.message}`
-  //     });
-  //   }
-  // });
+  // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1: 연결 테스트(`/settings/oauth/test`, backend 없음) 주석 코드 제거.
 
   // Handle local input changes (no immediate save)
   const handleInputChange = useCallback((provider: OAuthProvider, field: keyof OAuthConfig, value: string | boolean | string[]) => {
@@ -225,11 +205,6 @@ const OAuthSettings = () => {
       });
     }
   }, [addNotice]);
-
-  // Test connection (temporarily disabled)
-  // const testConnection = useCallback((provider: OAuthProvider) => {
-  //   testMutation.mutate({ provider });
-  // }, [testMutation]);
 
   // Generate callback URL
   const generateCallbackUrl = useCallback((provider: OAuthProvider): string => {
@@ -439,18 +414,6 @@ const OAuthSettings = () => {
                   <Save className="h-4 w-4 mr-2" />
                   {hasUnsavedChanges[provider] ? '저장' : '저장됨'}
                 </Button>
-
-                {/* Test Connection - temporarily disabled (endpoint not implemented) */}
-                {/* {config.enabled && config.clientId && config.clientSecret && !hasUnsavedChanges[provider] && (
-                  <Button
-                    variant="secondary"
-                    onClick={() => testConnection(provider)}
-                    disabled={testMutation.isPending || updateMutation.isPending}
-                  >
-                    <TestTube className="h-4 w-4 mr-2" />
-                    연결 테스트
-                  </Button>
-                )} */}
               </div>
               </form>
             </CardContent>

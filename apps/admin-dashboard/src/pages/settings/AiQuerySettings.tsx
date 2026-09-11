@@ -8,7 +8,10 @@
  * - 토큰 단위 X, 질문 횟수 기준
  */
 import React, { useState, useEffect } from 'react';
-import { authClient } from '@o4o/auth-client';
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+//   backend 는 `/api/ai/policy` (ai-query.routes, /api/ai mount) 이다. authClient.api 의 base 는
+//   `/api/v1` 이라 `/api/v1/ai/policy` → 404 였다 → base `/api` 인 unifiedApi.raw 로 호출한다.
+import { unifiedApi } from '@/api/unified-client';
 import toast from 'react-hot-toast';
 import {
   Save,
@@ -47,7 +50,7 @@ const AiQuerySettings: React.FC = () => {
   const loadPolicy = async () => {
     setLoading(true);
     try {
-      const response = await authClient.api.get('/ai/policy');
+      const response = await unifiedApi.raw.get('/ai/policy');
       if (response.data.success) {
         const data = response.data.data;
         setPolicy(data);
@@ -71,7 +74,7 @@ const AiQuerySettings: React.FC = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      const response = await authClient.api.put('/ai/policy', formData);
+      const response = await unifiedApi.raw.put('/ai/policy', formData);
       if (response.data.success) {
         setPolicy(response.data.data);
         toast.success('AI 정책이 저장되었습니다.');
