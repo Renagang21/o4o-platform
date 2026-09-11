@@ -1,6 +1,6 @@
 # CHECK — WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1
 
-> 상태: IMPLEMENTATION_COMPLETE_CI_PENDING (§11 · §16 에서 CI 확정 후 갱신)
+> 상태: **CLOSED** (CI 확정 · §11)
 > 작성일: 2026-09-11
 > 기준 origin/main: `9d2a81292` (worktree `work/o4o-form-legacy-app-disposition-v1`, 최신 origin/main 위로 rebase 후 push)
 > 선행: `WO-O4O-DEAD-SHORTCODE-RESIDUE-AND-PERMISSION-CONTRACT-FINAL-CLOSURE-V1` (CLOSED · `01808d025`) 의 유보 4건 중 Form 축 · legacy App 축 · 추적 산출물 · `WordPressGalleryShortcode` 를 본 WO 에서 처분
@@ -193,7 +193,8 @@ Cloud SQL Auth Proxy + `psql` · 자격정보는 Secret Manager 에서 환경변
 
 ## 8. §13 Git
 
-- path-specific stage · `node scripts/git/check-staged-scope.mjs` 확인 후 `git commit -- <paths>` (커밋 SHA 는 §16 에 기록)
+- path-specific stage · `node scripts/git/check-staged-scope.mjs` 확인 후 `git commit -- <paths>`
+- 구현 커밋 `824a0e1d4` · CHECK 커밋 `ec6579e44` (origin/main `02deb3e1d` 위 rebase 후 push) · CI 확정 커밋 (§11)
 - force-push 없음 · 최신 origin/main 위 rebase 후 `git push origin HEAD:main`
 
 ---
@@ -219,11 +220,11 @@ WORDPRESS_GALLERY_SHORTCODE_NAME   = REMOVED
 ADMIN_LINT_ERRORS                  = ZERO
 PRODUCTION_DATA_CHANGE             = ZERO
 OTHER_SERVICE_REGRESSION           = PASS
-CI_PIPELINE                        = PENDING
-CODEQL                             = PENDING
+CI_PIPELINE                        = SUCCESS
+CODEQL                             = SUCCESS
 
 UNPROVISIONED_FORM_AND_LEGACY_APP_AXIS_FINAL_DISPOSITION
-  = IMPLEMENTATION_COMPLETE_CI_PENDING
+  = CLOSED
 ```
 
 `LEGACY_APPS_TABLE = PRESENT` 주석: `apps` 테이블은 1 row(코드 자기 seed) 로 남는다. DROP · row 삭제는 §4 규정대로 본 WO 에 포함하지 않았다. 후속 처분(DROP migration) 은 별도 WO.
@@ -240,4 +241,17 @@ UNPROVISIONED_FORM_AND_LEGACY_APP_AXIS_FINAL_DISPOSITION
 
 ## 11. CI 확정 (§11)
 
-(push 후 갱신)
+push SHA `ec6579e44` 의 CI Pipeline · CodeQL 은 다른 세션의 연속 push (`252b2ceb6` → `2e5d355cc` → `8b4a568b7` → `3558825f8` → `e21046870` → `ba4ab7ffe` → `9522253fe`) 로 concurrency 취소가 반복되었다. 취소 실행은 성공으로 기록하지 않으며, 재실행하지 않고 **선형 후손** 실행으로 확정한다 (`git merge-base --is-ancestor ec6579e44 9522253fe` = true).
+
+| 워크플로 | run ID | SHA | 결과 |
+|---|---|---|---|
+| Deploy API Server (Cloud Run) | 34552853215 | `ec6579e44` (본 push) | success |
+| Deploy Admin Dashboard (Cloud Run) | 34552853247 | `ec6579e44` (본 push) | success |
+| Deploy Web Services (Cloud Run) | 34552853245 | `ec6579e44` (본 push) | success |
+| CI Pipeline | 34552853284 | `ec6579e44` | cancelled (concurrency) → 후손 확정 |
+| CI Pipeline | 34556318187 | `9522253fe` (선형 후손 · ancestor 확인) | **success** |
+| CodeQL Security Analysis | 34552853252 | `ec6579e44` | cancelled (concurrency) → 후손 확정 |
+| CodeQL Security Analysis | 34556318192 | `9522253fe` (선형 후손) | **success** |
+| AppStore Guard | — | `ec6579e44` | path filter (`packages/**/manifest.ts` · `packages/**/lifecycle/**` · `app-manifests/appsCatalog.ts`) 대상 미변경 → 미기동. 최근 success = `428349dab` (2026-09-10) |
+
+후손 `9522253fe` 까지의 상류 커밋은 본 WO 삭제 대상 파일을 접촉하지 않았다 (rebase 시점 `git diff --stat` 무겹침 · 제거 import 재유입 grep 0 · rebase 후 api-server `tsc --noEmit` exit 0).
