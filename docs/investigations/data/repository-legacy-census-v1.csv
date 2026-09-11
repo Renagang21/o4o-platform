@@ -1,0 +1,46 @@
+id,feature_unit,area,classification,priority,runtime_consumer,frontend_consumer,prod_evidence,replacement,blocked_by,proposed_wo
+F01,KCos /store-assets mount → KPA org resolver + kpa_store_asset_controls read/write,apps/api-server routes/cosmetics + web-k-cosmetics StoreChannelsPage,LEGACY_ACTIVE,P0,yes (menu /store/channels),yes,"controls 7 rows all KPA orgs; KCos org 0",KCos: drop asset-control axis or KCos wrapper,menu config change (store-ui-core),WO-B
+F02,Neture /api/v1/neture/assets → KPA asset-snapshot controller (kpa:* roles),apps/api-server routes/neture,DEAD_ROUTE,P0,mount only,0,"neture frontend has no /assets caller",remove mount,none,WO-C
+F03,KPA-hardcoded shared controllers (store-content/store-library-feed/store-asset-control/published-assets/asset-snapshot),apps/api-server routes/o4o-store,CANONICAL_NEEDS_ALIGNMENT,P1,KPA mounts,yes (KPA),—,service-scoped wrappers (PH/KCos pattern),none (KPA-only mounts safe),WO-B
+F04,kpa_store_asset_controls extension layer,DB + routes/kpa,LEGACY_ACTIVE (KPA_SPECIFIC),P2,KPA operator/admin/render,yes (KPA),"7 rows / 3 KPA orgs / forced 0",none needed,business demand outside KPA = 0,—
+F05,POP legacy instant-PDF axis (generate endpoint / StorePopCreateModal / storePop api),api-server + web-kpa-society + web-k-cosmetics,RETIRED (already removed),—,0,0,"store_pops 0 rows; pop_documents(V2) 16",POP V2,—,— (chain ④ landed)
+F06,ProductPopBuilderPage compatibility redirects (KPA/KCos),services App.tsx,LEGACY_COMPATIBILITY,P3,redirect only,deep-link,—,/store/marketing/pop-v2,none,WO-A
+F07,Redirect-only routes (kpa-society 40 / neture 41 / k-cosmetics 17 / ph 2),services App.tsx,LEGACY_COMPATIBILITY,P3,redirect only,deep-link,—,canonical routes,none (needs 60-day link audit),WO-A
+F08,Consumer checkout residue (/api/checkout refund+orders, /api/orders alias, /api/admin/orders),apps/api-server routes,RETIRE_READY,P2,0 frontend (admin UI removed REMOVE_BROKEN_UI),0,"checkout_orders 23 (B2B canonical ledger — keep table)",B2B: store_cart_items→checkout_orders,commerce-boundary confirmation,WO-G
+F09,partner-core package + /api/partner + /api/v1/partner + partner_* tables,packages/partner-core + routes,DEAD_PACKAGE / DEAD_ROUTE,P2,mount only,0,"partner_referrals/settlements/commissions 0 rows; entities registered w/o tables",none,NEEDS_BUSINESS_DECISION (Neture partner contract F7 is separate table set),WO-G
+F10,WordPress-style CMS/theme/taxonomy entity layer (categories/tags/terms/taxonomies/themes/widget_areas/template_parts/presets/cms_pages/cms_views/custom_posts/reusable_blocks/smtp_settings/user_activity_logs/approval_logs/role_applications),apps/api-server entities + cms-core,DEAD_SCHEMA_RESIDUE (entity-side),P2,registered in entities.ts,admin UI removed (45ac4d052),"~35 registered entities with NO production table",content-core/cms-core canonical,consumer trace per entity (grep noisy),WO-H
+F11,cms-core unregistered entities (acf/menus/media/templates/settings),packages/cms-core,DEAD_CODE,P2,0 (not registered),0,no tables,—,none,WO-H
+F12,cosmetics legacy entities (cosmetics_products/brands/lines/store*/price*) unregistered,apps/api-server routes/cosmetics/entities,DEAD_CODE,P2,0 (not registered),0,no tables,ProductMaster canonical,none,WO-H
+F13,neture legacy entities (neture-product/-order-item/-partner/-product-log) unregistered,apps/api-server routes/neture/entities,DEAD_CODE,P2,0,0,no tables,Neture domain V3,none,WO-H
+F14,role_applications route (/api/v2/roles) + /api/v1/userRole,apps/api-server,DEAD_ROUTE,P2,mount only,0,"role_applications table absent → 500 on call",role_assignments SSOT (F9 freeze),none,WO-G
+F15,forum-core tracked tsc output in src/ (32 files incl. orphan ForumTag.js),packages/forum-core,DEAD_GENERATED_ARTIFACT,P3,0 (exports point to dist/),0,—,dist/,none,WO-D
+F16,auth-client tracked tsc output in src/ (28 files),packages/auth-client,DEAD_GENERATED_ARTIFACT,P3,0,0,—,dist/,none,WO-D
+F17,admin-dashboard public/mockServiceWorker.js (msw not imported),apps/admin-dashboard,DEAD_GENERATED_ARTIFACT,P3,0,0,—,—,none,WO-D
+F18,tmp/** apply+rollback batches (6 batches: guide-gap-enrichment / mfds-usage-caution / store-to-b2b-copy / productmaster-apply-pilot / name-cleanup / product-landing-coverage),tmp,OPERATIONAL_RECOVERY_KEEP,P3,—,—,"rollback.sql.gz + apply-log + baseline-before present",relocate to docs/ops or keep,none,WO-E
+F19,tmp/** census/pilot data (.json.gz ≈ 30MB: cosmetics-retail-census / cosmetics-pilot / guide-production),tmp,UNKNOWN_STOP,P3,—,—,inputs of applied production batches; regenerable?,—,user decision on audit retention,WO-E
+F20,tmp/** pipeline .mjs scripts (35),tmp,ACTIVE_FIXTURE_RELOCATE,P3,manual CLI,—,—,apps/api-server/src/scripts,none,WO-E
+F21,tmp/*_install.sql (4) + delete_list_*.json (4),tmp,MIGRATION_HISTORY_KEEP,P3,—,—,forum_yaksa_install referenced by 4 docs,—,none,WO-E
+F22,Production backup tables (_bak_orphan_representative_products_20260706 16571 rows / offer_curations_backup_20260409 0 rows),DB,DROP_CANDIDATE,P3,0 (no entity, no SQL ref),0,"16571 / 0 rows",—,retention decision,WO-F
+F23,yaksa_* legacy tables (9) — 0 rows except yaksa_categories 5,DB,DROP_CANDIDATE,P3,0 entity; yaksa_members 1 raw ref,0,"0 rows ×8",kpa_members / organization-core,confirm raw ref yaksa_members,WO-F
+F24,apps / app_instances tables (app_registry canonical),DB,DROP_CANDIDATE,P3,0,0,"apps 1 / app_instances 0 / app_registry 2",app_registry,memory: app 3계보 IR,WO-F
+F25,custom_post_types/pages/views/role_permissions/forum_bookmark/kpa_stewards tables (0 rows no entity no ref),DB,DEAD_SCHEMA_RESIDUE,P3,0,0,0 rows,—,none,WO-F
+F26,product_*_cleanup/snapshot audit ledgers (product_candidate_cleanup_* / product_master_cleanup_audits / product_master_legacy_internal_code_snapshots),DB,OPERATIONAL_RECOVERY_KEEP,—,raw SQL refs,0,"3624 / 15776 / 57864 / 17171 rows",—,—,—
+F27,store_qr_codes.type dead column,DB,COMPAT_SCHEMA → DROP_CANDIDATE,P3,0 (canonical = landing_type),0,"92 rows; 2 rows diverge from landing_type",landing_type,none,WO-F
+F28,signage_forced_content(+positions) + forced-content.controller,api-server routes/signage + DB,LEGACY_INTERMEDIATE,P2,controller mounted,unknown (admin UI removed?),"0 rows both",HUB curation / campaign push?,business decision,WO-I
+F29,signage_playback_logs (migration 2026-09-10),DB,CANONICAL_SUPPORTING (new),—,player telemetry,signage-player-web,0 rows (just created),—,—,—
+F30,apps/forum-api (standalone forum API server 2025-12),apps/forum-api,DEAD_PACKAGE,P2,not deployed; not in CI,0,—,api-server /api/v1/forum,none,WO-D
+F31,apps/forum-web (23 files),apps/forum-web,DEAD_PACKAGE,P2,not deployed,0,—,service forum pages via forum-core,none,WO-D
+F32,apps/page-generator (44 files),apps/page-generator,UNKNOWN_STOP,P2,not deployed; not in CI,0,—,?,business decision (AI page generator),WO-D
+F33,services/web-account (Account Center; baseline O4O-MYPAGE-CANONICAL-V1),services/web-account,NEEDS_BUSINESS_DECISION,P2,type-checked; Dockerfile; NOT deployed; no Cloud Run service,—,"no account-web Cloud Run service",—,decision: deploy or retire baseline,WO-D
+F34,apps/mobile-app (1 file: android/.gitignore),apps/mobile-app,DEAD_GENERATED_ARTIFACT,P3,0,0,—,services/mobile-app,none,WO-D
+F35,Zero-dependent packages: @o4o/api-types / financial-core / forum-cosmetics / organization-lms / auth-core(frozen),packages,DEAD_PACKAGE (auth-core: UNKNOWN_STOP frozen §3),P2,0 imports,0,—,—,auth-core freeze policy,WO-D
+F36,glucoseview-web Cloud Run service with no repo source (last deploy 2026-04-14),infra,OPERATIONAL residue (out of repo),P3,serving,—,revision 00183,—,infra decision,WO-J
+F37,Duplicated auth pages across services (ResetPassword ×5 / AccountRecovery ×3 / VerifyEmail ×3 / Login ×3 / Handoff ×3) with no common core,services/*/pages,LEGACY_DUPLICATE (in-flight),P1,yes,yes,—,@o4o/auth-react (worktree o4o-auth-commonize · main 미병합),auth commonization merge,— (existing track)
+F38,KPA SignagePlaybackPage 533 lines w/o common core (KCos 39* / PH 70*),web-kpa-society,LEGACY_DUPLICATE,P1,yes,yes,—,common signage playback view,none,WO-K
+F39,InstructorDashboardPage divergent copies (564/121/277),services,LEGACY_DUPLICATE,P2,yes,yes,—,lms-ui,LMS track,WO-K
+F40,Fat adapters over common Views (SupplierProductsPage 1746 / StoreCockpitPage 677 / KpaEventOfferPage 547 / StoreHomePage 392 / ContentListPage 762),services,CANONICAL_NEEDS_ALIGNMENT,P2,yes,yes,—,thin adapter,none,WO-K
+F41,Legacy bare roles ('pharmacy'/'customer' etc.) in types/roles.ts,apps/api-server types,LEGACY_COMPATIBILITY,P3,role checks,—,—,prefixed roles (F9/F11 freeze),role migration log,—
+F42,Backend mounts with 0 frontend literal callers (19),apps/api-server register-routes,UNKNOWN (needs runtime log),P2,unknown,0 literal,—,—,request-log census,WO-G
+F43,1세대 tablet view (store-ui-core tablet/) + StoreQrConsoleView (KCos only),packages/store-ui-core,LEGACY_ACTIVE,P1,KCos,KCos,—,2세대 TabletCornerBoard / StoreQrOperationBoard,KCos adoption WO,WO-K
+F44,Store execution management home (StoreExecutionPage KPA/PH) — implemented after DESIGN,services,CANONICAL_ACTIVE,—,yes,yes,—,—,—,—
+F45,cosmetics-store-playlist / kpa store-playlist entities (store_playlists 11 rows),api-server,CANONICAL_ACTIVE (KEEP-LEGACY per baseline),—,yes,yes,11 rows,—,—,—

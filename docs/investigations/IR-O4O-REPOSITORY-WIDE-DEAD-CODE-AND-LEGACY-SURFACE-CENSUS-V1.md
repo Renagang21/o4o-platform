@@ -3,6 +3,7 @@
 > **상태**: COMPLETE_WITH_UNKNOWNS · **조사일**: 2026-09-11 · **성격**: 조사 전용 (코드·패키지·DB·GCP 무변경)
 > **선행**: `WO-O4O-ARCHIVE-RETENTION-AND-TRACKED-BACKUP-FINAL-DISPOSITION-V1` (CLOSED `19bcde423`) ·
 > `WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1` · `WO-O4O-WORDPRESS-COMPAT-FIELD-AND-THEME-CONTRACT-FINAL-DISPOSITION-V1`
+> **PASS 2** (같은 날 · `45ac4d052` 기준 · 프로덕션 schema diff + 사본 heuristic + 기능 단위 CSV): [`…-V1-PASS2.md`](IR-O4O-REPOSITORY-WIDE-DEAD-CODE-AND-LEGACY-SURFACE-CENSUS-V1-PASS2.md) · [`data/repository-legacy-census-v1.csv`](data/repository-legacy-census-v1.csv)
 > **원칙**: 이름만으로 dead 판정하지 않는다 · 의존자 0 만으로 삭제하지 않는다 · 운영 미확인 = UNKNOWN (코드 추정으로 ZERO 선언 금지)
 
 ---
