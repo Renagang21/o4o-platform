@@ -30,7 +30,7 @@ export function StoreLibraryContentRow({
         <div style={libraryStyles.rowTitle}>{item.title}</div>
         <div style={libraryContentMetaStyle}>
           <span style={libraryAccentBadgeStyle}>{item.sourceService ?? '—'}</span>
-          <span style={libraryMetaDateStyle}>{formatLibraryDate(item.createdAt)}</span>
+          <span style={libraryMetaDateStyle}>{formatLibraryDate(item.updatedAt ?? item.createdAt)}</span>
         </div>
       </div>
 

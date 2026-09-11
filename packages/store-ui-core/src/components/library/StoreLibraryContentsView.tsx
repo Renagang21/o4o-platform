@@ -53,7 +53,8 @@ export function StoreLibraryContentsView({
         id: item.id,
         title: item.title,
         description: readContentDescription(item),
-        origin: 'snapshot',
+        // WO-O4O-KCOS-LIBRARY-CONTENT-BD-CANONICAL-REALIGNMENT-V1: adapter 가 준 원장 origin 을 그대로 싣는다
+        origin: item.origin ?? 'snapshot',
       }],
     });
   };

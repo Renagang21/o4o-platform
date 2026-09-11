@@ -20,9 +20,27 @@ export async function getStoreQrCodes(opts?: { limit?: number }): Promise<any[]>
   return res.data?.data?.items ?? res.data?.items ?? [];
 }
 
-/** 내 매장 direct 콘텐츠 목록 (GET /store-contents 에서 sourceType='direct' 필터 — KPA 동일) */
-export async function getStoreDirectContents(): Promise<any[]> {
+/** GET /cosmetics/store-contents 목록 행 (공용 store-content.service listStoreContents 응답) */
+export interface StoreContentListItem {
+  id: string;
+  sourceType: string;
+  snapshotId: string | null;
+  title: string;
+  updatedAt: string | null;
+}
+
+/**
+ * 내 매장 콘텐츠 전체 목록 (kpa_store_contents · KCos org · direct + snapshot_edit)
+ * WO-O4O-KCOS-LIBRARY-CONTENT-BD-CANONICAL-REALIGNMENT-V1: 자료함 콘텐츠 탭의 B 축.
+ */
+export async function getStoreContents(): Promise<StoreContentListItem[]> {
   const res = await api.get('/cosmetics/store-contents');
   const list = res.data?.data ?? res.data ?? [];
-  return Array.isArray(list) ? list.filter((c: any) => c?.sourceType === 'direct') : [];
+  return Array.isArray(list) ? (list as StoreContentListItem[]) : [];
+}
+
+/** 내 매장 direct 콘텐츠 목록 (GET /store-contents 에서 sourceType='direct' 필터 — KPA 동일) */
+export async function getStoreDirectContents(): Promise<any[]> {
+  const list = await getStoreContents();
+  return list.filter((c) => c?.sourceType === 'direct');
 }

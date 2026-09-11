@@ -36,5 +36,6 @@ export {
 export type {
   StoreLibraryResourceItem,
   StoreLibraryContentItem,
+  StoreLibraryContentOrigin,
   StoreLibraryLabels,
 } from './types';

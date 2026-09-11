@@ -32,8 +32,9 @@ export function filterActiveResources(
   return items.filter((it) => it.isActive !== false);
 }
 
-/** 콘텐츠 snapshot 의 설명 필드(contentJson.description) 추출 */
+/** 콘텐츠 설명 — item.description 우선, 없으면 snapshot contentJson.description */
 export function readContentDescription(item: StoreLibraryContentItem): string | null {
+  if (item.description !== undefined) return item.description ?? null;
   const desc = (item.contentJson as Record<string, unknown> | null | undefined)?.description;
   return (desc as string | null | undefined) ?? null;
 }
