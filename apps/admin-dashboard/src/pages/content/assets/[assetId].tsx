@@ -39,7 +39,7 @@ import {
   ContentStatus,
   ContentVisibility,
   ContentOwnerType,
-} from '@o4o-apps/content-core';
+} from '@o4o-apps/content-core/types';
 
 import { contentAssetsApi, ContentAssetDetail } from '@/api/content-assets.api';
 

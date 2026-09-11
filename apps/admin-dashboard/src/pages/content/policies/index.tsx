@@ -50,7 +50,7 @@ import {
   ContentStatus,
   ContentVisibility,
   ContentOwnerType,
-} from '@o4o-apps/content-core';
+} from '@o4o-apps/content-core/types';
 
 // 정책 섹션 타입
 interface PolicySection {
