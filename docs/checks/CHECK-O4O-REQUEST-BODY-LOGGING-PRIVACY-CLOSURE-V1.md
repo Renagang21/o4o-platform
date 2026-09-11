@@ -2,8 +2,9 @@
 
 > WO: `WO-O4O-REQUEST-BODY-LOGGING-PRIVACY-CLOSURE-V1`
 > 목적: API 성능·운영 로그에서 request body 원문을 저장하지 않고, 비식별 메타데이터만 기록한다.
-> 상태: 코드·테스트·검증 완료 / production 부정 테스트 = §10
-> 코드 커밋: (본 커밋에서 채움)
+> 상태: 코드·테스트·production 부정 테스트 완료
+> 코드 커밋: `2e5d355cc` (fix+tests+CHECK) / §10 결과 후속 커밋
+> 배포 revision: `o4o-core-api-03609-d9c`
 
 ---
 
@@ -107,15 +108,21 @@ type-check: `tsc --noEmit` exit 0 / lint: eslint exit 0 / CI: (커밋 후 확인
 
 ---
 
-## 10. Production 부정 테스트
+## 10. Production 부정 테스트 — PASS
 
-(배포 후 채움)
-
-- 배포 revision:
-- 방법: 비식별 고유 문구 `O4O privacy smoke unique phrase 2026` 를 slow 응답이
-  나는 엔드포인트로 POST → Cloud Run 로그에서 해당 문구 검색.
-- 기대: 문구 hit 0, "API Performance"/"Slow API Response" 로그는 정상 생성.
+- 배포 revision: `o4o-core-api-03609-d9c` (커밋 2e5d355cc, deploy success)
+- 방법: 비식별 고유 문구 `O4O privacy smoke unique phrase 2026` 를 로그인 세션에서
+  `POST /api/ai/home-chat` (실측 responseTime **3161ms** → slow warn 경로 진입) 로 전송한 뒤
+  Cloud Run 로그에서 문구 및 body 필드 검색.
 - 결과:
+  - **문구 hit = 0** (`textPayload:"O4O privacy smoke unique phrase 2026"` 및
+    `"privacy smoke unique phrase"` 부분 검색 모두 0). 214 bytes body 에 문구가
+    담겼음에도 로그에 남지 않음 (구 코드였다면 `body` 필드로 적재됐을 크기).
+  - **Slow API Response 정상 생성** — `POST /home-chat` 3161ms 로그에
+    `bodyBytes:214, bodyPresent:true, contentType:"application/json", query:{}`,
+    method/path/statusCode/responseTime 유지, **`body` 필드 없음**.
+  - **API Performance 정상 생성** — 동 요청 info 로그 존재, 12분 창에서 30+ 건.
+- 판정: RAW BODY LOGGING = 0 / AI MESSAGE LOGGING = 0 / PERFORMANCE METRICS 유지. **PASS.**
 
 ---
 
@@ -130,4 +137,4 @@ type-check: `tsc --noEmit` exit 0 / lint: eslint exit 0 / CI: (커밋 후 확인
 | PERFORMANCE METRICS 유지 | ✅ (테스트 5·6·7·8) |
 | ERROR CODE LOGGING 유지 | ✅ (globalErrorHandler 무변경) |
 | DB MIGRATION = 0 / DB WRITE = 0 | ✅ (코드/로그만 변경) |
-| PRODUCTION NEGATIVE TEST | §10 |
+| PRODUCTION NEGATIVE TEST | ✅ PASS (§10 — 문구 0 hit / perf 정상 / revision o4o-core-api-03609-d9c) |
