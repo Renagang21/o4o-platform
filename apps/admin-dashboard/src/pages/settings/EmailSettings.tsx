@@ -1,14 +1,17 @@
 import { FC, useState, useEffect } from 'react';
-import { Mail, Send, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Mail, Eye, EyeOff } from 'lucide-react';
 import { settingsService, EmailSettings as EmailSettingsType } from '@/api/settings';
 import { useToast } from '@/hooks/use-toast';
 
+/**
+ * 이메일(SMTP) 설정 — backend `GET/PUT /api/v1/settings/email` 만 존재한다.
+ * "테스트 이메일 발송" 카드는 대응 endpoint 가 없어 항상 실패하던 UI 라 제거했다
+ * (WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1 §7·§8 REMOVE_BROKEN_UI).
+ */
 const EmailSettings: FC = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [testing, setTesting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [testEmail, setTestEmail] = useState('');
   const [settings, setSettings] = useState<Partial<EmailSettingsType>>({
     provider: 'smtp',
     smtpHost: '',
@@ -28,10 +31,6 @@ const EmailSettings: FC = () => {
       setLoading(true);
       const data = await settingsService.getEmailSettings();
       setSettings(data);
-      // 테스트 이메일 기본값 설정
-      if (data.fromEmail) {
-        setTestEmail(data.fromEmail);
-      }
     } catch (error) {
       // Error log removed
       // 에러 시 기본값 유지
@@ -68,43 +67,6 @@ const EmailSettings: FC = () => {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleTestEmail = async () => {
-    if (!testEmail) {
-      toast({
-        title: '오류',
-        description: '테스트 이메일 주소를 입력해주세요.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    try {
-      setTesting(true);
-      const result = await settingsService.testEmailSettings(testEmail);
-      
-      if (result.success) {
-        toast({
-          title: '성공',
-          description: `테스트 이메일이 ${testEmail}로 발송되었습니다.`,
-        });
-      } else {
-        toast({
-          title: '실패',
-          description: result.message || '테스트 이메일 발송에 실패했습니다.',
-          variant: 'destructive',
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: '오류',
-        description: error.response?.data?.message || '테스트 이메일 발송 중 오류가 발생했습니다.',
-        variant: 'destructive',
-      });
-    } finally {
-      setTesting(false);
     }
   };
 
@@ -298,63 +260,6 @@ const EmailSettings: FC = () => {
           </div>
         </div>
       </form>
-
-      {/* Test Email Section */}
-      <div className="o4o-card">
-        <div className="o4o-card-header">
-          <h3 className="o4o-card-title">테스트 이메일 발송</h3>
-        </div>
-        <div className="o4o-card-body">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-            <div className="flex items-start gap-2">
-              <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
-              <div className="text-sm text-blue-900">
-                <p className="font-medium">테스트 전 확인사항:</p>
-                <ul className="mt-1 space-y-1 list-disc list-inside">
-                  <li>SMTP 설정을 먼저 저장해주세요</li>
-                  <li>Gmail 사용 시 앱 비밀번호를 생성하여 사용하세요</li>
-                  <li>방화벽이 SMTP 포트를 차단하지 않는지 확인하세요</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            <input
-              type="email"
-              id="testEmail"
-              name="testEmail"
-              value={testEmail}
-              onChange={(e) => setTestEmail(e.target.value)}
-              className="o4o-input flex-1"
-              placeholder="테스트 이메일을 받을 주소 입력"
-              disabled={testing}
-            />
-            <button
-              type="button"
-              onClick={handleTestEmail}
-              disabled={testing || !testEmail}
-              className="o4o-button-primary flex items-center gap-2"
-            >
-              {testing ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  발송 중...
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4" />
-                  테스트 발송
-                </>
-              )}
-            </button>
-          </div>
-
-          <p className="mt-2 text-sm text-o4o-text-secondary">
-            설정이 올바른지 확인하기 위해 테스트 이메일을 발송합니다.
-          </p>
-        </div>
-      </div>
 
       {/* Common SMTP Settings Help */}
       <div className="o4o-card">

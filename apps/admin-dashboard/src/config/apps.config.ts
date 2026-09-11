@@ -74,11 +74,11 @@ export const apiEndpoints = {
   },
   
   // Settings
+  // backend `/api/v1/settings/:type` — unifiedApi.raw(base `/api`) 기준 `/v1/...`
+  // (WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1)
   settings: {
-    general: '/settings/general',
-    appearance: '/settings/appearance',
-    email: '/settings/email',
-    integrations: '/settings/integrations',
+    general: '/v1/settings/general',
+    email: '/v1/settings/email',
   },
 };
 

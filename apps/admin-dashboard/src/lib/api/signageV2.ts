@@ -2,10 +2,10 @@
  * Signage V2 API Client
  *
  * Sprint 2-5: Admin Dashboard API client for Phase 2 Digital Signage
- * Uses new multi-tenant endpoints: /api/signage/:serviceKey/...
+ * Uses new multi-tenant endpoints: /api/signage/:serviceKey/... (unifiedApi.raw, base `/api`)
  */
 
-import { authClient } from '@o4o/auth-client';
+import { unifiedApi } from '@/api/unified-client';
 
 // Default service key for platform admin
 const DEFAULT_SERVICE_KEY = 'neture';
@@ -422,380 +422,16 @@ interface PaginatedResponse<T> {
 // API Functions
 // ============================================================================
 
+// backend mount = `/api/signage/:serviceKey` (register-routes). `unifiedApi.raw` 의 base 가 `/api`
+// 이므로 `/signage/...` 로 붙인다. (이전 `authClient.api`(base `/api/v1`) + `/api/signage` 조합은
+// `/api/v1/api/signage/...` 404 — production smoke 에서 확인, WO-...-CLOSURE-V1 교정)
 const getBaseUrl = (serviceKey: string = DEFAULT_SERVICE_KEY) =>
-  `/api/signage/${serviceKey}`;
+  `/signage/${serviceKey}`;
 
-// Playlist API
-export const playlistApi = {
-  async list(serviceKey?: string, params?: { page?: number; limit?: number; isActive?: boolean }): Promise<ApiResponse<PaginatedResponse<SignagePlaylist>>> {
-    try {
-      const base = getBaseUrl(serviceKey);
-      const searchParams = new URLSearchParams();
-      if (params?.page) searchParams.append('page', params.page.toString());
-      if (params?.limit) searchParams.append('limit', params.limit.toString());
-      if (params?.isActive !== undefined) searchParams.append('isActive', params.isActive.toString());
-      const query = searchParams.toString();
-      const url = query ? `${base}/playlists?${query}` : `${base}/playlists`;
-      const response = await authClient.api.get(url);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to list playlists:', error);
-      return { success: false, error: 'Failed to list playlists' };
-    }
-  },
-
-  async get(id: string, serviceKey?: string): Promise<ApiResponse<SignagePlaylist>> {
-    try {
-      const response = await authClient.api.get(`${getBaseUrl(serviceKey)}/playlists/${id}`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to get playlist:', error);
-      return { success: false, error: 'Failed to get playlist' };
-    }
-  },
-
-  async create(dto: CreatePlaylistDto, serviceKey?: string): Promise<ApiResponse<SignagePlaylist>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/playlists`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to create playlist:', error);
-      return { success: false, error: 'Failed to create playlist' };
-    }
-  },
-
-  async update(id: string, dto: UpdatePlaylistDto, serviceKey?: string): Promise<ApiResponse<SignagePlaylist>> {
-    try {
-      const response = await authClient.api.patch(`${getBaseUrl(serviceKey)}/playlists/${id}`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to update playlist:', error);
-      return { success: false, error: 'Failed to update playlist' };
-    }
-  },
-
-  async delete(id: string, serviceKey?: string): Promise<ApiResponse<void>> {
-    try {
-      await authClient.api.delete(`${getBaseUrl(serviceKey)}/playlists/${id}`);
-      return { success: true };
-    } catch (error) {
-      console.error('Failed to delete playlist:', error);
-      return { success: false, error: 'Failed to delete playlist' };
-    }
-  },
-
-  async getItems(playlistId: string, serviceKey?: string): Promise<ApiResponse<SignagePlaylistItem[]>> {
-    try {
-      const response = await authClient.api.get(`${getBaseUrl(serviceKey)}/playlists/${playlistId}/items`);
-      return { success: true, data: response.data.items || response.data };
-    } catch (error) {
-      console.error('Failed to get playlist items:', error);
-      return { success: false, error: 'Failed to get playlist items' };
-    }
-  },
-
-  async addItem(playlistId: string, dto: AddPlaylistItemDto, serviceKey?: string): Promise<ApiResponse<SignagePlaylistItem>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/playlists/${playlistId}/items`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to add playlist item:', error);
-      return { success: false, error: 'Failed to add item' };
-    }
-  },
-
-  async updateItem(playlistId: string, itemId: string, dto: Partial<AddPlaylistItemDto>, serviceKey?: string): Promise<ApiResponse<SignagePlaylistItem>> {
-    try {
-      const response = await authClient.api.patch(`${getBaseUrl(serviceKey)}/playlists/${playlistId}/items/${itemId}`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to update playlist item:', error);
-      return { success: false, error: 'Failed to update item' };
-    }
-  },
-
-  async removeItem(playlistId: string, itemId: string, serviceKey?: string): Promise<ApiResponse<void>> {
-    try {
-      await authClient.api.delete(`${getBaseUrl(serviceKey)}/playlists/${playlistId}/items/${itemId}`);
-      return { success: true };
-    } catch (error) {
-      console.error('Failed to remove playlist item:', error);
-      return { success: false, error: 'Failed to remove item' };
-    }
-  },
-
-  async reorderItems(playlistId: string, itemIds: string[], serviceKey?: string): Promise<ApiResponse<void>> {
-    try {
-      await authClient.api.post(`${getBaseUrl(serviceKey)}/playlists/${playlistId}/items/reorder`, { itemIds });
-      return { success: true };
-    } catch (error) {
-      console.error('Failed to reorder items:', error);
-      return { success: false, error: 'Failed to reorder items' };
-    }
-  },
-};
-
-// Media API
-export const signageMediaApi = {
-  async list(serviceKey?: string, params?: { page?: number; limit?: number; mediaType?: SignageMediaType; ownerType?: MediaOwnerType }): Promise<ApiResponse<PaginatedResponse<SignageMedia>>> {
-    try {
-      const base = getBaseUrl(serviceKey);
-      const searchParams = new URLSearchParams();
-      if (params?.page) searchParams.append('page', params.page.toString());
-      if (params?.limit) searchParams.append('limit', params.limit.toString());
-      if (params?.mediaType) searchParams.append('mediaType', params.mediaType);
-      if (params?.ownerType) searchParams.append('ownerType', params.ownerType);
-      const query = searchParams.toString();
-      const url = query ? `${base}/media?${query}` : `${base}/media`;
-      const response = await authClient.api.get(url);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to list media:', error);
-      return { success: false, error: 'Failed to list media' };
-    }
-  },
-
-  async get(id: string, serviceKey?: string): Promise<ApiResponse<SignageMedia>> {
-    try {
-      const response = await authClient.api.get(`${getBaseUrl(serviceKey)}/media/${id}`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to get media:', error);
-      return { success: false, error: 'Failed to get media' };
-    }
-  },
-
-  async create(dto: CreateMediaDto, serviceKey?: string): Promise<ApiResponse<SignageMedia>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/media`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to create media:', error);
-      return { success: false, error: 'Failed to create media' };
-    }
-  },
-
-  async update(id: string, dto: UpdateMediaDto, serviceKey?: string): Promise<ApiResponse<SignageMedia>> {
-    try {
-      const response = await authClient.api.patch(`${getBaseUrl(serviceKey)}/media/${id}`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to update media:', error);
-      return { success: false, error: 'Failed to update media' };
-    }
-  },
-
-  async delete(id: string, serviceKey?: string): Promise<ApiResponse<void>> {
-    try {
-      await authClient.api.delete(`${getBaseUrl(serviceKey)}/media/${id}`);
-      return { success: true };
-    } catch (error) {
-      console.error('Failed to delete media:', error);
-      return { success: false, error: 'Failed to delete media' };
-    }
-  },
-
-  async getLibrary(serviceKey?: string): Promise<ApiResponse<{ platform: SignageMedia[]; organization: SignageMedia[]; supplier: SignageMedia[] }>> {
-    try {
-      const response = await authClient.api.get(`${getBaseUrl(serviceKey)}/media/library`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to get media library:', error);
-      return { success: false, error: 'Failed to get media library' };
-    }
-  },
-
-};
-
-// Schedule API
-export const signageScheduleApi = {
-  async list(serviceKey?: string, params?: { page?: number; limit?: number; channelId?: string; isActive?: boolean }): Promise<ApiResponse<PaginatedResponse<SignageSchedule>>> {
-    try {
-      const base = getBaseUrl(serviceKey);
-      const searchParams = new URLSearchParams();
-      if (params?.page) searchParams.append('page', params.page.toString());
-      if (params?.limit) searchParams.append('limit', params.limit.toString());
-      if (params?.channelId) searchParams.append('channelId', params.channelId);
-      if (params?.isActive !== undefined) searchParams.append('isActive', params.isActive.toString());
-      const query = searchParams.toString();
-      const url = query ? `${base}/schedules?${query}` : `${base}/schedules`;
-      const response = await authClient.api.get(url);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to list schedules:', error);
-      return { success: false, error: 'Failed to list schedules' };
-    }
-  },
-
-  async get(id: string, serviceKey?: string): Promise<ApiResponse<SignageSchedule>> {
-    try {
-      const response = await authClient.api.get(`${getBaseUrl(serviceKey)}/schedules/${id}`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to get schedule:', error);
-      return { success: false, error: 'Failed to get schedule' };
-    }
-  },
-
-  async create(dto: CreateScheduleDto, serviceKey?: string): Promise<ApiResponse<SignageSchedule>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/schedules`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to create schedule:', error);
-      return { success: false, error: 'Failed to create schedule' };
-    }
-  },
-
-  async update(id: string, dto: UpdateScheduleDto, serviceKey?: string): Promise<ApiResponse<SignageSchedule>> {
-    try {
-      const response = await authClient.api.patch(`${getBaseUrl(serviceKey)}/schedules/${id}`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to update schedule:', error);
-      return { success: false, error: 'Failed to update schedule' };
-    }
-  },
-
-  async delete(id: string, serviceKey?: string): Promise<ApiResponse<void>> {
-    try {
-      await authClient.api.delete(`${getBaseUrl(serviceKey)}/schedules/${id}`);
-      return { success: true };
-    } catch (error) {
-      console.error('Failed to delete schedule:', error);
-      return { success: false, error: 'Failed to delete schedule' };
-    }
-  },
-
-  async getCalendar(startDate: string, endDate: string, channelId?: string, serviceKey?: string): Promise<ApiResponse<ScheduleCalendarEvent[]>> {
-    try {
-      const base = getBaseUrl(serviceKey);
-      const searchParams = new URLSearchParams({ startDate, endDate });
-      if (channelId) searchParams.append('channelId', channelId);
-      const response = await authClient.api.get(`${base}/schedules/calendar?${searchParams.toString()}`);
-      return { success: true, data: response.data.events || response.data };
-    } catch (error) {
-      console.error('Failed to get schedule calendar:', error);
-      return { success: false, error: 'Failed to get calendar' };
-    }
-  },
-};
-
-// Template API
-export const templateApi = {
-  async list(serviceKey?: string, params?: { page?: number; limit?: number; isActive?: boolean }): Promise<ApiResponse<PaginatedResponse<SignageTemplate>>> {
-    try {
-      const base = getBaseUrl(serviceKey);
-      const searchParams = new URLSearchParams();
-      if (params?.page) searchParams.append('page', params.page.toString());
-      if (params?.limit) searchParams.append('limit', params.limit.toString());
-      if (params?.isActive !== undefined) searchParams.append('isActive', params.isActive.toString());
-      const query = searchParams.toString();
-      const url = query ? `${base}/templates?${query}` : `${base}/templates`;
-      const response = await authClient.api.get(url);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to list templates:', error);
-      return { success: false, error: 'Failed to list templates' };
-    }
-  },
-
-  async get(id: string, serviceKey?: string): Promise<ApiResponse<SignageTemplate>> {
-    try {
-      const response = await authClient.api.get(`${getBaseUrl(serviceKey)}/templates/${id}`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to get template:', error);
-      return { success: false, error: 'Failed to get template' };
-    }
-  },
-
-  async create(dto: CreateTemplateDto, serviceKey?: string): Promise<ApiResponse<SignageTemplate>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/templates`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to create template:', error);
-      return { success: false, error: 'Failed to create template' };
-    }
-  },
-
-  async update(id: string, dto: UpdateTemplateDto, serviceKey?: string): Promise<ApiResponse<SignageTemplate>> {
-    try {
-      const response = await authClient.api.patch(`${getBaseUrl(serviceKey)}/templates/${id}`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to update template:', error);
-      return { success: false, error: 'Failed to update template' };
-    }
-  },
-
-  async delete(id: string, serviceKey?: string): Promise<ApiResponse<void>> {
-    try {
-      await authClient.api.delete(`${getBaseUrl(serviceKey)}/templates/${id}`);
-      return { success: true };
-    } catch (error) {
-      console.error('Failed to delete template:', error);
-      return { success: false, error: 'Failed to delete template' };
-    }
-  },
-
-  async getZones(templateId: string, serviceKey?: string): Promise<ApiResponse<SignageTemplateZone[]>> {
-    try {
-      const response = await authClient.api.get(`${getBaseUrl(serviceKey)}/templates/${templateId}/zones`);
-      return { success: true, data: response.data.zones || response.data };
-    } catch (error) {
-      console.error('Failed to get template zones:', error);
-      return { success: false, error: 'Failed to get zones' };
-    }
-  },
-
-  async addZone(templateId: string, dto: CreateTemplateZoneDto, serviceKey?: string): Promise<ApiResponse<SignageTemplateZone>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/templates/${templateId}/zones`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to add template zone:', error);
-      return { success: false, error: 'Failed to add zone' };
-    }
-  },
-
-  async updateZone(templateId: string, zoneId: string, dto: Partial<CreateTemplateZoneDto>, serviceKey?: string): Promise<ApiResponse<SignageTemplateZone>> {
-    try {
-      const response = await authClient.api.patch(`${getBaseUrl(serviceKey)}/templates/${templateId}/zones/${zoneId}`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to update template zone:', error);
-      return { success: false, error: 'Failed to update zone' };
-    }
-  },
-
-  async removeZone(templateId: string, zoneId: string, serviceKey?: string): Promise<ApiResponse<void>> {
-    try {
-      await authClient.api.delete(`${getBaseUrl(serviceKey)}/templates/${templateId}/zones/${zoneId}`);
-      return { success: true };
-    } catch (error) {
-      console.error('Failed to remove template zone:', error);
-      return { success: false, error: 'Failed to remove zone' };
-    }
-  },
-
-  async preview(dto: { templateId: string; zoneContents: Record<string, string> }, serviceKey?: string): Promise<ApiResponse<{ previewUrl: string }>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/templates/preview`, dto);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to generate template preview:', error);
-      return { success: false, error: 'Failed to generate preview' };
-    }
-  },
-};
-
-// Content Block API
-
-// Layout Preset API
-
-// AI Generation API
+// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
+//   playlistApi · signageMediaApi · signageScheduleApi · templateApi 는 admin 소비처 0
+//   (admin 의 signage 화면은 /admin/digital-signage/content = ContentHub 조회 하나뿐) 이라 제거.
+//   남은 globalContentApi 는 backend `/api/signage/:serviceKey/global/*` 와 1:1.
 
 // Global Content API (Content Hub)
 // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone 메서드 제거 (clonePlaylist, cloneMedia 삭제)
@@ -811,7 +447,7 @@ export const globalContentApi = {
       if (params?.limit) searchParams.append('limit', params.limit.toString());
       const query = searchParams.toString();
       const url = query ? `${base}/global/playlists/${source}?${query}` : `${base}/global/playlists/${source}`;
-      const response = await authClient.api.get(url);
+      const response = await unifiedApi.raw.get(url);
       return { success: true, data: response.data };
     } catch (error) {
       console.error(`Failed to list ${source} playlists:`, error);
@@ -827,7 +463,7 @@ export const globalContentApi = {
       if (params?.limit) searchParams.append('limit', params.limit.toString());
       const query = searchParams.toString();
       const url = query ? `${base}/global/media/${source}?${query}` : `${base}/global/media/${source}`;
-      const response = await authClient.api.get(url);
+      const response = await unifiedApi.raw.get(url);
       return { success: true, data: response.data };
     } catch (error) {
       console.error(`Failed to list ${source} media:`, error);
