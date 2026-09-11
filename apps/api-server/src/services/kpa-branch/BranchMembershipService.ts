@@ -68,6 +68,8 @@ export class BranchMembershipService {
     note?: string | null;
     /** 발령일. 미지정이면 처리 시각. 전출 마감일과 전입일이 같은 값으로 기록된다. */
     effectiveDate?: Date | null;
+    /** 분회 회비구분 — 분회별 속성이므로 새 소속 행에만 기록한다 (이전 분회 행은 그대로) */
+    feeCategory?: string | null;
   }): Promise<BranchMembership> {
     const effectiveAt = params.effectiveDate ?? new Date();
     return this.ds.transaction(async (manager: EntityManager) => {
@@ -103,6 +105,9 @@ export class BranchMembershipService {
         left_at: null,
         transfer_reason: params.reason ?? null,
         note: params.note ?? null,
+        fee_category: params.feeCategory ?? null,
+        workplace_name: null,
+        workplace_address: null,
       });
       return repo.save(created);
     });

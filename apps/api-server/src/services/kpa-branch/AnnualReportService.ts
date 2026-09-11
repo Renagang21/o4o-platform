@@ -340,36 +340,50 @@ export class AnnualReportService {
    * ownership='auto' 필드의 초기값을 실제 원장에서 읽는다.
    * 초기값일 뿐이며 회원 수정 가능 여부는 Template 의 readonly 가 정한다.
    * 본 WO 에서 원장에 되쓰지 않는다 (sync 는 W3).
+   *
+   * 원장 source (WO-O4O-KPA-BRANCH-PHARMACIST-PROFILE-CANONICALIZATION-V1):
+   *   - 면허번호·직역   = `kpa_pharmacist_profiles` (canonical)
+   *   - 근무처명·주소   = `branch_memberships` 의 그 분회 active 행
+   *   - `kpa_members`   = 위 두 곳에 값이 없을 때만 읽는 fallback (쓰지 않는다)
+   * 2026 양식의 legacy 식별자(`kpa_members.*`)는 같은 canonical 값으로 alias 한다 — 양식 row 는 바꾸지 않는다.
    */
   static async buildPrefill(
     t: AnnualReportTemplate,
-    ctx: { userId: string },
+    ctx: { userId: string; organizationId: string },
   ): Promise<AnnualReportValues> {
     const prefill: AnnualReportValues = {};
 
     const rows: Array<Record<string, unknown>> = await AppDataSource.query(
       `SELECT u.name  AS user_name,
               u.email AS user_email,
-              m.license_number,
-              m.activity_type,
-              m.pharmacy_name,
-              m.pharmacy_address
+              COALESCE(p.license_number, m.license_number)     AS license_number,
+              COALESCE(p.activity_type,  m.activity_type)      AS activity_type,
+              COALESCE(bm.workplace_name,    m.pharmacy_name)    AS workplace_name,
+              COALESCE(bm.workplace_address, m.pharmacy_address) AS workplace_address
          FROM users u
+         LEFT JOIN kpa_pharmacist_profiles p ON p.user_id = u.id
+         LEFT JOIN branch_memberships bm
+                ON bm.user_id = u.id AND bm.organization_id = $2 AND bm.status = 'active'
          LEFT JOIN kpa_members m ON m.user_id = u.id
         WHERE u.id = $1
         LIMIT 1`,
-      [ctx.userId],
+      [ctx.userId, ctx.organizationId],
     );
     const src = rows[0] ?? {};
 
-    /** source.column → 실제 조회 결과 키 */
+    /** source.column → 실제 조회 결과 키 (canonical 식별자와 legacy alias 모두 같은 값) */
     const columnMap: Record<string, unknown> = {
       'users.name': src.user_name,
       'users.email': src.user_email,
+      'kpa_pharmacist_profiles.license_number': src.license_number,
+      'kpa_pharmacist_profiles.activity_type': src.activity_type,
+      'branch_memberships.workplace_name': src.workplace_name,
+      'branch_memberships.workplace_address': src.workplace_address,
+      // legacy alias (2026 양식)
       'kpa_members.license_number': src.license_number,
       'kpa_members.activity_type': src.activity_type,
-      'kpa_members.pharmacy_name': src.pharmacy_name,
-      'kpa_members.pharmacy_address': src.pharmacy_address,
+      'kpa_members.pharmacy_name': src.workplace_name,
+      'kpa_members.pharmacy_address': src.workplace_address,
     };
 
     for (const f of this.fields(t)) {

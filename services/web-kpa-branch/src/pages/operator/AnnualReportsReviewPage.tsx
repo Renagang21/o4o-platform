@@ -284,8 +284,9 @@ export default function AnnualReportsReviewPage({ slug }: { slug: string }) {
                     {detail.ledgerDiff.changes.map((c) => (
                       <li key={c.key} className="text-gray-700">
                         <span className="font-medium">{c.label}</span>{' '}
-                        <span className="text-gray-400 line-through">{display(c.before)}</span>{' '}
-                        <span aria-hidden>→</span> <span className="text-gray-900">{display(c.after)}</span>
+                        <span className="text-gray-400 line-through">{display(c.beforeLabel ?? c.before)}</span>{' '}
+                        <span aria-hidden>→</span>{' '}
+                        <span className="text-gray-900">{display(c.afterLabel ?? c.after)}</span>
                       </li>
                     ))}
                   </ul>
@@ -375,16 +376,23 @@ export default function AnnualReportsReviewPage({ slug }: { slug: string }) {
                 )}
 
                 {reportStatus === 'approved' && !detail.report.syncedToMembership && (
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() =>
-                      void run(() => syncAnnualReportToMembership(slug, selectedId), '회원정보에 반영했습니다.')
-                    }
-                    className="rounded bg-green-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
-                  >
-                    회원정보에 반영
-                  </button>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      // 원장이 없으면 서버도 같은 사유로 거절한다 — 눌러서 실패시키지 않는다
+                      disabled={busy || detail.ledgerDiff.unavailable !== null}
+                      title={detail.ledgerDiff.unavailable ?? undefined}
+                      onClick={() =>
+                        void run(() => syncAnnualReportToMembership(slug, selectedId), '회원정보에 반영했습니다.')
+                      }
+                      className="rounded bg-green-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+                    >
+                      회원정보에 반영
+                    </button>
+                    {detail.ledgerDiff.unavailable && (
+                      <span className="text-sm text-amber-700">{detail.ledgerDiff.unavailable}</span>
+                    )}
+                  </div>
                 )}
 
                 {reportStatus === 'revision_requested' && (

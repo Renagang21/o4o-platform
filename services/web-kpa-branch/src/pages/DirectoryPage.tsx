@@ -38,6 +38,7 @@ export default function DirectoryPage() {
         <p className="mt-1 text-gray-600">{BRAND.tagline}</p>
         <div className="mt-4 flex gap-3 text-sm">
           <Link to="/login" className="text-primary-700 hover:underline">로그인</Link>
+          <Link to="/join" className="text-primary-700 hover:underline">가입 신청</Link>
           <Link to="/me" className="text-primary-700 hover:underline">내 분회</Link>
         </div>
       </header>

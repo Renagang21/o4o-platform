@@ -92,7 +92,12 @@ export interface MemberConsoleListItem {
   email: string | null;
   licenseNumber: string | null;
   activityType: string | null;
+  /** canonical 약사 프로필 존재 여부 — false 면 면허번호·직역은 fallback 값이거나 없다 */
+  hasPharmacistProfile: boolean;
   feeCategory: string | null;
+  /** 분회별 속성 (`branch_memberships`) */
+  workplaceName: string | null;
+  workplaceAddress: string | null;
   report: { status: ReportSummaryStatus; submittedAt: Date | null; approvedAt: Date | null };
   fee: { status: FeeSummaryStatus; assessedAmount: number | null; paidAmount: number | null };
   education: {
@@ -109,12 +114,24 @@ export interface MemberConsoleListItem {
   positions: string[];
 }
 
-/** 목록·상세가 같은 조인을 쓰도록 한 곳에 둔다 — 두 화면이 다른 판정을 내지 않게 한다 */
+/**
+ * 목록·상세가 같은 조인을 쓰도록 한 곳에 둔다 — 두 화면이 다른 판정을 내지 않게 한다.
+ *
+ * 면허번호·직역의 canonical source 는 `kpa_pharmacist_profiles` 다
+ * (WO-O4O-KPA-BRANCH-PHARMACIST-PROFILE-CANONICALIZATION-V1). `kpa_members` 는 profile 에 값이
+ * 없을 때만 읽는 fallback 이며, 이 콘솔은 어느 쪽에도 쓰지 않는다.
+ * 분회별 속성(회비구분·근무처)은 `branch_memberships` 의 그 분회 행에서 읽는다.
+ */
 const CONSOLE_SELECT = `
   SELECT bm.id, bm.user_id, bm.organization_id, bm.status AS membership_status,
          bm.joined_at, bm.left_at, bm.transfer_reason, bm.note,
          u.name AS user_name, u.email AS user_email,
-         km.license_number, km.activity_type, km.fee_category AS member_fee_category,
+         COALESCE(p.license_number, km.license_number) AS license_number,
+         COALESCE(p.activity_type, km.activity_type) AS activity_type,
+         (p.id IS NOT NULL) AS has_profile,
+         bm.fee_category AS bm_fee_category,
+         bm.workplace_name, bm.workplace_address,
+         COALESCE(bm.fee_category, km.fee_category) AS member_fee_category,
          ar.id AS report_id, ar.status AS report_status, ar.submitted_at AS report_submitted_at,
          ar.approved_at AS report_approved_at, ar.synced_to_membership AS report_synced,
          ar.revision_reason AS report_revision_reason,
@@ -127,6 +144,7 @@ const CONSOLE_SELECT = `
          el.exemption_type AS edu_exemption_type, el.memo AS edu_memo
     FROM branch_memberships bm
     JOIN users u ON u.id = bm.user_id
+    LEFT JOIN kpa_pharmacist_profiles p ON p.user_id = bm.user_id
     LEFT JOIN kpa_members km ON km.user_id = bm.user_id
     LEFT JOIN annual_reports ar
            ON ar.user_id = bm.user_id AND ar.organization_id = bm.organization_id AND ar.year = $2
@@ -184,8 +202,11 @@ export class BranchMemberConsoleService {
       email: r.user_email ?? null,
       licenseNumber: r.license_number ?? null,
       activityType: r.activity_type ?? null,
+      hasPharmacistProfile: r.has_profile === true,
       // 회비 원장의 구분(부과 시점 스냅샷)이 있으면 그것이 그 해의 사실이다 (W5 §6 과 같은 우선순위)
       feeCategory: r.fee_ledger_category ?? r.member_fee_category ?? null,
+      workplaceName: r.workplace_name ?? null,
+      workplaceAddress: r.workplace_address ?? null,
 
       report: {
         status: (r.report_id ? r.report_status : 'not_submitted') as ReportSummaryStatus,
@@ -237,7 +258,9 @@ export class BranchMemberConsoleService {
     }
     if (params.q && params.q.trim()) {
       args.push(`%${params.q.trim()}%`);
-      where.push(`(u.name ILIKE $${args.length} OR km.license_number ILIKE $${args.length})`);
+      where.push(
+        `(u.name ILIKE $${args.length} OR COALESCE(p.license_number, km.license_number) ILIKE $${args.length})`,
+      );
     }
 
     const whereSql = where.join(' AND ');
@@ -302,28 +325,36 @@ export class BranchMemberConsoleService {
     const summary = this.serialize(r);
 
     /** 신고 상세 — 원장 대비 변경항목은 W3/W4 와 같은 함수로 판정한다 */
-    let reportChanges: Array<{ key: string; label: string; before: unknown; after: unknown }> = [];
+    let reportChanges: Array<{
+      key: string; label: string; before: unknown; after: unknown;
+      beforeLabel: string | null; afterLabel: string | null;
+    }> = [];
     let reportDiffUnavailable: string | null = null;
 
     if (r.report_id) {
       const template = await AnnualReportService.getTemplateById(r.report_template_id);
-      const ledger = await AnnualReportMembershipSyncService.loadMemberLedger(r.user_id);
+      const ledger = await AnnualReportMembershipSyncService.loadMemberLedger(r.user_id, params.organizationId);
       if (!template) {
         reportDiffUnavailable = '제출 당시 양식을 찾을 수 없습니다.';
       } else if (!ledger) {
-        reportDiffUnavailable = '약사회 회원정보가 없어 비교할 수 없습니다.';
+        reportDiffUnavailable = AnnualReportMembershipSyncService.unavailableReason(null);
       } else {
         const diff = AnnualReportMembershipSyncService.diffAgainstLedger(
           template,
           r.report_values ?? {},
           ledger,
         );
-        const labelOf = new Map(AnnualReportService.fields(template).map((f) => [f.key, f.label]));
+        const fields = AnnualReportService.fields(template);
+        const fieldOf = new Map(fields.map((f) => [f.key, f]));
+        // 반영 불가 사유는 sync 와 같은 판정을 쓴다 — 화면은 이 값으로 반영 버튼을 막는다
+        reportDiffUnavailable = AnnualReportMembershipSyncService.unavailableReason(ledger);
         reportChanges = diff.changes.map((c) => ({
           key: c.key,
-          label: labelOf.get(c.key) ?? c.key,
+          label: fieldOf.get(c.key)?.label ?? c.key,
           before: c.before,
           after: c.after,
+          beforeLabel: AnnualReportMembershipSyncService.labelFor(fieldOf.get(c.key), c.before),
+          afterLabel: AnnualReportMembershipSyncService.labelFor(fieldOf.get(c.key), c.after),
         }));
       }
     } else {
@@ -348,7 +379,10 @@ export class BranchMemberConsoleService {
         email: r.user_email ?? null,
         licenseNumber: r.license_number ?? null,
         activityType: r.activity_type ?? null,
+        hasPharmacistProfile: summary.hasPharmacistProfile,
         feeCategory: summary.feeCategory,
+        workplaceName: summary.workplaceName,
+        workplaceAddress: summary.workplaceAddress,
         /** 현재 직책 — 회원 1명 기준이라 상수 회수다 */
         positions: officerPositions.get(r.user_id) ?? [],
       },

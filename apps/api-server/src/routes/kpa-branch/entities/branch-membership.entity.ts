@@ -43,6 +43,23 @@ export class BranchMembership {
   @Column({ type: 'text', nullable: true })
   note: string | null;
 
+  /**
+   * 분회별 회원 속성 (WO-O4O-KPA-BRANCH-PHARMACIST-PROFILE-CANONICALIZATION-V1).
+   * 면허번호·직역은 여기 두지 않는다 — `kpa_pharmacist_profiles` 가 canonical 이다.
+   * `kpa_members` 의 같은 이름 컬럼은 read fallback 전용이다.
+   */
+  /** 회비구분 — branch_fee_policies.fee_category 와 같은 코드계 (A1_pharmacy_owner …) */
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  fee_category: string | null;
+
+  /** 근무처명 — 신상신고 employment.workplaceName sync 대상 */
+  @Column({ type: 'varchar', length: 200, nullable: true })
+  workplace_name: string | null;
+
+  /** 근무처 주소 — 신상신고 employment.workplaceRoadAddress sync 대상 */
+  @Column({ type: 'varchar', length: 300, nullable: true })
+  workplace_address: string | null;
+
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
 

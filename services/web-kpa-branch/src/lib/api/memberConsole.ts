@@ -79,7 +79,11 @@ export interface MemberConsoleListItem {
   email: string | null;
   licenseNumber: string | null;
   activityType: string | null;
+  /** canonical 약사 프로필 존재 여부 — false 면 면허번호·직역은 fallback 값이거나 없다 */
+  hasPharmacistProfile?: boolean;
   feeCategory: string | null;
+  workplaceName?: string | null;
+  workplaceAddress?: string | null;
   report: { status: ReportSummaryStatus; submittedAt: string | null; approvedAt: string | null };
   fee: { status: FeeSummaryStatus; assessedAmount: number | null; paidAmount: number | null };
   education: {
@@ -100,7 +104,10 @@ export interface MemberConsoleDetail {
     email: string | null;
     licenseNumber: string | null;
     activityType: string | null;
+    hasPharmacistProfile?: boolean;
     feeCategory: string | null;
+    workplaceName?: string | null;
+    workplaceAddress?: string | null;
     /** 현재 직책 — 읽기 전용 표시 */
     positions?: string[];
   };
@@ -122,7 +129,11 @@ export interface MemberConsoleDetail {
     revisionReason?: string | null;
     revisionRequestedAt?: string | null;
     revisionRound?: number;
-    changes?: Array<{ key: string; label: string; before: unknown; after: unknown }>;
+    changes?: Array<{
+      key: string; label: string; before: unknown; after: unknown;
+      beforeLabel?: string | null; afterLabel?: string | null;
+    }>;
+    /** null 이 아니면 원장 반영(sync)도 같은 사유로 거절된다 */
     diffUnavailable?: string | null;
   };
   fee: {

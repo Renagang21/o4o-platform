@@ -450,7 +450,14 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
             <>
               <Section title={`${detail.member.name ?? '회원'} · ${detail.year}년`}>
                 <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <Field label="면허번호" value={detail.member.licenseNumber ?? '-'} />
+                  <Field
+                    label="면허번호"
+                    value={
+                      detail.member.licenseNumber
+                        ?? (detail.member.hasPharmacistProfile === false ? '약사 프로필 없음' : '-')
+                    }
+                  />
+                  <Field label="근무처" value={detail.member.workplaceName ?? '-'} />
                   <Field
                     label="현재 직책"
                     value={
@@ -565,8 +572,8 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
                     <ul className="mt-1 space-y-1 text-sm text-gray-800">
                       {detail.report.changes.map((c) => (
                         <li key={c.key}>
-                          {c.label}: <span className="text-gray-500">{display(c.before)}</span> →{' '}
-                          <span className="font-medium">{display(c.after)}</span>
+                          {c.label}: <span className="text-gray-500">{display(c.beforeLabel ?? c.before)}</span> →{' '}
+                          <span className="font-medium">{display(c.afterLabel ?? c.after)}</span>
                         </li>
                       ))}
                     </ul>

@@ -26,6 +26,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import logger from '../../utils/logger.js';
+import { PharmacistProfilePromotionService } from '../../services/kpa-branch/PharmacistProfilePromotionService.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 /** 이 콘솔이 접근할 수 있는 유일한 서비스 범위 — 요청 값에서 유도하지 않는다. */
@@ -140,9 +141,30 @@ export class BranchServiceMembershipController {
           code: 'MEMBERSHIP_NOT_APPROVABLE',
         });
       }
+      /**
+       * 승인 확정 후 Extension 경계에서 약사 profile 을 보장한다
+       * (WO-O4O-KPA-BRANCH-PHARMACIST-PROFILE-CANONICALIZATION-V1).
+       * 가입 시 core 가 남긴 `businessInfo.licenseNumber` 를 canonical profile 로 승격하며,
+       * 기존 profile 은 보존한다. 실패해도 승인은 되돌리지 않는다.
+       */
+      const profile = await PharmacistProfilePromotionService.promoteFromUser({ userId: membership.user_id });
       return res.json({
         success: true,
-        data: { id: membership.id, userId: membership.user_id, status: membership.status, role: membership.role },
+        data: {
+          id: membership.id,
+          userId: membership.user_id,
+          status: membership.status,
+          role: membership.role,
+          pharmacistProfile: profile
+            ? {
+                id: profile.profileId,
+                created: profile.created,
+                licenseNumber: profile.licenseNumber,
+                activityType: profile.activityType,
+                licenseConflict: profile.licenseConflict,
+              }
+            : null,
+        },
       });
     } catch (error) {
       logger.error('[BranchServiceMembership] approve error', {

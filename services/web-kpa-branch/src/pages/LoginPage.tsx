@@ -6,7 +6,7 @@
  * (로그인 API 는 serviceKey 가 없으면 다른 축으로 검증돼 정상 계정도 401 이 된다).
  */
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { BRAND } from '../config/service';
 
@@ -67,6 +67,12 @@ export default function LoginPage() {
           {busy ? '로그인 중…' : '로그인'}
         </button>
       </form>
+      <p className="mt-4 text-sm text-gray-500">
+        아직 회원이 아니신가요?{' '}
+        <Link to="/join" className="font-medium text-primary-600 underline">
+          가입 신청
+        </Link>
+      </p>
     </div>
   );
 }

@@ -44,6 +44,7 @@ import { TenantProvider, useTenant, detectBasename } from './lib/tenant';
 import { BranchLayout } from './layouts/BranchLayout';
 import DirectoryPage from './pages/DirectoryPage';
 import LoginPage from './pages/LoginPage';
+import JoinPage from './pages/JoinPage';
 import MyBranchPage from './pages/MyBranchPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import BranchHomePage from './pages/BranchHomePage';
@@ -122,6 +123,7 @@ function AppRoutes() {
     return (
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/join" element={<JoinPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/me" element={<MyBranchPage />} />
         <Route path="/*" element={<BranchSection slug={hostBranch.slug} basePath="" />} />
@@ -133,6 +135,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<DirectoryPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/join" element={<JoinPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/me" element={<MyBranchPage />} />
       <Route path="/:branchSlug/*" element={<BranchBySlug />} />

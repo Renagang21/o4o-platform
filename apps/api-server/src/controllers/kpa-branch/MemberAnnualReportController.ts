@@ -109,7 +109,7 @@ export class MemberAnnualReportController {
       where: { user_id: userId, organization_id: organizationId, year: template.year },
     });
 
-    const prefill = await AnnualReportService.buildPrefill(template, { userId });
+    const prefill = await AnnualReportService.buildPrefill(template, { userId, organizationId });
     const association = await AnnualReportService.resolveAssociationValues(template, {
       organizationId,
       year: template.year,

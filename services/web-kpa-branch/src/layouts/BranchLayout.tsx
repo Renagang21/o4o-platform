@@ -174,7 +174,10 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
                 <button type="button" onClick={logout} className="text-gray-500 hover:text-gray-900">로그아웃</button>
               </span>
             ) : (
-              <Link to="/login" className="text-gray-600 hover:text-gray-900">로그인</Link>
+              <span className="flex items-center gap-3">
+                <Link to="/login" className="text-gray-600 hover:text-gray-900">로그인</Link>
+                <Link to="/join" className="text-gray-600 hover:text-gray-900">가입 신청</Link>
+              </span>
             )}
           </div>
         </div>

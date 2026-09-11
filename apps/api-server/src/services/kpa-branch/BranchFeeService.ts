@@ -321,12 +321,13 @@ export class BranchFeeService {
     const amountOf = new Map(policies.map((p) => [p.feeCategory, p.amount]));
 
     /**
-     * 대상 = 이 분회 active 소속 회원. `kpa_members` 는 LEFT JOIN 이다 —
-     * 회원 원장이 없어도 대상에서 빼지 않고 NO_FEE_CATEGORY 로 보고한다
+     * 대상 = 이 분회 active 소속 회원. 회비구분은 분회별 속성이라
+     * `branch_memberships.fee_category` 가 먼저이고, 비어 있으면 `kpa_members` 를 read fallback 으로 본다.
+     * 둘 다 없어도 대상에서 빼지 않고 NO_FEE_CATEGORY 로 보고한다
      * (조용히 누락되면 운영자가 빠진 사람을 알 수 없다).
      */
     const targets: Array<Record<string, any>> = await AppDataSource.query(
-      `SELECT bm.user_id, m.fee_category,
+      `SELECT bm.user_id, COALESCE(bm.fee_category, m.fee_category) AS fee_category,
               (l.id IS NOT NULL) AS already
          FROM branch_memberships bm
          LEFT JOIN kpa_members m ON m.user_id = bm.user_id
@@ -667,15 +668,16 @@ export class BranchFeeService {
   /**
    * 신상신고 `fee.category` 연동용 — 이 회원의 그 해 회비구분.
    *
-   * 우선순위: 그 연도 회비 원장 → 회원 원장(`kpa_members.fee_category`).
+   * 우선순위: 그 연도 회비 원장 → 분회 소속 행(`branch_memberships.fee_category`)
+   *          → 회원 원장(`kpa_members.fee_category`, read fallback).
    * 회비 원장이 먼저인 이유는 **부과 시점의 스냅샷**이기 때문이다.
-   * 둘 다 없으면 null 을 낸다 — 신상신고는 이를 '미연결'로 표시한다.
+   * 모두 없으면 null 을 낸다 — 신상신고는 이를 '미연결'로 표시한다.
    */
   static async resolveMemberFeeCategory(params: {
     organizationId: string;
     userId: string;
     year: number;
-  }): Promise<{ feeCategory: string | null; source: 'ledger' | 'member' | null }> {
+  }): Promise<{ feeCategory: string | null; source: 'ledger' | 'branch_membership' | 'member' | null }> {
     const ledger: Array<Record<string, any>> = await AppDataSource.query(
       `SELECT fee_category FROM branch_fee_ledgers
         WHERE organization_id = $1 AND user_id = $2 AND year = $3 LIMIT 1`,
@@ -683,6 +685,15 @@ export class BranchFeeService {
     );
     if (ledger[0]?.fee_category) {
       return { feeCategory: ledger[0].fee_category, source: 'ledger' };
+    }
+
+    const membership: Array<Record<string, any>> = await AppDataSource.query(
+      `SELECT fee_category FROM branch_memberships
+        WHERE organization_id = $1 AND user_id = $2 AND status = 'active' LIMIT 1`,
+      [params.organizationId, params.userId],
+    );
+    if (membership[0]?.fee_category) {
+      return { feeCategory: membership[0].fee_category, source: 'branch_membership' };
     }
 
     const member: Array<Record<string, any>> = await AppDataSource.query(

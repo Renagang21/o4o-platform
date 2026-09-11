@@ -28,6 +28,7 @@ import type {
 } from '../../routes/kpa-branch/entities/annual-report.entity.js';
 import { AnnualReportService } from './AnnualReportService.js';
 import { AnnualReportMembershipSyncService } from './AnnualReportMembershipSyncService.js';
+import type { MemberLedger } from './AnnualReportMembershipSyncService.js';
 
 export type ReviewFailureCode =
   | 'REPORT_NOT_FOUND'
@@ -104,7 +105,7 @@ export class AnnualReportReviewService {
     // 목록에서도 원장 비교를 보여준다. 판정 로직은 실제 반영(W3)과 **같은 함수**를 쓴다.
     const items: ReviewListItem[] = [];
     const templateCache = new Map<string, Awaited<ReturnType<typeof AnnualReportService.getTemplateById>>>();
-    const memberCache = new Map<string, Record<string, unknown> | null>();
+    const memberCache = new Map<string, MemberLedger | null>();
 
     for (const row of rows) {
       let template = templateCache.get(row.template_id);
@@ -114,7 +115,7 @@ export class AnnualReportReviewService {
       }
       let member = memberCache.get(row.user_id);
       if (member === undefined) {
-        member = await AnnualReportMembershipSyncService.loadMemberLedger(row.user_id);
+        member = await AnnualReportMembershipSyncService.loadMemberLedger(row.user_id, params.organizationId);
         memberCache.set(row.user_id, member);
       }
 
@@ -125,7 +126,7 @@ export class AnnualReportReviewService {
       if (!template) {
         diffUnavailable = '제출 당시 양식을 찾을 수 없습니다.';
       } else if (!member) {
-        diffUnavailable = '약사회 회원정보가 없어 비교할 수 없습니다.';
+        diffUnavailable = AnnualReportMembershipSyncService.unavailableReason(null);
       } else {
         const diff = AnnualReportMembershipSyncService.diffAgainstLedger(template, row.values ?? {}, member);
         const labelOf = new Map(AnnualReportService.fields(template).map((f) => [f.key, f.label]));
@@ -176,21 +177,36 @@ export class AnnualReportReviewService {
     );
     const user = rows[0] ?? {};
 
-    const member = await AnnualReportMembershipSyncService.loadMemberLedger(report.user_id);
-    const labelOf = new Map(AnnualReportService.fields(template).map((f) => [f.key, f.label]));
+    const member = await AnnualReportMembershipSyncService.loadMemberLedger(report.user_id, params.organizationId);
+    const fields = AnnualReportService.fields(template);
+    const labelOf = new Map(fields.map((f) => [f.key, f.label]));
+    const fieldOf = new Map(fields.map((f) => [f.key, f]));
 
-    /** 원장 대비 변경 항목. 원장이 없으면 비교를 만들어내지 않고 사유를 낸다 */
+    /**
+     * 원장 대비 변경 항목. 원장이 없으면 비교를 만들어내지 않고 사유를 낸다.
+     * `unavailable` 이 null 이 아니면 반영(sync)도 같은 사유로 거절된다 — 화면은 이 값으로 버튼을 막는다.
+     * `beforeLabel/afterLabel` 은 선택지 필드의 raw code 를 양식 label 로 바꾼 표시용 값이다 (원본 before/after 는 유지).
+     */
     const ledgerDiff = member
       ? (() => {
           const d = AnnualReportMembershipSyncService.diffAgainstLedger(template, report.values ?? {}, member);
           return {
-            unavailable: null as string | null,
-            changes: d.changes.map((c) => ({ ...c, label: labelOf.get(c.key) ?? c.key })),
+            unavailable: AnnualReportMembershipSyncService.unavailableReason(member),
+            changes: d.changes.map((c) => ({
+              ...c,
+              label: labelOf.get(c.key) ?? c.key,
+              beforeLabel: AnnualReportMembershipSyncService.labelFor(fieldOf.get(c.key), c.before),
+              afterLabel: AnnualReportMembershipSyncService.labelFor(fieldOf.get(c.key), c.after),
+            })),
             skipped: d.skipped.map((s) => ({ ...s, label: labelOf.get(s.key) ?? s.key })),
             invalid: d.invalid,
+            ledgerSource: member.source,
           };
         })()
-      : { unavailable: '약사회 회원정보가 없어 비교할 수 없습니다.', changes: [], skipped: [], invalid: [] };
+      : {
+          unavailable: AnnualReportMembershipSyncService.unavailableReason(null),
+          changes: [], skipped: [], invalid: [], ledgerSource: null,
+        };
 
     return {
       report: {

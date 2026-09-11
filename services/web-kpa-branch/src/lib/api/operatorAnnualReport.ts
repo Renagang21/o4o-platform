@@ -32,9 +32,14 @@ export interface ReviewListItem {
 export interface LedgerChange {
   key: string;
   label: string;
-  column: string;
+  /** sync 대상 식별자 (양식의 syncTarget — 2026 양식은 legacy `kpa_members.*` alias) */
+  target?: string;
+  column?: string;
   before: unknown;
   after: unknown;
+  /** 선택지 필드의 raw code 를 양식 label 로 바꾼 표시용 값 (없으면 before/after 그대로) */
+  beforeLabel?: string | null;
+  afterLabel?: string | null;
 }
 
 export interface LedgerSkip {

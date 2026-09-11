@@ -8,6 +8,7 @@
  */
 import type { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
+import { PharmacistProfilePromotionService } from '../../services/kpa-branch/PharmacistProfilePromotionService.js';
 import {
   branchMembershipService,
   BranchMembershipConflictError,
@@ -21,6 +22,7 @@ import {
 function serialize(m: {
   id: string; user_id: string; organization_id: string; status: string;
   joined_at: Date; left_at: Date | null; transfer_reason: string | null; note: string | null;
+  fee_category?: string | null; workplace_name?: string | null; workplace_address?: string | null;
 }) {
   return {
     id: m.id,
@@ -31,7 +33,19 @@ function serialize(m: {
     leftAt: m.left_at,
     transferReason: m.transfer_reason,
     note: m.note,
+    // 분회별 회원 속성 (WO-O4O-KPA-BRANCH-PHARMACIST-PROFILE-CANONICALIZATION-V1)
+    feeCategory: m.fee_category ?? null,
+    workplaceName: m.workplace_name ?? null,
+    workplaceAddress: m.workplace_address ?? null,
   };
+}
+
+/** 분회 회비구분 — 선택 입력. 코드계는 branch_fee_policies.fee_category 와 같다 (varchar 50) */
+function parseFeeCategory(raw: unknown): string | null | 'invalid' {
+  if (raw === undefined || raw === null || raw === '') return null;
+  if (typeof raw !== 'string') return 'invalid';
+  const v = raw.trim();
+  return v.length > 0 && v.length <= 50 ? v : 'invalid';
 }
 
 /**
@@ -176,6 +190,12 @@ export class BranchMemberController {
         .status(422)
         .json({ success: false, error: '발령일이 올바르지 않습니다.', code: 'INVALID_EFFECTIVE_DATE' });
     }
+    const feeCategory = parseFeeCategory(req.body?.feeCategory);
+    if (feeCategory === 'invalid') {
+      return res
+        .status(422)
+        .json({ success: false, error: '회비구분이 올바르지 않습니다.', code: 'INVALID_FEE_CATEGORY' });
+    }
 
     let targetUserId: string | undefined = userId;
     if (!targetUserId) {
@@ -194,9 +214,29 @@ export class BranchMemberController {
 
     try {
       const created = await branchMembershipService.join({
-        userId: targetUserId, organizationId: req.branch!.id, reason, note, effectiveDate,
+        userId: targetUserId, organizationId: req.branch!.id, reason, note, effectiveDate, feeCategory,
       });
-      return res.status(201).json({ success: true, data: serialize(created) });
+      /**
+       * 전입 확정 후 약사 profile 을 보장한다 (WO-O4O-KPA-BRANCH-PHARMACIST-PROFILE-CANONICALIZATION-V1).
+       * 가입 시 core 가 남긴 `businessInfo.licenseNumber` 를 canonical profile 로 승격하며 기존 값은 보존한다.
+       * 실패해도 전입은 되돌리지 않는다.
+       */
+      const profile = await PharmacistProfilePromotionService.promoteFromUser({ userId: targetUserId });
+      return res.status(201).json({
+        success: true,
+        data: {
+          ...serialize(created),
+          pharmacistProfile: profile
+            ? {
+                id: profile.profileId,
+                created: profile.created,
+                licenseNumber: profile.licenseNumber,
+                activityType: profile.activityType,
+                licenseConflict: profile.licenseConflict,
+              }
+            : null,
+        },
+      });
     } catch (error) {
       if (error instanceof BranchMembershipConflictError) {
         return res.status(409).json({ success: false, error: error.message, code: error.code });

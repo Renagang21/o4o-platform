@@ -16,6 +16,13 @@
  *   users(Identity) / service_memberships(서비스 접근) / service_credentials(서비스 비밀번호)
  *   / branch_memberships(분회 소속). 이 컨트롤러는 앞의 세 축만 다루고 분회 소속은 만들지 않는다.
  *   분회 소속은 분회 운영자 경로(BranchMemberController.join)에서만 생성된다.
+ *
+ * 약사 profile (WO-O4O-KPA-BRANCH-PHARMACIST-PROFILE-CANONICALIZATION-V1):
+ *   - `licenseNumber` / `activityType` 를 받는다. 신규 사용자는 core 가 `users.businessInfo.licenseNumber`
+ *     에 남기지만 기존 사용자 경로는 남기지 않으므로, 가입 성공 직후 **Extension 경계에서**
+ *     `kpa_pharmacist_profiles` 를 만들거나 비어 있는 값만 채운다 (PharmacistProfilePromotionService).
+ *   - 기존 profile 은 보존하고, 면허번호가 다른 사용자 것이면 자동 overwrite 하지 않는다.
+ *   - auth-core / createKpaRecords 는 수정하지 않았다. `kpa_members` 에는 쓰지 않는다.
  */
 
 import type { Request, Response } from 'express';
@@ -25,6 +32,11 @@ import { ServiceMembership } from '../../modules/auth/entities/ServiceMembership
 import { AuthRegisterController } from '../../modules/auth/controllers/auth-register.controller.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import logger from '../../utils/logger.js';
+import {
+  PharmacistProfilePromotionService,
+  KPA_ACTIVITY_TYPES,
+  LICENSE_NUMBER_MAX,
+} from '../../services/kpa-branch/PharmacistProfilePromotionService.js';
 
 const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
@@ -66,6 +78,22 @@ export class BranchJoinController {
       return res.status(400).json({ success: false, error: '이름이 필요합니다.', code: 'NAME_REQUIRED' });
     }
 
+    // 면허번호·직역 — 선택 입력이지만 형식은 여기서 확정한다 (profile 컬럼 한도·코드계)
+    const licenseNumber = body.licenseNumber === undefined || body.licenseNumber === null
+      ? null
+      : String(body.licenseNumber).trim();
+    if (licenseNumber !== null && licenseNumber.length > LICENSE_NUMBER_MAX) {
+      return res.status(422).json({
+        success: false, error: `면허번호는 ${LICENSE_NUMBER_MAX}자 이내여야 합니다.`, code: 'LICENSE_NUMBER_INVALID',
+      });
+    }
+    const activityType = typeof body.activityType === 'string' && body.activityType.trim() !== ''
+      ? body.activityType.trim()
+      : null;
+    if (activityType !== null && !KPA_ACTIVITY_TYPES.has(activityType)) {
+      return res.status(422).json({ success: false, error: '직역 구분이 올바르지 않습니다.', code: 'ACTIVITY_TYPE_INVALID' });
+    }
+
     try {
       // 중복 신청 상태 사전 판정 — 상태별 코드 분기를 위해 선조회한다.
       // (Core 경로는 모든 기존 row 를 SERVICE_ALREADY_JOINED 로 묶어 응답한다.)
@@ -92,9 +120,34 @@ export class BranchJoinController {
     }
 
     // serviceKey / role 은 서버가 강제한다 — 클라이언트가 임의 서비스나 운영자로 신청할 수 없다.
-    req.body = { ...body, service: SERVICE_KEY, role: 'member' };
+    req.body = {
+      ...body,
+      ...(licenseNumber ? { licenseNumber } : {}),
+      ...(activityType ? { activityType } : {}),
+      service: SERVICE_KEY,
+      role: 'member',
+    };
 
-    return AuthRegisterController.register(req, res);
+    await AuthRegisterController.register(req, res);
+
+    // Core 가 가입을 확정한 뒤에만 profile 을 승격한다. 응답은 이미 나갔으므로 결과는 로그로 남긴다.
+    if (res.statusCode >= 200 && res.statusCode < 300 && (licenseNumber || activityType)) {
+      try {
+        const user = await AppDataSource.getRepository(User).findOne({ where: { email }, select: ['id'] });
+        if (user) {
+          const promoted = await PharmacistProfilePromotionService.ensureProfile({
+            userId: user.id, licenseNumber, activityType,
+          });
+          logger.info('[BranchJoin] pharmacist profile promoted on join', {
+            userId: user.id, created: promoted.created, filled: promoted.filled, licenseConflict: promoted.licenseConflict,
+          });
+        }
+      } catch (error) {
+        logger.error('[BranchJoin] pharmacist profile promotion failed (best-effort)', {
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
   }
 
   /**
