@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "O4O Work Agent Bridge",
+  "version": "0.0.1",
+  "description": "O4O 로컬 작업 에이전트와 Chrome 을 연결하는 공식 브리지. 웹 자동화 전 환경검사와 작업 화면 모드를 제공합니다.",
+  "minimum_chrome_version": "116",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwDaCFC2oI4IiQpeDXq3b6fQWkElLsTrYpNbgNjaANJB1rBVpudv7x8vfGD89YsBBGNmNumTW24ucGwHpvGhk2h79n/27C17ZrnnmTbmaQb+Y49yxJkW+Rdj8JCvVGhJZYE0AZN3vf/5hMo7HE+wswKb0FAgqz+yazBY+XQnsfccOO8r99qaGWe3TvxIkRaoKTQfyKSrZ8vSQrGL0CSVMFeBtRtoAXFUGOIDPNKlhZ/AA6MesxnHUXiHN9DwZ7exStZSyVxZ7gPHXUnMcBUfNJemIRpEpJImNXCTCBN1F1LTOqW9DOWOJfqNUz18s+i1IDAAkr7yjBy55kWf8uK75qQIDAQAB",
+  "background": {
+    "service_worker": "src/service-worker.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "src/side-panel.html"
+  },
+  "action": {
+    "default_title": "O4O 작업 준비"
+  },
+  "permissions": ["sidePanel", "tabs", "nativeMessaging"],
+  "host_permissions": ["https://neture.co.kr/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://neture.co.kr/*"],
+      "js": ["src/content-script.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>O4O 작업 준비</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body { margin: 0; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; padding: 14px; }
+      h1 { font-size: 15px; margin: 0 0 12px; }
+      h2 { font-size: 13px; margin: 18px 0 8px; color: #666; text-transform: none; }
+      ul { list-style: none; padding: 0; margin: 0; }
+      li { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(128,128,128,.15); }
+      .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; background: #bbb; }
+      .dot.ok { background: #22a06b; }
+      .dot.no { background: #d1453b; }
+      .label { flex: 1; }
+      .status-line { margin: 12px 0; padding: 10px; border-radius: 8px; background: rgba(128,128,128,.1); font-size: 13px; }
+      .status-line.ready { background: rgba(34,160,107,.15); }
+      .status-line.blocked { background: rgba(209,69,59,.12); }
+      .modes { display: flex; gap: 8px; margin-top: 8px; }
+      button { flex: 1; padding: 9px; border: 1px solid rgba(128,128,128,.4); border-radius: 8px; background: transparent; font: inherit; cursor: pointer; }
+      button[aria-pressed="true"] { border-color: #22a06b; background: rgba(34,160,107,.12); font-weight: 600; }
+      button:disabled { opacity: .5; cursor: not-allowed; }
+      .hint { font-size: 12px; color: #888; margin-top: 6px; }
+      .refresh { margin-top: 14px; }
+    </style>
+  </head>
+  <body>
+    <h1>O4O 웹 자동화 준비</h1>
+
+    <div id="statusLine" class="status-line">준비 상태 확인 중…</div>
+
+    <h2>필수 조건 (3)</h2>
+    <ul id="checks">
+      <li><span class="dot" id="dot-chrome"></span><span class="label">Google Chrome 설치</span></li>
+      <li><span class="dot" id="dot-ext"></span><span class="label">O4O 확장 설치</span></li>
+      <li><span class="dot" id="dot-agent"></span><span class="label">O4O 작업 에이전트 연결</span></li>
+    </ul>
+
+    <h2>작업 화면 모드</h2>
+    <div class="modes">
+      <button id="mode-split" aria-pressed="false">함께 보기</button>
+      <button id="mode-focus" aria-pressed="false">작업 화면 크게 보기</button>
+    </div>
+    <div class="hint" id="context-hint"></div>
+
+    <button class="refresh" id="refresh">다시 확인</button>
+
+    <script type="module" src="side-panel.js"></script>
+  </body>
+</html>
