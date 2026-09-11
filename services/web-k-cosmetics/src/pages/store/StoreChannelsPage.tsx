@@ -12,14 +12,12 @@
 import {
   StoreChannelsView,
   type StoreChannelsApi,
-  type StoreChannelAssetItem,
 } from '@o4o/store-ui-core';
 import {
   fetchChannelOverviewWithCode,
   fetchChannelOverview,
   createChannel,
 } from '@/api/storeHub';
-import { storeAssetControlApi } from '@/api/assetSnapshot';
 import {
   fetchChannelProducts,
   fetchAvailableProducts,
@@ -38,12 +36,11 @@ const channelsApi: StoreChannelsApi = {
   fetchChannelOverviewWithCode: () => fetchChannelOverviewWithCode(),
   fetchChannelOverview: () => fetchChannelOverview(),
   createChannel: (channelType) => createChannel(channelType),
-  listAssets: (params) =>
-    storeAssetControlApi.list(params).then(r => r.data.items as StoreChannelAssetItem[]),
-  updateAssetPublishStatus: (snapshotId, status) =>
-    storeAssetControlApi.updatePublishStatus(snapshotId, status).then(r => ({ publishStatus: r.data.publishStatus })),
-  updateAssetChannelMap: (snapshotId, channelMap) =>
-    storeAssetControlApi.updateChannelMap(snapshotId, channelMap).then(r => ({ channelMap: r.data.channelMap })),
+  // WO-O4O-KCOS-STORE-CHANNEL-ASSET-TENANT-CANONICAL-CLOSURE-V1:
+  //   listAssets / updateAssetPublishStatus / updateAssetChannelMap 를 주입하지 않는다.
+  //   이 축은 KPA 의 kpa_store_asset_controls 확장(본사 강제 배포·게시·채널 매핑)이며 K-Cosmetics 에는
+  //   대응 원장·데이터·업무가 없다. 종전에는 /cosmetics/store-assets 가 KPA 조직 resolver 로 풀려
+  //   이 화면이 사용자의 **KPA 약국** 스냅샷을 보여줬다(P0 tenant 결함). 축 자체를 빼서 닫는다.
   fetchChannelProducts: (channelId) => fetchChannelProducts(channelId),
   fetchAvailableProducts: (channelId) => fetchAvailableProducts(channelId),
   addProductToChannel: (channelId, productListingId) => addProductToChannel(channelId, productListingId),

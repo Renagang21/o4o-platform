@@ -1,14 +1,11 @@
 /**
  * Asset Snapshot API Client — K-Cosmetics
  *
- * WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1: Store Asset Control + Channel Map
+ * WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1: Asset Snapshot copy/list (Store Asset Control 축은 WO-O4O-KCOS-STORE-CHANNEL-ASSET-TENANT-CANONICAL-CLOSURE-V1 에서 제거)
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
  */
 
 import { api } from '../lib/apiClient';
-import type { StoreAssetItem, AssetPublishStatus, ChannelMap } from '@o4o/store-asset-policy-core';
-
-export type { StoreAssetItem, AssetPublishStatus, ChannelMap };
 
 // ─── Asset Snapshot Copy (WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1) ───
 
@@ -70,34 +67,7 @@ export const assetSnapshotApi = {
 
 // ─── Store Asset Control ───────────────────────────
 
-interface PaginatedStoreAssets {
-  items: StoreAssetItem[];
-  total: number;
-  page: number;
-  limit: number;
-}
 
-export const storeAssetControlApi = {
-  list: async (params?: { limit?: number }) => {
-    const response = await api.get<{ success: boolean; data: PaginatedStoreAssets }>(
-      `/cosmetics/store-assets?limit=${params?.limit ?? 200}`,
-    );
-    return response.data;
-  },
+// WO-O4O-KCOS-STORE-CHANNEL-ASSET-TENANT-CANONICAL-CLOSURE-V1: storeAssetControlApi(/cosmetics/store-assets) 제거 —
+//   KPA 전용 kpa_store_asset_controls 축. K-Cosmetics 는 이 축을 갖지 않으며 route 도 마운트하지 않는다.
 
-  updatePublishStatus: async (snapshotId: string, status: AssetPublishStatus) => {
-    const response = await api.patch<{
-      success: boolean;
-      data: { snapshotId: string; publishStatus: AssetPublishStatus; updatedAt: string };
-    }>(`/cosmetics/store-assets/${snapshotId}/publish`, { status });
-    return response.data;
-  },
-
-  updateChannelMap: async (snapshotId: string, channelMap: ChannelMap) => {
-    const response = await api.patch<{
-      success: boolean;
-      data: { snapshotId: string; channelMap: ChannelMap; updatedAt: string };
-    }>(`/cosmetics/store-assets/${snapshotId}/channel`, { channelMap });
-    return response.data;
-  },
-};

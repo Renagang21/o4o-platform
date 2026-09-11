@@ -109,12 +109,20 @@ export interface StoreChannelsApi {
   /** 채널 목록만 (제품 변경 후 KPI 갱신용) */
   fetchChannelOverview: () => Promise<StoreChannelOverview[]>;
   createChannel: (channelType: StoreChannelType) => Promise<unknown>;
-  listAssets: (params: { limit: number }) => Promise<StoreChannelAssetItem[]>;
-  updateAssetPublishStatus: (
+  /**
+   * 자산 게시/채널 노출 통제 축 — **선택**.
+   * WO-O4O-KCOS-STORE-CHANNEL-ASSET-TENANT-CANONICAL-CLOSURE-V1:
+   *   이 세 함수는 KPA 의 `kpa_store_asset_controls` 확장(본사 강제 배포·게시·채널 매핑)을 전제로 한다.
+   *   그 축을 갖지 않는 서비스(K-Cosmetics)는 주입하지 않는다 → [E] 노출 자산 리스트 · 노출 콘텐츠/강제노출 KPI ·
+   *   "전체 자산 보기" 액션을 그리지 않는다. 채널 탭·상태·제품 노출([A]~[D])은 그대로다.
+   *   KPA 전용 route 를 다른 서비스에 마운트해 조직이 섞이던 P0 결함을 화면 계약에서부터 닫는다.
+   */
+  listAssets?: (params: { limit: number }) => Promise<StoreChannelAssetItem[]>;
+  updateAssetPublishStatus?: (
     snapshotId: string,
     status: StoreChannelAssetPublishStatus,
   ) => Promise<{ publishStatus: StoreChannelAssetPublishStatus }>;
-  updateAssetChannelMap: (
+  updateAssetChannelMap?: (
     snapshotId: string,
     channelMap: Record<string, boolean>,
   ) => Promise<{ channelMap: Record<string, boolean> }>;
@@ -559,7 +567,9 @@ export function StoreChannelsView({
     setLoading(true);
     const results = await Promise.allSettled([
       api.fetchChannelOverviewWithCode().catch(() => ({ channels: [] as StoreChannelOverview[], organizationCode: null })),
-      api.listAssets({ limit: 200 }).catch(() => [] as StoreChannelAssetItem[]),
+      api.listAssets
+        ? api.listAssets({ limit: 200 }).catch(() => [] as StoreChannelAssetItem[])
+        : Promise.resolve([] as StoreChannelAssetItem[]),
     ]);
     const chResult = results[0].status === 'fulfilled'
       ? results[0].value as { channels: StoreChannelOverview[]; organizationCode: string | null }
@@ -629,6 +639,8 @@ export function StoreChannelsView({
 
   const publishedAssets = channelAssets.filter(a => a.publishStatus === 'published');
   const forcedAssets = channelAssets.filter(a => isForcedActive(a));
+  /** 자산 통제 축 주입 여부 — 없으면 관련 KPI·리스트·액션을 그리지 않는다. */
+  const hasAssetControl = !!(api.listAssets && api.updateAssetPublishStatus && api.updateAssetChannelMap);
 
   const handleToggleChannelAsset = async (item: StoreChannelAssetItem) => {
     if (item.isForced || item.isLocked) return;
@@ -638,6 +650,7 @@ export function StoreChannelsView({
     const newMap: Record<string, boolean> = { ...currentMap, [assetKey]: !currentMap[assetKey] };
     setUpdatingId(item.id);
     try {
+      if (!api.updateAssetChannelMap) return;
       const res = await api.updateAssetChannelMap(item.id, newMap);
       setAssets(prev => prev.map(a =>
         a.id === item.id ? { ...a, channelMap: res.channelMap } : a,
@@ -656,6 +669,7 @@ export function StoreChannelsView({
     const next = cycle[(idx + 1) % cycle.length];
     setUpdatingId(item.id);
     try {
+      if (!api.updateAssetPublishStatus) return;
       const res = await api.updateAssetPublishStatus(item.id, next);
       setAssets(prev => prev.map(a =>
         a.id === item.id ? { ...a, publishStatus: res.publishStatus } : a,
@@ -972,19 +986,23 @@ export function StoreChannelsView({
             </span>
           </div>
         </div>
-        <div className="rounded-lg border border-slate-200 p-4 bg-white">
-          <div className="text-xs text-slate-500 mb-1">노출 콘텐츠</div>
-          <div className="text-2xl font-bold text-slate-900">
-            {publishedAssets.length}
-            <span className="text-sm font-normal text-slate-400 ml-1">
-              / {channelAssets.length}
-            </span>
-          </div>
-        </div>
-        <div className="rounded-lg border border-slate-200 p-4 bg-red-50">
-          <div className="text-xs text-red-500 mb-1">강제노출</div>
-          <div className="text-2xl font-bold text-red-700">{forcedAssets.length}</div>
-        </div>
+        {hasAssetControl && (
+          <>
+            <div className="rounded-lg border border-slate-200 p-4 bg-white">
+              <div className="text-xs text-slate-500 mb-1">노출 콘텐츠</div>
+              <div className="text-2xl font-bold text-slate-900">
+                {publishedAssets.length}
+                <span className="text-sm font-normal text-slate-400 ml-1">
+                  / {channelAssets.length}
+                </span>
+              </div>
+            </div>
+            <div className="rounded-lg border border-slate-200 p-4 bg-red-50">
+              <div className="text-xs text-red-500 mb-1">강제노출</div>
+              <div className="text-2xl font-bold text-red-700">{forcedAssets.length}</div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* [C] Quick Actions */}
@@ -995,12 +1013,14 @@ export function StoreChannelsView({
         >
           {labels.dashboardAction}
         </button>
-        <button
-          onClick={() => navigate(routes.storeContent)}
-          className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100"
-        >
-          전체 자산 보기
-        </button>
+        {hasAssetControl && (
+          <button
+            onClick={() => navigate(routes.storeContent)}
+            className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-50 border border-slate-200 rounded-lg hover:bg-slate-100"
+          >
+            전체 자산 보기
+          </button>
+        )}
         {renderExtraQuickActions?.({ activeTab })}
         {activeTab === 'B2C' && orgCode && (
           <a
@@ -1177,8 +1197,8 @@ export function StoreChannelsView({
         </div>
       )}
 
-      {/* [E] 노출 자산 리스트 */}
-      {currentTab.assetKey ? (
+      {/* [E] 노출 자산 리스트 — 자산 통제 축이 주입된 서비스에서만 */}
+      {!hasAssetControl ? null : currentTab.assetKey ? (
         channelAssets.length === 0 ? (
           <div className="text-center py-16 text-slate-400">
             <p className="text-sm">이 채널에 배치된 콘텐츠가 없습니다.</p>

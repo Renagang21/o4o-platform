@@ -51,7 +51,6 @@ import { createStoreQrStaffController } from '../o4o-store/controllers/qr.contro
 import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
 import { createMultilingualProductContentController } from '../o4o-store/controllers/multilingual-product-content.controller.js'; // WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-ENTITY-REGISTRY-AND-ROUTE-MOUNT-V1
 import { createCosmeticsAssetSnapshotController } from '../o4o-store/controllers/cosmetics-asset-snapshot.controller.js'; // WO-O4O-KCOS-LIBRARY-ORGANIZATION-SCOPE-AND-SNAPSHOT-ROUTE-CLOSURE-V1
-import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
 import { createStoreExecutionAssetsController } from '../o4o-store/controllers/store-execution-assets.controller.js'; // WO-O4O-STORE-EXECUTION-ASSETS-CROSSSERVICE-PHASE2-D-V1
 import { createStoreSettingsController } from '../o4o-store/controllers/store-settings.controller.js'; // WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
 // WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
@@ -179,8 +178,11 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   //   KCos request → cosmetics:store_owner → KCos organizationId. KPA fallback 없음.
   router.use('/assets', createCosmeticsAssetSnapshotController(dataSource, coreRequireAuth as any));
 
-  // Store Asset Control
-  router.use('/store-assets', createStoreAssetControlController(dataSource, coreRequireAuth as any));
+  // (제거) /store-assets — WO-O4O-KCOS-STORE-CHANNEL-ASSET-TENANT-CANONICAL-CLOSURE-V1:
+  //   KPA 전용 createStoreAssetControlController(isStoreOwner('kpa') + KpaMember fallback · kpa_store_asset_controls)
+  //   를 그대로 마운트해 K-Cosmetics 사용자에게 KPA 조직 스냅샷을 보여주고 KPA 조직 행을 쓰던 P0 결함.
+  //   K-Cosmetics 에는 이 축의 원장·데이터·업무가 없다(스냅샷 0 · controls 0 · 60일 mutation 0).
+  //   화면 소비처(/store/channels 자산 축 · /store/content) 를 먼저 걷어낸 뒤 마운트를 제거했다.
 
   // Store Execution Assets — 제작 자료 (WO-O4O-STORE-EXECUTION-ASSETS-CROSSSERVICE-PHASE2-D-V1)
   router.use('/', createStoreExecutionAssetsController(dataSource, coreRequireAuth as any, 'cosmetics'));

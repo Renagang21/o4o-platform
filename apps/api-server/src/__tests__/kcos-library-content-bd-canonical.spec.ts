@@ -87,9 +87,14 @@ describe('§3 core — 공통 View 는 additive 계약만 바뀌었다', () => {
 });
 
 describe('§4 axis — 범위 밖 축은 무변경', () => {
-  it('KCos /store-assets 화면은 여전히 storeAssetControlApi 를 쓴다 (채널 통제 축)', () => {
+  // WO-O4O-KCOS-STORE-CHANNEL-ASSET-TENANT-CANONICAL-CLOSURE-V1:
+  //   위 WO 시점의 "채널 통제 축은 손대지 않았다" 가드였다. 그 축(KPA 전용 kpa_store_asset_controls 를
+  //   KPA 조직 resolver 로 마운트하던 P0 결함)은 후속 WO 가 **의도적으로 은퇴**시켰으므로
+  //   금지 단언을 새 계약(redirect-only · storeAssetControlApi 0)으로 갱신한다. 회귀가 아니라 계약 변경이다.
+  it('KCos /store/content 는 은퇴됐다 — storeAssetControlApi 0 · canonical 자료함으로 redirect', () => {
     const s = codeOnly(read(...KCOS, 'pages', 'store', 'StoreAssetsPage.tsx'));
-    expect(s).toMatch(/storeAssetControlApi/);
+    expect(s).not.toMatch(/storeAssetControlApi/);
+    expect(s).toMatch(/<Navigate to="\/store\/library\/contents" replace \/>/);
   });
 
   it('HUB cms · signage copy 는 여전히 assetSnapshotApi.copy 를 쓴다', () => {
@@ -97,11 +102,12 @@ describe('§4 axis — 범위 밖 축은 무변경', () => {
     expect(codeOnly(read(...KCOS, 'pages', 'hub', 'HubSignagePage.tsx'))).toMatch(/assetSnapshotApi\.copy\(/);
   });
 
-  it('cosmetics.routes.ts 마운트는 무변경 (/store-contents wrapper · /store/assets · /store-assets · /assets)', () => {
+  it('cosmetics.routes.ts 마운트 (/store-contents wrapper · /store/assets · /assets 유지 · /store-assets 는 은퇴)', () => {
     const r = codeOnly(read(SRC, 'routes', 'cosmetics', 'cosmetics.routes.ts'));
     expect(r).toMatch(/router\.use\(\s*'\/store-contents'\s*,\s*createCosmeticsStoreContentController\(/);
     expect(r).toMatch(/createStoreExecutionAssetsController\(dataSource,[^)]*'cosmetics'\)/);
-    expect(r).toMatch(/router\.use\(\s*'\/store-assets'/);
+    // WO-O4O-KCOS-STORE-CHANNEL-ASSET-TENANT-CANONICAL-CLOSURE-V1: KPA 전용 자산 통제 마운트 제거
+    expect(r).not.toMatch(/router\.use\(\s*'\/store-assets'/);
     expect(r).toMatch(/router\.use\(\s*'\/assets'/);
   });
 });
