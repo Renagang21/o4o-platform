@@ -570,14 +570,16 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
     const imports = [...code.matchAll(/from\s+'([^']+)'/g)].map((m) => m[1]);
     // 창 제어가 들어오면서 저장소 안 모듈 두 개가 늘었고, 브라우저 제어(BROWSER-CONTROL-V0)로
     // 등재부 하나가 더 늘었다. 화면 조작(COMPUTER-USE-V0)으로 인자 한도 모듈(순수 함수, import 0)이
-    // 하나 더 늘었다. node 표준 모듈은 여전히 os 뿐이다 — 외부 프로세스 실행은
-    // windows-window-control.mjs 한 파일에만 있다.
+    // 하나 더 늘었다. 로컬 데이터(LOCAL-DATA-SQLITE-V0)로 SQLite 접근 모듈이 하나 더
+    // 늘었다 — 그 모듈이 node:sqlite·node:fs 를 캡슐화하므로 handler 자신은 여전히
+    // node 표준 모듈로 os 만 가진다. 외부 프로세스 실행은 windows-window-control.mjs 한 곳뿐이다.
     expect(imports).toEqual([
       'node:os',
       './windows-app-registry.mjs',
       './browser-site-registry.mjs',
       './windows-window-control.mjs',
       './computer-use-limits.mjs',
+      './local-db.mjs',
     ]);
     expect(imports.filter((i) => i.startsWith('node:'))).toEqual(['node:os']);
     for (const forbidden of ['child_process', 'spawn(', 'exec(', 'execFile', 'vm', 'eval(']) {
@@ -604,6 +606,70 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
     );
     for (const forbidden of ['child_process', 'node:fs', "from 'fs'", 'execSync']) {
       expect(src).not.toContain(forbidden);
+    }
+  });
+});
+
+// ─── Local Data Runtime V0 경계 (WO-O4O-LOCAL-DATA-SQLITE-V0 §36·§37·§31·§33·§34·§48) ──
+
+describe('로컬 SQLite 런타임의 경계가 소스에 박혀 있다', () => {
+  const agentSrcDir = join(__dirname, '..', '..', '..', '..', 'tools', 'o4o-local-agent', 'src');
+  const readAgent = (f: string) => readFileSync(join(agentSrcDir, f), 'utf8');
+  const stripComments = (src: string) =>
+    src
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .split('\n')
+      .map((l) => l.replace(/\/\/.*$/, ''))
+      .join('\n');
+
+  it('§48-14. 임의 SQL 실행 tool 이 어디에도 없다', () => {
+    for (const f of ['handlers.mjs', 'local-db.mjs', 'index.mjs']) {
+      const code = stripComments(readAgent(f));
+      expect(code).not.toContain('execute_sql');
+      expect(code).not.toContain('local.sqlite');
+    }
+  });
+
+  it('§48-15. local-db 는 임의 파일을 읽지 않는다 — 자기 홈 디렉터리만 만든다', () => {
+    const code = stripComments(readAgent('local-db.mjs'));
+    // fs 사용은 mkdir 하나뿐. 파일 읽기·디렉터리 스캔 API 가 없다(§19).
+    expect(code).toContain('mkdirSync');
+    for (const forbidden of ['readFileSync', 'readFile', 'readdir', 'readdirSync', 'glob']) {
+      expect(code).not.toContain(forbidden);
+    }
+  });
+
+  it('§48-15b. DB 경로는 모듈이 스스로 정한다 — DatabaseSync 는 자기 경로로만 한 번 열린다', () => {
+    const code = stripComments(readAgent('local-db.mjs'));
+    expect(code).toContain('O4O_AGENT_HOME');
+    expect(code).toContain("'local.db'");
+    expect(code).toContain('new DatabaseSync(dbPath())');
+    // DatabaseSync 를 여는 곳은 dbPath() 한 곳뿐 — 서버가 준 경로로 여는 통로가 없다.
+    expect((code.match(/new DatabaseSync\(/g) ?? []).length).toBe(1);
+  });
+
+  it('§48-16. cloud 동기화 수단이 없다 — local-db 에 네트워크 API 가 없다', () => {
+    const code = stripComments(readAgent('local-db.mjs'));
+    for (const forbidden of ['fetch(', 'http', 'XMLHttpRequest', 'node:net', 'WebSocket', 'upload']) {
+      expect(code).not.toContain(forbidden);
+    }
+  });
+
+  it('§48-17. credential 저장이 없다 — DB 정체성에 비밀번호·토큰·쿠키를 쓰지 않는다', () => {
+    const code = stripComments(readAgent('local-db.mjs'));
+    // local_db_id 는 무작위 UUID 다(§9).
+    expect(code).toContain('randomUUID()');
+    for (const forbidden of ['password', 'agentCredential', 'cookie', 'accessToken', 'refreshToken']) {
+      expect(code).not.toContain(forbidden);
+    }
+    // local-db 는 credentials 모듈을 가져오지 않는다.
+    expect(code).not.toContain('credentials');
+  });
+
+  it('§33. 민감정보(환자·처방·보험·주민번호) 스키마를 만들지 않는다', () => {
+    const code = stripComments(readAgent('local-db.mjs'));
+    for (const forbidden of ['patient', 'prescription', 'insurance', 'resident', 'rrn', 'ssn']) {
+      expect(code).not.toContain(forbidden);
     }
   });
 });

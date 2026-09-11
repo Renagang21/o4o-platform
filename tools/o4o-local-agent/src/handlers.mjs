@@ -43,6 +43,7 @@ import {
   validateKeyArgs,
   validateTextArgs,
 } from './computer-use-limits.mjs';
+import { LocalMetaRepository, LocalSettingsRepository, localDbHealth } from './local-db.mjs';
 
 export const AGENT_VERSION = '0.1.0';
 
@@ -60,6 +61,10 @@ export const ACTIONS = {
   COMPUTER_CLICK: 'local.computer.click',
   COMPUTER_TYPE_TEXT: 'local.computer.type_text',
   COMPUTER_KEY: 'local.computer.key',
+  // WO-O4O-LOCAL-DATA-SQLITE-V0 §35 — 최소 안전 데이터 tool 3개.
+  DATA_HEALTH: 'local.data.health',
+  DATA_GET_META: 'local.data.get_meta',
+  DATA_SET_SETTING: 'local.data.set_setting',
 };
 
 /**
@@ -472,6 +477,51 @@ const APP_HANDLERS = {
   [ACTIONS.ACTIVATE_WINDOW]: activateWindow,
 };
 
+// ─── Local Data Runtime V0 (WO-O4O-LOCAL-DATA-SQLITE-V0) ────────────────────
+//
+// 로컬 SQLite 접근은 전부 `local-db.mjs` 를 지난다(§27). 여기서는 AI 가 임의 SQL 을
+// 만들거나 실행하지 않는다(§36) — 등록된 tool → repository 메서드 → 고정 파라미터 쿼리다.
+// 되돌리는 데이터에 DB 경로·민감정보를 담지 않는다(§33·§38).
+
+/** `local.data.health` — 로컬 DB 열림/스키마/마이그레이션 상태(§38). 경로는 담지 않는다. */
+function dataHealth() {
+  const h = localDbHealth();
+  if (!h.ok) return { status: 'failed', errorCode: h.errorCode, data: { available: false } };
+  return { status: 'success', data: h };
+}
+
+/** `local.data.get_meta` — local_meta 의 key/value(§11). 민감정보 없음(local_db_id·schema_version 등). */
+function dataGetMeta() {
+  return { status: 'success', data: { meta: LocalMetaRepository.all() } };
+}
+
+/** `local.data.set_setting` — local_settings 한 건 쓰기(§35). 값 원문은 응답/로그에 담지 않는다. */
+function dataSetSetting(args) {
+  const saved = LocalSettingsRepository.set(args.key, args.value);
+  return { status: 'success', data: { key: saved.key, saved: true } };
+}
+
+/** set_setting 인자 검사 — key 는 안전 문자·길이 제한, value 는 길이 제한 문자열(§37). */
+function validateSetSettingArgs(args) {
+  if (!args || typeof args !== 'object') return { ok: false };
+  const { key, value } = args;
+  if (typeof key !== 'string' || !/^[A-Za-z0-9_.:-]{1,128}$/.test(key)) return { ok: false };
+  if (value != null && typeof value !== 'string') return { ok: false };
+  if (typeof value === 'string' && value.length > 4096) return { ok: false };
+  return { ok: true, args: { key, value: value ?? '' } };
+}
+
+/**
+ * 데이터 tool. 인자 없는 것(health·get_meta)과 인자 받는 것(set_setting)을 한 표에서
+ * validate/run 쌍으로 다룬다. 이 표에 없는 `local.data.*` 는 존재하지 않는다.
+ * 특히 `local.sqlite.execute_sql` 같은 임의 SQL tool 은 어디에도 없다(§36).
+ */
+const DATA_HANDLERS = {
+  [ACTIONS.DATA_HEALTH]: { validate: () => ({ ok: true, args: undefined }), run: () => dataHealth() },
+  [ACTIONS.DATA_GET_META]: { validate: () => ({ ok: true, args: undefined }), run: () => dataGetMeta() },
+  [ACTIONS.DATA_SET_SETTING]: { validate: validateSetSettingArgs, run: (args) => dataSetSetting(args) },
+};
+
 /**
  * 명령 하나를 실행한다.
  *
@@ -536,6 +586,20 @@ export async function runAction(action, context, args) {
     }
   }
 
+  // Local Data Runtime V0: `local.data.*`. appId/siteId 축이 아니다 — `#...` 형태를 허용하지 않는다.
+  // 임의 SQL 이 아니라 등록된 tool → repository → 고정 쿼리로만 로컬 DB 에 닿는다(§36).
+  const dataHandler = appId === undefined ? DATA_HANDLERS[base] : undefined;
+  if (dataHandler) {
+    const checked = dataHandler.validate(args);
+    if (!checked.ok) return { status: 'denied', errorCode: 'LOCAL_DATA_INVALID_ARGS' };
+    try {
+      return await dataHandler.run(checked.args);
+    } catch {
+      // 예외 원문(경로·스택)을 밖으로 내보내지 않는다 — 코드만.
+      return { status: 'failed', errorCode: 'LOCAL_DB_NOT_AVAILABLE' };
+    }
+  }
+
   // 인자 없는 action 은 `base#...` 형태를 허용하지 않는다 — 정확히 일치해야 한다.
   const handler = appId === undefined ? HANDLERS[base] : undefined;
   if (!handler) {
@@ -556,5 +620,6 @@ export function listAllowedActions() {
     ...Object.keys(APP_HANDLERS),
     ...Object.keys(SITE_HANDLERS),
     ...Object.keys(COMPUTER_HANDLERS),
+    ...Object.keys(DATA_HANDLERS),
   ];
 }
