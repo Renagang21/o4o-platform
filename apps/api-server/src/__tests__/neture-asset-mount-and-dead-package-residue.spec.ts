@@ -44,6 +44,16 @@ describe('§1 Neture — KPA 전용 asset-snapshot 컨트롤러를 마운트하�
   it('/store-playlists 는 유지된다 (Neture 고유 축)', () => {
     expect(src).toMatch(/router\.use\(\s*'\/store-playlists'/);
   });
+  it('modules/neture 의 Neture 전용 /assets(잠재 결함 · 소비처 0)도 마운트하지 않는다', () => {
+    const m = codeLines(read('apps/api-server/src/modules/neture/neture.routes.ts'));
+    expect(m).not.toMatch(/createNetureAssetSnapshotController/);
+    expect(m).not.toMatch(/router\.use\(\s*'\/assets'/);
+  });
+  it('orphan 컨트롤러·resolver 파일이 남아 있지 않다', () => {
+    const files = tracked();
+    expect(files).not.toContain('apps/api-server/src/modules/neture/controllers/neture-asset-snapshot.controller.ts');
+    expect(files).not.toContain('apps/api-server/src/modules/asset-snapshot/resolvers/neture-asset.resolver.ts');
+  });
 });
 
 describe('§2 dead package — 제거된 패키지를 다시 참조하지 않는다', () => {

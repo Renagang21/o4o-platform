@@ -41,7 +41,6 @@ import { createOperatorDashboardController } from './controllers/operator-dashbo
 import { createOperatorProductCleanupController } from './controllers/operator-product-cleanup.controller.js';
 import { createOperatorCategoryController } from './controllers/operator-category.controller.js';
 import { createOperatorBrandController } from './controllers/operator-brand.controller.js';
-import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
 import { createOperatorServiceApprovalController } from './controllers/operator-service-approval.controller.js';
 import { createOperatorProductApprovalController } from './controllers/operator-product-approval.controller.js';
@@ -216,7 +215,12 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
     actionLogService: netureActionLogService,
   });
   router.use('/hub/trigger', hubTriggerController);
-  router.use('/assets', createNetureAssetSnapshotController(dataSource, requireAuth as RequestHandler));
+  // (제거) /assets — WO-O4O-NETURE-KPA-ASSET-HARDCODING-AND-DEAD-PACKAGE-GENERATED-ARTIFACT-CLOSURE-V1:
+  //   routes/neture/neture.routes.ts 의 KPA 전용 /assets 마운트(먼저 등록돼 이쪽을 가리던 것)를 제거하자
+  //   이 Neture 전용 컨트롤러가 처음으로 도달 가능해졌고, resolveNetureOrgId 가 존재하지 않는 컬럼
+  //   ("userId" — 실제는 user_id)을 조회해 500 을 냈다. 생성 이후 한 번도 동작한 적 없는 잠재 결함이었다.
+  //   web-neture consumer 0 · 프로덕션 source_service='neture' 스냅샷 0 · Neture 는 매장 자료함 축이 없다.
+  //   대체 구현을 만들지 않고 마운트를 닫는다 → /api/v1/neture/assets = 의도된 404.
 
   // (제거됨) /__test__/tier1/* — WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1
   // 헤더에 "NOT for production use" 라고 적힌 채 환경 게이트 없이 프로덕션에 등록돼 있었고,
