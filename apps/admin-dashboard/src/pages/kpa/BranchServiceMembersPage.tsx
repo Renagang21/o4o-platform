@@ -182,13 +182,17 @@ const BranchServiceMembersPage: FC = () => {
     {
       key: '_actions',
       header: '',
-      width: 56,
+      width: 80,
       system: true,
       align: 'center',
       render: (_, row) => {
         if (row.status !== 'pending') return null;
+        // inlineMax: 두 액션을 인라인 아이콘 버튼으로 둔다. kebab 드롭다운은 position:fixed 인데
+        // 관리자 레이아웃 본문이 z-index 스택을 만들어 사이드바(z 9998) 아래로 깔린다(공통 레이아웃 이슈 —
+        // RoleApplicationsAdminPage 도 동일). 이 화면은 공통 컴포넌트의 기존 prop 으로만 회피한다.
         return (
           <RowActionMenu
+            inlineMax={2}
             actions={[
               {
                 key: 'approve',
