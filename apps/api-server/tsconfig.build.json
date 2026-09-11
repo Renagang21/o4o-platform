@@ -31,7 +31,6 @@
     "src/modules/shared/routes/test-item.routes.ts",
     "src/modules/shared/entities/TestItem.ts",
     "src/modules/shared/dto/test-item.dto.ts",
-    "modules/**/tests/**/*",
-    "src/migrations/ARCHIVE_2025/**/*"
+    "modules/**/tests/**/*"
   ]
 }

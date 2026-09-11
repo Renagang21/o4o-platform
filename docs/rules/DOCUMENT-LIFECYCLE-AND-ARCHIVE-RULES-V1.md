@@ -177,7 +177,19 @@ DRAFT → ACTIVE → SUPERSEDED(대체 ADR 명시)
 
 ---
 
-## 8. 관련 문서
+## 8. 코드 archive · 추적 백업 정책 (저장소 루트 `archive/**` · backup 디렉터리)
+
+> **WO-O4O-ARCHIVE-RETENTION-AND-TRACKED-BACKUP-FINAL-DISPOSITION-V1** (2026-09-11) 로 확정. 위 §1~§7 은 `docs/**` 문서 규칙이며, 본 절은 **코드 사본**에 적용한다.
+
+- **Git 이력이 코드의 보존 수단이다.** 과거 코드 전체 사본 · 날짜별 source backup · `*.bak` `*.old` `*.orig` `*.before-*` · `*-backup-*/` 디렉터리 · 생성 산출물(`dist`, 컴파일 JS·d.ts, 감사 출력물)은 저장소에 **추적하지 않는다**. "언젠가 참고할 수 있다"는 이유로 사본을 유지하지 않는다.
+- 저장소 루트 `archive/**` 는 위 WO 에서 제거되었다 (원본 커밋은 CHECK 에 기록). 같은 이름·다른 이름으로 재생성하지 않고, zip 으로 바꾸어 재추가하지 않는다.
+- 삭제 후 코드를 참조해야 하면 `git log --follow` · `git show <sha>:<path>` 로 이력에서 읽는다.
+- 예외는 **활성 소비**(runtime import · test fixture · CI 비교 기준 · migration/배포 읽기)가 있는 자료뿐이며, 그 자료는 archive 가 아니라 **활성 위치**에 둔다.
+- 문서 기록물(`docs/archive/**` · `docs/checks/**` · `docs/investigations/**`)은 본 절의 대상이 아니다 — §3~§5 및 `CLAUDE.md §16` 을 따른다.
+
+---
+
+## 9. 관련 문서
 
 - [`../README.md`](../README.md) — `docs/**` 최상위 폴더 색인
 - [`../checks/README.md`](../checks/README.md) · [`../investigations/README.md`](../investigations/README.md) · [`../ir/README.md`](../ir/README.md) — 폴더별 진입 문서
