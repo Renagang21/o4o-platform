@@ -20,7 +20,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState, useCallback, type CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Sparkles, Trash2, Search, FileText, Info, Printer, QrCode, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
@@ -36,8 +36,14 @@ import type { ProductionSourceItem } from './productionTargets';
 import { ContentPdfExportModal, type PdfExportContent } from './ContentPdfExportModal';
 // WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: 콘텐츠 선택 → QR 만들기 바로 호출
 import { StoreQrCreateModal, type InlineQrTarget } from '../../components/store/StoreQrCreateModal';
-// WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1: 콘텐츠 선택 → POP 만들기 바로 호출
-import { StorePopCreateModal, type InlinePopTarget } from '../../components/store/StorePopCreateModal';
+// WO-O4O-STORE-CONTENTS-SELECTOR-INLINE-POP-TO-V2-MIGRATION-V1:
+//   콘텐츠 선택 → "POP 만들기" 는 legacy 즉시 PDF 생성(POST /pharmacy/pop/generate) 대신
+//   POP V2 canonical handoff(식별자만) 로 편집기에 진입한다. 본문은 V2 source resolver 가 다시 읽는다.
+import {
+  CANONICAL_STORE_POP_V2_ROUTE,
+  buildPopV2HandoffState,
+  popV2HandoffFromProductionItem,
+} from '@o4o/store-ui-core';
 
 const PAGE_LIMIT = 20;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -238,8 +244,8 @@ function DocumentsSection({
   const [pdfTarget, setPdfTarget] = useState<PdfExportContent | null>(null);
   // WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: 인라인 QR 생성 대상(단일)
   const [qrTarget, setQrTarget] = useState<InlineQrTarget | null>(null);
-  // WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1: 인라인 POP 생성 대상(단일)
-  const [popTarget, setPopTarget] = useState<InlinePopTarget | null>(null);
+  // WO-O4O-STORE-CONTENTS-SELECTOR-INLINE-POP-TO-V2-MIGRATION-V1: POP 만들기 = V2 편집기로 handoff
+  const navigate = useNavigate();
   // WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 + 태그 정확 필터
   const [source, setSource] = useState<SourceFilter>('all');
   const [activeTag, setActiveTag] = useState<string | null>(null);
@@ -406,14 +412,24 @@ function DocumentsSection({
     setQrTarget({ id: singleSelectedRow.id, title: singleSelectedRow.title, origin: singleSelectedRow.origin });
   }, [singleSelectedRow]);
 
-  // WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1:
-  //   POP 은 백엔드 generate 가 direct/execution-asset/snapshot 3 origin 모두 받으므로 1개 선택이면 활성.
-  //   결과는 store_execution_assets(file/pop)=매장 제작 자료에 저장(콘텐츠 목록 asset_type='content' 필터로 미노출).
+  // WO-O4O-STORE-CONTENTS-SELECTOR-INLINE-POP-TO-V2-MIGRATION-V1:
+  //   POP V2 source resolver 가 direct / library(=execution-asset) / snapshot 3 origin 을 모두 읽으므로
+  //   1개 선택이면 활성. 즉시 PDF 를 만들지 않고 V2 편집기로 넘겨 저장·재편집·출력한다.
+  //   row origin 'execution-asset' → V2 어휘 'library' 매핑은 handleStart 와 동일. 본문은 싣지 않는다.
   const popEligible = !!singleSelectedRow;
   const handleCreatePop = useCallback(() => {
     if (!singleSelectedRow) return;
-    setPopTarget({ id: singleSelectedRow.id, title: singleSelectedRow.title, origin: singleSelectedRow.origin });
-  }, [singleSelectedRow]);
+    const r = singleSelectedRow;
+    navigate(CANONICAL_STORE_POP_V2_ROUTE, {
+      state: buildPopV2HandoffState(
+        popV2HandoffFromProductionItem({
+          id: r.id,
+          title: r.title,
+          origin: r.origin === 'execution-asset' ? 'library' : r.origin,
+        }),
+      ),
+    });
+  }, [singleSelectedRow, navigate]);
 
   // WO-O4O-STORE-IMPORTED-DESCRIPTION-REIMPORT-REPLACE-V1:
   //   "원본 갱신됨" 사본에서 현재 canonical 원본을 **새 사본으로 다시 가져오기**(덮어쓰기 아님).
@@ -590,6 +606,7 @@ function DocumentsSection({
   // WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1: page 모드에서만 QR 만들기 노출
   const showInlineQr = mode === 'page';
   // WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1: page 모드에서만 POP 만들기 노출
+  //   (INLINE-POP-TO-V2-MIGRATION-V1: 동작은 V2 handoff — 모달 없음)
   const showInlinePop = mode === 'page';
 
   return (
@@ -665,8 +682,8 @@ function DocumentsSection({
             onClick: handleCreateQr,
             disabled: !qrEligible,
           }] : []),
-          // WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1:
-          //   POP 은 3 origin 모두 지원 → 1개 선택 시 활성(복수 선택 비활성+안내).
+          // WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1 → INLINE-POP-TO-V2-MIGRATION-V1:
+          //   POP 은 3 origin 모두 지원 → 1개 선택 시 활성(복수 선택 비활성+안내). 클릭 = POP V2 편집기 진입.
           ...(showInlinePop ? [{
             key: 'pop',
             label: 'POP 만들기',
@@ -744,15 +761,6 @@ function DocumentsSection({
         />
       )}
 
-      {/* WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1: 인라인 POP 생성 모달 (생성 성공 시 선택 해제) */}
-      {showInlinePop && (
-        <StorePopCreateModal
-          open={!!popTarget}
-          target={popTarget}
-          onClose={() => setPopTarget(null)}
-          onCreated={() => setSelected(new Set())}
-        />
-      )}
     </section>
   );
 }

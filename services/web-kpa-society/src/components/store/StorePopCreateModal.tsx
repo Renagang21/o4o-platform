@@ -1,6 +1,11 @@
 /**
  * StorePopCreateModal — 콘텐츠 목록에서 선택한 콘텐츠로 POP 바로 생성
  *
+ * @deprecated WO-O4O-STORE-CONTENTS-SELECTOR-INLINE-POP-TO-V2-MIGRATION-V1:
+ *   StoreContentsSelector 의 "POP 만들기" 가 POP V2 handoff(/store/marketing/pop-v2) 로 이관되어
+ *   import 소비처 0. legacy 즉시 PDF 축(POST /pharmacy/pop/generate) 과 함께 다음 회차(④ retirement)에서 제거한다.
+ *   이번 회차는 consumer migration 이므로 파일은 KEEP_TEMPORARY.
+ *
  * WO-O4O-KPA-CONTENT-LIST-INLINE-POP-CREATE-V1
  *
  * /store/library/contents 에서 콘텐츠 1개를 선택하면 POP 메뉴로 이동하지 않고 이 모달에서 바로
