@@ -137,7 +137,14 @@ describe('tool eligibility — 자격 없는 tool 은 노출되지 않는다', (
    * 드래그 · 스크롤)은 여기 tool 로 존재하지 않는다(동 WO §5·§22).
    */
   it('registry 는 read-only 또는 허용된 effect 만 담고 browser-mode tool 은 0 이다', () => {
-    const allowedEffects = ['FOREGROUND_ACTIVATION', 'BROWSER_SITE_OPEN', 'COMPUTER_INTERACTION'];
+    const allowedEffects = [
+      'FOREGROUND_ACTIVATION',
+      'BROWSER_SITE_OPEN',
+      'COMPUTER_INTERACTION',
+      'LOCAL_DATA_WRITE',
+      // WO-O4O-BROWSER-DOM-CONTROL-V0 §18·§21·§22
+      'BROWSER_DOM_INTERACTION',
+    ];
     for (const t of AI_TOOL_REGISTRY) {
       expect(['server', 'local']).toContain(t.executionMode);
       if (!t.readOnly) {
@@ -153,7 +160,15 @@ describe('tool eligibility — 자격 없는 tool 은 노출되지 않는다', (
       AI_TOOL_NAMES.COMPUTER_CLICK,
       AI_TOOL_NAMES.COMPUTER_TYPE_TEXT,
       AI_TOOL_NAMES.COMPUTER_KEY,
+      AI_TOOL_NAMES.DATA_SET_LOCAL_SETTING,
+      // WO-O4O-BROWSER-DOM-CONTROL-V0: DOM 상호작용 셋. 그 밖(inspect·find·read_*·get_context)은 read-only.
+      AI_TOOL_NAMES.DOM_SET_INPUT,
+      AI_TOOL_NAMES.DOM_SELECT_OPTION,
+      AI_TOOL_NAMES.DOM_CLICK,
     ]);
+    for (const name of [AI_TOOL_NAMES.DOM_SET_INPUT, AI_TOOL_NAMES.DOM_SELECT_OPTION, AI_TOOL_NAMES.DOM_CLICK]) {
+      expect(AI_TOOL_REGISTRY.find((t) => t.name === name)?.effect).toBe('BROWSER_DOM_INTERACTION');
+    }
     // effect 와 tool 은 고정 대응이다 — 같은 effect 를 다른 이름으로 다시 열 수 없다.
     expect(AI_TOOL_REGISTRY.find((t) => t.name === AI_TOOL_NAMES.BROWSER_OPEN_SITE)?.effect)
       .toBe('BROWSER_SITE_OPEN');

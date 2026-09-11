@@ -68,15 +68,28 @@ describe('WO-O4O-AUTOMATION-EXECUTION-LAYER-REALIGNMENT-V1', () => {
       expect(computerTools.map((t) => t.name).sort()).toEqual(
         ['local.computer.click', 'local.computer.inspect', 'local.computer.key', 'local.computer.type_text'].sort(),
       );
+      // WO-O4O-BROWSER-DOM-CONTROL-V0: browser_dom 은 local.browser.dom.* 여덟뿐, 그 밖은 전부 api.
       const nonComputer = AI_TOOL_REGISTRY.filter((t) => t.automationMethod !== 'computer_use');
-      for (const t of nonComputer) expect(t.automationMethod).toBe('api');
+      for (const t of nonComputer) {
+        expect(t.automationMethod).toBe(t.name.startsWith('local.browser.dom.') ? 'browser_dom' : 'api');
+      }
     });
 
-    it('06. browser_dom · windows_uia 를 쓰는 tool 은 아직 없다 (V0 greenfield, §27·§28)', () => {
-      const structuredFuture = AI_TOOL_REGISTRY.filter(
-        (t) => t.automationMethod === 'browser_dom' || t.automationMethod === 'windows_uia',
+    it('06. browser_dom 은 BROWSER-DOM-CONTROL-V0 의 local.browser.dom.* 여덟뿐 · windows_uia 는 아직 없다 (§27·§28)', () => {
+      const dom = AI_TOOL_REGISTRY.filter((t) => t.automationMethod === 'browser_dom').map((t) => t.name).sort();
+      expect(dom).toEqual(
+        [
+          'local.browser.dom.get_context',
+          'local.browser.dom.inspect',
+          'local.browser.dom.find',
+          'local.browser.dom.read_text',
+          'local.browser.dom.read_table',
+          'local.browser.dom.set_input',
+          'local.browser.dom.select_option',
+          'local.browser.dom.click',
+        ].sort(),
       );
-      expect(structuredFuture).toHaveLength(0);
+      expect(AI_TOOL_REGISTRY.filter((t) => t.automationMethod === 'windows_uia')).toHaveLength(0);
     });
   });
 

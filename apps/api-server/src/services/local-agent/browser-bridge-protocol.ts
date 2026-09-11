@@ -34,6 +34,15 @@ export const NATIVE_BRIDGE_MESSAGE_TYPES = Object.freeze([
   'extension.status',
   'browser.get_context',
   'workspace.set_mode',
+  // ── Browser DOM Control V0 (WO-O4O-BROWSER-DOM-CONTROL-V0 §38) — agent→host→확장 방향.
+  'browser.dom.get_context',
+  'browser.dom.inspect',
+  'browser.dom.find',
+  'browser.dom.read_text',
+  'browser.dom.set_input',
+  'browser.dom.select_option',
+  'browser.dom.click',
+  'browser.dom.read_table',
 ] as const);
 
 export type NativeBridgeMessageType = (typeof NATIVE_BRIDGE_MESSAGE_TYPES)[number];
@@ -53,6 +62,16 @@ export const BROWSER_BRIDGE_ERROR = Object.freeze({
   SITE_NOT_ALLOWED: 'BROWSER_SITE_NOT_ALLOWED',
   WORKSPACE_MODE_UNSUPPORTED: 'WORKSPACE_MODE_UNSUPPORTED',
   BAD_MESSAGE: 'NATIVE_BRIDGE_BAD_MESSAGE',
+  // ── Browser DOM Control V0 (§29·§44) ──
+  DOM_SITE_NOT_ALLOWED: 'DOM_SITE_NOT_ALLOWED',
+  DOM_TAB_NOT_FOUND: 'DOM_TAB_NOT_FOUND',
+  DOM_ELEMENT_NOT_FOUND: 'DOM_ELEMENT_NOT_FOUND',
+  DOM_ELEMENT_STALE: 'DOM_ELEMENT_STALE',
+  DOM_ACTION_NOT_ALLOWED: 'DOM_ACTION_NOT_ALLOWED',
+  DOM_CROSS_ORIGIN_BLOCKED: 'DOM_CROSS_ORIGIN_BLOCKED',
+  DOM_USER_ACTION_REQUIRED: 'DOM_USER_ACTION_REQUIRED',
+  DOM_CONTENT_UNAVAILABLE: 'DOM_CONTENT_UNAVAILABLE',
+  DOM_PERMISSION_REQUIRED: 'BROWSER_DOM_PERMISSION_REQUIRED',
 } as const);
 
 export type BrowserBridgeErrorCode = (typeof BROWSER_BRIDGE_ERROR)[keyof typeof BROWSER_BRIDGE_ERROR];

@@ -52,6 +52,8 @@ import {
   executeAiTool,
   renderToolContext,
   computerRequestGap,
+  domRequestGap,
+  isDomToolName,
   needsLocalDeviceResolution,
 } from '../services/ai-tools/ai-tool-router.js';
 import {
@@ -1927,6 +1929,9 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
     if (!selected) {
       const gap = computerRequestGap(message);
       if (gap) facts.computerRequestGap = gap;
+      // BROWSER-DOM-CONTROL-V0 §3: DOM 요청인데 대상/텍스트가 없거나 금지 내용이면 실행하지 않고 되묻게 한다.
+      const domGap = domRequestGap(message);
+      if (domGap) facts.domRequestGap = domGap;
     }
     if (selected) {
       const toolResult = await executeAiTool(AppDataSource, selected.tool, selected.args, toolCtx);
@@ -1947,6 +1952,17 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
         else if (selected.tool === AI_TOOL_NAMES.COMPUTER_CLICK) facts.computerAction = 'click';
         else if (selected.tool === AI_TOOL_NAMES.COMPUTER_TYPE_TEXT) facts.computerAction = 'type_text';
         else if (selected.tool === AI_TOOL_NAMES.COMPUTER_KEY) facts.computerAction = 'key';
+        // BROWSER-DOM-CONTROL-V0 §32·§34: DOM 축은 읽기/상호작용 두 갈래로만 프롬프트에 반영하고,
+        // 페이지에서 읽은 텍스트는 renderer 가 [webpage] 블록(source=webpage)으로 표시한다.
+        else if (isDomToolName(selected.tool)) {
+          facts.browserDomAction = toolResult.data?.available === true
+            ? (selected.tool === AI_TOOL_NAMES.DOM_SET_INPUT ||
+               selected.tool === AI_TOOL_NAMES.DOM_SELECT_OPTION ||
+               selected.tool === AI_TOOL_NAMES.DOM_CLICK
+                ? 'interact'
+                : 'read')
+            : 'blocked';
+        }
       }
       if (
         selected.tool === AI_TOOL_NAMES.BROWSER_OPEN_SITE &&

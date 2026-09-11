@@ -73,13 +73,28 @@ test('malformed envelopes rejected (null/array/bad requestId/array payload)', ()
   );
 });
 
-test('exactly four message types allowed — no more (§27)', () => {
+test('exactly twelve message types allowed — bridge 4 + DOM 8, no more (§27 · DOM-CONTROL §38)', () => {
   assert.deepEqual([...agentContract.NATIVE_BRIDGE_MESSAGE_TYPES].sort(), [
+    'browser.dom.click',
+    'browser.dom.find',
+    'browser.dom.get_context',
+    'browser.dom.inspect',
+    'browser.dom.read_table',
+    'browser.dom.read_text',
+    'browser.dom.select_option',
+    'browser.dom.set_input',
     'browser.get_context',
     'extension.hello',
     'extension.status',
     'workspace.set_mode',
   ]);
+  assert.deepEqual([...agentContract.BRIDGE_DOM_MESSAGE_TYPES], [...extContract.BRIDGE_DOM_MESSAGE_TYPES]);
+  // DOM type 이 확장→host 방향으로 요청되면 host 는 서비스하지 않는다(agent→확장 방향만).
+  const r = host.handleBridgeMessage(
+    { version: 1, requestId: 'r', type: 'browser.dom.click', payload: {} },
+    { hasAgentCredentials: () => true },
+  );
+  assert.deepEqual(r.payload, { serviced: false, reason: 'AGENT_TO_EXTENSION_ONLY' });
 });
 
 // ── handshake (§30) ──────────────────────────────────────────────────────────
@@ -280,18 +295,23 @@ test('no forbidden capability appears in extension/host source (§29·§46·§47
     path.join(EXT_ROOT, 'src', 'content-script.js'),
     path.join(EXT_ROOT, 'src', 'native-bridge-client.js'),
   ];
-  // DOM executor·임의 실행이 소스에 없어야 한다. (native-host 는 child_process 를 import 하지 않는다)
+  // 임의 실행이 소스에 없어야 한다. (native-host 는 child_process 를 import 하지 않는다)
+  // DOM-CONTROL-V0 이후 content-script 는 DOM executor 를 갖지만, executor 는 상수 selector · elementRef 로만
+  // 동작한다 — 그 잠금은 browser-dom.test.mjs 가 별도로 건다. 여기서는 SW · client · host 의 부재만 본다.
   for (const f of files) {
     const src = readCode(f);
-    for (const bad of ['child_process', 'executeScript', 'chrome.debugger', 'document.querySelector', '.click(', 'eval(']) {
+    const bads = f.endsWith('content-script.js')
+      ? ['child_process', 'executeScript', 'chrome.debugger', 'eval(', 'new Function']
+      : ['child_process', 'executeScript', 'chrome.debugger', 'document.querySelector', '.click(', 'eval('];
+    for (const bad of bads) {
       assert.ok(!src.includes(bad), `${path.basename(f)} must not contain ${bad}`);
     }
   }
 });
 
-test('content script does not read page contents or cookies (§18·§45·§46)', () => {
+test('content script never touches cookies · storage · raw HTML · page scripts (§18·§45 · DOM-CONTROL §12·§43)', () => {
   const src = readCode(path.join(EXT_ROOT, "src", "content-script.js"));
-  for (const bad of ['document.cookie', 'localStorage', 'sessionStorage', 'innerHTML', 'document.forms', 'document.body']) {
+  for (const bad of ['document.cookie', 'localStorage', 'sessionStorage', 'innerHTML', 'outerHTML', 'document.forms', 'document.scripts', 'fetch(', 'XMLHttpRequest']) {
     assert.ok(!src.includes(bad), `content script must not touch ${bad}`);
   }
 });

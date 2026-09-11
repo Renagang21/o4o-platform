@@ -213,7 +213,10 @@ test('14. runAction: 임의 SQL tool 은 존재하지 않는다 (denied)', async
   assert.equal(r.errorCode, 'DENIED_UNKNOWN_ACTION');
   // 등록 목록에도 execute_sql 류가 없다.
   const listed = handlers.listAllowedActions();
-  assert.equal(listed.some((a) => /sql|exec|file|read/i.test(a)), false);
+  // DOM-CONTROL-V0 의 local.browser.dom.read_text / read_table 은 등재 site 탭의 **화면 텍스트** 읽기다 —
+  // 파일 · 행 · SQL 읽기가 아니므로 제외한다. 그 밖의 read_* 이름은 여전히 없어야 한다.
+  assert.equal(listed.some((a) => /sql|exec|file/i.test(a)), false);
+  assert.equal(listed.filter((a) => /read/i.test(a)).every((a) => a.startsWith('local.browser.dom.read_')), true);
   assert.ok(listed.includes('local.data.health'));
 });
 

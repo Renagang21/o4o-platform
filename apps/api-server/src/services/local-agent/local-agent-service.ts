@@ -32,6 +32,7 @@ import {
   APP_TARGET_ACTIONS,
   SITE_TARGET_ACTIONS,
   COMPUTER_TARGET_ACTIONS,
+  DOM_TARGET_ACTIONS,
   LOCAL_AGENT_ERROR,
   SUPPORTED_AGENT_PLATFORMS,
   isAllowedLocalAction,
@@ -474,9 +475,16 @@ export async function issueCommand(
   if (!isAllowedLocalAction(params.action)) {
     return { ok: false, errorCode: LOCAL_AGENT_ERROR.DENIED_UNKNOWN_ACTION };
   }
-  const validated = validateLocalCommandArgs(parseLocalAction(params.action).base, params.args);
+  const base = parseLocalAction(params.action).base;
+  const validated = validateLocalCommandArgs(base, params.args);
   if (validated.ok === false) {
-    return { ok: false, errorCode: LOCAL_AGENT_ERROR.COMPUTER_UNSUPPORTED_ACTION };
+    // DOM 축은 자기 코드로(BROWSER-DOM-CONTROL-V0 §29), 나머지는 기존 코드 그대로.
+    return {
+      ok: false,
+      errorCode: DOM_TARGET_ACTIONS.includes(base)
+        ? LOCAL_AGENT_ERROR.DOM_ACTION_NOT_ALLOWED
+        : LOCAL_AGENT_ERROR.COMPUTER_UNSUPPORTED_ACTION,
+    };
   }
   const args = validated.args;
   const hasArgs = Object.keys(args).length > 0;
@@ -609,11 +617,14 @@ export async function submitCommandResult(
   const failureBase = parseLocalAction(action).base;
   // COMPUTER-USE-V0: 화면 조작 action 도 동일 — 실패 시 found·foreground·windowCount 같은
   // 상태 플래그만 남는다(pickSafeComputerInfo). 이미지·창 제목·좌표는 화이트리스트에 없다.
+  // BROWSER-DOM-CONTROL-V0: DOM action 도 동일 — 실패 시 riskLevel · userActionRequired 같은 판정
+  // 플래그만 남는다(pickSafeDomInfo). HTML · 폼 값 · URL query 는 화이트리스트에 없다.
   const keepFailureData =
     status === 'failed' &&
     (APP_TARGET_ACTIONS.includes(failureBase) ||
       SITE_TARGET_ACTIONS.includes(failureBase) ||
-      COMPUTER_TARGET_ACTIONS.includes(failureBase));
+      COMPUTER_TARGET_ACTIONS.includes(failureBase) ||
+      DOM_TARGET_ACTIONS.includes(failureBase));
   const safeData =
     status === 'success' || keepFailureData ? pickSafeResultData(action, result.data) : null;
 

@@ -313,9 +313,9 @@ describe('10~12. 로그인은 사용자 몫 — credential/cookie 수단 부재'
     const names = AI_TOOL_REGISTRY.map((t) => t.name);
     for (const n of names) {
       expect(n).not.toMatch(/password|login|credential|fill|submit/i);
-      // 브라우저 축에는 입력 tool 자체가 없다. (`local.computer.type_text` 는 COMPUTER-USE-V0 의
-      // **등재 앱 창** 축이며, 브라우저 창은 등재 앱이 아니라 대상이 되지 못한다 — computer-use.spec 참조.)
-      if (n.startsWith('local.browser.')) expect(n).not.toMatch(/type|input/i);
+      // 열기 축(local.browser.<x>)에는 입력 tool 이 없다. DOM 축(local.browser.dom.*, BROWSER-DOM-CONTROL-V0)의
+      // set_input 은 elementRef 대상의 짧은 텍스트뿐이고 password/OTP 필드는 확장이 거절한다(browser-dom-control.spec).
+      if (n.startsWith('local.browser.') && !n.startsWith('local.browser.dom.')) expect(n).not.toMatch(/type|input/i);
     }
     for (const bogus of ['local.browser.login', 'local.browser.type_password', 'local.browser.fill']) {
       expect(assertToolAllowed(bogus, ctx())).toMatchObject({ allowed: false, reason: 'UNKNOWN_TOOL' });

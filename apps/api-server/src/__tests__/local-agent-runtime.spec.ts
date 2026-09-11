@@ -25,6 +25,7 @@ import {
   APP_TARGET_ACTIONS,
   COMPUTER_TARGET_ACTIONS,
   DATA_TARGET_ACTIONS,
+  DOM_TARGET_ACTIONS,
   SITE_TARGET_ACTIONS,
   composeAppAction,
   LOCAL_AGENT_ACTIONS,
@@ -545,6 +546,10 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
         ...COMPUTER_TARGET_ACTIONS.flatMap((base) =>
           WINDOWS_APP_IDS.map((appId) => composeAppAction(base, appId)),
         ),
+        // BROWSER-DOM-CONTROL-V0: DOM 축(등재 siteId 당 8항목). 탭 id · URL · selector 는 어느 항목에도 없다.
+        ...DOM_TARGET_ACTIONS.flatMap((base) =>
+          BROWSER_SITE_IDS.map((siteId) => composeAppAction(base, siteId)),
+        ),
       ].sort(),
     );
     for (const action of LOCAL_AGENT_ACTION_ALLOWLIST) {
@@ -583,6 +588,9 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
       './windows-window-control.mjs',
       './computer-use-limits.mjs',
       './local-db.mjs',
+      // BROWSER-DOM-CONTROL-V0: DOM 인자·결과 한도 사본(순수). 확장 통로(bridge relay)는 index.mjs 가
+      // context 로 넘기므로 handler 는 net 모듈을 import 하지 않는다.
+      './browser-dom-limits.mjs',
     ]);
     expect(imports.filter((i) => i.startsWith('node:'))).toEqual(['node:os']);
     for (const forbidden of ['child_process', 'spawn(', 'exec(', 'execFile', 'vm', 'eval(']) {

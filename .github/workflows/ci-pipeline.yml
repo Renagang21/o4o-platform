@@ -146,8 +146,10 @@ jobs:
     # 로컬 SQLite 계약(node:sqlite DatabaseSync, key/setting allowlist, 임의 SQL·파일 부재)을
     # Node 내장 test runner 로 blocking 검증한다. Node 22 내장이라 설치·DB·secret 불필요.
     # Node 22.18.0 에서 `node --test <dir>` 는 실패하므로 파일을 명시한다(실측 확인).
+    # WO-O4O-BROWSER-DOM-CONTROL-V0 §54: Chrome Extension / Native Bridge 계약 사본 대조와 DOM relay ·
+    # host 라우팅 · content-script 소스 잠금을 같은 runner 로 blocking 검증한다(의존성 0, 파일 명시).
     - name: Run tests (o4o-local-agent node:test)
-      run: node --test tools/o4o-local-agent/test/local-db.test.mjs
+      run: node --test tools/o4o-local-agent/test/local-db.test.mjs tools/o4o-local-agent/test/native-bridge.test.mjs tools/o4o-local-agent/test/browser-dom.test.mjs
 
     - name: Run tests (admin-dashboard Vitest, serial to prevent OOM)
       run: cd apps/admin-dashboard && npx vitest run --passWithNoTests --pool=forks --poolOptions.forks.maxForks=1

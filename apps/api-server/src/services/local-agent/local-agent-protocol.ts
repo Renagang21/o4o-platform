@@ -42,6 +42,16 @@ import {
   validateTextArgs,
   type ComputerActionArgs,
 } from './computer-use-contract.js';
+import {
+  BROWSER_DOM_ERROR,
+  pickSafeDomInfo,
+  validateDomElementArgs,
+  validateDomFindArgs,
+  validateDomReadTableArgs,
+  validateDomSelectOptionArgs,
+  validateDomSetInputArgs,
+  type DomActionArgs,
+} from './browser-dom-contract.js';
 
 // ─── Action ──────────────────────────────────────────────────────────────────
 
@@ -72,6 +82,23 @@ export const LOCAL_AGENT_ACTIONS = {
   COMPUTER_TYPE_TEXT: 'local.computer.type_text',
   /** ENTER · TAB · ESC 중 하나 (동 §19·§20). 조합키 없음. */
   COMPUTER_KEY: 'local.computer.key',
+  // ── Browser DOM Control V0 (WO-O4O-BROWSER-DOM-CONTROL-V0 §5·§38) ──────────
+  /** 현재 탭이 등재 site 인가 · active · ready · pathname (§8·§9). URL query 는 없다. */
+  DOM_GET_CONTEXT: 'local.browser.dom.get_context',
+  /** 구조화된 element 요약 목록 + snapshotId (§10·§11). 전체 HTML 이 아니다(§12). */
+  DOM_INSPECT: 'local.browser.dom.inspect',
+  /** role/text/name/label/placeholder 조건으로 element 찾기 (§15). selector 없음(§16). */
+  DOM_FIND: 'local.browser.dom.find',
+  /** elementRef 의 정규화된 visible text (§17). password/hidden 은 제외. */
+  DOM_READ_TEXT: 'local.browser.dom.read_text',
+  /** input[text/search] · textarea 에 짧은 텍스트 설정 (§18). password/OTP 는 거절(§19). */
+  DOM_SET_INPUT: 'local.browser.dom.set_input',
+  /** native <select> 의 option 선택 (§21). */
+  DOM_SELECT_OPTION: 'local.browser.dom.select_option',
+  /** button/link/checkbox/radio 클릭 (§22). COMMIT 분류면 실행하지 않는다(§23·§24). */
+  DOM_CLICK: 'local.browser.dom.click',
+  /** table/role=table 읽기, 행 상한 있음 (§26·§27). */
+  DOM_READ_TABLE: 'local.browser.dom.read_table',
   // ── Local Data Runtime bridge (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1) ────
   /** 매장 PC 로컬 SQLite 의 **상태만** — 스키마 버전·마이그레이션 정상 여부. 경로·행 없음. */
   DATA_HEALTH: 'local.data.health',
@@ -136,6 +163,41 @@ export const COMPUTER_ARGS_ACTIONS: readonly string[] = Object.freeze([
 
 export function composeComputerAction(base: string, targetId: string): string {
   return composeAppAction(base, targetId);
+}
+
+// ─── Browser DOM 대상 action (BROWSER-DOM-CONTROL-V0 §7·§8·§38) ──────────────
+
+/**
+ * targetId = **등재된 siteId** 다(§7). URL · origin · 탭 id 를 서버가 지정하지 않는다 — siteId 만
+ * 말하고, 확장이 자기 registry 로 "현재 탭이 그 site 인가" 를 판정한다(§8). appId/siteId 와 같은
+ * `base#siteId` 규칙이다.
+ *
+ * `SITE_TARGET_ACTIONS`(열기 축) 와 **분리**해 둔다 — 출력 화이트리스트가 다르다.
+ */
+export const DOM_TARGET_ACTIONS: readonly string[] = Object.freeze([
+  LOCAL_AGENT_ACTIONS.DOM_GET_CONTEXT,
+  LOCAL_AGENT_ACTIONS.DOM_INSPECT,
+  LOCAL_AGENT_ACTIONS.DOM_FIND,
+  LOCAL_AGENT_ACTIONS.DOM_READ_TEXT,
+  LOCAL_AGENT_ACTIONS.DOM_SET_INPUT,
+  LOCAL_AGENT_ACTIONS.DOM_SELECT_OPTION,
+  LOCAL_AGENT_ACTIONS.DOM_CLICK,
+  LOCAL_AGENT_ACTIONS.DOM_READ_TABLE,
+]);
+
+/** 인자를 받는 DOM action — get_context · inspect 는 없다. read_table 은 선택적 인자. */
+export const DOM_ARGS_ACTIONS: readonly string[] = Object.freeze([
+  LOCAL_AGENT_ACTIONS.DOM_FIND,
+  LOCAL_AGENT_ACTIONS.DOM_READ_TEXT,
+  LOCAL_AGENT_ACTIONS.DOM_SET_INPUT,
+  LOCAL_AGENT_ACTIONS.DOM_SELECT_OPTION,
+  LOCAL_AGENT_ACTIONS.DOM_CLICK,
+  LOCAL_AGENT_ACTIONS.DOM_READ_TABLE,
+]);
+
+/** DOM action 인가 — 결과 화이트리스트 · 실패 데이터 보존 판정에 쓴다. */
+export function isDomTargetAction(base: string): boolean {
+  return DOM_TARGET_ACTIONS.includes(base);
 }
 
 // ─── Local Data Runtime bridge 계약 (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1) ─
@@ -228,7 +290,28 @@ export function validateDataSetSettingArgs(args: unknown): { ok: boolean; args?:
 export function validateLocalCommandArgs(
   base: string,
   args: unknown,
-): { ok: true; args: Record<string, never> | ComputerActionArgs | DataActionArgs } | { ok: false } {
+): { ok: true; args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs } | { ok: false } {
+  // BROWSER-DOM-CONTROL-V0 §13·§15: elementRef/snapshotId/구조화 조건만. selector · JS 칸은 형상에 없다.
+  if (base === LOCAL_AGENT_ACTIONS.DOM_FIND) {
+    const r = validateDomFindArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DOM_READ_TEXT || base === LOCAL_AGENT_ACTIONS.DOM_CLICK) {
+    const r = validateDomElementArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DOM_SET_INPUT) {
+    const r = validateDomSetInputArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DOM_SELECT_OPTION) {
+    const r = validateDomSelectOptionArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DOM_READ_TABLE) {
+    const r = validateDomReadTableArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
   if (base === LOCAL_AGENT_ACTIONS.DATA_GET_META) {
     const r = validateDataGetMetaArgs(args);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
@@ -307,6 +390,10 @@ export const LOCAL_AGENT_ACTION_ALLOWLIST: readonly string[] = Object.freeze([
   ...COMPUTER_TARGET_ACTIONS.flatMap((base) =>
     WINDOWS_APP_IDS.map((appId) => composeComputerAction(base, appId)),
   ),
+  // BROWSER-DOM-CONTROL-V0: 등재 siteId 하나당 8항목. URL · 탭 id · selector 는 표현 불가.
+  ...DOM_TARGET_ACTIONS.flatMap((base) =>
+    BROWSER_SITE_IDS.map((siteId) => composeSiteAction(base, siteId)),
+  ),
 ]);
 
 export function isAllowedLocalAction(action: string): boolean {
@@ -329,7 +416,7 @@ export function isAllowedLocalAction(action: string): boolean {
 export interface LocalCommand {
   commandId: string;
   action: string;
-  args: Record<string, never> | ComputerActionArgs | DataActionArgs;
+  args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs;
   issuedAt: string;
   expiresAt: string;
 }
@@ -411,6 +498,28 @@ export const LOCAL_AGENT_ERROR = {
   DATA_DB_NOT_AVAILABLE: 'LOCAL_DB_NOT_AVAILABLE',
   /** setting 쓰기가 실패했다. */
   DATA_WRITE_FAILED: 'LOCAL_DATA_WRITE_FAILED',
+
+  // ── Browser DOM Control V0 (WO-O4O-BROWSER-DOM-CONTROL-V0 §29·§44) ─────────
+  /** 현재 탭이 등재 site 가 아니다 · siteId 미등재. */
+  DOM_SITE_NOT_ALLOWED: BROWSER_DOM_ERROR.SITE_NOT_ALLOWED,
+  /** 등재 site 탭을 찾지 못했다(없거나 여러 개라 확정 불가). */
+  DOM_TAB_NOT_FOUND: BROWSER_DOM_ERROR.TAB_NOT_FOUND,
+  /** 조건에 맞는 element 가 없다 — computer_use fallback 후보 사유(§30). */
+  DOM_ELEMENT_NOT_FOUND: BROWSER_DOM_ERROR.ELEMENT_NOT_FOUND,
+  /** elementRef 가 현재 snapshot/page 에 더 이상 유효하지 않다(§14). */
+  DOM_ELEMENT_STALE: BROWSER_DOM_ERROR.ELEMENT_STALE,
+  /** 허용되지 않은 element 종류 · COMMIT 분류 click · 형상 밖 인자(§18·§22·§24). */
+  DOM_ACTION_NOT_ALLOWED: BROWSER_DOM_ERROR.ACTION_NOT_ALLOWED,
+  /** 등재 origin 밖으로 이동시키는 link (§25). */
+  DOM_CROSS_ORIGIN_BLOCKED: BROWSER_DOM_ERROR.CROSS_ORIGIN_BLOCKED,
+  /** password/OTP/PIN 필드 · 로그인 단계 — 사용자가 직접(§19·§42). */
+  DOM_USER_ACTION_REQUIRED: BROWSER_DOM_ERROR.USER_ACTION_REQUIRED,
+  /** content script 가 응답하지 않는다(탭 새로고침 필요 등). */
+  DOM_CONTENT_UNAVAILABLE: BROWSER_DOM_ERROR.CONTENT_UNAVAILABLE,
+  /** 확장에 해당 site host permission 이 없다(§44). */
+  DOM_PERMISSION_REQUIRED: BROWSER_DOM_ERROR.PERMISSION_REQUIRED,
+  /** 확장이 native bridge 에 붙어 있지 않다. */
+  DOM_EXTENSION_NOT_CONNECTED: BROWSER_DOM_ERROR.EXTENSION_NOT_CONNECTED,
 } as const;
 
 export type LocalAgentErrorCode = (typeof LOCAL_AGENT_ERROR)[keyof typeof LOCAL_AGENT_ERROR];
@@ -659,6 +768,9 @@ export function pickSafeResultData(action: string, data: unknown): Record<string
   }
   if (DATA_TARGET_ACTIONS.includes(base)) {
     return pickSafeDataInfo(data);
+  }
+  if (DOM_TARGET_ACTIONS.includes(base)) {
+    return pickSafeDomInfo(data);
   }
   return {};
 }

@@ -26,17 +26,35 @@
 export const BRIDGE_PROTOCOL_VERSION = 1;
 
 /**
- * V0 에서 허용하는 message type 전부 (§27).
+ * 허용하는 message type 전부 (§27).
  *
- * 정확히 이 넷뿐이다. DOM 조작 · 클릭 · 입력 · form submit 을 나르는 type 은 이번 WO 에
- * 없다(§46·§47 — DOM executor 는 WO-O4O-BROWSER-DOM-CONTROL-V0 로 넘긴다).
+ * BRIDGE-V0 의 넷 + BROWSER-DOM-CONTROL-V0 의 DOM 여덟. DOM type 은 **등재 site 탭의 elementRef**
+ * 만 다루며 form submit · 결제 · 로그인 · 임의 JS 를 나르는 type 은 여전히 없다.
  */
 export const NATIVE_BRIDGE_MESSAGE_TYPES = Object.freeze([
   'extension.hello', // 확장→host 최초 handshake (§30)
   'extension.status', // 준비/연결 상태 조회 (§31)
   'browser.get_context', // 현재 active tab · 등재 site 여부 (§37)
   'workspace.set_mode', // split/focus 화면 모드 설정 (§12·§15)
+  // ── Browser DOM Control V0 (WO-O4O-BROWSER-DOM-CONTROL-V0 §38) — agent→host→확장 방향.
+  //    payload 는 elementRef · snapshotId · 구조화 조건 · 짧은 텍스트뿐이다. selector · JS 칸은 없다(§13·§16).
+  'browser.dom.get_context',
+  'browser.dom.inspect',
+  'browser.dom.find',
+  'browser.dom.read_text',
+  'browser.dom.set_input',
+  'browser.dom.select_option',
+  'browser.dom.click',
+  'browser.dom.read_table',
 ]);
+
+/** agent → 확장 방향으로만 흐르는 type(DOM 축). 확장이 host 로 **요청**할 수 있는 type 이 아니다. */
+export const BRIDGE_DOM_MESSAGE_TYPES = Object.freeze(
+  NATIVE_BRIDGE_MESSAGE_TYPES.filter((t) => t.startsWith('browser.dom.')),
+);
+export function isDomBridgeMessageType(type) {
+  return BRIDGE_DOM_MESSAGE_TYPES.includes(type);
+}
 
 /** 화면 모드 (§15). 이번 V0 은 둘뿐. dual 은 future contract 로만 열어 둔다(§16). */
 export const WORKSPACE_MODES = Object.freeze(['split', 'focus']);
@@ -52,6 +70,16 @@ export const NATIVE_BRIDGE_ERROR = Object.freeze({
   SITE_NOT_ALLOWED: 'BROWSER_SITE_NOT_ALLOWED',
   WORKSPACE_MODE_UNSUPPORTED: 'WORKSPACE_MODE_UNSUPPORTED',
   BAD_MESSAGE: 'NATIVE_BRIDGE_BAD_MESSAGE',
+  // ── Browser DOM Control V0 (§29·§44) ──
+  DOM_SITE_NOT_ALLOWED: 'DOM_SITE_NOT_ALLOWED',
+  DOM_TAB_NOT_FOUND: 'DOM_TAB_NOT_FOUND',
+  DOM_ELEMENT_NOT_FOUND: 'DOM_ELEMENT_NOT_FOUND',
+  DOM_ELEMENT_STALE: 'DOM_ELEMENT_STALE',
+  DOM_ACTION_NOT_ALLOWED: 'DOM_ACTION_NOT_ALLOWED',
+  DOM_CROSS_ORIGIN_BLOCKED: 'DOM_CROSS_ORIGIN_BLOCKED',
+  DOM_USER_ACTION_REQUIRED: 'DOM_USER_ACTION_REQUIRED',
+  DOM_CONTENT_UNAVAILABLE: 'DOM_CONTENT_UNAVAILABLE',
+  DOM_PERMISSION_REQUIRED: 'BROWSER_DOM_PERMISSION_REQUIRED',
 });
 
 export function isAllowedBridgeMessageType(type) {

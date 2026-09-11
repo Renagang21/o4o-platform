@@ -23,15 +23,24 @@
  *   - browser.get_context / workspace.set_mode = agent→확장 지시(future). V0 에서는 확장
  *     내부(service worker + chrome.windows)에서 브라우저-로컬로 처리한다. host 로 들어오면
  *     유효하지만 host 가 서비스하지 않으므로 serviced:false 로 정직하게 응답한다.
+ *
+ * WO-O4O-BROWSER-DOM-CONTROL-V0 §37 — **agent → 확장 방향이 처음 열린다.**
+ *   host 는 시작하면서 폴링 agent 의 bridge relay(named pipe, per-run 토큰)에 붙는다. relay 가
+ *   내려보내는 `browser.dom.*` 봉투를 **그대로** stdout 으로 확장에 전달하고, 확장의 응답 봉투를
+ *   requestId 로 짝지어 relay 로 되돌린다. host 는 DOM 내용을 판단하지 않는다 — 검증(봉투 형상 ·
+ *   allowlist) + 전달뿐이다. agent 가 없으면(세션 파일 없음) DOM 축은 조용히 닫힌 채 hello/status 만
+ *   서비스한다.
  */
 
 import process from 'node:process';
 import {
   BRIDGE_PROTOCOL_VERSION,
   NATIVE_BRIDGE_MESSAGE_TYPES,
+  isDomBridgeMessageType,
   validateBridgeMessage,
 } from './native-bridge-protocol.mjs';
 import { loadCredentials } from './credentials.mjs';
+import { connectBridgeRelay } from './bridge-relay.mjs';
 
 /** host 의 버전. 확장 version 과 별개로 관리(§30 handshake 에 실린다). */
 export const NATIVE_HOST_VERSION = '0.0.1';
@@ -93,6 +102,10 @@ export function handleBridgeMessage(message, deps = {}) {
       // 유효한 type 이나 V0 host 가 서비스하지 않는다(브라우저-로컬). 정직하게 알린다.
       return reply({ serviced: false, reason: 'BROWSER_LOCAL' });
     default:
+      // DOM type 이 확장→host 방향으로 **요청**되면 서비스하지 않는다 — 그 방향은 agent→확장뿐이다(§37).
+      if (isDomBridgeMessageType(message.type)) {
+        return reply({ serviced: false, reason: 'AGENT_TO_EXTENSION_ONLY' });
+      }
       // validateBridgeMessage 를 통과했다면 여기 오지 않는다. 방어적 fallback.
       return reply({ serviced: false });
   }
@@ -130,14 +143,60 @@ export function drainFrames(buffer) {
   return { messages, rest: buffer.subarray(offset) };
 }
 
+/**
+ * DOM 축 라우팅 상태 — relay 가 내려준 요청(requestId → 봉투)을 기억해 확장 응답과 짝짓는다.
+ * 순수 함수로 두어 테스트가 stdio 없이 검증할 수 있게 한다.
+ */
+export function createDomRouting() {
+  const inflight = new Map(); // requestId -> type
+  return {
+    /** relay → 확장. 확장으로 내보낼 프레임(봉투)을 돌려준다. */
+    accept(message) {
+      inflight.set(message.requestId, message.type);
+      return message;
+    },
+    /** 확장 → relay. 짝이 맞는 응답이면 그 봉투를 돌려주고, 아니면 null. */
+    match(raw) {
+      if (!raw || typeof raw !== 'object' || typeof raw.requestId !== 'string') return null;
+      const type = inflight.get(raw.requestId);
+      if (!type || raw.type !== type) return null;
+      const verdict = validateBridgeMessage(raw);
+      if (!verdict.ok) return null; // 봉투 위반 응답은 짝을 소비하지 않는다 — 올바른 응답이 뒤따를 수 있다
+      inflight.delete(raw.requestId);
+      return verdict.message;
+    },
+    size() {
+      return inflight.size;
+    },
+  };
+}
+
 /** 실제 stdio 루프. 직접 실행될 때만 돈다(테스트 import 시에는 돌지 않는다). */
 function runStdioLoop() {
   let acc = Buffer.alloc(0);
+  const routing = createDomRouting();
+  let extensionHello = false;
+
+  // §37: relay 에 붙는다. agent 미실행이면 connected=false 로 조용히 지나간다.
+  const relay = connectBridgeRelay({
+    extensionConnected: false,
+    onRequest(message) {
+      // relay → 확장: 검증된 봉투를 그대로 내보낸다. host 는 payload 를 해석하지 않는다.
+      process.stdout.write(encodeFrame(routing.accept(message)));
+    },
+  });
+
   process.stdin.on('data', (chunk) => {
     acc = Buffer.concat([acc, chunk]);
     const { messages, rest } = drainFrames(acc);
     acc = rest;
     for (const raw of messages) {
+      // 확장 → relay: DOM 응답이면 relay 로 되돌리고 host 는 응답하지 않는다.
+      const domReply = routing.match(raw);
+      if (domReply) {
+        relay.respond(domReply);
+        continue;
+      }
       const verdict = validateBridgeMessage(raw);
       if (verdict.ok === false) {
         // 계약 위반은 실행하지 않는다. requestId 를 알 수 있으면 오류 봉투로, 아니면 조용히 폐기.
@@ -158,10 +217,18 @@ function runStdioLoop() {
         continue;
       }
       const response = handleBridgeMessage(verdict.message);
+      if (verdict.message.type === 'extension.hello' && !extensionHello) {
+        // 확장이 인사했다 = 이 host 뒤에 확장이 살아 있다. relay 에 알려 DOM 축을 연다.
+        extensionHello = true;
+        relay.setExtensionState(true);
+      }
       process.stdout.write(encodeFrame(response));
     }
   });
-  process.stdin.on('end', () => process.exit(0));
+  process.stdin.on('end', () => {
+    relay.end();
+    process.exit(0);
+  });
 }
 
 // import.meta.url 이 실행 진입점과 같을 때만 루프를 돈다.

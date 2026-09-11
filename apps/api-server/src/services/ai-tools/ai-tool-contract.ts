@@ -46,6 +46,11 @@ import {
   validateDataGetMetaArgs,
   validateDataSetSettingArgs,
 } from '../local-agent/local-agent-protocol.js';
+import {
+  DOM_QUERY_VALUE_MAX,
+  domInputDenyReason,
+  validateDomFindQuery,
+} from '../local-agent/browser-dom-contract.js';
 import type { AutomationMethod, AutomationRiskLevel } from './automation-execution-contract.js';
 import { isComputerUseMethod, computerUseFallbackAllowed } from './automation-execution-contract.js';
 
@@ -127,6 +132,17 @@ export const AiCapability = {
    * generic KV 쓰기가 아니다 — 키·값 모두 좁은 스키마를 통과해야 하고, 임의 SQL 은 표현 불가다(§10·§11·§16).
    */
   LOCAL_DATA_SETTING_WRITE: 'LOCAL_DATA_SETTING_WRITE',
+  /**
+   * 연결된 PC 의 Chrome 에서 **등재 site 탭의 DOM 을 구조적으로 읽는** 자격
+   * (WO-O4O-BROWSER-DOM-CONTROL-V0 §9·§10·§15·§17·§26 — get_context · inspect · find · read_text · read_table).
+   * read-only 다. 전체 HTML · URL query · cookie · 폼 값 · 비밀번호 필드 값은 이 자격으로 얻을 수 없다(§12·§17·§43).
+   */
+  READ_ONLY_LOCAL_BROWSER_DOM: 'READ_ONLY_LOCAL_BROWSER_DOM',
+  /**
+   * 등재 site 탭의 **elementRef 하나**에 대한 제한된 상호작용 자격 (동 §18·§21·§22 — set_input · select_option · click).
+   * password/OTP 필드 · COMMIT 분류 click · 등재 origin 밖 이동 · 임의 selector/JS 는 이 자격으로 표현할 수 없다(§16·§19·§24·§25).
+   */
+  LOCAL_BROWSER_DOM_INTERACT: 'LOCAL_BROWSER_DOM_INTERACT',
 } as const;
 
 /**
@@ -225,6 +241,10 @@ export function deriveAiCapabilities(ctx: VerifiedToolContext): AiCapabilityKey[
     // 그 PC 에 있으므로, 연결된 단일 device 가 확정돼야 상태·meta 조회와 setting 쓰기가 성립한다.
     caps.push(AiCapability.READ_ONLY_LOCAL_DATA);
     caps.push(AiCapability.LOCAL_DATA_SETTING_WRITE);
+    // DOM 축도 같은 조건이다(BROWSER-DOM-CONTROL-V0 §4). 확장이 붙어 있는가는 서버가 미리 알 수
+    // 없다 — 명령이 가서 O4O_EXTENSION_NOT_CONNECTED 로 돌아오면 그때 사실로 안내한다.
+    caps.push(AiCapability.READ_ONLY_LOCAL_BROWSER_DOM);
+    caps.push(AiCapability.LOCAL_BROWSER_DOM_INTERACT);
   }
   return caps;
 }
@@ -285,8 +305,22 @@ export interface AiToolDefinition {
    * 받는 인자의 형상. 생략하면 **인자 없음**이다(V0 기본).
    * `appId` 는 `{ appId }` 하나만 허용하며, 값은 Windows App Registry 등재분이어야 한다(§9).
    */
-  argumentSchema?: 'none' | 'appId' | 'siteId' | ComputerArgumentSchema | DataArgumentSchema;
+  argumentSchema?: 'none' | 'appId' | 'siteId' | ComputerArgumentSchema | DataArgumentSchema | DomArgumentSchema;
 }
+
+/**
+ * BROWSER-DOM-CONTROL-V0 §9·§15·§17·§18·§21·§22·§26 인자 형상. 전부 `siteId`(등재분)를 포함한다.
+ *   domSite   → { siteId }                          get_context · inspect · read_table
+ *   domFind   → { siteId, query }                   query 는 role/text/name/label/placeholder 만
+ *   domTarget → { siteId, target }                  read_text · click — target 은 사용자가 따옴표로 말한 짧은 텍스트
+ *   domInput  → { siteId, target, text }            text 1~500자, credential/shell 문자열 거절
+ *   domSelect → { siteId, target, option }          native select 의 label/value
+ *
+ * **elementRef · snapshotId 는 이 경계에 없다.** 그 둘은 executor 가 find 결과에서 받아 agent 명령에만
+ * 싣는다(§13·§14) — 모델 · 클라이언트가 element 참조를 지정하는 경로가 없다.
+ * selector · xpath · js · url 칸은 어느 형상에도 없다(§16).
+ */
+export type DomArgumentSchema = 'domSite' | 'domFind' | 'domTarget' | 'domInput' | 'domSelect';
 
 /**
  * LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §6 인자 형상. 자유 args 채널이 아니다 — tool 별로 좁다.
@@ -331,7 +365,13 @@ export type ToolEffect =
    * (LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1 §5·§10·§11·§16). generic KV 쓰기도, 임의 SQL 도,
    * imported 원자료 write 도 아니다 — 키·값 모두 좁은 스키마를 통과해야 하고 그 밖은 이름이 없다.
    */
-  | 'LOCAL_DATA_WRITE';
+  | 'LOCAL_DATA_WRITE'
+  /**
+   * 등재 site 탭의 **elementRef 하나**에 대한 DOM 상호작용 한 번 (BROWSER-DOM-CONTROL-V0 §18·§21·§22):
+   * 텍스트 입력 · select 옵션 · 클릭 중 하나. COMMIT 으로 분류된 대상은 확장이 실행 전에 멈춘다(§24).
+   * 결제 · 주문 제출 · 로그인 · 등재 origin 밖 이동은 이 효과의 이름이 아니다(§6·§25·§31).
+   */
+  | 'BROWSER_DOM_INTERACTION';
 
 /** 실행이 허용된 부작용. **registry 에 무엇이 적혀 있든 이 집합이 최종 게이트다.** */
 const ALLOWED_TOOL_EFFECTS: readonly ToolEffect[] = Object.freeze([
@@ -339,6 +379,7 @@ const ALLOWED_TOOL_EFFECTS: readonly ToolEffect[] = Object.freeze([
   'BROWSER_SITE_OPEN',
   'COMPUTER_INTERACTION',
   'LOCAL_DATA_WRITE',
+  'BROWSER_DOM_INTERACTION',
 ]);
 
 /** read-only 이거나, 허용된 effect 를 선언한 tool 만 실행 후보가 된다. */
@@ -366,6 +407,15 @@ export const AI_TOOL_NAMES = {
   DATA_LOCAL_HEALTH: 'local.data.health',
   DATA_GET_LOCAL_META: 'local.data.get_meta',
   DATA_SET_LOCAL_SETTING: 'local.data.set_setting',
+  // WO-O4O-BROWSER-DOM-CONTROL-V0 §9·§10·§15·§17·§18·§21·§22·§26
+  DOM_GET_CONTEXT: 'local.browser.dom.get_context',
+  DOM_INSPECT: 'local.browser.dom.inspect',
+  DOM_FIND: 'local.browser.dom.find',
+  DOM_READ_TEXT: 'local.browser.dom.read_text',
+  DOM_SET_INPUT: 'local.browser.dom.set_input',
+  DOM_SELECT_OPTION: 'local.browser.dom.select_option',
+  DOM_CLICK: 'local.browser.dom.click',
+  DOM_READ_TABLE: 'local.browser.dom.read_table',
 } as const;
 
 export type AiToolName = (typeof AI_TOOL_NAMES)[keyof typeof AI_TOOL_NAMES];
@@ -541,6 +591,94 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
     effect: 'LOCAL_DATA_WRITE',
     argumentSchema: 'dataSetting',
   },
+  // ── Browser DOM Control V0 (BROWSER-DOM-CONTROL-V0 §38·§39·§40) — 사용자 Chrome 의 등재 site 탭.
+  //    automationMethod 는 전부 `browser_dom` 이다 — 이 8개가 첫 browser_dom production tool 이다(§39).
+  //    실행 위치는 여전히 `local`(Local Agent → Native Bridge → 확장) 이라 EXECUTABLE_MODES 는 그대로다.
+  {
+    name: AI_TOOL_NAMES.DOM_GET_CONTEXT,
+    automationMethod: 'browser_dom',
+    riskLevel: 'READ',
+    description: '연결된 PC 의 Chrome 에서 등재 사이트 탭이 열려 있고 준비됐는지 확인한다. URL query 는 돌려주지 않는다.',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_BROWSER_DOM],
+    executionMode: 'local',
+    readOnly: true,
+    argumentSchema: 'domSite',
+  },
+  {
+    name: AI_TOOL_NAMES.DOM_INSPECT,
+    automationMethod: 'browser_dom',
+    riskLevel: 'READ',
+    description: '등재 사이트 탭의 화면 요소를 구조화된 요약(역할·이름·짧은 텍스트·참조)으로 읽는다. 전체 HTML 이 아니다.',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_BROWSER_DOM],
+    executionMode: 'local',
+    readOnly: true,
+    argumentSchema: 'domSite',
+  },
+  {
+    name: AI_TOOL_NAMES.DOM_FIND,
+    automationMethod: 'browser_dom',
+    riskLevel: 'READ',
+    description: '등재 사이트 탭에서 역할·텍스트·이름·라벨·placeholder 조건으로 요소를 찾는다. selector 는 받지 않는다.',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_BROWSER_DOM],
+    executionMode: 'local',
+    readOnly: true,
+    argumentSchema: 'domFind',
+  },
+  {
+    name: AI_TOOL_NAMES.DOM_READ_TEXT,
+    automationMethod: 'browser_dom',
+    riskLevel: 'READ',
+    description: '참조된 요소의 보이는 텍스트를 읽는다. 비밀번호·숨김 값은 읽지 않는다.',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_BROWSER_DOM],
+    executionMode: 'local',
+    readOnly: true,
+    argumentSchema: 'domTarget',
+  },
+  {
+    name: AI_TOOL_NAMES.DOM_READ_TABLE,
+    automationMethod: 'browser_dom',
+    riskLevel: 'READ',
+    description: '등재 사이트 탭의 표를 열·행으로 읽는다(행 상한 있음).',
+    requiredCapabilities: [AiCapability.READ_ONLY_LOCAL_BROWSER_DOM],
+    executionMode: 'local',
+    readOnly: true,
+    argumentSchema: 'domSite',
+  },
+  {
+    name: AI_TOOL_NAMES.DOM_SET_INPUT,
+    automationMethod: 'browser_dom',
+    riskLevel: 'REVERSIBLE',
+    description: '참조된 텍스트 입력란에 사용자가 요청한 짧은 텍스트를 넣는다. 비밀번호·인증번호 필드에는 넣지 않는다.',
+    requiredCapabilities: [AiCapability.LOCAL_BROWSER_DOM_INTERACT],
+    executionMode: 'local',
+    readOnly: false,
+    effect: 'BROWSER_DOM_INTERACTION',
+    argumentSchema: 'domInput',
+  },
+  {
+    name: AI_TOOL_NAMES.DOM_SELECT_OPTION,
+    automationMethod: 'browser_dom',
+    riskLevel: 'REVERSIBLE',
+    description: '참조된 선택 상자(native select)에서 옵션 하나를 고른다.',
+    requiredCapabilities: [AiCapability.LOCAL_BROWSER_DOM_INTERACT],
+    executionMode: 'local',
+    readOnly: false,
+    effect: 'BROWSER_DOM_INTERACTION',
+    argumentSchema: 'domSelect',
+  },
+  {
+    // riskLevel 은 등록 시 REVERSIBLE 이지만 **element 별 runtime 판정이 더해진다**(§23·§40):
+    // 대상 이름이 COMMIT 표식(결제·주문확정·삭제…)이면 확장이 실행하지 않는다(§24).
+    name: AI_TOOL_NAMES.DOM_CLICK,
+    automationMethod: 'browser_dom',
+    riskLevel: 'REVERSIBLE',
+    description: '참조된 버튼·링크·체크박스·라디오를 클릭한다. 결제·주문확정 등 되돌릴 수 없는 대상은 클릭하지 않는다.',
+    requiredCapabilities: [AiCapability.LOCAL_BROWSER_DOM_INTERACT],
+    executionMode: 'local',
+    readOnly: false,
+    effect: 'BROWSER_DOM_INTERACTION',
+    argumentSchema: 'domTarget',
+  },
 ]);
 
 export function findToolDefinition(name: string): AiToolDefinition | undefined {
@@ -582,6 +720,12 @@ export function findAutomationInvariantViolations(
     }
     if (methodIsComputer && !computerUseFallbackAllowed(tool.riskLevel)) {
       violations.push({ tool: tool.name, rule: 'computer_use tool 은 자동 fallback 허용 위험 등급이어야 함(§17·§19)' });
+    }
+    // BROWSER-DOM-CONTROL-V0 §39: browser_dom ⇔ `local.browser.dom.*` 이름. 열기 축(local.browser.*)은 api 다.
+    const methodIsDom = tool.automationMethod === 'browser_dom';
+    const nameIsDom = tool.name.startsWith('local.browser.dom.');
+    if (methodIsDom !== nameIsDom) {
+      violations.push({ tool: tool.name, rule: 'automationMethod===browser_dom ⇔ local.browser.dom.* 이름' });
     }
   }
   return violations;
@@ -726,6 +870,42 @@ export function validateToolArguments(
             ? validateTextArgs(rest).ok
             : validateKeyArgs(rest).ok;
     return restOk ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
+  }
+
+  if (
+    schema === 'domSite' ||
+    schema === 'domFind' ||
+    schema === 'domTarget' ||
+    schema === 'domInput' ||
+    schema === 'domSelect'
+  ) {
+    // DOM tool (BROWSER-DOM-CONTROL-V0 §7·§13): siteId 는 등재분이어야 하고, 나머지 키는 형상별로
+    // 정확히 그 키만 허용된다. selector · xpath · js · url · elementRef 는 어느 형상에도 칸이 없다(§16).
+    if (!args || typeof args !== 'object' || Array.isArray(args)) {
+      return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    }
+    const a = args as Record<string, unknown>;
+    if (typeof a.siteId !== 'string' || !isRegisteredBrowserSite(a.siteId)) {
+      return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    }
+    const keys = Object.keys(a).sort().join(',');
+    // 대상 · 옵션은 짧은 일반 텍스트다. `<>{}` 는 페이지 텍스트를 가리키는 데 필요 없다 — selector 조각 차단.
+    const shortText = (v: unknown) =>
+      typeof v === 'string' && v.trim().length > 0 && v.length <= DOM_QUERY_VALUE_MAX && !/[<>{}]/.test(v);
+    const ok =
+      schema === 'domSite'
+        ? keys === 'siteId'
+        : schema === 'domFind'
+          ? keys === 'query,siteId' && validateDomFindQuery(a.query).ok
+          : schema === 'domTarget'
+            ? keys === 'siteId,target' && shortText(a.target)
+            : schema === 'domInput'
+              ? keys === 'siteId,target,text' &&
+                shortText(a.target) &&
+                typeof a.text === 'string' &&
+                domInputDenyReason(a.text) === null
+              : keys === 'option,siteId,target' && shortText(a.target) && shortText(a.option);
+    return ok ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
   }
 
   if (schema === 'dataMetaKey') {

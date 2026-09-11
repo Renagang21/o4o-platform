@@ -25,6 +25,7 @@
 import { runAction, listAllowedActions, AGENT_VERSION, ACTIONS } from './handlers.mjs';
 import { loadCredentials, saveCredentials, credentialsLocation } from './credentials.mjs';
 import { startLocalServer, LOCAL_AGENT_PORT } from './local-server.mjs';
+import { startBridgeRelay } from './bridge-relay.mjs';
 
 const API_BASE = process.env.O4O_API_BASE || 'https://api.neture.co.kr';
 /** 명령을 물어보러 가는 주기. 짧으면 반응이 빠르고, 길면 조용하다. */
@@ -179,7 +180,9 @@ async function commandRun() {
     log('아직 연결되지 않았습니다. O4O 웹에서 [이 PC 연결] 을 눌러 주세요.');
   }
 
-  const context = { deviceName: process.env.O4O_AGENT_DEVICE_NAME || '내 PC' };
+  // WO-O4O-BROWSER-DOM-CONTROL-V0 §37: native host 가 붙을 relay. 확장이 없으면 DOM 축만 닫힌 채 나머지는 그대로.
+  const bridge = await startBridgeRelay({ log });
+  const context = { deviceName: process.env.O4O_AGENT_DEVICE_NAME || '내 PC', bridge };
   let sessionToken = null;
   let backoff = RECONNECT_MIN_MS;
   let running = true;
@@ -188,6 +191,8 @@ async function commandRun() {
     if (!running) return;
     running = false;
     log('종료합니다.');
+    // relay 세션 파일을 지운다 — 죽은 파이프를 host 가 찾아가지 않게.
+    bridge.close();
     // 창구도 함께 닫는다. listen 소켓이 남으면 프로세스가 끝나지 않는다.
     process.exit(0);
   };

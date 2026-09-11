@@ -107,15 +107,16 @@ describe('three-way contract cross-check (§10·§54)', () => {
     }
   });
 
-  it('agent + extension copies list the same four message types', () => {
+  it('agent + extension copies list the same message types (bridge 4 + DOM 8)', () => {
     const agent = read(AGENT_PROTO);
     const ext = read(EXT_CONTRACT);
     for (const t of NATIVE_BRIDGE_MESSAGE_TYPES) {
       expect(agent).toContain(`'${t}'`);
       expect(ext).toContain(`'${t}'`);
     }
-    // 다섯 번째 type 이 몰래 들어오지 않았는지 — 서버 사본 길이 고정
-    expect(NATIVE_BRIDGE_MESSAGE_TYPES.length).toBe(4);
+    // 열세 번째 type 이 몰래 들어오지 않았는지 — 서버 사본 길이 고정(BRIDGE-V0 4 + BROWSER-DOM-CONTROL-V0 8).
+    expect(NATIVE_BRIDGE_MESSAGE_TYPES.length).toBe(12);
+    expect(NATIVE_BRIDGE_MESSAGE_TYPES.filter((t) => t.startsWith('browser.dom.')).length).toBe(8);
     expect([...WORKSPACE_MODES]).toEqual(['split', 'focus']);
     expect(BRIDGE_PROTOCOL_VERSION).toBe(1);
   });

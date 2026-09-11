@@ -44,6 +44,16 @@ import {
   validateTextArgs,
 } from './computer-use-limits.mjs';
 import { LocalMetaRepository, LocalSettingsRepository, localDbHealth } from './local-db.mjs';
+import {
+  DOM_RESULT_MAX_BYTES,
+  trimDomResult,
+  validateDomElementArgs,
+  validateDomFindArgs,
+  validateDomReadTableArgs,
+  validateDomSelectOptionArgs,
+  validateDomSetInputArgs,
+  validateNoArgs,
+} from './browser-dom-limits.mjs';
 
 export const AGENT_VERSION = '0.1.0';
 
@@ -61,6 +71,15 @@ export const ACTIONS = {
   COMPUTER_CLICK: 'local.computer.click',
   COMPUTER_TYPE_TEXT: 'local.computer.type_text',
   COMPUTER_KEY: 'local.computer.key',
+  // WO-O4O-BROWSER-DOM-CONTROL-V0 §5·§38 — 확장(content script)이 실행, agent 는 검증·전달·자르기만.
+  DOM_GET_CONTEXT: 'local.browser.dom.get_context',
+  DOM_INSPECT: 'local.browser.dom.inspect',
+  DOM_FIND: 'local.browser.dom.find',
+  DOM_READ_TEXT: 'local.browser.dom.read_text',
+  DOM_SET_INPUT: 'local.browser.dom.set_input',
+  DOM_SELECT_OPTION: 'local.browser.dom.select_option',
+  DOM_CLICK: 'local.browser.dom.click',
+  DOM_READ_TABLE: 'local.browser.dom.read_table',
   // WO-O4O-LOCAL-DATA-SQLITE-V0 §35 — 최소 안전 데이터 tool 3개.
   DATA_HEALTH: 'local.data.health',
   DATA_GET_META: 'local.data.get_meta',
@@ -465,6 +484,62 @@ const COMPUTER_HANDLERS = {
   [ACTIONS.COMPUTER_KEY]: { validate: validateKeyArgs, run: computerKey },
 };
 
+// ─── Browser DOM Control V0 (WO-O4O-BROWSER-DOM-CONTROL-V0 §35·§37) ─────────
+//
+// agent 는 DOM 을 **만지지 않는다.** 하는 일은 셋뿐이다:
+//   1. 서버가 보낸 인자를 browser-dom-limits 로 다시 검사한다(형상 밖이면 확장으로 가지 않는다).
+//   2. bridge relay 로 확장에 봉투를 넘기고 응답을 기다린다(확장 미연결이면 O4O_EXTENSION_NOT_CONNECTED).
+//   3. 확장이 돌려준 결과를 한도에 맞춰 잘라 cloud 로 올린다(전체 HTML · 긴 텍스트가 실릴 자리가 없다).
+// selector · JS · URL 을 만들거나 실행하는 코드는 이 파일에 없다.
+
+/** `local.browser.dom.<x>` → bridge type `browser.dom.<x>`. 이름 규칙이 곧 매핑이다. */
+function domBridgeType(base) {
+  return base.replace(/^local[.]/, '');
+}
+
+const DOM_HANDLERS = {
+  [ACTIONS.DOM_GET_CONTEXT]: { validate: validateNoArgs },
+  [ACTIONS.DOM_INSPECT]: { validate: validateNoArgs },
+  [ACTIONS.DOM_FIND]: { validate: validateDomFindArgs },
+  [ACTIONS.DOM_READ_TEXT]: { validate: validateDomElementArgs },
+  [ACTIONS.DOM_SET_INPUT]: { validate: validateDomSetInputArgs },
+  [ACTIONS.DOM_SELECT_OPTION]: { validate: validateDomSelectOptionArgs },
+  [ACTIONS.DOM_CLICK]: { validate: validateDomElementArgs },
+  [ACTIONS.DOM_READ_TABLE]: { validate: validateDomReadTableArgs },
+};
+
+/** 확장 응답 봉투 → agent 결과. 성공/실패 어느 쪽이든 필드는 trimDomResult 를 통과한 것뿐이다. */
+export function domOutcome(site, envelope) {
+  const payload = envelope && typeof envelope.payload === 'object' && envelope.payload ? envelope.payload : {};
+  const base = { siteId: site.siteId, displayName: site.displayName };
+  if (payload.ok === false) {
+    const errorCode =
+      typeof payload.errorCode === 'string' && /^[A-Z0-9_]{1,64}$/.test(payload.errorCode)
+        ? payload.errorCode
+        : 'DOM_CONTENT_UNAVAILABLE';
+    return { status: 'failed', errorCode, data: { ...base, ...trimDomResult(payload) } };
+  }
+  const trimmed = trimDomResult(payload);
+  if (JSON.stringify(trimmed).length > DOM_RESULT_MAX_BYTES) {
+    return { status: 'failed', errorCode: 'DOM_CONTENT_UNAVAILABLE', data: base };
+  }
+  return { status: 'success', data: { ...base, ...trimmed } };
+}
+
+async function runDomAction(base, site, args, context) {
+  const bridge = context && context.bridge;
+  const base0 = { siteId: site.siteId, displayName: site.displayName };
+  if (!bridge || !bridge.isExtensionConnected()) {
+    return { status: 'failed', errorCode: 'O4O_EXTENSION_NOT_CONNECTED', data: base0 };
+  }
+  const reply = await bridge.dispatch(domBridgeType(base), { siteId: site.siteId, ...args });
+  if (!reply.ok) {
+    const errorCode = reply.errorCode === 'O4O_EXTENSION_NOT_CONNECTED' ? reply.errorCode : 'DOM_CONTENT_UNAVAILABLE';
+    return { status: 'failed', errorCode, data: base0 };
+  }
+  return domOutcome(site, reply.message);
+}
+
 /** siteId 를 받는 handler. APP_HANDLERS 와 같은 규칙 — 인자 유무가 곧 계약이다. */
 const SITE_HANDLERS = {
   [ACTIONS.BROWSER_GET_SITE_STATUS]: getSiteStatus,
@@ -593,6 +668,26 @@ export async function runAction(action, context, args) {
     }
   }
 
+  // Browser DOM Control V0: `base#siteId` + 인자. 등재 밖 siteId · 형상 밖 인자는 확장으로 가지 않는다.
+  const domHandler = DOM_HANDLERS[base];
+  if (domHandler) {
+    const site = appId ? findBrowserSite(appId) : undefined;
+    if (!site) return { status: 'denied', errorCode: 'DOM_SITE_NOT_ALLOWED' };
+    const checked = domHandler.validate(args);
+    if (!checked.ok) {
+      return {
+        status: 'denied',
+        errorCode: 'DOM_ACTION_NOT_ALLOWED',
+        data: { siteId: site.siteId, displayName: site.displayName },
+      };
+    }
+    try {
+      return await runDomAction(base, site, checked.args, context);
+    } catch {
+      return { status: 'failed', errorCode: 'DOM_CONTENT_UNAVAILABLE' };
+    }
+  }
+
   // Browser Control V0: `base#siteId`. 등재되지 않은 siteId 는 서버가 보냈더라도 여기서 끝난다(§44).
   const siteHandler = SITE_HANDLERS[base];
   if (siteHandler) {
@@ -664,5 +759,6 @@ export function listAllowedActions() {
     ...Object.keys(SITE_HANDLERS),
     ...Object.keys(COMPUTER_HANDLERS),
     ...Object.keys(DATA_HANDLERS),
+    ...Object.keys(DOM_HANDLERS),
   ];
 }
