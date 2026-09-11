@@ -49,6 +49,7 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
     // Core
     '/users',
     '/operators',
+    '/admin/kpa-branch/service-members', // WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1
     '/operator/points',
     '/settings',
     // O4O 상품 DB — ProductDbLayout 의 탭과 1:1
@@ -216,6 +217,8 @@ describe('권한 경계 — 백엔드가 platform 전용인 메뉴는 같은 경
   const PLATFORM_ONLY_MENUS = [
     'core-users',
     'core-operators',
+    // WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1
+    'core-kpa-branch-service-members',
     'core-points',
     'platform-hub',
     'ops-metrics',

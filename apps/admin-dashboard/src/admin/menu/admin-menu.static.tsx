@@ -74,6 +74,7 @@ import {
   Layers,
   Shield,
   Coins,
+  UserCheck,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -95,7 +96,7 @@ export interface MenuItem {
  * ```text
  * Overview                  /admin
  * 플랫폼 HUB                 /admin/platform/hub
- * Core                      RBAC · 운영자 · 포인트 · 설정
+ * Core                      RBAC · 운영자 · 분회 서비스 가입 승인 · 포인트 · 설정
  * O4O 상품 DB                공통 기준 상품 데이터 (화면 내 탭과 1:1)
  * Content                   공통 콘텐츠 자산·정책
  * CMS                       Contents · Slots · 운영 상태
@@ -151,6 +152,17 @@ export const adminMenuStatic: MenuItem[] = [
         label: 'Service Operators',
         icon: <Shield className="w-4 h-4" />,
         path: '/operators',
+      },
+      // WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1
+      //   kpa-branch 서비스 가입 승인/반려. 서비스 전용 업무지만 "사람·권한" 축이고,
+      //   백엔드 `/api/v1/kpa-branch/admin/service-members*` 는 kpa-society 와 달리
+      //   platformBypass 라 플랫폼 관리자가 정상 통과한다. 승인 = service_memberships 만
+      //   (분회 소속 branch_memberships 는 분회 운영자 콘솔이 정본 — 여기서 결합하지 않는다).
+      {
+        id: 'core-kpa-branch-service-members',
+        label: '분회 서비스 가입 승인',
+        icon: <UserCheck className="w-4 h-4" />,
+        path: '/admin/kpa-branch/service-members',
       },
       // WO-O4O-ADMIN-MENU-CONNECT-BATCH-2-V1
       //   포인트 운영은 금액성 write(지급/차감)를 가진 화면이라 Admin 거버넌스 그룹에 둔다.

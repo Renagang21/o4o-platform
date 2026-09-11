@@ -13,6 +13,8 @@ const OperatorsPage = lazy(() => import('@/pages/operators'));
 const EnrollmentManagement = lazy(() => import('@/pages/enrollments/EnrollmentManagement'));
 // P4-Admin: Role Applications Management
 const RoleApplicationsAdminPage = lazy(() => import('@/pages/RoleApplicationsAdminPage'));
+// WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1: kpa-branch 서비스 가입 승인
+const BranchServiceMembersPage = lazy(() => import('@/pages/kpa/BranchServiceMembersPage'));
 // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: Operator Policy
 const MyPolicyPage = lazy(() => import('@/pages/operator/MyPolicyPage'));
 
@@ -123,6 +125,18 @@ export function UserRoutes() {
       <AdminProtectedRoute requiredPermissions={['users:update']}>
         <Suspense fallback={<PageLoader />}>
           <RoleApplicationsAdminPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1: kpa-branch 서비스 가입 승인/반려
+    //   백엔드 `/api/v1/kpa-branch/admin/service-members*` = adminGuards(kpa-branch:admin · platformBypass).
+    //   이 사이트의 진입 floor 가 platform:super_admin 이므로 같은 경계를 route 에도 선언한다.
+    //   kpa-branch member/operator 는 floor 에서 이미 막히고, 백엔드도 403 이다 (UI 숨김 ≠ 보안).
+    <Route key="/admin/kpa-branch/service-members" path="/admin/kpa-branch/service-members" element={
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]}>
+        <Suspense fallback={<PageLoader />}>
+          <BranchServiceMembersPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,

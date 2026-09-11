@@ -51,6 +51,10 @@ const PLATFORM_SCOPED_SCREENS = [
   //   `/operators` 도 같은 `/api/v1/admin/users` 를 소비한다. 선행 정렬 WO 가 이 화면을
   //   빠뜨려 legacy 역할이 진입 후 전 API 403 을 받고 있었다 → 같은 계약으로 등재한다.
   { menuId: 'core-operators', path: '/operators', source: USERS_ROUTES },
+  // WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1
+  //   백엔드는 adminGuards(kpa-branch:admin · platformBypass) 지만 이 사이트 floor 가
+  //   platform:super_admin 이라 route 도 같은 경계를 선언한다.
+  { menuId: 'core-kpa-branch-service-members', path: '/admin/kpa-branch/service-members', source: USERS_ROUTES },
 ];
 
 describe('계층 3 — 백엔드 경계가 프런트 상수와 일치한다', () => {

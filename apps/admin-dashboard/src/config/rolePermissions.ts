@@ -74,6 +74,14 @@ export const menuPermissions: MenuPermission[] = [
     roles: [...PLATFORM_ADMIN_ROLES]
   },
 
+  // WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1
+  //   `/admin/kpa-branch/service-members` — 백엔드 adminGuards(kpa-branch:admin · platformBypass).
+  //   이 사이트 floor(platform:super_admin)와 같은 경계를 선언한다.
+  {
+    menuId: 'core-kpa-branch-service-members',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+
   // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 백엔드 경계 복제
   //
   //   아래 3건은 백엔드가 `platform:super_admin` 만 허용하는 화면이다. 무게이트로 두면
