@@ -2235,7 +2235,9 @@ function renderDomFailure(data: Record<string, unknown>, displayName: string): s
       DOM_HEADER +
       (risk === 'COMMIT'
         ? '- 결제·주문 확정·삭제처럼 되돌릴 수 없는 동작으로 분류되어 **클릭하지 않았습니다.** 사용자가 직접 누르도록 안내하세요.'
-        : '- 요청한 요소는 허용된 종류(버튼·링크·체크박스·텍스트 입력란·선택 상자)가 아니어서 실행하지 않았습니다.')
+        : data.disabled === true
+          ? '- 요청한 요소가 지금 **비활성(disabled) 상태**여서 실행하지 않았습니다. 필요한 입력을 먼저 채우거나 사용자가 직접 확인하도록 안내하세요.'
+          : '- 요청한 요소는 허용된 종류(버튼·링크·체크박스·텍스트 입력란·선택 상자)가 아니어서 실행하지 않았습니다.')
     );
   }
   if (code === LOCAL_AGENT_ERROR.DOM_CROSS_ORIGIN_BLOCKED) {

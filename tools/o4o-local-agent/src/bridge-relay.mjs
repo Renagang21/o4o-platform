@@ -212,8 +212,11 @@ export async function startBridgeRelay({ log = () => {} } = {}) {
       // ignore
     }
     server.close();
+    // 세션 파일은 **이 relay 가 쓴 것일 때만** 지운다 — 같은 PC 의 다른 agent 프로세스(예: 검증용 relay 와
+    // 폴링 agent 가 함께 떠 있는 경우)가 쓴 파일을 지우면 그쪽 DOM 축이 조용히 끊긴다.
     try {
-      fs.unlinkSync(bridgeSessionPath());
+      const current = loadBridgeSession();
+      if (current && current.token === token) fs.unlinkSync(bridgeSessionPath());
     } catch {
       // 이미 없음
     }

@@ -368,7 +368,9 @@
     const type = (el.getAttribute('type') || 'text').toLowerCase();
     const allowed = tag === 'textarea' || (tag === 'input' && (type === 'text' || type === 'search'));
     if (!allowed) return { ok: false, errorCode: ERR.ACTION_NOT_ALLOWED, role: roleOf(el) };
-    if (el.disabled || el.readOnly || !isVisible(el)) return { ok: false, errorCode: ERR.ACTION_NOT_ALLOWED, role: roleOf(el) };
+    if (el.disabled || el.readOnly || !isVisible(el)) {
+      return { ok: false, errorCode: ERR.ACTION_NOT_ALLOWED, role: roleOf(el), disabled: el.disabled === true || el.readOnly === true };
+    }
     try {
       el.focus();
     } catch {
@@ -384,7 +386,7 @@
     if (r.error) return { ok: false, errorCode: r.error };
     const el = r.el;
     if (el.tagName.toLowerCase() !== 'select') return { ok: false, errorCode: ERR.ACTION_NOT_ALLOWED, role: roleOf(el) };
-    if (el.disabled || !isVisible(el)) return { ok: false, errorCode: ERR.ACTION_NOT_ALLOWED, role: 'combobox' };
+    if (el.disabled || !isVisible(el)) return { ok: false, errorCode: ERR.ACTION_NOT_ALLOWED, role: 'combobox', disabled: el.disabled === true };
     const want = compact(payload.option);
     let found = null;
     for (const opt of el.options) {
@@ -420,7 +422,7 @@
       return { ok: false, errorCode: ERR.ACTION_NOT_ALLOWED, role };
     }
     if (el.disabled || el.getAttribute('aria-disabled') === 'true' || !isVisible(el)) {
-      return { ok: false, errorCode: ERR.ACTION_NOT_ALLOWED, role };
+      return { ok: false, errorCode: ERR.ACTION_NOT_ALLOWED, role, disabled: true };
     }
     const label = accessibleName(el) || norm(el.innerText || el.textContent);
     const riskLevel = classifyClickRisk(label);
