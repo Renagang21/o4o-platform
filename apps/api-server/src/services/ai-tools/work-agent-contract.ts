@@ -103,6 +103,8 @@ export interface WorkObservation {
   source: 'webpage';
   /** 무진전 판정용 지문(§35). 경로 + 요소 role/name/text 의 요약. */
   fingerprint: string;
+  /** content script 의 문서 인스턴스 id. 이동 뒤 "새 문서를 봤는가" 판정용(무작위 값, 내용 무관). */
+  docId?: string;
 }
 
 export function fingerprintObservation(path: string, elements: readonly SafeDomElement[]): string {

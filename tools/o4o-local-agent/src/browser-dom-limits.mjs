@@ -219,6 +219,7 @@ export function trimDomResult(raw) {
   if (typeof raw.path === 'string' && raw.path.startsWith('/') && !/[?#\s]/.test(raw.path)) {
     out.path = raw.path.slice(0, DOM_PATH_MAX);
   }
+  if (typeof raw.docId === 'string' && /^d_[a-z0-9]{4,32}$/.test(raw.docId)) out.docId = raw.docId;
   if (typeof raw.riskLevel === 'string' && ['READ', 'REVERSIBLE', 'REVIEW_REQUIRED', 'COMMIT'].includes(raw.riskLevel)) {
     out.riskLevel = raw.riskLevel;
   }

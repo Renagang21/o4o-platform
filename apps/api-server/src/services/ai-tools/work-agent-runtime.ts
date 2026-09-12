@@ -133,13 +133,24 @@ function extractJson(text: string): unknown {
  * 이미지가 있고 provider 가 gemini 면 기존 `/api/ai/vision/analyze` 와 같은 generateContent inline_data 경로.
  * openai 는 이미지 입력 경로가 없다 — 이미지는 무시하고 텍스트로만 계획한다(프롬프트에 그 사실을 적는다).
  */
-export function createLlmPlanner(dataSource: DataSource, fetchImpl: typeof fetch = fetch): WorkPlanner {
+/** provider · model · key 해석기. 기본은 운영 SSOT(`resolveAiTarget`). 실 smoke 하네스가 entity 층 없이 같은 planner 코드를 돌릴 때만 주입한다. */
+export type PlannerTargetResolver = (dataSource: DataSource) => Promise<{ provider: 'gemini' | 'openai'; model: string; apiKey: string }>;
+
+const defaultTargetResolver: PlannerTargetResolver = async (dataSource) => {
+  // provider/model/key 해석은 호출 시점에 늦게 불러온다 — 이 모듈의 정적 import 그래프를 DB/entity 층과 떼어 둔다(테스트·smoke 하네스가 loop 만 싣는다).
+  const { resolveAiTarget } = await import('../../utils/ai-provider-runtime.js');
+  return resolveAiTarget(dataSource, undefined);
+};
+
+export function createLlmPlanner(
+  dataSource: DataSource,
+  fetchImpl: typeof fetch = fetch,
+  resolveTarget: PlannerTargetResolver = defaultTargetResolver,
+): WorkPlanner {
   return {
     kind: 'llm',
     async plan(input) {
-      // provider/model/key 해석은 호출 시점에 늦게 불러온다 — 이 모듈의 정적 import 그래프를 DB/entity 층과 떼어 둔다(테스트·smoke 하네스가 loop 만 싣는다).
-      const { resolveAiTarget } = await import('../../utils/ai-provider-runtime.js');
-      const { provider, model, apiKey } = await resolveAiTarget(dataSource, undefined);
+      const { provider, model, apiKey } = await resolveTarget(dataSource);
       const userPrompt = buildPlannerUserPrompt(input);
       if (input.image && provider === 'gemini') {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
@@ -255,6 +266,9 @@ export async function runWorkAgent(
     state.progress = progress;
     return finish();
   };
+  /** 행동 뒤 재관찰 실패의 인계 사유 — 예산 소진은 loop_limit, 그 밖(탭 없음 · 등재 밖 이동 등)은 site_not_ready. */
+  const observeFailed = (o: { errorCode?: string }): WorkAgentRunResult =>
+    o.errorCode === WORK_AGENT_ERROR.LOOP_LIMIT ? takeover('loop_limit', 'no_progress') : takeover('site_not_ready', 'needs_user');
 
   const resolution = await resolveTargetDevice(dataSource, ctx.userId);
   if (resolution.status !== 'ok') {
@@ -273,21 +287,38 @@ export async function runWorkAgent(
     return issueDomCommand(dataSource, ctx, deviceId as string, tool, action, siteId, args);
   };
 
-  /** get_context + inspect → 관찰(§7). 이동 직후엔 content script 가 설 때까지 짧게 재시도한다. */
-  const observe = async (): Promise<{ ok: boolean; errorCode?: string }> => {
-    for (let attempt = 0; attempt < 3; attempt += 1) {
+  /**
+   * get_context + inspect → 관찰(§7). 이동 직후엔 content script 가 설 때까지 짧게 재시도한다.
+   *
+   * `afterNavigation` 이면 **이전 문서(docId 동일)를 새 관찰로 받아들이지 않는다** — 실 health.kr smoke(2026-09-12)에서
+   * click 이 `navigated:true` 를 돌려준 뒤 700 ms 안에 옛 문서가 아직 살아 있어 홈 화면을 "결과 화면" 으로 관찰한 결함.
+   * 새 docId 가 올 때까지 몇 번 더 기다리되, 한 번도 안 바뀌면(같은 문서 안 이동) 마지막 관찰을 그대로 쓴다.
+   */
+  const observe = async (opts: { afterNavigation?: boolean } = {}): Promise<{ ok: boolean; errorCode?: string }> => {
+    const previousDocId = state.observation?.docId;
+    const attempts = opts.afterNavigation ? 10 : 3; // 이동 뒤 최대 ~7 s(실 health.kr 폼 이동이 4 s 를 넘긴다)
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
       if (attempt > 0) await sleep(NAVIGATION_SETTLE_MS);
       if (budgetLeft() < 2) return { ok: false, errorCode: WORK_AGENT_ERROR.LOOP_LIMIT };
       const c = await dom(LOCAL_AGENT_ACTIONS.DOM_GET_CONTEXT);
+      // 아직 쓸 수 없는 문서(미도달 · 로딩 중 · 옛 문서)를 다시 두드린 probe 는 행동 예산을 쓰지 않는다 —
+      // 예산은 "행동 + 유효 관찰" 의 상한이고, 대기 자체는 attempts · maxDuration 이 막는다(실 smoke 에서 이동 대기
+      // probe 4회가 예산을 잠식해 결과 화면 직전에 loop_limit 에 걸린 결함).
+      const unspend = () => { state.stepCount -= 1; };
       if (c.status !== 'success') {
-        if (c.errorCode === LOCAL_AGENT_ERROR.DOM_CONTENT_UNAVAILABLE) continue;
+        if (c.errorCode === LOCAL_AGENT_ERROR.DOM_CONTENT_UNAVAILABLE) { unspend(); continue; }
         return { ok: false, errorCode: c.errorCode };
       }
       if (typeof c.safe.siteId === 'string' && c.safe.siteId !== siteId) return { ok: false, errorCode: LOCAL_AGENT_ERROR.DOM_CROSS_ORIGIN_BLOCKED };
-      if (c.safe.ready !== true) continue;
+      if (c.safe.ready !== true) { unspend(); continue; }
+      if (opts.afterNavigation && previousDocId && c.safe.docId === previousDocId && attempt < attempts - 1) {
+        // 아직 옛 문서다 — 새 문서가 설 때까지 기다린다(마지막 시도면 그대로 받아들인다).
+        unspend();
+        continue;
+      }
       const i = await dom(LOCAL_AGENT_ACTIONS.DOM_INSPECT);
       if (i.status !== 'success') {
-        if (i.errorCode === LOCAL_AGENT_ERROR.DOM_CONTENT_UNAVAILABLE) continue;
+        if (i.errorCode === LOCAL_AGENT_ERROR.DOM_CONTENT_UNAVAILABLE) { unspend(); continue; }
         return { ok: false, errorCode: i.errorCode };
       }
       const elements = (Array.isArray(i.safe.elements) ? i.safe.elements : []) as SafeDomElement[];
@@ -295,6 +326,7 @@ export async function runWorkAgent(
       const obs: WorkObservation & { snapshotId: string } = {
         siteId, path, ready: true, elements, elementCount: typeof i.safe.elementCount === 'number' ? i.safe.elementCount : elements.length,
         source: 'webpage', fingerprint: fingerprintObservation(path, elements), snapshotId: String(i.safe.snapshotId ?? ''),
+        ...(typeof c.safe.docId === 'string' ? { docId: c.safe.docId } : {}),
       };
       const same = state.observation?.fingerprint === obs.fingerprint;
       sameObservationRun = same ? sameObservationRun + 1 : 0;
@@ -343,14 +375,15 @@ export async function runWorkAgent(
     if (proposal.neededInput) neededInput = proposal.neededInput;
     state.plannedAction = proposal.action;
 
-    // Loop control actions
-    if (proposal.action.kind === 'done' || proposal.assessment === 'completed') {
-      state.progress = 'completed';
-      return finish();
-    }
+    // Loop control actions — takeover 를 먼저 본다. Planner 가 assessment=completed 와 takeover 를 함께 내면
+    // 인계 사유(goal_sufficiently_advanced 등)를 기록으로 남기는 쪽이 맞다(실 smoke 에서 관측).
     if (proposal.action.kind === 'takeover') {
       const reason = proposal.action.reason as TakeoverReason;
       return takeover(reason, reason === 'goal_sufficiently_advanced' ? 'completed' : 'needs_user');
+    }
+    if (proposal.action.kind === 'done' || proposal.assessment === 'completed') {
+      state.progress = 'completed';
+      return finish();
     }
     if (proposal.assessment === 'needs_user') return takeover('user_judgment_required', 'needs_user');
 
@@ -372,7 +405,7 @@ export async function runWorkAgent(
         record.errorCode = o.errorCode;
         state.history.push(record);
         state.lastResult = record;
-        if (!o.ok) return takeover('site_not_ready', 'needs_user');
+        if (!o.ok) return observeFailed(o);
         continue;
       }
       case 'find':
@@ -411,12 +444,12 @@ export async function runWorkAgent(
       if (outcome.errorCode === LOCAL_AGENT_ERROR.DOM_ELEMENT_STALE || outcome.errorCode === LOCAL_AGENT_ERROR.DOM_CONTENT_UNAVAILABLE) {
         // 문서가 바뀌었다 — 다시 관찰하고 계속한다.
         const o = await observe();
-        if (!o.ok) return takeover('site_not_ready', 'needs_user');
+        if (!o.ok) return observeFailed(o);
         continue;
       }
       // 요소 없음 등 — 다시 관찰해서 Planner 가 다른 길을 찾게 한다(무진전 카운터가 상한을 건다).
       const o = await observe();
-      if (!o.ok) return takeover('site_not_ready', 'needs_user');
+      if (!o.ok) return observeFailed(o);
       continue;
     }
 
@@ -446,8 +479,8 @@ export async function runWorkAgent(
     const needsReobserve = a.kind === 'click' || record.navigated === true || record.changed === true;
     if (!needsReobserve) continue;
     if (record.navigated) await sleep(NAVIGATION_SETTLE_MS);
-    const o = await observe();
-    if (!o.ok) return takeover('site_not_ready', 'needs_user');
+    const o = await observe({ afterNavigation: record.navigated === true });
+    if (!o.ok) return observeFailed(o);
   }
 }
 

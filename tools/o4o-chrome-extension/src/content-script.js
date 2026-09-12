@@ -315,8 +315,15 @@
   }
 
   // ── actions ─────────────────────────────────────────────────────────────────
+  /**
+   * 문서 인스턴스 id. 이 content script 가 선 문서마다 하나. 같은 경로로 다시 이동해도 값이 바뀌므로
+   * runtime 이 "이동 뒤 새 문서를 봤는가" 를 판정할 수 있다(GOAL-DRIVEN-CLOSURE-V1 §43 re-observation timing).
+   * 페이지 내용 · URL 과 무관한 무작위 값이다.
+   */
+  const DOC_ID = 'd_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+
   function actGetContext() {
-    return { ok: true, siteId: SITE_ID, ready: document.readyState === 'complete', path: location.pathname };
+    return { ok: true, siteId: SITE_ID, ready: document.readyState === 'complete', path: location.pathname, docId: DOC_ID };
   }
 
   function actInspect() {

@@ -381,6 +381,8 @@ export function pickSafeDomInfo(data: unknown): Record<string, unknown> {
   if (typeof data.path === 'string' && data.path.startsWith('/') && !/[?#\s]/.test(data.path)) {
     out.path = data.path.slice(0, DOM_PATH_MAX);
   }
+  // 문서 인스턴스 id(무작위) — 이동 뒤 새 문서인지 판정하는 데만 쓴다. 페이지 내용과 무관하다.
+  if (typeof data.docId === 'string' && /^d_[a-z0-9]{4,32}$/.test(data.docId)) out.docId = data.docId;
   if (typeof data.errorCode === 'string' && /^[A-Z0-9_]{1,64}$/.test(data.errorCode)) out.errorCode = data.errorCode;
   if (typeof data.riskLevel === 'string' && SAFE_RISK.includes(data.riskLevel)) out.riskLevel = data.riskLevel;
   if (typeof data.role === 'string' && DOM_ELEMENT_ROLES.includes(data.role)) out.role = data.role;
