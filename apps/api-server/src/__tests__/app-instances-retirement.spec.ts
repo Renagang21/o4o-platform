@@ -56,11 +56,12 @@ describe('app_instances retirement contract', () => {
   });
 
   it('부트스트랩 스크립트가 app_instances 테이블을 다시 만들지 않는다', () => {
-    const script = readFileSync(
-      join(REPO, 'apps', 'api-server', 'scripts', 'run-migration-standalone.mjs'),
-      'utf-8'
-    );
-    expect(script).not.toMatch(/CREATE TABLE IF NOT EXISTS "app_instances"/);
-    expect(script).not.toMatch(/CREATE INDEX IF NOT EXISTS "IDX_app_instances_app_business"/);
+    // WO-O4O-DATABASE-MIGRATION-OWNERSHIP-STARTUP-HEALTH-AND-LEGACY-DEPLOY-TOOLING-FINAL-CLOSURE-V1:
+    //   `scripts/run-migration-standalone.mjs` 자체가 제거됐다(소비처 0 · 구형 스키마 재생성기 ·
+    //   자격정보 fallback 하드코딩). 파일 부재가 "app_instances 를 다시 만들지 않는다" 의
+    //   더 강한 형태다. 되살아나면 아래가 먼저 깨진다.
+    expect(
+      existsSync(join(REPO, 'apps', 'api-server', 'scripts', 'run-migration-standalone.mjs'))
+    ).toBe(false);
   });
 });

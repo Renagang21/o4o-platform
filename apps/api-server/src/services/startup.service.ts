@@ -1,5 +1,4 @@
 import { AppDataSource } from '../database/connection.js';
-import { DatabaseChecker } from '../utils/database-checker.js';
 // MaterializedViewScheduler removed — mv_product_listings view/function never created in DB
 // settlementScheduler removed (Phase 8-3 - legacy commerce)
 import { backupService } from './BackupService.js';
@@ -47,6 +46,25 @@ import logger from '../utils/logger.js';
  * - 503 판단은 Health Check의 책임
  *
  * @see docs/architecture/auth-infra-separation.md
+ *
+ * ============================================================================
+ * WO-O4O-DATABASE-MIGRATION-OWNERSHIP-STARTUP-HEALTH-AND-LEGACY-DEPLOY-TOOLING-FINAL-CLOSURE-V1
+ * ============================================================================
+ *
+ * **API startup 은 migration 을 실행하지 않는다.** 운영 migration 의 단일 소유자는
+ * deploy workflow 의 Cloud Run Job `o4o-api-migrations`(`dist/migrate.js`) 이며,
+ * 그 Job 이 성공한 뒤에만 API revision 이 배포된다 (`.github/workflows/deploy-api.yml`).
+ *
+ * 제거한 것 (2026-09-12, 30일 프로덕션 로그 실측 근거):
+ *   - `showMigrations()` → `runMigrations({transaction:'each'})` — 서비스 인스턴스가 부팅마다 실행,
+ *     실제로 17회 스키마를 변경했다 (Job 과 경쟁).
+ *   - migration 실패를 `warn` 으로 삼키고 기동 계속 — 3회 발생.
+ *   - 실패 시 Seed* migration 의 `up(queryRunner)` 직접 호출 fallback — 45회 실행,
+ *     `typeorm_migrations` 를 우회해 비멱등 · 실패 시 queryRunner 미release.
+ *   - `DatabaseChecker` health check — requiredTables=[] 라 항상 healthy 인 no-op.
+ *
+ * startup 은 **DB 연결과 서비스 초기화만** 담당한다. readiness 계약은 `routes/health.ts` 의
+ * `/health/ready`(`SELECT 1`) 가 담당하고, liveness 는 `main.ts` 의 즉시 `/health` 가 담당한다.
  * ============================================================================
  */
 export class StartupService {
@@ -138,68 +156,8 @@ export class StartupService {
       }
     }
 
-    // Database health check
-    if (AppDataSource.isInitialized) {
-      try {
-        const dbChecker = new DatabaseChecker(AppDataSource);
-        const healthCheck = await dbChecker.performHealthCheck();
-        if (!healthCheck.healthy) {
-          logger.error('Database health check failed', healthCheck.details);
-          // GRACEFUL_STARTUP Policy: Only throw if explicitly disabled
-          const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
-          if (!gracefulStartup) {
-            throw new Error('Database health check failed');
-          }
-          logger.warn('🔄 GRACEFUL_STARTUP=true: Continuing despite health check failure');
-        }
-      } catch (healthCheckError) {
-        logger.error('Database health check error:', healthCheckError);
-        const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
-        if (!gracefulStartup) {
-          throw healthCheckError;
-        }
-        logger.warn('🔄 GRACEFUL_STARTUP=true: Continuing despite health check error');
-      }
-    }
-
-    // Run migrations (production only) - with individual error handling
-    if (env.isProduction() && AppDataSource.isInitialized) {
-      try {
-        // Get pending migrations
-        const pendingMigrations = await AppDataSource.showMigrations();
-        if (pendingMigrations) {
-          logger.info('📋 Pending migrations detected, running...');
-        }
-
-        // Try to run all migrations first
-        const executedMigrations = await AppDataSource.runMigrations({ transaction: 'each' });
-        logger.info(`✅ Database migrations completed (${executedMigrations.length} executed)`);
-      } catch (migrationError) {
-        // Log the error but continue - migrations may have partially succeeded
-        logger.warn('⚠️ Migration error (continuing):', (migrationError as Error).message);
-
-        // Try to run Seed migrations individually (high priority)
-        try {
-          const seedMigrations = AppDataSource.migrations.filter(m =>
-            m.name?.includes('Seed') && parseInt(m.name?.match(/\d+/)?.[0] || '0') >= 9900000000000
-          );
-
-          for (const migration of seedMigrations) {
-            try {
-              const queryRunner = AppDataSource.createQueryRunner();
-              // MigrationInterface has up() method directly
-              await (migration as { up: (qr: typeof queryRunner) => Promise<void> }).up(queryRunner);
-              await queryRunner.release();
-              logger.info(`✅ Seed migration executed: ${migration.name}`);
-            } catch (seedError) {
-              logger.debug(`Seed migration skipped: ${migration.name} - ${(seedError as Error).message}`);
-            }
-          }
-        } catch {
-          logger.debug('Seed migration fallback skipped');
-        }
-      }
-    }
+    // migration 은 여기서 실행하지 않는다 — 소유자는 deploy workflow 의 Cloud Run Job (헤더 주석 참조).
+    logger.info('Database ready — migrations are owned by the deploy migration job, not by API startup');
   }
 
   /**

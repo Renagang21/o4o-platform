@@ -259,6 +259,74 @@ jobs:
         echo "✅ Image pushed: ${FULL_IMAGE}"
         echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
+    # ============================================================
+    # WO-O4O-DATABASE-MIGRATION-OWNERSHIP-STARTUP-HEALTH-AND-LEGACY-DEPLOY-TOOLING-FINAL-CLOSURE-V1
+    #
+    # 운영 migration 의 단일 소유자 = 이 step 의 Cloud Run Job `o4o-api-migrations`.
+    #
+    # 순서 계약 (이 step 은 반드시 "Deploy to Cloud Run" **앞**에 있어야 한다):
+    #   이미지 push → **migration job 실행·성공 확인** → API revision 배포·트래픽 전환
+    #
+    # 왜: 종전에는 deploy 가 먼저 실행돼 새 revision 이 migration 전에 트래픽을 받았고,
+    #     job 이 실패해도 새 revision 은 이미 serving 중이었다. 그래서 API startup 이
+    #     스스로 migration 을 돌리며 실패를 삼키는 우회 경로가 생겼다
+    #     (30일 로그: 서비스 인스턴스가 17회 스키마 변경 · 실패 삼킴 3회 · Seed 직접 실행 45회).
+    #     그 startup 경로는 제거했다(startup.service.ts). 이제 job 실패 = workflow 중단 =
+    #     기존 serving revision 유지 이며, `continue-on-error` · `|| true` 를 두지 않는다.
+    #
+    # 같은 IMAGE_TAG 를 쓴다 — "Build and Push Docker image" 가 이미 push 했다.
+    # ============================================================
+    - name: Run database migrations
+      run: |
+        echo "🔄 Running database migrations..."
+
+        FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+
+        # ============================================================
+        # Migration Strategy: Use dedicated migrate.js entry point
+        # ============================================================
+        # - migrate.js is a standalone CLI that runs migrations and exits
+        # - NO Express server, NO health endpoints, NO PORT listening
+        # - Exit 0 on success, Exit 1 on failure
+        # - This ensures Cloud Run Job terminates properly
+        # ============================================================
+
+        # Create or update the migration job with node migrate.js command
+        # Use ^::^ delimiter syntax to avoid issues with special characters in passwords
+        # This is more reliable than multiple --set-env-vars flags
+        gcloud run jobs create o4o-api-migrations \
+          --image="${FULL_IMAGE}" \
+          --region=${{ env.REGION }} \
+          --project=${{ env.PROJECT_ID }} \
+          --task-timeout=300 \
+          --max-retries=1 \
+          --set-env-vars="^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}::DB_NAME=${{ secrets.GCP_DB_NAME }}" \
+          --set-secrets="DB_PASSWORD=o4o-db-password:latest" \
+          --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
+          --command="node" \
+          --args="dist/migrate.js" \
+          2>/dev/null || \
+        gcloud run jobs update o4o-api-migrations \
+          --image="${FULL_IMAGE}" \
+          --region=${{ env.REGION }} \
+          --project=${{ env.PROJECT_ID }} \
+          --task-timeout=300 \
+          --max-retries=1 \
+          --set-env-vars="^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}::DB_NAME=${{ secrets.GCP_DB_NAME }}" \
+          --set-secrets="DB_PASSWORD=o4o-db-password:latest" \
+          --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
+          --command="node" \
+          --args="dist/migrate.js"
+
+        # Execute the migration job
+        echo "🚀 Executing migration job..."
+        gcloud run jobs execute o4o-api-migrations \
+          --region=${{ env.REGION }} \
+          --project=${{ env.PROJECT_ID }} \
+          --wait
+
+        echo "✅ Migrations completed successfully"
+
     - name: Deploy to Cloud Run
       run: |
         FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
@@ -313,57 +381,6 @@ jobs:
           --set-env-vars="CAFE24_REDIRECT_URI=https://api.neture.co.kr/api/v1/admin/cafe24/callback" \
           --clear-vpc-connector \
           --add-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db
-
-    - name: Run database migrations
-      run: |
-        echo "🔄 Running database migrations..."
-
-        FULL_IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
-
-        # ============================================================
-        # Migration Strategy: Use dedicated migrate.js entry point
-        # ============================================================
-        # - migrate.js is a standalone CLI that runs migrations and exits
-        # - NO Express server, NO health endpoints, NO PORT listening
-        # - Exit 0 on success, Exit 1 on failure
-        # - This ensures Cloud Run Job terminates properly
-        # ============================================================
-
-        # Create or update the migration job with node migrate.js command
-        # Use ^::^ delimiter syntax to avoid issues with special characters in passwords
-        # This is more reliable than multiple --set-env-vars flags
-        gcloud run jobs create o4o-api-migrations \
-          --image="${FULL_IMAGE}" \
-          --region=${{ env.REGION }} \
-          --project=${{ env.PROJECT_ID }} \
-          --task-timeout=300 \
-          --max-retries=1 \
-          --set-env-vars="^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}::DB_NAME=${{ secrets.GCP_DB_NAME }}" \
-          --set-secrets="DB_PASSWORD=o4o-db-password:latest" \
-          --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
-          --command="node" \
-          --args="dist/migrate.js" \
-          2>/dev/null || \
-        gcloud run jobs update o4o-api-migrations \
-          --image="${FULL_IMAGE}" \
-          --region=${{ env.REGION }} \
-          --project=${{ env.PROJECT_ID }} \
-          --task-timeout=300 \
-          --max-retries=1 \
-          --set-env-vars="^::^NODE_ENV=production::DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db::DB_PORT=5432::DB_USERNAME=${{ secrets.GCP_DB_USERNAME }}::DB_NAME=${{ secrets.GCP_DB_NAME }}" \
-          --set-secrets="DB_PASSWORD=o4o-db-password:latest" \
-          --set-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db \
-          --command="node" \
-          --args="dist/migrate.js"
-
-        # Execute the migration job
-        echo "🚀 Executing migration job..."
-        gcloud run jobs execute o4o-api-migrations \
-          --region=${{ env.REGION }} \
-          --project=${{ env.PROJECT_ID }} \
-          --wait
-
-        echo "✅ Migrations completed successfully"
 
     - name: Refresh one-off Cloud Run job image references
       # ---------------------------------------------------------------

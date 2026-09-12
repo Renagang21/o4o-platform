@@ -20,12 +20,22 @@ TypeORM migrations run automatically on every deployment to `main` branch.
 
 **How it works:**
 1. Code merged to `main` branch
-2. GitHub Actions builds and deploys API server
-3. Cloud Run Job `o4o-api-migrations` executes automatically
-4. Migration runs: `node dist/migrate.js`
-5. Deployment proceeds only if migrations succeed
+2. GitHub Actions builds the API image and pushes it to Artifact Registry
+3. Cloud Run Job `o4o-api-migrations` executes **before** the API service is deployed
+4. Migration runs: `node dist/migrate.js` (exit 1 on failure → workflow stops here)
+5. API service revision is deployed **only if migrations succeed** — on failure the previous
+   serving revision stays untouched
 
-**Configuration:** `.github/workflows/deploy-api.yml` lines 339-386
+> **Single owner.** Production migrations run **only** in this job. The API service startup does
+> **not** run `runMigrations()` / `showMigrations()` and does not fall back to executing seed
+> migrations directly (removed in
+> WO-O4O-DATABASE-MIGRATION-OWNERSHIP-STARTUP-HEALTH-AND-LEGACY-DEPLOY-TOOLING-FINAL-CLOSURE-V1,
+> 2026-09-12 — before that, service instances had applied migrations themselves 17 times in 30 days
+> and swallowed 3 failures). Regression guard:
+> `apps/api-server/src/__tests__/database-migration-ownership-startup-health-final-closure.spec.ts`.
+
+**Configuration:** `.github/workflows/deploy-api.yml` — step "Run database migrations"
+(placed before "Deploy to Cloud Run")
 
 **Logs:**
 ```bash
@@ -156,7 +166,7 @@ Merge to `main` → Migration runs automatically on deployment.
 3. `tsup` bundles main.js (service) and migrate.js (job)
 4. Restore migrations from backup
 
-See: `.github/workflows/deploy-api.yml` lines 146-249
+See: `.github/workflows/deploy-api.yml` — step "Build API server (bundled with tsup)"
 
 ---
 
