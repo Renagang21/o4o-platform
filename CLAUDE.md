@@ -1,211 +1,120 @@
-# CLAUDE.md – O4O Platform Development Constitution
+# CLAUDE.md — Claude Code 진입점
 
-> **이 문서는 O4O Platform에서 모든 개발(사람/AI)을 지배하는 최상위 규칙이다.**
-> 충돌 시 항상 CLAUDE.md가 우선한다.
-
----
-
-## 사업 철학 SSOT (Priority Chain)
-
-본 CLAUDE.md 다음, 영역별 Freeze/Baseline/IR 위에 다음 문서가 위치한다.
-
-| 순위 | 문서 | 역할 |
-|:---:|------|------|
-| 1 | `CLAUDE.md` (본 문서) | 기술/운영 규칙 |
-| 2 | [`docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md`](docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) | **사업 철학 SSOT** — 공급자/운영사업자/매장 정의, HUB 철학, AI 역할 |
-| 3 | [`docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) | **매장 commerce 사업 경계 SSOT** — 매장 경영자는 O4O로 소비자에게 판매하지 않는다 / O4O 자체 소비자 전자상거래 없음 / 판매 실행 = 외부 POS·외부 판매채널 / legacy commerce 판정 규칙·개발 금지선 |
-| 3-A | [`docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md`](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) | **공급자→매장 B2B 주문 canonical SSOT** — 3번의 소비자 commerce 금지선에 대한 **B2B 쪽 정본**(동 문서 §12 의 B2B 축). 살아 있는 3개 축(event-offer / Neture B2B / PharmacyHub)은 전부 `store_cart_items → checkout_orders` 로 수렴 / `store_cart_items` = B2B cart(보호 대상) / actor·ownership·serviceKey·lifecycle·취소 계약 / **POS = 현재 비개발 영역** |
-| 4 | [`docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md`](docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | **3자 Canonical Flow SSOT** — 누가/언제/무엇을/어떻게 넘기는가 (책임 매트릭스 · 데이터 흐름 · Drift 가드) |
-| 5 | Operator UX Baselines ([`Canonical Workflow`](docs/architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md) 검수·승인 UX + [`Non-Approval UX Baseline`](docs/baseline/O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md) 5 Workspace UX + [`HUB Content Publishing Standard`](docs/baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) RichTextEditor 기반 항목별 게시 — Source Ingestion 보류) | **Operator UX 영역 SSOT** — 자매 구조 |
-| 6 | Store Side Standards ([`Store Menu Canonical Tree`](docs/baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md) 매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 — 6 항목: 상품 상세 / POP / QR / 블로그 / 사이니지 / 고객 안내문. 설문 V1 범위 외) | **Store 측 메뉴·축 SSOT** — Operator HUB 게시 표준의 매장 측 대응 |
-| 7 | 영역별 Freeze / Baseline / IR | 도메인·계층별 세부 규칙 |
-| 8 | 개별 WO / CHECK | 과거 시점의 실행 기록 — 현재 사업 규정보다 우선하지 않는다 |
-
-**우선순위 적용:**
-
-- `O4O-BUSINESS-PHILOSOPHY-V1` 의 §3 (참여 주체) / §4 (Canonical Flow) / §5 (HUB 철학) / §6 (AI 역할) / §7 (Drift 방지) 정의는 영역별 문서(Operator, Supplier, HUB, Store, AI 등)에 우선한다.
-- `O4O-STORE-COMMERCE-BOUNDARY-V1` 의 §2 (최상위 원칙) / §7 (매장 환불) / §8 (기존 코드 취급) / §9 (legacy 분류) / §10 (개발 금지선) / §12 (B2B vs 소비자 order) / §13 (플랫폼 직접판매) / §14 (precedence) 는 **cart · checkout · orders · payments · refund · PG · POS · tablet · QR · 외부 판매채널** 관련 모든 영역 문서·코드 판단에 우선한다.
-  **이 문서는 코드보다 먼저 읽는다.** 저장소에 checkout/payment/refund 코드가 존재한다는 사실은 그 기능이 현행 사업 기능이라는 근거가 아니다 (동 문서 §8 · §14).
-- `O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1` 은 위 3번의 **역방향 고정**이다.
-  3번이 "소비자→매장 commerce 없음"을 정하고, 3-A 가 "**공급자→매장 B2B 주문은 O4O 의 공식 주문 축**"임을 정한다.
-  **3번의 소비자 commerce 금지선을 근거로 3-A 에 등재된 라우트·테이블·화면을 legacy 로 판정해 제거하지 않는다.**
-  `store_cart_items` · `checkout_orders` · `/api/v1/store/cart/*` 는 B2B 축이며 보호 대상이다.
-  B2B 주문 · 발주 · 공급 신청 · 매장 장바구니 관련 작업은 3번과 3-A 를 **함께** 선행 기준으로 삼는다.
-
-  현재 O4O 의 거래 축 구분(2026-08-26 확정):
-
-  ```text
-  소비자 → 매장          = O4O commerce 없음        (3번)
-  공급자 → 매장          = O4O B2B canonical        (3-A)
-  네이버/쿠팡 → 소비자   = 외부 판매채널 commerce   (범위 밖 · 손대지 않는다)
-  POS                    = 현재 비개발 영역          (선행조건으로 넣지 않는다)
-  ```
-- `O4O-3-ROLE-FLOW-BASELINE-V1` 의 §2 (책임 매트릭스) / §3 (데이터 흐름) / §4 (원천 자료 vs 실행 자산) / §5 (AI 개입) / §6 (Drift 금지/권장 흐름) 정의는 영역별 흐름·권한·검수 정책에 우선한다.
-
-충돌 시 위 순서를 기준으로 영역별 문서를 정렬한다. 영역별 Freeze 문서 변경은 별도 WO 필요.
-
-> **역추론 금지.** "코드에 `platform-seller` / checkout / refund 가 있으니 그 사업을 유지한다" 는 판단은
-> 허용하지 않는다. **사업 계약이 먼저이고 코드는 그 계약에 맞게 정리한다.**
-> 2026-08-25 확정: `PLATFORM_DIRECT_SALE_BUSINESS_CONTRACT = NONE`
+> **이 문서는 Claude Code 가 이 저장소에서 안전하게 작업하기 위한 진입점 · 안전 경계 · 정본 지도다.**
+> 규칙의 원문은 canonical 문서에 있다. 이 파일은 그것을 **복사하지 않고 가리킨다.**
+> Codex / 일반 에이전트의 진입점은 [`AGENTS.md`](AGENTS.md) 이며 두 문서는 **동급**이다 — 한쪽이 다른 쪽을 import 하거나 선행 조건으로 요구하지 않는다. 공통 지식은 [`docs/CANONICAL-INDEX.md`](docs/CANONICAL-INDEX.md) 와 각 정본에 둔다.
+>
+> **§ 번호(§0~§16, §13-A)는 고정이다.** 소스 주석과 기준 문서가 `CLAUDE.md §N` 으로 참조한다. 부록의 번호·순서를 바꾸지 않는다.
 
 ---
 
-## Claude Code 진입점
+## Source of Truth
 
-> **이 문서는 Claude Code 의 진입점이자 O4O 도메인 규칙의 색인이다.**
-> Codex/에이전트의 진입점은 [`AGENTS.md`](AGENTS.md) 이며 **두 문서는 동급**이다.
-> 한쪽이 다른 쪽의 선행 조건이 아니다. 공통 규칙은 양쪽 모두 아래 정본을 참조한다.
+시작 전 확인하는 정본:
 
-**섹션 번호는 고정이다.** `§0`~`§15` 는 저장소 전역(문서 200여 곳 + 일부 소스 주석)에서
-`CLAUDE.md §N` 형태로 참조된다. **번호 변경·삭제·재배치를 하지 않는다.**
+| 영역 | 정본 |
+|---|---|
+| **정본 지도 (전체 색인 · 상태)** | [`docs/CANONICAL-INDEX.md`](docs/CANONICAL-INDEX.md) |
+| 사업 철학 (참여 주체 · HUB · AI 역할) | [`O4O-BUSINESS-PHILOSOPHY-V1`](docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) |
+| **매장 commerce 경계** (cart · checkout · orders · payments · refund · PG · POS · tablet · QR · 외부 판매채널) | [`O4O-STORE-COMMERCE-BOUNDARY-V1`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) — **코드보다 먼저 읽는다** |
+| 공급자→매장 B2B 주문 (위 문서의 B2B 축 쌍) | [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) |
+| 3자 Canonical Flow | [`O4O-3-ROLE-FLOW-BASELINE-V1`](docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) |
+| Domain Boundary · Guard Rules 5종 | [`O4O-BOUNDARY-POLICY-V1`](docs/architecture/O4O-BOUNDARY-POLICY-V1.md) |
+| Core 동결 범위 | [`O4O-CORE-FREEZE-V1`](docs/architecture/O4O-CORE-FREEZE-V1.md) |
+| 공통 모듈 변경 절차 | [`O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1`](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) |
+| 개발환경 · 검증 명령 · CI 게이트 · DB 접속 절차 | [`SETUP.md`](SETUP.md) |
+| Git 병렬 작업 · PC 이동 | [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) |
+| 프로덕션 마이그레이션 | [`PRODUCTION-MIGRATION-STANDARD`](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) |
 
-### 시작 전 확인 — 외부 정본
+충돌 시 우선순위:
 
-| 영역 | 정본 | 본 문서 |
-|---|---|---|
-| 개발환경 · 설치 · 검증 명령 · CI 게이트 | [`SETUP.md`](SETUP.md) | §0 에서 정책만 |
-| Git 병렬 작업 · stage · PC 이동 | [`docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) | §1 에서 브랜치 전략만 |
-| 사업 철학 · 3자 Flow | 위 Priority Chain 2·3번 | — |
-| 도메인·계층별 세부 규칙 | 하단 **상세 규칙 문서 목록** | §2~§13-A 요약 |
+1. 사용자의 현재 명시적 작업 지시
+2. 사업 · 정책 정본 — PHILOSOPHY · COMMERCE-BOUNDARY · B2B-ORDER-CONTRACT · 3-ROLE-FLOW
+3. 구조 계약 — Frozen Baselines(§14) · Boundary · Core Freeze · Shared Module Protocol
+4. 도메인 · 서비스 정본 — `docs/CANONICAL-INDEX.md` 의 나머지
+5. WO / CHECK / IR / archive — **과거 시점의 실행 기록**. 현재 정책을 이기지 않는다
 
-### 실행 원칙
+아래 실행 안전 규칙(실행 원칙 · 중지 조건 · Git · DB · 검증 · 보고)은 이 체인 밖에서 **항상** 적용된다.
+
+> **역추론 금지.** 저장소에 cart / checkout / payment / refund / `platform-seller` 코드가 **존재한다는 사실은 그 기능이 현행 사업 기능이라는 근거가 아니다.** 사업 계약이 먼저이고 코드는 그 계약에 맞게 정리한다 (COMMERCE-BOUNDARY §8 · §14).
+>
+> **현재 정책 ≠ 영구 계약.** "현재 하지 않는다"(예: 플랫폼 직접 판매 계약 NONE, 2026-08-25 확정 / POS 비개발) 를 "앞으로도 절대 하지 않는다"로 읽거나 쓰지 않는다. 사업 모델 변경은 COMMERCE-BOUNDARY §15 절차, Frozen 구조 변경은 명시적 WO 를 따른다.
+
+---
+
+## 실행 원칙
 
 ```text
 조사 → 문제확정 → 최소 수정 → 검증 → CHECK/IR 갱신 → path-specific stage → commit → push → 완료 보고
 ```
 
 - WO 가 **조사 전용**이면 구현하지 않는다.
-- WO 가 **구현을 명시**하면 조사 후 안전 범위 안에서 검증까지 중간 승인 없이 계속 진행한다.
+- WO 가 **구현을 명시**하면 조사 후 안전 범위 안에서 검증까지 불필요한 중간 승인 없이 진행한다.
 - **작업 범위 외 수정 금지.** 범위 밖에서 발견한 문제는 고치지 말고 보고 후 별도 WO 로 분리한다.
 
-### 중지 조건
+## 중지 조건
 
 아래는 진행을 멈추고 사용자 판단을 요청한다.
 
-- WO 범위 밖 파일 수정 필요 / 다른 세션의 dirty·미추적 파일 접촉 필요
+- WO 범위 밖 파일 수정 필요 / 다른 세션의 dirty · 미추적 파일 접촉 필요
 - DB schema · migration · 데이터 삭제 · 대량 update · seed 변경 필요
 - `package.json` · lockfile · dependency 변경 필요
 - Docker · CI · build 인프라 변경 필요
-- Core · Frozen Baseline(§14) · 공통 계약 변경 필요
+- Core(§3) · Frozen Baseline(§14) · 공통 계약 변경 필요
 - 권한 · role · route · API contract 변경 필요
 - 결제 · 정산 · 법률 · 규제 판단 필요
 - 실제 계정 · 자격정보 · 외부 서비스 승인 필요
 - 현재 변경과 무관한 build · test 실패
 
-### 완료 · 보고 원칙
+## Git · 병렬 작업 안전
 
-- 보고는 **한국어**. 기술 식별자(파일명 · route · API · component · commit hash)는 원문 유지.
-- 긴 diff 나 전체 파일을 그대로 붙이지 않는다.
-- 변경 / 미변경 / 검증 결과 / CHECK / Git 상태 중심으로 간결하게.
-- **검증 실패나 건너뛴 항목을 숨기지 않는다.** 통과한 것만 골라 보고하지 않는다.
-- 완료 조건은 저장소 전체 clean 이 아니라 `이번 WO 범위의 미커밋 변경 0건` + `HEAD == origin/main`.
+**다중 PC · 다중 세션(사람 + AI)이 같은 `main` 에 직접 커밋**하는 환경이다. 절차의 정본은 [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md). 아래는 예외 없이 지킨다.
 
----
+- 작업 전 `git fetch origin` → `git status -sb`. **pull(merge/rebase)은 작업트리가 clean 할 때만.**
+- **`git add .` · `git add -A` · `git commit -am` 금지.** path-specific stage 만 사용한다.
+- **커밋에도 pathspec 을 붙인다.** foreign staged 파일이 있으면 pathspec 없는 `git commit` 금지 — 커밋 직전 `node scripts/git/check-staged-scope.mjs <내 작업 경로...>` → `git commit -m "..." -- <내 파일...>`.
+- 다른 세션의 수정 · 미추적 · staged 파일은 **불가침** (판단 · 커밋 · 정리 · `restore` · `reset` · `stash` 대상 아님).
+- **`--force` push 금지.** 공유 `main` 이력은 재작성하지 않는다(오타 정정도 후속 커밋으로).
+- 완료 조건은 저장소 전체 clean 이 아니라 **`이번 WO 범위의 미커밋 변경 0건` + `HEAD == origin/main`**.
+- feature 브랜치는 명시적 요청 또는 대규모 리팩토링 · 실험적 변경에서만.
 
-## 0. 환경 원칙 (CRITICAL)
+## DB · 보안 경계
 
-> **기본 환경은 프로덕션이다.** (2026-01-29~)
+- **기본 환경은 프로덕션이다.** 접속 절차 · 포트 · 프록시 · 도구는 [`SETUP.md`](SETUP.md) 가 유일 정본이다 (여기 복제하지 않는다).
+- read-only 검증(SELECT · 마이그레이션 이력 · 상태 조회)은 승인된 채널(`gcloud` · Admin API · Console)로 직접 수행 가능.
+- **UPDATE / DELETE / DDL · 대량 write · migration 수동 적용은 사용자 명시 승인 필요.** 마이그레이션은 CI/CD 자동 실행이 원칙 ([`PRODUCTION-MIGRATION-STANDARD`](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md)).
+- 실제 DB host · password · 계정값을 문서 · 로그 · 커밋 · 스크린샷에 기록하지 않는다. 운영 데이터 보고 시 민감정보는 요약 · 마스킹한다.
+- 진단 · seed · repair route 의 안전 규칙은 §8.
 
-| 항목 | 값 |
-|------|------|
-| Instance | `o4o-platform-db` |
-| Host | 환경설정 / Secret Manager 기준 (문서에 고정하지 않는다) |
-| Database | `o4o_platform` |
+## 검증 · 완료 보고
 
-> 실제 운영 endpoint 는 AI 작업 지침에 고정할 필요가 없어 제거했다(정보 최소화).
-> 접속은 항상 Cloud SQL Auth Proxy 또는 Cloud Run 의 `/cloudsql/...` 소켓을 경유한다 — [`SETUP.md`](SETUP.md).
-
-**DB 접근 정책:**
-- ✅ Cloud Run 내부 / Admin API / Google Cloud Console / `gcloud sql` CLI
-- ✅ **Claude Code 직접 검증 허용** — `gcloud` CLI 또는 Google Cloud Console을 통해 배포 후 SQL 검증, 마이그레이션 확인, 테이블/row 상태 확인 등을 직접 수행할 수 있음
-- ✅ 로컬 `psql` 클라이언트 설치 허용 — `gcloud sql connect` 인터랙티브 모드 사용을 위해 필요. 단, **프로덕션 DB는 방화벽으로 차단**되므로 직접 TCP 접속은 불가하며, 반드시 `gcloud sql connect`를 통해서만 사용
-
-**Claude Code가 활용 가능한 검증 채널:**
-- `gcloud run services describe o4o-core-api --region asia-northeast3` — 리비전/상태
-- `gcloud run revisions list` — 배포 이력
-- `gcloud logging read 'resource.type=cloud_run_revision AND ...'` — 로그 조회 (마이그레이션/에러/특정 키워드)
-- `gcloud sql connect o4o-platform-db --user=postgres --database=o4o_platform` — 인터랙티브 psql (단, psql 클라이언트 미설치 시 사용 불가)
-- **권장**: `gcloud sql` 대신 Cloud SQL Admin API 또는 `gcloud` 래퍼 스크립트로 SQL 실행
-- DB 접속 정보는 로컬 `apps/api-server/.env` 에 있다. Claude Code 는 필요 시 env 파일에서 값을 읽어 `gcloud sql` 계열 CLI 에 전달할 수 있음. **환경파일 위치 · 포트 분리(로컬 `5432` / 프록시 `5442`) · 프록시 기동 절차는 [`SETUP.md`](SETUP.md) 가 정본** (여기서 중복 서술하지 않는다)
-
-**SQL 검증 원칙:**
-- read-only 검증(SELECT, 마이그레이션 이력 확인 등)은 Claude Code가 직접 수행 가능
-- 데이터 변경(UPDATE/DELETE/DROP/ALTER)은 **반드시 사용자 승인 필요**. 마이그레이션은 CI/CD 자동 실행이 원칙
-- 검증 결과에 의미 있는 운영 데이터(개인정보/비밀 등)가 포함될 수 있으므로 보고 시 민감 데이터는 요약/마스킹
-
-**마이그레이션:** main 배포 → CI/CD 자동 실행 (권장) | 긴급 시 Admin API 또는 Cloud Console SQL Editor 또는 `gcloud sql connect`
-
-> 📄 상세: `docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md`
-
-**로컬 도구:**
-- ✅ `gcloud` CLI 설치됨 — Cloud Run 로그 조회, 리비전 확인, Cloud SQL 접근, 로깅 API 등 디버깅/운영/검증에 활용 가능
-- ✅ `gh` CLI 설치됨 — GitHub PR/이슈 관리
-- ✅ `psql` 로컬 클라이언트 설치 허용 — `gcloud sql connect` 인터랙티브 모드 지원 목적. 직접 TCP 접속은 방화벽으로 차단됨
+- **검증하지 않은 것을 PASS 로 보고하지 않는다.** 빌드 성공만으로 UI 작업을 종결하지 않는다.
+- **실패하거나 건너뛴 검증을 숨기지 않는다.** 통과한 것만 골라 보고하지 않는다. smoke 가 불가하면 구체적 이유를 적는다.
+- 보고는 **한국어**. 파일명 · route · API · component · commit hash 등 기술 식별자는 원문 유지.
+- 긴 diff 나 전체 파일을 그대로 붙이지 않는다. 변경 / 미변경 / 검증 결과 / CHECK / Git 상태 중심.
+- 모든 완료 보고에 **`문서 정합`** 한 줄을 포함한다 (§16-5).
 
 ---
+
+# 부록 A — 호환 reference (§ 번호 고정)
+
+> 각 절은 요지 + 정본 링크만 둔다. 상세는 정본이 우선한다.
+
+## 0. 환경 원칙
+
+- 기본 환경은 프로덕션(`o4o-platform-db` / `o4o_platform`). 실제 endpoint 는 문서에 고정하지 않는다.
+- DB 접근 정책은 위 **DB · 보안 경계** 절. 접속 절차 · 포트 분리 · 프록시 기동 · 로컬 도구는 [`SETUP.md`](SETUP.md).
 
 ## 1. 개발 기본 규칙
 
-### 브랜치 전략
-
-현재 운영 단계에서는 **main 직접 작업**이 기본이다.
-
-- 작업 전 sync 확인 필수: `git fetch origin` → `git status -sb`
-  단, **pull(merge/rebase)은 작업트리가 clean 할 때만 수행한다.** dirty 상태에서 pull 하면
-  다른 세션의 변경을 끌어들이거나 충돌로 훼손한다 (아래 Git 정본 §3 규칙 2)
-- 작업 완료 후 main에 직접 commit → push
-- feature 브랜치는 명시적 요청 또는 특수 작업(대규모 리팩토링·실험적 변경)에서만 사용
-- 작업 범위 외 수정 금지 / smoke test 후 결과 보고
-
-> **다중 PC · 다중 세션(사람 + AI) 환경의 stage · 커밋 · PC 이동 절차는
-> [`docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) 가 정본이다.**
-> path-specific stage 강제, `git add .` 금지, 다른 세션 미추적 파일 불가침,
-> pre-commit lockfile 검증 계약, 완료 조건(`HEAD == origin/main`)이 모두 그 문서에 있다.
->
-> **Safe Commit 계약(같은 문서 §6)**: foreign staged 파일이 index 에 있는 상태에서
-> **pathspec 없는 `git commit` 실행 금지**. `git add .` 금지만으로는 막지 못한다.
-> 커밋 직전 `node scripts/git/check-staged-scope.mjs <내 작업 경로...>` 로 확인하고,
-> `git commit -m "..." -- <내 파일...>` 형태로 커밋한다.
-
-### App 계층 (절대 규칙)
-
-```
-Core → Extension → Feature → Service
-```
-역방향 의존 금지
-
-### Work Order 필수 구조
-
-```
-조사 → 문제확정 → 최소 수정 → 검증 → 종료
-```
-
-### API 호출 규칙
-
-- `authClient.api.get()` / `authClient.api.post()` 필수
-- 환경변수 직접 사용 금지, 하드코딩 URL 금지
-
-### Shared Module / Core+Extension Change Rule
-
-공통 모듈, 공통 config, 공통 sidebar/menu, 공통 layout, 공통 capability/permission map, core+extension contract를 수정할 때는 **단일 서비스 기준으로 완료 판단하지 않는다.**
-
-- 반드시 해당 모듈의 **모든 소비처를 먼저 식별**하고, KPA-Society / K-Cosmetics / Neture / Pharmacy-Hub 및 관련 admin/operator/store/forum/store-hub/mypage 소비 영역에 미치는 영향을 확인한다.
-- KPA-only / K-Cosmetics-only / Neture-only 임시 예외로 해결하지 말고, **공통 정책 문제인지 먼저 판단**한다.
-- route, role, capability, visibility, feature flag, extension contract 필터를 함께 검증한다 (빈 그룹/빈 block 제거로 화면에서 사라질 가능성 포함).
-- DB backfill / migration / capability 주입으로 UI 정책 문제를 임시 해결하지 않는다. route 없는 메뉴는 노출하지 않고, route 있는 실기능 메뉴는 숨기지 않는다 (데드링크 0 / 기능 은폐 0).
-
-공통 계약(타입·nav 항목·route·href)을 제거할 때는 **식별자 검색만으로 소비처 0 을 선언하지 않는다.**
-소스를 `readFileSync` 해서 문자열을 단언하는 raw-source spec 은 import graph 에 나타나지 않으므로
-`node scripts/quality/check-literal-consumers.mjs --source <수정 대상 파일>` 로 함께 조사한다
-(프로토콜 §3-A).
-
-> 📄 세부 절차: `docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md`
-
----
+- 브랜치: 현재(2026-09 기준) 운영 단계에서는 **main 직접 작업**이 기본. 규칙은 위 **Git · 병렬 작업 안전** 절.
+- App 계층: `Core → Extension → Feature → Service`. 역방향 의존 금지.
+- API 호출: `authClient.api.get()` / `.post()` 필수. 환경변수 직접 사용 · 하드코딩 URL 금지.
+- 공통 모듈 · config · sidebar · layout · capability map · core+extension contract 수정은 **모든 소비처를 먼저 식별**하고 단일 서비스 기준으로 완료 판단하지 않는다. 식별자 검색만으로 소비처 0 을 선언하지 않는다(`node scripts/quality/check-literal-consumers.mjs --source <파일>`). 절차: [`O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1`](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md).
 
 ## 2. TypeORM Entity – ESM Rules (FROZEN)
 
-> 위반 시 API 서버 기동 실패
+> 위반 시 API 서버 기동 실패. 근거: [`ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01`](docs/reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md)
 
 ```typescript
 // ❌ FORBIDDEN
@@ -217,413 +126,123 @@ import type { RelatedEntity } from './related.entity.js';
 @ManyToOne('RelatedEntity', 'property')
 ```
 
----
-
 ## 3. Core 동결 정책
 
-동결 Core: `cms-core`, `auth-core`, `platform-core`, `organization-core`
+동결 Core: `cms-core` · `auth-core` · `platform-core` · `organization-core`. 구조 · 테이블 변경은 명시적 WO 승인 필요. 정본: [`O4O-CORE-FREEZE-V1`](docs/architecture/O4O-CORE-FREEZE-V1.md).
 
-구조/테이블 변경 금지. 명시적 WO 승인 필요.
+## 4. Order / Commerce Contract
 
----
-
-## 4. E-commerce Core 규칙
-
-| 원칙 | 설명 |
-|------|------|
-| 주문 생성 | `checkoutService.createOrder()` 필수 |
-| OrderType 불변 | 생성 시 결정, 이후 변경 금지 |
-| 금지 테이블 | `*_orders`, `*_payments` 생성 금지 |
-
-**OrderType**: DROPSHIPPING ✅ / COSMETICS ✅ / TOURISM ✅
-> GLYCOPHARM OrderType 은 WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1 에서 서비스와 함께 제거되었다.
-
-> 📄 상세: `docs/baseline/E-COMMERCE-ORDER-CONTRACT.md`
-
----
+- **주문 생성은 `checkoutService.createOrder()` 단일 지점.** 독립 `*_orders` · `*_payments` 테이블 신설 금지 (`scripts/check-forbidden-tables.mjs` 가 검사).
+- 현재 O4O 안에서 살아 있는 내부 주문 경로는 **공급자→매장 B2B** (event-offer / Neture B2B / PharmacyHub → `store_cart_items → checkout_orders`). 정본: [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 소비자→매장 commerce 는 [`O4O-STORE-COMMERCE-BOUNDARY-V1`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 이 정한다.
+- 새 주문 구조 · 결제 · 환불을 만들기 전에 위 두 정본을 먼저 확인한다. 이는 현행 계약이며, 사업 모델 변경은 COMMERCE-BOUNDARY §15 절차를 따른다.
+- 기술 계약 [`E-COMMERCE-ORDER-CONTRACT`](docs/baseline/E-COMMERCE-ORDER-CONTRACT.md) 는 `createOrder()` 단일 지점 규칙만 유효하고 `OrderType` 열거 절은 stale — 상태는 [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md).
 
 ## 5. O4O Store & Order
 
-- 모든 매장은 O4O Store Template 사용
-- 주문 생성 규칙: §4 E-commerce Core 참조 (`checkoutService.createOrder()`)
-- 독립 주문 테이블 생성 금지
-- 3중 방어: 런타임 Guard + OrderType 계약 + 스키마 검사
-
-> 📄 상세: `docs/architecture/O4O-STORE-RULES.md`
-
-### Store Production Material (Canonical)
-
-- **Store Production Material 관련 작업 전 `docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md` 를 우선 참조한다.**
-- `kpa_store_contents` 는 현재 **legacy physical table name** 으로 간주한다 (KPA / Cosmetics 공통 사용 중).
-- logical canonical 개념은 service-neutral **Store Production Material** 이다.
-- 단순 prefix 제거 또는 성급한 table rename 제안 금지. rename 판단은 canonical 문서 기준으로 수행한다.
-
-> 📄 상세: `docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md`
-
----
+- 모든 매장은 O4O Store Template 사용. 주문 생성은 §4. 3중 방어(런타임 Guard + 계약 + 스키마 검사). 정본: [`O4O-STORE-RULES`](docs/architecture/O4O-STORE-RULES.md).
+- Store Production Material 작업 전 [`O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1`](docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md) 선행. `kpa_store_contents` 는 legacy 물리 테이블명(KPA / Cosmetics 공용) — 성급한 rename 제안 금지.
 
 ## 6. 인프라 (GCP Cloud Run)
 
-| 서비스 | 역할 |
-|--------|------|
-| `o4o-core-api` | API 서버 |
-| `neture-web` | 네처 메인 |
-| `k-cosmetics-web` | K-화장품 |
-| `kpa-society-web` | 약사회 SaaS |
-
-금지: Source 배포, PM2, AWS EC2, `43.202.242.215` 참조
-
----
+- 배포는 Cloud Run (API `o4o-core-api` + 서비스별 web). 서비스 목록은 `.github/workflows/deploy-*.yml` 이 정본이다.
+- 금지: Source 배포 · PM2 · AWS EC2 · 구 IP `43.202.242.215` 참조.
 
 ## 7. Boundary Policy (FROZEN)
 
-> 📄 상세: `docs/architecture/O4O-BOUNDARY-POLICY-V1.md`
+정본: [`O4O-BOUNDARY-POLICY-V1`](docs/architecture/O4O-BOUNDARY-POLICY-V1.md) — Domain Primary Boundary(Broadcast=`serviceKey` / Community · Store Ops=`organizationId` / Commerce=`storeId`).
 
-| Domain | Primary Boundary | HUB 소비 |
-|--------|:----------------:|:---------:|
-| **Broadcast** (CMS, Signage) | `serviceKey` | YES |
-| **Community** (Forum) | `organizationId` | NO |
-| **Store Ops** (LocalProduct, Tablet, KPI) | `organizationId` | NO |
-| **Commerce** (Order, Payment) | `storeId` | NO |
+**Guard Rules — 모든 신규 개발 필수:**
 
-### Guard Rules — 모든 신규 개발 필수
+1. UUID 단독 조회 금지 — Domain Primary Boundary 복합 조건 필수
+2. Raw SQL Parameter Binding 필수 — String Interpolation 금지
+3. Domain Primary Boundary 필터 필수 — 모든 쿼리에 적용
+4. serviceKey 스푸핑 금지 — URL 경로 파라미터에서만 추출
+5. Cross-domain JOIN 금지 — 명시적 WO 예외 외
 
-1. **UUID 단독 조회 금지** — Domain Primary Boundary 복합 조건 필수
-2. **Raw SQL Parameter Binding 필수** — String Interpolation 금지
-3. **Domain Primary Boundary 필터 필수** — 모든 쿼리에 적용
-4. **serviceKey 스푸핑 금지** — URL 경로 파라미터에서만 추출
-5. **Cross-domain JOIN 금지** — 명시적 WO 예외 외
+## 8. 화면 디버깅 · 진단 경로 규칙
 
----
+**진단 · seed · 복구 경로 규칙 (필수 · 2026-08-08 사고 재발 방지):**
 
-## 8. 화면 디버깅 & 배포 후 검증
+1. 진단 · seed · repair · backfill 은 **CLI 우선**. HTTP route 로 만들지 않는다.
+2. HTTP 가 불가피하면 **`requireAuth` + role guard 필수**.
+3. debug / test 성격 route 는 **프로덕션에 등록하지 않는다** (`NODE_ENV !== 'production'` 게이트).
+4. **GET 으로 상태를 변경하지 않는다.**
+5. 권한을 코드에서 하드코딩하지 않는다 (`isPlatformAdmin: true` 등). 요청자 권한에서 파생한다.
 
-### 검증 방식
-
-| 방식 | 허용 | 설명 |
-|------|------|------|
-| API 직접 호출 (curl/httpie) | ✅ | 배포된 엔드포인트에 직접 요청하여 응답 검증 |
-| 코드 경로 정적 분석 | ✅ | 코드 흐름 추적으로 논리 정합성 검증 |
-| Health/Debug 엔드포인트 | ✅ | 진단용 API로 상태 확인 |
-| 사람 관측 → AI JSON 분석 | ✅ | 사람이 스크린샷/네트워크 로그 제공 → AI가 분석 |
-| 브라우저 직접 접속 | ✅ | 배포된 서비스에 브라우저로 직접 접속하여 테스트 |
-| 브라우저 자동화 (Playwright 등) | ✅ | 로컬 환경에서 자동화 테스트 |
-
-### 버그 디버깅 표준 절차
-
-**버그 발견 시 반드시 아래 순서를 따른다:**
-
-1. **JSON 디버그 테스트 페이지 생성** — 의심되는 API/데이터를 Raw JSON으로 출력하는 SSR 페이지를 만든다
-2. **브라우저로 접속하여 원인 파악** — 배포 후 브라우저에서 JSON 응답을 직접 확인한다
-3. **원인 확정 후 최소 수정** — JSON 결과를 근거로 코드를 수정한다
-
-> 📄 **JSON 테스트 페이지 작성 가이드: `docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md`**
->
-> 이 문서를 반드시 읽고 참고하여 디버그 페이지를 작성할 것.
-
-### 진단 Entry Point
-
-`/__debug__/auth-bootstrap` / `/health/detailed` / `/health/database` / `/api/v1/auth/status`
-
-### 진단·seed·복구 경로 규칙 (필수)
-
-> 2026-08-08 사고: `/__debug__/**` 8개가 인증·환경 게이트 없이 프로덕션에 노출돼
-> 인증 없는 승인(권한 하드코딩)·RBAC 부여·하드 삭제가 가능했다. 재발 방지 규칙이다.
-
-1. **진단 · seed · repair · backfill 기능은 CLI 우선.** HTTP route 로 만들지 않는다.
-2. HTTP 가 불가피하면 **`requireAuth` + role guard 필수** (인증 없는 진단 route 금지).
-3. **debug / test 성격 route 는 프로덕션에 등록하지 않는다** (`NODE_ENV !== 'production'` 게이트).
-4. **GET 으로 상태를 변경하지 않는다.** 조회는 GET, 변경은 POST/PATCH/DELETE.
-5. **권한을 코드에서 하드코딩하지 않는다** (`isPlatformAdmin: true` 등). 항상 요청자 권한에서 파생한다.
-
-### JSON 응답 표준
-
-`{ success: true, data: T }` 또는 `{ success: false, error: "msg", code: "ERROR_CODE" }`
-
----
+- 버그 디버깅 표준: 의심 API 를 Raw JSON 으로 출력하는 SSR 테스트 페이지 → 브라우저 확인 → 원인 확정 후 최소 수정. 가이드: [`DEBUG-SSR-TEST-PAGE-GUIDE-V1`](docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md).
+- JSON 응답 표준: `{ success: true, data: T }` / `{ success: false, error, code }`.
 
 ## 9. 도메인별 규칙 (참조)
 
-| 도메인 | 핵심 제약 | 상세 문서 |
-|--------|----------|----------|
-| **Cosmetics** | 독립 스키마 (`cosmetics_` prefix), E-commerce Core 통해 주문 | `docs/architecture/COSMETICS-DOMAIN-RULES.md` |
-| **Business Service** | OpenAPI 계약 우선, 서비스 간 직접 호출/DB 접근 금지 | `docs/architecture/BUSINESS-SERVICE-RULES.md` |
-| **Retail Stable** | Visibility Gate 4중 정의, Payment atomic transition | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
-| **Design Core** | 모든 신규 화면은 Design Core v1.0, 독자적 디자인 시스템 금지 | `docs/rules/DESIGN-CORE-GOVERNANCE.md` |
-
----
+Cosmetics(`cosmetics_` 독립 스키마 · 주문은 §4 경유) · Business Service(OpenAPI 계약 우선) · Design Core(신규 화면은 Design Core v1.0) — 정본은 [`CANONICAL-INDEX` §5](docs/CANONICAL-INDEX.md).
+`O4O-RETAIL-STABLE-V1` 은 현행 규칙이 아니라 **판정 대기(UNKNOWN)** — [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md).
 
 ## 10. KPA Society 구조
 
-> 📄 기준: `docs/baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md`
-
-3개 서비스 공존: **커뮤니티**(유지) / **분회 서비스**(유지) / **데모**(제거 예정)
-
-- 라우트 위치 ≠ 서비스 소속 (Forum은 커뮤니티 서비스의 기능)
-
----
+3개 서비스 공존(커뮤니티 / 분회 / 데모). 라우트 위치 ≠ 서비스 소속. 정본: [`KPA-SOCIETY-SERVICE-STRUCTURE`](docs/baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md).
 
 ## 11. Operator Dashboard 표준
 
-> 📄 상세: `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md`
-> 📄 DataTable 정책: `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md`
-> 📄 검수·승인 UX: `docs/architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md`
-> 📄 **검수 외 5개 Workspace UX (자료 등록 / AI 작업 / 큐레이션 / 매장 지원 / 운영 수익)**: `docs/baseline/O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md`
-> 📄 **매장 HUB 콘텐츠 게시 표준 (RichTextEditor 기반 항목별 게시 — Source Ingestion 보류)**: `docs/baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md`
-
-### Admin / Operator 역할 구분
-
-> **Canonical 정렬 (2026-05-23):**
-> 본 표는 **권한·기능 매트릭스** (Dashboard / RBAC / Guard 범위) 이다. Operator 의 **사업적 정의** 는 [`docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md §3.2`](docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) — "**서비스 운영 사업자** (공급자 자료 수신·등록·구성 + AI 활용 + 매장 실행 자산 제작 + 큐레이션 + 매장 지원 + 운영 수익 모델 구축)" 이다.
-> 본 표의 "운영 + 콘텐츠 + 모니터링" 은 PHILOSOPHY §3.2 의 책임 중 **권한 매트릭스에 반영된 부분 집합**이다.
-
-| 역할 | 범위 |
-|------|------|
-| **Admin** | 구조 + 정책 + 거버넌스 + 금융 |
-| **Operator** | 운영 + 콘텐츠 + 모니터링 (권한 매트릭스 — 사업적 정의는 위 노트 참조) |
-
-### 핵심 규칙
-
-1. **Guard**: `requireAuth` → `require{Service}Scope('{service}:{role}')` — 레거시 `requireAdmin` 서비스 레벨 사용 금지
-2. **Dashboard**: 5-Block 구조 (`KPI` + `AI Summary` + `Action Queue` + `Activity Log` + `Quick Actions`) — `OperatorDashboardLayout` 컴포넌트 사용. **A~F 6 Workspace 진입 허브** (A 자료 등록 / B AI 작업 / C 큐레이션 / D 매장 지원 / E 운영 수익 / F 검수·승인) — 검수·승인 편향은 Drift. 상세는 `OPERATOR-DASHBOARD-STANDARD-V1 §5-6~§5-9`.
-3. **AI Summary**: Backend `CopilotEngineService.generateInsights()` 사용 — Frontend client-side 생성 금지. AI Summary 는 수신 영역이며, Operator 의 능동 AI 활용은 Workspace B 에서 별도 수행.
-4. **Route**: Backend `/api/v1/{service}/operator/*` · `/api/v1/{service}/admin/*` — Frontend `/operator/*` · `/admin/*`
-
-레이아웃·Sidebar 순서·KPI 분류·DataTable 정책 등 상세 규칙은 canonical 문서 참조.
-
----
+- Guard: `requireAuth` → `require{Service}Scope('{service}:{role}')`. 레거시 `requireAdmin` 서비스 레벨 사용 금지.
+- Route: Backend `/api/v1/{service}/operator/*` · `/admin/*` — Frontend `/operator/*` · `/admin/*`.
+- Admin = 구조 · 정책 · 거버넌스 · 금융 / Operator = 운영 · 콘텐츠 · 모니터링 (사업적 정의는 PHILOSOPHY §3.2). 5-Block 대시보드 · A~F 6 Workspace · AI Summary 는 backend 생성.
+- 정본: [`OPERATOR-DASHBOARD-STANDARD-V1`](docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md) 외 [`CANONICAL-INDEX` §3](docs/CANONICAL-INDEX.md).
 
 ## 12. 플랫폼 개발 참조
 
-Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
-
-| 영역 | 문서 |
-|------|------|
-| Content Core | `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` |
-| LMS Core | `docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md` |
-| Navigation | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
-| Extension | `docs/platform/extensions/EXTENSION-GENERAL-GUIDE.md` |
-| Operator Dashboard | §11 참조 |
-| **HUB Template Standard** | `docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md` |
-
-핵심: Content 단일 출처 / Core 불변 / 데이터 소유권 분리 / 이벤트 기반 통신
-
----
+Content Core · LMS · Navigation · Extension · HUB Template 은 [`CANONICAL-INDEX` §6](docs/CANONICAL-INDEX.md). 핵심: Content 단일 출처 / Core 불변 / 데이터 소유권 분리 / 이벤트 기반 통신.
 
 ## 13. O4O 공통 구조 원칙
 
-> O4O의 **forum, lms, signage는 서비스별 기능이 아니라 플랫폼 공통 구조**이며,
-> 각 서비스는 동일한 구조 위에서 자신의 데이터를 노출한다.
-
-- KPA-Society는 공통 구조의 **reference implementation** — 구조 관련 작업 시 KPA 기준으로 먼저 조사
-- 서비스별로 Forum/LMS/Signage를 재구현하거나 독립 테이블 생성 금지
-- 구조는 공유, 데이터는 serviceKey 기반으로 격리
-
-> 📄 상세: `docs/o4o-common-structure.md`
-
-모든 Forum/LMS/Signage 관련 구조 작업(IR, WO, 구현)은 해당 문서를 기준으로 판단한다.
-
----
+forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference implementation. 서비스별 재구현 · 독립 테이블 금지, 데이터는 serviceKey 격리. 정본: [`o4o-common-structure`](docs/o4o-common-structure.md).
 
 ## 13-A. APP 표준화 (Baseline Lock)
 
-모든 APP = `@o4o/types/{app}` + `{App}QueryService` + 표준 UI 패턴
-
-| APP | 상태 |
-|-----|------|
-| APP-CONTENT | Frozen |
-| APP-SIGNAGE | Frozen |
-| APP-FORUM | Frozen |
-| APP-LMS | Baseline Defined (Phase 1) — 백엔드 공통, frontend 공통화는 후속. 상세: `docs/architecture/APP-LMS-BASELINE.md` |
-
-서비스 코드는 QueryService 호출 + 설정만. Raw SQL/중복 로직/서비스별 UI 분기 금지.
-
----
+모든 APP = `@o4o/types/{app}` + `{App}QueryService` + 표준 UI. 서비스 코드는 QueryService 호출 + 설정만. 상태: [`APP-LMS-BASELINE`](docs/architecture/APP-LMS-BASELINE.md).
 
 ## 14. Frozen Baselines
 
-모든 Freeze 항목 공통: **버그 수정·성능 개선·문서·테스트는 허용. 구조 변경은 명시적 WO 필수.**
+공통: **버그 수정 · 성능 · 문서 · 테스트 허용. 구조 변경은 명시적 WO 필수.**
 
-| # | 대상 | Freeze 일자 | 상세 문서 |
-|---|------|-----------|----------|
-| F1 | **Operator OS** — security-core, hub-core, ai-core, action-log-core, asset-copy-core, operator-ux-core, admin-ux-core | 2026-02-16 | `docs/baseline/BASELINE-OPERATOR-OS-V1.md` |
-| F2 | **KPA UX** — 3개 서비스 영역 5-Block/4-Block 통합 UX | 2026-02-17 | `docs/baseline/KPA-UX-BASELINE-V1.md` |
-| F3 | **Store Layer** — store-ui-core, store-asset-policy-core, store-core, asset-copy-core, hub-core 의존 방향 | 2026-02-22 | `docs/architecture/STORE-LAYER-ARCHITECTURE.md` |
-| F4 | **Platform Content Policy** — HUB 3축 모델 (Producer/Visibility/ServiceScope). `HubProducer='supplier'` 는 Legacy / 명문화된 예외 (2026-05-23 정렬) | 2026-02-23 | `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md` |
-| F5 | **Content Stable** — HUB 콘텐츠 타입·매핑·병합 로직·API 계약 | 2026-02-23 | `docs/baseline/CONTENT-STABLE-DECLARATION-V1.md` |
-| F6 | **Boundary Policy** — Domain Boundary Matrix + Guard Rules 5개 | 2026-02-24 | `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` |
-| F7 | **Neture Partner Contract** — 계약 테이블·ENUM·트랜잭션·Commission 불변 | 2026-02-24 | `docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md` |
-| F8 | **Neture Distribution Engine** — Distribution Tier 3단계·SERVICE 상태 머신·Checkout Guard 3계층·Listing 캐스케이드 | 2026-02-27 | `docs/baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md` |
-| F9 | **RBAC SSOT** — role_assignments 단일 소스, users.role/roles/user_roles 제거, write-path 통일 | 2026-02-27 | `docs/rbac/RBAC-FREEZE-DECLARATION-V1.md` |
-| F10 | **O4O Core** — Auth, Membership, Approval, RBAC 4개 모듈 Core Layer 고정 | 2026-03-11 | `docs/architecture/O4O-CORE-FREEZE-V1.md` |
-| F11 | **User/Operator** — users·service_memberships·role_assignments 3테이블 고정, Operator=membership 기반, user.role 사용 금지. **KPA-a 예외**: OperatorRoute 대신 RoleGuard+allowedRoles 사용 (role은 membership에서 파생, 구조 동등) | 2026-03-19 | `docs/architecture/USER-OPERATOR-FREEZE-V1.md` |
-| F12 | **Product Resource Architecture** — 2계층(계층1 Product Resource=master기준 canonical=`shared_product_descriptions` / 계층2 Store Production Material=매장 실행자산) 분리. 6불변식: ①DESCRIPTION=SPD ②canonical (master,resourceType,descriptionType) ③Resource ID=UUID+공개 `/r/{id}` ④QR 비저장·동적생성 ⑤계층1/2 분리 ⑥**ProductMaster는 Resource를 모른다**(FK 신설 금지, Resource→ProductMaster 단방향) | 2026-07-08 | `docs/baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1.md` |
-
----
-
-## 상세 규칙 문서 목록
-
-| 영역 | 문서 |
-|------|------|
-| **O4O 사업 철학 SSOT (최상위)** | `docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md` |
-| **O4O 3자 Canonical Flow SSOT** | `docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md` |
-| **O4O Store Commerce Boundary (canonical business boundary)** | `docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md` — 매장 경영자는 O4O로 소비자에게 판매하지 않는다 / 자체 매장 전자상거래 없음 / 판매 실행 = 외부 POS·외부 판매채널 / 태블릿·QR = 정보 제공 / legacy commerce 판정 규칙·개발 금지선. **store · cart · checkout · orders · payments · refund · PG · POS · tablet · QR · 외부 판매채널 관련 작업의 선행 기준** |
-| **O4O B2B Supplier → Store Order Contract (canonical order SSOT)** | `docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md` — 공급자→매장 B2B 주문의 정본. 살아 있는 3개 축(event-offer / Neture B2B / PharmacyHub)은 전부 `store_cart_items → checkout_orders` 로 수렴 / `store_cart_items` = **B2B cart**(소비자 cart 금지선 대상 아님) / actor·ownership·serviceKey·authorization·lifecycle·취소 계약 / 공급자 화면은 Neture 가 canonical / **POS = 현재 비개발 영역**. **B2B 주문 · 발주 · 공급 신청 · 매장 장바구니 관련 작업의 선행 기준 (위 Store Commerce Boundary 와 한 쌍)** |
-| Cosmetics 도메인 | `docs/architecture/COSMETICS-DOMAIN-RULES.md` |
-| Business 서비스 | `docs/architecture/BUSINESS-SERVICE-RULES.md` |
-| O4O Store/Order | `docs/architecture/O4O-STORE-RULES.md` |
-| **Store Production Material Canonical** | `docs/architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md` |
-| E-commerce 계약 | `docs/baseline/E-COMMERCE-ORDER-CONTRACT.md` |
-| GlycoPharm Legacy | `docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md` |
-| ESM Entity 규칙 | `docs/reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md` |
-| Content Core | `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` |
-| LMS Core | `docs/platform/lms/` |
-| Navigation | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
-| Extension | `docs/platform/extensions/` |
-| KPA Society 구조 | `docs/baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
-| KPA 권한 매트릭스 | `docs/baseline/KPA-ROLE-MATRIX-V1.md` |
-| Hub UX 규칙 | `docs/platform/hub/HUB-UX-GUIDELINES-V1.md` |
-| Retail Stable v1.0 | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
-| Operator OS Baseline | `docs/baseline/BASELINE-OPERATOR-OS-V1.md` |
-| UX Core Freeze | `docs/baseline/UX-CORE-FREEZE-V1.md` |
-| KPA UX Baseline | `docs/baseline/KPA-UX-BASELINE-V1.md` |
-| Store Layer Architecture | `docs/architecture/STORE-LAYER-ARCHITECTURE.md` |
-| Platform Content Policy | `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md` |
-| Content Stable | `docs/baseline/CONTENT-STABLE-DECLARATION-V1.md` |
-| Boundary Policy | `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` |
-| Neture Partner Contract | `docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md` |
-| Design Core | `docs/rules/DESIGN-CORE-GOVERNANCE.md` |
-| Production Migration | `docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md` |
-| Channel Execution Console | `docs/work-orders/WO-CHANNEL-EXECUTION-CONSOLE-V1.md` |
-| Channel Creation Flow | `docs/work-orders/WO-CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1.md` |
-| Neture Distribution Engine | `docs/baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md` |
-| **Neture Domain Architecture** | `docs/baseline/NETURE-DOMAIN-ARCHITECTURE-FREEZE-V3.md` |
-| RBAC Freeze Declaration | `docs/rbac/RBAC-FREEZE-DECLARATION-V1.md` |
-| RBAC Runbook | `docs/rbac/RBAC-RUNBOOK-V1.md` |
-| RBAC Role Catalog | `docs/rbac/RBAC-ROLE-CATALOG-V1.md` |
-| **O4O Core Freeze** | `docs/architecture/O4O-CORE-FREEZE-V1.md` |
-| Operator Dashboard 표준 | §11 참조 |
-| **디버그 SSR 테스트 페이지** | `docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md` |
-| **User/Operator Freeze** | `docs/architecture/USER-OPERATOR-FREEZE-V1.md` |
-| **O4O 공통 구조 원칙** | `docs/o4o-common-structure.md` |
-| **Shared Module Change Protocol** | `docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md` |
-| **HUB Template Standard** | `docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md` |
-| **Event Offer 공통 도메인** | `docs/baseline/EVENT-OFFER-COMMON-DOMAIN-V1.md` |
-| **Event Offer Store 통합** | `docs/baseline/EVENT-OFFER-STORE-INTEGRATION-V1.md` |
-| **Event Offer Neture 역할 구분** | `docs/baseline/EVENT-OFFER-NETURE-ROLE-CLARIFICATION-V1.md` |
-| **O4O Table Standard (Aspirational)** | `docs/baseline/O4O-TABLE-STANDARD-BASELINE-V1.md` |
-| **O4O Form Standard (Aspirational)** | `docs/baseline/O4O-FORM-STANDARD-BASELINE-V1.md` |
-| **APP-LMS Baseline** | `docs/architecture/APP-LMS-BASELINE.md` |
-| **LMS Scope Guard 설계** | `docs/architecture/LMS-SCOPE-GUARD.md` |
-| **LMS Client Convention V1** | `docs/architecture/LMS-CLIENT-CONVENTION-V1.md` |
-| **Operator Integration State V1** | `docs/architecture/OPERATOR-INTEGRATION-STATE-V1.md` |
-| **Operator DataTable Policy V1** | `docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md` |
-| **Operator Table Canonical V1** | `docs/architecture/O4O-OPERATOR-TABLE-CANONICAL-V1.md` |
-| **Operator Canonical Workflow V1** (검수·승인 UX) | `docs/architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md` |
-| **Operator Non-Approval UX Baseline V1** (5 Workspace — 자료 등록 / AI 작업 / 큐레이션 / 매장 지원 / 운영 수익) | `docs/baseline/O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md` |
-| **Operator HUB Content Publishing Standard V1** (RichTextEditor 기반 항목별 게시 — Source Ingestion 보류) | `docs/baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md` |
-| **Pharmacy-Hub Service Model Baseline V1** (PharmacyHub = KPA류 공통 매장경영 구조 − 공급 승인/매장지원 operator capability · supplier 역할 없음) | `docs/baseline/O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md` |
-| **Store Menu Canonical Tree V1** (매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 — 6 항목, 설문 V1 외) | `docs/baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md` |
-| **Operator Core Design V1** | `docs/architecture/OPERATOR-CORE-DESIGN-V1.md` |
-| **Operator Core Extraction Verify Checklist V1** (완료 기록 — 현행 기준 문서 아님) | `docs/archive/reports/OPERATOR-CORE-EXTRACTION-VERIFY-CHECKLIST-V1.md` |
-| **Guide sectionKey 충돌 정책** | `docs/architecture/O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md` |
-| **Guide Schema Validation** | `docs/architecture/O4O-GUIDE-SCHEMA-VALIDATION-V1.md` |
-| **Guide sectionKey Migration** | `docs/architecture/O4O-GUIDE-SECTIONKEY-MIGRATION-V1.md` |
-| **Guide Content Reseed** | `docs/architecture/O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1.md` |
-| **Guide pageKey Catalog V1** | `docs/architecture/O4O-GUIDE-PAGE-KEY-CATALOG-V1.md` |
-| **Store Local Product 경계 정책** | `docs/baseline/STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md` |
-| **Signage Store Playlist 모델 경계 (KEEP-LEGACY)** | `docs/baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md` |
-| **User Domain SSOT** | `docs/baseline/USER-DOMAIN-SSOT-V1.md` |
-| **Role Policy & Guard Baseline** | `docs/baseline/ROLE-POLICY-AND-GUARD-V1.md` |
-| **Global Header Standard** | `docs/architecture/ui/GLOBAL-HEADER-STANDARD-V1.md` |
-| **KPA Signage Structure Baseline** | `docs/baseline/KPA-SIGNAGE-STRUCTURE-V1.md` |
-| **O4O AI Usage Flow Baseline** | `docs/baseline/O4O-AI-USAGE-FLOW-BASELINE-V1.md` |
-| **Store Products Canonical** | `docs/architecture/STORE-PRODUCTS-CANONICAL-V1.md` |
-| **RBAC Canonical State** | `docs/rbac/RBAC-CANONICAL-STATE-V1.md` |
-| **콘텐츠 문서 체계 (진입점)** | `docs/guides/common/DOCUMENT-INDEX.md` — 설명서·QR·POP·블로그·동영상 등 콘텐츠 규칙의 단일 진입점(common/content-authoring/ai/products/services 5축, Rule Registry CR/DR/AR). 상세 규칙은 이 진입점에서만 찾고 CLAUDE.md에 복사하지 않는다. |
-| **Product Resource Architecture (F12 Baseline)** | `docs/baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1.md` — 2계층(Product Resource / Store Production Material) + 6불변식. 상세=`docs/architecture/IR-O4O-PRODUCT-CONTENT-RESOURCE-ARCHITECTURE-V1.md` · `docs/architecture/WO-O4O-PRODUCT-CONTENT-RESOURCE-PERSISTENCE-DESIGN-V1.md` |
-
-> **콘텐츠 작성 불변 원칙**
->
-> - 의약품 등 소비자 콘텐츠에서 **공식 원문에 없는 의료 사실을 외부 LLM이 생성·보강하는 것은 금지**한다.
-> - MFDS·e약은요·허가사항 등 공식 원문을 grounding으로 사용한 **매장용 설명서 저작은 허용된 정규 작업**이다. 기존 authored draft 부재는 저작 금지 사유가 아니다.
-> - 공식 원문의 효능·용법·금기·주의사항을 보존하면서 제목·요약·소제목·문장 구조·표현·디자인을 소비자 친화적으로 새로 구성할 수 있다.
-> - 매장용 의약품 설명서는 약사가 있는 매장에서 상담을 보조하는 콘텐츠이므로, 공식 원문에 있는 **질병명·질환명·증상명·허가 효능을 회피하거나 모호하게 약화하지 않는다.**
-> - 주의·제한 중심으로 만들어 제품의 용도와 구매 판단을 흐리는 방어적 작성은 금지한다.
-> - 제품 간 조성·투여경로·효능·용법·안전정보가 다르면 혼합하지 않고 subgroup 또는 제품별로 분리한다.
-> - 모든 의약품 매장용 설명서에는 매장 내 약사 등 전문가 문의 안내를 유지한다.
-> - DB 반영은 승인된 WO 범위에서 dry-run·이중게이트·독립검증·rollback 계약을 통과한 뒤 수행한다.
->
-> 상세 SSOT: `docs/guides/common/DOCUMENT-INDEX.md` → `docs/guides/products/O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1.md` → `docs/guides/products/drug/DRUG-WRITING.md`
-
----
+| # | 대상 | 문서 |
+|---|---|---|
+| F1 | Operator OS | [`BASELINE-OPERATOR-OS-V1`](docs/baseline/BASELINE-OPERATOR-OS-V1.md) |
+| F2 | KPA UX | [`KPA-UX-BASELINE-V1`](docs/baseline/KPA-UX-BASELINE-V1.md) |
+| F3 | Store Layer | [`STORE-LAYER-ARCHITECTURE`](docs/architecture/STORE-LAYER-ARCHITECTURE.md) |
+| F4 | Platform Content Policy | [`PLATFORM-CONTENT-POLICY-V1`](docs/baseline/PLATFORM-CONTENT-POLICY-V1.md) |
+| F5 | Content Stable | [`CONTENT-STABLE-DECLARATION-V1`](docs/baseline/CONTENT-STABLE-DECLARATION-V1.md) |
+| F6 | Boundary Policy | [`O4O-BOUNDARY-POLICY-V1`](docs/architecture/O4O-BOUNDARY-POLICY-V1.md) |
+| F7 | Neture Partner Contract | [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md) |
+| F8 | Neture Distribution Engine | [`NETURE-DISTRIBUTION-ENGINE-FREEZE-V1`](docs/baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md) |
+| F9 | RBAC SSOT | [`RBAC-FREEZE-DECLARATION-V1`](docs/rbac/RBAC-FREEZE-DECLARATION-V1.md) |
+| F10 | O4O Core | [`O4O-CORE-FREEZE-V1`](docs/architecture/O4O-CORE-FREEZE-V1.md) |
+| F11 | User / Operator | [`USER-OPERATOR-FREEZE-V1`](docs/architecture/USER-OPERATOR-FREEZE-V1.md) |
+| F12 | Product Resource Architecture | [`O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1`](docs/baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1.md) |
 
 ## 15. Browser Verification Test Accounts
 
-> 📄 **테스트시 사용하는 아이디/비밀번호 — `docs/local/TEST-ACCOUNTS.local.md`**
->
-> 이 문서가 모든 검증·테스트용 자격증명의 **단일 출처(SSOT)**이다.
-> 브라우저 검증(Playwright / MCP / Claude Code / 수동 smoke test) 전 반드시 이 문서를 참조한다.
+- SSOT: `docs/local/TEST-ACCOUNTS.local.md` (로컬 전용 · git 미추적). 브라우저 검증 전 반드시 참조.
+- 실제 운영 계정 사용 금지. **자격증명 하드코딩 금지** — seed · 테스트 코드 · CI 어디에도 박지 않는다. 발견 시 즉시 제거.
 
-**원칙:**
-- 로컬/검증 환경 전용 — 실제 운영 계정 사용 금지
-- Git commit 금지 (`.gitignore`로 추적 제외)
-- 서비스별·역할별 테스트 계정 중앙 관리
-- 계정 변경(비밀번호/역할/조직) 시 로컬 문서만 업데이트
-- **자격증명 하드코딩 금지** — 시드 스크립트·테스트 코드·CI 어디에도 이 문서의 비밀번호를 박지 말 것. 발견 시 즉시 제거.
+## 16. 문서 Drift 발견 시 정비
 
----
+정본: [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1`](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md). 본 절은 **발동 조건**만 정한다. 일괄 정리가 아니라 조사 · 개발 중 발견 시 처리한다.
 
-## 16. 문서 Drift 발견 시 정비 (Inline Documentation Hygiene)
-
-> 문서 상태·archive·헤더 형식의 **정본은 [`docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md`](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md)** 다.
-> 본 §16 은 그 규칙을 **일상 작업 중 언제 발동하는지**만 정한다. 규칙을 복사하지 않는다.
-
-문서 정비는 **일괄 정리가 아니라 조사·개발 과정에서 발견 시 처리**한다 (정본 §7: 전체 문서에 한 번에 적용하지 않는다).
-
-### 16-1. 적용 대상 (좁게 유지한다)
-
-- ✅ **기준 문서** — `docs/baseline/` · `docs/architecture/` · `docs/rules/` · `docs/rbac/` · `docs/platform/` · `docs/guides/`
-- ✅ **본 CLAUDE.md 의 상세 규칙 문서 목록** 및 `AGENTS.md` §1 정본 표
-- ❌ **기록물은 대상이 아니다** — `docs/checks/` · `docs/investigations/` · `docs/ir/` · `docs/work-orders/` · `docs/archive/**`
-  과거 시점의 사실 기록이므로 현재 지침과 충돌하지 않는다. "낡았다"는 이유로 손대지 않는다.
-
-### 16-2. 기본 동작은 **보고**다
-
-WO 범위 밖 문서를 발견 즉시 수정하는 것은 **범위 외 수정**이다 (실행 원칙 · 중지 조건). 기본은 완료 보고에 적고 넘어간다.
-
-### 16-3. 인라인 허용 — 다음 2가지뿐
-
-WO 없이 발견 즉시 처리할 수 있다.
-
-1. **SUPERSEDED 표기 추가** — 낡은 기준 문서 **상단에 한 줄만** 덧붙인다. 본문은 건드리지 않는다.
-   ```markdown
-   > **상태**: SUPERSEDED · **대체 문서**: <경로> · **표기일**: YYYY-MM-DD
-   ```
-   대체 문서 경로를 적을 수 없으면 SUPERSEDED 가 아니다 (정본 §2 판정 원칙 2). 그때는 보고만 한다.
-2. **깨진 링크 · 이동된 경로 수정** — 의미 판단이 없는 기계적 교정에 한한다.
-
-### 16-4. 인라인 금지 — 반드시 보고 후 별도 WO
-
-- 문서 **삭제** (정본 §5-4 삭제 금지) · 통합 · 분할 · `docs/archive/**` 이동
-- 본 CLAUDE.md 색인 줄 추가/제거, 링크된 문서의 **경로 변경** (정본 §5-3)
-- Frozen Baseline(§14) 본문 수정 (§14: 구조 변경은 명시적 WO 필수)
-- 기준 문서의 **내용·판정 변경** (표기 추가와 내용 수정은 다르다)
-
-### 16-5. 완료 보고 필수 항목
-
-모든 완료 보고에 **`문서 정합`** 한 줄을 포함한다. 발견이 없으면 `해당 없음` 이라고 쓴다.
-
-```text
-문서 정합: 발견 N건 / SUPERSEDED 표기 N건 / 링크 수정 N건 / 별도 WO 제안 N건
-```
-
-### 16-6. 판단 불가는 그대로 둔다
-
-애매하면 ACTIVE 로 유지하고 보고만 한다 (정본 §2 판정 원칙 3). **잘못된 표기·이동보다 방치가 안전하다.**
+- **16-1 대상은 기준 문서뿐** — `docs/baseline/` · `architecture/` · `rules/` · `rbac/` · `platform/` · `guides/` 와 `docs/CANONICAL-INDEX.md`. `checks/` · `investigations/` · `ir/` · `work-orders/` · `archive/**` 는 기록물이므로 대상이 아니다.
+- **16-2 기본 동작은 보고다.** 범위 밖 문서를 즉시 고치는 것은 범위 외 수정이다.
+- **16-3 인라인 허용 2가지뿐** — ① 낡은 기준 문서 상단에 `> **상태**: SUPERSEDED · **대체 문서**: <경로> · **표기일**: YYYY-MM-DD` 한 줄(본문 불변, 대체 문서를 못 적으면 보고만) ② 깨진 링크 · 이동된 경로의 기계적 수정.
+- **16-4 인라인 금지** — 삭제 · 통합 · 분할 · archive 이동 · `CANONICAL-INDEX` 행 변경 · Frozen Baseline 본문 수정 · 기준 문서의 내용 · 판정 변경. 보고 후 별도 WO.
+- **16-5 완료 보고 필수 항목** — `문서 정합: 발견 N건 / SUPERSEDED 표기 N건 / 링크 수정 N건 / 별도 WO 제안 N건` (없으면 `해당 없음`).
+- **16-6 판단 불가는 그대로 둔다** — 애매하면 ACTIVE 로 유지하고 보고만 한다. 잘못된 표기보다 방치가 안전하다.
 
 ---
 
-*Updated: 2026-08-26*
-*Version: 8.12*
-*Status: Active Constitution*
+# 부록 B — 상세 규칙 색인
+
+영역별 세부 규칙 문서(Frozen · 도메인 · Operator · RBAC · 콘텐츠 저작 등)의 전체 목록과 상태는 [`docs/CANONICAL-INDEX.md`](docs/CANONICAL-INDEX.md) 에 있다. 이 파일에는 복제하지 않는다.
+
+---
+
+*Updated: 2026-09-12*
+*Version: 9.0*
+*Status: Active — Claude Code Entry Point*
