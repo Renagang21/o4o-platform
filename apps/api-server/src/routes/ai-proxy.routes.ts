@@ -46,6 +46,7 @@ import { isYouTubeUrl, fetchYouTubeContent, fetchYouTubeOEmbed } from './ai-prox
 // WO-O4O-COMMON-HOME-AI-INPUT-V0: O4O 공통 Home 중앙 입력 — 텍스트 질의응답 전용
 import { execute } from '@o4o/ai-core';
 import { dynamicLimiter } from '../middleware/rateLimiter.js';
+import { createLlmPlanner, runWorkAgent } from '../services/ai-tools/work-agent-runtime.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
 import {
   selectToolInvocationForRequest,
@@ -61,6 +62,9 @@ import {
 } from '../services/ai-tools/ai-tool-router.js';
 import {
   AI_TOOL_NAMES,
+  assertToolAllowed,
+  validateToolArguments,
+  findToolDefinition,
   type VerifiedToolContext,
 } from '../services/ai-tools/ai-tool-contract.js';
 import {
@@ -236,6 +240,63 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
       error: error.message || 'Vision AI 분석 중 오류가 발생했습니다.',
     });
   }
+});
+
+// ===========================================
+// WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 — 목적 기반 Work Loop 1회
+//
+//   POST /api/ai/work-agent/run  { request, targetHint?, image?: { mimeType, base64 } }
+//
+//   사용자가 명시적으로 부른다(채팅 라우터가 자동 선택하지 않는다 §48). 상태는 이 요청 안에서만 산다(§40) —
+//   automation_jobs · 큐 · 스케줄러 · 실행 기록 테이블에 닿지 않는다(§41). 이미지는 메모리에서만 쓰고 버린다(§23).
+//   로그는 usage signal(허용 키)뿐 — goal 원문 · 관찰 · 입력값 · 이미지는 실리지 않는다(§22·§23).
+// ===========================================
+router.post('/work-agent/run', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
+  const authReq = req as AuthRequest;
+  const userId = authReq.user?.id;
+  if (!userId) return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+  const body = (req.body ?? {}) as Record<string, unknown>;
+  const args: Record<string, unknown> = { request: body.request };
+  if (body.targetHint !== undefined) args.targetHint = body.targetHint;
+  if (body.image !== undefined) args.image = body.image;
+
+  const tool = findToolDefinition(AI_TOOL_NAMES.WORK_AGENT_PERFORM);
+  const argCheck = validateToolArguments(args, tool);
+  if (!argCheck.ok) return res.status(400).json({ success: false, error: '요청 형식이 올바르지 않습니다(목적 문장 · 등록 사이트 · JPEG/PNG/WebP 이미지만).', code: 'WORK_AGENT_GOAL_INVALID' });
+
+  // home-chat 과 같은 방식으로 서버가 tool 컨텍스트를 확정한다 — 클라이언트 값은 권한 근거가 아니다.
+  const toolCtx: VerifiedToolContext = { userId, workspace: 'home' };
+  const deviceResolution = await resolveTargetDevice(AppDataSource, userId);
+  toolCtx.localAgentStatus = deviceResolution.status === 'ok' ? 'connected' : deviceResolution.status;
+  if (deviceResolution.status === 'ok') toolCtx.localDeviceId = deviceResolution.device.id;
+  const authz = assertToolAllowed(AI_TOOL_NAMES.WORK_AGENT_PERFORM, toolCtx);
+  if (!authz.allowed) {
+    return res.status(403).json({ success: false, error: '이 PC 의 O4O 확장이 연결되어 있어야 합니다.', code: 'WORK_AGENT_NOT_AVAILABLE', reason: authz.reason });
+  }
+
+  const result = await runWorkAgent(
+    AppDataSource,
+    toolCtx,
+    { request: String(body.request), targetHint: typeof body.targetHint === 'string' ? body.targetHint : undefined, image: body.image },
+    createLlmPlanner(AppDataSource),
+  );
+  // history 에는 행동 종류 · ref · 상태만 있고 입력 텍스트는 뺀다(응답에도 검색어를 되돌리지 않는다).
+  const history = result.history.map((h) => ({ step: h.step, kind: h.action.kind, status: h.status, errorCode: h.errorCode ?? null, navigated: h.navigated === true }));
+  return res.json({
+    success: true,
+    data: {
+      goal: { goalId: result.goal.goalId, status: result.goal.status, siteId: result.siteId, displayName: result.displayName },
+      progress: result.progress,
+      takeover: result.takeover,
+      neededInput: result.neededInput,
+      stepCount: result.stepCount,
+      aiPlanCount: result.aiPlanCount,
+      path: result.path,
+      history,
+      message: result.message,
+      errorCode: result.errorCode ?? null,
+    },
+  });
 });
 
 // ===========================================

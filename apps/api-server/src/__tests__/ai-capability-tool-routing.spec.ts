@@ -169,6 +169,8 @@ describe('tool eligibility — 자격 없는 tool 은 노출되지 않는다', (
       AI_TOOL_NAMES.SUPPLIER_PRODUCT_LOOKUP,
       // WO-O4O-PHARMACY-WEB-AUTOMATION-CORE-AND-HEALTHKR-ADAPTER-V0: 검색어 입력·링크/버튼 클릭이 있어 REVERSIBLE.
       AI_TOOL_NAMES.PHARMACY_WEB_ENTRYPOINT,
+      // WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0: loop 안에 입력·클릭이 있을 수 있어 REVERSIBLE.
+      AI_TOOL_NAMES.WORK_AGENT_PERFORM,
     ]);
     for (const name of [AI_TOOL_NAMES.DOM_SET_INPUT, AI_TOOL_NAMES.DOM_SELECT_OPTION, AI_TOOL_NAMES.DOM_CLICK]) {
       expect(AI_TOOL_REGISTRY.find((t) => t.name === name)?.effect).toBe('BROWSER_DOM_INTERACTION');

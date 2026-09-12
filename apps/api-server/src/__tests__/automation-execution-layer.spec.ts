@@ -73,12 +73,15 @@ describe('WO-O4O-AUTOMATION-EXECUTION-LAYER-REALIGNMENT-V1', () => {
       const nonComputer = AI_TOOL_REGISTRY.filter((t) => t.automationMethod !== 'computer_use');
       for (const t of nonComputer) {
         const isDomFamily =
-          t.name.startsWith('local.browser.dom.') || t.name.startsWith('local.supplier.') || t.name.startsWith('local.pharmacyweb.');
+          t.name.startsWith('local.browser.dom.') ||
+          t.name.startsWith('local.supplier.') ||
+          t.name.startsWith('local.pharmacyweb.') ||
+          t.name.startsWith('local.workagent.');
         expect(t.automationMethod).toBe(isDomFamily ? 'browser_dom' : 'api');
       }
     });
 
-    it('06. browser_dom 은 local.browser.dom.* 여덟 + Adapter tool 둘(supplier · pharmacyweb) · windows_uia 는 아직 없다 (§27·§28)', () => {
+    it('06. browser_dom 은 local.browser.dom.* 여덟 + Adapter tool 둘(supplier · pharmacyweb) + workagent 하나 · windows_uia 는 아직 없다 (§27·§28)', () => {
       const dom = AI_TOOL_REGISTRY.filter((t) => t.automationMethod === 'browser_dom').map((t) => t.name).sort();
       expect(dom).toEqual(
         [
@@ -86,6 +89,8 @@ describe('WO-O4O-AUTOMATION-EXECUTION-LAYER-REALIGNMENT-V1', () => {
           'local.supplier.product_lookup',
           // WO-O4O-PHARMACY-WEB-AUTOMATION-CORE-AND-HEALTHKR-ADAPTER-V0 §2: 같은 이유.
           'local.pharmacyweb.entrypoint',
+          // WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §14: 관찰·행동이 전부 DOM tool 이다.
+          'local.workagent.perform',
           'local.browser.dom.get_context',
           'local.browser.dom.inspect',
           'local.browser.dom.find',

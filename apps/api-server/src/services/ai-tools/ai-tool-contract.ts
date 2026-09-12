@@ -56,6 +56,7 @@ import {
   supplierQueryDenyReason,
 } from '../local-agent/supplier-site-adapter-contract.js';
 import { validatePharmacyWebEntryArgs } from '../local-agent/pharmacy-web-core.js';
+import { isValidWorkGoalRequest, validateWorkImageInput } from './work-agent-contract.js';
 import type { AutomationMethod, AutomationRiskLevel } from './automation-execution-contract.js';
 import { isComputerUseMethod, computerUseFallbackAllowed } from './automation-execution-contract.js';
 
@@ -318,8 +319,18 @@ export interface AiToolDefinition {
     | DataArgumentSchema
     | DomArgumentSchema
     | SupplierArgumentSchema
-    | PharmacyWebArgumentSchema;
+    | PharmacyWebArgumentSchema
+    | WorkAgentArgumentSchema;
 }
+
+/**
+ * WORK-AGENT V0 §5·§11·§47 인자 형상.
+ *   workAgentGoal → { request, targetHint?, image? }
+ *
+ * request 는 사용자의 자연어 목적, targetHint 는 등재 siteId, image 는 { mimeType, base64 }(메모리에서만). URL · selector ·
+ * elementRef · JS · 좌표 칸은 없다 — 행동은 runtime 안에서 Planner 제안을 검증해 만든다.
+ */
+export type WorkAgentArgumentSchema = 'workAgentGoal';
 
 /**
  * PHARMACY-WEB-CORE V0 §8·§12·§46 인자 형상.
@@ -452,6 +463,8 @@ export const AI_TOOL_NAMES = {
   SUPPLIER_PRODUCT_LOOKUP: 'local.supplier.product_lookup',
   // WO-O4O-PHARMACY-WEB-AUTOMATION-CORE-AND-HEALTHKR-ADAPTER-V0 §2·§8·§12 — 등재 EntryPoint 하나를 실행한다.
   PHARMACY_WEB_ENTRYPOINT: 'local.pharmacyweb.entrypoint',
+  // WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §3·§9 — 목적 기반 Work Loop 1회 실행(관찰 → 계획 → 행동 → 재관찰 → 인계).
+  WORK_AGENT_PERFORM: 'local.workagent.perform',
 } as const;
 
 export type AiToolName = (typeof AI_TOOL_NAMES)[keyof typeof AI_TOOL_NAMES];
@@ -749,6 +762,21 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
     effect: 'BROWSER_DOM_INTERACTION',
     argumentSchema: 'pharmacyWebEntry',
   },
+  // ── Goal-Driven Work Agent V0 (§3·§9·§14) — 등재 site 탭에서 목적 기반 loop 를 1회 돈다. 관찰·행동은 전부 DOM tool 이며
+  //    새 agent action · 새 capability 는 없다. 채팅 라우터가 자동으로 고르지 않는다 — 사용자가 명시적으로 "작업 수행" 을 눌러
+  //    호출한다(§48). riskLevel REVERSIBLE: 입력·클릭이 있을 수 있다. COMMIT · credential 은 확장이 막고 runtime 이 인계한다.
+  {
+    name: AI_TOOL_NAMES.WORK_AGENT_PERFORM,
+    automationMethod: 'browser_dom',
+    riskLevel: 'REVERSIBLE',
+    description:
+      '사용자의 목적을 기준으로 등록된 사이트 탭을 관찰하고, 안전한 범위의 입력·클릭을 수행한 뒤 적절한 지점에서 화면을 사용자에게 넘긴다. 로그인·결제·주문 확정은 하지 않는다.',
+    requiredCapabilities: [AiCapability.LOCAL_BROWSER_DOM_INTERACT],
+    executionMode: 'local',
+    readOnly: false,
+    effect: 'BROWSER_DOM_INTERACTION',
+    argumentSchema: 'workAgentGoal',
+  },
 ]);
 
 export function findToolDefinition(name: string): AiToolDefinition | undefined {
@@ -797,14 +825,16 @@ export function findAutomationInvariantViolations(
     // "구조화 tool 이 computer_use 로 표기되면 drift" 라는 원래 취지는 그대로다.
     const methodIsDom = tool.automationMethod === 'browser_dom';
     // PHARMACY-WEB-CORE V0: `local.pharmacyweb.*` 도 DOM tool 조합이다.
+    // WORK-AGENT V0: `local.workagent.*` 도 DOM tool 조합이다.
     const nameIsDom =
       tool.name.startsWith('local.browser.dom.') ||
       tool.name.startsWith('local.supplier.') ||
-      tool.name.startsWith('local.pharmacyweb.');
+      tool.name.startsWith('local.pharmacyweb.') ||
+      tool.name.startsWith('local.workagent.');
     if (methodIsDom !== nameIsDom) {
       violations.push({
         tool: tool.name,
-        rule: 'automationMethod===browser_dom ⇔ local.browser.dom.* | local.supplier.* | local.pharmacyweb.* 이름',
+        rule: 'automationMethod===browser_dom ⇔ local.browser.dom.* | local.supplier.* | local.pharmacyweb.* | local.workagent.* 이름',
       });
     }
   }
@@ -1007,6 +1037,17 @@ export function validateToolArguments(
     // 약국 웹 EntryPoint 실행(PHARMACY-WEB-CORE V0 §8·§12·§46): **정확히 `{ entryPointId, input }`**.
     // entryPointId 는 등재 · enabled 여야 하고 input 은 intent 별 좁은 형상만 — 검증 논리는 core 단일 출처.
     return validatePharmacyWebEntryArgs(args).ok ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
+  }
+
+  if (schema === 'workAgentGoal') {
+    // Work Agent(WORK-AGENT V0 §5·§47): { request, targetHint?, image? } — URL · selector · elementRef 칸 없음.
+    if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    const a = args as Record<string, unknown>;
+    for (const k of Object.keys(a)) if (!['request', 'targetHint', 'image'].includes(k)) return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    if (!isValidWorkGoalRequest(a.request)) return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    if (a.targetHint !== undefined && !isRegisteredBrowserSite(a.targetHint)) return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    if (!validateWorkImageInput(a.image).ok) return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    return { ok: true };
   }
 
   if (schema === 'dataMetaKey') {

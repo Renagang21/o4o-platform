@@ -22,12 +22,13 @@
  * (`/community`, `/mypage`, `/market-trial` 등)은 NetureLayout 을 그대로 유지한다.
  */
 
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type ClipboardEvent, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { UserCircle, Loader2, ArrowUp } from 'lucide-react';
+import { UserCircle, Loader2, ArrowUp, ImagePlus, Play, X } from 'lucide-react';
 import { useAuth, useLoginModal, useWorkScope } from '../contexts';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { sendHomeChat, HomeChatError, HOME_CHAT_MAX_MESSAGE_LENGTH } from '../lib/ai/home-chat';
+import { isSupportedWorkImage, readWorkImage, runWorkAgent, WorkAgentError, type WorkAgentResult } from '../lib/ai/work-agent';
 
 // ─── 서비스 진입 ──────────────────────────────────────────────────────────────
 // 신규 도메인·route 를 만들지 않는다.
@@ -95,6 +96,48 @@ export default function O4OHomePage() {
    */
   const [openedSite, setOpenedSite] = useState<{ siteId: string; displayName: string } | null>(null);
   const [loginReady, setLoginReady] = useState(false);
+  /**
+   * WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §48 — 최소 진입점. 같은 입력창의 문장을 **목적**으로 보내는 [작업 수행]
+   * 버튼과, 사용자가 붙여넣거나 고른 이미지 한 장(§6·§11). 이미지 · 결과는 React state 뿐이다 — 저장하지 않는다(§23).
+   */
+  const [workImage, setWorkImage] = useState<File | Blob | null>(null);
+  const [workResult, setWorkResult] = useState<WorkAgentResult | null>(null);
+  const [workPending, setWorkPending] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const takeImage = (file: File | Blob | null | undefined) => {
+    if (!file || !isSupportedWorkImage(file)) return false;
+    setWorkImage(file);
+    return true;
+  };
+  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    const item = Array.from(e.clipboardData?.items ?? []).find((it) => it.kind === 'file' && it.type.startsWith('image/'));
+    if (item && takeImage(item.getAsFile())) e.preventDefault();
+  };
+  const handleWork = async () => {
+    if (!trimmed || blocked || workPending) return;
+    if (!isAuthenticated) {
+      openLoginModal();
+      return;
+    }
+    setWorkPending(true);
+    setError(null);
+    setQuestion(trimmed);
+    setAnswer(null);
+    setWorkResult(null);
+    setOpenedSite(null);
+    try {
+      const image = workImage ? await readWorkImage(workImage) : undefined;
+      const result = await runWorkAgent(trimmed, image);
+      setWorkResult(result);
+      setInput('');
+      setWorkImage(null);
+    } catch (err) {
+      setError(err instanceof WorkAgentError ? err.message : '작업을 수행하지 못했습니다. 다시 시도해 주세요.');
+    } finally {
+      setWorkPending(false);
+    }
+  };
 
   const trimmed = input.trim();
   // 매장 scope 해석 중에는 불완전한 컨텍스트로 보내지 않는다(§12).
@@ -135,7 +178,7 @@ export default function O4OHomePage() {
     }
   };
 
-  const hasThread = question !== null || answer !== null || error !== null;
+  const hasThread = question !== null || answer !== null || error !== null || workResult !== null;
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
@@ -176,11 +219,43 @@ export default function O4OHomePage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               maxLength={HOME_CHAT_MAX_MESSAGE_LENGTH}
-              disabled={pending}
+              disabled={pending || workPending}
+              onPaste={handlePaste}
               aria-label="무엇을 도와드릴까요?"
-              placeholder="무엇이든 물어보세요"
-              className="w-full rounded-full border border-slate-200 bg-white py-4 pl-6 pr-14 text-base text-slate-900 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400"
+              placeholder="무엇이든 물어보세요 — 사진을 붙여넣고 [작업 수행]도 가능"
+              className="w-full rounded-full border border-slate-200 bg-white py-4 pl-6 pr-36 text-base text-slate-900 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400"
             />
+            {/* 사용자가 고른 이미지만 처리한다(§6). */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={(e) => {
+                takeImage(e.target.files?.[0]);
+                e.target.value = '';
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={pending || workPending}
+              aria-label="이미지 첨부"
+              title="이미지 첨부(작업 수행에 함께 보냅니다)"
+              className="absolute right-[5.75rem] top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition-colors hover:text-slate-700 disabled:cursor-not-allowed"
+            >
+              <ImagePlus className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={handleWork}
+              disabled={!trimmed || blocked || workPending}
+              aria-label="작업 수행"
+              title="이 문장을 목적으로 등록된 사이트에서 작업을 수행합니다"
+              className="absolute right-12 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-300 text-slate-700 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-300"
+            >
+              {workPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+            </button>
             <button
               type="submit"
               disabled={!trimmed || blocked}
@@ -195,6 +270,15 @@ export default function O4OHomePage() {
             </button>
           </div>
         </form>
+
+        {workImage && (
+          <div className="mt-2 flex w-full max-w-xl items-center gap-2 text-xs text-slate-500">
+            <span>이미지 1장 첨부됨 — [작업 수행] 시 함께 보냅니다(저장되지 않음).</span>
+            <button type="button" onClick={() => setWorkImage(null)} aria-label="이미지 제거" className="rounded-full p-0.5 text-slate-400 hover:text-slate-700">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
 
         {/*
           답변 영역 — 있을 때만 렌더한다. 항상 존재하는 빈 컨테이너를 두면
@@ -211,6 +295,26 @@ export default function O4OHomePage() {
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 응답 생성 중...
               </p>
+            )}
+            {workPending && (
+              <p className="m-0 flex items-center gap-2 text-sm text-slate-400">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                등록된 사이트 화면을 보며 작업 중... (Chrome 탭을 그대로 두세요)
+              </p>
+            )}
+            {/* WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §19·§20 — 결과와 인계 안내. 실제 화면은 Chrome 에 그대로 있다. */}
+            {workResult && !workPending && (
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-[0.95rem] leading-relaxed text-slate-800">
+                <p className="m-0 whitespace-pre-wrap">{workResult.message}</p>
+                <p className="m-0 mt-2 text-xs text-slate-500">
+                  {workResult.goal.displayName} · 행동 {workResult.stepCount}단계 · AI 판단 {workResult.aiPlanCount}회
+                  {workResult.takeover ? ` · 인계 사유 ${workResult.takeover.reason}` : ''}
+                  {workResult.path ? ` · 현재 경로 ${workResult.path}` : ''}
+                </p>
+                {workResult.progress === 'needs_user' && (
+                  <p className="m-0 mt-2 text-sm text-slate-700">Chrome 의 현재 화면에서 직접 이어서 진행하세요. 필요하면 다음 문장으로 다시 요청할 수 있습니다.</p>
+                )}
+              </div>
             )}
             {error && !pending && (
               <p className="m-0 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
