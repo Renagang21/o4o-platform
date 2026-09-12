@@ -1,7 +1,7 @@
 # CHECK-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1
 
 > **WO**: `WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1`
-> **상태**: IMPLEMENTED — 로컬 검증 PASS. production 배포·browser smoke 결과는 §9·§10 에 갱신한다. smoke 미확인이면 CLOSED 아님.
+> **상태**: DEPLOYED + PRODUCTION BROWSER SMOKE PASS (12/12) — §10. smoke 중 발견한 상세 페이지 404 처리 결함 1건은 후속 커밋으로 수정·재배포(§10-A). 최종 CLOSED 판정은 사용자 몫.
 > **작성일**: 2026-09-12
 > **성격**: 얇은 `automation_jobs` 1 테이블 + 기존 Media Library V2(`media_entity_links`) 연결. 영상 생성·편집·렌더링·외부 API 연동 없음.
 
@@ -100,11 +100,32 @@ Job 간 상호 제약이 없다. 테스트 B: 한 Job 이 WAITING(statusNote='�
 ## 9. Migration 결과
 
 - 로컬: 기존 media 4 migration → `CreateAutomationJobs` up → down → up 실제 적용 검증(테스트 첫 항목).
-- production: 배포 workflow 의 자동 migration(`o4o-api-migrations` job)에 맡긴다. 수동 적용 없음. 결과는 배포 후 갱신.
+- production: 구현 커밋 `12cbf4996` → [Deploy API](https://github.com/Renagang21/o4o-platform/actions/runs/34679720227) SUCCESS. `o4o-api-migrations` 실행 `o4o-api-migrations-6xrp7` 로그에 `[X] 675 CreateAutomationJobs20270410000000` 기록 확인(수동 적용 없음). [Deploy Admin](https://github.com/Renagang21/o4o-platform/actions/runs/34679720223) SUCCESS. 같은 push 의 CI Pipeline / CodeQL 은 직후 다른 세션 push 로 concurrency **cancelled** — 로컬 typecheck·lint·jest·vitest 로 대체 확인.
+- 비로그인 HTTP: `/health` 200 · `GET /api/v1/platform/automation-jobs` 401 · `admin.neture.co.kr/automation/video-jobs` 200.
 
-## 10. Production smoke
+## 10. Production smoke (2026-09-12, Playwright MCP, `renariver21` platform:super_admin — 비밀번호는 사용자가 직접 입력)
 
-배포 후 갱신.
+| # | 항목 | 결과 |
+|---|---|---|
+| 1 | 사이드바 `자동화 › 동영상 제작` → 목록 진입 | PASS (빈 목록, 탭 진행 중(0)/완료(0)) |
+| 2 | 새 VIDEO 작업 생성 | PASS — `[SMOKE] 미네락600 제품 설명영상`(지시 포함) |
+| 3 | 작업 3개 생성 후 독립 상태 | PASS — 인바디=WAITING(내레이션 검수), 외국인=DRAFT, 미네락=COMPLETED 로 각각 유지·목록 카운트 정확 |
+| 4 | 실제 Media asset 검색 | PASS — 빈 검색 20건, `q=SMOKE-DISPOSABLE` 1건 정확 |
+| 5 | INPUT 연결 | PASS — E2E-SEL-V2 png |
+| 6 | INTERMEDIATE 연결 | PASS — KPA snapshot png + 신규 등록한 disposable 외부(YouTube) asset. 이미 연결된 항목은 "용도 변경" 표시 |
+| 7 | OUTPUT 연결 | PASS — E2E-CONTENT png |
+| 8 | 완료 처리 (KEEP_OUTPUTS) | PASS — 상태 완료·편집 잠금·completedAt 표시·정리 방침 선택 상태 유지 |
+| 9 | 정리 미리보기 → 실행 | PASS — INPUT 보관 / OUTPUT 보관 / 다른 Job(외국인 INPUT)에 연결된 KPA png = **관계만 해제(LINKED_ELSEWHERE)** / disposable = **삭제 완료**. 실행 후 작업 자료 0건, 결과 표 구분 표시 |
+| 10 | 삭제 차단 / 보존 | PASS — 연결된 INPUT asset `DELETE /media-library/:id` → 409 `MEDIA_IN_USE_LINK`, asset 200 유지. KPA png 는 정리 후에도 존재(200)하고 외국인 Job 링크 유지. disposable 은 검색 0건 |
+| 11 | console error | PASS — 앱 자체 오류 0. 기록된 2건은 smoke 가 의도적으로 보낸 404(잘못된 id probe)·409(삭제 차단 검증) fetch |
+| 12 | navigation dead link | PASS — 사이드바 → 목록 → 상세 → breadcrumb → Media Assets 링크 전부 렌더. UI "연결 해제" 도 PASS |
+
+**원복**: 인바디·외국인 Job → CANCELLED(statusNote "smoke 종료 — 원복"), 외국인 Job 링크 해제, disposable asset 은 정리로 삭제됨. 잔여: `[SMOKE]` Job 3행(삭제 endpoint 는 설계상 없음)과 미네락 Job 의 INPUT/OUTPUT 링크 2건(E2E 픽스처 asset 2개 — 해당 asset 삭제 시 409 로 보호됨). 제거하려면 DB write 승인 필요.
+
+### 10-A. smoke 중 발견·수정
+
+- 존재하지 않는 job id 로 상세 진입 시 "Loading…" 에 머묾. 원인: axios 가 4xx 에서 throw 하므로 `{code:'JOB_NOT_FOUND'}` 가 페이지에 닿지 않음. 수정: `automation-job.api.ts` 의 `call()` 이 응답 본문 code 를 `Error.message` 로 정규화, 상세 페이지에 `loadError` 상태 추가(404 → "작업을 찾을 수 없습니다", 그 외 → 오류 + 목록 링크). typecheck·lint PASS. 재배포 후 재확인 결과는 아래.
+- 범위 밖 관찰(수정 안 함): 기존 Media Assets 목록이 external(youtube) 자산의 파일 크기를 "NaN undefined" 로 표시.
 
 ## 11. 미확인 / 미완료 · 범위 밖 발견
 

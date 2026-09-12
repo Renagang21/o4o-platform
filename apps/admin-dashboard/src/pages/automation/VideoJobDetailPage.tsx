@@ -71,6 +71,7 @@ const VideoJobDetailPage: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>();
   const [job, setJob] = useState<AutomationJobDetail | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [form, setForm] = useState({ title: '', status: 'DRAFT' as JobStatus, statusNote: '', instructions: '' });
   const [saving, setSaving] = useState(false);
 
@@ -95,7 +96,7 @@ const VideoJobDetailPage: React.FC = () => {
       if (j.cleanupDecision) setDecision(j.cleanupDecision);
     } catch (e) {
       if ((e as Error).message === 'JOB_NOT_FOUND') setNotFound(true);
-      else toast.error((e as Error).message);
+      else setLoadError((e as Error).message);
     }
   }, [id]);
   useEffect(() => {
@@ -191,6 +192,13 @@ const VideoJobDetailPage: React.FC = () => {
     return (
       <div className="px-8 py-6 text-sm text-gray-500">
         작업을 찾을 수 없습니다. <Link to="/automation/video-jobs" className="text-blue-600 hover:underline">목록으로</Link>
+      </div>
+    );
+  if (!job && loadError)
+    return (
+      <div className="px-8 py-6 text-sm text-red-600">
+        작업을 불러오지 못했습니다: {loadError}{' '}
+        <Link to="/automation/video-jobs" className="text-blue-600 hover:underline">목록으로</Link>
       </div>
     );
   if (!job) return <div className="px-8 py-6 text-sm text-gray-500">Loading…</div>;

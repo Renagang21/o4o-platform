@@ -103,44 +103,49 @@ const unwrap = <T,>(res: { data?: Envelope<T> }, fallback: string): T => {
   if (!res.data?.success) throw new Error(res.data?.code || res.data?.error || fallback);
   return res.data.data as T;
 };
+/** axios 는 4xx/5xx 에서 throw 하므로 응답 본문의 code 를 Error.message 로 정규화한다 (JOB_NOT_FOUND 등). */
+const call = async <T,>(p: Promise<{ data?: Envelope<T> }>, fallback: string): Promise<T> => {
+  try {
+    return unwrap(await p, fallback);
+  } catch (e) {
+    const body = (e as { response?: { data?: Envelope<T> } }).response?.data;
+    if (body) throw new Error(body.code || body.error || fallback);
+    throw e;
+  }
+};
 const BASE = '/platform/automation-jobs';
 
 export const listJobs = async (status?: JobStatus) =>
-  unwrap<AutomationJobListItem[]>(
-    await authClient.api.get<Envelope<AutomationJobListItem[]>>(`${BASE}${status ? `?status=${status}` : ''}`),
+  call<AutomationJobListItem[]>(authClient.api.get<Envelope<AutomationJobListItem[]>>(`${BASE}${status ? `?status=${status}` : ''}`),
     '작업 목록을 불러오지 못했습니다.',
   );
 export const createJob = async (input: { title: string; instructions?: string }) =>
-  unwrap<AutomationJob>(await authClient.api.post<Envelope<AutomationJob>>(BASE, input), '작업 생성에 실패했습니다.');
+  call<AutomationJob>(authClient.api.post<Envelope<AutomationJob>>(BASE, input), '작업 생성에 실패했습니다.');
 export const getJob = async (id: string) =>
-  unwrap<AutomationJobDetail>(await authClient.api.get<Envelope<AutomationJobDetail>>(`${BASE}/${id}`), '작업을 불러오지 못했습니다.');
+  call<AutomationJobDetail>(authClient.api.get<Envelope<AutomationJobDetail>>(`${BASE}/${id}`), '작업을 불러오지 못했습니다.');
 export const updateJob = async (
   id: string,
   patch: { title?: string; instructions?: string | null; statusNote?: string | null; status?: JobStatus },
-) => unwrap<AutomationJob>(await authClient.api.patch<Envelope<AutomationJob>>(`${BASE}/${id}`, patch), '저장에 실패했습니다.');
+) => call<AutomationJob>(authClient.api.patch<Envelope<AutomationJob>>(`${BASE}/${id}`, patch), '저장에 실패했습니다.');
 export const completeJob = async (id: string, cleanupDecision: CleanupDecision) =>
-  unwrap<AutomationJob>(
-    await authClient.api.post<Envelope<AutomationJob>>(`${BASE}/${id}/complete`, { cleanupDecision }),
+  call<AutomationJob>(authClient.api.post<Envelope<AutomationJob>>(`${BASE}/${id}/complete`, { cleanupDecision }),
     '완료 처리에 실패했습니다.',
   );
 export const linkAsset = async (id: string, mediaAssetId: string, purpose: Purpose) =>
-  unwrap<{ linkId: string }>(
-    await authClient.api.post<Envelope<{ linkId: string }>>(`${BASE}/${id}/assets`, { mediaAssetId, purpose }),
+  call<{ linkId: string }>(authClient.api.post<Envelope<{ linkId: string }>>(`${BASE}/${id}/assets`, { mediaAssetId, purpose }),
     'asset 연결에 실패했습니다.',
   );
 export const unlinkAsset = async (id: string, linkId: string) =>
-  unwrap<void>(await authClient.api.delete<Envelope<void>>(`${BASE}/${id}/assets/${linkId}`), '연결 해제에 실패했습니다.');
+  call<void>(authClient.api.delete<Envelope<void>>(`${BASE}/${id}/assets/${linkId}`), '연결 해제에 실패했습니다.');
 export const previewCleanup = async (id: string, decision: CleanupDecision, keepLinkIds: string[] = []) => {
   const qs = new URLSearchParams({ decision });
   if (keepLinkIds.length) qs.set('keepLinkIds', keepLinkIds.join(','));
-  return unwrap<{ decision: CleanupDecision; items: CleanupItem[] }>(
-    await authClient.api.get<Envelope<{ decision: CleanupDecision; items: CleanupItem[] }>>(`${BASE}/${id}/cleanup-preview?${qs}`),
+  return call<{ decision: CleanupDecision; items: CleanupItem[] }>(authClient.api.get<Envelope<{ decision: CleanupDecision; items: CleanupItem[] }>>(`${BASE}/${id}/cleanup-preview?${qs}`),
     '정리 미리보기에 실패했습니다.',
   );
 };
 export const applyCleanup = async (id: string, decision: CleanupDecision, keepLinkIds: string[] = []) =>
-  unwrap<{ decision: CleanupDecision; items: CleanupItem[] }>(
-    await authClient.api.post<Envelope<{ decision: CleanupDecision; items: CleanupItem[] }>>(`${BASE}/${id}/cleanup`, {
+  call<{ decision: CleanupDecision; items: CleanupItem[] }>(authClient.api.post<Envelope<{ decision: CleanupDecision; items: CleanupItem[] }>>(`${BASE}/${id}/cleanup`, {
       decision,
       keepLinkIds,
     }),
