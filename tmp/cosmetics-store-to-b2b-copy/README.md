@@ -19,7 +19,6 @@ node apps/api-server/src/scripts/cosmetics-store-to-b2b-copy/03-validate.mjs    
 node apps/api-server/src/scripts/cosmetics-store-to-b2b-copy/04-build-apply-sql.mjs  # apply SQL + STORE 기준선 (read-only)
 node apps/api-server/src/scripts/cosmetics-store-to-b2b-copy/05-apply.mjs         # §10 apply (INSERT 전용, 단일 트랜잭션)
 node apps/api-server/src/scripts/cosmetics-store-to-b2b-copy/06-post-verify.mjs   # §11·§12 독립 검증 (read-only)
-node tmp/cosmetics-store-to-b2b-copy/smoke.mjs                                    # §13 소비 API smoke (GET only)
 ```
 
 | 파일 | 내용 |
@@ -34,7 +33,6 @@ node tmp/cosmetics-store-to-b2b-copy/smoke.mjs                                  
 | `apply-result.json.gz` | 적용 결과 + 신규 B2B id 매니페스트 32,674개 |
 | `rollback.sql.gz` | §14 원복 — 이번 배치 신규 B2B 만 삭제 |
 | `post-verify.json` | §11·§12 독립 postVerify (PASS) |
-| `smoke.json` / `smoke.mjs` | §13 같은 제품의 STORE·B2B 동시 조회 확인 (GET only) |
 
 ## 원복
 

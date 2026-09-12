@@ -7,7 +7,8 @@
 
 ```bash
 gunzip -k tmp/cosmetics-retail-census/*.gz            # 선행 census (입력)
-gunzip -k tmp/cosmetics-guide-production/*.gz         # 선행 생산 (입력)
+# 선행 생산(`tmp/cosmetics-guide-production/`)은 저장소에 두지 않는다 — census 에서 결정적으로 재생성한다:
+#   node apps/api-server/src/scripts/cosmetics-guide-production/01-prepare.mjs … 04-aggregate.mjs
 gunzip -k tmp/cosmetics-guide-gap-enrichment/*.gz
 ```
 
@@ -50,8 +51,6 @@ node apps/api-server/src/scripts/cosmetics-guide-gap-enrichment/11-efficiency.mj
 | `baseline-before.txt` / `baseline-after.txt` | 적용 전후 구조 지표 |
 | `post-verify.json` | WO §11 독립 postVerify (PASS) |
 | `efficiency.json` | WO §12 효율 기록 |
-| `negative-control.mjs` | 검증기 음성 대조 — 결함을 주입해 검증기가 잡는지 확인 |
-| `probe-*.mjs` | 원천 접근성·수집 속도·보완 여유분 탐침 (재현용) |
 
 ## 원복
 

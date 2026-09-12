@@ -2,7 +2,7 @@
  * WO §3 · §12 — 추가 원천 확보 시도 결과를 **실측 근거와 함께** 남긴다.
  *
  * 이 파일은 손으로 쓴 요약이 아니라 실제 탐침 결과를 기록한 것이다.
- * 재현: `tmp/cosmetics-guide-gap-enrichment/probe-*.mjs`
+ * 탐침 스크립트(`probe-*.mjs`)는 일회성이라 저장소에 남기지 않았다 — 결과는 `source-availability.json` 이 정본이다.
  */
 import { writeOut } from './lib.mjs';
 

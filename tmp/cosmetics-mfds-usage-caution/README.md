@@ -20,7 +20,6 @@ psql "<proxy>" -At -c "select row_to_json(t) from (...) t" > tmp/cosmetics-mfds-
 node apps/api-server/src/scripts/cosmetics-mfds-usage-caution/01-census.mjs
 node apps/api-server/src/scripts/cosmetics-mfds-usage-caution/02-dry-run.mjs
 node apps/api-server/src/scripts/cosmetics-mfds-usage-caution/03-validate.mjs
-node tmp/cosmetics-mfds-usage-caution/negative-control.mjs      # 검증기 음성 대조
 node apps/api-server/src/scripts/cosmetics-mfds-usage-caution/04-build-apply-sql.mjs
 psql "<proxy>" -f tmp/cosmetics-mfds-usage-caution/apply.sql
 node apps/api-server/src/scripts/cosmetics-mfds-usage-caution/05-post-verify.mjs
@@ -39,8 +38,6 @@ node apps/api-server/src/scripts/cosmetics-mfds-usage-caution/05-post-verify.mjs
 | `apply-log.txt` | 적용 로그 (UPDATE 2,618 / 건너뜀 0) |
 | `baseline-before.txt` / `baseline-after.txt` | 적용 전후 구조 지표 |
 | `post-verify.json` | WO §9 독립 postVerify (PASS) |
-| `negative-control.mjs` | 검증기 음성 대조 — 결함 5종 주입 |
-| `probe-*.mjs` | 원문 형태·판정 분포·게이트 오탐 확인 |
 
 ## 원복
 

@@ -7,7 +7,7 @@
 | 검증일 | 2026-08-11 |
 | 선행 | `WO-O4O-COSMETICS-RETAIL-PRODUCT-CENSUS-V1` (`74657c931`) |
 | 기준문서 | [O4O-COSMETICS-PRODUCT-GUIDE-PRODUCTION-STANDARD-V0](../cosmetics/O4O-COSMETICS-PRODUCT-GUIDE-PRODUCTION-STANDARD-V0.md) |
-| 산출물 | `tmp/cosmetics-guide-production/` ([README](../../tmp/cosmetics-guide-production/README.md)) |
+| 산출물 | `tmp/cosmetics-guide-production/` — 당시 README 는 `c100b6f71` 에서 열람. 생성 산출물이라 `WO-O4O-TMP-OPERATIONAL-RECOVERY-AND-TEMPORARY-ARTIFACT-DISPOSITION-V1` 에서 저장소에서 제거 (census 입력으로 결정적 재생성: `apps/api-server/src/scripts/cosmetics-guide-production/01~05`) |
 | 운영 DB write | **0건** (WO §11) |
 | 영어 설명서 | **0건** (WO §7 — 이번 WO 범위 아님) |
 
