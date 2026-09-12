@@ -50,18 +50,10 @@ jobs:
     - name: Run TypeScript check (App Store packages)
       run: pnpm run typecheck:app-store-packages
 
-    # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1
-    # api-server 는 @o4o/security-core · @o4o/ai-core 등 11개 워크스페이스 패키지의 타입을
-    # package.json "types" → dist/*.d.ts 로 해석한다. 그런데 이 패키지들은 build:packages
-    # 체인에 없어 clean 체크아웃에서 dist 가 아예 없었고, type-check 가 TS2307 193건
-    # (+ 그 여파 4건) 으로 실패한 채 continue-on-error 에 가려져 있었다.
-    # 배포 경로는 정상이었다 — deploy-api.yml 의 "Build API-specific packages" 가 이미 빌드한다.
-    # 하드코딩 목록은 drift 하므로 pnpm 의존성 토폴로지(`^...`)로 빌드한다.
-    - name: Build api-server workspace dependencies
-      run: pnpm --filter '@o4o/api-server^...' run build
-
-    # WO-O4O-VERIFICATION-COMMAND-COVERAGE-RESTORATION-V1 에서 non-blocking 으로 가시화했고,
-    # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1 에서 위 사전 빌드로 실검사 가능해져 blocking 전환.
+    # setup-build-env가 이미 root build:packages를 실행하고, 그 체인에는
+    # build:api-deps (`pnpm --filter "@o4o/api-server^..." run build`)가 포함된다.
+    # 따라서 같은 quality-check runner에서 API dependency를 다시 빌드하지 않는다.
+    # API type-check 자체는 그대로 blocking으로 유지한다.
     - name: Run TypeScript check (api-server)
       run: pnpm --filter @o4o/api-server run type-check
 
