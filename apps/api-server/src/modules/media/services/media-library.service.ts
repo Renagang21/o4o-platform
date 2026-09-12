@@ -9,7 +9,7 @@ import { Storage } from '@google-cloud/storage';
 import { randomUUID } from 'crypto';
 import sharp from 'sharp';
 import { parse as parseHtml } from 'node-html-parser';
-import type { DataSource, Repository } from 'typeorm';
+import type { DataSource, EntityManager, Repository } from 'typeorm';
 import { MediaAsset } from '../entities/MediaAsset.entity.js';
 import logger from '../../../utils/logger.js';
 
@@ -390,7 +390,7 @@ export class MediaLibraryService {
    *     idle_media custom items 는 url 완전일치. 외부 YouTube/Vimeo 는 GCS url 과 매치되지 않아 자연 제외.
    *   - coarse(config::text ILIKE) 로 후보만 좁힌 뒤 정밀 판정(오탐 방지).
    */
-  private async screenSetUsageCount(url: string): Promise<number> {
+  async screenSetUsageCount(url: string): Promise<number> {
     if (!url) return 0;
     const rows: Array<{ config: unknown }> = await this.dataSource.query(
       `SELECT b.config
@@ -416,7 +416,18 @@ export class MediaLibraryService {
    * WO-O4O-SCREEN-SET-MEDIA-DELETE-GUARD-V1: Screen Set 이 참조 중이면 GCS/DB 삭제 거부(사본 이미지 깨짐 방지).
    */
   async deleteAsset(assetId: string): Promise<void> {
-    return this.dataSource.transaction(async manager => {
+    return this.dataSource.transaction(manager => this.deleteAssetIn(manager, assetId));
+  }
+
+  /**
+   * 호출자 트랜잭션 안에서 삭제 (WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1: Job 정리가 link 해제와
+   * asset 삭제를 한 트랜잭션으로 묶기 위해 분리). guard 규칙은 deleteAsset 과 동일하다.
+   *
+   * storage 삭제 실패 시 DB row 를 남기고 MEDIA_STORAGE_DELETE_FAILED 로 throw 한다(트랜잭션 rollback).
+   * 과거에는 warn 후 DB 삭제를 계속해 "삭제 완료"로 보고되면서 GCS object 가 고아로 남았다.
+   * object 가 이미 없는 404 는 삭제된 것으로 본다.
+   */
+  async deleteAssetIn(manager: EntityManager, assetId: string): Promise<void> {
     const repo=manager.getRepository(MediaAsset);
     const asset = await repo.findOne({ where: { id: assetId }, lock: { mode: 'pessimistic_write' } });
     if (!asset) throw new Error('Asset not found');
@@ -434,20 +445,23 @@ export class MediaLibraryService {
       throw err;
     }
 
-    // GCS 삭제 (gcsPath가 있는 경우만)
+    // GCS 삭제 (gcsPath가 있는 경우만) — 실패하면 DB 삭제도 하지 않는다.
     if (asset.gcsPath) {
       try {
         const bucket = this.storage.bucket(this.bucketName);
         await bucket.file(asset.gcsPath).delete();
         logger.info(`[MediaLibrary] GCS deleted: ${asset.gcsPath}`);
       } catch (err) {
-        logger.warn(`[MediaLibrary] GCS delete failed (continuing): ${asset.gcsPath}`, err);
+        if ((err as { code?: unknown })?.code !== 404) {
+          logger.error(`[MediaLibrary] GCS delete failed (asset kept): ${asset.gcsPath}`, err);
+          throw Object.assign(new Error('MEDIA_STORAGE_DELETE_FAILED'), { code: 'MEDIA_STORAGE_DELETE_FAILED' });
+        }
+        logger.warn(`[MediaLibrary] GCS object already absent: ${asset.gcsPath}`);
       }
     }
 
     await repo.remove(asset);
     logger.info(`[MediaLibrary] Deleted asset: ${assetId}`);
-    });
   }
 
   private getExtension(mimeType: string, originalName: string): string {

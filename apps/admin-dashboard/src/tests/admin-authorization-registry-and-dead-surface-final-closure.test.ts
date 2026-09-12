@@ -8,7 +8,8 @@
  *   3  legacy admin/operator 계열은 진입하지 못한다
  *   4  정적 메뉴 전 노드가 명시적 권한 설정을 갖는다
  *   5  미등록 menuId = DENY
- *   6  플랫폼 관리자는 정적 메뉴 전부에 접근한다 (22 → 23, WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1)
+ *   6  플랫폼 관리자는 정적 메뉴 전부에 접근한다 (22 → 23, WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1;
+ *      23 → 24 + 그룹 5 → 6, WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1)
  *   7  플랫폼 전용 API 는 platform:super_admin 만 통과한다
  *   8  /dashboard/business 최종 처리 고정
  *   9  PartnerOps 관리자 런타임 0
@@ -125,15 +126,16 @@ describe('§9-1~3 · 관리자 SPA 진입 floor', () => {
 
 describe('§9-4~6 · 메뉴 권한 정책', () => {
   // WO-O4O-KPA-BRANCH-SERVICE-MEMBER-APPROVAL-UI-V1: core-kpa-branch-service-members 추가 (22 → 23)
-  it('클릭 가능한 정적 메뉴는 23개다', () => {
-    expect(CLICKABLE).toHaveLength(23);
+  // WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1: automation 그룹 + automation-video-jobs 추가 (23 → 24, 헤더 5 → 6)
+  it('클릭 가능한 정적 메뉴는 24개다', () => {
+    expect(CLICKABLE).toHaveLength(24);
   });
 
-  it('4. 정적 메뉴 전 노드(클릭 23 + 그룹 헤더 5)가 명시적 권한 설정을 갖는다', () => {
+  it('4. 정적 메뉴 전 노드(클릭 24 + 그룹 헤더 6)가 명시적 권한 설정을 갖는다', () => {
     const configured = new Set(menuPermissions.map((m) => m.menuId));
     const missing = ALL_NODES.map((n) => n.id).filter((id) => !!id && !configured.has(id));
     expect(missing).toEqual([]);
-    expect(ALL_NODES).toHaveLength(28);
+    expect(ALL_NODES).toHaveLength(30);
   });
 
   it('4-b. 모든 설정 항목이 명시적 역할을 갖는다 (무게이트 항목 0)', () => {

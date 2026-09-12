@@ -170,6 +170,9 @@ import { ProductAiContent } from '../modules/store-ai/entities/product-ai-conten
 // MEDIA LIBRARY (WO-O4O-COMMON-MEDIA-LIBRARY-FOUNDATION-V1)
 import { MediaAsset } from '../modules/media/entities/MediaAsset.entity.js';
 
+// AUTOMATION JOB (WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1)
+import { AutomationJob } from '../modules/automation/entities/AutomationJob.entity.js';
+
 // PRODUCT OCR TEXT (WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1)
 import { ProductOcrText } from '../modules/store-ai/entities/product-ocr-text.entity.js';
 
@@ -1048,6 +1051,8 @@ export const entities = [
   ProductOcrText,
   // MEDIA LIBRARY (WO-O4O-COMMON-MEDIA-LIBRARY-FOUNDATION-V1)
   MediaAsset,
+  // AUTOMATION JOB (WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1)
+  AutomationJob,
   // ============================================================================
   // AI POLICY ENTITIES (WO-O4O-AI-COST-LIMIT-QUOTA-V1 + WO-O4O-AI-BILLING-DATA-SYSTEM-V1)
   // ============================================================================

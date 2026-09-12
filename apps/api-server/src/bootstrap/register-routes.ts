@@ -880,6 +880,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Media Library routes:', mediaLibError);
     }
 
+    // 29d-6. Register Automation Job routes (WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1)
+    try {
+      const { createAutomationJobRouter } = await import('../modules/automation/controllers/automation-job.controller.js');
+      app.use('/api/v1/platform', createAutomationJobRouter(dataSource));
+      logger.info('✅ Automation Job routes registered at /api/v1/platform/automation-jobs/*');
+    } catch (automationJobError) {
+      logger.error('Failed to register Automation Job routes:', automationJobError);
+    }
+
     // 29e. Register Copilot Engine routes (WO-O4O-COPILOT-ENGINE-INTEGRATION-V1)
     try {
       const { createCopilotEngineController } = await import('../copilot/copilot-engine.controller.js');

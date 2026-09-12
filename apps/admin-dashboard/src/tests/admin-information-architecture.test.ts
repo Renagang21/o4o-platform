@@ -73,6 +73,8 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
     '/apps/store',
     // Signage
     '/admin/digital-signage/content',
+    // 자동화 (WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1)
+    '/automation/video-jobs',
   ];
 
   it('메뉴 경로 집합이 canonical 구조와 정확히 일치한다', () => {

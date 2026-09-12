@@ -75,6 +75,7 @@ import {
   Shield,
   Coins,
   UserCheck,
+  Clapperboard,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -102,6 +103,7 @@ export interface MenuItem {
  * CMS                       Contents · Slots · 운영 상태
  * AppStore                  Browse Apps
  * 사이니지 콘텐츠 조회        /admin/digital-signage/content
+ * 자동화                     동영상 제작 (관리자 파일럿)
  * ```
  */
 export const adminMenuStatic: MenuItem[] = [
@@ -344,6 +346,25 @@ export const adminMenuStatic: MenuItem[] = [
     label: '사이니지 콘텐츠 조회',
     icon: <Monitor className="w-5 h-5" />,
     path: '/admin/digital-signage/content',
+  },
+
+  // ============================================
+  // 자동화 — 관리자 파일럿 (WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1)
+  //   동영상 제작 = automation_jobs + Media Library 연결만 관리하는 임시 작업공간.
+  //   영상 생성·편집은 O4O 밖. 일반 사용자/매장 공개는 별도 WO.
+  // ============================================
+  {
+    id: 'automation',
+    label: '자동화',
+    icon: <Clapperboard className="w-5 h-5" />,
+    children: [
+      {
+        id: 'automation-video-jobs',
+        label: '동영상 제작',
+        icon: <Clapperboard className="w-4 h-4" />,
+        path: '/automation/video-jobs',
+      },
+    ],
   },
 ];
 

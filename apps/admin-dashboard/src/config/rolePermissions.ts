@@ -216,6 +216,16 @@ export const menuPermissions: MenuPermission[] = [
     menuId: 'cms-slots',
     roles: [...PLATFORM_ADMIN_ROLES]
   },
+  // WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1 — 그룹 헤더 + leaf.
+  //   백엔드 /api/v1/platform/automation-jobs 는 platform:admin|super_admin 전용.
+  {
+    menuId: 'automation',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
+  {
+    menuId: 'automation-video-jobs',
+    roles: [...PLATFORM_ADMIN_ROLES]
+  },
   {
     menuId: 'digital-signage-content',
     roles: [...PLATFORM_ADMIN_ROLES]

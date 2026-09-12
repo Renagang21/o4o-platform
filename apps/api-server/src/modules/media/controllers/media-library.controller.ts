@@ -262,6 +262,11 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
         res.status(409).json({ success: false, code: error.code, error: '연결 Entity 또는 파생 자산이 있어 삭제할 수 없습니다.' });
         return;
       }
+      // WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1: storage 삭제 실패는 DB row 를 남긴 채 구분 보고(과거엔 '삭제 완료'로 보였다).
+      if (error.code === 'MEDIA_STORAGE_DELETE_FAILED') {
+        res.status(502).json({ success: false, code: 'MEDIA_STORAGE_DELETE_FAILED', error: 'storage 삭제에 실패해 자산을 보존했습니다. 다시 시도해 주세요.' });
+        return;
+      }
       if (error.code === 'MEDIA_IN_USE_SCREEN_SET') {
         res.status(409).json({
           success: false,

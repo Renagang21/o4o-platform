@@ -7,45 +7,50 @@ import {
   MediaCatalogService,
 } from '../services/media-catalog.service.js';
 
+/** platform 관리자 전용 guard — Media V2 관리 API 와 automation job API(동일 경계)가 공유한다. */
+export const requireMediaPlatformAdmin = (req: Request, res: Response, next: NextFunction) => {
+  const user = req.user as { roles?: string[] } | undefined;
+  if (
+    !user?.roles?.some((role) =>
+      ['platform:admin', 'platform:super_admin'].includes(role),
+    )
+  ) {
+    res.status(403).json({ success: false, code: 'PLATFORM_ADMIN_REQUIRED' });
+    return;
+  }
+  next();
+};
+/** MediaCatalogError → {success:false,error,code} 응답 wrapper. */
+export const runMediaCatalog =
+  (fn: (req: Request) => Promise<unknown>, status = 200) =>
+  async (req: Request, res: Response) => {
+    try {
+      if (
+        ['POST', 'PATCH'].includes(req.method) &&
+        (!req.body || typeof req.body !== 'object' || Array.isArray(req.body))
+      )
+        throw new MediaCatalogError('INVALID_BODY');
+      res.status(status).json({ success: true, data: await fn(req) });
+    } catch (error) {
+      if (error instanceof MediaCatalogError) {
+        res
+          .status(error.status)
+          .json({ success: false, error: error.message, code: error.code });
+        return;
+      }
+      if ((error as { code?: string }).code === '23505') {
+        res.status(409).json({ success: false, code: 'LINK_ALREADY_EXISTS' });
+        return;
+      }
+      res.status(500).json({ success: false, code: 'MEDIA_CATALOG_ERROR' });
+    }
+  };
+
 export function createMediaCatalogRouter(ds: DataSource): Router {
   const router = Router();
   const service = new MediaCatalogService(ds);
-  const admin = (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as { roles?: string[] } | undefined;
-    if (
-      !user?.roles?.some((role) =>
-        ['platform:admin', 'platform:super_admin'].includes(role),
-      )
-    ) {
-      res.status(403).json({ success: false, code: 'PLATFORM_ADMIN_REQUIRED' });
-      return;
-    }
-    next();
-  };
-  const run =
-    (fn: (req: Request) => Promise<unknown>, status = 200) =>
-    async (req: Request, res: Response) => {
-      try {
-        if (
-          ['POST', 'PATCH'].includes(req.method) &&
-          (!req.body || typeof req.body !== 'object' || Array.isArray(req.body))
-        )
-          throw new MediaCatalogError('INVALID_BODY');
-        res.status(status).json({ success: true, data: await fn(req) });
-      } catch (error) {
-        if (error instanceof MediaCatalogError) {
-          res
-            .status(error.status)
-            .json({ success: false, error: error.message, code: error.code });
-          return;
-        }
-        if ((error as { code?: string }).code === '23505') {
-          res.status(409).json({ success: false, code: 'LINK_ALREADY_EXISTS' });
-          return;
-        }
-        res.status(500).json({ success: false, code: 'MEDIA_CATALOG_ERROR' });
-      }
-    };
+  const admin = requireMediaPlatformAdmin;
+  const run = runMediaCatalog;
   router.post(
     '/media-library/external',
     authenticate,
