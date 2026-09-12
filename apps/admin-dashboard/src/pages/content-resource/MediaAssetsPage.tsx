@@ -9,6 +9,7 @@
  * 이번 WO 범위: media_assets metadata 조회·수정(검색 화면·통합검색은 후속).
  * 파일 속성(url/gcs_path/file_name/original_name)은 편집 불가(읽기 전용 표시).
  */
+import { ExternalMediaForm, MediaCatalogPanel } from './MediaCatalogPanel';
 import React, { useEffect, useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { formatDate, formatFileSize } from '@/lib/utils';
@@ -47,20 +48,23 @@ const MediaAssetsPage: React.FC = () => {
   const [source, setSource] = useState('');
   const [usageType, setUsageType] = useState('');
   const [status, setStatus] = useState('');
+  const [page, setPage] = useState(1);
+  const [catalogFilters,setCatalogFilters] = useState<Partial<MediaAssetSearchParams>>({});
 
   const doFetch = useCallback(async (override?: Partial<MediaAssetSearchParams>) => {
     setLoading(true);
-    const params: MediaAssetSearchParams = { page: 1, limit: 100, q, type, language, source, usageType, status, ...override };
+    const params: MediaAssetSearchParams = { page: 1, limit: 20, q, type, language, source, usageType, status, ...catalogFilters, ...override };
     try {
       const res = await listMediaAssets(params);
       setAssets(res.data);
       setTotal(res.total);
+      setPage(res.page);
     } catch {
       toast.error('미디어 자산을 불러오지 못했습니다.');
     } finally {
       setLoading(false);
     }
-  }, [q, type, language, source, usageType, status]);
+  }, [q, type, language, source, usageType, status, catalogFilters]);
 
   useEffect(() => {
     doFetch();
@@ -70,7 +74,9 @@ const MediaAssetsPage: React.FC = () => {
 
   const handleReset = () => {
     setQ(''); setType(''); setLanguage(''); setSource(''); setUsageType(''); setStatus('');
-    doFetch({ q: '', type: '', language: '', source: '', usageType: '', status: '' });
+    const cleared=Object.fromEntries(Object.keys(catalogFilters).map(k=>[k,'']));
+    setCatalogFilters({});
+    doFetch({ q: '', type: '', language: '', source: '', usageType: '', status: '', ...cleared });
   };
 
   if (loading && assets.length === 0) {
@@ -91,6 +97,7 @@ const MediaAssetsPage: React.FC = () => {
           제목·설명·태그 등 서술 메타데이터만 수정됩니다. (총 {total}건)
         </p>
 
+        <ExternalMediaForm onCreated={()=>void doFetch()}/>
         {/* WO-O4O-CONTENT-RESOURCE-UNIFIED-SEARCH-V1: Metadata 검색/필터 바 (AND) */}
         <div className="bg-white border rounded p-3 mb-4 flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1">
@@ -128,10 +135,12 @@ const MediaAssetsPage: React.FC = () => {
             placeholder="상태(Status)"
             className="w-28 px-2 py-1.5 text-sm border border-gray-300 rounded"
           />
+          {Object.entries({originType:['original','edited','ai_generated','external'],provider:['gcs','youtube','o4o'],storageType:['internal','external'],qaStatus:['PENDING','APPROVED','REJECTED'],productAccuracyLevel:['EXACT','ACCEPTABLE','SUPPORT_ONLY','REJECTED'],commercialUseAllowed:['true','false'],attributionRequired:['true','false']}).map(([key,values])=><label key={key} className="text-xs">{key}<select className="border rounded p-1 ml-1" value={String(catalogFilters[key as keyof MediaAssetSearchParams]||'')} onChange={e=>{const value=e.target.value;setCatalogFilters(v=>({...v,[key]:value}));void doFetch({[key]:value});}}><option value="">전체</option>{values.map(v=><option key={v}>{v}</option>)}</select></label>)}
+          {['rightsType','entityType','entityId'].map(key=><label key={key} className="text-xs">{key}<input className="border rounded p-1 w-32 ml-1" value={String(catalogFilters[key as keyof MediaAssetSearchParams]||'')} onChange={e=>setCatalogFilters(v=>({...v,[key]:e.target.value}))} onKeyDown={e=>{if(e.key==='Enter')void doFetch();}}/></label>)}
           <button onClick={handleReset} className="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 text-gray-600">초기화</button>
         </div>
 
-        <div className="bg-white border rounded">
+        <div className="bg-white border rounded overflow-x-auto">
           <table className="w-full">
             <thead className="border-b bg-gray-50">
               <tr>
@@ -148,8 +157,8 @@ const MediaAssetsPage: React.FC = () => {
                 <tr key={a.id} className="border-b hover:bg-gray-50">
                   <td className="px-3 py-3">
                     <div className="flex items-center gap-3">
-                      {a.assetType === 'image' ? (
-                        <img src={a.url} alt={a.title || a.originalName} className="w-14 h-14 object-cover rounded border" loading="lazy" />
+                      {a.assetType === 'image' || a.thumbnailUrl ? (
+                        <img src={a.thumbnailUrl || a.url} alt={a.title || a.originalName} className="w-14 h-14 object-cover rounded border" loading="lazy" />
                       ) : (
                         <div className="w-14 h-14 rounded border bg-gray-100 flex items-center justify-center text-[10px] text-gray-400">
                           {a.assetType}
@@ -180,7 +189,9 @@ const MediaAssetsPage: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-3 py-3 text-xs text-gray-600">
-                    <div>{a.folder}</div>
+                    <div>{a.provider} / {a.storageType}</div>
+                    <div>{a.originType || '미지정'} · {a.qaStatus || '미검수'}</div>
+                    <div className="text-gray-400">보조 폴더: {a.folder}</div>
                     <div className="text-gray-400">{a.assetType}</div>
                   </td>
                   <td className="px-3 py-3 text-xs text-gray-500">{formatDate(a.createdAt)}</td>
@@ -204,9 +215,11 @@ const MediaAssetsPage: React.FC = () => {
         </div>
       </div>
 
+      <div className="px-8 pb-5 flex gap-3 items-center text-sm"><button disabled={loading||page<=1} onClick={()=>void doFetch({page:page-1})}>이전</button><span>{page} / {Math.max(1,Math.ceil(total/20))}</span><button disabled={loading||page*20>=total} onClick={()=>void doFetch({page:page+1})}>다음</button></div>
       {editing && (
         <MetadataEditModal
           asset={editing}
+          onCatalogUpdated={updated=>{setEditing(updated);setAssets(prev=>prev.map(a=>a.id===updated.id?updated:a));}}
           saving={saving}
           onClose={() => setEditing(null)}
           onSave={async (patch) => {
@@ -234,7 +247,8 @@ const MetadataEditModal: React.FC<{
   saving: boolean;
   onClose: () => void;
   onSave: (patch: MediaAssetMetadataPatch) => void;
-}> = ({ asset, saving, onClose, onSave }) => {
+  onCatalogUpdated: (asset: MediaAssetAdmin) => void;
+}> = ({ asset, saving, onClose, onSave, onCatalogUpdated }) => {
   const [title, setTitle] = useState(asset.title ?? '');
   const [description, setDescription] = useState(asset.description ?? '');
   const [tags, setTags] = useState(toCsv(asset.tags));
@@ -296,6 +310,7 @@ const MetadataEditModal: React.FC<{
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
         </div>
 
+        <div className="px-5 pt-3 overflow-y-auto max-h-[45vh]"><MediaCatalogPanel asset={asset} onUpdated={onCatalogUpdated}/></div>
         {/* 탭: 메타데이터 / 사용처 (WO-O4O-CONTENT-RESOURCE-USAGE-TRACE-V1) */}
         <div className="px-5 pt-3 flex gap-1 border-b">
           <button

@@ -59,6 +59,12 @@ export interface MediaAssetAdmin {
   consentedAt: string;
   createdAt: string;
   updatedAt: string;
+  storageType: string; provider: string; externalUrl: string | null; externalId: string | null;
+  thumbnailUrl: string | null; parentAssetId: string | null; rootAssetId: string | null;
+  derivationType: string | null; originType: string | null; generationProvider: string | null;
+  generationModel: string | null; promptRef: string | null; generationJobId: string | null;
+  qaStatus: string | null; productAccuracyLevel: string | null; rightsType: string | null;
+  commercialUseAllowed: boolean | null; sourceUrl: string | null; attributionRequired: boolean | null;
   // Content Resource metadata
   title: string | null;
   description: string | null;
@@ -87,6 +93,9 @@ export interface MediaAssetMetadataPatch {
 
 /** media_assets 검색 파라미터 — WO-O4O-CONTENT-RESOURCE-UNIFIED-SEARCH-V1 */
 export interface MediaAssetSearchParams {
+  originType?: string; provider?: string; storageType?: string; qaStatus?: string;
+  productAccuracyLevel?: string; rightsType?: string; entityType?: string; entityId?: string;
+  commercialUseAllowed?: string; attributionRequired?: string;
   page?: number;
   limit?: number;
   folder?: string;
@@ -114,6 +123,9 @@ export async function listMediaAssets(
   if (params.source) qs.set('source', params.source);
   if (params.usageType) qs.set('usageType', params.usageType);
   if (params.status) qs.set('status', params.status);
+  for (const key of ['originType','provider','storageType','qaStatus','productAccuracyLevel','rightsType','entityType','entityId','commercialUseAllowed','attributionRequired'] as const) {
+    if (params[key]) qs.set(key,params[key]!);
+  }
   const res = await authClient.api.get<{ success: boolean; data?: MediaAssetAdmin[]; total?: number; page?: number; limit?: number }>(
     `/platform/media-library?${qs.toString()}`,
   );

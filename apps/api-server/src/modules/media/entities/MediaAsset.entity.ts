@@ -26,8 +26,8 @@ export class MediaAsset {
   @Column({ type: 'text' })
   url!: string;
 
-  @Column({ name: 'gcs_path', type: 'text' })
-  gcsPath!: string;
+  @Column({ name: 'gcs_path', type: 'text', nullable: true })
+  gcsPath!: string | null;
 
   @Column({ name: 'file_name', type: 'varchar', length: 500 })
   fileName!: string;
@@ -108,6 +108,63 @@ export class MediaAsset {
   /** 메타데이터 최종 수정자 (uploaded_by=최초 등록자와 별개). */
   @Column({ name: 'updated_by', type: 'uuid', nullable: true })
   updatedBy!: string | null;
+
+  @Column({ name: 'storage_type', type: 'varchar', length: 20, default: 'internal' })
+  storageType!: string;
+
+  @Column({ name: 'provider', type: 'varchar', length: 20, default: 'gcs' })
+  provider!: string;
+
+  @Column({ name: 'external_url', type: 'text', nullable: true })
+  externalUrl!: string | null;
+
+  @Column({ name: 'external_id', type: 'varchar', length: 255, nullable: true })
+  externalId!: string | null;
+
+  @Column({ name: 'thumbnail_url', type: 'text', nullable: true })
+  thumbnailUrl!: string | null;
+
+  @Column({ name: 'parent_asset_id', type: 'uuid', nullable: true })
+  parentAssetId!: string | null;
+
+  @Column({ name: 'root_asset_id', type: 'uuid', nullable: true })
+  rootAssetId!: string | null;
+
+  @Column({ name: 'derivation_type', type: 'varchar', length: 40, nullable: true })
+  derivationType!: string | null;
+
+  @Column({ name: 'origin_type', type: 'varchar', length: 20, nullable: true })
+  originType!: string | null;
+
+  @Column({ name: 'generation_provider', type: 'varchar', length: 100, nullable: true })
+  generationProvider!: string | null;
+
+  @Column({ name: 'generation_model', type: 'varchar', length: 200, nullable: true })
+  generationModel!: string | null;
+
+  @Column({ name: 'prompt_ref', type: 'varchar', length: 500, nullable: true })
+  promptRef!: string | null;
+
+  @Column({ name: 'generation_job_id', type: 'varchar', length: 200, nullable: true })
+  generationJobId!: string | null;
+
+  @Column({ name: 'qa_status', type: 'varchar', length: 20, nullable: true })
+  qaStatus!: string | null;
+
+  @Column({ name: 'product_accuracy_level', type: 'varchar', length: 20, nullable: true })
+  productAccuracyLevel!: string | null;
+
+  @Column({ name: 'rights_type', type: 'varchar', length: 100, nullable: true })
+  rightsType!: string | null;
+
+  @Column({ name: 'commercial_use_allowed', type: 'boolean', nullable: true })
+  commercialUseAllowed!: boolean | null;
+
+  @Column({ name: 'source_url', type: 'text', nullable: true })
+  sourceUrl!: string | null;
+
+  @Column({ name: 'attribution_required', type: 'boolean', nullable: true })
+  attributionRequired!: boolean | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

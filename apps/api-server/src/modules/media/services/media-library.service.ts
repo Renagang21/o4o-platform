@@ -226,6 +226,9 @@ export class MediaLibraryService {
     source?: string;
     usageType?: string;
     status?: string;
+    originType?: string; provider?: string; storageType?: string; qaStatus?: string;
+    productAccuracyLevel?: string; rightsType?: string; entityType?: string; entityId?: string;
+    commercialUseAllowed?: string; attributionRequired?: string;
   }): Promise<{ data: MediaAsset[]; total: number; page: number; limit: number }> {
     const page = Math.max(1, options.page || 1);
     const limit = Math.min(100, Math.max(1, options.limit || 20));
@@ -233,7 +236,7 @@ export class MediaLibraryService {
 
     const qb = this.repo.createQueryBuilder('m')
       .where('m.is_library_public = true')
-      .orderBy('m.created_at', 'DESC');
+      .orderBy('m.created_at', 'DESC').addOrderBy('m.id', 'DESC');
 
     // Type(asset_type) — 파일 종류 필터
     if (options.assetType) {
@@ -251,6 +254,19 @@ export class MediaLibraryService {
     if (options.usageType) qb.andWhere('m.usage_type = :usageType', { usageType: options.usageType });
     if (options.status) qb.andWhere('m.status = :status', { status: options.status });
 
+    const filters = {originType:'origin_type',provider:'provider',storageType:'storage_type',qaStatus:'qa_status',productAccuracyLevel:'product_accuracy_level',rightsType:'rights_type'} as const;
+    for (const [key,column] of Object.entries(filters)) {
+      const value=options[key as keyof typeof filters];
+      if (value) qb.andWhere('m.'+column+' = :'+key,{[key]:value});
+    }
+    for (const [key,column] of [['commercialUseAllowed','commercial_use_allowed'],['attributionRequired','attribution_required']] as const) {
+      if (options[key] === 'true' || options[key] === 'false') qb.andWhere('m.'+column+' = :'+key,{[key]:options[key] === 'true'});
+    }
+    if (options.entityType || options.entityId) {
+      qb.andWhere('EXISTS (SELECT 1 FROM media_entity_links el WHERE el.media_asset_id=m.id'+
+        (options.entityType?' AND el.entity_type=:entityType':'')+(options.entityId?' AND el.entity_id=:entityId':'')+')',
+        {entityType:options.entityType,entityId:options.entityId});
+    }
     // 검색어(q) — title/description/memo(ILIKE 부분) + keywords/tags(jsonb::text ILIKE). (§9)
     const q = options.q?.trim();
     if (q) {
@@ -400,9 +416,17 @@ export class MediaLibraryService {
    * WO-O4O-SCREEN-SET-MEDIA-DELETE-GUARD-V1: Screen Set 이 참조 중이면 GCS/DB 삭제 거부(사본 이미지 깨짐 방지).
    */
   async deleteAsset(assetId: string): Promise<void> {
-    const asset = await this.repo.findOne({ where: { id: assetId } });
+    return this.dataSource.transaction(async manager => {
+    const repo=manager.getRepository(MediaAsset);
+    const asset = await repo.findOne({ where: { id: assetId }, lock: { mode: 'pessimistic_write' } });
     if (!asset) throw new Error('Asset not found');
 
+    const links=await manager.query('SELECT 1 FROM media_entity_links WHERE media_asset_id=$1 LIMIT 1',[assetId]);
+    const descendants=await manager.query('SELECT 1 FROM media_assets WHERE parent_asset_id=$1 OR root_asset_id=$1 LIMIT 1',[assetId]);
+    if (links.length || descendants.length) {
+      const code=links.length?'MEDIA_IN_USE_LINK':'MEDIA_IN_USE_DERIVATION';
+      throw Object.assign(new Error(code),{code});
+    }
     // Screen Set 사용 가드 — GCS/DB 삭제 이전에 확인(사용 중이면 아무것도 지우지 않는다).
     if (asset.url && (await this.screenSetUsageCount(asset.url)) > 0) {
       const err = new Error('MEDIA_IN_USE_SCREEN_SET') as Error & { code?: string };
@@ -421,8 +445,9 @@ export class MediaLibraryService {
       }
     }
 
-    await this.repo.remove(asset);
+    await repo.remove(asset);
     logger.info(`[MediaLibrary] Deleted asset: ${assetId}`);
+    });
   }
 
   private getExtension(mimeType: string, originalName: string): string {

@@ -11,9 +11,11 @@ import { authenticate } from '../../../middleware/auth.middleware.js';
 import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import { MediaLibraryService } from '../services/media-library.service.js';
 import logger from '../../../utils/logger.js';
+import { createMediaCatalogRouter } from './media-catalog.controller.js';
 
 export function createMediaLibraryRouter(dataSource: DataSource): Router {
   const router = Router();
+  router.use(createMediaCatalogRouter(dataSource));
 
   /**
    * POST /media-library/upload
@@ -64,6 +66,9 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
    */
   router.get('/media-library', authenticate, async (req: any, res: Response) => {
     try {
+      if ((req.query.entityType || req.query.entityId) && !req.user?.roles?.some((role:string)=>['platform:admin','platform:super_admin'].includes(role))) {
+        res.status(403).json({success:false,code:'PLATFORM_ADMIN_REQUIRED'}); return;
+      }
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       // WO-O4O-CONTENT-RESOURCE-UNIFIED-SEARCH-V1: type(=asset_type) 는 type/assetType 둘 다 허용(alias)
@@ -76,7 +81,7 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
       const status = req.query.status as string | undefined;
 
       const service = new MediaLibraryService(dataSource);
-      const result = await service.list({ page, limit, assetType, folder, q, language, source, usageType, status });
+      const result = await service.list({ page, limit, assetType, folder, q, language, source, usageType, status, ...Object.fromEntries(['originType','provider','storageType','qaStatus','productAccuracyLevel','rightsType','entityType','entityId','commercialUseAllowed','attributionRequired'].filter(k => typeof req.query[k] === 'string').map(k => [k, req.query[k]])) });
 
       res.json({ success: true, ...result });
     } catch (error: any) {
@@ -253,6 +258,10 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
         return;
       }
       // WO-O4O-SCREEN-SET-MEDIA-DELETE-GUARD-V1: Screen Set 사용 중 → 409 로 삭제 거부.
+      if (['MEDIA_IN_USE_LINK', 'MEDIA_IN_USE_DERIVATION'].includes(error.code)) {
+        res.status(409).json({ success: false, code: error.code, error: '연결 Entity 또는 파생 자산이 있어 삭제할 수 없습니다.' });
+        return;
+      }
       if (error.code === 'MEDIA_IN_USE_SCREEN_SET') {
         res.status(409).json({
           success: false,
