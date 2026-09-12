@@ -28,6 +28,7 @@ const log = {
 
 const ROOT_DIR = resolve(import.meta.dirname, '..');
 const isWindows = platform() === 'win32';
+const packagesAlreadyPrebuilt = process.env.O4O_PACKAGES_PREBUILT === '1';
 
 /**
  * Execute a command synchronously
@@ -321,18 +322,22 @@ function runTypeCheckFrontend() {
   log.info('Running TypeScript checks (Frontend only)...');
   const t = createFailureTracker();
 
-  // Build packages first.
-  // 주의: 이 목록은 배포 산출물 목록(SSOT = 루트 `build:packages`)이 아니라, 타입 해석에
-  // 필요한 **최소 사전 빌드** 대상이다. `npx tsc` 로 in-place 빌드한다(buildPackages 참조).
-  const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'account-ui'];
+  // 로컬/독립 실행에서는 clean checkout 의 stale/missing dist 를 막기 위해 사전 빌드를 유지한다.
+  // setup-build-env가 실제 build:packages를 성공한 GitHub Actions 경로에서만
+  // O4O_PACKAGES_PREBUILT=1 이 설정되며, 이 경우 동일 package 빌드를 반복하지 않는다.
+  if (packagesAlreadyPrebuilt) {
+    log.info('Skipping frontend package prebuild (setup-build-env already completed build:packages).');
+  } else {
+    const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'account-ui'];
 
-  log.info('Building packages...');
-  buildDistTypedPackages(t);
-  for (const pkg of packages) {
-    const pkgPath = join('packages', pkg);
-    if (existsSync(join(ROOT_DIR, pkgPath))) {
-      console.log(`  - Building @o4o/${pkg}`);
-      t.track(`build packages/${pkg}`, exec('npx tsc', join(ROOT_DIR, pkgPath)));
+    log.info('Building packages...');
+    buildDistTypedPackages(t);
+    for (const pkg of packages) {
+      const pkgPath = join('packages', pkg);
+      if (existsSync(join(ROOT_DIR, pkgPath))) {
+        console.log(`  - Building @o4o/${pkg}`);
+        t.track(`build packages/${pkg}`, exec('npx tsc', join(ROOT_DIR, pkgPath)));
+      }
     }
   }
 
