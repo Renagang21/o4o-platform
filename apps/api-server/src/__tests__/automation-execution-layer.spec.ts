@@ -68,17 +68,21 @@ describe('WO-O4O-AUTOMATION-EXECUTION-LAYER-REALIGNMENT-V1', () => {
       expect(computerTools.map((t) => t.name).sort()).toEqual(
         ['local.computer.click', 'local.computer.inspect', 'local.computer.key', 'local.computer.type_text'].sort(),
       );
-      // WO-O4O-BROWSER-DOM-CONTROL-V0: browser_dom 은 local.browser.dom.* 여덟뿐, 그 밖은 전부 api.
+      // WO-O4O-BROWSER-DOM-CONTROL-V0: browser_dom 은 local.browser.dom.* 여덟 + SUPPLIER-SITE-ADAPTER-V0 의
+      // local.supplier.* (DOM tool 조합 — 자기 실행기 없음). 그 밖은 전부 api.
       const nonComputer = AI_TOOL_REGISTRY.filter((t) => t.automationMethod !== 'computer_use');
       for (const t of nonComputer) {
-        expect(t.automationMethod).toBe(t.name.startsWith('local.browser.dom.') ? 'browser_dom' : 'api');
+        const isDomFamily = t.name.startsWith('local.browser.dom.') || t.name.startsWith('local.supplier.');
+        expect(t.automationMethod).toBe(isDomFamily ? 'browser_dom' : 'api');
       }
     });
 
-    it('06. browser_dom 은 BROWSER-DOM-CONTROL-V0 의 local.browser.dom.* 여덟뿐 · windows_uia 는 아직 없다 (§27·§28)', () => {
+    it('06. browser_dom 은 local.browser.dom.* 여덟 + local.supplier.product_lookup 하나 · windows_uia 는 아직 없다 (§27·§28)', () => {
       const dom = AI_TOOL_REGISTRY.filter((t) => t.automationMethod === 'browser_dom').map((t) => t.name).sort();
       expect(dom).toEqual(
         [
+          // WO-O4O-SUPPLIER-SITE-ADAPTER-V0 §6·§7: Adapter 는 DOM tool 조합이므로 같은 수단으로 표기된다.
+          'local.supplier.product_lookup',
           'local.browser.dom.get_context',
           'local.browser.dom.inspect',
           'local.browser.dom.find',

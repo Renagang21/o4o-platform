@@ -51,6 +51,10 @@ import {
   domInputDenyReason,
   validateDomFindQuery,
 } from '../local-agent/browser-dom-contract.js';
+import {
+  isRegisteredSupplierAdapter,
+  supplierQueryDenyReason,
+} from '../local-agent/supplier-site-adapter-contract.js';
 import type { AutomationMethod, AutomationRiskLevel } from './automation-execution-contract.js';
 import { isComputerUseMethod, computerUseFallbackAllowed } from './automation-execution-contract.js';
 
@@ -305,8 +309,25 @@ export interface AiToolDefinition {
    * 받는 인자의 형상. 생략하면 **인자 없음**이다(V0 기본).
    * `appId` 는 `{ appId }` 하나만 허용하며, 값은 Windows App Registry 등재분이어야 한다(§9).
    */
-  argumentSchema?: 'none' | 'appId' | 'siteId' | ComputerArgumentSchema | DataArgumentSchema | DomArgumentSchema;
+  argumentSchema?:
+    | 'none'
+    | 'appId'
+    | 'siteId'
+    | ComputerArgumentSchema
+    | DataArgumentSchema
+    | DomArgumentSchema
+    | SupplierArgumentSchema;
 }
+
+/**
+ * SUPPLIER-SITE-ADAPTER-V0 §8·§9·§10 인자 형상.
+ *   supplierQuery → { supplierId, query }
+ *
+ * `supplierId` 는 Adapter 등재부에 있어야 하고, `query` 는 사용자가 말한 상품명(또는 O4O 내부
+ * 후보명)인 짧은 문자열이다. siteId · URL · selector · elementRef · 수량 · 주문 칸은 **없다** —
+ * 대상 site 는 Adapter 정의에서 나오고(§6), 장바구니·주문은 이번 범위 밖이다(§3).
+ */
+export type SupplierArgumentSchema = 'supplierQuery';
 
 /**
  * BROWSER-DOM-CONTROL-V0 §9·§15·§17·§18·§21·§22·§26 인자 형상. 전부 `siteId`(등재분)를 포함한다.
@@ -416,6 +437,8 @@ export const AI_TOOL_NAMES = {
   DOM_SELECT_OPTION: 'local.browser.dom.select_option',
   DOM_CLICK: 'local.browser.dom.click',
   DOM_READ_TABLE: 'local.browser.dom.read_table',
+  // WO-O4O-SUPPLIER-SITE-ADAPTER-V0 §8·§9·§15 — 공급처 화면 한 곳에서 상품 1건의 가격·재고를 읽는다.
+  SUPPLIER_PRODUCT_LOOKUP: 'local.supplier.product_lookup',
 } as const;
 
 export type AiToolName = (typeof AI_TOOL_NAMES)[keyof typeof AI_TOOL_NAMES];
@@ -679,6 +702,24 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
     effect: 'BROWSER_DOM_INTERACTION',
     argumentSchema: 'domTarget',
   },
+  // ── Supplier Site Adapter V0 (§2·§6·§8·§15) — 등재 공급처 화면에서 상품 1건의 가격·재고·주문가능
+  //    여부를 읽어 O4O 표준 결과로 돌려준다. 실행은 전부 `local.browser.dom.*` 경유다(§7).
+  //
+  //    riskLevel 은 REVERSIBLE 이다 — 결과는 조회지만 과정에 검색어 입력 · 검색 버튼 클릭이 있다.
+  //    장바구니 · 수량 · 주문 확정 · 결제는 이 tool 로 표현할 수 없다(§3 범위 밖, 인자에 칸이 없다).
+  //    새 capability 를 만들지 않는다 — DOM 상호작용 자격을 그대로 쓴다(§2 "새 권한 체계가 아니다").
+  {
+    name: AI_TOOL_NAMES.SUPPLIER_PRODUCT_LOOKUP,
+    automationMethod: 'browser_dom',
+    riskLevel: 'REVERSIBLE',
+    description:
+      '등재된 공급처 화면에서 상품 하나를 검색해 표시된 가격·재고·주문 가능 여부를 읽는다. 장바구니·주문·결제는 하지 않는다.',
+    requiredCapabilities: [AiCapability.LOCAL_BROWSER_DOM_INTERACT],
+    executionMode: 'local',
+    readOnly: false,
+    effect: 'BROWSER_DOM_INTERACTION',
+    argumentSchema: 'supplierQuery',
+  },
 ]);
 
 export function findToolDefinition(name: string): AiToolDefinition | undefined {
@@ -722,10 +763,16 @@ export function findAutomationInvariantViolations(
       violations.push({ tool: tool.name, rule: 'computer_use tool 은 자동 fallback 허용 위험 등급이어야 함(§17·§19)' });
     }
     // BROWSER-DOM-CONTROL-V0 §39: browser_dom ⇔ `local.browser.dom.*` 이름. 열기 축(local.browser.*)은 api 다.
+    // SUPPLIER-SITE-ADAPTER-V0 §6·§7 에서 한 갈래가 늘었다 — Adapter(`local.supplier.*`)는 자기 실행기를
+    // 갖지 않고 DOM tool 을 조합하므로 automationMethod 가 browser_dom 이어야 한다. 이름 집합만 넓히고
+    // "구조화 tool 이 computer_use 로 표기되면 drift" 라는 원래 취지는 그대로다.
     const methodIsDom = tool.automationMethod === 'browser_dom';
-    const nameIsDom = tool.name.startsWith('local.browser.dom.');
+    const nameIsDom = tool.name.startsWith('local.browser.dom.') || tool.name.startsWith('local.supplier.');
     if (methodIsDom !== nameIsDom) {
-      violations.push({ tool: tool.name, rule: 'automationMethod===browser_dom ⇔ local.browser.dom.* 이름' });
+      violations.push({
+        tool: tool.name,
+        rule: 'automationMethod===browser_dom ⇔ local.browser.dom.* | local.supplier.* 이름',
+      });
     }
   }
   return violations;
@@ -906,6 +953,21 @@ export function validateToolArguments(
                 domInputDenyReason(a.text) === null
               : keys === 'option,siteId,target' && shortText(a.target) && shortText(a.option);
     return ok ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
+  }
+
+  if (schema === 'supplierQuery') {
+    // 공급처 조회 tool (SUPPLIER-SITE-ADAPTER-V0 §8·§9·§10): **정확히 `{ supplierId, query }`**.
+    // supplierId 는 Adapter 등재부 등재분이어야 한다 — 모델이 만든 공급처 이름은 여기서 끝난다(§27).
+    // siteId · url · selector · 수량 · 주문 칸은 형상에 없다(§3 장바구니·주문 범위 밖).
+    if (!args || typeof args !== 'object' || Array.isArray(args)) {
+      return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    }
+    const a = args as Record<string, unknown>;
+    if (Object.keys(a).sort().join(',') !== 'query,supplierId') {
+      return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    }
+    if (!isRegisteredSupplierAdapter(a.supplierId)) return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    return supplierQueryDenyReason(a.query) === null ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
   }
 
   if (schema === 'dataMetaKey') {

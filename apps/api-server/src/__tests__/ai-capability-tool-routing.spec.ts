@@ -165,6 +165,8 @@ describe('tool eligibility — 자격 없는 tool 은 노출되지 않는다', (
       AI_TOOL_NAMES.DOM_SET_INPUT,
       AI_TOOL_NAMES.DOM_SELECT_OPTION,
       AI_TOOL_NAMES.DOM_CLICK,
+      // WO-O4O-SUPPLIER-SITE-ADAPTER-V0: 조회 결과지만 과정에 검색어 입력·검색 클릭이 있어 REVERSIBLE(non-readOnly).
+      AI_TOOL_NAMES.SUPPLIER_PRODUCT_LOOKUP,
     ]);
     for (const name of [AI_TOOL_NAMES.DOM_SET_INPUT, AI_TOOL_NAMES.DOM_SELECT_OPTION, AI_TOOL_NAMES.DOM_CLICK]) {
       expect(AI_TOOL_REGISTRY.find((t) => t.name === name)?.effect).toBe('BROWSER_DOM_INTERACTION');
