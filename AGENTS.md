@@ -21,7 +21,7 @@
 | **개발환경 · 검증 명령 · CI 게이트** | [`SETUP.md`](SETUP.md) |
 | **Git 병렬 작업 · PC 이동** | [`docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) |
 | 프로덕션 마이그레이션 | [`docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md`](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) |
-| Frozen Baseline 목록 · 도메인별 규칙 색인 | [`CLAUDE.md`](CLAUDE.md) §14 · 상세 규칙 문서 목록 |
+| Frozen Baseline 목록 · 도메인별 규칙 색인 | [`CLAUDE.md`](CLAUDE.md) §14 · [`docs/CANONICAL-INDEX.md`](docs/CANONICAL-INDEX.md) |
 | 문서 폴더 구조 | [`docs/README.md`](docs/README.md) |
 
 작업 시작 전, **현재 WO/IR/CHECK 가 가리키는 영역의 baseline 문서**를 확인한다.

@@ -347,4 +347,4 @@ Platform Hub는 hub-core를 사용하지 않고 admin-dashboard 자체 위젯으
 
 ---
 
-*이 문서는 CLAUDE.md Section 18 (APP 표준화 규칙)의 하위 문서이다.*
+*이 문서는 CLAUDE.md §13-A (APP 표준화)의 하위 문서이다.*

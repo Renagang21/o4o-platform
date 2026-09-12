@@ -24,7 +24,7 @@
 
 > **Status**: FROZEN
 > **Effective**: 2026-02-16
-> **Authority**: CLAUDE.md Section 13-A (Retail Stable Rule)
+> **Authority**: 판정 대기 — [`docs/CANONICAL-INDEX.md`](../../CANONICAL-INDEX.md) §9 (`UNKNOWN`). 현행 CLAUDE.md 는 본 문서를 현행 규칙으로 인용하지 않는다; 사업 경계는 [`O4O-STORE-COMMERCE-BOUNDARY-V1`](../../baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) 이 정한다
 
 ---
 

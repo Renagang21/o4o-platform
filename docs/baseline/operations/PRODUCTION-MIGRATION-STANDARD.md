@@ -268,7 +268,7 @@ VALUES (1234567890123, 'DescriptiveName1234567890123');
 
 ## Related Documents
 
-- [CLAUDE.md Section 0.1](../../../CLAUDE.md) — Production Environment Policy
+- [CLAUDE.md §0 환경 원칙](../../../CLAUDE.md) — Production Environment Policy
 - [deploy-api.yml](../../../.github/workflows/deploy-api.yml) — CI/CD Pipeline
 
 ---
