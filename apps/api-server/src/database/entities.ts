@@ -31,13 +31,8 @@ import { AccountActivity } from '../entities/AccountActivity.js';
 import { UserActivityLog } from '../entities/UserActivityLog.js';
 import { Notification } from '../entities/Notification.js';
 // Media/MediaFile/MediaFolder removed - legacy CMS entities
-import { Category } from '../entities/Category.js';
 import { Settings } from '../entities/Settings.js';
-import { Theme, ThemeInstallation } from '../entities/Theme.js';
 // Post/PostMeta/Page/PostAutosave removed - legacy WP-like CMS entities
-import { Tag } from '../entities/Tag.js';
-import { ReusableBlock } from '../entities/ReusableBlock.js';
-import { BlockPattern } from '../entities/BlockPattern.js';
 import { TemplatePart } from '../entities/TemplatePart.js';
 // Shipment/ShipmentTrackingHistory removed - legacy commerce entities
 import { SmtpSettings, EmailLog } from '@o4o/mail-core';
@@ -71,9 +66,6 @@ import { AppRegistry } from '../entities/AppRegistry.js';
 //   해당 엔티티는 등록된 적이 없다 (운영 테이블 0). 상품=ProductMaster,
 //   공급 오퍼=SupplierProductOffer, 주문=checkout_orders 가 정본이다.
 // Form (forms) · FormSubmission (form_submissions) retired — WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1 (운영 테이블 부재)
-// Customizer entities
-import { CustomizerPreset } from '../entities/CustomizerPreset.js';
-import { WidgetArea } from '../entities/WidgetArea.js';
 // CPT-ACF Preset entities
 import { FormPreset } from '../entities/FormPreset.js';
 import { ViewPreset } from '../entities/ViewPreset.js';
@@ -603,15 +595,9 @@ export const entities = [
   UserActivityLog,
   Notification,
   // Media/MediaFile/MediaFolder removed
-  Category,
   Settings,
-  Theme,
-  ThemeInstallation,
   // Content entities
   // Post/PostMeta/Page/PostAutosave removed
-  Tag,
-  ReusableBlock,
-  BlockPattern,
   TemplatePart,
   // Shipment/ShipmentTrackingHistory removed
   SmtpSettings,
@@ -638,9 +624,6 @@ export const entities = [
   AppRegistry,
   // Cart/Order/Settlement entities removed - legacy commerce
   // Form entities retired
-  // Customizer entities
-  CustomizerPreset,
-  WidgetArea,
   // CPT-ACF Preset entities
   FormPreset,
   ViewPreset,
