@@ -14,6 +14,7 @@ import type { DataSource } from 'typeorm';
 import type { AIProviderConfig } from '@o4o/ai-core';
 // AiModelSetting removed — WO-O4O-GLYCOPHARM-CARE-REMOVAL-V1
 import { resolveAiApiKey } from './ai-key.util.js';
+import { GEMINI_CANONICAL_MODEL } from '../types/ai-proxy.types.js';
 
 export function buildConfigResolver(
   dataSource: DataSource,
@@ -21,7 +22,7 @@ export function buildConfigResolver(
   overrides?: { maxTokens?: number },
 ): () => Promise<AIProviderConfig> {
   return async (): Promise<AIProviderConfig> => {
-    const model = 'gemini-2.5-flash';
+    const model = GEMINI_CANONICAL_MODEL;
     const temperature = 0.3;
     const maxTokens = overrides?.maxTokens ?? 2048;
     const apiKey = await resolveAiApiKey(dataSource, 'gemini');

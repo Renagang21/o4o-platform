@@ -14,7 +14,10 @@
  * 우선순위:
  *   1. `AiQueryPolicy.defaultModel` (id=1) — gemini whitelist 에 포함될 때
  *   2. `process.env.AI_DEFAULT_MODEL` — gemini whitelist 에 포함될 때
- *   3. 하드코딩 fallback `gemini-2.5-flash`
+ *   3. 하드코딩 fallback `GEMINI_CANONICAL_MODEL`(ai-proxy.types)
+ *
+ * WO-O4O-AI-MODEL-DYNAMIC-REGISTRY-V1: 1·2 의 "gemini whitelist 에 포함될 때" 는 이제
+ * **정적 whitelist ∪ Google ListModels(운영 키, 1h 캐시)** 다 — 관리자가 고른 새 모델이 코드 수정 없이 통과한다.
  *
  * 경계(엄수):
  * - **provider 교체는 본 WO 범위 밖.** 편집 경로는 gemini-only(`generateRawContent` 가 provider 강제) →
@@ -25,13 +28,14 @@
 
 import { AppDataSource } from '../database/connection.js';
 import { AiQueryPolicy } from '../entities/AiQueryPolicy.js';
-import { MODEL_WHITELIST } from '../types/ai-proxy.types.js';
+import { GEMINI_CANONICAL_MODEL, MODEL_WHITELIST } from '../types/ai-proxy.types.js';
+import { isGeminiModelAllowed } from '../services/ai-model-registry.service.js';
 // WO-O4O-AI-PROVIDER-ABSTRACTION-CALLPROVIDER-ALIGNMENT-V1: provider×surface guardrail
 import { isProviderAllowedForSurface, type AiProviderKey, type EditingSurface } from '@o4o/types';
 import logger from './logger.js';
 
-/** 편집 경로 최종 fallback (gemini whitelist 의 canonical 모델). */
-export const EDITING_MODEL_FALLBACK = 'gemini-2.5-flash';
+/** 편집 경로 최종 fallback (gemini whitelist 의 canonical 모델 — 단일 출처는 ai-proxy.types). */
+export const EDITING_MODEL_FALLBACK = GEMINI_CANONICAL_MODEL;
 
 const GEMINI_ALLOWED = MODEL_WHITELIST.gemini as readonly string[];
 
@@ -57,6 +61,8 @@ export async function resolveEditingModel(): Promise<string> {
     const policy = await AppDataSource.getRepository(AiQueryPolicy).findOne({ where: { id: 1 } });
     const model = policy?.defaultModel?.trim();
     if (isGeminiModel(model)) return model as string;
+    // 동적 registry(Google 실제 제공 목록)에 있으면 통과 — 관리자가 고른 새 모델이 여기서 살아난다.
+    if (model && (await isGeminiModelAllowed(AppDataSource, model))) return model;
     // policy 에 비-gemini 모델이 설정된 경우: 편집 경로는 gemini-only → provider 교체(후속 WO) 전까지 fallback.
     if (model) {
       logger.warn('resolveEditingModel: policy.defaultModel not gemini-compatible, using fallback', {

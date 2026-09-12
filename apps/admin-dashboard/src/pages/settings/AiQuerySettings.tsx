@@ -6,6 +6,11 @@
  * - Gemini Flash 단일 모델
  * - 무료/유료 차이: 일 사용 상한선만
  * - 토큰 단위 X, 질문 횟수 기준
+ *
+ * WO-O4O-AI-MODEL-DYNAMIC-REGISTRY-V1 (2026-09-12):
+ *   모델 드롭다운은 하드코딩 목록이 아니라 `GET /api/ai/models` — 서버가 운영 GEMINI_API_KEY 로 Google
+ *   ListModels 를 조회한(1h 캐시) **실제 사용 가능한 모델** ∪ 정적 whitelist — 를 쓴다. 새 Gemini 모델이
+ *   나오면 여기서 고르면 되고 코드 배포가 필요 없다. 서버는 저장 시 같은 목록으로 다시 검증한다(INVALID_MODEL).
  */
 import React, { useState, useEffect } from 'react';
 // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
@@ -31,8 +36,32 @@ interface AiQueryPolicy {
   updatedAt: string;
 }
 
+interface GeminiModelInfo {
+  id: string;
+  displayName: string;
+  description: string;
+  inputTokenLimit: number | null;
+  outputTokenLimit: number | null;
+}
+
+interface GeminiModelListing {
+  models: GeminiModelInfo[];
+  source: 'google' | 'google-stale' | 'static';
+  fetchedAt: string | null;
+  canonical: string;
+  current: string;
+}
+
+const SOURCE_LABEL: Record<GeminiModelListing['source'], string> = {
+  google: 'Google 실시간 목록',
+  'google-stale': 'Google 목록(캐시, 재조회 실패)',
+  static: '내장 목록(Google 조회 불가)',
+};
+
 const AiQuerySettings: React.FC = () => {
   const [policy, setPolicy] = useState<AiQueryPolicy | null>(null);
+  const [models, setModels] = useState<GeminiModelListing | null>(null);
+  const [modelsLoading, setModelsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
@@ -45,7 +74,21 @@ const AiQuerySettings: React.FC = () => {
 
   useEffect(() => {
     loadPolicy();
+    loadModels();
   }, []);
+
+  const loadModels = async (refresh = false) => {
+    setModelsLoading(true);
+    try {
+      const response = await unifiedApi.raw.get(refresh ? '/ai/models?refresh=1' : '/ai/models');
+      if (response.data.success) setModels(response.data.data);
+    } catch (error: any) {
+      console.error('Error loading AI models:', error);
+      toast.error('모델 목록을 불러오지 못했습니다.');
+    } finally {
+      setModelsLoading(false);
+    }
+  };
 
   const loadPolicy = async () => {
     setLoading(true);
@@ -81,7 +124,9 @@ const AiQuerySettings: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Error saving AI policy:', error);
-      toast.error('AI 정책 저장에 실패했습니다.');
+      // 서버가 모델을 거절한 경우(INVALID_MODEL)는 사유를 그대로 보여 준다 — 조용히 fallback 되지 않는다.
+      const serverMessage = error?.response?.data?.error;
+      toast.error(serverMessage ? String(serverMessage) : 'AI 정책 저장에 실패했습니다.');
     } finally {
       setSaving(false);
     }
@@ -197,21 +242,61 @@ const AiQuerySettings: React.FC = () => {
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">AI 모델</h3>
           <p className="text-sm text-gray-500 mb-4">
-            AI 질의에 사용할 모델을 선택합니다. (Gemini Flash 권장)
+            AI 질의·편집 AI 에 사용할 Gemini 모델을 선택합니다. 목록은 현재 API 키로 Google 이 실제 제공하는
+            모델입니다 — 새 모델이 나오면 여기서 고르면 되고, 코드 배포는 필요 없습니다.
           </p>
 
-          <select
-            value={formData.defaultModel}
-            onChange={(e) => handleChange('defaultModel', e.target.value)}
-            className="w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="gemini-2.5-flash">Gemini 2.5 Flash (권장, 빠름)</option>
-            <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (최저가, 짧은 문구)</option>
-            <option value="gemini-2.5-pro">Gemini 2.5 Pro (정확도 높음)</option>
-            <option value="gemini-2.0-flash">Gemini 2.0 Flash (안정)</option>
-            <option value="gemini-1.5-flash">Gemini 1.5 Flash (레거시)</option>
-            <option value="gemini-1.5-pro">Gemini 1.5 Pro (레거시)</option>
-          </select>
+          <div className="flex items-center gap-3">
+            <select
+              value={formData.defaultModel}
+              onChange={(e) => handleChange('defaultModel', e.target.value)}
+              disabled={modelsLoading}
+              className="w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+            >
+              {/* 현재 정책값이 목록에 없으면(무효 id 등) 그대로 보여 주되 표시한다 — 저장 시 서버가 거절한다. */}
+              {models && !models.models.some((m) => m.id === formData.defaultModel) && (
+                <option value={formData.defaultModel}>{formData.defaultModel} (현재 값 — 사용 불가, 다시 선택 필요)</option>
+              )}
+              {(models?.models ?? []).map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.displayName !== m.id ? `${m.displayName} — ${m.id}` : m.id}
+                  {m.id === models?.canonical ? ' (기본)' : ''}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => loadModels(true)}
+              disabled={modelsLoading}
+              className="flex items-center gap-1 px-3 py-2 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              title="Google 에서 모델 목록 다시 가져오기"
+            >
+              <RefreshCw className={`w-4 h-4 ${modelsLoading ? 'animate-spin' : ''}`} />
+              새로고침
+            </button>
+          </div>
+
+          {models && (
+            <div className="mt-3 text-xs text-gray-500 space-y-1">
+              <p>
+                목록 출처: {SOURCE_LABEL[models.source]}
+                {models.fetchedAt ? ` · 조회 ${new Date(models.fetchedAt).toLocaleString('ko-KR')}` : ''}
+                {' · '}지금 실제 사용 중: <span className="font-medium text-gray-700">{models.current}</span>
+                {models.current !== formData.defaultModel && formData.defaultModel !== policy?.defaultModel ? ' (저장 전)' : ''}
+              </p>
+              {(() => {
+                const sel = models.models.find((m) => m.id === formData.defaultModel);
+                if (!sel) return null;
+                return (
+                  <p>
+                    {sel.description || sel.displayName}
+                    {sel.inputTokenLimit ? ` · 입력 ${sel.inputTokenLimit.toLocaleString()} 토큰` : ''}
+                    {sel.outputTokenLimit ? ` · 출력 ${sel.outputTokenLimit.toLocaleString()} 토큰` : ''}
+                  </p>
+                );
+              })()}
+            </div>
+          )}
         </div>
 
         {/* 시스템 프롬프트 */}

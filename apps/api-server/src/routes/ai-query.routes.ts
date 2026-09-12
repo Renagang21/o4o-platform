@@ -22,6 +22,9 @@ import { aiQueryController } from '../controllers/ai/AiQueryController.js';
 import { aiCardExposureService } from '../services/ai-card-exposure.service.js';
 import { aiOperationsService } from '../services/ai-operations.service.js';
 import type { AuthRequest } from '../types/auth.js';
+import { AppDataSource } from '../database/connection.js';
+import { GEMINI_CANONICAL_MODEL, listGeminiModels, resetGeminiModelCache } from '../services/ai-model-registry.service.js';
+import { resolveEditingModel } from '../utils/ai-editing-model-resolver.js';
 
 const router: Router = Router();
 
@@ -57,6 +60,29 @@ router.get('/policy', authenticate, requireAdmin, (req, res: Response) =>
 router.put('/policy', authenticate, requireAdmin, (req, res: Response) =>
   aiQueryController.updatePolicy(req as AuthRequest, res)
 );
+
+// GET /api/ai/models - 선택 가능한 Gemini 모델 목록 (WO-O4O-AI-MODEL-DYNAMIC-REGISTRY-V1)
+//   Google ListModels(운영 키, 1h 캐시) ∪ 정적 whitelist. 관리자 화면 드롭다운이 이 목록을 쓴다.
+//   `?refresh=1` 이면 캐시를 버리고 다시 조회한다. 키 · 원문 오류는 응답에 싣지 않는다.
+router.get('/models', authenticate, requireAdmin, async (req, res: Response) => {
+  try {
+    if (String(req.query.refresh ?? '') === '1') resetGeminiModelCache();
+    const [listing, current] = await Promise.all([listGeminiModels(AppDataSource), resolveEditingModel()]);
+    return res.json({
+      success: true,
+      data: {
+        models: listing.models,
+        source: listing.source,
+        fetchedAt: listing.fetchedAt,
+        canonical: GEMINI_CANONICAL_MODEL,
+        /** 지금 실제로 쓰이는 모델(정책값이 허용 목록에 있으면 그것, 아니면 canonical). */
+        current,
+      },
+    });
+  } catch {
+    return res.status(500).json({ success: false, error: '모델 목록을 가져오지 못했습니다.', code: 'AI_MODELS_UNAVAILABLE' });
+  }
+});
 
 // ===========================================
 // Card Report routes (WO-AI-CARD-EXPOSURE-REPORT-V1.1)

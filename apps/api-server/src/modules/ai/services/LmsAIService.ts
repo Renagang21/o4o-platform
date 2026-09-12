@@ -1,4 +1,5 @@
 import logger from '../../../utils/logger.js';
+import { GEMINI_CANONICAL_MODEL } from '../../../types/ai-proxy.types.js';
 
 /**
  * LmsAIService
@@ -133,7 +134,7 @@ export class LmsAIService {
       const { execute } = await import('@o4o/ai-core');
       const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY!;
       const provider = process.env.GEMINI_API_KEY ? 'gemini' : 'openai';
-      const model = provider === 'gemini' ? 'gemini-2.5-flash' : 'gpt-4o-mini';
+      const model = provider === 'gemini' ? GEMINI_CANONICAL_MODEL : 'gpt-4o-mini';
 
       const result = await execute({
         systemPrompt,

@@ -22,6 +22,7 @@ import { AiLlmPolicy } from './entities/ai-llm-policy.entity.js';
 import { AIUsageLog, AIProvider, AIUsageStatus } from '../../entities/AIUsageLog.js';
 import type { AiQuotaService } from './ai-quota.service.js';
 import { resolveAiApiKey } from '../../utils/ai-key.util.js';
+import { GEMINI_CANONICAL_MODEL } from '../../types/ai-proxy.types.js';
 
 // ─────────────────────────────────────────────────────
 // Cache
@@ -243,7 +244,7 @@ export class AiPolicyExecutorService {
     const fallback = Object.assign(new AiLlmPolicy(), {
       scope,
       provider: 'gemini',
-      model: 'gemini-2.5-flash',
+      model: GEMINI_CANONICAL_MODEL,
       temperature: 0.3,
       maxTokens: 2048,
       topP: null,

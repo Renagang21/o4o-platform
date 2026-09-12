@@ -6,10 +6,20 @@
 // Supported AI Providers
 export type AIProvider = 'openai' | 'gemini' | 'claude';
 
-// Model Whitelist (2025 models)
+// Model Whitelist — **정적 fallback** 이다.
 // WO-O4O-AI-MODEL-SETTINGS-CLEANUP-V1: gemini-3.0-flash / gemini-3.0-pro removed —
 // Google API does not recognise these identifiers (per migration 20260323600000-FixGeminiModelName).
-// Canonical Gemini model: gemini-2.5-flash.
+//
+// WO-O4O-AI-MODEL-DYNAMIC-REGISTRY-V1 (2026-09-12): gemini 허용 목록은 이제
+// `services/ai-model-registry.service.ts` 가 **정적 whitelist ∪ Google ListModels(운영 키 기준, 1h 캐시)**
+// 로 판정한다. 새 Gemini 모델은 관리자 화면에서 고르면 되고 코드 수정이 필요 없다. 이 정적 목록은
+// Google 조회 실패 시의 최소 목록 + 레거시 호환용이다. canonical(코드 fallback)은 아래 상수 하나다.
+//   canonical = gemini-3.8-flash — Google 문서 "New Stable"(2026-09-12), 운영 키로 ListModels ·
+//   generateContent 실측 확인. 3.6/3.7 과 동가, 3.5-flash 는 legacy·2배 단가라 제외.
+
+/** api-server 의 gemini 기본(fallback) 모델 단일 출처. whitelist 에 반드시 포함돼 있어야 한다. */
+export const GEMINI_CANONICAL_MODEL = 'gemini-3.8-flash';
+
 export const MODEL_WHITELIST = {
   openai: [
     // WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0: 2026-09 공식 문서 기준 현행 라인업.
@@ -26,6 +36,7 @@ export const MODEL_WHITELIST = {
     'gpt-4o',
   ],
   gemini: [
+    GEMINI_CANONICAL_MODEL,
     'gemini-2.5-flash',
     'gemini-2.5-pro',
     // WO-O4O-AI-GEMINI-MODEL-UPGRADE-V1: 저비용/짧은 문구(POP/QR) 후보. 공식 id 확인됨

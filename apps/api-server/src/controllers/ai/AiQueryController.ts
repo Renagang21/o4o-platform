@@ -13,6 +13,8 @@ import { Response } from 'express';
 import { AuthRequest } from '../../types/auth.js';
 import { aiQueryService, AiQueryRequest, AiQueryContextType } from '../../services/ai-query.service.js';
 import logger from '../../utils/logger.js';
+import { isGeminiModelAllowed } from '../../services/ai-model-registry.service.js';
+import { AppDataSource } from '../../database/connection.js';
 
 export class AiQueryController {
   /**
@@ -228,7 +230,17 @@ export class AiQueryController {
         updates.aiEnabled = aiEnabled;
       }
       if (typeof defaultModel === 'string') {
-        updates.defaultModel = defaultModel;
+        // WO-O4O-AI-MODEL-DYNAMIC-REGISTRY-V1: Google 이 운영 키로 실제 제공하는 모델(또는 정적 whitelist)만.
+        // 무효 id(과거 gemini-3.0-flash)가 정책에 들어가 조용히 fallback 되는 일을 여기서 끊는다.
+        const trimmed = defaultModel.trim();
+        if (!(await isGeminiModelAllowed(AppDataSource, trimmed))) {
+          return res.status(400).json({
+            success: false,
+            error: `"${trimmed.slice(0, 64)}" 은(는) 현재 사용할 수 없는 Gemini 모델입니다. 목록에서 선택해 주세요.`,
+            code: 'INVALID_MODEL',
+          });
+        }
+        updates.defaultModel = trimmed;
       }
       if (typeof systemPrompt === 'string') {
         updates.systemPrompt = systemPrompt;

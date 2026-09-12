@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+// WO-O4O-AI-MODEL-DYNAMIC-REGISTRY-V1: 이 카드의 "모델 버전 · 최대 토큰" 은 하드코딩이 아니라
+// `GET /api/ai/models` 의 `current`(실제 사용 모델)를 보여 준다. 모델 변경은 AI 질의 설정(AiQuerySettings)에서.
+import { unifiedApi } from '@/api/unified-client';
 import {
   Eye,
   EyeOff,
@@ -59,6 +62,25 @@ const AppServices: React.FC = () => {
   const [isEnabled, setIsEnabled] = useState(true);
   const [saving, setSaving] = useState(false);
   const [usagePeriod, setUsagePeriod] = useState<'today' | 'thisWeek' | 'thisMonth'>('today');
+  const [currentModel, setCurrentModel] = useState<{ id: string; displayName: string; inputTokenLimit: number | null } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    unifiedApi.raw
+      .get('/ai/models')
+      .then((res) => {
+        if (cancelled || !res.data?.success) return;
+        const d = res.data.data as { current: string; models: { id: string; displayName: string; inputTokenLimit: number | null }[] };
+        const info = d.models.find((m) => m.id === d.current);
+        setCurrentModel({ id: d.current, displayName: info?.displayName ?? d.current, inputTokenLimit: info?.inputTokenLimit ?? null });
+      })
+      .catch(() => {
+        /* 목록을 못 받으면 카드는 "확인 중" 으로 남긴다 */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);
@@ -116,7 +138,7 @@ const AppServices: React.FC = () => {
       {/* Settings Tab */}
       {activeTab === 'settings' && (
         <div className="space-y-6">
-          {/* Gemini 3.0 Flash Card */}
+          {/* Gemini Card — 실제 사용 모델은 서버 registry 가 알려 준다 */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             <div className="flex items-start justify-between mb-6">
               <div className="flex items-center gap-4">
@@ -124,7 +146,7 @@ const AppServices: React.FC = () => {
                   <Zap className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Gemini 3.0 Flash</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{currentModel ? currentModel.displayName : 'Gemini'}</h3>
                   <p className="text-sm text-gray-500">Google AI - 최신 Gemini 모델</p>
                 </div>
               </div>
@@ -146,7 +168,7 @@ const AppServices: React.FC = () => {
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div>
                   <p className="font-medium text-gray-900">서비스 활성화</p>
-                  <p className="text-sm text-gray-500">Gemini 3.0 Flash API를 활성화/비활성화합니다</p>
+                  <p className="text-sm text-gray-500">Gemini API를 활성화/비활성화합니다</p>
                 </div>
                 <button
                   onClick={() => setIsEnabled(!isEnabled)}
@@ -201,19 +223,21 @@ const AppServices: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-500 mb-1">모델 버전</p>
-                  <p className="font-medium text-gray-900">gemini-2.5-flash</p>
+                  <p className="font-medium text-gray-900">{currentModel ? currentModel.id : '확인 중…'}</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-500 mb-1">최대 토큰</p>
-                  <p className="font-medium text-gray-900">1,000,000</p>
+                  <p className="font-medium text-gray-900">{currentModel?.inputTokenLimit ? currentModel.inputTokenLimit.toLocaleString() : '—'}</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-500 mb-1">입력 가격</p>
-                  <p className="font-medium text-gray-900">$0.075 / 1M tokens</p>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-500 mb-1">출력 가격</p>
-                  <p className="font-medium text-gray-900">$0.30 / 1M tokens</p>
+                <div className="p-4 bg-gray-50 rounded-lg col-span-2">
+                  <p className="text-sm text-gray-500 mb-1">가격</p>
+                  <p className="text-sm text-gray-700">
+                    모델별 단가는{' '}
+                    <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      Google 공식 가격표
+                    </a>
+                    를 참조하세요. 모델 변경은 <span className="font-medium">AI 질의 설정</span> 에서 합니다.
+                  </p>
                 </div>
               </div>
 

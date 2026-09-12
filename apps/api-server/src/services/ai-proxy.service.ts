@@ -27,6 +27,7 @@ import {
   OpenAIResponse,
   GeminiResponse,
   ClaudeResponse,
+  GEMINI_CANONICAL_MODEL,
 } from '../types/ai-proxy.types.js';
 
 // Internal: raw HTTP result from Gemini before normalization
@@ -46,6 +47,7 @@ import { resolveAiApiKey } from '../utils/ai-key.util.js';
 // WO-O4O-AI-PROVIDER-ABSTRACTION-CALLPROVIDER-ALIGNMENT-V1: provider×surface guardrail gate
 import { resolveEditingProvider, EDITING_MODEL_FALLBACK } from '../utils/ai-editing-model-resolver.js';
 import type { EditingSurface } from '@o4o/types';
+import { isGeminiModelAllowedSync } from './ai-model-registry.service.js';
 
 class AIProxyService {
   private static instance: AIProxyService;
@@ -192,11 +194,11 @@ class AIProxyService {
    * Returns validated model name or default for provider
    */
   private resolveModel(provider: AIProvider, requestedModel?: string): string {
-    // WO-O4O-AI-GEMINI-RESILIENCE-FIX-V1: gemini default → whitelist-included gemini-2.5-flash
-    // Previously 'gemini-3.0-flash' which is not in MODEL_WHITELIST (validateRequest would throw).
+    // WO-O4O-AI-GEMINI-RESILIENCE-FIX-V1: gemini default → canonical model (ai-proxy.types, whitelist 포함).
+    // WO-O4O-AI-MODEL-DYNAMIC-REGISTRY-V1: gemini 는 정적 whitelist ∪ Google 목록(캐시)으로 허용 판정.
     const defaults = {
       openai: 'gpt-5-mini',
-      gemini: 'gemini-2.5-flash',
+      gemini: GEMINI_CANONICAL_MODEL,
       claude: 'claude-sonnet-4.5',
     };
 
@@ -205,9 +207,12 @@ class AIProxyService {
       return defaults[provider];
     }
 
-    // Check if requested model is allowed
+    // Check if requested model is allowed (gemini: 정적 whitelist ∪ Google 동적 목록)
     const allowedModels = MODEL_WHITELIST[provider] as readonly string[];
     if ((allowedModels as string[]).includes(requestedModel)) {
+      return requestedModel;
+    }
+    if (provider === 'gemini' && isGeminiModelAllowedSync(requestedModel)) {
       return requestedModel;
     }
 
@@ -236,9 +241,11 @@ class AIProxyService {
       );
     }
 
-    // Check model whitelist
+    // Check model whitelist (gemini: 정적 whitelist ∪ Google 동적 목록)
     const allowedModels = MODEL_WHITELIST[provider] as readonly string[];
-    if (!(allowedModels as string[]).includes(model)) {
+    const modelAllowed =
+      (allowedModels as string[]).includes(model) || (provider === 'gemini' && isGeminiModelAllowedSync(model));
+    if (!modelAllowed) {
       throw this.createError(
         'VALIDATION_ERROR',
         `Model "${model}" not allowed for ${provider}. Allowed models: ${allowedModels.join(', ')}`,

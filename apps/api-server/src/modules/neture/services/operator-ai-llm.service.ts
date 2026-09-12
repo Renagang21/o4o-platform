@@ -16,6 +16,7 @@
 
 import type { OperatorContext, AiActionItem } from './operator-ai-action.service.js';
 import logger from '../../../utils/logger.js';
+import { GEMINI_CANONICAL_MODEL } from '../../../types/ai-proxy.types.js';
 
 // ─── LLM Output Schema ───
 
@@ -144,7 +145,7 @@ export class OperatorAiLlmService {
       }
 
       const provider = process.env.GEMINI_API_KEY ? 'gemini' : 'openai';
-      const model = provider === 'gemini' ? 'gemini-2.5-flash' : 'gpt-4o-mini';
+      const model = provider === 'gemini' ? GEMINI_CANONICAL_MODEL : 'gpt-4o-mini';
 
       const result = await execute({
         systemPrompt: SYSTEM_PROMPT,

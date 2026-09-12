@@ -15,6 +15,7 @@ import { AiQueryPolicy } from '../entities/AiQueryPolicy.js';
 import { AiQueryLog } from '../entities/AiQueryLog.js';
 import { aiOperationsService } from './ai-operations.service.js';
 import logger from '../utils/logger.js';
+import { GEMINI_CANONICAL_MODEL } from '../types/ai-proxy.types.js';
 
 // ============================================================
 // Types
@@ -108,11 +109,21 @@ class AiAdminService {
       // replaced with canonical valid identifiers.
       const defaultEngines: Partial<AiEngine>[] = [
         {
-          slug: 'gemini-2.5-flash',
-          name: 'Gemini 2.5 Flash',
-          description: '빠른 응답 속도와 비용 효율적인 모델. 일반적인 질의에 적합합니다.',
+          // WO-O4O-AI-MODEL-DYNAMIC-REGISTRY-V1: canonical(GEMINI_CANONICAL_MODEL). 빈 테이블 seed 에만 쓰인다.
+          slug: GEMINI_CANONICAL_MODEL,
+          name: 'Gemini 3.8 Flash',
+          description: '현행 기본 운영 모델(Google "New Stable"). 일반 질의·편집 AI 기본.',
           provider: 'google',
           isActive: true,
+          isAvailable: true,
+          sortOrder: 0,
+        },
+        {
+          slug: 'gemini-2.5-flash',
+          name: 'Gemini 2.5 Flash',
+          description: '이전 기본 운영 모델. 일반적인 질의에 적합합니다.',
+          provider: 'google',
+          isActive: false,
           isAvailable: true,
           sortOrder: 1,
         },
@@ -256,7 +267,7 @@ class AiAdminService {
         globalDailyLimit: 1000,
         warningThreshold: 80,
         aiEnabled: true,
-        defaultModel: 'gemini-2.5-flash',
+        defaultModel: GEMINI_CANONICAL_MODEL,
       });
       await this.policyRepo.save(policy);
     }
