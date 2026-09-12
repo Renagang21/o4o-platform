@@ -61,4 +61,5 @@ runs:
       run: |
         echo "🔨 Building shared packages..."
         pnpm run build:packages
+        echo "O4O_PACKAGES_PREBUILT=1" >> "$GITHUB_ENV"
         echo "✅ All packages built successfully"
