@@ -130,6 +130,7 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 | commerce | [STORE-COMMERCE-BOUNDARY](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) + [B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) |
 | Core / Frozen / Boundary / 도메인 | [CANONICAL-INDEX](docs/CANONICAL-INDEX.md)의 해당 정본 |
 | shared module | [O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) |
+| AI 자동화 (Local Agent · Browser · Computer Use · Adapter · Workflow) | [O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1](docs/baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) — §25 의 현행 정렬 상태를 먼저 확인 |
 | TypeORM / ESM | [ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01](docs/reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md) — Entity 관계는 type-only import + 문자열 참조 |
 | production migration | [PRODUCTION-MIGRATION-STANDARD](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) — §5의 승인·보안 경계 적용 |
 | 문서 lifecycle | [DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md) — §8의 실행 경계 적용 |
