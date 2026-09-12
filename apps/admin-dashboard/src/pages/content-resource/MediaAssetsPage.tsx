@@ -166,7 +166,8 @@ const MediaAssetsPage: React.FC = () => {
                       )}
                       <div className="min-w-0">
                         <div className="text-xs text-gray-500 truncate max-w-[180px]">{a.originalName}</div>
-                        <div className="text-[10px] text-gray-400">{formatFileSize(a.fileSize)}</div>
+                        {/* fileSize 는 bigint 컬럼이라 문자열로 온다. 외부 미디어(0)는 Math.log("0") → NaN 이므로 분기 */}
+                        <div className="text-[10px] text-gray-400">{a.storageType === 'external' ? '외부 미디어' : formatFileSize(Number(a.fileSize) || 0)}</div>
                       </div>
                     </div>
                   </td>

@@ -1,6 +1,6 @@
 ﻿# CHECK-O4O-MEDIA-LIBRARY-V2-P0-AI-VIDEO-FOUNDATION-V1
 
-Status: DEPLOYED — 로컬 검증 및 API/Admin 배포 완료, production browser smoke 미확인. CLOSED 아님.
+Status: CLOSED — 2026-09-12 production API·browser smoke PASS (§9). 이전 상태 DEPLOYED(§7)는 그대로 기록 유지.
 WO: WO-O4O-MEDIA-LIBRARY-V2-P0-AI-VIDEO-FOUNDATION-V1
 작성일: 2026-09-12
 
@@ -106,3 +106,91 @@ WO: WO-O4O-MEDIA-LIBRARY-V2-P0-AI-VIDEO-FOUNDATION-V1
 - P1/P2: entity picker/target 존재 검증, 추가 O4O 도메인 정책, 실제 볼륨 검색 최적화, 후손/연결의 대규모 탐색, 별도 Ownership/Dedup/Revision WO.
 - 영상 생성, Production Job 전체, YouTube 자동 업로드 등 제외 범위는 미구현.
 - 문서 정합: 이번 CHECK만 작성. 기존 핸드오프 WO·canonical 본문·과거 CHECK는 수정하지 않음. SETUP의 기존 환경/CI 수치 Drift는 앞선 감사의 후속 정비 대상으로 유지.
+
+## 9. Production smoke — 2026-09-12 (후속 세션, 마감)
+
+§7 의 `PRODUCTION_SMOKE != PASS` 를 해소한 기록. 기준 main `71ba4e074` (구현 `0e4d35e0d` + 후속 `12cbf4996` automation VIDEO job 포함 배포 상태).
+
+### 9-1. Production API smoke (`https://api.neture.co.kr`, 쿠키 인증, `platform:super_admin` smoke 계정)
+
+| 단계 | 결과 |
+|---|---|
+| 기존 GET list (`limit=5`) | 200 · 기존 row 에 V2 컬럼(storageType=internal / provider=gcs / originType·qaStatus=null) 존재 → **production migration 적용 확인** (§1 의 DB census NOT VERIFIED 대체) |
+| `storageType=external` 필터 (시작 시점) | 200 · 0건 |
+| `POST /external` provider=youtube consent=true | 201 · externalId `dQw4w9WgXcQ` 정규화, thumbnailUrl `i.ytimg.com/vi/…/hqdefault.jpg`, gcsPath=null, originType=external, qaStatus=PENDING |
+| `POST /external` consent 누락 | 400 `CONSENT_REQUIRED` |
+| `POST /external` provider 누락 | 400 `INVALID_PROVIDER` (계약대로 — provider 는 필수) |
+| `PATCH /:id/catalog` AI meta + QA + rights | 200 · generationProvider/Model/promptRef/generationJobId · qaStatus=APPROVED · productAccuracyLevel=SUPPORT_ONLY · rightsType · commercialUseAllowed=false · attributionRequired=true 저장·반환 |
+| 필터 `qaStatus=APPROVED&productAccuracyLevel=SUPPORT_ONLY&provider=youtube` | 200 · 대상 hit |
+| `POST /:id/links` product/smoke-product-1/smoke | 201 |
+| 동일 link 재요청 | 201 · 동일 link id (idempotent) |
+| 필터 `entityType=product&entityId=smoke-product-1` | 200 · 대상 hit (Entity 역조회) |
+| `GET /:id/relations` | 200 · links 1 · rootAssetId=자기 ID · children 0 |
+| 자식 external 생성 → `PATCH catalog {parentAssetId, derivationType:edited-video}` | 200 · parent/root 서버 계산 · 부모 relations children 1 |
+| `DELETE /:id` (link + child 존재) | **409 `MEDIA_IN_USE_LINK`** |
+| link 해제 후 `DELETE /:id` (child 존재) | **409 `MEDIA_IN_USE_DERIVATION`** |
+| child 삭제 → 부모 삭제 | 200 / 200 (external 은 GCS 미접촉) |
+| 삭제 후 `GET /:id` | 404 |
+| 비로그인 `GET /:id/relations` | 401 |
+
+### 9-2. Production Admin browser smoke (`https://admin.neture.co.kr/content-resource/media-assets`, Playwright chromium headless)
+
+로그인 → client-side nav → 화면 진입. **16/16 PASS**, console error 0, API 4xx/5xx 0 (의도한 409 제외 — 409 는 page 밖 `ctx.request` 로 호출해 콘솔 오염 없음).
+
+| 항목 | 결과 |
+|---|---|
+| 목록 로드 (`GET /platform/media-library?page=1&limit=20` 200, 20행) | PASS |
+| 행에 provider/storageType · originType·qaStatus · 보조 폴더 표시 | PASS |
+| "외부 영상 등록" 폼 → YouTube URL + 동의 → 201 + toast | PASS |
+| `storageType=external` 필터 → 등록 행 노출 (`youtube / external`, `external · PENDING`) | PASS |
+| 메타 편집 모달 → "제작 정보 · 연결 · 검수 · 권리" 패널 → `relations` 200 | PASS |
+| 제작 정보 저장 (AI 제공자/모델/프롬프트 참조/검수 상태/제품 정확성/권리/상업 이용/출처 표기) → 200 + toast | PASS |
+| 연결 추가 (product / smoke-ui-product-1 / smoke-ui) → 201 · 패널에 표시 | PASS |
+| 사용처 탭 → `usage` 200 | PASS |
+| 연결 상태에서 hard delete → 409 `MEDIA_IN_USE_LINK` | PASS |
+| 연결 해제 → 200 · "명시적 연결 없음" | PASS |
+| 기존 메타데이터 탭 저장 (title/tags) → `PATCH /metadata` 200 (기존 flow 회귀) | PASS |
+| 검색 (`SMOKE-UI`) → 편집된 제목 hit (기존 search 회귀) | PASS |
+| 정리: 연결 해제된 external 삭제 → 200 | PASS |
+
+**발견 결함 1건 (Admin UI, 이번 세션 수정):** 외부 자산 행의 크기 표기가 `NaN undefined`.
+원인: `fileSize` 는 bigint 컬럼이라 문자열 `"0"` 으로 오고, `formatFileSize` 의 `bytes === 0` 이 문자열에 false → `Math.log("0") = -Infinity`.
+기존 내부 자산은 0 이 아니라 영향 없었음. 수정: `MediaAssetsPage.tsx` 행 표시에서 external 은 `외부 미디어`, 그 외 `Number(fileSize) || 0`. 공용 `formatFileSize` 는 변경하지 않음(다른 소비처 영향 회피).
+
+### 9-3. Product 이미지 flow production 회귀 (Neture 공급자 계정, `POST /neture/supplier/import/copy-images`)
+
+기존 GCS 공개 이미지 1건을 원본으로 `mode=thumbnail` / `mode=preserve` 각 1회 실행.
+
+| mode | 결과 |
+|---|---|
+| thumbnail | 200 · copied 1 · 생성 row `1000×1000 image/webp` · storageType=internal / provider=gcs / folder=description · url = gcs 공개 URL |
+| preserve | 200 · copied 1 · 생성 row `848×1200 image/webp`(원본 비율 보존) · 동일 계약 |
+
+생성 row 2건은 super_admin 으로 `DELETE` 200 (기존 GCS+DB 삭제 경로 회귀 겸). smoke 종료 시 `storageType=external` 0건 — 잔재 없음.
+
+### 9-4. 실행하지 않은 것 (명시)
+
+- **Screen Set delete guard 의 production 실행**: 실제 Screen Set 이 참조하는 자산에 DELETE 를 보내야 하는데, 가드 실패 시 운영 자산이 실삭제되는 파괴적 검증이라 production 에서 실행하지 않음. §5 jest(Screen Set 가드) 및 `12cbf4996` 의 media 회귀 35/35 로 대체. 코드 경로상 기존 가드는 V2 link/derivation 가드 **앞**에 유지됨(`media-library.controller.ts` DELETE).
+- 실제 GCS 파일 업로드 폼(브라우저 파일 선택)은 §9-3 의 서버측 업로드 경로(`MediaLibraryService.upload` 를 통과)로 대체.
+- 운영 DB 직접 census(psql)는 하지 않음. §9-1 첫 행의 API 응답으로 V2 컬럼 적용을 확인.
+
+### 9-5. 종료 판정
+
+```text
+MEDIA_ASSET_CANONICAL_CORE        = PASS  (§2 · media_assets 단일 core, 새 Core 없음)
+ENTITY_MEDIA_LINK                 = PASS  (§4 · §9-1 · §9-2)
+DERIVATION_GRAPH_MINIMUM          = PASS  (§9-1 parent/root/children)
+EXTERNAL_MEDIA_SUPPORT            = PASS  (§9-1 · §9-2 YouTube 실데이터)
+AI_GENERATION_METADATA            = PASS  (§9-1 · §9-2 · prompt 본문 미저장)
+QA_PRODUCT_ACCURACY               = PASS
+RIGHTS_METADATA                   = PASS
+DELETE_GUARD_LINK_AWARE           = PASS  (409 LINK / 409 DERIVATION, Screen Set 가드는 §9-4)
+SEARCH_SCALE_BASELINE             = PASS  (§6 baseline · speculative index 없음)
+EXISTING_MEDIA_REGRESSION         = PASS  (list/search/metadata PATCH/delete · §9-2 · §9-3)
+PRODUCT_IMAGE_REGRESSION          = PASS  (§9-3 thumbnail-1000 / preserve-original)
+ADMIN_UI                          = PASS  (§9-2 · NaN 표기 결함 1건 수정 — 배포 확인은 §9-6)
+PRODUCTION_SMOKE                  = PASS
+```
+
+문서 정합: 해당 없음 (기존 핸드오프 WO·canonical 본문 미수정).
+
