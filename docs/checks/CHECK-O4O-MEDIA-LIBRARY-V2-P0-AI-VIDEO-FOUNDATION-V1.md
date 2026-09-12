@@ -194,3 +194,10 @@ PRODUCTION_SMOKE                  = PASS
 
 문서 정합: 해당 없음 (기존 핸드오프 WO·canonical 본문 미수정).
 
+### 9-6. 마감 커밋·배포·재검증
+
+- 마감 커밋: `a0c03fef9` (Admin `NaN undefined` 수정 + 본 CHECK §9).
+- [Admin 배포](https://github.com/Renagang21/o4o-platform/actions/runs/34694067189): SUCCESS · [CI Pipeline](https://github.com/Renagang21/o4o-platform/actions/runs/34694067120): SUCCESS · [CodeQL](https://github.com/Renagang21/o4o-platform/actions/runs/34694067172): SUCCESS.
+- 배포 후 §9-2 browser smoke 재실행 **16/16 PASS** — 외부 자산 행이 `외부 미디어` 로 표기됨(`NaN undefined` 해소 확인). smoke 자산은 정리 완료.
+- 로컬 검증: admin `tsc --noEmit` PASS · 변경 파일 focused ESLint PASS · `admin-legacy-route-api-and-navigation-closure.test.ts` 73/73 PASS. Admin production build 는 CI/배포 워크플로에서 확인(로컬 미실행).
+
