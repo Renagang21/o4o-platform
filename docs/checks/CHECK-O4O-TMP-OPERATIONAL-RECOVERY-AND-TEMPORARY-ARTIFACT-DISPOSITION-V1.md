@@ -3,7 +3,8 @@
 - **WO**: WO-O4O-TMP-OPERATIONAL-RECOVERY-AND-TEMPORARY-ARTIFACT-DISPOSITION-V1
 - **작업일**: 2026-09-12
 - **입력**: `IR-O4O-REPOSITORY-WIDE-DEAD-CODE-AND-LEGACY-SURFACE-CENSUS-V1-PASS2` §8 (`tmp/**` 169 파일 · 42MB) · `WO-O4O-ARCHIVE-RETENTION-AND-TRACKED-BACKUP-FINAL-DISPOSITION-V1-CHECK` §5 (tmp 인계)
-- **기준 SHA**: `origin/main` = `11b7083f861aee205bf8780629a5920ee1e918de` · 전용 worktree `.claude/worktrees/wo-tmp-disposition-v1` · branch `worktree-wo-tmp-disposition-v1`
+- **기준 SHA**: `origin/main` = `11b7083f861aee205bf8780629a5920ee1e918de` (조사·검증 기준) → push 직전 다른 세션의 `8f286151e`(ai-tools · 범위 겹침 0) 위에 rebase · 전용 worktree `.claude/worktrees/wo-tmp-disposition-v1` · branch `worktree-wo-tmp-disposition-v1`
+- **커밋**: `fc3b339cc` (본체) · 본 문서 CI 결과 갱신 커밋
 - **성격**: `tmp/**` 추적 파일 처분 — 운영 복구자료 보존 / 일회성·생성 산출물 제거
 - **schema / migration / production data**: **0 · 0 · 0**
 
@@ -180,7 +181,8 @@ removed  73 파일 ·  9,614,284 bytes ( 9.2 MB)
 ## 11. CI
 
 - push 후 `deploy-api` / `deploy-web` 는 `detect-changes` 가 tmp·docs·script 주석만 감지 → 배포 skip 예상 (runtime 변경 0 이므로 의도된 동작).
-- 결과: §14 완료 조건 표의 `CI` 항목에 기록.
+- 결과 (`fc3b339cc`): **CI Pipeline SUCCESS** (run 34668032788) · **Deploy API Server (Cloud Run) SUCCESS** (34668032805) · **CodeQL SUCCESS** (34668032792).
+- 별건: 같은 시각 Actions 에 남아 있던 `Auth Runtime E2E (3 Services)` 실패는 직전 WO 커밋 `4c4f93ecd` 의 실행(2026-09-11 14:55Z)이며, 원인은 저장소 Actions secret `E2E_{KPA,KCOS,NETURE}_ADMIN_{EMAIL,PASSWORD}` 6개 미등록(2026-08-27 이후 6회 연속 동일). 본 WO 와 무관하고 `fc3b339cc` 는 해당 워크플로의 path 필터에 걸리지 않는다 → §13-5 인계.
 
 ---
 
@@ -202,7 +204,8 @@ removed  73 파일 ·  9,614,284 bytes ( 9.2 MB)
 2. **`*_install.sql` 4** — `yaksa_*` 운영 테이블 처분 WO (forum-yaksa CHECK §후속 2) 에서 함께 판정.
 3. **PASS2 §8 정정 2건** (기록물이라 본문은 고치지 않고 여기 정정): (a) `delete_list_*.json` 은 DB 삭제 원장이 아니라 2025-12 문서 재구성 후보 목록 → DELETE. (b) `.mjs` 35 는 ACTIVE_FIXTURE_RELOCATE 가 아니라 전부 일회성 → DELETE (파이프라인 본체는 이미 `scripts/**`).
 4. **`tmp/` 명명** — 남은 96 파일은 "임시" 가 아니라 운영 복구자료다. 디렉터리명을 `ops-recovery/` 류로 바꾸는 것은 README 3 · CHECK 다수 · 파이프라인 `lib.mjs` 8곳의 경로 계약을 바꾸므로 별도 WO 로 분리(본 WO 는 경로 불변).
-5. 향후 배치 WO 의 `tmp/<wo>/` 에는 탐침·smoke `.mjs` 를 커밋하지 않는다 — 결과 JSON/CHECK 만 남기고 스크립트는 `scripts/**` 파이프라인에 두거나 버린다.
+5. **`e2e-auth-runtime.yml` Actions secret 6개 등록** — `E2E_{KPA,KCOS,NETURE}_ADMIN_{EMAIL,PASSWORD}` (값: `docs/local/TEST-ACCOUNTS.local.md` 서비스별 admin 행). 자격정보의 외부 등록은 사용자 승인·실행 영역. 폐기된 공용 `E2E_ADMIN_EMAIL` / `E2E_ADMIN_PASSWORD` 는 미사용 → 삭제 가능.
+6. 향후 배치 WO 의 `tmp/<wo>/` 에는 탐침·smoke `.mjs` 를 커밋하지 않는다 — 결과 JSON/CHECK 만 남기고 스크립트는 `scripts/**` 파이프라인에 두거나 버린다.
 
 ---
 
@@ -220,7 +223,7 @@ BROKEN REFERENCES                = 0 (링크 11/11 · script 참조 0)
 SCHEMA CHANGE                    = 0
 PRODUCTION DATA CHANGE           = 0
 OTHER SERVICE REGRESSION         = PASS (build:packages · type-check:frontend · api tsc · Jest 12/12)
-CI                               = PENDING → (push 후 갱신)
+CI                               = SUCCESS (fc3b339cc · CI Pipeline / Deploy API / CodeQL)
 ```
 
 ---
