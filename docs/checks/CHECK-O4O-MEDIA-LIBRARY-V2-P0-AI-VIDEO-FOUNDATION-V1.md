@@ -1,6 +1,6 @@
 ﻿# CHECK-O4O-MEDIA-LIBRARY-V2-P0-AI-VIDEO-FOUNDATION-V1
 
-Status: IMPLEMENTED — 로컬 검증 완료, 배포/production browser smoke 확인 전. CLOSED 아님.
+Status: DEPLOYED — 로컬 검증 및 API/Admin 배포 완료, production browser smoke 미확인. CLOSED 아님.
 WO: WO-O4O-MEDIA-LIBRARY-V2-P0-AI-VIDEO-FOUNDATION-V1
 작성일: 2026-09-12
 
@@ -91,12 +91,18 @@ WO: WO-O4O-MEDIA-LIBRARY-V2-P0-AI-VIDEO-FOUNDATION-V1
 - Browser runtime bootstrap 2회 및 기본 연결 확인 1회가 모두 timeout. in-app browser smoke 실행 불가.
 - production browser의 toast/API/console error 0, 실제 Product 선택/등록은 NOT VERIFIED.
 - production DB authentication 실패로 시작 운영 census는 NOT VERIFIED.
-- CI/CD 및 운영 migration 확인: push 후 확인 예정.
+- 구현 커밋: `0e4d35e0d`. 다른 세션의 후속 문서 커밋을 포함한 `5ce930426`으로 배포됨.
+- [API 배포](https://github.com/Renagang21/o4o-platform/actions/runs/34676867860): SUCCESS. Run database migrations 및 Verify deployment 단계 SUCCESS.
+- [Admin 배포](https://github.com/Renagang21/o4o-platform/actions/runs/34676867846): SUCCESS.
+- [CodeQL](https://github.com/Renagang21/o4o-platform/actions/runs/34676867847): SUCCESS.
+- [전체 CI](https://github.com/Renagang21/o4o-platform/actions/runs/34676867842): SUCCESS. Code Quality Check(타입·lint ratchet·전체 테스트) 및 Admin build 통과.
+- 배포 후 읽기 전용 HTTP: API /health 200, 기존 media 목록과 신규 /:id/relations 비로그인 요청 401, Admin canonical 주소 200. 로그인 CRUD/UI/console 검증을 대체하지 않음.
+- 임시 localhost PostgreSQL 테스트 서버 종료 완료.
 - 로컬 기능 검증을 production smoke PASS로 보고하지 않음. `PRODUCTION_SMOKE != PASS`이므로 WO는 CLOSED 아님.
 
 ## 8. 남은 P1/P2 및 문서 정합
 
-- 이번 P0 완료에 남은 검증: 운영 migration 확인, 브라우저 접속 복구 후 Admin/기존 Product/GCS/외부 영상 실데이터 smoke.
+- 이번 P0 완료에 남은 검증: 브라우저 접속 복구 후 Admin/기존 Product/GCS/외부 영상 실데이터 smoke.
 - P1/P2: entity picker/target 존재 검증, 추가 O4O 도메인 정책, 실제 볼륨 검색 최적화, 후손/연결의 대규모 탐색, 별도 Ownership/Dedup/Revision WO.
 - 영상 생성, Production Job 전체, YouTube 자동 업로드 등 제외 범위는 미구현.
 - 문서 정합: 이번 CHECK만 작성. 기존 핸드오프 WO·canonical 본문·과거 CHECK는 수정하지 않음. SETUP의 기존 환경/CI 수치 Drift는 앞선 감사의 후속 정비 대상으로 유지.
