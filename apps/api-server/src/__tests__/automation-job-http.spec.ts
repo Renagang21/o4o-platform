@@ -39,8 +39,31 @@ describe('Automation job HTTP authorization and validation', () => {
         (await request(app).post(`${job}/assets`).set('x-test-role', role).send({ mediaAssetId: 'x', purpose: 'INPUT' })).status,
       ).toBe(403);
       expect((await request(app).post(`${job}/cleanup`).set('x-test-role', role).send({ decision: 'KEEP_ALL' })).status).toBe(403);
+      // 완성 영상 임시 output — 등록·상태·다운로드·제거 모두 같은 platform admin 경계
+      expect((await request(app).get(`${job}/temp-output`).set('x-test-role', role)).status).toBe(403);
+      expect((await request(app).get(`${job}/temp-output/download`).set('x-test-role', role)).status).toBe(403);
+      expect((await request(app).post(`${job}/temp-output`).set('x-test-role', role).attach('file', Buffer.from('x'), 'a.mp4')).status).toBe(403);
+      expect((await request(app).delete(`${job}/temp-output`).set('x-test-role', role)).status).toBe(403);
     },
   );
+  test('temp output: anonymous denied; object key is never a route input (bucket path cannot be addressed via API)', async () => {
+    expect((await request(app).get(`${job}/temp-output/download`)).status).toBe(401);
+    expect((await request(app).post(`${job}/temp-output`).attach('file', Buffer.from('x'), 'a.mp4')).status).toBe(401);
+    const admin = 'platform:super_admin';
+    const notUuid = await request(app).get('/automation-jobs/not-a-uuid/temp-output/download').set('x-test-role', admin);
+    expect(notUuid.status).toBe(400);
+    expect(notUuid.body.code).toBe('INVALID_UUID');
+    // object key 로 직접 받는 경로는 존재하지 않는다
+    expect((await request(app).get('/automation-jobs/temp-output/video-jobs/x/y.mp4').set('x-test-role', admin)).status).toBe(404);
+    // multipart 없이 등록 → 파일 필수
+    const noFile = await request(app).post(`${job}/temp-output`).set('x-test-role', admin).send({});
+    expect(noFile.status).toBe(400);
+    expect(noFile.body.code).toBe('TEMP_OUTPUT_FILE_REQUIRED');
+    // 영상이 아닌 파일은 upload middleware 가 아니라 서비스가 거부한다 (image 는 middleware 허용 목록)
+    const png = await request(app).post(`${job}/temp-output`).set('x-test-role', admin).attach('file', Buffer.from('x'), { filename: 'a.png', contentType: 'image/png' });
+    expect(png.status).toBe(400);
+    expect(png.body.code).toBe('TEMP_OUTPUT_VIDEO_ONLY');
+  });
   test('platform admin gets bad-input errors before any DB access', async () => {
     const admin = 'platform:super_admin';
     const bad = await request(app).post('/automation-jobs').set('x-test-role', admin).send([]);

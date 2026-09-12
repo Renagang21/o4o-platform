@@ -5,7 +5,13 @@
  * - Job 자체는 automation_jobs 한 테이블. workflow/scheduler/retry/executionRef 없음.
  * - asset 연결은 media_entity_links(entity_type='video-production-job', entity_id=job.id) 재사용.
  * - 정리(cleanup)는 INTERMEDIATE 만 후보로 보며, 기존 Media delete guard(다른 연결·lineage·Screen Set)를
- *   그대로 따른다. 보호되는 asset 은 Job 관계만 해제하고 삭제하지 않는다. 자동 삭제 없음.
+ *   그대로 따른다. 보호되는 asset 은 Job 관계만 해제하고 삭제하지 않는다. 제작 자료의 자동 삭제 없음.
+ *
+ * WO-O4O-AUTOMATION-VIDEO-JOB-TEMP-OUTPUT-DOWNLOAD-AND-AUTO-CLEANUP-V1:
+ * - Media Library 연결은 제작 자료(INPUT · INTERMEDIATE)만. 완성 영상은 Media 자산이 아니라
+ *   VideoTempOutputService 의 임시 output(비공개 bucket · TTL · 자동 삭제)이다.
+ * - 새 OUTPUT 연결은 받지 않는다(PURPOSE_NOT_ALLOWED). 이미 있는 OUTPUT 행은 읽기 전용 legacy 로만 보여주고
+ *   삭제·backfill 하지 않는다. cleanup 에서도 항상 KEEP.
  */
 import type { DataSource, EntityManager } from 'typeorm';
 import {
@@ -22,9 +28,13 @@ import {
   mediaUuid,
 } from '../../media/services/media-catalog.service.js';
 import { MediaLibraryService } from '../../media/services/media-library.service.js';
+import { VideoTempOutputService } from './video-temp-output.service.js';
 
 export const JOB_ENTITY_TYPE = 'video-production-job';
+/** 읽기 가능한 purpose 전체(legacy OUTPUT 포함). */
 export const JOB_ASSET_PURPOSES = ['INPUT', 'INTERMEDIATE', 'OUTPUT'] as const;
+/** 새로 연결할 수 있는 purpose — 제작 자료만. 완성 영상은 Media Library 에 넣지 않는다. */
+export const JOB_LINKABLE_PURPOSES = ['INPUT', 'INTERMEDIATE'] as const;
 export type JobAssetPurpose = (typeof JOB_ASSET_PURPOSES)[number];
 
 /** Job 화면이 쓰는 asset 요약 — media_assets 전체 컬럼을 노출하지 않는다. */
@@ -76,6 +86,35 @@ const enumOf = <T extends string>(
 const optionalText = (value: unknown, max: number): string | null | undefined =>
   value === undefined ? undefined : value === null || value === '' ? null : mediaText(value, max);
 
+/**
+ * API 응답용 Job — 완성본 임시 output 의 storage 컬럼(object key 등)은 빼고 계산된 tempOutput view 만 붙인다.
+ * object key / bucket 은 UI·API 에 노출하지 않는다.
+ */
+export type PublicAutomationJob = Omit<
+  AutomationJob,
+  | 'tempOutputObjectKey'
+  | 'tempOutputFileName'
+  | 'tempOutputMimeType'
+  | 'tempOutputSize'
+  | 'tempOutputUploadedAt'
+  | 'tempOutputExpiresAt'
+  | 'tempOutputCleanupStatus'
+> & { tempOutput: ReturnType<typeof VideoTempOutputService.view> };
+const TEMP_OUTPUT_COLUMNS = [
+  'tempOutputObjectKey',
+  'tempOutputFileName',
+  'tempOutputMimeType',
+  'tempOutputSize',
+  'tempOutputUploadedAt',
+  'tempOutputExpiresAt',
+  'tempOutputCleanupStatus',
+] as const;
+export const toPublicJob = (job: AutomationJob): PublicAutomationJob => {
+  const rest = { ...job } as Record<string, unknown>;
+  for (const column of TEMP_OUTPUT_COLUMNS) delete rest[column];
+  return { ...(rest as Omit<PublicAutomationJob, 'tempOutput'>), tempOutput: VideoTempOutputService.view(job) };
+};
+
 const ASSET_SELECT = `a.id, a.url, a.thumbnail_url AS "thumbnailUrl", a.title, a.original_name AS "originalName",
   a.asset_type AS "assetType", a.mime_type AS "mimeType", a.file_size::float8 AS "fileSize", a.storage_type AS "storageType",
   a.parent_asset_id AS "parentAssetId", a.root_asset_id AS "rootAssetId"`;
@@ -101,9 +140,9 @@ export class AutomationJobService {
       throw new MediaCatalogError('JOB_CLOSED', 409);
   }
 
-  async create(input: Record<string, unknown>, userId: string): Promise<AutomationJob> {
+  async create(input: Record<string, unknown>, userId: string): Promise<PublicAutomationJob> {
     const repo = this.ds.getRepository(AutomationJob);
-    return repo.save(
+    return toPublicJob(await repo.save(
       repo.create({
         type: enumOf(input.type ?? 'VIDEO', AUTOMATION_JOB_TYPES, 'INVALID_JOB_TYPE'),
         title: mediaText(input.title, 200),
@@ -112,7 +151,7 @@ export class AutomationJobService {
         status: 'DRAFT',
         createdBy: userId,
       }),
-    );
+    ));
   }
 
   /** 목록 + purpose 별 asset 건수. 여러 Job 이 서로 독립적으로 유지된다(상태 간 상호 제약 없음). */
@@ -141,7 +180,7 @@ export class AutomationJobService {
       }
     }
     return jobs.map((j) => ({
-      ...j,
+      ...toPublicJob(j),
       assetCounts: counts.get(j.id) ?? { INPUT: 0, INTERMEDIATE: 0, OUTPUT: 0 },
     }));
   }
@@ -165,11 +204,11 @@ export class AutomationJobService {
   async get(id: string) {
     const job = await this.ds.getRepository(AutomationJob).findOneBy({ id: mediaUuid(id) });
     if (!job) throw new MediaCatalogError('JOB_NOT_FOUND', 404);
-    return { ...job, assets: await this.links(this.ds, job.id) };
+    return { ...toPublicJob(job), assets: await this.links(this.ds, job.id) };
   }
 
   /** 기본 정보·상태 수정. COMPLETED 는 complete() 로만 진입하며 완료 후엔 수정 불가. CANCELLED 는 재개(DRAFT 등) 가능. */
-  async update(id: string, input: Record<string, unknown>): Promise<AutomationJob> {
+  async update(id: string, input: Record<string, unknown>): Promise<PublicAutomationJob> {
     mediaUuid(id);
     return this.ds.transaction(async (manager) => {
       const job = await this.locked(manager, id);
@@ -184,12 +223,12 @@ export class AutomationJobService {
         if (status === 'COMPLETED') throw new MediaCatalogError('USE_COMPLETE_ENDPOINT');
         job.status = status;
       }
-      return manager.getRepository(AutomationJob).save(job);
+      return toPublicJob(await manager.getRepository(AutomationJob).save(job));
     });
   }
 
   /** 완료 처리 + cleanupDecision 저장. 정리 실행은 별도(cleanup). */
-  async complete(id: string, input: Record<string, unknown>): Promise<AutomationJob> {
+  async complete(id: string, input: Record<string, unknown>): Promise<PublicAutomationJob> {
     mediaUuid(id);
     const decision = enumOf(input.cleanupDecision, AUTOMATION_JOB_CLEANUP_DECISIONS, 'INVALID_CLEANUP_DECISION');
     return this.ds.transaction(async (manager) => {
@@ -198,7 +237,7 @@ export class AutomationJobService {
       job.status = 'COMPLETED';
       job.completedAt = new Date();
       job.cleanupDecision = decision;
-      return manager.getRepository(AutomationJob).save(job);
+      return toPublicJob(await manager.getRepository(AutomationJob).save(job));
     });
   }
 
@@ -210,6 +249,8 @@ export class AutomationJobService {
     mediaUuid(id);
     const mediaAssetId = mediaUuid(input.mediaAssetId);
     const purpose = enumOf(input.purpose, JOB_ASSET_PURPOSES, 'INVALID_PURPOSE');
+    if (!(JOB_LINKABLE_PURPOSES as readonly string[]).includes(purpose))
+      throw new MediaCatalogError('PURPOSE_NOT_ALLOWED');
     return this.ds.transaction(async (manager) => {
       const job = await this.locked(manager, id);
       this.assertOpen(job);
@@ -242,7 +283,7 @@ export class AutomationJobService {
   }
 
   /**
-   * 정리 계획. INTERMEDIATE 만 후보. INPUT(원본)·OUTPUT 은 항상 KEEP.
+   * 정리 계획. INTERMEDIATE 만 후보. INPUT(원본)·legacy OUTPUT 은 항상 KEEP. 완성 영상(temp output)은 여기 없다.
    * 후보 중 다른 entity 연결 / 후손(lineage) / Screen Set 사용이 있으면 관계만 해제(UNLINK_ONLY).
    */
   private async plan(

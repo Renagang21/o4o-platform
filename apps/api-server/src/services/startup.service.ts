@@ -5,6 +5,7 @@ import { backupService } from './BackupService.js';
 import { errorAlertService } from './ErrorAlertService.js';
 import { marketTrialLifecycleJob } from '../jobs/market-trial-lifecycle.job.js';
 import { spdRevisionExpiryJob } from '../jobs/spd-revision-expiry.job.js';
+import { videoTempOutputExpiryJob } from '../jobs/video-temp-output-expiry.job.js';
 import { env } from '../utils/env-validator.js';
 import logger from '../utils/logger.js';
 
@@ -202,6 +203,11 @@ export class StartupService {
       // 공급자 STORE 설명서 수정 요청(revision_requested) 만료(due<now) 자동 hard delete — 매일(부팅+24h).
       spdRevisionExpiryJob.start();
       logger.info('✅ SPD Revision Expiry Job started');
+
+      // WO-O4O-AUTOMATION-VIDEO-JOB-TEMP-OUTPUT-DOWNLOAD-AND-AUTO-CLEANUP-V1
+      // VIDEO Job 완성본 임시 output TTL 만료 → storage object 삭제 + EXPIRED 기록 (부팅+매시간).
+      videoTempOutputExpiryJob.start();
+      logger.info('✅ Video Temp Output Expiry Job started');
     } catch (schedulerError) {
       logger.warn('Scheduler initialization failed (non-critical):', schedulerError);
     }
@@ -284,6 +290,7 @@ export class StartupService {
       // MaterializedViewScheduler removed — mv_product_listings does not exist in DB
       marketTrialLifecycleJob.stop();
       spdRevisionExpiryJob.stop();
+      videoTempOutputExpiryJob.stop();
       logger.info('✅ Schedulers stopped');
     } catch (error) {
       logger.error('Error during shutdown:', error);

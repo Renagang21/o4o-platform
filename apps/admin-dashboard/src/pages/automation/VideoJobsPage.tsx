@@ -75,8 +75,8 @@ const VideoJobsPage: React.FC = () => {
         <div className="mb-1 text-xs text-gray-400">자동화</div>
         <h1 className="text-2xl font-normal mb-1">동영상 제작</h1>
         <p className="text-sm text-gray-500 mb-5">
-          동영상 제작 작업의 상태·지시·자료 연결만 관리하는 임시 작업공간입니다. 실제 생성·편집·렌더링은 외부 도구에서
-          수행하고, 결과는 Media Library 자산으로 연결합니다.
+          동영상 제작 작업의 상태·지시·제작 자료 연결만 관리하는 임시 작업공간입니다. 실제 생성·편집·렌더링은 외부 도구에서
+          수행합니다. 완성 영상은 Media Library 에 보관하지 않고 임시 저장 후 다운로드하며, 보관 기간이 지나면 자동 삭제됩니다.
         </p>
 
         <form onSubmit={handleCreate} className="bg-white border rounded p-4 mb-4">
@@ -131,20 +131,21 @@ const VideoJobsPage: React.FC = () => {
               <tr>
                 <th className="px-3 py-3 text-left text-sm font-medium">작업</th>
                 <th className="px-3 py-3 text-left text-sm font-medium">상태</th>
-                <th className="px-3 py-3 text-left text-sm font-medium">자료 (입력 / 작업 / 결과)</th>
+                <th className="px-3 py-3 text-left text-sm font-medium">제작 자료 (입력 / 작업)</th>
+                <th className="px-3 py-3 text-left text-sm font-medium">완성 영상</th>
                 <th className="px-3 py-3 text-left text-sm font-medium">수정일</th>
               </tr>
             </thead>
             <tbody>
               {loading && jobs.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-3 py-8 text-center text-sm text-gray-400">
+                  <td colSpan={5} className="px-3 py-8 text-center text-sm text-gray-400">
                     Loading…
                   </td>
                 </tr>
               ) : visible.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-3 py-8 text-center text-sm text-gray-400">
+                  <td colSpan={5} className="px-3 py-8 text-center text-sm text-gray-400">
                     {tab === 'open' ? '진행 중인 작업이 없습니다.' : '완료된 작업이 없습니다.'}
                   </td>
                 </tr>
@@ -166,7 +167,16 @@ const VideoJobsPage: React.FC = () => {
                       {j.statusNote && <div className="text-xs text-gray-500 mt-1">{j.statusNote}</div>}
                     </td>
                     <td className="px-3 py-3 text-sm text-gray-600">
-                      {j.assetCounts.INPUT} / {j.assetCounts.INTERMEDIATE} / {j.assetCounts.OUTPUT}
+                      {j.assetCounts.INPUT} / {j.assetCounts.INTERMEDIATE}
+                    </td>
+                    <td className="px-3 py-3 text-xs">
+                      {j.tempOutput.state === 'AVAILABLE' ? (
+                        <span className="text-green-700">다운로드 가능 · 만료 {formatDate(j.tempOutput.expiresAt ?? '')}</span>
+                      ) : j.tempOutput.state === 'EXPIRED' ? (
+                        <span className="text-gray-400">만료됨</span>
+                      ) : (
+                        <span className="text-gray-300">-</span>
+                      )}
                     </td>
                     <td className="px-3 py-3 text-xs text-gray-500">{formatDate(j.updatedAt)}</td>
                   </tr>

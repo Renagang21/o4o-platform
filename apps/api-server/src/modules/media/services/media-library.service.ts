@@ -59,7 +59,7 @@ const PRESERVE_MAX_BYTES = 8 * 1024 * 1024; // 8MB
  *   결과에 한글이 있으면 보정 값 사용
  * - ASCII만 포함된 파일명 → 그대로 반환
  */
-function decodeOriginalName(name: string): string {
+export function decodeOriginalName(name: string): string {
   // 이미 유니코드 한글(AC00-D7AF, 1100-11FF, 3130-318F)이 포함돼 있으면 올바른 상태
   if (/[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]/.test(name)) return name;
   // 비ASCII 바이트가 있을 때만 재해석 시도

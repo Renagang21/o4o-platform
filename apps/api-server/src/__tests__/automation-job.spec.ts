@@ -11,6 +11,8 @@ import { AddMediaAssetFolder20260401400000 } from '../database/migrations/202604
 import { AddMediaAssetMetadata20261222000000 } from '../database/migrations/20261222000000-AddMediaAssetMetadata.js';
 import { MediaLibraryV2Foundation20270407000000 } from '../database/migrations/20270407000000-MediaLibraryV2Foundation.js';
 import { CreateAutomationJobs20270410000000 } from '../database/migrations/20270410000000-CreateAutomationJobs.js';
+import { AddAutomationJobTempOutput20270411000000 } from '../database/migrations/20270411000000-AddAutomationJobTempOutput.js';
+import { JOB_ENTITY_TYPE } from '../modules/automation/services/automation-job.service.js';
 
 const saveFile = jest.fn().mockResolvedValue(undefined);
 const deleteFile = jest.fn().mockResolvedValue(undefined);
@@ -46,6 +48,7 @@ integration('Automation VIDEO job P0 — jobs, links, cleanup, delete guard regr
     await new AddMediaAssetMetadata20261222000000().up(q);
     await new MediaLibraryV2Foundation20270407000000().up(q);
     await new CreateAutomationJobs20270410000000().up(q);
+    await new AddAutomationJobTempOutput20270411000000().up(q);
     await q.query('CREATE TABLE store_execution_assets(id uuid,organization_id uuid,title text,usage_type text,updated_at timestamptz,html_content text)');
     await q.query('CREATE TABLE store_tablet_screen_sets(id uuid PRIMARY KEY)');
     await q.query('CREATE TABLE store_tablet_screen_blocks(screen_set_id uuid,config jsonb)');
@@ -65,14 +68,31 @@ integration('Automation VIDEO job P0 — jobs, links, cleanup, delete guard regr
     library.upload({ buffer: Buffer.from('x'), size: 1, originalname: name, mimetype: 'video/mp4' }, actor);
   const link = (jobId: string, purpose: string, assetId?: string) =>
     upload().then(async (a) => ({ asset: a, ...(await jobs.linkAsset(jobId, { mediaAssetId: assetId ?? a.id, purpose })) }));
+  /**
+   * WO-O4O-AUTOMATION-VIDEO-JOB-TEMP-OUTPUT-DOWNLOAD-AND-AUTO-CLEANUP-V1: OUTPUT 은 더 이상 API 로 만들 수 없다.
+   * P0 시절 만들어진 production 의 legacy OUTPUT 행을 흉내 내려면 media_entity_links 에 직접 넣는다.
+   */
+  const legacyOutput = async (jobId: string) => {
+    const a = await upload('legacy-final.mp4');
+    const [{ id }] = await ds.query(
+      'INSERT INTO media_entity_links(media_asset_id,entity_type,entity_id,purpose) VALUES($1,$2,$3,$4) RETURNING id',
+      [a.id, JOB_ENTITY_TYPE, jobId, 'OUTPUT'],
+    );
+    return { asset: a, linkId: id as string };
+  };
 
-  test('migration: rollback drops only automation_jobs and re-apply works', async () => {
+  test('migration: rollback drops only automation_jobs and re-apply works (temp output columns included)', async () => {
     const q = ds.createQueryRunner();
     const m = new CreateAutomationJobs20270410000000();
+    const m2 = new AddAutomationJobTempOutput20270411000000();
+    await m2.down(q);
+    expect((await q.query("SELECT column_name FROM information_schema.columns WHERE table_name='automation_jobs' AND column_name LIKE 'temp_output_%'")).length).toBe(0);
     await m.down(q);
     expect((await q.query("SELECT to_regclass('automation_jobs') AS t"))[0].t).toBeNull();
     expect((await q.query("SELECT to_regclass('media_entity_links') AS t"))[0].t).toBe('media_entity_links');
     await m.up(q);
+    await m2.up(q);
+    expect((await q.query("SELECT column_name FROM information_schema.columns WHERE table_name='automation_jobs' AND column_name LIKE 'temp_output_%'")).length).toBe(7);
     await q.release();
   });
 
@@ -119,17 +139,20 @@ integration('Automation VIDEO job P0 — jobs, links, cleanup, delete guard regr
     expect((await jobs.get(b.id)).assets[0]).toMatchObject({ linkId: bIn.linkId, purpose: 'INPUT', asset: { id: bIn.asset.id } });
   });
 
-  test('C. asset link INPUT/INTERMEDIATE/OUTPUT, purpose switch, unlink, unknown job/asset refused', async () => {
+  test('C. asset link INPUT/INTERMEDIATE only; legacy OUTPUT readable; purpose switch, unlink, unknown job/asset refused', async () => {
     const job = await jobs.create({ title: 'link' }, actor);
     const input = await link(job.id, 'INPUT');
     const mid = await link(job.id, 'INTERMEDIATE');
-    const out = await link(job.id, 'OUTPUT');
+    // 완성 영상은 Media Library OUTPUT 으로 연결하지 않는다 — 새 OUTPUT 연결 거부
+    await expect(jobs.linkAsset(job.id, { mediaAssetId: mid.asset.id, purpose: 'OUTPUT' })).rejects.toMatchObject({ code: 'PURPOSE_NOT_ALLOWED', status: 400 });
+    const out = await legacyOutput(job.id);
     expect((await jobs.get(job.id)).assets.map((l) => l.purpose)).toEqual(['INPUT', 'INTERMEDIATE', 'OUTPUT']);
+    expect((await jobs.list()).find((j) => j.id === job.id)?.assetCounts).toEqual({ INPUT: 1, INTERMEDIATE: 1, OUTPUT: 1 });
     // 같은 asset 을 다른 purpose 로 재연결하면 이전 purpose 링크는 사라진다(한 Job 에 한 purpose)
-    await jobs.linkAsset(job.id, { mediaAssetId: mid.asset.id, purpose: 'OUTPUT' });
+    await jobs.linkAsset(job.id, { mediaAssetId: mid.asset.id, purpose: 'INPUT' });
     const after = (await jobs.get(job.id)).assets;
     expect(after.filter((l) => l.asset.id === mid.asset.id)).toHaveLength(1);
-    expect(after.find((l) => l.asset.id === mid.asset.id)?.purpose).toBe('OUTPUT');
+    expect(after.find((l) => l.asset.id === mid.asset.id)?.purpose).toBe('INPUT');
     await expect(jobs.linkAsset(job.id, { mediaAssetId: input.asset.id, purpose: 'TEMPORARY' })).rejects.toMatchObject({ code: 'INVALID_PURPOSE' });
     await expect(jobs.linkAsset(job.id, { mediaAssetId: randomUUID(), purpose: 'INPUT' })).rejects.toMatchObject({ code: 'ASSET_NOT_FOUND', status: 404 });
     await expect(jobs.linkAsset(randomUUID(), { mediaAssetId: input.asset.id, purpose: 'INPUT' })).rejects.toMatchObject({ code: 'JOB_NOT_FOUND', status: 404 });
@@ -150,10 +173,10 @@ integration('Automation VIDEO job P0 — jobs, links, cleanup, delete guard regr
     const shared = await link(job.id, 'INTERMEDIATE');
     const parent = await link(job.id, 'INTERMEDIATE');
     const screen = await link(job.id, 'INTERMEDIATE');
-    const out = await link(job.id, 'OUTPUT');
+    const out = await legacyOutput(job.id);
     // shared: 다른 entity(product) 에도 연결
     await catalog.saveLink(shared.asset.id, { entityType: 'product', entityId: 'p-1', purpose: 'gallery' });
-    // parent: OUTPUT 의 lineage parent
+    // parent: legacy OUTPUT 의 lineage parent
     await catalog.patch(out.asset.id, { parentAssetId: parent.asset.id, derivationType: 'final-video' }, actor);
     // screen: Screen Set 이 참조
     const setId = randomUUID();
