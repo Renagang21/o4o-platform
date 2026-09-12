@@ -397,5 +397,5 @@ test('F3. service worker: DOM 요청은 등재 site 탭 하나로만 가고 exec
   assert.ok(!src.includes('chrome.scripting'));
   const manifest = JSON.parse(read(path.join(EXT_SRC, '..', 'manifest.json')));
   assert.deepEqual(manifest.permissions, ['sidePanel', 'tabs', 'nativeMessaging']);
-  assert.deepEqual(manifest.host_permissions, ['https://neture.co.kr/*']);
+  assert.deepEqual(manifest.host_permissions, ['https://neture.co.kr/*', 'https://health.kr/*']); // PHARMACY-WEB-CORE V0: 등재 site 2
 });

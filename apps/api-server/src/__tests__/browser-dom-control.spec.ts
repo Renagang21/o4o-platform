@@ -521,7 +521,7 @@ describe('18~19. arbitrary selector · arbitrary JS 부재', () => {
     const manifest = JSON.parse(read(join(REPO_ROOT, 'tools', 'o4o-chrome-extension', 'manifest.json')));
     expect(JSON.stringify(manifest)).not.toContain('<all_urls>');
     for (const p of ['scripting', 'cookies', 'debugger', 'webRequest']) expect(manifest.permissions).not.toContain(p);
-    expect(manifest.host_permissions).toEqual(['https://neture.co.kr/*']);
+    expect(manifest.host_permissions).toEqual(['https://neture.co.kr/*', 'https://health.kr/*']); // PHARMACY-WEB-CORE V0: 등재 site 2
   });
 });
 

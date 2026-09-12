@@ -16,10 +16,10 @@
     "default_title": "O4O 작업 준비"
   },
   "permissions": ["sidePanel", "tabs", "nativeMessaging"],
-  "host_permissions": ["https://neture.co.kr/*"],
+  "host_permissions": ["https://neture.co.kr/*", "https://health.kr/*"],
   "content_scripts": [
     {
-      "matches": ["https://neture.co.kr/*"],
+      "matches": ["https://neture.co.kr/*", "https://health.kr/*"],
       "js": ["src/content-script.js"],
       "run_at": "document_idle"
     }

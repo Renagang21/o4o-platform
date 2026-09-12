@@ -72,17 +72,20 @@ describe('WO-O4O-AUTOMATION-EXECUTION-LAYER-REALIGNMENT-V1', () => {
       // local.supplier.* (DOM tool 조합 — 자기 실행기 없음). 그 밖은 전부 api.
       const nonComputer = AI_TOOL_REGISTRY.filter((t) => t.automationMethod !== 'computer_use');
       for (const t of nonComputer) {
-        const isDomFamily = t.name.startsWith('local.browser.dom.') || t.name.startsWith('local.supplier.');
+        const isDomFamily =
+          t.name.startsWith('local.browser.dom.') || t.name.startsWith('local.supplier.') || t.name.startsWith('local.pharmacyweb.');
         expect(t.automationMethod).toBe(isDomFamily ? 'browser_dom' : 'api');
       }
     });
 
-    it('06. browser_dom 은 local.browser.dom.* 여덟 + local.supplier.product_lookup 하나 · windows_uia 는 아직 없다 (§27·§28)', () => {
+    it('06. browser_dom 은 local.browser.dom.* 여덟 + Adapter tool 둘(supplier · pharmacyweb) · windows_uia 는 아직 없다 (§27·§28)', () => {
       const dom = AI_TOOL_REGISTRY.filter((t) => t.automationMethod === 'browser_dom').map((t) => t.name).sort();
       expect(dom).toEqual(
         [
           // WO-O4O-SUPPLIER-SITE-ADAPTER-V0 §6·§7: Adapter 는 DOM tool 조합이므로 같은 수단으로 표기된다.
           'local.supplier.product_lookup',
+          // WO-O4O-PHARMACY-WEB-AUTOMATION-CORE-AND-HEALTHKR-ADAPTER-V0 §2: 같은 이유.
+          'local.pharmacyweb.entrypoint',
           'local.browser.dom.get_context',
           'local.browser.dom.inspect',
           'local.browser.dom.find',

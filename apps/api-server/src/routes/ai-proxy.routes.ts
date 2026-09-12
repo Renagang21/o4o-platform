@@ -55,6 +55,7 @@ import {
   domRequestGap,
   isDomToolName,
   isSupplierToolName,
+  pharmacyWebRequestGap,
   supplierRequestGap,
   needsLocalDeviceResolution,
 } from '../services/ai-tools/ai-tool-router.js';
@@ -1937,6 +1938,9 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
       // SUPPLIER-SITE-ADAPTER-V0 §35: 공급처 조회 요청인데 상품명이 없거나 금지 내용이면 되묻게 한다.
       const supplierGap = supplierRequestGap(message);
       if (supplierGap) facts.supplierRequestGap = supplierGap;
+      // PHARMACY-WEB-CORE V0 §13·§21·§28: 약국 웹 요청인데 작업이 모호하거나 입력이 없으면 되묻게 한다.
+      const pharmacyWebGap = pharmacyWebRequestGap(message);
+      if (pharmacyWebGap) facts.pharmacyWebRequestGap = pharmacyWebGap;
     }
     if (selected) {
       const toolResult = await executeAiTool(AppDataSource, selected.tool, selected.args, toolCtx);
@@ -1962,6 +1966,10 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
         // SUPPLIER-SITE-ADAPTER-V0 §26·§34: 공급처 축은 읽었다/막혔다 두 갈래로만 프롬프트에 반영한다.
         else if (isSupplierToolName(selected.tool)) {
           facts.supplierLookup = toolResult.data?.available === true ? 'read' : 'blocked';
+        }
+        // PHARMACY-WEB-CORE V0 §31·§44: 약국 웹 축은 읽었다/막혔다 두 갈래로만 프롬프트에 반영한다.
+        else if (selected.tool === AI_TOOL_NAMES.PHARMACY_WEB_ENTRYPOINT) {
+          facts.pharmacyWebAction = toolResult.data?.available === true ? 'read' : 'blocked';
         }
         else if (isDomToolName(selected.tool)) {
           facts.browserDomAction = toolResult.data?.available === true

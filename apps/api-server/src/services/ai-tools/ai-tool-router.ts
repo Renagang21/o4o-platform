@@ -57,7 +57,16 @@ import {
   pickSafeWindowInfo,
 } from '../local-agent/local-agent-protocol.js';
 import { textDenyReason } from '../local-agent/computer-use-contract.js';
-import { domInputDenyReason, pickSafeDomInfo } from '../local-agent/browser-dom-contract.js';
+import { domInputDenyReason } from '../local-agent/browser-dom-contract.js';
+import {
+  DOM_CLICKABLE_ROLES,
+  DOM_INPUT_ROLES,
+  DOM_SELECT_ROLES,
+  chooseDomTarget,
+  issueDomCommand,
+  traceDomFallback,
+} from './browser-dom-executor.js';
+export { chooseDomTarget } from './browser-dom-executor.js';
 import {
   SUPPLIER_ADAPTER_IDS,
   SUPPLIER_ERROR,
@@ -72,13 +81,20 @@ import {
   supplierErrorFromDom,
   supplierQueryDenyReason,
 } from '../local-agent/supplier-site-adapter-contract.js';
-import {
-  FALLBACK_REASON,
-  resolveAutomationMethod,
-  type AutomationRiskLevel,
-  type FallbackReason,
-} from './automation-execution-contract.js';
+import { FALLBACK_REASON, type AutomationRiskLevel, type FallbackReason } from './automation-execution-contract.js';
 import { windowsAppDisplayName, WINDOWS_APP_IDS } from '../local-agent/windows-app-registry.js';
+import {
+  PHARMACY_WEB_INTENT,
+  PHARMACY_WEB_SITE_REGISTRY,
+  isValidPharmacyWebQuery,
+  parsePillConditions,
+  resolvePharmacyWebEntryPoint,
+  resolvePharmacyWebIntent,
+  resolvePharmacyWebSite,
+  validatePillIdentificationInput,
+  type PharmacyWebIntent,
+} from '../local-agent/pharmacy-web-core.js';
+import { executePharmacyWebEntryPoint, renderPharmacyWebResult } from './pharmacy-web-executor.js';
 import { browserSiteDisplayName, BROWSER_SITE_IDS } from '../local-agent/browser-site-registry.js';
 import {
   awaitCommandResult,
@@ -747,6 +763,11 @@ export async function executeAiTool(
       const a = args as { supplierId: string; query: string };
       return executeSupplierProductLookup(dataSource, ctx, String(a.supplierId), String(a.query));
     }
+    // 약국 웹 EntryPoint (PHARMACY-WEB-CORE V0): entryPointId · input 은 validateToolArguments 를 통과한 값이다.
+    case AI_TOOL_NAMES.PHARMACY_WEB_ENTRYPOINT: {
+      const a = args as { entryPointId: string; input: Record<string, unknown> };
+      return executePharmacyWebEntryPoint(dataSource, ctx, String(a.entryPointId), a.input ?? {});
+    }
     // 로컬 데이터 (LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1): key·value 는 validateToolArguments 를
     // 통과한 값이고, issueCommand 가 같은 규칙(validateLocalCommandArgs)으로 한 번 더 검사한다(§14).
     case AI_TOOL_NAMES.DATA_LOCAL_HEALTH:
@@ -907,6 +928,13 @@ const SITE_INTENT_KEYWORDS: readonly {
     ],
     en: [/\bneture\b/i, /\bo4o\s*home\b/i],
   },
+  // PHARMACY-WEB-CORE V0 §6: 약국 웹사이트 별칭은 등재부(pharmacy-web-core)에서 파생한다 — 두 곳에 적지 않는다.
+  ...PHARMACY_WEB_SITE_REGISTRY.map((site) => ({
+    siteId: site.siteId,
+    // 별칭은 공백 제거 문자열로 대조한다(ASCII 별칭 "health.kr" 도 같은 방식). 정규식을 만들지 않는다.
+    ko: site.aliases.map((a) => a.replace(/\s+/g, '')),
+    en: [],
+  })),
 ];
 
 /** 문장에서 등재 사이트를 찾는다. 여러 개가 걸리면 **고르지 않는다**(임의 선택 금지). */
@@ -1270,6 +1298,9 @@ export function needsLocalDeviceResolution(message: string): boolean {
     detectRegisteredSite(message) !== null ||
     // SUPPLIER-SITE-ADAPTER-V0: 공급처 축도 PC 의 Chrome 탭이 있어야 성립한다.
     detectSupplierAdapter(message) !== null ||
+    // PHARMACY-WEB-CORE V0: 약국 웹 축도 PC 의 Chrome 탭이 있어야 성립한다.
+    resolvePharmacyWebSite(message) !== null ||
+    detectPharmacyWebInvocation(message) !== null ||
     // LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1: 데이터 축도 연결된 PC 의 local.db 가 있어야 성립한다.
     looksLikeLocalDataRequest(message)
   );
@@ -1298,6 +1329,19 @@ export function selectToolInvocationForRequest(
   // 공급처 축 (SUPPLIER-SITE-ADAPTER-V0 §9·§10·§34). 사이트 축보다 **먼저** 본다 — 공급처 화면은
   // 등재 site 위에 있으므로, 가격·재고를 묻는 문장을 일반 DOM 읽기로 흘려보내면 표준 결과가
   // 나오지 않는다. 창 축과 동시에 걸리면 고르지 않는다(site 축과 같은 규칙).
+  // 약국 웹 축 (PHARMACY-WEB-CORE V0 §11·§12·§13). 사이트 별칭(또는 약국 전용 업무) + 업무 intent + 입력이 모두
+  // 있어야 tool 하나가 된다. 로그인 요청은 이 축이 아니다(열기 축이 "직접 로그인" 을 안내한다).
+  if (!asksForLogin(message)) {
+    const pharmacyWeb = detectPharmacyWebInvocation(message);
+    if (pharmacyWeb) {
+      if (appIdEarly) return null;
+      return available.has(AI_TOOL_NAMES.PHARMACY_WEB_ENTRYPOINT)
+        ? { tool: AI_TOOL_NAMES.PHARMACY_WEB_ENTRYPOINT, args: { entryPointId: pharmacyWeb.entryPointId, input: pharmacyWeb.input } }
+        : null;
+    }
+    if (pharmacyWebRequestGap(message)) return null;
+  }
+
   const supplierIntent = detectSupplierLookupIntent(message);
   if (supplierIntent) {
     if (appIdEarly) return null;
@@ -1441,6 +1485,9 @@ export function renderToolContext(result: ToolResult): string | null {
     result.tool === AI_TOOL_NAMES.COMPUTER_KEY
   ) {
     return renderComputerAction(result.tool, result.data);
+  }
+  if (result.tool === AI_TOOL_NAMES.PHARMACY_WEB_ENTRYPOINT) {
+    return renderPharmacyWebResult(result.data);
   }
   if (isSupplierToolName(result.tool)) {
     return renderSupplierLookup(result.data);
@@ -1821,78 +1868,8 @@ function renderLocalSystemInfo(data: Record<string, unknown>): string {
 //   selector · XPath · JS 는 어디에도 없다 — element 는 확장이 발급한 elementRef 로만(§13·§16).
 // ═════════════════════════════════════════════════════════════════════════════
 
-// ─── DOM executors (§8·§9·§13·§28·§29·§30·§51) ───────────────────────────────
-
-/** click · set_input · select_option 대상으로 삼을 수 있는 role. 그 밖은 실행하지 않는다(§18·§22). */
-const DOM_CLICKABLE_ROLES: readonly string[] = Object.freeze(['button', 'link', 'checkbox', 'radio', 'tab', 'menuitem']);
-const DOM_INPUT_ROLES: readonly string[] = Object.freeze(['textbox', 'searchbox', 'textarea']);
-const DOM_SELECT_ROLES: readonly string[] = Object.freeze(['combobox']);
-
-/** DOM 실패 → computer_use fallback **후보** 사유. 실행하지 않는다(§30). 여기 없는 실패는 후보도 아니다. */
-function domFallbackReason(errorCode: string | undefined): FallbackReason | undefined {
-  if (errorCode === LOCAL_AGENT_ERROR.DOM_ELEMENT_NOT_FOUND) return FALLBACK_REASON.DOM_ELEMENT_NOT_FOUND;
-  if (errorCode === LOCAL_AGENT_ERROR.DOM_CONTENT_UNAVAILABLE) return FALLBACK_REASON.ACCESSIBILITY_UNAVAILABLE;
-  return undefined;
-}
-
-/**
- * DOM 명령 하나를 발행하고 결과를 기다린다. 안전 로그(§51)는 tool · siteId · action · riskLevel ·
- * automationMethod · status · errorCode · fallbackReason · duration 뿐 — 입력 텍스트 · 페이지 텍스트 ·
- * HTML · 좌표 · URL 은 값 안에 애초에 없다(pickSafeDomInfo).
- */
-async function issueDomCommand(
-  dataSource: DataSource,
-  ctx: VerifiedToolContext,
-  deviceId: string,
-  tool: string,
-  baseAction: string,
-  siteId: string,
-  args: Record<string, unknown> | undefined,
-): Promise<{ status: string; errorCode?: string; safe: Record<string, unknown>; fallbackReason?: FallbackReason }> {
-  const startedAt = Date.now();
-  const issued = await issueCommand(dataSource, {
-    userId: ctx.userId,
-    deviceId,
-    action: composeSiteAction(baseAction, siteId),
-    toolName: tool,
-    args,
-  });
-  if (issued.ok === false) {
-    return { status: 'denied', errorCode: issued.errorCode, safe: {} };
-  }
-  const result = await awaitCommandResult(dataSource, issued.command.commandId);
-  const safe = pickSafeDomInfo(result.data);
-  const fallbackReason = result.status === 'success' ? undefined : domFallbackReason(result.errorCode);
-  logger.info('local-agent browser dom command', {
-    tool,
-    siteId,
-    action: baseAction,
-    automationMethod: 'browser_dom',
-    riskLevel: typeof safe.riskLevel === 'string' ? safe.riskLevel : null,
-    elementRole: typeof safe.role === 'string' ? safe.role : null,
-    status: result.status,
-    errorCode: result.errorCode ?? null,
-    fallbackReason: fallbackReason ?? null,
-    durationMs: Date.now() - startedAt,
-    deviceId,
-  });
-  return { status: result.status, errorCode: result.errorCode, safe, fallbackReason };
-}
-
-/**
- * fallback 추적 정보(§30·§41 TRACEABLE). `resolveAutomationMethod` 에 "이 작업에는 computer_use 가
- * **available 하지 않다**" 를 그대로 넣는다 — 사이트 축은 computer_use 대상(등재 앱 창)이 아니므로
- * 결정은 항상 blocked 다. 그 결정과 사유가 결과에 남는다. 자동 실행은 없다.
- */
-function traceDomFallback(riskLevel: AutomationRiskLevel, fallbackReason: FallbackReason | undefined) {
-  const decision = resolveAutomationMethod({ availableMethods: [], riskLevel, fallbackReason });
-  return {
-    fallbackReason: fallbackReason ?? null,
-    fallbackCandidate: 'computer_use',
-    fallbackExecuted: false,
-    fallbackDecision: decision.blocked ? decision.blockReason : decision.method,
-  };
-}
+// ─── DOM executors — 발행 · fallback 추적 · 대상 선택은 browser-dom-executor.ts 로 옮겼다
+//     (PHARMACY-WEB-CORE V0: 공급처 · 약국 웹 Adapter 가 같은 발행 경로를 쓴다). 여기에는 tool 왕복만 남는다.
 
 interface DomExecOptions {
   tool: string;
@@ -1993,25 +1970,6 @@ async function executeDomAction(
       fallbackExecuted: false,
     },
   };
-}
-
-/**
- * find 후보 중 하나를 결정론적으로 고른다. 정확한 이름 일치 + role 적합 → role 적합 → (role 제한 없으면) 첫 후보.
- * 후보가 여럿이고 어느 것도 정확히 맞지 않으면 **첫 후보를 고르지 않고 null** — 엉뚱한 버튼을 누르지 않는다.
- */
-export function chooseDomTarget(
-  matches: readonly Record<string, unknown>[],
-  wanted: string,
-  acceptRoles?: readonly string[],
-): Record<string, unknown> | null {
-  const norm = (v: unknown) => String(v ?? '').replace(/\s+/g, '').toLowerCase();
-  const want = norm(wanted);
-  const roleOk = (m: Record<string, unknown>) => !acceptRoles || acceptRoles.includes(String(m.role));
-  const eligible = matches.filter(roleOk);
-  if (eligible.length === 0) return null;
-  const exact = eligible.filter((m) => norm(m.name) === want || norm(m.text) === want);
-  if (exact.length >= 1) return exact[0];
-  return eligible.length === 1 ? eligible[0] : null;
 }
 
 // ─── DOM intents (§3·§15) — 대상은 사용자가 따옴표로 말한 것만, AI 가 지어내지 않는다 ─────
@@ -2734,4 +2692,121 @@ function renderSupplierLookup(data: Record<string, unknown>): string {
     DOM_UNTRUSTED_NOTE +
     fence(lines.join('\n'))
   );
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Pharmacy Web Core V0 (WO-O4O-PHARMACY-WEB-AUTOMATION-CORE-AND-HEALTHKR-ADAPTER-V0) — 의도 해석
+//
+//   문장 → 사이트(별칭) → intent → EntryPoint → 입력(검색어 · 낱알 조건) → tool 1개.
+//   AI 가 URL · selector 를 만들지 않는다(§12·§46). 모호하면 실행하지 않고 되묻는다(§13).
+// ═════════════════════════════════════════════════════════════════════════════
+
+export interface PharmacyWebInvocation {
+  entryPointId: string;
+  input: Record<string, unknown>;
+}
+
+export type PharmacyWebRequestGap =
+  | 'PHARMACY_WEB_INTENT_AMBIGUOUS'
+  | 'PHARMACY_WEB_INPUT_MISSING'
+  | 'PHARMACY_WEB_INPUT_DENIED';
+
+/** 사이트 이름 없이도 성립하는 약국 전용 업무 — 등재 사이트 중 그 업무를 가진 곳이 하나뿐일 때만. */
+const SITE_OPTIONAL_INTENTS: readonly string[] = [
+  PHARMACY_WEB_INTENT.PILL_IDENTIFICATION,
+  PHARMACY_WEB_INTENT.SAME_INGREDIENT,
+  PHARMACY_WEB_INTENT.DRUG_DETAIL,
+];
+
+/** 제품명 어미(정 · 캡슐 · 시럽 …). 문자열 리터럴로 둔다(한글 정규식 리터럴 금지). */
+const DRUG_NAME_SUFFIXES_KO: readonly string[] = ['정', '캡슐', '시럽', '연고', '크림', '액', '주', '산', '환', '패치', '겔', '로션'];
+const TRAILING_PARTICLES_KO: readonly string[] = ['이랑', '하고', '으로', '을', '를', '이', '가', '은', '는', '도', '과', '와', '의', '로', '랑'];
+
+/**
+ * 따옴표가 없을 때 문장에서 제품명 토큰 하나를 뽑는다("아모디핀정 찾아줘" · "타이레놀정500mg 설명서").
+ * 어미 표에 있는 토큰이 정확히 하나일 때만 돌려준다 — 둘 이상이면 무엇을 찾을지 단정하지 않는다.
+ */
+export function extractDrugNameToken(message: string): string | null {
+  // 앞뒤 따옴표 · 괄호 · 문장부호를 뗀다. 비ASCII 따옴표는 문자열 목록으로 둔다(정규식 리터럴에 넣지 않는다).
+  const trimChars = new Set(['"', "'", '(', ')', '[', ']', ',', '.', '?', '!', ...QUOTE_PAIRS.flat()]);
+  const trim = (t: string): string => {
+    let a = 0;
+    let b = t.length;
+    while (a < b && trimChars.has(t[a])) a += 1;
+    while (b > a && trimChars.has(t[b - 1])) b -= 1;
+    return t.slice(a, b);
+  };
+  const tokens = String(message ?? '')
+    .split(/\s+/)
+    .map(trim)
+    .filter((t) => t.length > 0);
+  const found: string[] = [];
+  for (const raw of tokens) {
+    let token = raw;
+    for (const particle of TRAILING_PARTICLES_KO) {
+      if (token.length > particle.length + 1 && token.endsWith(particle)) {
+        token = token.slice(0, -particle.length);
+        break;
+      }
+    }
+    const stem = token.replace(/[0-9.,/]+(mg|g|ml|mcg|iu)?$/i, '');
+    if (DRUG_NAME_SUFFIXES_KO.some((sfx) => stem.length > sfx.length && stem.endsWith(sfx))) found.push(token);
+  }
+  return found.length === 1 ? found[0] : null;
+}
+
+function pharmacyWebSiteFor(message: string, intent: PharmacyWebIntent | undefined): string | null {
+  const named = resolvePharmacyWebSite(message);
+  if (named) return named;
+  if (!intent || !SITE_OPTIONAL_INTENTS.includes(intent)) return null;
+  const sites = PHARMACY_WEB_SITE_REGISTRY.filter((site) => site.enabled && resolvePharmacyWebEntryPoint(site.siteId, intent));
+  return sites.length === 1 ? sites[0].siteId : null;
+}
+
+/**
+ * 약국 웹 요청 → EntryPoint + 입력(§11·§12). 자격이 안 되면 null 이고 `pharmacyWebRequestGap` 이 사유를 준다.
+ *   - 사이트: 별칭으로 지목했거나, 약국 전용 업무(낱알 · 동일성분 · 상세)라 사이트가 하나로 정해질 때.
+ *   - intent: 구체 업무 1개(모호하면 null).
+ *   - 입력: 검색어는 따옴표 구절 → 제품명 토큰 순. 낱알은 식별문자가 하나는 있어야 한다.
+ */
+export function detectPharmacyWebInvocation(message: string): PharmacyWebInvocation | null {
+  const resolved = resolvePharmacyWebIntent(message);
+  if (!resolved.intent) return null;
+  const siteId = pharmacyWebSiteFor(message, resolved.intent);
+  if (!siteId) return null;
+  const ep = resolvePharmacyWebEntryPoint(siteId, resolved.intent);
+  if (!ep) return null;
+  if (ep.intent === PHARMACY_WEB_INTENT.DRUG_SEARCH || ep.intent === PHARMACY_WEB_INTENT.SAME_INGREDIENT) {
+    const quotes = extractQuotedStrings(message);
+    const query = quotes.length > 0 ? quotes[0] : extractDrugNameToken(message);
+    if (!query || !isValidPharmacyWebQuery(query)) return null;
+    return { entryPointId: ep.entryPointId, input: { query } };
+  }
+  if (ep.intent === PHARMACY_WEB_INTENT.PILL_IDENTIFICATION) {
+    const v = validatePillIdentificationInput(parsePillConditions(message));
+    if (!v.ok || !v.input) return null;
+    return { entryPointId: ep.entryPointId, input: v.input as Record<string, unknown> };
+  }
+  return { entryPointId: ep.entryPointId, input: {} };
+}
+
+/** 약국 웹 요청이었으나 실행하지 않은 이유(§13·§21·§28). 사이트도 업무도 아니면 null(다른 축). */
+export function pharmacyWebRequestGap(message: string): PharmacyWebRequestGap | null {
+  const resolved = resolvePharmacyWebIntent(message);
+  if (resolved.ambiguous) return resolvePharmacyWebSite(message) ? 'PHARMACY_WEB_INTENT_AMBIGUOUS' : null;
+  if (!resolved.intent) return null;
+  const siteId = pharmacyWebSiteFor(message, resolved.intent);
+  if (!siteId) return null;
+  const ep = resolvePharmacyWebEntryPoint(siteId, resolved.intent);
+  if (!ep) return null;
+  if (ep.intent === PHARMACY_WEB_INTENT.DRUG_SEARCH || ep.intent === PHARMACY_WEB_INTENT.SAME_INGREDIENT) {
+    const quotes = extractQuotedStrings(message);
+    const query = quotes.length > 0 ? quotes[0] : extractDrugNameToken(message);
+    if (!query) return 'PHARMACY_WEB_INPUT_MISSING';
+    return isValidPharmacyWebQuery(query) ? null : 'PHARMACY_WEB_INPUT_DENIED';
+  }
+  if (ep.intent === PHARMACY_WEB_INTENT.PILL_IDENTIFICATION) {
+    return validatePillIdentificationInput(parsePillConditions(message)).ok ? null : 'PHARMACY_WEB_INPUT_MISSING';
+  }
+  return null;
 }

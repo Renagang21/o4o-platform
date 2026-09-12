@@ -202,7 +202,9 @@ test('site registry identifies neture, rejects others; no <all_urls> host perms 
   assert.equal(extSites.siteIdForUrl('https://neture.co.kr/some/path?x=1'), 'o4o.neture');
   assert.equal(extSites.siteIdForUrl('https://evil.example.com/'), null);
   assert.equal(extSites.siteIdForUrl('not a url'), null);
-  assert.deepEqual(extSites.derivedHostPermissions(), ['https://neture.co.kr/*']);
+  assert.deepEqual(extSites.derivedHostPermissions(), ['https://neture.co.kr/*', 'https://health.kr/*']);
+  assert.equal(extSites.siteIdForUrl('https://health.kr/searchIdentity/search.asp'), 'healthkr');
+  assert.equal(extSites.siteIdForUrl('https://www.health.kr/'), null); // www 는 apex 로 301 — 등재 origin 아님
 });
 
 // ── Chrome 감지 (§32) ────────────────────────────────────────────────────────
@@ -252,7 +254,7 @@ test('extension manifest is minimal MV3 with no <all_urls> (§20·§21)', () => 
   assert.ok(!m.permissions.includes('cookies'), 'no cookies permission (§18·§45)');
   assert.ok(!m.permissions.includes('webRequest'), 'no webRequest permission');
   // host_permissions = 등재 origin 만, <all_urls> 금지
-  assert.deepEqual(m.host_permissions, ['https://neture.co.kr/*']);
+  assert.deepEqual(m.host_permissions, ['https://neture.co.kr/*', 'https://health.kr/*']);
   const raw = read(path.join(EXT_ROOT, 'manifest.json'));
   assert.ok(!raw.includes('<all_urls>'), 'manifest must not use <all_urls>');
   // background service worker = module
@@ -260,7 +262,7 @@ test('extension manifest is minimal MV3 with no <all_urls> (§20·§21)', () => 
   assert.ok(m.side_panel && typeof m.side_panel.default_path === 'string');
   // content_scripts 도 neture 로만 좁혀져 있어야 한다(§22)
   for (const cs of m.content_scripts) {
-    assert.deepEqual(cs.matches, ['https://neture.co.kr/*']);
+    assert.deepEqual(cs.matches, ['https://neture.co.kr/*', 'https://health.kr/*']);
   }
 });
 

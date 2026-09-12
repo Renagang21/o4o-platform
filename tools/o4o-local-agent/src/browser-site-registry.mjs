@@ -21,6 +21,13 @@ export const BROWSER_SITE_REGISTRY = Object.freeze([
     url: 'https://neture.co.kr/',
     allowedOrigins: Object.freeze(['https://neture.co.kr']),
   }),
+  // WO-O4O-PHARMACY-WEB-AUTOMATION-CORE-AND-HEALTHKR-ADAPTER-V0 §17·§43 — 약학정보원(첫 외부 실사이트).
+  Object.freeze({
+    siteId: 'healthkr',
+    displayName: '약학정보원',
+    url: 'https://health.kr/',
+    allowedOrigins: Object.freeze(['https://health.kr']),
+  }),
 ]);
 
 export function findBrowserSite(siteId) {

@@ -623,12 +623,13 @@ describe('20. arbitrary JS / selector absent (§6·§29·§30)', () => {
 // ─── 21~23. regressions ──────────────────────────────────────────────────────
 
 describe('21~23. Browser DOM · Chrome Bridge · Computer Use regression (§40)', () => {
-  it('agent · 확장 · manifest 는 손대지 않았다 — 새 agent action 0, 등재 site 1, host_permissions 1, 기존 tool 수 불변', () => {
+  it('agent handlers 에 공급처 규칙 0 · 등재 site 목록 · host_permissions 는 site registry 와 일치 · 기존 tool 수 불변', () => {
     const agent = read(join(REPO_ROOT, 'tools', 'o4o-local-agent', 'src', 'handlers.mjs'));
     expect(agent).not.toMatch(/supplier/i);
     const manifest = JSON.parse(read(join(REPO_ROOT, 'tools', 'o4o-chrome-extension', 'manifest.json')));
-    expect(manifest.host_permissions).toEqual(['https://neture.co.kr/*']);
-    expect(BROWSER_SITE_IDS).toEqual([SITE]);
+    // PHARMACY-WEB-CORE V0 에서 약학정보원이 등재됐다 — 공급처 축은 여전히 o4o.neture 위의 fixture 만 쓴다.
+    expect(manifest.host_permissions).toEqual(['https://neture.co.kr/*', 'https://health.kr/*']);
+    expect(BROWSER_SITE_IDS).toEqual([SITE, 'healthkr']);
     expect(AI_TOOL_REGISTRY.filter((t) => t.name.startsWith('local.browser.dom.'))).toHaveLength(8);
     expect(AI_TOOL_REGISTRY.filter((t) => t.name.startsWith('local.computer.'))).toHaveLength(4);
     expect(

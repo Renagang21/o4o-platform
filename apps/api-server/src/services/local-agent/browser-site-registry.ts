@@ -57,7 +57,7 @@ function assertHttps(url: string): string {
 }
 
 /**
- * V0 등재 목록 — **안전한 테스트 사이트 1개**(§9·§36).
+ * 등재 목록 — V0 의 안전한 테스트 사이트 1개(§9·§36) + PHARMACY-WEB-CORE V0 의 첫 외부 실사이트 1개.
  *
  * O4O 자체 홈이다. 로그인 없이 열리고, 로그인이 필요한 흐름(§38 C·D)도 같은 사이트에서
  * 확인할 수 있다. 외부 실서비스를 지금 넣지 않는다 — 이 구조가 특정 사이트에 의존하지
@@ -69,6 +69,18 @@ export const BROWSER_SITE_REGISTRY: readonly BrowserSiteDefinition[] = Object.fr
     displayName: 'O4O 홈',
     url: assertHttps('https://neture.co.kr/'),
     allowedOrigins: ['https://neture.co.kr'],
+  }) as BrowserSiteDefinition,
+  /**
+   * WO-O4O-PHARMACY-WEB-AUTOMATION-CORE-AND-HEALTHKR-ADAPTER-V0 §17·§43 — 첫 외부 실사이트.
+   * 2026-09-12 실측: `www.health.kr` → `health.kr` 301, 검색 · 식별 · 상세는 로그인 없이 열린다.
+   * robots.txt(`*`) Disallow 3경로(`/searchDrug/ajax/` · `result_sunb.asp` · `search_DUR.asp`)는
+   * pharmacy-web-core 의 site policy 가 들고 있으며 Adapter 가 그 경로로 가지 않는다.
+   */
+  Object.freeze({
+    siteId: 'healthkr',
+    displayName: '약학정보원',
+    url: assertHttps('https://health.kr/'),
+    allowedOrigins: ['https://health.kr'],
   }) as BrowserSiteDefinition,
 ]);
 

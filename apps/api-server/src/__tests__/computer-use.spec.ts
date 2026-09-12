@@ -20,6 +20,7 @@ jest.mock('../utils/logger.js', () => ({
   default: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), debug: jest.fn() },
 }));
 
+import { BROWSER_SITE_IDS } from '../services/local-agent/browser-site-registry.js';
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import {
@@ -867,10 +868,11 @@ describe('18~21. 회귀 — replay · 창 축 · 브라우저 축 · pairing/LNA
       LOCAL_AGENT_ACTIONS.GET_SYSTEM_INFO,
       ...DATA_TARGET_ACTIONS,
       ...APP_TARGET_ACTIONS.flatMap((b) => WINDOWS_APP_IDS.map((a) => composeAppAction(b, a))),
-      ...SITE_TARGET_ACTIONS.map((b) => composeAppAction(b, 'o4o.neture')),
+      // PHARMACY-WEB-CORE V0: 등재 site 가 늘면(o4o.neture + healthkr) site/DOM 축 항목도 siteId 당 함께 는다.
+      ...SITE_TARGET_ACTIONS.flatMap((b) => BROWSER_SITE_IDS.map((s) => composeAppAction(b, s))),
       ...COMPUTER_TARGET_ACTIONS.flatMap((b) => WINDOWS_APP_IDS.map((a) => composeComputerAction(b, a))),
       // BROWSER-DOM-CONTROL-V0: DOM 축(등재 siteId 당 8항목). 대상은 여전히 등재 siteId 뿐 — 탭 id · URL 은 표현 불가.
-      ...DOM_TARGET_ACTIONS.map((b) => composeAppAction(b, 'o4o.neture')),
+      ...DOM_TARGET_ACTIONS.flatMap((b) => BROWSER_SITE_IDS.map((s) => composeAppAction(b, s))),
     ].sort();
     expect([...LOCAL_AGENT_ACTION_ALLOWLIST].sort()).toEqual(expected);
     // 서버 규칙과 agent 규칙은 글자 단위로 같다 (§26 이중 검사의 전제).

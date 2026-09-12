@@ -55,6 +55,7 @@ import {
   isRegisteredSupplierAdapter,
   supplierQueryDenyReason,
 } from '../local-agent/supplier-site-adapter-contract.js';
+import { validatePharmacyWebEntryArgs } from '../local-agent/pharmacy-web-core.js';
 import type { AutomationMethod, AutomationRiskLevel } from './automation-execution-contract.js';
 import { isComputerUseMethod, computerUseFallbackAllowed } from './automation-execution-contract.js';
 
@@ -316,8 +317,18 @@ export interface AiToolDefinition {
     | ComputerArgumentSchema
     | DataArgumentSchema
     | DomArgumentSchema
-    | SupplierArgumentSchema;
+    | SupplierArgumentSchema
+    | PharmacyWebArgumentSchema;
 }
+
+/**
+ * PHARMACY-WEB-CORE V0 §8·§12·§46 인자 형상.
+ *   pharmacyWebEntry → { entryPointId, input }
+ *
+ * entryPointId 는 EntryPoint 등재부의 enabled 항목이어야 하고, input 은 그 EntryPoint 의 intent 가 정한 좁은
+ * 형상(검색어 · 낱알 조건 · 없음)만 받는다. siteId · url · selector · elementRef 칸은 없다.
+ */
+export type PharmacyWebArgumentSchema = 'pharmacyWebEntry';
 
 /**
  * SUPPLIER-SITE-ADAPTER-V0 §8·§9·§10 인자 형상.
@@ -439,6 +450,8 @@ export const AI_TOOL_NAMES = {
   DOM_READ_TABLE: 'local.browser.dom.read_table',
   // WO-O4O-SUPPLIER-SITE-ADAPTER-V0 §8·§9·§15 — 공급처 화면 한 곳에서 상품 1건의 가격·재고를 읽는다.
   SUPPLIER_PRODUCT_LOOKUP: 'local.supplier.product_lookup',
+  // WO-O4O-PHARMACY-WEB-AUTOMATION-CORE-AND-HEALTHKR-ADAPTER-V0 §2·§8·§12 — 등재 EntryPoint 하나를 실행한다.
+  PHARMACY_WEB_ENTRYPOINT: 'local.pharmacyweb.entrypoint',
 } as const;
 
 export type AiToolName = (typeof AI_TOOL_NAMES)[keyof typeof AI_TOOL_NAMES];
@@ -720,6 +733,22 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
     effect: 'BROWSER_DOM_INTERACTION',
     argumentSchema: 'supplierQuery',
   },
+  // ── Pharmacy Web Core V0 (§2·§8·§12) — 등재 사이트의 등재 EntryPoint 하나를 DOM tool 조합으로 실행한다.
+  //    새 사이트 · 새 EntryPoint 는 등재부에 항목을 더할 뿐 tool 을 늘리지 않는다(§4 누적형).
+  //    riskLevel 은 REVERSIBLE — 조회 결과지만 과정에 검색어 입력 · 링크/버튼 클릭이 있다. 로그인 · 결제 · 게시 · 삭제는
+  //    이 tool 로 표현할 수 없다(§39). 새 capability 를 만들지 않는다 — DOM 상호작용 자격을 그대로 쓴다.
+  {
+    name: AI_TOOL_NAMES.PHARMACY_WEB_ENTRYPOINT,
+    automationMethod: 'browser_dom',
+    riskLevel: 'REVERSIBLE',
+    description:
+      '등록된 약국 업무 웹사이트에서 등록된 작업(의약품 검색 · 동일성분 · 낱알 식별 · 상세 읽기) 하나를 실행하고 화면에 표시된 값만 읽는다. 로그인·결제·게시는 하지 않는다.',
+    requiredCapabilities: [AiCapability.LOCAL_BROWSER_DOM_INTERACT],
+    executionMode: 'local',
+    readOnly: false,
+    effect: 'BROWSER_DOM_INTERACTION',
+    argumentSchema: 'pharmacyWebEntry',
+  },
 ]);
 
 export function findToolDefinition(name: string): AiToolDefinition | undefined {
@@ -767,11 +796,15 @@ export function findAutomationInvariantViolations(
     // 갖지 않고 DOM tool 을 조합하므로 automationMethod 가 browser_dom 이어야 한다. 이름 집합만 넓히고
     // "구조화 tool 이 computer_use 로 표기되면 drift" 라는 원래 취지는 그대로다.
     const methodIsDom = tool.automationMethod === 'browser_dom';
-    const nameIsDom = tool.name.startsWith('local.browser.dom.') || tool.name.startsWith('local.supplier.');
+    // PHARMACY-WEB-CORE V0: `local.pharmacyweb.*` 도 DOM tool 조합이다.
+    const nameIsDom =
+      tool.name.startsWith('local.browser.dom.') ||
+      tool.name.startsWith('local.supplier.') ||
+      tool.name.startsWith('local.pharmacyweb.');
     if (methodIsDom !== nameIsDom) {
       violations.push({
         tool: tool.name,
-        rule: 'automationMethod===browser_dom ⇔ local.browser.dom.* | local.supplier.* 이름',
+        rule: 'automationMethod===browser_dom ⇔ local.browser.dom.* | local.supplier.* | local.pharmacyweb.* 이름',
       });
     }
   }
@@ -968,6 +1001,12 @@ export function validateToolArguments(
     }
     if (!isRegisteredSupplierAdapter(a.supplierId)) return { ok: false, reason: 'INVALID_ARGUMENTS' };
     return supplierQueryDenyReason(a.query) === null ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
+  }
+
+  if (schema === 'pharmacyWebEntry') {
+    // 약국 웹 EntryPoint 실행(PHARMACY-WEB-CORE V0 §8·§12·§46): **정확히 `{ entryPointId, input }`**.
+    // entryPointId 는 등재 · enabled 여야 하고 input 은 intent 별 좁은 형상만 — 검증 논리는 core 단일 출처.
+    return validatePharmacyWebEntryArgs(args).ok ? { ok: true } : { ok: false, reason: 'INVALID_ARGUMENTS' };
   }
 
   if (schema === 'dataMetaKey') {

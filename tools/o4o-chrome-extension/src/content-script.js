@@ -27,9 +27,18 @@
 (() => {
   // ── 등재 판정 · 등록 (BRIDGE-V0 §10) ──────────────────────────────────────
   const ORIGIN = location.origin;
-  const SITE_ID = ORIGIN === 'https://neture.co.kr' ? 'o4o.neture' : null;
-  /** 이 site 에서 "같은 site" 로 보는 origin. 링크 이동 허용 범위(§25). site-registry.js 사본과 같다. */
-  const ALLOWED_ORIGINS = ['https://neture.co.kr'];
+  /**
+   * origin → siteId. content script 는 ES import 를 못 쓰므로 site-registry.js 의 등재분을 **글자 그대로**
+   * 복제한다(agent test 가 3 사본과 대조). 등재 밖 origin 은 null — manifest matches 가 이미 막지만 이중 방어.
+   * PHARMACY-WEB-CORE V0 §43: 사이트가 늘면 여기 한 줄과 manifest 만 늘어난다.
+   */
+  const SITE_ID_BY_ORIGIN = {
+    'https://neture.co.kr': 'o4o.neture',
+    'https://health.kr': 'healthkr',
+  };
+  const SITE_ID = Object.prototype.hasOwnProperty.call(SITE_ID_BY_ORIGIN, ORIGIN) ? SITE_ID_BY_ORIGIN[ORIGIN] : null;
+  /** 이 site 에서 "같은 site" 로 보는 origin — 자기 origin 하나뿐(§25 · PHARMACY-WEB §43·§45). */
+  const ALLOWED_ORIGINS = SITE_ID ? [ORIGIN] : [];
   try {
     chrome.runtime.sendMessage({ action: 'content.registered', origin: ORIGIN, isRegisteredSite: SITE_ID !== null });
   } catch {
@@ -278,13 +287,28 @@
   function observeChange(ms) {
     return new Promise((resolve) => {
       let count = 0;
+      let done = false;
       const pathBefore = location.pathname;
       const obs = new MutationObserver((records) => {
         count += records.length;
       });
       obs.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
-      setTimeout(() => {
+      // PHARMACY-WEB-CORE V0 실사이트 결함 수정: form 제출(같은 경로 POST 포함)로 문서가 통째로 바뀌면 이 스크립트가
+      // 사라져 응답이 유실됐다. unload 가 시작되면 관찰을 끝내고 navigated:true 로 **먼저** 응답한다.
+      const onUnload = () => {
+        if (done) return;
+        done = true;
         obs.disconnect();
+        resolve({ changed: true, navigated: true });
+      };
+      window.addEventListener('pagehide', onUnload, { once: true });
+      window.addEventListener('beforeunload', onUnload, { once: true });
+      setTimeout(() => {
+        if (done) return;
+        done = true;
+        obs.disconnect();
+        window.removeEventListener('pagehide', onUnload);
+        window.removeEventListener('beforeunload', onUnload);
         resolve({ changed: count > 0, navigated: location.pathname !== pathBefore });
       }, ms);
     });
@@ -413,6 +437,23 @@
     }
   }
 
+  /** 이 버튼이 form 을 제출하는가(button 기본 type 은 submit). */
+  function isSubmitControl(el) {
+    const tag = el.tagName;
+    if (tag === 'BUTTON') return (el.getAttribute('type') || 'submit').toLowerCase() === 'submit';
+    if (tag === 'INPUT') return ['submit', 'image'].includes(String(el.type || '').toLowerCase());
+    return false;
+  }
+
+  /** form 의 제출 대상 URL. action 이 비었으면 현재 문서. 파싱 실패면 null(누르지 않는다). */
+  function formTarget(form) {
+    try {
+      return new URL(form.getAttribute('action') || location.href, location.href);
+    } catch {
+      return null;
+    }
+  }
+
   async function actClick(payload) {
     const r = resolveRef(payload.snapshotId, payload.elementRef);
     if (r.error) return { ok: false, errorCode: r.error };
@@ -436,6 +477,13 @@
       return { ok: false, errorCode: ERR.USER_ACTION_REQUIRED, role, userActionRequired: true };
     }
     let navigationLikely = false;
+    if (role === 'button' && form && isSubmitControl(el)) {
+      // 제출 대상 origin 이 등재 밖이면 누르지 않는다 — 링크와 같은 규칙을 form 에도 적용한다.
+      const target = formTarget(form);
+      if (target && !ALLOWED_ORIGINS.includes(target.origin)) {
+        return { ok: false, errorCode: ERR.CROSS_ORIGIN_BLOCKED, role, riskLevel };
+      }
+    }
     if (role === 'link') {
       const url = linkTarget(el);
       if (!url || !['https:', 'http:'].includes(url.protocol)) {
@@ -457,9 +505,10 @@
   }
 
   function cellsOf(row) {
-    return [...row.querySelectorAll('th, td, [role="cell"], [role="columnheader"], [role="gridcell"]')].map((c) =>
-      clip(c.innerText || c.textContent, DOM_CELL_MAX_LENGTH),
-    );
+    // PHARMACY-WEB-CORE V0 실사이트 결함 수정: 셀 안에 중첩된 표의 셀까지 딸려 와 열이 어긋났다 — 이 행에 직접 속한 셀만.
+    return [...row.querySelectorAll('th, td, [role="cell"], [role="columnheader"], [role="gridcell"]')]
+      .filter((c) => c.closest('tr, [role="row"]') === row)
+      .map((c) => clip(c.innerText || c.textContent, DOM_CELL_MAX_LENGTH));
   }
 
   function actReadTable(payload) {
