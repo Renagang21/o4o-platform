@@ -162,7 +162,8 @@ UNKNOWN_STOP                : _bak_orphan_representative_products_20260706(16,57
 | migration 무결성 | 신규 timestamp `20270408000000`·`20270409000000` 고유 · class 명 고유 · 최신순 · discovery glob 포함 |
 | local migration apply/rollback | **NOT_RUN** — 로컬 dev DB(5432)에 `o4o_platform` 부재. up/down SQL 은 프로덕션 스키마 read-only 대조로 검증(현행 CHECK 정의 = down() 복구본, 컬럼/제약 존재·의존 0·영향행 0). 실적용은 CI(main 병합 시 typeorm_migrations job) |
 | frontend type-check | **NOT_REQUIRED** — 백엔드 전용 schema 변경 · frontend/shared 가 `store-qr-code.entity` 를 import 하지 않음(literal scan 0) |
-| production migration | **PENDING** — main 병합 후 CI 자동 실행 |
+| production migration | **PASS** — 커밋 `11ae1acfb` push · CI 3/3 SUCCESS(CI Pipeline · Deploy API · CodeQL) · Deploy API migration job 자동 적용 |
+| post-deploy 실측(read-only) | **PASS** — typeorm_migrations 에 2건 기록 · `store_qr_codes.type` DROPPED(landing_type 유지 · 92행 보존) · block_type CHECK NARROWED(product_content 제거) |
 
 ---
 
@@ -212,7 +213,9 @@ TABLE_WITHOUT_CONSUMER         = CLASSIFIED (raw-SQL ACTIVE + dead 잔재 인계
 BACKUP_TABLES                  = PRESERVED_WITH_REASON (S1 STOP · audit 원장 KEEP)
 MIGRATION HISTORY              = PRESERVED (typeorm_migrations 671 · 실행완료 전부)
 SCHEMA REGRESSION              = PASS (build:packages · api tsc · Jest 78/78)
-PRODUCTION MIGRATION           = PENDING (main 병합 후 CI)
+CI                             = SUCCESS (11ae1acfb · CI Pipeline / Deploy API / CodeQL)
+WO                             = CLOSED
+PRODUCTION MIGRATION           = PASS (11ae1acfb · Deploy API job · post-deploy read-only 검증 통과)
 OTHER SERVICE REGRESSION       = PASS (백엔드 전용 · frontend import 0)
 ```
 
