@@ -1,6 +1,6 @@
 # CHECK-O4O-DATABASE-MIGRATION-OWNERSHIP-STARTUP-HEALTH-AND-LEGACY-DEPLOY-TOOLING-FINAL-CLOSURE-V1
 
-> **상태**: 사전 조사 완료 → 구현 진행 (§10 이후는 구현·검증 후 갱신)
+> **상태**: **CLOSED** — CI 3/3 success · migration job 성공 · 새 revision startup/health PASS (§11~§13)
 > **작성일**: 2026-09-12
 > **WO**: WO-O4O-DATABASE-MIGRATION-OWNERSHIP-STARTUP-HEALTH-AND-LEGACY-DEPLOY-TOOLING-FINAL-CLOSURE-V1
 
@@ -245,5 +245,131 @@ A  docs/checks/CHECK-…-FINAL-CLOSURE-V1.md
 **환경 이슈 (변경과 무관)**: 검증 중 `C:` 디스크가 가득 차(ENOSPC) `type-check:frontend` 와 전체 Jest 1차 실행이 중단됐다.
 worktree 는 손대지 않고 `npm cache clean`(2.2 GB) + `pnpm store prune`(957 packages) 으로 4.5 GB 확보 후 재실행했다.
 
-_(§11 CI · §12 운영 검증 · §13 최종 판정은 push 후 갱신)_
+---
+
+## 11. CI · 배포 (§11)
+
+구현 SHA = push SHA = **`15a9ac20a`** (rebase 후 · `5a6c397c1` 의 동일 내용). **취소·대체 없이 자기 SHA 에서 완주** → ancestor 대체 판정 불필요.
+
+| 워크플로 | 결과 | run ID |
+|---|---|---:|
+| CI Pipeline | ✅ **success** | 34696954469 |
+| CodeQL Security Analysis | ✅ success | 34696954442 |
+| Deploy API Server (Cloud Run) | ✅ **success** | 34696954549 |
+| Deploy Admin Dashboard · Deploy Web Services · AppStore Guard · E2E Auth Runtime | `NOT_TRIGGERED` (경로 필터 — 변경 경로 = api-server · deploy-api.yml · docs) | — |
+
+**Deploy run 34696954549 의 실제 step 순서** (`gh run view --json jobs`):
+
+```text
+ 9. Build and Push Docker image : success  13:40:39 → 13:45:19
+10. Run database migrations     : success  13:45:19 → 13:45:56   ← Job 이 먼저
+11. Deploy to Cloud Run         : success  13:45:56 → 13:46:16   ← 성공 후에만 도달
+13. Verify deployment           : success  13:46:55 → 13:46:58
+```
+
+## 12. 운영 검증 (§12)
+
+### 12-1. migration job
+| 항목 | 값 |
+|---|---|
+| execution | `o4o-api-migrations-dblmj` · completion 13:45:55Z · succeeded 1 · failed 0 |
+| Job 로그 | `Step 4: Running migrations…` → `No pending migrations` → `Migrations executed: 0` → `Migration Job - SUCCESS` → `exit(0)` |
+| 기대 (§10) | 이 WO 는 migration 파일을 추가하지 않으므로 **0 pending 정상 종료** — 일치 |
+| 후속 배포 | 제 커밋 뒤 다른 push 의 배포(`o4o-api-migrations-zj4b9` 14:11 · revision `03635`)도 **같은 새 순서로 성공** — 계약이 1회성이 아님을 실증 |
+
+### 12-2. API startup 로그 (신규 revision `o4o-core-api-03634-p7q` 13:45:59 · `03635-8dm` 14:11:38, 부팅 2회)
+
+| 로그 | 건수 (13:46 이후) |
+|---|---:|
+| `Database connection successful` | 2 |
+| `Database ready — migrations are owned by the deploy migration job, not by API startup` | **2** |
+| `Database migrations completed` (startup migration 실행) | **0** |
+| `Seed migration executed` | **0** |
+| `Migration error (continuing)` | **0** |
+| `Pending migrations detected` | **0** |
+| severity ≥ ERROR | **0** |
+
+(before: 30일간 각각 200+ / 45 / 3 / 33 — §2-2)
+
+### 12-3. health · 핵심 API (LB 도메인 `https://api.neture.co.kr`, 트래픽 100% = 최신 revision)
+
+| 경로 | 결과 |
+|---|---|
+| `/health` (liveness · deploy verify) | **200** `status:alive` |
+| `/health/live` | 200 |
+| `/health/ready` | **200** `status:ready` (DB `SELECT 1` 통과) |
+| `/health/database` | 200 `healthy` · PostgreSQL 15.18 · 12ms |
+| `/api/v1/public/cpt/types` (public read) | 200 |
+| `/api/v1/hub/contents?serviceKey=kpa` (public read) | 200 |
+| `/api/v1/admin/users` 미인증 | **401** (계약 유지) |
+| `/api/v1/platform/hub/summary` 미인증 | **401** |
+| 로그인(`renariver21`, platform:super_admin) → `/api/v1/admin/users?limit=1` | **200** |
+| → `/api/v1/platform/hub/summary` | **200** |
+| → `/api/v1/auth/status` | 200 |
+
+신규 500 없음 · 인증·권한 계약 변화 없음 · 서비스 frontend 배포 불필요(미트리거) · 12.4 실패 시나리오 미발생(rollback 불요).
+
+## 13. 중지 · 미처리 항목 (§7 · §4.2 · §4.5)
+
+| # | 항목 | 상태 |
+|:-:|---|---|
+| §7 1~14 | 중지 조건 | **미발생.** ①deploy job 이 전부 실행(§12-1) ②startup 별도 집합 없음(동일 dist) ③standalone 소비 0 ④PM2 별도 서버 없음(Cloud Run 단일) ⑤status code 변경 0 ⑥required table 미채택 ⑦migration 파일 수정 0 ⑧DB write 0 ⑨Secret 수정 0 ⑩PharmacyHub 교집합 0 ⑪다른 세션 충돌 0(rebase 무충돌) ⑫unrelated failure = lint 44 baseline 으로 분리·ENOSPC 는 환경 ⑬⑭미발생 |
+| §4.2 | `migration:drop` · `migration:sync` · `db:reset` | **보존·판정 유보** — 운영 호출 경로 0. 로컬 파괴 명령의 존치 여부는 별도 판단 |
+| §4.5 | `GRACEFUL_STARTUP=true` (프로덕션 명시) | **불변·보고** — Cloud Run probe 가 TCP 라 `/health` 200 을 바꿀 근거 없음. readiness 는 `/health/ready` 가 이미 담당. 분리는 완료된 상태 |
+| §3.6 | `deploy-api.yml` 헤더 주석 "Phase G1-2 … GRACEFUL_STARTUP=false" | stale 주석(실제 true). 동작 무관 → **보고만** |
+| 발견 | `packages/appearance-system` test script 의 POSIX 인라인 env (전 WO 에서 확인) | 무관 · 보고만 |
+| 환경 | `C:` 디스크 고갈(ENOSPC) — worktree 15개 누적 | npm cache 2.2 GB + pnpm store prune 으로 4.5 GB 확보. **worktree 는 손대지 않음.** 사용자가 정리 대상을 판단할 항목 |
+
+## 14. 문서 정합 (§13 · CLAUDE.md §16-5)
+
+```text
+문서 정합: 발견 2건 / SUPERSEDED 표기 0건 / 링크 수정 1건 / 별도 WO 제안 0건
+```
+
+1. `PRODUCTION-MIGRATION-STANDARD.md` — 단계 순서(deploy→job 을 job→deploy 로) · 단일 소유자 명시 · stale 줄 번호 2곳 → **WO §13 승인 범위 내 현재형 정정** (기준 문서이지만 WO 가 이 범위를 명시 허용).
+2. `SETUP.md` — PM2·startup migration 안내 **없음** (변경 불필요). `README`·`apps/api-server/*.md` 동일.
+과거 CHECK·IR·archive 는 본문 불변.
+
+## 15. 최종 판정 (§15)
+
+```text
+PRODUCTION_MIGRATION_OWNER           = DEPLOY_MIGRATION_JOB_ONLY
+DEPLOY_MIGRATION_FAILURE_GATE        = ENFORCED       (job → deploy 순서 · continue-on-error/|| true 0 · run 34696954549 실측)
+API_STARTUP_MIGRATION_EXECUTION      = ZERO
+API_STARTUP_SHOW_MIGRATIONS          = ZERO
+DIRECT_SEED_UP_FALLBACK              = ZERO
+MIGRATION_FAILURE_SWALLOWING         = ZERO
+LEGACY_STANDALONE_MIGRATION_RUNNER   = ZERO           (3 파일 + fix-user-roles-table)
+HARDCODED_DB_CREDENTIAL_FALLBACK     = ZERO           (2건 제거 · spec 이 패턴 검사)
+DATABASE_HEALTH_FALSE_POSITIVE       = ZERO           (DatabaseChecker 삭제)
+LEGACY_OPTIONAL_TABLE_CHECKS         = ZERO
+MIGRATION_PENDING_FALSE_REPORT       = ZERO
+PM2_DEPLOY_RUNTIME_CONTRACT          = ZERO           (12 script)
+MISSING_SCRIPT_REFERENCES            = ZERO           (+10 · spec 이 전 script 경로 실존 검사)
+PRODUCTION_SCHEMA_CHANGE             = ZERO
+PRODUCTION_DATA_CHANGE               = ZERO
+AUTHORIZATION_CHANGE                 = ZERO           (401/200 계약 실측)
+OTHER_SERVICE_REGRESSION             = PASS           (type-check:frontend · jest 4,388)
+CI_PIPELINE                          = SUCCESS        (run 34696954469)
+CODEQL                               = SUCCESS        (run 34696954442)
+DEPLOY_API                           = SUCCESS        (run 34696954549)
+PRODUCTION_MIGRATION_JOB             = SUCCESS        (o4o-api-migrations-dblmj · 0 pending)
+PRODUCTION_API_STARTUP               = PASS           (구 migration 로그 0 · 신규 계약 로그 2)
+PRODUCTION_HEALTH                    = PASS           (health 4종 200 · ready 200)
+
+DATABASE_MIGRATION_OWNERSHIP_STARTUP_HEALTH_AND_LEGACY_DEPLOY_TOOLING
+  = CLOSED
+```
+
+## 16. Git (§1.1 · WO §16)
+
+| 항목 | 값 |
+|---|---|
+| 기준 SHA | `71ba4e074` |
+| 구현 커밋 | `5a6c397c1` → rebase(origin/main 4커밋 앞) → **`15a9ac20a`** (충돌 0 · 상류와 파일 겹침 0) |
+| push | `git push origin HEAD:main` fast-forward · force 0 |
+| stage | path-specific · `check-staged-scope.mjs` 12건 범위 확인 · `git add .` 0 |
+| 다른 세션 변경 포함 | 0 |
+| 완료 조건 | `HEAD == origin/main` · 작업 범위 미커밋 0 |
+
 
