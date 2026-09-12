@@ -14,7 +14,7 @@
 | 코드 전수 (apps + packages, `dist` 제외) | O | entity · 테이블명 · 소비처 · 라우트 마운트 |
 | 운영 API read-only (`https://api.neture.co.kr`) | O | platform:super_admin 로그인 후 GET 만 |
 | 운영 로그 (`gcloud logging read`, 30일) | O | `relation ... does not exist` 집계 |
-| 운영 DB 직접 조회 (Cloud SQL Auth Proxy) | X | ADC 미설정(`could not find default credentials`) — §9 미확인 |
+| 운영 DB 직접 조회 (Cloud SQL Auth Proxy) | X | 프록시 터널은 성립했으나 `apps/api-server/.env` 의 `o4o_api` 자격정보가 운영에서 거부됨(`password authentication failed`) — §9 미확인 |
 
 **변경 0**: 코드 · schema · route · 운영 자원 모두 손대지 않았다. 운영 호출은 로그인 + GET 뿐이다.
 
@@ -186,7 +186,7 @@ API 표면은 `/api/v1/platform/media-library*` 하나로 통일돼 있다
 
 | # | 항목 | 사유 |
 |:-:|---|---|
-| 1 | lifecycle 16개 중 `cms_media` · `cms_cpt_types` 를 뺀 **14개의 운영 존재 여부** | ADC 미설정으로 `information_schema` 직접 조회 불가. 확인하려면 `gcloud auth application-default login`(브라우저) 이 선행돼야 한다 |
+| 1 | lifecycle 16개 중 `cms_media` · `cms_cpt_types` 를 뺀 **14개의 운영 존재 여부** | `information_schema` 조회를 시도했다. Cloud SQL Auth Proxy(v2 · access-token 방식) 터널은 성립했으나 로컬 `apps/api-server/.env` 의 `o4o_api` 비밀번호가 운영에서 거부됐다(`password authentication failed`). 운영 자격정보 확보는 사용자 승인 사항(CLAUDE.md 중지 조건)이라 더 진행하지 않았다. 자격정보가 갱신되면 단일 `information_schema.tables` SELECT 로 확정 가능하다 |
 | 2 | `cms_media` 데이터 유실 여부 | 테이블이 없으므로 잃을 데이터도 없다고 추정되나 DB 조회 전 단정하지 않는다 |
 | 3 | `/content/assets` 화면의 브라우저 실측 | 본 IR 은 API 계층까지만 확인(조사 전용). 화면의 오류 표시 방식은 미확인 |
 | 4 | `dashboard-assets` 쓰기 경로(copy · publish · archive) 의 운영 동작 | GET 만 수행했다. 삼킴 없이 500 일 것으로 읽히나 미실측 |
