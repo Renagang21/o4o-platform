@@ -124,7 +124,7 @@ Job 간 상호 제약이 없다. 테스트 B: 한 Job 이 WAITING(statusNote='�
 
 ### 10-A. smoke 중 발견·수정
 
-- 존재하지 않는 job id 로 상세 진입 시 "Loading…" 에 머묾. 원인: axios 가 4xx 에서 throw 하므로 `{code:'JOB_NOT_FOUND'}` 가 페이지에 닿지 않음. 수정: `automation-job.api.ts` 의 `call()` 이 응답 본문 code 를 `Error.message` 로 정규화, 상세 페이지에 `loadError` 상태 추가(404 → "작업을 찾을 수 없습니다", 그 외 → 오류 + 목록 링크). typecheck·lint PASS. 재배포 후 재확인 결과는 아래.
+- 존재하지 않는 job id 로 상세 진입 시 "Loading…" 에 머묾. 원인: axios 가 4xx 에서 throw 하므로 `{code:'JOB_NOT_FOUND'}` 가 페이지에 닿지 않음. 수정: `automation-job.api.ts` 의 `call()` 이 응답 본문 code 를 `Error.message` 로 정규화, 상세 페이지에 `loadError` 상태 추가(404 → "작업을 찾을 수 없습니다", 그 외 → 오류 + 목록 링크). typecheck·lint PASS. 수정 커밋 `bb3ae1e5c` → Deploy Admin SUCCESS, 서빙 번들 `VideoJobDetailPage-C0vNaGhm.js` 에 수정 포함 확인. **production 브라우저 재확인 PASS** — 존재하지 않는 id 진입 시 "작업을 찾을 수 없습니다 · 목록으로" 표시(콘솔은 의도된 API 404 1건뿐). 내 커밋을 포함한 후속 커밋(`02d896ffc` · `3a7df1296` · `68920bbf7`)에서 CI Pipeline / CodeQL success.
 - 범위 밖 관찰(수정 안 함): 기존 Media Assets 목록이 external(youtube) 자산의 파일 크기를 "NaN undefined" 로 표시.
 
 ## 11. 미확인 / 미완료 · 범위 밖 발견
