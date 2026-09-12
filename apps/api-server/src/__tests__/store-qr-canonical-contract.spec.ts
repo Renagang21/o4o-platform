@@ -98,16 +98,18 @@ describe('§1 canonical 2축 — targetKind · contentSource', () => {
 // §2 `type` 컬럼 = DEAD residue
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe('§2 store_qr_codes.type — DROP 하지 않고 런타임 의존 0', () => {
-  it('엔티티에 컬럼 정의는 남아 있다 (NOT NULL DEFAULT 라 DROP 금지)', () => {
-    const src = read(QR_ENTITY);
-    expect(src).toContain('type!: string');
-    expect(src).toContain("default: 'product'");
+describe('§2 store_qr_codes.type — DROP 완료 · canonical = landing_type', () => {
+  const DROP_MIGRATION =
+    'apps/api-server/src/database/migrations/20270408000000-DropStoreQrCodesTypeColumn.ts';
+
+  it('엔티티에서 type 컬럼 정의가 제거됐다', () => {
+    const src = stripComments(read(QR_ENTITY));
+    expect(src).not.toMatch(/^\s*type!:\s*string/m);
   });
 
-  it('마이그레이션이 type 컬럼을 DROP 하지 않는다', () => {
-    const src = stripComments(read(CONTENT_SOURCE_MIGRATION));
-    expect(src).not.toMatch(/DROP\s+COLUMN\s+"?type"?/i);
+  it('마이그레이션이 type 컬럼을 DROP 한다', () => {
+    const src = stripComments(read(DROP_MIGRATION));
+    expect(src).toMatch(/DROP\s+COLUMN\s+"?type"?/i);
   });
 
   it('QR 서비스가 type 을 읽지도 쓰지도 않는다', () => {

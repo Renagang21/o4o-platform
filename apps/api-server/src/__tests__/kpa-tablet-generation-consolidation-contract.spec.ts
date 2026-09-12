@@ -71,8 +71,9 @@ describe('§2 product_content 은퇴 — 쓰기·resolve·렌더 경로 0', () =
     expect(stripComments(read(KPA_TABLET_API))).not.toContain('product_content');
   });
 
-  it('의약품 가드는 방어적으로 계속 수집한다 (DB CHECK 제약이 아직 허용하므로)', () => {
-    // 은퇴는 쓰기·렌더 축이다. 안전 판정을 좁히지 않는다.
+  it('의약품 가드는 방어적으로 계속 수집한다 (CHECK 축소와 무관하게 안전 판정을 좁히지 않는다)', () => {
+    // 은퇴는 쓰기·렌더 축이다. block_type CHECK 는 20270409000000 에서 product_content 를 제거했지만,
+    // 과거 데이터·역방향 migration 가능성에 대비해 판정 로직은 방어적으로 유지한다.
     const ids = collectScreenSetMasterIds([
       { blockType: 'product_content', config: { productRef: '11111111-1111-4111-8111-111111111111' } },
     ]);

@@ -28,17 +28,10 @@ export class StoreQrCode {
   @Index('IDX_store_qr_codes_org')
   organizationId!: string;
 
-  /**
-   * @deprecated DEAD residue — canonical target 축은 `landingType` 이다.
-   *
-   * WO-O4O-STORE-QR-CANONICAL-TARGET-CONTENT-SOURCE-AND-KPA-PH-COMMONIZATION-V1:
-   *   프로덕션 88/88 행이 landing_type 과 동일하고 이 값으로 분기하는 코드가 0 건이라
-   *   read/write 의존을 모두 제거했다. 컬럼은 `NOT NULL DEFAULT 'product'` 라
-   *   DROP 하지 않는다 — schema housekeeping 은 별도 회차다.
-   *   신규 코드에서 읽지도 쓰지도 않는다.
-   */
-  @Column({ type: 'varchar', length: 50, default: 'product' })
-  type!: string;
+  // `type` 컬럼(COMPAT_SCHEMA residue)은 제거됐다 — canonical target 축은 `landingType`.
+  //   read/write 의존 0 · 프로덕션 92 행 중 4 행이 이미 landing_type 과 어긋난 stale 값이었다.
+  //   컬럼 DROP: migration 20270408000000-DropStoreQrCodesTypeColumn
+  //   (WO-O4O-SCHEMA-COMPATIBILITY-RESIDUE-AND-ORPHANED-TABLE-CLOSURE-V1 §1)
 
   @Column({ type: 'varchar', length: 300 })
   title!: string;
