@@ -38,6 +38,8 @@ public class O4OWindowCensus {
     public static extern int GetWindowTextW(IntPtr hWnd, StringBuilder text, int count);
     [DllImport("user32.dll")]
     public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
 
     public class WindowInfo {
         public long Hwnd;
@@ -93,6 +95,7 @@ foreach ($w in $windows) {
         processName = $name
         title       = $w.Title
         minimized   = [bool]$w.Minimized
+        foreground  = ([int64]$w.Hwnd -eq [int64][O4OWindowCensus]::GetForegroundWindow())
     }
 }
 

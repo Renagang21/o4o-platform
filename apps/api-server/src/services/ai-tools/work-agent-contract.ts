@@ -37,6 +37,8 @@
 import type { DomFindQuery, SafeDomElement } from '../local-agent/browser-dom-contract.js';
 import { DOM_QUERY_VALUE_MAX, domInputDenyReason, isDomElementRef, validateDomFindQuery } from '../local-agent/browser-dom-contract.js';
 import type { AutomationRiskLevel, ContentProvenance } from './automation-execution-contract.js';
+import { UIA_ALLOWED_KEYS, UIA_POINTER_ROLES } from '../local-agent/windows-uia-contract.js';
+import { textDenyReason as computerTextDenyReason } from '../local-agent/computer-use-contract.js';
 
 // ─── Goal (§5) ──────────────────────────────────────────────────────────────
 
@@ -92,15 +94,24 @@ export function validateWorkImageInput(v: unknown): { ok: boolean; image?: WorkI
 
 // ─── Observation (§7) ───────────────────────────────────────────────────────
 
+/** 관찰 요소 — DOM 요소 형상 + UIA 축이 더하는 힌트(editable · size · focused · userAction). */
+export type WorkElement = SafeDomElement & { editable?: boolean; size?: [number, number]; focused?: boolean; userAction?: boolean; windowRef?: string };
+
+/** WINDOWS-UI-AUTOMATION-V0 — 관찰/행동이 어느 표면에서 오는가. dom = 브라우저 탭(content script), uia = Windows 앱 창(UIA). */
+export type WorkSurface = 'dom' | 'uia';
+
 export interface WorkObservation {
   siteId: string;
-  /** pathname 만(query 없음). */
+  /** pathname 만(query 없음). uia 표면은 `window:<foreground 창 제목>`. */
   path: string;
   ready: boolean;
-  /** inspect 요약 — 전체 HTML 이 아니다. 80개 상한은 DOM 계약. */
-  elements: SafeDomElement[];
+  /** inspect 요약 — 전체 HTML 이 아니다. 80개 상한은 DOM 계약(uia 는 150). */
+  elements: WorkElement[];
   elementCount: number;
-  source: 'webpage';
+  source: 'webpage' | 'app_window';
+  surface?: WorkSurface;
+  /** uia 표면: 앱의 보이는 창 목록(제목은 UI 라벨 — UNTRUSTED). */
+  windows?: { windowRef: string; title: string; foreground: boolean; userAction: boolean }[];
   /** 무진전 판정용 지문(§35). 경로 + 요소 role/name/text 의 요약. */
   fingerprint: string;
   /** content script 의 문서 인스턴스 id. 이동 뒤 "새 문서를 봤는가" 판정용(무작위 값, 내용 무관). */
@@ -112,13 +123,18 @@ export function fingerprintObservation(path: string, elements: readonly SafeDomE
   return `${path}|${parts.join(',')}`;
 }
 
-/** Planner 에게 보여줄 한 줄 요약. ref · role · 이름/텍스트 · 상태만. */
-export function describeObservationElement(e: SafeDomElement): string {
+/** Planner 에게 보여줄 한 줄 요약. ref · role · 이름/텍스트 · 상태만. uia 는 editable · 크기 · focus 힌트를 더한다. */
+export function describeObservationElement(e: WorkElement): string {
   const bits = [e.elementRef, e.role];
+  if (e.windowRef) bits.push(`win=${e.windowRef}`);
   if (e.name) bits.push(`name="${e.name}"`);
-  else if (e.text) bits.push(`text="${e.text}"`);
+  if (e.text) bits.push(`text="${e.text}"`);
   if (e.hasValue) bits.push('has-value');
+  if (e.editable) bits.push('editable');
+  if (e.focused) bits.push('focused');
+  if (e.size) bits.push(`size=${e.size[0]}x${e.size[1]}`);
   if (e.disabled) bits.push('disabled');
+  if (e.userAction) bits.push('USER_ACTION(로그인/인증 창 — 입력 금지)');
   if (e.riskLevel === 'COMMIT') bits.push('COMMIT(자동 클릭 금지)');
   return bits.join(' ');
 }
@@ -128,6 +144,8 @@ export function describeObservationElement(e: SafeDomElement): string {
 /** Planner 가 제안할 수 있는 행동 종류 — 전부 기존 DOM tool 또는 loop 제어다. 새 실행 수단은 없다. */
 export const WORK_ACTION_KINDS = Object.freeze([
   'inspect', 'find', 'read_text', 'read_table', 'set_input', 'select_option', 'click', 'takeover', 'done',
+  // WINDOWS-UI-AUTOMATION-V0 — uia 표면 전용: 허용 키 1회(입력창 제출 포함). dom 표면에서는 거절된다.
+  'key',
 ] as const);
 export type WorkActionKind = (typeof WORK_ACTION_KINDS)[number];
 
@@ -157,6 +175,12 @@ export interface WorkAction {
   text?: string;
   option?: string;
   reason?: TakeoverReason;
+  /** uia: key 행동의 키(ENTER · TAB · ESC · CTRL+ENTER). */
+  key?: string;
+  /** uia: 요소 rect 안 정규화 좌표 클릭(0..1) — UIA 가 항목을 노출하지 않는 목록/창의 fallback. */
+  x?: number;
+  y?: number;
+  clicks?: 1 | 2;
 }
 
 export interface WorkProposal {
@@ -178,7 +202,11 @@ export type ProposalRejectReason =
   | 'TEXT_DENIED'
   | 'QUERY_INVALID'
   | 'TAKEOVER_REASON_INVALID'
-  | 'COMMIT_TARGET';
+  | 'COMMIT_TARGET'
+  | 'SURFACE_MISMATCH'
+  | 'KEY_INVALID'
+  | 'USER_ACTION_WINDOW'
+  | 'WINDOW_NOT_NAMED_IN_GOAL';
 
 /** URL · selector · JS · shell · credential 을 실어 오는 키 — 있으면 proposal 전체를 거절한다(§10·§47). */
 export const FORBIDDEN_PROPOSAL_KEYS: readonly string[] = Object.freeze([
@@ -224,7 +252,8 @@ export function validateWorkProposal(raw: unknown, observation: WorkObservation 
   if (typeof r.rationale === 'string') out.rationale = r.rationale.slice(0, 200);
   if (typeof r.neededInput === 'string') out.neededInput = r.neededInput.slice(0, 200);
 
-  const byRef = new Map<string, SafeDomElement>();
+  const surface: WorkSurface = observation?.surface ?? 'dom';
+  const byRef = new Map<string, WorkElement>();
   for (const e of observation?.elements ?? []) byRef.set(e.elementRef, e);
   const requireRef = (roles: readonly string[] | null): { ok: boolean; reason?: ProposalRejectReason } => {
     if (!isDomElementRef(act.elementRef)) return { ok: false, reason: 'SHAPE' };
@@ -232,9 +261,11 @@ export function validateWorkProposal(raw: unknown, observation: WorkObservation 
     if (!el) return { ok: false, reason: 'ELEMENT_NOT_IN_OBSERVATION' };
     if (roles && !roles.includes(el.role)) return { ok: false, reason: 'ELEMENT_ROLE_MISMATCH' };
     if (el.disabled) return { ok: false, reason: 'ELEMENT_ROLE_MISMATCH' };
+    if (el.userAction) return { ok: false, reason: 'USER_ACTION_WINDOW' };
     out.action.elementRef = act.elementRef;
     return { ok: true };
   };
+  const isCoord = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 1;
 
   switch (kind) {
     case 'inspect':
@@ -251,7 +282,19 @@ export function validateWorkProposal(raw: unknown, observation: WorkObservation 
       out.action.query = q.query;
       return { ok: true, proposal: out };
     }
+    case 'key': {
+      // uia 표면 전용. 허용 키만, elementRef 가 있으면 관찰 안의 입력창이어야 한다.
+      if (surface !== 'uia') return { ok: false, reason: 'SURFACE_MISMATCH' };
+      if (typeof act.key !== 'string' || !UIA_ALLOWED_KEYS.includes(act.key)) return { ok: false, reason: 'KEY_INVALID' };
+      out.action.key = act.key;
+      if (act.elementRef !== undefined) {
+        const r2 = requireRef(INPUT_ROLES);
+        if (!r2.ok) return { ok: false, reason: r2.reason };
+      }
+      return { ok: true, proposal: out };
+    }
     case 'read_table': {
+      if (surface === 'uia') return { ok: false, reason: 'SURFACE_MISMATCH' };
       if (act.elementRef === undefined) return { ok: true, proposal: out };
       const r2 = requireRef(['table']);
       return r2.ok ? { ok: true, proposal: out } : { ok: false, reason: r2.reason };
@@ -266,10 +309,13 @@ export function validateWorkProposal(raw: unknown, observation: WorkObservation 
       if (typeof act.text !== 'string' || act.text.trim().length === 0 || domInputDenyReason(act.text) !== null || /[<>{}]/.test(act.text)) {
         return { ok: false, reason: 'TEXT_DENIED' };
       }
+      // uia 표면은 computer-use 텍스트 규칙(길이 · 제어문자 · credential 성격)도 지난다.
+      if (surface === 'uia' && computerTextDenyReason(act.text) !== null) return { ok: false, reason: 'TEXT_DENIED' };
       out.action.text = act.text.trim().slice(0, DOM_QUERY_VALUE_MAX);
       return { ok: true, proposal: out };
     }
     case 'select_option': {
+      if (surface === 'uia') return { ok: false, reason: 'SURFACE_MISMATCH' };
       const r2 = requireRef(SELECT_ROLES);
       if (!r2.ok) return { ok: false, reason: r2.reason };
       if (!shortText(act.option)) return { ok: false, reason: 'TEXT_DENIED' };
@@ -277,7 +323,22 @@ export function validateWorkProposal(raw: unknown, observation: WorkObservation 
       return { ok: true, proposal: out };
     }
     case 'click': {
-      const r2 = requireRef(CLICK_ROLES);
+      // uia 표면의 좌표 클릭 — UIA 가 항목을 노출하지 않는 목록/창 안의 위치를 누른다(0..1 · clicks 1|2).
+      if (act.x !== undefined || act.y !== undefined || act.clicks !== undefined) {
+        if (surface !== 'uia') return { ok: false, reason: 'SURFACE_MISMATCH' };
+        if (!isCoord(act.x) || !isCoord(act.y)) return { ok: false, reason: 'SHAPE' };
+        if (act.clicks !== undefined && act.clicks !== 1 && act.clicks !== 2) return { ok: false, reason: 'SHAPE' };
+        const r3 = requireRef(UIA_POINTER_ROLES);
+        if (!r3.ok) return { ok: false, reason: r3.reason };
+        const el3 = byRef.get(String(act.elementRef));
+        if (el3?.riskLevel === 'COMMIT') return { ok: false, reason: 'COMMIT_TARGET' };
+        out.action.x = act.x;
+        out.action.y = act.y;
+        if (act.clicks === 1 || act.clicks === 2) out.action.clicks = act.clicks;
+        return { ok: true, proposal: out };
+      }
+      // uia: listitem(선택) · window(그 창을 앞으로) 도 클릭 대상이다.
+      const r2 = requireRef(surface === 'uia' ? [...CLICK_ROLES, 'listitem', 'window'] : CLICK_ROLES);
       if (!r2.ok) return { ok: false, reason: r2.reason };
       const el = byRef.get(String(act.elementRef));
       if (el?.riskLevel === 'COMMIT') return { ok: false, reason: 'COMMIT_TARGET' };
@@ -291,7 +352,18 @@ export function validateWorkProposal(raw: unknown, observation: WorkObservation 
 /** 같은 행동인지(반복 감지 §36). */
 export function sameWorkAction(a: WorkAction | undefined, b: WorkAction | undefined): boolean {
   if (!a || !b) return false;
-  return a.kind === b.kind && a.elementRef === b.elementRef && a.text === b.text && a.option === b.option && JSON.stringify(a.query ?? null) === JSON.stringify(b.query ?? null);
+  return a.kind === b.kind && a.elementRef === b.elementRef && a.text === b.text && a.option === b.option && a.key === b.key && a.x === b.x && a.y === b.y && JSON.stringify(a.query ?? null) === JSON.stringify(b.query ?? null);
+}
+
+/**
+ * WINDOWS-UI-AUTOMATION-V0 제출 경계 — 입력창에서 ENTER/CTRL+ENTER 는 "그 창에 보내기" 다. 보내는 창(foreground 창 제목)이
+ * 사용자 요청 문장에 **이름으로 들어 있어야** 한다. 대화 상대를 Planner 가 고르는 경로를 막는 최소 구조 규칙이다.
+ */
+export function isSubmitWindowNamedInGoal(observation: WorkObservation | null, request: string): boolean {
+  const fg = observation?.windows?.find((w) => w.foreground) ?? observation?.windows?.[0];
+  const title = String(fg?.title ?? '').replace(/\s+/g, '');
+  if (!title) return false;
+  return String(request ?? '').replace(/\s+/g, '').includes(title);
 }
 
 // ─── Loop safety (§34~§36) ──────────────────────────────────────────────────

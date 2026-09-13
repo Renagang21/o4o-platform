@@ -103,7 +103,7 @@ describe('target resolution', () => {
 describe('local.target.prepare contract', () => {
   it('allowlist 에 등재 targetId(siteId ∪ appId) 당 1항목 · 인자 0 · 등재 밖/URL/경로는 항목이 아니다', () => {
     expect(TARGET_ACTIONS).toEqual([LOCAL_AGENT_ACTIONS.TARGET_PREPARE]);
-    expect([...WORK_TARGET_IDS].sort()).toEqual(['healthkr', 'o4o.neture', 'windows.calculator', 'windows.notepad']);
+    expect([...WORK_TARGET_IDS].sort()).toEqual(['healthkr', 'o4o.neture', 'windows.calculator', 'windows.kakaotalk', 'windows.notepad']);
     for (const id of WORK_TARGET_IDS) expect(isAllowedLocalAction(composeTargetAction(LOCAL_AGENT_ACTIONS.TARGET_PREPARE, id))).toBe(true);
     for (const bad of ['local.target.prepare', 'local.target.prepare#evil.site', 'local.target.prepare#https://health.kr/', 'local.target.open#healthkr', 'local.target.launch#windows.notepad', 'local.app.launch#windows.notepad']) {
       expect(isAllowedLocalAction(bad)).toBe(false);
@@ -184,21 +184,17 @@ describe('Work Agent integration', () => {
     }
   });
 
-  it('windows_app: ready 면 찾기/활성화/실행까지 하고 handoff(unsupported_control) — DOM 명령 0 · Planner 0 (§37)', async () => {
-    const planner = scripted([{ assessment: 'progress', action: { kind: 'inspect' } }]);
+  it('windows_app: ready 면 UIA 표면으로 loop 에 들어간다(WINDOWS-UI-AUTOMATION-V0) — 첫 명령은 local.uia.inspect · Planner 는 surface=uia 관찰을 받는다', async () => {
+    const planner = scripted([{ assessment: 'progress', action: { kind: 'takeover', reason: 'goal_sufficiently_advanced' } }]);
     const reused = await run('메모장에 오늘 할 일 적어줘', planner, {
       'local.target.prepare': [OK({ targetId: 'windows.notepad', targetType: 'windows_app', state: 'ready', reusedExisting: true, windowCount: 1 })],
+      'local.uia.inspect': [OK({ appId: 'windows.notepad', snapshotId: 's_note0001', windows: [{ windowRef: 'w_1', title: '제목 없음 - 메모장', foreground: true, minimized: false, userAction: false }], elements: [{ elementRef: 'e_1', role: 'window', name: '제목 없음 - 메모장' }, { elementRef: 'e_2', role: 'textbox', name: '텍스트 편집기', editable: true, size: [800, 500] }], elementCount: 2 })],
     });
-    expect(reused.seen.map((s) => s.action)).toEqual(['local.target.prepare#windows.notepad']);
-    expect(planner.calls.length).toBe(0);
-    expect(reused.result.takeover?.reason).toBe('unsupported_control');
-    expect(reused.result.progress).toBe('needs_user');
+    expect(reused.seen.map((s) => s.action)).toEqual(['local.target.prepare#windows.notepad', 'local.uia.inspect#windows.notepad']);
+    expect(planner.calls.length).toBe(1);
+    expect(planner.calls[0].observation.surface).toBe('uia');
+    expect(planner.calls[0].observation.windows?.[0].title).toBe('제목 없음 - 메모장');
     expect(reused.result.message).toContain('메모장 창을 찾아 앞으로 가져왔습니다.');
-    expect(reused.result.message).toContain('직접 이어서');
-    const launched = await run('메모장에 오늘 할 일 적어줘', planner, {
-      'local.target.prepare': [OK({ targetId: 'windows.notepad', targetType: 'windows_app', state: 'ready', openedByO4O: true, windowCount: 1 })],
-    });
-    expect(launched.result.message).toContain('실행되어 있지 않아 실행했습니다');
     const userOpens = await run('계산기 켜줘', planner, {
       'local.target.prepare': [OK({ targetId: 'windows.calculator', targetType: 'windows_app', state: 'waiting_for_user', userActionRequired: true, reason: 'launch_not_allowed', windowCount: 0 })],
     });

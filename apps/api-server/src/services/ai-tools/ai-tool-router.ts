@@ -895,6 +895,12 @@ const APP_INTENT_KEYWORDS: readonly {
     ko: ['\uACC4\uC0B0\uAE30'], // 계산기
     en: [/\bcalculator\b/i],
   },
+  {
+    // WINDOWS-UI-AUTOMATION-V0 — 첫 실제 Windows 앱. 별칭은 등재부(windows-app-registry)와 같다.
+    appId: 'windows.kakaotalk',
+    ko: ['\uCE74\uCE74\uC624\uD1A1', '\uCE74\uD1A1'], // 카카오톡 · 카톡
+    en: [/\bkakao\s*talk\b/i],
+  },
 ];
 
 /** 문장에서 등재 앱을 찾는다. 여러 개가 걸리면 **고르지 않는다** — 임의 선택 금지(§16 정신). */

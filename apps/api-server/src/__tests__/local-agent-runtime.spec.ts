@@ -28,6 +28,7 @@ import {
   DOM_TARGET_ACTIONS,
   SITE_TARGET_ACTIONS,
   TARGET_ACTIONS,
+  UIA_TARGET_ACTIONS,
   WORK_TARGET_IDS,
   composeAppAction,
   LOCAL_AGENT_ACTIONS,
@@ -556,6 +557,10 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
         ...TARGET_ACTIONS.flatMap((base) =>
           WORK_TARGET_IDS.map((targetId) => composeAppAction(base, targetId)),
         ),
+        // WINDOWS-UI-AUTOMATION-V0: UIA 5항목 × 등재 appId. HWND · RuntimeId · 임의 키 조합은 표현 불가.
+        ...UIA_TARGET_ACTIONS.flatMap((base) =>
+          WINDOWS_APP_IDS.map((appId) => composeAppAction(base, appId)),
+        ),
       ].sort(),
     );
     for (const action of LOCAL_AGENT_ACTION_ALLOWLIST) {
@@ -598,6 +603,8 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
       './local-db-backup.mjs',
       // WORK-TARGET-DISCOVERY-V0: 대상 발견·활성화 계층(순수 — 창 제어 모듈과 bridge 를 통해서만 밖에 닿는다).
       './work-target.mjs',
+      // WINDOWS-UI-AUTOMATION-V0: UIA 실행층(순수 — 창 제어 모듈의 단일 execFile 지점을 통해서만 밖에 닿는다).
+      './windows-uia.mjs',
       // BROWSER-DOM-CONTROL-V0: DOM 인자·결과 한도 사본(순수). 확장 통로(bridge relay)는 index.mjs 가
       // context 로 넘기므로 handler 는 net 모듈을 import 하지 않는다.
       './browser-dom-limits.mjs',

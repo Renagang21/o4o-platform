@@ -46,6 +46,7 @@ import {
 import { LocalMetaRepository, LocalSettingsRepository, localDbHealth, LocalDbError } from './local-db.mjs';
 import { backupSummary } from './local-db-backup.mjs';
 import { prepareTarget, resolveRegisteredTarget } from './work-target.mjs';
+import { uiaInspect, uiaSetValue, uiaInvoke, uiaKey, uiaClick } from './windows-uia.mjs';
 import {
   DOM_RESULT_MAX_BYTES,
   trimDomResult,
@@ -86,6 +87,12 @@ export const ACTIONS = {
   // WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §3·§33 — `local.target.prepare#<targetId>`(등재 siteId 또는 appId).
   //   있으면 재사용·활성화 → 없으면 등재 방법으로 열기 → 그래도 안 되면 사용자 요청. 인자 없음.
   TARGET_PREPARE: 'local.target.prepare',
+  // WO-O4O-WINDOWS-UI-AUTOMATION-V0 — `local.uia.<x>#appId`. 등재 앱 창의 UIA 트리 읽기 · 요소 값 입력 · 기본 동작 · 키 1회 · 창 안 좌표 클릭.
+  UIA_INSPECT: 'local.uia.inspect',
+  UIA_SET_VALUE: 'local.uia.set_value',
+  UIA_INVOKE: 'local.uia.invoke',
+  UIA_KEY: 'local.uia.key',
+  UIA_CLICK: 'local.uia.click',
   DATA_HEALTH: 'local.data.health',
   DATA_GET_META: 'local.data.get_meta',
   DATA_SET_SETTING: 'local.data.set_setting',
@@ -727,6 +734,18 @@ export async function runAction(action, context, args) {
     }
   }
 
+  // Windows UI Automation V0: `local.uia.<x>#appId`. 등재 밖 appId 는 UIA 를 열지 않는다. 인자 규칙은 windows-uia.mjs 가 다시 본다.
+  const uiaHandler = UIA_HANDLERS[base];
+  if (uiaHandler) {
+    const app = appId ? findWindowsApp(appId) : undefined;
+    if (!app) return { status: 'denied', errorCode: 'WINDOWS_APP_NOT_REGISTERED' };
+    try {
+      return await uiaHandler(app, args);
+    } catch {
+      return { status: 'failed', errorCode: 'UIA_UNAVAILABLE', data: { appId: app.appId } };
+    }
+  }
+
   // Work Target Discovery V0: `local.target.prepare#<targetId>`. 등재 밖 targetId 는 아무것도 조사하지 않는다.
   // 인자는 받지 않는다 — URL · 경로 · 탭 · 창 제목을 서버가 지정하는 통로가 없다(§13·§22·§27).
   if (base === ACTIONS.TARGET_PREPARE) {
@@ -773,6 +792,15 @@ export async function runAction(action, context, args) {
   }
 }
 
+/** UIA handler — appId 와 인자를 받는다. 검증은 windows-uia.mjs 안(형상 · 텍스트 · 키 · 좌표 · snapshot). */
+const UIA_HANDLERS = {
+  [ACTIONS.UIA_INSPECT]: (app, args) => (args === undefined || (args && typeof args === 'object' && !Array.isArray(args) && Object.keys(args).length === 0) ? uiaInspect(app) : { status: 'denied', errorCode: 'UIA_INVALID_ARGUMENT' }),
+  [ACTIONS.UIA_SET_VALUE]: (app, args) => uiaSetValue(app, args),
+  [ACTIONS.UIA_INVOKE]: (app, args) => uiaInvoke(app, args),
+  [ACTIONS.UIA_KEY]: (app, args) => uiaKey(app, args),
+  [ACTIONS.UIA_CLICK]: (app, args) => uiaClick(app, args),
+};
+
 /** 테스트·감사용. 이 목록 밖의 action 은 존재하지 않는다. */
 export function listAllowedActions() {
   return [
@@ -782,6 +810,7 @@ export function listAllowedActions() {
     ...Object.keys(COMPUTER_HANDLERS),
     ...Object.keys(DATA_HANDLERS),
     ACTIONS.TARGET_PREPARE,
+    ...Object.keys(UIA_HANDLERS),
     ...Object.keys(DOM_HANDLERS),
   ];
 }

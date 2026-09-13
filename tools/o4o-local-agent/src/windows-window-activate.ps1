@@ -28,6 +28,8 @@ public class O4OWindowActivate {
     [DllImport("user32.dll")]
     public static extern bool SetForegroundWindow(IntPtr hWnd);
     [DllImport("user32.dll")]
+    public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+    [DllImport("user32.dll")]
     public static extern IntPtr GetForegroundWindow();
     [DllImport("user32.dll")]
     public static extern bool IsIconic(IntPtr hWnd);
@@ -41,6 +43,7 @@ public class O4OWindowActivate {
     public static extern uint GetCurrentThreadId();
 
     public const int SW_RESTORE = 9;
+    public const int SW_MINIMIZE = 6;
 }
 '@
 
@@ -71,6 +74,29 @@ if (-not $ok) {
         Start-Sleep -Milliseconds 120
         $ok = ([O4OWindowActivate]::GetForegroundWindow() -eq $handle)
     }
+}
+
+if (-not $ok) {
+    # WINDOWS-UI-AUTOMATION-V0 실측: 트레이에서 복귀한 창(카카오톡)은 AttachThreadInput 으로도 거절한다.
+    # 최소화 뒤 복원하면 OS 가 그 창을 앞으로 보낸다. 창 상태는 결국 복원(원래대로)이고 입력 이벤트는 만들지 않는다.
+    [void][O4OWindowActivate]::ShowWindow($handle, [O4OWindowActivate]::SW_MINIMIZE)
+    Start-Sleep -Milliseconds 300
+    [void][O4OWindowActivate]::ShowWindow($handle, [O4OWindowActivate]::SW_RESTORE)
+    Start-Sleep -Milliseconds 300
+    [void][O4OWindowActivate]::SetForegroundWindow($handle)
+    Start-Sleep -Milliseconds 300
+    $ok = ([O4OWindowActivate]::GetForegroundWindow() -eq $handle)
+}
+
+if (-not $ok) {
+    # 마지막 수단(WINDOWS-UI-AUTOMATION-V0 실측): 콘솔 창이 없는 agent 자식 프로세스는 위 두 방법도 거절당한다.
+    # ALT 키를 한 번 눌렀다 떼면 OS 가 이 프로세스에 foreground 권한을 준다(널리 알려진 규칙). 문자 · 단축키를 만들지 않는다 —
+    # ALT 단독 down/up 은 어떤 앱에도 명령이 되지 않는다.
+    [O4OWindowActivate]::keybd_event(0x12, 0, 0, [UIntPtr]::Zero)
+    [O4OWindowActivate]::keybd_event(0x12, 0, 2, [UIntPtr]::Zero)
+    [void][O4OWindowActivate]::SetForegroundWindow($handle)
+    Start-Sleep -Milliseconds 300
+    $ok = ([O4OWindowActivate]::GetForegroundWindow() -eq $handle)
 }
 
 ConvertTo-Json -InputObject ([pscustomobject]@{ activated = [bool]$ok; restored = [bool]$restored }) -Compress

@@ -83,13 +83,21 @@ export function chooseSiteTab(tabs) {
   return { tab: null, reason: 'ambiguous' };
 }
 
-/** 같은 앱 창이 여럿일 때(§10 준용): 정확히 하나 > 최소화되지 않은 창이 하나 > 못 고름. */
+/**
+ * 같은 앱 창이 여럿일 때(§10 준용): 정확히 하나 > foreground 인 창 > (같은 process 하나뿐이면) 최소화되지 않은 첫 창 > 못 고름.
+ * 한 process 가 창을 여럿 띄우는 것(메인 + 대화창 등, WINDOWS-UI-AUTOMATION-V0 실측)은 "인스턴스가 여럿" 이 아니다 — 어느 창을
+ * 앞으로 보내도 같은 앱이다. process 가 둘 이상일 때만 사용자 선택으로 넘긴다.
+ */
 export function chooseAppWindow(windows) {
   const list = Array.isArray(windows) ? windows : [];
   if (list.length === 0) return { window: null, reason: 'none' };
   if (list.length === 1) return { window: list[0], reason: 'single' };
+  const foreground = list.find((w) => w.foreground === true);
+  if (foreground) return { window: foreground, reason: 'active' };
   const visible = list.filter((w) => w.minimized !== true);
   if (visible.length === 1) return { window: visible[0], reason: 'visible' };
+  const pids = new Set(list.map((w) => w.pid));
+  if (pids.size === 1) return { window: visible[0] ?? list[0], reason: 'same_process' };
   return { window: null, reason: 'ambiguous' };
 }
 

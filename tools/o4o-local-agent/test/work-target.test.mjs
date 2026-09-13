@@ -181,7 +181,10 @@ test('13. 최소화된 창은 복원 뒤 앞으로 — 여러 창이면 보이�
   assert.equal(r.state, 'ready');
   assert.equal(r.restored, true);
   assert.equal(wt.chooseAppWindow([{ hwnd: 1, minimized: true }, { hwnd: 2, minimized: false }]).window.hwnd, 2);
-  assert.equal(wt.chooseAppWindow([{ hwnd: 1, minimized: false }, { hwnd: 2, minimized: false }]).window, null);
+  // 다른 process(인스턴스 둘) 는 못 고른다 · 같은 process 의 여러 창(메인+대화창)은 foreground > 첫 보이는 창
+  assert.equal(wt.chooseAppWindow([{ hwnd: 1, pid: 1, minimized: false }, { hwnd: 2, pid: 2, minimized: false }]).window, null);
+  assert.equal(wt.chooseAppWindow([{ hwnd: 1, pid: 1, minimized: false }, { hwnd: 2, pid: 1, minimized: false, foreground: true }]).window.hwnd, 2);
+  assert.equal(wt.chooseAppWindow([{ hwnd: 1, pid: 1, minimized: false }, { hwnd: 2, pid: 1, minimized: false }]).reason, 'same_process');
   const multi = fakeDeps({ windows: [{ hwnd: 1, pid: 1, processName: 'notepad', title: 'a - 메모장', minimized: false }, { hwnd: 2, pid: 2, processName: 'notepad', title: 'b - 메모장', minimized: false }] });
   const m = await wt.prepareTarget('windows.notepad', {}, multi);
   assert.equal(m.state, 'waiting_for_user');

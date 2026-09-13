@@ -59,6 +59,13 @@ export const WINDOWS_APP_REGISTRY: readonly WindowsAppDefinition[] = Object.free
     aliases: Object.freeze(['메모장', 'notepad']),
     processNames: ['notepad'],
   }) as WindowsAppDefinition,
+  // WINDOWS-UI-AUTOMATION-V0 — 첫 실제 Windows 앱(약국 프로그램 준비 전 대체). 실행 경로는 agent 등재부에만 있다.
+  Object.freeze({
+    appId: 'windows.kakaotalk',
+    displayName: '카카오톡',
+    aliases: Object.freeze(['카카오톡', '카톡', 'kakaotalk', 'kakao talk']),
+    processNames: ['KakaoTalk'],
+  }) as WindowsAppDefinition,
   Object.freeze({
     appId: 'windows.calculator',
     displayName: '계산기',

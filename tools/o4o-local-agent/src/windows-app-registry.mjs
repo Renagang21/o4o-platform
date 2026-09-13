@@ -29,6 +29,16 @@ export const WINDOWS_APP_REGISTRY = Object.freeze([
     launch: Object.freeze({ kind: 'executable', path: 'C:\\Windows\\System32\\notepad.exe' }),
     launchAllowed: true,
   }),
+  // WINDOWS-UI-AUTOMATION-V0 — 첫 실제 Windows 앱(약국 프로그램 준비 전 대체). UIA 공통층 검증용이지 카카오톡 전용 어댑터가 아니다.
+  //   트레이 상주 앱: 실행 중이어도 보이는 창이 없으면 census 에 안 잡힌다 → 등재 실행 파일을 다시 실행하면(단일 인스턴스) 창이 앞으로 온다(실측).
+  Object.freeze({
+    appId: 'windows.kakaotalk',
+    displayName: '카카오톡',
+    aliases: Object.freeze(['카카오톡', '카톡', 'kakaotalk', 'kakao talk']),
+    processNames: Object.freeze(['KakaoTalk']),
+    launch: Object.freeze({ kind: 'executable', path: 'C:\\Program Files\\Kakao\\KakaoTalk\\KakaoTalk.exe' }),
+    launchAllowed: true,
+  }),
   Object.freeze({
     appId: 'windows.calculator',
     displayName: '계산기',

@@ -34,6 +34,7 @@
  */
 
 import { WINDOWS_APP_IDS } from './windows-app-registry.js';
+import { pickSafeUiaInfo, validateUiaClickArgs, validateUiaInvokeArgs, validateUiaKeyArgs, validateUiaSetValueArgs, type UiaActionArgs } from './windows-uia-contract.js';
 import { BROWSER_SITE_IDS } from './browser-site-registry.js';
 import {
   COMPUTER_ALLOWED_KEYS,
@@ -104,6 +105,12 @@ export const LOCAL_AGENT_ACTIONS = {
   // ── Work Target Discovery V0 (WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §3·§33) ────────
   /** `local.target.prepare#<targetId>` — 있으면 재사용·활성화, 없으면 등재 방법으로 열기, 그래도 안 되면 사용자 요청. 인자 없음. */
   TARGET_PREPARE: 'local.target.prepare',
+  // ── Windows UI Automation V0 (WO-O4O-WINDOWS-UI-AUTOMATION-V0) — `local.uia.<x>#appId` ────────
+  UIA_INSPECT: 'local.uia.inspect',
+  UIA_SET_VALUE: 'local.uia.set_value',
+  UIA_INVOKE: 'local.uia.invoke',
+  UIA_KEY: 'local.uia.key',
+  UIA_CLICK: 'local.uia.click',
   DATA_HEALTH: 'local.data.health',
   /** allowlist 된 meta 키 하나의 값을 읽는다(§13). 임의 SQL·임의 키가 아니다. */
   DATA_GET_META: 'local.data.get_meta',
@@ -203,6 +210,19 @@ export function isDomTargetAction(base: string): boolean {
   return DOM_TARGET_ACTIONS.includes(base);
 }
 
+// ─── UIA 대상 action (WINDOWS-UI-AUTOMATION-V0) ─────────────────────────────────
+/** appId 를 `base#appId` 로 싣는다(창 축과 같은 규칙). 요소는 `e_n`+snapshotId 뿐 — HWND · RuntimeId · 실행 경로는 표현 불가. */
+export const UIA_TARGET_ACTIONS: readonly string[] = Object.freeze([
+  LOCAL_AGENT_ACTIONS.UIA_INSPECT,
+  LOCAL_AGENT_ACTIONS.UIA_SET_VALUE,
+  LOCAL_AGENT_ACTIONS.UIA_INVOKE,
+  LOCAL_AGENT_ACTIONS.UIA_KEY,
+  LOCAL_AGENT_ACTIONS.UIA_CLICK,
+]);
+export function isUiaTargetAction(base: string): boolean {
+  return UIA_TARGET_ACTIONS.includes(base);
+}
+
 // ─── Local Data Runtime bridge 계약 (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1) ─
 
 /**
@@ -293,7 +313,7 @@ export function validateDataSetSettingArgs(args: unknown): { ok: boolean; args?:
 export function validateLocalCommandArgs(
   base: string,
   args: unknown,
-): { ok: true; args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs } | { ok: false } {
+): { ok: true; args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs | UiaActionArgs } | { ok: false } {
   // BROWSER-DOM-CONTROL-V0 §13·§15: elementRef/snapshotId/구조화 조건만. selector · JS 칸은 형상에 없다.
   if (base === LOCAL_AGENT_ACTIONS.DOM_FIND) {
     const r = validateDomFindArgs(args);
@@ -313,6 +333,23 @@ export function validateLocalCommandArgs(
   }
   if (base === LOCAL_AGENT_ACTIONS.DOM_READ_TABLE) {
     const r = validateDomReadTableArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  // WINDOWS-UI-AUTOMATION-V0: 요소 ref+snapshot · 텍스트(computer-use 규칙) · 허용 키 · 0..1 좌표만.
+  if (base === LOCAL_AGENT_ACTIONS.UIA_SET_VALUE) {
+    const r = validateUiaSetValueArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.UIA_INVOKE) {
+    const r = validateUiaInvokeArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.UIA_KEY) {
+    const r = validateUiaKeyArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.UIA_CLICK) {
+    const r = validateUiaClickArgs(args);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_GET_META) {
@@ -415,6 +452,10 @@ export const LOCAL_AGENT_ACTION_ALLOWLIST: readonly string[] = Object.freeze([
   // WORK-TARGET-DISCOVERY-V0: 등재 targetId(siteId ∪ appId) 하나당 1항목.
   ...TARGET_ACTIONS.flatMap((base) =>
     WORK_TARGET_IDS.map((targetId) => composeTargetAction(base, targetId)),
+  ),
+  // WINDOWS-UI-AUTOMATION-V0: 등재 appId 하나당 5항목. HWND · RuntimeId · 실행 경로 · 임의 키 조합은 표현 불가.
+  ...UIA_TARGET_ACTIONS.flatMap((base) =>
+    WINDOWS_APP_IDS.map((appId) => composeAppAction(base, appId)),
   ),
 ]);
 
@@ -553,6 +594,26 @@ export const LOCAL_AGENT_ERROR = {
   TARGET_NOT_READY: 'WORK_TARGET_NOT_READY',
   /** 실행 뒤 창이 제한 시간 안에 나타나지 않았다. */
   TARGET_TIMEOUT: 'WORK_TARGET_TIMEOUT',
+
+  // ── Windows UI Automation V0 (WO-O4O-WINDOWS-UI-AUTOMATION-V0) ────────────────────────────
+  /** UIA 를 열지 못했다(스크립트 실패 · 앱이 UIA 를 노출하지 않음). */
+  UIA_UNAVAILABLE: 'UIA_UNAVAILABLE',
+  /** 형상 밖 인자 · 허용 밖 키 · 좌표 · 텍스트 길이. */
+  UIA_INVALID_ARGUMENT: 'UIA_INVALID_ARGUMENT',
+  /** credential 성격 텍스트. */
+  UIA_TEXT_DENIED: 'UIA_TEXT_DENIED',
+  /** snapshot 이 없거나(만료) 요소를 다시 찾지 못했다 → 다시 관찰. */
+  UIA_ELEMENT_STALE: 'UIA_ELEMENT_STALE',
+  /** snapshot 에 그 ref 가 없다. */
+  UIA_ELEMENT_NOT_FOUND: 'UIA_ELEMENT_NOT_FOUND',
+  /** 그 role 에 그 동작이 없다(값 입력 불가 · invoke 불가 · 좌표 클릭 불가). */
+  UIA_ACTION_NOT_SUPPORTED: 'UIA_ACTION_NOT_SUPPORTED',
+  /** COMMIT 성격 이름의 요소 — 자동 실행하지 않는다. */
+  UIA_ACTION_NOT_ALLOWED: 'UIA_ACTION_NOT_ALLOWED',
+  /** 로그인 · 비밀번호 · 인증 · 파일 대화상자 창 — 사용자가 직접. */
+  UIA_USER_ACTION_REQUIRED: 'UIA_USER_ACTION_REQUIRED',
+  /** 대상 창을 앞으로 보내지 못해 입력을 만들지 않았다. */
+  UIA_TARGET_NOT_FOREGROUND: 'UIA_TARGET_NOT_FOREGROUND',
 
   // ── Browser DOM Control V0 (WO-O4O-BROWSER-DOM-CONTROL-V0 §29·§44) ─────────
   /** 현재 탭이 등재 site 가 아니다 · siteId 미등재. */
@@ -851,6 +912,9 @@ export function pickSafeResultData(action: string, data: unknown): Record<string
   const { base } = parseLocalAction(action);
   if (TARGET_ACTIONS.includes(base)) {
     return pickSafeTargetInfo(data);
+  }
+  if (UIA_TARGET_ACTIONS.includes(base)) {
+    return pickSafeUiaInfo(data);
   }
   if (base === LOCAL_AGENT_ACTIONS.GET_SYSTEM_INFO || base === LOCAL_AGENT_ACTIONS.GET_AGENT_STATUS) {
     return pickSafeSystemInfo(data);

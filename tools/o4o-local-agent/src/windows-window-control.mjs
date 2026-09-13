@@ -48,6 +48,8 @@ const ACTIVATE_SCRIPT = path.join(HERE, 'windows-window-activate.ps1');
 const BROWSER_OPEN_SCRIPT = path.join(HERE, 'windows-browser-open.ps1');
 // WORK-TARGET-DISCOVERY-V0 §26·§27 — 등재 실행 파일/바로가기 하나를 인자 없이 시작하는 여섯 번째 스크립트.
 const APP_LAUNCH_SCRIPT = path.join(HERE, 'windows-app-launch.ps1');
+// WINDOWS-UI-AUTOMATION-V0 — UIA 읽기 · 요소 값 입력 · 기본 동작 · 키 · 창 안 좌표 클릭(일곱 번째 스크립트).
+const UIA_SCRIPT = path.join(HERE, 'windows-uia.ps1');
 // COMPUTER-USE-V0 — 아래 "Computer Use V0" 절 참조. 상수는 여기 한곳에 모아 둔다.
 const COMPUTER_INSPECT_SCRIPT = path.join(HERE, 'windows-computer-inspect.ps1');
 const COMPUTER_INPUT_SCRIPT = path.join(HERE, 'windows-computer-input.ps1');
@@ -87,14 +89,14 @@ function childEnv(extra) {
   };
 }
 
-function runScript(scriptPath, env) {
+function runScript(scriptPath, env, opts = {}) {
   return new Promise((resolve, reject) => {
     execFile(
       PS_EXE,
       [...PS_FLAGS, scriptPath],
       {
-        timeout: EXEC_TIMEOUT_MS,
-        maxBuffer: MAX_OUTPUT_BYTES,
+        timeout: opts.timeout ?? EXEC_TIMEOUT_MS,
+        maxBuffer: opts.maxBuffer ?? MAX_OUTPUT_BYTES,
         windowsHide: true,
         env,
       },
@@ -135,6 +137,8 @@ export async function censusWindows() {
       processName: String(w.processName || ''),
       title: String(w.title || ''),
       minimized: w.minimized === true,
+      // WINDOWS-UI-AUTOMATION-V0: 같은 앱 창이 여럿일 때(메인 + 대화창) foreground 창을 우선한다.
+      foreground: w.foreground === true,
     }))
     .filter((w) => Number.isFinite(w.hwnd) && w.hwnd > 0);
 }
@@ -174,6 +178,7 @@ export async function activateWindowHandle(hwnd) {
   );
   const parsed = parseJson(raw);
   if (!parsed || typeof parsed !== 'object') return { activated: false, restored: false };
+  if (parsed.activated === true) lastInjectAt = Date.now();
   return { activated: parsed.activated === true, restored: parsed.restored === true };
 }
 
@@ -268,6 +273,34 @@ export async function launchRegisteredApp(app) {
   const parsed = parseJson(raw);
   if (!parsed || parsed.launched !== true) return { launched: false, reason: parsed?.reason === 'NOT_FOUND' ? 'NOT_FOUND' : 'LAUNCH_FAILED' };
   return { launched: true };
+}
+
+// ─── Windows UI Automation V0 (WO-O4O-WINDOWS-UI-AUTOMATION-V0) ─────────────────
+
+const UIA_ENV_KEYS = Object.freeze(['O4O_UIA_ACTION', 'O4O_UIA_PID', 'O4O_UIA_PROCESS_NAMES', 'O4O_UIA_HWND', 'O4O_UIA_RID', 'O4O_UIA_TEXT', 'O4O_UIA_KEY', 'O4O_UIA_X', 'O4O_UIA_Y', 'O4O_UIA_CLICKS', 'O4O_UIA_SINCE_INJECT_MS']);
+// 우리 자신이 마지막으로 입력을 주입한 시각 — 스크립트의 사용자 활동 판정(GetLastInputInfo)이 우리 입력을 사용자 입력으로 오인하지 않게 한다.
+let lastInjectAt = 0;
+const INJECTING_ACTIONS = new Set(['set_value', 'key', 'click', 'activate']);
+const UIA_EXEC_TIMEOUT_MS = 20_000;
+
+/**
+ * UIA 스크립트 1회. 입력은 허용 키의 환경변수뿐이고 값은 문자열로 강제한다. pid 는 census 값(정수), 텍스트·키·좌표는
+ * windows-uia.mjs 가 이미 규칙을 적용했다. 실패는 null(호출자가 UIA_UNAVAILABLE 로 접는다).
+ */
+export async function runUiaScript(env) {
+  const extra = {};
+  for (const k of UIA_ENV_KEYS) if (env && env[k] !== undefined && env[k] !== null) extra[k] = String(env[k]);
+  if (!/^[1-9][0-9]{0,9}$/.test(extra.O4O_UIA_PID ?? '')) return null;
+  extra.O4O_UIA_SINCE_INJECT_MS = String(Math.min(999999, lastInjectAt ? Date.now() - lastInjectAt : 999999));
+  let raw;
+  try {
+    raw = await runScript(UIA_SCRIPT, childEnv(extra), { timeout: UIA_EXEC_TIMEOUT_MS, maxBuffer: MAX_OUTPUT_BYTES * 4 });
+  } catch {
+    return null;
+  }
+  const parsed = parseJson(raw);
+  if (INJECTING_ACTIONS.has(extra.O4O_UIA_ACTION) && parsed && parsed.ok === true) lastInjectAt = Date.now();
+  return parsed;
 }
 
 // ─── Computer Use V0 (WO-O4O-COMPUTER-USE-V0) ───────────────────────────────
