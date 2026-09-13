@@ -1,7 +1,7 @@
 # CHECK-O4O-AUTOMATION-VIDEO-JOB-TEMP-OUTPUT-DOWNLOAD-AND-AUTO-CLEANUP-V1
 
 > **WO**: `WO-O4O-AUTOMATION-VIDEO-JOB-TEMP-OUTPUT-DOWNLOAD-AND-AUTO-CLEANUP-V1`
-> **상태**: DEPLOYED + PRODUCTION SMOKE PASS (§13) — **CLOSED 아님**: 실제 48h TTL 만료·자동 삭제는 관찰 중(§14, 만료 2026-09-14T15:32:23Z = KST 09-15 00:32). 관찰 결과가 확인되면 CLOSED 판정 가능.
+> **상태**: **CLOSED** (2026-09-13) — DEPLOYED + PRODUCTION SMOKE PASS (§13) + **실제 TTL 만료·자동 삭제 controlled verification PASS (§14-A)**.
 > **작성일**: 2026-09-12
 > **성격**: P0(`CHECK-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1`) 후속 정비. Job 구조·Media INPUT/INTERMEDIATE 연결·권한은 유지하고
 > **완성 영상의 저장 위치와 생명주기만** 바꿨다 — Media Library 장기 자산 → 비공개 임시 저장 + 다운로드 + TTL 자동 삭제.
@@ -154,7 +154,28 @@ production 실측(2026-09-12, `GET /platform/automation-jobs` + `/media-library/
 
 ## 14. 미확인 / 미완료
 
-- **실제 TTL 만료·자동 삭제(§17-C)**: production 기본 TTL(48h)을 테스트 때문에 줄이지 않았고, 운영 DB 의 `temp_output_expires_at` 수동 UPDATE 도 하지 않았다. 대신 `[SMOKE] 미네락600`(`e9b943d3…`) 에 등록한 완성본을 그대로 두고 만료를 기다린다 — `expiresAt = 2026-09-14T15:32:23Z`. 확인 절차: (1) `GET /platform/automation-jobs/e9b943d3…/temp-output` → `state=EXPIRED, downloadable=false, cleanupPending=false`, download → 410; (2) `gcloud storage ls gs://o4o-video-temp-output/video-jobs/e9b943d3-f914-495e-8bb5-c1d54c432226/` → 0 objects(앱 expiry job 이 지움; lifecycle 은 그보다 늦은 3일 백스톱); (3) Cloud Run 로그 `[video-temp-output-expiry] apply done … expired: 1`. 로직 자체는 jest D(만료 → 410, expireDue → object 삭제 + EXPIRED, 실패 재시도) 로 검증됨.
+### 14-A. 실제 만료·자동 삭제 controlled production verification (2026-09-13) — PASS 4/4
+
+사용자 승인(운영 DB write 1건, `[SMOKE]` Job 한정)으로 48h 를 기다리지 않고 즉시 검증했다. 운영 기본 TTL 48h · bucket lifecycle · 실사용 데이터는 건드리지 않았다.
+
+| 단계 | 결과 |
+|---|---|
+| 테스트 Job `fc2ee48a-16c2-4504-8daf-c426798b97f1` `[SMOKE-TTL] 만료 삭제 controlled verification` 생성 + mp4(1,196B) 등록 (API) | 201 `AVAILABLE`, `expiresAt=2026-09-15T02:26:28Z`(48h), GCS object 1 |
+| DB write: `UPDATE automation_jobs SET temp_output_expires_at = now() - interval '1 hour' WHERE id=… AND title LIKE '[SMOKE-TTL]%' AND temp_output_cleanup_status='AVAILABLE'` (Cloud SQL Auth Proxy, 갱신된 로컬 `.env` 자격) | **`UPDATE 1`**, due 대상 count 1 |
+| ① status | 즉시 `state=EXPIRED, downloadable=false, cleanupPending=true`(job 실행 전) → job 실행 후 `cleanupPending=false` |
+| ② download | 즉시 **410 `TEMP_OUTPUT_EXPIRED`**(object 가 아직 있는 동안에도 차단) |
+| ③ GCS object | `gcloud storage ls gs://o4o-video-temp-output/video-jobs/fc2ee48a…/` → **0 objects** |
+| ④ 로그 | `2026-09-13T02:41:29Z` revision `o4o-core-api-03639-n9n` `[video-temp-output-expiry] apply done` **`due=1 expired=1 failed=0 jobIds=[fc2ee48a…] ttlHours=48`** — Cloud Run 이 새 인스턴스를 띄우면서 부팅 1회 실행 경로가 처리(UPDATE 02:37:35Z → 삭제 02:41:29Z). 이후 02:54:02Z 새 revision 부팅 실행은 `due=0`(이미 처리됨, 재삭제 없음) |
+| 다른 VIDEO Job 영향 | `[SMOKE] 미네락600` output `AVAILABLE`/download 200/object 1 그대로. DB 에서 `temp_output_cleanup_status` 가 있는 행은 두 건뿐 |
+| Media Library 영향 | legacy asset `c3079cf2…` 200, 2026-09-13 신규 `media_assets` 0 |
+| TTL / lifecycle 유지 | API `ttlHours=48`, 로그 `ttlHours=48`; `o4o-video-temp-output` lifecycle `Delete age 3 matchesPrefix video-jobs/` 그대로, `o4o-media-library` lifecycle 여전히 없음 |
+| 정리 | `[SMOKE-TTL]` Job → `CANCELLED`(statusNote "TTL controlled verification 종료 — 원복"). 행은 `EXPIRED` 기록으로 남는다(삭제 endpoint 없음, 실사용 데이터 아님). `[SMOKE] 미네락600` 의 output 은 그대로 두어 09-15 00:32 KST 자연 만료를 추가로 관찰할 수 있다 |
+
+비고: 로컬 `apps/api-server/.env` 의 DB 자격이 운영 자격 교체(`o4o_api` → `o4o_api_v2`, Secret Manager `o4o-db-password`) 이후 갱신되지 않아 첫 접속이 실패했고, 사용자가 `.env` 를 갱신한 뒤 진행했다(`.env` 는 `apps/api-server/.gitignore` 로 미추적 · 값은 어디에도 기록하지 않음). Secret Manager 값을 셸로 끌어오는 방식은 auto mode 가 차단했고 우회하지 않았다.
+
+### 14-B. 남은 항목 (WO 마감과 무관)
+
+- ~~실제 TTL 만료·자동 삭제~~ → §14-A 로 PASS. `[SMOKE] 미네락600` 의 output(만료 2026-09-14T15:32:23Z)은 48h 자연 만료의 추가 관찰용으로 남겨 둠(선택).
 - Cloud Run idle 로 인스턴스가 내려가 있으면 expiry job 이 그 시간엔 돌지 않는다. 다운로드 차단은 `expires_at` 으로 즉시이고, object 삭제는 다음 기동 또는 lifecycle(3일) 에 이루어진다 — 위 관찰에서 실측.
 - 100 MB 업로드 한도(기존 `uploadSingleMiddleware`)·Cloud Run 요청 크기 제약은 기존 Media Library 업로드와 동일한 플랫폼 제약. 대용량 완성본 경로는 이번 WO 범위 밖.
 - 범위 밖 발견(수정 안 함): `o4o-private-documents` bucket 부재(§1).
