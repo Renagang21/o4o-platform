@@ -1,0 +1,175 @@
+[
+  {
+    "file": "mineral-icon-set.png",
+    "title": "MINEROCK600 P1 mineral-icon-set",
+    "category": "PRODUCTION",
+    "mediaType": "IMAGE",
+    "purpose": "REUSABLE",
+    "status": "APPROVED",
+    "scope": "service-neutral",
+    "tags": [
+      "minerock600",
+      "mineral",
+      "icon",
+      "set"
+    ],
+    "jobRole": "INTERMEDIATE",
+    "mediaAssetId": null,
+    "registrationStatus": "PENDING_UPLOAD",
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "file": "mineral-Na.png",
+    "title": "MINEROCK600 P1 mineral-Na",
+    "category": "PRODUCTION",
+    "mediaType": "IMAGE",
+    "purpose": "REUSABLE",
+    "status": "APPROVED",
+    "scope": "service-neutral",
+    "tags": [
+      "minerock600",
+      "mineral",
+      "Na"
+    ],
+    "jobRole": "INTERMEDIATE",
+    "mediaAssetId": null,
+    "registrationStatus": "PENDING_UPLOAD",
+    "size": [
+      512,
+      512
+    ]
+  },
+  {
+    "file": "mineral-K.png",
+    "title": "MINEROCK600 P1 mineral-K",
+    "category": "PRODUCTION",
+    "mediaType": "IMAGE",
+    "purpose": "REUSABLE",
+    "status": "APPROVED",
+    "scope": "service-neutral",
+    "tags": [
+      "minerock600",
+      "mineral",
+      "K"
+    ],
+    "jobRole": "INTERMEDIATE",
+    "mediaAssetId": null,
+    "registrationStatus": "PENDING_UPLOAD",
+    "size": [
+      512,
+      512
+    ]
+  },
+  {
+    "file": "mineral-Mg.png",
+    "title": "MINEROCK600 P1 mineral-Mg",
+    "category": "PRODUCTION",
+    "mediaType": "IMAGE",
+    "purpose": "REUSABLE",
+    "status": "APPROVED",
+    "scope": "service-neutral",
+    "tags": [
+      "minerock600",
+      "mineral",
+      "Mg"
+    ],
+    "jobRole": "INTERMEDIATE",
+    "mediaAssetId": null,
+    "registrationStatus": "PENDING_UPLOAD",
+    "size": [
+      512,
+      512
+    ]
+  },
+  {
+    "file": "mineral-Ca.png",
+    "title": "MINEROCK600 P1 mineral-Ca",
+    "category": "PRODUCTION",
+    "mediaType": "IMAGE",
+    "purpose": "REUSABLE",
+    "status": "APPROVED",
+    "scope": "service-neutral",
+    "tags": [
+      "minerock600",
+      "mineral",
+      "Ca"
+    ],
+    "jobRole": "INTERMEDIATE",
+    "mediaAssetId": null,
+    "registrationStatus": "PENDING_UPLOAD",
+    "size": [
+      512,
+      512
+    ]
+  },
+  {
+    "file": "cell-base.png",
+    "title": "MINEROCK600 P1 cell-base",
+    "category": "PRODUCTION",
+    "mediaType": "IMAGE",
+    "purpose": "REUSABLE",
+    "status": "APPROVED",
+    "scope": "service-neutral",
+    "tags": [
+      "minerock600",
+      "cell",
+      "base"
+    ],
+    "jobRole": "INTERMEDIATE",
+    "mediaAssetId": null,
+    "registrationStatus": "PENDING_UPLOAD",
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "file": "na-k-pump-static.png",
+    "title": "MINEROCK600 P1 na-k-pump-static",
+    "category": "PRODUCTION",
+    "mediaType": "IMAGE",
+    "purpose": "REUSABLE",
+    "status": "APPROVED",
+    "scope": "service-neutral",
+    "tags": [
+      "minerock600",
+      "na",
+      "k",
+      "pump",
+      "static"
+    ],
+    "jobRole": "INTERMEDIATE",
+    "mediaAssetId": null,
+    "registrationStatus": "PENDING_UPLOAD",
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  {
+    "file": "east-sea-bedrock-reference.png",
+    "title": "MINEROCK600 P1 east-sea-bedrock-reference",
+    "category": "REFERENCE",
+    "mediaType": "IMAGE",
+    "purpose": "REFERENCE",
+    "status": "REVIEW",
+    "scope": "service-neutral",
+    "tags": [
+      "minerock600",
+      "east",
+      "sea",
+      "bedrock",
+      "reference"
+    ],
+    "jobRole": "INTERMEDIATE",
+    "mediaAssetId": null,
+    "registrationStatus": "PENDING_UPLOAD",
+    "size": [
+      1920,
+      1080
+    ]
+  }
+]
