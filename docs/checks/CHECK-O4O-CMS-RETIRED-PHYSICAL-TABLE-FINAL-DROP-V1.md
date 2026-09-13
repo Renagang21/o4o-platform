@@ -1,6 +1,6 @@
 # CHECK-O4O-CMS-RETIRED-PHYSICAL-TABLE-FINAL-DROP-V1
 
-> **상태**: 구현·로컬 검증 완료 → migration job 실행 · 운영 검증 _(§6~§8 갱신)_
+> **상태**: **CLOSED** — 구현 SHA = push SHA `5e2bfbc81` · CI 3/3 · migration job 성공(4 테이블 드롭) · 운영 read-only 부재 실측 · API PASS
 > **작성일**: 2026-09-13
 > **WO**: WO-O4O-CMS-RETIRED-PHYSICAL-TABLE-FINAL-DROP-V1 (IR §12 초안 승인)
 > **근거 조사**: [`IR-O4O-CMS-RETIRED-PHYSICAL-TABLE-RESIDUE-CENSUS-V1`](../investigations/IR-O4O-CMS-RETIRED-PHYSICAL-TABLE-RESIDUE-CENSUS-V1.md)
@@ -53,15 +53,73 @@ A  docs/checks/CHECK-O4O-CMS-RETIRED-PHYSICAL-TABLE-FINAL-DROP-V1.md
 
 ## 6. Migration job 실행 (배포)
 
-_(push 후 갱신)_
+| 워크플로 | 결과 | run |
+|---|---|---:|
+| CI Pipeline | ✅ success | (SHA `5e2bfbc81`) |
+| CodeQL Security Analysis | ✅ success | |
+| Deploy API Server (Cloud Run) | ✅ success — **Run database migrations → Deploy → Verify(`/health/ready`)** 전부 success | 34755715056 |
+
+**Job `o4o-api-migrations-m9tkf`** (`dist/migrate.js`, `transaction: 'each'`):
+
+```text
+[DropRetiredCmsCptResidueTables] custom_fields: dropped (rows=0, unexpected inbound FK=0)
+[DropRetiredCmsCptResidueTables] custom_post_types: dropped (rows=0, unexpected inbound FK=0)
+[DropRetiredCmsCptResidueTables] pages: dropped (rows=0, unexpected inbound FK=0)
+[DropRetiredCmsCptResidueTables] views: dropped (rows=0, unexpected inbound FK=0)
+Migration DropRetiredCmsCptResidueTables20270412000000 has been executed successfully.
+  - Migrations executed: 1  → Migration Job - SUCCESS → exit(0)
+```
+
+4개 모두 가드(존재 · `count(*)=0` · 후보 밖 inbound FK 0) 통과 후 **FK 자식 → 부모 순**으로 드롭. throw 0 · CASCADE 0.
 
 ## 7. 운영 검증
 
-_(job 후 갱신)_
+### 7-1. 물리 부재 (Cloud SQL Auth Proxy · `BEGIN READ ONLY … ROLLBACK` · 자격정보는 환경변수로만)
+
+| 항목 | 실측 |
+|---|---|
+| `custom_fields` · `custom_post_types` · `pages` · `views` | **전부 부재** (`pg_class` 0) |
+| 드롭된 테이블을 가리키는 잔류 FK | **0** |
+| `typeorm_migrations` | 676행(전 675 + 1) · 최신 `DropRetiredCmsCptResidueTables20270412000000` |
+| 정본 행 수 | `cms_contents` **63**(불변) · `cms_content_slots` 29 · `media_assets` 50 · `media_entity_links` 3 — 존재 · 접근 정상 |
+
+### 7-2. API (revision `o4o-core-api-03646-sw9`, 트래픽 100%)
+
+| 경로 | 결과 |
+|---|---|
+| `/health/ready` | **200** `ready` |
+| `/api/v1/cms/contents?serviceKey=neture` (인증) | **200** · 실데이터 |
+| `/api/v1/platform/media-library` (인증) | **200** · 실데이터 |
+| `/api/v1/hub/contents?serviceKey=kpa` | 200 |
+| 미인증 `media-library` · serviceKey 없는 `cms/contents` | 401 · 400 (기존 계약) |
+
+### 7-3. 신규 revision 로그
+
+severity ≥ ERROR **0** · 5xx **0** · `does not exist` **0**. 콜드스타트 순서 `process_start → db_connecting → ready(+4.24s) → http_listen = TCP probe 성공(같은 ms)` — 선행 readiness 게이트 계약 유지.
 
 ## 8. 완료 판정
 
-_(갱신)_
+```text
+DROP_TARGET_EXACT_MATCH            = PASS   (4 · wildcard 0)
+DROP_ORDER_FK_CHILD_FIRST          = PASS
+UP_GUARD_ROWS_ZERO                 = PASS   (job 로그 rows=0 ×4)
+UP_GUARD_UNEXPECTED_INBOUND_FK     = PASS   (0 ×4)
+CASCADE_USED                       = ZERO
+EXECUTED_MIGRATION_MODIFIED        = ZERO
+PRODUCTION_PHYSICAL_ABSENCE        = PASS   (read-only 실측)
+DANGLING_FK_TO_DROPPED             = ZERO
+CANONICAL_CONTENT_PRESERVED        = PASS   (cms_contents 63 · API 200)
+MEDIA_V2_PRESERVED                 = PASS
+PRODUCTION_MIGRATION_OWNER         = DEPLOY_MIGRATION_JOB_ONLY (job 이 실행 · startup 미실행)
+PRODUCTION_DATA_CHANGE             = ZERO   (삭제된 행 0)
+CREDENTIAL_EXPOSURE                = ZERO
+CI_PIPELINE · CODEQL · DEPLOY_API  = SUCCESS
+OTHER_SERVICE_REGRESSION           = PASS   (jest 4,524 · revision ERROR 0)
+
+CMS_RETIRED_PHYSICAL_TABLE_FINAL_DROP = CLOSED
+```
+
+이로써 CMS legacy · lifecycle · CPT/ACF 축은 **코드(entity · DDL · 런타임)와 운영 물리 객체 모두** 종결됐다.
 
 ## 9. 문서 정합
 
