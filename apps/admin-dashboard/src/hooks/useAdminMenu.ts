@@ -2,7 +2,7 @@
  * useAdminMenu - Admin Navigation Hook
  *
  * 메뉴 SSOT 는 `@/admin/menu/admin-menu.static` 이다. 이 hook 은
- * 1. 정적 메뉴에 CPT 메뉴를 주입하고
+ * 1. 정적 메뉴를 기준으로 (동적 CPT 주입은 제거됨)
  * 2. 사용자 권한(`/v1/userRole/:id/permissions`) · app 상태로 노출을 필터한다.
  *
  * WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1:
@@ -15,7 +15,6 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { adminMenuStatic, MenuItem } from '@/admin/menu/admin-menu.static';
-import { useDynamicCPTMenu, injectCPTMenuItems } from './useDynamicCPTMenu';
 import { useAuth } from '@o4o/auth-context';
 import { hasMenuPermission } from '@/config/rolePermissions';
 import { unifiedApi } from '@/api/unified-client';
@@ -23,7 +22,6 @@ import { useAppStatus } from './useAppStatus';
 
 export const useAdminMenu = () => {
   const { user } = useAuth();
-  const { cptMenuItems, isLoading: cptLoading } = useDynamicCPTMenu();
   const {
     isActive: isAppActive,
     isLoading: appStatusLoading,
@@ -68,8 +66,9 @@ export const useAdminMenu = () => {
     fetchPermissions();
   }, [user?.id]);
 
-  // Inject CPT menus into the static menu
-  const allMenuItems = injectCPTMenuItems([...adminMenuStatic], cptMenuItems);
+  // 동적 CPT 메뉴 주입(useDynamicCPTMenu → GET /public/cpt/types)은 제거됐다 — WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1.
+  //   admin 이 로드될 때마다 나가던 자동 호출이며 cms_cpt_types 부재를 빈 배열로 은폐하고 있었다.
+  const allMenuItems = [...adminMenuStatic];
 
   // Filter menu items based on permissions and app status
   const filterMenuItems = useCallback((items: MenuItem[]): MenuItem[] => {
@@ -128,7 +127,7 @@ export const useAdminMenu = () => {
 
   return {
     menuItems: filteredMenuItems,
-    isLoading: apiLoading || cptLoading || appStatusLoading,
+    isLoading: apiLoading || appStatusLoading,
     userRoles,
     userPermissions,
   };

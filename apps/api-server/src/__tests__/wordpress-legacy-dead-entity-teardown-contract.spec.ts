@@ -41,9 +41,15 @@ describe('WordPress legacy dead entity teardown', () => {
   });
 
   it('보존 대상(소비자 존재·보호 계약)은 그대로 등록돼 있다', () => {
-    // TemplatePart = settingsService 소비 / FormPreset·ViewPreset·TemplatePreset = CPT-ACF canonical(보호)
-    for (const keep of ['TemplatePart', 'FormPreset', 'ViewPreset', 'TemplatePreset']) {
+    // TemplatePart = settingsService 소비 → 보존.
+    // FormPreset·ViewPreset·TemplatePreset 은 당시 "CPT-ACF canonical(보호)" 였으나
+    // WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1 에서 CPT 사슬째 제거됐다
+    // (CustomPostType 에 FK · migration 0 · backend preset API 0 · 운영 호출 0).
+    for (const keep of ['TemplatePart']) {
       expect(reg).toMatch(new RegExp(`^\\s*${keep},\\s*$`, 'm'));
+    }
+    for (const gone of ['FormPreset', 'ViewPreset', 'TemplatePreset']) {
+      expect(reg).not.toMatch(new RegExp(`^\\s*${gone},\\s*$`, 'm'));
     }
   });
 });

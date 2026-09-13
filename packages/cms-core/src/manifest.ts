@@ -28,93 +28,42 @@ export const cmsCoreManifest = {
   },
 
   // ===== 소유 테이블 =====
-  ownsTables: [
-    // Template system
-    'cms_templates',
-    'cms_template_parts',
-    'cms_views',
-    // Custom Post Types
-    'cms_cpt_types',
-    'cms_cpt_fields',
-    // Advanced Custom Fields
-    'cms_acf_field_groups',
-    'cms_acf_fields',
-    'cms_acf_values',
-    // Settings
-    'cms_settings',
-    // Menu system
-    'cms_menus',
-    'cms_menu_items',
-    'cms_menu_locations',
-    // Media library 4 테이블은 제거됨 (WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1)
-    //   미디어 정본 = media_assets (api-server modules/media). cms-core 는 미디어 저장축을 갖지 않는다.
-  ],
-
-  // ===== 삭제 정책 =====
-  uninstallPolicy: {
-    defaultMode: 'keep-data' as const,
-    allowPurge: true,
-    autoBackup: true,
-  },
+  //   WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1:
+  //   cms-core 는 테이블을 만들지 않는다. 실동작 축 cms_contents · cms_content_slots 는 api-server migration
+  //   (1736500000000-CreateCmsContentTables) 소유이고, 이전에 여기 나열됐던 12 테이블(Template 2 · View ·
+  //   CPT 2 · ACF 3 · Setting · Menu 3)과 Media 4 는 lifecycle install() 이 호출된 적 없어 존재한 적도 없다.
+  //   entity · DDL · uninstall 계약을 함께 제거했다.
+  ownsTables: [],
 
   // ===== 백엔드 =====
+  //   WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1: 선언을 실제 export 에 맞췄다.
+  //   이전 목록(Template · Cpt · Acf · Menu · Media · Settings 계열 entity/service/controller)은
+  //   구현이 존재한 적이 없는 선언이었다. 이 선언을 읽는 코드는 저장소에 없다(정보성).
   backend: {
-    entities: [
-      'Template',
-      'TemplatePart',
-      'View',
-      'CptType',
-      'CptField',
-      'AcfFieldGroup',
-      'AcfField',
-      'AcfValue',
-      'CmsSetting',
-      'Menu',
-      'MenuItem',
-      'MenuLocation',
-      'Media',
-      'MediaFile',
-      'MediaFolder',
-      'MediaTag',
-    ],
-    services: [
-      'TemplateService',
-      'CptService',
-      'AcfService',
-      'MenuService',
-      'MediaService',
-      'SettingsService',
-    ],
-    controllers: [
-      'TemplateController',
-      'CptController',
-      'AcfController',
-      'MenuController',
-      'MediaController',
-    ],
+    entities: ['CmsContent', 'CmsContentSlot', 'Channel', 'ChannelPlaybackLog', 'ChannelHeartbeat'],
+    services: [],
+    controllers: [],
     routesExport: 'createRoutes',
   },
 
   // ===== 프론트엔드 =====
+  //   `/admin/cms/{templates,cpt,acf,menus,media}` 는 구현된 적 없다. 관리자의 실제 CMS 화면은
+  //   admin-dashboard 의 `/admin/cms/contents` · `/admin/cms/slots` 이며 이 manifest 가 아니라
+  //   admin 라우트가 정본이다.
   frontend: {
     admin: {
       pages: [
-        { path: '/admin/cms', component: 'CmsApp' },
-        { path: '/admin/cms/templates', component: 'TemplatesPage' },
-        { path: '/admin/cms/cpt', component: 'CptPage' },
-        { path: '/admin/cms/acf', component: 'AcfPage' },
-        { path: '/admin/cms/menus', component: 'MenusPage' },
-        { path: '/admin/cms/media', component: 'MediaPage' },
+        { path: '/admin/cms/contents', component: 'CMSContentList' },
+        { path: '/admin/cms/slots', component: 'CMSSlotList' },
       ],
     },
   },
 
   // ===== 라이프사이클 =====
   lifecycle: {
-    install: './lifecycle/install.js',
+    // install / uninstall 제거 — WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1 (스키마 소유자 = deploy migration job)
     activate: './lifecycle/activate.js',
     deactivate: './lifecycle/deactivate.js',
-    uninstall: './lifecycle/uninstall.js',
   },
 
   // ===== 권한 정의 =====

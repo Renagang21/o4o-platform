@@ -28,7 +28,6 @@ import creditRoutes from '../modules/credit/routes/credit.routes.js';
 import pointRoutes from '../modules/point/routes/point.routes.js';
 import { kpaLmsScopeGuard } from '../middleware/kpa-lms-scope-guard.js';
 import usersRoutes from '../routes/users.routes.js';
-import cptRoutes from '../routes/cpt.js';
 import healthRoutes from '../routes/health.js';
 import forumRoutes from '../routes/forum/forum.routes.js';
 // WO-O4O-NOTIFICATION-CORE-BASELINE-V1: platform-wide notification core
@@ -53,7 +52,6 @@ import adminSecurityBlockedIpsRoutes from '../routes/admin/security-blocked-ips.
 // DOMAIN ROUTE IMPORTS (registered after DB init)
 // ============================================================================
 
-import publicRoutes from '../routes/public.routes.js';
 import platformInquiryRoutes, { adminRouter as platformInquiryAdminRoutes } from '../routes/v1/platformInquiry.routes.js';
 import { createPlatformServicesRoutes } from '../routes/platform-services/platform-services.routes.js';
 import { createAdminPlatformServicesRoutes } from '../routes/platform-services/admin-platform-services.routes.js';
@@ -136,7 +134,9 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   // WO-O4O-POINT-CORE-EXTENSION-V1: Point admin grant/spend
   app.use('/api/v1/points', pointRoutes);
   app.use('/api/v1/users', usersRoutes);
-  app.use('/api/v1/cpt', cptRoutes);
+  // /api/v1/cpt (CPT/ACF 엔진) 은 제거됐다 — WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1.
+  //   cms_cpt_types 등 CPT 테이블은 운영에 존재한 적 없고(생성 주체 = 미호출 cms-core lifecycle) 30일간
+  //   정상 응답 0. 대체 alias 없음.
   app.use('/api/health', healthRoutes);
   app.use('/health', healthRoutes); // Cloud Run HEALTHCHECK compatibility
 
@@ -285,9 +285,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     //   `/api/v1/apps/availability`, AppManager)과 ModuleLoader 의 부트 시 dynamic route ·
     //   entity 등록은 별개 ACTIVE 축이며 이 retire 와 무관하다. 상세는 CHECK 문서.
 
-    // 8. Register Public routes (no auth required)
-    app.use('/api/v1/public', publicRoutes);
-    logger.info('✅ Public routes registered at /api/v1/public');
+    // 8. /api/v1/public/cpt/types (public.routes.ts 의 유일한 라우트) 는 제거됐다 — WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1.
+    //   admin 이 로드될 때마다 useDynamicCPTMenu 가 자동 호출하던 경로이며 cms_cpt_types 부재를
+    //   빈 배열 200 으로 은폐하고 있었다(30일 116건). 다른 /api/v1/public/* 마운트에는 영향 없다.
 
     // 8.1. Service Legal / Policy settings (WO-O4O-SERVICE-LEGAL-POLICY-SETTINGS-BACKEND-V1)
     //   public read (no auth) + admin write (serviceKey-scoped). frontend 미수정 — backend 기반만.

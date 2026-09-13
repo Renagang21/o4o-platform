@@ -256,15 +256,10 @@ describe('§7-§8 · 연결 수정 호출이 backend 계약 경로를 가리킨�
     expect(modal).not.toContain('.zip');
   });
 
-  it('CPT 도구 field group 목록 → /cpt/field-groups (fieldGroupApi)', () => {
-    const toolset = stripAllComments(read('pages/cpt-engine/CPTDashboardToolset.tsx'));
-    expect(toolset).toContain('fieldGroupApi.getAll()');
-    expect(toolset).not.toContain('acfGroupApi');
-    const acf = stripAllComments(read('features/cpt-acf/services/acf.api.ts'));
-    expect(acf).toContain("'/cpt/types'");
-    expect(acf).toContain("'/cpt/taxonomies'");
-    expect(acf).not.toContain('/cpt/custom-post-types');
-    expect(acf).not.toContain("get('/taxonomies')");
+  it('CPT 도구·acf.api 는 CPT 사슬째 제거됐다', () => {
+    // WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1 — 이 항목이 고정하던 backend 계약 경로(/cpt/*) 자체가 사라졌다.
+    expect(existsSync(join(SRC, 'pages', 'cpt-engine', 'CPTDashboardToolset.tsx'))).toBe(false);
+    expect(existsSync(join(SRC, 'features', 'cpt-acf', 'services', 'acf.api.ts'))).toBe(false);
   });
 
   it('내부 링크 오타 수정 — /apps/store · /settings/app-services', () => {

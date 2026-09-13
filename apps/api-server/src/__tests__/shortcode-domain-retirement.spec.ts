@@ -290,9 +290,9 @@ describe('9. dead shortcode 잔재 · 권한 계약 (WO-O4O-DEAD-SHORTCODE-RESID
       }
     });
 
-    it('`[form name="…"]` 생성 문자열이 api-server 에 없다', () => {
-      expect(readRoot('apps/api-server/src/routes/cpt.ts')).not.toContain('[form ');
-      expect(readRoot('apps/api-server/src/routes/cpt.ts')).not.toContain("router.post('/forms'");
+    it('`[form name="…"]` 를 생성하던 routes/cpt.ts 는 CPT 사슬째 제거됐다', () => {
+      // WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1 — 파일 부재가 곧 생성 문자열 부재다.
+      expect(exists('apps', 'api-server', 'src', 'routes', 'cpt.ts')).toBe(false);
     });
   });
 

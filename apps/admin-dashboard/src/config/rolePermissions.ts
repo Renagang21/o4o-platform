@@ -229,12 +229,7 @@ export const menuPermissions: MenuPermission[] = [
     roles: [...PLATFORM_ADMIN_ROLES]
   },
 
-  // 동적 CPT 메뉴의 부모 그룹 id (useDynamicCPTMenu.tsx) — 'cpt-' 접두사가 아니므로
-  // DYNAMIC_MENU_ID_PREFIXES 가 아닌 명시 항목으로 선언한다.
-  {
-    menuId: 'custom-posts',
-    roles: [...PLATFORM_ADMIN_ROLES]
-  },
+  // 'custom-posts'(동적 CPT 메뉴 부모 그룹) 제거 — WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1 (useDynamicCPTMenu 삭제)
 
   // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
   //   회원 관리(core-membership*) 메뉴 4건의 권한 설정은 메뉴·화면·`/api/v1/membership/*`
@@ -283,7 +278,8 @@ export const menuPermissions: MenuPermission[] = [
  * 선언된 접두사에 해당하지 않는 미등록 menuId 는 그대로 거부된다.
  */
 export const DYNAMIC_MENU_ID_PREFIXES: ReadonlyArray<{ prefix: string; roles: string[] }> = [
-  { prefix: 'cpt-', roles: [...PLATFORM_ADMIN_ROLES] }
+  // 'cpt-' 접두사 제거 — WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1. 동적 메뉴를 만드는 코드가 더 이상 없다.
+  //   배열과 resolveDynamicMenuPermission 은 deny-by-default 계약의 일부로 남긴다(빈 선언 = 전부 거부).
 ];
 
 /**

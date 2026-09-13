@@ -54,9 +54,9 @@ describe('A축 — unprovisioned Form 축 제거', () => {
   });
 
   it('/api/v1/cpt/forms/* 라우트가 0 이다 (비인증 name 조회 · submit 포함)', () => {
-    const cpt = codeOf('apps', 'api-server', 'src', 'routes', 'cpt.ts');
-    expect(cpt).not.toContain('FormsController');
-    expect(cpt).not.toMatch(/router\.(get|post|put|patch|delete)\(\s*'\/forms/);
+    // routes/cpt.ts 자체가 WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1 에서
+    // 제거됐다 — 파일 부재 = 라우트 0.
+    expect(exists('apps', 'api-server', 'src', 'routes', 'cpt.ts')).toBe(false);
   });
 
   it('api-server types/index 가 form-builder 를 re-export 하지 않는다', () => {
@@ -69,17 +69,10 @@ describe('A축 — unprovisioned Form 축 제거', () => {
   });
 
   it('admin-dashboard Form 화면 · 라우트 · API client 가 0 이다', () => {
-    expect(exists('apps', 'admin-dashboard', 'src', 'pages', 'cpt-engine', 'forms')).toBe(false);
-    const idx = codeOf('apps', 'admin-dashboard', 'src', 'pages', 'cpt-engine', 'index.tsx');
-    expect(idx).not.toContain('FormsManager');
-    expect(idx).not.toContain('FormBuilder');
-    expect(idx).not.toMatch(/path="forms/);
-    const toolset = codeOf('apps', 'admin-dashboard', 'src', 'pages', 'cpt-engine', 'CPTDashboardToolset.tsx');
-    expect(toolset).not.toContain('/cpt-engine/forms');
-    expect(toolset).not.toContain('Create Form');
-    const api = codeOf('apps', 'admin-dashboard', 'src', 'features', 'cpt-acf', 'services', 'cpt.api.ts');
-    expect(api).not.toContain('formApi');
-    expect(api).not.toMatch(/\$\{API_BASE\}\/forms/);
+    // pages/cpt-engine · features/cpt-acf 전체가
+    // WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1 에서 제거됐다.
+    expect(exists('apps', 'admin-dashboard', 'src', 'pages', 'cpt-engine')).toBe(false);
+    expect(exists('apps', 'admin-dashboard', 'src', 'features', 'cpt-acf')).toBe(false);
   });
 
   it('forms / form_submissions 를 생성하거나 DROP 하는 migration 이 없다 (운영 테이블 부재 · DB 무변경)', () => {
@@ -92,14 +85,13 @@ describe('A축 — unprovisioned Form 축 제거', () => {
     expect(offenders).toEqual([]);
   });
 
-  it('공유 CPT 런타임(CPT · FieldGroups · Taxonomies · FormPreset)은 보존된다', () => {
-    expect(exists('apps', 'api-server', 'src', 'modules', 'cpt-acf', 'controllers', 'cpt.controller.ts')).toBe(true);
-    expect(exists('apps', 'api-server', 'src', 'controllers', 'cpt', 'FieldGroupsController.ts')).toBe(true);
-    expect(exists('apps', 'api-server', 'src', 'controllers', 'cpt', 'TaxonomiesController.ts')).toBe(true);
-    expect(exists('apps', 'api-server', 'src', 'entities', 'FormPreset.ts')).toBe(true);
-    const entities = codeOf('apps', 'api-server', 'src', 'database', 'entities.ts');
-    expect(entities).toMatch(/^\s*FormPreset,\s*$/m);
-    expect(exists('apps', 'admin-dashboard', 'src', 'pages', 'cpt-engine', 'CPTDashboardToolset.tsx')).toBe(true);
+  it('공유 CPT 런타임은 이후 WO 에서 사슬째 제거됐다 (당시 보존 판정의 후속)', () => {
+    // WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1:
+    //   cms_cpt_types 등 CPT 테이블은 운영에 존재한 적 없고 30일 실사용 0 → CPT · FieldGroups · Taxonomies ·
+    //   preset 3 을 함께 제거. @o4o/types 의 preset 인터페이스(packages/types/src/preset.ts)는 패키지 계약이라 보존.
+    expect(exists('apps', 'api-server', 'src', 'modules', 'cpt-acf')).toBe(false);
+    expect(exists('apps', 'api-server', 'src', 'controllers', 'cpt')).toBe(false);
+    expect(exists('apps', 'api-server', 'src', 'entities', 'FormPreset.ts')).toBe(false);
     expect(exists('packages', 'types', 'src', 'preset.ts')).toBe(true);
   });
 });

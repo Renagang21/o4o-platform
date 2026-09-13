@@ -189,9 +189,13 @@ describe('백엔드 없는 화면이 되살아나지 않는다', () => {
     }
   });
 
-  it('/cpt-engine/* 는 보존된다 (백엔드 41 endpoint 실재 · 별도 판정 대상)', () => {
-    expect(ALL_ROUTES).toContain('path="/cpt-engine/*"');
-    expect(existsSync(join(SRC, 'pages', 'cpt-engine'))).toBe(true);
+  it('/cpt-engine/* 는 제거됐다 (별도 판정 완료 — WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1)', () => {
+    // 판정 근거: IR-O4O-CMS-LIFECYCLE-TABLE-OWNERSHIP-AND-RUNTIME-CONSUMER-CENSUS-V1.
+    //   cms_cpt_types 운영 부재 · /api/v1/cpt/* 30일 호출 0 · 메뉴 진입점 0 · 저장소 밖 소비자 0.
+    expect(ALL_ROUTES).not.toContain('path="/cpt-engine/*"');
+    expect(existsSync(join(SRC, 'pages', 'cpt-engine'))).toBe(false);
+    expect(existsSync(join(SRC, 'features', 'cpt-acf'))).toBe(false);
+    expect(existsSync(join(SRC, 'hooks', 'useDynamicCPTMenu.tsx'))).toBe(false);
   });
 });
 

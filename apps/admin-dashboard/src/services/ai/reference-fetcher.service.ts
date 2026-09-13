@@ -47,13 +47,12 @@ class ReferenceFetcherService {
    */
   async fetchCompleteReference(): Promise<string> {
     try {
-      // 1단계: 서버에서 데이터 가져오기 시도 (CPT 포함)
-      const [blocksRef, cptRef] = await Promise.all([
-        this.fetchFromServer('/ai/blocks/reference', 'blocks'),
-        this.fetchCptReference().catch(() => null) // CPT 실패해도 계속 진행
-      ]);
+      // 1단계: 서버에서 데이터 가져오기 시도
+      //   CPT 참조(/cpt/types)는 제거됐다 — WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1. backend /api/v1/cpt/* 자체가 사라졌고
+      //   cms_cpt_types 는 운영에 존재한 적이 없어 이 참조가 채워진 적도 없다.
+      const blocksRef = await this.fetchFromServer('/ai/blocks/reference', 'blocks');
 
-      const reference = this.formatServerReference(blocksRef, cptRef);
+      const reference = this.formatServerReference(blocksRef);
 
       // 서버 참조 데이터 로드 성공
       this.hasWarnedFallback = false;
@@ -72,28 +71,6 @@ class ReferenceFetcherService {
       }
 
       return await this.fetchLocalFallback();
-    }
-  }
-
-  /**
-   * CPT 참조 데이터 가져오기
-   */
-  private async fetchCptReference(): Promise<any> {
-    try {
-      const response = await authClient.api.get('/cpt/types?active=true');
-      const result = response.data;
-
-      if (result.success && result.data) {
-        return {
-          success: true,
-          cptTypes: result.data
-        };
-      }
-
-      return null;
-    } catch (error) {
-      console.warn('CPT 참조 데이터 로드 실패:', error);
-      return null;
     }
   }
 
@@ -142,7 +119,7 @@ class ReferenceFetcherService {
   /**
    * 서버 응답을 AI 프롬프트 형식으로 포맷
    */
-  private formatServerReference(blocksData: ServerResponse, cptData: any): string {
+  private formatServerReference(blocksData: ServerResponse): string {
     let reference = '';
 
     // 블록 레퍼런스
@@ -164,36 +141,6 @@ class ReferenceFetcherService {
         });
         reference += '\n';
       });
-    }
-
-    // ⭐ CPT 참조 데이터 추가
-    if (cptData?.success && cptData.cptTypes?.length > 0) {
-      reference += '\n=== 사용 가능한 Custom Post Types ===\n\n';
-      reference += '다음 CPT들을 Universal Form으로 생성/편집 가능:\n\n';
-
-      cptData.cptTypes.forEach((cpt: any) => {
-        reference += `${cpt.slug} (${cpt.label || cpt.name}):\n`;
-        reference += `- 설명: ${cpt.description || 'Custom Post Type'}\n`;
-
-        // Form 블록 사용 예시
-        reference += `- Form 블록 사용:\n`;
-        reference += `  {"type": "o4o/universal-form", "attributes": {"postType": "${cpt.slug}"}, "innerBlocks": [...]}\n`;
-
-        // ACF 필드가 있다면 표시
-        if (cpt.fields && cpt.fields.length > 0) {
-          reference += `- 사용 가능한 필드:\n`;
-          cpt.fields.slice(0, 5).forEach((field: any) => {
-            reference += `  * ${field.name} (${field.type})\n`;
-          });
-          if (cpt.fields.length > 5) {
-            reference += `  ... 외 ${cpt.fields.length - 5}개\n`;
-          }
-        }
-
-        reference += '\n';
-      });
-
-      reference += '중요: Universal Form Block을 사용하면 Post와 모든 CPT를 단일 블록으로 처리 가능!\n';
     }
 
     return reference;

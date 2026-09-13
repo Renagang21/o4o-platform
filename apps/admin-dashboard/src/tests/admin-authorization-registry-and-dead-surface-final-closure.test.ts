@@ -167,16 +167,12 @@ describe('§9-4~6 · 메뉴 권한 정책', () => {
     expect(denied).toEqual([]);
   });
 
-  it('6-b. 동적 CPT 메뉴 계열도 명시 선언으로 노출된다 (누락 소실 방지)', () => {
-    expect(DYNAMIC_MENU_ID_PREFIXES.map((e) => e.prefix)).toContain('cpt-');
-    for (const id of [
-      'custom-posts',
-      'cpt-notice',
-      'cpt-notice-all',
-      'cpt-notice-new',
-      'cpt-notice-categories',
-    ]) {
-      expect(hasMenuPermission(PLATFORM_ADMIN, [], id)).toBe(true);
+  it('6-b. 동적 CPT 메뉴 계열은 제거됐고 deny-by-default 로 거부된다', () => {
+    // WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1: useDynamicCPTMenu 삭제 → 'cpt-' 접두사 선언과 'custom-posts' 항목도 제거.
+    //   빈 DYNAMIC_MENU_ID_PREFIXES 는 "설정 없음 = 허용" fallback 의 부활이 아니라 전부 거부다.
+    expect(DYNAMIC_MENU_ID_PREFIXES.map((e) => e.prefix)).not.toContain('cpt-');
+    for (const id of ['custom-posts', 'cpt-notice', 'cpt-notice-all', 'cpt-notice-new', 'cpt-notice-categories']) {
+      expect(hasMenuPermission(PLATFORM_ADMIN, [], id)).toBe(false);
     }
   });
 

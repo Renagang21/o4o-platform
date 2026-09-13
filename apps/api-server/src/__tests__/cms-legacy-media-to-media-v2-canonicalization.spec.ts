@@ -100,9 +100,14 @@ describe('CMS legacy media → Media V2 정본화', () => {
     });
 
     it('cms-core lifecycle · manifest 가 cms_media 계열 테이블을 다루지 않는다', () => {
+      // WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1 에서 install/uninstall 자체가
+      // 제거됐다 — 파일이 없으면 통과, 남아 있다면 cms_media 를 다루지 않아야 한다.
       const lc = join(REPO, 'packages', 'cms-core', 'src', 'lifecycle');
-      expect(codeLines(join(lc, 'install.ts')).some((l) => /cms_media/.test(l))).toBe(false);
-      expect(codeLines(join(lc, 'uninstall.ts')).some((l) => /cms_media/.test(l))).toBe(false);
+      for (const f of ['install.ts', 'uninstall.ts']) {
+        if (existsSync(join(lc, f))) {
+          expect(codeLines(join(lc, f)).some((l) => /cms_media/.test(l))).toBe(false);
+        }
+      }
       expect(
         codeLines(join(REPO, 'packages', 'cms-core', 'src', 'manifest.ts')).some((l) => /'cms_media/.test(l)),
       ).toBe(false);

@@ -37,11 +37,7 @@ import { TemplatePart } from '../entities/TemplatePart.js';
 // Shipment/ShipmentTrackingHistory removed - legacy commerce entities
 import { SmtpSettings, EmailLog } from '@o4o/mail-core';
 import { OperatorNotificationSettings } from '../entities/OperatorNotificationSettings.js';
-import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField.js';
-import { CustomPost } from '../entities/CustomPost.js';
-import { CustomPostType } from '../entities/CustomPostType.js';
 // Taxonomy System entities
-import { Taxonomy, Term, TermRelationship } from '../entities/Taxonomy.js';
 // Menu System entities - removed (legacy CMS)
 // AI Settings entity (unified - AISetting removed)
 import { AiSettings } from '../entities/AiSettings.js';
@@ -67,9 +63,6 @@ import { AppRegistry } from '../entities/AppRegistry.js';
 //   공급 오퍼=SupplierProductOffer, 주문=checkout_orders 가 정본이다.
 // Form (forms) · FormSubmission (form_submissions) retired — WO-O4O-UNPROVISIONED-FORM-AND-LEGACY-APP-AXIS-FINAL-DISPOSITION-V1 (운영 테이블 부재)
 // CPT-ACF Preset entities
-import { FormPreset } from '../entities/FormPreset.js';
-import { ViewPreset } from '../entities/ViewPreset.js';
-import { TemplatePreset } from '../entities/TemplatePreset.js';
 // P0 Zero-Data Role Management entities
 import { RoleAssignment } from '../modules/auth/entities/RoleAssignment.js';
 // WO-O4O-SERVICE-MEMBERSHIP-ARCHITECTURE-V1: Global User + Service Membership
@@ -105,10 +98,6 @@ import { ForumNotification } from '../entities/ForumNotification.js';
 // 에서 retire 됐다. `sites` 테이블은 production 에 생성된 적이 없다.
 
 // ✅ CMS Module V2 entities (Phase C-2)
-// Note: CMSCustomPostType removed - now unified with CustomPostType using cms_cpt_types table
-import { CustomField as CMSCustomField } from '../modules/cms/entities/CustomField.js';
-import { View as CMSView } from '../modules/cms/entities/View.js';
-import { Page as CMSPage } from '../modules/cms/entities/Page.js';
 
 // ============================================================================
 // COSMETICS ENTITIES (Phase 7-A-1)
@@ -599,15 +588,9 @@ export const entities = [
   SmtpSettings,
   EmailLog,
   OperatorNotificationSettings,
-  FieldGroup,
-  CustomField,
-  CustomFieldValue,
-  CustomPost,
-  CustomPostType,
-  // Taxonomy System entities
-  Taxonomy,
-  Term,
-  TermRelationship,
+  // CPT/ACF 사슬(FieldGroup · CustomField · CustomFieldValue · CustomPost · CustomPostType ·
+  //   Taxonomy · Term · TermRelationship) 제거 — WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1.
+  //   테이블 전부 migration 0 · 운영 부재 · 실사용 0. 콘텐츠 정본은 cms_contents.
   // Menu System entities removed
   // AI Settings (unified)
   AiSettings,
@@ -620,10 +603,7 @@ export const entities = [
   AppRegistry,
   // Cart/Order/Settlement entities removed - legacy commerce
   // Form entities retired
-  // CPT-ACF Preset entities
-  FormPreset,
-  ViewPreset,
-  TemplatePreset,
+  // CPT-ACF Preset entities (FormPreset · ViewPreset · TemplatePreset — CustomPostType 에 FK) 도 함께 제거.
   // P0 Zero-Data Role Management entities (RoleAssignment moved to AUTH module)
   RoleApplication,
   KycDocument,
@@ -640,10 +620,8 @@ export const entities = [
   // Forum Notification entity (Phase 13) - local entity
   ForumNotification,
   // Digital Signage legacy entities removed — see digital-signage-core
-  // ✅ CMS Module V2 entities (Phase C-2) - local entities, kept
-  CMSCustomField,
-  CMSView,
-  CMSPage,
+  // CMS Module V2 local entities (CMSCustomField/cms_fields · CMSView/cms_views · CMSPage/cms_pages) 제거 —
+  //   생성 주체 0 · 소비 0 (WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1).
   // ============================================================================
   // COSMETICS ENTITIES (Phase 7-A-1: Cosmetics API Implementation)
   // ============================================================================

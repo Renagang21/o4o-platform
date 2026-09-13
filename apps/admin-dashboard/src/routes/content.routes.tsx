@@ -48,13 +48,13 @@ const CMSSlotList = lazy(() => import('@/pages/cms/slots/CMSSlotList'));
 // Ops Metrics Dashboard (NEXT: WO-NEXT-OPS-METRICS-P0)
 const OpsMetricsDashboard = lazy(() => import('@/pages/ops/OpsMetricsDashboard'));
 
-// CPT Engine
-const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
-// WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1 (§8):
-//   `/cpt-engine/presets/{forms,views,templates}` (pages/cpt-engine/presets · components/presets ·
-//   api/presets · utils/seedPresets · test/SeedPresets · test/PresetIntegrationTest) 제거 —
-//   판정 REMOVE_BROKEN_UI. backend `/api/v1/presets/*` 부재 · 프로덕션 30일 호출 0 · 메뉴 노출 0.
-//   cpt-engine 본체(`/api/v1/cpt/*` 실재)는 유지한다.
+// CPT Engine — 제거됨 (WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1).
+//   WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1 §8 이 presets 만 지우고
+//   "cpt-engine 본체는 `/api/v1/cpt/*` 실재 · 외부 소비처 전수조사 후 별도 판정" 으로 남긴 자리다.
+//   그 조사(IR-O4O-CMS-LIFECYCLE-TABLE-OWNERSHIP-AND-RUNTIME-CONSUMER-CENSUS-V1) 결과:
+//   cms_cpt_types 등 CPT 테이블은 운영에 존재한 적 없고(생성 주체 = 미호출 cms-core lifecycle),
+//   30일간 `/api/v1/cpt/*` 호출 0 · 메뉴 진입점 0 · 저장소 밖 소비자 0. pages/cpt-engine ·
+//   features/cpt-acf · hooks/cpt · components/cpt · useDynamicCPTMenu 와 backend 사슬을 함께 제거했다.
 
 // CPT/ACF Router
 
@@ -102,8 +102,7 @@ export function ContentRoutes() {
     //   [5] `/admin/cpt-acf/*` — 하위 16 routes 전부가 14줄
     //       "Temporarily disabled for CI/CD compatibility" 스텁 컴포넌트(9개)였다.
     //
-    //   ⓘ `/cpt-engine/*` 는 **유지**한다. 백엔드 `/api/v1/cpt/*` 는 41 endpoint 가 실재하며
-    //     삭제 판정에는 외부 소비처 전수조사가 선행돼야 한다(별도 WO). 메뉴 미연결 상태 유지.
+    //   ⓘ `/cpt-engine/*` 는 위 CPT Engine 주석대로 제거됐다.
     // 글 관리 · 카테고리 & 태그 — legacy redirect (WO-O4O-ADMIN-POSTS-CATEGORIES-TAGS-LEGACY-REDIRECT-V1)
     //   guard 를 두지 않는다. 이동 대상 /admin/cms/contents 가 자체 guard 를 갖고 있고,
     //   dead 화면 접근을 권한 오류로 막는 것보다 현재 화면으로 보내는 편이 목적에 맞다.
@@ -210,17 +209,5 @@ export function ContentRoutes() {
 
     // 분석
 
-    // CPT Engine - New Unified Dashboard
-    <Route key="/cpt-engine/*" path="/cpt-engine/*" element={
-      <AdminProtectedRoute requiredPermissions={['content:read']}>
-        <Suspense fallback={<PageLoader />}>
-          <CPTEngine />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
-    // CPT/ACF Archive & Forms
-
-    // ACF Legacy Routes
   ];
 }

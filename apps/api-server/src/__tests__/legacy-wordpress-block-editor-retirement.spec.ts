@@ -81,8 +81,7 @@ const PRESERVED_FILES = [
   `${ADMIN_SRC}/blocks/index.ts`,
   `${ADMIN_SRC}/pages/preview/ViewPreview.tsx`,
   `${ADMIN_SRC}/pages/cms/contents/ContentFormModal.tsx`,
-  `${ADMIN_SRC}/pages/cpt-engine/index.tsx`,
-  `${ADMIN_SRC}/pages/cpt-engine/CPTDashboardToolset.tsx`,
+  // pages/cpt-engine/{index,CPTDashboardToolset}.tsx 는 WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1 에서 CPT 사슬째 제거됨 → PRESERVED 목록에서 제외
   'packages/block-renderer/package.json',
   'packages/content-editor/package.json',
   'scripts/audit/check-block-registry.ts',
@@ -108,9 +107,9 @@ describe('1. legacy editor route 선언이 0 이다', () => {
     expect(src).not.toContain("path=\"/appearance/template-parts/new\"");
   });
 
-  it('cpt-engine 이 legacy editor bridge 를 route 로 걸지 않는다', () => {
-    const src = read(`${ADMIN_SRC}/pages/cpt-engine/index.tsx`);
-    expect(src).not.toContain('<CPTContentEditorWrapper');
+  it('cpt-engine 자체가 제거됐으므로 legacy editor bridge 도 존재하지 않는다', () => {
+    // WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1
+    expect(exists(`${ADMIN_SRC}/pages/cpt-engine`)).toBe(false);
   });
 });
 
