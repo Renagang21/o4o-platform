@@ -298,8 +298,6 @@ import { AuthGate } from './components/auth/AuthGate';
 const ActivitySetupPage = lazy(() => import('./pages/ActivitySetupPage').then(m => ({ default: m.ActivitySetupPage })));
 const PendingApprovalPage = lazy(() => import('./pages/PendingApprovalPage').then(m => ({ default: m.PendingApprovalPage })));
 
-// MyContentPage — Phase 2 lazy
-const MyContentPage = lazy(() => import('./pages/dashboard/MyContentPage').then(m => ({ default: m.MyContentPage })));
 
 // WO-O4O-ROLEBASED-HOME-REMOVAL-AND-ROUTING-NORMALIZATION-V1: getDefaultRouteByRole 사용 제거
 
@@ -764,8 +762,11 @@ function App() {
            * / 경로의 커뮤니티 홈에서 접근하는 서비스들
            * ======================================== */}
 
-          {/* My Content (내 콘텐츠 관리) - WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1 */}
-          <Route path="/my-content" element={<Layout serviceName={SERVICE_NAME}><MyContentPage /></Layout>} />
+          {/* /my-content (구 "내 콘텐츠 관리", WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1) 는 제거됐다 —
+              WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1.
+              backend /api/v1/dashboard/assets 의 cms_media 축이 운영에 존재한 적이 없어 화면이 동작한 적이 없다.
+              대체 화면·compatibility route 없이 기존 안전한 상위 경로(/mypage)로 보낸다. */}
+          <Route path="/my-content" element={<Navigate to="/mypage" replace />} />
 
           {/* ──────────────────────────────────────────────────────────────────
               Content Hub

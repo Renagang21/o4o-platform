@@ -478,10 +478,6 @@ import {
 import {
   CmsContent,
   CmsContentSlot,
-  CmsMedia,
-  CmsMediaFile,
-  CmsMediaFolder,
-  CmsMediaTag,
   // WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1:
   //   channels 축 3종 — runtime 은퇴, schema 보존.
   //   소비 라우트는 모두 제거됐지만 table 을 아직 drop 하지 않았으므로
@@ -919,14 +915,12 @@ export const entities = [
   Attendance,
   // ============================================================================
   // CMS-CORE ENTITIES (WO-NETURE-SMOKE-STABILIZATION-V1)
-  // WO-O4O-KPA-CONTENT-COPY-INFRA-HOTFIX-V1: CmsMedia 계열 추가
+  // WO-O4O-KPA-CONTENT-COPY-INFRA-HOTFIX-V1 이 추가했던 CmsMedia 계열 4종은
+  //   WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1 에서 제거됨
+  //   (cms_media 는 운영에 존재한 적 없음 · 미디어 정본 = MediaAsset/media_assets).
   // ============================================================================
   CmsContent,
   CmsContentSlot,
-  CmsMedia,
-  CmsMediaFile,
-  CmsMediaFolder,
-  CmsMediaTag,
   // ============================================================================
   // CHANNELS ENTITIES — [RETIRED RUNTIME / RETAINED SCHEMA]
   // WO-O4O-SIGNAGE-CHANNEL-STACK-RETIREMENT-AND-TABLET-SCREENSET-CANONICALIZATION-V1

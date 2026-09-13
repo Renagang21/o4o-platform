@@ -12,21 +12,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Bell, FileText, Calendar, BookOpen } from 'lucide-react';
-import { cmsApi, contentAssetApi, type CmsContent } from '../../lib/api';
+import { cmsApi, type CmsContent } from '../../lib/api';
 import { blocksToHtml } from '@o4o/forum-core/utils';
 import { ContentRenderer } from '@o4o/content-editor';
-import { useAuth } from '../../contexts/AuthContext';
 import { ContentUtilizationGuide } from '../../components/ContentUtilizationGuide';
 import { ContentMetaBar } from '@o4o/ui';
 
 export default function ContentDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuth();
   const [content, setContent] = useState<CmsContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [recommending, setRecommending] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -53,13 +50,7 @@ export default function ContentDetailPage() {
     fetchContent();
   }, [id]);
 
-  // Check if already copied
-  useEffect(() => {
-    if (!user?.id || !id) return;
-    contentAssetApi.getCopiedSourceIds(user.id)
-      .then(res => setIsCopied(new Set(res.sourceIds || []).has(id)))
-      .catch(() => {});
-  }, [user?.id, id]);
+  // "사용 중 / 가져오기" 표시(cms_media 자료함) 는 제거됨 — WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1
 
   const handleRecommend = useCallback(async () => {
     if (!id || recommending) return;
@@ -247,15 +238,6 @@ export default function ContentDetailPage() {
                 {recommendCount > 0 && <span className="font-semibold">{recommendCount}</span>}
               </button>
 
-              {isCopied ? (
-                <span className="inline-flex items-center gap-1 px-5 py-2.5 bg-green-50 text-green-600 rounded-lg text-sm font-medium">
-                  ✓ 사용 중
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 px-5 py-2.5 bg-gray-50 text-gray-500 rounded-lg text-sm">
-                  가져오기는 목록에서 이용 가능
-                </span>
-              )}
             </div>
           </div>
         </div>

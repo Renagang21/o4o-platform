@@ -59,6 +59,86 @@ describe('CMS legacy media → Media V2 정본화', () => {
     });
   });
 
+  describe('A-2. dashboard-assets 의 cms_media 축 제거 (중지 조건 해소 단계)', () => {
+    const DASH = join(SRC, 'routes', 'dashboard');
+    const SERVICES = join(REPO, 'services');
+    const codeLines = (p: string) =>
+      read(p)
+        .split('\n')
+        .filter((l) => !l.trim().startsWith('//') && !l.trim().startsWith('*') && !l.trim().startsWith('/*'));
+
+    it('copy · mutation · types 핸들러 파일과 dashboard-access.guard 가 존재하지 않는다', () => {
+      expect(existsSync(join(DASH, 'dashboard-assets.copy-handlers.ts'))).toBe(false);
+      expect(existsSync(join(DASH, 'dashboard-assets.mutation-handlers.ts'))).toBe(false);
+      expect(existsSync(join(DASH, 'dashboard-assets.types.ts'))).toBe(false);
+      expect(existsSync(join(SRC, 'utils', 'dashboard-access.guard.ts'))).toBe(false);
+    });
+
+    it('라우터에는 supplier-signal · seller-signal 만 남는다', () => {
+      const routes = codeLines(join(DASH, 'dashboard-assets.routes.ts')).filter((l) =>
+        /router\.(get|post|patch|delete)\(/.test(l),
+      );
+      expect(routes.map((l) => l.trim())).toEqual([
+        "router.get('/supplier-signal', authenticate, createGetSupplierSignalHandler(dataSource));",
+        "router.get('/seller-signal', authenticate, createGetSellerSignalHandler(dataSource));",
+      ]);
+    });
+
+    it("query-handlers 가 cms_media 를 참조하지 않고 'does not exist' 를 삼키지 않는다", () => {
+      const code = codeLines(join(DASH, 'dashboard-assets.query-handlers.ts'));
+      expect(code.some((l) => /CmsMedia|cms_media/.test(l))).toBe(false);
+      expect(code.some((l) => /does not exist/.test(l))).toBe(false);
+    });
+
+    it('CmsMedia 계열 entity 가 cms-core 에 없고 entities.ts 에 등록되지 않는다', () => {
+      const ent = join(REPO, 'packages', 'cms-core', 'src', 'entities');
+      for (const f of ['CmsMedia', 'CmsMediaFile', 'CmsMediaFolder', 'CmsMediaTag']) {
+        expect(existsSync(join(ent, `${f}.entity.ts`))).toBe(false);
+      }
+      const reg = codeLines(join(SRC, 'database', 'entities.ts'));
+      expect(reg.some((l) => /\bCmsMedia(File|Folder|Tag)?\b/.test(l))).toBe(false);
+    });
+
+    it('cms-core lifecycle · manifest 가 cms_media 계열 테이블을 다루지 않는다', () => {
+      const lc = join(REPO, 'packages', 'cms-core', 'src', 'lifecycle');
+      expect(codeLines(join(lc, 'install.ts')).some((l) => /cms_media/.test(l))).toBe(false);
+      expect(codeLines(join(lc, 'uninstall.ts')).some((l) => /cms_media/.test(l))).toBe(false);
+      expect(
+        codeLines(join(REPO, 'packages', 'cms-core', 'src', 'manifest.ts')).some((l) => /'cms_media/.test(l)),
+      ).toBe(false);
+    });
+
+    it('두 웹 서비스에 dashboard-assets 프런트 소비자가 없다 (signal 제외)', () => {
+      for (const f of [
+        join(SERVICES, 'web-kpa-society', 'src', 'api', 'dashboard.ts'),
+        join(SERVICES, 'web-kpa-society', 'src', 'pages', 'dashboard', 'MyContentPage.tsx'),
+        join(SERVICES, 'web-neture', 'src', 'lib', 'api', 'dashboardCopy.ts'),
+        join(SERVICES, 'web-neture', 'src', 'pages', 'dashboard', 'MyContentPage.tsx'),
+      ]) {
+        expect(existsSync(f)).toBe(false);
+      }
+      const neture = codeLines(join(SERVICES, 'web-neture', 'src', 'lib', 'api', 'content.ts'));
+      expect(neture.some((l) => /dashboard\/assets/.test(l))).toBe(false);
+    });
+
+    it('supplier-signal 소비자는 보존된다 (Neture HubPage → dashboardApi)', () => {
+      const dash = read(join(SERVICES, 'web-neture', 'src', 'lib', 'api', 'dashboard.ts'));
+      expect(dash).toMatch(/\/dashboard\/assets\/supplier-signal/);
+      expect(dash).toMatch(/\/dashboard\/assets\/seller-signal/);
+      const hub = read(join(SERVICES, 'web-neture', 'src', 'pages', 'hub', 'HubPage.tsx'));
+      expect(hub).toMatch(/dashboardApi\.getSupplierSignal\(\)/);
+    });
+
+    it('제거된 딥링크는 compatibility 화면 없이 상위 경로로만 보낸다', () => {
+      const kpa = read(join(SERVICES, 'web-kpa-society', 'src', 'App.tsx'));
+      expect(kpa).toMatch(/path="\/my-content" element=\{<Navigate to="\/mypage" replace \/>\}/);
+      expect(kpa).not.toMatch(/MyContentPage/);
+      const neture = read(join(SERVICES, 'web-neture', 'src', 'App.tsx'));
+      expect(neture).toMatch(/path="\/workspace\/my-content" element=\{<Navigate to="\/" replace \/>\}/);
+      expect(neture).not.toMatch(/import MyContentPage/);
+    });
+  });
+
   describe('B. cms_media 대체 테이블을 만들지 않는다', () => {
     it('cms_media 를 생성하는 migration 이 없다', () => {
       const dir = join(SRC, 'database', 'migrations');

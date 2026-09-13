@@ -113,7 +113,6 @@ import PartnershipRequestCreatePage from './pages/partners/requests/PartnershipR
 import PartnerInfoPage from './pages/PartnerInfoPage';
 import ContentListPage from './pages/content/ContentListPage';
 import ContentDetailPage from './pages/content/ContentDetailPage';
-import MyContentPage from './pages/dashboard/MyContentPage';
 
 
 // Forum Pages
@@ -1053,7 +1052,9 @@ function App() {
               <Route path="/workspace/partners/requests/new" element={<PartnershipRequestCreatePage />} />
               <Route path="/workspace/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
               <Route path="/workspace/partners/info" element={<PartnerInfoPage />} />
-              <Route path="/workspace/my-content" element={<MyContentPage />} />
+              {/* /workspace/my-content ("내 콘텐츠" cms_media 자료함) 는 제거됐다 — WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1.
+                  backend cms_media 축이 운영에 존재한 적 없어 동작한 적 없는 화면. 기존 은퇴 workspace 경로와 같이 / 로 보낸다. */}
+              <Route path="/workspace/my-content" element={<Navigate to="/" replace />} />
 
               {/* Workspace 포럼 */}
               <Route path="/workspace/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/workspace/forum" />} />
@@ -1270,7 +1271,7 @@ function App() {
             <Route path="/partners/requests" element={<Navigate to="/workspace/partners/requests" replace />} />
             <Route path="/partners/info" element={<Navigate to="/workspace/partners/info" replace />} />
             {/* /content, /content/:id — NetureLayout 내 /content 라우트로 처리됨 (레거시 redirect 제거) */}
-            <Route path="/my-content" element={<Navigate to="/workspace/my-content" replace />} />
+            <Route path="/my-content" element={<Navigate to="/" replace />} />
 
             {/* Hub/Workspace 리다이렉트 — WO-O4O-ROLE-ROUTE-ISOLATION-V1 */}
             <Route path="/hub" element={<Navigate to="/workspace/hub" replace />} />

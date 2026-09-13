@@ -6,6 +6,11 @@
  * ContentHubTemplate + Neture config-only adapter.
  * Route: /content
  * API: GET /api/v1/hub/contents?serviceKey=neture&sourceDomain=cms&type=...
+ *
+ * WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1:
+ *   카드의 "내 콘텐츠로" 복사 버튼과 loadCopiedIds/onCopy/afterCopyAction(/my-content) 를 제거했다.
+ *   backend /api/v1/dashboard/assets(cms_media) 축이 운영에 존재한 적 없어 복사는 항상 실패했다.
+ *   목록(hub content) 자체는 그대로 유지한다. Media V2 로 치환하지 않는다.
  */
 
 import { useMemo } from 'react';
@@ -15,11 +20,8 @@ import {
   ContentHubTemplate,
   type ContentHubConfig,
   type ContentHubItem,
-  type ContentHubItemContext,
 } from '@o4o/shared-space-ui';
 import { hubContentApi } from '../../lib/api/hubContent';
-import { dashboardCopyApi } from '../../lib/api/dashboardCopy';
-import { useAuth } from '../../contexts/AuthContext';
 import type { HubContentItemResponse } from '@o4o/types/hub-content';
 
 function apiItemToContentHubItem(item: HubContentItemResponse): ContentHubItem {
@@ -41,12 +43,10 @@ function apiItemToContentHubItem(item: HubContentItemResponse): ContentHubItem {
   };
 }
 
-function CardGrid({ items, ctx }: { items: ContentHubItem[]; ctx: ContentHubItemContext }) {
+function CardGrid({ items }: { items: ContentHubItem[] }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {items.map((item) => {
-        const isCopied = ctx.copiedIds.has(item.id);
-        const isCopying = ctx.copyingId === item.id;
         const hasLink = !!item.href;
         return (
           <div
@@ -98,19 +98,6 @@ function CardGrid({ items, ctx }: { items: ContentHubItem[]; ctx: ContentHubItem
               </div>
               <div className="flex items-center justify-between mt-2">
                 <p className="text-[10px] text-gray-400">{item.date}</p>
-                <button
-                  onClick={(e) => { e.stopPropagation(); ctx.onCopy(item); }}
-                  disabled={isCopied || isCopying}
-                  className={`inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
-                    isCopied
-                      ? 'bg-gray-100 text-gray-400 cursor-default'
-                      : isCopying
-                        ? 'bg-gray-100 text-gray-400 cursor-wait'
-                        : 'bg-primary-50 text-primary-600 hover:bg-primary-100'
-                  }`}
-                >
-                  {isCopied ? ctx.copiedLabel : isCopying ? ctx.copyingLabel : ctx.copyLabel}
-                </button>
               </div>
             </div>
           </div>
@@ -121,9 +108,6 @@ function CardGrid({ items, ctx }: { items: ContentHubItem[]; ctx: ContentHubItem
 }
 
 export default function ContentLibraryPage() {
-  const { user } = useAuth();
-  const userId = user?.id;
-
   const config: ContentHubConfig = useMemo(() => ({
     serviceKey: 'neture',
     heroTitle: '콘텐츠 라이브러리',
@@ -166,37 +150,11 @@ export default function ContentLibraryPage() {
       }
     },
 
-    loadCopiedIds: userId
-      ? async () => {
-          try {
-            const ids = await dashboardCopyApi.getCopiedSourceIds(userId);
-            return new Set(ids);
-          } catch {
-            return new Set<string>();
-          }
-        }
-      : undefined,
-
-    onCopy: userId
-      ? async (item: ContentHubItem) => {
-          await dashboardCopyApi.copyAsset({
-            sourceType: 'hub_content',
-            sourceId: item.id,
-            targetDashboardId: userId,
-          });
-        }
-      : undefined,
-
-    copyLabel: '↓ 내 콘텐츠로',
-    copiedLabel: '✓ 가져옴',
-    copyingLabel: '복사 중...',
-    afterCopyAction: { label: '내 콘텐츠로', href: '/my-content' },
-
-    renderItems: (items, ctx) => <CardGrid items={items} ctx={ctx} />,
+    renderItems: (items) => <CardGrid items={items} />,
 
     emptyMessage: '등록된 콘텐츠가 없습니다.',
     emptyFilteredMessage: '조건에 맞는 콘텐츠가 없습니다.',
-  }), [userId]);
+  }), []);
 
   return <ContentHubTemplate config={config} />;
 }

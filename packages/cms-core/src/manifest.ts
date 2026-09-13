@@ -46,11 +46,8 @@ export const cmsCoreManifest = {
     'cms_menus',
     'cms_menu_items',
     'cms_menu_locations',
-    // Media library
-    'cms_media',
-    'cms_media_files',
-    'cms_media_folders',
-    'cms_media_tags',
+    // Media library 4 테이블은 제거됨 (WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1)
+    //   미디어 정본 = media_assets (api-server modules/media). cms-core 는 미디어 저장축을 갖지 않는다.
   ],
 
   // ===== 삭제 정책 =====

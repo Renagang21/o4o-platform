@@ -17,7 +17,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
 import { useAuth } from '../../contexts/AuthContext';
-import { contentAssetApi, dashboardApi } from '../../lib/api';
+import { dashboardApi } from '../../lib/api';
 import { HubLayout, createSignal, createActionSignal } from '@o4o/hub-core';
 import type { HubSectionDefinition, HubSignal, HubActionResult } from '@o4o/hub-core';
 import { api } from '../../lib/apiClient';
@@ -431,7 +431,7 @@ export default function HubPage() {
       // Fetch base signals + dashboard summary + AI insight in parallel
       // Promise.allSettled: individual failures don't crash the entire hub
       const basePromises: Promise<any>[] = [
-        contentAssetApi.getSupplierSignal(),
+        dashboardApi.getSupplierSignal(),
         dashboardApi.getSellerSignal(),
         dashboardApi.getSupplierDashboardSummary(),
         api.get('/neture/seller/dashboard/ai-insight').then((r: { data: unknown }) => r.data).catch(() => null),

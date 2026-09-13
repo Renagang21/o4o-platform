@@ -121,6 +121,16 @@ export const dashboardApi = {
     }
   },
 
+  // WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1: content.ts(contentAssetApi) 에서 이동. backend /dashboard/assets/supplier-signal 은 product_approvals 기반으로 보존된다.
+  async getSupplierSignal(): Promise<{ success: boolean; hasApprovedSupplier: boolean }> {
+    try {
+      const response = await api.get('/dashboard/assets/supplier-signal');
+      return response.data;
+    } catch {
+      return { success: false, hasApprovedSupplier: false };
+    }
+  },
+
   async getSellerSignal(): Promise<{ success: boolean; hasApprovedSeller: boolean }> {
     try {
       const response = await api.get('/dashboard/assets/seller-signal');

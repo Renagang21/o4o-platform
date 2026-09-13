@@ -1,5 +1,8 @@
 /**
- * Content APIs - CMS Content + Content Asset Dashboard
+ * Content APIs - CMS Content
+ *
+ * WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1: cms_media 기반 Content Asset Dashboard(contentAssetApi) 제거.
+ *   미디어 정본 = media_assets. supplier-signal 은 ./dashboard.ts 의 dashboardApi 로 이동.
  *
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  */
@@ -14,17 +17,13 @@ import { api } from '../apiClient';
  *
  * Backend 계약(read-only 확인):
  *   `GET /neture/admin/homepage-contents?section=` → `200 { success:true, data:[] }` (400 잘못된 section / 500 오류 / 401·403 scope)
- *   `GET /dashboard/assets?dashboardId=`           → `200 { success:true, data:[] }` (미프로비전도 200 빈배열 = 정상 / 500 오류)
- *   `GET /dashboard/assets/kpi?dashboardId=`       → `200 { success:true, data:{...0...} }` (0 KPI = 정상 / 500 오류)
  *   `GET /neture/content`                          → `200 { success:true, data:[], pagination }` (500 오류)
  *
  * 의도된 fail-open(본 계약 대상 아님, 유지): getHeroSlides/getAds/getLogos(공개 홈 섹션),
- *   trackView(조회수), getCopiedSourceIds/getSupplierSignal(배지·시그널성 조회).
+ *   trackView(조회수), getSupplierSignal(시그널성 조회 — dashboard.ts).
  * mutation(create/update/delete/publish/archive/status 등)은 본 계약 대상이 아니며 기존 fail 처리를 유지한다.
  */
 export const OPERATOR_HOMEPAGE_CONTENTS_LOAD_FAILED = 'OPERATOR_HOMEPAGE_CONTENTS_LOAD_FAILED';
-export const CONTENT_ASSETS_LOAD_FAILED = 'CONTENT_ASSETS_LOAD_FAILED';
-export const CONTENT_ASSET_KPI_LOAD_FAILED = 'CONTENT_ASSET_KPI_LOAD_FAILED';
 export const CMS_CONTENTS_LOAD_FAILED = 'CMS_CONTENTS_LOAD_FAILED';
 
 function describeApiError(error: any): string {
@@ -58,115 +57,6 @@ export interface CmsContent {
   recommendCount?: number;
   isRecommendedByMe?: boolean;
 }
-
-// ==================== Content Asset Dashboard Types ====================
-
-export interface DashboardAsset {
-  id: string;
-  title: string;
-  description?: string | null;
-  type: string;
-  status: 'draft' | 'active' | 'archived';
-  sourceContentId?: string;
-  copiedAt?: string;
-  createdAt: string;
-  viewCount?: number;
-  recommendCount?: number;
-  exposure?: string[];
-}
-
-export type DashboardSortType = 'recent' | 'views' | 'recommend';
-
-export interface DashboardKpi {
-  totalAssets: number;
-  activeAssets: number;
-  recentViewsSum: number;
-  topRecommended: { id: string; title: string; recommendCount: number } | null;
-}
-
-// ==================== Content Asset API ====================
-
-export const contentAssetApi = {
-  async getCopiedSourceIds(dashboardId: string): Promise<{ success: boolean; sourceIds: string[] }> {
-    try {
-      const response = await api.get(`/dashboard/assets/copied-source-ids?dashboardId=${encodeURIComponent(dashboardId)}`);
-      return response.data;
-    } catch {
-      return { success: false, sourceIds: [] };
-    }
-  },
-
-  async listAssets(dashboardId: string, params?: {
-    status?: 'draft' | 'active' | 'archived';
-    sort?: DashboardSortType;
-  }): Promise<DashboardAsset[]> {
-    let response;
-    try {
-      const queryParams = new URLSearchParams({ dashboardId });
-      if (params?.status) queryParams.set('status', params.status);
-      if (params?.sort) queryParams.set('sort', params.sort);
-      response = await api.get(`/dashboard/assets?${queryParams.toString()}`);
-    } catch (error) {
-      console.warn('[Content Asset API] Failed to list assets:', describeApiError(error));
-      throw new Error(CONTENT_ASSETS_LOAD_FAILED);
-    }
-    const result = response.data;
-    if (result?.success !== true || !Array.isArray(result.data)) {
-      console.warn('[Content Asset API] Unexpected assets payload shape');
-      throw new Error(CONTENT_ASSETS_LOAD_FAILED);
-    }
-    return result.data;
-  },
-
-  async getKpi(dashboardId: string): Promise<DashboardKpi> {
-    let response;
-    try {
-      response = await api.get(`/dashboard/assets/kpi?dashboardId=${encodeURIComponent(dashboardId)}`);
-    } catch (error) {
-      console.warn('[Content Asset API] Failed to fetch KPI:', describeApiError(error));
-      throw new Error(CONTENT_ASSET_KPI_LOAD_FAILED);
-    }
-    const result = response.data;
-    if (result?.success !== true || !result.data || typeof result.data !== 'object') {
-      console.warn('[Content Asset API] Unexpected KPI payload shape');
-      throw new Error(CONTENT_ASSET_KPI_LOAD_FAILED);
-    }
-    return result.data;
-  },
-
-  async updateAsset(id: string, data: {
-    dashboardId: string;
-    title?: string;
-    description?: string;
-  }): Promise<{ success: boolean }> {
-    const response = await api.patch(`/dashboard/assets/${id}`, data);
-    return response.data;
-  },
-
-  async publishAsset(id: string, dashboardId: string): Promise<{ success: boolean }> {
-    const response = await api.post(`/dashboard/assets/${id}/publish`, { dashboardId });
-    return response.data;
-  },
-
-  async archiveAsset(id: string, dashboardId: string): Promise<{ success: boolean }> {
-    const response = await api.post(`/dashboard/assets/${id}/archive`, { dashboardId });
-    return response.data;
-  },
-
-  async deleteAsset(id: string, dashboardId: string): Promise<{ success: boolean }> {
-    const response = await api.delete(`/dashboard/assets/${id}?dashboardId=${encodeURIComponent(dashboardId)}`);
-    return response.data;
-  },
-
-  async getSupplierSignal(): Promise<{ success: boolean; hasApprovedSupplier: boolean }> {
-    try {
-      const response = await api.get('/dashboard/assets/supplier-signal');
-      return response.data;
-    } catch {
-      return { success: false, hasApprovedSupplier: false };
-    }
-  },
-};
 
 // ==================== CMS API ====================
 

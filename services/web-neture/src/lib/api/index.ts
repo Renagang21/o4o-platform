@@ -48,16 +48,10 @@ export {
 // Content APIs
 export {
   cmsApi,
-  contentAssetApi,
   // WO-O4O-NETURE-OPERATOR-HOMEPAGE-CMS-AND-CONTENT-ASSETS-LOAD-ERROR-CONTRACT-V1 (IR 묶음 3)
   OPERATOR_HOMEPAGE_CONTENTS_LOAD_FAILED,
-  CONTENT_ASSETS_LOAD_FAILED,
-  CONTENT_ASSET_KPI_LOAD_FAILED,
   CMS_CONTENTS_LOAD_FAILED,
   type CmsContent,
-  type DashboardAsset,
-  type DashboardSortType,
-  type DashboardKpi,
 } from './content.js';
 
 // Supplier API

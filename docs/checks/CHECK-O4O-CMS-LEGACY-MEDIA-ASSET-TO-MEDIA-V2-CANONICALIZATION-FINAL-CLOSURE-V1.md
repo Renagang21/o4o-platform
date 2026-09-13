@@ -257,6 +257,65 @@ WO §10 의 두 항목(`LEGACY_CMS_MEDIA_RUNTIME` · `CMS_MEDIA_ERROR_SWALLOWING
 
 ---
 
+## 12. 중지 조건 해소 단계 — dashboard-assets 축 최종 제거 (A안 승인, 2026-09-13)
+
+### 12-1. 삭제 전 경계 확인 (WO 지시 1~5)
+
+| 화면 | 판정 | 근거 |
+|---|---|---|
+| KPA `/my-content` (`pages/dashboard/MyContentPage.tsx`, 1,001줄) | **전용** | 호출 API 가 `dashboardApi.*`(list · kpi · publish · archive · delete · update · getSupplierSignal) 뿐. 다른 CMS 기능 교집합 0 |
+| Neture `/workspace/my-content` (`pages/dashboard/MyContentPage.tsx`, 690줄) | **전용** | `contentAssetApi.*` 뿐 |
+| Neture `/content` (`ContentLibraryPage.tsx`) | **혼합** | 목록 = `hubContentApi.list`(정상, 보존) + 카드의 "내 콘텐츠로" 복사 버튼(`dashboardCopyApi`, 제거) |
+| Neture `/content`(list) · `/content/:id` (`ContentListPage` · `ContentDetailPage`) | **혼합** | 목록·상세·추천·조회수 = `cmsApi`(보존) + "사용 중" 배지(`getCopiedSourceIds`, 제거) |
+| Neture `HubPage` | **혼합** | 신호 4종 중 `contentAssetApi.getSupplierSignal()` 1개만 이 축의 클라이언트에 있었음 → 보존 모듈 `dashboardApi` 로 이동 |
+| 메뉴·네비게이션 | 진입점 0 | 두 서비스 모두 `/my-content` 로 가는 메뉴·버튼 없음. 유일한 링크는 `ContentLibraryPage.afterCopyAction`(제거) |
+| 저장소 밖 소비자 | 0 | 30일 로그: 실사용 호출은 08-19~08-26 `neture.co.kr`/`localhost` 뿐, 최근 2주 0. 이 호출자 코드가 위 두 서비스다 |
+
+### 12-2. 제거
+
+| 계층 | 파일 | 처분 |
+|---|---|---|
+| backend route | `routes/dashboard/dashboard-assets.routes.ts` | `/supplier-signal` · `/seller-signal` **2개만** 남김 (경로 불변) |
+| backend handlers | `dashboard-assets.query-handlers.ts` | list · copied-source-ids · kpi(= **삼킴 3곳**) 제거, signal 2개만 잔존 |
+| | `dashboard-assets.copy-handlers.ts` · `dashboard-assets.mutation-handlers.ts` · `dashboard-assets.types.ts` | **삭제** |
+| | `utils/dashboard-access.guard.ts` | **삭제** (소비처 = 위 핸들러뿐) |
+| entity | `packages/cms-core/src/entities/CmsMedia{,File,Folder,Tag}.entity.ts` · `entities/index.ts` export | **삭제** |
+| | `apps/api-server/src/database/entities.ts` 등록 2곳 | 제거 |
+| cms-core lifecycle | `lifecycle/install.ts` — `cms_media*` CREATE TABLE 4 + 인덱스 5 | 제거 (entity 와 한 단위. 나머지 12 테이블은 불변 — 다음 단계) |
+| | `lifecycle/uninstall.ts` drop 목록 4 · `manifest.ts` 테이블 목록 4 | 제거 |
+| KPA 프런트 | `pages/dashboard/MyContentPage.tsx` · `api/dashboard.ts` · `api/index.ts` export | **삭제** |
+| | `App.tsx` `/my-content` | `<Navigate to="/mypage" replace />` (기존 `/dashboard → /mypage` 패턴) |
+| Neture 프런트 | `pages/dashboard/MyContentPage.tsx` · `lib/api/dashboardCopy.ts` | **삭제** |
+| | `lib/api/content.ts` | `contentAssetApi` · `DashboardAsset/SortType/Kpi` · `CONTENT_ASSETS_LOAD_FAILED`/`_KPI_` 제거. `cmsApi` · `homepageCmsApi` 불변 |
+| | `lib/api/dashboard.ts` | `getSupplierSignal` 이동 (보존) |
+| | `ContentLibraryPage.tsx` | 복사 버튼 · `loadCopiedIds/onCopy/copy*Label/afterCopyAction` 제거. 목록 불변 |
+| | `ContentListPage.tsx` · `ContentDetailPage.tsx` | "사용 중" 배지·`isCopied` 제거. 미사용이 된 `useAuth` 정리 |
+| | `HubPage.tsx` | `contentAssetApi.getSupplierSignal` → `dashboardApi.getSupplierSignal` |
+| | `App.tsx` `/workspace/my-content` · `/my-content` | `<Navigate to="/" replace />` (기존 은퇴 workspace 경로 패턴) |
+| spec | `__tests__/security/dashboard-assets-ownership-gate.spec.ts` | **삭제** — 가드 대상 핸들러 자체가 사라짐 |
+| | `cms-legacy-media-to-media-v2-canonicalization.spec.ts` | **A-2 절 8 tests 추가** (총 22) |
+
+**만들지 않은 것**: 대체 화면 · compatibility route · Media V2 치환 · fallback · 빈 목록 위장. 딥링크는 각 서비스의 기존 안전한 상위 경로로만 보낸다.
+
+**`@o4o/shared-space-ui` ContentHubTemplate 의 optional copy props** 는 손대지 않았다 — 공용 패키지이며 web-k-cosmetics · web-kpa-society(HubContentLibraryPage) 도 소비한다(둘 다 copy prop 미사용). 소비 0 인 optional 기능이 남는 셈이라 §11 보고.
+
+**signal 핸들러의 `product_approvals` catch** (`// Table may not exist — silent fallback`) 는 WO 보존 대상(supplier/seller-signal) 내부라 손대지 않았다. `cms_media` 삼킴 3곳과는 다른 테이블이며 그 테이블은 운영에 존재한다.
+
+### 12-3. 검증
+
+| 단계 | 결과 |
+|---|---|
+| 신규 spec (22 tests) | ✅ 22/22 |
+| `@o4o-apps/cms-core` build | ✅ 0 errors |
+| api-server type-check | ✅ 0 errors |
+| `@o4o/web-kpa-society` type-check · build · lint | ✅ 0 / exit 0 / 0 problems |
+| `@o4o/web-neture` type-check · build · lint | ✅ 0 / exit 0 / 0 problems |
+| api-server lint | 44 errors = baseline 동일 · 내 파일 0 |
+| `check-unsafe-routes` | ✅ 1139 파일 · 위반 0 |
+| `check-typeorm-entities` | ✅ DEFINED_BUT_UNREGISTERED 0 / 중복 0 / stale 0 |
+| api-server 전체 Jest (`--runInBand`) | **270/271 suites · 4,404 pass · 21 skipped**. 실패 1 = `main-site-full-source-deletion.spec.ts` — §5-1 과 같은 로컬 미추적 잔여물, 내 변경과 무관 |
+| CI · 배포 · 운영 | _(§12-4)_ |
+
 ## 10. 문서 정합
 
 ```text

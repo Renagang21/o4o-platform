@@ -300,87 +300,10 @@ async function createTables(dataSource: any, logger: any): Promise<void> {
     )
   `);
 
-  // Media tables
-  await dataSource.query(`
-    CREATE TABLE IF NOT EXISTS cms_media (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      "organizationId" UUID NOT NULL,
-      "folderId" UUID,
-      "uploadedBy" UUID,
-      title VARCHAR(255) NOT NULL,
-      "altText" VARCHAR(255),
-      caption TEXT,
-      description TEXT,
-      type VARCHAR(100) NOT NULL,
-      "mimeType" VARCHAR(255) NOT NULL,
-      "originalFilename" VARCHAR(500) NOT NULL,
-      "fileSize" BIGINT DEFAULT 0,
-      width INT,
-      height INT,
-      duration INT,
-      metadata JSONB DEFAULT '{}',
-      "isActive" BOOLEAN DEFAULT true,
-      "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  await dataSource.query(`
-    CREATE TABLE IF NOT EXISTS cms_media_files (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      "mediaId" UUID NOT NULL,
-      variant VARCHAR(100) NOT NULL,
-      path VARCHAR(1000) NOT NULL,
-      url VARCHAR(2000),
-      storage VARCHAR(100) NOT NULL,
-      "mimeType" VARCHAR(255) NOT NULL,
-      "fileSize" BIGINT DEFAULT 0,
-      width INT,
-      height INT,
-      quality INT,
-      metadata JSONB DEFAULT '{}',
-      "isActive" BOOLEAN DEFAULT true,
-      "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  await dataSource.query(`
-    CREATE TABLE IF NOT EXISTS cms_media_folders (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      "organizationId" UUID NOT NULL,
-      "parentId" UUID,
-      name VARCHAR(255) NOT NULL,
-      path VARCHAR(1000) NOT NULL,
-      description TEXT,
-      icon VARCHAR(50),
-      color VARCHAR(50),
-      metadata JSONB DEFAULT '{}',
-      "isActive" BOOLEAN DEFAULT true,
-      "sortOrder" INT DEFAULT 0,
-      "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE("organizationId", "parentId", name)
-    )
-  `);
-
-  await dataSource.query(`
-    CREATE TABLE IF NOT EXISTS cms_media_tags (
-      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      "organizationId" UUID NOT NULL,
-      name VARCHAR(255) NOT NULL,
-      slug VARCHAR(255) NOT NULL,
-      description TEXT,
-      color VARCHAR(50),
-      "mediaIds" JSONB DEFAULT '[]',
-      metadata JSONB DEFAULT '{}',
-      "isActive" BOOLEAN DEFAULT true,
-      "sortOrder" INT DEFAULT 0,
-      "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE("organizationId", slug)
-    )
-  `);
+  // Media tables (cms_media · cms_media_files · cms_media_folders · cms_media_tags) 는 제거됐다 —
+  //   WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1.
+  //   이 install() 은 호출자가 없어 운영에 위 테이블이 생성된 적이 없고, 미디어 정본은
+  //   media_assets(+media_entity_links, api-server migration 소유) 다. cms-core 는 미디어 저장축을 갖지 않는다.
 
   // Create indexes
   await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_cms_templates_org ON cms_templates("organizationId")`);
@@ -394,11 +317,6 @@ async function createTables(dataSource: any, logger: any): Promise<void> {
   await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_cms_menus_org ON cms_menus("organizationId")`);
   await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_cms_menu_items_menu ON cms_menu_items("menuId")`);
   await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_cms_menu_locations_org ON cms_menu_locations("organizationId")`);
-  await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_cms_media_org ON cms_media("organizationId")`);
-  await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_cms_media_folder ON cms_media("folderId")`);
-  await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_cms_media_files_media ON cms_media_files("mediaId")`);
-  await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_cms_media_folders_org ON cms_media_folders("organizationId")`);
-  await dataSource.query(`CREATE INDEX IF NOT EXISTS idx_cms_media_tags_org ON cms_media_tags("organizationId")`);
 
   logger.info('CMS tables created successfully.');
 }

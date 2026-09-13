@@ -14,8 +14,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, FileText, Bell } from 'lucide-react';
-import { cmsApi, contentAssetApi, type CmsContent } from '../../lib/api';
-import { useAuth } from '../../contexts/AuthContext';
+import { cmsApi, type CmsContent } from '../../lib/api';
 import {
   CONTENT_TYPE_LABELS,
   CONTENT_SOURCE_COLORS,
@@ -27,7 +26,6 @@ import { ContentPagination, ContentMetaBar, ContentSortButtons } from '@o4o/ui';
 const PAGE_SIZE = 10;
 
 export default function ContentListPage() {
-  const { user } = useAuth();
   const [contents, setContents] = useState<CmsContent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,15 +33,7 @@ export default function ContentListPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [copiedIds, setCopiedIds] = useState<Set<string>>(new Set());
-
-  // Phase 3: 이미 복사한 콘텐츠 ID 로드
-  useEffect(() => {
-    if (!user?.id) return;
-    contentAssetApi.getCopiedSourceIds(user.id)
-      .then(res => setCopiedIds(new Set(res.sourceIds || [])))
-      .catch(() => {});
-  }, [user?.id]);
+  // "사용 중" 배지(cms_media 자료함 복사 여부) 는 제거됨 — WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1
 
   // 조회 실패는 정상 0건과 분리 — error 상태로 표면화, 재시도는 현재 정렬·페이지 보존
   const fetchContents = useCallback(async () => {
@@ -190,11 +180,6 @@ export default function ContentListPage() {
                       size="sm"
                     />
                     <div className="flex items-center gap-2">
-                      {copiedIds.has(content.id) && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-600 rounded-md text-xs font-medium">
-                          &#10003; 사용 중
-                        </span>
-                      )}
                       <span className="inline-flex items-center text-primary-600 text-sm font-medium">
                         자세히 보기
                         <ArrowRight className="ml-1 w-4 h-4" />

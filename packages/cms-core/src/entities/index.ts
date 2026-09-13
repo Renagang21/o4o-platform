@@ -34,10 +34,6 @@ export * from './CmsMenuItem.entity.js';
 export * from './CmsMenuLocation.entity.js';
 
 // Media library
-export * from './CmsMedia.entity.js';
-export * from './CmsMediaFile.entity.js';
-export * from './CmsMediaFolder.entity.js';
-export * from './CmsMediaTag.entity.js';
 
 // All entities for TypeORM registration
 export const CmsEntities = [

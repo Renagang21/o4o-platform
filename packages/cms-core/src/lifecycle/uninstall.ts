@@ -37,10 +37,6 @@ async function dropTables(
 
   // Drop tables in reverse dependency order
   const tablesToDrop = [
-    'cms_media_tags',
-    'cms_media_folders',
-    'cms_media_files',
-    'cms_media',
     'cms_menu_locations',
     'cms_menu_items',
     'cms_menus',
