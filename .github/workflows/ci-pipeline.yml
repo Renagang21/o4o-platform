@@ -263,30 +263,16 @@ jobs:
       uses: ./.github/actions/setup-build-env
       with:
         node-version: ${{ env.NODE_VERSION }}
-        # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1: 검증 경로에서는 lockfile drift 를 실패로 만든다.
+        # 검증 경로에서는 lockfile drift 를 실패로 만든다. 패키지 빌드는 아래에서
+        # Admin Dashboard 의 실제 transitive dependency closure 만 수행한다.
         strict-lockfile: 'true'
+        build-packages: 'false'
 
-    - name: Verify package builds
+    - name: Build admin workspace dependencies
       run: |
-        echo "🔍 Verifying all build:packages dist directories..."
-        MISSING_DIST=0
-
-        # All packages built by build:packages (must stay in sync)
-        for pkg in types auth-utils capabilities appearance-system auth-client utils ui auth-context block-renderer content-editor slide-app organization-core forum-core pharmacy-ai-insight ai-prompts lms-client account-ui; do
-          if [ ! -d "packages/$pkg/dist" ]; then
-            echo "❌ packages/$pkg/dist not found!"
-            MISSING_DIST=1
-          else
-            echo "✅ packages/$pkg/dist exists"
-          fi
-        done
-
-        if [ $MISSING_DIST -eq 1 ]; then
-          echo "❌ Some dist directories are missing. Cannot proceed."
-          exit 1
-        fi
-
-        echo "✅ All build:packages outputs verified ($(echo types capabilities appearance-system auth-client utils ui auth-context block-renderer content-editor slide-app organization-core forum-core pharmacy-ai-insight lms-client account-ui | wc -w) packages)"
+        echo "🔨 Building Admin Dashboard workspace dependencies..."
+        pnpm --filter '@o4o/admin-dashboard^...' run build
+        echo "✅ Admin Dashboard dependency closure built successfully"
 
     - name: Build ${{ matrix.app }}
       run: bash scripts/ci-build-app.sh ${{ matrix.app }}
