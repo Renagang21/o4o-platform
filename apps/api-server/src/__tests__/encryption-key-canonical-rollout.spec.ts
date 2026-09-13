@@ -25,11 +25,17 @@ const CIPHER_FORMAT = /^[0-9a-f]{32}:[0-9a-f]+$/;
  * "wrong key 로 원문을 복구할 수 없음" 이므로, 예외 또는 원문 불일치 둘 다 정상으로 본다.
  */
 function expectWrongKeyCannotRecover(ciphertext: string, wrongKey: string, plaintext: string): void {
+  let recovered: string | undefined;
+  let decryptFailed = false;
+
   try {
-    const recovered = decryptWithKey(ciphertext, wrongKey);
-    expect(recovered).not.toBe(plaintext);
+    recovered = decryptWithKey(ciphertext, wrongKey);
   } catch {
-    // 잘못된 키로 padding 검증이 실패하는 일반적인 경로.
+    decryptFailed = true;
+  }
+
+  if (!decryptFailed) {
+    expect(recovered).not.toBe(plaintext);
   }
 }
 
