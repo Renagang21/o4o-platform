@@ -74,7 +74,7 @@ describe('1. site registry (§5·§7)', () => {
     // 등재는 browser site 3 사본과 allowlist 로 이어진다 — 새 agent action 종류는 없다(siteId 당 10항목).
     expect(BROWSER_SITE_IDS).toContain(SITE);
     const forSite = LOCAL_AGENT_ACTION_ALLOWLIST.filter((a) => a.endsWith(`#${SITE}`));
-    expect(forSite).toHaveLength(10);
+    expect(forSite).toHaveLength(11); // site 2 + DOM 8 + target prepare 1(WORK-TARGET-DISCOVERY-V0)
     expect(forSite).toContain(composeSiteAction('local.browser.dom.read_table', SITE));
     for (const copy of ['tools/o4o-local-agent/src/browser-site-registry.mjs', 'tools/o4o-chrome-extension/src/site-registry.js', 'tools/o4o-chrome-extension/src/content-script.js']) {
       expect(read(join(REPO_ROOT, copy))).toContain("'https://health.kr'");

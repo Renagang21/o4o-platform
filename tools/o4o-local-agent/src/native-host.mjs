@@ -36,7 +36,7 @@ import process from 'node:process';
 import {
   BRIDGE_PROTOCOL_VERSION,
   NATIVE_BRIDGE_MESSAGE_TYPES,
-  isDomBridgeMessageType,
+  isAgentRequestMessageType,
   validateBridgeMessage,
 } from './native-bridge-protocol.mjs';
 import { loadCredentials } from './credentials.mjs';
@@ -103,7 +103,7 @@ export function handleBridgeMessage(message, deps = {}) {
       return reply({ serviced: false, reason: 'BROWSER_LOCAL' });
     default:
       // DOM type 이 확장→host 방향으로 **요청**되면 서비스하지 않는다 — 그 방향은 agent→확장뿐이다(§37).
-      if (isDomBridgeMessageType(message.type)) {
+      if (isAgentRequestMessageType(message.type)) {
         return reply({ serviced: false, reason: 'AGENT_TO_EXTENSION_ONLY' });
       }
       // validateBridgeMessage 를 통과했다면 여기 오지 않는다. 방어적 fallback.

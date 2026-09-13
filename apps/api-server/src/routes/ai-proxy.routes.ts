@@ -295,6 +295,8 @@ router.post('/work-agent/run', authenticate, dynamicLimiter('free'), async (req,
       history,
       message: result.message,
       errorCode: result.errorCode ?? null,
+      // WORK-TARGET-DISCOVERY-V0 §33·§54 — 대상 준비 요약(안전 필드만). 경로 · 탭 제목 · 실행 경로 없음.
+      target: result.target,
     },
   });
 });

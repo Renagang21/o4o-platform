@@ -17,7 +17,7 @@ import {
   BRIDGE_PROTOCOL_VERSION,
   NATIVE_BRIDGE_ERROR,
   buildBridgeMessage,
-  isDomBridgeMessageType,
+  isAgentRequestMessageType,
   validateBridgeMessage,
   newRequestId,
 } from './message-contract.js';
@@ -86,7 +86,7 @@ export class NativeBridgeClient {
       return;
     }
     // 짝 없는 봉투가 DOM type 이면 agent→확장 **요청**이다(§37). 그 밖의 짝 없는 봉투는 무시한다.
-    if (isDomBridgeMessageType(verdict.message.type) && typeof this.onRequest === 'function') {
+    if (isAgentRequestMessageType(verdict.message.type) && typeof this.onRequest === 'function') {
       this._serveRequest(verdict.message);
     }
   }

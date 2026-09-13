@@ -36,6 +36,8 @@ import {
   SAFE_COMPUTER_INFO_NUMBER_FIELDS,
   SAFE_COMPUTER_INFO_STRING_FIELDS,
   SITE_TARGET_ACTIONS,
+  TARGET_ACTIONS,
+  WORK_TARGET_IDS,
   composeAppAction,
   composeComputerAction,
   isAllowedLocalAction,
@@ -873,6 +875,8 @@ describe('18~21. 회귀 — replay · 창 축 · 브라우저 축 · pairing/LNA
       ...COMPUTER_TARGET_ACTIONS.flatMap((b) => WINDOWS_APP_IDS.map((a) => composeComputerAction(b, a))),
       // BROWSER-DOM-CONTROL-V0: DOM 축(등재 siteId 당 8항목). 대상은 여전히 등재 siteId 뿐 — 탭 id · URL 은 표현 불가.
       ...DOM_TARGET_ACTIONS.flatMap((b) => BROWSER_SITE_IDS.map((s) => composeAppAction(b, s))),
+      // WORK-TARGET-DISCOVERY-V0: 대상 준비 1항목 × 등재 targetId(siteId ∪ appId).
+      ...TARGET_ACTIONS.flatMap((b) => WORK_TARGET_IDS.map((t) => composeAppAction(b, t))),
     ].sort();
     expect([...LOCAL_AGENT_ACTION_ALLOWLIST].sort()).toEqual(expected);
     // 서버 규칙과 agent 규칙은 글자 단위로 같다 (§26 이중 검사의 전제).

@@ -43,6 +43,11 @@ export const NATIVE_BRIDGE_MESSAGE_TYPES = Object.freeze([
   'browser.dom.select_option',
   'browser.dom.click',
   'browser.dom.read_table',
+  // ── Work Target Discovery V0 (WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §8~§14) — agent→host→확장 방향.
+  //    payload 는 siteId(등재)와 확장 자신이 준 tabId 뿐이다. URL · 검색어 · 임의 탭 선택 칸은 없다.
+  'browser.target.discover', // 등재 site 의 열린 탭 요약(개수 · active · path) — 전체 탭 census 가 아니다(§48)
+  'browser.target.activate', // 그 site 의 탭 하나를 앞으로(창 focus + 탭 active) — 새 탭 0(§9·§12)
+  'browser.target.open', // 등재 canonical URL 로 탭 하나를 연다(§13·§14)
 ] as const);
 
 export type NativeBridgeMessageType = (typeof NATIVE_BRIDGE_MESSAGE_TYPES)[number];

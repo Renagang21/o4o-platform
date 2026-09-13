@@ -27,6 +27,8 @@ import {
   DATA_TARGET_ACTIONS,
   DOM_TARGET_ACTIONS,
   SITE_TARGET_ACTIONS,
+  TARGET_ACTIONS,
+  WORK_TARGET_IDS,
   composeAppAction,
   LOCAL_AGENT_ACTIONS,
   LOCAL_AGENT_ACTION_ALLOWLIST,
@@ -550,6 +552,10 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
         ...DOM_TARGET_ACTIONS.flatMap((base) =>
           BROWSER_SITE_IDS.map((siteId) => composeAppAction(base, siteId)),
         ),
+        // WORK-TARGET-DISCOVERY-V0: 대상 준비 1항목 × 등재 targetId(siteId ∪ appId). URL · 경로 · 탭 · 창 제목은 표현 불가.
+        ...TARGET_ACTIONS.flatMap((base) =>
+          WORK_TARGET_IDS.map((targetId) => composeAppAction(base, targetId)),
+        ),
       ].sort(),
     );
     for (const action of LOCAL_AGENT_ACTION_ALLOWLIST) {
@@ -590,6 +596,8 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
       './local-db.mjs',
       // LOCAL-DATA-RUNTIME V1: health 의 백업 요약(개수·최근 시각)만 — 이 모듈의 fs 는 자기 backups/ 디렉터리에 한정된다.
       './local-db-backup.mjs',
+      // WORK-TARGET-DISCOVERY-V0: 대상 발견·활성화 계층(순수 — 창 제어 모듈과 bridge 를 통해서만 밖에 닿는다).
+      './work-target.mjs',
       // BROWSER-DOM-CONTROL-V0: DOM 인자·결과 한도 사본(순수). 확장 통로(bridge relay)는 index.mjs 가
       // context 로 넘기므로 handler 는 net 모듈을 import 하지 않는다.
       './browser-dom-limits.mjs',

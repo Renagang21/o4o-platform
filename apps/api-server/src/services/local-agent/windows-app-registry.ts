@@ -31,6 +31,8 @@ export interface WindowsAppDefinition {
   appId: string;
   /** 사용자에게 읽어줘도 안전한 이름. AI 응답에 나가는 유일한 표시 문자열이다. */
   displayName: string;
+  /** WORK-TARGET-DISCOVERY-V0 §7 — 문장에서 이 앱을 가리키는 별칭(공백 제거 대조). URL·경로가 아니다. */
+  aliases: readonly string[];
   /**
    * 이 앱으로 인정할 process 이름(확장자 없음, 대소문자 무시).
    * **agent 밖으로 나가지 않는다.**
@@ -54,11 +56,13 @@ export const WINDOWS_APP_REGISTRY: readonly WindowsAppDefinition[] = Object.free
   Object.freeze({
     appId: 'windows.notepad',
     displayName: '메모장',
+    aliases: Object.freeze(['메모장', 'notepad']),
     processNames: ['notepad'],
   }) as WindowsAppDefinition,
   Object.freeze({
     appId: 'windows.calculator',
     displayName: '계산기',
+    aliases: Object.freeze(['계산기', 'calculator']),
     processNames: ['CalculatorApp', 'Calculator', 'win32calc'],
   }) as WindowsAppDefinition,
 ]);

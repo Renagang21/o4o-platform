@@ -583,10 +583,10 @@ describe('20~22. prompt injection boundary · fallbackReason · structured-first
 // ─── 23~25. regressions ──────────────────────────────────────────────────────
 
 describe('23~25. 회귀 — Chrome bridge · Browser Control · Computer Use', () => {
-  it('23. Chrome bridge — 세 사본이 12 type(4+8)을 똑같이 갖고, DOM type 은 agent→확장 방향만 서비스된다', () => {
+  it('23. Chrome bridge — 세 사본이 15 type(4+8+3)을 똑같이 갖고, DOM/target type 은 agent→확장 방향만 서비스된다', () => {
     const agent = read(join(AGENT_SRC, 'native-bridge-protocol.mjs'));
     const ext = read(join(EXT_SRC, 'message-contract.js'));
-    expect(NATIVE_BRIDGE_MESSAGE_TYPES.length).toBe(12);
+    expect(NATIVE_BRIDGE_MESSAGE_TYPES.length).toBe(15);
     for (const t of NATIVE_BRIDGE_MESSAGE_TYPES) {
       expect(agent).toContain(`'${t}'`);
       expect(ext).toContain(`'${t}'`);

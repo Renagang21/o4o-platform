@@ -59,6 +59,12 @@ async function drive(db: LocalAgentDb, script: Script, max = 80) {
     if (!cmd) break;
     k += 1;
     const base = parseLocalAction(String(cmd.action)).base.replace('local.browser.dom.', '');
+    // WORK-TARGET-DISCOVERY-V0 §34: loop 앞에 대상 준비 명령이 하나 선행한다. 이 spec 은 loop 를 보므로
+    // "탭이 이미 열려 있어 재사용" 으로 응답하고 seen 에는 넣지 않는다(대상 축은 work-target-discovery.spec 이 본다).
+    if (base === 'local.target.prepare') {
+      await submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: 'success', data: { targetId: 'healthkr', targetType: 'browser_site', state: 'ready', reusedExisting: true, openedByO4O: false, tabCount: 1, path: '/' } } as any);
+      continue;
+    }
     seen.push({ base, args: cmd.result_data ? JSON.parse(String(cmd.result_data)) : {} });
     const queue = script[base] ?? [{ status: 'failed', errorCode: 'DOM_ELEMENT_NOT_FOUND' }];
     const idx = Math.min(cursors[base] ?? 0, queue.length - 1);

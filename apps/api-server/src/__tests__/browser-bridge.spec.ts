@@ -114,9 +114,10 @@ describe('three-way contract cross-check (§10·§54)', () => {
       expect(agent).toContain(`'${t}'`);
       expect(ext).toContain(`'${t}'`);
     }
-    // 열세 번째 type 이 몰래 들어오지 않았는지 — 서버 사본 길이 고정(BRIDGE-V0 4 + BROWSER-DOM-CONTROL-V0 8).
-    expect(NATIVE_BRIDGE_MESSAGE_TYPES.length).toBe(12);
+    // 열여섯 번째 type 이 몰래 들어오지 않았는지 — 서버 사본 길이 고정(BRIDGE-V0 4 + BROWSER-DOM-CONTROL-V0 8 + WORK-TARGET-DISCOVERY-V0 3).
+    expect(NATIVE_BRIDGE_MESSAGE_TYPES.length).toBe(15);
     expect(NATIVE_BRIDGE_MESSAGE_TYPES.filter((t) => t.startsWith('browser.dom.')).length).toBe(8);
+    expect(NATIVE_BRIDGE_MESSAGE_TYPES.filter((t) => t.startsWith('browser.target.')).length).toBe(3);
     expect([...WORKSPACE_MODES]).toEqual(['split', 'focus']);
     expect(BRIDGE_PROTOCOL_VERSION).toBe(1);
   });

@@ -101,6 +101,9 @@ export const LOCAL_AGENT_ACTIONS = {
   DOM_READ_TABLE: 'local.browser.dom.read_table',
   // ── Local Data Runtime bridge (WO-O4O-LOCAL-DATA-TOOL-BRIDGE-CLOSURE-V1) ────
   /** 매장 PC 로컬 SQLite 의 **상태만** — 스키마 버전·마이그레이션 정상 여부. 경로·행 없음. */
+  // ── Work Target Discovery V0 (WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §3·§33) ────────
+  /** `local.target.prepare#<targetId>` — 있으면 재사용·활성화, 없으면 등재 방법으로 열기, 그래도 안 되면 사용자 요청. 인자 없음. */
+  TARGET_PREPARE: 'local.target.prepare',
   DATA_HEALTH: 'local.data.health',
   /** allowlist 된 meta 키 하나의 값을 읽는다(§13). 임의 SQL·임의 키가 아니다. */
   DATA_GET_META: 'local.data.get_meta',
@@ -357,6 +360,21 @@ export function composeSiteAction(base: string, siteId: string): string {
   return composeAppAction(base, siteId);
 }
 
+// ─── Work Target 대상 action (WORK-TARGET-DISCOVERY-V0 §4·§5·§13·§22) ───────────
+
+/**
+ * targetId = **등재 siteId 또는 등재 appId**. 두 id 공간은 겹치지 않는다(`healthkr` vs `windows.*`).
+ * URL · 실행 경로 · 탭 · 창 제목은 action 문자열 어디에도 없다 — agent 가 자기 등재부에서 꺼낸다.
+ */
+export const TARGET_ACTIONS: readonly string[] = Object.freeze([LOCAL_AGENT_ACTIONS.TARGET_PREPARE]);
+export const WORK_TARGET_IDS: readonly string[] = Object.freeze([...BROWSER_SITE_IDS, ...WINDOWS_APP_IDS]);
+export function composeTargetAction(base: string, targetId: string): string {
+  return composeAppAction(base, targetId);
+}
+export function isRegisteredWorkTarget(targetId: unknown): boolean {
+  return typeof targetId === 'string' && WORK_TARGET_IDS.includes(targetId);
+}
+
 /** action 문자열을 base 와 appId 로 나눈다. appId 가 없는 action 이면 appId 는 undefined. */
 export function parseLocalAction(action: string): { base: string; appId?: string } {
   const idx = String(action ?? '').indexOf(LOCAL_APP_ACTION_SEPARATOR);
@@ -393,6 +411,10 @@ export const LOCAL_AGENT_ACTION_ALLOWLIST: readonly string[] = Object.freeze([
   // BROWSER-DOM-CONTROL-V0: 등재 siteId 하나당 8항목. URL · 탭 id · selector 는 표현 불가.
   ...DOM_TARGET_ACTIONS.flatMap((base) =>
     BROWSER_SITE_IDS.map((siteId) => composeSiteAction(base, siteId)),
+  ),
+  // WORK-TARGET-DISCOVERY-V0: 등재 targetId(siteId ∪ appId) 하나당 1항목.
+  ...TARGET_ACTIONS.flatMap((base) =>
+    WORK_TARGET_IDS.map((targetId) => composeTargetAction(base, targetId)),
   ),
 ]);
 
@@ -509,6 +531,28 @@ export const LOCAL_AGENT_ERROR = {
   DATA_DB_BACKUP_FAILED: 'LOCAL_DB_BACKUP_FAILED',
   /** setting 쓰기가 실패했다. */
   DATA_WRITE_FAILED: 'LOCAL_DATA_WRITE_FAILED',
+
+  // ── Work Target Discovery V0 (WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §51) ──────────
+  /** 문장에서 대상을 하나로 정하지 못했다(없거나 여럿). 임의로 고르지 않는다. */
+  TARGET_NOT_RESOLVED: 'WORK_TARGET_NOT_RESOLVED',
+  /** 등재되지 않은 targetId. */
+  TARGET_NOT_REGISTERED: 'WORK_TARGET_NOT_REGISTERED',
+  /** 열린 탭/창이 없다. */
+  TARGET_NOT_FOUND: 'WORK_TARGET_NOT_FOUND',
+  /** 같은 대상 탭/창이 여럿이고 규칙으로 하나를 고를 수 없다 → 사용자 선택. */
+  TARGET_MULTIPLE_MATCHES: 'WORK_TARGET_MULTIPLE_MATCHES',
+  /** 찾았지만 앞으로 보내지 못했다. */
+  TARGET_ACTIVATION_FAILED: 'WORK_TARGET_ACTIVATION_FAILED',
+  /** 등재부가 실행을 허용하지 않는 대상. */
+  TARGET_LAUNCH_NOT_ALLOWED: 'WORK_TARGET_LAUNCH_NOT_ALLOWED',
+  /** 등재 실행이 실패했다(경로 없음 등). */
+  TARGET_LAUNCH_FAILED: 'WORK_TARGET_LAUNCH_FAILED',
+  /** O4O 가 열 수 없어 사용자가 직접 열어야 한다. */
+  TARGET_USER_ACTION_REQUIRED: 'WORK_TARGET_USER_ACTION_REQUIRED',
+  /** 확장 미연결 · 권한 없음 등으로 대상을 조사/준비할 수 없다. */
+  TARGET_NOT_READY: 'WORK_TARGET_NOT_READY',
+  /** 실행 뒤 창이 제한 시간 안에 나타나지 않았다. */
+  TARGET_TIMEOUT: 'WORK_TARGET_TIMEOUT',
 
   // ── Browser DOM Control V0 (WO-O4O-BROWSER-DOM-CONTROL-V0 §29·§44) ─────────
   /** 현재 탭이 등재 site 가 아니다 · siteId 미등재. */
@@ -769,8 +813,45 @@ export function pickSafeDataInfo(data: unknown): Record<string, unknown> {
  * **모르는 action 은 빈 객체를 돌려준다.** 새 action 을 추가하면서 여기에 등록하지 않으면
  * 데이터가 새는 것이 아니라 **아무것도 통과하지 못한다**. 실수의 방향을 안전한 쪽으로 둔다.
  */
+// ─── Safe target info (WORK-TARGET-DISCOVERY-V0 §11·§33·§46·§48) ────────────────
+
+const SAFE_TARGET_STATES: readonly string[] = Object.freeze(['not_found', 'found', 'active', 'opening', 'waiting_for_user', 'ready', 'failed']);
+const SAFE_TARGET_TYPES: readonly string[] = Object.freeze(['browser_site', 'windows_app']);
+const SAFE_TARGET_REASONS: readonly string[] = Object.freeze([
+  'extension_not_connected', 'permission_required', 'site_not_allowed', 'bridge_error', 'multiple_tabs', 'activate_failed', 'open_failed',
+  'multiple_windows', 'launch_not_allowed', 'no_launch_metadata', 'launch_path_missing', 'launch_failed', 'window_not_seen', 'internal_error',
+]);
+const SAFE_TARGET_SELECTIONS: readonly string[] = Object.freeze(['active', 'single', 'recent', 'visible']);
+
+/**
+ * `local.target.prepare` 가 되돌릴 수 있는 **유일한** 필드 집합. targetId 는 등재분만, state/type/reason 은 enum 만,
+ * 개수는 작은 정수, path 는 pathname 형식(query 없음)만. 탭 제목 · 전체 URL · 창 제목 · 실행 경로 · 탭/창 핸들은 없다.
+ */
+export function pickSafeTargetInfo(data: unknown): Record<string, unknown> {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return {};
+  const src = data as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  if (isRegisteredWorkTarget(src.targetId)) out.targetId = src.targetId;
+  if (typeof src.targetType === 'string' && SAFE_TARGET_TYPES.includes(src.targetType)) out.targetType = src.targetType;
+  if (typeof src.state === 'string' && SAFE_TARGET_STATES.includes(src.state)) out.state = src.state;
+  if (typeof src.reason === 'string' && SAFE_TARGET_REASONS.includes(src.reason)) out.reason = src.reason;
+  if (typeof src.selection === 'string' && SAFE_TARGET_SELECTIONS.includes(src.selection)) out.selection = src.selection;
+  for (const key of ['reusedExisting', 'openedByO4O', 'userActionRequired', 'restored']) {
+    if (typeof src[key] === 'boolean') out[key] = src[key];
+  }
+  for (const key of ['tabCount', 'windowCount']) {
+    const v = src[key];
+    if (typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 1000) out[key] = v;
+  }
+  if (typeof src.path === 'string' && src.path.startsWith('/') && !/[?#\s]/.test(src.path)) out.path = src.path.slice(0, 200);
+  return out;
+}
+
 export function pickSafeResultData(action: string, data: unknown): Record<string, unknown> {
   const { base } = parseLocalAction(action);
+  if (TARGET_ACTIONS.includes(base)) {
+    return pickSafeTargetInfo(data);
+  }
   if (base === LOCAL_AGENT_ACTIONS.GET_SYSTEM_INFO || base === LOCAL_AGENT_ACTIONS.GET_AGENT_STATUS) {
     return pickSafeSystemInfo(data);
   }

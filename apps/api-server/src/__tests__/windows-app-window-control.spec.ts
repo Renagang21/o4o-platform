@@ -20,7 +20,7 @@ jest.mock('../utils/logger.js', () => ({
   default: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), debug: jest.fn() },
 }));
 
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import {
   APP_TARGET_ACTIONS,
@@ -400,6 +400,22 @@ describe('11~14. 실행 · 종료 · 셸 · 파일 접근은 구현 자체가 �
     expect(openerCode).toContain("-notmatch '^https://");
     expect(openerCode).not.toContain('$args');
     expect(openerCode).not.toContain('param(');
+
+    // WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §22·§26·§27 — **두 번째(마지막) 예외**.
+    // `windows-app-launch.ps1` 의 `Start-Process -FilePath $raw -PassThru` 한 번. `$raw` 는 agent 등재부 상수
+    // (절대 경로 · .exe/.lnk · 존재 확인)이고 -ArgumentList · -Verb · 셸은 없다. 저장소 전체에서 Start-Process 는 이 두 파일뿐이다.
+    const launcher = readAgent('windows-app-launch.ps1');
+    const launcherCode = launcher.split('\n').filter((l) => !l.trim().startsWith('#')).join('\n');
+    expect((launcherCode.match(/Start-Process/g) ?? []).length).toBe(1);
+    expect(launcherCode).toContain('Start-Process -FilePath $raw -PassThru');
+    for (const forbidden of ['-ArgumentList', '-Verb', '-WorkingDirectory', 'ShellExecute', 'CreateProcess', 'Invoke-', 'iex', 'cmd.exe', '$args', 'param(']) {
+      expect(launcherCode).not.toContain(forbidden);
+    }
+    expect(launcherCode).toContain('$env:O4O_LAUNCH_PATH');
+    expect(launcherCode).toContain("\\.(exe|lnk)$'");
+    expect(launcherCode).toContain('Test-Path -LiteralPath $raw -PathType Leaf');
+    const startProcessFiles = readdirSync(AGENT_SRC).filter((f) => f.endsWith('.ps1') && readAgent(f).split('\n').filter((l) => !l.trim().startsWith('#')).join('\n').includes('Start-Process'));
+    expect(startProcessFiles.sort()).toEqual(['windows-app-launch.ps1', 'windows-browser-open.ps1']);
   });
 
   it('12. 프로그램을 종료 · 강제 종료할 수단이 없다', () => {
@@ -435,10 +451,12 @@ describe('11~14. 실행 · 종료 · 셸 · 파일 접근은 구현 자체가 �
     // `execFile` 은 허용, 맨 `exec(` · `spawn(` 은 불가 — 앞 글자를 붙여 구분한다.
     expect(controlCode).not.toMatch(/[^A-Za-z]exec[(]/);
     expect(controlCode).not.toMatch(/[^A-Za-z]spawn[(]/);
-    // (c) 실행 대상은 저장소에 체크인된 .ps1 다섯 개뿐이고, argv 는 상수다.
-    //     (BROWSER-CONTROL-V0 에서 등재 사이트 열기 1개, COMPUTER-USE-V0 에서 창 검사 · 창 입력 2개가 늘었다.)
+    // (c) 실행 대상은 저장소에 체크인된 .ps1 여섯 개뿐이고, argv 는 상수다.
+    //     (BROWSER-CONTROL-V0 에서 등재 사이트 열기 1개, COMPUTER-USE-V0 에서 창 검사 · 창 입력 2개,
+    //      WORK-TARGET-DISCOVERY-V0 에서 등재 프로그램 실행 1개가 늘었다.)
     const scripts = [...control.matchAll(/'([\w-]+\.ps1)'/g)].map((m) => m[1]).sort();
     expect(scripts).toEqual([
+      'windows-app-launch.ps1',
       'windows-browser-open.ps1',
       'windows-computer-input.ps1',
       'windows-computer-inspect.ps1',

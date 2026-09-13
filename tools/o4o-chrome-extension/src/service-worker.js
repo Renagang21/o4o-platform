@@ -28,7 +28,7 @@ import { transitionWorkspaceMode, initialWorkspaceState, DEFAULT_WORKSPACE_MODE 
 import { NativeBridgeClient } from './native-bridge-client.js';
 
 const bridge = new NativeBridgeClient({
-  onRequest: (message) => serveDomRequest(message),
+  onRequest: (message) => (String(message.type).startsWith('browser.target.') ? serveTargetRequest(message) : serveDomRequest(message)),
   onStateChange: (connected) => {
     log({ status: 'native_port', connected });
     if (!connected) scheduleReconnect();
@@ -123,6 +123,101 @@ async function serveDomRequest(message) {
     riskLevel: typeof reply.riskLevel === 'string' ? reply.riskLevel : null,
   });
   return { ...reply, active: resolved.active };
+}
+
+// ── Work Target Discovery V0 (WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §8~§14·§48·§56) ──
+//
+// agent 가 "이 site 가 이미 열려 있는가 → 있으면 그 탭을 앞으로 → 없으면 canonical URL 로 하나 연다" 를 묻는다.
+// 판정은 여기(확장)에서 끝나고 밖으로 나가는 것은 **개수 · active 여부 · path · 확장이 준 tabId** 뿐이다 —
+// 전체 탭의 제목·URL 목록은 host 로도 cloud 로도 나가지 않는다(§48). 다른 탭은 닫거나 옮기지 않는다(§56).
+
+const TARGET_TAB_SUMMARY_MAX = 10;
+
+/** 등재 site 의 탭들. URL 은 siteId 판정과 path 추출에만 쓴다. */
+async function siteTabs(siteId) {
+  const all = await chrome.tabs.query({});
+  return all.filter((t) => t.url && siteIdForUrl(t.url) === siteId);
+}
+
+function tabSummary(t, activeTabId) {
+  let path = '/';
+  try { path = new URL(t.url).pathname.slice(0, 200); } catch { /* keep default */ }
+  return {
+    tabId: t.id,
+    windowId: t.windowId,
+    active: t.id === activeTabId,
+    path,
+    // Chrome 121+ 가 준다. 없으면 0 — agent 는 "최근" 판정을 건너뛴다.
+    lastAccessed: typeof t.lastAccessed === 'number' ? Math.trunc(t.lastAccessed) : 0,
+  };
+}
+
+async function waitTabComplete(tabId, timeoutMs = 8000) {
+  const started = Date.now();
+  while (Date.now() - started < timeoutMs) {
+    try {
+      const t = await chrome.tabs.get(tabId);
+      if (t.status === 'complete') return t;
+    } catch {
+      return null;
+    }
+    await new Promise((r) => setTimeout(r, 150));
+  }
+  try { return await chrome.tabs.get(tabId); } catch { return null; }
+}
+
+async function serveTargetRequest(message) {
+  const payload = message.payload || {};
+  const siteId = typeof payload.siteId === 'string' ? payload.siteId : null;
+  const site = siteId ? findBrowserSite(siteId) : null;
+  if (!site) return { ok: false, errorCode: NATIVE_BRIDGE_ERROR.DOM_SITE_NOT_ALLOWED };
+  if (!(await hasSitePermission(siteId))) return { ok: false, errorCode: NATIVE_BRIDGE_ERROR.DOM_PERMISSION_REQUIRED };
+  const kind = message.type.replace(/^browser[.]target[.]/, '');
+  const [activeTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  const activeTabId = activeTab ? activeTab.id : -1;
+
+  if (kind === 'discover') {
+    const tabs = await siteTabs(siteId);
+    const summary = tabs.map((t) => tabSummary(t, activeTabId)).slice(0, TARGET_TAB_SUMMARY_MAX);
+    log({ status: 'target_discover', siteId, tabCount: tabs.length });
+    return { ok: true, siteId, tabCount: tabs.length, tabs: summary };
+  }
+
+  if (kind === 'activate') {
+    const tabId = Number.isInteger(payload.tabId) ? payload.tabId : null;
+    if (tabId === null) return { ok: false, errorCode: NATIVE_BRIDGE_ERROR.DOM_TAB_NOT_FOUND };
+    let tab;
+    try { tab = await chrome.tabs.get(tabId); } catch { tab = null; }
+    // 확장이 방금 discover 로 준 id 라도 다시 등재 site 인지 확인한다 — 다른 site 탭을 앞으로 보내는 통로가 없다.
+    if (!tab || !tab.url || siteIdForUrl(tab.url) !== siteId) return { ok: false, errorCode: NATIVE_BRIDGE_ERROR.DOM_TAB_NOT_FOUND };
+    try {
+      const win = await chrome.windows.get(tab.windowId);
+      if (win.state === 'minimized') await chrome.windows.update(tab.windowId, { state: 'normal' });
+      await chrome.windows.update(tab.windowId, { focused: true });
+      await chrome.tabs.update(tabId, { active: true });
+    } catch {
+      log({ status: 'target_activate_failed', siteId });
+      return { ok: false, errorCode: NATIVE_BRIDGE_ERROR.DOM_TAB_NOT_FOUND };
+    }
+    log({ status: 'target_activate', siteId });
+    return { ok: true, siteId, activated: true, ...tabSummary({ ...tab, id: tabId }, tabId) };
+  }
+
+  if (kind === 'open') {
+    // URL 은 확장 자신의 등재부 상수(site.url)다. payload 의 어떤 값도 URL 이 되지 않는다(§13·§14).
+    let created;
+    try {
+      created = await chrome.tabs.create({ url: site.url, active: true });
+      await chrome.windows.update(created.windowId, { focused: true });
+    } catch {
+      log({ status: 'target_open_failed', siteId });
+      return { ok: false, errorCode: NATIVE_BRIDGE_ERROR.DOM_TAB_NOT_FOUND };
+    }
+    const settled = await waitTabComplete(created.id);
+    log({ status: 'target_open', siteId });
+    return { ok: true, siteId, opened: true, ...tabSummary({ ...(settled || created), id: created.id, url: (settled || created).url || site.url }, created.id) };
+  }
+  return { ok: false, errorCode: NATIVE_BRIDGE_ERROR.BAD_MESSAGE };
 }
 
 // 화면 모드 상태는 확장 런타임 메모리에만 둔다(§57 — 영속 선호 불요).

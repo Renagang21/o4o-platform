@@ -46,6 +46,8 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CENSUS_SCRIPT = path.join(HERE, 'windows-window-census.ps1');
 const ACTIVATE_SCRIPT = path.join(HERE, 'windows-window-activate.ps1');
 const BROWSER_OPEN_SCRIPT = path.join(HERE, 'windows-browser-open.ps1');
+// WORK-TARGET-DISCOVERY-V0 §26·§27 — 등재 실행 파일/바로가기 하나를 인자 없이 시작하는 여섯 번째 스크립트.
+const APP_LAUNCH_SCRIPT = path.join(HERE, 'windows-app-launch.ps1');
 // COMPUTER-USE-V0 — 아래 "Computer Use V0" 절 참조. 상수는 여기 한곳에 모아 둔다.
 const COMPUTER_INSPECT_SCRIPT = path.join(HERE, 'windows-computer-inspect.ps1');
 const COMPUTER_INPUT_SCRIPT = path.join(HERE, 'windows-computer-input.ps1');
@@ -238,6 +240,34 @@ export async function openRegisteredSiteUrl(url) {
   const parsed = parseJson(raw);
   if (!parsed || parsed.opened !== true) return { opened: false, browserType: null };
   return { opened: true, browserType: browserTypeFromProgId(parsed.progId) };
+}
+
+// ─── Work Target Discovery V0 (WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §22·§26·§27) ─────
+
+/** 등재부 launch.path 형식 — 절대 경로 · .exe/.lnk · 공백/따옴표/제어문자 없음. 스크립트가 같은 규칙을 한 번 더 본다. */
+const LAUNCH_PATH_RE = /^[A-Za-z]:\\[^"'<>|?*\r\n\t]+\.(exe|lnk)$/;
+
+/**
+ * 등재 앱을 시작한다. 입력은 **등재부 항목 자체**다 — 경로 문자열을 따로 받지 않는다. `launchAllowed`
+ * 와 `launch.path` 가 모두 등재부에 있어야 하고, 형식 검사를 지나야 스크립트가 불린다.
+ * 반환: `{ launched, reason? }`. 실행 성공 ≠ 준비 완료 — 창 발견 · foreground 는 호출자가 다시 확인한다(§28).
+ */
+export async function launchRegisteredApp(app) {
+  if (!app || app.launchAllowed !== true) return { launched: false, reason: 'LAUNCH_NOT_ALLOWED' };
+  const launch = app.launch;
+  if (!launch || typeof launch.path !== 'string' || !LAUNCH_PATH_RE.test(launch.path)) {
+    return { launched: false, reason: 'LAUNCH_NOT_ALLOWED' };
+  }
+  if (launch.kind !== 'executable' && launch.kind !== 'shortcut') return { launched: false, reason: 'LAUNCH_NOT_ALLOWED' };
+  let raw;
+  try {
+    raw = await runScript(APP_LAUNCH_SCRIPT, childEnv({ O4O_LAUNCH_PATH: launch.path }));
+  } catch {
+    return { launched: false, reason: 'LAUNCH_FAILED' };
+  }
+  const parsed = parseJson(raw);
+  if (!parsed || parsed.launched !== true) return { launched: false, reason: parsed?.reason === 'NOT_FOUND' ? 'NOT_FOUND' : 'LAUNCH_FAILED' };
+  return { launched: true };
 }
 
 // ─── Computer Use V0 (WO-O4O-COMPUTER-USE-V0) ───────────────────────────────

@@ -18,11 +18,11 @@ import logger from '../../utils/logger.js';
 import { AI_TOOL_NAMES, type VerifiedToolContext } from './ai-tool-contract.js';
 import { LOCAL_AGENT_ACTIONS, LOCAL_AGENT_ERROR } from '../local-agent/local-agent-protocol.js';
 import { resolveTargetDevice } from '../local-agent/local-agent-service.js';
-import { browserSiteDisplayName, isRegisteredBrowserSite } from '../local-agent/browser-site-registry.js';
+import { isRegisteredBrowserSite } from '../local-agent/browser-site-registry.js';
 import type { SafeDomElement } from '../local-agent/browser-dom-contract.js';
 import { issueDomCommand } from './browser-dom-executor.js';
-import { resolvePharmacyWebSite } from '../local-agent/pharmacy-web-core.js';
-import { detectRegisteredSite } from './ai-tool-router.js';
+import { resolveWorkTarget, type WorkTargetRef } from './work-target-resolver.js';
+import { issueTargetPrepare, type WorkTargetOutcome } from './work-target-executor.js';
 import {
   WORK_AGENT_ERROR,
   WORK_LOOP_LIMITS,
@@ -212,12 +212,15 @@ export interface WorkAgentRunResult {
   history: WorkStepRecord[];
   /** 사용자에게 보여줄 문장(약 확정 · 페이지 텍스트 인용 없음). */
   message: string;
+  /** WORK-TARGET-DISCOVERY-V0 §33·§54 — 대상 준비 결과(재사용/열림/사용자 요청). 조사 전이면 null. */
+  target: WorkTargetOutcome | null;
 }
 
-/** 문장 또는 힌트에서 등재 site 를 정한다. 별칭은 site 축 + 약국 웹 등재부 것을 재사용한다(§29). */
+/** 문장 또는 힌트에서 등재 site 를 정한다(V0 호환 — browser 대상만). 공통 해석은 `resolveWorkTarget`. */
 export function resolveWorkSite(request: string, targetHint?: string): string | null {
-  if (targetHint && isRegisteredBrowserSite(targetHint)) return targetHint;
-  return detectRegisteredSite(request) ?? resolvePharmacyWebSite(request);
+  if (targetHint && !isRegisteredBrowserSite(targetHint)) return null;
+  const t = resolveWorkTarget(request, targetHint);
+  return t && t.targetType === 'browser_site' ? t.targetId : null;
 }
 
 export async function runWorkAgent(
@@ -231,15 +234,18 @@ export async function runWorkAgent(
   const imageCheck = validateWorkImageInput(input.image);
   const finishNoState = (errorCode: string, message: string, progress: WorkProgress = 'failed'): WorkAgentRunResult => ({
     ok: false, errorCode, goal: { ...goal, status: progress === 'needs_user' ? 'waiting_for_user' : 'stopped' }, siteId: null, displayName: '해당 사이트',
-    progress, takeover: null, neededInput: null, stepCount: 0, aiPlanCount: 0, path: null, history: [], message,
+    progress, takeover: null, neededInput: null, stepCount: 0, aiPlanCount: 0, path: null, history: [], message, target: null,
   });
   if (!isValidWorkGoalRequest(goal.request)) return finishNoState(WORK_AGENT_ERROR.GOAL_INVALID, '무엇을 하려는지 한 문장으로 알려 주세요.', 'needs_user');
   if (!imageCheck.ok) return finishNoState(WORK_AGENT_ERROR.IMAGE_INVALID, 'JPEG · PNG · WebP 이미지만 첨부할 수 있습니다(최대 10MB).', 'needs_user');
-  const siteId = resolveWorkSite(goal.request, input.targetHint);
-  if (!siteId) return finishNoState(WORK_AGENT_ERROR.SITE_UNRESOLVED, '어느 사이트에서 할 일인지 알려 주세요(예: 약학정보원에서 …).', 'needs_user');
+  // WORK-TARGET-DISCOVERY-V0 §6·§34 — 어디서 할 일인지(등재 사이트 또는 등재 프로그램)를 먼저 정한다. 못 정하면 묻는다.
+  const targetRef: WorkTargetRef | null = resolveWorkTarget(goal.request, input.targetHint);
+  if (!targetRef) return finishNoState(WORK_AGENT_ERROR.SITE_UNRESOLVED, '어느 사이트나 프로그램에서 할 일인지 알려 주세요(예: 약학정보원에서 …).', 'needs_user');
+  const siteId = targetRef.targetId;
   if (input.targetHint) goal.targetHint = siteId;
 
-  const displayName = browserSiteDisplayName(siteId);
+  const displayName = targetRef.displayName;
+  let targetOutcome: WorkTargetOutcome | null = null;
   const state: WorkAgentState = createWorkAgentState(goal, siteId);
   const image = imageCheck.image;
   const inputMode: 'text' | 'text+image' = image ? 'text+image' : 'text';
@@ -258,7 +264,8 @@ export async function runWorkAgent(
       ok: state.progress === 'completed' || state.progress === 'needs_user' || state.progress === 'progress',
       goal, siteId, displayName, progress: state.progress, takeover: state.takeover, neededInput,
       stepCount: state.stepCount, aiPlanCount: state.aiPlanCount, path: state.observation?.path ?? null, history: state.history,
-      message: renderWorkAgentMessage(state, displayName, neededInput),
+      message: renderWorkAgentMessage(state, displayName, neededInput, targetOutcome),
+      target: targetOutcome,
     };
   };
   const takeover = (reason: TakeoverReason, progress: WorkProgress): WorkAgentRunResult => {
@@ -279,6 +286,21 @@ export async function runWorkAgent(
     return r;
   }
   deviceId = resolution.device.id;
+
+  // ── Target Discovery / Activation (§3·§34·§35) — 관찰 · Planner 전에 대상을 준비한다. 행동 예산을 쓰지 않는다.
+  //    이미 열려 있으면 그 탭/창을 앞으로, 없으면 등재 방법으로 열고, 그래도 안 되면 사용자에게 넘긴다. 준비되지 않은 대상에
+  //    DOM inspect 를 반복하지 않는다.
+  targetOutcome = await issueTargetPrepare(dataSource, ctx, deviceId, tool, targetRef);
+  if (targetOutcome.state !== 'ready') {
+    // 사용자 요청(열어 주세요 · 로그인 · 여러 탭 중 선택) 또는 준비 실패 — 둘 다 loop 를 시작하지 않는다.
+    const r = takeover('site_not_ready', 'needs_user');
+    r.errorCode = targetOutcome.errorCode ?? WORK_AGENT_ERROR.SITE_NOT_READY;
+    return r;
+  }
+  if (targetRef.targetType === 'windows_app') {
+    // §37 — 프로그램 내부 자동화(UIA)는 후속 트랙. 여기서는 찾기 · 활성화 · 실행까지 하고 사용자에게 넘긴다.
+    return takeover('unsupported_control', 'needs_user');
+  }
 
   const budgetLeft = () => WORK_LOOP_LIMITS.maxSteps - state.stepCount;
   const overTime = () => Date.now() - state.startedAt > WORK_LOOP_LIMITS.maxDurationMs;
@@ -500,9 +522,33 @@ const TAKEOVER_LINE: Record<TakeoverReason, string> = {
   planner_unavailable: '다음 행동을 정하지 못해 멈췄습니다. 현재 화면에서 직접 이어서 하세요.',
 };
 
-export function renderWorkAgentMessage(state: WorkAgentState, displayName: string, neededInput: string | null): string {
+/** 대상 준비 결과 한 줄(§54). 사용자가 확인할 수 있는 사실만 — 경로 · 탭 제목 · 실행 경로는 없다. */
+export function renderTargetLine(t: WorkTargetOutcome | null): string {
+  if (!t) return '';
+  const unit = t.targetType === 'browser_site' ? '탭' : '창';
+  if (t.state === 'ready') {
+    if (t.reusedExisting) return t.targetType === 'browser_site' ? `${t.displayName} 탭이 이미 열려 있어 그 탭을 사용합니다.` : `${t.displayName} 창을 찾아 앞으로 가져왔습니다.`;
+    if (t.openedByO4O) return t.targetType === 'browser_site' ? `${t.displayName} 탭이 없어 새로 열었습니다.` : `${t.displayName}이(가) 실행되어 있지 않아 실행했습니다.`;
+    return `${t.displayName} 준비됨.`;
+  }
+  if (t.reason === 'multiple_tabs' || t.reason === 'multiple_windows') return `${t.displayName} ${unit}이 여러 개라 하나를 정하지 못했습니다. 사용할 ${unit}을 앞으로 가져온 뒤 다시 요청하세요.`;
+  if (t.reason === 'extension_not_connected') return `${t.displayName} 탭을 확인하려면 이 PC 의 O4O Chrome 확장이 연결되어 있어야 합니다.`;
+  if (t.reason === 'permission_required') return `${t.displayName} 사이트 권한을 Chrome 확장에서 허용한 뒤 다시 요청하세요.`;
+  if (t.targetType === 'windows_app') return `${t.displayName}이(가) 실행되어 있지 않고 O4O 가 열 수 없습니다. 프로그램을 실행해 주세요. 로그인이 필요하면 로그인까지 완료해 주세요.`;
+  return `${t.displayName} 탭을 준비하지 못했습니다. Chrome 에서 ${t.displayName}을(를) 열어 둔 뒤 다시 요청하세요.`;
+}
+
+export function renderWorkAgentMessage(state: WorkAgentState, displayName: string, neededInput: string | null, target: WorkTargetOutcome | null = null): string {
   const actions = state.history.filter((h) => h.status === 'success' && !['inspect', 'find', 'read_text', 'read_table'].includes(h.action.kind)).length;
-  const head = `${displayName} 에서 ${state.history.filter((h) => h.status === 'success').length}단계(입력·클릭 ${actions}회) 를 수행했습니다.`;
+  const targetLine = renderTargetLine(target);
+  // 대상 준비 단계에서 끝난 경우 — 행동 0 단계를 "수행했습니다" 로 말하지 않는다.
+  if (target && target.state !== 'ready' && state.takeover?.reason === 'site_not_ready') {
+    return `${targetLine} Chrome 의 현재 화면은 그대로 두었습니다.`.trim();
+  }
+  if (target && target.targetType === 'windows_app' && state.takeover?.reason === 'unsupported_control') {
+    return `${targetLine} 프로그램 안의 작업은 아직 O4O 가 대신하지 않습니다 — 화면에서 직접 이어서 하세요.`;
+  }
+  const head = `${targetLine ? `${targetLine} ` : ''}${displayName} 에서 ${state.history.filter((h) => h.status === 'success').length}단계(입력·클릭 ${actions}회) 를 수행했습니다.`;
   if (state.progress === 'completed' && !state.takeover) return `${head} 목적을 이룬 것으로 판단해 멈췄습니다. Chrome 화면에서 결과를 확인하세요.`;
   if (state.takeover) {
     const line = TAKEOVER_LINE[state.takeover.reason];

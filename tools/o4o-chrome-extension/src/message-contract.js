@@ -48,6 +48,11 @@ export const NATIVE_BRIDGE_MESSAGE_TYPES = Object.freeze([
   'browser.dom.select_option',
   'browser.dom.click',
   'browser.dom.read_table',
+  // ── Work Target Discovery V0 (WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §8~§14) — agent→host→확장 방향.
+  //    payload 는 siteId(등재)와 확장 자신이 준 tabId 뿐이다. URL · 검색어 · 임의 탭 선택 칸은 없다.
+  'browser.target.discover', // 등재 site 의 열린 탭 요약(개수 · active · path) — 전체 탭 census 가 아니다(§48)
+  'browser.target.activate', // 그 site 의 탭 하나를 앞으로(창 focus + 탭 active) — 새 탭 0(§9·§12)
+  'browser.target.open', // 등재 canonical URL 로 탭 하나를 연다(§13·§14)
 ]);
 
 /** agent → 확장 방향으로만 흐르는 type(DOM 축). 확장이 host 로 **요청**할 수 있는 type 이 아니다. */
@@ -56,6 +61,18 @@ export const BRIDGE_DOM_MESSAGE_TYPES = Object.freeze(
 );
 export function isDomBridgeMessageType(type) {
   return BRIDGE_DOM_MESSAGE_TYPES.includes(type);
+}
+
+/** agent → 확장 방향으로만 흐르는 type(target 축). WORK-TARGET-DISCOVERY-V0 §8·§12·§13. */
+export const BRIDGE_TARGET_MESSAGE_TYPES = Object.freeze(
+  NATIVE_BRIDGE_MESSAGE_TYPES.filter((t) => t.startsWith('browser.target.')),
+);
+export function isTargetBridgeMessageType(type) {
+  return BRIDGE_TARGET_MESSAGE_TYPES.includes(type);
+}
+/** agent → 확장 **요청** 으로만 쓰이는 type 전부(DOM + target). 확장이 host 로 요청할 수 있는 type 이 아니다. */
+export function isAgentRequestMessageType(type) {
+  return isDomBridgeMessageType(type) || isTargetBridgeMessageType(type);
 }
 
 /** 화면 모드 (§15). 이번 V0 은 둘뿐. dual 은 future contract 로만 열어 둔다(§16). */

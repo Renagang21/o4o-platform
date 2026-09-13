@@ -45,6 +45,7 @@ import {
 } from './computer-use-limits.mjs';
 import { LocalMetaRepository, LocalSettingsRepository, localDbHealth, LocalDbError } from './local-db.mjs';
 import { backupSummary } from './local-db-backup.mjs';
+import { prepareTarget, resolveRegisteredTarget } from './work-target.mjs';
 import {
   DOM_RESULT_MAX_BYTES,
   trimDomResult,
@@ -82,6 +83,9 @@ export const ACTIONS = {
   DOM_CLICK: 'local.browser.dom.click',
   DOM_READ_TABLE: 'local.browser.dom.read_table',
   // WO-O4O-LOCAL-DATA-SQLITE-V0 §35 — 최소 안전 데이터 tool 3개.
+  // WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §3·§33 — `local.target.prepare#<targetId>`(등재 siteId 또는 appId).
+  //   있으면 재사용·활성화 → 없으면 등재 방법으로 열기 → 그래도 안 되면 사용자 요청. 인자 없음.
+  TARGET_PREPARE: 'local.target.prepare',
   DATA_HEALTH: 'local.data.health',
   DATA_GET_META: 'local.data.get_meta',
   DATA_SET_SETTING: 'local.data.set_setting',
@@ -723,6 +727,20 @@ export async function runAction(action, context, args) {
     }
   }
 
+  // Work Target Discovery V0: `local.target.prepare#<targetId>`. 등재 밖 targetId 는 아무것도 조사하지 않는다.
+  // 인자는 받지 않는다 — URL · 경로 · 탭 · 창 제목을 서버가 지정하는 통로가 없다(§13·§22·§27).
+  if (base === ACTIONS.TARGET_PREPARE) {
+    if (appId === undefined || !resolveRegisteredTarget(appId)) {
+      return { status: 'denied', errorCode: 'WORK_TARGET_NOT_REGISTERED' };
+    }
+    if (args !== undefined && !(args && typeof args === 'object' && !Array.isArray(args) && Object.keys(args).length === 0)) {
+      return { status: 'denied', errorCode: 'WORK_TARGET_NOT_REGISTERED' }; // 인자가 있는 형태는 이 action 이 아니다
+    }
+    const target = await prepareTarget(appId, { bridge: context && context.bridge });
+    // 준비 실패도 명령 실패가 아니라 "대상 상태" 다 — 서버 runtime 이 state/errorCode 로 판단한다(§35).
+    return { status: target.state === 'failed' ? 'failed' : 'success', errorCode: target.errorCode, data: target };
+  }
+
   // Local Data Runtime V0: `local.data.*`. appId/siteId 축이 아니다 — `#...` 형태를 허용하지 않는다.
   // 임의 SQL 이 아니라 등록된 tool → repository → 고정 쿼리로만 로컬 DB 에 닿는다(§36).
   const dataHandler = appId === undefined ? DATA_HANDLERS[base] : undefined;
@@ -763,6 +781,7 @@ export function listAllowedActions() {
     ...Object.keys(SITE_HANDLERS),
     ...Object.keys(COMPUTER_HANDLERS),
     ...Object.keys(DATA_HANDLERS),
+    ACTIONS.TARGET_PREPARE,
     ...Object.keys(DOM_HANDLERS),
   ];
 }

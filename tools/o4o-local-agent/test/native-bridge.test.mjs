@@ -73,7 +73,7 @@ test('malformed envelopes rejected (null/array/bad requestId/array payload)', ()
   );
 });
 
-test('exactly twelve message types allowed — bridge 4 + DOM 8, no more (§27 · DOM-CONTROL §38)', () => {
+test('exactly fifteen message types allowed — bridge 4 + DOM 8 + target 3, no more (§27 · DOM-CONTROL §38 · TARGET-DISCOVERY §8~§14)', () => {
   assert.deepEqual([...agentContract.NATIVE_BRIDGE_MESSAGE_TYPES].sort(), [
     'browser.dom.click',
     'browser.dom.find',
@@ -84,10 +84,19 @@ test('exactly twelve message types allowed — bridge 4 + DOM 8, no more (§27 �
     'browser.dom.select_option',
     'browser.dom.set_input',
     'browser.get_context',
+    'browser.target.activate',
+    'browser.target.discover',
+    'browser.target.open',
     'extension.hello',
     'extension.status',
     'workspace.set_mode',
   ]);
+  assert.deepEqual([...agentContract.BRIDGE_TARGET_MESSAGE_TYPES], [...extContract.BRIDGE_TARGET_MESSAGE_TYPES]);
+  // target type 도 확장→host 방향 요청은 서비스되지 않는다(agent→확장 방향만).
+  assert.equal(
+    host.handleBridgeMessage({ version: 1, requestId: 'r', type: 'browser.target.open', payload: {} }, { hasAgentCredentials: () => true }).payload.reason,
+    'AGENT_TO_EXTENSION_ONLY',
+  );
   assert.deepEqual([...agentContract.BRIDGE_DOM_MESSAGE_TYPES], [...extContract.BRIDGE_DOM_MESSAGE_TYPES]);
   // DOM type 이 확장→host 방향으로 요청되면 host 는 서비스하지 않는다(agent→확장 방향만).
   const r = host.handleBridgeMessage(
