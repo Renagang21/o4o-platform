@@ -353,3 +353,82 @@ describe('18. 서버 · agent 이중 방어', () => {
     }
   });
 });
+
+// ─── Local Data Runtime V1 (WO-O4O-LOCAL-DATA-RUNTIME-AND-SCHEMA-EVOLUTION-V1 §29·§30·§58·§59·§63) ──
+
+describe('V1. health 확장 · 실패 원인 구분 · agent 경계', () => {
+  const agentSrcDir = join(__dirname, '..', '..', '..', '..', 'tools', 'o4o-local-agent', 'src');
+  const readAgentSrc = (f: string) =>
+    readFileSync(join(agentSrcDir, f), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, ' ')
+      .split('\n')
+      .map((l) => l.replace(/\/\/.*$/, ''))
+      .join('\n');
+
+  it('V1-1. pickSafeDataInfo — ready · latestMigration · pendingMigrations · integrityStatus · backupCount · lastBackupAt 은 통과, 경로·파일명·행은 통과하지 못한다', () => {
+    const safe = pickSafeDataInfo({
+      ok: true, ready: true, schemaVersion: 2, latestMigration: 2, pendingMigrations: 0, migrationStatus: 'current',
+      integrityStatus: 'ok', backupCount: 3, lastBackupAt: '2026-09-13T01:02:03.000Z',
+      dbPath: 'C:\\Users\\x\\local.db', backups: ['local-20260913T010203-manual.db'], datasets: [{ name: 'product_list' }], rows: [{ a: 1 }],
+      appliedNow: [2], durationMs: 12,
+    });
+    expect(safe).toEqual({
+      ok: true, ready: true, schemaVersion: 2, latestMigration: 2, pendingMigrations: 0, migrationStatus: 'current',
+      integrityStatus: 'ok', backupCount: 3, lastBackupAt: '2026-09-13T01:02:03.000Z',
+    });
+    // enum 밖 · 형식 밖 값은 버린다
+    expect(pickSafeDataInfo({ integrityStatus: 'C:\\x', lastBackupAt: 'yesterday', migrationStatus: 'too_new' })).toEqual({ migrationStatus: 'too_new' });
+  });
+
+  it('V1-2. bootstrap 실패 코드(MIGRATION_FAILED · SCHEMA_TOO_NEW · INTEGRITY_FAILED · BACKUP_FAILED · NOT_READY)는 각각 안전 문장으로 렌더된다 — 자동 초기화 제안 0', () => {
+    const render = (errorCode: string) =>
+      renderToolContext({ ok: true, tool: AI_TOOL_NAMES.DATA_LOCAL_HEALTH, data: { available: false, errorCode } }) ?? '';
+    expect(render(LOCAL_AGENT_ERROR.DATA_DB_MIGRATION_FAILED)).toContain('업데이트가 실패');
+    expect(render(LOCAL_AGENT_ERROR.DATA_DB_MIGRATION_FAILED)).toContain('백업은 보존');
+    expect(render(LOCAL_AGENT_ERROR.DATA_DB_BACKUP_FAILED)).toContain('업데이트가 실패');
+    expect(render(LOCAL_AGENT_ERROR.DATA_DB_SCHEMA_TOO_NEW)).toContain('업데이트해야');
+    expect(render(LOCAL_AGENT_ERROR.DATA_DB_INTEGRITY_FAILED)).toContain('초기화하지 않았');
+    expect(render(LOCAL_AGENT_ERROR.DATA_DB_NOT_READY)).toContain('사용할 수 없습니다');
+    for (const code of Object.values(LOCAL_AGENT_ERROR).filter((c) => c.startsWith('LOCAL_DB_'))) {
+      const text = render(code);
+      expect(text).not.toMatch(/초기화하세요|삭제하세요|local\.db|C:\\/);
+    }
+    const healthy = renderToolContext({
+      ok: true, tool: AI_TOOL_NAMES.DATA_LOCAL_HEALTH,
+      data: { available: true, ok: true, schemaVersion: 2, migrationStatus: 'current', backupCount: 2, lastBackupAt: '2026-09-13T01:02:03.000Z' },
+    }) ?? '';
+    expect(healthy).toContain('스키마 버전 2');
+    expect(healthy).toContain('백업 2개 (최근 2026-09-13)');
+  });
+
+  it('V1-3. agent 경계 — migration 은 체크인 코드뿐 · 임의 SQL/파일 통로 0 · CLI 모듈은 명령 경로에서 닿지 않는다 · 백업은 자기 디렉터리만 · 민감 스키마 0', () => {
+    const localDb = readAgentSrc('local-db.mjs');
+    expect(localDb).toContain('export const MIGRATIONS = Object.freeze([');
+    expect(localDb).toContain("name: 'core_v0'");
+    expect(localDb).toContain("name: 'datasets_v1'");
+    expect(localDb).toContain('compareMigrationHistory');
+    expect(localDb).toContain("PRAGMA quick_check");
+    expect(localDb).toContain("'VACUUM INTO ?'");
+    for (const forbidden of ['readFileSync', 'readdirSync', 'fetch(', 'http', 'execute_sql', 'patient', 'prescription', 'insurance', 'resident', 'password', 'cookie', 'accessToken']) {
+      expect(localDb).not.toContain(forbidden);
+    }
+    expect((localDb.match(/new DatabaseSync\(/g) ?? []).length).toBe(1);
+    const backup = readAgentSrc('local-db-backup.mjs');
+    expect(backup).toContain("path.join(agentHome(), 'backups')");
+    expect(backup).toContain('pre-restore');
+    for (const forbidden of ['fetch(', 'http', 'process.argv', 'child_process']) expect(backup).not.toContain(forbidden);
+    const handlers = readAgentSrc('handlers.mjs');
+    expect(handlers).not.toContain('local-data-cli');
+    expect(handlers).not.toContain("'node:fs'");
+    // 서버 계약의 데이터 action 은 여전히 3개 — import/export/backup 은 cloud 명령이 아니라 로컬 CLI 다(§63).
+    expect(Object.values(LOCAL_AGENT_ACTIONS).filter((a) => a.startsWith('local.data.'))).toEqual([
+      LOCAL_AGENT_ACTIONS.DATA_HEALTH, LOCAL_AGENT_ACTIONS.DATA_GET_META, LOCAL_AGENT_ACTIONS.DATA_SET_SETTING,
+    ]);
+    const cli = readAgentSrc('local-data-cli.mjs');
+    expect(cli).toContain('args.file');
+    expect(cli).not.toContain('fetch(');
+    // 서버 코드 어디에도 CSV 원문을 명령 인자로 싣는 통로가 없다(§46 local first).
+    const service = readFileSync(join(__dirname, '..', 'services', 'local-agent', 'local-agent-service.ts'), 'utf8');
+    expect(service).not.toContain('csvText');
+  });
+});

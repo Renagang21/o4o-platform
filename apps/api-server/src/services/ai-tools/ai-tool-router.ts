@@ -1520,8 +1520,18 @@ function renderDataFailure(data: Record<string, unknown>): string {
   if (code === LOCAL_AGENT_ERROR.TIMEOUT) {
     return DATA_HEADER + '- 이 PC의 에이전트가 제한 시간 안에 응답하지 않았습니다.';
   }
-  if (code === LOCAL_AGENT_ERROR.DATA_DB_NOT_AVAILABLE) {
+  if (code === LOCAL_AGENT_ERROR.DATA_DB_NOT_AVAILABLE || code === LOCAL_AGENT_ERROR.DATA_DB_NOT_READY) {
     return DATA_HEADER + '- 이 PC의 로컬 데이터 저장소를 사용할 수 없습니다.';
+  }
+  // LOCAL-DATA-RUNTIME V1 §17·§20·§66·§67 — 실패 원인을 구분해 안내한다. 자동 초기화·복구를 제안하지 않는다.
+  if (code === LOCAL_AGENT_ERROR.DATA_DB_MIGRATION_FAILED || code === LOCAL_AGENT_ERROR.DATA_DB_BACKUP_FAILED) {
+    return DATA_HEADER + '- 이 PC의 로컬 데이터 업데이트가 실패해 로컬 데이터 기능을 시작할 수 없습니다. 기존 데이터와 백업은 보존되어 있습니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.DATA_DB_SCHEMA_TOO_NEW) {
+    return DATA_HEADER + '- 이 PC의 로컬 데이터가 현재 에이전트보다 새로운 버전입니다. 에이전트를 업데이트해야 합니다.';
+  }
+  if (code === LOCAL_AGENT_ERROR.DATA_DB_INTEGRITY_FAILED) {
+    return DATA_HEADER + '- 이 PC의 로컬 데이터 파일 검사에 실패했습니다. 데이터를 자동으로 초기화하지 않았으며 복구 절차가 필요합니다.';
   }
   if (code === LOCAL_AGENT_ERROR.DATA_KEY_NOT_ALLOWED) {
     return DATA_HEADER + '- 요청한 항목은 조회·저장이 허용되지 않은 키입니다.';
@@ -1550,12 +1560,21 @@ function renderDataHealth(data: Record<string, unknown>): string {
         ? ' 스키마 갱신이 필요합니다.'
         : data.migrationStatus === 'failed'
           ? ' 스키마 갱신에 실패했습니다.'
-          : '';
+          : data.migrationStatus === 'too_new'
+            ? ' 에이전트보다 새로운 스키마입니다.'
+            : '';
+  // V1 §29 — 백업 요약(개수·최근 시각). 경로·파일명은 data 에 애초에 없다.
+  const backups =
+    typeof data.backupCount === 'number'
+      ? data.backupCount > 0
+        ? ` 백업 ${data.backupCount}개${typeof data.lastBackupAt === 'string' ? ` (최근 ${data.lastBackupAt.slice(0, 10)})` : ''}.`
+        : ' 백업 없음.'
+      : '';
   return (
     DATA_HEADER +
     (ok
-      ? `- 로컬 데이터 저장소가 정상입니다.${ver}${status}`
-      : `- 로컬 데이터 저장소에 문제가 있습니다.${ver}${status}`)
+      ? `- 로컬 데이터 저장소가 정상입니다.${ver}${status}${backups}`
+      : `- 로컬 데이터 저장소에 문제가 있습니다.${ver}${status}${backups}`)
   );
 }
 

@@ -494,8 +494,19 @@ export const LOCAL_AGENT_ERROR = {
   DATA_INVALID_ARGUMENT: 'LOCAL_DATA_INVALID_ARGUMENT',
   /** allowlist 밖 meta/setting 키(§10·§26). 값 스키마 위반(INVALID_ARGUMENT)과 구분한다. */
   DATA_KEY_NOT_ALLOWED: 'LOCAL_DATA_KEY_NOT_ALLOWED',
-  /** 로컬 SQLite 를 열거나 마이그레이션하지 못했다. */
+  /** 로컬 SQLite 를 열거나 마이그레이션하지 못했다(원인 불명 · V0 호환). */
   DATA_DB_NOT_AVAILABLE: 'LOCAL_DB_NOT_AVAILABLE',
+  // ── Local Data Runtime V1 (WO-O4O-LOCAL-DATA-RUNTIME-AND-SCHEMA-EVOLUTION-V1 §17·§20·§58) ──
+  /** bootstrap 이 끝나지 않았거나 실패해 데이터 축이 닫혀 있다. */
+  DATA_DB_NOT_READY: 'LOCAL_DB_NOT_READY',
+  /** startup migration 이 실패해 롤백됐다(백업은 남아 있다). */
+  DATA_DB_MIGRATION_FAILED: 'LOCAL_DB_MIGRATION_FAILED',
+  /** 이 agent 보다 새로운 schema 의 DB — 내리지 않고 멈췄다. agent 업데이트가 필요하다. */
+  DATA_DB_SCHEMA_TOO_NEW: 'LOCAL_DB_SCHEMA_TOO_NEW',
+  /** quick_check 실패 — 파일 손상 의심. 자동 초기화하지 않는다. */
+  DATA_DB_INTEGRITY_FAILED: 'LOCAL_DB_INTEGRITY_FAILED',
+  /** migration 전 백업을 만들지 못해 migration 을 보류했다. */
+  DATA_DB_BACKUP_FAILED: 'LOCAL_DB_BACKUP_FAILED',
   /** setting 쓰기가 실패했다. */
   DATA_WRITE_FAILED: 'LOCAL_DATA_WRITE_FAILED',
 
@@ -718,10 +729,14 @@ export function pickSafeComputerInfo(data: unknown): Record<string, unknown> {
  * 키와 그 값(짧게 잘라)만, set_setting 은 키와 저장 여부만 남는다. `value` 원문은 남기지 않는다 —
  * get_meta 값조차 60자로 자른다(meta 는 버전·시각뿐이라 길 이유가 없다).
  */
-const SAFE_DATA_INFO_STRING_FIELDS: readonly string[] = Object.freeze(['key', 'value', 'migrationStatus']);
-const SAFE_DATA_INFO_BOOLEAN_FIELDS: readonly string[] = Object.freeze(['ok', 'saved']);
-const SAFE_DATA_INFO_NUMBER_FIELDS: readonly string[] = Object.freeze(['schemaVersion']);
-const SAFE_DATA_MIGRATION_STATUS: readonly string[] = Object.freeze(['current', 'behind', 'failed']);
+// LOCAL-DATA-RUNTIME V1 §29: health 에 ready · 최신/대기 migration · 무결성 · 백업 요약(개수·시각)이 더해졌다.
+// 여전히 경로 · 파일명 · 행 데이터는 없다 — 상태 enum · 정수 · ISO 시각뿐.
+const SAFE_DATA_INFO_STRING_FIELDS: readonly string[] = Object.freeze(['key', 'value', 'migrationStatus', 'integrityStatus', 'lastBackupAt']);
+const SAFE_DATA_INFO_BOOLEAN_FIELDS: readonly string[] = Object.freeze(['ok', 'saved', 'ready']);
+const SAFE_DATA_INFO_NUMBER_FIELDS: readonly string[] = Object.freeze(['schemaVersion', 'latestMigration', 'pendingMigrations', 'backupCount']);
+const SAFE_DATA_MIGRATION_STATUS: readonly string[] = Object.freeze(['current', 'behind', 'failed', 'too_new']);
+const SAFE_DATA_INTEGRITY_STATUS: readonly string[] = Object.freeze(['ok', 'failed', 'unknown']);
+const ISO_INSTANT_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/;
 
 export function pickSafeDataInfo(data: unknown): Record<string, unknown> {
   if (!data || typeof data !== 'object' || Array.isArray(data)) return {};
@@ -733,6 +748,8 @@ export function pickSafeDataInfo(data: unknown): Record<string, unknown> {
     // key 는 allowlist(meta 또는 setting)에 있는 것만 통과 — agent 가 임의 키 이름을 실어도 버린다.
     if (key === 'key' && !LOCAL_DATA_META_KEYS.includes(v) && !LOCAL_DATA_SETTING_KEYS.includes(v)) continue;
     if (key === 'migrationStatus' && !SAFE_DATA_MIGRATION_STATUS.includes(v)) continue;
+    if (key === 'integrityStatus' && !SAFE_DATA_INTEGRITY_STATUS.includes(v)) continue;
+    if (key === 'lastBackupAt' && !ISO_INSTANT_RE.test(v)) continue;
     out[key] = v.slice(0, 60);
   }
   for (const key of SAFE_DATA_INFO_BOOLEAN_FIELDS) {

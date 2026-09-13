@@ -57,6 +57,18 @@ const ALLOWED_ORIGINS = new Set([
   'https://www.k-cosmetics.site',
 ]);
 
+/** /health 의 localData 요약 — 허용 키만, 실패해도 창구는 산다. */
+function safeLocalDataSummary(fn) {
+  try {
+    const s = fn() ?? {};
+    const out = { ready: s.ready === true, schemaVersion: Number.isInteger(s.schemaVersion) ? s.schemaVersion : 0, backups: Number.isInteger(s.backups) ? s.backups : 0 };
+    if (typeof s.errorCode === 'string' && /^LOCAL_DB_[A-Z_]{1,40}$/.test(s.errorCode)) out.errorCode = s.errorCode;
+    return out;
+  } catch {
+    return { ready: false, schemaVersion: 0, backups: 0 };
+  }
+}
+
 /** nonce 유효 시간. 버튼을 누르고 왕복하는 데 필요한 시간이면 충분하다. */
 const NONCE_TTL_MS = 60 * 1000;
 /** 요청 본문 상한. 여기로 오는 것은 짧은 토큰 하나뿐이다. */
@@ -127,9 +139,10 @@ async function readJsonBody(req) {
  * @param {string} options.agentVersion
  * @param {() => boolean} options.isConnected  현재 연결 여부 (paired 상태)
  * @param {(grant: string) => Promise<{ ok: boolean, status?: string, code?: string }>} options.onPair
+ * @param {() => { ready: boolean, schemaVersion: number, backups: number }} [options.localDataSummary]  LOCAL-DATA-RUNTIME V1 §64 — 경로 없는 요약
  * @param {(message: string, extra?: unknown) => void} options.log
  */
-export function startLocalServer({ agentVersion, isConnected, onPair, log }) {
+export function startLocalServer({ agentVersion, isConnected, onPair, localDataSummary, log }) {
   const nonces = createNonceStore();
 
   const server = http.createServer((req, res) => {
@@ -174,6 +187,8 @@ export function startLocalServer({ agentVersion, isConnected, onPair, log }) {
           // 사용자 이름 · 경로 · IP · 설치 프로그램 목록 등은 담지 않는다 (V0 §21).
           connected: isConnected(),
           nonce: nonces.issue(),
+          // Local Data 준비 여부 · schema version · 백업 수(§64). 경로 · 파일명 · 행 데이터는 없다(§30).
+          ...(typeof localDataSummary === 'function' ? { localData: safeLocalDataSummary(localDataSummary) } : {}),
         },
         origin,
       );

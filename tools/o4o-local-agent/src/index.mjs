@@ -23,6 +23,8 @@
  */
 
 import { runAction, listAllowedActions, AGENT_VERSION, ACTIONS } from './handlers.mjs';
+import { bootstrapLocalDb, getLocalDbState } from './local-db.mjs';
+import { createBackup, backupSummary } from './local-db-backup.mjs';
 import { loadCredentials, saveCredentials, credentialsLocation } from './credentials.mjs';
 import { startLocalServer, LOCAL_AGENT_PORT } from './local-server.mjs';
 import { startBridgeRelay } from './bridge-relay.mjs';
@@ -169,10 +171,26 @@ async function commandRun() {
   log(`API: ${API_BASE}`);
   log(`자격증명 위치: ${credentialsLocation()}`);
 
+  // LOCAL-DATA-RUNTIME V1 §8·§16·§47: credentials 다음, 창구·relay 전에 로컬 DB 를 세운다.
+  // 없으면 만들고, 있으면 버전을 보고 필요한 migration 만(적용 전 백업) 적용한다. 사용자는 아무것도 하지 않는다.
+  // 실패는 ready 로 위장하지 않는다 — 데이터 축만 코드와 함께 닫히고, 브라우저 축은 그대로 돈다(§69).
+  const localData = bootstrapLocalDb({ log, backup: (db, reason) => createBackup(db, reason) });
+  if (localData.ready) {
+    const applied = localData.appliedNow?.length ? ` · migration ${localData.appliedNow.join(',')} 적용(백업 ${localData.backupStatus})` : '';
+    log(`Local Data 준비됨 · schema v${localData.schemaVersion}${applied} · 백업 ${backupSummary().count}개`);
+  } else {
+    log(`Local Data 업데이트 실패 (${localData.errorCode}) — 로컬 데이터 기능을 시작할 수 없습니다. 'node src/index.mjs data status' 로 확인하세요.`);
+  }
+
   await startLocalServer({
     agentVersion: AGENT_VERSION,
     isConnected: () => Boolean(state.creds),
     onPair: (grant) => submitPairingGrant(grant, state),
+    // /health 에 실리는 요약(§64) — 준비 여부 · schema version · 백업 수뿐. 경로 없음(§30).
+    localDataSummary: () => {
+      const s = getLocalDbState();
+      return { ready: s.ready === true, schemaVersion: Number(s.schemaVersion ?? 0), backups: backupSummary().count, ...(s.ready ? {} : { errorCode: s.errorCode }) };
+    },
     log,
   });
 
@@ -263,7 +281,14 @@ async function main() {
     await commandRun();
     return;
   }
-  console.error('사용법: node src/index.mjs run');
+  if (command === 'data') {
+    // LOCAL-DATA-RUNTIME V1: 로컬 전용 관리 명령(status · backup · backups · restore · import · export).
+    // 사용자 PC 콘솔에서만 — 서버 명령으로는 닿지 않는다(§63). 모듈은 필요할 때만 싣는다.
+    const { runDataCommand } = await import('./local-data-cli.mjs');
+    process.exitCode = await runDataCommand(process.argv.slice(3));
+    return;
+  }
+  console.error('사용법: node src/index.mjs run | data <status|backup|backups|restore|import|export>');
   process.exitCode = 1;
 }
 

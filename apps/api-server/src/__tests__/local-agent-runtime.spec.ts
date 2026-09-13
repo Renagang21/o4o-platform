@@ -588,6 +588,8 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
       './windows-window-control.mjs',
       './computer-use-limits.mjs',
       './local-db.mjs',
+      // LOCAL-DATA-RUNTIME V1: health 의 백업 요약(개수·최근 시각)만 — 이 모듈의 fs 는 자기 backups/ 디렉터리에 한정된다.
+      './local-db-backup.mjs',
       // BROWSER-DOM-CONTROL-V0: DOM 인자·결과 한도 사본(순수). 확장 통로(bridge relay)는 index.mjs 가
       // context 로 넘기므로 handler 는 net 모듈을 import 하지 않는다.
       './browser-dom-limits.mjs',

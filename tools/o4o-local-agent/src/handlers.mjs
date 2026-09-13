@@ -43,7 +43,8 @@ import {
   validateKeyArgs,
   validateTextArgs,
 } from './computer-use-limits.mjs';
-import { LocalMetaRepository, LocalSettingsRepository, localDbHealth } from './local-db.mjs';
+import { LocalMetaRepository, LocalSettingsRepository, localDbHealth, LocalDbError } from './local-db.mjs';
+import { backupSummary } from './local-db-backup.mjs';
 import {
   DOM_RESULT_MAX_BYTES,
   trimDomResult,
@@ -576,10 +577,13 @@ function isValidSettingValue(key, value) {
   return false;
 }
 
-/** `local.data.health` — 로컬 DB 열림/스키마/마이그레이션 상태(§38). 경로는 담지 않는다. */
+/**
+ * `local.data.health` — 로컬 DB 준비/스키마/마이그레이션/무결성/백업 상태(V0 §38 · V1 §29).
+ * 경로는 담지 않는다. bootstrap 이 실패한 상태면 그 코드(MIGRATION_FAILED · SCHEMA_TOO_NEW …)가 그대로 나간다(§17).
+ */
 function dataHealth() {
-  const h = localDbHealth();
-  if (!h.ok) return { status: 'failed', errorCode: h.errorCode, data: { available: false } };
+  const h = localDbHealth({ backupSummary });
+  if (!h.ok) return { status: 'failed', errorCode: h.errorCode, data: { ...h, available: false } };
   return { status: 'success', data: h };
 }
 
@@ -732,9 +736,9 @@ export async function runAction(action, context, args) {
     }
     try {
       return await dataHandler.run(checked.args);
-    } catch {
-      // 예외 원문(경로·스택)을 밖으로 내보내지 않는다 — 코드만.
-      return { status: 'failed', errorCode: 'LOCAL_DB_NOT_AVAILABLE' };
+    } catch (err) {
+      // 예외 원문(경로·스택)을 밖으로 내보내지 않는다 — 코드만. bootstrap 실패는 그 원인 코드(V1 §58).
+      return { status: 'failed', errorCode: err instanceof LocalDbError ? err.code : 'LOCAL_DB_NOT_AVAILABLE' };
     }
   }
 
