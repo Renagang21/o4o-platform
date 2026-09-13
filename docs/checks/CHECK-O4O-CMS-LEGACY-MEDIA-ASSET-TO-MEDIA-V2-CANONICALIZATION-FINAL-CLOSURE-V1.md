@@ -1,6 +1,6 @@
 # CHECK-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1
 
-> **상태**: **PARTIAL** — admin Content Assets 축 CLOSED(CI·배포·운영 실측 완료) / dashboard-assets 축은 WO §9 중지 조건으로 미실행·보고
+> **상태**: **CLOSED** — 1차(admin Content Assets 축, `ae06d0a31`) + 2차(dashboard-assets 축 A안 승인, `c52aeb083`) 모두 CI·배포·운영 실측 완료. cms_media 계열 완전 종결
 > **작성일**: 2026-09-13
 > **WO**: WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1
 > **기준 조사**: [`IR-O4O-CMS-MEDIA-PAGE-VIEW-LEGACY-RUNTIME-AND-MEDIA-V2-OWNERSHIP-CENSUS-V1`](../investigations/IR-O4O-CMS-MEDIA-PAGE-VIEW-LEGACY-RUNTIME-AND-MEDIA-V2-OWNERSHIP-CENSUS-V1.md)
@@ -137,7 +137,7 @@ clean 체크아웃인 CI 에서는 발생하지 않는다. **미추적 파일은
 
 ---
 
-## 6. §9 중지 조건 발동 — dashboard-assets 축 (미실행, 보고)
+## 6. §9 중지 조건 발동 — dashboard-assets 축 (1차 시점 보고 · **§12 에서 A안으로 해소**)
 
 ### 6-1. 무엇을 멈췄나
 
@@ -231,95 +231,36 @@ API·번들·로그 계층까지만 확인했으므로 `PRODUCTION_BROWSER_SMOKE
 
 ---
 
-## 9. 완료 판정
+## 9. 완료 판정 (2차 반영 · 최종)
 
 ```text
-CMS_MEDIA_TABLE_CREATED             = ZERO      (migration 추가 0 · spec 이 CREATE TABLE cms_media 0 을 고정)
-LEGACY_CONTENT_ASSETS_API           = ZERO      (route 삭제 · 운영 404 실측 · alias 0)
-MEDIA_V2_CANONICAL_RUNTIME          = PASS      (/platform/media-library 200 · media_assets 실데이터)
-ADMIN_MEDIA_LIBRARY_ENTRY           = PASS      (메뉴·권한·Overview 타일 정합 · 배포 번들 실측)
-MEDIA_ENTITY_LINKS_PRESERVED        = PASS      (automation VIDEO Job 소비 불변)
-OTHER_MEDIA_DOMAINS_PRESERVED       = PASS      (signage_media · store_execution_assets · store_videos · product_images 불변)
-OTHER_SERVICE_REGRESSION            = PASS      (admin test 16/16 · build 0 · api jest 271/272, 유일 실패는 무관 §5-1)
+LEGACY_CMS_MEDIA_RUNTIME            = ZERO      (CmsMedia entity · handlers · lifecycle DDL · 두 서비스 소비자 전부 제거, spec 22 고정)
+CMS_MEDIA_ERROR_SWALLOWING          = ZERO      (삼킴 3곳 = 제거된 핸들러와 함께 소멸, 운영 404 실측)
+LEGACY_CONTENT_ASSETS_API           = ZERO      (1차 · 운영 404)
+DASHBOARD_ASSETS_RUNTIME            = ZERO      (signal 2개 외 라우트 0 · 운영 404 ×4)
+DASHBOARD_ASSETS_ACTIVE_ROUTE       = ZERO
+DASHBOARD_ASSETS_FRONTEND_CONSUMER  = ZERO      (배포 번들 실측 0)
+CMS_MEDIA_TABLE_CREATED             = ZERO
+MEDIA_V2_CANONICAL_RUNTIME          = PASS      (운영 200 · 실데이터)
+ADMIN_MEDIA_LIBRARY_ENTRY           = PASS      (1차)
+MEDIA_ENTITY_LINKS_PRESERVED        = PASS
+SUPPLIER_SELLER_SIGNALS             = PRESERVED (운영 200 ×2 · Neture 소비 보존)
+OTHER_CONTENT_FUNCTIONS             = PRESERVED (Neture /content 목록 · /content/:id · cmsApi · homepageCmsApi · KPA /mypage 불변)
+OTHER_MEDIA_DOMAINS_PRESERVED       = PASS
+OTHER_SERVICE_REGRESSION            = PASS      (kpa/neture/admin type-check·build·lint 0 · api jest 4,404 pass)
 PRODUCTION_SCHEMA_CHANGE            = ZERO
 PRODUCTION_DATA_CHANGE              = ZERO
+PRODUCTION_BROWSER_SMOKE            = NOT_RUN   (§12-4 — API·번들·로그 계층까지 실측)
 
-LEGACY_CMS_MEDIA_RUNTIME            = NOT_ZERO  ← dashboard-assets 축 (§6, WO §9 중지 조건)
-CMS_MEDIA_ERROR_SWALLOWING          = NOT_ZERO  ← 같은 축의 삼킴 3곳 (§6)
-PRODUCTION_BROWSER_SMOKE            = NOT_RUN   (§8-5)
-
-CMS_LEGACY_MEDIA_TO_MEDIA_V2_CANONICALIZATION = PARTIAL
-  — admin Content Assets 축은 CLOSED. dashboard-assets 축은 사용자 판단 대기(§6-4).
+CMS_LEGACY_MEDIA_TO_MEDIA_V2_CANONICALIZATION = CLOSED
 ```
 
-WO §10 의 두 항목(`LEGACY_CMS_MEDIA_RUNTIME` · `CMS_MEDIA_ERROR_SWALLOWING`)이 ZERO 가 아니므로
-**CLOSED 로 보고하지 않는다.** 남은 조건은 §6-4 의 처분 선택 하나다.
-
----
-
-## 12. 중지 조건 해소 단계 — dashboard-assets 축 최종 제거 (A안 승인, 2026-09-13)
-
-### 12-1. 삭제 전 경계 확인 (WO 지시 1~5)
-
-| 화면 | 판정 | 근거 |
-|---|---|---|
-| KPA `/my-content` (`pages/dashboard/MyContentPage.tsx`, 1,001줄) | **전용** | 호출 API 가 `dashboardApi.*`(list · kpi · publish · archive · delete · update · getSupplierSignal) 뿐. 다른 CMS 기능 교집합 0 |
-| Neture `/workspace/my-content` (`pages/dashboard/MyContentPage.tsx`, 690줄) | **전용** | `contentAssetApi.*` 뿐 |
-| Neture `/content` (`ContentLibraryPage.tsx`) | **혼합** | 목록 = `hubContentApi.list`(정상, 보존) + 카드의 "내 콘텐츠로" 복사 버튼(`dashboardCopyApi`, 제거) |
-| Neture `/content`(list) · `/content/:id` (`ContentListPage` · `ContentDetailPage`) | **혼합** | 목록·상세·추천·조회수 = `cmsApi`(보존) + "사용 중" 배지(`getCopiedSourceIds`, 제거) |
-| Neture `HubPage` | **혼합** | 신호 4종 중 `contentAssetApi.getSupplierSignal()` 1개만 이 축의 클라이언트에 있었음 → 보존 모듈 `dashboardApi` 로 이동 |
-| 메뉴·네비게이션 | 진입점 0 | 두 서비스 모두 `/my-content` 로 가는 메뉴·버튼 없음. 유일한 링크는 `ContentLibraryPage.afterCopyAction`(제거) |
-| 저장소 밖 소비자 | 0 | 30일 로그: 실사용 호출은 08-19~08-26 `neture.co.kr`/`localhost` 뿐, 최근 2주 0. 이 호출자 코드가 위 두 서비스다 |
-
-### 12-2. 제거
-
-| 계층 | 파일 | 처분 |
-|---|---|---|
-| backend route | `routes/dashboard/dashboard-assets.routes.ts` | `/supplier-signal` · `/seller-signal` **2개만** 남김 (경로 불변) |
-| backend handlers | `dashboard-assets.query-handlers.ts` | list · copied-source-ids · kpi(= **삼킴 3곳**) 제거, signal 2개만 잔존 |
-| | `dashboard-assets.copy-handlers.ts` · `dashboard-assets.mutation-handlers.ts` · `dashboard-assets.types.ts` | **삭제** |
-| | `utils/dashboard-access.guard.ts` | **삭제** (소비처 = 위 핸들러뿐) |
-| entity | `packages/cms-core/src/entities/CmsMedia{,File,Folder,Tag}.entity.ts` · `entities/index.ts` export | **삭제** |
-| | `apps/api-server/src/database/entities.ts` 등록 2곳 | 제거 |
-| cms-core lifecycle | `lifecycle/install.ts` — `cms_media*` CREATE TABLE 4 + 인덱스 5 | 제거 (entity 와 한 단위. 나머지 12 테이블은 불변 — 다음 단계) |
-| | `lifecycle/uninstall.ts` drop 목록 4 · `manifest.ts` 테이블 목록 4 | 제거 |
-| KPA 프런트 | `pages/dashboard/MyContentPage.tsx` · `api/dashboard.ts` · `api/index.ts` export | **삭제** |
-| | `App.tsx` `/my-content` | `<Navigate to="/mypage" replace />` (기존 `/dashboard → /mypage` 패턴) |
-| Neture 프런트 | `pages/dashboard/MyContentPage.tsx` · `lib/api/dashboardCopy.ts` | **삭제** |
-| | `lib/api/content.ts` | `contentAssetApi` · `DashboardAsset/SortType/Kpi` · `CONTENT_ASSETS_LOAD_FAILED`/`_KPI_` 제거. `cmsApi` · `homepageCmsApi` 불변 |
-| | `lib/api/dashboard.ts` | `getSupplierSignal` 이동 (보존) |
-| | `ContentLibraryPage.tsx` | 복사 버튼 · `loadCopiedIds/onCopy/copy*Label/afterCopyAction` 제거. 목록 불변 |
-| | `ContentListPage.tsx` · `ContentDetailPage.tsx` | "사용 중" 배지·`isCopied` 제거. 미사용이 된 `useAuth` 정리 |
-| | `HubPage.tsx` | `contentAssetApi.getSupplierSignal` → `dashboardApi.getSupplierSignal` |
-| | `App.tsx` `/workspace/my-content` · `/my-content` | `<Navigate to="/" replace />` (기존 은퇴 workspace 경로 패턴) |
-| spec | `__tests__/security/dashboard-assets-ownership-gate.spec.ts` | **삭제** — 가드 대상 핸들러 자체가 사라짐 |
-| | `cms-legacy-media-to-media-v2-canonicalization.spec.ts` | **A-2 절 8 tests 추가** (총 22) |
-
-**만들지 않은 것**: 대체 화면 · compatibility route · Media V2 치환 · fallback · 빈 목록 위장. 딥링크는 각 서비스의 기존 안전한 상위 경로로만 보낸다.
-
-**`@o4o/shared-space-ui` ContentHubTemplate 의 optional copy props** 는 손대지 않았다 — 공용 패키지이며 web-k-cosmetics · web-kpa-society(HubContentLibraryPage) 도 소비한다(둘 다 copy prop 미사용). 소비 0 인 optional 기능이 남는 셈이라 §11 보고.
-
-**signal 핸들러의 `product_approvals` catch** (`// Table may not exist — silent fallback`) 는 WO 보존 대상(supplier/seller-signal) 내부라 손대지 않았다. `cms_media` 삼킴 3곳과는 다른 테이블이며 그 테이블은 운영에 존재한다.
-
-### 12-3. 검증
-
-| 단계 | 결과 |
-|---|---|
-| 신규 spec (22 tests) | ✅ 22/22 |
-| `@o4o-apps/cms-core` build | ✅ 0 errors |
-| api-server type-check | ✅ 0 errors |
-| `@o4o/web-kpa-society` type-check · build · lint | ✅ 0 / exit 0 / 0 problems |
-| `@o4o/web-neture` type-check · build · lint | ✅ 0 / exit 0 / 0 problems |
-| api-server lint | 44 errors = baseline 동일 · 내 파일 0 |
-| `check-unsafe-routes` | ✅ 1139 파일 · 위반 0 |
-| `check-typeorm-entities` | ✅ DEFINED_BUT_UNREGISTERED 0 / 중복 0 / stale 0 |
-| api-server 전체 Jest (`--runInBand`) | **270/271 suites · 4,404 pass · 21 skipped**. 실패 1 = `main-site-full-source-deletion.spec.ts` — §5-1 과 같은 로컬 미추적 잔여물, 내 변경과 무관 |
-| CI · 배포 · 운영 | _(§12-4)_ |
+WO §10 조건 전부 충족. `cms_media` 계열(entity 4 · 테이블 DDL 4 · 라우트 · 핸들러 · 프런트 소비자)은 저장소에서 종결됐다.
 
 ## 10. 문서 정합
 
 ```text
-문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건
+문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건 (1차의 제안 1건은 §12 로 해소)
 ```
 
 - 기준 문서(`docs/baseline/**` · `docs/architecture/**` · `docs/platform/**`) 중 `/content/assets` 를 현행 기능으로 서술하는 문서는 없었다.
@@ -333,4 +274,8 @@ WO §10 의 두 항목(`LEGACY_CMS_MEDIA_RUNTIME` · `CMS_MEDIA_ERROR_SWALLOWING
 | 1 | `apps/main-site/{dist,node_modules}` 로컬 미추적 잔여물 — 소스는 `a425865ba` 에서 삭제됨 | 병렬 세션 소유 원칙상 삭제하지 않음. CI 영향 없음 |
 | 2 | `/api/v1/content/media*` 를 호출하는 admin 클라이언트 3종(`contentApi` · `unified-client` · `postApi`) — backend 404 | 선행 IR §4-2 항목 9. 별도 WO |
 | 3 | cms-core lifecycle 나머지 14개 테이블 · `cms_pages`/`cms_fields`/중복 `cms_views` | 다음 단계 과제 (사용자 제시 순서 2·3) |
-| 4 | push 시점 — 다른 세션 CI 진행 중에 push 했다(기존 run 은 취소되지 않고 완주). 다음부터 완주 후 push | 절차 |
+| 4 | push 시점(1차) — 다른 세션 CI 진행 중에 push 했다(기존 run 은 취소되지 않고 완주) | 절차 |
+| 5 | push 시점(2차) — 확인·rebase·push 를 한 명령에 체인해 "진행 중 2건" 출력에도 push 가 실행됐고, **`d26dc7ea4`(다른 세션 · CHECK 문서 1파일)의 CI Pipeline·CodeQL 이 취소됐다.** 문서 전용 커밋이라 코드 검증 손실은 없고 `c52aeb083` 이 그 위에서 같은 트리를 검증해 success 했다. 확인과 push 를 별도 호출로 분리하도록 메모리에 기록 | 절차 · 사고 |
+| 6 | `@o4o/shared-space-ui` ContentHubTemplate 의 optional copy props(`loadCopiedIds`/`onCopy`/`copy*Label`/`afterCopyAction`) — 이번 제거로 소비자 0 이 됐다. 공용 패키지라 손대지 않음 | 별도 판단 |
+| 7 | signal 핸들러 2개의 `product_approvals` catch("Table may not exist — silent fallback") — 보존 대상 내부. 그 테이블은 운영에 존재하며 `cms_media` 삼킴과 다른 성질 | 보고만 |
+| 8 | `docs/platform/store/IR-STORE-CONTENT-UX-PRINCIPLE-ALIGNMENT-AUDIT-V1.md` 가 `POST /dashboard/assets/copy` 를 서술 — IR 기록물(2026-04-20) 이라 §16-1 대상 아님 | 보고만 |
