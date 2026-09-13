@@ -107,7 +107,6 @@ import netureLibraryRoutes from '../modules/neture/neture-library.routes.js';
 import { createCatalogImportRoutes } from '../modules/catalog-import/catalog-import.routes.js';
 import { createGuideContentsRouter } from '../routes/guide/index.js';
 import { createCmsContentRoutes } from '../routes/cms-content/cms-content.routes.js';
-import { createContentAssetsRoutes } from '../routes/content/content-assets.routes.js';
 import { createDashboardAssetsRoutes } from '../routes/dashboard/dashboard-assets.routes.js';
 import { createSignageRoutes, createSignagePublicRoutes } from '../routes/signage/index.js';
 // [RETIRED] CMS Channel 축 (channels / channel_heartbeats / channel_playback_logs)
@@ -1012,14 +1011,11 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register CMS Content routes:', cmsContentError);
     }
 
-    // 32-b. Register Content Assets routes (WO-O4O-CONTENT-ASSETS-DB-READONLY-V1)
-    try {
-      const contentAssetsRoutes = createContentAssetsRoutes(dataSource);
-      app.use('/api/v1/content/assets', contentAssetsRoutes);
-      logger.info('✅ Content Assets routes registered at /api/v1/content/assets (READ-ONLY)');
-    } catch (contentAssetsError) {
-      logger.error('Failed to register Content Assets routes:', contentAssetsError);
-    }
+    // 32-b. Content Assets(/api/v1/content/assets) 는 제거됐다 —
+    //   WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1.
+    //   cms_media 테이블은 운영에 존재한 적이 없어(생성 주체 = 호출되지 않는 cms-core lifecycle)
+    //   이 라우트는 상시 500 이었다. 미디어 정본은 media_assets + media_entity_links 이며
+    //   API 정본은 /api/v1/platform/media-library* 다. 대체 alias 를 만들지 않는다.
 
     // 32-c. Register Content Templates routes (WO-O4O-CONTENT-TEMPLATE-SYSTEM-V1)
     try {

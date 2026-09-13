@@ -197,15 +197,13 @@ export const menuPermissions: MenuPermission[] = [
     roles: [...PLATFORM_ADMIN_ROLES]
   },
   {
-    menuId: 'content-assets',
+    // WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1:
+    //   'content-assets'(cms_media) → 'content-media-library'(media_assets 정본) 로 교체.
+    menuId: 'content-media-library',
     roles: [...PLATFORM_ADMIN_ROLES]
   },
   {
     menuId: 'content-policies',
-    roles: [...PLATFORM_ADMIN_ROLES]
-  },
-  {
-    menuId: 'content-analytics',
     roles: [...PLATFORM_ADMIN_ROLES]
   },
   {

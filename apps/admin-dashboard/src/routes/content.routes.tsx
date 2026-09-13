@@ -22,12 +22,14 @@ const LEGACY_CONTENT_REDIRECT = '/admin/cms/contents';
 // 페이지 관리(PagesRouter/PageList)도 동일하게 legacy redirect 로 대체했다
 // (WO-O4O-LEGACY-WORDPRESS-BLOCK-EDITOR-DOMAIN-RETIREMENT-V1).
 
+// `/content/assets` · `/content/assets/:assetId` · `/content/analytics` 는 제거됐다 —
+//   WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1.
+//   세 화면 모두 backend `/api/v1/content/assets*`(cms_media) 하나에 의존했고, 그 테이블은
+//   운영에 존재한 적이 없어 상시 500 이었다. 미디어 관리 정본 화면은 아래
+//   `/content-resource/media-assets`(media_assets · /platform/media-library) 다.
 // Content Core Shell Pages (WO-O4O-OPERATOR-NAV-CONTENT-SHELL-V1)
 const ContentOverviewPage = lazy(() => import('@/pages/content'));
-const ContentAssetsPage = lazy(() => import('@/pages/content/assets'));
-const ContentAssetDetailPage = lazy(() => import('@/pages/content/assets/[assetId]'));
 const ContentPoliciesPage = lazy(() => import('@/pages/content/policies'));
-const ContentAnalyticsPage = lazy(() => import('@/pages/content/analytics'));
 
 // CMS V2 Pages (Phase C-2.5 & C-3)
 
@@ -137,31 +139,10 @@ export function ContentRoutes() {
         </Suspense>
       </AdminProtectedRoute>
     } />,
-    <Route key="/content/assets" path="/content/assets" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <ContentAssetsPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/content/assets/:assetId" path="/content/assets/:assetId" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <ContentAssetDetailPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
     <Route key="/content/policies" path="/content/policies" element={
       <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
           <ContentPoliciesPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/content/analytics" path="/content/analytics" element={
-      <AdminProtectedRoute requiredRoles={['admin']}>
-        <Suspense fallback={<PageLoader />}>
-          <ContentAnalyticsPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,

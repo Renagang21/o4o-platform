@@ -26,7 +26,9 @@ const AppDisabled = lazy(() => import('@/pages/error/AppDisabled'));
  * WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
  *   `/admin/service-content-manager` 제거 (API 호출 0 · 하드코딩 샘플). 정본 = `/admin/cms/slots`.
  * WO-O4O-ADMIN-AUTHORIZATION-REGISTRY-AND-DEAD-SURFACE-FINAL-CLOSURE-V1 (§6):
- *   `/dashboard/business` 제거 (도달 가능한 사용자 0). 정본 = `content-assets` · `content-analytics`.
+ *   `/dashboard/business` 제거 (도달 가능한 사용자 0). 정본 = `content-media-library`
+ *   (WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1 에서
+ *   `content-assets` · `content-analytics` 를 cms_media 부재로 제거하고 미디어 정본으로 교체).
  */
 
 // Loading component

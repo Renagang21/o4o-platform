@@ -249,6 +249,9 @@ export const adminMenuStatic: MenuItem[] = [
   // CONTENT — 공통 콘텐츠 자산 · 정책
   //   `Collections` 제거(기능 미구현 명시). `Policies` 는 데이터 화면이 아니라
   //   content-core 의 Owner/Status/Visibility 정책 **안내 문서** 화면이므로 이름을 맞춘다.
+  //   `Assets` → `미디어 라이브러리`(/content-resource/media-assets) 로 교체하고 `Analytics` 를 제거했다
+  //   (WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1).
+  //   둘 다 cms_media 하나에 의존했고 그 테이블은 운영에 존재한 적이 없어 상시 500 이었다.
   // ============================================
   {
     id: 'content',
@@ -262,22 +265,19 @@ export const adminMenuStatic: MenuItem[] = [
         path: '/content',
       },
       {
-        id: 'content-assets',
-        label: 'Assets',
+        // WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1:
+        //   깨진 `Assets`(/content/assets · cms_media) 진입점을 미디어 정본 화면으로 교체한다.
+        //   대상 = media_assets · /api/v1/platform/media-library*.
+        id: 'content-media-library',
+        label: '미디어 라이브러리',
         icon: <Image className="w-4 h-4" />,
-        path: '/content/assets',
+        path: '/content-resource/media-assets',
       },
       {
         id: 'content-policies',
         label: '정책 안내',
         icon: <Shield className="w-4 h-4" />,
         path: '/content/policies',
-      },
-      {
-        id: 'content-analytics',
-        label: 'Analytics',
-        icon: <BarChart2 className="w-4 h-4" />,
-        path: '/content/analytics',
       },
     ],
   },

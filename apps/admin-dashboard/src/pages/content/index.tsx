@@ -18,10 +18,12 @@ import { Link } from 'react-router-dom';
 export default function ContentOverviewPage() {
   const subMenus = [
     {
-      id: 'assets',
-      label: 'Assets',
-      description: '콘텐츠 자산 관리 (동영상, 이미지, 문서, 블록)',
-      path: '/content/assets',
+      // WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1:
+      //   `Assets`(/content/assets · cms_media) 타일을 미디어 정본 화면으로 교체했다.
+      id: 'media-library',
+      label: '미디어 라이브러리',
+      description: '이미지 · 동영상 등 제작 자료 관리 (media_assets)',
+      path: '/content-resource/media-assets',
     },
     // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1:
     //   `Collections` 타일 제거 — 화면 주석에 "기능 미구현 · DB 미구현 · Mock 없음" 이
@@ -33,12 +35,9 @@ export default function ContentOverviewPage() {
       description: '콘텐츠 소유·상태·공개 범위 정책 안내',
       path: '/content/policies',
     },
-    {
-      id: 'analytics',
-      label: 'Analytics',
-      description: '콘텐츠 사용 현황 및 분석',
-      path: '/content/analytics',
-    },
+    // WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1:
+    //   `Analytics` 타일 제거 — 화면이 cms_media 집계(`/content/assets/stats`) 하나에만 의존했고
+    //   그 테이블은 운영에 존재한 적이 없어 상시 500 이었다. 여기 남기면 데드링크가 된다.
   ];
 
   return (

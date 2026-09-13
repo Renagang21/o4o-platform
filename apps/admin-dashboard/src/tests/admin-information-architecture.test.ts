@@ -61,10 +61,12 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
     '/admin/o4o-product-db/image-quality',
     '/admin/o4o-product-db/maintenance',
     // Content
+    //   WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1:
+    //   `/content/assets` → `/content-resource/media-assets`(미디어 정본) 로 교체,
+    //   `/content/analytics` 제거. 둘 다 cms_media 하나에 의존했고 운영에 그 테이블이 없다.
     '/content',
-    '/content/assets',
+    '/content-resource/media-assets',
     '/content/policies',
-    '/content/analytics',
     // CMS
     '/admin/cms/contents',
     '/admin/cms/slots',

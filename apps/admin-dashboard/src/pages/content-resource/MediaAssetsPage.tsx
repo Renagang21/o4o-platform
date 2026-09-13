@@ -3,7 +3,10 @@
  *
  * WO-O4O-CONTENT-RESOURCE-METADATA-STANDARDIZATION-V1
  *
- * media_assets(/platform/media-library) 전용 관리 화면. 레거시 /content/media(MediaLibraryAdmin)와 별개.
+ * media_assets(/platform/media-library) 전용 관리 화면 = O4O 미디어 관리의 **정본**.
+ * WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1 에서
+ * 관리자 메뉴 `Content > 미디어 라이브러리` 진입점이 이 화면을 가리키도록 정리했다
+ * (깨져 있던 cms_media 기반 `/content/assets` 를 대체). 레거시 /content/media 와도 별개.
  * Content Resource 관리 영역의 첫 섹션 — 이후 Templates / Search / Usage 로 확장.
  *
  * 이번 WO 범위: media_assets metadata 조회·수정(검색 화면·통합검색은 후속).
@@ -91,7 +94,7 @@ const MediaAssetsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="px-8 py-6">
         <div className="mb-1 text-xs text-gray-400">Content Resource</div>
-        <h1 className="text-2xl font-normal mb-1">Media Assets</h1>
+        <h1 className="text-2xl font-normal mb-1">미디어 라이브러리</h1>
         <p className="text-sm text-gray-500 mb-5">
           공용 미디어 라이브러리(media_assets) 자산의 메타데이터를 관리합니다. 파일 URL은 변경되지 않으며,
           제목·설명·태그 등 서술 메타데이터만 수정됩니다. (총 {total}건)
