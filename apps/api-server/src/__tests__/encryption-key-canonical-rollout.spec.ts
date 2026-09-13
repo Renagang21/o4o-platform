@@ -19,6 +19,26 @@ import {
 const CANONICAL = 'canonical-test-key-0123456789abcdef'; // 32바이트 초과
 const CIPHER_FORMAT = /^[0-9a-f]{32}:[0-9a-f]+$/;
 
+/**
+ * AES-CBC 는 인증 태그가 없으므로 잘못된 키로 복호화할 때 항상 예외가 난다고 보장할 수 없다.
+ * 우연히 PKCS#7 padding 이 유효하면 쓰레기 평문이 반환될 수 있다. 키 격리 계약은
+ * "wrong key 로 원문을 복구할 수 없음" 이므로, 예외 또는 원문 불일치 둘 다 정상으로 본다.
+ */
+function expectWrongKeyCannotRecover(ciphertext: string, wrongKey: string, plaintext: string): void {
+  let recovered: string | undefined;
+  let decryptFailed = false;
+
+  try {
+    recovered = decryptWithKey(ciphertext, wrongKey);
+  } catch {
+    decryptFailed = true;
+  }
+
+  if (!decryptFailed) {
+    expect(recovered).not.toBe(plaintext);
+  }
+}
+
 describe('ENCRYPTION_KEY canonical 계약', () => {
   const original = process.env.ENCRYPTION_KEY;
   afterEach(() => {
@@ -66,9 +86,9 @@ describe('키 교체 (기존 암호문 재암호화)', () => {
     else process.env.ENCRYPTION_KEY = original;
   });
 
-  it('은퇴 기본 키로 만든 암호문은 새 키로 읽히지 않는다 (교체가 필요한 이유)', () => {
+  it('은퇴 기본 키로 만든 암호문은 새 키로 원문을 복구할 수 없다 (교체가 필요한 이유)', () => {
     const legacyCt = encryptWithKey('legacy-secret', RETIRED_DEFAULT_ENCRYPTION_KEY);
-    expect(() => decryptWithKey(legacyCt, CANONICAL)).toThrow();
+    expectWrongKeyCannotRecover(legacyCt, CANONICAL, 'legacy-secret');
   });
 
   it('legacy 로 복호화 → canonical 로 재암호화 하면 값이 보존된다', () => {
@@ -81,6 +101,6 @@ describe('키 교체 (기존 암호문 재암호화)', () => {
   it('이미 canonical 키로 읽히는 값은 재교체 대상이 아니다 (멱등)', () => {
     const ct = encryptWithKey('already', CANONICAL);
     expect(decryptWithKey(ct, CANONICAL)).toBe('already');
-    expect(() => decryptWithKey(ct, RETIRED_DEFAULT_ENCRYPTION_KEY)).toThrow();
+    expectWrongKeyCannotRecover(ct, RETIRED_DEFAULT_ENCRYPTION_KEY, 'already');
   });
 });
