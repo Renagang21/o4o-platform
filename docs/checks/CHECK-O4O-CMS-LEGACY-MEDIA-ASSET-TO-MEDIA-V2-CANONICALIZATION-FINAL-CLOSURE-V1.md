@@ -1,6 +1,6 @@
 # CHECK-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1
 
-> **상태**: 구현·검증 완료 / **부분 중지 1건 보고** (§9 중지 조건 발동 — dashboard-assets 축)
+> **상태**: **PARTIAL** — admin Content Assets 축 CLOSED(CI·배포·운영 실측 완료) / dashboard-assets 축은 WO §9 중지 조건으로 미실행·보고
 > **작성일**: 2026-09-13
 > **WO**: WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1
 > **기준 조사**: [`IR-O4O-CMS-MEDIA-PAGE-VIEW-LEGACY-RUNTIME-AND-MEDIA-V2-OWNERSHIP-CENSUS-V1`](../investigations/IR-O4O-CMS-MEDIA-PAGE-VIEW-LEGACY-RUNTIME-AND-MEDIA-V2-OWNERSHIP-CENSUS-V1.md)
@@ -126,7 +126,7 @@ M  apps/admin-dashboard/src/tests/admin-authorization-registry-and-dead-surface-
 | `pnpm --filter @o4o/api-server run lint:no-fix` | ⚠️ 44 errors / 481 warnings = **baseline 동일**(stash 후 실측). 내 파일 **0** (초기 1건은 `require()` → import 로 수정) |
 | api-server 전체 Jest (`--runInBand`) | **271/272 suites · 4,421 pass · 21 skipped · 723s**. 실패 1 suite(2 tests) = `main-site-full-source-deletion.spec.ts` — **내 변경과 무관** (§5-1) |
 | `node scripts/check-unsafe-routes.mjs` | ✅ 1143 파일 · 위반 0 |
-| Production browser smoke | _(§8 갱신)_ |
+| Production 검증 | ✅ §8 |
 
 ### 5-1. 무관한 실패 1건 (로컬 전용)
 
@@ -191,15 +191,69 @@ packages/cms-core/src/entities/CmsMedia*.entity.ts + database/entities.ts 등록
 
 ---
 
-## 8. Production 검증
+## 8. CI · 배포 · Production 검증
 
-_(배포 후 갱신)_
+### 8-1. CI (구현 SHA = push SHA = `ae06d0a31`, 취소·대체 없이 자기 SHA 에서 완주)
+
+| 워크플로 | 결과 | run |
+|---|---|---:|
+| CI Pipeline | ✅ success | 34730463681 |
+| CodeQL Security Analysis | ✅ success | 34730463655 |
+| Deploy API Server (Cloud Run) | ✅ success | 34730463716 |
+| Deploy Admin Dashboard (Cloud Run) | ✅ success | 34730463705 |
+
+배포 revision: API `o4o-core-api-03638-4zc` (트래픽 100%) · Admin `o4o-admin-dashboard-01263-xtz`.
+
+### 8-2. 운영 실측 (platform:super_admin 로그인 후 GET)
+
+| 경로 | 기대 | 실측 |
+|---|---|---|
+| `GET /api/v1/content/assets?limit=1` | 제거됨 | **404** (전: 500 `relation "cms_media" does not exist`) |
+| `GET /api/v1/content/assets/stats` | 제거됨 | **404** (전: 500) |
+| `GET /api/v1/platform/media-library?limit=2` | 정본 | **200** · `media_assets` 실데이터 |
+| `GET /api/v1/dashboard/assets/supplier-signal` | 보존 | **200** `{"success":true,"hasApprovedSupplier":false}` |
+| `GET /api/v1/dashboard/assets/seller-signal` | 보존 | **200** `{"success":true,"hasApprovedSeller":false}` |
+
+### 8-3. 배포된 관리자 번들 실측
+
+`https://admin.neture.co.kr` 진입 번들 `index-BZ7hDxcJ.js`:
+**`content/assets` 출현 0** · **`content-resource/media-assets` 출현 2** → 깨진 진입점이 배포본에서 사라지고 정본 경로가 들어갔다.
+
+### 8-4. 신규 revision 로그
+
+`o4o-core-api-03638-4zc` 기동 이후 `cms_media` 관련 오류 **0건**, severity ≥ ERROR **0건**
+(전: 30일간 `cms_media` 46건).
+
+### 8-5. 미실측
+
+브라우저 화면 조작(메뉴 클릭 → 미디어 라이브러리 렌더 · console error 0)은 수행하지 않았다.
+API·번들·로그 계층까지만 확인했으므로 `PRODUCTION_BROWSER_SMOKE` 는 판정하지 않는다(§9).
 
 ---
 
 ## 9. 완료 판정
 
-_(Jest · CI · 배포 · smoke 후 갱신)_
+```text
+CMS_MEDIA_TABLE_CREATED             = ZERO      (migration 추가 0 · spec 이 CREATE TABLE cms_media 0 을 고정)
+LEGACY_CONTENT_ASSETS_API           = ZERO      (route 삭제 · 운영 404 실측 · alias 0)
+MEDIA_V2_CANONICAL_RUNTIME          = PASS      (/platform/media-library 200 · media_assets 실데이터)
+ADMIN_MEDIA_LIBRARY_ENTRY           = PASS      (메뉴·권한·Overview 타일 정합 · 배포 번들 실측)
+MEDIA_ENTITY_LINKS_PRESERVED        = PASS      (automation VIDEO Job 소비 불변)
+OTHER_MEDIA_DOMAINS_PRESERVED       = PASS      (signage_media · store_execution_assets · store_videos · product_images 불변)
+OTHER_SERVICE_REGRESSION            = PASS      (admin test 16/16 · build 0 · api jest 271/272, 유일 실패는 무관 §5-1)
+PRODUCTION_SCHEMA_CHANGE            = ZERO
+PRODUCTION_DATA_CHANGE              = ZERO
+
+LEGACY_CMS_MEDIA_RUNTIME            = NOT_ZERO  ← dashboard-assets 축 (§6, WO §9 중지 조건)
+CMS_MEDIA_ERROR_SWALLOWING          = NOT_ZERO  ← 같은 축의 삼킴 3곳 (§6)
+PRODUCTION_BROWSER_SMOKE            = NOT_RUN   (§8-5)
+
+CMS_LEGACY_MEDIA_TO_MEDIA_V2_CANONICALIZATION = PARTIAL
+  — admin Content Assets 축은 CLOSED. dashboard-assets 축은 사용자 판단 대기(§6-4).
+```
+
+WO §10 의 두 항목(`LEGACY_CMS_MEDIA_RUNTIME` · `CMS_MEDIA_ERROR_SWALLOWING`)이 ZERO 가 아니므로
+**CLOSED 로 보고하지 않는다.** 남은 조건은 §6-4 의 처분 선택 하나다.
 
 ---
 
@@ -212,3 +266,12 @@ _(Jest · CI · 배포 · smoke 후 갱신)_
 - 기준 문서(`docs/baseline/**` · `docs/architecture/**` · `docs/platform/**`) 중 `/content/assets` 를 현행 기능으로 서술하는 문서는 없었다.
   `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` 의 `cms_media` 언급 1건은 **개념 설명**이며 route 계약이 아니다 — 보고만 한다(§16-2).
 - 별도 WO 제안 1건 = §6-4 의 dashboard-assets 축 처분.
+
+## 11. 보고 (범위 밖 · 손대지 않음)
+
+| # | 항목 | 성격 |
+|:-:|---|---|
+| 1 | `apps/main-site/{dist,node_modules}` 로컬 미추적 잔여물 — 소스는 `a425865ba` 에서 삭제됨 | 병렬 세션 소유 원칙상 삭제하지 않음. CI 영향 없음 |
+| 2 | `/api/v1/content/media*` 를 호출하는 admin 클라이언트 3종(`contentApi` · `unified-client` · `postApi`) — backend 404 | 선행 IR §4-2 항목 9. 별도 WO |
+| 3 | cms-core lifecycle 나머지 14개 테이블 · `cms_pages`/`cms_fields`/중복 `cms_views` | 다음 단계 과제 (사용자 제시 순서 2·3) |
+| 4 | push 시점 — 다른 세션 CI 진행 중에 push 했다(기존 run 은 취소되지 않고 완주). 다음부터 완주 후 push | 절차 |
