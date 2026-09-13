@@ -615,6 +615,26 @@ export const LOCAL_AGENT_ERROR = {
   /** 대상 창을 앞으로 보내지 못해 입력을 만들지 않았다. */
   UIA_TARGET_NOT_FOREGROUND: 'UIA_TARGET_NOT_FOREGROUND',
 
+  // ── Windows Automation Safety V1 (WO-O4O-WINDOWS-AUTOMATION-SAFETY-AND-TAKEOVER-V1 §58) — agent 안전층 거절 ──
+  /** 최근 사용자 키/마우스 활동 — 짧게 멈춘 뒤에도 계속이라 인계. */
+  WINDOWS_AUTOMATION_USER_ACTIVE: 'WINDOWS_AUTOMATION_USER_ACTIVE',
+  /** foreground 가 대상 창이 아니거나 대상 창이 사라졌다 · 새 창(modal)이 생겼다. */
+  WINDOWS_AUTOMATION_TARGET_CHANGED: 'WINDOWS_AUTOMATION_TARGET_CHANGED',
+  /** 대상 창 제목이 관찰 때와 다르다(같은 창인데 내용이 바뀜). */
+  WINDOWS_AUTOMATION_TARGET_UNCERTAIN: 'WINDOWS_AUTOMATION_TARGET_UNCERTAIN',
+  /** 요소를 다시 찾지 못했다. */
+  WINDOWS_AUTOMATION_UIA_AMBIGUOUS: 'WINDOWS_AUTOMATION_UIA_AMBIGUOUS',
+  /** 항목이 노출되지 않는 목록에 좌표 클릭 — 눈감고 고르지 않는다. */
+  WINDOWS_AUTOMATION_HIDDEN_CONTROL: 'WINDOWS_AUTOMATION_HIDDEN_CONTROL',
+  /** 제출 직전 대상 재검증 실패. */
+  WINDOWS_AUTOMATION_SUBMIT_UNVERIFIED: 'WINDOWS_AUTOMATION_SUBMIT_UNVERIFIED',
+  /** 앱 profile 이 없거나 위험 키 — 제출/위험 성격 키 자동 실행 금지. */
+  WINDOWS_AUTOMATION_KEY_UNKNOWN: 'WINDOWS_AUTOMATION_KEY_UNKNOWN',
+  /** vision 후보 신뢰 낮음(V1 에서는 vision 경로 없음 — 코드만 예약). */
+  WINDOWS_AUTOMATION_VISION_UNCERTAIN: 'WINDOWS_AUTOMATION_VISION_UNCERTAIN',
+  /** 사용자 활동으로 멈춘 상태. */
+  WINDOWS_AUTOMATION_PAUSED: 'WINDOWS_AUTOMATION_PAUSED',
+
   // ── Browser DOM Control V0 (WO-O4O-BROWSER-DOM-CONTROL-V0 §29·§44) ─────────
   /** 현재 탭이 등재 site 가 아니다 · siteId 미등재. */
   DOM_SITE_NOT_ALLOWED: BROWSER_DOM_ERROR.SITE_NOT_ALLOWED,

@@ -22,6 +22,11 @@ const NAME_MAX = 80;
 const TITLE_MAX = 60;
 const SAFE_RISK: readonly string[] = Object.freeze(['READ', 'REVERSIBLE', 'REVIEW_REQUIRED', 'COMMIT']);
 const WINDOW_REF_RE = /^w_[1-9][0-9]{0,2}$/;
+/** agent 안전층 판정 사유(enum). 창 제목 · 좌표 · 키 내용은 사유가 아니다. */
+export const SAFE_SAFETY_REASONS: readonly string[] = Object.freeze([
+  'user_active', 'probe_failed', 'target_window_gone', 'unexpected_window', 'title_changed', 'element_stale', 'other_window_same_process', 'other_app_foreground',
+  'blind_list_click', 'key_semantics_unknown', 'risky_key', 'submit_element_unverified', 'submit_title_unverified', 'ok', 'user_idle_after_pause',
+]);
 
 export interface UiaKeyArgs { key: string; snapshotId: string; elementRef?: string }
 export interface UiaClickArgs { elementRef: string; snapshotId: string; x: number; y: number; clicks?: 1 | 2 }
@@ -138,6 +143,11 @@ export function pickSafeUiaInfo(data: unknown): Record<string, unknown> {
     if (typeof data[k] === 'boolean') out[k] = data[k];
   }
   if (data.clicks === 1 || data.clicks === 2) out.clicks = data.clicks;
+  // SAFETY-V1 §48·§59: 안전층 판정 요약 — 사유 enum · 멈춤 여부 · 재검사 횟수만.
+  if (isPlain(data.safety)) {
+    const reason = typeof data.safety.reason === 'string' && SAFE_SAFETY_REASONS.includes(data.safety.reason) ? data.safety.reason : undefined;
+    out.safety = { ...(reason ? { reason } : {}), paused: data.safety.paused === true, retries: typeof data.safety.retries === 'number' && Number.isInteger(data.safety.retries) && data.safety.retries >= 0 && data.safety.retries <= 10 ? data.safety.retries : 0 };
+  }
   if (typeof data.elementCount === 'number' && Number.isInteger(data.elementCount) && data.elementCount >= 0 && data.elementCount <= 10000) out.elementCount = data.elementCount;
   if (Array.isArray(data.elements)) {
     const els: SafeUiaElement[] = [];

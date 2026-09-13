@@ -25,6 +25,7 @@
 import { runAction, listAllowedActions, AGENT_VERSION, ACTIONS } from './handlers.mjs';
 import { bootstrapLocalDb, getLocalDbState } from './local-db.mjs';
 import { createBackup, backupSummary } from './local-db-backup.mjs';
+import { automationSummary } from './windows-automation-safety.mjs';
 import { loadCredentials, saveCredentials, credentialsLocation } from './credentials.mjs';
 import { startLocalServer, LOCAL_AGENT_PORT } from './local-server.mjs';
 import { startBridgeRelay } from './bridge-relay.mjs';
@@ -191,6 +192,8 @@ async function commandRun() {
       const s = getLocalDbState();
       return { ready: s.ready === true, schemaVersion: Number(s.schemaVersion ?? 0), backups: backupSummary().count, ...(s.ready ? {} : { errorCode: s.errorCode }) };
     },
+    // WINDOWS-AUTOMATION-SAFETY-V1 §35 — 자동화 진행/멈춤 상태(창 제목 · 핸들 없음).
+    automationSummary,
     log,
   });
 

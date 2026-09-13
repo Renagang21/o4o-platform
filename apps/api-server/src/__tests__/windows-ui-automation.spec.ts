@@ -156,7 +156,9 @@ describe('planner validation on the uia surface', () => {
   );
   it('key: 허용 키 · 입력창 ref · dom 표면 거절 · 임의 키 거절', () => {
     expect(validateWorkProposal({ assessment: 'progress', action: { kind: 'key', key: 'CTRL+ENTER', elementRef: 'e_2' } }, obs).ok).toBe(true);
-    expect(validateWorkProposal({ assessment: 'progress', action: { kind: 'key', key: 'ESC' } }, obs).ok).toBe(true);
+    // SAFETY-V1 §18·§19: 카카오톡 profile 에서 ESC 는 riskyKeys(대화창 닫힘) → 제안 단계에서 거절, TAB 은 통과
+    expect(validateWorkProposal({ assessment: 'progress', action: { kind: 'key', key: 'ESC' } }, obs).reason).toBe('KEY_INVALID');
+    expect(validateWorkProposal({ assessment: 'progress', action: { kind: 'key', key: 'TAB' } }, obs).ok).toBe(true);
     expect(validateWorkProposal({ assessment: 'progress', action: { kind: 'key', key: 'ALT+F4' } }, obs).reason).toBe('KEY_INVALID');
     expect(validateWorkProposal({ assessment: 'progress', action: { kind: 'key', key: 'ENTER', elementRef: 'e_3' } }, obs).reason).toBe('ELEMENT_ROLE_MISMATCH');
     expect(validateWorkProposal({ assessment: 'progress', action: { kind: 'key', key: 'ENTER', elementRef: 'e_5' } }, obs).reason).toBe('USER_ACTION_WINDOW');

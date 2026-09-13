@@ -38,6 +38,7 @@ import type { DomFindQuery, SafeDomElement } from '../local-agent/browser-dom-co
 import { DOM_QUERY_VALUE_MAX, domInputDenyReason, isDomElementRef, validateDomFindQuery } from '../local-agent/browser-dom-contract.js';
 import type { AutomationRiskLevel, ContentProvenance } from './automation-execution-contract.js';
 import { UIA_ALLOWED_KEYS, UIA_POINTER_ROLES } from '../local-agent/windows-uia-contract.js';
+import { findWindowsApp } from '../local-agent/windows-app-registry.js';
 import { textDenyReason as computerTextDenyReason } from '../local-agent/computer-use-contract.js';
 
 // ─── Goal (§5) ──────────────────────────────────────────────────────────────
@@ -154,6 +155,8 @@ export const WORK_PROGRESS_VALUES: readonly string[] = Object.freeze(['progress'
 
 /** Takeover 사유(§19). 등재분 밖은 거절된다. */
 export const TAKEOVER_REASONS = Object.freeze([
+  // WINDOWS-AUTOMATION-SAFETY-V1 §32 — agent 안전층이 멈춘 사유(정상 인계).
+  'user_active', 'target_changed', 'target_identity_uncertain', 'uia_target_ambiguous', 'uia_hidden_control', 'submit_not_verified', 'key_semantics_unknown', 'vision_uncertain', 'unexpected_window',
   'goal_sufficiently_advanced',
   'user_judgment_required',
   'ambiguous_result',
@@ -206,7 +209,8 @@ export type ProposalRejectReason =
   | 'SURFACE_MISMATCH'
   | 'KEY_INVALID'
   | 'USER_ACTION_WINDOW'
-  | 'WINDOW_NOT_NAMED_IN_GOAL';
+  | 'WINDOW_NOT_NAMED_IN_GOAL'
+  | 'SAFETY_REJECT';
 
 /** URL · selector · JS · shell · credential 을 실어 오는 키 — 있으면 proposal 전체를 거절한다(§10·§47). */
 export const FORBIDDEN_PROPOSAL_KEYS: readonly string[] = Object.freeze([
@@ -286,6 +290,11 @@ export function validateWorkProposal(raw: unknown, observation: WorkObservation 
       // uia 표면 전용. 허용 키만, elementRef 가 있으면 관찰 안의 입력창이어야 한다.
       if (surface !== 'uia') return { ok: false, reason: 'SURFACE_MISMATCH' };
       if (typeof act.key !== 'string' || !UIA_ALLOWED_KEYS.includes(act.key)) return { ok: false, reason: 'KEY_INVALID' };
+      // SAFETY-V1 §20·§21: 앱 profile 로 키 의미를 안다. profile 이 없으면 제출/취소 성격 키는 제안 단계에서 거절, 위험 키(riskyKeys)도 거절.
+      const profile = observation?.siteId ? findWindowsApp(observation.siteId)?.interactionProfile : undefined;
+      const submitClass = act.key === 'ENTER' || act.key === 'CTRL+ENTER' || act.key === 'ESC';
+      if (!profile && submitClass) return { ok: false, reason: 'KEY_INVALID' };
+      if (profile && profile.riskyKeys.includes(act.key)) return { ok: false, reason: 'KEY_INVALID' };
       out.action.key = act.key;
       if (act.elementRef !== undefined) {
         const r2 = requireRef(INPUT_ROLES);

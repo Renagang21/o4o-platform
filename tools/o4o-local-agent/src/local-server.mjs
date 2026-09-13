@@ -69,6 +69,20 @@ function safeLocalDataSummary(fn) {
   }
 }
 
+/** /health 의 automation 요약 — 허용 키만. */
+function safeAutomationSummary(fn) {
+  try {
+    const s = fn() ?? {};
+    const status = ['idle', 'running', 'paused_user_active', 'waiting_for_user'].includes(s.status) ? s.status : 'idle';
+    const out = { active: s.active === true, status };
+    if (typeof s.targetId === 'string' && /^(windows\.[a-z0-9_.-]{1,40}|[a-z0-9_.-]{1,40})$/.test(s.targetId)) out.targetId = s.targetId;
+    if (typeof s.pauseReason === 'string' && /^[a-z_]{1,40}$/.test(s.pauseReason)) out.pauseReason = s.pauseReason;
+    return out;
+  } catch {
+    return { active: false, status: 'idle' };
+  }
+}
+
 /** nonce 유효 시간. 버튼을 누르고 왕복하는 데 필요한 시간이면 충분하다. */
 const NONCE_TTL_MS = 60 * 1000;
 /** 요청 본문 상한. 여기로 오는 것은 짧은 토큰 하나뿐이다. */
@@ -142,7 +156,7 @@ async function readJsonBody(req) {
  * @param {() => { ready: boolean, schemaVersion: number, backups: number }} [options.localDataSummary]  LOCAL-DATA-RUNTIME V1 §64 — 경로 없는 요약
  * @param {(message: string, extra?: unknown) => void} options.log
  */
-export function startLocalServer({ agentVersion, isConnected, onPair, localDataSummary, log }) {
+export function startLocalServer({ agentVersion, isConnected, onPair, localDataSummary, automationSummary, log }) {
   const nonces = createNonceStore();
 
   const server = http.createServer((req, res) => {
@@ -189,6 +203,8 @@ export function startLocalServer({ agentVersion, isConnected, onPair, localDataS
           nonce: nonces.issue(),
           // Local Data 준비 여부 · schema version · 백업 수(§64). 경로 · 파일명 · 행 데이터는 없다(§30).
           ...(typeof localDataSummary === 'function' ? { localData: safeLocalDataSummary(localDataSummary) } : {}),
+          // WINDOWS-AUTOMATION-SAFETY-V1 §35: "O4O 가 지금 ○○ 에서 작업 중 / 멈춤" 을 보여줄 최소 상태. 창 제목 · 핸들 · 좌표 없음.
+          ...(typeof automationSummary === 'function' ? { automation: safeAutomationSummary(automationSummary) } : {}),
         },
         origin,
       );

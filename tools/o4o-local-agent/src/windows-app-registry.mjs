@@ -28,6 +28,9 @@ export const WINDOWS_APP_REGISTRY = Object.freeze([
     // Windows 10/11 공통 경로. 인자 없이 실행한다(§27). 존재하지 않으면 launch 는 실패로 끝나고 사용자에게 넘긴다(§30).
     launch: Object.freeze({ kind: 'executable', path: 'C:\\Windows\\System32\\notepad.exe' }),
     launchAllowed: true,
+    // WINDOWS-AUTOMATION-SAFETY-V1 §18: 편집기 — ENTER 는 줄바꿈(제출 아님), ESC 는 취소(대화상자 닫기).
+    interactionProfile: Object.freeze({ submitKeys: Object.freeze([]), newlineKeys: Object.freeze(['ENTER']), cancelKeys: Object.freeze(['ESC']), riskyKeys: Object.freeze([]) }),
+    uiaVisibilityHints: Object.freeze({ exposed: Object.freeze(['window', 'input', 'menu']), hidden: Object.freeze([]) }),
   }),
   // WINDOWS-UI-AUTOMATION-V0 — 첫 실제 Windows 앱(약국 프로그램 준비 전 대체). UIA 공통층 검증용이지 카카오톡 전용 어댑터가 아니다.
   //   트레이 상주 앱: 실행 중이어도 보이는 창이 없으면 census 에 안 잡힌다 → 등재 실행 파일을 다시 실행하면(단일 인스턴스) 창이 앞으로 온다(실측).
@@ -38,6 +41,10 @@ export const WINDOWS_APP_REGISTRY = Object.freeze([
     processNames: Object.freeze(['KakaoTalk']),
     launch: Object.freeze({ kind: 'executable', path: 'C:\\Program Files\\Kakao\\KakaoTalk\\KakaoTalk.exe' }),
     launchAllowed: true,
+    // WINDOWS-AUTOMATION-SAFETY-V1 §18·§19·§22 — 실측(2026-09-13): ENTER=전송 · CTRL+ENTER=줄바꿈 · ESC=대화창 닫힘.
+    // UIA 노출: 창 · 검색창(Ctrl+F 뒤) · 입력창(RichEdit). 미노출: 목록 행 · 메시지 목록 · 전송 버튼.
+    interactionProfile: Object.freeze({ submitKeys: Object.freeze(['ENTER']), newlineKeys: Object.freeze(['CTRL+ENTER']), cancelKeys: Object.freeze(['ESC']), riskyKeys: Object.freeze(['ESC']) }),
+    uiaVisibilityHints: Object.freeze({ exposed: Object.freeze(['window', 'search', 'input']), hidden: Object.freeze(['list_rows', 'message_list', 'send_button']) }),
   }),
   Object.freeze({
     appId: 'windows.calculator',

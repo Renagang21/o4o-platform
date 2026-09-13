@@ -103,7 +103,7 @@ public static class O4OUia {
 '@
 
 $action = $env:O4O_UIA_ACTION
-if ($action -notmatch '^(inspect|set_value|invoke|key|click|activate)$') { throw 'O4O_UIA_ACTION invalid' }
+if ($action -notmatch '^(inspect|set_value|invoke|key|click|activate|verify)$') { throw 'O4O_UIA_ACTION invalid' }
 $pidRaw = $env:O4O_UIA_PID
 if ($pidRaw -notmatch '^[1-9][0-9]{0,9}$') { throw 'O4O_UIA_PID invalid' }
 $targetPid = [int]$pidRaw
@@ -256,6 +256,26 @@ $owner = [uint32]0
 if ([int]$owner -ne $targetPid) { Out-Json ([pscustomobject]@{ ok = $false; reason = 'WINDOW_NOT_TARGET' }); exit 0 }
 if (-not [O4OUia]::IsWindowVisible($hwnd)) { Out-Json ([pscustomobject]@{ ok = $false; reason = 'WINDOW_NOT_VISIBLE' }); exit 0 }
 $winEl = [System.Windows.Automation.AutomationElement]::FromHandle($hwnd)
+
+if ($action -eq 'verify') {
+    # WINDOWS-AUTOMATION-SAFETY-V1 §7·§13·§14 — 입력을 만들지 않는 검사만: 사용자 idle · foreground 창/프로세스 · 대상 창 존재/제목 ·
+    # (요소 rid 가 있으면) 요소 재해석 가능 여부 · 대상 process 의 보이는 top-level 창 수(새 modal/dialog 감지).
+    $fg = [O4OUia]::GetForegroundWindow()
+    $fgPid = [uint32]0
+    [void][O4OUia]::GetWindowThreadProcessId($fg, [ref]$fgPid)
+    $targetTitle = $null
+    try { $targetTitle = Trunc $winEl.Current.Name 60 } catch { $targetTitle = $null }
+    $elementOk = $null
+    if ($env:O4O_UIA_RID) { try { $e = FindByRid $winEl $env:O4O_UIA_RID; $elementOk = ($null -ne $e -and $e.Current.IsEnabled) } catch { $elementOk = $false } }
+    $count = 0
+    foreach ($w in TopWindows) { $count++ }
+    Out-Json ([pscustomobject]@{
+        ok = $true; idleMs = [int][O4OUia]::IdleMs(); sinceInjectMs = $sinceInject; userBusy = (UserBusy)
+        foregroundHwnd = [int64]$fg; foregroundPid = [int]$fgPid; foregroundIsTarget = ($fg -eq $hwnd); foregroundSameProcess = ([int]$fgPid -eq $targetPid)
+        targetVisible = [bool][O4OUia]::IsWindowVisible($hwnd); targetTitle = $targetTitle; elementOk = $elementOk; windowCount = $count
+    })
+    exit 0
+}
 
 if ($action -eq 'activate') {
     # 창 요소의 "기본 동작" = 그 창을 앞으로(같은 앱의 여러 창 중 하나를 고를 때). 입력을 만들지 않는다(ALT 잠금 해제 제외).

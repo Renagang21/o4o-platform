@@ -88,7 +88,8 @@ test('경계(소스): uia.mjs 는 fs/child_process/네트워크 0 · 스크립�
   assert.ok(mjs.includes('entry.userAction'));
   const ps = codeOnly(read('windows-uia.ps1'));
   for (const forbidden of ['Start-Process', 'Invoke-Expression', 'iex ', '-Command', 'cmd.exe', '$args', 'param(', 'Get-Clipboard', 'Set-Clipboard', 'ShellExecute']) assert.ok(!ps.includes(forbidden), forbidden);
-  assert.ok(ps.includes("'^(inspect|set_value|invoke|key|click|activate)$'"));
+  assert.ok(ps.includes("'^(inspect|set_value|invoke|key|click|activate|verify)$'"));
+  assert.ok(ps.includes("if ($action -eq 'verify')"), 'SAFETY-V1 probe(입력 없음)');
   assert.ok(ps.includes('GetLastInputInfo') && ps.includes('UserBusy'), '사용자 활동 중 입력 주입 금지');
   assert.ok(ps.includes('ReplaceAllText') && ps.includes('0x00C2'), 'Edit/RichEdit 는 편집 메시지(EM_REPLACESEL)');
   assert.ok(ps.includes("'^(ENTER|TAB|ESC|CTRL\\+ENTER)$'"));

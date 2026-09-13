@@ -21,6 +21,7 @@
 
 import { censusWindows, matchWindows, runUiaScript } from './windows-window-control.mjs';
 import { textDenyReason, isUserActionTitle, COMPUTER_ALLOWED_KEYS, isValidNormalizedCoordinate } from './computer-use-limits.mjs';
+import { runSafetyGate, markAutomationActive, SAFETY_ERROR } from './windows-automation-safety.mjs';
 
 /** UIA 키 허용 목록 = computer-use 의 셋 + CTRL+ENTER(여러 줄 입력창 제출 관례). 다른 수식키 조합 · 단축키는 없다. */
 export const UIA_ALLOWED_KEYS = Object.freeze([...COMPUTER_ALLOWED_KEYS, 'CTRL+ENTER']);
@@ -113,6 +114,8 @@ export async function uiaInspect(app) {
   }
   remember(snapshot);
   const windowsOut = snapshot.windows.map((w, i) => ({ windowRef: `w_${i + 1}`, title: w.title.slice(0, 60), foreground: w.foreground, minimized: w.minimized, userAction: isUserActionTitle(w.title) }));
+  // SAFETY-V1 §6: 관찰이 성공하면 이 앱에서 자동화 진행 중이다(창 ref 만 — 제목·핸들은 상태에 넣지 않는다).
+  markAutomationActive(app.appId, windowsOut.find((w) => w.foreground)?.windowRef ?? windowsOut[0]?.windowRef ?? null);
   return {
     status: 'success',
     data: { appId: app.appId, displayName: app.displayName, snapshotId: snapshot.id, windows: windowsOut, elements, elementCount: elements.length, truncated: raw.truncated === true },
@@ -132,6 +135,21 @@ function lookup(args) {
   return { ok: true, snapshot, entry };
 }
 
+/**
+ * SAFETY-V1 §5·§47 — 입력 action 직전 안전 게이트. verify probe(입력 없음)로 사용자 활동 · foreground · 대상 창/요소 · 제출 재검증을 판정한다.
+ * 거절이면 `{ status:'failed', errorCode: WINDOWS_AUTOMATION_*, data.safety }` 를 돌려주고 스크립트 action 은 부르지 않는다.
+ */
+async function safetyGate(app, snapshot, entry, ctx) {
+  const win = snapshot.windows.find((w) => w.hwnd === entry.hwnd);
+  const probe = () => runUiaScript({ O4O_UIA_ACTION: 'verify', O4O_UIA_PID: String(snapshot.pid), O4O_UIA_PROCESS_NAMES: (app.processNames || []).join(','), O4O_UIA_HWND: String(entry.hwnd), ...(entry.rid ? { O4O_UIA_RID: entry.rid } : {}) });
+  const decision = await runSafetyGate(
+    { ...ctx, app, entry: { role: entry.role, hwnd: entry.hwnd, rid: entry.rid, name: entry.name }, snapshotTitle: win ? win.title.slice(0, 60) : undefined, snapshotWindowCount: snapshot.windows.length },
+    { probe, sleep: (ms) => new Promise((r) => setTimeout(r, ms)) },
+  );
+  if (decision.allow) return null;
+  return { status: 'failed', errorCode: decision.code, data: { appId: app.appId, elementRef: ctx.elementRef, safety: { reason: decision.reason, paused: decision.paused === true, retries: decision.retries ?? 0 } } };
+}
+
 function envBase(app, snapshot, entry) {
   return { O4O_UIA_PID: String(snapshot.pid), O4O_UIA_PROCESS_NAMES: (app.processNames || []).join(','), O4O_UIA_HWND: String(entry.hwnd), O4O_UIA_RID: entry.rid };
 }
@@ -141,7 +159,7 @@ function mapScriptFailure(raw) {
   if (reason === 'ELEMENT_STALE') return 'UIA_ELEMENT_STALE';
   if (reason === 'ELEMENT_DISABLED' || reason === 'NOT_EDITABLE' || reason === 'READ_ONLY' || reason === 'NOT_INVOKABLE') return 'UIA_ACTION_NOT_SUPPORTED';
   if (reason === 'TARGET_NOT_FOREGROUND' || reason === 'WINDOW_NOT_VISIBLE') return 'UIA_TARGET_NOT_FOREGROUND';
-  if (reason === 'USER_ACTIVE') return 'UIA_USER_ACTIVE';
+  if (reason === 'USER_ACTIVE') return SAFETY_ERROR.USER_ACTIVE;
   if (reason === 'PROCESS_NOT_FOUND' || reason === 'WINDOW_NOT_TARGET') return 'WINDOWS_APP_NOT_RUNNING';
   return 'UIA_UNAVAILABLE';
 }
@@ -154,6 +172,8 @@ export async function uiaSetValue(app, args) {
   const r = lookup(args);
   if (!r.ok) return { status: r.errorCode === 'UIA_USER_ACTION_REQUIRED' ? 'failed' : 'denied', errorCode: r.errorCode, data: { appId: app.appId } };
   if (r.entry.role !== 'textbox') return { status: 'denied', errorCode: 'UIA_ACTION_NOT_SUPPORTED', data: { appId: app.appId, elementRef: args.elementRef, role: r.entry.role } };
+  const blocked = await safetyGate(app, r.snapshot, r.entry, { action: 'set_value', elementRef: args.elementRef });
+  if (blocked) return blocked;
   const raw = await runUiaScript({ ...envBase(app, r.snapshot, r.entry), O4O_UIA_ACTION: 'set_value', O4O_UIA_TEXT: args.text });
   if (!raw || raw.ok !== true) return { status: 'failed', errorCode: mapScriptFailure(raw), data: { appId: app.appId, elementRef: args.elementRef } };
   return { status: 'success', data: { appId: app.appId, elementRef: args.elementRef, role: r.entry.role, riskLevel: 'REVERSIBLE', executed: true, verified: raw.verified === true, hasValue: raw.hasValue === true, via: raw.via === 'edit_message' ? 'edit_message' : 'setvalue' } };
@@ -166,12 +186,16 @@ export async function uiaInvoke(app, args) {
   if (!r.ok) return { status: r.errorCode === 'UIA_USER_ACTION_REQUIRED' ? 'failed' : 'denied', errorCode: r.errorCode, data: { appId: app.appId } };
   if (r.entry.role === 'window') {
     // 창 요소의 기본 동작 = 그 창을 앞으로. 같은 앱이 창을 여럿(메인 + 대화창) 띄웠을 때 Planner 가 작업 창을 고르는 구조적 방법.
+    const blockedA = await safetyGate(app, r.snapshot, r.entry, { action: 'activate', elementRef: args.elementRef });
+    if (blockedA) return blockedA;
     const rawA = await runUiaScript({ ...envBase(app, r.snapshot, r.entry), O4O_UIA_ACTION: 'activate' });
     if (!rawA || rawA.ok !== true) return { status: 'failed', errorCode: mapScriptFailure(rawA), data: { appId: app.appId, elementRef: args.elementRef } };
     return { status: 'success', data: { appId: app.appId, elementRef: args.elementRef, role: 'window', riskLevel: 'READ', executed: true } };
   }
   if (!CLICKABLE_ROLES.includes(r.entry.role)) return { status: 'denied', errorCode: 'UIA_ACTION_NOT_SUPPORTED', data: { appId: app.appId, elementRef: args.elementRef, role: r.entry.role } };
   if (riskLevelForName(r.entry.name) === 'COMMIT') return { status: 'failed', errorCode: 'UIA_ACTION_NOT_ALLOWED', data: { appId: app.appId, elementRef: args.elementRef, role: r.entry.role, riskLevel: 'COMMIT' } };
+  const blocked = await safetyGate(app, r.snapshot, r.entry, { action: 'invoke', elementRef: args.elementRef });
+  if (blocked) return blocked;
   const raw = await runUiaScript({ ...envBase(app, r.snapshot, r.entry), O4O_UIA_ACTION: 'invoke' });
   if (!raw || raw.ok !== true) return { status: 'failed', errorCode: mapScriptFailure(raw), data: { appId: app.appId, elementRef: args.elementRef } };
   return { status: 'success', data: { appId: app.appId, elementRef: args.elementRef, role: r.entry.role, riskLevel: 'REVERSIBLE', executed: true } };
@@ -198,6 +222,8 @@ export async function uiaKey(app, args) {
     if (isUserActionTitle(fg.title)) return { status: 'failed', errorCode: 'UIA_USER_ACTION_REQUIRED', data: { appId: app.appId } };
     entry = { hwnd: fg.hwnd, rid: '' };
   }
+  const blocked = await safetyGate(app, snapshot, entry, { action: 'key', key: args.key, elementRef: args.elementRef });
+  if (blocked) return blocked;
   const env = { O4O_UIA_PID: String(snapshot.pid), O4O_UIA_PROCESS_NAMES: (app.processNames || []).join(','), O4O_UIA_HWND: String(entry.hwnd), O4O_UIA_ACTION: 'key', O4O_UIA_KEY: args.key };
   if (entry.rid) env.O4O_UIA_RID = entry.rid;
   const raw = await runUiaScript(env);
@@ -235,6 +261,8 @@ export async function uiaClick(app, args) {
   const nx = Math.min(1, Math.max(0, (ex + ew * args.x - wx) / ww));
   const ny = Math.min(1, Math.max(0, (ey + eh * args.y - wy) / wh));
   const fmt = (v) => v.toFixed(6).replace(/0+$/, '').replace(/\.$/, '.0');
+  const blocked = await safetyGate(app, r.snapshot, r.entry, { action: 'click', coords: true, elementRef: args.elementRef });
+  if (blocked) return blocked;
   const raw = await runUiaScript({ O4O_UIA_PID: String(r.snapshot.pid), O4O_UIA_PROCESS_NAMES: (app.processNames || []).join(','), O4O_UIA_HWND: String(r.entry.hwnd), O4O_UIA_ACTION: 'click', O4O_UIA_X: fmt(nx), O4O_UIA_Y: fmt(ny), O4O_UIA_CLICKS: String(clicks) });
   if (!raw || raw.ok !== true) return { status: 'failed', errorCode: mapScriptFailure(raw), data: { appId: app.appId, elementRef: args.elementRef } };
   return { status: 'success', data: { appId: app.appId, elementRef: args.elementRef, role: r.entry.role, riskLevel: 'REVERSIBLE', executed: true, clicks } };

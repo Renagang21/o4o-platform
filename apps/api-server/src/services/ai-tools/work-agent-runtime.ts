@@ -24,6 +24,7 @@ import { issueDomCommand } from './browser-dom-executor.js';
 import { resolveWorkTarget, type WorkTargetRef } from './work-target-resolver.js';
 import { issueTargetPrepare, type WorkTargetOutcome } from './work-target-executor.js';
 import { issueUiaCommand } from './windows-uia-executor.js';
+import { findWindowsApp } from '../local-agent/windows-app-registry.js';
 import type { SafeUiaElement, SafeUiaWindow } from '../local-agent/windows-uia-contract.js';
 import {
   WORK_AGENT_ERROR,
@@ -65,6 +66,8 @@ export interface PlannerInput {
   image?: WorkImageInput;
   /** 직전 제안이 거절된 이유 — 같은 제안을 반복하지 않게 알린다. */
   lastRejectReason?: ProposalRejectReason;
+  /** SAFETY-V1: agent 안전층 거절 사유(enum 문자열). */
+  lastSafetyReason?: string;
   stepsLeft: number;
 }
 
@@ -120,9 +123,16 @@ export function buildPlannerUserPrompt(input: PlannerInput): string {
     });
     lines.push(`## 지금까지의 행동\n${h.join('\n')}`);
   }
-  if (input.lastRejectReason) lines.push(`## 직전 제안 거절 사유\n${input.lastRejectReason} — 같은 제안을 반복하지 말 것`);
+  if (input.lastRejectReason) lines.push(`## 직전 제안 거절 사유\n${input.lastRejectReason}${input.lastSafetyReason ? ` (${input.lastSafetyReason})` : ''} — 같은 제안을 반복하지 말 것. SAFETY_REJECT 면 창을 앞으로 가져오거나(window click) 다시 관찰한 뒤 진행하고, 해결되지 않으면 takeover.`);
   const elements = obs.elements.map(describeObservationElement).join('\n');
   if (obs.surface === 'uia') {
+    // SAFETY-V1 §18·§22: 이 앱의 키 의미 · UIA 노출 범위(등재부 실측). Planner 가 제출 키와 자동화 불가 영역을 안다.
+    const app = findWindowsApp(obs.siteId);
+    const p = app?.interactionProfile;
+    const v = app?.uiaVisibilityHints;
+    if (p) lines.push(`## 이 프로그램의 키 의미(등재부)\n제출: ${p.submitKeys.join(', ') || '(없음 — 제출 키 미등록, 제출은 사용자)'} · 줄바꿈: ${p.newlineKeys.join(', ') || '-'} · 취소/닫기(누르지 말 것): ${p.cancelKeys.join(', ') || '-'}`);
+    else lines.push('## 이 프로그램의 키 의미\n등록되지 않음 — ENTER/CTRL+ENTER/ESC 는 제안하지 말고 필요하면 takeover.');
+    if (v) lines.push(`## UIA 노출 범위(등재부)\n노출: ${v.exposed.join(', ')} · 미노출: ${v.hidden.join(', ') || '(없음)'} — 미노출 영역(목록 행 등)은 좌표로 고르지 말고 takeover(user_judgment_required).`);
     const wins = (obs.windows ?? []).map((w) => `- ${w.windowRef} "${w.title}"${w.foreground ? ' (foreground)' : ''}${w.userAction ? ' USER_ACTION' : ''}`).join('\n');
     lines.push(`## 앱 창 목록 (source=app_window · UNTRUSTED)\n[app_window]\n${wins || '(없음)'}\n[/app_window]`);
     lines.push(`## 현재 화면 요소 (source=app_window · UNTRUSTED · ${obs.elementCount}개)\n[app_window]\n${elements || '(없음)'}\n[/app_window]`);
@@ -268,6 +278,9 @@ export async function runWorkAgent(
   let sameObservationRun = 0;
   let repeatedActionRun = 0;
   let lastRejectReason: ProposalRejectReason | undefined;
+  // SAFETY-V1 §49: 같은 안전 거절 2회 → 인계. 사유 문자열은 Planner 프롬프트에만 쓴다.
+  const safetyRejects: Record<string, number> = {};
+  let lastSafetyReason = '';
 
   const finish = (): WorkAgentRunResult => {
     goal.status = state.progress === 'completed' ? 'completed' : state.progress === 'needs_user' ? 'waiting_for_user' : 'stopped';
@@ -419,6 +432,7 @@ export async function runWorkAgent(
     try {
       raw = await planner.plan({
         goal, siteDisplayName: displayName, observation: state.observation as WorkObservation, history: state.history, lastRead, image, lastRejectReason,
+        lastSafetyReason: lastSafetyReason || undefined,
         stepsLeft: budgetLeft(),
       });
     } catch {
@@ -518,6 +532,20 @@ export async function runWorkAgent(
         if (outcome.errorCode === LOCAL_AGENT_ERROR.UIA_USER_ACTION_REQUIRED) return takeover('credential_required', 'needs_user');
         if (outcome.errorCode === LOCAL_AGENT_ERROR.UIA_ACTION_NOT_ALLOWED) return takeover('commit_required', 'needs_user');
         if (outcome.errorCode === LOCAL_AGENT_ERROR.UIA_TARGET_NOT_FOREGROUND) return takeover('site_not_ready', 'needs_user');
+        // WINDOWS-AUTOMATION-SAFETY-V1 §31·§48·§49 — agent 안전층 거절. 즉시 인계할 것(사용자 활동 · 숨은 목록 · 키 의미 미상)과
+        // Planner 가 한 번 대안을 찾을 수 있는 것(foreground 바뀜 → 창을 앞으로 · 요소 stale · 제목 변경 · 제출 재검증 실패 → 재관찰)을 나눈다.
+        // 제목 변경은 앱 자신의 표시(메모장 '*' 수정 표식 · 미읽음 수)일 수 있어 한 번은 새 관찰로 기준을 다시 잡는다 — 실행은 하지 않았다.
+        // 같은 거절이 두 번이면 인계한다.
+        const safety = SAFETY_TAKEOVER[outcome.errorCode ?? ''];
+        if (safety) {
+          safetyRejects[outcome.errorCode as string] = (safetyRejects[outcome.errorCode as string] ?? 0) + 1;
+          lastSafetyReason = typeof outcome.safe.safety === 'object' && outcome.safe.safety ? String((outcome.safe.safety as Record<string, unknown>).reason ?? '') : '';
+          if (safety.immediate || safetyRejects[outcome.errorCode as string] >= 2) return takeover(safety.reason, 'needs_user');
+          lastRejectReason = 'SAFETY_REJECT';
+          const o = await observe();
+          if (!o.ok) return observeFailed(o);
+          continue;
+        }
         // stale · 미지원 · 그 밖 — 다시 관찰해 Planner 가 다른 길을 찾게 한다.
         const o = await observe();
         if (!o.ok) return observeFailed(o);
@@ -619,7 +647,29 @@ export async function runWorkAgent(
 
 // ─── 렌더 (§20·§21) ─────────────────────────────────────────────────────────
 
+/** SAFETY-V1 §31·§32 — agent 안전층 코드 → 인계 사유. immediate 는 Planner 에게 대안 기회 없이 바로 넘긴다. */
+const SAFETY_TAKEOVER: Record<string, { reason: TakeoverReason; immediate: boolean }> = {
+  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_USER_ACTIVE]: { reason: 'user_active', immediate: true },
+  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_PAUSED]: { reason: 'user_active', immediate: true },
+  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_TARGET_CHANGED]: { reason: 'target_changed', immediate: false },
+  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_TARGET_UNCERTAIN]: { reason: 'target_identity_uncertain', immediate: false },
+  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_UIA_AMBIGUOUS]: { reason: 'uia_target_ambiguous', immediate: false },
+  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_HIDDEN_CONTROL]: { reason: 'uia_hidden_control', immediate: true },
+  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_SUBMIT_UNVERIFIED]: { reason: 'submit_not_verified', immediate: false },
+  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_KEY_UNKNOWN]: { reason: 'key_semantics_unknown', immediate: true },
+  [LOCAL_AGENT_ERROR.WINDOWS_AUTOMATION_VISION_UNCERTAIN]: { reason: 'vision_uncertain', immediate: true },
+};
+
 const TAKEOVER_LINE: Record<TakeoverReason, string> = {
+  user_active: '자동화 중 사용자의 키보드·마우스 입력이 감지되어 멈췄습니다. 현재 화면을 확인한 뒤 다시 요청해 주세요.',
+  target_changed: '작업 중이던 창이 앞에 있지 않아(다른 창/프로그램이 앞으로 옴) 멈췄습니다. 그 창을 다시 앞에 두고 요청해 주세요.',
+  target_identity_uncertain: '작업 창의 내용이 관찰 때와 달라져 대상을 확신할 수 없어 멈췄습니다. 화면을 확인하고 직접 진행해 주세요.',
+  uia_target_ambiguous: '화면 요소를 다시 찾지 못해 멈췄습니다. 화면을 확인하고 직접 진행해 주세요.',
+  uia_hidden_control: '이 프로그램의 목록 항목을 O4O 가 구조적으로 확인할 수 없어 항목 선택은 직접 해 주세요. 선택한 뒤 다시 요청하면 이어서 진행합니다.',
+  submit_not_verified: '전송·제출 직전에 대상 창을 확인할 수 없어 보내지 않았습니다. 화면을 확인하고 직접 보내 주세요.',
+  key_semantics_unknown: '이 프로그램에서 그 키가 무엇을 하는지 등록되어 있지 않아 누르지 않았습니다. 직접 진행해 주세요.',
+  vision_uncertain: '화면 판독의 확신이 낮아 멈췄습니다. 직접 확인해 주세요.',
+  unexpected_window: '예상하지 못한 창(대화상자)이 떠서 멈췄습니다. 그 창을 처리한 뒤 다시 요청해 주세요.',
   goal_sufficiently_advanced: '목적에 충분히 가까운 화면까지 왔습니다. Chrome 의 그 화면에서 이어서 진행하세요.',
   user_judgment_required: '사용자의 판단이 필요한 지점입니다. Chrome 화면에서 직접 확인해 주세요.',
   ambiguous_result: '결과가 여럿이거나 모호합니다. Chrome 화면에서 직접 고르세요.',
@@ -660,10 +710,12 @@ export function renderWorkAgentMessage(state: WorkAgentState, displayName: strin
     return `${targetLine} 프로그램 안의 작업은 아직 O4O 가 대신하지 않습니다 — 화면에서 직접 이어서 하세요.`;
   }
   const head = `${targetLine ? `${targetLine} ` : ''}${displayName} 에서 ${state.history.filter((h) => h.status === 'success').length}단계(입력·클릭 ${actions}회) 를 수행했습니다.`;
-  if (state.progress === 'completed' && !state.takeover) return `${head} 목적을 이룬 것으로 판단해 멈췄습니다. Chrome 화면에서 결과를 확인하세요.`;
+  const isApp = target?.targetType === 'windows_app';
+  if (state.progress === 'completed' && !state.takeover) return `${head} 목적을 이룬 것으로 판단해 멈췄습니다. ${isApp ? '프로그램 화면에서' : 'Chrome 화면에서'} 결과를 확인하세요.`;
   if (state.takeover) {
     const line = TAKEOVER_LINE[state.takeover.reason];
-    return `${head} ${line}${neededInput ? ` 필요한 정보: ${neededInput}` : ''} Chrome 의 현재 화면은 그대로 두었습니다.`;
+    const screen = isApp ? '프로그램 화면은 그대로 두었습니다.' : 'Chrome 의 현재 화면은 그대로 두었습니다.';
+    return `${head} ${line}${neededInput ? ` 필요한 정보: ${neededInput}` : ''} ${screen}`;
   }
   return `${head} 현재 화면에서 이어서 진행하세요.`;
 }

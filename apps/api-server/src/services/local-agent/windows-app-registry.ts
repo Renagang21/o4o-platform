@@ -34,6 +34,13 @@ export interface WindowsAppDefinition {
   /** WORK-TARGET-DISCOVERY-V0 §7 — 문장에서 이 앱을 가리키는 별칭(공백 제거 대조). URL·경로가 아니다. */
   aliases: readonly string[];
   /**
+   * WINDOWS-AUTOMATION-SAFETY-V1 §18~§21 — 이 앱에서 키가 뜻하는 것(실측 기준). 없으면 제출 성격 키(ENTER · CTRL+ENTER)는 자동 실행하지 않는다.
+   * 매크로 정의가 아니다 — 제출 · 줄바꿈 · 취소 · 위험 네 묶음뿐.
+   */
+  interactionProfile?: { submitKeys: readonly string[]; newlineKeys: readonly string[]; cancelKeys: readonly string[]; riskyKeys: readonly string[] };
+  /** WINDOWS-AUTOMATION-SAFETY-V1 §22~§24 — 실제 사용에서 확인된 UIA 노출 범위(힌트). Planner 가 "무엇을 자동화할 수 있는가" 를 안다. */
+  uiaVisibilityHints?: { exposed: readonly string[]; hidden: readonly string[] };
+  /**
    * 이 앱으로 인정할 process 이름(확장자 없음, 대소문자 무시).
    * **agent 밖으로 나가지 않는다.**
    */
@@ -58,6 +65,8 @@ export const WINDOWS_APP_REGISTRY: readonly WindowsAppDefinition[] = Object.free
     displayName: '메모장',
     aliases: Object.freeze(['메모장', 'notepad']),
     processNames: ['notepad'],
+    interactionProfile: { submitKeys: [], newlineKeys: ['ENTER'], cancelKeys: ['ESC'], riskyKeys: [] },
+    uiaVisibilityHints: { exposed: ['window', 'input', 'menu'], hidden: [] },
   }) as WindowsAppDefinition,
   // WINDOWS-UI-AUTOMATION-V0 — 첫 실제 Windows 앱(약국 프로그램 준비 전 대체). 실행 경로는 agent 등재부에만 있다.
   Object.freeze({
@@ -65,6 +74,9 @@ export const WINDOWS_APP_REGISTRY: readonly WindowsAppDefinition[] = Object.free
     displayName: '카카오톡',
     aliases: Object.freeze(['카카오톡', '카톡', 'kakaotalk', 'kakao talk']),
     processNames: ['KakaoTalk'],
+    // 실측(2026-09-13): ENTER=전송 · CTRL+ENTER=줄바꿈 · ESC=대화창 닫힘. 목록 행 · 메시지 목록 · 전송 버튼은 UIA 미노출.
+    interactionProfile: { submitKeys: ['ENTER'], newlineKeys: ['CTRL+ENTER'], cancelKeys: ['ESC'], riskyKeys: ['ESC'] },
+    uiaVisibilityHints: { exposed: ['window', 'search', 'input'], hidden: ['list_rows', 'message_list', 'send_button'] },
   }) as WindowsAppDefinition,
   Object.freeze({
     appId: 'windows.calculator',

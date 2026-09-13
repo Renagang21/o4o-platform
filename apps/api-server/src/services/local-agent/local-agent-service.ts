@@ -33,6 +33,7 @@ import {
   SITE_TARGET_ACTIONS,
   COMPUTER_TARGET_ACTIONS,
   DOM_TARGET_ACTIONS,
+  UIA_TARGET_ACTIONS,
   LOCAL_AGENT_ERROR,
   SUPPORTED_AGENT_PLATFORMS,
   isAllowedLocalAction,
@@ -619,12 +620,15 @@ export async function submitCommandResult(
   // 상태 플래그만 남는다(pickSafeComputerInfo). 이미지·창 제목·좌표는 화이트리스트에 없다.
   // BROWSER-DOM-CONTROL-V0: DOM action 도 동일 — 실패 시 riskLevel · userActionRequired 같은 판정
   // 플래그만 남는다(pickSafeDomInfo). HTML · 폼 값 · URL query 는 화이트리스트에 없다.
+  // WINDOWS-AUTOMATION-SAFETY-V1 §48·§59: UIA action 의 안전층 거절도 동일 — 사유 enum · 멈춤 여부 · 재검사 횟수만
+  // 남는다(pickSafeUiaInfo.safety). 창 제목 · 좌표 · 키 내용은 화이트리스트에 없다.
   const keepFailureData =
     status === 'failed' &&
     (APP_TARGET_ACTIONS.includes(failureBase) ||
       SITE_TARGET_ACTIONS.includes(failureBase) ||
       COMPUTER_TARGET_ACTIONS.includes(failureBase) ||
-      DOM_TARGET_ACTIONS.includes(failureBase));
+      DOM_TARGET_ACTIONS.includes(failureBase) ||
+      UIA_TARGET_ACTIONS.includes(failureBase));
   const safeData =
     status === 'success' || keepFailureData ? pickSafeResultData(action, result.data) : null;
 
