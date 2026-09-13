@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { AppDataSource } from '../database/connection.js';
+import { getStartupState } from '../bootstrap/startup-state.js';
 import { opsMetrics } from '../services/ops-metrics.service.js';
 import * as os from 'os';
 
@@ -249,7 +250,13 @@ async function performDetailedHealthCheck(): Promise<DetailedHealthCheckResponse
 
 async function checkReadiness(): Promise<boolean> {
   try {
-    // Check database connection
+    // WO-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1:
+    //   readiness 의 첫 조건은 서버 상태 정본(startup-state)이 READY 인가다.
+    //   STARTING · DB_CONNECTING(비프로덕션 graceful 경로) · FAILED · SHUTTING_DOWN 은 전부 not-ready(503).
+    if (getStartupState() !== 'READY') {
+      return false;
+    }
+    // Check database connection — 실제 DB 왕복. 실패는 catch 에서 false 로 떨어진다(200 위장 없음).
     await AppDataSource.query('SELECT 1');
     
     // Check if we have enough memory

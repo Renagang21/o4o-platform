@@ -8,30 +8,32 @@ import { spdRevisionExpiryJob } from '../jobs/spd-revision-expiry.job.js';
 import { videoTempOutputExpiryJob } from '../jobs/video-temp-output-expiry.job.js';
 import { env } from '../utils/env-validator.js';
 import logger from '../utils/logger.js';
+import {
+  transitionStartupState,
+  isGracefulStartupAllowed,
+  DB_CONNECT_MAX_ATTEMPTS,
+  DB_CONNECT_ATTEMPT_TIMEOUT_MS,
+  DB_CONNECT_RETRY_BASE_DELAY_MS,
+} from '../bootstrap/startup-state.js';
 
 /**
  * ============================================================================
  * Startup Service - Phase 2.5 GRACEFUL_STARTUP Policy
  * ============================================================================
  *
- * GRACEFUL_STARTUP Policy:
- * - Default: true (GRACEFUL_STARTUP !== 'false')
- * - When true: DB/Redis/external service failures are logged but don't crash
- * - When false: Fail-fast behavior for strict production requirements
+ * GRACEFUL_STARTUP Policy — WO-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1 로 개정:
+ * - **프로덕션(NODE_ENV=production)에서는 무시된다.** DB 연결이 예산 안에 성공하지 못하면 throw 하고
+ *   main.ts 가 process exit non-zero 로 끝낸다. HTTP port 는 열리지 않으므로 Cloud Run TCP startup probe 가
+ *   성공하지 않고, 해당 revision 은 트래픽을 받지 않는다.
+ * - 비프로덕션(로컬 개발 · 테스트)에서만 `GRACEFUL_STARTUP !== 'false'` 이면 DB 없이 기동을 계속한다
+ *   (`bootstrap/startup-state.ts` 의 isGracefulStartupAllowed 가 단일 판정 지점).
  *
- * Responsibilities:
- * 1. "기동 책임" (Startup Responsibility):
- *    - Express server MUST start and listen on PORT
- *    - /health endpoint MUST always respond
+ * 폐기한 옛 계약: "Express server MUST start and listen on PORT / DB is optional / Server continues with
+ * degraded functionality". 프로덕션에서 DB 없이 port 를 여는 것은 모든 DB 의존 route 를 500 으로 만들 뿐이며,
+ * 정식 degraded mode 계약은 존재하지 않는다.
  *
- * 2. "의존성 책임" (Dependency Responsibility):
- *    - DB/Redis/external services are optional
- *    - Failures are logged with warnings
- *    - Server continues with degraded functionality
- *
- * Usage:
- * - Cloud Run: GRACEFUL_STARTUP=true (default) - server always starts
- * - Production with DB: GRACEFUL_STARTUP=false - fail-fast if DB unavailable
+ * DB 연결 예산: 5회 × (연결 timeout 15s) + 백오프 3·6·9·12s = 최대 약 105s.
+ * Cloud Run startup probe(TCP · timeout 240s · failureThreshold 1) 안에 들어온다.
  *
  * ============================================================================
  * Phase 5-B: Auth ↔ Infra Separation
@@ -68,6 +70,7 @@ import logger from '../utils/logger.js';
  * `/health/ready`(`SELECT 1`) 가 담당하고, liveness 는 `main.ts` 의 즉시 `/health` 가 담당한다.
  * ============================================================================
  */
+
 export class StartupService {
   /**
    * Initialize all services
@@ -93,28 +96,26 @@ export class StartupService {
    */
   private async initializeDatabase(): Promise<void> {
     logger.info('Initializing database...');
+    transitionStartupState('DB_CONNECTING');
 
     if (AppDataSource.isInitialized) {
       logger.info('Database already initialized');
       return;
     }
 
-    const dbConfig = {
-      host: env.getString('DB_HOST'),
-      port: env.getNumber('DB_PORT'),
-      username: env.getString('DB_USERNAME'),
-      password: env.getString('DB_PASSWORD'),
-      database: env.getString('DB_NAME')
+    // 접속 문자열(host · username · database)은 로그에 남기지 않는다 — 설정 존재 여부만 확인한다.
+    const dbConfigured = {
+      host: !!env.getString('DB_HOST'),
+      port: !!env.getNumber('DB_PORT'),
+      username: !!env.getString('DB_USERNAME'),
+      password: !!env.getString('DB_PASSWORD'),
+      database: !!env.getString('DB_NAME'),
     };
-
-    logger.info('Database configuration:', {
-      ...dbConfig,
-      password: dbConfig.password ? '***' : 'NOT SET'
-    });
+    logger.info('Database configuration presence:', dbConfigured);
 
     let dbConnected = false;
-    const maxRetries = 5;
-    const retryDelayMs = 3000;
+    const maxRetries = DB_CONNECT_MAX_ATTEMPTS;
+    const retryDelayMs = DB_CONNECT_RETRY_BASE_DELAY_MS;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
@@ -122,7 +123,7 @@ export class StartupService {
 
         const dbConnectionPromise = AppDataSource.initialize();
         const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Database connection timeout')), 15000);
+          setTimeout(() => reject(new Error('Database connection timeout')), DB_CONNECT_ATTEMPT_TIMEOUT_MS);
         });
 
         await Promise.race([dbConnectionPromise, timeoutPromise]);
@@ -130,7 +131,12 @@ export class StartupService {
         dbConnected = true;
         break;
       } catch (connectionError) {
-        logger.warn(`Database connection attempt ${attempt} failed:`, connectionError);
+        // 에러 객체 전체(address · port · 메시지 속 host:port)를 남기지 않는다 — 코드 · 이름만 기록.
+        const err = connectionError as { code?: string; name?: string } | undefined;
+        logger.warn(`Database connection attempt ${attempt}/${maxRetries} failed`, {
+          code: err?.code ?? 'UNKNOWN',
+          name: err?.name ?? 'Error',
+        });
 
         if (attempt < maxRetries) {
           const delay = retryDelayMs * attempt;
@@ -141,20 +147,17 @@ export class StartupService {
     }
 
     if (!dbConnected) {
-      const errorMessage = 'Failed to connect to database after multiple attempts';
+      const errorMessage = `Failed to connect to database after ${maxRetries} attempts`;
       logger.error(`⚠️ ${errorMessage}`);
 
-      // GRACEFUL_STARTUP Policy: Default to true (only false when explicitly set)
-      const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
-
-      if (gracefulStartup) {
-        logger.warn('🔄 GRACEFUL_STARTUP=true: Continuing without database');
-        logger.warn('   → /health will respond, but DB-dependent features are unavailable');
+      if (isGracefulStartupAllowed()) {
+        // 비프로덕션 전용 — 프로덕션에서는 isGracefulStartupAllowed() 가 항상 false 다.
+        logger.warn('🔄 GRACEFUL_STARTUP (non-production): Continuing without database');
+        logger.warn('   → DB-dependent features are unavailable in this process');
         return;
-      } else {
-        logger.error('GRACEFUL_STARTUP=false: Failing due to database connection failure');
-        throw new Error(errorMessage);
       }
+      transitionStartupState('FAILED', 'database-connect');
+      throw new Error(errorMessage);
     }
 
     // migration 은 여기서 실행하지 않는다 — 소유자는 deploy workflow 의 Cloud Run Job (헤더 주석 참조).

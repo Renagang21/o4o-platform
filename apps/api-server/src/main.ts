@@ -27,6 +27,7 @@ import logger from './utils/logger.js';
 
 // Services
 import { startupService } from './services/startup.service.js';
+import { transitionStartupState, isGracefulStartupAllowed, logStartupPhase } from './bootstrap/startup-state.js';
 
 // Configuration
 import { initializePassport } from './config/passportDynamic.js';
@@ -95,7 +96,11 @@ io.on('connection', (socket) => {
 });
 
 // ============================================================================
-// IMMEDIATE HEALTH ENDPOINT — CLOUD RUN STARTUP PROBE
+// LIVENESS ENDPOINT (/health) — 프로세스 생존만 뜻한다. DB 상태를 반영하지 않는다.
+//   WO-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1:
+//   HTTP listen 은 아래 startServer() 에서 DB 연결·라우트 등록이 끝나 READY 로 전환된 뒤에만 호출된다.
+//   따라서 이 핸들러가 "등록" 됐다는 것과 port 가 "열렸다" 는 것은 다르다 — Cloud Run TCP startup probe 는
+//   listen 이후에만 성공한다. 준비 여부는 /health/ready (routes/health.ts) 가 답한다.
 // ============================================================================
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -115,7 +120,7 @@ app.get('/', (req, res, next) => {
   next();
 });
 
-logger.info(`[STARTUP] Immediate health endpoint registered on port ${port}`);
+logger.info(`[STARTUP] Liveness handler registered (port ${port} is NOT open yet — listen happens after READY)`);
 
 // ============================================================================
 // MIDDLEWARE SETUP
@@ -143,8 +148,8 @@ try {
 // ============================================================================
 const startServer = async () => {
   logger.info('Starting server...');
+  logStartupPhase('process_start', { nodeEnv: process.env.NODE_ENV || 'development' });
   const host = process.env.HOST || '0.0.0.0';
-  const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
 
   // ── Phase 1: Non-DB initialization ──
 
@@ -168,11 +173,13 @@ const startServer = async () => {
     await startupService.initialize();
   } catch (error) {
     logger.error('⚠️ Service initialization failed:', error);
-    if (!gracefulStartup) {
-      logger.error('GRACEFUL_STARTUP=false: Exiting due to initialization failure');
+    if (!isGracefulStartupAllowed()) {
+      // 프로덕션: port 를 열지 않고 non-zero 로 종료한다. TCP startup probe 가 성공하지 않으므로
+      // 이 revision 은 트래픽을 받지 않고, 기존 serving revision 이 유지된다.
+      logger.error('💀 Startup FAILED (production): exiting without opening the HTTP port');
       process.exit(1);
     }
-    logger.warn('🔄 GRACEFUL_STARTUP=true: Continuing with degraded functionality');
+    logger.warn('🔄 GRACEFUL_STARTUP (non-production): Continuing with degraded functionality');
   }
 
   try {
@@ -191,10 +198,18 @@ const startServer = async () => {
   // WO-O4O-GLOBAL-ERROR-HANDLER-ENABLEMENT-V1
   app.use(globalErrorHandler);
 
-  // ── Phase 4: Start listening — ALL routes ready ──
+  // ── Phase 4: READY → listen — DB 연결 · 라우트 등록이 끝난 뒤에만 port 를 연다 ──
+  //   (WO-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1)
+  //   비프로덕션 graceful 경로에서는 DB 없이 여기 도달할 수 있다. 그 경우 상태는 DB_CONNECTING 에 머물고
+  //   /health/ready 는 503 을 유지한다 — 준비 안 됨을 200 으로 위장하지 않는다.
+
+  if (AppDataSource.isInitialized) {
+    transitionStartupState('READY');
+  }
 
   await new Promise<void>((resolve) => {
     httpServer.listen(port as number, host as string, () => {
+      logStartupPhase('http_listen', { host, port });
       logger.info(`🚀 API Server listening on ${host}:${port} (all routes registered)`);
       resolve();
     });
@@ -207,12 +222,11 @@ const startServer = async () => {
 
 startServer().catch((error) => {
   logger.error('Failed to start server:', error);
-  const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
-  if (!gracefulStartup) {
-    logger.error('💀 GRACEFUL_STARTUP=false: Exiting process due to startup failure');
+  if (!isGracefulStartupAllowed()) {
+    logger.error('💀 Startup FAILED (production): exiting process, HTTP port stays closed');
     process.exit(1);
   }
-  logger.warn('🔄 Server startup failed but GRACEFUL_STARTUP enabled: Process will continue');
+  logger.warn('🔄 Server startup failed but GRACEFUL_STARTUP (non-production) enabled: Process will continue');
   logger.warn('   Note: Some features may not work. Check logs for details.');
 });
 

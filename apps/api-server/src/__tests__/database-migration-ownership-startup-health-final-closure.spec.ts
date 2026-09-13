@@ -67,9 +67,11 @@ describe('8.1 startup — API startup 은 migration 을 실행하지 않는다',
     expect(src).not.toMatch(/database-checker/);
   });
 
-  it('DB 연결 재시도와 GRACEFUL_STARTUP 정책은 보존된다 (제거 범위 밖)', () => {
+  it('DB 연결 재시도는 보존되고, GRACEFUL 판정은 startup-state 의 단일 지점으로 옮겨졌다', () => {
+    // WO-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1:
+    //   프로덕션에서는 GRACEFUL_STARTUP 이 무시된다(isGracefulStartupAllowed). 상세는 api-database-readiness-cold-start-gate.spec.
     expect(src).toMatch(/AppDataSource\.initialize\s*\(/);
-    expect(src).toMatch(/GRACEFUL_STARTUP/);
+    expect(src).toMatch(/isGracefulStartupAllowed\(\)/);
   });
 });
 

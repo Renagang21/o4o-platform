@@ -94,7 +94,9 @@ class EnvironmentValidator {
   private logConfiguration(): void {
     logger.info('🔧 Environment Configuration:');
     logger.info(`  - Environment: ${this.env.NODE_ENV || 'development'}`);
-    logger.info(`  - Database: ${this.env.DB_NAME}@${this.env.DB_HOST}:${this.env.DB_PORT}`);
+    // WO-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1:
+    //   접속 문자열(db@host:port)을 기동 로그에 남기지 않는다 — 설정 존재 여부만.
+    logger.info(`  - Database: ${this.env.DB_HOST && this.env.DB_NAME ? 'configured' : 'NOT CONFIGURED'}`);
     logger.info(`  - Server Port: ${this.env.PORT || '8080'}`);
     
     // Optional services

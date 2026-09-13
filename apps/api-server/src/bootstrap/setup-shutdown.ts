@@ -4,6 +4,7 @@
  */
 import { Server as HttpServer } from 'http';
 import logger from '../utils/logger.js';
+import { transitionStartupState, getStartupState } from './startup-state.js';
 
 interface ShutdownableService {
   shutdown(): Promise<void>;
@@ -17,6 +18,12 @@ export function setupGracefulShutdown(
 ): void {
   const gracefulShutdown = async (signal: string) => {
     logger.info(`${signal} signal received: initiating graceful shutdown`);
+    // WO-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1:
+    //   readiness 를 즉시 503 으로 내린다. httpServer.close() 가 신규 연결을 거부하는 것과 별개로,
+    //   이미 열린 keep-alive 연결로 들어오는 /health/ready 가 200 을 돌려주지 않게 한다.
+    if (getStartupState() !== 'SHUTTING_DOWN') {
+      transitionStartupState('SHUTTING_DOWN', signal);
+    }
 
     // Set a timeout to force exit if shutdown takes too long
     const forceExitTimeout = setTimeout(() => {

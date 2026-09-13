@@ -2,7 +2,11 @@ name: Deploy API Server (Cloud Run)
 
 # Deploy API server to Cloud Run on push to main branch
 # Phase R5: Cloud Run 단일 배포 체계
-# Phase G1-2: Operational Mode (GRACEFUL_STARTUP=false, Cloud SQL 연결 필수)
+# Phase G1-2: Operational Mode (Cloud SQL 연결 필수)
+# WO-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1:
+#   API 는 DB 연결·라우트 등록이 끝난 뒤에만 HTTP port 를 연다(READY → listen). 프로덕션에서 GRACEFUL_STARTUP 은
+#   코드가 무시하며(NODE_ENV=production 은 항상 fail-fast) 여기서도 더 이상 설정하지 않는다.
+#   DB 연결 실패 = process exit 1 = TCP startup probe 미성공 = 새 revision 미승격 = 기존 revision 유지.
 #
 # Migration Architecture:
 # - Uses TypeORM CLI with lightweight migration-config.js (NO entity imports)
@@ -334,11 +338,11 @@ jobs:
         echo "🚀 Deploying to Cloud Run..."
 
         # ============================================================
-        # ============================================================
-        # GRACEFUL_STARTUP=true: Server starts immediately, DB connects async.
-        # Cloud SQL Auth Proxy sometimes takes 5-10s, causing connection timeout
-        # if GRACEFUL_STARTUP=false. Health check reports alive, routes register
-        # once DB connection succeeds.
+        # WO-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1
+        #   옛 주석("GRACEFUL_STARTUP=true: Server starts immediately, DB connects async")은 더 이상
+        #   사실이 아니다. 서버는 DB 연결 후에만 listen 하며, Cloud SQL 소켓이 늦게 뜨는 경우는
+        #   앱의 DB 연결 예산(5회 × 15s + 백오프, 최대 약 105s < startup probe 240s)이 흡수한다.
+        #   GRACEFUL_STARTUP 은 프로덕션에서 무시되므로 env 에서 제거했다(dead configuration).
         # ============================================================
 
         gcloud run deploy ${{ env.SERVICE_NAME }} \
@@ -356,7 +360,6 @@ jobs:
           --concurrency=80 \
           --timeout=300 \
           --set-env-vars="NODE_ENV=production" \
-          --set-env-vars="GRACEFUL_STARTUP=true" \
           --set-env-vars="EMAIL_SERVICE_ENABLED=true" \
           --set-env-vars="SMTP_HOST=smtp.gmail.com" \
           --set-env-vars="SMTP_PORT=587" \
@@ -464,15 +467,19 @@ jobs:
           exit 1
         fi
 
-        # Health check via the official load balancer domain
+        # Readiness check via the official load balancer domain
+        #   WO-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1:
+        #   /health 는 liveness(프로세스 생존, 항상 200)라 배포 성공의 근거가 못 된다.
+        #   /health/ready 는 서버 상태가 READY 이고 DB `SELECT 1` 이 통과할 때만 200, 아니면 503 이다.
+        #   재시도는 5회 × 10s 로 상한이 있고, 최종 실패는 exit 1 로 정확히 반환한다 (continue-on-error · || true 없음).
         for i in {1..5}; do
-          echo "Health check attempt $i (${{ env.PUBLIC_API_URL }}/health)..."
-          if curl -sf "${{ env.PUBLIC_API_URL }}/health" > /dev/null; then
-            echo "✅ Health check passed!"
+          echo "Readiness check attempt $i (${{ env.PUBLIC_API_URL }}/health/ready)..."
+          if curl -sf "${{ env.PUBLIC_API_URL }}/health/ready" > /dev/null; then
+            echo "✅ Readiness check passed (READY + DB SELECT 1)"
             break
           fi
           if [ $i -eq 5 ]; then
-            echo "❌ Health check failed after 5 attempts"
+            echo "❌ Readiness check failed after 5 attempts"
             exit 1
           fi
           sleep 10
@@ -483,7 +490,7 @@ jobs:
         echo "✅ API Server Deployed Successfully!"
         echo "=========================================="
         echo "🌐 Public URL: ${{ env.PUBLIC_API_URL }}"
-        echo "🏥 Health: ${{ env.PUBLIC_API_URL }}/health"
+        echo "🏥 Readiness: ${{ env.PUBLIC_API_URL }}/health/ready"
         echo "🔒 Cloud Run URL (LB-only): ${SERVICE_URL}"
         echo "📅 Time: $(date)"
         echo "📝 Commit: ${{ github.sha }}"
