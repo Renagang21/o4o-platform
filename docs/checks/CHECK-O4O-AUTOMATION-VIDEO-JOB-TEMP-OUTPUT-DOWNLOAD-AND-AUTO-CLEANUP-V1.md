@@ -164,7 +164,7 @@ production 실측(2026-09-12, `GET /platform/automation-jobs` + `/media-library/
 
 - 구현 커밋 `4a569fff8` (docs 2건 뒤로 rebase). 문서 커밋은 이 파일을 담은 커밋(HEAD).
 - `HEAD == origin/main` — 문서 push 직후 확인. 최종 `git status`: WO 범위 미커밋 0건.
-- 세션 중 사건: 외부 디스크 정리가 `packages/` 8개 디렉터리(추적 175 파일 + node_modules) 를 비움 → 사용자 승인 후 `git restore --source=HEAD` 로 복구, `pnpm install --frozen-lockfile --offline` + `build:packages` 재실행. 추적 변경 없음. **원인(왜 `o4o-platform\packages\` 가 정리 대상이었는지) 은 별도 확인 필요.**
+- 세션 중 사건(2026-09-12 23:29): `packages/` 8개 디렉터리(추적 175 파일 + node_modules)가 비워짐 → 사용자 승인 후 `git restore --source=HEAD` 로 복구, `pnpm install --frozen-lockfile --offline` + `build:packages` 재실행. 추적 변경 없음. **원인 확정(정정)**: 처음 보고한 "외부 디스크 정리" 가 아니라, 다른 세션이 `C:	mp\o4o-product-landing-coverage-closure` worktree 를 `git worktree remove` 할 때 그 worktree 의 `node_modules` 가 메인 `node_modules` 를 가리키는 **junction** 이었고(해제 실패 미확인), Windows git 이 junction 을 재귀 삭제 → pnpm workspace 링크(`node_modules/@o4o/<pkg>` → `packages/<pkg>`)를 타고 소스가 삭제된 것. 재발 방지: 재귀 삭제·`git worktree remove` 전 모든 깊이의 reparse point 를 비재귀로 해제하고 재스캔 0 을 확인한 뒤에만 삭제, 삭제 후 메인에서 `git status --short | grep '^ D'` 로 손상 검증.
 
 ## 16. 문서 정합
 
