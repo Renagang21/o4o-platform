@@ -1,6 +1,6 @@
 # CHECK-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1
 
-> **상태**: 구현·로컬 검증 완료 → CI·배포·운영 검증 _(§9 갱신)_
+> **상태**: **CLOSED** — 구현 · CI 6/6 · 배포 · 운영 실측 완료 (구현 SHA = push SHA = `f8f041970`)
 > **작성일**: 2026-09-13
 > **WO**: WO-O4O-CMS-LIFECYCLE-SCHEMA-CPT-ACF-AND-DEAD-ENTITY-FINAL-RETIREMENT-V1
 > **기준 조사**: [`IR-O4O-CMS-LIFECYCLE-TABLE-OWNERSHIP-AND-RUNTIME-CONSUMER-CENSUS-V1`](../investigations/IR-O4O-CMS-LIFECYCLE-TABLE-OWNERSHIP-AND-RUNTIME-CONSUMER-CENSUS-V1.md) — 권고 A 승인
@@ -164,12 +164,72 @@ A  1   cms-lifecycle-schema-cpt-acf-dead-entity-retirement.spec.ts
 | 3 | `@o4o/shared-space-ui` copy props (소비 0) | 전역 dead-code 후보 — 미혼합 (WO §E) |
 | 4 | `packages/utils` `usePreset` · `@o4o/types` preset/CPT 인터페이스 — backend preset API 가 없는데 프런트 훅이 남아 있음 | 이번 범위 밖(패키지 계약). 전역 dead-code census 인계 |
 | 5 | 다른 core(auth · platform · organization · lms)의 `lifecycle/install.ts` 에도 `CREATE TABLE` 이 남아 있다(각 8·3·4·8) — 호출자 유무는 미조사 | 별도 IR 후보 (스키마 단일 소유자 계약의 잔여 위험) |
+| 6 | 신규 revision 콜드스타트 중 DB 준비 전 도착한 요청이 500 (`/guide/contents`, 8.5s, §9-4) — startupProbe 가 TCP 라 DB 준비 전에도 트래픽이 들어온다 | 본 WO 무관 · 기동 경합 잔재. 별도 판단 |
 
 ---
 
 ## 9. CI · 배포 · 운영 검증
 
-_(push 후 갱신)_
+### 9-1. CI (SHA `f8f041970`, 자기 SHA 완주)
+
+| 워크플로 | 결과 | run |
+|---|---|---:|
+| CI Pipeline | ✅ success | 34738705936 |
+| CodeQL Security Analysis | ✅ success | 34738705941 |
+| AppStore Guard | ✅ success (cms-core `install.ts` 부재 경고 — 비차단 · 의도) | 34738705986 |
+| Deploy API Server (Cloud Run) | ✅ success | 34738705914 |
+| Deploy Admin Dashboard (Cloud Run) | ✅ success | 34738705968 |
+| Deploy Web Services (Cloud Run) | ✅ success — `packages/cms-core` 변경으로 6 서비스 재배포 | 34738705956 |
+
+API revision `o4o-core-api-03642-7f9` 트래픽 100%.
+
+### 9-2. 운영 API (platform:super_admin GET)
+
+| 경로 | 기대 | 실측 |
+|---|---|---|
+| `GET /api/v1/public/cpt/types` | 제거 | **404** (전: 200 빈 배열 은폐) |
+| `GET /api/v1/cpt/types` · `/field-groups` · `/taxonomies` | 제거 | **404** ×3 |
+| `GET /api/v1/cms/contents?limit=1` · `/api/v1/cms/health` | 정본 보존 | **200** · 실데이터 (`cms_contents`) |
+| `GET /api/v1/hub/contents?serviceKey=kpa` | 보존 | **200** |
+| `GET /api/v1/platform/media-library?limit=1` | 보존 | **200** |
+| `GET /api/v1/dashboard/assets/supplier-signal` | 보존 | **200** |
+
+### 9-3. 배포된 admin 번들 (`index-CkgpeFhK.js` + 전 lazy chunk 스캔)
+
+`cpt-engine` **0** · `public/cpt` **0** · `DynamicCPT` **0** · `custom-posts` **0** · `/cpt/types` 포함 chunk **0**.
+
+### 9-4. 신규 revision 로그 (`o4o-core-api-03642-7f9`)
+
+- `cms_cpt_types` · `does not exist` 언급 **0**.
+- 기동 후 `/cpt/types` 호출 = 내 probe 404 **2건뿐** → admin 자동 호출 **소멸** (전: 30일 120회).
+- severity ≥ ERROR **1건**: `GET /api/v1/guide/contents?serviceKey=neture` 500 · latency 8.5s · bingbot · **05:36:08** — 이 revision 의 `Database ready` 가 **05:36:16** 이므로 **콜드스타트 중 DB 준비 전 도착한 요청**이다. guide 모듈은 CPT 코드를 쓰지 않고(참조 0), 같은 URL warm 재요청 **200 / 0.10s**, 05:36:17 이후 ERROR **0**. 본 변경과 무관한 기동 경합 — §8 에 잔재로 기록.
+
+### 9-5. 미실측
+
+브라우저 화면 조작(admin 로그인 → 사이드바 렌더 · console error)은 수행하지 않았다. 번들·API·로그 계층까지 실측했고, admin 변경은 dead 메뉴 주입 제거뿐이다 → `PRODUCTION_BROWSER_SMOKE = NOT_RUN`.
+
+### 9-6. 완료 판정
+
+```text
+CMS_LIFECYCLE_DEAD_ENTITY       = ZERO     (14 entity 부재 · @Entity 선언 0 · spec 고정)
+CMS_LIFECYCLE_SCHEMA_DDL        = ZERO     (install/uninstall 삭제 · cms-core CREATE TABLE 0 · ownsTables [])
+CMS_CPT_ACF_RUNTIME             = ZERO     (backend 사슬 · admin 사슬 부재)
+CMS_CPT_TYPES_API               = ZERO     (운영 404 ×4)
+ADMIN_DYNAMIC_CPT_REQUEST       = ZERO     (번들 0 · 신규 revision 자동 호출 0)
+CMS_RELATION_ERROR_SWALLOWING   = ZERO     (cpt.service 소멸 · 로그 0)
+DEAD_CPT_ACF_ROUTES             = ZERO     (/cpt-engine 라우트·페이지 부재)
+CMS_CANONICAL_CONTENT           = PRESERVED (/api/v1/cms/contents 200 · cms_contents entity/migration 불변)
+O4O_EDITOR                      = PRESERVED
+MEDIA_V2                        = PRESERVED (200)
+PRODUCTION_SCHEMA_CHANGE        = ZERO
+PRODUCTION_DATA_CHANGE          = ZERO
+OTHER_SERVICE_REGRESSION        = PASS     (type-check 3 · admin 16/16 · api jest · 6 서비스 재배포 success)
+PRODUCTION_BROWSER_SMOKE        = NOT_RUN
+
+CMS_LIFECYCLE_SCHEMA_CPT_ACF_AND_DEAD_ENTITY_RETIREMENT = CLOSED
+```
+
+코드 관점에서 **cms-core lifecycle installer 는 사라졌다.** 남는 것은 §8-1 의 운영 물리 잔재 확인(자격정보 확보 후)뿐이다.
 
 ---
 
