@@ -4,7 +4,7 @@
 > **상태**: **ESTABLISHED (PARTIAL) · 계측기 사용 개시** — 계측 창 + production 격리 + 노출 지도(inspect) + 숨은 목록 좌표 클릭 차단 + 사용자 활동/대상 전환/재개 안전 동작을 O4O 통제 창에서 반복 검증. **WinForms 요소 값/기본동작(set_value·invoke)은 이 창에서 구동 불가** — 실측 발견(§18): WinForms UIA 브리지가 패턴을 첫 UIA 클라이언트에만 노출, 별도 action 프로세스에는 패턴 없는 프록시. 지속 UIA 클라이언트가 필요한 별도 WO(§19). 네이티브/HWND 기반 앱(카카오톡·메모장)은 영향 없음.
 > **작성일**: 2026-09-13
 > **선행**: Windows UI Automation V0(`3d6e738a6`) · Windows Automation Safety & Takeover V1(`f3403e60e`) · Work Target Discovery V0
-> **commit**: __COMMIT__ · 본 문서
+> **commit**: `7a359619c` · 본 문서
 
 ---
 
