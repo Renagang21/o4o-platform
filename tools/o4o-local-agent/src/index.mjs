@@ -291,7 +291,43 @@ async function main() {
     process.exitCode = await runDataCommand(process.argv.slice(3));
     return;
   }
-  console.error('사용법: node src/index.mjs run | data <status|backup|backups|restore|import|export>');
+  if (command === 'test-surface') {
+    // UIA-CANONICAL-TEST-SURFACE-V0 §27~§29: O4O 계측 창을 띄우고 창이 닫힐 때까지 이 명령이 붙어 있는다(창 수명 = 이 명령).
+    // 개발/검증 전용 — 이 프로세스에서만 개발 대상이 켜진다(O4O_DEV_TARGETS). 끝내려면 창을 닫거나 Ctrl+C.
+    process.env.O4O_DEV_TARGETS = '1';
+    const [{ launchTestSurface, censusWindows, matchWindows }, { TEST_SURFACE_TARGET }] = await Promise.all([import('./windows-window-control.mjs'), import('./windows-test-surface.mjs')]);
+    const already = matchWindows(await censusWindows(), TEST_SURFACE_TARGET);
+    if (already.length > 0) {
+      console.log(`[o4o-agent] 시험 창이 이미 떠 있습니다 (창 ${already.length}개).`);
+      return;
+    }
+    const launched = launchTestSurface();
+    if (!launched.launched) {
+      console.error('[o4o-agent] 시험 창을 시작하지 못했습니다.');
+      process.exitCode = 1;
+      return;
+    }
+    const onSignal = () => launched.stop();
+    process.once('SIGINT', onSignal);
+    process.once('SIGTERM', onSignal);
+    const started = Date.now();
+    let ready = false;
+    while (!ready && Date.now() - started < 10_000) {
+      await sleep(500);
+      ready = matchWindows(await censusWindows(), TEST_SURFACE_TARGET).length > 0;
+    }
+    if (!ready) {
+      launched.stop();
+      console.error('[o4o-agent] 시험 창이 10초 안에 나타나지 않았습니다.');
+      process.exitCode = 1;
+      return;
+    }
+    console.log(`[o4o-agent] 시험 창 준비됨 (targetId ${TEST_SURFACE_TARGET.appId}). 창을 닫거나 Ctrl+C 로 끝냅니다.`);
+    await launched.exited;
+    console.log('[o4o-agent] 시험 창이 닫혔습니다.');
+    return;
+  }
+  console.error('사용법: node src/index.mjs run | data <status|backup|backups|restore|import|export> | test-surface');
   process.exitCode = 1;
 }
 

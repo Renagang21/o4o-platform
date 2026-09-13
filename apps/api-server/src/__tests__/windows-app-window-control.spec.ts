@@ -451,15 +451,17 @@ describe('11~14. 실행 · 종료 · 셸 · 파일 접근은 구현 자체가 �
     // `execFile` 은 허용, 맨 `exec(` · `spawn(` 은 불가 — 앞 글자를 붙여 구분한다.
     expect(controlCode).not.toMatch(/[^A-Za-z]exec[(]/);
     expect(controlCode).not.toMatch(/[^A-Za-z]spawn[(]/);
-    // (c) 실행 대상은 저장소에 체크인된 .ps1 일곱 개뿐이고, argv 는 상수다.
+    // (c) 실행 대상은 저장소에 체크인된 .ps1 여덟 개뿐이고, argv 는 상수다.
     //     (BROWSER-CONTROL-V0 에서 등재 사이트 열기 1개, COMPUTER-USE-V0 에서 창 검사 · 창 입력 2개,
-    //      WORK-TARGET-DISCOVERY-V0 에서 등재 프로그램 실행 1개, WINDOWS-UI-AUTOMATION-V0 에서 UIA 1개가 늘었다.)
+    //      WORK-TARGET-DISCOVERY-V0 에서 등재 프로그램 실행 1개, WINDOWS-UI-AUTOMATION-V0 에서 UIA 1개,
+    //      UIA-CANONICAL-TEST-SURFACE-V0 에서 개발/검증용 계측 창 1개가 늘었다.)
     const scripts = [...control.matchAll(/'([\w-]+\.ps1)'/g)].map((m) => m[1]).sort();
     expect(scripts).toEqual([
       'windows-app-launch.ps1',
       'windows-browser-open.ps1',
       'windows-computer-input.ps1',
       'windows-computer-inspect.ps1',
+      'windows-test-surface.ps1',
       'windows-uia.ps1',
       'windows-window-activate.ps1',
       'windows-window-census.ps1',

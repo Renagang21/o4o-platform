@@ -41,7 +41,8 @@
 1. `execFile` 만 씁니다. `exec` · `spawn` · `shell: true` 가 없으므로 **셸이 개입하지 않습니다**
    (인용 · `&` · 파이프 해석 자체가 일어나지 않습니다).
 2. 실행 대상은 저장소에 체크인된 `windows-window-census.ps1` · `windows-window-activate.ps1` ·
-   `windows-browser-open.ps1` · `windows-computer-inspect.ps1` · `windows-computer-input.ps1` **5개**뿐입니다. `-Command` 를 쓰지 않고 `-File` 만 쓰므로
+   `windows-browser-open.ps1` · `windows-computer-inspect.ps1` · `windows-computer-input.ps1` · `windows-app-launch.ps1` ·
+   `windows-uia.ps1` · `windows-test-surface.ps1`(개발/검증용 계측 창) **8개**뿐입니다. `-Command` 를 쓰지 않고 `-File` 만 쓰므로
    스크립트 문자열을 런타임에 조립하지 않습니다.
 3. argv 는 상수 배열이 전부입니다. **호출자가 argv 에 값을 넣을 수 없습니다.**
 4. 런타임 입력(창 핸들 · 화면 조작 인자)은 환경변수로 넘기며, 넘기기 전(JS)과 스크립트 안에서
@@ -152,6 +153,22 @@ node src/index.mjs run
 PC 전용으로 발급된 기기 자격증명뿐이며, O4O 웹에서 언제든 해지할 수 있습니다.
 
 연결을 끊으려면 이 파일을 지우면 됩니다.
+
+## 개발/검증용 계측 창 (WO-O4O-WINDOWS-UIA-CANONICAL-TEST-SURFACE-V0)
+
+Windows 자동화 공통층(UIA · 안전층 · 인계)의 회귀는 외부 프로그램이 아니라 O4O 가 UIA 노출을 스스로
+정한 **계측 창**에서 돕니다. 제품 기능이 아니며 O4O 웹 · 서버 · 일반 `run` 은 이 창을 대상으로 삼을 수
+없습니다(서버 등재부에 없고, agent 는 `O4O_DEV_TARGETS=1` 인 프로세스에서만 인식).
+
+```bash
+node src/index.mjs test-surface                       # 계측 창을 띄우고, 창을 닫거나 Ctrl+C 할 때까지 붙어 있음
+node test/smoke/test-surface-smoke.mjs                # 고정 회귀 smoke(창을 직접 띄우고 끝에 닫음) — 실행 중 키보드·마우스를 쓰지 마세요
+```
+
+계측 창은 Windows 기본 .NET WinForms(`src/windows-test-surface.ps1`)로만 만들며 새 런타임 · 패키지가 없습니다.
+입력창 · 버튼 · 목록 · 체크박스 · 콤보 · 탭 · 모달 · "전송"(ENTER) 과, 일부러 UIA 에 행을 노출하지 않는
+직접 그린 목록(CustomRows)이 있습니다. 파일 · 네트워크 · 클립보드 · 다른 프로세스에 손대지 않고 고정된
+synthetic 값만 씁니다.
 
 ## 환경변수
 

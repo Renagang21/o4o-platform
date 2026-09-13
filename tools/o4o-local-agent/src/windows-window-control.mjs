@@ -50,6 +50,8 @@ const BROWSER_OPEN_SCRIPT = path.join(HERE, 'windows-browser-open.ps1');
 const APP_LAUNCH_SCRIPT = path.join(HERE, 'windows-app-launch.ps1');
 // WINDOWS-UI-AUTOMATION-V0 — UIA 읽기 · 요소 값 입력 · 기본 동작 · 키 · 창 안 좌표 클릭(일곱 번째 스크립트).
 const UIA_SCRIPT = path.join(HERE, 'windows-uia.ps1');
+// UIA-CANONICAL-TEST-SURFACE-V0 — O4O 계측 창(WinForms) 스크립트(여덟 번째). 개발/검증 전용 · `launchTestSurface()` 만 부른다.
+const TEST_SURFACE_SCRIPT = path.join(HERE, 'windows-test-surface.ps1');
 // COMPUTER-USE-V0 — 아래 "Computer Use V0" 절 참조. 상수는 여기 한곳에 모아 둔다.
 const COMPUTER_INSPECT_SCRIPT = path.join(HERE, 'windows-computer-inspect.ps1');
 const COMPUTER_INPUT_SCRIPT = path.join(HERE, 'windows-computer-input.ps1');
@@ -248,6 +250,26 @@ export async function openRegisteredSiteUrl(url) {
 }
 
 // ─── Work Target Discovery V0 (WO-O4O-WORK-TARGET-DISCOVERY-AND-ACTIVATION-V0 §22·§26·§27) ─────
+
+/**
+ * UIA-CANONICAL-TEST-SURFACE-V0 §27·§28 — O4O 계측 창을 띄운다. 실행 대상은 저장소 상수 스크립트 하나, argv 상수, 입력 없음.
+ * 창의 수명 = 호출한 프로세스(CLI · 회귀 harness)의 수명: 창을 닫으면 `exited` 가 풀리고, `stop()` 이면 창이 닫힌다.
+ * 등재 실행 경로(`launchRegisteredApp`)와 무관하고 그 경로로는 이 스크립트를 시작할 수 없다(.exe/.lnk 만).
+ * 반환: `{ launched, pid, exited: Promise<void>, stop() }`.
+ *
+ * 실측(이 PC): CREATE_NO_WINDOW(windowsHide) 를 주면 PowerShell 이 WinForms 창을 만들지 못한다. 콘솔을 아예 만들지 않고(detached)
+ * `-WindowStyle Hidden` 을 주면 창이 뜬다 — 사용자의 터미널 콘솔을 상속하지 않으므로 그 터미널이 숨겨지는 일도 없다.
+ */
+export function launchTestSurface() {
+  try {
+    let resolveExit;
+    const exited = new Promise((resolve) => { resolveExit = resolve; });
+    const child = execFile(PS_EXE, ['-WindowStyle', 'Hidden', ...PS_FLAGS, TEST_SURFACE_SCRIPT], { detached: true, windowsHide: false, timeout: 0, maxBuffer: MAX_OUTPUT_BYTES, env: childEnv({}) }, () => resolveExit());
+    return { launched: typeof child.pid === 'number', pid: child.pid ?? null, exited, stop: () => { try { child.kill(); } catch { /* 이미 끝남 */ } } };
+  } catch {
+    return { launched: false, pid: null, exited: Promise.resolve(), stop: () => {} };
+  }
+}
 
 /** 등재부 launch.path 형식 — 절대 경로 · .exe/.lnk · 공백/따옴표/제어문자 없음. 스크립트가 같은 규칙을 한 번 더 본다. */
 const LAUNCH_PATH_RE = /^[A-Za-z]:\\[^"'<>|?*\r\n\t]+\.(exe|lnk)$/;

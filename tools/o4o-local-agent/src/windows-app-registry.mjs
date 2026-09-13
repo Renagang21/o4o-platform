@@ -17,7 +17,12 @@
  *   appId 만 말한다. agent 는 `launch.path` 가 **이 파일의 상수**일 때만, `launchAllowed` 가
  *   true 일 때만 실행한다(§22·§26·§27). AI 가 준 경로 · 인자 · 명령줄이 실행되는 통로는 없다.
  *   실행 자체는 `windows-window-control.mjs`(execFile 단일 지점) → `windows-app-launch.ps1`.
+ *
+ * 개발 대상(UIA-CANONICAL-TEST-SURFACE-V0)
+ *   O4O 계측 창 `windows.o4o-test-surface` 는 이 목록(production · 서버와 동일)에 **없다**. `windows-test-surface.mjs` 가 따로 정의하고,
+ *   `O4O_DEV_TARGETS=1` 인 프로세스에서만 `findWindowsApp` 이 돌려준다. 서버 등재부에 없으므로 production 경로가 고를 수 없다.
  */
+import { findDevTarget } from './windows-test-surface.mjs';
 
 export const WINDOWS_APP_REGISTRY = Object.freeze([
   Object.freeze({
@@ -57,7 +62,7 @@ export const WINDOWS_APP_REGISTRY = Object.freeze([
 ]);
 
 export function findWindowsApp(appId) {
-  return WINDOWS_APP_REGISTRY.find((a) => a.appId === appId);
+  return WINDOWS_APP_REGISTRY.find((a) => a.appId === appId) ?? findDevTarget(appId);
 }
 
 export function listWindowsAppIds() {
