@@ -1,6 +1,6 @@
 # CHECK-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1
 
-> **상태**: 구현·로컬 검증 완료 → CI·배포·콜드스타트 관측 _(§8~§10 갱신)_
+> **상태**: **CLOSED** — 구현 SHA `3ae501167` · CI(후손 `f3403e60e` run 34743987375 success, ancestor 관계 확인) · Deploy API success · 콜드스타트 **3회** 관측 · 운영 API PASS
 > **작성일**: 2026-09-13
 > **WO**: WO-O4O-API-DATABASE-READINESS-AND-COLD-START-TRAFFIC-GATE-FINAL-CLOSURE-V1
 > **기준 SHA**: `64c6c7ba2` (origin/main · 이번 범위 clean · 다른 세션 dirty 1건 `IR-O4O-CROSSSERVICE-…` 불가침)
@@ -175,15 +175,88 @@ schema · migration · 운영 데이터 · 권한 · minScale · probe · Docker
 
 ## 9. CI · 배포
 
-_(push 후 갱신)_
+| 워크플로 | SHA | 결과 | run |
+|---|---|---|---:|
+| Deploy API Server (Cloud Run) | `3ae501167` (구현 SHA) | ✅ success — migration job 06:53:54→54:32 → deploy →54:32→55:00 → **Verify(`/health/ready`) 06:55:38→55:42 success** | 34743633433 |
+| CodeQL Security Analysis | `3ae501167` | ✅ success | 34743633407 |
+| CI Pipeline | `3ae501167` | ❌ **cancelled** — 직후 다른 세션 push(`f3403e60e`)의 concurrency 취소. **success 로 기록하지 않는다** | 34743633428 |
+| CI Pipeline | **`f3403e60e`** (직계 자식 · `git merge-base --is-ancestor 3ae501167 origin/main` = YES) | ✅ **success** — 내 트리를 포함해 검증 | **34743987375** |
+| Deploy API Server | `f3403e60e` | ✅ success (내 변경 포함 2차 배포 → revision 03645) | 34743987374 |
+| CodeQL | `f3403e60e` | ✅ success | 34743987372 |
+
+배포 revision: **`o4o-core-api-03644-47z`**(내 배포, 06:54) → **`o4o-core-api-03645-x8q`**(후손 배포, 07:03, 트래픽 100%). 두 revision 모두 이번 변경을 포함한다.
+새 revision 의 probe 는 불변(`tcpSocket 8080 · failureThreshold 1 · period/timeout 240`), env 에 `GRACEFUL_STARTUP` **없음**(실측).
 
 ## 10. 콜드스타트 관측 · 운영 API · 로그
 
-_(배포 후 갱신)_
+### 10-1. 콜드스타트 타임라인 3회 (`[STARTUP] phase=…` 구조화 로그 · UTC)
+
+| 시점 | ① 03644 / `…8799c3f8` (DEPLOYMENT_ROLLOUT) | ② 03645 / `…c12c6281` (DEPLOYMENT_ROLLOUT) | ③ 03645 / `…3f1c917b` (**AUTOSCALING**) |
+|---|---|---|---|
+| Starting new instance | 06:54:40.351 | 07:03:15.367 | 07:30:11.596 |
+| PROCESS_START | 06:54:52.498 (t+95ms) | 07:03:23.972 (t+157ms) | 07:30:16.990 (t+83ms) |
+| DB_CONNECT_START | 06:54:52.506 (attempt 1/5) | 07:03:23.976 | 07:30:16.994 |
+| DB_READY | 06:54:55.301 | 07:03:26.009 | 07:30:18.272 |
+| READY | 06:54:56.646 (t+4,243ms) | 07:03:27.244 (t+3,428ms) | 07:30:19.609 (t+2,702ms) |
+| **HTTP_LISTEN** | **06:54:56.651** (t+4,248ms) | **07:03:27.247** | **07:30:19.612** |
+| **STARTUP_PROBE_SUCCESS** | **06:54:56.651** (같은 ms) | **07:03:27.247** (같은 ms) | **07:30:19.618** (+6ms) |
+| FIRST_REQUEST (앱 처리) | 06:55:42.051 `GET /health/ready` | 07:04:15.074 `GET /health/ready` | 07:30:19.851 `GET /wp-content/…`(봇) |
+| FIRST_SUCCESS_RESPONSE | 200 · 0.16s | 200 · 0.06s | (봇 스캔 404 · 0.007s) — 정상 경로 첫 200 은 이후 요청 |
+| 트래픽 100% 전환 | deploy step 완료 06:55:00 | 07:03 rollout | — |
+
+기대 순서 `PROCESS_START → DB_CONNECT_START → DB_READY → HTTP_LISTEN → STARTUP_PROBE_SUCCESS → FIRST_REQUEST` 가 **3회 모두 성립**. listen 과 probe 성공이 같은 ms 인 것이 "port 개방 = 준비 완료" 의 실측이다.
+③ 은 §0-1 과 같은 유형(요청이 스케일아웃을 유발, 인스턴스 시작 후 5.4s 만에 프로세스 기동)이다. 이번엔 유발 요청(`/wp-content/plugins/…`, latency 7.87s)이 **listen 뒤 앱에서 처리돼 404**(존재하지 않는 경로 · 봇)로 끝났고 5xx 는 없었다. 즉 대기 요청이 준비 완료까지 기다렸다가 앱에 도달했다.
+
+### 10-2. 운영 API (revision 03645, LB 도메인)
+
+| 경로 | 결과 |
+|---|---|
+| `/health` · `/health/live` | 200 `alive` |
+| **`/health/ready`** | **200 `ready`** (READY + SELECT 1) |
+| `/api/v1/guide/contents?serviceKey=neture&pageKey=guide/features` (§0 의 오류 경로) | **200 · 0.09s** |
+| `/api/v1/hub/contents?serviceKey=kpa` (public) | 200 |
+| `/api/v1/public/cpt/types` | 404 (선행 WO 에서 제거 — 계약 유지) |
+| `/api/v1/admin/users` 미인증 | **401** |
+| 로그인(platform:super_admin) → `/api/v1/auth/status` · `/api/v1/admin/users` · `/api/v1/platform/media-library` | **200 ×3** |
+
+### 10-3. 신규 revision 로그 (03644 · 03645 전 구간)
+
+| 항목 | 03644 | 03645 |
+|---|:-:|:-:|
+| DB 준비 전 앱 처리 요청 | 0 (첫 앱 요청이 listen 뒤) | 0 |
+| severity ≥ ERROR | **0** | **0** |
+| HTTP 5xx | **0** | **0** |
+| migration 실행 · seed 직접 실행 · `does not exist` 삼킴 · `Continuing without database` | 0 | 0 |
+| 접속 문자열(`@/cloudsql` · `Database: <db>@`) | **0** (전: 기동마다 1) | **0** |
 
 ## 11. 완료 판정
 
-_(§9·§10 후 갱신)_
+```text
+API_HTTP_LISTEN_BEFORE_DB_READY       = ZERO      (3회 타임라인 · spec 순서 고정 · 시뮬 A)
+HTTP_TRAFFIC_BEFORE_DB_READY          = ZERO      (probe 성공 = listen 시각 · 첫 앱 요청은 그 뒤)
+COLD_START_DATABASE_ROUTE_500         = ZERO      (두 revision 5xx 0 · §0 오류 경로 200)
+READINESS_FALSE_POSITIVE              = ZERO      (READY 선행 + SELECT 1 · catch→503 · 시뮬 B 503)
+DATABASE_CONNECT_FAILURE_SWALLOWING   = ZERO      (프로덕션 fail-fast · 시뮬 A exit 1)
+UNBOUNDED_DATABASE_RETRY              = ZERO      (5회 · 105s < 240s)
+API_STARTUP_MIGRATION_EXECUTION       = ZERO
+DIRECT_SEED_UP_FALLBACK               = ZERO
+DEPLOY_MIGRATION_JOB_OWNERSHIP        = PRESERVED (job → deploy · run 34743633433 실측)
+DEPLOY_MIGRATION_FAILURE_GATE         = ENFORCED
+HEALTH_LIVENESS_READINESS_SEPARATION  = PASS      (계약표 §5 · 시뮬 B · 운영 실측)
+POST_READY_PUBLIC_API                 = PASS
+POST_READY_AUTH_API                   = PASS
+POST_READY_ADMIN_API                  = PASS      (401 → 200)
+PRODUCTION_SCHEMA_CHANGE              = ZERO
+PRODUCTION_DATA_CHANGE                = ZERO
+AUTHORIZATION_CHANGE                  = ZERO
+OTHER_SERVICE_REGRESSION              = PASS      (jest 4,508 · build:packages · frontend type-check 0)
+CI_PIPELINE                           = SUCCESS   (자기 SHA 는 cancelled — 직계 자식 f3403e60e run 34743987375 success 로 대체, ancestor 확인)
+CODEQL                                = SUCCESS   (run 34743633407)
+DEPLOY_API                            = SUCCESS   (run 34743633433 · verify = /health/ready)
+PRODUCTION_COLD_START_VERIFICATION    = PASS      (3회 · 기대 순서 성립)
+
+API_DATABASE_READINESS_AND_COLD_START_TRAFFIC_GATE = CLOSED
+```
 
 ## 12. 중지 · 미처리 · 보고
 
