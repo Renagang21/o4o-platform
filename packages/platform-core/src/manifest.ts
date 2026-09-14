@@ -52,11 +52,11 @@ export const platformCoreManifest = {
   },
 
   // ===== Lifecycle =====
+  // install / uninstall 은 은퇴 — app_registry · settings · account_activities 스키마는 api-server deploy migration job 이 소유한다.
+  // (WO-O4O-PLATFORM-CORE-DEAD-LIFECYCLE-MANIFEST-AND-APPSTORE-SCHEMA-CONTRACT-FINAL-CLOSURE-V1)
   lifecycle: {
-    install: './lifecycle/install.js',
     activate: './lifecycle/activate.js',
     deactivate: './lifecycle/deactivate.js',
-    uninstall: './lifecycle/uninstall.js',
   },
 
   // ===== Permissions =====

@@ -37,8 +37,11 @@ export const disabledAppsRegistry: DisabledAppEntry[] = [
     name: '플랫폼 코어',
     disabled: {
       status: 'incomplete',
-      reason: 'api-server dependencies에 미등록',
-      nextAction: 'package.json에 의존성 추가 후 import 활성화',
+      // WO-O4O-PLATFORM-CORE-DEAD-LIFECYCLE-MANIFEST-AND-APPSTORE-SCHEMA-CONTRACT-FINAL-CLOSURE-V1:
+      //   "dependencies 미등록" 문구는 stale 였다 — 패키지는 api-server 에 등록되어 있고 store-identity · store-policy
+      //   subpath 로만 소비된다. AppStore 런타임 로더 · lifecycle install/uninstall 은 은퇴했고 운영 상태 정본은 app_registry.
+      reason: 'AppStore 런타임 로더 은퇴 — 패키지는 store-identity · store-policy subpath 로만 소비됨 (lifecycle install/uninstall 없음)',
+      nextAction: '없음 — 운영 상태는 app_registry, 스키마는 api-server migration 이 소유',
       disabledAt: '2024-12-15',
     },
   },
