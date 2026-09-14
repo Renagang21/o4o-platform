@@ -72,11 +72,11 @@ export const organizationCoreManifest = {
   },
 
   // ===== 라이프사이클 =====
+  // install / uninstall 은 은퇴 — 테이블 생성·삭제는 api-server deploy migration job 이 소유한다.
+  // (WO-O4O-ORGANIZATION-CORE-DEAD-LIFECYCLE-AND-DESTRUCTIVE-UNINSTALL-FINAL-RETIREMENT-V1)
   lifecycle: {
-    install: './lifecycle/install.js',
     activate: './lifecycle/activate.js',
     deactivate: './lifecycle/deactivate.js',
-    uninstall: './lifecycle/uninstall.js',
   },
 
   // ===== 권한 정의 =====

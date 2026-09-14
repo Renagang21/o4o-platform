@@ -20,7 +20,7 @@ export * from './types/index.js';
 export * from './entities/index.js';
 export * from './services/index.js';
 export * from './controllers/index.js';
-export * from './lifecycle/index.js';
+// lifecycle 은 barrel 로 노출하지 않는다 (WO-O4O-ORGANIZATION-CORE-DEAD-LIFECYCLE-AND-DESTRUCTIVE-UNINSTALL-FINAL-RETIREMENT-V1)
 export * from './utils/index.js';
 
 // Entity list for TypeORM

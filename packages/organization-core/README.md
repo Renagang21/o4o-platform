@@ -218,7 +218,7 @@ class Product {
 - [organization_rbac_scope.md](../../docs/dev/design/organization-core/organization_rbac_scope.md) - RBAC 확장
 - [organization_extension_rules.md](../../docs/dev/design/organization-core/organization_extension_rules.md) - Extension 개발 가이드
 - [organization_app_manifest.md](../../docs/dev/design/organization-core/organization_app_manifest.md) - App Store manifest
-- [organization_lifecycle_hooks.md](../../docs/dev/design/organization-core/organization_lifecycle_hooks.md) - Lifecycle hooks
+- ~~organization_lifecycle_hooks.md~~ - Lifecycle install/uninstall 은퇴 (WO-O4O-ORGANIZATION-CORE-DEAD-LIFECYCLE-AND-DESTRUCTIVE-UNINSTALL-FINAL-RETIREMENT-V1) · 스키마 소유자 = api-server migration
 - [organization_integration_map.md](../../docs/dev/design/organization-core/organization_integration_map.md) - 도메인 연동 규칙
 
 ---

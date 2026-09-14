@@ -61,39 +61,6 @@ export interface Logger {
 }
 
 /**
- * InstallContext
- *
- * install hook에 전달되는 컨텍스트
- */
-export interface InstallContext {
-  /**
-   * TypeORM DataSource
-   */
-  dataSource: DataSource;
-
-  /**
-   * 앱 manifest
-   */
-  manifest: AppManifest;
-
-  /**
-   * 로거
-   */
-  logger: Logger;
-
-  /**
-   * 설치 옵션
-   */
-  options?: {
-    /**
-     * 초기 데이터 생성 여부
-     */
-    seedDefaultData?: boolean;
-    [key: string]: any;
-  };
-}
-
-/**
  * ActivateContext
  *
  * activate hook에 전달되는 컨텍스트
@@ -140,43 +107,4 @@ export interface DeactivateContext {
    * 로거
    */
   logger: Logger;
-}
-
-/**
- * UninstallContext
- *
- * uninstall hook에 전달되는 컨텍스트
- */
-export interface UninstallContext {
-  /**
-   * TypeORM DataSource
-   */
-  dataSource: DataSource;
-
-  /**
-   * 앱 manifest
-   */
-  manifest: AppManifest;
-
-  /**
-   * 로거
-   */
-  logger: Logger;
-
-  /**
-   * 삭제 옵션
-   */
-  options?: {
-    /**
-     * 데이터 삭제 여부 (기본값: false)
-     */
-    purgeData?: boolean;
-
-    /**
-     * 테이블 삭제 여부 (기본값: false)
-     */
-    dropTables?: boolean;
-
-    [key: string]: any;
-  };
 }
