@@ -123,10 +123,15 @@ describe('DropRetiredCmsCptResidueTables — 소스 계약', () => {
     expect(code).toMatch(/DROP TABLE "\$\{table\}" RESTRICT/);
   });
 
-  it('실행 완료 migration 을 수정하지 않았다 (이 파일이 유일한 신규 · 이름이 마지막 timestamp 보다 크다)', () => {
+  it('실행 완료 migration 을 수정하지 않았다 (이 파일이 존재하고 · 그보다 앞선 timestamp 의 파일은 이 WO 이전 것뿐이다)', () => {
+    // 이전 assertion("마지막 파일 == 이 파일") 은 이후 WO 의 정당한 신규 migration(예: 20270413000000-BaselineRbacAndAccountTables)
+    // 까지 실패시키는 시간 고정 계약이었다. 의도(이 WO 가 기존 migration 을 수정하지 않았고 순차 카운터로 뒤에 붙었다) 만 고정한다.
     const dir = join(SRC, 'database', 'migrations');
     const names = readdirSync(dir).filter((f) => /^\d{14}-/.test(f)).sort();
-    expect(names[names.length - 1]).toBe('20270412000000-DropRetiredCmsCptResidueTables.ts');
+    const self = '20270412000000-DropRetiredCmsCptResidueTables.ts';
+    expect(names).toContain(self);
+    const before = names.filter((n) => n < self);
+    expect(before[before.length - 1]).toBe('20270411000000-AddAutomationJobTempOutput.ts');
   });
 
   it('migration 클래스명 · name 이 TypeORM 규약(이름+timestamp)을 따른다', () => {
