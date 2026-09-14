@@ -4,7 +4,7 @@
  * WO-O4O-START-PRODUCTION-MODAL-SHARED-COMPONENT-PHASE2-H-V1
  *
  * KPA StartProductionModal 을 canonical 기준으로 삼아 공통 컴포넌트로 승격.
- * KPA / GlycoPharm / K-Cosmetics 3 서비스가 동일 코드를 사용.
+ * KPA / K-Cosmetics 가 동일 코드를 사용 (GlycoPharm 은 2026-09-08 서비스 삭제).
  * 서비스별 차이는 targets / getTemplates props 로만 제어한다.
  *
  * 제로-의존 원칙:
@@ -25,7 +25,7 @@ import { buildPopV2HandoffState, popV2HandoffFromProductionItem } from './pop-v2
 /**
  * 제작 대상 하나의 설정.
  * KPA: PRODUCTION_TARGET_CATALOG 배열 항목과 구조 호환 (superset OK).
- * GlycoPharm/K-Cosmetics: 서비스별 로컬 정의로 POP/QR만 포함.
+ * K-Cosmetics: 서비스별 로컬 정의로 POP/QR만 포함.
  */
 export interface StartProductionTargetConfig {
   key: ProductionTarget;
@@ -65,12 +65,14 @@ export interface StartProductionModalProps {
   onClose: () => void;
   /**
    * "AI 제작 자료 초안 만들기" 선택 시 콜백.
-   * 미제공 시 AI 카드 미표시 (GlycoPharm/K-Cosmetics 이번 단계에서 미연결).
+   * 미제공 시 AI 카드 미표시. 2026-09-14 기준 전 소비처(KPA wrapper · StoreLibraryContentsView)가
+   * 미전달 → DORMANT capability. 매장 콘텐츠의 기획·초안은 사용자 외부 AI 축
+   * (docs/baseline/O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md) — 재연결·제거는 별도 WO.
    */
   onAiAction?: (source: ProductionSource) => void;
   /**
    * target별 template 목록 반환 함수.
-   * KPA: getTemplatesForTarget 전달. GlycoPharm/K-Cosmetics: 미제공 시 template step 건너뜀.
+   * KPA: getTemplatesForTarget 전달. 미제공 시 template step 건너뜀.
    */
   getTemplates?: (target: ProductionTarget) => StartProductionTemplateItem[];
 }

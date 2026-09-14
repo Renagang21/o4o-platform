@@ -7,7 +7,14 @@
 
 *Status: Active Baseline*
 *Date: 2026-04-23*
-*Last aligned with production: 2026-09 (WO-O4O-AI-USAGE-FLOW-BASELINE-REALIGNMENT-V1)*
+*Last aligned with production: 2026-09-14 (WO-O4O-STORE-CONTENT-PRODUCTION-EXTERNAL-LLM-STANDARD-ENV-REALIGNMENT-V1 · 이전 WO-O4O-AI-USAGE-FLOW-BASELINE-REALIGNMENT-V1)*
+
+> **2026-09-14 정렬 요지** — AI 의 위치를 4축으로 나눈다. ① 플랫폼 **일반 업무 진입** = Home AI(가능).
+> ② **매장 콘텐츠의 Creative/Strategy**(기획·스토리·초안) = **사용자 자신의 외부 AI**(ChatGPT/Gemini/Claude 등) 사용 가능·권장 가능.
+> ③ **매장 제작 실행** = O4O 표준 제작환경(편집기 · POP/QR/Blog/상품설명/태블릿/사이니지/영상 · Media Library · VIDEO Job).
+> ④ O4O **내부 AI = 선택적 보조**(편집 정리 · 구조화 · 내부 자동화) — 매장 콘텐츠 제작의 **필수 단계가 아니다**.
+> Home AI 는 "모든 콘텐츠 제작의 필수 시작점" 이 아니다. 역할 경계의 정본은
+> [O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1](O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md)(§15).
 
 > **2026-09 정렬 요지** — O4O 공통 Home(`neture.co.kr/`)에 **중앙 AI 입력이 canonical 로 존재**한다.
 > 2026-04 판 전제였던 "독립 AI 입력 화면 없음" 은 현재 구조와 맞지 않아 폐기했다(§11).
@@ -19,12 +26,14 @@
 
 | 레이어 | 화면/서비스 | 역할 |
 |-------|-----------|------|
-| **Entry** | O4O 공통 Home (`neture.co.kr/`) 중앙 AI 입력 | 업무 진입 + 질의응답 (2026-09 추가) |
+| **External** | 사용자의 외부 AI (ChatGPT / Gemini / Claude 등, 플랫폼 밖) | 매장 콘텐츠의 기획 · 스토리 · 초안 · 문구 (Creative / Strategy) — 결과를 O4O 로 가져온다 (2026-09-14, §15) |
+| **Entry** | O4O 공통 Home (`neture.co.kr/`) 중앙 AI 입력 | 플랫폼 일반 업무 진입 + 질의응답 (2026-09 추가) — 콘텐츠 제작의 필수 시작점이 아님 |
 | **HUB** | `/content`, `/forum`, `/resources`, `/lms` | 선택 + 복사 |
 | **AI** | RichTextEditor + AiContentModal, POP 제작기, 기타 편집 화면 | 정리 + 생성 |
 | **Execution** | POP, QR, 블로그, 상품 상세 설명 | 실행 + 노출 |
 
 Entry 레이어는 HUB→편집기 흐름의 **대체가 아니라 상위 진입점**이다. 상세는 §11.
+External 레이어는 O4O 가 호출·연동·저장하지 않는다 — 안내(`ContentCreationGuideModal`)와 복사/붙여넣기 도구(`LlmAssistPanel`)로 **가져오는 지점**만 돕는다(§15).
 
 ---
 
@@ -121,13 +130,13 @@ HUB
 
 ### 4.1 실행 위치
 
-AI 진입점은 **공통 Home 중앙 입력 1곳 + 편집기 내부**다.
+O4O 내부 AI 진입점은 **공통 Home 중앙 입력 1곳 + 편집기 내부**다. (사용자 외부 AI 는 플랫폼 밖 — §15)
 
 | 진입점 | 경로 | AI 진입 | 성격 |
 |-------|------|--------|------|
 | **O4O 공통 Home 중앙 입력** | `neture.co.kr/` (`O4OHomePage.tsx`) | 자유 질문 (WorkScope 동반) | **업무 진입점** — 텍스트 응답 전용 |
 | RichTextEditor 툴바 | AiContentModal (✨ 버튼) | textarea 수동 입력 or "에디터에서 가져오기" | 편집 대상 산출물 생성 |
-| POP 제작기 Step 3 | PopCreatePage | 상품 마스터 자동 — 사용자 입력 불필요 | 편집 대상 산출물 생성 |
+| ~~POP 제작기 Step 3~~ | ~~PopCreatePage~~ | — | **stale(2026-09-14 정정)** — `PopCreatePage` 는 저장소에 없고 POP canonical 은 `/store/marketing/pop-v2`(AI 단계 없음). 페이지형 제작 AI 의 현재 census 는 [IR §4](../investigations/IR-O4O-STORE-CONTENT-PRODUCTION-EXTERNAL-LLM-STANDARD-ENV-AUDIT-V1.md) |
 
 > 2026-04 판에 있던 `FloatingAiButton` 행은 제거했다. 해당 컴포넌트는
 > WO-O4O-ADMIN-DEDICATED-SUPER-ADMIN-CUTOVER-AND-LEGACY-CLEANUP-V1 에서 이미 제거되어
@@ -261,11 +270,12 @@ Frontend에서 LLM API 직접 호출 없음 (WO-O4O-AI-SECURITY-APIKEY-REMEDIATI
 
 ## 10. 한 줄 핵심
 
-> O4O의 AI는 **업무의 진입점이자, 콘텐츠를 실행으로 연결하는 흐름의 일부**다.
+> O4O의 AI는 **업무의 진입점이자, 콘텐츠를 실행으로 연결하는 흐름의 선택적 일부**다. 매장 콘텐츠의 창작 주체는 사용자(와 사용자의 AI)다.
 
 ```
-진입:  O4O Home 중앙 AI 입력 → WorkScope → 텍스트 응답
-실행:  선택(HUB) → 복사(텍스트) → 정리(AI) → 실행(POP/QR/콘텐츠)
+진입:  O4O Home 중앙 AI 입력 → WorkScope → 텍스트 응답            (플랫폼 일반 업무)
+기획:  사용자 외부 AI → 기획·초안 → O4O 로 가져오기(HTML 붙여넣기)   (§15)
+실행:  선택(HUB/자료) → 복사(텍스트) → [정리(AI, 선택)] → 실행(POP/QR/콘텐츠)
 ```
 
 2026-04 판의 "AI 는 따로 사용하는 기능이 아니다" 는 **편집기 축에 한해 여전히 유효**하다 —
@@ -457,3 +467,21 @@ WorkScope 타입의 `executionMode: 'local' | 'hybrid'` 와 capability `local_re
 
 여기에 적힌 항목은 **전부 미구현**이다. 구현·검증되기 전까지 canonical 기능으로 인용하지 않는다.
 비용/사용량 telemetry(§11.6)도 이 축의 후속 과제에 포함한다.
+
+---
+
+## 15. 매장 콘텐츠 제작에서의 AI 위치 (2026-09-14)
+
+> 정본: [O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1](O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md). 본 절은 이 문서의 진입 흐름과 그 원칙의 접점만 적는다.
+
+| 단계 | 주체 | O4O 코드 접점 |
+|---|---|---|
+| 기획 · 스토리 · 초안 (Creative / Strategy) | **사용자의 외부 AI** | 없음(플랫폼 밖). O4O 는 LLM API 호출·계정 연동·대화 저장을 하지 않는다 |
+| 가져오기 · 누락 확인 (Normalize / Handoff) | O4O Guide | `ContentCreationGuideModal`(KPA) · `LlmAssistPanel`(`@o4o/content-editor`, 태블릿 코너) · 편집기 HTML 탭 |
+| 제작 실행 (Execute / Manage / Reuse) | O4O 표준 제작환경 | `StartProductionModal` → POP V2 / QR / Blog / 상품설명 · Production Materials 편집 · Media Library V2 · VIDEO Job · Temporary Output |
+| 편집 보조 · 구조화 · 내부 자동화 (Assist) | O4O 내부 AI (**선택**) | Toolbar `AI 정리`(`AiContentModal`, `/api/ai/content`) · Product AI pipeline(§5.1) · Home AI(§11) |
+
+- §2.2 편집기 AI 흐름의 "AI 정리" 는 **선택 단계**다. 외부 LLM 결과를 붙여넣고 AI 정리 없이 바로 실행해도 canonical 흐름이다.
+- `StartProductionModal.onAiAction`("AI 제작 자료 초안 만들기") 은 프로덕션 소비처 0 인 DORMANT capability 다(IR §3.2). 이 문서의 어느 흐름도 그것을 전제하지 않는다.
+- 잔존 페이지형 제작 AI(KPA `/store/marketing/qr/ai-description`)의 처분은 별도 WO(IR §8-4). 이 문서는 그것을 canonical 진입점으로 등재하지 않는다.
+

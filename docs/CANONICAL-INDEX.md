@@ -52,6 +52,7 @@
 | — | [O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1](baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) | 공통 모듈 · config · sidebar · capability map 변경 시 전 소비처 식별 절차 (raw-source spec 포함) | ACTIVE |
 | — | [O4O-STORE-RULES](architecture/O4O-STORE-RULES.md) | O4O Store & Order 가드레일 — Store Template · 주문 생성 3중 방어 | ACTIVE |
 | — | [O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1](architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md) | Store Production Material 논리 canonical (`kpa_store_contents` = legacy 물리명) | ACTIVE |
+| — | [O4O-CONTENT-PRODUCTION-FLOW-CANONICAL-V1](architecture/O4O-CONTENT-PRODUCTION-FLOW-CANONICAL-V1.md) | 매장 콘텐츠 제작 6단계 흐름(대상 선택 → 자료 투입 → 편집기/AI → 용도별 저장 → 템플릿 → 산출물) — AI 단계는 선택(운영 원칙 문서 §3) | ACTIVE |
 | — | [STORE-PRODUCTS-CANONICAL-V1](architecture/STORE-PRODUCTS-CANONICAL-V1.md) | Store Products canonical | ACTIVE |
 | — | [STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1](baseline/STORE-LOCAL-PRODUCT-BOUNDARY-POLICY-V1.md) | 매장 자체 상품의 Commerce 연결 금지 경계 | ACTIVE |
 | — | [O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1](baseline/O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md) | Signage Store Playlist 모델 경계 (KEEP-LEGACY 판정) | ACTIVE |
@@ -118,7 +119,8 @@
 | [O4O-GUIDE-SECTIONKEY-MIGRATION-V1](architecture/O4O-GUIDE-SECTIONKEY-MIGRATION-V1.md) | Guide sectionKey Migration | ACTIVE |
 | [O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1](architecture/O4O-GUIDE-CONTENT-RESEED-GUIDEBLOCK-V1.md) | Guide Content Reseed (GuideBlock) | ACTIVE |
 | [O4O-GUIDE-PAGE-KEY-CATALOG-V1](architecture/O4O-GUIDE-PAGE-KEY-CATALOG-V1.md) | Guide pageKey 카탈로그 | ACTIVE |
-| [O4O-AI-USAGE-FLOW-BASELINE-V1](baseline/O4O-AI-USAGE-FLOW-BASELINE-V1.md) | O4O AI 활용 흐름 baseline | ACTIVE |
+| [O4O-AI-USAGE-FLOW-BASELINE-V1](baseline/O4O-AI-USAGE-FLOW-BASELINE-V1.md) | O4O AI 활용 흐름 baseline (Home AI · 편집기 AI 계약 · §15 매장 콘텐츠 AI 위치) | ACTIVE |
+| [O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1](baseline/O4O-STORE-CONTENT-PRODUCTION-OPERATING-PRINCIPLES-V1.md) | **매장 콘텐츠 제작 운영 원칙 SSOT** — 사용자 외부 AI(ChatGPT/Gemini/Claude)=Creative/Strategy · O4O=표준 제작환경(Execute/Manage/Reuse) · 내부 AI=선택적 보조(필수 단계 아님) · provider 중립 · Media Library/VIDEO Job/Temp Output 재사용 · 파일럿 ≠ Canonical | ACTIVE |
 | [O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1](baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) | **AI 자동화 진화 원칙 SSOT** — 사용자 행동은 학습 자료 · 목적/결과가 기준 · 완전 자동화가 아닌 시간 절감 · takeover 는 학습 신호 · 사이트별 업무 사전 정의 금지 · AI=발견/판단, Runtime=검증된 실행. Local Agent · Browser DOM · Computer Use · Site Adapter · Workflow · 주문/회계 자동화 등 **모든 자동화 WO 의 상위 기준** (§25 현행 정렬 상태) | ACTIVE |
 
 ## 7. 운영 · 환경 · 절차
