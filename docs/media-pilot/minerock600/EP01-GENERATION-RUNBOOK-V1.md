@@ -30,7 +30,7 @@ AI 영상  = 약사 A 움직임 + 바다/암반 분위기 + 카메라 + 배경
 | Model | Multilingual v2 (또는 v3 가 안정적이면 v3) |
 | 설정 | Stability 0.55 · Similarity 0.75 · Style 0.15 · Speaker boost on · Speed 1.0 (길이 초과 시 0.95 → 0.9) |
 | 생성 단위 | CUT 별 3회 (`[CUT1]` / `[CUT2]` / `[CUT3]` 블록 각각) |
-| 목표 길이 | CUT1 ≤ 6.5s · CUT2 ≤ 9.5s · CUT3 ≤ 9.5s |
+| 목표 길이 | 기준 CUT1 ≈ 6s · CUT2 ≈ 9s · CUT3 ≈ 9s — 넘어도 속도를 바꾸지 않는다. 실측 후 CUT 길이를 내레이션에 맞춘다 |
 | 저장 | `C:\tmp\minerock600-pilot\ep01\narration\ep01-cut1.mp3` · `ep01-cut2.mp3` · `ep01-cut3.mp3` (mp3 44.1kHz 128k 이상) |
 
 발음 주의: `미네락600` → "미네락 육백", `1,050미터` → "천오십 미터", `경도 600` → "경도 육백". 잘못 읽으면 텍스트를 한글 숫자로 바꿔 재생성한다.
@@ -90,7 +90,8 @@ python scripts/media/minerock600-pilot/ep01/assemble_ep01.py          # 합성
 python scripts/media/minerock600-pilot/ep01/assemble_ep01.py --dry-run # 입력 확인·오버레이 렌더·명령만
 ```
 
-- 필요: `ffmpeg` (PATH). 현재 이 PC 에 **없음** → `winget install Gyan.FFmpeg` 후 새 터미널. (설치는 사용자 승인 후)
+- `ffmpeg` 9.0.1 설치 완료(2026-09-14, `winget install Gyan.FFmpeg`, 사용자 승인). 스크립트는 PATH → winget Links → Packages 순으로 자동 탐색.
+- **CUT 길이 규칙**: 7/10/10s 는 기준값. 내레이션이 들어오면 `--measure` 로 실측 → `실측 + 앞 0.4s + 뒤 0.8s` 를 CUT 길이로 씀. **내레이션 속도 변경 없음.** raw clip 이 더 짧으면 clip 길이로 제한하고 보고. → Seedance 생성 duration 은 내레이션 실측 후 확정(§1 → §3 순서).
 - 파이프라인: raw clip → 1920×1080 crop/trim → 오버레이(실제 Cutout 레이어 · 그래픽 PIP · Ca/Mg 아이콘 · 자막 PNG) → 내레이션 mux → CUT 별 `assembly/cutN-composited.mp4` → concat `assembly/ep01-v1-preview.mp4`.
 - 자막은 [`subtitles-ko.srt`](../../../scripts/media/minerock600-pilot/ep01/subtitles-ko.srt) 와 동일 문구를 PIL(맑은 고딕) 로 PNG 렌더 → overlay (drawtext 폰트 문제 회피).
 - Cutout 좌측 알파 밴드: 병 뒤에 밝은 반투명 패널을 깔아 비침 완화(`cutout_layer`). 병은 정지(움직이는 병 영상 없음).
