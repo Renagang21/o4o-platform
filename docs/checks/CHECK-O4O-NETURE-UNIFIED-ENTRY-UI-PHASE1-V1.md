@@ -3,7 +3,7 @@
 > **WO**: `WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1`
 > **선행 IR**: `IR-O4O-NETURE-UNIFIED-ENTRY-AUTH-SERVICE-MEMBERSHIP-ROUTING-AUDIT-V1` (판정 `UI_FIRST_WITH_MINIMAL_FIX`)
 > **상태**: 구현 + 정적 · 단위 검증 = **PASS** · 프로덕션 실 화면 검증 = **PASS_WITH_UNVERIFIED** (§7 — 결함 1건 발견 · 수정 · 재배포, 계정 부재 항목은 미검증 명시)
-> **커밋**: `2464f2494`(구현) · 후속 1건(KPA Society 수신 페이지 문구 — §7-10)
+> **커밋**: `2464f2494`(구현) · `09ed2fad0`(KPA Society 수신 페이지 문구 — §7-10 · 배포 후 실 화면 재검증 PASS)
 > **작성일**: 2026-09-14
 > **성격**: Neture 대표 홈(`/`) 로그인 후 개인화 + 서비스 이동(handoff) 수신 정합 + 대표 진입 로그인 예외(로그인 허용만). 새 SSO · 범용 권한 엔진 · DB migration · 회원 데이터 변경 **0**.
 
@@ -124,7 +124,7 @@
 | 7 | 매장 없음 · 복수 매장 | **부분** — 매장 없음: 운영자 계정은 KCos · PH 매장이 없어 해당 서비스의 매장 HUB/내 매장 버튼이 나타나지 않음(**PASS**). 복수 매장(한 서비스 2개 이상): 로스터 계정 없음 → **미검증**(코드는 전체 매장명 나열 + 서비스 화면에서 선택 안내, 자동 선택 없음) |
 | 8 | 다른 서비스 회원의 Neture 홈 로그인 | **미검증(실 화면)** — 로스터 계정이 전부 Neture membership 을 보유해 예외 경로를 실계정으로 태울 수 없다. 운영 회원 데이터 변경 금지 원칙상 계정을 만들지 않았다. 계약은 `representativeEntryLoginContract.test.ts` 6건으로 고정(§5) |
 | 9 | handoff 이동 후 세션 유지 · 도착 화면 | **PASS** — 매장 계정: 파머시 허브 매장 HUB → `pharmacyhub.co.kr/store-hub`(약국 경영자 헤더 · 로그인 상태), KPA Society 내 매장 → `kpa-society.co.kr/handoff?token=…&returnTo=%2Fstore` → `/store`(테스트 약국 매장 홈), K-Cosmetics 내 매장 → `/store`, 약사회 분회 → `kpa-society.co.kr/kpa/me`(내 분회). 운영자 계정: 분회 운영자 · PH 운영자 · KCos 운영자 도착 확인(#3 · #5). 이동 후 Neture 로 돌아와도 Neture 세션 유지 |
-| 10 | 만료 · 실패 handoff 문구 | **결함 1건 → 수정** — 사용 완료 토큰 재사용 시 PharmacyHub · K-Cosmetics · Neture 수신 페이지는 `이동 링크가 만료되었거나 이미 사용되었습니다. 다시 로그인해 주세요.` + 로그인 링크(**PASS**, 기존 세션 미손상). **KPA Society 는 API 원문 영문 그대로 노출** → `HandoffPage.tsx` 에 코드→문구 표 적용(후속 커밋). 분회 수신 페이지 실패 문구는 동일 템플릿이나 실 화면 **미검증** |
+| 10 | 만료 · 실패 handoff 문구 | **결함 1건 → 수정** — 사용 완료 토큰 재사용 시 PharmacyHub · K-Cosmetics · Neture 수신 페이지는 `이동 링크가 만료되었거나 이미 사용되었습니다. 다시 로그인해 주세요.` + 로그인 링크(**PASS**, 기존 세션 미손상). **KPA Society 는 API 원문 영문 그대로 노출** → `HandoffPage.tsx` 에 코드→문구 표 적용(`09ed2fad0`) → 재배포 후 `kpa-society.co.kr/handoff?token=…` 실 화면에서 한국어 문구 확인 **PASS**. 분회 수신 페이지 실패 문구는 동일 템플릿이나 실 화면 **미검증** |
 | 11 | 직접 URL · API 권한(서버 최종 판정) | **PASS** — 비로그인 `GET /api/v1/neture/home/entry` → 401 `AUTH_REQUIRED`, 비로그인 `POST /auth/handoff` → 401. 화면 버튼은 안내일 뿐 최종 판정은 각 서비스 guard(도착 화면이 서버 응답으로 렌더됨을 #9 로 확인) |
 | 12 | 데스크톱 · 모바일 | **PASS** — 1280px · 390px(모바일) 모두 pill 이 줄바꿈되며 가로 스크롤 없음. 모바일에서 AI 입력 · 개인화 절 · 푸터 정상 |
 | 13 | 로딩 · 오류 · 빈 상태 | **부분** — 로딩: 세션 복구 중 개인화 절 미노출 · 로그인 직후 "이용 중인 서비스를 확인하는 중" 경유 후 렌더(**PASS**). 오류(조회 실패 → 재시도 + 공개 안내 대체) · 빈 상태: 프로덕션에서 재현 수단 없음 → **미검증**(정적 검증만) |
