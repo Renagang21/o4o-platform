@@ -99,9 +99,34 @@ canonical = **2026-09-14 운영 `pg_catalog` 실측 구조 전체** (67 fingerpr
 | `typeorm_migrations` | 676 건 |
 | 예상 효과 | **no-op** (fresh 생성 fingerprint == 운영 fingerprint · 같은 assertion 로직) |
 
-## 7. 운영 적용 후 검증
+## 7. 운영 적용 후 검증 (read-only · 2026-09-14)
 
-_(deploy migration job 실행 후 기입)_
+적용 경로: commit `5499a2864` → `Deploy API Server (Cloud Run)` run `#34807284797` SUCCESS → Cloud Run job `o4o-api-migrations` execution `th247` (04:52:36Z). 수동 실행 0.
+
+| 항목 | 결과 |
+|---|---|
+| migration job 로그 | `[BaselineRbacAndAccountTables] permissions / role_permissions / linked_accounts / settings / account_activities: exists · structure matches canonical · no-op` ×5 → `Migrations executed: 1` · `Migration Job - SUCCESS` |
+| `typeorm_migrations` | 676 → **677** (id 678 `BaselineRbacAndAccountTables20270413000000` · 직전 677 `DropRetiredCmsCptResidueTables20270412000000`) |
+| row count | permissions 0 · role_permissions 0 · linked_accounts 0 · settings 4 · account_activities **8,950** (적용 직후 · 불변) |
+| 불변 대조군 | roles 41 · role_assignments 73 · users 58 — **불변** |
+| schema fingerprint | 67 행 · md5 `c2df13a2cd0912d66fe8042ddeb2fe75` — **적용 전과 동일** (diff 0) |
+| `/health/ready` | 200 `ready` |
+| 로그인 (`POST /api/v1/auth/login` · kpa-society 테스트 계정) | 200 · `accessToken` · `refreshToken` 쿠키 발급 |
+| `GET /api/v1/auth/me` | 200 · email 일치 |
+| `POST /api/v1/auth/refresh` | 200 `Token refreshed successfully` · 이후 `/me` 200 |
+| account_activities 기록 | smoke 로그인 2회 → `login_email` success 2건 기록 (8,950 → 8,952 · 증가분 = smoke 로그인만) |
+| settings | 4 key (`email` · `general` · `reading` · `theme`) 불변 · 로그인 경로(passportDynamic) 가 정상 읽음 |
+| CodeQL (`5499a2864`) | SUCCESS |
+| CI Pipeline (`5499a2864`) | **FAILURE 1건** — `cms-retired-physical-table-final-drop.spec.ts` 의 "마지막 migration 파일 == 20270412" 시간 고정 assertion (어떤 신규 migration 이라도 실패시키는 stale 계약) → 의도 보존형(파일 존재 + 직전 파일 고정) 으로 완화 커밋 `771d1008c` (테스트만 수정 · 다른 세션 커밋 `5d6e3bf03` · `ac16737e2` 의 CI 도 같은 사유로 실패 중이었음) |
+| CI Pipeline · CodeQL · Deploy API (`771d1008c`) | §7-1 |
+
+### 7-1. `771d1008c` 결과
+
+| workflow | 결과 |
+|---|---|
+| Deploy API Server (Cloud Run) `#34809849778` | SUCCESS (migration job: pending 0 · 재실행 no-op) |
+| CodeQL `#34809849731` | SUCCESS |
+| CI Pipeline `#34809849721` | FAILURE — `cms-retired-physical-table-final-drop.spec` 은 **해소(PASS)**. 남은 실패 1건 = `work-agent.spec.ts` "Work Agent 코드는 automation_jobs · 큐 · 스케줄러 · DB 에 닿지 않는다" — 다른 세션 커밋 `5d6e3bf03`(local-agent 복구 계층) 의 run `#34808176447` 에서 이미 실패하던 항목이며 본 WO 파일(migration · 2 spec · CHECK) 과 무관. 범위 밖이므로 수정하지 않고 보고 (별도 세션 소관) |
 
 ## 8. 완료 조건
 
@@ -111,17 +136,20 @@ BASELINE_TABLE_CREATION_OWNER           = DEPLOY_MIGRATION_JOB (20270413000000-B
 FRESH_DATABASE_REPRODUCIBILITY          = PASS (fingerprint == 운영 67/67)
 EXISTING_SCHEMA_ASSERTION               = PASS (drift 9종 실패 · 추가 index 허용)
 EXISTING_SCHEMA_DRIFT_SILENT_ACCEPTANCE = ZERO
-PRODUCTION_MIGRATION_EFFECT             = (적용 후 기입 · 예상 NO_OP)
-PRODUCTION_ROW_COUNT_CHANGE             = (적용 후 기입)
+PRODUCTION_MIGRATION_EFFECT             = NO_OP (5/5 exists · structure matches canonical · history +1)
+PRODUCTION_ROW_COUNT_CHANGE             = ZERO (smoke 로그인에 의한 account_activities +2 는 정상 런타임 기록)
 PRODUCTION_ROLE_CHANGE                  = ZERO (코드상 write 0)
 PRODUCTION_PERMISSION_ASSIGNMENT_CHANGE = ZERO
 PRODUCTION_AUTHORIZATION_CHANGE         = ZERO
 RETIRED_USER_ROLES_RECREATION           = ZERO
 CORE_LIFECYCLE_SCHEMA_RUNTIME           = ZERO
-LOGIN_AND_TOKEN_REGRESSION              = (적용 후 기입)
-SETTINGS_REGRESSION                     = (적용 후 기입)
-ACCOUNT_ACTIVITY_REGRESSION             = (적용 후 기입)
-CI_PIPELINE / CODEQL / DEPLOY_API       = (적용 후 기입)
+LOGIN_AND_TOKEN_REGRESSION              = PASS (login 200 · me 200 · refresh 200)
+SETTINGS_REGRESSION                     = PASS (4 key 불변 · 로그인 경로 읽기 정상)
+ACCOUNT_ACTIVITY_REGRESSION             = PASS (login_email 기록 정상)
+CODEQL                                  = SUCCESS
+DEPLOY_API                              = SUCCESS (#34807284797 · migration job th247)
+CI_PIPELINE                             = FAILURE_OUT_OF_SCOPE (본 WO 유발 실패 0 · 잔여 1건 = 다른 세션 work-agent.spec · §7-1)
+RBAC_AND_ACCOUNT_BASELINE_MIGRATION_OWNERSHIP = CLOSED
 ```
 
 ## 9. 잔여 · 별도 WO 제안
@@ -129,5 +157,7 @@ CI_PIPELINE / CODEQL / DEPLOY_API       = (적용 후 기입)
 1. **`roles` 생성 migration 부재** (WO §5 STOP 규정) — 41행 · camel/snake 중복 컬럼 18개 · synchronize 산물. 같은 방식(실측 canonical + assertion) 의 별도 WO 필요. 본 baseline 은 fresh DB 에서 `roles` 가 먼저 있어야 `role_permissions` 를 만들 수 있으므로, 완전한 fresh 재현은 이 WO 까지 닫혀야 성립한다.
 2. **entity ↔ 운영 drift 정비** — `Permission`(name NOT NULL 미매핑 · key unique 부재) · `LinkedAccount`(userId 타입 · unique · users FK 부재 · 잉여 5 col) · `AccountActivity`(action 길이 · details 타입 · 잉여 `type`) . 운영 ALTER 또는 entity 정정이 필요하므로 F9 · Core Freeze 절차의 별도 WO.
 3. platform-core manifest `exposes` / `backend` metadata 정비 (`WO-O4O-PLATFORM-CORE-MANIFEST-EXPOSES-AND-BACKEND-METADATA-TRUTHFULNESS-CLOSURE-V1`, 우선순위 낮음).
+
+4. (범위 밖 · 보고) `work-agent.spec.ts` CI 실패 — 다른 세션 `5d6e3bf03` 소관.
 
 **문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건 (roles 생성 migration · entity↔운영 drift 정비)**
