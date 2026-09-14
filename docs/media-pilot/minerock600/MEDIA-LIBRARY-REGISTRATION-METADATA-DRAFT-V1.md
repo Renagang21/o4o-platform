@@ -1,7 +1,7 @@
 # Media Library 등록 metadata 초안 — EP01 신규 자산 4건 (V1)
 
 > **대상**: [Asset manifest](EP01-ASSET-MANIFEST-V1.md) A-01 · A-02 · A-03 · B-01. 파일 수령 후 이 값 그대로 등록한다.
-> **경로 계약**: `POST /media-library/upload`(multipart, `folder`) → `PATCH /media-library/:id/metadata` → `PATCH /media-library/:id/catalog` → `POST /media-library/:id/links`. 전부 production API · `platform:super_admin` smoke 계정 · 쿠키 인증 (ASSET-PREP CHECK 와 동일).
+> **경로 계약**: (prefix `/api/v1/platform`) `POST /media-library/upload`(multipart, `folder`) → `PATCH /media-library/:id/metadata` → `PATCH /media-library/:id/catalog` → `POST /media-library/:id/links`. 전부 production API · `platform:super_admin` smoke 계정 · 쿠키 인증 (ASSET-PREP CHECK 와 동일).
 > **enum 근거**: `apps/api-server/src/modules/media/services/media-catalog.service.ts` `MEDIA_ENUMS` (originType `original|edited|ai_generated|external` · qaStatus `PENDING|APPROVED|REJECTED` · productAccuracyLevel `EXACT|ACCEPTABLE|SUPPORT_ONLY|REJECTED` · derivationType `original|background-removed|generated-scene|…`).
 > **주의**: 일반 업로드는 1200px WebP 로 축소 저장된다. 등록본은 카탈로그/reference 용이며 합성 원본은 로컬 파일(manifest 경로).
 
@@ -55,6 +55,8 @@
 
 ## 3. A-03 `O4O 한국 여성 약사 A` — R-01 정면
 
+> 등록 완료(2026-09-14): R-01 `4aa5e0c3…` · R-02 `ba0b9211…`(`generated-angle`, parent R-01) · R-03 `4dd57f20…`(동일). 실제 경로 prefix 는 `/api/v1/platform/…`.
+
 ```jsonc
 // upload: folder=production
 {
@@ -75,6 +77,8 @@
 
 ## 4. B-01 동해/심층수 분위기 배경
 
+> 실측(2026-09-14): `derivationType=generated-scene` 은 `parentAssetId` 필수(`PARENT_REQUIRED`). 원본 없이 생성한 배경은 **`derivationType=original`** 로 등록했다. 아래 payload 는 그에 맞춰 정정. 등록 ID `555b7289…`.
+
 ```jsonc
 // upload: folder=production
 {
@@ -86,7 +90,7 @@
   "isLibraryPublic": false,
   "memo": "Category=SCENE / MediaType=image / Purpose=INTERMEDIATE / Scope=MINEROCK / Visibility=INTERNAL. 가드: 실사·현장 의미 부여 금지."
 }
-{ "originType": "ai_generated", "derivationType": "generated-scene", "qaStatus": "PENDING",
+{ "originType": "ai_generated", "derivationType": "original", "qaStatus": "PENDING",
   "productAccuracyLevel": "SUPPORT_ONLY", "rightsType": "o4o-original", "commercialUseAllowed": true, "attributionRequired": false,
   "generationProvider": "<도구명>", "promptRef": "EP01-ASSET-MANIFEST-V1 B-01" }
 { "entityType": "video-production-job", "entityId": "8a357640-ad64-42f3-ae4c-43519ce78222", "purpose": "INTERMEDIATE" }
