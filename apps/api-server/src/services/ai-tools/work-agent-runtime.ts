@@ -49,6 +49,16 @@ import {
   type WorkElement,
   type WorkSurface,
 } from './work-agent-contract.js';
+import {
+  RECOVERY_ERROR,
+  RECOVERY_LIMITS,
+  classifyFailure,
+  decideRecovery,
+  noteNotRecovered,
+  noteRecovered,
+  sanitizeRecoveryHint,
+  type ClassifyInput,
+} from './automation-recovery-contract.js';
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const NAVIGATION_SETTLE_MS = 700;
@@ -68,6 +78,8 @@ export interface PlannerInput {
   lastRejectReason?: ProposalRejectReason;
   /** SAFETY-V1: agent 안전층 거절 사유(enum 문자열). */
   lastSafetyReason?: string;
+  /** 사용자가 직접 준 복구 힌트(source=user · 신뢰 입력이나 권한·위험은 못 바꾼다 §65). 없으면 undefined. */
+  recoveryHint?: string;
   stepsLeft: number;
 }
 
@@ -124,6 +136,8 @@ export function buildPlannerUserPrompt(input: PlannerInput): string {
     lines.push(`## 지금까지의 행동\n${h.join('\n')}`);
   }
   if (input.lastRejectReason) lines.push(`## 직전 제안 거절 사유\n${input.lastRejectReason}${input.lastSafetyReason ? ` (${input.lastSafetyReason})` : ''} — 같은 제안을 반복하지 말 것. SAFETY_REJECT 면 창을 앞으로 가져오거나(window click) 다시 관찰한 뒤 진행하고, 해결되지 않으면 takeover.`);
+  // 사용자 힌트(source=user · 신뢰). 권한·위험은 못 바꾼다 — 그래도 로그인/결제/제출 금지 규칙이 우선한다(§65).
+  if (input.recoveryHint) lines.push(`## 사용자 추가 지시 (source=user)\n${input.recoveryHint}\n(이 지시로도 로그인·결제·주문 확정·삭제·게시는 하지 않는다 → takeover.)`);
   const elements = obs.elements.map(describeObservationElement).join('\n');
   if (obs.surface === 'uia') {
     // SAFETY-V1 §18·§22: 이 앱의 키 의미 · UIA 노출 범위(등재부 실측). Planner 가 제출 키와 자동화 불가 영역을 안다.
@@ -163,6 +177,15 @@ const defaultTargetResolver: PlannerTargetResolver = async (dataSource) => {
   // provider/model/key 해석은 호출 시점에 늦게 불러온다 — 이 모듈의 정적 import 그래프를 DB/entity 층과 떼어 둔다(테스트·smoke 하네스가 loop 만 싣는다).
   const { resolveAiTarget } = await import('../../utils/ai-provider-runtime.js');
   return resolveAiTarget(dataSource, undefined);
+};
+
+/**
+ * 복구용 strong target resolver — 같은 provider·같은 키, **더 강한 모델**(§11·§12). 새 provider stack 이 아니다.
+ * 일반 resolver 와 execute() 경로가 완전히 같고 model ID 만 다르다.
+ */
+const strongTargetResolver: PlannerTargetResolver = async (dataSource) => {
+  const { resolveStrongAiTarget } = await import('../../utils/ai-provider-runtime.js');
+  return resolveStrongAiTarget(dataSource, undefined);
 };
 
 export function createLlmPlanner(
@@ -212,12 +235,30 @@ export function createLlmPlanner(
   };
 }
 
+/**
+ * strong 복구 planner — `createLlmPlanner` 와 같은 코드, target resolver 만 strong(§11·§12).
+ * 복구 계층이 일반 planner 로 뚫지 못했을 때 runtime 이 이 planner 로 갈아탄다. provider stack 은 그대로다.
+ */
+export function createStrongLlmPlanner(
+  dataSource: DataSource,
+  fetchImpl: typeof fetch = fetch,
+): WorkPlanner {
+  return createLlmPlanner(dataSource, fetchImpl, strongTargetResolver);
+}
+
 // ─── Runtime loop (§3·§17·§18·§34~§36) ──────────────────────────────────────
 
 export interface WorkAgentRunInput {
   request: string;
   targetHint?: string;
   image?: unknown;
+  /** 실패 인계 뒤 사용자가 다시 요청하며 준 복구 힌트(§64·§65). runtime 이 sanitize 한다. */
+  recoveryHint?: string;
+}
+
+/** runWorkAgent 선택 의존성. strongPlanner 는 복구 계층의 "더 강한 추론" 경로(§11·§12) — 없으면 escalation 없이 기존대로 동작한다. */
+export interface WorkAgentRunOptions {
+  strongPlanner?: WorkPlanner;
 }
 
 export interface WorkAgentRunResult {
@@ -251,6 +292,7 @@ export async function runWorkAgent(
   ctx: VerifiedToolContext,
   input: WorkAgentRunInput,
   planner: WorkPlanner,
+  options: WorkAgentRunOptions = {},
 ): Promise<WorkAgentRunResult> {
   const tool = AI_TOOL_NAMES.WORK_AGENT_PERFORM;
   const goal: WorkGoal = { goalId: `g_${Date.now().toString(36)}`, request: String(input.request ?? '').trim(), status: 'active' };
@@ -281,11 +323,16 @@ export async function runWorkAgent(
   // SAFETY-V1 §49: 같은 안전 거절 2회 → 인계. 사유 문자열은 Planner 프롬프트에만 쓴다.
   const safetyRejects: Record<string, number> = {};
   let lastSafetyReason = '';
+  // 실패→복구 계층(WO-O4O-AUTOMATION-FAILURE-ESCALATION). strongPlanner 없으면 escalation 없이 기존대로 동작한다.
+  const strongPlanner = options.strongPlanner;
+  let activePlanner: WorkPlanner = planner;
+  const recoveryHint = sanitizeRecoveryHint(input.recoveryHint) ?? undefined;
+  let recoveryStatus: string | null = null;
 
   const finish = (): WorkAgentRunResult => {
     goal.status = state.progress === 'completed' ? 'completed' : state.progress === 'needs_user' ? 'waiting_for_user' : 'stopped';
-    // §22·§23 usage signal — 허용 키만. goal 원문 · 관찰 · 입력값 · 이미지는 실리지 않는다.
-    logger.info('work-agent run', buildWorkAgentUsageEvent(state, inputMode));
+    // §22·§23 usage signal — 허용 키만. goal 원문 · 관찰 · 입력값 · 이미지는 실리지 않는다. 복구 신호는 §60 화이트리스트만.
+    logger.info('work-agent run', buildWorkAgentUsageEvent(state, inputMode, new Date(), recoveryStatus));
     return {
       ok: state.progress === 'completed' || state.progress === 'needs_user' || state.progress === 'progress',
       goal, siteId, displayName, progress: state.progress, takeover: state.takeover, neededInput,
@@ -302,6 +349,42 @@ export async function runWorkAgent(
   /** 행동 뒤 재관찰 실패의 인계 사유 — 예산 소진은 loop_limit, 그 밖(탭 없음 · 등재 밖 이동 등)은 site_not_ready. */
   const observeFailed = (o: { errorCode?: string }): WorkAgentRunResult =>
     o.errorCode === WORK_AGENT_ERROR.LOOP_LIMIT ? takeover('loop_limit', 'no_progress') : takeover('site_not_ready', 'needs_user');
+
+  // ── 실패→복구 계층 (WO-O4O-AUTOMATION-FAILURE-ESCALATION §4·§11·§16·§22·§27·§67) ──
+  //   실패를 무작정 반복하지 않는다. 분류(classify) → 판단(decideRecovery): 더 강한 추론(strong)으로 올릴지,
+  //   그냥 다시 시도할지, 사용자에게 넘길지. credential/commit/unsupported 는 이 경로를 타지 않는다 —
+  //   위의 즉시 takeover 가 먼저 잡는다(§8 never-escalate). strongPlanner 가 없으면 escalation 없이 기존 동작 그대로다.
+  //
+  //   normalSpent=true 는 "이미 정상 재시도(loop 의 반복 상한 · invalidProposals 예산)를 소진했다" 는 뜻 —
+  //   국면을 strong 부터 판단하게 한다(§16). throw 경로는 false 로 정상 tier 진행(정상 재시도 → strong).
+  const recover = (input2: ClassifyInput, opts: { normalSpent?: boolean } = {}): 'retry' | 'giveup' => {
+    const cls = classifyFailure(input2);
+    if (opts.normalSpent) {
+      state.recovery.activeClass = cls;
+      state.recovery.lastClass = cls;
+      state.recovery.normalRetries = RECOVERY_LIMITS.normalRetryMax;
+    }
+    const decision = decideRecovery(state.recovery, cls);
+    if (decision.useStrongModel && strongPlanner) {
+      activePlanner = strongPlanner;
+      recoveryStatus = RECOVERY_ERROR.ESCALATED;
+      state.invalidProposals = 0;
+      sameObservationRun = 0;
+      repeatedActionRun = 0;
+      return 'retry';
+    }
+    if (!decision.askUser && !opts.normalSpent && strongPlanner) return 'retry'; // normal_retry(throw 경로) — strong 이 있을 때만 재시도 이득.
+    noteNotRecovered(state.recovery);
+    recoveryStatus = decision.useStrongModel ? RECOVERY_ERROR.PROVIDER_UNAVAILABLE : RECOVERY_ERROR.USER_HELP_REQUIRED;
+    return 'giveup';
+  };
+  /** 복구 국면 뒤 성공(완료) — 무엇으로 복구됐는지 기록한다(§27). 힌트가 실려 있으면 그 덕으로 본다. */
+  const markRecovered = () => {
+    if (state.recovery.escalatedToStrong || state.recovery.activeClass || recoveryHint) {
+      noteRecovered(state.recovery, { userHintPresent: !!recoveryHint });
+      recoveryStatus = null; // 복구 성공 — 진행(ESCALATED) 신호 해제.
+    }
+  };
 
   const resolution = await resolveTargetDevice(dataSource, ctx.userId);
   if (resolution.status !== 'ok') {
@@ -424,26 +507,35 @@ export async function runWorkAgent(
   while (true) {
     if (overTime() || budgetLeft() < 1) return takeover('loop_limit', 'no_progress');
     if (state.aiPlanCount >= WORK_LOOP_LIMITS.maxAiPlans) return takeover('loop_limit', 'no_progress');
-    if (sameObservationRun >= WORK_LOOP_LIMITS.maxSameObservation) return takeover('no_progress', 'no_progress');
+    // 같은 관찰이 반복됐다(무진전) — 무작정 다시 계획하지 말고 복구 판단(§36·§16). strong 이 있으면 한 번 더 세게, 없으면 인계.
+    if (sameObservationRun >= WORK_LOOP_LIMITS.maxSameObservation) {
+      if (recover({ noProgress: true }, { normalSpent: true }) === 'giveup') return takeover('no_progress', 'no_progress');
+    }
 
     // Plan (§8)
     let raw: unknown;
     state.aiPlanCount += 1;
     try {
-      raw = await planner.plan({
+      raw = await activePlanner.plan({
         goal, siteDisplayName: displayName, observation: state.observation as WorkObservation, history: state.history, lastRead, image, lastRejectReason,
         lastSafetyReason: lastSafetyReason || undefined,
+        recoveryHint,
         stepsLeft: budgetLeft(),
       });
     } catch {
-      return takeover('planner_unavailable', 'failed');
+      // planner 호출 실패(PLANNING_FAILURE) — 정상 재시도 → strong → 사용자(§16). strong 없으면 기존대로 즉시 인계.
+      if (recover({ plannerFault: true }) === 'giveup') return takeover('planner_unavailable', 'failed');
+      continue;
     }
     const checked = validateWorkProposal(raw, state.observation);
     if (!checked.ok || !checked.proposal) {
       state.invalidProposals += 1;
       lastRejectReason = checked.reason;
       state.history.push({ step: state.stepCount, action: { kind: 'inspect' }, status: 'rejected', rejectReason: checked.reason });
-      if (state.invalidProposals >= WORK_LOOP_LIMITS.maxInvalidProposals) return takeover('planner_unavailable', 'failed');
+      if (state.invalidProposals >= WORK_LOOP_LIMITS.maxInvalidProposals) {
+        // 정상 planner 가 계속 무효 제안 — 정상 재시도 소진으로 보고 strong 부터 판단(§16). strong 없으면 기존대로 인계.
+        if (recover({ plannerFault: true }, { normalSpent: true }) === 'giveup') return takeover('planner_unavailable', 'failed');
+      }
       continue;
     }
     lastRejectReason = undefined;
@@ -455,18 +547,23 @@ export async function runWorkAgent(
     // 인계 사유(goal_sufficiently_advanced 등)를 기록으로 남기는 쪽이 맞다(실 smoke 에서 관측).
     if (proposal.action.kind === 'takeover') {
       const reason = proposal.action.reason as TakeoverReason;
+      if (reason === 'goal_sufficiently_advanced') markRecovered();
       return takeover(reason, reason === 'goal_sufficiently_advanced' ? 'completed' : 'needs_user');
     }
     if (proposal.action.kind === 'done' || proposal.assessment === 'completed') {
       state.progress = 'completed';
+      markRecovered();
       return finish();
     }
     if (proposal.assessment === 'needs_user') return takeover('user_judgment_required', 'needs_user');
 
-    // 반복 행동 감지(§36)
+    // 반복 행동 감지(§36) — 같은 행동을 무작정 반복하지 않는다. 복구 판단: strong 이 있으면 다른 계획을 세우게 하고, 없으면 인계.
     if (sameWorkAction(state.lastResult?.action, proposal.action)) {
       repeatedActionRun += 1;
-      if (repeatedActionRun >= WORK_LOOP_LIMITS.maxRepeatedAction) return takeover('no_progress', 'no_progress');
+      if (repeatedActionRun >= WORK_LOOP_LIMITS.maxRepeatedAction) {
+        if (recover({ noProgress: true }, { normalSpent: true }) === 'giveup') return takeover('no_progress', 'no_progress');
+        continue; // strong planner 로 다시 계획한다(이 반복 행동은 실행하지 않는다).
+      }
     } else repeatedActionRun = 0;
 
     // Act (§14·§16) — 전부 기존 DOM 명령. elementRef 는 직전 관찰의 snapshot 과 짝이다.

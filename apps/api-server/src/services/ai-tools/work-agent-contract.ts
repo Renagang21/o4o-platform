@@ -38,6 +38,12 @@ import type { DomFindQuery, SafeDomElement } from '../local-agent/browser-dom-co
 import { DOM_QUERY_VALUE_MAX, domInputDenyReason, isDomElementRef, validateDomFindQuery } from '../local-agent/browser-dom-contract.js';
 import type { AutomationRiskLevel, ContentProvenance } from './automation-execution-contract.js';
 import { UIA_ALLOWED_KEYS, UIA_POINTER_ROLES } from '../local-agent/windows-uia-contract.js';
+import {
+  buildRecoveryUsageFields,
+  createRecoveryState,
+  type RecoveryState,
+  type RecoveryUsageFields,
+} from './automation-recovery-contract.js';
 import { findWindowsApp } from '../local-agent/windows-app-registry.js';
 import { textDenyReason as computerTextDenyReason } from '../local-agent/computer-use-contract.js';
 
@@ -416,24 +422,30 @@ export interface WorkAgentState {
   history: WorkStepRecord[];
   progress: WorkProgress;
   takeover: { reason: TakeoverReason; step: number } | null;
+  /** 실패→복구 계층 상태(WO-O4O-AUTOMATION-FAILURE-ESCALATION). 요청 안에서만 산다. */
+  recovery: RecoveryState;
   startedAt: number;
 }
 
 export function createWorkAgentState(goal: WorkGoal, siteId: string, now = Date.now()): WorkAgentState {
   return {
     goal, siteId, observation: null, plannedAction: null, lastResult: null, stepCount: 0, aiPlanCount: 0, invalidProposals: 0,
-    history: [], progress: 'progress', takeover: null, startedAt: now,
+    history: [], progress: 'progress', takeover: null, recovery: createRecoveryState(), startedAt: now,
   };
 }
 
 // ─── Usage signal (§22·§23) ─────────────────────────────────────────────────
 
-/** 로그에 남는 키 — 이것뿐이다. goal 원문 · 관찰 텍스트 · 입력값 · 이미지 · 페이지 텍스트는 칸이 없다. */
+/**
+ * 로그에 남는 키 — 이것뿐이다. goal 원문 · 관찰 텍스트 · 입력값 · 이미지 · 페이지 텍스트는 칸이 없다.
+ * 뒤쪽 6개는 복구 신호(RECOVERY_USAGE_KEYS §60) — 실패 종류·tier·복구 방법·시도 횟수·상태·개선 후보만.
+ */
 export const WORK_AGENT_USAGE_KEYS: readonly string[] = Object.freeze([
   'siteId', 'inputMode', 'actionCount', 'aiPlanCount', 'takeoverReason', 'takeoverStep', 'userCorrectionCount', 'completionState', 'durationMs', 'timestamp',
+  'failureClass', 'recoveryTier', 'recoveryMethod', 'recoveryAttempt', 'recoveryStatus', 'improvementCandidate',
 ]);
 
-export interface WorkAgentUsageEvent {
+export interface WorkAgentUsageEvent extends RecoveryUsageFields {
   siteId: string;
   inputMode: 'text' | 'text+image';
   actionCount: number;
@@ -447,7 +459,12 @@ export interface WorkAgentUsageEvent {
   timestamp: string;
 }
 
-export function buildWorkAgentUsageEvent(state: WorkAgentState, inputMode: 'text' | 'text+image', now = new Date()): WorkAgentUsageEvent {
+export function buildWorkAgentUsageEvent(
+  state: WorkAgentState,
+  inputMode: 'text' | 'text+image',
+  now = new Date(),
+  recoveryStatus: string | null = null,
+): WorkAgentUsageEvent {
   return {
     siteId: state.siteId,
     inputMode,
@@ -459,6 +476,7 @@ export function buildWorkAgentUsageEvent(state: WorkAgentState, inputMode: 'text
     completionState: state.progress,
     durationMs: Math.max(0, now.getTime() - state.startedAt),
     timestamp: now.toISOString(),
+    ...buildRecoveryUsageFields(state.recovery, recoveryStatus),
   };
 }
 

@@ -115,6 +115,71 @@ export async function resolveModelForProvider(provider: RuntimeProvider): Promis
   return OPENAI_DEFAULT_MODEL;
 }
 
+// ─── Strong recovery model (WO-O4O-AUTOMATION-FAILURE-ESCALATION §11·§12) ────────
+//
+// 복구 계층이 일반 planner 로 뚫지 못했을 때 올라가는 "더 강한 추론" 경로다. **새 provider
+// stack 이 아니다** — 같은 `execute()` 경로에 같은 키로, 같은 provider 의 더 강한 whitelisted
+// 모델 ID 만 얹는다. vendor·model 이름은 여기(런타임)에만 있고, 복구 계약(개념 `strong_model`)은
+// 모른다(§12). env 로 바꿀 수 있게 두되 반드시 whitelist 로 검증한다.
+
+/** provider 별 strong 모델 env override 이름. */
+const STRONG_MODEL_ENV_BY_PROVIDER: Record<RuntimeProvider, string> = {
+  gemini: 'AI_STRONG_MODEL',
+  openai: 'AI_STRONG_MODEL_OPENAI',
+};
+
+/**
+ * strong 모델 코드 기본값.
+ *
+ * gemini: 캐논(`gemini-3.8-flash`)보다 추론이 강한 `gemini-2.5-pro`(whitelist 포함).
+ * openai: 플래그십 `gpt-6-astra`(이미 기본 모델과 동일 — OpenAI 라인업의 최상위).
+ * 둘 다 기존 whitelist 안에 있어 같은 키로 도달한다.
+ */
+export const STRONG_MODEL_DEFAULT: Record<RuntimeProvider, string> = {
+  gemini: 'gemini-2.5-pro',
+  openai: 'gpt-6-astra',
+};
+
+/**
+ * provider 별 strong 복구 모델 결정 — `AI_STRONG_MODEL[_OPENAI]` env → 코드 기본값.
+ * whitelist 에 없는 값은 무시하고 기본값으로 접는다(오타가 복구 자체를 죽이면 안 된다).
+ */
+export function resolveStrongModelForProvider(provider: RuntimeProvider): string {
+  const allowed = MODEL_WHITELIST[provider] as readonly string[];
+  const fallback = STRONG_MODEL_DEFAULT[provider];
+  const env = process.env[STRONG_MODEL_ENV_BY_PROVIDER[provider]]?.trim();
+  if (env) {
+    if (allowed.includes(env)) return env;
+    logger.warn('strong 모델 env 가 whitelist 에 없어 기본값으로 대체', {
+      provider,
+      configured: env,
+      fallback,
+    });
+  }
+  // 기본값이 whitelist 를 벗어나면(향후 whitelist 개정) 일반 모델로 안전 강등.
+  if (!allowed.includes(fallback)) {
+    logger.warn('strong 모델 기본값이 whitelist 에 없어 일반 모델로 강등', { provider, fallback });
+    return provider === 'gemini' ? MODEL_WHITELIST.gemini[0] : OPENAI_DEFAULT_MODEL;
+  }
+  return fallback;
+}
+
+/**
+ * strong 복구 경로 target — 같은 provider·같은 키, 더 강한 모델. 새 stack 없음(§12).
+ * provider 를 명시하지 않으면 일반 경로와 같은 기본 provider 를 쓴다.
+ */
+export async function resolveStrongAiTarget(
+  dataSource: DataSource,
+  requestedProvider?: unknown,
+): Promise<ResolvedAiTarget> {
+  const provider = resolveProvider(requestedProvider);
+  const [model, apiKey] = await Promise.all([
+    Promise.resolve(resolveStrongModelForProvider(provider)),
+    resolveKeyForProvider(dataSource, provider),
+  ]);
+  return { provider, model, apiKey };
+}
+
 /** provider 별 API key. `ai_settings` → env 순서는 기존 SSOT(`resolveAiApiKey`) 그대로다. */
 export async function resolveKeyForProvider(
   dataSource: DataSource,

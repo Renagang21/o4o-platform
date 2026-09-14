@@ -280,7 +280,8 @@ describe('Runtime · Multimodal · Privacy (§13·§18~§24·§34)', () => {
     expect(everything).not.toContain(image.base64);
     const runs = (logger.info as jest.Mock).mock.calls.filter((c) => c[0] === 'work-agent run');
     const usage = runs[runs.length - 1]?.[1]; // 이 테스트의 run(마지막)
-    expect(Object.keys(usage).sort()).toEqual(['actionCount', 'aiPlanCount', 'completionState', 'durationMs', 'inputMode', 'siteId', 'takeoverReason', 'takeoverStep', 'timestamp', 'userCorrectionCount']);
+    // 기존 10키 + 복구 신호 6키(RECOVERY_USAGE_KEYS §60). 복구가 없었으므로 값은 null/0/false 지만 키는 항상 있다.
+    expect(Object.keys(usage).sort()).toEqual(['actionCount', 'aiPlanCount', 'completionState', 'durationMs', 'failureClass', 'improvementCandidate', 'inputMode', 'recoveryAttempt', 'recoveryMethod', 'recoveryStatus', 'recoveryTier', 'siteId', 'takeoverReason', 'takeoverStep', 'timestamp', 'userCorrectionCount']);
     expect(usage.inputMode).toBe('text+image');
     // 고정 약 스키마 · 이미지 저장 경로 부재(소스 잠금).
     const src = read('services/ai-tools/work-agent-runtime.ts') + read('services/ai-tools/work-agent-contract.ts');

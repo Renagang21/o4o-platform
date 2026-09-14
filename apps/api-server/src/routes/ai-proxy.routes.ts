@@ -46,7 +46,7 @@ import { isYouTubeUrl, fetchYouTubeContent, fetchYouTubeOEmbed } from './ai-prox
 // WO-O4O-COMMON-HOME-AI-INPUT-V0: O4O 공통 Home 중앙 입력 — 텍스트 질의응답 전용
 import { execute } from '@o4o/ai-core';
 import { dynamicLimiter } from '../middleware/rateLimiter.js';
-import { createLlmPlanner, runWorkAgent } from '../services/ai-tools/work-agent-runtime.js';
+import { createLlmPlanner, createStrongLlmPlanner, runWorkAgent } from '../services/ai-tools/work-agent-runtime.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
 import {
   selectToolInvocationForRequest,
@@ -277,8 +277,16 @@ router.post('/work-agent/run', authenticate, dynamicLimiter('free'), async (req,
   const result = await runWorkAgent(
     AppDataSource,
     toolCtx,
-    { request: String(body.request), targetHint: typeof body.targetHint === 'string' ? body.targetHint : undefined, image: body.image },
+    {
+      request: String(body.request),
+      targetHint: typeof body.targetHint === 'string' ? body.targetHint : undefined,
+      image: body.image,
+      // 실패 인계 뒤 사용자가 다시 요청하며 준 힌트(§64·§65). runtime 이 sanitize 한다.
+      recoveryHint: typeof body.recoveryHint === 'string' ? body.recoveryHint : undefined,
+    },
     createLlmPlanner(AppDataSource),
+    // 복구 계층의 strong 추론 경로(§11·§12) — 같은 provider·키, 더 강한 모델. 새 stack 아님.
+    { strongPlanner: createStrongLlmPlanner(AppDataSource) },
   );
   // history 에는 행동 종류 · ref · 상태만 있고 입력 텍스트는 뺀다(응답에도 검색어를 되돌리지 않는다).
   const history = result.history.map((h) => ({ step: h.step, kind: h.action.kind, status: h.status, errorCode: h.errorCode ?? null, navigated: h.navigated === true }));
