@@ -1,7 +1,7 @@
 # CHECK-O4O-MINEROCK600-EP01-GENERATION-V1 — EP01 1차 생성 실험
 
 > **WO**: 사용자 지시(2026-09-14, 채팅) — "CHECK-O4O-MINEROCK600-EP01-PREP-V1 기준으로 실제 EP01 제작 단계에 착수한다" 12항목. 선행: [CHECK-…-EP01-PREP-V1](CHECK-O4O-MINEROCK600-EP01-PREP-V1.md) · Runbook: [EP01-GENERATION-RUNBOOK-V1](../media-pilot/minerock600/EP01-GENERATION-RUNBOOK-V1.md)
-> **상태**: **1차 생성 대기 — 로컬 준비 완료, 외부 서비스 단계(ElevenLabs · Higgsfield/Seedance)는 사용자 실행 필요** · 합성·검수 미실행
+> **상태**: **1차 생성 대기 — ffmpeg 설치·합성 파이프라인 smoke PASS(§2-1), 외부 생성물(내레이션 3 → 영상 3) 입력 대기** · 임의 생성·합성 없음(사용자 지시)
 > **Job**: VIDEO `8a357640-ad64-42f3-ae4c-43519ce78222` → `IN_PROGRESS` · statusNote `EP01 첫 생성 준비` (2026-09-14, PATCH 200)
 
 ---
@@ -20,7 +20,7 @@
 | 8 | 제품명·숫자·미네랄 그래픽·자막 후합성 | ✅ | PIP `east-sea-bedrock-concept`/`hardness-scale` · Ca/Mg 아이콘 · 자막 PNG(맑은 고딕) |
 | 9 | CUT 2 의 1,050m 는 그래픽만 | ✅ | 프롬프트 negative `depth markers, scale…` + PIP 2.0s 부터 |
 | 10 | ElevenLabs 한국 여성 voice · 결제는 사용자 | 📋 | Runbook §1 설정값 — **로그인·구독·생성은 사용자** |
-| 11 | raw clip 3 + narration 보존 · 1차 합성본 | ⏸ | 보존 경로 `C:\tmp\minerock600-pilot\ep01\{clips,narration,assembly}` 생성. 합성은 clip/narration 입수 + ffmpeg 설치 후 |
+| 11 | raw clip 3 + narration 보존 · 1차 합성본 | ⏸ | 보존 경로 `C:\tmp\minerock600-pilot\ep01\{clips,narration,assembly}` 생성. ffmpeg 준비 완료 → 입력 입수 후 "합성 진행" 지시로 실행 |
 | 12 | 1차 합성본에서 중지·검수 보고 | ⏸ | §3 보고 표 예약 |
 
 ## 2. 이번 세션에서 실제로 한 것 · 검증
@@ -29,6 +29,13 @@
 - `assemble_ep01.py --dry-run` 실행: clip 0/3 · narration 0/3 → 건너뜀 보고, 오버레이 레이어 10장 렌더 성공. clip 없이 레이어만 회색 배경에 합성한 `preview-layout-cut{1,2,3}.png` 육안 확인 — CUT3: 중앙 실제 병(라벨 `MINEROCK · 1000 mL (0 kcal)` 원본 유지) · 우상단 경도 scale PIP(300/600 마커) · 좌하단 Ca/Mg 아이콘 · 하단 자막. CUT1: 좌측 병 + 자막. CUT2: 우하단 `동해 · 1,050m 암반수` PIP + 자막.
 - **ffmpeg 이 이 PC 에 없음** (`where ffmpeg` 없음 · imageio-ffmpeg 없음) → 실제 인코딩은 미검증. 설치(`winget install Gyan.FFmpeg`)는 시스템 도구 추가이므로 사용자 승인 후.
 - 하지 않은 것: ElevenLabs/Higgsfield 접속·생성(자격·결제 = 사용자) · Veo 3.1 · BGM/SFX · Media Library OUTPUT 등록 · Job COMPLETED.
+
+## 2-1. ffmpeg 설치 · 파이프라인 smoke (2026-09-14, 사용자 승인)
+
+- `winget install Gyan.FFmpeg` → **ffmpeg 9.0.1-full_build** · ffprobe 9.0.1 확인. 설치 직후 셸 PATH 미갱신 → `assemble_ep01.py` 에 winget Links/Packages fallback 추가.
+- 스크립트 변경: `--measure`(내레이션 실측 → CUT 길이 재계산, `실측 + 0.4/0.8s`, **속도 변경 없음**, raw clip 이 짧으면 clip 길이로 제한) · 내레이션 `adelay 0.4s` · 자막 시작 0.4s · 최종 concat 을 demuxer `-c copy` → filter `concat` 재인코딩(오디오 길이 차이로 인한 Non-monotonic DTS 경고 22건 → 0).
+- smoke(EP01 산출물 아님, scratch 전용): `testsrc2` 1280×720 6s 클립 3개 + 440Hz 3.7s 가짜 내레이션(cut2) → CUT 길이 6.00/4.90/6.00 계산 정상 → `ep01-v1-preview.mp4` 1920×1080 · 오디오 · 16.90s · 오류 0. 프레임 추출 육안: 실제 병 라벨 원본 유지 · 경도 scale PIP · 자막 정상. 720p 입력은 1080p 로 업스케일되므로 Seedance 는 1080p 출력 권장.
+- 임의 EP01 영상 생성·합성은 하지 않음.
 
 ## 3. 1차 합성본 검수 보고 (생성 후 기입)
 
@@ -51,7 +58,7 @@
 
 1. ElevenLabs: Runbook §1 대로 3 파일 생성 → `ep01/narration/`.
 2. Higgsfield: Character 고정(§2) → CUT 1·2·3 생성(§3) → `ep01/clips/cut{1,2,3}.mp4`.
-3. ffmpeg 설치 승인(또는 직접 설치).
+3. ~~ffmpeg 설치~~ ✅ 9.0.1.
 4. "합성 진행" 지시 → Claude Code 가 `assemble_ep01.py` 실행 → §3 표 기입 → 1차 preview 에서 중지.
 
 ## 5. 문서 정합
