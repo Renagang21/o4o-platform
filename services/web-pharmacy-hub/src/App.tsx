@@ -119,6 +119,7 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import JoinPage from './pages/JoinPage';
 import JoinStatusPage from './pages/JoinStatusPage';
+import HandoffPage from './pages/HandoffPage';
 // WO-O4O-PHARMACYHUB-HOME-NEWS-AND-USAGE-GUIDE-REALIGNMENT-V1 §3 — 홈 뉴스 카드의 착지 경로
 import PharmacyHubNewsListPage from './pages/news/PharmacyHubNewsListPage';
 import PharmacyHubNewsDetailPage from './pages/news/PharmacyHubNewsDetailPage';
@@ -289,6 +290,13 @@ export default function App() {
           */}
           <Route path="/" element={<CommunityHomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          {/*
+            WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1
+            O4O 대표 홈(neture.co.kr) → PharmacyHub 서비스 이동 수신 경로.
+            `POST /auth/handoff` 의 targetUrl(`https://pharmacyhub.co.kr/handoff?token=…`)이
+            착지하는 곳 — 이전에는 route 가 없어 이동이 404 로 끝났다.
+          */}
+          <Route path="/handoff" element={<HandoffPage />} />
 
           {/*
             WO-O4O-PHARMACYHUB-PASSWORD-RECOVERY-UI-FIX-V1

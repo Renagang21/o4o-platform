@@ -47,6 +47,7 @@ import LoginPage from './pages/LoginPage';
 import JoinPage from './pages/JoinPage';
 import MyBranchPage from './pages/MyBranchPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+import HandoffPage from './pages/HandoffPage';
 import BranchHomePage from './pages/BranchHomePage';
 import BranchPostsPage from './pages/BranchPostsPage';
 import BranchEventsPage from './pages/BranchEventsPage';
@@ -125,6 +126,7 @@ function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/join" element={<JoinPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/handoff" element={<HandoffPage />} />
         <Route path="/me" element={<MyBranchPage />} />
         <Route path="/*" element={<BranchSection slug={hostBranch.slug} basePath="" />} />
       </Routes>
@@ -137,6 +139,12 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/join" element={<JoinPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+      {/*
+        WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1
+        O4O 대표 홈 → 분회 서비스 이동 수신 경로 (`/kpa/handoff?token=…&returnTo=/{slug}`).
+        `/:branchSlug/*` 보다 먼저 두어 "handoff" 가 분회 slug 로 해석되지 않게 한다.
+      */}
+      <Route path="/handoff" element={<HandoffPage />} />
       <Route path="/me" element={<MyBranchPage />} />
       <Route path="/:branchSlug/*" element={<BranchBySlug />} />
       <Route path="*" element={<NotFoundPage />} />

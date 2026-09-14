@@ -30,6 +30,20 @@ import { setAuthCookies } from '../../../utils/cookie.utils.js';
 import { getService, getServiceOrigin, O4O_SERVICES } from '../../../config/service-catalog.js';
 import logger from '../../../utils/logger.js';
 
+/**
+ * WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: returnPath 안전 검증.
+ * '/' 로 시작하는 단일 슬래시 상대 경로만 허용. 길이 상한·제어문자·백슬래시 거부.
+ */
+function isSafeReturnPath(value: unknown): value is string {
+  if (typeof value !== 'string') return false;
+  if (value.length === 0 || value.length > 512) return false;
+  if (!value.startsWith('/')) return false;
+  if (value.startsWith('//') || value.startsWith('/\\')) return false;
+  // eslint-disable-next-line no-control-regex
+  if (/[\x00-\x1f\x7f]/.test(value)) return false;
+  return true;
+}
+
 export class HandoffController extends BaseController {
   /**
    * POST /api/v1/auth/handoff
@@ -38,7 +52,7 @@ export class HandoffController extends BaseController {
    * Requires authentication. The token is stored in Redis (60s TTL, single-use).
    */
   static async generateHandoff(req: Request, res: Response): Promise<any> {
-    const { targetServiceKey } = req.body;
+    const { targetServiceKey, returnPath } = req.body;
     const user = (req as AuthRequest).user;
 
     if (!user) {
@@ -47,6 +61,18 @@ export class HandoffController extends BaseController {
 
     if (!targetServiceKey) {
       return BaseController.error(res, 'targetServiceKey is required', 400, 'VALIDATION_ERROR');
+    }
+
+    // WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: optional returnPath
+    //   대표 홈에서 "내 매장"·"내 분회"처럼 대상 서비스의 특정 화면으로 바로 보내기 위한
+    //   상대 경로. 대상 앱 basePath 기준 상대 경로만 허용한다 ('/' 로 시작, '//' 금지,
+    //   scheme 불가 → open redirect 차단). 검증 실패는 무시하지 않고 400.
+    let safeReturnPath: string | null = null;
+    if (returnPath !== undefined && returnPath !== null && returnPath !== '') {
+      if (!isSafeReturnPath(returnPath)) {
+        return BaseController.error(res, 'returnPath must be a relative path', 400, 'VALIDATION_ERROR');
+      }
+      safeReturnPath = returnPath;
     }
 
     // Validate target service exists
@@ -131,7 +157,9 @@ export class HandoffController extends BaseController {
       //   basePath 를 가진 서비스(kpa-branch = kpa-society.co.kr/kpa)는 host 루트가
       //   다른 서비스이므로 origin helper 로 base URL 을 만든다.
       const targetOrigin = getServiceOrigin(targetService.key) ?? `https://${targetService.domain}`;
-      const targetUrl = `${targetOrigin}/handoff?token=${handoffToken}`;
+      const targetUrl =
+        `${targetOrigin}/handoff?token=${handoffToken}` +
+        (safeReturnPath ? `&returnTo=${encodeURIComponent(safeReturnPath)}` : '');
 
       return BaseController.ok(res, {
         handoffToken,
@@ -416,10 +444,14 @@ export class HandoffController extends BaseController {
       );
 
       // Build service catalog with membership status
+      // WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: nameKo · basePath 추가 (additive).
+      //   대표 홈이 서비스 한글명과 실제 진입 URL(basePath 포함)을 catalog 에서 얻는다.
       const services = O4O_SERVICES.map(svc => ({
         key: svc.key,
         name: svc.name,
+        nameKo: svc.nameKo ?? svc.name,
         domain: svc.domain,
+        basePath: svc.basePath ?? '',
         description: svc.description,
         joinEnabled: svc.joinEnabled,
         membership: membershipMap.has(svc.key)

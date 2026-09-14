@@ -18,6 +18,16 @@ const REFRESH_TOKEN_KEY = 'o4o_refreshToken';
 
 type HandoffStatus = 'loading' | 'success' | 'error';
 
+/**
+ * WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: `returnTo` 상대 경로 지원.
+ * '/' 로 시작하는 단일 슬래시 경로만 허용 (open redirect 차단). 그 외는 홈.
+ */
+function resolveReturnTo(raw: string | null): string {
+  if (!raw) return '/';
+  if (!raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) return '/';
+  return raw;
+}
+
 export default function HandoffPage() {
   const [status, setStatus] = useState<HandoffStatus>('loading');
   const [error, setError] = useState<string>('');
@@ -25,6 +35,7 @@ export default function HandoffPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
+    const returnTo = resolveReturnTo(params.get('returnTo'));
 
     if (!token) {
       setStatus('error');
@@ -47,7 +58,7 @@ export default function HandoffPage() {
           localStorage.setItem(ACCESS_TOKEN_KEY, data.data.tokens.accessToken);
           localStorage.setItem(REFRESH_TOKEN_KEY, data.data.tokens.refreshToken);
           setStatus('success');
-          window.location.href = '/';
+          window.location.replace(returnTo);
         } else {
           setStatus('error');
           setError(data.error || '서비스 이동에 실패했습니다.');

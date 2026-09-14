@@ -17,6 +17,14 @@
  *   대화는 저장하지 않는다(새로고침하면 사라진다). 화면은 검색 초기화면형을 유지하며
  *   답변이 있을 때만 입력창 아래에 영역이 나타난다(대기 상태 레이아웃 불변).
  *
+ * WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1:
+ *   neture.co.kr 을 O4O 대표 진입으로 삼는다. 로그인 후에는 같은 화면 안에
+ *   주요 업무 / 내가 이용하는 서비스 / 가입·이용 상태 / 가입 가능한 서비스 를 보여준다
+ *   (components/home/HomeEntryPanel · lib/home-entry). 로그인 전에는 서비스 안내 pill 과
+ *   로그인·회원가입만 — 공개 안내 링크는 로그인 없이 그대로 열린다.
+ *   다른 서비스로의 이동은 기존 세션 인계(POST /auth/handoff)를 재사용하며 정적 외부 링크로
+ *   보내지 않는다. 판정은 서버가 최종이다.
+ *
  * Neture 전용 chrome(NetureGlobalHeader / Footer / NetureBottomNav)은 쓰지 않는다 —
  * `/` 는 App.tsx 에서 NetureLayout 밖에 배치되어 있고, 기존 Neture 영역
  * (`/community`, `/mypage`, `/market-trial` 등)은 NetureLayout 을 그대로 유지한다.
@@ -29,11 +37,14 @@ import { useAuth, useLoginModal, useWorkScope } from '../contexts';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { sendHomeChat, HomeChatError, HOME_CHAT_MAX_MESSAGE_LENGTH } from '../lib/ai/home-chat';
 import { isSupportedWorkImage, readWorkImage, runWorkAgent, WorkAgentError, type WorkAgentResult } from '../lib/ai/work-agent';
+import { useHomeEntry } from '../lib/home-entry';
+import HomeEntryPanel from '../components/home/HomeEntryPanel';
 
-// ─── 서비스 진입 ──────────────────────────────────────────────────────────────
+// ─── 서비스 안내 (로그인 전) ────────────────────────────────────────────────────
 // 신규 도메인·route 를 만들지 않는다.
-// 외부 항목은 현재 운영 중인 진입 URL(= packages/shared-space-ui/src/O4OHelpSection.tsx
+// 외부 항목은 현재 운영 중인 공개 진입 URL(= packages/shared-space-ui/src/O4OHelpSection.tsx
 // cross-service 카탈로그와 동일 값), 내부 항목은 web-neture 의 기존 canonical route.
+// 로그인 후에는 이 pill 대신 HomeEntryPanel(접근 가능한 기능 · 세션 인계 이동)을 보여준다.
 
 interface HomeEntry {
   label: string;
@@ -73,8 +84,10 @@ function EntryPill({ entry }: { entry: HomeEntry }) {
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function O4OHomePage() {
-  const { user, isAuthenticated } = useAuth();
-  const { openLoginModal } = useLoginModal();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { openLoginModal, openRegisterModal } = useLoginModal();
+  // WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 — 로그인 후에만 조회. 실패는 미가입이 아니라 오류로 보여준다.
+  const entry = useHomeEntry(isAuthenticated && !!user);
   // Phase 3 연결점 — 현재 업무 컨텍스트를 그대로 AI 요청에 싣는다.
   // 서버가 membership·매장을 다시 확정하므로 여기 값은 권한 근거가 아니다.
   const { workScope, isResolvingStore } = useWorkScope();
@@ -353,11 +366,45 @@ export default function O4OHomePage() {
           </div>
         )}
 
-        <nav className="mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-2">
-          {ENTRIES.map((entry) => (
-            <EntryPill key={entry.href} entry={entry} />
-          ))}
-        </nav>
+        {/* 로그인 후 개인화 영역 — WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 */}
+        {isAuthenticated && user && (
+          <HomeEntryPanel user={user} data={entry.data} loading={entry.loading} error={entry.error} onReload={entry.reload} />
+        )}
+
+        {/* 로그인 전(또는 세션 복구 중 · 개인화 조회 실패 시 공개 안내 대체) — 서비스 안내 · 로그인 · 회원가입 */}
+        {(!isAuthenticated || entry.error) && (
+          <>
+            {!isAuthenticated && !authLoading && (
+              <div className="mt-8 flex flex-col items-center gap-3 text-center">
+                <p className="m-0 max-w-md text-sm text-slate-500">
+                  O4O 는 약국 · 화장품 매장 · 공급자 · 파트너가 한 곳에서 일하는 서비스입니다. 로그인하면 이용 중인
+                  서비스와 업무 화면을 바로 열 수 있습니다.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openLoginModal()}
+                    className="rounded-full bg-slate-900 px-5 py-2 text-sm text-white transition-opacity hover:opacity-80"
+                  >
+                    로그인
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openRegisterModal()}
+                    className="rounded-full border border-slate-300 px-5 py-2 text-sm text-slate-700 transition-colors hover:border-slate-500"
+                  >
+                    회원가입
+                  </button>
+                </div>
+              </div>
+            )}
+            <nav aria-label="서비스 안내" className="mt-6 flex max-w-2xl flex-wrap items-center justify-center gap-2">
+              {ENTRIES.map((e) => (
+                <EntryPill key={e.href} entry={e} />
+              ))}
+            </nav>
+          </>
+        )}
       </main>
 
       {/* 법정 고지 링크만. 홍보·뉴스·통계 섹션 없음. */}

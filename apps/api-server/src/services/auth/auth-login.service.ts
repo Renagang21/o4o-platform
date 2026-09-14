@@ -33,6 +33,7 @@ import {
 } from './auth-context.helper.js';
 import { ActionLogService } from '@o4o/action-log-core';
 import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
+import { REPRESENTATIVE_ENTRY_SERVICE_KEY } from '../../config/service-catalog.js';
 import logger from '../../utils/logger.js';
 
 /**
@@ -175,7 +176,18 @@ export class AuthLoginService {
         const membership = await smRepo.findOne({
           where: { userId: user.id, serviceKey },
         });
-        if (!membership) {
+        // WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: O4O 대표 진입(neture) 예외
+        //   neture.co.kr 은 O4O 대표 홈이므로, Neture membership 이 없어도 **다른 O4O 서비스의
+        //   membership row 를 하나라도 가진 계정**은 로그인을 허용한다 (status 불문 — 일반
+        //   서비스 로그인의 "row 존재" 규칙과 동일). 이 예외는 로그인 허용에만 관여한다:
+        //   membership·role 을 생성·부여하지 않고, 비밀번호는 아래 dual-read 규칙대로
+        //   neture credential 이 없으면 identity password(users.password)로 검증한다.
+        //   서비스별 기능 접근은 기존 scope guard(membership·role)가 그대로 판정한다.
+        const isRepresentativeEntryMember =
+          !membership &&
+          serviceKey === REPRESENTATIVE_ENTRY_SERVICE_KEY &&
+          !!(await smRepo.findOne({ where: { userId: user.id } }));
+        if (!membership && !isRepresentativeEntryMember) {
           await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'service_not_member');
           const err: any = new Error(`이 계정은 ${serviceKey} 서비스에 가입되어 있지 않습니다.`);
           err.code = 'SERVICE_NOT_MEMBER';

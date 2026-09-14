@@ -10,12 +10,13 @@
  *     401(만료·무효 토큰)을 refresh 시도로 오해해 기존 세션을 지우는 일을 막는다.
  *   - 토큰 값은 어떤 로그·화면에도 남기지 않는다.
  *
- * URL: /handoff?token={handoffToken}[&returnTo=/relative/path]
+ * URL: /kpa/handoff?token={handoffToken}[&returnTo=/relative/path]
  */
 
 import { useEffect, useState } from 'react';
 import { storeTokens } from '@o4o/auth-client';
 import { API_BASE_URL } from '../lib/apiClient';
+import { detectBasename } from '../lib/tenant';
 
 type HandoffStatus = 'loading' | 'success' | 'error';
 
@@ -37,7 +38,8 @@ const ERROR_MESSAGES: Record<string, string> = {
 export default function HandoffPage() {
   const [status, setStatus] = useState<HandoffStatus>('loading');
   const [error, setError] = useState<string>('');
-  const basename = '';
+  // 공용 host 에서는 /kpa prefix, 분회 자체 도메인에서는 '' (App 의 BrowserRouter basename 과 동일 규칙)
+  const basename = detectBasename();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

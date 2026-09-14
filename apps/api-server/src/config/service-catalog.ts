@@ -9,7 +9,8 @@
  * - PASSWORD_MISMATCH 응답
  * - 가입 UX 서비스 표시
  * - Account Center (향후)
- * - 서비스 이동 handoff (향후)
+ * - 서비스 이동 handoff (`POST /auth/handoff` · `/auth/handoff/exchange`)
+ * - O4O 대표 진입(neture.co.kr) 로그인 예외 (`REPRESENTATIVE_ENTRY_SERVICE_KEY`)
  */
 
 export interface O4OService {
@@ -122,6 +123,16 @@ export const O4O_SERVICES: O4OService[] = [
     joinEnabled: false,
   },
 ];
+
+/**
+ * O4O 대표 진입 서비스 키 — WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1
+ *
+ * neture.co.kr 은 O4O 전체의 대표 진입 화면이다. 다른 O4O 서비스 회원(service_memberships
+ * row 보유자)은 Neture membership 이 없어도 이 키로 로그인해 대표 홈에 도달할 수 있어야 한다.
+ * 이 예외는 **로그인 허용**에만 적용되며 Neture 역할·membership 을 만들거나 부여하지 않는다
+ * (서비스별 권한 판정은 기존 scope guard 가 그대로 담당한다).
+ */
+export const REPRESENTATIVE_ENTRY_SERVICE_KEY = 'neture';
 
 /** 서비스 키 → O4OService 조회 */
 const serviceMap = new Map(O4O_SERVICES.map(s => [s.key, s]));

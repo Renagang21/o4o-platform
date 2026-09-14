@@ -26,6 +26,7 @@ import { createNetureB2bPaymentController } from './controllers/neture-b2b-payme
 
 // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
 import { createServiceForumRouter } from '../forum/service-forum.routes.js';
+import { createNetureHomeEntryController } from './controllers/neture-home-entry.controller.js';
 
 export function createNetureRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -79,6 +80,9 @@ export function createNetureRoutes(dataSource: DataSource): Router {
   // checkout_orders(metadata.source='neture_b2b_checkout') 결제 → payment.completed(serviceKey='neture-b2b')
   // ============================================================================
   router.use('/b2b/payments', createNetureB2bPaymentController(dataSource, requireAuth as any));
+
+  // WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: 대표 홈 진입 정보 (requireAuth 만 · neture scope 없음)
+  router.use('/home', createNetureHomeEntryController(dataSource, requireAuth as any));
 
   // WO-O4O-NETURE-BLOG-RETIRE-V1: Blog 라우트 미등록.
   // Neture 는 Blog 를 운영 대상으로 두지 않음. /api/v1/neture/stores/:slug/blog/* endpoint 미노출.
