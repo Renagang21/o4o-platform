@@ -399,7 +399,7 @@ describe('Boundary — automation_jobs ≠ agent runtime (§37~§43)', () => {
     }
     // 상태 객체는 순수 값이며 저장 훅이 없다.
     const s = createWorkAgentState({ goalId: 'g', request: 'r', status: 'active' }, SITE, 0);
-    expect(Object.keys(s).sort()).toEqual(['aiPlanCount', 'goal', 'history', 'invalidProposals', 'lastResult', 'observation', 'plannedAction', 'progress', 'siteId', 'startedAt', 'stepCount', 'takeover'].sort());
+    expect(Object.keys(s).sort()).toEqual(['aiPlanCount', 'goal', 'history', 'invalidProposals', 'lastResult', 'observation', 'plannedAction', 'progress', 'recovery', 'siteId', 'startedAt', 'stepCount', 'takeover'].sort());
     expect(buildWorkAgentUsageEvent(s, 'text', new Date(1000)).durationMs).toBe(1000);
     // 저장소에 agent run history · workflow DAG · job steps 테이블/마이그레이션이 없다.
     const migrations = readdirSync(join(__dirname, '..', 'database', 'migrations'));
