@@ -2,7 +2,8 @@
 
 > **WO**: `WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1`
 > **선행 IR**: `IR-O4O-NETURE-UNIFIED-ENTRY-AUTH-SERVICE-MEMBERSHIP-ROUTING-AUDIT-V1` (판정 `UI_FIRST_WITH_MINIMAL_FIX`)
-> **상태**: 구현 + 정적 · 단위 검증 = **PASS** · 프로덕션 실 화면 검증 = **§7 참조 (배포 후 갱신)**
+> **상태**: 구현 + 정적 · 단위 검증 = **PASS** · 프로덕션 실 화면 검증 = **PASS_WITH_UNVERIFIED** (§7 — 결함 1건 발견 · 수정 · 재배포, 계정 부재 항목은 미검증 명시)
+> **커밋**: `2464f2494`(구현) · 후속 1건(KPA Society 수신 페이지 문구 — §7-10)
 > **작성일**: 2026-09-14
 > **성격**: Neture 대표 홈(`/`) 로그인 후 개인화 + 서비스 이동(handoff) 수신 정합 + 대표 진입 로그인 예외(로그인 허용만). 새 SSO · 범용 권한 엔진 · DB migration · 회원 데이터 변경 **0**.
 
@@ -36,7 +37,7 @@
 | `services/web-k-cosmetics/src/pages/HandoffPage.tsx` | 동일 (응답 처리 결함 수정) |
 | `services/web-pharmacy-hub/src/pages/HandoffPage.tsx` (신규) + `App.tsx` `/handoff` route | 수신 페이지 신설 |
 | `services/web-kpa-branch/src/pages/HandoffPage.tsx` (신규) + `App.tsx` `/handoff` route (custom-domain · platform 양쪽) | 수신 페이지 신설 · `detectBasename()` 으로 `/kpa` prefix 처리 |
-| `services/web-kpa-society/src/pages/HandoffPage.tsx` | `returnTo` 처리 추가 (기존 fetch · 저장 로직 유지) |
+| `services/web-kpa-society/src/pages/HandoffPage.tsx` | `returnTo` 처리 추가 (기존 fetch · 저장 로직 유지) · **실 화면 결함 수정**: 만료 토큰 시 API 원문(영문 `Handoff token is invalid or expired`)이 그대로 보여 다른 수신 페이지와 같은 코드→문구 표 적용 |
 
 **미변경(의도)**: 각 서비스의 서버 guard · RoleGuard · 회원 데이터 · 로그인 API contract(serviceKey 필수 유지) · 기존 서비스 화면/도메인.
 
@@ -110,24 +111,26 @@
 
 ## 7. 프로덕션 실 화면 검증
 
-> 코드가 배포되기 전에는 실 화면 확인이 불가하다. 본 절은 **배포 후** 갱신한다. 갱신 전까지 아래 전 항목은 **미검증**이다.
+> 2026-09-14, `2464f2494` 배포(Deploy API Server `34817728071` · Deploy Web Services `34817728081` 모두 success) 후 Playwright 실 브라우저로 확인. 계정은 `docs/local/TEST-ACCOUNTS.local.md` 로스터만 사용했고 **회원 상태 · 역할은 변경하지 않았다.** 캡처: `neture-home-anon.png` · `neture-home-store-owner.png` · `neture-home-operator.png` · `neture-home-mobile.png` (Playwright 출력 디렉터리, 저장소 미포함).
 
 | # | 시나리오 (WO §7) | 결과 |
 |---|---|---|
-| 1 | 비로그인 홈 (소개 · 안내 pill · 로그인/회원가입) | 미검증 |
-| 2 | PharmacyHub 만 승인된 회원 | 미검증 |
-| 3 | PharmacyHub + KPA + 분회 승인 회원 | 미검증 |
-| 4 | 화장품 매장 회원 | 미검증 |
-| 5 | 서비스 운영자 | 미검증 |
-| 6 | 신청 중 · 정지 · 미가입 상태 | 미검증 |
-| 7 | 매장 없음 · 복수 매장 | 미검증 |
-| 8 | 다른 서비스 회원의 Neture 홈 로그인 | 미검증 |
-| 9 | handoff 이동 후 세션 유지 · 도착 화면 | 미검증 |
-| 10 | 만료 · 실패 handoff 문구 | 미검증 |
-| 11 | 직접 URL · API 권한(서버 최종 판정) | 미검증 |
-| 12 | 데스크톱 · 모바일 | 미검증 |
-| 13 | 로딩 · 오류 · 빈 상태 | 미검증 |
-| 14 | 공급자 · 파트너 · 운영자 · AI 입력 회귀 | 미검증 |
+| 1 | 비로그인 홈 (소개 · 안내 pill · 로그인/회원가입) | **PASS** — 세션 복구(401→refresh 401) 완료 후 O4O 소개 문구 + 로그인 · 회원가입 버튼 + 공개 안내 pill 6개(약국 · 약국 경영 · 화장품 · 공급자 · 파트너 · 커뮤니티). 안내 pill 은 handoff 없이 공개 URL 로 연다 |
+| 2 | PharmacyHub 만 승인된 회원 | **미검증** — 로스터에 PharmacyHub 단독 회원이 없다(매장 계정은 KPA · KCos · Neture 도 회원). 동일 계정으로 PharmacyHub 매장 HUB 이동은 #9 에서 확인 |
+| 3 | PharmacyHub + KPA + 분회 승인 회원 | **PASS** — 운영자 로스터 계정: 주요 업무에 커뮤니티(Neture · KPA · 파머시 허브) · 매장 HUB/내 매장(Sohae 약국) · 서비스 운영자 화면(Neture 관리자 · `O4O 파일럿 테스트분회 운영자` · 파머시 허브 운영자/관리자 · K-Cosmetics 관리자/운영자 · KPA Society 관리자/운영자), 내가 이용하는 서비스에 `약사회 분회 · O4O 파일럿 테스트분회` 표시. 분회 운영자 버튼 → `kpa-society.co.kr/kpa/o4o-pilot/operator/site` 도착(운영 메뉴 렌더) |
+| 4 | 화장품 매장 회원 | **PASS** — 매장 로스터 계정: `K-Cosmetics 매장 HUB` / `K-Cosmetics 내 매장`(테스트 뷰티샵) 표시. 내 매장 → `k-cosmetics.site/store` 도착(내 매장 홈 · 테스트 뷰티샵 · 운영중) |
+| 5 | 서비스 운영자 | **PASS** — 파머시 허브 운영자 → `pharmacyhub.co.kr/operator`(운영자 대시보드) · K-Cosmetics 운영자 → `k-cosmetics.site/operator` · Neture 관리자는 내부 `/admin` Link. 운영자 화면은 `서비스 운영자 화면` 절에만 노출되고 일반 회원 화면에는 나타나지 않음(#4 계정에서 부재 확인) |
+| 6 | 신청 중 · 정지 · 미가입 상태 | **부분** — 미가입(가입 가능한 서비스 절): 두 계정 모두 모든 joinEnabled 서비스에 membership row 가 있어 절이 비어 **미노출 자체는 정상**이나 노출 케이스는 **미검증**. 신청 중 · 정지: 로스터에 pending/suspended 계정 없음 → **미검증**. 판정 로직은 §3 · 단위 검증으로만 고정 |
+| 7 | 매장 없음 · 복수 매장 | **부분** — 매장 없음: 운영자 계정은 KCos · PH 매장이 없어 해당 서비스의 매장 HUB/내 매장 버튼이 나타나지 않음(**PASS**). 복수 매장(한 서비스 2개 이상): 로스터 계정 없음 → **미검증**(코드는 전체 매장명 나열 + 서비스 화면에서 선택 안내, 자동 선택 없음) |
+| 8 | 다른 서비스 회원의 Neture 홈 로그인 | **미검증(실 화면)** — 로스터 계정이 전부 Neture membership 을 보유해 예외 경로를 실계정으로 태울 수 없다. 운영 회원 데이터 변경 금지 원칙상 계정을 만들지 않았다. 계약은 `representativeEntryLoginContract.test.ts` 6건으로 고정(§5) |
+| 9 | handoff 이동 후 세션 유지 · 도착 화면 | **PASS** — 매장 계정: 파머시 허브 매장 HUB → `pharmacyhub.co.kr/store-hub`(약국 경영자 헤더 · 로그인 상태), KPA Society 내 매장 → `kpa-society.co.kr/handoff?token=…&returnTo=%2Fstore` → `/store`(테스트 약국 매장 홈), K-Cosmetics 내 매장 → `/store`, 약사회 분회 → `kpa-society.co.kr/kpa/me`(내 분회). 운영자 계정: 분회 운영자 · PH 운영자 · KCos 운영자 도착 확인(#3 · #5). 이동 후 Neture 로 돌아와도 Neture 세션 유지 |
+| 10 | 만료 · 실패 handoff 문구 | **결함 1건 → 수정** — 사용 완료 토큰 재사용 시 PharmacyHub · K-Cosmetics · Neture 수신 페이지는 `이동 링크가 만료되었거나 이미 사용되었습니다. 다시 로그인해 주세요.` + 로그인 링크(**PASS**, 기존 세션 미손상). **KPA Society 는 API 원문 영문 그대로 노출** → `HandoffPage.tsx` 에 코드→문구 표 적용(후속 커밋). 분회 수신 페이지 실패 문구는 동일 템플릿이나 실 화면 **미검증** |
+| 11 | 직접 URL · API 권한(서버 최종 판정) | **PASS** — 비로그인 `GET /api/v1/neture/home/entry` → 401 `AUTH_REQUIRED`, 비로그인 `POST /auth/handoff` → 401. 화면 버튼은 안내일 뿐 최종 판정은 각 서비스 guard(도착 화면이 서버 응답으로 렌더됨을 #9 로 확인) |
+| 12 | 데스크톱 · 모바일 | **PASS** — 1280px · 390px(모바일) 모두 pill 이 줄바꿈되며 가로 스크롤 없음. 모바일에서 AI 입력 · 개인화 절 · 푸터 정상 |
+| 13 | 로딩 · 오류 · 빈 상태 | **부분** — 로딩: 세션 복구 중 개인화 절 미노출 · 로그인 직후 "이용 중인 서비스를 확인하는 중" 경유 후 렌더(**PASS**). 오류(조회 실패 → 재시도 + 공개 안내 대체) · 빈 상태: 프로덕션에서 재현 수단 없음 → **미검증**(정적 검증만) |
+| 14 | 공급자 · 파트너 · 운영자 · AI 입력 회귀 | **PASS** — 공급자 계정 홈에 `공급자 업무` → `/supplier/dashboard` Link, 마이페이지 `공급자 대시보드` 정상. AI 입력창 · 이미지 첨부 · 작업 수행 · 전송 버튼 로그인 전후 동일. 운영자 `/admin` Link 노출. 파트너: 로스터에 파트너 계정 없음 → **미검증** |
+
+**미검증 요약**: #2(PH 단독 회원) · #6(신청 중 · 정지 · 가입 가능 노출) · #7 복수 매장 · #8 실계정 · #10 분회 실패 문구 · #13 오류/빈 상태 · #14 파트너 — 전부 **로스터 계정 부재**가 원인이며 운영 회원 데이터를 변경하지 않기 위해 계정을 만들지 않았다.
 
 ---
 

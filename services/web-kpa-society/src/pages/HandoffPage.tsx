@@ -18,6 +18,15 @@ const REFRESH_TOKEN_KEY = 'o4o_refreshToken';
 
 type HandoffStatus = 'loading' | 'success' | 'error';
 
+/** WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: 만료·실패 코드를 사용자 문구로 (다른 수신 페이지와 동일 표) */
+const ERROR_MESSAGES: Record<string, string> = {
+  HANDOFF_TOKEN_INVALID: '이동 링크가 만료되었거나 이미 사용되었습니다. 다시 로그인해 주세요.',
+  HANDOFF_TARGET_NO_MEMBERSHIP: '이 서비스에 가입되어 있지 않습니다.',
+  HANDOFF_TARGET_WITHDRAWN: '탈퇴한 서비스는 이동할 수 없습니다.',
+  HANDOFF_TARGET_NOT_ACTIVE: '이 서비스 이용이 아직 승인되지 않았거나 정지 상태입니다.',
+  INVALID_USER: '계정을 확인할 수 없습니다. 다시 로그인해 주세요.',
+};
+
 /**
  * WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1: `returnTo` 상대 경로 지원.
  * '/' 로 시작하는 단일 슬래시 경로만 허용 (open redirect 차단). 그 외는 홈.
@@ -51,9 +60,9 @@ export default function HandoffPage() {
           body: JSON.stringify({ token }),
         });
 
-        const data = await response.json();
+        const data = await response.json().catch(() => null);
 
-        if (response.ok && data.success && data.data?.tokens) {
+        if (response.ok && data?.success && data.data?.tokens) {
           // Store tokens in localStorage (KPA Society uses localStorage strategy)
           localStorage.setItem(ACCESS_TOKEN_KEY, data.data.tokens.accessToken);
           localStorage.setItem(REFRESH_TOKEN_KEY, data.data.tokens.refreshToken);
@@ -61,7 +70,7 @@ export default function HandoffPage() {
           window.location.replace(returnTo);
         } else {
           setStatus('error');
-          setError(data.error || '서비스 이동에 실패했습니다.');
+          setError(ERROR_MESSAGES[data?.code] || data?.error || '서비스 이동에 실패했습니다.');
         }
       } catch {
         setStatus('error');
