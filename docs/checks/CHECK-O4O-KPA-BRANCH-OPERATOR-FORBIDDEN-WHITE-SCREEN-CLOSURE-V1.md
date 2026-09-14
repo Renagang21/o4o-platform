@@ -4,7 +4,7 @@
 - **일자**: 2026-09-11
 - **판정**: **`OPERATOR_FORBIDDEN_WHITE_SCREEN_CLOSED`** — 5 상태 × 9 경로 × (deep-link + reload) = 90 케이스 전부 PASS, React #31 / uncaught 0 (§5)
 - **선행**: [admin 운영자 카탈로그 kpa-branch:operator](CHECK-O4O-ADMIN-OPERATOR-CATALOG-KPA-BRANCH-V1.md) §9-1 에서 발견한 결함
-- **commit**: `589c00769` (`services/web-kpa-branch/src/lib/errors.ts` 1파일) · 본 CHECK 는 후속 커밋
+- **commit**: `589c00769` (`services/web-kpa-branch/src/lib/errors.ts` 1파일) · 본 CHECK `0424d1379` · 후속 `15ea1cfde` (같은 파일, code-only/최상위 message fallback — §2-1)
 - **환경**: 프로덕션 — 분회 웹 `https://kpa-society.co.kr/kpa/o4o-pilot` · 관리자 `https://admin.neture.co.kr` · API `https://api.neture.co.kr/api/v1` · DB `o4o_platform`(read-only)
 - **CI**: Deploy Web Services `34571922220`(589c00769) success — `deploy-kpa-branch` success, 나머지 web skipped(detect-changes). 배포 번들에 새 안내 문자열 확인 후 smoke 수행
 
@@ -34,6 +34,22 @@
   - 403 **객체형** → `이 분회에 대한 권한이 없습니다.` (scope guard 내부 문구 "Required scope: …" 는 노출하지 않음)
   - 404 / 기타 → 정규화된 문구 또는 기존 기본 문구
 - 호출부 14파일 무변경 · tsc 통과
+
+### 2-1. error shape 정규화 계약 (2026-09-14 재게시 WO 반영, commit `15ea1cfde`, Deploy `34791489315` success)
+
+| 입력 `response.data` | 반환 |
+|---|---|
+| `error: string` | 그 문자열 (403 포함, 기존 계약) |
+| `error: { message }` | `message` (403 은 예외 — 아래) |
+| `error: { code }` 만 | `code` |
+| `error` 없음 · `message` 만 | 최상위 `message` |
+| 403 + 객체형 `error` (어떤 형태든) | `이 분회에 대한 권한이 없습니다.` (scope guard 내부 문구 비노출) |
+| 401 | `로그인이 필요합니다.` |
+| 404 + 문구 없음 | `대상을 찾을 수 없습니다.` |
+| 문자열·배열·`null`·`undefined` 본문 / `response` 없음 | `요청을 처리하지 못했습니다.` |
+
+- 확인: 12 케이스(403 string / 403 object / code-only / message-only / malformed string·array / `error:null` / data undefined / e null·undefined / 401 / 404) ad-hoc 실행 → 전부 non-empty string. 배포 후 `member`(객체형 403)·`anon`(401) 브라우저 smoke 18/18·18/18 PASS, React #31 0 재확인
+- **unit test 미추가**: `services/web-kpa-branch` 에 테스트 러너(vitest/jest)·`test` 스크립트가 없어 추가하려면 `package.json`·의존성 변경이 필요 → 중지 조건. 위 ad-hoc 케이스 스크립트는 세션 scratchpad 에만 둠
 
 ## 3. 검증 절차 (영구 계정, fixture 신규 생성 0)
 
