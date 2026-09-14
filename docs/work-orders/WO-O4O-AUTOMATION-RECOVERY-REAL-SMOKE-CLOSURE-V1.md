@@ -38,7 +38,7 @@
 
 1. **환경 준비** — 실 paired Local Agent(이 PC) 연결 확인(`/api/local-agent/devices` 토큰 probe, chat input 존재로 판정 금지), 실 Chrome/등재 Windows 앱 창, 실 provider 키(프로덕션 Gemini) 가용 확인.
 2. **smoke 1 (브라우저)** — 막힌 경로 시나리오 구성 → 정상→strong 전환이 실제로 일어나는지, 다른 경로/인계로 귀결하는지 관찰. usage 로그(`failureClass`·`recoveryMethod`·`improvementCandidate`·`recoveryStatus`) 확인.
-3. **smoke 2 (Windows · 대표 = Doctors)** — 집행 정본은 [EXEC 요청서](../handoffs/EXEC-O4O-AUTOMATION-RECOVERY-DOCTORS-REAL-SMOKE-CLOSURE-V1.md). **서버측 Goal-Driven Work Agent** 가 업무 목표 자연어 Goal 로 Doctors 를 화면 보며 판단·집행(고정 좌표/수치 미리 못박지 않음): target 발견 → UIA 관찰 → 메뉴/화면 탐색 → 환자·약품 확정(모호하면 질문) → 입력·검증 → **환경별 저장 경계**(A·B 저장 허용 / C 운영은 저장 직전 STOP·takeover) → 외부 전송 전 정지. 어느 요소가 UIA 로 노출됐고 어디서 fallback/recovery 가 필요했는지 기록. (계측 창은 fixture fallback.)
+3. **smoke 2 (Windows · 대표 = Doctors, 상세 부록 A)** — **서버측 Goal-Driven Work Agent** 가 업무 목표 자연어 Goal 로 Doctors 를 화면 보며 판단·집행(고정 좌표/수치 미리 못박지 않음): target 발견 → UIA 관찰 → 메뉴/화면 탐색 → 환자·약품 확정(모호하면 질문) → 입력·검증 → **환경별 저장 경계**(A·B 저장 허용 / C 운영은 저장 직전 STOP·takeover) → 외부 전송 전 정지. 어느 요소가 UIA 로 노출됐고 어디서 fallback/recovery 가 필요했는지 기록. (계측 창은 fixture fallback.)
 4. **smoke 3 (사용자 유도 복구)** — AI 실패 → 사용자 대상 구체 질문 문구 확인(내부 용어 없음) → 힌트 주입 → stale 폐기·재관찰·재계획·재개 확인 → `recovered_by_user_hint` 기록 확인.
 5. **로그 whitelist 재확인** — 6키(`failureClass`·`recoveryTier`·`recoveryMethod`·`recoveryAttempt`·`recoveryStatus`·`improvementCandidate`)만 남고, 채팅 원문·힌트 전문·창 제목·비밀번호/토큰이 로그에 없는지 negative search.
 6. **CHECK 작성** — `CHECK-O4O-AUTOMATION-RECOVERY-REAL-SMOKE-CLOSURE-V1` 에 각 smoke 를 PASS/FAIL/PARTIAL + 리비전 + 재현 방법으로 기록.
@@ -57,7 +57,7 @@
 
 각 항목은 **실측했을 때만 PASS**. 못 돌린 항목은 사유와 함께 PENDING 유지(선행 CHECK §21 방식).
 
-> **참고(이 WO 밖·후속)**: 복구 tier 순서를 "강한 AI 우선"에서 **"가장 싸고 빠른 복구 경로 선택"**(사용자가 답을 알 가능성이 높으면 strong 보다 질문 먼저)으로 재정의하는 것은 `decideRecovery` 로직 변경이라 이 최소-코드 CLOSURE 밖이다 → [WO-O4O-AUTOMATION-RECOVERY-COST-AWARE-POLICY-V1](WO-O4O-AUTOMATION-RECOVERY-COST-AWARE-POLICY-V1.md).
+> **참고(이 WO 밖·후속 후보)**: 복구 tier 순서를 "강한 AI 우선"에서 **"가장 싸고 빠른 복구 경로 선택"**(사용자가 답을 알 가능성이 높으면 strong 보다 질문 먼저)으로 재정의하는 것은 `decideRecovery` 로직 변경이라 이 최소-코드 CLOSURE 밖이다. 이 smoke 가 표준코드류 국면에서 질문-우선이 실제로 더 싸고 빠른지 실측하면 그때 별도 코드 WO 로 분리한다(현재는 미착수 아이디어이므로 문서화하지 않는다).
 
 ## 6. 산출물
 
@@ -72,18 +72,18 @@
 - 복구 planner 는 safety 비활성·capability 변경·권한 상승·shell 실행·credential 접근·commit 실행을 **할 수 없다**(선행 WO 경계 그대로).
 - 내부 용어(planner escalation·RuntimeId·UIA stale·tier 명)를 사용자에게 노출하지 않는다.
 - 실제 DB host·password·계정·provider 키를 문서·로그·커밋에 기록하지 않는다.
-- **Doctors 하드 경계** — 실행 환경을 먼저 확인한다(교육·연습 A / 별도 테스트 DB B / 운영 C, 추정 금지). **A·B 만 Agent 저장 허용**, **C(운영)는 테스트 환자라도 저장=실제 원장 변경 → 저장 직전 STOP·사용자 확인/takeover**(무확인 자동 저장 금지). **조제보고·마약류 관리센터 전송·외부 제출 = COMMIT 경계 = 환경 불문 자동화 절대 금지·사용자 직접**(never-escalate). 실 환자/개인정보 미사용, 저장 직전 입력값 재검증, 확신 없는 좌표 클릭·불확실 상태 저장·다른 환자/처방 변경 금지. 상세는 [EXEC 요청서](../handoffs/EXEC-O4O-AUTOMATION-RECOVERY-DOCTORS-REAL-SMOKE-CLOSURE-V1.md) §3~§4.
+- **Doctors 하드 경계** — 실행 환경을 먼저 확인한다(교육·연습 A / 별도 테스트 DB B / 운영 C, 추정 금지). **A·B 만 Agent 저장 허용**, **C(운영)는 테스트 환자라도 저장=실제 원장 변경 → 저장 직전 STOP·사용자 확인/takeover**(무확인 자동 저장 금지). **조제보고·마약류 관리센터 전송·외부 제출 = COMMIT 경계 = 환경 불문 자동화 절대 금지·사용자 직접**(never-escalate). 실 환자/개인정보 미사용, 저장 직전 입력값 재검증, 확신 없는 좌표 클릭·불확실 상태 저장·다른 환자/처방 변경 금지. 상세는 부록 A.
 - KakaoTalk 대상은 **자기채팅만**. 실 타인 대화·발송·결제·주문 확정·삭제·게시 금지.
 - smoke 불가 항목은 PASS 로 적지 않고 사유를 명시한다(CLAUDE.md 검증·보고 원칙).
 - Git: 전용 worktree·최신 origin/main·path-specific stage·`--force` 금지(선행 WO 와 동일).
 
 ---
 
-## 부록 A — 실 업무형 Windows 대표 시나리오: Doctors (개요)
+## 부록 A — 실 업무형 Windows 대표 시나리오: Doctors
 
 > 지금까지 만든 자동화 기반(Goal-Driven Work Agent + Windows UIA + Safety + Recovery)을 **실제 의료기관 업무 프로그램에 처음 적용**하는 대표 smoke. Doctors 전용 adapter 를 미리 만드는 것이 **아니다** — 범용 계층이 실 업무형 앱에서도 작동하는지 검증한다.
 >
-> **이 부록은 고정 스크립트가 아니다.** 구체 집행 절차·환경 분류·판정 기준은 집행 요청서 [EXEC-O4O-AUTOMATION-RECOVERY-DOCTORS-REAL-SMOKE-CLOSURE-V1](../handoffs/EXEC-O4O-AUTOMATION-RECOVERY-DOCTORS-REAL-SMOKE-CLOSURE-V1.md) 이 정본이다. Agent 는 **화면을 보며 적절히 판단**한다 — 고정 단계·좌표·수치를 미리 못박지 않는다.
+> **이 부록은 고정 스크립트가 아니다.** Agent 는 **화면을 보며 적절히 판단**한다 — 고정 단계·좌표·수치를 미리 못박지 않는다. 실행 시점의 약품명·입력값은 사용자/테스트 책임자가 제공한다. 이 smoke 는 실 paired Local Agent + 실행 중 Doctors 창 + 실 provider 키 + O4O 채팅/AI proxy 서버측 `runWorkAgent` 가 동시에 필요한 **대화형 세션**에서 집행한다(비대화형 dev worktree 세션은 이 loop 를 구동하지 못한다).
 
 **대상 프로그램**: Doctors 요양병원 관리 프로그램 (실 업무형 Windows 앱).
 
@@ -93,6 +93,4 @@
 
 **절대 자동화 금지 (환경 불문)**: 조제보고 · 마약류 관리센터 전송 · 심평원/공단/정부 제출 · 외부 보고 · 청구 · 결제 · 승인 확정 · 전자서명 · 외부 전송/예약 · 전송 여부 불명확 버튼. 도달 시 `STOP_BEFORE_EXTERNAL_SUBMISSION`. 위험 단계는 strong 모델을 써도 자동 진행 안 함.
 
-**성공 판정 (§5 계승)**: 첫 실행 질문 1~2회 정상 · 질문 후 저장(허용 환경) 또는 운영 DB 저장 직전 takeover(`PASS_WITH_TAKEOVER`) 모두 정상 성공 · 외부 전송 전 정지 · 위험/개인정보/중복저장 0. "strong 이 혼자 다 풂"이 기준이 아니다.
-
-**집행 전제 (이 세션에서 불가한 이유)**: 실 paired Local Agent + 실행 중 Doctors 창 + 실 provider 키 + O4O 채팅/AI proxy 를 통한 서버측 `runWorkAgent` 구동이 동시에 필요하다. 비대화형 dev worktree 세션은 이 loop 를 구동하지 못하므로 여기서 집행하지 않는다 — EXEC 요청서를 실 작업 채팅방에 전달해 집행한다.
+**성공 판정 (§5 계승)**: 판정값 = **PASS / PASS_WITH_TAKEOVER / FAIL / BLOCKED**. 첫 실행 질문 1~2회 정상 · 질문 후 저장(허용 환경) 또는 운영 DB 저장 직전 takeover(`PASS_WITH_TAKEOVER`) 모두 정상 성공 · 외부 전송 전 정지 · 위험/개인정보/중복저장 0. "strong 이 혼자 다 풂"이 기준이 아니다. 환경 확인 불가·paired Agent/UIA/로그인 미비 등 실행 전제 미충족은 제품 실패가 아니라 `BLOCKED`. **BLOCKED·FAIL 이면 CLOSURE 를 닫지 않는다.**
