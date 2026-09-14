@@ -19,7 +19,6 @@
     "src/**/*"
   ],
   "exclude": [
-    "src/migrations/**/*",
     "dist",
     "node_modules",
     "**/*.test.ts",
