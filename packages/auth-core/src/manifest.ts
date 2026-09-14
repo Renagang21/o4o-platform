@@ -63,11 +63,11 @@ export const authCoreManifest = {
   },
 
   // ===== Lifecycle =====
+  // install / uninstall 은 은퇴 — 인증 테이블 스키마는 api-server deploy migration job 이 소유한다.
+  // (WO-O4O-AUTH-CORE-DEAD-LIFECYCLE-AND-RETIRED-USER-ROLES-RESURRECTION-FINAL-CLOSURE-V1)
   lifecycle: {
-    install: './lifecycle/install.js',
     activate: './lifecycle/activate.js',
     deactivate: './lifecycle/deactivate.js',
-    uninstall: './lifecycle/uninstall.js',
   },
 
   // ===== Permissions =====
