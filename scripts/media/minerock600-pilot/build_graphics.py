@@ -4,11 +4,16 @@
 - 16:9 (1920x1080) 기준, 핵심 피사체는 중앙 safe area(9:16 파생 대비, x 656~1264)에 둔다.
 - 개념도이며 실제 해부·지질·축척을 재현하지 않는다. 제품 효능 표현 없음.
 """
+import os
+import sys
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
-OUT = Path(__file__).parent / "png"
-OUT.mkdir(exist_ok=True)
+# 1080p 원본 고정 경로(리포 밖). Media Library 일반 업로드는 1200px 로 축소되므로
+# 영상 합성에는 이 경로의 PNG 를 직접 쓴다. 우선순위: argv[1] > MINEROCK600_PNG_OUT > 기본값.
+DEFAULT_OUT = Path("C:/tmp/minerock600-pilot/png")
+OUT = Path(sys.argv[1] if len(sys.argv) > 1 else os.environ.get("MINEROCK600_PNG_OUT", DEFAULT_OUT))
+OUT.mkdir(parents=True, exist_ok=True)
 FONT = "C:/Windows/Fonts/malgun.ttf"
 BOLD = "C:/Windows/Fonts/malgunbd.ttf"
 
@@ -261,4 +266,5 @@ def sodium_sources():
 if __name__ == "__main__":
     mineral_icon_set(); cell_base(); na_k_pump(); water_electrolyte()
     kidney_base(); hardness_scale(); east_sea_bedrock(); sodium_sources()
+    print(OUT)
     print(sorted(p.name for p in OUT.iterdir()))
