@@ -96,8 +96,8 @@ test('경계(소스): uia.mjs 는 fs/child_process/네트워크 0 · 스크립�
   assert.ok(ps.includes('$allowedNames -notcontains $proc.ProcessName'));
   assert.ok(ps.includes('$text.Length -gt 500'));
   assert.ok(ps.includes('$SKIP_CLASS'), '임베디드 웹 콘텐츠는 내려가지 않는다');
-  // execFile 지점은 여전히 windows-window-control 하나 · 스크립트 8개(UIA-CANONICAL-TEST-SURFACE-V0 의 계측 창 1개 포함)
+  // execFile 지점은 여전히 windows-window-control 하나 · 스크립트 9개(계측 창 1개 + 지속 UIA 호스트 1개 포함)
   const control = codeOnly(read('windows-window-control.mjs'));
   const scripts = [...control.matchAll(/'([\w-]+\.ps1)'/g)].map((m) => m[1]).sort();
-  assert.deepEqual(scripts, ['windows-app-launch.ps1', 'windows-browser-open.ps1', 'windows-computer-input.ps1', 'windows-computer-inspect.ps1', 'windows-test-surface.ps1', 'windows-uia.ps1', 'windows-window-activate.ps1', 'windows-window-census.ps1']);
+  assert.deepEqual(scripts, ['windows-app-launch.ps1', 'windows-browser-open.ps1', 'windows-computer-input.ps1', 'windows-computer-inspect.ps1', 'windows-test-surface.ps1', 'windows-uia-host.ps1', 'windows-uia.ps1', 'windows-window-activate.ps1', 'windows-window-census.ps1']);
 });

@@ -16,10 +16,13 @@
  *   - 텍스트 · 키는 computer-use-limits 의 같은 규칙(길이 · 제어문자 · credential 성격 금지 · ENTER/TAB/ESC)을 지난다.
  *   - 로그인 · 비밀번호 · 인증 · 파일 대화상자 창(제목 표식)에는 어떤 입력도 넣지 않는다(USER_ACTION_REQUIRED).
  *   - COMMIT 성격 이름(결제 · 삭제 · 송금 …)의 요소는 invoke 하지 않는다(DOM 과 같은 목록).
- *   - 실행은 windows-window-control.mjs 의 단일 execFile 지점 → windows-uia.ps1 하나.
+ *   - 실행은 windows-window-control.mjs 의 단일 execFile 지점 하나다. inspect · set_value · invoke(요소 동작)는 지속 UIA
+ *     호스트(windows-uia-host.ps1, windows-uia-client.mjs 경유)로 — 네이티브 공급자 핸들을 캐시해 안정적으로 구동한다.
+ *     verify(안전 probe) · key · click(물리 입력) · activate 는 요청당 스크립트(windows-uia.ps1)로 그대로 둔다(SAFETY-V1 무변경).
  */
 
 import { censusWindows, matchWindows, runUiaScript } from './windows-window-control.mjs';
+import { hostInspect, hostAct } from './windows-uia-client.mjs';
 import { textDenyReason, isUserActionTitle, COMPUTER_ALLOWED_KEYS, isValidNormalizedCoordinate } from './computer-use-limits.mjs';
 import { runSafetyGate, markAutomationActive, SAFETY_ERROR } from './windows-automation-safety.mjs';
 
@@ -81,11 +84,15 @@ const exactKeys = (o, keys) => Object.keys(o).sort().join(',') === [...keys].sor
 export async function uiaInspect(app) {
   const pid = await resolvePid(app);
   if (pid === null) return { status: 'failed', errorCode: 'WINDOWS_APP_NOT_RUNNING', data: { appId: app.appId, displayName: app.displayName } };
-  const raw = await runUiaScript({ O4O_UIA_ACTION: 'inspect', O4O_UIA_PID: String(pid), O4O_UIA_PROCESS_NAMES: (app.processNames || []).join(',') });
+  // 지속 호스트로 관찰한다 — 여기서 캐시된 live element 핸들을 뒤의 set_value/invoke 가 재사용한다(요소 동일성 계약).
+  const raw = await hostInspect(pid, (app.processNames || []).join(','));
   if (!raw || raw.ok !== true || !Array.isArray(raw.elements)) {
-    return { status: 'failed', errorCode: raw?.reason === 'PROCESS_NOT_FOUND' ? 'WINDOWS_APP_NOT_RUNNING' : 'UIA_UNAVAILABLE', data: { appId: app.appId, displayName: app.displayName } };
+    const code = raw?.reason === 'PROCESS_NOT_FOUND' || raw?.reason === 'PROCESS_NOT_REGISTERED' ? 'WINDOWS_APP_NOT_RUNNING'
+      : (raw?.errorCode === 'UIA_CLIENT_UNAVAILABLE' || raw?.errorCode === 'UIA_CLIENT_TIMEOUT') ? raw.errorCode : 'UIA_UNAVAILABLE';
+    return { status: 'failed', errorCode: code, data: { appId: app.appId, displayName: app.displayName } };
   }
-  const snapshot = { id: newSnapshotId(), appId: app.appId, pid, elements: new Map(), windows: [] };
+  // generation = 이 호스트 기동 토큰. snapshot 에 새겨 두면, 호스트가 (재)기동한 뒤 이 snapshot 의 ref 로 act 하면 거부된다.
+  const snapshot = { id: newSnapshotId(), appId: app.appId, pid, generation: typeof raw.generation === 'string' ? raw.generation : '', elements: new Map(), windows: [] };
   const elements = [];
   let n = 0;
   const windowUserAction = new Map();
@@ -104,7 +111,8 @@ export async function uiaInspect(app) {
     const hwnd = Number(e.hwnd);
     const userAction = windowUserAction.get(hwnd) === true;
     const riskLevel = role === 'window' || role === 'pane' || role === 'list' || role === 'text' || role === 'image' ? 'READ' : riskLevelForName(name);
-    snapshot.elements.set(elementRef, { hwnd, rid: String(e.rid ?? ''), role, name, rect: Array.isArray(e.rect) ? e.rect : null, userAction, patterns: Array.isArray(e.patterns) ? e.patterns : [] });
+    // automationId · className 은 재식별 앵커다(요소가 stale 되면 호스트가 이 값으로 트리를 다시 걸어 찾는다). 서버로는 나가지 않는다.
+    snapshot.elements.set(elementRef, { hwnd, rid: String(e.rid ?? ''), role, name, automationId: String(e.automationId ?? ''), className: String(e.className ?? ''), rect: Array.isArray(e.rect) ? e.rect : null, userAction, patterns: Array.isArray(e.patterns) ? e.patterns : [] });
     const out = { elementRef, role, name, riskLevel, disabled: e.enabled === false, offscreen: e.offscreen === true, focused: e.focused === true, windowRef: windowRefByHwnd.get(hwnd) ?? 'w_0' };
     if (typeof e.value === 'string' && e.value.length > 0) { out.text = e.value.slice(0, NAME_MAX); out.hasValue = true; }
     if (Array.isArray(e.patterns) && e.patterns.includes('value')) out.editable = true;
@@ -164,6 +172,24 @@ function mapScriptFailure(raw) {
   return 'UIA_UNAVAILABLE';
 }
 
+/** 지속 호스트 act 응답의 실패를 §51 오류 계약으로 접는다. 클라이언트 오류(UIA_CLIENT_x·GENERATION_MISMATCH)는 그대로 통과. */
+function mapHostFailure(raw) {
+  if (raw?.errorCode === 'UIA_CLIENT_UNAVAILABLE' || raw?.errorCode === 'UIA_CLIENT_TIMEOUT') return raw.errorCode;
+  if (raw?.errorCode === 'UIA_GENERATION_MISMATCH') return 'UIA_GENERATION_MISMATCH';
+  const reason = raw?.reason;
+  if (reason === 'GENERATION_MISMATCH') return 'UIA_GENERATION_MISMATCH';
+  if (reason === 'ELEMENT_STALE') return 'UIA_ELEMENT_STALE';
+  if (reason === 'ELEMENT_DISABLED' || reason === 'NOT_EDITABLE' || reason === 'READ_ONLY' || reason === 'NOT_INVOKABLE' || reason === 'BAD_KIND' || reason === 'BAD_TEXT') return 'UIA_ACTION_NOT_SUPPORTED';
+  if (reason === 'WINDOW_NOT_VISIBLE') return 'UIA_TARGET_NOT_FOREGROUND';
+  if (reason === 'PROCESS_NOT_FOUND' || reason === 'WINDOW_NOT_TARGET') return 'WINDOWS_APP_NOT_RUNNING';
+  return 'UIA_UNAVAILABLE';
+}
+
+/** 재식별 앵커(automationId · name · className · controlType)만 묶는다 — RuntimeId 원문이 아니라 안정 속성이다. */
+function identityOf(entry) {
+  return { automationId: entry.automationId || '', name: entry.name || '', className: entry.className || '', role: entry.role || '' };
+}
+
 /** `{ elementRef, snapshotId, text }` — Value pattern 이 있는 요소(textbox)에만. 값 원문은 응답에 짧게(80자)만. */
 export async function uiaSetValue(app, args) {
   if (!isPlainObject(args) || !exactKeys(args, ['elementRef', 'snapshotId', 'text'])) return { status: 'denied', errorCode: 'UIA_INVALID_ARGUMENT' };
@@ -174,9 +200,10 @@ export async function uiaSetValue(app, args) {
   if (r.entry.role !== 'textbox') return { status: 'denied', errorCode: 'UIA_ACTION_NOT_SUPPORTED', data: { appId: app.appId, elementRef: args.elementRef, role: r.entry.role } };
   const blocked = await safetyGate(app, r.snapshot, r.entry, { action: 'set_value', elementRef: args.elementRef });
   if (blocked) return blocked;
-  const raw = await runUiaScript({ ...envBase(app, r.snapshot, r.entry), O4O_UIA_ACTION: 'set_value', O4O_UIA_TEXT: args.text });
-  if (!raw || raw.ok !== true) return { status: 'failed', errorCode: mapScriptFailure(raw), data: { appId: app.appId, elementRef: args.elementRef } };
-  return { status: 'success', data: { appId: app.appId, elementRef: args.elementRef, role: r.entry.role, riskLevel: 'REVERSIBLE', executed: true, verified: raw.verified === true, hasValue: raw.hasValue === true, via: raw.via === 'edit_message' ? 'edit_message' : 'setvalue' } };
+  // 지속 호스트의 캐시된 네이티브 핸들에 ValuePattern.SetValue. stale 면 호스트가 identity 앵커로 재식별해 복구한다.
+  const raw = await hostAct({ generation: r.snapshot.generation, kind: 'set_value', rid: r.entry.rid, hwnd: r.entry.hwnd, text: args.text, identity: identityOf(r.entry) });
+  if (!raw || raw.ok !== true) return { status: 'failed', errorCode: mapHostFailure(raw), data: { appId: app.appId, elementRef: args.elementRef } };
+  return { status: 'success', data: { appId: app.appId, elementRef: args.elementRef, role: r.entry.role, riskLevel: 'REVERSIBLE', executed: true, verified: raw.verified === true, hasValue: raw.hasValue === true, via: 'setvalue', reidentified: raw.reidentified === true } };
 }
 
 /** `{ elementRef, snapshotId }` — button/link/checkbox/radio/tab/menuitem/listitem 의 기본 동작. COMMIT 이름은 실행하지 않는다. */
@@ -196,9 +223,10 @@ export async function uiaInvoke(app, args) {
   if (riskLevelForName(r.entry.name) === 'COMMIT') return { status: 'failed', errorCode: 'UIA_ACTION_NOT_ALLOWED', data: { appId: app.appId, elementRef: args.elementRef, role: r.entry.role, riskLevel: 'COMMIT' } };
   const blocked = await safetyGate(app, r.snapshot, r.entry, { action: 'invoke', elementRef: args.elementRef });
   if (blocked) return blocked;
-  const raw = await runUiaScript({ ...envBase(app, r.snapshot, r.entry), O4O_UIA_ACTION: 'invoke' });
-  if (!raw || raw.ok !== true) return { status: 'failed', errorCode: mapScriptFailure(raw), data: { appId: app.appId, elementRef: args.elementRef } };
-  return { status: 'success', data: { appId: app.appId, elementRef: args.elementRef, role: r.entry.role, riskLevel: 'REVERSIBLE', executed: true } };
+  // 지속 호스트의 캐시된 네이티브 핸들에 InvokePattern.Invoke. stale 면 identity 앵커로 재식별해 복구한다.
+  const raw = await hostAct({ generation: r.snapshot.generation, kind: 'invoke', rid: r.entry.rid, hwnd: r.entry.hwnd, identity: identityOf(r.entry) });
+  if (!raw || raw.ok !== true) return { status: 'failed', errorCode: mapHostFailure(raw), data: { appId: app.appId, elementRef: args.elementRef } };
+  return { status: 'success', data: { appId: app.appId, elementRef: args.elementRef, role: r.entry.role, riskLevel: 'REVERSIBLE', executed: true, reidentified: raw.reidentified === true } };
 }
 
 /** `{ key, snapshotId, elementRef? }` — ENTER/TAB/ESC 1회. elementRef 가 있으면 그 요소에 focus 를 준 뒤 보낸다(입력창에서 ENTER = 제출). */

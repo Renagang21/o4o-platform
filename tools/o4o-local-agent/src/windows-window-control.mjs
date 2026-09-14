@@ -55,6 +55,10 @@ const TEST_SURFACE_SCRIPT = path.join(HERE, 'windows-test-surface.ps1');
 // COMPUTER-USE-V0 — 아래 "Computer Use V0" 절 참조. 상수는 여기 한곳에 모아 둔다.
 const COMPUTER_INSPECT_SCRIPT = path.join(HERE, 'windows-computer-inspect.ps1');
 const COMPUTER_INPUT_SCRIPT = path.join(HERE, 'windows-computer-input.ps1');
+// UIA-ELEMENT-IDENTITY-AND-PERSISTENT-CLIENT-V1 — 오래 사는 지속 UIA 호스트(아홉 번째 스크립트).
+// windows-uia.ps1 과 달리 요청당 1회가 아니라 한 프로세스가 살아 있으며, 네이티브 공급자로 건 element 핸들을 캐시해
+// 여러 동작에 재사용한다. `startUiaHost()` 만 이 스크립트를 시작한다(stdin/stdout JSON 한 줄 프로토콜).
+const UIA_HOST_SCRIPT = path.join(HERE, 'windows-uia-host.ps1');
 
 /**
  * 브라우저로 인정할 process 이름 (§24 — Chrome · Edge 만).
@@ -143,6 +147,26 @@ export async function censusWindows() {
       foreground: w.foreground === true,
     }))
     .filter((w) => Number.isFinite(w.hwnd) && w.hwnd > 0);
+}
+
+// ─── 지속 UIA 호스트 (WO-O4O-WINDOWS-UIA-ELEMENT-IDENTITY-AND-PERSISTENT-CLIENT-V1) ──
+//
+// execFile 지점은 여전히 이 파일 하나다. argv 는 상수([...PS_FLAGS, UIA_HOST_SCRIPT]), 입력은 없다(환경도 SystemRoot 뿐).
+// runUiaScript(요청당 1회)와 달리 이 프로세스는 오래 산다 — 호출자(windows-uia-client.mjs)가 stdin 으로 JSON 한 줄을 쓰고
+// stdout 에서 JSON 한 줄을 읽는다(단순 IPC, §29·§30). 프로세스 수명·요청 상관·유휴 종료·재기동은 전부 client 가 관리한다.
+// detached 아님 — agent 프로세스가 죽으면 호스트도 함께 정리된다. 텍스트/키/좌표 등 동작 인자는 client 가 JSON 으로 실어 보낸다.
+// (부작용 있는 실행 지점이라 matchWindows 앞에 둔다 — 그 뒤 구간은 순수 함수 선언만 남긴다.)
+const UIA_HOST_MAX_OUTPUT_BYTES = MAX_OUTPUT_BYTES * 16; // 세션 누적 stdout 여유(호스트는 작은 JSON 한 줄만 낸다)
+
+export function startUiaHost() {
+  // execFile 은 stdout 을 내부적으로 버퍼링하지만 stdin/stdout 스트림을 그대로 노출한다 — client 가 그 스트림으로 왕복한다.
+  const child = execFile(
+    PS_EXE,
+    [...PS_FLAGS, UIA_HOST_SCRIPT],
+    { windowsHide: true, timeout: 0, maxBuffer: UIA_HOST_MAX_OUTPUT_BYTES, env: childEnv({}) },
+    () => { /* 예외/종료는 client 가 스트림 이벤트로 관찰한다 */ },
+  );
+  return child;
 }
 
 /**
