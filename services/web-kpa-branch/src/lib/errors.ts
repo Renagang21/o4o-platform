@@ -20,14 +20,16 @@ type ApiErrorBody = {
   message?: unknown;
 };
 
-/** `error` 필드(문자열 / `{code,message}` 객체 / 그 외)를 사용자 안내 문자열로 내린다. 없으면 null. */
+/** `error` 필드를 사용자 안내 문자열로 내린다 — string 그대로 / object 는 message → code → 최상위 message 순 / 없으면 null. */
 function errorText(data: unknown): string | null {
   if (!data || typeof data !== 'object') return null;
   const body = data as ApiErrorBody;
   if (typeof body.error === 'string' && body.error.trim()) return body.error;
   if (body.error && typeof body.error === 'object') {
-    const msg = (body.error as { message?: unknown }).message;
+    const { message: msg, code } = body.error as { message?: unknown; code?: unknown };
     if (typeof msg === 'string' && msg.trim()) return msg;
+    if (typeof code === 'string' && code.trim()) return code;
+    if (typeof body.message === 'string' && body.message.trim()) return body.message;
     return null;
   }
   if (typeof body.message === 'string' && body.message.trim()) return body.message;
