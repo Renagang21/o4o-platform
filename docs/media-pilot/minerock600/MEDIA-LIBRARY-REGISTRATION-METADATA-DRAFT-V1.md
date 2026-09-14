@@ -13,6 +13,8 @@
 
 ## 1. A-01 제품 Master (실사 정면)
 
+> ✅ 등록 완료 2026-09-14 — `1a09602e-7c48-48a0-82d2-b43b803baa64` (873×1200 webp · INPUT · APPROVED · internal · catalog `original/original` · qa APPROVED · EXACT · supplier-provided · memo `provisional master — replace when high-resolution source becomes available`) · Job INPUT `b84b611c…`. 기존 잠정 Master `215592fd` memo 에 SUPERSEDED 표기(링크 유지).
+
 ```jsonc
 // upload: folder=general
 // metadata
@@ -36,6 +38,8 @@
 `rightsType` 은 사진 출처에 따라 확정(공급자 제공 → `supplier-provided`, 직접 촬영 → `o4o-original`).
 
 ## 2. A-02 제품 Cutout (투명 배경)
+
+> ✅ 등록 완료 2026-09-14 — `1a0263e1-03fa-41c7-bc67-ea9a2975e045` (382×1200 webp alpha · INTERMEDIATE · APPROVED · catalog `edited/background-removed` · parent=A-01 · qa APPROVED · EXACT) · Job **INTERMEDIATE** `8317dc11…` (사용자 지시로 아래 초안의 INPUT 대신 INTERMEDIATE). status 는 육안 검수 통과로 REVIEW 단계 없이 APPROVED.
 
 ```jsonc
 // upload: folder=general  (PNG alpha → webp alpha 유지 확인)
@@ -98,4 +102,4 @@
 
 ## 5. 등록 후 Job 갱신
 
-`PATCH /automation/video-jobs/8a357640…` — `statusNote`: `자산 완비(Master/Cutout/약사 A/배경) · EP01 영상 생성 대기`. 상태는 `DRAFT` 유지. **영상 생성은 별도 지시.**
+`PATCH /api/v1/platform/automation-jobs/8a357640…` — ✅ 2026-09-14 `statusNote`: `EP01 자산 완비 — 영상 생성 준비`. 상태는 `DRAFT` 유지. Job `{INPUT: 6, INTERMEDIATE: 14}`. **영상 생성은 별도 지시.**

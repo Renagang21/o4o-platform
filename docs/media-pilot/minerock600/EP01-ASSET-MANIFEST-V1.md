@@ -7,8 +7,8 @@
 
 | ID | 자산 | 로컬 원본 (합성용) | Media Library | 컷 | 상태 | 비고 |
 |---|---|---|---|---|---|---|
-| A-01 | 제품 Master (실사 정면, 고해상도) | 사용자 제공 예정 — 예: `C:\Users\home\Downloads\minerock600-product-source.png` | 신규 등록 (metadata §1) → 기존 잠정 Master `215592fd` 는 INPUT 링크 유지·status 는 `SUPERSEDED` memo 만 | 1·3 | ⏸ 대기 | AI 재생성 금지 |
-| A-02 | 제품 Cutout (투명 배경 PNG) | A-01 에서 제작 → `C:\tmp\minerock600-pilot\product\minerock600-cutout.png` | 신규 등록 (metadata §2) | 1·3 | ⏸ A-01 후 | 배경 제거만(라벨 픽셀 보존). 워터마크·수치 왜곡 육안 검수 |
+| A-01 | 제품 Master (실사 정면, **provisional** 1600×2200) | `C:\tmp\minerock600-pilot\product\minerock600-product-master-provisional.png` (사용자 제공, AI 재생성 없음) | ✅ `1a09602e-7c48-48a0-82d2-b43b803baa64` · INPUT `b84b611c…` · memo `provisional master — replace when high-resolution source becomes available` · 기존 `215592fd` 는 링크 유지 + SUPERSEDED memo | 1·3 | ✅ 2026-09-14 | 고해상도 원본 입수 시 교체(파일럿 blocker 아님) |
+| A-02 | 제품 Cutout (투명 배경 PNG, 637×2000) | `C:\tmp\minerock600-pilot\product\minerock600-product-cutout-provisional.png` (A-01 원본 픽셀 분리) | ✅ `1a0263e1-03fa-41c7-bc67-ea9a2975e045` · `background-removed` · parent=A-01 · INTERMEDIATE `8317dc11…` | 1·3 | ✅ 2026-09-14 | 검수: 라벨 4항목 동일·수치 왜곡 없음. 병체 좌측 투명부 소프트 알파 밴드 → 합성 시 확인 |
 | A-03 | `O4O 한국 여성 약사 A` R-01 정면 | `C:\tmp\minerock600-pilot\character\o4o-pharmacist-a-r01-front.png` (1122×1402, 원본은 `Downloads` 동명 파일) | **`4aa5e0c3-fc81-4bac-8aec-32e54a264f30`** (960×1200 축소본) · INPUT linkId `fdda776c…` | 1·3 | ✅ 등록 2026-09-14 | [캐릭터 시트](CHARACTER-SHEET-O4O-KR-FEMALE-PHARMACIST-A-V1.md). 파생: R-02 측면 `ba0b9211-491f-45b5-b2a5-a001b4150f9e` · R-03 제스처 `4dd57f20-556b-498d-a49c-18345339b836` (둘 다 `generated-angle`, parent=R-01, INPUT 연결) |
 
 ## B. 분위기 배경 (AI 생성 · 사실 정보 부여 금지)
@@ -49,8 +49,8 @@ quiet and pure atmosphere, no people, no bottles, no text, no logos. 16:9, photo
 
 ## 진행 게이트
 
-1. A-01 파일 경로 수신 → A-02 제작 → §1·§2 등록·INPUT 연결 — **남은 유일한 게이트**
+1. ~~A-01 수신 → A-02 → §1·§2 등록·연결(Master=INPUT, Cutout=INTERMEDIATE)~~ ✅ 2026-09-14 (provisional)
 2. ~~A-03 등록·INPUT 연결~~ ✅ 2026-09-14
 3. ~~B-01 등록·INTERMEDIATE 연결~~ ✅ 2026-09-14
-4. Job statusNote 갱신 (`자산 완비 · 영상 생성 대기`) — 1 완료 후
+4. ~~Job statusNote 갱신~~ ✅ 2026-09-14 `EP01 자산 완비 — 영상 생성 준비` (status DRAFT 유지) — **READY: 필수 자산 A-01/A-02/A-03/B-01/G 전부 등록·연결**
 5. **여기서 중지** — EP01 외부 영상 생성은 별도 지시

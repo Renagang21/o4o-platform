@@ -1,7 +1,7 @@
 # CHECK-O4O-MINEROCK600-EP01-PREP-V1
 
 > **WO**: 사용자 지시(2026-09-14, 채팅) — "세 가지 결정 완료 · 외부 입력 없이 가능한 작업을 계속 진행하라". 선행: [CHECK-…-ASSET-PREP-V1](CHECK-O4O-MINEROCK600-VIDEO-PILOT-RESET-AND-ASSET-PREP-V1.md)
-> **상태**: PREP DONE + **약사 A 3장 · 배경 1장 등록·Job 연결 완료(2026-09-14, §7)** · 외부 입력 대기 1건(제품 실사 원본) · 영상 생성 미착수(범위 밖)
+> **상태**: **EP01 자산 완비 — 영상 생성 준비**(2026-09-14, §8) · 약사 A 3장 · 배경 1장(§7) + 제품 provisional Master/Cutout(§8) 등록·Job 연결 완료 · 영상 생성 미착수(사용자 지시로 중지)
 > **작성일**: 2026-09-14 · production API 호출 · 코드 변경 = pilot 스크립트 출력 경로 1건뿐
 
 ## 1. 사용자 결정 반영
@@ -58,6 +58,23 @@
 - 해상도: 약사 1122px · 배경 1672px 로 시트 사양(2000px / 1920px) 미달이나 파일럿 허용(사용자 합의). 합성 원본은 로컬 PNG.
 - V2 보정 후보: 안쪽 하늘색 V넥이 스크럽 느낌 → 다음 생성 시 라운드/셔츠 카라.
 - 하지 않은 것: 제품 Master/Cutout(원본 대기) · 영상 생성 · 브라우저 Admin smoke.
+
+## 8. 3차 — 제품 provisional Master/Cutout 등록 · READY 판정 (2026-09-14)
+
+사용자가 ChatGPT 에서 **AI 재생성 없이** 원본 픽셀 기반으로 분리한 Master/Cutout 을 `Downloads`(언더스코어 파일명) → `C:\tmp\minerock600-pilot\product\` 하이픈 규격명으로 보존 후 검수·등록. "고해상도 Master 대기는 blocker 아님"(사용자).
+
+검수(PIL, numpy 없음): Cutout alpha opaque 64.0% / transparent 17.1% / partial 18.9%(투명 병체 소프트 알파) · 병 bbox 613×1967 vs Master 599×1940(≈2% 스케일 차, 정렬 차이) · 불투명 영역 평균 절대차 RGB ≈ 22 · 라벨 밴드 `1000 mL (0 kcal)` ≈ 24. 육안(side-by-side · 라벨 밴드 확대): 라벨 4항목(MINEROCK · 물처럼 마시는 미네랄 · FROM DEEP SEA BEDROCK · 1000 mL (0 kcal)) 동일, 수치·워터마크 왜곡 없음 → 재생성 징후 없음. 결함: 병체 좌측 투명 플라스틱부에 블록형 소프트 알파 밴드 → 합성 시 배경 비침 확인 필요(memo 기록). Master 1600×2200 은 500px 광고본 업스케일 추정 → provisional 표기.
+
+| 자산 | 원본 | Asset ID | 저장 | catalog | Job 링크 |
+|---|---|---|---|---|---|
+| 제품 Master (provisional) | 1600×2200 RGB | `1a09602e-7c48-48a0-82d2-b43b803baa64` | 873×1200 webp · folder general · INPUT · APPROVED · internal | `original/original` · qa APPROVED · EXACT · supplier-provided · memo `provisional master — replace when high-resolution source becomes available` | INPUT `b84b611c…` |
+| 제품 Cutout (provisional) | 637×2000 RGBA | `1a0263e1-03fa-41c7-bc67-ea9a2975e045` | 382×1200 webp alpha · INTERMEDIATE · APPROVED · internal | `edited/background-removed` · parent=Master · qa APPROVED · EXACT | INTERMEDIATE `8317dc11…` |
+
+- 기존 잠정 Master `215592fd`(500×500) — INPUT 링크 유지, memo 에 `SUPERSEDED 2026-09-14 by provisional Master 1a09602e…` 추가.
+- Job `8a357640` — `{INPUT: 6, INTERMEDIATE: 14}` · statusNote `EP01 자산 완비 — 영상 생성 준비` · status `DRAFT` 유지.
+- 검증: login 200 · upload 2/2 201 · metadata 2/2 200 · catalog 2/2 200(parent 연결 1회 성공) · assets 링크 2/2 201 · 기존 Master memo PATCH 200 · Job PATCH 200 · GET Job 으로 purpose 집계 재확인 · 공개 URL HEAD 2/2 `200 image/webp`. 브라우저 Admin smoke 없음.
+- **READY 재검증**: A-01 ✅ · A-02 ✅ · A-03 R-01/02/03 ✅ · B-01 ✅ · G 12건 ✅ · S-02 자막 ✅(문서) · S-01 내레이션 ⏸(생성 서비스 선택은 다음 단계) → 영상 생성 전 필수 자산 완비.
+- 하지 않은 것: **영상 생성(사용자 지시로 중지)** · 고해상도 Master 교체(입수 시) · preserve-original 확장(P1).
 
 ## 6. 문서 정합
 
