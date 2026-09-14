@@ -6,7 +6,7 @@
  * - Role management (roles table)
  * - Permission management (permissions table)
  * - Role-Permission assignments (role_permissions table)
- * - User-Role assignments (user_roles table)
+ * - User-Role assignments → role_assignments (RBAC SSOT · user_roles 는 은퇴 · F9 재생성 금지)
  * - OAuth linked accounts (linked_accounts table)
  * - Refresh tokens (refresh_tokens table)
  * - Login attempts tracking (login_attempts table)
@@ -34,12 +34,15 @@ export const authCoreManifest = {
   },
 
   // ===== Owned Tables =====
+  // 선언은 "이 Core 가 개념적으로 책임지는 운영 테이블" 이며 스키마 창조자가 아니다 — 스키마 소유자는 api-server deploy migration job.
+  // WO-O4O-RBAC-BASELINE-TABLE-MIGRATION-OWNERSHIP-AND-LEGACY-SCHEMA-DECLARATION-CLOSURE-V1:
+  //   user_roles 제거 (HISTORICAL_RETIRED · 20260228000002-DropLegacyRbacColumns 가 DROP · RBAC Freeze F9 재생성 금지).
+  //   permissions · role_permissions · linked_accounts = MIGRATION_OWNERSHIP_REQUIRED (실물 존재 · entity 존재 · 창조 migration 부재 — 별도 baseline migration WO).
   ownsTables: [
     'users',
     'roles',
     'permissions',
     'role_permissions',
-    'user_roles',
     'linked_accounts',
     'refresh_tokens',
     'login_attempts',

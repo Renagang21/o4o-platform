@@ -28,11 +28,11 @@ export const organizationCoreManifest = {
   },
 
   // ===== 소유 테이블 =====
+  // WO-O4O-RBAC-BASELINE-TABLE-MIGRATION-OWNERSHIP-AND-LEGACY-SCHEMA-DECLARATION-CLOSURE-V1:
+  //   organization_units · organization_roles 제거 (ABSENT_AND_UNUSED · 프로덕션 미존재 · entity 없음 · 은퇴한 lifecycle install 만 정의했음).
   ownsTables: [
     'organizations',
     'organization_members',
-    'organization_units',
-    'organization_roles',
   ],
 
   // ===== 삭제 정책 =====

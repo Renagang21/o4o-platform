@@ -29,6 +29,9 @@ export const platformCoreManifest = {
   },
 
   // ===== Owned Tables =====
+  // WO-O4O-RBAC-BASELINE-TABLE-MIGRATION-OWNERSHIP-AND-LEGACY-SCHEMA-DECLARATION-CLOSURE-V1:
+  //   app_registry = migration 소유 (2026012200001-CreateAppRegistryTable). settings · account_activities = MIGRATION_OWNERSHIP_REQUIRED
+  //   (실물 존재 · entity 존재 · 창조 migration 부재 — 별도 baseline migration WO). 선언은 스키마 창조가 아니다.
   ownsTables: [
     'app_registry',
     'settings',
