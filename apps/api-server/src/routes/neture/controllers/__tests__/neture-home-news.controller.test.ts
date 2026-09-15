@@ -24,7 +24,7 @@ function makeHarness(options: { forum?: { id: string; slug: string; name: string
       const n = String(sql).replace(/\s+/g, ' ').trim();
       calls.push({ sql: n, params });
       if (/FROM forum_category_requests/i.test(n)) return options.forum ? [options.forum] : [];
-      if (/FROM forum_posts/i.test(n)) return options.posts ?? [];
+      if (/FROM forum_post/i.test(n)) return options.posts ?? [];
       return [];
     },
   };
@@ -99,7 +99,7 @@ describe('GET /neture/home/news', () => {
     handler({ query: { limit: '3' } } as any, res, next);
     await flush();
     expect(next).not.toHaveBeenCalled();
-    const postCall = calls.find((c) => /FROM forum_posts/i.test(c.sql))!;
+    const postCall = calls.find((c) => /FROM forum_post/i.test(c.sql))!;
     expect(postCall.params).toEqual([FORUM.id, 3]);
     expect(postCall.sql).toMatch(/status = 'publish'/);
     expect(postCall.sql).toMatch(/organization_id IS NULL/);
@@ -122,6 +122,6 @@ describe('GET /neture/home/news', () => {
     await flush();
     expect(res.statusCode).toBe(200);
     expect(res.json.mock.calls[0][0]).toEqual({ success: true, data: { forum: null, posts: [] } });
-    expect(calls.some((c) => /FROM forum_posts/i.test(c.sql))).toBe(false);
+    expect(calls.some((c) => /FROM forum_post/i.test(c.sql))).toBe(false);
   });
 });

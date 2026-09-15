@@ -11,7 +11,7 @@
  *     "게시일 내림차순" 과 다르다.
  *   - 포럼을 표시 이름이 아니라 **slug 상수**로 고정해 서버가 해석해야 한다. 홈이 포럼 목록을
  *     한 번 더 조회해 이름으로 고르는 방식은 불안정하다.
- *   기존 테이블(`forum_category_requests` · `forum_posts`)만 읽는다. 새 게시판 · 새 테이블 없음.
+ *   기존 테이블(`forum_category_requests` · `forum_post`)만 읽는다. 새 게시판 · 새 테이블 없음.
  *
  * 노출 규칙(서버에서 배제):
  *   - 포럼: `service_code='neture'` + `status='completed'` + `forum_type='open'` 인 것만.
@@ -103,7 +103,7 @@ export function createNetureHomeNewsController(dataSource: DataSource): Router {
       }> = await dataSource.query(
         `SELECT id, slug, title, tags,
                 COALESCE(published_at, created_at) AS published_at
-           FROM forum_posts
+           FROM forum_post
           WHERE forum_id = $1
             AND status = 'publish'
             AND organization_id IS NULL
