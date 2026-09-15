@@ -94,10 +94,11 @@ describe('ServiceUsageGate', () => {
     expect(screen.getByText('다시 시도')).toBeTruthy();
   });
 
-  it('관리자는 상태와 무관하게 통과(운영 목적)', () => {
-    authState.user!.roles = ['neture:admin'];
+  it('관리자도 예외 없음 — 서비스 행이 없으면 신청 안내(서버 guard 와 동일 · 401→로그아웃 연쇄 방지)', () => {
+    authState.user!.roles = ['neture:admin', 'platform:super_admin'];
     statesResult.states = st('none', 'none');
     mount('partner');
-    expect(screen.getByTestId('work-area')).toBeTruthy();
+    expect(screen.queryByTestId('work-area')).toBeNull();
+    expect(screen.getByTestId('service-gate-partner-none')).toBeTruthy();
   });
 });

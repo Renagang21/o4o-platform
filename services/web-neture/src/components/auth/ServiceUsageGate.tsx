@@ -14,14 +14,15 @@
  *   withdrawn → 탈퇴 + 다시 신청
  *   조회 실패 → 미가입으로 취급하지 않고 재시도만
  *
- * 관리자(ADMIN_ROLES)는 운영 목적으로 통과한다(서버 guard 와 동일한 예외).
- * 최종 판정은 서버 guard(requireLinkedSupplier / requireActivePartner 등) 가 한다.
+ * 관리자 예외 없음 — 서버 guard(requireLinkedSupplier / requireActivePartner) 도 role 이 아니라 서비스 행의
+ * 상태만 본다. 서비스 행이 없는 관리자를 통과시키면 업무 화면의 API 가 401(NO_SUPPLIER/NO_PARTNER) 을 내고
+ * auth-client 의 refresh 경로가 토큰을 지워 **대표 로그아웃**으로 이어진다(운영 검증에서 확인). 운영 목적의
+ * 조회 · 승인은 /operator/* 콘솔에서 한다. 최종 판정은 서버 guard 가 한다.
  */
 
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { ADMIN_ROLES } from '../../lib/role-constants';
 import { NETURE_SERVICE_INFO, SERVICE_STATUS_LABELS } from '../../lib/home-entry';
 import { useNetureServiceStates } from '../../lib/neture-service-state';
 
@@ -46,10 +47,7 @@ const STATUS_MESSAGES: Record<ServiceKey, Record<string, { title: string; body: 
 
 export function ServiceUsageGate({ service, children }: { service: ServiceKey; children: ReactNode }) {
   const { user } = useAuth();
-  const isAdmin = (user?.roles ?? []).some((r) => ADMIN_ROLES.includes(r));
-  const { states, loading, error, reload } = useNetureServiceStates(Boolean(user) && !isAdmin);
-
-  if (isAdmin) return <>{children}</>;
+  const { states, loading, error, reload } = useNetureServiceStates(Boolean(user));
 
   if (loading || (!states && !error)) {
     return (
