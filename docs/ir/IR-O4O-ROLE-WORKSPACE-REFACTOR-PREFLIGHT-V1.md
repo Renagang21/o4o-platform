@@ -245,6 +245,7 @@ NEXT = GO_PARTNER_RETIREMENT
 | 신규 링크 유효성 | 새 정본 · IR · 색인 · CLAUDE.md · AGENTS.md 의 상대 링크 전수 존재 확인 (§E-1 스크립트) |
 | CANONICAL-INDEX 중복/충돌 | 새 행 1 · 상태 변경 2(3-ROLE-FLOW · F7) · 주석 4 — 중복 없음 |
 | CLAUDE.md / AGENTS.md | 양쪽 우선순위 2 에 동일 정본 추가. § 번호(§0~§16 · §13-A) 불변 |
+| 커밋 | `06f17cb5f` (정본 · IR · 색인 · CLAUDE.md · AGENTS.md · 헤더 표기 2건, 7 파일) — 본 SHA 기록은 후속 커밋 |
 | 관련 quality script | 별도 링크 검사 스크립트 없음 → ad-hoc 검사 수행 (§E-1). `scripts/git/check-staged-scope.mjs` 커밋 전 실행 |
 
 ### E-1. 링크 검사 (ad-hoc)
