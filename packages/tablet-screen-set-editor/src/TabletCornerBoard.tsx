@@ -116,6 +116,12 @@ export interface TabletCornerBoardProps {
   icons?: { tablet?: ReactNode; add?: ReactNode };
   /** 목록 위에 붙일 서비스 전용 슬롯(예: 안내 배너). */
   headerSlot?: ReactNode;
+  /**
+   * WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 카드 하단(액션 버튼 위) 서비스 전용 슬롯.
+   * 위치 ≠ 실제 태블릿 분리 후 "연결된 실제 태블릿 N대 · [태블릿 연결]" 같은 기기 정보를 붙일 때 쓴다.
+   * Core 는 기기 모델을 모른다 — 서비스가 위치 id 로 자기 데이터를 찾아 그린다. 미지정=기존 카드 그대로.
+   */
+  cardFooterSlot?: (tablet: TabletCornerItem) => ReactNode;
 }
 
 /** 코너 제목 = 위치 우선, 없으면 이름. 부제 = 위치가 있을 때만 이름. */
@@ -151,6 +157,7 @@ export function TabletCornerBoard({
   accent,
   icons,
   headerSlot,
+  cardFooterSlot,
 }: TabletCornerBoardProps) {
   const L = { ...DEFAULT_TABLET_CORNER_BOARD_LABELS, ...labels };
   const A = { ...TABLET_CORNER_BOARD_TEAL, ...accent };
@@ -240,6 +247,8 @@ export function TabletCornerBoard({
                       <div className={`mt-0.5 text-[11px] ${A.templateText}`}>{set.templateLabel}</div>
                     )}
                   </div>
+
+                  {cardFooterSlot ? cardFooterSlot(t) : null}
 
                   <div className="mt-auto flex gap-2">
                     <button

@@ -233,6 +233,8 @@ export interface ScreenSet {
   // WO-O4O-KPA-TABLET-TEMPLATE-SELECTION-EDITOR-V1: 화면 세트 렌더 템플릿 키.
   //   서버 GET 은 COALESCE 로 항상 non-null 반환(미지정 → corner_information_basic_v1).
   templateKey: string;
+  // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 콘텐츠 설명(운영 메모, 선택).
+  description?: string | null;
   createdByUserId: string | null;
   createdAt: string;
   updatedAt: string;
@@ -273,7 +275,7 @@ export async function fetchScreenSet(id: string): Promise<ScreenSetDetail> {
   return res.data;
 }
 
-export async function createScreenSet(input: { name: string; tabletId?: string | null; status?: 'draft' | 'active'; templateKey?: string | null }): Promise<ScreenSet> {
+export async function createScreenSet(input: { name: string; description?: string | null; tabletId?: string | null; status?: 'draft' | 'active'; templateKey?: string | null }): Promise<ScreenSet> {
   const res = await request<{ success: boolean; data: ScreenSet }>(`${BASE}/screen-sets`, {
     method: 'POST',
     body: JSON.stringify(input),
@@ -281,10 +283,22 @@ export async function createScreenSet(input: { name: string; tabletId?: string |
   return res.data;
 }
 
-export async function updateScreenSet(id: string, input: { name?: string; status?: ScreenSetStatus; tabletId?: string | null; templateKey?: string | null }): Promise<ScreenSet> {
+export async function updateScreenSet(id: string, input: { name?: string; description?: string | null; status?: ScreenSetStatus; tabletId?: string | null; templateKey?: string | null }): Promise<ScreenSet> {
   const res = await request<{ success: boolean; data: ScreenSet }>(`${BASE}/screen-sets/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(input),
+  });
+  return res.data;
+}
+
+/**
+ * WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: Screen Set 복제.
+ * 이름/설명/blocks(product_list 포함) 복사 → 새 ID(draft). 현재 적용·위치 연결·runtime 상태는 복사하지 않는다.
+ */
+export async function duplicateScreenSet(id: string, name?: string): Promise<ScreenSet> {
+  const res = await request<{ success: boolean; data: ScreenSet }>(`${BASE}/screen-sets/${id}/duplicate`, {
+    method: 'POST',
+    body: JSON.stringify(name ? { name } : {}),
   });
   return res.data;
 }
@@ -485,4 +499,182 @@ export async function saveTabletIdlePlaylist(
     { method: 'PUT', body: JSON.stringify({ items }) },
   );
   return Array.isArray(res.data?.items) ? res.data.items : [];
+}
+
+// ==================== 위치 · 실제 태블릿 · 빠른 상품 수정 (WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1) ====================
+// 세 축 분리: store_tablets = 위치(location 코드 + 메모), store_tablet_devices = 실제 태블릿(연결 기기),
+//   Screen Set = 태블릿 콘텐츠. 위치↔콘텐츠 N:M, 기기↔위치는 current_location_id 로 이동 가능.
+
+export interface ProductListSelection {
+  productType: 'supplier' | 'local';
+  productId: string;
+  qrCodeId?: string | null;
+  name?: string | null;
+}
+export interface ProductListEditorData {
+  screenSetId: string;
+  screenSetName: string;
+  blockId: string | null;
+  hasProductListBlock: boolean;
+  selected: ProductListSelection[];
+  pool: {
+    supplierProducts: Array<{ productType: 'supplier'; productId: string; name: string }>;
+    localProducts: Array<{ productType: 'local'; productId: string; name: string }>;
+  };
+}
+
+/** 빠른 상품 수정 편집 데이터(현재 선택 + 매장 상품 풀). 경영자 경로. */
+export async function fetchProductListEditor(screenSetId: string): Promise<ProductListEditorData> {
+  const res = await request<{ success: boolean; data: ProductListEditorData }>(`${BASE}/screen-sets/${screenSetId}/product-list`);
+  return res.data;
+}
+
+/** 빠른 상품 수정 저장(추가/제거/순서 = 배열 전체 교체). canonical product_list config 만 갱신. */
+export async function saveProductList(
+  screenSetId: string,
+  products: Array<{ productType: 'supplier' | 'local'; productId: string; qrCodeId?: string | null }>,
+): Promise<void> {
+  await request(`${BASE}/screen-sets/${screenSetId}/product-list`, {
+    method: 'PUT',
+    body: JSON.stringify({ products: products.map((p) => ({ productType: p.productType, productId: p.productId, qrCodeId: p.qrCodeId ?? null })) }),
+  });
+}
+
+export interface TabletDevice {
+  id: string;
+  organizationId: string;
+  name: string;
+  currentLocationId: string | null;
+  lastSeenAt: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  /** 연결 코드만 발급되고 아직 기기가 연결하지 않은 상태 */
+  pairingPending: boolean;
+  pairingExpiresAt: string | null;
+  locationName?: string | null;
+  locationCode?: string | null;
+}
+
+/** 이 매장의 실제 태블릿(연결됨 + 연결 대기) 목록. */
+export async function fetchTabletDevices(): Promise<TabletDevice[]> {
+  const res = await request<{ success: boolean; data: TabletDevice[] }>(`${BASE}/tablet-devices`);
+  return res.data ?? [];
+}
+
+/** 위치 카드 [태블릿 연결] → 6자리 연결 코드 발급(10분 유효). */
+export async function createPairingCode(locationId: string): Promise<{ code: string; expiresAt: string; deviceId: string; locationId: string }> {
+  const res = await request<{ success: boolean; data: { code: string; expiresAt: string; deviceId: string; locationId: string } }>(
+    `${BASE}/tablets/${locationId}/pairing-codes`,
+    { method: 'POST' },
+  );
+  return res.data;
+}
+
+export async function updateTabletDevice(
+  id: string,
+  input: { name?: string; currentLocationId?: string | null; isActive?: boolean },
+): Promise<TabletDevice> {
+  const res = await request<{ success: boolean; data: TabletDevice }>(`${BASE}/tablet-devices/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+  return res.data;
+}
+
+/** 기기 연결 해제(비활성 + 토큰 폐기). 위치/콘텐츠는 무변경. */
+export async function disconnectTabletDevice(id: string): Promise<void> {
+  await request(`${BASE}/tablet-devices/${id}`, { method: 'DELETE' });
+}
+
+// ---- 현장 직원 runtime (태블릿 화면 안 [직원 메뉴]) ----
+// 기존 로그인 세션(Bearer) + 이 태블릿의 기기 토큰(X-Tablet-Device-Token) 을 함께 보낸다.
+// 서버는 기기 토큰으로 매장을 확정하고, 로그인 사용자가 그 매장의 owner/admin/manager 인지만 본다.
+// 별도 PIN·직원 계정·태블릿 전용 identity 없음. 경영자 전용(withStoreAuth) 권한을 넓히지 않는다.
+
+export const TABLET_DEVICE_TOKEN_HEADER = 'X-Tablet-Device-Token';
+
+export interface RuntimeLocation {
+  id: string;
+  name: string;
+  location: string | null;
+  currentScreenSetId: string | null;
+  currentScreenSetName: string | null;
+  deviceCount: number;
+}
+export interface RuntimeContent {
+  id: string;
+  name: string;
+  description: string | null;
+  status: ScreenSetStatus;
+  updatedAt: string;
+  sortOrder: number;
+  isVisible: boolean;
+  isCurrent: boolean;
+  blockCount: number;
+}
+export interface RuntimeSnapshot {
+  device: TabletDevice;
+  store: { organizationId: string; name: string };
+  location: { id: string; name: string; location: string | null } | null;
+  currentScreenSet: { id: string; name: string; description: string | null } | null;
+  locations: RuntimeLocation[];
+  contents: RuntimeContent[];
+}
+
+function withDevice(deviceToken: string, options: RequestInit = {}): RequestInit {
+  return { ...options, headers: { ...(options.headers as Record<string, string> | undefined), [TABLET_DEVICE_TOKEN_HEADER]: deviceToken } };
+}
+
+export async function fetchRuntimeDevice(deviceToken: string): Promise<RuntimeSnapshot> {
+  const res = await request<{ success: boolean; data: RuntimeSnapshot }>(`${BASE}/tablet-runtime/device`, withDevice(deviceToken));
+  return res.data;
+}
+
+export async function fetchRuntimeLocationContents(deviceToken: string, locationId: string): Promise<RuntimeContent[]> {
+  const res = await request<{ success: boolean; data: RuntimeContent[] }>(
+    `${BASE}/tablet-runtime/locations/${locationId}/contents`,
+    withDevice(deviceToken),
+  );
+  return res.data ?? [];
+}
+
+/** 이 기기의 위치 이동 — store_tablet_devices.current_location_id 만 바뀐다. */
+export async function moveRuntimeDevice(deviceToken: string, deviceId: string, locationId: string): Promise<RuntimeSnapshot> {
+  const res = await request<{ success: boolean; data: RuntimeSnapshot }>(
+    `${BASE}/tablet-runtime/devices/${deviceId}/location`,
+    withDevice(deviceToken, { method: 'POST', body: JSON.stringify({ locationId }) }),
+  );
+  return res.data;
+}
+
+/** 현재 위치의 표시 콘텐츠 전환(current_screen_set_id). active 콘텐츠만. */
+export async function switchRuntimeContent(deviceToken: string, deviceId: string, screenSetId: string): Promise<RuntimeSnapshot> {
+  const res = await request<{ success: boolean; data: RuntimeSnapshot }>(
+    `${BASE}/tablet-runtime/devices/${deviceId}/content`,
+    withDevice(deviceToken, { method: 'POST', body: JSON.stringify({ screenSetId }) }),
+  );
+  return res.data;
+}
+
+export async function fetchRuntimeProductListEditor(deviceToken: string, screenSetId: string): Promise<ProductListEditorData> {
+  const res = await request<{ success: boolean; data: ProductListEditorData }>(
+    `${BASE}/tablet-runtime/screen-sets/${screenSetId}/product-list`,
+    withDevice(deviceToken),
+  );
+  return res.data;
+}
+
+export async function saveRuntimeProductList(
+  deviceToken: string,
+  screenSetId: string,
+  products: Array<{ productType: 'supplier' | 'local'; productId: string; qrCodeId?: string | null }>,
+): Promise<void> {
+  await request(
+    `${BASE}/tablet-runtime/screen-sets/${screenSetId}/product-list`,
+    withDevice(deviceToken, {
+      method: 'PUT',
+      body: JSON.stringify({ products: products.map((p) => ({ productType: p.productType, productId: p.productId, qrCodeId: p.qrCodeId ?? null })) }),
+    }),
+  );
 }

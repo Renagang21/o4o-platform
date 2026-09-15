@@ -34,11 +34,15 @@ import { createStorePublicHomeRoutes } from './store-public/store-public-home.ha
 import { createStorePublicProductRoutes } from './store-public/store-public-product.handler.js';
 import { createStorePublicContentRoutes } from './store-public/store-public-content.handler.js';
 import { createStorePublicTabletRoutes } from './store-public/store-public-tablet.handler.js';
+// WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 기기 연결(pairing)·heartbeat 공개 경로.
+import { createStorePublicTabletDeviceRoutes } from './store-tablet-device.routes.js';
 
 export function createUnifiedStorePublicRoutes(dataSource: DataSource): Router {
   const router = Router();
   const blogRepo = dataSource.getRepository(StoreBlogPost);
 
+  // 고정 경로(/tablet-pairing/*)가 `/:slug/...` 보다 먼저 매칭되도록 앞에 둔다.
+  router.use('/', createStorePublicTabletDeviceRoutes({ dataSource }));
   router.use('/', createStorePublicHomeRoutes({ dataSource }));
   router.use('/', createStorePublicProductRoutes({ dataSource }));
   router.use('/', createStorePublicContentRoutes({ dataSource, blogRepo }));

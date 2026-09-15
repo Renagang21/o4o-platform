@@ -188,3 +188,122 @@ export async function fetchTabletScreen(slug: string, tabletId?: string, languag
   }
 }
 
+
+// ==================== 실제 태블릿 연결 · heartbeat (WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1) ====================
+// 연결 코드(6자리)로 이 브라우저를 매장의 "실제 태블릿"으로 등록한다. 기기 토큰은 브라우저 저장소에만 두고
+// 서버는 sha256 hash 만 보관한다. heartbeat 는 위치/현재 콘텐츠/version 을 돌려주는 가벼운 폴링(10~30초).
+
+export const TABLET_DEVICE_STORAGE_KEY = 'o4o.tablet.device';
+export const TABLET_DEVICE_TOKEN_HEADER = 'X-Tablet-Device-Token';
+
+export interface StoredTabletDevice {
+  deviceToken: string;
+  deviceId: string;
+  deviceName: string;
+  storeSlug: string;
+  storeName: string;
+  locationId: string | null;
+}
+
+export function loadStoredTabletDevice(): StoredTabletDevice | null {
+  try {
+    const raw = localStorage.getItem(TABLET_DEVICE_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed.deviceToken !== 'string' || typeof parsed.storeSlug !== 'string') return null;
+    return parsed as StoredTabletDevice;
+  } catch {
+    return null;
+  }
+}
+
+export function saveStoredTabletDevice(device: StoredTabletDevice): void {
+  try { localStorage.setItem(TABLET_DEVICE_STORAGE_KEY, JSON.stringify(device)); } catch { /* storage 불가 환경 */ }
+}
+
+export function clearStoredTabletDevice(): void {
+  try { localStorage.removeItem(TABLET_DEVICE_STORAGE_KEY); } catch { /* noop */ }
+}
+
+export interface PairingLookupResult {
+  storeName: string;
+  storeSlug: string;
+  serviceKey: string | null;
+  defaultLocationId: string | null;
+  expiresAt: string;
+  locations: Array<{ id: string; name: string; location: string | null }>;
+}
+
+async function readJson(res: Response): Promise<any> {
+  return res.json().catch(() => ({ success: false, error: `HTTP ${res.status}` }));
+}
+
+/** 연결 코드 확인 — 어느 매장인지·위치 목록. 잘못된/만료 코드는 PAIRING_CODE_INVALID. */
+export async function pairingLookup(code: string): Promise<PairingLookupResult> {
+  const res = await fetch(`${getApiBase()}/tablet-pairing/lookup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }),
+  });
+  const json = await readJson(res);
+  if (!res.ok || !json.success) {
+    const err: any = new Error(json.error?.message || json.error || '연결 코드를 확인할 수 없습니다.');
+    err.code = json.code;
+    err.status = res.status;
+    throw err;
+  }
+  return json.data;
+}
+
+/** 연결 확정 — 기기 이름·위치 선택 후 토큰 발급(1회). */
+export async function pairingClaim(input: { code: string; deviceName?: string; locationId?: string | null }): Promise<StoredTabletDevice> {
+  const res = await fetch(`${getApiBase()}/tablet-pairing/claim`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  const json = await readJson(res);
+  if (!res.ok || !json.success) {
+    const err: any = new Error(json.error?.message || json.error || '태블릿을 연결할 수 없습니다.');
+    err.code = json.code;
+    err.status = res.status;
+    throw err;
+  }
+  const d = json.data;
+  return {
+    deviceToken: d.deviceToken,
+    deviceId: d.deviceId,
+    deviceName: d.deviceName,
+    storeSlug: d.storeSlug,
+    storeName: d.storeName,
+    locationId: d.locationId ?? null,
+  };
+}
+
+export interface DeviceHeartbeat {
+  deviceId: string;
+  deviceName: string;
+  locationId: string | null;
+  location: { id: string; name: string; location: string | null } | null;
+  currentScreenSetId: string | null;
+  /** 위치·현재 콘텐츠·콘텐츠 수정시각을 합친 서명. 바뀌면 화면을 다시 조회한다. */
+  version: string;
+}
+
+/**
+ * 기기 heartbeat(POST — last_seen_at 갱신). 토큰이 무효/해제되면 401 → 호출자는 저장된 기기 정보를 지운다.
+ */
+export async function deviceHeartbeat(slug: string, deviceToken: string): Promise<DeviceHeartbeat> {
+  const res = await fetch(`${getApiBase()}/${encodeURIComponent(slug)}/tablet/device/heartbeat`, {
+    method: 'POST',
+    headers: { [TABLET_DEVICE_TOKEN_HEADER]: deviceToken },
+  });
+  const json = await readJson(res);
+  if (!res.ok || !json.success) {
+    const err: any = new Error(json.error?.message || json.error || 'heartbeat failed');
+    err.code = json.code;
+    err.status = res.status;
+    throw err;
+  }
+  return json.data;
+}

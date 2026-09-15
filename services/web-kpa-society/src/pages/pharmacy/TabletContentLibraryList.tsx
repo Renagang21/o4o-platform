@@ -14,7 +14,7 @@
  */
 
 import { useMemo, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
-import { Edit3, Trash2, Plus, Layers, Eye, X, Loader2, MonitorSmartphone, Check, QrCode, Download, RotateCcw } from 'lucide-react';
+import { Edit3, Trash2, Plus, Layers, Eye, X, Loader2, MonitorSmartphone, Check, QrCode, Download, RotateCcw, Copy, ListChecks, Tag } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import {
@@ -26,7 +26,19 @@ import {
   type ListColumnDef,
 } from '@o4o/operator-ux-core';
 import { TabletKioskPage, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
-import { archiveScreenSet, fetchScreenSet, previewScreenSet, type ScreenSet, type ScreenSetStatus } from '../../api/tabletDisplays';
+import {
+  archiveScreenSet,
+  fetchScreenSet,
+  previewScreenSet,
+  duplicateScreenSet,
+  updateScreenSet,
+  fetchProductListEditor,
+  saveProductList,
+  type ScreenSet,
+  type ScreenSetStatus,
+} from '../../api/tabletDisplays';
+// WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 빠른 상품 수정(경영자 PC · 직원 태블릿 공용 컴포넌트).
+import { TabletProductListQuickEditor } from '../tablet/TabletProductListQuickEditor';
 // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑦: 기존 매장 QR 출력/다운로드 기능 재사용(신규 엔드포인트 없음).
 import {
   getStoreQrCodes,
@@ -78,6 +90,11 @@ const contentActionPolicy = defineActionPolicy<ScreenSet>('kpa:tablet-content', 
     { key: 'qr', label: 'QR 보기·출력', visible: (s) => !!s.publicQrSlug && s.status !== 'archived' },
     // WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1: 보관 항목은 편집 대상이 아니다(복원 후 수정).
     { key: 'edit', label: '수정', visible: (s) => s.status !== 'archived' },
+    // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 콘텐츠 관리 3종 —
+    //   빠른 상품 수정(product_list 선택 목록만) · 이름/설명 변경 · 복제(새 ID, 현재 적용/연결/runtime 은 복사하지 않음).
+    { key: 'quickEdit', label: '상품 빠른 수정', visible: (s) => s.status !== 'archived' },
+    { key: 'rename', label: '이름 · 설명 변경', visible: (s) => s.status !== 'archived' },
+    { key: 'duplicate', label: '복제' },
     // 보관(= soft delete/archived). 확인은 상위 handleArchive 에서 수행(중복 방지). 내부 status 는 archived 그대로.
     { key: 'archive', label: '보관', variant: 'warning', visible: (s) => s.status !== 'archived' },
     // WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1: 보관 확인 문구가 약속한 '다시 확인/되돌리기' 의 실행 지점.
@@ -92,6 +109,9 @@ const ACTION_ICONS: Record<string, ReactNode> = {
   archive: <Trash2 className="w-4 h-4" />,
   restore: <RotateCcw className="w-4 h-4" />,
   qr: <QrCode className="w-4 h-4" />,
+  quickEdit: <ListChecks className="w-4 h-4" />,
+  rename: <Tag className="w-4 h-4" />,
+  duplicate: <Copy className="w-4 h-4" />,
 };
 
 /** 적용 대상 태블릿(최소 형태 — StoreTabletDisplaysPage 의 TabletType 하위집합). */
@@ -176,6 +196,57 @@ export default function TabletContentLibraryList({
   const [activeHighlight, setActiveHighlight] = useState<string | null>(null);
   const listTopRef = useRef<HTMLDivElement | null>(null);
 
+  // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 빠른 상품 수정 / 이름·설명 변경 / 복제.
+  const [quickEditFor, setQuickEditFor] = useState<ScreenSet | null>(null);
+  const [renameFor, setRenameFor] = useState<ScreenSet | null>(null);
+  const [renameName, setRenameName] = useState('');
+  const [renameDesc, setRenameDesc] = useState('');
+  const [renameBusy, setRenameBusy] = useState(false);
+  const [duplicateBusyId, setDuplicateBusyId] = useState<string | null>(null);
+
+  const quickEditLoad = useCallback(() => fetchProductListEditor(quickEditFor!.id), [quickEditFor]);
+  const quickEditSave = useCallback(
+    (products: Array<{ productType: 'supplier' | 'local'; productId: string; qrCodeId?: string | null }>) => saveProductList(quickEditFor!.id, products),
+    [quickEditFor],
+  );
+
+  const openRename = useCallback((s: ScreenSet) => {
+    setRenameFor(s);
+    setRenameName(s.name);
+    setRenameDesc(s.description ?? '');
+  }, []);
+
+  const submitRename = useCallback(async () => {
+    if (!renameFor || renameBusy) return;
+    const name = renameName.trim();
+    if (!name) { toast.error('이름을 입력해 주세요.'); return; }
+    setRenameBusy(true);
+    try {
+      await updateScreenSet(renameFor.id, { name, description: renameDesc.trim() || null });
+      toast.success('이름 · 설명을 저장했습니다.');
+      setRenameFor(null);
+      onRefresh();
+    } catch (e: any) {
+      toast.error(e?.message || '저장에 실패했습니다.');
+    } finally {
+      setRenameBusy(false);
+    }
+  }, [renameFor, renameBusy, renameName, renameDesc, onRefresh]);
+
+  const handleDuplicate = useCallback(async (s: ScreenSet) => {
+    if (duplicateBusyId) return;
+    setDuplicateBusyId(s.id);
+    try {
+      const copy = await duplicateScreenSet(s.id);
+      toast.success(`“${copy.name}” 으로 복제했습니다. (현재 적용 · 위치 연결은 복사되지 않습니다)`);
+      onRefresh();
+    } catch (e: any) {
+      toast.error(e?.message || '복제에 실패했습니다.');
+    } finally {
+      setDuplicateBusyId(null);
+    }
+  }, [duplicateBusyId, onRefresh]);
+
   // HUB 가져오기 완료 → 방금 가져온 사본을 보이게: 필터 초기화(전체) + 1페이지(최신순이라 상단) + 스크롤 + 하이라이트.
   useEffect(() => {
     if (!highlightId) return;
@@ -195,7 +266,7 @@ export default function TabletContentLibraryList({
   const openApply = useCallback((s: ScreenSet) => {
     if (!onApplyToTablet) return;
     if (!tablets || tablets.length === 0) {
-      toast.error('먼저 ‘코너별 운영’에서 태블릿을 추가해 주세요.');
+      toast.error('먼저 ‘위치별 운영’에서 위치를 추가해 주세요.');
       return;
     }
     setApplyFor(s);
@@ -337,7 +408,7 @@ export default function TabletContentLibraryList({
         if (r.status === 'fulfilled') return { id, status: 'success' as const };
         const err = r.reason as { code?: string; message?: string } | null;
         const error = (err?.code === 'SCREEN_SET_IN_USE' || err?.code === 'ARCHIVE_BLOCKED_CONNECTED')
-          ? '코너에 연결되어 있어 보관할 수 없습니다. 먼저 코너 연결을 해제하세요'
+          ? '위치에 연결되어 있어 보관할 수 없습니다. 먼저 위치 연결을 해제하세요'
           : err?.message || '보관하지 못했습니다';
         return { id, status: 'failed' as const, error };
       });
@@ -352,7 +423,7 @@ export default function TabletContentLibraryList({
       toast.error('보관할 수 있는 항목이 없습니다. (이미 보관된 항목은 제외됩니다)');
       return;
     }
-    if (!window.confirm(`선택한 ${ids.length}개 콘텐츠를 보관하시겠습니까?\n콘텐츠는 삭제되지 않으며, ‘보관’ 필터에서 다시 확인할 수 있습니다.\n(코너에 연결된 콘텐츠는 먼저 연결을 해제해야 합니다.)`)) return;
+    if (!window.confirm(`선택한 ${ids.length}개 콘텐츠를 보관하시겠습니까?\n콘텐츠는 삭제되지 않으며, ‘보관’ 필터에서 다시 확인할 수 있습니다.\n(위치에 연결된 콘텐츠는 먼저 연결을 해제해야 합니다.)`)) return;
     const result = await batch.executeBatch(batchArchiveOp, ids);
     if (result.successCount > 0) {
       setSelectedKeys(new Set());
@@ -408,13 +479,13 @@ export default function TabletContentLibraryList({
     {
       key: 'usage',
       // WO-...-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: usageBySet = '현재 화면으로 적용된' 코너(연결만은 미포함) → 정확한 라벨.
-      header: '현재 적용 코너',
+      header: '현재 적용 위치',
       render: (_v, s) => {
         const corners = usageBySet[s.id] ?? [];
         return corners.length > 0 ? (
-          <span className="text-xs text-emerald-700 truncate" title={`현재 적용 코너: ${corners.join(', ')}`}>{corners.join(', ')}</span>
+          <span className="text-xs text-emerald-700 truncate" title={`현재 적용 위치: ${corners.join(', ')}`}>{corners.join(', ')}</span>
         ) : (
-          <span className="text-xs text-slate-400" title="현재 어느 코너에도 적용되지 않음(연결만 되어 있을 수 있음)">현재 미적용</span>
+          <span className="text-xs text-slate-400" title="현재 어느 위치에도 적용되지 않음(연결만 되어 있을 수 있음)">현재 미적용</span>
         );
       },
     },
@@ -448,6 +519,9 @@ export default function TabletContentLibraryList({
             apply: () => openApply(s),
             qr: () => openQr(s),
             edit: () => onEdit(s.id),
+            quickEdit: () => setQuickEditFor(s),
+            rename: () => openRename(s),
+            duplicate: () => { void handleDuplicate(s); },
             archive: () => onArchive(s),
             restore: () => onRestore?.(s),
           }, {
@@ -456,14 +530,16 @@ export default function TabletContentLibraryList({
               ? { preview: true }
               : qrBusy === s.id
                 ? { qr: true }
-                : (busy ? { archive: true, restore: true } : undefined),
+                : duplicateBusyId === s.id
+                  ? { duplicate: true }
+                  : (busy ? { archive: true, restore: true } : undefined),
             // 핸들러 미주입 소비처에서는 '보관 해제' 를 아예 노출하지 않는다(빈 동작 방지).
           }).filter((a) => a.key !== 'restore' || !!onRestore)}
           inlineMax={contentActionPolicy.inlineMax}
         />
       ),
     },
-  ], [templateLabel, usageBySet, onEdit, onArchive, onRestore, busy, handlePreview, previewBusy, activeHighlight, openApply, openQr, qrBusy]);
+  ], [templateLabel, usageBySet, onEdit, onArchive, onRestore, busy, handlePreview, previewBusy, activeHighlight, openApply, openQr, qrBusy, openRename, handleDuplicate, duplicateBusyId]);
 
   const selectCls = 'px-2.5 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400';
 
@@ -497,8 +573,8 @@ export default function TabletContentLibraryList({
             {templateOptions.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
           </select>
           {/* 현재 적용 코너 필터 */}
-          <select value={cornerFilter} onChange={(e) => setCornerFilter(e.target.value)} className={selectCls} aria-label="현재 적용 코너 필터">
-            <option value="">현재 적용 코너 전체</option>
+          <select value={cornerFilter} onChange={(e) => setCornerFilter(e.target.value)} className={selectCls} aria-label="현재 적용 위치 필터">
+            <option value="">현재 적용 위치 전체</option>
             {cornerOptions.map((n) => <option key={n} value={n}>{n}</option>)}
             <option value="__none__">현재 미적용</option>
           </select>
@@ -541,7 +617,7 @@ export default function TabletContentLibraryList({
             loading: batch.loading,
             group: 'actions',
             visible: selectedKeys.size > 0,
-            tooltip: '선택한 콘텐츠를 보관합니다(콘텐츠는 삭제되지 않음). 코너에 연결된 콘텐츠는 먼저 연결 해제 필요.',
+            tooltip: '선택한 콘텐츠를 보관합니다(콘텐츠는 삭제되지 않음). 위치에 연결된 콘텐츠는 먼저 연결 해제 필요.',
           },
         ]}
       />
@@ -704,7 +780,7 @@ export default function TabletContentLibraryList({
             <div className="px-5 py-4 border-b flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h3 className="text-base font-bold text-slate-800">태블릿에 적용</h3>
-                <p className="text-xs text-slate-500 mt-0.5 truncate">“{applyFor.name}” 을(를) 어느 태블릿에 띄울지 고르세요.</p>
+                <p className="text-xs text-slate-500 mt-0.5 truncate">“{applyFor.name}” 을(를) 어느 위치에 띄울지 고르세요.</p>
               </div>
               <button onClick={() => !applyBusyTabletId && setApplyFor(null)} className="p-1.5 rounded hover:bg-slate-100 shrink-0" aria-label="닫기">
                 <X className="w-4 h-4 text-slate-500" />
@@ -729,7 +805,7 @@ export default function TabletContentLibraryList({
                         <MonitorSmartphone className="w-4 h-4 text-slate-400 shrink-0" />
                         <span className="min-w-0 flex-1">
                           <span className="block text-sm font-medium text-slate-800 truncate">{t.name}</span>
-                          <span className="block text-[11px] text-slate-400 truncate">{corner ? `설치 코너: ${corner}` : '설치 코너 미지정'}</span>
+                          <span className="block text-[11px] text-slate-400 truncate">{corner ? `위치: ${corner}` : '위치 코드 미지정'}</span>
                         </span>
                         {busyThis ? (
                           <Loader2 className="w-4 h-4 animate-spin text-teal-600 shrink-0" />
@@ -744,8 +820,58 @@ export default function TabletContentLibraryList({
                 })}
               </ul>
               <p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
-                적용하면 해당 태블릿의 ‘지금 나오는 화면’이 바뀝니다. 자동으로 QR이 만들어지지 않으며, 공개 태블릿 화면에서 새로고침하면 반영됩니다.
+                적용하면 해당 위치의 ‘지금 나오는 화면’이 바뀝니다. 연결된 실제 태블릿은 자동으로(10~30초 안에) 반영됩니다.
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 빠른 상품 수정(product_list 선택 목록만). */}
+      {quickEditFor && (
+        <div className="fixed inset-0 z-[100001] bg-slate-900/50 flex items-center justify-center p-4" role="presentation" onClick={() => setQuickEditFor(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[85vh] overflow-y-auto p-5" onClick={(e) => e.stopPropagation()}>
+            <TabletProductListQuickEditor
+              load={quickEditLoad}
+              save={quickEditSave}
+              onSaved={() => { toast.success('표시 상품을 저장했습니다. 연결된 태블릿에 자동 반영됩니다.'); onRefresh(); }}
+              onClose={() => setQuickEditFor(null)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 이름 · 설명 변경 (기존 PATCH /screen-sets/:id 재사용, description 은 이번 WO 에서 추가된 선택 필드). */}
+      {renameFor && (
+        <div className="fixed inset-0 z-[100001] bg-slate-900/50 flex items-center justify-center p-4" role="dialog" aria-modal="true" onClick={() => !renameBusy && setRenameFor(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-md p-5 space-y-3" onClick={(e) => e.stopPropagation()} data-testid="content-rename-modal">
+            <h3 className="text-base font-bold text-slate-800">이름 · 설명 변경</h3>
+            <label className="block text-sm">
+              <span className="text-slate-600">이름</span>
+              <input
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                value={renameName}
+                maxLength={200}
+                onChange={(e) => setRenameName(e.target.value)}
+                data-testid="content-rename-name"
+              />
+            </label>
+            <label className="block text-sm">
+              <span className="text-slate-600">설명 <span className="text-slate-400">(선택 · 직원이 콘텐츠를 고를 때 보입니다)</span></span>
+              <textarea
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                rows={3}
+                maxLength={1000}
+                value={renameDesc}
+                onChange={(e) => setRenameDesc(e.target.value)}
+                data-testid="content-rename-description"
+              />
+            </label>
+            <div className="flex justify-end gap-2 pt-1">
+              <button type="button" className="px-3 py-2 text-sm rounded-lg border border-slate-200" disabled={renameBusy} onClick={() => setRenameFor(null)}>취소</button>
+              <button type="button" className="px-3 py-2 text-sm rounded-lg bg-indigo-600 text-white disabled:opacity-50" disabled={renameBusy} onClick={() => { void submitRename(); }} data-testid="content-rename-save">
+                {renameBusy ? '저장 중…' : '저장'}
+              </button>
             </div>
           </div>
         </div>

@@ -393,6 +393,13 @@ export interface TabletKioskPageProps {
    * 미지정=기존 동작(fetchProducts 로 매장 상품 표시).
    */
   previewLayoutOnly?: boolean;
+  /**
+   * WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: runtime 자동 갱신 키.
+   * caller(매장 태블릿 페이지)가 heartbeat 로 받은 현재 위치/콘텐츠 version 을 넘기면 값이 바뀔 때
+   * api.fetchScreen 을 다시 호출한다(직원이 현장에서 위치/콘텐츠를 바꾸거나 PC 에서 적용을 바꾼 뒤
+   * 태블릿을 새로고침하지 않아도 반영). 미지정=기존 동작(최초 1회 + 언어 변경 시).
+   */
+  screenRefreshKey?: string | number;
 }
 
 export interface TabletKioskDisplaySettings {
@@ -416,6 +423,7 @@ export function TabletKioskPage({
   previewScreen,
   embedded = false,
   previewLayoutOnly = false,
+  screenRefreshKey,
 }: TabletKioskPageProps) {
   const { slug: routeSlug } = useParams<{ slug: string }>();
   const slug = slugProp ?? routeSlug;
@@ -509,7 +517,7 @@ export function TabletKioskPage({
       .then((s) => { if (!cancelled) setFetchedScreen(s && s.mode === 'screen_set' ? s : null); })
       .catch(() => { if (!cancelled) setFetchedScreen(null); });
     return () => { cancelled = true; };
-  }, [slug, api, previewScreen, viewerLang]);
+  }, [slug, api, previewScreen, viewerLang, screenRefreshKey]);
   // 주입 우선(previewScreen) → 없으면 fetch 결과. mode='screen_set' 인 것만 유효.
   const screen = (previewScreen && previewScreen.mode === 'screen_set') ? previewScreen : fetchedScreen;
 

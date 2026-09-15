@@ -42,6 +42,9 @@ import { ProductMaster } from '../../modules/neture/entities/ProductMaster.entit
 import { StoreProductProfile } from '../../modules/store-core/entities/StoreProductProfile.entity.js';
 import { validateGtin } from '../../utils/gtin.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../utils/store-owner.utils.js';
+// WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 실제 태블릿 기기·연결 코드·현장 runtime + 복제.
+import { registerStoreTabletDeviceRoutes } from './store-tablet-device.routes.js';
+import { duplicateScreenSetRows } from './store-tablet-screen-set-ops.js';
 // WO-O4O-KPA-TABLET-IDLE-BLOCK-INTEGRATION-V1: idle_media block config 검증 (dual-read helper 모듈)
 import { parseIdleMediaConfig, resolveIdleMediaItems } from './store-tablet-idle-block.js';
 // WO-O4O-KPA-TABLET-CONTENT-LIST-BLOCK-SCHEMA-CONTRACT-V1: content_list config 검증
@@ -371,6 +374,11 @@ export function createStoreTabletRoutes(
       },
     });
   }));
+
+  // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1:
+  //   실제 태블릿 기기(store_tablet_devices)·연결 코드·현장 직원 runtime(/tablet-runtime/*)·빠른 상품 수정.
+  //   위치(store_tablets) CRUD 는 아래 기존 경로 그대로(위치 = location 코드 + name 메모).
+  registerStoreTabletDeviceRoutes(router, { dataSource, withStoreAuth, getRequireAuth, storeOwnerServiceKey: options.storeOwnerServiceKey });
 
   // ─── Tablet CRUD ───────────────────────────────────
 
@@ -1448,6 +1456,8 @@ export function createStoreTabletRoutes(
     // WO-O4O-SCREEN-SET-OWNER-SCOPE-SCHEMA-MIGRATION-V1: supplier_id(additive, store/operator=null) 응답 포함.
     `${p}supplier_id AS "supplierId", ` +
     `${p}tablet_id AS "tabletId", ${p}name, ${p}origin, ${p}status, ` +
+    // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: description(additive, nullable).
+    `${p}description, ` +
     `COALESCE(${p}template_key, 'corner_information_basic_v1') AS "templateKey", ` +
     // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: 연결된 screen_set QR slug(additive, nullable).
     `${p}public_qr_slug AS "publicQrSlug", ` +
@@ -1529,6 +1539,8 @@ export function createStoreTabletRoutes(
       if (!name) { res.status(400).json({ success: false, error: 'Screen set name is required', code: 'SCREEN_SET_NAME_REQUIRED' }); return; }
       if (name.length > 120) { res.status(400).json({ success: false, error: 'name too long (max 120)', code: 'VALIDATION_ERROR' }); return; }
       const status = req.body?.status === 'active' ? 'active' : 'draft';
+      // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: description(옵션, 최대 2000자).
+      const description: string | null = typeof req.body?.description === 'string' && req.body.description.trim() ? req.body.description.trim().slice(0, 2000) : null;
       // WO-O4O-KPA-TABLET-SCREEN-SET-TEMPLATE-KEY-SCHEMA-V1: templateKey(옵션). 미지정=NULL(=기본).
       let templateKey: string | null = null;
       if (req.body?.templateKey != null) {
@@ -1548,10 +1560,10 @@ export function createStoreTabletRoutes(
         const ins = await m.query(
           // WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1: 매장 생성 계약 명시 — origin='store'·supplier_id=NULL.
           //   (organization_id=현재 매장, status=draft|active[UI 기본 active], supplier_id 는 매장 원본에 항상 NULL.)
-          `INSERT INTO store_tablet_screen_sets (organization_id, service_key, supplier_id, tablet_id, name, origin, status, template_key, created_by_user_id)
-           VALUES ($1, NULL, NULL, $2, $3, 'store', $4, $5, $6)
+          `INSERT INTO store_tablet_screen_sets (organization_id, service_key, supplier_id, tablet_id, name, description, origin, status, template_key, created_by_user_id)
+           VALUES ($1, NULL, NULL, $2, $3, $7, 'store', $4, $5, $6)
            RETURNING ${setCols('')}`,
-          [organizationId, tabletId, name, status, templateKey, userId],
+          [organizationId, tabletId, name, status, templateKey, userId, description],
         );
         data = await withQrLink(m, organizationId, ins[0].id, ins[0], qrServiceKey);
       });
@@ -1560,6 +1572,29 @@ export function createStoreTabletRoutes(
       if (error?.code === 'SCREEN_SET_QR_FAILED') { respondQrFailure(res); return; }
       console.error('[StoreTablet] POST /screen-sets error:', error);
       res.status(500).json({ success: false, error: 'Failed to create screen set', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
+  // POST /screen-sets/:id/duplicate — 복제(WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1)
+  //   복사: 이름(옵션 name, 기본 "원본 (복사)")·설명·template·blocks(product_list 포함). 새 ID·draft.
+  //   미복사: 현재 적용·위치 연결·legacy tablet_id·QR slug·runtime 상태. QR 은 새 세트용으로 별도 확보(withQrLink).
+  router.post('/screen-sets/:id/duplicate', withStoreAuth(async (req, res, organizationId) => {
+    try {
+      const userId = (req as any).user?.id ?? null;
+      const name = typeof req.body?.name === 'string' ? req.body.name : null;
+      let data: Record<string, unknown> | null = null;
+      let notFound = false;
+      await dataSource.transaction(async (m) => {
+        const created = await duplicateScreenSetRows(m, organizationId, req.params.id, { name, userId, returningCols: setCols('') });
+        if (!created) { notFound = true; return; }
+        data = await withQrLink(m, organizationId, created.id, created, qrServiceKey);
+      });
+      if (notFound) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
+      res.status(201).json({ success: true, data });
+    } catch (error: any) {
+      if (error?.code === 'SCREEN_SET_QR_FAILED') { respondQrFailure(res); return; }
+      console.error('[StoreTablet] POST /screen-sets/:id/duplicate error:', error);
+      res.status(500).json({ success: false, error: 'Failed to duplicate screen set', code: 'INTERNAL_ERROR' });
     }
   }));
 
@@ -1585,6 +1620,12 @@ export function createStoreTabletRoutes(
         const nm = req.body.name.trim();
         if (!nm || nm.length > 120) { res.status(400).json({ success: false, error: 'invalid name', code: 'VALIDATION_ERROR' }); return; }
         params.push(nm); sets.push(`name = $${params.length}`);
+      }
+      // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: description 수정(null/빈 문자열=지움).
+      if (req.body?.description !== undefined) {
+        const d = req.body.description == null ? '' : String(req.body.description).trim();
+        if (d.length > 2000) { res.status(400).json({ success: false, error: 'description too long (max 2000)', code: 'VALIDATION_ERROR' }); return; }
+        params.push(d || null); sets.push(`description = $${params.length}`);
       }
       if (req.body?.status !== undefined) {
         if (!SET_STATUSES_WRITABLE.includes(req.body.status)) { res.status(400).json({ success: false, error: 'invalid status', code: 'INVALID_STATUS' }); return; }

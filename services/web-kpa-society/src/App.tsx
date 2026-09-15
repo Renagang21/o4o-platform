@@ -309,6 +309,8 @@ import { HubGuard } from './components/auth/HubGuard';
 
 // Tablet Kiosk — Phase 2 lazy
 const TabletStorePage = lazy(() => import('./pages/tablet/TabletStorePage').then(m => ({ default: m.TabletStorePage })));
+// WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 실제 태블릿 연결(6자리 코드) 온보딩
+const TabletSetupPage = lazy(() => import('./pages/tablet/TabletSetupPage').then(m => ({ default: m.TabletSetupPage })));
 
 // Store Blog — Phase 2 lazy
 const StoreBlogPage = lazy(() => import('./pages/store/StoreBlogPage').then(m => ({ default: m.StoreBlogPage })));
@@ -928,6 +930,7 @@ function App() {
           <Route path="/privacy" element={<Layout serviceName={SERVICE_NAME}><PrivacyPage /></Layout>} />
 
           {/* Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1) — fullscreen, no auth */}
+          <Route path="/tablet/setup" element={<TabletSetupPage />} />
           <Route path="/tablet/:slug" element={<TabletStorePage />} />
 
           {/* ========================================
