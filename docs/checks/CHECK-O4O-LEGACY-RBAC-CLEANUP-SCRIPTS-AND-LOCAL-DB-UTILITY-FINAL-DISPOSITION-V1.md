@@ -1,7 +1,7 @@
 # CHECK — WO-O4O-LEGACY-RBAC-CLEANUP-SCRIPTS-AND-LOCAL-DB-UTILITY-FINAL-DISPOSITION-V1
 
 **작성일**: 2026-09-15
-**구현 커밋**: (본 문서와 같은 커밋 · `main`) · CI 결과 기록 후속 커밋 1건
+**구현 커밋**: `2ab064c26` (`main`) · CI 결과 기록 후속 커밋 1건
 **판정**: **5 파일 전부 DELETE_DEAD_LEGACY_SCRIPT · DEFERRED 0** — 현재 저장소 정비 트랙 **CLOSED**
 
 > DB host · database name · 계정 · 비밀번호는 기록하지 않는다. 운영 DB 는 read-only(테이블 존재 여부 · 컬럼 존재 여부)만 조회했고 행 내용 · 사용자 식별값은 조회하지 않았다.
@@ -71,7 +71,7 @@ DEFERRED: **0** · 단순 rename 없음 · 다른 실행 경로로 이전 없음
 | api-server `tsc --noEmit` | PASS (삭제 파일은 tsconfig include 밖) |
 | api-server Jest — `cms-lifecycle-schema-cpt-acf-dead-entity-retirement.spec.ts` · `auth-core-dead-lifecycle-retired-user-roles-resurrection-closure.spec.ts` | 2 suites · 70/70 PASS |
 | 운영 DB write / schema / data / migration history 변경 | **0** (SELECT 만 · 스크립트 실행 0회) |
-| CI_PIPELINE / CODEQL / DEPLOY_API | §8 (push 후 기록) |
+| CI_PIPELINE / CODEQL / DEPLOY_API | §8 전부 SUCCESS |
 
 ## 7. 이번 조사에서 발견된 잔재 — 분류만 (새 WO 생성 금지)
 
@@ -87,9 +87,9 @@ DEFERRED: **0** · 단순 rename 없음 · 다른 실행 경로로 이전 없음
 
 | 항목 | 값 |
 |---|---|
-| CI_PIPELINE | (push 후 기록) |
-| CODEQL | (push 후 기록) |
-| DEPLOY_API | (push 후 기록 — `apps/api-server/**` 경로 트리거 · 런타임 내용 변화 없음) |
+| CI_PIPELINE | **SUCCESS** — run `34940593540` (대상 `2ab064c26` · cancelled 없음) |
+| CODEQL | **SUCCESS** — run `34940593602` |
+| DEPLOY_API | **SUCCESS** — run `34940593537` (`apps/api-server/**` 경로 트리거 · 스크립트는 이미지 미포함) |
 
 ## 9. 최종 종결 선언
 
@@ -99,7 +99,7 @@ LOCAL_DB_VIEW_FIX_UTILITY          = DISPOSED (DELETE — cms_views 부재 · E2
 PRODUCTION_SCHEMA_CHANGE           = ZERO
 PRODUCTION_DATA_CHANGE             = ZERO
 OTHER_SERVICE_REGRESSION           = PASS
-CI_PIPELINE                        = (§8)
+CI_PIPELINE                        = SUCCESS (34940593540)
 
 CURRENT_REPOSITORY_CLEANUP_TRACK   = CLOSED
 FURTHER_LEGACY_CLEANUP             = DEFERRED_UNTIL_FUTURE_CENSUS
