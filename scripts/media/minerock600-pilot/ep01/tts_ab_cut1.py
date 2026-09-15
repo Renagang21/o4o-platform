@@ -11,7 +11,9 @@ O4O 서버의 narrow TTS endpoint(POST /api/v1/platform/automation/tts) 를 호�
 - 보고 항목: provider · model · voice · format · duration · HTTP status · 성공 여부 (key/token 없음)
 
 사용: PYTHONUTF8=1 python tts_ab_cut1.py [--only openai|gemini] [--openai-voice nova] [--gemini-voice Kore]
-                                      [--api https://api.neture.co.kr/api/v1]
+                                      [--api https://api.neture.co.kr/api/v1] [--cut 2] [--out <dir>] [--stem ep01-cut2]
+EP01 채택(2026-09-15): Gemini gemini-3.1-flash-tts-preview · voice Kore · 동일 STYLE. CUT2/3 는
+  python tts_ab_cut1.py --only gemini --cut 2 --out C:\tmp\minerock600-pilot\ep01\narration --stem ep01-cut2
 """
 import argparse, json, os, re, subprocess, sys, urllib.error, urllib.request
 from pathlib import Path
@@ -24,9 +26,9 @@ STYLE = ("30~40대 한국 여성 약사가 손님에게 설명하는 톤. 차분
          "자연스러운 속도로. 고유명사 '미네락 육백' 은 또박또박.")
 
 
-def cut1_text() -> str:
+def cut_text(n: int) -> str:
     txt = (HERE / "narration-ko.txt").read_text(encoding="utf-8")
-    m = re.search(r"\[CUT1\]\s*(.*?)(?=\n\[CUT|\Z)", txt, re.S)
+    m = re.search(rf"\[CUT{n}\]\s*(.*?)(?=\n\[CUT|\Z)", txt, re.S)
     return "\n".join(l for l in m.group(1).strip().splitlines() if l.strip())
 
 
@@ -77,7 +79,7 @@ def duration(path):
     return round(float(r.stdout.strip()), 2) if r.returncode == 0 and r.stdout.strip() else None
 
 
-def run(api: str, token: str, provider: str, text: str, voice: str, fmt: str):
+def run(api: str, token: str, provider: str, text: str, voice: str, fmt: str, out_dir: Path, stem: str):
     st, data, headers = post(f"{api}/platform/automation/tts", {"Authorization": f"Bearer {token}"},
                              {"provider": provider, "text": text, "voice": voice, "style": STYLE, "format": fmt})
     rep = {"provider": provider, "http": st, "ok": st == 200}
@@ -91,7 +93,7 @@ def run(api: str, token: str, provider: str, text: str, voice: str, fmt: str):
     h = {k.lower(): v for k, v in headers.items()}
     rep.update({"model": h.get("x-tts-model"), "voice": h.get("x-tts-voice"), "format": h.get("x-tts-format"),
                 "content_type": h.get("content-type"), "bytes": len(data)})
-    out = OUT / f"cut1-{provider}.{fmt}"
+    out = out_dir / f"{stem}.{fmt}"
     out.write_bytes(data)
     rep["file"] = str(out); rep["duration"] = duration(out)
     if fmt == "wav":
@@ -108,17 +110,21 @@ def main():
     ap.add_argument("--openai-voice", default="nova")
     ap.add_argument("--gemini-voice", default="Kore")
     ap.add_argument("--api", default="https://api.neture.co.kr/api/v1")
+    ap.add_argument("--cut", type=int, default=1, help="narration-ko.txt 의 [CUTn] 블록 (기본 1)")
+    ap.add_argument("--out", help="출력 폴더 (기본 narration-test)")
+    ap.add_argument("--stem", help="출력 파일 stem (기본 cut{n}-{provider})")
     a = ap.parse_args()
-    OUT.mkdir(parents=True, exist_ok=True)
-    text = cut1_text()
-    print("CUT1 text:", text)
+    out_dir = Path(a.out) if a.out else OUT
+    out_dir.mkdir(parents=True, exist_ok=True)
+    text = cut_text(a.cut)
+    print(f"CUT{a.cut} text:", text)
     token = login(a.api)
     print("login: ok")
     results = []
     if a.only in (None, "openai"):
-        results.append(run(a.api, token, "openai", text, a.openai_voice, "mp3"))
+        results.append(run(a.api, token, "openai", text, a.openai_voice, "mp3", out_dir, a.stem or f"cut{a.cut}-openai"))
     if a.only in (None, "gemini"):
-        results.append(run(a.api, token, "gemini", text, a.gemini_voice, "wav"))
+        results.append(run(a.api, token, "gemini", text, a.gemini_voice, "wav", out_dir, a.stem or f"cut{a.cut}-gemini"))
     print(json.dumps(results, ensure_ascii=False, indent=1))
 
 

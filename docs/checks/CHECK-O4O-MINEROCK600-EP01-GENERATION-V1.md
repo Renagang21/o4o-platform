@@ -37,6 +37,22 @@
 - smoke(EP01 산출물 아님, scratch 전용): `testsrc2` 1280×720 6s 클립 3개 + 440Hz 3.7s 가짜 내레이션(cut2) → CUT 길이 6.00/4.90/6.00 계산 정상 → `ep01-v1-preview.mp4` 1920×1080 · 오디오 · 16.90s · 오류 0. 프레임 추출 육안: 실제 병 라벨 원본 유지 · 경도 scale PIP · 자막 정상. 720p 입력은 1080p 로 업스케일되므로 Seedance 는 1080p 출력 권장.
 - 임의 EP01 영상 생성·합성은 하지 않음.
 
+### 2-2. 내레이션 3개 확보 · 실측 (2026-09-15 추가 — 아래 §1 #10 · §4 1 의 ElevenLabs 는 이 시점에 대체됨)
+
+- 결정: ElevenLabs 제외 → O4O TTS endpoint(`POST /api/v1/platform/automation/tts`, [CHECK-…-TTS-NARROW-ENDPOINT-V1](CHECK-O4O-AUTOMATION-TTS-NARROW-ENDPOINT-V1.md)) · **Gemini `gemini-3.1-flash-tts-preview` · voice `Kore`** 채택(CUT1 청취 → 사용자 승인 전제). OpenAI 는 크레딧 소진으로 미비교.
+- 생성: CUT1 = smoke 산출물 복사(재생성 없음) · CUT2/CUT3 각 1회 · 동일 style · 속도 변경·후처리 없음. 원본 `.wav`(PCM 24kHz mono) 보존 + ffmpeg `.mp3`. 위치 `C:\tmp\minerock600-pilot\ep01\narration\ep01-cut{1,2,3}.{wav,mp3}`.
+- `assemble_ep01.py --measure` (clips 없음 → clip 제한 없이 산출):
+
+| CUT | 내레이션 실측 | 권장 CUT 길이(+0.4/0.8) | 기획 |
+|---|---|---|---|
+| 1 | 8.88s | **10.08s** | 7s |
+| 2 | 12.28s | **13.48s** | 10s |
+| 3 | 13.44s | **14.64s** | 10s |
+| 합계 | 34.60s | **38.20s** | 27s (목표 25~30s) |
+
+- 발음: CUT1 사용자 청취 대기. CUT2/3 은 텍스트가 한글 숫자 표기("천오십 미터"·"경도 육백")라 오독 요인 없음 — 기계 검증 불가, 청취 확인 필요.
+- 미실행: 영상 생성 · FFmpeg 최종 합성. 다음 판단(사용자): 38.2s 수용 vs 대본 축약.
+
 ## 3. 1차 합성본 검수 보고 (생성 후 기입)
 
 | 항목 | 값 |

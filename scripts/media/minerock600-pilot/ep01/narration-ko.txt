@@ -1,4 +1,4 @@
-# MINEROCK600 EP01 — S-01 내레이션 (ElevenLabs 입력용)
+# MINEROCK600 EP01 — S-01 내레이션 (O4O TTS endpoint 입력용 · Gemini gemini-3.1-flash-tts-preview · voice Kore)
 # TTS 안전을 위해 숫자는 한글로 풀어 쓴다 (자막 subtitles-ko.srt 는 숫자 표기 유지). 대본 §2 확정안과 내용 동일.
 # 한 CUT 씩 따로 생성한다 (3 파일, 같은 한국어 여성 voice). 파일명: ep01-cut1.mp3 / ep01-cut2.mp3 / ep01-cut3.mp3
 # 길이 기준 CUT1 ≈ 6s · CUT2 ≈ 9s · CUT3 ≈ 9s — 넘어도 속도를 바꾸지 않는다. 실측(--measure) 후 CUT 길이를 내레이션에 맞춘다.

@@ -1,6 +1,6 @@
 """MINEROCK600 EP01 1차 합성 (FFmpeg).
 
-Seedance raw clip 3개 + ElevenLabs 내레이션 3개 + 실제 제품 Cutout + 정확 그래픽 + 한글 자막
+Seedance raw clip 3개 + O4O TTS(Gemini) 내레이션 3개 + 실제 제품 Cutout + 정확 그래픽 + 한글 자막
 → ep01-v1-preview.mp4. 자체 편집기 없음. 모든 원본은 리포 밖(C:/tmp/minerock600-pilot).
 
   python assemble_ep01.py            # 합성
@@ -12,7 +12,7 @@ CUT 길이 규칙: 기획값 7/10/10s 는 기준일 뿐. 내레이션 파일이 
 
 입력 규약 (없으면 해당 단계 건너뛰고 보고):
   ep01/clips/cut1.mp4  cut2.mp4  cut3.mp4      Seedance 2.5 raw (16:9)
-  ep01/narration/ep01-cut1.mp3 (cut2/cut3)      ElevenLabs
+  ep01/narration/ep01-cut1.mp3 (cut2/cut3)      O4O TTS endpoint (Gemini Kore, tts_ab_cut1.py)
   product/minerock600-product-cutout-provisional.png
   png/east-sea-bedrock-concept.png · hardness-scale.png · mineral-Ca.png · mineral-Mg.png
 자막 텍스트는 subtitles-ko.srt 가 아니라 아래 SUBS(같은 내용) 를 PIL 로 PNG 렌더 → overlay.

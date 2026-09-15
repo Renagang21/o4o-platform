@@ -1,7 +1,7 @@
-# MINEROCK600 EP01 — 1차 생성 Runbook (Higgsfield · Seedance 2.5 · ElevenLabs · FFmpeg)
+# MINEROCK600 EP01 — 1차 생성 Runbook (Higgsfield · Seedance 2.5 · O4O TTS(Gemini) · FFmpeg)
 
 > **Job**: VIDEO `8a357640-ad64-42f3-ae4c-43519ce78222` (`IN_PROGRESS` · statusNote `EP01 첫 생성 준비`) · **선행**: [CHECK-…-EP01-PREP-V1](../../checks/CHECK-O4O-MINEROCK600-EP01-PREP-V1.md) · 대본 [EP01-SCRIPT-AND-STORYBOARD-V1](EP01-SCRIPT-AND-STORYBOARD-V1.md)
-> **제작 스택(사용자 결정 2026-09-14)**: 1순위 Higgsfield + Seedance 2.5 · 보조 Veo 3.1(4/6/8s 재생성·camera control) · 내레이션 ElevenLabs(한국어 여성 voice, Starter 이상 상업 라이선스) · 합성 FFmpeg(Claude Code)
+> **제작 스택(사용자 결정 2026-09-14)**: 1순위 Higgsfield + Seedance 2.5 · 보조 Veo 3.1(4/6/8s 재생성·camera control) · 내레이션 **O4O TTS endpoint**(`POST /api/v1/platform/automation/tts` · Gemini `gemini-3.1-flash-tts-preview` · voice `Kore`; ElevenLabs 는 2026-09-15 제외) · 합성 FFmpeg(Claude Code)
 > **역할 분담**: 외부 서비스 로그인·구독·결제·생성 버튼 = **사용자** / 텍스트·프롬프트·파일·Media Library·Job·합성 = Claude Code
 
 ---
@@ -19,19 +19,22 @@ AI 영상  = 약사 A 움직임 + 바다/암반 분위기 + 카메라 + 배경
 - CUT 2: 1,050m 를 수심으로 시각화하지 않는다. 숫자·측정선·텍스트 없음. `1,050m 암반수` 는 그래픽 PIP 만.
 - 첫 버전은 **CUT 별 생성 → 합성**. 성공 시 2차 실험으로 27초 one-pass 비교.
 
-## 1. S-01 내레이션 (ElevenLabs) — 사용자 실행
+## 1. S-01 내레이션 (O4O TTS endpoint · Gemini) — Claude Code 실행
 
-텍스트 정본: [`scripts/media/minerock600-pilot/ep01/narration-ko.txt`](../../../scripts/media/minerock600-pilot/ep01/narration-ko.txt) (대본 §2 원문, CUT 별 3 블록).
+> 2026-09-15 정정: ElevenLabs 는 파이프라인에서 제외. O4O 서버가 이미 가진 Gemini 연결로 TTS 를 자체 제작환경 안에서 처리한다 ([CHECK-O4O-AUTOMATION-TTS-NARROW-ENDPOINT-V1](../../checks/CHECK-O4O-AUTOMATION-TTS-NARROW-ENDPOINT-V1.md)).
+
+텍스트 정본: [`scripts/media/minerock600-pilot/ep01/narration-ko.txt`](../../../scripts/media/minerock600-pilot/ep01/narration-ko.txt) (대본 §2 원문, CUT 별 3 블록, 숫자는 한글 표기).
 
 | 항목 | 값 |
 |---|---|
-| 플랜 | Starter 이상(상업 이용). 무료 플랜 산출물은 사용 금지 |
-| Voice | 한국어 지원 여성, 차분·신뢰(광고 톤 아님). 후보를 2~3개 들어보고 **하나를 O4O 공통 voice 로 고정**(12편 동일) — Voice 이름/ID 를 보고에 기록 |
-| Model | Multilingual v2 (또는 v3 가 안정적이면 v3) |
-| 설정 | Stability 0.55 · Similarity 0.75 · Style 0.15 · Speaker boost on · Speed 1.0 (길이 초과 시 0.95 → 0.9) |
-| 생성 단위 | CUT 별 3회 (`[CUT1]` / `[CUT2]` / `[CUT3]` 블록 각각) |
-| 목표 길이 | 기준 CUT1 ≈ 6s · CUT2 ≈ 9s · CUT3 ≈ 9s — 넘어도 속도를 바꾸지 않는다. 실측 후 CUT 길이를 내레이션에 맞춘다 |
-| 저장 | `C:\tmp\minerock600-pilot\ep01\narration\ep01-cut1.mp3` · `ep01-cut2.mp3` · `ep01-cut3.mp3` (mp3 44.1kHz 128k 이상) |
+| Endpoint | `POST /api/v1/platform/automation/tts` (platform admin guard · provider/model 서버 고정 · key 비노출) |
+| Provider / Model | `gemini` / `gemini-3.1-flash-tts-preview` (EP01 채택 2026-09-15 · 12편 동일 provider 유지) |
+| Voice | `Kore` (O4O 공통 voice 로 고정) |
+| Style | "30~40대 한국 여성 약사가 손님에게 설명하는 톤. 차분하고 신뢰감 있게, 광고 성우처럼 과장하지 않고, 자연스러운 속도로. 고유명사 '미네락 육백' 은 또박또박." |
+| 생성 단위 | CUT 별 1회 (`[CUT1]` / `[CUT2]` / `[CUT3]` 블록 각각) — `python tts_ab_cut1.py --only gemini --cut N --out C:\tmp\minerock600-pilot\ep01\narration --stem ep01-cutN` |
+| 출력 | 서버는 WAV(PCM 24kHz mono) 반환 → 원본 `.wav` 보존 + ffmpeg 로 `.mp3` 청취/합성본. **속도 변경·time stretch 없음** |
+| 목표 길이 | 넘어도 속도를 바꾸지 않는다. 실측(`assemble_ep01.py --measure`) 후 CUT 길이(실측 + 0.4/0.8s)를 내레이션에 맞춘다 |
+| 저장 | `C:\tmp\minerock600-pilot\ep01\narration\ep01-cut1.mp3` · `ep01-cut2.mp3` · `ep01-cut3.mp3` (+ 같은 이름 `.wav`) |
 
 발음 주의: `미네락600` → "미네락 육백", `1,050미터` → "천오십 미터", `경도 600` → "경도 육백". 잘못 읽으면 텍스트를 한글 숫자로 바꿔 재생성한다.
 
