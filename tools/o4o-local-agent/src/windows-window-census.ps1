@@ -1,4 +1,4 @@
-# O4O Local Work Agent — 창 목록 조사
+﻿# O4O Local Work Agent — 창 목록 조사
 #
 # WO-O4O-WINDOWS-APP-WINDOW-CONTROL-V0 §6·§7·§17·§20
 #
@@ -14,6 +14,9 @@
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+# 창 제목 · process 이름(한글)을 JSON 으로 내보낸다 — stdout 을 UTF-8 로 고정한다(기본 CP949 면 agent 쪽에서 깨진다).
+# WO-O4O-AUTOMATION-RECOVERY-REAL-SMOKE-CLOSURE-V1 — real smoke 에서 'Doctors.메인' 이 U+FFFD 로 깨져 matchWindows 가 0건이 된 결함 수정.
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 Add-Type -TypeDefinition @'
 using System;

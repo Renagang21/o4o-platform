@@ -73,7 +73,24 @@
 5. smoke 1(브라우저 막힌 경로)·smoke 3(유도 복구)도 같은 loop 에서 관찰.
 6. 관찰 항목(§12) 로그 → 이 CHECK 갱신 → CLOSURE 판정.
 
+## 8. 실 smoke 재개(2026-09-15) — 실행 전제 충족 + 범용 UTF-8 stdout 결함 발견·수정
+
+§4 의 BLOCKED 전제가 이번 대화형 세션(사용자 실 PC)에서 해소됐다: paired Local Agent 가 loopback 47821 에서 `connected:true`(사용자가 [이 PC 연결] 수행), Doctors 실행 중, O4O 채팅→서버측 `runWorkAgent`(프로덕션 `api.neture.co.kr`)→paired Agent loop 가 실제로 구동됐다. 그 결과 **선행 WO 가 목표로 한 "서비스 개선 갭 발견"이 실제로 일어났다.**
+
+- **경위**: `[작업 수행]`(▶) 실행 시 Doctors 가 열려 있는데도 `인계 사유 site_not_ready`(행동 0단계·AI 판단 0회)로 끝났다. (그 전 두 전제 문제 — ① 웹 세션이 pairing 계정과 다른 계정으로 로그인되어 403 `WORK_AGENT_NOT_AVAILABLE`, ② `[전송/채팅]`(↑)·Enter 는 work-agent 가 아니라 일반 채팅 — 은 사용자 조치·경로 안내로 해소.)
+- **근본 원인(확정)**: agent census 의 **UTF-8 stdout 인코딩 결함**. `windows-window-control.mjs` `runScript` 는 `execFile(powershell, [-File, census.ps1])` 을 인코딩 옵션 없이 호출 → Node 는 stdout 을 UTF-8 로 디코드하는데, 한국어 Windows PowerShell 5.1 은 리다이렉트된 stdout 을 OEM 코드페이지(cp949)로 출력. 결과로 census 의 `processName='Doctors.메인'` 이 `Doctors.` + U+FFFD×4 로 깨져 `matchWindows()` 가 **0건** → 실행 중인 창을 "실행 안 됨"으로 오판 → `site_not_ready`.
+- **성격**: **범용 runtime 결함**. Doctors 특정이 아니라 **비ASCII 프로세스명을 가진 모든 Windows 앱**에 영향. real smoke 가 아니었으면 드러나지 않았을 실사용 결함(선행 WO 의 smoke 목적 = "Agent 가 막히는 지점 발견"에 정확히 부합).
+- **수정(§14 최소 수정·CLOSURE 범위 내, 별도 WO 없음)**:
+  - `tools/o4o-local-agent/src/windows-window-census.ps1` 상단에 `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` 1줄 추가(이미 동일 계약을 가진 `windows-uia.ps1:23`·`windows-uia-host.ps1:33` 과 같은 idiom). Node 쪽 cp949 추측 디코딩은 하지 않음(경계는 스크립트가 자신의 stdout 계약을 UTF-8 로 고정하는 쪽).
+  - PS5.1 `-File` 파싱 안전을 위해 해당 파일 **UTF-8 BOM 유지 확인**.
+  - **census 범위 확정**: Node 가 stdout 을 파싱하는 .ps1 중 OS 유래 자유 텍스트(창 제목·프로세스명)를 내보내는 것은 census.ps1 하나뿐. UIA 계열 2종은 이미 계약 적용됨. 나머지(activate·app-launch·browser-open·computer-inspect·computer-input)는 출력이 boolean·int·고정 코드 문자열뿐이라 cp949 위험 없음 → 미적용.
+- **검증**:
+  - 실제 `execFile` 경로 재실측: `censusWindows()`→`Doctors.메인`(정상)·`matchWindows(windows.doctors)`=**1건**(수정 전 0건).
+  - agent 계층 node:test 6 스위트 green: work-target 13 / windows-automation-safety 11 / windows-uia 5 / windows-test-surface 3 / windows-uia-persistent-client 6 / browser-dom 17.
+  - api-server jest 5 스위트 green(53/53): windows-app-window-control · windows-automation-safety · windows-ui-automation · windows-uia-test-surface · work-target-discovery.
+- **다음**: 같은 loop 에서 read-only 첫 smoke(`반납대상 리스트 조회`) 재개 → §12 관찰 항목 기록 → smoke 1·3 → CLOSURE 판정. Doctors 환경 A/B/C 확인은 등록/저장 성격 작업 전에 선행(§4 원칙 유지).
+
 ---
 
 *기준 commit(census): `5e08e23ef` / 테스트 수정 commit: 본 CHECK 커밋과 동일 리비전*
-*최종 판정: BLOCKED (실 smoke 미실행) · CLOSURE 미종료*
+*최종 판정: BLOCKED (실 smoke 미실행) · CLOSURE 미종료 — §8(2026-09-15) 이후 실 smoke 재개 중, 범용 UTF-8 stdout 결함 수정 반영. CLOSURE 판정은 smoke 1·2·3 관찰 완료 후.*
