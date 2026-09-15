@@ -21,7 +21,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[3]
 OUT = Path(r"C:\tmp\minerock600-pilot\ep01\narration-test")
-ACCOUNTS = REPO / "docs/local/TEST-ACCOUNTS.local.md"
+ACCOUNTS = Path(os.environ.get("O4O_TEST_ACCOUNTS_FILE") or REPO / "docs/local/TEST-ACCOUNTS.local.md")  # worktree 에서는 env 로 메인 체크아웃 경로 지정
 STYLE = ("30~40대 한국 여성 약사가 손님에게 설명하는 톤. 차분하고 신뢰감 있게, 광고 성우처럼 과장하지 않고, "
          "자연스러운 속도로. 고유명사 '미네락 육백' 은 또박또박.")
 
