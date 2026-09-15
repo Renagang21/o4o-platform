@@ -97,6 +97,7 @@
 | 구현 커밋 | `e393c2f52` (origin/main · 로컬 `6e1261d24` 를 `c1aeca061` 위로 cherry-pick) |
 | Deploy Web Services run | `34917407647` — detect-changes → deploy-neture success (다른 서비스 skipped) |
 | CI · CodeQL | CodeQL `34917407588` success. CI Pipeline `34917407600` 은 다른 세션의 후속 push(`c12f8c746`) 로 concurrency **cancelled** — 본 변경의 vitest 20 · tsc 0 은 로컬 확인. 후속 커밋 CI `34918113529` 가 같은 코드를 포함해 실행 중 |
+| CI · 후손 커밋 success (보충) | **CI Pipeline `34918113529` = success** (head `c12f8c746`). `git merge-base --is-ancestor e393c2f52 c12f8c746` = true → `e393c2f52` 는 `c12f8c746` 의 조상이며 본 변경 전체가 해당 CI 대상에 포함됨. 다음 커밋 `55c76b245` 의 CI `34922406460` 은 cancelled 이므로 success 로 기록하지 않음 |
 | CHECK 갱신 커밋 | 본 커밋 |
 | 최종 상태 | `HEAD == origin/main` · 본 WO 범위 미커밋 0건 |
 
