@@ -318,7 +318,7 @@ export default function O4OHomePage() {
             {workPending && (
               <p className="m-0 flex items-center gap-2 text-sm text-slate-400">
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                등록된 사이트 화면을 보며 작업 중... (Chrome 탭을 그대로 두세요)
+                등록된 화면을 보며 작업 중... (열려 있는 화면을 그대로 두세요)
               </p>
             )}
             {/* WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §19·§20 — 결과와 인계 안내. 실제 화면은 Chrome 에 그대로 있다. */}
@@ -331,7 +331,12 @@ export default function O4OHomePage() {
                   {workResult.path ? ` · 현재 경로 ${workResult.path}` : ''}
                 </p>
                 {workResult.progress === 'needs_user' && (
-                  <p className="m-0 mt-2 text-sm text-slate-700">Chrome 의 현재 화면에서 직접 이어서 진행하세요. 필요하면 다음 문장으로 다시 요청할 수 있습니다.</p>
+                  <p className="m-0 mt-2 text-sm text-slate-700">
+                    {workResult.target?.targetType === 'windows_app'
+                      ? '프로그램의 현재 화면에서 직접 이어서 진행하세요.'
+                      : 'Chrome 의 현재 화면에서 직접 이어서 진행하세요.'}{' '}
+                    필요하면 다음 문장으로 다시 요청할 수 있습니다.
+                  </p>
                 )}
               </div>
             )}

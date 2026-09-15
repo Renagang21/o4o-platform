@@ -90,6 +90,19 @@
   - api-server jest 5 스위트 green(53/53): windows-app-window-control · windows-automation-safety · windows-ui-automation · windows-uia-test-surface · work-target-discovery.
 - **다음**: 같은 loop 에서 read-only 첫 smoke(`반납대상 리스트 조회`) 재개 → §12 관찰 항목 기록 → smoke 1·3 → CLOSURE 판정. Doctors 환경 A/B/C 확인은 등록/저장 성격 작업 전에 선행(§4 원칙 유지).
 
+## 9. 실 smoke 재개(2026-09-15) — PC 작업에 'Chrome' 하드코딩 표시 결함 발견·수정
+
+§8 수정 후 재개한 read-only smoke 에서 실제로 갭이 관찰됐다: Doctors(Windows 앱) 작업이 `행동 4단계 · AI 판단 3회 · 인계 사유 unsupported_control · 현재 경로 window:닥터스` 로 진전(= `site_not_ready` 해소, §8 수정 효과 실증). 그런데 인계 안내 문구가 **"Chrome 의 현재 화면에서 직접 이어서 진행하세요"** 로 떠 — PC(Windows 앱) 작업인데 'Chrome' 을 언급하는 표시 오류가 드러났다.
+
+- **근본 원인(확정)**: 백엔드 `renderWorkAgentMessage`(work-agent-runtime.ts) 는 `target.targetType === 'windows_app'` 을 보고 "프로그램 화면 / Chrome 화면"을 이미 올바르게 갈라 쓰고, 라우터 응답(`ai-proxy.routes.ts:307`)도 `target` 을 그대로 실어 보낸다. 결함은 **프론트**에 있었다: `services/web-neture/src/lib/ai/work-agent.ts` 의 `WorkAgentResult` 타입이 `target` 필드를 선언하지 않아 무시됐고, `O4OHomePage.tsx` 가 `needs_user` 안내(라인 334)와 작업 중 안내(라인 321)를 **target 종류와 무관하게 'Chrome' 로 하드코딩**했다.
+- **성격**: 범용 표시 결함(browser_site 든 windows_app 이든 같은 문구). Doctors 특정 아님. real smoke 가 아니었으면 드러나지 않았을 실사용 갭.
+- **수정(§14 최소 수정·CLOSURE 범위 내, 별도 WO 없음 — tooltip UX 변경은 여전히 보류)**:
+  - `work-agent.ts`: `WorkTargetSummary { targetType, displayName }` 추가, `WorkAgentResult.target: WorkTargetSummary | null` 선언(서버가 이미 보내는 안전 필드만).
+  - `O4OHomePage.tsx` 라인 334: `workResult.target?.targetType === 'windows_app'` 이면 "프로그램의 현재 화면에서…", 아니면 "Chrome 의 현재 화면에서…" 로 분기.
+  - `O4OHomePage.tsx` 라인 321(작업 중, target 미확정 시점): 사이트/탭 전제를 걷어내고 target 중립 문구 "등록된 화면을 보며 작업 중... (열려 있는 화면을 그대로 두세요)" 로 교체.
+- **검증**: `services/web-neture` `tsc --noEmit` PASS(신규 필드·분기 타입 정합). 프론트 전용 표시 변경이라 agent/api 회귀는 §8 결과 유지.
+- **다음**: 계속 read-only smoke 관찰 — `unsupported_control` 이 새 서비스 개선 갭(Agent 가 다루지 못하는 창 요소에서 멈추는 지점·사용자 질문이 가장 효율적인 지점) → §12 기록 → smoke 1·3 → CLOSURE 판정.
+
 ---
 
 *기준 commit(census): `5e08e23ef` / 테스트 수정 commit: 본 CHECK 커밋과 동일 리비전*

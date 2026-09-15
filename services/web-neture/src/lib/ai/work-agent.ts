@@ -22,6 +22,16 @@ export interface WorkAgentStep {
   navigated: boolean;
 }
 
+/**
+ * 대상 준비 요약(안전 필드만) — 서버 `target` 을 그대로 받는다.
+ * `targetType` 으로 등재 사이트(browser_site)인지 Windows 프로그램(windows_app)인지 구분해
+ * "Chrome 화면 / 프로그램 화면" 안내 문구를 갈라 쓴다(PC 작업에 'Chrome' 을 쓰지 않기 위해서다).
+ */
+export interface WorkTargetSummary {
+  targetType: 'browser_site' | 'windows_app';
+  displayName: string;
+}
+
 export interface WorkAgentResult {
   goal: { goalId: string; status: 'active' | 'waiting_for_user' | 'completed' | 'stopped'; siteId: string | null; displayName: string };
   progress: 'progress' | 'no_progress' | 'needs_user' | 'completed' | 'failed';
@@ -33,6 +43,7 @@ export interface WorkAgentResult {
   history: WorkAgentStep[];
   message: string;
   errorCode: string | null;
+  target: WorkTargetSummary | null;
 }
 
 export class WorkAgentError extends Error {
