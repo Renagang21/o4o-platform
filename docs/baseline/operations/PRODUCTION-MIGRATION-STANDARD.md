@@ -1,8 +1,13 @@
 # Production Migration Standard
 
 **Status:** Active
-**Version:** 1.0
-**Last Updated:** 2026-01-29
+**Version:** 2.0
+**Last Updated:** 2026-09-15
+
+> **v2.0 (2026-09-15, WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1)**
+> 신규 환경의 **canonical schema bootstrap** 과 기존 운영 환경의 **incremental migration** 을 분리했다.
+> 이 판에서 정정된 항목과 근거는 [§ Bootstrap / Incremental Separation](#bootstrap--incremental-separation) 과
+> [§ Change Log](#change-log) 에 기록한다. 이전 판의 `migrations` 테이블 표기는 오기이며 실제 history 테이블은 `typeorm_migrations` 다.
 
 ---
 
@@ -22,7 +27,9 @@ TypeORM migrations run automatically on every deployment to `main` branch.
 1. Code merged to `main` branch
 2. GitHub Actions builds the API image and pushes it to Artifact Registry
 3. Cloud Run Job `o4o-api-migrations` executes **before** the API service is deployed
-4. Migration runs: `node dist/migrate.js` (exit 1 on failure → workflow stops here)
+4. Migration runs: `node dist/migrate.js` (exit 1 on failure → workflow stops here).
+   The job first classifies `DATABASE_STATE` (see § Bootstrap / Incremental Separation) and then
+   applies **only** the incremental manifest — historical migrations are never replayed.
 5. API service revision is deployed **only if migrations succeed** — on failure the previous
    serving revision stays untouched
 
@@ -93,10 +100,13 @@ gcloud logs read \
 Local development database only. The production DB is not directly accessible from developer machines (Cloud SQL Auth Proxy or the Cloud Run `/cloudsql/...` socket only).
 
 ```bash
-# Development only
+# Development only (isolated local PostgreSQL — never the production proxy port)
 cd apps/api-server
-pnpm run migration:run
+pnpm run migration:show   # = node src/migrate.ts --status  (classify + pending, no writes)
+pnpm run migration:run    # = node src/migrate.ts           (bootstrap if FRESH_EMPTY, then incremental)
 ```
+
+Both scripts execute the same `src/migrate.ts` entry as the Cloud Run job; there is no second runner.
 
 ---
 
@@ -110,6 +120,19 @@ pnpm run migration:generate -- src/database/migrations/DescriptiveName
 ```
 
 This creates a timestamped migration file in `src/database/migrations/`.
+
+**Naming contract (enforced by `scripts/db/check-migration-contract.mjs` in CI):**
+
+| Item | Rule |
+|---|---|
+| File | `src/database/migrations/<epoch13>-<PascalName>.ts` — `epoch13` = `Date.now()` at creation, **13 digits** |
+| Class | `export class <PascalName><epoch13> implements MigrationInterface` |
+| `name` | `name = '<PascalName><epoch13>'` — identical to the class name |
+| Order | `epoch13` strictly greater than every epoch already in `INCREMENTAL_MIGRATIONS` |
+| Registration | import + append to `INCREMENTAL_MIGRATIONS` in `src/database/incremental/manifest.ts` (append only) |
+
+TypeORM orders migrations by `parseInt(name.slice(-13))`, so a non-13-digit or non-epoch suffix breaks
+ordering silently (the historical `YYYYMMDDhhmmss`-style names are frozen for this reason).
 
 ### Step 2: Review Generated SQL
 
@@ -134,9 +157,9 @@ pnpm run migration:revert
 ### Step 4: Commit and Deploy
 
 ```bash
-git add src/database/migrations/
-git commit -m "feat(db): add migration for [description]"
-git push origin feature/your-branch
+git add -- src/database/migrations/<epoch13>-<PascalName>.ts src/database/incremental/manifest.ts
+git commit -m "feat(db): add migration for [description]" -- src/database/migrations/<epoch13>-<PascalName>.ts src/database/incremental/manifest.ts
+git push origin HEAD:main
 ```
 
 Merge to `main` → Migration runs automatically on deployment.
@@ -150,9 +173,12 @@ Merge to `main` → Migration runs automatically on deployment.
 **Migration Config:** `src/database/migration-config.ts`
 
 - Lightweight config (NO entity imports)
-- Avoids bundling issues
+- Loads **only** `INCREMENTAL_MIGRATIONS` from `src/database/incremental/manifest.ts` (no glob)
 - Compiled to `migration-config.js` by tsc
-- Used by TypeORM CLI
+- Used by TypeORM CLI (`migration:revert`)
+
+**API runtime (`src/database/connection.ts`)** declares `migrations: []` and `migrationsRun: false`:
+the service neither loads nor runs migrations or the bootstrap.
 
 **Why separate from main config?**
 - Main config imports 60+ entities
@@ -267,16 +293,78 @@ await fetch('https://api.neture.co.kr/api/v1/admin/migrations/status', {
 
 **Don't.** Fix the migration instead.
 
-If absolutely necessary, manually insert into `migrations` table:
+Manual edits to the history table `typeorm_migrations` (INSERT / UPDATE / DELETE of rows, renaming
+recorded names) are **prohibited** — see § Bootstrap / Incremental Separation. A migration that must not
+run is fixed in code (or superseded by a new migration); history is never rewritten to skip it.
 
-```sql
-INSERT INTO migrations (timestamp, name)
-VALUES (1234567890123, 'DescriptiveName1234567890123');
+---
+
+## Bootstrap / Incremental Separation
+
+> Introduced 2026-09-15 (WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1).
+> Background: production `typeorm_migrations` holds 677 rows (674 distinct names, max id 678) while the
+> repository holds 644 historical migration files; 30 production-only names come from deleted files, and
+> replaying the repository history on an empty database fails (IR-O4O-MIGRATION-TIMESTAMP-ORDERING-HISTORY-GAP-AND-FRESH-DATABASE-REPLAY-CENSUS-V1).
+> Empty databases are therefore built from a canonical schema snapshot, not from history replay.
+
+### Components
+
+| Component | Path | Role |
+|---|---|---|
+| Canonical schema snapshot | `apps/api-server/src/database/bootstrap/canonical-schema-baseline.ts` | schema-only DDL (tables · enums · sequences · constraints · indexes · functions · triggers). No data, no seed, no roles/permission rows, no GRANT/OWNER, no `IF NOT EXISTS` |
+| Snapshot meta | `.../bootstrap/canonical-schema-baseline.meta.ts` | baseline version `2026-09-15-id678`, expected fingerprint + line count, last historical migration |
+| State classifier | `.../bootstrap/database-state.ts` | `FRESH_EMPTY` · `BOOTSTRAPPED` · `LEGACY_ESTABLISHED` · `UNKNOWN_PARTIAL` |
+| Bootstrap runner | `.../bootstrap/bootstrap-runner.ts` | one transaction: extensions → statements → fingerprint verify → marker |
+| Bootstrap marker | table `o4o_schema_baselines` (`.../bootstrap/baseline-marker.ts`) | exactly one row per bootstrap; **not** a bulk INSERT of 644 names into `typeorm_migrations` |
+| Incremental manifest | `apps/api-server/src/database/incremental/manifest.ts` | the only migration list loaded by the job and the CLI |
+| Historical freeze | `.../incremental/historical-migrations.manifest.json` | 644 frozen (file · class · name) triples — never loaded, never renamed |
+| Entry point | `apps/api-server/src/migrate.ts` | classify → bootstrap or skip → incremental (each in its own transaction) |
+| Contract guard | `scripts/db/check-migration-contract.mjs` (CI `ci-pipeline.yml`) | naming · ordering · manifest · entry-point · no-glob · no API-startup migration |
+| Snapshot builder | `scripts/db/build-canonical-schema-baseline.mjs` | regenerates the snapshot from an isolated database only (never from production) |
+
+### Database states and job behaviour
+
+| `DATABASE_STATE` | Condition | Job behaviour |
+|---|---|---|
+| `FRESH_EMPTY` | no user objects, no history, no marker | bootstrap **EXECUTED**, then incremental |
+| `BOOTSTRAPPED` | marker present **and** live fingerprint == expected | bootstrap SKIPPED, incremental only |
+| `LEGACY_ESTABLISHED` | `typeorm_migrations` with anchor rows + core tables, no marker (production) | bootstrap SKIPPED, incremental only |
+| `UNKNOWN_PARTIAL` | anything else (partial schema, marker without schema, fingerprint mismatch, history without schema…) | **fail-fast, exit 1** — no repair, no fallback, no DDL |
+
+Expected job log for production (LEGACY_ESTABLISHED, nothing pending):
+
+```text
+DATABASE_STATE = LEGACY_ESTABLISHED
+BOOTSTRAP_EXECUTION = SKIPPED
+HISTORICAL_REPLAY = ZERO
+INCREMENTAL_PENDING = 0
+MIGRATION_JOB = SUCCESS
 ```
+
+### Rules
+
+1. **History table is `typeorm_migrations`** (`migrationsTableName` in every DataSource). The name `migrations` in earlier versions of this document was wrong.
+2. **Never rename, renumber, edit or re-run an applied migration** (file name, class name, `name`). The historical set is frozen in `historical-migrations.manifest.json`.
+3. **Never modify `typeorm_migrations` rows** (no manual INSERT / UPDATE / DELETE, no synthetic "historical" bulk INSERT).
+4. **Bootstrap is for empty databases only.** Production (`LEGACY_ESTABLISHED`) is never bootstrapped, never fingerprint-repaired, never auto-ALTERed.
+5. **Fail-fast.** `UNKNOWN_PARTIAL` stops the job; a fingerprint mismatch rolls the bootstrap back with no marker. No `IF NOT EXISTS` / catch-and-continue is used to hide drift.
+6. **Single entry point.** Migrations and bootstrap run only through `dist/migrate.js` (job) or `src/migrate.ts` (local isolated DB). No API-startup migration, no HTTP route, no lifecycle installer, no `synchronize: true`.
+7. **Snapshot regeneration** requires a new baseline version, a new expected fingerprint and a WO; it is built from an isolated database, never from production.
+8. Reference seed (roles · permissions · catalogs) is **out of scope** of the bootstrap and is handled by a separate, explicit step.
+
+### Change Log
+
+| Date | Change | Basis |
+|---|---|---|
+| 2026-09-15 | v2.0 — bootstrap/incremental separation · `migrations`→`typeorm_migrations` · naming contract (13-digit epoch, class=name) · manifest registration · history/rename prohibition · CLI scripts route to `src/migrate.ts` | WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1 (CHECK: `docs/checks/CHECK-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1.md`) |
+| 2026-09-12 | Single owner — API startup no longer runs migrations | WO-O4O-DATABASE-MIGRATION-OWNERSHIP-STARTUP-HEALTH-AND-LEGACY-DEPLOY-TOOLING-FINAL-CLOSURE-V1 |
+| 2026-01-29 | v1.0 | initial |
 
 ---
 
 ## Related Documents
+
+- [IR-O4O-MIGRATION-TIMESTAMP-ORDERING-HISTORY-GAP-AND-FRESH-DATABASE-REPLAY-CENSUS-V1](../../investigations/IR-O4O-MIGRATION-TIMESTAMP-ORDERING-HISTORY-GAP-AND-FRESH-DATABASE-REPLAY-CENSUS-V1.md) — why history replay cannot build an empty database
 
 - [CLAUDE.md §0 환경 원칙](../../../CLAUDE.md) — Production Environment Policy
 - [deploy-api.yml](../../../.github/workflows/deploy-api.yml) — CI/CD Pipeline

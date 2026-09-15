@@ -1,10 +1,5 @@
 import { DataSource } from 'typeorm';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import { SnakeNamingStrategy } from './SnakeNamingStrategy.js';
-// ESM equivalent of __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 // Note: Environment variables are loaded by main.ts at startup
 // In Cloud Run, env vars are injected via workflow (no .env files needed)
@@ -109,15 +104,11 @@ export const AppDataSource = new DataSource({
   entities,
 
   // 마이그레이션 설정
-  // 프로덕션: dist/database/migrations/*.js (컴파일된 JS)
-  // 개발: src/database/migrations/*.ts (TypeScript 소스)
-  migrations: NODE_ENV === 'production'
-    ? ['dist/database/migrations/*.js']
-    : [__dirname + '/migrations/*.ts'],
+  // API 런타임은 migration 을 로드하지도 실행하지도 않는다 (schema bootstrap 포함).
+  // 실행 경로는 배포 migration job(src/migrate.ts) 단일 — incremental manifest 만 로드한다.
+  // (WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1)
+  migrations: [],
   migrationsTableName: 'typeorm_migrations',
-  // 프로덕션에서 자동 마이그레이션 비활성화
-  // 기존 DB에 마이그레이션 기록이 없으면 테이블 중복 생성 오류 발생
-  // 마이그레이션은 별도의 프로세스로 수동 실행 권장
   migrationsRun: false,
 
   // SSL 설정 (PostgreSQL TCP 연결 프로덕션 환경에서만)

@@ -99,6 +99,14 @@ jobs:
     - name: Guard TypeORM entity registry integrity
       run: node scripts/check-typeorm-entities.mjs
 
+    # WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1
+    # 빈 DB bootstrap(canonical snapshot + o4o_schema_baselines) 과 기존 운영 DB incremental migration 을 분리한다. blocking.
+    #   historical 644 migration 파일명/class/name 동결 · incremental manifest 명명(13자리 epoch, 순서 증가, 중복 0)
+    #   snapshot schema-only · runner/classifier 금지 패턴(IF NOT EXISTS, DROP CASCADE, synchronize) · 진입점(migrate.ts, connection.ts, package.json, deploy job)
+    # DB 연결도 secret 도 필요 없는 순수 정적 검사다. 규칙 본문은 scripts/db/check-migration-contract.mjs 상단 주석 참조.
+    - name: Guard canonical bootstrap / incremental migration contract
+      run: node scripts/db/check-migration-contract.mjs
+
     - name: Check for console.log statements
       run: |
         # Find all console.log statements, excluding comments, test files, CLI scripts, config files, migrations, and logger utilities

@@ -1,0 +1,45 @@
+/**
+ * Incremental migration manifest
+ * (WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1)
+ *
+ * This is the ONLY migration list the deploy job (src/migrate.ts) and the TypeORM CLI load.
+ * It contains migrations created AFTER the canonical baseline cutoff. The 644 historical
+ * migrations in src/database/migrations/ are listed in historical-migrations.manifest.json
+ * and are never loaded, never replayed and never bulk-inserted into typeorm_migrations.
+ *
+ * Adding a migration (enforced by scripts/db/check-migration-contract.mjs in CI):
+ *   1. file    src/database/migrations/<epoch13>-<PascalName>.ts     (epoch13 = Date.now(), 13 digits)
+ *   2. class   export class <PascalName><epoch13> implements MigrationInterface
+ *   3. name    name = '<PascalName><epoch13>'   (identical to the class name)
+ *   4. epoch13 > every epoch already in INCREMENTAL_MIGRATIONS (strictly increasing)
+ *   5. import it here and append it to INCREMENTAL_MIGRATIONS (append only; never reorder)
+ * Never rename, renumber or edit an applied migration; never modify typeorm_migrations rows.
+ */
+
+import type { MigrationInterface } from 'typeorm';
+
+export const INCREMENTAL_MIGRATION_CUTOFF = {
+  baselineVersion: '2026-09-15-id678',
+  /** Last historical migration (production typeorm_migrations id 678). */
+  lastHistoricalMigration: 'BaselineRbacAndAccountTables20270413000000',
+  /** TypeORM orders by parseInt(name.slice(-13)); the last historical sorts as this value. */
+  lastHistoricalSortKey: 270413000000,
+  /** Every incremental migration must carry a 13-digit epoch ≥ this (2026-01-01T00:00:00Z). */
+  minimumEpoch13: 1767225600000,
+} as const;
+
+export type MigrationClass = new () => MigrationInterface;
+
+/** Append only. Order must match ascending epoch. */
+export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [];
+
+export function incrementalMigrationNames(): string[] {
+  return INCREMENTAL_MIGRATIONS.map((m) => {
+    const instance = new m();
+    const name = (instance as { name?: string }).name ?? m.name;
+    if (name !== m.name) {
+      throw new Error(`incremental migration name/class mismatch: name='${name}' class='${m.name}'`);
+    }
+    return name;
+  });
+}
