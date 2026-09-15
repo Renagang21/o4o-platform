@@ -17,6 +17,8 @@
  */
 
 import type { MigrationInterface } from 'typeorm';
+// WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1
+import { CreateStoreTabletDevicesAndScreenSetDescription1789435443554 } from '../migrations/1789435443554-CreateStoreTabletDevicesAndScreenSetDescription.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-15-id678',
@@ -31,7 +33,9 @@ export const INCREMENTAL_MIGRATION_CUTOFF = {
 export type MigrationClass = new () => MigrationInterface;
 
 /** Append only. Order must match ascending epoch. */
-export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [];
+export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
+  CreateStoreTabletDevicesAndScreenSetDescription1789435443554,
+];
 
 export function incrementalMigrationNames(): string[] {
   return INCREMENTAL_MIGRATIONS.map((m) => {
