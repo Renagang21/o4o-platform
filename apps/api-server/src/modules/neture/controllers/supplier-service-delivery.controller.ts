@@ -140,7 +140,7 @@ export function createSupplierServiceDeliveryController(dataSource: DataSource):
   router.get('/:serviceKey/products', ...guards, async (req: Request, res: Response) => {
     const supplierId = getSupplierId(req);
     if (!supplierId) {
-      return res.status(401).json({ success: false, error: '공급자 계정을 확인할 수 없습니다.', code: 'NO_SUPPLIER' });
+      return res.status(403).json({ success: false, error: '공급자 계정을 확인할 수 없습니다.', code: 'NO_SUPPLIER' });
     }
     const serviceKey = getServiceKey(req);
 
@@ -245,7 +245,7 @@ export function createSupplierServiceDeliveryController(dataSource: DataSource):
   router.patch('/:serviceKey/products/:offerId/delivery', ...guards, async (req: Request, res: Response) => {
     const supplierId = getSupplierId(req);
     if (!supplierId) {
-      return res.status(401).json({ success: false, error: '공급자 계정을 확인할 수 없습니다.', code: 'NO_SUPPLIER' });
+      return res.status(403).json({ success: false, error: '공급자 계정을 확인할 수 없습니다.', code: 'NO_SUPPLIER' });
     }
     const serviceKey = getServiceKey(req);
 

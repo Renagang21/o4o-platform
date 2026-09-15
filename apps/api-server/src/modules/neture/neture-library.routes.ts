@@ -52,7 +52,7 @@ async function requireActiveSupplier(req: Request, res: Response, next: () => vo
   }
   const supplier = await netureService.getSupplierByUserId(authReq.user.id);
   if (!supplier) {
-    res.status(401).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
+    res.status(403).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
     return;
   }
   if (supplier.status !== SupplierStatus.ACTIVE) {
@@ -77,7 +77,7 @@ async function requireLinkedSupplier(req: Request, res: Response, next: () => vo
   }
   const supplier = await netureService.getSupplierByUserId(authReq.user.id);
   if (!supplier) {
-    res.status(401).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
+    res.status(403).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
     return;
   }
   (req as SupplierRequest).supplierId = supplier.id;

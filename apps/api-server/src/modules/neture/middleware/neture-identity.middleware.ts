@@ -4,6 +4,13 @@
  * WO-O4O-ROUTES-REFACTOR-V1
  * Extracted from neture.routes.ts — requireActiveSupplier, requireLinkedSupplier,
  * requireActivePartner, requireLinkedPartner
+ *
+ * WO-O4O-NETURE-AUTH-ERROR-CONTRACT-AND-LEGACY-TOKEN-RECOVERY-FIX-V1 — 인증 오류 / 서비스 권한 오류 분리:
+ *   401 UNAUTHORIZED          : 자격증명 없음·무효 (auth-client 가 refresh 를 시도하는 유일한 조건)
+ *   403 NO_SUPPLIER/NO_PARTNER: 로그인은 유효하지만 공급자/파트너 서비스 미가입 (대표 로그인 유지)
+ *   403 *_NOT_ACTIVE          : 가입은 있으나 신청 중·반려·정지·탈퇴
+ * 서비스 미가입은 토큰 문제가 아니므로 401 로 내보내면 클라이언트가 refresh 실패→토큰 삭제→대표 로그아웃으로
+ * 오판한다. 오류 코드·응답 구조는 그대로 두고 status 만 403 이다.
  */
 
 import type { Request, Response, NextFunction } from 'express';
@@ -51,7 +58,7 @@ export function createRequireActiveSupplier(dataSource: DataSource) {
     );
     const supplier = rows[0];
     if (!supplier) {
-      res.status(401).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
+      res.status(403).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
       return;
     }
     if (supplier.status !== 'ACTIVE') {
@@ -85,7 +92,7 @@ export function createRequireLinkedSupplier(dataSource: DataSource) {
     );
     const supplier = rows[0];
     if (!supplier) {
-      res.status(401).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
+      res.status(403).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
       return;
     }
     (req as SupplierRequest).supplierId = supplier.id;
@@ -113,7 +120,7 @@ export function createRequireActivePartner(dataSource: DataSource) {
     );
     const partner = rows[0];
     if (!partner) {
-      res.status(401).json({ success: false, error: { code: 'NO_PARTNER', message: 'No linked partner account found' } });
+      res.status(403).json({ success: false, error: { code: 'NO_PARTNER', message: 'No linked partner account found' } });
       return;
     }
     // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
@@ -149,7 +156,7 @@ export function createRequireLinkedPartner(dataSource: DataSource) {
     );
     const partner = rows[0];
     if (!partner) {
-      res.status(401).json({ success: false, error: { code: 'NO_PARTNER', message: 'No linked partner account found' } });
+      res.status(403).json({ success: false, error: { code: 'NO_PARTNER', message: 'No linked partner account found' } });
       return;
     }
     (req as PartnerRequest).partnerId = partner.id;
