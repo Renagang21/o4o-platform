@@ -240,9 +240,14 @@ if (!isolatedUrl) {
 }
 
 describeIsolated('isolated PostgreSQL classifier scenarios (§8.2)', () => {
-  const harness = new IsolatedPgHarness(isolatedUrl ?? '');
+  // describe.skip still evaluates this body, so the harness (which validates the URL in its
+  // constructor) must only be built when the block actually runs.
+  let harness: IsolatedPgHarness;
+  beforeAll(() => {
+    harness = new IsolatedPgHarness(isolatedUrl ?? '');
+  });
   afterAll(async () => {
-    await harness.cleanup();
+    await harness?.cleanup();
   }, 120_000);
 
   it('classifies all standard scenarios as expected (real PostgreSQL verdicts)', async () => {
