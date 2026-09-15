@@ -13,8 +13,8 @@
 |---|---|
 | 작업 worktree 기준 | `22facc22c` (origin/main 은 작업 중 `c9c4d4add` → `0872bf05b` 로 전진, rebase 후 push) |
 | snapshot `sourceCommit` | `22facc22c` (저장소 migration 644 파일 기준) |
-| 구현 커밋 | §14 에 기록 |
-| 최종 SHA (CHECK 갱신 커밋) | §14 에 기록 |
+| 구현 커밋 | `3b3c0f5e6` (origin/main, 로컬 `e553950cc` 를 `b8ea214f6` 위로 rebase) |
+| 최종 SHA (CHECK 갱신 커밋) | 본 커밋 (`git log -1 -- docs/checks/CHECK-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1.md`) |
 
 ## 2. 기존 644 migration 보존
 
@@ -173,23 +173,43 @@ MIGRATION_JOB = SUCCESS
 
 | 항목 | 적용 전 (2026-09-15) | 적용 후 |
 |---|---|---|
-| `typeorm_migrations` rows / distinct / max id | 677 / 674 / 678 | §14 배포 후 기록 |
-| `o4o_schema_baselines` | 없음 | 없음(예상) |
-| 테이블(public+cosmetics+neture) / enum / sequence | 287 / 37 / 9 | |
-| schema fingerprint (normalized) | `58eb27a1…` 5,876 | |
-| roles / permissions / role_assignments 행 수 | 무변경 대상 | |
+| `typeorm_migrations` rows / distinct / max id | 677 / 674 / 678 | 677 / 674 / 678 (동일) |
+| `o4o_schema_baselines` | 없음 | 없음 (`to_regclass` null) |
+| 테이블(public+cosmetics+neture) / enum / sequence | 287 / 37 / 9 | 287 / 37 / 9 (동일 · `typeorm_migrations` 와 그 sequence 제외 기준) |
+| schema fingerprint (normalized) | `58eb27a1…` 5,876 | `58eb27a1…` 5,876 — job 로그 `live fingerprint` 가 baseline `2026-09-15-id678` 과 일치 |
+| roles / permissions / role_assignments 행 수 | 무변경 대상 | 41 / 0 / 73 (읽기 전용 확인 · 이 WO 는 행을 쓰지 않음) |
 
 기대 job 로그: `DATABASE_STATE = LEGACY_ESTABLISHED / BOOTSTRAP_EXECUTION = SKIPPED / HISTORICAL_REPLAY = ZERO / INCREMENTAL_PENDING = 0 / MIGRATION_JOB = SUCCESS`.
 
+실제 job 로그 (`o4o-api-migrations-zw9xf`, 2026-09-15T01:13:39Z, `gcloud logging read` 로 확인):
+
+```text
+Incremental manifest: 0 migration(s) after cutoff BaselineRbacAndAccountTables20270413000000
+DATABASE_STATE = LEGACY_ESTABLISHED
+  reason: typeorm_migrations 677 rows, all 5 anchors present, core tables present, no marker
+  schemas: [public, cosmetics, neture] · user objects: 335
+  o4o_schema_baselines: absent
+  live fingerprint: 58eb27a1c17a484b49a87cb5942da782972f1778968abceec36b42af4024bdb6 (5876 lines)
+  baseline 2026-09-15-id678 fingerprint: 58eb27a1c17a484b49a87cb5942da782972f1778968abceec36b42af4024bdb6
+BOOTSTRAP_EXECUTION = SKIPPED
+HISTORICAL_REPLAY = ZERO
+INCREMENTAL_PENDING = 0
+INCREMENTAL_EXECUTED = 0
+MIGRATION_JOB = SUCCESS
+Container called exit(0).
+```
+
+배포 후 `GET https://api.neture.co.kr/health/ready` → 200.
+
 ## 14. CI · 배포 run ID
 
-배포 후 갱신.
+커밋 `3b3c0f5e6` 기준.
 
 | 워크플로 | run ID | 결과 |
 |---|---|---|
-| CI Pipeline | | |
-| CodeQL | | |
-| Deploy API (migration job 포함) | | |
+| CI Pipeline | `34915889560` | success (Code Quality Check · API Server Jest · Build Applications 모두 success — contract guard step 포함) |
+| CodeQL | `34915889532` | success |
+| Deploy API (migration job 포함) | `34915889538` | success — migration job execution `o4o-api-migrations-zw9xf` SUCCESS (§13 로그) |
 
 ## 15. 실패 · 취소 · 미수행 항목
 
@@ -264,13 +284,13 @@ PRODUCTION_AUTHORIZATION_CHANGE              = ZERO
 ISOLATED_FRESH_DATABASE                      = PASS
 ISOLATED_PARTIAL_DATABASE_NEGATIVE_TESTS     = PASS
 ISOLATED_INCREMENTAL_CANARY                  = PASS
-PRODUCTION_MIGRATION_JOB                     = PENDING (§14 배포 후 갱신)
-PRODUCTION_READINESS                         = PENDING
-CI_PIPELINE                                  = PENDING
-CODEQL                                       = PENDING
-DEPLOY_API                                   = PENDING
+PRODUCTION_MIGRATION_JOB                     = SUCCESS (LEGACY_ESTABLISHED · SKIPPED · ZERO · pending 0)
+PRODUCTION_READINESS                         = PASS (/health/ready 200)
+CI_PIPELINE                                  = PASS (34915889560)
+CODEQL                                       = PASS (34915889532)
+DEPLOY_API                                   = SUCCESS (34915889538)
 
-CANONICAL_DATABASE_BOOTSTRAP_AND_INCREMENTAL_MIGRATION_SEPARATION = IMPLEMENTED (CLOSED 는 §14 갱신 시)
+CANONICAL_DATABASE_BOOTSTRAP_AND_INCREMENTAL_MIGRATION_SEPARATION = CLOSED
 ```
 
 ```text
