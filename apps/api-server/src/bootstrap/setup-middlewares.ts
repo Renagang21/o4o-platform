@@ -162,7 +162,9 @@ export function setupMiddlewares(app: Application): void {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'X-Organization-Id'],
+    // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1: 실제 태블릿 기기 토큰 헤더
+    //   (heartbeat · 직원 runtime API). 허용 목록에 없으면 브라우저 preflight 에서 차단된다.
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'X-Organization-Id', 'X-Tablet-Device-Token'],
     // WO-O4O-KPA-QR-EXPORT-FILENAME-BY-TITLE-V1: 교차출처 다운로드에서 파일명(Content-Disposition)을
     //   프론트가 읽을 수 있도록 노출 (QR/CSV/PDF 등 모든 첨부 다운로드 공통 혜택).
     exposedHeaders: ['X-Total-Count', 'X-Page-Count', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'Retry-After', 'Content-Disposition'],
