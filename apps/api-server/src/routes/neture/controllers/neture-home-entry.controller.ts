@@ -27,6 +27,9 @@ import {
   findStoreOrganizationCandidates,
   type StoreOwnerServiceKey,
 } from '../../../utils/store-organization.resolver.js';
+// WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
+// 공급자 · 파트너 서비스 이용 상태(단일 출처) — 대표 홈 · 서비스 레이아웃이 role 문자열 대신 이 값을 쓴다.
+import { resolveNetureServiceStates } from '../../../modules/neture/services/neture-service-state.service.js';
 
 /**
  * 대표 홈에서 "내 매장" 을 노출하는 서비스 — canonical service_key ↔ role prefix.
@@ -129,7 +132,13 @@ export function createNetureHomeEntryController(
         name: r.name,
       }));
 
-      return res.json({ success: true, data: { stores, branches } });
+      // ── 공급자 · 파트너 서비스 상태 ─────────────────────────────────────
+      // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
+      // neture_suppliers · neture.neture_partners (없으면 service_memberships(neture).role 기반 legacy fallback).
+      // 요청자 본인 것만. 실제 API 접근은 neture-identity guard 가 같은 테이블로 다시 판정한다.
+      const serviceStates = await resolveNetureServiceStates(dataSource, userId);
+
+      return res.json({ success: true, data: { stores, branches, serviceStates } });
     }),
   );
 

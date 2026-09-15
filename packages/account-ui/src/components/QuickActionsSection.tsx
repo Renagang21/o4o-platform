@@ -7,6 +7,8 @@ interface QuickActionsSectionProps {
   dashboardLabel?: string;
   showDashboard?: boolean;
   onLogout?: () => void;
+  /** 로그아웃 버튼 라벨 (기본 '로그아웃') */
+  logoutLabel?: string;
   children?: ReactNode;
 }
 
@@ -15,6 +17,7 @@ export function QuickActionsSection({
   dashboardLabel = '내 대시보드',
   showDashboard = true,
   onLogout,
+  logoutLabel = '로그아웃',
   children,
 }: QuickActionsSectionProps) {
   const showDashboardLink = showDashboard && dashboardPath;
@@ -41,7 +44,7 @@ export function QuickActionsSection({
             className="flex items-center gap-3 w-full p-4 bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
           >
             <LogOut className="w-5 h-5" />
-            <span className="text-sm font-medium">로그아웃</span>
+            <span className="text-sm font-medium">{logoutLabel}</span>
           </button>
         )}
       </div>

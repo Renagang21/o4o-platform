@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
+import { ServiceApplyPanel } from '../components/auth/ServiceApplyPanel';
 
 /* ── 파트너 프로그램 소개 ── */
 const programCards = [
@@ -90,9 +91,11 @@ const registrationSteps = [
 ];
 
 export default function PartnerLandingPage() {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { openLoginModal } = useLoginModal();
-  const isPartner = isAuthenticated && user?.roles.some((r) => ['neture:partner', 'partner', 'neture:admin', 'platform:super_admin'].includes(r));
+  // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
+  //   비로그인 → O4O 회원가입(파트너) · 로그인. 로그인 회원 → role 이 아니라 **서비스 이용 상태** 로
+  //   신청 폼 / 신청 중 / 업무 진입 / 반려 · 정지 안내 (ServiceApplyPanel).
 
   return (
     <div>
@@ -108,14 +111,8 @@ export default function PartnerLandingPage() {
             판매 실적에 따라 커미션을 정산받는 프로그램입니다.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            {isPartner ? (
-              <Link
-                to="/partner/dashboard"
-                className="inline-flex items-center px-6 py-3 bg-white text-emerald-700 font-semibold rounded-lg hover:bg-emerald-50 transition-colors"
-              >
-                Partner Dashboard
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+            {isAuthenticated ? (
+              <ServiceApplyPanel service="partner" />
             ) : (
               <>
                 <Link
@@ -290,13 +287,24 @@ export default function PartnerLandingPage() {
           <p className="text-gray-400 mb-8">
             제품 홍보 활동을 통해 커미션을 정산받고 함께 성장하세요.
           </p>
-          <Link
-            to="/register"
-            className="inline-flex items-center px-8 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors"
-          >
-            파트너 등록
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Link>
+          {isAuthenticated ? (
+            <a
+              href="#top"
+              onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              className="inline-flex items-center px-8 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors"
+            >
+              파트너 서비스 신청 · 상태 보기
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </a>
+          ) : (
+            <Link
+              to="/register"
+              className="inline-flex items-center px-8 py-3 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 transition-colors"
+            >
+              파트너 등록
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
+          )}
         </div>
       </section>
     </div>

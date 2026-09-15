@@ -29,6 +29,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // route(/operator/suppliers) 유지. Neture 는 USER_MANAGEMENT/MEMBERSHIP_APPROVAL 모두 활성이라
     // 그룹 이동으로 인한 권한 회귀 없음. (라벨: '공급자 활성화' → '공급자 승인')
     { label: '공급자 승인', path: '/operator/suppliers' },
+    // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1: 파트너 서비스 신청 승인(공급자 승인의 대칭)
+    { label: '파트너 승인', path: '/operator/partners' },
     // WO-O4O-NETURE-OPERATOR-SIDEBAR-DEAD-LINKS-CLEANUP-V1: adminOnly 항목은 /operator/* 라우트가
     // 없으므로 실제 존재하는 /admin/* 로 정정 (회원 완전삭제 와 동일 패턴). 권한자에게만 노출.
     // WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리 성격 표면화(라벨).

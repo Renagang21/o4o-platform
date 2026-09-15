@@ -149,6 +149,7 @@ export default function MyPageHub() {
         dashboardLabel={`${roleLabel} 대시보드`}
         showDashboard={hasDashboard}
         onLogout={handleLogout}
+        logoutLabel="O4O 로그아웃"
       />
     </MyPageLayout>
   );

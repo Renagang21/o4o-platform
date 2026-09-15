@@ -92,6 +92,7 @@ export function NetureGlobalHeader() {
       onLogin={openLoginModal}
       onRegister={openRegisterModal}
       onLogout={handleLogout}
+      logoutLabel="O4O 로그아웃"
       utilitySlot={
         <>
           {isAuthenticated && user && (

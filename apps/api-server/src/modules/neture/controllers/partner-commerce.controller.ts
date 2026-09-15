@@ -43,7 +43,7 @@ export function createPartnerCommerceController(deps: {
    * Partner 계약 목록 조회
    * Query: ?status=active|terminated|expired
    */
-  router.get('/partner/contracts', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/partner/contracts', requireAuth, requireLinkedPartner, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {

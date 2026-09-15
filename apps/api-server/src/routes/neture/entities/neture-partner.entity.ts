@@ -35,6 +35,8 @@ export enum NeturePartnerStatus {
   ACTIVE = 'active',
   SUSPENDED = 'suspended',
   INACTIVE = 'inactive',
+  /** WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1: 파트너 서비스 신청 반려 */
+  REJECTED = 'rejected',
 }
 
 /**

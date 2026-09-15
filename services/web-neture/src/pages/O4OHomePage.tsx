@@ -35,9 +35,9 @@
  * (`/community`, `/mypage`, `/market-trial` 등)은 NetureLayout 을 그대로 유지한다.
  */
 
-import { useRef, useState, type ClipboardEvent, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type ClipboardEvent, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { UserCircle, Loader2, ArrowUp, ImagePlus, Play, X } from 'lucide-react';
+import { UserCircle, Loader2, ArrowUp, ImagePlus, Play, X, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth, useLoginModal, useWorkScope } from '../contexts';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { sendHomeChat, HomeChatError, HOME_CHAT_MAX_MESSAGE_LENGTH } from '../lib/ai/home-chat';
@@ -90,7 +90,7 @@ function EntryPill({ entry }: { entry: HomeEntry }) {
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function O4OHomePage() {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const { openLoginModal, openRegisterModal } = useLoginModal();
   // WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 — 로그인 후에만 조회. 실패는 미가입이 아니라 오류로 보여준다.
   const entry = useHomeEntry(isAuthenticated && !!user);
@@ -124,6 +124,53 @@ export default function O4OHomePage() {
   const [workPending, setWorkPending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  /**
+   * WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1 §4
+   *
+   * 대표 홈의 `O4O 로그아웃` 은 대표 인증(실제 토큰) 종료다. 로그아웃 뒤에는 이전 사용자의 AI 응답 ·
+   * 첨부 · 진행 중 응답이 화면에 남지 않아야 한다.
+   *   - 세대 카운터(`aiGenRef`): 로그아웃 · 사용자 변경 시 증가 → 그 전에 시작된 요청의 응답은 버린다.
+   *   - 사용자(id) 가 바뀌거나 사라지면(다른 탭 로그아웃 · bfcache 복원 포함) AI 상태를 전부 초기화한다.
+   */
+  const aiGenRef = useRef(0);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
+  const resetAiState = () => {
+    aiGenRef.current += 1;
+    setInput('');
+    setQuestion(null);
+    setAnswer(null);
+    setError(null);
+    setPending(false);
+    setOpenedSite(null);
+    setLoginReady(false);
+    setWorkImage(null);
+    setWorkResult(null);
+    setWorkPending(false);
+  };
+  const userId = user?.id ?? null;
+  const prevUserIdRef = useRef<string | null>(userId);
+  useEffect(() => {
+    if (prevUserIdRef.current !== userId) {
+      prevUserIdRef.current = userId;
+      resetAiState();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+  useEffect(() => {
+    if (!accountMenuOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(e.target as Node)) setAccountMenuOpen(false);
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [accountMenuOpen]);
+  const handleLogout = () => {
+    setAccountMenuOpen(false);
+    resetAiState();
+    logout();
+  };
+
   const takeImage = (file: File | Blob | null | undefined) => {
     if (!file || !isSupportedWorkImage(file)) return false;
     setWorkImage(file);
@@ -145,16 +192,19 @@ export default function O4OHomePage() {
     setAnswer(null);
     setWorkResult(null);
     setOpenedSite(null);
+    const gen = aiGenRef.current;
     try {
       const image = workImage ? await readWorkImage(workImage) : undefined;
       const result = await runWorkAgent(trimmed, image);
+      if (gen !== aiGenRef.current) return; // 로그아웃 · 사용자 변경 후 도착한 응답은 버린다
       setWorkResult(result);
       setInput('');
       setWorkImage(null);
     } catch (err) {
+      if (gen !== aiGenRef.current) return;
       setError(err instanceof WorkAgentError ? err.message : '작업을 수행하지 못했습니다. 다시 시도해 주세요.');
     } finally {
-      setWorkPending(false);
+      if (gen === aiGenRef.current) setWorkPending(false);
     }
   };
 
@@ -180,12 +230,15 @@ export default function O4OHomePage() {
     // 새 요청이 시작되면 이전 로그인 완료 신호는 의미가 없다 — 업무 단위 transient(§42).
     setOpenedSite(null);
     setLoginReady(false);
+    const gen = aiGenRef.current;
     try {
       const result = await sendHomeChat(trimmed, workScope);
+      if (gen !== aiGenRef.current) return; // 로그아웃 · 사용자 변경 후 도착한 응답은 버린다
       setAnswer(result.message);
       setOpenedSite(result.browserSiteOpened ?? null);
       setInput('');
     } catch (err) {
+      if (gen !== aiGenRef.current) return;
       setAnswer(null);
       setError(
         err instanceof HomeChatError
@@ -193,7 +246,7 @@ export default function O4OHomePage() {
           : '응답을 생성하지 못했습니다. 다시 시도해 주세요.',
       );
     } finally {
-      setPending(false);
+      if (gen === aiGenRef.current) setPending(false);
     }
   };
 
@@ -201,26 +254,76 @@ export default function O4OHomePage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      {/* 최소 계정 영역만. 상단 navigation·서비스 메뉴바 없음. */}
+      {/* 최소 계정 영역만. 상단 navigation·서비스 메뉴바 없음.
+          WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1 §4:
+          로그인 전 = 로그인 · 회원가입(기존 모달) / 로그인 후 = 이름 · 계정 메뉴(내 정보 · O4O 로그아웃).
+          모바일도 같은 메뉴(작은 계정 메뉴). */}
       <div className="flex justify-end px-4 py-4 text-sm sm:px-6">
         {isAuthenticated && user ? (
-          <Link
-            to="/mypage"
-            className="flex items-center gap-1.5 text-slate-600 no-underline hover:text-slate-900"
-            title="내 정보"
-          >
-            <UserCircle className="h-5 w-5" />
-            <span className="hidden sm:inline">{getUserDisplayName(user)}</span>
-          </Link>
+          <div className="relative" ref={accountMenuRef}>
+            <button
+              type="button"
+              onClick={() => setAccountMenuOpen((v) => !v)}
+              aria-haspopup="menu"
+              aria-expanded={accountMenuOpen}
+              data-testid="home-account-menu-button"
+              className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900"
+              title="계정 메뉴"
+            >
+              <UserCircle className="h-5 w-5" />
+              <span className="hidden sm:inline">{getUserDisplayName(user)}</span>
+              <ChevronDown className="h-4 w-4" />
+            </button>
+            {accountMenuOpen && (
+              <div
+                role="menu"
+                data-testid="home-account-menu"
+                className="absolute right-0 mt-2 w-52 rounded-lg border border-slate-200 bg-white py-1 shadow-lg z-50"
+              >
+                <div className="px-3 py-2 border-b border-slate-100">
+                  <p className="m-0 text-sm font-medium text-slate-900 truncate">{getUserDisplayName(user)}</p>
+                  <p className="m-0 text-xs text-slate-500 truncate">{user.email}</p>
+                </div>
+                <Link
+                  to="/mypage"
+                  role="menuitem"
+                  onClick={() => setAccountMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 no-underline hover:bg-slate-50"
+                >
+                  <UserCircle className="h-4 w-4" />
+                  내 정보
+                </Link>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={handleLogout}
+                  data-testid="home-o4o-logout"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+                >
+                  <LogOut className="h-4 w-4" />
+                  O4O 로그아웃
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
-          <button
-            type="button"
-            onClick={() => openLoginModal()}
-            className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900"
-          >
-            <UserCircle className="h-5 w-5" />
-            <span>로그인</span>
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => openLoginModal()}
+              className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900"
+            >
+              <UserCircle className="h-5 w-5" />
+              <span>로그인</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => openRegisterModal()}
+              className="rounded-md border border-slate-300 px-2.5 py-1 text-slate-700 hover:bg-slate-50"
+            >
+              회원가입
+            </button>
+          </div>
         )}
       </div>
 

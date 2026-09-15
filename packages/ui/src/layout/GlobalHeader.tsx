@@ -71,6 +71,11 @@ export interface GlobalHeaderProps {
   onRegister?: () => void;
   /** 로그아웃 클릭 */
   onLogout?: () => void;
+  /**
+   * 로그아웃 버튼 라벨 (기본 '로그아웃'). 대표 계정 인증 종료임을 드러내야 하는 서비스는
+   * 'O4O 로그아웃' 등으로 지정한다 (WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1).
+   */
+  logoutLabel?: string;
   /** UserArea 드롭다운 내부 커스텀 메뉴 항목 (대시보드, 마이페이지 등) */
   userMenuItems?: React.ReactNode;
   /**
@@ -110,6 +115,7 @@ export function GlobalHeader({
   onLogin,
   onRegister,
   onLogout,
+  logoutLabel = '로그아웃',
   userMenuItems,
   mobileUserMenuItems,
   showMobileUserMenu = true,
@@ -300,7 +306,7 @@ export function GlobalHeader({
                         }}
                         className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-600 bg-transparent border-none cursor-pointer text-left hover:bg-red-50 transition-colors"
                       >
-                        로그아웃
+                        {logoutLabel}
                       </button>
                     </div>
                   </div>
@@ -406,7 +412,7 @@ export function GlobalHeader({
                       }}
                       className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-red-600 bg-transparent border-none cursor-pointer hover:bg-red-50 rounded-xl"
                     >
-                      로그아웃
+                      {logoutLabel}
                     </button>
                   </div>
                 </div>

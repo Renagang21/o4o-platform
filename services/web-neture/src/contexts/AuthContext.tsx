@@ -10,7 +10,7 @@
  *   이 파일에는 **Neture 고유분**만 남는다 — serviceKey/user 변환 주입 + 역할 전환 UI 상태.
  */
 
-import { createContext, useContext, useMemo, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, ReactNode } from 'react';
 import { buildPlatformUser } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { useServiceAuth, useRoleSelection, type AuthLoginResult } from '@o4o/auth-react';
@@ -71,6 +71,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const { user } = core;
+
+  /**
+   * WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1 §4·§8
+   *
+   * 대표 로그아웃 뒤 개인화 화면이 남지 않도록 두 경로에서 인증 상태를 실제 토큰으로 다시 맞춘다.
+   *   - bfcache 복원(pageshow persisted): 뒤로가기로 되살아난 화면은 토큰이 없으면 비로그인으로.
+   *   - 다른 같은-origin 탭의 로그아웃/로그인(storage 이벤트: 토큰 키 변경 · clear).
+   * refresh() 는 토큰이 없으면 user=null, 있으면 /auth/me 로 재확인한다(기존 Core 동작 재사용).
+   */
+  const { refresh } = core;
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) void refresh();
+    };
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === null || e.key === 'o4o_accessToken') void refresh();
+    };
+    window.addEventListener('pageshow', onPageShow);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('pageshow', onPageShow);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, [refresh]);
+
   // 역할 전환·부분 갱신은 3서비스 동일 구현이었다 → 공통 Core(useRoleSelection).
   const { switchRole, updateUser, hasMultipleRoles } = useRoleSelection(core);
 

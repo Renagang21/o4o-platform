@@ -19,6 +19,7 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import {
+  ArrowLeft,
   Home,
   Package,
   Link2,
@@ -34,7 +35,7 @@ import { NetureGlobalHeader } from '../NetureGlobalHeader';
 import { NetureBottomNav } from '../NetureBottomNav';
 // WO-O4O-NETURE-SHELL-FOOTER-LEGAL-CONTRACT-ADOPTION-V1: 공개 푸터와 동일 loader 재사용
 import { loadFooterLegal } from '../../lib/footerLegal';
-import { PARTNER_ACCESS_ROLES } from '../../lib/role-constants';
+import { ServiceUsageGate } from '../auth/ServiceUsageGate';
 
 /* ------------------------------------------------------------------ */
 /*  Sidebar 그룹 정의                                                   */
@@ -114,20 +115,10 @@ export default function PartnerSpaceLayout() {
     return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
-  const hasAccess = user.roles.some(r => PARTNER_ACCESS_ROLES.includes(r));
-  if (!hasAccess) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen text-center p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">접근 권한 없음</h1>
-        <p className="text-gray-600 mb-6">이 페이지는 파트너 전용입니다.</p>
-        <Link to="/" className="text-primary-600 hover:text-primary-700 font-medium">
-          홈으로 돌아가기
-        </Link>
-      </div>
-    );
-  }
-
+  // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
+  //   role 문자열 대신 **파트너 서비스 이용 상태(neture.neture_partners)** 로 게이트. 상태별 안내는 ServiceUsageGate.
   return (
+    <ServiceUsageGate service="partner">
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: Layer A — GlobalHeader */}
       <NetureGlobalHeader />
@@ -138,6 +129,16 @@ export default function PartnerSpaceLayout() {
           {/* Desktop Sidebar */}
           <aside className="w-60 flex-shrink-0 hidden md:block">
             <nav className="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-20">
+              {/* WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
+                  'O4O 홈으로' = 로그인 유지한 채 대표 홈 이동 (로그아웃 아님) */}
+              <Link
+                to="/"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-500 border-b border-gray-100 hover:bg-gray-50 hover:text-gray-900"
+                data-testid="service-o4o-home-link"
+              >
+                <ArrowLeft size={16} />
+                O4O 홈으로
+              </Link>
               {PARTNER_SIDEBAR_GROUPS.map((group) => {
                 const Icon = group.icon;
                 const active = isGroupActive(group);
@@ -207,6 +208,10 @@ export default function PartnerSpaceLayout() {
           {/* Mobile Navigation */}
           <div className="md:hidden w-full mb-4">
             <nav className="flex gap-1 overflow-x-auto bg-white rounded-xl border border-gray-200 p-1">
+              <Link to="/" className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap text-gray-500 hover:bg-gray-50" data-testid="service-o4o-home-link-mobile">
+                <ArrowLeft size={14} />
+                O4O 홈
+              </Link>
               {PARTNER_SIDEBAR_GROUPS.map((group) => {
                 const Icon = group.icon;
                 const active = isGroupActive(group);
@@ -261,5 +266,6 @@ export default function PartnerSpaceLayout() {
       {/* WO-O4O-NETURE-MOBILE-NAV-...-V1: 파트너 영역 모바일 하단 utility nav(알림/내정보). */}
       <NetureBottomNav />
     </div>
+    </ServiceUsageGate>
   );
 }

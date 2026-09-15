@@ -126,6 +126,7 @@ export function NetureBottomNav() {
             email={user?.email}
             onClose={closeSheet}
             onLogout={handleLogout}
+            logoutLabel="O4O 로그아웃"
           >
             <NetureUserMenuItems
               user={user}

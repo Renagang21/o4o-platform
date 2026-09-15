@@ -116,10 +116,12 @@ export function createRequireActivePartner(dataSource: DataSource) {
       res.status(401).json({ success: false, error: { code: 'NO_PARTNER', message: 'No linked partner account found' } });
       return;
     }
-    if (partner.status !== 'ACTIVE') {
+    // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
+    // neture.neture_partners.status 는 entity 기준 소문자('active') — 기존 대문자 비교는 항상 403 이었다.
+    if (String(partner.status ?? '').toLowerCase() !== 'active') {
       res.status(403).json({
         success: false,
-        error: { code: 'PARTNER_NOT_ACTIVE', message: `Partner account is ${partner.status}. Only ACTIVE partners can perform this action.` },
+        error: { code: 'PARTNER_NOT_ACTIVE', message: `Partner account is ${partner.status}. Only active partners can perform this action.` },
         currentStatus: partner.status,
       });
       return;

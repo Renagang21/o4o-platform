@@ -8,7 +8,11 @@
  * 데이터 소스 (전부 기존 API):
  *   - `GET /auth/services`           서비스 카탈로그 + 내 가입 상태 (nameKo · basePath 는 이번 WO 에서 추가)
  *   - `GET /neture/home/entry`       내 매장(복수 나열) · 내 분회(slug)  — 이번 WO 의 홈 전용 read API
- *   - `user.roles` (from /auth/me)   공급자 · 파트너 · 운영자 진입 판정 (Neture RoleGuard 와 같은 상수)
+ *   - `user.roles` (from /auth/me)   운영자 진입 판정 (Neture RoleGuard 와 같은 상수)
+ *   - `entry.serviceStates`          공급자 · 파트너 **서비스별 이용 상태** (WO-O4O-NETURE-MAIN-ACCOUNT-AND-
+ *                                    SUPPLIER-PARTNER-SERVICE-SEPARATION-V1 — role 문자열 · neture 회원
+ *                                    active 만으로 두 상태를 추론하지 않는다. 출처: neture_suppliers /
+ *                                    neture.neture_partners, 승인 전에는 service_memberships role fallback)
  *
  * 원칙:
  *   - 조회 실패는 **미가입으로 취급하지 않는다** → `error` 로 노출하고 재시도만 제공한다.
@@ -21,12 +25,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { api } from './apiClient';
-import {
-  OPERATOR_OR_ABOVE_ROLES,
-  PARTNER_ONLY_ROLES,
-  PLATFORM_ROLES,
-  SUPPLIER_ACCESS_ROLES,
-} from './role-constants';
+import { ADMIN_ROLES, OPERATOR_OR_ABOVE_ROLES, PLATFORM_ROLES } from './role-constants';
 import type { User } from '../contexts/AuthContext';
 
 // ─── API 응답 타입 ────────────────────────────────────────────────────────────
@@ -57,10 +56,29 @@ export interface EntryBranch {
   name: string;
 }
 
+/** 공급자 · 파트너 서비스 이용 상태 — 서버 `resolveNetureServiceStates` 와 같은 값 */
+export type NetureServiceUsageStatus = 'none' | 'pending' | 'active' | 'rejected' | 'suspended' | 'withdrawn';
+
+export interface NetureServiceState {
+  status: NetureServiceUsageStatus;
+  source: string;
+}
+
+export interface NetureServiceStates {
+  supplier: NetureServiceState;
+  partner: NetureServiceState;
+}
+
+export const NONE_SERVICE_STATES: NetureServiceStates = {
+  supplier: { status: 'none', source: 'none' },
+  partner: { status: 'none', source: 'none' },
+};
+
 export interface HomeEntryData {
   services: EntryService[];
   stores: EntryStore[];
   branches: EntryBranch[];
+  serviceStates: NetureServiceStates;
 }
 
 // ─── 진입 액션 ────────────────────────────────────────────────────────────────
@@ -147,6 +165,31 @@ export const STATUS_LABELS: Record<string, string> = {
   withdrawn: '탈퇴',
 };
 
+/** 공급자 · 파트너 서비스는 "O4O 계정 가입" 이 아니라 "서비스 신청" 이다 — 문구를 구분한다. */
+export const SERVICE_STATUS_LABELS: Record<NetureServiceUsageStatus, string> = {
+  none: '미신청',
+  active: '이용 중',
+  pending: '신청 중',
+  suspended: '이용 정지',
+  rejected: '신청 반려',
+  withdrawn: '탈퇴',
+};
+
+/** 공급자 · 파트너 서비스 고정 정보 — 안내 · 신청 · 업무 진입은 전부 Neture 내부 route */
+export const NETURE_SERVICE_INFO = {
+  supplier: { name: '공급자 서비스', landing: '/supplier', work: '/supplier/dashboard', workLabel: '공급자 업무' },
+  partner: { name: '파트너 서비스', landing: '/partner', work: '/partner/dashboard', workLabel: '파트너 업무' },
+} as const;
+
+export function normalizeServiceStates(raw: unknown): NetureServiceStates {
+  const r = (raw ?? {}) as Partial<Record<'supplier' | 'partner', Partial<NetureServiceState>>>;
+  const pick = (v?: Partial<NetureServiceState>): NetureServiceState => ({
+    status: (v?.status as NetureServiceUsageStatus) ?? 'none',
+    source: v?.source ?? 'none',
+  });
+  return { supplier: pick(r.supplier), partner: pick(r.partner) };
+}
+
 // ─── 조회 ─────────────────────────────────────────────────────────────────────
 
 export interface UseHomeEntryResult {
@@ -186,12 +229,13 @@ export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
         ]);
         const services = servicesRes.data?.data?.services;
         const entry = entryRes.data?.data;
-        if (!Array.isArray(services) || !entry) throw new Error('bad response');
+        if (!Array.isArray(services) || !entry || !entry.serviceStates) throw new Error('bad response');
         if (cancelled) return;
         setData({
           services,
           stores: Array.isArray(entry.stores) ? entry.stores : [],
           branches: Array.isArray(entry.branches) ? entry.branches : [],
+          serviceStates: normalizeServiceStates(entry.serviceStates),
         });
       } catch {
         if (cancelled) return;
@@ -306,16 +350,17 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     }
   }
 
-  // 공급자 · 파트너 — Neture 자체 화면. RoleGuard 와 같은 상수 + Neture 이용 중일 때만.
+  // 공급자 · 파트너 — 각각 독립 서비스. 업무 진입은 **그 서비스 이용 상태가 active 일 때만**
+  // (관리자는 운영 목적으로 통과 — 서버 guard 와 동일). role 문자열 · neture 회원 여부로 판정하지 않는다.
+  const states = data.serviceStates ?? NONE_SERVICE_STATES;
+  const isAdmin = isPlatformAdmin || hasAnyRole(roles, ADMIN_ROLES);
   const supplier: EntryItem[] = [];
   const partner: EntryItem[] = [];
-  if (isActive('neture') || isPlatformAdmin) {
-    if (hasAnyRole(roles, SUPPLIER_ACCESS_ROLES)) {
-      supplier.push({ id: 'supplier:neture', label: '공급자 업무', action: { kind: 'internal', to: '/supplier/dashboard' } });
-    }
-    if (hasAnyRole(roles, PARTNER_ONLY_ROLES)) {
-      partner.push({ id: 'partner:neture', label: '파트너 업무', action: { kind: 'internal', to: '/partner/dashboard' } });
-    }
+  if (states.supplier.status === 'active' || isAdmin) {
+    supplier.push({ id: 'supplier:neture', label: NETURE_SERVICE_INFO.supplier.workLabel, action: { kind: 'internal', to: NETURE_SERVICE_INFO.supplier.work } });
+  }
+  if (states.partner.status === 'active' || isAdmin) {
+    partner.push({ id: 'partner:neture', label: NETURE_SERVICE_INFO.partner.workLabel, action: { kind: 'internal', to: NETURE_SERVICE_INFO.partner.work } });
   }
 
   // 서비스 운영자 화면 — `{prefix}:operator|admin` + 해당 서비스 이용 중. platform:super_admin 은 Neture /admin.
@@ -359,6 +404,11 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
 
   // ── 내가 이용하는 서비스 (active 만) ──
   const myServices: EntryItem[] = [];
+  for (const svcKey of ['supplier', 'partner'] as const) {
+    if (states[svcKey].status !== 'active') continue;
+    const info = NETURE_SERVICE_INFO[svcKey];
+    myServices.push({ id: `svc:neture-${svcKey}`, label: info.name, action: { kind: 'internal', to: info.work } });
+  }
   for (const svc of data.services) {
     if (svc.membership?.status !== 'active') continue;
     if (svc.key === 'neture') {
@@ -385,6 +435,17 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
 
   // ── 가입 · 이용 상태 (active 가 아닌 membership 만) ──
   const statusItems: StatusItem[] = [];
+  for (const svcKey of ['supplier', 'partner'] as const) {
+    const status = states[svcKey].status;
+    if (status === 'none' || status === 'active') continue;
+    const info = NETURE_SERVICE_INFO[svcKey];
+    // 신청 중 · 반려 · 정지 · 탈퇴 → 안내 화면(랜딩)만. 업무 진입 버튼은 없다.
+    const guide =
+      status === 'rejected' || status === 'withdrawn'
+        ? { label: '다시 신청하기', href: info.landing }
+        : { label: '신청 상태 보기', href: info.landing };
+    statusItems.push({ id: `status:neture-${svcKey}`, serviceName: info.name, status, statusLabel: SERVICE_STATUS_LABELS[status], guide });
+  }
   for (const svc of data.services) {
     const status = svc.membership?.status;
     if (!status || status === 'active') continue;
@@ -403,6 +464,17 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
 
   // ── 가입 가능한 서비스 — membership row 없음 + joinEnabled + 가입 경로 확인된 것만 ──
   const joinable: EntryItem[] = [];
+  // 공급자 · 파트너 서비스 미신청 → 서비스 신청 안내 (O4O 계정 가입이 아니다)
+  for (const svcKey of ['supplier', 'partner'] as const) {
+    if (states[svcKey].status !== 'none') continue;
+    const info = NETURE_SERVICE_INFO[svcKey];
+    joinable.push({
+      id: `join:neture-${svcKey}`,
+      label: `${info.name} 신청`,
+      note: svcKey === 'supplier' ? '제품을 등록하고 매장에 공급하는 공급자 서비스' : '제품을 소개하고 연결하는 파트너 서비스',
+      action: { kind: 'internal', to: info.landing },
+    });
+  }
   for (const svc of data.services) {
     if (svc.membership) continue;
     if (!svc.joinEnabled) continue;

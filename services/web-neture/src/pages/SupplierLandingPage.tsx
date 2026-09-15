@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
+import { ServiceApplyPanel } from '../components/auth/ServiceApplyPanel';
 
 /* ── 참여 혜택 ── */
 const benefits = [
@@ -85,9 +86,11 @@ const registrationSteps = [
 ];
 
 export default function SupplierLandingPage() {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { openLoginModal } = useLoginModal();
-  const isSupplier = isAuthenticated && user?.roles.some((r) => ['neture:supplier', 'supplier', 'neture:admin', 'platform:super_admin'].includes(r));
+  // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
+  //   비로그인 → O4O 회원가입(공급자) · 로그인. 로그인 회원 → role 이 아니라 **서비스 이용 상태** 로
+  //   신청 폼 / 신청 중 / 업무 진입 / 반려 · 정지 안내 (ServiceApplyPanel).
 
   return (
     <div>
@@ -102,7 +105,9 @@ export default function SupplierLandingPage() {
             <br />
             공급자는 제품과 콘텐츠를 등록하고 매장과 파트너를 통해 판매를 확장할 수 있습니다.
           </p>
-          {!isSupplier && (
+          {isAuthenticated ? (
+            <ServiceApplyPanel service="supplier" />
+          ) : (
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link
                 to="/register"
@@ -238,13 +243,24 @@ export default function SupplierLandingPage() {
           <p className="text-gray-400 mb-8">
             전국 매장 네트워크를 통해 제품을 공급하고 비즈니스를 성장시키세요.
           </p>
-          <Link
-            to="/register"
-            className="inline-flex items-center px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            공급자 등록
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Link>
+          {isAuthenticated ? (
+            <a
+              href="#top"
+              onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              className="inline-flex items-center px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              공급자 서비스 신청 · 상태 보기
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </a>
+          ) : (
+            <Link
+              to="/register"
+              className="inline-flex items-center px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              공급자 등록
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
+          )}
         </div>
       </section>
     </div>

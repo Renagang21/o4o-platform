@@ -504,6 +504,8 @@ const HomepageCmsPage = lazy(() => import('./pages/operator/HomepageCmsPage'));
 const OperatorGuideContentsPage = lazy(() => import('./pages/operator/OperatorGuideContentsPage'));
 // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1
 const OperatorSupplierApprovalPage = lazy(() => import('./pages/operator/OperatorSupplierApprovalPage'));
+// WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1: 파트너 서비스 신청 승인
+const OperatorPartnerApprovalPage = lazy(() => import('./pages/operator/OperatorPartnerApprovalPage'));
 // WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1
 const OperatorContactMessagesPage = lazy(() => import('./pages/operator/OperatorContactMessagesPage'));
 
@@ -1236,6 +1238,8 @@ function App() {
               <Route path="/operator/actions" element={<OperatorActionQueuePage />} />
               {/* WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1: operator scope supplier activation */}
               <Route path="/operator/suppliers" element={<OperatorSupplierApprovalPage />} />
+              {/* WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1: partner service application approval */}
+              <Route path="/operator/partners" element={<OperatorPartnerApprovalPage />} />
               {/* WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1: operator scope contact messages */}
               <Route path="/operator/contact-messages" element={<OperatorContactMessagesPage />} />
             </Route>

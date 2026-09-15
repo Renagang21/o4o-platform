@@ -13,6 +13,10 @@
  *   GET   /partner/dashboard/items/:itemId/contents
  *   PATCH /partner/dashboard/items/:itemId/contents/reorder
  *   PATCH /partner/dashboard/items/:itemId/contents/:linkId/primary
+ *
+ * WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
+ *   요청자 본인 소유 자원이라도 파트너 서비스 이용 상태(neture.neture_partners)를 먼저 검사한다 —
+ *   조회 = requireLinkedPartner · 변경 = requireActivePartner. O4O 로그인만으로는 접근 불가.
  */
 import { Router } from 'express';
 import type { Request, Response, RequestHandler } from 'express';
@@ -171,7 +175,7 @@ export function createPartnerDashboardController(deps: {
    * GET /partner/dashboard/summary
    * Get partner dashboard summary
    */
-  router.get('/partner/dashboard/summary', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/partner/dashboard/summary', requireAuth, requireLinkedPartner, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
 
@@ -228,7 +232,7 @@ export function createPartnerDashboardController(deps: {
    * POST /partner/dashboard/items/:itemId/contents
    * Link content to a dashboard item
    */
-  router.post('/partner/dashboard/items/:itemId/contents', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.post('/partner/dashboard/items/:itemId/contents', requireAuth, requireActivePartner, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -273,7 +277,7 @@ export function createPartnerDashboardController(deps: {
    * DELETE /partner/dashboard/items/:itemId/contents/:linkId
    * Unlink content from a dashboard item
    */
-  router.delete('/partner/dashboard/items/:itemId/contents/:linkId', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.delete('/partner/dashboard/items/:itemId/contents/:linkId', requireAuth, requireActivePartner, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -307,7 +311,7 @@ export function createPartnerDashboardController(deps: {
    * GET /partner/dashboard/items/:itemId/contents
    * Get linked contents for a dashboard item
    */
-  router.get('/partner/dashboard/items/:itemId/contents', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.get('/partner/dashboard/items/:itemId/contents', requireAuth, requireLinkedPartner, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -365,7 +369,7 @@ export function createPartnerDashboardController(deps: {
    * Reorder linked contents
    * WO-PARTNER-CONTENT-ORDER-PHASE2-V1
    */
-  router.patch('/partner/dashboard/items/:itemId/contents/reorder', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.patch('/partner/dashboard/items/:itemId/contents/reorder', requireAuth, requireActivePartner, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {
@@ -416,7 +420,7 @@ export function createPartnerDashboardController(deps: {
    * Set a content link as primary
    * WO-PARTNER-CONTENT-ORDER-PHASE2-V1
    */
-  router.patch('/partner/dashboard/items/:itemId/contents/:linkId/primary', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  router.patch('/partner/dashboard/items/:itemId/contents/:linkId/primary', requireAuth, requireActivePartner, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const userId = req.user?.id;
       if (!userId) {

@@ -265,6 +265,32 @@ export class OperatorRegistrationService {
         }
       }
 
+      // 5. partner role → neture.neture_partners 자동 생성/활성화
+      // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
+      //   파트너 서비스 이용 상태의 단일 출처는 neture.neture_partners.status 다(공급자의 neture_suppliers 와 대칭).
+      //   기존에는 승인이 role 만 부여하고 행을 만들지 않아 requireActivePartner guard 가 항상 NO_PARTNER 였다.
+      //   pending 행(로그인 회원의 서비스 신청)이 있으면 active 로 전이, 없으면 active 로 생성. rejected/suspended 는 보존.
+      if (rawRole === 'partner') {
+        const [partnerUserRow] = await queryRunner.query(
+          `SELECT name, "businessInfo" FROM users WHERE id = $1`,
+          [userId],
+        );
+        const partnerName = partnerUserRow?.businessInfo?.businessName || partnerUserRow?.name || 'partner';
+        await queryRunner.query(
+          `UPDATE neture.neture_partners
+              SET status = 'active', updated_by = $2, updated_at = NOW()
+            WHERE user_id = $1 AND status = 'pending'`,
+          [userId, approvedBy],
+        );
+        await queryRunner.query(
+          `INSERT INTO neture.neture_partners (name, business_name, type, status, user_id, created_by, updated_by, created_at, updated_at)
+           SELECT $2, $3, 'partner', 'active', $1, $4, $4, NOW(), NOW()
+            WHERE NOT EXISTS (SELECT 1 FROM neture.neture_partners WHERE user_id = $1)`,
+          [userId, partnerName, partnerUserRow?.businessInfo?.businessName || null, approvedBy],
+        );
+        logger.info(`[Registration] neture_partners ensured active for user ${userId} — partner service approval`);
+      }
+
       await queryRunner.commitTransaction();
       return { success: true, userId };
     } catch (error) {
@@ -295,6 +321,15 @@ export class OperatorRegistrationService {
     if (!result?.length) {
       throw new Error('REGISTRATION_NOT_FOUND');
     }
+
+    // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
+    //   가입 반려 시 파트너 서비스 신청 행(pending)이 있으면 함께 반려 — 서비스 상태 단일 출처 정합.
+    await this.dataSource.query(
+      `UPDATE neture.neture_partners
+          SET status = 'rejected', updated_by = $1, updated_at = NOW()
+        WHERE user_id = $2 AND status = 'pending'`,
+      [rejectedBy, userId],
+    );
 
     return { success: true, userId };
   }

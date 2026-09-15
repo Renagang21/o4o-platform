@@ -20,6 +20,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import {
+  ArrowLeft,
   Home,
   Package,
   ShoppingCart,
@@ -38,7 +39,7 @@ import { NetureGlobalHeader } from '../NetureGlobalHeader';
 import { NetureBottomNav } from '../NetureBottomNav';
 // WO-O4O-NETURE-SHELL-FOOTER-LEGAL-CONTRACT-ADOPTION-V1: 공개 푸터와 동일 loader 재사용
 import { loadFooterLegal } from '../../lib/footerLegal';
-import { SUPPLIER_ACCESS_ROLES } from '../../lib/role-constants';
+import { ServiceUsageGate } from '../auth/ServiceUsageGate';
 
 // WO-NETURE-SUPPLIER-PRODUCT-LIST-WIDE-TABLE-VIEW-APPLY-V1
 // 자식 페이지가 본문 영역의 max-width 제약을 해제할 수 있도록 컨텍스트 제공
@@ -221,6 +222,17 @@ export default function SupplierSpaceLayout() {
   //   onNavigate: 메뉴(Link) 선택 시 호출(mobile drawer 에서만 closeMobile 전달). 그룹 토글은 close 안 함.
   const renderNav = (onNavigate?: () => void) => (
     <>
+      {/* WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
+          'O4O 홈으로' = 로그인 유지한 채 대표 홈 이동 (로그아웃 아님) */}
+      <Link
+        to="/"
+        onClick={onNavigate}
+        className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-500 border-b border-gray-100 hover:bg-gray-50 hover:text-gray-900"
+        data-testid="service-o4o-home-link"
+      >
+        <ArrowLeft size={16} />
+        O4O 홈으로
+      </Link>
       {SUPPLIER_SIDEBAR_GROUPS.map((group) => {
         const Icon = group.icon;
         const active = isGroupActive(group);
@@ -301,20 +313,10 @@ export default function SupplierSpaceLayout() {
     return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
-  const hasAccess = user.roles.some(r => SUPPLIER_ACCESS_ROLES.includes(r));
-  if (!hasAccess) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen text-center p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">접근 권한 없음</h1>
-        <p className="text-gray-600 mb-6">이 페이지는 공급자 전용입니다.</p>
-        <Link to="/" className="text-primary-600 hover:text-primary-700 font-medium">
-          홈으로 돌아가기
-        </Link>
-      </div>
-    );
-  }
-
+  // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
+  //   role 문자열 대신 **공급자 서비스 이용 상태(neture_suppliers)** 로 게이트. 상태별 안내는 ServiceUsageGate.
   return (
+    <ServiceUsageGate service="supplier">
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: Layer A — GlobalHeader */}
       <NetureGlobalHeader />
@@ -402,5 +404,6 @@ export default function SupplierSpaceLayout() {
       {/* WO-O4O-NETURE-MOBILE-NAV-...-V1: 공급자 영역 모바일 하단 utility nav(알림/내정보). */}
       <NetureBottomNav />
     </div>
+    </ServiceUsageGate>
   );
 }
