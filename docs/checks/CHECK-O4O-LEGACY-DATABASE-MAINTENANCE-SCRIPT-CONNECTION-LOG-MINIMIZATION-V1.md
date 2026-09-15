@@ -1,7 +1,7 @@
 # CHECK — WO-O4O-LEGACY-DATABASE-MAINTENANCE-SCRIPT-CONNECTION-LOG-MINIMIZATION-V1
 
 **작성일**: 2026-09-15
-**구현 커밋**: (본 문서와 같은 커밋 · `main`)
+**구현 커밋**: `76827baf7` (`main`) · CI 결과 기록 후속 커밋 1건
 **판정**: **C · DEAD_LEGACY_SCRIPT → 삭제 (REMOVED_WITH_EVIDENCE)** — §16 완료 키 전부 충족
 
 > DB host · database name · 계정 · 비밀번호 · instance 이름 · 접속 URL 은 이 문서에 기록하지 않는다. canary 값도 기록하지 않는다. 운영 DB 는 read-only 조회(컬럼 존재 여부 · migration history · 건수)만 수행했고 사용자 식별값 · 행 내용은 조회하지 않았다.
@@ -158,13 +158,13 @@ cloud-sql-proxy(:5442, 다른 세션 기동) 경유 `psql -w` · SELECT 만 실�
 
 ## 13. CI · CodeQL · Deploy (§15)
 
-push 후 갱신 — 아래 값은 push 직후 기록한다.
+대상 커밋 `76827baf7` (본 WO 구현 커밋 자체 · 조상 SHA 대체 없음 · cancelled 없음).
 
 | 항목 | 값 |
 |---|---|
-| CI_PIPELINE | (push 후 기록) |
-| CODEQL | (push 후 기록) |
-| DEPLOY_API | (push 후 기록 — `apps/api-server/**` 경로 트리거로 실행 예상, 이미지 내용 변화 없음) |
+| CI_PIPELINE | **SUCCESS** — run `34934728115` |
+| CODEQL | **SUCCESS** — run `34934728207` |
+| DEPLOY_API | **SUCCESS** — run `34934728103` (`apps/api-server/**` 경로 트리거 · 스크립트는 이미지 미포함이므로 런타임 내용 변화 없음) |
 
 ## 14. 중지 조건 (§13) 점검
 
@@ -181,7 +181,7 @@ push 후 갱신 — 아래 값은 push 직후 기록한다.
 | 9 | 다른 세션이 같은 파일 편집 | ✗ (기존 worktree 는 0 commits ahead · 파일 dirty 없음) |
 | 10 | 메인 diverged 해소 필요 | ✗ (별도 worktree) |
 | 11 | 운영 migration/schema/data 변경 필요 | ✗ |
-| 12 | 관련 CI/CodeQL 실패 | §13 에서 기록 |
+| 12 | 관련 CI/CodeQL 실패 | ✗ (§13 전부 SUCCESS) |
 
 ## 15. 최종 판정 · 완료 키 (§16)
 
@@ -199,9 +199,9 @@ PRODUCTION_DATA_CHANGE = ZERO
 PRODUCTION_MIGRATION_HISTORY_CHANGE = ZERO
 API_RUNTIME_CHANGE = ZERO
 OTHER_SERVICE_REGRESSION = PASS
-CI_PIPELINE = (§13)
-CODEQL = (§13)
-DEPLOY_API = (§13)
+CI_PIPELINE = SUCCESS (34934728115)
+CODEQL = SUCCESS (34934728207)
+DEPLOY_API = SUCCESS (34934728103)
 LEGACY_DATABASE_MAINTENANCE_SCRIPT_CONNECTION_LOG_MINIMIZATION = CLOSED
 ```
 
