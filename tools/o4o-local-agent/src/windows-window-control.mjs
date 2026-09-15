@@ -374,15 +374,28 @@ function validHandle(hwnd) {
 /**
  * 대상 창 검사 (§9·§10·§14).
  * 반환: `{ ok, foreground, targetPid, foregroundPid, foregroundHwnd, clientWidth, clientHeight,
- *          captured, snapshotWidth, snapshotHeight }` — 이미지는 없다. 스크립트가 만들지 않는다.
+ *          captured, snapshotWidth, snapshotHeight }` + (capture 요청·성공 시) `imageMime, imageWidth,
+ *          imageHeight, imageBase64`.
+ *
+ * WO-O4O-WINDOWS-VISUAL-COMPUTER-USE-AND-FAST-LOOP-V1 §4·§4-1:
+ *   `opts.capture === true` 일 때만 스크립트에 `O4O_INSPECT_CAPTURE=1` 을 주어 client 영역 JPEG base64 를
+ *   한 번 받는다. 그 값은 이 함수 반환값(메모리)에만 있고, 파일로 쓰지 않는다. base64 가 커질 수 있어
+ *   그 경우에만 maxBuffer 를 올린다(치수-only 응답은 종전 512KB 로 둔다).
  */
-export async function inspectComputerWindow(hwnd) {
+export async function inspectComputerWindow(hwnd, opts = {}) {
   const handle = validHandle(hwnd);
   if (handle === null) return { ok: false };
-  const raw = await runScript(COMPUTER_INSPECT_SCRIPT, childEnv({ O4O_WINDOW_HANDLE: String(handle) }));
+  const capture = opts.capture === true;
+  const env = { O4O_WINDOW_HANDLE: String(handle) };
+  if (capture) env.O4O_INSPECT_CAPTURE = '1';
+  const raw = await runScript(
+    COMPUTER_INSPECT_SCRIPT,
+    childEnv(env),
+    capture ? { maxBuffer: MAX_OUTPUT_BYTES * 16 } : {},
+  );
   const parsed = parseJson(raw);
   if (!parsed || typeof parsed !== 'object' || parsed.visible !== true) return { ok: false };
-  return {
+  const result = {
     ok: true,
     foreground: parsed.foreground === true,
     targetPid: Number(parsed.targetPid) || 0,
@@ -394,6 +407,14 @@ export async function inspectComputerWindow(hwnd) {
     snapshotWidth: Math.max(0, Number(parsed.snapshotWidth) || 0),
     snapshotHeight: Math.max(0, Number(parsed.snapshotHeight) || 0),
   };
+  // 이미지는 flag+캡처 성공+정상 형식일 때만 반환값에 실린다. 그 밖엔 필드 자체가 없다(하위호환).
+  if (capture && typeof parsed.imageBase64 === 'string' && parsed.imageBase64.length > 0 && /^[A-Za-z0-9+/=]+$/.test(parsed.imageBase64)) {
+    result.imageMime = 'image/jpeg';
+    result.imageWidth = Math.max(0, Number(parsed.imageWidth) || 0);
+    result.imageHeight = Math.max(0, Number(parsed.imageHeight) || 0);
+    result.imageBase64 = parsed.imageBase64;
+  }
+  return result;
 }
 
 /**

@@ -71,6 +71,8 @@ export const ACTIONS = {
   BROWSER_OPEN_SITE: 'local.browser.open_site',
   // WO-O4O-COMPUTER-USE-V0 §14~§20·§24
   COMPUTER_INSPECT: 'local.computer.inspect',
+  // WO-O4O-WINDOWS-VISUAL-COMPUTER-USE-AND-FAST-LOOP-V1 §4·§4-1 — inspect + client 영역 JPEG(요청 메모리 전용).
+  COMPUTER_CAPTURE: 'local.computer.capture',
   COMPUTER_CLICK: 'local.computer.click',
   COMPUTER_TYPE_TEXT: 'local.computer.type_text',
   COMPUTER_KEY: 'local.computer.key',
@@ -403,6 +405,55 @@ async function computerInspect(app) {
 }
 
 /**
+ * `local.computer.capture` — inspect 와 같은 검사에 더해 client 영역 JPEG base64 를 **한 번** 돌려준다.
+ *
+ * WO-O4O-WINDOWS-VISUAL-COMPUTER-USE-AND-FAST-LOOP-V1 §4·§4-1:
+ *   UIA 가 못 보는 화면을 AI 가 보고 이어 작업하기 위한 좁은 capability. 이미지는 스크립트가
+ *   메모리에서 만들고 stdout 한 줄로만 내보내며(파일 0), 이 handler 는 그것을 result.data 에 실어
+ *   서버로 보낸다. 서버는 `pickCaptureImage`(메모리 전용)로만 planner 에 넘기고, 로그·DB 뷰
+ *   (`pickSafeComputerInfo`)에는 이미지가 들어가지 않는다. 로그인/파일 대화상자 성격 창은 캡처하지 않는다.
+ */
+async function computerCapture(app) {
+  const target = await resolveComputerTarget(app);
+  if (target.failure) return target.failure;
+  // 로그인·인증·파일 대화상자 성격 창은 화면 자체를 캡처하지 않는다(§5 credential/OTP deny).
+  if (isUserActionTitle(target.window.title)) {
+    return {
+      status: 'failed',
+      errorCode: COMPUTER_ERR.USER_ACTION_REQUIRED,
+      data: computerBase(app, { found: true, windowCount: 1, userActionRequired: true }),
+    };
+  }
+  const info = await inspectComputerWindow(target.window.hwnd, { capture: true });
+  if (!info.ok) {
+    return {
+      status: 'failed',
+      errorCode: COMPUTER_ERR.TARGET_NOT_FOUND,
+      data: computerBase(app, { found: false, windowCount: 0 }),
+    };
+  }
+  const image = typeof info.imageBase64 === 'string'
+    ? { imageMime: info.imageMime, imageWidth: info.imageWidth, imageHeight: info.imageHeight, imageBase64: info.imageBase64 }
+    : {};
+  return {
+    status: 'success',
+    data: computerBase(app, {
+      found: true,
+      windowCount: 1,
+      foreground: info.foreground,
+      clientWidth: info.clientWidth,
+      clientHeight: info.clientHeight,
+      snapshotAvailable: info.captured,
+      snapshotWidth: info.snapshotWidth,
+      snapshotHeight: info.snapshotHeight,
+      userActionRequired: false,
+      capturedAt: new Date().toISOString(),
+      ...image,
+    }),
+  };
+}
+
+/**
  * 스크립트가 "실행하지 않았다" 고 한 이유를 서버 코드로 옮긴다 (§9·§41·§42·§45).
  *
  *   TARGET_LOST + 다른 프로세스가 앞에 있음 → TARGET_LOST
@@ -491,6 +542,7 @@ function computerKey(app, args) {
  */
 const COMPUTER_HANDLERS = {
   [ACTIONS.COMPUTER_INSPECT]: { validate: () => ({ ok: true, args: undefined }), run: computerInspect },
+  [ACTIONS.COMPUTER_CAPTURE]: { validate: () => ({ ok: true, args: undefined }), run: computerCapture },
   [ACTIONS.COMPUTER_CLICK]: { validate: validateClickArgs, run: computerClick },
   [ACTIONS.COMPUTER_TYPE_TEXT]: { validate: validateTextArgs, run: computerTypeText },
   [ACTIONS.COMPUTER_KEY]: { validate: validateKeyArgs, run: computerKey },

@@ -127,7 +127,12 @@ describe('Work Agent — 안전 거절 → 인계', () => {
     ] as const) {
       const planner = scripted(SEND);
       const { result, seen } = await run(GOAL, planner, { 'local.target.prepare': [PREP], 'local.uia.inspect': [CHAT], 'local.uia.set_value': [SAFETY_FAIL(code, reason, code.endsWith('USER_ACTIVE'))] });
-      expect(seen.map((s) => s.base)).toEqual(['local.target.prepare', 'local.uia.inspect', 'local.uia.set_value']);
+      // VISUAL-CU-V1 §4: HIDDEN_CONTROL 은 즉시 인계 전에 시각 fallback 을 한 번 시도한다(활성화→캡처). 이 하네스엔
+      // 캡처 스크립트가 없어 캡처가 실패하고, 그때 비로소 uia_hidden_control 로 인계한다. 나머지 3종은 캡처 없이 즉시 인계.
+      const expectedSeen = code.endsWith('HIDDEN_CONTROL')
+        ? ['local.target.prepare', 'local.uia.inspect', 'local.uia.set_value', 'local.activate_window', 'local.computer.capture']
+        : ['local.target.prepare', 'local.uia.inspect', 'local.uia.set_value'];
+      expect(seen.map((s) => s.base)).toEqual(expectedSeen);
       expect(result.takeover?.reason).toBe(expected);
       expect(result.progress).toBe('needs_user');
       expect(result.ok).toBe(true);
@@ -179,7 +184,7 @@ describe('Work Agent — 안전 거절 → 인계', () => {
     expect(result.message).toContain('보내지 않았습니다');
   });
 
-  it('로그 키 불변 · 사유/제목/좌표가 로그에 없다 · Computer Use vision 경로는 Work Agent 에 배선돼 있지 않다(§64)', async () => {
+  it('로그 키 불변 · 사유/제목/좌표가 로그에 없다 · Computer Use 는 시각 fallback(capture+visual_*)만 배선되고 inspect vision 루프는 아니다(§64/VISUAL-CU-V1)', async () => {
     const planner = scripted(SEND);
     await run(GOAL, planner, { 'local.target.prepare': [PREP], 'local.uia.inspect': [CHAT], 'local.uia.set_value': [SAFETY_FAIL('WINDOWS_AUTOMATION_USER_ACTIVE', 'user_active', true)] });
     const entry = (logger.info as jest.Mock).mock.calls.filter((c) => c[0] === 'local-agent uia command').pop();
@@ -187,7 +192,11 @@ describe('Work Agent — 안전 거절 → 인계', () => {
     expect(entry![1].errorCode).toBe('WINDOWS_AUTOMATION_USER_ACTIVE');
     expect(JSON.stringify(entry![1])).not.toMatch(/홍길동|user_active|x=|y=/);
     const runtime = readFileSync(join(__dirname, '..', 'services', 'ai-tools', 'work-agent-runtime.ts'), 'utf8');
-    expect(runtime).not.toContain('local.computer.');
+    // VISUAL-CU-V1: 시각 fallback 은 이제 Work Agent 에 배선된다 — 조작은 COMPUTER_CLICK/TYPE_TEXT/KEY 로만 나간다.
+    expect(runtime).toContain('LOCAL_AGENT_ACTIONS.COMPUTER_CLICK');
+    expect(runtime).toContain('LOCAL_AGENT_ACTIONS.COMPUTER_TYPE_TEXT');
+    expect(runtime).toContain('LOCAL_AGENT_ACTIONS.COMPUTER_KEY');
+    // 그러나 무거운 inspect vision 추론 루프(COMPUTER_INSPECT)는 여전히 Work Agent 에 배선하지 않는다 — 화면은 capture 로만 읽는다.
     expect(runtime).not.toContain('COMPUTER_INSPECT');
   });
 });

@@ -45,7 +45,7 @@ import {
   type RecoveryUsageFields,
 } from './automation-recovery-contract.js';
 import { findWindowsApp } from '../local-agent/windows-app-registry.js';
-import { textDenyReason as computerTextDenyReason } from '../local-agent/computer-use-contract.js';
+import { COMPUTER_ALLOWED_KEYS, textDenyReason as computerTextDenyReason } from '../local-agent/computer-use-contract.js';
 
 // ─── Goal (§5) ──────────────────────────────────────────────────────────────
 
@@ -82,7 +82,8 @@ export interface WorkImageInput {
   mimeType: 'image/jpeg' | 'image/png' | 'image/webp';
   /** 순수 base64. */
   base64: string;
-  provenance: 'user_image';
+  /** user_image=사용자 첨부(§11) · screen_capture=UIA fallback 시 등재 앱 foreground client 캡처(§4). 둘 다 UNTRUSTED. */
+  provenance: 'user_image' | 'screen_capture';
 }
 
 export const WORK_IMAGE_MIME_TYPES: readonly string[] = Object.freeze(['image/jpeg', 'image/png', 'image/webp']);
@@ -123,6 +124,12 @@ export interface WorkObservation {
   fingerprint: string;
   /** content script 의 문서 인스턴스 id. 이동 뒤 "새 문서를 봤는가" 판정용(무작위 값, 내용 무관). */
   docId?: string;
+  /**
+   * WO-O4O-WINDOWS-VISUAL-COMPUTER-USE-AND-FAST-LOOP-V1 §4 — 이 관찰이 **Visual Computer Use fallback** 관찰인가.
+   * UIA 가 요소를 노출하지 못해 화면 이미지를 planner 에 넘긴 상태에서만 true. 이때에만 visual_* 행동이 허용된다.
+   * (이미지 base64 자체는 여기에 담지 않는다 — 로그·지문에 새지 않도록 runtime 이 planner 호출에만 따로 넘긴다.)
+   */
+  visualFallback?: boolean;
 }
 
 export function fingerprintObservation(path: string, elements: readonly SafeDomElement[]): string {
@@ -148,13 +155,29 @@ export function describeObservationElement(e: WorkElement): string {
 
 // ─── Proposal (§8·§10) ──────────────────────────────────────────────────────
 
-/** Planner 가 제안할 수 있는 행동 종류 — 전부 기존 DOM tool 또는 loop 제어다. 새 실행 수단은 없다. */
+/** Planner 가 제안할 수 있는 행동 종류 — 전부 기존 DOM/UIA tool 또는 loop 제어다. 새 실행 수단은 없다. */
 export const WORK_ACTION_KINDS = Object.freeze([
   'inspect', 'find', 'read_text', 'read_table', 'set_input', 'select_option', 'click', 'takeover', 'done',
   // WINDOWS-UI-AUTOMATION-V0 — uia 표면 전용: 허용 키 1회(입력창 제출 포함). dom 표면에서는 거절된다.
   'key',
+  // WO-O4O-WINDOWS-VISUAL-COMPUTER-USE-AND-FAST-LOOP-V1 §4 — Visual Computer Use.
+  //   UIA 가 화면 요소를 노출하지 못할 때만(observation.visualFallback), AI 가 캡처 이미지를 보고
+  //   client 영역 정규화 0..1 좌표/텍스트/허용키로 직접 조작한다. 기존 local.computer.* 로 실행되며
+  //   elementRef 를 요구하지 않는다(요소가 없기 때문이다). structured-first 는 유지 — UIA 로 보이는
+  //   요소는 여전히 UIA(click/set_input/key)로만 다룬다.
+  'visual_click', 'visual_type', 'visual_key',
 ] as const);
 export type WorkActionKind = (typeof WORK_ACTION_KINDS)[number];
+
+/** 한 plan 에 실을 수 있는 행동 배치 상한(§7 Fast Loop). runtime 이 각 행동마다 안전 재검증·중단 조건을 본다. */
+export const WORK_BATCH_MAX = 4;
+/**
+ * 배치에 담을 수 있는 행동 종류 — **화면을 바꾸는 실행 행동만**. inspect·find·read_text·read_table 은
+ * 결과가 Planner 입력이 되어야 하므로(=다음에 AI 가 필요) 배치로 이어 실행하지 않는다. takeover·done 은 단일 제어다.
+ */
+const BATCHABLE_ACTION_KINDS: readonly string[] = Object.freeze([
+  'set_input', 'select_option', 'click', 'key', 'visual_click', 'visual_type', 'visual_key',
+]);
 
 export type WorkProgress = 'progress' | 'no_progress' | 'needs_user' | 'completed' | 'failed';
 export const WORK_PROGRESS_VALUES: readonly string[] = Object.freeze(['progress', 'no_progress', 'needs_user', 'completed', 'failed']);
@@ -195,7 +218,14 @@ export interface WorkAction {
 export interface WorkProposal {
   /** 직전 결과 · 현재 상태에 대한 판단(§17·§18). */
   assessment: WorkProgress;
+  /** 다음 행동 하나. 배치가 있으면 그 첫 행동과 같다(단일 실행 경로 하위호환). */
   action: WorkAction;
+  /**
+   * WO-O4O-...-FAST-LOOP-V1 §7 — 짧은 행동 배치(최대 WORK_BATCH_MAX). 있으면 runtime 이
+   * 각 행동마다 안전을 재검증하며 연속 실행하고, 화면 변화·새 창·모달·오류 등 중단 조건에서 즉시 멈추고 재관찰한다.
+   * 검증을 통과한 실행 행동만 담긴다(inspect/takeover/done 은 배치 밖).
+   */
+  batch?: WorkAction[];
   /** 짧은 근거(프롬프트 표시용 · 로그 미기록). */
   rationale?: string;
   /** 지금 필요한 사용자 입력이 무엇인지(§11 need-based). */
@@ -242,27 +272,22 @@ function shortText(v: unknown): v is string {
 }
 
 /**
- * Planner 응답 → 검증된 proposal(§9·§10). Runtime 이 실행 직전에 부른다.
- *   - 형상 · 행동 종류 · 금지 키.
+ * 행동 하나를 검증한다(§9·§10). 단일 proposal 과 배치 항목이 **같은 규칙**을 지나도록 분리했다.
+ *   - 형상 · 행동 종류에 맞는 role/필드.
  *   - elementRef 는 **직전 관찰에 있던 것**이어야 하고 행동에 맞는 role 이어야 한다.
- *   - click 대상이 관찰에서 COMMIT 으로 표시됐으면 제안 단계에서 거절한다(확장도 다시 막는다).
- *   - set_input 텍스트는 DOM 입력 거절 규칙(비밀번호 · 명령어 성격 · 500자 초과)을 통과해야 한다.
+ *   - click 대상이 관찰에서 COMMIT 으로 표시됐으면 거절(확장/UIA 도 다시 막는다).
+ *   - set_input/visual_type 텍스트는 입력 거절 규칙(비밀번호 · 명령어 성격 · 길이 초과)을 통과해야 한다.
+ *   - visual_* 는 observation.visualFallback 일 때만 허용(structured-first 보존).
+ * 반환: 검증된 WorkAction(정규화 사본) 또는 거절 사유.
  */
-export function validateWorkProposal(raw: unknown, observation: WorkObservation | null): { ok: boolean; proposal?: WorkProposal; reason?: ProposalRejectReason } {
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return { ok: false, reason: 'SHAPE' };
-  if (hasForbiddenKey(raw)) return { ok: false, reason: 'FORBIDDEN_KEY' };
-  const r = raw as Record<string, unknown>;
-  const assessment = typeof r.assessment === 'string' && WORK_PROGRESS_VALUES.includes(r.assessment) ? (r.assessment as WorkProgress) : 'progress';
-  const a = r.action;
-  if (!a || typeof a !== 'object' || Array.isArray(a)) return { ok: false, reason: 'SHAPE' };
-  const act = a as Record<string, unknown>;
+// NOTE: strictNullChecks off → 판별 유니온의 부정 내로잉(`if (!x.ok)`)이 동작하지 않는다(ref-api-server-strictnullchecks-no-negation-narrowing).
+// 그래서 성공/실패를 유니온이 아니라 두 필드 다 접근 가능한 한 형상으로 돌린다 — 호출자는 ok 로 분기하고 action/reason 을 그대로 읽는다.
+function validateSingleAction(act: Record<string, unknown>, observation: WorkObservation | null): { ok: boolean; action?: WorkAction; reason?: ProposalRejectReason } {
   const kind = act.kind;
   if (typeof kind !== 'string' || !(WORK_ACTION_KINDS as readonly string[]).includes(kind)) return { ok: false, reason: 'UNKNOWN_ACTION' };
-  const out: WorkProposal = { assessment, action: { kind: kind as WorkActionKind } };
-  if (typeof r.rationale === 'string') out.rationale = r.rationale.slice(0, 200);
-  if (typeof r.neededInput === 'string') out.neededInput = r.neededInput.slice(0, 200);
-
+  const action: WorkAction = { kind: kind as WorkActionKind };
   const surface: WorkSurface = observation?.surface ?? 'dom';
+  const visualOk = surface === 'uia' && observation?.visualFallback === true;
   const byRef = new Map<string, WorkElement>();
   for (const e of observation?.elements ?? []) byRef.set(e.elementRef, e);
   const requireRef = (roles: readonly string[] | null): { ok: boolean; reason?: ProposalRejectReason } => {
@@ -272,96 +297,157 @@ export function validateWorkProposal(raw: unknown, observation: WorkObservation 
     if (roles && !roles.includes(el.role)) return { ok: false, reason: 'ELEMENT_ROLE_MISMATCH' };
     if (el.disabled) return { ok: false, reason: 'ELEMENT_ROLE_MISMATCH' };
     if (el.userAction) return { ok: false, reason: 'USER_ACTION_WINDOW' };
-    out.action.elementRef = act.elementRef;
+    action.elementRef = act.elementRef;
     return { ok: true };
   };
   const isCoord = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 1;
+  const fail = (reason: ProposalRejectReason) => ({ ok: false as const, reason });
+  const done = () => ({ ok: true as const, action });
 
   switch (kind) {
     case 'inspect':
     case 'done':
-      return { ok: true, proposal: out };
+      return done();
     case 'takeover': {
-      if (typeof act.reason !== 'string' || !(TAKEOVER_REASONS as readonly string[]).includes(act.reason)) return { ok: false, reason: 'TAKEOVER_REASON_INVALID' };
-      out.action.reason = act.reason as TakeoverReason;
-      return { ok: true, proposal: out };
+      if (typeof act.reason !== 'string' || !(TAKEOVER_REASONS as readonly string[]).includes(act.reason)) return fail('TAKEOVER_REASON_INVALID');
+      action.reason = act.reason as TakeoverReason;
+      return done();
     }
     case 'find': {
       const q = validateDomFindQuery(act.query);
-      if (!q.ok || !q.query) return { ok: false, reason: 'QUERY_INVALID' };
-      out.action.query = q.query;
-      return { ok: true, proposal: out };
+      if (!q.ok || !q.query) return fail('QUERY_INVALID');
+      action.query = q.query;
+      return done();
     }
     case 'key': {
       // uia 표면 전용. 허용 키만, elementRef 가 있으면 관찰 안의 입력창이어야 한다.
-      if (surface !== 'uia') return { ok: false, reason: 'SURFACE_MISMATCH' };
-      if (typeof act.key !== 'string' || !UIA_ALLOWED_KEYS.includes(act.key)) return { ok: false, reason: 'KEY_INVALID' };
+      if (surface !== 'uia') return fail('SURFACE_MISMATCH');
+      if (typeof act.key !== 'string' || !UIA_ALLOWED_KEYS.includes(act.key)) return fail('KEY_INVALID');
       // SAFETY-V1 §20·§21: 앱 profile 로 키 의미를 안다. profile 이 없으면 제출/취소 성격 키는 제안 단계에서 거절, 위험 키(riskyKeys)도 거절.
       const profile = observation?.siteId ? findWindowsApp(observation.siteId)?.interactionProfile : undefined;
       const submitClass = act.key === 'ENTER' || act.key === 'CTRL+ENTER' || act.key === 'ESC';
-      if (!profile && submitClass) return { ok: false, reason: 'KEY_INVALID' };
-      if (profile && profile.riskyKeys.includes(act.key)) return { ok: false, reason: 'KEY_INVALID' };
-      out.action.key = act.key;
+      if (!profile && submitClass) return fail('KEY_INVALID');
+      if (profile && profile.riskyKeys.includes(act.key)) return fail('KEY_INVALID');
+      action.key = act.key;
       if (act.elementRef !== undefined) {
         const r2 = requireRef(INPUT_ROLES);
-        if (!r2.ok) return { ok: false, reason: r2.reason };
+        if (!r2.ok) return fail(r2.reason ?? 'SHAPE');
       }
-      return { ok: true, proposal: out };
+      return done();
     }
     case 'read_table': {
-      if (surface === 'uia') return { ok: false, reason: 'SURFACE_MISMATCH' };
-      if (act.elementRef === undefined) return { ok: true, proposal: out };
+      if (surface === 'uia') return fail('SURFACE_MISMATCH');
+      if (act.elementRef === undefined) return done();
       const r2 = requireRef(['table']);
-      return r2.ok ? { ok: true, proposal: out } : { ok: false, reason: r2.reason };
+      return r2.ok ? done() : fail(r2.reason ?? 'SHAPE');
     }
     case 'read_text': {
       const r2 = requireRef(null);
-      return r2.ok ? { ok: true, proposal: out } : { ok: false, reason: r2.reason };
+      return r2.ok ? done() : fail(r2.reason ?? 'SHAPE');
     }
     case 'set_input': {
       const r2 = requireRef(INPUT_ROLES);
-      if (!r2.ok) return { ok: false, reason: r2.reason };
-      if (typeof act.text !== 'string' || act.text.trim().length === 0 || domInputDenyReason(act.text) !== null || /[<>{}]/.test(act.text)) {
-        return { ok: false, reason: 'TEXT_DENIED' };
-      }
+      if (!r2.ok) return fail(r2.reason ?? 'SHAPE');
+      if (typeof act.text !== 'string' || act.text.trim().length === 0 || domInputDenyReason(act.text) !== null || /[<>{}]/.test(act.text)) return fail('TEXT_DENIED');
       // uia 표면은 computer-use 텍스트 규칙(길이 · 제어문자 · credential 성격)도 지난다.
-      if (surface === 'uia' && computerTextDenyReason(act.text) !== null) return { ok: false, reason: 'TEXT_DENIED' };
-      out.action.text = act.text.trim().slice(0, DOM_QUERY_VALUE_MAX);
-      return { ok: true, proposal: out };
+      if (surface === 'uia' && computerTextDenyReason(act.text) !== null) return fail('TEXT_DENIED');
+      action.text = act.text.trim().slice(0, DOM_QUERY_VALUE_MAX);
+      return done();
     }
     case 'select_option': {
-      if (surface === 'uia') return { ok: false, reason: 'SURFACE_MISMATCH' };
+      if (surface === 'uia') return fail('SURFACE_MISMATCH');
       const r2 = requireRef(SELECT_ROLES);
-      if (!r2.ok) return { ok: false, reason: r2.reason };
-      if (!shortText(act.option)) return { ok: false, reason: 'TEXT_DENIED' };
-      out.action.option = act.option;
-      return { ok: true, proposal: out };
+      if (!r2.ok) return fail(r2.reason ?? 'SHAPE');
+      if (!shortText(act.option)) return fail('TEXT_DENIED');
+      action.option = act.option;
+      return done();
     }
     case 'click': {
       // uia 표면의 좌표 클릭 — UIA 가 항목을 노출하지 않는 목록/창 안의 위치를 누른다(0..1 · clicks 1|2).
       if (act.x !== undefined || act.y !== undefined || act.clicks !== undefined) {
-        if (surface !== 'uia') return { ok: false, reason: 'SURFACE_MISMATCH' };
-        if (!isCoord(act.x) || !isCoord(act.y)) return { ok: false, reason: 'SHAPE' };
-        if (act.clicks !== undefined && act.clicks !== 1 && act.clicks !== 2) return { ok: false, reason: 'SHAPE' };
+        if (surface !== 'uia') return fail('SURFACE_MISMATCH');
+        if (!isCoord(act.x) || !isCoord(act.y)) return fail('SHAPE');
+        if (act.clicks !== undefined && act.clicks !== 1 && act.clicks !== 2) return fail('SHAPE');
         const r3 = requireRef(UIA_POINTER_ROLES);
-        if (!r3.ok) return { ok: false, reason: r3.reason };
+        if (!r3.ok) return fail(r3.reason ?? 'SHAPE');
         const el3 = byRef.get(String(act.elementRef));
-        if (el3?.riskLevel === 'COMMIT') return { ok: false, reason: 'COMMIT_TARGET' };
-        out.action.x = act.x;
-        out.action.y = act.y;
-        if (act.clicks === 1 || act.clicks === 2) out.action.clicks = act.clicks;
-        return { ok: true, proposal: out };
+        if (el3?.riskLevel === 'COMMIT') return fail('COMMIT_TARGET');
+        action.x = act.x;
+        action.y = act.y;
+        if (act.clicks === 1 || act.clicks === 2) action.clicks = act.clicks;
+        return done();
       }
       // uia: listitem(선택) · window(그 창을 앞으로) 도 클릭 대상이다.
       const r2 = requireRef(surface === 'uia' ? [...CLICK_ROLES, 'listitem', 'window'] : CLICK_ROLES);
-      if (!r2.ok) return { ok: false, reason: r2.reason };
+      if (!r2.ok) return fail(r2.reason ?? 'SHAPE');
       const el = byRef.get(String(act.elementRef));
-      if (el?.riskLevel === 'COMMIT') return { ok: false, reason: 'COMMIT_TARGET' };
-      return { ok: true, proposal: out };
+      if (el?.riskLevel === 'COMMIT') return fail('COMMIT_TARGET');
+      return done();
+    }
+    // ── Visual Computer Use (§4) — elementRef 없이 client 영역 정규화 좌표/텍스트/허용키. visualFallback 관찰에서만. ──
+    case 'visual_click': {
+      // local.computer.click 원형은 {x,y} 정확히 두 키만 받는다(더블클릭·clicks 없음). 단일 클릭만 표현한다.
+      if (!visualOk) return fail('SURFACE_MISMATCH');
+      if (!isCoord(act.x) || !isCoord(act.y)) return fail('SHAPE');
+      if (act.clicks !== undefined) return fail('SHAPE');
+      action.x = act.x;
+      action.y = act.y;
+      return done();
+    }
+    case 'visual_type': {
+      if (!visualOk) return fail('SURFACE_MISMATCH');
+      // computer-use 텍스트 규칙(길이 1~500 · 제어문자 · credential/OTP/명령어 성격) 그대로. HTML 문자도 거절.
+      if (typeof act.text !== 'string' || act.text.length === 0 || computerTextDenyReason(act.text) !== null || /[<>{}]/.test(act.text)) return fail('TEXT_DENIED');
+      action.text = act.text;
+      return done();
+    }
+    case 'visual_key': {
+      if (!visualOk) return fail('SURFACE_MISMATCH');
+      // computer.key 는 ENTER · TAB · ESC 만(조합키 없음).
+      if (typeof act.key !== 'string' || !COMPUTER_ALLOWED_KEYS.includes(act.key)) return fail('KEY_INVALID');
+      action.key = act.key;
+      return done();
     }
     default:
-      return { ok: false, reason: 'UNKNOWN_ACTION' };
+      return fail('UNKNOWN_ACTION');
   }
+}
+
+/**
+ * Planner 응답 → 검증된 proposal(§9·§10). Runtime 이 실행 직전에 부른다.
+ *   - 형상 · 금지 키(URL · selector · JS · shell · credential).
+ *   - `action` 하나를 validateSingleAction 으로 검증한다.
+ *   - `actions`(배치, §7 Fast Loop)가 있으면 각 항목을 같은 규칙으로 검증한다 — 실행 행동만, 최대 WORK_BATCH_MAX.
+ */
+export function validateWorkProposal(raw: unknown, observation: WorkObservation | null): { ok: boolean; proposal?: WorkProposal; reason?: ProposalRejectReason } {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return { ok: false, reason: 'SHAPE' };
+  if (hasForbiddenKey(raw)) return { ok: false, reason: 'FORBIDDEN_KEY' };
+  const r = raw as Record<string, unknown>;
+  const assessment = typeof r.assessment === 'string' && WORK_PROGRESS_VALUES.includes(r.assessment) ? (r.assessment as WorkProgress) : 'progress';
+  const a = r.action;
+  if (!a || typeof a !== 'object' || Array.isArray(a)) return { ok: false, reason: 'SHAPE' };
+  const single = validateSingleAction(a as Record<string, unknown>, observation);
+  if (!single.ok) return { ok: false, reason: single.reason };
+  const out: WorkProposal = { assessment, action: single.action };
+  if (typeof r.rationale === 'string') out.rationale = r.rationale.slice(0, 200);
+  if (typeof r.neededInput === 'string') out.neededInput = r.neededInput.slice(0, 200);
+
+  // 배치(선택) — 있으면 실행 행동만, 최대 WORK_BATCH_MAX. 하나라도 어긋나면 proposal 전체를 거절한다(부분 실행 금지).
+  if (r.actions !== undefined) {
+    if (!Array.isArray(r.actions) || r.actions.length === 0 || r.actions.length > WORK_BATCH_MAX) return { ok: false, reason: 'SHAPE' };
+    const batch: WorkAction[] = [];
+    for (const item of r.actions) {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) return { ok: false, reason: 'SHAPE' };
+      if (hasForbiddenKey(item)) return { ok: false, reason: 'FORBIDDEN_KEY' };
+      const it = item as Record<string, unknown>;
+      if (typeof it.kind !== 'string' || !BATCHABLE_ACTION_KINDS.includes(it.kind)) return { ok: false, reason: 'UNKNOWN_ACTION' };
+      const checked = validateSingleAction(it, observation);
+      if (!checked.ok) return { ok: false, reason: checked.reason };
+      batch.push(checked.action);
+    }
+    out.batch = batch;
+  }
+  return { ok: true, proposal: out };
 }
 
 /** 같은 행동인지(반복 감지 §36). */
@@ -482,9 +568,12 @@ export function buildWorkAgentUsageEvent(
 
 // ─── Risk (§16) ─────────────────────────────────────────────────────────────
 
-/** 행동 종류 → 위험 등급. read 계열 READ, 입력/클릭 REVERSIBLE(요소별 COMMIT 판정은 확장이 한다). */
+/** 행동 종류 → 위험 등급. read 계열 READ, 입력/클릭/visual_* REVERSIBLE(요소별·화면별 COMMIT 판정은 별도). */
 export function workActionRisk(kind: WorkActionKind): AutomationRiskLevel {
-  return kind === 'set_input' || kind === 'select_option' || kind === 'click' ? 'REVERSIBLE' : 'READ';
+  return kind === 'set_input' || kind === 'select_option' || kind === 'click'
+    || kind === 'visual_click' || kind === 'visual_type' || kind === 'visual_key'
+    ? 'REVERSIBLE'
+    : 'READ';
 }
 
 // ─── 오류 코드 ──────────────────────────────────────────────────────────────

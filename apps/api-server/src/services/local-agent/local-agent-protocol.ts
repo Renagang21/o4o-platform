@@ -75,8 +75,16 @@ export const LOCAL_AGENT_ACTIONS = {
   BROWSER_GET_SITE_STATUS: 'local.browser.get_site_status',
   /** 등재 사이트를 Windows 기본 URL handler 로 연다 (동 §14·§15·§25). */
   BROWSER_OPEN_SITE: 'local.browser.open_site',
-  /** 등재 앱 창의 foreground 여부·client 크기·snapshot 가능 여부 (COMPUTER-USE-V0 §14). */
+  /** 등재 앱 창의 foreground 여부·client 크기·snapshot 가능 여부 (COMPUTER-USE-V0 §14). 이미지는 없다. */
   COMPUTER_INSPECT: 'local.computer.inspect',
+  /**
+   * Visual Computer Use (WO-O4O-WINDOWS-VISUAL-COMPUTER-USE-AND-FAST-LOOP-V1 §4·§4-1):
+   * inspect 와 같은 검사에 더해 client 영역 JPEG 이미지를 **요청 메모리 한정**으로 한 번 돌려준다.
+   * UIA 가 못 보는 화면을 AI 가 보고 이어 작업하기 위한 좁은 capability. inspect 의 "이미지 없음"
+   * 불변식을 흐리지 않도록 별도 action 으로 분리한다. 이미지는 `pickSafeComputerInfo`(로그·DB 뷰)에
+   * 실리지 않고 `pickCaptureImage`(메모리 전용)로만 planner 에 전달된다.
+   */
+  COMPUTER_CAPTURE: 'local.computer.capture',
   /** 등재 앱 창 client 영역 안 정규화 좌표 한 점을 **왼쪽 단일 클릭** (동 §15·§16·§22). */
   COMPUTER_CLICK: 'local.computer.click',
   /** 등재 앱 창에 짧은 일반 텍스트 입력 (동 §17·§18). 로그인 창 앞에서는 실행하지 않는다. */
@@ -159,6 +167,7 @@ export function composeAppAction(base: string, appId: string): string {
  */
 export const COMPUTER_TARGET_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.COMPUTER_INSPECT,
+  LOCAL_AGENT_ACTIONS.COMPUTER_CAPTURE,
   LOCAL_AGENT_ACTIONS.COMPUTER_CLICK,
   LOCAL_AGENT_ACTIONS.COMPUTER_TYPE_TEXT,
   LOCAL_AGENT_ACTIONS.COMPUTER_KEY,
@@ -844,6 +853,64 @@ export function pickSafeComputerInfo(data: unknown): Record<string, unknown> {
   return out;
 }
 
+// ─── Capture image (WO-O4O-WINDOWS-VISUAL-COMPUTER-USE-AND-FAST-LOOP-V1 §4·§4-1) ──
+
+/** JPEG base64 최대 길이 — agent PowerShell maxBuffer(≈8MB) 안에서, 프롬프트 비용도 감안한 상한. */
+export const CAPTURE_IMAGE_MAX_BASE64_LENGTH = 8 * 1024 * 1024;
+const CAPTURE_IMAGE_BASE64_RE = /^[A-Za-z0-9+/]+={0,2}$/;
+
+export interface CaptureImage {
+  mimeType: 'image/jpeg';
+  base64: string;
+  width: number;
+  height: number;
+}
+
+/**
+ * `local.computer.capture` 결과에서 **요청 메모리 전용** 이미지를 뽑는다.
+ *
+ * 이것은 `pickSafeComputerInfo`(로그·DB·프롬프트 텍스트에 남는 유일한 뷰)와 **의도적으로 분리**돼 있다 —
+ * 이미지 base64 는 그 안전-뷰에 절대 실리지 않고, 오직 이 함수를 통해 planner 호출(메모리)까지만 흐른다.
+ * 호출자는 반환값을 로그·DB 에 쓰지 않는다(§4-1 파일·DB·장기로그 0). 형식·상한을 넘으면 null.
+ */
+export function pickCaptureImage(data: unknown): CaptureImage | null {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+  const src = data as Record<string, unknown>;
+  if (src.imageMime !== 'image/jpeg') return null;
+  const base64 = src.imageBase64;
+  if (typeof base64 !== 'string' || base64.length === 0 || base64.length > CAPTURE_IMAGE_MAX_BASE64_LENGTH) return null;
+  if (!CAPTURE_IMAGE_BASE64_RE.test(base64)) return null;
+  const width = Number(src.imageWidth);
+  const height = Number(src.imageHeight);
+  if (!Number.isFinite(width) || width <= 0 || width > 100000) return null;
+  if (!Number.isFinite(height) || height <= 0 || height > 100000) return null;
+  return { mimeType: 'image/jpeg', base64, width: Math.trunc(width), height: Math.trunc(height) };
+}
+
+/**
+ * `local.computer.capture` 전용 출력 화이트리스트 (§4·§4-1).
+ *
+ * capture 는 다른 computer action 과 달리 **image-free 안전 뷰(pickSafeComputerInfo)에 더해**
+ * planner 가 볼 JPEG base64 를 딱 한 번의 result_data 왕복 동안만 실어 나른다. 이 이미지는
+ * `awaitCommandResult` 가 결과를 읽는 즉시 result_data 를 NULL 로 지우므로(§37) 감사 기록 · 장기 로그 ·
+ * 파일에는 남지 않는다(§4-1 파일·DB·장기로그 0 = SENSITIVE_IMAGE_PERSISTENCE 0). 실행자는 이 필드를
+ * `pickCaptureImage` 로 다시 뽑아 planner 호출(메모리)까지만 넘기고, 로그에는 존재 여부·치수만 남긴다.
+ *
+ * capture 만 이 경로를 쓴다 — inspect · click · type_text · key 는 image-free 뷰만 통과한다.
+ * 여기서도 `pickCaptureImage` 로 형식·상한을 다시 검사해, 형식을 벗어난 base64 는 애초에 실리지 않는다.
+ */
+export function pickSafeCaptureResultData(data: unknown): Record<string, unknown> {
+  const out = pickSafeComputerInfo(data);
+  const image = pickCaptureImage(data);
+  if (image) {
+    out.imageMime = image.mimeType;
+    out.imageBase64 = image.base64;
+    out.imageWidth = image.width;
+    out.imageHeight = image.height;
+  }
+  return out;
+}
+
 // ─── Safe data info (LOCAL-DATA-TOOL-BRIDGE-V1 §18·§19·§20) ──────────────────
 
 /**
@@ -944,6 +1011,10 @@ export function pickSafeResultData(action: string, data: unknown): Record<string
   }
   if (SITE_TARGET_ACTIONS.includes(base)) {
     return pickSafeBrowserInfo(data);
+  }
+  if (base === LOCAL_AGENT_ACTIONS.COMPUTER_CAPTURE) {
+    // 유일하게 이미지를 왕복시키는 action — 한 번의 result_data 왕복 동안만(읽는 즉시 wipe, §37).
+    return pickSafeCaptureResultData(data);
   }
   if (COMPUTER_TARGET_ACTIONS.includes(base)) {
     return pickSafeComputerInfo(data);

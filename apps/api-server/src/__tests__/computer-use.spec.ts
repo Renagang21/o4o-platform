@@ -542,24 +542,34 @@ describe('10~13. shell · process · file · credential 경로 부재 (§5·§33
     }
   });
 
-  it('12. 파일 접근은 불가능하다 — 캡처는 파일로 가지 않는다 (§5·§12·§15)', () => {
+  it('12. 파일 접근은 불가능하다 — 캡처는 파일이 아니라 메모리에서만 인코딩된다 (§5·§12·§15 · VISUAL-CU-V1 §4-1)', () => {
     for (const f of ['handlers.mjs', 'windows-window-control.mjs', 'computer-use-limits.mjs']) {
       expect(readAgent(f)).not.toContain('node:fs');
       expect(readAgent(f)).not.toMatch(/from\s+'fs'/);
     }
     // 순수 함수 모듈은 import 자체가 없다.
     expect(codeOnly(readAgent('computer-use-limits.mjs'))).not.toMatch(/\bimport\b/);
+    // 파일·클립보드 경로는 어느 ps1 에도 없다 — 캡처든 입력이든 디스크·클립보드로 나가지 않는다(§4-1).
     for (const f of newPs1) {
       const code = codeOnly(readAgent(f));
       for (const forbidden of [
         'Get-Content', 'Set-Content', 'Remove-Item', 'Out-File', 'Export-', 'Add-Content', 'New-Item',
-        '.Save(', 'ImageFormat', 'Clipboard', 'Get-Clipboard', 'Set-Clipboard', 'ToBase64String', 'MemoryStream', 'FileStream',
+        'FileStream', 'Clipboard', 'Get-Clipboard', 'Set-Clipboard',
       ]) {
         expect(code).not.toContain(forbidden);
       }
     }
-    // inspect 스크립트는 비트맵을 만들면 반드시 Dispose 한다.
+    // 입력 ps1 은 이미지 인코딩 원형(캡처 전용)을 아예 갖지 않는다.
+    const input = codeOnly(readAgent('windows-computer-input.ps1'));
+    for (const forbidden of ['.Save(', 'ImageFormat', 'ToBase64String', 'MemoryStream']) {
+      expect(input).not.toContain(forbidden);
+    }
+    // inspect(=캡처 생산자)는 JPEG 를 오직 메모리에서만 인코딩한다: MemoryStream 만, FileStream·파일경로 Save 없음.
     const inspect = codeOnly(readAgent('windows-computer-inspect.ps1'));
+    expect(inspect).toContain('MemoryStream');
+    expect(inspect).not.toContain('FileStream');
+    expect(inspect).not.toMatch(/\.Save\(\s*['"]/); // .Save('경로' / .Save("경로") 형태의 파일 저장 금지 — 스트림 대상만 허용
+    // inspect 스크립트는 비트맵을 만들면 반드시 Dispose 한다.
     expect(inspect).toContain('$bitmap.Dispose()');
     expect(inspect).toContain('CopyFromScreen');
     // inspect tool 의 인자에 path · format 칸이 없다.
@@ -670,7 +680,10 @@ describe('15. 스크린샷 저장 0 (§11·§12·§43·§44)', () => {
     expect(pickSafeComputerInfo({ key: 'F4' })).toEqual({});
     // dispatch 도 computer action 은 computer 화이트리스트를 탄다.
     expect(pickSafeResultData(composeComputerAction(LOCAL_AGENT_ACTIONS.COMPUTER_INSPECT, NOTEPAD), { image: 'x', snapshotWidth: 10 })).toEqual({ snapshotWidth: 10 });
-    // (b) 서버 코드에 이미지 저장 · 파일 쓰기가 없다.
+    // (b) 서버 코드에 이미지 저장 · 파일 쓰기 · data-URI 구성 · PNG 변환이 없다.
+    // VISUAL-CU-V1 §4-1: 캡처 base64 는 result_data 왕복 한 번(읽는 즉시 wipe)과 planner 메모리까지만 흐른다 —
+    // 그래서 protocol 의 pickCaptureImage 는 base64 문자열을 통과시킨다. 금지는 "지속·유출" 경로다:
+    // 파일 쓰기 · 외부 저장 · 이미지 변환 라이브러리 · data-URI(`;base64,`) 구성.
     for (const f of [
       'services/local-agent/local-agent-service.ts',
       'services/local-agent/local-agent-protocol.ts',
@@ -678,7 +691,7 @@ describe('15. 스크린샷 저장 0 (§11·§12·§43·§44)', () => {
       'services/ai-tools/ai-tool-router.ts',
     ]) {
       const code = codeOnly(readServer(f));
-      for (const forbidden of ['writeFile', 'createWriteStream', 'sharp(', "toString('base64')", 'base64,', 'image/png', 'Storage(']) {
+      for (const forbidden of ['writeFile', 'createWriteStream', 'sharp(', "toString('base64')", ';base64,', 'image/png', 'Storage(']) {
         expect(code).not.toContain(forbidden);
       }
     }
@@ -739,8 +752,10 @@ describe('16~17. 서버 capability · agent allowlist (§23·§24·§25·§26)',
 
   it('17. 서버 · agent allowlist 가 같고, agent 는 미등재 대상 · 규칙 밖 인자를 스크립트 전에 거절한다', () => {
     // (a) 서버 allowlist = 기존 + computer × 등재 appId. HWND 는 항목이 될 수 없다.
+    // VISUAL-CU-V1 §4: capture 가 더해졌다 — 시각 fallback 에서 화면을 planner 에 넘기기 위한 읽기 전용 캡처.
     expect(COMPUTER_TARGET_ACTIONS).toEqual([
       LOCAL_AGENT_ACTIONS.COMPUTER_INSPECT,
+      LOCAL_AGENT_ACTIONS.COMPUTER_CAPTURE,
       LOCAL_AGENT_ACTIONS.COMPUTER_CLICK,
       LOCAL_AGENT_ACTIONS.COMPUTER_TYPE_TEXT,
       LOCAL_AGENT_ACTIONS.COMPUTER_KEY,
@@ -775,11 +790,12 @@ describe('16~17. 서버 capability · agent allowlist (§23·§24·§25·§26)',
     expect(iRun).toBeGreaterThan(iArg);
     expect(run).toContain("'WINDOWS_APP_NOT_REGISTERED'");
     expect(run).toContain("'COMPUTER_USE_UNSUPPORTED_ACTION'");
-    // (d) agent 의 handler 표에 4개가 있고 그 밖의 computer 항목은 없다.
+    // (d) agent 의 handler 표에 5개(inspect·capture·click·type_text·key)가 있고 그 밖의 computer 항목은 없다.
+    // VISUAL-CU-V1 §4: capture 는 inspect 와 같은 검사 위에 client 영역 JPEG base64 를 한 번 돌려주는 읽기 전용 handler.
     expect([...code.matchAll(/\[ACTIONS\.(COMPUTER_[A-Z_]+)\]/g)].map((m) => m[1]).sort()).toEqual(
-      ['COMPUTER_CLICK', 'COMPUTER_INSPECT', 'COMPUTER_KEY', 'COMPUTER_TYPE_TEXT'],
+      ['COMPUTER_CAPTURE', 'COMPUTER_CLICK', 'COMPUTER_INSPECT', 'COMPUTER_KEY', 'COMPUTER_TYPE_TEXT'],
     );
-    expect(code).not.toMatch(/local\.computer\.(?!inspect|click|type_text|key)/);
+    expect(code).not.toMatch(/local\.computer\.(?!inspect|capture|click|type_text|key)/);
   });
 });
 
