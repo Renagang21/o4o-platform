@@ -9,10 +9,15 @@
  * @see docs/architecture/auth-ssot-declaration.md
  * @see CLAUDE.md Section 2.6
  *
- * MIGRATION NOTE:
- * - Legacy keys (accessToken, authToken, token) are read for backward compatibility
- * - All writes go to `o4o_accessToken` only
- * - Legacy keys will be removed in future versions
+ * MIGRATION NOTE (WO-O4O-NETURE-AUTH-ERROR-CONTRACT-AND-LEGACY-TOKEN-RECOVERY-FIX-V1):
+ * - 읽기는 표준 키(`o4o_accessToken` / `o4o_refreshToken`) 만 본다. 과거 키(accessToken · authToken · token ·
+ *   refreshToken) 와 `admin-auth-storage` 의 **읽기 시점 자동 이관은 제거**했다.
+ *   이유: 다른 탭의 clearAllTokens() 가 키를 순차 삭제하는 동안 storage 이벤트로 깨어난 탭이 getAccessToken() 을
+ *   호출하면 아직 남은 legacy 저장소에서 토큰을 되살려 표준 키에 다시 써 넣어 로그아웃이 되돌려졌다.
+ *   localStorage 전략 서비스(neture · k-cosmetics · kpa-branch · kpa-society · pharmacy-hub) 중 legacy 키를
+ *   기록하는 곳은 없고(admin-dashboard 는 별도 origin · 별도 store), 이 fallback 의 유일한 공급원은
+ *   updateAuthStorage() 가 스스로 쓴 `admin-auth-storage` 였다 — 즉 이관이 필요한 실제 소비처는 없다.
+ * - 쓰기는 표준 키에만 한다. clearAllTokens() 는 legacy 키·`admin-auth-storage` 도 함께 지운다(정리 목적).
  *
  * ============================================================================
  * Phase 6-7: Cookie Auth Primary
@@ -39,42 +44,11 @@ const LEGACY_REFRESH_TOKEN_KEY = 'refreshToken';
 
 /**
  * Get access token from localStorage
- * Reads from standard key first, falls back to legacy keys for migration
+ * 표준 키만 읽는다 — 읽기는 저장소를 변경하지 않는다 (legacy 자동 이관 제거, 상단 MIGRATION NOTE 참조).
  */
 export function getAccessToken(): string | null {
   if (typeof window === 'undefined') return null;
-
-  // Try standard key first
-  const standardToken = localStorage.getItem(TOKEN_KEY);
-  if (standardToken) return standardToken;
-
-  // Fallback to legacy keys for backward compatibility
-  for (const key of LEGACY_TOKEN_KEYS) {
-    const legacyToken = localStorage.getItem(key);
-    if (legacyToken) {
-      // Auto-migrate to standard key
-      localStorage.setItem(TOKEN_KEY, legacyToken);
-      return legacyToken;
-    }
-  }
-
-  // Also check admin-auth-storage for token
-  const authStorage = localStorage.getItem('admin-auth-storage');
-  if (authStorage) {
-    try {
-      const parsed = JSON.parse(authStorage);
-      const token = parsed.state?.accessToken || parsed.state?.token;
-      if (token) {
-        // Auto-migrate to standard key
-        localStorage.setItem(TOKEN_KEY, token);
-        return token;
-      }
-    } catch {
-      // Ignore parse errors
-    }
-  }
-
-  return null;
+  return localStorage.getItem(TOKEN_KEY) || null;
 }
 
 /**
@@ -98,20 +72,8 @@ export function setAccessToken(token: string): void {
  */
 export function getRefreshToken(): string | null {
   if (typeof window === 'undefined') return null;
-
-  // Try standard key first
-  const standardToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-  if (standardToken) return standardToken;
-
-  // Fallback to legacy key
-  const legacyToken = localStorage.getItem(LEGACY_REFRESH_TOKEN_KEY);
-  if (legacyToken) {
-    // Auto-migrate to standard key
-    localStorage.setItem(REFRESH_TOKEN_KEY, legacyToken);
-    return legacyToken;
-  }
-
-  return null;
+  // 표준 키만 읽는다 — legacy `refreshToken` 키 자동 이관 제거 (getAccessToken 과 동일한 이유)
+  return localStorage.getItem(REFRESH_TOKEN_KEY) || null;
 }
 
 /**
@@ -133,7 +95,9 @@ export function setRefreshToken(token: string): void {
 export function clearAllTokens(): void {
   if (typeof window === 'undefined') return;
 
-  // Remove standard keys
+  // 인증 키만 개별 삭제한다 — localStorage.clear() 로 무관한 사용자 설정을 지우지 않는다.
+  // 다른 탭은 TOKEN_KEY 삭제 storage 이벤트로 로그아웃을 인지하므로 표준 키를 먼저 지운다
+  // (읽기가 legacy 저장소를 보지 않으므로 이후 순서는 로그인 상태에 영향을 주지 않는다).
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 

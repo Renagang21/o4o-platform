@@ -1158,7 +1158,7 @@ export const supplierApi = {
    *   200 + data:null  → 주문은 존재하나 배송 정보 미생성(정상 미출고)
    *   200 + data:{...} → 배송 정보 존재
    *   404 ORDER_NOT_FOUND → 주문 미존재 또는 타인 소유(존재 은닉)
-   *   401 → 미인증 또는 공급자 미연결(NO_SUPPLIER). 403 경로는 없다.
+   *   401 → 미인증 · 403 NO_SUPPLIER → 공급자 미연결(WO-O4O-NETURE-AUTH-ERROR-CONTRACT-AND-LEGACY-TOKEN-RECOVERY-FIX-V1)
    *   500 → 서버 오류
    *
    * "정상 미출고" 는 실재하는 상태이므로 null 반환을 유지하고, 실패만 고정 코드로 throw 한다.
@@ -1425,7 +1425,7 @@ export const supplierProfileApi = {
    *   ACTIVE 공급자면 **항상 200 + 객체** 를 반환한다.
    *   "조건 미설정" 은 별도 null 상태가 아니라 객체 내부 필드가 null 인 것이다.
    *   404 SUPPLIER_NOT_FOUND 는 공급자 부재 또는 비-ACTIVE = 오류 상태다.
-   *   401 만 존재하고 403 경로는 없다.
+   *   401 미인증 · 403 NO_SUPPLIER(공급자 미연결) — 둘 다 LOAD_FAILED 로 접는다.
    * 따라서 정상 null 반환 경로가 없으므로 반환 타입에서 null 을 제거하고 실패는 throw 한다.
    */
   async getOrderCondition(supplierId: string): Promise<SupplierOrderCondition> {

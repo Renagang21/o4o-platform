@@ -15,8 +15,9 @@
  *   조회 실패 → 미가입으로 취급하지 않고 재시도만
  *
  * 관리자 예외 없음 — 서버 guard(requireLinkedSupplier / requireActivePartner) 도 role 이 아니라 서비스 행의
- * 상태만 본다. 서비스 행이 없는 관리자를 통과시키면 업무 화면의 API 가 401(NO_SUPPLIER/NO_PARTNER) 을 내고
- * auth-client 의 refresh 경로가 토큰을 지워 **대표 로그아웃**으로 이어진다(운영 검증에서 확인). 운영 목적의
+ * 상태만 본다. 서비스 행이 없는 관리자를 통과시키면 업무 화면의 API 가 NO_SUPPLIER/NO_PARTNER 를 낸다
+ * (과거 401 → auth-client refresh 실패 → 토큰 삭제 → **대표 로그아웃** 연쇄가 운영 검증에서 확인됐고,
+ * WO-O4O-NETURE-AUTH-ERROR-CONTRACT-AND-LEGACY-TOKEN-RECOVERY-FIX-V1 에서 403 으로 정정). 운영 목적의
  * 조회 · 승인은 /operator/* 콘솔에서 한다. 최종 판정은 서버 guard 가 한다.
  */
 

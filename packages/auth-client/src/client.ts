@@ -68,8 +68,15 @@ export class AuthClient {
   private baseURL: string;
   public api: AxiosInstance;
   private isRefreshing = false;
-  private refreshSubscribers: Array<(token: string) => void> = [];
+  private refreshSubscribers: Array<(token: string | null) => void> = [];
   private strategy: AuthStrategy;
+  /**
+   * WO-O4O-NETURE-AUTH-ERROR-CONTRACT-AND-LEGACY-TOKEN-RECOVERY-FIX-V1:
+   * 로그아웃(명시적 logout/logoutAll · refresh 실패 정리)마다 증가하는 세션 세대.
+   * refresh 시작 시점의 세대와 응답 시점의 세대가 다르면 그 응답은 "로그아웃 이후 도착한 늦은 응답" 이므로
+   * 토큰을 저장하지 않는다. 다른 탭 로그아웃은 세대가 아니라 storage 의 refresh token 부재로 판정한다.
+   */
+  private sessionGeneration = 0;
 
   constructor(baseURL: string, options?: AuthClientOptions) {
     this.baseURL = baseURL;
@@ -128,8 +135,13 @@ export class AuthClient {
 
           if (this.isRefreshing) {
             // Wait for token refresh
-            return new Promise((resolve) => {
-              this.refreshSubscribers.push((token: string) => {
+            return new Promise((resolve, reject) => {
+              this.refreshSubscribers.push((token: string | null) => {
+                if (token === null) {
+                  // 진행 중이던 refresh 가 로그아웃으로 폐기됨 — 대기 요청도 원래 401 로 종료
+                  reject(error);
+                  return;
+                }
                 if (this.strategy === 'localStorage') {
                   originalRequest.headers.Authorization = `Bearer ${token}`;
                 }
@@ -146,6 +158,7 @@ export class AuthClient {
           // If a concurrent login stores a new token while this refresh is in flight,
           // the catch block should NOT clear the newly stored token.
           const tokenBeforeRefresh = this.strategy === 'localStorage' ? getAccessToken() : null;
+          const generationAtStart = this.sessionGeneration;
 
           try {
             // Phase 6-7: Cookie Auth Primary
@@ -164,10 +177,20 @@ export class AuthClient {
             if (!accessToken) {
               // Refresh endpoint returned 200 but no usable token — treat as failure
               console.warn('[AuthClient] Refresh succeeded but no accessToken in response');
-              if (this.strategy === 'localStorage') {
+              if (this.strategy === 'localStorage' && !this.isSessionEndedSince(generationAtStart)) {
+                this.sessionGeneration += 1;
                 clearAllTokens();
               }
+              this.rejectRefreshSubscribers();
               return Promise.reject(new Error('Refresh response missing accessToken'));
+            }
+
+            // WO-O4O-NETURE-AUTH-ERROR-CONTRACT-AND-LEGACY-TOKEN-RECOVERY-FIX-V1:
+            // refresh 가 진행되는 사이 로그아웃이 일어났으면(같은 탭: 세대 증가 · 다른 탭: storage 의
+            // refresh token 삭제) 늦게 도착한 이 응답으로 로그인을 되살리지 않는다.
+            if (this.strategy === 'localStorage' && this.isSessionEndedSince(generationAtStart)) {
+              this.rejectRefreshSubscribers();
+              return Promise.reject(new Error('Refresh response discarded: session ended during refresh'));
             }
 
             // Phase 6-7: Only update localStorage for localStorage strategy
@@ -196,8 +219,13 @@ export class AuthClient {
               // Comparing current token to the one captured before refresh prevents wiping a fresh login token.
               const currentToken = getAccessToken();
               const freshLoginOccurred = tokenBeforeRefresh !== currentToken && currentToken !== null;
-              if (!freshLoginOccurred) {
+              if (this.isSessionEndedSince(generationAtStart)) {
+                // 이미 로그아웃된 세션 — 다시 지우거나 이벤트를 내지 않는다 (대기 요청만 종료)
+                this.rejectRefreshSubscribers();
+              } else if (!freshLoginOccurred) {
+                this.sessionGeneration += 1;
                 clearAllTokens();
+                this.rejectRefreshSubscribers();
                 // Notify React layer (AuthContext) to set user=null.
                 // auth:token-cleared is already handled by AuthContext.tsx listener.
                 // Using window.dispatchEvent (not localStorage event) so it only affects
@@ -299,9 +327,31 @@ export class AuthClient {
       // Phase 6-7: Clear localStorage tokens for localStorage strategy
       // For cookie strategy, server handles cookie clearing
       if (this.strategy === 'localStorage') {
-        clearAllTokens();
+        this.endLocalSession();
       }
     }
+  }
+
+  /**
+   * WO-O4O-NETURE-AUTH-ERROR-CONTRACT-AND-LEGACY-TOKEN-RECOVERY-FIX-V1:
+   * 로컬 세션 종료 — 세대를 올려 진행 중인 refresh 응답을 무효화한 뒤 토큰을 지운다.
+   * 지우기 전에 세대를 올려야 "clearAllTokens 직후 · 응답 도착 직전" 창에서도 저장이 막힌다.
+   */
+  private endLocalSession(): void {
+    this.sessionGeneration += 1;
+    clearAllTokens();
+    this.rejectRefreshSubscribers();
+  }
+
+  /** refresh 시작 이후 세션이 끝났는가 — 같은 탭(세대) 또는 다른 탭(storage 의 refresh token 삭제) */
+  private isSessionEndedSince(generationAtStart: number): boolean {
+    return this.sessionGeneration !== generationAtStart || getRefreshToken() === null;
+  }
+
+  private rejectRefreshSubscribers(): void {
+    const pending = this.refreshSubscribers;
+    this.refreshSubscribers = [];
+    pending.forEach((cb) => cb(null));
   }
 
   /**
@@ -316,7 +366,7 @@ export class AuthClient {
       await this.api.post('/auth/logout-all', {});
     } finally {
       if (this.strategy === 'localStorage') {
-        clearAllTokens();
+        this.endLocalSession();
       }
     }
   }
