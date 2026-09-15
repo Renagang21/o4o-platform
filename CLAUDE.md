@@ -15,10 +15,11 @@
 | 영역 | 정본 |
 |---|---|
 | **정본 지도 (전체 색인 · 상태)** | [`docs/CANONICAL-INDEX.md`](docs/CANONICAL-INDEX.md) |
+| **역할별 업무공간 Architecture** (Community · Store · Supplier · Service Operator · Supplier → Store Hub/Operator 경로 · 1 Store : N Services · Legacy Partner 은퇴 · 리팩터링 실행 규칙) | [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](docs/baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) — 역할 경계 · 업무공간 · 콘텐츠 유입 · Partner 에 관해 PHILOSOPHY 와 충돌하면 이 문서 우선 |
 | 사업 철학 (참여 주체 · HUB · AI 역할) | [`O4O-BUSINESS-PHILOSOPHY-V1`](docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) |
 | **매장 commerce 경계** (cart · checkout · orders · payments · refund · PG · POS · tablet · QR · 외부 판매채널) | [`O4O-STORE-COMMERCE-BOUNDARY-V1`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) — **코드보다 먼저 읽는다** |
 | 공급자→매장 B2B 주문 (위 문서의 B2B 축 쌍) | [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) |
-| 3자 Canonical Flow | [`O4O-3-ROLE-FLOW-BASELINE-V1`](docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) |
+| 3자 Canonical Flow | [`O4O-3-ROLE-FLOW-BASELINE-V1`](docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) — **판정 대기** (2026-09-15, ROLE-WORKSPACE-ARCHITECTURE §2-1 · §6 과 충돌 절 있음 — [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md)) |
 | **AI 자동화 진화 원칙** (Local Agent · Browser DOM · Computer Use · Site Adapter · Workflow · 주문/회계 자동화 WO 의 상위 기준) | [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](docs/baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) — 사용자 행동은 학습 자료, 목적/결과가 기준 · 완전 자동화가 아닌 시간 절감 · 사이트별 업무 사전 정의 금지 |
 | Domain Boundary · Guard Rules 5종 | [`O4O-BOUNDARY-POLICY-V1`](docs/architecture/O4O-BOUNDARY-POLICY-V1.md) |
 | Core 동결 범위 | [`O4O-CORE-FREEZE-V1`](docs/architecture/O4O-CORE-FREEZE-V1.md) |
@@ -30,7 +31,7 @@
 충돌 시 우선순위:
 
 1. 사용자의 현재 명시적 작업 지시
-2. 사업 · 정책 정본 — PHILOSOPHY · COMMERCE-BOUNDARY · B2B-ORDER-CONTRACT · 3-ROLE-FLOW
+2. 사업 · 정책 정본 — ROLE-WORKSPACE-ARCHITECTURE · PHILOSOPHY · COMMERCE-BOUNDARY · B2B-ORDER-CONTRACT (3-ROLE-FLOW 는 판정 대기)
 3. 구조 계약 — Frozen Baselines(§14) · Boundary · Core Freeze · Shared Module Protocol
 4. 도메인 · 서비스 정본 — `docs/CANONICAL-INDEX.md` 의 나머지
 5. WO / CHECK / IR / archive — **과거 시점의 실행 기록**. 현재 정책을 이기지 않는다
@@ -213,7 +214,7 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 | F4 | Platform Content Policy | [`PLATFORM-CONTENT-POLICY-V1`](docs/baseline/PLATFORM-CONTENT-POLICY-V1.md) |
 | F5 | Content Stable | [`CONTENT-STABLE-DECLARATION-V1`](docs/baseline/CONTENT-STABLE-DECLARATION-V1.md) |
 | F6 | Boundary Policy | [`O4O-BOUNDARY-POLICY-V1`](docs/architecture/O4O-BOUNDARY-POLICY-V1.md) |
-| F7 | Neture Partner Contract | [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md) |
+| F7 | Neture Partner Contract | [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md) — **판정 대기 · Legacy Partner 전면 은퇴 대상** (ROLE-WORKSPACE-ARCHITECTURE §7) |
 | F8 | Neture Distribution Engine | [`NETURE-DISTRIBUTION-ENGINE-FREEZE-V1`](docs/baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md) |
 | F9 | RBAC SSOT | [`RBAC-FREEZE-DECLARATION-V1`](docs/rbac/RBAC-FREEZE-DECLARATION-V1.md) |
 | F10 | O4O Core | [`O4O-CORE-FREEZE-V1`](docs/architecture/O4O-CORE-FREEZE-V1.md) |
@@ -244,6 +245,6 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 ---
 
-*Updated: 2026-09-12*
-*Version: 9.0*
+*Updated: 2026-09-15*
+*Version: 9.1*
 *Status: Active — Claude Code Entry Point*

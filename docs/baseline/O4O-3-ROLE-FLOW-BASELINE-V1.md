@@ -1,5 +1,9 @@
 # O4O-3-ROLE-FLOW-BASELINE-V1
 
+> **[2026-09-15 · 판정 대기 표기]** 본 문서 §2(공급자 → 운영자 → 매장 단선 흐름) · §6(공급자의 HUB 직접 게시 금지 · 매장→공급자 직접 요청 금지)은
+> [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 · §6 과 **충돌**한다. 충돌 절은 Architecture 가 우선하며 근거로 승격하지 않는다.
+> §3 · §4 · §5 는 참고 가능. 본문은 수정하지 않았다 — 판정은 Supplier / Store Hub 리팩터링 단계 WO. 근거: [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md) §C.
+
 > 이 문서는 O4O 3자 Canonical Flow의 기준 문서이다.
 > 세부 구현 지시는 개별 WO 및 하위 기준 문서를 따른다.
 

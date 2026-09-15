@@ -17,7 +17,7 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 충돌 시 우선순위:
 
 1. 현재 사용자의 명시적 작업 지시
-2. 사업·정책 canonical docs — 사업 철학, commerce 경계, B2B 계약, 3자 흐름
+2. 사업·정책 canonical docs — 역할별 업무공간 Architecture([O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](docs/baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)), 사업 철학, commerce 경계, B2B 계약 (3자 흐름 문서는 판정 대기 — 충돌 절은 Architecture 우선)
 3. 구조 계약 — Frozen / Boundary / Core / Shared Module Protocol
 4. 도메인·서비스 canonical docs
 5. 과거 WO / CHECK / IR / archive — 당시 실행 기록이며 현재 정책을 이기지 않는다
@@ -127,6 +127,7 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 | 작업 | 먼저 확인할 정본 |
 |---|---|
 | 환경 / 설치 / 검증 명령 | [SETUP.md](SETUP.md) — 설치는 `pnpm install --frozen-lockfile`. 버전·CI 수치는 복제하지 않고 현재 설정·스크립트를 확인 |
+| 역할 경계 · 업무공간 · 콘텐츠 유입 경로 · Legacy Partner · 리팩터링 단계 WO | [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](docs/baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) — §9 실행 규칙(매 단계 최신 `origin/main` 에서 모집단 재산출) 적용 |
 | commerce | [STORE-COMMERCE-BOUNDARY](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) + [B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) |
 | Core / Frozen / Boundary / 도메인 | [CANONICAL-INDEX](docs/CANONICAL-INDEX.md)의 해당 정본 |
 | shared module | [O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) |
