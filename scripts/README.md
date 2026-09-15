@@ -51,6 +51,7 @@
 ./scripts/dev-start.sh
 
 # 로컬 DB 설정 — apt 기반 PostgreSQL 설치. Windows 에서 동작하지 않음
+# 비밀번호는 출력하지 않는다(SET/MISSING 만 보고). LOCAL_DB_PASSWORD · O4O_API_ENV_FILE 환경변수로 재정의 가능
 ./scripts/setup-local-db.sh
 ```
 

@@ -2,10 +2,9 @@
  * Historical migration names — GENERATED, do not edit by hand.
  * (WO-O4O-DATABASE-STATE-CLASSIFIER-SCHEMA-DRIFT-AND-CONNECTION-LOG-HARDENING-V1)
  *
- * Source: historical-migrations.manifest.json (644 frozen entries). For every entry both the
- * TypeORM `name` and the class name are listed (TypeORM records `instance.name ?? class.name`;
- * three manifest entries carry a mis-parsed `name` — see the CHECK — so the class name is the
- * identifier actually present in production history for those).
+ * Source: historical-migrations.manifest.json (644 frozen entries). One name per entry: the
+ * TypeORM runtime name (`declaredName ?? className`), taken from the migration AST by
+ * scripts/db/migration-identity.mjs — exactly the identifier recorded in typeorm_migrations.
  *
  * Used ONLY by the database state classifier to validate LEGACY_ESTABLISHED history names.
  * Never loaded as migrations, never replayed, never bulk-inserted.
@@ -201,7 +200,6 @@ export const HISTORICAL_MIGRATION_NAMES: readonly string[] = [
   'CampaignPeriodCheck1740783601000',
   'ProductMasterCoreReset20260301100000',
   'CreateStoreEvents20260301200000',
-  'CreateStoreEvents1709301200000',
   'ProductMasterWOAlignment20260301200000',
   'CampaignCleanCore20260301210000',
   'CsvImportBatchTables20260301300000',
@@ -209,15 +207,11 @@ export const HISTORICAL_MIGRATION_NAMES: readonly string[] = [
   'DropNetureSupplierContents1709420400000',
   'CreateNetureSupplierLibraryItems20260303100000',
   'CreateStoreLibraryItems20260303100000',
-  'CreateStoreLibraryItems1709303100000',
   'CleanupProductDemoData1709560000000',
   'CreateStoreLibraryItems20260304100000',
-  'CreateStoreLibraryItems1709304100000',
   'CleanupDemoSeedData1709564400000',
   'CreateStoreQrCodes20260304120000',
-  'CreateStoreQrCodes1709304120000',
   'CreateStoreQrScanEvents20260304130000',
-  'CreateStoreQrScanEvents1709304130000',
   'CreateProductMarketingAssets20260304200000',
   'BackfillKpaStoreOwners20260304210000',
   'AllowNullableKpaMembersOrganizationId20260305100000',
@@ -243,20 +237,14 @@ export const HISTORICAL_MIGRATION_NAMES: readonly string[] = [
   'AddPharmacistCommentToStoreProductProfiles1709884800000',
   'BackfillKpaStoreSlugs20260309100000',
   'CreateServiceProducts20260309100000',
-  'CreateServiceProducts1709309100000',
   'CreateStoreAiTables20260309120000',
-  'CreateStoreAiTables1709309120000',
   'CreateStoreAiProductTables20260309180000',
-  'CreateStoreAiProductTables1709309180000',
   'CreateProductAiTags20260309200000',
-  'CreateProductAiTags1709309200000',
   'EnsurePlatformStoreSlugHistory20260309200000',
   'SeedProductServiceKeys20260309200000',
   'BackfillKpaStoreSlugsV220260309300000',
   'CreateProductAiContents20260309300000',
-  'CreateProductAiContents1709309300000',
   'CreateProductOcrTexts20260309400000',
-  'CreateProductOcrTexts1709309400000',
   'CreateNetureContactMessages20260311000001',
   'CreateStoreCapabilities20260311100000',
   'CosmeticsStoreOrgBridge20260311200000',
@@ -325,9 +313,7 @@ export const HISTORICAL_MIGRATION_NAMES: readonly string[] = [
   'UnifyUserRoleToCustomer1711871600000',
   'UnifyGlycopharmSellerToPharmacy1711875200000',
   'UnifyGlycopharmPharmacyRole1711878800000',
-  'pharmacy',
   'UnifyGlycopharmRolesCatalog1711882400000',
-  'seller',
   'UnifyCosmeticsRolesCatalog1711886000000',
   'UnifyNetureRoles20260331500000',
   'BackfillHealthReadingsPharmacyId1712000000000',

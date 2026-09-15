@@ -43,7 +43,7 @@ const SRC = path.join(API_ROOT, 'src');
 const read = (rel: string) => fs.readFileSync(path.join(SRC, rel), 'utf8');
 const TSX_CLI = path.join(REPO_ROOT, 'node_modules', 'tsx', 'dist', 'cli.mjs');
 
-interface HistoricalEntry { file: string; className: string; name: string }
+interface HistoricalEntry { file: string; className: string; declaredName: string | null; name: string }
 const historical = JSON.parse(read('database/incremental/historical-migrations.manifest.json')) as { count: number; entries: HistoricalEntry[] };
 const manifest = incrementalMigrationNames();
 
@@ -89,12 +89,17 @@ describe('expected schema state registry ↔ incremental manifest lockstep', () 
 });
 
 describe('historical migration names ↔ frozen JSON manifest lockstep', () => {
-  it('generated name list equals name ∪ className of every historical entry (first-occurrence order)', () => {
+  it('generated name list equals the runtime name (declaredName ?? className) of every historical entry, manifest order', () => {
     const derived: string[] = [];
     const seen = new Set<string>();
-    for (const e of historical.entries) for (const n of [e.name, e.className]) if (n && !seen.has(n)) { seen.add(n); derived.push(n); }
+    for (const e of historical.entries) if (e.name && !seen.has(e.name)) { seen.add(e.name); derived.push(e.name); }
     expect([...HISTORICAL_MIGRATION_NAMES]).toEqual(derived);
     expect(historical.count).toBe(historical.entries.length);
+    for (const e of historical.entries) {
+      expect(e.name).toBe(e.declaredName ?? e.className);
+      // identity is a migration identifier, never a role / SQL literal (the pre-V1 parser false positive)
+      expect(e.name).toMatch(/^[A-Z][A-Za-z0-9_]*\d{13,14}$/);
+    }
   });
 
   it('historical names, retired facts and incremental names are pairwise disjoint; duplicates are historical; retired names have no file', () => {

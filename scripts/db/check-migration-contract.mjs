@@ -11,14 +11,23 @@
  *   - entrypoints load ONLY the manifest (no glob), API never loads/runs migrations or bootstrap
  *   - the canonical baseline snapshot carries schema only (no data / roles / grants / credentials)
  *
+ *   - migration identity (class · declared `name` · runtime name) is taken from the TypeScript AST
+ *     (scripts/db/migration-identity.mjs) — never from a repository-wide regex
+ *
  * Usage:
  *   node scripts/db/check-migration-contract.mjs                 check (exit 1 on violation)
- *   node scripts/db/check-migration-contract.mjs --write-historical   regenerate the historical manifest (+ historical-migration-names.ts)
- *                                                                 (only for an explicit WO; never for new migrations)
+ *   node scripts/db/check-migration-contract.mjs --write-historical
+ *       verify-only: re-derives every historical entry from source and prints the entries whose
+ *       identity fields differ from the JSON manifest (exit 1 when any differ). Writes nothing.
+ *   node scripts/db/check-migration-contract.mjs --write-historical --maintenance
+ *       explicit maintenance mode (WO only, refused when CI is set): corrects identity fields of
+ *       EXISTING historical entries only — never adds, removes or absorbs an incremental migration —
+ *       and regenerates historical-migration-names.ts.
  */
 import { readFileSync, readdirSync, existsSync, writeFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseMigrationIdentity, MigrationIdentityError } from './migration-identity.mjs';
 
 const REPO = resolve(fileURLToPath(import.meta.url), '..', '..', '..');
 const API = join(REPO, 'apps', 'api-server');
@@ -38,20 +47,29 @@ const fail = (id, msg) => failures.push(`[${id}] ${msg}`);
 const passes = [];
 const pass = (id, msg) => passes.push(`[${id}] ${msg}`);
 
+/**
+ * Identity of one migration file from its AST. `name` is the TypeORM runtime name
+ * (declaredName ?? className). Throws MigrationIdentityError for dynamic / ambiguous identity.
+ */
 function parseMigrationFile(file) {
-  const src = stripComments(read(join(MIGRATIONS_DIR, file)));
-  const cls = /export\s+class\s+([A-Za-z0-9_]+)/.exec(src);
-  const nm = /\bname\s*(?::\s*string)?\s*=\s*['"]([A-Za-z0-9_]+)['"]/.exec(src);
-  return { file, className: cls ? cls[1] : null, name: nm ? nm[1] : cls ? cls[1] : null };
+  const r = parseMigrationIdentity(read(join(MIGRATIONS_DIR, file)), file);
+  return { file, className: r.className, declaredName: r.declaredName, name: r.runtimeName };
+}
+/** Same, but reports a guard failure instead of throwing. */
+function tryParseMigrationFile(id, file) {
+  try { return parseMigrationFile(file); } catch (e) {
+    fail(id, e instanceof MigrationIdentityError ? `${e.message} [${e.code}]` : `${file}: ${e.message}`);
+    return null;
+  }
 }
 
 const files = readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith('.ts')).sort();
 
-/** Historical names as recorded by TypeORM: `name` and class name of every frozen entry, first occurrence order. */
+/** Historical names exactly as TypeORM recorded them: the runtime name of every frozen entry, manifest order. */
 function historicalNamesFromEntries(entries) {
   const out = [];
   const seen = new Set();
-  for (const e of entries) for (const n of [e.name, e.className]) if (n && !seen.has(n)) { seen.add(n); out.push(n); }
+  for (const e of entries) if (e.name && !seen.has(e.name)) { seen.add(e.name); out.push(e.name); }
   return out;
 }
 function renderHistoricalNamesTs(names, entryCount) {
@@ -59,10 +77,9 @@ function renderHistoricalNamesTs(names, entryCount) {
  * Historical migration names — GENERATED, do not edit by hand.
  * (WO-O4O-DATABASE-STATE-CLASSIFIER-SCHEMA-DRIFT-AND-CONNECTION-LOG-HARDENING-V1)
  *
- * Source: historical-migrations.manifest.json (${entryCount} frozen entries). For every entry both the
- * TypeORM \`name\` and the class name are listed (TypeORM records \`instance.name ?? class.name\`;
- * three manifest entries carry a mis-parsed \`name\` — see the CHECK — so the class name is the
- * identifier actually present in production history for those).
+ * Source: historical-migrations.manifest.json (${entryCount} frozen entries). One name per entry: the
+ * TypeORM runtime name (\`declaredName ?? className\`), taken from the migration AST by
+ * scripts/db/migration-identity.mjs — exactly the identifier recorded in typeorm_migrations.
  *
  * Used ONLY by the database state classifier to validate LEGACY_ESTABLISHED history names.
  * Never loaded as migrations, never replayed, never bulk-inserted.
@@ -78,19 +95,48 @@ ${names.map((n) => `  '${n}',`).join('\n')}
 }
 
 
-// ---- --write-historical
+// ---- --write-historical (verify-only by default; --maintenance corrects existing entries only)
 if (process.argv.includes('--write-historical')) {
-  // historical = every migration file NOT registered in the incremental manifest
+  const maintenance = process.argv.includes('--maintenance');
+  if (maintenance && process.env.CI) { console.error('refused: --maintenance never runs in CI'); process.exit(1); }
+  if (!existsSync(HISTORICAL_MANIFEST)) { console.error('historical-migrations.manifest.json missing — it is created only under an explicit WO, not regenerated here'); process.exit(1); }
+  const current = JSON.parse(read(HISTORICAL_MANIFEST));
   const incrementalFilesNow = new Set([...stripComments(read(INCREMENTAL_MANIFEST)).matchAll(/from\s+['"]\.\.\/migrations\/([^'"]+?)(?:\.js)?['"]/g)].map((m) => `${m[1]}.ts`));
-  const entries = files.filter((f) => !incrementalFilesNow.has(f)).map(parseMigrationFile);
+  const currentFiles = new Set(current.entries.map((e) => e.file));
+  const added = files.filter((f) => !currentFiles.has(f) && !incrementalFilesNow.has(f));
+  const removed = [...currentFiles].filter((f) => !files.includes(f));
+  const absorbed = [...currentFiles].filter((f) => incrementalFilesNow.has(f));
+  if (added.length || removed.length || absorbed.length) {
+    console.error(`refused: the historical set itself must not change here (new unregistered ${added.length}, missing ${removed.length}, incremental∩historical ${absorbed.length})`);
+    for (const f of added) console.error(`  unregistered migration file (register it in incremental/manifest.ts): ${f}`);
+    for (const f of removed) console.error(`  historical file missing: ${f}`);
+    for (const f of absorbed) console.error(`  historical AND incremental: ${f}`);
+    process.exit(1);
+  }
+  const FIELDS = ['className', 'declaredName', 'name'];
+  const corrected = [];
+  const entries = current.entries.map((e) => {
+    const p = parseMigrationFile(e.file); // throws on dynamic / ambiguous identity — never guessed
+    const diffs = FIELDS.filter((k) => (e[k] ?? null) !== p[k]);
+    if (diffs.length) corrected.push({ file: e.file, diffs: diffs.map((k) => `${k}: ${JSON.stringify(e[k] ?? null)} -> ${JSON.stringify(p[k])}`) });
+    return { file: e.file, className: p.className, declaredName: p.declaredName, name: p.name };
+  });
+  for (const c of corrected) console.log(`${maintenance ? 'correct' : 'would correct'} ${c.file}\n    ${c.diffs.join('\n    ')}`);
+  const names = historicalNamesFromEntries(entries);
+  const namesTs = renderHistoricalNamesTs(names, entries.length);
+  const namesDiffer = !existsSync(HISTORICAL_NAMES_TS) || read(HISTORICAL_NAMES_TS) !== namesTs;
+  console.log(`historical entries ${entries.length} · identity corrections ${corrected.length} · historical-migration-names.ts ${namesDiffer ? 'DIFFERS' : 'in lockstep'}`);
+  if (!maintenance) {
+    if (corrected.length || namesDiffer) { console.error('verify-only: nothing written (re-run with --maintenance under an explicit WO)'); process.exit(1); }
+    process.exit(0);
+  }
   writeFileSync(HISTORICAL_MANIFEST, JSON.stringify({
-    $comment: 'GENERATED by scripts/db/check-migration-contract.mjs --write-historical. Historical migrations before the canonical baseline cutoff: never replayed, never bulk-inserted, never renamed. Regenerate only under an explicit WO.',
+    $comment: 'GENERATED by scripts/db/check-migration-contract.mjs --write-historical --maintenance (identity from the TypeScript AST, scripts/db/migration-identity.mjs). Historical migrations before the canonical baseline cutoff: never replayed, never bulk-inserted, never renamed. `name` = TypeORM runtime name (declaredName ?? className). Entries are only ever corrected, never added/removed, under an explicit WO.',
     count: entries.length,
     entries,
   }, null, 2) + '\n');
   console.log(`wrote ${HISTORICAL_MANIFEST} (${entries.length} entries)`);
-  const names = historicalNamesFromEntries(entries);
-  writeFileSync(HISTORICAL_NAMES_TS, renderHistoricalNamesTs(names, entries.length));
+  writeFileSync(HISTORICAL_NAMES_TS, namesTs);
   console.log(`wrote ${HISTORICAL_NAMES_TS} (${names.length} names)`);
   process.exit(0);
 }
@@ -104,16 +150,20 @@ const historicalByFile = new Map(historical.entries.map((e) => [e.file, e]));
 if (historical.count !== historical.entries.length) fail('C01', `historical count ${historical.count} != entries ${historical.entries.length}`);
 else pass('C01', `historical manifest ${historical.entries.length} entries`);
 
-// ---- C02 every historical entry still exists with the same class and name (rename / class change forbidden)
+// ---- C02 every historical entry still exists with the same class / declaredName / runtime name
+//      (rename, class change, adding/removing/changing an explicit `name`, dynamic identity: all forbidden)
 let c02 = 0;
 for (const e of historical.entries) {
   if (!existsSync(join(MIGRATIONS_DIR, e.file))) { fail('C02', `historical file removed or renamed: ${e.file}`); continue; }
-  const p = parseMigrationFile(e.file);
-  if (p.className !== e.className) fail('C02', `${e.file}: class '${p.className}' != manifest '${e.className}'`);
-  else if (p.name !== e.name) fail('C02', `${e.file}: name '${p.name}' != manifest '${e.name}'`);
+  const p = tryParseMigrationFile('C02', e.file);
+  if (!p) continue;
+  if (!('declaredName' in e)) fail('C02', `${e.file}: manifest entry lacks declaredName (run --write-historical --maintenance under an explicit WO)`);
+  else if (p.className !== e.className) fail('C02', `${e.file}: class '${p.className}' != manifest '${e.className}'`);
+  else if (p.declaredName !== e.declaredName) fail('C02', `${e.file}: declaredName ${JSON.stringify(p.declaredName)} != manifest ${JSON.stringify(e.declaredName)}`);
+  else if (p.name !== e.name) fail('C02', `${e.file}: runtime name '${p.name}' != manifest '${e.name}'`);
   else c02 += 1;
 }
-if (c02 === historical.entries.length) pass('C02', `historical file/class/name frozen (${c02})`);
+if (c02 === historical.entries.length) pass('C02', `historical file/class/declaredName/runtime name frozen (${c02})`);
 
 // ---- C03 incremental manifest parses
 const manifestSrc = stripComments(read(INCREMENTAL_MANIFEST));
@@ -142,7 +192,8 @@ for (const inc of imports) {
   const [, epochStr, pascal] = m;
   const epoch = Number(epochStr);
   if (!existsSync(join(MIGRATIONS_DIR, inc.file))) { fail('C05', `incremental file missing: ${inc.file}`); continue; }
-  const p = parseMigrationFile(inc.file);
+  const p = tryParseMigrationFile('C06', inc.file);
+  if (!p) continue;
   if (p.className !== `${pascal}${epochStr}`) fail('C06', `${inc.file}: class '${p.className}' must be '${pascal}${epochStr}'`);
   if (p.className !== inc.className) fail('C06', `${inc.file}: imported '${inc.className}' != class '${p.className}'`);
   if (p.name !== p.className) fail('C07', `${inc.file}: name '${p.name}' must equal class '${p.className}'`);
@@ -385,6 +436,30 @@ for (const [re, label] of [
   [/'DB_WRITES',\s*0/, 'DB_WRITES = 0 (status mode)'],
 ]) if (!re.test(migrateSrc)) { fail('C24', `migrate.ts: missing ${label}`); c24ok = false; }
 if (c24ok) pass('C24', 'migrate.ts: no connection detail logging, safe error summary, pre/post schema assertions reported');
+
+// ---- C25 identity uniqueness: every migration file parses; no duplicate file / class / runtime name
+//      across historical + incremental; historical ∩ incremental (by runtime name) = ∅
+{
+  let c25ok = true;
+  const seenClass = new Map();
+  const seenRuntime = new Map();
+  for (const f of files) {
+    const p = tryParseMigrationFile('C25', f);
+    if (!p) { c25ok = false; continue; }
+    if (seenClass.has(p.className)) { fail('C25', `duplicate class '${p.className}': ${seenClass.get(p.className)} and ${f}`); c25ok = false; }
+    if (seenRuntime.has(p.name)) { fail('C25', `duplicate runtime name '${p.name}': ${seenRuntime.get(p.name)} and ${f}`); c25ok = false; }
+    seenClass.set(p.className, f);
+    seenRuntime.set(p.name, f);
+  }
+  const histFiles = historical.entries.map((e) => e.file);
+  if (histFiles.length !== new Set(histFiles).size) { fail('C25', 'duplicate file in the historical manifest'); c25ok = false; }
+  const histRuntime = historical.entries.map((e) => e.name);
+  if (histRuntime.length !== new Set(histRuntime).size) { fail('C25', 'duplicate runtime name in the historical manifest'); c25ok = false; }
+  const histClasses = historical.entries.map((e) => e.className);
+  if (histClasses.length !== new Set(histClasses).size) { fail('C25', 'duplicate className in the historical manifest'); c25ok = false; }
+  for (const n of histRuntime) if (listed.includes(n)) { fail('C25', `'${n}' is both a historical runtime name and an incremental migration`); c25ok = false; }
+  if (c25ok) pass('C25', `identity extracted for all ${files.length} migration files; file/class/runtime name unique; historical ∩ incremental = ∅`);
+}
 
 // ---- report
 for (const p of passes) console.log(`PASS ${p}`);

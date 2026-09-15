@@ -104,8 +104,13 @@ jobs:
     #   historical 644 migration 파일명/class/name 동결 · incremental manifest 명명(13자리 epoch, 순서 증가, 중복 0)
     #   snapshot schema-only · runner/classifier 금지 패턴(IF NOT EXISTS, DROP CASCADE, synchronize) · 진입점(migrate.ts, connection.ts, package.json, deploy job)
     # DB 연결도 secret 도 필요 없는 순수 정적 검사다. 규칙 본문은 scripts/db/check-migration-contract.mjs 상단 주석 참조.
+    #   migration identity(class · declared name · runtime name)는 TypeScript AST(scripts/db/migration-identity.mjs) 단일 parser — 정규식 오탐 금지.
+    #   parser fixture + 실제 migration 전수 교차검증은 node --test. --write-historical --maintenance 는 CI 에서 실행 금지(스크립트가 거부).
     - name: Guard canonical bootstrap / incremental migration contract
-      run: node scripts/db/check-migration-contract.mjs
+      run: |
+        node scripts/db/check-migration-contract.mjs
+        node --test scripts/db/__tests__/migration-identity.test.mjs
+        node --test scripts/db/__tests__/setup-local-db-credential-log.test.mjs
 
     - name: Check for console.log statements
       run: |

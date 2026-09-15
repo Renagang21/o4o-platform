@@ -47,7 +47,7 @@ const REPO_ROOT = path.resolve(API_ROOT, '..', '..');
 const SRC = path.join(API_ROOT, 'src');
 const read = (rel: string) => fs.readFileSync(path.join(SRC, rel), 'utf8');
 
-interface HistoricalEntry { file: string; className: string; name: string }
+interface HistoricalEntry { file: string; className: string; declaredName: string | null; name: string }
 const historical = JSON.parse(read('database/incremental/historical-migrations.manifest.json')) as { count: number; entries: HistoricalEntry[] };
 const historicalNames = new Set(historical.entries.map((e) => e.name));
 
@@ -149,16 +149,21 @@ describe('historical migrations are frozen and never loaded', () => {
     expect(historical.entries.filter((e) => !files.includes(e.file)).map((e) => e.file)).toEqual([]);
   });
 
-  it('historical file/class/name triples are unchanged', () => {
+  it('historical file/class/declaredName/name entries are unchanged (single AST identity parser, no regex copy)', () => {
+    // WO-O4O-MIGRATION-HISTORICAL-MANIFEST-IDENTITY-AND-LOCAL-DB-CREDENTIAL-LOG-FINAL-CLOSURE-V1 §6.3:
+    // identity is parsed by exactly one parser (scripts/db/migration-identity.mjs). This spec used to carry its
+    // own regex, which matched SQL text (`SET name = 'pharmacy'`) — so it delegates to the guard's verify-only mode.
     const drift: string[] = [];
     for (const e of historical.entries) {
       const src = fs.readFileSync(path.join(migrationsDir, e.file), 'utf8');
-      if (!new RegExp(`export class ${e.className}\\b`).test(src)) drift.push(`${e.file}: class ${e.className}`);
-      // TypeORM falls back to the class name when no `name` property is declared.
-      const declared = /\bname\s*(?::\s*string)?\s*=\s*['"]([A-Za-z0-9_]+)['"]/.exec(src)?.[1] ?? e.className;
-      if (declared !== e.name) drift.push(`${e.file}: name ${declared} != ${e.name}`);
+      if (!new RegExp('export class ' + e.className + '\\b').test(src)) drift.push(`${e.file}: class ${e.className}`);
+      if (e.name !== (e.declaredName ?? e.className)) drift.push(`${e.file}: name ${e.name} != declaredName ?? className`);
     }
     expect(drift).toEqual([]);
+    const guard = path.join(SRC, '..', '..', '..', 'scripts', 'db', 'check-migration-contract.mjs');
+    const r = spawnSync(process.execPath, [guard, '--write-historical'], { encoding: 'utf8', env: { ...process.env, CI: '1' } });
+    expect(r.status).toBe(0);
+    expect(r.stdout).toMatch(/historical entries 644 · identity corrections 0 · historical-migration-names\.ts in lockstep/);
   });
 });
 
