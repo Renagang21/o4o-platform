@@ -6,7 +6,7 @@
 > **상위 정본**: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7 · §9 — `CURRENT PARTNER = FULL RETIREMENT / FUTURE PARTNER = GREENFIELD`
 > **선행 기록**: [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md) (모집단은 재사용하지 않고 §1 에서 다시 산출)
 > **기준 commit**: `585c03eb52d004f51204d42b7c64bc41e18bd200` (HEAD == origin/main · clean · 타 세션 미추적 zip 1건 불가침)
-> **실행 commit**: (아래 §10 에 기록)
+> **실행 commit**: `7efe5b6a5` (280 files · +2,044 / −22,163)
 
 ---
 
@@ -249,4 +249,4 @@ Fresh census:
 ## 10. Git
 
 - path-specific stage(`git add -- <경로>`)만 사용. 타 세션 미추적 `output/minerock600-p1/*.zip` 불가침.
-- 실행 commit: (커밋 후 후속 커밋으로 SHA 기록)
+- 실행 commit: `7efe5b6a5013c495b6d6ca836f57ee6e0c35ed0e` — 본 SHA 기록은 후속 커밋. CI/CodeQL/Deploy 결과는 관례대로 후속 `docs(check)` 커밋으로 기록.
