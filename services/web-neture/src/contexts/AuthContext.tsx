@@ -79,14 +79,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    *   - bfcache 복원(pageshow persisted): 뒤로가기로 되살아난 화면은 토큰이 없으면 비로그인으로.
    *   - 다른 같은-origin 탭의 로그아웃/로그인(storage 이벤트: 토큰 키 변경 · clear).
    * refresh() 는 토큰이 없으면 user=null, 있으면 /auth/me 로 재확인한다(기존 Core 동작 재사용).
+   *
+   * 주의(운영 검증에서 확인된 경합): 다른 탭의 clearAllTokens() 는 키를 순차 삭제하므로 `o4o_accessToken`
+   * 삭제 이벤트 시점에 `admin-auth-storage` 가 아직 남아 있을 수 있다. 이때 getAccessToken() 을 호출하면
+   * legacy 자동 이관이 access token 을 되살려 다른 탭의 로그아웃을 되돌린다. 그래서 토큰 삭제 이벤트는
+   * storage 를 다시 읽지 않고 이벤트 값(newValue=null)만으로 비로그인 처리한다.
    */
-  const { refresh } = core;
+  const { refresh, setUser } = core;
   useEffect(() => {
     const onPageShow = (e: PageTransitionEvent) => {
       if (e.persisted) void refresh();
     };
     const onStorage = (e: StorageEvent) => {
-      if (e.key === null || e.key === 'o4o_accessToken') void refresh();
+      if (e.key === null) {
+        setUser(null);
+        return;
+      }
+      if (e.key !== 'o4o_accessToken') return;
+      if (e.newValue === null) setUser(null);
+      else void refresh();
     };
     window.addEventListener('pageshow', onPageShow);
     window.addEventListener('storage', onStorage);
@@ -94,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('pageshow', onPageShow);
       window.removeEventListener('storage', onStorage);
     };
-  }, [refresh]);
+  }, [refresh, setUser]);
 
   // 역할 전환·부분 갱신은 3서비스 동일 구현이었다 → 공통 Core(useRoleSelection).
   const { switchRole, updateUser, hasMultipleRoles } = useRoleSelection(core);
