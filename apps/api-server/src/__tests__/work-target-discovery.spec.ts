@@ -103,7 +103,7 @@ describe('target resolution', () => {
 describe('local.target.prepare contract', () => {
   it('allowlist 에 등재 targetId(siteId ∪ appId) 당 1항목 · 인자 0 · 등재 밖/URL/경로는 항목이 아니다', () => {
     expect(TARGET_ACTIONS).toEqual([LOCAL_AGENT_ACTIONS.TARGET_PREPARE]);
-    expect([...WORK_TARGET_IDS].sort()).toEqual(['healthkr', 'o4o.neture', 'windows.calculator', 'windows.kakaotalk', 'windows.notepad']);
+    expect([...WORK_TARGET_IDS].sort()).toEqual(['healthkr', 'o4o.neture', 'windows.calculator', 'windows.doctors', 'windows.kakaotalk', 'windows.notepad']);
     for (const id of WORK_TARGET_IDS) expect(isAllowedLocalAction(composeTargetAction(LOCAL_AGENT_ACTIONS.TARGET_PREPARE, id))).toBe(true);
     for (const bad of ['local.target.prepare', 'local.target.prepare#evil.site', 'local.target.prepare#https://health.kr/', 'local.target.open#healthkr', 'local.target.launch#windows.notepad', 'local.app.launch#windows.notepad']) {
       expect(isAllowedLocalAction(bad)).toBe(false);

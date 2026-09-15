@@ -59,6 +59,17 @@ export const WINDOWS_APP_REGISTRY = Object.freeze([
     // Store 앱 — 실행 파일 경로가 고정이 아니다. V0 는 실행하지 않는다(§50 launchAllowed=false 예시).
     launchAllowed: false,
   }),
+  // WO-O4O-AUTOMATION-RECOVERY-REAL-SMOKE-CLOSURE-V1 — 첫 실제 약국 업무 프로그램 등재(최소).
+  //   실측(2026-09-15): Get-Process ProcessName = 'Doctors.메인'(확장자 .exe 제거·내부 점/한글 유지), 창 제목 '닥터스'.
+  //   실행 대행 안 함 — launchAllowed:false 이고 launch 경로도 두지 않는다. Doctors 는 사용자가 직접 띄운다.
+  //   interactionProfile·uiaVisibilityHints 는 실측 전이라 넣지 않는다(없으면 제출성 키 ENTER/CTRL+ENTER 를 자동 실행하지 않는다 — 보수적 기본).
+  Object.freeze({
+    appId: 'windows.doctors',
+    displayName: 'Doctors',
+    aliases: Object.freeze(['닥터스', 'doctors']),
+    processNames: Object.freeze(['Doctors.메인']),
+    launchAllowed: false,
+  }),
 ]);
 
 export function findWindowsApp(appId) {

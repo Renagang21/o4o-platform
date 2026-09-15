@@ -84,6 +84,15 @@ export const WINDOWS_APP_REGISTRY: readonly WindowsAppDefinition[] = Object.free
     aliases: Object.freeze(['계산기', 'calculator']),
     processNames: ['CalculatorApp', 'Calculator', 'win32calc'],
   }) as WindowsAppDefinition,
+  // WO-O4O-AUTOMATION-RECOVERY-REAL-SMOKE-CLOSURE-V1 — 첫 실제 약국 업무 프로그램 등재(최소).
+  //   실측(2026-09-15): process 이름 'Doctors.메인'(확장자 제거), 창 제목 '닥터스'. 실행 metadata 는 서버 등재부에 두지 않는다(§45 — 사용자 직접 실행).
+  //   interactionProfile·uiaVisibilityHints 는 실측 후 채운다(없으면 제출성 키 ENTER/CTRL+ENTER 를 자동 실행하지 않는다 — 보수적 기본).
+  Object.freeze({
+    appId: 'windows.doctors',
+    displayName: 'Doctors',
+    aliases: Object.freeze(['닥터스', 'doctors']),
+    processNames: ['Doctors.메인'],
+  }) as WindowsAppDefinition,
 ]);
 
 /** 등재된 appId 목록. allowlist 조립과 테스트에서 쓴다. */
