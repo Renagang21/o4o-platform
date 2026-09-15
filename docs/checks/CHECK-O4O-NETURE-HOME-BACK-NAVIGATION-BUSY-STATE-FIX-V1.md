@@ -53,23 +53,52 @@
 | 1 | KPA Society 커뮤니티 → `kpa-society.co.kr/handoff?token=***` | `pageshow persisted=true` · disabled 15/15 · 스피너 1 · textarea/스크롤 보존(scrollY 240) |
 | 2 | 파머시 허브 커뮤니티 | **클릭 불가** — `element is not enabled` 로 TimeoutError (결함 재현) |
 
-### 수정 후 (배포 후 갱신)
+### 수정 후 (운영, 2026-09-15 02:0x UTC, 번들 `index-CH05sVzo.js`, Deploy Web Services `34917407647` deploy-neture success)
 
-| 라운드 | 이동 | 뒤로가기 후 |
-|---|---|---|
-| | | 배포 후 기록 |
+모든 라운드에서 뒤로가기 전 심은 `pageshow` 리스너가 살아 있고 `persisted: true` 기록 → **bfcache 복원**(단순 재로드 아님). 이동 전 AI 입력창에 넣은 값 · scrollY 240 이 복원 후에도 그대로였다(소식 · AI · 스크롤 초기화 없음).
+
+| 라운드 | 이동(handoff 대상) | 뒤로가기 후 disabled / 스피너 (handoff 버튼 15개) | 비고 |
+|---|---|---|---|
+| 1 | KPA Society 커뮤니티 → `kpa-society.co.kr/handoff` | 0 / 0 | |
+| 2 | KPA Society 커뮤니티 (같은 서비스 재진입) | 0 / 0 | handoff 재발급 · 정상 이동 |
+| 3 | 파머시 허브 커뮤니티 → `pharmacyhub.co.kr/handoff` | 0 / 0 | 다른 서비스 |
+| 4 | K-Cosmetics → `k-cosmetics.site/handoff` | 0 / 0 | |
+| 5 | 약사회 분회 · O4O 파일럿 테스트분회 → `kpa-society.co.kr/kpa/handoff?returnTo=/o4o-pilot` | 0 / 0 | |
+| 6 | KPA Society 커뮤니티 (반복 왕복) | 0 / 0 | |
+| 7 | 파머시 허브 커뮤니티 (별도 실행) | 0 / 0 | AI 입력값 `bfcache-테스트 입력` 보존 확인 |
+| 8 | KPA Society 매장 HUB → `returnTo=/store-hub` | 0 / 0 | |
+
+이동 실패 · 재시도 (`/api/v1/auth/handoff` 를 Playwright `route.abort` 로 차단 — 서버 · 회원 상태 무변경):
+
+| 단계 | 결과 |
+|---|---|
+| 차단 상태에서 KPA Society 커뮤니티 클릭 | `role=alert` 「서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.」 · handoff 버튼 전부 재활성(disabled 는 AI 입력창의 「작업 수행」·「전송」 2개뿐 — 본 WO 무관) |
+| 차단 해제 후 재클릭 | 정상 이동 → 뒤로가기(`persisted: true`) → 오류 안내 0 · handoff 버튼 disabled 0 |
+
+회귀:
+
+| 항목 | 결과 |
+|---|---|
+| Neture 내부 링크 「Neture 커뮤니티」(`/community`, `<Link>`) | 이동 · 뒤로가기 정상, 버튼 상태 영향 없음 |
+| 「O4O 서비스 소식」 섹션 · AI 입력 영역 | 렌더 유지 · 복원 후 입력값 보존 |
+| 섹션 구성 | 주요 업무 / 내가 이용하는 서비스 / O4O 서비스 소식 (변경 없음) |
 
 ## 5. 미검증 항목
 
-배포 후 갱신.
+- **공개 링크(`target=_blank`, 미가입 서비스 안내)**: 검증 계정이 4개 서비스 모두 active 회원이라 「가입 가능한 서비스」 · 공개 안내 링크가 렌더되지 않아 실 화면에서 확인하지 못했다. 코드상 `EntryButton` 의 `public` 분기는 변경 없음.
+- **Firefox · Safari 의 bfcache**: Chromium(Playwright headed, bfcache 활성) 만 확인. `pageshow.persisted` 는 표준 이벤트라 동작은 동일할 것으로 보나 실측하지 않았다.
+- **사용자 실제 Chrome 프로필**: 자동화 Chromium 으로 확인. 확장 프로그램 · `Cache-Control` 등으로 bfcache 가 불가한 환경에서는 새 로드가 되어 결함 자체가 발생하지 않는다.
+- 라운드 8 에서 scrollY 가 0 으로 관측됐다(라운드 1~7 은 240 보존). 재현되지 않았고 본 WO 가 스크롤을 건드리지 않으므로 기록만 한다.
 
 ## 6. Git · 배포
 
 | 항목 | 값 |
 |---|---|
-| 구현 커밋 | 배포 후 갱신 |
-| Deploy Web Services run | 배포 후 갱신 |
-| 최종 상태 | 배포 후 갱신 |
+| 구현 커밋 | `e393c2f52` (origin/main · 로컬 `6e1261d24` 를 `c1aeca061` 위로 cherry-pick) |
+| Deploy Web Services run | `34917407647` — detect-changes → deploy-neture success (다른 서비스 skipped) |
+| CI · CodeQL | CodeQL `34917407588` success. CI Pipeline `34917407600` 은 다른 세션의 후속 push(`c12f8c746`) 로 concurrency **cancelled** — 본 변경의 vitest 20 · tsc 0 은 로컬 확인. 후속 커밋 CI `34918113529` 가 같은 코드를 포함해 실행 중 |
+| CHECK 갱신 커밋 | 본 커밋 |
+| 최종 상태 | `HEAD == origin/main` · 본 WO 범위 미커밋 0건 |
 
 ## 7. 문서 정합
 
