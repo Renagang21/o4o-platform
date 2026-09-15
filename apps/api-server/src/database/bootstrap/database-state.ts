@@ -1,19 +1,25 @@
 /**
  * Database state classifier
- * (WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1)
+ * (WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1,
+ *  hardened by WO-O4O-DATABASE-STATE-CLASSIFIER-SCHEMA-DRIFT-AND-CONNECTION-LOG-HARDENING-V1)
  *
  *   FRESH_EMPTY         no user relations/types/schemas, no typeorm_migrations, no marker
  *                       → canonical bootstrap runs, then incremental migrations
- *   BOOTSTRAPPED        marker row matches the code baseline (version + fingerprint),
- *                       history ⊆ incremental manifest, core tables present,
- *                       and — when no incremental migration has been applied yet —
- *                       the live fingerprint equals the baseline exactly
+ *   BOOTSTRAPPED        exactly one marker row matching the code baseline (version + fingerprint),
+ *                       no legacy anchors, history = contiguous incremental prefix only,
+ *                       core tables present, live fingerprint == expected state for that prefix
  *                       → bootstrap SKIPPED, incremental migrations only
- *   LEGACY_ESTABLISHED  no marker, typeorm_migrations carries every historical anchor
- *                       incl. the last historical migration, core tables present
+ *   LEGACY_ESTABLISHED  no marker, typeorm_migrations carries every historical anchor incl. the
+ *                       last historical migration, every history name is historical / retired
+ *                       fact / contiguous incremental prefix, core tables present,
+ *                       live fingerprint == expected state for that prefix
  *                       → bootstrap SKIPPED, historical replay ZERO, incremental only
- *   UNKNOWN_PARTIAL     anything else (partial schema, marker/fingerprint mismatch,
- *                       mixed legacy+marker, truncated history, …) → fail-fast, no repair
+ *   UNKNOWN_PARTIAL     anything else (partial schema, drift, marker/fingerprint mismatch,
+ *                       mixed legacy+marker, history gap / reversal / duplicate / unknown name,
+ *                       unregistered expected state, …) → fail-fast, no repair
+ *
+ * The schema fingerprint is compared for EVERY established database: the marker, the anchors and
+ * the history rows are evidence of provenance, never a substitute for the schema comparison.
  *
  * Read-only. Runs inside a transaction (the fingerprint requires one).
  */
@@ -26,7 +32,13 @@ import {
 } from './canonical-schema-baseline.meta.js';
 import { baselineMarkerTableExists, readBaselineMarkers, type BaselineMarkerRow } from './baseline-marker.js';
 import { computeSchemaFingerprint } from './schema-fingerprint.js';
+import { resolveIncrementalPrefix, validateLegacyHistoryNames } from './incremental-history.js';
 import { incrementalMigrationNames } from '../incremental/manifest.js';
+import {
+  EXPECTED_SCHEMA_STATES,
+  expectedSchemaStateFor,
+  type ExpectedSchemaState,
+} from '../incremental/expected-schema-states.js';
 
 export type DatabaseState = 'FRESH_EMPTY' | 'BOOTSTRAPPED' | 'LEGACY_ESTABLISHED' | 'UNKNOWN_PARTIAL';
 
@@ -45,15 +57,36 @@ export interface DatabaseStateFacts {
   readonly markers: readonly BaselineMarkerRow[];
   readonly liveFingerprint: string | null;
   readonly liveFingerprintLineCount: number | null;
+  /** Contiguous incremental prefix length; -1 when the history violates the prefix rule. */
+  readonly incrementalPrefixLength: number;
+  readonly incrementalHistoryContiguous: boolean;
+  readonly incrementalHistoryProblems: readonly string[];
   readonly incrementalApplied: readonly string[];
   readonly incrementalPending: readonly string[];
+  /** History names that are not incremental manifest names (historical rows for a legacy DB). */
   readonly historyNamesOutsideManifest: readonly string[];
+  /** History names that are neither historical, retired-fact nor manifest names. */
+  readonly historyNamesUnknown: readonly string[];
+  readonly historyDuplicateProblems: readonly string[];
+  /** Registered expected state for the current prefix (undefined = not registered). */
+  readonly expectedSchemaState: ExpectedSchemaState | undefined;
+  /** true / false when comparable; null when no live fingerprint (empty database). */
+  readonly fingerprintMatch: boolean | null;
 }
 
 export interface DatabaseStateResult {
   readonly state: DatabaseState;
   readonly reasons: readonly string[];
   readonly facts: DatabaseStateFacts;
+}
+
+/**
+ * Contract injection for the isolated-PostgreSQL harness ONLY (gap / reversal scenarios need a
+ * synthetic manifest). The migration job always uses the defaults.
+ */
+export interface ClassifierContract {
+  readonly manifestNames?: readonly string[];
+  readonly expectedStates?: readonly ExpectedSchemaState[];
 }
 
 async function tableExists(queryRunner: QueryRunner, schema: string, table: string): Promise<boolean> {
@@ -65,7 +98,14 @@ async function tableExists(queryRunner: QueryRunner, schema: string, table: stri
   return rows.length > 0;
 }
 
-export async function classifyDatabaseState(queryRunner: QueryRunner): Promise<DatabaseStateResult> {
+function describeFingerprint(hash: string | null, lines: number | null): string {
+  return `${hash ? `${hash.slice(0, 12)}…` : '(none)'} (${lines ?? 0} lines)`;
+}
+
+export async function classifyDatabaseState(
+  queryRunner: QueryRunner,
+  contract: ClassifierContract = {},
+): Promise<DatabaseStateResult> {
   if (!queryRunner.isTransactionActive) {
     throw new Error('classifyDatabaseState requires an active transaction');
   }
@@ -106,25 +146,38 @@ export async function classifyDatabaseState(queryRunner: QueryRunner): Promise<D
   const markerTableExists = await baselineMarkerTableExists(queryRunner);
   const markers = markerTableExists ? await readBaselineMarkers(queryRunner) : [];
 
-  const manifestNames = incrementalMigrationNames();
+  const manifestNames = contract.manifestNames ?? incrementalMigrationNames();
+  const expectedStates = contract.expectedStates ?? EXPECTED_SCHEMA_STATES;
   const manifestSet = new Set(manifestNames);
-  const incrementalApplied = manifestNames.filter((n) => historySet.has(n));
-  const incrementalPending = manifestNames.filter((n) => !historySet.has(n));
+  const prefix = resolveIncrementalPrefix(historyNames, manifestNames);
   const historyNamesOutsideManifest = historyNames.filter((n) => !manifestSet.has(n));
+  const legacyNames = validateLegacyHistoryNames(historyNames, manifestNames);
 
   let liveFingerprint: string | null = null;
   let liveFingerprintLineCount: number | null = null;
-  const needFingerprint = userObjectCount > 0;
-  if (needFingerprint) {
+  if (userObjectCount > 0) {
     const fp = await computeSchemaFingerprint(queryRunner);
     liveFingerprint = fp.hash;
     liveFingerprintLineCount = fp.lineCount;
   }
 
+  const expectedSchemaState = prefix.contiguous ? expectedSchemaStateFor(prefix.prefixLength, expectedStates) : undefined;
+  let fingerprintMatch: boolean | null = null;
+  if (liveFingerprint !== null) {
+    fingerprintMatch =
+      expectedSchemaState !== undefined &&
+      liveFingerprint === expectedSchemaState.fingerprint &&
+      liveFingerprintLineCount === expectedSchemaState.fingerprintLineCount;
+  }
+
   const facts: DatabaseStateFacts = {
     userSchemas, userObjectCount, historyTableExists, historyRowCount: historyNames.length, historyNames,
     anchorsPresent, anchorsMissing, coreTablesMissing, markerTableExists, markers,
-    liveFingerprint, liveFingerprintLineCount, incrementalApplied, incrementalPending, historyNamesOutsideManifest,
+    liveFingerprint, liveFingerprintLineCount,
+    incrementalPrefixLength: prefix.prefixLength, incrementalHistoryContiguous: prefix.contiguous,
+    incrementalHistoryProblems: prefix.problems, incrementalApplied: prefix.applied, incrementalPending: prefix.pending,
+    historyNamesOutsideManifest, historyNamesUnknown: legacyNames.unknown, historyDuplicateProblems: legacyNames.duplicateProblems,
+    expectedSchemaState, fingerprintMatch,
   };
 
   const reasons: string[] = [];
@@ -136,6 +189,22 @@ export async function classifyDatabaseState(queryRunner: QueryRunner): Promise<D
 
   const meta = CANONICAL_SCHEMA_BASELINE_META;
 
+  // Shared by both established branches: prefix rule + expected-state fingerprint comparison.
+  const establishedChecks = (): void => {
+    reasons.push(...prefix.problems);
+    if (coreTablesMissing.length > 0) reasons.push(`core tables missing: ${coreTablesMissing.join(', ')}`);
+    if (prefix.contiguous && !expectedSchemaState) {
+      reasons.push(`no expected schema state registered for incremental prefix ${prefix.prefixLength} (expected-schema-states.ts has ${expectedStates.length} entries)`);
+    }
+    if (expectedSchemaState && fingerprintMatch !== true) {
+      reasons.push(
+        `live fingerprint ${describeFingerprint(liveFingerprint, liveFingerprintLineCount)} != expected ` +
+          `${describeFingerprint(expectedSchemaState.fingerprint, expectedSchemaState.fingerprintLineCount)} for incremental prefix ${prefix.prefixLength}` +
+          ` (${expectedSchemaState.appliedThrough ?? 'baseline'})`,
+      );
+    }
+  };
+
   // ---- BOOTSTRAPPED (marker-driven, fingerprint-verified)
   if (markerTableExists) {
     if (markers.length !== 1) reasons.push(`o4o_schema_baselines has ${markers.length} rows (expected exactly 1)`);
@@ -143,24 +212,27 @@ export async function classifyDatabaseState(queryRunner: QueryRunner): Promise<D
     if (m && m.baseline_version !== meta.baselineVersion) reasons.push(`marker baseline_version '${m.baseline_version}' != code '${meta.baselineVersion}'`);
     if (m && m.schema_fingerprint !== meta.expectedFingerprint) reasons.push('marker schema_fingerprint != code expectedFingerprint');
     if (anchorsPresent.length > 0) reasons.push(`marker present but legacy history anchors also present: ${anchorsPresent.join(', ')}`);
-    if (historyNamesOutsideManifest.length > 0) reasons.push(`typeorm_migrations has ${historyNamesOutsideManifest.length} name(s) outside the incremental manifest`);
-    if (coreTablesMissing.length > 0) reasons.push(`core tables missing: ${coreTablesMissing.join(', ')}`);
-    if (incrementalApplied.length === 0 && liveFingerprint !== meta.expectedFingerprint) {
-      reasons.push(`live fingerprint ${liveFingerprint?.slice(0, 12)}… (${liveFingerprintLineCount} lines) != baseline ${meta.expectedFingerprint.slice(0, 12)}… (${meta.expectedFingerprintLineCount} lines) with no incremental migration applied`);
-    }
+    if (historyNamesOutsideManifest.length > 0) reasons.push(`typeorm_migrations has ${historyNamesOutsideManifest.length} name(s) outside the incremental manifest: ${historyNamesOutsideManifest.slice(0, 5).join(', ')}`);
+    establishedChecks();
     if (reasons.length === 0) {
-      return { state: 'BOOTSTRAPPED', reasons: [`marker ${meta.baselineVersion} verified; incremental applied ${incrementalApplied.length}, pending ${incrementalPending.length}`], facts };
+      return { state: 'BOOTSTRAPPED', reasons: [`marker ${meta.baselineVersion} verified; incremental prefix ${prefix.prefixLength} (pending ${prefix.pending.length}); live fingerprint == expected`], facts };
     }
     return { state: 'UNKNOWN_PARTIAL', reasons, facts };
   }
 
-  // ---- LEGACY_ESTABLISHED (history-driven)
+  // ---- LEGACY_ESTABLISHED (history-driven, fingerprint-verified)
   if (historyTableExists) {
     if (anchorsMissing.length > 0) reasons.push(`legacy history anchors missing: ${anchorsMissing.join(', ')}`);
     if (!historySet.has(meta.lastHistoricalMigration)) reasons.push(`last historical migration '${meta.lastHistoricalMigration}' not in typeorm_migrations`);
-    if (coreTablesMissing.length > 0) reasons.push(`core tables missing: ${coreTablesMissing.join(', ')}`);
+    if (legacyNames.unknown.length > 0) reasons.push(`typeorm_migrations has ${legacyNames.unknown.length} unknown name(s): ${legacyNames.unknown.slice(0, 5).join(', ')}`);
+    reasons.push(...legacyNames.duplicateProblems);
+    establishedChecks();
     if (reasons.length === 0) {
-      return { state: 'LEGACY_ESTABLISHED', reasons: [`typeorm_migrations ${historyNames.length} rows, all ${LEGACY_HISTORY_ANCHORS.length} anchors present, core tables present, no marker`], facts };
+      return {
+        state: 'LEGACY_ESTABLISHED',
+        reasons: [`typeorm_migrations ${historyNames.length} rows, all ${LEGACY_HISTORY_ANCHORS.length} anchors present, every name known, core tables present, no marker; incremental prefix ${prefix.prefixLength} (pending ${prefix.pending.length}); live fingerprint == expected`],
+        facts,
+      };
     }
     return { state: 'UNKNOWN_PARTIAL', reasons, facts };
   }
