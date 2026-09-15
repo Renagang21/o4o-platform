@@ -3,8 +3,10 @@
  *
  * WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1
  *
- * 섹션: 주요 업무 / 내가 이용하는 서비스 / 가입·이용 상태 / 가입 가능한 서비스.
+ * 섹션: 주요 업무 / 내가 이용하는 서비스 / (newsSlot: O4O 서비스 소식) / 가입·이용 상태 / 가입 가능한 서비스.
  * 판정 · 데이터는 전부 `lib/home-entry.ts` — 이 컴포넌트는 표시와 버튼 동작만 맡는다.
+ * WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1: `newsSlot` 은 주요 업무 · 서비스 진입 아래,
+ * 가입 · 이용 상태 위에 놓인다 — 업무 진입이 소식 목록에 밀리지 않도록 한다.
  *
  * 상태 3종: 로딩(자리표시) · 오류(재시도 — "미가입" 으로 보이지 않게 한다) · 정상.
  * 알림 · KPI · 유료 권한 같은 만들어낸 정보는 없다.
@@ -28,6 +30,8 @@ interface HomeEntryPanelProps {
   loading: boolean;
   error: string | null;
   onReload: () => void;
+  /** 「O4O 서비스 소식」 섹션 — 내가 이용하는 서비스 아래 · 가입 · 이용 상태 위 */
+  newsSlot?: React.ReactNode;
 }
 
 const BTN =
@@ -78,7 +82,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export default function HomeEntryPanel({ user, data, loading, error, onReload }: HomeEntryPanelProps) {
+export default function HomeEntryPanel({ user, data, loading, error, onReload, newsSlot }: HomeEntryPanelProps) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
 
@@ -175,6 +179,8 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload }:
         </Section>
       )}
 
+      {newsSlot && <div className="mt-6 first:mt-0">{newsSlot}</div>}
+
       {model.statusItems.length > 0 && (
         <Section title="가입 · 이용 상태">
           <ul className="m-0 list-none p-0 text-sm text-slate-700">
@@ -213,7 +219,7 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload }:
         </Section>
       )}
 
-      {nothingToShow && (
+      {nothingToShow && !newsSlot && (
         <p className="m-0 text-sm text-slate-400">지금 이용 중이거나 가입할 수 있는 서비스가 없습니다.</p>
       )}
     </div>

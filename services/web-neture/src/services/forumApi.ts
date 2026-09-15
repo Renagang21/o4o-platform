@@ -231,6 +231,8 @@ export async function fetchForumPosts(params: {
   limit?: number;
   isPinned?: boolean;
   search?: string;
+  /** WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1: 태그 정확 일치 (서버 `:tag = ANY(post.tags)`) */
+  tag?: string;
   sortBy?: 'latest' | 'popular' | 'oldest';
 }): Promise<PostsResponse> {
   if (!USE_REAL_API) {
@@ -273,6 +275,7 @@ export async function fetchForumPosts(params: {
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.limit) queryParams.append('limit', params.limit.toString());
     if (params.search) queryParams.append('search', params.search);
+    if (params.tag) queryParams.append('tag', params.tag);
     if (params.sortBy) queryParams.append('sortBy', params.sortBy);
 
     const response = await api.get(`${FORUM_BASE}/posts?${queryParams}`);
@@ -565,6 +568,11 @@ export interface CreateForumPostPayload {
    *   400 FORUM_REQUIRED 로 막는다(과거에는 forum_id NULL 로 저장돼 글이 사라졌다).
    */
   forumId?: string;
+  /**
+   * WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1: 글 분류 태그. 「O4O 서비스 소식」 포럼은
+   * 새 기능·업데이트 / 사용법 / 활용 사례 를 태그로 분류한다 (별도 게시판 없음).
+   */
+  tags?: string[];
   // WO-NETURE-EXTERNAL-CONTACT-V1: Show author's contact on this post
   showContactOnPost?: boolean;
 }
@@ -624,6 +632,7 @@ export async function createForumPost(
       ...(payload.forumId ? { forumId: payload.forumId } : {}),
       categorySlug: payload.categorySlug,
       type: 'discussion',
+      ...(payload.tags && payload.tags.length > 0 ? { tags: payload.tags } : {}),
       // WO-NETURE-EXTERNAL-CONTACT-V1
       showContactOnPost: payload.showContactOnPost || false,
     });

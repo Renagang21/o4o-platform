@@ -88,8 +88,10 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
   const categoryFilter = searchParams.get('category') || '';
   const typeFilter = (searchParams.get('type') || '') as PostType | '';
   const sortBy = (searchParams.get('sort') || 'latest') as 'latest' | 'popular' | 'oldest';
+  // WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1: 태그 분류 필터 (홈 바로가기 → `?category=<forumId>&tag=<태그>`)
+  const tagFilter = searchParams.get('tag') || '';
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
-  const hasFilters = !!searchQuery || !!categoryFilter || !!typeFilter || sortBy !== 'latest';
+  const hasFilters = !!searchQuery || !!categoryFilter || !!typeFilter || !!tagFilter || sortBy !== 'latest';
 
   const [searchInput, setSearchInput] = useState(searchQuery);
   const [categories, setCategories] = useState<ForumCategory[]>([]);
@@ -111,7 +113,7 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
   }, []);
 
   // Load posts when filters/page change
-  const filterKey = `${boardSlug}|${searchQuery}|${categoryFilter}|${typeFilter}|${sortBy}|${currentPage}`;
+  const filterKey = `${boardSlug}|${searchQuery}|${categoryFilter}|${typeFilter}|${tagFilter}|${sortBy}|${currentPage}`;
 
   useEffect(() => {
     let cancelled = false;
@@ -121,12 +123,13 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
       setError(null);
 
       try {
-        const isFiltering = !!searchQuery || !!categoryFilter || sortBy !== 'latest';
+        const isFiltering = !!searchQuery || !!categoryFilter || !!tagFilter || sortBy !== 'latest';
 
         if (isFiltering) {
           const res = await fetchForumPosts({
             search: searchQuery || undefined,
             categoryId: categoryFilter || undefined,
+            tag: tagFilter || undefined,
             sortBy,
             page: currentPage,
             limit: PAGE_SIZE,
@@ -215,12 +218,22 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
   if (activeType) {
     activeChips.push({ label: activeType.label, onRemove: () => updateParam('type', '') });
   }
+  if (tagFilter) {
+    activeChips.push({ label: `#${tagFilter}`, onRemove: () => updateParam('tag', '') });
+  }
   if (sortBy !== 'latest') {
     const sortLabel = SORT_OPTIONS.find((o) => o.value === sortBy)?.label;
     if (sortLabel) activeChips.push({ label: sortLabel, onRemove: () => updateParam('sort', '') });
   }
 
-  // Pagination range
+  // WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1: 포럼(카테고리) 필터 중이면 글쓰기가 그 포럼을 대상으로 열리도록
+  // slug 와 현재 태그를 넘긴다. 필터가 없으면 기존과 동일하게 `${basePath}/write`.
+  const writeHref = (() => {
+    if (!activeCategory) return `${basePath}/write`;
+    const q = new URLSearchParams({ forum: activeCategory.slug });
+    if (tagFilter) q.set('tag', tagFilter);
+    return `${basePath}/write?${q}`;
+  })();
 
   return (
     <PageSection last>
@@ -234,7 +247,7 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
               {customDescription || 'o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다.'}
             </p>
           </div>
-          <Link to={`${basePath}/write`} style={s.writeButton}>글쓰기</Link>
+          <Link to={writeHref} style={s.writeButton}>글쓰기</Link>
         </div>
       </header>
 
@@ -320,7 +333,7 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
         ) : (
           <>
             <p style={s.emptyTitle}>아직 등록된 글이 없습니다</p>
-            <Link to={`${basePath}/write`} style={s.emptyBtn}>글쓰기</Link>
+            <Link to={writeHref} style={s.emptyBtn}>글쓰기</Link>
           </>
         ))}
       />

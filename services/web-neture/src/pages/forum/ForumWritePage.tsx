@@ -11,9 +11,14 @@
  *
  * 금지:
  * - 글 유형 선택 (공지/질문 등)
- * - 태그/카테고리 선택
  * - 첨부파일/이미지 업로드
  * - 임시저장/자동 초안
+ *
+ * WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1:
+ * - `?forum=<slug>` 로 대상 포럼을 지정할 수 있다 (없으면 기존과 같이 첫 포럼).
+ * - 대상 포럼에 태그가 등록돼 있으면 「분류」 선택을 보여주고 글의 `tags` 로 저장한다
+ *   (「O4O 서비스 소식」 의 새 기능·업데이트 / 사용법 / 활용 사례 분류). 별도 게시판 없음.
+ *   `?tag=<태그>` 가 있으면 그 분류를 미리 선택한다.
  */
 
 import { useState, useEffect } from 'react';
@@ -59,11 +64,16 @@ export function ForumWritePage({
   const [searchParams] = useSearchParams();
   const editPostId = searchParams.get('edit');
   const isEditMode = !!editPostId;
+  const forumSlugParam = searchParams.get('forum') || '';
+  const tagParam = searchParams.get('tag') || '';
 
   // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
   //   categorySlug 만 보내면 실제 forum 이 확정되지 않아 글이 forum_id NULL 로 저장되고
   //   Neture 목록에서 다시 보이지 않았다. 공통 `GET /forum/categories` 로 대상 forum 을 확정한다.
   const [forumId, setForumId] = useState('');
+  const [targetForum, setTargetForum] = useState<{ id: string; slug: string; name: string; tags: string[] } | null>(null);
+  // 분류(태그) — 대상 포럼의 tags 중 하나. '' = 분류 없음.
+  const [classification, setClassification] = useState(tagParam);
 
   useEffect(() => {
     if (isEditMode) return;
@@ -72,12 +82,25 @@ export function ForumWritePage({
       .then((res) => {
         if (!alive) return;
         const items: any[] = Array.isArray(res?.data) ? res.data : [];
-        const matched = items.find((item) => item?.slug === categorySlug) || items[0];
-        if (matched?.id) setForumId(String(matched.id));
+        // `?forum=<slug>` 가 있으면 그 포럼을 우선 확정한다 (홈 소식 섹션 · 포럼 목록 필터에서 진입).
+        const matched =
+          (forumSlugParam ? items.find((item) => item?.slug === forumSlugParam) : undefined)
+          || items.find((item) => item?.slug === categorySlug)
+          || items[0];
+        if (matched?.id) {
+          setForumId(String(matched.id));
+          const tags: string[] = Array.isArray(matched.tags)
+            ? matched.tags.map((t: unknown) => String(t).trim()).filter(Boolean)
+            : [];
+          setTargetForum({ id: String(matched.id), slug: String(matched.slug ?? ''), name: String(matched.name ?? ''), tags });
+        }
       })
       .catch(() => { /* forum 확정 실패 시 제출 단계에서 안내 */ });
     return () => { alive = false; };
-  }, [isEditMode, categorySlug]);
+  }, [isEditMode, categorySlug, forumSlugParam]);
+
+  const forumTags = targetForum?.tags ?? [];
+  const selectedClassification = forumTags.includes(classification) ? classification : '';
 
   const { isAuthenticated } = useAuth();
   const { openLoginModal } = useLoginModal();
@@ -212,6 +235,7 @@ export function ForumWritePage({
         content: blocks,
         forumId,
         categorySlug: categorySlug,
+        ...(selectedClassification ? { tags: [selectedClassification] } : {}),
         showContactOnPost: hasContactInfo ? showContactOnPost : false,
       });
       if (response.success && response.data) {
@@ -264,6 +288,9 @@ export function ForumWritePage({
         <p style={styles.description}>
           {isEditMode ? '게시글 내용을 수정합니다.' : 'o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.'}
         </p>
+        {!isEditMode && targetForum && (
+          <p style={styles.targetForum}>등록 포럼: <strong>{targetForum.name}</strong></p>
+        )}
       </header>
 
       {/* Notice Banner */}
@@ -309,7 +336,23 @@ export function ForumWritePage({
             </div>
           )}
           renderExtra={
-            hasContactInfo ? (
+            <>
+            {!isEditMode && forumTags.length > 0 && (
+              <div style={styles.classificationBox}>
+                <label htmlFor="forum-post-classification" style={styles.classificationLabel}>분류</label>
+                <select
+                  id="forum-post-classification"
+                  value={selectedClassification}
+                  onChange={(e) => setClassification(e.target.value)}
+                  style={styles.classificationSelect}
+                >
+                  <option value="">분류 선택 안 함</option>
+                  {forumTags.map((t) => <option key={t} value={t}>{t}</option>)}
+                </select>
+                <p style={styles.contactHint}>선택한 분류는 글의 태그로 저장되며 포럼 목록에서 분류별로 찾을 수 있습니다.</p>
+              </div>
+            )}
+            {hasContactInfo ? (
               <div style={styles.contactOption}>
                 <label style={styles.contactLabel}>
                   <input
@@ -333,7 +376,8 @@ export function ForumWritePage({
                   연락 설정하기 →
                 </Link>
               </div>
-            )
+            )}
+            </>
           }
         />
     </div>
@@ -398,6 +442,36 @@ const styles: Record<string, React.CSSProperties> = {
     color: GRAY_500,
     margin: 0,
     lineHeight: 1.5,
+  },
+  targetForum: {
+    fontSize: '13px',
+    color: GRAY_500,
+    margin: '8px 0 0 0',
+  },
+
+  // WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1: 분류(태그) 선택
+  classificationBox: {
+    padding: '16px 20px',
+    backgroundColor: GRAY_100,
+    borderRadius: '8px',
+    marginBottom: '12px',
+  },
+  classificationLabel: {
+    display: 'block',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: GRAY_700,
+    marginBottom: '8px',
+  },
+  classificationSelect: {
+    width: '100%',
+    maxWidth: '320px',
+    padding: '8px 12px',
+    fontSize: '14px',
+    border: `1px solid ${GRAY_200}`,
+    borderRadius: '6px',
+    backgroundColor: '#fff',
+    color: GRAY_700,
   },
 
   // Notice Banner

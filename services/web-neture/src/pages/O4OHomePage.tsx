@@ -25,6 +25,11 @@
  *   다른 서비스로의 이동은 기존 세션 인계(POST /auth/handoff)를 재사용하며 정적 외부 링크로
  *   보내지 않는다. 판정은 서버가 최종이다.
  *
+ * WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1:
+ *   「O4O 서비스 소식」(components/home/HomeServiceNews · lib/home-news) — 로그인 후에는
+ *   HomeEntryPanel 의 newsSlot(내가 이용하는 서비스 아래 · 가입·이용 상태 위), 로그인 전에는
+ *   서비스 안내 pill 아래. 소식 포럼의 공개 글 최신 5건 + 분류 바로가기 3종. 실패해도 홈은 막히지 않는다.
+ *
  * Neture 전용 chrome(NetureGlobalHeader / Footer / NetureBottomNav)은 쓰지 않는다 —
  * `/` 는 App.tsx 에서 NetureLayout 밖에 배치되어 있고, 기존 Neture 영역
  * (`/community`, `/mypage`, `/market-trial` 등)은 NetureLayout 을 그대로 유지한다.
@@ -39,6 +44,7 @@ import { sendHomeChat, HomeChatError, HOME_CHAT_MAX_MESSAGE_LENGTH } from '../li
 import { isSupportedWorkImage, readWorkImage, runWorkAgent, WorkAgentError, type WorkAgentResult } from '../lib/ai/work-agent';
 import { useHomeEntry } from '../lib/home-entry';
 import HomeEntryPanel from '../components/home/HomeEntryPanel';
+import HomeServiceNews from '../components/home/HomeServiceNews';
 
 // ─── 서비스 안내 (로그인 전) ────────────────────────────────────────────────────
 // 신규 도메인·route 를 만들지 않는다.
@@ -368,7 +374,14 @@ export default function O4OHomePage() {
 
         {/* 로그인 후 개인화 영역 — WO-O4O-NETURE-UNIFIED-ENTRY-UI-PHASE1-V1 */}
         {isAuthenticated && user && (
-          <HomeEntryPanel user={user} data={entry.data} loading={entry.loading} error={entry.error} onReload={entry.reload} />
+          <HomeEntryPanel
+            user={user}
+            data={entry.data}
+            loading={entry.loading}
+            error={entry.error}
+            onReload={entry.reload}
+            newsSlot={<HomeServiceNews />}
+          />
         )}
 
         {/* 로그인 전(또는 세션 복구 중 · 개인화 조회 실패 시 공개 안내 대체) — 서비스 안내 · 로그인 · 회원가입 */}
@@ -403,6 +416,8 @@ export default function O4OHomePage() {
                 <EntryPill key={e.href} entry={e} />
               ))}
             </nav>
+            {/* 로그인 전 공개 소식 — 공개 서비스 안내 아래. 로그인 후와 같은 컴포넌트 (WO-O4O-NETURE-HOME-SERVICE-NEWS-FORUM-V1) */}
+            <HomeServiceNews className="mt-8 w-full max-w-2xl text-left" />
           </>
         )}
       </main>
