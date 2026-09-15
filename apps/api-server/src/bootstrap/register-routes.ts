@@ -888,6 +888,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Automation Job routes:', automationJobError);
     }
 
+    // 29d-7. Register TTS narration narrow endpoint (WO-O4O-AUTOMATION-TTS-NARROW-ENDPOINT-V1)
+    try {
+      const { createTtsNarrationRouter } = await import('../modules/automation/controllers/tts-narration.controller.js');
+      app.use('/api/v1/platform', createTtsNarrationRouter(dataSource));
+      logger.info('✅ TTS narration route registered at /api/v1/platform/automation/tts');
+    } catch (ttsError) {
+      logger.error('Failed to register TTS narration route:', ttsError);
+    }
+
     // 29e. Register Copilot Engine routes (WO-O4O-COPILOT-ENGINE-INTEGRATION-V1)
     try {
       const { createCopilotEngineController } = await import('../copilot/copilot-engine.controller.js');
