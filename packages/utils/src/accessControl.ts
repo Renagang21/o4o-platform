@@ -110,7 +110,6 @@ export function getAvailableRoles(includeSpecialRoles: boolean = true): Array<{ 
     { value: 'seller', label: '셀러' },
     { value: 'supplier', label: '공급자' },
     { value: 'affiliate', label: '제휴자' },
-    { value: 'partner', label: '파트너' },
     { value: 'business', label: '비즈니스 회원' },
     { value: 'customer', label: '일반 고객' },
     { value: 'beta_user', label: '베타 사용자' },

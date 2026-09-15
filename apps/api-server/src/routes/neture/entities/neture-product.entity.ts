@@ -21,7 +21,6 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
-import type { NeturePartner } from './neture-partner.entity.js';
 
 /**
  * Product Status Enum
@@ -71,9 +70,8 @@ export class NetureProduct {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'partner_id', type: 'uuid', nullable: true })
-  @Index()
-  partnerId?: string | null;
+  // partner_id 컬럼: Legacy Partner 은퇴로 매핑 제거 (물리 컬럼은 physical cleanup 대상)
+  //   WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
 
   @Column({ type: 'varchar', length: 200 })
   @Index()
@@ -172,8 +170,4 @@ export class NetureProduct {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
-  // Relations (no FK constraints to other schemas)
-  @ManyToOne('NeturePartner', 'products')
-  @JoinColumn({ name: 'partner_id' })
-  partner?: NeturePartner;
 }

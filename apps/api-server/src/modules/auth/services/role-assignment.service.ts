@@ -117,13 +117,6 @@ export class RoleAssignmentService {
   }
 
   /**
-   * Check if user is partner
-   */
-  async isPartner(userId: string): Promise<boolean> {
-    return this.hasRole(userId, 'partner');
-  }
-
-  /**
    * Assign a role to a user
    *
    * WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
@@ -390,13 +383,6 @@ export class RoleAssignmentService {
         'content.create',
         'content.edit',
         'orders.view',
-        'api.access',
-      ],
-      partner: [
-        'content.view',
-        'content.create',
-        'content.edit',
-        'analytics.view',
         'api.access',
       ],
       moderator: [

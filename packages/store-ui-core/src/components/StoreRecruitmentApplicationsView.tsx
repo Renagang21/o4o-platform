@@ -43,7 +43,9 @@ const SERVICE_LABELS: Record<string, string> = {
 };
 
 function resolveState(a: StoreRecruitmentApplicationRow): { label: string; cls: string; note: string } {
-  if (a.status === 'approved' && a.participationTerminated) {
+  // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 참여 해지 = status 'cancelled'(공급자 결정) + participationTerminated.
+  //   (과거 legacy 계약 행 파생 시절에는 approved+terminated 였다 — 서버 플래그만 신뢰한다.)
+  if (a.participationTerminated) {
     return {
       label: '참여 해지됨',
       cls: 'bg-slate-200 text-slate-600',

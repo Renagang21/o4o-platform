@@ -221,7 +221,7 @@ describe('resolveWorkScopeStore — 매장 scope 해석 (read-only)', () => {
   });
 
   it('8. store 축이 아닌 workspace 는 질의를 전혀 하지 않는다', async () => {
-    for (const workspace of ['home', 'community', 'operator', 'admin', 'supplier', 'partner']) {
+    for (const workspace of ['home', 'community', 'operator', 'admin', 'supplier']) {
       const { dataSource, calls } = makeDataSource([ACTIVE, []]);
 
       const result = await resolveWorkScopeStore(dataSource, {

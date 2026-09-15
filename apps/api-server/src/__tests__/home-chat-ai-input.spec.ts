@@ -102,7 +102,7 @@ describe('home-chat system prompt — 서버 확정 사실만 반영', () => {
   });
 
   it('6. tool 실행 금지 지시가 항상 포함된다 (모든 workspace)', () => {
-    for (const workspace of ['home', 'community', 'store', 'supplier', 'partner', 'operator', 'admin']) {
+    for (const workspace of ['home', 'community', 'store', 'supplier', 'operator', 'admin']) {
       const prompt = buildHomeChatSystemPrompt(baseFacts({ workspace }));
       expect(prompt).toContain('답변만');
       expect(prompt).toContain('매장 데이터를 직접 조회하지 않습니다');

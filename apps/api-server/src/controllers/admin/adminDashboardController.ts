@@ -9,7 +9,6 @@
  * Entities used:
  * - User (users table) - user growth
  * - NetureOrder (neture.neture_orders) - order/sales data
- * - NeturePartner (neture.neture_partners) - partner data
  * - CosmeticsProduct - cosmetics metrics
  */
 
@@ -18,7 +17,6 @@ import { AppDataSource, checkDatabaseHealth } from '../../database/connection.js
 import { User } from '../../modules/auth/entities/User.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { NetureOrder } from '../../routes/neture/entities/neture-order.entity.js';
-import { NeturePartner } from '../../routes/neture/entities/neture-partner.entity.js';
 import { CosmeticsProduct, CosmeticsBrand, CosmeticsProductStatus } from '../../routes/cosmetics/entities/index.js';
 
 export class AdminDashboardController {
@@ -295,151 +293,8 @@ export class AdminDashboardController {
     }
   }
 
-  /**
-   * GET /api/v1/admin/partners
-   *
-   * Returns partner list from NeturePartner
-   */
-  async getPartners(req: AuthRequest, res: Response) {
-    try {
-
-      const { page = 1, limit = 20 } = req.query;
-      const skip = (Number(page) - 1) * Number(limit);
-
-      const partnerRepo = AppDataSource.getRepository(NeturePartner);
-
-      const [partners, total] = await partnerRepo.findAndCount({
-        take: Number(limit),
-        skip,
-        order: { createdAt: 'DESC' }
-      });
-
-      res.json({
-        success: true,
-        data: partners,
-        pagination: {
-          page: Number(page),
-          limit: Number(limit),
-          total,
-          totalPages: Math.ceil(total / Number(limit))
-        }
-      });
-    } catch (error: any) {
-      console.error('Error fetching partners:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to fetch partners',
-        error: error.message
-      });
-    }
-  }
-
-  /**
-   * GET /api/v1/admin/partners/:id/summary
-   *
-   * Returns partner performance summary
-   */
-  async getPartnerSummary(req: AuthRequest, res: Response) {
-    try {
-
-      const { id } = req.params;
-
-      // Get partner info
-      const partnerRepo = AppDataSource.getRepository(NeturePartner);
-      const partner = await partnerRepo.findOne({ where: { id } });
-
-      if (!partner) {
-        return res.status(404).json({
-          success: false,
-          message: 'Partner not found'
-        });
-      }
-
-      // Partner sales summary would require order attribution
-      // For now, return partner info with placeholder for metrics
-      // (Real implementation requires partner_id on orders)
-
-      res.json({
-        success: true,
-        data: {
-          partner: {
-            id: partner.id,
-            name: partner.name,
-            type: partner.type,
-            userId: partner.userId,
-            status: partner.status,
-            createdAt: partner.createdAt
-          },
-          metrics: {
-            // Empty until order attribution is implemented
-            totalOrders: 0,
-            totalRevenue: 0,
-            totalCommission: 0,
-            message: 'Partner attribution not yet implemented on orders'
-          }
-        }
-      });
-    } catch (error: any) {
-      console.error('Error fetching partner summary:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to fetch partner summary',
-        error: error.message
-      });
-    }
-  }
-
-  /**
-   * GET /api/v1/admin/cosmetics/partner-metrics
-   *
-   * Returns cosmetics partner metrics
-   */
-  async getCosmeticsPartnerMetrics(req: AuthRequest, res: Response) {
-    try {
-
-      // Get cosmetics product and brand counts
-      const productRepo = AppDataSource.getRepository(CosmeticsProduct);
-      const brandRepo = AppDataSource.getRepository(CosmeticsBrand);
-
-      const [productCount, brandCount] = await Promise.all([
-        productRepo.count(),
-        brandRepo.count()
-      ]);
-
-      // Visible products (public)
-      const activeProductCount = await productRepo.count({
-        where: { status: CosmeticsProductStatus.VISIBLE }
-      });
-
-      // Note: Click/conversion tracking requires cosmetics_partner extension
-      // which is not yet implemented. Return empty metrics.
-
-      res.json({
-        success: true,
-        data: {
-          catalog: {
-            totalProducts: productCount,
-            activeProducts: activeProductCount,
-            totalBrands: brandCount
-          },
-          performance: {
-            // Empty until cosmetics partner tracking is implemented
-            clicks: 0,
-            conversions: 0,
-            revenue: 0,
-            message: 'Cosmetics partner tracking not yet implemented'
-          }
-        }
-      });
-    } catch (error: any) {
-      console.error('Error fetching cosmetics partner metrics:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to fetch cosmetics partner metrics',
-        error: error.message
-      });
-    }
-  }
+  // (은퇴) GET /partners · /partners/:id/summary · /cosmetics/partner-metrics
+  //   — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
 }
 
 export default new AdminDashboardController();

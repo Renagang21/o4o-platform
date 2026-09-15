@@ -50,7 +50,7 @@ describe('adminRouteAccess — 서비스 접두 역할 (핵심 수정)', () => {
   it('비관리자 전용 화면에는 서비스 접두 관리자 역할이 들어오지 못한다 (수정 대상 결함)', () => {
     expect(matchesRequiredRole('kpa:admin', ['seller'])).toBe(false);
     expect(matchesRequiredRole('kpa:admin', ['supplier'])).toBe(false);
-    expect(matchesRequiredRole('neture:operator', ['partner', 'affiliate', 'seller', 'supplier'])).toBe(false);
+    expect(matchesRequiredRole('neture:operator', ['affiliate', 'seller', 'supplier'])).toBe(false);
   });
 
   it('요구 집합에 관리자급이 하나라도 있으면 서비스 접두 역할을 받아준다', () => {

@@ -29,8 +29,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // route(/operator/suppliers) 유지. Neture 는 USER_MANAGEMENT/MEMBERSHIP_APPROVAL 모두 활성이라
     // 그룹 이동으로 인한 권한 회귀 없음. (라벨: '공급자 활성화' → '공급자 승인')
     { label: '공급자 승인', path: '/operator/suppliers' },
-    // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1: 파트너 서비스 신청 승인(공급자 승인의 대칭)
-    { label: '파트너 승인', path: '/operator/partners' },
     // WO-O4O-NETURE-OPERATOR-SIDEBAR-DEAD-LINKS-CLEANUP-V1: adminOnly 항목은 /operator/* 라우트가
     // 없으므로 실제 존재하는 /admin/* 로 정정 (회원 완전삭제 와 동일 패턴). 권한자에게만 노출.
     // WO-O4O-NETURE-PLATFORM-ADMIN-SCOPE-SEPARATION-V1: 플랫폼 관리 성격 표면화(라벨).
@@ -75,10 +73,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   orders: [
     { label: '주문 관리', path: '/operator/orders' },
-    { label: '파트너 현황', path: '/admin/partners', adminOnly: true },
     { label: '정산 관리', path: '/admin/settlements', adminOnly: true },
-    { label: '파트너 정산', path: '/admin/partner-settlements', adminOnly: true },
-    { label: '커미션 관리', path: '/admin/commissions', adminOnly: true },
   ],
   content: [
     { label: '홈페이지 CMS', path: '/operator/homepage-cms' },
@@ -173,10 +168,7 @@ export function getAdminMenu(
       { label: '카테고리 매핑', path: '/admin/category-mapping-rules' },
     ],
     orders: [
-      { label: '파트너 현황', path: '/admin/partners' },
       { label: '정산 관리', path: '/admin/settlements' },
-      { label: '파트너 정산', path: '/admin/partner-settlements' },
-      { label: '커미션 관리', path: '/admin/commissions' },
     ],
     content: [
       { label: '커뮤니티 광고', path: '/admin/community-admin' },

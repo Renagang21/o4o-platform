@@ -70,13 +70,12 @@ export { Brand } from './Brand.entity.js';
 export { SupplierProductOffer, OfferDistributionType, OfferApprovalStatus } from './SupplierProductOffer.entity.js';
 // WO-O4O-STORE-CORE-ENTITY-EXTRACTION-V1: re-export from store-core
 export { StoreProductProfile } from '../../store-core/entities/StoreProductProfile.entity.js';
-export { NeturePartnershipRequest, PartnershipStatus } from './NeturePartnershipRequest.entity.js';
-export { NeturePartnershipProduct } from './NeturePartnershipProduct.entity.js';
-export { NeturePartnerDashboardItem, type PartnerDashboardItemStatus } from './NeturePartnerDashboardItem.entity.js';
-export { NeturePartnerDashboardItemContent, type ContentSource } from './NeturePartnerDashboardItemContent.entity.js';
-export { NeturePartnerRecruitment, RecruitmentStatus, ExposureStatus } from './NeturePartnerRecruitment.entity.js';
-export { NeturePartnerApplication, ApplicationStatus } from './NeturePartnerApplication.entity.js';
-export { NetureSellerPartnerContract, ContractStatus, ContractTerminatedBy } from './NetureSellerPartnerContract.entity.js';
+// WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
+//   Legacy Partner 엔티티(NeturePartnershipRequest/Product · NeturePartnerDashboardItem(+Content) ·
+//   NetureSellerPartnerContract) 는 runtime 에서 은퇴했다(테이블 DROP 은 후속 physical cleanup).
+//   판매자 모집(Seller Recruitment) 은 Partner 가 아니므로 분리 유지한다.
+export { SellerRecruitment, RecruitmentStatus, ExposureStatus, SELLER_RECRUITMENT_TABLE } from './SellerRecruitment.entity.js';
+export { SellerRecruitmentApplication, ApplicationStatus, SELLER_RECRUITMENT_APPLICATION_TABLE } from './SellerRecruitmentApplication.entity.js';
 export { SupplierCsvImportBatch, CsvImportBatchStatus } from './SupplierCsvImportBatch.entity.js';
 export { SupplierCsvImportRow, CsvRowValidationStatus, CsvRowActionType } from './SupplierCsvImportRow.entity.js';
 export { NetureSupplierLibraryItem } from './NetureSupplierLibraryItem.entity.js';

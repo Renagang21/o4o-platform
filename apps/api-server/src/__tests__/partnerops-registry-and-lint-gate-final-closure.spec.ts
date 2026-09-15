@@ -99,10 +99,12 @@ describe('A축 — 이름이 비슷한 살아 있는 계약은 보존한다', ()
     expect(existsSync(resolve(REPO, 'packages/partner-core/src'))).toBe(true);
   });
 
-  it('appsCatalog 의 partnerops serviceGroup id 는 보존된다', () => {
-    const s = read('apps/api-server/src/app-manifests/appsCatalog.ts');
-    expect(s).toContain("id: 'partnerops',");
-    expect(s).toContain("serviceGroups: ['platform-core', 'partnerops'],");
+  // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
+  //   partnerops serviceGroup · partner-core 앱 항목은 Legacy Partner 전면 은퇴로 제거됐다 (보존 계약 해제).
+  it('appsCatalog 에 partnerops serviceGroup / partner-core 앱 항목이 없다', () => {
+    const s = code('apps/api-server/src/app-manifests/appsCatalog.ts');
+    expect(s).not.toMatch(/id:\s*'partnerops'/);
+    expect(s).not.toMatch(/appId:\s*'partner-core'/);
   });
 
   it('appsCatalog 에 실행 앱 partnerops 항목은 없다', () => {

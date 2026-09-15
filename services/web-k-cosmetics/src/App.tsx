@@ -54,7 +54,7 @@ const ProductsPage = lazy(() => import('@/pages').then(m => ({ default: m.Produc
 const SupplyPage = lazy(() => import('@/pages').then(m => ({ default: m.SupplyPage })));
 const TouristHubPage = lazy(() => import('@/pages').then(m => ({ default: m.TouristHubPage })));
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
-const PartnerInfoPage = lazy(() => import('@/pages/PartnerInfoPage'));
+const SupplierInfoPage = lazy(() => import('@/pages/SupplierInfoPage'));
 // WO-O4O-KCOS-SERVICE-GUIDE-PAGE-V1: 서비스 안내 (공개)
 const ServiceGuidePage = lazy(() => import('@/pages/ServiceGuidePage'));
 // WO-O4O-CROSSSERVICE-POLICY-ROUTES-V1: 공개 약관/개인정보처리방침
@@ -429,7 +429,7 @@ function PostLoginRedirect() {
     }
 
     // workspace 경로 early-exit
-    const WORKSPACE_PREFIXES = ['/store', '/operator', '/admin', '/partner', '/instructor'];
+    const WORKSPACE_PREFIXES = ['/store', '/operator', '/admin', '/instructor'];
     if (WORKSPACE_PREFIXES.some(p => location.pathname.startsWith(p))) {
       didRedirectRef.current = true; return;
     }
@@ -463,7 +463,9 @@ function AppRoutes() {
         <Route path="service-guide" element={<ServiceGuidePage />} />
         {/* WO-O4O-KCOS-MENU-CANONICAL-ALIGN-V1: 모바일 매장 경영 허브 */}
         <Route path="mobile/store" element={<MobileStorePage />} />
-        <Route path="partners" element={<PartnerInfoPage />} />
+        {/* WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: /partners → /suppliers (파트너 카드 은퇴) */}
+        <Route path="suppliers" element={<SupplierInfoPage />} />
+        <Route path="partners" element={<Navigate to="/suppliers" replace />} />
 
         {/* Resources Hub (WO-KCOS-RESOURCES-HUB-IMPLEMENTATION-V1) */}
         <Route path="resources" element={<ResourcesPage />} />

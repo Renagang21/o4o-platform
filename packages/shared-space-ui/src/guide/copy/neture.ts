@@ -71,7 +71,7 @@ export const netureGuideIntroProps: GuideIntroPageProps = {
       items: [
         { label: '소규모 사업자 연대', detail: '개별 매장이 플랫폼을 통해 공급자와 대등하게 협력합니다.' },
         { label: '정보 기반 협력', detail: '공급자의 전문 콘텐츠가 매장 신뢰도와 고객 상담을 높입니다.' },
-        { label: '계약 기반 협업', detail: '공급자와 파트너 · 매장은 명시적 계약으로 신뢰를 확보합니다.' },
+        { label: '계약 기반 협업', detail: '공급자와 매장은 명시적 계약으로 신뢰를 확보합니다.' },
       ],
     },
   ],
@@ -112,13 +112,12 @@ export const netureGuideIntroStructureProps: GuideIntroStructurePageProps = {
           '상품 등록 및 콘텐츠 작성',
           '유통 범위와 가격 등급 결정',
           'Event Offer 및 유통참여형 펀딩 제안',
-          '파트너와 계약 기반 협업',
         ],
       },
       {
         label: '운영자',
         tasks: [
-          '공급자 · 파트너 가입 승인',
+          '공급자 가입 승인',
           '상품 품질 검수 및 승인',
           '서비스별 노출 승인 및 정책 관리',
         ],
@@ -150,7 +149,6 @@ export const netureGuideIntroStructureProps: GuideIntroStructurePageProps = {
       '상품 등록 및 유통 정책 설정',
       'B2B · B2C 콘텐츠 및 자료실',
       'Event Offer · 유통참여형 펀딩',
-      '파트너 계약 기반 협업',
     ],
   },
   bottomNav: {
@@ -176,7 +174,6 @@ export const netureGuideIntroNetureProps: GuideIntroKpaPageProps = {
     sectionTitle: '공급자 협력 구조',
     cards: [
       { label: '공급자', summary: '상품 · 콘텐츠 · 유통 전략 주도' },
-      { label: '파트너', summary: '콘텐츠 협업 · 레퍼럴 · 커미션 기반 확산' },
       { label: '운영자', summary: '품질 승인 · 정책 관리 · 운영 지원' },
     ],
   },
@@ -189,7 +186,7 @@ export const netureGuideIntroNetureProps: GuideIntroKpaPageProps = {
       },
       {
         label: '계약 기반 협력',
-        summary: '공급자 · 파트너 · 매장 사이의 협력을 명시적 계약으로 관리합니다.',
+        summary: '공급자 · 매장 사이의 협력을 명시적 계약으로 관리합니다.',
       },
       {
         label: '오프라인 실행 연결',
@@ -215,7 +212,6 @@ export const netureGuideIntroNetureProps: GuideIntroKpaPageProps = {
       'B2B · B2C 콘텐츠를 작성하여 매장에 상품 정보와 운영 자료를 전달합니다.',
       'Event Offer로 여러 매장에 동시에 이벤트 참여를 제안합니다.',
       '유통참여형 펀딩으로 오프라인 실행 시나리오를 포함한 유통 펀딩을 운영합니다.',
-      '파트너와 계약 기반으로 협력하여 콘텐츠 확산과 레퍼럴을 관리합니다.',
     ],
   },
   bottomNav: {
@@ -234,13 +230,13 @@ export const netureGuideIntroOperationProps: GuideIntroOperationPageProps = {
       '공급자 주도 유통과 운영자 정책 · 매장 실행이 연결되는 운영 흐름을 안내합니다. 공급자가 콘텐츠와 이벤트를 제안하면, 운영자가 검토하고, 매장이 실행합니다.',
     context: [
       { label: '운영 주체', value: '운영자 (Neture Admin · Operator)' },
-      { label: '실행 주체', value: '공급자 · 파트너 · 매장' },
+      { label: '실행 주체', value: '공급자 · 매장' },
     ],
   },
   operator: {
     sectionTitle: '운영자의 역할',
     cards: [
-      { label: '가입 승인', summary: '공급자 · 파트너 가입 신청을 검토하고 승인합니다.' },
+      { label: '가입 승인', summary: '공급자 가입 신청을 검토하고 승인합니다.' },
       { label: '상품 품질 승인', summary: '등록된 상품의 정보와 품질 기준을 검수합니다.' },
       { label: '서비스 노출 승인', summary: 'KPA Society · K-Cosmetics 등 서비스별 노출 여부를 결정합니다.' },
     ],
@@ -363,11 +359,6 @@ export const netureGuideIntroConceptProps: GuideIntroConceptPageProps = {
         dim: false,
       },
       {
-        label: '파트너 모델',
-        items: ['단순 제휴', '계약 기반 1:N 협업 + 커미션 관리'],
-        dim: false,
-      },
-      {
         label: '매장 실행',
         items: ['온라인 종결', '오프라인 시나리오 포함 (유통참여형 펀딩)'],
         dim: false,
@@ -396,27 +387,22 @@ export const netureGuideUsageProps: GuideUsagePageProps = {
     eyebrow: '이용 가이드',
     title: '서비스 활용 방법',
     description:
-      'Neture를 처음 시작하는 공급자 · 파트너를 위한 단계별 활용 흐름을 안내합니다. 가입부터 실제 매장 실행 연결까지 순서대로 설명합니다.',
+      'Neture를 처음 시작하는 공급자를 위한 단계별 활용 흐름을 안내합니다. 가입부터 실제 매장 실행 연결까지 순서대로 설명합니다.',
     flowBarTitle: '활용 흐름',
-    flowLabels: ['가입', '상품 등록', '콘텐츠 운영', 'Event / Trial', '매장 실행', '협력 확장'],
+    flowLabels: ['가입', '상품 등록', '콘텐츠 운영', 'Event / Trial', '매장 실행', '커뮤니티'],
   },
   sections: [
     {
       step: '01',
-      title: '공급자 / 파트너 가입',
-      routeLabel: '/supplier · /partner',
+      title: '공급자 가입',
+      routeLabel: '/supplier',
       description:
-        '공급자 또는 파트너로 Neture에 참여합니다. 현재 가입은 문의 · 상담 기반으로 진행되며, 운영자 검토 후 활성화됩니다.',
+        '공급자로 Neture에 참여합니다. 현재 가입은 문의 · 상담 기반으로 진행되며, 운영자 검토 후 활성화됩니다.',
       items: [
         {
           label: '공급자 가입',
           detail:
             '/supplier 안내 페이지에서 가입 방법을 확인하고, Business Inquiry 또는 Contact를 통해 신청합니다.',
-        },
-        {
-          label: '파트너 가입',
-          detail:
-            '/partner 안내 페이지에서 협업 유형을 확인하고 가입 신청을 제출합니다.',
         },
       ],
     },
@@ -481,18 +467,14 @@ export const netureGuideUsageProps: GuideUsagePageProps = {
     },
     {
       step: '05',
-      title: '매장 실행 · 협력 확장',
+      title: '매장 실행 · 커뮤니티',
       routeLabel: '/store · /forum',
       description:
-        '매장은 승인된 상품과 이벤트를 받아 오프라인에서 실행합니다. 파트너와 커뮤니티가 확산을 지원합니다.',
+        '매장은 승인된 상품과 이벤트를 받아 오프라인에서 실행합니다. 커뮤니티가 운영 노하우 확산을 지원합니다.',
       items: [
         {
           label: '매장 노출',
           detail: '승인된 상품과 이벤트가 매장 화면에 노출됩니다.',
-        },
-        {
-          label: '파트너 협업',
-          detail: '파트너가 콘텐츠 · 레퍼럴을 통해 상품 인지도를 확산합니다.',
         },
         {
           label: '커뮤니티 피드백',
@@ -522,7 +504,6 @@ export const netureGuideFeaturesProps: GuideFeaturesPageProps = {
       'B2B 콘텐츠',
       'Event Offer',
       '유통참여형 펀딩',
-      '파트너',
       'Forum / 자료실',
       'Copilot',
     ],
@@ -575,15 +556,6 @@ export const netureGuideFeaturesProps: GuideFeaturesPageProps = {
     },
     {
       step: '06',
-      title: '파트너 협력',
-      primaryRoute: '/partner',
-      description:
-        '파트너 협업 유형과 콘텐츠 · 레퍼럴 · 커미션 활용 방법을 안내합니다.',
-      items: [{ label: '파트너 프로그램 이용 방법', route: '/guide/features/partner-program' }],
-      linkTo: '/guide/features/partner-program',
-    },
-    {
-      step: '07',
       title: 'Forum & 자료실',
       primaryRoute: '/forum',
       description:
@@ -592,7 +564,7 @@ export const netureGuideFeaturesProps: GuideFeaturesPageProps = {
       linkTo: '/guide/features/forum-resources',
     },
     {
-      step: '08',
+      step: '07',
       title: '공급자 Copilot Dashboard',
       primaryRoute: '/supplier/dashboard',
       description:
@@ -1150,106 +1122,7 @@ export const netureGuideFeatureMarketTrialProps: GuideFeatureManualPageProps = {
   },
 };
 
-// ─── /guide/features/partner-program ───────────────────────────────────
-
-export const netureGuideFeaturePartnerProgramProps: GuideFeatureManualPageProps = {
-  hero: {
-    eyebrow: '기능별 이용 방법',
-    title: '파트너로 협력하기',
-    description:
-      'Neture 파트너 협업 유형과 콘텐츠 · 레퍼럴 · 커미션 활용 방법을 안내합니다. 파트너는 계약 기반으로 공급자와 협력하며, 콘텐츠 제작과 유통 확산에 기여합니다.',
-    primaryAction: { label: '파트너 안내로 이동 →', to: '/partner' },
-    flowBarTitle: '협력 흐름',
-    flowLabels: ['가입 경로', '계약', '콘텐츠 · 레퍼럴', '커미션 조회'],
-  },
-  sections: [
-    {
-      step: '01',
-      title: '파트너 가입 경로',
-      description:
-        '협업 형태에 따라 다양한 가입 경로를 제공합니다. 상황에 맞는 경로를 선택합니다.',
-      items: [
-        {
-          label: '공개 신청',
-          detail: 'Neture에 관심 있는 누구나 파트너 신청 의사를 전달할 수 있습니다.',
-        },
-        {
-          label: '파트너십 요청',
-          detail: '매장 · 공급자와 직접 협력 관계를 제안하고 협상합니다.',
-        },
-        {
-          label: '모집 공고 신청',
-          detail: '공급자가 올린 파트너 모집 공고에 지원하여 참여합니다.',
-        },
-      ],
-    },
-    {
-      step: '02',
-      title: '계약',
-      description:
-        '파트너와 공급자는 명시적 계약을 통해 협력 범위와 커미션 조건을 확정합니다.',
-      items: [
-        {
-          label: '커미션 조건 확정',
-          detail: '계약 시점에 커미션율이 확정됩니다. 조건 변경 시 신규 계약이 필요합니다.',
-        },
-        {
-          label: '활성 계약 관리',
-          detail: '공급자 1명과 파트너 1명 사이에는 활성 계약 1건만 유지됩니다.',
-        },
-        {
-          label: '독립적 종료',
-          detail: '공급자와 파트너 양측이 각자 계약을 종료할 수 있습니다.',
-        },
-      ],
-    },
-    {
-      step: '03',
-      title: '콘텐츠 · 레퍼럴 링크',
-      description:
-        '계약이 완료되면 파트너 콘텐츠를 작성하고 레퍼럴 링크를 생성하여 상품 확산 활동을 시작합니다.',
-      items: [
-        {
-          label: '콘텐츠 작성',
-          detail: '텍스트 · 이미지 · 링크 형태의 콘텐츠를 작성하여 상품을 소개합니다.',
-        },
-        {
-          label: '레퍼럴 링크',
-          detail: '파트너 고유 링크를 생성하여 유입 경로를 추적합니다.',
-        },
-        {
-          label: '콘텐츠 연결',
-          detail: '파트너 대시보드에서 상품과 콘텐츠를 연결하여 성과를 관리합니다.',
-        },
-      ],
-    },
-    {
-      step: '04',
-      title: '커미션 조회',
-      routeLabel: '/partner/settlements',
-      description:
-        '계약 기반으로 누적된 커미션을 조회합니다. 현재 자동 정산(Payout)은 운영 중이 아니며, 정산은 별도 안내에 따라 진행됩니다.',
-      items: [
-        {
-          label: '활동 현황',
-          detail: '활성 계약 수 · 콘텐츠 수 · 누적 커미션을 확인합니다.',
-        },
-        {
-          label: '커미션 내역',
-          detail: '항목별 커미션 발생 내역을 상세하게 확인합니다.',
-        },
-        {
-          label: '정산 방식',
-          detail: '자동 정산은 현재 준비 중입니다. 정산은 별도 안내에 따라 진행됩니다.',
-        },
-      ],
-    },
-  ],
-  bottomNav: {
-    prev: { label: '← 기능별 이용 방법', to: '/guide/features' },
-    home: { label: '홈으로', to: '/' },
-  },
-};
+// (은퇴) /guide/features/partner-program — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
 
 // ─── /guide/features/forum-resources ───────────────────────────────────
 
@@ -1419,7 +1292,7 @@ export const netureGuideO4OOverviewProps: GuideFeatureManualPageProps = {
     eyebrow: '이용 안내',
     title: 'O4O 개요',
     description:
-      'O4O는 매장 판매 환경을 만드는 서비스입니다. 좋은 제품이 매장에서 잘 설명되고, 고객이 이해하고, 실제로 판매되도록 — 공급자 · 운영자 · 판매자 · 파트너가 각자의 역할로 함께 만드는 구조입니다. 모든 사업자가 먼저 읽는 공통 입구입니다.',
+      'O4O는 매장 판매 환경을 만드는 서비스입니다. 좋은 제품이 매장에서 잘 설명되고, 고객이 이해하고, 실제로 판매되도록 — 공급자 · 운영자 · 판매자가 각자의 역할로 함께 만드는 구조입니다. 모든 사업자가 먼저 읽는 공통 입구입니다.',
     primaryAction: { label: '전체 가이드 보기 →', to: '/guide' },
     flowBarTitle: '이해 흐름',
     flowLabels: ['대상 시장', '제품 특징', '해결 과제', '3자 구조', '운영 방식', '활용 사업자'],
@@ -1436,10 +1309,10 @@ export const netureGuideO4OOverviewProps: GuideFeatureManualPageProps = {
       { title: '어떤 시장을 위한 것인가', audience: '공통', summary: '다품종 · 소량 · 정보 전달이 중요한 시장을 위한 구조입니다.', to: '#market' },
       { title: 'O4O 대상 제품의 특징', audience: '공통', summary: '유통비용 · 정보 전달 · 공급자의 필요라는 공통점이 있습니다.', to: '#product' },
       { title: 'O4O가 해결하려는 것', audience: '공통', summary: '유통비용을 낮추고 좋은 제품의 시장 진입을 돕습니다.', to: '#problem' },
-      { title: '공급자 · 운영자 · 판매자', audience: '공통', summary: '세 주체와 파트너가 각자의 역할로 협력합니다.', to: '#roles' },
+      { title: '공급자 · 운영자 · 판매자', audience: '공통', summary: '세 주체가 각자의 역할로 협력합니다.', to: '#roles' },
       { title: '누가 O4O를 운영할 수 있는가', audience: '공통', summary: '조직 형태가 아니라 가진 자산으로 판단 — 매장 · 공급망 · 전문성 · 고객군.', to: '#service-operator' },
       { title: 'O4O 주요 운영 방식', audience: '공통', summary: '승인 상품 · 이벤트 오퍼 · 판매자 모집 · 유통참여형 펀딩 · 매장 HUB · 내 매장.', to: '#operations' },
-      { title: '누가 활용하나', audience: '공통', summary: '공급자 · 운영자 · 판매자 · 파트너가 활용합니다.', to: '#actors' },
+      { title: '누가 활용하나', audience: '공통', summary: '공급자 · 운영자 · 판매자가 활용합니다.', to: '#actors' },
     ],
   },
   sections: [
@@ -1501,12 +1374,11 @@ export const netureGuideO4OOverviewProps: GuideFeatureManualPageProps = {
       step: '05',
       title: '공급자 · 운영자 · 판매자',
       description:
-        'O4O는 세 주체가 각자의 역할을 맡고, 파트너가 이를 돕는 구조입니다. 한 주체가 모든 것을 통제하지 않고 역할을 나눠 협력합니다.',
+        'O4O는 세 주체가 각자의 역할을 맡는 구조입니다. 한 주체가 모든 것을 통제하지 않고 역할을 나눠 협력합니다.',
       items: [
         { label: '공급자', detail: '제품 · 브랜드 · 마케팅 원천 자료를 제공하는 사업자입니다. 제품이 매장에서 움직이도록 자료와 조건을 만듭니다.' },
         { label: '운영자', detail: '매장 네트워크를 구성 · 운영하는 사업자입니다. 자료를 받아 매장 실행 자산으로 구성하고 매장을 지원합니다.' },
         { label: '판매자(매장)', detail: '실제 고객을 만나는 매장입니다. 무엇을 노출하고 어떻게 활용할지 매장이 결정합니다.' },
-        { label: '파트너', detail: '제휴 · 마케팅 · 레퍼럴 등으로 공급자 · 운영자 · 매장의 실행을 돕는 협력 주체입니다.' },
       ],
     },
     {
@@ -1548,7 +1420,6 @@ export const netureGuideO4OOverviewProps: GuideFeatureManualPageProps = {
         { label: '공급자', detail: '제품 · 콘텐츠를 매장에 유통하려는 사업자 — 상품 등록 · 이벤트 오퍼 · 유통참여형 펀딩 활용.' },
         { label: '운영자', detail: '매장 네트워크를 구성 · 운영하려는 사업자(협동조합 · 세미 프랜차이즈 · 전문 네트워크) — 운영자 가이드 참고.' },
         { label: '판매자(매장)', detail: '내 매장에서 상품 · 콘텐츠를 활용하려는 매장 경영자 — 매장 HUB · 내 매장 활용.' },
-        { label: '파트너', detail: '제휴 · 마케팅 · 레퍼럴로 협력하려는 주체 — 파트너 가이드 참고.' },
       ],
     },
   ],
@@ -3761,7 +3632,7 @@ export const netureGuideBusinessOperatorRevenueProps: GuideFeatureManualPageProp
       { title: '이 문서의 대상', audience: '공통', summary: '서비스 운영자 · 예비 운영자 · 협동조합 · 전문/공급자 기반 운영자.', to: '#audience' },
       { title: '왜 수익 구조가 필요한가', audience: '공통', summary: '콘텐츠 · 매장 지원 · 운영에는 비용이 든다 — 운영자는 사업 주체.', to: '#why' },
       { title: '사업 모델과 수익 구조는 다르다', audience: '중요', summary: '무엇을 하는가(모델) ≠ 무엇으로 버는가(수익).', to: '#model-vs-revenue' },
-      { title: '현재 검증된 수익 구조', audience: '현재 가능', summary: '자체 제품 · 서비스 전용 상품 판매 · 파트너 커미션/정산.', to: '#verified' },
+      { title: '현재 검증된 수익 구조', audience: '현재 가능', summary: '자체 제품 · 서비스 전용 상품 판매 · 판매자 모집 거래/정산.', to: '#verified' },
       { title: '운영 도구와 수익 구조의 관계', audience: '공통', summary: '승인상품 · 오퍼 · 모집 · 펀딩은 도구이지 수익 그 자체가 아님.', to: '#tools' },
       { title: '콘텐츠는 왜 중요한가', audience: '공통', summary: '콘텐츠는 판매 · 매장 활용 · 성장을 돕는 자산.', to: '#content' },
       { title: '광고와 스폰서십', audience: '향후 가능', summary: 'Hero · 커뮤니티 · 사이니지 · 강좌 연계 — 현재 준비 단계.', to: '#ads' },
@@ -3818,7 +3689,7 @@ export const netureGuideBusinessOperatorRevenueProps: GuideFeatureManualPageProp
         '현재 O4O에서 실제로 결제 · 정산까지 이어지는 검증된 수익 구조는 다음 두 가지입니다. 나머지는 아래 "준비 단계"에서 별도로 설명합니다.',
       items: [
         { label: '자체 제품 / 서비스 전용 상품 (현재 가능)', detail: '운영자가 기획한 제품을 직접 공급하거나 협력 공급업체와 함께 운영해 판매 마진을 얻는 구조. 자세한 내용은 자체 제품 운영 안내를 참조합니다.' },
-        { label: '파트너 커미션 / 정산 (현재 가능)', detail: '판매자 모집 · 계약을 통해 발생하는 거래에서 커미션 · 정산이 이루어지는 구조 — 거래 기반 · 계약 기반.' },
+        { label: '판매자 모집 기반 거래 · 정산 (현재 가능)', detail: '판매자 모집을 통해 발생하는 조달 거래에서 정산이 이루어지는 구조 — 거래 기반.' },
       ],
     },
     {
@@ -3983,7 +3854,7 @@ export const netureGuideBusinessHubProps: GuideFeatureManualPageProps = {
       items: [
         { label: '운영자 수익 구조 안내', detail: '수익 구조 전반을 다루는 안내서 — 현재 가능(자체 제품 · 커미션)과 향후 가능(광고 · 강좌 · 설문 · 운영 패키지 · 구독)을 구분해 설명합니다.' },
         { label: '자체 제품 / 서비스 전용 상품 판매', detail: '운영자가 기획한 제품의 판매 마진 — 검증된 직접 수익원.' },
-        { label: '파트너 커미션 · 정산', detail: '판매 네트워크에서 발생하는 거래 커미션과 정산 — 검증된 직접 수익원.' },
+        { label: '판매자 모집 거래 · 정산', detail: '판매 네트워크에서 발생하는 거래 정산 — 검증된 직접 수익원.' },
       ],
     },
   ],

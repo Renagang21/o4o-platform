@@ -9,7 +9,7 @@
  *   - shared_product_descriptions : description_curated(curated_at, canonical 지정)
  *   - product_images : image_added(created_at, 작성자 없음)
  * gap(미매핑) — 억지로 표시하지 않고 gaps 로 반환:
- *   - 공통 audit_logs 테이블은 존재하나 ProductMaster 이벤트가 기록되지 않음(commission/partner 도메인용)
+ *   - 공통 audit_logs 테이블은 존재하나 ProductMaster 이벤트가 기록되지 않음(다른 도메인용)
  *   - product_candidates 상태변경 이력(operator 큐, 별도 트랙)
  *   - 기본정보 수정 / 이미지 교체·삭제 / archive 는 후속 write WO 에서 이력 생성
  */

@@ -122,7 +122,8 @@ describe('WO-O4O-ADMIN-PRODUCT-DESCRIPTION-ROUTE-AUTH-BOUNDARY-ALIGNMENT-V1', ()
       expect(res.status).toBe(401);
     });
 
-    it.each(['/api/v1/admin/system/health', '/api/v1/admin/partners', '/api/v1/admin/cosmetics/partner-metrics'])(
+    // (Legacy Partner `/admin/partners` · `/admin/cosmetics/partner-metrics` 는 WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 로 은퇴)
+    it.each(['/api/v1/admin/system/health'])(
       '%s 도 service operator 에게 403 유지',
       async (path) => {
         const res = await request(app).get(path).set('x-test-user', 'cosmetics-operator');

@@ -7,7 +7,7 @@
  * 이 파일의 역할:
  *   - Neture 전용 EditUserModalConfig (NETURE_CONFIG) 정의 및 주입
  *   - API 어댑터: Neture api 인스턴스 래핑 (baseURL 에 /api/v1 포함)
- *   - 회원 유형: supplier / partner (customer·seller 제외 — 주석 참고)
+ *   - 회원 유형: supplier (customer·seller 제외 — 주석 참고 · partner 은 Legacy Partner 은퇴)
  *   - profileClassification: 없음 (Neture 는 sub_role 미사용)
  */
 
@@ -35,7 +35,6 @@ const NETURE_CONFIG: EditUserModalConfig = {
   makeRequest,
   membershipRoleOptions: [
     { value: 'supplier', label: '공급자' },
-    { value: 'partner', label: '파트너' },
   ],
   adminRoleOptions: [
     { value: '', label: '일반 회원' },

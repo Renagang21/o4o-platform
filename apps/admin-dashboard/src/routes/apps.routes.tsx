@@ -123,11 +123,8 @@ export function AppRoutes() {
     //     - 진입 네비게이션 0건 · ViewComponentRegistry 등록도 함께 제거.
     //     - 가드가 legacy `partner` role literal 기반이라 canonical RBAC(F9) 계약
     //       바깥이다 → "파일이 존재한다"는 이유로 재등록하지 않는다.
-    //   유지한 것(제거 금지):
-    //     - serviceGroup id 'partnerops' — appsCatalog 의 살아 있는 항목
-    //       'partner-core' 가 소비한다(sellerops/supplierops 선례와 동일).
-    //     - appsCatalog appId 'partnerops' 항목과 프로덕션 `app_registry` 의
-    //       active 행 — 운영 데이터이므로 WO §6.2 에 따라 손대지 않고 보고한다.
-    //     - Neture 파트너 · partner-core 계약(F7) · partner_* 테이블은 별개 축이다.
+    //   (2026-09-15) WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
+    //     serviceGroup id 'partnerops' · appsCatalog 'partner-core' 항목 · Neture 파트너 화면(F7 계약)도
+    //     Legacy Partner 전면 은퇴로 함께 제거됐다. partner_* 테이블 DROP 은 physical cleanup 으로 이연.
   ];
 }

@@ -196,7 +196,7 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'cart',             label: '장바구니',  subPath: '/cart' },
       { key: 'purchase-orders',  label: '주문 내역', subPath: '/orders' },
       // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7:
-      //   KPA/GP/KCos 와 같은 service-neutral 계약(/neture/partner/applications/mine) 채택.
+      //   KPA/GP/KCos 와 같은 service-neutral 계약(/neture/seller-recruitment/applications/mine) 채택.
       //   '판매자 모집' 탐색은 backend proxy 가 kpa-society 고정이라 PH 에 없다(§7 판정 기록).
       { key: 'recruitment-applications', label: '신청·승인 현황', subPath: '/recruitment-applications' },
     ]},

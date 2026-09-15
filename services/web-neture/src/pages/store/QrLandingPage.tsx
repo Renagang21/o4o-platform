@@ -10,7 +10,7 @@
  *
  * landingType:
  * - product → /store/{storeSlug}/product/{landingTargetId} 또는 /store/product/{landingTargetId}
- * - promotion → /partner/contents/{landingTargetId}
+ * - promotion → /content (Legacy Partner 콘텐츠 경로 /partner/contents 은퇴 — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1)
  * - page → /content
  * - link → 외부 URL
  */
@@ -67,7 +67,7 @@ export default function QrLandingPage() {
           }
           case 'promotion': {
             if (qr.landingTargetId) {
-              navigate(`/partner/contents/${qr.landingTargetId}`, { replace: true });
+              navigate(`/content`, { replace: true });
             } else {
               setError('QR 코드에 프로모션 정보가 없습니다.');
             }

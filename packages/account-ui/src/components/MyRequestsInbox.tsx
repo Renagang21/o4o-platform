@@ -39,7 +39,6 @@ export type MyRequestEntityType =
   | 'membership'
   | 'service_application'
   | 'store_application'
-  | 'partner_application'
   | 'other'
   | string;
 

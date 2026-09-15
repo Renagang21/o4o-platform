@@ -53,35 +53,7 @@ export interface OperatorDashboardData {
   quickActions: Array<{ id: string; label: string; link: string; icon?: string }>;
 }
 
-// ==================== Partner Dashboard Summary Types ====================
-
-export interface PartnerDashboardStats {
-  totalRequests: number;
-  openRequests: number;
-  matchedRequests: number;
-  closedRequests: number;
-  connectedServiceCount: number;
-  totalSupplierCount: number;
-}
-
-export interface ConnectedService {
-  serviceId: string;
-  serviceName: string;
-  supplierCount: number;
-  lastActivity: string;
-}
-
-export interface Notification {
-  type: string;
-  text: string;
-  link: string;
-}
-
-export interface PartnerDashboardSummary {
-  stats: PartnerDashboardStats;
-  connectedServices: ConnectedService[];
-  notifications: Notification[];
-}
+// (은퇴) Partner Dashboard Summary Types — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
 
 // ==================== Admin Dashboard 4-Block (WO-O4O-ADMIN-OPERATOR-DASHBOARD-SEPARATION-V1) ====================
 
@@ -140,14 +112,4 @@ export const dashboardApi = {
     }
   },
 
-  async getPartnerDashboardSummary(): Promise<PartnerDashboardSummary | null> {
-    try {
-      const response = await api.get('/neture/partner/dashboard/summary');
-      return response.data?.data ?? null;
-    } catch (error) {
-      console.warn('[Dashboard API] Failed to fetch partner dashboard summary:', error);
-      if ((error as any)?.response?.status === 404) return null;
-      throw error;
-    }
-  },
 };

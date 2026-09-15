@@ -25,7 +25,7 @@ const router: Router = Router();
  * 여기 걸린 API 의 super_admin 전용 경계(`requireAdmin` = `platform:super_admin`)는 그대로다.
  * 새 최상위 prefix 를 추가하면 이 배열에도 같이 추가해야 한다.
  */
-const OWNED_PREFIXES = ['/dashboard', '/system', '/partners', '/cosmetics'];
+const OWNED_PREFIXES = ['/dashboard', '/system'];
 
 router.use(OWNED_PREFIXES, authenticate);
 router.use(OWNED_PREFIXES, requireAdmin);
@@ -66,33 +66,6 @@ router.get(
   (req, res: Response) => adminDashboardController.getSystemHealth(req as AuthRequest, res)
 );
 
-/**
- * Partner APIs
- */
-
-// GET /api/v1/admin/partners
-// Returns partner list
-router.get(
-  '/partners',
-  (req, res: Response) => adminDashboardController.getPartners(req as AuthRequest, res)
-);
-
-// GET /api/v1/admin/partners/:id/summary
-// Returns partner performance summary
-router.get(
-  '/partners/:id/summary',
-  (req, res: Response) => adminDashboardController.getPartnerSummary(req as AuthRequest, res)
-);
-
-/**
- * Cosmetics APIs
- */
-
-// GET /api/v1/admin/cosmetics/partner-metrics
-// Returns cosmetics partner metrics
-router.get(
-  '/cosmetics/partner-metrics',
-  (req, res: Response) => adminDashboardController.getCosmeticsPartnerMetrics(req as AuthRequest, res)
-);
+// (은퇴) Partner APIs · Cosmetics partner-metrics — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
 
 export default router;

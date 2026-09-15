@@ -24,7 +24,6 @@ import {
 export enum ForumUserRole {
   SUPPLIER = 'supplier',
   SELLER = 'seller',
-  PARTNER = 'partner',
   GUEST = 'guest',
 }
 
@@ -48,7 +47,6 @@ export interface ForumUserContext {
   userId: string;
   supplierId?: string;
   sellerId?: string;
-  partnerId?: string;
 }
 
 export class MarketTrialForumService {
@@ -90,26 +88,12 @@ export class MarketTrialForumService {
       }
     }
 
-    // Check if user is a partner participant
-    if (user.partnerId) {
-      const partnerParticipant = await this.participantRepo.findOne({
-        where: {
-          marketTrialId: trial.id,
-          participantId: user.partnerId,
-          participantType: ParticipantType.PARTNER,
-        },
-      });
-      if (partnerParticipant) {
-        return ForumUserRole.PARTNER;
-      }
-    }
-
     return ForumUserRole.GUEST;
   }
 
   /**
    * Check if user can read forum based on role
-   * Only Supplier, Seller, Partner can read
+   * Only Supplier, Seller can read
    */
   canReadByRole(role: ForumUserRole): boolean {
     return role !== ForumUserRole.GUEST;

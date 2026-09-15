@@ -176,14 +176,12 @@ export interface StoreBusinessRegistrationInfo extends BusinessRegistrationInfo 
 }
 
 /**
- * Neture 공급자 / 파트너 사업자 확장.
- * B2B supplier / partner 도메인 특화 필드.
+ * Neture 공급자 사업자 확장.
+ * B2B supplier 도메인 특화 필드.
  */
 export interface SupplierBusinessRegistrationInfo extends BusinessRegistrationInfo {
   /** 공급자 유형 (예: "manufacturer", "distributor", "wholesaler") */
   supplierType?: string;
-  /** 파트너 유형 (예: "agency", "consultant", "service") */
-  partnerType?: string;
   /** 공급 / 취급 제품군 (예: ["pharmaceutical", "cosmetic", "wellness"]) */
   productCategories?: string[];
 }

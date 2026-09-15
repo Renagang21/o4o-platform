@@ -14,7 +14,6 @@ export const NETURE_ROLES = {
   ADMIN: 'neture:admin',
   OPERATOR: 'neture:operator',
   SUPPLIER: 'neture:supplier',
-  PARTNER: 'neture:partner',
   SELLER: 'neture:seller',
 } as const;
 
@@ -25,9 +24,9 @@ export const NETURE_ROLES = {
  */
 export const LEGACY_ROLES = {
   SUPPLIER: 'supplier',
-  PARTNER: 'partner',
   SELLER: 'seller',
 } as const;
+// ('neture:partner' / 'partner' 는 WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 로 은퇴)
 
 // ─── Role Group Arrays ─────────────────────────────────────────────────────
 
@@ -67,20 +66,16 @@ export const OPERATOR_OR_ABOVE_ROLES: string[] = [
 
 /**
  * Supplier route guard 역할 집합.
- * legacy 미접두사(supplier/partner/seller) 포함 — SupplierRoute는 B2B 전체 커버.
+ * legacy 미접두사(supplier/seller) 포함 — SupplierRoute는 B2B 전체 커버.
  */
 export const SUPPLIER_ROLES: string[] = [
   NETURE_ROLES.SUPPLIER,
   LEGACY_ROLES.SUPPLIER,
-  LEGACY_ROLES.PARTNER,
   LEGACY_ROLES.SELLER,
 ];
 
 /** Supplier-only 역할 집합 — UI 가시성용 (isSupplier 체크) */
 export const SUPPLIER_ONLY_ROLES: string[] = [NETURE_ROLES.SUPPLIER, LEGACY_ROLES.SUPPLIER];
-
-/** Partner-only 역할 집합 — UI 가시성용 (isPartner 체크) */
-export const PARTNER_ONLY_ROLES: string[] = [NETURE_ROLES.PARTNER, LEGACY_ROLES.PARTNER];
 
 /** Supplier 레이아웃 접근 역할 (supplier + admin) */
 export const SUPPLIER_ACCESS_ROLES: string[] = [
@@ -90,27 +85,16 @@ export const SUPPLIER_ACCESS_ROLES: string[] = [
   NETURE_ROLES.PLATFORM_SUPER_ADMIN,
 ];
 
-/** Partner 레이아웃 접근 역할 (partner + admin) */
-export const PARTNER_ACCESS_ROLES: string[] = [
-  NETURE_ROLES.PARTNER,
-  LEGACY_ROLES.PARTNER,
-  NETURE_ROLES.ADMIN,
-  NETURE_ROLES.PLATFORM_SUPER_ADMIN,
-];
-
-/** Supplier Hub 접근 역할 (supplier + partner + admin) */
+/** Supplier Hub 접근 역할 (supplier + admin) */
 export const SUPPLIER_HUB_ACCESS_ROLES: string[] = [
   NETURE_ROLES.ADMIN,
   NETURE_ROLES.PLATFORM_SUPER_ADMIN,
   NETURE_ROLES.SUPPLIER,
   LEGACY_ROLES.SUPPLIER,
-  NETURE_ROLES.PARTNER,
-  LEGACY_ROLES.PARTNER,
 ];
 
 /** Dashboard B2B 역할 — legacy 미접두사 (AccountMenu hasDashboardRole 체크용) */
 export const DASHBOARD_B2B_ROLES: string[] = [
   LEGACY_ROLES.SUPPLIER,
-  LEGACY_ROLES.PARTNER,
   LEGACY_ROLES.SELLER,
 ];

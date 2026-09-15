@@ -227,7 +227,6 @@ const WORKSPACE_LABEL: Record<string, string> = {
   community: '커뮤니티',
   store: '매장 업무 공간',
   supplier: '공급자 업무 공간',
-  partner: '파트너 업무 공간',
   operator: '운영자 업무 공간',
   admin: '관리자 업무 공간',
 };

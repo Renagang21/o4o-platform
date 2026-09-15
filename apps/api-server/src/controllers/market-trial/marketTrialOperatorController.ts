@@ -1258,8 +1258,7 @@ export class MarketTrialOperatorController {
       // 사용자 화면 라벨은 두 값 모두 "매장 경영자" 로 통일.
       const participantTypeLabel = (v: string) => {
         if (v === 'store_owner' || v === 'seller') return '매장 경영자';
-        if (v === 'partner') return '파트너';
-        return v;
+        return v; // (Legacy Partner 'partner' 라벨 은퇴 — 잔존 row 는 원문 표시)
       };
       const fmtDate = (d: Date) => {
         const dt = new Date(d);

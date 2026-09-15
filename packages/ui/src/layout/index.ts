@@ -81,7 +81,7 @@ export * from './AGContent';
 // ═══════════════════════════════════════════════════════════════════════════
 // Storefront Layout - 소비자향 레이아웃
 // ═══════════════════════════════════════════════════════════════════════════
-export * from './AGStorefrontLayout';
+// AGStorefrontLayout (Legacy Partner storefront, 소비처 0) — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 로 제거
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Operator Shell - 운영자 전용 레이아웃 (WO-O4O-OPERATOR-UI-STANDARDIZATION-V1)

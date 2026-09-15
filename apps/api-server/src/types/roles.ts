@@ -61,7 +61,6 @@ export type NetureRole =
   | 'neture:admin'    // Neture admin
   | 'neture:operator' // Neture operator
   | 'neture:supplier' // Neture supplier
-  | 'neture:partner'  // Neture partner
   | 'neture:user';    // Neture user
 
 /**
@@ -70,12 +69,12 @@ export type NetureRole =
  * WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1:
  *   과거 GlycoPharm 경계 안에 잘못 등록돼 있던 공용 역할이다.
  *   `glycopharm:*` 접두 역할은 서비스 삭제와 함께 제거했으나, 아래 bare role 은
- *   Neture(supplier/partner)·플랫폼 전반이 실제 보유 중이므로 유지한다.
+ *   Neture(supplier)·플랫폼 전반이 실제 보유 중이므로 유지한다.
+ *   ('partner' bare role 은 WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 로 은퇴 — 보유자 0)
  */
 export type LegacyBareRole =
   | 'pharmacy'                // 약국 (legacy bare role)
   | 'supplier'                // 공급자
-  | 'partner'                 // 파트너
   | 'customer';               // 당뇨인 (정규)
 
 /**
@@ -87,8 +86,7 @@ export type CosmeticsRole =
   | 'cosmetics:pharmacist'   // K-Cosmetics 약사
   | 'cosmetics:user'         // K-Cosmetics 사용자
   | 'cosmetics:supplier'     // K-Cosmetics supplier
-  | 'cosmetics:store_owner'  // K-Cosmetics store owner
-  | 'cosmetics:partner';     // K-Cosmetics partner
+  | 'cosmetics:store_owner'; // K-Cosmetics store owner
 
 /**
  * LMS roles
@@ -359,14 +357,6 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     category: 'commerce',
     deprecated: false
   },
-  'neture:partner': {
-    role: 'neture:partner',
-    label: 'Neture Partner',
-    description: 'Neture partner',
-    service: 'neture',
-    category: 'commerce',
-    deprecated: false
-  },
   'neture:user': {
     role: 'neture:user',
     label: 'Neture User',
@@ -398,14 +388,6 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     role: 'supplier',
     label: '공급자',
     description: '공급자 (legacy bare role — Neture 는 neture:supplier 가 canonical)',
-    service: 'platform',
-    category: 'commerce',
-    deprecated: false
-  },
-  'partner': {
-    role: 'partner',
-    label: '파트너',
-    description: '파트너 (legacy bare role — Neture 는 neture:partner 가 canonical)',
     service: 'platform',
     category: 'commerce',
     deprecated: false
@@ -456,14 +438,6 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     role: 'cosmetics:store_owner',
     label: 'K-Cosmetics Store Owner',
     description: 'K-Cosmetics store owner',
-    service: 'cosmetics',
-    category: 'commerce',
-    deprecated: false
-  },
-  'cosmetics:partner': {
-    role: 'cosmetics:partner',
-    label: 'K-Cosmetics Partner',
-    description: 'K-Cosmetics partner',
     service: 'cosmetics',
     category: 'commerce',
     deprecated: false

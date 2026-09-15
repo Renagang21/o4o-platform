@@ -22,7 +22,9 @@ import { loadContactSettings } from '../../contact-inquiry/contact-settings.help
 import { sendContactEmails } from '../../contact-inquiry/contact-notification.helper.js';
 import logger from '../../../utils/logger.js';
 
-const VALID_CONTACT_TYPES = ['supplier', 'partner', 'service', 'other'] as const;
+// WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 'partner' 유형 신규 접수 종료
+//   (기존 row 의 contactType='partner' 는 목록·라벨에서 그대로 표시된다).
+const VALID_CONTACT_TYPES = ['supplier', 'service', 'other'] as const;
 const VALID_STATUSES = ['new', 'in_progress', 'resolved'] as const;
 
 /** contactType → 운영자 알림용 한글 라벨. */

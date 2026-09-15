@@ -7,8 +7,6 @@ Disallow: /admin-vault/
 Disallow: /operator/
 Disallow: /supplier/dashboard
 Disallow: /supplier/products
-Disallow: /partner/dashboard
-Disallow: /partner/products
 Disallow: /mypage/
 Disallow: /qr/
 Disallow: /p/

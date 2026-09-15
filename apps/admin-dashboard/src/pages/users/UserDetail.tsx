@@ -111,7 +111,6 @@ export default function UserDetail() {
       customer: 'bg-gray-500',
       business: 'bg-yellow-500',
       moderator: 'bg-indigo-500',
-      partner: 'bg-pink-500',
     };
     return colors[role as keyof typeof roleDisplayNames] || 'bg-gray-500';
   };

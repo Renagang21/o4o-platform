@@ -137,11 +137,12 @@ export class OperatorRegistrationService {
       // WO-NETURE-ROLE-NORMALIZATION-V1: admin/operator만 prefixed, 나머지는 unprefixed
       //
       // WO-O4O-ROLE-ASSIGNMENT-CONTRACT-CONSISTENCY-AUDIT-AND-HARDENING-V1 (1):
-      //   가입 승인은 **신청 가능한 역할(supplier · partner 등)만** 확정한다.
+      //   가입 승인은 **신청 가능한 역할(supplier)만** 확정한다.
       //   운영자·관리자 부여는 중앙 `/operators`(플랫폼 관리자) 전용이므로
       //   (WO-O4O-NETURE-LEGACY-ADMIN-OPERATOR-API-RETIREMENT-V1 로 Neture 전용 경로는 은퇴),
       //   이 경로에서 admin/operator 로 승격되는 분기 자체를 제거하고 명시적으로 거부한다.
-      //   현재 Neture 신청 허용 role 은 supplier/partner 뿐이라 정상 흐름에는 영향이 없다.
+      //   현재 Neture 신청 허용 role 은 supplier 뿐이라 정상 흐름에는 영향이 없다
+      //   (WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: partner 신청 경로 은퇴).
       //   (다만 service_memberships 에 과거 API 가 남긴 role='operator' 행이 실재하므로
       //    그 행이 pending/rejected 로 되돌아가는 경우를 대비한 방어다.)
       const rawRole = smRow.role || 'member';
@@ -265,31 +266,7 @@ export class OperatorRegistrationService {
         }
       }
 
-      // 5. partner role → neture.neture_partners 자동 생성/활성화
-      // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
-      //   파트너 서비스 이용 상태의 단일 출처는 neture.neture_partners.status 다(공급자의 neture_suppliers 와 대칭).
-      //   기존에는 승인이 role 만 부여하고 행을 만들지 않아 requireActivePartner guard 가 항상 NO_PARTNER 였다.
-      //   pending 행(로그인 회원의 서비스 신청)이 있으면 active 로 전이, 없으면 active 로 생성. rejected/suspended 는 보존.
-      if (rawRole === 'partner') {
-        const [partnerUserRow] = await queryRunner.query(
-          `SELECT name, "businessInfo" FROM users WHERE id = $1`,
-          [userId],
-        );
-        const partnerName = partnerUserRow?.businessInfo?.businessName || partnerUserRow?.name || 'partner';
-        await queryRunner.query(
-          `UPDATE neture.neture_partners
-              SET status = 'active', updated_by = $2, updated_at = NOW()
-            WHERE user_id = $1 AND status = 'pending'`,
-          [userId, approvedBy],
-        );
-        await queryRunner.query(
-          `INSERT INTO neture.neture_partners (name, business_name, type, status, user_id, created_by, updated_by, created_at, updated_at)
-           SELECT $2, $3, 'partner', 'active', $1, $4, $4, NOW(), NOW()
-            WHERE NOT EXISTS (SELECT 1 FROM neture.neture_partners WHERE user_id = $1)`,
-          [userId, partnerName, partnerUserRow?.businessInfo?.businessName || null, approvedBy],
-        );
-        logger.info(`[Registration] neture_partners ensured active for user ${userId} — partner service approval`);
-      }
+      // 5. (은퇴) partner role → neture.neture_partners 자동 생성 — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
 
       await queryRunner.commitTransaction();
       return { success: true, userId };
@@ -321,15 +298,6 @@ export class OperatorRegistrationService {
     if (!result?.length) {
       throw new Error('REGISTRATION_NOT_FOUND');
     }
-
-    // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
-    //   가입 반려 시 파트너 서비스 신청 행(pending)이 있으면 함께 반려 — 서비스 상태 단일 출처 정합.
-    await this.dataSource.query(
-      `UPDATE neture.neture_partners
-          SET status = 'rejected', updated_by = $1, updated_at = NOW()
-        WHERE user_id = $2 AND status = 'pending'`,
-      [rejectedBy, userId],
-    );
 
     return { success: true, userId };
   }
@@ -380,7 +348,7 @@ export class OperatorRegistrationService {
 
     for (const r of rows) {
       const role = (r.role || '').toLowerCase();
-      if (role === 'partner' || (role === 'supplier' && (r.businessNumber || r.licenseNumber))) {
+      if (role === 'supplier' && (r.businessNumber || r.licenseNumber)) {
         high.push(r);
       } else if (role === 'supplier' || role === 'seller') {
         medium.push(r);

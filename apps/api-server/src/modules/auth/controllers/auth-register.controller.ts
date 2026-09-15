@@ -54,7 +54,7 @@ export class AuthRegisterController extends BaseController {
       // WO-O4O-NETURE-SELLER-LEGACY-CLEANUP-TO-STORE-OWNER-PARTICIPANT-V1:
       // 'store_owner' = Neture 내부 participant type (권한 role 아님). 'seller' 는 legacy 호환 유지.
       // neture:store_owner role 은 생성하지 않으며 다른 서비스 store_owner 와 연결하지 않는다.
-      const VALID_ROLES = ['super_admin', 'admin', 'vendor', 'seller', 'store_owner', 'user', 'business', 'partner', 'supplier', 'manager', 'customer', 'pharmacy'];
+      const VALID_ROLES = ['super_admin', 'admin', 'vendor', 'seller', 'store_owner', 'user', 'business', 'supplier', 'manager', 'customer', 'pharmacy'];
 
       const rawServiceKey = data.service || 'platform';
       // WO-O4O-KPA-MEMBERSHIP-SYNC-FIX-V1: canonical service_key — 'kpa' alias → 'kpa-society'
@@ -67,14 +67,15 @@ export class AuthRegisterController extends BaseController {
       //   (store_owner 는 inert: 전용 workspace 없음, 유통참여 펀딩은 가입 role 미의존.
       //    Market Trial 의 ParticipantType.STORE_OWNER 는 별개 도메인 — 본 변경과 무관.)
       //   기존 store_owner 회원 데이터는 그대로 잔존(legacy) — migration 없음.
-      // 허용 신청 role: supplier / partner. (admin/operator 는 가입 신청 경로 미지원)
+      // 허용 신청 role: supplier. (admin/operator 는 가입 신청 경로 미지원)
+      // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 'partner' 신청 은퇴.
       // 다른 서비스(KPA / K-Cosmetics)의 가입 흐름은 영향 없음 — 기존 fallback 유지.
-      const NETURE_ALLOWED_SIGNUP_ROLES = ['supplier', 'partner'];
+      const NETURE_ALLOWED_SIGNUP_ROLES = ['supplier'];
       if (serviceKey === 'neture') {
         if (!data.role || !NETURE_ALLOWED_SIGNUP_ROLES.includes(data.role)) {
           return BaseController.error(
             res,
-            'Neture 가입 신청 역할이 필요합니다. (supplier / partner)',
+            'Neture 가입 신청 역할이 필요합니다. (supplier)',
             400,
             'NETURE_SIGNUP_ROLE_REQUIRED',
           );
@@ -331,7 +332,7 @@ export class AuthRegisterController extends BaseController {
         // GlycoPharm 운영자 알림 — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
         // WO-O4O-NETURE-MEMBERSHIP-OPERATOR-NOTIFICATION-V1:
-        //   기존 계정 Neture 가입 신청(supplier/partner) 시 운영자(neture:operator / neture:admin) 알림.
+        //   기존 계정 Neture 가입 신청(supplier) 시 운영자(neture:operator / neture:admin) 알림.
         //   KPA / K-Cosmetics 패턴과 동일 — best-effort.
         if (serviceKey === 'neture') {
           try {
@@ -620,7 +621,7 @@ export class AuthRegisterController extends BaseController {
       // GlycoPharm 운영자 알림 — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
       // WO-O4O-NETURE-MEMBERSHIP-OPERATOR-NOTIFICATION-V1:
-      //   신규 계정 Neture 가입 신청(supplier/partner) 시 운영자(neture:operator / neture:admin) 알림.
+      //   신규 계정 Neture 가입 신청(supplier) 시 운영자(neture:operator / neture:admin) 알림.
       //   KPA / K-Cosmetics 패턴과 동일 — best-effort.
       if (serviceKey === 'neture') {
         try {

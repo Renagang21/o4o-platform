@@ -15,7 +15,7 @@ import type { ContextualNavItem, GlobalHeaderNavItem } from '@o4o/ui';
 
 // WO-O4O-NETURE-HEADER-AND-GUIDE-CONSOLIDATION-V1
 // 상단 메뉴 3개로 단순화.
-// Supplier / Partner / 유통참여형 펀딩 / O4O 소개는 /guide(이용 안내) 허브 안에서 진입.
+// Supplier / 유통참여형 펀딩 / O4O 소개는 /guide(이용 안내) 허브 안에서 진입.
 // WO-O4O-COMMON-HOME-PHASE1-V1:
 //   `/` 가 O4O 공통 Home 으로 바뀌면서 기존 Neture 커뮤니티 홈은 `/community` 로 이동했다.
 //   route 있는 실기능을 nav 에서 숨기지 않는다(CLAUDE.md Shared Module Change Rule) → 항목 추가.
@@ -31,13 +31,12 @@ export const NETURE_PUBLIC_NAV: GlobalHeaderNavItem[] = [
 
 // WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1:
 //   필터 구조는 @o4o/ui 의 공통 filterContextualNav 로 승격. 노출 조건 키는 서비스별로 유지.
-export type NetureContextualNavItem = ContextualNavItem<'supplier' | 'partner' | 'operator' | 'admin'>;
+export type NetureContextualNavItem = ContextualNavItem<'supplier' | 'operator' | 'admin'>;
 
 // WO-O4O-NETURE-CONTEXTUAL-NAV-SUPPLIER-PARTNER-INTEGRATION-V1
-// supplier/partner 역할 사용자가 상단 nav 에서 자신의 워크스페이스(대시보드)로 바로 진입.
-// Neture 는 공급자·파트너 조직 중심 — store owner / 매장 허브 구조를 적용하지 않는다.
-// operator/admin 은 filterContextualNav 정책상 두 항목 모두 노출(전체 진입 허용).
+// supplier 역할 사용자가 상단 nav 에서 자신의 워크스페이스(대시보드)로 바로 진입.
+// WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 파트너 대시보드 항목 은퇴.
+// operator/admin 은 filterContextualNav 정책상 항목 전체 노출(전체 진입 허용).
 export const NETURE_CONTEXTUAL_NAV: NetureContextualNavItem[] = [
   { label: '공급자 대시보드', href: '/supplier/dashboard', visibleWhen: 'supplier' },
-  { label: '파트너 대시보드', href: '/partner/dashboard', visibleWhen: 'partner' },
 ];

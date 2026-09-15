@@ -14,7 +14,7 @@
 import { useState, useEffect } from 'react';
 // WO-O4O-PASSWORD-COMPLEXITY-POLICY-UNIFY-V1: 비밀번호 정책 공용 검증
 import { checkPasswordPolicy } from '@o4o/auth-utils';
-import { X, Eye, EyeOff, CheckCircle, ArrowLeft, Factory, Handshake, type LucideIcon } from 'lucide-react';
+import { X, Eye, EyeOff, CheckCircle, ArrowLeft, Factory, type LucideIcon } from 'lucide-react';
 import { BusinessRegistrationFields } from '@o4o/account-ui';
 import { AddressSearch } from '@o4o/ui';
 import { useLoginModal } from '../contexts';
@@ -22,10 +22,11 @@ import { api } from '../lib/apiClient';
 
 // WO-O4O-NETURE-STORE-OWNER-SIGNUP-CARD-REMOVE-V1:
 // Neture 가입 유형에서 'store_owner'(매장 경영자) 제거 — 전용 workspace 없음, 권한/guard inert,
-// 유통참여 펀딩은 가입 role 미의존. 신청 역할은 공급자/파트너 2개만.
+// 유통참여 펀딩은 가입 role 미의존. 신청 역할은 공급자 1개.
+// WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 'partner' 가입 유형 은퇴.
 // (Market Trial 의 ParticipantType.STORE_OWNER 는 별개 도메인 — 본 변경과 무관, 미수정.)
 // WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1: 'user'(일반 이용자) 미사용.
-type SignupRole = 'supplier' | 'partner';
+type SignupRole = 'supplier';
 
 function formatBusinessNumber(digits: string): string {
   if (digits.length <= 3) return digits;
@@ -33,7 +34,7 @@ function formatBusinessNumber(digits: string): string {
   return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5, 10)}`;
 }
 
-// WO-O4O-NETURE-STORE-OWNER-SIGNUP-CARD-REMOVE-V1: '매장 경영자' 카드 제거 — 공급자/파트너만 노출.
+// WO-O4O-NETURE-STORE-OWNER-SIGNUP-CARD-REMOVE-V1: '매장 경영자' 카드 제거 — 공급자만 노출.
 // WO-O4O-NETURE-HOME-ROLE-MARKET-TRIAL-ICON-ALIGNMENT-V1: 역할 emoji → lucide
 const roleOptions: Array<{ role: SignupRole; label: string; description: string; Icon: LucideIcon }> = [
   {
@@ -41,12 +42,6 @@ const roleOptions: Array<{ role: SignupRole; label: string; description: string;
     label: '공급자',
     description: '제품을 공급하는 공급사·제조사',
     Icon: Factory,
-  },
-  {
-    role: 'partner',
-    label: '파트너',
-    description: '마케팅·협업으로 참여하는 파트너',
-    Icon: Handshake,
   },
 ];
 
@@ -317,7 +312,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
 
   const isStep2Valid = () => {
     // WO-O4O-NETURE-REGISTRATION-ROLE-SMOKING-GUN-FIX-V1: 'user' 분기 제거.
-    // 모든 신청 역할(supplier / partner)이 companyName 을 필수로 한다.
+    // 모든 신청 역할(supplier)이 companyName 을 필수로 한다.
     if (!selectedRole || !formData.agreeTerms || !formData.agreePrivacy) return false;
     if (!formData.companyName.trim()) return false;
     if (selectedRole === 'supplier') {
@@ -593,7 +588,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
               {selectedRole && (
                 <div className="p-4 bg-gray-50 rounded-xl space-y-3">
                   <h4 className="text-sm font-semibold text-gray-700">
-                    {selectedRole === 'supplier' ? '공급자 정보' : '파트너 정보'}
+                    공급자 정보
                   </h4>
 
                   {/* WO-O4O-NETURE-STORE-OWNER-SIGNUP-CARD-REMOVE-V1: '매장 경영자' 입력 분기 제거 */}
@@ -778,70 +773,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                     </>
                   )}
 
-                  {/* 파트너 */}
-                  {selectedRole === 'partner' && (
-                    <>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          활동명 / 회사명 <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="companyName"
-                          value={formData.companyName}
-                          onChange={handleInputChange}
-                          placeholder="OO 마케팅, OO 에이전시 등"
-                          className={INPUT_CLASS_BG}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          활동 분야
-                        </label>
-                        <select
-                          name="businessType"
-                          value={formData.businessType}
-                          onChange={handleInputChange}
-                          className={INPUT_CLASS_BG}
-                        >
-                          <option value="">선택</option>
-                          <option value="cosmetics">화장품·뷰티</option>
-                          <option value="health">건강·식품</option>
-                          <option value="medical">의료·헬스케어</option>
-                          <option value="food">식품·음료</option>
-                          <option value="other">기타</option>
-                        </select>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            담당자명
-                          </label>
-                          <input
-                            type="text"
-                            name="contactName"
-                            value={formData.contactName}
-                            onChange={handleInputChange}
-                            placeholder="홍길동"
-                            className={INPUT_CLASS_BG}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            담당자 연락처
-                          </label>
-                          <input
-                            type="tel"
-                            name="contactPhone"
-                            value={formData.contactPhone}
-                            onChange={handleInputChange}
-                            placeholder="숫자만 입력"
-                            className={INPUT_CLASS_BG}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
 
                   {/* 민감 정보 안내 */}
                   <p className="text-xs text-gray-400 pt-1">

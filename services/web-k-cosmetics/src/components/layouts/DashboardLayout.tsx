@@ -114,11 +114,6 @@ const icons = {
       <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
     </svg>
   ),
-  Handshake: ({ className }: { className?: string }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m11 17 2 2a1 1 0 1 0 3-3" /><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" /><path d="m21 3 1 11h-2" /><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" /><path d="M3 4h8" />
-    </svg>
-  ),
   Monitor: ({ className }: { className?: string }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" />
@@ -189,19 +184,6 @@ const roleConfig: Record<string, RoleConfig> = {
         // WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1: 문의 '설정'은 admin 유지 (문의 '관리'는 operator 이관)
         { label: '문의 설정', path: '/admin/settings/contact' },
       ]},
-    ],
-  },
-  partner: {
-    title: '파트너 관리',
-    icon: icons.Handshake,
-    color: 'purple',
-    menuItems: [
-      { path: '/partner', label: '대시보드', icon: icons.LayoutDashboard },
-      { path: '/partner/overview', label: '개요', icon: icons.BarChart3 },
-      { path: '/partner/targets', label: '타겟 설정', icon: icons.Users },
-      { path: '/partner/content', label: '콘텐츠', icon: icons.Package },
-      { path: '/partner/events', label: '이벤트', icon: icons.Megaphone },
-      { path: '/partner/status', label: '현황', icon: icons.FileCheck },
     ],
   },
   // operator config removed — WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: uses shared OperatorShell
@@ -368,7 +350,7 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
                 );
               })
             ) : (
-              // ── Flat list rendering (admin/partner) ──
+              // ── Flat list rendering (admin) ──
               config.menuItems?.map((item) => {
                 const Icon = item.icon;
                 return (

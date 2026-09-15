@@ -1,7 +1,7 @@
 /**
  * Market Trial App
  *
- * Supplier product trial funding with seller/partner participation.
+ * Supplier product trial funding with store owner (seller) participation.
  * Phase 1: Entity & API.
  * WO-MARKET-TRIAL-POLICY-ALIGNMENT-V1: 정책 기준선 통합
  */

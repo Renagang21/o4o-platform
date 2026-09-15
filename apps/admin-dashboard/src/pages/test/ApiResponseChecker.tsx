@@ -8,7 +8,7 @@ import { authClient } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 
 export default function ApiResponseChecker() {
-  const [email, setEmail] = useState('partner04@test.com');
+  const [email, setEmail] = useState('user@test.com');
   const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<any>(null);

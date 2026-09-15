@@ -37,8 +37,7 @@ export * from './pricing.js';
 // Export dashboard types (P1 Phase C)
 export * from './dashboard.js';
 
-// Export partner types (replacing old affiliate module)
-export * from './partner.js';
+// (은퇴) partner / affiliate 타입 — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 (소비처 0 실측)
 
 // Export app manifest types (App Market V1)
 export * from './app-manifest.js';
@@ -63,25 +62,6 @@ export * from './operator-routes.js';
 
 // Export operator action types (WO-O4O-OPERATOR-ACTION-STANDARDIZATION-V1)
 export * from './operator-action.js';
-
-// For backward compatibility, re-export partner types with affiliate names
-export type {
-  PartnerUser as AffiliateUser,
-  PartnerCommission as AffiliateCommission,
-  PartnerStats as AffiliateStats,
-  CreatePartnerRequest as CreateAffiliateRequest,
-  CreatePartnerResponse as CreateAffiliateResponse,
-  GetPartnerStatsRequest as GetAffiliateStatsRequest,
-  AdminPartnerOverview as AdminAffiliateOverview,
-  UserPartnerDashboard as UserAffiliateDashboard,
-  BankAccount as AffiliateBankAccount,
-  ReferralRelationship as AffiliateReferralRelationship,
-  ReferralClick as AffiliateReferralClick,
-  CommissionPolicy as AffiliateCommissionPolicy,
-  GenerateReferralLinkRequest as GenerateAffiliateLinkRequest,
-  GenerateReferralLinkResponse as GenerateAffiliateLinkResponse,
-  ProcessCommissionRequest as ProcessAffiliateCommissionRequest
-} from './partner.js';
 
 // Export forum API response types (Phase 19-B)
 export * from './forum.js';

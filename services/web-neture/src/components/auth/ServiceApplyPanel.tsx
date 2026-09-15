@@ -1,15 +1,16 @@
 /**
- * ServiceApplyPanel — 로그인 회원의 공급자 · 파트너 서비스 신청 · 상태 패널 (랜딩 페이지용)
+ * ServiceApplyPanel — 로그인 회원의 공급자 서비스 신청 · 상태 패널 (랜딩 페이지용)
  *
  * WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1
  *
  * O4O 계정이 이미 있는 회원은 "회원가입" 이 아니라 **서비스 신청** 을 한다.
- *   none      → 신청 폼 (POST /supplier/register · POST /partner/register — 기존 신청 API 재사용)
+ *   none      → 신청 폼 (POST /supplier/register — 기존 신청 API 재사용)
  *   pending   → 신청 중 (승인 대기)
  *   active    → 업무 공간 진입
- *   rejected  → 반려 안내 (파트너는 다시 신청 가능 · 공급자는 운영자 문의)
+ *   rejected  → 반려 안내 (운영자 문의)
  *   suspended / withdrawn → 안내만
  * 상태 출처는 서버 serviceStates 뿐이다 (role 문자열로 판정하지 않는다).
+ * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 파트너 서비스 신청 은퇴.
  */
 
 import { useState, type FormEvent } from 'react';
@@ -21,14 +22,13 @@ import { ADMIN_ROLES } from '../../lib/role-constants';
 import { NETURE_SERVICE_INFO, SERVICE_STATUS_LABELS } from '../../lib/home-entry';
 import { useNetureServiceStates } from '../../lib/neture-service-state';
 
-type ServiceKey = 'supplier' | 'partner';
+type ServiceKey = 'supplier';
 
 const ERROR_MESSAGES: Record<string, string> = {
   MISSING_NAME: '이름(회사명)을 입력해 주세요.',
   INVALID_SLUG: '식별자는 영문 소문자 · 숫자 · 하이픈(-)만 사용할 수 있습니다.',
   SLUG_ALREADY_EXISTS: '이미 사용 중인 식별자입니다. 다른 값을 입력해 주세요.',
   USER_ALREADY_HAS_SUPPLIER: '이미 공급자 서비스 신청 이력이 있습니다. 운영자에게 문의해 주세요.',
-  USER_ALREADY_HAS_PARTNER: '이미 파트너 서비스 신청 이력이 있습니다.',
 };
 
 export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
@@ -40,7 +40,6 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [contactEmail, setContactEmail] = useState('');
-  const [businessName, setBusinessName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -115,18 +114,14 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
     );
   }
 
-  // none · (partner) rejected / withdrawn → 신청 폼
+  // none · rejected / withdrawn → 신청 폼
   const isReapply = status !== 'none';
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setSubmitError(null);
     try {
-      if (service === 'supplier') {
-        await api.post('/neture/supplier/register', { name: name.trim(), slug: slug.trim(), contactEmail: contactEmail.trim() || user?.email });
-      } else {
-        await api.post('/neture/partner/register', { name: name.trim() || user?.name || '', businessName: businessName.trim() || undefined });
-      }
+      await api.post('/neture/supplier/register', { name: name.trim(), slug: slug.trim(), contactEmail: contactEmail.trim() || user?.email });
       reload();
     } catch (err: unknown) {
       const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response?.data?.error?.code;
@@ -146,7 +141,6 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
           ? `${info.name} 신청이 반려되었습니다. 내용을 확인한 뒤 다시 신청할 수 있습니다.`
           : `이미 O4O 계정으로 로그인되어 있습니다. 회원가입 없이 ${info.name}만 신청합니다.`}
       </p>
-      {service === 'supplier' ? (
         <div className="space-y-3">
           <label className="block text-sm">
             <span className="text-gray-700">회사명 *</span>
@@ -161,18 +155,6 @@ export function ServiceApplyPanel({ service }: { service: ServiceKey }) {
             <input className={input} type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder={user?.email} />
           </label>
         </div>
-      ) : (
-        <div className="space-y-3">
-          <label className="block text-sm">
-            <span className="text-gray-700">파트너 이름 *</span>
-            <input className={input} value={name} onChange={(e) => setName(e.target.value)} placeholder={user?.name} maxLength={100} />
-          </label>
-          <label className="block text-sm">
-            <span className="text-gray-700">사업자명 (선택)</span>
-            <input className={input} value={businessName} onChange={(e) => setBusinessName(e.target.value)} maxLength={100} />
-          </label>
-        </div>
-      )}
       {submitError && <p className="text-sm text-red-600 mt-3">{submitError}</p>}
       <button type="submit" disabled={submitting} className="mt-4 inline-flex items-center px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-50">
         {submitting ? '신청 중...' : isReapply ? '다시 신청하기' : `${info.name} 신청`}

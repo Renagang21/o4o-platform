@@ -79,8 +79,6 @@ import localAgentRoutes from '../routes/local-agent.routes.js';
 import { MarketTrialController } from '../controllers/market-trial/marketTrialController.js';
 import { MarketTrialOperatorController } from '../controllers/market-trial/marketTrialOperatorController.js';
 import { createNetureOperatorTrialRoutes } from '../routes/market-trial-operator.routes.js';
-import partnerRoutes from '../routes/partner.routes.js';
-import { partnerDashboardRoutes } from '../modules/partner/index.js';
 import checkoutRoutes from '../routes/checkout.routes.js';
 import adminOrderRoutes from '../routes/admin-orders.routes.js';
 import adminDashboardRoutes from '../routes/admin/dashboard.routes.js';
@@ -393,24 +391,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     //   두 패키지는 commit 2d5be046b 에서 삭제되어 'disabled'(재활성 대기) 가 아니라
     //   존재하지 않는 라우트다. App Store 카탈로그 항목도 함께 제거했다.
 
-    // 20. Register Partner routes (Phase K)
-    app.use('/api/partner', partnerRoutes);
-    logger.info('✅ Partner routes registered at /api/partner');
-
-    // 21-a. Register Partner Dashboard API v1 (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
-    app.use('/api/v1/partner', partnerDashboardRoutes);
-    logger.info('✅ Partner Dashboard API v1 registered at /api/v1/partner');
-
-    // 21-b. (은퇴) Partner Application API — WO-PARTNER-APPLICATION-V1
-    //   WO-O4O-PARTNER-APPLICATION-ENTITY-TABLE-CONTRACT-ROOT-CAUSE-AND-PRODUCTION-CLOSURE-V1:
-    //   이 mount 는 **도달 불가**였다. 바로 위 21-a 가 `/api/v1/partner` 로 먼저 마운트되고
-    //   partner-dashboard.routes 가 router 레벨에서 `authenticate + partnerContextGuard` 를 걸기 때문에
-    //   `/api/v1/partner/applications` 는 항상 21-a 에 먼저 매칭돼 401/403('Partner role required')로 끝났다.
-    //   즉 "파트너가 되려는 사람"이 "파트너 역할"을 요구받는 논리적 모순 상태였고,
-    //   대상 테이블 `partner_applications` 는 migration 이 없어 프로덕션에 존재한 적도 없다.
-    //   canonical 대체 경로 = POST /api/v1/cosmetics/stores/apply
-    //   → cosmetics.cosmetics_store_applications → 운영자 검수 콘솔(/operator/applications).
-    //   90일 프로덕션 호출 0건. entity/service/route 전부 제거했다.
+    // 20 · 21. (은퇴) Legacy Partner routes — `/api/partner` (Phase K) · `/api/v1/partner` (Partner Dashboard API v1)
+    //   WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
+    //   과거 제휴마케팅 Partner 는 runtime 에서 전면 은퇴했다(O4O-ROLE-WORKSPACE-ARCHITECTURE-V1 §7).
+    //   판매자 모집(비-Partner)은 /api/v1/neture/seller-recruitment/* 로 분리 유지.
 
     // 22. Register Market Trial routes (Phase L-1)
     MarketTrialController.setDataSource(dataSource);
@@ -826,7 +810,7 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Neture routes:', netureError);
     }
 
-    // 29b. Register Neture Module routes (modules/neture - supplier/admin/partner/seller)
+    // 29b. Register Neture Module routes (modules/neture - supplier/admin/seller/seller-recruitment)
     try {
       const netureModuleRoutes = createNetureModuleRoutes(dataSource);
       app.use('/api/v1/neture', netureModuleRoutes);

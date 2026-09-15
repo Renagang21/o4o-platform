@@ -214,7 +214,6 @@ export class User {
   // Dropshipping relationships
   supplier?: any;
   seller?: any;
-  partner?: any;
 
 
   // Password hashing
@@ -306,15 +305,10 @@ export class User {
     return this.hasRole('seller') || !!this.seller;
   }
 
-  isPartner(): boolean {
-    return this.hasRole('partner') || !!this.partner;
-  }
-
   getDropshippingRoles(): string[] {
     const dRoles: string[] = [];
     if (this.isSupplier()) dRoles.push('supplier');
     if (this.isSeller()) dRoles.push('seller');
-    if (this.isPartner()) dRoles.push('partner');
     return dRoles;
   }
 

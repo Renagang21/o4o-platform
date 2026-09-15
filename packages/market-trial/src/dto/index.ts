@@ -124,14 +124,6 @@ export interface SellerDecisionRequest {
 }
 
 /**
- * Partner Decision Request
- */
-export interface PartnerDecisionRequest {
-  decision: string; // 'continue' | 'stop'
-  sellerIds?: string[]; // Required when decision = 'continue'
-}
-
-/**
  * Decision Response
  */
 export interface DecisionResponse {
@@ -171,28 +163,3 @@ export function validateSellerDecisionRequest(data: any): SellerDecisionRequest 
   };
 }
 
-/**
- * Validate Partner Decision Request
- */
-export function validatePartnerDecisionRequest(data: any): PartnerDecisionRequest {
-  if (!data.decision) {
-    throw new Error('decision is required');
-  }
-
-  const validDecisions = [DecisionType.CONTINUE, DecisionType.STOP];
-  if (!validDecisions.includes(data.decision as DecisionType)) {
-    throw new Error('decision must be "continue" or "stop"');
-  }
-
-  // sellerIds is required when decision = CONTINUE
-  if (data.decision === DecisionType.CONTINUE) {
-    if (!data.sellerIds || !Array.isArray(data.sellerIds) || data.sellerIds.length === 0) {
-      throw new Error('sellerIds is required when decision is "continue"');
-    }
-  }
-
-  return {
-    decision: data.decision,
-    sellerIds: data.sellerIds,
-  };
-}

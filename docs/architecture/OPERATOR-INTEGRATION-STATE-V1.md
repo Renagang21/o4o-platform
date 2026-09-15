@@ -114,7 +114,7 @@
 | AI Report | OperatorAiReportPage | AiReportPage + AiUsage + AiBilling | OperatorAiReportPage | Glyco 가 가장 분화 (3 페이지) |
 | Forum Management (전체) | ForumManagementPage | OperatorForumManagementPage | — | 2 서비스만 |
 | LMS Operator | OperatorLmsCoursesPage | LmsCoursesPage | — | 2 서비스만 |
-| Applications (가입/승인) | Product/Qualification 별개 | Pharmacy/Store 별개 | Partner Single | 도메인 의미 모두 다름 |
+| Applications (가입/승인) | Product/Qualification 별개 | Pharmacy/Store 별개 | Supplier Single (Partner 는 2026-09-15 은퇴) | 도메인 의미 모두 다름 |
 | Roles | RoleManagementPage | (admin 영역으로 이동) | — | 정책 분기 |
 
 ### 3.3 🔴 Service Extension (서비스 전용)

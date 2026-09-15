@@ -3,7 +3,7 @@
  *
  * WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1
  *
- * O4O 로그인(신원) 과 서비스 이용 상태는 별개다. 업무 공간(/supplier/* · /partner/*) 은
+ * O4O 로그인(신원) 과 서비스 이용 상태는 별개다. 업무 공간(/supplier/*) 은
  * **그 서비스 이용 상태가 active 일 때만** 연다. 그 외 상태는 상태별 안내 화면을 보여 주고
  * 대표 홈(로그인 유지) 으로 돌아가는 길만 준다 — 여기서 로그아웃하지 않는다.
  *
@@ -14,8 +14,8 @@
  *   withdrawn → 탈퇴 + 다시 신청
  *   조회 실패 → 미가입으로 취급하지 않고 재시도만
  *
- * 관리자 예외 없음 — 서버 guard(requireLinkedSupplier / requireActivePartner) 도 role 이 아니라 서비스 행의
- * 상태만 본다. 서비스 행이 없는 관리자를 통과시키면 업무 화면의 API 가 NO_SUPPLIER/NO_PARTNER 를 낸다
+ * 관리자 예외 없음 — 서버 guard(requireLinkedSupplier) 도 role 이 아니라 서비스 행의
+ * 상태만 본다. 서비스 행이 없는 관리자를 통과시키면 업무 화면의 API 가 NO_SUPPLIER 를 낸다
  * (과거 401 → auth-client refresh 실패 → 토큰 삭제 → **대표 로그아웃** 연쇄가 운영 검증에서 확인됐고,
  * WO-O4O-NETURE-AUTH-ERROR-CONTRACT-AND-LEGACY-TOKEN-RECOVERY-FIX-V1 에서 403 으로 정정). 운영 목적의
  * 조회 · 승인은 /operator/* 콘솔에서 한다. 최종 판정은 서버 guard 가 한다.
@@ -27,7 +27,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { NETURE_SERVICE_INFO, SERVICE_STATUS_LABELS } from '../../lib/home-entry';
 import { useNetureServiceStates } from '../../lib/neture-service-state';
 
-type ServiceKey = 'supplier' | 'partner';
+type ServiceKey = 'supplier';
 
 const STATUS_MESSAGES: Record<ServiceKey, Record<string, { title: string; body: string; action: 'apply' | 'reapply' | null }>> = {
   supplier: {
@@ -36,13 +36,6 @@ const STATUS_MESSAGES: Record<ServiceKey, Record<string, { title: string; body: 
     rejected: { title: '공급자 서비스 신청이 반려되었습니다', body: '신청 내용을 확인한 뒤 다시 신청할 수 있습니다. 다른 서비스 이용에는 영향이 없습니다.', action: 'reapply' },
     suspended: { title: '공급자 서비스 이용이 정지되었습니다', body: '공급자 업무 공간을 이용할 수 없습니다. 자세한 내용은 운영자에게 문의해 주세요.', action: null },
     withdrawn: { title: '공급자 서비스를 탈퇴했습니다', body: '공급자 서비스만 종료된 상태입니다. O4O 계정과 다른 서비스는 그대로 이용할 수 있습니다.', action: 'reapply' },
-  },
-  partner: {
-    none: { title: '파트너 서비스 신청이 필요합니다', body: 'O4O 계정으로 로그인되어 있지만 파트너 서비스는 아직 신청하지 않았습니다. 신청 후 승인되면 파트너 업무를 이용할 수 있습니다.', action: 'apply' },
-    pending: { title: '파트너 서비스 신청 중', body: '신청이 접수되어 승인을 기다리고 있습니다. 승인되면 파트너 업무를 이용할 수 있습니다.', action: null },
-    rejected: { title: '파트너 서비스 신청이 반려되었습니다', body: '신청 내용을 확인한 뒤 다시 신청할 수 있습니다. 다른 서비스 이용에는 영향이 없습니다.', action: 'reapply' },
-    suspended: { title: '파트너 서비스 이용이 정지되었습니다', body: '파트너 업무 공간을 이용할 수 없습니다. 자세한 내용은 운영자에게 문의해 주세요.', action: null },
-    withdrawn: { title: '파트너 서비스를 탈퇴했습니다', body: '파트너 서비스만 종료된 상태입니다. O4O 계정과 다른 서비스는 그대로 이용할 수 있습니다.', action: 'reapply' },
   },
 };
 

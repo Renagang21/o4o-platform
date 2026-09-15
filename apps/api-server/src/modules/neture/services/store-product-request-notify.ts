@@ -20,7 +20,7 @@ import logger from '../../../utils/logger.js';
 // 알림은 notification.serviceKey 로 필터되어 **해당 서비스 web 앱 헤더에서만** 노출되고, 헤더는
 // metadata.targetUrl 로 자기 origin 내부 경로만 navigate 한다(resolveNotificationTarget 는 내부 절대
 // 경로만 통과시킨다). 따라서 target 은 serviceKey 별 route tree 에 실재하는 경로여야 한다.
-// partner-contract.service.ts 의 resolveRecruitmentApplicationTargetUrl 선례와 동일 패턴.
+// seller-recruitment.service.ts 의 resolveRecruitmentApplicationTargetUrl 선례와 동일 패턴.
 //
 // 검토 화면 현황:
 //   - neture : /operator/product-candidates (ProductCandidateReviewPage — sourceType 'store_web' 포함) ✅

@@ -54,7 +54,6 @@ describe('Neture Legacy Role Denial', () => {
     'manager',
     'seller',
     'supplier',
-    'partner',
   ];
 
   it.each(netureLegacyRoles)('unprefixed "%s" → Neture guard 403 (standard denial)', async (role) => {

@@ -22,7 +22,7 @@
  * isStoreOwnerDual(user.roles, 'glycopharm:store_owner')
  *
  * @example
- * // 향후 확장 (instructor, supplier, partner 등 동일 패턴 적용 가능)
+ * // 향후 확장 (instructor, supplier 등 동일 패턴 적용 가능)
  * isStoreOwnerDual(user.roles, 'neture:supplier', user.isSupplier)
  */
 export function isStoreOwnerDual(

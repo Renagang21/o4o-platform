@@ -43,7 +43,7 @@
 | F4 | [PLATFORM-CONTENT-POLICY-V1](baseline/PLATFORM-CONTENT-POLICY-V1.md) | HUB 3축 모델 (Producer / Visibility / ServiceScope). §3.1 · §6.3 · §10-5 의 "`producer='supplier'` = legacy 예외" 는 ROLE-WORKSPACE-ARCHITECTURE §2-1 과 충돌 → UPDATE_REQUIRED (후속 WO, 3축 모델은 유지) | FROZEN |
 | F5 | [CONTENT-STABLE-DECLARATION-V1](baseline/CONTENT-STABLE-DECLARATION-V1.md) | HUB 콘텐츠 타입 · 매핑 · 병합 로직 · API 계약 | FROZEN |
 | F6 | [O4O-BOUNDARY-POLICY-V1](architecture/O4O-BOUNDARY-POLICY-V1.md) | Domain Boundary Matrix + Guard Rules 5개 | FROZEN |
-| F7 | [NETURE-PARTNER-CONTRACT-FREEZE-V1](baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md) | Neture 파트너 계약 테이블 · ENUM · 트랜잭션 · Commission 불변 — **2026-09-15 Legacy Partner 전면 은퇴 대상 (§9 행 참조)** | 판정 대기 |
+| F7 | ~~NETURE-PARTNER-CONTRACT-FREEZE-V1~~ | **은퇴 — SUPERSEDED (2026-09-15)**. Legacy Partner runtime 전면 은퇴 (`WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1`). 대체: [ROLE-WORKSPACE-ARCHITECTURE](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7. 원문은 [기록](baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md)으로 보존(현행 계약 아님). F7 번호는 재사용하지 않는다 | — |
 | F8 | [NETURE-DISTRIBUTION-ENGINE-FREEZE-V1](baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md) | Distribution Tier 3단계 · SERVICE 상태 머신 · Checkout Guard 3계층 | FROZEN |
 | F9 | [RBAC-FREEZE-DECLARATION-V1](rbac/RBAC-FREEZE-DECLARATION-V1.md) | RBAC SSOT — `role_assignments` 단일 소스, write-path 통일 | FROZEN |
 | F10 | [O4O-CORE-FREEZE-V1](architecture/O4O-CORE-FREEZE-V1.md) | O4O Core — Auth · Membership · Approval · RBAC 4모듈 Core Layer 고정 | FROZEN |
@@ -147,7 +147,6 @@
 | 문서 | 상황 | 상태 |
 |---|---|---|
 | [O4O-3-ROLE-FLOW-BASELINE-V1](baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | 3자 Canonical Flow (책임 매트릭스 · 원천 자료 vs 실행 자산 · AI 개입 지점). **§2 단선 흐름 · §6 Drift 금지(공급자 HUB 직접 게시 금지 · 매장→공급자 직접 요청 금지) 가 [ROLE-WORKSPACE-ARCHITECTURE](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 · §6 과 충돌** (2026-09-15 헤더 표기). 충돌 절을 근거로 승격하지 않는다. 판정은 Supplier / Store Hub 리팩터링 단계 WO | 판정 대기 |
-| [NETURE-PARTNER-CONTRACT-FREEZE-V1](baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md) | F7. **Legacy Partner 전면 은퇴 대상** (ROLE-WORKSPACE-ARCHITECTURE §7 · RETIRE_CANDIDATE, 2026-09-15 헤더 표기). 프로덕션 partner 데이터 0행 실측. Partner Retirement WO 완료 시 SUPERSEDED/archive — 그 전까지 **기능 복구·확장 금지** | 판정 대기 |
 | [O4O-RETAIL-STABLE-V1](platform/architecture/O4O-RETAIL-STABLE-V1.md) | `channel_type='B2C'` storefront closed loop 을 기술 — [COMMERCE-BOUNDARY](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) §2 · §12 와 충돌 후보. 결제 leg 은 이미 `410` 으로 차단. 동 문서 §8 판정 전까지 `UNKNOWN` — **기능 복구·확장 금지** (문서 헤더 2026-08-25 표기 참조) | 판정 대기 |
 | [E-COMMERCE-ORDER-CONTRACT](baseline/E-COMMERCE-ORDER-CONTRACT.md) | 기술 계약. **유효한 부분**: 주문 생성은 `checkoutService.createOrder()` 단일 지점 · `*_orders` / `*_payments` 독립 테이블 금지. **stale 부분**: §3 · §5 · §7.2 의 `OrderType` 열거(GLYCOPHARM 서비스 삭제 2026-09-08 · DROPSHIPPING 제거 · 엔티티가 `order_type` 컬럼을 매핑하지 않음). 현행 살아있는 주문 축의 정본은 [B2B 계약](baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 본문 정리는 후속 docs 정비 | 판정 대기 |
 | [GLYCOPHARM-LEGACY-POSTMORTEM](baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md) | GlycoPharm 서비스 제거 경위 — legacy 판정 기록 | ACTIVE |

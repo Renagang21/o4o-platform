@@ -205,13 +205,10 @@ import {
   ProductCategory,
   Brand,
   SupplierProductOffer,
-  NeturePartnershipRequest,
-  NeturePartnershipProduct,
-  NeturePartnerDashboardItem,
-  NeturePartnerDashboardItemContent,
-  NeturePartnerRecruitment,
-  NeturePartnerApplication,
-  NetureSellerPartnerContract,
+  // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
+  //   Legacy Partner 엔티티 7종 등록 해제. 판매자 모집(비-Partner) 2종만 유지(물리 테이블은 legacy 명).
+  SellerRecruitment,
+  SellerRecruitmentApplication,
   SupplierCsvImportBatch,
   SupplierCsvImportRow,
   NetureSupplierLibraryItem,
@@ -226,14 +223,13 @@ import {
 } from '../modules/neture/entities/index.js';
 // ============================================================================
 // NETURE ROUTES ENTITIES (WO-TYPEORM-ENTITY-REGISTRATION-FIX-V3)
-// Phase G-3: 주문/결제 + Phase D-1: 파트너/상품
-// 의존 관계: NetureOrder ↔ NetureOrderItem, NeturePartner ↔ NetureProduct
-// 전체 5개를 함께 등록해야 "No metadata found" 오류가 발생하지 않음
+// Phase G-3: 주문/결제 + Phase D-1: 상품 (NeturePartner 는 Legacy Partner 은퇴로 제거)
+// 의존 관계: NetureOrder ↔ NetureOrderItem
+// 전체를 함께 등록해야 "No metadata found" 오류가 발생하지 않음
 // ============================================================================
 import {
   NetureOrder,
   NetureOrderItem,
-  NeturePartner,
   NetureProduct,
   NetureProductLog,
 } from '../routes/neture/entities/index.js';
@@ -328,15 +324,6 @@ import {
   // WO-O4O-KPA-BRANCH-OFFICER-ROSTER-V1
   BranchOfficer,
 } from '../routes/kpa-branch/entities/index.js';
-
-// ============================================================================
-// PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
-// ============================================================================
-import {
-  PartnerContent,
-  PartnerEvent,
-  PartnerTarget,
-} from '../modules/partner/entities/index.js';
 
 // ============================================================================
 // MARKET-TRIAL CORE ENTITIES (WO-MARKET-TRIAL-DB-PERSISTENCE-INTEGRATION-V1)
@@ -695,13 +682,10 @@ export const entities = [
   ProductCategory,
   Brand,
   SupplierProductOffer,
-  NeturePartnershipRequest,
-  NeturePartnershipProduct,
-  NeturePartnerDashboardItem,
-  NeturePartnerDashboardItemContent,
-  NeturePartnerRecruitment,
-  NeturePartnerApplication,
-  NetureSellerPartnerContract,
+  // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
+  //   Legacy Partner 엔티티 7종 등록 해제. 판매자 모집(비-Partner) 2종만 유지(물리 테이블은 legacy 명).
+  SellerRecruitment,
+  SellerRecruitmentApplication,
   SupplierCsvImportBatch,
   SupplierCsvImportRow,
   NetureSupplierLibraryItem,
@@ -716,7 +700,6 @@ export const entities = [
   // WO-TYPEORM-ENTITY-REGISTRATION-FIX-V3: routes/neture 전체 등록
   NetureOrder,
   NetureOrderItem,
-  NeturePartner,
   NetureProduct,
   NetureProductLog,
   // WO-O4O-GUIDE-CONTENT-DATASOURCE-REGISTER-V1
@@ -800,15 +783,7 @@ export const entities = [
   BranchEventRsvp,
   // WO-O4O-KPA-BRANCH-OFFICER-ROSTER-V1
   BranchOfficer,
-  // ============================================================================
-  // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
-  // ============================================================================
-  PartnerContent,
-  PartnerEvent,
-  PartnerTarget,
-  // WO-O4O-PARTNER-APPLICATION-ENTITY-TABLE-CONTRACT-ROOT-CAUSE-AND-PRODUCTION-CLOSURE-V1:
-  //   PartnerApplication 등록 제거. 대상 테이블 partner_applications 는 migration 이 없어
-  //   프로덕션에 존재한 적이 없고, 소비 route 는 `/api/v1/partner` 마운트에 가려 도달 불가였다.
+  // (은퇴) PARTNER DASHBOARD ENTITIES — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
   // ============================================================================
   // CONTENT TEMPLATE ENTITY (WO-O4O-CONTENT-TEMPLATE-SYSTEM-V1)
   // ============================================================================

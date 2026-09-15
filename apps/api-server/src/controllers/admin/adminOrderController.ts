@@ -40,14 +40,13 @@ export class AdminOrderController {
         });
       }
 
-      const { status, paymentStatus, supplierId, partnerId, limit, offset } =
+      const { status, paymentStatus, supplierId, limit, offset } =
         req.query;
 
       const { orders, total } = await checkoutService.findAll({
         status: status as any,
         paymentStatus: paymentStatus as any,
         supplierId: supplierId as string,
-        partnerId: partnerId as string,
         limit: limit ? parseInt(limit as string, 10) : 50,
         offset: offset ? parseInt(offset as string, 10) : 0,
       });

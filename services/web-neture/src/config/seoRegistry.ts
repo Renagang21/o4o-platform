@@ -8,7 +8,7 @@
  *
  * 유지 규칙:
  *   - 라우트 추가 시 동시 등록
- *   - 인증 필요 경로(supplier/dashboard, partner/dashboard, mypage 등)는 등록 불필요
+ *   - 인증 필요 경로(supplier/dashboard, mypage 등)는 등록 불필요
  */
 
 import type { PageSeoConfig, SeoRegistry } from '@o4o/shared-space-ui';
@@ -41,11 +41,6 @@ export const netureSeoRegistry: SeoRegistry = {
   '/supplier': {
     title: 'Supplier — Neture',
     description: '네뚜레 공급자 파트너십. O4O 유통망 진입 안내.',
-    ogType: 'website',
-  },
-  '/partner': {
-    title: 'Partner — Neture',
-    description: '네뚜레 파트너 프로그램. 매장과 협업하는 유통 구조.',
     ogType: 'website',
   },
   '/forum': {

@@ -24,7 +24,6 @@ export interface OperatorContext {
   pendingInquiries: number;
   activeProducts: number;
   pendingRegs: number;
-  partnerRequests: number;
 }
 
 export interface AiActionItem {

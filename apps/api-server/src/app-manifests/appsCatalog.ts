@@ -17,7 +17,6 @@ export type ServiceGroup =
   | 'tourist'             // 관광객 서비스 (Tourist Services)
   | 'sellerops'           // 판매자 운영 (Seller Operations)
   | 'supplierops'         // 공급자 운영 (Supplier Operations)
-  | 'partnerops'          // 파트너 운영 (Partner/Affiliate Operations)
   | 'signage'             // 디지털 사이니지 (Digital Signage)
   | 'platform-core'       // 플랫폼 코어 (Platform Infrastructure)
   | 'global';             // 모든 서비스 공통 (Available to all)
@@ -111,15 +110,6 @@ export const SERVICE_GROUP_META: ServiceGroupMeta[] = [
     icon: 'truck',
     color: '#14B8A6',
     priority: 11,
-  },
-  {
-    id: 'partnerops',
-    name: 'Partner Operations',
-    nameKo: '파트너 운영',
-    description: 'Affiliate and partner management tools',
-    icon: 'users',
-    color: '#6366F1',
-    priority: 12,
   },
   {
     id: 'global',
@@ -254,17 +244,9 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     serviceGroups: ['platform-core'],
   },
   // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1: ecommerce-core app 엔트리 제거 (package 은퇴 · runtime mount 0건).
-  {
-    appId: 'partner-core',
-    name: 'Partner Core',
-    version: '1.0.0',
-    description: '파트너 프로그램 엔진 - 클릭→전환→커미션→정산 워크플로우 관리',
-    category: 'commerce',
-    tags: ['파트너', 'partner', 'affiliate', 'commission', 'conversion', 'settlement'],
-    type: 'core',
-    author: 'O4O Platform',
-    serviceGroups: ['platform-core', 'partnerops'],
-  },
+  // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
+  //   `partner-core` 앱 항목 + `partnerops` serviceGroup 제거 — Legacy Partner 전면 은퇴(App Store 노출 0).
+  //   `packages/partner-core` 디렉터리 자체는 lockfile/workspace 변경이 필요해 physical cleanup 으로 이연.
   {
     appId: 'digital-signage-core',
     name: 'Digital Signage Core',
@@ -378,11 +360,8 @@ export const APPS_CATALOG: AppCatalogItem[] = [
   //     · dependencies {} — 이 항목을 참조하는 설치 소비자 0
   //   선행 사례와 동일한 처리다 (sellerops · supplierops · cosmetics-partner).
   //
-  //   ⚠ 아래 두 가지는 **살아 있으므로 제거하지 않는다**:
-  //     · `partnerops` **serviceGroup id** — SERVICE_GROUPS 메타 + `partner-core`
-  //       카탈로그 항목(`serviceGroups: ['platform-core','partnerops']`)이 소비한다.
-  //     · `@o4o/partner-core` 패키지 및 그 앱 정의.
-  //   즉 "partnerops 라는 문자열" 을 일괄 삭제하지 않는다 (§7.1).
+  //   (2026-09-15) WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 로
+  //   `partnerops` serviceGroup id 와 `partner-core` 앱 항목도 함께 은퇴했다.
   // ============================================
 
   // ============================================
@@ -396,7 +375,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     version: '1.0.0',
     description: '공급자 상품 유통 참여형 펀딩 - 판매자/파트너 참여형 시장 테스트 (운영 실험 목적, 자동화 기능 미포함, 정책 변경 가능성 있음)',
     category: 'commerce',
-    tags: ['market-trial', '유통-참여형-펀딩', 'trial', 'funding', '펀딩', 'supplier', 'seller', 'partner', 'experimental'],
+    tags: ['market-trial', '유통-참여형-펀딩', 'trial', 'funding', '펀딩', 'supplier', 'seller', 'experimental'],
     type: 'extension',
     status: 'experimental',
     dependencies: {},

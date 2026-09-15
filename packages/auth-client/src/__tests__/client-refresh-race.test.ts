@@ -92,13 +92,13 @@ describe('AuthClient 401 interceptor — localStorage 전략', () => {
     expect(localStorage.getItem('o4o_refreshToken')).toBe('new-refresh');
   });
 
-  it('403 (NO_PARTNER 등 서비스 권한 오류) → refresh 없음 · 토큰 유지 · 이벤트 없음', async () => {
+  it('403 (NO_SUPPLIER 등 서비스 권한 오류) → refresh 없음 · 토큰 유지 · 이벤트 없음', async () => {
     loggedIn();
     const { client, calls, handlers } = makeClient();
-    handlers['/neture/partner/commissions'] = () => ({ status: 403, data: { success: false, error: { code: 'NO_PARTNER' } } });
+    handlers['/neture/supplier/settlements'] = () => ({ status: 403, data: { success: false, error: { code: 'NO_SUPPLIER' } } });
 
-    await expect(client.api.get('/neture/partner/commissions')).rejects.toMatchObject({ response: { status: 403 } });
-    expect(calls).toEqual(['GET /neture/partner/commissions']);
+    await expect(client.api.get('/neture/supplier/settlements')).rejects.toMatchObject({ response: { status: 403 } });
+    expect(calls).toEqual(['GET /neture/supplier/settlements']);
     expect(localStorage.getItem('o4o_accessToken')).toBe('old-access');
     expect(cleared).toBe(0);
   });

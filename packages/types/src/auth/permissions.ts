@@ -39,7 +39,6 @@ export const PERMISSION_CATEGORIES = {
   // Dropshipping
   DROPSHIPPING: 'dropshipping',
   SUPPLIERS: 'suppliers',
-  PARTNERS: 'partners',
 
   // Settings & Config
   SETTINGS: 'settings',
@@ -172,10 +171,6 @@ export const PERMISSIONS = {
   // Suppliers
   'suppliers.view': 'suppliers.view',
   'suppliers.manage': 'suppliers.manage',
-
-  // Partners
-  'partners.view': 'partners.view',
-  'partners.manage': 'partners.manage',
 
   // Settings
   'settings.view': 'settings.view',
@@ -337,18 +332,6 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     PERMISSIONS['reports.view'],
   ],
 
-  // Partner - Dropshipping partner
-  [ROLES.PARTNER]: [
-    PERMISSIONS['content.view'],
-    PERMISSIONS['products.view'],
-    PERMISSIONS['orders.view'],
-    PERMISSIONS['dropshipping.dashboard.view'],
-    PERMISSIONS['dropshipping.products.view'],
-    PERMISSIONS['dropshipping.orders.view'],
-    PERMISSIONS['analytics.view'],
-    PERMISSIONS['reports.view'],
-    PERMISSIONS['partners.view'],
-  ],
 
   // Manager
   [ROLES.MANAGER]: [

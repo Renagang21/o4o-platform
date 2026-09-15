@@ -86,7 +86,6 @@ export {
   netureGuideFeatureB2BContentProps,
   netureGuideFeatureEventOfferProps,
   netureGuideFeatureMarketTrialProps,
-  netureGuideFeaturePartnerProgramProps,
   netureGuideFeatureForumResourcesProps,
   netureGuideFeatureCopilotDashboardProps,
   // WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-IA-PHASE1-V1

@@ -65,7 +65,6 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
         pendingRegsRow,
         pendingSuppliersRow,
         unreadMessagesRow,
-        partnerRequestsRow,
       ] = await Promise.all([
         dataSource.query(
           `SELECT COUNT(*)::int AS cnt, MIN(created_at) AS oldest
@@ -85,18 +84,12 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
            FROM neture_contact_messages
            WHERE status != 'resolved'`,
         ),
-        dataSource.query(
-          `SELECT COUNT(*)::int AS cnt, MIN(created_at) AS oldest
-           FROM neture_partnership_requests
-           WHERE status = 'OPEN'`,
-        ),
       ]);
 
       const pendingRegs = pendingRegsRow[0]?.cnt || 0;
       const pendingSuppliers = pendingSuppliersRow[0]?.cnt || 0;
       // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: pendingProducts(OSA) 제거
       const unreadMessages = unreadMessagesRow[0]?.cnt || 0;
-      const partnerRequests = partnerRequestsRow[0]?.cnt || 0;
 
       // Active products for AI context
       const activeProductsRow = await dataSource.query(
@@ -164,18 +157,6 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
           actionApi: '/neture/operator/actions/execute/inquiries-mark-read',
           actionMethod: 'POST',
         },
-        {
-          id: 'partner-requests',
-          type: 'approval',
-          title: '파트너 요청',
-          description: '파트너십 요청이 대기 중입니다.',
-          count: partnerRequests,
-          oldest: partnerRequestsRow[0]?.oldest || null,
-          actionUrl: '/operator/applications',
-          actionLabel: '요청 관리',
-          alwaysHigh: false,
-          actionType: 'NAVIGATE',
-        },
       ];
 
       const systemItems: ActionQueueItem[] = definitions
@@ -209,7 +190,6 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
         pendingInquiries: unreadMessages,
         activeProducts,
         pendingRegs,
-        partnerRequests,
       });
 
       const aiItems: ActionQueueItem[] = aiRaw.map((a) => ({

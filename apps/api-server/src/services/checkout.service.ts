@@ -54,7 +54,6 @@ export interface CreateOrderDto {
   buyerId: string;
   sellerId: string;
   supplierId: string;
-  partnerId?: string;
   sellerOrganizationId?: string; // WO-CHECKOUT-ORG-BOUNDARY-FIX-V1
   items: OrderItem[];
   shippingAddress?: ShippingAddress;
@@ -183,7 +182,6 @@ class CheckoutService {
       buyerId: dto.buyerId,
       sellerId: dto.sellerId,
       supplierId: dto.supplierId,
-      partnerId: dto.partnerId,
       sellerOrganizationId: dto.sellerOrganizationId,
       items: dto.items,
       subtotal,
@@ -453,7 +451,6 @@ class CheckoutService {
     status?: CheckoutOrderStatus;
     paymentStatus?: CheckoutPaymentStatus;
     supplierId?: string;
-    partnerId?: string;
     limit?: number;
     offset?: number;
   }): Promise<{ orders: CheckoutOrder[]; total: number }> {
@@ -472,11 +469,6 @@ class CheckoutService {
     if (filters?.supplierId) {
       query.andWhere('order.supplierId = :supplierId', {
         supplierId: filters.supplierId,
-      });
-    }
-    if (filters?.partnerId) {
-      query.andWhere('order.partnerId = :partnerId', {
-        partnerId: filters.partnerId,
       });
     }
 

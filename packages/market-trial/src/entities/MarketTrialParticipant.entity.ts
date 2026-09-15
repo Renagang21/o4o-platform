@@ -1,7 +1,7 @@
 /**
  * MarketTrialParticipant Entity
  *
- * Represents a seller or partner participating in a market trial.
+ * Represents a store owner (seller) participating in a market trial.
  * Phase 1: Entity definition only (minimal fields).
  * Phase 2 (WO-MARKET-TRIAL-PHASE2-PARTICIPANT-DASHBOARD-AND-SETTLEMENT-STATE-V1):
  *   정산 선택/상태 필드 추가.
@@ -21,7 +21,8 @@ import {
 export enum ParticipantType {
   /** WO-O4O-NETURE-MARKET-TRIAL-PARTICIPANT-ENUM-FIX-V1: primary type for store owners */
   STORE_OWNER = 'store_owner',
-  PARTNER = 'partner',
+  // PARTNER ('partner') — 은퇴. WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
+  //   Legacy Partner 참여 경로·UI 소비 제거. 컬럼은 varchar(20) 이라 DB enum 정리 대상은 없다(프로덕션 row 0건 실측).
   /** Legacy: pre-existing rows stored as 'seller'. Keep for backward compatibility. */
   SELLER = 'seller',
 }
@@ -40,8 +41,7 @@ export class MarketTrialParticipant {
   marketTrialId!: string;
 
   /**
-   * Participant ID (seller or partner ID)
-   * References dropshipping_sellers.id or partners table
+   * Participant ID (store owner / seller user id)
    */
   @Column({ type: 'uuid' })
   @Index()

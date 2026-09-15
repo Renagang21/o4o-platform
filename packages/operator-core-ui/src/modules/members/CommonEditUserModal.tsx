@@ -91,7 +91,7 @@ export interface EditUserModalConfig {
   /**
    * service_memberships.role 드롭다운 옵션.
    * 서비스마다 허용 역할이 다르므로 wrapper 에서 정의한다.
-   * e.g. Neture: [supplier, partner] / GP: [pharmacy, supplier] / K-Cos: [seller, consumer, ...]
+   * e.g. Neture: [supplier] / GP: [pharmacy, supplier] / K-Cos: [seller, consumer, ...]
    */
   membershipRoleOptions: EditUserModalOption[];
   /**

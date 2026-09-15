@@ -1,10 +1,10 @@
 /**
  * WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1
+ * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: partner 게이트 은퇴
  *
- * 업무 공간 게이트는 role 문자열이 아니라 **서비스별 이용 상태**로 연다.
+ * 업무 공간 게이트는 role 문자열이 아니라 **서비스 이용 상태**로 연다.
  *   - active 만 children · 그 외는 상태별 안내 + 'O4O 홈으로'(로그인 유지)
  *   - 조회 실패는 미가입으로 취급하지 않는다
- *   - 한 서비스 상태는 다른 서비스 게이트에 영향을 주지 않는다
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
@@ -14,7 +14,7 @@ const authState = { user: { id: 'u1', email: 'u1@example.test', name: '회원', 
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: authState.user, isAuthenticated: !!authState.user }) }));
 
 const statesResult = {
-  states: null as null | { supplier: { status: string; source: string }; partner: { status: string; source: string } },
+  states: null as null | { supplier: { status: string; source: string } },
   loading: false,
   error: null as string | null,
   reload: vi.fn(),
@@ -24,15 +24,14 @@ vi.mock('../../../lib/apiClient', () => ({ api: { get: vi.fn(), post: vi.fn() } 
 
 import { ServiceUsageGate } from '../ServiceUsageGate';
 
-const st = (supplier: string, partner: string) => ({
+const st = (supplier: string) => ({
   supplier: { status: supplier, source: 'test' },
-  partner: { status: partner, source: 'test' },
 });
 
-function mount(service: 'supplier' | 'partner') {
+function mount() {
   return render(
     <MemoryRouter>
-      <ServiceUsageGate service={service}>
+      <ServiceUsageGate service="supplier">
         <div data-testid="work-area">업무 공간</div>
       </ServiceUsageGate>
     </MemoryRouter>,
@@ -49,15 +48,15 @@ describe('ServiceUsageGate', () => {
   });
 
   it('공급자 active → 업무 공간을 연다', () => {
-    statesResult.states = st('active', 'none');
-    mount('supplier');
+    statesResult.states = st('active');
+    mount();
     expect(screen.getByTestId('work-area')).toBeTruthy();
   });
 
   it('공급자 role 이 있어도 상태가 none 이면 신청 안내 + O4O 홈으로 (로그아웃 버튼 없음)', () => {
     authState.user!.roles = ['supplier', 'neture:supplier'];
-    statesResult.states = st('none', 'none');
-    mount('supplier');
+    statesResult.states = st('none');
+    mount();
     expect(screen.queryByTestId('work-area')).toBeNull();
     expect(screen.getByTestId('service-gate-supplier-none')).toBeTruthy();
     expect(screen.getByText('공급자 서비스 신청')).toBeTruthy();
@@ -65,12 +64,9 @@ describe('ServiceUsageGate', () => {
     expect(screen.queryByText(/로그아웃/)).toBeNull();
   });
 
-  it('공급자 정지 + 파트너 active: 파트너 게이트는 열리고 공급자 게이트는 정지 안내', () => {
-    statesResult.states = st('suspended', 'active');
-    const a = mount('partner');
-    expect(screen.getByTestId('work-area')).toBeTruthy();
-    a.unmount();
-    mount('supplier');
+  it('공급자 정지 → 정지 안내', () => {
+    statesResult.states = st('suspended');
+    mount();
     expect(screen.queryByTestId('work-area')).toBeNull();
     expect(screen.getByTestId('service-gate-supplier-suspended')).toBeTruthy();
   });
@@ -79,16 +75,16 @@ describe('ServiceUsageGate', () => {
     ['pending', '신청 상태 보기'],
     ['rejected', '다시 신청하기'],
     ['withdrawn', '다시 신청하기'],
-  ])('파트너 %s → 안내 + %s', (status, label) => {
-    statesResult.states = st('none', status);
-    mount('partner');
-    expect(screen.getByTestId(`service-gate-partner-${status}`)).toBeTruthy();
+  ])('공급자 %s → 안내 + %s', (status, label) => {
+    statesResult.states = st(status);
+    mount();
+    expect(screen.getByTestId(`service-gate-supplier-${status}`)).toBeTruthy();
     expect(screen.getByText(label)).toBeTruthy();
   });
 
   it('조회 실패는 미가입 안내가 아니라 재시도 화면', () => {
     statesResult.error = '서비스 이용 상태를 불러오지 못했습니다.';
-    mount('supplier');
+    mount();
     expect(screen.getByTestId('service-gate-error')).toBeTruthy();
     expect(screen.queryByTestId('service-gate-supplier-none')).toBeNull();
     expect(screen.getByText('다시 시도')).toBeTruthy();
@@ -96,9 +92,9 @@ describe('ServiceUsageGate', () => {
 
   it('관리자도 예외 없음 — 서비스 행이 없으면 신청 안내(서버 guard 와 동일 · 401→로그아웃 연쇄 방지)', () => {
     authState.user!.roles = ['neture:admin', 'platform:super_admin'];
-    statesResult.states = st('none', 'none');
-    mount('partner');
+    statesResult.states = st('none');
+    mount();
     expect(screen.queryByTestId('work-area')).toBeNull();
-    expect(screen.getByTestId('service-gate-partner-none')).toBeTruthy();
+    expect(screen.getByTestId('service-gate-supplier-none')).toBeTruthy();
   });
 });

@@ -11,12 +11,6 @@ import {
   NetureCurrency,
   NetureProductImage,
 } from '../entities/neture-product.entity.js';
-import {
-  NeturePartnerType,
-  NeturePartnerStatus,
-  NeturePartnerContact,
-  NeturePartnerAddress,
-} from '../entities/neture-partner.entity.js';
 import { NetureLogAction } from '../entities/neture-product-log.entity.js';
 import {
   NetureOrderStatus,
@@ -51,7 +45,6 @@ export interface ErrorResponseDto {
 
 export interface ProductDto {
   id: string;
-  partner_id: string | null;
   name: string;
   subtitle: string | null;
   description: string | null;
@@ -68,13 +61,11 @@ export interface ProductDto {
   view_count: number;
   created_at: string;
   updated_at: string;
-  partner?: PartnerDto;
 }
 
 export interface ListProductsQueryDto {
   page?: number;
   limit?: number;
-  partner_id?: string;
   category?: NetureProductCategory;
   status?: NetureProductStatus;
   is_featured?: boolean;
@@ -94,7 +85,6 @@ export interface ListProductsResponseDto {
 }
 
 export interface CreateProductRequestDto {
-  partner_id?: string;
   name: string;
   subtitle?: string;
   description?: string;
@@ -111,7 +101,6 @@ export interface CreateProductRequestDto {
 }
 
 export interface UpdateProductRequestDto {
-  partner_id?: string;
   name?: string;
   subtitle?: string;
   description?: string;
@@ -129,74 +118,6 @@ export interface UpdateProductRequestDto {
 
 export interface UpdateProductStatusRequestDto {
   status: NetureProductStatus;
-}
-
-// ============================================================================
-// Partner DTOs
-// ============================================================================
-
-export interface PartnerDto {
-  id: string;
-  name: string;
-  business_name: string | null;
-  business_number: string | null;
-  type: NeturePartnerType;
-  status: NeturePartnerStatus;
-  description: string | null;
-  logo: string | null;
-  website: string | null;
-  contact: NeturePartnerContact | null;
-  address: NeturePartnerAddress | null;
-  /** WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1: Identity(users.status) */
-  identity_status: string | null;
-  user_email: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ListPartnersQueryDto {
-  page?: number;
-  limit?: number;
-  type?: NeturePartnerType;
-  status?: NeturePartnerStatus;
-  sort?: 'created_at' | 'name';
-  order?: 'asc' | 'desc';
-}
-
-export interface ListPartnersResponseDto {
-  data: PartnerDto[];
-  meta: PaginationMeta;
-}
-
-export interface CreatePartnerRequestDto {
-  name: string;
-  business_name?: string;
-  business_number?: string;
-  type?: NeturePartnerType;
-  description?: string;
-  logo?: string;
-  website?: string;
-  contact?: NeturePartnerContact;
-  address?: NeturePartnerAddress;
-  user_id?: string;
-  metadata?: Record<string, any>;
-}
-
-export interface UpdatePartnerRequestDto {
-  name?: string;
-  business_name?: string;
-  business_number?: string;
-  type?: NeturePartnerType;
-  description?: string;
-  logo?: string;
-  website?: string;
-  contact?: NeturePartnerContact;
-  address?: NeturePartnerAddress;
-  metadata?: Record<string, any>;
-}
-
-export interface UpdatePartnerStatusRequestDto {
-  status: NeturePartnerStatus;
 }
 
 // ============================================================================

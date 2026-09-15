@@ -8,9 +8,9 @@
  *
  * - 목록: apiClient(/api/v1/kpa) → GET /store/seller-recruitments
  *     (backend 가 serviceKey='kpa-society' · approved · recruiting 을 고정 — 프론트 필터 의존 없음)
- * - 참여: coreApiClient(/api/v1) → POST /neture/partner/applications { recruitmentId }
+ * - 참여: coreApiClient(/api/v1) → POST /neture/seller-recruitment/applications { recruitmentId }
  *     (backend 가 NOT_EXPOSED/CLOSED/DUPLICATE 강제)
- * - 이미 신청: coreApiClient → GET /neture/partner/applications/mine
+ * - 이미 신청: coreApiClient → GET /neture/seller-recruitment/applications/mine
  * - 상세: 목록 데이터로 modal 구성(별도 상세 API 없음 — 운영자 검토 정보 미노출).
  */
 import { useCallback, useEffect, useState } from 'react';
@@ -66,7 +66,7 @@ export default function SellerRecruitmentsBrowsePage() {
       const [listRes, mineRes] = await Promise.all([
         apiClient.get<{ success: boolean; data: SellerRecruitment[] }>('/store/seller-recruitments'),
         coreApiClient
-          .get<{ success: boolean; data: MyApplication[] }>('/neture/partner/applications/mine')
+          .get<{ success: boolean; data: MyApplication[] }>('/neture/seller-recruitment/applications/mine')
           .catch(() => null),
       ]);
       setItems(listRes?.data ?? []);
@@ -101,7 +101,7 @@ export default function SellerRecruitmentsBrowsePage() {
   const handleApply = async (recruitmentId: string) => {
     setApplyingId(recruitmentId);
     try {
-      await coreApiClient.post('/neture/partner/applications', { recruitmentId });
+      await coreApiClient.post('/neture/seller-recruitment/applications', { recruitmentId });
       setAppliedIds((prev) => new Set(prev).add(recruitmentId));
       showToast('참여 신청이 완료되었습니다. 신청·승인 현황에서 확인할 수 있습니다.');
     } catch (e: any) {

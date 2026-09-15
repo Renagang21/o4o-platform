@@ -1,9 +1,12 @@
 # Neture Partner Contract Freeze v1.0
 
-> **[2026-09-15 · 판정 대기 표기 — Legacy Partner 전면 은퇴 대상]** 본 계약이 기술하는 Partner(제휴 · 커미션 · 정산)는
-> [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7 에 따라 `CURRENT PARTNER = FULL RETIREMENT` 다.
-> 프로덕션 partner 테이블 · role 보유자 0건 실측 ([`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md) §B-2).
-> Partner Retirement WO 완료 전까지 **기능 복구·확장 금지**. 완료 시 SUPERSEDED 표기 후 archive. 본문은 수정하지 않았다.
+> **상태**: SUPERSEDED · **대체 문서**: [`docs/baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7 (`CURRENT PARTNER = FULL RETIREMENT`) · **표기일**: 2026-09-15
+>
+> 본 계약이 기술하던 Legacy Partner(제휴 · 커미션 · 정산 · `neture_seller_partner_contracts` · `neture:partner` role)는
+> `WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1` 로 **runtime 에서 전면 은퇴**했다
+> (기록: [`CHECK`](../checks/CHECK-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1.md)).
+> 판매자 모집(Recruitment / Application)은 Partner 가 아니므로 `SellerRecruitment` 도메인으로 분리 보존됐다.
+> 물리 테이블 DROP 은 후속 physical cleanup WO 대상이며, 그 전까지 이 문서는 Frozen 계약이 아니라 **역사 기록**이다. 본문은 수정하지 않았다.
 
 > **WO-NETURE-SELLER-PARTNER-CONTRACT-V1 + ATOMICITY-PATCH-V1 완료 후 기준선 고정**
 > **Freeze Date: 2026-02-24**

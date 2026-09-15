@@ -4,10 +4,10 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Package, Handshake, Wrench, ShoppingCart, Info, type LucideIcon } from 'lucide-react';
+import { Package, Wrench, ShoppingCart, Info, type LucideIcon } from 'lucide-react';
 
 interface RoleNotAvailablePageProps {
-  role: 'supplier' | 'partner' | 'admin' | 'seller';
+  role: 'supplier' | 'admin' | 'seller';
 }
 
 const ROLE_INFO: Record<RoleNotAvailablePageProps['role'], { label: string; Icon: LucideIcon; description: string }> = {
@@ -15,11 +15,6 @@ const ROLE_INFO: Record<RoleNotAvailablePageProps['role'], { label: string; Icon
     label: '공급자',
     Icon: Package,
     description: '상품 공급 및 재고 관리',
-  },
-  partner: {
-    label: '파트너',
-    Icon: Handshake,
-    description: '파트너십 및 연계 서비스 관리',
   },
   admin: {
     label: '관리자',

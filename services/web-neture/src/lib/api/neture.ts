@@ -1,5 +1,5 @@
 /**
- * Neture Core API - Suppliers & Partnership
+ * Neture Core API - Suppliers (Partnership 요청 API 는 WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 로 은퇴)
  *
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  */
@@ -13,11 +13,11 @@ export type ContactVisibility = 'public' | 'partners' | 'private';
 
 export interface TrustSignals {
   contactCompleteness: number; // 0-4
-  hasApprovedPartners: boolean;
+  hasApprovedBuyers: boolean;
   recentActivity: boolean;
 }
 
-export type ContactHint = 'available' | 'partner_exclusive' | 'not_registered' | 'private' | 'partners_only';
+export type ContactHint = 'available' | 'approved_buyer_exclusive' | 'not_registered' | 'private' | 'approved_buyers_only';
 
 export interface ContactHints {
   email: ContactHint;
@@ -69,44 +69,6 @@ export interface SupplierDetail {
   trustSignals?: TrustSignals;
 }
 
-export interface PartnershipRequest {
-  id: string;
-  seller: {
-    id: string;
-    name: string;
-    serviceType: string;
-    storeUrl: string;
-  };
-  productCount: number;
-  period: {
-    start: string;
-    end: string;
-  };
-  revenueStructure: string;
-  status: 'OPEN' | 'MATCHED' | 'CLOSED';
-}
-
-export interface PartnershipRequestDetail extends PartnershipRequest {
-  products: Array<{
-    id: string;
-    name: string;
-    category: string;
-  }>;
-  promotionScope: {
-    sns: boolean;
-    content: boolean;
-    banner: boolean;
-    other: string;
-  };
-  contact: {
-    email: string;
-    phone: string;
-    kakao: string;
-  };
-  createdAt: string;
-  matchedAt: string | null;
-}
-
 /**
  * API Client
  */
@@ -122,44 +84,4 @@ export const netureApi = {
     return response.data;
   },
 
-  async getPartnershipRequests(status?: 'OPEN' | 'MATCHED' | 'CLOSED'): Promise<PartnershipRequest[]> {
-    try {
-      const url = status
-        ? `/neture/partnership/requests?status=${status}`
-        : '/neture/partnership/requests';
-
-      const response = await api.get(url);
-      const data = response.data;
-      return data.requests || [];
-    } catch (error) {
-      // 조회 실패를 빈 목록으로 위장하지 않는다(4상태 계약) — 호출층이 error 를 판정한다.
-      console.warn('[Neture API] Failed to fetch partnership requests:', error);
-      throw error;
-    }
-  },
-
-  async getPartnershipRequestById(id: string): Promise<PartnershipRequestDetail> {
-    const response = await api.get(`/neture/partnership/requests/${id}`);
-    return response.data;
-  },
-
-  async createPartnershipRequest(data: {
-    sellerName: string;
-    sellerServiceType?: string;
-    sellerStoreUrl?: string;
-    periodStart?: string;
-    periodEnd?: string;
-    revenueStructure?: string;
-    promotionSns?: boolean;
-    promotionContent?: boolean;
-    promotionBanner?: boolean;
-    promotionOther?: string;
-    contactEmail?: string;
-    contactPhone?: string;
-    contactKakao?: string;
-    products?: Array<{ name: string; category?: string }>;
-  }): Promise<{ success: boolean; data?: { id: string; status: string; createdAt: string }; error?: string }> {
-    const response = await api.post('/neture/partnership/requests', data);
-    return response.data;
-  },
 };

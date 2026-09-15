@@ -6,7 +6,6 @@
  */
 
 export * from './neture-product.entity.js';
-export * from './neture-partner.entity.js';
 export * from './neture-product-log.entity.js';
 export * from './neture-order.entity.js';
 export * from './neture-order-item.entity.js';

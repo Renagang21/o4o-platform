@@ -21,7 +21,6 @@ import logger from '../../../utils/logger.js';
 import { AppDataSource } from '../../../database/connection.js';
 import type { ActionLogService } from '@o4o/action-log-core';
 import type { NetureService } from '../neture.service.js';
-import { PartnershipStatus } from '../entities/NeturePartnershipRequest.entity.js';
 
 type AuthenticatedRequest = Request & {
   user?: {
@@ -386,45 +385,7 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
     }
   });
 
-  /**
-   * POST /hub/trigger/manage-partnership
-   * 관리자: 제휴 요청 현황 확인
-   */
-  router.post('/manage-partnership', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
-    const start = Date.now();
-    try {
-      const openRequests = await netureService.getPartnershipRequests({ status: PartnershipStatus.OPEN });
-      const count = openRequests?.length ?? 0;
-
-      const userId = getUserId(req);
-      if (userId) {
-        actionLogService?.logSuccess('neture', userId, 'neture.trigger.manage_partnership', {
-          durationMs: Date.now() - start,
-          meta: { openCount: count },
-        }).catch(() => {});
-      }
-
-      if (count === 0) {
-        res.json({ success: true, message: '대기 중인 제휴 요청이 없습니다.' });
-        return;
-      }
-
-      res.json({
-        success: true,
-        message: `열린 제휴 요청 ${count}건. 파트너십 관리에서 확인하세요.`,
-        data: { openCount: count },
-      });
-    } catch (error: unknown) {
-      const userId = getUserId(req);
-      if (userId) {
-        actionLogService?.logFailure('neture', userId, 'neture.trigger.manage_partnership', getErrorMessage(error), {
-          durationMs: Date.now() - start,
-        }).catch(() => {});
-      }
-      logger.error('[Neture Hub Trigger] manage-partnership error:', error);
-      res.status(500).json({ success: false, message: '제휴 요청 조회 실패' });
-    }
-  });
+  // (은퇴) POST /hub/trigger/manage-partnership — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
 
   /**
    * POST /hub/trigger/audit-review

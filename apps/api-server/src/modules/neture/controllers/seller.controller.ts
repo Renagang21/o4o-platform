@@ -20,15 +20,12 @@
  * 공급자 계약 API는 /supplier/contracts로 이동됨.
  * → WO-O4O-NETURE-SELLER-CONTRACT-TO-SUPPLIER-MIGRATION-V1
  *
- * Partner Contracts (mounted separately at /partner prefix):
- *     GET  /contracts                             (partner contracts)
- *     POST /contracts/:id/terminate               (partner terminate contract)
+ * (은퇴) Partner Contracts — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
  */
 import { Router } from 'express';
 import type { Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
-import { createRequireActivePartner } from '../middleware/neture-identity.middleware.js';
 import type { AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import { NetureService } from '../neture.service.js';
 import { NetureService as LegacyNetureService } from '../../../routes/neture/services/neture.service.js';
@@ -345,7 +342,7 @@ export function createSellerController(dataSource: DataSource): Router {
    *   완전 삭제는 일정 기간 호출 0건 확인 후 별도 WO(...-REMOVE-V2).
    *
    * 이전 동작 (참고): WO-O4O-STORE-CART-PAGE-V1 6-gate 주문 생성 +
-   *   WO-O4O-PARTNER-HUB-CORE-V1 referral attribution. canonical cutover(P2d-2)로 대체됨.
+   *   (은퇴한 Legacy Partner) referral attribution. canonical cutover(P2d-2)로 대체됨.
    */
   router.post('/orders', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
     return res.status(410).json({
@@ -355,68 +352,6 @@ export function createSellerController(dataSource: DataSource): Router {
       canonicalAction: 'store_cart_checkout_b2b',
       canonicalRoute: '/api/v1/store/cart/neture/checkout-confirm-b2b',
     });
-  });
-
-  return router;
-}
-
-// ==================== Partner Contract Controller ====================
-
-/**
- * Partner-facing contract routes — mounted at /partner prefix
- * WO-NETURE-SELLER-PARTNER-CONTRACT-V1
- */
-export function createPartnerContractController(dataSource: DataSource): Router {
-  const router = Router();
-  const netureService = new NetureService();
-  const requireActivePartner = createRequireActivePartner(dataSource);
-
-  /**
-   * GET /contracts
-   * Partner 계약 목록 조회
-   * Query: ?status=active|terminated|expired
-   */
-  router.get('/contracts', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
-      }
-
-      const { status } = req.query;
-      const contracts = await netureService.getPartnerContracts(userId, status as string | undefined);
-      res.json({ success: true, data: contracts });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching partner contracts:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch contracts' });
-    }
-  });
-
-  /**
-   * POST /contracts/:id/terminate
-   * Partner가 계약 해지
-   */
-  router.post('/contracts/:id/terminate', requireAuth, requireActivePartner as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
-      }
-
-      const { id } = req.params;
-      const result = await netureService.terminateContract(id, userId, 'partner');
-      res.json({ success: true, data: result });
-    } catch (error) {
-      const msg = (error as Error).message;
-      if (msg === 'CONTRACT_NOT_FOUND') {
-        return res.status(404).json({ success: false, error: 'NOT_FOUND', message: '계약을 찾을 수 없습니다.' });
-      }
-      if (msg === 'CONTRACT_NOT_ACTIVE') {
-        return res.status(400).json({ success: false, error: 'INVALID_STATUS', message: '활성 상태의 계약만 해지할 수 있습니다.' });
-      }
-      logger.error('[Neture API] Error terminating contract (partner):', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to terminate contract' });
-    }
   });
 
   return router;

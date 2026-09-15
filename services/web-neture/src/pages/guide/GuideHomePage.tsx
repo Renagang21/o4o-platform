@@ -164,18 +164,6 @@ const homeProps: GuideFeaturesPageProps = {
       ],
       linkTo: '/guide/for-seller',
     },
-    {
-      step: '07',
-      title: '파트너 안내',
-      primaryRoute: '/partner',
-      description:
-        '현재 파트너는 사이트 URL 기반 제휴자/인플루언서 구조입니다. 제휴 URL · 추천인 구조 · 유입/성과 확인을 안내합니다.',
-      items: [
-        { label: '파트너 참여 안내', route: '/partner' },
-        { label: '파트너 프로그램 가이드', route: '/guide/features/partner-program' },
-      ],
-      linkTo: '/partner',
-    },
   ],
   bottomNav: {
     prev: { label: '← 홈으로', to: '/' },

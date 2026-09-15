@@ -91,12 +91,8 @@ export class CheckoutOrder {
   @Column({ type: 'uuid', nullable: true })
   sellerOrganizationId?: string;
 
-  /**
-   * 파트너 ID (Attribution)
-   */
-  @Index()
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  partnerId?: string;
+  // partnerId (Legacy Partner attribution) 매핑 제거 — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
+  //   물리 컬럼 checkout_orders."partnerId"(nullable, 0건 사용) 는 physical cleanup 대상.
 
   /**
    * 상품 금액 합계

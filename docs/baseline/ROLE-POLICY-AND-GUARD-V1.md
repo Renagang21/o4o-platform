@@ -132,7 +132,7 @@ requireScope('{service}:branch_admin') + validateBranchOwnership()
 |--------|------|
 | platform | `platform:super_admin` |
 | kpa | `kpa:admin`, `kpa:operator`, `kpa:district_admin`, `kpa:branch_admin`, `kpa:branch_operator` |
-| neture | `neture:admin`, `neture:operator`, `neture:supplier`, `neture:partner` |
+| neture | `neture:admin`, `neture:operator`, `neture:supplier` (`neture:partner` 는 2026-09-15 Legacy Partner 은퇴로 scope 제거) |
 | glycopharm | `glycopharm:admin`, `glycopharm:operator` |
 
 ### Frontend 역할 매핑

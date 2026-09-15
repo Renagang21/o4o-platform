@@ -192,21 +192,6 @@ describe('Neture Scope Guard', () => {
       const result = await executeGuard(guard, user);
       expect(result.allowed).toBe(false);
     });
-
-    // neture:partner → neture:partner OR neture:admin
-    it('neture:partner scope → neture:partner allowed', async () => {
-      const guard = requireNetureScope('neture:partner');
-      const user = createMockUser({ roles: ['neture:partner'] });
-      const result = await executeGuard(guard, user);
-      expect(result.allowed).toBe(true);
-    });
-
-    it('neture:partner scope → neture:admin allowed (hierarchy)', async () => {
-      const guard = requireNetureScope('neture:partner');
-      const user = createMockUser({ roles: ['neture:admin'] });
-      const result = await executeGuard(guard, user);
-      expect(result.allowed).toBe(true);
-    });
   });
 
   describe('platform bypass ENABLED', () => {

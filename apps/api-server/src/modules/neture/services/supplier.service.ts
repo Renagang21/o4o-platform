@@ -8,8 +8,6 @@ import {
   SupplierStatus,
   ContactVisibility,
 } from '../entities/index.js';
-import type { NeturePartner } from '../../../routes/neture/entities/neture-partner.entity.js';
-import { NeturePartnerStatus } from '../../../routes/neture/entities/neture-partner.entity.js';
 import logger from '../../../utils/logger.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 import { ServiceMembership } from '../../auth/entities/ServiceMembership.js';
@@ -821,7 +819,8 @@ export class NetureSupplierService {
     }
   }
 
-  async hasApprovedPartnership(supplierId: string, viewerId: string): Promise<boolean> {
+  /** viewer(조직) 가 이 공급자의 PRIVATE 공급 승인을 받은 거래처인가 — Legacy Partner 와 무관(ContactVisibility.PARTNERS = 승인 거래처) */
+  async hasApprovedPrivateSupply(supplierId: string, viewerId: string): Promise<boolean> {
     try {
       const [{ count }] = await AppDataSource.query(
         `SELECT COUNT(*)::int AS count FROM product_approvals pa
@@ -832,7 +831,7 @@ export class NetureSupplierService {
       );
       return count > 0;
     } catch (error) {
-      logger.error('[NetureSupplierService] Error checking partnership:', error);
+      logger.error('[NetureSupplierService] Error checking approved private supply:', error);
       return false;
     }
   }
@@ -849,11 +848,11 @@ export class NetureSupplierService {
       const org = await this.getOrgData(supplier.organizationId);
 
       const isOwner = !!viewerId && supplier.userId === viewerId;
-      const isPartner = !!viewerId && !isOwner
-        ? await this.hasApprovedPartnership(supplier.id, viewerId)
+      const isApprovedBuyer = !!viewerId && !isOwner
+        ? await this.hasApprovedPrivateSupply(supplier.id, viewerId)
         : false;
-      const contact = this.filterContactInfo(supplier, viewerId || null, isPartner, isOwner);
-      const contactHints = this.computeContactHints(supplier, isPartner, isOwner);
+      const contact = this.filterContactInfo(supplier, viewerId || null, isApprovedBuyer, isOwner);
+      const contactHints = this.computeContactHints(supplier, isApprovedBuyer, isOwner);
       const trustSignals = await this.computeTrustSignals(supplier.id, supplier);
 
       return {
@@ -1222,7 +1221,7 @@ export class NetureSupplierService {
    * 4. contactEmail - 이메일 (public/partners)
    * 5. contactWebsite - 웹사이트 (public/partners)
    * 6. contactKakao - 카카오톡 (public/partners)
-   * 7. hasApprovedPartners - 파트너 승인 1건+
+   * 7. hasApprovedBuyers - PRIVATE 공급 승인 거래처 1건+
    * 8. recentActivity - 최근 30일 활동
    *
    * Phone excluded (private allowed).
@@ -1276,7 +1275,7 @@ export class NetureSupplierService {
         missing.push('kakao');
       }
 
-      // 7. hasApprovedPartners (1+ approved PRIVATE approval)
+      // 7. hasApprovedBuyers (1+ approved PRIVATE approval)
       // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
       const [{ count: pApprovedCount }] = await AppDataSource.query(
         `SELECT COUNT(*)::int AS count FROM product_approvals pa
@@ -1285,7 +1284,7 @@ export class NetureSupplierService {
         [supplierId],
       );
       if (pApprovedCount === 0) {
-        missing.push('partnerApproval');
+        missing.push('privateSupplyApproval');
       }
 
       // 8. recentActivity (30 days)
@@ -1340,7 +1339,7 @@ export class NetureSupplierService {
 
     return {
       contactCompleteness: publicContacts,
-      hasApprovedPartners: approvedCount > 0,
+      hasApprovedBuyers: approvedCount > 0,
       recentActivity: recentCount > 0,
     };
   }
@@ -1348,14 +1347,14 @@ export class NetureSupplierService {
   private filterContactInfo(
     supplier: NetureSupplier,
     viewerId: string | null,
-    isPartner: boolean,
+    isApprovedBuyer: boolean,
     isOwner: boolean,
   ) {
     const canView = (visibility: ContactVisibility): boolean => {
       if (isOwner) return true;
       if (!viewerId) return false;
       if (visibility === ContactVisibility.PUBLIC) return true;
-      if (visibility === ContactVisibility.PARTNERS) return isPartner;
+      if (visibility === ContactVisibility.PARTNERS) return isApprovedBuyer;
       return false;
     };
     return {
@@ -1545,15 +1544,15 @@ export class NetureSupplierService {
 
   private computeContactHints(
     supplier: NetureSupplier,
-    isPartner: boolean,
+    isApprovedBuyer: boolean,
     isOwner: boolean,
   ) {
-    type ContactHint = 'available' | 'partner_exclusive' | 'not_registered' | 'private' | 'partners_only';
+    type ContactHint = 'available' | 'approved_buyer_exclusive' | 'not_registered' | 'private' | 'approved_buyers_only';
     const getHint = (value: string | null | undefined, visibility: ContactVisibility): ContactHint => {
       if (isOwner) return value ? 'available' : 'not_registered';
       if (!value) return 'not_registered';
       if (visibility === ContactVisibility.PUBLIC) return 'available';
-      if (visibility === ContactVisibility.PARTNERS) return isPartner ? 'partner_exclusive' : 'partners_only';
+      if (visibility === ContactVisibility.PARTNERS) return isApprovedBuyer ? 'approved_buyer_exclusive' : 'approved_buyers_only';
       return 'private';
     };
     return {

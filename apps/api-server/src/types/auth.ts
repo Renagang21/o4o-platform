@@ -13,7 +13,6 @@ export enum UserRole {
   VENDOR      = 'vendor',
   SELLER      = 'seller',
   SUPPLIER    = 'supplier',    // 공급자: 상품 제공, 재고 관리
-  PARTNER     = 'partner',     // 파트너: 제휴 마케팅, 커미션
   AFFILIATE   = 'affiliate',   // 제휴 파트너 (content-assets 접근 권한에서 사용)
   BUSINESS    = 'business',
   USER        = 'user',        // 일반 회원 (previously CUSTOMER)

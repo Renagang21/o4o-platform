@@ -27,7 +27,6 @@
 import {
   ADMIN_ROLES,
   OPERATOR_OR_ABOVE_ROLES,
-  PARTNER_ACCESS_ROLES,
   SUPPLIER_ACCESS_ROLES,
   SUPPLIER_ROLES,
 } from '../role-constants';
@@ -43,7 +42,6 @@ export type Workspace =
   | 'community'
   | 'store'
   | 'supplier'
-  | 'partner'
   | 'operator'
   | 'admin';
 
@@ -194,7 +192,6 @@ const SUPPLIER_EFFECTIVE_ROLES: string[] = SUPPLIER_ROLES.filter((r) =>
  *   admin     AdminRoute(ADMIN_ROLES) + requireMembership 'neture'
  *   operator  OperatorRoute(OPERATOR_OR_ABOVE_ROLES) + requireMembership 'neture'
  *   supplier  SupplierRoute ∩ SupplierSpaceLayout + requireMembership 'neture'
- *   partner   PartnerSpaceLayout / PartnerAccountLayout (PARTNER_ACCESS_ROLES) — route guard 없음 → membership 미요구
  *   store     route guard 없음. 단 매장 식별자가 서버 전용이라 클라이언트에서 확정 불가
  *   community / home  공개
  */
@@ -205,11 +202,6 @@ export const WORKSPACE_ACCESS: Readonly<Record<Workspace, WorkspaceAccessRule>> 
   supplier: {
     allowedRoles: SUPPLIER_EFFECTIVE_ROLES,
     requireMembership: true,
-    requiresStoreIdentity: false,
-  },
-  partner: {
-    allowedRoles: PARTNER_ACCESS_ROLES,
-    requireMembership: false,
     requiresStoreIdentity: false,
   },
   operator: {

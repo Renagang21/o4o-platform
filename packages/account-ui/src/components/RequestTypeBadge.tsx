@@ -27,7 +27,6 @@ const DEFAULT_TYPE_CONFIG: Record<string, RequestTypeConfig> = {
   membership:              { label: '가입',   tone: 'amber'   },
   service_application:     { label: '서비스', tone: 'blue'    },
   store_application:       { label: '매장',   tone: 'pink'    },
-  partner_application:     { label: '파트너', tone: 'emerald' },
   other:                   { label: '기타',   tone: 'slate'   },
 };
 

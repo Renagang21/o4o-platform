@@ -19,7 +19,6 @@ export interface OperatorThresholdConfig {
   content?: ThresholdRule;
   signage?: ThresholdRule;
   store?: ThresholdRule;
-  partner?: ThresholdRule;
   order?: ThresholdRule;
 }
 

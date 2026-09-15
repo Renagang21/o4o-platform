@@ -24,6 +24,7 @@
  */
 
 import type { DataSource } from 'typeorm';
+import { SELLER_RECRUITMENT_TABLE } from '../../../modules/neture/entities/SellerRecruitment.entity.js';
 import type { ContentQueryService } from '../../../modules/content/index.js';
 import type { SignageQueryService } from '../../../modules/signage/index.js';
 import type { ForumQueryService } from '../../../modules/forum/index.js';
@@ -101,7 +102,7 @@ interface SecondaryCounts {
   eventOfferPendingCount: number;
   productApplicationPendingCount: number;
   // WO-O4O-KPA-OPERATOR-SELLER-RECRUITMENT-PENDING-KPI-ACTION-QUEUE-V1:
-  //   판매자 모집 노출 승인 대기 = neture_partner_recruitments.exposure_status='pending'
+  //   판매자 모집 노출 승인 대기 = SellerRecruitment(legacy table).exposure_status='pending'
   //   (service_id='kpa-society' scope). 운영자 승인 큐(proxy GET ?exposureStatus=pending) 와 동일 조건.
   recruitmentExposurePendingCount: number;
   storeStats: { totalStores: number; activeStores: number } | null;
@@ -282,8 +283,9 @@ async function fetchSecondaryCounts(
     // WO-O4O-KPA-OPERATOR-SELLER-RECRUITMENT-PENDING-KPI-ACTION-QUEUE-V1:
     //   read-only count. service_id='kpa-society' AND exposure_status='pending' — 운영자 승인 큐 목록과
     //   동일 조건(getRecruitmentsForExposureReview: serviceId + exposureStatus, status/삭제 조건 없음).
+    //   물리 테이블명은 SellerRecruitment 엔티티의 legacy seam 상수만 안다 (WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1).
     dataSource.query(`
-      SELECT COUNT(*) AS count FROM neture_partner_recruitments
+      SELECT COUNT(*) AS count FROM ${SELLER_RECRUITMENT_TABLE}
       WHERE service_id = 'kpa-society' AND exposure_status = 'pending'
     `).catch(() => [{ count: '0' }]),
     dataSource.query(`

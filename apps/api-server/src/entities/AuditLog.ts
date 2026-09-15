@@ -42,7 +42,7 @@ export class AuditLog {
 
   /**
    * Type of entity being audited
-   * Examples: 'commission', 'conversion', 'policy', 'partner'
+   * Examples: 'policy', 'product', 'membership'
    */
   @Column({ type: 'varchar', length: 100 })
   entityType: string;

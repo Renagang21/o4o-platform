@@ -4,7 +4,7 @@
  * Phase 2: Decision (의사 표현) service.
  *
  * Responsibilities:
- * - Submit seller/partner decisions
+ * - Submit seller decisions (partner decision 은퇴 — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1)
  * - Check for duplicate decisions
  * - Record decision only (판매 전환은 별도 수동 등록)
  *
@@ -25,12 +25,6 @@ import {
 export interface SellerDecisionDto {
   participantId: string;
   decision: DecisionType;
-}
-
-export interface PartnerDecisionDto {
-  participantId: string;
-  decision: DecisionType;
-  sellerIds?: string[]; // Required when decision = CONTINUE
 }
 
 export interface DecisionResult {
@@ -133,52 +127,6 @@ export class MarketTrialDecisionService {
         participantType: ParticipantType.STORE_OWNER,
         decision: dto.decision,
         selectedSellerIds: null,
-      });
-
-      const savedDecision = await decisionRepo.save(decision);
-
-      // Decision 기록만 수행. 판매 전환은 별도 수동 등록으로 처리.
-      return {
-        decision: savedDecision,
-        applicationsCreated: 0,
-        applicationIds: [],
-      };
-    });
-  }
-
-  /**
-   * Submit partner decision
-   */
-  async submitPartnerDecision(trialId: string, dto: PartnerDecisionDto): Promise<DecisionResult> {
-    // Validate trial status
-    await this.validateTrialStatus(trialId);
-
-    // Validate participant
-    await this.validateParticipant(trialId, dto.participantId, [ParticipantType.PARTNER]);
-
-    // Check for duplicate decision
-    if (await this.hasDecisionAlready(trialId, dto.participantId)) {
-      throw new Error('Decision already submitted');
-    }
-
-    // For CONTINUE, sellerIds is required
-    if (dto.decision === DecisionType.CONTINUE) {
-      if (!dto.sellerIds || dto.sellerIds.length === 0) {
-        throw new Error('sellerIds required when decision is CONTINUE');
-      }
-    }
-
-    // Use transaction for atomicity
-    return await this.dataSource.transaction(async (manager) => {
-      const decisionRepo = manager.getRepository(MarketTrialDecision);
-
-      // Create decision record
-      const decision = decisionRepo.create({
-        marketTrialId: trialId,
-        participantId: dto.participantId,
-        participantType: ParticipantType.PARTNER,
-        decision: dto.decision,
-        selectedSellerIds: dto.sellerIds ? JSON.stringify(dto.sellerIds) : null,
       });
 
       const savedDecision = await decisionRepo.save(decision);

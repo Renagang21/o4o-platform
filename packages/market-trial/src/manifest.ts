@@ -11,7 +11,7 @@ export const marketTrialManifest = {
   displayName: 'Market Trial',
   version: '1.0.0',
   appType: 'extension' as const,
-  description: 'Supplier product trial funding with seller/partner participation',
+  description: 'Supplier product trial funding with store owner participation',
 
   // ===== Dependencies =====
   dependencies: {

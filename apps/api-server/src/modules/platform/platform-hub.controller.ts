@@ -168,7 +168,6 @@ const TRIGGER_WHITELIST: Record<string, Record<string, string>> = {
     'neture.trigger.refresh_settlement': 'refresh-settlement',
     'neture.trigger.refresh_ai': 'ai-refresh',
     'neture.trigger.approve_supplier': 'approve-supplier',
-    'neture.trigger.manage_partnership': 'manage-partnership',
     'neture.trigger.audit_review': 'audit-review',
   },
 };

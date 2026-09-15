@@ -5,8 +5,8 @@
  * Phase D-3: Admin Dashboard에 Neture 서비스 등록
  *
  * 조회 전용 (Read-Only):
- * - Partnership Requests: 조회만 가능 (승인/거절은 각 서비스에서 처리)
  * - Neture는 중앙 신청 시스템이 아님
+ * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: Partners · Partnership Requests 화면 은퇴
  */
 
 import React from 'react';
@@ -15,10 +15,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 // Lazy load pages for code splitting
 const ProductListPage = React.lazy(() => import('./ProductListPage'));
 const ProductDetailPage = React.lazy(() => import('./ProductDetailPage'));
-const PartnerListPage = React.lazy(() => import('./PartnerListPage'));
-const PartnerDetailPage = React.lazy(() => import('./PartnerDetailPage'));
-const PartnershipRequestListPage = React.lazy(() => import('./PartnershipRequestListPage'));
-const PartnershipRequestDetailPage = React.lazy(() => import('./PartnershipRequestDetailPage'));
 const SupplierListPage = React.lazy(() => import('./SupplierListPage'));
 const CategoryListPage = React.lazy(() => import('./CategoryListPage'));
 const BrandListPage = React.lazy(() => import('./BrandListPage'));
@@ -45,14 +41,6 @@ const NetureRouter: React.FC = () => {
         {/* Categories & Brands (WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1) */}
         <Route path="categories" element={<CategoryListPage />} />
         <Route path="brands" element={<BrandListPage />} />
-
-        {/* Partners */}
-        <Route path="partners" element={<PartnerListPage />} />
-        <Route path="partners/:partnerId" element={<PartnerDetailPage />} />
-
-        {/* Partnership Requests */}
-        <Route path="partnership-requests" element={<PartnershipRequestListPage />} />
-        <Route path="partnership-requests/:id" element={<PartnershipRequestDetailPage />} />
 
         {/* Default redirect */}
         <Route index element={<Navigate to="/neture/products" replace />} />

@@ -10,7 +10,6 @@ export { default as SupplierOrdersPage } from './SupplierOrdersPage';
 export { default as SupplierProfilePage } from './SupplierProfilePage';
 export { default as SupplierLibraryPage } from './SupplierLibraryPage';
 export { default as SupplierLibraryFormPage } from './SupplierLibraryFormPage';
-export { default as SupplierPartnerCommissionsPage } from './SupplierPartnerCommissionsPage';
 export { default as SupplierTrialCreatePage } from './SupplierTrialCreatePage';
 export { default as SupplierTrialListPage } from './SupplierTrialListPage';
 export { default as SupplierTrialDetailPage } from './SupplierTrialDetailPage';

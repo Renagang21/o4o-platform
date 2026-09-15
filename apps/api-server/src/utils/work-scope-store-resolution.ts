@@ -55,7 +55,7 @@ export type WorkScopeStoreReason =
   | 'MULTIPLE_ACCESSIBLE_STORES'
   /** 이 서비스는 매장 identity 축을 갖지 않는다(예: neture — organization 미연결). */
   | 'STORE_IDENTITY_NOT_SUPPORTED'
-  /** store 의미가 없는 workspace(home/community/operator/admin/supplier/partner). */
+  /** store 의미가 없는 workspace(home/community/operator/admin/supplier). */
   | 'WORKSPACE_NOT_STORE_SCOPED';
 
 export interface WorkScopeStoreResolution {
@@ -80,8 +80,8 @@ export interface WorkScopeStoreResolution {
 /**
  * store identity 가 의미를 갖는 workspace.
  *
- * 나머지(home/community/operator/admin/supplier/partner)는 이 해석의 대상이 아니다.
- * supplier/partner 가 organization context 를 필요로 하는지는 별도 축이라 이번 범위 밖이다.
+ * 나머지(home/community/operator/admin/supplier)는 이 해석의 대상이 아니다.
+ * supplier 가 organization context 를 필요로 하는지는 별도 축이라 이번 범위 밖이다.
  */
 export const STORE_SCOPED_WORKSPACES: readonly string[] = ['store'];
 

@@ -2,7 +2,7 @@
  * StoreRecruitmentApplicationsPage (KPA) — 신청·승인 현황
  *
  * WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
- * 기존 GET /neture/partner/applications/mine(neture 도메인, 본인 신청) 를 coreApiClient(/api/v1)로 조회.
+ * 기존 GET /neture/seller-recruitment/applications/mine(neture 도메인, 본인 신청) 를 coreApiClient(/api/v1)로 조회.
  * WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1: pending 신청 본인 취소.
  * WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1:
  *   조회 실패를 `setRows([])` 로 삼켜 "신청 내역 없음"으로 위장하던 문제 수정.
@@ -24,7 +24,7 @@ export default function StoreRecruitmentApplicationsPage() {
     setLoadError(null);
     try {
       const res = await coreApiClient.get<{ success: boolean; data: StoreRecruitmentApplicationRow[] }>(
-        '/neture/partner/applications/mine',
+        '/neture/seller-recruitment/applications/mine',
       );
       setRows(res?.data ?? []);
     } catch {
@@ -43,7 +43,7 @@ export default function StoreRecruitmentApplicationsPage() {
       if (!window.confirm('이 신청을 취소하면 공급자가 더 이상 해당 신청을 심사하지 않습니다.\n취소하시겠습니까?')) return;
       setCancellingId(applicationId);
       try {
-        await coreApiClient.post(`/neture/partner/applications/${applicationId}/cancel`);
+        await coreApiClient.post(`/neture/seller-recruitment/applications/${applicationId}/cancel`);
         await load();
       } catch {
         window.alert('신청 취소에 실패했습니다. 잠시 후 다시 시도해 주세요.');

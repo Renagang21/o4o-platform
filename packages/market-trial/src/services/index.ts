@@ -22,7 +22,6 @@ export type {
 export { MarketTrialDecisionService } from './MarketTrialDecisionService.js';
 export type {
   SellerDecisionDto,
-  PartnerDecisionDto,
   DecisionResult,
 } from './MarketTrialDecisionService.js';
 

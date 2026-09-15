@@ -49,7 +49,7 @@ export class MarketTrialDecision {
   participantId!: string;
 
   /**
-   * Type of participant (SELLER or PARTNER)
+   * Type of participant (STORE_OWNER / legacy SELLER)
    */
   @Column({
     type: 'varchar',
@@ -67,8 +67,8 @@ export class MarketTrialDecision {
   decision!: string;
 
   /**
-   * For partners: selected seller IDs (JSON array)
-   * Only populated when participantType = PARTNER and decision = CONTINUE
+   * (legacy) selected seller IDs (JSON array) — Legacy Partner 결정 전용 컬럼. 은퇴 후 항상 null.
+   * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 (물리 컬럼은 physical cleanup 대상)
    */
   @Column({ type: 'text', nullable: true })
   selectedSellerIds!: string | null;

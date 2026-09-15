@@ -16,7 +16,6 @@ export { GuideFeatureProductRegistrationPage } from './GuideFeatureProductRegist
 export { GuideFeatureB2BContentPage } from './GuideFeatureB2BContentPage';
 export { GuideFeatureEventOfferPage } from './GuideFeatureEventOfferPage';
 export { GuideFeatureMarketTrialPage } from './GuideFeatureMarketTrialPage';
-export { GuideFeaturePartnerProgramPage } from './GuideFeaturePartnerProgramPage';
 export { GuideFeatureForumResourcesPage } from './GuideFeatureForumResourcesPage';
 export { GuideFeatureCopilotDashboardPage } from './GuideFeatureCopilotDashboardPage';
 // WO-O4O-NETURE-GUIDE-BUSINESS-ACTOR-IA-PHASE1-V1

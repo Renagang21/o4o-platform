@@ -7,12 +7,12 @@
  * Commerce Core 변경 없이 metadata 기반 구현.
  *
  * ref 형식:
- *   ?ref=partner:abc123  → { referrerId: 'abc123', referrerType: 'partner' }
+ *   (Legacy Partner 'partner:' 접두 은퇴 — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1)
  *   ?ref=qr:flyer001     → { referrerId: 'flyer001', referrerType: 'qr' }
  *   ?ref=abc123           → { referrerId: 'abc123', referrerType: 'external' }
  */
 
-export type ReferrerType = 'partner' | 'qr' | 'content' | 'external';
+export type ReferrerType = 'qr' | 'content' | 'external';
 
 export interface ReferralInfo {
   referrerId: string;
@@ -23,7 +23,7 @@ export interface ReferralInfo {
 const COOKIE_KEY = 'o4o_ref';
 const COOKIE_MAX_AGE_DAYS = 30;
 
-const VALID_TYPES: ReferrerType[] = ['partner', 'qr', 'content', 'external'];
+const VALID_TYPES: ReferrerType[] = ['qr', 'content', 'external'];
 
 /**
  * URL searchParams에서 ref 파라미터를 추출하여 ReferralInfo로 변환

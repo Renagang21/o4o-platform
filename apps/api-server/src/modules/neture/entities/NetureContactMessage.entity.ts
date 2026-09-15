@@ -4,7 +4,7 @@
  * WO-O4O-NETURE-CONTACT-PAGE-V1
  *
  * Neture service contact form submissions.
- * Types: supplier | partner | service | other
+ * Types: supplier | partner(legacy — 신규 접수 종료) | service | other
  * Status: new → in_progress → resolved
  */
 

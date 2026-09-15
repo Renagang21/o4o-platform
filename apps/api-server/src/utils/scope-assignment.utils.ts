@@ -80,7 +80,6 @@ function rolesToScopeLevel(role: string, roles?: string[]): ScopeLevel {
     hasRole(allRoles, 'seller') ||
     hasRole(allRoles, 'vendor') ||
     hasRole(allRoles, 'supplier') ||
-    hasRole(allRoles, 'partner') ||
     hasRole(allRoles, 'patient')
   ) {
     return 'member';

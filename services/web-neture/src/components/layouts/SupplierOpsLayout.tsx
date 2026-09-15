@@ -22,7 +22,6 @@ import {
   Home,
   Package,
   FileText,
-  CreditCard,
   Box,
   ChevronRight,
   ChevronDown,
@@ -58,11 +57,6 @@ const BASE_SIDEBAR_GROUPS: SidebarGroup[] = [
     icon: FileText,
     items: [{ label: '콘텐츠', path: '/workspace/content' }],
   },
-  {
-    label: '정산',
-    icon: CreditCard,
-    items: [{ label: '정산', path: '/workspace/partner/settlements' }],
-  },
 ];
 
 const HUB_GROUP: SidebarGroup = {
@@ -79,7 +73,7 @@ export default function SupplierOpsLayout() {
   const { pathname } = useLocation();
   const { user } = useAuth();
 
-  // 허브 접근 가능 역할: supplier, partner, admin
+  // 허브 접근 가능 역할: supplier, admin
   const hasHubAccess = user?.roles.some(r => SUPPLIER_HUB_ACCESS_ROLES.includes(r));
 
   const sidebarGroups = hasHubAccess

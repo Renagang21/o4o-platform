@@ -1,7 +1,7 @@
 /**
  * MarketTrial Entity
  *
- * Represents a supplier's product trial campaign that sellers/partners can fund.
+ * Represents a supplier's product trial campaign that sellers (store owners) can fund.
  * Phase 1: Entity definition only (minimal fields).
  */
 
@@ -157,7 +157,7 @@ export class MarketTrial {
 
   /**
    * Roles eligible to participate
-   * WO-O4O-MARKET-TRIAL-PHASE1-V1: partner excluded, seller only
+   * WO-O4O-MARKET-TRIAL-PHASE1-V1: seller only (Legacy Partner 은퇴)
    */
   @Column({ type: 'jsonb', default: '["seller"]' })
   eligibleRoles!: string[];

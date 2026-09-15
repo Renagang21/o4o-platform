@@ -26,7 +26,6 @@ const SERVICE_GROUP_ICONS: Record<ServiceGroup, React.ComponentType<{ className?
   'signage': Tv,
   'sellerops': ShoppingBag,
   'supplierops': Truck,
-  'partnerops': Users,
   'global': Grid3X3,
 };
 

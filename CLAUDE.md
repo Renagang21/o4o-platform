@@ -214,7 +214,7 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 | F4 | Platform Content Policy | [`PLATFORM-CONTENT-POLICY-V1`](docs/baseline/PLATFORM-CONTENT-POLICY-V1.md) |
 | F5 | Content Stable | [`CONTENT-STABLE-DECLARATION-V1`](docs/baseline/CONTENT-STABLE-DECLARATION-V1.md) |
 | F6 | Boundary Policy | [`O4O-BOUNDARY-POLICY-V1`](docs/architecture/O4O-BOUNDARY-POLICY-V1.md) |
-| F7 | Neture Partner Contract | [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md) — **판정 대기 · Legacy Partner 전면 은퇴 대상** (ROLE-WORKSPACE-ARCHITECTURE §7) |
+| F7 | ~~Neture Partner Contract~~ | **은퇴 (SUPERSEDED 2026-09-15)** — Legacy Partner runtime 전면 은퇴. 대체: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](docs/baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7. 원문 [기록](docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md). 번호 재사용 없음 |
 | F8 | Neture Distribution Engine | [`NETURE-DISTRIBUTION-ENGINE-FREEZE-V1`](docs/baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md) |
 | F9 | RBAC SSOT | [`RBAC-FREEZE-DECLARATION-V1`](docs/rbac/RBAC-FREEZE-DECLARATION-V1.md) |
 | F10 | O4O Core | [`O4O-CORE-FREEZE-V1`](docs/architecture/O4O-CORE-FREEZE-V1.md) |

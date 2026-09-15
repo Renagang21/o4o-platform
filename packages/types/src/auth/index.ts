@@ -11,7 +11,6 @@ export {
   ROLE_LABELS_EN,
   ADMIN_ROLES,
   COMMERCE_ROLES,
-  PARTNERSHIP_ROLES,
   isAdminRole,
   isCommerceRole,
   hasHigherOrEqualPrivilege,

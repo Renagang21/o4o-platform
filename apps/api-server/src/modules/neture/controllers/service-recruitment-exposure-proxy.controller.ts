@@ -8,7 +8,7 @@
  * scope 로 접근한다(권한 우회가 아니라 권한 경계 보강).
  *
  *  - serviceKey 는 클라이언트 입력을 신뢰하지 않고 backend 에서 고정.
- *  - 기존 NeturePartnerContractService(setRecruitmentExposure/getRecruitmentsForExposureReview) 재사용.
+ *  - SellerRecruitmentService(setRecruitmentExposure/getRecruitmentsForExposureReview) 재사용.
  *  - approve/reject 는 recruitment.serviceId === 고정 serviceKey 일 때만 허용(SERVICE_MISMATCH 차단).
  *
  * Routes (mounted at service base):

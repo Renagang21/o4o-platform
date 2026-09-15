@@ -127,7 +127,6 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
       { label: '주문 현황', path: '/supplier/orders' },
       { label: '재고 관리', path: '/supplier/inventory' },
       { label: '정산 내역', path: '/supplier/settlements' },
-      { label: '파트너 수수료', path: '/supplier/partner-commissions' },
     ],
   },
   {

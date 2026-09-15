@@ -140,7 +140,7 @@ export interface DashboardLayout {
   id: string;
 
   /** Role this layout is for */
-  role: 'supplier' | 'seller' | 'partner' | 'admin';
+  role: 'supplier' | 'seller' | 'admin';
 
   /** Widget IDs in display order */
   widgetIds: string[];

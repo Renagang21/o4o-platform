@@ -17,7 +17,6 @@ export type ServiceGroup =
   | 'tourist'
   | 'sellerops'
   | 'supplierops'
-  | 'partnerops'
   | 'signage'
   | 'platform-core'
   | 'global';

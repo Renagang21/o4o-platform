@@ -71,7 +71,6 @@ const KCOS_ROLE_DISPLAY: Record<string, string> = {
   seller: '판매자',
   consumer: '소비자',
   customer: '소비자',
-  partner: '파트너',
 };
 
 // "운영 권한" 컬럼용. 관리자 > 운영자 우선순위. cosmetics:/k-cosmetics:/bare 모두 인정.

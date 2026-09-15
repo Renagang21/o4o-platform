@@ -10,7 +10,6 @@
  *                                   store_owner → '/seller/overview' 로 보낸다)
  *   `/admin-vault`      → admin    (ProtectedRoute allowedRoles={ADMIN_ROLES})
  *   `/account/supplier` → supplier (SupplierRoute 가 그대로 걸려 있는 legacy redirect 트리)
- *   `/account/partner`  → partner  (PartnerAccountLayout = PARTNER_ACCESS_ROLES)
  *
  * 매핑에 없는 경로는 전부 'home' 으로 떨어진다(보수적 기본값).
  * `/guide/*` `/forum/*` `/market-trial/*` 같은 공개 페이지는 **업무 축이 아니므로**
@@ -34,12 +33,10 @@ interface RouteRule {
  */
 const ROUTE_RULES: readonly RouteRule[] = [
   { prefix: '/account/supplier', workspace: 'supplier' },
-  { prefix: '/account/partner', workspace: 'partner' },
   { prefix: '/admin-vault', workspace: 'admin' },
   { prefix: '/admin', workspace: 'admin' },
   { prefix: '/operator', workspace: 'operator' },
   { prefix: '/supplier', workspace: 'supplier' },
-  { prefix: '/partner', workspace: 'partner' },
   { prefix: '/store', workspace: 'store' },
   { prefix: '/seller', workspace: 'store' },
   { prefix: '/community', workspace: 'community' },

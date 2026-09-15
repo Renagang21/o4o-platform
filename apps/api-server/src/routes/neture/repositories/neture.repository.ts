@@ -13,11 +13,6 @@ import {
   NetureProductCategory,
 } from '../entities/neture-product.entity.js';
 import {
-  NeturePartner,
-  NeturePartnerType,
-  NeturePartnerStatus,
-} from '../entities/neture-partner.entity.js';
-import {
   NetureProductLog,
   NetureLogAction,
 } from '../entities/neture-product-log.entity.js';
@@ -27,7 +22,6 @@ import { SupplierProductOffer } from '../../../modules/neture/entities/SupplierP
 
 export class NetureRepository {
   private productRepo: Repository<NetureProduct>;
-  private partnerRepo: Repository<NeturePartner>;
   private logRepo: Repository<NetureProductLog>;
   private orderRepo: Repository<NetureOrder>;
   private orderItemRepo: Repository<NetureOrderItem>;
@@ -35,7 +29,6 @@ export class NetureRepository {
 
   constructor(private dataSource: DataSource) {
     this.productRepo = dataSource.getRepository(NetureProduct);
-    this.partnerRepo = dataSource.getRepository(NeturePartner);
     this.logRepo = dataSource.getRepository(NetureProductLog);
     this.orderRepo = dataSource.getRepository(NetureOrder);
     this.orderItemRepo = dataSource.getRepository(NetureOrderItem);
@@ -49,7 +42,6 @@ export class NetureRepository {
   async findProducts(options: {
     page?: number;
     limit?: number;
-    partnerId?: string;
     category?: NetureProductCategory;
     status?: NetureProductStatus;
     isFeatured?: boolean;
@@ -61,7 +53,6 @@ export class NetureRepository {
     const skip = (page - 1) * limit;
 
     const where: any = {};
-    if (options.partnerId) where.partnerId = options.partnerId;
     if (options.category) where.category = options.category;
     if (options.status) where.status = options.status;
     if (options.isFeatured !== undefined) where.isFeatured = options.isFeatured;
@@ -71,7 +62,6 @@ export class NetureRepository {
 
     const findOptions: FindManyOptions<NetureProduct> = {
       where,
-      relations: ['partner'],
       skip,
       take: limit,
       order: { [orderField === 'price' ? 'basePrice' : orderField]: orderDir } as any,
@@ -95,7 +85,6 @@ export class NetureRepository {
         { name: ILike(`%${options.query}%`) },
         { description: ILike(`%${options.query}%`) },
       ],
-      relations: ['partner'],
       skip,
       take: limit,
       order: { createdAt: 'DESC' },
@@ -107,7 +96,6 @@ export class NetureRepository {
   async findProductById(id: string): Promise<NetureProduct | null> {
     return this.productRepo.findOne({
       where: { id },
-      relations: ['partner'],
     });
   }
 
@@ -128,58 +116,6 @@ export class NetureRepository {
 
   async incrementViewCount(id: string): Promise<void> {
     await this.productRepo.increment({ id }, 'viewCount', 1);
-  }
-
-  // ============================================================================
-  // Partner Operations
-  // ============================================================================
-
-  async findPartners(options: {
-    page?: number;
-    limit?: number;
-    type?: NeturePartnerType;
-    status?: NeturePartnerStatus;
-    sort?: string;
-    order?: 'asc' | 'desc';
-  }): Promise<{ partners: NeturePartner[]; total: number }> {
-    const page = options.page || 1;
-    const limit = options.limit || 20;
-    const skip = (page - 1) * limit;
-
-    const where: any = {};
-    if (options.type) where.type = options.type;
-    if (options.status) where.status = options.status;
-
-    const orderField = options.sort || 'createdAt';
-    const orderDir = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-
-    const [partners, total] = await this.partnerRepo.findAndCount({
-      where,
-      skip,
-      take: limit,
-      order: { [orderField]: orderDir } as any,
-    });
-
-    return { partners, total };
-  }
-
-  async findPartnerById(id: string): Promise<NeturePartner | null> {
-    return this.partnerRepo.findOne({ where: { id } });
-  }
-
-  async createPartner(data: Partial<NeturePartner>): Promise<NeturePartner> {
-    const partner = this.partnerRepo.create(data);
-    return this.partnerRepo.save(partner);
-  }
-
-  async updatePartner(id: string, data: Partial<NeturePartner>): Promise<NeturePartner | null> {
-    await this.partnerRepo.update(id, data);
-    return this.findPartnerById(id);
-  }
-
-  async deletePartner(id: string): Promise<boolean> {
-    const result = await this.partnerRepo.delete(id);
-    return (result.affected || 0) > 0;
   }
 
   // ============================================================================

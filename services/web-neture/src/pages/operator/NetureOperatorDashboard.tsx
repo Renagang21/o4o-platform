@@ -23,7 +23,7 @@ import { buildNetureOperatorConfig } from './operatorConfig';
 
 // WO-O4O-OPERATOR-DASHBOARD-AUX-SECTION-P1-ALIGNMENT-V1:
 //   타 3서비스와 동일하게 2축 운영 네비게이션 추가 (frontend-only, route 무변경).
-//   operator 가 관리/모니터링하는 영역만 노출 — supplier/partner workspace 직접 진입 아님.
+//   operator 가 관리/모니터링하는 영역만 노출 — supplier workspace 직접 진입 아님.
 const NETURE_AXES: OperatorAxisGroup[] = [
   {
     key: 'supply',

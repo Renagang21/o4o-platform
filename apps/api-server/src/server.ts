@@ -41,8 +41,7 @@ const corsOptions = {
     const allowedOrigins = [
       'https://neture.co.kr',
       'https://www.neture.co.kr',
-      'https://admin.neture.co.kr',
-      'https://partner.neture.co.kr'
+      'https://admin.neture.co.kr'
     ];
     
     if (!origin || allowedOrigins.includes(origin)) {
@@ -180,7 +179,6 @@ async function startServer() {
         endpoints: {
           business: '/api/v1/business/*',
           admin: '/api/v1/admin/*',
-          partner: '/api/v1/partner/*',
           internal: '/api/v1/internal/*'
         }
       });

@@ -17,33 +17,9 @@ export {
   type ContactHints,
   type Supplier,
   type SupplierDetail,
-  type PartnershipRequest,
-  type PartnershipRequestDetail,
 } from './neture.js';
 
-// Partner APIs
-export {
-  partnerDashboardApi,
-  partnerRecruitmentApi,
-  partnerCommissionApi,
-  type PartnerDashboardItem,
-  type BrowsableContent,
-  type LinkedContent,
-  type PartnerRecruitment,
-  type CommissionStatus,
-  type Commission,
-  type CommissionOrderItem,
-  type CommissionDetail,
-  type PartnerCommissionKpi,
-  type CommissionsResponse,
-  partnerAffiliateApi,
-  partnerSettlementApi,
-  type PoolProduct,
-  type ReferralLink,
-  type PartnerSettlementSummary,
-  type PartnerSettlementDetail,
-  type PartnerSettlementDetailItem,
-} from './partner.js';
+// (은퇴) Partner APIs — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
 
 // Content APIs
 export {
@@ -66,7 +42,6 @@ export {
   type RegulatedCategory,
   type RegulatedCategoryStatus,
   type SupplierRegulatedCategory,
-  supplierCommissionApi,
   type SupplierProductPurpose,
   type DistributionType,
   type SupplierLibraryItem,
@@ -79,7 +54,6 @@ export {
   type SupplierOnboardingDocument,
   type SupplierOrderCondition,
   type ProfileCompleteness,
-  type SupplierPartnerCommission,
   supplierCopilotApi,
   type SupplierKpiSummary,
   type ProductPerformanceItem,
@@ -120,13 +94,11 @@ export {
   type OperatorContactPagination,
   type OperatorContactListParams,
   adminSettlementApi,
-  adminCommissionApi,
   adminMasterApi,
   adminServiceApprovalApi,
   adminRegistrationApi,
   operatorRegistrationApi,
   type RegistrationRecord,
-  adminPartnerSettlementApi,
   type AdminSupplier,
   // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1
   PROFILE_FIELD_LABELS,
@@ -142,11 +114,6 @@ export {
   type AdminProductPagination,
   type AdminMaster,
   type ServiceApproval,
-  type AdminCommissionKpi,
-  type PartnerSettlement,
-  type PartnerSettlementItem,
-  type PartnerSettlementStatus,
-  type PartnerSettlementsResponse,
 } from './admin.js';
 
 // Product API
@@ -173,10 +140,6 @@ export {
   type ServiceStat,
   type RecentActivity,
   type OperatorDashboardData,
-  type PartnerDashboardSummary,
-  type PartnerDashboardStats,
-  type ConnectedService,
-  type Notification,
 } from './dashboard.js';
 
 // Operator API

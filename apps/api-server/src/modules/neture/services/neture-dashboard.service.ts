@@ -3,18 +3,17 @@ import { AppDataSource } from '../../../database/connection.js';
 import {
   NetureSupplier,
   SupplierProductOffer,
-  NeturePartnershipRequest,
   OfferDistributionType,
   OfferApprovalStatus,
   SupplierStatus,
-  PartnershipStatus,
 } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
 
 /**
  * NetureDashboardService
  *
- * Dashboard summary/statistics for supplier, admin, partner, seller.
+ * Dashboard summary/statistics for supplier, admin, seller.
+ * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: partner 대시보드·제휴 요청 통계 은퇴.
  * Mostly raw SQL queries — read-only aggregation.
  *
  * Extracted from NetureService (WO-O4O-NETURE-SERVICE-SPLIT-V1 Phase 2).
@@ -23,7 +22,6 @@ export class NetureDashboardService {
   // Lazy repositories (only used for count queries in getAdminDashboardSummary / getSupplierDashboardSummary)
   private _supplierRepo?: Repository<NetureSupplier>;
   private _offerRepo?: Repository<SupplierProductOffer>;
-  private _partnershipRepo?: Repository<NeturePartnershipRequest>;
 
   private get supplierRepo(): Repository<NetureSupplier> {
     if (!this._supplierRepo) {
@@ -37,13 +35,6 @@ export class NetureDashboardService {
       this._offerRepo = AppDataSource.getRepository(SupplierProductOffer);
     }
     return this._offerRepo;
-  }
-
-  private get partnershipRepo(): Repository<NeturePartnershipRequest> {
-    if (!this._partnershipRepo) {
-      this._partnershipRepo = AppDataSource.getRepository(NeturePartnershipRequest);
-    }
-    return this._partnershipRepo;
   }
 
   // ==================== Order Summary (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.4, P1 §3.3) ====================
@@ -260,17 +251,11 @@ export class NetureDashboardService {
       const serviceTier = tierStats.find((t) => t.approval_type === 'service') || emptyTier;
       const privateTier = tierStats.find((t) => t.approval_type === 'private') || emptyTier;
 
-      // 파트너십 요청 통계
-      const totalPartnershipRequests = await this.partnershipRepo.count();
-      const openPartnershipRequests = await this.partnershipRepo.count({
-        where: { status: PartnershipStatus.OPEN },
-      });
-
-      // 서비스별 공급자/파트너 통계 (SERVICE + PRIVATE 모두 포함)
-      const serviceStats: Array<{ serviceId: string; serviceName: string; suppliers: number; partners: number }> = await AppDataSource.query(`
+      // 서비스별 공급자/승인 거래 조직 통계 (SERVICE + PRIVATE 모두 포함)
+      const serviceStats: Array<{ serviceId: string; serviceName: string; suppliers: number; organizations: number }> = await AppDataSource.query(`
         SELECT pa.service_key AS "serviceId", pa.service_key AS "serviceName",
           COUNT(DISTINCT CASE WHEN pa.approval_status = 'approved' THEN spo.supplier_id END)::int AS suppliers,
-          COUNT(DISTINCT CASE WHEN pa.approval_status = 'approved' THEN pa.organization_id END)::int AS partners
+          COUNT(DISTINCT CASE WHEN pa.approval_status = 'approved' THEN pa.organization_id END)::int AS organizations
         FROM product_approvals pa
         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
         GROUP BY pa.service_key
@@ -295,8 +280,6 @@ export class NetureDashboardService {
           pendingRequests: adminReqStats.pendingRequests,
           approvedRequests: adminReqStats.approvedRequests,
           rejectedRequests: adminReqStats.rejectedRequests,
-          totalPartnershipRequests,
-          openPartnershipRequests,
           totalContents: 0,
           publishedContents: 0,
           totalProducts,
@@ -311,7 +294,7 @@ export class NetureDashboardService {
           serviceId: s.serviceId,
           serviceName: s.serviceName,
           suppliers: s.suppliers,
-          partners: s.partners,
+          organizations: s.organizations,
           status: 'active' as const,
         })),
         recentApplications: recentPending.map((r) => ({
@@ -334,98 +317,6 @@ export class NetureDashboardService {
     }
   }
 
-  /**
-   * GET /partner/dashboard/summary - 파트너 대시보드 통계 요약
-   */
-  async getPartnerDashboardSummary(userId: string) {
-    try {
-      // 파트너십 요청 통계
-      const partnershipRequests = await this.partnershipRepo.find({
-        where: { sellerId: userId },
-      });
-
-      const totalRequests = partnershipRequests.length;
-      const openRequests = partnershipRequests.filter((r) => r.status === PartnershipStatus.OPEN).length;
-      const matchedRequests = partnershipRequests.filter((r) => r.status === PartnershipStatus.MATCHED).length;
-      const closedRequests = partnershipRequests.filter((r) => r.status === PartnershipStatus.CLOSED).length;
-
-      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: v2 product_approvals
-      const sellerApprovals: Array<{ id: string; serviceId: string; serviceName: string; createdAt: string }> = await AppDataSource.query(`
-        SELECT pa.id, pa.service_key AS "serviceId", pa.service_key AS "serviceName",
-               pa.created_at AS "createdAt"
-        FROM product_approvals pa
-        WHERE pa.organization_id = $1 AND pa.approval_type = 'private' AND pa.approval_status = 'approved'
-      `, [userId]);
-
-      // 연결된 서비스 (중복 제거)
-      const connectedServicesMap = new Map<string, {
-        serviceId: string;
-        serviceName: string;
-        supplierCount: number;
-        lastActivity: Date;
-      }>();
-
-      sellerApprovals.forEach((r) => {
-        const existing = connectedServicesMap.get(r.serviceId);
-        if (existing) {
-          existing.supplierCount++;
-          if (new Date(r.createdAt) > existing.lastActivity) {
-            existing.lastActivity = new Date(r.createdAt);
-          }
-        } else {
-          connectedServicesMap.set(r.serviceId, {
-            serviceId: r.serviceId,
-            serviceName: r.serviceName,
-            supplierCount: 1,
-            lastActivity: new Date(r.createdAt),
-          });
-        }
-      });
-
-      const connectedServices = Array.from(connectedServicesMap.values());
-
-      // 알림 (최근 파트너십 요청 상태 변경, 정산 등)
-      const notifications: Array<{ type: string; text: string; link: string }> = [];
-
-      const recentMatchedRequests = partnershipRequests.filter(
-        (r) => r.status === PartnershipStatus.MATCHED && r.matchedAt
-      );
-      if (recentMatchedRequests.length > 0) {
-        notifications.push({
-          type: 'success',
-          text: `파트너십 매칭 완료 ${recentMatchedRequests.length}건`,
-          link: '/partner/collaboration',
-        });
-      }
-
-      if (openRequests > 0) {
-        notifications.push({
-          type: 'info',
-          text: `진행 중인 파트너십 요청 ${openRequests}건`,
-          link: '/partner/collaboration',
-        });
-      }
-
-      return {
-        stats: {
-          totalRequests,
-          openRequests,
-          matchedRequests,
-          closedRequests,
-          connectedServiceCount: connectedServices.length,
-          totalSupplierCount: sellerApprovals.length,
-        },
-        connectedServices: connectedServices.map((s) => ({
-          ...s,
-          lastActivity: this.formatRelativeTime(s.lastActivity),
-        })),
-        notifications,
-      };
-    } catch (error) {
-      logger.error('[NetureDashboardService] Error fetching partner dashboard summary:', error);
-      throw error;
-    }
-  }
 
   /**
    * 상대적 시간 포맷팅

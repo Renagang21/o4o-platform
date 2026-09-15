@@ -247,84 +247,7 @@ export interface OrderSummary {
   message: string;
 }
 
-// ==================== Supplier Partner Commission Types ====================
-
-export interface SupplierPartnerCommission {
-  id: string;
-  supplier_product_id: string;
-  commission_per_unit: number;
-  start_date: string;
-  end_date: string | null;
-  created_at: string;
-  product_name: string;
-  barcode: string;
-}
-
-// ==================== Supplier Partner Commission API ====================
-
-/**
- * 목록 조회 실패 sentinel.
- * WO-O4O-NETURE-SUPPLIER-PARTNER-COMMISSIONS-LOAD-ERROR-CONTRACT-V1:
- * 조회 실패를 빈 배열로 삼키면 화면에서 "정상 0건" 과 구분되지 않으므로 throw 한다.
- * 서버 원문 대신 고정 코드만 전파하고, 원인은 console 로만 남긴다.
- */
-export const SUPPLIER_COMMISSION_LOAD_FAILED = 'SUPPLIER_COMMISSION_LOAD_FAILED';
-
-export const supplierCommissionApi = {
-  async getCommissions(): Promise<SupplierPartnerCommission[]> {
-    let response;
-    try {
-      response = await api.get('/neture/supplier/partner-commissions');
-    } catch (error) {
-      // 4xx / 5xx / 네트워크 오류
-      console.warn('[Supplier Commission API] Failed to fetch commissions:', extractApiError(error));
-      throw new Error(SUPPLIER_COMMISSION_LOAD_FAILED);
-    }
-
-    // 200 이지만 payload 계약이 깨진 경우도 실패로 처리한다 (success=false / data 비배열)
-    const result = response.data;
-    if (!result?.success || !Array.isArray(result.data)) {
-      console.warn('[Supplier Commission API] Unexpected commissions payload shape');
-      throw new Error(SUPPLIER_COMMISSION_LOAD_FAILED);
-    }
-    return result.data as SupplierPartnerCommission[];
-  },
-
-  async create(data: {
-    supplier_product_id: string;
-    commission_per_unit: number;
-    start_date: string;
-    end_date?: string;
-  }): Promise<{ success: boolean; error?: string; data?: SupplierPartnerCommission }> {
-    try {
-      const response = await api.post('/neture/supplier/partner-commissions', data);
-      return response.data;
-    } catch (error) {
-      return { success: false, error: extractApiError(error) };
-    }
-  },
-
-  async update(
-    id: string,
-    data: { commission_per_unit?: number; start_date?: string; end_date?: string | null }
-  ): Promise<{ success: boolean; error?: string; data?: SupplierPartnerCommission }> {
-    try {
-      const response = await api.put(`/neture/supplier/partner-commissions/${id}`, data);
-      return response.data;
-    } catch (error) {
-      return { success: false, error: extractApiError(error) };
-    }
-  },
-
-  async remove(id: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      const response = await api.delete(`/neture/supplier/partner-commissions/${id}`);
-      return response.data;
-    } catch (error) {
-      return { success: false, error: extractApiError(error) };
-    }
-  },
-};
+// (은퇴) Supplier Partner Commission — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
 
 // ==================== Supplier Copilot Types (WO-O4O-SUPPLIER-COPILOT-DASHBOARD-V1) ====================
 
@@ -1712,9 +1635,9 @@ export interface SupplierRecruitment {
 // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1
 export interface RecruitmentApplication {
   id: string;
-  partnerId: string;
-  partnerName: string;
-  partnerEmail: string;
+  applicantId: string;
+  applicantName: string;
+  applicantEmail: string;
   organizationName: string;
   status: string;
   appliedAt: string;
@@ -1751,7 +1674,7 @@ export const supplierRecruitmentApi = {
   async listMine(): Promise<SupplierRecruitment[]> {
     let response;
     try {
-      response = await api.get('/neture/partner/recruitments/mine');
+      response = await api.get('/neture/seller-recruitment/recruitments/mine');
     } catch (error) {
       console.warn('[Supplier Recruitment API] Failed to list:', extractApiError(error));
       throw new Error(SUPPLIER_RECRUITMENTS_LOAD_FAILED);
@@ -1767,7 +1690,7 @@ export const supplierRecruitmentApi = {
   /**
    * WO-O4O-NETURE-SUPPLIER-REMAINING-LOAD-ERROR-CONTRACT-V1 (묶음 4)
    *
-   * backend 계약(partner-recruitment.controller.ts): 404 NOT_FOUND(모집 미존재/타인 소유)
+   * backend 계약(seller-recruitment.controller.ts): 404 NOT_FOUND(모집 미존재/타인 소유)
    * 와 500 INTERNAL_ERROR 를 구분한다. 200 은 항상 RecruitmentDetail 객체(신청 0건이면
    * applications:[]) → 200+null 성공 상태는 없다.
    * 404 는 전용 코드로, 그 외 조회 실패는 LOAD_FAILED 로 throw 해 화면이
@@ -1776,7 +1699,7 @@ export const supplierRecruitmentApi = {
   async getApplications(recruitmentId: string): Promise<RecruitmentDetail> {
     let response;
     try {
-      response = await api.get(`/neture/partner/recruitments/${recruitmentId}/applications`);
+      response = await api.get(`/neture/seller-recruitment/recruitments/${recruitmentId}/applications`);
     } catch (error) {
       console.warn('[Supplier Recruitment API] Failed to fetch applications:', extractApiError(error));
       throw new Error(isNotFound(error) ? SUPPLIER_RECRUITMENT_NOT_FOUND : SUPPLIER_RECRUITMENT_APPLICATIONS_LOAD_FAILED);
@@ -1792,7 +1715,7 @@ export const supplierRecruitmentApi = {
   // 기존 승인/반려 엔드포인트 재사용 (ownership + C bridge backend 처리)
   async approveApplication(applicationId: string): Promise<{ success: boolean; error?: string; message?: string }> {
     try {
-      const response = await api.post(`/neture/partner/applications/${applicationId}/approve`);
+      const response = await api.post(`/neture/seller-recruitment/applications/${applicationId}/approve`);
       return response.data;
     } catch (error: any) {
       const d = error?.response?.data;
@@ -1802,7 +1725,7 @@ export const supplierRecruitmentApi = {
 
   async rejectApplication(applicationId: string, reason?: string): Promise<{ success: boolean; error?: string; message?: string }> {
     try {
-      const response = await api.post(`/neture/partner/applications/${applicationId}/reject`, { reason });
+      const response = await api.post(`/neture/seller-recruitment/applications/${applicationId}/reject`, { reason });
       return response.data;
     } catch (error: any) {
       const d = error?.response?.data;
@@ -1813,7 +1736,7 @@ export const supplierRecruitmentApi = {
   // WO-O4O-SELLER-RECRUITMENT-PARTICIPATION-TERMINATION-V1: 승인 판매자 참여 해지
   async terminateApplication(applicationId: string): Promise<{ success: boolean; error?: string; message?: string }> {
     try {
-      const response = await api.post(`/neture/partner/applications/${applicationId}/terminate`);
+      const response = await api.post(`/neture/seller-recruitment/applications/${applicationId}/terminate`);
       return response.data;
     } catch (error: any) {
       const d = error?.response?.data;
@@ -1824,7 +1747,7 @@ export const supplierRecruitmentApi = {
   // WO-O4O-SELLER-RECRUITMENT-CLOSE-ACTION-V1: 모집 마감(신규 신청 차단)
   async close(recruitmentId: string): Promise<{ success: boolean; error?: string; message?: string }> {
     try {
-      const response = await api.patch(`/neture/partner/recruitments/${recruitmentId}/close`);
+      const response = await api.patch(`/neture/seller-recruitment/recruitments/${recruitmentId}/close`);
       return response.data;
     } catch (error: any) {
       const d = error?.response?.data;
@@ -1835,7 +1758,7 @@ export const supplierRecruitmentApi = {
   // WO-O4O-SELLER-RECRUITMENT-REOPEN-ACTION-V1: 모집 재개(다시 신규 신청 가능)
   async reopen(recruitmentId: string): Promise<{ success: boolean; error?: string; message?: string }> {
     try {
-      const response = await api.patch(`/neture/partner/recruitments/${recruitmentId}/reopen`);
+      const response = await api.patch(`/neture/seller-recruitment/recruitments/${recruitmentId}/reopen`);
       return response.data;
     } catch (error: any) {
       const d = error?.response?.data;
@@ -1855,7 +1778,7 @@ export const supplierRecruitmentApi = {
     imageUrl?: string;
   }): Promise<{ success: boolean; error?: string; message?: string; data?: { id: string; recruitments?: Array<{ id: string; serviceId: string; status: string }> } }> {
     try {
-      const response = await api.post('/neture/partner/recruitments', input);
+      const response = await api.post('/neture/seller-recruitment/recruitments', input);
       return response.data;
     } catch (error: any) {
       const d = error?.response?.data;

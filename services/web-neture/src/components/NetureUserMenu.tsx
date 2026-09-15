@@ -17,14 +17,12 @@ import {
   ADMIN_ROLES,
   OPERATOR_OR_ABOVE_ROLES,
   SUPPLIER_ONLY_ROLES,
-  PARTNER_ONLY_ROLES,
 } from '../lib/role-constants';
 
 export interface NetureUserRoles {
   isAdmin: boolean;
   isOperator: boolean;
   isSupplier: boolean;
-  isPartner: boolean;
 }
 
 /** 기존 NetureGlobalHeader 와 동일한 역할 판정 SSOT */
@@ -35,7 +33,6 @@ export function useNetureUserRoles(user: any, isAuthenticated: boolean): NetureU
     isAdmin: has(ADMIN_ROLES),
     isOperator: has(OPERATOR_OR_ABOVE_ROLES),
     isSupplier: has(SUPPLIER_ONLY_ROLES),
-    isPartner: has(PARTNER_ONLY_ROLES),
   };
 }
 
@@ -64,7 +61,7 @@ export function NetureUserMenuItems({
   isAuthenticated: boolean;
   onItemClick?: () => void;
 }) {
-  const { isAdmin, isOperator, isSupplier, isPartner } = useNetureUserRoles(user, isAuthenticated);
+  const { isAdmin, isOperator, isSupplier } = useNetureUserRoles(user, isAuthenticated);
   return (
     <>
       {isAdmin && (
@@ -80,11 +77,6 @@ export function NetureUserMenuItems({
       {isSupplier && (
         <GlobalHeaderMenuItem to="/supplier/dashboard" icon={<LayoutDashboard className="w-4 h-4" />} onClick={onItemClick}>
           공급자 대시보드
-        </GlobalHeaderMenuItem>
-      )}
-      {isPartner && (
-        <GlobalHeaderMenuItem to="/partner/dashboard" icon={<LayoutDashboard className="w-4 h-4" />} onClick={onItemClick}>
-          파트너 대시보드
         </GlobalHeaderMenuItem>
       )}
       <GlobalHeaderMenuItem to="/mypage" icon={<LayoutDashboard className="w-4 h-4" />} onClick={onItemClick}>

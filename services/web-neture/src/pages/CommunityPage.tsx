@@ -16,7 +16,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2, Layers, Users, TrendingUp, FlaskConical } from 'lucide-react';
+import { Loader2, Layers, TrendingUp, FlaskConical } from 'lucide-react';
 import { useTemplate } from '@o4o/ui';
 import {
   StandardHomeTemplate,
@@ -161,13 +161,6 @@ export default function CommunityPage() {
                 '진행 중인 유통참여형 펀딩을 확인하고 공급자·운영자·매장이 함께 참여합니다',
               href: '/market-trial',
               icon: <span className={iconCls}><TrendingUp size={24} /></span>,
-            },
-            {
-              title: '파트너 협력 안내',
-              description:
-                '플랫폼 이용 규모가 형성된 이후 마케팅·유통·프로모션 협력을 단계적으로 활성화합니다',
-              href: '/partner',
-              icon: <span className={iconCls}><Users size={24} /></span>,
             },
           ]}
         />

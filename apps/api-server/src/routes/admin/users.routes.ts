@@ -18,7 +18,7 @@ const adminUserController = new AdminUserController();
 // WO-OPERATOR-FIX-V1: Valid role patterns include service-prefixed roles
 const LEGACY_ROLES = [
   'super_admin', 'admin', 'operator', 'manager', 'moderator',
-  'vendor', 'seller', 'customer', 'business', 'partner', 'supplier', 'affiliate', 'user'
+  'vendor', 'seller', 'customer', 'business', 'supplier', 'affiliate', 'user'
 ];
 // Validate role: accept legacy roles OR service-prefixed roles (e.g., kpa:admin, neture:operator)
 const isValidRole = (value: string) => {

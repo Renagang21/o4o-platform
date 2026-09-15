@@ -12,7 +12,7 @@
  */
 
 import { useState, useRef } from 'react';
-import { Package, Megaphone, Settings, HelpCircle, Mail, Phone, Send, CheckCircle2 } from 'lucide-react';
+import { Package, Settings, HelpCircle, Mail, Phone, Send, CheckCircle2 } from 'lucide-react';
 import { contactApi } from '../lib/api/contact';
 import type { ContactFormData } from '../lib/api/contact';
 
@@ -25,13 +25,6 @@ const inquiryTypes: { type: ContactType; icon: typeof Package; title: string; de
     title: '공급자 문의',
     desc: '제품 공급, 유통 채널, 매장 네트워크에 관한 문의',
     color: { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-200' },
-  },
-  {
-    type: 'partner',
-    icon: Megaphone,
-    title: '파트너 문의',
-    desc: '마케팅 파트너십, 콘텐츠 협업, 홍보 활동에 관한 문의',
-    color: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-200' },
   },
   {
     type: 'service',
@@ -51,7 +44,6 @@ const inquiryTypes: { type: ContactType; icon: typeof Package; title: string; de
 
 const typeLabels: Record<ContactType, string> = {
   supplier: 'Supplier 문의',
-  partner: 'Partner 문의',
   service: '서비스 문의',
   other: '기타',
 };

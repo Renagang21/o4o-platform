@@ -84,8 +84,7 @@ interface LocalChannelMeta {
 }
 
 interface CommissionMeta {
-  partnerId?: string;
-  referralCode?: string;
+  // partnerId / referralCode (Legacy Partner attribution) 은퇴 — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
   rate?: number;
 }
 

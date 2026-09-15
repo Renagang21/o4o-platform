@@ -48,12 +48,12 @@ bare 값을 여전히 인정하므로, 값이 존재하면 그대로 동작한�
 | `vendor` | 벤더 |
 | `seller` | 판매자 |
 | `supplier` | 공급자 — Neture 공급자에 실사용. 접두어 없음이 의도된 계약이다 (WO-NETURE-ROLE-NORMALIZATION-V1) |
-| `partner` | 파트너 |
+| ~~`partner`~~ | ~~파트너~~ — 은퇴 (2026-09-15, Legacy Partner runtime 은퇴 · 활성 보유자 0 · 비활성 이력 row 3건은 physical cleanup 대상) |
 | `manager` | 매니저 |
 | `pharmacy` | GlycoPharm 약국. 접두어 없음이 **정규값**이다 — `20260318110000-RenamePharmacistToPharmacyRole` 로 `pharmacist` → `pharmacy` 개명, `20260326100000-NormalizeGlycopharmPharmacyRole` 로 확정. 소비처는 bare 문자열을 직접 읽는다 (`controllers/forum/ForumRecommendationController.ts`) |
 
 > 2026-08-24 프로덕션 실측(활성 role_assignments): `supplier` 6 · `pharmacy` 2 · `customer` 7 · `user` 2.
-> `vendor` · `seller` · `partner` · `manager` 는 **보유자 0** 이다. 목록에는 남기되 신규 부여 대상이 아니다.
+> `vendor` · `seller` · `manager` 는 **보유자 0** 이다. 목록에는 남기되 신규 부여 대상이 아니다. (`partner` 는 카탈로그·가드에서 제거됨)
 > (`manager` 를 조회하는 코드 대부분은 `organization_members.role` — RBAC role 축이 아니다.)
 
 > `store_owner` 는 이 목록에 없다 — 매장 경영자 판정은 전부 접두어 형태다
@@ -67,7 +67,7 @@ bare 값을 여전히 인정하므로, 값이 존재하면 그대로 동작한�
 |--------|--------|------|
 | `platform:` | 플랫폼 Core | `platform:super_admin` |
 | `kpa:` | KPA 약사회 | `kpa:admin`, `kpa:pharmacist`, `kpa:branch_admin`, `kpa:branch_operator` |
-| `neture:` | 네처 | `neture:admin`, `neture:operator`, `neture:seller`, `neture:supplier`, `neture:partner` |
+| `neture:` | 네처 | `neture:admin`, `neture:operator`, `neture:seller`, `neture:supplier` (~~`neture:partner`~~ 은퇴 2026-09-15) |
 | `glycopharm:` | 글라이코팜 | `glycopharm:admin`, `glycopharm:operator`, `glycopharm:pharmacist`, `glycopharm:store_owner` |
 | `glucoseview:` | 글루코스뷰 | `glucoseview:admin`, `glucoseview:operator` |
 | `cosmetics:` | K-화장품 | `cosmetics:admin`, `cosmetics:operator` |

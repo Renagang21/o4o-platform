@@ -261,13 +261,13 @@ describe('§9-9~11 · PartnerOps 계층별 최종 상태', () => {
     expect(catalog).not.toContain("appId: 'partnerops'");
   });
 
-  it('11. partnerops **serviceGroup** 과 partner-core 는 보존된다', () => {
+  // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
+  //   partnerops serviceGroup · partner-core 앱 항목은 Legacy Partner 전면 은퇴로 제거됐다 (구 11. 보존 계약 해제).
+  it('11. partnerops serviceGroup · partner-core 앱 항목이 없다 (Legacy Partner 은퇴)', () => {
     const catalog = stripAllComments(readApi('app-manifests/appsCatalog.ts'));
-    expect(catalog).toContain("id: 'partnerops'");
-    expect(catalog).toContain("appId: 'partner-core'");
-    expect(catalog).toContain("serviceGroups: ['platform-core', 'partnerops']");
-    // 프런트 ServiceGroup union 도 같은 공용 계약을 공유한다.
-    expect(read('api/admin-apps.ts')).toContain("'partnerops'");
+    expect(catalog).not.toContain("id: 'partnerops'");
+    expect(catalog).not.toContain("appId: 'partner-core'");
+    expect(stripAllComments(read('api/admin-apps.ts'))).not.toContain("'partnerops'");
   });
 });
 

@@ -26,7 +26,7 @@ describe('isAdminTierRoleName — operator/admin tier 이름 규칙', () => {
 
   it.each([
     'supplier',
-    'partner',
+    'seller',
     'customer',
     'member',
     'user',

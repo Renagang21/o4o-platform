@@ -44,7 +44,6 @@ export default function ActiveUsers() {
       seller: 'bg-green-100 text-green-800',
       customer: 'bg-gray-100 text-gray-800',
       supplier: 'bg-orange-100 text-orange-800',
-      partner: 'bg-pink-100 text-pink-800',
     };
     return colors[role] || 'bg-gray-100 text-gray-800';
   };
@@ -57,7 +56,6 @@ export default function ActiveUsers() {
       seller: '판매자',
       customer: '고객',
       supplier: '공급자',
-      partner: '파트너',
     };
     return labels[role] || role;
   };

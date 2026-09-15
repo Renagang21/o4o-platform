@@ -240,13 +240,14 @@ export default function SupplierRecruitmentDetailPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {detail.applications.map((a) => {
-                const badge = APP_STATUS[a.status] || { label: a.status, cls: 'bg-gray-100 text-gray-600' };
+                // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 참여 해지 = cancelled(공급자 결정)+participationTerminated → '승인' 배지 유지 + 해지 표기
+                const badge = a.participationTerminated ? APP_STATUS.approved : (APP_STATUS[a.status] || { label: a.status, cls: 'bg-gray-100 text-gray-600' });
                 const busy = busyId === a.id;
                 return (
                   <tr key={a.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3">
-                      <div className="font-medium text-slate-800">{a.partnerName}</div>
-                      {a.partnerEmail && <div className="text-xs text-slate-400">{a.partnerEmail}</div>}
+                      <div className="font-medium text-slate-800">{a.applicantName}</div>
+                      {a.applicantEmail && <div className="text-xs text-slate-400">{a.applicantEmail}</div>}
                     </td>
                     <td className="px-4 py-3 text-slate-600">{a.organizationName || <span className="text-slate-300">-</span>}</td>
                     <td className="px-4 py-3">

@@ -18,8 +18,6 @@ export const ROLE_LABELS: Record<string, string> = {
   'neture:operator': '운영자',
   'neture:supplier': '공급자',
   supplier: '공급자',
-  'neture:partner': '파트너',
-  partner: '파트너',
   store_owner: '매장 경영자',          // canonical
   'neture:seller': '매장 경영자',      // legacy fallback
   seller: '매장 경영자',               // legacy fallback
@@ -32,8 +30,6 @@ export const NETURE_ROLE_PRIORITY = [
   'neture:operator',
   'neture:supplier',
   'supplier',            // legacy: 가입 시 supplier로 저장됨
-  'neture:partner',
-  'partner',             // legacy: 가입 시 partner로 저장됨
   'store_owner',         // canonical
   'neture:seller',       // legacy fallback
   'seller',              // legacy: 기존 데이터 호환
@@ -45,8 +41,6 @@ export const NETURE_DASHBOARD_MAP: Record<string, string> = {
   'neture:operator': '/operator',
   'neture:supplier': '/supplier/dashboard',
   'supplier': '/supplier/dashboard',   // legacy
-  'neture:partner': '/partner/dashboard',
-  'partner': '/partner/dashboard',     // legacy
   'store_owner': '/seller/overview',   // canonical (route path rename 은 후속 WO)
   'neture:seller': '/seller/overview', // legacy fallback
   'seller': '/seller/overview',        // legacy

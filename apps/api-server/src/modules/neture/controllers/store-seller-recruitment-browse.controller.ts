@@ -9,9 +9,9 @@
  *   - service_id = 'kpa-society'   (고정, 타 서비스 모집 미노출)
  *   - exposure_status = 'approved'  (미승인/반려/대기 미노출)
  *   - status = 'recruiting'         (종료/보관 모집 미노출)
- * 응답은 기존 getPartnerRecruitments (감사 필드 미포함) 재사용 — 운영자 검토 정보 노출 0.
+ * 응답은 SellerRecruitmentService.getRecruitments (감사 필드 미포함) 재사용 — 운영자 검토 정보 노출 0.
  *
- * 신규 테이블·상태·승인 API·migration 없음. 참여(apply)는 기존 POST /neture/partner/applications 사용.
+ * 신규 테이블·상태·승인 API·migration 없음. 참여(apply)는 POST /neture/seller-recruitment/applications 사용.
  */
 import { Router, Request, Response, RequestHandler } from 'express';
 import { NetureService } from '../neture.service.js';
@@ -36,7 +36,7 @@ export function createStoreSellerRecruitmentBrowseController(
     requireStoreOwner,
     async (_req: Request, res: Response): Promise<void> => {
       try {
-        const data = await netureService.getPartnerRecruitments({
+        const data = await netureService.getSellerRecruitments({
           serviceKey: 'kpa-society', // 고정 — 클라이언트 입력 무시
           exposureStatus: ExposureStatus.APPROVED, // 승인만
           status: RecruitmentStatus.RECRUITING, // 모집 중만

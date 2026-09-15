@@ -1,10 +1,11 @@
 /**
- * 공급자 · 파트너 서비스 이용 상태 조회 hook
+ * 공급자 서비스 이용 상태 조회 hook
  *
  * WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1
+ * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: partner 축 은퇴
  *
- * 두 서비스의 상태는 `GET /neture/home/entry` 의 `serviceStates` (서버 resolveNetureServiceStates,
- * 출처 = neture_suppliers / neture.neture_partners) 에서만 읽는다. 이 hook 은 안내 · 화면 분기용이고
+ * 상태는 `GET /neture/home/entry` 의 `serviceStates` (서버 resolveNetureServiceStates,
+ * 출처 = neture_suppliers) 에서만 읽는다. 이 hook 은 안내 · 화면 분기용이고
  * 실제 접근은 서버 guard 가 최종 판정한다.
  *
  * 조회 실패는 **미가입으로 취급하지 않는다** → `error` 로 노출하고 재시도만 제공한다.

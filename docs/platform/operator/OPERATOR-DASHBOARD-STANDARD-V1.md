@@ -369,7 +369,7 @@ Admin Sidebar는 서비스별로 다를 수 있으나, 다음 그룹을 우선 �
  2. Users          — 사용자/운영자 관리
  3. Approvals      — 승인 관리 (공급자, 상품, 서비스)
  4. Products       — 상품 마스터/카탈로그
- 5. Finance        — 정산/커미션/파트너
+ 5. Finance        — 정산 (커미션/파트너는 2026-09-15 Legacy Partner 은퇴)
  6. Content        — 광고/스폰서
  7. Analytics      — AI 정책/엔진
  8. System         — 시스템 설정

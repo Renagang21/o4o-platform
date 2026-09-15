@@ -48,7 +48,9 @@ import { tmpdir } from 'node:os';
 //     no-useless-catch 5 (web-neture admin.ts 3 · partner.ts 2 — `catch(e){throw e}` 제거)
 //     no-useless-escape 1 (pharmacy-hub-parity-contract.test.ts — 문자클래스 내 불필요 escape)
 //   실측 51 로 재산출.
-const ERROR_BASELINE = 51;
+// WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 (2026-09-15):
+//   Legacy Partner 파일 삭제로 실측 51 → 46 (web-neture partner.ts no-useless-catch 2 등). 실측값으로 낮춘다.
+const ERROR_BASELINE = 46;
 
 const baseline = Number(process.env.LINT_ERROR_BASELINE ?? ERROR_BASELINE);
 const reportPath = join(tmpdir(), `eslint-ratchet-${process.pid}.json`);

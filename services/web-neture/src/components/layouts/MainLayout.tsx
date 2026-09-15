@@ -4,7 +4,7 @@
  * WO-O4O-GLOBAL-LAYOUT-UNIFICATION-V1: Header → NetureGlobalHeader 교체
  *
  * 스코프:
- * - /, /o4o, /channel/*, /seller/overview/*, /partner/overview-info
+ * - /, /o4o, /channel/*, /seller/overview/*
  * - /test-center, /test-guide (다중 서비스)
  */
 

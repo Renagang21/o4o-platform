@@ -959,7 +959,6 @@ const QUICK_LINKS = [
   { label: '주문 처리', path: '/supplier/orders' },
   { label: '재고 관리', path: '/supplier/inventory' },
   { label: '정산 내역', path: '/supplier/settlements' },
-  { label: '파트너 수수료', path: '/supplier/partner-commissions' },
   { label: '사업자 정보', path: '/mypage/business-profile' },
 ];
 

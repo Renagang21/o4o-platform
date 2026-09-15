@@ -43,7 +43,6 @@ import {
 import { QRCodeCanvas } from 'qrcode.react';
 import { api } from '../../lib/api/index.js';
 import { storeCart } from '../../lib/api/storeCart';
-import { captureReferralToken } from '../../lib/referral.js';
 
 // ── Types ──
 
@@ -89,10 +88,6 @@ export default function StoreProductPage() {
   const [added, setAdded] = useState(false);
   const [shared, setShared] = useState(false);
   const [flyerLoading, setFlyerLoading] = useState<number | null>(null);
-
-  useEffect(() => {
-    captureReferralToken();
-  }, []);
 
   useEffect(() => {
     let path: string | null = null;

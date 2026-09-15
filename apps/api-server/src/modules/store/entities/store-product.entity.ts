@@ -71,8 +71,8 @@ export class StoreProduct {
   @Column({ name: 'is_featured', type: 'boolean', default: false })
   isFeatured: boolean;
 
-  @Column({ name: 'is_partner_recruiting', type: 'boolean', default: false })
-  isPartnerRecruiting: boolean;
+  // is_partner_recruiting (Legacy Partner 모집 플래그, 소비처 0 · 0건 true) 매핑 제거
+  //   — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 (물리 컬럼은 physical cleanup 대상)
 
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;

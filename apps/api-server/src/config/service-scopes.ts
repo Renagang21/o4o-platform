@@ -61,11 +61,9 @@ export const SERVICE_SCOPES: Record<string, ServiceScopes> = {
       'neture:products:read',
       'neture:orders:read',
       'neture:orders:manage',
-      'neture:partners:read',
     ],
     admin: [
       'neture:products:write',
-      'neture:partners:manage',
       'neture:orders:manage',
     ],
   },
@@ -123,7 +121,6 @@ export const SERVICE_SCOPES: Record<string, ServiceScopes> = {
     admin: [
       'cosmetics:products:write',
       'cosmetics:brands:write',
-      'cosmetics:partners:manage',
       'cosmetics:admin:access',
     ],
   },

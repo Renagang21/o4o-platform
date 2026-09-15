@@ -277,9 +277,8 @@ describe('§7-§8 · 연결 수정 호출이 backend 계약 경로를 가리킨�
     expect(stripAllComments(read('config/rolePermissions.ts'))).not.toContain("get('/roles')");
     expect(stripAllComments(read('types/user.ts'))).not.toContain('/api/v1/roles');
     expect(stripAllComments(read('pages/settings/OAuthSettings.tsx'))).not.toContain('/settings/oauth/test');
-    const partners = stripAllComments(read('pages/neture/PartnerListPage.tsx'));
-    expect(partners).not.toContain('/status');
-    expect(partners).not.toContain('useMutation');
+    // pages/neture/PartnerListPage.tsx 는 WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 로 삭제됐다.
+    expect(existsSync(join(SRC, 'pages/neture/PartnerListPage.tsx'))).toBe(false);
   });
 });
 

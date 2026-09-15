@@ -129,6 +129,7 @@ export const KPA_SCOPE_CONFIG: ServiceScopeGuardConfig = {
 /**
  * Neture Service Configuration
  *
+ * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 'neture:partner' scope 은퇴(보유자 0).
  * Platform bypass enabled: platform:super_admin can access.
  * Scope-level role mapping for hierarchical access control.
  */
@@ -138,7 +139,6 @@ export const NETURE_SCOPE_CONFIG: ServiceScopeGuardConfig = {
     'neture:admin',
     'neture:operator',
     'neture:supplier',
-    'neture:partner',
   ],
   platformBypass: true,
   legacyRoles: [],
@@ -147,7 +147,6 @@ export const NETURE_SCOPE_CONFIG: ServiceScopeGuardConfig = {
     'neture:admin': ['neture:admin'],
     'neture:operator': ['neture:operator', 'neture:admin'],
     'neture:supplier': ['neture:supplier', 'neture:admin'],
-    'neture:partner': ['neture:partner', 'neture:admin'],
   },
 };
 

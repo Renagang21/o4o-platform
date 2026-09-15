@@ -64,7 +64,6 @@ const KCOS_ADMIN_ROLE_DISPLAY: Record<string, string> = {
   seller: '판매자',
   consumer: '소비자',
   customer: '소비자',
-  partner: '파트너',
 };
 
 function getKcosAdminOperatorRole(u: UserData): '관리자' | '운영자' | null {

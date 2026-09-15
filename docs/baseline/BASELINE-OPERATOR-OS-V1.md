@@ -80,7 +80,7 @@
 | `neture.trigger.refresh_settlement` | refresh-settlement | Yes |
 | `neture.trigger.refresh_ai` | ai-refresh | Yes |
 | `neture.trigger.approve_supplier` | approve-supplier | Yes |
-| `neture.trigger.manage_partnership` | manage-partnership | Yes |
+| ~~`neture.trigger.manage_partnership`~~ | ~~manage-partnership~~ | 은퇴 (2026-09-15, WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 — Legacy Partner 제휴 요청 트리거) |
 | `neture.trigger.audit_review` | audit-review | Yes |
 
 ### GlycoPharm (4 triggers)

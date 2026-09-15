@@ -20,8 +20,6 @@ class HttpMetricsService {
   private httpRequestsInProgress: promClient.Gauge;
 
   // Custom Business Metrics
-  private commissionsInProgress: promClient.Gauge;
-  private activePartnersCount: promClient.Gauge;
 
   // Cache Metrics
   private cacheHitsTotal: promClient.Counter;
@@ -85,18 +83,6 @@ class HttpMetricsService {
     });
 
     // Custom business metrics
-    this.commissionsInProgress = getOrCreateMetric<promClient.Gauge>(promClient.Gauge, {
-      name: 'commissions_in_progress',
-      help: 'Number of commissions currently in progress state',
-      registers: [registry],
-    });
-
-    this.activePartnersCount = getOrCreateMetric<promClient.Gauge>(promClient.Gauge, {
-      name: 'active_partners_count',
-      help: 'Number of active partners in the system',
-      registers: [registry],
-    });
-
     // Cache metrics
     this.cacheHitsTotal = getOrCreateMetric<promClient.Counter>(promClient.Counter, {
       name: 'cache_hits_total',
@@ -228,24 +214,10 @@ class HttpMetricsService {
     try {
       // These will be populated from actual data sources
       // For now, they're placeholders
-      // TODO: Integrate with actual commission and partner services
+      // (Legacy Partner commission/partner gauge 는 WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 로 제거)
     } catch (error: any) {
       logger.error('Failed to update business metrics', { error: error.message });
     }
-  }
-
-  /**
-   * Set commissions in progress count
-   */
-  setCommissionsInProgress(count: number): void {
-    this.commissionsInProgress.set(count);
-  }
-
-  /**
-   * Set active partners count
-   */
-  setActivePartnersCount(count: number): void {
-    this.activePartnersCount.set(count);
   }
 
   /**

@@ -29,7 +29,7 @@ export const ACTION_KEYS = {
   NETURE_REFRESH_SETTLEMENT: 'neture.trigger.refresh_settlement',
   NETURE_REFRESH_AI: 'neture.trigger.refresh_ai',
   NETURE_APPROVE_SUPPLIER: 'neture.trigger.approve_supplier',
-  NETURE_MANAGE_PARTNERSHIP: 'neture.trigger.manage_partnership',
+  // NETURE_MANAGE_PARTNERSHIP — 은퇴 (WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1)
   NETURE_AUDIT_REVIEW: 'neture.trigger.audit_review',
 
   // GlycoPharm Care Operations — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)

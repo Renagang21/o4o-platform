@@ -7,7 +7,8 @@
 import { api } from './client.js';
 
 export interface ContactFormData {
-  contactType: 'supplier' | 'partner' | 'service' | 'other';
+  // 'partner'(마케팅 파트너십 문의) 는 Legacy Partner 은퇴로 신규 접수 종료 — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
+  contactType: 'supplier' | 'service' | 'other';
   name: string;
   email: string;
   phone?: string;

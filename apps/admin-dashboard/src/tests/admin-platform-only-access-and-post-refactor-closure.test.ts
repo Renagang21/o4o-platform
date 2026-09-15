@@ -218,11 +218,10 @@ describe('B축 · /partnerops/* 프런트 잔재 0', () => {
     expect(offenders).toEqual([]);
   });
 
-  it('serviceGroup id 는 유지한다 — partner-core 카탈로그 항목이 소비한다', () => {
-    // 잔재 제거가 살아 있는 공용 계약까지 지우지 않았음을 고정한다 (WO §6.3).
-    expect(read('api/admin-apps.ts')).toContain("'partnerops'");
-    const catalog = readFileSync(join(API, 'app-manifests/appsCatalog.ts'), 'utf8');
-    expect(catalog).toContain("id: 'partnerops'");
+  it('serviceGroup id partnerops 는 Legacy Partner 은퇴로 제거됐다 (WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1)', () => {
+    expect(stripAllComments(read('api/admin-apps.ts'))).not.toContain("'partnerops'");
+    const catalog = stripAllComments(readFileSync(join(API, 'app-manifests/appsCatalog.ts'), 'utf8'));
+    expect(catalog).not.toContain("id: 'partnerops'");
   });
 });
 

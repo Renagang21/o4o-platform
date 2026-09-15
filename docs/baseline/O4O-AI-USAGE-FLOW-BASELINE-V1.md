@@ -297,7 +297,7 @@ neture.co.kr/  =  O4O 전체 서비스 대표 진입점
 ```
 
 `neture.co.kr` 는 Neture 단일 서비스의 홈이 아니라 **O4O 공통 Home** 이다.
-Supplier(`/supplier`) · Partner(`/partner`) 는 O4O 의 **하위 업무영역**이며 pill 로 진입한다.
+Supplier(`/supplier`) 는 O4O 의 **하위 업무영역**이며 pill 로 진입한다. (Partner(`/partner`) 진입은 2026-09-15 Legacy Partner 은퇴로 제거 — ROLE-WORKSPACE-ARCHITECTURE §7)
 
 Home 의 기본 구성은 다음 4가지로 고정한다. 포털형·대시보드형 Home 으로 정의하지 않는다.
 

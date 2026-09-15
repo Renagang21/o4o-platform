@@ -21,7 +21,6 @@ import {
   ADMIN_ROLES,
   OPERATOR_OR_ABOVE_ROLES,
   SUPPLIER_ONLY_ROLES,
-  PARTNER_ONLY_ROLES,
 } from '../lib/role-constants';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
@@ -60,12 +59,11 @@ export function NetureGlobalHeader() {
   const isAdmin = isAuthenticated && user?.roles?.some((r: string) => ADMIN_ROLES.includes(r));
   const isOperator = isAuthenticated && user?.roles?.some((r: string) => OPERATOR_OR_ABOVE_ROLES.includes(r));
   const isSupplier = isAuthenticated && user?.roles?.some((r: string) => SUPPLIER_ONLY_ROLES.includes(r));
-  const isPartner = isAuthenticated && user?.roles?.some((r: string) => PARTNER_ONLY_ROLES.includes(r));
 
   // WO-O4O-COMMON-MENU-VISIBILITY-POLICY-IMPL-V1: operator/admin은 모든 메뉴를 본다
   const contextualNav = filterContextualNav(
     NETURE_CONTEXTUAL_NAV,
-    { supplier: !!isSupplier, partner: !!isPartner },
+    { supplier: !!isSupplier },
     { showAll: !!(isAdmin || isOperator) },
   );
 

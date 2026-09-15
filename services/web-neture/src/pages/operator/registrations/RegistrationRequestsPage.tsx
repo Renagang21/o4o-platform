@@ -33,7 +33,7 @@ import { operatorRegistrationApi } from '../../../lib/api';
 type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL';
 // WO-O4O-NETURE-ADMIN-OPERATOR-DASHBOARD-AND-MEMBER-TYPE-FIX-V1:
 // Neture 회원 유형에서 'consumer' 제거. 'user' 는 백엔드가 role 미지정 시 fallback 으로만 사용.
-type UserRole = 'supplier' | 'partner' | 'user' | 'seller' | 'pharmacist' | 'ALL';
+type UserRole = 'supplier' | 'user' | 'seller' | 'pharmacist' | 'ALL';
 
 interface RegistrationRequest {
   id: string;
@@ -88,7 +88,6 @@ const roleLabels: Record<string, string> = {
   admin: '관리자',
   operator: '운영자',
   supplier: '공급자',
-  partner: '파트너',
   user: '사용자',
   seller: '판매자',
   pharmacist: '약사회원',

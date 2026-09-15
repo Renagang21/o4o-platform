@@ -17,7 +17,6 @@ interface NotificationSettings {
   operatorEmailSecondary: string;
   notifications: {
     registrationRequest: boolean;
-    partnerApplication: boolean;
     supplierApplication: boolean;
     contactInquiry: boolean;
     systemAlert: boolean;
@@ -30,7 +29,6 @@ const defaultSettings: NotificationSettings = {
   operatorEmailSecondary: '',
   notifications: {
     registrationRequest: true,
-    partnerApplication: true,
     supplierApplication: true,
     contactInquiry: true,
     systemAlert: true,
@@ -43,11 +41,6 @@ const notificationTypes = [
     key: 'registrationRequest' as const,
     label: '회원가입 신청',
     description: '새로운 회원가입 신청이 접수되면 알림을 받습니다.',
-  },
-  {
-    key: 'partnerApplication' as const,
-    label: '파트너 신청',
-    description: '새로운 파트너 가입 신청이 접수되면 알림을 받습니다.',
   },
   {
     key: 'supplierApplication' as const,

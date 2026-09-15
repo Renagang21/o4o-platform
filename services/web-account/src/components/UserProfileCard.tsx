@@ -12,7 +12,6 @@ const ROLE_LABELS: Record<string, string> = {
   'neture:admin': '관리자',
   'neture:operator': '운영자',
   'neture:supplier': '공급자',
-  'neture:partner': '파트너',
   'neture:seller': '셀러',
   'kpa-society:admin': 'KPA 관리자',
   'kpa-society:operator': 'KPA 운영자',

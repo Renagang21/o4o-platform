@@ -1,7 +1,7 @@
 /**
  * P3: RoleApplication Entity
  *
- * Manages user role application workflow (seller, supplier, partner, etc.)
+ * Manages user role application workflow (seller, supplier, etc.)
  * - Users submit applications via /apply/* pages
  * - Admins review and approve/reject
  * - Approved applications create RoleAssignments
@@ -37,7 +37,7 @@ export class RoleApplication {
   user!: User;
 
   @Column({ type: 'varchar', length: 50 })
-  role!: string; // 'seller' | 'supplier' | 'partner' | 'admin' etc.
+  role!: string; // 'seller' | 'supplier' | 'admin' etc.
 
   @Column({
     type: 'enum',

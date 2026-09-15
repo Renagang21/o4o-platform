@@ -1,8 +1,8 @@
 /**
- * PartnerInfoPage - 공급자/파트너/협력사 안내 페이지
+ * SupplierInfoPage - 공급자/협력사 안내 페이지 (구 PartnerInfoPage — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1)
  *
  * 이 페이지는 소비자-facing 서비스에서
- * 공급자·파트너·협력사가 서비스와 관계를 맺을 수 있는 공식 진입 통로를 제공합니다.
+ * 공급자·협력사가 서비스와 관계를 맺을 수 있는 공식 진입 통로를 제공합니다.
  *
  * 책임:
  * - 역할과 관계 설명
@@ -14,7 +14,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Package, Handshake, Globe, type LucideIcon } from 'lucide-react';
+import { Package, Globe, type LucideIcon } from 'lucide-react';
 
 interface RoleCard {
   id: string;
@@ -31,12 +31,6 @@ const ROLE_CARDS: RoleCard[] = [
     description: '상품을 공급하고 K-Cosmetics 유통망에 참여합니다. 공급 등록 및 관리는 네뚜레에서 진행됩니다.',
   },
   {
-    id: 'partner',
-    Icon: Handshake,
-    title: '파트너',
-    description: '판매 및 유통 파트너로 참여합니다. 파트너 등록 및 정산은 네뚜레에서 통합 관리됩니다.',
-  },
-  {
     id: 'collaborator',
     Icon: Globe,
     title: '협력사',
@@ -44,18 +38,18 @@ const ROLE_CARDS: RoleCard[] = [
   },
 ];
 
-export function PartnerInfoPage() {
+export function SupplierInfoPage() {
   return (
     <div style={styles.container}>
       {/* 상단 설명 영역 */}
       <header style={styles.header}>
-        <h1 style={styles.title}>공급자 · 파트너 · 협력사 안내</h1>
+        <h1 style={styles.title}>공급자 · 협력사 안내</h1>
         <div style={styles.notice}>
           <p style={styles.noticeText}>
             <strong>K-Cosmetics는 소비자를 위한 쇼핑 공간입니다.</strong>
           </p>
           <p style={styles.noticeText}>
-            공급자, 파트너, 협력사는 이 서비스의 회원이 아닙니다.
+            공급자, 협력사는 이 서비스의 회원이 아닙니다.
           </p>
           <p style={styles.noticeText}>
             참여 및 협력은 <strong>네뚜레(Neture)</strong>를 통해 이루어집니다.
@@ -192,4 +186,4 @@ const styles: Record<string, React.CSSProperties> = {
   },
 };
 
-export default PartnerInfoPage;
+export default SupplierInfoPage;

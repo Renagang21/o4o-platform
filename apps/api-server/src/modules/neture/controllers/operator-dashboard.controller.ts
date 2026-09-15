@@ -19,10 +19,8 @@
  *   - neture.neture_orders (recent orders, revenue)
  *   - service_memberships (pending registrations)
  *   - cms_contents (serviceKey='neture')
- *   - neture.neture_partners (active partners)
  *   - neture_settlements (pending settlements)
  *   - neture_contact_messages (unread messages)
- *   - neture_partnership_requests (open requests)
  */
 
 import { Router, Request, Response } from 'express';
@@ -55,10 +53,8 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         pendingRegistrations,
         cmsCounts,
         recentActivity,
-        partnerCount,
         settlementCount,
         contactCount,
-        partnerRequestCount,
         pendingProductCount,
         pendingTrialCount,
       ] = await Promise.all([
@@ -136,13 +132,6 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           LIMIT 5
         `).catch(() => []) as Promise<Array<{ source: string; ref: string; detail: string; created_at: string }>>,
 
-        // 8. Active partners — .catch: neture_partners migration 미존재 방어
-        dataSource.query(`
-          SELECT COUNT(*)::int AS cnt
-          FROM neture.neture_partners
-          WHERE status = 'active'
-        `).catch(() => [{ cnt: 0 }]) as Promise<Array<{ cnt: number }>>,
-
         // 9. Pending settlements
         dataSource.query(`
           SELECT COUNT(*)::int AS cnt
@@ -155,13 +144,6 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           SELECT COUNT(*)::int AS cnt
           FROM neture_contact_messages
           WHERE status != 'resolved'
-        `).catch(() => [{ cnt: 0 }]) as Promise<Array<{ cnt: number }>>,
-
-        // 11. Open partnership requests
-        dataSource.query(`
-          SELECT COUNT(*)::int AS cnt
-          FROM neture_partnership_requests
-          WHERE status = 'OPEN'
         `).catch(() => [{ cnt: 0 }]) as Promise<Array<{ cnt: number }>>,
 
         // 12. Pending product offers (상품 승인 대기 — /operator/product-approvals 소스)
@@ -194,10 +176,8 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
       const orders = orderStats[0] || { total_orders: 0, paid_orders: 0, total_revenue: 0 };
       const pendingRegs = pendingRegistrations[0]?.cnt || 0;
       const cms = cmsCounts[0] || { total: 0, published: 0 };
-      const activePartners = partnerCount[0]?.cnt || 0;
       const pendingSettlements = settlementCount[0]?.cnt || 0;
       const unreadMessages = contactCount[0]?.cnt || 0;
-      const partnerRequests = partnerRequestCount[0]?.cnt || 0;
       // WO-O4O-NETURE-OPERATOR-DASHBOARD-V2-IA-REBUILD-V1: 승인 큐 분리 소스
       const pendingProducts = pendingProductCount[0]?.cnt || 0;          // supplier_product_offers.approval_status='PENDING'
       const pendingServiceApprovals = products.pending;                  // offer_service_approvals.approval_status='pending' (service_key='neture')
@@ -206,15 +186,14 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
       // === Build 5-block response ===
 
       // Block 1: KPIs — WO-O4O-NETURE-OPERATOR-DASHBOARD-V2-IA-REBUILD-V1
-      // Neture 운영 흐름 축으로 재배열: 공급자/파트너 → 상품/콘텐츠 → Market Trial → 주문/정산 → 조직.
-      // 실제 존재하는 /operator/* 라우트에만 link 부착 (정산/파트너는 operator 라우트 없음 → link 없음, 요약만).
+      // Neture 운영 흐름 축으로 재배열: 공급자 → 상품/콘텐츠 → Market Trial → 주문/정산 → 조직.
+      // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 파트너 KPI 2종 은퇴.
+      // 실제 존재하는 /operator/* 라우트에만 link 부착 (정산은 operator 라우트 없음 → link 없음, 요약만).
       // KPI-LABEL-DRIFT-FIX-V1: '활성 약국' → '활성 참여 조직' (organizations JOIN organization_service_enrollments WHERE service_code='neture').
       const kpis: KpiItem[] = [
-        // ── 공급자 / 파트너 상태 ──
+        // ── 공급자 상태 ──
         { key: 'active-suppliers', label: '활성 공급사', value: activeSuppliers, status: 'neutral', link: '/operator/suppliers' },
         { key: 'pending-suppliers', label: '공급사 승인 대기', value: pendingSuppliers, status: pendingSuppliers > 0 ? 'warning' : 'neutral', link: '/operator/suppliers' },
-        { key: 'active-partners', label: '활성 파트너', value: activePartners, status: 'neutral' },
-        { key: 'partner-requests', label: '파트너 요청', value: partnerRequests, status: partnerRequests > 0 ? 'warning' : 'neutral' },
         // ── 상품 / 콘텐츠 상태 ──
         { key: 'active-products', label: '판매 상품', value: products.active, status: 'neutral', link: '/operator/all-registered-products' },
         { key: 'pending-products', label: '승인 대기 상품', value: pendingProducts, status: pendingProducts > 0 ? 'warning' : 'neutral', link: '/operator/product-approvals' },
@@ -237,7 +216,6 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         orders: { monthly: orders.total_orders, revenue: orders.total_revenue },
         registrations: { pending: pendingRegs },
         cms: { published: cms.published, total: cms.total },
-        partners: { active: activePartners },
         settlements: { pending: pendingSettlements },
         contacts: { unread: unreadMessages },
       };
@@ -282,9 +260,9 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           '접수된 문의 중 아직 확인하지 않은 건입니다.'),
       ];
 
-      // Block 4: Activity Log (multi-source: orders, suppliers, products, partners, contacts)
+      // Block 4: Activity Log (multi-source: orders, suppliers, products, contacts)
       const sourceLabel: Record<string, string> = {
-        order: '주문', supplier: '공급사', product: '상품', partner: '파트너', contact: '문의',
+        order: '주문', supplier: '공급사', product: '상품', contact: '문의',
       };
       const activityLog: ActivityItem[] = recentActivity.map((a, i) => ({
         id: `${a.source}-${i}`,

@@ -52,7 +52,6 @@ export const SUPPORTED_POLICY_DOCUMENT_TYPES = [
   'refund',
   'commerce',
   'seller',
-  'partner',
   'community',
   'marketing',
   'location',

@@ -34,7 +34,7 @@ import { createMembershipScopeGuard } from '../common/middleware/membership-guar
  *   (`packages/security-core/src/service-configs.ts` 의 KPA_SCOPE_CONFIG 등 참조).
  *
  *   admin 은 **운영 권한만** 포괄한다. store_owner 는 약국 경영자라는 사업자 신분이므로
- *   admin 이 대신하지 않는다 (Neture 가 admin 에게 supplier/partner scope 까지 준 것과
+ *   admin 이 대신하지 않는다 (Neture 가 admin 에게 supplier scope 까지 준 것과
  *   의도적으로 다르다 — Pharmacy-Hub 는 거래 당사자 축을 분리한다).
  *
  *   operator 는 store_owner scope 를 대신 통과하지 않는다. 운영자는 가입 승인·회원

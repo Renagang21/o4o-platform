@@ -11,7 +11,7 @@ import { Router, Request, Response } from 'express';
 import type { RequestHandler, Router as ExpressRouter } from 'express';
 import type { DataSource } from 'typeorm';
 import { NetureService } from './neture.service.js';
-import { SupplierStatus, PartnershipStatus } from './entities/index.js';
+import { SupplierStatus } from './entities/index.js';
 import logger from '../../utils/logger.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
@@ -31,9 +31,11 @@ import { createSupplierSettlementController } from './controllers/supplier-settl
 import { createAdminController, createProductImageController } from './controllers/admin.controller.js';
 import { createAdminServiceAudienceController } from './controllers/admin-service-audience.controller.js';
 import { createAdminSettlementController } from './controllers/admin-settlement.controller.js';
-import { createPartnerController } from './controllers/partner.controller.js';
-import { createSellerController, createPartnerContractController } from './controllers/seller.controller.js';
-import { createSupplierContractController } from './controllers/supplier-contract.controller.js';
+import { createSellerController } from './controllers/seller.controller.js';
+// WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 판매자 모집(비-Partner)
+import { createSellerRecruitmentController } from './controllers/seller-recruitment.controller.js';
+import { createRequireActiveSupplier } from './middleware/neture-identity.middleware.js';
+import { SellerRecruitmentService } from './services/seller-recruitment.service.js';
 import { createSupplierImportController } from './controllers/supplier-import.controller.js';
 import { createContactController } from './controllers/contact.controller.js';
 import { createOperatorRegistrationController } from './controllers/operator-registration.controller.js';
@@ -52,7 +54,6 @@ import { createAdminDashboardController } from './controllers/admin-dashboard.co
 import { createOperatorCategoryMappingController } from './controllers/operator-category-mapping.controller.js';
 import { createOperatorRecruitmentExposureController } from './controllers/operator-recruitment-exposure.controller.js';
 import { createOperatorSupplierController } from './controllers/operator-supplier.controller.js';
-import { createOperatorPartnerController } from './controllers/operator-partner.controller.js';
 import { createOperatorContactController } from './controllers/operator-contact.controller.js';
 import { CategoryMappingService } from './services/category-mapping.service.js';
 
@@ -89,7 +90,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/supplier', createInventoryController(dataSource));
   router.use('/supplier', createSupplierSettlementController(dataSource));
   // WO-O4O-NETURE-SELLER-CONTRACT-TO-SUPPLIER-MIGRATION-V1: 공급자 계약 API
-  router.use('/supplier', createSupplierContractController(dataSource));
+  // (은퇴) /supplier/contracts* — Legacy seller-partner 계약 (WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1)
   // WO-O4O-NETURE-SUPPLIER-IMPORT-ASSISTANT-DYNAMIC-DETAIL-CONTENTS-DETECTION-V1: 동적 상세설명 SSRF-safe 조회
   router.use('/supplier', createSupplierImportController(dataSource));
 
@@ -189,15 +190,21 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1
   // operator scope supplier activation (admin scope endpoints 와 별도 — 권한 확장 아님)
   router.use('/operator', createOperatorSupplierController(dataSource));
-  // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1: 파트너 서비스 신청 승인 콘솔
-  router.use('/operator', createOperatorPartnerController(dataSource));
   // WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1
   // operator scope contact-messages list (admin endpoints 와 별도 — 권한 확장 아님)
   router.use('/operator', createOperatorContactController(dataSource));
 
-  // Partner domain (full paths included in controller: /partner/*, /admin/partners/*, /admin/partner-settlements/*)
-  router.use('/', createPartnerController(dataSource));
-  router.use('/partner', createPartnerContractController(dataSource));
+  // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
+  //   Legacy Partner 도메인(/partner/* 대시보드·상품풀·링크·정산 · /admin/partners* · /admin/partner-settlements*
+  //   · /operator/partners* · /partnership/requests*) 은 runtime 에서 은퇴했다.
+  //   판매자 모집(Seller Recruitment) 은 Partner 가 아니므로 분리해 유지한다.
+  //   canonical: /seller-recruitment/* — /partner/* 는 배포 창 동안의 은퇴 예정 alias (physical cleanup 에서 제거).
+  const sellerRecruitmentRouter = createSellerRecruitmentController({
+    sellerRecruitmentService: new SellerRecruitmentService(),
+    requireActiveSupplier: createRequireActiveSupplier(dataSource),
+  });
+  router.use('/seller-recruitment', sellerRecruitmentRouter);
+  router.use('/partner', sellerRecruitmentRouter);
 
   // Seller domain
   router.use('/seller', createSellerController(dataSource));
@@ -283,39 +290,6 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
     } catch (error) {
       logger.error('[Neture API] Error fetching supplier detail:', error);
       res.status(500).json({ error: 'Failed to fetch supplier detail', details: (error as Error).message });
-    }
-  });
-
-  /**
-   * GET /api/v1/neture/partnership/requests
-   */
-  router.get('/partnership/requests', requireAuth, async (req: Request, res: Response) => {
-    try {
-      const { status } = req.query;
-      const filters: { status?: PartnershipStatus } = {};
-      if (status && typeof status === 'string') filters.status = status as PartnershipStatus;
-      const requests = await netureService.getPartnershipRequests(filters);
-      res.json({ requests });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching partnership requests:', error);
-      res.status(500).json({ error: 'Failed to fetch partnership requests', details: (error as Error).message });
-    }
-  });
-
-  /**
-   * GET /api/v1/neture/partnership/requests/:id
-   */
-  router.get('/partnership/requests/:id', requireAuth, async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      const request = await netureService.getPartnershipRequestById(id);
-      if (!request) {
-        return res.status(404).json({ error: 'Partnership request not found' });
-      }
-      res.json(request);
-    } catch (error) {
-      logger.error('[Neture API] Error fetching partnership request detail:', error);
-      res.status(500).json({ error: 'Failed to fetch partnership request detail', details: (error as Error).message });
     }
   });
 

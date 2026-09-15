@@ -2,7 +2,7 @@
  * HomepageCmsPage — 운영자 홈페이지 CMS 관리
  * WO-O4O-NETURE-HOMEPAGE-CMS-V1
  *
- * 탭: Hero Slides | Homepage Ads | Partner Logos
+ * 탭: Hero Slides | Homepage Ads | 협력사 로고 (metadataSection 'partner-logo' = 홈 협력사 로고 CMS 섹션, Legacy Partner 아님)
  * 기능: 등록 / 수정 / 삭제 / 발행 / 순서 변경
  */
 
@@ -16,7 +16,7 @@ type Section = 'hero' | 'ads' | 'logos';
 const TABS: { key: Section; label: string }[] = [
   { key: 'hero', label: 'Hero Slides' },
   { key: 'ads', label: 'Homepage Ads' },
-  { key: 'logos', label: 'Partner Logos' },
+  { key: 'logos', label: '협력사 로고' },
 ];
 
 interface FormData {

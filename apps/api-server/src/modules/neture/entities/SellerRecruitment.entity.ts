@@ -1,9 +1,17 @@
 /**
- * NeturePartnerRecruitment Entity
+ * SellerRecruitment Entity — 공급자의 판매자(매장) 모집 공고
  *
- * WO-O4O-PARTNER-RECRUITMENT-API-IMPLEMENTATION-V1
+ * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
+ *   (구 NeturePartnerRecruitment · WO-O4O-PARTNER-RECRUITMENT-API-IMPLEMENTATION-V1 에서 분리)
  *
- * 제품 × 판매자 단위 파트너 모집 공고
+ * 도메인: Supplier → Store 판매자 모집. Legacy Partner(제휴마케팅)가 **아니다**
+ *   (O4O-ROLE-WORKSPACE-ARCHITECTURE-V1 §7 · IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1 §B-8).
+ *
+ * ⚠️ temporary legacy persistence seam:
+ *   물리 테이블명 `neture_partner_recruitments` 는 과거 명칭이다. 이번 WO 는 DDL 을 만들지 않으므로
+ *   테이블/컬럼명은 그대로 두고 **이 엔티티만이 그 이름을 안다**. rename 은 후속
+ *   WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 대상.
+ *
  * 상태:
  *  - status(RecruitmentStatus): 모집 운영 상태 — recruiting (모집중) / closed (마감)
  *  - exposureStatus(ExposureStatus): 서비스 노출 승인 상태 — pending / approved / rejected
@@ -38,12 +46,15 @@ export enum ExposureStatus {
   REJECTED = 'rejected',
 }
 
-@Entity('neture_partner_recruitments')
+/** 물리 테이블명 (legacy seam) — 이 상수 밖에서 문자열을 반복하지 않는다. */
+export const SELLER_RECRUITMENT_TABLE = 'neture_partner_recruitments';
+
+@Entity(SELLER_RECRUITMENT_TABLE)
 // WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1:
-// 서비스당 1 row — 같은 상품×판매자라도 service 별 독립 모집(각자 exposure_status).
+// 서비스당 1 row — 같은 상품×공급자라도 service 별 독립 모집(각자 exposure_status).
 @Unique(['productId', 'sellerId', 'serviceId'])
 @Index(['status'])
-export class NeturePartnerRecruitment {
+export class SellerRecruitment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -62,6 +73,7 @@ export class NeturePartnerRecruitment {
   @Column({ name: 'commission_rate', type: 'decimal', precision: 5, scale: 2, default: 0 })
   commissionRate: number;
 
+  /** 모집 주체 = 공급자 user id (C bridge offer 해소 전제). 컬럼명 seller_id 는 legacy. */
   @Column({ name: 'seller_id' })
   sellerId: string;
 

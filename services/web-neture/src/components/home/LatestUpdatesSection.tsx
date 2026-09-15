@@ -3,23 +3,24 @@
  *
  * Work Order: WO-O4O-NETURE-UI-REFACTORING-V1
  *
- * 표시 항목: 새 공급자 등록, 새 파트너 참여, 새 포럼 글
+ * 표시 항목: 새 공급자 등록
+ * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 파트너 참여(제휴 요청) 항목 은퇴
  * 정렬: 최신순
  * 표시 개수: 최대 5
  *
- * 데이터: netureApi.getSuppliers() + netureApi.getPartnershipRequests() 조합
+ * 데이터: netureApi.getSuppliers()
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Activity, Building2, Handshake } from 'lucide-react';
-import { netureApi, type Supplier, type PartnershipRequest } from '../../lib/api';
+import { Activity, Building2 } from 'lucide-react';
+import { netureApi, type Supplier } from '../../lib/api';
 import { LoadError } from '@o4o/ui';
 
 interface UpdateItem {
   id: string;
   name: string;
   role: string;
-  icon: 'supplier' | 'partner';
+  icon: 'supplier';
 }
 
 export function LatestUpdatesSection() {
@@ -34,37 +35,23 @@ export function LatestUpdatesSection() {
     setLoading(true);
     setLoadError(false);
     try {
-      const [suppliersRes, requestsRes] = await Promise.allSettled([
-        netureApi.getSuppliers(),
-        netureApi.getPartnershipRequests('OPEN'),
-      ]);
+      const [suppliersRes] = await Promise.allSettled([netureApi.getSuppliers()]);
 
-      if (suppliersRes.status === 'rejected' && requestsRes.status === 'rejected') {
+      if (suppliersRes.status === 'rejected') {
         setLoadError(true);
         return;
       }
 
-      const suppliers: Supplier[] = suppliersRes.status === 'fulfilled' ? suppliersRes.value : [];
-      const requests: PartnershipRequest[] =
-        requestsRes.status === 'fulfilled' ? requestsRes.value : [];
+      const suppliers: Supplier[] = suppliersRes.value;
 
       const updates: UpdateItem[] = [];
 
-      suppliers.slice(0, 3).forEach((s) => {
+      suppliers.slice(0, 5).forEach((s) => {
         updates.push({
           id: `s-${s.id}`,
           name: s.name,
           role: '새 공급자 참여',
           icon: 'supplier',
-        });
-      });
-
-      requests.slice(0, 2).forEach((r) => {
-        updates.push({
-          id: `p-${r.id}`,
-          name: r.seller.name,
-          role: '새 파트너 참여',
-          icon: 'partner',
         });
       });
 
@@ -131,13 +118,8 @@ export function LatestUpdatesSection() {
       <div className="space-y-3">
         {items.map((item) => (
           <div key={item.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-              item.icon === 'supplier' ? 'bg-blue-100' : 'bg-emerald-100'
-            }`}>
-              {item.icon === 'supplier'
-                ? <Building2 className="w-5 h-5 text-blue-600" />
-                : <Handshake className="w-5 h-5 text-emerald-600" />
-              }
+            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-100">
+              <Building2 className="w-5 h-5 text-blue-600" />
             </div>
             <div>
               <span className="text-sm font-medium text-gray-900">{item.name}</span>

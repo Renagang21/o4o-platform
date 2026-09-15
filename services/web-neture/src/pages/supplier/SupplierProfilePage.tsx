@@ -54,7 +54,8 @@ import { AddressSearch } from '@o4o/ui';
 
 const VISIBILITY_OPTIONS: { value: ContactVisibility; label: string; desc: string }[] = [
   { value: 'public', label: '전체 공개', desc: '모든 판매자에게 표시' },
-  { value: 'partners', label: '파트너만', desc: '승인된 파트너에게만 표시' },
+  // 'partners' = 공급 승인(PRIVATE) 된 거래 매장 — Legacy Partner 와 무관한 물리 enum 값(라벨만 정정)
+  { value: 'partners', label: '승인 거래처만', desc: '공급 승인된 매장(거래처)에게만 표시' },
   { value: 'private', label: '비공개', desc: '본인만 확인 가능' },
 ];
 
@@ -1020,7 +1021,7 @@ export default function SupplierProfilePage() {
               type="email"
               value={contactEmail}
               onChange={(e) => setContactEmail(e.target.value)}
-              placeholder="partner@example.com"
+              placeholder="contact@example.com"
               className={inputClass}
             />
             <VisibilitySelector value={emailVisibility} onChange={setEmailVisibility} />

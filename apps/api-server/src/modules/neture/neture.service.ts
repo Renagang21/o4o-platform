@@ -12,8 +12,7 @@
  *   - NetureOfferService       (offer CRUD, approval, supplier products)
  *   - NetureCatalogService     (master, category, brand, image)
  *   - NetureDashboardService   (dashboard summaries & KPI)
- *   - NeturePartnerContractService (partner recruitment, application, contract)
- *   - NeturePartnershipService (partnership request CRUD)
+ *   - SellerRecruitmentService (판매자 모집 — 비-Partner, WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1)
  */
 
 import { AppDataSource } from '../../database/connection.js';
@@ -23,12 +22,11 @@ import { NetureOfferService } from './services/offer.service.js';
 import { OfferServicePriceService, type ServicePriceInput } from './services/offer-service-price.service.js';
 import { NetureSupplierService } from './services/supplier.service.js';
 import { NetureDashboardService } from './services/neture-dashboard.service.js';
-import { NeturePartnerContractService } from './services/partner-contract.service.js';
-import { NeturePartnershipService } from './services/partnership.service.js';
+// WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: Partner 계약/제휴 서비스 은퇴, 판매자 모집만 분리 유지
+import { SellerRecruitmentService } from './services/seller-recruitment.service.js';
 
 import type { NetureSupplier, SupplierStatus, OfferDistributionType, OfferApprovalStatus, ContactVisibility, ProductMaster, ProductCategory, Brand, ProductImage } from './entities/index.js';
-import type { NeturePartner } from '../../routes/neture/entities/neture-partner.entity.js';
-import type { PartnershipStatus, RecruitmentStatus } from './entities/index.js';
+import type { RecruitmentStatus } from './entities/index.js';
 import { ExposureStatus } from './entities/index.js';
 
 export class NetureService {
@@ -52,6 +50,12 @@ export class NetureService {
     return this._supplierService;
   }
 
+  private _sellerRecruitmentService?: SellerRecruitmentService;
+  private get sellerRecruitmentService(): SellerRecruitmentService {
+    if (!this._sellerRecruitmentService) this._sellerRecruitmentService = new SellerRecruitmentService();
+    return this._sellerRecruitmentService;
+  }
+
   // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1
   private _servicePriceService?: OfferServicePriceService;
   private get servicePriceService(): OfferServicePriceService {
@@ -73,18 +77,6 @@ export class NetureService {
     return this._dashboardService;
   }
 
-  private _partnerContractService?: NeturePartnerContractService;
-  private get partnerContractService(): NeturePartnerContractService {
-    if (!this._partnerContractService) this._partnerContractService = new NeturePartnerContractService();
-    return this._partnerContractService;
-  }
-
-  private _partnershipService?: NeturePartnershipService;
-  private get partnershipService(): NeturePartnershipService {
-    if (!this._partnershipService) this._partnershipService = new NeturePartnershipService();
-    return this._partnershipService;
-  }
-
   // ==================== Supplier Identity ====================
 
   async getSupplierIdByUserId(userId: string): Promise<string | null> {
@@ -93,12 +85,6 @@ export class NetureService {
 
   async getSupplierByUserId(userId: string): Promise<NetureSupplier | null> {
     return this.supplierService.getSupplierByUserId(userId);
-  }
-
-  // ==================== Partner Identity ====================
-
-  async getPartnerByUserId(userId: string): Promise<NeturePartner | null> {
-    return this.partnerContractService.getPartnerByUserId(userId);
   }
 
   // ==================== Supplier Onboarding ====================
@@ -221,10 +207,6 @@ export class NetureService {
     return this.supplierService.getSuppliers(filters);
   }
 
-  async hasApprovedPartnership(supplierId: string, viewerId: string): Promise<boolean> {
-    return this.supplierService.hasApprovedPartnership(supplierId, viewerId);
-  }
-
   async getSupplierBySlug(slug: string, viewerId?: string | null) {
     return this.supplierService.getSupplierBySlug(slug, viewerId);
   }
@@ -284,40 +266,6 @@ export class NetureService {
 
   async computeProfileCompleteness(supplierId: string) {
     return this.supplierService.computeProfileCompleteness(supplierId);
-  }
-
-  // ==================== Partnership Requests ====================
-
-  async getPartnershipRequests(filters?: { status?: PartnershipStatus }) {
-    return this.partnershipService.getPartnershipRequests(filters);
-  }
-
-  async getPartnershipRequestById(id: string) {
-    return this.partnershipService.getPartnershipRequestById(id);
-  }
-
-  async createPartnershipRequest(data: {
-    sellerId: string;
-    sellerName: string;
-    sellerServiceType?: string;
-    sellerStoreUrl?: string;
-    periodStart?: string;
-    periodEnd?: string;
-    revenueStructure?: string;
-    promotionSns?: boolean;
-    promotionContent?: boolean;
-    promotionBanner?: boolean;
-    promotionOther?: string;
-    contactEmail?: string;
-    contactPhone?: string;
-    contactKakao?: string;
-    products?: Array<{ name: string; category?: string }>;
-  }) {
-    return this.partnershipService.createPartnershipRequest(data);
-  }
-
-  async updatePartnershipRequestStatus(id: string, status: PartnershipStatus) {
-    return this.partnershipService.updatePartnershipRequestStatus(id, status);
   }
 
   // ==================== Supplier Products ====================
@@ -621,10 +569,6 @@ export class NetureService {
     return this.dashboardService.getAdminDashboardSummary();
   }
 
-  async getPartnerDashboardSummary(userId: string) {
-    return this.dashboardService.getPartnerDashboardSummary(userId);
-  }
-
   async getSellerDashboardInsight(sellerId: string) {
     return this.dashboardService.getSellerDashboardInsight(sellerId);
   }
@@ -640,96 +584,20 @@ export class NetureService {
     return this.offerService.getAllRegisteredOffers(options);
   }
 
-  // ==================== Partner Recruitment & Application ====================
+  // ==================== Seller Recruitment (판매자 모집 · 비-Partner) ====================
+  // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
+  //   운영자 노출 승인 큐 · 매장 browse 컨트롤러가 쓰는 위임 메서드. 본체는 SellerRecruitmentService.
 
-  async getPartnerRecruitments(filters?: { status?: RecruitmentStatus; serviceKey?: string; exposureStatus?: ExposureStatus }) {
-    return this.partnerContractService.getPartnerRecruitments(filters);
+  async getSellerRecruitments(filters?: { status?: RecruitmentStatus; serviceKey?: string; exposureStatus?: ExposureStatus }) {
+    return this.sellerRecruitmentService.getRecruitments(filters);
   }
 
   // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-BACKEND-V1: 운영자 노출 승인 큐 + approve/reject
   async getRecruitmentsForExposureReview(filters?: { serviceKey?: string; exposureStatus?: ExposureStatus; status?: RecruitmentStatus }) {
-    return this.partnerContractService.getRecruitmentsForExposureReview(filters);
+    return this.sellerRecruitmentService.getRecruitmentsForExposureReview(filters);
   }
 
   async setRecruitmentExposure(recruitmentId: string, operatorUserId: string, decision: ExposureStatus.APPROVED | ExposureStatus.REJECTED, note?: string, serviceKey?: string) {
-    return this.partnerContractService.setRecruitmentExposure(recruitmentId, operatorUserId, decision, note, serviceKey);
-  }
-
-  async createPartnerApplication(recruitmentId: string, partnerId: string, partnerName: string) {
-    return this.partnerContractService.createPartnerApplication(recruitmentId, partnerId, partnerName);
-  }
-
-  // WO-O4O-SELLER-RECRUITMENT-CREATION-FLOW-V1: 공급자 모집 생성
-  async createPartnerRecruitment(
-    sellerUserId: string,
-    // WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1: serviceKeys[](복수) 수용 + serviceKey 하위호환
-    input: { masterId?: string; serviceKey?: string; serviceKeys?: string[]; commissionRate?: number; consumerPrice?: number; shopUrl?: string; imageUrl?: string },
-  ) {
-    return this.partnerContractService.createRecruitment(sellerUserId, input);
-  }
-
-  // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-STATUS-VIEW-V1: 공급자 본인 모집 현황
-  async getSellerRecruitments(sellerUserId: string) {
-    return this.partnerContractService.getSellerRecruitments(sellerUserId);
-  }
-
-  // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1: 모집 신청자 목록(소유권 필터)
-  async getRecruitmentApplications(recruitmentId: string, sellerUserId: string) {
-    return this.partnerContractService.getRecruitmentApplications(recruitmentId, sellerUserId);
-  }
-
-  // WO-O4O-SELLER-RECRUITMENT-CLOSE-ACTION-V1: 모집 마감(신규 신청 차단)
-  async closePartnerRecruitment(recruitmentId: string, sellerUserId: string) {
-    return this.partnerContractService.closeRecruitment(recruitmentId, sellerUserId);
-  }
-
-  // WO-O4O-SELLER-RECRUITMENT-REOPEN-ACTION-V1: 모집 재개(다시 신규 신청 가능)
-  async reopenPartnerRecruitment(recruitmentId: string, sellerUserId: string) {
-    return this.partnerContractService.reopenRecruitment(recruitmentId, sellerUserId);
-  }
-
-  // WO-O4O-SELLER-RECRUITMENT-PARTICIPATION-TERMINATION-V1: 승인 판매자 참여 해지
-  async terminateRecruitmentParticipation(applicationId: string, sellerUserId: string) {
-    return this.partnerContractService.terminateParticipation(applicationId, sellerUserId);
-  }
-
-  // WO-O4O-MY-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1: 판매자 본인 신청 현황
-  async getPartnerApplications(partnerUserId: string) {
-    return this.partnerContractService.getApplicationsForPartner(partnerUserId);
-  }
-
-  // WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1: 신청자 본인 pending 신청 철회
-  async cancelPartnerApplication(applicationId: string, partnerUserId: string) {
-    return this.partnerContractService.cancelApplication(applicationId, partnerUserId);
-  }
-
-  async approvePartnerApplication(applicationId: string, sellerId: string) {
-    return this.partnerContractService.approvePartnerApplication(applicationId, sellerId);
-  }
-
-  async rejectPartnerApplication(applicationId: string, sellerId: string, reason?: string) {
-    return this.partnerContractService.rejectPartnerApplication(applicationId, sellerId, reason);
-  }
-
-  // ==================== Seller-Partner Contracts ====================
-
-  async terminateContract(
-    contractId: string,
-    actorId: string,
-    actorType: 'seller' | 'partner',
-  ) {
-    return this.partnerContractService.terminateContract(contractId, actorId, actorType);
-  }
-
-  async getSellerContracts(sellerId: string, status?: string) {
-    return this.partnerContractService.getSellerContracts(sellerId, status);
-  }
-
-  async getPartnerContracts(partnerId: string, status?: string) {
-    return this.partnerContractService.getPartnerContracts(partnerId, status);
-  }
-
-  async updateCommissionRate(contractId: string, newRate: number, sellerId: string) {
-    return this.partnerContractService.updateCommissionRate(contractId, newRate, sellerId);
+    return this.sellerRecruitmentService.setRecruitmentExposure(recruitmentId, operatorUserId, decision, note, serviceKey);
   }
 }

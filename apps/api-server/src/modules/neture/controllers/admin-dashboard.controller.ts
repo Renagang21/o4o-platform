@@ -39,17 +39,15 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
       const authReq = req as AuthenticatedRequest;
       const userId = authReq.user?.id || '';
 
-      // === 9 parallel queries ===
+      // === 7 parallel queries === (WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 파트너 2종 은퇴)
       const [
         totalUsersRow,
         activeSuppliersRow,
         pendingApprovalsRow,
-        activePartnersRow,
         activeProductsRow,
         pendingSettlementsRow,
         pendingSuppliersRow,
         pendingRegsRow,
-        partnerRequestsRow,
       ] = await Promise.all([
         // 1. 총 사용자 — Neture 서비스 활성 회원 수 (WO-O4O-NETURE-ADMIN-DASHBOARD-TOTAL-USERS-SCOPE-FIX-V1)
         dataSource.query(
@@ -63,10 +61,6 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
           `SELECT COUNT(*)::int AS cnt FROM offer_service_approvals
            WHERE service_key = 'neture' AND approval_status = 'pending'`,
         ),
-        // 4. 활성 파트너
-        dataSource.query(
-          `SELECT COUNT(*)::int AS cnt FROM neture.neture_partners WHERE status = 'active'`,
-        ).catch(() => [{ cnt: 0 }]),
         // 5. 활성 상품
         dataSource.query(
           `SELECT COUNT(*)::int AS cnt FROM supplier_product_offers
@@ -83,21 +77,15 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
           `SELECT COUNT(*)::int AS cnt FROM service_memberships
            WHERE service_key = 'neture' AND status = 'pending'`,
         ),
-        // 9. 파트너 요청
-        dataSource.query(
-          `SELECT COUNT(*)::int AS cnt FROM neture_partnership_requests WHERE status = 'OPEN'`,
-        ),
       ]);
 
       const totalUsers = totalUsersRow[0]?.cnt || 0;
       const activeSuppliers = activeSuppliersRow[0]?.cnt || 0;
       const pendingApprovals = pendingApprovalsRow[0]?.cnt || 0;
-      const activePartners = activePartnersRow[0]?.cnt || 0;
       const activeProducts = activeProductsRow[0]?.cnt || 0;
       const pendingSettlements = pendingSettlementsRow[0]?.cnt || 0;
       const pendingSuppliers = pendingSuppliersRow[0]?.cnt || 0;
       const pendingRegs = pendingRegsRow[0]?.cnt || 0;
-      const partnerRequests = partnerRequestsRow[0]?.cnt || 0;
 
       // === Block A: Structure Snapshot ===
       const structureMetrics = [
@@ -109,7 +97,6 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
           value: pendingApprovals,
           status: (pendingApprovals > 0 ? 'attention' : 'stable') as 'stable' | 'attention',
         },
-        { key: 'active-partners', label: '활성 파트너', value: activePartners, status: 'stable' as const },
         { key: 'active-products', label: '활성 상품', value: activeProducts, status: 'stable' as const },
         {
           key: 'pending-settlements',
@@ -136,12 +123,6 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
           status: (pendingRegs > 0 ? 'partial' : 'configured') as 'partial' | 'configured',
           link: '/admin/applications',
         },
-        {
-          key: 'partner-requests',
-          label: '파트너 요청',
-          status: (partnerRequests > 0 ? 'partial' : 'configured') as 'partial' | 'configured',
-          link: '/admin/applications',
-        },
       ];
 
       // === Block C: Governance Alerts (rule-based, no external AI call) ===
@@ -150,7 +131,6 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
         suppliers: { active: activeSuppliers, pending: pendingSuppliers },
         products: { active: activeProducts, pendingApprovals },
         registrations: { pending: pendingRegs },
-        partners: { active: activePartners, requests: partnerRequests },
         settlements: { pending: pendingSettlements },
       };
       const insights = generateRuleBasedInsights('neture', adminMetrics);

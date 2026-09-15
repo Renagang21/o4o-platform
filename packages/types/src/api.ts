@@ -140,7 +140,7 @@ export interface RegisterPayload {
   email: string;
   password: string;
   name: string;
-  role?: 'customer' | 'business' | 'affiliate' | 'partner';
+  role?: 'customer' | 'business' | 'affiliate';
 }
 
 export interface UpdateProfilePayload {

@@ -150,7 +150,7 @@ router.get('/new', (req, res) => {
     success: true,
     data: {
       user: null,
-      roles: ['admin', 'moderator', 'manager', 'vendor', 'seller', 'user', 'business', 'partner']
+      roles: ['admin', 'moderator', 'manager', 'vendor', 'seller', 'user', 'business']
     }
   });
 });

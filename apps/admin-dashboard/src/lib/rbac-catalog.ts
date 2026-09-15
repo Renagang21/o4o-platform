@@ -63,7 +63,6 @@ export const ROLES: Record<string, RoleMeta> = {
   vendor: { key: 'vendor', label: 'Vendor', badgeClass: 'text-emerald-700 bg-emerald-50', isOperatorRole: false },
   seller: { key: 'seller', label: 'Seller', badgeClass: 'text-emerald-700 bg-emerald-50', isOperatorRole: false },
   supplier: { key: 'supplier', label: 'Supplier', badgeClass: 'text-purple-700 bg-purple-50', isOperatorRole: false },
-  partner: { key: 'partner', label: 'Partner', badgeClass: 'text-amber-700 bg-amber-50', isOperatorRole: false },
   affiliate: { key: 'affiliate', label: 'Affiliate', badgeClass: 'text-amber-700 bg-amber-50', isOperatorRole: false },
   pharmacist: { key: 'pharmacist', label: 'Pharmacist', badgeClass: 'text-cyan-700 bg-cyan-50', isOperatorRole: false },
   business: { key: 'business', label: 'Business', badgeClass: 'text-amber-700 bg-amber-50', isOperatorRole: false },

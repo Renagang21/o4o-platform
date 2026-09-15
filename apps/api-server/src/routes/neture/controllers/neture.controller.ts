@@ -7,11 +7,8 @@
  * Public endpoints (no auth):
  * - GET /suppliers
  * - GET /suppliers/:slug
- * - GET /partnership/requests
- * - GET /partnership/requests/:id
  *
- * Authenticated endpoints:
- * - POST /partnership/requests (create)
+ * (은퇴) /partnership/requests* — Legacy Partnership (WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1)
  */
 
 import { Router, Request, Response } from 'express';
@@ -20,7 +17,7 @@ import { NetureService } from '../../../modules/neture/neture.service.js';
 import { ContentQueryService } from '../../../modules/content/index.js';
 import { SignageQueryService } from '../../../modules/signage/index.js';
 import { ForumQueryService } from '../../../modules/forum/index.js';
-import { SupplierStatus, PartnershipStatus } from '../../../modules/neture/entities/index.js';
+import { SupplierStatus } from '../../../modules/neture/entities/index.js';
 import { requireAuth, optionalAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 import logger from '../../../utils/logger.js';
@@ -230,192 +227,6 @@ export function createNetureController(dataSource: DataSource): Router {
   });
 
   // ============================================================================
-  // PARTNERSHIP ENDPOINTS
-  // ============================================================================
-
-  /**
-   * GET /partnership/requests
-   * List all partnership requests
-   *
-   * Query Parameters:
-   * - status (optional): Filter by status ('OPEN', 'MATCHED', 'CLOSED')
-   */
-  router.get('/partnership/requests', async (req: Request, res: Response) => {
-    try {
-      const { status } = req.query;
-
-      const filters: { status?: PartnershipStatus } = {};
-
-      if (status && typeof status === 'string') {
-        filters.status = status as PartnershipStatus;
-      }
-
-      const requests = await service.getPartnershipRequests(filters);
-
-      res.json({
-        requests,
-      });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching partnership requests:', error);
-      res.status(500).json({
-        error: 'Failed to fetch partnership requests',
-        details: (error as Error).message,
-      });
-    }
-  });
-
-  /**
-   * GET /partnership/requests/:id
-   * Get partnership request detail by ID
-   */
-  router.get('/partnership/requests/:id', async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-
-      const request = await service.getPartnershipRequestById(id);
-
-      if (!request) {
-        return res.status(404).json({
-          error: 'Partnership request not found',
-        });
-      }
-
-      res.json(request);
-    } catch (error) {
-      logger.error('[Neture API] Error fetching partnership request detail:', error);
-      res.status(500).json({
-        error: 'Failed to fetch partnership request detail',
-        details: (error as Error).message,
-      });
-    }
-  });
-
-  // ============================================================================
-  // P2: AUTHENTICATED ENDPOINTS
-  // ============================================================================
-
-  /**
-   * POST /partnership/requests
-   * Create a new partnership request (requires login)
-   */
-  router.post('/partnership/requests', requireAuth, async (req: Request, res: Response) => {
-    try {
-      // Check if user is logged in
-      const user = (req as any).user;
-      if (!user) {
-        return res.status(401).json({
-          success: false,
-          error: 'Authentication required',
-          code: 'AUTH_REQUIRED',
-        });
-      }
-
-      const {
-        sellerName,
-        sellerServiceType,
-        sellerStoreUrl,
-        periodStart,
-        periodEnd,
-        revenueStructure,
-        promotionSns,
-        promotionContent,
-        promotionBanner,
-        promotionOther,
-        contactEmail,
-        contactPhone,
-        contactKakao,
-        products,
-      } = req.body;
-
-      // Validate required fields
-      if (!sellerName) {
-        return res.status(400).json({
-          success: false,
-          error: 'sellerName is required',
-          code: 'VALIDATION_ERROR',
-        });
-      }
-
-      const result = await service.createPartnershipRequest({
-        sellerId: user.id,
-        sellerName,
-        sellerServiceType,
-        sellerStoreUrl,
-        periodStart,
-        periodEnd,
-        revenueStructure,
-        promotionSns,
-        promotionContent,
-        promotionBanner,
-        promotionOther,
-        contactEmail: contactEmail || user.email,
-        contactPhone,
-        contactKakao,
-        products,
-      });
-
-      res.status(201).json({
-        success: true,
-        data: result,
-      });
-    } catch (error) {
-      logger.error('[Neture API] Error creating partnership request:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to create partnership request',
-        details: (error as Error).message,
-      });
-    }
-  });
-
-  /**
-   * PATCH /partnership/requests/:id
-   * Update partnership request status (admin only)
-   *
-   * WO-P1-SERVICE-ROLE-PREFIX-ROLLING-IMPLEMENTATION-V1 (Phase 3: Neture)
-   * - Requires neture:admin OR platform:super_admin
-   * - Legacy roles (admin, super_admin) are logged and denied
-   */
-  router.patch('/partnership/requests/:id', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      const { status } = req.body;
-
-      // Validate status
-      const validStatuses = ['pending', 'approved', 'rejected'];
-      if (!status || !validStatuses.includes(status)) {
-        return res.status(400).json({
-          success: false,
-          error: 'Invalid status. Must be one of: pending, approved, rejected',
-          code: 'VALIDATION_ERROR',
-        });
-      }
-
-      const result = await service.updatePartnershipRequestStatus(id, status as PartnershipStatus);
-
-      if (!result) {
-        return res.status(404).json({
-          success: false,
-          error: 'Partnership request not found',
-          code: 'NOT_FOUND',
-        });
-      }
-
-      res.json({
-        success: true,
-        data: result,
-      });
-    } catch (error) {
-      logger.error('[Neture API] Error updating partnership request status:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to update partnership request status',
-        details: (error as Error).message,
-      });
-    }
-  });
-
-  // ============================================================================
   // ADMIN DASHBOARD ENDPOINT (운영자 실사용 화면 1단계)
   // ============================================================================
 
@@ -428,8 +239,6 @@ export function createNetureController(dataSource: DataSource): Router {
       // Parallel fetch: Neture stats + APP summaries
       const [
         supplierCount,
-        requestCount,
-        pendingRequestCount,
         contentPublishedCount,
         recentContent,
         signageHome,
@@ -439,8 +248,6 @@ export function createNetureController(dataSource: DataSource): Router {
         forumPostCount,
       ] = await Promise.all([
         dataSource.query(`SELECT COUNT(*) as count FROM neture_suppliers WHERE status = 'ACTIVE'`),
-        dataSource.query(`SELECT COUNT(*) as count FROM neture_partnership_requests`),
-        dataSource.query(`SELECT COUNT(*) as count FROM neture_partnership_requests WHERE status = 'OPEN'`),
         dataSource.query(`SELECT COUNT(*) as count FROM cms_contents WHERE "serviceKey" = 'neture' AND status = 'published'`),
         contentService.listForHome(['notice', 'news', 'hero'], 5),
         signageService.listForHome(3, 3),
@@ -455,8 +262,9 @@ export function createNetureController(dataSource: DataSource): Router {
         data: {
           stats: {
             activeSuppliers: parseInt(supplierCount[0]?.count || '0', 10),
-            totalRequests: parseInt(requestCount[0]?.count || '0', 10),
-            pendingRequests: parseInt(pendingRequestCount[0]?.count || '0', 10),
+            // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 제휴 요청 통계 은퇴 (0 고정 — 응답 shape 유지)
+            totalRequests: 0,
+            pendingRequests: 0,
             publishedContents: parseInt(contentPublishedCount[0]?.count || '0', 10),
           },
           content: {

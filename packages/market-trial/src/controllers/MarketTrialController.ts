@@ -12,7 +12,6 @@
  *
  * Phase 2 Endpoints (Decision):
  * - POST   /:id/decision/seller   - Submit seller decision
- * - POST   /:id/decision/partner  - Submit partner decision
  * - GET    /:id/decisions         - Get decisions for trial
  *
  * Phase 3 Endpoints (Forum):
@@ -29,7 +28,6 @@ import {
   validateCreateRequest,
   validateParticipateRequest,
   validateSellerDecisionRequest,
-  validatePartnerDecisionRequest,
 } from '../dto/index.js';
 
 /**
@@ -87,7 +85,7 @@ export function createMarketTrialController(dataSource: DataSource): Router {
   /**
    * GET /api/market-trials
    * List Market Trials with optional filtering
-   * Permission: Seller / Partner / Supplier
+   * Permission: Seller / Supplier
    */
   router.get('/', async (req: Request, res: Response) => {
     try {
@@ -121,7 +119,7 @@ export function createMarketTrialController(dataSource: DataSource): Router {
   /**
    * GET /api/market-trials/:id
    * Get Market Trial details with forum information
-   * Permission: Seller / Partner / Supplier
+   * Permission: Seller / Supplier
    */
   router.get('/:id', async (req: Request, res: Response) => {
     try {
@@ -152,7 +150,7 @@ export function createMarketTrialController(dataSource: DataSource): Router {
   /**
    * POST /api/market-trials/:id/participate
    * Participate in a Market Trial
-   * Permission: Seller / Partner
+   * Permission: Seller
    */
   router.post('/:id/participate', async (req: Request, res: Response) => {
     try {
@@ -161,7 +159,6 @@ export function createMarketTrialController(dataSource: DataSource): Router {
 
       // Get participant info from request context or body
       const participantId = (req as any).user?.id || req.body.participantId;
-      const participantTypeRaw = req.body.participantType || 'seller';
 
       if (!participantId) {
         return res.status(400).json({
@@ -170,10 +167,8 @@ export function createMarketTrialController(dataSource: DataSource): Router {
         });
       }
 
-      // Validate participant type
-      const participantType = participantTypeRaw === 'partner'
-        ? ParticipantType.PARTNER
-        : ParticipantType.STORE_OWNER;
+      // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 참여 유형은 STORE_OWNER 뿐 (partner 입력 허용 제거)
+      const participantType = ParticipantType.STORE_OWNER;
 
       const participation = await service.participate(req.params.id, {
         participantId,
@@ -204,7 +199,7 @@ export function createMarketTrialController(dataSource: DataSource): Router {
   /**
    * GET /api/market-trials/:id/participants
    * Get participants for a trial
-   * Permission: Seller / Partner / Supplier
+   * Permission: Seller / Supplier
    */
   router.get('/:id/participants', async (req: Request, res: Response) => {
     try {
@@ -279,52 +274,6 @@ export function createMarketTrialController(dataSource: DataSource): Router {
   });
 
   /**
-   * POST /api/market-trials/:id/decision/partner
-   * Submit partner decision (CONTINUE or STOP)
-   * Permission: PARTNER only
-   */
-  router.post('/:id/decision/partner', async (req: Request, res: Response) => {
-    try {
-      // Validate request
-      const validatedData = validatePartnerDecisionRequest(req.body);
-
-      // Get participant ID from request context or body
-      const participantId = (req as any).user?.id || req.body.participantId;
-
-      if (!participantId) {
-        return res.status(400).json({
-          success: false,
-          error: 'participantId is required',
-        });
-      }
-
-      const result = await decisionService.submitPartnerDecision(req.params.id, {
-        participantId,
-        decision: validatedData.decision as DecisionType,
-        sellerIds: validatedData.sellerIds,
-      });
-
-      res.status(201).json({
-        success: true,
-        data: {
-          decision: toDecisionResponse(result.decision),
-          applicationsCreated: result.applicationsCreated,
-          applicationIds: result.applicationIds,
-        },
-      });
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error';
-      const status = message.includes('not found') ? 404 :
-                     message.includes('already') ? 409 :
-                     message.includes('required') ? 400 : 400;
-      res.status(status).json({
-        success: false,
-        error: message,
-      });
-    }
-  });
-
-  /**
    * GET /api/market-trials/:id/decisions
    * Get all decisions for a trial
    * Permission: Supplier / Admin
@@ -363,11 +312,10 @@ export function createMarketTrialController(dataSource: DataSource): Router {
         userId: user.id || req.body.userId || '',
         supplierId: user.supplierId || req.query.supplierId as string,
         sellerId: user.sellerId || req.query.sellerId as string,
-        partnerId: user.partnerId || req.query.partnerId as string,
       };
 
       // Require at least userId for access check
-      if (!userContext.userId && !userContext.supplierId && !userContext.sellerId && !userContext.partnerId) {
+      if (!userContext.userId && !userContext.supplierId && !userContext.sellerId) {
         return res.status(401).json({
           success: false,
           error: 'Authentication required',

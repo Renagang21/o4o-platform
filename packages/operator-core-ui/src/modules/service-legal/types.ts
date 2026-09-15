@@ -117,7 +117,6 @@ export const POLICY_DOCUMENT_TYPES: { value: string; label: string }[] = [
   { value: 'refund', label: '환불정책' },
   { value: 'commerce', label: '전자상거래 안내' },
   { value: 'seller', label: '판매자 안내' },
-  { value: 'partner', label: '파트너 안내' },
   { value: 'community', label: '커뮤니티 운영정책' },
   { value: 'marketing', label: '마케팅 정책' },
   { value: 'location', label: '위치기반 서비스' },

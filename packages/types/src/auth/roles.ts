@@ -21,8 +21,7 @@ export const ROLES = {
   VENDOR: 'vendor',
   SUPPLIER: 'supplier',
 
-  // Partnership roles
-  PARTNER: 'partner',
+  // Partnership roles ('partner' 은퇴 — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1)
   AFFILIATE: 'affiliate',
 
   // Management roles
@@ -63,7 +62,6 @@ export const ROLE_HIERARCHY: Record<Role, number> = {
 
   // Partnership roles (20-30)
   [ROLES.AFFILIATE]: 20,
-  [ROLES.PARTNER]: 25,
 
   // Management roles (50-60)
   [ROLES.MANAGER]: 50,
@@ -88,7 +86,6 @@ export const ROLE_LABELS: Record<Role, string> = {
   [ROLES.BUSINESS]: '비즈니스',
   [ROLES.SUPPLIER]: '공급자',
   [ROLES.AFFILIATE]: '제휴회원',
-  [ROLES.PARTNER]: '파트너',
   [ROLES.MANAGER]: '매니저',
   [ROLES.OPERATOR]: '운영자',
   [ROLES.ADMIN]: '관리자',
@@ -109,7 +106,6 @@ export const ROLE_LABELS_EN: Record<Role, string> = {
   [ROLES.BUSINESS]: 'Business',
   [ROLES.SUPPLIER]: 'Supplier',
   [ROLES.AFFILIATE]: 'Affiliate',
-  [ROLES.PARTNER]: 'Partner',
   [ROLES.MANAGER]: 'Manager',
   [ROLES.OPERATOR]: 'Operator',
   [ROLES.ADMIN]: 'Admin',
@@ -135,14 +131,6 @@ export const COMMERCE_ROLES: Role[] = [
   ROLES.VENDOR,
   ROLES.SUPPLIER,
   ROLES.BUSINESS,
-];
-
-/**
- * Partnership Roles - Roles for partnership programs
- */
-export const PARTNERSHIP_ROLES: Role[] = [
-  ROLES.PARTNER,
-  ROLES.AFFILIATE,
 ];
 
 /**

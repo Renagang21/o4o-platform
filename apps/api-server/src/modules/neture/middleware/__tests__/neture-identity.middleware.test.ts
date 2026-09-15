@@ -3,16 +3,15 @@
  *
  * 인증 오류(401) 와 서비스 권한 오류(403) 분리 계약.
  *   - 미인증               → 401 UNAUTHORIZED (변경 없음)
- *   - 로그인 + 서비스 미가입 → 403 NO_SUPPLIER / NO_PARTNER (구 401 — 대표 로그아웃 연쇄의 원인)
+ *   - 로그인 + 서비스 미가입 → 403 NO_SUPPLIER (구 401 — 대표 로그아웃 연쇄의 원인)
  *   - 가입 + 비활성 상태     → 403 *_NOT_ACTIVE + currentStatus (변경 없음)
  * 오류 코드·응답 구조는 그대로다.
+ * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: partner gate 케이스 제거(은퇴).
  */
 import type { DataSource } from 'typeorm';
 import {
   createRequireActiveSupplier,
   createRequireLinkedSupplier,
-  createRequireActivePartner,
-  createRequireLinkedPartner,
 } from '../neture-identity.middleware.js';
 
 function mockRes() {
@@ -32,8 +31,6 @@ const ANON_REQ = {} as any;
 describe.each([
   ['requireActiveSupplier', createRequireActiveSupplier, 'NO_SUPPLIER', 'SUPPLIER_NOT_ACTIVE', 'PENDING'],
   ['requireLinkedSupplier', createRequireLinkedSupplier, 'NO_SUPPLIER', null, null],
-  ['requireActivePartner', createRequireActivePartner, 'NO_PARTNER', 'PARTNER_NOT_ACTIVE', 'pending'],
-  ['requireLinkedPartner', createRequireLinkedPartner, 'NO_PARTNER', null, null],
 ] as const)('%s', (_name, factory, missingCode, notActiveCode, inactiveStatus) => {
   it('미인증 → 401 UNAUTHORIZED (일괄 403 전환 아님)', async () => {
     const next = jest.fn();
@@ -72,10 +69,9 @@ describe.each([
     const next = jest.fn();
     const res = mockRes();
     const req = { ...USER_REQ };
-    const activeStatus = missingCode === 'NO_PARTNER' ? 'active' : 'ACTIVE';
-    await factory(dataSourceWith([{ id: 'row1', status: activeStatus }]))(req, res, next);
+    await factory(dataSourceWith([{ id: 'row1', status: 'ACTIVE' }]))(req, res, next);
     expect(next).toHaveBeenCalledTimes(1);
     expect(res.status).not.toHaveBeenCalled();
-    expect(missingCode === 'NO_PARTNER' ? req.partnerId : req.supplierId).toBe('row1');
+    expect(req.supplierId).toBe('row1');
   });
 });

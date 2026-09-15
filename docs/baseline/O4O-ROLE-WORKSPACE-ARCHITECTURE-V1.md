@@ -1,7 +1,7 @@
 # O4O-ROLE-WORKSPACE-ARCHITECTURE-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-15
+> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-15 (§7 · §9-1 Partner runtime 은퇴 반영)
 > **근거 WO/IR**: `WO-O4O-ROLE-WORKSPACE-REFACTOR-BASELINE-AND-PREFLIGHT-V1` · [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md)
 > **위치**: 사업·정책 정본(우선순위 2). [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) 과 동급이며, **역할 경계 · 업무공간 구조 · 콘텐츠 유입 경로 · Legacy Partner** 에 관해 두 문서가 충돌하면 **이 문서가 우선**한다 (§8).
 
@@ -148,7 +148,7 @@ FUTURE PARTNER  = GREENFIELD
 ```
 
 - 현재 저장소의 Partner(제휴 링크 · 클릭/전환 추적 · 커미션 · 정산 · 파트너 대시보드 · `neture:partner` 역할 · `partner_*` / `neture_partner*` 테이블 · `/partner/*` · `/account/partner/*`)는 **과거 제휴마케팅 모델**이다. 신규 인플루언서 / SNS Partner 설계의 **기반으로 사용하지 않는다.**
-- 현재 리팩터링에서 Partner 기능을 새 구조에 **호환시키지 않는다.** 은퇴 대상이며, 모집단과 분류는 IR §B 가 기록한다. 실제 삭제는 후속 `Partner Retirement` WO 에서 수행한다.
+- 현재 리팩터링에서 Partner 기능을 새 구조에 **호환시키지 않는다.** 모집단과 분류는 IR §B 가 기록했고, runtime 삭제는 `WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1`(2026-09-15) 로 완료됐다. 물리 schema · dead package 제거는 `WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1`(후속).
 - 향후 Partner 는 다음 순서로 **별도** 진행한다.
 
 ```text
@@ -156,7 +156,8 @@ FUTURE PARTNER  = GREENFIELD
 ```
 
 - **이름 충돌 주의** — `foreign_visitor_partners`(매장 소유 외국인 방문객 유입 파트너, Store Ops) · HFF 데이터의 "partner 성분" · `neture_partner_recruitments`(공급자의 **판매자(매장) 모집** 공고) 등은 이름에 partner 가 있어도 제휴마케팅 Partner 가 아니다. 분류는 IR §B 의 `KEEP_SHARED_NOT_PARTNER` 를 따르며, 은퇴 WO 는 이름만으로 삭제하지 않는다.
-- [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](NETURE-PARTNER-CONTRACT-FREEZE-V1.md)(F7) 은 은퇴 대상 계약이다. Partner Retirement WO 완료 시 SUPERSEDED 로 표기하고 archive 한다. 그 전까지 **기능 복구·확장 금지**(판정 대기).
+- [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](NETURE-PARTNER-CONTRACT-FREEZE-V1.md)(구 F7) 은 2026-09-15 `WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1` 로 runtime 은퇴가 완료되어 **SUPERSEDED** 로 표기됐다(원문은 기록 보존). 물리 테이블·dead package 제거는 후속 physical cleanup WO.
+- **판매자 모집(Seller Recruitment)** 은 Partner 가 아니다 — `SellerRecruitment` / `SellerRecruitmentApplication` 도메인으로 분리 보존됐다(물리 테이블명 `neture_partner_*` 는 엔티티 seam 으로 격리, rename 은 physical cleanup).
 
 ---
 
@@ -169,7 +170,7 @@ FUTURE PARTNER  = GREENFIELD
 | [`PLATFORM-CONTENT-POLICY-V1`](PLATFORM-CONTENT-POLICY-V1.md) (F4) | 3축 모델(Producer / Visibility / ServiceScope)은 유지. `producer='supplier'` 를 "legacy 예외" 로 둔 §3.1 · §6.3 · §10-5 가 §2-1 과 충돌 | FROZEN 유지, 해당 절 UPDATE_REQUIRED (Supplier / Store Hub 단계) |
 | [`O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1`](O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) | §6 첫 항목(공급자 HUB 직접 제작·게시 금지)이 §2-1 과 충돌 | ACTIVE 유지, §6 UPDATE_REQUIRED |
 | [`O4O-STORE-MENU-CANONICAL-TREE-V1`](O4O-STORE-MENU-CANONICAL-TREE-V1.md) | §1.3(Neture 제외) · §5.1(출처 4종)이 §1 · §6 과 부분 충돌. 6 항목 축 · 사본화 원칙은 유지 | ACTIVE 유지, 해당 절 UPDATE_REQUIRED (Store 단계) |
-| [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](NETURE-PARTNER-CONTRACT-FREEZE-V1.md) (F7) | §7 은퇴 대상 | **판정 대기 → Partner Retirement 후 SUPERSEDED/archive** |
+| [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](NETURE-PARTNER-CONTRACT-FREEZE-V1.md) (구 F7) | §7 은퇴 대상 | **SUPERSEDED (2026-09-15)** — runtime 은퇴 완료, 물리 정리는 후속 WO |
 | [`NETURE-DISTRIBUTION-ENGINE-FREEZE-V1`](NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md) (F8) | 공급자 제품 → 조직 진열 흐름. Partner 무관. §2-1 의 Supplier → Store Hub 제품 축 근거 | KEEP |
 | [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) · [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) | commerce 경계 · B2B 주문 계약. 이 문서는 commerce 를 바꾸지 않는다 | KEEP (Supplier › Orders · Business Operation › Products 의 주문 축 근거) |
 | [`O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1`](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) | "공통 매장경영 구조 − operator capability" 모델은 이 문서의 Store / My Services 와 정합 | KEEP |
@@ -206,7 +207,7 @@ latest main sync
 
 ```text
 0. Baseline + Preflight      ← 이 문서 · IR (완료)
-1. Legacy Partner Retirement
+1. Legacy Partner Retirement ← A. runtime 은퇴 완료(2026-09-15) · B. physical cleanup 대기
 2. Supplier Workspace
 3. Store Workspace (Home · My Store · Store Hub · My Services)
 4. Service Operator Workspace

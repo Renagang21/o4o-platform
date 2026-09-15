@@ -14,11 +14,6 @@ import {
   NetureProductCategory,
   NetureCurrency,
 } from '../entities/neture-product.entity.js';
-import {
-  NeturePartner,
-  NeturePartnerType,
-  NeturePartnerStatus,
-} from '../entities/neture-partner.entity.js';
 import { NetureLogAction } from '../entities/neture-product-log.entity.js';
 import {
   NetureOrder,
@@ -30,7 +25,6 @@ import { NetureOrderItem } from '../entities/neture-order-item.entity.js';
 import { calculateSupplierShippingFee } from '../../../services/shipping/supplier-shipping.js';
 import {
   ProductDto,
-  PartnerDto,
   ProductLogDto,
   OrderDto,
   OrderItemDto,
@@ -40,11 +34,6 @@ import {
   CreateProductRequestDto,
   UpdateProductRequestDto,
   UpdateProductStatusRequestDto,
-  ListPartnersQueryDto,
-  ListPartnersResponseDto,
-  CreatePartnerRequestDto,
-  UpdatePartnerRequestDto,
-  UpdatePartnerStatusRequestDto,
   ListLogsQueryDto,
   ListLogsResponseDto,
   CreateOrderRequestDto,
@@ -52,16 +41,13 @@ import {
   ListOrdersResponseDto,
   UpdateOrderStatusRequestDto,
 } from '../dto/index.js';
-import { PartnerCommissionService } from '../../../modules/neture/services/partner-commission.service.js';
 import logger from '../../../utils/logger.js';
 
 export class NetureService {
   private repository: NetureRepository;
-  private partnerCommissionService: PartnerCommissionService;
 
   constructor(private dataSource: DataSource) {
     this.repository = new NetureRepository(dataSource);
-    this.partnerCommissionService = new PartnerCommissionService(dataSource);
   }
 
   // ============================================================================
@@ -71,7 +57,6 @@ export class NetureService {
   private toProductDto(product: NetureProduct): ProductDto {
     return {
       id: product.id,
-      partner_id: product.partnerId || null,
       name: product.name,
       subtitle: product.subtitle || null,
       description: product.description || null,
@@ -88,7 +73,6 @@ export class NetureService {
       view_count: product.viewCount,
       created_at: product.createdAt.toISOString(),
       updated_at: product.updatedAt.toISOString(),
-      partner: product.partner ? this.toPartnerDto(product.partner) : undefined,
     };
   }
 
@@ -99,7 +83,6 @@ export class NetureService {
     const { products, total } = await this.repository.findProducts({
       page,
       limit,
-      partnerId: query.partner_id,
       category: query.category,
       status: query.status,
       isFeatured: query.is_featured,
@@ -156,7 +139,6 @@ export class NetureService {
     userId?: string
   ): Promise<ProductDto> {
     const product = await this.repository.createProduct({
-      partnerId: data.partner_id,
       name: data.name,
       subtitle: data.subtitle,
       description: data.description,
@@ -198,7 +180,6 @@ export class NetureService {
       updatedBy: userId,
     };
 
-    if (data.partner_id !== undefined) updateData.partnerId = data.partner_id;
     if (data.name !== undefined) updateData.name = data.name;
     if (data.subtitle !== undefined) updateData.subtitle = data.subtitle;
     if (data.description !== undefined) updateData.description = data.description;
@@ -252,150 +233,6 @@ export class NetureService {
     });
 
     return this.toProductDto(product);
-  }
-
-  // ============================================================================
-  // Partner Operations
-  // ============================================================================
-
-  private toPartnerDto(partner: NeturePartner, userInfo?: { status: string; email: string } | null): PartnerDto {
-    return {
-      id: partner.id,
-      name: partner.name,
-      business_name: partner.businessName || null,
-      business_number: partner.businessNumber || null,
-      type: partner.type,
-      status: partner.status,
-      description: partner.description || null,
-      logo: partner.logo || null,
-      website: partner.website || null,
-      contact: partner.contact || null,
-      address: partner.address || null,
-      identity_status: userInfo?.status || null,
-      user_email: userInfo?.email || null,
-      created_at: partner.createdAt.toISOString(),
-      updated_at: partner.updatedAt.toISOString(),
-    };
-  }
-
-  async listPartners(query: ListPartnersQueryDto): Promise<ListPartnersResponseDto> {
-    const page = query.page || 1;
-    const limit = query.limit || 20;
-
-    const { partners, total } = await this.repository.findPartners({
-      page,
-      limit,
-      type: query.type,
-      status: query.status,
-      sort: query.sort,
-      order: query.order,
-    });
-
-    // WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1: batch-fetch user identity statuses
-    const userIds = partners.map((p) => p.userId).filter(Boolean) as string[];
-    const userStatusMap = new Map<string, { status: string; email: string }>();
-    if (userIds.length > 0) {
-      const rows: Array<{ id: string; status: string; email: string }> = await this.dataSource.query(
-        `SELECT u.id, u.status, u.email FROM users u
-         JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'neture'
-         WHERE u.id = ANY($1)`,
-        [userIds],
-      );
-      for (const row of rows) {
-        userStatusMap.set(row.id, { status: row.status, email: row.email });
-      }
-    }
-
-    return {
-      data: partners.map((p) => this.toPartnerDto(p, p.userId ? userStatusMap.get(p.userId) : null)),
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
-  }
-
-  async getPartner(id: string): Promise<PartnerDto | null> {
-    const partner = await this.repository.findPartnerById(id);
-    if (!partner) return null;
-
-    // WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1: fetch user identity status
-    let userInfo: { status: string; email: string } | null = null;
-    if (partner.userId) {
-      const rows: Array<{ status: string; email: string }> = await this.dataSource.query(
-        `SELECT status, email FROM users WHERE id = $1`,
-        [partner.userId],
-      );
-      userInfo = rows[0] || null;
-    }
-
-    return this.toPartnerDto(partner, userInfo);
-  }
-
-  async createPartner(
-    data: CreatePartnerRequestDto,
-    userId?: string
-  ): Promise<PartnerDto> {
-    const partner = await this.repository.createPartner({
-      name: data.name,
-      businessName: data.business_name,
-      businessNumber: data.business_number,
-      type: data.type || NeturePartnerType.PARTNER,
-      description: data.description,
-      logo: data.logo,
-      website: data.website,
-      contact: data.contact ? { ...data.contact, phone: data.contact.phone?.replace(/\D/g, '') || data.contact.phone } : data.contact,
-      address: data.address,
-      userId: data.user_id,
-      metadata: data.metadata,
-      status: NeturePartnerStatus.PENDING,
-      createdBy: userId,
-      updatedBy: userId,
-    });
-
-    return this.toPartnerDto(partner);
-  }
-
-  async updatePartner(
-    id: string,
-    data: UpdatePartnerRequestDto,
-    userId?: string
-  ): Promise<PartnerDto | null> {
-    const updateData: Partial<NeturePartner> = {
-      updatedBy: userId,
-    };
-
-    if (data.name !== undefined) updateData.name = data.name;
-    if (data.business_name !== undefined) updateData.businessName = data.business_name;
-    if (data.business_number !== undefined) updateData.businessNumber = data.business_number;
-    if (data.type !== undefined) updateData.type = data.type;
-    if (data.description !== undefined) updateData.description = data.description;
-    if (data.logo !== undefined) updateData.logo = data.logo;
-    if (data.website !== undefined) updateData.website = data.website;
-    if (data.contact !== undefined) updateData.contact = data.contact;
-    if (data.address !== undefined) updateData.address = data.address;
-    if (data.metadata !== undefined) updateData.metadata = data.metadata;
-
-    const partner = await this.repository.updatePartner(id, updateData);
-    if (!partner) return null;
-
-    return this.toPartnerDto(partner);
-  }
-
-  async updatePartnerStatus(
-    id: string,
-    data: UpdatePartnerStatusRequestDto,
-    userId?: string
-  ): Promise<PartnerDto | null> {
-    const partner = await this.repository.updatePartner(id, {
-      status: data.status,
-      updatedBy: userId,
-    });
-    if (!partner) return null;
-
-    return this.toPartnerDto(partner);
   }
 
   // ============================================================================
@@ -821,15 +658,7 @@ export class NetureService {
         }
       }
 
-      // Partner Commission auto-trigger (WO-O4O-PARTNER-COMMISSION-TRIGGER-V1)
-      try {
-        const created = await this.partnerCommissionService.createContractCommissionsForOrder(id);
-        if (created > 0) {
-          logger.info(`[Partner Commission] Auto-created ${created} commission(s) for order ${id}`);
-        }
-      } catch (commErr) {
-        logger.warn('[Partner Commission] Auto-trigger failed (non-blocking):', commErr);
-      }
+      // (은퇴) Partner Commission auto-trigger — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
     }
 
     const updated = await this.repository.updateOrder(id, updateData);

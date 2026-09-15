@@ -734,7 +734,7 @@ function ParticipantSection({
   updatingPaymentId: string | null;
   trialStatus: TrialStatus;
 }) {
-  const typeLabel = (t: string) => (t === 'seller' ? '판매자' : t === 'partner' ? '파트너' : t);
+  const typeLabel = (t: string) => (t === 'seller' || t === 'store_owner' ? '매장 경영자' : t);
   const rewardLabel = (r: string | null) => {
     if (r === 'product') return '제품';
     if (r === 'cash') return '현금';

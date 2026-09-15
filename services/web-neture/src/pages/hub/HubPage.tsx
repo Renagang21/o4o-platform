@@ -7,7 +7,8 @@
  * WO-NETURE-HUB-ACTION-TRIGGER-EXPANSION-V1: AI→Signal→QuickAction→Trigger 실행
  *
  * KPA에서 검증된 허브 모델을 Neture에 확산:
- * - Seller 6카드 (supplier/partner 역할) + AI 기반 운영 신호 + QuickAction
+ * - Seller 카드 (supplier 역할) + AI 기반 운영 신호 + QuickAction
+ * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: 파트너 역할·정산·제휴 카드·트리거 은퇴
  * - Admin 5카드 (admin 역할) + 운영 신호 + QuickAction
  * - AI Insight 카드 (beforeSections)
  * - 역할 기반 카드 렌더링 (hub-core 위임)
@@ -31,7 +32,6 @@ const NETURE_KEYS = {
   REFRESH_SETTLEMENT: 'neture.trigger.refresh_settlement',
   REFRESH_AI: 'neture.trigger.refresh_ai',
   APPROVE_SUPPLIER: 'neture.trigger.approve_supplier',
-  MANAGE_PARTNERSHIP: 'neture.trigger.manage_partnership',
   AUDIT_REVIEW: 'neture.trigger.audit_review',
 } as const;
 
@@ -41,7 +41,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
   {
     id: 'seller',
     title: '공급자 운영',
-    roles: ['neture:supplier', 'supplier', 'neture:partner', 'partner', 'neture:admin', 'platform:super_admin'],
+    roles: ['neture:supplier', 'supplier', 'neture:admin', 'platform:super_admin'],
     cards: [
       {
         id: 'products',
@@ -62,8 +62,8 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
       {
         id: 'settlements',
         title: '정산 현황',
-        description: '파트너 정산 내역을 확인합니다.',
-        href: '/partner/dashboard',
+        description: '공급자 정산 내역을 확인합니다.',
+        href: '/supplier/settlements',
         icon: '💰',
         signalKey: 'settlements',
       },
@@ -90,14 +90,6 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         href: '/operator/applications',
         icon: '✅',
         signalKey: 'supplierApproval',
-      },
-      {
-        id: 'partnership',
-        title: '파트너십 관리',
-        description: '파트너십 요청과 제휴를 관리합니다.',
-        href: '/partner/dashboard',
-        icon: '🤝',
-        signalKey: 'partnership',
       },
       {
         id: 'fee-policy',
@@ -155,7 +147,6 @@ interface DashboardStats {
 
 interface AdminStats {
   pendingRequests: number;
-  openPartnershipRequests: number;
   totalSuppliers: number;
   activeSuppliers: number;
 }
@@ -309,21 +300,6 @@ function buildNetureSignals(data: NetureSignalData | null): Record<string, HubSi
       signals.supplierApproval = createSignal('info', {
         label: `${admin.activeSuppliers}개 활성`,
       });
-    }
-
-    if (admin.openPartnershipRequests > 0) {
-      signals.partnership = createActionSignal('warning', {
-        label: '제휴 요청',
-        count: admin.openPartnershipRequests,
-        action: {
-          key: NETURE_KEYS.MANAGE_PARTNERSHIP,
-          buttonLabel: '제휴 검토',
-        },
-      });
-    } else {
-      signals.partnership = data.hasApprovedSeller
-        ? createSignal('info', { label: '제휴 활성' })
-        : createSignal('warning', { label: '제휴 없음' });
     }
 
     signals.audit = createActionSignal('info', {
@@ -487,7 +463,6 @@ export default function HubPage() {
         };
         data.adminStats = {
           pendingRequests: adminSummary.actionQueue?.find((a: any) => a.id === 'aq-pending-products')?.count ?? 0,
-          openPartnershipRequests: adminSummary.actionQueue?.find((a: any) => a.id === 'aq-pending-registrations')?.count ?? 0,
           totalSuppliers: findKpi('active-suppliers'),
           activeSuppliers: findKpi('active-suppliers'),
         };
@@ -516,7 +491,6 @@ export default function HubPage() {
       [NETURE_KEYS.REFRESH_SETTLEMENT]: 'refresh-settlement',
       [NETURE_KEYS.REFRESH_AI]: 'ai-refresh',
       [NETURE_KEYS.APPROVE_SUPPLIER]: 'approve-supplier',
-      [NETURE_KEYS.MANAGE_PARTNERSHIP]: 'manage-partnership',
       [NETURE_KEYS.AUDIT_REVIEW]: 'audit-review',
     };
 
@@ -560,10 +534,10 @@ export default function HubPage() {
   const userRoles = user.roles;
 
   // user 역할은 허브 접근 불가
-  if (!['neture:admin', 'platform:super_admin', 'neture:supplier', 'supplier', 'neture:partner', 'partner'].includes(role)) {
+  if (!['neture:admin', 'platform:super_admin', 'neture:supplier', 'supplier'].includes(role)) {
     return (
       // WO-O4O-WEB-COMMON-UX-COMPONENT-PROMOTION-BATCH-V1: 공통 AccessDenied 로 교체
-      <AccessDenied message="공급자, 파트너 또는 관리자 권한이 필요합니다." />
+      <AccessDenied message="공급자 또는 관리자 권한이 필요합니다." />
     );
   }
 

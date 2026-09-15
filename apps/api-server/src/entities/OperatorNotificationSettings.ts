@@ -14,7 +14,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
  */
 export interface NotificationTypeSettings {
   registrationRequest: boolean;   // 회원가입 신청
-  partnerApplication: boolean;    // 파트너 신청
+  // partnerApplication — 은퇴 (WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1). 기존 jsonb 행의 키는 무시된다.
   supplierApplication: boolean;   // 공급자 신청
   contactInquiry: boolean;        // 문의 접수
   systemAlert: boolean;           // 시스템 알림
@@ -86,7 +86,6 @@ export class OperatorNotificationSettings {
   static getDefaultNotifications(): NotificationTypeSettings {
     return {
       registrationRequest: true,
-      partnerApplication: true,
       supplierApplication: true,
       contactInquiry: true,
       systemAlert: true,

@@ -73,7 +73,7 @@ describe('approveRegistration — 가입 승인은 운영자·관리자를 부�
     },
   );
 
-  it.each(['supplier', 'partner', 'member', 'customer'])(
+  it.each(['supplier', 'member', 'customer'])(
     "정상 신청 역할 '%s' 는 그대로 부여한다(접두 정규화 없음)",
     async (role) => {
       const { service, state } = createService(role);
@@ -92,22 +92,12 @@ describe('approveRegistration — 가입 승인은 운영자·관리자를 부�
     },
   );
 
-  // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
-  //   파트너 승인은 파트너 서비스 상태 단일 출처(neture.neture_partners) 행을 만든다 — 공급자와 대칭.
-  it("'partner' 승인은 neture.neture_partners 행을 active 로 보장한다", async () => {
-    const { service, state } = createService('partner');
+  // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
+  //   Legacy Partner 은퇴 — 어떤 역할의 승인도 neture.neture_partners 를 읽거나 쓰지 않는다.
+  it.each(['supplier', 'member', 'partner'])("'%s' 승인은 neture.neture_partners 를 건드리지 않는다", async (role) => {
+    const { service, state } = createService(role);
     await service.approveRegistration('user-1', 'approver-1');
-
-    const partnerWrites = state.queries.filter((q) => q.sql.includes('neture.neture_partners'));
-    expect(partnerWrites.some((q) => q.sql.includes("SET status = 'active'"))).toBe(true);
-    expect(partnerWrites.some((q) => q.sql.includes('INSERT INTO neture.neture_partners'))).toBe(true);
-    expect(state.committed).toBe(true);
-  });
-
-  it("'supplier' 승인은 neture.neture_partners 를 건드리지 않는다", async () => {
-    const { service, state } = createService('supplier');
-    await service.approveRegistration('user-1', 'approver-1');
-    expect(state.queries.some((q) => q.sql.includes('neture.neture_partners'))).toBe(false);
+    expect(state.queries.some((q) => q.sql.includes('neture_partners'))).toBe(false);
   });
 
   it('membership role 이 비어 있으면 기존과 같이 member 로 부여한다', async () => {

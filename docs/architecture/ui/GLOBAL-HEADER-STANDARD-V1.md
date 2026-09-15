@@ -225,8 +225,7 @@ GlobalLayout
 표현 가능한 컨텍스트:
 - 운영자 모드 (Operator)
 - 내 매장 (Store)
-- 파트너 영역 (Partner)
-- 공급자 영역 (Supplier)
+- 공급자 영역 (Supplier) — (파트너 영역은 2026-09-15 Legacy Partner 은퇴)
 - HUB 영역
 
 Context 표현 방법 (허용):
@@ -375,7 +374,7 @@ serviceNavigation
 | Store Owner | 없음 | ContextBar 또는 Badge ("내 매장") | Store Sidebar 표시 |
 | Operator | 없음 | ContextBar 또는 Badge ("운영") | Operator Sidebar 표시 |
 | Admin | 없음 | ContextBar 또는 Badge ("관리") | Admin Sidebar 표시 |
-| Supplier/Partner | 없음 | ContextBar 또는 Badge | Space Sidebar 표시 |
+| Supplier | 없음 | ContextBar 또는 Badge | Space Sidebar 표시 |
 
 ### 7.3 표준 제정 당시 위반 사례와 해소 결과
 
@@ -444,7 +443,7 @@ serviceNavigation
 |--------|:------------:|:----------:|:--------:|:---------:|
 | kpa-society | `#2563eb` | 💊 | KPA-Society | 약사 전문 플랫폼 |
 | glycopharm | `#059669` | 💉 | GlycoPharm | 혈당관리 전문 플랫폼 |
-| neture | `#059669` | 🌿 | Neture | 공급자·파트너 협업 플랫폼 |
+| neture | `#059669` | 🌿 | Neture | 공급자 협업 플랫폼 (O4O 대표 진입) |
 | k-cosmetics | `#db2777` | Sparkles (lucide) | K-Cosmetics | K-Beauty 전문 플랫폼 |
 | pharmacy-hub | `PH_PRIMARY` (config) | Pill (lucide) | Pharmacy-Hub | 파머시 허브 |
 

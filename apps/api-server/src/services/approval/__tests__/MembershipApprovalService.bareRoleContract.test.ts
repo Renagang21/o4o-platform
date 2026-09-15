@@ -14,7 +14,7 @@
  *       (auth-login.service.ts PLATFORM_ADMIN_ROLES) 재활성화만으로 플랫폼 관리자가 되는
  *       경로를 막는다. 추측 prefix 변환도 하지 않는다(권한 확대 금지).
  *
- * 의도적으로 접두어가 없는 전역 역할(`supplier`/`partner` — WO-NETURE-ROLE-NORMALIZATION-V1,
+ * 의도적으로 접두어가 없는 전역 역할(`supplier` — WO-NETURE-ROLE-NORMALIZATION-V1,
  * `user`/`customer` — RBAC Role Catalog V1 Platform Core)은 그대로 부여되는지도 함께 고정한다.
  * 이 테스트가 실패하면 정규화 대상이 조용히 넓어졌거나 좁아진 것이다.
  */
@@ -232,7 +232,6 @@ describe('멤버십 lifecycle — 접두어 없는 서비스 역할을 만들지
   describe('의도적으로 접두어가 없는 전역 역할은 그대로 부여한다', () => {
     it.each([
       ['neture', 'supplier'],
-      ['neture', 'partner'],
       ['kpa-society', 'user'],
       ['k-cosmetics', 'customer'],
     ])('%s / %s', async (serviceKey, role) => {

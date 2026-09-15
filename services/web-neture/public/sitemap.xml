@@ -16,11 +16,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://neture.co.kr/partner</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://neture.co.kr/forum</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>

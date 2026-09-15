@@ -58,7 +58,7 @@ export interface AuthResponse {
 }
 
 // P0 RBAC: Enrollment Types
-export type EnrollmentRole = 'supplier' | 'seller' | 'partner' | 'vendor' | 'affiliate';
+export type EnrollmentRole = 'supplier' | 'seller' | 'vendor' | 'affiliate';
 export type EnrollmentStatus = 'pending' | 'approved' | 'rejected' | 'on_hold';
 
 export interface Enrollment {
