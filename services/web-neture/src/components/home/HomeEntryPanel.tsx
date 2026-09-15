@@ -12,13 +12,13 @@
  * 알림 · KPI · 유료 권한 같은 만들어낸 정보는 없다.
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader2, ArrowUpRight, ExternalLink, RefreshCw } from 'lucide-react';
 import type { User } from '../../contexts/AuthContext';
 import {
   buildHomeEntryModel,
-  openServiceEntry,
+  resolveServiceEntryUrl,
   ServiceEntryError,
   type EntryItem,
   type HomeEntryData,
@@ -85,15 +85,37 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function HomeEntryPanel({ user, data, loading, error, onReload, newsSlot }: HomeEntryPanelProps) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
+  // 이동 세대(generation). 이동 시작마다 1 증가하고, 뒤로가기(bfcache) 복원 시에도 1 증가한다.
+  // 복원 이전에 시작된 요청은 세대가 달라져 늦게 도착해도 이동시키지 않는다.
+  const handoffGeneration = useRef(0);
+
+  // WO-O4O-NETURE-HOME-BACK-NAVIGATION-BUSY-STATE-FIX-V1
+  // 서비스로 이동한 뒤 브라우저 뒤로가기로 돌아오면 브라우저가 페이지를 bfcache 에서 복원하여
+  // 이동 직전의 busyId(모래시계 · 전 버튼 disabled) 가 그대로 남는다. `pageshow` 는 복원 시에도
+  // 발생하므로 여기서만 이동 중 상태를 푼다. 소식 · AI · 스크롤 등 다른 화면 상태는 건드리지 않는다.
+  useEffect(() => {
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (!event.persisted) return; // 최초 로드 · 새로고침은 상태가 이미 초기값이다
+      handoffGeneration.current += 1;
+      setBusyId(null);
+    };
+    window.addEventListener('pageshow', onPageShow);
+    return () => window.removeEventListener('pageshow', onPageShow);
+  }, []);
 
   const handleHandoff = async (item: EntryItem) => {
     if (item.action.kind !== 'handoff') return;
+    if (busyId !== null) return; // 정상 이동 중 중복 클릭 방지 (버튼 disabled 와 이중 방어)
+    const generation = ++handoffGeneration.current;
     setBusyId(item.id);
     setMoveError(null);
     try {
-      await openServiceEntry(item.action.serviceKey, item.action.returnPath);
-      // 성공 시 현재 탭이 대상 서비스로 이동한다 — busy 는 풀지 않는다.
+      const targetUrl = await resolveServiceEntryUrl(item.action.serviceKey, item.action.returnPath);
+      if (generation !== handoffGeneration.current) return; // 복원 이후 늦게 도착한 응답 — 재이동하지 않는다
+      // 성공 시 현재 탭이 대상 서비스로 이동한다 — busy 는 pageshow(복원) 에서 푼다.
+      window.location.assign(targetUrl);
     } catch (err) {
+      if (generation !== handoffGeneration.current) return;
       setMoveError(err instanceof ServiceEntryError ? err.message : '서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.');
       setBusyId(null);
     }

@@ -226,10 +226,12 @@ const HANDOFF_ERROR_MESSAGES: Record<string, string> = {
 };
 
 /**
- * 다른 서비스로 이동 — 기존 handoff 계약 재사용. 성공하면 현재 탭이 대상 서비스로 바뀐다.
+ * 다른 서비스 진입 URL 을 발급받는다 — 기존 handoff 계약 재사용(서버 계약 무변경).
+ * 이동은 하지 않는다: 호출부가 응답이 아직 유효한지(뒤로가기 복원 이후 늦게 도착한 응답이 아닌지)
+ * 판단한 뒤 `window.location.assign` 한다 (WO-O4O-NETURE-HOME-BACK-NAVIGATION-BUSY-STATE-FIX-V1).
  * 실패는 예외로 돌려 호출부가 화면에 표시한다. 토큰 · 개인정보를 로그에 남기지 않는다.
  */
-export async function openServiceEntry(serviceKey: string, returnPath?: string): Promise<void> {
+export async function resolveServiceEntryUrl(serviceKey: string, returnPath?: string): Promise<string> {
   let targetUrl: string | undefined;
   try {
     const res = await api.post('/auth/handoff', { targetServiceKey: serviceKey, returnPath });
@@ -244,7 +246,12 @@ export async function openServiceEntry(serviceKey: string, returnPath?: string):
   if (!targetUrl || !/^https:\/\//.test(targetUrl)) {
     throw new ServiceEntryError('서비스 이동 주소를 확인하지 못했습니다.');
   }
-  window.location.assign(targetUrl);
+  return targetUrl;
+}
+
+/** 발급 + 즉시 이동. 성공하면 현재 탭이 대상 서비스로 바뀐다. */
+export async function openServiceEntry(serviceKey: string, returnPath?: string): Promise<void> {
+  window.location.assign(await resolveServiceEntryUrl(serviceKey, returnPath));
 }
 
 /** 공개 안내 URL (로그인 · handoff 없이 열리는 주소) */
