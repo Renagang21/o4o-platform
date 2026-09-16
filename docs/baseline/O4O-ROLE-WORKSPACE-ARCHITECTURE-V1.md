@@ -1,7 +1,7 @@
 # O4O-ROLE-WORKSPACE-ARCHITECTURE-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-15 (§7 · §9-1 Partner runtime 은퇴 반영)
+> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-16 (§4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 Service Tenant Foundation 반영)
 > **근거 WO/IR**: `WO-O4O-ROLE-WORKSPACE-REFACTOR-BASELINE-AND-PREFLIGHT-V1` · [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md)
 > **위치**: 사업·정책 정본(우선순위 2). [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) 과 동급이며, **역할 경계 · 업무공간 구조 · 콘텐츠 유입 경로 · Legacy Partner** 에 관해 두 문서가 충돌하면 **이 문서가 우선**한다 (§8).
 
@@ -103,6 +103,16 @@ Service Operation           Business Operation
 - **Content 와 사업 프로그램(Business Operation)은 별도 도메인**으로 유지하며, 필요할 때 관계만 연결한다. 한쪽을 다른 쪽의 하위로 만들지 않는다.
 - Service Operator 는 자기 Service 의 Service Operation · Business Operation 을 운영한다. 한 운영자가 여러 Service 를 운영할 수 있다 (1 Operator : N Services — IR §A).
 
+### 4-1. Service Identity ≠ Service Workspace
+
+`WO-O4O-SERVICE-TENANT-FOUNDATION-V1`(2026-09-16) 이 고정한 용어.
+
+- **Service Identity** — "어떤 서비스가 존재하는가". 정본은 `platform_services` 의 canonical `code` 와 `apps/api-server/src/config/service-catalog.ts` `O4O_SERVICES` (같은 집합). role prefix 별칭 행(`kpa` → `kpa-society`, `cosmetics` → `k-cosmetics`)은 **독립 서비스가 아니라** canonical 의 alias 이며, 정규화는 `@o4o/security-core` 의 기존 매핑 하나만 쓴다. 제품 도메인 키(`kpa-groupbuy` · `*-event-offer`)는 서비스 identity 가 아니다.
+- **Service Workspace** — "그 서비스가 My Services 항목(매장 화면) · 운영자 화면으로 노출되는가". Identity 와 **별도 metadata** 로 catalog 에 붙인다: `workspace.workspaceMode`(`standard | special | none | undecided`) · `storeWorkspaceEnabled` · `operatorWorkspaceEnabled`. `PlatformService.service_type`(`community | tool | extension`)은 **다른 축**이며 Workspace 판정에 쓰지 않는다.
+- **모든 platform service 가 My Services 항목이 되는 것은 아니다.** 노출 조건은 `Store 의 enrollment 가 active` **AND** `해당 서비스의 storeWorkspaceEnabled` 이다. 근거 없는 서비스는 `undecided` 로 두고 노출하지 않는다 — 코드가 사업 결정을 대신 내리지 않는다.
+- 세 관계는 물리적으로 분리 유지한다 (합치지 않는다): Store ↔ Service = `organization_service_enrollments` · Operator ↔ Service = `role_assignments` + `service_memberships`(membership guard 와 동일 정책) · 사용자 ↔ 조직 = `organization_members`. 읽기 계약은 `/api/v1/work-scope/store-services` · `/operator-services` (`utils/service-tenant.resolver.ts`) 하나로 두며 UI 노출 ≠ 권한이다 — Workspace metadata 는 권한 SSOT 가 아니다.
+- **Industry(업종) 는 아직 정의하지 않았다.** Community §5 의 Industry Community 와 Service Identity 의 관계는 별도 단계에서 정한다.
+
 ---
 
 ## 5. Community
@@ -148,7 +158,7 @@ FUTURE PARTNER  = GREENFIELD
 ```
 
 - 현재 저장소의 Partner(제휴 링크 · 클릭/전환 추적 · 커미션 · 정산 · 파트너 대시보드 · `neture:partner` 역할 · `partner_*` / `neture_partner*` 테이블 · `/partner/*` · `/account/partner/*`)는 **과거 제휴마케팅 모델**이다. 신규 인플루언서 / SNS Partner 설계의 **기반으로 사용하지 않는다.**
-- 현재 리팩터링에서 Partner 기능을 새 구조에 **호환시키지 않는다.** 모집단과 분류는 IR §B 가 기록했고, runtime 삭제는 `WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1`(2026-09-15) 로 완료됐다. 물리 schema · dead package 제거는 `WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1`(후속).
+- 현재 리팩터링에서 Partner 기능을 새 구조에 **호환시키지 않는다.** 모집단과 분류는 IR §B 가 기록했고, runtime 삭제는 `WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1`(2026-09-15), 물리 schema · dead package 제거는 `WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1`(2026-09-16) 로 완료됐다. **Partner 트랙은 CLOSED** 이며 이후 단계의 범위에 들어오지 않는다.
 - 향후 Partner 는 다음 순서로 **별도** 진행한다.
 
 ```text
@@ -207,11 +217,13 @@ latest main sync
 
 ```text
 0. Baseline + Preflight      ← 이 문서 · IR (완료)
-1. Legacy Partner Retirement ← A. runtime 은퇴 완료(2026-09-15) · B. physical cleanup 대기
-2. Supplier Workspace
-3. Store Workspace (Home · My Store · Store Hub · My Services)
-4. Service Operator Workspace
-5. Community (Industry Community)
+1. Legacy Partner Retirement ← A. runtime 은퇴(2026-09-15) · B. physical cleanup(2026-09-16) 완료 · CLOSED
+2. Service Tenant Foundation ← Service Identity · Store↔Service · Operator↔Service · Workspace metadata 읽기 계약 (2026-09-16 완료, UI 없음)
+3. Content Boundary Alignment
+4. Supplier Workspace
+5. Store Workspace (Home · My Store · Store Hub · My Services)
+6. Service Operator Workspace
+7. Community (Industry Community)
 ```
 
 순서는 권장이며, 각 단계 WO 가 착수 시점의 fresh census 로 확정한다.

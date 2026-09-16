@@ -4,6 +4,8 @@
  * WO-O4O-WORK-SCOPE-STORE-RESOLUTION-V0
  *
  *   GET /api/v1/work-scope/store-resolution?serviceKey=<canonical>&workspace=store
+ *   GET /api/v1/work-scope/store-services[?organizationId=<uuid>]   — WO-O4O-SERVICE-TENANT-FOUNDATION-V1
+ *   GET /api/v1/work-scope/operator-services                        — WO-O4O-SERVICE-TENANT-FOUNDATION-V1
  *
  * 프런트엔드 Work Scope 가 `organizationId` / `storeId` 를 **추측하지 않도록**
  * 서버가 기존 membership · resolver 로 확정해 돌려주는 유일한 경로다.
@@ -29,6 +31,7 @@ import type { DataSource } from 'typeorm';
 import { asyncHandler } from '../middleware/error-handler.js';
 import type { AuthRequest } from '../types/auth.js';
 import { resolveWorkScopeStore } from '../utils/work-scope-store-resolution.js';
+import { resolveOperatorServices, resolveStoreServices } from '../utils/service-tenant.resolver.js';
 
 export function createWorkScopeRoutes(dataSource: DataSource, requireAuth: RequestHandler): Router {
   const router = Router();
@@ -49,6 +52,53 @@ export function createWorkScopeRoutes(dataSource: DataSource, requireAuth: Reque
       const data = await resolveWorkScopeStore(dataSource, { userId, serviceKey, workspace });
 
       res.json({ success: true, data });
+    }),
+  );
+
+  /**
+   * WO-O4O-SERVICE-TENANT-FOUNDATION-V1 — 현재 매장의 가입 서비스 목록 (1 Store : N Services).
+   *
+   * 미래 My Services · O4O Home 이 쓰는 서비스 중립 read contract. UI 는 만들지 않는다.
+   *   - organizationId 는 **소유 검증 후에만** 쓴다(organization_members 활성 매장 역할). 남의 조직은 `NOT_STORE_MEMBER`.
+   *   - 미지정 시 접근 가능한 매장이 정확히 1개일 때만 resolved. 2개 이상은 `ambiguous`(자동 선택 없음).
+   *   - inactive enrollment 는 목록에 남되 `workspaceAvailable=false`. 별칭 코드는 canonical 로 합쳐진다.
+   *   - 위 `store-resolution` 과 같은 이유로 모든 미해석 사유를 같은 200 형상으로 돌려준다.
+   */
+  router.get(
+    '/store-services',
+    requireAuth,
+    asyncHandler(async (req, res) => {
+      const userId = (req as AuthRequest).user?.id;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Authentication required', code: 'UNAUTHENTICATED' });
+        return;
+      }
+      const organizationId = typeof req.query.organizationId === 'string' && req.query.organizationId
+        ? req.query.organizationId
+        : null;
+
+      const data = await resolveStoreServices(dataSource, { userId, organizationId });
+      res.json({ success: true, data });
+    }),
+  );
+
+  /**
+   * WO-O4O-SERVICE-TENANT-FOUNDATION-V1 — 현재 운영자가 운영 가능한 서비스 목록 (1 Operator : N Services).
+   *
+   * role_assignments(`{prefix}:admin|operator`, is_active) + service_memberships(active) 결합.
+   * 표시용 목록이며 권한 SSOT 가 아니다 — 실제 운영 API 접근은 각 서비스의 `require{Service}Scope` 가 판정한다.
+   */
+  router.get(
+    '/operator-services',
+    requireAuth,
+    asyncHandler(async (req, res) => {
+      const userId = (req as AuthRequest).user?.id;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Authentication required', code: 'UNAUTHENTICATED' });
+        return;
+      }
+      const services = await resolveOperatorServices(dataSource, userId);
+      res.json({ success: true, data: { services } });
     }),
   );
 

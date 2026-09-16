@@ -11,7 +11,44 @@
  * - Account Center (향후)
  * - 서비스 이동 handoff (`POST /auth/handoff` · `/auth/handoff/exchange`)
  * - O4O 대표 진입(neture.co.kr) 로그인 예외 (`REPRESENTATIVE_ENTRY_SERVICE_KEY`)
+ * - Service Workspace 자격 metadata (`workspace`) — WO-O4O-SERVICE-TENANT-FOUNDATION-V1
+ *
+ * WO-O4O-SERVICE-TENANT-FOUNDATION-V1 — Service Identity ≠ Service Workspace
+ *   이 배열의 `key` 가 **Service Identity 의 canonical 집합**이다 (`platform_services.code` 와
+ *   1:1 · role prefix 별칭 `kpa` / `cosmetics` 는 `@o4o/security-core` 의
+ *   `resolveCanonicalServiceKey` 로 여기 키에 흡수된다 — 독립 서비스가 아니다).
+ *   Service Workspace(My Services 노출) 자격은 identity 와 **별도 축**이며 `workspace` 에만 둔다.
+ *   `platform_services.service_type`(community | tool | extension) 은 카탈로그 분류 축이고
+ *   Workspace 자격이 아니다 — 두 축을 서로 유도하지 않는다.
  */
+
+/**
+ * Service Workspace(매장 · 운영자용 서비스 업무공간) 의 노출 방식 — WO-O4O-SERVICE-TENANT-FOUNDATION-V1
+ *
+ *   'standard'  : My Services 의 표준 Service Workspace 후보 (STANDARD_CANDIDATE). **자동 활성화가 아니다.**
+ *   'special'   : 표준 Workspace 로 다루지 않는 서비스 (대표 진입 · 통합 축 등 별도 화면).
+ *   'none'      : 매장 대상 Service Workspace 가 없다 (예: 분회 tenant 축).
+ *   'undecided' : 현재 코드에 판정 근거가 없어 미정. 사업 판단 전까지 노출하지 않는다.
+ *
+ * 이 값은 **기술 분류(현재 runtime 의 근거)** 이지 사업 노출 정책·권한이 아니다. 접근 권한은
+ * 각 서비스의 scope guard · membership · organization_members 가 그대로 판정한다.
+ */
+export type ServiceWorkspaceMode = 'standard' | 'special' | 'none' | 'undecided';
+
+export interface ServiceWorkspaceCapability {
+  workspaceMode: ServiceWorkspaceMode;
+  /** 매장(organization)이 enrollment 를 통해 이 서비스의 Store-facing Workspace 를 가질 수 있는가 */
+  storeWorkspaceEnabled: boolean;
+  /** `{prefix}:operator` / `{prefix}:admin` 이 운영하는 Operator Workspace 가 현재 존재하는가 */
+  operatorWorkspaceEnabled: boolean;
+}
+
+/** 근거 없는 서비스의 기본값. 카탈로그에 `workspace` 를 적지 않으면 이 값으로 읽힌다. */
+export const UNDECIDED_SERVICE_WORKSPACE: Readonly<ServiceWorkspaceCapability> = Object.freeze({
+  workspaceMode: 'undecided',
+  storeWorkspaceEnabled: false,
+  operatorWorkspaceEnabled: false,
+});
 
 export interface O4OService {
   /** 서비스 식별 키 (DB service_key) */
@@ -39,6 +76,11 @@ export interface O4OService {
   description: string;
   /** 가입 가능 여부 */
   joinEnabled: boolean;
+  /**
+   * Service Workspace 자격 metadata (optional — 미지정 시 `UNDECIDED_SERVICE_WORKSPACE`).
+   * WO-O4O-SERVICE-TENANT-FOUNDATION-V1. 단일 출처 — 서비스별 `if (serviceKey === ...)` 분기 금지.
+   */
+  workspace?: ServiceWorkspaceCapability;
 }
 
 export const O4O_SERVICES: O4OService[] = [
@@ -48,6 +90,9 @@ export const O4O_SERVICES: O4OService[] = [
     domain: 'neture.co.kr',
     description: 'O4O 공급자 및 유통 플랫폼',
     joinEnabled: true,
+    // SPECIAL — O4O 대표 진입(REPRESENTATIVE_ENTRY_SERVICE_KEY) · 공급자 축. 매장 identity 축이 없다
+    // (`STORE_SERVICE_ORG_LINKAGE` 미등재 → WorkScope STORE_IDENTITY_NOT_SUPPORTED). 운영자 scope 는 존재.
+    workspace: { workspaceMode: 'special', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: true },
   },
   {
     key: 'kpa-society',
@@ -55,6 +100,8 @@ export const O4O_SERVICES: O4OService[] = [
     domain: 'kpa-society.co.kr',
     description: '약사 커뮤니티 서비스',
     joinEnabled: true,
+    // STANDARD_CANDIDATE — 매장 linkage(kpa) · kpa:store_owner · kpa:operator 가 현재 runtime 에 있다. 자동 활성화 아님.
+    workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },
   },
   {
     key: 'k-cosmetics',
@@ -62,6 +109,8 @@ export const O4O_SERVICES: O4OService[] = [
     domain: 'k-cosmetics.site',
     description: '화장품 유통 플랫폼',
     joinEnabled: true,
+    // STANDARD_CANDIDATE — 매장 linkage(cosmetics) · cosmetics:store_owner · cosmetics:operator 존재. 자동 활성화 아님.
+    workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },
   },
   /**
    * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
@@ -80,6 +129,8 @@ export const O4O_SERVICES: O4OService[] = [
     domain: 'pharmacyhub.co.kr',
     description: '약국 경영자·공급자 직접 연결 약국 전문 서비스',
     joinEnabled: true,
+    // STANDARD_CANDIDATE — 매장 linkage(pharmacy-hub) · pharmacy-hub:store_owner · pharmacy-hub:operator 존재. 자동 활성화 아님.
+    workspace: { workspaceMode: 'standard', storeWorkspaceEnabled: true, operatorWorkspaceEnabled: true },
   },
   /**
    * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
@@ -104,6 +155,9 @@ export const O4O_SERVICES: O4OService[] = [
     basePath: '/kpa',
     description: '약사회 분회 홈페이지 및 분회 회원 관리 서비스',
     joinEnabled: false,
+    // NO_STORE_WORKSPACE — tenant 축이 organization_service_enrollments 가 아니라 kpa_organizations · branch_memberships 다.
+    // 매장 linkage 없음. kpa-branch:operator Operator Workspace 는 존재.
+    workspace: { workspaceMode: 'none', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: true },
   },
   /**
    * WO-O4O-CAFE24-B2B-STORE-MEMBER-LOGIN-PILOT-V1
@@ -121,6 +175,9 @@ export const O4O_SERVICES: O4OService[] = [
     domain: 'neture.co.kr',
     description: 'Cafe24 B2B 사업자의 거래처 매장 판매지원 서비스',
     joinEnabled: false,
+    // UNDECIDED — 회원은 Cafe24 로그인 전용(O4O 세션 회원 아님 · 대표 홈 STORE_CAPABLE_SERVICES 제외) 이고
+    // cafe24-b2b:operator role 이 없다. My Services 노출은 사업·통합 판단 후 별도 WO.
+    workspace: { workspaceMode: 'undecided', storeWorkspaceEnabled: false, operatorWorkspaceEnabled: false },
   },
 ];
 
@@ -140,6 +197,14 @@ const serviceMap = new Map(O4O_SERVICES.map(s => [s.key, s]));
 /** 서비스 키로 서비스 정보 조회 */
 export function getService(key: string): O4OService | undefined {
   return serviceMap.get(key);
+}
+
+/**
+ * 서비스 키 → Service Workspace 자격 (canonical key 기준. 별칭·미등록 키는 UNDECIDED).
+ * WO-O4O-SERVICE-TENANT-FOUNDATION-V1 — Workspace 자격의 단일 읽기 지점.
+ */
+export function getServiceWorkspaceCapability(key: string): ServiceWorkspaceCapability {
+  return serviceMap.get(key)?.workspace ?? UNDECIDED_SERVICE_WORKSPACE;
 }
 
 /** 서비스 키로 표시 이름 조회 (없으면 키 반환) */
