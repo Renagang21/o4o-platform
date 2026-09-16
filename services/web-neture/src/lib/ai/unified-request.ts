@@ -16,7 +16,7 @@
 
 import { api, API_BASE_URL } from '../apiClient';
 import type { WorkScope } from '../work-scope';
-import { toHomeChatScope, type HomeChatResult } from './home-chat';
+import { sendHomeChat, toHomeChatScope, type HomeChatResult } from './home-chat';
 import { readWorkImage, type WorkAgentResult } from './work-agent';
 
 export type UnifiedAttachmentKind = 'image' | 'document' | 'spreadsheet';
@@ -177,6 +177,19 @@ export interface UnifiedRequestInput {
   routeHint?: 'work';
 }
 
+/**
+ * 배포 간극 대비: web 이 먼저 배포되고 API 에 `/api/ai/request` 가 아직 없으면(404) 텍스트 요청은 기존
+ * `/api/ai/home-chat` 으로 그대로 보낸다 — 홈 입력창이 깨지지 않는다. 첨부 · 재개(runId) · confirm 은 새 경로가 필요하므로
+ * 그때는 "서버 업데이트 대기" 를 알린다. API 가 배포되면 이 분기는 자연히 타지 않는다.
+ */
+async function legacyHomeChatFallback(input: UnifiedRequestInput): Promise<UnifiedRequestResult> {
+  if (input.attachments.length > 0 || input.runId || input.routeHint) {
+    throw new UnifiedRequestError('서버가 아직 파일 첨부 · 작업 이어가기를 지원하는 버전으로 업데이트되지 않았습니다. 잠시 후 다시 시도해 주세요.', 'UNIFIED_REQUEST_UNAVAILABLE', 404);
+  }
+  const chat = await sendHomeChat(input.text, input.workScope);
+  return { kind: 'chat', route: 'chat', reason: 'legacy_fallback', chat };
+}
+
 export async function sendUnifiedRequest(input: UnifiedRequestInput): Promise<UnifiedRequestResult> {
   const attachments = await Promise.all(input.attachments.map(readAttachmentFile));
   try {
@@ -193,6 +206,7 @@ export async function sendUnifiedRequest(input: UnifiedRequestInput): Promise<Un
   } catch (err) {
     if (err instanceof UnifiedRequestError) throw err;
     const resp = (err as { response?: { status?: number; data?: { error?: string; code?: string } } }).response;
+    if (resp?.status === 404) return legacyHomeChatFallback(input);
     if (resp) throw new UnifiedRequestError(resp.data?.error || '응답을 생성하지 못했습니다. 다시 시도해 주세요.', resp.data?.code || 'AI_ERROR', resp.status);
     throw new UnifiedRequestError('네트워크 오류가 발생했습니다. 다시 시도해 주세요.', 'NETWORK_ERROR');
   }

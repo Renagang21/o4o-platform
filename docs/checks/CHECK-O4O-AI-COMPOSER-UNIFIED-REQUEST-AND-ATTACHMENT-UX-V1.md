@@ -123,7 +123,8 @@ console error · pageerror **0**. 스크린샷은 세션 scratchpad(커밋하지
 | I-2 | 문서 · 표 첨부를 Work Agent 참고 자료로 전달 | 이번 WO 범위 밖(자동화 엔진 변경). 지금은 chat 으로 분석 |
 | I-3 | 내 PC 자료 연결(Local Data Source) 실제 연결 | PHASE 3 WO |
 | I-4 | CP949 등 비-UTF-8 텍스트 파일 | unreadable 로 표시(변환 없음) |
-| I-5 | OpenAI provider 에서 이미지 · PDF | 텍스트 경로 fallback + "볼 수 없다" 안내(Gemini 만 inline) |
+| I-5 | **배포 간극 fallback** | web 이 API 보다 먼저 배포돼 `/api/ai/request` 가 404 면 텍스트 요청은 기존 `/api/ai/home-chat` 으로 자동 회귀(`reason=legacy_fallback`). 첨부 · runId · confirm 은 "서버 업데이트 대기" 안내. API 배포 후 자연 소멸 — 후속 커밋 |
+| I-6 | OpenAI provider 에서 이미지 · PDF | 텍스트 경로 fallback + "볼 수 없다" 안내(Gemini 만 inline) |
 
 ## J. commit / CHECK / 검증 명령
 

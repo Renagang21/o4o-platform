@@ -7,7 +7,7 @@
  *   - 개수 · 크기 상한.
  */
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   addPendingAttachments,
   resolveAttachmentType,
@@ -78,5 +78,26 @@ describe('unified attachment — 목록 추가', () => {
     const { next } = addPendingAttachments(first, [file('b.csv', '')]);
     expect(next.map((a) => a.kind)).toEqual(['image', 'spreadsheet']);
     expect(next[0].id).toBe(first[0].id);
+  });
+});
+
+describe('unified request — 배포 간극 fallback (API 에 /request 가 아직 없을 때)', () => {
+  it('404 + 텍스트만 → 기존 /home-chat 으로 회귀 · 첨부/runId 가 있으면 명확한 대기 안내', async () => {
+    const mod = await import('../apiClient');
+    const home = await import('../ai/home-chat');
+    const { sendUnifiedRequest, UnifiedRequestError } = await import('../ai/unified-request');
+    const post = vi.spyOn(mod.api, 'post');
+    post.mockRejectedValueOnce({ response: { status: 404, data: {} } });
+    const chatSpy = vi.spyOn(home, 'sendHomeChat').mockResolvedValueOnce({ message: '구 경로 답변', scope: { workspace: 'home', serviceKey: null, storeStatus: null } });
+    const scope = { workspace: 'home', capabilities: [], executionMode: 'none', status: 'ready' } as any;
+    const r = await sendUnifiedRequest({ text: '안녕', attachments: [], workScope: scope });
+    expect(r.kind).toBe('chat');
+    expect(r.reason).toBe('legacy_fallback');
+    expect(chatSpy).toHaveBeenCalledWith('안녕', scope);
+
+    post.mockRejectedValueOnce({ response: { status: 404, data: {} } });
+    await expect(sendUnifiedRequest({ text: '이어서', attachments: [], workScope: scope, runId: 'g_1' })).rejects.toBeInstanceOf(UnifiedRequestError);
+    post.mockRestore();
+    chatSpy.mockRestore();
   });
 });
