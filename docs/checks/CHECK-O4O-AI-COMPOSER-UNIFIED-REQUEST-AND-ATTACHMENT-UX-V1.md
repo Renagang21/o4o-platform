@@ -6,6 +6,8 @@
 > **선행**: `WO-O4O-COMMON-HOME-AI-INPUT-V0`(home-chat) · `WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0`(work-agent/run) · `WO-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-…-V1` PHASE 1(runId) · `WO-O4O-WINDOWS-VISUAL-COMPUTER-USE-AND-FAST-LOOP-V1`
 > **원칙**: 사용자는 `Chat / Work Agent / Local Agent / Workflow` 를 알 필요가 없다. "원하는 일을 말한다" → O4O 가 경로를 판정한다.
 
+> **갱신 2026-09-16 (WO-O4O-PHASE1-SAME-RUN-CI-AND-MIGRATION-EXPECTED-STATE-REPAIR-V1)**: §9 의 차단이 해소되어 API `7dfed9a19`(`o4o-core-api-03682-9zv`) 가 `/api/ai/request` 를 serving 한다. **PRODUCTION_SMOKE = PASS**(API: A chat · B work 경로(Local Agent 미연결 → 403 안전 거절) · C confirm · D 이미지 · E CSV · F 미지원 400 · G 상태조회 chat / 브라우저: 단일 버튼 · ＋ 메뉴 · A·D·E 답변 + 참고한 첨부 표기). 부수 결함 수정: `validateUnifiedAttachments` 의 10MB base64 backtracking 정규식(Linux V8 스택 초과) → 선형 검사(`isWellFormedBase64`). §I-1 의 Work Agent 실행 · Doctors 실측은 여전히 PENDING(agent 연결 환경). 상세: [`CHECK-O4O-PHASE1-SAME-RUN-CI-AND-MIGRATION-EXPECTED-STATE-REPAIR-V1`](CHECK-O4O-PHASE1-SAME-RUN-CI-AND-MIGRATION-EXPECTED-STATE-REPAIR-V1.md).
+
 ---
 
 ## A. 기존 Composer 구조 (조사 · origin/main `7f4f6eb26` 기준)
@@ -153,5 +155,5 @@ UNIFIED_COMPOSER     = DONE (＋ · 입력 · ↑ 단일 · 모드 선택 없음
 ATTACHMENT_SUPPORT   = DONE (JPG/PNG/WebP · PDF · DOCX · TXT/MD · XLSX/XLS/CSV — 단일 진입점 · 이번 요청에서만)
 AUTO_REQUEST_ROUTING = DONE (서버 결정론 라우터 chat|work|confirm · runId 재개 · 기존 endpoint 불변)
 SAFETY_REGRESSION    = NONE (권한 확장 0 · Local Agent 미연결 403 · 로그인 자동화 없음 · 문서→행동 loop 차단 · 저장/로그 0)
-PRODUCTION_SMOKE     = BLOCKED (origin/main PHASE 1 CI red + migration Job 실패 → /api/ai/request 미배포 · §9 별도 WO 필요)
+PRODUCTION_SMOKE     = PASS (2026-09-16 갱신 — API 7dfed9a19 배포 후 A·C·D·E·F·G 실측 · B 는 work 경로 판정까지, 실행은 agent 연결 환경 PENDING)
 ```

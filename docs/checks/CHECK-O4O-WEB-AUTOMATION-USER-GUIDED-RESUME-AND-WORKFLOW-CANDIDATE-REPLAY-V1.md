@@ -6,6 +6,8 @@
 > **선행**: `WO-O4O-PHARMACY-WEB-AUTOMATION-CORE-AND-HEALTHKR-ADAPTER-V0` · `WO-O4O-COMPUTER-USE-V0` · `WO-O4O-AUTOMATION-EXECUTION-LAYER-REALIGNMENT-V1` · PHASE 0 preflight IR(commit `52a9df42a`)
 > **commit**: `d9b11d204` (PHASE 1 코드 · 테스트 · migration · manifest) · 본 문서
 
+> **갱신 2026-09-16 (WO-O4O-PHASE1-SAME-RUN-CI-AND-MIGRATION-EXPECTED-STATE-REPAIR-V1)**: `d9b11d204` 는 `expected-schema-states.ts` 5번째 항목 · ledger 명령(`local.data.work_run_*`) spec 4종 · agent `local-db.test` 테이블 수 · lint(`local-agent-protocol.ts` 제어문자 정규식) 를 함께 갱신하지 않아 **origin/main CI red + Deploy API migration Job 실패**(운영 API 가 `fb08c0dd1` 에 머묾)를 일으켰다. `7dfed9a19` · `851552cf6` 로 수리 — 운영 migration Job `SUCCESS`(prefix 4/4 · fingerprint `8b5be7bd…` 5722) · serving `o4o-core-api-03682-9zv`. PHASE 1 코드 자체는 운영에 배포 완료. **§58 실 smoke A~F 는 여전히 PENDING**(Local Agent 연결 환경 필요). 상세: [`CHECK-O4O-PHASE1-SAME-RUN-CI-AND-MIGRATION-EXPECTED-STATE-REPAIR-V1`](CHECK-O4O-PHASE1-SAME-RUN-CI-AND-MIGRATION-EXPECTED-STATE-REPAIR-V1.md).
+
 ---
 
 ## 0. 한 줄 요약
