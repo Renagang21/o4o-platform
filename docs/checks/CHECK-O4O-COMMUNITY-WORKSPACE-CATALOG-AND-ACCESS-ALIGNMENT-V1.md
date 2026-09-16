@@ -4,7 +4,7 @@
 > **일자**: 2026-09-16 · **기준 main**: `68c18634a` (Service Operator CLOSED 이후 · fresh census)
 > **성격**: Community Identity ≠ Service Identity 분리 · Community Catalog(SSOT 1, 초기 3) · 참여 자격 resolver · 공통 Forum Core 의 communityKey 컨텍스트 채택 · Industry Community 폐기. 새 테이블 0 · migration 0 · schema 변경 0 · 새 membership 테이블 0 · policy engine 0 · Forum/Content/Resources/LMS Core 복제 0 · RBAC 변경 0 · 프로덕션 write 0.
 > **상위 기준**: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §5(재작성) · §4-1 · §6 · §9-1(7단계) · 선행 [`CHECK-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1`](CHECK-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1.md) · [`CHECK-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1`](CHECK-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1.md)
-> **구현 commit**: §8 참조
+> **구현 commit**: `c1fc325d8` (2026-09-16 · Deploy Web Services success · **Deploy API Server = failure** — `7f4f6eb26` 부터 이어지는 migration Job 실패(타 세션 PHASE 1 `expected-schema-states` 미등록, 본 WO 무관) → 프로덕션 API 는 `fb08c0dd1` 에 머묾 · 본 WO 의 backend 는 그 수리 후 도달)
 
 ---
 
@@ -110,9 +110,19 @@ Community 를 Service 와 **별도 Identity** 로 세웠다. SSOT 는 `apps/api-
 | `node scripts/lint-ratchet.mjs` | 본 WO 파일 오류 0 · 전체 47 > 46 (선행 WO 와 동일 · 무관 파일, 별도) |
 | 프로덕션 read-only census | §1-2 (write 0) |
 
-### 4-1. Production smoke (§39)
+### 4-1. Production smoke (§39) — **PARTIAL_API_DEPLOY_BLOCKED**
 
-(배포 후 기록 — §8 참조)
+**실행**: 2026-09-16, `c1fc325d8` web 배포 성공 후 Playwright(headless) · 프로덕션 read-only(write 0) · `sohae2100` L1 토큰 주입 우회(TEST-ACCOUNTS §4-2, 로그인 검증 아님).
+
+| # | 항목 | 결과 | 확인 내용 |
+|---|---|---|---|
+| S1 | `GET /api/v1/communities` | **BLOCKED** | 404 — API 배포가 선행 migration Job 실패로 차단(F1). Catalog · access · Forum 합집합은 프로덕션에 미도달 |
+| S2 | O4O Home(neture.co.kr) 배포 간극 fallback | PASS | `/communities` 404 인데 홈 전체 error 배너 없음(`불러오지 못했습니다` 0) · 「내 매장」 · 「서비스 운영자 화면」(5행) 정상 · 「커뮤니티」 그룹은 목록이 없어 비표시(설계 D10). telemetry: 404 1건(= S1) 외 clean |
+| S3 | KPA `/kpa/forum/categories` · PH `/pharmacy-hub/forum/categories` (read-only) | INFO | 구 API 기준: KPA 2 forum · PH 0 → 아직 별도 (API 배포 후 두 목록이 pharmacy 합집합으로 같아져야 함 — spec 이 계약 고정) |
+| S4 | KPA member / PH member / KCos member / generic user 별 Community 진입 | **BLOCKED** | S1 과 같은 이유. 시나리오 A~E · PH-only 접근 · 누출 차단은 unit spec 28 로 검증(§4) |
+| S5 | write smoke | 미실행 | 안전한 테스트 데이터 없음 (WO §39) |
+
+**한계(숨기지 않음)**: backend 동작 전부가 API 배포 차단에 걸려 있다. 차단 해소(별도 WO, F1) 후 S1·S3·S4 를 재실행해야 PASS 로 바뀐다 — 그때까지 프로덕션 커뮤니티 동작은 종전(서비스별 격리)과 같다.
 
 ---
 
@@ -198,7 +208,7 @@ INDUSTRY_COMMUNITY           = RETIRED
 LEGACY_DATA_COMPLEXITY       = 0 (adapter 1 · migration 0 · bridge 0)
 LEGACY_ROUTE_COMPAT          = /kpa/forum · /pharmacy-hub/forum · /cosmetics/forum · /neture/forum = KEEP_AS_CONTEXT_ALIAS (RETIRE 0)
 
-PRODUCTION_SMOKE             = (배포 후 §4-1)
+PRODUCTION_SMOKE             = PARTIAL_API_DEPLOY_BLOCKED (web 배포 · 홈 fallback PASS · backend 는 선행 migration Job 실패로 미도달, unit 28 로 대체 검증 — §4-1)
 
 NEXT                         = GO_FINAL_ROLE_WORKSPACE_ARCHITECTURE_CENSUS
 ```
