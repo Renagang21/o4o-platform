@@ -16,6 +16,12 @@
 
 핵심 원칙: **"처음 보는 업무 → AI 적극 + 사용자 도움 / 성공 경로 발견 → Workflow / 반복 → 결정론적 빠른 실행 / 변경·실패 → AI 재개입."**
 
+**고정 개념(2026-09-16 승인 — 구현·IR 이 반드시 준수)**
+- **`same-run` = 동일 logical Work Run**, 동일 HTTP 요청이 아니다. 사용자 답변까지 수십 초~수분·Cloud Run 인스턴스 교체가 가능하므로, 하나의 요청/서버 메모리를 붙잡는 구조는 금지한다.
+- **QUESTION 과 TAKEOVER 는 별도 상태**다. `QUESTION`(=`waiting_for_user`, Work Run 살아 있음·답 대기·재개 가능) ≠ `TAKEOVER`(=자동화 종료·사용자가 직접 이어서 처리). 현재는 둘이 사실상 같은 방식으로 run 을 끝낸다 — 이 구분이 이번 작업의 핵심 제품 계약이다.
+- **저장은 Local-first.** 정본(Work Run 상태·trajectory·Workflow Candidate·사용자 variation)은 사용자 PC Local SQLite. Cloud 에는 **재개 연결용 최소 coordination 메타(`runId`/user·device/`status`(waiting/running/completed)/`expiresAt`/version|hash)만**. 화면 캡처·DOM 전문·힌트 전문·업무 데이터·환자/처방·Excel 원자료·credential 은 **cloud 에 저장하지 않는다**(매장별 로컬 자료 정책과 동일 방향).
+- **Workflow Candidate 는 semantic 중심**이다. raw 클릭 좌표(`x=0.324,y=0.487`)나 `elementRef` 스냅샷을 재생 단위로 저장하지 않는다 — target · semantic goal · action kind · semantic locator(role/name/label/text) · 예상 state transition · 검증 checkpoint · 사용자 힌트로 푼 decision point 로 **일반화**해 UI 가 조금 달라져도 재검증·self-healing 이 가능하게 한다.
+
 ## 2. 배경
 
 - 현재 실행 상태는 **request-scoped 전용**이며, `automation_jobs` 등에 Goal·step·observation·workflow engine 을 만들지 않도록 설계가 **명시적으로 금지**한다([work-agent-contract.ts:28-34](../../apps/api-server/src/services/ai-tools/work-agent-contract.ts#L28-L34)). 질문이 필요하면 run 을 끝내고([work-agent-runtime.ts:353](../../apps/api-server/src/services/ai-tools/work-agent-runtime.ts#L353)) `recoveryHint` 를 실은 **새 run** 으로만 재진입한다.
@@ -28,12 +34,12 @@
 **In scope**
 
 PHASE 1 — Same-run resume
-1. AI 가 사용자 도움이 필요할 때 run 을 **일시정지 상태**로 보존(종료가 아님)하고, 사용자에게 **막힌 원인 + 필요한 것 하나만** 구체적으로 질문한다(내부 용어 노출 금지).
+1. AI 가 사용자 도움이 필요할 때 run 을 **`QUESTION`(waiting_for_user·살아 있음) 상태**로 보존(`TAKEOVER` 종료와 별도)하고, 사용자에게 **막힌 원인 + 필요한 것 하나만** 구체적으로 질문한다(내부 용어 노출 금지).
 2. 사용자 답변을 **텍스트 + 이미지 + 화면/메뉴 위치 설명** 으로 받아, 낡은 관찰(stale observation)을 폐기 → **현재 화면 재관찰** → 같은 run 을 이어간다.
 3. 이미지 답변은 기존 Visual CU 규칙(§4-1)을 그대로 계승 — **파일 저장 X / DB 저장 X / 장기 로그 X**, 요청 메모리 안에서만.
 
 PHASE 2 — Workflow Candidate & Replay
-4. 첫 성공 run 의 경로(타깃 · 액션 시퀀스 · 사용자 힌트로 메운 결정지점)를 **trajectory** 로 저장하고 **Workflow Candidate(개인 범위)** 로 만든다.
+4. 첫 성공 run 의 경로를 **semantic trajectory**(target · semantic goal · action kind · semantic locator · state transition · checkpoint · 사용자 힌트 decision point)로 저장하고 **Workflow Candidate(개인 범위)** 로 만든다 — **좌표/elementRef raw replay 금지**.
 5. 같은 업무 재요청 시 후보를 **결정론적으로 재생**하되, 각 스텝은 재생 전 **현재 화면과 대조(재검증)** 한다 — 맹목 재생 금지. 불일치·실패 시 **AI self-healing(재개입)** 으로 전환한다.
 6. `improvementCandidate` 신호를 실제 Workflow Candidate 갱신에 연결한다(반복·사용자 수정이 후보를 다듬는다).
 
@@ -47,7 +53,7 @@ PHASE 2 — Workflow Candidate & Replay
 ## 4. 단계
 
 0. **PHASE 0 — Preflight IR (구현 전 필수 · 승인 게이트)** — 아래 설계 결정을 조사·확정하고 승인받기 전에는 코드 변경 0. 산출: `IR-O4O-WEB-AUTOMATION-RESUME-AND-WORKFLOW-STORE-PREFLIGHT-V1`.
-   - **저장 위치 결정(핵심)**: pending-run 상태와 trajectory/Workflow Candidate 를 어디에 둘지 — 권고 방향은 **민감 데이터를 사용자 PC(Local SQLite)에 두는 것**(raw workflow·관찰·이미지는 cloud 로 올리지 않음 → 데이터 소유권 + "raw data 공유 안 함" 원칙 부합, cloud migration 회피). 단 서버측 run 을 두 요청에 걸쳐 재개하려면 cloud 조정 상태가 필요할 수 있음 — 최소 TTL 방식/무저장 대안을 비교해 확정한다.
+   - **저장 위치 결정(핵심)**: 기본 방향 = **Local-first**(정본은 Local SQLite). Cloud Run 환경에서 사용자 질문 후 **동일 logical run 재개**에 필요한 **최소 coordination state 만** cloud 에 둘지 조사한다. cloud 가 필요하면 raw observation·이미지·힌트 전문·업무 데이터 없이 `runId / device / status / expiresAt / version` 수준으로 한정한다. **실제 현재 구조(HTTP work-agent 표면 · Local Agent command/device 상관 · Local SQLite)에 대입해 최소안 2~3개를 비교하고 하나를 권고**한다(무저장 대안 포함).
    - **계약 완화 범위**: `work-agent-contract.ts:28-34` 의 "저장 금지" 를 어디까지, 어떤 문장으로 완화할지(정본 문구 제안).
    - **신규 스키마(있다면)**: Local SQLite 테이블 or cloud 테이블 초안. cloud 테이블이면 **DB schema·migration = 사용자 명시 승인 필수**(CLAUDE.md 중지 조건).
    - trajectory 데이터 형상: 무엇을 저장하고(액션 시퀀스·결정지점) **무엇을 저장하지 않는지**(비밀번호·토큰·개인정보·이미지 원본).
