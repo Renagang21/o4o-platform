@@ -4,7 +4,7 @@
 > **일자**: 2026-09-16 · **기준 main**: `7f4f6eb26` (Store Workspace CLOSED `fb08c0dd1`/`052855eb6` 이후 — 과거 SHA 재사용 없이 fresh census)
 > **성격**: 표준 Service Operator 최상위 IA 재정렬(서비스 운영 / 사업 운영 / 운영 관리, **메뉴 항목 단위** 분류) + operator-services 기반 다중 서비스 전환 + Supplier → Service Operator 수신함 + 대시보드 3도메인 재편 + Neture SPECIAL 보존. 새 테이블 0 · migration 0 · schema 변경 0 · RBAC/Membership Core 변경 0 · 공통 셸 재작성 0 · package.json/lockfile 변경 0 · 프로덕션 write 0.
 > **상위 기준**: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 · §4 · §4-1 · §4-2(신설) · §9-1(6단계) · 선행 [`CHECK-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1`](CHECK-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1.md) · [`CHECK-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1`](CHECK-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1.md) · [`CHECK-O4O-SERVICE-TENANT-FOUNDATION-V1`](CHECK-O4O-SERVICE-TENANT-FOUNDATION-V1.md)
-> **구현 commit**: §8 참조 (production smoke 는 배포 후 §4-1 에 기록)
+> **구현 commit**: `5e8e137a3` (2026-09-16 · Deploy Web Services 6/6 success · Deploy API Server success · CI Pipeline 은 직후 타 세션 push `c01bd80f1` 의 concurrency 로 cancelled — 후속 커밋 CI 가 superset 으로 재실행)
 
 ---
 
@@ -165,7 +165,29 @@
 
 ### 4-1. Production smoke (§23)
 
-(배포 후 기록 — §8 참조)
+**실행**: 2026-09-16, `5e8e137a3` 배포 성공 후 Playwright(headless chromium) · desktop 1280×900 + mobile 400×800 · 프로덕션 read-only(write 0) · 자격정보 미기록.
+**로그인 채널(숨기지 않음)**: 서비스 웹 폼 L2 credential 미확보(TEST-ACCOUNTS §2 unknown)라 `sohae2100`(5서비스 admin/operator 계정) **L1 토큰 주입 우회(§4-2)** 로 O4O Home 진입 → 이후 각 서비스는 **실제 `POST /auth/handoff` → 대상 `/operator`** 로 이동(canonical 경로). "로그인 200" 검증이 아니다.
+
+| # | 항목 | 결과 | 확인 내용 |
+|---|---|---|---|
+| S1 | `GET /work-scope/operator-services` | PASS | 200 · 5건 = k-cosmetics:admin:standard · kpa-branch:operator:none · kpa-society:admin:standard · neture:admin:special · pharmacy-hub:admin:standard (§1-4 census 의 5서비스 운영자 1명과 일치) |
+| S2 | O4O Home(neture.co.kr) "서비스 운영자 화면" | PASS | 5행 = Neture 관리자 · K-Cosmetics 관리자 · O4O 파일럿 테스트분회 운영자(kpa-branch = 내 분회 slug) · KPA Society 관리자 · 파머시 허브 관리자 — 목록 출처 = operator-services (admin scope → 관리자 라벨/`/admin`) · telemetry clean |
+| S3 | O4O Home → KPA 버튼 클릭 | PASS | `POST /auth/handoff` → `kpa-society.co.kr/admin/kpa-dashboard` 도착 (admin scope 의 returnPath=`/admin`, 기존 규칙) |
+| S4 | KPA `/operator` desktop | PASS | 헤딩 서비스 운영 / 사업 운영 / 운영 관리 · 구 헤딩 0 · **approvals 분리**: 서비스 운영 › `제공받은 콘텐츠 승인`(단독 링크) / 사업 운영 › 승인 › 공급 상품 신청 승인 · 이벤트 오퍼 승인 · 판매자 모집 노출 승인 · 매장(HUB 자료 포함)·콘텐츠·포럼·자료실·강의·사이니지 = 서비스 운영 · 상품/주문 = 사업 운영 · 분석/시스템 = 운영 관리 · **전환 바** `운영 중인 서비스: K-Cosmetics(button) · 약사회 분회(span, 링크 없음) · KPA Society(현재) · Neture(button) · 파머시 허브(button)` · **대시보드 3축**(서비스 운영 4 KPI + 6 링크 / 사업 운영 2 KPI + 4 링크 / 운영 관리 2 링크, 축·5-block 링크 20개 전부 `/operator/*` 실 route) · telemetry: KPA `/admin` 경유 시 `public/services/kpa-society/policies/{terms,privacy}` · `kpa/legal/documents/published/*` 404 4건 — 푸터 법정정보 조회의 기존 동작(본 WO 무관, 운영자 화면 자체는 clean) |
+| S5 | KPA `/operator` mobile 400×800 | PASS | `운영자 메뉴 열기` → drawer `aria-hidden=false` · 헤딩 서비스 운영/사업 운영/운영 관리 (desktop 과 동일 트리) · telemetry clean |
+| S6 | K-Cos `/operator` desktop | PASS | 3헤딩 · 서비스 운영 › `매장 가입 신청 관리`(override) · 콘텐츠 › `제공받은 콘텐츠` · 사업 운영 › 승인 3 + 상품/주문 · 전환 바 5 · 대시보드 3축 17 링크 실 route · telemetry clean |
+| S7 | K-Cos `/operator/supplier-contents` | PASS | 제목 "제공받은 콘텐츠" · empty state "검토 대기 중인 제공 콘텐츠가 없습니다" (`GET /cms/contents?serviceKey=k-cosmetics&authorRole=supplier&status=pending` 200 · §1-4 제공 행 0 — WO 허용) · telemetry clean |
+| S8 | K-Cos mobile | PASS | drawer 3헤딩 · clean |
+| S9 | PH `/operator` desktop | PASS | 헤딩 서비스 운영 / 운영 관리 — **사업 운영 미노출**(항목 0, REAL_SERVICE_DIFFERENCE) · 서비스 운영 › `가입 신청 관리`(override) · 콘텐츠 › `제공받은 콘텐츠` · 운영 관리 › 운영 분석 · 역할 관리 · 전환 바 5 · quick action 6(가입 신청·회원·포럼·공지·뉴스·제공받은 콘텐츠·운영 분석) 실 route · telemetry clean |
+| S10 | PH `/operator/supplier-contents` | PASS | 제목 ok · empty state ok · clean |
+| S11 | PH mobile | PASS | drawer 헤딩 서비스 운영/운영 관리 · clean |
+| S12 | Neture `/operator` (SPECIAL) | PASS | 자체 헤딩 `공급·유통 운영` present · 표준 3헤딩 none · 전환 바 present (IA 무변경 + 전환 바만) |
+| S13 | 누출 | PASS | 전환 바 · 대표 홈 모두 operator-services 5건 밖 서비스 0 · cafe24-b2b 0 |
+
+**한계(숨기지 않음)**
+- 검증 계정이 5서비스 전부 admin scope 라 **순수 operator-only 화면**(adminOnly 항목 제외 상태)은 프로덕션에서 확인 못 함 — 항목 분류는 spec/render test 로 고정. PH 미노출 케이스(합성 Operator X 의 "PH 없음")도 프로덕션 계정으로는 재현 불가(unit 3층으로만).
+- 서비스 웹 폼 로그인은 L2 미확보로 실행하지 않았다(우회 채널 명시). 수신함은 제공 행 0 이라 empty state 까지만(전이 write 는 안전한 테스트 데이터 없음 → 미실행, WO §24).
+- KPA `/admin` 경유 404 4건은 법정정보 조회의 기존 동작(§7 F6).
 
 ---
 
@@ -211,6 +233,7 @@
 | F3 | KPA `SupplierContentApprovalPage`(kpa_approval_requests) 와 공통 `SupplierContentInbox` 의 UI 통일 여부 — 승인 정책은 서비스별 유지가 원칙이므로 사업 판단 후 | 판정 대기 |
 | F4 | lint-ratchet 47 > 46 (본 WO 무관 파일) | 별도 정리 |
 | F5 | 다음 단계 = Community (Industry Community) — ROLE-WORKSPACE §9-1 7단계 | 다음 WO |
+| F6 | KPA 푸터 법정정보 조회 `public/services/kpa-society/policies/*` · `kpa/legal/documents/published/*` 404 (기존 동작, 본 WO 무관) | 별도 조사 |
 
 ---
 
@@ -230,6 +253,6 @@ SERVICE_CONTENT            = cms_contents serviceKey 스코프 재사용 (서비
 BUSINESS_PROGRAM_BOUNDARY  = Content 하위 아님 (사업 운영)
 NETURE_SPECIAL             = PRESERVED (자체 IA 무변경 · switcher 만)
 LEGACY_STORE_HUB_IA        = RETIRED
-PRODUCTION_SMOKE           = (배포 후 §4-1)
+PRODUCTION_SMOKE           = PASS (S1~S13 · read-only · L1 우회 + 실제 handoff · empty-state 허용 · §4-1 한계 명시)
 NEXT                       = GO_COMMUNITY_INDUSTRY_ALIGNMENT
 ```
