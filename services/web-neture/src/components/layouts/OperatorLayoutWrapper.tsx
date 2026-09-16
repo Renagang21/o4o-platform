@@ -11,7 +11,8 @@
  */
 
 import { filterMenuByRole } from '@o4o/ui';
-import { OperatorAreaShell } from '@o4o/operator-ux-core';
+import { OperatorAreaShell, OperatorServiceSwitcher, createOperatorServicesApi } from '@o4o/operator-ux-core';
+import { api } from '../../lib/apiClient';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
 import {
   UNIFIED_MENU,
@@ -20,6 +21,13 @@ import {
 import { NetureGlobalHeader } from '../NetureGlobalHeader';
 import { NetureBottomNav } from '../NetureBottomNav';
 
+// WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: Neture 는 SPECIAL(자체 도메인 IA 유지)이지만
+//   1 Operator : N Services 전환 바는 공통이다 — 출처 GET /api/v1/work-scope/operator-services 하나.
+const netureOperatorServicesApi = createOperatorServicesApi({
+  get: async (url) => (await api.get(url)).data,
+  post: async (url, body) => (await api.post(url, body)).data,
+});
+
 export default function OperatorLayoutWrapper() {
   // operator sidebar 는 operator-scope 메뉴만 (admin 항목은 AdminLayoutWrapper 별도) — isAdmin=false 보존.
   const menuItems = filterMenuByRole(UNIFIED_MENU, false);
@@ -27,7 +35,12 @@ export default function OperatorLayoutWrapper() {
   return (
     <>
       <OperatorAreaShell
-        header={<NetureGlobalHeader />}
+        header={
+          <>
+            <NetureGlobalHeader />
+            <OperatorServiceSwitcher api={netureOperatorServicesApi} currentServiceKey="neture" />
+          </>
+        }
         menuItems={menuItems}
         capabilities={ENABLED_CAPABILITIES}
         domainIAConfig={NETURE_OPERATOR_DOMAIN_IA}

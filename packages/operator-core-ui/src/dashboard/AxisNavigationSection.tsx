@@ -7,6 +7,10 @@
  *
  * KPA: extData 기반 실시간 metrics 포함
  * GP / K-Cos: 초기에는 links-only (metrics 확장은 향후 WO)
+ *
+ * WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1:
+ *   표준 Service Operator 는 3축(서비스 운영 / 사업 운영 / 운영 관리)으로 주입한다 — 축 수는 데이터가 정한다.
+ *   3축 이상이면 xl 에서 3열. 아이콘 compass / briefcase / sliders-horizontal 추가.
  */
 
 import { Link } from 'react-router-dom';
@@ -21,6 +25,9 @@ import {
   Settings,
   Home,
   ShoppingCart,
+  Compass,
+  Briefcase,
+  SlidersHorizontal,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -42,6 +49,9 @@ const AXIS_ICON_MAP: Record<string, LucideIcon> = {
   settings: Settings,
   home: Home,
   'shopping-cart': ShoppingCart,
+  compass: Compass,
+  briefcase: Briefcase,
+  'sliders-horizontal': SlidersHorizontal,
 };
 const AXIS_ICON_NAME_LIKE = /^[a-z0-9-]+$/i;
 
@@ -89,7 +99,7 @@ const TONE_MAP: Record<string, { border: string; link: string }> = {
 
 export function AxisNavigationSection({ axes }: AxisNavigationSectionProps) {
   return (
-    <div className={`grid grid-cols-1 gap-4${axes.length >= 2 ? ' md:grid-cols-2' : ''}`}>
+    <div className={`grid grid-cols-1 gap-4${axes.length >= 2 ? ' md:grid-cols-2' : ''}${axes.length >= 3 ? ' xl:grid-cols-3' : ''}`}>
       {axes.map((axis) => {
         const t = TONE_MAP[axis.tone ?? 'slate'];
         return (

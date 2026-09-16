@@ -43,6 +43,10 @@ export type {
 export { CmsContentManager } from './modules/cms-content';
 export type { CmsContentManagerProps } from './modules/cms-content';
 
+// Supplier Content Inbox Module (WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1)
+export { SupplierContentInbox } from './modules/supplier-content-inbox';
+export type { SupplierContentInboxProps, SupplierInboxItem } from './modules/supplier-content-inbox';
+
 // LMS Operator Courses Module (WO-O4O-LMS-OPERATOR-COURSES-MANAGER-EXTRACTION-V1)
 export { OperatorLmsCoursesManager } from './modules/lms-courses';
 export type {

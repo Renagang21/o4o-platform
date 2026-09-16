@@ -1,5 +1,5 @@
 /**
- * Pharmacy-Hub Operator Menu Items + Domain IA
+ * Pharmacy-Hub Operator Menu Items
  *
  * WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1
  *
@@ -15,10 +15,16 @@
  *   커뮤니티(포럼) 운영 5화면 · 회원 관리 · 운영 분석 · 역할 관리를 공통 Core 채택으로 추가.
  *   매장 HUB / 상품 / 주문 / 이벤트 오퍼 / 공급 상품 운영은 Pharmacy-Hub 운영자 축에 두지
  *   않는다 (WO 명시 제외 대상).
+ *
+ * WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1 (2026-09-16):
+ *   Pharmacy-Hub 는 표준 Service Operator(STANDARD_CANDIDATE) — 서비스 전용 도메인 IA
+ *   (가입·회원 운영 / 커뮤니티 운영 / 운영 공통)를 은퇴하고 @o4o/operator-ux-core DEFAULT_OPERATOR_DOMAIN_IA
+ *   (서비스 운영 / 사업 운영 / 운영 관리)를 그대로 쓴다. 사업 운영 항목이 없으므로 그 도메인은 비어 있어
+ *   노출되지 않는다 (REAL_SERVICE_DIFFERENCE — 운영자는 거래에 개입하지 않는다).
+ *   `Supplier → Service Operator` 제공 콘텐츠 수신함(/operator/supplier-contents) 진입 추가.
  */
 
 import type { OperatorGroupKey, UnifiedMenuItem } from '@o4o/ui';
-import type { OperatorDomainIAConfig } from '@o4o/operator-ux-core';
 
 // ─── Unified Menu ─────────────────────────────────────────────
 
@@ -29,7 +35,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   // 가입 신청 관리 = service_memberships 승인/반려 (MEMBERSHIP_APPROVAL capability).
   // 실제 권한 경계는 backend pharmacy-hub:operator scope guard 가 강제한다.
-  approvals: [{ label: '가입 신청 관리', path: '/operator/memberships' }],
+  // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 가입 신청 = 회원 관리 축 → 서비스 운영 (approvals 그룹 기본은 사업 운영).
+  approvals: [{ label: '가입 신청 관리', path: '/operator/memberships', domain: 'service_operation' }],
   // 회원 관리 = 승인 완료 이후 사용자 축(목록·상태). 가입 신청 관리(멤버십 축)와 역할이 다르다.
   users: [{ label: '회원 관리', path: '/operator/members' }],
   // 커뮤니티(포럼) 운영 — 공통 /api/v1/forum/operator/* (serviceCode=pharmacy-hub) 채택.
@@ -60,6 +67,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     //   @o4o/operator-core-ui Surveys module. KPA/GP/KCos 도 같은 content 그룹에 둔다.
     //   회원 응답 동선(/content/surveys)이 같은 WO 에서 함께 열려 dead-end 가 아니다.
     { label: '설문조사 관리', path: '/operator/surveys' },
+    // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: `Supplier → Service Operator` 제공 콘텐츠 수신함.
+    //   cms_contents(serviceKey='pharmacy-hub', authorRole='supplier') 를 그대로 읽는다 — 새 원장 · 상태 기계 없음.
+    //   (공급자 → 약국 Store Hub 직접 경로는 종전대로 운영자 무개입 — 이 수신함은 §2-1 두 번째 경로만 받는다.)
+    { label: '제공받은 콘텐츠', path: '/operator/supplier-contents' },
   ],
   resources: [{ label: '자료실 관리', path: '/operator/resources' }],
   // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#95):
@@ -84,77 +95,5 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
 };
 
 // ─── Domain IA ────────────────────────────────────────────────
-
-/**
- * Pharmacy-Hub operator sidebar 도메인 키.
- *
- * KPA 계열 default IA (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통) 는 approvals 를
- * store_hub 로 묶는다. Pharmacy-Hub 의 approvals 는 매장 HUB 업무가 아니라
- * 서비스 가입 승인이므로 도메인 헤딩을 서비스에 맞게 주입한다
- * (Neture 와 동일한 domainIAConfig 주입 방식).
- */
-export type PharmacyHubOperatorDomainKey = 'membership' | 'community' | 'common';
-
-export const PHARMACY_HUB_DOMAIN_LABELS: Record<
-  PharmacyHubOperatorDomainKey,
-  { label: string; emoji: string }
-> = {
-  membership: { label: '가입·회원 운영', emoji: '👥' },
-  community: { label: '커뮤니티 운영', emoji: '💬' },
-  common: { label: '운영 공통', emoji: '⚙️' },
-};
-
-/** STANDARD_GROUPS 의 13 key 전부를 매핑한다 (부분 매핑 시 그룹이 사라진다).
- *  현재 UNIFIED_MENU 에 없는 그룹은 항목 0 이라 sidebar 에서 skip 된다. */
-export const PHARMACY_HUB_GROUP_TO_DOMAIN: Record<OperatorGroupKey, PharmacyHubOperatorDomainKey> = {
-  dashboard: 'common',
-  users: 'membership',
-  approvals: 'membership',
-  products: 'common',
-  stores: 'common',
-  orders: 'common',
-  content: 'common',
-  resources: 'common',
-  lms: 'common',
-  signage: 'common',
-  forum: 'community',
-  analytics: 'common',
-  system: 'common',
-};
-
-export const PHARMACY_HUB_DOMAIN_GROUP_ORDER: Record<
-  PharmacyHubOperatorDomainKey,
-  OperatorGroupKey[]
-> = {
-  membership: ['approvals', 'users'],
-  community: ['forum'],
-  common: [
-    'stores',
-    'products',
-    'orders',
-    'content',
-    'resources',
-    'lms',
-    'signage',
-    'analytics',
-    'system',
-  ],
-};
-
-export const PHARMACY_HUB_DOMAIN_DISPLAY_ORDER: PharmacyHubOperatorDomainKey[] = [
-  'membership',
-  'community',
-  'common',
-];
-
-/** 대시보드는 도메인 헤딩과 무관하게 최상단 고정 (KPA 계열과 동일 계약).
- *  UNIFIED_MENU.dashboard 가 비어 있으면 렌더되지 않는다. */
-export const PHARMACY_HUB_TOP_PINNED_GROUPS: OperatorGroupKey[] = ['dashboard'];
-
-export const PHARMACY_HUB_OPERATOR_DOMAIN_IA: OperatorDomainIAConfig = {
-  labels: PHARMACY_HUB_DOMAIN_LABELS,
-  groupToDomain: PHARMACY_HUB_GROUP_TO_DOMAIN,
-  groupOrder: PHARMACY_HUB_DOMAIN_GROUP_ORDER,
-  displayOrder: PHARMACY_HUB_DOMAIN_DISPLAY_ORDER,
-  topPinnedGroups: PHARMACY_HUB_TOP_PINNED_GROUPS,
-};
+// WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 서비스 전용 config(PHARMACY_HUB_OPERATOR_DOMAIN_IA) 제거.
+//   OperatorLayoutWrapper 는 domainIAConfig 를 주입하지 않고 DEFAULT_OPERATOR_DOMAIN_IA 를 쓴다.

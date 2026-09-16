@@ -12,8 +12,13 @@
  *                    (GET /forum/operator/{requests,delete-requests}/pending-count?serviceCode=pharmacy-hub)
  *   운영 활동 로그 : action_logs           (GET /operator/analytics/actions)
  *
+ * WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1:
+ *   표준 Service Operator 3도메인(서비스 운영 / 사업 운영 / 운영 관리) 기준으로 quick actions 를 정렬한다.
+ *   Pharmacy-Hub 는 사업 운영 항목이 없다(REAL_SERVICE_DIFFERENCE) — 가짜 카드를 만들지 않는다.
+ *   `Supplier → Service Operator` 제공 콘텐츠 수신함(/operator/supplier-contents)은 서비스 운영이다.
+ *
  * 규칙:
- *   - 매장 HUB 운영 블록은 가져오지 않는다 (Pharmacy-Hub 운영자는 거래에 개입하지 않는다).
+ *   - 사업 운영(상품 · 주문 · 이벤트 오퍼) 블록은 가져오지 않는다 (Pharmacy-Hub 운영자는 거래에 개입하지 않는다).
  *   - 미구현 업무를 가짜 카드로 만들지 않는다.
  *   - 조회 실패를 0 으로 삼키지 않는다. 다만 **부가 블록(커뮤니티·활동 로그)의 실패가
  *     대시보드 전체를 막지 않도록** 블록 단위로 degrade 시키고 배너로 알린다.
@@ -212,17 +217,22 @@ export default function OperatorDashboardPage() {
     actionQueue,
     activityLog: activity ?? [],
     quickActions: [
+      // 서비스 운영
       { id: 'memberships', label: '가입 신청 관리', link: '/operator/memberships' },
       { id: 'members', label: '회원 관리', link: '/operator/members' },
       { id: 'forum', label: '포럼 운영', link: '/operator/forum' },
+      { id: 'content', label: '공지·뉴스 관리', link: '/operator/content' },
+      { id: 'supplier-contents', label: '제공받은 콘텐츠', link: '/operator/supplier-contents' },
+      // 운영 관리
       { id: 'analytics', label: '운영 분석', link: '/operator/analytics' },
     ],
     aboveBlocks: (
       <section className="rounded-2xl border border-slate-200 bg-white p-4">
         <h1 className="mb-1 text-lg font-semibold text-slate-800">{BRAND.name} 운영자</h1>
         <p className="m-0 text-sm text-slate-500">
-          가입·회원 운영과 커뮤니티(포럼) 운영을 담당합니다.
-          공급자 ↔ 약국 간 상품 거래와 공급자 콘텐츠 전달에는 운영자가 개입하지 않습니다.
+          서비스 운영(가입·회원 · 커뮤니티 · 콘텐츠)과 운영 관리(분석)를 담당합니다.
+          공급자 ↔ 약국 간 상품 거래와 공급자 → 약국 HUB 직접 제공에는 운영자가 개입하지 않습니다.
+          공급자가 이 서비스에 제공한 콘텐츠는 서비스 운영 › 제공받은 콘텐츠에서 받습니다.
         </p>
         {degraded.length > 0 && (
           <p className="mt-3 mb-0 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700">

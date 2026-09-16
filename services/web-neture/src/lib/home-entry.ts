@@ -8,7 +8,11 @@
  * 데이터 소스 (전부 기존 API):
  *   - `GET /auth/services`           서비스 카탈로그 + 내 가입 상태 (nameKo · basePath 는 이번 WO 에서 추가)
  *   - `GET /neture/home/entry`       내 매장(복수 나열) · 내 분회(slug)  — 이번 WO 의 홈 전용 read API
- *   - `user.roles` (from /auth/me)   운영자 진입 판정 (Neture RoleGuard 와 같은 상수)
+ *   - `user.roles` (from /auth/me)   platform:super_admin · 관리자 판정 (Neture RoleGuard 와 같은 상수)
+ *   - `GET /work-scope/operator-services`  운영자로 참여하는 서비스 목록 — **서비스 운영자 화면 진입의 유일한 출처**
+ *                                    (WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: role 문자열을 프런트에서
+ *                                    파싱해 서비스를 추측하지 않는다. 서버가 role_assignments + service_memberships
+ *                                    active 로 확정한 목록만 쓴다. 1개면 바로 진입, 여러 개면 선택.)
  *   - `entry.serviceStates`          공급자 **서비스 이용 상태** (WO-O4O-NETURE-MAIN-ACCOUNT-AND-
  *                                    SUPPLIER-PARTNER-SERVICE-SEPARATION-V1 — role 문자열 · neture 회원
  *                                    active 만으로 상태를 추론하지 않는다. 출처: neture_suppliers,
@@ -27,7 +31,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { api } from './apiClient';
-import { ADMIN_ROLES, OPERATOR_OR_ABOVE_ROLES, PLATFORM_ROLES } from './role-constants';
+import { ADMIN_ROLES, PLATFORM_ROLES } from './role-constants';
 import type { User } from '../contexts/AuthContext';
 
 // ─── API 응답 타입 ────────────────────────────────────────────────────────────
@@ -74,11 +78,22 @@ export const NONE_SERVICE_STATES: NetureServiceStates = {
   supplier: { status: 'none', source: 'none' },
 };
 
+/** `GET /work-scope/operator-services` 응답 1건 (apps/api-server/src/utils/service-tenant.resolver.ts OperatorServiceMembership) */
+export interface EntryOperatorService {
+  serviceKey: string;
+  serviceName: string;
+  scope: 'admin' | 'operator';
+  workspaceMode: 'standard' | 'special' | 'none' | 'undecided';
+  workspaceAvailable: boolean;
+}
+
 export interface HomeEntryData {
   services: EntryService[];
   stores: EntryStore[];
   branches: EntryBranch[];
   serviceStates: NetureServiceStates;
+  /** 운영자로 참여하는 서비스 (서버 확정 목록). 없으면 빈 배열로 취급한다 */
+  operatorServices?: EntryOperatorService[];
 }
 
 // ─── 진입 액션 ────────────────────────────────────────────────────────────────
@@ -152,14 +167,6 @@ const SERVICE_PATHS: Record<string, ServicePaths> = {
 };
 
 /** role prefix → canonical service key (role_assignments 의 prefix 는 service_key 와 다르다) */
-const ROLE_PREFIX_TO_SERVICE: Record<string, string> = {
-  neture: 'neture',
-  kpa: 'kpa-society',
-  'pharmacy-hub': 'pharmacy-hub',
-  cosmetics: 'k-cosmetics',
-  'kpa-branch': 'kpa-branch',
-};
-
 export const STATUS_LABELS: Record<string, string> = {
   active: '이용 중',
   pending: '가입 신청 중',
@@ -225,19 +232,25 @@ export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
     setError(null);
     (async () => {
       try {
-        const [servicesRes, entryRes] = await Promise.all([
+        const [servicesRes, entryRes, operatorRes] = await Promise.all([
           api.get('/auth/services'),
           api.get('/neture/home/entry'),
+          // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 운영자 서비스 목록의 유일한 출처
+          api.get('/work-scope/operator-services'),
         ]);
         const services = servicesRes.data?.data?.services;
         const entry = entryRes.data?.data;
-        if (!Array.isArray(services) || !entry || !entry.serviceStates) throw new Error('bad response');
+        const operatorServices = operatorRes.data?.data?.services;
+        if (!Array.isArray(services) || !entry || !entry.serviceStates || !Array.isArray(operatorServices)) {
+          throw new Error('bad response');
+        }
         if (cancelled) return;
         setData({
           services,
           stores: Array.isArray(entry.stores) ? entry.stores : [],
           branches: Array.isArray(entry.branches) ? entry.branches : [],
           serviceStates: normalizeServiceStates(entry.serviceStates),
+          operatorServices,
         });
       } catch {
         if (cancelled) return;
@@ -361,20 +374,25 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
     supplier.push({ id: 'supplier:neture', label: NETURE_SERVICE_INFO.supplier.workLabel, action: { kind: 'internal', to: NETURE_SERVICE_INFO.supplier.work } });
   }
 
-  // 서비스 운영자 화면 — `{prefix}:operator|admin` + 해당 서비스 이용 중. platform:super_admin 은 Neture /admin.
+  // 서비스 운영자 화면 — 출처는 `GET /work-scope/operator-services` 하나 (role_assignments + service_memberships
+  // active 를 서버가 결합). 프런트는 role 문자열에서 서비스를 추측하지 않는다. platform:super_admin 은 Neture /admin
+  // (platformBypass 는 guard 의 예외이지 "운영하는 서비스" 가 아니므로 목록에 없다 — 별도 진입).
+  // 목록이 1개면 그 서비스로 바로, 여러 개면 여기서 선택한다 (WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1).
   const operator: EntryItem[] = [];
   if (isPlatformAdmin) {
     operator.push({ id: 'operator:platform', label: `${nameOf('neture')} 관리자`, action: { kind: 'internal', to: SERVICE_PATHS.neture.admin! } });
-  } else if (isActive('neture') && hasAnyRole(roles, OPERATOR_OR_ABOVE_ROLES)) {
-    const to = roles.includes('neture:admin') ? SERVICE_PATHS.neture.admin! : SERVICE_PATHS.neture.operator!;
-    operator.push({ id: 'operator:neture', label: `${nameOf('neture')} 운영자`, action: { kind: 'internal', to } });
   }
-  for (const role of roles) {
-    const [prefix, name] = role.split(':');
-    if (!prefix || !name || prefix === 'neture' || prefix === 'platform') continue;
-    if (name !== 'operator' && name !== 'admin') continue;
-    const key = ROLE_PREFIX_TO_SERVICE[prefix];
-    if (!key || !isActive(key)) continue;
+  for (const svc of data.operatorServices ?? []) {
+    if (!svc.workspaceAvailable) continue;
+    const key = svc.serviceKey;
+    const roleLabel = svc.scope === 'admin' ? '관리자' : '운영자';
+    const label = byKey.has(key) ? nameOf(key) : svc.serviceName;
+    if (key === 'neture') {
+      if (isPlatformAdmin) continue; // 이미 Neture 관리자 진입이 있다
+      const to = svc.scope === 'admin' ? SERVICE_PATHS.neture.admin! : SERVICE_PATHS.neture.operator!;
+      operator.push({ id: 'operator:neture', label: `${label} ${roleLabel}`, action: { kind: 'internal', to } });
+      continue;
+    }
     if (key === 'kpa-branch') {
       // 분회 운영자 화면은 분회 slug 아래 (index route 없음 → 첫 운영 화면 operator/site) — 내 분회가 확인될 때만
       for (const b of data.branches) {
@@ -384,11 +402,11 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
       continue;
     }
     const paths = SERVICE_PATHS[key];
-    const path = name === 'admin' ? paths?.admin : paths?.operator;
-    if (!path) continue;
-    const id = `operator:${key}:${name}`;
+    const path = svc.scope === 'admin' ? paths?.admin : paths?.operator;
+    if (!path) continue; // canonical route 가 확인된 서비스만 (dead link 0)
+    const id = `operator:${key}:${svc.scope}`;
     if (operator.some((o) => o.id === id)) continue;
-    operator.push({ id, label: `${nameOf(key)} ${name === 'admin' ? '관리자' : '운영자'}`, action: { kind: 'handoff', serviceKey: key, returnPath: path } });
+    operator.push({ id, label: `${label} ${roleLabel}`, action: { kind: 'handoff', serviceKey: key, returnPath: path } });
   }
 
   const groups: EntryGroup[] = [

@@ -9,8 +9,11 @@
  *   기능 변경 없음 — 직전 3개 서비스 sidebar 의 동작을 그대로 보존하는 중복 제거 리팩토링.
  *
  * 구성 (3개 서비스 sidebar 와 동일):
- *   - desktop: 도메인 헤딩 (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통) + 그룹별 collapsible
- *   - mobile: 수평 탭 (도메인 헤딩 생략, 그룹 순서로 도메인 클러스터링)
+ *   - desktop: 도메인 헤딩 + 그룹별 collapsible
+ *       표준 Service Operator = 서비스 운영 / 사업 운영 / 운영 관리 (DEFAULT_OPERATOR_DOMAIN_IA,
+ *       WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1) · Neture SPECIAL 은 자체 config 주입
+ *   - mobile: 햄버거 drawer (desktop 과 같은 트리)
+ *   - 항목 단위 도메인 배치: item.domain ?? groupToDomain[group] (operatorDomainIA.resolveDomainGroupItems)
  *   - capability + adminOnly 필터: 호출처(wrapper) 가 menuItems 사전 필터 수행
  *
  * STANDARD_GROUPS 의 icon / label 은 packages/ui 에서 import 하여 시각 일관성 유지.
@@ -29,6 +32,9 @@ import {
   Settings,
   Package,
   CreditCard,
+  Compass,
+  Briefcase,
+  SlidersHorizontal,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -39,6 +45,7 @@ import {
 import type { OperatorCapability } from '@o4o/types';
 import {
   DEFAULT_OPERATOR_DOMAIN_IA,
+  resolveDomainGroupItems,
   type OperatorDomainIAConfig,
 } from './operatorDomainIA';
 
@@ -46,7 +53,11 @@ import {
 // WO-O4O-DOMAIN-IA-SIDEBAR-HEADING-ICON-ALIGNMENT-V1 (IR Option A):
 // config 데이터(DOMAIN_LABELS / NETURE_DOMAIN_LABELS)의 emoji 는 그대로 두고,
 // 렌더 시점에 domain key → lucide 로 치환한다. 미매핑 key 는 emoji fallback.
+// WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 표준 3도메인 키 추가 (구 키는 Neture SPECIAL · 호환용 유지).
 const DOMAIN_HEADING_ICONS: Record<string, LucideIcon> = {
+  service_operation: Compass,
+  business_operation: Briefcase,
+  operations_management: SlidersHorizontal,
   community: MessagesSquare,
   community_content: MessagesSquare,
   store_hub: Store,
@@ -58,6 +69,8 @@ const DOMAIN_HEADING_ICONS: Record<string, LucideIcon> = {
 // ─── Internal types ───────────────────────────────────────────────────────
 
 interface ResolvedGroup {
+  /** collapsible 상태 · React key — 한 그룹이 두 도메인에 나뉘어 나타날 수 있으므로 `${domain}:${group}` */
+  id: string;
   key: OperatorGroupKey;
   label: string;
   icon: (typeof STANDARD_GROUPS)[number]['icon'];
@@ -122,22 +135,24 @@ export function DomainIASidebar({
       const standard = STANDARD_GROUPS.find((g) => g.key === groupKey);
       if (!standard) continue;
       if (standard.capability && !capabilities.includes(standard.capability)) continue;
-      out.push({ key: groupKey, label: standard.label, icon: standard.icon, items });
+      out.push({ id: `top:${groupKey}`, key: groupKey, label: standard.label, icon: standard.icon, items });
     }
     return out;
   }, [menuItems, capabilities, domainIAConfig]);
 
   // ── Resolve visible domains × groups (STANDARD_GROUPS 의 icon/label 재사용) ──
+  // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 항목 단위 도메인 해석
+  //   (item.domain ?? groupToDomain[group]) — 규칙은 operatorDomainIA.resolveDomainGroupItems 한 곳.
+  //   한 그룹(예: approvals)이 두 도메인에 나뉘어 나타날 수 있다.
   const resolvedDomains: ResolvedDomain[] = useMemo(() => {
+    const placed = resolveDomainGroupItems(menuItems, domainIAConfig);
     return domainIAConfig.displayOrder
       .map((domainKey): ResolvedDomain | null => {
-        const groupOrder = domainIAConfig.groupOrder[domainKey] ?? [];
         const groups: ResolvedGroup[] = [];
 
-        for (const groupKey of groupOrder) {
-          if (domainIAConfig.groupToDomain[groupKey] !== domainKey) continue;
-          const items = menuItems[groupKey];
-          if (!items || items.length === 0) continue;
+        for (const entry of placed) {
+          if (entry.domainKey !== domainKey) continue;
+          const groupKey = entry.groupKey;
 
           const standard = STANDARD_GROUPS.find((g) => g.key === groupKey);
           if (!standard) continue;
@@ -146,10 +161,11 @@ export function DomainIASidebar({
           if (standard.capability && !capabilities.includes(standard.capability)) continue;
 
           groups.push({
+            id: `${domainKey}:${groupKey}`,
             key: groupKey,
             label: standard.label,
             icon: standard.icon,
-            items,
+            items: entry.items,
           });
         }
 
@@ -174,21 +190,21 @@ export function DomainIASidebar({
 
   // ── Collapsible state ── (active group 자동 open)
   const initialOpen = useMemo(() => {
-    const set = new Set<OperatorGroupKey>();
+    const set = new Set<string>();
     for (const g of resolvedTopGroups) {
-      if (isGroupActive(g)) set.add(g.key);
+      if (isGroupActive(g)) set.add(g.id);
     }
     for (const dom of resolvedDomains) {
       for (const g of dom.groups) {
-        if (isGroupActive(g)) set.add(g.key);
+        if (isGroupActive(g)) set.add(g.id);
       }
     }
     return set;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedTopGroups, resolvedDomains]);
-  const [openGroups, setOpenGroups] = useState<Set<OperatorGroupKey>>(initialOpen);
+  const [openGroups, setOpenGroups] = useState<Set<string>>(initialOpen);
 
-  const toggleGroup = (key: OperatorGroupKey) => {
+  const toggleGroup = (key: string) => {
     setOpenGroups((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
@@ -219,7 +235,7 @@ export function DomainIASidebar({
       {resolvedTopGroups.map((group) => {
         const Icon = group.icon;
         const active = isGroupActive(group);
-        const isOpen = openGroups.has(group.key);
+        const isOpen = openGroups.has(group.id);
         const isSingle = group.items.length === 1;
 
         if (isSingle) {
@@ -227,7 +243,7 @@ export function DomainIASidebar({
           const itemActive = isItemActive(item.path, item.exact);
           return (
             <Link
-              key={group.key}
+              key={group.id}
               to={item.path}
               onClick={onNavigate}
               className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
@@ -243,10 +259,10 @@ export function DomainIASidebar({
         }
 
         return (
-          <div key={group.key}>
+          <div key={group.id}>
             <button
               type="button"
-              onClick={() => toggleGroup(group.key)}
+              onClick={() => toggleGroup(group.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-colors border-l-2 ${
                 active
                   ? 'text-blue-600 border-blue-600'
@@ -318,7 +334,7 @@ export function DomainIASidebar({
           {domain.groups.map((group) => {
             const Icon = group.icon;
             const active = isGroupActive(group);
-            const isOpen = openGroups.has(group.key);
+            const isOpen = openGroups.has(group.id);
             const isSingle = group.items.length === 1;
 
             if (isSingle) {
@@ -326,7 +342,7 @@ export function DomainIASidebar({
               const itemActive = isItemActive(item.path, item.exact);
               return (
                 <Link
-                  key={group.key}
+                  key={group.id}
                   to={item.path}
                   onClick={onNavigate}
                   className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
@@ -342,10 +358,10 @@ export function DomainIASidebar({
             }
 
             return (
-              <div key={group.key}>
+              <div key={group.id}>
                 <button
                   type="button"
-                  onClick={() => toggleGroup(group.key)}
+                  onClick={() => toggleGroup(group.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-colors border-l-2 ${
                     active
                       ? 'text-blue-600 border-blue-600'

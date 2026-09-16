@@ -147,6 +147,9 @@ export default function KpaOperatorDashboard() {
 //   기존 buildKpaAxes(extData) 는 8개의 source 필드를 사용했으나, Adapter 단계에서는
 //   dashboardConfig.kpis (key 매칭) 5개 + storeStats.totalStores 1개로 파생.
 //   축 자체의 title/description/icon/tone/links 는 frontend static 유지 (I3 정합).
+// WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1:
+//   2축(커뮤니티 운영 / 매장 HUB 운영 — RETIRED) → 표준 3도메인(서비스 운영 / 사업 운영 / 운영 관리).
+//   기존 KPI · 링크를 재배치만 한다 — 새 지표 · 새 route 없음 (모든 href 는 UNIFIED_MENU 의 실 route).
 
 function getKpiValue(kpis: KpiItem[], key: string): number {
   const item = kpis.find((k) => k.key === key);
@@ -172,37 +175,52 @@ function buildKpaAxesFromConfig(
 
   return [
     {
-      key: 'community',
-      title: '커뮤니티 운영',
-      description: '포럼 · 회원 · 콘텐츠 · LMS · 자료실',
-      icon: 'message-square',
+      key: 'service_operation',
+      title: '서비스 운영',
+      description: '회원 · 매장(가맹점) · 공지 · 콘텐츠 · 포럼 · 자료 · 강의 · 매장 지원 콘텐츠',
+      icon: 'compass',
       tone: 'blue',
       metrics: [
         { label: '회원 승인', value: pendingMembers, href: '/operator/members', warn: pendingMembers > 0 },
         { label: '포럼 요청', value: forumPending, href: '/operator/forum-requests', warn: forumPending > 0 },
         { label: '콘텐츠 대기', value: contentPending, href: '/operator/content', warn: contentPending > 0 },
+        { label: '등록 매장', value: totalStores, href: '/operator/stores', warn: false },
       ],
       links: [
-        { key: 'forum', label: '포럼 운영', href: '/operator/forum' },
         { key: 'members', label: '회원 관리', href: '/operator/members' },
+        { key: 'stores', label: '매장 관리', href: '/operator/stores' },
+        { key: 'forum', label: '포럼 운영', href: '/operator/forum' },
         { key: 'lms', label: '강의 관리', href: '/operator/lms' },
+        { key: 'supplier-contents', label: '제공받은 콘텐츠', href: '/operator/approvals' },
+        { key: 'signage', label: '사이니지', href: '/operator/signage/hq-media' },
       ],
     },
     {
-      key: 'store-hub',
-      title: '매장 HUB 운영',
-      description: '매장 · 이벤트 오퍼 · 사이니지 · 상품 신청',
-      icon: 'store',
+      key: 'business_operation',
+      title: '사업 운영',
+      description: '상품 · 상품 신청 승인 · 이벤트 오퍼 · 판매자 모집 · 주문',
+      icon: 'briefcase',
       tone: 'emerald',
       metrics: [
         { label: '상품 신청', value: productApplicationPending, href: '/operator/product-applications', warn: productApplicationPending > 0 },
         { label: '이벤트 오퍼 승인', value: eventOfferPending, href: '/operator/event-offers', warn: eventOfferPending > 0 },
-        { label: '등록 매장', value: totalStores, href: '/operator/stores', warn: false },
       ],
       links: [
-        { key: 'stores', label: '매장 관리', href: '/operator/stores' },
+        { key: 'products', label: '상품 현황', href: '/operator/products' },
+        { key: 'orders', label: '주문 현황', href: '/operator/orders' },
         { key: 'event-offers', label: '이벤트 오퍼', href: '/operator/event-offers' },
-        { key: 'signage', label: '사이니지', href: '/operator/signage/hq-media' },
+        { key: 'recruitment-exposure', label: '판매자 모집 노출', href: '/operator/recruitment-exposure' },
+      ],
+    },
+    {
+      key: 'operations_management',
+      title: '운영 관리',
+      description: '분석 · AI 리포트 · 감사 · 역할',
+      icon: 'sliders-horizontal',
+      tone: 'slate',
+      links: [
+        { key: 'analytics', label: '운영 분석', href: '/operator/analytics' },
+        { key: 'ai-report', label: 'AI 리포트', href: '/operator/ai-report' },
       ],
     },
   ];

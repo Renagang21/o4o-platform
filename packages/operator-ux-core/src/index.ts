@@ -49,6 +49,9 @@ export * from './sidebar/index';
 // Operator Area Layout Module (WO-O4O-CROSSSERVICE-OPERATOR-LAYOUT-WRAPPER-COMMON-COMPONENT-V1)
 export * from './layout/index';
 
+// Operator Service Switcher (WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1 — 1 Operator : N Services)
+export * from './service-switcher/index';
+
 // Recruitment Exposure Console (WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1)
 export { RecruitmentExposureConsole } from './recruitment-exposure/RecruitmentExposureConsole';
 export type { RecruitmentExposureItem, RecruitmentExposureConsoleProps } from './recruitment-exposure/RecruitmentExposureConsole';

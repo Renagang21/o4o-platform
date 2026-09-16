@@ -17,31 +17,50 @@ import { operatorApi } from '@/services/operatorApi';
 import { buildKCosmeticsOperatorConfig } from './operatorConfig';
 
 // WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1
+// WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1:
+//   2축(매장 HUB 운영 / 콘텐츠 운영 — RETIRED) → 표준 3도메인(서비스 운영 / 사업 운영 / 운영 관리).
+//   기존 링크 재배치 + UNIFIED_MENU 의 실 route 만 추가 (새 route 없음).
 const KCOS_AXES: OperatorAxisGroup[] = [
   {
-    key: 'store-hub',
-    title: '매장 HUB 운영',
-    description: '매장 · 상품 · 주문 · 이벤트',
-    icon: 'store',
-    tone: 'emerald',
-    links: [
-      { key: 'stores', label: '매장 관리', href: '/operator/stores' },
-      { key: 'products', label: '상품 관리', href: '/operator/products' },
-      { key: 'orders', label: '주문 관리', href: '/operator/orders' },
-      { key: 'event-offers', label: '이벤트 오퍼', href: '/operator/event-offers' },
-    ],
-  },
-  {
-    key: 'content',
-    title: '콘텐츠 운영',
-    description: '콘텐츠 · LMS · 자료실 · 사이니지',
-    icon: 'clipboard-list',
+    key: 'service_operation',
+    title: '서비스 운영',
+    description: '회원 · 매장(가맹점) · 콘텐츠 · 강의 · 자료실 · 사이니지',
+    icon: 'compass',
     tone: 'blue',
     links: [
+      { key: 'members', label: '회원 관리', href: '/operator/members' },
+      { key: 'applications', label: '매장 가입 신청', href: '/operator/applications' },
+      { key: 'stores', label: '매장 관리', href: '/operator/stores' },
       { key: 'content-management', label: '콘텐츠 관리', href: '/operator/content-management' },
+      { key: 'supplier-contents', label: '제공받은 콘텐츠', href: '/operator/supplier-contents' },
       { key: 'lms', label: '강의 관리', href: '/operator/lms' },
       { key: 'resources', label: '자료실', href: '/operator/resources' },
       { key: 'signage', label: '사이니지', href: '/operator/signage/hq-media' },
+    ],
+  },
+  {
+    key: 'business_operation',
+    title: '사업 운영',
+    description: '상품 · 상품 신청 승인 · 이벤트 오퍼 · 판매자 모집 · 주문',
+    icon: 'briefcase',
+    tone: 'emerald',
+    links: [
+      { key: 'products', label: '상품 현황', href: '/operator/products' },
+      { key: 'product-applications', label: '상품 신청 승인', href: '/operator/product-applications' },
+      { key: 'event-offers', label: '이벤트 오퍼', href: '/operator/event-offers' },
+      { key: 'recruitment-exposure', label: '판매자 모집 노출', href: '/operator/recruitment-exposure' },
+      { key: 'orders', label: '주문 현황', href: '/operator/orders' },
+    ],
+  },
+  {
+    key: 'operations_management',
+    title: '운영 관리',
+    description: '분석 · AI 리포트',
+    icon: 'sliders-horizontal',
+    tone: 'slate',
+    links: [
+      { key: 'analytics', label: '운영 분석', href: '/operator/analytics' },
+      { key: 'ai-report', label: 'AI 리포트', href: '/operator/ai-report' },
     ],
   },
 ];
@@ -131,7 +150,7 @@ export default function KCosmeticsOperatorDashboard() {
             <OperatorRoleGuideCard guideHref="/guide/usage" />
             {/* 부가 섹션: [Alert/Notice] → [Axis] → [5-block] */}
             {orderMetricsNotice}
-            {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1: 2축 운영 네비게이션 */}
+            {/* WO-O4O-OPERATOR-DASHBOARD-AXIS-NAVIGATION-COMMONIZATION-V1 · WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 3도메인 운영 네비게이션 */}
             <AxisNavigationSection axes={KCOS_AXES} />
           </>
         ),

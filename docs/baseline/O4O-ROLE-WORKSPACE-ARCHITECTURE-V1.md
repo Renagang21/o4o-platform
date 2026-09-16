@@ -1,7 +1,7 @@
 # O4O-ROLE-WORKSPACE-ARCHITECTURE-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영)
+> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영)
 > **근거 WO/IR**: `WO-O4O-ROLE-WORKSPACE-REFACTOR-BASELINE-AND-PREFLIGHT-V1` · [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md)
 > **위치**: 사업·정책 정본(우선순위 2). [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) 과 동급이며, **역할 경계 · 업무공간 구조 · 콘텐츠 유입 경로 · Legacy Partner** 에 관해 두 문서가 충돌하면 **이 문서가 우선**한다 (§8).
 
@@ -100,19 +100,22 @@ My Services
 └─ Service C
 ```
 
-Service 내부:
+Service 내부 (표준 Service Operator 최상위 IA — 2026-09-16 확정):
 
 ```text
-Service Operation           Business Operation
-├─ Notice                   ├─ Products
-├─ Content                  ├─ Group Buy
-├─ Forum / Board            ├─ Special Deal
-├─ Resources                ├─ Event
-└─ Education                └─ Promotion
+Home
+├─ Service Operation   (서비스 운영)   회원 · 가맹점(매장 = 회원 관리) · 공지 · 서비스 콘텐츠 · 포럼 · 자료 ·
+│                                      교육/LMS · 설문 · 안내 · 문의/협업 · 매장 지원 콘텐츠 · 사이니지/태블릿 자료 ·
+│                                      공급자가 제공한 콘텐츠 수신
+├─ Business Operation  (사업 운영)     상품 · 상품 신청/취급 승인 · 공동구매 · 특가 · Event Offer · 프로모션 ·
+│                                      캠페인 · 판매자 모집 노출 승인 · 주문 · 사업 프로그램 승인
+└─ Operations Management (운영 관리)   분석 · 서비스/시스템 설정 · 감사 로그 · 운영 정책 (Platform Admin 업무 아님)
 ```
 
 - **Content 와 사업 프로그램(Business Operation)은 별도 도메인**으로 유지하며, 필요할 때 관계만 연결한다. 한쪽을 다른 쪽의 하위로 만들지 않는다.
-- Service Operator 는 자기 Service 의 Service Operation · Business Operation 을 운영한다. 한 운영자가 여러 Service 를 운영할 수 있다 (1 Operator : N Services — IR §A).
+- Service Operator 는 자기 Service 의 Service Operation · Business Operation · Operations Management 를 운영한다. 한 운영자가 여러 Service 를 운영할 수 있다 (1 Operator : N Services — IR §A).
+- 종전 표준 서비스 운영자 최상위 IA "커뮤니티 운영 / 매장 HUB 운영 / 운영 공통" 은 **RETIRED** (2026-09-16). "매장 HUB 운영 = Service Operator 사업 전체" 라는 의미도 함께 은퇴한다 — 매장 지원 콘텐츠(HUB 블로그 · POP · QR · 사이니지 · 태블릿)는 서비스 운영이고, 상품 · 주문 · 승인형 사업 프로그램은 사업 운영이다.
+- **분류 단위는 메뉴 항목(route/page)이다.** 그룹 키(approvals 등)로 일괄 이동하지 않는다 — 예: `approvals` 안의 공급자 콘텐츠 승인은 서비스 운영, 상품 신청 · 이벤트 오퍼 · 판매자 모집 노출 승인은 사업 운영.
 
 ### 4-1. Service Identity ≠ Service Workspace
 
@@ -123,6 +126,15 @@ Service Operation           Business Operation
 - **모든 platform service 가 My Services 항목이 되는 것은 아니다.** 노출 조건은 `Store 의 enrollment 가 active` **AND** `해당 서비스의 storeWorkspaceEnabled` 이다. 근거 없는 서비스는 `undecided` 로 두고 노출하지 않는다 — 코드가 사업 결정을 대신 내리지 않는다.
 - 세 관계는 물리적으로 분리 유지한다 (합치지 않는다): Store ↔ Service = `organization_service_enrollments` · Operator ↔ Service = `role_assignments` + `service_memberships`(membership guard 와 동일 정책) · 사용자 ↔ 조직 = `organization_members`. 읽기 계약은 `/api/v1/work-scope/store-services` · `/operator-services` (`utils/service-tenant.resolver.ts`) 하나로 두며 UI 노출 ≠ 권한이다 — Workspace metadata 는 권한 SSOT 가 아니다.
 - **Industry(업종) 는 아직 정의하지 않았다.** Community §5 의 Industry Community 와 Service Identity 의 관계는 별도 단계에서 정한다.
+
+### 4-2. Service Operator Workspace 구현 상태 (WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1 · 2026-09-16)
+
+- **공통 셸 재작성 0.** `OperatorAreaShell` · `DomainIASidebar` · `OperatorDashboardLayout` · `DataTable` 은 보존. 바뀐 것은 IA 메타데이터(`@o4o/operator-ux-core` `DEFAULT_OPERATOR_DOMAIN_IA` = `service_operation / business_operation / operations_management`), 서비스 `operatorMenuGroups.ts` 의 항목 단위 `domain` override(`OperatorMenuItem.domain`, additive · 표시 전용), 대시보드 축 재편(3도메인), 최소 공통 컴포넌트 2개다. 셸 안에 서비스별 if 분기는 없다.
+- **표준 Service Operator = KPA Society · K-Cosmetics · Pharmacy-Hub** (STANDARD_CANDIDATE, 서비스 전용 도메인 IA config 없음 — PH 의 전용 config 는 은퇴). **Neture = SPECIAL** (자체 `NETURE_OPERATOR_DOMAIN_IA` 유지). kpa-branch = NO_STORE_WORKSPACE/특수(분회 slug 아래 운영 화면) · cafe24-b2b = UNDECIDED.
+- **운영 가능 서비스 목록 출처 = `GET /api/v1/work-scope/operator-services` 하나.** 다중 서비스 운영자는 공통 `OperatorServiceSwitcher`(운영 화면 header 슬롯, 2개 이상일 때만 표시) 와 대표 홈 "서비스 운영자 화면"(1개 = 바로 진입 · 여러 개 = 선택)으로 전환하며, 이동은 기존 `POST /auth/handoff` → 대상 `/operator`. 프런트는 role 문자열을 파싱해 서비스를 추측하지 않는다. 새 membership 테이블 0 · 새 role 시스템 0 · 실제 게이트는 role_assignments + active service_memberships + security-core scope guard 그대로.
+- **Supplier → Service Operator 수신(§2-1 두 번째 경로).** 공급자 제공 = 기존 `SupplierContentService.submit`(cms_contents `authorRole='supplier'`, serviceKey 경계). 수신 진입은 서비스 운영 › 제공받은 콘텐츠 — KPA 는 자체 승인 정책(`kpa_approval_requests`, `/operator/approvals`) 유지, K-Cosmetics · Pharmacy-Hub 는 공통 `SupplierContentInbox`(`/operator/supplier-contents`, 공통 CMS read + 기존 상태 전이만). 새 원장 · 전송 엔진 · 통일 승인 state machine 없음 — 수신 ≠ 승인 강제.
+- **Service Content = `cms_contents` serviceKey 스코프 재사용** (서비스 운영 아래). 사업 프로그램(상품 신청 · 이벤트 오퍼 · 공동구매 · 판매자 모집)은 Content 하위가 아니다.
+- `/operator/*` route 는 전부 KEEP_CANONICAL (RETIRE · COMPAT_REDIRECT 0). 모바일은 `DomainIASidebar` drawer 재사용(별도 모바일 IA 없음). 권한 · capability 판정 무변경.
 
 ---
 
@@ -242,7 +254,7 @@ latest main sync
 3. Content Boundary Alignment ← 논리 도메인 4종 · canonical producer(adapter 정규화) · KPA producer drift FIX · F4/게시 표준/3자 흐름 문서 정합 (2026-09-16 완료, 물리 schema 변경 없음)
 4. Supplier Workspace        ← Products / Orders / Content 3축 IA · Supplier 전용 Community 진입 은퇴 · §2-1 두 경로 구현(Hub adapter · handoff) (2026-09-16 완료, schema 변경 없음)
 5. Store Workspace        ← Home · My Store · Store Hub · My Services 상위 구조(store-ui-core `workspace/`) · My Services(`/work-scope/store-services`) · 대표 홈 진입 정렬 · KPA 모바일 전용 화면 RETIRE (2026-09-16 완료, schema 변경 없음)
-6. Service Operator Workspace
+6. Service Operator Workspace ← 표준 최상위 IA 서비스 운영 / 사업 운영 / 운영 관리 (항목 단위 분류) · operator-services 기반 다중 서비스 전환 · Supplier → Service Operator 수신함 · Neture SPECIAL 보존 (2026-09-16 완료, schema 변경 없음 — §4-2)
 7. Community (Industry Community)
 ```
 

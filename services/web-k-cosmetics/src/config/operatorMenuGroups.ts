@@ -5,9 +5,13 @@
  * WO-O4O-AUTH-RBAC-CLEANUP-V1: UNIFIED_MENU + filterMenuByRole 도입
  * WO-O4O-KCOS-OPERATOR-MENU-ALIGN-WITH-KPA-V1:
  *   KPA-Society / GlycoPharm 와 동일한 도메인 IA (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통)
- *   로 UNIFIED_MENU 재배치 + Domain IA 메타데이터 추가.
+ *   로 UNIFIED_MENU 재배치 + Domain IA 메타데이터 추가 (그 IA 는 은퇴).
  *   - content 의 안내 문구 관리 → lms 그룹 (KPA 정합)
  *   - content 의 자료실 관리 → 신규 resources 그룹 (KPA 정합)
+ * WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1 (2026-09-16):
+ *   표준 Service Operator 최상위 IA = 서비스 운영 / 사업 운영 / 운영 관리 (ROLE-WORKSPACE-ARCHITECTURE §4).
+ *   @o4o/operator-ux-core DEFAULT_OPERATOR_DOMAIN_IA 의 그룹 기본값 + 항목 단위 `domain` override(approvals).
+ *   `Supplier → Service Operator` 제공 콘텐츠 수신함(/operator/supplier-contents) 진입 추가.
  *
  * 표준 11-그룹 키에 대한 라우트 매핑.
  */
@@ -20,11 +24,13 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   // WO-O4O-K-COSMETICS-OPERATOR-ROUTE-CANONICALIZATION-V1: /operator/members (KPA/GlycoPharm canonical)
   users: [{ label: '회원 관리', path: '/operator/members' }],
+  // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: approvals 는 업무가 섞인 그룹이라 항목 단위로 나눈다.
+  //   그룹 기본 = 사업 운영(상품 신청 · 이벤트 오퍼 · 판매자 모집 노출 승인). 매장 가입 신청 = 가맹점(회원) 관리 → 서비스 운영.
   approvals: [
     // WO-O4O-CROSSSERVICE-OPERATOR-APPROVAL-GROUP-LABEL-ALIGN-V1:
     //   '신청 관리' → '매장 가입 신청 관리' (ApplicationsPage = 매장 가입신청 관리 의미 명확화).
     //   공통 항목(공급 상품 신청 승인 → 이벤트 오퍼 승인) 순서를 KPA/GP 와 정합.
-    { label: '매장 가입 신청 관리', path: '/operator/applications' },
+    { label: '매장 가입 신청 관리', path: '/operator/applications', domain: 'service_operation' },
     // WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1
     { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
     // WO-O4O-EVENT-OFFER-KCOS-OPERATOR-APPROVAL-V1
@@ -66,6 +72,9 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     //   문의 처리(목록·상세·답변·상태/메모)는 operator 업무 → operator 로 이관 신설.
     //   문의 '설정'은 admin 유지(/admin/settings/contact). backend 가드 operator 레벨로 조정(scopeRoleMapping 엄격 대응).
     { label: '문의 관리', path: '/operator/contacts' },
+    // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: `Supplier → Service Operator` 제공 콘텐츠 수신함.
+    //   cms_contents(serviceKey='k-cosmetics', authorRole='supplier') 를 그대로 읽는다 — 새 원장 · 상태 기계 없음.
+    { label: '제공받은 콘텐츠', path: '/operator/supplier-contents' },
   ],
   // WO-O4O-KCOS-OPERATOR-MENU-ALIGN-WITH-KPA-V1: 자료실 독립 그룹 (KPA 정합)
   resources: [
@@ -121,6 +130,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
 //   Domain IA 메타데이터 (OperatorDomainKey / DOMAIN_LABELS / GROUP_TO_DOMAIN /
 //   DOMAIN_GROUP_ORDER / DOMAIN_DISPLAY_ORDER / TOP_PINNED_GROUPS) 는 3개 서비스 공통
 //   @o4o/operator-ux-core 의 sidebar/operatorDomainIA 로 이동. (중복 제거 — 노출 결과 불변)
+// WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: K-Cosmetics 는 표준 Service Operator(STANDARD_CANDIDATE) —
+//   DEFAULT_OPERATOR_DOMAIN_IA(서비스 운영 / 사업 운영 / 운영 관리)를 그대로 쓰고 서비스 전용 config 를 두지 않는다.
 
 // WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1:
 //   deprecated OPERATOR_MENU_ITEMS (하위호환 사본) 제거 — 저장소 전체 runtime consumer 0.

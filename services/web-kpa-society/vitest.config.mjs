@@ -21,6 +21,10 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
+    // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 공통 패키지(@o4o/operator-ux-core)가 루트 node_modules 의
+    // react-router 를, 서비스가 자기 node_modules 의 사본을 쓰면 Link 가 MemoryRouter 컨텍스트를 못 찾는다
+    // (useContext null). 한 인스턴스로 접는다 — 의존성 추가 아님.
+    dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
   },
   test: {
     environment: 'jsdom',

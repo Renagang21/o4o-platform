@@ -193,6 +193,8 @@ import InstructorSubmissionsPage from './pages/instructor/InstructorSubmissionsP
 // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4:
 //   공지/뉴스 관리 (공통 @o4o/operator-core-ui CmsContentManager · /pharmacy-hub/news)
 import OperatorContentPage from './pages/operator/ContentPage';
+// WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 서비스 운영 › 제공받은 콘텐츠 (Supplier → Service Operator 수신함)
+import OperatorSupplierContentsPage from './pages/operator/SupplierContentsPage';
 import OperatorRoleManagementPage from './pages/operator/RoleManagementPage';
 // WO-O4O-PHARMACY-HUB-STORE-HUB-HOME-INTRODUCTION-V1 — 매장허브 홈 (공통 StoreHubTemplate)
 import StoreHubPage from './pages/store-hub/StoreHubPage';
@@ -693,6 +695,8 @@ export default function App() {
             <Route path="forum-analytics" element={<OperatorForumAnalyticsPage />} />
             <Route path="analytics" element={<OperatorAnalyticsPage />} />
             <Route path="content" element={<OperatorContentPage />} />
+            {/* WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 제공받은 콘텐츠 — 공통 CMS(serviceKey=pharmacy-hub, authorRole=supplier) */}
+            <Route path="supplier-contents" element={<OperatorSupplierContentsPage />} />
             <Route path="resources" element={<OperatorResourcesPage />} />
             {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#93)
                 회원 콘텐츠 검토 큐. 자료실 관리와 같은 공통 console, subType 축만 다르다. */}

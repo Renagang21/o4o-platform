@@ -239,6 +239,8 @@ const OperatorGuideContentsPage = lazy(() => import('@/pages/operator/OperatorGu
 const OperatorResourcesPage = lazy(() => import('@/pages/operator/OperatorResourcesPage'));
 // Operator Content Management (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1)
 const OperatorContentPage = lazy(() => import('@/pages/operator/OperatorContentPage'));
+// WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 서비스 운영 › 제공받은 콘텐츠 (Supplier → Service Operator 수신함)
+const OperatorSupplierContentsPage = lazy(() => import('@/pages/operator/OperatorSupplierContentsPage'));
 // WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
 //   운영 분석 / Home 편집 공통 모듈 채택 (K-Cosmetics 만 미채택이었다)
 const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
@@ -846,6 +848,8 @@ function AppRoutes() {
         <Route path="resources" element={<OperatorResourcesPage />} />
         {/* Content Management 공지/뉴스 (WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1) */}
         <Route path="content-management" element={<OperatorContentPage />} />
+        {/* WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 제공받은 콘텐츠 — 공통 CMS(serviceKey=k-cosmetics, authorRole=supplier) */}
+        <Route path="supplier-contents" element={<OperatorSupplierContentsPage />} />
         {/* WO-O4O-OPERATOR-CROSSSERVICE-CAPABILITY-ADOPTION-FINAL-AUDIT-AND-GAP-CLOSURE-V1:
             운영 분석 — 공통 /api/v1/operator/analytics/* (신규 API 0) */}
         <Route path="analytics" element={<OperatorAnalyticsPage />} />

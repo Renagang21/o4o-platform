@@ -24,6 +24,14 @@ export interface OperatorMenuItem {
    * 미지정(대부분)이면 기존 렌더 그대로 — 4서비스 무영향.
    */
   sectionLabel?: string;
+  /**
+   * WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1:
+   * 항목 단위 도메인 override (표시 메타데이터). 지정 시 DomainIASidebar 가 그룹 기본
+   * 도메인(`groupToDomain[group]`) 대신 이 값으로 배치한다 — 한 그룹(예: approvals) 안에
+   * 서비스 운영(콘텐츠 승인)과 사업 운영(상품 신청 · 이벤트 오퍼 승인)이 섞일 때 item 단위로
+   * 분리하기 위한 additive 힌트. 권한 · route 와 무관하며 미지정이면 기존 렌더 그대로.
+   */
+  domain?: string;
 }
 
 /**

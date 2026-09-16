@@ -10,18 +10,23 @@
  * 가드는 기존과 동일하게 MembershipGate (service_memberships.status 축) 를 유지한다.
  * 셸 채택은 UX 편입이며 권한 경계를 바꾸지 않는다 — 실제 경계는 backend
  * pharmacy-hub:operator scope guard 가 강제한다.
+ *
+ * WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1:
+ *   서비스 전용 도메인 IA 은퇴 → 표준(서비스 운영 / 사업 운영 / 운영 관리) 기본값 사용.
+ *   header 슬롯에 OperatorServiceSwitcher(1 Operator : N Services) 합성.
  */
 
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { isAdminOrAbove } from '@o4o/auth-utils';
 import { filterMenuByRole } from '@o4o/ui';
-import { OperatorAreaShell } from '@o4o/operator-ux-core';
+import { OperatorAreaShell, OperatorServiceSwitcher, createOperatorServicesApi } from '@o4o/operator-ux-core';
 import { useAuth } from '../contexts/AuthContext';
+import { api } from '../lib/apiClient';
 import { MembershipGate } from '../components/MembershipGate';
 import { OperatorHeader } from '../components/operator/OperatorHeader';
 import { ENABLED_CAPABILITIES } from '../config/operatorCapabilities';
-import { UNIFIED_MENU, PHARMACY_HUB_OPERATOR_DOMAIN_IA } from '../config/operatorMenuGroups';
+import { UNIFIED_MENU } from '../config/operatorMenuGroups';
 import { ROLES, SERVICE_KEY, satisfiesRole } from '../config/service';
 
 /**
@@ -32,6 +37,13 @@ import { ROLES, SERVICE_KEY, satisfiesRole } from '../config/service';
  * 관리자 영역(AdminLayoutWrapper.NoAdminAccess)과 같은 형태의 역할 안내 +
  * 안전한 복귀 링크로 대체한다. API guard·권한 범위는 변경하지 않는다.
  */
+// WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 1 Operator : N Services — 출처는
+//   GET /api/v1/work-scope/operator-services 하나(/api/v1 루트 axios, envelope 는 .data 로 unwrap).
+const phOperatorServicesApi = createOperatorServicesApi({
+  get: async (url) => (await api.get(url)).data,
+  post: async (url, body) => (await api.post(url, body)).data,
+});
+
 function NoOperatorAccess() {
   return (
     <div className="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-6 text-center">
@@ -73,10 +85,14 @@ export function OperatorLayoutWrapper() {
   return (
     <MembershipGate>
       <OperatorAreaShell
-        header={<OperatorHeader />}
+        header={
+          <>
+            <OperatorHeader />
+            <OperatorServiceSwitcher api={phOperatorServicesApi} currentServiceKey={SERVICE_KEY} />
+          </>
+        }
         menuItems={menuItems}
         capabilities={ENABLED_CAPABILITIES}
-        domainIAConfig={PHARMACY_HUB_OPERATOR_DOMAIN_IA}
       />
     </MembershipGate>
   );

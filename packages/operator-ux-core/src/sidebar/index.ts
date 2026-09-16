@@ -12,5 +12,6 @@ export {
   DOMAIN_DISPLAY_ORDER,
   TOP_PINNED_GROUPS,
   DEFAULT_OPERATOR_DOMAIN_IA,
+  resolveDomainGroupItems,
 } from './operatorDomainIA';
-export type { OperatorDomainKey, OperatorDomainIAConfig } from './operatorDomainIA';
+export type { OperatorDomainKey, OperatorDomainIAConfig, ResolvedDomainGroupItems } from './operatorDomainIA';

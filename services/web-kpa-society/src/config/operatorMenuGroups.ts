@@ -4,8 +4,12 @@
  * WO-O4O-OPERATOR-UI-STANDARDIZATION-V1
  * WO-O4O-RBAC-GLOBAL-STANDARD-ROLL-OUT-V1: adminOnly 플래그 추가
  * WO-O4O-KPA-OPERATOR-SIDEBAR-DOMAIN-IA-RESTRUCTURE-V1:
- *   KPA-only domain 매핑 추가 (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통).
- *   STANDARD_GROUPS 자체는 보존 — KPA 전용 KpaOperatorSidebar 가 domain 헤딩 + 그룹 정렬에 사용.
+ *   KPA-only domain 매핑 추가 (커뮤니티 운영 / 매장 HUB 운영 / 운영 공통) — 은퇴.
+ * WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1 (2026-09-16):
+ *   표준 Service Operator 최상위 IA = 서비스 운영 / 사업 운영 / 운영 관리 (ROLE-WORKSPACE-ARCHITECTURE §4).
+ *   기본 배치는 @o4o/operator-ux-core DEFAULT_OPERATOR_DOMAIN_IA 의 그룹 기본값을 따르고,
+ *   한 그룹에 다른 업무가 섞인 항목만 `domain` 으로 항목 단위 override 한다 (아래 approvals).
+ *   route · page · 권한 · capability 불변 — 표시 메타데이터만 바뀐다.
  *
  * 표준 11-그룹 키에 대한 라우트 매핑.
  * adminOnly 항목은 admin 역할만 표시.
@@ -23,6 +27,9 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '회원 관리', path: '/operator/members' },
     // WO-KPA-OPERATOR-STORE-RELATED-MENU-HIDE-V1: 약국 서비스 신청 메뉴 제거 (라우트/API/DB 유지)
   ],
+  // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: approvals 는 업무가 섞인 그룹이라 항목 단위로 나눈다.
+  //   그룹 기본 = 사업 운영(상품 신청 · 이벤트 오퍼 · 판매자 모집 노출 승인 = 사업 프로그램 승인).
+  //   공급자가 제공한 콘텐츠의 수신·승인은 서비스 콘텐츠 업무 → 서비스 운영 (domain override).
   approvals: [
     // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자격 신청 관리 → lms 그룹으로 이동
     // WO-O4O-KPA-PRODUCT-APPLICATIONS-MENU-EXPOSURE-V1: GP/KCos 와 메뉴명 정렬
@@ -30,7 +37,9 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
     //   공급자 CMS→HUB 콘텐츠 승인 + 사이니지 캠페인 요청 승인 (백엔드 kpa:operator 는 이미 존재,
     //   진입 화면만 부재였음 → 운영자 콘솔에 화면 연결).
-    { label: '공급자 콘텐츠 승인', path: '/operator/approvals' },
+    // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: `Supplier → Service Operator` 제공 경로의 KPA 수신함
+    //   (kpa_approval_requests hub_content_submission — KPA 고유 승인 정책 유지). 서비스 운영 › 제공받은 콘텐츠.
+    { label: '제공받은 콘텐츠 승인', path: '/operator/approvals', domain: 'service_operation' },
     // WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1: 이벤트 오퍼 승인 관리
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
     // WO-O4O-KPA-SELLER-RECRUITMENT-OPERATOR-APPROVAL-FLOW-RESTORE-V1:
@@ -137,6 +146,9 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
 //   Domain IA 메타데이터 (OperatorDomainKey / DOMAIN_LABELS / GROUP_TO_DOMAIN /
 //   DOMAIN_GROUP_ORDER / DOMAIN_DISPLAY_ORDER / TOP_PINNED_GROUPS) 는 3개 서비스 공통
 //   @o4o/operator-ux-core 의 sidebar/operatorDomainIA 로 이동. (중복 제거 — 노출 결과 불변)
+// WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: KPA 는 표준 Service Operator(STANDARD_CANDIDATE) —
+//   DEFAULT_OPERATOR_DOMAIN_IA(서비스 운영 / 사업 운영 / 운영 관리)를 그대로 쓰고 서비스 전용 config 를 두지 않는다.
+//   항목 단위 분류 결과는 docs/checks/CHECK-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1.md §3.
 
 // WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1:
 //   deprecated OPERATOR_MENU_ITEMS (하위호환 사본) 제거 — 저장소 전체 runtime consumer 0.
