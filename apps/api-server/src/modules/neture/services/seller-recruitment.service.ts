@@ -17,7 +17,7 @@
  * 흐름(E2E 계약):
  *   Supplier 모집 생성 → Service Operator 노출 승인 → Store browse/apply → Supplier approve/reject/terminate
  *
- * 물리 테이블명(neture_partner_*)은 엔티티 파일이 격리한다(temporary legacy persistence seam).
+ * 물리 테이블명(seller_recruitments · seller_recruitment_applications)은 엔티티 파일의 상수가 격리한다.
  * 이 서비스의 raw SQL 은 상수 SELLER_RECRUITMENT_*_TABLE 만 사용한다.
  */
 import { Repository } from 'typeorm';
@@ -364,7 +364,7 @@ export class SellerRecruitmentService {
               r.product_id, r.product_name, r.seller_name, r.service_id, r.seller_id
        FROM ${SELLER_RECRUITMENT_APPLICATION_TABLE} a
        JOIN ${SELLER_RECRUITMENT_TABLE} r ON r.id = a.recruitment_id
-       WHERE a.partner_id = $1
+       WHERE a.applicant_id = $1
        ORDER BY a.applied_at DESC`,
       [applicantUserId],
     );
@@ -412,17 +412,17 @@ export class SellerRecruitmentService {
     if (!recruitment || recruitment.sellerId !== supplierUserId) return null;
 
     const rows: Array<{
-      id: string; partner_id: string; partner_name: string | null; status: string;
+      id: string; applicant_id: string; applicant_name: string | null; status: string;
       applied_at: Date; decided_at: Date | null; decided_by: string | null; reason: string | null;
       applicant_user_name: string | null; applicant_email: string | null; organization_name: string | null;
     }> = await AppDataSource.query(
-      `SELECT a.id, a.partner_id, a.partner_name, a.status, a.applied_at, a.decided_at, a.decided_by, a.reason,
+      `SELECT a.id, a.applicant_id, a.applicant_name, a.status, a.applied_at, a.decided_at, a.decided_by, a.reason,
               u.name AS applicant_user_name, u.email AS applicant_email,
               (SELECT o.name FROM organization_members om
                  JOIN organizations o ON o.id = om.organization_id
-               WHERE om.user_id = a.partner_id AND om.left_at IS NULL LIMIT 1) AS organization_name
+               WHERE om.user_id = a.applicant_id AND om.left_at IS NULL LIMIT 1) AS organization_name
        FROM ${SELLER_RECRUITMENT_APPLICATION_TABLE} a
-       LEFT JOIN users u ON u.id = a.partner_id
+       LEFT JOIN users u ON u.id = a.applicant_id
        WHERE a.recruitment_id = $1
        ORDER BY a.applied_at DESC`,
       [recruitmentId],
@@ -446,8 +446,8 @@ export class SellerRecruitmentService {
       },
       applications: rows.map((a) => ({
         id: a.id,
-        applicantId: a.partner_id,
-        applicantName: a.partner_name || a.applicant_user_name || '신청자',
+        applicantId: a.applicant_id,
+        applicantName: a.applicant_name || a.applicant_user_name || '신청자',
         applicantEmail: a.applicant_email || '',
         organizationName: a.organization_name || '',
         status: a.status,

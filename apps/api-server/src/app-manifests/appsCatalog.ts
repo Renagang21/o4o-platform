@@ -246,7 +246,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
   // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1: ecommerce-core app 엔트리 제거 (package 은퇴 · runtime mount 0건).
   // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:
   //   `partner-core` 앱 항목 + `partnerops` serviceGroup 제거 — Legacy Partner 전면 은퇴(App Store 노출 0).
-  //   `packages/partner-core` 디렉터리 자체는 lockfile/workspace 변경이 필요해 physical cleanup 으로 이연.
+  //   `packages/partner-core` 디렉터리는 WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 에서 제거.
   {
     appId: 'digital-signage-core',
     name: 'Digital Signage Core',

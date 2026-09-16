@@ -14,8 +14,9 @@
  *   6) 판매자 모집 승인은 Legacy Partner 계약·role·대시보드를 만들지 않는다
  *   7) Foreign Visitor Partner(Store Ops) 는 무변경 보존
  *
- * 물리 DB(테이블·컬럼·enum)·dead package(partner-core · financial-core) 는 후속
- * WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 대상이라 여기서 고정하지 않는다.
+ * 물리 DB(테이블·컬럼·enum)·dead package(partner-core · financial-core) 는
+ * WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 이 정리했다 —
+ * 물리 명칭 계약은 아래 Seller Recruitment 절 + legacy-partner-physical-cleanup.spec.ts 가 고정한다.
  */
 import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
@@ -103,11 +104,13 @@ describe('WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT — Legacy Partner runtime = 
 });
 
 describe('Seller Recruitment (판매자 모집) — Partner 가 아니므로 보존된다', () => {
-  it('SellerRecruitment 엔티티 2종이 존재하고 legacy 물리 테이블을 seam 으로 격리한다', () => {
+  it('SellerRecruitment 엔티티 2종이 존재하고 행위자 기준 물리 테이블명을 상수로 격리한다', () => {
     const r = read('apps/api-server/src/modules/neture/entities/SellerRecruitment.entity.ts');
     const a = read('apps/api-server/src/modules/neture/entities/SellerRecruitmentApplication.entity.ts');
-    expect(r).toContain("SELLER_RECRUITMENT_TABLE = 'neture_partner_recruitments'");
-    expect(a).toContain("SELLER_RECRUITMENT_APPLICATION_TABLE = 'neture_partner_applications'");
+    expect(r).toContain("SELLER_RECRUITMENT_TABLE = 'seller_recruitments'");
+    expect(a).toContain("SELLER_RECRUITMENT_APPLICATION_TABLE = 'seller_recruitment_applications'");
+    expect(a).toContain("@Column({ name: 'applicant_id' })");
+    expect(a).toContain("@Column({ name: 'applicant_name', nullable: true })");
     const ent = code('apps/api-server/src/database/entities.ts');
     expect(ent).toMatch(/\bSellerRecruitment\b/);
     expect(ent).toMatch(/\bSellerRecruitmentApplication\b/);

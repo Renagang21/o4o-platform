@@ -28,8 +28,10 @@
  * ⚠ 보호 대상 (이 WO 가 건드리지 않는다 — 이름에 cart/order/payment 가 있어도 제거 금지):
  *   - B2B_SUPPORT: `routes/cart/store-cart.routes.ts` (buyerId 축), PharmacyHub
  *     cart/orders/payments, neture-b2b checkout, KPA event-offer — 전부 매장이 *구매자*.
- *   - ACTIVE_CANONICAL: `packages/payment-core` · `store-core` · `financial-core`,
+ *   - ACTIVE_CANONICAL: `packages/payment-core` · `store-core`,
  *     `services/toss-payments.service.ts` (refund canonical).
+ *     (`financial-core` 는 이후 WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 에서
+ *      import 0 · commission helper 가 neture-settlement.service 에 inline 된 dead package 로 제거됐다.)
  *
  * 이 테스트는 **재도입 방지 계약**이다. DB · 네트워크 접근 0.
  */
@@ -214,7 +216,7 @@ describe('WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT
       expect(fs.readFileSync(p, 'utf-8')).toContain('buyerId');
     });
 
-    it.each(['payment-core', 'store-core', 'financial-core'])(
+    it.each(['payment-core', 'store-core'])(
       'packages/%s 가 유지된다',
       (name) => {
         expect(fs.existsSync(path.join(REPO, 'packages', name, 'package.json'))).toBe(true);

@@ -218,7 +218,9 @@ describe('WO-O4O-APP-MANAGEMENT-CANONICAL-MODEL-AND-RUNTIME-RESIDUE-CLOSURE-V1',
       //   소비처 0 이던 `packages/partnerops` 제거로 14 → 13.
       // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §18:
       //   runtime 소비처 0 이던 `packages/cosmetics-seller-extension` 제거로 13 → 12.
-      expect(found).toHaveLength(12);
+      // WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1:
+      //   Legacy Partner dead package `packages/partner-core` 제거로 12 → 11.
+      expect(found).toHaveLength(11);
     });
 
     it('app_registry 를 건드리는 migration 이 이 WO 로 추가되지 않았다 (DB schema change 0)', () => {

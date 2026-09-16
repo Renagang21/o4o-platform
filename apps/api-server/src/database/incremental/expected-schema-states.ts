@@ -45,6 +45,15 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'bbef95607b3f24ae61796f4e2042b01e171e1cb7ec6a8470f6c6f3963306d816',
     fingerprintLineCount: 5895,
   },
+  // WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 (Phase 1 · expand) — computed in
+  // an isolated PostgreSQL 15.17 (bootstrap + migrations 1..2) on 2026-09-16. Legacy Partner tables 11 ·
+  // enums 3 · columns 3 dropped; Seller Recruitment renamed (seller_recruitments ·
+  // seller_recruitment_applications) with 2 TEMP_COMPAT deploy-window views under the old names.
+  {
+    appliedThrough: 'RetireLegacyPartnerPhysicalSchemaAndRenameSellerRecruitment1789523426775',
+    fingerprint: 'd145d68a68ceeb41a46a913ee08fdc1075fc25e44687a774af6e7d317999b33c',
+    fingerprintLineCount: 5713,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

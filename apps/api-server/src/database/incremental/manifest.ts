@@ -19,6 +19,8 @@
 import type { MigrationInterface } from 'typeorm';
 // WO-O4O-STORE-TABLET-LOCATION-CONTENT-RUNTIME-MANAGEMENT-V1
 import { CreateStoreTabletDevicesAndScreenSetDescription1789435443554 } from '../migrations/1789435443554-CreateStoreTabletDevicesAndScreenSetDescription.js';
+// WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 (Phase 1 · expand)
+import { RetireLegacyPartnerPhysicalSchemaAndRenameSellerRecruitment1789523426775 } from '../migrations/1789523426775-RetireLegacyPartnerPhysicalSchemaAndRenameSellerRecruitment.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-15-id678',
@@ -35,6 +37,7 @@ export type MigrationClass = new () => MigrationInterface;
 /** Append only. Order must match ascending epoch. */
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreTabletDevicesAndScreenSetDescription1789435443554,
+  RetireLegacyPartnerPhysicalSchemaAndRenameSellerRecruitment1789523426775,
 ];
 
 export function incrementalMigrationNames(): string[] {

@@ -20,14 +20,13 @@ const codeLines = (s: string) => s.split('\n').filter((l) => !/^\s*(\/\/|\*|\/\*
 const tracked = (): string[] => execSync('git ls-files', { cwd: REPO, encoding: 'utf-8', maxBuffer: 64 * 1024 * 1024 }).split('\n').filter(Boolean);
 
 // 제거 확정: 미배포·CI 미참조·import 0·manifest 없음·보호 spec 없음 인 앱 3개.
-//   packages/partner-core · financial-core · forum-cosmetics · organization-lms 는 import 0 이지만
-//   선행 마감 WO 의 보호 계약(partnerops · ecommerce-core · auth-runtime spec) 과 CI AppStore Guard 의
-//   manifest 12개 고정에 걸려 **제거하지 않는다** (WO 중지 조건 2·4 → STOP 보고).
-const REMOVED_PACKAGES = ['@o4o/forum-api', '@o4o/forum-web'];
-const REMOVED_DIRS = ['apps/forum-api/', 'apps/forum-web/', 'apps/mobile-app/'];
+//   packages/forum-cosmetics · organization-lms 는 import 0 이지만 선행 마감 WO 의 보호 계약
+//   (ecommerce-core · auth-runtime spec) 에 걸려 **제거하지 않는다** (WO 중지 조건 2·4 → STOP 보고).
+//   packages/partner-core · financial-core 는 WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1
+//   에서 Legacy Partner dead package 로 제거됐다 (REMOVED 로 이동).
+const REMOVED_PACKAGES = ['@o4o/forum-api', '@o4o/forum-web', '@o4o/partner-core', '@o4o/financial-core'];
+const REMOVED_DIRS = ['apps/forum-api/', 'apps/forum-web/', 'apps/mobile-app/', 'packages/partner-core/', 'packages/financial-core/'];
 const PROTECTED_PACKAGE_DIRS = [
-  'packages/partner-core/',
-  'packages/financial-core/',
   'packages/forum-cosmetics/',
   'packages/organization-lms/',
 ];
@@ -82,7 +81,7 @@ describe('§2 dead package — 제거된 패키지를 다시 참조하지 않는
     }
     expect(offenders).toEqual([]);
   });
-  it('보호 패키지 4개는 그대로 남아 있다 (선행 WO 보호 계약 · manifest guard)', () => {
+  it('보호 패키지 2개는 그대로 남아 있다 (선행 WO 보호 계약)', () => {
     for (const d of PROTECTED_PACKAGE_DIRS) {
       expect(files.some((f) => f === d + 'package.json')).toBe(true);
     }

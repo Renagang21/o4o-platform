@@ -91,7 +91,7 @@ WHERE relname IN (
   'store_cart_items', 'neture_orders', 'neture_order_items',
   'checkout_orders', 'checkout_order_logs', 'neture_settlement_orders',
   'store_local_products',
-  'neture_partner_recruitments', 'neture_partner_applications', 'partner_applications',
+  'seller_recruitments', 'seller_recruitment_applications', 'partner_applications',
   'market_trials', 'market_trial_participants', 'market_trial_decisions',
   'notifications'
 )

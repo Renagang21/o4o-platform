@@ -126,7 +126,6 @@ export class MarketTrialDecisionService {
         participantId: dto.participantId,
         participantType: ParticipantType.STORE_OWNER,
         decision: dto.decision,
-        selectedSellerIds: null,
       });
 
       const savedDecision = await decisionRepo.save(decision);

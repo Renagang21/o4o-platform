@@ -7,10 +7,9 @@
  * 도메인: Supplier → Store 판매자 모집. Legacy Partner(제휴마케팅)가 **아니다**
  *   (O4O-ROLE-WORKSPACE-ARCHITECTURE-V1 §7 · IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1 §B-8).
  *
- * ⚠️ temporary legacy persistence seam:
- *   물리 테이블명 `neture_partner_recruitments` 는 과거 명칭이다. 이번 WO 는 DDL 을 만들지 않으므로
- *   테이블/컬럼명은 그대로 두고 **이 엔티티만이 그 이름을 안다**. rename 은 후속
- *   WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 대상.
+ * 물리 테이블 `seller_recruitments` (구 neture_partner_recruitments →
+ *   WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 에서 rename).
+ *   테이블명은 **이 엔티티의 상수만이 안다** — raw SQL 은 SELLER_RECRUITMENT_TABLE 을 쓴다.
  *
  * 상태:
  *  - status(RecruitmentStatus): 모집 운영 상태 — recruiting (모집중) / closed (마감)
@@ -46,8 +45,8 @@ export enum ExposureStatus {
   REJECTED = 'rejected',
 }
 
-/** 물리 테이블명 (legacy seam) — 이 상수 밖에서 문자열을 반복하지 않는다. */
-export const SELLER_RECRUITMENT_TABLE = 'neture_partner_recruitments';
+/** 물리 테이블명 — 이 상수 밖에서 문자열을 반복하지 않는다. */
+export const SELLER_RECRUITMENT_TABLE = 'seller_recruitments';
 
 @Entity(SELLER_RECRUITMENT_TABLE)
 // WO-O4O-NETURE-SELLER-RECRUITMENT-MULTI-SERVICE-CREATE-V1:
@@ -73,7 +72,7 @@ export class SellerRecruitment {
   @Column({ name: 'commission_rate', type: 'decimal', precision: 5, scale: 2, default: 0 })
   commissionRate: number;
 
-  /** 모집 주체 = 공급자 user id (C bridge offer 해소 전제). 컬럼명 seller_id 는 legacy. */
+  /** 모집 주체 = 공급자 user id (C bridge offer 해소 전제). 컬럼명 seller_id 는 과거 명칭(값 = 공급자 user id). */
   @Column({ name: 'seller_id' })
   sellerId: string;
 

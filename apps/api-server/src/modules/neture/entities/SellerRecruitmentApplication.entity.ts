@@ -6,10 +6,10 @@
  *
  * 신청 주체 = 매장/판매자 사용자(applicantId). Legacy Partner 계정·role·계약과 무관하다.
  *
- * ⚠️ temporary legacy persistence seam:
- *   물리 테이블 `neture_partner_applications` · 컬럼 `partner_id` / `partner_name` 은 과거 명칭이다.
- *   이번 WO 는 DDL 을 만들지 않으므로 물리명은 그대로 두고 이 엔티티만이 그 이름을 안다.
- *   rename 은 후속 WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 대상.
+ * 물리 테이블 `seller_recruitment_applications` · 컬럼 `applicant_id` / `applicant_name`
+ *   (구 neture_partner_applications · partner_id / partner_name →
+ *   WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 에서 rename).
+ *   테이블명은 이 엔티티의 상수만이 안다 — raw SQL 은 SELLER_RECRUITMENT_APPLICATION_TABLE 을 쓴다.
  *
  * 상태: pending (신청) / approved (승인) / rejected (반려) / cancelled
  *   - cancelled + decidedBy = 신청자 본인  → 신청 철회 (WO-O4O-SELLER-RECRUITMENT-APPLICATION-CANCEL-V1)
@@ -36,8 +36,8 @@ export enum ApplicationStatus {
   CANCELLED = 'cancelled',
 }
 
-/** 물리 테이블명 (legacy seam) */
-export const SELLER_RECRUITMENT_APPLICATION_TABLE = 'neture_partner_applications';
+/** 물리 테이블명 */
+export const SELLER_RECRUITMENT_APPLICATION_TABLE = 'seller_recruitment_applications';
 
 @Entity(SELLER_RECRUITMENT_APPLICATION_TABLE)
 @Unique(['recruitmentId', 'applicantId'])
@@ -51,12 +51,12 @@ export class SellerRecruitmentApplication {
   @Column({ name: 'recruitment_id' })
   recruitmentId: string;
 
-  /** 신청자(매장/판매자) user id — 물리 컬럼 partner_id (legacy seam) */
-  @Column({ name: 'partner_id' })
+  /** 신청자(매장/판매자) user id */
+  @Column({ name: 'applicant_id' })
   applicantId: string;
 
-  /** 신청자 표시명 — 물리 컬럼 partner_name (legacy seam) */
-  @Column({ name: 'partner_name', nullable: true })
+  /** 신청자 표시명 */
+  @Column({ name: 'applicant_name', nullable: true })
   applicantName: string;
 
   @Column({

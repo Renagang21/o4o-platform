@@ -376,9 +376,6 @@ function toDecisionResponse(decision: any): any {
     participantId: decision.participantId,
     participantType: decision.participantType,
     decision: decision.decision,
-    selectedSellerIds: decision.selectedSellerIds
-      ? JSON.parse(decision.selectedSellerIds)
-      : null,
     createdAt: new Date(decision.createdAt).toISOString(),
   };
 }

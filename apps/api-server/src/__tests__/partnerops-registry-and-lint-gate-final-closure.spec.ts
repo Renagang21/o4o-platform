@@ -94,9 +94,10 @@ describe('A축 — PartnerOps app_registry 비활성화 migration', () => {
 });
 
 describe('A축 — 이름이 비슷한 살아 있는 계약은 보존한다', () => {
-  it('packages/partner-core 는 그대로 존재한다', () => {
-    expect(existsSync(resolve(REPO, 'packages/partner-core/package.json'))).toBe(true);
-    expect(existsSync(resolve(REPO, 'packages/partner-core/src'))).toBe(true);
+  // WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1:
+  //   packages/partner-core 는 import 0 dead package 로 제거됐다 (보존 계약 해제).
+  it('packages/partner-core 는 되살아나지 않는다', () => {
+    expect(existsSync(resolve(REPO, 'packages/partner-core'))).toBe(false);
   });
 
   // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1:

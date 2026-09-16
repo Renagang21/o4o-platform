@@ -71,8 +71,12 @@ describe('WO-O4O-AUTH-RUNTIME-AND-LEGACY-PACKAGE-FINAL-CLOSURE-V1', () => {
       expect(readRepo('pnpm-lock.yaml')).not.toContain('packages/partnerops:');
     });
 
-    it('packages/partner-core 는 그대로 남아 있다 (§9 보호 대상)', () => {
-      expect(fs.existsSync(path.join(REPO, 'packages', 'partner-core'))).toBe(true);
+    // WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1: §9 보호 계약 해제 — dead package 제거.
+    it('packages/partner-core · financial-core 는 되살아나지 않는다 (lockfile importer 0)', () => {
+      expect(fs.existsSync(path.join(REPO, 'packages', 'partner-core'))).toBe(false);
+      expect(fs.existsSync(path.join(REPO, 'packages', 'financial-core'))).toBe(false);
+      expect(readRepo('pnpm-lock.yaml')).not.toContain('packages/partner-core:');
+      expect(readRepo('pnpm-lock.yaml')).not.toContain('packages/financial-core:');
     });
   });
 

@@ -132,7 +132,6 @@ export interface DecisionResponse {
   participantId: string;
   participantType: string;
   decision: string;
-  selectedSellerIds: string[] | null;
   createdAt: string;
 }
 

@@ -66,12 +66,8 @@ export class MarketTrialDecision {
   })
   decision!: string;
 
-  /**
-   * (legacy) selected seller IDs (JSON array) — Legacy Partner 결정 전용 컬럼. 은퇴 후 항상 null.
-   * WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 (물리 컬럼은 physical cleanup 대상)
-   */
-  @Column({ type: 'text', nullable: true })
-  selectedSellerIds!: string | null;
+  // (구 selectedSellerIds — Legacy Partner 결정 전용 컬럼) 매핑 제거.
+  // WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1: 물리 컬럼은 Phase 2 migration 이 DROP.
 
   @CreateDateColumn()
   createdAt!: Date;
