@@ -25,13 +25,31 @@
 
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MyStoreShell, StoreOwnerGuard, PHARMACY_HUB_STORE_CONFIG } from '@o4o/store-ui-core';
+import {
+  MyStoreShell,
+  StoreOwnerGuard,
+  PHARMACY_HUB_STORE_CONFIG,
+  // WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: Home / My Store / Store Hub / My Services 상위 구조
+  StoreTopBar,
+  StoreWorkspaceNav,
+  StoreWorkspaceShell,
+  resolveStoreWorkspacePaths,
+} from '@o4o/store-ui-core';
 import type { StoreOwnerGuardUser } from '@o4o/store-ui-core';
 import { AccessDenied } from '@o4o/ui';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { useAuth } from '../contexts/AuthContext';
 import { MembershipGate } from '../components/MembershipGate';
 import { BRAND } from '../config/service';
+
+/** WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: Store Workspace 경로 (basePath `/store-owner` 파생 — PG callback 경로 불변) */
+export const PHARMACY_HUB_STORE_WORKSPACE_PATHS = resolveStoreWorkspacePaths(PHARMACY_HUB_STORE_CONFIG);
+
+/**
+ * MyStoreShell 의 navItems 슬롯 — `/store-hub` 진입은 상위 StoreWorkspaceNav 가 맡으므로 가이드만 남긴다.
+ * (WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §14: Store Hub 편입 — 중복 진입점 제거)
+ */
+const STORE_NAV_ITEMS = [{ label: '이용 가이드', href: '/guide/features' }];
 
 function ShellLayout() {
   const { user, logout } = useAuth();
@@ -40,6 +58,7 @@ function ShellLayout() {
   return (
     <MyStoreShell
       config={PHARMACY_HUB_STORE_CONFIG}
+      banner={<StoreWorkspaceNav paths={PHARMACY_HUB_STORE_WORKSPACE_PATHS} accent="blue" />}
       userName={user ? getUserDisplayName(user) : ''}
       homeLink="/"
       serviceLabel={BRAND.name}
@@ -48,15 +67,51 @@ function ShellLayout() {
       //   `/store-hub`(자원 탐색) 라우트가 직접 URL 로만 접근 가능했다. 공통 셸이 이미 제공하는
       //   navItems 슬롯만 채워 진입점을 연결한다 — 메뉴 계약(StoreDashboardConfig) 은 확장하지 않는다.
       // WO-O4O-PHARMACYHUB-GUIDE-ADOPTION-V1: 매장 업무 화면에서 기능 매뉴얼로 나가는 진입점.
-      navItems={[
-        { label: '매장 허브', href: '/store-hub' },
-        { label: '이용 가이드', href: '/guide/features' },
-      ]}
+      navItems={STORE_NAV_ITEMS}
       onLogout={() => {
         logout();
         navigate('/');
       }}
     />
+  );
+}
+
+/**
+ * WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §6 · §10:
+ *   Store Workspace Home(/store-owner/workspace) · My Services(/store-owner/services) — 사이드바 없는 두 표면.
+ *   상단바는 MyStoreShell 이 쓰는 공통 StoreTopBar 를 그대로 header 슬롯에 넣는다 (사본 없음).
+ */
+function WorkspaceShellLayout() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  return (
+    <StoreWorkspaceShell
+      paths={PHARMACY_HUB_STORE_WORKSPACE_PATHS}
+      accent="blue"
+      header={
+        <StoreTopBar
+          config={PHARMACY_HUB_STORE_CONFIG}
+          userName={user ? getUserDisplayName(user) : ''}
+          homeLink="/"
+          serviceLabel={BRAND.name}
+          serviceBadge="약국 경영자"
+          navItems={STORE_NAV_ITEMS}
+          onLogout={() => {
+            logout();
+            navigate('/');
+          }}
+        />
+      }
+    />
+  );
+}
+
+/** Store Workspace Home · My Services 용 — 가드는 StoreOwnerShell 과 동일 (StoreOwnerGuard + MembershipGate) */
+export function StoreOwnerWorkspaceShell() {
+  return (
+    <StoreOwnerChromeFreeGuard>
+      <WorkspaceShellLayout />
+    </StoreOwnerChromeFreeGuard>
   );
 }
 

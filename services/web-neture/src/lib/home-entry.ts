@@ -139,11 +139,14 @@ interface ServicePaths {
   joinStatus?: string;
 }
 
+// WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §18:
+//   대표 홈 "내 매장" 진입 = 각 서비스 Store Workspace Home (`<basePath>/workspace`) — Home / My Store / Store Hub / My Services 상위 구조로 들어간다.
+//   경로 파생 규칙은 @o4o/store-ui-core resolveStoreWorkspacePaths 와 동일 (KPA·KCos `/store`, PH `/store-owner`).
 const SERVICE_PATHS: Record<string, ServicePaths> = {
   neture: { home: '/community', operator: '/operator', admin: '/admin', join: '/register' },
-  'kpa-society': { home: '/', storeHub: '/store-hub', myStore: '/store', operator: '/operator', admin: '/admin', join: '/register' },
-  'pharmacy-hub': { home: '/', storeHub: '/store-hub', myStore: '/store-owner', operator: '/operator', admin: '/admin', join: '/join', joinStatus: '/join/status' },
-  'k-cosmetics': { storeHub: '/store-hub', myStore: '/store', operator: '/operator', admin: '/admin', join: '/register' },
+  'kpa-society': { home: '/', storeHub: '/store-hub', myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
+  'pharmacy-hub': { home: '/', storeHub: '/store-hub', myStore: '/store-owner/workspace', operator: '/operator', admin: '/admin', join: '/join', joinStatus: '/join/status' },
+  'k-cosmetics': { storeHub: '/store-hub', myStore: '/store/workspace', operator: '/operator', admin: '/admin', join: '/register' },
   // 분회: 자가 가입 없음 · 운영자 화면은 분회 slug 아래
   'kpa-branch': {},
 };

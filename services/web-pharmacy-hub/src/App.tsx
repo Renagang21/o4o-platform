@@ -76,7 +76,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { AuthProvider } from './contexts/AuthContext';
-import { StoreOwnerShell, StoreOwnerChromeFreeGuard } from './layouts/StoreOwnerShell';
+import { StoreOwnerShell, StoreOwnerChromeFreeGuard, StoreOwnerWorkspaceShell } from './layouts/StoreOwnerShell';
 // WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1
 import { OperatorLayoutWrapper } from './layouts/OperatorLayoutWrapper';
 import { AdminLayoutWrapper } from './layouts/AdminLayoutWrapper';
@@ -197,6 +197,9 @@ import OperatorRoleManagementPage from './pages/operator/RoleManagementPage';
 // WO-O4O-PHARMACY-HUB-STORE-HUB-HOME-INTRODUCTION-V1 — 매장허브 홈 (공통 StoreHubTemplate)
 import StoreHubPage from './pages/store-hub/StoreHubPage';
 import StoreOwnerHomePage from './pages/store-owner/HomePage';
+// WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 — Store Workspace Home · My Services
+import StoreOwnerWorkspaceHomePage from './pages/store-owner/WorkspaceHomePage';
+import StoreOwnerMyServicesPage from './pages/store-owner/MyServicesPage';
 import StoreOwnerProductsPage from './pages/store-owner/ProductsPage';
 import StoreOwnerProductDetailPage from './pages/store-owner/ProductDetailPage';
 // WO-PHARMACY-HUB-STORE-OWNER-CHECKOUT-AND-PAYMENT-UI-V1
@@ -743,6 +746,15 @@ export default function App() {
             path="/store-owner/signage/play/:playlistId"
             element={<StoreOwnerChromeFreeGuard><SignagePlaybackPage /></StoreOwnerChromeFreeGuard>}
           />
+          {/* WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §6 · §10
+              Store Workspace 상위 구조 = Home / My Store / Store Hub / My Services.
+              Home(/store-owner/workspace) · My Services(/store-owner/services) 는 사이드바 없는 표면이므로
+              StoreOwnerWorkspaceShell(가드 동일 · StoreWorkspaceShell 조립) 아래 정적 세그먼트로 둔다 — `/store-owner` 와 충돌 없음.
+              PG callback `/store-owner/payment/success|fail` 은 그대로. */}
+          <Route element={<StoreOwnerWorkspaceShell />}>
+            <Route path="/store-owner/workspace" element={<StoreOwnerWorkspaceHomePage />} />
+            <Route path="/store-owner/services" element={<StoreOwnerMyServicesPage />} />
+          </Route>
           <Route path="/store-owner" element={<StoreOwnerShell />}>
             <Route index element={<StoreOwnerHomePage />} />
             <Route path="products" element={<StoreOwnerProductsPage />} />

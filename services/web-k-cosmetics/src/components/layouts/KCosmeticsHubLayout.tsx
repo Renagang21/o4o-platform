@@ -10,11 +10,14 @@
 
 import { Outlet } from 'react-router-dom';
 import { Home, ShoppingCart, Monitor, FileText, Megaphone, BookOpen, QrCode } from 'lucide-react';
-import { StoreHubShell } from '@o4o/store-ui-core';
+import { StoreHubShell, StoreWorkspaceNav, resolveStoreWorkspacePaths, COSMETICS_STORE_CONFIG } from '@o4o/store-ui-core';
 import type { StoreHubNavGroup } from '@o4o/store-ui-core';
 // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: store-facing compact 푸터
 import { StoreFacingFooter } from '@o4o/shared-space-ui';
 import { loadFooterLegal } from '../../lib/footerLegal';
+
+/** WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §14: Store Hub 를 Store Workspace 상위 구조에 편입 */
+const KCOS_STORE_WORKSPACE_PATHS = resolveStoreWorkspacePaths(COSMETICS_STORE_CONFIG);
 
 /** K-Cosmetics 는 그룹 헤더 없는 평면 메뉴 — 단일 무명 그룹으로 표현한다. */
 const HUB_MENU: StoreHubNavGroup[] = [
@@ -94,6 +97,8 @@ const HUB_MENU: StoreHubNavGroup[] = [
 
 export function KCosmeticsHubLayout() {
   return (
+    <>
+    <StoreWorkspaceNav paths={KCOS_STORE_WORKSPACE_PATHS} accent="pink" />
     <StoreHubShell
       accent="pink"
       title="매장 운영 허브"
@@ -113,5 +118,6 @@ export function KCosmeticsHubLayout() {
     >
       <Outlet />
     </StoreHubShell>
+    </>
   );
 }

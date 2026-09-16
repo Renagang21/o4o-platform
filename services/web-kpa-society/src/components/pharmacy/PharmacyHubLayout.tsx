@@ -28,10 +28,13 @@ import {
   Video,
   MonitorSmartphone,
   Languages,
+  FileText,
 } from 'lucide-react';
-import { StoreHubShell } from '@o4o/store-ui-core';
+import { StoreHubShell, StoreWorkspaceNav, resolveStoreWorkspacePaths, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
 import type { StoreHubNavGroup } from '@o4o/store-ui-core';
 import { eventOfferApi } from '../../api/eventOffer';
+
+const KPA_STORE_WORKSPACE_PATHS = resolveStoreWorkspacePaths(KPA_SOCIETY_STORE_CONFIG);
 
 /**
  * WO-O4O-KPA-STORE-HUB-MENU-ALIGNMENT-WITH-MY-STORE-V1:
@@ -89,6 +92,8 @@ const HUB_MENU_GROUPS: StoreHubNavGroup[] = [
     label: '약국 자료함',
     items: [
       { key: 'content', label: '콘텐츠 가져오기', to: '/store-hub/content', icon: Files, description: 'CMS 콘텐츠 탐색 · 내 약국으로 복사' },
+      // WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §14: Supplier → Store Hub (supplier-library adapter) UI 편입 · 열람 전용
+      { key: 'supplier-library', label: '공급자 콘텐츠', to: '/store-hub/supplier-library', icon: FileText, description: '공급자 공개 자료 열람 (사본 없음)' },
     ],
   },
 ];
@@ -116,16 +121,22 @@ export function PharmacyHubLayout() {
     }));
   }, [activeEventCount]);
 
+  // WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §14 · §19:
+  //   Store Hub 를 Store Workspace 상위 구조(Home/내 매장/매장 HUB/내 서비스)에 편입 — 데스크톱·모바일 동일 위치(본문 상단).
+  //   StoreHubShell 은 변경하지 않고 위에 한 줄만 합성한다.
   return (
-    <StoreHubShell
-      accent="blue"
-      title="약국 운영 허브"
-      subtitle="플랫폼이 제공하는 자원을 탐색하고 내 약국으로 가져갑니다"
-      groups={groups}
-      footerNote="탐색한 자원은 내 약국 (/store)에서 설정·운영합니다."
-      sidebarId="pharmacy-hub-sidebar"
-    >
-      <Outlet />
-    </StoreHubShell>
+    <>
+      <StoreWorkspaceNav paths={KPA_STORE_WORKSPACE_PATHS} accent="blue" />
+      <StoreHubShell
+        accent="blue"
+        title="약국 운영 허브"
+        subtitle="플랫폼이 제공하는 자원을 탐색하고 내 약국으로 가져갑니다"
+        groups={groups}
+        footerNote="탐색한 자원은 내 약국 (/store)에서 설정·운영합니다."
+        sidebarId="pharmacy-hub-sidebar"
+      >
+        <Outlet />
+      </StoreHubShell>
+    </>
   );
 }

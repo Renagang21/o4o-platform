@@ -46,7 +46,8 @@ const ACTIVE_COLOR = '#2563eb';
 /** KPA 배지 위치/굵기 (공통 기본값과 다른 부분만 — 기존 UX 보존). */
 const BADGE_STYLE: React.CSSProperties = { top: -6, fontWeight: 600 };
 
-// 약국 경영 active 판정: /mobile/pharmacy, /pharmacy, /store-hub, /store (slug 경로 제외)
+// 약국 경영 active 판정: /mobile/pharmacy(compat), /pharmacy, /store-hub, /store (slug 경로 제외)
+// WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §19: Store Workspace(/store/workspace · /store/services) 포함
 function isPharmacyActive(pathname: string): boolean {
   if (pathname === '/mobile/pharmacy') return true;
   if (pathname.startsWith('/pharmacy')) return true;
@@ -55,7 +56,7 @@ function isPharmacyActive(pathname: string): boolean {
   if (pathname === '/store' || pathname.startsWith('/store/')) {
     // /store/:slug 공개 페이지 제외 — slug 라우트는 영문 소문자+하이픈 패턴
     const afterStore = pathname.slice('/store/'.length);
-    const isSlug = afterStore.length > 0 && !afterStore.includes('/') && !/^(dashboard|info|marketing|commerce|analytics|my-products|library|channels|content|billing|settings|requests|qr|pop|signage|analytics)/.test(afterStore);
+    const isSlug = afterStore.length > 0 && !afterStore.includes('/') && !/^(workspace|services|dashboard|info|marketing|commerce|analytics|my-products|library|channels|content|billing|settings|requests|qr|pop|signage)/.test(afterStore);
     return !isSlug;
   }
   return false;
@@ -86,7 +87,8 @@ export function MobileBottomNav() {
   const isPharmacy = isPharmacyActive(pathname);
 
   function handlePharmacyTab() {
-    if (!isPharmacy) navigate('/mobile/pharmacy');
+    // WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: 모바일 진입점 = Store Workspace Home (동일 상위 구조)
+    if (!isPharmacy) navigate('/store/workspace');
   }
 
   function handleNotifTab() {

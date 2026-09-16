@@ -1,7 +1,7 @@
 # O4O-ROLE-WORKSPACE-ARCHITECTURE-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영)
+> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영)
 > **근거 WO/IR**: `WO-O4O-ROLE-WORKSPACE-REFACTOR-BASELINE-AND-PREFLIGHT-V1` · [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md)
 > **위치**: 사업·정책 정본(우선순위 2). [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) 과 동급이며, **역할 경계 · 업무공간 구조 · 콘텐츠 유입 경로 · Legacy Partner** 에 관해 두 문서가 충돌하면 **이 문서가 우선**한다 (§8).
 
@@ -80,6 +80,14 @@ Store Workspace
 - **My Store 와 Store Hub 의 기존 공통 Core 는 재작성하지 않고 최대한 유지**한다 (`store-core` · `store-ui-core` · `hub-core` · `asset-copy-core` · [`STORE-LAYER-ARCHITECTURE`](../architecture/STORE-LAYER-ARCHITECTURE.md) F3).
 - My Store 는 **Store 소유** 공간이다. Store 자산의 경계는 `organizationId` 이며 서비스로 나뉘지 않는다. 서비스별로 달라지는 것은 My Services (§4) 안에서만 표현한다.
 
+### 3-1. 구현 상태 (WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 · 2026-09-16)
+
+- **상위 구조 구현 = 1 (`@o4o/store-ui-core` `workspace/`)** — `resolveStoreWorkspacePaths(config)` 가 서비스 `basePath` 에서 `Home = <base>/workspace` · `My Store = <base>` · `Store Hub = /store-hub`(공통) · `My Services = <base>/services` 를 파생한다 (KPA · KCos `/store`, Pharmacy Hub `/store-owner` — PG callback 경로 불변). 서비스는 `StoreWorkspaceNav` 를 `MyStoreShell.banner` 슬롯과 Store Hub 레이아웃 위에 조립만 하고, Home / My Services 는 `StoreWorkspaceShell` + `StoreWorkspaceHomeView` / `MyServicesView` 조립만 한다. `MyStoreShell` · `StoreHubShell` · `store-core` · `hub-core` · `asset-copy-core` 는 재작성하지 않았다.
+- **My Store canonical = KPA 기반 공통 `MyStoreShell` 1개.** 세 서비스 모두 공통 `StoreOwnerGuard(serviceKey)` + 서비스 `MembershipGate` 로 진입하며 매장 자산 경계는 `organizationId` 다. 서비스별 메뉴 집합 차이는 `StoreDashboardConfig` 의 실제 capability 차이(REAL_STORE_CAPABILITY_DIFFERENCE) 또는 구현 시점 차이이지, My Store 구현이 복수라는 뜻이 아니다.
+- **My Services 출처 = `GET /api/v1/work-scope/store-services` 하나.** 표시 조건 `enrollmentStatus=active AND workspaceAvailable=true`(= §4-1). 다른 서비스 진입은 기존 `POST /auth/handoff` → 대상 서비스 My Store. 새 membership 테이블 0 · 권한 판정 0.
+- **대표 홈(Neture) "내 매장" 진입 = 각 서비스 Store Workspace Home.** 대상 서비스 목록은 하드코딩이 아니라 catalog `storeWorkspaceEnabled` ∩ store_owner role registry 파생(`listStoreCapableServices`) — 권한 SSOT 는 그대로다.
+- KPA 모바일 전용 `/mobile/pharmacy`(`MobilePharmacyPage`) 는 RETIRE — `/store/workspace` 로 COMPAT_REDIRECT. 모바일도 같은 상위 구조를 쓴다(별도 모바일 정보구조 없음).
+
 ---
 
 ## 4. My Services / Service Workspace
@@ -149,7 +157,16 @@ My Services ──┘
 
 - 가져오기는 **Store 소유 독립 사본** 원칙을 유지한다 ([`O4O-STORE-MENU-CANONICAL-TREE-V1`](O4O-STORE-MENU-CANONICAL-TREE-V1.md) §4 · `asset-copy-core`). 원본 변경이 사본에 전파되지 않는다.
 - 위 세 경로 밖의 유입(예: Supplier → 특정 Store 직접 전달)은 §2-2 로 제외한다.
-- 현행 출처 4종(`operator_hub` / `community_snapshot` / `store_direct` / `library_self`)과 이 절의 3+1 경로의 대응은 Store 리팩터링 단계에서 정한다. `My Services` 출처는 신설 후보다.
+- 현행 출처 4종과 이 절의 3+1 경로의 대응 (WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §15 · 2026-09-16 확정, 코드 변경 없음 · 문서 판정만):
+
+  | 3+1 경로 | 현행 출처 (`O4O-STORE-MENU-CANONICAL-TREE-V1` §5.1) | 물리 근거 (프로덕션 read-only, 2026-09-16) | 판정 |
+  |---|---|---|---|
+  | Community → My Store | `community_snapshot` (= `snapshot`) | `asset_snapshots` content/kpa · cms/kpa · `kpa_store_contents` snapshot_edit | PASS |
+  | Store Hub → My Store | `operator_hub` (= `library`) | `store_execution_assets` generated/uploaded · Hub adapter(operator/supplier-library) 가져오기 | PASS |
+  | My Services → My Store | (출처 값 없음) | enrollment 읽기 계약(`/work-scope/store-services`)만 존재 · 서비스 기원 콘텐츠 producer 없음 | FOUNDATION_ONLY — 출처 값 신설은 Service Operator Workspace 단계(§9-1 6) 에서 |
+  | Store Direct Authoring | `store_direct` (= `direct`) · `library_self` | `kpa_store_contents` direct/store·operator | PASS |
+
+  Copy 불변식(Store 소유 독립 사본 · 원본 변경 비전파 · provenance 보존)은 네 경로 모두 `asset-copy-core` 그대로다.
 
 ---
 
@@ -224,7 +241,7 @@ latest main sync
 2. Service Tenant Foundation ← Service Identity · Store↔Service · Operator↔Service · Workspace metadata 읽기 계약 (2026-09-16 완료, UI 없음)
 3. Content Boundary Alignment ← 논리 도메인 4종 · canonical producer(adapter 정규화) · KPA producer drift FIX · F4/게시 표준/3자 흐름 문서 정합 (2026-09-16 완료, 물리 schema 변경 없음)
 4. Supplier Workspace        ← Products / Orders / Content 3축 IA · Supplier 전용 Community 진입 은퇴 · §2-1 두 경로 구현(Hub adapter · handoff) (2026-09-16 완료, schema 변경 없음)
-5. Store Workspace (Home · My Store · Store Hub · My Services)
+5. Store Workspace        ← Home · My Store · Store Hub · My Services 상위 구조(store-ui-core `workspace/`) · My Services(`/work-scope/store-services`) · 대표 홈 진입 정렬 · KPA 모바일 전용 화면 RETIRE (2026-09-16 완료, schema 변경 없음)
 6. Service Operator Workspace
 7. Community (Industry Community)
 ```

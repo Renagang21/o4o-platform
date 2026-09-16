@@ -142,7 +142,19 @@ const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/Te
 const ForcedContentPage = lazy(() => import('@/pages/operator/signage/ForcedContentPage'));
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-import { MyStoreShell, COSMETICS_STORE_CONFIG, StoreOwnerGuard } from '@o4o/store-ui-core';
+import {
+  MyStoreShell,
+  COSMETICS_STORE_CONFIG,
+  StoreOwnerGuard,
+  // WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: Home / My Store / Store Hub / My Services 상위 구조
+  StoreWorkspaceNav,
+  StoreWorkspaceShell,
+  StoreWorkspaceHomeView,
+  MyServicesView,
+  createStoreServicesApi,
+  resolveStoreWorkspacePaths,
+} from '@o4o/store-ui-core';
+import { api as coreApi } from '@/lib/apiClient';
 import { MembershipGate } from './components/auth/MembershipGate';
 import { fetchStoreCapabilities } from './api/storeHub';
 import { getUserDisplayName } from '@o4o/account-ui';
@@ -384,14 +396,59 @@ function StoreLayoutWrapper() {
       homeLink="/"
       onLogout={() => { logout(); navigate('/'); }}
       header={<KCosGlobalHeader />}
-      footer={
-        <StoreFacingFooter
-          serviceKey="k-cosmetics"
-          serviceName="K-Cosmetics"
-          loadProfile={loadFooterLegal}
-          links={{ terms: '/terms', privacy: '/privacy', contact: '/contact' }}
-        />
-      }
+      banner={<StoreWorkspaceNav paths={KCOS_STORE_WORKSPACE_PATHS} accent="pink" />}
+      footer={<KCosStoreFooter />}
+    />
+  );
+}
+
+/** WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: Store Workspace 경로 (basePath 파생) */
+const KCOS_STORE_WORKSPACE_PATHS = resolveStoreWorkspacePaths(COSMETICS_STORE_CONFIG);
+/** /api/v1 루트 axios → work-scope/store-services · auth/handoff (envelope 는 .data 로 unwrap) */
+const kcosStoreServicesApi = createStoreServicesApi({
+  get: async (url) => (await coreApi.get(url)).data,
+  post: async (url, body) => (await coreApi.post(url, body)).data,
+});
+
+function KCosStoreFooter() {
+  return (
+    <StoreFacingFooter
+      serviceKey="k-cosmetics"
+      serviceName="K-Cosmetics"
+      loadProfile={loadFooterLegal}
+      links={{ terms: '/terms', privacy: '/privacy', contact: '/contact' }}
+    />
+  );
+}
+
+/**
+ * WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §6 · §10:
+ *   Store Workspace Home(/store/workspace) · My Services(/store/services) — 사이드바 없는 두 표면.
+ *   StoreLayoutWrapper 와 같은 header/footer, 가드는 StoreOwnerRoute 그대로.
+ */
+function StoreWorkspaceWrapper() {
+  return (
+    <StoreWorkspaceShell
+      paths={KCOS_STORE_WORKSPACE_PATHS}
+      accent="pink"
+      header={<KCosGlobalHeader />}
+      footer={<KCosStoreFooter />}
+    />
+  );
+}
+
+function StoreWorkspaceHomePage() {
+  return <StoreWorkspaceHomeView paths={KCOS_STORE_WORKSPACE_PATHS} accent="pink" serviceName="K-Cosmetics" />;
+}
+
+function MyServicesPage() {
+  // K-Cosmetics 는 조직 id 를 화면에서 들고 있지 않다 — 접근 가능한 매장이 1개일 때 서버가 해석한다(ambiguous 는 안내 문구).
+  return (
+    <MyServicesView
+      api={kcosStoreServicesApi}
+      currentServiceKey="k-cosmetics"
+      currentMyStorePath={KCOS_STORE_WORKSPACE_PATHS.myStore}
+      accent="pink"
     />
   );
 }
@@ -823,6 +880,11 @@ function AppRoutes() {
         path="/store/marketing/signage/play/:playlistId"
         element={<StoreOwnerRoute><SignagePlaybackPage /></StoreOwnerRoute>}
       />
+      {/* WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §6: Store Workspace Home · My Services (가드 동일) */}
+      <Route element={<StoreOwnerRoute><StoreWorkspaceWrapper /></StoreOwnerRoute>}>
+        <Route path="store/workspace" element={<StoreWorkspaceHomePage />} />
+        <Route path="store/services" element={<MyServicesPage />} />
+      </Route>
       <Route
         path="store"
         element={

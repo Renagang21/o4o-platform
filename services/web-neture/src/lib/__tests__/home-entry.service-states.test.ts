@@ -99,3 +99,40 @@ describe('buildHomeEntryModel — 공급자 서비스 상태', () => {
     expect(s).toEqual({ supplier: { status: 'active', source: 'neture_suppliers' } });
   });
 });
+
+// WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §18 — 대표 홈 "내 매장" 진입 = Store Workspace Home
+describe('buildHomeEntryModel — 매장 진입 = Store Workspace Home', () => {
+  const svc = (key: string, nameKo: string, domain: string) => ({
+    ...neture,
+    key,
+    name: key,
+    nameKo,
+    domain,
+  });
+  const storeData = (): HomeEntryData => ({
+    services: [
+      neture,
+      svc('kpa-society', 'KPA Society', 'kpa-society.example'),
+      svc('k-cosmetics', 'K-Cosmetics', 'k-cosmetics.example'),
+      svc('pharmacy-hub', 'Pharmacy Hub', 'pharmacy-hub.example'),
+    ] as HomeEntryData['services'],
+    stores: [
+      { serviceKey: 'kpa-society', organizationId: 'org-a', name: '매장 A', memberRole: 'owner' },
+      { serviceKey: 'k-cosmetics', organizationId: 'org-a', name: '매장 A', memberRole: 'owner' },
+      { serviceKey: 'pharmacy-hub', organizationId: 'org-a', name: '매장 A', memberRole: 'owner' },
+    ],
+    branches: [],
+    serviceStates: { supplier: { status: 'none', source: 'none' } },
+  });
+
+  it('내 매장 returnPath = <basePath>/workspace (KPA·KCos /store, PH /store-owner) · 매장 HUB = /store-hub', () => {
+    const m = buildHomeEntryModel(user(['user']), storeData());
+    const myStore = m.groups.find((g) => g.id === 'my-store')!;
+    const byKey = Object.fromEntries(myStore.items.map((i) => [i.action.kind === 'handoff' ? i.action.serviceKey : '', i.action]));
+    expect(byKey['kpa-society']).toMatchObject({ kind: 'handoff', returnPath: '/store/workspace' });
+    expect(byKey['k-cosmetics']).toMatchObject({ kind: 'handoff', returnPath: '/store/workspace' });
+    expect(byKey['pharmacy-hub']).toMatchObject({ kind: 'handoff', returnPath: '/store-owner/workspace' });
+    const hub = m.groups.find((g) => g.id === 'store-hub')!;
+    expect(hub.items.every((i) => i.action.kind === 'handoff' && i.action.returnPath === '/store-hub')).toBe(true);
+  });
+});

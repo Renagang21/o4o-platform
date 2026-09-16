@@ -501,3 +501,19 @@ export * from './components/blog';
 
 // 공통 View 반응형 판정 (WO-O4O-MY-STORE-FINAL-COMMONIZATION-AUDIT-AND-CLOSURE-V1 §12)
 export { useIsNarrowViewport } from './hooks/useIsNarrowViewport';
+
+// Store Workspace 상위 구조 — Home / My Store / Store Hub / My Services
+// (WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1) — 합성 전용, MyStoreShell/StoreHubShell 을 대체하지 않는다.
+export * from './workspace';
+export { createStoreServicesApi, selectMyServices } from './api/createStoreServicesApi';
+export type {
+  StoreServicesHttp,
+  StoreServicesApi,
+  StoreServiceMembership,
+  StoreServiceResolution,
+  StoreServiceResolutionStatus,
+  StoreServiceResolutionReason,
+  StoreServiceEnrollmentStatus,
+  StoreServiceWorkspaceMode,
+  MyServicesSelection,
+} from './api/createStoreServicesApi';

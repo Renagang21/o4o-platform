@@ -23,29 +23,19 @@ import type { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { getServiceMembershipStatusFromDb } from '../../../utils/service-membership.js';
-import {
-  findStoreOrganizationCandidates,
-  type StoreOwnerServiceKey,
-} from '../../../utils/store-organization.resolver.js';
+import { findStoreOrganizationCandidates } from '../../../utils/store-organization.resolver.js';
+import { listStoreCapableServices } from '../../../utils/store-owner.utils.js';
 // WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1:
 // 공급자 서비스 이용 상태(단일 출처) — 대표 홈 · 서비스 레이아웃이 role 문자열 대신 이 값을 쓴다.
 // WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1: serviceStates.partner 은퇴 (응답 = { supplier }).
 import { resolveNetureServiceStates } from '../../../modules/neture/services/neture-service-state.service.js';
 
 /**
- * 대표 홈에서 "내 매장" 을 노출하는 서비스 — canonical service_key ↔ role prefix.
- * `utils/store-owner.utils.ts` 의 STORE_OWNER_ROLES_BY_SERVICE 와 같은 집합이다
- * (cafe24-b2b 는 O4O 로그인 회원이 아니므로 제외 — Cafe24 회원 로그인 전용).
+ * 대표 홈에서 "내 매장" 을 노출하는 서비스 — catalog `storeWorkspaceEnabled` ∩ store_owner role registry 파생.
+ * WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 (§18): 하드코딩 목록 → `listStoreCapableServices()`
+ * (cafe24-b2b 는 catalog 에서 undecided · role registry 에도 없으므로 자연히 제외).
  */
-const STORE_CAPABLE_SERVICES: ReadonlyArray<{
-  serviceKey: string;
-  rolePrefix: StoreOwnerServiceKey;
-  storeOwnerRole: string;
-}> = [
-  { serviceKey: 'kpa-society', rolePrefix: 'kpa', storeOwnerRole: 'kpa:store_owner' },
-  { serviceKey: 'k-cosmetics', rolePrefix: 'cosmetics', storeOwnerRole: 'cosmetics:store_owner' },
-  { serviceKey: 'pharmacy-hub', rolePrefix: 'pharmacy-hub', storeOwnerRole: 'pharmacy-hub:store_owner' },
-];
+const STORE_CAPABLE_SERVICES = listStoreCapableServices();
 
 export interface HomeEntryStore {
   /** canonical service_key (kpa-society · k-cosmetics · pharmacy-hub) */

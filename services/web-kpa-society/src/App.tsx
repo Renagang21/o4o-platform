@@ -128,8 +128,8 @@ const OperatorRoutes = lazy(() => import('./routes/OperatorRoutes').then(m => ({
 const ResourcesHubPage = lazy(() => import('./pages/resources/ResourcesHubPage').then(m => ({ default: m.ResourcesHubPage })));
 const ResourceWritePage = lazy(() => import('./pages/resources/ResourceWritePage').then(m => ({ default: m.ResourceWritePage })));
 
-// Mobile Pages — WO-O4O-KPA-MOBILE-MENU-STRUCTURE-PHASE2-V1
-const MobilePharmacyPage = lazy(() => import('./pages/mobile/MobilePharmacyPage').then(m => ({ default: m.MobilePharmacyPage })));
+// WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: MobilePharmacyPage RETIRE —
+//   /mobile/pharmacy → /store/workspace (Store Workspace Home 이 모바일에서도 같은 상위 구조를 맡는다)
 
 // Manual Pages (WO-KPA-A-MANUAL-MAIN-PAGE-V1)
 
@@ -201,6 +201,8 @@ const PharmacyVideoPage = lazy(() => import('./pages/pharmacy/PharmacyVideoPage'
 const HubQrLibraryPage = lazy(() => import('./pages/pharmacy/HubQrLibraryPage').then(m => ({ default: m.HubQrLibraryPage })));
 // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1
 const HubMultilingualContentLibraryPage = lazy(() => import('./pages/pharmacy/HubMultilingualContentLibraryPage').then(m => ({ default: m.HubMultilingualContentLibraryPage })));
+// WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §14: Supplier → Store Hub UI 편입 (supplier-library adapter · 열람 전용)
+const HubSupplierLibraryPage = lazy(() => import('./pages/pharmacy/HubSupplierLibraryPage').then(m => ({ default: m.HubSupplierLibraryPage })));
 const StoreMultilingualContentsMyPage = lazy(() => import('./pages/pharmacy/StoreMultilingualContentsMyPage').then(m => ({ default: m.StoreMultilingualContentsMyPage })));
 const PharmacySellPage = lazy(() => import('./pages/pharmacy/PharmacySellPage').then(m => ({ default: m.PharmacySellPage })));
 const TabletRequestsPage = lazy(() => import('./pages/pharmacy/TabletRequestsPage').then(m => ({ default: m.TabletRequestsPage })));
@@ -275,7 +277,18 @@ import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
-import { MyStoreShell, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
+import {
+  MyStoreShell,
+  KPA_SOCIETY_STORE_CONFIG,
+  // WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: Home / My Store / Store Hub / My Services 상위 구조
+  StoreWorkspaceNav,
+  StoreWorkspaceShell,
+  StoreWorkspaceHomeView,
+  MyServicesView,
+  createStoreServicesApi,
+  resolveStoreWorkspacePaths,
+} from '@o4o/store-ui-core';
+import { coreApiClient } from './api/client';
 import { fetchStoreCapabilities } from './api/storeHub';
 import { getUserDisplayName } from '@o4o/account-ui';
 // WO-O4O-STORE-FACING-FOOTER-COVERAGE-V1: 공통 footer 법정정보 loader
@@ -518,22 +531,95 @@ function KpaStoreLayoutWrapper() {
       orgName={pharmacyName}
       onLogout={() => { logout(); navigate('/'); }}
       header={<KpaGlobalHeader />}
-      footer={
-        <StoreFacingFooter
-          serviceKey="kpa-society"
-          serviceName="약사회"
-          loadProfile={loadFooterLegal}
-          links={{ terms: '/policy', privacy: '/privacy', contact: '/contact' }}
-        />
-      }
-      below={
-        <>
-          {/* WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
-              내 약국(store) 영역에도 모바일 하단 utility nav(알림/내정보) 제공 + 하단 여백 확보. */}
-          <div className="md:hidden" aria-hidden style={{ height: 'calc(3.5rem + env(safe-area-inset-bottom, 0px))' }} />
-          <MobileBottomNav />
-        </>
-      }
+      banner={<StoreWorkspaceNav paths={KPA_STORE_WORKSPACE_PATHS} accent="blue" />}
+      footer={<KpaStoreFooter />}
+      below={<KpaStoreBelow />}
+    />
+  );
+}
+
+/** WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: Store Workspace 경로 (basePath 파생) */
+const KPA_STORE_WORKSPACE_PATHS = resolveStoreWorkspacePaths(KPA_SOCIETY_STORE_CONFIG);
+/** /api/v1 루트 클라이언트 → work-scope/store-services · auth/handoff */
+const kpaStoreServicesApi = createStoreServicesApi({
+  get: (url) => coreApiClient.get(url),
+  post: (url, body) => coreApiClient.post(url, body),
+});
+
+function KpaStoreFooter() {
+  return (
+    <StoreFacingFooter
+      serviceKey="kpa-society"
+      serviceName="약사회"
+      loadProfile={loadFooterLegal}
+      links={{ terms: '/policy', privacy: '/privacy', contact: '/contact' }}
+    />
+  );
+}
+
+function KpaStoreBelow() {
+  return (
+    <>
+      {/* WO-O4O-KPA-MOBILE-BOTTOM-UTILITY-NAV-ROUTE-COVERAGE-FIX-V1:
+          내 약국(store) 영역에도 모바일 하단 utility nav(알림/내정보) 제공 + 하단 여백 확보. */}
+      <div className="md:hidden" aria-hidden style={{ height: 'calc(3.5rem + env(safe-area-inset-bottom, 0px))' }} />
+      <MobileBottomNav />
+    </>
+  );
+}
+
+/**
+ * WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §6 · §10:
+ *   Store Workspace Home(/store/workspace) · My Services(/store/services) 의 합성 셸.
+ *   KpaStoreLayoutWrapper 와 같은 header/footer/below 를 쓰고 사이드바만 없다. 가드는 PharmacyGuard 그대로.
+ */
+function KpaStoreWorkspaceWrapper() {
+  return (
+    <StoreWorkspaceShell
+      paths={KPA_STORE_WORKSPACE_PATHS}
+      accent="blue"
+      header={<KpaGlobalHeader />}
+      footer={<KpaStoreFooter />}
+      below={<KpaStoreBelow />}
+    />
+  );
+}
+
+function KpaStoreWorkspaceHomePage() {
+  const [pharmacy, setPharmacy] = useState<{ name?: string; organizationId?: string } | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    getPharmacyInfo().then((info) => { if (!cancelled && info) setPharmacy(info); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+  return (
+    <StoreWorkspaceHomeView
+      paths={KPA_STORE_WORKSPACE_PATHS}
+      accent="blue"
+      storeName={pharmacy?.name}
+      serviceName="KPA Society"
+    />
+  );
+}
+
+function KpaMyServicesPage() {
+  const [organizationId, setOrganizationId] = useState<string | null | undefined>(undefined);
+  useEffect(() => {
+    let cancelled = false;
+    getPharmacyInfo()
+      .then((info) => { if (!cancelled) setOrganizationId(info?.organizationId ?? null); })
+      .catch(() => { if (!cancelled) setOrganizationId(null); });
+    return () => { cancelled = true; };
+  }, []);
+  // 조직 id 를 알기 전엔 조회하지 않는다 (복수 매장 사용자의 ambiguous 방지)
+  if (organizationId === undefined) return null;
+  return (
+    <MyServicesView
+      api={kpaStoreServicesApi}
+      currentServiceKey="kpa-society"
+      currentMyStorePath={KPA_STORE_WORKSPACE_PATHS.myStore}
+      organizationId={organizationId}
+      accent="blue"
     />
   );
 }
@@ -745,6 +831,8 @@ function App() {
             {/* WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-WEB-PILOT-V1: 다국어 상품 콘텐츠 진열 + 가져가기 */}
             <Route path="multilingual-product-contents" element={<HubMultilingualContentLibraryPage />} />
             <Route path="multilingual-product-contents/my" element={<StoreMultilingualContentsMyPage />} />
+            {/* WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §14: 공급자 콘텐츠 진열 (Supplier → Store Hub) */}
+            <Route path="supplier-library" element={<HubSupplierLibraryPage />} />
           </Route>
           {/* 자료실 Hub — 공동자료실 진입점 (WO-KPA-RESOURCE-SYSTEM-RESET-V1) */}
           <Route path="/resources" element={<Layout serviceName={SERVICE_NAME}><ResourcesHubPage /></Layout>} />
@@ -917,7 +1005,8 @@ function App() {
           <Route path="/event-offers/:id" element={<Layout serviceName={SERVICE_NAME}><PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard></Layout>} />
 
           {/* Mobile Hub — WO-O4O-KPA-MOBILE-MENU-STRUCTURE-PHASE2-V1 */}
-          <Route path="/mobile/pharmacy" element={<Layout serviceName={SERVICE_NAME}><MobilePharmacyPage /></Layout>} />
+          {/* WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1: COMPAT_REDIRECT — 모바일 약국 경영 허브 → Store Workspace Home */}
+          <Route path="/mobile/pharmacy" element={<Navigate to="/store/workspace" replace />} />
 
           {/* Info Pages — WO-O4O-KPA-WEB-MENU-STRUCTURE-PHASE1-V1 (stub) */}
           <Route path="/about" element={<Layout serviceName={SERVICE_NAME}><AboutPage /></Layout>} />
@@ -948,6 +1037,12 @@ function App() {
             path="/store/marketing/signage/play/:playlistId"
             element={<PharmacyGuard><SignagePlaybackPage /></PharmacyGuard>}
           />
+          {/* WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 §6:
+              Store Workspace Home · My Services — 사이드바 없는 두 표면. 가드는 /store 와 동일(PharmacyGuard). */}
+          <Route element={<PharmacyGuard><KpaStoreWorkspaceWrapper /></PharmacyGuard>}>
+            <Route path="/store/workspace" element={<KpaStoreWorkspaceHomePage />} />
+            <Route path="/store/services" element={<KpaMyServicesPage />} />
+          </Route>
           <Route path="/store" element={<PharmacyGuard><KpaStoreLayoutWrapper /></PharmacyGuard>}>
             {/* Home (WO-KPA-A-STORE-HOME-AND-SIDEBAR-RESTRUCTURE-V1) */}
             <Route index element={<StoreHomePage />} />

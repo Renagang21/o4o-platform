@@ -36,6 +36,7 @@ import type { DataSource } from 'typeorm';
 import type { Request, Response, NextFunction } from 'express';
 import type { AuthContext } from '../auth/auth-context.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
+import { getServiceWorkspaceCapability } from '../config/service-catalog.js';
 import {
   resolveStoreOrganization,
   type StoreOrganizationResolution,
@@ -77,6 +78,30 @@ const STORE_OWNER_ROLES_BY_SERVICE = {
 const ALL_STORE_OWNER_ROLES: readonly string[] = Object.values(
   STORE_OWNER_ROLES_BY_SERVICE,
 ).flat();
+
+/**
+ * WO-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1 (§18):
+ *   "내 매장" 을 제공하는 서비스 = catalog `storeWorkspaceEnabled` ∩ store_owner role registry.
+ *   대표 홈(neture-home-entry) 이 가지던 하드코딩 STORE_CAPABLE_SERVICES 를 이 파생값으로 대체한다.
+ *   권한 판정 SSOT 는 그대로 role_assignments / service_memberships 이며, 이 목록은 "어느 서비스를
+ *   순회할지" 만 정한다 (storeWorkspaceEnabled = UI metadata, WO §9).
+ */
+export interface StoreCapableService {
+  /** canonical service_key (kpa-society · k-cosmetics · pharmacy-hub) */
+  serviceKey: string;
+  rolePrefix: StoreOwnerServiceKey;
+  storeOwnerRole: string;
+}
+
+export function listStoreCapableServices(): StoreCapableService[] {
+  const out: StoreCapableService[] = [];
+  for (const prefix of Object.keys(STORE_OWNER_ROLES_BY_SERVICE) as StoreOwnerServiceKey[]) {
+    const serviceKey = resolveCanonicalServiceKey(prefix);
+    if (!getServiceWorkspaceCapability(serviceKey).storeWorkspaceEnabled) continue;
+    out.push({ serviceKey, rolePrefix: prefix, storeOwnerRole: STORE_OWNER_ROLES_BY_SERVICE[prefix][0] });
+  }
+  return out;
+}
 
 /**
  * Service-aware store_owner 체크.
