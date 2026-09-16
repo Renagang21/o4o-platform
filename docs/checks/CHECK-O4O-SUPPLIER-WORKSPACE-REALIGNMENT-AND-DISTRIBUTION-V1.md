@@ -109,10 +109,27 @@
 | `apps/api-server` `tsc --noEmit` | PASS |
 | jest — `supplier-workspace-realignment.spec.ts` | 16/16 PASS (대상 서비스 집합·제외 · cms 키 매핑 · Hub adapter is_public/producer/serviceKey gate/mixed 미편입 · submit KPA 2 INSERT vs 타 서비스 1 INSERT · type 매핑) |
 | jest — 기존 Supplier 관련 8 suites (`content-boundary-alignment` · `service-tenant-foundation` · `market-trial-neture-forum-sync` · `supplier-offer-*` 2 · `b2b-supplier-to-store-order-canonical-contract` · `frozen-auth-permissions-and-kpa-supplier-final-closure` · `auth-runtime-and-legacy-package-final-closure`) | 9 suites 131/131 PASS |
-| UI 확인 (사이드바 5그룹 · 대시보드 3축 · 라이브러리 제공 모달) | 정적 확인(tsc/build) — 브라우저 확인은 production smoke 항목 |
-| production smoke | 본 CHECK 작성 시점 = push 전. 결과는 §7 후속 기록 |
+| UI 확인 (사이드바 5그룹 · 대시보드 3축 · 라이브러리 제공 모달) | PASS — 배포 후 실브라우저 확인(§4-1) |
+| production smoke | PASS — §4-1 (배포 de728b3e6 · 2026-09-16) |
 
 ---
+
+### 4-1. Production smoke (배포 de728b3e6 후 · 읽기 전용 · 2026-09-16)
+
+공급자 표준 계정(`docs/local/TEST-ACCOUNTS.local.md` · supplier-6967ebe0)으로 API · 브라우저 확인. 쓰기 호출 0 (handoff 는 유효하지 않은 대상으로 400 거부만 확인).
+
+| 항목 | 결과 |
+|---|---|
+| `GET /api/v1/neture/library/handoff-targets` (공급자 인증) | 200 · `kpa-society / k-cosmetics / pharmacy-hub` 3건 — catalog 파생과 일치, `kpa-branch`·`cafe24-b2b`·`neture` 없음 |
+| 동일 endpoint 비인증 | 401 |
+| `POST /neture/library/{uuid}/handoff {serviceKey:"kpa-branch"}` | 400 `INVALID_HANDOFF_TARGET` — 원장 조회 전 거부, write 0 |
+| `GET /api/v1/hub/contents?serviceKey=kpa-society&sourceDomain=supplier-library` | 200 · total 0 (프로덕션 원장 0행과 정합 · 오류 없음) |
+| 동일 · `serviceKey=neture` / `kpa-branch` (store workspace 없음) | 200 · 빈 응답 |
+| `GET /neture/library` (공급자) | 200 · 0건 (원장 0행 정합) |
+| 브라우저 `/supplier/dashboard` 사이드바 | `대시보드 / 상품 / 주문 / 콘텐츠 / 공급자 정보` — `공급자 포럼`·`내 포럼` 링크 0 (`a[href*="/supplier/forum"]` = 0) |
+| 브라우저 대시보드 업무 바로가기 | 상품(상품 목록·상품 등록·거래 상품 정보·공급 오퍼) / 주문(주문 현황·재고 관리·정산 내역) / 콘텐츠(콘텐츠 라이브러리·매장용 상품 설명서·검수·게시 현황) |
+| 브라우저 `/supplier/library` | 제목 `콘텐츠 라이브러리` · 두 경로 안내(공개=매장 HUB · 서비스에 제공=운영자 · 특정 매장 직접 전송 없음) 렌더 · 공개 필터 라벨 반영 |
+| 제공 모달 실제 제출 | 미실행 — 프로덕션 원장에 자료 0행이며 write smoke 는 WO 범위 밖(cms_contents pending 행 생성). 단위 테스트(§4)로 계약 검증 |
 
 ## 5. Re-census (§16)
 
@@ -148,7 +165,7 @@
 1. **Store Hub UI 편입** — `supplier-library` 를 Store Hub 탭/mixed 목록에 노출 · KPA Store Hub 의 cms serviceKey `'kpa'` legacy drift 정렬 · `HubProducer` 축소 · TEMP_COMPAT 제거 → Store Workspace 단계(§9-1 5).
 2. **k-cosmetics · pharmacy-hub 운영자 수신 화면** — 공통 CMS pending 목록으로 수신 가능하나 "공급자 제공 콘텐츠" 전용 뷰는 없음 → Service Operator Workspace 단계(§9-1 6).
 3. **PHILOSOPHY §3 본문 정정** — 별도 WO.
-4. production smoke 결과 — 후속 기록 커밋.
+4. production smoke 결과 — §4-1 기록 완료 (2026-09-16).
 
 ---
 
@@ -168,4 +185,4 @@ NEW_UNIVERSAL_ENGINE=0
 NEXT=GO_STORE_WORKSPACE
 ```
 
-구현 commit: 후속 커밋에서 hash 기재.
+구현 commit: `de728b3e6` (2026-09-16 · push 완료 · Deploy API/Web/Admin success). smoke 기록: 본 커밋.
