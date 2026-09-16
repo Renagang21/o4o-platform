@@ -66,7 +66,7 @@
 
 ## §6. 금지 사항
 
-- 공급자가 HUB에 직접 콘텐츠를 제작·게시하는 구조 금지
+- ~~공급자가 HUB에 직접 콘텐츠를 제작·게시하는 구조 금지~~ — **삭제 (2026-09-16 · `WO-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1`)**. [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 에 따라 `Supplier → Store Hub` 는 공식 온라인 제공 경로다. 이 문서는 **운영자 게시 항목·방식**만 정하며, 공급자 제공 콘텐츠의 Hub 유입(제출·승인 여부)은 Architecture §2-1 과 서비스별 정책이 정한다.
 - HUB 항목이 매장 메뉴 축과 달라지는 구조 금지 (설문 제외)
 - 운영자가 매장 경영자 대신 내 매장을 직접 제어하는 구조 금지
 - Source Ingestion(원천 자료 자동 변환)을 이 문서 범위에서 구현 금지 (별도 WO 필요)

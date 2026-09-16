@@ -37,23 +37,18 @@ HUB는 내부 도메인 구현과 무관하게
 type HubProducer = 'operator' | 'supplier' | 'community' | 'store';
 ```
 
-> **Canonical 정렬 (2026-05-23):**
-> [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md) 기준 Canonical Producer 는 **`operator` / `community` / `store`** 3종이다. `supplier` Producer 는 **legacy / 명문화된 예외** 로 분류된다.
+> **Canonical 재정렬 (2026-09-16 · `WO-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1`):**
+> [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 기준 **`Supplier → Store Hub` 는 공식 온라인 제공 경로**다. 따라서 `supplier` Producer 는 legacy 예외가 아니라 **Canonical 4종 중 하나**다 (`operator` / `supplier` / `community` / `store`).
+> 2026-05-23 의 "supplier = legacy 예외 · 공급자 → 오프라인 전달 → Operator 등록" 정렬은 폐기한다 (`O4O-3-ROLE-FLOW-BASELINE-V1` §2 · §6 은 SUPERSEDED).
 >
-> Canonical 흐름:
->
-> ```text
-> 공급자 → 오프라인 전달 → Operator 등록 → HUB
-> ```
->
-> 자세한 내용은 본 문서 §6.3 및 [`O4O-3-ROLE-FLOW-BASELINE-V1 §6.1`](O4O-3-ROLE-FLOW-BASELINE-V1.md) 참조.
+> HubProducer 는 **Store Hub 노출(발견) 축**이며 논리 콘텐츠 도메인(Community / Service / Supplier / Store — `@o4o/types` `ContentDomain`)과 별개다. 소비처별 이동 판정과 Hub 축 축소는 Store Hub 리팩터링 단계가 정한다 (`CHECK-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1` §7).
 
 ### 3.2 도메인별 매핑
 
 | HUB Producer | CMS (authorRole)   | Signage (source) | 상태 |
 | ------------ | ------------------ | ---------------- | ---- |
 | operator     | admin / service_admin | hq               | Canonical |
-| supplier     | supplier           | supplier         | **Legacy (명문화된 예외)** |
+| supplier     | supplier           | supplier         | Canonical (2026-09-16, Supplier → Store Hub) |
 | community    | community          | community        | Canonical |
 | store        | (visibility=store) | store            | Canonical |
 
@@ -119,12 +114,9 @@ visibility IN ('global','service')
 serviceKey = current
 ```
 
-### 6.3 공급자 (Legacy / 명문화된 예외)
+### 6.3 공급자
 
-> **Canonical 정렬 (2026-05-23):**
-> 본 탭은 [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md) 기준 비-Canonical 영역이다. 현재 코드에 잔존하는 `producer='supplier'` 콘텐츠를 표시하기 위해 유지되나, **신규 콘텐츠는 Operator 가 등록한 supplier-origin 콘텐츠** (`producer='operator'`) 로 전환되어야 한다.
->
-> 단계적 전환 계획은 §10.5 참조.
+> **Canonical 재정렬 (2026-09-16):** `Supplier → Store Hub` 는 공식 경로다 (ROLE-WORKSPACE-ARCHITECTURE §2-1). 공급자 제출(`cms_contents.authorRole='supplier'`) → 운영자 승인 게시 흐름이 이 탭의 원천이며, "Operator 가 대신 등록" 으로 전환하지 않는다. Store Hub 에서 운영자 검수가 개입하는지는 서비스별 정책이 유지된다 (Architecture §2-1).
 
 ```
 producer = 'supplier'
@@ -192,7 +184,7 @@ HUB는:
 2. CMS/Signage 필드명 정규화 여부 (중기 과제)
 3. HubContentQueryService 통합 레이어 도입
 4. Store 콘텐츠 HUB 노출 정책 재검토
-5. **`producer='supplier'` 정책의 단계적 전환** — `O4O-3-ROLE-FLOW-BASELINE-V1` 의 Canonical 흐름 (`공급자 → 오프라인 전달 → Operator 등록 → HUB`) 으로 정렬. 현 단계는 legacy / 명문화된 예외로 유지하며, 신규 흐름은 `producer='operator'` 로 등록된 supplier-origin 콘텐츠를 사용한다. 별도 IR/WO 로 전환 일정 확정 예정.
+5. ~~`producer='supplier'` 정책의 단계적 전환~~ — **폐기 (2026-09-16)**. `Supplier → Store Hub` 가 공식 경로로 확정되어 전환 대상이 아니다. 대신 Store Hub 단계에서 Hub 를 공개 발견 축(`Platform/Public` · `Supplier/Public`)으로 재정의할 때 `community` / `store` producer 소비처의 이동을 판정한다 (`CHECK-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1` §7).
 
 ---
 

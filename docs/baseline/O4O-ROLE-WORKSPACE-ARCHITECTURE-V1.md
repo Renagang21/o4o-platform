@@ -176,9 +176,9 @@ FUTURE PARTNER  = GREENFIELD
 | 문서 | 관계 | 처리 |
 |---|---|---|
 | [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) | 동급 상위 정본. §1 · §2 · §5 · §6 은 그대로 유효. **§3(공급자 = 직접 제작 주체 아님) · §4 (3자 구조) · §7 (3자 경계 Drift) · 주의사항(Neture 내 매장 기능 추가 금지)** 은 이 문서와 충돌 | 충돌 절은 **이 문서가 우선**. 본문 정정은 후속 WO(UPDATE_REQUIRED) |
-| [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md) | §2 Canonical Flow(공급자 → 운영자 → 매장 단선) · §6 Drift 금지(공급자 HUB 직접 게시 금지, 매장→공급자 직접 요청 금지) 가 §2-1 · §6 과 충돌 | **판정 대기**. 책임 매트릭스 §3 · 원천/실행 자산 §4 · AI 기준 §5 는 참고 가능하나 근거로 승격하지 않는다 |
-| [`PLATFORM-CONTENT-POLICY-V1`](PLATFORM-CONTENT-POLICY-V1.md) (F4) | 3축 모델(Producer / Visibility / ServiceScope)은 유지. `producer='supplier'` 를 "legacy 예외" 로 둔 §3.1 · §6.3 · §10-5 가 §2-1 과 충돌 | FROZEN 유지, 해당 절 UPDATE_REQUIRED (Supplier / Store Hub 단계) |
-| [`O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1`](O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) | §6 첫 항목(공급자 HUB 직접 제작·게시 금지)이 §2-1 과 충돌 | ACTIVE 유지, §6 UPDATE_REQUIRED |
+| [`O4O-3-ROLE-FLOW-BASELINE-V1`](O4O-3-ROLE-FLOW-BASELINE-V1.md) | §2 Canonical Flow(공급자 → 운영자 → 매장 단선) · §6 첫 항목(공급자 HUB 직접 게시 금지) · §3 공급자 직접 제작 ❌ 가 §2-1 · §6 과 충돌 | **판정 확정 (2026-09-16, Content Boundary Alignment)** — 충돌 절 SUPERSEDED (헤더 표기, 본문 보존). §4 · §5 는 참고 가능하나 근거로 승격하지 않는다 |
+| [`PLATFORM-CONTENT-POLICY-V1`](PLATFORM-CONTENT-POLICY-V1.md) (F4) | 3축 모델(Producer / Visibility / ServiceScope)은 유지. `producer='supplier'` 를 "legacy 예외" 로 둔 §3.1 · §6.3 · §10-5 가 §2-1 과 충돌 | FROZEN 유지. **§3.1 · §3.2 · §6.3 · §10-5 정정 완료 (2026-09-16, Content Boundary Alignment)** — supplier = Canonical. Hub 축 축소는 Store Hub 단계 |
+| [`O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1`](O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) | §6 첫 항목(공급자 HUB 직접 제작·게시 금지)이 §2-1 과 충돌 | ACTIVE 유지. **§6 첫 항목 삭제 완료 (2026-09-16, Content Boundary Alignment)** |
 | [`O4O-STORE-MENU-CANONICAL-TREE-V1`](O4O-STORE-MENU-CANONICAL-TREE-V1.md) | §1.3(Neture 제외) · §5.1(출처 4종)이 §1 · §6 과 부분 충돌. 6 항목 축 · 사본화 원칙은 유지 | ACTIVE 유지, 해당 절 UPDATE_REQUIRED (Store 단계) |
 | [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](../archive/obsolete/partner/NETURE-PARTNER-CONTRACT-FREEZE-V1.md) (구 F7) | §7 은퇴 대상 | **SUPERSEDED (2026-09-15) · ARCHIVED (2026-09-16)** — runtime · 물리 스키마 · dependency 정리 모두 완료 |
 | [`NETURE-DISTRIBUTION-ENGINE-FREEZE-V1`](NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md) (F8) | 공급자 제품 → 조직 진열 흐름. Partner 무관. §2-1 의 Supplier → Store Hub 제품 축 근거 | KEEP |
@@ -219,7 +219,7 @@ latest main sync
 0. Baseline + Preflight      ← 이 문서 · IR (완료)
 1. Legacy Partner Retirement ← A. runtime 은퇴(2026-09-15) · B. physical cleanup(2026-09-16) 완료 · CLOSED
 2. Service Tenant Foundation ← Service Identity · Store↔Service · Operator↔Service · Workspace metadata 읽기 계약 (2026-09-16 완료, UI 없음)
-3. Content Boundary Alignment
+3. Content Boundary Alignment ← 논리 도메인 4종 · canonical producer(adapter 정규화) · KPA producer drift FIX · F4/게시 표준/3자 흐름 문서 정합 (2026-09-16 완료, 물리 schema 변경 없음)
 4. Supplier Workspace
 5. Store Workspace (Home · My Store · Store Hub · My Services)
 6. Service Operator Workspace

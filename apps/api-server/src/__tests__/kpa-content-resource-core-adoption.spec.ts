@@ -254,7 +254,7 @@ describe('KPA 필드 매핑 보존', () => {
     const item = res.body.data.items[0];
     expect(item).toEqual(
       expect.objectContaining({
-        producer: 'service_admin',
+        producer: 'community',
         visibility: 'service',
         serviceKey: 'kpa-society',
         contentType: 'document',

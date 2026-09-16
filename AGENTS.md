@@ -17,7 +17,7 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 충돌 시 우선순위:
 
 1. 현재 사용자의 명시적 작업 지시
-2. 사업·정책 canonical docs — 역할별 업무공간 Architecture([O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](docs/baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)), 사업 철학, commerce 경계, B2B 계약 (3자 흐름 문서는 판정 대기 — 충돌 절은 Architecture 우선)
+2. 사업·정책 canonical docs — 역할별 업무공간 Architecture([O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](docs/baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md)), 사업 철학, commerce 경계, B2B 계약 (3자 흐름 문서의 충돌 절은 2026-09-16 판정 확정으로 SUPERSEDED — Architecture 가 대체)
 3. 구조 계약 — Frozen / Boundary / Core / Shared Module Protocol
 4. 도메인·서비스 canonical docs
 5. 과거 WO / CHECK / IR / archive — 당시 실행 기록이며 현재 정책을 이기지 않는다

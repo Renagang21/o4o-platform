@@ -29,12 +29,17 @@ import ContentFormModal from './ContentFormModal';
 import { cmsServiceOptionsWithAll } from '../cmsServiceCatalog';
 
 // ContentMeta display labels (WO-CONTENT-META-UI-INTEGRATION-V1)
+// WO-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1: canonical producer 값 (@o4o/types CONTENT_PRODUCER_LABELS 와 동일).
+//   구 값(platform_admin / service_admin / store_operator)은 TEMP_COMPAT — Store Hub 단계에서 제거.
 const PRODUCER_LABELS: Record<string, string> = {
-  platform_admin: '플랫폼 운영',
-  service_admin: '서비스 운영',
+  platform: '플랫폼 운영',
+  service_operator: '서비스 운영자',
   supplier: '공급자',
-  store_operator: '매장 운영자',
   community: '커뮤니티',
+  store: '매장',
+  platform_admin: '플랫폼 운영',
+  service_admin: '서비스 운영자',
+  store_operator: '매장',
 };
 
 const VISIBILITY_LABELS: Record<string, string> = {

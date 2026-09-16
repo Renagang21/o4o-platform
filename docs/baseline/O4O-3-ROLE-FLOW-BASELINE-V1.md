@@ -1,8 +1,8 @@
 # O4O-3-ROLE-FLOW-BASELINE-V1
 
-> **[2026-09-15 · 판정 대기 표기]** 본 문서 §2(공급자 → 운영자 → 매장 단선 흐름) · §6(공급자의 HUB 직접 게시 금지 · 매장→공급자 직접 요청 금지)은
-> [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 · §6 과 **충돌**한다. 충돌 절은 Architecture 가 우선하며 근거로 승격하지 않는다.
-> §3 · §4 · §5 는 참고 가능. 본문은 수정하지 않았다 — 판정은 Supplier / Store Hub 리팩터링 단계 WO. 근거: [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md) §C.
+> **[2026-09-16 · 판정 확정]** 본 문서 §2(공급자 → 운영자 → 매장 단선 흐름) · §6 첫 항목(공급자의 HUB 직접 게시 금지) · §3 의 "공급자 O4O 내부 콘텐츠 직접 제작 ❌" 는
+> [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 · §6 으로 **SUPERSEDED** 다 (`Supplier → Store Hub` · `Supplier → Service Operator` 가 공식 온라인 제공 경로). §6 의 "매장→공급자 직접 요청 금지" 는 Architecture §2-2(Supplier → 특정 Store 직접 ✕)와 같은 취지로 유지된다.
+> §4(원천 자료 vs 실행 자산) · §5(AI 개입 기준) 는 참고 가능하며 근거로 승격하지 않는다. 본문은 기록 보존을 위해 수정하지 않았다. 판정 근거: `WO-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1` §15 · [`CHECK-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1`](../checks/CHECK-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1.md) §8 · 선행 표기 2026-09-15 [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md) §C.
 
 > 이 문서는 O4O 3자 Canonical Flow의 기준 문서이다.
 > 세부 구현 지시는 개별 WO 및 하위 기준 문서를 따른다.

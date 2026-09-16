@@ -16,6 +16,7 @@
  *    Core 로 일반화하거나 삭제하지 않는다 — 여기 훅에서만 표현한다.
  */
 
+import { mapKpaContentProducer } from '@o4o/types';
 import type {
   AuditHook,
   ContentResourceConfig,
@@ -74,11 +75,16 @@ export function resolveKpaListVisibility(ctx: ListStatusContext): ListVisibility
 /**
  * KPA 목록 행 후처리 — ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1).
  * `mapCmsStatus` 는 KPA 라우터가 갖고 있어 주입받는다.
+ *
+ * WO-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1: producer 는 `community` 다.
+ *   kpa_contents 는 회원 작성 원장(`POST /contents` = authenticate 만, 작성자 role 미저장)이며
+ *   운영자도 같은 경로로 쓴다. `created_by` 로 role 을 추정하지 않고 원장 계약으로 판정한다.
+ *   (종전 `service_admin` 고정은 Service Operator 와 Community 를 같은 producer 로 섞은 drift.)
  */
 export function createKpaListRowMapper(mapCmsStatus: (s: string) => unknown) {
   return (row: any) => ({
     ...row,
-    producer: 'service_admin' as const,
+    producer: mapKpaContentProducer(),
     producerRef: row.created_by ?? '',
     visibility: 'service' as const,
     serviceKey: 'kpa-society' as const,

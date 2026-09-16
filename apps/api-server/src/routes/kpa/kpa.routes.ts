@@ -149,7 +149,7 @@ import { asyncHandler } from '../../middleware/error-handler.js';
 import { uploadSingleMiddleware } from '../../middleware/upload.middleware.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: legacy role utils removed
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
-import { mapCmsStatus, mapCmsAuthorRole, mapCmsVisibilityScope } from '@o4o/types';
+import { mapCmsStatus, mapCmsAuthorRole, mapCmsVisibilityScope, mapKpaContentProducer } from '@o4o/types';
 // WO-O4O-COMMUNITY-CONTENT-RESOURCE-KPA-CORE-ADOPTION-CLOSURE-V1
 import { createContentResourceCore } from '../common/content-resource/content-resource-core.js';
 import { createKpaContentResourceConfig } from './controllers/kpa-content-resource.config.js';
@@ -1742,7 +1742,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           ...content,
           isRecommendedByMe,
           // ContentMeta (WO-CONTENT-META-API-ENRICHMENT-V1)
-          producer: 'service_admin' as const,
+          // WO-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1: kpa_contents = 회원 작성 원장 → 'community'
+          producer: mapKpaContentProducer(),
           producerRef: content.created_by ?? '',
           visibility: 'service' as const,
           serviceKey: 'kpa-society' as const,

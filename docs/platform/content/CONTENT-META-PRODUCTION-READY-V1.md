@@ -6,8 +6,13 @@
 |------|------|
 | 문서명 | CONTENT-META-PRODUCTION-READY-V1 |
 | 작성일 | 2026-04-21 |
-| 상태 | **Production Ready** |
+| 상태 | **Production Ready** (2026-09-16 `WO-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1` 로 canonical producer · 논리 도메인 정렬) |
 | 타입 정의 | `packages/types/src/content-meta.ts` |
+
+> **2026-09-16 정렬 요약** — ContentMeta 는 "공통 메타 언어"로만 유지한다(콘텐츠 시스템·전송 엔진 아님).
+> `ContentProducer` 는 `platform | service_operator | supplier | community | store` 로 정렬(구 `platform_admin / service_admin / store_operator` 는 `normalizeContentProducer()` 로 TEMP_COMPAT 정규화, Store Hub 단계에서 제거).
+> 논리 도메인 `ContentDomain = community | service | supplier | store` 를 producer · visibility 와 분리해 추가. `ContentServiceKey` 는 복제 union 대신 문자열 계약(정본 = `service-catalog.ts`).
+> KPA `kpa_contents` 의 producer 는 회원 작성 원장 계약에 따라 **`community`** 다 (종전 `service_admin` 고정은 drift). 공급자 원장 명칭은 `neture_supplier_library_items` (구 `neture_supplier_contents` 표기는 HISTORICAL_ONLY). 상세: [`CHECK-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1`](../../checks/CHECK-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1.md).
 
 ---
 
@@ -51,11 +56,12 @@ O4O Platform의 콘텐츠는 서비스별로 독립된 테이블에 분산 저�
 
 | 타입 | 값 |
 |------|------|
-| `ContentProducer` | `platform_admin` \| `service_admin` \| `supplier` \| `store_operator` \| `community` |
+| `ContentProducer` | `platform` \| `service_operator` \| `supplier` \| `community` \| `store` (2026-09-16 정렬. 구 값 `platform_admin` \| `service_admin` \| `store_operator` 는 `normalizeContentProducer()` TEMP_COMPAT) |
+| `ContentDomain` | `community` \| `service` \| `supplier` \| `store` — 논리 콘텐츠 도메인 (2026-09-16 추가, producer 와 1:1 아님) |
 | `ContentVisibility` | `platform` \| `service` \| `store` \| `personal` |
 | `ContentType` | `cms_block` \| `document` \| `media` \| `guide` \| `banner` \| `working_copy` \| `execution_asset` |
 | `ContentStatus` | `draft` \| `ready` \| `published` \| `archived` |
-| `ContentServiceKey` | `neture` \| `glycopharm` \| `glucoseview` \| `kpa-society` \| `k-cosmetics` |
+| `ContentServiceKey` | `string` — canonical 목록은 `apps/api-server/src/config/service-catalog.ts` (2026-09-16: 복제 union 폐기, 실원장에 `pharmacy-hub` 등 union 밖 키 존재) |
 
 **매핑 함수** 5개를 함께 제공:
 
@@ -81,7 +87,7 @@ mapExecutionAssetStatus() — Store isActive → ContentStatus
 |--------|-----------|----------|
 | Neture Library | `GET /api/v1/neture/library/public`, `GET /api/v1/neture/library` | `isPublic` → `visibility`, 고정 `producer='supplier'` |
 | CMS | `GET /api/v1/cms-content` (list/detail) | `authorRole` → `producer`, `visibilityScope` → `visibility` |
-| KPA | `GET /api/v1/kpa/news` | 고정 `producer='service_admin'`, `visibility='service'` |
+| KPA | `GET /api/v1/kpa/contents` (list/detail) | 고정 `producer='community'` (`mapKpaContentProducer()`), `visibility='service'` — 2026-09-16 정정: kpa_contents 는 회원 작성 원장 |
 
 **결과**: 프론트엔드는 서비스 무관하게 `item.producer`, `item.visibility`, `item.contentType`, `item.metaStatus` 접근 가능.
 
@@ -188,10 +194,10 @@ interface ContentMeta {
 
 | 필드 | 의미 | 설명 |
 |------|------|------|
-| `producer` | **누가 만들었는가** | 플랫폼 관리자, 서비스 관리자, 공급자, 매장 운영자, 커뮤니티 |
+| `producer` | **누가 만들었는가** | `platform`(플랫폼 관리자) · `service_operator`(서비스 운영자) · `supplier`(공급자) · `community`(회원) · `store`(매장). "어느 공간의 콘텐츠인가" 는 `ContentDomain`, "누가 보는가" 는 `visibility` 로 분리 |
 | `producerRef` | **생산자 식별자** | `created_by` (CMS), `supplier_id` (Neture), `owner_id` (Working) |
 | `visibility` | **누가 볼 수 있는가** | `platform`=전체, `service`=서비스 내, `store`=매장 내, `personal`=본인만 |
-| `serviceKey` | **어떤 서비스 소속인가** | `visibility='service'`일 때 필수. `neture`, `kpa-society` 등 |
+| `serviceKey` | **어떤 서비스 소속인가** | `visibility='service'`일 때 필수. 값 정본은 `service-catalog.ts`. `visibility='service'` 가 Service Content 도메인을 뜻하지는 않는다 |
 | `organizationId` | **어떤 조직 소속인가** | `visibility='store'`일 때 필수. 매장/조직 격리 |
 | `contentType` | **콘텐츠 유형** | `cms_block`, `document`, `media`, `guide`, `banner`, `working_copy`, `execution_asset` |
 | `status` | **콘텐츠 상태** | `draft`→`ready`→`published`→`archived` |

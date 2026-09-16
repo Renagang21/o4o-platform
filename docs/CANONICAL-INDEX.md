@@ -40,7 +40,7 @@
 | F1 | [BASELINE-OPERATOR-OS-V1](baseline/BASELINE-OPERATOR-OS-V1.md) | Operator OS 기술 baseline — security / hub / ai / action-log / asset-copy / operator-ux / admin-ux core | FROZEN |
 | F2 | [KPA-UX-BASELINE-V1](baseline/KPA-UX-BASELINE-V1.md) | KPA 3개 서비스 영역 5-Block / 4-Block 통합 UX | FROZEN |
 | F3 | [STORE-LAYER-ARCHITECTURE](architecture/STORE-LAYER-ARCHITECTURE.md) | Store Layer 의존 방향 (store-ui-core · store-asset-policy-core · store-core · asset-copy-core · hub-core) | FROZEN |
-| F4 | [PLATFORM-CONTENT-POLICY-V1](baseline/PLATFORM-CONTENT-POLICY-V1.md) | HUB 3축 모델 (Producer / Visibility / ServiceScope). §3.1 · §6.3 · §10-5 의 "`producer='supplier'` = legacy 예외" 는 ROLE-WORKSPACE-ARCHITECTURE §2-1 과 충돌 → UPDATE_REQUIRED (후속 WO, 3축 모델은 유지) | FROZEN |
+| F4 | [PLATFORM-CONTENT-POLICY-V1](baseline/PLATFORM-CONTENT-POLICY-V1.md) | HUB 3축 모델 (Producer / Visibility / ServiceScope). §3.1 · §3.2 · §6.3 · §10-5 는 2026-09-16 `WO-O4O-CONTENT-BOUNDARY-ALIGNMENT-V1` 로 정정 — `producer='supplier'` = Canonical (Supplier → Store Hub). HubProducer 는 Store Hub 노출 축, 논리 도메인은 `@o4o/types` `ContentDomain` | FROZEN |
 | F5 | [CONTENT-STABLE-DECLARATION-V1](baseline/CONTENT-STABLE-DECLARATION-V1.md) | HUB 콘텐츠 타입 · 매핑 · 병합 로직 · API 계약 | FROZEN |
 | F6 | [O4O-BOUNDARY-POLICY-V1](architecture/O4O-BOUNDARY-POLICY-V1.md) | Domain Boundary Matrix + Guard Rules 5개 | FROZEN |
 | F7 | ~~NETURE-PARTNER-CONTRACT-FREEZE-V1~~ | **은퇴 — SUPERSEDED (2026-09-15)**. Legacy Partner runtime 전면 은퇴 (`WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1`). 대체: [ROLE-WORKSPACE-ARCHITECTURE](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7. 물리 스키마·dead package 까지 `WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1`(2026-09-16) 로 정리 완료. 원문은 [archive/obsolete](archive/obsolete/partner/NETURE-PARTNER-CONTRACT-FREEZE-V1.md) 에 보존(현행 계약 아님). F7 번호는 재사용하지 않는다 | — |
@@ -65,7 +65,7 @@
 | [OPERATOR-DASHBOARD-STANDARD-V1](platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md) | 5-Block 대시보드 · A~F 6 Workspace 진입 허브 · Sidebar 순서 · KPI 분류 | ACTIVE |
 | [O4O-OPERATOR-CANONICAL-WORKFLOW-V1](architecture/O4O-OPERATOR-CANONICAL-WORKFLOW-V1.md) | 검수·승인 UX | ACTIVE |
 | [O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1](baseline/O4O-OPERATOR-NON-APPROVAL-UX-BASELINE-V1.md) | 검수 외 5 Workspace UX (자료 등록 / AI 작업 / 큐레이션 / 매장 지원 / 운영 수익) | ACTIVE |
-| [O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1](baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) | 매장 HUB 콘텐츠 게시 표준 (RichTextEditor 기반 항목별 게시 · Source Ingestion 보류). §6 첫 항목(공급자 HUB 직접 게시 금지)은 ROLE-WORKSPACE-ARCHITECTURE §2-1 과 충돌 → UPDATE_REQUIRED | ACTIVE |
+| [O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1](baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) | 매장 HUB 콘텐츠 게시 표준 (RichTextEditor 기반 항목별 게시 · Source Ingestion 보류). §6 첫 항목(공급자 HUB 직접 게시 금지)은 2026-09-16 삭제 — 공급자 유입은 ROLE-WORKSPACE-ARCHITECTURE §2-1 | ACTIVE |
 | [O4O-STORE-MENU-CANONICAL-TREE-V1](baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md) | 매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 (6 항목). §1.3(Neture 제외) · §5.1(출처 4종)은 ROLE-WORKSPACE-ARCHITECTURE §1 · §6 과 부분 충돌 → UPDATE_REQUIRED (Store 단계) | ACTIVE |
 | [OPERATOR-DATATABLE-POLICY-V1](architecture/OPERATOR-DATATABLE-POLICY-V1.md) | Operator DataTable 정책 | ACTIVE |
 | [O4O-OPERATOR-TABLE-CANONICAL-V1](architecture/O4O-OPERATOR-TABLE-CANONICAL-V1.md) | Operator Table canonical | ACTIVE |
@@ -146,7 +146,7 @@
 
 | 문서 | 상황 | 상태 |
 |---|---|---|
-| [O4O-3-ROLE-FLOW-BASELINE-V1](baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | 3자 Canonical Flow (책임 매트릭스 · 원천 자료 vs 실행 자산 · AI 개입 지점). **§2 단선 흐름 · §6 Drift 금지(공급자 HUB 직접 게시 금지 · 매장→공급자 직접 요청 금지) 가 [ROLE-WORKSPACE-ARCHITECTURE](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 · §6 과 충돌** (2026-09-15 헤더 표기). 충돌 절을 근거로 승격하지 않는다. 판정은 Supplier / Store Hub 리팩터링 단계 WO | 판정 대기 |
+| [O4O-3-ROLE-FLOW-BASELINE-V1](baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | 3자 Canonical Flow (책임 매트릭스 · 원천 자료 vs 실행 자산 · AI 개입 지점). **§2 단선 흐름 · §6 첫 항목(공급자 HUB 직접 게시 금지) · §3 공급자 직접 제작 ❌ 는 2026-09-16 판정 확정 → [ROLE-WORKSPACE-ARCHITECTURE](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 · §6 으로 SUPERSEDED** (헤더 표기, 본문 보존). §4 · §5 는 참고만, 근거로 승격하지 않는다 | 부분 SUPERSEDED (판정 확정) |
 | [O4O-RETAIL-STABLE-V1](platform/architecture/O4O-RETAIL-STABLE-V1.md) | `channel_type='B2C'` storefront closed loop 을 기술 — [COMMERCE-BOUNDARY](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) §2 · §12 와 충돌 후보. 결제 leg 은 이미 `410` 으로 차단. 동 문서 §8 판정 전까지 `UNKNOWN` — **기능 복구·확장 금지** (문서 헤더 2026-08-25 표기 참조) | 판정 대기 |
 | [E-COMMERCE-ORDER-CONTRACT](baseline/E-COMMERCE-ORDER-CONTRACT.md) | 기술 계약. **유효한 부분**: 주문 생성은 `checkoutService.createOrder()` 단일 지점 · `*_orders` / `*_payments` 독립 테이블 금지. **stale 부분**: §3 · §5 · §7.2 의 `OrderType` 열거(GLYCOPHARM 서비스 삭제 2026-09-08 · DROPSHIPPING 제거 · 엔티티가 `order_type` 컬럼을 매핑하지 않음). 현행 살아있는 주문 축의 정본은 [B2B 계약](baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 본문 정리는 후속 docs 정비 | 판정 대기 |
 | [GLYCOPHARM-LEGACY-POSTMORTEM](baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md) | GlycoPharm 서비스 제거 경위 — legacy 판정 기록 | ACTIVE |
