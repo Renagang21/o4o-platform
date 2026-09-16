@@ -198,13 +198,13 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   //   Legacy Partner 도메인(/partner/* 대시보드·상품풀·링크·정산 · /admin/partners* · /admin/partner-settlements*
   //   · /operator/partners* · /partnership/requests*) 은 runtime 에서 은퇴했다.
   //   판매자 모집(Seller Recruitment) 은 Partner 가 아니므로 분리해 유지한다.
-  //   canonical: /seller-recruitment/* — /partner/* 는 배포 창 동안의 은퇴 예정 alias (physical cleanup 에서 제거).
+  //   canonical: /seller-recruitment/* (배포 창 alias /partner/* 는
+  //   WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 Phase 2 에서 제거 — alias 트래픽 0 확인).
   const sellerRecruitmentRouter = createSellerRecruitmentController({
     sellerRecruitmentService: new SellerRecruitmentService(),
     requireActiveSupplier: createRequireActiveSupplier(dataSource),
   });
   router.use('/seller-recruitment', sellerRecruitmentRouter);
-  router.use('/partner', sellerRecruitmentRouter);
 
   // Seller domain
   router.use('/seller', createSellerController(dataSource));

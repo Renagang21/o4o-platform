@@ -1,6 +1,6 @@
 # SELLER-PARTNER-CONTRACT-ARCHITECTURE-V1
 
-> **상태**: SUPERSEDED · **대체 문서**: [`docs/baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7 · **표기일**: 2026-09-15
+> **상태**: SUPERSEDED · **대체 문서**: [`docs/baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md`](../../../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7 · **표기일**: 2026-09-15 · **archive 이동**: 2026-09-16 (`WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1` — 물리 스키마·dependency 정리 완료, OBSOLETE)
 > (Legacy Partner 계약 runtime 은퇴 — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1. 본문은 설계 기록으로 보존.)
 
 > **Seller↔Partner 계약 독립화 아키텍처 설계**

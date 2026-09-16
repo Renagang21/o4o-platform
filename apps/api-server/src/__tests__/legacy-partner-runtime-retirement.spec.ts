@@ -10,7 +10,7 @@
  *   2) `/api/partner` · `/api/v1/partner` mount 가 없다 (register-routes)
  *   3) Legacy Partner 엔티티가 DataSource 에 등록되지 않는다
  *   4) `neture:partner` scope 가 security-core 에 없다
- *   5) 판매자 모집(Seller Recruitment)은 **보존**된다 — canonical mount `/seller-recruitment` + 배포 창 alias `/partner`
+ *   5) 판매자 모집(Seller Recruitment)은 **보존**된다 — canonical mount `/seller-recruitment` 만 (alias `/partner` 는 physical cleanup 에서 제거)
  *   6) 판매자 모집 승인은 Legacy Partner 계약·role·대시보드를 만들지 않는다
  *   7) Foreign Visitor Partner(Store Ops) 는 무변경 보존
  *
@@ -116,11 +116,11 @@ describe('Seller Recruitment (판매자 모집) — Partner 가 아니므로 보
     expect(ent).toMatch(/\bSellerRecruitmentApplication\b/);
   });
 
-  it('canonical mount /seller-recruitment 와 배포 창 alias /partner 가 같은 라우터를 쓴다', () => {
+  it('canonical mount /seller-recruitment 만 있고 alias /partner mount 는 없다', () => {
     // 양성 매칭이므로 주석 제거 없이 원문을 본다 (주석 안의 `/*` 경로 표기가 stripper 를 오작동시킨다)
     const c = read('apps/api-server/src/modules/neture/neture.routes.ts');
     expect(c).toMatch(/router\.use\(\s*'\/seller-recruitment',\s*sellerRecruitmentRouter\s*\)/);
-    expect(c).toMatch(/router\.use\(\s*'\/partner',\s*sellerRecruitmentRouter\s*\)/);
+    expect(c).not.toMatch(/router\.use\(\s*'\/partner'/);
   });
 
   it('SellerRecruitmentService 는 Legacy Partner 계약·role·대시보드·neture_partners 를 만들지 않는다', () => {

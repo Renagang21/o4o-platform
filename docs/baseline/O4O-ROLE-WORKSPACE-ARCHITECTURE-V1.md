@@ -156,7 +156,7 @@ FUTURE PARTNER  = GREENFIELD
 ```
 
 - **이름 충돌 주의** — `foreign_visitor_partners`(매장 소유 외국인 방문객 유입 파트너, Store Ops) · HFF 데이터의 "partner 성분" · `neture_partner_recruitments`(공급자의 **판매자(매장) 모집** 공고) 등은 이름에 partner 가 있어도 제휴마케팅 Partner 가 아니다. 분류는 IR §B 의 `KEEP_SHARED_NOT_PARTNER` 를 따르며, 은퇴 WO 는 이름만으로 삭제하지 않는다.
-- [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](NETURE-PARTNER-CONTRACT-FREEZE-V1.md)(구 F7) 은 2026-09-15 `WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1` 로 runtime 은퇴가 완료되어 **SUPERSEDED** 로 표기됐다(원문은 기록 보존). 물리 테이블·dead package 제거는 후속 physical cleanup WO.
+- [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](../archive/obsolete/partner/NETURE-PARTNER-CONTRACT-FREEZE-V1.md)(구 F7) 은 2026-09-15 `WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1` 로 runtime 은퇴가 완료되어 **SUPERSEDED** 로 표기됐고, 2026-09-16 `WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1` 로 물리 테이블·enum·컬럼·dead package(`@o4o/partner-core` · `@o4o/financial-core`)·비활성 partner role row 까지 제거되어 `docs/archive/obsolete/partner/` 로 이동했다. Seller Recruitment 물리 명칭은 `seller_recruitments` · `seller_recruitment_applications`(`applicant_id` · `applicant_name`) 로 정리됐다.
 - **판매자 모집(Seller Recruitment)** 은 Partner 가 아니다 — `SellerRecruitment` / `SellerRecruitmentApplication` 도메인으로 분리 보존됐다(물리 테이블명 `neture_partner_*` 는 엔티티 seam 으로 격리, rename 은 physical cleanup).
 
 ---
@@ -170,7 +170,7 @@ FUTURE PARTNER  = GREENFIELD
 | [`PLATFORM-CONTENT-POLICY-V1`](PLATFORM-CONTENT-POLICY-V1.md) (F4) | 3축 모델(Producer / Visibility / ServiceScope)은 유지. `producer='supplier'` 를 "legacy 예외" 로 둔 §3.1 · §6.3 · §10-5 가 §2-1 과 충돌 | FROZEN 유지, 해당 절 UPDATE_REQUIRED (Supplier / Store Hub 단계) |
 | [`O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1`](O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md) | §6 첫 항목(공급자 HUB 직접 제작·게시 금지)이 §2-1 과 충돌 | ACTIVE 유지, §6 UPDATE_REQUIRED |
 | [`O4O-STORE-MENU-CANONICAL-TREE-V1`](O4O-STORE-MENU-CANONICAL-TREE-V1.md) | §1.3(Neture 제외) · §5.1(출처 4종)이 §1 · §6 과 부분 충돌. 6 항목 축 · 사본화 원칙은 유지 | ACTIVE 유지, 해당 절 UPDATE_REQUIRED (Store 단계) |
-| [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](NETURE-PARTNER-CONTRACT-FREEZE-V1.md) (구 F7) | §7 은퇴 대상 | **SUPERSEDED (2026-09-15)** — runtime 은퇴 완료, 물리 정리는 후속 WO |
+| [`NETURE-PARTNER-CONTRACT-FREEZE-V1`](../archive/obsolete/partner/NETURE-PARTNER-CONTRACT-FREEZE-V1.md) (구 F7) | §7 은퇴 대상 | **SUPERSEDED (2026-09-15) · ARCHIVED (2026-09-16)** — runtime · 물리 스키마 · dependency 정리 모두 완료 |
 | [`NETURE-DISTRIBUTION-ENGINE-FREEZE-V1`](NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md) (F8) | 공급자 제품 → 조직 진열 흐름. Partner 무관. §2-1 의 Supplier → Store Hub 제품 축 근거 | KEEP |
 | [`O4O-STORE-COMMERCE-BOUNDARY-V1`](O4O-STORE-COMMERCE-BOUNDARY-V1.md) · [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) | commerce 경계 · B2B 주문 계약. 이 문서는 commerce 를 바꾸지 않는다 | KEEP (Supplier › Orders · Business Operation › Products 의 주문 축 근거) |
 | [`O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1`](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) | "공통 매장경영 구조 − operator capability" 모델은 이 문서의 Store / My Services 와 정합 | KEEP |

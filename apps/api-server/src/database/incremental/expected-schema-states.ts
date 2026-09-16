@@ -54,6 +54,14 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'd145d68a68ceeb41a46a913ee08fdc1075fc25e44687a774af6e7d317999b33c',
     fingerprintLineCount: 5713,
   },
+  // WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 (Phase 2 · contract) — computed in
+  // an isolated PostgreSQL 15.17 (bootstrap + migrations 1..3) on 2026-09-16. TEMP_COMPAT views 2 dropped ·
+  // market_trial_decisions."selectedSellerIds" dropped. Legacy Partner physical schema = 0.
+  {
+    appliedThrough: 'DropSellerRecruitmentCompatViewsAndSelectedSellerIds1789525702200',
+    fingerprint: 'd0a8d491e188be39df38fa50b708eea6617a6f38e188d781f7c4c2455e0d8535',
+    fingerprintLineCount: 5708,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
