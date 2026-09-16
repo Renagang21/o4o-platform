@@ -342,7 +342,8 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // ============================================================================
   const homeRouter = Router();
 
-  const forumService = new ForumQueryService(dataSource, { scope: 'community' });
+  // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 화장품 커뮤니티(cosmetics) 경계
+  const forumService = new ForumQueryService(dataSource, { scope: 'community', communityKey: 'cosmetics' });
   const signageService = new SignageQueryService(dataSource, {
     serviceKey: 'k-cosmetics',
     sources: ['hq', 'store'],
@@ -482,8 +483,10 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // ===========================================================================
   router.use(
     '/forum',
+    // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 화장품 커뮤니티(communityKey='cosmetics')
+    //   쓰기 자격 = k-cosmetics active membership (requireCommunityAccess · catalog policy).
     createServiceForumRouter({
-      context: { serviceCode: 'cosmetics', scope: 'community' },
+      context: { serviceCode: 'cosmetics', communityKey: 'cosmetics', scope: 'community' },
     }),
   );
 

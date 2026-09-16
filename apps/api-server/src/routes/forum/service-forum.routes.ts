@@ -10,6 +10,8 @@ import {
   type ForumContext,
 } from '../../middleware/forum-context.middleware.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
+import { resolveCommunityAccess } from '../../utils/community-access.resolver.js';
+import { communityKeyForServiceEntry } from '../../config/community-catalog.js';
 
 /**
  * Service-scoped Forum Routes
@@ -73,18 +75,59 @@ export function requireActiveServiceMembership(rolePrefix: string): RequestHandl
   };
 }
 
+/**
+ * WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1
+ *
+ * Community 참여 자격 write gate. 판정은 `resolveCommunityAccess`(community catalog 의 participation
+ * policy) 한 곳이며 서비스별 분기가 없다:
+ *   pharmacy     = kpa-society OR pharmacy-hub active membership
+ *   cosmetics    = k-cosmetics active membership
+ *   o4o-general  = authenticated O4O user (Neture membership 불요)
+ * 참여 자격만 판정한다 — 운영자 권한 · closed forum 멤버십 · 공개 read 는 기존 계약 그대로.
+ */
+export function requireCommunityAccess(communityKey: string): RequestHandler {
+  return (req, res, next) => {
+    const user = (req as any).user;
+    const access = resolveCommunityAccess(user, communityKey);
+    if (access.allowed) {
+      next();
+      return;
+    }
+    if (access.reason === 'AUTH_REQUIRED') {
+      res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
+      return;
+    }
+    res.status(403).json({
+      success: false,
+      error: `Participation in community '${communityKey}' requires eligible service membership.`,
+      code: 'COMMUNITY_ACCESS_DENIED',
+      reason: access.reason,
+    });
+  };
+}
+
 export interface ServiceForumRouterOptions {
-  /** forumContextMiddleware 에 주입할 컨텍스트 (serviceCode 는 RBAC prefix) */
+  /**
+   * forumContextMiddleware 에 주입할 컨텍스트 (serviceCode 는 RBAC prefix).
+   * `communityKey` 가 있으면 읽기·쓰기 경계는 Community 원장 코드 집합(catalog)이며,
+   * 없으면 serviceCode 에서 catalog `entries` 로 Community 를 찾아 자동 주입한다
+   * (`communityKeyForServiceEntry`). Community 가 아닌 서비스 mount 는 종전 serviceCode 경계 그대로.
+   */
   context: ForumContext;
   /**
    * 쓰기(작성/수정/삭제/댓글/좋아요) 경로에 추가로 적용할 guard.
-   * 기존 서비스의 쓰기 권한은 변경하지 않는다 — 신규 서비스에서만 사용한다.
+   * Community 컨텍스트에서는 `requireCommunityAccess(communityKey)` 가 항상 먼저 적용되고, 여기 guard 는 그 뒤에 온다.
    */
   writeGuards?: RequestHandler[];
 }
 
 export function createServiceForumRouter(options: ServiceForumRouterOptions): Router {
-  const { context, writeGuards = [] } = options;
+  const { writeGuards = [] } = options;
+  // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: Community 컨텍스트 해석 (catalog 한 곳)
+  const communityKey =
+    options.context.communityKey ?? communityKeyForServiceEntry(resolveCanonicalServiceKey(options.context.serviceCode ?? ''));
+  const context: ForumContext = communityKey ? { ...options.context, communityKey } : options.context;
+  const communityGuards: RequestHandler[] = communityKey ? [requireCommunityAccess(communityKey)] : [];
 
   const router: Router = Router();
   const postController = new ForumPostController();
@@ -97,7 +140,7 @@ export function createServiceForumRouter(options: ServiceForumRouterOptions): Ro
   router.use(optionalAuth as any);
   router.use(forumContextMiddleware(context));
 
-  const write: RequestHandler[] = [authenticate as any, ...writeGuards];
+  const write: RequestHandler[] = [authenticate as any, ...communityGuards, ...writeGuards];
 
   // Health / Stats
   router.get('/health', moderationController.health.bind(moderationController));

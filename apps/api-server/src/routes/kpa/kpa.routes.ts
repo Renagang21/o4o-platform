@@ -162,6 +162,8 @@ import { kpaActionConfig } from './action-definitions.js';
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
 import { forumContextMiddleware } from '../../middleware/forum-context.middleware.js';
+// WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 약사 커뮤니티 참여 자격 gate (공통)
+import { requireCommunityAccess } from '../forum/service-forum.routes.js';
 // WO-O4O-LMS-PUBLIC-COURSE-LIST-SERVICE-SCOPE-V1
 import { lmsContextMiddleware } from '../../modules/lms/utils/lms-service-scope.js';
 
@@ -224,8 +226,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   });
 
   // APP-FORUM Phase 1: shared forum query service
+  // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: KPA 홈·포럼 허브 = 약사 커뮤니티(pharmacy)
   const forumService = new ForumQueryService(dataSource, {
     scope: 'community',
+    communityKey: 'pharmacy',
   });
 
   // ============================================================================
@@ -674,10 +678,16 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // WO-FORUM-SCOPE-SEPARATION-V1: community scope — organizationId 미설정
   // 커뮤니티 포럼은 organizationId IS NULL인 글만 조회/생성
+  // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1:
+  //   이 mount 는 약사 커뮤니티(communityKey='pharmacy')의 진입 surface — Pharmacy-Hub `/pharmacy-hub/forum` 과
+  //   같은 Community(원장 코드 kpa-society + pharmacy-hub). 쓰기 자격 = kpa-society OR pharmacy-hub active
+  //   membership. 구조 변경(categories)·중재(moderation)는 kpa 운영 governance 그대로.
   forumRouter.use(forumContextMiddleware({
     serviceCode: 'kpa',
+    communityKey: 'pharmacy',
     scope: 'community',
   }));
+  const pharmacyWrite = requireCommunityAccess('pharmacy');
 
   // Health check
   forumRouter.get('/health', forumController.health.bind(forumController));
@@ -690,26 +700,26 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Must be before /posts/:id to prevent 'tags' being matched as :id param
   forumRouter.get('/posts/tags/popular', optionalAuth, forumController.getPopularTags.bind(forumController));
   forumRouter.get('/posts/:id', optionalAuth, forumController.getPost.bind(forumController));
-  forumRouter.post('/posts', authenticate, forumController.createPost.bind(forumController));
-  forumRouter.put('/posts/:id', authenticate, forumController.updatePost.bind(forumController));
-  forumRouter.delete('/posts/:id', authenticate, forumController.deletePost.bind(forumController));
-  forumRouter.post('/posts/:id/like', authenticate, forumController.toggleLike.bind(forumController));
+  forumRouter.post('/posts', authenticate, pharmacyWrite, forumController.createPost.bind(forumController));
+  forumRouter.put('/posts/:id', authenticate, pharmacyWrite, forumController.updatePost.bind(forumController));
+  forumRouter.delete('/posts/:id', authenticate, pharmacyWrite, forumController.deletePost.bind(forumController));
+  forumRouter.post('/posts/:id/like', authenticate, pharmacyWrite, forumController.toggleLike.bind(forumController));
   // WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §8 (routing defect fix)
   //   KPA 프런트(forumApi.pinPost)는 `/api/v1/kpa/forum/posts/:id/pin` 을 호출하는데 remount 에
   //   빠져 있어 404 였다(WO-KPA-A-FORUM-NOTICE-PIN-BY-OWNER-V1 기능이 실질 사망).
   //   신규 기능이 아니라 공통 핸들러·가드를 그대로 서비스 스코프에 remount 하는 정합 조치다.
-  forumRouter.patch('/posts/:id/pin', authenticate, forumController.pinPost.bind(forumController));
+  forumRouter.patch('/posts/:id/pin', authenticate, pharmacyWrite, forumController.pinPost.bind(forumController));
 
   // Comments
   forumRouter.get('/posts/:postId/comments', forumController.listComments.bind(forumController));
-  forumRouter.post('/comments', authenticate, forumController.createComment.bind(forumController));
+  forumRouter.post('/comments', authenticate, pharmacyWrite, forumController.createComment.bind(forumController));
   // WO-FORUM-COMMENT-ROUTE-STANDARDIZATION-V1: RESTful nested 경로 추가 (프론트 정합)
-  forumRouter.post('/posts/:postId/comments', authenticate, forumController.createComment.bind(forumController));
-  forumRouter.delete('/posts/:postId/comments/:id', authenticate, forumController.deleteComment.bind(forumController));
+  forumRouter.post('/posts/:postId/comments', authenticate, pharmacyWrite, forumController.createComment.bind(forumController));
+  forumRouter.delete('/posts/:postId/comments/:id', authenticate, pharmacyWrite, forumController.deleteComment.bind(forumController));
   // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C
   //   댓글 수정 route 만 remount 되지 않아 KPA 만 댓글 수정을 못 했다.
   //   공통 service-forum.routes.ts 와 동일 경로·핸들러 그대로 사용한다(신규 로직 0).
-  forumRouter.put('/comments/:id', authenticate, forumController.updateComment.bind(forumController));
+  forumRouter.put('/comments/:id', authenticate, pharmacyWrite, forumController.updateComment.bind(forumController));
 
   // Forum Directory (읽기: 공개, 쓰기: admin scope — WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1)
   // (path /categories kept for compat — WO-O4O-FORUM-NAMING-CLEANUP-V1)

@@ -1,7 +1,7 @@
 # O4O-ROLE-WORKSPACE-ARCHITECTURE-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영)
+> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영 · §3-1 Store Workspace 구현 상태 · §6 출처 4종↔3+1 경로 대응 · §9-1 5단계 반영 · §4-2 Service Operator Workspace 구현 상태 · §9-1 6단계 반영 · §5 Community Workspace(Community Identity ≠ Service Identity · Industry Community 폐기) · §9-1 7단계 반영)
 > **근거 WO/IR**: `WO-O4O-ROLE-WORKSPACE-REFACTOR-BASELINE-AND-PREFLIGHT-V1` · [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md)
 > **위치**: 사업·정책 정본(우선순위 2). [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) 과 동급이며, **역할 경계 · 업무공간 구조 · 콘텐츠 유입 경로 · Legacy Partner** 에 관해 두 문서가 충돌하면 **이 문서가 우선**한다 (§8).
 
@@ -125,7 +125,7 @@ Home
 - **Service Workspace** — "그 서비스가 My Services 항목(매장 화면) · 운영자 화면으로 노출되는가". Identity 와 **별도 metadata** 로 catalog 에 붙인다: `workspace.workspaceMode`(`standard | special | none | undecided`) · `storeWorkspaceEnabled` · `operatorWorkspaceEnabled`. `PlatformService.service_type`(`community | tool | extension`)은 **다른 축**이며 Workspace 판정에 쓰지 않는다.
 - **모든 platform service 가 My Services 항목이 되는 것은 아니다.** 노출 조건은 `Store 의 enrollment 가 active` **AND** `해당 서비스의 storeWorkspaceEnabled` 이다. 근거 없는 서비스는 `undecided` 로 두고 노출하지 않는다 — 코드가 사업 결정을 대신 내리지 않는다.
 - 세 관계는 물리적으로 분리 유지한다 (합치지 않는다): Store ↔ Service = `organization_service_enrollments` · Operator ↔ Service = `role_assignments` + `service_memberships`(membership guard 와 동일 정책) · 사용자 ↔ 조직 = `organization_members`. 읽기 계약은 `/api/v1/work-scope/store-services` · `/operator-services` (`utils/service-tenant.resolver.ts`) 하나로 두며 UI 노출 ≠ 권한이다 — Workspace metadata 는 권한 SSOT 가 아니다.
-- **Industry(업종) 는 아직 정의하지 않았다.** Community §5 의 Industry Community 와 Service Identity 의 관계는 별도 단계에서 정한다.
+- **Community Identity 도 Service Identity 와 별도 축이다** (§5). Industry(업종) 모델은 만들지 않는다 — Community + participation policy 로 충분하다.
 
 ### 4-2. Service Operator Workspace 구현 상태 (WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1 · 2026-09-16)
 
@@ -138,20 +138,28 @@ Home
 
 ---
 
-## 5. Community
+## 5. Community Workspace
 
-일반 사용자 공간은 서비스별 Community 가 아니라 장기적으로 **Industry Community** 축으로 정리한다.
+> `WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1` (2026-09-16) 이 확정. 종전 "Industry Community" 방향은 **폐기(RETIRED)** — Industry / IndustryMembership / IndustryCommunity / Industry-Service mapping 을 만들지 않는다.
 
 ```text
-Industry Community
-├─ Forum
-├─ Content
-├─ Resources
-└─ Education
+Community Identity ≠ Service Identity
+
+O4O Community Workspace
+├─ 약사 커뮤니티      (pharmacy)      참여 = kpa-society OR pharmacy-hub active membership
+├─ 화장품 커뮤니티    (cosmetics)     참여 = k-cosmetics active membership
+└─ O4O 공통 커뮤니티  (o4o-general)   참여 = authenticated O4O user (Neture membership · role 불요)
 ```
 
-- 현행 `serviceKey` 격리 기반 Community/Content 구조([`o4o-common-structure`](../o4o-common-structure.md) · [`PLATFORM-CONTENT-POLICY-V1`](PLATFORM-CONTENT-POLICY-V1.md) F4)는 Community 리팩터링 단계 전까지 **그대로 유효**하다. 이 절은 방향을 정할 뿐 현행 격리를 해제하지 않는다.
-- "Industry" 의 단위(업종 · 직능 · 지역 등)는 **이 문서가 정하지 않는다.** Community 단계 WO 의 업무분석에서 정한다.
+- **Community 는 Service 와 독립된 별도 Identity 다.** Service 는 Community 의 소유자가 아니며, Service membership 은 특정 Community 의 **참여 자격 조건 중 하나**일 뿐이다. `Community = Service` · `Community isolation = serviceKey 자체` 는 현행 구조가 아니다.
+- **Community Catalog SSOT = `apps/api-server/src/config/community-catalog.ts` (`O4O_COMMUNITIES`).** 초기 3개는 고정 enum 이 아니라 등록값이다 — 새 Community = Catalog 등록 + participation policy + capabilities(forum/content/resources/education) + UI metadata(entries). Forum / Content / Resources / LMS 공통 Core 는 수정하지 않는다. `key` 는 string 이며 고정 union 을 복제하지 않는다.
+- **Participation policy 는 두 가지뿐**: `authenticated` · `service_membership_any(serviceKeys)`. 범용 policy engine · rule builder · workflow engine 없음. 새 Service 가 약사 커뮤니티에 참여하려면 `pharmacy.participationPolicy.serviceKeys` 에 추가하는 것으로 끝난다.
+- **참여 판정 = `resolveCommunityAccess(user, communityKey)` 한 곳** (`utils/community-access.resolver.ts`, 기존 service_memberships 를 **읽기만**). Community 접근을 위해 membership · role · enrollment 를 만들지 않는다 (PH 만 가입한 회원 → 약사 커뮤니티 O, KPA My Services X, KPA membership 생성 0). 읽기 계약은 `GET /api/v1/communities`(목록 + canParticipate) · `/communities/:key/access`. 프런트가 `if (hasKpaMembership)` 를 반복하지 않는다.
+- **참여 자격 ≠ 운영 권한 ≠ 공개 read.** 운영자 권한(승인·중재)은 각 forum 원장의 `service_code` 서비스 운영자가 그대로 맡는다(다중 운영 governance engine 없음). 비로그인 read 정책은 기존 route 계약 그대로다.
+- **약사 커뮤니티는 하나다.** KPA `/kpa/forum` 과 Pharmacy-Hub `/pharmacy-hub/forum` 은 같은 `communityKey=pharmacy` context(원장 코드 kpa-society + pharmacy-hub 합집합)를 소비한다 — URL 이 여러 개여도 데이터 · Identity 는 하나 (PH 별도 약사 Community = 0). O4O 공통 커뮤니티는 종전 Neture 커뮤니티 구현을 **seed** 로 재사용하지만 identity 는 `o4o-general` 이며 "Neture Community" 라는 business identity 는 없다.
+- **Forum Core 는 하나** (`createServiceForumRouter` · `ForumControllerBase` · `ForumQueryService`). `ForumContext.communityKey` 가 논리 경계이고, 물리 원장 `forum_category_requests.service_code` 는 (a) 파티션 (b) 운영 governance 를 겸하는 실제 Service scope 라 rename 하지 않는다 — Catalog `forumStorageCodes` 가 `논리 communityKey → 물리 코드 집합` adapter 다(dual-read · bridge table · lineage 없음). 새 business logic 은 `community == serviceKey` 를 가정하지 않는다.
+- **Content · Resources · Education** 은 Content Boundary Alignment 의 `Community Content ≠ Service Content` 를 유지한다. 현재 물리 원장(`cms_contents.serviceKey` · `lms_courses.service_key`)은 실제 Service scope(운영자 승인 · course scope · points)와 공유되므로 rename 하지 않고 EXISTING_BOUNDARY_REUSED 로 둔다 — 논리 귀속은 Catalog `capabilities` 와 participation policy 로 표현하며 Core 재작성은 하지 않는다.
+- Community → My Store 는 §6 의 Copy 계약(독립 사본 · auto sync 0)을 그대로 쓴다. Community 가 늘어나도 같다.
 
 ---
 
@@ -255,7 +263,8 @@ latest main sync
 4. Supplier Workspace        ← Products / Orders / Content 3축 IA · Supplier 전용 Community 진입 은퇴 · §2-1 두 경로 구현(Hub adapter · handoff) (2026-09-16 완료, schema 변경 없음)
 5. Store Workspace        ← Home · My Store · Store Hub · My Services 상위 구조(store-ui-core `workspace/`) · My Services(`/work-scope/store-services`) · 대표 홈 진입 정렬 · KPA 모바일 전용 화면 RETIRE (2026-09-16 완료, schema 변경 없음)
 6. Service Operator Workspace ← 표준 최상위 IA 서비스 운영 / 사업 운영 / 운영 관리 (항목 단위 분류) · operator-services 기반 다중 서비스 전환 · Supplier → Service Operator 수신함 · Neture SPECIAL 보존 (2026-09-16 완료, schema 변경 없음 — §4-2)
-7. Community (Industry Community)
+7. Community Workspace        ← Community Catalog(SSOT 1) · Community Identity / Service Identity 분리 · 초기 3 Community(pharmacy · cosmetics · o4o-general) · access policy(authenticated / service_membership_any) · 공통 Forum Core adoption(communityKey 컨텍스트) · Industry Community 폐기 (2026-09-16 완료, schema 변경 없음 — §5)
+8. Final Role Workspace Census ← Supplier / Store / Service Operator / Community 4축의 코드 · 문서 · 권한 · route 일치 최종 검증
 ```
 
 순서는 권장이며, 각 단계 WO 가 착수 시점의 fresh census 로 확정한다.

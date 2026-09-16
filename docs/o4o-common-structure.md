@@ -123,6 +123,9 @@ KPA-Society는 O4O 공통 구조의 **reference implementation**이다.
 
 4. 데이터는 서비스 기준
    → serviceKey 격리, 멤버십 기반 권한
+   → 단, Forum 의 커뮤니티 경계는 serviceKey 가 아니라 communityKey 다
+     (Community Identity ≠ Service Identity — ROLE-WORKSPACE-ARCHITECTURE §5 ·
+      apps/api-server/src/config/community-catalog.ts · 약사 커뮤니티 = kpa-society OR pharmacy-hub)
 ```
 
 ---

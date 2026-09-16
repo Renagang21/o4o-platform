@@ -100,8 +100,11 @@ export function createNetureRoutes(dataSource: DataSource): Router {
   // ===========================================================================
   router.use(
     '/forum',
+    // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: O4O 공통 커뮤니티(communityKey='o4o-general')
+    //   identity 는 Neture Community 가 아니다 — 저장 코드 'neture' 는 구현 seed. 쓰기 자격 = authenticated O4O user
+    //   (Neture membership · role 불요).
     createServiceForumRouter({
-      context: { serviceCode: 'neture', scope: 'community' },
+      context: { serviceCode: 'neture', communityKey: 'o4o-general', scope: 'community' },
     }),
   );
 

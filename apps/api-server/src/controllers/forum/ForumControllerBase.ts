@@ -14,6 +14,8 @@ import {
 } from '@o4o/security-core';
 import { isPlatformAdmin, isServiceOperator } from '../../utils/role.utils.js';
 import type { ServiceKey } from '../../types/roles.js';
+// WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey → 원장 코드 집합 adapter
+import { communityForumStorageCodes } from '../../utils/community-access.resolver.js';
 
 /**
  * ForumControllerBase
@@ -133,27 +135,47 @@ export class ForumControllerBase {
     alias: string,
     ctx: ForumContext | undefined,
   ): void {
-    const canonical = this.getCanonicalServiceKey(ctx);
-    if (!canonical) return; // generic/admin route — 무필터 현행 유지
+    const codes = this.getContextForumCodes(ctx);
+    if (!codes) return; // generic/admin route — 무필터 현행 유지
 
     qb.andWhere(
       `EXISTS (
         SELECT 1 FROM forum_category_requests _svc
         WHERE _svc.id = ${alias}.forum_id
-          AND _svc.service_code = :ctxServiceKey
+          AND _svc.service_code IN (:...ctxForumCodes)
       )`,
-      { ctxServiceKey: canonical },
+      { ctxForumCodes: codes },
     );
   }
 
   /**
    * WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
    * ForumContext.serviceCode(RBAC prefix) → canonical service key. undefined = 무경계.
+   *
+   * WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 경계 판정은 {@link getContextForumCodes}
+   * 를 쓴다. 이 함수는 "컨텍스트가 있는가"(generic/admin 무경계 여부)와 legacy serviceCode 단일값이
+   * 필요한 곳에만 남긴다 — communityKey 컨텍스트에서는 첫 저장 코드를 돌려준다 (경계 판정에 쓰지 말 것).
    */
   protected getCanonicalServiceKey(ctx: ForumContext | undefined): string | undefined {
+    const codes = this.getContextForumCodes(ctx);
+    return codes?.[0];
+  }
+
+  /**
+   * WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1 — Forum 경계의 단일 해석 지점.
+   *
+   *   ctx.communityKey 지정 → community catalog `forumStorageCodes` (예: pharmacy → ['kpa-society','pharmacy-hub'])
+   *   ctx.serviceCode 만 지정 → [resolveCanonicalServiceKey(prefix)] (기존 service-scoped 계약 그대로)
+   *   둘 다 없음 → undefined (generic/admin 무경계)
+   *
+   * 미등록 communityKey 는 빈 배열 → 모든 경계 판정이 fail-closed (아무것도 보이지 않음).
+   */
+  protected getContextForumCodes(ctx: ForumContext | undefined): string[] | undefined {
+    const communityKey = ctx?.communityKey?.trim();
+    if (communityKey) return communityForumStorageCodes(communityKey);
     const prefix = ctx?.serviceCode?.trim();
     if (!prefix) return undefined;
-    return resolveCanonicalServiceKey(prefix);
+    return [resolveCanonicalServiceKey(prefix)];
   }
 
   /**
@@ -165,13 +187,13 @@ export class ForumControllerBase {
     forumId: string | null | undefined,
     ctx: ForumContext | undefined,
   ): Promise<boolean> {
-    const canonical = this.getCanonicalServiceKey(ctx);
-    if (!canonical) return true;
-    if (!forumId) return false;
+    const codes = this.getContextForumCodes(ctx);
+    if (!codes) return true;
+    if (!forumId || codes.length === 0) return false;
 
     const rows = await AppDataSource.query(
-      `SELECT 1 FROM forum_category_requests WHERE id = $1 AND service_code = $2 LIMIT 1`,
-      [forumId, canonical],
+      `SELECT 1 FROM forum_category_requests WHERE id = $1 AND service_code = ANY($2::text[]) LIMIT 1`,
+      [forumId, codes],
     );
     return rows.length > 0;
   }

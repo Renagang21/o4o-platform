@@ -6,13 +6,22 @@
  *
  * community scope: organization_id IS NULL (공동 커뮤니티)
  * organization scope: organization_id = config.organizationId (조직 전용)
+ *
+ * WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1:
+ *   `communityKey` 가 있으면 community scope 질의를 그 Community 의 원장 코드 집합
+ *   (`forum_category_requests.service_code IN catalog.forumStorageCodes`)으로 경계 짓는다.
+ *   종전에는 community scope 에 서비스 경계가 없어 어느 서비스 홈 피드든 모든 서비스의 포럼이
+ *   보였다(누출). 미지정이면 종전 무경계 동작 그대로 (admin/generic 용).
  */
 
 import { DataSource } from 'typeorm';
+import { communityForumStorageCodes } from '../../utils/community-access.resolver.js';
 
 export interface ForumQueryConfig {
   scope: 'community' | 'organization';
   organizationId?: string;
+  /** Community Identity (community-catalog key). community scope 에서만 의미가 있다. */
+  communityKey?: string;
 }
 
 export class ForumQueryService {
@@ -21,12 +30,28 @@ export class ForumQueryService {
     private config: ForumQueryConfig,
   ) {}
 
+  /** Community 원장 코드 집합 (미지정 = null = 무경계). 미등록 key 는 빈 배열 = fail-closed. */
+  private communityCodes(): string[] | null {
+    if (this.config.scope !== 'community' || !this.config.communityKey) return null;
+    return communityForumStorageCodes(this.config.communityKey);
+  }
+
+  /** `AND <alias>.service_code = ANY($n::text[])` 조각 — params 에 코드 배열을 push 한 뒤 SQL 조각을 돌려준다 */
+  private communityFilter(alias: string, params: any[]): string {
+    const codes = this.communityCodes();
+    if (!codes) return '';
+    params.push(codes);
+    return `AND ${alias}.service_code = ANY($${params.length}::text[])`;
+  }
+
   /**
    * 홈 페이지용 최근 게시글 요약
    * WO-O4O-FORUM-CATEGORY-CLEANUP-V1: forum_category → forum_category_requests (forum_id 기반)
    */
   async listRecentPosts(limit = 5) {
     if (this.config.scope === 'community') {
+      const params: any[] = [limit];
+      const communityFilter = this.communityFilter('f', params);
       return this.dataSource.query(`
         SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", f.name as "categoryName"
         FROM forum_post p
@@ -34,9 +59,10 @@ export class ForumQueryService {
         LEFT JOIN users u ON p.author_id = u.id
         WHERE p.status = 'publish' AND p.organization_id IS NULL
           AND f.forum_type != 'closed'
+          ${communityFilter}
         ORDER BY p.created_at DESC
         LIMIT $1
-      `, [limit]);
+      `, params);
     }
 
     // organization scope
@@ -92,7 +118,7 @@ export class ForumQueryService {
 
     let scopeFilter: string;
     if (this.config.scope === 'community') {
-      scopeFilter = 'c.organization_id IS NULL';
+      scopeFilter = `c.organization_id IS NULL ${this.communityFilter('c', params)}`;
     } else {
       params.push(this.config.organizationId);
       scopeFilter = `c.organization_id = $${params.length}`;
@@ -146,6 +172,8 @@ export class ForumQueryService {
    * WO-O4O-FORUM-MULTI-STRUCTURE-RECONSTRUCTION-V1
    */
   async getForumBySlug(slug: string) {
+    const params: any[] = [slug];
+    const communityFilter = this.communityFilter('c', params);
     const rows = await this.dataSource.query(`
       SELECT
         c.id, c.name, c.slug, c.description,
@@ -154,9 +182,9 @@ export class ForumQueryService {
         c.tags,
         c.organization_id AS "organizationId"
       FROM forum_category_requests c
-      WHERE c.status = 'completed' AND c.slug = $1
+      WHERE c.status = 'completed' AND c.slug = $1 ${communityFilter}
       LIMIT 1
-    `, [slug]);
+    `, params);
     return rows[0] || null;
   }
 
@@ -196,7 +224,7 @@ export class ForumQueryService {
 
     let scopeFilter: string;
     if (this.config.scope === 'community') {
-      scopeFilter = 'c.organization_id IS NULL';
+      scopeFilter = `c.organization_id IS NULL ${this.communityFilter('c', params)}`;
     } else {
       params.push(this.config.organizationId);
       scopeFilter = `c.organization_id = $${params.length}`;
@@ -267,6 +295,8 @@ export class ForumQueryService {
     }
 
     if (this.config.scope === 'community') {
+      const activityParams: any[] = [limit];
+      const communityFilter = this.communityFilter('c', activityParams);
       const rows: any[] = await this.dataSource.query(`
         SELECT
           c.id AS "categoryId", c.name AS "categoryName", c.slug AS "categorySlug",
@@ -297,8 +327,9 @@ export class ForumQueryService {
         LEFT JOIN users u ON lp.author_id = u.id
         WHERE c.status = 'completed' AND c.organization_id IS NULL
           AND (c.forum_type IS NULL OR c.forum_type != 'closed')
+          ${communityFilter}
         ORDER BY c.created_at DESC
-      `, [limit]);
+      `, activityParams);
 
       return this.groupActivityRows(rows);
     }
@@ -478,6 +509,8 @@ export class ForumQueryService {
    */
   async listPinnedPosts(limit = 3) {
     if (this.config.scope === 'community') {
+      const params: any[] = [limit];
+      const communityFilter = this.communityFilter('f', params);
       return this.dataSource.query(`
         SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", f.name as "categoryName"
         FROM forum_post p
@@ -485,9 +518,10 @@ export class ForumQueryService {
         LEFT JOIN users u ON p.author_id = u.id
         WHERE p.status = 'publish' AND p."isPinned" = true AND p.organization_id IS NULL
           AND f.forum_type != 'closed'
+          ${communityFilter}
         ORDER BY p.created_at DESC
         LIMIT $1
-      `, [limit]);
+      `, params);
     }
 
     // organization scope

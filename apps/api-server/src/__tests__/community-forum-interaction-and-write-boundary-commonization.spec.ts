@@ -104,8 +104,10 @@ function fakeQuery(sql: string, params?: any[]): any[] {
 
   // isForumInServiceScope
   if (s.includes('SELECT 1 FROM forum_category_requests')) {
-    const [forumId, serviceCode] = params || [];
-    return state.forums.some((f) => f.id === forumId && f.service_code === serviceCode) ? [1] : [];
+    // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 경계는 코드 집합(ANY($2::text[]))
+    const [forumId, codes] = params || [];
+    const set: string[] = Array.isArray(codes) ? codes : [codes];
+    return state.forums.some((f) => f.id === forumId && set.includes(f.service_code)) ? [1] : [];
   }
   // checkClosedForumAccess / hasForumModerationOverride / pin ownership
   if (s.includes('FROM forum_category_requests')) {

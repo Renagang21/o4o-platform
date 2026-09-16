@@ -42,8 +42,10 @@ export function createNetureController(dataSource: DataSource): Router {
   });
 
   // APP-FORUM Phase 1: shared forum query service
+  // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: O4O 공통 커뮤니티(o4o-general) 경계
   const forumService = new ForumQueryService(dataSource, {
     scope: 'community',
+    communityKey: 'o4o-general',
   });
 
   // ============================================================================

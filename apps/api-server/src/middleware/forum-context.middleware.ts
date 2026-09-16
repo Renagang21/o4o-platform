@@ -18,6 +18,16 @@ export interface ForumContext {
   /** Organization UUID — null means global (admin-dashboard) */
   organizationId?: string | null;
   /**
+   * Community boundary key — WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1
+   *
+   * 논리 Community Identity (`config/community-catalog.ts` 의 key: 'pharmacy' | 'cosmetics' | 'o4o-general' | …).
+   * 지정되면 `serviceCode` 대신 이 값이 읽기·쓰기 경계다: ForumControllerBase 가 catalog 의
+   * `forumStorageCodes`(원장 `forum_category_requests.service_code` 집합) 로 해석한다 — KPA 와
+   * Pharmacy-Hub 진입이 같은 'pharmacy' 를 보는 이유. Community ≠ Service 이므로 이 값으로
+   * 운영자 권한을 추론하지 않는다 (moderation 은 forum 의 service_code 로 그대로 판정).
+   */
+  communityKey?: string;
+  /**
    * Service boundary key — NOT a logging label.
    *
    * WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1

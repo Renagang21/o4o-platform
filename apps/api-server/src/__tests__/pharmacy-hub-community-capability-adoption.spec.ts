@@ -207,9 +207,11 @@ describe('§15 서비스 경계 — cross-service mixing 0', () => {
     }
   });
 
-  it('PH forum 마운트는 공통 factory + PH serviceKey/쓰기 가드다(backend 무변경)', () => {
+  it('PH forum 마운트는 공통 factory + 약사 커뮤니티 컨텍스트다 (WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 쓰기 자격 = catalog policy)', () => {
     expect(phRoutes).toContain('createServiceForumRouter({');
     expect(phRoutes).toContain("scope: 'community'");
-    expect(phRoutes).toContain('requireActiveServiceMembership(SERVICE_KEY)');
+    // 종전 PH 서비스 전용 membership guard 는 Community access(kpa-society OR pharmacy-hub)로 대체됐다.
+    expect(phRoutes).toContain("communityKey: 'pharmacy'");
+    expect(phRoutes).not.toContain('requireActiveServiceMembership(SERVICE_KEY)');
   });
 });

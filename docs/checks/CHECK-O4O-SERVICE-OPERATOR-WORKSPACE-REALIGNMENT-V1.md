@@ -4,7 +4,7 @@
 > **일자**: 2026-09-16 · **기준 main**: `7f4f6eb26` (Store Workspace CLOSED `fb08c0dd1`/`052855eb6` 이후 — 과거 SHA 재사용 없이 fresh census)
 > **성격**: 표준 Service Operator 최상위 IA 재정렬(서비스 운영 / 사업 운영 / 운영 관리, **메뉴 항목 단위** 분류) + operator-services 기반 다중 서비스 전환 + Supplier → Service Operator 수신함 + 대시보드 3도메인 재편 + Neture SPECIAL 보존. 새 테이블 0 · migration 0 · schema 변경 0 · RBAC/Membership Core 변경 0 · 공통 셸 재작성 0 · package.json/lockfile 변경 0 · 프로덕션 write 0.
 > **상위 기준**: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 · §4 · §4-1 · §4-2(신설) · §9-1(6단계) · 선행 [`CHECK-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1`](CHECK-O4O-STORE-WORKSPACE-INTEGRATION-AND-MY-SERVICES-V1.md) · [`CHECK-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1`](CHECK-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1.md) · [`CHECK-O4O-SERVICE-TENANT-FOUNDATION-V1`](CHECK-O4O-SERVICE-TENANT-FOUNDATION-V1.md)
-> **구현 commit**: `5e8e137a3` (2026-09-16 · Deploy Web Services 6/6 success · Deploy API Server success · CI Pipeline 은 직후 타 세션 push `c01bd80f1` 의 concurrency 로 cancelled — 후속 커밋 CI 가 superset 으로 재실행)
+> **구현 commit**: `5e8e137a3` (2026-09-16 · Deploy Web Services 6/6 success · **Deploy API Server = failure** — `7f4f6eb26` 부터 이어지는 migration Job(`expected-schema-states` 5번째 미등록, 타 세션 PHASE 1) 실패로 프로덕션 API 는 `fb08c0dd1` 에 머묾. 본 WO 는 backend runtime 변경 0(테스트 spec 만)이라 smoke 에 영향 없음 — `operator-services` 는 Service Tenant Foundation 때 이미 배포됨. 정정 2026-09-16: 최초 기록의 "Deploy API Server success" 는 오기 · CI Pipeline 은 직후 타 세션 push `c01bd80f1` 의 concurrency 로 cancelled)
 
 ---
 

@@ -74,10 +74,9 @@ import { createStoreAnalyticsController } from '../o4o-store/controllers/store-a
 import { createStorePopV2Controller } from '../o4o-store/controllers/store-pop-v2.controller.js';
 import { createMultilingualProductContentController } from '../o4o-store/controllers/multilingual-product-content.controller.js'; // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8 (#76)
 // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1
-import {
-  createServiceForumRouter,
-  requireActiveServiceMembership,
-} from '../forum/service-forum.routes.js';
+// WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 쓰기 자격은 router 가 catalog policy 로 판정
+import { createServiceForumRouter } from '../forum/service-forum.routes.js';
+import { communityForumStorageCodes } from '../../utils/community-access.resolver.js';
 import { resolvePharmacyHubOrganizationForRoute } from '../../controllers/pharmacy-hub/pharmacy-hub-store-org.seam.js';
 // WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1
 import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/PharmacyHubCartController.js';
@@ -596,11 +595,15 @@ export function createPharmacyHubRoutes(): Router {
   //   serviceCode 는 RBAC prefix('pharmacy-hub'), scope 는 커뮤니티(조직 비귀속).
   //   쓰기는 Pharmacy-Hub 활성 멤버십 보유자만 — mount 단계에서 차단한다.
   // ===========================================================================
+  // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1:
+  //   이 mount 는 약사 커뮤니티(communityKey='pharmacy')의 진입 surface 다 — KPA `/kpa/forum` 과 같은 Community.
+  //   읽기 경계 = catalog forumStorageCodes(kpa-society + pharmacy-hub), 쓰기 자격 = kpa-society OR
+  //   pharmacy-hub active membership (requireCommunityAccess). 서비스 membership 전용 guard 는 제거 —
+  //   PH 별도 약사 Community = 0. 운영 governance(승인·중재)는 pharmacy-hub service_code 그대로.
   router.use(
     '/forum',
     createServiceForumRouter({
-      context: { serviceCode: SERVICE_KEY, scope: 'community' },
-      writeGuards: [requireActiveServiceMembership(SERVICE_KEY)],
+      context: { serviceCode: SERVICE_KEY, communityKey: 'pharmacy', scope: 'community' },
     }),
   );
 
@@ -654,10 +657,11 @@ export function createPharmacyHubRoutes(): Router {
                 WHERE p.status = 'publish'
                   AND p.organization_id IS NULL
                   AND f.forum_type != 'closed'
-                  AND f.service_code = $1
+                  AND f.service_code = ANY($1::text[])
                 ORDER BY p.created_at DESC
                 LIMIT $2`,
-              [SERVICE_KEY, perLimit],
+              // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 약사 커뮤니티(pharmacy) 원장 코드 집합
+              [communityForumStorageCodes('pharmacy'), perLimit],
             );
             for (const r of rows) {
               items.push({

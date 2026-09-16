@@ -23,8 +23,9 @@ const LATEST = PH_ROUTES.slice(
 );
 
 describe('PharmacyHub Community baseline — /home/latest 서비스 경계', () => {
-  it('forum 집계는 forum_category_requests.service_code 로 격리한다', () => {
-    expect(LATEST).toContain('f.service_code = $1');
+  it('forum 집계는 forum_category_requests.service_code 로 격리한다 — 경계는 약사 커뮤니티 원장 코드 집합 (WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1)', () => {
+    expect(LATEST).toContain('f.service_code = ANY($1::text[])');
+    expect(LATEST).toContain("communityForumStorageCodes('pharmacy')");
   });
 
   it('course 집계는 lms_courses.service_key 로 격리한다', () => {

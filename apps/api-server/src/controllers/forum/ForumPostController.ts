@@ -317,11 +317,13 @@ export class ForumPostController extends ForumControllerBase {
       if (forumIdFromBody && typeof forumIdFromBody === 'string') {
         resolvedForumId = forumIdFromBody;
       } else if (requestedForumSlug) {
+        // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey 컨텍스트는 원장 코드 집합.
+        const ctxForumCodes = this.getContextForumCodes(ctx);
         const rows = await this.postRepository.manager.query(
-          canonicalServiceKey
-            ? `SELECT id FROM forum_category_requests WHERE slug = $1 AND status = 'completed' AND service_code = $2 LIMIT 1`
+          ctxForumCodes
+            ? `SELECT id FROM forum_category_requests WHERE slug = $1 AND status = 'completed' AND service_code = ANY($2::text[]) LIMIT 1`
             : `SELECT id FROM forum_category_requests WHERE slug = $1 AND status = 'completed' LIMIT 1`,
-          canonicalServiceKey ? [requestedForumSlug, canonicalServiceKey] : [requestedForumSlug],
+          ctxForumCodes ? [requestedForumSlug, ctxForumCodes] : [requestedForumSlug],
         );
         resolvedForumId = rows[0]?.id ?? null;
       }
@@ -767,13 +769,14 @@ export class ForumPostController extends ForumControllerBase {
       }
 
       // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1: 서비스 격리
+      // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey 컨텍스트는 원장 코드 집합
       let serviceCondition = '';
-      const canonicalServiceKey = this.getCanonicalServiceKey(ctx);
-      if (canonicalServiceKey) {
-        params.push(canonicalServiceKey);
+      const ctxForumCodes = this.getContextForumCodes(ctx);
+      if (ctxForumCodes) {
+        params.push(ctxForumCodes);
         serviceCondition = `AND EXISTS (
              SELECT 1 FROM forum_category_requests _svc
-             WHERE _svc.id = p.forum_id AND _svc.service_code = $${params.length}
+             WHERE _svc.id = p.forum_id AND _svc.service_code = ANY($${params.length}::text[])
            )`;
       }
 

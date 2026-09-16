@@ -951,6 +951,17 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Work Scope routes:', workScopeError);
     }
 
+    // 31-d-3. Register Communities routes (WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1)
+    //   Community Catalog + 참여 자격 판정의 서비스 중립 read contract. write 0.
+    try {
+      const { createCommunitiesRoutes } = await import('../routes/communities.routes.js');
+      const { optionalAuth: communitiesOptionalAuth } = await import('../middleware/auth.middleware.js');
+      app.use('/api/v1/communities', createCommunitiesRoutes(communitiesOptionalAuth as any));
+      logger.info('✅ Communities routes registered at /api/v1/communities');
+    } catch (communitiesError) {
+      logger.error('Failed to register Communities routes:', communitiesError);
+    }
+
     // 31-e. Register Store Product Library routes (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1)
     try {
       const { createStoreProductLibraryController } = await import(

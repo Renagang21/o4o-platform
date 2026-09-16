@@ -9,6 +9,10 @@
  *   - `GET /auth/services`           서비스 카탈로그 + 내 가입 상태 (nameKo · basePath 는 이번 WO 에서 추가)
  *   - `GET /neture/home/entry`       내 매장(복수 나열) · 내 분회(slug)  — 이번 WO 의 홈 전용 read API
  *   - `user.roles` (from /auth/me)   platform:super_admin · 관리자 판정 (Neture RoleGuard 와 같은 상수)
+ *   - `GET /communities`             Community Catalog + 참여 가능 여부 — **커뮤니티 진입의 유일한 출처**
+ *                                    (WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: Community Identity ≠
+ *                                    Service Identity. 약사 커뮤니티 = kpa-society OR pharmacy-hub, 화장품 = k-cosmetics,
+ *                                    O4O 공통 = 모든 로그인 사용자. 프런트에서 membership 으로 커뮤니티를 추론하지 않는다.)
  *   - `GET /work-scope/operator-services`  운영자로 참여하는 서비스 목록 — **서비스 운영자 화면 진입의 유일한 출처**
  *                                    (WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: role 문자열을 프런트에서
  *                                    파싱해 서비스를 추측하지 않는다. 서버가 role_assignments + service_memberships
@@ -87,6 +91,16 @@ export interface EntryOperatorService {
   workspaceAvailable: boolean;
 }
 
+/** `GET /communities` 응답 1건 (apps/api-server/src/utils/community-access.resolver.ts CommunityListItem) */
+export interface EntryCommunity {
+  communityKey: string;
+  name: string;
+  canParticipate: boolean;
+  reason: string | null;
+  /** 진입 surface — Community 하나에 여러 URL 이 있을 수 있다 (같은 Community 데이터) */
+  entries: { serviceKey: string; path: string }[];
+}
+
 export interface HomeEntryData {
   services: EntryService[];
   stores: EntryStore[];
@@ -94,6 +108,8 @@ export interface HomeEntryData {
   serviceStates: NetureServiceStates;
   /** 운영자로 참여하는 서비스 (서버 확정 목록). 없으면 빈 배열로 취급한다 */
   operatorServices?: EntryOperatorService[];
+  /** Community Catalog + 참여 판정 (서버 확정). 없으면 빈 배열로 취급한다 */
+  communities?: EntryCommunity[];
 }
 
 // ─── 진입 액션 ────────────────────────────────────────────────────────────────
@@ -232,15 +248,21 @@ export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
     setError(null);
     (async () => {
       try {
-        const [servicesRes, entryRes, operatorRes] = await Promise.all([
+        const [servicesRes, entryRes, operatorRes, communitiesRes] = await Promise.all([
           api.get('/auth/services'),
           api.get('/neture/home/entry'),
           // WO-O4O-SERVICE-OPERATOR-WORKSPACE-REALIGNMENT-V1: 운영자 서비스 목록의 유일한 출처
           api.get('/work-scope/operator-services'),
+          // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 커뮤니티 목록·참여 판정의 유일한 출처.
+          //   배포 간극(web 먼저 · API 나중) 동안 404 면 커뮤니티 그룹만 비운다 — 홈 전체를 error 로 만들지 않는다.
+          //   (다른 출처는 종전대로 하나라도 실패하면 전체 error.)
+          api.get('/communities').catch(() => null),
         ]);
         const services = servicesRes.data?.data?.services;
         const entry = entryRes.data?.data;
         const operatorServices = operatorRes.data?.data?.services;
+        const communitiesRaw = communitiesRes?.data?.data?.communities;
+        const communities = Array.isArray(communitiesRaw) ? communitiesRaw : [];
         if (!Array.isArray(services) || !entry || !entry.serviceStates || !Array.isArray(operatorServices)) {
           throw new Error('bad response');
         }
@@ -251,6 +273,7 @@ export function useHomeEntry(enabled: boolean): UseHomeEntryResult {
           branches: Array.isArray(entry.branches) ? entry.branches : [],
           serviceStates: normalizeServiceStates(entry.serviceStates),
           operatorServices,
+          communities,
         });
       } catch {
         if (cancelled) return;
@@ -331,15 +354,25 @@ export function buildHomeEntryModel(user: User, data: HomeEntryData): HomeEntryM
   const isPlatformAdmin = hasAnyRole(roles, PLATFORM_ROLES);
 
   // ── 주요 업무 ──
-  const community: EntryItem[] = [
-    { id: 'community:neture', label: `${nameOf('neture')} 커뮤니티`, action: { kind: 'internal', to: SERVICE_PATHS.neture.home! } },
-  ];
-  for (const key of ['kpa-society', 'pharmacy-hub']) {
-    if (isActive(key) && SERVICE_PATHS[key]?.home) {
+  // 커뮤니티 — 출처는 `GET /communities`(Community Catalog + 서버 참여 판정) 하나. Community ≠ Service:
+  //   약사 커뮤니티는 KPA/PH 두 진입 surface 를 가진 **하나의** Community 라, 이용 중인 서비스의 surface 로
+  //   들어간다(PH 만 가입한 회원 → PH 진입). O4O 공통 커뮤니티는 Neture 내부 경로(로그인만 있으면 참여).
+  //   참여 불가 Community 는 진입을 만들지 않는다 (WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1).
+  const community: EntryItem[] = [];
+  for (const c of data.communities ?? []) {
+    if (!c.canParticipate || !Array.isArray(c.entries) || c.entries.length === 0) continue;
+    const entry =
+      c.entries.find((e) => e.serviceKey === 'neture') ??
+      c.entries.find((e) => isActive(e.serviceKey)) ??
+      c.entries[0];
+    if (entry.serviceKey === 'neture') {
+      community.push({ id: `community:${c.communityKey}`, label: c.name, action: { kind: 'internal', to: entry.path } });
+    } else {
       community.push({
-        id: `community:${key}`,
-        label: `${nameOf(key)} 커뮤니티`,
-        action: { kind: 'handoff', serviceKey: key, returnPath: SERVICE_PATHS[key].home },
+        id: `community:${c.communityKey}`,
+        label: c.name,
+        note: c.entries.length > 1 ? `${nameOf(entry.serviceKey)}에서 참여` : undefined,
+        action: { kind: 'handoff', serviceKey: entry.serviceKey, returnPath: entry.path },
       });
     }
   }

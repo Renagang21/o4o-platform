@@ -35,9 +35,10 @@ export class ForumDirectoryController extends ForumControllerBase {
     // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1:
     //   forum 원장은 service_code 컬럼을 직접 가지므로 EXISTS 없이 직접 비교한다.
     //   아래 scope 분기들이 early return 하므로 반드시 그 앞에 AND 로 붙인다.
-    const canonical = this.getCanonicalServiceKey(ctx);
-    if (canonical) {
-      qb.andWhere(`${alias}.serviceCode = :ctxServiceKey`, { ctxServiceKey: canonical });
+    // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: communityKey 컨텍스트는 코드 집합(IN).
+    const codes = this.getContextForumCodes(ctx);
+    if (codes) {
+      qb.andWhere(`${alias}.serviceCode IN (:...ctxForumCodes)`, { ctxForumCodes: codes.length ? codes : ['__none__'] });
     }
     if (ctx.scope === 'demo') {
       qb.andWhere('1 = 0');
@@ -110,8 +111,8 @@ export class ForumDirectoryController extends ForumControllerBase {
 
       // WO-O4O-FORUM-SERVICE-SCOPE-DETAIL-AND-WRITE-COMMONIZATION-V1:
       //   다른 서비스의 forum 은 id/slug 로도 조회되지 않는다.
-      const canonicalServiceKey = this.getCanonicalServiceKey(this.getForumContext(req));
-      if (forum && canonicalServiceKey && forum.serviceCode !== canonicalServiceKey) {
+      const ctxForumCodes = this.getContextForumCodes(this.getForumContext(req));
+      if (forum && ctxForumCodes && !ctxForumCodes.includes(forum.serviceCode)) {
         forum = null;
       }
 
