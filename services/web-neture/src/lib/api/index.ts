@@ -45,6 +45,8 @@ export {
   type SupplierProductPurpose,
   type DistributionType,
   type SupplierLibraryItem,
+  type SupplierLibraryHandoffTarget,
+  type SupplierLibraryHandoffResult,
   type SupplierProduct,
   type ServiceSummary,
   type OrderSummaryResponse,

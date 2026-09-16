@@ -2,14 +2,17 @@
  * SupplierDashboardPage — 공급자 홈 (운영 현황 중심)
  *
  * WO-O4O-NETURE-SUPPLIER-DASHBOARD-OPS-STATUS-V1
+ * WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1 (2026-09-16):
+ *   공급자 업무를 상품 / 주문 / 콘텐츠 3축으로 재정렬. 홈은 utility — 3축 진입점 + 처리 필요 + KPI.
+ *   바로가기 · 운영 현황 블록의 어휘는 SupplierSpaceLayout 사이드바(canonical)와 동일하다.
  *
  * 구조 (위 → 아래):
  *  1. 공급자 상태 배너 (SupplierActivationGate — 승인/프로필 분리)
  *  2. 처리 필요 알림 — 실제 0 초과 항목만
  *  3. 핵심 운영 KPI — canonical 업무 화면 링크
- *  4. 업무 바로가기
+ *  4. 업무 바로가기 — 상품 / 주문 / 콘텐츠 3축
  *  5. 상품 · 콘텐츠 운영 현황
- *  6. 유통 활동 현황 (판매자 모집 / 유통참여형 펀딩 / 이벤트 오퍼)
+ *  6. 상품 축 — 유통 활동 현황 (판매자 모집 / 유통참여형 펀딩 / 이벤트 오퍼)
  *  7. 공급자 계정 상태 (승인 ≠ 프로필 완성)
  *  8. AI · 분석 (기존 Copilot 블록 — 접기 가능, 하단 배치)
  *
@@ -520,18 +523,23 @@ export default function SupplierDashboardPage() {
         )}
       </section>
 
-      {/* ── 3. 업무 바로가기 ── */}
+      {/* ── 3. 업무 바로가기 — 상품 / 주문 / 콘텐츠 3축 ── */}
       <section className="bg-white rounded-xl border border-slate-200 p-6">
         <h2 className="text-base font-semibold text-slate-800 mb-4">업무 바로가기</h2>
-        <div className="flex flex-wrap gap-2">
-          {QUICK_LINKS.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className="px-3 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
-            >
-              {link.label}
-            </Link>
+        <div className="space-y-3">
+          {QUICK_LINK_GROUPS.map((group) => (
+            <div key={group.label} className="flex flex-wrap items-center gap-2">
+              <span className="w-14 shrink-0 text-xs font-semibold text-slate-500">{group.label}</span>
+              {group.links.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className="px-3 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           ))}
         </div>
       </section>
@@ -577,9 +585,9 @@ export default function SupplierDashboardPage() {
         {/* 콘텐츠 */}
         <section className="bg-white rounded-xl border border-slate-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-slate-800">매장용 콘텐츠</h2>
-            <Link to="/supplier/store-descriptions" className="text-xs font-medium text-blue-600 hover:text-blue-700">
-              매장용 상품 설명서 →
+            <h2 className="text-base font-semibold text-slate-800">콘텐츠</h2>
+            <Link to="/supplier/library" className="text-xs font-medium text-blue-600 hover:text-blue-700">
+              콘텐츠 라이브러리 →
             </Link>
           </div>
           {cdFailed.storeDescriptions ? (
@@ -597,7 +605,7 @@ export default function SupplierDashboardPage() {
           ) : (
             <p className="text-sm text-slate-400 py-2">작성한 매장용 상품 설명서가 없습니다.</p>
           )}
-          {/* 제품 콘텐츠·태블릿·사이니지는 공통 count API 가 없어 진입점만 제공한다. */}
+          {/* 라이브러리·태블릿·사이니지는 공통 count API 가 없어 진입점만 제공한다. */}
           <div className="mt-4 flex flex-wrap gap-2">
             {CONTENT_LINKS.map((link) => (
               <Link
@@ -612,9 +620,9 @@ export default function SupplierDashboardPage() {
         </section>
       </div>
 
-      {/* ── 5. 유통 활동 현황 ── */}
+      {/* ── 5. 상품 축 — 유통 활동 현황 ── */}
       <section className="bg-white rounded-xl border border-slate-200 p-6">
-        <h2 className="text-base font-semibold text-slate-800 mb-4">유통 활동</h2>
+        <h2 className="text-base font-semibold text-slate-800 mb-4">상품 · 유통 활동</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* 판매자 모집 */}
           <div className="rounded-lg border border-slate-200 p-4">
@@ -952,21 +960,43 @@ function StatRow({ label, value }: { label: string; value: string }) {
 /*  Constants & helpers                                                */
 /* ------------------------------------------------------------------ */
 
-// 모든 경로는 canonical /supplier/* (사업자 정보만 /mypage/business-profile)
-const QUICK_LINKS = [
-  { label: '상품 등록', path: '/supplier/products/register' },
-  { label: '공급 오퍼 관리', path: '/supplier/supply-offers' },
-  { label: '주문 처리', path: '/supplier/orders' },
-  { label: '재고 관리', path: '/supplier/inventory' },
-  { label: '정산 내역', path: '/supplier/settlements' },
-  { label: '사업자 정보', path: '/mypage/business-profile' },
+// 모든 경로는 canonical /supplier/* (사업자 정보는 사이드바 '설정' — 홈 바로가기에서는 제외)
+// WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1: 상품 / 주문 / 콘텐츠 3축 진입.
+const QUICK_LINK_GROUPS = [
+  {
+    label: '상품',
+    links: [
+      { label: '상품 목록', path: '/supplier/products' },
+      { label: '상품 등록', path: '/supplier/products/register' },
+      { label: '거래 상품 정보', path: '/supplier/b2b-content' },
+      { label: '공급 오퍼', path: '/supplier/supply-offers' },
+    ],
+  },
+  {
+    label: '주문',
+    links: [
+      { label: '주문 현황', path: '/supplier/orders' },
+      { label: '재고 관리', path: '/supplier/inventory' },
+      { label: '정산 내역', path: '/supplier/settlements' },
+    ],
+  },
+  {
+    label: '콘텐츠',
+    links: [
+      { label: '콘텐츠 라이브러리', path: '/supplier/library' },
+      { label: '매장용 상품 설명서', path: '/supplier/store-descriptions' },
+      { label: '검수·게시 현황', path: '/supplier/store-materials-status' },
+    ],
+  },
 ];
 
 // WO-O4O-NETURE-SUPPLIER-OPERATING-READINESS-CLOSEOUT-BATCH-V1:
 //   라벨은 SupplierSpaceLayout 사이드바(canonical)와 동일 어휘를 사용한다.
 //   검수·게시 현황(/supplier/store-materials-status) 진입점 누락도 함께 해소한다.
+// WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1: 콘텐츠 축 = 사이드바 '콘텐츠' 그룹과 동일.
+//   거래 상품 정보(/supplier/b2b-content)는 상품 축으로 이동.
 const CONTENT_LINKS = [
-  { label: '제품 콘텐츠', path: '/supplier/b2b-content' },
+  { label: '콘텐츠 라이브러리', path: '/supplier/library' },
   { label: '매장용 상품 설명서', path: '/supplier/store-descriptions' },
   { label: '태블릿 화면 자료', path: '/supplier/tablet-screen-sets' },
   { label: '디지털 사이니지', path: '/supplier/signage' },

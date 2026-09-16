@@ -15,6 +15,15 @@
  *   cms_contents.status → 'published' 로 전환한다 (재사용, 수정 없음).
  *
  * 신규 테이블 없음. RBAC 변경 없음.
+ *
+ * WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1 (2026-09-16):
+ *   `Supplier → Service Operator` 공식 경로(ROLE-WORKSPACE-ARCHITECTURE §2-1)의 수신 계약으로 재사용·정렬.
+ *   - `data.serviceKey`(cms 물리 키) 를 받는다. 미지정 시 종전 'kpa' 그대로 (기존 KPA 경로 불변).
+ *   - `kpa_approval_requests`(hub_content_submission) 는 KPA 운영자 콘솔(SupplierContentApprovalPage) 전용
+ *     수신함이므로 cms 키가 'kpa' 일 때만 생성한다. 그 외 서비스는 cms_contents(authorRole='supplier',
+ *     status='pending', serviceKey=<service>) 행 자체가 운영자 수신함이다 — 공통 CMS 목록이
+ *     `?status=pending&authorRole=supplier` 로 서비스 운영자에게 보여준다 (cms-content-query.handler.ts).
+ *   - 제공 이후(검토·수정·복사·발행)는 운영자 업무. 여기서 상태 기계를 만들지 않는다.
  */
 
 import type { DataSource } from 'typeorm';
@@ -34,6 +43,8 @@ export interface SubmitContentData {
   linkUrl?: string;
   contentType?: 'article' | 'image' | 'link' | 'product_info';
   organizationId?: string;
+  /** cms_contents."serviceKey" 물리 키 (canonical→물리 매핑은 호출측 책임). 기본 'kpa'. */
+  serviceKey?: string;
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -61,6 +72,8 @@ export class SupplierContentService {
 
     const organizationId =
       data.organizationId && UUID_RE.test(data.organizationId) ? data.organizationId : null;
+    const serviceKey = data.serviceKey?.trim() || SERVICE_KEY;
+    const withKpaApprovalRequest = serviceKey === SERVICE_KEY;
 
     const qr = this.dataSource.createQueryRunner();
     await qr.connect();
@@ -79,7 +92,7 @@ export class SupplierContentService {
             $9, NOW(), NOW())
          RETURNING id, title, status`,
         [
-          SERVICE_KEY,
+          serviceKey,
           organizationId,
           data.contentType || 'article',
           data.title.trim(),
@@ -91,8 +104,10 @@ export class SupplierContentService {
         ],
       );
 
-      // 2. kpa_approval_requests INSERT
-      const [ar] = await qr.query(
+      // 2. kpa_approval_requests INSERT — KPA 운영자 콘솔 수신함 (cms 키 'kpa' 일 때만)
+      let ar: { id: string | null; status: string } = { id: null, status: 'pending' };
+      if (withKpaApprovalRequest) {
+      [ar] = await qr.query(
         `INSERT INTO kpa_approval_requests
            (id, entity_type, organization_id, payload, status,
             requester_id, requester_name, requester_email,
@@ -118,6 +133,7 @@ export class SupplierContentService {
           user.email || null,
         ],
       );
+      }
 
       await qr.commitTransaction();
 
@@ -127,6 +143,7 @@ export class SupplierContentService {
           contentId: cms.id,
           title: cms.title,
           status: ar.status,
+          serviceKey,
         },
       };
     } catch (err) {

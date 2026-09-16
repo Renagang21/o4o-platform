@@ -149,6 +149,21 @@ export interface SupplierLibraryItem {
   blocks?: Record<string, unknown>[] | null;
 }
 
+// WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1 — Supplier → Service Operator 제공
+export interface SupplierLibraryHandoffTarget {
+  key: string;
+  name: string;
+  nameKo: string;
+}
+
+export interface SupplierLibraryHandoffResult {
+  contentId: string;
+  serviceKey: string;
+  cmsServiceKey: string;
+  approvalRequestId: string | null;
+  title: string;
+}
+
 export interface SupplierProduct {
   id: string;
   name: string;
@@ -924,6 +939,33 @@ export const supplierApi = {
   async deleteLibraryItem(id: string): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await api.delete(`/neture/library/${id}`);
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
+  /**
+   * WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1
+   *
+   * Supplier → Service Operator 제공 경로 (ROLE-WORKSPACE-ARCHITECTURE §2-1).
+   * 대상 서비스는 backend 가 canonical catalog 에서 계산한다 (프론트 하드코딩 없음).
+   * 제공 후 검토·수정·발행은 해당 서비스 운영자 업무 — 공급자 책임은 여기서 끝난다.
+   */
+  async getLibraryHandoffTargets(): Promise<SupplierLibraryHandoffTarget[]> {
+    try {
+      const response = await api.get('/neture/library/handoff-targets');
+      const data = response.data?.data;
+      return Array.isArray(data) ? (data as SupplierLibraryHandoffTarget[]) : [];
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch library handoff targets:', extractApiError(error));
+      return [];
+    }
+  },
+
+  async handoffLibraryItem(id: string, serviceKey: string): Promise<{ success: boolean; error?: string; data?: SupplierLibraryHandoffResult }> {
+    try {
+      const response = await api.post(`/neture/library/${encodeURIComponent(id)}/handoff`, { serviceKey });
       return response.data;
     } catch (error) {
       return { success: false, error: extractApiError(error) };

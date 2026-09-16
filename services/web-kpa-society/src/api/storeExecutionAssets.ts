@@ -5,26 +5,13 @@
  * (renamed from storeLibrary.ts — store_library_items → store_execution_assets)
  *
  * Store Execution Assets CRUD: /api/v1/kpa/store/assets
- * Neture Public: /api/v1/neture/library/public/:id (unchanged)
+ *
+ * WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1: 종전 "Neture Public /library/public/:id"
+ * 클라이언트(`netureClient` · `NetureLibraryItem` · `getNetureLibraryItem`) RETIRE — backend route 부재 + 호출처 0.
+ * 매장이 공급자 라이브러리를 보는 공식 경로는 Store Hub (`/hub/contents?sourceDomain=supplier-library`).
  */
 
-import { ApiClient } from './client';
 import { apiClient } from './client';
-
-// Neture public API is under /api/v1/neture (not /api/v1/kpa)
-const NETURE_API_BASE = import.meta.env.VITE_API_BASE_URL
-  ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/neture`
-  : '/api/v1/neture';
-
-const netureClient = new ApiClient(NETURE_API_BASE);
-
-export interface NetureLibraryItem {
-  id: string;
-  title: string;
-  description: string | null;
-  type: string;
-  imageUrl: string | null;
-}
 
 export type AssetType = 'file' | 'content' | 'external-link';
 export type UsageType = 'pop' | 'qr' | 'signage' | 'banner' | 'notice';
@@ -62,16 +49,6 @@ export interface CreateStoreAssetParams {
   url?: string;
   htmlContent?: string;
   sourceType?: string;
-}
-
-/**
- * Neture 공개 자료 단건 조회 (published 상태만)
- * 인증 불필요
- */
-export async function getNetureLibraryItem(
-  id: string,
-): Promise<{ success: boolean; data: NetureLibraryItem }> {
-  return netureClient.get(`/library/public/${id}`);
 }
 
 /**

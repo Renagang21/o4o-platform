@@ -452,7 +452,7 @@ export default function SupplierLibraryFormPage() {
             style={{ width: '16px', height: '16px', cursor: 'pointer' }}
           />
           <label htmlFor="isPublic" style={{ fontSize: '14px', color: '#1e293b', cursor: 'pointer' }}>
-            공개 자료로 등록 (비인증 사용자도 조회 가능)
+            공개 자료로 등록 (매장 HUB 의 공급자 콘텐츠로 노출 · 비인증 조회 가능)
           </label>
         </div>
 

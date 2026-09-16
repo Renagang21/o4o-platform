@@ -42,7 +42,10 @@ export type HubVisibility = 'global' | 'service' | 'store';
 // WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1 (2026-07-21): 'screen-set' 추가.
 //   운영자 Screen Set 원본(store_tablet_screen_sets origin='operator' status='operator_template')을
 //   매장 HUB 에 노출. 매장 가져가기 = 매장 소유 독립 사본 생성(가져오기=사본 불변식).
-export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'blog' | 'pop' | 'qr' | 'video' | 'screen-set';
+// WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1 (2026-09-16): 'supplier-library' 추가 (additive).
+//   공급자 canonical 콘텐츠 원장(neture_supplier_library_items, is_public=true)을 Store Hub 의 source adapter 로 연결.
+//   Supplier → Store Hub 공식 경로(ROLE-WORKSPACE-ARCHITECTURE §2-1). 새 원장·전송 엔진 없음. producer 는 항상 'supplier'.
+export type HubSourceDomain = 'cms' | 'signage-media' | 'signage-playlist' | 'blog' | 'pop' | 'qr' | 'video' | 'screen-set' | 'supplier-library';
 
 // =============================================================================
 // API Response DTOs
@@ -80,6 +83,14 @@ export interface HubContentItemResponse {
   // WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 템플릿 필터·배지용.
   templateKey?: string;
   blockCount?: number;
+
+  // Supplier Library-specific (sourceDomain = 'supplier-library')
+  // WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1: 파일/문서 원천 식별용.
+  fileUrl?: string | null;
+  fileName?: string | null;
+  mimeType?: string | null;
+  category?: string | null;
+  contentType?: string;
 }
 
 /** HUB 콘텐츠 목록 응답 */
@@ -123,4 +134,5 @@ export const HUB_SOURCE_DOMAIN_LABELS: Record<HubSourceDomain, string> = {
   qr: 'QR-code',
   video: '동영상',
   'screen-set': '타블렛 화면',
+  'supplier-library': '공급자 콘텐츠 라이브러리',
 };

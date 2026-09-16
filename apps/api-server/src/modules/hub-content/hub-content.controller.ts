@@ -26,7 +26,10 @@ const VALID_PRODUCERS: string[] = ['operator', 'supplier', 'community'];
 // WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1 (2026-07-21): 'screen-set' 추가.
 //   운영자 Screen Set 원본(origin='operator' AND status='operator_template' AND service_key AND deleted_at IS NULL).
 //   상세·미리보기·가져오기는 매장 인증이 필요하므로 /api/v1/store/screen-set-hub/* 로 분리(여기는 공개 목록만).
-const VALID_DOMAINS: string[] = ['cms', 'signage-media', 'signage-playlist', 'blog', 'pop', 'qr', 'video', 'screen-set'];
+// WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1 (2026-09-16): 'supplier-library' 추가.
+//   공급자 canonical 콘텐츠 원장(neture_supplier_library_items · is_public=true)을 Hub source adapter 로 연결
+//   (Supplier → Store Hub 공식 경로). 단일 도메인 조회만 — mixed 통합 목록 편입은 Store Workspace 단계가 정한다.
+const VALID_DOMAINS: string[] = ['cms', 'signage-media', 'signage-playlist', 'blog', 'pop', 'qr', 'video', 'screen-set', 'supplier-library'];
 
 export function createHubContentRouter(dataSource: DataSource): Router {
   const router = Router();

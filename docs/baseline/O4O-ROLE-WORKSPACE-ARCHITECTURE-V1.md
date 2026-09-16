@@ -1,7 +1,7 @@
 # O4O-ROLE-WORKSPACE-ARCHITECTURE-V1
 
 > **상태**: ACTIVE
-> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-16 (§4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 Service Tenant Foundation 반영)
+> **작성일**: 2026-09-15 · **최종 갱신**: 2026-09-16 (§2-1 제공 경로 구현 계약 상세화 · §4 Service Identity ≠ Service Workspace · §7 물리 정리 완료 · §9-1 4단계 Supplier Workspace 반영)
 > **근거 WO/IR**: `WO-O4O-ROLE-WORKSPACE-REFACTOR-BASELINE-AND-PREFLIGHT-V1` · [`IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1`](../ir/IR-O4O-ROLE-WORKSPACE-REFACTOR-PREFLIGHT-V1.md)
 > **위치**: 사업·정책 정본(우선순위 2). [`O4O-BUSINESS-PHILOSOPHY-V1`](O4O-BUSINESS-PHILOSOPHY-V1.md) 과 동급이며, **역할 경계 · 업무공간 구조 · 콘텐츠 유입 경로 · Legacy Partner** 에 관해 두 문서가 충돌하면 **이 문서가 우선**한다 (§8).
 
@@ -60,6 +60,9 @@ Supplier → Community 직접 게시           ✕
 - 특정 매장에 직접 자료를 줄 필요가 있으면 **O4O 밖에서** 전달하고, Store 가 필요 시 **직접 등록**한다 (§5 Store Direct Authoring).
 - 이 절은 `O4O-BUSINESS-PHILOSOPHY-V1` §3 의 "공급자는 O4O 내부에서 콘텐츠를 직접 제작·등록하는 주체가 아니다" 와 `O4O-3-ROLE-FLOW-BASELINE-V1` §6 의 "공급자가 O4O 시스템에서 직접 HUB 콘텐츠를 제작·게시 금지" 를 **대체**한다. 공급자는 Content 를 가지며, Store Hub 와 Service Operator 에 온라인으로 제공한다.
 - Store Hub 에 도달한 공급자 콘텐츠에 운영자 검수·승인이 개입하는지는 **이 문서가 정하지 않는다.** 현행 서비스별 정책(예: [`O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1`](O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1.md) 원칙 4 = 운영자 승인 없이 유입)이 각자 유지되며, 통일은 Supplier / Store Hub 리팩터링 단계 WO 가 정한다.
+- **구현 계약 상세화 (2026-09-16, `WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1`)** — 공급자 콘텐츠의 canonical 원장은 `neture_supplier_library_items` 하나다(새 원장 없음).
+  · `Supplier → Store Hub` = Hub source adapter `sourceDomain=supplier-library` (`is_public=true` 행을 `storeWorkspaceEnabled` 서비스의 Store Hub 에 노출 · 사본 없음 · 특정 매장 대상 없음 · Hub UI 편입은 Store Workspace 단계).
+  · `Supplier → Service Operator` = `POST /neture/library/:id/handoff {serviceKey}` — 대상은 canonical catalog(`operatorWorkspaceEnabled=true` + `workspaceMode=standard`)에서만 파생, 수신은 기존 `cms_contents(authorRole=supplier, status=pending)` 계약 재사용. 제공 후 검토·수정·발행은 운영자 업무이며 **공급자 책임은 제공에서 끝난다** (상태 기계 · 전송 엔진 · lineage 없음).
 
 ---
 
@@ -220,7 +223,7 @@ latest main sync
 1. Legacy Partner Retirement ← A. runtime 은퇴(2026-09-15) · B. physical cleanup(2026-09-16) 완료 · CLOSED
 2. Service Tenant Foundation ← Service Identity · Store↔Service · Operator↔Service · Workspace metadata 읽기 계약 (2026-09-16 완료, UI 없음)
 3. Content Boundary Alignment ← 논리 도메인 4종 · canonical producer(adapter 정규화) · KPA producer drift FIX · F4/게시 표준/3자 흐름 문서 정합 (2026-09-16 완료, 물리 schema 변경 없음)
-4. Supplier Workspace
+4. Supplier Workspace        ← Products / Orders / Content 3축 IA · Supplier 전용 Community 진입 은퇴 · §2-1 두 경로 구현(Hub adapter · handoff) (2026-09-16 완료, schema 변경 없음)
 5. Store Workspace (Home · My Store · Store Hub · My Services)
 6. Service Operator Workspace
 7. Community (Industry Community)

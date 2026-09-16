@@ -15,6 +15,7 @@ import type {
   HubContentItemResponse,
   HubContentListResponse,
 } from '@o4o/types/hub-content';
+import { getServiceWorkspaceCapability } from '../../config/service-catalog.js';
 
 // ============================================
 // Producer ↔ Domain 매핑 (서버 내부 전용)
@@ -118,6 +119,9 @@ export class HubContentQueryService {
       case 'screen-set':
         // WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 운영자 타블렛 화면 원본
         return this.queryScreenSet(serviceKey, producer, page, limit);
+      case 'supplier-library':
+        // WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1: 공급자 콘텐츠 라이브러리 (Supplier → Store Hub)
+        return this.querySupplierLibrary(serviceKey, producer, page, limit);
       // (제거됨) case 'kpa-store-content' — WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1.
       // Store → Community 공유 흐름 폐기로 store-shared 콘텐츠는 HUB 에 노출되지 않는다.
       default:
@@ -189,6 +193,79 @@ export class HubContentQueryService {
       }
       throw error;
     }
+  }
+
+  // ── Supplier Library (Supplier → Store Hub source adapter) ──
+  //
+  // WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1 (2026-09-16):
+  //   공급자 canonical 콘텐츠 원장 `neture_supplier_library_items` 를 Hub 의 하나의 source adapter 로 연결한다.
+  //   ROLE-WORKSPACE-ARCHITECTURE §2-1 "Supplier → Store Hub" 공식 경로의 Supplier 측 계약.
+  //
+  // 조회 조건:
+  //   - is_public = true  ← 기존 `isPublic` 의미("공개 자료 · 비인증 사용자도 조회 가능")를 그대로 재사용.
+  //                         Hub 공개는 그 부분집합이므로 의미 재정의·schema 변경 없음.
+  //   - 공급자 원장은 service_key 컬럼이 없다(공급자는 Neture 에서만 활동, 원장은 platform-public).
+  //     따라서 serviceKey 는 Store Workspace 가 있는 canonical 서비스(storeWorkspaceEnabled) 인지만 확인하고
+  //     행 필터에는 쓰지 않는다. 미등록·Store Workspace 없는 키는 빈 응답 (cross-service 노출 아님 — 서비스 태그가 없는 원장).
+  //   - producer 는 항상 'supplier' — 다른 producer 가 명시되면 빈 응답.
+  //
+  // 하지 않는 것: 특정 매장 대상 발송/assignment 없음 · 사본 생성 없음(Store 가져가기 = Store Workspace 단계) ·
+  //   mixed 통합 목록 편입 없음(Hub UI 탭 신설과 함께 Store Workspace 단계가 정한다).
+  private async querySupplierLibrary(
+    serviceKey: string,
+    producer: HubProducer | undefined,
+    page: number,
+    limit: number,
+  ): Promise<HubContentListResponse> {
+    const empty = { success: true, data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
+    if (producer && producer !== 'supplier') return empty;
+    if (!getServiceWorkspaceCapability(serviceKey).storeWorkspaceEnabled) return empty;
+    try {
+      const offset = (page - 1) * limit;
+      const rows = await this.dataSource.query(
+        `SELECT i.id, i.title, i.description, i.file_url, i.file_name, i.mime_type, i.category,
+                i.content_type, i.supplier_id, i.created_at,
+                s.name AS supplier_name
+         FROM neture_supplier_library_items i
+         LEFT JOIN neture_suppliers s ON s.id = i.supplier_id
+         WHERE i.is_public = true
+         ORDER BY i.created_at DESC
+         LIMIT $1 OFFSET $2`,
+        [limit, offset],
+      );
+      const countRows = await this.dataSource.query(
+        `SELECT COUNT(*)::int AS total FROM neture_supplier_library_items WHERE is_public = true`,
+      );
+      const total = countRows[0]?.total ?? 0;
+      return {
+        success: true,
+        data: rows.map((r: any) => this.mapSupplierLibraryItem(r)),
+        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      };
+    } catch (error: any) {
+      if (error.message?.includes('does not exist')) return empty;
+      throw error;
+    }
+  }
+
+  private mapSupplierLibraryItem(r: any): HubContentItemResponse {
+    const isImage = typeof r.mime_type === 'string' && r.mime_type.startsWith('image/');
+    return {
+      id: r.id,
+      sourceDomain: 'supplier-library',
+      producer: 'supplier',
+      title: r.title,
+      description: r.description ?? null,
+      thumbnailUrl: isImage ? r.file_url ?? null : null,
+      createdAt: r.created_at instanceof Date ? r.created_at.toISOString() : String(r.created_at),
+      authorId: r.supplier_id ?? null,
+      creatorName: r.supplier_name ?? null,
+      fileUrl: r.file_url ?? null,
+      fileName: r.file_name ?? null,
+      mimeType: r.mime_type ?? null,
+      category: r.category ?? null,
+      contentType: r.content_type ?? 'media',
+    };
   }
 
   // ── Mixed merge (in-memory) ──

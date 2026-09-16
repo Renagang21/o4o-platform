@@ -1,8 +1,9 @@
 /**
  * Neture Library Service
  *
- * 공급자 전용 자료실 CRUD
- * 독립 도메인 — HUB/Signage/CMS 연동 없음
+ * 공급자 canonical 콘텐츠 원장 CRUD (neture_supplier_library_items)
+ * WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1: is_public=true 행은 Hub source adapter
+ * ('supplier-library') 가 읽는다. 여기서는 원장 CRUD 만 담당한다 (전송·복사 없음).
  *
  * WO-O4O-NETURE-LIBRARY-FOUNDATION-V1
  */

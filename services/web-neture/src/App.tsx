@@ -847,6 +847,10 @@ function App() {
                   매장 제공 자료 3종(설명서·태블릿 화면·사이니지)의 검수·게시 상태 집계.
                   기존 3개 목록 API 의 클라이언트 집계 — 신규 백엔드 API·테이블 0. 읽기 전용. */}
               <Route path="/supplier/store-materials-status" element={<SupplierStoreMaterialsStatusPage />} />
+              {/* WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1:
+                  아래 /supplier/forum* · /supplier/my-forum 은 legacy deep-link 보존용이다.
+                  공급자 사이드바 '커뮤니티' 그룹은 은퇴(SUPPLIER_COMMUNITY_ENTRY=RETIRED) — Community 참여는 O4O Home 경로.
+                  route rename · redirect chain 금지 (WO §5). Forum 기능 자체는 삭제 대상이 아니다. */}
               <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" basePath="/supplier/forum" />} />
               <Route path="/supplier/forum/write" element={<ForumWritePage backPath="/supplier/forum" />} />
               <Route path="/supplier/forum/post/:slug" element={<ForumPostPage basePath="/supplier/forum" />} />
