@@ -198,4 +198,4 @@ FOLLOWUP=<Hub 이동: 회원 signage 탭 MOVE_TO_COMMUNITY · producer='store' d
 NEXT=GO_SERVICE_WORKSPACE_FOUNDATION
 ```
 
-구현 commit: (본 CHECK 와 동일 commit) · 기록 commit: 후속 기재.
+구현 commit: `29fffdb98` (본 CHECK 포함) · 기록 commit: 후속 커밋에서 hash 기재.
