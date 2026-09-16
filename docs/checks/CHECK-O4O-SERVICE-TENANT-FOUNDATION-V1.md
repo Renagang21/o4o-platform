@@ -137,7 +137,7 @@ GET /api/v1/work-scope/operator-services
 
 ## 7. Git
 
-- 커밋: (본문 commit 해시는 push 후 보고에 기록) · path-specific stage · `check-staged-scope.mjs` 통과
+- 커밋: `b4ff7b267` (구현 + 문서 + CHECK) · path-specific stage · `check-staged-scope.mjs` 통과 · push 완료
 - 완료 조건: WO 범위 미커밋 0 · `HEAD == origin/main`
 
 ---
