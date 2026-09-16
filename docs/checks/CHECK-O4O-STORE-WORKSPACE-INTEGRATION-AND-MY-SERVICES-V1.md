@@ -4,7 +4,7 @@
 > **일자**: 2026-09-16 · **기준 main**: `52a9df42a` (Supplier Workspace CLOSED `de728b3e6`/`69413f43e` 이후)
 > **성격**: Store Workspace 상위 구조(Home / My Store / Store Hub / My Services) 통합 + My Services 최소 All view + 대표 홈 진입 정렬 + Supplier→Store Hub UI 편입 + KPA 모바일 전용 화면 RETIRE. 새 테이블 0 · migration 0 · schema 변경 0 · RBAC 변경 0 · 공통 셸 재작성 0 · 프로덕션 write 0.
 > **상위 기준**: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §3 · §4 · §4-1 · §6 · §9-1(5단계) · 선행 [`CHECK-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1`](CHECK-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1.md) §7-1 · [`CHECK-O4O-SERVICE-TENANT-FOUNDATION-V1`](CHECK-O4O-SERVICE-TENANT-FOUNDATION-V1.md)
-> **구현 commit**: _(후속 commit 에서 기록)_
+> **구현 commit**: `fb08c0dd1` (2026-09-16 · Deploy API Server / Web Services / Admin Dashboard / CodeQL success)
 
 ---
 
@@ -127,7 +127,27 @@
 
 ### 4-1. Production smoke (§22)
 
-_(배포 후 후속 commit 에서 기록 — 배포 전에는 PENDING)_
+**실행**: 2026-09-16, 배포 성공 후 Playwright(실 브라우저) · desktop 1280×900 + mobile 400×800 · 로그인은 KPA 로그인 페이지 데모 버튼(체험용 약국 경영자)만 사용 · 프로덕션 read-only(write 0) · 자격정보 미기록.
+
+| # | 항목 | 결과 | 확인 내용 |
+|---|---|---|---|
+| S1 | KPA `/store` (내 매장) | PASS | 기존 `MyStoreShell` 위 배너 nav `홈 / 내 매장 / 매장 HUB / 내 서비스`(`data-testid=store-workspace-nav`) 표시 · 매장 "테스트 약국 매장" |
+| S2 | KPA `/store/workspace` (홈) | PASS | 제목 "테스트 약국 업무공간" + 진입 카드 3(내 매장 · 매장 HUB · 내 서비스) |
+| S3 | KPA `/store/services` (내 서비스) | PASS | 화면 = `KPA Society · 현재 서비스 · 이용 중 · 내 매장으로(/store)` 1행. 화면이 호출한 `GET /work-scope/store-services?organizationId=<org>` → 200 `status:resolved`, services=[{kpa-society, enrollmentStatus:active, workspaceAvailable:true}] — UI == API |
+| S4 | KPA `/store-hub` (매장 HUB) | PASS | Hub 레이아웃 **위**에 workspace nav · Hub 사이드바에 `공급자 콘텐츠 → /store-hub/supplier-library` |
+| S5 | KPA `/store-hub/supplier-library` | PASS | empty state "아직 공개된 공급자 콘텐츠가 없습니다" (`GET /hub/contents?serviceKey=kpa-society&sourceDomain=supplier-library` 200, total 0 — §22 허용) |
+| S6 | KPA canonical 기능 1건 | PASS | `/store/library/contents` 정상 렌더(18건) — canonical 회귀 없음 |
+| S7 | KPA `/mobile/pharmacy` | PASS | `/store/workspace` 로 redirect |
+| S8 | KPA mobile 400×800 | PASS | `/store/workspace` 4탭 nav + 카드 세로 적층 + 하단 nav "약국 경영" active · `/store-hub` workspace nav + "허브 메뉴 열기" drawer (screenshot `kpa-workspace-mobile.png`, 미커밋) |
+| S9 | O4O Home(neture.co.kr) → Store Workspace | PASS | KPA 세션에서 `POST /auth/handoff {neture}` 로 대표 홈 진입 → `내 매장` 그룹에 KPA Society(테스트 약국) · K-Cosmetics(테스트 뷰티샵) · 파머시 허브(네뚜레 약국) 3행 (`GET /neture/home/entry` stores 3 = catalog 파생) |
+| S10 | O4O Home → KPA 내 매장 | PASS | `kpa-society.co.kr/store/workspace` 도착 |
+| S11 | O4O Home → PH 내 매장 | PASS | `pharmacyhub.co.kr/store-owner/workspace` "네뚜레 약국 업무공간" · nav `/store-owner · /store-hub · /store-owner/services` · `/store-owner/services` = `파머시 허브 · 이용 중 · 내 매장으로(/store-owner)` · PG callback 경로 접촉 없음 |
+| S12 | O4O Home → KCos 내 매장 | PASS | `k-cosmetics.site/store/workspace` "매장 업무공간" · nav `/store · /store-hub · /store/services` |
+
+**한계(숨기지 않음)**
+- 프로덕션의 테스트 매장 3개는 **각각 별도 organization 이며 서비스 1개씩만 가입** → My Services 의 *타 서비스 handoff 행*(2+ 서비스 가입 org)은 프로덕션에서 실행 불가. 이 경로는 §4 합성 시나리오(unit test 3층)로만 검증됨.
+- KCos 홈 제목에 매장명이 붙지 않음("매장 업무공간") — 기능 결함 아님, 본 WO 범위 밖 표시 차이. §7 후속에 기록.
+- 첫 진입 시 각 cross-origin 서비스에서 `auth/me`·`auth/refresh` 401 콘솔 1회 — handoff 이전 토큰 없는 상태의 기존 동작, 회귀 아님.
 
 ---
 
@@ -166,6 +186,7 @@ _(배포 후 후속 commit 에서 기록 — 배포 전에는 PENDING)_
 2. `/mobile/pharmacy` COMPAT_REDIRECT 제거 (RETIRE_LATER).
 3. My Services 출처 값(`SERVICE`) 신설 — Service Operator Workspace 단계(§9-1 6).
 4. 상위 `StoreWorkspaceNav` 의 반응형 표준 편입 여부 — 별도 WO 후보.
+5. KCos `/store/workspace` 홈 제목에 매장명 표시(현재 "매장 업무공간" 고정) — production smoke S12 관찰.
 
 ---
 
@@ -183,6 +204,6 @@ NEW_MEMBERSHIP_TABLE=0
 CONTENT_SOURCE_MAPPING COMMUNITY=PASS HUB=PASS SERVICE=FOUNDATION_ONLY DIRECT=PASS
 STORE_CAPABLE_DRIFT=CLOSED
 SERVICE_ROUTE_COMPAT=/mobile/pharmacy→/store/workspace · /hub→/store-hub(기존)
-PRODUCTION_SMOKE=PENDING_DEPLOY (배포 후 §4-1 에 기록)
+PRODUCTION_SMOKE=PASS (desktop+mobile · KPA/Neture/PH/KCos 12항목 · 다중 서비스 handoff 행은 프로덕션에 2+ 서비스 가입 org 부재 → unit test 로만 검증)
 NEXT=GO_SERVICE_OPERATOR_WORKSPACE
 ```
