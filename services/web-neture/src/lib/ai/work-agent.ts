@@ -44,6 +44,12 @@ export interface WorkAgentResult {
   message: string;
   errorCode: string | null;
   target: WorkTargetSummary | null;
+  /**
+   * PHASE 1 same-run(WO-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1): QUESTION 으로 멈춘 run 의
+   * 재개 앵커(opaque). `resumable=true` 일 때만 다음 요청에 `runId` 를 실어 같은 업무를 잇는다. UI 는 값을 해석하지 않는다.
+   */
+  runId?: string | null;
+  resumable?: boolean;
 }
 
 export class WorkAgentError extends Error {

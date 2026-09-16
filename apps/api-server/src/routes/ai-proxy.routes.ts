@@ -47,6 +47,16 @@ import { isYouTubeUrl, fetchYouTubeContent, fetchYouTubeOEmbed } from './ai-prox
 import { execute } from '@o4o/ai-core';
 import { dynamicLimiter } from '../middleware/rateLimiter.js';
 import { createLlmPlanner, createStrongLlmPlanner, runWorkAgent } from '../services/ai-tools/work-agent-runtime.js';
+// WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 — 단일 요청 라우터 · 첨부 계약 · 첨부 리더 · multimodal 호출
+import {
+  validateUnifiedAttachments,
+  unifiedAttachmentErrorMessage,
+  firstImageAttachment,
+  type UnifiedAttachment,
+} from '../services/ai-tools/unified-request-contract.js';
+import { classifyUnifiedRequest, confirmWorkMessage } from '../services/ai-tools/unified-request-router.js';
+import { readAttachments, renderAttachmentTextBlocks } from '../services/ai-tools/attachment-reader.js';
+import { executeMultimodalChat } from '../services/ai-tools/multimodal-chat.js';
 import { resolveWorkScopeStore, STORE_SCOPED_WORKSPACES } from '../utils/work-scope-store-resolution.js';
 import {
   selectToolInvocationForRequest,
@@ -247,15 +257,21 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
 //
 //   POST /api/ai/work-agent/run  { request, targetHint?, image?: { mimeType, base64 } }
 //
-//   사용자가 명시적으로 부른다(채팅 라우터가 자동 선택하지 않는다 §48). 상태는 이 요청 안에서만 산다(§40) —
-//   automation_jobs · 큐 · 스케줄러 · 실행 기록 테이블에 닿지 않는다(§41). 이미지는 메모리에서만 쓰고 버린다(§23).
-//   로그는 usage signal(허용 키)뿐 — goal 원문 · 관찰 · 입력값 · 이미지는 실리지 않는다(§22·§23).
+//   상태는 이 요청 안에서만 산다(§40) — automation_jobs · 큐 · 스케줄러 · 실행 기록 테이블에 닿지 않는다(§41).
+//   이미지는 메모리에서만 쓰고 버린다(§23). 로그는 usage signal(허용 키)뿐 — goal 원문 · 관찰 · 입력값 · 이미지는 실리지 않는다(§22·§23).
+//
+//   WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1: 이 endpoint 는 그대로 두고, 본체를 `performWorkAgentRun` 으로
+//   떼어 `POST /api/ai/request`(단일 요청 라우터)도 같은 실행 경로를 쓴다. 사용자가 [작업 수행] 을 고르는 대신 서버 라우터가
+//   요청 성격을 판정해 이 경로로 보낸다(§48 "명시적 호출" 원칙은 상위 라우터의 결정론적 판정으로 대체 — 안전 경계는 불변).
 // ===========================================
-router.post('/work-agent/run', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
-  const authReq = req as AuthRequest;
-  const userId = authReq.user?.id;
-  if (!userId) return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
-  const body = (req.body ?? {}) as Record<string, unknown>;
+
+/** route 본체가 돌려주는 응답 — 두 endpoint 가 같은 본체를 쓴다. */
+interface RouteReply {
+  status: number;
+  body: Record<string, unknown>;
+}
+
+async function performWorkAgentRun(userId: string, body: Record<string, unknown>): Promise<RouteReply> {
   const args: Record<string, unknown> = { request: body.request };
   if (body.targetHint !== undefined) args.targetHint = body.targetHint;
   if (body.image !== undefined) args.image = body.image;
@@ -264,7 +280,7 @@ router.post('/work-agent/run', authenticate, dynamicLimiter('free'), async (req,
 
   const tool = findToolDefinition(AI_TOOL_NAMES.WORK_AGENT_PERFORM);
   const argCheck = validateToolArguments(args, tool);
-  if (!argCheck.ok) return res.status(400).json({ success: false, error: '요청 형식이 올바르지 않습니다(목적 문장 · 등록 사이트 · JPEG/PNG/WebP 이미지만).', code: 'WORK_AGENT_GOAL_INVALID' });
+  if (!argCheck.ok) return { status: 400, body: { success: false, error: '요청 형식이 올바르지 않습니다(목적 문장 · 등록 사이트 · JPEG/PNG/WebP 이미지만).', code: 'WORK_AGENT_GOAL_INVALID' } };
 
   // home-chat 과 같은 방식으로 서버가 tool 컨텍스트를 확정한다 — 클라이언트 값은 권한 근거가 아니다.
   const toolCtx: VerifiedToolContext = { userId, workspace: 'home' };
@@ -273,7 +289,7 @@ router.post('/work-agent/run', authenticate, dynamicLimiter('free'), async (req,
   if (deviceResolution.status === 'ok') toolCtx.localDeviceId = deviceResolution.device.id;
   const authz = assertToolAllowed(AI_TOOL_NAMES.WORK_AGENT_PERFORM, toolCtx);
   if (!authz.allowed) {
-    return res.status(403).json({ success: false, error: '이 PC 의 O4O 확장이 연결되어 있어야 합니다.', code: 'WORK_AGENT_NOT_AVAILABLE', reason: authz.reason });
+    return { status: 403, body: { success: false, error: '이 PC 의 O4O 확장이 연결되어 있어야 합니다.', code: 'WORK_AGENT_NOT_AVAILABLE', reason: authz.reason } };
   }
 
   const result = await runWorkAgent(
@@ -293,26 +309,37 @@ router.post('/work-agent/run', authenticate, dynamicLimiter('free'), async (req,
   );
   // history 에는 행동 종류 · ref · 상태만 있고 입력 텍스트는 뺀다(응답에도 검색어를 되돌리지 않는다).
   const history = result.history.map((h) => ({ step: h.step, kind: h.action.kind, status: h.status, errorCode: h.errorCode ?? null, navigated: h.navigated === true }));
-  return res.json({
-    success: true,
-    data: {
-      goal: { goalId: result.goal.goalId, status: result.goal.status, siteId: result.siteId, displayName: result.displayName },
-      // PHASE 1: 같은 logical run 재개용 id(opaque) + 재개 가능 여부. QUESTION(waiting_for_user)일 때만 resumable=true.
-      runId: result.goal.runId ?? null,
-      resumable: result.resumable,
-      progress: result.progress,
-      takeover: result.takeover,
-      neededInput: result.neededInput,
-      stepCount: result.stepCount,
-      aiPlanCount: result.aiPlanCount,
-      path: result.path,
-      history,
-      message: result.message,
-      errorCode: result.errorCode ?? null,
-      // WORK-TARGET-DISCOVERY-V0 §33·§54 — 대상 준비 요약(안전 필드만). 경로 · 탭 제목 · 실행 경로 없음.
-      target: result.target,
+  return {
+    status: 200,
+    body: {
+      success: true,
+      data: {
+        goal: { goalId: result.goal.goalId, status: result.goal.status, siteId: result.siteId, displayName: result.displayName },
+        // PHASE 1: 같은 logical run 재개용 id(opaque) + 재개 가능 여부. QUESTION(waiting_for_user)일 때만 resumable=true.
+        runId: result.goal.runId ?? null,
+        resumable: result.resumable,
+        progress: result.progress,
+        takeover: result.takeover,
+        neededInput: result.neededInput,
+        stepCount: result.stepCount,
+        aiPlanCount: result.aiPlanCount,
+        path: result.path,
+        history,
+        message: result.message,
+        errorCode: result.errorCode ?? null,
+        // WORK-TARGET-DISCOVERY-V0 §33·§54 — 대상 준비 요약(안전 필드만). 경로 · 탭 제목 · 실행 경로 없음.
+        target: result.target,
+      },
     },
-  });
+  };
+}
+
+router.post('/work-agent/run', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
+  const authReq = req as AuthRequest;
+  const userId = authReq.user?.id;
+  if (!userId) return res.status(401).json({ success: false, error: '로그인이 필요합니다.' });
+  const reply = await performWorkAgentRun(userId, (req.body ?? {}) as Record<string, unknown>);
+  return res.status(reply.status).json(reply.body);
 });
 
 // ===========================================
@@ -1922,24 +1949,26 @@ router.post('/lesson-body', authenticate, async (req, res: Response) => {
 //   - 클라이언트가 보낸 workScope 는 **요청 컨텍스트 힌트**일 뿐 권한 근거가 아니다.
 //     serviceKey/workspace 만 받아 서버가 membership·store 를 다시 확정한다.
 //     클라이언트의 organizationId/storeId 는 읽지도, 프롬프트에 넣지도 않는다.
+//
+// WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1: 본체를 `performHomeChat` 으로 떼어 `POST /api/ai/request` 가 같은
+// 경로를 쓴다. 첨부(이미지 · PDF inline / 문서 · 표 텍스트)는 그 경로에서만 들어오며 **요청 메모리 안에서만** 산다 —
+// 저장 · 로그 없음. `/home-chat` 자체의 계약(텍스트만)은 그대로다.
 // ===========================================
-router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
-  const authReq = req as AuthRequest;
-  const userId = authReq.user?.id;
 
-  if (!userId) {
-    return res.status(401).json({ success: false, error: '로그인이 필요합니다.', code: 'UNAUTHENTICATED' });
-  }
-
-  const validation = validateHomeChatMessage(req.body?.message);
+async function performHomeChat(
+  userId: string,
+  reqBody: Record<string, unknown>,
+  attachments: readonly UnifiedAttachment[] = [],
+): Promise<RouteReply> {
+  const validation = validateHomeChatMessage(reqBody.message);
   if (!validation.ok || !validation.message) {
     const code = validation.error ?? 'INVALID_MESSAGE';
-    return res.status(400).json({ success: false, error: homeChatValidationMessage(code), code });
+    return { status: 400, body: { success: false, error: homeChatValidationMessage(code), code } };
   }
   const message = validation.message;
 
   // ── 신뢰 경계: 클라이언트 workScope 에서 **축 힌트만** 취한다 ──────────────
-  const clientScope = (req.body?.workScope ?? {}) as Record<string, unknown>;
+  const clientScope = (reqBody.workScope ?? {}) as Record<string, unknown>;
   const workspace = typeof clientScope.workspace === 'string' ? clientScope.workspace : 'home';
   const requestedServiceKey = typeof clientScope.serviceKey === 'string' ? clientScope.serviceKey : '';
   const capabilities = Array.isArray(clientScope.capabilities)
@@ -2074,63 +2103,77 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
     // WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0:
     //   provider 는 (요청 body 명시) → (AI_DEFAULT_PROVIDER env) → (코드 기본값) 순으로 정한다.
     //   Home UI 는 provider 를 보내지 않으므로 실사용에서는 env/기본값이 쓰인다(§11 selector 미노출).
-    const { provider, model, apiKey } = await resolveAiTarget(AppDataSource, req.body?.provider);
+    const { provider, model, apiKey } = await resolveAiTarget(AppDataSource, reqBody.provider);
+
+    // UNIFIED-REQUEST §6·§7 — 첨부는 여기서 읽고(요청 메모리) 프롬프트 사실 + 자료 블록 + inline part 로만 쓴다.
+    const attachmentParts = attachments.length > 0 ? readAttachments(attachments) : [];
+    if (attachments.length > 0) {
+      facts.attachments = attachmentParts.map((p) => ({
+        name: p.name,
+        kind: attachments.find((a) => a.name === p.name && a.mimeType === p.mimeType)?.kind ?? 'document',
+        readable: p.kind !== 'unreadable',
+      }));
+    }
 
     // tool 결과는 system prompt 뒤에 **요약 문장으로만** 덧붙인다(구조체 통째 전달 금지).
     const basePrompt = buildHomeChatSystemPrompt(facts);
     const systemPrompt = toolContextBlock ? `${basePrompt}\n\n${toolContextBlock}` : basePrompt;
+    const userPrompt = buildHomeChatUserPrompt(message, renderAttachmentTextBlocks(attachmentParts));
 
-    const result = await execute({
-      systemPrompt,
-      userPrompt: buildHomeChatUserPrompt(message),
-      provider,
-      responseMode: 'text',
-      config: {
-        apiKey,
-        model,
-        // temperature 는 gemini 용이다. OpenAI 현행 세대는 provider adapter 가 생략한다.
-        temperature: 0.5,
-        maxTokens: 2048,
-        responseMode: 'text',
-        // reasoning 계열은 10s 기본 타임아웃으로는 끊긴다. 넉넉히 준다.
-        timeoutMs: HOME_CHAT_TIMEOUT_MS,
-      },
-      retry: { maxAttempts: 1 },
-      meta: { service: 'o4o-home', callerName: 'home-chat' },
-    });
+    const result = attachmentParts.some((p) => p.kind === 'inline')
+      ? await executeMultimodalChat({ provider, model, apiKey, systemPrompt, userPrompt, parts: attachmentParts, timeoutMs: HOME_CHAT_TIMEOUT_MS })
+      : await execute({
+          systemPrompt,
+          userPrompt,
+          provider,
+          responseMode: 'text',
+          config: {
+            apiKey,
+            model,
+            // temperature 는 gemini 용이다. OpenAI 현행 세대는 provider adapter 가 생략한다.
+            temperature: 0.5,
+            maxTokens: 2048,
+            responseMode: 'text',
+            // reasoning 계열은 10s 기본 타임아웃으로는 끊긴다. 넉넉히 준다.
+            timeoutMs: HOME_CHAT_TIMEOUT_MS,
+          },
+          retry: { maxAttempts: 1 },
+          meta: { service: 'o4o-home', callerName: 'home-chat' },
+        });
 
     const answer = extractHomeChatAnswer(result.content);
     if (!answer) {
       logger.warn('home-chat empty answer', { requestId, userId, model: result.model });
-      return res.status(502).json({
-        success: false,
-        error: '응답을 생성하지 못했습니다. 다시 시도해 주세요.',
-        code: 'AI_ERROR',
-      });
+      return { status: 502, body: { success: false, error: '응답을 생성하지 못했습니다. 다시 시도해 주세요.', code: 'AI_ERROR' } };
     }
 
-    return res.json({
-      success: true,
-      data: {
-        message: answer,
-        scope: {
-          workspace: facts.workspace,
-          serviceKey: facts.serviceKey ?? null,
-          storeStatus: facts.storeStatus ?? null,
+    return {
+      status: 200,
+      body: {
+        success: true,
+        data: {
+          message: answer,
+          scope: {
+            workspace: facts.workspace,
+            serviceKey: facts.serviceKey ?? null,
+            storeStatus: facts.storeStatus ?? null,
+          },
+          // 어느 provider/model 이 응답했는지. 키·프롬프트가 아니라 식별자뿐이라 비민감이며,
+          // multi-provider 전환 검증에 필요하다(§20 smoke 가 이 값을 본다).
+          provider,
+          model: result.model,
+          // 어떤 tool 이 실행/차단됐는지. 이름과 판정뿐이라 비민감이며 smoke 검증에 필요하다.
+          tool: executedTool,
+          toolOutcome,
+          // BROWSER-CONTROL-V0: 열렸을 때만 채워진다. URL·browserType 은 싣지 않는다 — UI 가
+          // 필요한 것은 "[로그인 완료] 버튼을 보여줄 것인가" 뿐이다.
+          browserSiteOpened,
+          // UNIFIED-REQUEST: 어떤 첨부가 읽혔는지(이름 · 종류 · 읽힘 여부만 — 내용 없음). UI 가 "읽지 못함" 을 표시한다.
+          attachments: facts.attachments ?? [],
+          requestId,
         },
-        // 어느 provider/model 이 응답했는지. 키·프롬프트가 아니라 식별자뿐이라 비민감이며,
-        // multi-provider 전환 검증에 필요하다(§20 smoke 가 이 값을 본다).
-        provider,
-        model: result.model,
-        // 어떤 tool 이 실행/차단됐는지. 이름과 판정뿐이라 비민감이며 smoke 검증에 필요하다.
-        tool: executedTool,
-        toolOutcome,
-        // BROWSER-CONTROL-V0: 열렸을 때만 채워진다. URL·browserType 은 싣지 않는다 — UI 가
-        // 필요한 것은 "[로그인 완료] 버튼을 보여줄 것인가" 뿐이다.
-        browserSiteOpened,
-        requestId,
       },
-    });
+    };
   } catch (error: unknown) {
     // WO-O4O-AI-MULTI-PROVIDER-RUNTIME-V0: provider 마다 다른 원문을 공통 코드로 접는다.
     // 원문(키·모델·상태코드 포함 가능)은 **서버 로그에만** 남기고 응답에는 코드만 싣는다.
@@ -2148,12 +2191,101 @@ router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res:
       : normalized.code === 'TIMEOUT' ? 504
       : normalized.code === 'INSUFFICIENT_QUOTA' ? 503
       : 502;
-    return res.status(status).json({
-      success: false,
-      error: aiErrorUserMessage(normalized.code),
-      code: normalized.code,
+    return { status, body: { success: false, error: aiErrorUserMessage(normalized.code), code: normalized.code } };
+  }
+}
+
+router.post('/home-chat', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
+  const authReq = req as AuthRequest;
+  const userId = authReq.user?.id;
+  if (!userId) {
+    return res.status(401).json({ success: false, error: '로그인이 필요합니다.', code: 'UNAUTHENTICATED' });
+  }
+  const reply = await performHomeChat(userId, (req.body ?? {}) as Record<string, unknown>);
+  return res.status(reply.status).json(reply.body);
+});
+
+// ===========================================
+// POST /api/ai/request — 단일 자연어 요청 진입점 (Unified Request Router)
+// WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 §4·§5·§6
+//
+//   { text, attachments?: [{ name, mimeType, base64 }], runId?, routeHint?: 'work', workScope? }
+//
+//   사용자는 "질문 / 작업 수행" 을 고르지 않는다. 서버 라우터(unified-request-router, 결정론적 · AI 호출 없음)가
+//   판정해 기존 두 본체(performHomeChat · performWorkAgentRun) 중 하나로 보낸다. 응답은 `data.kind` 로 갈린다:
+//     chat    — data.chat = home-chat 응답 그대로
+//     work    — data.work = work-agent/run 응답 그대로
+//     confirm — data.confirm = { message, target } ; 사용자가 "진행" 하면 같은 text 에 routeHint:'work' 로 다시 온다
+//   첨부: 이미지는 두 경로 모두(Work Agent 는 첫 이미지 1장 — 기존 계약), 문서 · 표는 chat 경로에서만 읽는다.
+//   안전: Work 경로의 COMMIT · credential · never-escalate 판정은 runtime 그대로 — 라우터는 권한을 넓히지 않는다.
+//   저장: 첨부 · 텍스트 · 응답 어느 것도 DB · 파일 · 로그에 쓰지 않는다. 로그는 route 판정 이름과 첨부 개수뿐이다.
+// ===========================================
+router.post('/request', authenticate, dynamicLimiter('free'), async (req, res: Response) => {
+  const authReq = req as AuthRequest;
+  const userId = authReq.user?.id;
+  if (!userId) {
+    return res.status(401).json({ success: false, error: '로그인이 필요합니다.', code: 'UNAUTHENTICATED' });
+  }
+  const body = (req.body ?? {}) as Record<string, unknown>;
+
+  const validation = validateHomeChatMessage(body.text);
+  if (!validation.ok || !validation.message) {
+    const code = validation.error ?? 'INVALID_MESSAGE';
+    return res.status(400).json({ success: false, error: homeChatValidationMessage(code), code });
+  }
+  const text = validation.message;
+
+  const attachmentCheck = validateUnifiedAttachments(body.attachments);
+  if (!attachmentCheck.ok) {
+    const code = attachmentCheck.error ?? 'ATTACHMENT_INVALID';
+    return res.status(400).json({ success: false, error: unifiedAttachmentErrorMessage(code, attachmentCheck.errorName), code });
+  }
+  const attachments = attachmentCheck.attachments;
+
+  const runId = typeof body.runId === 'string' && body.runId.length > 0 ? body.runId : undefined;
+  const routeHint = body.routeHint === 'work' ? 'work' : undefined;
+  const decision = classifyUnifiedRequest(text, {
+    runId,
+    routeHint,
+    hasDocumentAttachment: attachments.some((a) => a.kind !== 'image'),
+  });
+  logger.info('ai unified request routed', {
+    userId,
+    route: decision.route,
+    reason: decision.reason,
+    targetType: decision.target?.targetType ?? null,
+    attachmentCount: attachments.length,
+  });
+
+  if (decision.route === 'confirm_work' && decision.target) {
+    return res.json({
+      success: true,
+      data: {
+        kind: 'confirm',
+        route: decision.route,
+        reason: decision.reason,
+        confirm: {
+          message: confirmWorkMessage(decision.target),
+          target: { targetType: decision.target.targetType, displayName: decision.target.displayName },
+        },
+      },
     });
   }
+
+  if (decision.route === 'work') {
+    const image = firstImageAttachment(attachments);
+    const workBody: Record<string, unknown> = { request: text };
+    if (image) workBody.image = image;
+    if (runId) workBody.runId = runId;
+    if (typeof body.recoveryHint === 'string') workBody.recoveryHint = body.recoveryHint;
+    const reply = await performWorkAgentRun(userId, workBody);
+    if (reply.status !== 200) return res.status(reply.status).json(reply.body);
+    return res.json({ success: true, data: { kind: 'work', route: decision.route, reason: decision.reason, work: reply.body.data } });
+  }
+
+  const reply = await performHomeChat(userId, { message: text, workScope: body.workScope, provider: body.provider }, attachments);
+  if (reply.status !== 200) return res.status(reply.status).json(reply.body);
+  return res.json({ success: true, data: { kind: 'chat', route: decision.route, reason: decision.reason, chat: reply.body.data } });
 });
 
 export default router;

@@ -30,18 +30,33 @@
  *   HomeEntryPanel 의 newsSlot(내가 이용하는 서비스 아래 · 가입·이용 상태 위), 로그인 전에는
  *   서비스 안내 pill 아래. 소식 포럼의 공개 글 최신 5건 + 분류 바로가기 3종. 실패해도 홈은 막히지 않는다.
  *
+ * WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1:
+ *   [작업 수행] / [전송] 두 버튼과 이미지 전용 첨부를 **＋ · 입력창 · ↑** 하나의 흐름으로 합쳤다. 사용자는 질문인지
+ *   작업인지 고르지 않는다 — `POST /api/ai/request` 의 서버 라우터가 판정한다(lib/ai/unified-request). ＋ 는 범용 자료
+ *   입력(파일 첨부: 이미지 · PDF · DOCX · TXT/MD · XLSX/XLS/CSV — 같은 파이프라인 / 내 PC 자료 연결: PHASE 3 자리).
+ *   첨부는 이번 요청에서만 쓰고 저장하지 않는다. `/home-chat` · `/work-agent/run` 클라이언트는 그대로 두었다(회귀 금지).
+ *
  * Neture 전용 chrome(NetureGlobalHeader / Footer / NetureBottomNav)은 쓰지 않는다 —
  * `/` 는 App.tsx 에서 NetureLayout 밖에 배치되어 있고, 기존 Neture 영역
  * (`/community`, `/mypage`, `/market-trial` 등)은 NetureLayout 을 그대로 유지한다.
  */
 
-import { useEffect, useRef, useState, type ClipboardEvent, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type ClipboardEvent, type DragEvent, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { UserCircle, Loader2, ArrowUp, ImagePlus, Play, X, LogOut, ChevronDown } from 'lucide-react';
+import { UserCircle, Loader2, ArrowUp, Plus, Paperclip, HardDrive, FileText, Image as ImageIcon, Table2, X, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth, useLoginModal, useWorkScope } from '../contexts';
 import { getUserDisplayName } from '@o4o/account-ui';
-import { sendHomeChat, HomeChatError, HOME_CHAT_MAX_MESSAGE_LENGTH } from '../lib/ai/home-chat';
-import { isSupportedWorkImage, readWorkImage, runWorkAgent, WorkAgentError, type WorkAgentResult } from '../lib/ai/work-agent';
+import { HOME_CHAT_MAX_MESSAGE_LENGTH } from '../lib/ai/home-chat';
+import { type WorkAgentResult } from '../lib/ai/work-agent';
+import {
+  addPendingAttachments,
+  sendUnifiedRequest,
+  UnifiedRequestError,
+  UNIFIED_ATTACHMENT_ACCEPT,
+  UNIFIED_ATTACHMENT_EXTENSIONS,
+  type PendingAttachment,
+  type UnifiedRequestResult,
+} from '../lib/ai/unified-request';
 import { useHomeEntry } from '../lib/home-entry';
 import HomeEntryPanel from '../components/home/HomeEntryPanel';
 import HomeServiceNews from '../components/home/HomeServiceNews';
@@ -115,13 +130,23 @@ export default function O4OHomePage() {
   const [openedSite, setOpenedSite] = useState<{ siteId: string; displayName: string } | null>(null);
   const [loginReady, setLoginReady] = useState(false);
   /**
-   * WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §48 — 최소 진입점. 같은 입력창의 문장을 **목적**으로 보내는 [작업 수행]
-   * 버튼과, 사용자가 붙여넣거나 고른 이미지 한 장(§6·§11). 이미지 · 결과는 React state 뿐이다 — 저장하지 않는다(§23).
+   * WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 — 단일 요청 상태.
+   *   attachments  : ＋ · drag&drop · 붙여넣기로 들어온 범용 첨부(이미지 · 문서 · 표). 이번 요청에서만 쓰고 저장하지 않는다(§7).
+   *   workResult   : 서버가 Work 경로로 판정해 수행한 결과(WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §23 — React state 뿐).
+   *   confirm      : 서버가 "작업인지 모호" 로 되물은 상태. [진행] 은 같은 문장을 routeHint 로 다시 보낸다 — 모드 스위치가 아니다.
+   *   resumeRunId  : 직전 Work 응답이 QUESTION(resumable)이면 다음 요청을 같은 업무로 잇는 앵커(PHASE 1 same-run).
+   *   attachmentsUsed : 서버가 어떤 첨부를 읽었는지(이름 · 종류 · 읽힘 여부만).
    */
-  const [workImage, setWorkImage] = useState<File | Blob | null>(null);
+  const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
+  const [attachError, setAttachError] = useState<string | null>(null);
+  const [plusMenuOpen, setPlusMenuOpen] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
   const [workResult, setWorkResult] = useState<WorkAgentResult | null>(null);
-  const [workPending, setWorkPending] = useState(false);
+  const [confirm, setConfirm] = useState<{ text: string; message: string } | null>(null);
+  const [resumeRunId, setResumeRunId] = useState<string | null>(null);
+  const [attachmentsUsed, setAttachmentsUsed] = useState<{ name: string; kind: string; readable: boolean }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const plusMenuRef = useRef<HTMLDivElement>(null);
 
   /**
    * WO-O4O-NETURE-MAIN-ACCOUNT-AND-SUPPLIER-PARTNER-SERVICE-SEPARATION-V1 §4
@@ -143,9 +168,13 @@ export default function O4OHomePage() {
     setPending(false);
     setOpenedSite(null);
     setLoginReady(false);
-    setWorkImage(null);
+    setAttachments([]);
+    setAttachError(null);
+    setPlusMenuOpen(false);
     setWorkResult(null);
-    setWorkPending(false);
+    setConfirm(null);
+    setResumeRunId(null);
+    setAttachmentsUsed([]);
   };
   const userId = user?.id ?? null;
   const prevUserIdRef = useRef<string | null>(userId);
@@ -157,99 +186,109 @@ export default function O4OHomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
   useEffect(() => {
-    if (!accountMenuOpen) return;
+    if (!accountMenuOpen && !plusMenuOpen) return;
     const onDown = (e: MouseEvent) => {
-      if (accountMenuRef.current && !accountMenuRef.current.contains(e.target as Node)) setAccountMenuOpen(false);
+      if (accountMenuOpen && accountMenuRef.current && !accountMenuRef.current.contains(e.target as Node)) setAccountMenuOpen(false);
+      if (plusMenuOpen && plusMenuRef.current && !plusMenuRef.current.contains(e.target as Node)) setPlusMenuOpen(false);
     };
     document.addEventListener('mousedown', onDown);
     return () => document.removeEventListener('mousedown', onDown);
-  }, [accountMenuOpen]);
+  }, [accountMenuOpen, plusMenuOpen]);
   const handleLogout = () => {
     setAccountMenuOpen(false);
     resetAiState();
     logout();
   };
 
-  const takeImage = (file: File | Blob | null | undefined) => {
-    if (!file || !isSupportedWorkImage(file)) return false;
-    setWorkImage(file);
-    return true;
+  /** 어떤 경로(＋ · 붙여넣기 · drag&drop)로 들어와도 같은 첨부 파이프라인. 안 되는 파일만 사유를 알린다. */
+  const takeFiles = (files: readonly (File | Blob)[]) => {
+    if (files.length === 0) return;
+    const { next, rejected } = addPendingAttachments(attachments, files);
+    setAttachments(next);
+    setAttachError(rejected.length > 0 ? rejected.join(' ') : null);
   };
   const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
-    const item = Array.from(e.clipboardData?.items ?? []).find((it) => it.kind === 'file' && it.type.startsWith('image/'));
-    if (item && takeImage(item.getAsFile())) e.preventDefault();
+    const files = Array.from(e.clipboardData?.items ?? [])
+      .filter((it) => it.kind === 'file')
+      .map((it) => it.getAsFile())
+      .filter((f): f is File => !!f);
+    if (files.length > 0) {
+      e.preventDefault();
+      takeFiles(files);
+    }
   };
-  const handleWork = async () => {
-    if (!trimmed || blocked || workPending) return;
-    if (!isAuthenticated) {
-      openLoginModal();
-      return;
-    }
-    setWorkPending(true);
-    setError(null);
-    setQuestion(trimmed);
-    setAnswer(null);
-    setWorkResult(null);
-    setOpenedSite(null);
-    const gen = aiGenRef.current;
-    try {
-      const image = workImage ? await readWorkImage(workImage) : undefined;
-      const result = await runWorkAgent(trimmed, image);
-      if (gen !== aiGenRef.current) return; // 로그아웃 · 사용자 변경 후 도착한 응답은 버린다
-      setWorkResult(result);
-      setInput('');
-      setWorkImage(null);
-    } catch (err) {
-      if (gen !== aiGenRef.current) return;
-      setError(err instanceof WorkAgentError ? err.message : '작업을 수행하지 못했습니다. 다시 시도해 주세요.');
-    } finally {
-      if (gen === aiGenRef.current) setWorkPending(false);
-    }
+  const handleDrop = (e: DragEvent<HTMLElement>) => {
+    e.preventDefault();
+    setDragOver(false);
+    if (pending) return;
+    takeFiles(Array.from(e.dataTransfer?.files ?? []));
   };
 
   const trimmed = input.trim();
   // 매장 scope 해석 중에는 불완전한 컨텍스트로 보내지 않는다(§12).
   const blocked = pending || isResolvingStore;
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!trimmed || blocked) return;
-
+  /**
+   * 단일 실행. 질문 · 파일 분석 · 웹/PC 작업의 구분은 서버 라우터가 한다(§4·§5).
+   *   text      : 보낼 문장(confirm [진행] 은 되물은 문장을 그대로 다시 보낸다)
+   *   routeHint : confirm 에 "진행" 으로 답할 때만 'work'
+   */
+  const submit = async (text: string, routeHint?: 'work') => {
+    if (!text || blocked) return;
     // 비로그인은 기존 로그인 모달로 보낸다. 입력은 state 에 남아 있으므로
     // 로그인 후 그대로 다시 보낼 수 있다(§30 — auth/redirect 계약은 건드리지 않는다).
     if (!isAuthenticated) {
       openLoginModal();
       return;
     }
-
     setPending(true);
     setError(null);
-    setQuestion(trimmed);
+    setQuestion(text);
     setAnswer(null);
+    setWorkResult(null);
+    setConfirm(null);
+    setAttachmentsUsed([]);
+    setPlusMenuOpen(false);
     // 새 요청이 시작되면 이전 로그인 완료 신호는 의미가 없다 — 업무 단위 transient(§42).
     setOpenedSite(null);
     setLoginReady(false);
     const gen = aiGenRef.current;
+    const runId = resumeRunId ?? undefined;
     try {
-      const result = await sendHomeChat(trimmed, workScope);
+      const result: UnifiedRequestResult = await sendUnifiedRequest({ text, attachments, workScope, runId, routeHint });
       if (gen !== aiGenRef.current) return; // 로그아웃 · 사용자 변경 후 도착한 응답은 버린다
-      setAnswer(result.message);
-      setOpenedSite(result.browserSiteOpened ?? null);
+      if (result.kind === 'confirm') {
+        // 실행하지 않았다. 입력 · 첨부는 그대로 두고 [진행] 을 기다린다.
+        setConfirm({ text, message: result.confirm.message });
+        return;
+      }
       setInput('');
+      setAttachments([]);
+      setAttachError(null);
+      if (result.kind === 'work') {
+        setWorkResult(result.work);
+        setResumeRunId(result.work.resumable && result.work.runId ? result.work.runId : null);
+        return;
+      }
+      setAnswer(result.chat.message);
+      setOpenedSite(result.chat.browserSiteOpened ?? null);
+      setAttachmentsUsed(result.chat.attachments ?? []);
+      setResumeRunId(null);
     } catch (err) {
       if (gen !== aiGenRef.current) return;
       setAnswer(null);
-      setError(
-        err instanceof HomeChatError
-          ? err.message
-          : '응답을 생성하지 못했습니다. 다시 시도해 주세요.',
-      );
+      setError(err instanceof UnifiedRequestError || err instanceof Error ? err.message : '응답을 생성하지 못했습니다. 다시 시도해 주세요.');
     } finally {
       if (gen === aiGenRef.current) setPending(false);
     }
   };
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    void submit(trimmed);
+  };
 
-  const hasThread = question !== null || answer !== null || error !== null || workResult !== null;
+  const hasThread = question !== null || answer !== null || error !== null || workResult !== null || confirm !== null;
+  const ATTACH_ICON = { image: ImageIcon, document: FileText, spreadsheet: Table2 } as const;
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
@@ -332,73 +371,142 @@ export default function O4OHomePage() {
 
         <p className="mt-6 mb-0 text-base text-slate-500">무엇을 도와드릴까요?</p>
 
-        {/* AI 입력 (WO-O4O-COMMON-HOME-AI-INPUT-V0). 단일 행 입력이라 Enter 전송이 곧 submit 이다. */}
-        <form onSubmit={handleSubmit} className="mt-5 w-full max-w-xl">
-          <div className="relative">
+        {/*
+          AI 입력 — WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 §3·§8·§9.
+          [＋] 자료 입력 · 입력창 · [↑] 하나. 요청 유형을 고르는 버튼 · 모드 스위치는 없다. 단일 행 입력이라 Enter 가 곧 submit.
+          PC · 모바일 같은 구조 — 공간만 tailwind 반응형으로 줄어든다.
+        */}
+        <form
+          onSubmit={handleSubmit}
+          onDragOver={(e) => {
+            e.preventDefault();
+            if (!pending) setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          className="mt-5 w-full max-w-xl"
+          data-testid="home-composer"
+        >
+          <div className={`relative rounded-full transition-shadow ${dragOver ? 'ring-2 ring-slate-400' : ''}`}>
+            {/* ＋ 범용 자료 입력 진입점 — 파일 첨부 · 내 PC 자료 연결 */}
+            <div ref={plusMenuRef} className="absolute left-2 top-1/2 -translate-y-1/2">
+              <button
+                type="button"
+                onClick={() => setPlusMenuOpen((v) => !v)}
+                disabled={pending}
+                aria-label="자료 추가"
+                aria-haspopup="menu"
+                aria-expanded={plusMenuOpen}
+                title="파일 첨부 · 내 PC 자료 연결"
+                data-testid="home-composer-plus"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:text-slate-300"
+              >
+                <Plus className="h-5 w-5" />
+              </button>
+              {plusMenuOpen && (
+                <div role="menu" data-testid="home-composer-plus-menu" className="absolute left-0 top-11 z-40 w-64 rounded-xl border border-slate-200 bg-white py-1 text-left shadow-lg">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setPlusMenuOpen(false);
+                      fileInputRef.current?.click();
+                    }}
+                    className="flex w-full items-start gap-2.5 px-3 py-2 text-left hover:bg-slate-50"
+                  >
+                    <Paperclip className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
+                    <span>
+                      <span className="block text-sm text-slate-900">파일 첨부</span>
+                      <span className="block text-xs text-slate-500">이미지 · PDF · DOCX · TXT/MD · XLSX/XLS/CSV — 이번 요청에서만 사용</span>
+                    </span>
+                  </button>
+                  {/* PHASE 3 Local Data Source 진입 자리(§3). 반복 사용 자료 연결은 별도 계약 — 여기서는 구분만 보여준다. */}
+                  <button
+                    type="button"
+                    role="menuitem"
+                    aria-disabled="true"
+                    onClick={() => {
+                      setPlusMenuOpen(false);
+                      setAttachError('내 PC 자료 연결(반복 사용 자료)은 준비 중입니다. 지금은 [파일 첨부]로 이번 요청에 사용할 수 있습니다.');
+                    }}
+                    className="flex w-full items-start gap-2.5 px-3 py-2 text-left hover:bg-slate-50"
+                  >
+                    <HardDrive className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                    <span>
+                      <span className="block text-sm text-slate-500">내 PC 자료 연결</span>
+                      <span className="block text-xs text-slate-400">원내 약품 목록 · 재고 · 가격표처럼 반복해서 쓰는 자료 — 준비 중</span>
+                    </span>
+                  </button>
+                </div>
+              )}
+            </div>
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               maxLength={HOME_CHAT_MAX_MESSAGE_LENGTH}
-              disabled={pending || workPending}
+              disabled={pending}
               onPaste={handlePaste}
               aria-label="무엇을 도와드릴까요?"
-              placeholder="무엇이든 물어보세요 — 사진을 붙여넣고 [작업 수행]도 가능"
-              className="w-full rounded-full border border-slate-200 bg-white py-4 pl-6 pr-36 text-base text-slate-900 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400"
+              placeholder="무엇을 도와드릴까요?"
+              data-testid="home-composer-input"
+              className="w-full rounded-full border border-slate-200 bg-white py-4 pl-14 pr-14 text-base text-slate-900 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400"
             />
-            {/* 사용자가 고른 이미지만 처리한다(§6). */}
+            {/* 사용자가 고른 파일만 처리한다. 형식은 탐색기에서 고른다 — 종류별 메뉴를 두지 않는다(§3). */}
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp"
+              multiple
+              accept={UNIFIED_ATTACHMENT_ACCEPT}
               className="hidden"
+              data-testid="home-composer-file"
               onChange={(e) => {
-                takeImage(e.target.files?.[0]);
+                takeFiles(Array.from(e.target.files ?? []));
                 e.target.value = '';
               }}
             />
             <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={pending || workPending}
-              aria-label="이미지 첨부"
-              title="이미지 첨부(작업 수행에 함께 보냅니다)"
-              className="absolute right-[5.75rem] top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition-colors hover:text-slate-700 disabled:cursor-not-allowed"
-            >
-              <ImagePlus className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={handleWork}
-              disabled={!trimmed || blocked || workPending}
-              aria-label="작업 수행"
-              title="이 문장을 목적으로 등록된 사이트에서 작업을 수행합니다"
-              className="absolute right-12 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-slate-300 text-slate-700 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-300"
-            >
-              {workPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-            </button>
-            <button
               type="submit"
               disabled={!trimmed || blocked}
-              aria-label="전송"
+              aria-label="요청 실행"
+              title="요청 실행"
+              data-testid="home-composer-submit"
               className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-900 text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:bg-slate-200"
             >
-              {pending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <ArrowUp className="h-4 w-4" />
-              )}
+              {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
             </button>
           </div>
         </form>
 
-        {workImage && (
-          <div className="mt-2 flex w-full max-w-xl items-center gap-2 text-xs text-slate-500">
-            <span>이미지 1장 첨부됨 — [작업 수행] 시 함께 보냅니다(저장되지 않음).</span>
-            <button type="button" onClick={() => setWorkImage(null)} aria-label="이미지 제거" className="rounded-full p-0.5 text-slate-400 hover:text-slate-700">
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </div>
+        {/* 첨부 chip — 종류별 아이콘 하나로 같은 목록. 제거만 가능. */}
+        {attachments.length > 0 && (
+          <ul className="mt-2 flex w-full max-w-xl flex-wrap gap-1.5" data-testid="home-composer-attachments">
+            {attachments.map((a) => {
+              const Icon = ATTACH_ICON[a.kind];
+              return (
+                <li key={a.id} className="flex max-w-full items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 py-1 pl-2.5 pr-1 text-xs text-slate-700">
+                  <Icon className="h-3.5 w-3.5 shrink-0 text-slate-500" />
+                  <span className="truncate">{a.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => setAttachments((cur) => cur.filter((x) => x.id !== a.id))}
+                    disabled={pending}
+                    aria-label={`${a.name} 제거`}
+                    className="rounded-full p-0.5 text-slate-400 hover:text-slate-700 disabled:cursor-not-allowed"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </li>
+              );
+            })}
+            <li className="self-center text-xs text-slate-400">이번 요청에서만 사용 · 저장되지 않음</li>
+          </ul>
+        )}
+        {attachError && (
+          <p className="mt-2 w-full max-w-xl rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800" role="status" data-testid="home-composer-attach-error">
+            {attachError}
+            <span className="sr-only"> 지원 형식: {UNIFIED_ATTACHMENT_EXTENSIONS.join(', ')}</span>
+          </p>
         )}
 
         {/*
@@ -412,33 +520,52 @@ export default function O4OHomePage() {
               <p className="m-0 mb-3 text-sm font-medium text-slate-500">{question}</p>
             )}
             {pending && (
-              <p className="m-0 flex items-center gap-2 text-sm text-slate-400">
+              <p className="m-0 flex items-center gap-2 text-sm text-slate-400" data-testid="home-composer-pending">
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                응답 생성 중...
+                처리 중... (화면에서 작업이 필요하면 열려 있는 화면을 그대로 두세요)
               </p>
             )}
-            {workPending && (
-              <p className="m-0 flex items-center gap-2 text-sm text-slate-400">
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                등록된 화면을 보며 작업 중... (열려 있는 화면을 그대로 두세요)
-              </p>
+            {/* 서버가 "작업인지 모호" 로 되물은 경우 — 실행하지 않았다. [진행] 은 같은 문장을 다시 보낸다(§5-2). */}
+            {confirm && !pending && (
+              <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-700" data-testid="home-composer-confirm">
+                <p className="m-0">{confirm.message}</p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void submit(confirm.text, 'work')}
+                    className="rounded-full bg-slate-900 px-4 py-2 text-sm text-white transition-opacity hover:opacity-80"
+                  >
+                    진행
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirm(null)}
+                    className="rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 transition-colors hover:border-slate-500"
+                  >
+                    아니요, 질문을 고칠게요
+                  </button>
+                </div>
+              </div>
             )}
-            {/* WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §19·§20 — 결과와 인계 안내. 실제 화면은 Chrome 에 그대로 있다. */}
-            {workResult && !workPending && (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-[0.95rem] leading-relaxed text-slate-800">
+            {/* WO-O4O-GOAL-DRIVEN-MULTIMODAL-WORK-AGENT-V0 §19·§20 — 결과와 인계 안내. 실제 화면은 Chrome/프로그램에 그대로 있다. */}
+            {workResult && !pending && (
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-[0.95rem] leading-relaxed text-slate-800" data-testid="home-composer-work-result">
                 <p className="m-0 whitespace-pre-wrap">{workResult.message}</p>
                 <p className="m-0 mt-2 text-xs text-slate-500">
                   {workResult.goal.displayName} · 행동 {workResult.stepCount}단계 · AI 판단 {workResult.aiPlanCount}회
                   {workResult.takeover ? ` · 인계 사유 ${workResult.takeover.reason}` : ''}
                   {workResult.path ? ` · 현재 경로 ${workResult.path}` : ''}
                 </p>
-                {workResult.progress === 'needs_user' && (
+                {workResult.progress === 'needs_user' && !workResult.resumable && (
                   <p className="m-0 mt-2 text-sm text-slate-700">
                     {workResult.target?.targetType === 'windows_app'
                       ? '프로그램의 현재 화면에서 직접 이어서 진행하세요.'
                       : 'Chrome 의 현재 화면에서 직접 이어서 진행하세요.'}{' '}
                     필요하면 다음 문장으로 다시 요청할 수 있습니다.
                   </p>
+                )}
+                {workResult.resumable && (
+                  <p className="m-0 mt-2 text-sm text-slate-700">답을 입력하면 같은 작업을 이어서 진행합니다.</p>
                 )}
               </div>
             )}
@@ -452,6 +579,12 @@ export default function O4OHomePage() {
                     {line || <br />}
                   </p>
                 ))}
+                {attachmentsUsed.length > 0 && (
+                  <p className="m-0 mt-3 text-xs text-slate-500">
+                    참고한 첨부:{' '}
+                    {attachmentsUsed.map((a) => `${a.name}${a.readable ? '' : '(읽지 못함)'}`).join(' · ')}
+                  </p>
+                )}
               </div>
             )}
             {/* WO-O4O-BROWSER-CONTROL-V0 §19 — 사이트가 열렸을 때만. 로그인은 사용자가 직접 한다. */}

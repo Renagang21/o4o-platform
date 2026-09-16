@@ -763,8 +763,10 @@ export const AI_TOOL_REGISTRY: readonly AiToolDefinition[] = Object.freeze([
     argumentSchema: 'pharmacyWebEntry',
   },
   // ── Goal-Driven Work Agent V0 (§3·§9·§14) — 등재 site 탭에서 목적 기반 loop 를 1회 돈다. 관찰·행동은 전부 DOM tool 이며
-  //    새 agent action · 새 capability 는 없다. 채팅 라우터가 자동으로 고르지 않는다 — 사용자가 명시적으로 "작업 수행" 을 눌러
-  //    호출한다(§48). riskLevel REVERSIBLE: 입력·클릭이 있을 수 있다. COMMIT · credential 은 확장이 막고 runtime 이 인계한다.
+  //    새 agent action · 새 capability 는 없다. home-chat 의 1-step tool 라우터는 이것을 고르지 않는다(§48) — 호출 경로는
+  //    `POST /api/ai/work-agent/run` 과, WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 의 상위 라우터
+  //    (`POST /api/ai/request` → unified-request-router 결정론 판정) 두 곳뿐이다. riskLevel REVERSIBLE: 입력·클릭이 있을 수 있다.
+  //    COMMIT · credential 은 확장이 막고 runtime 이 인계한다.
   {
     name: AI_TOOL_NAMES.WORK_AGENT_PERFORM,
     automationMethod: 'browser_dom',
