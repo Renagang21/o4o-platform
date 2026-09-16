@@ -6,7 +6,7 @@
 > **상위 정본**: [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §7 — `CURRENT PARTNER = FULL RETIREMENT / FUTURE PARTNER = GREENFIELD`
 > **선행 기록**: [`CHECK-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1`](CHECK-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1.md) §8 (모집단은 재사용하지 않고 §1 에서 다시 산출)
 > **기준 commit**: `ccbd16be480f89668f650245eabe7f3ce1cdf34a` (Fresh Census 시점 HEAD == origin/main · clean)
-> **실행 commit**: Phase 1 `a319edbd6a0a435961ed46bd3f61045db563add3` · Phase 2 — §10 참조(후속 `docs(check)` 커밋에 기록)
+> **실행 commit**: Phase 1 `a319edbd6a0a435961ed46bd3f61045db563add3` · Phase 2 `6d5cfcdcd` (§10-1)
 
 ---
 
@@ -18,8 +18,8 @@ SELLER_RECRUITMENT      = PASS        (seller_recruitments · seller_recruitment
 DEAD_PACKAGES           = REMOVED     (@o4o/partner-core · @o4o/financial-core)
 LOCKFILE                = ALIGNED     (pnpm-lock.yaml importer 2 제거 · --frozen-lockfile PASS)
 ACTIVE_DOCS             = ALIGNED     (F7 · SELLER-PARTNER 설계 문서 → docs/archive/obsolete/partner/ · 현행 링크 3곳 수정)
-PRODUCTION_MIGRATION    = PASS        (Phase 1: Cloud Run Job o4o-api-migrations · INCREMENTAL_EXECUTED=1 · POST_MIGRATION_SCHEMA_ASSERTION=PASS · Phase 2: §10)
-PRODUCTION_SMOKE        = PASS        (Seller Recruitment canonical 5 endpoint · 새 revision o4o-core-api-03676-tvk 100%)
+PRODUCTION_MIGRATION    = PASS        (Phase 1 · Phase 2 모두 Cloud Run Job o4o-api-migrations · INCREMENTAL_EXECUTED=1 · POST_MIGRATION_SCHEMA_ASSERTION=PASS)
+PRODUCTION_SMOKE        = PASS        (Seller Recruitment canonical 5 endpoint · Phase 1 revision o4o-core-api-03676-tvk · Phase 2 revision o4o-core-api-03677-lzp 100% · alias 404)
 TEMP_COMPAT_ALIAS       = 0           (route alias /neture/partner/* 제거 · 배포 창 VIEW 2개 Phase 2 에서 DROP)
 
 NEXT = GO_SERVICE_TENANT_FOUNDATION
@@ -148,7 +148,7 @@ alias 트래픽(Cloud Run request log · 14h): 마지막 organic 요청 **2026-0
 
 ---
 
-## 5. 최종 Fresh Re-Census — `partner` 잔존 분류 (Phase 2 격리 적용 후 · 프로덕션 §10 확정)
+## 5. 최종 Fresh Re-Census — `partner` 잔존 분류 (Phase 2 프로덕션 적용 후 실측)
 
 | 분류 | 대상 |
 |---|---|
@@ -157,7 +157,7 @@ alias 트래픽(Cloud Run request log · 14h): 마지막 organic 요청 **2026-0
 | **ALLOWED_GENERIC_TERM** | `operator_notification_settings.notifications` json 의 `partnerApplication` 키(코드 무시 · 무해) · 주석의 "Legacy Partner 은퇴" 설명 · 예약 slug |
 | **LEGACY_PARTNER_*** | **0** (runtime · schema · dependency · active doc) |
 
-프로덕션 `pg_tables`/`information_schema.columns` 의 `%partner%` = `foreign_visitor_partner*` 3 테이블 · 컬럼 5개뿐. `pg_type` 의 partner/partnership enum = 0.
+프로덕션 실측(Phase 2 후): `pg_tables` `%partner%` = `foreign_visitor_partner*` 3 · `pg_views` 0 · 컬럼 4(`foreign_visitor_*` 만) · `pg_type` enum/domain 0(composite 3 = 위 테이블 row type) · `pg_proc` 0 · `role_assignments` `%partner%` 0.
 
 ---
 
@@ -202,4 +202,17 @@ alias 트래픽(Cloud Run request log · 14h): 마지막 organic 요청 **2026-0
 
 - path-specific stage · `check-staged-scope` · `git commit -- <paths>` 만 사용.
 - Phase 1: `a319edbd6` (60 files · +292 / −6,069) — Deploy API 35048074116 SUCCESS · CI 35048074098 · CodeQL · AppStore Guard · Admin/Web deploy SUCCESS.
-- Phase 2: 본 문서와 함께 커밋 — SHA · Deploy API run · 프로덕션 재검증 결과는 후속 `docs(check)` 커밋 §10-1 에 기록.
+- Phase 2: `6d5cfcdcd` (13 files · 본 문서 포함) — Deploy API 35049043295 SUCCESS · CI 35049043336 SUCCESS · CodeQL 35049043259 SUCCESS.
+
+### 10-1. Phase 2 프로덕션 실행 · 재검증 (2026-09-16T02:49Z)
+
+```text
+CLASSIFICATION = LEGACY_ESTABLISHED · CURRENT_INCREMENTAL_PREFIX = 2 / 3
+INCREMENTAL_PENDING = 1 → INCREMENTAL_EXECUTED = 1 (DropSellerRecruitmentCompatViewsAndSelectedSellerIds1789525702200)
+LIVE_FINGERPRINT = d0a8d491… (5708 lines) == EXPECTED → POST_MIGRATION_SCHEMA_ASSERTION = PASS · MIGRATION_JOB = SUCCESS
+Cloud Run: o4o-core-api-03677-lzp 100% traffic · typeorm_migrations 680행
+```
+
+read-only 재검증: compat VIEW 0 · `market_trial_decisions."selectedSellerIds"` 부재 · `seller_recruitments` · `seller_recruitment_applications` 존재. smoke: `GET /neture/seller-recruitment/recruitments` 200 · `/recruitments/mine`(공급자) 200 · `/applications/mine`(공급자) 200 · `GET /neture/operator/recruitment-exposure`(운영자) 200 · alias `/neture/partner/*` **404** (TEMP_COMPAT_ALIAS = 0).
+
+- SHA 기록 커밋: 후속 `docs(check)`.
