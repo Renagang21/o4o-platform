@@ -65,6 +65,12 @@ async function drive(db: LocalAgentDb, script: Script, max = 80) {
       await submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: 'success', data: { targetId: 'healthkr', targetType: 'browser_site', state: 'ready', reusedExisting: true, openedByO4O: false, tabCount: 1, path: '/' } } as any);
       continue;
     }
+    // PHASE 1 same-run resume: logical run 을 Local SQLite 에 남기는 ledger 명령(local.data.work_run_*)은 대상 준비처럼
+    // loop 관찰 밖의 부수 채널이다 — 이 spec 은 DOM loop 를 보므로 success 로 답하고 seen 에는 넣지 않는다.
+    if (base.startsWith('local.data.work_run_')) {
+      await submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: 'success', data: { runId: 'r_test', runStatus: 'active', saved: true } } as any);
+      continue;
+    }
     seen.push({ base, args: cmd.result_data ? JSON.parse(String(cmd.result_data)) : {} });
     const queue = script[base] ?? [{ status: 'failed', errorCode: 'DOM_ELEMENT_NOT_FOUND' }];
     const idx = Math.min(cursors[base] ?? 0, queue.length - 1);

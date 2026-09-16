@@ -43,7 +43,7 @@ import {
   validateKeyArgs,
   validateTextArgs,
 } from './computer-use-limits.mjs';
-import { LocalMetaRepository, LocalSettingsRepository, localDbHealth, LocalDbError } from './local-db.mjs';
+import { LocalMetaRepository, LocalSettingsRepository, LocalWorkRunRepository, WORK_RUN_ID_RE, WORK_RUN_STATUSES, localDbHealth, LocalDbError } from './local-db.mjs';
 import { backupSummary } from './local-db-backup.mjs';
 import { prepareTarget, resolveRegisteredTarget } from './work-target.mjs';
 import { uiaInspect, uiaSetValue, uiaInvoke, uiaKey, uiaClick } from './windows-uia.mjs';
@@ -98,6 +98,8 @@ export const ACTIONS = {
   DATA_HEALTH: 'local.data.health',
   DATA_GET_META: 'local.data.get_meta',
   DATA_SET_SETTING: 'local.data.set_setting',
+  DATA_WORK_RUN_UPSERT: 'local.data.work_run_upsert',
+  DATA_WORK_RUN_SET_STATUS: 'local.data.work_run_set_status',
 };
 
 /**
@@ -665,6 +667,78 @@ function dataSetSetting(args) {
   return { status: 'success', data: { key: saved.key, saved: true } };
 }
 
+// same-run resume 정본 원장(WEB-AUTOMATION-RESUME-V1 PHASE 1).
+const WORK_RUN_UPSERT_STATUSES = Object.freeze(['active', 'waiting_for_user']);
+const WORK_RUN_TEXT_MAX = 500;
+
+function sanitizeWorkRunText(value) {
+  if (typeof value !== 'string') return undefined;
+  const cleaned = value.replace(/[ -]/g, ' ').trim();
+  if (cleaned.length === 0) return undefined;
+  return cleaned.slice(0, WORK_RUN_TEXT_MAX);
+}
+
+/** `local.data.work_run_upsert` — logical run 생성/갱신. runId·상태만 응답에 담는다(goal/note 원문 비노출). */
+function dataWorkRunUpsert(args) {
+  const saved = LocalWorkRunRepository.upsert({
+    runId: args.runId,
+    status: args.status,
+    targetId: args.targetId,
+    goalSummary: args.goalSummary,
+    note: args.note,
+  });
+  return { status: 'success', data: { runId: saved.runId, runStatus: saved.status, saved: true } };
+}
+
+/** `local.data.work_run_set_status` — 상태 전이(complete/expire/taken_over 포함). */
+function dataWorkRunSetStatus(args) {
+  const res = LocalWorkRunRepository.setStatus(args.runId, args.status, args.note);
+  if (!res.ok) return { status: 'denied', errorCode: 'LOCAL_DATA_INVALID_ARGUMENT' };
+  return { status: 'success', data: { runId: res.runId, runStatus: res.status, saved: true } };
+}
+
+/** work_run_upsert 인자 검사 — 서버 validateDataWorkRunUpsertArgs 와 동일 규칙. */
+function validateWorkRunUpsertArgs(args) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const allowed = new Set(['runId', 'status', 'targetId', 'goalSummary', 'note']);
+  for (const k of Object.keys(args)) if (!allowed.has(k)) return { ok: false };
+  if (typeof args.runId !== 'string' || !WORK_RUN_ID_RE.test(args.runId)) return { ok: false };
+  if (typeof args.status !== 'string' || !WORK_RUN_UPSERT_STATUSES.includes(args.status)) return { ok: false };
+  const out = { runId: args.runId, status: args.status };
+  if (args.targetId !== undefined) {
+    // 등재 대상만 — resolveRegisteredTarget 이 site/app registry 로 판정한다.
+    if (!resolveRegisteredTarget(args.targetId)) return { ok: false };
+    out.targetId = args.targetId;
+  }
+  if (args.goalSummary !== undefined) {
+    const g = sanitizeWorkRunText(args.goalSummary);
+    if (g === undefined) return { ok: false };
+    out.goalSummary = g;
+  }
+  if (args.note !== undefined) {
+    const n = sanitizeWorkRunText(args.note);
+    if (n === undefined) return { ok: false };
+    out.note = n;
+  }
+  return { ok: true, args: out };
+}
+
+/** work_run_set_status 인자 검사 — `{ runId, status, note? }`. */
+function validateWorkRunSetStatusArgs(args) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const allowed = new Set(['runId', 'status', 'note']);
+  for (const k of Object.keys(args)) if (!allowed.has(k)) return { ok: false };
+  if (typeof args.runId !== 'string' || !WORK_RUN_ID_RE.test(args.runId)) return { ok: false };
+  if (typeof args.status !== 'string' || !WORK_RUN_STATUSES.includes(args.status)) return { ok: false };
+  const out = { runId: args.runId, status: args.status };
+  if (args.note !== undefined) {
+    const n = sanitizeWorkRunText(args.note);
+    if (n === undefined) return { ok: false };
+    out.note = n;
+  }
+  return { ok: true, args: out };
+}
+
 /** get_meta 인자 검사 — `{ key }`, key 는 meta allowlist 안이어야 한다. */
 function validateGetMetaArgs(args) {
   if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
@@ -700,6 +774,8 @@ const DATA_HANDLERS = {
   [ACTIONS.DATA_HEALTH]: { validate: () => ({ ok: true, args: undefined }), run: () => dataHealth() },
   [ACTIONS.DATA_GET_META]: { validate: validateGetMetaArgs, run: (args) => dataGetMeta(args) },
   [ACTIONS.DATA_SET_SETTING]: { validate: validateSetSettingArgs, run: (args) => dataSetSetting(args) },
+  [ACTIONS.DATA_WORK_RUN_UPSERT]: { validate: validateWorkRunUpsertArgs, run: (args) => dataWorkRunUpsert(args) },
+  [ACTIONS.DATA_WORK_RUN_SET_STATUS]: { validate: validateWorkRunSetStatusArgs, run: (args) => dataWorkRunSetStatus(args) },
 };
 
 /**

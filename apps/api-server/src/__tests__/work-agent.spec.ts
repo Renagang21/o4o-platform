@@ -74,6 +74,12 @@ async function drive(db: LocalAgentDb, script: Script, max = 40) {
       await submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: 'success', data: { targetId: 'healthkr', targetType: 'browser_site', state: 'ready', reusedExisting: true, openedByO4O: false, tabCount: 1, path: '/' } } as any);
       continue;
     }
+    // PHASE 1 same-run resume: logical run 을 Local SQLite 에 남기는 ledger 명령(local.data.work_run_*)은 대상 준비처럼
+    // loop 관찰 밖의 부수 채널이다 — 이 spec 은 DOM loop 를 보므로 success 로 답하고 seen 에는 넣지 않는다.
+    if (base.startsWith('local.data.work_run_')) {
+      await submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: 'success', data: { runId: 'r_test', runStatus: 'active', saved: true } } as any);
+      continue;
+    }
     seen.push({ base, args: cmd.result_data ? JSON.parse(String(cmd.result_data)) : {} });
     const queue = script[base] ?? [{ status: 'failed', errorCode: 'DOM_ELEMENT_NOT_FOUND' }];
     const idx = Math.min(cursors[base] ?? 0, queue.length - 1);
@@ -251,7 +257,8 @@ describe('Action (§14·§16)', () => {
     expect(seen[2].args).toEqual({ elementRef: 'e_2', snapshotId: SNAP, text: '아모디핀정' });
     expect(seen[3].args).toEqual({ elementRef: 'e_3', snapshotId: SNAP });
     for (const s of seen) expect(JSON.stringify(s.args)).not.toMatch(/selector|url|javascript/i);
-    expect(db.commands.every((c) => String(c.action).endsWith(`#${SITE}`))).toBe(true);
+    // 사이트 스코프 불변식은 site 채널(dom · target)에만 적용된다 — logical run ledger(local.data.work_run_*)는 site-agnostic.
+    expect(db.commands.filter((c) => !String(c.action).startsWith('local.data.work_run_')).every((c) => String(c.action).endsWith(`#${SITE}`))).toBe(true);
     expect(db.commands.filter((c) => String(c.action).startsWith('local.computer.'))).toHaveLength(0);
     expect(result.takeover?.reason).toBe('goal_sufficiently_advanced');
     expect(result.progress).toBe('completed');
@@ -299,12 +306,16 @@ describe('Result · Progress (§17·§18)', () => {
 
 describe('Takeover (§19·§20·§21)', () => {
   it('사용자 판단 · 모호한 결과 · 미지원 컨트롤 · commit 사유가 등재분이고 실패로 취급되지 않는다 · 화면은 그대로', async () => {
+    // PHASE 1 QUESTION↔TAKEOVER 분리(§조건 5): user_judgment_required 만 QUESTION(waiting_for_user·resumable),
+    // 그 밖(모호·미지원·commit)은 TAKEOVER(taken_over·재개 불가). 넷 다 화면은 그대로 두고 실패로 치지 않는다(ok·needs_user).
+    const QUESTION_REASONS = new Set(['user_judgment_required']);
     for (const reason of ['user_judgment_required', 'ambiguous_result', 'unsupported_control', 'commit_required'] as const) {
       const { result } = await run('약학정보원에서 아모디핀정 찾아줘', scripted([{ action: { kind: 'takeover', reason } }]), { get_context: [CTX('/')], inspect: [INSPECT(HOME_ELEMENTS)] });
       expect(result.takeover).toEqual({ reason, step: 2 });
       expect(result.ok).toBe(true);
       expect(result.progress).toBe('needs_user');
-      expect(result.goal.status).toBe('waiting_for_user');
+      expect(result.goal.status).toBe(QUESTION_REASONS.has(reason) ? 'waiting_for_user' : 'taken_over');
+      expect(result.resumable).toBe(QUESTION_REASONS.has(reason));
       expect(result.message).toContain('Chrome');
     }
     // 등재 밖 이동 차단 → unsupported_control

@@ -184,6 +184,36 @@ export const MIGRATIONS = Object.freeze([
       `);
     },
   },
+  {
+    version: 3,
+    name: 'work_runs_v1',
+    up(db) {
+      // WO-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1 (PHASE 1)
+      // same-run resume 의 **정본 원장**. logical Work Run 하나 = 한 row.
+      //   run_id        — runtime 이 발급한 logical run 식별자(cloud coordination 과 동일 값).
+      //   status        — active | waiting_for_user | completed | taken_over | expired.
+      //   target_id     — 등재 대상(browser_site/windows_app) 식별자. 없으면 NULL.
+      //   goal_summary  — semantic 목표 요약(사용자가 입력한 업무 문장, 짧게). 이것은 사용자 PC 의
+      //                   자기 데이터이므로 정본으로 담는다.
+      //   note          — 재개용 semantic 메모(예: 마지막 질문 요지). 짧은 텍스트만.
+      // 저장 금지(§검증 D · 조건 6): 이미지 · screenshot · raw DOM 전문 · credential/token ·
+      //   개인정보/환자정보 · 화면 전체 텍스트 dump. 이 테이블에 그런 컬럼은 없다.
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS local_work_runs (
+          run_id       TEXT PRIMARY KEY,
+          status       TEXT NOT NULL DEFAULT 'active',
+          target_id    TEXT,
+          goal_summary TEXT,
+          note         TEXT,
+          created_at   TEXT NOT NULL,
+          updated_at   TEXT NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_local_work_runs_status
+          ON local_work_runs (status);
+      `);
+    },
+  },
 ]);
 
 /** DB 스키마 버전 = 체크인된 마지막 migration 의 version(§11). 따로 손으로 올리지 않는다. */
@@ -524,6 +554,68 @@ export const LocalDatasetRepository = {
       .prepare('SELECT row_key, data FROM local_dataset_rows WHERE dataset=? ORDER BY rowid LIMIT ?')
       .all(String(name), Number(limit) || 100000)
       .map((r) => ({ rowKey: r.row_key, ...JSON.parse(r.data) }));
+  },
+};
+
+/** same-run resume 정본 원장(PHASE 1). 고정 쿼리만 — 임의 SQL 통로 없음. */
+export const WORK_RUN_ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
+export const WORK_RUN_STATUSES = Object.freeze(['active', 'waiting_for_user', 'completed', 'taken_over', 'expired']);
+/** semantic 요약 필드는 짧게만 담는다 — 화면 dump·raw 데이터 유입 방지(§검증 D). */
+const WORK_RUN_TEXT_CAP = 500;
+
+function clampWorkRunText(value) {
+  if (value == null) return null;
+  const s = String(value);
+  return s.length > WORK_RUN_TEXT_CAP ? s.slice(0, WORK_RUN_TEXT_CAP) : s;
+}
+
+export const LocalWorkRunRepository = {
+  /** logical run 생성/갱신(idempotent). 재개 요청이 같은 runId 로 다시 와도 안전하다. */
+  upsert({ runId, status, targetId, goalSummary, note }) {
+    const id = String(runId);
+    const st = WORK_RUN_STATUSES.includes(status) ? status : 'active';
+    const now = nowIso();
+    openLocalDb()
+      .prepare(
+        'INSERT INTO local_work_runs(run_id, status, target_id, goal_summary, note, created_at, updated_at) ' +
+          'VALUES(?, ?, ?, ?, ?, ?, ?) ' +
+          'ON CONFLICT(run_id) DO UPDATE SET ' +
+          'status=excluded.status, ' +
+          'target_id=COALESCE(excluded.target_id, local_work_runs.target_id), ' +
+          'goal_summary=COALESCE(excluded.goal_summary, local_work_runs.goal_summary), ' +
+          'note=excluded.note, ' +
+          'updated_at=excluded.updated_at',
+      )
+      .run(
+        id,
+        st,
+        targetId == null ? null : String(targetId),
+        clampWorkRunText(goalSummary),
+        clampWorkRunText(note),
+        now,
+        now,
+      );
+    return { runId: id, status: st };
+  },
+  /** 상태만 전이한다(note 는 넘긴 경우에만 덮어쓴다). 종료 상태(completed/taken_over/expired)로도 사용. */
+  setStatus(runId, status, note) {
+    const st = WORK_RUN_STATUSES.includes(status) ? status : null;
+    if (!st) return { ok: false };
+    const hasNote = note !== undefined;
+    openLocalDb()
+      .prepare(
+        hasNote
+          ? 'UPDATE local_work_runs SET status=?, note=?, updated_at=? WHERE run_id=?'
+          : 'UPDATE local_work_runs SET status=?, updated_at=? WHERE run_id=?',
+      )
+      .run(...(hasNote ? [st, clampWorkRunText(note), nowIso(), String(runId)] : [st, nowIso(), String(runId)]));
+    return { ok: true, runId: String(runId), status: st };
+  },
+  /** agent 내부 진단용 조회. cloud 로 read-back 하지 않는다(§조건 4). */
+  get(runId) {
+    return openLocalDb()
+      .prepare('SELECT run_id, status, target_id, goal_summary, note, created_at, updated_at FROM local_work_runs WHERE run_id=?')
+      .get(String(runId)) || null;
   },
 };
 

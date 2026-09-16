@@ -25,13 +25,20 @@
  *   돌려주면 `validateWorkProposal` 이 거절한다. elementRef 는 확장이 발급한 것이며 직전 관찰에 없으면 거절된다.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * ⚠️ 실행 상태는 runtime/session 수준이다 (§37~§41)
+ * ⚠️ 실행 상태는 runtime/session 수준이다 (§37~§41 · WEB-AUTOMATION-RESUME-V1 PHASE 1 완화)
  *
- *   WorkAgentState 는 요청 안에서만 산다. `automation_jobs`(VIDEO P0 트랙, 장기 작업의 얇은 persistence record)에
- *   Goal · step · observation 을 넣지 않는다. scheduler · executor · workflow engine · agent loop · retry · step
- *   orchestration · planner state machine · tool execution queue · background worker 를 여기서도, 거기서도 만들지 않는다.
+ *   한 요청의 `WorkAgentState`(관찰·proposal·step 등 실행 상태 전문)는 여전히 요청 안에서만 산다 — DB 에 넣지 않는다.
+ *   PHASE 1 이 새로 허용하는 것은 **logical Work Run 의 재개**에 필요한 최소한뿐이다:
+ *     · runId 로 식별되는 logical run 을 **Local SQLite**(사용자 PC, 정본)에 최소 semantic 상태로 남긴다.
+ *     · Cloud 에는 **최소 coordination**(runId · 소유자 · device · status · version · 만료)만 둔다 —
+ *       goal/질문/답변 원문 · DOM · 관찰 · trajectory · step 전문은 cloud 에 넣지 않고, cloud 는 Local 을 read-back 하지 않는다.
+ *     · 재개 = 같은 runId + **현재 화면 재관찰** + planner re-prime. 저장된 관찰을 되살리지 않는다.
+ *   `automation_jobs` 는 이 축에 재사용하지 않는다(video 트랙 전용). 다음은 PHASE 1 이후로도 계속 금지한다:
+ *     scheduler · background queue · executor · general workflow engine · agent loop · retry orchestration ·
+ *     planner state machine · tool execution queue · background worker · 사이트별 사전 정의 workflow ·
+ *     단일 실행의 공용 workflow 자동 승격 · Safety/Risk/capability 완화.
  *   `automation_jobs is a lightweight persistent work record. It is not a scheduler, executor, workflow engine,
- *    agent runtime, or tool execution queue.`
+ *    agent runtime, or tool execution queue. The PHASE 1 run ledger is Local-canonical; cloud holds coordination only.`
  */
 
 import type { DomFindQuery, SafeDomElement } from '../local-agent/browser-dom-contract.js';
@@ -49,10 +56,22 @@ import { COMPUTER_ALLOWED_KEYS, textDenyReason as computerTextDenyReason } from 
 
 // ─── Goal (§5) ──────────────────────────────────────────────────────────────
 
-export type WorkGoalStatus = 'active' | 'waiting_for_user' | 'completed' | 'stopped';
+/**
+ * QUESTION 과 TAKEOVER 는 **별개 상태**다(WEB-AUTOMATION-RESUME-V1 §IR).
+ *   waiting_for_user — QUESTION. logical run 유지 · 사용자가 답하면 같은 runId 로 재개.
+ *   taken_over       — TAKEOVER. automation 종료 · 사용자 직접 · 자동 resume 대상 아님.
+ *                      never-escalate 영역(조제보고·마약류·정부 제출·청구·결제·전자서명·외부전송)은 항상 여기.
+ *   stopped          — 사용자/시스템이 멈춘 비목표달성 종료(재개 대상 아님).
+ */
+export type WorkGoalStatus = 'active' | 'waiting_for_user' | 'completed' | 'stopped' | 'taken_over';
 
 export interface WorkGoal {
   goalId: string;
+  /**
+   * logical Work Run 식별자(PHASE 1). 재개의 유일한 앵커 — 같은 runId 로 다시 오면 같은 업무를 잇는다.
+   * 새 run 은 goalId 를 그대로 승격해 쓴다. 미지정이면 이 요청 안에서만 사는 run 으로 본다.
+   */
+  runId?: string;
   /** 사용자의 자연어 목적. 프롬프트 · 결과에는 쓰지만 로그에는 싣지 않는다(§23). */
   request: string;
   /** 등재 site 힌트(siteId). 문장의 별칭으로도 정해진다. */
@@ -586,4 +605,6 @@ export const WORK_AGENT_ERROR = Object.freeze({
   PLANNER_FAILED: 'WORK_AGENT_PLANNER_FAILED',
   NO_PROGRESS: 'WORK_AGENT_NO_PROGRESS',
   LOOP_LIMIT: 'WORK_AGENT_LOOP_LIMIT',
+  /** 재개 요청(runId)이 유효하지 않다 — 이미 종료(taken_over/completed)됐거나 TTL 만료됐거나 소유자가 아니다(PHASE 1). */
+  RESUME_REJECTED: 'WORK_AGENT_RESUME_REJECTED',
 } as const);

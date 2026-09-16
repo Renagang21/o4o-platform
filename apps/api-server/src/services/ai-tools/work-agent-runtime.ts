@@ -43,6 +43,7 @@ import {
   type TakeoverReason,
   type WorkAgentState,
   type WorkGoal,
+  type WorkGoalStatus,
   type WorkImageInput,
   type WorkObservation,
   type WorkProgress,
@@ -56,11 +57,42 @@ import {
   RECOVERY_LIMITS,
   classifyFailure,
   decideRecovery,
+  isEscalatable,
   noteNotRecovered,
   noteRecovered,
   sanitizeRecoveryHint,
   type ClassifyInput,
 } from './automation-recovery-contract.js';
+// PHASE 1 — same-run resume. Cloud 는 최소 coordination(runId·소유자·device·status·version·만료)만 담는다(§조건 2).
+// Local SQLite 가 정본이며, 이 runtime 은 cloud→local write 만 한다(read-back 없음 §조건 1·4).
+import {
+  WORK_RUN_STATUS,
+  checkResumable,
+  createWorkRun,
+  isValidRunId,
+  transitionWorkRun,
+  type ResumeRejectReason,
+  type WorkRunCoordinationRow,
+  type WorkRunStatus,
+} from './work-run-coordination-service.js';
+import { issueWorkRunSetStatus, issueWorkRunUpsert } from './work-run-executor.js';
+
+/**
+ * QUESTION 성격의 인계 사유(§조건 5) — 사용자의 판단/답만 있으면 같은 logical run 으로 이어갈 수 있는 국면.
+ * 이 사유로 끝나면 waiting_for_user 로 남겨 재개를 허용한다. 나머지 인계 사유는 모두 TAKEOVER(재개 불가).
+ * never-escalate(credential_required·commit_required 등)는 여기 절대 넣지 않는다.
+ */
+const QUESTION_TAKEOVER_REASONS = new Set<TakeoverReason>(['user_judgment_required']);
+
+/** 재개 거부 사유 → 사용자 안내 한 줄. runId·원문·상태 enum 은 노출하지 않는다(§20). */
+function resumeRejectMessage(reason: ResumeRejectReason): string {
+  switch (reason) {
+    case 'terminal': return '그 작업은 이미 종료되어 이어서 진행할 수 없습니다. 새로 요청해 주세요.';
+    case 'expired': return '이어서 진행할 수 있는 시간이 지났습니다. 새로 요청해 주세요.';
+    case 'not_waiting': return '그 작업은 지금 이어서 진행할 수 있는 상태가 아닙니다. 잠시 뒤 다시 시도해 주세요.';
+    default: return '이어서 진행할 작업을 찾지 못했습니다. 새로 요청해 주세요.';
+  }
+}
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const NAVIGATION_SETTLE_MS = 700;
@@ -274,6 +306,12 @@ export interface WorkAgentRunInput {
   image?: unknown;
   /** 실패 인계 뒤 사용자가 다시 요청하며 준 복구 힌트(§64·§65). runtime 이 sanitize 한다. */
   recoveryHint?: string;
+  /**
+   * PHASE 1 — 같은 logical Work Run 을 이어가려는 재개 요청. 직전 QUESTION(waiting_for_user) 응답에서 돌려받은 runId 다.
+   * 유효하면(소유자·미만료·waiting_for_user) 같은 runId 로 이어가고, 아니면 재개를 거부한다(§조건 5·검증 A·B·F).
+   * 재개는 저장된 관찰을 되살리지 않는다 — 현재 화면을 새로 관찰하고 planner 를 re-prime 한다.
+   */
+  runId?: string;
 }
 
 /** runWorkAgent 선택 의존성. strongPlanner 는 복구 계층의 "더 강한 추론" 경로(§11·§12) — 없으면 escalation 없이 기존대로 동작한다. */
@@ -290,6 +328,11 @@ export interface WorkAgentRunResult {
   progress: WorkProgress;
   takeover: { reason: TakeoverReason; step: number } | null;
   neededInput: string | null;
+  /**
+   * PHASE 1 — 이 결과가 QUESTION(waiting_for_user)이라 같은 logical run 으로 이어갈 수 있는가. true 면 goal.runId 로 재개한다.
+   * TAKEOVER(taken_over) · 완료 · 중지는 false — 자동 재개 대상이 아니다(§조건 5).
+   */
+  resumable: boolean;
   stepCount: number;
   aiPlanCount: number;
   path: string | null;
@@ -319,7 +362,7 @@ export async function runWorkAgent(
   const imageCheck = validateWorkImageInput(input.image);
   const finishNoState = (errorCode: string, message: string, progress: WorkProgress = 'failed'): WorkAgentRunResult => ({
     ok: false, errorCode, goal: { ...goal, status: progress === 'needs_user' ? 'waiting_for_user' : 'stopped' }, siteId: null, displayName: '해당 사이트',
-    progress, takeover: null, neededInput: null, stepCount: 0, aiPlanCount: 0, path: null, history: [], message, target: null,
+    progress, takeover: null, neededInput: null, resumable: false, stepCount: 0, aiPlanCount: 0, path: null, history: [], message, target: null,
   });
   if (!isValidWorkGoalRequest(goal.request)) return finishNoState(WORK_AGENT_ERROR.GOAL_INVALID, '무엇을 하려는지 한 문장으로 알려 주세요.', 'needs_user');
   if (!imageCheck.ok) return finishNoState(WORK_AGENT_ERROR.IMAGE_INVALID, 'JPEG · PNG · WebP 이미지만 첨부할 수 있습니다(최대 10MB).', 'needs_user');
@@ -348,26 +391,82 @@ export async function runWorkAgent(
   let activePlanner: WorkPlanner = planner;
   const recoveryHint = sanitizeRecoveryHint(input.recoveryHint) ?? undefined;
   let recoveryStatus: string | null = null;
+  // PHASE 1 — QUESTION↔TAKEOVER 분리 · 재개 원장(§조건 5). QUESTION 은 waiting_for_user(같은 runId 재개 가능),
+  // TAKEOVER 는 taken_over(자동 재개 대상 아님). recoveryGiveupKind 는 복구 소진의 끝이 질문인지 인계인지 정한다.
+  let terminalKind: 'question' | 'takeover' | null = null;
+  let recoveryGiveupKind: 'question' | 'takeover' = 'takeover';
+  let runCreated = false;
+  let coordinationVersion: number | null = null;
 
-  const finish = (): WorkAgentRunResult => {
-    goal.status = state.progress === 'completed' ? 'completed' : state.progress === 'needs_user' ? 'waiting_for_user' : 'stopped';
+  /**
+   * 종료 상태를 정본(Local SQLite, set_status) + 최소 coordination(Cloud, transition) 에 남긴다(§조건 1·2·4).
+   * cloud→local write 만 한다 — local raw state 를 read-back 하지 않는다. best-effort: 실패해도 사용자 응답은 막지 않는다.
+   */
+  const persistTerminalRun = async (kind: WorkGoalStatus): Promise<void> => {
+    if (!goal.runId) return;
+    const status: WorkRunStatus =
+      kind === 'completed' ? WORK_RUN_STATUS.COMPLETED
+      : kind === 'waiting_for_user' ? WORK_RUN_STATUS.WAITING_FOR_USER
+      : WORK_RUN_STATUS.TAKEN_OVER; // taken_over · stopped 는 둘 다 재개 불가 종료.
+    try {
+      const row = await transitionWorkRun(dataSource, {
+        runId: goal.runId, status, expectedVersion: coordinationVersion ?? undefined, deviceId: deviceId ?? undefined,
+      });
+      if (row) coordinationVersion = row.version;
+      // Local SQLite 정본 갱신(사용자 PC). goal/질문 원문은 싣지 않는다 — 상태 enum 만.
+      if (deviceId) await issueWorkRunSetStatus(dataSource, { userId: ctx.userId, deviceId }, { runId: goal.runId, status });
+    } catch (e) {
+      logger.warn('work-agent run terminal persist failed', { code: (e as { code?: string })?.code ?? null });
+    }
+  };
+
+  const finish = async (): Promise<WorkAgentRunResult> => {
+    // goal.status ← 진행/종료 종류. QUESTION=waiting_for_user, TAKEOVER=taken_over, 완료=completed, 그 밖 중지=stopped.
+    // run 이 열리기 전(대상 준비 실패 등)에는 종전대로 progress 기준으로만 매핑한다 — QUESTION/TAKEOVER 구분은 logical run 이 있어야 의미가 있다.
+    const kind: WorkGoalStatus =
+      state.progress === 'completed' ? 'completed'
+      : runCreated && terminalKind === 'question' ? 'waiting_for_user'
+      : runCreated && terminalKind === 'takeover' ? 'taken_over'
+      : runCreated && state.takeover ? 'taken_over'
+      : state.progress === 'needs_user' ? 'waiting_for_user'
+      : 'stopped';
+    goal.status = kind;
+    // QUESTION 만 같은 logical run 으로 이어갈 수 있다 — run 이 실제로 열렸을 때만(runId 존재).
+    const resumable = kind === 'waiting_for_user' && !!goal.runId;
+    if (runCreated && goal.runId) await persistTerminalRun(kind);
     // §22·§23 usage signal — 허용 키만. goal 원문 · 관찰 · 입력값 · 이미지는 실리지 않는다. 복구 신호는 §60 화이트리스트만.
     logger.info('work-agent run', buildWorkAgentUsageEvent(state, inputMode, new Date(), recoveryStatus));
     return {
       ok: state.progress === 'completed' || state.progress === 'needs_user' || state.progress === 'progress',
-      goal, siteId, displayName, progress: state.progress, takeover: state.takeover, neededInput,
+      goal, siteId, displayName, progress: state.progress, takeover: state.takeover, neededInput, resumable,
       stepCount: state.stepCount, aiPlanCount: state.aiPlanCount, path: state.observation?.path ?? null, history: state.history,
-      message: renderWorkAgentMessage(state, displayName, neededInput, targetOutcome),
+      message: renderWorkAgentMessage(state, displayName, neededInput, targetOutcome, resumable),
       target: targetOutcome,
     };
   };
-  const takeover = (reason: TakeoverReason, progress: WorkProgress): WorkAgentRunResult => {
+  /** QUESTION — AI 가 막혀 사용자 판단/답이 필요하다. logical run 유지 · 답하면 같은 runId 로 재개(§조건 5·검증 A). */
+  const question = (reason: TakeoverReason): Promise<WorkAgentRunResult> => {
+    terminalKind = 'question';
+    state.takeover = { reason, step: state.stepCount };
+    state.progress = 'needs_user';
+    return finish();
+  };
+  /**
+   * TAKEOVER — automation 종료(자동 재개 대상 아님 §조건 5). 단, 사용자 판단만 필요한 질문 성격(user_judgment_required)은
+   * QUESTION 으로 돌린다 — 그 경우 답하면 같은 runId 로 이어간다. never-escalate(credential·commit 등)는 여기 그대로 인계다.
+   */
+  const takeover = (reason: TakeoverReason, progress: WorkProgress): Promise<WorkAgentRunResult> => {
+    if (QUESTION_TAKEOVER_REASONS.has(reason)) return question(reason);
+    if (terminalKind === null) terminalKind = 'takeover';
     state.takeover = { reason, step: state.stepCount };
     state.progress = progress;
     return finish();
   };
+  /** 복구 소진 뒤 끝맺음 — escalatable 하고 사용자 답으로 이어질 국면이면 QUESTION, 아니면 TAKEOVER(§조건 5). */
+  const stuckEnd = (reason: TakeoverReason, progress: WorkProgress): Promise<WorkAgentRunResult> =>
+    recoveryGiveupKind === 'question' ? question(reason) : takeover(reason, progress);
   /** 행동 뒤 재관찰 실패의 인계 사유 — 예산 소진은 loop_limit, 그 밖(탭 없음 · 등재 밖 이동 등)은 site_not_ready. */
-  const observeFailed = (o: { errorCode?: string }): WorkAgentRunResult =>
+  const observeFailed = (o: { errorCode?: string }): Promise<WorkAgentRunResult> =>
     o.errorCode === WORK_AGENT_ERROR.LOOP_LIMIT ? takeover('loop_limit', 'no_progress') : takeover('site_not_ready', 'needs_user');
 
   // ── 실패→복구 계층 (WO-O4O-AUTOMATION-FAILURE-ESCALATION §4·§11·§16·§22·§27·§67) ──
@@ -396,6 +495,9 @@ export async function runWorkAgent(
     if (!decision.askUser && !opts.normalSpent && strongPlanner) return 'retry'; // normal_retry(throw 경로) — strong 이 있을 때만 재시도 이득.
     noteNotRecovered(state.recovery);
     recoveryStatus = decision.useStrongModel ? RECOVERY_ERROR.PROVIDER_UNAVAILABLE : RECOVERY_ERROR.USER_HELP_REQUIRED;
+    // 복구 소진의 끝: escalatable 하고 사용자에게 넘기는 국면이면 QUESTION(답하면 같은 run 재개), 아니면 TAKEOVER(§조건 5).
+    // non-escalatable(RISK_BLOCKED·USER_INTERFERENCE·UNSUPPORTED_UI·AMBIGUOUS_STATE) · provider 불가는 항상 TAKEOVER.
+    recoveryGiveupKind = decision.askUser && isEscalatable(cls) ? 'question' : 'takeover';
     return 'giveup';
   };
   /** 복구 국면 뒤 성공(완료) — 무엇으로 복구됐는지 기록한다(§27). 힌트가 실려 있으면 그 덕으로 본다. */
@@ -410,11 +512,26 @@ export async function runWorkAgent(
   if (resolution.status !== 'ok') {
     state.progress = 'needs_user';
     state.takeover = { reason: 'site_not_ready', step: 0 };
-    const r = finish();
+    const r = await finish();
     r.errorCode = resolution.status === 'none' ? LOCAL_AGENT_ERROR.NO_DEVICE : resolution.status === 'ambiguous' ? LOCAL_AGENT_ERROR.AMBIGUOUS : LOCAL_AGENT_ERROR.OFFLINE;
     return r;
   }
   deviceId = resolution.device.id;
+
+  // ── PHASE 1 same-run resume(§조건 5·검증 A·B·F) — 재개 요청 runId 를 먼저 읽기 전용으로 검증한다(claim 은 대상 준비 뒤).
+  //    유효하지 않은(종료·만료·비소유·비대기) runId 는 여기서 즉시 거부한다 — 대상 준비 비용을 쓰기 전에.
+  let resumeRow: WorkRunCoordinationRow | null = null;
+  if (input.runId !== undefined) {
+    if (!isValidRunId(input.runId)) return finishNoState(WORK_AGENT_ERROR.RESUME_REJECTED, resumeRejectMessage('not_found'), 'needs_user');
+    const check = await checkResumable(dataSource, { runId: input.runId, userId: ctx.userId });
+    // strictNullChecks off — 판별 union 의 negation narrowing 이 안 먹으므로 positive 분기 + 좁은 캐스트로 reason 을 읽는다(ref).
+    if (check.ok) {
+      resumeRow = check.row;
+    } else {
+      const reason = (check as { reason: ResumeRejectReason }).reason;
+      return finishNoState(WORK_AGENT_ERROR.RESUME_REJECTED, resumeRejectMessage(reason), 'needs_user');
+    }
+  }
 
   // ── Target Discovery / Activation (§3·§34·§35) — 관찰 · Planner 전에 대상을 준비한다. 행동 예산을 쓰지 않는다.
   //    이미 열려 있으면 그 탭/창을 앞으로, 없으면 등재 방법으로 열고, 그래도 안 되면 사용자에게 넘긴다. 준비되지 않은 대상에
@@ -422,10 +539,37 @@ export async function runWorkAgent(
   targetOutcome = await issueTargetPrepare(dataSource, ctx, deviceId, tool, targetRef);
   if (targetOutcome.state !== 'ready') {
     // 사용자 요청(열어 주세요 · 로그인 · 여러 탭 중 선택) 또는 준비 실패 — 둘 다 loop 를 시작하지 않는다.
-    const r = takeover('site_not_ready', 'needs_user');
+    // 아직 run 을 열지 않았다(runCreated=false) — 재개 요청이면 coordination row 는 waiting_for_user 로 그대로 남아 재시도 가능.
+    const r = await takeover('site_not_ready', 'needs_user');
     r.errorCode = targetOutcome.errorCode ?? WORK_AGENT_ERROR.SITE_NOT_READY;
     return r;
   }
+
+  // ── PHASE 1 same-run resume — 대상이 준비된 지금 logical run 을 확정한다(§조건 5 우선순위 1·4). ──
+  //    재개면 같은 runId 를 claim(active 로 전이, optimistic version), 새 작업이면 goalId 를 runId 로 승격해 새 run 을 연다.
+  //    저장된 관찰을 되살리지 않는다 — 아래 loop 가 현재 화면을 새로 관찰하고 planner 를 re-prime 한다.
+  if (resumeRow) {
+    goal.runId = resumeRow.runId;
+    const claimed = await transitionWorkRun(dataSource, {
+      runId: resumeRow.runId, status: WORK_RUN_STATUS.ACTIVE, expectedVersion: resumeRow.version, deviceId,
+    });
+    if (!claimed) {
+      // 읽은 뒤 다른 인스턴스가 먼저 claim/전이했다(version 불일치) — 안전하게 재개를 거부한다(검증 E).
+      return finishNoState(WORK_AGENT_ERROR.RESUME_REJECTED, resumeRejectMessage('not_waiting'), 'needs_user');
+    }
+    coordinationVersion = claimed.version;
+    runCreated = true;
+  } else {
+    goal.runId = goal.goalId; // 새 logical run — goalId 가 곧 runId 앵커.
+    const created = await createWorkRun(dataSource, { runId: goal.runId, userId: ctx.userId, deviceId });
+    coordinationVersion = created?.version ?? 1;
+    runCreated = true;
+  }
+  // Local SQLite 정본에 run 을 기록한다(cloud→local write only). semantic 만 — 대상 id·짧은 목표 요약(원문 관찰/DOM 없음).
+  await issueWorkRunUpsert(dataSource, { userId: ctx.userId, deviceId }, {
+    runId: goal.runId, status: 'active', targetId: siteId, goalSummary: goal.request.slice(0, 200),
+  });
+
   // WINDOWS-UI-AUTOMATION-V0 — 표면 선택. windows_app 은 UIA(같은 Planner 어휘 · 같은 검증 · 다른 실행층).
   const surface: WorkSurface = targetRef.targetType === 'windows_app' ? 'uia' : 'dom';
 
@@ -638,7 +782,7 @@ export async function runWorkAgent(
   if (!first.ok) {
     state.progress = 'needs_user';
     state.takeover = { reason: first.errorCode === LOCAL_AGENT_ERROR.DOM_CROSS_ORIGIN_BLOCKED ? 'unsupported_control' : 'site_not_ready', step: state.stepCount };
-    const r = finish();
+    const r = await finish();
     r.errorCode = first.errorCode ?? WORK_AGENT_ERROR.SITE_NOT_READY;
     return r;
   }
@@ -649,7 +793,7 @@ export async function runWorkAgent(
     if (state.aiPlanCount >= WORK_LOOP_LIMITS.maxAiPlans) return takeover('loop_limit', 'no_progress');
     // 같은 관찰이 반복됐다(무진전) — 무작정 다시 계획하지 말고 복구 판단(§36·§16). strong 이 있으면 한 번 더 세게, 없으면 인계.
     if (sameObservationRun >= WORK_LOOP_LIMITS.maxSameObservation) {
-      if (recover({ noProgress: true }, { normalSpent: true }) === 'giveup') return takeover('no_progress', 'no_progress');
+      if (recover({ noProgress: true }, { normalSpent: true }) === 'giveup') return stuckEnd('no_progress', 'no_progress');
     }
 
     // Plan (§8)
@@ -708,7 +852,7 @@ export async function runWorkAgent(
     if (sameWorkAction(state.lastResult?.action, proposal.action)) {
       repeatedActionRun += 1;
       if (repeatedActionRun >= WORK_LOOP_LIMITS.maxRepeatedAction) {
-        if (recover({ noProgress: true }, { normalSpent: true }) === 'giveup') return takeover('no_progress', 'no_progress');
+        if (recover({ noProgress: true }, { normalSpent: true }) === 'giveup') return stuckEnd('no_progress', 'no_progress');
         continue; // strong planner 로 다시 계획한다(이 반복 행동은 실행하지 않는다).
       }
     } else repeatedActionRun = 0;
@@ -884,7 +1028,7 @@ export function renderTargetLine(t: WorkTargetOutcome | null): string {
   return `${t.displayName} 탭을 준비하지 못했습니다. Chrome 에서 ${t.displayName}을(를) 열어 둔 뒤 다시 요청하세요.`;
 }
 
-export function renderWorkAgentMessage(state: WorkAgentState, displayName: string, neededInput: string | null, target: WorkTargetOutcome | null = null): string {
+export function renderWorkAgentMessage(state: WorkAgentState, displayName: string, neededInput: string | null, target: WorkTargetOutcome | null = null, resumable = false): string {
   const actions = state.history.filter((h) => h.status === 'success' && !['inspect', 'find', 'read_text', 'read_table'].includes(h.action.kind)).length;
   const targetLine = renderTargetLine(target);
   // 대상 준비 단계에서 끝난 경우 — 행동 0 단계를 "수행했습니다" 로 말하지 않는다.
@@ -900,6 +1044,10 @@ export function renderWorkAgentMessage(state: WorkAgentState, displayName: strin
   if (state.takeover) {
     const line = TAKEOVER_LINE[state.takeover.reason];
     const screen = isApp ? '프로그램 화면은 그대로 두었습니다.' : 'Chrome 의 현재 화면은 그대로 두었습니다.';
+    // QUESTION(재개 가능) — 답을 주면 같은 작업을 이어서 진행한다는 것을 알린다. TAKEOVER(재개 불가) 는 화면을 직접 이어받으라고 한다.
+    if (resumable) {
+      return `${head} ${line}${neededInput ? ` 필요한 정보: ${neededInput}` : ''} ${screen} 답을 주시면 같은 작업을 이어서 진행합니다.`;
+    }
     return `${head} ${line}${neededInput ? ` 필요한 정보: ${neededInput}` : ''} ${screen}`;
   }
   return `${head} 현재 화면에서 이어서 진행하세요.`;

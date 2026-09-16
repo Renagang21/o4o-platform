@@ -259,6 +259,8 @@ router.post('/work-agent/run', authenticate, dynamicLimiter('free'), async (req,
   const args: Record<string, unknown> = { request: body.request };
   if (body.targetHint !== undefined) args.targetHint = body.targetHint;
   if (body.image !== undefined) args.image = body.image;
+  // runId(PHASE 1): 이전 QUESTION 응답으로 같은 logical Work Run 을 이어갈 때만 온다. 형상은 contract 가 검증한다.
+  if (body.runId !== undefined) args.runId = body.runId;
 
   const tool = findToolDefinition(AI_TOOL_NAMES.WORK_AGENT_PERFORM);
   const argCheck = validateToolArguments(args, tool);
@@ -281,6 +283,7 @@ router.post('/work-agent/run', authenticate, dynamicLimiter('free'), async (req,
       request: String(body.request),
       targetHint: typeof body.targetHint === 'string' ? body.targetHint : undefined,
       image: body.image,
+      runId: typeof body.runId === 'string' ? body.runId : undefined,
       // 실패 인계 뒤 사용자가 다시 요청하며 준 힌트(§64·§65). runtime 이 sanitize 한다.
       recoveryHint: typeof body.recoveryHint === 'string' ? body.recoveryHint : undefined,
     },
@@ -294,6 +297,9 @@ router.post('/work-agent/run', authenticate, dynamicLimiter('free'), async (req,
     success: true,
     data: {
       goal: { goalId: result.goal.goalId, status: result.goal.status, siteId: result.siteId, displayName: result.displayName },
+      // PHASE 1: 같은 logical run 재개용 id(opaque) + 재개 가능 여부. QUESTION(waiting_for_user)일 때만 resumable=true.
+      runId: result.goal.runId ?? null,
+      resumable: result.resumable,
       progress: result.progress,
       takeover: result.takeover,
       neededInput: result.neededInput,

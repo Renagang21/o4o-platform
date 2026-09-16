@@ -124,6 +124,11 @@ export const LOCAL_AGENT_ACTIONS = {
   DATA_GET_META: 'local.data.get_meta',
   /** allowlist 된 setting 키에 검증된 값을 쓴다(§10·§11). 범용 KV 저장이 아니다. */
   DATA_SET_SETTING: 'local.data.set_setting',
+  // ── same-run resume 정본 원장 (WEB-AUTOMATION-RESUME-V1 PHASE 1) ────────────
+  /** logical Work Run 하나를 생성/갱신한다(semantic 목표·대상·상태). generic row write 아님. */
+  DATA_WORK_RUN_UPSERT: 'local.data.work_run_upsert',
+  /** logical Work Run 의 상태를 전이한다(complete/expire/taken_over 포함). */
+  DATA_WORK_RUN_SET_STATUS: 'local.data.work_run_set_status',
 } as const;
 
 export type LocalAgentAction = (typeof LOCAL_AGENT_ACTIONS)[keyof typeof LOCAL_AGENT_ACTIONS];
@@ -242,7 +247,38 @@ export const DATA_TARGET_ACTIONS: readonly string[] = Object.freeze([
   LOCAL_AGENT_ACTIONS.DATA_HEALTH,
   LOCAL_AGENT_ACTIONS.DATA_GET_META,
   LOCAL_AGENT_ACTIONS.DATA_SET_SETTING,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT,
+  LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS,
 ]);
+
+/**
+ * Work Run 상태 집합(§IR QUESTION↔TAKEOVER 분리). cloud coordination 의 status 와 동일 어휘.
+ *   active/waiting_for_user 는 upsert 로, 종료(completed/taken_over/expired)는 set_status 로 전이한다.
+ */
+export const LOCAL_WORK_RUN_STATUSES: readonly string[] = Object.freeze([
+  'active',
+  'waiting_for_user',
+  'completed',
+  'taken_over',
+  'expired',
+]);
+/** upsert(생성/갱신)로 허용하는 비종료 상태만. 종료 전이는 set_status 전용. */
+const LOCAL_WORK_RUN_UPSERT_STATUSES: readonly string[] = Object.freeze(['active', 'waiting_for_user']);
+const LOCAL_WORK_RUN_ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
+/** semantic 요약/메모 최대 길이 — 화면 dump·raw 데이터 유입 차단(§검증 D). */
+const LOCAL_WORK_RUN_TEXT_MAX = 500;
+
+export function isValidLocalWorkRunId(value: unknown): value is string {
+  return typeof value === 'string' && LOCAL_WORK_RUN_ID_RE.test(value);
+}
+
+/** 제어문자 제거 + 길이 제한. 원문 그대로 흘리지 않는다. */
+function sanitizeWorkRunText(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const cleaned = value.replace(/[ -]/g, ' ').trim();
+  if (cleaned.length === 0) return undefined;
+  return cleaned.slice(0, LOCAL_WORK_RUN_TEXT_MAX);
+}
 
 /**
  * `get_meta` 로 읽을 수 있는 meta 키 — **유한 목록**이다(§13). 임의 키·임의 SQL 이 아니다.
@@ -289,7 +325,19 @@ export interface DataSetSettingArgs {
   key: string;
   value: string;
 }
-export type DataActionArgs = DataGetMetaArgs | DataSetSettingArgs;
+export interface DataWorkRunUpsertArgs {
+  runId: string;
+  status: string;
+  targetId?: string;
+  goalSummary?: string;
+  note?: string;
+}
+export interface DataWorkRunSetStatusArgs {
+  runId: string;
+  status: string;
+  note?: string;
+}
+export type DataActionArgs = DataGetMetaArgs | DataSetSettingArgs | DataWorkRunUpsertArgs | DataWorkRunSetStatusArgs;
 
 /** `{ key }` — allowlist 된 meta 키 하나. 그 밖의 키·추가 필드는 실패. */
 export function validateDataGetMetaArgs(args: unknown): { ok: boolean; args?: DataGetMetaArgs } {
@@ -310,6 +358,47 @@ export function validateDataSetSettingArgs(args: unknown): { ok: boolean; args?:
   if (typeof key !== 'string' || !LOCAL_DATA_SETTING_KEYS.includes(key)) return { ok: false };
   if (!isValidLocalSettingValue(key, value)) return { ok: false };
   return { ok: true, args: { key, value: value as string } };
+}
+
+/**
+ * `{ runId, status, targetId?, goalSummary?, note? }` — logical run 생성/갱신.
+ * status 는 비종료(active/waiting_for_user)만. targetId 는 등재 대상만. 텍스트는 정규화·절단.
+ * 알 수 없는 키가 있으면 실패한다(정규화된 사본만 통과).
+ */
+export function validateDataWorkRunUpsertArgs(args: unknown): { ok: boolean; args?: DataWorkRunUpsertArgs } {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const src = args as Record<string, unknown>;
+  const allowed = new Set(['runId', 'status', 'targetId', 'goalSummary', 'note']);
+  for (const k of Object.keys(src)) if (!allowed.has(k)) return { ok: false };
+  if (!isValidLocalWorkRunId(src.runId)) return { ok: false };
+  if (typeof src.status !== 'string' || !LOCAL_WORK_RUN_UPSERT_STATUSES.includes(src.status)) return { ok: false };
+  const out: DataWorkRunUpsertArgs = { runId: src.runId, status: src.status };
+  if (src.targetId !== undefined) {
+    if (!isRegisteredWorkTarget(src.targetId)) return { ok: false };
+    out.targetId = src.targetId as string;
+  }
+  const goalSummary = sanitizeWorkRunText(src.goalSummary);
+  if (src.goalSummary !== undefined && goalSummary === undefined) return { ok: false };
+  if (goalSummary !== undefined) out.goalSummary = goalSummary;
+  const note = sanitizeWorkRunText(src.note);
+  if (src.note !== undefined && note === undefined) return { ok: false };
+  if (note !== undefined) out.note = note;
+  return { ok: true, args: out };
+}
+
+/** `{ runId, status, note? }` — 상태 전이(종료 상태 포함). */
+export function validateDataWorkRunSetStatusArgs(args: unknown): { ok: boolean; args?: DataWorkRunSetStatusArgs } {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false };
+  const src = args as Record<string, unknown>;
+  const allowed = new Set(['runId', 'status', 'note']);
+  for (const k of Object.keys(src)) if (!allowed.has(k)) return { ok: false };
+  if (!isValidLocalWorkRunId(src.runId)) return { ok: false };
+  if (typeof src.status !== 'string' || !LOCAL_WORK_RUN_STATUSES.includes(src.status)) return { ok: false };
+  const out: DataWorkRunSetStatusArgs = { runId: src.runId, status: src.status };
+  const note = sanitizeWorkRunText(src.note);
+  if (src.note !== undefined && note === undefined) return { ok: false };
+  if (note !== undefined) out.note = note;
+  return { ok: true, args: out };
 }
 
 /**
@@ -367,6 +456,14 @@ export function validateLocalCommandArgs(
   }
   if (base === LOCAL_AGENT_ACTIONS.DATA_SET_SETTING) {
     const r = validateDataSetSettingArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_UPSERT) {
+    const r = validateDataWorkRunUpsertArgs(args);
+    return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
+  }
+  if (base === LOCAL_AGENT_ACTIONS.DATA_WORK_RUN_SET_STATUS) {
+    const r = validateDataWorkRunSetStatusArgs(args);
     return r.ok && r.args ? { ok: true, args: r.args } : { ok: false };
   }
   if (base === LOCAL_AGENT_ACTIONS.COMPUTER_CLICK) {
@@ -952,6 +1049,9 @@ export function pickSafeDataInfo(data: unknown): Record<string, unknown> {
     const v = src[key];
     if (typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 100000) out[key] = v;
   }
+  // Work Run 쓰기 verb 확인용 — runId 반향 + 상태 enum 만. goal/note/화면 텍스트는 통과하지 않는다.
+  if (isValidLocalWorkRunId(src.runId)) out.runId = src.runId;
+  if (typeof src.runStatus === 'string' && LOCAL_WORK_RUN_STATUSES.includes(src.runStatus)) out.runStatus = src.runStatus;
   return out;
 }
 

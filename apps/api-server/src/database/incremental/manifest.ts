@@ -23,6 +23,8 @@ import { CreateStoreTabletDevicesAndScreenSetDescription1789435443554 } from '..
 import { RetireLegacyPartnerPhysicalSchemaAndRenameSellerRecruitment1789523426775 } from '../migrations/1789523426775-RetireLegacyPartnerPhysicalSchemaAndRenameSellerRecruitment.js';
 // WO-O4O-LEGACY-PARTNER-PHYSICAL-SCHEMA-AND-DEPENDENCY-CLEANUP-V1 (Phase 2 · contract)
 import { DropSellerRecruitmentCompatViewsAndSelectedSellerIds1789525702200 } from '../migrations/1789525702200-DropSellerRecruitmentCompatViewsAndSelectedSellerIds.js';
+// WO-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1 (PHASE 1 · same-run resume coordination ledger)
+import { CreateWorkRunCoordination1789540958496 } from '../migrations/1789540958496-CreateWorkRunCoordination.js';
 
 export const INCREMENTAL_MIGRATION_CUTOFF = {
   baselineVersion: '2026-09-15-id678',
@@ -41,6 +43,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreTabletDevicesAndScreenSetDescription1789435443554,
   RetireLegacyPartnerPhysicalSchemaAndRenameSellerRecruitment1789523426775,
   DropSellerRecruitmentCompatViewsAndSelectedSellerIds1789525702200,
+  CreateWorkRunCoordination1789540958496,
 ];
 
 export function incrementalMigrationNames(): string[] {

@@ -1040,13 +1040,15 @@ export function validateToolArguments(
   }
 
   if (schema === 'workAgentGoal') {
-    // Work Agent(WORK-AGENT V0 §5·§47): { request, targetHint?, image? } — URL · selector · elementRef 칸 없음.
+    // Work Agent(WORK-AGENT V0 §5·§47): { request, targetHint?, image?, runId? } — URL · selector · elementRef 칸 없음.
+    // runId(PHASE 1): 같은 logical Work Run 으로 재개할 때만. opaque id 형상만 검증한다(내용 없음).
     if (!args || typeof args !== 'object' || Array.isArray(args)) return { ok: false, reason: 'INVALID_ARGUMENTS' };
     const a = args as Record<string, unknown>;
-    for (const k of Object.keys(a)) if (!['request', 'targetHint', 'image'].includes(k)) return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    for (const k of Object.keys(a)) if (!['request', 'targetHint', 'image', 'runId'].includes(k)) return { ok: false, reason: 'INVALID_ARGUMENTS' };
     if (!isValidWorkGoalRequest(a.request)) return { ok: false, reason: 'INVALID_ARGUMENTS' };
     if (a.targetHint !== undefined && !isRegisteredBrowserSite(a.targetHint)) return { ok: false, reason: 'INVALID_ARGUMENTS' };
     if (!validateWorkImageInput(a.image).ok) return { ok: false, reason: 'INVALID_ARGUMENTS' };
+    if (a.runId !== undefined && !(typeof a.runId === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(a.runId))) return { ok: false, reason: 'INVALID_ARGUMENTS' };
     return { ok: true };
   }
 
