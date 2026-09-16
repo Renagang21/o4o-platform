@@ -118,6 +118,20 @@ function base64ByteLength(b64: string): number {
 }
 
 /**
+ * base64 형상 검사 — **선형**이다. 문자 집합은 부정 클래스 한 번(`[^...]`, backtracking 없음)으로 보고,
+ * `=` 패딩은 위치로 본다(끝의 1~2개만 허용). 문자열 길이에 상관없이 스택을 쓰지 않는다.
+ */
+export function isWellFormedBase64(b64: string): boolean {
+  if (b64.length === 0 || b64.length % 4 !== 0) return false;
+  if (/[^A-Za-z0-9+/=]/.test(b64)) return false;
+  const firstPad = b64.indexOf('=');
+  if (firstPad === -1) return true;
+  if (firstPad < b64.length - 2) return false;
+  for (let i = firstPad; i < b64.length; i += 1) if (b64[i] !== '=') return false;
+  return true;
+}
+
+/**
  * `attachments[]` 검증. 하나라도 틀리면 전체를 거부한다(부분 수용으로 사용자가 "첨부됐다" 고 오해하지 않게).
  * 비어 있거나 undefined 면 ok · 빈 배열.
  */
@@ -136,9 +150,12 @@ export function validateUnifiedAttachments(raw: unknown): UnifiedAttachmentValid
     const kind = UNIFIED_ATTACHMENT_MIME_KINDS[mimeType];
     if (typeof r.base64 !== 'string' || r.base64.length === 0) return { ok: false, attachments: [], error: 'ATTACHMENT_INVALID', errorName: name };
     const base64 = r.base64.replace(/^data:[^;]+;base64,/, '').replace(/\s+/g, '');
-    if (base64.length === 0 || !/^[A-Za-z0-9+/]+={0,2}$/.test(base64)) return { ok: false, attachments: [], error: 'ATTACHMENT_INVALID', errorName: name };
+    if (base64.length === 0) return { ok: false, attachments: [], error: 'ATTACHMENT_INVALID', errorName: name };
+    // 크기 상한을 **형상 검사보다 먼저** 본다 — 10MB 급 문자열에 `^[...]+={0,2}$` 같은 backtracking 정규식을 걸면
+    // Linux(CI · Cloud Run) 의 V8 스택이 넘친다(RangeError: Maximum call stack size exceeded — CI 실측 2026-09-16).
     const bytes = base64ByteLength(base64);
     if (bytes > UNIFIED_ATTACHMENT_MAX_BYTES) return { ok: false, attachments: [], error: 'ATTACHMENT_TOO_LARGE', errorName: name };
+    if (!isWellFormedBase64(base64)) return { ok: false, attachments: [], error: 'ATTACHMENT_INVALID', errorName: name };
     total += bytes;
     if (total > UNIFIED_ATTACHMENT_TOTAL_MAX_BYTES) return { ok: false, attachments: [], error: 'ATTACHMENT_TOO_LARGE', errorName: name };
     out.push({ kind, mimeType, name, base64, bytes });

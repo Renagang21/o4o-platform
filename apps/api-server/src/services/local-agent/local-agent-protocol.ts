@@ -275,7 +275,14 @@ export function isValidLocalWorkRunId(value: unknown): value is string {
 /** 제어문자 제거 + 길이 제한. 원문 그대로 흘리지 않는다. */
 function sanitizeWorkRunText(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined;
-  const cleaned = value.replace(/[ -]/g, ' ').trim();
+  // 제어문자(U+0000~U+001F · U+007F)를 공백으로. 정규식 리터럴에 제어문자를 두지 않는다(no-control-regex · 소스 바이너리화 방지).
+  const cleaned = Array.from(value)
+    .map((ch) => {
+      const code = ch.charCodeAt(0);
+      return code < 0x20 || code === 0x7f ? ' ' : ch;
+    })
+    .join('')
+    .trim();
   if (cleaned.length === 0) return undefined;
   return cleaned.slice(0, LOCAL_WORK_RUN_TEXT_MAX);
 }

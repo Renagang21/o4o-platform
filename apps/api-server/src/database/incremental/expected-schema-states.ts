@@ -62,6 +62,18 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
     fingerprint: 'd0a8d491e188be39df38fa50b708eea6617a6f38e188d781f7c4c2455e0d8535',
     fingerprintLineCount: 5708,
   },
+  // WO-O4O-WEB-AUTOMATION-USER-GUIDED-RESUME-AND-WORKFLOW-CANDIDATE-REPLAY-V1 PHASE 1 (same-run) — the
+  // migration landed in d9b11d204 WITHOUT this entry, so every production migration Job since then ended in
+  // UNKNOWN_PARTIAL / POST_MIGRATION_SCHEMA_ASSERTION=FAILED. Registered by
+  // WO-O4O-PHASE1-SAME-RUN-CI-AND-MIGRATION-EXPECTED-STATE-REPAIR-V1 on 2026-09-16: computed in an isolated
+  // PostgreSQL 15.19 (fresh bootstrap + migrations 1..4 via migrate.ts) and cross-checked READ-ONLY against
+  // production, where the migration had already been applied by the failed Job (typeorm_migrations row
+  // CreateWorkRunCoordination1789540958496 · table work_run_coordination present): identical hash and line count.
+  {
+    appliedThrough: 'CreateWorkRunCoordination1789540958496',
+    fingerprint: '8b5be7bdad427bea966dedd13dd8ef86c4923e981ba6ccb2f9976a611d600f5b',
+    fingerprintLineCount: 5722,
+  },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

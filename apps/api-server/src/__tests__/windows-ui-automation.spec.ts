@@ -52,6 +52,12 @@ async function drive(db: LocalAgentDb, script: Script, max = 40) {
     if (!cmd) break;
     k += 1;
     const base = parseLocalAction(String(cmd.action)).base;
+    // PHASE 1 same-run resume: logical run 을 Local SQLite 에 남기는 ledger 명령(local.data.work_run_*)은 loop 관찰 밖의
+    // 부수 채널이다(work-agent.spec 과 같은 처리). success 로 답하고 seen 에는 넣지 않는다.
+    if (base.startsWith('local.data.work_run_')) {
+      await submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: 'success', data: { runId: 'r_test', runStatus: 'active', saved: true } } as any);
+      continue;
+    }
     seen.push({ action: String(cmd.action), base, args: cmd.result_data ? JSON.parse(String(cmd.result_data)) : {} });
     const queue = script[base] ?? [{ status: 'failed', errorCode: 'UIA_UNAVAILABLE' }];
     const idx = Math.min(cursors[base] ?? 0, queue.length - 1);
