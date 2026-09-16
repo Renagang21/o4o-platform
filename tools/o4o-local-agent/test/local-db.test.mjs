@@ -37,8 +37,9 @@ test('1. DB 자동 생성 — 열면 local.db 파일과 핵심 테이블이 생�
   const h = db.localDbHealth();
   assert.equal(h.ok, true);
   assert.ok(fs.existsSync(path.join(tmpHome, 'local.db')));
-  // local_ prefix 테이블: V0 핵심 7(meta·migrations·settings·mappings·imports·exports·work_state) + V1 datasets 2 = 9
-  assert.equal(h.tableCount, 9);
+  // local_ prefix 테이블: V0 핵심 7(meta·migrations·settings·mappings·imports·exports·work_state) + V1 datasets 2
+  //   + PHASE 1 same-run(WEB-AUTOMATION-RESUME-V1) work_runs 1 = 10
+  assert.equal(h.tableCount, 10);
 });
 
 test('2. 재기동 — 닫았다 다시 열어도 local_db_id 가 유지된다', () => {
@@ -96,7 +97,7 @@ test('7. 파라미터 쿼리 — 주입 시도 문자열이 리터럴로만 저�
   assert.equal(db.LocalSettingsRepository.get('inj_key'), evil);
   // 테이블이 여전히 살아 있다 → 값이 SQL 로 실행되지 않았다.
   const h = db.localDbHealth();
-  assert.equal(h.tableCount, 9);
+  assert.equal(h.tableCount, 10);
 });
 
 test('9. 설정 쓰기/읽기 — set 한 값이 그대로 읽힌다', () => {
