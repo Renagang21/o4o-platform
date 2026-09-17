@@ -100,7 +100,7 @@
 
 ```text
 Credential   = 현재 자격 상태     (Professional Credential Domain · 초기 물리 kpa_pharmacist_profiles)
-Role         = 서비스 권한 할당 기록 (role_assignments · RBAC F9 SSOT · 예: glycopharm:store_owner)
+Role         = 서비스 권한 할당 기록 (role_assignments · RBAC F9 SSOT · 예: kpa-society:store_owner)
 Relationship = 소속·관계           (organization_members · branch_memberships)
 
 실제 접근 허용 = Role 존재
