@@ -214,6 +214,41 @@ export const MIGRATIONS = Object.freeze([
       `);
     },
   },
+  {
+    version: 4,
+    name: 'source_bindings_v1',
+    up(db) {
+      // WO-O4O-HOSPITAL-DRUG-LOCAL-AUTOMATION-PILOT-V1 (게이트 2 · Agent 로컬 바인딩)
+      // 반복해서 쓰는 자료(원내 약품 목록 등)를 **로컬 파일에 묶어** 두고, 변경되면 다시 import 하기
+      // 위한 최소 메타. 파일 선택·경로 기억·stat 비교·재-import 는 전부 이 PC 안(local-data-cli)에서만
+      // 일어난다. 웹/cloud 는 이 테이블을 읽지 않는다 — localDbHealth 도 local.data.* 핸들러도
+      // file_path 를 노출하지 않는다(게이트 2 경계).
+      //   logical_source — 이 자료의 논리 이름(파일명이 아니라 업무상 식별자, §7 파일명≠식별기준).
+      //   dataset        — import 결과가 담기는 local_datasets 이름.
+      //   file_path      — 사용자가 CLI 로 직접 고른 로컬 경로. **로컬 전용** — 밖으로 나가지 않는다.
+      //   file_format    — 현재 'csv' 만(XLSX 직접 파싱은 후속, WO 결정).
+      //   column_mapping — { 원본열: field } JSON. key_field/required_fields 는 import 규칙 그대로.
+      //   last_size/last_mtime_ms/last_imported_at/last_row_count — 변경감지(§7)용 최소 meta.
+      // 저장 금지: 파일 내용·행 데이터(그건 local_datasets 로 감)·credential·개인정보.
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS local_source_bindings (
+          logical_source   TEXT PRIMARY KEY,
+          dataset          TEXT NOT NULL,
+          file_path        TEXT NOT NULL,
+          file_format      TEXT NOT NULL DEFAULT 'csv',
+          column_mapping   TEXT NOT NULL,
+          key_field        TEXT,
+          required_fields  TEXT,
+          last_size        INTEGER,
+          last_mtime_ms    INTEGER,
+          last_imported_at TEXT,
+          last_row_count   INTEGER NOT NULL DEFAULT 0,
+          created_at       TEXT NOT NULL,
+          updated_at       TEXT NOT NULL
+        );
+      `);
+    },
+  },
 ]);
 
 /** DB 스키마 버전 = 체크인된 마지막 migration 의 version(§11). 따로 손으로 올리지 않는다. */
@@ -616,6 +651,86 @@ export const LocalWorkRunRepository = {
     return openLocalDb()
       .prepare('SELECT run_id, status, target_id, goal_summary, note, created_at, updated_at FROM local_work_runs WHERE run_id=?')
       .get(String(runId)) || null;
+  },
+};
+
+/**
+ * 로컬 파일 바인딩 원장(게이트 2 · WO-O4O-HOSPITAL-DRUG-LOCAL-AUTOMATION-PILOT-V1).
+ * 반복 자료를 로컬 파일에 묶어 두고 변경감지·재-import 를 하기 위한 최소 메타.
+ *
+ * **경계**: file_path 는 로컬 전용이다. 이 repository 를 호출하는 것은 `local-data-cli`(이 PC 의
+ * CLI)뿐이며, cloud 명령(handlers.mjs)은 어떤 `local.data.*` action 으로도 이 테이블을 읽지 않는다.
+ * localDbHealth 도 이 테이블을 요약에 담지 않는다. 즉 파일 경로는 밖으로 나가지 않는다.
+ */
+export const LocalSourceBindingRepository = {
+  /** 바인딩 등록/갱신(idempotent). 같은 logical_source 로 다시 오면 경로·매핑을 덮어쓴다. */
+  upsert({ logicalSource, dataset, filePath, fileFormat, columnMapping, keyField, requiredFields }) {
+    const now = nowIso();
+    openLocalDb()
+      .prepare(
+        'INSERT INTO local_source_bindings' +
+          '(logical_source, dataset, file_path, file_format, column_mapping, key_field, required_fields, created_at, updated_at) ' +
+          'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?) ' +
+          'ON CONFLICT(logical_source) DO UPDATE SET ' +
+          'dataset=excluded.dataset, file_path=excluded.file_path, file_format=excluded.file_format, ' +
+          'column_mapping=excluded.column_mapping, key_field=excluded.key_field, ' +
+          'required_fields=excluded.required_fields, updated_at=excluded.updated_at',
+      )
+      .run(
+        String(logicalSource),
+        String(dataset),
+        String(filePath),
+        fileFormat ? String(fileFormat) : 'csv',
+        JSON.stringify(columnMapping ?? {}),
+        keyField == null ? null : String(keyField),
+        requiredFields && requiredFields.length ? JSON.stringify(requiredFields) : null,
+        now,
+        now,
+      );
+    return { logicalSource: String(logicalSource) };
+  },
+  /** import 뒤 stat 지표를 기록한다(변경감지 기준선). */
+  recordImport(logicalSource, { size, mtimeMs, rowCount }) {
+    openLocalDb()
+      .prepare(
+        'UPDATE local_source_bindings SET last_size=?, last_mtime_ms=?, last_imported_at=?, last_row_count=?, updated_at=? ' +
+          'WHERE logical_source=?',
+      )
+      .run(
+        size == null ? null : Number(size),
+        mtimeMs == null ? null : Math.floor(Number(mtimeMs)),
+        nowIso(),
+        Number(rowCount) || 0,
+        nowIso(),
+        String(logicalSource),
+      );
+    return { ok: true };
+  },
+  /** 한 바인딩 조회 — CLI 의 stat 비교/재-import 에 쓴다(로컬 전용). */
+  get(logicalSource) {
+    const row = openLocalDb()
+      .prepare(
+        'SELECT logical_source, dataset, file_path, file_format, column_mapping, key_field, required_fields, ' +
+          'last_size, last_mtime_ms, last_imported_at, last_row_count, created_at, updated_at ' +
+          'FROM local_source_bindings WHERE logical_source=?',
+      )
+      .get(String(logicalSource));
+    if (!row) return null;
+    return {
+      ...row,
+      columnMapping: JSON.parse(row.column_mapping),
+      requiredFields: row.required_fields ? JSON.parse(row.required_fields) : [],
+    };
+  },
+  /** 전체 바인딩 목록(로컬 CLI 표시용). file_path 포함 — 이 결과는 cloud 로 나가지 않는다. */
+  list() {
+    return openLocalDb()
+      .prepare(
+        'SELECT logical_source, dataset, file_path, file_format, key_field, ' +
+          'last_size, last_mtime_ms, last_imported_at, last_row_count, updated_at ' +
+          'FROM local_source_bindings ORDER BY logical_source',
+      )
+      .all();
   },
 };
 

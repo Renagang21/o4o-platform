@@ -60,25 +60,31 @@ const REQ = { csvText: CSV, dataset: 'product_list', columnMapping: MAP, require
 
 // ─── migration chain (§51·§52) ───────────────────────────────────────────────
 
-test('empty → latest: 디렉터리·DB 생성 · schema v2 · 백업 불필요(new DB 는 pending 이 전부라 pre-migration 없이 시작하지 않는다)', () => {
+test('empty → latest: 디렉터리·DB 생성 · schema=SCHEMA_VERSION · 백업 불필요(new DB 는 pending 이 전부라 pre-migration 없이 시작하지 않는다)', () => {
   assert.equal(fs.existsSync(dbFile()), false);
   const s = boot();
   assert.equal(s.ready, true);
   assert.equal(s.schemaVersion, db.SCHEMA_VERSION);
-  assert.deepEqual(s.appliedNow, [1, 2]);
+  // 빈 DB → 코드의 모든 migration 을 순서대로 적용한다(버전 하드코딩 대신 chain 에서 유도).
+  assert.deepEqual(s.appliedNow, db.MIGRATIONS.map((m) => m.version));
   assert.equal(fs.existsSync(dbFile()), true);
   const h = db.localDbHealth({ backupSummary: bk.backupSummary });
   assert.equal(h.migrationStatus, 'current');
   assert.equal(h.pendingMigrations, 0);
   assert.equal(h.integrityStatus, 'ok');
-  assert.equal(h.tableCount, 9);
+  // health 의 tableCount 가 실제 local_% 테이블 수와 일치하는지 확인(고정 숫자 대신 실측 대조 — migration 추가 시 stale 방지).
+  const actualTables = db.openLocalDb()
+    .prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type='table' AND name LIKE 'local\\_%' ESCAPE '\\'")
+    .get().n;
+  assert.equal(h.tableCount, actualTables);
 });
 
-test('v1(V0) DB → latest: pre-migration 백업 뒤 migration 2 만 적용 · 기존 meta/settings/work_state 행 유지', () => {
+test('v1(V0) DB → latest: pre-migration 백업 뒤 v2 이상 migration 만 적용 · 기존 meta/settings/work_state 행 유지', () => {
   makeV0Fixture();
   const s = boot();
   assert.equal(s.ready, true);
-  assert.deepEqual(s.appliedNow, [2]);
+  // v1 은 이미 적용됨 → 코드의 v2 이상만 새로 적용된다(버전 하드코딩 대신 chain 에서 유도).
+  assert.deepEqual(s.appliedNow, db.MIGRATIONS.filter((m) => m.version >= 2).map((m) => m.version));
   assert.equal(s.backupStatus, 'created');
   const backups = bk.listBackups();
   assert.equal(backups.length, 1);
@@ -88,7 +94,7 @@ test('v1(V0) DB → latest: pre-migration 백업 뒤 migration 2 만 적용 · �
   assert.equal(db.LocalSettingsRepository.get('locale'), 'ko');
   const ws = db.openLocalDb().prepare("SELECT value FROM local_work_state WHERE key='last_task'").get();
   assert.equal(ws.value, '재고확인');
-  assert.equal(db.LocalMetaRepository.get('schema_version'), '2');
+  assert.equal(db.LocalMetaRepository.get('schema_version'), String(db.SCHEMA_VERSION));
   // 백업은 migration 이전 상태(v1)다
   const b = new DatabaseSync(path.join(home, 'backups', backups[0].id), { readOnly: true });
   assert.equal(b.prepare('SELECT MAX(version) AS v FROM local_schema_migrations').get().v, 1);
@@ -104,7 +110,7 @@ test('already latest → no-op: 재기동해도 migration 행·백업이 늘지 
   assert.deepEqual(s.appliedNow, []);
   assert.equal(s.backupStatus, 'not_needed');
   assert.equal(bk.listBackups().length, 0);
-  assert.equal(db.openLocalDb().prepare('SELECT COUNT(*) AS n FROM local_schema_migrations').get().n, 2);
+  assert.equal(db.openLocalDb().prepare('SELECT COUNT(*) AS n FROM local_schema_migrations').get().n, db.MIGRATIONS.length);
 });
 
 test('unknown future version → SCHEMA_TOO_NEW 로 멈춘다 · 내리지 않는다 · 데이터 축 호출은 그 코드로 거절', async () => {
@@ -117,7 +123,8 @@ test('unknown future version → SCHEMA_TOO_NEW 로 멈춘다 · 내리지 않�
   assert.equal(s.schemaVersion, 9);
   // 파일은 그대로 — 행이 지워지지 않았다
   const raw = new DatabaseSync(dbFile(), { readOnly: true });
-  assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM local_schema_migrations').get().n, 3);
+  // 코드의 모든 migration + 주입한 미래 버전(9) 1개.
+  assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM local_schema_migrations').get().n, db.MIGRATIONS.length + 1);
   raw.close();
   assert.throws(() => db.LocalMetaRepository.get('schema_version'), (e) => e.code === 'LOCAL_DB_SCHEMA_TOO_NEW');
   const r = await handlers.runAction('local.data.get_meta', {}, { key: 'schema_version' });
@@ -151,7 +158,8 @@ test('migration failure → 해당 migration 롤백 · MIGRATION_FAILED · 이�
   db.closeLocalDb();
   const s2 = boot();
   assert.equal(s2.ready, true);
-  assert.deepEqual(s2.appliedNow, [2]);
+  // v1 만 남아 있던 DB → 정상 chain 재기동 시 v2 이상만 이어 올린다.
+  assert.deepEqual(s2.appliedNow, db.MIGRATIONS.filter((m) => m.version >= 2).map((m) => m.version));
   assert.equal(db.LocalSettingsRepository.get('locale'), 'ko');
 });
 
@@ -391,6 +399,55 @@ test('CLI: status → backup → backups → import(preview/apply) → export �
   assert.ok(bk.listBackups().some((b) => b.reason === 'pre-restore'));
   // 출력에 행 데이터가 없다
   assert.ok(!out.join('\n').includes('8806400000001'));
+  assert.ok(!out.join('\n').includes('타이레놀'));
+});
+
+test('CLI bind/sync/bindings: 파일 연결 → 변경감지 재-import → 실패 시 기존 유지 → 목록(게이트2)', async () => {
+  const out = [];
+  const print = (m) => out.push(String(m));
+  const csvFile = path.join(home, 'ward-drugs.csv');
+  fs.writeFileSync(csvFile, '﻿' + CSV, 'utf8');
+
+  // 잘못된 source 이름 → 거절, 아무것도 저장하지 않는다
+  assert.equal(await cli.runDataCommand(['bind', '--file', csvFile, '--source', 'Ward-Drugs', '--map', '품목명=item_name'], print), 1);
+  assert.equal(db.LocalSourceBindingRepository.list().length, 0);
+
+  // bind: 최초 연결 = replace import + 바인딩 + stat 기준선
+  assert.equal(await cli.runDataCommand(['bind', '--file', csvFile, '--source', 'ward_drugs', '--map', '품목명=item_name,바코드=barcode,단가=unit_price', '--key', 'barcode', '--required', 'item_name,barcode'], print), 0);
+  assert.equal(db.LocalDatasetRepository.get('ward_drugs').row_count, 3);
+  const b0 = db.LocalSourceBindingRepository.list();
+  assert.equal(b0.length, 1);
+  assert.equal(b0[0].logical_source, 'ward_drugs');
+  assert.equal(b0[0].last_row_count, 3);
+  assert.ok(Number(b0[0].last_mtime_ms) > 0 && Number(b0[0].last_size) > 0);
+
+  // sync: 변경 없음 → unchanged (재-import 하지 않는다)
+  out.length = 0;
+  assert.equal(await cli.runDataCommand(['sync', '--source', 'ward_drugs'], print), 0);
+  assert.equal(JSON.parse(out[0]).synced[0].status, 'unchanged');
+
+  // 파일이 바뀌면(행 추가 → 크기 변화) sync 가 전체 재-import(replace)
+  fs.writeFileSync(csvFile, '﻿' + CSV + '새상품,8806400000004,500,\r\n', 'utf8');
+  out.length = 0;
+  assert.equal(await cli.runDataCommand(['sync'], print), 0);
+  const synced = JSON.parse(out[0]).synced[0];
+  assert.equal(synced.status, 'reimported');
+  assert.equal(synced.rows, 4);
+  assert.equal(db.LocalDatasetRepository.get('ward_drugs').row_count, 4);
+
+  // import 실패(필수열 빠진 파일) → 기존 SQLite 유지 · exit 3
+  fs.writeFileSync(csvFile, '﻿품목명,단가\r\n무바코드,100\r\n', 'utf8');
+  out.length = 0;
+  assert.equal(await cli.runDataCommand(['sync', '--source', 'ward_drugs'], print), 3);
+  assert.equal(JSON.parse(out[0]).synced[0].status, 'failed');
+  assert.equal(db.LocalDatasetRepository.get('ward_drugs').row_count, 4, 'import 실패 → 기존 데이터 유지');
+
+  // bindings 목록 — 로컬 콘솔 전용(행 데이터 없음)
+  out.length = 0;
+  assert.equal(await cli.runDataCommand(['bindings'], print), 0);
+  const listed = JSON.parse(out[0]).bindings;
+  assert.equal(listed[0].source, 'ward_drugs');
+  assert.equal(listed[0].lastRowCount, 4);
   assert.ok(!out.join('\n').includes('타이레놀'));
 });
 

@@ -9,6 +9,18 @@
  *   node src/index.mjs data restore <backup-id>          해당 백업으로 되돌린다(직전에 pre-restore 스냅샷)
  *   node src/index.mjs data import --file <csv> --dataset <name> --map "원본열=field,..." [--key field] [--required a,b] [--replace] [--preview]
  *   node src/index.mjs data export --dataset <name> --out <csv> [--columns a,b]
+ *   node src/index.mjs data bind --file <csv> --source <name> --map "원본열=field,..." [--dataset <name>] [--key field] [--required a,b]
+ *   node src/index.mjs data sync [--source <name>]     묶어 둔 파일이 바뀌었으면 다시 import(§7 변경감지)
+ *   node src/index.mjs data bindings                     묶어 둔 자료 목록(로컬 콘솔 전용)
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * 게이트 2 — Agent 로컬 바인딩 (WO-O4O-HOSPITAL-DRUG-LOCAL-AUTOMATION-PILOT-V1)
+ *
+ *   반복해서 쓰는 자료(원내 약품 목록 등)를 로컬 파일에 **묶어** 두고(bind), 파일이 바뀌면
+ *   다시 읽어 SQLite 를 갱신한다(sync). 파일 선택·경로 기억·변경감지·재-import 가 전부 이
+ *   PC 안에서만 일어난다 — 파일 경로도, 파일 내용도 cloud 로 나가지 않는다. 변경감지는
+ *   파일 크기·수정시각(mtime)만으로 판단하고(§7), 바뀌었으면 전체 재-import(행 단위 diff 없음),
+ *   import 실패 시 기존 SQLite 를 그대로 둔다. 웹/cloud 는 연결 상태·결과만 조회한다.
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * 이 모듈만 사용자 파일을 읽고 쓴다 — 그리고 **사용자가 명령줄에 직접 적은 경로만**(§33·§63)
@@ -25,7 +37,8 @@ import fs from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import {
   bootstrapLocalDb, closeLocalDb, openLocalDb, localDbHealth,
-  previewImport, applyImport, exportDataset, LocalDatasetRepository, LocalDbError, SCHEMA_VERSION,
+  previewImport, applyImport, exportDataset, LocalDatasetRepository, LocalSourceBindingRepository,
+  LocalDbError, SCHEMA_VERSION,
 } from './local-db.mjs';
 import { backupSummary, createBackup, listBackups, restoreBackup } from './local-db-backup.mjs';
 
@@ -56,6 +69,37 @@ function parseMap(spec) {
 
 const listOf = (v) => (typeof v === 'string' && v.trim() ? v.split(',').map((s) => s.trim()).filter(Boolean) : []);
 const boot = () => bootstrapLocalDb({ backup: (db, reason) => createBackup(db, reason) });
+
+// logical source 는 파일명이 아니라 업무상 식별자다(§7). dataset 이름과 같은 규칙.
+const SOURCE_NAME_RE = /^[a-z][a-z0-9_]{0,63}$/;
+
+/** 사용자가 적은 경로 하나의 크기·수정시각만 읽는다(변경감지 기준). 내용은 여기서 읽지 않는다. */
+function statFile(file) {
+  const st = fs.statSync(file);
+  return { size: st.size, mtimeMs: Math.floor(st.mtimeMs) };
+}
+
+/** 파일이 마지막 import 이후 바뀌었는지 — 크기 또는 수정시각(§7). 한 번도 안 했으면 항상 변경으로 본다. */
+function isChanged(binding, stat) {
+  if (binding.last_size == null || binding.last_mtime_ms == null) return true;
+  return Number(binding.last_size) !== stat.size || Number(binding.last_mtime_ms) !== stat.mtimeMs;
+}
+
+/**
+ * 바인딩 하나를 파일에서 다시 import 한다(replace) — 성공하면 stat 기준선을 갱신한다.
+ * 실패(파일 없음·검증 실패)면 예외를 던지고 기존 SQLite/기준선은 건드리지 않는다.
+ */
+function reimportBinding(binding) {
+  const stat = statFile(binding.file_path); // 파일 없으면 여기서 던진다 → 기존 데이터 유지
+  const csvText = fs.readFileSync(binding.file_path, 'utf8');
+  const request = {
+    csvText, dataset: binding.dataset, columnMapping: binding.columnMapping,
+    requiredFields: binding.requiredFields ?? [], keyField: binding.key_field ?? undefined, mode: 'replace',
+  };
+  const applied = applyImport(request); // 검증 실패면 던진다 → 기존 데이터 유지(기준선 미갱신)
+  LocalSourceBindingRepository.recordImport(binding.logical_source, { size: stat.size, mtimeMs: stat.mtimeMs, rowCount: applied.totalRows });
+  return applied;
+}
 
 /** bootstrap 을 거쳐 준비 상태를 요구한다. 실패면 코드와 함께 종료(§17·§66). */
 function requireReady(print) {
@@ -140,8 +184,67 @@ export async function runDataCommand(argv, print = (m) => console.log(m)) {
         print(`export 완료: dataset=${r.dataset} rows=${r.rowCount} columns=${r.columns.join(',')}`);
         return 0;
       }
+      case 'bind': {
+        if (!requireReady(print)) return 2;
+        if (typeof args.file !== 'string' || typeof args.source !== 'string' || typeof args.map !== 'string') {
+          print('사용법: data bind --file <csv> --source <name> --map "원본열=field,..." [--dataset <name>] [--key field] [--required a,b]');
+          return 1;
+        }
+        if (!SOURCE_NAME_RE.test(args.source)) { print(`잘못된 --source 이름: ${args.source} (영문 소문자로 시작, 소문자·숫자·_ 만)`); return 1; }
+        const dataset = typeof args.dataset === 'string' ? args.dataset : args.source;
+        const columnMapping = parseMap(args.map);
+        const keyField = typeof args.key === 'string' ? args.key : undefined;
+        const requiredFields = listOf(args.required);
+        // 최초 연결 = replace import 로 검증까지 한다. 통과해야 바인딩을 저장한다.
+        const stat = statFile(args.file); // 파일 없으면 여기서 던진다
+        const csvText = fs.readFileSync(args.file, 'utf8');
+        const request = { csvText, dataset, columnMapping, requiredFields, keyField, mode: 'replace' };
+        const preview = previewImport(request);
+        if (!preview.ok) {
+          print(JSON.stringify({ preview }, null, 1));
+          print('연결하지 않았습니다 — 부족한 필드/열/키를 채운 뒤 다시 시도하세요.');
+          return 3;
+        }
+        const applied = applyImport(request);
+        LocalSourceBindingRepository.upsert({ logicalSource: args.source, dataset, filePath: args.file, fileFormat: 'csv', columnMapping, keyField, requiredFields });
+        LocalSourceBindingRepository.recordImport(args.source, { size: stat.size, mtimeMs: stat.mtimeMs, rowCount: applied.totalRows });
+        print(`연결 완료: source=${args.source} dataset=${dataset} rows=${applied.totalRows}`);
+        return 0;
+      }
+      case 'sync': {
+        if (!requireReady(print)) return 2;
+        const only = typeof args.source === 'string' ? args.source : null;
+        const targets = only ? [LocalSourceBindingRepository.get(only)] : LocalSourceBindingRepository.list().map((b) => LocalSourceBindingRepository.get(b.logical_source));
+        if (only && !targets[0]) { print(`묶어 둔 자료가 없습니다: ${only}`); return 1; }
+        if (targets.length === 0) { print('묶어 둔 자료가 없습니다. data bind 로 먼저 연결하세요.'); return 0; }
+        const results = [];
+        for (const b of targets) {
+          try {
+            const stat = statFile(b.file_path);
+            if (!isChanged(b, stat)) { results.push({ source: b.logical_source, status: 'unchanged' }); continue; }
+            const applied = reimportBinding(b);
+            results.push({ source: b.logical_source, status: 'reimported', rows: applied.totalRows });
+          } catch (err) {
+            // import 실패 → 기존 SQLite 유지. 다른 자료의 sync 는 계속한다.
+            results.push({ source: b.logical_source, status: 'failed', errorCode: err?.code ?? 'ERROR' });
+          }
+        }
+        print(JSON.stringify({ synced: results }, null, 1));
+        return results.some((r) => r.status === 'failed') ? 3 : 0;
+      }
+      case 'bindings': {
+        if (!requireReady(print)) return 2;
+        const list = LocalSourceBindingRepository.list();
+        if (list.length === 0) { print('묶어 둔 자료 없음'); return 0; }
+        // 로컬 콘솔 전용 — 이 출력은 cloud 로 나가지 않는다.
+        print(JSON.stringify({ bindings: list.map((b) => ({
+          source: b.logical_source, dataset: b.dataset, format: b.file_format, filePath: b.file_path,
+          keyField: b.key_field ?? null, lastRowCount: b.last_row_count, lastImportedAt: b.last_imported_at ?? null,
+        })) }, null, 1));
+        return 0;
+      }
       default:
-        print('사용법: data status | backup | backups | restore <id> | import ... | export ...');
+        print('사용법: data status | backup | backups | restore <id> | import ... | export ... | bind ... | sync [--source <name>] | bindings');
         return 1;
     }
   } catch (err) {
