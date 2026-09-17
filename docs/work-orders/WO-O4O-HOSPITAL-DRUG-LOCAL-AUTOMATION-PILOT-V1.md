@@ -191,12 +191,16 @@ Excel = 원본, Local SQLite = 실행용 검색 데이터. 최소 메타 저장:
 A. PHASE 0 무로그인 Local Agent 조사 / B. `/hospital-drug` 구조 / C. Excel Local Data Source / D. Excel change·reimport / E. 약학정보원 Workflow / F. Local Data 결합 / G. AI 화면 / H. Desktop shortcut·PWA / I. Safety·Privacy / J. 실 smoke / K. PENDING / L. commit·CHECK. 보고는 한국어 존댓말, 미검증 PASS 금지, `문서 정합` 한 줄 포함.
 
 ```text
-HOSPITAL_DRUG_ENTRY =
-ANONYMOUS_WARD_USE =
-LOCAL_AGENT_ACCESS =
-EXCEL_LOCAL_SOURCE =
-LOCAL_SQLITE_UPDATE =
-PHARMACY_INFO_WORKFLOW =
-DESKTOP_ENTRY =
-PRODUCTION_SMOKE =
+HOSPITAL_DRUG_ENTRY    = DONE (공개 라우트 + 슬림 페이지, 단위검증)
+ANONYMOUS_WARD_USE     = DONE (옵션 C 무로그인 · 401→재연결 · trust boundary 불변)
+LOCAL_AGENT_ACCESS     = DONE (probeLocalAgent 무인증 상태 · pairing 은 설치 시 1회)
+EXCEL_LOCAL_SOURCE     = DONE_CODE / PENDING_SMOKE (게이트2 bind·import 로컬)
+LOCAL_SQLITE_UPDATE    = DONE_CODE / PENDING_SMOKE (변경감지·재import·실패 시 기존 유지)
+PHARMACY_INFO_WORKFLOW = REUSED (healthkr 기존 코어 · 실 smoke 13/13 완료 · 병동에서 도달)
+DESKTOP_ENTRY          = DONE_CODE / PENDING_SMOKE (화면 전용 manifest·안내)
+PRODUCTION_SMOKE       = PENDING_USER_VERIFICATION (실 병동 PC 종단 §14 3~16)
 ```
+
+> **실행 결과(2026-09-17)**: 상세는 `docs/checks/CHECK-O4O-HOSPITAL-DRUG-LOCAL-AUTOMATION-PILOT-V1.md`.
+> commit `5ed603aed`·`31e62159c`·`aa106a7df`·`c8fb4e9f7`. §9 단일응답 자동결합은 「요청당 tool 1」 엔진 계약상
+> 신규 오케스트레이션이 필요하고 실 하드웨어 검증이 필수라 **별도 WO 후보**로 분리(현 병동 페이지는 2단계 순차 질의로 지원).
