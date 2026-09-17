@@ -4,7 +4,8 @@
 > **적용 대상**: Neture · KPA Society · K-Cosmetics · PharmacyHub (활성 4 서비스)
 > **성격**: 개인정보 처리방침 v1.0 의 "보유기간" 항목과 보유기간 집행(자동 삭제) 구현의 **단일 기준**. 이 문서의 기간을 바꾸는 것은 정책 변경이며 처리방침 개정을 동반한다.
 > **근거 실측**: [`IR-O4O-PRIVACY-POLICY-RUNTIME-DATA-FLOW-CENSUS-V1`](../investigations/IR-O4O-PRIVACY-POLICY-RUNTIME-DATA-FLOW-CENSUS-V1.md) §7 · §8 · §9 · §5-1 (2026-09-17 프로덕션 read-only 조사)
-> **집행 WO**: [`WO-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1`](../work-orders/WO-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1.md)
+> **집행 WO**: [`WO-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1`](../work-orders/WO-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1.md) — **CLOSED (2026-09-17)** · CHECK [`CHECK-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1`](../checks/CHECK-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1.md)
+> **현행 집행 상태 (2026-09-17)**: 정책 확정 + retention job 구현(`apps/api-server/src/services/privacy-retention.service.ts` · `jobs/privacy-retention.job.ts`, 부팅 시 1회 + 24h) + **production `PRIVACY_RETENTION_MODE=apply` 활성**(`.github/workflows/deploy-api.yml` 고정). 기간 env(`PRIVACY_RETENTION_DAYS_*`)는 이 문서보다 길게만 허용된다.
 > **법적 근거**: 개인정보 보호법 제21조(목적 달성 시 지체 없이 파기 · 법령상 보존은 분리 보관) · 개인정보의 안전성 확보조치 기준 제8조(접속기록 1년 이상 · 5만 명 이상 또는 민감정보/고유식별정보 처리 시스템은 2년 이상) · 전자상거래법 시행령 제6조(표시·광고 6개월 · 계약/청약철회 5년 · 대금결제/공급 5년 · 불만/분쟁 3년)
 
 ---
@@ -36,7 +37,7 @@
 
 - 대상: 이름 · 이메일 · 전화번호 · 소속 · 문의 제목 · 문의 내용 · source path · User-Agent · IP hash(원본 IP 미저장) · 문의 처리내역(`handled_at · handled_by · internal_note`)
 - **보유기간: 문의 처리 완료 후 1년** (처리 완료 = `handled_at`; 미처리 문의는 처리 완료 전까지 보관)
-- 현행: 자동 삭제 없음 → 집행 WO 대상.
+- 현행: retention job 집행 중(apply). 삭제 조건 = `status IN ('answered','closed','spam') AND handled_at < 기준일`. `received/in_review` 는 처리 중이므로 대상 아님. 종결 상태인데 `handled_at` 이 NULL 인 row 는 삭제하지 않고 `UNRESOLVED_RETENTION_ANCHOR` 로 건수만 보고한다(`created_at` 을 대체 기준으로 쓰지 않는다).
 - 향후 실제 전자상거래에서 발생한 **소비자 불만·분쟁처리 기록**은 전자상거래법 대상인 경우 **3년** 별도 보존한다. 현재 O4O 는 실결제가 활성화되지 않았으므로(IR §10) 이 거래 보존기간을 **현재 처리항목으로 표시하지 않는다** (§14).
 
 ---
@@ -45,7 +46,7 @@
 
 - 대상: 수신 이메일 · 발송 유형 · 제목 · 성공/실패 상태 · message ID · 발송 시각. **이메일 본문은 저장하지 않는다** (`body/htmlBody` 컬럼 존재하나 코드가 쓰지 않음 · 프로덕션 전건 NULL).
 - **보유기간: 발송일로부터 1년** (비밀번호 재설정 · 이메일 인증 발송 사실 확인 · 장애 조사 목적)
-- 현행: 자동 삭제 없음 → 집행 WO 대상.
+- 현행: retention job 집행 중(apply). 기준 = `COALESCE(sentAt, createdAt)`.
 
 ---
 
@@ -66,7 +67,7 @@
   - 민감정보 또는 고유식별정보 처리
   - 그 밖에 법령상 2년 보존 대상
 - 2026-09-17 기준 활성 4 서비스는 위 2년 요건에 해당하지 않음이 확인되지 않았으므로(회원 58명 규모 · 민감정보/고유식별정보 처리 없음) **1년**을 적용한다. 향후 소비자 건강정보 등 민감정보 서비스가 붙는 시스템은 별도 2년 정책을 적용하고 처리방침을 개정한다.
-- 현행: 3 테이블 모두 자동 삭제 없음(`action_logs` 90일 초과 4,153 row) → 집행 WO 대상.
+- 현행: 3 테이블 모두 retention job 집행 중(apply · 생성일 + 1년). 코드가 1년 미만 단축을 거부하므로(env 는 정본 이상만 채택) 안전성 확보조치 기준 §8 의 1년 이상 보존이 설정 실수로 깨지지 않는다. 2년 상향은 이 문서 개정 + `policyDays` 변경으로 처리한다.
 
 ---
 
@@ -88,7 +89,7 @@
 - **보유기간: 1년**
 - O4O 는 AI 프롬프트 · AI 응답 본문을 `ai_usage_logs` 에 **저장하지 않는다.** (`ai_query_logs` 는 본문 저장 구조이나 프로덕션 0 row · 호출 화면 없음 — 미사용)
 - AI 입력·첨부파일을 별도 저장하는 기능이 추가되면 그 기능의 보유기간을 별도로 정하고 처리방침을 개정한다.
-- 현행: 자동 삭제 없음 → 집행 WO 대상.
+- 현행: retention job 집행 중(apply · 생성일 + 1년).
 
 ---
 
@@ -97,7 +98,7 @@
 - 상품 이미지 · 마케팅 콘텐츠 등 **개인정보가 아닌 콘텐츠**는 이 정책의 보유기간 대상이 아니다.
 - 개인을 식별할 수 있는 파일(프로필 이미지 · 개인 사진 · 개인정보가 포함된 첨부파일)은 개인정보로 관리한다.
 - **보유기간: 회원 또는 해당 콘텐츠의 서비스 이용기간 동안.** 삭제 요청 · 콘텐츠 삭제 · 회원 탈퇴 등으로 보유 목적이 종료되면 활성 저장소에서 지체 없이 삭제한다. 백업 사본은 해당 백업 보존주기 종료 시 순차 삭제한다.
-- 현행: 버킷 lifecycle 없음 · 탈퇴/콘텐츠 삭제 ↔ GCS 객체 삭제의 연결 여부 **미검증** → 집행 WO 에서 검증.
+- 현행(집행 WO 검증 결과, 2026-09-17): 콘텐츠 단위 삭제 경로는 GCS 객체 삭제와 연결되어 있다(미디어 라이브러리 = GCS 삭제 후 row 제거 · 상품 이미지 = 삭제 요청 후 실패 시 재시도 없음). 회원 탈퇴 → GCS 자동 삭제 연동은 **없다**(자체 탈퇴 경로 자체가 없음). 따라서 처리방침에는 "탈퇴 즉시 자동 삭제" 로 쓰지 않고, 보유 목적 종료 시 삭제하는 절차(삭제 요청 처리 · 콘텐츠 삭제)로 기재한다. 탈퇴↔GCS 연동은 개인정보·Identity 재정렬 트랙에서 별도 WO 로 다룬다.
 
 ---
 
@@ -118,7 +119,7 @@
 ## 12. 수동 DB Export
 
 - 수동 생성한 개인정보 포함 가능 DB export: **최대 30일** 보관 후 삭제. 장기 아카이브를 원칙으로 하지 않는다.
-- 현존 `neture-db-final-export` 버킷은 운영상 복구 필요성을 확인한 뒤 불필요하면 삭제한다(삭제는 사용자 명시 승인 · 집행 WO §중지 조건). 향후 수동 export 는 30일 자동삭제 lifecycle 적용을 원칙으로 한다.
+- 현존 `neture-db-final-export` 버킷(2026-09-17 정리): 2026-08-18 빈 export 2건은 30일 경과 · 복구 가치 없음으로 사용자 승인 후 삭제했다. 2026-09-04 full export(검증된 유효 복구자산)는 보존하며 **2026-10-04 이후 재정당화 여부를 다시 판단**한다. 버킷 lifecycle 은 아직 없다. 향후 수동 export 는 30일 자동삭제 lifecycle 적용을 원칙으로 한다.
 
 ---
 
@@ -154,18 +155,18 @@
 
 | 개인정보 또는 기록 | O4O 보유기간 | 현행 집행 |
 |---|---:|:-:|
-| 회원 · 프로필 정보 | 탈퇴/목적 종료 시까지 | 탈퇴 = 삭제 (검증은 집행 WO) |
-| 일반 문의 | 처리 완료 후 1년 | **미구현** |
+| 회원 · 프로필 정보 | 탈퇴/목적 종료 시까지 | 자체 탈퇴 경로 없음 · 관리자 삭제 경로 (Identity 재정렬 트랙) |
+| 일반 문의 | 처리 완료 후 1년 | 구현됨 (retention job · apply) |
 | 소비자 거래 불만·분쟁 | 해당 시 3년 | n/a (거래 없음) |
-| 이메일 발송로그 | 1년 | **미구현** |
+| 이메일 발송로그 | 1년 | 구현됨 (retention job · apply) |
 | 로그인 시도 | 30일 | 구현됨 |
-| 개인정보 접속·감사기록 | 1년 | **미구현** |
+| 개인정보 접속·감사기록 | 1년 | 구현됨 (retention job · apply · 1년 미만 단축 불가) |
 | 민감정보 등 대상 시스템 접속기록 | 2년 | n/a (해당 시스템 없음) |
-| AI 사용 메타데이터 | 1년 | **미구현** |
-| 개인 식별 가능 미디어 | 이용기간 또는 삭제 시까지 | **미검증** |
+| AI 사용 메타데이터 | 1년 | 구현됨 (retention job · apply) |
+| 개인 식별 가능 미디어 | 이용기간 또는 삭제 시까지 | 콘텐츠 삭제 = GCS 삭제 연결 · 탈퇴 연동 없음 (별도 WO) |
 | 영상 임시 출력 | 3일 | 구현됨 (GCS lifecycle) |
 | Cloud SQL 자동백업 / PITR | 7일 | 구현됨 (Cloud SQL 설정) |
-| 수동 DB export | 최대 30일 | **미구현** (기존 버킷 처분 대기) |
+| 수동 DB export | 최대 30일 | 수동 관리 (8/18 export 삭제 · 9/04 full 은 10/04 재판단 · lifecycle 없음) |
 | Cloud Logging `_Default` | 30일 | Google 기본 |
 | Cloud Logging `_Required` | 400일 | Google 고정 |
 

@@ -2,7 +2,7 @@
 
 > **성격**: 구현 WO — [`O4O-PRIVACY-DATA-RETENTION-POLICY-V1`](../baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md) 이 정한 보유기간을 **현재 무기한으로 쌓이는 저장소에 실제로 적용**한다. 정책을 새로 정하지 않는다(기간은 정본 그대로).
 > **핸드오프 전용** — 명시 지시 전에는 실행하지 않는다.
-> **상태**: DRAFT (2026-09-17)
+> **상태**: CLOSED (2026-09-17) — Phase 1 구현·dry-run `40b5939e9` · Phase 2 apply 활성 `5c0b7114e` · CHECK [`CHECK-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1`](../checks/CHECK-O4O-PRIVACY-DATA-RETENTION-ENFORCEMENT-V1.md)
 > **선행**: 보유기간 정책 확정 (완료 · 2026-09-17) · [`IR-O4O-PRIVACY-POLICY-RUNTIME-DATA-FLOW-CENSUS-V1`](../investigations/IR-O4O-PRIVACY-POLICY-RUNTIME-DATA-FLOW-CENSUS-V1.md) §7 · §8 · §9
 > **후속**: 이 WO 완료 상태를 기준으로 `O4O 개인정보 처리방침 v1.0` 최종본 작성 → 4 활성 서비스 `/privacy` 게시(`service_policy_documents`)
 > **관련 정본**: [`O4O-CORE-FREEZE-V1`](../architecture/O4O-CORE-FREEZE-V1.md)(auth-core 는 읽기만) · [`PRODUCTION-MIGRATION-STANDARD`](../baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) · CLAUDE.md §8(진단·정리 경로는 CLI/job 우선, HTTP route 금지)
