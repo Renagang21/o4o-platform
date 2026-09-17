@@ -196,6 +196,26 @@ probe 도구: `scripts/dev/probe-public-drug-api.mjs`(dev 전용·인증키는 e
   이 API 가 제품↔일반명코드 매핑 + 동일 일반명코드 제품군을 준다면 체인의 중심이 된다.
 - **동일성분 제품군 열거 = 아직 미확정.** 15021027 은 열거하지 않는다. 열거는 ① 15054445 가 일반명코드로 제품목록을 주는지(probe),
   또는 ② HIRA 약가마스터 파일(15067461 의약품주성분 · 15067462 의약품표준코드)로 제품↔주성분코드 전체표를 O4O DB 에 적재해 로컬 조회.
+### HIRA 라이브 probe 실측 결과 (2026-09-17) — 동일성분 체인 확정
+
+probe: `scripts/dev/probe-public-drug-api.mjs` + PowerShell `Invoke-RestMethod`(UTF-8) · 인증키 = data.go.kr 계정 키 **Encoding 형** (env `PUBLIC_DRUG_API_SERVICE_KEY` 사용자 범위 · 값 미기록). 15054445 · 15021027 활용신청 승인 후 즉시 200(반영 지연 없었음).
+`202106092` 는 식약처 ITEM_SEQ(품목기준코드)라 어느 단계에서도 `gnlNmCd` 입력값으로 쓰지 않았다.
+
+**① 약가기준정보조회서비스 (15054445)** — 요청주소 `https://apis.data.go.kr/B551182/dgamtCrtrInfoService1.2/getDgamtList` (`_type=json` 지원)
+- 응답 필드(실측): `adtStaDd`(적용시작일) · `gnlNmCd`(일반명코드 9자리) · `injcPthNm`(투여경로) · `itmNm`(제품명) · `mdsCd`(제품코드 9자리) · `meftDivNo`(약효분류) · `mnfEntpNm`(업체) · `mxCprc`(상한금액) · `nomNm` · `payTpNm`(급여/삭제/비급여) · `spcGnlTpNm`(전문/일반) · `unit`.
+- **요청 필터로 실제 동작하는 변수: `itmNm`(부분일치) · `mdsCd`(prefix 일치 — `6723002` → 2건) · `adtStaDd`(정확일치).** `gnlNmCd` · `gnlNmcd` · `gnlCd` · `gnlNm` · `meftDivNo` · `mnfEntpNm` · `spcGnlTpNm` · `payTpNm` · `injcPthNm` 은 **무시**(0건 또는 필터 미적용 — `gnlNmCd=…&adtStaDd=…` 는 adtStaDd 만 적용된 97건). 필터 0개면 `totalCount 0`(전체 열거 불가).
+- 실측: `itmNm=타이레놀` → 25건. **타이레놀정500mg → `mdsCd=A43800471` · `gnlNmCd=101305ATB`**(급여 삭제 2002-04 이력 — 현행 OTC 500mg 은 비급여라 현재 약가목록에 없음) · **타이레놀8시간이알서방정 → `mdsCd=672300240` · `gnlNmCd=101430ATR`**(급여 · 70원 · 2024-04-01). 어린이현탁액 `101403ASS/101433ASS/101330ASS`, 160mg `101401ATB` 등 제형·함량별로 코드가 다르다(= 일반명코드가 성분+함량+제형+투여경로 단위임을 실측).
+- `mdsCd` 는 식약처 `EDI_CODE` 와 같은 축(심평원 제품코드) → 식약처 제품허가정보 `EDI_CODE` → `mdsCd` 정확 조회로 이름 없이도 연결 가능.
+
+**② 의약품성분약효정보조회서비스 (15021027)** — `https://apis.data.go.kr/B551182/msupCmpnMeftInfoService/getMajorCmpnNmCdList` (`getMsupCmpnMeftInfo` · `getCmpnMeftList` 는 400)
+- `gnlNmCd=101305ATB` → 1건: `gnlNm=acetaminophen · iqtyTxt=0.5 · unit=g · fomnTpCdNm=정제,저작정 · injcPthCdNm=내복 · meftDivNo=114 · divNm=해열·진통·소염제`. 응답 필드명은 포털 명세와 약간 다름(`fomnTpCdNm` · `injcPthCdNm`).
+
+**③ 동일 일반명코드 제품 열거** — `gnlNmCd` 가 요청 필터가 아니므로 API 로 직접 열거는 불가. 대신 두 경로가 실측됨:
+- (a) `itmNm=<성분 한글명>` 검색 → 클라이언트 `gnlNmCd` 필터. `itmNm=아세트아미노펜` 210건(500/page 페이징) → `101430ATR` **22건**(급여 18 · 삭제 4: 세타펜·세토펜·써스펜·아니스펜·아세트엠·엔시드·이알펜·타미스펜·타세놀·타스펜·타이레놀·타이레펜 … 전부 0.65g 서방정 70원). 제품명에 "(성분명)" 이 없는 옛 항목(예 `타이레놀정500mg`)은 이 검색에 안 잡히므로 완전 열거는 아니다.
+- (b) `mdsCd` prefix 스캔으로 마스터 전수 페이징 → 로컬 `gnlNmCd` 색인. 규모 실측: `6*`=48,533 · `A*`=38,915 · `E*`=2,549 · `0*`=2,217 · `C*`=298 · `B*`=69 · `D*`=4 · `9*`=3 (1~5·7·8 = 0) ≈ **92.6k 행 · 500/page ≈ 190 요청**. 이것이 정확한 동일성분 제품군 정본(IR 의 약가마스터 파일 15067462 와 같은 내용을 API 로 얻는 경로).
+
+**판정**: `상품명 → 15054445(itmNm/mdsCd) → gnlNmCd → 15021027(성분·함량·제형·경로) → 동일 gnlNmCd 제품군` 체인 **실측 완결**. health.kr 병동 V1 의존 제거는 **확정 가능** — 열거 정본은 (b) 전수 색인(1일 1회 갱신 정도로 충분 · 급여 `payTpNm` 로 현행/삭제 구분), 즉시 응답은 (a) 성분명 검색으로 보완. 구현은 별도 WO(첨부 §7 소스 확정 반영 · 새 endpoint/스키마는 승인 게이트).
+
 ### O4O 자체 DB 조사 결과 (2026-09-17) — 현 상태 동일성분 조회 불가
 
 read-only 코드 조사(Explore) 결론: **현 상태 O4O DB 만으로는 동일성분 제품군 조회 불가.** 근거:
