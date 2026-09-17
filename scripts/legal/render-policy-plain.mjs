@@ -11,7 +11,7 @@
  *   → 문장은 한 글자도 바꾸지 않고 서식 토큰만 제거한 plain 형으로 게시한다(두 뷰어 모두 정상 표시).
  *
  * 규칙(결정적):
- *   - 파일 상단 `> ` 헤더 블록(저장소 메타)은 제외 · 첫 `# 제목` 줄은 제외(title 컬럼이 담당)
+ *   - 파일 상단 `> ` 헤더 블록(저장소 메타)은 제외 · `>` 단독 빈 줄도 제외(부록 blockquote) · 첫 `# 제목` 줄은 제외(title 컬럼이 담당)
  *   - `## ` / `### ` 접두 제거(제목 줄은 그대로 한 줄)
  *   - `**x**` → `x` · `[text](url)` → `text` · `---` 구분선 제거
  *   - `* ` 불릿 → `- ` · 들여쓴 하위 불릿 `   * ` → `  - `
@@ -27,7 +27,7 @@ export function renderPolicyPlain(md) {
   const out = [];
   let titleDropped = false;
   for (let line of lines) {
-    if (line.startsWith('> ')) continue; // 저장소 헤더 블록
+    if (/^>( |$)/.test(line)) continue; // 저장소 헤더 블록 · 부록(`>` 빈 줄 포함)
     if (!titleDropped && /^# /.test(line)) { titleDropped = true; continue; }
     if (/^---\s*$/.test(line)) continue;
     line = line.replace(/^#{2,3} /, '');
@@ -44,7 +44,7 @@ export function bareText(s) {
   return s
     .replace(/\r\n/g, '\n')
     .split('\n')
-    .filter((l) => !l.startsWith('> ') && !/^---\s*$/.test(l))
+    .filter((l) => !/^>( |$)/.test(l) && !/^---\s*$/.test(l))
     .join('\n')
     .replace(/^# .*\n/m, '')
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
