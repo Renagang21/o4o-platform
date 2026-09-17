@@ -7,7 +7,7 @@
 ## 0. 결론 — ✅ PASS
 
 같은 `stores` collapsible 그룹 안에서 성격이 다른 두 업무를 비클릭 구획 라벨로 구분. 공통 `OperatorMenuItem`에
-optional `sectionLabel` additive 추가 → 미지정(GP/KCos/Neture·타 그룹)은 기존 렌더 그대로, KPA stores 두 항목에만
+optional `sectionLabel` additive 추가 → 미지정(KCos/Neture·타 그룹)은 기존 렌더 그대로, KPA stores 두 항목에만
 지정. route·권한·순서·기능명 불변.
 
 ## 1. 조사 — 렌더 구조 (중지 조건 미해당)
@@ -41,7 +41,7 @@ optional `sectionLabel` additive 추가 → 미지정(GP/KCos/Neture·타 그룹
   web-kpa-society) 0 · **@o4o/ui dist 재빌드** 후 통과 · KPA build 0.
 
 ### KPA 외 무회귀
-- **web-glycopharm tsc 0 + build 0**(operator-ux-core·@o4o/ui 소비, sectionLabel 미지정 → 렌더 불변). KCos·Neture
+- KCos·Neture
   동일 구조(미지정) → 무영향. 타 그룹(users/content 등)·타 항목 sectionLabel 없음 → 기존 렌더 유지.
 
 ### 브라우저 smoke (kpa-society, 운영자 sohae2100)

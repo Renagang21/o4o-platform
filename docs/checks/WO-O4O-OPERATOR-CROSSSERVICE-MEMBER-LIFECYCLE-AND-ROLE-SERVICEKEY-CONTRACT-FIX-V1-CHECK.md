@@ -1,7 +1,7 @@
 # WO-O4O-OPERATOR-CROSSSERVICE-MEMBER-LIFECYCLE-AND-ROLE-SERVICEKEY-CONTRACT-FIX-V1 — CHECK
 
 > 선행 WO: [WO-O4O-PHARMACYHUB-OPERATOR-COMMUNITY-AND-COMMON-CAPABILITY-FULL-ADOPTION-V1](WO-O4O-PHARMACYHUB-OPERATOR-COMMUNITY-AND-COMMON-CAPABILITY-FULL-ADOPTION-V1-CHECK.md) §7-A 의 D3 · D4.
-> 대상 서비스: KPA-Society · K-Cosmetics · Neture · Pharmacy-Hub (GlycoPharm 은 공유 모듈 회귀 확인 대상).
+> 대상 서비스: KPA-Society · K-Cosmetics · Neture · Pharmacy-Hub
 
 ## 1. D3 — 회원 재활성화 lifecycle 결함
 
@@ -51,7 +51,6 @@ pending/rejected membership 있음   → approveMembership()      (기존)
 * UI `SERVICE_OPTIONS` = role prefix(`kpa`) → `scope.serviceKeys.includes('kpa')` 실패 → **403**
 * canonical(`kpa-society`) 을 보내면 scope 는 통과하나 `getRolesByService('kpa-society')` → **0건**
 * 무필터 경로는 `scope.serviceKeys`(canonical)로 카탈로그를 뒤진다 → KPA·K-Cosmetics 운영자에게 **자기 서비스 역할이 한 건도 안 나온다**. `@o4o/ui` UserDetailPage 역할 추가 모달의 "할당 가능한 역할이 없습니다" 가 같은 원인.
-  (self-map 서비스 neture/glycopharm/pharmacy-hub 는 우연히 동작 — 그래서 지금까지 드러나지 않았다.)
 
 **수정 계약**: **UI·API 는 canonical service key 하나만 쓴다. role prefix 변환은 backend 의 `roles` 테이블 경계 한 곳에서만 한다.**
 
@@ -86,7 +85,6 @@ pending/rejected membership 있음   → approveMembership()      (기존)
 | K-Cosmetics typecheck / build | `tsc --noEmit` · `vite build` | **PASS** / **PASS** |
 | Neture typecheck / build | `tsc --noEmit` · `vite build` | **PASS** / **PASS** |
 | Pharmacy-Hub typecheck / build | `tsc -b --force` · `vite build` | **PASS** / **PASS** |
-| GlycoPharm 공유모듈 회귀 | `tsc -b --force` · `vite build` | **PASS** / **PASS** |
 
 검증 중 관측한 선행 결함 1건 — **본 WO 와 무관하며 현재 main 에서 이미 해소**되었다.
 `6ce7c84bb` 시점 `web-pharmacy-hub` 는 `App.tsx` 의 `RoleEntryPage`(110) · `ROLES`(178) 미사용 import 로
@@ -127,13 +125,11 @@ pending/rejected membership 있음   → approveMembership()      (기존)
 | `kpa-society` | 200 / 8 | 200 / 8 | (lockedServiceKey) |
 | `k-cosmetics` | 200 / 7 | 200 / 7 | — |
 | `neture` | 200 / 5 | 200 / 5 | — |
-| `glycopharm` | 200 / 7 | 200 / 7 | — |
 | `pharmacy-hub` | 200 / 3 | 200 / 3 | **200 / 3** (`?service=pharmacy-hub`) |
 | 무필터 | 200 / 33 (scope 6키 합집합, 수정 전 0) | 200 | — |
 | `platform` · `lms` | 403 | 403 | — |
 
 `platform`·`lms` 403 은 scope guard 정상 동작이며 결함이 아니다.
-프로덕션 DOM 의 `<option value>` 는 `''|platform|neture|glycopharm|kpa-society|k-cosmetics|pharmacy-hub|lms` — canonical 전환이 배포에 반영됐다.
 역할 추가 모달도 채워진다(KPA 31 / Neture 30). 수정 전 "할당 가능한 역할이 없습니다".
 
 **역할 부여 → 회수 → 원복**
@@ -153,7 +149,6 @@ pending/rejected membership 있음   → approveMembership()      (기존)
 
 **기타 브라우저 검증**: desktop(1440) · mobile(390) 양쪽에서 Neture `/admin/roles` · Neture 회원 상세 deep link + 새로고침 ·
 Pharmacy-Hub `/operator/roles` · `/operator/members` 로드 — 예상치 못한 4xx/5xx 0 · 가로 overflow 0 · white screen 0 · JS exception 0.
-GlycoPharm 은 공유 `RoleManagementPage` + 공유 backend 를 통해 `glycopharm` 필터 200/7 로 확인했고, typecheck·build 회귀도 PASS(§4).
 
 ## 7. 결론
 

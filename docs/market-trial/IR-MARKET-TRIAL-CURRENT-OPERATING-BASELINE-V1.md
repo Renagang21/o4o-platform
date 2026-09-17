@@ -26,7 +26,6 @@ Extension App (@o4o/market-trial)
 ├── apps/api-server/routes/         ← Route 정의
 ├── services/web-kpa-society/       ← 참여자 허브 (Hub)
 ├── services/web-neture/            ← 운영 관리 (본진)
-├── services/web-glycopharm/        ← 게이트웨이
 └── services/web-k-cosmetics/       ← 게이트웨이
 ```
 
@@ -95,13 +94,13 @@ Market Trial은 3개 서비스에 걸쳐 역할이 분리된다.
 | `MarketTrialHubPage` | `/market-trial` | Trial 전체 목록 |
 | `MarketTrialDetailPage` | `/market-trial/:id` | Trial 상세 + 참여 폼 + 포럼 딥링크 |
 
-### 2.3. GlycoPharm / K-Cosmetics (게이트웨이 / Gateway)
+### 2.3. K-Cosmetics (게이트웨이 / Gateway)
 
 | 항목 | 내용 |
 |------|------|
 | 역할 | Trial 노출, KPA 허브로 리다이렉트 |
 | 사용자 | 해당 서비스 회원 |
-| Route 기반 | Gateway API (`/api/market-trial/gateway?serviceKey=glycopharm`) |
+| Route 기반 | Gateway API |
 | 주요 기능 | 서비스별 visibleServiceKeys 필터링, 서비스 운영자 Trial 조회 |
 
 **서비스 운영자 API (2차 승인 — DEPRECATED):**
@@ -340,7 +339,6 @@ none → interested → considering → adopted → first_order
 | **Decision 수집 UI** | 참여자 사후 결정(CONTINUE/STOP) 프론트엔드 | 백엔드 API 존재, 프론트엔드 미구현 |
 | **배송지 수집 UI** | `market_trial_shipping_addresses` 프론트엔드 | 테이블 존재, UI 미구현 |
 | **이행 추적 UI** | `market_trial_fulfillments` 프론트엔드 | 테이블 존재, UI 미구현 |
-| **GlycoPharm/K-Cosmetics Trial 노출** | 게이트웨이 서비스에서 직접 Trial 노출 | 현재 KPA 허브로 리다이렉트만 |
 | **알림 채널 확장** | 푸시 알림, 이메일 알림 | 현재 in_app 알림만 |
 | **Trial 수정** | DRAFT 상태 Trial 수정 | 삭제 후 재생성 방식 |
 | **참여 취소** | 참여자의 참여 취소 | 미구현 |
@@ -349,7 +347,7 @@ none → interested → considering → adopted → first_order
 
 | 항목 | 제약 |
 |------|------|
-| **OrderType** | `GLYCOPHARM` BLOCKED — Market Trial은 독립 유통 경로 |
+| **OrderType** | — |
 | **2차 승인** | DEPRECATED — 서비스별 approve/reject는 403 반환 |
 | **participantType** | 현재 `seller`만 사용 (partner 미활성화) |
 | **contributionAmount** | 현재 항상 `0` (무료 참여) |
@@ -362,7 +360,6 @@ none → interested → considering → adopted → first_order
 
 1. **Decision 수집 프론트엔드** — OUTCOME_CONFIRMING 상태에서 참여자에게 CONTINUE/STOP 결정 UI 제공
 2. **배송지 수집 + 이행 추적 UI** — product 보상 참여자 배송 관리
-3. **GlycoPharm 내 Trial 카드** — 게이트웨이에서 직접 Trial 요약 노출 (리다이렉트 없이)
 
 ### 중기
 

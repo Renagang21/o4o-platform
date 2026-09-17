@@ -58,8 +58,8 @@ QR 화면은 전자를 쓰지 않고, 설명서 화면은 후자를 쓰지 않�
 
 | 신규 service | 위임 전환된 공통 controller | 소비 서비스 |
 |---|---|---|
-| `services/store/store-qr.service.ts` | `o4o-store/store-qr-landing.controller.ts` | KPA · GlycoPharm · K-Cosmetics · **PH** |
-| `services/store/store-pop.service.ts` | `o4o-store/pop.controller.ts` | KPA · GlycoPharm · K-Cosmetics · **PH** |
+| `services/store/store-qr.service.ts` | `o4o-store/store-qr-landing.controller.ts` | KPA · K-Cosmetics · **PH** |
+| `services/store/store-pop.service.ts` | `o4o-store/pop.controller.ts` | KPA · K-Cosmetics · **PH** |
 | (추출 불필요) `StorePlaylistRepository` | — 이미 org-scoped 클래스라 그대로 재사용 | KPA · **PH** |
 
 세 경우 모두 **인터페이스·응답 envelope·상태코드 무변경**의 기계적 위임 전환이며,
@@ -148,19 +148,17 @@ PH 전용 운영자 HUB 를 신설하는 대신, 기존 구조가 **이미 허�
 | `api-server` tsc --noEmit | ✅ PASS |
 | `pharmacy-hub-web` type-check + build | ✅ PASS (3,482 modules) |
 | `web-kpa-society` tsc --noEmit | ✅ PASS |
-| `web-glycopharm` type-check | ✅ PASS |
 | `web-k-cosmetics` tsc --noEmit | ✅ PASS |
 
 `store-ui-core` 메뉴 config 를 바꿨으므로 **4개 소비 서비스 전부** 확인했다.
 
 ### 5-3. 프로덕션 API smoke — 공개 QR 랜딩 (4개 서비스)
 
-위임 전환의 최대 위험은 KPA·GlycoPharm·K-Cosmetics 의 QR 회귀였다. 실측 결과:
+위임 전환의 최대 위험은 KPA·K-Cosmetics 의 QR 회귀였다. 실측 결과:
 
 | 서비스 | 응답 | envelope |
 |---|---|---|
 | `kpa` | `404` `QR_NOT_FOUND` | nested `{error:{code,message}}` — **기존 계약 그대로** |
-| `glycopharm` | `404` `QR_NOT_FOUND` | nested — 동일 |
 | `cosmetics` | `404` `QR_NOT_FOUND` | nested — 동일 |
 | `pharmacy-hub` | `404` `QR_NOT_FOUND` | flat `{error,code}` — **PH 계약대로** |
 
@@ -197,7 +195,7 @@ PH 전용 운영자 HUB 를 신설하는 대신, 기존 구조가 **이미 허�
 
 | 서비스 | 응답 | envelope |
 |---|---|---|
-| kpa · glycopharm · cosmetics | `404 QR_NOT_FOUND` | nested `{error:{code,message}}` — **기존 계약 보존** |
+| kpa · cosmetics | `404 QR_NOT_FOUND` | nested `{error:{code,message}}` — **기존 계약 보존** |
 | pharmacy-hub | `404 QR_NOT_FOUND` | flat `{error,code}` — PH 계약대로 |
 
 **PH 웹 배포 확인** — `https://pharmacyhub.co.kr` 200, 번들(`index-BJKehv_A.js`)에
@@ -243,7 +241,6 @@ PH 전용 운영자 HUB 를 신설하는 대신, 기존 구조가 **이미 허�
 | 공개 랜딩 `screen_set`(비활성) | `410 SCREEN_SET_INACTIVE` + 종료 안내 문구 — **의도된 계약** |
 | 공개 랜딩 없는 slug | `404 QR_NOT_FOUND` (nested) |
 | 비활성 QR 출력 | `404` — 비활성 QR 출력 차단(기존 계약, 병행 세션 M-1 과도 정합) |
-| GlycoPharm QR owner | `200` · 20건 |
 | K-Cosmetics QR owner | `200` · 20건 |
 
 > 초회 실행에서 4건이 FAIL 로 보였으나 **전부 검증 스크립트의 기대값 오류**였다.
@@ -357,7 +354,7 @@ role 부여 + 매장 조직 enrollment 가 필요한데, 둘 다 **RBAC·운영 
 | PH 설명서 canonical 조회 · 언어 전환 · 빈 상태 | 인증 세션 없음 |
 | 조직 격리(미연결 · 교차 조직 · client organizationId 주입 차단) | 인증 세션 없음 |
 | AMBIGUOUS | 실계정 없음 — 작업요청서 지시대로 **fixture 만들지 않고** 코드 경로 + 후속 관측으로 기록 |
-| KPA · GlycoPharm · K-Cosmetics QR **owner CRUD** 실측 | 인증 세션 없음 (공개 랜딩 계약은 확인 §5-5) |
+| KPA · K-Cosmetics QR **owner CRUD** 실측 | 인증 세션 없음 (공개 랜딩 계약은 확인 §5-5) |
 | W1~W8 브라우저 회귀 | 인증 세션 없음 |
 
 > 코드 경로 근거는 남아 있다: 조직 해석은 4개 컨트롤러 모두
@@ -439,7 +436,7 @@ back-compat 경로가 `pharmacy-hub:store_owner` 를 포함한 **모든** store_
 
 프로덕션 로그 실측: `[QR Scan Event] Insert failed: QueryFailedError: inconsistent types deduced for parameter $6`
 DB 실측: `store_qr_scan_events` 전체 row **0건**, `max(created_at)` = null.
-즉 KPA·GlycoPharm·K-Cosmetics·Pharmacy-Hub **모두** `scanCount` 와 스캔 통계가 항상 0 이다.
+즉 KPA·K-Cosmetics·Pharmacy-Hub **모두** `scanCount` 와 스캔 통계가 항상 0 이다.
 
 원인 — 같은 파라미터 `$6`(ip_hash)이 INSERT 값 목록(`SELECT … $6`)과 중복 방지 비교
 (`ip_hash = $6`) 양쪽에 쓰여 PostgreSQL 이 타입을 하나로 확정하지 못한다.

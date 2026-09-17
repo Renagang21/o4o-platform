@@ -290,23 +290,6 @@ KPA Society가 이 시스템의 **기준 구현(canonical implementation)**이�
 </PageSection>
 ```
 
-### GlycoPharm
-
-Hero가 full-bleed가 아닌 경우의 단순화 패턴:
-
-```tsx
-// services/web-glycopharm/src/pages/community/CommunityMainPage.tsx
-<PageContainer>              {/* outer single container */}
-  <PageHero>
-    <HeroSummarySection ... />
-  </PageHero>
-  <PageSection>...</PageSection>
-  ...
-</PageContainer>
-```
-
-> Hero가 full-bleed 배경을 쓰지 않으면 outer PageContainer 단일 래퍼도 허용된다.
-
 ### Neture
 
 ```tsx

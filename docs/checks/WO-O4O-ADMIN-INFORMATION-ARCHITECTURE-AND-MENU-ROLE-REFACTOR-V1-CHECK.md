@@ -72,7 +72,7 @@ endpoint 의 응답**:
 
 | 계정 | 보유 role | floor 축소 시 |
 |---|---|---|
-| `sohae2100@gmail.com` (주 운영자) | `kpa:admin` `kpa:operator` `kpa:store_owner` `glycopharm:admin/operator` `cosmetics:admin/operator` `neture:admin` `neture:operator` `pharmacy-hub:operator` — **`platform:super_admin` 없음** | **admin.neture.co.kr 전면 차단** |
+| `sohae2100@gmail.com` (주 운영자) | — | **admin.neture.co.kr 전면 차단** |
 | `renariver21@gmail.com` | `platform:super_admin` (§4-3 검증 계정) | 정상 |
 
 같은 문서 §4-1 은 프로덕션의 `platform:super_admin` 보유 계정이 **2개**라고 기록한다.
@@ -359,7 +359,6 @@ POST_REFACTOR_RESIDUALS    = OPEN       ← 아래 후속 통합 WO 로 묶어 �
 4. 그 후 admin.neture.co.kr 진입 floor 를 platform:super_admin 으로 제한
 5. 서비스 역할만 가진 테스트 계정의 관리자 사이트 차단 확인
 6. /partnerops/* 8개 dead runtime 제거
-7. insight-rules.ts 의 GlycoPharm 활성 소스 잔재 수정
 8. 해당 오류를 발생시키는 패키지 type-check 가 CI 에서 누락됐는지도 확인
 9. CI · 배포 · 프로덕션 브라우저 검증 후 최종 CHECK 작성
 ```

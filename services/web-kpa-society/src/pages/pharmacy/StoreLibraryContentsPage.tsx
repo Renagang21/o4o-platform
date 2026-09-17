@@ -19,7 +19,7 @@
  *   페이지형 AI 진입 제거 — StartProductionModal 의 AI 카드(onAiAction 미전달로 숨김) +
  *   in-page AiContentModal("AI 매장 제작 자료 초안") 제거. 콘텐츠 선택·복사, 제작 시작(POP/QR/
  *   블로그/상품설명), 빈 편집기 콘텐츠 제작(CreateContentFromResourcesModal)은 보존.
- *   공통 StartProductionModal(@o4o/store-ui-core)은 미변경 — GP/KCos 무영향.
+ *   공통 StartProductionModal(@o4o/store-ui-core)은 미변경 — KCos 무영향.
  *
  * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
  *   기존 페이지 내부에 직접 정의되어 있던 TopTabBar / SubTabBar / DocumentsSection /

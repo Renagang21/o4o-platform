@@ -72,41 +72,6 @@ return user && user.roles?.some((r: string) => ['admin', 'operator'].includes(r)
 
 ## 2. 서비스별 변경 대상 파일 목록
 
-### Service 1: GlycoPharm (커밋 1) — 위험도 HIGH
-
-**영향도**: GlycoPharm 서비스 전체 관리자 접근 차단/허용
-
-| 파일 | Type | 위치 | 변경 내용 |
-|------|------|------|---------|
-| `routes/glycopharm/controllers/admin.controller.ts` | A | lines 56, 124, 233, 470, 574, 639, 693 | legacyRoles → requireAdmin |
-| `routes/glycopharm/controllers/billing-preview.controller.ts` | A | lines 29, 73 | legacyRoles → requireAdmin |
-| `routes/glycopharm/controllers/invoice.controller.ts` | A | lines 32, 54 | legacyRoles → requireAdmin |
-| `routes/glycopharm/controllers/invoice-dispatch.controller.ts` | A | lines 31, 53 | legacyRoles → requireAdmin |
-| `routes/glycopharm/controllers/operator.controller.ts` | A | lines 104, 152, 306, 341 | legacyRoles → requireAdmin |
-| `routes/glycopharm/controllers/report.controller.ts` | A | lines 31, 75, 142 | legacyRoles → requireAdmin |
-
-**현재 패턴** (공통):
-```typescript
-const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
-if (!user.roles?.some(r => legacyRoles.includes(r))) {
-  return res.status(403).json({
-    success: false,
-    error: 'Operator or administrator role required',
-    code: 'FORBIDDEN'
-  });
-}
-```
-
-**교체 패턴**: 라우트 파일에서 미들웨어 적용, 컨트롤러 내 체크 제거
-```typescript
-// glycopharm.routes.ts에 requireAdmin 추가
-router.use('/admin', requireAdmin, adminController.someMethod);
-// OR 개별 라우트에 적용
-router.get('/reports', requireAdmin, reportController.getReports);
-```
-
-> ⚠️ GlycoPharm 라우트 구조 확인 필요: 현재 컨트롤러에서 체크하는지 vs 라우트에서 체크하는지
-
 ### Service 2: GlucoseView (커밋 2) — 위험도 HIGH
 
 | 파일 | Type | 위치 | 변경 내용 |
@@ -189,9 +154,6 @@ return ['admin', 'super_admin', 'manager'].includes(roleName);
 ## 4. 커밋 분리 전략
 
 ```
-커밋 1: feat(glycopharm): replace legacyRoles check with requireAdmin middleware
-  - 6개 파일, glycopharm 서비스 완결
-  - 검증: GlycoPharm 관리자 기능 정상 동작
 
 커밋 2: feat(glucoseview): replace legacyRoles check with requireAdmin middleware
   - 2개 파일, glucoseview 서비스 완결
@@ -215,17 +177,14 @@ return ['admin', 'super_admin', 'manager'].includes(roleName);
 ## 5. 테스트 시나리오
 
 ### 시나리오 1: admin 역할 사용자
-- GlycoPharm 관리자 API → 200 OK (변경 전과 동일)
 - GlucoseView 관리자 API → 200 OK
 - K-Cosmetics 관리자 API → 200 OK
 
 ### 시나리오 2: operator 역할 사용자
-- GlycoPharm 관리자 API → 200 OK (requireAdmin에 operator 포함)
 - GlucoseView 관리자 API → 200 OK
 - 일반 사용자 API → 200 OK
 
 ### 시나리오 3: 일반 user 역할
-- GlycoPharm 관리자 API → 403 FORBIDDEN
 - GlucoseView 관리자 API → 403 FORBIDDEN
 
 ### 시나리오 4: administrator (DB에 없는 역할)
@@ -238,7 +197,6 @@ return ['admin', 'super_admin', 'manager'].includes(roleName);
 
 | 위험 | 발생 가능성 | 대응 |
 |------|------------|------|
-| GlycoPharm 관리자 접근 불가 | 낮음 (role_assignments에 operator 있으면 정상) | 배포 전 operator 역할 보유 사용자 DB 확인 |
 | `administrator` 역할 보유 사용자가 실제로 존재 | 낮음 (Backfill 대상 아님) | `SELECT COUNT(*) FROM role_assignments WHERE role='administrator'` 배포 전 확인 |
 | 이중 체크 제거로 인한 보안 약화 | 없음 (requireAdmin이 RA 직접 쿼리로 더 강력) | 해당 없음 |
 

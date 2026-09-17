@@ -131,7 +131,7 @@
 ### 2.2 Forum API 구조
 
 **공유 Forum 라우트**: `/api/v1/forum/*`
-- 모든 서비스 공용 (KPA, K-Cosmetics, GlycoPharm 등)
+- 모든 서비스 공용 (KPA, K-Cosmetics 등)
 - 인증 선택적 (읽기 공개, 쓰기 인증 필요)
 
 **K-Cosmetics 전용 추천 엔드포인트**:

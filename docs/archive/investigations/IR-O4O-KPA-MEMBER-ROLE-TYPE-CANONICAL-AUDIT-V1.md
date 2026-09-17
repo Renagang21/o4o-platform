@@ -258,7 +258,7 @@ KPA-Society 회원관리(`/operator/members`)의 표시 컬럼 5종 (`유형 / �
 |------|-----------------|
 | `activity_type='pharmacy_owner'` (직역) | `kpa_pharmacist_profiles.activity_type` (SSOT) → mirror `kpa_members.activity_type` |
 | `kpa:store_owner` (RBAC capability) | `role_assignments` `role='kpa:store_owner' AND is_active=true` (RBAC SSOT) |
-| `user.isStoreOwner` (auth context flag) | me-context 응답 ← [me-context.controller.ts:42-44](apps/api-server/src/routes/kpa/controllers/me-context.controller.ts#L42-L44) 의 `EXISTS(SELECT 1 FROM role_assignments WHERE role IN ('kpa:store_owner','glycopharm:store_owner','cosmetics:store_owner') AND is_active=true)` |
+| `user.isStoreOwner` (auth context flag) | me-context 응답 ← [me-context.controller.ts:42-44](apps/api-server/src/routes/kpa/controllers/me-context.controller.ts#L42-L44) 의 `EXISTS(SELECT 1 FROM role_assignments WHERE role IN AND is_active=true)` |
 | `organization_members` (owner row) | 별도 — store_owner 부여 시 자동 생성되나 deactivate 동기화 없음 (§4 주석) |
 
 ### 5-2. 판정 결과 표

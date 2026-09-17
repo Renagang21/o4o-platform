@@ -66,7 +66,7 @@
 ## 6. 불변 / 미구현 확인 (§7)
 
 - 기존 `/admin/users` raw response·mutation **무변경**. 상태변경/삭제/파기/role·membership 편집 UI **없음**. detail page **없음**. 개인정보 상세 조회 **없음**.
-- operator/member·service admin 회원관리 화면 **무변경**. Tier 1 route 이동 / sidebar role 진입점 / Finance / GP·KCos·KPA frontend / DB migration **변경 0**.
+- operator/member·service admin 회원관리 화면 **무변경**. Tier 1 route 이동 / sidebar role 진입점 / Finance / KCos·KPA frontend / DB migration **변경 0**.
 
 ## 7. 완료 판정
 

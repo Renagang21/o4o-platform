@@ -3,7 +3,7 @@
  *
  * 두 축을 고정한다.
  *   A축 ADMIN_PLATFORM_ONLY_ACCESS — `admin.neture.co.kr` 진입 floor = `platform:super_admin` 단독
- *   B축 POST_REFACTOR_RESIDUALS    — `/partnerops/*` 잔재 0 · 활성 소스의 GlycoPharm 서비스 맵 0
+ *   B축 POST_REFACTOR_RESIDUALS    — `/partnerops/*` 잔재 0 · 은퇴 서비스 맵 0
  *
  * 검증 기록: docs/checks/WO-O4O-ADMIN-PLATFORM-ONLY-ACCESS-AND-POST-REFACTOR-FINAL-CLOSURE-V1-CHECK.md
  *
@@ -226,24 +226,16 @@ describe('B축 · /partnerops/* 프런트 잔재 0', () => {
 });
 
 // ===========================================================================
-// B축 — GlycoPharm 잔재
+// B축 — AIServiceId ↔ SERVICE_LINKS 정합
 // ===========================================================================
 
-describe('B축 · 활성 소스의 GlycoPharm 서비스 계약 0', () => {
+describe('B축 · AIServiceId union 과 insight-rules 정합', () => {
   const TYPES = readFileSync(join(PKG, 'ai-core/src/orchestration/types.ts'), 'utf8');
   const RULES = readFileSync(join(API, 'copilot/insight-rules.ts'), 'utf8');
   const unionMatch = TYPES.match(/export type AIServiceId\s*=\s*([^;]+);/);
 
-  it('AIServiceId union 에 glycopharm 이 없다', () => {
-    expect(unionMatch, 'AIServiceId 선언을 찾지 못했다').toBeTruthy();
-    expect(unionMatch![1]).not.toContain('glycopharm');
-  });
-
-  it('insight-rules 에 glycopharm 참조가 없다', () => {
-    expect(RULES.toLowerCase()).not.toContain('glycopharm');
-  });
-
   it('SERVICE_LINKS 맵이 AIServiceId union 과 정확히 같은 키를 갖는다', () => {
+    expect(unionMatch, 'AIServiceId 선언을 찾지 못했다').toBeTruthy();
     // 키가 어긋나면 tsc 도 잡지만, 회귀 시 원인을 즉시 지목하려고 함께 고정한다.
     const union = [...unionMatch![1].matchAll(/'([^']+)'/g)].map((x) => x[1]).sort();
     const body = RULES.slice(RULES.indexOf('SERVICE_LINKS'));

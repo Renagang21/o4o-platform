@@ -69,7 +69,7 @@ KPA 구현(DataTable · 3계층 독립 오류 · AI 인사이트)을 공통 본�
 
 ### 2-4. Neture 주문 1 → **SERVICE_SPECIFIC**
 
-| 축 | 공통 `product-order-view` (KPA·KCos·GP) | Neture `OrdersManagementPage` |
+| 축 | 공통 `product-order-view` (KPA·KCos) | Neture `OrdersManagementPage` |
 |---|---|---|
 | endpoint | `{service}/operator/orders` | `/neture/operator/orders` |
 | row 축 | `storeName` · `channel` · `itemCount` · `orderNumber` (**매장 × 채널**) | `buyer_name` · `buyer_email` · `final_amount` (**구매자**) |
@@ -233,7 +233,6 @@ git diff --stat (기존 파일): 22 files changed, 350 insertions(+), 6661 delet
 | KPA `tsc --noEmit` | EXIT=0 |
 | K-Cosmetics `tsc --noEmit` | EXIT=0 |
 | Neture `tsc --noEmit` | EXIT=0 |
-| **GlycoPharm `tsc --noEmit`** (공유 모듈 소비처 회귀) | EXIT=0 |
 | Pharmacy-Hub `tsc -b` | EXIT=0 |
 | `vite build` × 4 서비스 | 전부 성공 |
 | 브라우저 smoke | §5-2 (52 조합, JS 예외 0) |
@@ -242,12 +241,10 @@ git diff --stat (기존 파일): 22 files changed, 350 insertions(+), 6661 delet
 
 ## 8. 남은 사항
 
-### 8-1. 범위 밖 3번째 소비처 (GlycoPharm)
+### 8-1. 범위 밖 3번째 소비처 
 
 본 WO 대상은 KPA / K-Cosmetics / Neture / Pharmacy-Hub 4서비스다.
-GlycoPharm 에도 같은 사이니지 HQ 화면군이 있으나 census 모집단 밖이라 **손대지 않았다**.
 공통 모듈은 준비돼 있어 `signageHqConfig.ts` 1개 추가로 편입 가능하다.
-GlycoPharm 은 공유 모듈 소비처이므로 **회귀 검증만 수행**했다(`tsc` EXIT=0).
 
 ### 8-2. 이전 WO 에서 이월된 기존 결함 (본 WO 미해결, 재기록)
 
@@ -265,7 +262,6 @@ GlycoPharm 은 공유 모듈 소비처이므로 **회귀 검증만 수행**했�
 문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 3건
 ```
 
-1. `WO-…-GLYCOPHARM-OPERATOR-SIGNAGE-HQ-COMMON-ADOPTION-V1` — §8-1
 2. `WO-…-KCOSMETICS-OPERATOR-BLOG-BACKEND-ROUTE-V1` — §8-2 의 404
 3. `WO-…-OPERATOR-MOBILE-TABLE-OVERFLOW-V1` — §8-2 의 overflow 3+1건
 

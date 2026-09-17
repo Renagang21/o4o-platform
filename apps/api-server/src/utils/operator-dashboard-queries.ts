@@ -1,10 +1,9 @@
 /**
  * Shared Operator Dashboard Query Helpers
  *
- * WO-O4O-OPERATOR-CODE-CLEANUP-AND-REFRACTOR-V1
- * WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-V1: Care 관련 코드 제거
+ * WO-O4O-OPERATOR-CODE-CLEANUP-AND-REFRACTOR-V1 (Care 관련 코드 제거)
  *
- * Audit queries used by GlycoPharm operator dashboard.
+ * Audit queries used by operator dashboards.
  */
 
 import type { DataSource } from 'typeorm';

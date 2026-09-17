@@ -65,7 +65,7 @@ export function createCmsContentQueryRoutes(deps: {
    *   판정: platform admin 또는 해당 서비스 운영자면 종전대로 전부 본다.
    *         그 외에는 community 행 중 `published` 가 아닌 것은 **작성자 본인만** 본다.
    *
-   *   community 행이 없는 서비스(KPA/GP/KCos/Neture)에는 해당 조건이 걸릴 대상이 없어
+   *   community 행이 없는 서비스(KPA/KCos/Neture)에는 해당 조건이 걸릴 대상이 없어
    *   기존 read 결과가 그대로다 (behavior 변화 0).
    */
   const communityReadRestriction = async (
@@ -93,7 +93,7 @@ export function createCmsContentQueryRoutes(deps: {
    * Get content statistics for dashboards
    *
    * Query params:
-   * - serviceKey: Filter by service (glycopharm, kpa, etc.)
+   * - serviceKey: Filter by service
    * - organizationId: Filter by organization
    */
   router.get('/stats', optionalAuth, async (req: Request, res: Response): Promise<void> => {
@@ -171,7 +171,7 @@ export function createCmsContentQueryRoutes(deps: {
           featured: { total: featuredTotal, operatorPicked: featuredOperatorPicked },
           promo: { total: promoTotal, active: promoActive },
           event: { total: eventTotal, active: eventActive },
-          // Combined for Glycopharm dashboard compatibility
+          // Combined event+notice for dashboard compatibility
           eventNotice: { total: eventNoticeTotal, active: eventNoticeActive },
           // WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1
           pendingApproval: pendingTotal,

@@ -2,7 +2,7 @@
  * MyCreditsView — 내 크레딧(잔액 + 적립 내역) 공통 View
  *
  * WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §8
- * K-Cosmetics / GlycoPharm 동일 View 중복 공통화. 데이터 로딩은 서비스 wrapper 담당.
+ * K-Cosmetics 동일 View 중복 공통화. 데이터 로딩은 서비스 wrapper 담당.
  * 리워드 정책 안내 문구는 WO-O4O-LMS-GPKCOS-POLICY-DRIFT-ALIGNMENT-V1 기준을 유지한다
  * (고정 스케줄 +10/+20/+50 노출 금지).
  */

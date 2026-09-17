@@ -34,7 +34,6 @@ My Page의 다음 개별 기능인 **설정 / 보안(Settings / Security)** 을 
 
 ```text
 KPA-Society
-GlycoPharm
 K-Cosmetics
 Neture
 Pharmacy-Hub
@@ -377,12 +376,6 @@ dead link/404는 MUST_FIX 후보.
 약사회 개인 환경
 ```
 
-### GlycoPharm
-
-```text
-서비스 이용 관련 개인 설정
-```
-
 ### K-Cosmetics
 
 ```text
@@ -453,7 +446,6 @@ route/menu는 있으나 화면 dead
 
 ```text
 KPA
-GP
 KCos
 Neture
 PH
@@ -513,7 +505,6 @@ DB schema/migration
 @o4o/account-ui build
 
 KPA typecheck/build
-GP typecheck/build
 KCos typecheck/build
 Neture typecheck/build
 PH typecheck/build
@@ -786,7 +777,6 @@ packages/account-ui/src/adapters/requestNormalizers.ts
 
 ```text
 KPA-Society      /mypage  (MyDashboardPage)
-GlycoPharm       /mypage  (MyPageHub) + navItems.ts
 K-Cosmetics      /mypage  (MyPageHub)
 Neture           /mypage  (MyPageHub) + navItems.ts
 Pharmacy-Hub     /account (+ /store-owner/account 호환 계약 유지 — /mypage 신설 금지)

@@ -19,7 +19,7 @@ interface KpaOperatorDashboardLayoutProps {
   config: OperatorDashboardConfig;
   /**
    * WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-FINALIZE-V1:
-   *   부가 섹션을 5-Block **위**에 배치하는 slot. GlycoPharm·K-Cosmetics 가 사용하는
+   *   부가 섹션을 5-Block **위**에 배치하는 slot. K-Cosmetics 가 사용하는
    *   공통 layout 의 `aboveBlocks` 와 같은 위치·같은 순서 컨벤션([안내 카드] → [Axis] → [5-Block]).
    *   기존 `auxiliary`(5-Block 아래) 는 세 서비스 배치 parity 를 깨뜨려 대체했다.
    */

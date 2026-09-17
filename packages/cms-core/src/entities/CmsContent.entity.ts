@@ -5,7 +5,7 @@
  *
  * Scope hierarchy:
  * - Global: organizationId=null, serviceKey=null (platform-wide)
- * - Service: organizationId=null, serviceKey='glycopharm' (service-wide)
+ * - Service: organizationId=null, serviceKey='neture' (service-wide)
  * - Organization: organizationId='uuid', serviceKey=null or 'kpa' (org-specific)
  */
 
@@ -45,7 +45,7 @@ export class CmsContent {
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   @Index()
-  serviceKey!: string | null; // 'glycopharm', 'kpa', null = global
+  serviceKey!: string | null; // 'kpa', 'neture', null = global
 
   // === Type (what kind of content?) ===
   @Column({ type: 'varchar', length: 50 })

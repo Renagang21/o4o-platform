@@ -18,7 +18,6 @@
 **핵심 결론:**
 - 실제 정산/인보이스는 backend entity · migration · API · 운영 정책이 없어 구현 불가.
 - `/cosmetics/orders` 기존 API로 **주문 기반 매출 요약** 화면은 frontend-only로 가능.
-- GlycoPharm `StoreBillingPage`도 `pharmacyApi.getOrders()` 기반 mock 수준 — K-Cosmetics가 참조할 수 있으나 "정산 확정" 표현은 사용 금지.
 - **즉시 권장**: placeholder 문구 명확화 + 주문 기반 매출 요약(참고용) frontend WO.
 
 ---
@@ -27,7 +26,6 @@
 
 ```
 M docs/investigations/CHECK-O4O-CURRENT-WORKSTREAM-NEXT-SCOPE-AUDIT-V1.md ← 다른 세션 WIP
-M services/web-glycopharm/src/pages/operator/ForumRequestsPage.tsx ← 다른 세션 WIP
 ?? *.png (스크린샷)
 staged 없음. 소스 파일 수정 없음.
 ```
@@ -92,53 +90,6 @@ staged 없음. 소스 파일 수정 없음.
 
 ---
 
-## 5. GlycoPharm Billing-Invoice Reference 분석
-
-### 5.1 backend entity 구조
-
-**파일:** `apps/api-server/src/routes/glycopharm/entities/billing-invoice.entity.ts`
-
-```
-serviceKey: 'glycopharm' (고정)
-supplierId, pharmacyId: 청구 주체
-periodFrom, periodTo: 정산 기간
-unit: 'consultation_action' | 'approved_request' (GlycoPharm 전용 단위)
-unitPrice, count, amount: 금액
-status: DRAFT | CONFIRMED | ARCHIVED
-lineSnapshot: JSONB (상세 근거)
-dispatchStatus: NONE | SENT | RECEIVED (발송 상태)
-```
-
-**특징:**
-- GlycoPharm 전용 도메인 설계 (`unit: consultation_action`)
-- K-Cosmetics와 무관한 도메인 단위 (상담 행위 기준)
-- `sellerOrganizationId` 직접 연결 없음 (별도 설계 필요)
-
-### 5.2 GlycoPharm StoreBillingPage 실제 수준
-
-```typescript
-// services/web-glycopharm/src/pages/store-management/StoreBillingPage.tsx
-const MOCK_HISTORY = [...]; // ← Mock 데이터
-// "실 정산 API 연동 전" 주석 명시
-
-pharmacyApi.getOrders() // ← 실제 주문 API 호출
-+ COMMISSION_RATE = 5% // ← 하드코딩 수수료
-```
-
-**판정: Mock 수준.** 실제 정산 API 미연동. 주문 API로 매출을 계산하는 참고용.
-
-### 5.3 K-Cosmetics 재사용 가능성
-
-| 항목 | 재사용 가능 | 이유 |
-|------|:----------:|------|
-| `billing-invoice.entity.ts` 구조 참조 | ⚠️ | unit 필드가 GlycoPharm 전용 — K-Cosmetics용으로 재설계 필요 |
-| billing-preview / invoice controller 패턴 | ⚠️ | 참조 가능하나 K-Cosmetics용 service 별도 작성 필요 |
-| StoreBillingPage UI 패턴 | ✅ | 주문 API 기반 매출 요약 UI 패턴 재사용 가능 |
-| 5% 수수료 하드코딩 | ❌ | K-Cosmetics 수수료 정책 별도 확인 필요 |
-| "약국 정산" 문구 | ❌ | K-Cosmetics는 "매장 정산" 사용 |
-
----
-
 ## 6. EcommerceOrder 정산 활용 가능 필드
 
 ### 6.1 정산에 충분한 필드 (현재 존재)
@@ -197,8 +148,6 @@ pharmacyApi.getOrders() // ← 실제 주문 API 호출
 - B2B 공급자-매장 주문 흐름만 구현
 - 정산 체계 미구현
 
-→ **3개 서비스(KPA/Neture/K-Cosmetics) 모두 실제 정산 미구현.** GlycoPharm만 mock 수준 구현.
-
 ---
 
 ## 8. 정책 옵션 비교
@@ -222,17 +171,7 @@ pharmacyApi.getOrders() // ← 실제 주문 API 호출
 | 위험도 | 낮음 — "참고용" 명확 표시 전제 |
 | 사용자 UX | 실질적인 매출 파악 가능 |
 | 제약 | "정산 확정", "인보이스", "지급 예정" 표현 사용 금지 |
-| 권장 | **✅ 권장 — GlycoPharm StoreBillingPage 수준** |
-
-### Option C — GlycoPharm billing-invoice mock 이식
-
-| 항목 | 내용 |
-|------|------|
-| 범위 | billing-invoice entity + controller + 수수료 하드코딩 |
-| 개발량 | 중간 — migration 필요 |
-| 위험도 | 중간 — "정산 확정" 오해 유발 가능 |
-| 사용자 UX | GlycoPharm 수준의 mock 화면 |
-| 권장 | ❌ 불필요한 migration, GlycoPharm 전용 도메인 재사용 위험 |
+| 권장 | — |
 
 ### Option D — 실제 정산/인보이스 설계 후 구현
 
@@ -333,7 +272,6 @@ pharmacyApi.getOrders() // ← 실제 주문 API 호출
 주의:
 - "정산/인보이스" 라는 표현은 메뉴와 화면 모두에서 제거 권장
 - backend/migration 없음
-- GlycoPharm COMMISSION_RATE 하드코딩 패턴 금지 (수수료 정책 미정의)
 ```
 
 ---
@@ -364,8 +302,6 @@ pharmacyApi.getOrders() // ← 실제 주문 API 호출
 | `packages/store-ui-core/src/config/storeMenuConfig.ts` | COSMETICS_STORE_CONFIG billing 항목 없음 확인 |
 | `packages/store-ui-core/src/components/StorePlaceholderPage.tsx` | "준비 중" 컴포넌트 |
 | `apps/api-server/src/routes/cosmetics/cosmetics.routes.ts` | billing 마운트 없음 |
-| `apps/api-server/src/routes/glycopharm/entities/billing-invoice.entity.ts` | GlycoPharm 정산 entity (참조) |
-| `services/web-glycopharm/src/pages/store-management/StoreBillingPage.tsx` | GlycoPharm mock billing page |
 | `packages/ecommerce-core/src/entities/EcommerceOrder.entity.ts` | 주문 entity 정산 가능 필드 확인 |
 | `packages/ecommerce-core/src/entities/EcommercePayment.entity.ts` | 결제 entity |
 | `packages/ecommerce-core/src/services/CosmeticsOrderService.ts` | metadata.commission 구조 |

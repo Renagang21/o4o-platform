@@ -249,5 +249,5 @@ unique 가 partial 이 아니므로 soft-deleted 행도 `(master, supplier)` 슬
 ## 16. 제외 범위 변경 0
 
 DB schema·constraint / entity·Offer 서비스 코드 / 기존 migration / 운영 데이터 /
-Platform Store / Glycopharm / Cosmetics / Neture 비관련 기능 / Forum / service-groups /
+Platform Store / Cosmetics / Neture 비관련 기능 / Forum / service-groups
 RBAC / OTC·HFF / pnpm-lock.yaml / 병렬 세션 산출물 — **전부 변경 0건**

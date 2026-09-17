@@ -29,7 +29,7 @@
 
 ### 즉시 WO 필요
 
-**`WO-O4O-GLYCOPHARM-USE-STORE-HUB-AUTHCLIENT-FIX-V1`** (권고) — [services/web-glycopharm/src/pages/store/hooks/useStoreHub.ts](../../services/web-glycopharm/src/pages/store/hooks/useStoreHub.ts) 의 singleton 사용을 glycopharm 의 localStorage-strategy `api` (`@/lib/apiClient`) 로 교체. store-products-ui 와 동일 결함이 GlycoPharm `StoreOverviewPage` / `StoreHubPage` / `HubEventOffersPage` 에 잠재. 영향 endpoint 4 종 (`/glycopharm/pharmacy/cockpit/*`, `/glycopharm/pharmacy/products`).
+영향 endpoint 4 종
 
 ### Dead Code Cleanup 후보
 
@@ -71,7 +71,7 @@ function getApi(): StoreProductsApiClient {
 }
 ```
 
-각 서비스 (KPA / Neture / Glyco / K-Cosmetics) 의 authClient 정의 파일에서 모듈 로드 시점에 `configureStoreProductsApi(authClient.api)` 1 회 호출 — 자신의 localStorage-strategy `authClient.api` 주입.
+각 서비스 의 authClient 정의 파일에서 모듈 로드 시점에 `configureStoreProductsApi(authClient.api)` 1 회 호출 — 자신의 localStorage-strategy `authClient.api` 주입.
 
 ### 본 IR 의 적용 패턴
 
@@ -112,7 +112,6 @@ grep -rn "from '@o4o/<package-name>'" packages/ services/ apps/
 | 채널 | 용도 |
 |---|---|
 | `apps/admin-dashboard/src/App.tsx:77` | `new AuthClient(getAuthApiUrl(), { strategy: 'cookie' })` — admin-dashboard 는 **cookie strategy** 확정 |
-| `services/web-{kpa-society, neture, glycopharm, k-cosmetics}` | 모두 localStorage strategy 확정 (이전 WO 에서 검증) |
 | `packages/auth-context/src/AuthProvider.tsx:38` | default `strategy = 'cookie'` |
 
 ---
@@ -123,7 +122,6 @@ grep -rn "from '@o4o/<package-name>'" packages/ services/ apps/
 
 | # | 위치 | import | 사용 패턴 | 소비처 | Strategy 정합 | 위험도 |
 |:-:|---|---|---|---|:-:|:-:|
-| 1 | [services/web-glycopharm/src/pages/store/hooks/useStoreHub.ts:18](../../services/web-glycopharm/src/pages/store/hooks/useStoreHub.ts#L18) | `import { authClient } from '@o4o/auth-client'` | `authClient.api.get` × 4 endpoint | glycopharm StoreOverviewPage / StoreHubPage / HubEventOffersPage (localStorage svc) | **불일치 (singleton=cookie, svc=localStorage)** | **A** |
 | 2 | [packages/utils/src/hooks/usePresets.ts:2](../../packages/utils/src/hooks/usePresets.ts#L2) | `import { authClient }` | `authClient.api.get` × 1 | admin-dashboard 5 file | 일치 (둘 다 cookie) | E |
 | 3 | [packages/utils/src/hooks/usePresetData.ts:2](../../packages/utils/src/hooks/usePresetData.ts#L2) | 동일 | `authClient.api` × 2 | admin-dashboard | 일치 | E |
 | 4 | [packages/utils/src/hooks/usePreset.ts:2](../../packages/utils/src/hooks/usePreset.ts#L2) | 동일 | `authClient.api` × 1 | admin-dashboard | 일치 | E |
@@ -145,84 +143,12 @@ grep -rn "from '@o4o/<package-name>'" packages/ services/ apps/
 | singleton import | YES | YES | YES | YES |
 | `authClient.api.X` 사용 | YES | YES | YES | YES |
 | 소비 서비스의 strategy | localStorage | **localStorage** | cookie | n/a (never mount) |
-| 실제 실행 경로 | YES (KPA `/store/my-products`) | YES (glyco store routes) | YES (admin-dashboard) | NO |
+| 실제 실행 경로 | YES (KPA `/store/my-products`) | YES | YES (admin-dashboard) | NO |
 | 401 발생 | **YES (확인)** | **잠재 (로그 트래픽 부족)** | NO | NO |
 
 ---
 
 ## 4. High Risk Items
-
-### A-1. `services/web-glycopharm/src/pages/store/hooks/useStoreHub.ts`
-
-#### 4.1 위치 및 코드
-
-[useStoreHub.ts:18, 168-179](../../services/web-glycopharm/src/pages/store/hooks/useStoreHub.ts#L168-L179):
-
-```typescript
-import { authClient } from '@o4o/auth-client';   // ← cookie singleton in localStorage service
-...
-const fetchData = useCallback(async () => {
-  ...
-  const api = authClient.api;
-  try {
-    const [aiRes, actionsRes, signageRes, productsRes] = await Promise.allSettled([
-      api.get('/glycopharm/pharmacy/cockpit/ai-summary'),
-      api.get('/glycopharm/pharmacy/cockpit/today-actions'),
-      api.get('/glycopharm/pharmacy/cockpit/franchise-services'),
-      api.get('/glycopharm/pharmacy/products?pageSize=1'),
-    ]);
-    ...
-```
-
-#### 4.2 소비 페이지
-
-[services/web-glycopharm/src/App.tsx](../../services/web-glycopharm/src/App.tsx) 에서 다음 라우트들이 useStoreHub 를 직간접 사용:
-
-| 라우트 | 페이지 | App.tsx |
-|---|---|:-:|
-| `/store/` (index) | StoreOverviewPage | L656 |
-| `/hub/` (index, GlycoStoreHubPage) | StoreHubPage | L465 |
-| `/hub/event-offers` | HubEventOffersPage | L470 |
-
-또한 [services/web-glycopharm/src/api/storeHub.ts](../../services/web-glycopharm/src/api/storeHub.ts) 도 useStoreHub 를 import — 더 깊은 의존 그래프.
-
-#### 4.3 예상 실패 유형
-
-`AUTH_REQUIRED` 401 — store-products-ui 와 동일 패턴.
-
-- glycopharm 의 authClient (localStorage strategy) 는 모듈 로드 시 토큰을 localStorage 에 저장
-- useStoreHub 가 가져온 **singleton authClient** 는 cookie strategy 기본 → `Authorization` 헤더 안 붙음
-- `withCredentials: true` 가 시도하는 쿠키는 `.glycopharm.co.kr` 도메인 → `api.neture.co.kr` 에 실리지 않음
-- 4 개 endpoint 모두 401
-
-#### 4.4 로그 검증
-
-```
-gcloud logging read 'resource.type=cloud_run_revision
-  AND resource.labels.service_name="o4o-core-api"
-  AND httpRequest.requestUrl=~"glycopharm/pharmacy/cockpit"'
-  --freshness=24h --project=netureyoutube
-```
-
-→ 24h 트래픽 0 건. 운영 사용자가 아직 해당 페이지를 활발히 안 쓰는 것으로 추정. 결함은 잠재 상태로 존재.
-
-#### 4.5 권장 조치
-
-1-line fix (singleton → 로컬 strategy-일치 `api`):
-
-```diff
-- import { authClient } from '@o4o/auth-client';
-+ import { api } from '@/lib/apiClient';   // glycopharm localStorage authClient.api
-  ...
-- const api = authClient.api;
-+ // (use the module-level `api` directly)
-```
-
-→ store-products-ui 와 달리 packages 가 아닌 service 내부 파일이므로 주입 구조 불필요. 단일 import 교체로 충분.
-
-**후속 WO 명**: `WO-O4O-GLYCOPHARM-USE-STORE-HUB-AUTHCLIENT-FIX-V1`
-
----
 
 ## 5. Medium / Low Risk Items
 
@@ -293,10 +219,6 @@ grep -rn "CookieAuthProvider\|SSOAuthProvider" --include="*.ts" --include="*.tsx
 
 ### 7.1 즉시 (High Priority)
 
-| WO | 범위 | 비용 |
-|---|---|:-:|
-| **`WO-O4O-GLYCOPHARM-USE-STORE-HUB-AUTHCLIENT-FIX-V1`** | useStoreHub.ts 의 import 1 줄 + `const api = authClient.api;` 삭제. KPA /store/my-products fix 와 같은 종류의 결함, 단 서비스 내부 파일이므로 주입 구조 없이 import 교체로 해결. | XS (10 분) |
-
 ### 7.2 후순위 (Cleanup)
 
 | WO/IR | 범위 | 비용 |
@@ -329,7 +251,7 @@ grep -rn "CookieAuthProvider\|SSOAuthProvider" --include="*.ts" --include="*.tsx
 
 **현재 동작 정합 이유**: 우연. admin-dashboard 와 singleton 이 둘 다 cookie strategy 라서 결과적으로 정상 동작. **구조적으로는 공통 패키지가 strategy 를 결정하고 있는 위반 상태**.
 
-**O4O 다중 서비스 구조의 의도**: KPA / Neture / GlycoPharm / K-Cosmetics 가 각자 자기 도메인의 localStorage 토큰을 쓰고, admin-dashboard 는 `.neture.co.kr` 서브도메인이라 cookie 를 씀. 공통 패키지는 어느 쪽이든 받을 수 있어야 함 — store-products-ui 가 인 commit `66aa8e2c6` 에서 회복한 이 원칙이 다른 패키지에는 적용 안 됨.
+**O4O 다중 서비스 구조의 의도**: KPA / Neture / K-Cosmetics 가 각자 자기 도메인의 localStorage 토큰을 쓰고, admin-dashboard 는 `.neture.co.kr` 서브도메인이라 cookie 를 씀. 공통 패키지는 어느 쪽이든 받을 수 있어야 함 — store-products-ui 가 인 commit `66aa8e2c6` 에서 회복한 이 원칙이 다른 패키지에는 적용 안 됨.
 
 ### 8.3 1 인 개발 관점의 trade-off
 
@@ -386,7 +308,6 @@ grep -n "forum-core-yaksa" apps/admin-dashboard/src/routes/apps.routes.tsx
 ```bash
 gcloud logging read 'resource.type=cloud_run_revision
   AND resource.labels.service_name="o4o-core-api"
-  AND httpRequest.requestUrl=~"glycopharm/pharmacy/cockpit"' \
   --limit=10 --freshness=24h --project=netureyoutube
 ```
 
@@ -396,4 +317,3 @@ gcloud logging read 'resource.type=cloud_run_revision
 
 *Version: V1 (2026-05-24)*
 *Status: Audit Complete — 1 High Risk (즉시 WO 권고), 3 Dead Code (별도 cleanup), 10 Safe (현 구조 유지)*
-*Next: 사용자 결정 → `WO-O4O-GLYCOPHARM-USE-STORE-HUB-AUTHCLIENT-FIX-V1` 착수 여부*

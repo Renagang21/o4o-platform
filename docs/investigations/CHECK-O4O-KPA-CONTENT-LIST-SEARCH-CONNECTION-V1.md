@@ -45,7 +45,7 @@
 | `?search=` query string | `ContentSurveysPage` · `CourseHubPage` · `ForumListPage` · `ForumFeedPage` | **KPA canonical 패턴** |
 | 빈 결과 문구 `검색 결과가 없습니다` | `ContentDocumentsPage` 문구 그대로 | |
 
-**신규 검색 컴포넌트 0.** 공용 컴포넌트(`CommunityContentSearchBar`)는 **변경하지 않고 그대로 사용**했다 → GP/K-Cosmetics 영향 0.
+**신규 검색 컴포넌트 0.** 공용 컴포넌트(`CommunityContentSearchBar`)는 **변경하지 않고 그대로 사용**했다 → K-Cosmetics 영향 0.
 
 ---
 
@@ -105,7 +105,7 @@
 | 항목 | 영향 |
 |------|:----:|
 | `CommunityContentSearchBar` (공용) | **무변경** — props 사용만 |
-| GlycoPharm / K-Cosmetics `ContentWritePage` 등 | **0** |
+| K-Cosmetics `ContentWritePage` 등 | **0** |
 | 자료실(`/content/resources`) 검색 | 기존 동작 유지 + `?search=` 초기값 수용이 추가됨(동일 컴포넌트라 자동 적용, 기존 흐름 파괴 없음) |
 | 포럼 검색 | **무변경** |
 | 백엔드 | **무변경** |

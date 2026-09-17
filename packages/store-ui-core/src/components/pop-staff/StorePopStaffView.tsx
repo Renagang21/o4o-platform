@@ -2,8 +2,8 @@
  * StorePopStaffView — 내 매장 POP 사본 관리 (공통 화면 본체)
  * WO-O4O-MY-STORE-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1
  *
- * 원본: WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1 / WO-O4O-GLYCOPHARM-HUB-IMPORT-BLOG-POP-QR-V1.
- * KCos·GP 사본의 차이는 매장/약국 문구뿐이었다. API·라우트·payload 는 원본 그대로다.
+ * 원본: WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1.
+ * 서비스별 사본의 차이는 매장/약국 문구뿐이었다. API·라우트·payload 는 원본 그대로다.
  *
  * RichTextEditor(@o4o/content-editor)는 store-ui-core 의존성이 아니므로 slot 으로 주입받는다
  * (신규 dependency 를 만들지 않는다).
@@ -45,7 +45,7 @@ export interface StorePopStaffApi {
 
 export interface StorePopStaffViewProps {
   api: StorePopStaffApi;
-  /** 사용자-facing 명사 — GlycoPharm 은 '약국', 그 외는 '매장' */
+  /** 사용자-facing 명사 — 약국형 서비스는 '약국', 그 외는 '매장' */
   storeNoun?: string;
   /** 본문 편집기 slot (RichTextEditor 주입) */
   renderEditor: (ctx: { value: string; onChange: (html: string) => void; disabled: boolean }) => ReactNode;

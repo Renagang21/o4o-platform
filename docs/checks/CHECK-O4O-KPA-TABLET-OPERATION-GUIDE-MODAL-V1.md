@@ -51,7 +51,7 @@ services/web-kpa-society/src/pages/pharmacy/StoreTabletDisplaysPage.tsx
 
 ## 6. typecheck / build
 - web-kpa-society `tsc --noEmit`: **StoreTabletDisplaysPage 에러 0**.
-- KPA 전용 페이지 → GP/KCos 무관.
+- KPA 전용 페이지 → KCos 무관.
 
 ## 7. browser smoke
 - 배포: web deploy run 29229825980 **success**.

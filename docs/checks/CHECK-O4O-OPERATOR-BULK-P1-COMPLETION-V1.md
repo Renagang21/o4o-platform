@@ -14,10 +14,10 @@
 | 항목 | 판정 |
 |------|:----:|
 | K-Cos Products 데드 selectable 제거 | 🟢 PASS |
-| KPA/GP QualificationRequests BulkResultModal 연결 | 🟢 PASS |
+| KPA QualificationRequests BulkResultModal 연결 | 🟢 PASS |
 | Neture all-offers operator scope guard | 🟢 PASS |
 | Neture `/operator/supply-products` scope guard | 🟢 PASS (기존 fix 검증, gap 없음) |
-| GP Pharmacies 페이지 batch/row action 표준 정렬 | 🟢 PASS |
+ Pharmacies 페이지 batch/row action 표준 정렬 | 🟢 PASS |
 | Custom bulk 수렴 안전성 IR | 🟢 PASS (조사 완료) |
 
 ---
@@ -28,9 +28,9 @@
 |------|------|------|
 | Bulk action flow cross-service audit IR | `ff2dbb60d` | 서비스 횡단 bulk 흐름 1차 감사 |
 | K-Cos Products 데드 selectable 제거 | `68dfead02` | operator ProductsPage 에서 동작 없는 selectable 제거 |
-| KPA/GP QualificationRequests BulkResultModal 연결 | `d190f30cb` | bulk 처리 결과를 표준 모달로 표시 |
+| KPA QualificationRequests BulkResultModal 연결 | `d190f30cb` | bulk 처리 결과를 표준 모달로 표시 |
 | Neture all-offers operator scope guard | `82119f532` | all-offers 라우트에 operator scope guard 적용 |
-| GP Pharmacies 페이지 batch UI 정렬 | `e908c8906` | PharmaciesPage row action RowActionMenu 표준 정렬 (WO-O4O-GLYCOPHARM-PHARMACIES-PAGE-BATCH-UI-ALIGNMENT-V1) |
+ Pharmacies 페이지 batch UI 정렬 | `e908c8906` | PharmaciesPage row action RowActionMenu 표준 정렬 |
 | Custom bulk convergence safety audit IR | `e1687bcc5` | custom bulk 수렴 안전성 조사 |
 
 > sync: 본 CHECK 작성 시점 `origin/main` 동기화.
@@ -42,8 +42,8 @@
 ### 3-1. K-Cos Products 데드 selectable 제거 — 🟢 PASS (`68dfead02`)
 K-Cosmetics operator ProductsPage 에서 실제 bulk 동작이 없는 selectable(체크박스/선택 상태)을 제거. 사용자에게 동작하지 않는 선택 UI를 노출하지 않음(데드 표면 0).
 
-### 3-2. KPA/GP QualificationRequests BulkResultModal 연결 — 🟢 PASS (`d190f30cb`)
-KPA/GlycoPharm 자격 요청(QualificationRequests) 화면의 bulk 처리 결과를 공통 `BulkResultModal` 로 표시하도록 연결. 처리 성공/실패 건수가 표준 모달로 일관 표시.
+### 3-2. KPA QualificationRequests BulkResultModal 연결 — 🟢 PASS (`d190f30cb`)
+KPA 자격 요청(QualificationRequests) 화면의 bulk 처리 결과를 공통 `BulkResultModal` 로 표시하도록 연결. 처리 성공/실패 건수가 표준 모달로 일관 표시.
 
 ### 3-3. Neture all-offers operator scope guard — 🟢 PASS (`82119f532`)
 operator sub-router 가드 이전(line 90 부근)에 등록된 all-offers 라우트에 operator scope guard 를 명시 적용. standalone route 의 scope 미상속 문제 해소.
@@ -53,9 +53,6 @@ operator sub-router 가드 이전(line 90 부근)에 등록된 all-offers 라우
   `router.get('/operator/supply-products', requireAuth, requireNetureScope('neture:operator') ...)`
 - 핸들러는 `getOperatorSupplyProducts(userId)` read-only. 주석에 `WO-O4O-NETURE-SUPPLY-PRODUCTS-SCOPE-GUARD-FIX-V1` 로 이미 닫힌 작업 명시(standalone route 라 operator sub-router scope 미상속 → 명시 적용).
 - **판정: 신규 guard gap 없음.** 본 CHECK 에서 추가 수정 불요.
-
-### 3-5. GP Pharmacies 페이지 batch/row action 표준 정렬 — 🟢 PASS (`e908c8906`)
-GlycoPharm operator PharmaciesPage 의 row action 을 표준 `RowActionMenu` 로 정렬(canonical batch UI 정합). 데드 표면/비표준 액션 정리.
 
 ### 3-6. Custom bulk 수렴 안전성 IR — 🟢 PASS (`e1687bcc5`, 선행 `ff2dbb60d`)
 서비스별 custom bulk 흐름을 표준 BulkResultModal/표준 액션으로 수렴할 때의 안전성(회귀 위험·예외 흐름)을 조사. 실제 수렴 실행은 후속(P2)으로 분리.

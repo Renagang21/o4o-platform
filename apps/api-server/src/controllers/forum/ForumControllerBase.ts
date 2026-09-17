@@ -107,7 +107,7 @@ export class ForumControllerBase {
       return;
     }
 
-    // Legacy behavior (no scope set — e.g. glycopharm)
+    // Legacy behavior (no scope set)
     if (ctx.organizationId) {
       qb.andWhere(
         `(${alias}.isOrganizationExclusive = false OR ${alias}.organizationId = :ctxOrgId)`,

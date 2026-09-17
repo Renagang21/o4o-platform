@@ -2,7 +2,6 @@
  * Store Library API Client — K-Cosmetics
  *
  * WO-O4O-STORE-LIBRARY-CROSSSERVICE-PHASE2-B-V1
- * Adapted from GlycoPharm storeLibrary.ts for K-Cosmetics.
  *
  * Store Library CRUD: /api/v1/cosmetics/pharmacy/library
  */

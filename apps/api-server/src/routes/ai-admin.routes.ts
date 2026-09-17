@@ -11,7 +11,6 @@
  * - GET /api/ai/admin/usage - 사용량 통계
  * - GET /api/ai/admin/ops/summary - AI 운영 요약 (WO-O4O-AI-OBSERVABILITY-MINIMUM-V1)
  * - GET /api/ai/admin/ops/errors - 최근 AI 오류 (WO-O4O-AI-OBSERVABILITY-MINIMUM-V1)
- * WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-PHASE2-V1: /ops/care-status 제거
  */
 
 import { Router, Response } from 'express';
@@ -185,7 +184,6 @@ router.get('/usage', authenticate, requireAdmin, async (req, res: Response) => {
 /**
  * GET /api/ai/admin/ops/summary
  * AI 운영 상태 요약: provider별 호출/에러, 토큰 사용량
- * WO-O4O-GLYCOPHARM-CARE-DEAD-CODE-REMOVAL-PHASE2-V1: Care 집계 블록 제거
  */
 router.get('/ops/summary', authenticate, requireAdmin, async (_req, res: Response) => {
   try {

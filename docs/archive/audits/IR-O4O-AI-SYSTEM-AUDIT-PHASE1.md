@@ -62,7 +62,7 @@ O4O 플랫폼에서 발견된 AI 관련 모듈 전체 목록이다.
 | 2 | **GoogleAIService** | `apps/api-server/src/services/google-ai.service.ts` | Gemini 2.0 Flash | AI Query, Forum AI |
 | 3 | **GeminiProvider** | `packages/ai-core/src/orchestration/providers/gemini.provider.ts` | Gemini | ai-core Orchestrator |
 | 4 | **OpenAIProvider** | `packages/ai-core/src/orchestration/providers/openai.provider.ts` | OpenAI | ai-core Fallback |
-| 5 | **CareLlmInsightService** | `apps/api-server/src/modules/care/services/llm/care-llm-insight.service.ts` | Gemini | GlycoPharm Care |
+| 5 | **CareLlmInsightService** | `apps/api-server/src/modules/care/services/llm/care-llm-insight.service.ts` | Gemini | — |
 | 6 | **PatientAiInsightService** | `apps/api-server/src/modules/care/services/llm/patient-ai-insight.service.ts` | Gemini | GlucoseView 환자앱 |
 | 7 | **CareCoachingDraftService** | `apps/api-server/src/modules/care/services/llm/care-coaching-draft.service.ts` | Gemini | 코칭 초안 |
 | 8 | **CareAiChatService** | `apps/api-server/src/modules/care/services/llm/care-ai-chat.service.ts` | Gemini | Care Copilot 채팅 |
@@ -174,7 +174,7 @@ O4O 플랫폼에서 발견된 AI 관련 모듈 전체 목록이다.
 
 ## 5. AI Insights / Analysis 기능
 
-### 5.1 Care AI (GlycoPharm / GlucoseView)
+### 5.1 Care AI (GlucoseView)
 
 | Feature | Input | Output | Screen | 캐시 |
 |---------|-------|--------|--------|------|
@@ -212,7 +212,7 @@ O4O 플랫폼에서 발견된 AI 관련 모듈 전체 목록이다.
 
 | # | Chat | Service | LLM | Context | Screen |
 |---|------|---------|-----|---------|--------|
-| 1 | **Care AI Chat** | CareAiChatService | Gemini | Population / Patient | GlycoPharm Care Copilot 패널 |
+| 1 | **Care AI Chat** | CareAiChatService | Gemini | Population / Patient | — |
 | 2 | **AI Query (FloatingAiButton)** | AiQueryService | Gemini | Store/Product/Category/Page | Neture/Admin 전역 |
 
 ### 6.2 Copilot 기능
@@ -231,13 +231,8 @@ O4O 플랫폼에서 발견된 AI 관련 모듈 전체 목록이다.
 | `AiSummaryButton` | `@o4o/ai-components` | 공급자/파트너 대시보드 |
 | `AiSummaryModal` | `@o4o/ai-components` | AI 요약 모달 |
 | `AiPreviewModal` | `@o4o/ai-components` | AI 미리보기 |
-| `CareAiChatPanel` | web-glycopharm | Care Copilot 사이드 패널 |
 | `AIInsightCard` | web-neture | AI 인사이트 카드 |
 | `AIInsightBadge` | web-neture | AI 뱃지 |
-| `CareAiPopulationSummary` | web-glycopharm | 모집단 요약 |
-| `CareAiPrioritySummary` | web-glycopharm | 우선 환자 AI 요약 |
-| `PatientAiSummary` | web-glycopharm | 환자 AI 인사이트 |
-| `CareRiskSummary` | web-glycopharm | 위험도 요약 |
 
 ---
 
@@ -502,7 +497,6 @@ Snapshot → Insight 패턴 (모든 AI 분석):
 ```
 - Partner AI Builder (화장품 전용)
 - Pharmacy AI Insight (약국 전용)
-- Care AI Chat (GlycoPharm 전용)
 - Forum AI (포럼 전용)
 ```
 

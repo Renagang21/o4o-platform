@@ -2,7 +2,7 @@
  * ProductDescriptionsPage — 매장 상품 설명 (Pharmacy-Hub)
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §7
- *   KPA / GlycoPharm / K-Cosmetics 와 **같은 공통 View** 를 소비하는 thin adapter.
+ *   KPA / K-Cosmetics 와 **같은 공통 View** 를 소비하는 thin adapter.
  *   저장 대상은 이미 있는 매장 자체 상품(store_local_products.detail_html) 이다 — 신규 원장 0.
  *   PharmacyHub 에는 제작 템플릿 registry 가 없어 findTemplate 을 주입하지 않는다
  *   (템플릿 진입 경로 자체가 없다 — 빈 registry 를 만들지 않는다).

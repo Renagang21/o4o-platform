@@ -20,7 +20,6 @@ PharmacyHub 인증 상태
 production browser 미검증
 
 OPEN-B
-GlycoPharm
 MyCertificatesPage
 MyCreditsPage
 MyEnrollmentsPage
@@ -77,77 +76,6 @@ MyPageLayout re-export shim
 ```
 
 선행 구현을 다시 설계하거나 재작성하지 않는다.
-
----
-
-## 4. OPEN-B — GlycoPharm 3페이지 adoption
-
-대상:
-
-```text
-MyCertificatesPage.tsx
-MyCreditsPage.tsx
-MyEnrollmentsPage.tsx
-```
-
-선행 WO 당시 다른 세션 WIP라 접촉하지 못했다.
-
-먼저 현재 main 상태를 확인한다.
-
-### A. 병행 세션 변경이 이미 main 반영됨
-
-3페이지에 필요한 My Page navigation adoption을 진행한다.
-
-예상 최소 변경:
-
-```text
-navItems={GLYCOPHARM_MYPAGE_NAV_ITEMS}
-```
-
-실제 컴포넌트 계약을 확인한 뒤 적용한다.
-
-### B. 아직 미커밋 WIP가 존재
-
-접촉하지 않는다.
-
-```text
-git diff
-git diff --cached
-```
-
-로 소유권 확인 후 충돌이면 중지하고 보고한다.
-
-> **작성 시점 사실(2026-08-19)**: 병행 세션의 GP My Page 변경은 `ed7d6ed17` 로 이미 main 에 반영됐다.
-> 즉 시작 시점 기준으로는 **A 경로**가 유력하나, 실행 시점에 다시 확인한 뒤 판단한다.
-
----
-
-## 5. GP 3페이지 완료 검증
-
-각 페이지:
-
-```text
-/certificates
-/credits
-/enrollments
-```
-
-실제 route는 현재 코드 기준 확인.
-
-확인:
-
-```text
-공통 MyPageShell 유지
-MyPageNavigation 표시
-현재 route 활성 표시
-desktop 정상
-mobile 정상
-본문 회귀 없음
-breadcrumb/header 회귀 없음
-dead nav 0
-```
-
-3페이지 전부 통과해야 OPEN-B CLOSED.
 
 ---
 
@@ -295,8 +223,6 @@ MyPageShell adoption 여부
 선행 발견:
 
 ```text
-GP MySettingsPage
-GP MyProfilePage
 breadcrumb 누락
 ```
 
@@ -323,9 +249,6 @@ FOLLOWUP
 이번 WO에서 최종 확인:
 
 ```text
-GP Certificates
-GP Credits
-GP Enrollments
 
 PH /account
 PH /store-owner/account
@@ -411,7 +334,6 @@ Profile Core 재설계
 
 ```text
 @o4o/account-ui build
-GlycoPharm typecheck/build
 PharmacyHub typecheck/build
 ```
 
@@ -427,7 +349,6 @@ PharmacyHub typecheck/build
 OPEN-A = CLOSED
 OPEN-B = CLOSED
 
-GP 3페이지 navigation adoption PASS
 PH /account authenticated PASS
 PH /store-owner/account PASS
 
@@ -484,7 +405,6 @@ docs/checks/CHECK-O4O-CROSS-SERVICE-MYPAGE-SHELL-FINAL-CLOSURE-V1.md
 1. 기준 commit
 2. OPEN-A 결과
 3. OPEN-B 결과
-4. GP 3페이지 browser
 5. PH 2경로 authenticated browser
 6. desktop/mobile
 7. console/network
@@ -530,7 +450,6 @@ HEAD == origin/main
 
 ```text
 1. 기준 commit / deployed revision
-2. GP 3페이지 adoption
 3. PH authenticated /account
 4. PH /store-owner/account
 5. desktop/mobile
@@ -558,7 +477,6 @@ HEAD == origin/main
 
 ```text
 최신 main 확인
-→ GP 병행 WIP 해소 여부 확인
 → 3페이지 navigation adoption
 → PH authenticated browser 검증
 → desktop/mobile

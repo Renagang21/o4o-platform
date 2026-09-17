@@ -6,7 +6,7 @@
  *   admin-ux-core 4-block 구조로 K-Cosmetics Admin 전용 뷰 신설.
  *
  * WO-O4O-KCOS-ADMIN-DASHBOARD-LAYOUT-WRAPPER-V1:
- *   admin-ux-core 블록 개별 렌더링 → AdminDashboardLayout wrapper 적용 (Neture/GlycoPharm 정합).
+ *   admin-ux-core 블록 개별 렌더링 → AdminDashboardLayout wrapper 적용 (Neture 정합).
  *   4-Block 표준(A:Snapshot → B:Policy → C:GovernanceAlerts → D:Actions) 구조로 정렬.
  *   누락돼 있던 C(GovernanceAlerts) 블록 채움(현재 데이터 없음 → 빈 배열, "구조 이상 없음").
  *   Governance/Network 섹션은 레이아웃 하단에 유지(공통 추출은 후속 WO).

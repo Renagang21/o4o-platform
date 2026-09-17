@@ -3,7 +3,7 @@
 > **WO**: `WO-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1`
 > **유형**: Phase 0 read-only 조사 — 코드/DB/package/lock/route **무변경**. 문서 1개만 생성.
 > **목적**: 공통화·`core + extension` 정비를 시작하기 **전에**, 저장소에 이미 존재하는 공통화 자산(문서·패키지·적용 결과)의 현재 상태를 확정한다.
-> **결론(요약)**: **공통화는 신규 과제가 아니라 이미 1차 종료(Cycle 1 CLOSED, 2026-06-15)된 영역이다.** 공식 대상 4개 서비스 중 **KPA / K-Cosmetics / Neture 3개는 성숙한 공통 core 소비자**이며, **PharmacyHub 는 공통 인증을 제외한 UI·페이지 모듈 adoption 이 아직 초기 단계**다. 따라서 이번 정비의 실제 과제는 "공통화 설계"가 아니라 **① PharmacyHub adoption ② GlycoPharm 제외에 따른 기준 문서·페어링 재정렬 ③ 잔존 legacy 패키지 정리** 3가지다.
+> **결론(요약)**: **공통화는 신규 과제가 아니라 이미 1차 종료(Cycle 1 CLOSED, 2026-06-15)된 영역이다.** 공식 대상 4개 서비스 중 **KPA / K-Cosmetics / Neture 3개는 성숙한 공통 core 소비자**이며, **PharmacyHub 는 공통 인증을 제외한 UI·페이지 모듈 adoption 이 아직 초기 단계**다.
 >
 > **용어 주의**: 본 문서에서 PharmacyHub 화면을 "자체 구현"으로 기술한 것은 **현재 공통 패키지를 경유하지 않는다는 사실 기술**이며, 구현이 잘못되었다는 판정이 아니다. PharmacyHub 자체 구현에는 ① 공통 기반으로 대체할 부분 ② 서비스 고유 extension 으로 유지할 부분 ③ 현재 형태를 그대로 유지할 부분이 섞여 있다. 이 구분은 후속 IR(§19-2) 범위이며, 본 IR 은 "제거 대상"을 지정하지 않는다.
 > **작성일**: 2026-08-03 · HEAD `3a9dde01653d1a0da2fc0c4ced77b1f0224d6110` (main, working tree clean)
@@ -27,7 +27,7 @@
 
 **포함**: 문서 인벤토리(`docs/**`), 공통 패키지 인벤토리(`packages/**`), 서비스별 실제 `import` 확인, 대표 core+extension 사례, Operator 공통화 현황, 인증·service catalog 위치.
 
-**제외(WO §18 준수)**: 새 공통 패키지 설계·생성, 서비스 앱 통합 결정, route/import/package.json/lockfile 변경, dead code 삭제, DB 조회·write, 배포, GlycoPharm 수정.
+**제외(WO §18 준수)**: 새 공통 패키지 설계·생성, 서비스 앱 통합 결정, route/import/package.json/lockfile 변경, dead code 삭제, DB 조회·write, 배포 수정.
 
 **변경 0 확인**: §19.
 
@@ -44,15 +44,7 @@
 
 > **관찰**: PharmacyHub 만 package name 이 `@o4o/` scope 밖(`pharmacy-hub-web`)이다. 워크스페이스 네이밍 규약에서 이탈 — 사실로만 기록(수정하지 않음).
 
-`services/` 전체: `mobile-app`, `signage-player-web`, `web-account`, `web-glycopharm`, `web-k-cosmetics`, `web-kpa-society`, `web-neture`, `web-pharmacy-hub` (8). 이 중 `web-account`·`signage-player-web`·`mobile-app` 는 본 WO 대상 밖.
-
----
-
-## 4. GlycoPharm 제외 원칙
-
-- GlycoPharm 코드·문서·패키지에 **무접촉**(읽기조차 판정 근거로 사용하지 않음).
-- 기존 공통화 문서 다수가 GlycoPharm 을 포함하나, 본 IR 에서는 전부 **`OUT_OF_SCOPE_REFERENCE`** 로만 취급했다.
-- **단, 구조적 사실 1건은 후속 판단에 필요하므로 기록한다**: 다수의 공통 컴포넌트 추출이 **GP ↔ KCos 2-서비스 페어링**으로 정당화되었다(`CHECK-O4O-STORE-HUB-B2B-CATALOG-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1`, `...-EVENT-OFFER-GP-KCOS-...`, `IR-O4O-MY-STORE-COMMONIZATION-PHASE6-GP-KCOS-APPLICATION-SCOPE-V1` 등). GlycoPharm 이 제거되면 **이 추출들의 소비처가 KCos 단독으로 줄어드는 축이 생긴다.** → 이번 WO 에서 판정하지 않고 §18 후속 조사로 넘긴다.
+이 중 `web-account`·`signage-player-web`·`mobile-app` 는 본 WO 대상 밖.
 
 ---
 
@@ -64,18 +56,18 @@
 
 | 문서 | 종류 | 주제 | 대상 서비스 | 상태 | 코드 일치 | 재조사 |
 |------|------|------|------------|------|----------|:-----:|
-| [docs/architecture/O4O-COMMONIZATION-STANDARD.md](docs/architecture/O4O-COMMONIZATION-STANDARD.md) | architecture | **공통화 판정 SSOT**(4-요소 구조·6항목 체크리스트·Hub 채택 매트릭스) | KPA/GP/KCos/Neture | Active (2026-05-02) | Hub Template 채택은 **일치**. 단 **PharmacyHub 미등재**, GlycoPharm 포함 → §17 DOC_CODE_MISMATCH | **Yes** |
+| [docs/architecture/O4O-COMMONIZATION-STANDARD.md](docs/architecture/O4O-COMMONIZATION-STANDARD.md) | architecture | **공통화 판정 SSOT**(4-요소 구조·6항목 체크리스트·Hub 채택 매트릭스) | KPA/KCos/Neture | Active (2026-05-02) | Hub Template 채택은 **일치**. 단 **PharmacyHub 미등재** 포함 → §17 DOC_CODE_MISMATCH | **Yes** |
 | [docs/o4o-common-structure.md](docs/o4o-common-structure.md) | baseline | forum/lms/signage = 플랫폼 공통 구조 | 전체 | Active | 일치 | No |
 | [docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) | baseline | 공유 모듈 변경 시 전 소비처 식별 절차 | 전체 | Active | 일치 | No |
 | [docs/architecture/OPERATOR-CORE-DESIGN-V1.md](docs/architecture/OPERATOR-CORE-DESIGN-V1.md) | architecture | Operator core 설계 | 전체 | Active | §9 참조 | No |
 | [docs/architecture/OPERATOR-INTEGRATION-STATE-V1.md](docs/architecture/OPERATOR-INTEGRATION-STATE-V1.md) | architecture | Operator 통합 상태 | 전체 | Active | §9 참조 | No |
 | [docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md](docs/architecture/OPERATOR-DATATABLE-POLICY-V1.md) | architecture | DataTable 정책 | 전체 | Active | 일치 | No |
 | [docs/baseline/UX-CORE-FREEZE-V1.md](docs/baseline/UX-CORE-FREEZE-V1.md) | baseline(Freeze) | operator-ux-core / admin-ux-core 동결 | 전체 | Frozen | 일치 | No |
-| [docs/baseline/STORE-UI-CORE-FREEZE-V1.md](docs/baseline/STORE-UI-CORE-FREEZE-V1.md) | baseline(Freeze) | store-ui-core 동결 | KPA/GP/KCos | Frozen | 일치 | No |
+| [docs/baseline/STORE-UI-CORE-FREEZE-V1.md](docs/baseline/STORE-UI-CORE-FREEZE-V1.md) | baseline(Freeze) | store-ui-core 동결 | KPA/KCos | Frozen | 일치 | No |
 | [docs/architecture/O4O-CORE-FREEZE-V1.md](docs/architecture/O4O-CORE-FREEZE-V1.md) | baseline(F10) | Auth/Membership/Approval/RBAC Core 고정 | 전체 | Frozen | 일치 | No |
 | [docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md](docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md) | baseline | Hub Template 명세 | 전체 | Active | 일치 | No |
-| [docs/architecture/STORE-LAYER-ARCHITECTURE.md](docs/architecture/STORE-LAYER-ARCHITECTURE.md) | architecture(F3) | store-ui-core 의존 방향 | KPA/GP/KCos | Frozen | 일치 | No |
-| [docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md](docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md) | baseline | LMS core+extension 원칙 | KPA/GP/KCos | Active | 일치 | No |
+| [docs/architecture/STORE-LAYER-ARCHITECTURE.md](docs/architecture/STORE-LAYER-ARCHITECTURE.md) | architecture(F3) | store-ui-core 의존 방향 | KPA/KCos | Frozen | 일치 | No |
+| [docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md](docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md) | baseline | LMS core+extension 원칙 | KPA/KCos | Active | 일치 | No |
 | [docs/platform/extensions/EXTENSION-GENERAL-GUIDE.md](docs/platform/extensions/EXTENSION-GENERAL-GUIDE.md) | baseline | Extension 일반 가이드 | 전체 | Active | 미검증(범위 밖) | No |
 | [docs/rules/DESIGN-CORE-GOVERNANCE.md](docs/rules/DESIGN-CORE-GOVERNANCE.md) | rules | 신규 화면 = Design Core v1.0(`@o4o/ui`) 필수 | 전체 | Active | **PharmacyHub 불일치**(§12) | **Yes** |
 | [docs/architecture/ADR-O4O-SCREEN-CONTENT-CORE-AND-ROLE-EXTENSION-ARCHITECTURE-V1.md](docs/architecture/ADR-O4O-SCREEN-CONTENT-CORE-AND-ROLE-EXTENSION-ARCHITECTURE-V1.md) | ADR | screen-content-core + role extension | KPA/Neture/공급자 | Active | 일치 | No |
@@ -87,7 +79,7 @@
 | [docs/investigations/IR-O4O-CROSS-SERVICE-COMMONIZATION-OVERALL-AUDIT-V1.md](docs/investigations/IR-O4O-CROSS-SERVICE-COMMONIZATION-OVERALL-AUDIT-V1.md) | 2026-06-15 (`582e8ec66`) | **CLOSED with MINOR FOLLOW-UP** — 14개 축 A.CLOSED, 4서비스 `tsc -b` 0, 즉시 NEEDS-WO 0 |
 | [docs/checks/CHECK-O4O-CROSS-SERVICE-COMMONIZATION-CYCLE1-CLOSURE-V1.md](docs/checks/CHECK-O4O-CROSS-SERVICE-COMMONIZATION-CYCLE1-CLOSURE-V1.md) | 2026-06-15 | **CLOSED** — Cycle 1 종료 고정 |
 
-> **이 2건이 본 WO 의 직접 선행 문서다.** 두 문서의 대상은 KPA / GlycoPharm / K-Cosmetics / Neture 이며 **PharmacyHub 는 조사 대상에 포함된 적이 없다.** 즉 이번 WO 의 공식 대상 4개와 선행 종료 문서의 4개는 **1개 서비스가 다르다**(GP → PharmacyHub). 이것이 이번 정비의 실질적 delta 다.
+> 이것이 이번 정비의 실질적 delta 다.
 
 ---
 
@@ -293,7 +285,7 @@ Extension:       서비스별 `src/lib/apiClient.ts` (20~27L) 에서 인스턴�
 ### 10.1 Service catalog
 
 - 위치: [apps/api-server/src/config/service-catalog.ts](apps/api-server/src/config/service-catalog.ts) — `export const O4O_SERVICES: O4OService[]`
-- 등록 키(실측): `neture` · `glycopharm` · `kpa-society` · `k-cosmetics` · **`pharmacy-hub`** (+ 이하 항목) — **PharmacyHub 는 이미 catalog 에 등재되어 있다.**
+- 등록 키(실측): `neture` · `kpa-society` · `k-cosmetics` · **`pharmacy-hub`** (+ 이하 항목) — **PharmacyHub 는 이미 catalog 에 등재되어 있다.**
 - 판정: **backend catalog 는 SSOT 로 기능한다.** frontend 측 중복 정의는 발견되지 않았고, 대신 PharmacyHub 만 `src/config/service.ts`(39L) 를 별도 보유.
 - 함정(기존 기록 확인): 서비스 키 `kpa-society` ≠ 일부 데이터의 `kpa` — catalog 키와 데이터 `service_key` 가 항상 같지 않다.
 
@@ -320,10 +312,10 @@ Extension:       서비스별 `src/lib/apiClient.ts` (20~27L) 에서 인스턴�
 |------|-----------|------|
 | **CURRENT_BASELINE** | `docs/architecture/O4O-COMMONIZATION-STANDARD.md` · `docs/checks/CHECK-O4O-CROSS-SERVICE-COMMONIZATION-CYCLE1-CLOSURE-V1.md` · `docs/baseline/UX-CORE-FREEZE-V1.md` · `docs/baseline/STORE-UI-CORE-FREEZE-V1.md` | 판정 기준 |
 | **CURRENT_REFERENCE** | `IR-O4O-CROSS-SERVICE-COMMONIZATION-OVERALL-AUDIT-V1` · `IR-O4O-OPERATOR-UX-CROSSSERVICE-RECHECK-V1` · `IR-O4O-STORE-HUB-CROSSSERVICE-COMMONIZATION-RECHECK-V1` · `IR-O4O-MYPAGE-CROSSSERVICE-COMMONIZATION-RECHECK-V1` · `IR-O4O-COMMUNITY-FORUM-CROSSSERVICE-COMMONIZATION-RECHECK-V1` | 축별 최신 상태 |
-| **PARTIALLY_VALID** | LMS 계열(`CHECK-O4O-LMS-*-ADOPTION-V1`, `IR-O4O-LMS-COMMONIZATION-*`) | 결론 유효하나 대상 서비스 집합에 GP 포함 |
+| **PARTIALLY_VALID** | LMS 계열(`CHECK-O4O-LMS-*-ADOPTION-V1`, `IR-O4O-LMS-COMMONIZATION-*`) | — |
 | **SUPERSEDED** | `CHECK-O4O-LMS-COMMONIZATION-CYCLE1-CLOSURE-V1` → V2, `CHECK-O4O-MY-STORE-EXECUTION-CROSSSERVICE-COMMONIZATION-V1` → V2/V3, `CHECK-O4O-STORE-HUB-CANONICAL-CROSSSERVICE-COMPLETION-V1` → V2 | 상위 버전 존재 |
 | **ARCHIVED_HISTORY** | `docs/archive/investigations/**`(64건 중 다수) — `IR-O4O-CROSS-SERVICE-DUPLICATION-AUDIT-V1`, `IR-O4O-MEMBER-MANAGEMENT-COMMONIZATION-AUDIT-V1` 등 | 이력 참고 |
-| **OUT_OF_SCOPE_REFERENCE** | GP 페어링 추출 문서 전체 — `CHECK-O4O-STORE-HUB-B2B-CATALOG-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1`, `CHECK-O4O-STORE-HUB-EVENT-OFFER-GP-KCOS-COMMON-COMPONENT-EXTRACTION-V1`, `IR-O4O-MY-STORE-COMMONIZATION-PHASE6-GP-KCOS-APPLICATION-SCOPE-V1`, `CHECK-O4O-LMS-GLYCOPHARM-*` | 패턴 참고만. 현재 판정 근거로 미사용 |
+| **OUT_OF_SCOPE_REFERENCE** | — | 패턴 참고만. 현재 판정 근거로 미사용 |
 | **REQUIRES_RECHECK** | `O4O-COMMONIZATION-STANDARD` §3/§9(대상 서비스 집합) · `DESIGN-CORE-GOVERNANCE`(PharmacyHub 적용) | §17 참조 |
 
 ---
@@ -401,8 +393,8 @@ KPA 가 reference 라는 사실이 "KPA 코드 전체 = 공통 프레임"을 뜻
 
 | # | 영역 | 사유 |
 |---|------|------|
-| R1 | `O4O-COMMONIZATION-STANDARD` §3·§9 대상 서비스 집합 | GlycoPharm 포함 / PharmacyHub 미등재 → 기준 문서가 현재 공식 4개 서비스와 불일치 |
-| R2 | GP 페어링으로 추출된 공통 컴포넌트의 잔존 소비처 | B2B 카탈로그·Event Offer·My Store Phase6 등이 GP 제거 시 KCos 단독 소비로 축소되는지 |
+| R1 | `O4O-COMMONIZATION-STANDARD` §3·§9 대상 서비스 집합 | — |
+| R2 | — | — |
 | R3 | `@o4o/operator-core` legacy 정리 | 소비 0인데 3개 서비스 dependency 잔존. 2026-06-15 B 항목 미해결 |
 | R4 | `@o4o/auth-context` 포지션 | 서비스 0 소비 / admin-dashboard 전용 — 공통 auth 축의 canonical 인지 legacy 인지 미확정 |
 | R5 | 서비스별 `AuthContext.tsx` 4중 병존 | 공통화 여지 있으나 membership/role 의미 비교 선행 필요 |
@@ -431,13 +423,12 @@ KPA 가 reference 라는 사실이 "KPA 코드 전체 = 공통 프레임"을 뜻
 | Neture 공급자/거래/B2B extension | `SERVICE_ONLY` | 도메인 고유 |
 | KPA 약국/태블릿/QR 실행 자산 | `SERVICE_ONLY`(구조는 공통, 데이터·정책은 고유) | Boundary Policy F6 |
 | PharmacyHub B2B 주문/결제 도메인 로직 | `SERVICE_ONLY` | 신규 서비스 고유 업무 — **단 UI/레이아웃 축은 §14 adoption 대상** |
-| GlycoPharm 전체 | `OUT_OF_SCOPE` | 무접촉 |
 
 ### 17.1 DOC_CODE_MISMATCH 확정 목록
 
 | 문서 | 불일치 |
 |------|--------|
-| `O4O-COMMONIZATION-STANDARD` §3 서비스별 채택 범위 / §9 채택 매트릭스 | GlycoPharm 포함, **PharmacyHub 행 없음** |
+| `O4O-COMMONIZATION-STANDARD` §3 서비스별 채택 범위 / §9 채택 매트릭스 | — |
 | `DESIGN-CORE-GOVERNANCE` ("모든 신규 화면은 Design Core v1.0") | PharmacyHub 25파일 중 `@o4o/ui` import **0** |
 | 2026-06-15 Cycle 1 closure §7 B 항목(operator-core deprecation, lms-ui dormant, shared-space-ui 네이밍) | 2026-08-03 현재 **미해결 상태 그대로** |
 
@@ -466,7 +457,6 @@ KPA 가 reference 라는 사실이 "KPA 코드 전체 = 공통 프레임"을 뜻
 | 매장 자산 정책 | `O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1` | `packages/store-asset-policy-core` | ✅ | ✅ | — | — | `CORE_READY` | R2 |
 | HUB layout/signal | `O4O-HUB-TEMPLATE-STANDARD-V1` | `packages/hub-core` | ❌ | ❌ | 부분 2 | — | `PARTIAL_ADOPTION` | R2 |
 | Service catalog | — | `apps/api-server/src/config/service-catalog.ts` | ✅ | ✅ | ✅ | **✅ 등재됨** | `CORE_READY` | — |
-| GlycoPharm 전 영역 | — | — | — | — | — | — | `OUT_OF_SCOPE` | 무접촉 |
 
 ---
 
@@ -474,10 +464,10 @@ KPA 가 reference 라는 사실이 "KPA 코드 전체 = 공통 프레임"을 뜻
 
 | 순위 | 제안 문서 | 성격 | 목적 |
 |:---:|-----------|------|------|
-| 1 | `WO-O4O-COMMONIZATION-STANDARD-SCOPE-REALIGNMENT-V1` | docs-only | R1 — 기준 문서의 대상 서비스 집합을 KPA/KCos/Neture/PharmacyHub 로 갱신, GP 를 이력 처리. **이후 모든 판정의 전제** |
+| 1 | `WO-O4O-COMMONIZATION-STANDARD-SCOPE-REALIGNMENT-V1` | docs-only | R1 — 기준 문서의 대상 서비스 집합을 KPA/KCos/Neture/PharmacyHub 로 갱신 를 이력 처리. **이후 모든 판정의 전제** |
 | 2 | `IR-O4O-PHARMACY-HUB-COMMON-CORE-ADOPTION-SCOPE-V1` | read-only | §14 gap 을 **패키지 목록이 아니라 화면군 단위**로 분해. 화면군 = Public / Auth·Join / Role Entry / Operator / Store Owner / Supplier / Product / Order·Payment / Account·Notification / Common Error·Loading. 화면군마다 판정값 부여: `KEEP_BESPOKE` · `ADOPT_PRIMITIVE` · `ADOPT_TEMPLATE` · `ADOPT_PAGE_MODULE` · `ADOPT_LAYOUT_ONLY` · `ADOPT_ERROR_CONTRACT` · `ADOPT_TYPES_ONLY` · `SERVICE_EXTENSION_REQUIRED` · `NOT_APPLICABLE`. 채택 순서 가설(types → ui/error-handling → shared-space-ui → operator 축 → store 축)은 이 판정 결과로 검증 |
 | 3 | `WO-O4O-OPERATOR-CORE-LEGACY-RETIREMENT-V1` | 소규모 코드 | R3 — dead 패키지 + 3개 dependency 정리. **제거 전 재검증 필수**: dynamic import · build script · Dockerfile COPY · tsconfig reference · package build order · docs link · test fixture (본 IR 의 소비 0 확인은 정적 `from` import 기준) |
-| 4 | `IR-O4O-GP-PAIRED-EXTRACTION-RESIDUAL-CONSUMER-AUDIT-V1` | read-only | R2 — GP 제거 시 단독 소비로 축소되는 공통 컴포넌트 식별. **목적은 GlycoPharm 제거가 아니라, GlycoPharm 존폐 여부가 공통 core 유지 판단에 영향을 주지 않는 상태를 만드는 것.** GP 제거 미확정이므로 코드 제거 금지 |
+| 4 | `IR-O4O-GP-PAIRED-EXTRACTION-RESIDUAL-CONSUMER-AUDIT-V1` | read-only | — |
 | 5 | `IR-O4O-AUTH-CONTEXT-CANONICAL-POSITION-V1` | read-only | R4·R5 — auth-context 포지션 + 서비스별 AuthContext 4중 병존 공통화 여지 |
 | 6 | `IR-O4O-FORUM-CORE-VS-SHARED-SPACE-UI-SEAM-V1` | read-only | R7 — forum 축 두 패키지 책임 경계 |
 
@@ -495,18 +485,16 @@ KPA 가 reference 라는 사실이 "KPA 코드 전체 = 공통 프레임"을 뜻
 | package / lockfile / dependency | **0** |
 | route / import | **0** |
 | 배포 | **0** |
-| GlycoPharm 접촉 | **0** — 수정·삭제 없음. 판정 근거로도 미사용(§4) |
 | `pnpm install` / 전체 build | **미실행**(WO §5) |
 | 사용 명령 | `git status/branch/rev-parse/remote/pull --ff-only/log`, 파일 열거·읽기, ripgrep 검색만 |
 
-**중지 조건(WO §19) 해당 없음** — 작업 트리 clean 유지, 기준 commit 불변, 문서↔코드 관계 확인 가능, 공통 패키지 소비처를 실제 import 로 확인 완료, 진행 중 리팩터링과 충돌 없음, GlycoPharm 제외 원칙 준수 가능.
+**중지 조건(WO §19) 해당 없음** — 작업 트리 clean 유지, 기준 commit 불변, 문서↔코드 관계 확인 가능, 공통 패키지 소비처를 실제 import 로 확인 완료, 진행 중 리팩터링과 충돌 없음 제외 원칙 준수 가능.
 
 ### 미확정 사항
 
-1. GP 제거가 각 공통 컴포넌트 소비처에 미치는 정량 영향 — GlycoPharm 무접촉 원칙상 이번 조사에서 산정하지 않음(R2).
 2. `AuthContext.tsx` 4중 병존의 공통화 타당성 — membership/role 의미 비교 필요(R5).
 3. PharmacyHub 각 화면의 공통 모듈 대응 가능 여부(화면 단위) — 후속 IR 2번 범위.
 
 ---
 
-*Date: 2026-08-03 · Phase 0 read-only asset & status registry · HEAD `3a9dde01` · docs md 2,884 중 공통화 매칭 283 · packages 96 · 공식 대상 4 서비스 import 실측 · 코드/DB/package 변경 0 · GlycoPharm 무접촉.*
+*Date: 2026-08-03 · Phase 0 read-only asset & status registry · HEAD `3a9dde01` · docs md 2,884 중 공통화 매칭 283 · packages 96 · 공식 대상 3 서비스 import 실측 · 코드/DB/package 변경 0 무접촉.*

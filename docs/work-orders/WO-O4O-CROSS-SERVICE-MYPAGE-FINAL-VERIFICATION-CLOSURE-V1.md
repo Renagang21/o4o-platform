@@ -9,7 +9,7 @@
 * **남은 검증 공백**
 
   1. `pending / rejected` 상태 실제 렌더 미검증
-  2. GlycoPharm / PharmacyHub mobile `390×844` smoke 미실시
+  2. PharmacyHub mobile `390×844` smoke 미실시
 
 ---
 
@@ -21,7 +21,6 @@
 
 ```text
 A. pending / rejected UX 최종 검증
-B. GP mobile smoke
 C. PH mobile smoke
 → CROSS-SERVICE MY PAGE TRACK = FINAL CLOSED
 ```
@@ -178,69 +177,6 @@ dead navigation
 
 ---
 
-# PART B — GlycoPharm mobile smoke
-
-## 8. 환경
-
-실제 production:
-
-```text
-viewport 390×844
-```
-
-정상 로그인 세션 사용.
-
----
-
-## 9. GP 검증 경로
-
-최소:
-
-```text
-/mypage
-/mypage/profile
-/mypage/settings
-/mypage/requests
-/mypage/certificates
-/mypage/credits
-/mypage/enrollments
-```
-
-실제 current-main route 기준 확인 후 수행.
-
----
-
-## 10. GP mobile 확인
-
-```text
-MyPageShell 정상
-navigation 표시
-활성 항목 자동 노출
-가로 nav scroll 정상
-page-level horizontal overflow 없음
-user summary 정상
-card/grid stacking 정상
-긴 label 잘림 없음
-button/touch target 접근 가능
-뒤로가기 정상
-새로고침 정상
-```
-
-합격:
-
-```text
-white screen = 0
-JS exception = 0
-unexpected 401/403 = 0
-404 = 0
-5xx = 0
-dead nav = 0
-mobile 기능 소실 = 0
-double shell = 0
-```
-
----
-
 # PART C — PharmacyHub mobile smoke
 
 ## 11. 환경
@@ -392,7 +328,6 @@ membership lifecycle 재설계
 
 ```text
 @o4o/account-ui build (공통 package 변경 시)
-GP typecheck/build
 PH typecheck/build
 영향 받은 다른 서비스 typecheck/build
 ```
@@ -413,7 +348,6 @@ pending/rejected:
   또는
 - 테스트 계정 부재 + 3단 정적 증거 PASS
 
-GP mobile 390×844 PASS
 PH mobile 390×844 PASS
 
 white screen = 0
@@ -515,7 +449,6 @@ docs/checks/CHECK-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1.md
 1. 기준 commit / deployed revision
 2. pending/rejected 테스트 계정 census
 3. 실제 렌더 또는 3단 정적 증거
-4. GP mobile 390×844
 5. PH mobile 390×844
 6. 선행 결함 최소 회귀
 7. production browser
@@ -570,7 +503,6 @@ origin/main 반영 확인
 1. 기준 commit / deployed revision
 2. pending/rejected 검증 방식
 3. pending/rejected 결과
-4. GP mobile 결과
 5. PH mobile 결과
 6. 선행 결함 회귀
 7. production browser
@@ -598,7 +530,6 @@ origin/main 반영 확인
 최신 main 확인
 → pending/rejected 테스트 가능성 확인
 → 실제 렌더 또는 3단 정적 증거
-→ GP mobile smoke
 → PH mobile smoke
 → 필요한 최소 회귀 확인
 → 결함 있으면 최소 수정/배포/재검증
@@ -624,22 +555,6 @@ origin/main 반영 확인
 * 선행 코드 수정 3건: `c9fd2d6a4` · `142943486` · `6777d7503`
 * 착수 시점 작업트리 clean. 다만 **다른 세션이 동시에 진행 중**(guide 공통화 · signage · main-site 정리 트랙이 최근 커밋에 있음). §2 대로 dirty/untracked 가 생기면 미접촉하고 path-specific stage 만 사용할 것.
 
-### B. §9 GP route — **WO 원문의 `/mypage/requests` 는 실재하지 않는다**
-
-`services/web-glycopharm/src/App.tsx` 실측 7 route:
-
-```
-736: mypage
-741: mypage/profile
-746: mypage/settings
-752: mypage/enrollments
-757: mypage/certificates
-762: mypage/credits
-768: mypage/my-requests      ← 원문의 "/mypage/requests" 아님
-```
-
-§9 가 "실제 current-main route 기준 확인 후 수행" 이라고 단서를 달았으므로 **`/mypage/my-requests` 로 검증**하면 된다. `/mypage/requests` 로 접속해 404 가 나오는 것을 dead route 결함으로 오판하지 말 것 — 애초에 정의된 적 없는 경로다. 다만 **nav item 이나 card 가 `/mypage/requests` 를 가리키고 있다면 그것은 실제 dead link** 이므로 구분해서 볼 것.
-
 ### C. §12 PH route — 두 경로는 서로 다른 컴포넌트다
 
 `services/web-pharmacy-hub/src/App.tsx` 실측:
@@ -658,7 +573,6 @@ PH `pages/account/` 에는 `MyProfilePage.tsx` · `navItems.ts` 2파일뿐이다
 `MembershipStatusNotice` / `MembershipStatusBadge` 소비처 실측:
 
 ```
-services/web-glycopharm/src/components/auth/MembershipGate.tsx
 services/web-k-cosmetics/src/components/auth/MembershipGate.tsx
 services/web-kpa-society/src/components/auth/MembershipGate.tsx
 services/web-neture/src/components/auth/MembershipGate.tsx
@@ -702,14 +616,14 @@ Neture 오문구는 **auth bootstrap 중 수 초간만** 나타나던 증상이�
 
 ### G. §18 — "0" 항목을 측정 없이 적지 말 것
 
-§18 의 합격 기준은 대부분 `= 0` 형태다. **관측하지 않은 항목을 0 으로 적는 것이 이번 WO 의 주된 실패 모드다.** JS exception / 401·403 / 404 / 5xx 는 브라우저 console + network 를 실제로 확인한 결과여야 하고, 확인하지 않았으면 0 이 아니라 **미확인**으로 적는다. 선행 WO 는 GP·PH mobile 을 "미실시 — 미확인"으로 정직하게 남겼고 그래서 이번 WO 가 존재한다. 같은 기준을 유지할 것.
+§18 의 합격 기준은 대부분 `= 0` 형태다. **관측하지 않은 항목을 0 으로 적는 것이 이번 WO 의 주된 실패 모드다.** JS exception / 401·403 / 404 / 5xx 는 브라우저 console + network 를 실제로 확인한 결과여야 하고, 확인하지 않았으면 0 이 아니라 **미확인**으로 적는다. 선행 WO 는 PH mobile 을 "미실시 — 미확인"으로 정직하게 남겼고 그래서 이번 WO 가 존재한다. 같은 기준을 유지할 것.
 
 ### H. §22 선행 CHECK 정합화 방식
 
 `docs/checks/CHECK-O4O-CROSS-SERVICE-MYPAGE-FINAL-AUDIT-AND-CLOSURE-V1.md` 에서 손댈 곳은 다음이며, **삭제는 하지 않는다**:
 
 * 5행 판정 줄 · 324행 트랙 선언 블록 · 329~334행 "FINAL CLOSED 를 선언하지 않는 이유"
-* 151행(pending/rejected 미검증) · 229·232행(GP·PH mobile 미실시) · 283행(backlog B7) 의 **미확인 기록은 원문 보존**하고, 본 WO 로 해소됐다는 경위를 덧붙인다
+* 151행(pending/rejected 미검증) · 229·232행(PH mobile 미실시) · 283행(backlog B7) 의 **미확인 기록은 원문 보존**하고, 본 WO 로 해소됐다는 경위를 덧붙인다
 
 직전 Help/Support CHECK 정합화(`b4a030629`, 29 insertions / **1 deletion**)가 정확한 선례다. 같은 형태로 처리할 것. **WO 문서 자체는 수정하지 않는다.**
 

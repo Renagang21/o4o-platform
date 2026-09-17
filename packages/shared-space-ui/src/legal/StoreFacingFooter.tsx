@@ -20,7 +20,7 @@ import { Link } from 'react-router-dom';
 import { PublicLegalFooterInfo, type PublicLegalProfileDto } from './PublicLegalFooterInfo';
 
 export interface StoreFacingFooterLinks {
-  /** 이용약관 route (GP/KCos `/terms`, KPA `/policy`) */
+  /** 이용약관 route (KCos `/terms`, KPA `/policy`) */
   terms: string;
   /** 개인정보처리방침 route */
   privacy: string;

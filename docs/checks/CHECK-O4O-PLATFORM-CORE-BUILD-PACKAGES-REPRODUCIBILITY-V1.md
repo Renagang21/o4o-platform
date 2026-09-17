@@ -62,9 +62,7 @@ src/database/entities.ts(406,65): error TS2307: Cannot find module '@o4o/platfor
 `packages/ai-core/dist` 가 낡은 채로 소비되고 있었다.
 
 ```text
-src/copilot/insight-rules.ts(38,7): error TS2741: Property 'glycopharm' is missing ... 'Record<AIServiceId, ...>'
   - src: packages/ai-core/src/orchestration/types.ts → 'kpa' | 'neture' | 'cosmetics'
-  - stale dist: packages/ai-core/dist/orchestration/types.d.ts → 'kpa' | 'neture' | 'glycopharm' | 'cosmetics'
 ```
 
 `pnpm install` 의 prepare/postinstall 의존은 `packages/types` **한 곳뿐**이며
@@ -182,7 +180,7 @@ api-server tsconfig paths 가 가리키는 3개 진입점이 모두 생성된다
 
 - `.github/workflows/**` · `apps/api-server/Dockerfile` — 미변경 (조사만 수행)
 - runtime · API 계약 · entity · migration — 미변경
-- ops-metrics `services`·`opsStatus` / Channel schema / Cafe24 B2B / GlycoPharm 복구 / dependency 정리 — WO 제외 범위, 미접촉
+- ops-metrics `services`·`opsStatus` / Channel schema / Cafe24 B2B 복구 / dependency 정리 — WO 제외 범위, 미접촉
 - `scratchpad/` — 미접촉 (삭제·이동·수정·커밋 0)
 - `C:/tmp/o4o-cafe24-pilot` worktree 및 그곳의 `main` — 미접촉
 - `work/kpa-branch-annual-report-review-v1` branch — 미접촉

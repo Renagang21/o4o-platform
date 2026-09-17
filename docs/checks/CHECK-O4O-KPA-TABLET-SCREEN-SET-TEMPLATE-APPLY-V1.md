@@ -55,7 +55,7 @@ const SET_TEMPLATE_KEYS_ALLOWED = ['corner_information_basic_v1', 'product_focus
 ## 6. 기존 템플릿 불변 검증
 
 - `isProductFocus === false`(기본 템플릿 + legacy `screen=null`)일 때 헤더/그리드/QR 배너 style 과 배치가 **기존과 byte 동일**(모든 분기가 원래 값으로 폴백). 새 코드 경로는 `product_focus` 에서만 진입.
-- `TabletKioskPageProps` / `TabletKioskDisplaySettings` **export 타입 무변경** → 소비 서비스(KPA/Cosmetics/GlycoPharm) 계약 불변.
+- `TabletKioskPageProps` / `TabletKioskDisplaySettings` **export 타입 무변경** → 소비 서비스(KPA/Cosmetics) 계약 불변.
 - **product_list 0건**: `products.length === 0` → 기존 "표시할 상품이 없습니다" centerMessage 로 폴백(분기와 무관). **크래시 없음**(§4, §7).
 - idle auto-return 흐름 무변경(§7).
 
@@ -67,7 +67,6 @@ const SET_TEMPLATE_KEYS_ALLOWED = ['corner_information_basic_v1', 'product_focus
 | api-server (production 빌드 스코프) | `tsc -p tsconfig.build.json --noEmit` | ✅ **exit 0** |
 | `store-tablet.routes.ts` (변경 파일) | (위 포함) | ✅ 에러 0 |
 | web-k-cosmetics | `tsc --noEmit` | ✅ kiosk-core 관련 에러 0 |
-| web-glycopharm | `tsc --noEmit` | ✅ kiosk-core 관련 에러 0 |
 | public 단위 테스트 | `jest store-public-tablet-screen` | ✅ **6/6 pass** (`resolveTemplateKey('product_focus') → 'product_focus'` 포함) |
 
 ### 7-1. 참고: 로컬 baseline 조치(코드/커밋 변경 없음)
@@ -117,7 +116,7 @@ const SET_TEMPLATE_KEYS_ALLOWED = ['corner_information_basic_v1', 'product_focus
 
 **Current verified scope:**
 - Code implemented (whitelist + editor option + kiosk-core renderer branch)
-- CI/build passed (web-kpa-society `tsc && vite build`, api-server build-scope tsc, cosmetics/glyco tsc)
+- CI/build passed
 - Unit tests passed (public tablet screen 6/6, incl. `product_focus`)
 - Production deploy succeeded (`o4o-core-api-02538-6vr`, web services)
 - API health passed (`/api/v1/auth/status` 200)

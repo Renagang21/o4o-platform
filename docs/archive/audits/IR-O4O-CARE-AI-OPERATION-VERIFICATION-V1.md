@@ -12,7 +12,7 @@
 |---|----------|------|------|
 | 1 | AI Provider 연결 | **PASS** | GEMINI_API_KEY 설정 완료, status=ready |
 | 2 | AI 운영 상태 (ops/summary) | PENDING | 인증 필요 — 관리자 로그인 후 확인 |
-| 3 | Care AI 실제 생성 | PENDING | 인증 필요 — GlycoPharm에서 환자 분석 실행 필요 |
+| 3 | Care AI 실제 생성 | PENDING | — |
 | 4 | DB 상태 | PENDING | AI 실행 후 확인 가능 |
 | 5 | 운영 API (ops/care-status) | PENDING | 인증 필요 |
 | 6 | Retry 동작 | **PASS** (코드 분석) | 정상 구현 확인 |
@@ -113,8 +113,6 @@ Admin API는 `authenticate` + `requireAdmin` 미들웨어로 보호됨.
 
 테스트 계정(`admin@test.com`)은 프로덕션에 존재하지 않음 — **정상** (프로덕션 보안).
 
-**검증 방법**: 관리자 계정으로 GlycoPharm 또는 Neture 웹에 로그인 후 브라우저 DevTools에서 직접 확인.
-
 ---
 
 ## 코드 경로 분석: Care AI 실행 흐름
@@ -180,40 +178,6 @@ generateAndCache() 진입
 ---
 
 ## UI 확인 (코드 분석)
-
-### GlycoPharm AnalysisTab
-
-**파일**: `services/web-glycopharm/src/pages/care/patient-tabs/AnalysisTab.tsx`
-
-| 항목 | 구현 | 판정 |
-|------|------|------|
-| API 호출 | `GET /api/v1/care/llm-insight/{patientId}` | **PASS** |
-| 표시 필드 | `pharmacyInsight` | **PASS** |
-| Null 처리 | `{llmInsight?.pharmacyInsight && (...)}` — 없으면 숨김 | **PASS** |
-| 로딩 상태 | Spinner (Loader2 icon) | **PASS** |
-| 모델/시각 표시 | model + createdAt 표시 | **PASS** |
-
-### GlycoPharm CoachingTab
-
-**파일**: `services/web-glycopharm/src/pages/care/patient-tabs/CoachingTab.tsx`
-
-| 항목 | 구현 | 판정 |
-|------|------|------|
-| API 호출 | `GET /api/v1/care/coaching-drafts/{patientId}` | **PASS** |
-| 표시 필드 | `draftMessage` | **PASS** |
-| Null 처리 | `{draft && (...)}` — 없으면 숨김 | **PASS** |
-| 승인/거절 | Approve + Discard 버튼 | **PASS** |
-| 편집 가능 | 약사가 draftMessage 수정 가능 | **PASS** |
-
-### GlycoPharm HomeLivePage
-
-**파일**: `services/web-glycopharm/src/pages/HomeLivePage.tsx`
-
-| 항목 | 구현 | 판정 |
-|------|------|------|
-| API 호출 | `GET /api/v1/care/llm-insight/{topPriorityPatientId}` | **PASS** |
-| 표시 필드 | `pharmacyInsight` (우선순위 1위 환자) | **PASS** |
-| Null 처리 | `{aiInsight?.pharmacyInsight && todayPriority.length > 0 && (...)}` | **PASS** |
 
 ### GlucoseView CareDashboardPage
 
@@ -300,12 +264,6 @@ generateAndCache() 진입
 
 대표님이 직접 확인해야 할 항목:
 
-### Step 1: GlycoPharm 로그인
-```
-https://glycopharm.co.kr (또는 glycopharm.neture.co.kr)
-→ 약사 계정으로 로그인
-```
-
 ### Step 2: 환자 분석 실행
 ```
 Care 메뉴 → 환자 선택 → Analysis Tab
@@ -345,4 +303,3 @@ https://glucoseview.co.kr
 *Generated: 2026-03-09*
 *Updated: 2026-03-09T01:56Z (GEMINI_API_KEY 등록 + 재배포 완료)*
 *Status: READY — 첫 AI 실행 대기*
-*Next Action: GlycoPharm에서 환자 분석 실행 → AI 생성 확인*

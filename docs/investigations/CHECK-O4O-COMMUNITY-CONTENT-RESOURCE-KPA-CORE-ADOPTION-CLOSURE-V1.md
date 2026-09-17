@@ -14,7 +14,7 @@
 | 항목 | 상태 |
 |---|---|
 | 공통 Core (`content-resource-core.ts` 706줄) | 완료 |
-| GP / K-Cosmetics adoption (557→101 × 2) | 완료 |
+| K-Cosmetics adoption (557→101 × 2) | 완료 |
 | table isolation 스펙 19 tests | 완료 |
 | KPA config (`kpa-content-resource.config.ts` 110줄) | 작성 완료 · **미배선** |
 | **KPA 6 handler adoption** | **미완료** |
@@ -31,7 +31,7 @@ response DTO · audit · KPA 전용 field mapping 기준으로 재확인했다.
 | G1 | `GET /contents` | 가시성 규칙 동일, KPA 는 `content_type` 필터 + ContentMeta enrichment + `status=all` → config 3종으로 재현 가능 | **Core** |
 | G5 | `DELETE /contents/:id` | owner-or-operator 403 · soft delete · `CONTENT_DELETED` audit — Core 와 동일 | **Core** |
 | G6 | `POST /contents/:id/view` | `view_count + 1` 단일 UPDATE — 완전 동일 | **Core** |
-| G11 | `GET /operator/resources` | `sub_type='resource'` + source_type/status/usage_type 필터 + search — 동일. **select 컬럼만 GP/KCos 와 달라** config 정정(§6) | **Core** |
+| G11 | `GET /operator/resources` | `sub_type='resource'` + source_type/status/usage_type 필터 + search — 동일. **select 컬럼만 KCos 와 달라** config 정정(§6) | **Core** |
 | G13 | `PATCH /operator/resources/:id/status` | status 검증 · 404 · `RESOURCE_STATUS_CHANGED` + `{title, from, to}` audit — Core 와 동일 | **Core** |
 | G14 | `DELETE /operator/resources/:id` | soft delete · `RESOURCE_DELETED` audit — 동일 | **Core** |
 
@@ -70,7 +70,7 @@ Core 의 `detail` 은 `SELECT * WHERE id AND is_deleted=false` 뿐이라 옮기�
 | `POST /contents` · `PATCH /contents/:id` | DATA_MODEL_DIFFERENT (`content_type` NOT NULL) | KPA 유지 |
 | `POST /contents/:id/recommend` | UNIQUE | KPA 유지 |
 | `POST /contents/:id/ai/{summarize,extract,tag}` | UNIQUE | KPA 유지 |
-| `POST /operator/resources` (G12) | GP/KCos 전용 | **KPA 로 확산시키지 않음** (테스트 고정) |
+| `POST /operator/resources` (G12) | KCos 전용 | **KPA 로 확산시키지 않음** (테스트 고정) |
 
 ## 5. `status=all` 보존
 
@@ -98,15 +98,15 @@ Core 는 이 분기를 알지 못한다 — `resolveKpaListVisibility` 훅에만
 | 운영자 상태 변경 | `RESOURCE_STATUS_CHANGED` | `kpa_content` | `{ title, from, to }` |
 | 운영자 삭제 | `RESOURCE_DELETED` | `kpa_content` | `{ title }` |
 
-GP/KCos 는 audit 미주입 → 호출 0(기존과 동일).
+KCos 는 audit 미주입 → 호출 0(기존과 동일).
 
 ### 6-1. 배선 중 정정한 계약 1건
 
-KPA 운영자 목록의 select 컬럼이 GP/KCos 와 다르다는 것을 배선 직전 재확인에서 발견했다.
+KPA 운영자 목록의 select 컬럼이 KCos 와 다르다는 것을 배선 직전 재확인에서 발견했다.
 
 ```text
 원본 KPA : ... c.view_count, c.like_count, c.created_at, c.updated_at   (reusable_policy 없음)
-초기 config: ... c.like_count, c.view_count, c.reusable_policy, ...      (GP/KCos 기준)
+초기 config: ... c.like_count, c.view_count, c.reusable_policy, ... (KCos 기준)
 ```
 
 그대로 뒀다면 **운영자 목록 응답에 `reusable_policy` 가 새로 붙는 DTO 변경**이 됐다.
@@ -117,7 +117,7 @@ KPA 운영자 목록의 select 컬럼이 GP/KCos 와 다르다는 것을 배선 
 | 검증 | 결과 |
 |---|:--:|
 | KPA Core handler 6종이 `kpa_contents` 만 접근 | PASS |
-| `glycopharm_contents` / `cosmetics_contents` 접근 0 | PASS |
+| `cosmetics_contents` 접근 0 | PASS |
 | tableName 명시 주입 (기본값 없음) | PASS |
 | 위험 식별자 reject | PASS |
 | 사용자 입력으로 table 선택 불가 | PASS |
@@ -145,7 +145,6 @@ KPA 콘텐츠/자료실 인라인 handler 본체 **약 290줄 → 약 40줄**(�
 ### 9-1. 축 전체 누적 (선행 WO 포함)
 
 ```text
-GP  resources.controller.ts    557 → 101
 KCos resources.controller.ts   557 → 101
 KPA  인라인 handler            약 290 → 약 40   (detail/create/update/추천/AI 는 별도 유지)
 ────────────────────────────────────────────
@@ -154,15 +153,14 @@ KPA  인라인 handler            약 290 → 약 40   (detail/create/update/추
 구현체 수                      3벌 → 1벌
 ```
 
-## 10. GP/KCos 회귀
+## 10. KCos 회귀
 
-이번 WO 에서 **GP/KCos 코드는 건드리지 않았다** (`git diff` 대상 파일 2개 = `kpa.routes.ts`, KPA config).
-기존 Core 스펙 19 tests 가 GP/KCos config 로 계속 통과함을 재실행으로 확인했다.
+이번 WO 에서 **KCos 코드는 건드리지 않았다** (`git diff` 대상 파일 2개 = `kpa.routes.ts`, KPA config).
+기존 Core 스펙 19 tests 가 KCos config 로 계속 통과함을 재실행으로 확인했다.
 
 ## 11. Core 소비 서비스 수
 
 ```text
-content-resource-core 소비: 3 서비스 (GlycoPharm · K-Cosmetics · KPA-Society)
 미배선 KPA config: 0
 half-wired reference: 0  (kpaContentCore 참조 7 = 선언 1 + 사용 6)
 ```
@@ -200,7 +198,7 @@ KPA 필드 매핑 4종 · ContentMeta enrichment · KPA table isolation.
 
 1. **KPA detail 을 이후에 Core 로 옮기면 안 된다** — draft/private 접근 회귀. 테스트로 막아 뒀으나
    테스트를 함께 지우면 방어가 사라진다.
-2. **전체 빌드 미검증 누적** — 이 브랜치에 포럼 소유자 영역·GP/KCos Core·KPA adoption 이 쌓였는데
+2. **전체 빌드 미검증 누적** — 이 브랜치에 포럼 소유자 영역·KCos Core·KPA adoption 이 쌓였는데
    전체 typecheck/jest 를 한 번도 완주하지 못했다. **main 통합 전 CI 또는 여유 환경에서 1회 전체 검증 필요.**
 3. **런타임 미검증** — 정적/단위 검증만 했다. 배포 전 KPA 목록(`status=all` 포함)·자료실·운영자 목록·
    삭제·조회수의 실제 응답 비교 권장.
@@ -214,7 +212,7 @@ KPA 필드 매핑 4종 · ContentMeta enrichment · KPA table isolation.
 
 | 선행 WO 완료 기준 (§10) | 상태 |
 |---|:--:|
-| GP/KCos 동일 handler 본체 중복 → 0 에 가깝게 | 달성 (557×2 → 101×2) |
+| KCos 동일 handler 본체 중복 → 0 에 가깝게 | 달성 (557×2 → 101×2) |
 | KPA `IDENTICAL/PARAMETERIZABLE` handler → Core 채택 | **달성 (6/6)** |
 | `POLICY_DIFFERENT / DATA_MODEL_DIFFERENT / UNIQUE` → 근거 있는 service extension | 달성 (§3·§4) |
 | 미배선 KPA config 0 · half-wired 0 | 달성 |

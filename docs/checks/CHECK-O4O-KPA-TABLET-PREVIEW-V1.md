@@ -43,7 +43,7 @@
 | 12.5 상담 요청 차단 | ✅ previewApi.submitInterest 가 throw → 실제 요청 미생성. (local 제품은 상담 버튼 미표시 — supplier 제품 부재로 버튼 자체 미노출) |
 | 12.6 자동 넘김 + 닫기 cleanup | ✅ autoSlide 5초 → 강조 카드 **B → A 순환**(6초 후 재확인). 닫기 시 모달 unmount → kiosk useEffect cleanup 으로 timer 정리 |
 | 12.8 기존 기능 회귀 | ✅ |
-| 12.9 GP/KCos 비영향 | ✅ kiosk-core `slug?` 는 opt-in(미지정 시 useParams) — KCos tsc 0, 미주입 무변화 |
+| 12.9 KCos 비영향 | ✅ kiosk-core `slug?` 는 opt-in(미지정 시 useParams) — KCos tsc 0, 미주입 무변화 |
 | 12.10 온라인 판매 비영향 | ✅ (git diff) |
 
 - tsc: `web-kpa-society` / `web-k-cosmetics` error 0. 검증 후 SMOKE 데이터(제품 2건·진열·설정) 정리.
@@ -64,4 +64,4 @@
 
 ## 결론
 
-`타블렛 구성` 화면에 **고객 화면 미리보기 모달**을 추가 — 공유 kiosk-core 를 opt-in `slug` prop 으로 재사용하고, 미리보기 전용 api 로 공개 데이터 조회 + 상담 POST 차단. 저장된 전시 설정(가격/QR/자동 넘김) 반영. 초기 Router 중첩 크래시는 slug prop 도입으로 해소. 브라우저 smoke 전 항목 PASS, GP/KCos·온라인 판매·API/DB 무변경, tsc(KPA/KCos) 통과.
+`타블렛 구성` 화면에 **고객 화면 미리보기 모달**을 추가 — 공유 kiosk-core 를 opt-in `slug` prop 으로 재사용하고, 미리보기 전용 api 로 공개 데이터 조회 + 상담 POST 차단. 저장된 전시 설정(가격/QR/자동 넘김) 반영. 초기 Router 중첩 크래시는 slug prop 도입으로 해소. 브라우저 smoke 전 항목 PASS, KCos·온라인 판매·API/DB 무변경, tsc(KPA/KCos) 통과.

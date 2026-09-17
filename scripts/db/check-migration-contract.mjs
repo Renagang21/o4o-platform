@@ -254,7 +254,7 @@ if (!metaCensusObj || JSON.stringify(census) !== JSON.stringify(metaCensusObj)) 
 const statementCount = (stmtBody.match(/^\s*`/gm) || []).length;
 if (statementCount !== census.total) fail('C13', `snapshot has ${statementCount} statements, census says ${census.total}`);
 const retired = [
-  /\buser_roles\b/, /\borganization_units\b/, /\borganization_roles\b/, /\bglycopharm_/,
+  /\buser_roles\b/, /\borganization_units\b/, /\borganization_roles\b/,
   /\bcms_acf_/, /\bcms_cpt_/, /\bcms_menus\b/, /\bcms_menu_items\b/, /\bcms_menu_locations\b/, /\bcms_settings\b/,
   /\bcms_templates\b/, /\bcms_template_parts\b/, /\bcms_views\b/, /\bcms_pages\b/, /\bcms_fields\b/,
   /\bcustom_fields\b/, /\bcustom_media\b/, /\bcustom_post_types\b/, /\bcustom_posts\b/,

@@ -64,7 +64,7 @@ enum UserRole {
 
 ### 1-4. 서비스별 접두 역할
 
-`kpa:`, `neture:`, `glycopharm:`, `glucoseview:`, `cosmetics:` + `:admin` / `:operator`.
+`kpa:`, `neture:`, `glucoseview:`, `cosmetics:` + `:admin` / `:operator`.
 `organization_members.role` ∈ {owner, admin, member} 은 **별도 Layer(B)** 이며 RBAC 역할이 아니다.
 
 ### 1-5. 프런트가 실제로 선언하는 값 (route 파일 14개 전수)

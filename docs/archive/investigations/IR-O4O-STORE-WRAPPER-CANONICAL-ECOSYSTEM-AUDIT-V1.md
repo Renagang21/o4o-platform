@@ -222,10 +222,9 @@ assetColumns 패턴이 이미 같은 monorepo 내 모범 — 정비 비용 낮�
 index.ts L9-12 주석:
 > "본 패키지는 다음 3개의 서비스 웹앱에서 동일하게 사용된다(다음 Phase):
 > - services/web-kpa-society
-> - services/web-glycopharm
 > - services/web-k-cosmetics"
 
-현재 KPA 만 라우팅 (`/store/my-products`). 후속 Phase 에서 GlycoPharm + K-Cosmetics 라우팅 시 별도 audit 권장 (3개 서비스 정합성).
+현재 KPA 만 라우팅 (`/store/my-products`). 후속 Phase 에서 K-Cosmetics 라우팅 시 별도 audit 권장 (2개 서비스 정합성).
 
 ---
 
@@ -332,7 +331,7 @@ index.ts L9-12 주석:
 |---|---|---|
 | 1 | **다른 세션 store-asset-policy-core build break** | `tsc --noEmit` 17개 TS 에러 (모두 해당 패키지). `@o4o/ui` 모듈 not found (pnpm install 미수행 가능성) + implicit any. 그 세션이 곧 해소할 것으로 보임 — 본 IR 단계 침범 금지 |
 | 2 | **ContentHubTemplate KPA override 없음 검증 완료** | `renderItems` grep 0건 → KPA `/store-hub/content` 사용자도 raw `<table>` 노출 중. 정비 영향 KPA 포함 |
-| 3 | **store-products-ui 후속 Phase 라우팅** | 3개 서비스 (KPA/GlycoPharm/K-Cosmetics) 동일 적용 시점에 별도 audit 권장 |
+| 3 | **store-products-ui 후속 Phase 라우팅** | 3개 서비스 동일 적용 시점에 별도 audit 권장 |
 | 4 | **ContentHubTemplate bulk copy 정책 결정 사항** | 정책상 single-item 의도이나 향후 가치 검토. 패키지 내 모범 사례 (Resources/Lms) 적용 가능 |
 | 5 | **shared-space-ui 내부 패턴 일관성 문서화 가치** | TRUE-CANONICAL (Resources/Lms) vs single-action (Content/Forum/Store/Signage Hub) 혼재 — 정책상 의도. 패턴 선택 기준 문서화 권장 |
 | 6 | **SignageManagerTemplate 사용처 확인 후속 진행** | 선행 IR §10-3 항목 — store 측 (StoreSignagePage, HubSignageLibraryPage) 미사용 직접 확인됨 (이전 검증). operator/manager 사용처 별도 식별 권장 |
@@ -342,7 +341,7 @@ index.ts L9-12 주석:
 
 ## 13. 본 IR 범위 외 (후속)
 
-- GlycoPharm / K-Cosmetics 의 wrapper 사용 패턴 (multi-service 영향)
+- K-Cosmetics 의 wrapper 사용 패턴 (multi-service 영향)
 - `SignageHubTemplate` 내부 직접 검증 (선행 IR + 본 IR 모두 미수행)
 - `SignageManagerTemplate` 사용처 정확 식별 (store 측 미사용 확인됨, operator 측 미확인)
 - ContentHubTemplate bulk copy 정책 결정

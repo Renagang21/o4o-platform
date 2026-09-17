@@ -75,7 +75,6 @@ Supplier → Product → Store → Order
 | ProductMaster (Dropshipping) | `dropshipping_product_masters` | public | VARCHAR(100) | ❌ | Generic S2S |
 | PharmaProductMaster | `pharma_product_masters` | public | VARCHAR(100) | ❌ | 의약품 전용 |
 | CosmeticsProduct | `cosmetics_products` | cosmetics | JSONB array | ❌ | 화장품 |
-| GlycopharmProduct | `glycopharm_products` | public | JSONB array | ❌ | 혈당측정기기 |
 | NetureProduct (legacy) | `neture_products` | neture | JSONB array | ❌ | 레거시 |
 | StoreLocalProduct | `store_local_products` | public | **없음** | - | 매장 진열용 (비커머스) |
 
@@ -172,7 +171,6 @@ DB UNIQUE 제약 + 앱 레벨 조회-후-생성 패턴으로
 | Dropshipping Core | ❌ |
 | Pharmaceutical Core | ❌ |
 | Cosmetics | ❌ (JSONB array) |
-| Glycopharm | ❌ (JSONB array) |
 
 ```
 평가: ⚠️ PARTIAL
@@ -519,7 +517,6 @@ GIN 인덱스로 검색 성능 보장.
 | ProductApproval 유형 | ProductApprovalType | `service`, `private` |
 | Neture Legacy | NetureProductStatus | `draft`, `visible`, `hidden`, `sold_out` |
 | Cosmetics | CosmeticsProductStatus | `draft`, `visible`, `hidden`, `sold_out` |
-| Glycopharm | GlycopharmProductStatus | `draft`, `active`, `inactive`, `discontinued` |
 
 ### 9.2 평가
 
@@ -672,11 +669,10 @@ UNIQUE 제약이 없다. 현재 이 도메인들이 비활성 상태이므로
 Neture Core ProductMaster로 통합.
 ```
 
-#### Risk 3: Cosmetics/Glycopharm barcode JSONB 배열
+#### Risk 3: Cosmetics barcode JSONB 배열
 
 ```
 위험도: LOW
-대상: cosmetics_products.barcodes, glycopharm_products.barcodes
 
 barcode가 JSONB 배열로 저장되어 UNIQUE 제약 적용이 불가.
 이 도메인들은 독립 스키마에서 운영되므로

@@ -26,7 +26,7 @@
 |---|---|
 | `e20292818` | 커뮤니티 콘텐츠·자료실 backend canonicalization 감사 (IR) |
 | `3acf0b76a` | 콘텐츠·자료실 backend Core 추출 + table isolation 테스트 |
-| `a99a6a1fc` | GP / K-Cosmetics resources controller 를 공통 Core 로 수렴 |
+| `a99a6a1fc` | K-Cosmetics resources controller 를 공통 Core 로 수렴 |
 | `0a7d337b3` | backend Core 공통화 부분 완료 기록 (CHECK) |
 | `5a03bcd96` | KPA 콘텐츠·자료실 6 handler 공통 Core 채택 |
 | `1ee3f9adf` | KPA Core adoption 마감 기록 (CHECK) |
@@ -64,7 +64,7 @@
 
 ### 3-3. 5개 서비스 전체 검증 — PASS
 
-`web-kpa-society` · `web-glycopharm` · `web-k-cosmetics` · `web-neture` · `web-neture-operator`
+`web-kpa-society` · `web-k-cosmetics` · `web-neture` · `web-neture-operator`
 → **typecheck EXIT=0 / production build EXIT=0 (5/5)**
 
 ### 3-4. 기능 회귀 검증 (코드 레벨 등가성)
@@ -74,11 +74,10 @@
 | 대상 | 방법 | 결과 |
 |---|---|---|
 | KPA 콘텐츠·자료실 route surface | merge-base vs HEAD `diff` | **IDENTICAL (11 routes)** |
-| GP `resources.controller.ts` | 557L → 101L, config 주입만 남김 | router wiring 6개 (`GET /`, `POST /`, `GET /:id`, `PATCH /:id`, `DELETE /:id`, `POST /:id/view`) **완전 보존** |
+ `resources.controller.ts` | 557L → 101L, config 주입만 남김 | router wiring 6개 (`GET /`, `POST /`, `GET:id`, `PATCH:id`, `DELETE:id`, `POST:id/view`) **완전 보존** |
 | K-Cosmetics resources | 동일 factory 사용 | `/contents` · `/operator/resources` mount 유지 |
 | `neture` frontend `/api/v1` 소비 | 경로 literal 전수 비교 | **57 paths 동일** |
-| GlycoPharm `/api/v1/lms/certificates/` literal 소멸 | 추적 | **기능 손실 없음** — 하드코딩 `window.open()` 이 `CourseCertificateCard.tsx` 의 typed API client blob download 로 대체되어 공통 `CourseDetailView` 의 `renderSidebarExtra` slot 으로 주입. `api/lms.ts` 는 3개 엔드포인트 모두 보유 |
-| Express route ordering | `glycopharm.routes.ts:205-232` | `/categories/popular` 가 `/categories/:id` **앞에 등록** 확인 → param shadowing 없음 |
+| Express route ordering | — | `/categories/popular` 가 `/categories/:id` **앞에 등록** 확인 → param shadowing 없음 |
 
 ### 3-5. Browser smoke — 부분 수행
 
@@ -92,9 +91,9 @@
 | JS exception | **0** |
 | dead link | **0** |
 | mobile 가로 스크롤 | **hscroll=0 (전 화면)** |
-| LMS course detail → lesson player | K-Cosmetics · GlycoPharm 에서 실제 이동 확인 |
+| LMS course detail → lesson player | K-Cosmetics 에서 실제 이동 확인 |
 
-> 프로덕션 API 는 허용되지 않은 `Origin` 에 **HTTP 500** 을 반환한다(무 Origin=200 / `http://127.0.0.1:4203`=500 / `https://glycopharm.co.kr`=200). Playwright route interception 으로 프로덕션 Origin 을 사용해 우회한 뒤에야 실데이터 검증이 가능했다. 이는 브랜치와 무관한 **환경 제약**이다.
+> 프로덕션 API 는 허용되지 않은 `Origin` 에 **HTTP 500** 을 반환한다. Playwright route interception 으로 프로덕션 Origin 을 사용해 우회한 뒤에야 실데이터 검증이 가능했다. 이는 브랜치와 무관한 **환경 제약**이다.
 
 ---
 
@@ -114,13 +113,13 @@
 |---|---|
 | E1 | 프로덕션 API 가 비허용 `Origin` 에 500 응답 → localhost browser smoke 직접 불가 |
 | E2 | 브랜치 backend 미배포 → 신규 content-resource Core **런타임 smoke 불가** (unit test 120건으로만 커버) |
-| E3 | `/glycopharm/forum/categories/popular` 프로덕션 404 — main 에 해당 route 부재(미배포)이며 브랜치 결함 아님 |
+| E3 | — |
 | E4 | forum-owner 회원관리 화면 미실행 — 테스트 계정이 소유 forum 없음 |
 | E5 | KPA LMS course detail / lesson player 미실행 — 강의 0건 |
 
 ### OUT_OF_SCOPE — 1건
 
-- GlycoPharm `/community` 404: `path="community"` 는 admin layout 의 `CommunityManagementPage`, 공개 커뮤니티 메인은 index route `/` 의 `CommunityMainPage`. 검증자의 probe 경로 오류이며 결함 아님.
+- 검증자의 probe 경로 오류이며 결함 아님.
 
 ---
 
@@ -141,8 +140,7 @@
 
 **통합 가능**. 단 아래를 통합 후 조건으로 둔다.
 
-1. 배포 직후 GP / K-Cosmetics / KPA 의 콘텐츠·자료실 엔드포인트(`/contents`, `/operator/resources`, KPA 6 handler) 런타임 응답 확인 — **E2 해소**
-2. `/glycopharm/forum/categories/popular` 200 응답 확인 — **E3 해소**
+1. 배포 직후 K-Cosmetics / KPA 의 콘텐츠·자료실 엔드포인트(`/contents`, `/operator/resources`, KPA 6 handler) 런타임 응답 확인 — **E2 해소**
 3. forum 소유 계정 · KPA 강의 데이터 확보 후 E4 / E5 화면 smoke 보완
 
 ---

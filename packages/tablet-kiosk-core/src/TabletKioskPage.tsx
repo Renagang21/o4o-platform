@@ -604,7 +604,7 @@ export function TabletKioskPage({
   const isProductLayout = isProductFocus || isProductGrid; // 축약 헤더 + 하단 QR 배너
   // WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1:
   //   screen-set 소비자(KPA, qrGuide.url 있음)는 코너명 전용 헤더 밴드를 제거하고(제목은 코너 설명 섹션이 담당),
-  //   우상단 작은 '휴대전화로 보기' 버튼 → QR 모달로 단순화. legacy(GP/KCos, qrGuide 없음)는 기존 헤더 유지(무영향).
+  //   우상단 작은 '휴대전화로 보기' 버튼 → QR 모달로 단순화. legacy(KCos, qrGuide 없음)는 기존 헤더 유지(무영향).
   //   idle_touch 는 상단 hero 에 QR chip 이 이미 있어 별도 버튼 없이 헤더만 숨긴다.
   // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1:
   //   코너 QR 은 qr_guide block 이 있어야만 보이던 제약을 없앤다. 서버가 top-level 로 내려주는 Screen Set QR
@@ -982,7 +982,7 @@ export function TabletKioskPage({
             제목/설명을 좌우 1행(space-between)에서 세로 스택으로 변경 → 제목이 좁은 폭에 눌려
             글자 단위로 세로로 깨지던 문제 해소. 제목 wordBreak:keep-all(한글 단어 보존),
             설명은 별도 문단으로 줄폭/줄간격 확보. clamp() 로 화면 폭 대응. */}
-      {/* WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: 코너명 전용 헤더 밴드는 legacy(GP/KCos)에서만.
+      {/* WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: 코너명 전용 헤더 밴드는 legacy(KCos)에서만.
           KPA(screen-set)는 코너 설명 섹션이 제목을 담고, QR 은 우상단 작은 버튼 → 모달. */}
       {!hideHeaderBand && (
       <div style={isProductLayout ? styles.headerCompact : styles.header}>

@@ -39,7 +39,7 @@
 | Frontend filter | ❌ `kpaMemberToUserData` / `capabilitiesColumn` 모두 raw role 그대로 전달 + sort 만 |
 | CAPABILITY_LABELS 커버리지 | 5/8 — `kpa:store_owner` / `kpa:operator` / `kpa:admin` / `lms:instructor` / `platform:super_admin` (supplier / pharmacy 등 미등록 role 은 raw 표시) |
 | supplier role 부여 | 정상 — `OperatorRegistrationService.approveRegistration` (Neture supplier 승인 시 unprefixed) |
-| pharmacy role 부여 | 정상 — `MembershipApprovalService.approveMembership` (GP membership.role 그대로 INSERT) |
+| pharmacy role 부여 | — |
 | lms:instructor 부여 | 2 경로: (1) 명시 승인 `instructor.service.ts:255`, (2) **migration 자동 변환** `20260700200000-MigrateLmsCreatorQualification` (사용자 신청 없이도 가능) |
 | renagang21 의 roles | `["lms:instructor", "pharmacy", "supplier"]` (이전 IR login response 검증) — 3 종 모두 cross-service leak 으로 KPA 화면 표시 |
 
@@ -53,7 +53,7 @@
 | [services/web-kpa-society/src/pages/operator/MemberManagementPage.tsx](services/web-kpa-society/src/pages/operator/MemberManagementPage.tsx#L108-L135) | 108-135 | CAPABILITY_LABELS / sortCapabilities / formatCapabilityLabel |
 | [services/web-kpa-society/src/pages/operator/MemberManagementPage.tsx](services/web-kpa-society/src/pages/operator/MemberManagementPage.tsx#L149-L171) | 149-171 | `kpaMemberToUserData` (filter 없이 capabilities 그대로) |
 | [apps/api-server/src/modules/neture/services/operator-registration.service.ts](apps/api-server/src/modules/neture/services/operator-registration.service.ts) | 85-142 | Neture supplier 승인 → role_assignments 에 **unprefixed `supplier`** INSERT |
-| [apps/api-server/src/services/approval/MembershipApprovalService.ts](apps/api-server/src/services/approval/MembershipApprovalService.ts) | 173-182 | GP/일반 membership 승인 → membership.role 값 그대로 role_assignments INSERT (예: `pharmacy`) |
+| [apps/api-server/src/services/approval/MembershipApprovalService.ts](apps/api-server/src/services/approval/MembershipApprovalService.ts) | 173-182 | 일반 membership 승인 → membership.role 값 그대로 role_assignments INSERT (예: `pharmacy`) |
 | [apps/api-server/src/routes/kpa/services/instructor.service.ts](apps/api-server/src/routes/kpa/services/instructor.service.ts#L255) | 255 | 분회 admin 명시 승인 시 `lms:instructor` 부여 |
 | [apps/api-server/src/database/migrations/20260700200000-MigrateLmsCreatorQualification.ts](apps/api-server/src/database/migrations/20260700200000-MigrateLmsCreatorQualification.ts#L89-L106) | 89-106 | **레거시 자격 자동 변환 — `member_qualifications.status='approved'` 인 경우 자동 부여** |
 
@@ -66,10 +66,10 @@
 | **Q1.** "추가 권한" 컬럼 데이터 | `KpaMemberRaw.capabilities` (string[]) → frontend `KpaUserData.capabilities` → `capabilitiesColumn.render` 에서 chip 으로 표시 |
 | **Q2.** role_assignments 전체 vs KPA 필터링 | **전체 표시** — backend SQL 의 prefix 필터 없음 (`is_active = true` 만) |
 | **Q3.** supplier 역할 | Neture 전용 — `OperatorRegistrationService.approveRegistration` 이 **unprefixed `supplier`** 로 INSERT (의도적 — ADMIN_ROLES 만 prefix 적용) |
-| **Q4.** pharmacy 역할 | GP membership role 의 직접 mirror — `MembershipApprovalService` 가 membership.role(='pharmacy') 그대로 INSERT (legacy unprefixed). 단 kpa pharmacy_owner 승인은 `kpa:store_owner` (prefixed) 별도 |
+| **Q4.** pharmacy 역할 membership role 의 직접 mirror — `MembershipApprovalService` 가 membership.role(='pharmacy') 그대로 INSERT (legacy unprefixed). 단 kpa pharmacy_owner 승인은 `kpa:store_owner` (prefixed) 별도 |
 | **Q5.** 강사 역할 | `lms:instructor` (prefixed) |
 | **Q6.** lms:instructor 자동 부여 코드 | **있음** — `20260700200000-MigrateLmsCreatorQualification` 이 `member_qualifications.qualification_type IN ('instructor','content_provider','survey_operator') AND status='approved'` 인 경우 자동 부여 |
-| **Q7.** 모든 서비스 또는 가입 흐름에서 자동 부여 | ❌ 가입 흐름에서는 자동 부여 없음 (auth-register / KPA / GP / K-Cos / Neture 가입 모두). **단 migration 의 backfill 자동 부여 + 분회 admin 의 명시 승인** 2 경로 |
+| **Q7.** 모든 서비스 또는 가입 흐름에서 자동 부여 | ❌ 가입 흐름에서는 자동 부여 없음 (auth-register / KPA / K-Cos / Neture 가입 모두). **단 migration 의 backfill 자동 부여 + 분회 admin 의 명시 승인** 2 경로 |
 | **Q8.** KPA 회원관리에서 타서비스 role 표시 정책 | 현재 의도된 정책 부재 (코드만 보면 사이드 이펙트). 운영자 mental model 상 KPA 권한만 표시가 자연스러움 (운영 혼선 회피) |
 
 ---
@@ -82,7 +82,6 @@
 {
   "roles": ["lms:instructor", "pharmacy", "supplier"],
   "memberships": [
-    { "serviceKey": "glycopharm", "status": "active", "role": "pharmacy" },
     { "serviceKey": "neture", "status": "active", "role": "supplier" }
   ]
 }
@@ -90,7 +89,7 @@
 
 | role | 출처 | KPA 관련성 | 표시 정합 |
 |---|---|:---:|:---:|
-| `pharmacy` | GP membership active (membership.role 그대로 INSERT) | ❌ | leak (KPA 화면에 노출 부적합) |
+| `pharmacy` membership active (membership.role 그대로 INSERT) | ❌ | leak (KPA 화면에 노출 부적합) |
 | `supplier` | Neture supplier 승인 (unprefixed) | ❌ | leak |
 | `lms:instructor` | (1) 명시 승인 또는 (2) migration 자동 변환 | ❌ (LMS 권한) | leak |
 
@@ -107,7 +106,7 @@
 | role | 잘못 부여? | 근거 |
 |---|:---:|---|
 | `supplier` | ❌ | Neture supplier 승인 product (정상) |
-| `pharmacy` | ❌ | GP membership 'pharmacy' 의 정상 mirror (단 legacy unprefixed 정책 — 별건 cleanup 후보) |
+| `pharmacy` | ❌ membership 'pharmacy' 의 정상 mirror (단 legacy unprefixed 정책 — 별건 cleanup 후보) |
 | `lms:instructor` | ⚠️ **확정 불가** | 정상 (명시 승인) 또는 비정상 (migration 자동) 둘 중 하나 — `member_qualifications` 직접 조회 필요 |
 
 ### 6.2 표시 문제 (cross-service leak)?
@@ -227,7 +226,7 @@ WO-O4O-MEMBER-ROLE-BADGE-SERVICE-GROUPING-V1
 | KPA operator 의 권한 안내 | 운영자가 KPA scope 외 정보로 혼선 | **충돌** (운영 명확성) |
 | 신청 없는 권한 자동 부여 | instructor migration 자동 부여 시나리오 | **약함** (권한 최소화 원칙) |
 | 서비스별 회원관리 표시 정책 부재 | 4 service 모두 동일 가능성 (별건 audit 필요) | 약함 |
-| GP / Neture / K-Cos 회원관리 — 같은 leak 가능성 | 본 IR 범위 외 — `OperatorMembersConsolePage` 의 default columns 에는 capabilities 미포함 → KPA 만 노출 위험 | 없음 (현재 KPA 만 capabilities 컬럼 보유) |
+| Neture / K-Cos 회원관리 — 같은 leak 가능성 | 본 IR 범위 외 — `OperatorMembersConsolePage` 의 default columns 에는 capabilities 미포함 → KPA 만 노출 위험 | 없음 (현재 KPA 만 capabilities 컬럼 보유) |
 
 ### 판정: **명확한 충돌 2건** (서비스 분리 / 운영 명확성) + 약한 충돌 1건 (권한 최소화)
 
@@ -243,7 +242,7 @@ WO-O4O-MEMBER-ROLE-BADGE-SERVICE-GROUPING-V1
 
 - renagang21 의 lms:instructor 부여 경로 (Priority 2 — DB SELECT 1회 필요)
 - 정책 결정 (A vs C — Priority 1 으로 A 우선)
-- 다른 service 의 회원관리 화면 leak 가능성 (현재 GP/K-Cos/Neture wrapper 는 capabilities 컬럼 미보유로 leak 가능성 낮음, 단 별건 audit 가치)
+- 다른 service 의 회원관리 화면 leak 가능성 (현재 K-Cos/Neture wrapper 는 capabilities 컬럼 미보유로 leak 가능성 낮음, 단 별건 audit 가치)
 - legacy unprefixed role 정책 (Priority 4 — 별건)
 - Priority 1-5 의 실제 실행 시점
 

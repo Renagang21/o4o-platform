@@ -19,7 +19,7 @@ KPA 하단 안내 = **연속 4블록**:
 | 1 | `cta` | KPA-Society 활용이 처음이신가요? | "서비스 구조와 **기능별 이용 방법**을 가이드에서 확인하세요" / `이용 가이드 보기 →` | **`/guide/usage`** |
 | 2 | `help.usageItems` | KPA-Society 이용 가이드 | O4O 개요 / **서비스 활용 방법** / **기능별 이용 방법** 3카드 | `/guide/intro` · **`/guide/usage`** · `/guide/features` |
 | 3 | `valueGuideSlot` 상단 | 내 역할에 따른 활용 방법 | 매장 경영자 / 서비스 운영자 / 커뮤니티 참여자 3카드 | `/guide/for/{store-owner,operator,member}` |
-| 4 | `valueGuideSlot` 하단 | 다른 서비스 소개 | GlycoPharm / K-Cosmetics 2카드 | 서비스별 외부 링크 |
+| 4 | `valueGuideSlot` 하단 | 다른 서비스 소개 | K-Cosmetics 2카드 | 서비스별 외부 링크 |
 
 로그인 전후 노출 조건은 4블록 모두 **동일**(조건 분기 없음). 수정 전 Home 문서 높이 **2809px**(데스크톱 1440).
 
@@ -79,7 +79,7 @@ Hero(체험 계정 안내 포함) → 공지 / 약사공론 → 최신글 → �
 
 ## 5. 공용 컴포넌트 변경 여부
 
-**변경 0.** `StandardHomeTemplate` · `O4OHelpSection` · `AppEntrySection` · `CtaGuidanceSection` 전부 무수정 → GlycoPharm · K-Cosmetics · Neture **무영향**.
+**변경 0.** `StandardHomeTemplate` · `O4OHelpSection` · `AppEntrySection` · `CtaGuidanceSection` 전부 무수정 → K-Cosmetics · Neture **무영향**.
 
 > **중지 조건 관련 기록:** `StandardHomeTemplate` 의 `cta` 는 **required prop** 이라, CTA 블록 자체를 없애려면 공용 템플릿을 `cta?:` 로 바꿔야 한다. WO §11 "가능하면 공용 템플릿을 변경하지 않고 KPA props 에서 해결" 에 따라 **템플릿을 건드리지 않고** 중복 항목 제거로 처리했다. 블록 수 자체를 4→3 으로 줄이려면 공용 변경이 필요하므로 별도 판단 대상이다.
 

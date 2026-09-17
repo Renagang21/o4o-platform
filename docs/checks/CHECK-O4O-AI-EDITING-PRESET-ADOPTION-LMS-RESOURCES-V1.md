@@ -2,7 +2,7 @@
 
 > **작업명:** WO-O4O-AI-EDITING-PRESET-ADOPTION-LMS-RESOURCES-V1
 > **유형:** `EditingPreset` 표준 추가 적용 — library-entry preset 적용 + 기존 적용 surface 점검 (frontend-only)
-> **결과: PASS** — KPA/GP/KCos `StoreLibraryContentsPage` 의 generic AI 모달에 `findEditingPreset('library-entry')` preset(중립 tone/length, target-미고정) 적용. resources(KPA)·LMS lesson(KPA/GP) 기존 적용 무회귀 점검. `AiContentModal` 기존 prop 재사용(새 모달·새 prop 0). `ProductionTarget`/`ProductionTemplate` 무변경(store 경계 보존). backend/모델/DB·migration/package.json/Dockerfile 무변경. web-kpa-society·web-glycopharm·web-k-cosmetics typecheck 0.
+> **결과: PASS** — KPA/KCos `StoreLibraryContentsPage` 의 generic AI 모달에 `findEditingPreset('library-entry')` preset(중립 tone/length, target-미고정) 적용. resources(KPA)·LMS lesson(KPA) 기존 적용 무회귀 점검. `AiContentModal` 기존 prop 재사용(새 모달·새 prop 0). `ProductionTarget`/`ProductionTemplate` 무변경(store 경계 보존). backend/모델/DB·migration/package.json/Dockerfile 무변경.
 > **선행:** `WO-O4O-AI-PRODUCTION-TEMPLATE-SURFACE-PRESET-EXTEND-V1`(EditingPreset 도입)
 > **작성일:** 2026-06-14 · 기준 HEAD `d7eff68fb`
 
@@ -15,14 +15,13 @@
 ## 2. 선행 EditingPreset 도입 요약
 
 - `@o4o/types` `EditingPreset`/`EditingSurface` + `EDITING_PRESETS`(lms-lesson/resource/library-entry) + `findEditingPreset`. `ProductionTarget` 경계 보존.
-- 적용 완료: KPA resources(`resource`), KPA/GP LMS lesson(`lms-lesson`). **library-entry = 정의만(적용 보류).**
+- 적용 완료: KPA resources(`resource`), KPA LMS lesson(`lms-lesson`). **library-entry = 정의만(적용 보류).**
 
 ## 3. 변경 파일
 
 | 파일 | 변경 |
 |------|------|
 | `services/web-kpa-society/src/pages/pharmacy/StoreLibraryContentsPage.tsx` | `AiContentModal` 에 `findEditingPreset('library-entry')` preset 전달 |
-| `services/web-glycopharm/src/pages/store-management/StoreLibraryContentsPage.tsx` | 동일 |
 | `services/web-k-cosmetics/src/pages/store/StoreLibraryContentsPage.tsx` | 동일 |
 | `docs/checks/CHECK-...-V1.md` | 본 문서 |
 
@@ -41,7 +40,7 @@
 |---------|--------|--------|:--:|
 | resource | KPA ResourceWritePage | `resource` | 직전 WO 적용 — 무회귀(소스 미변경) |
 | lms-lesson | KPA CourseEditPage LessonModal | `lms-lesson` | 무회귀(소스 미변경) |
-| lms-lesson | GP InstructorCourseEditPage LessonModal | `lms-lesson` | 무회귀(소스 미변경) |
+| lms-lesson InstructorCourseEditPage LessonModal | `lms-lesson` | 무회귀(소스 미변경) |
 
 → 본 WO 는 위 3 surface 소스 미수정 → 기존 적용 그대로(typecheck 0 으로 무회귀 확인).
 
@@ -54,7 +53,7 @@
 
 - **CourseStructureAiModal:** 2단계 생성·고정 프롬프트·AiContentModal 비경유 → 별도 설계(후속 §9-1).
 - **Signage AI / admin builder:** 별도 파이프라인·도메인 상이(WO §4 제외).
-- **GP/KCos QR AI / KCos LMS editor:** surface 부재 — 신규 미구축(WO §4).
+- **KCos QR AI / KCos LMS editor:** surface 부재 — 신규 미구축(WO §4).
 - **service별 preset override:** 현재 3서비스 동일 라이브러리 구조라 단일 `library-entry` preset 공통 적용. 서비스별 차이가 생기면 자체 registry override(후속) — 현재 불필요.
 
 ## 8. backend 미수정 확인
@@ -63,7 +62,6 @@
 
 ## 9. 검증 결과
 
-- **TypeScript:** `web-kpa-society` **0**, `web-glycopharm` **0**, `web-k-cosmetics` **0**.
 - **정적:**
   - `ProductionTarget` 에 LMS/resources/library-entry 미추가(§6).
   - `library-entry` preset 이 3서비스 AiContentModal 에 전달(grep 확인).
@@ -71,7 +69,7 @@
   - POP/제품설명/QR ProductionTemplate flow 무회귀(소스 미변경).
   - CourseStructureAi/Signage/provider 작업 미혼입.
 - **무변경:** backend, DB/migration, package.json/pnpm-lock, Dockerfile, `@o4o/types`(소비만).
-- **browser smoke:** 미수행 — 배포 후 KPA/GP/KCos 라이브러리 진입 AI 모달에서 기본 tone/length 가 preset(professional/medium) 기준으로 진입하는지 확인 권장(production write 미실행).
+- **browser smoke:** 미수행 — 배포 후 KPA/KCos 라이브러리 진입 AI 모달에서 기본 tone/length 가 preset(professional/medium) 기준으로 진입하는지 확인 권장(production write 미실행).
 
 ## 10. 완료 판정
 

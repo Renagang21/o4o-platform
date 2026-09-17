@@ -253,7 +253,7 @@ user.status === ACTIVE || user.status === APPROVED
 | 필드 | 라벨 | 필수 | 비고 |
 |------|------|:----:|------|
 | `sellerName` | 판매자/파트너명 | ✅ | 유일한 필수 필드 |
-| `sellerServiceType` | 서비스 유형 | ❌ | glycopharm/k-cosmetics/other |
+| `sellerServiceType` | 서비스 유형 | ❌ | — |
 | `sellerStoreUrl` | 스토어 URL | ❌ | |
 | `periodStart/End` | 제휴 기간 | ❌ | |
 | `revenueStructure` | 수수료 조건 | ❌ | |

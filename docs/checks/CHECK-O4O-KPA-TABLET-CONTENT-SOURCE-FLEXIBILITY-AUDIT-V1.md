@@ -74,7 +74,6 @@
 
 - **테이블** `kpa_store_contents` (= canonical "Store Production Material" 물리 구현). 컬럼: `title`, `content_json`(blocks/html/body/summary/usage/tags/subType…), `source_type`(**direct**=매장 직접 / **snapshot_edit**=허브·snapshot 편집), `organization_id`(매장 격리), `author_role`(operator/store, supplier 금지), `visibility_scope`(organization 고정), `workspace_status`(draft→…→archived), `source_metadata`(복사 출처 추적용). **master_id 컬럼 없음** — 상품 연결은 링크 테이블 경유.
 - **링크** `kpa_store_content_product_links`: `product_source_type`(listing/local) + `product_source_id` + `master_id`(부가) + `link_type='product_description'`.
-- **API** `/api/v1/{kpa|glycopharm|cosmetics}/store-contents` (service-neutral): 목록/생성(direct)/수정/삭제/번역/snapshot 편집.
 - **일반(상품 무관) 콘텐츠 저장 가능** — 동일 테이블 `source_type='direct'`, 링크 없이. (즉 저장소는 이미 "상품 콘텐츠 + 일반 콘텐츠" 겸용.)
 
 ### DB 실측 (현재)

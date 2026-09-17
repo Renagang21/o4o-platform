@@ -185,8 +185,7 @@ telemetry(`/playback-log`, `/heartbeat`) 는 손대지 않았다(§20).
 - 결과: **성공**. serving image tag `f6b35153ec767c15206ffab31fe4b65035376370` == commit `f6b35153e` (검증 완료)
 - 같은 SHA 의 `CodeQL Security Analysis`: success
 - 같은 SHA 의 `CI Pipeline`: **failure — 이 WO 와 무관한 기존 실패**.
-  실패 step 은 `Code Quality Check / type-check:frontend` 의 `services/web-glycopharm` 한 건이며,
-  base commit `d525575a1` 의 CI Pipeline 도 동일하게 failure 였다. 이번 변경은 web-glycopharm 을 건드리지 않는다.
+  base commit `d525575a1` 의 CI Pipeline 도 동일하게 failure 였다.
 
 **player 는 배포하지 않았다.** `.github/workflows/` 어디에도 signage-player-web 이 없고
 (`deploy-web-services.yml` 은 web-* 6개만 다룬다), Cloud Run 에도 해당 서비스가 없다.
@@ -215,7 +214,7 @@ API client 계약 테스트를 수행했다(§9, §10).
 8/8 PASS. 전부 GET, 인증 없이 실행.
 
 **200 exact-lookup smoke 는 실행할 수 없었다.** production 의 channels table 에 행이 0건이다
-(`serviceKey=kpa|kpa-society|k-cosmetics|cosmetics|glycopharm|neture|pharmacy-hub|kpa-branch` 전부 `total: 0`).
+.
 채널을 만들면 production write 가 되므로(§29, fixture 생성 금지) 하지 않았다.
 → **`SMOKE_200_BLOCKED_NO_PRODUCTION_CHANNEL_ROW`**. 200 경로는 회귀 테스트(§9)로만 고정되어 있다.
 

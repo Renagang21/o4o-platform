@@ -2,7 +2,7 @@
 
 > **유형:** read-only 전수조사 (코드/DB/의존성 변경 없음)
 > **판정: PASS.** 전체 frontend(`services/*` + `packages/*` + `apps/admin-dashboard`)의 raw HTML 렌더링 사용처 전수조사 완료. `dangerouslySetInnerHTML` ~30 주입 + 직접 `.innerHTML=` 6건 분류. **공개 surface CRITICAL XSS 없음.** DANGER 2건(content-editor AI preview raw), WARNING 6건, 나머지 SAFE/NOT_APPLICABLE.
-> 선행: SANITIZE-ON-WRITE-V2(PASS) · GLYCOPHARM-RICH-RENDER · HTML-RENDERING-POLICY — 2026-06-16
+> 선행: SANITIZE-ON-WRITE-V2(PASS) · HTML-RENDERING-POLICY — 2026-06-16
 
 ---
 
@@ -24,7 +24,6 @@
 ## 2. Scope
 
 **조사 대상(완료):**
-- `services/web-kpa-society`, `services/web-glycopharm`, `services/web-k-cosmetics`, `services/web-neture`, `services/signage-player-web`
 - `packages/*` (content-editor, block-renderer, shared-space-ui, forum-core, utils, operator-core-ui, tablet-kiosk-core, store-ui-core 등)
 - `apps/admin-dashboard` (raw HTML 사용 다수 — 포함)
 
@@ -76,7 +75,6 @@ rg "sanitizeHtml|sanitizeRichHtml|DOMPurify|ContentRenderer" -g "*.{tsx,jsx,ts}"
 | shared-space-ui | `ResourcesHubTemplate.tsx`(990 / innerHTML 193,200) | `safeHtml`/`DOMPurify.sanitize` |
 | forum-core | `ForumBlockRenderer.tsx`(37,66,109) | `DOMPurify.sanitize` |
 | utils | `TemplateRenderer.tsx`(163) | `sanitizeHtml` (JSON-LD `<script>`) |
-| web-glycopharm | `education/CourseDetailPage.tsx`(90) | `sanitizeHtml` (긴급수정 반영분) |
 | web-neture | `supplier/SupplierProductImportPage.tsx`(639) | 로컬 `escapeHtml()` 후 고정 구조 조립 |
 | signage-player-web | `ContentRenderer.tsx`(161) | `sanitizeHtml` |
 | admin-dashboard | `cover/CoverOverlay.tsx`(550) | `sanitizeHtml` (생성 SVG, 입력=고정 템플릿+색상) |
@@ -113,7 +111,7 @@ rg "sanitizeHtml|sanitizeRichHtml|DOMPurify|ContentRenderer" -g "*.{tsx,jsx,ts}"
 ## 6. Critical Findings
 
 **없음(CRITICAL 0).**
-- 공개 소비자 surface(KPA/GP storefront·tablet, signage, neture CMS public)는 전부 `ContentRenderer`/`sanitizeHtml` 경유 → 미차단 raw XSS 없음.
+- 공개 소비자 surface(KPA storefront·tablet, signage, neture CMS public)는 전부 `ContentRenderer`/`sanitizeHtml` 경유 → 미차단 raw XSS 없음.
 - DANGER(D1/D2)는 **admin/operator 모달 preview** 영역이며 입력은 자체 AI 생성 결과 → 외부 공격자 직접 제어 입력 아님. 즉시 긴급도 중간, 그러나 신뢰 경계상 sanitize 표준화 필요.
 - WARNING 중 W2/W3(content API `body`)는 **백엔드 sanitize 여부 확인 시 등급 재평가** 필요(후속 WO 에서 surface 공개 여부 + 저장 sanitize 확인 → 미sanitize+공개면 승격).
 

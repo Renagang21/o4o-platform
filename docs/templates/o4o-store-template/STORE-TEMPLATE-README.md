@@ -74,7 +74,6 @@ const order = await checkoutService.createOrder({
 export enum OrderType {
   GENERIC = 'GENERIC',
   DROPSHIPPING = 'DROPSHIPPING',
-  GLYCOPHARM = 'GLYCOPHARM',
   COSMETICS = 'COSMETICS',
   TOURISM = 'TOURISM',
   // 새 매장 추가

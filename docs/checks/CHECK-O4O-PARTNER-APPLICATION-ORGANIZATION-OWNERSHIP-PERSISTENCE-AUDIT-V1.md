@@ -61,7 +61,7 @@
 
 ## 5. 서비스별 영향
 
-- `neture_partner_applications`/`createPartnerApplication`은 **KPA/GP/KCos/Neture 공용 단일 경로**
+- `neture_partner_applications`/`createPartnerApplication`은 **KPA/KCos/Neture 공용 단일 경로**
   (`POST /neture/partner/applications {recruitmentId}`, client는 org 미전달). 서비스별 생성 경로 없음.
 - nullable `organization_id` 추가는 additive(기존 INSERT 생략 → NULL, read-path 미소비) → 4서비스 apply 흐름
   무변경. **단** create-time org 확정 로직은 serviceKey별 `isStoreOwner` 필요(공용 함수 존재).

@@ -18,7 +18,7 @@
 | # | 항목 | 결과 |
 |---|------|------|
 | 6.1 | entrypoint | ✅ 로그인 후 `/admin` 에 "O4O 플랫폼 관리 → /admin/platform" 카드 표시 |
-| 6.2 | **`/admin/platform/roles` 렌더** | ✅ **PASS** — platform section 헤더/nav, "O4O 플랫폼 역할 관리" 안내 배너, 역할 관리 화면(**39개** roles), service 필터(전체/Platform/Neture/GlycoPharm/KPA/K-Cosmetics/LMS) + 검색 + table 정상 |
+| 6.2 | **`/admin/platform/roles` 렌더** | ✅ **PASS** — platform section 헤더/nav, "O4O 플랫폼 역할 관리" 안내 배너, 역할 관리 화면(**39개** roles), service 필터 + 검색 + table 정상 |
 | 6.3 | platform section nav | ✅ 플랫폼 홈·계정 관리·서비스 관리·사용자 조회·**역할 관리** 표시, active 정상 |
 | 6.4 | **기존 `/admin/roles` 보존+deprecated** | ✅ **PASS** — 상단 "역할 관리는 O4O 플랫폼 관리 영역으로 이동되었습니다 … `/admin/platform/roles`" 배너 + "플랫폼 역할 관리로 이동" 버튼. 기존 역할 화면(39 roles) **기능 보존**(hard delete/redirect 없음) |
 | 6.5 | Tier 2(accounts/services) 무회귀 | ⏸ **browser 재확인 미완**(세션 종료). users 는 직전 smoke PASS. accounts/services 페이지 컴포넌트는 본 WO 미변경(landing 카드/nav/신규 route 만 추가) |

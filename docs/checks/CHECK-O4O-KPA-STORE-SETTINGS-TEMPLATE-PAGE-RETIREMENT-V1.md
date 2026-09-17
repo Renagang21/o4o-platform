@@ -44,7 +44,6 @@ GET/PUT /stores/:slug/template  (kpa-store-template.controller.ts)
 ```
 
 WO §9·§13 에 따라 **API·`template_profile` 은 이번에 건드리지 않았다.**
-GlycoPharm 이 동명 경로 API 를 별도 보유하고(`glycopharm/controllers/store.controller.ts`),
 공개 `GET /stores/:slug/template` 은 platform 공개 라우트에도 존재하므로 은퇴 판단은 별도 WO 대상이다.
 
 ---
@@ -86,7 +85,7 @@ GlycoPharm 이 동명 경로 API 를 별도 보유하고(`glycopharm/controllers
 | `store-settings-template.ts` / `generateDefaultBlocks` | **변경 0** |
 | `template_profile` / `storefront_config` / `storefront_blocks` | **변경 0** |
 | DB schema · migration · 운영 데이터 | **변경 0** |
-| K-Cosmetics · GlycoPharm · store-ui-core · 사이드바 | **변경 0** |
+| K-Cosmetics · store-ui-core · 사이드바 | **변경 0** |
 
 프론트엔드(KPA) route·컴포넌트 은퇴만 수행했다.
 

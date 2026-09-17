@@ -27,7 +27,7 @@ KPA 4개 영역 14개 화면에 걸쳐 카드형 UI → 표준 테이블(`@o4o/u
 | `7d89a32fb` | IR — StoreContentsSelector DataTable 방향 조사 | IR-O4O-KPA-STORE-CONTENTS-SELECTOR-STANDARDIZATION-V1 |
 | `69c75b620` | WO — StoreContentsSelector DataTable 교체 | StoreContentsSelector (자료함 콘텐츠 선택) |
 | `bae565ac5` | IR — StoreAssetsPanel BaseTable 선택 활성화 방향 조사 | IR-O4O-STORE-ASSET-POLICY-CORE-DATATABLE-V1 |
-| `0f452ffec` | WO — StoreAssetsPanel Regular section BaseTable 선택 + ActionBar | `@o4o/store-asset-policy-core` + KPA + GlycoPharm |
+| `0f452ffec` | WO — StoreAssetsPanel Regular section BaseTable 선택 + ActionBar | `@o4o/store-asset-policy-core` + KPA |
 | `03a62df47` | FIX — StoreAssetsPanel _select 컬럼 보완 | BaseTable body checkbox 렌더링 누락 수정 |
 | `b2615dfce` | IR — /store-hub FOUH 원인 조사 | IR-O4O-KPA-STORE-HUB-SESSION-LOSS-AUDIT-V1 |
 | `202cd3b8a` | FIX — FOUH 1차 방지 | KpaGlobalHeader `isAuthenticated={isLoading \|\| !!user}` |
@@ -130,12 +130,11 @@ KPA 4개 영역 14개 화면에 걸쳐 카드형 UI → 표준 테이블(`@o4o/u
 - `TEST-ACCOUNTS.local.md` 계정과 production 실제 잠금 상태 불일치 가능성
 - admin 계정 잠금 해제 후 `TEST-ACCOUNTS.local.md` 재확인 권장
 
-### R3 — GlycoPharm / K-Cosmetics 이식 미진행
+### R3 — K-Cosmetics 이식 미진행
 
 - 이번 1차 사이클은 **KPA canonical 구현**이 목표였으므로 cross-service 이식은 미진행
-- StoreAssetsPanel은 `@o4o/store-asset-policy-core` 공통 패키지 → KPA + GlycoPharm 동시 적용 완료
+- StoreAssetsPanel은 `@o4o/store-asset-policy-core` 공통 패키지 → KPA 동시 적용 완료
 - K-Cosmetics는 `StoreAssetsPanel` 미사용 확인 (types만 import)
-- 나머지 화면(OperatorBlogListPage 등)의 GlycoPharm 대응 여부: 별도 IR 필요
 
 ### R4 — /store-hub/pop, /store-hub/qr 빈 데이터
 
@@ -151,11 +150,9 @@ Step 1. 사용자가 /operator/blog, /operator/pop, /operator/qr smoke 직접 �
          → admin 계정 잠금 해제 후 진행
 
 Step 2. IR-O4O-CROSS-SERVICE-STANDARD-TABLE-PORTING-AUDIT-V1
-         → KPA canonical → GlycoPharm / K-Cosmetics 이식 가능 범위 조사
          → OperatorBlogListPage, OperatorPopListPage, OperatorQrListPage 등
 
 Step 3. 서비스별 이식 WO
-         → GlycoPharm 대상 화면 이식
          → K-Cosmetics 대상 화면 이식
 
 Step 4. (선택) TEST-ACCOUNTS production smoke access 정비
@@ -168,9 +165,8 @@ Step 4. (선택) TEST-ACCOUNTS production smoke access 정비
 
 | 패키지/서비스 | 변경 | 영향 |
 |---------------|------|------|
-| `@o4o/store-asset-policy-core` | BaseTable selection + ActionBar 추가 | KPA + GlycoPharm 양쪽 적용 |
+| `@o4o/store-asset-policy-core` | BaseTable selection + ActionBar 추가 | KPA 양쪽 적용 |
 | `services/web-kpa-society` | 14개 화면 표준 테이블 전환 | KPA 전용 |
-| `services/web-glycopharm` | StoreAssetsPage bulk handler 추가 | StoreAssetsPanel 공용 패키지 경유 |
 | `services/web-k-cosmetics` | 변경 없음 | StoreAssetsPanel 미사용 확인 |
 
 ---

@@ -152,7 +152,7 @@ export const PLATFORM_ADMIN_ROLES = ['platform:admin', 'platform:super_admin'] a
 | **실제 역할 보유 현황** | `platform:admin`·`platform:super_admin` 을 보유한 계정이 실재하는지 미확인. 선행 WO 들에서 확인된 대로 **사용 가능한 테스트 계정 3개는 모두 403** 이다. 운영 DB 역할 census 는 수행하지 않았다 | 8번 |
 | `/enrollments` · `/admin/enrollments` · `/admin/role-applications` | `users:update` permission 만 선언. 메뉴 항목이 아니고 소비 백엔드가 달라 이번 정렬 대상에서 제외 | 6번 |
 | permission 공급 | 백엔드가 `user.permissions` 를 채우는 작업. 그때 88건 선언이 자동 활성화되므로 **선언 내용 감사**가 선행돼야 한다 | 별도 WO |
-| `App.tsx:186` 셸 게이트 | 축소하지 않았다 — 축소 시 `requireServiceLegalScope('operator')` 를 쓰는 KCos·GlycoPharm 서비스 운영자가 잠긴다 | 원칙 6·7 |
+| `App.tsx:186` 셸 게이트 | 축소하지 않았다 — 축소 시 `requireServiceLegalScope('operator')` 를 쓰는 KCos 운영자가 잠긴다 | 원칙 6·7 |
 
 ---
 

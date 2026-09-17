@@ -25,7 +25,6 @@ Store Hub 장바구니
 ```ts
 metadata: {
   source: 'store_cart_checkout',
-  serviceKey: eventServiceKey,     // ← kpa-groupbuy / glycopharm-event-offer / k-cosmetics-event-offer
   sourceTypes: ['event_offer'],
   ...
 }
@@ -40,7 +39,6 @@ metadata: {
 | 서비스 | 파일 | 기존 필터 | 지점 |
 |---|---|---|---:|
 | KPA | `routes/kpa/controllers/kpa-checkout.controller.ts` | `metadata->>'serviceKey' IN ('kpa-society','kpa')` | 3 |
-| GlycoPharm | `routes/glycopharm/controllers/checkout.controller.ts` | `= 'glycopharm'` | 2 |
 | K-Cosmetics | `routes/cosmetics/controllers/cosmetics-order.controller.ts` | `= 'cosmetics'` | 2 |
 
 → 이벤트 오퍼 주문은 어느 서비스에서도 목록에 잡히지 않고, 단건 조회도 404 `ORDER_NOT_FOUND`.
@@ -48,7 +46,7 @@ metadata: {
 
 ### 1-3. 취소 경로 부재
 
-KPA·GlycoPharm·K-Cosmetics 의 checkout 컨트롤러에 **취소 route 자체가 없었다.**
+KPA·K-Cosmetics 의 checkout 컨트롤러에 **취소 route 자체가 없었다.**
 결제 전 취소는 Pharmacy-Hub 에만 존재
 (`POST /pharmacy-hub/store-owner/orders/:orderId/cancel` → `PharmacyHubPaymentController.cancelBeforePayment`).
 
@@ -57,7 +55,6 @@ KPA·GlycoPharm·K-Cosmetics 의 checkout 컨트롤러에 **취소 route 자체�
 | service_key | 건수 | status | paymentStatus |
 |---|---:|---|---|
 | `kpa-groupbuy` | 3 | created | pending |
-| `glycopharm-event-offer` | 2 | created | pending |
 | `k-cosmetics-event-offer` | 2 | created | pending |
 | **합계** | **7** | | |
 
@@ -90,7 +87,6 @@ KPA·GlycoPharm·K-Cosmetics 의 checkout 컨트롤러에 **취소 route 자체�
 
 ```text
 POST /api/v1/kpa/checkout/orders/:orderId/cancel
-POST /api/v1/glycopharm/checkout/orders/:orderId/cancel
 POST /api/v1/cosmetics/orders/:id/cancel
 ```
 
@@ -156,7 +152,7 @@ TS2307 등 **기존 환경 이슈**이며 `git stash` 대조로 본 변경과 �
 내부 경로가 상대경로다(목록 `'/'` · 상세 `'/:id'`). 취소를 `'/orders/:id/cancel'` 로 적어
 최종 경로가 `/api/v1/cosmetics/orders/**orders**/:id/cancel` 로 중복됐다.
 
-`'/:id/cancel'` 로 교정. KPA·GP 는 `router.use('/checkout', ...)` mount 라
+`':id/cancel'` 로 교정. KPA 는 `router.use('/checkout', ...)` mount 라
 `'/orders/:orderId/cancel'` 이 올바르며 1차 배포에서 이미 취소 200 으로 확인됐다.
 
 ---
@@ -170,7 +166,6 @@ TS2307 등 **기존 환경 이슈**이며 `git stash` 대조로 본 변경과 �
 | 서비스 | endpoint | 결과 |
 |---|---|---|
 | KPA | `GET /kpa/checkout/orders` | **200 · 3건** (`ORD-…-4428` · `7338` · `6987`) |
-| GlycoPharm | `GET /glycopharm/checkout/orders` | **200 · 2건** (`8038` · `4939`) |
 | K-Cosmetics | `GET /cosmetics/orders` | **200 · 2건** (`0552` · `2002`) |
 | KPA 단건 | `GET /kpa/checkout/orders/:id` (`ORD-…-4428`) | **200** (이전 404) |
 
@@ -183,8 +178,8 @@ TS2307 등 **기존 환경 이슈**이며 `git stash` 대조로 본 변경과 �
 | `ORD-20260814-4428` | KPA | 200 | `[]` (무제한 listing) |
 | `ORD-20260814-7338` | KPA | 200 | `[]` |
 | `ORD-20260814-6987` | KPA | 200 | `[]` |
-| `ORD-20260814-4939` | GP | 200 | `[{e627c1eb…, 1}]` |
-| `ORD-20260814-8038` | GP | 200 | `[{e627c1eb…, 1}]` |
+| `ORD-20260814-4939` | 200 | `[{e627c1eb…, 1}]` |
+| `ORD-20260814-8038` | 200 | `[{e627c1eb…, 1}]` |
 | `ORD-20260814-0552` | KCos | 200 | `[{ec4f4b1a…, 1}]` |
 | `ORD-20260814-2002` | KCos | 200 | `[{ec4f4b1a…, 1}]` |
 
@@ -192,7 +187,7 @@ TS2307 등 **기존 환경 이슈**이며 `git stash` 대조로 본 변경과 �
 
 | listing | 취소 전 | 취소 후 |
 |---|---:|---:|
-| `e627c1eb…` (glycopharm-event-offer) | 98 | **100** |
+| `e627c1eb…` | 98 | **100** |
 | `ec4f4b1a…` (k-cosmetics-event-offer) | 98 | **100** |
 | `02003281…` (kpa-groupbuy) | NULL(무제한) | **NULL** (정상 미변경) |
 
@@ -226,7 +221,6 @@ JS 예외 0.
 | 서비스 | viewport | 노출 주문 | JS 예외 | 404 | overflow |
 |---|---|---|---:|---|---|
 | KPA | desktop / mobile | `4428` · `7338` · `6987` | 0 | 없음 | 없음 |
-| GlycoPharm | desktop / mobile | `8038` · `4939` | 0 | 없음 | 없음 |
 | K-Cosmetics | desktop / mobile | `0552` · `2002` | 0 | 없음 | 없음 |
 
 **7/7 이 매장측 주문 목록 UI 에 "취소" 상태로 렌더**된다.
@@ -235,7 +229,7 @@ JS 예외 0.
 
 처음에 `/store-hub/orders` 로 검증했으나 **3서비스 모두 404**(존재하지 않는 route)였다.
 구매자 주문 목록 canonical 경로는 `/store/commerce/orders` 다
-(KPA `StoreOrdersPage` · GP `PharmacyOrders` · KCos `StoreOrdersPage`, 모두 `/checkout/orders` 소비).
+(KPA `StoreOrdersPage` `PharmacyOrders` · KCos `StoreOrdersPage`, 모두 `/checkout/orders` 소비).
 `/store-hub/orders` 는 원래 없던 경로이며 본 WO 가 만든 결함이 아니다.
 
 ### 6-4. 이벤트오퍼 · 장바구니 화면 회귀

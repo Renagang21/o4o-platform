@@ -3,7 +3,7 @@
 > **상태**: COMPLETE_WITH_UNKNOWNS · **조사일**: 2026-09-17 · **기준 commit**: `4f8dd3b90` (`main` == `origin/main`)
 > **성격**: 조사 전용. 코드 수정 0 · DB write 0 · migration 0 · 설정 변경 0 · 배포 0.
 > **목적**: 주식회사 쓰리라이프존 O4O 「개인정보 처리방침 v1.0」 최종 작성을 위해 **현재 프로덕션에서 실제로 동작하는** 개인정보 처리 흐름을 확정한다. 코드에 존재하는 기능과 실제 운영되는 기능을 분리한다.
-> **대상 서비스**: neture · kpa-society · k-cosmetics · pharmacy-hub (GlycoPharm 은 삭제 완료 — 제외)
+> **대상 서비스**: neture · kpa-society · k-cosmetics · pharmacy-hub
 > **비밀값 정책**: secret · API key · SMTP 비밀번호 · 토큰 · 개인 문의내용 · 이메일 주소는 어떤 것도 기록하지 않았다. 존재 여부(`SET / NOT_SET`)와 집계·날짜만 사용한다.
 
 ---

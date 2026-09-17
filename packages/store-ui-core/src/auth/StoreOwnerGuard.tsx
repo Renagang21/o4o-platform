@@ -7,7 +7,7 @@
  *
  * 정책:
  *   - 구조: KPA canonical (`PharmacyGuard`) — 단계적 평가.
- *   - Guard semantics: canonical store-owner guard (원본: `PharmacyStoreGuard` — WO-O4O-GLYCOPHARM-
+ *   - Guard semantics: canonical store-owner guard (원본: `PharmacyStoreGuard` —
  *     MY-STORE-MENU-MEMBERSHIP-GUARD-V1) — 3-way OR (role / membership / operator-or-above).
  *   - KPA stale JWT recovery 는 optional `staleRecovery` prop 으로 보존.
  *   - 서비스별 platform-only 차단 카드 등은 호출 측 wrapper 에서 처리 (본 Guard 는
@@ -19,8 +19,8 @@
  *   3. direct access?
  *        - isOperatorOrAbove (admin/operator/super_admin)
  *        - isStoreOwnerByRole (canonical role OR user.isStoreOwner dual flag)
- *        - extraRoleMatcher(r) (서비스별 별칭 — Glyco pharmacist 등)
- *        - membership-aware (Glyco — service_memberships role='pharmacy' active/approved)
+ *        - extraRoleMatcher(r) (서비스별 별칭 — pharmacist 등)
+ *        - membership-aware (service_memberships role='pharmacy' active/approved)
  *      → membershipGate(children) 또는 children 직접 반환
  *   4. staleRecovery 가 제공된 경우 → 한 번만 check() → true 면 refreshSession() 후 통과
  *   5. 그 외                                → renderDenied 가 있으면 그 노드, 없으면

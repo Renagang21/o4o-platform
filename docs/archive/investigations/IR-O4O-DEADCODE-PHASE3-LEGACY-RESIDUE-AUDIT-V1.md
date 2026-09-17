@@ -24,7 +24,6 @@
 |--------|----------------------|------|
 | web-kpa-society | **61개** | /pharmacy/* (24개) 포함 |
 | web-neture | **31개** | /workspace/* 호환 레이어 포함 |
-| web-glycopharm | **2개** | signage 경로 통합 2건 |
 | web-k-cosmetics | **0개** | 가장 클린한 구조 |
 | **합계** | **94개** | |
 
@@ -238,13 +237,6 @@
 - `/manual/*`, `/channel/*` redirect 8개 — 구 문서 경로
 - `/about`, `/my`, `/partner/product-pool`, `/partner/referrals` — 개별 구 경로
 
-### 4-C. GlycoPharm — 2개 Navigate 라우트
-
-- `/store/signage` → `playlist` (index redirect) — 기능적으로 필요
-- `/signage` → `/store/signage/library` (WO-O4O-GLYCOPHARM-SIGNAGE-STRUCTURE-ALIGNMENT-TO-KPA-V1)
-
-**판정: HOLD** — 현재도 유효한 signage 경로 통합 redirect
-
 ### 4-D. K-Cosmetics — 0개 Navigate 라우트
 
 가장 클린한 구조. 별도 조치 불필요.
@@ -269,7 +261,6 @@
 | Neture | `RedirectSupplierDetail` + route | LEGACY | Navigate to `/` | LOW | **DELETE** |
 | Neture | `/manual/*`, `/channel/*` → `/o4o/*` 8개 | LEGACY | 구 문서 경로 | LOW | **DELETE** |
 | Neture | `/about`, `/my`, `/partner/product-pool` 등 | LEGACY | 구 경로 | LOW | **DELETE** |
-| GlycoPharm | signage redirect 2개 | ACTIVE | 현재 유효한 경로 통합 | - | HOLD |
 
 ---
 
@@ -340,11 +331,9 @@
 
 | 항목 | 이유 |
 |------|------|
-| GlycoPharm signage redirect 2개 | 현재 유효한 signage 경로 통합 |
 | KPA `/pharmacy`, `/pharmacy/approval` | 실제 동작 페이지 — gate/approval 플로우 확인 필요 |
 | K-Cosmetics `/partners` (public 소개) | 별도 경로, /partner/* 삭제와 무관 |
 | K-Cosmetics `/partners/apply` (public 신청) | 별도 경로, 생존 |
-| GlycoPharm `/service/*` | Phase 1 완성 구현, backend 연결 — 별도 WO 처리 |
 | Neture `/workspace/partners/*` | ACTIVE 사용 (PartnershipRequest 기능) |
 
 ---

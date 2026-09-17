@@ -40,7 +40,7 @@
 | 항목 | 변경 |
 |------|------|
 | **제목 세로 깨짐(§5.1)** | 헤더를 space-between 1행 → **세로 스택**. 제목 `word-break: keep-all`(한글 단어 보존) + `clamp(18–26px)`. 제목 행이 전체 폭 확보 → 압축·세로 깨짐 제거 |
-| **제목/설명 섹션 분리(리뷰)** | 헤더 = **코너 제목(+QR 배지)만**. 코너 설명 = **별도 섹션**("코너 안내" 라벨 + 본문, 틴트 배경 `#f8fafc` + 상단 구분선, `max-height:30vh` 자체 스크롤로 상단 독점 방지). 실제 corner_description 있을 때만(legacy/GP/KCos 는 헤더 힌트 유지) |
+| **제목/설명 섹션 분리(리뷰)** | 헤더 = **코너 제목(+QR 배지)만**. 코너 설명 = **별도 섹션**("코너 안내" 라벨 + 본문, 틴트 배경 `#f8fafc` + 상단 구분선, `max-height:30vh` 자체 스크롤로 상단 독점 방지). 실제 corner_description 있을 때만(legacy/KCos 는 헤더 힌트 유지) |
 | **설명 가독성(§5.6)** | 본문 `line-height:1.65`, `max-width:70ch`, `clamp(13–15px)`, keep-all |
 | **QR 카드화(§5.3·§5.4)** | `label + 전체 URL` → **카드**(▣ 아이콘 + 라벨 + "QR을 스캔하면 이 코너 안내를 모바일에서도 확인할 수 있습니다." + **짧은 도메인 배지**). `shortHost()` 로 hostname 만 표기, 전체 `https://…` 미노출. 상단(기본)·하단(product_focus) 공통 |
 | **Empty state 카드(§5.5)** | 한 줄 → **카드**(🗂️ + "이 코너의 상품을 준비 중입니다" + "코너 안내를 확인하시고, 필요한 제품은 직원에게 문의해 주세요."). `products.length===0` 일 때만(상품 들어가면 자동 미표시) |
@@ -134,8 +134,7 @@ after-oral-1280.png        # 구강관리 코너 after
 ## 10. typecheck / build
 
 - `@o4o/tablet-kiosk-core` `tsc --noEmit`: **0**.
-- 소비처(Shared Module Protocol): `web-kpa-society` / `web-glycopharm` / `web-k-cosmetics` `tsc --noEmit` **전부 0**.
-- 공유 패키지 안전성: `fetchScreen` 은 **KPA 만 주입** → GP/KCos 는 `screen=null`(cornerInfo/qrGuide null) → legacy 헤더(기본 문구)·QR 카드 미표시. 레이아웃 개선만 적용, 동작 변경 없음.
+- 공유 패키지 안전성: `fetchScreen` 은 **KPA 만 주입** → KCos 는 `screen=null`(cornerInfo/qrGuide null) → legacy 헤더(기본 문구)·QR 카드 미표시. 레이아웃 개선만 적용, 동작 변경 없음.
 
 ---
 

@@ -39,7 +39,7 @@ const TYPE_FILTERS = [
 // Normalize forum-core data → MyRequestItem
 // WO-O4O-CROSS-SERVICE-MYPAGE-REQUESTS-COMMONIZATION-V1 §8:
 //   `GET /forum/category-requests/my` 변환은 공통 adapter 로 이전했다
-//   (`normalizeForumCategoryRequest` — KPA / GlycoPharm / K-Cosmetics 공용).
+//   (`normalizeForumCategoryRequest` — KPA / K-Cosmetics 공용).
 // ============================================================================
 
 // UnifiedRequestItem → MyRequestItem (필드 호환)

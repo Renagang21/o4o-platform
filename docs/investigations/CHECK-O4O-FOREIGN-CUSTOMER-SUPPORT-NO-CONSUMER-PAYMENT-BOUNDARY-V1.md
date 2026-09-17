@@ -127,6 +127,6 @@ O4O 는 현재 고객에게 직접 결제를 받지 않는다.
 외국인 고객 응대 기능은 **콘텐츠 표시/매장 응대 기능**으로 경계가 고정되었다.
 소비자 결제·관광객 앱·자동 주문과 분리되며, 향후 확장은 별도 축으로만 도입한다.
 
-본 CHECK 가 닫힌 뒤에야 GP/KCos 공통화 IR(`IR-O4O-MULTILINGUAL-PRODUCT-CONTENT-CROSS-SERVICE-ADOPTION-V1`)로 진행한다.
+본 CHECK 가 닫힌 뒤에야 KCos 공통화 IR(`IR-O4O-MULTILINGUAL-PRODUCT-CONTENT-CROSS-SERVICE-ADOPTION-V1`)로 진행한다.
 
 **CHECK-O4O-FOREIGN-CUSTOMER-SUPPORT-NO-CONSUMER-PAYMENT-BOUNDARY-V1 → CLOSED / PASS**

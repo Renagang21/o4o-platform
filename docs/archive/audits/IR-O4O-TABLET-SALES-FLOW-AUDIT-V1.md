@@ -198,7 +198,6 @@ Supplier와 Local이 별도 필드로 분리 반환됨.
 | 서비스 | 화면 | 경로 |
 |--------|------|------|
 | KPA | TabletRequestsPage | `/store/channels/tablet` |
-| GlycoPharm | CustomerRequestsPage | `/store/requests` |
 
 ### 4.2 KPA 직원 워크플로
 
@@ -379,16 +378,6 @@ tablet_service_requests (서비스 큐 — 주문 아님)
 | 결제 | **없음** — 요청 전송만 |
 | 자동 리셋 | 완료/취소 후 2분 뒤 |
 
-### 7.2 GlycoPharm Tablet (직원 보조)
-
-| 항목 | 내용 |
-|------|------|
-| 레이아웃 | TabletLayout (직원 보조 주문 모드) |
-| 검색 | 대형 터치 검색창 |
-| 카테고리 | Sticky 카테고리 네비게이션 |
-| 직원 요청 | 모달 (상담/샘플/주문) |
-| 이벤트 추적 | `POST /api/v1/glycopharm/events` |
-
 ### 7.3 QR 코드 지원
 
 | 항목 | 내용 |
@@ -490,21 +479,18 @@ apps/api-server/src/routes/platform/entities/store-local-product.entity.ts    �
 
 ```
 services/web-kpa-society/src/pages/tablet/TabletStorePage.tsx         — KPA Tablet 키오스크
-services/web-glycopharm/src/components/layouts/TabletLayout.tsx       — GlycoPharm Tablet 레이아웃
 ```
 
 ### Frontend — 직원 관리
 
 ```
 services/web-kpa-society/src/pages/pharmacy/TabletRequestsPage.tsx    — KPA 요청 관리
-services/web-glycopharm/src/pages/pharmacy/CustomerRequestsPage.tsx   — GlycoPharm 요청 관리
 ```
 
 ### Frontend — 진열 구성 (WO-O4O-STORE-LOCAL-PRODUCT-UI-V1)
 
 ```
 services/web-kpa-society/src/pages/pharmacy/StoreTabletDisplaysPage.tsx
-services/web-glycopharm/src/pages/pharmacy/StoreTabletDisplaysPage.tsx
 services/web-k-cosmetics/src/pages/store/StoreTabletDisplaysPage.tsx
 ```
 

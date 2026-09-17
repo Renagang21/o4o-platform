@@ -7,7 +7,6 @@
  * §6 최종 판정 = MISSING_ADOPTION (INTENTIONAL_DIFFERENCE 아님)
  *
  *   KPA   `contentRouter.post('/', authenticate, …)`
- *   GP    `router.post('/', authenticate, write.create)`
  *   KCos  `router.post('/', authenticate, write.create)`
  *
  *   → 회원 콘텐츠 작성은 3개 원장 서비스 **공통의 회원 capability** 이며 operator role 을

@@ -1,7 +1,7 @@
 /**
  * WO-O4O-GUIDE-CLIENT-EXTRACTION-V1: thin wrapper over @o4o/shared-space-ui guide-client.
  *
- * Neture 최초 도입. 다른 3 서비스(KPA / GlycoPharm / K-Cosmetics)와 동일 패턴.
+ * Neture 최초 도입. 다른 2 서비스(KPA / K-Cosmetics)와 동일 패턴.
  */
 
 import { createGuideClient } from '@o4o/shared-space-ui';

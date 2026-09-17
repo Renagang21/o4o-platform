@@ -3,7 +3,7 @@
  *
  * WO-O4O-CROSSSERVICE-LEGAL-POLICY-PRODUCTION-COMPLETION-V1
  *
- * GlycoPharm / K-Cosmetics 와 동일한 공통 `PolicyDocumentViewer`(@o4o/shared-space-ui) 소비.
+ * K-Cosmetics 와 동일한 공통 `PolicyDocumentViewer`(@o4o/shared-space-ui) 소비.
  * serviceKey('pharmacy-hub' canonical) + public API loader 만 주입한다 — 화면을 복사하지 않는다.
  * backend: GET /api/v1/public/services/pharmacy-hub/policies/:documentType (published only).
  *

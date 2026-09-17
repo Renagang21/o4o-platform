@@ -56,7 +56,7 @@ mount: `app.use('/api/v1/cms', ...)`. read 성격 endpoint만 추림.
 |---|---|---|
 | `ContentQueryService.listPublished()` | `where.serviceKey = In(config.serviceKeys)` **항상 제한** | `content-query.service.ts:48` |
 | `HubContentService.queryCms()` | `where = { serviceKey, status:'published', visibilityScope: In(['platform','service']) }` | `hub-content.service.ts:270-274` |
-| GP / KCos `/{service}/contents/:id` | URL 에 서비스 축 존재 | 서비스별 라우트 |
+| KCos `/{service}/contents:id` | URL 에 서비스 축 존재 | 서비스별 라우트 |
 
 → **경계를 강제하는 canonical read 경로는 이미 존재한다.** 강제하지 않는 것은 `/api/v1/cms/*` 공통 라우트뿐이다.
 
@@ -69,7 +69,6 @@ mount: `app.use('/api/v1/cms', ...)`. read 성격 endpoint만 추림.
 | **PharmacyHub** `/resources` | SERVICE_MEMBER | 목록 + 상세 | ✅ (목록·상세 모두) | ❌ | ❌ |
 | **K-Cosmetics** `api/cms.ts` | SERVICE_MEMBER | 목록 · slot | ✅ (기본값 `'cosmetics'`) | ❌ | ❌ |
 | **admin-dashboard** `CMSContentList` | PLATFORM_ADMIN | 목록(전 서비스) + 상세 | ❌ | ❌ | ✅ **업무상 필요** |
-| GlycoPharm `api/cms.ts getContent` | — | 상세 | — | — | **dead (소비처 0)** |
 | KPA / Neture | — | `/cms/*` 호출 **0** | — | — | — |
 | 서비스별 wrapper (§1-1) | SERVICE_MEMBER / PUBLIC | 자체 route | 내부 강제 | — | ❌ |
 
@@ -83,9 +82,6 @@ mount: `app.use('/api/v1/cms', ...)`. read 성격 endpoint만 추림.
 
 | serviceKey | visibilityScope | status | rows | organizationId |
 |---|---|---|---:|---|
-| glycopharm | service | draft | 63 | 전부 NULL |
-| glycopharm | platform | published | 2 | NULL |
-| glycopharm | service | archived | 1 | NULL |
 | **kpa** | platform | published | **1** | NULL |
 | **kpa-society** | platform | published | **53** | **32건 non-NULL** |
 | neture | platform | published | 3 | NULL |
@@ -240,7 +236,6 @@ KPA alias                   — serviceKey IN ('kpa-society','kpa')
 |---|---|
 | `apps/admin-dashboard/src/lib/cms.ts` | `getContent(id, params?: { serviceKey? })` — 상세도 경계를 전달할 수 있게 확장 |
 | `apps/admin-dashboard/src/pages/cms/contents/CMSContentList.tsx` | 편집 진입 시 `content.serviceKey` 전달 (목록이 이미 갖고 있는 값) |
-| `services/web-glycopharm/src/api/cms.ts` | `getContentById` 에 `serviceKey` 기본값(`glycopharm`) — 목록/슬롯과 동일. (이 client 는 여전히 소비처 0 = §11-2 부채 3) |
 
 **변경 불필요로 확인된 소비처**: KCos `api/cms.ts` (항상 `serviceKey` 세팅) · PH `pharmacyHubResources.ts`
 (목록·상세 모두 `serviceKey='pharmacy-hub'`) · admin-dashboard slot 화면
@@ -266,7 +261,7 @@ export function resolveCmsServiceKeys(serviceKey: string): string[] {
 |---|---|
 | `kpa` · `kpa-society` | `['kpa-society', 'kpa']` |
 | `cosmetics` · `k-cosmetics` | `['k-cosmetics', 'cosmetics']` (§10 이 추가 코드 없이 성립) |
-| `neture` · `glycopharm` · `pharmacy-hub` | 자기 자신 1개 (self-map) |
+| `neture` · `pharmacy-hub` | 자기 자신 1개 (self-map) |
 
 `cms-content-slot.handler.ts` 의 로컬 alias 값(`SCOPE_TO_CMS_KEYS`)도 같은 helper 파생으로 바꿔
 **read 경계와 slot manage 범위가 한 벌의 파생**을 쓰게 했다.
@@ -292,7 +287,6 @@ export function resolveCmsServiceKeys(serviceKey: string): string[] {
 | `cms-content-slot-service-scope.spec.ts` (신규) | **4/4 PASS** |
 | `pharmacy-hub-content-resource-adoption.spec.ts` | **18/18 PASS** — 정적 가드가 옛 리터럴(`where.serviceKey = serviceKey as string`)을 검사하고 있어 새 계약 문자열로 교정 |
 | 인접 회귀 (`kpa-content-resource-core-adoption` · `content-resource-core-table-isolation` · `community-content-resource-frontend-view-commonization` · `pharmacy-hub-community-capability-adoption`) | **PASS** |
-| `tsc --noEmit` — api-server · admin-dashboard · web-glycopharm | **PASS** |
 | production DB write | **0** |
 | production API matrix (WO §16) · browser smoke (WO §17) | **완료** — 아래 §10-2 |
 
@@ -307,7 +301,6 @@ export function resolveCmsServiceKeys(serviceKey: string): string[] {
 | api-server `tsc --noEmit` | **PASS** |
 | api-server **전체 Jest** (`--runInBand`, `--max-old-space-size=3072`) | **182 suites / 2980 tests PASS** (exit 0) |
 | admin-dashboard production build | **PASS** |
-| web-glycopharm production build | **PASS** |
 | 선행 실패(타 세션 귀속) | **0건** — CMS 관련 실패를 선행 실패로 귀속시킨 항목 없음 (WO §19) |
 
 ### 배포
@@ -328,12 +321,9 @@ PH 의 `published` 자료는 여전히 0건이므로 자료실 목록 0건은 �
 | `GET /contents?serviceKey=pharmacy-hub&status=published` | 자기 서비스만 | **200 / 0건** (DB 실제 0건) |
 | `GET /contents?serviceKey=kpa-society` | 자기 서비스만 | **200 / kpa-society row** |
 | `GET /contents/{KPA uuid}?serviceKey=pharmacy-hub` | 차단 | **404 `NOT_FOUND`** |
-| `GET /contents/{GP uuid}?serviceKey=pharmacy-hub` | 차단 | **404** |
 | `GET /contents/{KPA uuid}?serviceKey=kpa-society` | 허용 | **200** |
 | `GET /contents/{legacy `kpa` uuid}?serviceKey=kpa-society` | alias 허용 | **200** |
 | `GET /contents/{kpa-society uuid}?serviceKey=kpa` | 역방향 alias 허용 | **200** |
-| `GET /contents/{GP uuid}?serviceKey=kpa-society` | 차단 | **404** |
-| `GET /contents/{GP uuid}?serviceKey=glycopharm` | 허용 | **200** |
 | `GET /contents/{uuid}` (serviceKey 생략, 익명) | 차단 | **400** |
 | `GET /contents/not-a-uuid?serviceKey=kpa-society` | canonical not-found | **404 `NOT_FOUND`** (500·Postgres 텍스트 노출 없음) |
 | `GET /stats` (생략) / `?serviceKey=kpa` | 차단 / 허용 | **400** / **200**, `scope.serviceKeys = ["kpa-society","kpa"]` |
@@ -347,8 +337,8 @@ PH 의 `published` 자료는 여전히 0건이므로 자료실 목록 0건은 �
 | PH `/resources` Desktop 1440 | 정상 렌더 · `GET /cms/contents?serviceKey=pharmacy-hub&type=knowledge&status=published` **200** · "총 0개의 자료" (DB 0건과 일치) · console error 0 · pageerror 0 |
 | PH `/resources` Mobile 390 | 정상 렌더 · 동일 요청 200 · console error 0 |
 | K-Cosmetics `https://k-cosmetics.site/` | 정상 렌더 · `GET /cms/contents?serviceKey=cosmetics&type=notice&status=published` **200** · error 0 |
-| admin-dashboard `/admin/cms/contents` · `/admin/cms/slots` | 정상 렌더 · serviceKey 생략 요청 **200** (cross-service 목록 유지, glycopharm row 표시) · error 0 |
-| admin-dashboard 편집 진입(상세 hydrate) | `GET /cms/contents/857ac192-…?serviceKey=glycopharm` **200** — §8 대로 상세에 `content.serviceKey` 동행. 에러 토스트·console error 0 |
+| admin-dashboard `/admin/cms/contents` · `/admin/cms/slots` | 정상 렌더 · serviceKey 생략 요청 **200** (cross-service 목록 유지 row 표시) · error 0 |
+| admin-dashboard 편집 진입(상세 hydrate) | 에러 토스트·console error 0 |
 
 백화면 0 · JS 예외 0 · 신규 500 0 · 자기 서비스 콘텐츠 유실 0 · cross-service 노출 0.
 
@@ -381,7 +371,7 @@ HEAD == origin/main == bc13a977e   ·   branch=main   ·   worktree clean
 
 | 그룹 | 케이스 | 결과 |
 |---|---|---|
-| A 자기 서비스 상세 | glycopharm · kpa-society · kpa · neture | **4/4 200** |
+| A 자기 서비스 상세 | kpa-society · kpa · neture | **4/4 200** |
 | B serviceKey 누락 (익명) | `/contents/:id` · `/contents` · `/stats` · `/slots/home` | **4/4 400 `SERVICE_KEY_REQUIRED`** |
 | C 잘못된 serviceKey | 상세 / 목록 | **404** / **200 0건** |
 | D KPA alias | legacy `kpa` row ↔ `kpa-society` 양방향 · 목록 동수 | **4/4 200**, 목록 `kpa`=54 `kpa-society`=54 (53+1 합집합) |
@@ -395,7 +385,7 @@ HEAD == origin/main == bc13a977e   ·   branch=main   ·   worktree clean
 | 화면 | 결과 |
 |---|---|
 | admin-dashboard `https://admin.neture.co.kr` 로그인 | **PASS** — `POST /auth/login` 200 → `/home` |
-| admin `/admin/cms/contents` | **PASS** — `GET /api/v1/cms/contents` (serviceKey 생략) **200**, **129 contents** cross-service 렌더 (glycopharm·kpa-society 확인). console error 0 |
+| admin `/admin/cms/contents` | **PASS** — `GET /api/v1/cms/contents` (serviceKey 생략) **200**, **129 contents** cross-service 렌더 (kpa-society 확인). console error 0 |
 | admin CMS 목록 deep-link 새로고침 · 타 경로 경유 후 재진입 | **PASS** (3회 모두 200) |
 | K-Cosmetics `/` · `/service-guide` (익명) | **PASS** — `GET /cms/contents?serviceKey=cosmetics&…` **200** (**legacy alias 가 공개 경로에서 정상 동작**) |
 | K-Cosmetics `/` (모바일 390×844) | **PASS** — 동일 요청 200 |
@@ -448,7 +438,6 @@ HEAD == origin/main == 466c8ec3c   ·   branch=main   ·   이번 WO 범위 미�
 
 | 변경 | commit | 판정 |
 |---|---|---|
-| `services/web-glycopharm/src/api/cms.ts` **삭제** (167줄) | `3496d26bf` | §11-2 부채 3(“소비처 0 인 dead code”)이 **은퇴로 해소**. GP 홈은 CMS 호출 0 건(브라우저 실측) — 자기 서비스 콘텐츠 유실 없음 |
 | `apps/api-server/src/routes/cms-content/index.ts` (barrel) **삭제** | 은퇴 4축 마감분 | **무영향**. `bootstrap/register-routes.ts:111` 이 `cms-content.routes.js` 를 **직접 import** 하므로 라우트 등록 경로가 barrel 을 경유하지 않는다 |
 | `constants/service-keys.ts` 에 `cafe24-b2b` 추가 | `6d53fd1f2` | alias resolver 가 **self-map** 1키로 파생 → CMS read 에서 타 서비스와 섞이지 않는다. 실측 `?serviceKey=cafe24-b2b` **200 / 0건** |
 
@@ -469,7 +458,7 @@ read 계약 구현부(`cms-content-utils.ts` · `cms-content-query.handler.ts` �
 
 | 그룹 | 케이스 | 결과 |
 |---|---|---|
-| A 정상 serviceKey | 목록 5종(`kpa-society`·`glycopharm`·`neture`·`k-cosmetics`·`pharmacy-hub`) + 상세 3종 | **8/8 200** |
+| A 정상 serviceKey | 목록 5종(`kpa-society`·`neture`·`k-cosmetics`·`pharmacy-hub`) + 상세 3종 | **8/8 200** |
 | B serviceKey 누락 (익명) | `/contents` · `/contents/:id` · `/stats` · `/slots/home-hero` | **4/4 400 `SERVICE_KEY_REQUIRED`** |
 | C 잘못된 serviceKey | 목록 200/0건 · 상세 404 · 신규 키 `cafe24-b2b` 200/0건 · 비-UUID 상세 404 | **5/5** (500·PG 텍스트 노출 0) |
 | D KPA alias | 목록 동수 `kpa`=54 / `kpa-society`=54 · 양방향 상세 200 · `/stats` scope `["kpa-society","kpa"]` · `/slots` meta 동일 | **5/5** |
@@ -485,7 +474,7 @@ read 계약 구현부(`cms-content-utils.ts` · `cms-content-query.handler.ts` �
 
 | 계정 성격 (역할 요약) | `/cms/contents` 생략 | `/cms/stats` 생략 | `?serviceKey=kpa-society` |
 |---|---|---|---|
-| **5개 서비스 admin/operator** 보유 · `platform:super_admin` **없음** (`kpa:admin` · `glycopharm:admin` · `cosmetics:admin` · `neture:admin` · `pharmacy-hub:admin` 등 12개 역할) | **400 `SERVICE_KEY_REQUIRED`** | **400** | **200** |
+| **4개 서비스 admin/operator** 보유 · `platform:super_admin` **없음** (`kpa:admin` · `cosmetics:admin` · `neture:admin` · `pharmacy-hub:admin` 등 12개 역할) | **400 `SERVICE_KEY_REQUIRED`** | **400** | **200** |
 | 서비스 회원 · store_owner 계열 (`user` · `kpa:store_owner` · `supplier` 등 10개 역할) | **400 `SERVICE_KEY_REQUIRED`** | **400** | **200** |
 
 → **“serviceKey 생략 = 관리자 모드” 가 아니라는 계약이 프로덕션에서 확정적으로 실증됐다.**
@@ -497,14 +486,14 @@ read 계약 구현부(`cms-content-utils.ts` · `cms-content-query.handler.ts` �
 | 화면 | 결과 |
 |---|---|
 | admin-dashboard 로그인 | **PASS** — `POST /auth/login` 200 → `/home` |
-| admin `/admin/cms/contents` 목록 진입 | **PASS** — `GET /api/v1/cms/contents` (serviceKey 생략) 200 · **“129 contents”** cross-service 렌더 (glycopharm · kpa-society 행 확인) |
+| admin `/admin/cms/contents` 목록 진입 | **PASS** — `GET /api/v1/cms/contents` (serviceKey 생략) 200 · **“129 contents”** cross-service 렌더 (kpa-society 행 확인) |
 | 새로고침 | **PASS** — 동일 경로 유지 · CMS 200 |
 | deep link 재진입 (`/admin/users` 경유 후 재진입) | **PASS** — 동일 경로 · CMS 200 |
 | admin `/admin/cms/slots` | **PASS** — `GET /api/v1/cms/slots` 200 |
 | **400/403 처리** — 익명으로 admin CMS 화면 직접 접근 | **PASS** — `/login` 으로 정상 바운스 (백화면·무한로딩 아님, JS 예외 0) |
 | K-Cosmetics `/` (Desktop 1440 · Mobile 390) | **PASS** — `GET /cms/contents?serviceKey=cosmetics&type=notice&status=published` **200** (legacy alias 가 공개 경로에서 정상 동작) |
 | PharmacyHub `/` · `/resources` (Desktop · Mobile) | **PASS** — 정상 렌더. `/resources` 는 **현재 로그인 게이트**라 익명 CMS 호출 0 (아래 관찰 1) |
-| KPA-Society `/` · GlycoPharm `/` · Neture `/` | **PASS** — 정상 렌더 · console error 0 · pageerror 0 · 4xx/5xx 0 (CMS 호출 0) |
+| KPA-Society `/` `/` · Neture `/` | **PASS** — 정상 렌더 · console error 0 · pageerror 0 · 4xx/5xx 0 (CMS 호출 0) |
 
 **백화면 0 · 무한 로딩 0 · JS 예외 0 · console error 0 · 신규 4xx/5xx 0 · cross-service 노출 0.**
 
@@ -527,7 +516,7 @@ read 계약 구현부(`cms-content-utils.ts` · `cms-content-query.handler.ts` �
 ### production 데이터 drift (판정 영향 없음)
 
 `cms_contents` 총 **129건** (§10-3 과 동일). 분포:
-`glycopharm` 66 (published 2 / draft 63 / archived 1) · `kpa-society` 53 (published 53) ·
+`kpa-society` 53 (published 53)
 `neture` 6 (published 3 / draft 2 / archived 1) · `pharmacy-hub` 3 (archived 3) · legacy `kpa` 1 (published 1).
 `serviceKey IS NULL` **0** — §3·§5 판정 근거 그대로다. PH 의 `published` 는 여전히 0 이므로 자료실 0건은 정상이다.
 
@@ -573,7 +562,7 @@ CMS read 는 공개 경로를 포함하므로 배포 후 KCos 홈 슬롯 · PH �
 |---|---|
 | 1 | `kpa-society` 콘텐츠 53건이 `authorizeCmsMutation` 의 alias 미정규화로 platform admin 외 수정 불가 |
 | 2 | `visibilityScope='platform'` + `organizationId` non-NULL 32건 — org 를 쓰지 않으면서 기록한 조합 (§3) |
-| 3 | ~~GlycoPharm `api/cms.ts getContent` dead code — 소비처 0~~ → **해소** (2026-09-04 확인): `services/web-glycopharm/src/api/cms.ts` 가 `3496d26bf` 에서 은퇴 삭제됐다 (§10-4) |
+| 3 | — |
 | 4 | `serviceKey='kpa'` 1건 — canonical `kpa-society` 로의 데이터 정합은 **migration 필요** → WO §25 에 따라 별도 보고 |
 
 ---

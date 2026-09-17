@@ -51,7 +51,7 @@ org owner 2명 모두 **neture membership 을 포함한 multi-membership**:
 | user | active service_memberships |
 |------|----------------------------|
 | `52a4c1e6…` | **kpa-society**, **neture** |
-| `6967ebe0…` | glycopharm, k-cosmetics, **kpa-society**, **neture** |
+| `6967ebe0…` | k-cosmetics, **kpa-society**, **neture** |
 
 → `deriveListingServiceKey` 의 `MULTI_MEMBERSHIP_PRIORITY=['neture', …]` 에 의해 **둘 다 `neture` 로 파생**. 가설 실측 확정.
 
@@ -78,11 +78,9 @@ org owner 2명 모두 **neture membership 을 포함한 multi-membership**:
 값 출처 = req.user.memberships 중 status='active'
 매핑(MEMBERSHIP_KEY_TO_LISTING_SERVICE_KEY):
   kpa-society → kpa
-  glycopharm  → glycopharm
   neture      → neture
   k-cosmetics → cosmetics
 single-membership → 그 값
-multi-membership  → MULTI_MEMBERSHIP_PRIORITY=['neture','kpa-society','glycopharm','k-cosmetics'] 최우선 1개
 ```
 
 - 즉 **매장의 소비 서비스(slug 'kpa')가 아니라 "등록 사용자의 membership"** 이 값을 결정한다.
@@ -108,9 +106,9 @@ multi-membership  → MULTI_MEMBERSHIP_PRIORITY=['neture','kpa-society','glycoph
 
 | 레이어 | service_key 값 형식 | 의미 |
 |--------|--------------------|------|
-| `service_memberships` / registry | `kpa-society`, `k-cosmetics`, `neture`, `glycopharm`, `platform` | 사용자 자격/서비스 가입 |
-| `platform_store_slugs` (소비 slug) | `kpa`, `glycopharm`, `cosmetics` | 매장 **공개 소비 면** |
-| `organization_product_listings` | `kpa`, `cosmetics`, `neture`, `glycopharm` | (본건) 등록자 membership 파생 / (auto) enrollment |
+| `service_memberships` / registry | `kpa-society`, `k-cosmetics`, `neture`, `platform` | 사용자 자격/서비스 가입 |
+| `platform_store_slugs` (소비 slug) | `kpa`, `cosmetics` | 매장 **공개 소비 면** |
+| `organization_product_listings` | `kpa`, `cosmetics`, `neture` | (본건) 등록자 membership 파생 / (auto) enrollment |
 | 소비 브리지 | `resolveServiceKeys('kpa')=['kpa','kpa-society']` | slug↔membership 형식 차 보정 |
 
 - membership 형식(`kpa-society`)과 listing/slug 형식(`kpa`)이 다르며 `MEMBERSHIP_KEY_TO_LISTING_SERVICE_KEY` 로 매핑.

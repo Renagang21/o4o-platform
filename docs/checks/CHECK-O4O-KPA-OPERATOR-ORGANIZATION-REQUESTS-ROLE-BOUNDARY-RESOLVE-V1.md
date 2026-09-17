@@ -31,7 +31,7 @@ KPA 운영자 대시보드의 `service-apps` KPI·`ai-service-apps`·`aq-service
 | 승인이 플랫폼 전체 조직 권한 영향 | ❌ 단일 KPA org `organization_members` insert + users.status, cross-service role 없음 |
 | KPA service scope 분리 불가 | ❌ 전부 `/api/v1/kpa`·requireKpaScope·kpa-society |
 | admin-API 권한 완화 필요 | ❌ 제거만, 권한 변경 0. KPI 이미 isAdmin-gated, controller kpa:admin — 정합 |
-| 타 서비스 동일 KPI·route 공용 | ❌ `buildKpaOperatorDashboardConfig` KPA 전용, GP 대시보드에 service-apps/organization-requests 없음 |
+| 타 서비스 동일 KPI·route 공용 | ❌ `buildKpaOperatorDashboardConfig` KPA 전용 대시보드에 service-apps/organization-requests 없음 |
 | 동일 파일 동시 작업 | ❌ operator-dashboard.service/OperatorRoutes 미커밋 0 |
 
 ## 3. 변경
@@ -65,7 +65,7 @@ KPA 운영자 대시보드의 `service-apps` KPI·`ai-service-apps`·`aq-service
 ## 6. KPA 외 영향
 
 - `operator-dashboard.service.ts`/`buildKpaOperatorDashboardConfig`는 KPA operator-summary.controller 전용.
-  GP/KCos 대시보드는 자체 service(service-apps/organization-requests 미보유) → **무영향**. Neture 무관.
+  KCos 대시보드는 자체 service(service-apps/organization-requests 미보유) → **무영향**. Neture 무관.
 
 ## 7. 커밋
 

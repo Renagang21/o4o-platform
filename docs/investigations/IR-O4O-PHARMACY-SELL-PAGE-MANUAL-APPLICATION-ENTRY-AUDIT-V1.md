@@ -16,9 +16,9 @@
 | 서버 `supplyProductId` 계약 | `supplier_product_offers.id` (UUID). `findApplicableOffer` 가 카탈로그 노출 게이트와 동일 조건 재검증 |
 | A/B/C 판정 | **C** (화면 전체가 구형 v1 계약) — 부수적으로 B(엔티티 종류 상이) 포함. **A(필드명만) 아님** |
 | 대체 정상 경로 | **있음** — `HubB2BCatalogPage`(`/store-hub/b2b`) `applyBySupplyProductId(offer.id)` + `PharmacyB2BPage` `getOrderable()` |
-| 영향 서비스 | **KPA 전용** (GP/KCos 는 `commerce/products/b2c` 라우트·`PharmacySellPage` 미보유) |
+| 영향 서비스 | **KPA 전용** (KCos 는 `commerce/products/b2c` 라우트·`PharmacySellPage` 미보유) |
 | **우선순위 판정** | **MEDIUM** |
-| 권장 조치 | 즉시 수정 WO 생성하지 않음. **HUB-P0-03 (GP/KCos 자료함 공통화) 이후** 처리. 수정 방향은 "필드명 치환"이 아니라 **수동 폼 탭 제거 또는 카탈로그 기반 재작성** |
+| 권장 조치 | 즉시 수정 WO 생성하지 않음. **HUB-P0-03 (KCos 자료함 공통화) 이후** 처리. 수정 방향은 "필드명 치환"이 아니라 **수동 폼 탭 제거 또는 카탈로그 기반 재작성** |
 
 ---
 
@@ -59,9 +59,8 @@
 ## 3. 영향 서비스
 
 - **KPA 전용.**
-- `web-glycopharm`: `commerce/products` → `PharmacyB2BProducts` (b2c child 없음, `PharmacySellPage` 미import)
 - `web-k-cosmetics`: `commerce/products` → `StoreCommerceProductsPage` (b2c child 없음)
-- 공통 package 로 공유되는 화면 아님. GP/KCos 는 별개 컴포넌트.
+- 공통 package 로 공유되는 화면 아님. KCos 는 별개 컴포넌트.
 
 ---
 
@@ -130,12 +129,12 @@
 
 ## 9. 권장 후속 조치
 
-1. **즉시 수정 WO 생성하지 않음.** MEDIUM 이므로 **HUB-P0-03 (GP/KCos 자료함 서비스별 공통화)** 를 먼저 진행한다.
+1. **즉시 수정 WO 생성하지 않음.** MEDIUM 이므로 **HUB-P0-03 (KCos 자료함 서비스별 공통화)** 를 먼저 진행한다.
 2. P0-03 이후 후속 WO 시 수정 방향(택1):
    - **(권장) 수동 자유입력 탭 제거** — `PharmacyB2BPage.tsx:341` "판매 신청" 서브탭 링크 및 `PharmacySellPage` `ApplicationsTab` 의 수동 폼을 제거하고, 상품 추가는 카탈로그(`/store-hub/b2b`) 경로로 일원화. (F11/Shared Module 관점: b2c 라우트·redirect·value-guide route 정리 동반 검토)
    - 또는 **카탈로그 기반 재작성** — 수동 input 을 offer 선택 UI 로 교체하고 `applyBySupplyProductId` 를 호출. 단 이는 이미 `HubB2BCatalogPage` 와 기능 중복이므로 제거가 더 정합적.
 3. **단순 필드명 치환 금지** — §5·§7 근거로 `externalProductId → supplyProductId` 치환은 오히려 404 를 유발하는 오답.
-4. 정리 시 소비처 동반 점검: `App.tsx:970,1025`(라우트·redirect), `PharmacyB2BPage.tsx:341`(서브탭), `shared-space-ui` value-guide `route` 필드(kpa.ts / glycopharm.ts).
+4. 정리 시 소비처 동반 점검: `App.tsx:970,1025`(라우트·redirect), `PharmacyB2BPage.tsx:341`(서브탭), `shared-space-ui` value-guide `route` 필드(kpa.ts.ts).
 
 ---
 

@@ -32,7 +32,7 @@ DB 실측: 사본 origin=store·supplier_id NULL ✅ · provenance(store_asset_d
 | 비활성 사이니지 차단 | **NOT_RUN_NO_DATA** (운영 전량 active 5 — 코드 게이트 배포 확인으로 대체, 미존재 id 404 sanity ✅) |
 | video QR 상태 게이트 | **NOT_RUN_NO_DATA** (store_videos 0건) — 배포 코드 분기(`AND status='published'`) 실측 + tsc ✅. 존재하지 않는 대상=videoUrl null 계약 유지 |
 | 의약품 경계 | 해당 가드 파일 미변경(diff-tree) + 2026-07-22 E2E(의약품 비약국 0) 유효 ✅ |
-| GP/KCos | 변경 3파일 전부 KPA/매장 QR 경로 — 무접촉 ✅ |
+| KCos | 변경 3파일 전부 KPA/매장 QR 경로 — 무접촉 ✅ |
 
 ## 5. 보존 검증 — ✅
 

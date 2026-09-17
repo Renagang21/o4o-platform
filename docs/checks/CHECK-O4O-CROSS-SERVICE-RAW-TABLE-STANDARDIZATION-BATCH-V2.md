@@ -47,7 +47,6 @@ commits: `f1f4b95aa`(A) · `72b2e176e`(C)
 
 | 서비스 | 래퍼 | 라우트 |
 |--------|------|--------|
-| GlycoPharm | `pages/admin/ServiceLegalSettingsPage.tsx` | `App.tsx` |
 | K-Cosmetics | 〃 | `App.tsx` |
 | KPA-Society | 〃 | `routes/AdminRoutes.tsx` |
 | Neture | 〃 | `App.tsx` |
@@ -79,7 +78,7 @@ commits: `f1f4b95aa`(A) · `72b2e176e`(C)
 | 항목 | 결과 |
 |------|:---:|
 | typecheck (변경 파일) | **오류 0** |
-| build — GP / KCos / KPA / Neture | **4서비스 전부 PASS** |
+| build — KCos / KPA / Neture | **3서비스 전부 PASS** |
 | 배포 | `Deploy Web Services` run `30200935693` — **success** (4서비스 전부) |
 
 > `web-k-cosmetics` 최초 빌드가 `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)` 로 실패했으나

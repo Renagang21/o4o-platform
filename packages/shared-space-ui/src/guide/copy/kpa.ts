@@ -1,7 +1,6 @@
 /**
  * KPA-Society Guide Copy
  *
- * WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1
  *
  * 기존 services/web-kpa-society/src/pages/guide/* 파일에서 추출한 데이터를
  * shared Guide 페이지 컴포넌트의 prop 형태로 정리.

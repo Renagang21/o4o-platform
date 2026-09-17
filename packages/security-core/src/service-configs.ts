@@ -167,7 +167,6 @@ export const PLATFORM_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   blockedServicePrefixes: ['kpa', 'neture', 'cosmetics'],
 };
 
-// GLYCOPHARM_SCOPE_CONFIG — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
 /**
  * K-Cosmetics Service Configuration

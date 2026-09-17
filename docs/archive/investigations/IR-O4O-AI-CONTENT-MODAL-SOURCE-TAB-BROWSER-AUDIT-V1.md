@@ -146,7 +146,7 @@ File: CourseEditPage-DIJuWmen.js
 | ResourceWritePage | `/content/resources` 작성 | 정리 모드 |
 | ContentWritePage | `/content/documents` 작성 | 정리 모드 |
 | PharmacyBlogPage (KPA) | 약국 블로그 작성 | 정리 모드 |
-| PharmacyBlogPage (glycopharm) | 글라이코팜 블로그 작성 | 정리 모드 |
+| PharmacyBlogPage | — | 정리 모드 |
 | Toolbar.tsx (RichTextEditor 안의 AI 버튼) | 모든 RichTextEditor 사용처 | 정리 모드 |
 
 → 사용자가 "AI 레슨 초안 만들기" 라는 명확한 LMS 어휘를 사용했으므로 진입처 혼동 가능성은 낮지만, 1차 검증에서 확인 권장 (§4.1).

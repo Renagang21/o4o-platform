@@ -72,7 +72,7 @@
 │  ├── channel_price: decimal (nullable)                                  │
 │  └── FK: listingId, channelId, organizationId                           │
 │                                                                         │
-│  ※ sales_limit: GlycoPharm checkout에서 FOR UPDATE로 enforcement        │
+│  ※ sales_limit: checkout에서 FOR UPDATE로 enforcement                   │
 │  ※ channel_price: null이면 listing의 retail_price 사용                   │
 └──────────────┬──────────────────────────────────────────────────────────┘
                │
@@ -97,7 +97,7 @@
 ┌──────────────┴──────────────────────────────────────────────────────────┐
 │                    CHECKOUT LAYER (주문 생성)                            │
 │                                                                         │
-│  GlycoPharm (7-step validation):                                        │
+│   (7-step validation):                                                  │
 │  ├── 1. listing 존재 확인                                               │
 │  ├── 2. listing.is_active 확인                                          │
 │  ├── 3. channel 존재 확인                                               │
@@ -135,11 +135,11 @@
 | distribution_type | ✅ | ✅ (간접) | — | — | ❌ |
 | allowed_seller_ids | ✅ | ✅ (간접) | — | — | ❌ |
 | product.status | — | — | — | ✅ (Gate 4) | ❌ |
-| listing.is_active | — | — | — | ✅ (Gate 1) | ✅ (GlycoPharm) |
-| channel.is_active | — | — | — | ✅ (Gate 2) | ✅ (GlycoPharm) |
+| listing.is_active | — | — | — | ✅ (Gate 1) | ✅ |
+| channel.is_active | — | — | — | ✅ (Gate 2) | ✅ |
 | channel.status | — | — | — | ✅ (Gate 3) | ❌ |
-| sales_limit | — | — | — | — | ✅ (GlycoPharm) |
-| supply contract | — | — | — | — | ✅ (GlycoPharm) |
+| sales_limit | — | — | — | — | ✅ |
+| supply contract | — | — | — | — | ✅ |
 
 ---
 
@@ -187,7 +187,6 @@
 
 | 위치 | 역할 |
 |------|------|
-| `routes/glycopharm/controllers/checkout.controller.ts` | GlycoPharm 7-step validation |
 | `core/checkout/checkout-guard.service.ts` → `validateSupplierSellerRelation()` | supply contract 검증 |
 | `routes/cosmetics/controllers/cosmetics-order.controller.ts` | Cosmetics 3-step validation |
 
@@ -195,11 +194,11 @@
 
 ## 4. 정책 일관성 판정
 
-### 4-A. GlycoPharm/KPA 공유 인프라
+### 4-A. KPA 공유 인프라
 
 **판정: Stable with Gaps**
 
-GlycoPharm과 KPA는 동일한 유통 인프라(org_product_listings, org_product_channels, org_channels)를 공유한다. 전체적으로 일관된 구조이나 다음 gap이 존재:
+전체적으로 일관된 구조이나 다음 gap이 존재:
 
 1. **Storefront ↔ Hub 불일치**: B2C/TABLET의 4중 게이트와 Hub의 2중 게이트가 일관되지 않음
 2. **Checkout에서 distribution_type 미검증**: 카탈로그에서 필터링되므로 정상 흐름에서는 문제없으나, 직접 API 호출 시 우회 가능
@@ -229,7 +228,7 @@ Neture는 공급자 측 데이터 소유권만 가지며, distribution_type과 a
 | **영향** | PRIVATE 제품이 allowed_seller_ids 외부 판매자에 의해 주문될 수 있음 |
 | **현재 방어** | 카탈로그 필터링 + 신청 필터링 (정상 UI 흐름에서는 노출 안 됨) |
 | **우회 시나리오** | 직접 API 호출로 listingId/productId를 지정하면 카탈로그 필터 우회 가능 |
-| **위치** | `checkout.controller.ts` (GlycoPharm), `cosmetics-order.controller.ts` (Cosmetics) |
+| **위치** | `checkout.controller.ts` , `cosmetics-order.controller.ts` (Cosmetics) |
 | **권장** | checkout에 distribution_type + allowed_seller_ids 검증 추가 검토 |
 
 ### Risk-2: Hub visibleProductCount 게이트 불일치 (MEDIUM)
@@ -251,7 +250,7 @@ Neture는 공급자 측 데이터 소유권만 가지며, distribution_type과 a
 | **영향** | SUSPENDED/EXPIRED/TERMINATED 채널의 상품이 checkout에서 차단되지 않음 |
 | **현재 방어** | 스토어프론트 4중 게이트에서 APPROVED만 노출 (정상 흐름에서는 비노출) |
 | **우회 시나리오** | 이전에 카트에 담긴 상품이 채널 상태 변경 후에도 결제 가능 |
-| **위치** | `checkout.controller.ts` (GlycoPharm) |
+| **위치** | `checkout.controller.ts` |
 | **권장** | checkout에 `oc.status = 'APPROVED'` 검증 추가 검토 |
 
 ### Risk-4: Cosmetics checkout 제품 검증 부재 (MEDIUM)
@@ -279,7 +278,7 @@ Neture는 공급자 측 데이터 소유권만 가지며, distribution_type과 a
 
 ## 6. ServiceKey별 유통 구조 비교
 
-| 구분 | GlycoPharm / KPA | Cosmetics | Neture |
+| 구분 | KPA | Cosmetics | Neture |
 |------|-------------------|-----------|--------|
 | **인프라** | 공유 (org_product_*) | 격리 (cosmetics_*) | 공급 전용 |
 | **distribution_type** | ✅ 카탈로그 필터 | ❌ 해당 없음 | ✅ 정의 |

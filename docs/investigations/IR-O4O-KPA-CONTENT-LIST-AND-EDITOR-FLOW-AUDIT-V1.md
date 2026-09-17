@@ -117,7 +117,7 @@ KPA 콘텐츠 리스트(내매장/허브/운영자)·POP/QR/블로그/안내문 
 | 운영자 콘솔 | ✅ OperatorResourcesConsolePage(operator-core-ui) |
 | 콘텐츠 리스트 display | △ surface 별 패턴 상이(통합배지/분할탭/remap) — 경미 정렬 여지 |
 | 제품 콘텐츠 뷰 | ❌ 미설계 |
-| GP/KCos 동형 여부 | 본 IR KPA 범위 — cross-service 확인은 후속 |
+| KCos 동형 여부 | 본 IR KPA 범위 — cross-service 확인은 후속 |
 
 ## 11. 후속 WO 제안
 
@@ -126,7 +126,7 @@ KPA 콘텐츠 리스트(내매장/허브/운영자)·POP/QR/블로그/안내문 
 | `IR-O4O-PRODUCT-CONTENT-PRESENTATION-DESIGN-V1` | 제품 연결 콘텐츠의 "전체/일반/제품" 리스트·탭·필터·B2B/B2C 표현 설계(junction 기반) | **권장(다음)** |
 | `WO-O4O-CONTENT-LIST-DISPLAY-ALIGNMENT-V1` | 3 surface 콘텐츠 리스트 display 패턴 정렬(통합배지 기준) | 선택(경미) |
 | `IR-O4O-OPERATOR-HUB-PUBLISH-COPY-VS-REFERENCE-POLICY-V1` | 운영자→HUB 게시의 참조 vs 복사 원칙 명문화 | 선택 |
-| `IR-O4O-CONTENT-PRODUCTION-CROSSSERVICE-PARITY-V1` | GP/KCos 가 KPA StartProductionModal/편집기 동형인지 확인 | 선택(확산 전) |
+| `IR-O4O-CONTENT-PRODUCTION-CROSSSERVICE-PARITY-V1` | KCos 가 KPA StartProductionModal/편집기 동형인지 확인 | 선택(확산 전) |
 
 ## 12. 최종 판단 (A/B/C/D/E)
 

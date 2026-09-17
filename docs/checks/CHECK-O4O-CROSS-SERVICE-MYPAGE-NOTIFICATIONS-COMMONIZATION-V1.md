@@ -19,7 +19,7 @@
 | 구현 commit | `55582fea1` (16 files, +631 / -266) |
 | 후속 commit | `858c0c043` — PH `/account` 벨 모바일 전용 제한 (프로덕션 데스크톱 검증 결과 반영) |
 | CHECK commit | 본 문서 |
-| 배포 | `deploy-web-services` run `32322264908` — 5 서비스 전부 success (KPA / GlycoPharm / K-Cosmetics / Neture / Pharmacy-Hub) |
+| 배포 | `deploy-web-services` run `32322264908` — 4 서비스 전부 success (KPA / K-Cosmetics / Neture / Pharmacy-Hub) |
 
 백엔드(`apps/api-server`) 변경 0 — 이번 WO 는 사용자 표시 계층만 다뤘다.
 
@@ -30,7 +30,6 @@
 | 서비스 | 데스크톱 진입 | 모바일 진입 | 데이터 어댑터 |
 |---|---|---|---|
 | KPA-Society | `KpaGlobalHeader` utilitySlot `NotificationBell` | `MobileBottomNav` 알림 탭 | `src/lib/api/notifications.ts` |
-| GlycoPharm | `GlycoGlobalHeader` utilitySlot | `MobileBottomNav` 알림 탭 | 동형 |
 | K-Cosmetics | `KCosGlobalHeader` utilitySlot | `MobileBottomNav` 알림 탭 | 동형 |
 | Neture | `NetureGlobalHeader` utilitySlot | `NetureBottomNav` 알림 탭 | 동형 |
 | Pharmacy-Hub | `PharmacyHubGlobalHeader` utilitySlot | `/account`(MyPageShell headerActions) — 하단 nav 없음 | 동형 |
@@ -43,7 +42,7 @@
 
 `O` 구현 · `X` 미구현 · `-` 해당 없음
 
-| # | 기능 | KPA | GP | KCos | Neture | PH | 판정 |
+| # | 기능 | KPA | KCos | Neture | PH | 판정 |
 |---|---|:--:|:--:|:--:|:--:|:--:|---|
 | 1 | 알림 목록 | O | O | O | O | O | FULLY_COMMON (`NotificationListBody`) |
 | 2 | 알림 카운트(unread-count) | O | O | O | O | O | FULLY_COMMON (`useNotifications`) |
@@ -94,7 +93,7 @@ POST /api/v1/notifications/read
 | 모바일 시트 | KPA · Neture 2벌 중복 | `NotificationSheet` 1벌 (4서비스 소비) |
 | 상대 시각 | 3벌 중복 | `formatRelativeTime` 1벌 |
 | deep link 해석 | 5벌 (그중 4벌은 내부 경로 가드 없음) | `resolveNotificationTarget` 1벌 + 서비스 fallback 주입 |
-| GP 모바일 알림 탭 | `/mypage` 로 가는 **dead link** (활성 판정식이 영구 false) | 실제 알림 시트 |
+ 모바일 알림 탭 | `/mypage` 로 가는 **dead link** (활성 판정식이 영구 false) | 실제 알림 시트 |
 | KCos 모바일 알림 탭 | 동일 dead link | 실제 알림 시트 |
 | PH `/account` 벨 | `onItemClick` 없음 → 클릭해도 이동 없음 · 기본 비활성 | 클릭 이동 동작 + 모바일 진입점으로 노출 |
 
@@ -171,7 +170,7 @@ KPA 고유 fallback(`store.consultation_requested` · `store.tablet*` → `/stor
 ## 12. settings 진입
 
 - KPA `MySettingsPage` 의 알림 토글만 존재 = **SERVICE_SPECIFIC** (공통화 대상 아님).
-- GlycoPharm operator `SettingsPage` · Neture `EmailNotificationSettingsPage` 는 운영자 화면 = **OUT_OF_SCOPE**.
+- Neture `EmailNotificationSettingsPage` 는 운영자 화면 = **OUT_OF_SCOPE**.
 - WO §13 대로 진입·표시만 확인했고 백엔드 정책·채널 모델은 건드리지 않았다.
 
 ---
@@ -201,7 +200,6 @@ web-neture/src/lib/notificationRouting.ts        공통 resolver 위임(고유 f
 | 서비스 | 데스크톱 | 모바일 | 판정 |
 |---|---|---|---|
 | KPA-Society | 공통 벨 + 공통 목록 | 공통 시트 | ADOPTED |
-| GlycoPharm | 공통 벨 + 공통 목록 | 공통 시트 (dead link 교정) | ADOPTED |
 | K-Cosmetics | 공통 벨 + 공통 목록 | 공통 시트 (dead link 교정) | ADOPTED |
 | Neture | 공통 벨 + 공통 목록 | 공통 시트 | ADOPTED |
 | Pharmacy-Hub | 공통 벨(헤더) | `/account` 벨 (`md:hidden`) | ADOPTED |
@@ -229,8 +227,6 @@ PH 에 하단 nav 를 새로 만들지 않았다 — 셸/레이아웃 트랙 소
 | Neture | 390 | 하단 nav 알림 탭 → 공통 시트 6건 · 가로 overflow 없음 (scrollWidth 390 = clientWidth 390) |
 | KPA-Society | 1440 | 헤더 벨 → 시트 10건 (`신규 KPA 회원 가입 신청` 등) |
 | KPA-Society | 390 | 하단 nav → 시트 10건 · 항목 클릭 → `/store/requests` 정상 진입 · 하단 nav 유지 |
-| GlycoPharm | 1440 | 헤더 벨 → 4건 (`새 문의가 접수되었습니다 [서비스 이용 문의] ...`) |
-| GlycoPharm | 390 | 가시 벨 1개(하단 nav 탭) → 시트 4건 · 클릭 → `/admin/contact-inquiries` 정상 |
 | K-Cosmetics | 1440 | 헤더 벨 → 5건 |
 | K-Cosmetics | 390 | 하단 nav 탭 → 시트 5건 · 클릭 → `/admin/contact-inquiries` 정상 |
 | Pharmacy-Hub | 1440 | `/account` 헤더 액션 벨 → `알림이 없습니다.` (알림 0건 · 정상 empty) |
@@ -248,14 +244,14 @@ PH 에 하단 nav 를 새로 만들지 않았다 — 셸/레이아웃 트랙 소
 | 항목 | 결과 |
 |---|---|
 | 백지 화면 | 0 |
-| JS 예외 | 0 (관측된 콘솔 오류는 로그인 전 `auth/me` · `auth/refresh` 401 = 의도된 가드, 그리고 GP 최초 진입의 stale chunk — 캐시 버스트 후 소멸) |
+| JS 예외 | 0 (관측된 콘솔 오류는 로그인 전 `auth/me` |
 | 예기치 않은 401/403 | 0 |
 | 404 | **1건 발견** (Neture · §21 참조) |
 | 5xx | 0 |
 | dead notification link | **1건 발견** (위 404 와 동일 건) |
 | 잘못된 unread count | 0 |
 | 잘못된 type label | 0 (type 라벨 자체가 없음 — census 9) |
-| 모바일 기능 소실 | 0 (오히려 GP·KCos 2건 복구) |
+| 모바일 기능 소실 | 0 (오히려 KCos 2건 복구) |
 | 이중 셸 | 0 |
 
 ---

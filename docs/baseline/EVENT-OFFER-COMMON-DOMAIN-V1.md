@@ -142,7 +142,6 @@ KPA Adapter
 향후:
 K-Cosmetics Adapter
 Neture Adapter
-GlycoPharm Adapter
 ```
 
 서비스별 차이(권한/라우트)만 처리, 비즈니스 로직은 Core Service 공유
@@ -227,7 +226,6 @@ UI/UX
 KPA (기준 구현)
 → Neture
 → K-Cosmetics
-→ GlycoPharm
 ```
 
 각 서비스 적용 시:

@@ -14,14 +14,14 @@
  *
  * 계약
  *   - 이 모듈은 **인증·조직 결정을 하지 않는다.** organizationId 는 호출자가
- *     이미 서비스 경계에 맞게 해석한 값이어야 한다 (KPA/GP/KCos = resolveStoreAccess,
+ *     이미 서비스 경계에 맞게 해석한 값이어야 한다 (KPA/KCos = resolveStoreAccess,
  *     Pharmacy-Hub = resolvePharmacyHubStoreOrganization).
  *   - SSOT 무변경: organization_product_listings(listing) + store_local_products(local)
  *     을 물리 통합하지 않고 sourceType 으로 구분해 조회 통합한다.
  *   - Boundary Policy: organization_id 필터 필수 · Raw SQL parameter binding 필수.
  *
  * 기존 동작 보존
- *   기본값(includeInactive=false, 기본 managePaths)에서 생성되는 SQL 은 KPA·GlycoPharm·
+ *   기본값(includeInactive=false, 기본 managePaths)에서 생성되는 SQL 은 KPA·
  *   K-Cosmetics 가 쓰던 것과 동일하다. 응답은 `masterId` 1개만 additive 로 늘었다
  *   (기존 필드 제거·의미 변경 0 — 기존 화면 무영향).
  *
@@ -39,7 +39,7 @@
  *   OPL.service_key 는 이 화면의 서비스 축이 아니다. 진열 생성 경로마다 축이 다르다:
  *     - store-product-library : 사용자 membership 에서 도출(MULTI_MEMBERSHIP_PRIORITY 가
  *       neture 우선) → KPA 약국의 실제 취급 제품 20건이 service_key='neture' 로 저장돼 있다.
- *     - event-offer 파생행    : 참여한 이벤트의 서비스로 저장('glycopharm' / 'k-cosmetics').
+ *     - event-offer 파생행    : 참여한 이벤트의 서비스로 저장('k-cosmetics' 등).
  *     - auto-listing          : enrollment.service_code 복사.
  *   따라서 "현재 서비스의 canonical key 만 필터"하면 실제 취급 제품 20/23 이 화면에서
  *   사라진다(기능 은폐). Boundary Policy §7 상 Store Ops 의 경계는 organizationId 이고,
@@ -114,7 +114,7 @@ export interface HandledProductItem {
   masterId: string | null;
 }
 
-/** 서비스별 "관리 화면으로 이동" 경로. 기본값 = KPA·GP·KCos 가 쓰던 기존 경로. */
+/** 서비스별 "관리 화면으로 이동" 경로. 기본값 = KPA·KCos 가 쓰던 기존 경로. */
 export interface HandledProductManagePaths {
   listing: (sourceId: string) => string;
   local: (sourceId: string) => string;
@@ -133,7 +133,7 @@ export interface ListHandledProductsOptions {
   source?: unknown;
   /**
    * true 면 비활성 제품도 포함한다 (활성 상태 관리 화면용).
-   * 기본 false — 기존 소비처(KPA/GP/KCos)의 `is_active = true` 조건을 그대로 유지한다.
+   * 기본 false — 기존 소비처(KPA/KCos)의 `is_active = true` 조건을 그대로 유지한다.
    */
   includeInactive?: boolean;
   managePaths?: HandledProductManagePaths;

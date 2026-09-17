@@ -6,7 +6,7 @@
  * WO-O4O-KPA-STORE-HUB-HOME-LATEST-RESOURCE-FEED-V1:
  *   정적 안내 카드(자원 4카드 / AI 추천 placeholder / 내 약국 CTA 블록 / 운영 흐름 3단계) 제거.
  *   첫 화면 = 최신 자원 피드(StoreHubLatestFeed) — 새 상품 + 최신 콘텐츠 + 최신 디지털 자료 미리보기.
- *   StoreHubTemplate.renderMainSections 슬롯 + showHeroCta=false (KPA opt-in, GP/KCos 무영향).
+ *   StoreHubTemplate.renderMainSections 슬롯 + showHeroCta=false (KPA opt-in, KCos 무영향).
  */
 
 import { StoreHubTemplate, type StoreHubConfig } from '@o4o/shared-space-ui';

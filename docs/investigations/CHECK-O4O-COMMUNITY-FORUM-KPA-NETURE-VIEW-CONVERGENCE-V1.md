@@ -113,7 +113,6 @@ Neture 목록은 읽기 중심 피드 표다. 두 표현은 실제 업무 차이
 | `@o4o/shared-space-ui` typecheck | PASS |
 | `web-kpa-society` typecheck / `vite build` | PASS / PASS (18.94s) |
 | `web-neture` typecheck / `vite build` | PASS / PASS (14.79s) |
-| 회귀 — `web-glycopharm` / `web-k-cosmetics` / `web-pharmacy-hub` typecheck | PASS (shared 변경이 전부 additive·optional 임을 확인) |
 | `apps/api-server` `npx jest` | PASS — 118 suites / **1,937 tests** / 43.1s |
 
 기존 route 유지(`/forum`, `/forum/post/:id`, `{basePath}/post/:slug`) · dead link 0 · 모바일 터치 타깃(44px)은 `compact` prop 으로 보존.

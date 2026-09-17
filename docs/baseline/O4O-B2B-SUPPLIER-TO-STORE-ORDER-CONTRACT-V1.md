@@ -135,7 +135,7 @@ WO 가 정한 canonical 흐름:
 
 현재 main 에 **살아 있는 구현은 3개 축**이다. 셋 다 `store_cart_items` → `checkout_orders` 로 수렴한다.
 
-### 5-1. Axis A — Event-Offer 축 (KPA Society · GlycoPharm · K-Cosmetics)
+### 5-1. Axis A — Event-Offer 축 (KPA Society · K-Cosmetics)
 
 ```text
 event_offer (공급자 제안, 운영자 승인)
@@ -144,7 +144,6 @@ event_offer (공급자 제안, 운영자 승인)
       → EventOfferCartCheckoutService  (공급자별로 주문 분리 생성)
       → checkout_orders
   → 매장 조회: /api/v1/kpa/checkout/orders
-              /api/v1/glycopharm/checkout/orders
               /api/v1/cosmetics/orders
 ```
 
@@ -154,7 +153,6 @@ event_offer (공급자 제안, 운영자 승인)
 | cart serviceKey | event-offer serviceKey |
 |---|---|
 | `kpa-society` | `kpa-groupbuy` |
-| `glycopharm` | `glycopharm-event-offer` |
 | `k-cosmetics` | `k-cosmetics-event-offer` |
 
 이 축은 **결제 축이 아니다.** 주문 생성까지가 O4O 의 책임이고, 정산은 공급자–매장 간 기존 거래 관계를 따른다.
@@ -267,19 +265,18 @@ Axis A 의 `checkout-confirm` 은 **주문 확정**이지 소비자 결제가 �
 | 서비스 | B2B 주문 축 | 매장(buyer) | 공급자(seller) 화면 | 비고 |
 |---|---|---|---|---|
 | **KPA Society** | Axis A (`kpa-groupbuy`) | 있음 — 장바구니 · `/kpa/checkout/orders` | 없음 (Neture 측이 정본) | 관심상품 주문 작업대는 **안내 전용**. 실행 leg 은 410 은퇴 |
-| **GlycoPharm** | Axis A (`glycopharm-event-offer`) | 있음 — 장바구니 · `/glycopharm/checkout/orders` | 없음 — `RoleNotAvailablePage` 고정 | `/store/b2b-order` 는 **조회 화면**(주문 실행 미연결) |
 | **K-Cosmetics** | Axis A (`k-cosmetics-event-offer`) | 있음 — 장바구니 · `/cosmetics/orders` | 없음 | 조회 경로만 `/checkout` 접두어가 없다 (§10 DF-1) |
 | **PharmacyHub** | Axis C | 있음 — 자체 라우트 표면 | 없음 (서비스에 supplier 역할 없음) | `O4O-PHARMACY-HUB-SERVICE-MODEL-BASELINE-V1` |
 | **Neture** | Axis B | 있음 | 있음 — `/api/v1/neture/supplier/orders*` = **공급자 화면 canonical** | 다른 서비스가 복제하지 않는다 |
 
 **불변식 S1.** 공급자(seller) 의 B2B 주문 화면은 **Neture 측이 canonical** 이다.
-KPA · GlycoPharm · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 다시 만들지 않는다.
+KPA · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 다시 만들지 않는다.
 
 **불변식 S2.** 두 개의 공급 진입 축이 있고 서로 다르다. 섞지 않는다.
 
 | 축 | 상수 | 서비스 |
 |---|---|---|
-| 운영자 승인형 | `APPROVAL_ELIGIBLE_SERVICE_KEYS` | glycopharm · kpa-society · k-cosmetics |
+| 운영자 승인형 | `APPROVAL_ELIGIBLE_SERVICE_KEYS` | kpa-society · k-cosmetics |
 | 공급자 opt-in 형 | `SUPPLIER_OPTIN_SERVICE_KEYS` | pharmacy-hub |
 
 ---
@@ -293,10 +290,8 @@ KPA · GlycoPharm · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 �
 | 소비자→매장 주문 (`POST /api/v1/cosmetics/orders`) | `410 STORE_CONSUMER_ORDER_RETIRED` | `O4O-STORE-COMMERCE-BOUNDARY-V1` |
 | 매장 소비자 판매 결제 | `410 STORE_SALE_PAYMENT_DEPRECATED` | 동일 |
 | 매장 B2C 채널 | `410 STORE_B2C_CHANNEL_RETIRED` | 동일 |
-| `POST /api/v1/{kpa,glycopharm}/checkout/orders` (소비자 주문 생성) | 라우트 제거 (404) | 동일 |
 | `/api/v1/ecommerce/*` (admin-dashboard 소비자 commerce client) | **서버에 없음 (404)** — client 도 제거 | 본 WO 결함 D2 |
 | 공급자 취급 요청 (`POST /api/v1/neture/supplier/requests`, `createHandlingRequest`) | 엔드포인트·테이블 모두 제거됨 | `WO-NETURE-SUPPLIER-OFFERS-DEAD-CODE-REMOVAL-V1` (`9798e2d80`) · 본 WO 결함 D4 |
-| GlycoPharm 공급자 역할 화면 | `/supplier`, `/supplier/*` → `RoleNotAvailablePage` | 본 WO 결함 D3 |
 
 **불변식 R1.** 위 항목들은 회귀 가드 스펙이 감시한다.
 소스에 다시 나타나면 `b2b-supplier-to-store-order-canonical-contract.spec.ts` 가 실패한다.
@@ -307,16 +302,14 @@ KPA · GlycoPharm · K-Cosmetics · PharmacyHub 에 공급자 주문 화면을 �
 
 | # | 내용 | 왜 미루는가 |
 |---|---|---|
-| DF-1 | 매장 주문 조회 경로가 서비스마다 다르다 — KPA/GP 는 `/checkout/orders`, K-Cosmetics 는 `/orders` | 경로 변경은 frontend API contract 변경이다. CLAUDE.md 중지 조건 — 별도 WO 필요 
+| DF-1 | 매장 주문 조회 경로가 서비스마다 다르다 — KPA 는 `/checkout/orders`, K-Cosmetics 는 `/orders` | 경로 변경은 frontend API contract 변경이다. CLAUDE.md 중지 조건 — 별도 WO 필요
 | ↳ **DF-1 종결** | `WO-O4O-CROSSSERVICE-B2B-BUYER-ORDER-READ-CONTRACT-AND-COMMONIZATION-V1` | 경로는 그대로 두고(`KEEP_COMPATIBLE_ALIASES`) **의미·ownership·응답 계약**을 §12 로 통일했다. 불일치의 실체는 경로 이름이 아니라 응답 계약이었다 |
-| DF-2 | GlycoPharm `/store/b2b-order` 의 "주문하기" 는 `toast.info('주문 기능은 준비 중입니다.')` 만 호출한다 | canonical 장바구니로 연결할지 여부는 **제품/UX 결정**이다. 임의로 배선하지 않는다 |
 | DF-3 | KPA `관심상품 주문 작업대` → canonical 장바구니 담기 이관 | 동일. 현재는 안내만 한다 |
-| DF-4 | 매장 buyer 주문 조회 컨트롤러가 KPA / GlycoPharm / K-Cosmetics 3벌로 중복 | `B2B_COMMONIZABLE` 로 분류. 공통화는 3서비스 동시 회귀가 필요해 별도 WO |
-| ↳ **DF-4 종결** | 동일 WO | 3벌 조회 SQL 을 `services/checkout/buyer-order-read.service.ts` 하나로 모았다. controller 3개는 thin wrapper |
-| DF-5 | GlycoPharm 에 **`sourceType: 'b2b'` 를 만드는 frontend 생산자가 없다.** 서버(`checkout-confirm-b2b`)와 공통 client(`useStoreCart`)는 준비됐지만 승인 공급 상품을 장바구니에 담는 화면이 없다. `/store/commerce/products` 는 "공급 상품 **신청**"(ProductApproval PENDING) 이며 신청 ≠ 주문 | 담기 버튼을 붙이는 것은 그 화면의 **의미를 바꾸는 제품/UX 결정**이다 (DF-2 와 같은 이유). 임의 배선 금지 |
-| ↳ **DF-5 종결** | `WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1` | 새 주문 UI 를 만들지 않고, `/store/commerce/products` 카탈로그를 **opt-in** cart producer 로 연결했다(§13-6). "신청"(ProductApproval) 액션은 그대로 남고 "담기"가 별개 액션으로 추가된다 — 담기 ≠ 신청 ≠ 주문 |
-| DF-7 | GlycoPharm 다중 매장(조직) 사용자를 위한 **조직 선택 UI 가 없다.** 서버는 `AMBIGUOUS_STORE_ORGANIZATION` 으로 fail closed 하고 화면은 그 사유를 그대로 보여준다 | 임의로 첫 조직을 고르지 않는 것이 계약(§13-3)이다. 선택 UI 는 조직 목록 조회 표면이 새로 필요하므로 별도 WO |
-| DF-8 | 승인축 `gate` 의 PRIVATE 판정은 `allowed_seller_ids` 를 **buyerId(사용자)** 와 비교하는데, 카탈로그 노출 판정은 **organizationId(매장)** 와 비교한다 — 카탈로그에 보이는 PRIVATE offer 가 confirm 에서 거부될 수 있다 | 공급 승인 정책의 축을 바꾸는 변경이고 glycopharm · kpa-society · k-cosmetics 3서비스에 동시 영향이다. 완화가 아니라 축 정렬이므로 별도 WO |
+| DF-4 | 매장 buyer 주문 조회 컨트롤러가 KPA / K-Cosmetics 2벌로 중복 | `B2B_COMMONIZABLE` 로 분류. 공통화는 2서비스 동시 회귀가 필요해 별도 WO |
+| ↳ **DF-4 종결** | 동일 WO | 조회 SQL 을 `services/checkout/buyer-order-read.service.ts` 하나로 모았다. 서비스별 controller 는 thin wrapper |
+| DF-5 | `/store/commerce/products` 는 "공급 상품 **신청**"(ProductApproval PENDING) 이며 신청 ≠ 주문 | 담기 버튼을 붙이는 것은 그 화면의 **의미를 바꾸는 제품/UX 결정**이다 (DF-3 과 같은 이유). 임의 배선 금지 |
+| ↳ **DF-5 종결** | canonical cart producer 채택 (§13-6) | 새 주문 UI 를 만들지 않고, `/store/commerce/products` 카탈로그를 **opt-in** cart producer 로 연결했다(§13-6). "신청"(ProductApproval) 액션은 그대로 남고 "담기"가 별개 액션으로 추가된다 — 담기 ≠ 신청 ≠ 주문 |
+| DF-8 | 승인축 `gate` 의 PRIVATE 판정은 `allowed_seller_ids` 를 **buyerId(사용자)** 와 비교하는데, 카탈로그 노출 판정은 **organizationId(매장)** 와 비교한다 — 카탈로그에 보이는 PRIVATE offer 가 confirm 에서 거부될 수 있다 | 공급 승인 정책의 축을 바꾸는 변경이고 kpa-society · k-cosmetics 2서비스에 동시 영향이다. 완화가 아니라 축 정렬이므로 별도 WO |
 | DF-6 | `neture` 노출 strategy 는 `spo.deleted_at IS NULL` 을 걸지 않는다 — soft-delete 된 offer 가 Neture confirm 에서 여전히 보인다 | 현행 main 과 **정확히 동일한 동작**이다. confirm 공통화 WO 에서 Neture 노출 범위를 바꾸면 §22 회귀 위험. 별도 WO 로 축소 |
 | ↳ **DF-6 종결** | `WO-O4O-B2B-REMAINING-DEBT-FINAL-CLOSURE-V1` | soft delete 는 서비스별 공급 노출 정책이 아니라 **3축 공통 불변식**이라고 판정하고, strategy 조각이 아니라 `b2b-checkout-confirm.core.ts` 의 base 쿼리가 소유하게 옮겼다(`approval`/`optin` 조각에서 제거 · `neture` 축이 자동 상속). 같은 게이트를 catalog SSOT 4개 쿼리(`/catalog` 목록·건수 · `findApplicableOffer` · `/orderable`)에도 맞췄다 — `삭제된 offer → catalog 미노출 → cart 담기 불가 → confirm 불가` |
 
@@ -369,7 +362,6 @@ controller 는 thin wrapper 다 — 경로 · 서비스 scope · 서비스별 �
 | 서비스 | 목록 | 상세 |
 |---|---|---|
 | KPA Society | `GET /api/v1/kpa/checkout/orders` | `.../orders/:orderId` |
-| GlycoPharm | `GET /api/v1/glycopharm/checkout/orders` | `.../orders/:orderId` |
 | K-Cosmetics | `GET /api/v1/cosmetics/orders` | `/orders/:id` |
 
 경로 접두어 차이는 **의도적으로 남긴다** (`KEEP_COMPATIBLE_ALIASES`). 통일 대상은 경로 이름이 아니라 의미·소유권·응답 계약이다.
@@ -420,7 +412,7 @@ confirm 의 **공통부는 서비스 무관(service-agnostic)** 이다.
 
 | strategy | 서비스 | 노출 근거 (SQL) | gate |
 |---|---|---|---|
-| `approval` | glycopharm · kpa-society · k-cosmetics | `EXISTS offer_service_approvals(offer_id, service_key, approval_status = 'approved')` | `MASTER_INACTIVE` · `DISTRIBUTION_DENIED` |
+| `approval` | kpa-society · k-cosmetics | `EXISTS offer_service_approvals(offer_id, service_key, approval_status = 'approved')` | `MASTER_INACTIVE` · `DISTRIBUTION_DENIED` |
 | `optin` | pharmacy-hub | `$key = ANY(spo.service_keys)` | `DISTRIBUTION_DENIED` · `MASTER_INACTIVE` |
 | `neture` | neture | 없음 (junction 미사용) | `PRODUCT_NOT_APPROVED` · `DISTRIBUTION_DENIED` |
 
@@ -433,7 +425,7 @@ confirm 의 **공통부는 서비스 무관(service-agnostic)** 이다.
 **불변식 C5.** strategy 에 등록되지 않은 serviceKey 는 B2B confirm 대상이 아니다
 (`UNSUPPORTED_CART_SERVICE`).
 
-**불변식 C6** (WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1).
+**불변식 C6.**
 `offer_service_approvals.approval_status` 는 **소문자** 도메인이다(`pending` / `approved` / …).
 대문자 `'APPROVED'` 는 `supplier_product_offers.approval_status` 의 축이며 서로 다른 축이다.
 confirm 의 노출 SQL 은 카탈로그 SSOT(`buildServiceApprovalGateSql`)와 **같은 표기**로 비교해야 한다 —
@@ -467,7 +459,6 @@ confirm 의 노출 SQL 은 카탈로그 SSOT(`buildServiceApprovalGateSql`)와 *
 
 | 서비스 | `organizationPolicy` | 이유 |
 |---|---|---|
-| 승인축 (glycopharm 등) | `required` | 매장이 주문 주체다 |
 | Neture | `validate-only` | 현행 client 가 조직을 보내지 않는다. 자동 확정하면 seller 축과 SERVICE 유통 판정이 바뀐다 (회귀) |
 | PharmacyHub | `unused` | 현행 계약에 조직 축이 없다 |
 
@@ -475,7 +466,7 @@ confirm 의 노출 SQL 은 카탈로그 SSOT(`buildServiceApprovalGateSql`)와 *
 
 | 서비스 | 경로 | 구현 |
 |---|---|---|
-| KPA · GlycoPharm · K-Cosmetics (event_offer) | `POST /store/cart/:serviceKey/checkout-confirm` | `EventOfferCartCheckoutService` — **변경 없음** |
+| KPA · K-Cosmetics (event_offer) | `POST /store/cart/:serviceKey/checkout-confirm` | `EventOfferCartCheckoutService` — **변경 없음** |
 | 승인축 B2B | `POST /store/cart/:serviceKey/checkout-confirm-b2b` | `StoreB2BCartCheckoutService` (wrapper) |
 | Neture B2B | 동일 경로 | `NetureB2BCartCheckoutService` (wrapper) |
 | PharmacyHub | 자체 `PharmacyHubOrderController` | `PharmacyHubCartCheckoutService` (wrapper) |
@@ -502,8 +493,6 @@ confirm 의 노출 SQL 은 카탈로그 SSOT(`buildServiceApprovalGateSql`)와 *
 
 ### 13-6. cart producer — 승인 카탈로그가 유일한 B2B 담기 출처다
 
-WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1.
-
 `store_cart_items(sourceType='b2b')` 를 만드는 화면은 **승인된 공급 카탈로그**
 (`supplier_product_offers` 기반 catalog SSOT) 뿐이다. 카탈로그 행의 `id` 가 곧
 `supplier_product_offers.id` 이며, 이 값이 `supplierProductOfferId` 로 그대로 간다.
@@ -517,7 +506,7 @@ WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1.
 
 금지:
 
-- legacy 서비스 자체 상품(예: `glycopharm_products`)을 B2B 주문 source 로 쓰는 것
+- legacy 서비스 자체 상품을 B2B 주문 source 로 쓰는 것
 - 표시명(`supplierName`) · manufacturer 문자열을 공급자 식별자로 쓰는 것
 - sku · barcode heuristic 으로 offer 를 매칭하는 것
 - frontend 가 승인·유통·조직 자격을 선판단해 담기를 막거나 허용하는 것
@@ -538,7 +527,7 @@ WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1.
 
 WO-O4O-KPA-INTEREST-PRODUCT-WORKTABLE-TO-CANONICAL-CART-ADOPTION-V1.
 
-§13-6 의 GlycoPharm 채택과 **같은 계약**을 KPA-Society 의 관심상품 작업대
+§13-6 의 cart producer 계약을 KPA-Society 의 관심상품 작업대
 (`/pharmacy/store-order-worktable`)에 적용한 것이다. 새 주문 축이 아니다.
 
 ```text
@@ -592,10 +581,10 @@ WO-O4O-KPA-INTEREST-PRODUCT-WORKTABLE-TO-CANONICAL-CART-ADOPTION-V1.
 서버가 항목 단위로 fail-closed 하므로 **축 오염은 없었지만** 사용자에게는 "반쪽 주문"으로 보였다.
 새 cart architecture 를 만들지 않고 경로 선택만 고쳤다(§8 — 새 cart 구조 금지).
 
-적용 범위: `useStoreCart` 를 쓰는 KPA-Society · GlycoPharm · K-Cosmetics.
+적용 범위: `useStoreCart` 를 쓰는 KPA-Society · K-Cosmetics.
 Neture 매장 장바구니(`services/web-neture/.../StoreCartPage.tsx`)는 이 hook 을 쓰지 않지만
 `neture` 축에는 event-offer producer 자체가 없어(`getBuyerOrderServiceKeys` 의 event-offer 키는
-KPA/GP/K-Cosmetics 전용) 혼재가 성립하지 않는다 — **억지로 hook 으로 이관하지 않는다**.
+KPA/K-Cosmetics 전용) 혼재가 성립하지 않는다 — **억지로 hook 으로 이관하지 않는다**.
 Pharmacy-Hub 는 자체 cart 표면을 유지한다(§13-4).
 
 계약 고정: `packages/store-ui-core/src/components/store-cart/__tests__/useStoreCart.axis-separation.test.tsx`.

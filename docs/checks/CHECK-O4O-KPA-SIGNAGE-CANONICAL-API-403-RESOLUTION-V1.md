@@ -29,8 +29,8 @@ KPA signage 프론트 3개 화면이 `X-Organization-Id` 로 **약사회 회원 
 |---|---|
 | 계정 | KPA 약국 경영자 테스트 계정 (`docs/local/TEST-ACCOUNTS.local.md`, 자격증명 미기재) |
 | 로그인 | `POST /api/v1/auth/login` · `serviceKey='kpa-society'` · 200 · 인증은 httpOnly cookie(`accessToken`/`refreshToken`) |
-| roles | `kpa:store_owner`, `cosmetics:store_owner`, `glycopharm:store_owner`, `pharmacy-hub:store_owner`, `lms:instructor` 외 |
-| service_memberships | `kpa-society=active`, `platform=active`, `pharmacy-hub=active`, `k-cosmetics=active`, `glycopharm=active`, `neture=active`, `kpa-branch=active` |
+| roles | `kpa:store_owner`, `cosmetics:store_owner`, `pharmacy-hub:store_owner`, `lms:instructor` 외 |
+| service_memberships | `kpa-society=active`, `platform=active`, `pharmacy-hub=active`, `k-cosmetics=active`, `neture=active`, `kpa-branch=active` |
 | user.organizationId | **undefined** (JWT/user 객체에 없음) |
 | user.permissions / scopes | 빈 배열 |
 | 프론트가 보낸 organizationId | `c92b857f…` = `kpa_members.organization_id` (조직명 「테스트 약국」) |
@@ -103,7 +103,7 @@ mount: `apps/api-server/src/bootstrap/register-routes.ts:1021` → `app.use('/ap
 | `service_memberships` | `kpa-society` = `active` | 정상 — membership 은 원인 아님 |
 | `organization_members` | 4행 전부 `role='owner'`, `left_at IS NULL` — 그중 KPA 매장 = `9c87f46b…` | 정상 |
 | `kpa_members` | 1행 — `organization_id=c92b857f…`, `role='member'`, `status='active'` | **다른 축**(회원 자격) |
-| `organization_service_enrollments` | `9c87f46b→kpa-society(active)`, `c92b857f→kpa-society/glycopharm(active)` | 두 조직 모두 서비스 연결은 있음 |
+| `organization_service_enrollments` | — | 두 조직 모두 서비스 연결은 있음 |
 | `platform_store_slugs` | `9c87f46b→kpa(네뚜레-약국)`, `c92b857f→kpa(테스트-약국)` | 동일 |
 | store-owner resolver (`resolveStoreOrganization('kpa')`) | 후보 **1건 = `9c87f46b…`** (`c92b857f` 는 `organization_members` 행 자체가 없어 탈락) | **canonical 매장 조직 확정** |
 | `kpa ↔ kpa-society 혼용` | operator 경로에는 rolePrefix 정규화 존재(`hasSignageOperatorPermission`), store 경로는 role prefix 를 보지 않음 | 이번 403 과 무관 |
@@ -114,7 +114,7 @@ mount: `apps/api-server/src/bootstrap/register-routes.ts:1021` → `app.use('/ap
 
 ## 5. 교차 서비스 대조군 (§6)
 
-- K-Cosmetics / GlycoPharm / Pharmacy-Hub 의 내 매장 화면은 **조직 id 를 클라이언트가 보내지 않는다**.
+- K-Cosmetics / Pharmacy-Hub 의 내 매장 화면은 **조직 id 를 클라이언트가 보내지 않는다**.
   전부 백엔드 `resolveStoreOrganization(serviceKey)` 로 해석한다 → 동일 결함 없음.
 - KPA 도 signage 외 화면(`local-products`·`handled-products`·`pharmacy/info`·`store/config`)은 백엔드 해석이라 정상이었다.
 - 즉 이 결함은 **"클라이언트가 조직을 지정하는 유일한 축(signage)"** 에만 존재했다.

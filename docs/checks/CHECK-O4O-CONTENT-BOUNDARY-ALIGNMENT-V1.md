@@ -51,7 +51,7 @@
 | `neture_supplier_contents` 참조 | `content-meta.ts` 헤더·주석 5곳, `CONTENT-META-PRODUCTION-READY-V1` | 원장은 `20260303000000-DropNetureSupplierContents` 로 DROP. 현행 = `neture_supplier_library_items` |
 | `ContentServiceKey` 3개 하드코딩("5개" 주석) | `content-meta.ts` | 실원장 `cms_contents.serviceKey` 에 `pharmacy-hub` · `kpa` 존재 (§2) → union 복제 drift 확정 |
 | `kpa_contents.created_by (role 기반 추론) → 'service_admin'` | `content-meta.ts` 주석 · KPA adapter 2곳 | §2 실데이터로도 반증 |
-| `GlycoPharm 관리자` · `kpa_working_contents` (Layer 2) | `content-meta.ts` | GlycoPharm 은 공식 서비스 아님 · `kpa_working_contents` 는 `20270213000000-DropKpaWorkingContentsDeadTable` 로 DROP |
+| `kpa_working_contents` (Layer 2) | `content-meta.ts` | `kpa_working_contents` 는 `20270213000000-DropKpaWorkingContentsDeadTable` 로 DROP |
 | "supplier = legacy 예외 · 공급자 → 오프라인 → Operator 등록" | F4 §3.1 · §3.2 · §6.3 · §10-5 | Architecture §2-1 과 충돌 |
 | "공급자가 HUB에 직접 콘텐츠를 제작·게시하는 구조 금지" | 게시 표준 §6 · 3자 흐름 §2 · §3 · §6 | Architecture §2-1 과 충돌 |
 

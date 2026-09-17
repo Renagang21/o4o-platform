@@ -59,7 +59,6 @@ pricingRevalidationRequired: true, fulfillmentVisibility: 'hidden_until_paid'
 - **positive 주문 생성 — DEFERRED**: 유효 SPO·매장(organization) seed 가 필요. 운영 데이터 mutation 지양 → bogus/graceful 로 갈음, positive 는 frontend 전환(P2d) 또는 seed 확보 시 동반 CHECK.
 
 ## 8. 회귀 무영향
-- event_offer checkout-confirm / KPA·Glyco·KCos cart 흐름 무변경(별도 route).
 - `/neture/seller/orders`·legacyNetureService·payment·정산·fulfillment guard·web-neture 무변경.
 - createOrder 기본값 사용 — payment/정산 로직 무변경.
 

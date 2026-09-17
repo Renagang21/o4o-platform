@@ -36,7 +36,7 @@
 - 백엔드 `enum UserRole` (`types/auth.ts`): `platform:super_admin`, `platform:admin`, `operator`, `manager`, `vendor`, `seller`, `supplier`, `partner`, `affiliate`, `business`, `user`, `customer`
 - `packages/types/src/auth.ts` 의 `UserRole` = **`string`** (타입 제약 없음)
 - RBAC 단일 소스 = `role_assignments` (F9)
-- 서비스 접두: `kpa:`, `neture:`, `glycopharm:`, `glucoseview:`, `cosmetics:` × `:admin` / `:operator`
+- 서비스 접두: `kpa:`, `neture:`, `glucoseview:`, `cosmetics:` × `:admin` / `:operator`
 - `requireAdmin` 허용 = **`platform:admin`, `platform:super_admin` 2종뿐**
 - 프런트 선언 실측 분포: `admin` 69 / `super_admin` 20 / `operator` 8 / `seller` 6 / `supplier` 6 / `partner` 2 / `affiliate` 1 / `platform:super_admin` 1 / `platform:admin` 1 / **`platform_admin`(존재하지 않는 값) 1**
 

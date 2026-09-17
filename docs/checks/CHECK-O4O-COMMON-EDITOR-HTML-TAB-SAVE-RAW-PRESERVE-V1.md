@@ -54,7 +54,6 @@ TipTap 스키마는 **변경하지 않음**(방안 B 최소 수정). 백엔드/P
 ## 4. 영향 범위 (Shared Module Change Protocol)
 
 `@o4o/content-editor` 소비처(서비스별 파일 수, node_modules 제외):
-`web-kpa-society 27 / web-neture 14 / web-glycopharm 14 / admin-dashboard 13 / web-k-cosmetics 11 /
 main-site 7 / shared-space-ui 6 …` — 전 서비스 admin·operator·store·forum 편집 화면.
 
 **회귀 안전성 근거:**
@@ -63,7 +62,7 @@ main-site 7 / shared-space-ui 6 …` — 전 서비스 admin·operator·store·f
 - `setContent` emit=false 전환은 TipTap 기본값(emitUpdate 기본 false)과 동일 계열 — 불필요한 onChange 발생만 제거.
 - 컨트롤러/스키마/DTO/타 패키지 변경 없음. 타입 계약(ContentEditorProps) 불변 → 소비처 빌드 영향 없음(web-kpa-society tsc PASS).
 
-**검증 필요 소비처(대표):** KPA 콘텐츠 직접 작성/제작 자료, Operator 콘텐츠 허브/블로그/POP/QR/다국어, admin-dashboard 콘텐츠, GP/KCos/Neture 편집 화면. → 우선 KPA smoke, 이후 서비스별 점검(후속).
+**검증 필요 소비처(대표):** KPA 콘텐츠 직접 작성/제작 자료, Operator 콘텐츠 허브/블로그/POP/QR/다국어, admin-dashboard 콘텐츠, KCos/Neture 편집 화면. → 우선 KPA smoke, 이후 서비스별 점검(후속).
 
 ---
 
@@ -96,4 +95,4 @@ onChange(raw)를 아직 반영하기 전, 빈값)에 stale value 로 htmlSource 
 
 - 제외: 편집 탭 전환 경고 모달 / HTML 모드 잠금 / 편집 탭 전환 차단 / TipTap 스키마 style 전역 허용 / div·card·callout 구조화 블록 / PDF 추가 수정.
 - 운영 인지: 사용자가 편집(WYSIWYG) 탭으로 직접 전환 후 편집하면 TipTap 직렬화로 일부 스타일 유실될 수 있음(설계상 수용).
-- 후속: 서비스별(GP/KCos/Neture/admin) 편집 화면 회귀 점검. 필요 시 방안 A(스키마 보존)/C(블록 확장) 별도 WO.
+- 후속: 서비스별(KCos/Neture/admin) 편집 화면 회귀 점검. 필요 시 방안 A(스키마 보존)/C(블록 확장) 별도 WO.

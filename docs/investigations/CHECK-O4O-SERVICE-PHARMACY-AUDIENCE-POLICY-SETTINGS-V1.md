@@ -2,7 +2,7 @@
 
 > **작업명:** WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1
 > **유형:** 기능 추가 — 서비스별 "약국 대상 서비스 여부" DB 정책 + admin.neture.co.kr 설정 화면 + 후속 gate 용 helper. **gate 실제 적용은 제외**(다음 WO).
-> **결과: PASS — `service_audience_policies` 전용 테이블(serviceKey UNIQUE, is_pharmacy_target_service) + 4서비스 seed(kpa-society/glycopharm=true, k-cosmetics/neture=false) + neture:admin API(GET list / PUT :serviceKey) + web-neture 로컬 admin 페이지(/admin/settings/service-audience) + `isPharmacyAudienceService()` helper(후속 의약품 gate 기준). api-server typecheck 0 · web-neture build ✓.**
+> **결과: PASS — `service_audience_policies` 전용 테이블(serviceKey UNIQUE, is_pharmacy_target_service) + 4서비스 seed + neture:admin API(GET list / PUTserviceKey) + web-neture 로컬 admin 페이지(/admin/settings/service-audience) + `isPharmacyAudienceService()` helper(후속 의약품 gate 기준). api-server typecheck 0 · web-neture build ✓.**
 > 선행 조사: 사용자 승인(후보 A 단순형 + web-neture 로컬 페이지) — 2026-06-15
 
 ---
@@ -10,13 +10,13 @@
 ## 1. 조사 결론 (구현 전 확정)
 
 - 서비스 key SSOT = **코드 상수** `service-catalog.ts`(DB 아님). per-service 설정 DB 패턴은 이미 3종(`service_legal_profiles`/`service_policy_documents`/`service_contact_settings`) 존재 → 동일 패턴 재사용.
-- **기존 하드코딩 발견:** `offer.service.ts:67` `PHARMACY_ALLOWED_SERVICE_KEYS=['glycopharm','kpa-society']` + `assertPharmacyOnlyServiceKeys`(createSupplierOffer 시 의약품 비약국 차단). **본 정책이 이를 대체할 SSOT** — 후속 gate WO 에서 교체.
+- **기존 하드코딩 발견:** `offer.service.ts:67` `assertPharmacyOnlyServiceKeys`(createSupplierOffer 시 의약품 비약국 차단). **본 정책이 이를 대체할 SSOT** — 후속 gate WO 에서 교체.
 - **사용자 결정:** DB 후보 **A 단순형**(`is_pharmacy_target_service` boolean) + admin UI **web-neture 로컬 페이지**(shared operator-core-ui 미사용 — Neture admin 전용 platform 설정).
 
 ## 2. 구현 요약
 
 - 전용 테이블 `service_audience_policies`(serviceKey당 1 row, UNIQUE) — `is_pharmacy_target_service` boolean + `note` + `updated_by`.
-- migration 에 **4서비스 초기값 seed**(idempotent `ON CONFLICT DO NOTHING`): kpa-society/glycopharm=true, k-cosmetics/neture=false (기존 하드코딩과 정합).
+- migration 에 **3서비스 초기값 seed**(idempotent `ON CONFLICT DO NOTHING`): kpa-society=true, k-cosmetics/neture=false (기존 하드코딩과 정합).
 - `ServiceAudienceService`: list(카탈로그×정책 병합) / get / upsert / **`isPharmacyAudienceService(serviceKey)`**(row 부재 시 레거시 상수 fallback — 후속 gate 안전 기준).
 - neture:admin API + web-neture 로컬 admin 페이지(서비스별 약국 대상 토글 + 메모).
 - **gate 실제 적용·B2B/판매자모집/서비스등록 흐름 변경 없음**(WO 제외 범위 준수).
@@ -52,8 +52,8 @@
 
 ## 5. 초기값/seed
 
-- migration seed 로 4서비스 명시 주입(idempotent). row 부재 시 helper 는 `['glycopharm','kpa-society']` fallback → seed 전·신규 서비스에도 안전.
-- 기존 무-seed 패턴과 달리 seed 한 이유: 본 정책은 초기값이 **정책적으로 확정**(약국=kpa-society/glycopharm)되어 gate 기준의 정확성이 필요.
+- migration seed 로 4서비스 명시 주입(idempotent).
+- 기존 무-seed 패턴과 달리 seed 한 이유: 본 정책은 초기값이 **정책적으로 확정**(약국=kpa-society)되어 gate 기준의 정확성이 필요.
 
 ## 6. 후속 gate 연결 (이번 WO 제외, 참조용)
 

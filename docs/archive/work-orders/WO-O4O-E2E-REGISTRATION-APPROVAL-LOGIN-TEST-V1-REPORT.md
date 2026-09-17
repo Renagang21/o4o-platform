@@ -2,7 +2,6 @@
 
 Version: **4.0**
 Date: **2026-03-11**
-Status: **Round 4: API 전체 플로우 성공 (가입→승인→로그인 4/4), UI 회원관리 GlycoPharm OK**
 
 ---
 
@@ -18,7 +17,6 @@ Cloud SQL `o4o_api` 비밀번호 재설정 + 마이그레이션 실행 → **DB 
 ### Round 2 (DB 복구 후)
 
 ```
-가입(Registration):  4/5 성공 (GlycoPharm, KPA-a, GlucoseView, K-Cosmetics OK / Neture FAIL)
 운영자 로그인:       4/5 성공 (GlucoseView /login 빈 화면 — P1)
 승인(Approval):      0/5 — 테스트 스크립트 URL 불일치 (404)
 사용자 로그인:       0/5 — 승인 미완료로 "대기 중" 상태 (정상 동작)
@@ -29,7 +27,7 @@ Cloud SQL `o4o_api` 비밀번호 재설정 + 마이그레이션 실행 → **DB 
 | # | 수정 | 커밋 |
 |---|------|------|
 | 1 | **GlucoseView /login 빈 화면 수정** — LoginPage 라우트 등록 (`App.tsx`) | `a28861fb8` |
-| 2 | **GlycoPharm /operator/users 404 수정** — operator 라우터에 UsersPage 라우트 추가 | `a28861fb8` |
+| 2 | — | `a28861fb8` |
 | 3 | **K-Cosmetics /operator/users 404 수정** — operator 라우터에 OperatorUsersPage 라우트 추가 | `a28861fb8` |
 | 4 | **E2E 스크립트 개선** — KPA-a 직접 `/operator/members` 이동, GlucoseView 약관 체크박스 자동 체크 | `a28861fb8` |
 
@@ -38,7 +36,6 @@ Cloud SQL `o4o_api` 비밀번호 재설정 + 마이그레이션 실행 → **DB 
 ```
 가입(Registration):  4/5 성공 (Round 2 동일)
 운영자 로그인:       5/5 성공 ← GlucoseView 빈 화면 수정됨
-승인 페이지 로드:    3/5 성공 (GlycoPharm, KPA-a, K-Cosmetics 페이지 렌더링)
 승인 API 호출:      0/5 실패 — API 403 Forbidden (Backend RBAC 이슈)
 사용자 로그인:       0/5 — 승인 미완료 → "가입 승인 대기 중" (정상 동작)
 ```
@@ -48,26 +45,23 @@ Cloud SQL `o4o_api` 비밀번호 재설정 + 마이그레이션 실행 → **DB 
 | # | 수정 | 커밋 |
 |---|------|------|
 | 1 | **API 403 수정 (WO-O4O-MEMBERSHIP-APPROVAL-API-403-FIX-V1)** — operator 역할을 admin/users API에 허용 | `53ad9a1ef` |
-| 2 | **회원관리 UI 통합 (WO-O4O-MEMBERSHIP-MANAGEMENT-UNIFICATION-V1)** — GlycoPharm/K-Cosmetics UsersPage Mock→실제 API, GlucoseView 신규 생성 | `8f2f547d2` |
+| 2 | **회원관리 UI 통합 (WO-O4O-MEMBERSHIP-MANAGEMENT-UNIFICATION-V1)** — K-Cosmetics UsersPage Mock→실제 API, GlucoseView 신규 생성 | `8f2f547d2` |
 | 3 | **Routes 리팩터링 (WO-O4O-ROUTES-REFACTOR-V1)** — neture + kpa controller/service 분리 | `5afc75991` |
 
 ### Round 4 (API 직접 테스트 + UI 검증)
 
 ```
-가입(Registration):  4/4 성공 (API curl — GlycoPharm, KPA-a, GlucoseView, K-Cosmetics)
 운영자 승인:         4/4 성공 (API curl — cookie 인증으로 PATCH /admin/users/:id/status)
 승인 후 로그인:      4/4 성공 (API curl — status=approved, roles=["customer"])
-UI 회원관리:         1/3 성공 (GlycoPharm OK / GlucoseView 세션소실 / K-Cosmetics CORS 차단)
 ```
 
 **핵심 성과:**
 - **API 전체 플로우 최초 성공** — 가입→운영자 승인→승인 후 로그인 4/4 서비스 완전 동작
-- **GlycoPharm 회원관리 UI 완전 동작** — 실제 데이터 표시, 승인/거부/비밀번호 변경/삭제 버튼 정상
 - **남은 이슈**: GlucoseView 세션 소실 (P1, Round 3부터), K-Cosmetics Cloud Run CORS 미등록 (P1)
 
 **핵심 발견:**
 - GlucoseView P1 빈 화면 **수정 확인** — `/login` 정상 렌더링
-- 승인 페이지 404 **수정 확인** — GlycoPharm, KPA-a 회원 관리 UI 렌더링 성공
+- 승인 페이지 404 **수정 확인** — KPA-a 회원 관리 UI 렌더링 성공
 - **NEW P1: 승인 API 403 Forbidden** — 운영자 계정이 회원 관리 API 호출 시 403 반환
 - 사용자 로그인 "가입 승인 대기 중" 메시지 4/4 서비스 정상 표시
 
@@ -122,22 +116,6 @@ neture.co.kr      → 136.110.132.35 (OK)
 
 테스트 계정: `test-e2e-v3@o4o.com` / `O4oTestPass1!`
 
-### 3.1 GlycoPharm (glycopharm.co.kr)
-
-| 단계 | Round 2 | Round 3 | 스크린샷 | 비고 |
-|------|---------|---------|---------|------|
-| 가입 | OK | **OK** | 01~03 | 가입 성공 |
-| 운영자 로그인 | OK | **OK** | 04 | `GlycopharmAdmin` 대시보드 진입 |
-| 승인 페이지 | 404 | **페이지 로드 OK** | 05 | "회원 관리" UI 렌더링 성공, "가입 신청" 탭 표시 |
-| 승인 API | — | **403 Forbidden** | 05~06 | 전체 0, 활성 0, 대기 0, 거부 0 — API 차단 |
-| 사용자 로그인 | 승인 대기 | **승인 대기** | 07 | "가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다." |
-
-**Round 3 분석:**
-- `/operator/users` 라우트 수정 확인 — 페이지 정상 렌더링
-- "회원 관리" 헤더, 전체/활성/대기/거부 카운트 카드, "회원 목록"/"가입 신청" 탭 모두 표시
-- **API 403**: `GlycopharmAdmin` 계정의 역할이 회원 관리 API 호출 권한 없음
-- 사용자 로그인 시 "가입 승인 대기 중" 정상 표시 (test-e2e-v3 계정 pending 확인)
-
 ### 3.2 KPA-a (kpa-society.co.kr)
 
 | 단계 | Round 2 | Round 3 | 스크린샷 | 비고 |
@@ -151,7 +129,6 @@ neture.co.kr      → 136.110.132.35 (OK)
 **Round 3 분석:**
 - `/operator/members` 직접 이동 → 페이지 정상 렌더링
 - "회원 관리" 헤더, 총 회원 수/승인 대기/승인 완료 카드 표시
-- **API error 403**: GlycoPharm과 동일 패턴 — 운영자 역할의 API 권한 부족
 - 사용자 로그인 시 "가입 승인 대기 중" 정상 표시
 
 ### 3.3 GlucoseView (glucoseview.co.kr)
@@ -207,7 +184,6 @@ neture.co.kr      → 136.110.132.35 (OK)
 
 | 서비스 | 가입 | 운영자 로그인 | 승인 페이지 | 승인 API | 사용자 로그인 |
 |--------|------|-------------|-----------|---------|-------------|
-| **GlycoPharm** | OK | OK | **OK** | **403** | 승인 대기 중 |
 | **KPA-a** | OK | OK | **OK** | **403** | 승인 대기 중 |
 | **GlucoseView** | OK | OK (→홈) | 세션 소실 | — | 승인 대기 중 |
 | **K-Cosmetics** | OK | OK | 세션 소실 | — | 승인 대기 중 |
@@ -218,7 +194,7 @@ neture.co.kr      → 136.110.132.35 (OK)
 | 항목 | Round 2 | Round 3 | 상태 |
 |------|---------|---------|------|
 | GlucoseView /login 빈 화면 | 완전 빈 화면 (P1) | LoginPage 정상 렌더링 | **FIXED** |
-| GlycoPharm /operator/users | 404 | 회원 관리 UI 렌더링 | **FIXED** |
+| operator/users | 404 | 회원 관리 UI 렌더링 | **FIXED** |
 | K-Cosmetics /operator/users | 404 | 라우트 등록됨 (세션 이슈 별도) | **FIXED** |
 | GlucoseView 약관 체크 | 미체크로 가입 실패 | 자동 체크로 가입 성공 | **FIXED** |
 | KPA-a 승인 페이지 네비게이션 | 실패 | `/operator/members` 직접 이동 성공 | **FIXED** |
@@ -232,7 +208,7 @@ neture.co.kr      → 136.110.132.35 (OK)
 | Service Membership | **PASS** | "가입 승인 대기 중" 메시지 = pending 상태 정상 |
 | 운영자 UI 인증 | **PASS** | 5/5 서비스 운영자 대시보드/홈 진입 |
 | 운영자 API 인증 | **PASS** | 10/10 계정 API 로그인 성공 (Round 2 전 검증) |
-| **회원 관리 API 권한** | **FAIL** | API 403 Forbidden (GlycoPharm, KPA-a 확인) |
+| **회원 관리 API 권한** | **FAIL** | API 403 Forbidden (KPA-a 확인) |
 
 ---
 
@@ -269,10 +245,7 @@ neture.co.kr      → 136.110.132.35 (OK)
 
 ### 증상
 
-GlycoPharm과 KPA-a 모두 **회원 관리 페이지는 정상 렌더링**되지만, API 호출 시 **403 Forbidden** 반환.
-
 ```
-GlycoPharm-05: "회원 관리" UI 렌더링 → "Forbidden" 에러 (빨간색)
 KPA-a-05:      "회원 관리" UI 렌더링 → "API error 403" (빨간색)
 ```
 
@@ -297,7 +270,6 @@ KPA-a-05:      "회원 관리" UI 렌더링 → "API error 403" (빨간색)
 
 | 서비스 | 승인 페이지 URL | 페이지 렌더링 | API 결과 |
 |--------|----------------|-------------|---------|
-| GlycoPharm | `/operator/users` → "가입 신청" 탭 | OK | **403 Forbidden** |
 | KPA-a | `/operator/members` → "가입 신청" 탭 | OK | **403 (API error 403)** |
 | GlucoseView | `/operator/glucoseview/users` | 세션 소실 | 미확인 |
 | K-Cosmetics | `/operator/users` | 세션 소실 | 미확인 |
@@ -311,7 +283,6 @@ KPA-a-05:      "회원 관리" UI 렌더링 → "API error 403" (빨간색)
 
 | 서비스 | 로그인 UI | 메시지 | 스크린샷 |
 |--------|----------|--------|---------|
-| GlycoPharm | 전용 페이지 | "가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다." | 07 |
 | KPA-a | 모달 | "가입 승인 대기 중입니다. 운영자 승인 후 이용합니다." | 07 |
 | GlucoseView | **LoginPage** (P1 수정됨) | "가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다." | 07 |
 | K-Cosmetics | 전용 페이지 | "가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다." | 07 |
@@ -327,7 +298,6 @@ KPA-a-05:      "회원 관리" UI 렌더링 → "API error 403" (빨간색)
 [DONE] 2. [P0] 마이그레이션 실행 (service_memberships 테이블 생성) → 완료
 [DONE] 3. [P0] 전체 운영자 계정 API 검증 (10/10 PASS) → 완료
 [DONE] 4. [P1] GlucoseView /login 빈 화면 → LoginPage 라우트 등록으로 수정
-[DONE] 5. [P1] GlycoPharm/K-Cosmetics /operator/users 404 → operator 라우터에 라우트 추가
 [OPEN] 6. [P1] 회원 관리 API 403 Forbidden → Backend RBAC 권한 조사 + 수정 필요
 [OPEN] 7. [P1] GlucoseView/K-Cosmetics 운영자 세션 소실 → 인증 상태 유지 조사
 [OPEN] 8. [P1] K-Cosmetics / Neture 대시보드 데이터 로딩 에러 조사
@@ -337,21 +307,12 @@ KPA-a-05:      "회원 관리" UI 렌더링 → "API error 403" (빨간색)
 
 ### 우선순위: API 403 Forbidden (#6)
 
-이 이슈가 해결되면 GlycoPharm과 KPA-a에서 승인 → 사용자 로그인 → 서비스 접근 전체 플로우 검증 가능.
-
 ---
 
 ## 10. 스크린샷 경로 (Round 3)
 
 ```
 e2e/screenshots/
-├── GlycoPharm-01-register-page.png
-├── GlycoPharm-02-register-filled.png
-├── GlycoPharm-03-register-result.png     ✅ 가입 성공
-├── GlycoPharm-04-operator-login.png      ✅ 운영자 대시보드 (GlycopharmAdmin)
-├── GlycoPharm-05-approval-page.png       ✅ 회원 관리 UI 로드, ❌ API 403 Forbidden
-├── GlycoPharm-06-approval-result.png     ❌ Forbidden 지속
-├── GlycoPharm-07-user-login.png          ⏳ "가입 승인 대기 중"
 ├── KPA-a-01-register-page.png
 ├── KPA-a-02-register-filled.png
 ├── KPA-a-03-register-result.png          ✅ 가입 성공
@@ -391,14 +352,13 @@ e2e/screenshots/
 | 수정 | 검증 |
 |------|------|
 | GlucoseView /login 빈 화면 | **FIXED** — LoginPage 정상 렌더링, "가입 승인 대기 중" 표시 |
-| GlycoPharm /operator/users 404 | **FIXED** — "회원 관리" UI 정상 로드 |
+| operator/users 404 | **FIXED** — "회원 관리" UI 정상 로드 |
 | K-Cosmetics /operator/users 404 | **FIXED** — 라우트 등록됨 (세션 문제 별도) |
 | GlucoseView 약관 체크 E2E | **FIXED** — 가입 성공 |
 
 ### 현재 차단 이슈
 
 **API 403 Forbidden** — 운영자 계정으로 회원 관리 API 호출 시 403 반환
-- GlycoPharm: `/operator/users` 페이지 로드 OK → API "Forbidden"
 - KPA-a: `/operator/members` 페이지 로드 OK → API "API error 403"
 - 원인: Backend RBAC 설정 (role_assignments / API 미들웨어 권한 체크)
 
@@ -432,12 +392,11 @@ Round 3까지 Playwright 브라우저 자동화 중심 → Round 4에서는 **AP
 
 | 서비스 | 테스트 계정 | 비밀번호 | User ID |
 |--------|-----------|---------|---------|
-| GlycoPharm | e2e-r4-glycopharm@o4o.com | O4oTest1! | `55347f3d-...` |
 | KPA-a | e2e-r4-kpa@o4o.com | O4oTest1! | `527414f5-...` |
 | GlucoseView | e2e-r4-glucoseview@o4o.com | O4oTest1! | `c3e26ac3-...` |
 | K-Cosmetics | e2e-r4-kcosmetics@o4o.com | O4oTest1! | `20e42f28-...` |
 
-운영자 계정: `admin-glycopharm@o4o.com` / `O4oGlycoAdmin!2026` (admin 역할, 쿠키 인증)
+운영자 계정: `O4oGlycoAdmin!2026` (admin 역할, 쿠키 인증)
 
 ---
 
@@ -447,7 +406,6 @@ Round 3까지 Playwright 브라우저 자동화 중심 → Round 4에서는 **AP
 
 | 서비스 | service 파라미터 | 결과 | 응답 |
 |--------|-----------------|------|------|
-| GlycoPharm | `glycopharm` | **OK** | `{"success":true,"message":"Registration successful"}` |
 | KPA-a | `kpa` | **OK** | `{"success":true,"message":"Registration successful"}` |
 | GlucoseView | `glucoseview` | **OK** | `{"success":true,"message":"Registration successful"}` |
 | K-Cosmetics | `k-cosmetics` | **OK** | `{"success":true,"message":"Registration successful"}` |
@@ -468,7 +426,6 @@ Round 3까지 Playwright 브라우저 자동화 중심 → Round 4에서는 **AP
 **운영자 로그인:**
 ```
 POST /api/v1/auth/login
-Body: {"email":"admin-glycopharm@o4o.com","password":"O4oGlycoAdmin!2026","service":"glycopharm"}
 Response: {"success":true,"data":{"message":"Login successful","user":{"id":"...","role":"admin"}}}
 Cookies: sessionId, refreshToken, accessToken (httpOnly)
 ```
@@ -476,14 +433,12 @@ Cookies: sessionId, refreshToken, accessToken (httpOnly)
 **pending 사용자 조회:**
 ```
 GET /api/v1/admin/users?status=pending
-Response: 4 users (e2e-r4-glycopharm, e2e-r4-kpa, e2e-r4-glucoseview, e2e-r4-kcosmetics)
 ```
 
 **승인 처리:**
 
 | 사용자 | PATCH 결과 | 응답 |
 |--------|-----------|------|
-| e2e-r4-glycopharm | **OK** | `{"success":true,"data":{"id":"55347f3d...","status":"approved"}}` |
 | e2e-r4-kpa | **OK** | `{"success":true,"data":{"id":"527414f5...","status":"approved"}}` |
 | e2e-r4-glucoseview | **OK** | `{"success":true,"data":{"id":"c3e26ac3...","status":"approved"}}` |
 | e2e-r4-kcosmetics | **OK** | `{"success":true,"data":{"id":"20e42f28...","status":"approved"}}` |
@@ -498,7 +453,6 @@ Response: 4 users (e2e-r4-glycopharm, e2e-r4-kpa, e2e-r4-glucoseview, e2e-r4-kco
 
 | 사용자 | 로그인 | status | roles | auth/status |
 |--------|--------|--------|-------|-------------|
-| e2e-r4-glycopharm | **OK** | `approved` | `["customer"]` | authenticated |
 | e2e-r4-kpa | **OK** | `approved` | `["customer"]` | authenticated |
 | e2e-r4-glucoseview | **OK** | `approved` | `["customer"]` | authenticated |
 | e2e-r4-kcosmetics | **OK** | `approved` | `["customer"]` | authenticated |
@@ -508,22 +462,6 @@ Response: 4 users (e2e-r4-glycopharm, e2e-r4-kpa, e2e-r4-glucoseview, e2e-r4-kco
 ---
 
 ### R4-4. UI 회원관리 검증 (Playwright)
-
-#### GlycoPharm (glycopharm.co.kr) — SUCCESS
-
-**운영자 로그인:** `admin-glycopharm@o4o.com` → GlycoPharm 대시보드 진입 성공
-**회원 관리 페이지:** `/operator/users` 정상 로드
-
-| 항목 | 결과 |
-|------|------|
-| 통계 카드 | 전체 111, 활성 7,526, 대기 10, 거부 0 |
-| 회원 목록 탭 | 사용자 테이블 정상 표시 (20명/페이지) |
-| 가입 신청 탭 | pending 사용자 목록 표시 |
-| R4 테스트 사용자 | 4명 모두 "승인" 상태로 표시 확인 |
-| 액션 버튼 | 정지, 비밀번호 변경, 삭제 버튼 정상 렌더링 |
-| 페이지네이션 | 1/6 페이지, 이전/다음 버튼 정상 |
-
-**스크린샷:** `R4-GlycoPharm-operator-users.png`, `R4-GlycoPharm-operator-users-table.png`
 
 #### GlucoseView (glucoseview.co.kr) — FAIL (세션 소실)
 
@@ -537,8 +475,6 @@ Response: 4 users (e2e-r4-glycopharm, e2e-r4-kpa, e2e-r4-glucoseview, e2e-r4-kco
 
 #### K-Cosmetics (k-cosmetics-web Cloud Run) — FAIL (CORS 차단)
 
-**운영자 로그인 시도:** `admin-glycopharm@o4o.com` 입력 → "로그인에 실패했습니다"
-
 **원인:** CORS 정책에 Cloud Run URL(`k-cosmetics-web-3e3aws7zqa-du.a.run.app`)이 미등록.
 API CORS 허용 목록에는 `https://k-cosmetics.site`만 등록되어 있음.
 
@@ -550,7 +486,6 @@ has been blocked by CORS policy
 
 **CORS 허용 목록 (`main.ts:getAllowedOrigins`):**
 ```
-프로덕션: k-cosmetics.site, glycopharm.co.kr, glucoseview.co.kr, kpa-society.co.kr
 Cloud Run URL: 미등록 (*.a.run.app)
 ```
 
@@ -564,7 +499,6 @@ Cloud Run URL: 미등록 (*.a.run.app)
 
 | 서비스 | 가입 (API) | 운영자 승인 (API) | 승인 후 로그인 (API) | UI 회원관리 |
 |--------|-----------|-----------------|-------------------|-----------|
-| **GlycoPharm** | OK | OK | OK (approved, customer) | **OK** — 완전 동작 |
 | **KPA-a** | OK | OK | OK (approved, customer) | 미테스트 (API 확인) |
 | **GlucoseView** | OK | OK | OK (approved, customer) | **FAIL** — 세션 소실 (P1) |
 | **K-Cosmetics** | OK | OK | OK (approved, customer) | **FAIL** — CORS 차단 (P1) |
@@ -574,7 +508,6 @@ Cloud Run URL: 미등록 (*.a.run.app)
 | 항목 | Round 3 | Round 4 | 상태 |
 |------|---------|---------|------|
 | 회원 관리 API 403 Forbidden | 0/5 실패 | **4/4 성공** | **FIXED** |
-| GlycoPharm 회원 관리 UI | 페이지만 렌더링 (데이터 없음) | **실데이터 표시 + 액션 동작** | **FIXED** |
 | 가입→승인→로그인 전체 플로우 | 불가 (403 차단) | **4/4 완전 성공** | **FIXED** |
 | GlucoseView 운영자 세션 소실 | 세션 소실 | 세션 소실 (동일) | **OPEN** |
 | K-Cosmetics 운영자 UI | 세션 소실 | CORS 차단 (Cloud Run URL) | **OPEN** (원인 구체화) |
@@ -588,7 +521,7 @@ Cloud Run URL: 미등록 (*.a.run.app)
 | # | 이슈 | 수정 | 검증 |
 |---|------|------|------|
 | 6 | 회원 관리 API 403 Forbidden | `WO-O4O-MEMBERSHIP-APPROVAL-API-403-FIX-V1` — operator 역할 허용 | API 4/4 승인 성공 |
-| — | GlycoPharm 회원관리 Mock 데이터 | `WO-O4O-MEMBERSHIP-MANAGEMENT-UNIFICATION-V1` — 실제 API 연결 | UI 실데이터 표시 |
+| — | — | `WO-O4O-MEMBERSHIP-MANAGEMENT-UNIFICATION-V1` — 실제 API 연결 | UI 실데이터 표시 |
 
 #### 미해결 (P1)
 
@@ -611,7 +544,7 @@ Cloud Run URL: 미등록 (*.a.run.app)
 | **회원 관리 API 권한** | **차단 (403)** | **정상 (4/4)** | **FIXED** |
 | Service Membership pending | 정상 | **정상** | approved 전환 확인 |
 | 승인 후 로그인 | 미검증 (403 차단) | **정상 (4/4)** | status=approved, roles=["customer"] |
-| UI 회원관리 (GlycoPharm) | 데이터 없음 | **완전 동작** | 실데이터 + 액션 |
+| UI 회원관리 | 데이터 없음 | **완전 동작** | 실데이터 + 액션 |
 | UI 회원관리 (GlucoseView) | 세션 소실 | 세션 소실 | P1 지속 |
 | UI 회원관리 (K-Cosmetics) | 세션 소실 | CORS 차단 | P1 원인 구체화 |
 
@@ -629,8 +562,6 @@ Cloud Run URL: 미등록 (*.a.run.app)
 
 ```
 .playwright-mcp/
-├── R4-GlycoPharm-operator-users.png       ✅ 회원 관리 페이지 (통계 + 테이블)
-├── R4-GlycoPharm-operator-users-table.png ✅ 회원 테이블 전체 (full page)
 ├── R4-GlucoseView-session-lost.png        ❌ 세션 소실 → 로그인 모달
 ├── R4-KCosmetics-CORS-error.png           ❌ CORS 차단 → "로그인에 실패했습니다"
 ```

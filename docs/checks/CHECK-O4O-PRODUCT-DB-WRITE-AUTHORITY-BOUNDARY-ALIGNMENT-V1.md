@@ -22,7 +22,7 @@ PRODUCT_DB_WRITE_ROLES = ['platform:super_admin', 'neture:admin', 'neture:operat
 | 주체 | 공통 Product DB 조회 | 공통 Product DB 수정 |
 |---|:---:|:---:|
 | O4O 전체 관리자 (`platform:super_admin` · `neture:admin` · `neture:operator`) | O | **O** |
-| 서비스 admin/operator (`cosmetics:*` · `kpa-society:*` · `glycopharm:*`) | **O (유지)** | **X (403)** |
+| 서비스 admin/operator (`cosmetics:*` · `kpa-society:*`) | **O (유지)** | **X (403)** |
 | 정당한 공급자 (`requireActiveSupplier` + `supplierId` 스코프) | 자기 제품 O | **자기 제품 O / 타 공급자 X (기존 계약 불변)** |
 | 매장 경영자 | 매장 경로 한정 | X |
 

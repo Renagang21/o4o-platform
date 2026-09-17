@@ -46,7 +46,6 @@ store_owner는 매장 운영 기능을 사용할 수 있는 권한이다.
 ### 3.1 서비스별 store_owner
 
 - kpa:store_owner
-- glycopharm:store_owner
 - cosmetics:store_owner
 
 ### 3.2 Neture
@@ -106,7 +105,6 @@ role_assignments.role IN ({service}:store_owner)
 다음 전환이 완료되었다.
 
 * kpa:store_owner backfill 완료
-* glycopharm:store_owner 구조 준비 완료
 * k-cosmetics:seller → cosmetics:store_owner 전환 완료
 * legacy fallback 제거 완료
 

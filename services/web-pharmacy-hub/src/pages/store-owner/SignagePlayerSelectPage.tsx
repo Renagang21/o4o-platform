@@ -2,7 +2,7 @@
  * SignagePlayerSelectPage — 디지털사이니지 TV 재생 대상 선택 (Pharmacy-Hub)
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §8
- *   KPA / GlycoPharm / K-Cosmetics 와 **같은 공통 View** 를 소비하는 thin adapter.
+ *   KPA / K-Cosmetics 와 **같은 공통 View** 를 소비하는 thin adapter.
  *   PharmacyHub 의 매장 셸 basePath 는 `/store-owner` 라 재생 경로만 prop 으로 주입한다
  *   (공통 View 의 기본값 `/store/marketing/signage/play` 는 그대로 보존).
  */

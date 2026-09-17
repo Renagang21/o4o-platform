@@ -1,6 +1,6 @@
 # IR-O4O-MULTIROLE-SHARED-UTILITY-EXTRACTION-V1
 
-> **조사 목적**: KPA, GlycoPharm, K-Cosmetics, Neture에서 정렬된 multi-role dashboard/workspace 구조를 기준으로, 공통 utility로 추출 가능한 영역과 서비스별로 유지해야 하는 영역을 정리한다.
+> **조사 목적**: KPA, K-Cosmetics, Neture에서 정렬된 multi-role dashboard/workspace 구조를 기준으로, 공통 utility로 추출 가능한 영역과 서비스별로 유지해야 하는 영역을 정리한다.
 >
 > **상태**: COMPLETE
 > **날짜**: 2026-05-15
@@ -12,15 +12,15 @@
 
 ### 1-A. PRIORITY + MAP + Resolver
 
-| 항목 | KPA | GlycoPharm | K-Cosmetics | Neture |
-|------|-----|-----------|------------|--------|
-| PRIORITY 배열 | `KPA_ROLE_PRIORITY` | `GLYCOPHARM_ROLE_PRIORITY` | `KCOSMETICS_ROLE_PRIORITY` | `NETURE_ROLE_PRIORITY` |
-| DASHBOARD_MAP | `KPA_DASHBOARD_MAP` | `GLYCOPHARM_DASHBOARD_MAP` | `KCOSMETICS_DASHBOARD_MAP` | `NETURE_DASHBOARD_MAP` |
-| resolver 함수 | `getKpaPostLoginRoute(user)` | `getGlycopharmDashboardRoute(roles)` | `getKCosmeticsDashboardRoute(roles)` | `getNetureDashboardRoute(roles)` |
-| resolver 입력 | `User` 객체 (context fallback 포함) | `roles[]` | `roles[]` | `roles[]` |
-| context fallback | ✅ `isStoreOwner`, `activityType` | ❌ | ❌ | ❌ |
-| mypage null 처리 | ✅ (`/mypage` → null) | ❌ | ❌ | ❌ |
-| role label helper | ❌ | ❌ | ❌ | ✅ `getNetureRoleLabel()` |
+| 항목 | KPA | K-Cosmetics | Neture |
+| ------ | ----- | ------------ | -------- |
+| PRIORITY 배열 | `KPA_ROLE_PRIORITY` | `KCOSMETICS_ROLE_PRIORITY` | `NETURE_ROLE_PRIORITY` |
+| DASHBOARD_MAP | `KPA_DASHBOARD_MAP` | `KCOSMETICS_DASHBOARD_MAP` | `NETURE_DASHBOARD_MAP` |
+| resolver 함수 | `getKpaPostLoginRoute(user)` | `getKCosmeticsDashboardRoute(roles)` | `getNetureDashboardRoute(roles)` |
+| resolver 입력 | `User` 객체 (context fallback 포함) | `roles[]` | `roles[]` |
+| context fallback | ✅ `isStoreOwner`, `activityType` | ❌ | ❌ |
+| mypage null 처리 | ✅ (`/mypage` → null) | ❌ | ❌ |
+| role label helper | ❌ | ❌ | ✅ `getNetureRoleLabel()` |
 
 ---
 
@@ -29,7 +29,6 @@
 | 서비스 | 진입점 | 구조 |
 |--------|--------|------|
 | KPA | `App.tsx` `<PostLoginRedirect />` | `useRef` 이중 가드 + `wasAuthenticatedRef` + `didRedirectRef` + early exit paths + context loading wait |
-| GlycoPharm | `LoginPage.tsx` 내부 `handleSubmit` | `loginType` override 분기 → `getGlycopharmDashboardRoute(user.roles)` |
 | K-Cosmetics | `LoginPage.tsx` + `LoginModal.tsx` 내부 | `result.roles?.length` 체크 → `getKCosmeticsDashboardRoute(result.roles)` |
 | Neture | 없음 | LoginModal 기반 — 역할 redirect 없이 `/` 이동 |
 
@@ -41,7 +40,6 @@
 |--------|----------|------------|
 | KPA GlobalHeader | `user.isStoreOwner === true \|\| roles.includes('kpa:store_owner')` | ✅ |
 | KPA PharmacyGuard | `hasAnyRole(roles, STORE_OWNER_ROLES) \|\| user.isStoreOwner === true` | ✅ |
-| GlycoPharm GlobalHeader | `roles.includes('glycopharm:pharmacist')` (store_owner 별도 체크 없음) | ❌ |
 | K-Cosmetics GlobalHeader | `roles.includes('cosmetics:store_owner')` | ❌ |
 | Neture GlobalHeader | `roles.some(r => r === 'neture:supplier' \|\| r === 'supplier')` | ❌ |
 
@@ -52,7 +50,6 @@
 | 서비스 | 워크스페이스 드롭다운 링크 | 판정 |
 |--------|------------------------|------|
 | KPA | ✅ "내 매장" (`/store`) | `isStoreOwner` (dual-source) |
-| GlycoPharm | ❌ 없음 | — |
 | K-Cosmetics | ❌ 없음 | — |
 | Neture | ❌ 없음 (대시보드 링크 별도 구성) | `hasDashboardRole` → `getNetureDashboardRoute()` |
 
@@ -78,14 +75,13 @@ ROLE_DASHBOARD_MAP     // legacy 비접두사 맵
 
 ### 2-A. `isStoreOwnerDual()` — 추출 가치 높음
 
-**현재 중복**: KPA GlobalHeader + PharmacyGuard에 동일 로직이 2번 구현되어 있고, GlycoPharm/K-Cosmetics는 context fallback 없이 role-only로 처리 중.
+**현재 중복**: KPA GlobalHeader + PharmacyGuard에 동일 로직이 2번 구현되어 있고, K-Cosmetics는 context fallback 없이 role-only로 처리 중.
 
 **제안 API**:
 ```typescript
 // packages/auth-utils/src/isStoreOwnerDual.ts
 export function isStoreOwnerDual(
   roles: string[],
-  storeOwnerRole: string,          // e.g. 'kpa:store_owner', 'glycopharm:store_owner'
   contextFlag?: boolean,           // e.g. user.isStoreOwner
 ): boolean {
   return roles.includes(storeOwnerRole) || contextFlag === true;
@@ -97,8 +93,6 @@ export function isStoreOwnerDual(
 // KPA GlobalHeader
 const isStoreOwner = isStoreOwnerDual(user.roles, 'kpa:store_owner', user.isStoreOwner);
 
-// GlycoPharm GlobalHeader (upgrade path)
-const isStoreOwner = isStoreOwnerDual(user.roles, 'glycopharm:store_owner');
 ```
 
 ---
@@ -190,10 +184,10 @@ export function isStoreOwner(roles: string[], serviceKey: string): boolean {
 
 | 영역 | 이유 |
 |------|------|
-| `{SERVICE}_ROLE_PRIORITY` 배열 | 서비스마다 역할 체계 다름 (kpa:pharmacist vs glycopharm:store_owner vs neture:supplier) |
+| `{SERVICE}_ROLE_PRIORITY` 배열 | 서비스마다 역할 체계 다름 (kpa:pharmacist:store_owner vs neture:supplier) |
 | `{SERVICE}_DASHBOARD_MAP` | 서비스마다 워크스페이스 경로 다름 (`/store` vs `/store/hub` vs `/supplier/dashboard`) |
 | `get{Service}PostLoginRoute()` 함수 body | context fallback 이름, mypage null 처리, activityType 체크 등 서비스별 상이 |
-| `loginType` override 분기 | GlycoPharm 전용 (pharmacy/operator URL 쿼리 파라미터) |
+| `loginType` override 분기 | — |
 | `MembershipGate` 내부 serviceKey | 서비스별 고정값 |
 | `ROLE_LABELS`, `ROLE_ICONS` | 서비스별 표시 텍스트/이모지 상이 |
 
@@ -339,7 +333,6 @@ function PostLoginRedirect() {
 
 **각 서비스 적용 상태**:
 - KPA: ✅ 구현됨 (reference)
-- GlycoPharm: ❌ LoginPage 내부 — P2 이관 대상
 - K-Cosmetics: ❌ LoginPage + LoginModal 내부 — P2 이관 대상
 - Neture: ❌ 미구현 — 현재 gap 없음 (P3)
 
@@ -352,7 +345,6 @@ function PostLoginRedirect() {
 | `kpa:instructor` | ✅ 이미 `lms:instructor` | ✅ `/instructor` | KPA 적용됨 |
 | `neture:supplier` (upgrade) | ✅ 기존 `supplier` 아래에 추가 | ✅ | legacy `supplier` 공존 유지 |
 | `kpa:branch` (분회) | ✅ pharmacist 아래 추가 | ✅ `/branch` | 향후 WO 필요 |
-| `glycopharm:partner` | ✅ store_owner 아래 추가 | ✅ | 신규 역할 시 MAP 확장만 |
 
 **결론**: PRIORITY+MAP 구조는 신규 역할 추가 시 배열/맵에 항목만 추가하면 됨. `getPrimaryDashboardRoute()`는 변경 불필요. **확장성 충분**.
 
@@ -365,9 +357,7 @@ function PostLoginRedirect() {
 | P1 | WO-O4O-AUTH-UTILS-STORE-OWNER-DUAL-V1 | `isStoreOwnerDual()` → `@o4o/auth-utils` 추출 + KPA 적용 | 패키지 |
 | P1 | WO-O4O-INSTRUCTOR-ROUTE-GUARD-V1 | `/instructor` RoleGuard 추가 | KPA |
 | P2 | WO-O4O-AUTH-UTILS-ROLE-LABEL-V1 | `getRoleLabel()` → `@o4o/auth-utils` 추출 + Neture 위임 | 패키지 |
-| P2 | WO-O4O-GLYCOPHARM-POSTLOGIN-REDIRECT-UNIFICATION-V1 | LoginPage → App.tsx PostLoginRedirect 이관 | GlycoPharm |
 | P2 | WO-O4O-KCOSMETICS-POSTLOGIN-REDIRECT-UNIFICATION-V1 | LoginPage+Modal → App.tsx PostLoginRedirect 이관 | K-Cosmetics |
-| P3 | WO-O4O-GLYCOPHARM-STORE-MENU-ENTRY-V1 | 헤더 드롭다운 "내 매장" 추가 (KPA 패턴) | GlycoPharm |
 | P3 | WO-O4O-KCOSMETICS-STORE-MENU-ENTRY-V1 | 헤더 드롭다운 "내 매장" 추가 | K-Cosmetics |
 | P3 | WO-O4O-NETURE-POSTLOGIN-REDIRECT-V1 | 역할 기반 redirect 구현 | Neture |
 | P4 | WO-O4O-LEGACY-ROLE-PRIORITY-CLEANUP-V1 | `rolePriority.ts` / `roleDashboardMap.ts` legacy 비접두사 제거 | 패키지 |
@@ -380,7 +370,6 @@ function PostLoginRedirect() {
 - 4개 서비스 PRIORITY+MAP 구조 통일 ✅
 - `getPrimaryDashboardRoute()` 공유 ✅
 - K-Cosmetics roles array 버그 수정 ✅
-- GlycoPharm store_owner Map 추가 ✅
 
 **즉시 추출 가능한 유틸:**
 - `isStoreOwnerDual()` — 구현 단순, 가치 명확, stale JWT 문제 해결

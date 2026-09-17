@@ -132,7 +132,6 @@ STOP_WHEN_UNUSED   (1순위 · 절감 최대)
 | `signage-player-web` | 0 | 5 | 1 / 256Mi | 2026-09-04 13:52 | X | KEEP_MINIMAL |
 | `k-cosmetics-web` | 0 | 5 | 1 / 256Mi | 2026-09-04 13:47 | O | KEEP_MINIMAL |
 | `kpa-society-web` | 0 | 5 | 1 / 256Mi | 2026-09-04 13:40 | O | KEEP_MINIMAL |
-| `glycopharm-web` | 0 | 5 | 1 / 256Mi | 2026-09-04 13:13 | O | KEEP_MINIMAL |
 | `pharmacy-hub-web` | 0 | 5 | 1 / 256Mi | 2026-09-04 13:11 | O | KEEP_MINIMAL |
 | `glucoseview-web` | 0 | 5 | 1 / 256Mi | 2026-09-04 12:53 | O | KEEP_MINIMAL |
 | `kpa-branch-web` | 0 | 5 | 1 / 256Mi | 요청 로그 **0** | X | **KEEP_MINIMAL** (아래 주석) |
@@ -235,7 +234,7 @@ gcloud compute networks vpc-access connectors list --region=asia-northeast3  →
 | 레거시 인증서 | `cert-final-neture-v3` (classic managed) — **PROVISIONING_FAILED_PERMANENTLY · 16개 도메인 전부 FAILED_NOT_VISIBLE** |
 
 **호스트 라우팅(10개 host rule)**: `neture.co.kr`/`www` · `admin.neture.co.kr` · `api.*`(5개 도메인 통합) ·
-`glycopharm.co.kr`/`www` · `glucoseview.co.kr`/`www` · `kpa-society.co.kr`/`www` · `k-cosmetics.site`/`www` ·
+`www` · `glucoseview.co.kr`/`www` · `kpa-society.co.kr`/`www` · `k-cosmetics.site`/`www`
 `pharmacyhub.co.kr`/`www`
 
 > **주의**: 실제 TLS 는 **Certificate Manager 가 서빙**하고 있고, target proxy 에 함께 붙어 있는

@@ -251,9 +251,9 @@ export function createStorePublicTabletRoutes(deps: {
       // 상담 요청 생성 시 매장 사용자(경영자/직원)에게 in-app 알림 생성.
       // - 기존엔 알림이 없어 직원이 /store/requests 화면을 5초 polling 으로 직접 봐야 인지 가능했음.
       // - best-effort: 알림 실패가 요청 생성(본 기능)을 막지 않는다.
-      // - KPA 한정: 본 handler 는 service-neutral 이나 본 WO 범위는 KPA. GP 는 별도
+      // - KPA 한정: 본 handler 는 service-neutral 이나 본 WO 범위는 KPA. 타 서비스는 별도
       //   customer_requests 모델을 사용하므로 의도치 않은 동작 변경을 피하기 위해 'kpa' 만 처리.
-      //   GP/KCos parity 는 후속 WO 에서 판단(IR-...-CONSULTATION-REQUESTS-NOTIFICATION-REPLACEMENT-AUDIT-V1).
+      //   KCos parity 는 후속 WO 에서 판단(IR-...-CONSULTATION-REQUESTS-NOTIFICATION-REPLACEMENT-AUDIT-V1).
       if (resolved.serviceKey === 'kpa') {
         try {
           // 대상: 해당 매장(organization)의 owner/admin/manager. 운영자 전체가 아닌 매장 사용자에게만.

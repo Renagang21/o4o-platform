@@ -40,10 +40,7 @@
 ## 4. API 계약
 
 `PATCH /api/v1/neture/supplier/products/:id/distribution` (requireActiveSupplier)
-```json
-{ "isPublic": false, "serviceKeys": ["kpa-society", "glycopharm"] }
-```
-- serviceKeys는 `filterApprovalEligibleServiceKeys`(SSOT: kpa-society/glycopharm/k-cosmetics)로 검증. 소유권(NOT_OWNED 403)·존재(OFFER_NOT_FOUND 404) 가드.
+- serviceKeys는 `filterApprovalEligibleServiceKeys`로 검증. 소유권(NOT_OWNED 403)·존재(OFFER_NOT_FOUND 404) 가드.
 - 응답: `{ success, data: { isPublic, serviceKeys, distributionType, added, removed, addedResult, removedResult, sync } }`.
 
 ## 5. 검증 (Phase 1)
@@ -53,19 +50,17 @@
 
 ### 배포 후 API smoke (Phase 1) — 2026-06-19 **PASS** (실 API, 인증 fetch)
 
-- **방식(비파괴)**: ACTIVE 공급자(renagang21) 미네락 600 offer(이미 kpa-society/glycopharm approved, PUBLIC)에 **현재 없는 서비스 `k-cosmetics`만 추가→제거→재추가→원복** — 기존 kpa/glyco/PUBLIC 불변. 종료 후 원상복구.
+- 종료 후 원상복구.
 - **결과(`PATCH /supplier/products/:id/distribution` 응답)**:
   - **추가**: `added=["k-cosmetics"]`, `addedResult.insertedServiceKeys=["k-cosmetics"]` → **pending 신규**. offer 유지 APPROVED. ✅
   - **제거**: `removed=["k-cosmetics"]`, serviceKeys 복귀. ✅
   - **재추가**: `addedResult.resubmittedServiceKeys=["k-cosmetics"]` → **cancelled→pending 재심사**(ON CONFLICT WHERE 가 cancelled 매칭). 이는 **직전 제거가 실제로 cancelled 전환됐음을 증명**(pending 이었으면 resubmit=0, skip). **자동 approved 복구 없음.** ✅
-  - **원복**: serviceKeys=[kpa-society, glycopharm], offer=APPROVED+PUBLIC 복귀(kpa/glyco 무결). ✅
 
 | smoke | 결과 |
 |------|:--:|
 | 1. SERVICE 추가 → pending | **PASS** |
 | 2. SERVICE 제거 → cancelled(재추가 resubmit로 입증) | **PASS** |
 | 3. cancelled 재추가 → pending(approved 복구 없음) | **PASS** |
-| 4. 기존 approved(kpa/glyco) 무결 + offer APPROVED 유지 | **PASS** |
 | 5. PUBLIC 유지(distribution_type=PUBLIC) | **PASS** |
 | 6. operator 승인→approved 후 제거(listing 비활성) | 미실행(운영자 자격 없음) — cancelServiceApprovals 가 approved 동일 처리(코드/typecheck) |
 
@@ -76,7 +71,7 @@
 변경 파일(3): `lib/api/supplier.ts` · `pages/supplier/ProductDetailDrawer.tsx` · `components/product/ProductForm.tsx`.
 
 - **API 클라이언트**: `supplierApi.updateDistribution(id, {isPublic, serviceKeys})` → `PATCH .../distribution`.
-- **공급 방식 변경 모달**(drawer): [공급 방식 변경] 버튼 → 모달. **B2B 전체 공급 토글**(PUBLIC 경고) + **서비스 대상 체크박스**(KPA/GlycoPharm/K-Cosmetics, 철회 예정 표시) + 내부상품 안내 + 저장→`updateDistribution`. **SERVICE 제거 확인 다이얼로그**("HUB 노출 중단 + 이력 '철회됨' 보존 + 재신청 필요"). 저장 후 `onSaved()` 새로고침.
+- **공급 방식 변경 모달**(drawer): [공급 방식 변경] 버튼 → 모달. **B2B 전체 공급 토글**(PUBLIC 경고) + **서비스 대상 체크박스** + 내부상품 안내 + 저장→`updateDistribution`. **SERVICE 제거 확인 다이얼로그**("HUB 노출 중단 + 이력 '철회됨' 보존 + 재신청 필요"). 저장 후 `onSaved()` 새로고침.
 - **cancelled='철회됨'** 배지 표시(공급 방식 섹션 서비스별 승인).
 - **drawer auto submitForApproval 우회 제거**: 상품 정보 저장(`handleSave`) payload 에서 `serviceKeys` 제거 + 신규 키 auto `submitForApproval` 블록 제거 → **상품 정보 저장과 공급 방식 변경 완전 분리**(D UX 핵심).
 - **편집 폼 distribution 숨김**: `ProductForm` 에 `hideDistribution` prop 추가, drawer 편집(mode=edit)에서 전체공개/서비스공급 UI 숨김(혼선 제거). **create 위저드는 무영향**(prop 미전달).
@@ -87,15 +82,15 @@
 | # | 확인 | 결과 |
 |---|------|:--:|
 | 1 | drawer 공급 방식 섹션 [공급 방식 변경] 버튼 → 모달 열림 | **PASS** |
-| 2 | 모달 초기화 정확: B2B 전체 공급 ☑(PUBLIC), KPA ☑/GlycoPharm ☑/K-Cosmetics ☐ (현재 serviceKeys 반영) | **PASS** |
+| 2 | 모달 초기화 정확: B2B 전체 공급 ☑(PUBLIC), KPA ☑ ☑/K-Cosmetics ☐ (현재 serviceKeys 반영) | **PASS** |
 | 3 | PUBLIC 체크 시 즉시 노출 경고 문구 표시 | **PASS** |
 | 4 | 서비스 체크 해제 시 "철회 예정" 표시 | **PASS** |
-| 5 | 저장 → **SERVICE 제거 확인 다이얼로그**("GlycoPharm 철회 / HUB 노출 중단 / 이력 '철회됨' 보존 / 재신청 필요") + 뒤로/철회하고 저장 | **PASS** |
+| 5 | 저장 → **SERVICE 제거 확인 다이얼로그** + 뒤로/철회하고 저장 | **PASS** |
 | 6 | "뒤로"→폼 복귀, "취소"→모달 닫힘, **저장 미수행으로 offer 무변경** | **PASS** |
 | 7 | **B2C 편집 진입 시 전체공개/서비스공급 UI 미표시**(상품명/가격/재고/활성/추천만) — 정보 편집 ↔ 공급방식 분리(D UX 핵심) | **PASS** |
 | 8 | operator 공유 drawer 레이아웃 무붕괴(순수 추가) | **PASS** |
 
-- 비파괴: 모달은 열고 검증만, 저장은 미수행(미네락 600 kpa/glyco approved·PUBLIC 그대로).
+- 비파괴: 모달은 열고 검증만, 저장은 미수행.
 
 ### 잔존(마이너, 후속 권장)
 - drawer 하단 **레거시 "서비스" 섹션** + 목록 "승인" 컬럼은 'cancelled' 를 **'반려'/'승인 *'** 로 표시(해당 섹션은 cancelled 미처리). 공급 방식 섹션(신규)은 serviceKeys 기준이라 cancelled 제외. → cancelled='철회됨' 표시를 레거시 서비스 섹션/목록 컬럼에도 확장하는 소규모 후속 권장(기능 영향 없음, 표시 정합만).

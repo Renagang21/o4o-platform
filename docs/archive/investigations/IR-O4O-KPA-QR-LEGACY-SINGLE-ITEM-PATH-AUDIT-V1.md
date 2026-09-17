@@ -127,7 +127,7 @@ const targetAsset = data?.libraryAssets.find((a) => a.isActive);
 ### 판정: **B + C (혼합)**
 
 - **A 아님**: 호출 경로 모두 active 검증됨 (라우트 등록·진입점·실제 사용자 흐름 추적 가능).
-- **D 아님**: web-kpa-society 단일 서비스 내부에 닫혀있음. neture/glycopharm/k-cosmetics 영향 0.
+- **D 아님**: web-kpa-society 단일 서비스 내부에 닫혀있음.
 - **B**: 두 진입 흐름은 의미가 다르므로 **유지가 default 안전**.
 - **C 가능**: state 시그니처만 canonical로 흡수해도 의미 손상 없음. 오히려 "legacy/canonical 두 시그니처"라는 인지 비용을 제거.
 

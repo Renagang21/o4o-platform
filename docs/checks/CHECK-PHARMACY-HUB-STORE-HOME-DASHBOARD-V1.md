@@ -46,7 +46,7 @@ K-Cosmetics 조직 / KPA 약국 조직 / Neture 공급자 조직 / `users.busine
 `apps/api-server/src/utils/store-owner.utils.ts` 의 `isStoreOwner()` 는
 `organization_members` 를 **ORDER BY 없이 `LIMIT 1`** 로 읽고 서비스 스코프도 걸지 않는다.
 다중 조직 계정에서 비결정적이며, 실제 프로덕션에 그런 계정이 존재한다(§4 실측).
-공통 해석기 정비는 KPA·GlycoPharm·K-Cosmetics 까지 영향이 가므로 **별도 작업으로 남기고**,
+공통 해석기 정비는 KPA·K-Cosmetics 까지 영향이 가므로 **별도 작업으로 남기고**
 본 WO 는 `resolveStoreAccess()` 를 **변경하지 않은 채** Pharmacy-Hub 읽기 경로에서만
 enrollment 스코프를 적용했다.
 
@@ -191,12 +191,12 @@ KPA·K-Cosmetics 대시보드 복사 **없음**.
 
 - `OrdersPage` 는 상태 판정 함수를 **동일 로직 그대로** 공용 모듈에서 import 하도록만 바꿨다(문구·톤 불변).
 - 기존 엔드포인트(`/store-owner/products|cart|orders|payments/*`) 무변경 — 추가만 했다.
-- 공통 패키지(`@o4o/store-ui-core` 등) 무변경 → 타 서비스(KPA·K-Cosmetics·Neture·GlycoPharm) 영향 없음.
+- 공통 패키지(`@o4o/store-ui-core` 등) 무변경 → 타 서비스(KPA·K-Cosmetics·Neture) 영향 없음.
 
 ---
 
 ## 9. 남긴 항목 (본 WO 범위 밖)
 
-- 공통 `isStoreOwner()` / `resolveStoreAccess()` 의 `LIMIT 1` 비결정성 정비 (C안 — KPA·GlycoPharm·K-Cosmetics 영향 범위).
+- 공통 `isStoreOwner` / `resolveStoreAccess` 의 `LIMIT 1` 비결정성 정비 (C안 — KPA·K-Cosmetics 영향 범위).
 - 매장 정보 편집 · 계정 설정 · 취급 상품 · 콘텐츠 · QR · POP · 태블릿 (WO §범위 제외).
 - `AMBIGUOUS_STORE_CONNECTION` 운영자 해소 UI.

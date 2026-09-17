@@ -34,7 +34,7 @@ status:                   legacy physical table name
 이 선언이 의미하는 바:
 
 - **현재 table / entity rename 은 수행하지 않는다.**
-- 기능 재사용은 유지한다 (KPA / GlycoPharm / K-Cosmetics 3 서비스 공통 사용 중).
+- 기능 재사용은 유지한다 (KPA / K-Cosmetics 2 서비스 공통 사용 중).
 - canonical 개념만 공통화한다 — DB / 코드 식별자는 기존 그대로 둔다.
 - `kpa_store_contents` 라는 prefix 만 보고 KPA 전용 구조로 해석하지 않는다.
 
@@ -167,7 +167,7 @@ kpa_store_contents 는 현재 legacy physical table name 으로 간주한다.
 
 선언의 함의:
 
-- **사실관계** — 컨트롤러(`createStoreContentController`) 가 KPA / GlycoPharm / Cosmetics 3 서비스에 공통 마운트되어 동일 table 을 공유하고 있다. 컨트롤러 / 라우트 / 디렉토리 수준의 공통화는 이미 완성되어 있다.
+- **사실관계** — 컨트롤러(`createStoreContentController`) 가 KPA / Cosmetics 2 서비스에 공통 마운트되어 동일 table 을 공유하고 있다. 컨트롤러 / 라우트 / 디렉토리 수준의 공통화는 이미 완성되어 있다.
 - **해석 규칙** — table 이름의 `kpa_` prefix 는 *역사적 잔존* 이며, 현재 의미는 service-neutral 이다.
 - **금지 행위** —
   - 본 table 을 KPA 전용 구조로 가정한 신규 코드 작성 금지.
@@ -186,7 +186,7 @@ kpa_store_contents 는 현재 legacy physical table name 으로 간주한다.
 | 항목 | 결과 |
 |------|------|
 | `store_contents` 단순 prefix 제거 | **충돌** — `packages/interactive-content-core` 의 LMS Template-copy entity (`@Entity('store_contents')`) 가 이미 점유 중 |
-| 공통 컨트롤러 공유 서비스 | 3개 (KPA / GlycoPharm / Cosmetics) |
+| 공통 컨트롤러 공유 서비스 | 2개 (KPA / Cosmetics) |
 | FK 참조 | **0건** |
 | seed 데이터 | **0건** |
 | Raw SQL 직접 참조 | 2 군데 (`asset-render-filter.ts:120`, `published-assets.controller.ts:123`) |
@@ -236,7 +236,6 @@ store_production_materials
 | Service | Mount path | 컨트롤러 | 사용 형태 |
 |---------|------------|---------|----------|
 | KPA | `/api/v1/kpa/store-contents` | `createStoreContentController` | full read/write |
-| GlycoPharm | `/api/v1/glycopharm/store-contents` | `createStoreContentController` | full read/write |
 | K-Cosmetics | `/api/v1/cosmetics/store-contents` | `createStoreContentController` | full read/write |
 | Neture | (미마운트) | — | — |
 

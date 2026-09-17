@@ -160,6 +160,5 @@ W7 콘솔 연동         회원 상세에 "현재 이사" 를 표시할 근거�
 발견 1건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건
 
 **발견 1건 (범위 밖 · 미수정)** — `apps/api-server/src/copilot/insight-rules.ts:38` 타입 오류.
-`83853d8d3 GlycoPharm 서비스 완전 삭제` 가 데이터에서 `glycopharm` 을 제거했으나
 `AIServiceId` 타입에 남겨두어 `Record<AIServiceId, …>` 불만족. W9·W10 CHECK 에 이어
 여전히 남아 있다. 이번 조사와 무관하며 별도 WO 대상이다.

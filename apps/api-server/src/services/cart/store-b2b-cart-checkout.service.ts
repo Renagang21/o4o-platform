@@ -4,7 +4,7 @@
  * WO-O4O-CROSSSERVICE-B2B-CHECKOUT-CONFIRM-SERVICE-AGNOSTIC-ADOPTION-V1 (§18 · §20)
  * 계약 정본: `docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md`
  *
- * 대상: `APPROVAL_ELIGIBLE_SERVICE_KEYS` = glycopharm / kpa-society / k-cosmetics.
+ * 대상: `APPROVAL_ELIGIBLE_SERVICE_KEYS` = kpa-society / k-cosmetics.
  * 이 서비스들에서 공급자 상품이 노출되려면 `offer_service_approvals` 의 **승인 행**이 있어야
  * 한다. Pharmacy-Hub 식 `service_keys` opt-in 만으로는 우회되지 않는다
  * (`OfferExposureStrategy('approval')` 참조).

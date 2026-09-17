@@ -219,7 +219,7 @@ users ─(1:N)─ organization_members ─(N:1)─ organizations     (매장 소
 | `/pharmacy/events` | 매장 이벤트 CRUD | 🔴 오염 | 매장 프로모션 이벤트 |
 | `/pharmacy/qr` | QR 코드 관리 | 🔴 오염 | 매장 운영 도구 |
 | `/pharmacy/pop` | POP PDF 생성 | 🔴 오염 | 매장 마케팅 도구 |
-| `/stores/:slug/tablet` | 태블릿 채널 | 🔴 오염 | GlycoPharm 레거시 채널 |
+| `/stores/:slug/tablet` | 태블릿 채널 | 🔴 오염 | — |
 | `/stores/:slug/blog` | 블로그 채널 | 🔴 오염 | 매장 콘텐츠 |
 | `/stores/:slug/template` | 매장 템플릿 | 🔴 오염 | 매장 스토어프론트 설정 |
 

@@ -2,7 +2,7 @@
 
 > **조사 보고서 (Investigation Report) — 조사 전용 / 코드·DB·UI·migration 변경 없음.**
 >
-> 4 service (KPA / Neture / GP / K-Cos) 의 Operator 회원 관리 화면에서 회원 상세 표시 방식의 **Canonical UX 결정.**
+> 3 service (KPA / Neture / K-Cos) 의 Operator 회원 관리 화면에서 회원 상세 표시 방식의 **Canonical UX 결정.**
 
 - **작성일:** 2026-05-24
 - **개정:** 2026-05-24 (Rev.1) — KPA scope 보강 (§2.1 정정, §2.5 신설, §7 WO scope 재정의)
@@ -42,11 +42,10 @@
 |---|---|---|---|---|---|
 | **KPA** | `MemberManagementPage` (`/operator/members`) | `setSelectedMember(m)` → Drawer (MemberManagementPage:1181) | ✅ `OperatorRoutes.tsx:161` (App.tsx 아닌 OperatorRoutes 패턴) | ❌ 없음 | **Drawer ONLY (link 없음)** |
 | **Neture** | `UsersManagementPage` (`/operator/users`) | `setSelectedUser(user)` → Drawer (line 719) | ✅ `/operator/users/:id` + `/admin/users/:id` (App.tsx 889, 965) | ✅ 있음 (line 832-840) | **Drawer + Page link 완성** |
-| **GP** | `UsersPage` (`/operator/users` + `/admin/users`) | `navigate('/operator/users/${user.id}')` → Page (line 738) | ✅ `/operator/users/:id` x2 (App.tsx 537, 577) | (Drawer 없음) | **Page nav ONLY** |
 | **K-Cos** | `UsersPage` (`/operator/users` + `/admin/users`) | `navigate('/operator/users/${user.id}')` → Page (line 550) | ✅ `/operator/users/:id` x2 (App.tsx 434, 474) | (Drawer 없음) | **Page nav ONLY** |
 
 → **Drawer 사용:** KPA / Neture (2 service)
-→ **Page nav 사용:** GP / K-Cos (2 service)
+→ **Page nav 사용:** K-Cos (1 service)
 → **Hybrid (Drawer + footer link) 완성:** Neture (1 service)
 
 > **이전 (Rev.0) 의 KPA 분석 오류**: `UsersPage.tsx` (956 lines) 기준으로 "Drawer ONLY + App.tsx route 미등록" 으로 기재했으나, **KPA UsersPage.tsx 는 dead code** 이며 (§2.5 참조) 실제 KPA 의 live members 페이지는 `MemberManagementPage` 이다. 라우팅은 App.tsx 가 아닌 `OperatorRoutes.tsx` 를 통해 처리된다. 본 표는 Rev.1 에서 live page 기준으로 재작성.
@@ -59,7 +58,7 @@
 |---|---|---:|---|
 | KPA | UserDetailPage.tsx | 72 | `<CommonUserDetailPage apiAdapter config={kpaConfig} ... />` |
 | Neture | UserDetailPage.tsx | 104 | `+ actions={netureActions}` (Neture 만 status change 별도 endpoint 사용) |
-| GP | UserDetailPage.tsx | 70 | `<CommonUserDetailPage ... config={glycopharmConfig}>` (theme: primary, businessNameLabel: '약국명') |
+| UserDetailPage.tsx | 70 | `<CommonUserDetailPage.. |
 | K-Cos | UserDetailPage.tsx | 69 | 동일 패턴 |
 
 → **`/operator/users/:id` 페이지 자체는 100% commonization 완료.** drift 는 페이지가 아니라 "진입 방식 (drawer vs nav)" 에만 존재.
@@ -70,7 +69,7 @@
 |---|---:|
 | KPA | 397 |
 | Neture | 336 |
-| GP | 354 |
+| 354 |
 | K-Cos | 356 |
 
 → 4 service 모두 별도 EditUserModal 보유 (size 비슷, structural 차이 미확정). 본 IR 의 직접 영역 아님 (별건 정합).
@@ -82,7 +81,7 @@
 | KPA | UsersPage.tsx | 956 | **DEAD CODE** (§2.5) |
 | KPA | MemberManagementPage.tsx | 1850+ | **live members 페이지** (KpaMember entity) |
 | Neture | UsersManagementPage.tsx | 916 | live |
-| GP | UsersPage.tsx | 809 | live |
+| UsersPage.tsx | 809 | live |
 | K-Cos | UsersPage.tsx | 620 | live |
 
 → live 평균 ~1050 lines (KPA MemberManagementPage 포함). KPA 는 entity 가 달라 다른 wrapper 후보. 향후 list-side commonization 후보 (별건 — 본 IR 영역 아님).
@@ -137,7 +136,7 @@
 - URL 공유 / 북마크 불가 (회원 ID 가 URL 에 없음)
 - 키보드 navigation 약함
 
-### 3.2 Page Navigation 방식 (GP / K-Cos 현재)
+### 3.2 Page Navigation 방식 (K-Cos 현재)
 
 **장점:**
 - 상세 정보가 많을 때 layout 여유 (이력, 권한, 결제, 활동)
@@ -160,7 +159,7 @@
 - Drawer 의 빠른 검토 + Page 의 깊이 있는 관리 모두 보존
 - `/operator/users/:id` URL 공유/북마크 가능 (직접 URL 도 작동)
 - 4 service 동일 UX (drawer = default, page = optional deeper)
-- **이미 4 service 모두 `CommonUserDetailPage` 보유** → 새 인프라 부재 (GP/K-Cos route 보존, KPA route 만 추가)
+- **이미 3 service 모두 `CommonUserDetailPage` 보유** → 새 인프라 부재 (K-Cos route 보존, KPA route 만 추가)
 
 **단점:**
 - "전체 상세 보기" 버튼 UX 의 자연스러움이 운영자에 달림 — 실 사용 검증 필요
@@ -172,7 +171,7 @@
 
 `CommonUserDetailPage` 가 표시하는 정보 종류:
 
-| 영역 | KPA | Neture | GP | K-Cos |
+| 영역 | KPA | Neture | K-Cos |
 |---|---|---|---|---|
 | 프로필 (name/email/phone/avatar) | ✓ | ✓ | ✓ | ✓ |
 | 역할 (roles[]) | ✓ | ✓ | ✓ | ✓ |
@@ -181,7 +180,7 @@
 | 비밀번호 변경 (operator-as-user) | ✓ | ✓ | ✓ | ✓ |
 | 정지 / 활성화 / 삭제 | ✓ | ✓ | ✓ | ✓ |
 | Business 정보 (약국/사업자 정보) | "약국 정보" | "사업자 정보" | "약국 정보" | (default) |
-| 서비스별 데이터 (포인트/수강/자격 등) | KPA only | (Neture supplier 등) | (GP-only billing 등) | (K-Cos 매장) |
+| 서비스별 데이터 (포인트/수강/자격 등) | KPA only | (Neture supplier 등) | — | (K-Cos 매장) |
 
 → **공통 영역은 6-7 항목** + service-specific theme/label 만 다름. CommonUserDetailPage 가 이미 generic config 로 처리.
 
@@ -197,7 +196,7 @@
 | 컴포넌트 | 공통화 상태 | 추가 작업 |
 |---|---|---|
 | `CommonUserDetailPage` (`@o4o/ui`) | ✅ 이미 4 service 통합 | 없음 |
-| `BaseDetailDrawer` (`@o4o/ui`) | ✅ 4 service 모두 채택 가능 (현재 KPA/Neture 사용) | GP/K-Cos 의 UsersPage 에 Drawer 추가 |
+| `BaseDetailDrawer` (`@o4o/ui`) | ✅ 3 service 모두 채택 가능 (현재 KPA/Neture 사용) | K-Cos 의 UsersPage 에 Drawer 추가 |
 | `MemberListLayout` (`operator-ux-core`) | ✅ 4 service 모두 채택 | 없음 |
 | Drawer 내 member detail content | ⚪ KPA/Neture 각자 구현 (300+ lines 의 InfoRow + actions) | **공통 컴포넌트 추출 가능** — 향후 commonization 의 핵심 후보 |
 | Approval/status action (drawer footer) | ⚪ KPA/Neture 각자 구현 | **공통 actions slot 후보** |
@@ -214,11 +213,11 @@
 
 ### Option A — Drawer Canonical (4 service 모두 Drawer)
 - 장점: 모두 KPA/Neture 패턴 통일 + 빠른 검토 강점
-- 단점: 복잡한 정보 표시 불편, GP/K-Cos 의 기존 page navigation UX 손실
+- 단점: 복잡한 정보 표시 불편, K-Cos 의 기존 page navigation UX 손실
 - 판정: ⚪ 가능하나 추천 안 함 (page 강점 폐기)
 
 ### Option B — Page Canonical (4 service 모두 page nav)
-- 장점: 모두 GP/K-Cos 패턴 통일 + URL 공유 강점
+- 장점: 모두 K-Cos 패턴 통일 + URL 공유 강점
 - 단점: KPA/Neture 의 drawer 빠른 검토 UX 손실, 운영자 대량 처리 UX 떨어짐
 - 판정: ❌ 비추천 (운영 현실에서 drawer 가 빠른 처리에 유리)
 
@@ -229,10 +228,10 @@
   - 두 UX 의 강점 모두 보존
   - 4 service 모두 동일 진입 패턴 (drawer = default, page = optional deeper)
   - 인프라 부재 없음 — `CommonUserDetailPage` 이미 4 service 보유
-  - GP/K-Cos 기존 page route 보존 (직접 URL 접근 가능)
+  - K-Cos 기존 page route 보존 (직접 URL 접근 가능)
 - 단점:
   - KPA App.tsx 에 `/operator/users/:id` route 1 개 신설 필요 (소규모)
-  - GP/K-Cos UsersPage 의 row click 동작 변경 + BaseDetailDrawer 추가 필요 (중간 규모)
+  - K-Cos UsersPage 의 row click 동작 변경 + BaseDetailDrawer 추가 필요 (중간 규모)
 - 판정: ✅ **권장**
 
 ### 결정: **Option C — Hybrid Canonical**
@@ -245,19 +244,19 @@
 
 | 항목 | 내용 |
 |---|---|
-| 범위 | **GP + K-Cos 의 UsersPage 에 Drawer 도입 + KPA MemberManagementPage Drawer 에 footer 링크 추가** (Rev.1 정정) |
+| 범위 | **K-Cos 의 UsersPage 에 Drawer 도입 + KPA MemberManagementPage Drawer 에 footer 링크 추가** (Rev.1 정정) |
 | KPA 작업 | **MemberManagementPage Drawer 의 footer 에 "전체 상세 페이지 →" 링크 추가** — `href={\`/operator/users/${selectedMember.user_id}\`}` (KpaMember 의 user_id 사용, UserDetailPage 의 user UUID 매칭). **App.tsx 작업 0** (route 는 이미 OperatorRoutes.tsx:161 에 등재). **UsersPage.tsx 작업 0** (dead code, 본 WO 범위 외). |
 | Neture 작업 | **작업 0** (Rev.1 정정 — Neture UsersManagementPage:832-840 에 이미 footer 링크 완성. 추가 작업 없음). |
-| GP 작업 | UsersPage row click: `navigate` → `setSelectedUser`. BaseDetailDrawer 신설 (Neture 패턴 mirror). Drawer footer "전체 상세 페이지 →" 링크 추가 (기존 page route 보존). |
-| K-Cos 작업 | 동일 (GP 와 같음). |
+ 작업 | UsersPage row click: `navigate` → `setSelectedUser`. BaseDetailDrawer 신설 (Neture 패턴 mirror). Drawer footer "전체 상세 페이지 →" 링크 추가 (기존 page route 보존). |
+| K-Cos 작업 ||
 | Backend 변경 | 0 |
 | `CommonUserDetailPage` 변경 | 0 (이미 commonized) |
 | `BaseDetailDrawer` 변경 | 0 (이미 commonized) |
-| 회귀 위험 | 중간 — GP/K-Cos 의 UsersPage UX 변경 (navigate → drawer). 운영자가 새 UX 에 익숙해질 시간 필요. 단, page 도 URL 직접 접근 가능 (보존). KPA 변경은 footer 링크 1 추가로 최소. |
-| 검증 | KPA `/operator/members` → row click → Drawer → "전체 상세 페이지 →" → `/operator/users/<user_id>` 진입. Neture `/operator/users` 동작 변화 없음. GP/K-Cos `/operator/users` → row click → Drawer (신설) → "전체 상세 페이지 →" → 기존 page 진입. |
+| 회귀 위험 | 중간 — K-Cos 의 UsersPage UX 변경 (navigate → drawer). 운영자가 새 UX 에 익숙해질 시간 필요. 단, page 도 URL 직접 접근 가능 (보존). KPA 변경은 footer 링크 1 추가로 최소. |
+| 검증 | KPA `/operator/members` → row click → Drawer → "전체 상세 페이지 →" → `/operator/users/<user_id>` 진입. Neture `/operator/users` 동작 변화 없음. K-Cos `/operator/users` → row click → Drawer (신설) → "전체 상세 페이지 →" → 기존 page 진입. |
 
 **Optional 별건 follow-up** (본 WO 후 또는 병렬):
-- `WO-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-V1` — 4 service members list 의 commonization. 단, KPA 는 `MemberManagementPage` (KpaMember entity) + Neture/GP/K-Cos 는 UsersPage (User entity) 이라 wrapper 가 entity-agnostic 이어야 함. 또는 KPA 만 별도 wrapper.
+- `WO-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-V1` — 3 service members list 의 commonization. 단, KPA 는 `MemberManagementPage` (KpaMember entity) + Neture/K-Cos 는 UsersPage (User entity) 이라 wrapper 가 entity-agnostic 이어야 함. 또는 KPA 만 별도 wrapper.
 - `WO-O4O-OPERATOR-MEMBERS-EDIT-MODAL-COMMONIZATION-V1` — 4 service EditUserModal (~360 lines 평균) 의 통합. KPA EditUserModal 도 dead code 후보 (UsersPage 만 import 한다면).
 - `WO-O4O-KPA-USERS-PAGE-DEAD-CODE-REMOVAL-V1` (Rev.1 신설) — KPA `UsersPage.tsx` (956 lines) + 연관 dead code (`EditUserModal.tsx` 일부 가능성) 의 정리. **본 IR 결정 외 별건** — 본 WO 와 분리 권장 (한 번에 두 WO 가 겹치면 staging 충돌 가능).
 
@@ -321,8 +320,8 @@
 | KPA `/operator/users/:id` route | "미등록" | **이미 등재** (OperatorRoutes.tsx:161) |
 | KPA 의 WO 작업량 | App.tsx route 추가 + Drawer footer 링크 | **Drawer footer 링크 1 줄 추가만** (user_id 사용) |
 | Neture 의 WO 작업량 | Drawer footer 링크 추가 | **작업 0** (이미 832-840 에 완성) |
-| GP/K-Cos 의 WO 작업량 | 변경 없음 (Rev.0 동일) | 변경 없음 (Rev.0 동일) |
-| WO 전체 회귀 위험 | "중간" | "중간" (GP/K-Cos UX 변경은 동일, KPA/Neture 는 더 가벼움) |
+| K-Cos 의 WO 작업량 | 변경 없음 (Rev.0 동일) | 변경 없음 (Rev.0 동일) |
+| WO 전체 회귀 위험 | "중간" | "중간" (K-Cos UX 변경은 동일, KPA/Neture 는 더 가벼움) |
 
 ---
 
@@ -330,7 +329,6 @@
 
 ```bash
 # 1. 4 service Members 관련 파일 라인 수
-for SVC in kpa-society neture glycopharm k-cosmetics; do
   echo "=== $SVC ==="
   for FILE in UserDetailPage EditUserModal UsersPage UsersManagementPage; do
     F="services/web-$SVC/src/pages/operator/$FILE.tsx"
@@ -339,20 +337,17 @@ for SVC in kpa-society neture glycopharm k-cosmetics; do
 done
 
 # 2. row click 동작
-for SVC in kpa-society glycopharm k-cosmetics; do
   echo "=== $SVC UsersPage row click ==="
   grep -nE "onRowClick|navigate.*users.*\${|setSelectedUser" services/web-$SVC/src/pages/operator/UsersPage.tsx | head -5
 done
 grep -nE "onRowClick|setSelectedUser" services/web-neture/src/pages/operator/UsersManagementPage.tsx | head -5
 
 # 3. UserDetailPage route 등재
-for SVC in kpa-society neture glycopharm k-cosmetics; do
   echo "=== $SVC ==="
   grep -nE "UserDetailPage|operator.*users/:" services/web-$SVC/src/App.tsx | head -5
 done
 
 # 4. CommonUserDetailPage 사용 확인
-for SVC in kpa-society neture glycopharm k-cosmetics; do
   echo "=== $SVC ==="
   grep -n "CommonUserDetailPage" services/web-$SVC/src/pages/operator/UserDetailPage.tsx
 done
@@ -364,4 +359,4 @@ done
 *Revised: 2026-05-24 (Rev.1 — KPA scope 보강 + dead code 발견 반영)*
 *Type: Investigation Report (read-only)*
 *Status: ✅ 결정 — Option C (Hybrid Canonical). Drawer default + Page optional. `CommonUserDetailPage` 이미 commonized 활용.*
-*Decision Required: `WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1` (Rev.1 scope) 진입 — GP/K-Cos Drawer 도입 + KPA MemberManagementPage Drawer footer 링크 (user_id 사용) + Neture 작업 0.*
+*Decision Required: `WO-O4O-OPERATOR-MEMBERS-DETAIL-SURFACE-CANONICALIZATION-V1` (Rev.1 scope) 진입 — K-Cos Drawer 도입 + KPA MemberManagementPage Drawer footer 링크 (user_id 사용) + Neture 작업 0.*

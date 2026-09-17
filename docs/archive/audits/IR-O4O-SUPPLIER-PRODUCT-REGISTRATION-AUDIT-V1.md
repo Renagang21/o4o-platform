@@ -204,7 +204,6 @@ ProductMaster (SSOT)
 │        ├─ organizationId (매장)
 │        ├─ offerId (FK CASCADE)
 │        ├─ masterId (FK RESTRICT)
-│        ├─ serviceKey ('neture', 'glycopharm' 등)
 │        ├─ price (매장 가격 오버라이드, nullable)
 │        ├─ is_active (매장 진열 여부)
 │        │
@@ -438,7 +437,7 @@ ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING
 | `organization_id` | UUID FK | 매장/판매자 |
 | `approval_type` | ENUM | `service` / `private` |
 | `approval_status` | ENUM | `pending` / `approved` / `rejected` / `revoked` |
-| `service_key` | VARCHAR | 서비스 키 (neture, glycopharm 등) |
+| `service_key` | VARCHAR | 서비스 키 (neture 등) |
 | `requested_by` | UUID | 요청자 |
 | `decided_by` | UUID | 결정자 |
 | `decided_at` | TIMESTAMP | 결정 시각 |

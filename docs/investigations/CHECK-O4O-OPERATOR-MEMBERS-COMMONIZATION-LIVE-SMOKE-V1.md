@@ -1,7 +1,7 @@
 # CHECK-O4O-OPERATOR-MEMBERS-COMMONIZATION-LIVE-SMOKE-V1
 
 **날짜**: 2026-06-01  
-**목적**: Operator Members 공통화 완료 후 Neture / GlycoPharm / K-Cosmetics 회원관리 화면 배포 환경 실사용 검증  
+**목적**: Operator Members 공통화 완료 후 Neture / K-Cosmetics 회원관리 화면 배포 환경 실사용 검증  
 **검증 방식**: Playwright 브라우저 자동화 (배포된 Cloud Run 서비스)  
 **범위**: read-only smoke — 코드/UI/API/DB 수정 없음  
 **제외**: KPA (Option C 별도 유지)
@@ -14,34 +14,8 @@
 
 | 서비스 | 로그인 | 회원관리 렌더 | DataTable | role/status 탭 | RowAction | Drawer | EditModal | Bulk | 판정 |
 |--------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| GlycoPharm | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
 | K-Cosmetics | ✅ | ✅ | ✅ | ✅ | ✅ | — | ✅ | ✅ | **PASS** |
 | Neture | ✅ | ✅ | ✅ | ✅ | ✅ | — | ✅ | — | **PASS** |
-
----
-
-## 1. GlycoPharm smoke 결과
-
-**URL**: `https://glycopharm-web-3e3aws7zqa-du.a.run.app/operator/members`
-
-| 항목 | 결과 |
-|------|------|
-| 로그인 | ✅ sohae2100@gmail.com |
-| 회원관리 페이지 렌더 | ✅ KPI 4블록 (전체4/활성4/대기0/거부0) |
-| searchPlaceholder | ✅ "이름, 이메일로 검색" |
-| role 탭 | ✅ 전체/약사/약국 경영자 |
-| status 탭 | ✅ 승인/반려/정지/탈퇴/가입 신청 |
-| DataTable | ✅ 회원 유형·운영 권한 컬럼 분리 표시 |
-| RowActionMenu | ✅ 정보 수정/비밀번호 변경/삭제/정지 |
-| BaseDetailDrawer | ✅ 서비스 멤버십(kpa-society/neture/glycopharm) 표시, 전체 상세 페이지 링크 |
-| EditUserModal | ✅ 회원 유형(약국/공급자), 운영 권한, **"약국 정보"/"약국명" 레이블** |
-| Care/GlucoseView 잔재 | ✅ 없음 |
-| API 4xx/5xx | ✅ 없음 (auth.neture.co.kr/auth/me 401은 무관한 cross-domain check) |
-
-**GlycoPharm 특수 확인:**
-- 약사/약국 경영자 표시 정상
-- CommonEditUserModal config('약국 정보' 오버라이드) 적용 확인
-- Care/GlucoseView 잔재 재노출 없음
 
 ---
 
@@ -95,20 +69,20 @@
 
 ## 4. PASS 항목 종합
 
-| 검증 항목 | GlycoPharm | K-Cosmetics | Neture |
-|----------|:---:|:---:|:---:|
-| 로그인 | ✅ | ✅ | ✅ |
-| 회원관리 접근 | ✅ | ✅ | ✅ |
-| OperatorMembersConsolePage 렌더 | ✅ | ✅ | ✅ |
-| 검색 input + placeholder | ✅ | ✅ | ✅ |
-| role/status 탭 | ✅ | ✅ | ✅ |
-| DataTable | ✅ | ✅ | ✅ |
-| row action | ✅ | ✅ | ✅ |
-| detail drawer | ✅ | (미확인) | (미확인) |
-| EditUserModal | ✅ | ✅ | ✅ |
-| bulk selection + action | (미확인) | ✅ | (미확인) |
-| 상태 변경/삭제 버튼 조건 | ✅ | ✅ | ✅ |
-| API 4xx/5xx 오류 | 없음 | subRole 조회 1건(fallback 정상) | 없음 |
+| 검증 항목 | K-Cosmetics | Neture |
+| ---------- | :---: | :---: |
+| 로그인 | ✅ | ✅ |
+| 회원관리 접근 | ✅ | ✅ |
+| OperatorMembersConsolePage 렌더 | ✅ | ✅ |
+| 검색 input + placeholder | ✅ | ✅ |
+| role/status 탭 | ✅ | ✅ |
+| DataTable | ✅ | ✅ |
+| row action | ✅ | ✅ |
+| detail drawer | (미확인) | (미확인) |
+| EditUserModal | ✅ | ✅ |
+| bulk selection + action | ✅ | (미확인) |
+| 상태 변경/삭제 버튼 조건 | ✅ | ✅ |
+| API 4xx/5xx 오류 | subRole 조회 1건(fallback 정상) | 없음 |
 
 > detail drawer / bulk는 서비스별로 1곳씩 대표 검증 — 동일 `OperatorMembersConsolePage` 컴포넌트이므로 교차 동작 보장.
 
@@ -125,7 +99,7 @@
 | 항목 | 분류 | 영향 |
 |------|------|------|
 | K-Cos EditModal `GET /cosmetics/members/{id}` 콘솔 로그 | 데이터 부재 fallback | 없음 — '미지정'으로 정상 표시. profileClassification optional 동작 정상 |
-| `api.neture.co.kr/auth/me` 401 (GlycoPharm) | cross-domain auth check | 없음 — 로그인/화면 동작 정상 |
+| `api.neture.co.kr/auth/me` 401 | cross-domain auth check | 없음 — 로그인/화면 동작 정상 |
 
 **코드 결함으로 판정할 오류 없음.**
 
@@ -142,7 +116,7 @@ Operator Members 공통화 — 기능·구조·실사용 전 영역 검증 완�
 2. 편집 모달   → CommonEditUserModal config-driven (3서비스 PASS)
 3. API client → service-local 유지 (live 동작 PASS)
 4. bulk parity → K-Cosmetics 복구 확인
-5. 서비스 특수성 → Neture 대시보드 접근 / GP 약국 레이블 / K-Cos 매장 역할 모두 정상
+5. 서비스 특수성 → Neture 대시보드 접근 레이블 / K-Cos 매장 역할 모두 정상
 
 → Operator Members 공통화 완료 고정
 ```

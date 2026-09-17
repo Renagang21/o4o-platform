@@ -12,7 +12,7 @@ K-Cosmetics 내 매장 `매장 상품·거래` 그룹에 `상품` 화면을 1차
 
 - 메뉴 `상품`(subPath `/commerce/products`)을 `주문 관리` 위에 추가
 - route `/store/commerce/products` mount(데드링크 0 — 메뉴·route 동시 추가)
-- 공통 컴포넌트에 **선택적(optional) 헤더 override prop**(`heading`)을 추가하여 내 매장 맥락 제목("상품 관리")을 주입. 기존 HUB 소비처(GP/KC)는 prop 미전달 → 기본 문구 유지(무영향)
+- 공통 컴포넌트에 **선택적(optional) 헤더 override prop**(`heading`)을 추가하여 내 매장 맥락 제목("상품 관리")을 주입. 기존 HUB 소비처(KC)는 prop 미전달 → 기본 문구 유지(무영향)
 - Store HUB(`/store-hub/b2b`) 및 주문 관리는 무변경
 
 IR `F. MISSING` 격차를 해소했다.
@@ -23,7 +23,7 @@ IR `F. MISSING` 격차를 해소했다.
 
 - 대상: K-Cosmetics 단독 + 공통 컴포넌트 1개(additive optional prop)
 - 한다: 메뉴/route/화면 도입, 기존 API·컴포넌트 재사용, typecheck, CHECK
-- 하지 않는다: 신규 backend API/DB/migration, 거래 신청 화면 신설, Store HUB 제거, 주문 관리 변경, KPA/GP 화면 변경, OrderType/checkout/cart 변경
+- 하지 않는다: 신규 backend API/DB/migration, 거래 신청 화면 신설, Store HUB 제거, 주문 관리 변경, KPA 화면 변경, OrderType/checkout/cart 변경
 
 ---
 
@@ -37,7 +37,7 @@ IR `F. MISSING` 격차를 해소했다.
 | `services/web-k-cosmetics/src/pages/store/StoreCommerceProductsPage.tsx` | **신규** — SupplyCatalogHub thin wrapper(accent pink, tableId `kcos-store-commerce-products`, heading 주입, 기존 cosmetics API) |
 | `docs/investigations/CHECK-O4O-KCOSMETICS-STORE-COMMERCE-PRODUCT-PAGE-INTRODUCE-V1.md` | 본 CHECK 문서(신규) |
 
-> KPA/GP 상품 화면, OrderType, checkout/cart, Hero/Home/Header, 디지털 사이니지, 주문 관리, Store HUB route 미접촉. 신규 backend/DB/migration 0.
+> KPA 상품 화면, OrderType, checkout/cart, Hero/Home/Header, 디지털 사이니지, 주문 관리, Store HUB route 미접촉. 신규 backend/DB/migration 0.
 
 ---
 
@@ -86,11 +86,8 @@ IR `F. MISSING` 격차를 해소했다.
 |---|---|---|---|
 | K-Cosmetics 내 매장 | 있음 | 상품 메뉴/route/화면 추가, `heading` 주입 | PASS |
 | K-Cosmetics HUB (`HubB2BPage`) | 없음 | `heading` 미전달 → 기본 "상품 카탈로그" 유지. config 영향 없음 | PASS |
-| GlycoPharm HUB (`HubB2BCatalogPage`) | 없음 | `heading` 미전달 → 기본 문구 유지. GP config 무변경 | PASS |
 | KPA-Society | 없음 | KPA는 자체 `HubB2BCatalogPage`(별도, SupplyCatalogHub 미사용) + 독자 상품 화면. config 무변경 | PASS |
 | Neture | 없음 | 내 매장 상품·거래 대상 아님 | PASS |
-
-> `SupplyCatalogHub` 소비처 전수: GP `HubB2BCatalogPage`, KC `HubB2BPage` 2곳 — 둘 다 `heading` 미전달 확인.
 
 ---
 
@@ -123,7 +120,7 @@ services/web-k-cosmetics: npx tsc --noEmit -p tsconfig.json → EXIT 0
 ## 10. Regression Check
 
 - `SupplyCatalogHub` 변경은 optional prop 추가 + 헤더 텍스트를 변수화(기본값 = 기존 리터럴 동일)뿐 → 미전달 소비처 동작/표시 불변.
-- `storeMenuConfig` 변경은 KC 그룹에 item 1개 추가뿐 → KPA/GP/Neture config 블록 무변경.
+- `storeMenuConfig` 변경은 KC 그룹에 item 1개 추가뿐 → KPA/Neture config 블록 무변경.
 - App.tsx 변경은 lazy import + route 1개 추가뿐 → 기존 route 무변경. `commerce/products/:productId/marketing|pop` 등 하위 경로와 충돌 없음(정확 경로 매칭).
 - menuCapabilityMap 무변경(products 미매핑 → 항상 표시).
 
@@ -133,5 +130,5 @@ services/web-k-cosmetics: npx tsc --noEmit -p tsconfig.json → EXIT 0
 
 - 배포 후 browser smoke 수행 및 본 문서 §9 갱신
 - (선택) `WO-O4O-PRODUCT-DESCRIPTION-EDITOR-NEW-ENTRY-V1` 등과 별개로, 내 매장 상품 화면의 거래 신청/주문 흐름 정렬은 `WO-O4O-STORE-COMMERCE-TRADE-APPLICATION-INTEGRATION-V1`(IR 후속 P5)에서 다룸
-- (선택) `WO-O4O-STORE-COMMERCE-PRODUCT-PAGE-CROSSSERVICE-PARITY-V1` — KPA 기준 GP/KC 공통 정렬 시 내 매장 상품 화면 컬럼/탭 표준화
+- (선택) `WO-O4O-STORE-COMMERCE-PRODUCT-PAGE-CROSSSERVICE-PARITY-V1` — KPA 기준 KC 공통 정렬 시 내 매장 상품 화면 컬럼/탭 표준화
 - (선택) `WO-O4O-KCOSMETICS-STOREFRONT-PRODUCT-DETAIL-V1` — 소비자 상품 상세(IR-PRODUCT-DESCRIPTION-PRODUCTION-FLOW 판정 관련)

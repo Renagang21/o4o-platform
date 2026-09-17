@@ -21,7 +21,7 @@
 | `services/web-neture/src/App.tsx` | nested route(PlatformSectionLayout + index/accounts/services) + lazy import |
 | `docs/investigations/CHECK-O4O-PLATFORM-ACCOUNTS-SERVICES-UI-V1.md` | 본 문서 |
 
-→ backend/API/DB/공유 모듈/Tier1 route/sidebar/GP·KCos·KPA **무변경**.
+→ backend/API/DB/공유 모듈/Tier1 route/sidebar/KCos·KPA **무변경**.
 
 ## 3. 연결한 backend API (재사용 — live 검증)
 

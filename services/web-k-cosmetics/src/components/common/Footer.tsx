@@ -1,6 +1,5 @@
 /**
  * Footer - K-Cosmetics
- * Based on GlycoPharm Footer structure
  */
 
 import { Link } from 'react-router-dom';

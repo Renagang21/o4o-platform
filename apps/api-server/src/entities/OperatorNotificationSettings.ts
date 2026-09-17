@@ -20,7 +20,7 @@ export interface NotificationTypeSettings {
   systemAlert: boolean;           // 시스템 알림
   dailyReport: boolean;           // 일일 리포트
   // 서비스별 추가 알림 타입
-  serviceApplication?: boolean;   // 서비스 이용 신청 (GlycoPharm 등)
+  serviceApplication?: boolean;   // 서비스 이용 신청
 }
 
 @Entity('operator_notification_settings')

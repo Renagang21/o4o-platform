@@ -17,7 +17,6 @@
 | Cloud Run 서비스 | 검증 시점 latest ready revision |
 |---|---|
 | `kpa-society-web` | `kpa-society-web-01868-mgh` |
-| `glycopharm-web` | `glycopharm-web-01300-tcq` |
 | `k-cosmetics-web` | `k-cosmetics-web-01043-r77` |
 | `neture-web` | `neture-web-01495-p7t` |
 | `pharmacy-hub-web` | `pharmacy-hub-web-00119-4gr` |
@@ -31,7 +30,6 @@ SSOT = `docs/local/TEST-ACCOUNTS.local.md` (자격증명은 본 문서에 적지
 | 서비스 | membership status `pending` 계정 | `rejected` 계정 |
 |---|:---:|:---:|
 | KPA-Society | 없음 | 없음 |
-| GlycoPharm | 없음 | 없음 |
 | K-Cosmetics | 없음 | 없음 |
 | Neture | 없음 | 없음 (E2E fixture 1건이 표기돼 있으나 My Page 검증용 상시 계정 아님) |
 | Pharmacy-Hub | 없음 | 없음 |
@@ -50,7 +48,6 @@ SSOT = `docs/local/TEST-ACCOUNTS.local.md` (자격증명은 본 문서에 적지
 
 | 서비스 | My Page route guard | membership 분기 위치 | unreachable branch |
 |---|---|---|---|
-| GlycoPharm | `SoftGuard feature="mypage"` (`services/web-glycopharm/src/App.tsx:434`) — auth-only | 페이지 내부 `RoleBadgeGroup` 상태 배지 | 도달 가능 (gate 없음) |
 | KPA-Society | `MyPageGuard` (`services/web-kpa-society/src/App.tsx:465`) — auth-only, 미인증 시 `/login` | 페이지 내부 `MembershipStatusBadge` | 도달 가능 |
 | K-Cosmetics | `ProtectedRoute = RoleGuard` → `createRouteGuard({ MembershipGate })` (`services/web-k-cosmetics/src/components/auth/RoleGuard.tsx`) | `MembershipGate` (route 레벨) | 도달 가능 |
 | Neture | route guard 없음 — 페이지 레벨 auth 처리 | 페이지 내부 상태 배지 | 도달 가능 |
@@ -77,33 +74,6 @@ SSOT = `docs/local/TEST-ACCOUNTS.local.md` (자격증명은 본 문서에 적지
   안내 문구: pending = "가입 승인 대기 중"(⏳), rejected = "가입 신청 반려"(🚫).
 
 **3단 정적 증거 = PASS** (축 1·2·3 모두 실코드에서 확인).
-
----
-
-## 4. GP mobile 390×844
-
-Playwright MCP · viewport 390×844 · `https://www.glycopharm.co.kr`
-
-| route | 렌더 | nav | `aria-current` | page overflow (`scrollWidth`/`clientWidth`) |
-|---|:---:|:---:|:---:|:---:|
-| `/mypage` | OK | OK | 홈 | 382 / 382 |
-| `/mypage/profile` | OK | OK | 프로필 | 382 / 382 |
-| `/mypage/settings` | OK | OK | 설정 | 382 / 382 |
-| `/mypage/enrollments` | OK | OK | 내 수강 | 382 / 382 |
-| `/mypage/certificates` | OK | OK | 학습 결과 | 382 / 382 |
-| `/mypage/credits` | OK | OK | 크레딧 | 382 / 382 |
-| `/mypage/my-requests` | OK | OK | 내 신청 | 382 / 382 |
-
-- 페이지 레벨 가로 overflow **0건** (7/7 route 에서 `scrollWidth == clientWidth`).
-- nav 컨테이너는 `overflow-x: auto` (scrollWidth 520 / clientWidth 342) 로 **의도된 가로 스크롤**이며 활성 항목이 자동으로 view 안으로 스크롤된다.
-- double shell 없음 (`shellCount: 1`, `h1Count: 1`).
-- 뒤로가기·하드 리프레시 정상.
-- console error **0**, network 요청 **전부 200** (401/403/404/5xx 0건).
-- 관찰(결함 아님): breadcrumb "홈"(16px) · "프로필 수정"(32px) 이 40px 미만 터치 타깃. 클릭은 정상. §11 backlog 로 기록.
-
-**WO 부기 B 검증**: WO 원문의 `/mypage/requests` 는 GP 에 정의된 적이 없는 경로이며,
-**nav 항목·카드 어디에서도 `/mypage/requests` 를 가리키지 않는다** (GP nav "내 신청" → `/mypage/my-requests`).
-→ dead link 아님. 404 오판정하지 않았다.
 
 ---
 
@@ -157,7 +127,7 @@ Playwright MCP · viewport 390×844 · `https://pharmacyhub.co.kr`
 
 측정한 것만 적는다. 측정하지 않은 것은 0 이 아니라 **미확인**으로 적는다.
 
-| 항목 | GP `/mypage` 7 route | PH `/account`·`/store-owner/account` | KCos `/mypage`·`/profile`·`/settings` | Neture `/mypage` | KPA `/mypage`·`/qualifications` |
+| 항목 `/mypage` 7 route | PH `/account`·`/store-owner/account` | KCos `/mypage`·`/profile`·`/settings` | Neture `/mypage` | KPA `/mypage`·`/qualifications` |
 |---|:---:|:---:|:---:|:---:|:---:|
 | white screen | 0 | 0 | 0 | 0 | 0 |
 | JS exception (console error) | 0 | 0 | 0 | 0 (인증 상태) | 0 |
@@ -234,7 +204,7 @@ notification 장기 followup / KPA 고아 page / PH 로그인 demo autofill 401
 
 본 WO 에서 추가로 기록하는 관찰(전부 blocker 아님):
 
-- GP breadcrumb "홈"(16px) · "프로필 수정"(32px) 터치 타깃 40px 미만.
+- "프로필 수정"(32px) 터치 타깃 40px 미만.
 - `packages/account-ui/src/adapters/requestNormalizers.ts:46` 의 `?? 'pending'` (내 신청 row status 기본값).
 - K-Cosmetics `MyPageHub` 내부 상태 배지의 non-active 값은 route 레벨 `MembershipGate` 때문에 실질 도달하지 않음.
 - **KPA 가입 신청(apply) 화면 부재** — §9 수정으로 dead link 는 제거했으나 `none` 상태 사용자를 위한 KPA 신청 동선 자체는 여전히 없다 (§21 "Neture membership none 가입 동선" 과 같은 성격의 backlog).
@@ -263,7 +233,7 @@ WO §18 대응:
 | 완료 기준 | 결과 |
 |---|:---:|
 | pending/rejected — 테스트 계정 부재 + 3단 정적 증거 PASS | PASS (§3) |
-| GP mobile 390×844 PASS | PASS (§4) |
+ mobile 390×844 PASS | PASS (§4) |
 | PH mobile 390×844 PASS | PASS (§5) |
 | white screen = 0 | 측정 완료 · 0 (§7) |
 | JS exception = 0 | 측정 완료 · 0 (§7) |

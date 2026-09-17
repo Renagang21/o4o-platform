@@ -14,7 +14,6 @@
 ```
 OPL.service_key = 매장 "소비 서비스 면" (consumption surface) 단일 축
 값 도메인(canonical) = 매장 registry/consumption 키
-  { kpa-society, glycopharm, cosmetics, neture(전용 매장 존재 시) }
 파생 기준 = 매장 store context (organization → platform_store_slugs → registry key)
            NOT 등록 사용자 membership
 ```
@@ -28,7 +27,6 @@ origin 정보(등록·공급·운영·이벤트 출처)는 service_key 에서 �
                            ※ 이미 존재하는 컬럼. 현재 'market_trial','event-offer','seller_recruitment' 사용 중.
 - source_id    uuid     = 출처 레코드 참조 (이미 존재)
 - origin_service_key varchar nullable (신규) = origin 서비스/도메인 키
-                           (neture, kpa-groupbuy, glycopharm-event-offer 등 — 감사·노출·분석용)
 ```
 
 **핵심 원칙:** 조회·노출·채널·slug 와 결합되는 값은 `service_key`(소비 축)에만, "어디서 유래했는가"는 origin 축에. **origin 값은 절대 공개 visibility 필터의 주축이 되어선 안 된다.**
@@ -75,9 +73,9 @@ service_key 에 넣는 값의 "축"이 경로마다 다르다 — 이것이 혼�
 | 2 | Tablet 공개 queryTabletVisibleProducts | store-public-utils.ts:422,492 | **소비** | 필터(TABLET gate) | ✅ resolveServiceKeys `ANY` | ✗ |
 | 3 | B2C product handler | store-public-product.handler.ts:148 | **소비** | 필터 | ✅ | ✗ |
 | 4 | Tablet handler | store-public-tablet.handler.ts:62 | **소비** | 필터 | ✅ | ✗ |
-| 5 | GP 공개 상품 | glycopharm/store.controller.ts:122,174,292 | **소비** | 필터(B2C gate) | ✗ `GLYCOPHARM_OPL_SERVICE_KEYS` allowlist `ANY` | ✗ |
-| 6 | GP 체크아웃 채널검증 | glycopharm/checkout.controller.ts:371,406 | **소비** | 필터 | ✗ GP allowlist | ✗ |
-| 7 | GP 결제 hook sales-limit | GlycopharmPaymentEventHandler.ts:216 | **소비** | 필터 | ✗ GP allowlist | ✗ |
+| 5 공개 상품 | store.controller.ts:122,174,292 | **소비** | 필터(B2C gate) | — | ✗ |
+| 6 | — | checkout.controller.ts:371,406 | **소비** | 필터 | — | ✗ |
+| 7 | — | — | **소비** | 필터 | — | ✗ |
 | 8 | KPA 체크아웃 채널매핑 | kpa-checkout.controller.ts:375 | **소비** | 필터 | ✗ 하드코딩 `= 'kpa-society'` (alias 미보정) | ✗ |
 | 9 | 매장 채널상품 관리뷰 | store-channel-products.controller.ts:104,142 | 소비 | **필터 아님**(org+channel scoped) | — | ✅ `serviceKey` |
 | 10 | Tablet product-pool 관리뷰 | store-tablet.routes.ts:851 | 소비 | **필터 아님**(org scoped) | — | ✅ raw |
@@ -107,10 +105,10 @@ service_key 에 넣는 값의 "축"이 경로마다 다르다 — 이것이 혼�
 | 현재 kpa / kpa-society OPL | **0건** (NormalizeKpaServiceKeys는 이후 제거된 과거 데이터에 적용) |
 | 현재 event-offer(kpa-groupbuy 등) OPL | **0건** (코드·상수는 존재, 데이터 미적재) |
 | product_approvals | **0건** (backfill 소스 없음) |
-| enrollment service_code | neture(2)·k-cosmetics(2)·glycopharm(1)·**cosmetics(1)** — k-cosmetics/cosmetics 혼용 |
+| enrollment service_code | neture(2)·k-cosmetics(2)·**cosmetics(1)** — k-cosmetics/cosmetics 혼용 |
 | **store→service 결정성** | 전 매장(12) 각 **active slug 정확히 1개** → org→소비 서비스 **결정적** |
-| slug 도메인 | {kpa, glycopharm, cosmetics} — **neture slug 없음**(neture=origin 축 확증) |
-| membership 도메인 | {kpa-society, k-cosmetics, glycopharm, neture, platform} |
+| slug 도메인 | {kpa, cosmetics} — **neture slug 없음**(neture=origin 축 확증) |
+| membership 도메인 | {kpa-society, k-cosmetics, neture, platform} |
 | 재태깅 충돌 | 이 org에 기존 'kpa' 동일 master listing **0건** → neture→소비키 재태깅 **무충돌** |
 | origin 컬럼 여지 | `source_type`/`source_id`(nullable) **이미 존재**, 현 10건 전량 NULL |
 | unique index | `idx_org_listing_unique_v2`(org,**sk**,offer_id) + `idx_org_listing_unique_master`(org,**sk**,master_id WHERE offer_id NULL) — **둘 다 service_key 포함** |
@@ -122,7 +120,6 @@ service_key 에 넣는 값의 "축"이 경로마다 다르다 — 이것이 혼�
 ```sql
 -- (신규, additive/nullable — 기존 동작 무변경)
 ALTER TABLE organization_product_listings
-  ADD COLUMN origin_service_key varchar(50) NULL;   -- neture, kpa-groupbuy, glycopharm-event-offer 등
 -- source_type / source_id 는 이미 존재 → origin_type 역할로 정착(값 어휘 표준화)
 --   store_manual | supplier_offer | operator_seed | event_offer | product_approval | seller_recruitment | migration
 ```
@@ -167,7 +164,7 @@ ALTER TABLE organization_product_listings
 |-----------|---------|-----------|
 | 매장 관리뷰(#9,#10,#17 GET) | organization_id 중심 | 유지(이미 대체로 org-scoped) |
 | 공개 B2C/Tablet(#1~#4) | 소비 service_key + resolveServiceKeys | canonical 정렬 후 resolveServiceKeys **단순화/은퇴** 검토(slug=OPL 정합 시) |
-| GP 소비(#5~#7) | GLYCOPHARM_OPL_SERVICE_KEYS allowlist | **event-offer 키를 origin 축으로 이관** → 소비 게이트에서 origin 혼입 제거 |
+ 소비(#5~#7) | — | **event-offer 키를 origin 축으로 이관** → 소비 게이트에서 origin 혼입 제거 |
 | KPA 체크아웃(#8) | 하드코딩 'kpa-society' | canonical 상수화(alias 보정 일관) |
 | event-offer flows(#11~#15) | 현재 service_key='kpa-groupbuy' 필터 | **origin 축(source_type='event_offer' 또는 origin_service_key) 필터로 이관** |
 
@@ -195,10 +192,9 @@ ALTER TABLE organization_product_listings
 ```
 위험:
 - service_key 가 unique key 구성요소 → 값 변경이 row identity 이동. 이중생성/충돌 가능.
-- resolveServiceKeys(kpa↔kpa-society) 와 GP allowlist(glycopharm↔glycopharm-event-offer)가
   이미 소비/​origin 을 부분적으로 섞고 있어, 한쪽만 바꾸면 회귀.
 - event-offer flows 가 service_key='kpa-groupbuy' 를 도메인 필터로 직접 사용 → origin 이관 시 광범위 수정.
-- Shared Module(store-public-utils, auto-listing, resolveServiceKeys)이라 KPA/GP/KCos/neture 전 소비처 동시 영향.
+- Shared Module(store-public-utils, auto-listing, resolveServiceKeys)이라 KPA/KCos/neture 전 소비처 동시 영향.
 
 중단(후속 분리) 기준:
 - origin 이관이 event-offer/groupbuy 도메인 로직 재설계로 확대되면 별도 WO.
@@ -221,7 +217,7 @@ ALTER TABLE organization_product_listings
 4) WO-O4O-OPL-SERVICEKEY-CANONICAL-BACKFILL-APPLY-V1  (사용자 승인 필수)
    - dry-run 근거로 실제 재태깅 + origin backfill.
 5) WO-O4O-OPL-CONSUMER-SURFACE-QUERY-ALIGNMENT-V1
-   - event-offer flows origin 축 이관 + GP allowlist origin 분리 + resolveServiceKeys 단순화 검토.
+   - event-offer flows origin 축 이관 allowlist origin 분리 + resolveServiceKeys 단순화 검토.
 ```
 
 의존: 1 → 2 → 3 → 4 → 5 (2는 1 없이도 부분 가능하나 origin 기록 위해 1 선행 권장). **apply(4)는 반드시 승인 후.**
@@ -238,4 +234,4 @@ migration 작성 0
 
 ---
 
-*결론: OPL.service_key=소비 서비스 면 단일 축(A) + origin 별도 축(source_type/source_id 기존 + origin_service_key 신규, 3안). deriveListingServiceKey=store context(org→slug 결정적)로 대체. 생성 20경로/소비 18처/비소비 4처 전수. 현 데이터 OPL 10건 전량 neture·offer_id NULL·slug 불일치, 재태깅 무충돌. event-offer origin 키가 이미 동일 컬럼에 혼입(GP는 소비 게이트에 포함, KPA는 분리). 후속 5 WO(마이그레이션→derive fix→backfill dryrun→apply(승인)→consumer align). write 0.*
+*결론: OPL.service_key=소비 서비스 면 단일 축(A) + origin 별도 축(source_type/source_id 기존 + origin_service_key 신규, 3안). deriveListingServiceKey=store context(org→slug 결정적)로 대체. 생성 20경로/소비 18처/비소비 4처 전수. 현 데이터 OPL 10건 전량 neture·offer_id NULL·slug 불일치, 재태깅 무충돌. 후속 5 WO(마이그레이션→derive fix→backfill dryrun→apply(승인)→consumer align). write 0.*

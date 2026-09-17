@@ -41,7 +41,6 @@ import {
 } from './cms-content-member-authoring.js';
 
 /**
- * WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
  * WO-O4O-CMS-KPA-MUTATION-SERVICEKEY-CANONICALIZATION-V1
  *
  * Authorize a CMS mutation request against a target serviceKey.
@@ -102,7 +101,7 @@ export function createCmsContentMutationRoutes(deps: {
    *
    * WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1:
    * - Admin: author_role='admin', any visibility_scope
-   * - Service admin (e.g. glycopharm:admin): author_role='service_admin', visibility_scope='service'
+   * - Service admin (e.g. kpa:admin): author_role='service_admin', visibility_scope='service'
    */
   router.post('/contents', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
     try {
@@ -133,13 +132,12 @@ export function createCmsContentMutationRoutes(deps: {
         subType: reqSubType,
       } = req.body;
 
-      // WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
       // Authorize against target serviceKey (platform admin, or the service's operator|admin role)
       const { allowed, isPlatformAdmin } = await authorizeCmsMutation(user, serviceKey);
 
       // WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6
       // operator/admin 인가에서 떨어지면 **회원 저작 capability** 를 본다.
-      // capability 가 등록되지 않은 서비스(KPA/GP/KCos/Neture)는 종전과 완전히 동일한 403 이다.
+      // capability 가 등록되지 않은 서비스(KPA/KCos/Neture)는 종전과 완전히 동일한 403 이다.
       let memberCapability: CmsMemberAuthoringCapability | null = null;
       if (!allowed) {
         const memberDecision = authorizeCmsMemberCreate(user as any, serviceKey, type);
@@ -289,7 +287,6 @@ export function createCmsContentMutationRoutes(deps: {
         return;
       }
 
-      // WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
       // Service-scoped authorization against the existing content's serviceKey.
       // Non-platform-admin callers cannot move content across services.
       const putAuth = await authorizeCmsMutation(req.user, content.serviceKey);
@@ -396,7 +393,6 @@ export function createCmsContentMutationRoutes(deps: {
       const { id } = req.params;
       const { status } = req.body;
 
-      // WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
       // Load existing content to authorize against its serviceKey before transitioning.
       const contentRepo = dataSource.getRepository(CmsContent);
       const existing = await contentRepo.findOne({ where: { id } });

@@ -14,7 +14,7 @@ KPA 푸터의 더미/하드코딩 법정정보를 제거하고 serviceKey 기반
 
 ## 2. 선행 IR 반영
 - `IR-O4O-KPA-LEGAL-DOCUMENTS-CROSSSERVICE-INTEGRATION-V1` Phase 1(저위험 footer + dead link) 실행.
-- 동적 footer 공통 컴포넌트(`PublicLegalFooterInfo`, GP/KCos/Neture 검증) 재사용.
+- 동적 footer 공통 컴포넌트(`PublicLegalFooterInfo`, KCos/Neture 검증) 재사용.
 
 ## 3. KPA Footer 컴포넌트 위치
 - `services/web-kpa-society/src/components/Footer.tsx` (inline style). `components/Layout.tsx` 에서 렌더(공개 페이지 전반).
@@ -62,13 +62,13 @@ KPA 푸터의 더미/하드코딩 법정정보를 제거하고 serviceKey 기반
 - 기존 KPA `/operator/legal`(정책문서 관리)은 본 작업에서 **수정하지 않음** — 정책문서 관리 기능으로 유지.
 - KPA 법정정보 입력 경로는 후속 통합 작업에서 **공통 Admin `/admin/settings/legal-terms`(service_legal_profiles)** 로
   수렴 권장. 이번 작업은 KPA Admin UI 를 새로 연결하지 않음(푸터 표시 측만 동적 전환).
-- service_legal_profiles 에 KPA 값 없으면 공개 푸터에 법정정보 비표시(GP/KCos/Neture 와 동일 패턴).
+- service_legal_profiles 에 KPA 값 없으면 공개 푸터에 법정정보 비표시(KCos/Neture 와 동일 패턴).
 
 ## 11. /operator/legal 미수정 / 12. kpa_legal_documents 미수정 / 13. backend 미수정
 - `/operator/legal`(LegalManagementPage), `kpa_legal_documents`(entity/migration/controller), apps/api-server **0건 수정**.
 
 ## 14. 타 서비스 미수정 확인
-- web-neture / web-glycopharm / web-k-cosmetics **0건**. packages/shared-space-ui **0건**(기존 컴포넌트 재사용, 결함 없음).
+- packages/shared-space-ui **0건**(기존 컴포넌트 재사용, 결함 없음).
 
 ## 15. 검증 결과
 - tsc web-kpa-society **0** ✅ / build **0** ✅

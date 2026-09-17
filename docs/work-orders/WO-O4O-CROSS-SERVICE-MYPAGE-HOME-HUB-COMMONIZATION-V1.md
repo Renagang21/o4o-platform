@@ -30,7 +30,6 @@ Requests, Settings, Membership 등 개별 업무 내부는 이번 WO에서 공�
 
 ```text
 KPA-Society
-GlycoPharm
 K-Cosmetics
 Neture
 Pharmacy-Hub
@@ -229,7 +228,6 @@ KPA
 - 약사회 업무
 - 교육/증명
 
-GlycoPharm
 - 교육/학점/증명
 - 서비스 신청
 
@@ -251,12 +249,6 @@ Pharmacy-Hub
 ---
 
 ## 11. 서비스별 주의
-
-### GlycoPharm
-
-선행 작업에서 정리된 My Page navigation과 Home entry가 실제 route와 일치하는지 확인한다.
-
-dead entry/card 0.
 
 ### Neture
 
@@ -321,7 +313,6 @@ Identity 변경
 
 ```text
 KPA
-GP
 KCos
 Neture
 PH
@@ -360,7 +351,6 @@ OUT_OF_SCOPE
 ```text
 @o4o/account-ui build
 KPA typecheck/build
-GP typecheck/build
 KCos typecheck/build
 Neture typecheck/build
 PH typecheck/build
@@ -583,7 +573,6 @@ packages/account-ui/src/components/MyPageEntryCardGrid.tsx
 
 ```text
 KPA-Society      /mypage  (MyDashboardPage)
-GlycoPharm       /mypage  (MyPageHub) + navItems.ts
 K-Cosmetics      /mypage  (MyPageHub)
 Neture           /mypage  (MyPageHub) + navItems.ts
 Pharmacy-Hub     /account (+ /store-owner/account 호환 계약 유지)

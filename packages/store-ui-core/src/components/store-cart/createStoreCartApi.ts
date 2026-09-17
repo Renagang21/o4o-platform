@@ -2,7 +2,7 @@
  * createStoreCartApi — canonical Store Cart 클라이언트 팩토리
  *
  * WO-O4O-STORE-HUB-CROSSSERVICE-FINAL-COMMONIZATION-AUDIT-AND-CLEANUP-V1:
- *   KPA / K-Cosmetics / GlycoPharm 3 서비스가 동일한 7개 endpoint 목록을 각각 복제하고 있었다.
+ *   KPA / K-Cosmetics 2 서비스가 동일한 7개 endpoint 목록을 각각 복제하고 있었다.
  *   차이는 오직 **전송 계층**(coreApiClient / authClient.api 언랩 방식)뿐이었으므로
  *   endpoint·payload·응답 계약을 여기 한 곳으로 모으고, 서비스는 http 어댑터만 주입한다.
  *

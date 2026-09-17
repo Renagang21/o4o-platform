@@ -1,7 +1,7 @@
 # Hub UX Guidelines V1 — O4O 운영 허브 공통 규칙
 
 > **상위 문서**: `CLAUDE.md` (Section 18: APP 표준화 규칙)
-> **적용 범위**: KPA, Neture, GlycoPharm, Platform Hub
+> **적용 범위**: KPA, Neture, Platform Hub
 > **상태**: Active Baseline (2026-02-16)
 
 ---
@@ -19,7 +19,7 @@ hub-core 패키지(`@o4o/hub-core`)의 타입과 컴포넌트가 이 규칙의 �
 
 | 등급 | 정의 | 대상 |
 |------|------|------|
-| **운영 OS** | Signal + QuickAction + AI + ActionLog 완전 루프 | Neture, GlycoPharm |
+| **운영 OS** | Signal + QuickAction + AI + ActionLog 완전 루프 | Neture |
 | **경량 허브** | Signal + Navigation 카드, Trigger 최소 | KPA |
 | **전략 허브** | Cross-service 집계 + Proxy Trigger | Platform |
 
@@ -133,7 +133,7 @@ interface HubCardDefinition {
 
 | 허브 등급 | 최소 Signal 비율 | 현행 |
 |-----------|----------------|------|
-| 운영 OS | **70%** | Neture 80%, GlycoPharm 60% |
+| 운영 OS | **70%** | Neture 80% |
 | 경량 허브 | **40%** | KPA 25% (미달) |
 | 전략 허브 | N/A (집계형) | Platform |
 
@@ -194,7 +194,6 @@ Signal 인지 → QuickAction 클릭 → API 호출 →
 | 서비스 | 현행 | 권장 |
 |--------|------|------|
 | Neture | `refreshKey` 증가 | 유지 (즉시) |
-| GlycoPharm | `setTimeout(1000)` | 유지 (1초 딜레이) |
 | Platform | `await fetchData()` | 유지 (동기 대기) |
 
 ---
@@ -205,7 +204,7 @@ Signal 인지 → QuickAction 클릭 → API 호출 →
 
 | 패턴 | 사용 서비스 | 권장 |
 |------|-----------|------|
-| `Promise.allSettled` | GlycoPharm, Platform | 모든 허브 필수 |
+| `Promise.allSettled` | Platform | 모든 허브 필수 |
 | `Promise.all` | Neture | allSettled로 전환 권장 |
 | 단일 fetch | KPA | 현행 유지 가능 |
 
@@ -290,15 +289,15 @@ sections: [
 
 ### 9.1 현행 vs 규칙 비교
 
-| 규칙 | KPA | Neture | GlycoPharm | Platform |
-|------|-----|--------|------------|----------|
-| 카드 ≤ 12 | 12 (상한) | 11 | 10 | N/A |
-| Signal ≥ 40%/70% | 25% ❌ | 80% ✅ | 60% ⚠️ | N/A |
-| beforeSections | StatusCards ✅ | AI Card ✅ | AI Card ✅ | Risk Overview ✅ |
-| QuickAction 루프 | 없음 ❌ | 완전 ✅ | 완전 ✅ | Proxy ✅ |
-| Admin 섹션 분리 | ✅ | ✅ | ✅ | N/A |
-| allSettled fetch | 단일 | Promise.all ⚠️ | allSettled ✅ | allSettled ✅ |
-| ActionLog | 없음 ❌ | 8/8 ✅ | 4/10 ⚠️ | 1/1 ✅ |
+| 규칙 | KPA | Neture | Platform |
+| ------ | ----- | -------- | ---------- |
+| 카드 ≤ 12 | 12 (상한) | 11 | N/A |
+| Signal ≥ 40%/70% | 25% ❌ | 80% ✅ | N/A |
+| beforeSections | StatusCards ✅ | AI Card ✅ | Risk Overview ✅ |
+| QuickAction 루프 | 없음 ❌ | 완전 ✅ | Proxy ✅ |
+| Admin 섹션 분리 | ✅ | ✅ | N/A |
+| allSettled fetch | 단일 | Promise.all ⚠️ | allSettled ✅ |
+| ActionLog | 없음 ❌ | 8/8 ✅ | 1/1 ✅ |
 
 ### 9.2 개선 필요 항목
 
@@ -306,7 +305,6 @@ sections: [
 |---------|--------|------|------------|
 | 1 | KPA | Signal 커버리지 | 25% → 40%+ |
 | 2 | Neture | fetch 패턴 | Promise.all → allSettled |
-| 3 | GlycoPharm | Signal 커버리지 | 60% → 70%+ |
 | 4 | KPA | QuickAction | 0 → 2+개 |
 
 ---

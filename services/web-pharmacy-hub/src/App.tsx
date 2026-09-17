@@ -668,7 +668,7 @@ export default function App() {
           {/*
             운영자 영역 셸 (WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1)
             OperatorLayoutWrapper = MembershipGate + 공통 OperatorAreaShell(@o4o/operator-ux-core)
-              + DomainIASidebar. KPA / K-Cosmetics / GlycoPharm 와 같은 구조다.
+              + DomainIASidebar. KPA / K-Cosmetics 와 같은 구조다.
             URL 3개(/operator · /operator/memberships · /operator/memberships/:membershipId) 는
             그대로 두고 nested route 로만 정리한다 — 하위 화면 컴포넌트도 무변경.
           */}
@@ -701,7 +701,7 @@ export default function App() {
             {/* WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#93)
                 회원 콘텐츠 검토 큐. 자료실 관리와 같은 공통 console, subType 축만 다르다. */}
             <Route path="community-contents" element={<OperatorCommunityContentsPage />} />
-            {/* 동일 WO 4 (#97) — KPA/GP/KCos 와 같은 공통 설문 콘솔. */}
+            {/* 동일 WO 4 (#97) — KPA/KCos 와 같은 공통 설문 콘솔. */}
             <Route path="surveys" element={<OperatorSurveyListPage />} />
             <Route path="surveys/new" element={<OperatorSurveyCreatePage />} />
             {/* 동일 WO §4 (#95) — 공통 LMS 운영 콘솔. 서비스 경계는 backend 가
@@ -715,7 +715,7 @@ export default function App() {
           {/*
             관리자 영역 셸 (WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1)
             AdminLayoutWrapper = MembershipGate + 역할 가드(admin | platform:super_admin)
-              + 공통 OperatorAreaShell. K-Cosmetics / GlycoPharm / Neture / KPA 의 `/admin` 과 같은 축이다.
+              + 공통 OperatorAreaShell. K-Cosmetics / Neture / KPA 의 `/admin` 과 같은 축이다.
             admin 이 operator API 를 쓸 수 있다는 이유로 두 영역을 합치지 않는다.
 
             법정정보·약관 설정은 저장이 `pharmacy-hub:admin` 권한이므로 다른 4서비스와 동일하게

@@ -238,7 +238,6 @@ service-scoped role (e.g., kpa:admin) → bypass
 
 ```
 neture.co.kr       ─┐
-glycopharm.co.kr   ─┤
 glucoseview.co.kr  ─┤── 동일 JWT_SECRET
 yaksa.site         ─┤   동일 o4o-core-api
 cosmetics.neture   ─┘
@@ -294,7 +293,6 @@ req.user.memberships┤
 서비스 A (neture.co.kr)
   ↓ 사용자가 서비스 B로 이동 클릭
   ↓ 기존 JWT 그대로 전달 (same API server)
-서비스 B (glycopharm.co.kr)
   ↓ 기존 JWT로 API 호출
   ↓ membership-guard가 memberships 확인
   ↓ 접근 허용/거부

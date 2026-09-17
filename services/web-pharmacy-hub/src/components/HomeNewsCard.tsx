@@ -5,7 +5,7 @@
  *
  * 홈 우측 슬롯(noticesRightSlot)의 canonical 용도로 돌아온다 — 공통
  * StandardHomeTemplate 이 이 슬롯을 "서비스별 뉴스" 로 정의하고 있고,
- * KPA(약사공론) · GlycoPharm(약업신문) · K-Cosmetics(트렌드)도 같은 축을 쓴다.
+ * KPA(약사공론) · K-Cosmetics(트렌드)도 같은 축을 쓴다.
  * 기존의 `커뮤니티 이용 안내`(사용법)는 홈이 아니라 이용 안내로 옮겼다.
  *
  * 표시부는 좌측 공지와 **같은 공통 컴포넌트** `NewsNoticesSection` 을 쓴다 —

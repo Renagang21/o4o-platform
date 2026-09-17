@@ -1,8 +1,6 @@
 /**
  * SupplyCatalogHub — canonical B2B 장바구니 producer (opt-in) 계약
  *
- * WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1 (§10 · §38 · §41)
- *
  * 고정하는 것
  *   1. `cart` prop 이 없으면 화면은 종전과 완전히 동일하다 — KPA-Society / K-Cosmetics 회귀 0.
  *   2. `cart` prop 이 있으면 카탈로그 행을 그대로 producer 에 넘긴다.

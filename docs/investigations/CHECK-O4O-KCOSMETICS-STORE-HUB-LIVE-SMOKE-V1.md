@@ -81,18 +81,17 @@ positive-path(라우트 렌더 · redirect · empty/error state)는 대부분 PA
 - K-Cosmetics `AuthContext` 의 `isLoading` 은 `!!getAccessToken()` 로 init 되고, `checkSession()` 은 **lazy**(호출자가 트리거). 호출자는 `RoleGuard` 뿐 ([RoleGuard.tsx:34](../../services/web-k-cosmetics/src/components/auth/RoleGuard.tsx#L34)).
 - `/store/*` 는 `StoreOwnerRoute`→`StoreOwnerGuard`(공통 패키지)로, **checkSession 을 호출하지 않음** ([App.tsx StoreOwnerRoute](../../services/web-k-cosmetics/src/App.tsx#L288)). K-cos `AuthContext` 에는 **mount-time checkSession useEffect 도 없음**(useEffect 는 token-cleared 리스너 뿐, [AuthContext.tsx:150](../../services/web-k-cosmetics/src/contexts/AuthContext.tsx#L150)).
 - ⇒ cold load 시 `isLoading` 영구 true → `StoreOwnerGuard` loadingNode("권한을 확인하는 중...") 무한.
-- **cross-service**: **GlycoPharm 은 영향 없음** — AuthContext 가 mount useEffect 에서 `checkSession()` 호출([web-glycopharm AuthContext.tsx:100-133](../../services/web-glycopharm/src/contexts/AuthContext.tsx#L100)). **K-Cosmetics 고유 divergence** (GlycoPharm canonical 미반영).
+- **K-Cosmetics 고유 divergence**
 
 ### P0-2 — forced-content serviceKey 거부
 - 프론트 `ForcedContentPage` 가 `SERVICE_KEY='k-cosmetics'` 로 `/api/signage/k-cosmetics/hq/forced-content` 호출 ([ForcedContentPage.tsx:17-18](../../services/web-k-cosmetics/src/pages/operator/signage/ForcedContentPage.tsx#L17)).
-- backend `signage-role.middleware.ts` 의 `validServiceKeys = ['pharmacy','cosmetics','tourism','common','kpa-society','neture','glycopharm']` 에 **`k-cosmetics` 없음 / `cosmetics` 있음** ([signage-role.middleware.ts:641](../../apps/api-server/src/middleware/signage-role.middleware.ts#L641)) → 400.
 - ⇒ 프론트(k-cosmetics) ↔ signage backend(cosmetics) **serviceKey 표준 불일치**.
 
 ---
 
 ## 7. 후속 WO 후보 (코드 미수정)
 
-1. **WO-O4O-STORE-OWNER-GUARD-CHECKSESSION-FIX-V1** (P0-1) — K-cos AuthContext mount-time checkSession 부트스트랩 추가(GlycoPharm canonical 정합) 또는 StoreOwnerRoute 에서 checkSession 트리거. cross-service(KPA 등) 점검.
+1. **WO-O4O-STORE-OWNER-GUARD-CHECKSESSION-FIX-V1** (P0-1) — K-cos AuthContext mount-time checkSession 부트스트랩 추가 또는 StoreOwnerRoute 에서 checkSession 트리거. cross-service(KPA 등) 점검.
 2. **WO-O4O-SIGNAGE-FORCED-CONTENT-KCOSMETICS-SERVICEKEY-FIX-V1** (P0-2) — 프론트 SERVICE_KEY 를 `cosmetics` 로 정합(signage 표준) 또는 backend validServiceKeys 에 `k-cosmetics` 추가. signage serviceKey 표준 결정 필요.
 3. (P1) orders API no-store 500 → 403/200-empty 정상화.
 4. (CONDITIONAL 해소) cosmetics:store_owner 테스트 계정 확보 후 채워진 데이터 경험 재검증.

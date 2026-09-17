@@ -4,7 +4,7 @@
 
 - **작성일**: 2026-06-05
 - **작업 유형**: CHECK (완료 고정 문서화)
-- **대상 서비스**: Neture (KPA-Society / GlycoPharm / K-Cosmetics 제외)
+- **대상 서비스**: Neture (KPA-Society / K-Cosmetics 제외)
 - **검증 기준 HEAD**: `b11c06d74`
 - **확인 방식**: git log 정합 + 정적 route/menu 확인 + read-only live API probe (선행 결과 인용)
 
@@ -157,7 +157,6 @@ Quick Actions: 9
 
 ```text
 - KPA-Society       변경 없음
-- GlycoPharm        변경 없음
 - K-Cosmetics       변경 없음
 - DB schema/migration  없음
 - role/membership 로직   변경 없음

@@ -13,7 +13,7 @@
 | 1. Pharmacy-Hub 단일 조직 계정 `resolveStoreAccess()` 성공 | **PASS** (§3-1) |
 | 2. `organizationId = c5e3a37a-…` 반환 | **PASS** (§3-1) |
 | 3. Pharmacy-Hub 공통 매장 API 최소 smoke | **PASS — 5/5 endpoint 200** (§3-4) |
-| 4. KPA·GlycoPharm·K-Cosmetics 권한 회귀 0 | **PASS** (§3-2) |
+| 4. KPA·K-Cosmetics 권한 회귀 0 | **PASS** (§3-2) |
 | 5. 비매장 사용자 접근 차단 유지 | **PASS** (§3-3) |
 | 6. renagang21 계속 HOLD | **PASS — 무변경** (§3-5) |
 | 7. W1 CHECK 보완 후 W1 최종 종료 | **완료** — W1 §8 갱신 |
@@ -31,14 +31,12 @@
 ```ts
 const STORE_OWNER_ROLES_BY_SERVICE = {
   kpa: ['kpa:store_owner'],
-  glycopharm: ['glycopharm:store_owner'],
   cosmetics: ['cosmetics:store_owner'],
   'pharmacy-hub': ['pharmacy-hub:store_owner'],   // 신규
 } as const;
 
 const STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY: Record<StoreOwnerServiceKey, string> = {
   kpa: 'kpa-society',
-  glycopharm: 'glycopharm',
   cosmetics: 'k-cosmetics',
   'pharmacy-hub': 'pharmacy-hub',                 // 신규
 };
@@ -85,7 +83,6 @@ back-compat 가드를 통과해 `req.organizationId = null` 로 핸들러에 들
 | role | active 총원 | 조직 보유 | 조직 미보유 |
 |---|:--:|:--:|:--:|
 | `kpa:store_owner` | 5 | 5 | **0** |
-| `glycopharm:store_owner` | 1 | 1 | **0** |
 | `cosmetics:store_owner` | 2 | 2 | **0** |
 | `pharmacy-hub:store_owner` | 3 | 2 | 1 (rejected E2E 계정) |
 
@@ -106,11 +103,10 @@ back-compat 가드를 통과해 `req.organizationId = null` 로 핸들러에 들
 ```
 'kpa'        : store-content(×8) / store-asset-control / asset-snapshot / store-library-feed /
                kpa-store-owner.util / kpa-checkout / store-seller-recruitment-browse
-'glycopharm' : glycopharm/mypage.controller (×2)
 ```
 
 `store-hub.controller` · `store-qr-landing.controller` 는 factory 파라미터로 serviceKey 를
-받으며 `kpa` / `glycopharm` / `cosmetics` 3개 서비스 라우터에서만 mount 된다.
+받으며 `kpa` / `cosmetics` 2개 서비스 라우터에서만 mount 된다.
 
 ### 2-2. 영향 없음 — 동명이인(로컬 함수)
 
@@ -125,7 +121,6 @@ back-compat 가드를 통과해 `req.organizationId = null` 로 핸들러에 들
 modules/foreign-visitor-partner/foreign-visitor-partner.routes.ts:29
 modules/foreign-visitor-partner/foreign-visitor-partner-qr-code.routes.ts:37
 modules/store-entitlement/store-entitlement.routes.ts:35
-  const STORE_OWNER_SERVICE_KEYS: StoreOwnerServiceKey[] = ['kpa', 'glycopharm', 'cosmetics'];
 ```
 
 union 확장 후에도 **런타임 allowlist 는 3개 그대로**다 (부분집합이므로 타입도 통과).
@@ -157,7 +152,7 @@ mount prefix 도 `/api/v1/store`, `/api/v1/store-hub/ai`, `/api/v1/products` 로
 
 ### 2-5. 확장 부작용 — 기록 후 별도 WO 권고
 
-back-compat 경로는 원래부터 kpa·glycopharm·cosmetics 매장주를 서로 통과시킨다.
+back-compat 경로는 원래부터 kpa·cosmetics 매장주를 서로 통과시킨다.
 pharmacy-hub 추가는 그 기존 자세와 **대칭**이지 새 정책이 아니다. 다만 아래 3곳은
 서비스 의미상 back-compat 가 부적절하므로 service-aware 전환을 권고한다 (본 WO 범위 밖).
 
@@ -195,7 +190,6 @@ W1 §8-5 의 `null` → **기대 organizationId 반환**. 완료 기준 1·2 PAS
 
 ```
 cosmetics:store_owner   scoped 31e926a0-…  /  back-compat 31e926a0-…   OK
-glycopharm:store_owner  scoped 9c87f46b-…  /  back-compat 9c87f46b-…   OK
 kpa:store_owner         scoped 8712bff0-…  /  back-compat 8712bff0-…   OK
 ```
 
@@ -203,7 +197,6 @@ cross-service leakage 도 차단 유지:
 
 ```
 Pharmacy-Hub 사용자 → resolveStoreAccess('kpa')        = null
-                    → resolveStoreAccess('glycopharm') = null
                     → resolveStoreAccess('cosmetics')  = null
 KPA 매장주        → createRequireStoreOwner('pharmacy-hub') = 403 MEMBERSHIP_NOT_FOUND
 Pharmacy-Hub 매장주 → createRequireStoreOwner('kpa')          = 403 MEMBERSHIP_NOT_FOUND

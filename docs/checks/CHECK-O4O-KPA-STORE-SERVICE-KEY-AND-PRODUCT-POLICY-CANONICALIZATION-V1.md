@@ -79,7 +79,7 @@ canonical membership 을 role-prefix 로 **되돌려서** OPL 에 기록하고 �
 
 → 제거하고 **공용 도출기 하나로 수렴**: 신규 `apps/api-server/src/utils/listing-service-key.ts` 의 `deriveListingServiceKeyFromMemberships()`. 컨트롤러는 얇은 wrapper 만 유지한다. `MULTI_MEMBERSHIP_PRIORITY`(neture 우선)는 **종전 동작 그대로 보존**했다.
 
-동작 변화: KPA 매장 `kpa` → **`kpa-society`** / K-Cosmetics 매장 `cosmetics` → **`k-cosmetics`**. GlycoPharm · Neture 는 **값 변화 없음**.
+동작 변화: KPA 매장 `kpa` → **`kpa-society`** / K-Cosmetics 매장 `cosmetics` → **`k-cosmetics`**. Neture 는 **값 변화 없음**.
 
 ### 3-2. `routes/kpa/controllers/organization.controller.ts` — auto-listing 두 호출의 key 불일치 제거
 
@@ -87,7 +87,7 @@ canonical membership 을 role-prefix 로 **되돌려서** OPL 에 기록하고 �
 
 ### 3-3. candidate → listing 경계 변환 (SSOT 위임)
 
-`product_candidates.service_key` 는 **role-prefix 축**이다(운영자 스코프 `{sk}:operator` 구성에 쓰인다 — `store-product-request.controller` 의 `MEMBERSHIP_KEY_TO_SERVICE_KEY` 는 그 목적이므로 **불변 유지**). 그 값이 OPL 로 그대로 흘러가던 두 지점에만 `resolveCanonicalServiceKey()` 를 1회 적용했다. canonical 입력에는 항등이므로 KCos/GP/Neture 회귀 없음.
+`product_candidates.service_key` 는 **role-prefix 축**이다(운영자 스코프 `{sk}:operator` 구성에 쓰인다 — `store-product-request.controller` 의 `MEMBERSHIP_KEY_TO_SERVICE_KEY` 는 그 목적이므로 **불변 유지**). 그 값이 OPL 로 그대로 흘러가던 두 지점에만 `resolveCanonicalServiceKey` 를 1회 적용했다. canonical 입력에는 항등이므로 KCos/Neture 회귀 없음.
 
 - `store-product-request-admin.service.ts:upsertOrganizationListing`
 - `product-candidate.service.ts:linkCandidateToOrganizationListing`
@@ -102,7 +102,7 @@ canonical membership 을 role-prefix 로 **되돌려서** OPL 에 기록하고 �
 
 | 요구 | 결과 |
 |---|---|
-| KCos / GlycoPharm / PharmacyHub 기존 동작 불변 | ✅ GlycoPharm 3개 호출부 모두 `'glycopharm'`(canonical) 유지. KCos·PH 는 `autoList*ForOrg` 호출부 없음. `autoExpand*` 는 `ose.service_code` 복사 방식으로 **로직 무변경** |
+| KCos / PharmacyHub 기존 동작 불변 | KCos·PH 는 `autoList*ForOrg` 호출부 없음. `autoExpand*` 는 `ose.service_code` 복사 방식으로 **로직 무변경** |
 | KPA 신규 enrollment(`kpa-society`) → OPL 은 확정 LISTING_KEY 사용 | ✅ 두 축이 동일 값이므로 복사만으로 충족. 별도 변환 불필요 |
 | 동일 master/org/service 중복 listing 0 | ✅ `ON CONFLICT (organization_id, service_key, offer_id) DO NOTHING` · `(organization_id, service_key, master_id) WHERE offer_id IS NULL` 유지. 유니크 인덱스 무변경 |
 | 기존 listing 재분류·대량 수정 없음 | ✅ UPDATE 0건. 코드 변경만 |
@@ -115,7 +115,6 @@ canonical membership 을 role-prefix 로 **되돌려서** OPL 에 기록하고 �
 
 | service_key | is_pharmacy_target_service |
 |---|:---:|
-| `glycopharm` | true |
 | `k-cosmetics` | false |
 | `kpa-society` | **true** |
 | `neture` | false |
@@ -175,7 +174,7 @@ canonical membership 을 role-prefix 로 **되돌려서** OPL 에 기록하고 �
 | OPL `service_key IN ('kpa','kpa-society')` | **0행** |
 | OPL 중복 후보 (같은 org+offer 에 두 키 공존) | **0건** |
 | `service_audience_policies` KPA 행 | `kpa-society` 1행(true) · `kpa` **0행** |
-| `organization_service_enrollments` | cosmetics 1 · glycopharm 2 · k-cosmetics 2 · neture 3 · pharmacy-hub 5 · **kpa / kpa-society 0** |
+| `organization_service_enrollments` | cosmetics 1 2 · k-cosmetics 2 · neture 3 · pharmacy-hub 5 · **kpa / kpa-society 0** |
 | `product_approvals` | 1행 (`kpa-society`) |
 | `offer_service_approvals` | 전체 3행 · `kpa-society` approved **1행** |
 | PUBLIC 승인 offer (활성 공급자) | **0건** / 그 중 DRUG **0건** |
@@ -221,8 +220,8 @@ canonical membership 을 role-prefix 로 **되돌려서** OPL 에 기록하고 �
 |---|---|
 | `tsc --noEmit` (api-server) | ✅ 0 errors |
 | **전체 api-server Jest** | ✅ **122 suites / 1,925 tests 전부 통과** |
-| auto-listing 회귀 (KCos/GP/PH) | ✅ 호출부 값 무변경 확인 + 전체 스위트 통과 |
-| listing key 도출 신규 테스트 | ✅ `src/utils/__tests__/listing-service-key.test.ts` 7 tests — canonical 유지 · role-prefix 거부 · multi-membership 우선순위 · GP/Neture 무회귀 |
+| auto-listing 회귀 (KCos/PH) | ✅ 호출부 값 무변경 확인 + 전체 스위트 통과 |
+| listing key 도출 신규 테스트 | ✅ `src/utils/__tests__/listing-service-key.test.ts` 7 tests — canonical 유지 · role-prefix 거부 · multi-membership 우선순위 · Neture 무회귀 |
 | drug gate allow/deny 계약 | ✅ `src/__tests__/security/drug-access-gate.spec.ts` 통과 (가드 로직 무변경) |
 | KPA handled-products 회귀 | ✅ `kpa-boundary-regression.spec.ts` · `kpa-role-guard.spec.ts` 통과 |
 | production read-only 영향 예측 | ✅ §7 |

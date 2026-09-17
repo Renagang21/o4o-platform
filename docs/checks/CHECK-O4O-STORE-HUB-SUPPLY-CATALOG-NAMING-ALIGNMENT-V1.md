@@ -26,11 +26,9 @@
 |---|---|---|---|
 | `packages/store-ui-core/src/components/b2b-catalog/B2BCatalogHub.tsx` | 컴포넌트 본체 + 8개 export 심볼 | rename 대상 | `git mv` → `supply-catalog/SupplyCatalogHub.tsx` + `B2BCatalog`→`SupplyCatalog` |
 | `packages/store-ui-core/src/index.ts` | export 8종 + 경로 | rename 대상 | SupplyCatalog* + supply-catalog 경로 |
-| `services/web-glycopharm/src/pages/hub/HubB2BCatalogPage.tsx` | `B2BCatalogHub` import/usage | wrapper | `SupplyCatalogHub` 로 정렬 (파일명·route 유지) |
 | `services/web-k-cosmetics/src/pages/hub/HubB2BPage.tsx` | `B2BCatalogHub` import/usage | wrapper | `SupplyCatalogHub` 로 정렬 (파일명·route 유지) |
 | `SupplyCatalogHub.tsx` `DISTRIBUTION_TABS` `{ key:'SERVICE', label:'B2B' }` | 유통유형 탭 라벨 | **KPA canonical 정합 — 유지** | 미변경 (cross-service 분포 라벨 drift 방지, §7) |
 | `services/web-*/.../store/StoreChannelsPage·StoreSettingsPage`, `ChannelType 'B2C'` | 매장 채널 타입(B2C/KIOSK/...) | **범위 외 — 별개 개념** | 미변경 (온라인 스토어 채널, supply catalog 아님) |
-| `services/web-glycopharm/.../business/BusinessProductsPage.tsx` `판매자 모집` | KPA business 페이지 | 범위 외 | 미변경 |
 | 그 외 `판매자 모집`(storeCart.ts 주석 등) | Neture 파트너 모집 경계 주석 | 범위 외 | 미변경 |
 
 > supply catalog 컴포넌트 내부에는 이미 '판매자 모집' 잔재 0 (PRIVATE = '공급 승인 대상', SELLER-RECRUITMENT-FIX 적용 상태 유지).
@@ -42,9 +40,9 @@
 - 헤더 주석에 canonical Naming Note 추가. `HubB2BCatalogPage`/`HubB2BPage` 파일명 참조는 실제 파일명이므로 원복 유지.
 - `index.ts` export 8종 + import 경로(`./components/supply-catalog/SupplyCatalogHub`) 정렬.
 
-## 5. Phase 3 — GP/KCos wrapper import 변경
+## 5. Phase 3 — KCos wrapper import 변경
 
-- GP `HubB2BCatalogPage.tsx`: `import { SupplyCatalogHub }` + `<SupplyCatalogHub<CatalogProduct>>`. 파일명/route(`/store-hub/b2b`)/accent(teal)/tableId/labels 유지.
+- 파일명/route(`/store-hub/b2b`)/accent(teal)/tableId/labels 유지.
 - KCos `HubB2BPage.tsx`: 동일(accent pink). 파일명/route 유지.
 - 두 wrapper의 user-facing 문구는 이미 "공급 상품 / 상품 카탈로그 / 내 매장에 추가" 기준 — B2C 문구 없음.
 
@@ -64,12 +62,11 @@
 
 ## 8. 검증 결과
 
-- **정적 grep:** `B2BCatalogHub` 코드 심볼 사용처 = 0 (잔존은 index.ts/컴포넌트의 "구 B2BCatalogHub →" 명칭 노트 주석뿐). `SupplyCatalogHub` export/import 정상. GP/KCos wrapper가 `SupplyCatalogHub` 사용.
+- **정적 grep:** `B2BCatalogHub` 코드 심볼 사용처 = 0 (잔존은 index.ts/컴포넌트의 "구 B2BCatalogHub →" 명칭 노트 주석뿐). `SupplyCatalogHub` export/import 정상. KCos wrapper가 `SupplyCatalogHub` 사용.
 - **PRIVATE = '공급 승인 대상' 유지**, supply catalog 컴포넌트 내 '판매자 모집'·B2C 문구 0.
 - **route `/store-hub/b2b` 유지**, backend/DB/migration/ProductApproval/OPL 무변경.
 - **typecheck:**
   - `@o4o/store-ui-core` (자체 tsconfig) — `SupplyCatalogHub.tsx` 에 **12건 오류**가 있으나 전부 **사전 존재(pre-existing)**: `@o4o/error-handling`/`@o4o/ui`/`@o4o/operator-ux-core` 로컬 dist 미빌드(TS2307) + 그로 인한 `ListColumnDef=any` cascade(TS7006). 동일 import/render 시그니처가 **원본 `B2BCatalogHub.tsx`(HEAD)에 그대로 존재** → rename 으로 인한 신규 오류 0. CI `build:deps` 후 해소.
-  - GP(`tsconfig.app.json`)·KCos(`tsconfig.json`) — store-ui-core src 를 transitive 컴파일하며 동일 dep-미빌드 오류만 표면화(신규 0). GP 에 무관한 사전 오류 `ForumPage.tsx` viewCount 2건 — 본 WO 범위 외.
   - 즉 **rename 은 module graph 동일(심볼/경로만 변경) → type 안전**.
 
 ## 9. 완료 판정

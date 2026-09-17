@@ -25,7 +25,6 @@
 | KPA-Society | `openRegisterModal` | `/register` 이동 → `RegisterRoute` shim 이 모달 오픈 (URL 왕복) | 모달 즉시 오픈, 이동 없음 |
 | Neture | `openRegisterModal` | `/register` 이동 → `RegisterRedirect` shim 이 모달 오픈 후 `/` 로 redirect | 모달 즉시 오픈, 이동 없음 |
 | K-Cosmetics | `navigate('/register')` | `/register` → `RegisterPage` | 동일 (`RegisterPage`) |
-| GlycoPharm | `openRegisterModal` | `/register` → `Navigate to="/"` (동작 모호) | 모달 오픈으로 확정 |
 | Pharmacy-Hub | (미주입 — 우회) | `/register` route 없음 → **데드링크**. nav 항목으로 우회 중이었음 | 표준 버튼 → `/join` |
 
 기존 `/register` 라우트(shim 포함)는 외부 링크·북마크 호환을 위해 **그대로 유지**했다.
@@ -35,12 +34,12 @@
 - `packages/ui/src/layout/GlobalHeader.tsx` — desktop 회원가입 `<Link to="/register">` → `<button onClick={onRegister}>` (스타일 동일). `onRegister` prop 주석에 "경로는 서비스가 결정한다" 계약 명시
 - `services/web-pharmacy-hub/src/components/PharmacyHubGlobalHeader.tsx` — 우회로 넣었던 public nav `가입 신청` 항목 제거, `onRegister={() => navigate('/join')}` 표준 버튼으로 정렬
 
-KPA-Society · K-Cosmetics · Neture · GlycoPharm 서비스 코드는 **무변경**(공통 계약 정정만으로 각자 의도한 동작이 성립).
+KPA-Society · K-Cosmetics · Neture 코드는 **무변경**(공통 계약 정정만으로 각자 의도한 동작이 성립).
 
 ## 3. typecheck / build / CI
 
 - `pharmacy-hub-web type-check` PASS
-- build PASS — `kpa-society-web` · `k-cosmetics-web` · `neture-web` · `pharmacy-hub-web` (+ 소비처 `glycopharm-web`)
+- build PASS — `kpa-society-web` · `k-cosmetics-web` · `neture-web` · `pharmacy-hub-web`
 - CI Pipeline (`32730cd79`) PASS · Deploy Web Services (Cloud Run) PASS
 - `packages/**` 변경이므로 detect-changes 가 전 web 서비스 재배포로 판정 (workflow §"shared packages changed → rebuild all")
 

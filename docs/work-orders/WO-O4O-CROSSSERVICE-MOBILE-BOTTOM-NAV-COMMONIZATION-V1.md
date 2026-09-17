@@ -2,13 +2,12 @@
 
 ## 1. 목적
 
-KPA Society / GlycoPharm / K-Cosmetics / Neture에 각각 복제되어 있는 모바일 하단 네비게이션 구현을 공통화한다.
+KPA Society / K-Cosmetics / Neture에 각각 복제되어 있는 모바일 하단 네비게이션 구현을 공통화한다.
 
 선행 census 기준 대상:
 
 ```text
 KPA MobileBottomNav        약 303 LOC
-GlycoPharm MobileBottomNav 약 256 LOC
 K-Cosmetics MobileBottomNav 약 254 LOC
 NetureBottomNav            약 217 LOC
 총 약 1,030 LOC
@@ -76,7 +75,6 @@ git pull --ff-only origin main
 
 ```text
 KPA Society
-GlycoPharm
 K-Cosmetics
 Neture
 ```
@@ -198,7 +196,6 @@ Mobile Bottom Nav만 다룬다.
 
 ```ts
 if (serviceKey === 'kpa-society') ...
-if (serviceKey === 'glycopharm') ...
 ```
 
 형태의 분기를 쌓지 않는다.
@@ -331,7 +328,7 @@ KPA MobileBottomNav
 → common MobileBottomNav 호출
 ```
 
-동일하게 GP/KCos/Neture 적용.
+동일하게 KCos/Neture 적용.
 
 ### 11.3 중복 코드 제거
 
@@ -354,7 +351,7 @@ Neture 고유 메뉴 구성
 권한 차이
 ```
 
-KPA/GP/KCos 구조에 억지로 맞추지 않는다.
+KPA/KCos 구조에 억지로 맞추지 않는다.
 
 공통 rendering contract만 채택한다.
 
@@ -379,7 +376,6 @@ AuthContext 구조
 메뉴 명칭 개편
 아이콘 redesign
 PharmacyHub Header/Footer
-Glyco stale copyright
 dead component 정리
 ```
 
@@ -443,7 +439,6 @@ git diff --check
 
 ```text
 KPA Society
-GlycoPharm
 K-Cosmetics
 Neture
 ```
@@ -505,13 +500,6 @@ console error 0
 기존 메뉴 순서
 active path
 브랜드 색상
-```
-
-### GlycoPharm
-
-```text
-기존 메뉴 순서
-Store 관련 route active 처리
 ```
 
 ### K-Cosmetics
@@ -586,7 +574,6 @@ router 구조 변경이 필요함
 현재 main 기준 4서비스 모집단 재확인
 공통 MobileBottomNav Core 생성 또는 기존 공통 Core 채택
 KPA 적용
-GlycoPharm 적용
 K-Cosmetics 적용
 Neture 적용
 서비스별 메뉴/route semantics 유지
@@ -665,7 +652,6 @@ git push origin <현재 브랜치>
 | 서비스 | 파일 | LOC |
 |---|---|---:|
 | KPA | `services/web-kpa-society/src/components/MobileBottomNav.tsx` | 303 |
-| GlycoPharm | `services/web-glycopharm/src/components/MobileBottomNav.tsx` | 256 |
 | K-Cosmetics | `services/web-k-cosmetics/src/components/MobileBottomNav.tsx` | 254 |
 | Neture | `services/web-neture/src/components/NetureBottomNav.tsx` | 217 |
 | | **합계** | **1,030** |
@@ -679,7 +665,6 @@ git push origin <현재 브랜치>
 전부 살아있는 렌더 경로가 있다. 어느 것도 dead 로 제외할 수 없다.
 
 - KPA (4곳): `App.tsx:532` · `components/Layout.tsx:35` · `components/admin/AdminLayout.tsx:58` · `components/instructor/InstructorLayout.tsx:176` · `components/kpa-operator/KpaOperatorLayoutWrapper.tsx:45`
-- GlycoPharm (1곳): `components/layouts/MainLayout.tsx:23`
 - K-Cosmetics (1곳): `components/layouts/MainLayout.tsx:21`
 - Neture (6곳): `MainLayout.tsx:56` · `NetureLayout.tsx:58` · `AdminLayoutWrapper.tsx:40` · `OperatorLayoutWrapper.tsx:36` · `PartnerSpaceLayout.tsx:262` · `SupplierSpaceLayout.tsx:403`
 
@@ -690,7 +675,7 @@ git push origin <현재 브랜치>
 
 측정한 구조상 네 구현은 동일 계열이 아니다.
 
-**계열 1 — GP · KCos (사실상 쌍둥이, 256/254 LOC)**
+**계열 1 — KCos (사실상 쌍둥이, 256/254 LOC)**
 - 탭: 커뮤니티 / 약국(매장) 경영 / 알림 / 내정보, 비로그인 시 로그인 버튼
 - 알림 라우팅 = **`@o4o/account-ui` 의 `resolveNotificationTarget`** (이미 공통 자산)
 - 프로필 시트 없음. `notifOpen` boolean 하나
@@ -702,7 +687,7 @@ git push origin <현재 브랜치>
 - 프로필 시트가 서비스 로컬 SSOT(`KpaUserMenu` / `NetureUserMenu`)를 재사용
 - **Neture 는 primary 탭바가 아니다.** 헤더 주석: "상단 햄버거 = 사이트 이동 / 하단 utility = 알림·프로필(개인 기능)", 그리고 `isAuthenticated` 아니면 `null` 렌더(공개 랜딩/QR 누출 방지). 탭 구성도 Home/알림/내정보뿐이다.
 
-→ §12 대로 **Neture 를 KPA/GP/KCos 모양에 억지로 맞추지 않는다.**
+→ §12 대로 **Neture 를 KPA/KCos 모양에 억지로 맞추지 않는다.**
 → 알림 라우팅 SSOT 가 두 갈래(공통 vs 로컬)인 것은 이번 WO 범위 밖이다. **통합하지 말고 주입으로 받는다.**
 → §19 에 따라 계열 1만, 혹은 계열 1+2 의 렌더 shell 만 공통화하고 나머지는 이유를 CHECK 에 기록하는 결말이 정당하다. **무리한 100% 통합보다 정직한 부분 공통화가 맞다.**
 
@@ -733,7 +718,7 @@ git push origin <현재 브랜치>
 세 서비스의 active 함수는 겉보기만 비슷하고 **제외 규칙이 서로 다르다.**
 
 - KPA `isPharmacyActive`: `/mobile/pharmacy` exact · `/pharmacy*` · `/store-hub*` · `/store`,`/store/*` 에서 **slug 판별 정규식(`dashboard|info|marketing|commerce|...` 화이트리스트)** 으로 공개 매장 페이지 제외
-- GP `isPharmacyActive`: `/mobile/pharmacy` exact · `/store-hub*` · `/store/*` 에서 **`/^\d/` 숫자 시작이면 소비자 스토어로 제외**
+- `/store-hub*` · `/store/*` 에서 **`/^\d/` 숫자 시작이면 소비자 스토어로 제외**
 - KCos `isStoreActive`: `/mobile/store` exact · `/store-hub*` · `/store/*` 에서 **`/^\d/` 제외**
 - 커뮤니티 탭: KPA 는 `pathname === '/' || /forum* || /lms* || /resources*`
 

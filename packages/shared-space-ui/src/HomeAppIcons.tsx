@@ -3,7 +3,7 @@
  *
  * WO-O4O-HOME-SHARED-ICONS-V1
  *
- * KPA-Society / GlycoPharm / K-Cosmetics Home AppEntry 카드에서
+ * KPA-Society / K-Cosmetics Home AppEntry 카드에서
  * 중복 정의된 인라인 SVG 아이콘을 이 파일로 통합.
  *
  * 사용:

@@ -60,7 +60,7 @@
 
 ## 6. 범위/안전
 
-- **KPA endpoint 한정**(`kpa.routes.ts:400` mount) → GP/KCos 무영향.
+- **KPA endpoint 한정**(`kpa.routes.ts:400` mount) → KCos 무영향.
 - DB migration·tags 컬럼 없음. QR/POP 제작 흐름·제작자료 메뉴·execution-asset legacy target 무변경. 기존 QR 공개 URL 비파손.
 
 ---

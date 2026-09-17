@@ -134,7 +134,6 @@ routes/o4o-store/repositories/store-playlist.repository.ts
 | 서비스 | mount | 전달 `serviceKey` | forced merge 활성 |
 |---|---|---|---|
 | KPA | `kpa.routes.ts:452` | **`'kpa-society'`** | **YES — 살아 있는 경로** |
-| GlycoPharm | `glycopharm.routes.ts:440` | `undefined` | NO (serviceKey 없으면 forced UNION 자체를 타지 않음) |
 | K-Cosmetics | `cosmetics.routes.ts:178` | `undefined` | NO |
 | Neture | `neture.routes.ts:56` | `undefined` | NO |
 
@@ -296,8 +295,6 @@ production write                            0
    - **보고된 오류 파일 목록에 본 WO 수정 파일은 0건**이다
      (`otc-v4-*.ga.ts`, `digital-signage-agent/**`, `block-core/PluginLoader.ts`, `web-neture/**` 등 무관 파일).
    - 다른 세션의 파일은 규칙에 따라 **수정·삭제·stash 하지 않았다.**
-2. **GlycoPharm / K-Cosmetics / Neture 는 `serviceKey` 를 넘기지 않아 forced merge 가 영구 비활성**이다.
-   의도된 정책인지(서비스별 forced content 미사용) 누락인지는 본 WO 범위 밖 — 별도 판단 필요.
 3. 기존 production row 의 surface 분포 미확인 (§9 `BLOCKED_ENV`).
 4. `findPlaylistItems()`(편집 reader)는 전체 surface 를 노출한다. 편집 화면에서 태블릿 전용 항목을
    시각적으로 구분할지는 UI 정책 사안으로 남는다.

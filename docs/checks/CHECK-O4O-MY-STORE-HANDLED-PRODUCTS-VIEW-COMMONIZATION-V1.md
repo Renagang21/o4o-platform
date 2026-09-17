@@ -61,7 +61,6 @@ KPA 기능을 PharmacyHub 로 이식하지 않았고, 두 화면을 동일하게
 ## 4. 제외 (WO 명시)
 
 - **K-Cosmetics `StoreLocalProduct`** — 데이터 축이 다르므로 대상 제외. 코드 변경 0.
-- **GlycoPharm** — 회귀 확인만.
 - `StoreLocalProduct` ↔ handled-products 통합 **하지 않음**.
 
 ---
@@ -74,7 +73,6 @@ KPA 기능을 PharmacyHub 로 이식하지 않았고, 두 화면을 동일하게
 | web-kpa-society | PASS | PASS (25.5s) |
 | web-pharmacy-hub | PASS | PASS (17.2s) |
 | web-k-cosmetics (회귀) | PASS | PASS |
-| web-glycopharm (회귀) | PASS | PASS |
 
 전제: 루트에서 `pnpm run build:packages` 선행 필요(공통 패키지 dist 미빌드 시 `@o4o/ui`·`@o4o/auth-utils` 해석 실패).
 

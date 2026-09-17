@@ -38,12 +38,10 @@ Home 기본 흐름:
 |--------|:--------------:|---------------------|------|:--------:|
 | **Neture** | ✅ (공급자/MT/파트너) | (미지정 → 기본) `before-app-entry` | 가이드 **위** | ✅ 표준 |
 | **KPA** | ✅ (3 역할) | **`after-help`** (명시 override, `CommunityHomePage.tsx:261`) | 가이드 **아래** | ❌ 표준 이탈 |
-| GlycoPharm | ❌ 없음 | — | (역할 카드 미사용) | N/A |
 | K-Cosmetics | ❌ 없음 | — | (역할 카드 미사용) | N/A |
 
 - 표준(before-app-entry)은 **이미 템플릿 기본값**이며 Neture 가 따른다.
 - **KPA 만 명시적으로 `after-help` 로 덮어씀** (최근 `1f68218a5`). 즉 표준 정렬 = KPA 의 override 제거/변경(1줄).
-- Glyco/KCos 는 역할 카드 자체가 없으므로 본 표준 영향 없음(**강제 도입 금지**).
 
 ---
 
@@ -73,7 +71,6 @@ KPA 는 최근 `1f68218a5`(WO-O4O-KPA-HOME-VALUE-CARDS-AFTER-GUIDE-V1)로 의도
 - StandardHomeTemplate.tsx — 정책 문서 단계에서 미수정 (기본값이 이미 before-app-entry라 변경 불필요)
 - Market Trial CTA 아이콘 작업(dcc4b55a9)과 섞지 않음
 - 외부 세션 WIP(store-asset 등) — 미접촉
-- Glyco/KCos 에 역할 카드 강제 도입 금지
 ```
 
 ---

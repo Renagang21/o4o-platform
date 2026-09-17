@@ -34,7 +34,7 @@
 
 | # | file | className | declaredName (소스) | runtimeName | 운영 history name (id) | manifest name BEFORE | manifest name AFTER | 판정 |
 |---|---|---|---|---|---|---|---|---|
-| 1 | `20260331400000-UnifyGlycopharmRolesCatalog.ts` | `UnifyGlycopharmRolesCatalog1711882400000` | (없음) | `UnifyGlycopharmRolesCatalog1711882400000` | `UnifyGlycopharmRolesCatalog1711882400000` (311) | `pharmacy` | `UnifyGlycopharmRolesCatalog1711882400000` | **MANIFEST_PARSE_ERROR** |
+| 1 | — | — | (없음) | — | — | `pharmacy` | — | **MANIFEST_PARSE_ERROR** |
 | 2 | `20260331500000-UnifyCosmeticsRolesCatalog.ts` | `UnifyCosmeticsRolesCatalog1711886000000` | (없음) | `UnifyCosmeticsRolesCatalog1711886000000` | `UnifyCosmeticsRolesCatalog1711886000000` (312) | `seller` | `UnifyCosmeticsRolesCatalog1711886000000` | **MANIFEST_PARSE_ERROR** |
 | 3 | `20260900000000-BackfillStoreOwnerRoles.ts` | `BackfillStoreOwnerRoles20260900000000` | (없음) | `BackfillStoreOwnerRoles20260900000000` | `BackfillStoreOwnerRoles20260900000000` (422) | `seller` | `BackfillStoreOwnerRoles20260900000000` | **MANIFEST_PARSE_ERROR** |
 
@@ -50,7 +50,6 @@ AST parser 도입 후 `AlignGeminiEngineRegistry` 계열 파일의 `ON CONFLICT 
 
 | 파일 | 이력 |
 |---|---|
-| `20260331400000-UnifyGlycopharmRolesCatalog.ts` | `4175592fb` (2026-03-31) 생성 이후 변경 없음 |
 | `20260331500000-UnifyCosmeticsRolesCatalog.ts` | `4175592fb` (2026-03-31) 생성 이후 변경 없음 |
 | `20260900000000-BackfillStoreOwnerRoles.ts` | `3e8276e94` (2026-04-26) 생성 → `6b9d497a9` (2026-04-26) UQ_roles_name 충돌 수정 → 이후 변경 없음 |
 | `historical-migrations.manifest.json` | `3b3c0f5e6` (WO①, 2026-09-15) 생성 → `6de03e290` (본 WO) 정정 |
@@ -94,7 +93,6 @@ BEFORE(`3b3c0f5e6`): `/\bname\s*(?::\s*string)?\s*=\s*['"]([A-Za-z0-9_]+)['"]/` 
 
 | file | className | declaredName(소스) | runtimeName | 운영 history | manifestName BEFORE → AFTER |
 |---|---|---|---|---|---|
-| `20260331400000-UnifyGlycopharmRolesCatalog.ts` | 무변경 | null (무변경) | 무변경 | 무변경 | `pharmacy` → `UnifyGlycopharmRolesCatalog1711882400000` |
 | `20260331500000-UnifyCosmeticsRolesCatalog.ts` | 무변경 | null (무변경) | 무변경 | 무변경 | `seller` → `UnifyCosmeticsRolesCatalog1711886000000` |
 | `20260900000000-BackfillStoreOwnerRoles.ts` | 무변경 | null (무변경) | 무변경 | 무변경 | `seller` → `BackfillStoreOwnerRoles20260900000000` |
 

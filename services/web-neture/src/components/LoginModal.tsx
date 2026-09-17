@@ -19,7 +19,7 @@ import { useAuth, useLoginModal } from '../contexts';
 const REMEMBER_EMAIL_KEY = 'neture_remember_email';
 // WO-O4O-CROSSSERVICE-PRODUCTION-RESIDUAL-404-AUTH-AND-LEGAL-CLEANUP-V1:
 //   App.tsx 의 동명 상수와 같은 값. App 이 LoginModal 을 import 하므로 역방향 import 는
-//   순환이 된다 — GlycoPharm 과 동일한 로컬 상수 패턴을 따른다.
+//   순환이 된다 — 로컬 상수 패턴을 따른다.
 const LOGIN_EXPLICIT_NAV_KEY = 'neture_login_explicit_nav';
 
 interface LoginModalProps {
@@ -227,7 +227,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                   </label>
                 </div>
 
-                {/* 체험용 공용 계정 빠른 입력 (WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1) — GP/KCos/KPA 동일 패턴 */}
+                {/* 체험용 공용 계정 빠른 입력 (WO-O4O-HOME-TEMP-EXPERIENCE-ACCOUNT-NOTICE-V1) — KCos/KPA 동일 패턴 */}
                 <button
                   type="button"
                   onClick={() => {

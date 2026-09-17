@@ -5,7 +5,7 @@
  *
  * `@o4o/operator-ux-core` 의 `RecruitmentExposureConsole` 은 이미 공통이지만,
  * 그 위의 **페이지 셸**(조회 · exposureStatus 필터 · URL sync · 승인/반려 · 4상태 처리)이
- * KPA / K-Cosmetics / GlycoPharm 3곳에 각각 복제돼 있었다(CORE_ONLY).
+ * KPA / K-Cosmetics 2곳에 각각 복제돼 있었다(CORE_ONLY).
  * 셸을 공통 모듈로 올리고, 서비스는 HTTP client adapter + audienceLabel 만 주입한다.
  *
  * API endpoint · payload 계약은 서비스별 per-service proxy 그대로다(백엔드 무변경).

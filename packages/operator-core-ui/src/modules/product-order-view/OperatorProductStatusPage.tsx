@@ -4,7 +4,7 @@
  * WO-O4O-OPERATOR-PRODUCT-ORDER-VIEW-COMMONIZE-V1
  *
  * Operator 서비스 전역 "상품 현황" view-only 콘솔 (Product Master 카탈로그 조회).
- * GlycoPharm / K-Cosmetics 공통. serviceKey 별 fetch + accent/copy 는 wrapper 가 주입.
+ * K-Cosmetics 공통. serviceKey 별 fetch + accent/copy 는 wrapper 가 주입.
  *
  * ⚠️ view-only: 생성/수정/삭제 액션 없음. 행 클릭 시 상세로 이동만.
  */

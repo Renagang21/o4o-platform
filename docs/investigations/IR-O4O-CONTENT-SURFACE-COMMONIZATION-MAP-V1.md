@@ -1,7 +1,7 @@
 # IR-O4O-CONTENT-SURFACE-COMMONIZATION-MAP-V1
 
 > **유형:** read-only 전수조사 지도 (코드/DB/dependency 변경 없음)
-> **판정: PASS.** O4O 4서비스(KPA/GlycoPharm/K-Cosmetics/Neture) + 공통 packages + api-server 의 content surface 를 route/page/API/component/table 로 지도화. 역할(원본/복사본/출력물/템플릿/AI draft/Hub publish/상품설명) 분류, "가져오기=복사" 정책·상품설명 분리·중복/drift·공통화 후보·후속 WO 우선순위 정리.
+> **판정: PASS.** O4O 4서비스 + 공통 packages + api-server 의 content surface 를 route/page/API/component/table 로 지도화. 역할(원본/복사본/출력물/템플릿/AI draft/Hub publish/상품설명) 분류, "가져오기=복사" 정책·상품설명 분리·중복/drift·공통화 후보·후속 WO 우선순위 정리.
 > 방법: 6개 read-only Explore 에이전트 병렬 조사(서비스 4 + packages + backend) → 종합. 일부 table 명/세부는 에이전트 추론으로 **(미검증)** 표기.
 > 선행: SANITIZE-ON-WRITE-V2 · KPA-CONTENT-BODY-SANITIZE-ON-WRITE-V1 · FRONTEND-DANGEROUS-HTML-RENDERING-AUDIT-V1 · CROSSSERVICE-OPERATOR-FORUM-HUB(HOLD) — 2026-06-16
 
@@ -13,14 +13,13 @@
 - **가져오기=복사** 는 일관된 모델: store services 는 `assetSnapshotApi.copy()` → asset snapshot(원본 분리, source metadata 보존). Neture 만 별도 `dashboardCopy` → DashboardAsset.
 - **상품설명**은 일반 content 와 데이터/페이지가 분리. 단 **"상품설명"이 2개 축으로 분기**: Neture **canonical** `shared_product_descriptions`(ProductDescriptionCurationModal) vs store services **per-store** `product_ai_contents(contentType='product_description')`. 이 둘의 관계가 명확히 연결되어 있지 않음 → 주요 정렬 포인트.
 - **AI 흐름**: 공통 `AiContentModal`(@o4o/content-editor) 결과는 **draft** → editor 경유 저장(production material / product_ai_contents / content body). KPA `AiContentGenerationModal`(signage 전용)은 별도 custom.
-- **sanitize-on-write drift**: `kpa_contents` ✅ / `shared_product_descriptions` ✅ 외 **cms_contents·product_ai_contents·cosmetics_contents·glycopharm_contents·kpa_store_contents·signage blocks 는 raw 저장** → 보안 후속 연결점.
-- 주요 중복: `ProductionMaterialEditorPage`(GP/KCos 동일, 미추출), KPA `StartProductionModal` local copy 잔존 가능성, `content-core` package = skeleton(미사용).
+- 주요 중복: `ProductionMaterialEditorPage`(KCos 동일, 미추출), KPA `StartProductionModal` local copy 잔존 가능성, `content-core` package = skeleton(미사용).
 
 ## 2. Scope
 
 | 영역 | 대상 | 상태 |
 |------|------|------|
-| Frontend | web-kpa-society / web-glycopharm / web-k-cosmetics / web-neture | 조사 완료 |
+| Frontend | — | 조사 완료 |
 | Packages | content-editor, store-ui-core, shared-space-ui, block-renderer, asset-copy-core, tablet-kiosk-core, operator-ux-core, operator-core-ui, hub-core, forum-core, content-core(skeleton) | 조사 완료 |
 | Backend | apps/api-server (kpa.routes content / cms-content / o4o-store / hub-content / neture shared-product-description / store-ai / signage / guide) | 조사 완료 |
 | 제외 | 실제 코드 수정·DB·dependency. legacy/hidden route 일부 = PARTIAL 가능 | — |
@@ -64,21 +63,6 @@ rg "shared_product_descriptions|product_ai_contents|kpa_contents|cms_content|kpa
 
 KPA-only: operator HUB blog/pop/qr write(`operator_*_posts`), direct content(`store_contents source=direct`), tablet requests, ProductionMaterialEditorPage(unified).
 
-### 5.2 GlycoPharm
-
-| Route/Page | Surface | Role | API | Table | Common comp | Status |
-|---|---|---|---|---|---|---|
-| `/content`·`/content/documents/new`·`/content/:id` | member | 원본 content | contentApi.* | glycopharm_contents | RichTextEditor | active |
-| `/resources` | public | resource | glycoResourcesApi | glycopharm_contents(sub_type=resource) | ResourcesHubTemplate | active |
-| `/store-hub/{content,blog,pop,qr,signage}` | store/hub | hub-published→복사 | hubContentApi+assetSnapshotApi.copy / import* | cms·store_blog_posts·signage_media | ContentHubTemplate | active |
-| `/store/library/{contents,resources,production-materials,product-descriptions}` | store | 복사/출력물/**상품설명** | assetSnapshotApi/productAiContent | asset_snapshots/product_ai_contents | StartProductionModal+AiContentModal+RichTextEditor | active |
-| `/store/marketing/{pop,qr,signage/*}`·`/store/content/blog` | store | 출력물/POP/QR/signage | popStaff/qrStaff/storePlaylist/signageSchedule | store_pops/store_qr_codes/store_playlists | AiContentModal+RichTextEditor | active |
-| `/operator/{content,guide-contents,resources,blog,pop,qr,signage/*,lms}` | operator | CMS/원본/hub-published/template | CmsContentManager/operator*/guideContentApi | news/operator_*_posts/guide_pages | CmsContentManager+RichTextEditor | active |
-| `/lms/course/:id`·`/lms/.../lesson/:id`·`/instructor/courses/*` | member/instructor | 원본/상품성 콘텐츠 | lmsApi/lmsInstructorClient | lms_* | sanitizeHtml(CourseDetail)+RichTextEditor | active |
-| `/store/:slug/blog/*` | public | community | blogStaff(public) | store_blog_posts | sanitizeHtml | active |
-
-GP 특이: 라벨 "내 약국에 복사"(가드됨), patient/care surface 제거, operator blog/pop/qr write 보유. signage module은 KPA와 drift(별도 IR 존재).
-
 ### 5.3 K-Cosmetics
 
 | Route/Page | Surface | Role | API | Table | Common comp | Status |
@@ -120,29 +104,29 @@ Neture 특이: **B2C/B2B 이중 설명**(consumer* vs business*), **shared_produ
 | Shared product desc (neture shared-product-description) | /admin/shared-product-descriptions/* | create/canonical/status/seed | **shared_product_descriptions** | ✅ content/summary(sanitizeDescriptionHtml, 빈값 400) | platform/service admin·operator |
 | Product AI content (store-ai product-ai-content) | /products/:id/ai-contents | generate/save | product_ai_contents | ❌ raw(AI 출력) | product org owner |
 | Signage content (signage content.controller) | /signage/:svc/content-blocks | create/update/delete | signage_content_blocks(미검증) | ❌ raw(blockData) | service admin |
-| Cosmetics/Glycopharm content (service routes) | /cosmetics·/glycopharm contents | create/update/delete | cosmetics_contents/glycopharm_contents | ❌ raw(body) | service admin·operator |
+| Cosmetics content (service routes) | cosmetics· contents | create/update/delete | — | ❌ raw(body) | service admin·operator |
 | Supplier content submission | /supplier/content-submissions | submit→cms+approval | cms_content + approval_requests | ❌ raw | supplier org |
 
-**content table 권위 요약:** cms_content(O4O CMS, per-service) · kpa_contents/cosmetics_contents/glycopharm_contents(per-service 원본) · kpa_store_contents(store-local Production Material) · shared_product_descriptions(상품설명 canonical, per-master) · product_ai_contents(per-product AI) · o4o_asset_snapshots(복사본) · guide_pages(공유, service-scoped).
+**content table 권위 요약:** cms_content(O4O CMS, per-service) · kpa_store_contents(store-local Production Material) · shared_product_descriptions(상품설명 canonical, per-master) · product_ai_contents(per-product AI) · o4o_asset_snapshots(복사본) · guide_pages(공유, service-scoped).
 
 ## 7. Common Package Map
 
 | 관심사 | 공통 package export | 소비 | 상태 |
 |---|---|---|---|
-| Editor | `@o4o/content-editor` RichTextEditor / ContentPreview / Toolbar / Template(Save)Modal | KPA/GP/KCos/tablet | ✅ 공통 |
+| Editor | `@o4o/content-editor` RichTextEditor / ContentPreview / Toolbar / Template(Save)Modal | KPA/KCos/tablet | ✅ 공통 |
 | Renderer | `@o4o/content-editor` ContentRenderer (+variant product-detail/guide) / `@o4o/block-renderer` BlockRenderer | 전 서비스/signage-player | ✅ 공통 |
 | Sanitize | `@o4o/content-editor` sanitizeHtml/sanitizeRichHtml (`src/sanitize.ts` canonical) | 전 서비스 + backend util 동일 정책 | ✅ canonical |
 | AI modal | `@o4o/content-editor` AiContentModal / StoreUseModal | store/operator content | ✅ 공통(단 KPA signage용 AiContentGenerationModal은 별도 custom) |
-| Production modal | `@o4o/store-ui-core` StartProductionModal / StoreProductionMaterialsView / StoreAssetDerivationViewer | KPA/GP/KCos | ✅ 공통(KPA local copy 잔존 의심) |
+| Production modal | `@o4o/store-ui-core` StartProductionModal / StoreProductionMaterialsView / StoreAssetDerivationViewer | KPA/KCos | ✅ 공통(KPA local copy 잔존 의심) |
 | Copy/import | `@o4o/asset-copy-core` AssetSnapshot/AssetCopyService/createAssetCopyController | backend resolver + 서비스 HTTP | ✅ 공통 |
-| Community write/detail | `@o4o/shared-space-ui` CommunityContentWriteShell / CommunityContentDetailView / SearchBar | KPA/GP/KCos | ✅ 공통(상세는 W1 sanitize 계약 미확정) |
+| Community write/detail | `@o4o/shared-space-ui` CommunityContentWriteShell / CommunityContentDetailView / SearchBar | KPA/KCos | ✅ 공통(상세는 W1 sanitize 계약 미확정) |
 | Hub/Forum template | `@o4o/shared-space-ui`·`@o4o/hub-core`·`@o4o/forum-core` *HubTemplate / Forum* | 전 서비스 | ✅ 공통 |
 | Operator console | `@o4o/operator-ux-core` DataTable/5-block · `@o4o/operator-core-ui` CmsContentManager/Guide | 전 서비스 operator | ✅ 공통 |
 | (미완) Content base | `@o4o/content-core` | — | ⚠️ **skeleton, 미사용** |
 
 ## 8. Copy / Publish / Production Contract
 
-- **Copy(가져오기=복사)**: store services = `assetSnapshotApi.copy({sourceAssetId, assetType})` → `o4o_asset_snapshots`(원본 분리, source metadata 보존). UI 문구: KPA "내 매장에 복사" / GP "내 약국에 복사"(가드) / KCos "내 매장에 복사·가져가기". KCos 는 "원본 수정·삭제되어도 사본 영향 없음" 문구 명시. → **정책 구현 일치, 문구만 서비스별 상이**.
+- **Copy(가져오기=복사)**: store services = `assetSnapshotApi.copy({sourceAssetId, assetType})` → `o4o_asset_snapshots`(원본 분리, source metadata 보존). UI 문구: KPA "내 매장에 복사" "내 약국에 복사"(가드) / KCos "내 매장에 복사·가져가기". KCos 는 "원본 수정·삭제되어도 사본 영향 없음" 문구 명시. → **정책 구현 일치, 문구만 서비스별 상이**.
 - **Neture copy 분기**: Neture 는 `dashboardCopy` → `DashboardAsset`(draft→publish→archive, exposure 추적)로 **store services 와 다른 copy 모델**. 통합 contract 정렬 후보.
 - **Publish(HUB)**: `hub-content.service` 3축(Producer/SourceDomain/serviceKey). operator 가 blog/pop/qr/cms 를 published→HUB 노출, store 가 import(copy). store→community share 흐름은 제거됨(WO-...-REMOVE-STORE-TO-COMMUNITY-SHARE).
 - **Production**: `StartProductionModal`(store-ui-core) → POP/QR(+서비스별 template registry) → AiContentModal(draft) → ProductionMaterialEditorPage → 저장. blog/signage/notice 는 production modal 외 별도 경로(서비스별 약간 상이).
@@ -151,12 +135,12 @@ Neture 특이: **B2C/B2B 이중 설명**(consumer* vs business*), **shared_produ
 
 | 항목 | 현재 중복/drift | 위험 |
 |---|---|---|
-| ProductionMaterialEditorPage | KPA/GP/KCos 각자 구현(GP/KCos 거의 동일, 미추출) | 중복 유지보수 |
+| ProductionMaterialEditorPage | KPA/KCos 각자 구현(KCos 거의 동일, 미추출) | 중복 유지보수 |
 | StartProductionModal | store-ui-core canonical 존재하나 KPA `pages/pharmacy/StartProductionModal.tsx` local copy 잔존 의심(+KPA-only Select/TypeSelector modal) | 분기 drift |
 | 상품설명 2축 | Neture `shared_product_descriptions`(canonical) ↔ store `product_ai_contents(product_description)` 연결 불명확 | taxonomy 혼동 |
 | AI modal | 공통 `AiContentModal` vs KPA signage `AiContentGenerationModal`(custom) | 패턴 분기 |
-| 라벨 | 내 약국(GP) vs 내 매장(KPA/KCos) | 의도적(가드)이나 문구 정렬 여지 |
-| sanitize-on-write | kpa_contents/shared_product_descriptions ✅ vs cms_content·product_ai_contents·cosmetics/glycopharm_contents·kpa_store_contents·signage blocks ❌ | 저장 XSS 잔여(보안) |
+| 라벨 | 내 약국 vs 내 매장(KPA/KCos) | 의도적(가드)이나 문구 정렬 여지 |
+| sanitize-on-write | — | 저장 XSS 잔여(보안) |
 | ContentWritePage | 서비스별 wrapper(thin, shell 공유) | 허용 패턴(과한 추출 불요) |
 | content-core | skeleton, 미연결 | 의존 전 평가 필요 |
 | Neture context-assets / partner-contents | Mock(WIP) | 미완 — 향후 정렬 |
@@ -165,18 +149,18 @@ Neture 특이: **B2C/B2B 이중 설명**(consumer* vs business*), **shared_produ
 
 | Candidate | 현재 중복 | Risk | 권장 조치 | 우선 |
 |---|---|---|---|---|
-| ProductionMaterialEditorPage 추출 | GP/KCos 동일 | 중(상태/AI 결합) | store-ui-core 로 추출(GP/KCos 먼저, KPA 후) | 2 |
+| ProductionMaterialEditorPage 추출 | KCos 동일 | 중(상태/AI 결합) | store-ui-core 로 추출(KCos 먼저, KPA 후) | 2 |
 | StartProductionModal canonical 단일화 | KPA local copy | 중 | KPA 가 store-ui-core import 확인/교체 | 2 |
 | 상품설명 taxonomy 정렬 | shared_product_descriptions ↔ product_ai_contents | 고(데이터 권위) | canonical↔per-store 관계/명칭 contract 문서화 | 1 |
 | copy contract 통합 | assetSnapshot ↔ dashboardCopy(Neture) | 중 | Hub publish/My Store copy API contract 명문화 | 3 |
-| sanitize-on-write 확장 | raw 저장 6+ table | 고(보안) | cms_content/product_ai_contents/cosmetics·glycopharm_contents 등 write sanitize | 1 |
+| sanitize-on-write 확장 | raw 저장 6+ table | 고(보안) | — | 1 |
 | copy 문구 정렬 | 내 약국/내 매장 | 저 | UI label 정렬(가드 유지) | 4 |
 | ContentRenderer/sanitize 사용 기준 | 일부 직접 dangerouslySetInnerHTML(IR-AUDIT WARNING) | 중 | 사용 기준 가이드 + 잔여 WARNING 정리 | 3 |
 
 ## 11. Recommended WO Sequence
 
 1. **WO-O4O-CONTENT-TYPE-TAXONOMY-AND-NAMING-ALIGNMENT-V1** — 상품설명(canonical vs per-store)·콘텐츠·자료실·출력물·템플릿·AI draft 명칭/관계 정렬(지도 기반 문서 우선). [§9 상품설명 2축]
-2. **WO-O4O-CONTENT-BODY-SANITIZE-ON-WRITE-CROSSSERVICE-V1** — 보안: cms_content / product_ai_contents / cosmetics·glycopharm_contents / kpa_store_contents 등 raw 저장 경로에 backend sanitize 확장(상품설명 V2·KPA body V1 패턴 재사용 + COMMONIZATION util). [§6 sanitize drift]
+2. [§6 sanitize drift]
 3. **WO-O4O-CONTENT-PRODUCTION-FLOW-UI-COMMONIZATION-V1** — ProductionMaterialEditorPage 추출 + StartProductionModal canonical 단일화(KPA local copy 정리). [§10-1,2]
 4. **WO-O4O-CONTENT-HUB-MY-STORE-COPY-CONTRACT-V1** — assetSnapshot ↔ Neture dashboardCopy copy/publish contract 정렬. [§8]
 5. **WO-O4O-CONTENT-COPY-POLICY-UI-LABEL-ALIGNMENT-V1** — 가져오기=복사·원본/사본 분리·삭제 영향 문구 정렬(내 약국/내 매장 포함). [§8]

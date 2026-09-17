@@ -3,7 +3,7 @@
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §6
  *
- * form UI 는 공통 `CommunityContentWriteShell` 에 위임한다 (KPA/GP/KCos 와 동일 채택).
+ * form UI 는 공통 `CommunityContentWriteShell` 에 위임한다 (KPA/KCos 와 동일 채택).
  * wrapper 는 PH 고유 축만: cms_contents 저장 · 라우팅 · 소유권 · 인증.
  *
  * 3원장(`{service}_contents`)과 다른 두 축을 config 로 끈다 — 없는 컬럼에 UI 를 만들지 않는다:

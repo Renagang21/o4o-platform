@@ -3,7 +3,7 @@
  *
  * WO-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-V1
  *
- * Neture / GP / K-Cos 3 service 의 Operator Members list-side 공통 wrapper 의 타입.
+ * Neture / K-Cos 2 service 의 Operator Members list-side 공통 wrapper 의 타입.
  * IR: docs/investigations/IR-O4O-OPERATOR-MEMBERS-LIST-COMMONIZATION-DESIGN-V1.md (Option C).
  *
  * KPA 는 KpaMember entity 기반으로 별도 페이지 유지 — 본 wrapper 범위 외.
@@ -13,7 +13,7 @@
  *   비밀번호·삭제·정지·일괄처리 endpoint 자체가 없음 — 백엔드가 의도적으로 공통
  *   /api/v1/operator/members 라우터에 포함되지 않음)이다. 이를 흡수하기 위해
  *   `consoleMode: 'approval'` 과 client 선택 메서드를 추가한다.
- *   기본값은 모두 기존 동작이며 Neture/GP/K-Cos/KPA 는 무변경이다.
+ *   기본값은 모두 기존 동작이며 Neture/K-Cos/KPA 는 무변경이다.
  */
 
 import type { ReactNode } from 'react';
@@ -78,7 +78,7 @@ export interface MembersConsoleStatsResponse {
 }
 
 /**
- * Service-side API client adapter. Each service (Neture / GP / K-Cos) provides
+ * Service-side API client adapter. Each service (Neture / K-Cos) provides
  * its own client conforming to this interface. Wrapper calls these methods.
  *
  * Neture 의 registration approve/reject flow 는 `updateStatus` 와 `batchUpdateStatus`
@@ -203,7 +203,7 @@ export interface MembersBulkActionConfig {
 // ─── Wrapper Props ───────────────────────────────────────────
 
 export interface OperatorMembersConsolePageProps {
-  /** Canonical service key (neture / glycopharm / k-cosmetics). */
+  /** Canonical service key (neture / k-cosmetics). */
   serviceKey: string;
   /** Service-side API client. */
   client: MembersConsoleClient;
@@ -275,7 +275,6 @@ export interface OperatorMembersConsolePageProps {
    * Optional delete UX. If undefined, delete action is hidden.
    * Each service provides its own delete confirmation modal:
    *   - Neture: soft + hard choice modal
-   *   - GP: DeleteRiskModal with risk check
    *   - K-Cos: simple confirm
    */
   renderDeleteFlow?: (props: DeleteFlowRenderProps) => ReactNode;

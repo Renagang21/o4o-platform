@@ -16,9 +16,9 @@
 | **콘텐츠 계열 원본→사본→활용 동선** | **CLOSED** | 7개 KPA HUB 화면 전부 import=사본 계약·독립성·오류 4상태+재시도 정합. 프로덕션 사본 무결성 clean |
 | **KPA 사용자 flow 차단 요인** | **없음** | HUB원본→가져오기→매장사본→활용을 막는 STILL_OPEN 항목 0건 |
 | **잔존 STILL_OPEN (KPA 범위)** | **후속 WO** | 드리프트 방지(P1-02)·보안 하드닝(P1-05)·UX/기술부채(P2-01/04/05/09)·데이터 의존 게이트(P1-06 DATA_PASS) |
-| **GP / K-Cosmetics 영역** | **OUT_OF_SCOPE** | P0-03·P1-03·P1-01(GP/KCos 부분)은 사용자 결정으로 보류 — 이번 조사 범위 밖 |
+| **K-Cosmetics 영역** | **OUT_OF_SCOPE** | P0-03·P1-03·P1-01(KCos 부분)은 사용자 결정으로 보류 — 이번 조사 범위 밖 |
 
-**한 줄 결론:** 선행 감사의 **P0 4건 중 KPA 에 영향을 주는 3건(P0-01/02/04)은 코드에서 실제로 닫혔고**, 프로덕션 데이터·API·사본 무결성이 이를 뒷받침한다. KPA 매장 경영자의 매장 HUB 핵심 동선을 **차단하는 결함은 0건**이므로 매장 HUB 는 **CLOSED_WITH_FOLLOWUPS** 로 유지 가능하다. 잔존 항목은 전부 (a) 보안 하드닝·드리프트 방지·UX 정합의 **후속 WO**, 또는 (b) 사용자가 보류한 **GP/KCos 정비**이다.
+**한 줄 결론:** 선행 감사의 **P0 4건 중 KPA 에 영향을 주는 3건(P0-01/02/04)은 코드에서 실제로 닫혔고**, 프로덕션 데이터·API·사본 무결성이 이를 뒷받침한다. KPA 매장 경영자의 매장 HUB 핵심 동선을 **차단하는 결함은 0건**이므로 매장 HUB 는 **CLOSED_WITH_FOLLOWUPS** 로 유지 가능하다. 잔존 항목은 전부 (a) 보안 하드닝·드리프트 방지·UX 정합의 **후속 WO**, 또는 (b) 사용자가 보류한 **KCos 정비**이다.
 
 ### 1.2 왜 NOT_CLOSED 가 아닌가
 
@@ -98,17 +98,17 @@
 |----|:----:|-----------------|
 | **HUB-P0-01** 상품 apply 게이트 미재검증 | **CLOSED** | `pharmacy-products.controller.ts:426-428` `findApplicableOffer` 가 catalog 와 동일 `buildServiceApprovalGateSql` 재적용. WO-...APPLY-APPROVAL-GATE-PARITY-V1 landed. DATA_PASS(offer 0행) |
 | **HUB-P0-02** PRIVATE `allowed_seller_ids` 미검사 | **CLOSED** | `buildPrivateSellerScopeSql` 를 catalog(`:254`)·count(`:342`)·apply(`:154`) 3경로 전부 적용. WO-...PRIVATE-OFFER-SELLER-SCOPE-GATE-V1 landed. DATA_PASS |
-| **HUB-P0-03** GP/KCos 자료함 KPA 하드와이어링 | **STILL_OPEN / OUT_OF_SCOPE** | `glycopharm.routes.ts:388,391`·`cosmetics.routes.ts:155,158` 여전히 KPA 고정 컨트롤러 마운트. **사용자 결정으로 GP/KCos 정비 보류** — 이번 조사 범위 밖 |
+| **HUB-P0-03** KCos 자료함 KPA 하드와이어링 | **STILL_OPEN / OUT_OF_SCOPE** | `cosmetics.routes.ts:155,158` 여전히 KPA 고정 컨트롤러 마운트. **사용자 결정으로 KCos 정비 보류** — 이번 조사 범위 밖 |
 | **HUB-P0-04** apply `service_key` 클라이언트 입력 | **CLOSED** | `pharmacy-products.controller.ts:393-406` serviceKey 를 마운트에서 도출, body 불일치 시 `400 SERVICE_KEY_MISMATCH`. Guard Rule 4 정렬 |
 
 ### P1 (6건)
 
 | ID | 판정 | 근거(현재 main) |
 |----|:----:|-----------------|
-| **HUB-P1-01** GP/KCos HUB 콘텐츠 검색 서버 무시 | **STILL_OPEN / 대부분 OUT_OF_SCOPE** | `hub-content.controller.ts:47` 여전히 `search` 미독. GP/KCos 영향분은 범위 밖. 공유 백엔드 `HubContentQueryService` 검색 미지원은 후속 WO |
+| **HUB-P1-01** KCos HUB 콘텐츠 검색 서버 무시 | **STILL_OPEN / 대부분 OUT_OF_SCOPE** | `hub-content.controller.ts:47` 여전히 `search` 미독. KCos 영향분은 범위 밖. 공유 백엔드 `HubContentQueryService` 검색 미지원은 후속 WO |
 | **HUB-P1-02** KPA 프론트 serviceKey 리터럴 산재 | **STILL_OPEN (드리프트 방지 리팩터)** | `HubPopLibraryPage.tsx:31 const SERVICE_KEY='kpa'` 등 화면별 로컬 리터럴 유지, 상수 미통합. **이축 자체는 의도**(정상 동작). 회귀 방지용 후속 WO |
-| **HUB-P1-03** GP/KCos 동영상·태블렛·다국어 부재 | **PARTIALLY_CLOSED / OUT_OF_SCOPE** | 다국어 **백엔드 대칭** 마운트됨(`glycopharm.routes.ts:463`·`cosmetics.routes.ts:204`, "UI는 KPA 파일럿 전용" 명시). 동영상·화면세트 UI/백엔드 여전히 KPA 전용 |
-| **HUB-P1-04** mixed 모드 total 부정확 + screen-set 누락 | **STILL_OPEN (저영향)** | `hub-content.service.ts:245 total=items.length`, `queryMixed(:216-222)` 가 `queryScreenSet` 미포함. **실사용 영향 낮음** — KPA/GP/KCos 프론트 전부 `sourceDomain` 지정 호출 |
+| **HUB-P1-03** KCos 동영상·태블렛·다국어 부재 | **PARTIALLY_CLOSED / OUT_OF_SCOPE** | 다국어 **백엔드 대칭** 마운트됨(`cosmetics.routes.ts:204`, "UI는 KPA 파일럿 전용" 명시). 동영상·화면세트 UI/백엔드 여전히 KPA 전용 |
+| **HUB-P1-04** mixed 모드 total 부정확 + screen-set 누락 | **STILL_OPEN (저영향)** | `hub-content.service.ts:245 total=items.length`, `queryMixed(:216-222)` 가 `queryScreenSet` 미포함. **실사용 영향 낮음** — KPA/KCos 프론트 전부 `sourceDomain` 지정 호출 |
 | **HUB-P1-05** HUB 목록 API 무인증 + serviceKey 쿼리 | **STILL_OPEN (보안 하드닝)** | `hub-content.controller.ts:45` auth 미들웨어 없음, `:47` serviceKey 쿼리 파라미터. **대상=`published` 운영자 자료**(매장 데이터 유출 아님). API smoke 로 재현 확인(§6) |
 | **HUB-P1-06** 상품 카탈로그 의약품/매장유형 게이트 부재 | **STILL_OPEN (code) / DATA_PASS** | `pharmacy-products.controller.ts` 에 medication/regulatory_type 게이트 없음. 단 **offer 0행 → PUBLIC 의약품 offer 0** → 현 시점 노출 실체 없음 |
 
@@ -133,7 +133,7 @@
 | **CLOSED** | 8 | P0-01, P0-02, P0-04, P2-02, P2-03, P2-06, P2-07, P2-08 |
 | **PARTIALLY_CLOSED** | 1 | P1-03 (OUT_OF_SCOPE) |
 | **STILL_OPEN — KPA 후속 WO** | 7 | P1-02, P1-04, P1-05, P1-06(DATA_PASS), P2-01, P2-04, P2-05, P2-09 |
-| **STILL_OPEN — OUT_OF_SCOPE (GP/KCos)** | 2 | P0-03, P1-01(GP/KCos 부분) |
+| **STILL_OPEN — OUT_OF_SCOPE (KCos)** | 2 | P0-03, P1-01(KCos 부분) |
 
 > STILL_OPEN 8건(KPA 범위) 중 **KPA 사용자 flow 를 차단하는 항목은 0건**. 전부 보안 하드닝(P1-05)·드리프트 방지(P1-02)·저영향 정합(P1-04)·데이터 의존 게이트(P1-06)·UX/기술부채(P2-01/04/05/09).
 
@@ -145,7 +145,7 @@
 
 | 항목 | 성격 | 비고 |
 |------|------|------|
-| P1-03 다국어 백엔드 대칭 마운트 | **개선(회귀 아님)** | GP/KCos 에 다국어 백엔드가 추가되었으나 UI 는 KPA 전용 — "backend symmetry" 주석 명시. 미완이나 결함 아님 |
+| P1-03 다국어 백엔드 대칭 마운트 | **개선(회귀 아님)** | KCos 에 다국어 백엔드가 추가되었으나 UI 는 KPA 전용 — "backend symmetry" 주석 명시. 미완이나 결함 아님 |
 | 상품 count 쿼리 게이트 동기화 | **개선 확인** | `pharmacy-products.controller.ts:336,342` count 쿼리도 목록과 동일 게이트 — 페이지네이션 total 정확성 확보 |
 
 ---
@@ -221,7 +221,7 @@
 | 각 HUB 화면 실제 DOM 렌더·상호작용 | **미확인(자동화)** | 프로파일 잠금. 정적+API smoke 로 부분 대체 |
 | import→copy→retry 실데이터 상호작용 | **NOT_TESTABLE_DATA_ABSENCE** | pop/qr/video/screen-set 원본 0. 데이터 생성 금지 원칙 준수 |
 | P1-06 잠재 위험 재발 조건 | **조건부** | 향후 PUBLIC 의약품 offer 등록 시 코드 게이트 부재가 실위험화 — 후속 WO 트리거 |
-| GP/KCos 실사용자 role 겸직 분포 (P0-03 실위험) | **미확인 / OUT_OF_SCOPE** | GP/KCos 보류 결정 |
+| KCos 실사용자 role 겸직 분포 (P0-03 실위험) | **미확인 / OUT_OF_SCOPE** | KCos 보류 결정 |
 
 **본 IR 의 CLOSED 판정은 (a) 코드 게이트 존재 + (b) 프로덕션 데이터 무결성 + (c) API/SPA smoke 3중 근거에 기반한다.** 브라우저 자동화 미실증분은 위와 같이 명시한다.
 
@@ -232,7 +232,7 @@
 ### 9.1 판정: **CLOSED_WITH_FOLLOWUPS** (KPA 매장 HUB)
 
 - KPA 영향 P0 3건(01/02/04) **CLOSED**(코드+데이터). KPA 사용자 flow 차단 요인 **0**.
-- 잔존은 전부 후속 WO(보안·드리프트·UX) 또는 사용자 보류 GP/KCos.
+- 잔존은 전부 후속 WO(보안·드리프트·UX) 또는 사용자 보류 KCos.
 
 ### 9.2 후속 WO 우선순위 (본 IR 에서 수정하지 않음 — 분리 실행)
 
@@ -241,10 +241,10 @@
 | P1 | `WO-O4O-HUB-CONTENT-SERVICEKEY-PATH-SCOPING-V1` | HUB-P1-05, P2-04 | 보안 하드닝(무인증+쿼리 serviceKey→경로/인증) | 상시 |
 | P1 | `WO-O4O-STORE-HUB-PRODUCT-MEDICATION-STORE-TYPE-GATE-V1` | HUB-P1-06 | 의약품/매장유형 게이트 | **PUBLIC 의약품 offer 등록 전** |
 | P2 | `WO-O4O-KPA-STORE-HUB-SERVICEKEY-CONSTANT-CONSOLIDATION-V1` | HUB-P1-02 | 드리프트 방지 리팩터(동작 무변경) | 상시 |
-| P2 | `WO-O4O-HUB-CONTENT-QUERY-SEARCH-PARAM-SUPPORT-V1` | HUB-P1-01, P2-01 | KPA/GP/KCos 검색 백엔드 지원 | 상시 |
+| P2 | `WO-O4O-HUB-CONTENT-QUERY-SEARCH-PARAM-SUPPORT-V1` | HUB-P1-01, P2-01 | KPA/KCos 검색 백엔드 지원 | 상시 |
 | P2 | `WO-O4O-HUB-CONTENT-MIXED-MODE-TOTAL-AND-DOMAIN-COVERAGE-V1` | HUB-P1-04, P2-05 | mixed total 정확화 + 죽은 도메인 정리 | 상시 |
 | P3 | `WO-O4O-STORE-HUB-COPY-ORIGIN-TRACKING-V1` | HUB-P2-09 | blog/pop/qr `copied_from_id` (schema 변경) | 별도 판단 |
-| — | (보류) `WO-O4O-ASSET-SNAPSHOT-CONTROLLER-SERVICE-AWARE-FACTORY-V1` 외 | HUB-P0-03, P1-03 | GP/KCos 정비 | **사용자 결정 대기** |
+| — | (보류) `WO-O4O-ASSET-SNAPSHOT-CONTROLLER-SERVICE-AWARE-FACTORY-V1` 외 | HUB-P0-03, P1-03 | KCos 정비 | **사용자 결정 대기** |
 
 ---
 

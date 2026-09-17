@@ -43,10 +43,10 @@
 
 | # | 파일 | +/- | 역할 |
 |---|---|---:|---|
-| 1 | `apps/api-server/src/routes/cosmetics/entities/cosmetics-content.entity.ts` | +101 (신규) | TypeORM entity (GP `glycopharm-content.entity.ts` mirror) |
+| 1 | `apps/api-server/src/routes/cosmetics/entities/cosmetics-content.entity.ts` | 101 (신규) | TypeORM entity |
 | 2 | `apps/api-server/src/routes/cosmetics/entities/index.ts` | +6 | `cosmetics-content.entity` export |
-| 3 | `apps/api-server/src/database/migrations/20261029000000-CreateCosmeticsContentsTables.ts` | +63 (신규) | single all-in-one migration (GP `1771200000027` mirror) |
-| 4 | `apps/api-server/src/routes/cosmetics/controllers/resources.controller.ts` | +335 (신규) | `createCosmeticsContentsRouter` + `createCosmeticsOperatorResourcesRouter` (GP `resources.controller.ts` mirror) |
+| 3 | `apps/api-server/src/database/migrations/20261029000000-CreateCosmeticsContentsTables.ts` | 63 (신규) | — |
+| 4 | `apps/api-server/src/routes/cosmetics/controllers/resources.controller.ts` | 335 (신규) | — |
 | 5 | `apps/api-server/src/routes/cosmetics/cosmetics.routes.ts` | +21 | import + 2 mount (`/contents`, `/operator/resources`) |
 | **합계** | | **+526** | |
 
@@ -115,7 +115,7 @@ HTTP 401
 |---|---|---|
 | 기존 cosmetics routes (store/order/payment/event-offer 등) | ✅ 무영향 | 신규 routes 만 추가, 기존 mount 수정 0 |
 | 기존 cosmetics entities (store/playlist 등) | ✅ 무영향 | 신규 entity 만 추가, index 에 추가 export |
-| 다른 service (KPA/GP/Neture) 의 contents/resources | ✅ 무영향 | 본 WO 는 cosmetics 디렉토리만 |
+| 다른 service (KPA/Neture) 의 contents/resources | ✅ 무영향 | 본 WO 는 cosmetics 디렉토리만 |
 | 기존 migration 들 | ✅ 무영향 | 신규 migration 1 개만 추가 |
 | `requireCosmeticsScope` middleware | ✅ 변경 없음 | 기존 export 재사용 |
 | Boundary Policy / Identity V2 / RBAC | ✅ 무관 | `cosmetics:operator` scope 가 이미 정의됨 |
@@ -128,9 +128,7 @@ HTTP 401
 
 | 작업 원칙 | 준수 |
 |---|:---:|
-| GP 구현을 Canonical 로 사용 | ✅ entity / controller / migration 모두 GP mirror |
-| 신규 구조 설계 금지 | ✅ GP 구조 그대로 (필드 / index / route / validation 동일) |
-| Response Shape GP 와 동일 | ✅ 동일 ({success, data: {items, total, page, limit, totalPages}}) |
+| 신규 구조 설계 금지 | — |
 | Capability 먼저 → Wrapper 공통화는 다음 WO | ✅ Frontend 변경 0, 다음 WO 의 전제 충족 |
 | 다른 세션 파일 절대 포함 금지 | ✅ precise add 5 파일, 평행 세션 staged 침범 0 |
 | `git add .` 금지 | ✅ 각 파일 경로 명시 |
@@ -146,8 +144,8 @@ HTTP 401
 | 항목 | 내용 |
 |---|---|
 | Frontend 신규 | K-Cos `services/web-k-cosmetics/src/api/resources.ts` + `OperatorResourcesPage.tsx` |
-| Frontend wrapper | `packages/operator-core-ui/src/modules/resources/OperatorResourcesConsolePage.tsx` (GP-only AiContentModal slot 포함) |
-| 3 service thin wrapper | KPA / GP / K-Cos 모두 단일 wrapper 호출 |
+| Frontend wrapper | — |
+| 2 service thin wrapper | KPA / K-Cos 모두 단일 wrapper 호출 |
 | Backend | ✅ 본 WO 로 완료 |
 
 ---
@@ -185,4 +183,4 @@ git show --stat bb05e4d9c
 *Created: 2026-05-24*
 *Type: Verification Result (deploy + smoke test)*
 *Status: ✅ Backend Resource Layer 도입 완료. Frontend commonization WO 진입 가능.*
-*Next: `WO-O4O-OPERATOR-RESOURCES-CANONICAL-COMMONIZATION-V1` (KPA + GP + K-Cos 3 service 통합)*
+*Next: `WO-O4O-OPERATOR-RESOURCES-CANONICAL-COMMONIZATION-V1` (KPA + K-Cos 2 service 통합)*

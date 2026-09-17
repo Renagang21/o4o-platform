@@ -743,9 +743,7 @@ export function createStoreHubController(
           } catch { /* table may not exist */ }
         }
 
-        // 3. Pending customer requests — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
-        //    glycopharm_customer_requests / glycopharm_pharmacies 가 유일한 출처였다.
-        //    signals.pendingSalesRequests · surveyRequests 는 기본값(0)을 유지한다.
+        // pendingSalesRequests · surveyRequests 는 출처 테이블이 없어 기본값(0)을 유지한다.
 
         res.json({ success: true, data: signals });
       } catch (error: any) {

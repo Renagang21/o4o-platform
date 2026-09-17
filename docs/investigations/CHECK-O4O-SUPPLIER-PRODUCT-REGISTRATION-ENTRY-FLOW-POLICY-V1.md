@@ -67,7 +67,7 @@
 **PASS.** 진입 첫 화면 의약품/비의약품 2분기 단순화, 의약품 비처방/처방 유지, 비의약품 표준 폼, 식별정보 비강제, B2B/B2C 기존 흐름 유지, 하단 연결 안내. gate·DB·route 무변경.
 
 **커밋:** path-specific 2파일 · `<commit>`.
-**차기 WO:** **WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1** — 약국 대상 서비스(kpa-society/glycopharm) DB 관리 + admin 설정 화면(의약품 서비스 연결 gate 기반).
+**차기 WO:** **WO-O4O-SERVICE-PHARMACY-AUDIENCE-POLICY-SETTINGS-V1** — 약국 대상 서비스(kpa-society) DB 관리 + admin 설정 화면(의약품 서비스 연결 gate 기반).
 
 ---
 

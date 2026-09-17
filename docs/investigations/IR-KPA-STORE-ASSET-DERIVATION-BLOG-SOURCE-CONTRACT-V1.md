@@ -22,7 +22,7 @@ QR relation write-path는 `libraryItemId`라는 명확한 source로 연결 완�
 | **boundary 정합성** | ✅ **일치** — blog `store_id` = `OrganizationStore.id` = `organizations.id` = derivation/read `organization_id` |
 | **source 전달 경로** | ✅ **canonical 경로 존재** — `location.state.production.source.items[]`(id/title/origin)를 블로그 페이지가 이미 수신 |
 | **구현 가능 여부** | ✅ **가능** — optional `sourceItems` contract + 프론트 forwarding. migration/저장소 통합 없음 |
-| **GP/KCos 영향** | 없음(additive optional, service_key 격리) — §6 매트릭스 |
+| **KCos 영향** | 없음(additive optional, service_key 격리) — §6 매트릭스 |
 
 → **블로그 relation write-path는 안전하게 구현 가능.** 후속 WO 착수 조건 충족.
 
@@ -110,17 +110,16 @@ sourceItems?: { kind: string; id: string; title?: string }[]
 
 ## 6. Consumer Impact Matrix (Shared Module 규칙)
 
-`blog.controller.ts` 는 **serviceKey 파라미터로 다서비스 공유**(KPA `kpa`, GlycoPharm `glycopharm` 기본). `store_asset_derivations`/`recordDerivations`도 공통.
+`blog.controller.ts` 는 **serviceKey 파라미터로 다서비스 공유**. `store_asset_derivations`/`recordDerivations`도 공통.
 
 | 소비처 | blog.controller 사용 | optional `sourceItems` 추가 영향 | 비고 |
 |--------|:--------------------:|----------------------------------|------|
 | **KPA-Society** | ✅ (`kpa`) | 본 작업 대상(프론트 forwarding 추가) | service_key='kpa' |
-| **GlycoPharm** | ✅ (`glycopharm`) | **없음** — optional, 미전달 시 기존 동작. 프론트 미연동 | 추후 동일 패턴 확장 가능 |
 | **K-Cosmetics** | △ blog 사용 여부 확인 | **없음**(미전달) | 매장 블로그 사용 시에도 additive |
 | **Neture** | 미사용 | 없음 | 매장 블로그 비대상 |
 | derivation read endpoint | 공통 | blog_post 조회 가능(boundary 일치) | org 격리 동일 |
 
-→ **공통 컨트롤러 변경이지만 additive/optional + service_key 격리**로 GP/KCos 무영향. WRITEPATH WO의 CHECK 문서에 본 매트릭스 재확인 필수.
+→ **공통 컨트롤러 변경이지만 additive/optional + service_key 격리**로 KCos 무영향. WRITEPATH WO의 CHECK 문서에 본 매트릭스 재확인 필수.
 
 ---
 
@@ -151,9 +150,9 @@ sourceItems?: { kind: string; id: string; title?: string }[]
 - KPA: 제작 시작 → 블로그 작성 → blog_post derivation(source_kind 정확) 기록 확인(API smoke).
 - 기존 블로그 작성/수정/발행/삭제(소스 없는 일반 진입 포함) 회귀 없음.
 - read endpoint(req.organizationId)로 blog_post relation 조회 정상(boundary 일치).
-- GP/KCos blog create 회귀 없음(optional 미전달).
+- KCos blog create 회귀 없음(optional 미전달).
 
-금지: blog hard delete 정책 변경 / 저장소 통합 / GP·KCos 프론트 수정 / migration.
+금지: blog hard delete 정책 변경 / 저장소 통합 / KCos 프론트 수정 / migration.
 ```
 
 이후: **QR/블로그 relation viewer 확장**(POP 전용 "원본 보기"를 derivedKind 파라미터화) → **IR-O4O-STORE-ASSET-DERIVATION-CROSSSERVICE-COMMONIZATION-V1**.
@@ -161,7 +160,7 @@ sourceItems?: { kind: string; id: string; title?: string }[]
 ---
 
 ## 9. Out of Scope
-코드/API/DB/migration/UI 수정 없음. relation write-path 구현·GP/KCos 수정·blog hard delete 정책 변경 없음. StoreSidebar/storeMenuConfig/menuCapabilityMap/HeroBannerSection 무접촉.
+코드/API/DB/migration/UI 수정 없음. relation write-path 구현·KCos 수정·blog hard delete 정책 변경 없음. StoreSidebar/storeMenuConfig/menuCapabilityMap/HeroBannerSection 무접촉.
 
 ---
 

@@ -40,14 +40,14 @@ WO: "QR = 현재 태블릿 콘텐츠의 모바일 화면. 가능하면 상품 �
 
 | 항목 | 결과 |
 |------|------|
-| 소비처 tsc (kpa / k-cosmetics / glycopharm) | ✅ 전부 EXIT=0 |
+| 소비처 tsc (kpa / k-cosmetics) | ✅ 전부 EXIT=0 |
 | KPA `vite build` | ✅ EXIT=0 |
 | 배포 | ✅ Deploy Web Services success (run 29542299700) |
 | 상품 상세 진입(태블릿 1280) | ✅ 헤더+QR+2단+`8,500원` 스크린샷 확인 |
 | 가격 `.00` 노출 | ✅ **false** (상세·전 템플릿 카드) |
 | console / pageerror / API 4xx·5xx | ✅ 0건 |
 
-> 상세 뷰의 template-layout 분기는 screen set 소비(KPA)에서만 활성 → k-cosmetics/glycopharm 은 legacy 경로라 무영향(tsc 로 확인).
+> 상세 뷰의 template-layout 분기는 screen set 소비(KPA)에서만 활성 → k-cosmetics 은 legacy 경로라 무영향(tsc 로 확인).
 
 ## 5. 데이터 상태
 

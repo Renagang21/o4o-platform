@@ -7,13 +7,12 @@
 > **상태**: Active — Operator 공통화 설계 기준 문서
 > **WO**: WO-O4O-OPERATOR-INTEGRATION-DOC-V1
 >
-> 본 문서는 KPA-Society / GlycoPharm / K-Cosmetics 3 서비스의 Operator 영역 현재 상태를 **분류·정책·우선순위로 고정**한다. 이후 모든 Operator 공통화 작업(`@o4o/operator-core-ui` 패키지 설계, 모듈별 추출 WO, DataTable 통합 등)의 판정 기준이다.
+> 본 문서는 KPA-Society / K-Cosmetics 2 서비스의 Operator 영역 현재 상태를 **분류·정책·우선순위로 고정**한다. 이후 모든 Operator 공통화 작업(`@o4o/operator-core-ui` 패키지 설계, 모듈별 추출 WO, DataTable 통합 등)의 판정 기준이다.
 
 > **스코프 note (2026-08-03 추가 · 2026-08-04 정정):**
 >
-> 본 문서의 조사 대상은 **작성 시점(2026-05-03) 기준 3서비스**(KPA / GlycoPharm / K-Cosmetics)다. 현재 공통화 대상 서비스는 **KPA Society · K-Cosmetics · GlycoPharm · Neture · PharmacyHub** 이다 ([`O4O-COMMONIZATION-STANDARD` §3](O4O-COMMONIZATION-STANDARD.md) V3).
+> 본 문서의 조사 대상은 **작성 시점(2026-05-03) 기준 2서비스**(KPA / K-Cosmetics)다. 현재 공통화 대상 서비스는 **KPA Society · K-Cosmetics · Neture · PharmacyHub** 이다 ([`O4O-COMMONIZATION-STANDARD` §3](O4O-COMMONIZATION-STANDARD.md) V3).
 >
-> **정정(2026-08-04)**: 2026-08-03 자 note 의 "GlycoPharm 은 `historical out-of-scope`" 표현은 폐기한다. GlycoPharm 삭제 검토는 보류되었고 GlycoPharm 은 **현재 공통화 대상 서비스**다(`O4O-COMMONIZATION-STANDARD` §3.4 V3). 따라서 본 문서의 GlycoPharm 기재는 이력이 아니라 **현재 대상 서비스의 (2026-05-03 시점) 조사 기록**으로 읽는다 — 다만 아래 항목대로 서비스별 현황 표·우선순위는 그대로 사용하지 않는다.
 >
 > - §1.1 **"Operator 는 Capability 집합이다"** 와 §1.2 **3-카테고리 분류 정책**(🟢 Core / 🟡 Core UI + Service Logic / 🔴 Extension)은 **현재도 유효**하다. Neture 가 LMS·CMS·자료실·포럼 일부를 채택하지 않은 채 정상 동작하는 것이 이 정책의 실증이다.
 > - 다만 **서비스별 현황 표·우선순위는 3서비스 기준이므로 그대로 사용하지 않는다.** Neture / PharmacyHub 를 포함한 실측 구성은 [`IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1` §7](../investigations/IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1.md) 을 참조한다.
@@ -71,7 +70,6 @@
 | 서비스 | 라우트 수 | 라우팅 구조 | 레이아웃 |
 |---|---|---|---|
 | **KPA-Society** | 30 | `OperatorRoutes.tsx` 별도 파일 (lazy) | `KpaOperatorLayoutWrapper` |
-| **GlycoPharm** | 29 | `App.tsx` 인라인 | `OperatorAreaLayout` / `OperatorLayoutWrapper` |
 | **K-Cosmetics** | 20 | `App.tsx` 인라인 | `OperatorLayoutWrapper` |
 
 ### 2.2 공통화 수준 요약
@@ -93,29 +91,29 @@
 
 ### 3.1 🟢 Core (이미 공통화 완료)
 
-| 기능 | KPA | Glyco | K-Cos | 상태 |
-|---|---|---|---|---|
-| Dashboard 5-Block | ✅ KpaOperatorDashboard | ✅ GlycoPharmOperatorDashboard | ✅ KCosmeticsOperatorDashboard | `OperatorDashboardLayout` 사용 |
-| Forum Delete Requests | ✅ | ✅ | ✅ | 동일 파일명 |
-| Forum Analytics | ✅ ForumAnalyticsDashboard | ✅ ForumAnalyticsPage | ✅ ForumAnalyticsPage | 이름만 다름, API 동일 |
-| Community Management | ✅ | ✅ | ✅ | 동일 파일명 |
-| Signage HQ Console | ✅ | ✅ | ✅ | Media/Playlists/Templates/Forced 4 페이지 동일 |
+| 기능 | KPA | K-Cos | 상태 |
+|---|---|---|---|
+| Dashboard 5-Block | ✅ KpaOperatorDashboard | ✅ KCosmeticsOperatorDashboard | `OperatorDashboardLayout` 사용 |
+| Forum Delete Requests | ✅ | ✅ | 동일 파일명 |
+| Forum Analytics | ✅ ForumAnalyticsDashboard | ✅ ForumAnalyticsPage | 이름만 다름, API 동일 |
+| Community Management | ✅ | ✅ | 동일 파일명 |
+| Signage HQ Console | ✅ | ✅ | Media/Playlists/Templates/Forced 4 페이지 동일 |
 
 → 추가 작업 불필요. 단, `ForumAnalytics` 는 KPA 명칭(`Dashboard`)을 통일할 가치 있음 (선택).
 
 ### 3.2 🟡 Core UI + Service Logic (추출 핵심 영역)
 
-| 기능 | KPA | Glyco | K-Cos | 분기점 |
-|---|---|---|---|---|
-| **Stores 관리** ⭐ | OperatorStoresPage + Detail + Channels | StoresPage + Detail | StoresPage + Detail | 3 서비스 95% 동일, 차이는 K-Cos `StoreChannelsPage` |
-| **Users / Members** | MemberManagementPage (Member 도메인) | UsersPage + Pharmacies (User+Pharmacist) | OperatorUsersPage (User) | UI 동일, 데이터 모델 다름 |
-| Products | — | ProductsPage | OperatorProductsPage | 2 서비스만 (KPA 미해당) |
-| Orders | — | OrdersPage | OperatorOrdersPage | 2 서비스만 |
-| AI Report | OperatorAiReportPage | AiReportPage + AiUsage + AiBilling | OperatorAiReportPage | Glyco 가 가장 분화 (3 페이지) |
-| Forum Management (전체) | ForumManagementPage | OperatorForumManagementPage | — | 2 서비스만 |
-| LMS Operator | OperatorLmsCoursesPage | LmsCoursesPage | — | 2 서비스만 |
-| Applications (가입/승인) | Product/Qualification 별개 | Pharmacy/Store 별개 | Supplier Single (Partner 는 2026-09-15 은퇴) | 도메인 의미 모두 다름 |
-| Roles | RoleManagementPage | (admin 영역으로 이동) | — | 정책 분기 |
+| 기능 | KPA | K-Cos | 분기점 |
+|---|---|---|---|
+| **Stores 관리** ⭐ | OperatorStoresPage + Detail + Channels | StoresPage + Detail | 2 서비스 95% 동일, 차이는 K-Cos `StoreChannelsPage` |
+| **Users / Members** | MemberManagementPage (Member 도메인) | OperatorUsersPage (User) | UI 동일, 데이터 모델 다름 |
+| Products | — | OperatorProductsPage | K-Cos 만 (KPA 미해당) |
+| Orders | — | OperatorOrdersPage | K-Cos 만 |
+| AI Report | OperatorAiReportPage | OperatorAiReportPage | 동일 |
+| Forum Management (전체) | ForumManagementPage | — | KPA 만 |
+| LMS Operator | OperatorLmsCoursesPage | — | KPA 만 |
+| Applications (가입/승인) | Product/Qualification 별개 | Supplier Single (Partner 는 2026-09-15 은퇴) | 도메인 의미 모두 다름 |
+| Roles | RoleManagementPage | — | 정책 분기 |
 
 ### 3.3 🔴 Service Extension (서비스 전용)
 
@@ -124,8 +122,6 @@
 | Legal / Audit Log | KPA | KPA 거버넌스 전용 |
 | Content / Resources / Working Content | KPA | KPA CMS 전용 |
 | Pharmacy Requests / Qualification Requests | KPA | KPA 약사회 도메인 |
-| Guidelines | Glyco | 약학 지침 CMS |
-| Settings | Glyco | Operator 자체 설정 |
 | Event Offers Approvals | K-Cos | 이벤트 오퍼 승인 워크플로우 |
 | Store Cockpit | K-Cos | 매장 종합 대시보드 |
 
@@ -137,14 +133,14 @@
 
 ### 4.1 사용 매트릭스
 
-| 컴포넌트 / 패키지 | KPA | Glyco | K-Cos | 출처 |
-|---|---|---|---|---|
-| `OperatorDashboardLayout` (5-Block) | ✅ | ✅ | ✅ | `@o4o/operator-ux-core` |
-| `DataTable` from `@o4o/operator-ux-core` | **18 페이지** | 1 | 1 | KPA 중심 |
-| `DataTable` from `@o4o/ui` | 소수 | **10+** | **6+** | Glyco/K-Cos 중심 |
-| `useBatchAction`, `defineActionPolicy` | **6 페이지** | 0 | 0 | KPA 전용 사용 |
-| `Pagination` (operator-ux-core) | ✅ | 0 | 0 | KPA 전용 사용 |
-| `RoleGuard` / `OperatorRoute` | ✅ | ✅ | ✅ | 서비스 자체 구현 |
+| 컴포넌트 / 패키지 | KPA | K-Cos | 출처 |
+|---|---|---|---|
+| `OperatorDashboardLayout` (5-Block) | ✅ | ✅ | `@o4o/operator-ux-core` |
+| `DataTable` from `@o4o/operator-ux-core` | **18 페이지** | 1 | KPA 중심 |
+| `DataTable` from `@o4o/ui` | 소수 | **6+** | K-Cos 중심 |
+| `useBatchAction`, `defineActionPolicy` | **6 페이지** | 0 | KPA 전용 사용 |
+| `Pagination` (operator-ux-core) | ✅ | 0 | KPA 전용 사용 |
+| `RoleGuard` / `OperatorRoute` | ✅ | ✅ | 서비스 자체 구현 |
 
 ### 4.2 문제점 #1 — **DataTable 계층 분리 + 정책 확정 필요** (해소됨 — `OPERATOR-DATATABLE-POLICY-V1` 으로 정책 확정)
 
@@ -153,7 +149,7 @@
 | 컬럼 타입 | `ListColumnDef<T>` / `O4OColumn<T>` | `Column<T>` |
 | `system` / `onCellClick` 속성 | ✅ 있음 | ❌ 없음 |
 | `useBatchAction` 연동 | ✅ | ❌ |
-| 사용 서비스 | KPA 중심 | Glyco / K-Cos 중심 |
+| 사용 서비스 | KPA 중심 | K-Cos 중심 |
 | 패키지 관계 | **`@o4o/ui` BaseTable 을 wrap 한 상위 레이어** | 범용 UI 컴포넌트 (전 플랫폼) |
 
 → 두 DataTable 은 **경쟁 관계가 아니라 의도된 계층 분리**임이 IR-V1 에서 확정됨. operator-ux-core 가 ui 의 BaseTable 을 wrap 하여 Operator 도메인 전용 기능(batch action / action policy / system 컬럼)을 더한 상위 레이어.
@@ -163,9 +159,8 @@
 ### 4.3 문제점 #2 — **라우팅 구조 불일치**
 
 - KPA: `services/web-kpa-society/src/OperatorRoutes.tsx` 별도 파일 (lazy 로딩 + 가독성)
-- Glyco / K-Cos: `App.tsx` 인라인 (라우트 정의가 메인 App 코드와 섞임)
 
-**정책**: 신규 라우트 추가 시 KPA 패턴(별도 `OperatorRoutes.tsx`) 권장. Glyco/K-Cos 의 분리는 별도 정리 WO.
+**정책**: 신규 라우트 추가 시 KPA 패턴(별도 `OperatorRoutes.tsx`) 권장. K-Cos 의 분리는 별도 정리 WO.
 
 ---
 
@@ -192,14 +187,13 @@
 `@o4o/operator-ux-core` 가 `@o4o/ui` BaseTable 을 wrap 한 의도된 계층 분리임이 `IR-O4O-OPERATOR-DATATABLE-UNIFICATION-V1` 에서 확정됨. 정책은 `OPERATOR-DATATABLE-POLICY-V1` 로 정전. Operator 페이지는 `@o4o/operator-ux-core` `DataTable` 표준, 그 외는 `@o4o/ui`.
 
 ### 6.3 라우팅 구조 불일치 (P1 문제)
-KPA만 `OperatorRoutes.tsx` 별도. Glyco/K-Cos는 App.tsx 인라인. 정리 가능하나 우선순위 낮음.
+KPA만 `OperatorRoutes.tsx` 별도. K-Cos는 App.tsx 인라인. 정리 가능하나 우선순위 낮음.
 
 ### 6.4 Stores 관리 — 가장 큰 공통화 기회
 3 서비스 모두 `OperatorStoresPage` + `OperatorStoreDetailPage` 거의 동일. API `/api/v1/operator/stores/*` 공통. **본 문서 §7 의 1순위 후보**. 예상 LOC 절약 800-1000.
 
 ### 6.5 사용자 관리 — 데이터 모델 분기
 - KPA: `Member` 도메인
-- Glyco: `User` + `Pharmacist`
 - K-Cos: `User`
 
 → 100% Core로 흡수 불가. **Core UI + 서비스 주입 service logic** 패턴 적용 필요. `EditUserModal`은 100% 동일하므로 분리 추출 가능.
@@ -263,7 +257,6 @@ KPA만 `OperatorRoutes.tsx` 별도. Glyco/K-Cos는 App.tsx 인라인. 정리 가
 - ❌ 신규 페이지 추가 시 한쪽 DataTable만 사용하기로 즉흥 결정 (§4.2 정책 무시)
 - ❌ Core Candidate 외 다른 모듈 우선 추출
 - ❌ Service Extension 영역을 Core 로 강제 흡수
-- ❌ Glyco/K-Cos 의 `App.tsx` 인라인 라우트를 즉흥적으로 분리 파일 변경 (별도 라우팅 정리 WO 필요)
 
 ---
 
@@ -285,5 +278,4 @@ KPA만 `OperatorRoutes.tsx` 별도. Glyco/K-Cos는 App.tsx 인라인. 정리 가
 - 기존 패키지: [packages/operator-ux-core/](../../packages/operator-ux-core/), [packages/admin-ux-core/](../../packages/admin-ux-core/)
 - 서비스별 operator 페이지:
   - [services/web-kpa-society/src/pages/operator/](../../services/web-kpa-society/src/pages/operator/)
-  - [services/web-glycopharm/src/pages/operator/](../../services/web-glycopharm/src/pages/operator/)
   - [services/web-k-cosmetics/src/pages/operator/](../../services/web-k-cosmetics/src/pages/operator/)

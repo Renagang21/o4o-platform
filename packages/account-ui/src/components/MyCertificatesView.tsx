@@ -2,7 +2,7 @@
  * MyCertificatesView — 학습 결과(수료증) 공통 View
  *
  * WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §8
- * K-Cosmetics / GlycoPharm 동일 View 중복 공통화.
+ * K-Cosmetics 동일 View 중복 공통화.
  * PDF 다운로드(blob) · 검증 링크 origin 은 서비스 wrapper 가 주입한다.
  */
 

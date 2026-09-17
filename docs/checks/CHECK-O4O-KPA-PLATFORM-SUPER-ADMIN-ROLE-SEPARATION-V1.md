@@ -19,12 +19,11 @@ WO 중지 조건 **"별도 플랫폼 Super Admin 계정이 없거나 로그인 �
 
 | 항목 | 값 |
 |------|-----|
-| role_assignments (10) | `platform:super_admin`, `kpa:admin`, `kpa:operator`, `kpa:store_owner`, `neture:admin`, `neture:operator`, `glycopharm:admin`, `glycopharm:operator`, `cosmetics:admin`, `cosmetics:operator` |
-| service_memberships (4, 전부 active) | `kpa-society`, `neture`, `glycopharm`, `k-cosmetics` |
+| role_assignments (10) | `platform:super_admin`, `kpa:admin`, `kpa:operator`, `kpa:store_owner`, `neture:admin`, `neture:operator`, `cosmetics:admin`, `cosmetics:operator` |
+| service_memberships (4, 전부 active) | `kpa-society`, `neture`, `k-cosmetics` |
 | WO 목표 최종 상태 | `kpa:admin` + `kpa:operator` 유지, `platform:super_admin` 제거 |
 
 주의: 이 계정은 KPA 전용이 아니라 **4개 서비스 전체의 admin/operator 를 겸임**한다.
-WO 원칙 블록은 KPA 관점만 기술하나, 실제 계정은 neture/glycopharm/cosmetics 운영 권한도 보유한다.
 (본 WO 는 서비스 역할을 제거하지 않으므로 해당 역할들은 그대로 유지 대상이다.)
 
 ## 2. 별도 Super Admin 계정 확인 결과 — **존재하나 사용 가능 여부 미확인**
@@ -73,7 +72,7 @@ WO 원칙 블록은 KPA 관점만 기술하나, 실제 계정은 neture/glycopha
 ### 2-B. 대체 계정의 추가 제약
 
 - `memberships: []` — 서비스 멤버십이 0개다. platform admin 이 service console 을 우회하는지 여부와
-  별개로, KPA/GP/KCos/Neture 운영 화면에서의 동작이 미검증 상태다.
+  별개로, KPA/KCos/Neture 운영 화면에서의 동작이 미검증 상태다.
 - 프로젝트 정책상 `*@o4o.com` 시드 계정은 **정리 대상 잔재**로 취급되어 왔다
   (임시 시드 UUID 000002~000008 은 `WO-O4O-KPA-TEMP-SEED-BOOTSTRAP-DEPRECATION-V1` 로 이미 정의에서 제거됨).
   이 계열 계정을 **유일한 플랫폼 최고 관리자로 삼는 것**은 그 정책 방향과 상충한다.

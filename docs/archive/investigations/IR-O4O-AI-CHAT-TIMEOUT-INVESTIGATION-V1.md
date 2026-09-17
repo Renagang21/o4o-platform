@@ -16,7 +16,7 @@
 | 엔드포인트 | 경로 | 파일 |
 |-----------|------|------|
 | AI Proxy (범용) | `POST /api/ai/generate` | `ai-proxy.routes.ts` → `ai-proxy.service.ts` |
-| Care AI Chat | `POST /api/v1/glycopharm/:id/ai-chat` | `care-ai-chat.controller.ts` → `care-ai-chat.service.ts` |
+| Care AI Chat | — | `care-ai-chat.controller.ts` → `care-ai-chat.service.ts` |
 | Vision API | `POST /api/ai/vision/analyze` | `ai-proxy.routes.ts` (inline) |
 | Copilot Engine | In-process call | `copilot-engine.service.ts` |
 | Job Queue | BullMQ async | `ai-job-queue.service.ts` + `ai-job.worker.ts` |
@@ -29,7 +29,6 @@
 
 ```
 Client (React)
-  → POST /api/v1/glycopharm/:id/ai-chat
     → authenticate middleware
     → createPharmacyContextMiddleware (DB 3 queries: org lookup + active check + enrollment)
     → care-ai-chat.controller.ts
@@ -241,7 +240,6 @@ return { apiKey, model, temperature, maxTokens };
 ### 재현 가능 시나리오
 
 ```
-POST /api/v1/glycopharm/:pharmacyId/ai-chat
 Authorization: Bearer <pharmacist-token>
 {
   "message": "전체 환자 현황을 분석해주세요. 고위험 환자의 최근 혈당 추세와 코칭 이력을 포함해서 설명해주세요."
@@ -325,7 +323,6 @@ execute({
 ## 12. Timeout 아키텍처 비교
 
 ```
-AI Proxy Service (CMS 등)         Care AI Chat (GlycoPharm)
 ━━━━━━━━━━━━━━━━━━━━              ━━━━━━━━━━━━━━━━━━━━
 Cloud Run     300s                 Cloud Run     300s
     ↓                                  ↓
@@ -344,10 +341,6 @@ Provider API  ~3-30s               Provider API   ~5-60s
 ## 13. 영향 분석
 
 ### 직접 영향
-
-| 서비스 | 기능 | 영향 |
-|--------|------|------|
-| GlycoPharm | Care AI Chat | ❌ 504 timeout 발생 (사용자 경험 저하) |
 
 ### 간접 영향 (동일 ai-core 사용)
 

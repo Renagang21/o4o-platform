@@ -183,7 +183,6 @@ CASE WHEN ra.user_id IS NOT NULL THEN true ELSE false END AS is_store_owner
 LEFT JOIN (
   SELECT user_id FROM role_assignments
   WHERE user_id = $1
-    AND role IN ('kpa:store_owner','glycopharm:store_owner','cosmetics:store_owner')
     AND is_active = true
   LIMIT 1
 ) ra ON ra.user_id = u.id

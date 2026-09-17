@@ -87,7 +87,6 @@
 |--------|------|------|
 | **StoreQRPage** | `web-kpa-society/src/pages/pharmacy/StoreQRPage.tsx` | QR 관리 전체 UI: 생성(Library 선택→slug 설정→landingType 선택→저장), 리스트, 체크박스 선택, 일괄 PDF 출력, 개별 PNG/SVG 다운로드, 스캔 분석 패널 |
 | **QrLandingPage** (KPA) | `web-kpa-society/src/pages/qr/QrLandingPage.tsx` | 공개 랜딩 페이지: `/qr/:slug` → 모바일 카드 UI → 대상 페이지 이동 |
-| **QrLandingPage** (Glyco) | `web-glycopharm/src/pages/qr/QrLandingPage.tsx` | Glycopharm용 QR 랜딩 |
 | **QrLandingPage** (Neture) | `web-neture/src/pages/store/QrLandingPage.tsx` | Neture용 QR 랜딩 |
 | **QrLandingPage** (Admin) | `admin-dashboard/src/pages/storefront/QrLandingPage.tsx` | Admin용 QR 랜딩 |
 | **StorePopPage** | `web-kpa-society/src/pages/pharmacy/StorePopPage.tsx` | POP 자동 생성 UI |
@@ -120,7 +119,6 @@
 | **SupplierProductOffer** | `supplier_product_offers` | `business_detail_description` (Tiptap HTML) | 공급자 | 공급자만 |
 | **CatalogProduct** | `catalog_products` | `short_description`, `description` | 플랫폼 공용 | 등록자 |
 | **StoreProduct** | `store_products` | `short_description`, `description` | 매장 | **잠재적 수정 대상** (현재 미사용) |
-| **GlycopharmProduct** | `glycopharm_products` | `short_description`, `description` | 약국 | 약국 |
 | **NatureProduct** | `neture_products` | `short_description` | 공급자 | 공급자 |
 | **CosmeticsProduct** | `cosmetics_products` | `short_description` | 공급자 | 공급자 |
 
@@ -239,7 +237,6 @@
 - `services/web-kpa-society/src/pages/qr/QrLandingPage.tsx`
 - `services/web-kpa-society/src/api/storeQr.ts`
 - `services/web-kpa-society/src/components/store/StoreLibrarySelectorModal.tsx`
-- `services/web-glycopharm/src/pages/qr/QrLandingPage.tsx`
 - `services/web-neture/src/pages/store/QrLandingPage.tsx`
 - `apps/admin-dashboard/src/pages/storefront/QrLandingPage.tsx`
 

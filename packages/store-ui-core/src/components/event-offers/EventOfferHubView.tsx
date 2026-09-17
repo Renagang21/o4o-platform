@@ -3,12 +3,12 @@
  *
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1
  *
- * GP/KCos 의 단순 목록(EventOffersHubList)과 KPA 의 선택·묶음 담기 화면이 같은 테이블
+ * KCos 의 단순 목록(EventOffersHubList)과 KPA 의 선택·묶음 담기 화면이 같은 테이블
  * (상품명 / 공급업체 / 가격 / 날짜 / 상태 / 작업)을 각각 그리고 있었다. 그 테이블을 여기로 모은다.
  *
  * 서비스 차이는 **config + slot** 으로만 표현한다 (서비스명 조건문 금지).
  *   - selection      : 선택 컬럼 사용 여부 (KPA 공급업체 묶음 담기)
- *   - dateColumn     : '승인일'(GP/KCos) vs '기간'(KPA)
+ *   - dateColumn     : '승인일'(KCos) vs '기간'(KPA)
  *   - showDiscount   : 이벤트가/정가/할인율 표기 (KPA)
  *   - renderName     : 상세 링크 여부
  *   - renderAction   : 행 액션 셀 (담기 버튼 / 곧 시작 / 매진 / 종료됨 …)

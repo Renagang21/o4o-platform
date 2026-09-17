@@ -24,20 +24,20 @@
 
 ## 2. §5 — 3서비스 계약 비교 (읽기 전용 조사)
 
-| 항목 | KPA (web-kpa-society) | GlycoPharm | K-Cosmetics |
-|---|---|---|---|
-| API 모듈 | `src/api/localProducts.ts` | `src/api/localProducts.ts` | `src/services/localProductApi.ts` |
-| 목록 API | `GET /api/v1/store/local-products` | 동일 | 동일 |
-| 목록 응답 형태 | raw SQL **snake_case** row | 동일 | 동일 |
-| 목록 unwrap | `res.data` | `res.data?.data` | `res.data.data` |
-| 수정 API | `PUT /api/v1/store/local-products/:id` | 동일 | 동일 |
-| 수정 응답 형태 | TypeORM entity **camelCase** | 동일 | 동일 |
-| `updateLocalProduct` 반환 | `LocalProduct` 직접 | 동일 | 동일 |
-| detailHtml 매핑 | 목록 `detail_html` / PUT `detailHtml` | 동일 | 동일 |
-| 설명 화면 | `pages/pharmacy/StoreProductDescriptionsPage.tsx` | `pages/store-management/…` | `pages/store/…` |
-| 문구 축 | "내 약국 / 약국" | "내 약국 / 약국" | "내 매장 / 매장" |
-| POP 화면 | `pages/pharmacy/ProductPopBuilderPage.tsx` | `pages/store-management/…` | `pages/store/…` |
-| POP 저장 계약 | 전역 `product_ai_contents` (부적합) | 동일 | 동일 |
+| 항목 | KPA (web-kpa-society) | K-Cosmetics |
+|---|---|---|
+| API 모듈 | `src/api/localProducts.ts` | `src/services/localProductApi.ts` |
+| 목록 API | `GET /api/v1/store/local-products` | 동일 |
+| 목록 응답 형태 | raw SQL **snake_case** row | 동일 |
+| 목록 unwrap | `res.data` | `res.data.data` |
+| 수정 API | `PUT /api/v1/store/local-products/:id` | 동일 |
+| 수정 응답 형태 | TypeORM entity **camelCase** | 동일 |
+| `updateLocalProduct` 반환 | `LocalProduct` 직접 | 동일 |
+| detailHtml 매핑 | 목록 `detail_html` / PUT `detailHtml` | 동일 |
+| 설명 화면 | `pages/pharmacy/StoreProductDescriptionsPage.tsx` | `pages/store/…` |
+| 문구 축 | "내 약국 / 약국" | "내 매장 / 매장" |
+| POP 화면 | `pages/pharmacy/ProductPopBuilderPage.tsx` | `pages/store/…` |
+| POP 저장 계약 | 전역 `product_ai_contents` (부적합) | 동일 |
 
 **PUT 은 부분 업데이트(partial)** 임을 코드로 확인했다
 ([store-local-product.routes.ts:346-361](../../apps/api-server/src/routes/platform/store-local-product.routes.ts#L346-L361)) —
@@ -65,13 +65,11 @@
 `LocalProductInput` 에 `detailHtml?` 추가.
 
 - [web-kpa-society/src/api/localProducts.ts](../../services/web-kpa-society/src/api/localProducts.ts)
-- [web-glycopharm/src/api/localProducts.ts](../../services/web-glycopharm/src/api/localProducts.ts)
 - [web-k-cosmetics/src/services/localProductApi.ts](../../services/web-k-cosmetics/src/services/localProductApi.ts)
 
 ### 3.3 설명 화면 3종 (범위 A 본체)
 
 - [web-kpa-society/…/StoreProductDescriptionsPage.tsx](../../services/web-kpa-society/src/pages/pharmacy/StoreProductDescriptionsPage.tsx)
-- [web-glycopharm/…/StoreProductDescriptionsPage.tsx](../../services/web-glycopharm/src/pages/store-management/StoreProductDescriptionsPage.tsx)
 - [web-k-cosmetics/…/StoreProductDescriptionsPage.tsx](../../services/web-k-cosmetics/src/pages/store/StoreProductDescriptionsPage.tsx)
 
 3서비스 **동일 계약**으로 정렬(문구·import 경로만 서비스별 유지):
@@ -124,7 +122,6 @@ RichTextEditor 의 기존 보조 AI 는 유지하되 결과는 편집기 state �
 
 ```
 rg "ai-contents|productAiContent|getProductAiContents|saveProductAiContent" \
-   services/web-{kpa-society,glycopharm,k-cosmetics}/src
 ```
 
 → `StoreProductDescriptionsPage` **3종 모두 0 hit**.
@@ -170,7 +167,6 @@ rg "ai-contents|productAiContent|getProductAiContents|saveProductAiContent" \
 |---|---|
 | `@o4o/api-server type-check` | 변경 범위 **0 error** (잔여 error 는 전부 `src/scripts/*` — 타 트랙 생산 스크립트, 선행 존재) |
 | web-kpa-society `tsc --noEmit` | 대상 파일 0 error |
-| web-glycopharm `tsc --noEmit` | 대상 파일 0 error |
 | web-k-cosmetics `tsc --noEmit` | 대상 파일 0 error |
 
 ---
@@ -206,7 +202,7 @@ rg "ai-contents|productAiContent|getProductAiContents|saveProductAiContent" \
 
 배포: GitHub Actions `Deploy API Server` run 30432565393 **success** ·
 `Deploy Web Services` run 30432565400 **success**
-(detect-changes → kpa-society / glycopharm / k-cosmetics 3종 모두 deploy success).
+(detect-changes → kpa-society / k-cosmetics 3종 모두 deploy success).
 커밋 `513cc64f4` 가 `origin/main` 의 조상임 확인.
 
 ### 10.1 KPA — `/store/marketing/product-descriptions` (약국 경영자 계정) — **PASS**
@@ -226,12 +222,6 @@ rg "ai-contents|productAiContent|getProductAiContents|saveProductAiContent" \
 **원복**: 대상 상품(`cd3a2b29…7923`) 의 원래 값은 `detail_html = NULL` 이었고,
 앱의 부분 업데이트 API 로 `detailHtml: ''` 를 전송해 **NULL 로 복구 완료** (직접 DB write 0).
 복구 후 `detail_html` 이 비어있지 않은 로컬 상품 **0건** 재확인.
-
-### 10.2 GlycoPharm — `/store/library/product-descriptions` — **PASS**
-
-페이지 로드 ✅ (내 약국 상품 8건) · `ai-contents` 요청 **0건** ·
-`200 GET /api/v1/store/local-products` · `저장된 상세 설명이 없습니다.` ·
-"약국" 문구 축 유지 확인.
 
 ### 10.3 K-Cosmetics — `/store/library/product-descriptions` — **PASS**
 

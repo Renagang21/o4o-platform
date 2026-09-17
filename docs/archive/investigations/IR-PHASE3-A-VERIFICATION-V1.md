@@ -29,7 +29,6 @@
 **수정 파일 (11):**
 | 파일 | 변경 내용 |
 |------|----------|
-| `routes/glycopharm/controllers/admin.controller.ts` | 승인 시 organization_members owner INSERT |
 | `routes/kpa/controllers/pharmacy-request.controller.ts` | pharmacy_owner → organization_members 전환 |
 | `routes/kpa/controllers/pharmacy-store-config.controller.ts` | createRequireStoreOwner 미들웨어 적용 |
 | `routes/kpa/controllers/pharmacy-products.controller.ts` | createRequireStoreOwner 미들웨어 적용 |
@@ -78,7 +77,6 @@ grep -rn "store_owner" apps/api-server/src/
 
 | 패턴 | 결과 | 판정 |
 |------|------|------|
-| `glycopharm:store_owner` | **0건** | GREEN |
 | `cosmetics:store_owner` | **0건** | GREEN |
 | `store_owner` (일반) | 1건 (audit log fallback) | YELLOW |
 
@@ -182,7 +180,6 @@ login() → handleEmailLogin() → tokenUtils.generateTokens(user)
 | 중복 방지 | NOT EXISTS 사용 | GREEN |
 | 멱등성 | 재실행 시 중복 생성 없음 | GREEN |
 | 롤백 가능 | DOWN: `DELETE WHERE role = 'owner'` | GREEN |
-| GlycoPharm 누락 | organizations WHERE type='pharmacy' AND created_by_user_id IS NOT NULL | GREEN |
 | KPA 누락 | users JOIN kpa_members WHERE pharmacist_role='pharmacy_owner' | GREEN |
 | FK 무결성 | organization_id, user_id 모두 기존 레코드 참조 | GREEN |
 
@@ -190,7 +187,6 @@ login() → handleEmailLogin() → tokenUtils.generateTokens(user)
 
 | 흐름 | 구현 | 중복 방지 | 판정 |
 |------|------|----------|------|
-| GlycoPharm 매장 승인 | `admin.controller.ts:394-404` | ON CONFLICT DO NOTHING | GREEN |
 | KPA 약국 승인 | `pharmacy-request.controller.ts:179-191` | ON CONFLICT DO NOTHING | GREEN |
 
 ---
@@ -254,10 +250,9 @@ login() → handleEmailLogin() → tokenUtils.generateTokens(user)
 
 **판정:** GREEN — pharmacistRole은 API 응답에서만 derive, JWT 미포함
 
-### 시나리오 2: 일반 사용자 + GlycoPharm 매장 owner
+### 시나리오 2: 일반 사용자 owner
 
 **코드 경로:**
-1. GlycoPharm 신청 승인 → `admin.controller.ts:394-404`
 2. organization_members에 `role='owner'` INSERT
 3. `createRequireStoreOwner` 미들웨어에서 `isStoreOwner()` 확인
 4. `req.organizationId` 주입 후 매장 관리 API 접근 허용
@@ -284,17 +279,6 @@ login() → handleEmailLogin() → tokenUtils.generateTokens(user)
 4. `createRequireStoreOwner` → 403 STORE_OWNER_REQUIRED 반환
 
 **판정:** GREEN — left_at 기반 soft delete로 접근 자동 차단
-
-### 시나리오 4: GlycoPharm 매장 승인 → owner 자동 등록
-
-**코드 경로:** `admin.controller.ts:394-404`
-```sql
-INSERT INTO organization_members (id, organization_id, user_id, role, ...)
-VALUES (uuid_generate_v4(), $1, $2, 'owner', ...)
-ON CONFLICT (organization_id, user_id) DO NOTHING
-```
-
-**판정:** GREEN — ON CONFLICT으로 멱등성 보장
 
 ### 시나리오 5: Cosmetics 매장 승인 → owner 자동 등록
 
@@ -341,7 +325,6 @@ Phase3-A 범위에서 **제외** (CLAUDE.md §9 스키마 격리 원칙).
 
 | 패턴 | 위치 | 대체 |
 |------|------|------|
-| `users.roles.push('glycopharm:store_owner')` | GlycoPharm 승인 흐름 | organization_members INSERT |
 | `UPDATE users SET pharmacist_role = 'pharmacy_owner'` | KPA 약국 승인 | organization_members INSERT |
 | `isStoreOwnerRole(roles, user)` | 7개 guard 파일 | `resolveStoreAccess()` / `createRequireStoreOwner()` |
 | `isPharmacyOwnerRole(roles, user)` | 5개 controller | `resolveStoreAccess()` |
@@ -372,7 +355,6 @@ Phase3-A 범위에서 **제외** (CLAUDE.md §9 스키마 격리 원칙).
 | 조건 | 상태 |
 |------|------|
 | users.pharmacist_role = 'pharmacy_owner' 신규 기록 중단 | ✅ 완료 |
-| users.roles[]에 glycopharm:store_owner push 중단 | ✅ 완료 |
 | 모든 backend store owner 체크가 organization_members 기반 | ✅ 완료 |
 | Auth API 응답에서 pharmacistRole derive 정상 동작 | ✅ 완료 |
 | Frontend 동작 변경 없음 (API 응답 형태 유지) | ✅ 완료 |

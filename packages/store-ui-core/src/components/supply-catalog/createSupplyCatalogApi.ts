@@ -32,7 +32,7 @@ export interface SupplyCatalogQueryParams {
   offset?: number;
   category?: string;
   recommended?: boolean;
-  /** K-Cosmetics / GlycoPharm 은 canonical service_key 를 명시 전송한다(KPA 는 경로 기반). */
+  /** K-Cosmetics 은 canonical service_key 를 명시 전송한다(KPA 는 경로 기반). */
   service_key?: string;
 }
 

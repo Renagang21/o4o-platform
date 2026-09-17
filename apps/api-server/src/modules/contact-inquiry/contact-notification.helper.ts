@@ -3,7 +3,7 @@
  *
  * WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1
  *
- * GP/KCos public-contact-inquiry.controller 의 이메일/자동 회신 로직을 service-neutral 하게 추출.
+ * KCos public-contact-inquiry.controller 의 이메일/자동 회신 로직을 service-neutral 하게 추출.
  * Neture(/neture/contact) · KPA(/kpa/contact-requests) 의 기존 submit 흐름이 자체 저장·in-app 알림은
  * 그대로 둔 채, 본 helper 를 호출해 ServiceContactSettings 기반 이메일/자동 회신만 추가한다.
  *
@@ -13,8 +13,8 @@
  *   - 수신자(recipientEmails)와 문의자(input.email)를 혼동하지 않는다.
  *   - 사용자 입력은 HTML escape 후 본문에 포함.
  *
- * 참고: GP/KCos public controller 는 본 helper 를 사용하지 않고 인라인 구현을 유지한다
- *   (WO 범위 경계 — GP/KCos 미수정). 동일 정책의 의도적 중복.
+ * 참고: KCos public controller 는 본 helper 를 사용하지 않고 인라인 구현을 유지한다
+ *   (WO 범위 경계 — KCos 미수정). 동일 정책의 의도적 중복.
  */
 
 import { emailService } from '../../services/email.service.js';

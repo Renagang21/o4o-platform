@@ -3,7 +3,7 @@
  *
  * WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1
  *
- * 4개 서비스(KPA / GlycoPharm / K-Cosmetics / Neture)에서
+ * 3개 서비스(KPA / K-Cosmetics / Neture)에서
  * 동일 UI로 안내 문구를 관리하기 위한 공통 모듈.
  *
  * serviceKey / config / client 를 props로 주입받아 동작하며,

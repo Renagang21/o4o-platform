@@ -3,16 +3,15 @@
  * WO-O4O-MY-STORE-REMAINING-VIEW-DUPLICATION-ZERO-CLEANUP-V1
  *
  * 원본 계약 유지:
- *   WO-O4O-GLYCO-BLOG-INTRODUCE-V1 (GP) / WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1 (KCos)
+ *   WO-O4O-KCOS-STORE-EXECUTION-CANONICAL-ALIGNMENT-V1 (KCos)
  *   WO-O4O-KPA-STORE-BLOG-META-V1 (블로그 설정 identity)
  *
  * 3 ViewMode: list(카드 목록) / editor / settings.
- * K-Cosmetics · GlycoPharm 사본의 실제 차이(diff 실측 75줄)는 다음뿐이었다.
+ * K-Cosmetics 사본의 실제 차이(diff 실측 75줄)는 다음뿐이었다.
  *   1) slug resolver — KCos `fetchChannelOverviewWithCode().organizationCode`
- *                      GP  `pharmacyApi.getPharmacyStatus().storeSlug`   → resolveSlug 주입
- *   2) service 파라미터 ('cosmetics' / 'glycopharm')                      → api adapter 가 흡수
+ *   2) service 파라미터 ('cosmetics' 등)                                 → api adapter 가 흡수
  *   3) 명사·안내 문구 (매장/약국)                                          → labels 주입
- *   4) 목록 액션 title 속성(GP 만 보유)                                    → labels.publishedActionTitles
+ *   4) 목록 액션 title 속성(선택)                                          → labels.publishedActionTitles
  * publish/archive/delete 정책과 공개 URL 규칙(`/store/{slug}/blog/{postSlug}`)은 바꾸지 않는다.
  *
  * ⚠️ KPA `PharmacyBlogPage` 는 목록이 DataTable + 일괄(발행/보관/삭제) 모델이라 이 View 를 쓰지 않는다.
@@ -47,7 +46,7 @@ export interface StoreBlogPostInput {
 
 /** 서비스 `api/blogStaff` 바인딩 — service 파라미터는 서비스가 고정한다 */
 export interface StoreBlogManageApi {
-  /** 매장 slug 해석 (KCos: organizationCode / GP: storeSlug) */
+  /** 매장 slug 해석 (KCos: organizationCode 등) */
   resolveSlug: () => Promise<string | null>;
   fetchPosts: (slug: string, params: { status?: string; limit: number }) => Promise<StoreBlogPost[]>;
   createPost: (slug: string, input: StoreBlogPostInput) => Promise<unknown>;
@@ -68,7 +67,7 @@ export interface StoreBlogManageLabels {
   resolveErrorFallback: string;
   /** 본문 편집기 placeholder */
   editorPlaceholder: string;
-  /** 발행글 액션 버튼 title 속성 (GP 만 보유 — 없으면 미지정) */
+  /** 발행글 액션 버튼 title 속성 (선택 — 없으면 미지정) */
   publishedActionTitles?: { copyUrl: string; preview: string };
   settings: StoreBlogSettingsPanelLabels;
 }

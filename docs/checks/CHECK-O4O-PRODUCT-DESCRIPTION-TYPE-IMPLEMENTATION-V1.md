@@ -16,7 +16,6 @@ Scope: `shared_product_descriptions` 에 `description_type`(B2B/B2C/STORE/SUPPLI
 | `apps/api-server/src/modules/neture/entities/SharedProductDescription.entity.ts` | `descriptionType` 컬럼 + `SharedProductDescriptionType` union + 상수 + `DEFAULT_SHARED_PRODUCT_DESCRIPTION_TYPE='STORE'` |
 | `apps/api-server/src/modules/neture/services/shared-product-description.service.ts` | `getCanonical(descriptionType='STORE')` · `setCanonical` 강등을 같은 type 한정 · `createCandidate` 기본 STORE · 검토 응답에 `descriptionType` 포함 |
 | `apps/api-server/src/routes/platform/store-public/store-public-utils.ts` | 소비자 storefront + 태블릿 canonical join 에 `AND spd.description_type='STORE'` |
-| `apps/api-server/src/routes/glycopharm/controllers/store.controller.ts` | GP storefront canonical join 에 STORE 필터 |
 | `apps/api-server/src/routes/o4o-store/controllers/store-content.controller.ts` | 콘텐츠 소스 목록(master-scope) canonical 에 STORE 필터. **id-scope 복사 쿼리(:562)는 불변** |
 
 > 타임스탬프 충돌 회피: 병렬 세션이 `20261222000000-AddMediaAssetMetadata` 를 동시 생성 → 본 마이그레이션을 **20261223000000** 으로 상향.
@@ -40,7 +39,7 @@ CREATE INDEX IF NOT EXISTS idx_shared_product_descriptions_master_desctype
 
 ## 3. 조회 기본값 STORE 적용 위치
 - 서비스: `getCanonical()` 2번째 인자 기본 `STORE`; `createCandidate` 기본 `STORE`; `setCanonical` 강등 범위 `description_type = target.descriptionType`.
-- Raw SQL (master-scope canonical = "그 대표설명"): storefront(store-public-utils) · 태블릿(store-public-utils) · GP storefront · store-content 소스목록 — 4곳 `AND description_type='STORE'`.
+- Raw SQL (master-scope canonical = "그 대표설명"): storefront(store-public-utils) · 태블릿(store-public-utils) storefront · store-content 소스목록 — 3곳 `AND description_type='STORE'`.
 - **미적용(의도)**: `store-content.controller:562`(spd.id 로 특정 row 복사 — id-scope 유일). admin 검토 목록/상태 카운트(전 타입 관리 대상 — WO-2 에서 type-aware).
 
 ## 4. ProductMaster 무변경 확인 (Freeze #6)

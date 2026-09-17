@@ -141,7 +141,7 @@ M services/web-neture/src/pages/supplier/SupplierTabletScreenSetsPage.tsx   (안
 ```
 
 **무변경 확인:** `apps/api-server` 0 · migration 0 · DB write 0 · 공용 패키지(`packages/*`) 0 ·
-KPA/GlycoPharm/K-Cosmetics 0 · Screen Set / Signage / SPD 백엔드 계약 0.
+Screen Set / Signage / SPD 백엔드 계약 0.
 
 ---
 

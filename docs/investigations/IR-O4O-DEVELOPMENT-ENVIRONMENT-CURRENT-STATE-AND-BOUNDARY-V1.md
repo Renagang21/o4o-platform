@@ -229,7 +229,7 @@
 
 | 항목 | 내용 |
 |---|---|
-| **문제** | Cloud Run 서비스명을 `o4o-admin-web`으로 기재. 실제는 `o4o-admin-dashboard` (`deploy-admin.yml:46`). 워크플로를 3개만 열거하나 실제 11개이며 `deploy-web-services.yml`(neture/k-cosmetics/kpa-society/glycopharm/**pharmacy-hub**) 누락 |
+| **문제** | Cloud Run 서비스명을 `o4o-admin-web`으로 기재. 실제는 `o4o-admin-dashboard` (`deploy-admin.yml:46`). 워크플로를 3개만 열거하나 실제 11개이며 `deploy-web-services.yml` 누락 |
 | **영향** | 배포 대상 오인. pharmacy-hub 배포 경로가 문서에서 보이지 않음 |
 | **변경 예상 범위** | 문서 1건 표 2개 |
 | **위험** | 낮음 |

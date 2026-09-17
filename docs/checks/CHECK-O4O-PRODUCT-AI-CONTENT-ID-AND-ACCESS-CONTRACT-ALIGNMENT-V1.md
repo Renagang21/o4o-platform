@@ -22,7 +22,7 @@ WO 는 §11 에서 **소유권 계약이 확정되기 전에는 단순 가드 �
 |---|----------------------|----------|
 | S1 | `organization_id` 없이 여러 매장이 같은 ProductMaster row 를 덮어쓸 수 있음 | **충족** — `product_ai_contents` 에 `organization_id` **컬럼 없음**, unique 제약 **0개**, upsert 키 = `(product_id, content_type)` 전역 |
 | S2 | ProductMaster 연결 없는 local product 가 핵심 업무의 대부분 | **충족** — `store_local_products` 에 `master_id` **컬럼 자체가 없음**. 프로덕션 43행 **전부(100%)** 미연결 |
-| S3 | `product_ai_contents` 가 전역 콘텐츠인데 매장 화면이 매장별 설명을 저장 | **충족** — 전역 row 를 KPA/GP/K-Cos 매장 편집 화면이 직접 upsert |
+| S3 | `product_ai_contents` 가 전역 콘텐츠인데 매장 화면이 매장별 설명을 저장 | **충족** — 전역 row 를 KPA/K-Cos 매장 편집 화면이 직접 upsert |
 
 ---
 
@@ -108,7 +108,6 @@ columns : id, organization_id, name, description, images, category, price_displa
 | 서비스 | 영향 화면 |
 |--------|----------|
 | KPA | `StoreProductDescriptionsPage`, `ProductPopBuilderPage` |
-| GlycoPharm | 동일 2화면 (`pages/store-management/`) |
 | K-Cosmetics | 동일 2화면 (`pages/store/`) |
 | 공통 | `/:productId/ai-tags` 6개 엔드포인트 (동일 가드) · POP PDF · SPD candidate seed |
 

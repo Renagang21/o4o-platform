@@ -43,7 +43,6 @@ WHERE EXISTS (
 )
 
 -- Pattern C: Service-specific table
-SELECT * FROM glycopharm_applications  -- 서비스 전용 테이블
 ```
 
 ### 위험 패턴 (UNSAFE)
@@ -123,8 +122,6 @@ Guard: `requireRole(['admin', 'super_admin'])`
 **판정**: Platform Admin은 전체 사용자 관리가 목적이므로 **전체 조회가 의도된 설계**.
 Guard가 `requireRole(['admin', 'super_admin'])`으로 제한되어 서비스 운영자 접근 불가.
 
-> 개선 제안: 선택적 `?service=glycopharm` 필터 추가 (편의 기능)
-
 ### 3-2. AdminDashboardController — DESIGN-OK
 
 파일: `controllers/admin/adminDashboardController.ts`
@@ -154,15 +151,6 @@ Guard: 확인 필요 (requireAuth 수준이면 UNSAFE)
 | `routes/neture/services/neture.service.ts` | 297, 324 | `SELECT ... FROM users WHERE id = ANY($1)` (partner 사용자) | 없음 | **UNSAFE** |
 | `operator-registration.service.ts` | 33-50 | `JOIN service_memberships WHERE service_key = 'neture'` | 있음 | SAFE |
 | `partner.service.ts` | 347, 397 | `JOIN service_memberships WHERE service_key = 'neture'` | 있음 | SAFE |
-
-### 4-2. GlycoPharm
-
-| 파일 | 라인 | 쿼리 | 격리 | 판정 |
-|------|:----:|------|:----:|------|
-| `store-applications.controller.ts` | 373, 389 | `userRepo.findByIds(userIds)` (operator 목록) | 없음 | **UNSAFE** |
-| `admin.controller.ts` | 103, 132 | `userRepo.findByIds(userIds)` (admin 목록) | 없음 | **UNSAFE** |
-| `application.controller.ts` | 151 | `findOne({ where: { id: req.user.id } })` | 인증 컨텍스트 | EXEMPT |
-| `store-applications.controller.ts` | 456, 474 | `findOne({ where: { id: application.userId } })` | 신청 소유자 | EXEMPT |
 
 ### 4-3. GlucoseView
 
@@ -210,18 +198,6 @@ Guard: 확인 필요 (requireAuth 수준이면 UNSAFE)
 
 > **참고**: `neture_*` 테이블은 Neture 전용이지만, 테이블 이름으로 격리하는 것은 스키마 레벨 격리가 아닌 관례적 격리. 현재 다른 서비스에서 사용하지 않으므로 **실질적 SAFE**이나, 원칙적으로는 UNSAFE.
 
-### 5-2. GlycoPharm Operator Dashboard
-
-파일: `routes/glycopharm/controllers/operator.controller.ts`
-
-| 메트릭 | 격리 방식 | 판정 |
-|--------|----------|------|
-| Pharmacy Counts | `JOIN organization_service_enrollments WHERE service_code = 'glycopharm'` | SAFE |
-| Applications | `GlycopharmApplication` (서비스 전용 엔티티) | SAFE |
-| Products | `GlycopharmProduct` (서비스 전용 엔티티) | SAFE |
-| Patient Profiles | `patient_health_profiles` (필터 없음) | **UNSAFE** |
-| Care Metrics | `care_kpi_snapshots`, `care_alerts` (필터 없음) | **UNSAFE** |
-
 ### 5-3. GlucoseView Operator Dashboard
 
 파일: `routes/glucoseview/controllers/operator-dashboard.controller.ts`
@@ -254,19 +230,17 @@ Guard: 확인 필요 (requireAuth 수준이면 UNSAFE)
 
 ## 6. 공유 테이블 격리 문제
 
-### 6-1. Care 테이블 (GlycoPharm + GlucoseView 공유)
+### 6-1. Care 테이블 (GlucoseView 공유)
 
-다음 테이블은 **GlycoPharm과 GlucoseView에서 동시에 조회**하지만 서비스 필터가 없다:
-
-| 테이블 | GlycoPharm | GlucoseView | service_key 컬럼 |
-|--------|:----------:|:-----------:|:---------------:|
-| `care_kpi_snapshots` | 조회 | 조회 | 없음 |
-| `care_alerts` | 조회 | 조회 | 없음 |
-| `care_coaching_sessions` | 조회 | 조회 | 없음 |
-| `patient_health_profiles` | 조회 | — | 없음 |
+| 테이블 | GlucoseView | service_key 컬럼 |
+| -------- | :-----------: | :---------------: |
+| `care_kpi_snapshots` | 조회 | 없음 |
+| `care_alerts` | 조회 | 없음 |
+| `care_coaching_sessions` | 조회 | 없음 |
+| `patient_health_profiles` | — | 없음 |
 
 **위험**: 두 서비스의 대시보드에서 동일한 데이터가 중복 표시됨.
-현재 Care 데이터는 사실상 GlycoPharm/GlucoseView 공유이므로 실질적 문제는 낮으나,
+현재 Care 데이터는 사실상 GlucoseView 공유이므로 실질적 문제는 낮으나
 서비스가 분리될 경우 데이터 혼합 위험 존재.
 
 ### 6-2. Forum 테이블
@@ -297,9 +271,7 @@ KPA 대시보드에서 전체 플랫폼 포럼 게시물 수를 카운트할 위
 |---|--------|------|------|
 | 1 | Neture | `neture.service.ts:382,503` | Supplier 사용자 batch fetch — service_memberships 없음 |
 | 2 | Neture | `routes/neture/services/neture.service.ts:297,324` | Partner 사용자 batch fetch — service_memberships 없음 |
-| 3 | GlycoPharm | `store-applications.controller.ts:373,389` | Application 사용자 batch fetch — service_memberships 없음 |
-| 4 | GlycoPharm | `admin.controller.ts:103,132` | Admin application 사용자 batch fetch — 무필터 |
-| 5 | GlycoPharm+GlucoseView | `operator-dashboard-queries.ts:38-69` | 공유 Care 테이블 — service 필터 없음 |
+| 5 | GlucoseView | `operator-dashboard-queries.ts:38-69` | 공유 Care 테이블 — service 필터 없음 |
 
 ### P1 — 격리 원칙 위반 (경미)
 
@@ -336,7 +308,7 @@ KPA 대시보드에서 전체 플랫폼 포럼 게시물 수를 카운트할 위
 
 ## 10. 수정 표준 패턴
 
-### 패턴 A: Batch User Fetch (Neture, GlycoPharm)
+### 패턴 A: Batch User Fetch (Neture)
 
 ```sql
 -- ❌ BEFORE (UNSAFE)
@@ -386,7 +358,6 @@ WHERE organization_id IS NULL
 | K-Cosmetics | 완벽 (스키마 + 필터) | A |
 | GlucoseView | 우수 (서비스 전용 테이블), Care 공유 문제 | B+ |
 | Neture | 혼합 (Registration SAFE, Supplier/Partner batch UNSAFE) | B- |
-| GlycoPharm | 혼합 (서비스 엔티티 SAFE, User batch UNSAFE, Care 공유) | B- |
 | KPA Society | 혼합 (KPA 테이블 SAFE, Forum/Branch UNSAFE) | B- |
 | Platform Admin | 의도적 전체 조회 (설계상 허용) | N/A |
 
@@ -399,7 +370,7 @@ WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1
 ```
 
 우선순위:
-1. P0: Neture/GlycoPharm batch user fetch에 service_memberships 필터 추가
+1. P0: Neture batch user fetch에 service_memberships 필터 추가
 2. P0: 공유 Care 테이블 격리 방안 수립
 3. P1: KPA Forum/Branch 격리 강화
 4. P2: Platform Admin API 선택적 service 필터

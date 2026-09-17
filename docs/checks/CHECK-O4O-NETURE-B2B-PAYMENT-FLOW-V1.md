@@ -10,7 +10,7 @@
 ## 1. 조사 결론 (후보 선택)
 | 질문 | 답 |
 |------|-----|
-| checkout_order 를 paid 전이하는 기존 패턴 | KPA/Glyco/KCos: PaymentCoreService prepare/confirm(sourceService) → `payment.completed(serviceKey)` → 서비스별 핸들러가 CheckoutOrder paid 전이 |
+| checkout_order 를 paid 전이하는 기존 패턴 | — |
 | legacy neture payment 경로 | `routes/neture/controllers/payment.controller.ts` 는 **neture_orders 전용**(direct Toss). checkout_orders 미지원. NeturePaymentEventHandler(serviceKey='neture')는 neture_orders 만, 미존재 시 graceful skip |
 | checkout_order 결제 가능한 기존 route | **없음** — neture 는 neture_orders 만. → B2B checkout 전용 route 신설 필요 |
 | serviceKey 충돌 | PaymentEventHub 는 serviceKey 미검증(임의 문자열 허용) → **`neture-b2b`** 분리 시 legacy `neture` 와 무충돌 |
@@ -25,7 +25,7 @@
 | `apps/api-server/src/routes/neture/neture.routes.ts` | `/b2b/payments/*` mount |
 | `apps/api-server/src/bootstrap/register-routes.ts` | `initializeNetureB2bCheckoutPaymentHandler` 등록 |
 
-> legacy neture payment / NeturePaymentEventHandler / KPA·Glyco·KCos handler / 정산 / fulfillment / web-neture **무변경**. DB/migration **무변경**.
+> DB/migration **무변경**.
 
 ## 3. payment event flow
 ```
@@ -52,11 +52,11 @@ POST /api/v1/neture/b2b/payments/confirm
 - **api-server tsc 0** ✅
 - **핸들러 init 로그** ✅ (§9): `✅ NetureB2bCheckoutPaymentEventHandler initialized` / `subscribed (serviceKey=neture-b2b)`.
 - **graceful smoke** ✅ (§9): prepare/confirm/order no-auth → 401(mount+auth 정상).
-- **positive paid 전이 — DEFERRED**: 유효 Toss 결제(prepare→승인→confirm)에서만 `payment.completed(serviceKey='neture-b2b')` 발행. 실 결제·유효 B2B checkout_order seed 부재로 live 미실측. 전이 로직은 KPA/Glyco/KCos 와 동일 패턴(프로덕션 검증), 구독은 init 로그로 입증 → 유효 결제 시 자동 동작. (내부 emit 경로 `paymentEventHub.emitCompleted` 로 테스트 가능하나 운영 DB mutation 지양.)
+- **positive paid 전이 — DEFERRED**: 유효 Toss 결제(prepare→승인→confirm)에서만 `payment.completed(serviceKey='neture-b2b')` 발행. 실 결제·유효 B2B checkout_order seed 부재로 live 미실측. (내부 emit 경로 `paymentEventHub.emitCompleted` 로 테스트 가능하나 운영 DB mutation 지양.)
 
 ## 7. 회귀 무영향
 - legacy neture_orders 결제(payment.controller)·NeturePaymentEventHandler 무변경(serviceKey 분리).
-- KPA/Glyco/KCos checkout payment handler 무변경. B2B orchestrator(P2a)·event_offer cart 무변경.
+- B2B orchestrator(P2a)·event_offer cart 무변경.
 - 정산/fulfillment guard/web-neture 무변경.
 
 ## 8. 완료 기준 체크 (WO §11)
@@ -72,7 +72,7 @@ POST /api/v1/neture/b2b/payments/confirm
   - `POST /api/v1/neture/b2b/payments/confirm` → **401**
   - `GET  /api/v1/neture/b2b/payments/order/:id` → **401**
   → 3 route mount + auth 정상, 500/route-누락 없음. (authed 시 prepare/confirm 은 B2B-source guard·payable 검증 통과 후 동작 — 코드 §4.)
-- 회귀: 본 변경은 **순수 additive**(신규 controller/handler/mount/bootstrap). legacy neture payment 컨트롤러·KPA/Glyco/KCos 무수정.
+- 회귀: 본 변경은 **순수 additive**(신규 controller/handler/mount/bootstrap).
 
 ## 10. 남은 GAP/RISK · 후속
 - **positive paid 전이 실측**: 유효 Toss 결제 + B2B checkout_order seed 확보 시(또는 P2d frontend 전환 동반).

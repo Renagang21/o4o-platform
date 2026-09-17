@@ -271,7 +271,7 @@ WO-O4O-CHECKOUT-REFUND-AUTHORIZATION-CANONICAL-ROLE-CONTRACT-V1 에서 확정.
 membership 판정 SSOT 는 `@o4o/auth-utils` 의 `membershipGate` 이며 데이터원은
 `GET /auth/me` 다(JWT 아님). 5개 서비스가 각자 `lib/membershipGate.ts` 에서
 자기 `SERVICE_KEY` 만 바인딩해 re-export 한다 —
-`kpa-society` · `k-cosmetics` · `glycopharm` · `neture` · `pharmacy-hub`.
+`kpa-society` · `k-cosmetics` · `neture` · `pharmacy-hub`.
 
 ---
 

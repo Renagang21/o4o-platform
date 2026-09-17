@@ -326,7 +326,6 @@ render: (_v, row) => (
 
 | 서비스 | 현재 상태 | Canonical 적용 대상 예시 |
 |--------|-----------|------------------------|
-| **GlycoPharm** | operator pages 미구현 | 회원 신청, 포럼 관리, 상품 승인 |
 | **K-Cosmetics** | operator pages 미구현 | 상품 관리 (파트너 신청은 2026-09-15 Legacy Partner 은퇴) |
 | **KPA (신규)** | 기존 10개 완료 | 추가 moderation 페이지 |
 | **Neture (신규)** | 기존 2개 완료 | ProductServiceApprovalPage 리팩토링 등 |

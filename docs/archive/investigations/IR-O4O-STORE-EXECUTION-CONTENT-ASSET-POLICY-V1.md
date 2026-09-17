@@ -73,7 +73,6 @@ constraint:
    └── Blog 발행 후에도 본문이 두 곳 존재  (재발행 불가)         가리킴          별도 저장
        (duplication 발생)
 
-
 [가설 — 통합 저장]
    자료함 콘텐츠 = kpa_store_contents (single source of truth)
         │
@@ -449,8 +448,6 @@ D는 의도적으로 회피. CLAUDE.md §3 Core 동결 정책과 §13 공통 구
 - `store_library_items`: [apps/api-server/src/routes/platform/entities/store-library-item.entity.ts](apps/api-server/src/routes/platform/entities/store-library-item.entity.ts)
 - `store_execution_assets`: [apps/api-server/src/routes/platform/entities/store-execution-asset.entity.ts](apps/api-server/src/routes/platform/entities/store-execution-asset.entity.ts)
 - `store_qr_codes`: [apps/api-server/src/routes/platform/entities/store-qr-code.entity.ts](apps/api-server/src/routes/platform/entities/store-qr-code.entity.ts)
-- `store_blog_posts` / `staff_blog_posts`: [apps/api-server/src/routes/glycopharm/entities/store-blog-post.entity.ts](apps/api-server/src/routes/glycopharm/entities/store-blog-post.entity.ts)
-- `store_blog_settings`: [apps/api-server/src/routes/glycopharm/entities/store-blog-settings.entity.ts](apps/api-server/src/routes/glycopharm/entities/store-blog-settings.entity.ts)
 - `product_ai_contents`: [apps/api-server/src/modules/store-ai/entities/product-ai-content.entity.ts](apps/api-server/src/modules/store-ai/entities/product-ai-content.entity.ts)
 - `kpa_store_asset_controls`: 자매 IR 참조
 

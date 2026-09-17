@@ -38,7 +38,7 @@ KPA Society 강사 화면에서:
 | Course approval 상태가 변경되는가 | **YES.** PUBLISHED → PENDING_REVIEW 로 자동 회귀. `rejectionReason` 도 null 로 초기화. |
 | Frontend badge 표시 조건 | "미발행" 텍스트 badge: `!lesson.isPublished` (즉 토글 OFF 일 때만). "비공개" 텍스트: 토글 버튼의 **다음 액션 라벨** (`isPublished ? '비공개' : '발행'`) — 강사가 상태로 오인할 위험. |
 | Backend lesson visibility/status | `Lesson.isPublished: boolean` 만 존재 (default `true`). approval/status enum 없음. 수강생 조회 시 자동 필터링 안 함. |
-| 사용 중인 서비스 | KPA-Society **단독**. K-Cosmetics·GlycoPharm·Neture 에는 instructor lesson editor 자체가 없음. |
+| 사용 중인 서비스 | KPA-Society **단독**. K-Cosmetics·Neture 에는 instructor lesson editor 자체가 없음. |
 | 제거 가능 후보 | (a) `LessonService.maybeRevertToPendingReview` 호출 제거 (lesson mutation 시), (b) `CourseEditPage.tsx` 의 레슨별 토글 버튼/미발행 badge, (c) `Lesson.isPublished` 컬럼 자체. |
 | 보류 필요 | (i) 강의 단위 unpublish/archive 운영자 권한, (ii) 강의 단위 visibility(`PUBLIC`/`MEMBERS`), (iii) Quiz/Assignment 변경 시 재승인 트리거 — 별도 결정 필요. |
 
@@ -51,7 +51,6 @@ KPA Society 강사 화면에서:
 - KPA frontend (instructor): [services/web-kpa-society/src/pages/instructor/courses/](services/web-kpa-society/src/pages/instructor/courses/)
 - KPA frontend (student): [services/web-kpa-society/src/pages/lms/](services/web-kpa-society/src/pages/lms/)
 - Operator routes: [apps/api-server/src/routes/kpa/kpa.routes.ts](apps/api-server/src/routes/kpa/kpa.routes.ts)
-- 비교 서비스: web-k-cosmetics / web-glycopharm / web-neture
 - Canonical 문서: [docs/architecture/APP-LMS-BASELINE.md](docs/architecture/APP-LMS-BASELINE.md), [docs/architecture/LMS-SCOPE-GUARD.md](docs/architecture/LMS-SCOPE-GUARD.md)
 
 조사 기준 commit: `main` 동기화 직후 (조사 시점 HEAD).
@@ -320,7 +319,6 @@ if (isPublished !== undefined) {
 |---|---|---|---|
 | KPA-Society | ✅ `/instructor/courses/:id` | ✅ 존재 (현 IR 대상) | ✅ |
 | K-Cosmetics | ❌ 없음 | ❌ | ❌ |
-| GlycoPharm | ❌ 없음 (`/education` 별도 흐름) | ❌ | ❌ |
 | Neture | ❌ 없음 | ❌ | ❌ |
 
 Lesson 토글/뱃지 코드는 **KPA-Society 단독**. 다만 백엔드 `LessonService.maybeRevertToPendingReview` 호출은 LMS 백엔드 공통이므로, 다른 서비스가 추후 lesson editor 를 도입하면 동일한 재승인 트리거가 작동한다.

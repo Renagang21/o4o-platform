@@ -145,7 +145,7 @@ npx tsc --noEmit -p tsconfig.build.json
 
 | 단계 | 호출 | 결과 |
 |------|------|------|
-| baseline | `GET /operator/service-approvals` | offer 3adc23b1 행 2건(glycopharm, kpa-society) 모두 `pending`, reason/decidedBy/decidedAt = null |
+| baseline | `GET /operator/service-approvals` | offer 3adc23b1 행 2건(kpa-society) 모두 `pending`, reason/decidedBy/decidedAt = null |
 | 반려 | `POST /operator/products/3adc23b1/reject {reason}` | offer `REJECTED`, isActive=false. 두 행 모두 `rejected` + reason 저장 + decidedBy(운영자 `cfd2a5e7`)/decidedAt 설정 |
 | **재요청** | `POST /supplier/products/submit-approval {offerIds:[3adc23b1]}` | **`{submitted:1, skipped:[], errors:[]}`** ← 수정 전이라면 `skipped: ALREADY_REQUESTED_OR_DECIDED` 였을 것. **P0 결함 해소 확정** |
 | reset 검증 | `GET /operator/service-approvals` | 두 행 모두 `pending`, **reason=null, decidedBy=null, decidedAt=null** (초기화 확인) |

@@ -51,7 +51,7 @@ Q5 (서비스별 설정):   단일 serviceKey 컬럼, 매핑 테이블 없음
 │  │  (서버 강제)         │     │  (서버 강제)           │        │
 │  │                     │     │                      │        │
 │  │  serviceKey =       │     │  serviceKey =        │        │
-│  │    'glycopharm'     │     │    'glycopharm'       │        │
+│  │                     │     │                       │        │
 │  │  (필수, 단일값)      │     │  (필수, 단일값)        │        │
 │  │                     │     │                      │        │
 │  │  status = 'draft'   │     │  승인 워크플로우        │        │
@@ -70,7 +70,7 @@ Q5 (서비스별 설정):   단일 serviceKey 컬럼, 매핑 테이블 없음
 ┌──────────────────────────────────────────────────────────────┐
 │                    HUB CONTENT QUERY                          │
 │                                                              │
-│  HubContentQueryService.getContents(serviceKey='glycopharm') │
+│  HubContentQueryService.getContents(serviceKey)              │
 │                                                              │
 │  ┌─────────────────────┐     ┌─────────────────────┐        │
 │  │   CMS Query         │     │   Signage Query      │        │
@@ -210,8 +210,6 @@ WHERE m.serviceKey = $1
 **CMS**:
 - `visibilityScope = 'platform'`이 "전체 공개"에 해당하지만...
 - HUB 쿼리는 `WHERE serviceKey = $1`로 필터 → `serviceKey`가 일치해야 함
-- `serviceKey = NULL`인 콘텐츠는 `serviceKey = 'glycopharm'` 조건에 매치되지 않음
-  (SQL: `NULL = 'glycopharm'` → `FALSE`)
 - **따라서**: `visibilityScope='platform'`이라도 특정 serviceKey가 있어야 해당 서비스 HUB에 노출
 
 **Signage**:
@@ -223,7 +221,6 @@ WHERE m.serviceKey = $1
 
 | 시나리오 | 현재 가능 여부 | 방법 |
 |---------|:------------:|------|
-| serviceKey='glycopharm' 콘텐츠를 glycopharm HUB에 노출 | YES | 기본 동작 |
 | 동일 콘텐츠를 kpa HUB에도 노출 | NO (직접) | serviceKey='kpa'로 별도 row 생성 |
 | 모든 서비스 HUB에 일괄 노출 | NO | 각 serviceKey별 row 생성 필요 |
 
@@ -253,7 +250,7 @@ WHERE m.serviceKey = $1
 ┌─────────────────────────────────────────────────────────┐
 │                Single ServiceKey Model                   │
 │                                                         │
-│  Content Row ──── serviceKey: 'glycopharm' ──── 1:1     │
+│  Content Row ──── serviceKey ──── 1:1                   │
 │                                                         │
 │  1 row = 1 serviceKey                                   │
 │  복수 서비스 = 복수 row                                   │
@@ -292,7 +289,6 @@ WHERE m.serviceKey = $1
 
 ### L-1: 복수 서비스 진열 불가 (구조적 한계)
 
-공급자가 동일 콘텐츠를 glycopharm과 cosmetics 두 서비스에 동시에 진열하려면
 두 개의 독립적인 콘텐츠 row를 생성해야 한다.
 
 | 영향 | 수준 |

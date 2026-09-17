@@ -151,9 +151,6 @@ const availableTags = [...new Set(items.flatMap(item => item.tags ?? []))].sort(
 | KPA-Society | `pages/signage/ContentHubPage.tsx` |
 | KPA-Society | `pages/operator/signage/HqMediaPage.tsx` |
 | KPA-Society | `pages/operator/signage/HqPlaylistsPage.tsx` |
-| GlycoPharm | `pages/store-management/signage/ContentHubPage.tsx` |
-| GlycoPharm | `pages/operator/signage/HqMediaPage.tsx` |
-| GlycoPharm | `pages/operator/signage/HqPlaylistsPage.tsx` |
 | K-Cosmetics | `pages/signage/ContentHubPage.tsx` |
 | K-Cosmetics | `pages/operator/signage/HqMediaPage.tsx` |
 | K-Cosmetics | `pages/operator/signage/HqPlaylistsPage.tsx` |

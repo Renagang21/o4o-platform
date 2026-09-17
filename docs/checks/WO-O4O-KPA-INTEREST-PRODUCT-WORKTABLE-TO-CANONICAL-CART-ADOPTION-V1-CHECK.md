@@ -120,7 +120,6 @@ Vitest 단독으로 완료 판정하지 않았다 — typecheck · build · api-
 ## 12. 회귀 (§23)
 
 - KPA 이벤트오퍼 주문: 관련 코드 무변경 + 담기 축 분리 테스트로 고정
-- GlycoPharm regular B2B / Neture B2B / PharmacyHub B2B: 공통 confirm Core 무변경, api-server Jest 통과
 - K-Cosmetics cart 소비: `store-ui-core` 무변경, 해당 vitest 통과
 - 소비자 checkout 은퇴 계약: 무변경
 - **공통 패키지 변경 0** → 소비처 전수 확인 불필요 (변경 자체가 없다)
@@ -143,7 +142,7 @@ read-only 만 수행했다. **실사용 금전 write 0.**
 
 1. **다중 조직 매장 사용자** — `useStoreCart` 가 `checkoutConfirmB2B(serviceKey)` 를 조직 힌트
    없이 호출하므로 confirm 에서 `AMBIGUOUS_STORE_ORGANIZATION` 이 난다. 공통 패키지의
-   기존 동작이며 GlycoPharm 도 동일하다. 별도 WO 대상.
+   별도 WO 대상.
 2. `useStoreCart` 의 "b2b 1건이면 cart 전체를 b2b confirm 으로" 라우팅 — 공통 패키지 변경이라
    범위 밖. 이번엔 producer 쪽에서 혼재를 막는 것으로 대응했다.
 

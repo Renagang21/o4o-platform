@@ -16,7 +16,7 @@
 ## 2. 신규 entity / table
 
 - **`ForeignVisitorPartner`** (`foreign_visitor_partners`) — 외국인 관광객 유입 파트너 마스터.
-- 소유 축: `organization_id`(Store Ops Boundary) + `service_key`('kpa'|'glycopharm'|'cosmetics', /me/check 와 동일).
+- 소유 축: `organization_id`(Store Ops Boundary) + `service_key`.
 - 컬럼: id, service_key, organization_id, partner_type, partner_name, contact_name?, contact_phone?, contact_email?, status(default ACTIVE), memo?, created_by?, updated_by?, created_at, updated_at, **deleted_at?(soft delete)**.
 - `partnerType`: TRAVEL_AGENCY | GUIDE | HOTEL | BUS_OPERATOR | MEDICAL_TOUR_COORDINATOR | OTHER.
 - `status`: ACTIVE | INACTIVE (**승인 workflow 없음** — PENDING/APPROVED/REJECTED V1 제외).

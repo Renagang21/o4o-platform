@@ -5,7 +5,6 @@
 - **성격**: 조사 전용 (read-only) — 제품 코드 변경 0 · 리팩터링 0 · route/UI/권한 변경 0 · migration/DB write/배포 0
 - **기준 HEAD**: `8750e090f` (worktree clean, `HEAD == origin/main`)
 - **판정**: **공통화 착수 가능.** 단, 착수 지점은 Operator/Store 계층이 아니라 **공개 Header · Mobile Bottom Nav 계층**이다.
-  GlycoPharm `scopeRoleMapping` 누락은 **선행 정비 필요 = NO (병행 가능)** — 다만 **독립 WO 로 반드시 처리해야 하는 실 결함**이다.
 
 선행: [`CHECK-O4O-PHARMACY-HUB-ADMIN-ROLE-CATALOG-SEED-V1`](CHECK-O4O-PHARMACY-HUB-ADMIN-ROLE-CATALOG-SEED-V1.md) §11 에서
 "선행 정비로 넘긴 항목" 이 본 조사의 입력이다.
@@ -28,21 +27,21 @@
 
 ### 2-1. 진입 · 레이아웃 골격
 
-| 축 | kpa-society (기준) | k-cosmetics | glycopharm | neture | pharmacy-hub |
-|---|---|---|---|---|---|
-| `App.tsx` 줄수 | 1,206 | 907 | 1,133 | 1,252 | **227** |
-| lazy + Suspense | ✅ | ✅ | ✅ | ✅ | ❌ (전량 eager) |
-| 로딩 컴포넌트 | `PageLoader` (inline style + `LoadingSpinner`) | `PageLoading` (Tailwind, pink-600) | `PageLoading` (Tailwind, primary-600) | `PageLoading` (`Loading...` 텍스트) | 없음 |
-| ErrorBoundary | `O4OErrorBoundary` | 동일 | 동일 | 동일 | 동일 |
-| Toast | `O4OToastProvider` | 동일 | 동일 | 동일 | 동일 |
-| 로그인 UX | 모달 (`LoginModalContext`) | 모달 (`LoginModalContext`) | 모달 (`LoginModalContext` + **별도 `RegisterModalContext`**) | 페이지 | 페이지 |
-| 레이아웃 파일 수 | 1 (`layouts/MyPageLayout`) + `components/Layout.tsx` | 4 | **7** (Kiosk/Store/Tablet/Hub 추가) | **9** (Partner/Supplier 축 추가) | **1** (`StoreOwnerShell`) |
+| 축 | kpa-society (기준) | k-cosmetics | neture | pharmacy-hub |
+|---|---|---|---|---|
+| `App.tsx` 줄수 | 1,206 | 907 | 1,252 | **227** |
+| lazy + Suspense | ✅ | ✅ | ✅ | ❌ (전량 eager) |
+| 로딩 컴포넌트 | `PageLoader` (inline style + `LoadingSpinner`) | `PageLoading` (Tailwind, pink-600) | `PageLoading` (`Loading...` 텍스트) | 없음 |
+| ErrorBoundary | `O4OErrorBoundary` | 동일 | 동일 | 동일 |
+| Toast | `O4OToastProvider` | 동일 | 동일 | 동일 |
+| 로그인 UX | 모달 (`LoginModalContext`) | 모달 (`LoginModalContext`) | 페이지 | 페이지 |
+| 레이아웃 파일 수 | 1 (`layouts/MyPageLayout`) + `components/Layout.tsx` | 4 | **9** (Partner/Supplier 축 추가) | **1** (`StoreOwnerShell`) |
 
 > `O4OErrorBoundary` · `O4OToastProvider` 는 이미 `@o4o/error-handling` 공용이다. **오류 UX 는 공통화 대상이 아니다(완료 상태).**
 
 ### 2-2. 메뉴 정의 위치 · 줄수
 
-| 파일 | kpa | kcos | glyco | neture | pharmacy-hub |
+| 파일 | kpa | kcos || neture | pharmacy-hub |
 |---|--:|--:|--:|--:|--:|
 | `config/navigation.ts` (공개 헤더 메뉴) | 64 | 58 | 63 | 66 | **없음** |
 | `config/operatorMenuGroups.ts` | 218 | 131 | 206 | 287 | **없음** |
@@ -70,7 +69,6 @@
 |---|---|---|---|---|
 | kpa-society | 💊 | KPA-Society | 약사 전문 플랫폼 | `#2563eb` |
 | k-cosmetics | `<Sparkles/>` | K-Cosmetics | K-Beauty 전문 플랫폼 | `#db2777` |
-| glycopharm | 💉 | GlycoPharm | 혈당관리 전문 플랫폼 | `#059669` |
 | neture | 🌿 | Neture | 공급자·파트너 협업 플랫폼 | `#059669` |
 | pharmacy-hub | `config/service.ts` `BRAND` | Pharmacy-Hub | — | — |
 
@@ -80,7 +78,7 @@
 
 ### 3-1. `getUserDisplayName` — **4개 서비스 바이트 동일**
 
-`KpaGlobalHeader` · `KCosGlobalHeader` · `GlycoGlobalHeader` · `NetureGlobalHeader` 에 같은 함수가 들어 있다
+`KpaGlobalHeader` · `KCosGlobalHeader` · `NetureGlobalHeader` 에 같은 함수가 들어 있다
 (차이는 인자 타입 `UserType` vs `any` 뿐).
 
 ```ts
@@ -96,7 +94,7 @@ function getUserDisplayName(user: any): string {
 
 ### 3-2. `filterContextualNav` — 4개 동일 본문, **KPA 만 분기 1개 누락**
 
-kcos · glyco · neture 는 `if (vis.isAdminOrOperator) return items.map(...)` 단축 분기를 갖지만
+kcos · neture 는 `if (vis.isAdminOrOperator) return items.map(...)` 단축 분기를 갖지만
 **kpa 에는 없다.** 즉 동일 계약을 의도한 함수가 서비스마다 미세하게 어긋나 있다 — 공통화의 전형적 근거다.
 
 ### 3-3. `filterMenuByRole` — 4개 완전 동일 (각 ~12줄)
@@ -105,9 +103,6 @@ kcos · glyco · neture 는 `if (vis.isAdminOrOperator) return items.map(...)` �
 
 ### 3-4. MobileBottomNav — **최대 중복**
 
-- `diff web-k-cosmetics/MobileBottomNav.tsx web-glycopharm/MobileBottomNav.tsx` = **64줄**, 전 hunk 가
-  용어(`매장 경영`↔`약국 경영`) · 경로(`/mobile/store`↔`/mobile/pharmacy`) · 판정함수명(`isStoreActive`↔`isPharmacyActive`) · 색(`#db2777`↔`#059669`)
-  **네 가지 Config 값 차이뿐**이다.
 - kpa(371) 과 neture(274) 는 더 풍부한 동일 구조를 공유한다 — `formatRelative`,
   `useState<'none'|'profile'|'notif'>` 시트 상태머신, ESC keydown, `useEffect(..., [pathname])` 자동 닫기,
   backdrop, 알림 시트, 프로필 시트 슬롯, 그리고 동일한 스타일 상수(`NAV_CLASS` · `navSafeArea` · `tabStyle` · `activeStyle` · `loginStyle` · `labelStyle` · `badgeStyle`).
@@ -115,12 +110,11 @@ kcos · glyco · neture 는 `if (vis.isAdminOrOperator) return items.map(...)` �
 ### 3-5. 알림 배선 블록 — 4개 반복
 
 `useNotifications(notificationsApi, { enabled, serviceKey })` + `<NotificationBell/>` (동일 7 props) + `handleNotificationClick`.
-kpa/neture 는 `resolve*NotificationTarget` SSOT 로 위임하고, kcos/glyco 는 `metadata.targetUrl` 을 인라인 처리한다 → **계약 불일치**.
 
 ### 3-6. 미사용 공용 헬퍼
 
 `@o4o/operator-ux-core` 의 `isAdminOrOperator(roles, prefix)` 가 존재하지만
-**헤더 어댑터 4개 중 사용처 0**. kcos/glyco 는 문자열 직접 비교, neture 는 자체 `lib/role-constants` 를 쓴다.
+**헤더 어댑터 4개 중 사용처 0**.
 → 신규 패키지가 아니라 **기존 헬퍼 채택**만으로 해소되는 중복이다.
 
 ---
@@ -135,7 +129,7 @@ kpa/neture 는 `resolve*NotificationTarget` SSOT 로 위임하고, kcos/glyco �
 | Mobile bottom nav 셸 (safe-area · 시트 상태머신 · ESC · pathname 자동닫기 · backdrop · 스타일 상수 · `formatRelative`) | 4서비스 | **`@o4o/ui` layout** | `ResponsiveTabBar` 선례와 동일 성격(동작만 강제, 디자인 미강제). `MobileSafeArea` 도 이미 여기 있음 |
 | `filterContextualNav` | 4서비스 `navigation.ts` | **`@o4o/ui` layout (GlobalHeader 인접)** | 본문 동일. 차이는 술어 키 이름뿐 → `visibility: Record<string, boolean>` 로 일반화 가능 |
 | `filterMenuByRole` + `UnifiedMenuItem` | 4서비스 `operatorMenuGroups.ts` | **`@o4o/ui` operator-shell** | `OperatorMenuItem` · `OperatorGroupKey` 가 이미 거기 있음 |
-| 알림 배선(`useNotifications` + `NotificationBell` props 세트) | 4서비스 헤더 | Core 후보이나 **§4-5 선행 정비 이후** | kcos/glyco 의 targetUrl 계약이 kpa/neture 와 다름 |
+| 알림 배선(`useNotifications` + `NotificationBell` props 세트) | 4서비스 헤더 | Core 후보이나 **§4-5 선행 정비 이후** | — |
 
 ### 4-2. Config (값만 다른 항목 — 서비스에 남기되 형식만 표준화)
 
@@ -149,11 +143,9 @@ kpa/neture 는 `resolve*NotificationTarget` SSOT 로 위임하고, kcos/glyco �
 
 | 항목 | 서비스 | 왜 Extension 인가 |
 |---|---|---|
-| `KpaUserMenuItems` / `NetureUserMenuItems` / kcos·glyco 인라인 userMenu 트리 | 전 서비스 | 역할별 업무 의미가 다르다. 합치면 공용 컴포넌트 안에 서비스 분기가 생긴다 |
 | 공급자·파트너 축 (`SupplierOpsLayout` · `PartnerSpaceLayout` 등 5) | neture | store-hub 축 자체가 없다 |
-| Kiosk · Tablet · Store 레이아웃 (3) | glycopharm | 하드웨어/현장 화면. 다른 서비스에 대응물 없음 |
 | 크레딧 잔액 뱃지 | kpa | 고유 도메인 |
-| `productionTemplates.ts` | kcos · glyco | 제작 자산 도메인 (kpa/neture 무관) |
+| `productionTemplates.ts` | kcos | 제작 자산 도메인 (kpa/neture 무관) |
 | `seoRegistry.ts` | kpa · neture | 공개 SEO 축 보유 서비스만 |
 
 ### 4-4. Local (불안정하거나 공통화 가치 낮음 — 그대로 둔다)
@@ -169,66 +161,10 @@ kpa/neture 는 `resolve*NotificationTarget` SSOT 로 위임하고, kcos/glyco �
 
 | # | 항목 | 상태 | 공통화 차단 여부 |
 |---|---|---|:--:|
-| S1 | **GlycoPharm `scopeRoleMapping` 누락** (§5) | 실 결함 | **차단 아님** (백엔드 축) — 단 독립 WO 필수 |
-| S2 | `@o4o/operator-ux-core` `ServiceKey` union 이 `'kpa-society' \| 'glycopharm' \| 'k-cosmetics'` — **neture · pharmacy-hub 없음** | 구조 갭 | **차단** — 5서비스 공용 config 계층을 쓰려면 먼저 확장 |
+| S1 | — | 실 결함 | **차단 아님** (백엔드 축) — 단 독립 WO 필수 |
 | S3 | 알림 targetUrl 해석 계약 2종 (SSOT 위임 vs 인라인) | 계약 불일치 | 알림 Core 화만 차단 |
 | S4 | KPA `filterContextualNav` 의 `isAdminOrOperator` 단축 분기 누락 | 동작 미세 불일치 | 차단 아님 (Core 화 시 자동 수렴) |
 | S5 | neture `OperatorLayoutWrapper` 가 `filterMenuByRole(UNIFIED_MENU, **false**)` 하드코딩 → `adminOnly: true` **21개 항목이 operator 화면에서 항상 숨겨짐** | 관찰 (의도일 수 있음) | 차단 아님 — 범위 밖, 보고만 |
-
----
-
-## 5. GlycoPharm `scopeRoleMapping` 누락 — 영향과 수정 범위 (조사만, 수정 없음)
-
-### 5-1. 결함
-
-`packages/security-core/src/service-configs.ts:180-189`
-
-```ts
-export const GLYCOPHARM_SCOPE_CONFIG: ServiceScopeGuardConfig = {
-  serviceKey: 'glycopharm',
-  allowedRoles: ['glycopharm:admin', 'glycopharm:operator'],
-  platformBypass: true,
-  legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'cosmetics'],
-};   // ← scopeRoleMapping 없음
-```
-
-KPA(126-129) · NETURE(149-154) · COSMETICS(208-211) · PHARMACY_HUB 는 모두 정의돼 있다.
-**mapping 이 없으면 `allowedRoles` 전체가 허용**되므로 `glycopharm:admin` scope 를 `glycopharm:operator` 가 통과한다 (계층 붕괴).
-이 사실은 이미 테스트 주석에 기록돼 있다 — `apps/api-server/src/__tests__/security/pharmacy-hub-scope-guard.spec.ts:167`
-"mapping 이 비면 allowedRoles 전체가 허용되어 계층이 무너진다 (GlycoPharm 이 그 상태다)".
-
-`PLATFORM_SCOPE_CONFIG` 도 mapping 이 없으나 allowedRoles 가 1개라 붕괴가 발생하지 않는다.
-
-### 5-2. 실제 영향 범위 (실측)
-
-가드는 `createMembershipScopeGuard(GLYCOPHARM_SCOPE_CONFIG)` (`glycopharm.routes.ts:98`) 로 주입된다.
-`'glycopharm:admin'` 을 요구하는 지점은 **11곳**이며, 현재 전부 `glycopharm:operator` 로 통과 가능하다.
-
-| 위치 | 엔드포인트 | 성격 |
-|---|---|---|
-| `controllers/glycopharm.controller.ts` 145·171·213·240·285 | `GET/POST /admin/pharmacies`, `GET/PUT /admin/pharmacies/:id`, `PATCH /admin/pharmacies/:id/status` | 약국 마스터 CRUD + 상태변경 |
-| 〃 330·362·414·441·500 | `GET/POST /admin/products`, `GET/PUT /admin/products/:id`, `PATCH /admin/products/:id/status` | 상품 마스터 CRUD + 상태변경 |
-| `glycopharm.routes.ts:363` | `/glycopharm/operator/**` (Action Queue router) | **경로명은 operator 인데 요구 scope 는 admin** |
-
-프런트는 `OperatorLayoutWrapper` 가 `isAdminOrAbove(user.roles, 'glycopharm')` 로 `adminOnly` 메뉴 3건을 숨긴다.
-즉 **화면에서는 가려지지만 API 는 열려 있다** — 전형적 UI-only 방어 상태다.
-
-### 5-3. 수정 범위 (실행하지 않음)
-
-1. `GLYCOPHARM_SCOPE_CONFIG` 에 mapping 추가:
-   `{'glycopharm:admin': ['glycopharm:admin'], 'glycopharm:operator': ['glycopharm:operator','glycopharm:admin']}`
-2. **동시에 `glycopharm.routes.ts:363` 재판정 필요.** mapping 을 추가하면 `/glycopharm/operator/**` Action Queue 가
-   admin 전용으로 **좁아진다.** 경로 의미상 `'glycopharm:operator'` 로 바꾸는 것이 맞을 가능성이 높으나,
-   이는 **권한 변경**이므로 본 감사 범위 밖이다.
-3. `scope-guard.spec.ts` 에 계층 고정 테스트 추가 (pharmacy-hub spec 의 `config 계약` 블록과 동형).
-
-### 5-4. 판정
-
-- **공통화의 선행 조건은 아니다.** 이번 공통화는 **프런트 메뉴·레이아웃** 축이고, 이 결함은 **백엔드 scope guard** 축이다. 접점이 없다.
-- 다만 `packages/security-core` 는 **F1 Frozen Baseline** 이고 수정이 **권한 변경**을 동반하므로
-  **반드시 별도 WO** 로 처리해야 한다. 우선순위는 **공통화보다 높다** (인가 결함이므로).
-- 결론: **병행 처리 — 공통화 착수를 막지 않되, 별도 WO 를 즉시 발행한다.**
 
 ---
 
@@ -257,7 +193,6 @@ KPA(126-129) · NETURE(149-154) · COSMETICS(208-211) · PHARMACY_HUB 는 모두
 2. operator 레이아웃 wrapper 4종 — 이미 얇다.
 3. `PageLoading` / `PageLoader` — 디자인 토큰 차이.
 4. userMenuItems 트리 — 역할·업무 의미가 다름 (Extension).
-5. glycopharm Kiosk/Tablet/Store, neture Supplier/Partner 레이아웃 — 대응물 부재.
 6. `UNIFIED_MENU` · `ENABLED_CAPABILITIES` — 이미 Config 로 올바르게 분리돼 있다. **Core 로 올리면 안 된다.**
 7. **전 서비스를 한 번에 바꾸는 셸 프레임워크** — 만들지 않는다. 항목 단위로 옮긴다.
 
@@ -285,7 +220,7 @@ KPA(126-129) · NETURE(149-154) · COSMETICS(208-211) · PHARMACY_HUB 는 모두
 | 예상 후 | Core ~230줄 + 서비스별 탭/색/용어 Config 40~60줄 × 4 = **약 430~470줄** |
 | 순감 | **약 -500줄** |
 | 위험 | 중간 — 모바일 실기기 회귀 검증 필요 (safe-area · 시트 · ESC · 활성 판정) |
-| 착수 순서 | **kcos → glyco** (diff 64줄로 가장 안전) → neture → kpa |
+| 착수 순서 | — |
 
 ### 그다음: **G3 — `filterMenuByRole` · `filterContextualNav` 흡수**
 
@@ -311,9 +246,9 @@ KPA(126-129) · NETURE(149-154) · COSMETICS(208-211) · PHARMACY_HUB 는 모두
 
 | 순위 | WO(안) | 성격 | 비고 |
 |:--:|---|---|---|
-| 1 | `WO-O4O-GLYCOPHARM-SCOPE-ROLE-MAPPING-HARDENING-V1` | 인가 결함 수정 | F1 Frozen 패키지 + 권한 변경 → **명시 승인 필요**. §5-3 의 3단계 |
+| 1 | — | 인가 결함 수정 | F1 Frozen 패키지 + 권한 변경 → **명시 승인 필요**. §5-3 의 3단계 |
 | 2 | `WO-O4O-SERVICE-HEADER-DISPLAYNAME-CORE-V1` | 공통화 G1 | 최소 위험 착수 |
-| 3 | `WO-O4O-SERVICE-BOTTOM-NAV-CORE-V1` | 공통화 G2 | kcos·glyco 우선 2서비스 파일럿 후 확대 |
+| 3 | `WO-O4O-SERVICE-BOTTOM-NAV-CORE-V1` | 공통화 G2 | — |
 | 4 | `WO-O4O-SERVICE-NAV-FILTER-CORE-V1` | 공통화 G3 | S4 동시 해소 |
 | 5 | `WO-O4O-OPERATOR-UX-CORE-SERVICEKEY-EXTENSION-V1` | 선행 정비 S2 | 5서비스 공용 config 계층을 쓸 때 필요 |
 | — | (보고만) S3 알림 targetUrl 계약 · S5 neture adminOnly 21건 | 관찰 | 별도 판단 필요 |
@@ -327,7 +262,7 @@ KPA(126-129) · NETURE(149-154) · COSMETICS(208-211) · PHARMACY_HUB 는 모두
 | WO 범위 밖 파일 수정 필요 | ❌ — 본 작업은 read-only, 수정 0 |
 | DB schema · migration · 데이터 변경 필요 | ❌ |
 | dependency · lockfile 변경 필요 | ❌ |
-| Core · Frozen Baseline 변경 필요 | ⚠️ — GlycoPharm 수정은 F1 변경이므로 **수정하지 않고 §9 1번 WO 로 분리** |
+| Core · Frozen Baseline 변경 필요 | — |
 | 권한 · route · API contract 변경 필요 | ⚠️ — 동일. 조사만 하고 분리 |
 
 ---

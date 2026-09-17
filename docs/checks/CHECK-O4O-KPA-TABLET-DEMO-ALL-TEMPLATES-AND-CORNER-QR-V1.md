@@ -19,7 +19,7 @@
 - URL 은 **서버가 Screen Set `public_qr_slug` 로 도출**(임의 URL 아님) — 기존 계약 그대로.
 - 중복 제거: 상단 전용 QR 카드 + 하단 보조 QR 배너 삭제 → 헤더 QR 로 통일.
 - idle_touch 는 상단 hero 의 QR chip 유지(헤더 QR 생략) → "대기 영상 화면에서도 작은 QR 유지".
-- legacy(GP/KCos, qrGuide 없음)는 기존 'QR 코드로 접속' 텍스트 배지 유지 → 무영향.
+- legacy(KCos, qrGuide 없음)는 기존 'QR 코드로 접속' 텍스트 배지 유지 → 무영향.
 - 상품 상세 헤더 QR 과 코너 메인 QR 모두 유지.
 
 ## 2. 데모 데이터

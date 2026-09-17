@@ -13,7 +13,7 @@
 
 - KPA 는 매장 조직을 만들 때 `organizations` + `organization_members` + `role_assignments`
   + `platform_store_slugs` 만 기록했다.
-- `organization_service_enrollments` 는 K-Cosmetics / GlycoPharm / Pharmacy-Hub / Neture
+- `organization_service_enrollments` 는 K-Cosmetics / Pharmacy-Hub / Neture
   프로비저닝이 각자 `enrollService()` 로 채우고 있었고, KPA 만 그 단계가 통째로 빠져 있었다.
 - 그 결과 "KPA 매장인가?" 를 판정할 유일한 흔적이 `platform_store_slugs.service_key='kpa'`
   하나뿐이었고, 선행 WO(store-owner service-scoped resolution)가 slug 를 보조 근거로
@@ -24,7 +24,6 @@
 | 서비스 | enrollment 기록 | 기록 위치 |
 |---|:---:|---|
 | K-Cosmetics | O | `routes/cosmetics/services/cosmetics-store.service.ts` |
-| GlycoPharm | O | provisioning + `20260222900000-GlycopharmOrgEnrollmentRepair` |
 | Pharmacy-Hub | O | `services/pharmacy-hub/PharmacyHubStoreProvisioningService.ts` |
 | Neture(공급자) | O | `modules/auth/controllers/auth-register.controller.ts` |
 | **KPA** | **X** | — (본 WO 에서 신설) |
@@ -118,7 +117,7 @@ store_owner 연결 정상:       4        (organization_members owner/admin/mana
 | `utils/auto-listing.utils.ts` | PUBLIC/SERVICE offer 확산 시 신규 KPA 조직에 `organization_product_listings` 행 생성 (`is_active=false`) | 노출 없음(비활성). 다만 `service_key='kpa-society'` 로 기록되고 KPA 매장 UI 는 `'kpa'` 로 조회 → **키 체계 불일치를 후속 항목으로 기록** (본 WO 에서 고치면 범위 확대) |
 | `modules/neture/guards/drug-access.guard.ts` | **변화 없음** | 아래 상세 |
 | `modules/neture/services/seller.service.ts` `resolveServiceKey()` | 변화 없음 (기본값이 이미 `'kpa-society'`) |
-| pharmacy-hub / glycopharm / cosmetics / neture 소비처 | 변화 없음 (각자 자기 `service_code` 로만 조회) |
+| pharmacy-hub / cosmetics / neture 소비처 | 변화 없음 (각자 자기 `service_code` 로만 조회) |
 
 ### drug gate 무영향 근거
 

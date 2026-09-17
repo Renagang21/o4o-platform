@@ -3,7 +3,7 @@
  *
  * WO-O4O-PHARMACY-HUB-OPERATOR-SHELL-COMMON-CORE-ADOPTION-V1
  *
- * KPA-Society / K-Cosmetics / GlycoPharm 와 동일한 공통 구조로 편입한다:
+ * KPA-Society / K-Cosmetics 와 동일한 공통 구조로 편입한다:
  *   OperatorAreaShell(@o4o/operator-ux-core) + DomainIASidebar + 서비스별 menu/header/config.
  * Pharmacy-Hub 전용 Layout·Sidebar 사본을 만들지 않는다.
  *

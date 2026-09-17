@@ -31,7 +31,6 @@
 > orphaned migration 잔여 32 → **29**.
 
 ## 3. 절대 보호 — live `kpa_store_contents` 무변경 (검증)
-- live 경로 `routes/o4o-store/controllers/store-content.controller.ts`(`createStoreContentController`, **KpaStoreContent=kpa_store_contents**) 및 KPA/Glyco/Cosmetics `/{service}/store-contents` 마운트 **무변경**.
 - 삭제 후 잔여 `StoreContentController` substring grep = **`createStoreContentController`**(live 함수, 별개) 뿐 → 우리가 제거한 클래스/서비스 참조 **0**.
 - `published-assets.controller.ts` 의 `sc` JOIN = `LEFT JOIN kpa_store_contents`(live) — 무관·무변경.
 - frontend `web-kpa-society/api/assetSnapshot.ts` 의 `/store-contents`(서비스 prefix) 호출 = kpa_store_contents 대상, 무영향.
@@ -62,7 +61,6 @@ LMS course/lesson/certificate/enrollment/template route : 무변경(보존)
 ```
 GET /api/v1/lms/store-contents        → 기대: 404/Not Found (route 제거됨; 기존 401→이제 404)
 GET /api/v1/lms/courses               → 기대: 기존과 동일(정상/auth-first) — LMS 본체 무회귀
-GET /api/v1/{kpa|glycopharm}/store-contents → 기대: 기존 auth-first/정상 — live kpa_store_contents 무회귀
 ```
 
 ## 7. 완료 기준 체크 (WO §9)

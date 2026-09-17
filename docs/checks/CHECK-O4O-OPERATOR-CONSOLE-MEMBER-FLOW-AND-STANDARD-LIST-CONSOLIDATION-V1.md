@@ -165,7 +165,7 @@ IR 은 이 페이지를 "`ListColumnDef` 는 쓰면서 `DataTable` 미사용 = �
 - 변경 파일은 `apps/api-server/src/routes/kpa/services/operator-dashboard.service.ts` **1개**이며
   **KPA 전용 대시보드 KPI** 에만 영향한다.
 - 공용 컴포넌트·frontend·타 서비스 **무변경**(§3 중지).
-- Neture / GlycoPharm / K-Cosmetics 코드 경로 **변화 0**.
+- Neture / K-Cosmetics 코드 경로 **변화 0**.
 
 ## 6. 권한 교차 검증 (배포 후)
 

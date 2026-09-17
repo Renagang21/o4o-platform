@@ -64,8 +64,6 @@ ERROR:  cannot execute CREATE TABLE in a read-only transaction
 | `kpa:store_owner` | 5 | 5 | 5 | 5 | 5 |
 | `platform:super_admin` | 5 | 4 | 2 | 2 | **2** |
 | `pharmacy-hub:store_owner` | 3 | 3 | 3 | 3 | 3 |
-| `glycopharm:admin` | 2 | 2 | 2 | 2 | 2 |
-| `glycopharm:operator` | 2 | 2 | 2 | 2 | 2 |
 | `cosmetics:store_owner` | 2 | 2 | 2 | 2 | 2 |
 | `pharmacy` | 2 | 2 | 2 | 2 | 1 |
 | `neture:operator` | 2 | 2 | 1 | 1 | 1 |
@@ -74,7 +72,6 @@ ERROR:  cannot execute CREATE TABLE in a read-only transaction
 | `kpa:admin` | 1 | 1 | 1 | 1 | 1 |
 | `kpa:operator` | 1 | 1 | 1 | 1 | 1 |
 | `neture:admin` | 1 | 1 | 1 | 1 | 1 |
-| `glycopharm:store_owner` | 1 | 1 | 1 | 1 | 1 |
 | `pharmacy-hub:operator` | 1 | 1 | 1 | 1 | 1 |
 | `pharmacy-hub:supplier` | 1 | 1 | 1 | 1 | 1 |
 | `lms:instructor` | 1 | 1 | 1 | 1 | 1 |
@@ -138,9 +135,6 @@ ERROR:  cannot execute CREATE TABLE in a read-only transaction
 
 | role 문자열 | 접두 | 성격 | active 계정 | 로그인 가능 | 동일 service_key membership 연결 |
 |-------------|------|------|---:|---:|---:|
-| `glycopharm:admin` | glycopharm | admin | 2 | 2 | 2 / 2 |
-| `glycopharm:operator` | glycopharm | operator | 2 | 2 | 2 / 2 |
-| `glycopharm:store_owner` | glycopharm | store | 1 | 1 | 1 / 1 |
 | `neture:admin` | neture | admin | 1 | 1 | 1 / 1 |
 | `neture:operator` | neture | operator | 1 | 1 | 1 / 1 |
 | `cosmetics:admin` | cosmetics | admin | 1 | 1 | **0 / 1** |
@@ -155,15 +149,15 @@ ERROR:  cannot execute CREATE TABLE in a read-only transaction
 | `lms:instructor` | lms | 기능 역할 | 1 | 1 | **0 / 1** (lms 는 service 가 아님) |
 | `platform:super_admin` | platform | 플랫폼 | 2 | 2 | 1 / 2 |
 
-**실제 존재하는 role 접두 7종:** `cosmetics` · `glycopharm` · `kpa` · `lms` · `neture` · `pharmacy-hub` · `platform`
+**실제 존재하는 role 접두 7종:** `cosmetics` · `kpa` · `lms` · `neture` · `pharmacy-hub` · `platform`
 
-**축 불일치 (중요):** membership 연결 0 은 membership 부재가 아니라 **키 문자열 축이 다르기 때문**이다. `service_memberships.service_key` 실측 값은 `glycopharm` · `k-cosmetics` · `kpa-society` · `neture` · `pharmacy-hub` · `platform` 이다.
+**축 불일치 (중요):** membership 연결 0 은 membership 부재가 아니라 **키 문자열 축이 다르기 때문**이다. `service_memberships.service_key` 실측 값은 `k-cosmetics` · `kpa-society` · `neture` · `pharmacy-hub` · `platform` 이다.
 
 | role 접두 | 대응 service_key | 일치 |
 |---|---|:---:|
 | `cosmetics:` | `k-cosmetics` | ✗ |
 | `kpa:` | `kpa-society` | ✗ |
-| `glycopharm:` / `neture:` / `pharmacy-hub:` / `platform:` | 동일 | ✓ |
+| `neture:` / `pharmacy-hub:` / `platform:` | 동일 | ✓ |
 
 → `split_part(role,':',1) = service_key` 를 가정한 코드가 있다면 cosmetics·kpa 에서 오작동한다. 역할명만으로 serviceKey 를 추측하지 말라는 WO 지시가 실측으로 확인되었다.
 
@@ -171,7 +165,6 @@ ERROR:  cannot execute CREATE TABLE in a read-only transaction
 
 | service_key | status | rows |
 |---|---|---:|
-| glycopharm | active | 4 |
 | k-cosmetics | active / pending | 5 / 1 |
 | kpa-society | active | 5 |
 | neture | active | 4 |
@@ -292,13 +285,13 @@ targetServices  : serviceCode 가 주어지면 [serviceCode]
 ```
 
 **결함 1 — 비관리자에게는 토큰에도 scope 가 생성되지 않는다.**
-로그인 경로는 `deriveUserScopes` 에 `serviceCode` 를 **전달하지 않는다**. 따라서 `scopeLevel !== 'admin'` 인 모든 계정(operator 포함)의 `targetServices` 가 `[]` 가 되어 `payload.scopes = []` 다. 프로덕션의 operator 역할 보유자 5명(`glycopharm:operator` 2, `neture:operator` 1, `cosmetics:operator` 1, `kpa:operator` 1, `pharmacy-hub:operator` 1) 은 **토큰에 scope 를 받지 못한다.**
+로그인 경로는 `deriveUserScopes` 에 `serviceCode` 를 **전달하지 않는다**. 따라서 `scopeLevel !== 'admin'` 인 모든 계정(operator 포함)의 `targetServices` 가 `[]` 가 되어 `payload.scopes = []` 다. 프로덕션의 operator 역할 보유자 5명 은 **토큰에 scope 를 받지 못한다.**
 
 **결함 2 — 생성된 scope 조차 `req.user` 에 전달되지 않는다.**
 `authentication.middleware.ts` 의 세 개 인증 블록(`requireAuth` L148-154, `optionalAuth` L222-225, `requirePlatformUser` L316-319) 은 **`roles` 와 `memberships` 만 할당하고 `scopes` 는 할당하지 않는다.** DB 에서 로드한 `User` 엔티티에 scopes 필드가 채워지는 지점이 없으므로, 백엔드의 모든 `req.user.scopes` 읽기는 `undefined → []` 로 평가된다.
 
 **결함 3 — 일부 scope 는 애초에 생성 불가능하다.**
-`config/service-scopes.ts` 의 `SERVICE_SCOPES` 키는 `glycopharm` · `neture` · `kpa-society` · `cosmetics` **4개뿐**이며 `yaksa` · `dropshipping` 이 없다. 따라서 `yaksa:admin` · `dropshipping:admin` scope 는 어떤 경로로도 발급되지 않는다.
+`config/service-scopes.ts` 의 `SERVICE_SCOPES` 키는 `neture` · `kpa-society` · `cosmetics` **4개뿐**이며 `yaksa` · `dropshipping` 이 없다. 따라서 `yaksa:admin` · `dropshipping:admin` scope 는 어떤 경로로도 발급되지 않는다.
 
 **소비 지점의 실제 판정 결과:**
 
@@ -337,7 +330,7 @@ targetServices  : serviceCode 가 주어지면 [serviceCode]
 | 2 | `DELETE /api/v1/operator/membership/:userId/roles/:role` → `removeMemberRole` (L1265) | 동일 | 회수. **마지막 `platform:super_admin` 회수 차단 로직 내장** (L1240-1258) |
 | 3 | `DELETE /api/v1/admin/users/:userId/role-assignments/:role` → `AdminUserController.revokeRoleAssignment` | `requireRole(['platform:admin','platform:super_admin'])` | 계정 삭제 없이 배정만 비활성화. **`platform:super_admin` 회수 전면 차단** (L507-511) |
 | 4 | `AdminUserController` 계정 생성·수정 (L254/290/368/372) | 동일 ADMIN_ROLES | 생성 시 역할 동시 부여 |
-| 5 | 서비스 승인 흐름 자동 부여 | 각 서비스 가드 | `supplier.service.ts`(supplier), `member.controller.ts`(kpa), `instructor.service.ts`(lms:instructor), `cosmetics-store.service.ts`, `glycopharm-member.service.ts`, `partner-contract.service.ts`, `socialAuthService.ts` |
+| 5 | 서비스 승인 흐름 자동 부여 | 각 서비스 가드 | `supplier.service.ts`(supplier), `member.controller.ts`(kpa), `instructor.service.ts`(lms:instructor), `cosmetics-store.service.ts`, `partner-contract.service.ts`, `socialAuthService.ts` |
 | 6 | migration / 스크립트 | 없음(운영자 수동) | `ActivateAdminUser` migration, `create-admin-user.ts`, `diagnose-admin-login.ts`, 접두 migration 3종 |
 | 7 | 프론트 화면 | `AdminProtectedRoute` | `OperatorsPage.tsx`(단건·일괄 회수), `UsersListClean.tsx`(회수) — **부여 전용 화면은 확인되지 않음** |
 
@@ -352,7 +345,7 @@ WO 지시대로 위 경로를 **하나도 호출하지 않았다.**
 | # | 7번이 8번에 넘긴 질문 | 실측 답변 |
 |---|---|---|
 | 1 | `platform:admin` · `platform:super_admin` 활성 계정 수 | `platform:admin` **0명** / `platform:super_admin` **활성 2명(둘 다 로그인 가능)** |
-| 2 | 서비스 접두 admin·operator 보유 현황 | admin 4명(glycopharm 2, neture 1, cosmetics 1, kpa 1 — 계정 기준 5배정), operator 5명. 전원 로그인 가능. `yaksa:*` · `dropshipping:*` 보유자 0 |
+| 2 | 서비스 접두 admin·operator 보유 현황 | admin 4명, operator 5명. 전원 로그인 가능. `yaksa:*` · `dropshipping:*` 보유자 0 |
 | 3 | legacy 무접두 `admin`/`super_admin` 잔존 여부 | 무접두 `admin` **0건**, `super_admin` 1건이나 `is_active=false` → **유효 잔존 0** |
 | 4 | `user.permissions` 를 실제로 공급하는가 | **공급하지 않는다.** 비어있지 않은 계정 0/40, write 코드 0 |
 | 5 | JWT scopes 가 백엔드 guard 까지 도달하는가 | **도달하지 않는다.** 생성은 되나 `authentication.middleware` 가 `req.user.scopes` 를 할당하지 않아 모든 scope guard 가 `[]` 로 평가 (§10) |
@@ -371,9 +364,6 @@ WO 지시대로 위 경로를 **하나도 호출하지 않았다.**
 | `kpa:store_owner` | 5 | 가능 | |
 | `neture:admin` | 1 | 가능 | |
 | `neture:operator` | 1 | 가능 | |
-| `glycopharm:admin` | 2 | 가능 | |
-| `glycopharm:operator` | 2 | 가능 | |
-| `glycopharm:store_owner` | 1 | 가능 | |
 | `cosmetics:admin` | 1 | 가능 | |
 | `cosmetics:operator` | 1 | 가능 | |
 | `cosmetics:store_owner` | 2 | 가능 | |

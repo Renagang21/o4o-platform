@@ -35,7 +35,6 @@ ForumCommentListProps {
 | 서비스 | 적용 | 본문 렌더 | 액션 | 비고 |
 |--------|:--:|----------|------|------|
 | **KPA** | ✅ | plain(default) | `renderCommentActions`=삭제 버튼(isAuthor) | comment **작성 form**·삭제 동작·ownership guard·API **그대로 유지** |
-| **GlycoPharm** | ✅ | plain(default) | 없음(read-only) | 섹션 헤더 유지, Tailwind divide-y → 부품(경미한 정규화) |
 | **K-Cosmetics** | ✅ | **renderContent=ContentRenderer(html)** | 없음(read-only) | 댓글 html 렌더 보존(blocksToHtmlInline → ContentRenderer) |
 | **Neture** | **보류** | — | — | full CRUD inline edit(CommentItem: create/update/delete + mobile/desktop) 으로 display-only 래퍼에 부적합 → 보류(WO 허용) |
 
@@ -51,9 +50,9 @@ ForumCommentListProps {
 
 ✅ Neture 댓글 create/update/delete/inline edit **전부 미변경**(이번 WO 미적용). Neture `ForumPostPage.tsx` 는 본 WO 에서 **수정하지 않음**.
 
-## 7. GP/KCos read-only 유지 확인
+## 7. KCos read-only 유지 확인
 
-✅ GP·KCos 는 여전히 read-only(작성/수정/삭제 없음). `ForumCommentList` 에 `renderCommentActions` 미전달 → 액션 미노출. 작성 기능 **추가 없음**.
+✅ KCos 는 여전히 read-only(작성/수정/삭제 없음). `ForumCommentList` 에 `renderCommentActions` 미전달 → 액션 미노출. 작성 기능 **추가 없음**.
 
 ## 8. comment API / backend / DB 변경 없음 확인
 
@@ -64,11 +63,10 @@ ForumCommentListProps {
 | 패키지 | 결과 |
 |--------|------|
 | shared-space-ui (ForumCommentList) | ✅ (web-neture tsc source 컴파일, 0 error) |
-| web-neture / web-kpa-society / web-glycopharm / web-k-cosmetics | ✅ 전부 PASS (총 0 error) |
 
 ## 10. browser smoke 여부
 
-⚠️ **라이브 미수행(보류).** KPA/GP/KCos 3서비스 dev 서버 + 댓글 보유 forum 글 확보 비용 대비, `ForumCommentList` 는 순수 presentational(map + 렌더 + empty)이고 **4서비스 tsc PASS**, 직전 WO 에서 동일 계열 shared forum 부품(ForumDetailNotFoundState 등)이 런타임 정상 렌더됨을 확인 → 회귀 위험 낮음. **tsc + 정적 검증으로 갈음.** 실제 댓글 작성/수정/삭제 smoke 는 WO 금지대로 미수행.
+⚠️ **라이브 미수행(보류).** KPA/KCos 2서비스 dev 서버 + 댓글 보유 forum 글 확보 비용 대비, `ForumCommentList` 는 순수 presentational(map + 렌더 + empty)이고 **4서비스 tsc PASS**, 직전 WO 에서 동일 계열 shared forum 부품(ForumDetailNotFoundState 등)이 런타임 정상 렌더됨을 확인 → 회귀 위험 낮음. **tsc + 정적 검증으로 갈음.** 실제 댓글 작성/수정/삭제 smoke 는 WO 금지대로 미수행.
 
 ## 11. backend / API / DB / migration / route / menu 변경 없음 확인
 
@@ -91,10 +89,10 @@ ForumCommentListProps {
 | 항목 | 결과 |
 |------|------|
 | ForumCommentList 추출 | ✅ (display-only, slot 기반) |
-| 적용 | KPA(+삭제 slot)·GP·KCos(html renderContent). Neture 보류 |
+| 적용 | KPA(+삭제 slot)·KCos(html renderContent). Neture 보류 |
 | KPA 작성 form·삭제 동작 | ✅ 유지 |
 | Neture CRUD | ✅ 미변경(미적용) |
-| GP/KCos read-only | ✅ 유지(작성 추가 없음) |
+| KCos read-only | ✅ 유지(작성 추가 없음) |
 | comment API/backend/DB | 무변경 |
 | route/menu | 무변경 |
 | TypeScript | 4서비스+shared PASS |

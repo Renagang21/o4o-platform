@@ -3,7 +3,7 @@
  *
  * WO-O4O-COMMUNITY-CONTENT-RESOURCE-BACKEND-CORE-COMMONIZATION-V1
  *
- * KPA 는 GP/K-Cosmetics 와 **같은 원장 모델**이지만 다음이 다르다. 전부 config 로 재현한다.
+ * KPA 는 K-Cosmetics 와 **같은 원장 모델**이지만 다음이 다르다. 전부 config 로 재현한다.
  *
  *   - select 컬럼: `content_type` 포함 (KPA 전용 컬럼)
  *   - 회원 목록 필터: `content_type` · `sub_type` (usage_type/source_type 은 읽지 않는다)
@@ -31,7 +31,7 @@ export const KPA_CONTENT_LIST_COLUMNS = `c.id, c.title, c.summary, c.category, c
 
 /**
  * 운영자 자료 목록 select — **기존 KPA 응답 필드 그대로**.
- * GP/KCos 와 달리 `reusable_policy` 를 포함하지 않는다. 추가하면 응답 DTO 가 바뀌므로
+ * KCos 와 달리 `reusable_policy` 를 포함하지 않는다. 추가하면 응답 DTO 가 바뀌므로
  * 계약 보존을 위해 원본과 1:1 로 맞춘다 (필드 순서까지 동일).
  */
 export const KPA_OPERATOR_RESOURCE_COLUMNS = `c.id, c.title, c.summary, c.tags, c.category, c.status,

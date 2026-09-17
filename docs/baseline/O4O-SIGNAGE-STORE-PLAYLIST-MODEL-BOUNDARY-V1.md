@@ -33,7 +33,7 @@
 
 | 모델 | 저장소 | 의미 | 항목 참조 | 사용 surface |
 |---|---|---|---|---|
-| **매장 실행자산** | `store_playlists` / `store_playlist_items` (KPA·GlycoPharm 공유) | 매장이 실행하는 불변 자산 묶음 | `snapshot_id` → `o4o_asset_snapshots` (불변 스냅샷, forced 시간창) | 내 매장 (KPA·GP) |
+| **매장 실행자산** | `store_playlists` / `store_playlist_items` (KPA 공유) | 매장이 실행하는 불변 자산 묶음 | `snapshot_id` → `o4o_asset_snapshots` (불변 스냅샷, forced 시간창) | 내 매장 (KPA) |
 | **매장 실행자산 (격리)** | `cosmetics_store_playlists` / items (cosmetics 스키마) | 동일 성격, K-Cosmetics 격리 스키마 | cosmetics 스키마 내부 | 내 매장 (KCos) |
 | **방송 미디어 카탈로그** | `signage_playlists` / `signage_playlist_items` (canonical) | 서비스/HQ/커뮤니티 방송 카탈로그 | `mediaId` → `signage_media` (직접 참조) | 운영자(HQ) · 커뮤니티 |
 

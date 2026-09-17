@@ -74,8 +74,8 @@ mobileUserMenuItems?: React.ReactNode;   // 신규 optional
 
 ## 5. 정적 검증 (CI)
 
-- `Deploy Web Services (Cloud Run)` run `29180396428` — `detect-changes`/`deploy-glycopharm`/`deploy-k-cosmetics`/`deploy-kpa-society`/`deploy-neture` **전부 success**.
-- 공용 `@o4o/ui` 변경이므로 4개 web 서비스 전부 재빌드 → **KPA 외 서비스(GlycoPharm/K-Cosmetics/Neture) 빌드 성공**으로 additive prop의 backward-compat/타입 무결성 live 확인.
+- `Deploy Web Services (Cloud Run)` run `29180396428` — `detect-changes`/`deploy-k-cosmetics`/`deploy-kpa-society`/`deploy-neture` **전부 success**.
+- 공용 `@o4o/ui` 변경이므로 4개 web 서비스 전부 재빌드 → **KPA 외 서비스 빌드 성공**으로 additive prop의 backward-compat/타입 무결성 live 확인.
 - `Deploy Admin Dashboard` `29180396429`, `Deploy API Server` `29180396422` — success.
 
 | 항목 | 결과 |

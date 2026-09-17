@@ -10,7 +10,7 @@
 ## 1. 조사 범위
 
 - 코드 근거 확인: `apps/api-server/src/routes/platform/store-public/store-public-utils.ts`(public 해석 순서), `modules/neture/services/shared-product-description.service.ts`(seed), `modules/store-ai/entities/product-ai-content.entity.ts`, `modules/store-core/entities/StoreProductProfile.entity.ts`.
-- product_ai_contents 사용처 grep: content-editor AiContentModal / GP·KCos·KPA StoreProductDescriptionsPage·ProductPopBuilderPage / store-ai service·controller / shared-product-description seed.
+- product_ai_contents 사용처 grep: content-editor AiContentModal / KCos·KPA StoreProductDescriptionsPage·ProductPopBuilderPage / store-ai service·controller / shared-product-description seed.
 
 ## 2. Taxonomy 결정 (SSOT)
 

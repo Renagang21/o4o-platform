@@ -2,7 +2,7 @@
 
 > **KPA Society 다국어 상품 콘텐츠 파일럿 전체 closure.**
 > 이 문서는 정책·경계를 **고정(freeze-intent)** 하는 closure 문서이며, 코드/API/DB/UI/schema/migration 변경은 포함하지 않는다.
-> 대상: **KPA only.** GP/KCos 적용·공통화는 본 closure 범위 밖(별도 IR).
+> 대상: **KPA only.** KCos 적용·공통화는 본 closure 범위 밖(별도 IR).
 
 상태: **CLOSED / PASS**
 일자: 2026-06-23
@@ -114,11 +114,11 @@
 
 ---
 
-## 8. GP/KCos 정책 (경계)
+## 8. KCos 정책 (경계)
 
 - 본 closure 는 **KPA only**.
-- store 측 컨트롤러/엔티티는 `service_key`(kpa/glycopharm/cosmetics) 중립으로 설계되어 있으나, **GP/KCos 의 UI 적용·공통 컴포넌트 추출·운영자/매장 동선 연결은 본 파일럿에서 수행하지 않는다.**
-- backend 공유 컨트롤러에 GP/KCos 도 동일 라우트가 존재하지만 **프론트 소비처가 KPA 뿐**이므로 GP/KCos UX 는 무변경 상태다.
+- store 측 컨트롤러/엔티티는 `service_key` 중립으로 설계되어 있으나, **KCos 의 UI 적용·공통 컴포넌트 추출·운영자/매장 동선 연결은 본 파일럿에서 수행하지 않는다.**
+- backend 공유 컨트롤러에 KCos 도 동일 라우트가 존재하지만 **프론트 소비처가 KPA 뿐**이므로 KCos UX 는 무변경 상태다.
 - Cross-service 적용 여부·범위는 **별도 IR 에서 검토**한다.
 
 ---
@@ -128,7 +128,7 @@
 ```
 IR-O4O-MULTILINGUAL-PRODUCT-CONTENT-CROSS-SERVICE-ADOPTION-V1
 ```
-- GP/KCos 적용 타당성, 공통 컴포넌트(badge/actions/landing) 추출 범위, 서비스별 도메인/문구/운영자 동선 차이 검토.
+- KCos 적용 타당성, 공통 컴포넌트(badge/actions/landing) 추출 범위, 서비스별 도메인/문구/운영자 동선 차이 검토.
 - 본 closure 의 §1~§5 정책을 기준선으로 삼는다.
 
 ---

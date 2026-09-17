@@ -6,7 +6,7 @@
  *   /store-owner/multilingual-product-contents
  *
  * 매장이 저작한 store-scoped 다국어 콘텐츠 목록 + 언어 fallback 확인.
- * 원장·계약은 KPA / GlycoPharm / K-Cosmetics 와 동일한 공통 controller 다.
+ * 원장·계약은 KPA / K-Cosmetics 와 동일한 공통 controller 다.
  * PH 는 매장허브 운영자 원본이 없어(#85·#86) "HUB 에서 가져오기" 진입을 만들지 않는다.
  * 새 콘텐츠는 상품 화면에서 시작한다 — 존재하지 않는 경로를 CTA 로 노출하지 않는다.
  */

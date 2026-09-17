@@ -18,7 +18,7 @@ O4O Store 계층은 5개 패키지로 구성되며, 각 패키지는 명확한 �
 ```
 ┌─────────────────────────────────────────────────────┐
 │                    web-* Services                     │
-│  (web-kpa-society, web-glycopharm, web-k-cosmetics,  │
+│  (web-kpa-society, web-k-cosmetics,                  │
 │   web-glucoseview)                                    │
 │                                                       │
 │  역할: 데이터 페칭, API 호출, 라우트 정의              │
@@ -73,7 +73,7 @@ api-server → asset-copy-core    (Snapshot Engine)
 | 항목 | 내용 |
 |------|------|
 | **역할** | StoreDashboardLayout, 메뉴 구성, 서비스별 config, Insight 계산 |
-| **소비자** | web-kpa-society, web-glycopharm, web-k-cosmetics, web-glucoseview |
+| **소비자** | web-kpa-society, web-k-cosmetics, web-glucoseview |
 
 **Public API:**
 
@@ -84,7 +84,6 @@ api-server → asset-copy-core    (Snapshot Engine)
 | `computeStoreInsights` | Function |
 | `ALL_STORE_MENUS` | Constant |
 | `KPA_SOCIETY_STORE_CONFIG` | Constant |
-| `GLYCOPHARM_STORE_CONFIG` | Constant |
 | `COSMETICS_STORE_CONFIG` | Constant |
 | `GLUCOSEVIEW_STORE_CONFIG` | Constant |
 | `StoreMenuKey`, `StoreDashboardConfig`, `StoreMenuItemDef` | Type |
@@ -102,7 +101,7 @@ api-server → asset-copy-core    (Snapshot Engine)
 | 항목 | 내용 |
 |------|------|
 | **역할** | Snapshot 정책 해석, 필터, 배지, 버튼 제어, UI 컴포넌트 |
-| **소비자** | web-kpa-society, web-glycopharm |
+| **소비자** | web-kpa-society |
 
 **Public API:**
 
@@ -184,7 +183,7 @@ api-server → asset-copy-core    (Snapshot Engine)
 | 항목 | 내용 |
 |------|------|
 | **역할** | HubLayout, HubSection, HubCard, AI Signal |
-| **소비자** | web-glycopharm, web-neture |
+| **소비자** | web-neture |
 | **동결** | o4o-operator-os-baseline-v1 (2026-02-16) |
 
 **Public API:**
@@ -231,7 +230,6 @@ api-server ──→ asset-copy-core     (Snapshot Engine)
 | 서비스 | store-ui-core | store-asset-policy-core | hub-core |
 |--------|:---:|:---:|:---:|
 | web-kpa-society | O | O | - |
-| web-glycopharm | O | O | O |
 | web-k-cosmetics | O | - | - |
 | web-glucoseview | O | - | - |
 

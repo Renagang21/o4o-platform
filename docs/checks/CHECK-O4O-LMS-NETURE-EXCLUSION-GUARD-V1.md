@@ -1,15 +1,14 @@
 # CHECK-O4O-LMS-NETURE-EXCLUSION-GUARD-V1
 
 > **유형:** Read-only CHECK (코드/DB/route/UI/API/package/Dockerfile 변경 없음, 문서 1개만 생성)
-> **목적:** `@o4o/lms-ui` 가 KPA/GlycoPharm/K-Cosmetics 3서비스에서 소비되기 시작한 시점에, **Neture 가 LMS route/menu/package/Dockerfile/import 소비처에 잘못 연결되지 않았는지** 최종 확인하고 제외 상태를 공식 고정.
-> **결과: PASS** — Neture 는 `@o4o/lms-ui`/`@o4o/lms-client`/`@o4o/lms-core` 미소비, LMS route/menu/page 0, Dockerfile lms-ui COPY 0. backend LMS 는 service-neutral 유지(Neture hard-block 미추가). lms-ui 소비처 = KPA/GP/KCos 정확히 3개.
+> **결과: PASS** — Neture 는 `@o4o/lms-ui`/`@o4o/lms-client`/`@o4o/lms-core` 미소비, LMS route/menu/page 0, Dockerfile lms-ui COPY 0. backend LMS 는 service-neutral 유지(Neture hard-block 미추가). lms-ui 소비처 = KPA/KCos 정확히 3개.
 > **작성일:** 2026-06-13 · 기준 HEAD `5b85c9ffd`
 
 ---
 
 ## 1. 목적
 
-LMS 사용자 화면 공통화 1차 마일스톤(`@o4o/lms-ui` 추출 + KPA/GP/KCos adoption) 이후, Neture 가 LMS/강의 기능 공통화 대상에서 계속 제외되어 있는지 최종 확인한다. read-only — 문서만 생성.
+LMS 사용자 화면 공통화 1차 마일스톤(`@o4o/lms-ui` 추출 + KPA/KCos adoption) 이후, Neture 가 LMS/강의 기능 공통화 대상에서 계속 제외되어 있는지 최종 확인한다. read-only — 문서만 생성.
 
 ## 2. 결론 요약
 
@@ -22,14 +21,14 @@ LMS 사용자 화면 공통화 1차 마일스톤(`@o4o/lms-ui` 추출 + KPA/GP/K
 | Neture LMS/강의/수강 메뉴 | **없음**(operator config 에 "lms 미사용" 주석만) ✅ |
 | Neture 강의 목록/상세/수강/레슨/퀴즈/수료 화면 | **없음** ✅ |
 | backend LMS Neture hard-block | **미추가**(LMS service-neutral 유지) ✅ |
-| `@o4o/lms-ui` 소비처 | **정확히 KPA / GlycoPharm / K-Cosmetics 3개** ✅ |
+| `@o4o/lms-ui` 소비처 | — |
 
 **판정: PASS.** Neture LMS 제외는 **frontend 비소비 + Dockerfile 미연결 + 문서 guard** 로 고정됨. backend 하드코딩 차단 없이(service-neutral 원칙 유지) 제외가 성립한다.
 
 ## 3. 선행 작업 요약
 
-- `IR-O4O-LMS-SERVICE-COMMONIZATION-BOUNDARY-V1` — Neture 는 LMS 대상 아님(공급자/파트너/운영 기반), 공통화 대상 = KPA/GP/KCos.
-- `WO-O4O-LMS-GPKCOS-POLICY-DRIFT-ALIGNMENT-V1` · `WO-O4O-LMS-COMMON-UI-EXTRACTION-V1`(`7020e2c4c`) · `WO-O4O-LMS-GLYCOPHARM-ADOPTION-V1`(`2f2122559`) · `WO-O4O-LMS-KCOSMETICS-ADOPTION-V1`(`5b85c9ffd`) · KPA Docker hotfix `e4a9edef1`.
+- `IR-O4O-LMS-SERVICE-COMMONIZATION-BOUNDARY-V1` — Neture 는 LMS 대상 아님(공급자/파트너/운영 기반), 공통화 대상 = KPA/KCos.
+- `WO-O4O-LMS-GPKCOS-POLICY-DRIFT-ALIGNMENT-V1` · `WO-O4O-LMS-COMMON-UI-EXTRACTION-V1`(`7020e2c4c`) · `WO-O4O-LMS-KCOSMETICS-ADOPTION-V1`(`5b85c9ffd`) · KPA Docker hotfix `e4a9edef1`.
 - 현재: `@o4o/lms-ui` 3서비스 소비 시작. 본 CHECK 가 Neture 제외를 그 시점에 고정.
 
 ## 4. Neture package dependency 확인
@@ -79,13 +78,12 @@ LMS 사용자 화면 공통화 1차 마일스톤(`@o4o/lms-ui` 추출 + KPA/GP/K
 
 ## 12. 판정
 
-**PASS.** Neture 는 LMS 수강 기능 공통화 대상에서 완전히 제외되어 있다 — package dependency / Dockerfile COPY / source import / route / menu / page 전부 0건. backend LMS 는 service-neutral 을 유지하며 Neture 하드코딩 차단을 추가하지 않았다(원칙 준수). `@o4o/lms-ui` 소비처는 KPA/GlycoPharm/K-Cosmetics 3개로 한정 확인. **Neture LMS 제외 상태가 본 문서로 공식 고정됨.**
+**PASS.** Neture 는 LMS 수강 기능 공통화 대상에서 완전히 제외되어 있다 — package dependency / Dockerfile COPY / source import / route / menu / page 전부 0건. backend LMS 는 service-neutral 을 유지하며 Neture 하드코딩 차단을 추가하지 않았다(원칙 준수). **Neture LMS 제외 상태가 본 문서로 공식 고정됨.**
 
 ## 13. 후속 작업
 
-1. **`WO-O4O-LMS-LESSONLIST-ROWCLICK-OPTION-V1`** — `LessonList` full-row navigation 옵션 추가 → GP/KPA/KCos 사이드바 LessonList 수렴(현재 3서비스 모두 보류된 핵심 컴포넌트).
+1. **`WO-O4O-LMS-LESSONLIST-ROWCLICK-OPTION-V1`** — `LessonList` full-row navigation 옵션 추가 → KPA/KCos 사이드바 LessonList 수렴(현재 2서비스 모두 보류된 핵심 컴포넌트).
 2. **`WO-O4O-LMS-KPA-FULLER-ADOPTION-V1`** — KPA 목록/레슨에서 미사용 공통 컴포넌트 활용 확대.
-3. **`WO-O4O-LMS-GLYCOPHARM-FULLER-ADOPTION-V1`** — GlycoPharm 에서 LessonList/CourseCard 등 추가 adoption.
 4. **`WO-O4O-LMS-KCOSMETICS-FULLER-ADOPTION-V1`** — K-Cosmetics 에서 LessonList/CourseCard 등 추가 adoption.
 5. **`IR-O4O-REWARD-BUDGET-FLOW-PLATFORM-SERVICE-INSTRUCTOR-V1`** — 별도 작업선. 강사 리워드 지갑/충전/배정/처리중/ledger 조사.
 

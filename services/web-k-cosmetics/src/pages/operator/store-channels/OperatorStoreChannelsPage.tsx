@@ -3,7 +3,7 @@
  *
  * WO-O4O-KCOSMETICS-OPERATOR-STORE-CHANNELS-V1
  * WO-O4O-OPERATOR-CROSSSERVICE-CORE-ONLY-AND-VIEW-DUPLICATION-CLEANUP-V1:
- *   KPA/GlycoPharm 과 3중복이던 화면 본체를 @o4o/operator-core-ui 공통 콘솔로 수렴.
+ *   KPA 와 2중복이던 화면 본체를 @o4o/operator-core-ui 공통 콘솔로 수렴.
  *   서비스는 client adapter + accent(pink/emerald) + actionPolicyKey 만 주입.
  *
  * Backend: GET /api/v1/operator/stores/channels (injectServiceScope → k-cosmetics 자동 격리)

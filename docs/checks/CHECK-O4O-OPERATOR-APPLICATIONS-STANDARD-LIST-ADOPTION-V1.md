@@ -1,20 +1,17 @@
 # CHECK-O4O-OPERATOR-APPLICATIONS-STANDARD-LIST-ADOPTION-V1
 
 > **작업명:** WO-O4O-OPERATOR-APPLICATIONS-STANDARD-LIST-ADOPTION-V1
-> **유형:** `/operator/applications`(GlycoPharm) 표준 리스트 상태 계층 전환. frontend only, backend/DB/package/lock 무변경.
-> **결과: PASS — GP `ApplicationsPage` 를 `useStandardListQuery` + `normalize({applications,pagination})` + URL sync(`applications_*`) + 필터 page=1 reset 로 전환. 기존 DataTable/필터패널/Pagination JSX·승인동선(상세 link) 유지. 검색·정렬은 backend 미지원 → 보류. KCos `/operator/applications`는 array-only/client-filter(다른 backend) → 본 WO 비대상(분리). web-glycopharm tsc 0.**
+> **유형:** `/operator/applications` 표준 리스트 상태 계층 전환. frontend only, backend/DB/package/lock 무변경.
+> 기존 DataTable/필터패널/Pagination JSX·승인동선(상세 link) 유지. 검색·정렬은 backend 미지원 → 보류. KCos `/operator/applications`는 array-only/client-filter(다른 backend) → 본 WO 비대상(분리).
 > 선행: STORES(203353832)·MEMBERS(fc0465b4a)·EXPOSURE(3c8f62b9b)·ONSORT(ed962cc59) — 2026-06-17
 
 ---
 
 ## 1. 적용 route/component
 
-- **GlycoPharm `/operator/applications`** → `services/web-glycopharm/src/pages/operator/ApplicationsPage.tsx`(서비스별 자체 화면, 공통 컴포넌트 아님).
-- API: `glycopharmApi.getAdminApplications({status, serviceType, organizationType, page, limit})` → `{ applications, pagination{page,limit,total,totalPages} }`.
-
 ## 2. 사전 조사 결과 (핵심 — 서비스별 분기)
 
-| | GlycoPharm `/operator/applications` | K-Cosmetics `/operator/applications` |
+| || K-Cosmetics `/operator/applications` |
 |---|---|---|
 | 응답 | **`{applications, pagination}`** (서버 페이지네이션) | **array-only** (`/cosmetics/stores/admin/applications`) |
 | 필터 | status/serviceType/organizationType (**서버**) | statusFilter (**client** `.filter`) |
@@ -22,13 +19,9 @@
 | 정렬 | 없음(sortable 컬럼 0, backend sortBy 미지원) | 없음 |
 | 표준 적합 | **적합(본 WO 대상)** | **비대상**(array+client filter — recruitment-exposure 류) |
 
-> WO 의 기술 전제(`{applications,pagination}` + normalizePaginatedResponse)는 **GP**. KCos 는 backend·구조가 달라 별도 처리(분리) — §12.
+> KCos 는 backend·구조가 달라 별도 처리(분리) — §12.
 
 ## 3. 변경 파일 목록 (1 + CHECK)
-
-| 파일 | 변경 |
-|------|------|
-| `web-glycopharm/.../operator/ApplicationsPage.tsx` | local state(applications/loading/error/filters/page/total) → `useStandardListQuery` + normalize + URL sync. 필터 select→setFilter, 초기화→resetFilters, pagination→query.pagination/setPage, error→useStandardListQuery error 매핑(403/401 보존) |
 
 > KCos ApplicationsPage **무변경**. backend·DB·package·lock·승인 동선·DataTable/필터패널 UI 무변경.
 
@@ -71,10 +64,9 @@
 
 ## 11. 검증
 
-- **web-glycopharm 전체 tsc EXIT 0** (ApplicationsPage 에러 0). operator-ux-core(useStandardListQuery/normalize) 기존 빌드 사용.
+- operator-ux-core(useStandardListQuery/normalize) 기존 빌드 사용.
 - **backend/package/lock 변경 없음**: staged diff 에 apps/api-server·package.json·pnpm-lock.yaml 없음. @o4o/ui dist 미변경.
 - **DataTable/Pagination breaking 0**, **KCos applications 무변경**, **다른 세션 WIP(platform roles) 미접촉**.
-- **browser smoke 미수행** — 배포 후 권장: GP `/operator/applications` 필터 변경→URL(applications_f_*)·page=1 / 페이지 이동→필터 유지 / 새로고침 복원 / 빈 결과 crash 0 / 상세 link 정상.
 
 ## 12. 후속 확산 후보
 
@@ -83,4 +75,4 @@
 
 ---
 
-*Date: 2026-06-17 · PASS · GP /operator/applications → useStandardListQuery + normalize({applications,pagination}) + URL sync(applications_*) + 필터 page=1 reset. 기존 DataTable/필터패널/Pagination/상세 link 유지. 검색·정렬 backend 미지원 보류. KCos applications(array-only)는 분리. backend/package/lock 무변경. web-glycopharm tsc 0.*
+*Date: 2026-06-17 · PASS · operator/applications → useStandardListQuery + normalize({applications,pagination}) + URL sync(applications_*) + 필터 page=1 reset. 기존 DataTable/필터패널/Pagination/상세 link 유지. 검색·정렬 backend 미지원 보류. KCos applications(array-only)는 분리. backend/package/lock 무변경.

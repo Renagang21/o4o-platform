@@ -256,6 +256,6 @@ Q1 의 Planning Time(0.986 ms)이 Execution Time(0.152 ms)보다 크다 —
 ## 18. 제외 범위 변경 0
 
 forum_post entity·service·controller·repository / DB schema·index / 기존 migration / 운영 데이터 /
-Forum 기능·권한·승인 정책 / RBAC / Platform Store / Glycopharm / Cosmetics / Neture 비관련 기능 /
+Forum 기능·권한·승인 정책 / RBAC / Platform Store / Cosmetics / Neture 비관련 기능
 service-groups / SupplierProductOffer / OTC·HFF / pnpm-lock.yaml / 병렬 세션 산출물
 — **전부 변경 0건**

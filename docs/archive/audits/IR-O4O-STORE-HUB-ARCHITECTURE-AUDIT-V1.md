@@ -3,7 +3,7 @@
 > **Investigation Report — O4O Platform Store Hub Architecture Comprehensive Audit**
 > Date: 2026-03-09
 > Status: Complete
-> Scope: Store Hub structure, service navigation, product listings, account architecture, data sharing across GlycoPharm / Neture / K-Cosmetics / KPA
+> Scope: Store Hub structure, service navigation, product listings, account architecture, data sharing across Neture / K-Cosmetics / KPA
 
 ---
 
@@ -20,8 +20,6 @@ Platform Store Hub (Core)
    ├── @o4o/store-core          ← 공통 KPI Engine (Adapter Pattern)
    ├── @o4o/store-asset-policy-core  ← 공통 Asset Policy
    ├── @o4o/hub-exploration-core     ← 공통 Marketplace Layout
-   │
-   ├── GlycoPharm Extension     (8/8 menus, /store/hub)
    ├── K-Cosmetics Extension    (6/8 menus, /store)
    ├── KPA Society Extension    (Section-based menus, /store)
    └── GlucoseView Extension    (2/8 menus, /store)
@@ -43,8 +41,6 @@ Platform Store Hub (Core)
 
 | Service | Role | Default Landing | Store Entry |
 |---------|------|----------------|-------------|
-| **GlycoPharm** | pharmacy | `/care` (Care Dashboard) | `/store` → `/store/hub` |
-| **GlycoPharm** | admin | `/admin` | `/store` |
 | **K-Cosmetics** | operator | `/operator` | `/store` (StoreCockpitPage) |
 | **KPA Society** | pharmacy | `/` → PharmacyGate 검사 | `/store` (approval 후) |
 | **KPA Society** | admin | `/admin/dashboard` | `/store` |
@@ -85,7 +81,6 @@ Platform Store Hub (Core)
 
 **Service Navigation Pattern (현재)**:
 ```
-사용자 → GlycoPharm 로그인 → Store Hub 사용
       → K-Cosmetics 도메인 직접 방문 → 세션 공유 (Redis)
       → 별도 로그인 불필요 (같은 세션)
 ```
@@ -100,27 +95,10 @@ Platform Store Hub (Core)
 
 | Service | Store Base | Hub Route | Entry Guard |
 |---------|-----------|-----------|-------------|
-| **GlycoPharm** | `/store` | `/store/hub` (StoreOverviewPage) | SoftGuard (pharmacy role) |
 | **K-Cosmetics** | `/store` | `/store` (StoreCockpitPage) | ProtectedRoute (operator role) |
 | **KPA Society** | `/store` | `/store/dashboard` (StoreMarketingDashboardPage) | PharmacyGuard (approval check) |
 | **GlucoseView** | `/store` | `/store` (StoreDashboardLayout) | ProtectedRoute (operator role) |
 | **Neture** | `/store/:slug` | N/A (consumer storefront) | N/A |
-
-### 2.2 GlycoPharm Store Routes (Full)
-
-| Route | Page | Purpose |
-|-------|------|---------|
-| `/store` | StoreEntryPage | Store 진입 |
-| `/store/hub` | StoreOverviewPage | Hub Dashboard (HubLayout) |
-| `/store/identity` | StoreMainPage | Store 프로필 |
-| `/store/products` | PharmacyProducts | 제품 관리 |
-| `/store/channels` | StorePlaceholderPage | 채널 관리 |
-| `/store/orders` | PharmacyOrders | 주문 관리 |
-| `/store/content` | StoreAssetsPage | 콘텐츠 관리 |
-| `/store/services` | PharmacyPatients | 서비스 관리 |
-| `/store/settings` | PharmacySettings | 설정 |
-| `/store/billing` | StoreBillingPage | 정산 |
-| `/store/signage/*` | (8 sub-routes) | 디지털 사이니지 |
 
 ### 2.3 KPA Society Store Routes (Section-based)
 
@@ -183,16 +161,16 @@ Platform Store Hub (Core)
 
 ### 3.2 Service Menu Activation Matrix
 
-| Menu | GlycoPharm | K-Cosmetics | KPA Society | GlucoseView |
-|------|:----------:|:-----------:|:-----------:|:-----------:|
-| dashboard | O | O | O (Section) | O |
-| products | O | O | O (Commerce) | - |
-| channels | O | - | - | - |
-| orders | O | O | O (Commerce) | - |
-| content | O | O | - | - |
-| signage | O | - | O (Marketing) | - |
-| billing | O | O | - | - |
-| settings | O | O | - | O |
+| Menu | K-Cosmetics | KPA Society | GlucoseView |
+| ------ | :-----------: | :-----------: | :-----------: |
+| dashboard | O | O (Section) | O |
+| products | O | O (Commerce) | - |
+| channels | - | - | - |
+| orders | O | O (Commerce) | - |
+| content | O | - | - |
+| signage | - | O (Marketing) | - |
+| billing | O | - | - |
+| settings | O | - | O |
 
 ### 3.3 KPA Society 고유 메뉴 (Section-based)
 
@@ -216,7 +194,6 @@ Dashboard
 | 구분 | 항목 |
 |------|------|
 | **공통 메뉴** | dashboard, products, orders, settings |
-| **GlycoPharm 전용** | channels, services (환자 관리), signage (8 sub-routes) |
 | **KPA 전용** | library, QR, POP, marketing analytics |
 | **K-Cosmetics 전용** | market-trial |
 | **GlucoseView** | minimal (dashboard + settings만) |
@@ -246,7 +223,6 @@ Customer Visibility                     ← 4중 Gate 통과 시 노출
 | Service | 제품 테이블 | Service Key | Schema |
 |---------|-----------|-------------|--------|
 | **KPA** | organization_product_listings | `kpa` | public |
-| **GlycoPharm** | organization_product_listings + glycopharm_products | `glycopharm` | public + glycopharm |
 | **K-Cosmetics** | cosmetics_products + cosmetics_store_listings | `cosmetics` | cosmetics (격리) |
 | **Neture** | supplier_product_offers (공급자측) | N/A | public |
 
@@ -254,9 +230,8 @@ Customer Visibility                     ← 4중 Gate 통과 시 노출
 
 | Service | Endpoint | Purpose |
 |---------|----------|---------|
-| KPA/GlycoPharm | `GET /api/v1/o4o-store/pharmacy-products/listings` | 매장 제품 로스터 (service_key 필터) |
-| KPA/GlycoPharm | `GET /api/v1/o4o-store/pharmacy-products/catalog` | 제품 카탈로그 (승인 가능 제품) |
-| GlycoPharm | `GET /api/v1/glycopharm/stores/:slug/products` | Public 스토어프론트 제품 |
+| KPA | `GET /api/v1/o4o-store/pharmacy-products/listings` | 매장 제품 로스터 (service_key 필터) |
+| KPA | `GET /api/v1/o4o-store/pharmacy-products/catalog` | 제품 카탈로그 (승인 가능 제품) |
 | K-Cosmetics | `GET /api/v1/cosmetics/stores/:storeId/listings` | Cosmetics 매장 제품 |
 | Platform | `GET /api/v1/stores/:slug/products` | Unified 공용 스토어프론트 |
 
@@ -268,9 +243,9 @@ Customer Visibility                     ← 4중 Gate 통과 시 노출
 
 | 구분 | 동작 |
 |------|------|
-| **Backend 관리** | `service_key`별 분리 — KPA 추천과 GlycoPharm 추천 별도 관리 |
-| **B2C Storefront** | `service_key IN ('kpa', 'glycopharm')` — **통합 노출** |
-| **추천 방식** | GlycoPharmFeaturedProduct (position-ordered curation) |
+| **Backend 관리** | — |
+| **B2C Storefront** | `service_key IN ` — **통합 노출** |
+| **추천 방식** | — |
 | **StoreLocalProduct** | `badgeType: 'recommend'` (매장 자체 추천) |
 
 ### 4.5 B2C Storefront Visibility Gate (4중 검증)
@@ -313,7 +288,6 @@ Organization (Hierarchical Tree)
     ↓ parentId → tree structure
     ↓
 OrganizationServiceEnrollment (M:N)
-    ↓ service_code: 'kpa' | 'glycopharm' | 'neture' | 'cosmetics'
     ↓ status: 'active'
     ↓
 OrganizationChannel (Multi-channel)
@@ -341,7 +315,6 @@ PhysicalStore (business_number UNIQUE)
 PhysicalStoreLink (serviceType + serviceStoreId)
     ├── serviceType='kpa',       serviceStoreId=Organization.id
     ├── serviceType='cosmetics', serviceStoreId=CosmeticsStore.id
-    ├── serviceType='glycopharm', serviceStoreId=GlycopharmPharmacy.id
     └── serviceType='neture',    serviceStoreId=NeturePartner.id
 ```
 
@@ -350,7 +323,6 @@ PhysicalStoreLink (serviceType + serviceStoreId)
 | Service | Store Entity | Table | Isolation |
 |---------|-------------|-------|-----------|
 | **KPA** | Organization (확장) | `organizations` | 공통 테이블 |
-| **GlycoPharm** | Organization (공유) | `organizations` | KPA와 공유 |
 | **K-Cosmetics** | CosmeticsStore | `cosmetics_stores` | cosmetics schema 격리 |
 | **Neture** | NeturePartner | `neture_partners` | neture schema 격리 |
 | **GlucoseView** | GlucoseviewPharmacy | `glucoseview_pharmacies` | Legacy 별도 |
@@ -363,7 +335,7 @@ PhysicalStoreLink (serviceType + serviceStoreId)
 
 | Table | Purpose | Service Key | Shared |
 |-------|---------|------------|--------|
-| `organizations` | 매장/조직 기본 정보 | N/A | KPA + GlycoPharm 공유 |
+| `organizations` | 매장/조직 기본 정보 | N/A | KPA 공유 |
 | `organization_members` | 매장 구성원 | N/A | 공유 |
 | `organization_channels` | B2C/KIOSK/TABLET/SIGNAGE | N/A | 공유 |
 | `organization_product_listings` | 매장 제품 로스터 | `service_key` 컬럼 | 서비스별 격리 |
@@ -384,8 +356,8 @@ PhysicalStoreLink (serviceType + serviceStoreId)
 | cosmetics | `cosmetics_stores` | K-Cosmetics 매장 | Schema 격리 |
 | cosmetics | `cosmetics_products` | K-Cosmetics 제품 | Schema 격리 |
 | neture | `neture_partners` | Neture 파트너 | Schema 격리 |
-| public | `glycopharm_products` | GlycoPharm 제품 | Table prefix 격리 |
-| public | `glycopharm_featured_products` | GlycoPharm 추천 | Table prefix 격리 |
+| public | — | — | Table prefix 격리 |
+| public | — | — | Table prefix 격리 |
 
 ### 6.3 Data Sharing Diagram
 
@@ -410,7 +382,6 @@ PhysicalStoreLink (serviceType + serviceStoreId)
                       │
         ┌─────────────┼─────────────┐
         │             │             │
-   cosmetics.*   neture.*    glycopharm_*
    (Schema)      (Schema)    (Prefix)
 ```
 
@@ -437,10 +408,10 @@ PhysicalStoreLink (serviceType + serviceStoreId)
 |-----------|------|------|
 | **UI Shell** | 모든 서비스가 `@o4o/store-ui-core` `StoreDashboardLayout` 사용 | Platform Common |
 | **Menu Config** | `storeMenuConfig.ts`에서 서비스별 활성화 메뉴만 다름 | Config-driven Extension |
-| **Hub Control** | `@o4o/hub-core` `HubLayout`을 GlycoPharm + Neture 공유 | Platform Common (FROZEN) |
+| **Hub Control** | `@o4o/hub-core` `HubLayout`을 Neture 공유 | Platform Common (FROZEN) |
 | **KPI Engine** | `@o4o/store-core` Adapter Pattern으로 서비스별 주입 | Platform Common |
 | **Asset Policy** | `@o4o/store-asset-policy-core` 전체 공유 | Platform Common |
-| **DB Organizations** | KPA + GlycoPharm `organizations` 테이블 공유 | Shared Foundation |
+| **DB Organizations** | KPA `organizations` 테이블 공유 | Shared Foundation |
 | **Product Listings** | `organization_product_listings.service_key`로 서비스 구분 | Shared Table + Service Key |
 | **Checkout** | `checkout_orders` 단일 주문 테이블 | Platform Common |
 | **Store Linking** | `physical_stores` + `physical_store_links` cross-service | Platform Bridge |
@@ -465,7 +436,7 @@ PhysicalStoreLink (serviceType + serviceStoreId)
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │              Service Extensions                           │ │
 │  │                                                           │ │
-│  │  GlycoPharm    K-Cosmetics    KPA Society    GlucoseView │ │
+│  │                K-Cosmetics    KPA Society    GlucoseView │ │
 │  │  ─────────     ───────────    ──────────     ─────────── │ │
 │  │  8/8 menus     6/8 menus     Section-based   2/8 menus  │ │
 │  │  Care hub      Cockpit       Marketing hub   Minimal    │ │
@@ -492,8 +463,6 @@ PhysicalStoreLink (serviceType + serviceStoreId)
 ### 7.3 Package Dependency Diagram
 
 ```
-Services (web-glycopharm, web-k-cosmetics, web-kpa-society, web-glucoseview)
-    │
     ├── @o4o/store-ui-core     (StoreDashboardLayout, StoreSidebar, StoreTopBar)
     ├── @o4o/hub-core          (HubLayout, HubCard, role-filter, signal-adapter)
     ├── @o4o/store-core        (StoreSummaryEngine, StoreInsightsEngine, StoreDataAdapter)
@@ -517,7 +486,6 @@ Services (web-glycopharm, web-k-cosmetics, web-kpa-society, web-glucoseview)
 ### RISK-2: K-Cosmetics Store 격리 (MEDIUM)
 
 **현상**: `cosmetics_stores`는 별도 schema, `organizations` 테이블 미사용
-**영향**: KPA/GlycoPharm과 달리 Organization 기반 공통 기능 (channels, product_listings) 사용 불가
 **현재 상태**: `physical_store_links`로 bridge만 존재
 **권장**: K-Cosmetics의 Organization 통합 여부 검토 (또는 의도적 격리 유지 확인)
 
@@ -538,7 +506,6 @@ Services (web-glycopharm, web-k-cosmetics, web-kpa-society, web-glucoseview)
 ### RISK-5: Product Listing service_key 분리 (LOW)
 
 **현상**: B2C Storefront에서 `service_key IN (...)` 으로 통합 노출
-**영향**: 고객이 KPA 제품과 GlycoPharm 제품을 구분하지 못할 수 있음
 **현재 상태**: 의도된 설계로 보임 (통합 스토어프론트)
 **권장**: 서비스 출처 표시 여부 검토
 
@@ -594,7 +561,6 @@ Services (web-glycopharm, web-k-cosmetics, web-kpa-society, web-glucoseview)
 
 | Service | File | Purpose |
 |---------|------|---------|
-| GlycoPharm | `apps/api-server/src/routes/glycopharm/controllers/store.controller.ts` | Public Storefront |
 | K-Cosmetics | `apps/api-server/src/routes/cosmetics/controllers/cosmetics-store.controller.ts` | Cosmetics Store Management |
 | KPA | `apps/api-server/src/routes/kpa/kpa.routes.ts` | KPA Store Controllers Mount Point |
 
@@ -602,7 +568,7 @@ Services (web-glycopharm, web-k-cosmetics, web-kpa-society, web-glucoseview)
 
 | Entity | Table | Purpose |
 |--------|-------|---------|
-| Organization | `organizations` | Store Identity (KPA/GlycoPharm) |
+| Organization | `organizations` | Store Identity (KPA) |
 | OrganizationStore | `organizations` (extended) | Storefront Config |
 | OrganizationServiceEnrollment | `organization_service_enrollments` | Service M:N |
 | OrganizationChannel | `organization_channels` | Sales Channels |
@@ -621,7 +587,6 @@ Services (web-glycopharm, web-k-cosmetics, web-kpa-society, web-glucoseview)
 
 | Service | File | Page |
 |---------|------|------|
-| GlycoPharm | `services/web-glycopharm/src/App.tsx` | Store routes (lines 255-380) |
 | K-Cosmetics | `services/web-k-cosmetics/src/App.tsx` | Store routes (lines 265-280) |
 | KPA Society | `services/web-kpa-society/src/App.tsx` | Store routes (lines 380-480) |
 | GlucoseView | `services/web-glucoseview/src/App.tsx` | Store routes |

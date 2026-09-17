@@ -1,7 +1,7 @@
 # CHECK-O4O-OPERATOR-FORUM-CONSOLE-CROSSSERVICE-COMPLETION-V1
 
 > **read-only 완료 검증 CHECK.** 코드/UI/API/DB/route/menu 변경 없음.
-> 4개 서비스(GlycoPharm / K-Cosmetics / Neture / KPA-Society)의 operator **포럼 신청·삭제요청 콘솔 공통화 완료**를 정적 검증한다.
+> 3개 서비스(K-Cosmetics / Neture / KPA-Society)의 operator **포럼 신청·삭제요청 콘솔 공통화 완료**를 정적 검증한다.
 
 | 항목 | 값 |
 |------|------|
@@ -39,13 +39,12 @@ operator 포럼 **신청(category 생성 요청)** 과 **삭제 요청** 두 콘
 
 | 서비스 | 신청 콘솔 wrapper | 삭제요청 콘솔 wrapper | batch-client |
 |--------|-------------------|------------------------|:------------:|
-| **GlycoPharm** | `ForumRequestsPage.tsx` (43L) ✅ | `ForumDeleteRequestsPage.tsx` (48L) ✅ | fan-out (미보유) |
 | **K-Cosmetics** | `ForumRequestsPage.tsx` (42L) ✅ | `ForumDeleteRequestsPage.tsx` (48L) ✅ | fan-out (미보유) |
 | **Neture** | `ForumManagementPage.tsx` (50L) ✅ | `ForumDeleteRequestsPage.tsx` (60L) ✅ | batchReview / batchApprove·Reject 주입 |
 | **KPA-Society** | `ForumRequestsManagementPage.tsx` (140L) ✅ | `ForumDeleteRequestsPage.tsx` (62L) ✅ | delete: batchApprove·Reject 주입 / requests: fan-out |
 
-- **신청 콘솔(`OperatorForumRequestsConsolePage`) 소비처 = 4** (GP/K-Cos/KPA/Neture)
-- **삭제요청 콘솔(`OperatorForumDeleteRequestsConsolePage`) 소비처 = 4** (GP/K-Cos/KPA/Neture)
+- **신청 콘솔(`OperatorForumRequestsConsolePage`) 소비처 = 4** (K-Cos/KPA/Neture)
+- **삭제요청 콘솔(`OperatorForumDeleteRequestsConsolePage`) 소비처 = 4** (K-Cos/KPA/Neture)
 - 모든 wrapper가 thin(42–140L, 직접 DataTable/ActionBar/Drawer 마크업 없음). KPA 신청 wrapper(140L)는 optional 확장 config 주입 때문에 다소 길지만 여전히 wrapper(콘솔 위임).
 
 > 잔여 직접구현 forum 신청/삭제 콘솔 **없음**. 누락 서비스 **없음**.
@@ -56,7 +55,6 @@ operator 포럼 **신청(category 생성 요청)** 과 **삭제 요청** 두 콘
 
 | 서비스 | 수렴 WO |
 |--------|---------|
-| GlycoPharm | WO-O4O-OPERATOR-FORUM-REQUESTS/DELETE-REQUESTS-CONSOLE-COMMONIZATION-V1 |
 | K-Cosmetics | 〃 (동일 commonization WO) |
 | Neture | WO-O4O-NETURE-FORUM-CONSOLE-CONVERGENCE-APPLY-V1 (+ batch-client option) |
 | KPA-Society (삭제) | WO-O4O-KPA-FORUM-DELETE-REQUESTS-CONSOLE-CONVERGENCE-V1 (`627e6c4f0`) |
@@ -80,7 +78,7 @@ KPA 신청 wrapper(`ForumRequestsManagementPage.tsx`)는 공통 콘솔의 **back
 | `renderDetailExtra` | 유형/태그/생성오류/슬러그 drawer 상세 | grep ✓ |
 
 - **상태머신 보존**: `creating` · `completed` · `failed` · `recreate` 모두 유지(WO 요구 충족).
-- **GP/K-Cos/Neture 영향 없음**: base 4-state만 사용 → 확장 미주입 시 기존 동작 그대로. `operator-core-ui` tsc(forum-requests 오류 0) + `web-neture` tsc(forum 오류 0)로 type-level 호환 검증.
+- **K-Cos/Neture 영향 없음**: base 4-state만 사용 → 확장 미주입 시 기존 동작 그대로. `operator-core-ui` tsc(forum-requests 오류 0) + `web-neture` tsc(forum 오류 0)로 type-level 호환 검증.
 - **정책 계승**: 보완(revision) 의견 필수 · bulk는 승인/거절만 · recreate는 bulk 제외(단건 drawer) — 공통 콘솔에서 일괄 보장.
 
 ---
@@ -92,7 +90,7 @@ KPA 신청 wrapper(`ForumRequestsManagementPage.tsx`)는 공통 콘솔의 **back
 - `ForumRequestsConsole.tsx` — default+override 병합 statusConfig, filterOptions 렌더, tags 검색 흡수, extraColumns 삽입, recreate drawer 액션, renderDetailExtra
 - `index.ts` — `ForumRequestExtendedStatus` export
 
-삭제요청 모듈은 이전 WO에서 batch-client option(`batchApprove?/batchReject?`) + `loadGuideSections` 확장 완료(GP/K-Cos/Neture/KPA 공용).
+삭제요청 모듈은 이전 WO에서 batch-client option(`batchApprove?/batchReject?`) + `loadGuideSections` 확장 완료(K-Cos/Neture/KPA 공용).
 
 ---
 

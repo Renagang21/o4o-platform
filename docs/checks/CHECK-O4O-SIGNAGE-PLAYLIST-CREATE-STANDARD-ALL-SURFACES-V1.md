@@ -13,7 +13,7 @@
 | 결정 | 내용 |
 |------|------|
 | 백엔드 기준 | **Canonical 채택** — 단, surface별 저장 endpoint 는 "그 목록이 읽는 바로 그 엔드포인트"에 맞춤 (데이터 정합성). 진짜 API canonical 통합은 후속 백엔드 IR. |
-| 커뮤니티 축 | **KPA만** 표준화. GP/KCos 커뮤니티는 HUB 소비 surface 로 유지(생성 추가 안 함 — Drift 방지). |
+| 커뮤니티 축 | **KPA만** 표준화. KCos 커뮤니티는 HUB 소비 surface 로 유지(생성 추가 안 함 — Drift 방지). |
 | 등록 진입 | **/new route 로 통일** — 모달/인라인 폼 → 별도 `/new` 페이지 + 공통 Shell. |
 | 내 매장 저장 | **현행 endpoint 유지** — `signage_playlists`(canonical) ≠ `store_playlists`(매장) 테이블 상이. canonical 전환은 백엔드 마이그레이션 필요 → WO §9 위반이므로 분리. |
 
@@ -54,19 +54,19 @@
 | 서비스 | 신규 등록 페이지 | 목록 페이지 전환 | 라우트 |
 |---|---|---|---|
 | KPA | `pages/operator/signage/HqPlaylistCreatePage.tsx` | `HqPlaylistsPage.tsx` (모달 제거, 버튼→/new) | `OperatorRoutes.tsx` `signage/hq-playlists/new` |
-| GP | `pages/operator/signage/HqPlaylistCreatePage.tsx` | `HqPlaylistsPage.tsx` (인라인폼 제거, 버튼 2곳→/new) | `App.tsx` `signage/hq-playlists/new` |
+| `pages/operator/signage/HqPlaylistCreatePage.tsx` | `HqPlaylistsPage.tsx` (인라인폼 제거, 버튼 1곳→/new) | `App.tsx` `signage/hq-playlists/new` |
 | KCos | `pages/operator/signage/HqPlaylistCreatePage.tsx` | `HqPlaylistsPage.tsx` (인라인폼 제거, 버튼→/new) | `App.tsx` `signage/hq-playlists/new` |
 
-GP/KCos 운영자 등록은 기존 단건(메타데이터만) → KPA 기준 다단계(URL 항목 포함)로 정렬.
+KCos 운영자 등록은 기존 단건(메타데이터만) → KPA 기준 다단계(URL 항목 포함)로 정렬.
 
 ### 3.4 내 매장 (3사) — 현행 `store-playlists` endpoint 유지 (store 모드, 항목 없음)
 | 서비스 | 신규 등록 페이지 | 목록 페이지 전환 | 라우트 |
 |---|---|---|---|
 | KPA | `pages/pharmacy/StorePlaylistCreatePage.tsx` | `pages/pharmacy/StoreSignagePage.tsx` (모달 제거, 버튼→/new) | `App.tsx` `marketing/signage/playlist/new` |
-| GP | `pages/store-management/signage/StorePlaylistCreatePage.tsx` | `StoreSignageMainPage.tsx` (인라인폼 제거, 버튼→/new) | `App.tsx` |
+| `pages/store-management/signage/StorePlaylistCreatePage.tsx` | `StoreSignageMainPage.tsx` (인라인폼 제거, 버튼→/new) | `App.tsx` |
 | KCos | `pages/store/StorePlaylistCreatePage.tsx` | `StoreSignagePage.tsx` (인라인폼 제거, 버튼→/new) | `App.tsx` |
 
-KPA store-playlists 는 description/tags 수용 → store 모드 기본(표시). GP/KCos store-playlists 는 name 만 수용 → `showTags=false, showDescription=false`.
+KPA store-playlists 는 description/tags 수용 → store 모드 기본(표시). KCos store-playlists 는 name 만 수용 → `showTags=false, showDescription=false`.
 
 생성 후 항목(미디어)은 기존 HUB 복사 흐름(목록/상세)에서 추가 — 변경 없음.
 
@@ -79,34 +79,31 @@ KPA store-playlists 는 description/tags 수용 → store 모드 기본(표시).
 |---|---|---|---|
 | @o4o/shared-space-ui | — | `tsc --noEmit -p tsconfig.json` | PASS |
 | web-kpa-society | direct include | `tsc --noEmit` | PASS (EXIT 0) |
-| web-glycopharm | project refs | `tsc -b --noEmit` | PASS (EXIT 0) |
 | web-k-cosmetics | direct include | `tsc --noEmit` | PASS (EXIT 0) |
 
 `noUnusedLocals`/`noUnusedParameters` strict → 모달/인라인 폼 제거 시 잔여 state/handler/import 없음 확인됨(tsc 통과).
 
 ### 브라우저 smoke (2026-06-17, 배포 후 — 리비전 13:56Z)
-Playwright headless, 프로덕션 도메인(kpa-society.co.kr / glycopharm.co.kr / k-cosmetics.site). operator=sohae2100, store=renagang21 (자격증명 SSOT 직접 read, 미노출).
+Playwright headless, 프로덕션 도메인(kpa-society.co.kr / k-cosmetics.site). operator=sohae2100, store=renagang21 (자격증명 SSOT 직접 read, 미노출).
 
 | 서비스 | community `/signage/playlist/new` | operator `/operator/signage/hq-playlists/new` | store `/store/marketing/signage/playlist/new` |
 |---|---|---|---|
 | KPA | ✅ PASS (Shell) | ✅ PASS | ✅ PASS |
-| GlycoPharm | ⛔ 404 = 의도(소비 surface, /new 미추가) | ✅ PASS | ✅ PASS |
 | K-Cosmetics | ⛔ 404 = 의도(소비 surface, /new 미추가) | ✅ PASS | ✅ PASS |
 
 - 전 PASS: route 해결(redirect 0) · Shell 마운트(제목 input + 저장/생성 버튼) · **console error 0 · 관련 4xx/5xx 0**.
-- surface 구성 정확: operator=재생옵션+태그필수, store=KPA(설명/태그 노출)·GP/KCos(name-only).
+- surface 구성 정확: operator=재생옵션+태그필수, store=KPA(설명/태그 노출)·KCos(name-only).
 - **저장 round-trip**: 내 매장 3사 모두 1건씩 통제 수행(생성→목록확인→삭제). 데이터명 `[SMOKE] keep-legacy <svc> <ts>`.
 
 #### 내 매장 store-playlist round-trip — 3사 (KEEP-LEGACY 핵심 라이브 검증)
 | 서비스 | 생성 | 저장 endpoint (실제 캡처) | 목록 반영 | 삭제 | 잔존 |
 |---|---|---|---|---|---|
 | KPA | ✅ 201 | `/api/v1/kpa/store-playlists` (store_playlists) | ✅ YES | 200 | removed |
-| GlycoPharm | ✅ 201 | `/api/v1/glycopharm/store-playlists` (store_playlists) | ✅ YES | 200 | removed |
 | K-Cosmetics | ✅ 201 | `/api/v1/cosmetics/store-playlists` (cosmetics_store_playlists) | ✅ YES | 200 | removed |
 
 - **3사 모두 각 서비스의 현행 store endpoint 로 저장** — canonical `/api/signage/:serviceKey/playlists` 로 저장된 건 **0건**. KEEP-LEGACY 핵심 주장(내 매장 저장은 현행 store playlist endpoint, 저장 후 해당 목록 반영) 라이브 확인.
 - 저장 후 내 매장 목록(`/store/marketing/signage/playlist`)에 즉시 반영, 즉시 삭제, 잔존 `[SMOKE]` 0 (앱 토큰 인증 정리).
-- console/4xx·5xx: GP·KCos 0. KPA 의 403 다수 = pharmacy 계정이 operator signage 엔드포인트(`/api/signage/kpa-society/{playlists,media,schedules}`) 호출 시 발생 — **pre-existing 권한 경계, 이번 변경 무관**.
+- console/4xx·5xx: KCos 0. KPA 의 403 다수 = pharmacy 계정이 operator signage 엔드포인트(`/api/signage/kpa-society/{playlists,media,schedules}`) 호출 시 발생 — **pre-existing 권한 경계, 이번 변경 무관**.
 - K-Cosmetics 는 별도 `cosmetics_store_playlists` 계열이지만 동일하게 생성·목록 반영·삭제 PASS.
 
 **배포 주의(재발 방지):** `deploy-web-services.yml` 의 detect-changes 가 `git diff HEAD~1 HEAD`(HEAD 단일 커밋)만 봄. 코드 커밋 뒤 docs-only 커밋이 HEAD 가 되면 web 배포가 전부 skip 됨(이번에 발생). → `gh workflow run deploy-web-services.yml --ref main -f service=all` 수동 트리거로 해결(run 27694104841).
@@ -118,7 +115,7 @@ Playwright headless, 프로덕션 도메인(kpa-society.co.kr / glycopharm.co.kr
 - DB / migration: 변경 0
 - package.json / lockfile / Dockerfile: 변경 0
 - 권한 guard: 변경 0
-- GP/KCos 커뮤니티 사이니지: 무수정
+- KCos 커뮤니티 사이니지: 무수정
 - 공통 Shell 은 기존 의존 패키지(@o4o/shared-space-ui) 내 신규 파일 — Dockerfile 영향 없음
 
 ---
@@ -126,7 +123,7 @@ Playwright headless, 프로덕션 도메인(kpa-society.co.kr / glycopharm.co.kr
 ## 6. 남은 이슈 / 후속
 - **브라우저 smoke** (3 서비스 × 운영자/내매장, KPA 커뮤니티) — 배포 후.
 - **백엔드 canonical 통합 IR** — `store_playlists` → `signage_playlists` 정합(미러 write / dual-read / migration) 은 별도 IR/WO 로 분리(이번 WO §9 범위 외). 제안 문서명: `IR-O4O-SIGNAGE-STORE-PLAYLISTS-CANONICAL-DATA-MODEL-V1` (조사 대상: 두 테이블 필드 차이 / store-playlists API 사용처 / 목록·상세·복사·미디어추가 흐름 / organizationId·serviceKey 스코핑 차이 / dual-read·mirror-write 가능성 / migration·데이터 보존 정책).
-- GP/KCos 운영자 등록이 단건→다단계로 바뀌며 "URL 최소 1개 필수"가 됨(KPA 정합). 의도된 정렬.
+- KCos 운영자 등록이 단건→다단계로 바뀌며 "URL 최소 1개 필수"가 됨(KPA 정합). 의도된 정렬.
 
 ---
 

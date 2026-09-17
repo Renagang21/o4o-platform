@@ -30,7 +30,7 @@ KCos 의 canonical 축은 MEMBERSHIP·ENROLLMENT·LISTING 모두 `k-cosmetics` �
 계정: KCos 매장 계정 (`docs/local/TEST-ACCOUNTS.local.md`, 자격증명 미기재).
 로그인 `POST /api/v1/auth/login` · `serviceKey='k-cosmetics'` · 200 · httpOnly cookie.
 `role_assignments`(is_active) = `cosmetics:store_owner`, `kpa:store_owner`,
-`glycopharm:store_owner`, `pharmacy-hub:store_owner`.
+`pharmacy-hub:store_owner`.
 
 | 요청 (`GET`, `X-Organization-Id` = 자기 KCos 매장 조직) | 상태 | code |
 |---|---|---|
@@ -64,7 +64,6 @@ mount: `apps/api-server/src/bootstrap/register-routes.ts`
 | KPA-Society | `kpa-society` | `kpa-society` | 허용 | `kpa-society` | `kpa` | `kpa-society` | `kpa` | 200 |
 | K-Cosmetics (매장) | `k-cosmetics` | `k-cosmetics` | **미허용** | `k-cosmetics` | `cosmetics` | `k-cosmetics` | `cosmetics` | **400** |
 | K-Cosmetics (운영자 HQ) | `cosmetics` | `cosmetics` | 허용(=drift) | `k-cosmetics` | `cosmetics` | `k-cosmetics` | `cosmetics` | 200 |
-| GlycoPharm | `glycopharm` | `glycopharm` | 허용 | `glycopharm` | `glycopharm` | `glycopharm` | `glycopharm` | 200 |
 | Neture (admin-dashboard) | `neture` | `neture` | 허용 | `neture` | `neture` | `neture` | `neture` | 200 |
 | PharmacyHub | (signage URL 미사용) | — | — | `pharmacy-hub` | `pharmacy-hub` | `pharmacy-hub` | — | 해당 없음 |
 
@@ -153,12 +152,12 @@ DB write · migration.
 신규 `apps/api-server/src/__tests__/signage-servicekey-canonicalization.spec.ts` (24 케이스, DB stub):
 
 - canonical 수렴: `cosmetics→k-cosmetics`, `kpa→kpa-society`, canonical self-map, 빈 값
-- validator: `k-cosmetics` 통과(본 결함) · KPA/GP/Neture 회귀 없음 · alias 수렴 통과 ·
+- validator: `k-cosmetics` 통과(본 결함) · KPA/Neture 회귀 없음 · alias 수렴 통과
   legacy key 기존 동작 유지 · 미등록 key 400 유지(원본 key 를 메시지에 노출) · `SERVICE_KEY_REQUIRED` 유지
 - 축 변환: role scope(`cosmetics:*`) 판정 · community 판정 · `toStoreOwnerServiceKey` ·
   `extractScope` 데이터 scope canonical
 - §8 cross-service 매트릭스: 자기 KCos org 200 · 미소유 org 403 `SIGNAGE_STORE_REQUIRED` ·
-  KPA-only / GP-only org 403 · alias 입력이어도 `req.signageContext.serviceKey === 'k-cosmetics'` ·
+  KPA-only org 403 · alias 입력이어도 `req.signageContext.serviceKey === 'k-cosmetics'`
   operator 계약 회귀 없음
 
 기존 `signage-cross-service-org-guard.spec.ts` 는 **무수정 통과**.
@@ -173,7 +172,7 @@ DB write · migration.
 | api-server `tsc --noEmit` | **PASS** |
 | K-Cosmetics `tsc --noEmit` | **PASS** |
 | K-Cosmetics `vite build` | **PASS** |
-| KPA / GlycoPharm signage 테스트 | 회귀 없음(전체 스위트에 포함) |
+| KPA signage 테스트 | 회귀 없음(전체 스위트에 포함) |
 | production DB write | **0** (read-only 조회만) |
 
 > 참고: `pnpm --filter "./packages/**" run build` 에서 `@o4o/financial-core` 의
@@ -192,12 +191,11 @@ DB write · migration.
 | `k-cosmetics` | `/playlists` · `/media` · `/schedules` | 자기 KCos 매장 org | **200** (수정 전 400) |
 | `cosmetics` (alias) | 동일 3종 | 자기 KCos 매장 org | 200 (수렴) |
 | `k-cosmetics` | `/playlists` | KPA-only org | **403** `SIGNAGE_ACCESS_DENIED` |
-| `k-cosmetics` | `/playlists` | GP-only org | **403** `SIGNAGE_ACCESS_DENIED` |
+| `k-cosmetics` | `/playlists` | — | **403** `SIGNAGE_ACCESS_DENIED` |
 | `k-cosmetics` | `/playlists` | 존재하지 않는 org | **403** `SIGNAGE_ACCESS_DENIED` |
-| `cosmetics` (alias) | `/playlists` | KPA-only / GP-only / 없는 org | 403 (동일) |
+| `cosmetics` (alias) | `/playlists` | KPA-only / 없는 org | 403 (동일) |
 | `k-cosmetics` · `cosmetics` | `/public/media` | (헤더 없음) | 200 |
 | `kpa-society` | `/playlists` | KPA 매장 org | 200 (회귀 없음) |
-| `glycopharm` | `/playlists` | GP 매장 org | 200 (회귀 없음) |
 | `bogus-key` | `/playlists` | — | **400** `INVALID_SERVICE_KEY` (유지) |
 | `k-cosmetics` | `/playlists` | 쿠키 없음 | **401** `AUTH_REQUIRED` (유지) |
 

@@ -6,7 +6,7 @@
  *
  * 기존 Organization (organization-core, Frozen)의 기본 필드 +
  * Phase A에서 추가된 storefront/약국 확장 필드를 포함.
- * KPA/GlycoPharm 코드에서 organizations 테이블 접근 시 사용.
+ * KPA 코드에서 organizations 테이블 접근 시 사용.
  *
  * ESM RULES (CLAUDE.md §4): string-based relation, type-only import
  */

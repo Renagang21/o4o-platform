@@ -88,7 +88,7 @@
 ## 8. 이벤트 오퍼 연결 현황 — PASS
 
 - 제품 목록 → `?supplierProductId/&masterId` → 제안 모달 자동 오픈 + 매칭 SPO 자동 선택(autoOpen/autoSelect 각 1회, 수동 선택 존중). 직접 진입 crash 없음.
-- 이벤트가 ≤ 일반 공급가 검증, 원본 가격 불변. 대상 서비스에 Neture 미포함(kpa-society/glycopharm/k-cosmetics).
+- 이벤트가 ≤ 일반 공급가 검증, 원본 가격 불변. 대상 서비스에 Neture 미포함.
 
 ---
 

@@ -51,8 +51,8 @@
 | `pharmacy-products.controller.ts` 기본값 | `'kpa'` | `/applications`, `/approved` 필터 | 승인 데이터 미노출 |
 | `kpa-checkout.controller.ts` L399 | `'kpa'` | 체크아웃 listing 확인 | 주문 가능 상품 누락 가능 |
 | `kpa-checkout.controller.ts` L495 | `'kpa'` | 주문 metadata | 주문 조회 불일치 가능 |
-| `store.controller.ts` (glycopharm) 3곳 | `'kpa'` | 약국 매장 상품 조회 | 상품 미노출 |
-| `checkout.controller.ts` (glycopharm) 2곳 | `'kpa'` | 체크아웃 validation | 주문 차단 가능 |
+| `store.controller.ts` 2곳 | `'kpa'` | 약국 매장 상품 조회 | 상품 미노출 |
+| `checkout.controller.ts` 1곳 | `'kpa'` | 체크아웃 validation | 주문 차단 가능 |
 | `seller.service.ts` fallback | `'kpa'` | 판매자 서비스키 조회 | 잘못된 키로 승인 생성 |
 | `product-policy-v2.internal.routes.ts` 2곳 | `'kpa'` | 내부 테스트 | 테스트 데이터 불일치 |
 
@@ -72,8 +72,8 @@
 |------|----------|
 | `pharmacy-products.controller.ts` | `resolveServiceKeyFromQuery/Body` 기본값 `KPA` → `KPA_SOCIETY` |
 | `kpa-checkout.controller.ts` | listing 조회 `'kpa'` → `'kpa-society'`, 주문 metadata `'kpa-society'`, 주문 목록 조회 하위호환 `IN ('kpa-society', 'kpa')` |
-| `store.controller.ts` (glycopharm) | 3개 WHERE `'kpa'` → `'kpa-society'` + 주석 업데이트 |
-| `checkout.controller.ts` (glycopharm) | 2개 WHERE `'kpa'` → `'kpa-society'` |
+| `store.controller.ts` | 3개 WHERE `'kpa'` → `'kpa-society'` + 주석 업데이트 |
+| `checkout.controller.ts` | 2개 WHERE `'kpa'` → `'kpa-society'` |
 | `seller.service.ts` | `resolveServiceKey()` fallback `'kpa'` → `'kpa-society'` |
 | `product-policy-v2.internal.routes.ts` | 2개 내부 테스트 기본값 `'kpa'` → `'kpa-society'` |
 | `blog.controller.ts` | 주석 업데이트 |
@@ -152,12 +152,6 @@ checkout → service_key = 'kpa-society' → ✅ 일치
 | `/catalog` (isListed) | 3건 | **3건** ✅ |
 | `/catalog` (isApplied) | ? | **3건** ✅ |
 | `/catalog` (isApproved) | ? | **3건** ✅ |
-
-### 시나리오 3: Glycopharm 경로
-
-| 엔드포인트 | 결과 |
-|-----------|------|
-| `/glycopharm/pharmacy/products/listings` | **3건** ✅ (service_key=kpa-society) |
 
 ### 시나리오 4: 주문 하위호환
 

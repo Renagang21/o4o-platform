@@ -13,7 +13,6 @@
 |--------|------|------|
 | Neture `NetureResourcesPage` | 정비 필요 (throw 가 템플릿에서 삼켜짐) | 템플릿 정비로 자동 정상화 (파일 무변경) |
 | KPA `ResourcesHubPage` | 정비 필요 (throw 가 템플릿에서 삼켜짐) | 템플릿 정비로 자동 정상화 (파일 무변경) |
-| GlycoPharm `ResourcesPage` | 결함 (어댑터가 먼저 삼킴) | 어댑터 try/catch 제거 → throw 전파 |
 | K-Cosmetics `ResourcesPage` | 결함 (주석 stale) | 어댑터 try/catch 제거 → throw 전파, 주석 정정 |
 
 **의도된 fail-open = 0.** IR §4 참조.
@@ -51,14 +50,13 @@
 | 로딩 고착 0 | ✅ |
 | 가로 overflow 0 | ✅ (레이아웃 불변) |
 | 운영 write 0 | ✅ |
-| 최소 2 소비처 (Neture + 최소 1) | ✅ (Neture·KPA·GlycoPharm·KCos 전수) |
+| 최소 2 소비처 (Neture + 최소 1) | ✅ (Neture·KPA·KCos 전수) |
 
 ## §10 typecheck·build
 
 | 앱 | typecheck | build |
 |----|:---:|:---:|
 | @o4o/web-neture | EXIT 0 | ✅ 13.07s |
-| glycopharm-web | EXIT 0 | ✅ 23.58s |
 | @o4o/web-k-cosmetics | EXIT 0 | ✅ 14.55s |
 | @o4o/web-kpa-society | EXIT 0 | ✅ 18.21s |
 
@@ -76,7 +74,6 @@
 | 서비스 | 리비전 |
 |--------|--------|
 | neture-web | `neture-web-01345-5kp` |
-| glycopharm-web | `glycopharm-web-01171-fx5` |
 | k-cosmetics-web | `k-cosmetics-web-00919-9ls` |
 | kpa-society-web | `kpa-society-web-01714-29j` |
 
@@ -87,10 +84,8 @@
 | 대상 | 코드 |
 |------|:---:|
 | `/api/v1/neture/content?type=resource` | 200 |
-| `/api/v1/glycopharm/contents?sub_type=resource` | 200 |
 | `/api/v1/cosmetics/contents` | 200 |
 | `/api/v1/kpa/contents?sub_type=resource` | 200 |
-| neture/glyco/kcos/kpa `/resources` 앱 루트 | 200 |
 
 > 4개 자료실 엔드포인트 모두 정상 200 → 내 변경(throw 경로에만 반응)이 정상 조회를 오류 상태로 오판하지 않음을 확인. 오류 상태 자체는 throw(500/네트워크) 강제 주입이 필요하나 프로덕션에 비파괴적으로 유발 불가 + Playwright 영속 프로파일 점유 가능성 → 시리즈 표준대로 게이팅 + 빌드타임 typecheck 로 코드 경로 확정. (KPA 첫 curl 의 404 는 `/kpa` 누락한 경로 오타였고 정정 후 200.)
 

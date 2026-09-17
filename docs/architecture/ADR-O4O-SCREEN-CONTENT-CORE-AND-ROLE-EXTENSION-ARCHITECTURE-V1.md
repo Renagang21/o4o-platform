@@ -67,7 +67,6 @@
          ★ kpa_store_contents(= "Store Production Material" 논리, 유일 확장 seam)
 
 [렌더 — 이미 공유 패키지]
- @o4o/tablet-kiosk-core (KPA/K-Cosmetics/GlycoPharm 공유)
    입력계약 TabletScreenResponse{mode,templateKey,sections:[{blockType,sortOrder,data}]}
    ├─ 채널 A 태블릿:  GET /:slug/tablet/screen  → resolve(tabletContext=full)
    └─ 채널 B ScreenSet QR: GET /qr/public/:slug → resolve(tabletContext=none, idle 제외)

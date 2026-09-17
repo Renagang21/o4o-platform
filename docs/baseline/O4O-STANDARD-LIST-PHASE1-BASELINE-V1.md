@@ -21,7 +21,7 @@
 | DataTable onSort controlled sort | `ed962cc59` |
 | Operator Members adoption | `fc0465b4a` |
 | Recruitment Exposure adoption | `3c8f62b9b` |
-| GP Operator Applications adoption | `280d757ab` |
+| Operator Applications adoption | `280d757ab` |
 | KCos Applications URL sync (minimal) | `40ed83132` |
 | Admin Product Approval backend pagination | `3ff222bfe` |
 | Admin Product Approval standard list adoption | `e59be827c` |
@@ -45,7 +45,7 @@
 
 ### 적용 대상 화면
 
-`/operator/stores`(4사) · `/operator/members`(Neture·GP·KCos) · `/operator/recruitment-exposure`(KPA·GP·KCos) · GP `/operator/applications` · KCos `/operator/applications` · `/admin/product-approvals`(Neture Admin). + `/admin/members` 무변경 확인.
+`/operator/stores`(3사) · `/operator/members`(Neture·KCos) · `/operator/recruitment-exposure`(KPA·KCos) · KCos `/operator/applications` · `/admin/product-approvals`(Neture Admin). + `/admin/members` 무변경 확인.
 
 ---
 
@@ -86,10 +86,10 @@ O4O 표준 리스트는 **단순 DataTable 이 아니라** 다음 조합이다 (
 - **대표:** `/operator/recruitment-exposure`
 - **조건:** DataTable 화면이 아님(카드형 승인 큐), backend pagination/search/sort 없음.
 - **표준:** 카드 UI 유지, status filter URL sync, 기본 pending. **DataTable/Pagination 도입 금지.**
-- **smoke 근거:** 3사 모두 `hasTable=0` 확인.
+- **smoke 근거:** 2사 모두 `hasTable=0` 확인.
 
 ### D. Service-specific Full Adoption
-- **대표:** GlycoPharm `/operator/applications`
+- **대표:** 현행 대표 화면 없음 (패턴 정의만 유지)
 - **조건:** 같은 route 명이라도 서비스별 backend shape 상이. 특정 서비스만 `{applications,pagination}` 같은 표준 근접 응답 보유.
 - **표준:** 해당 서비스만 full adoption, 다른 서비스는 별도 판정. (검색·정렬은 backend 미지원이면 N/A.)
 
@@ -194,10 +194,9 @@ O4O 표준 리스트는 **단순 DataTable 이 아니라** 다음 조합이다 (
 
 | 화면 | 유형 |
 |------|------|
-| `/operator/stores` (Neture·GP·KCos·KPA) | A. Full reference |
-| `/operator/members` (Neture·GP·KCos) | B. Targeted adoption |
-| `/operator/recruitment-exposure` (KPA·GP·KCos) | C. Minimal card queue |
-| GP `/operator/applications` | D. Service-specific full |
+| `/operator/stores` (Neture·KCos·KPA) | A. Full reference |
+| `/operator/members` (Neture·KCos) | B. Targeted adoption |
+| `/operator/recruitment-exposure` (KPA·KCos) | C. Minimal card queue |
 | KCos `/operator/applications` | E. Minimal URL sync |
 | `/admin/product-approvals` (Neture Admin) | F. Backend-first full |
 | `/admin/members` | (shared console — 무변경 확인) |
@@ -207,7 +206,7 @@ O4O 표준 리스트는 **단순 DataTable 이 아니라** 다음 조합이다 (
 ## 11. Smoke 결과 요약
 
 - 도구: Playwright headless chromium (ephemeral context — profile lock 회피).
-- 범위: Neture / GlycoPharm / K-Cosmetics / KPA Society 4서비스.
+- 범위: Neture / K-Cosmetics / KPA Society 3서비스.
 - 결과: 로그인 4사 성공, 전 route 렌더, **console error 0 · network 4xx/5xx 0**, PASS.
 - `/admin/product-approvals`: 검색·정렬·토글·status 필터 URL sync + page=1 reset + 새로고침 복원 전부 통과.
 - **제외(설계상):** 승인/반려 **live 실행**은 prod 데이터 변경이라 미실행(금지선 준수). 2페이지+ page-nav 는 단일 페이지 데이터로 미발생.

@@ -12,14 +12,13 @@
 ## 1. 작업 전 기능 × 서비스 재실측표
 
 census 숫자를 그대로 믿지 않고 이 축만 코드에서 다시 실측했다 (`main` 과 브랜치의 owner-area 파일 drift 0 —
-차이는 직전 WO 의 GlycoPharm 변경 3파일뿐이라 브랜치 내용으로 실측).
 
-| 기능 | KPA-Society | GlycoPharm | K-Cosmetics | Neture | Pharmacy-Hub |
-|---|---|---|---|---|---|
-| **내 포럼 대시보드 (F31)** | `/mypage/my-forums` · 285줄 | `/forum/my-dashboard` · 572줄 | `/forum/my-dashboard` · 581줄 | `/supplier/my-forum` · 576줄 | 없음 |
-| **폐쇄형 회원 관리 (F34)** | `/mypage/my-forums/:forumId/members` · 381줄 | `/forum/my-dashboard/:forumId/members` · 354줄 | `/forum/my-dashboard/:forumId/members` · 354줄 | **없음** | 없음 |
-| 포럼 개설 신청 (F29) | `/forum/request` · 49줄 | `/forum/request-category` · 46줄 | `/forum/request-category` · 48줄 | `/forum/request` 52줄 · `/supplier/forum/request-category` 48줄 | 없음 |
-| 내 신청 내역 (F30) | `/mypage/my-requests` · 156줄 | `/mypage/my-requests` 58줄 **+ `/forum/my-requests` 285줄(legacy)** | `/mypage/my-requests` · 63줄 | 없음 | `/join/status` (서비스 가입) |
+| 기능 | KPA-Society | K-Cosmetics | Neture | Pharmacy-Hub |
+|---|---|---|---|---|
+| **내 포럼 대시보드 (F31)** | `/mypage/my-forums` · 285줄 | `/forum/my-dashboard` · 581줄 | `/supplier/my-forum` · 576줄 | 없음 |
+| **폐쇄형 회원 관리 (F34)** | `/mypage/my-forums/:forumId/members` · 381줄 | `/forum/my-dashboard/:forumId/members` · 354줄 | **없음** | 없음 |
+| 포럼 개설 신청 (F29) | `/forum/request` · 49줄 | `/forum/request-category` · 48줄 | `/forum/request` 52줄 · `/supplier/forum/request-category` 48줄 | 없음 |
+| 내 신청 내역 (F30) | `/mypage/my-requests` · 156줄 | `/mypage/my-requests` · 63줄 | 없음 | `/join/status` (서비스 가입) |
 
 - **F29 · F30 은 이미 공통 부품 채택 완료** (`ForumRequestForm` · `@o4o/account-ui MyRequestsInbox`) → 본 WO 대상 아님.
 - 본 WO 대상 = **F31 + F34 = 7셀 / 3,103줄**.
@@ -49,35 +48,6 @@ census 숫자를 그대로 믿지 않고 이 축만 코드에서 다시 실측�
 | Neture 회원 관리 없음 | **정책** | `links.memberManageHref` 미주입 → 진입 미노출 |
 | API envelope (KPA throw / 나머지 axios `{success,error}`) | 전송 | 공통 adapter factory 가 정규화 |
 
-## 2. 기존 VD 7셀 재검증 결과 — GP ↔ KCos 실제 diff
-
-census 판정("GP↔KCos 회원관리 diff 약 5줄")을 재검증했다.
-
-**`ForumMemberManagementPage` (354줄) — diff 14줄**
-
-| 구분 | 줄 수 | 내용 |
-|---|---:|---|
-| 직전 WO 로 GP 에만 추가된 주석 | 5 | `WO-...-ISOLATION-FIX-V1` 헤더 (census 시점엔 없었음) |
-| 서비스명 주석 | 1 | `(GlycoPharm)` ↔ `(K-Cosmetics)` |
-| accent 색 | 8 | `emerald` ↔ `pink` 4곳 (Shield · Loader2 · 배지 · 승인 버튼) |
-| **실질 로직 차이** | **0** | — |
-
-→ census 판정 재확인. 직전 WO 주석 5줄을 제외하면 **원래 diff 9줄(주석 1 + 색 8)** 이다.
-
-**`MyForumDashboardPage` (572 / 581줄) — diff 57줄**
-
-| 구분 | 내용 |
-|---|---|
-| accent 색 | emerald ↔ pink 다수 |
-| JSX 섹션 주석 | KCos 에만 `{/* Header */}` 류 7개 |
-| **실질 차이** | **1줄** — 이모지 placeholder `예: 💊` ↔ `예: 💄` |
-
-**Neture vs GP 대시보드 — diff 48줄**: basePath 5곳 · 컨테이너 여백 · **회원 관리 링크 블록(8줄) 부재** · 포맷.
-→ Neture 는 "폐쇄형 회원 관리 동선 없음" 이 실제 정책 차이임을 확인.
-
-**KPA vs GP 회원관리 — diff 101줄**: 레이아웃 래퍼(`MyPageNavigation`) · API envelope(`{data}` vs `{data.data}`) ·
-오류 추출(`err.message` vs `err.response.data.error`) · back link · accent. **업무 로직 차이 0.**
-
 ## 3. 추출한 shared View / API adapter
 
 `packages/shared-space-ui/src/forum-owner/` 신설 (barrel 은 `@o4o/shared-space-ui` 로 re-export).
@@ -103,7 +73,6 @@ View 만 합치고 adapter 를 서비스마다 두면 **동일 mapper 가 4벌 �
 
 - 배열 응답 3형태(`T[]` · `{data:T[]}` · `{data:{data:T[]}}`)를 모두 수용
 - `{ success:false, error }` → `throw Error(error)` 승격 — **조회 실패를 "정상 0건" 으로 위장하지 않는다**
-  (`WO-O4O-GLYCOPHARM-API-WRAPPER-FAILURE-CONTRACT-CLOSEOUT-BATCH-V1` 계약)
 - axios 오류 → `Error(서버 메시지)` (기본 message "Request failed with status code 403" 노출 방지),
   회원 관리의 403 분기를 위해 `status` 보존
 
@@ -112,7 +81,6 @@ View 만 합치고 adapter 를 서비스마다 두면 **동일 mapper 가 4벌 �
 | 서비스 | adapter | theme | links | slot / 기타 |
 |---|---|---|---|---|
 | KPA-Society | `api/forumOwnerAdapter.ts` (56줄) · **`fetchMyRequests` 미주입** | blue | `/forum` · `/mypage/my-forums/:id/members` · 신청 폼 링크 없음 | `MyPageLayout` 래핑 · `MyPageNavigation` navSlot · 통합 신청함 `noticeSlot` · `containerClassName=""` |
-| GlycoPharm | `services/forumOwnerAdapter.ts` (58줄) | emerald | `/forum` · `/forum/request-category` · `/forum/my-dashboard/:id/members` | `headerSlot` · `emojiPlaceholder="예: 💊"` |
 | K-Cosmetics | `services/forumOwnerAdapter.ts` (53줄) | pink | 동일 구조 | `headerSlot` · `emojiPlaceholder="예: 💄"` |
 | Neture | `services/forumOwnerAdapter.ts` (46줄) · membership adapter 없음 | emerald | `/supplier/forum` · `/supplier/forum/request-category` · **`memberManageHref` 없음** | `containerClassName="max-w-4xl"` (공급자 셸이 여백 담당) |
 
@@ -129,7 +97,7 @@ adapter 합계 213줄.
 | **KPA** — 대시보드에 개설 신청 Quick Action 없음 | `requestFormHref` 미주입 (기존 화면과 동일) |
 | **Neture** — 폐쇄형 회원 관리 동선 없음 | `memberManageHref` 미주입 → 링크 미노출. **회원 관리 page/route 신설하지 않음** |
 | **Neture** — 공급자 공간 basePath | `/supplier/*` 링크 유지 |
-| **GP / KCos** — 폐쇄형 회원 관리 보유 | 링크·route 유지 |
+| **KCos** — 폐쇄형 회원 관리 보유 | 링크·route 유지 |
 | **Pharmacy-Hub** — 소유자 영역 없음 | 신설하지 않음. `/operator/memberships` 는 **서비스 가입 멤버십**(다른 업무 모델)이라 이 축이 아니다 → census `NOT_IMPLEMENTED` 유지 |
 | 서비스별 문구·이모지·accent | config 로 보존 |
 
@@ -150,8 +118,6 @@ adapter 합계 213줄.
 |---|---|---:|---:|---:|
 | KPA-Society | 대시보드 | 285 | 52 | −233 |
 | KPA-Society | 회원 관리 | 381 | 31 | −350 |
-| GlycoPharm | 대시보드 | 572 | 40 | −532 |
-| GlycoPharm | 회원 관리 | 354 | 31 | −323 |
 | K-Cosmetics | 대시보드 | 581 | 40 | −541 |
 | K-Cosmetics | 회원 관리 | 354 | 29 | −325 |
 | Neture | 대시보드 | 576 | 43 | −533 |
@@ -169,19 +135,16 @@ adapter 합계 213줄.
 ```
 
 **핵심은 −1,099줄이 아니라 7벌 → 1벌**이다. 이전에는 회원 관리 버그 1건을 3곳에, 대시보드 변경 1건을 4곳에
-반영해야 했다(그리고 실제로 GP↔KCos 는 색만 바꾼 축자 복제였다).
 
 ## 8. census 셀 판정 — 변경 전/후
 
 | census # | 기능 | 서비스 | 전 | 후 | 근거 |
 |---|---|---|:--:|:--:|---|
 | F31 | 내 포럼 대시보드 | KPA-Society | `VIEW_DUPLICATED` | **`FULLY_COMMON`** | 공통 `ForumOwnerDashboard` + config·slot 주입만 (52줄) |
-| F31 | | GlycoPharm | `VIEW_DUPLICATED` | **`FULLY_COMMON`** | 동일 (40줄) |
 | F31 | | K-Cosmetics | `VIEW_DUPLICATED` | **`FULLY_COMMON`** | 동일 (40줄) |
 | F31 | | Neture | `VIEW_DUPLICATED` | **`FULLY_COMMON`** | 동일 (43줄). 회원 관리 미노출은 config 로 표현 |
 | F31 | | Pharmacy-Hub | `NOT_IMPLEMENTED` | `NOT_IMPLEMENTED` | 신설하지 않음 |
 | F34 | 포럼 회원 관리 | KPA-Society | `VIEW_DUPLICATED` | **`FULLY_COMMON`** | 공통 `ForumOwnerMemberManagement` (31줄) |
-| F34 | | GlycoPharm | `VIEW_DUPLICATED` | **`FULLY_COMMON`** | 동일 (31줄) |
 | F34 | | K-Cosmetics | `VIEW_DUPLICATED` | **`FULLY_COMMON`** | 동일 (29줄) |
 | F34 | | Neture | `NOT_IMPLEMENTED` | `NOT_IMPLEMENTED` | 정책상 동선 없음 — 만들지 않음 |
 | F34 | | Pharmacy-Hub | `NOT_IMPLEMENTED` | `NOT_IMPLEMENTED` | 동일 |
@@ -202,14 +165,14 @@ FULLY_COMMON    0 → 7
 `apps/api-server/src/__tests__/forum-owner-area-commonization.spec.ts` — **55 tests**
 
 정적 회귀 가드 (이 저장소에서 실행이 검증된 러너가 api-server jest 뿐이라 여기에 둔다 —
-`kpa-boundary-regression.spec.ts` · `glycopharm-forum-service-boundary.spec.ts` 와 같은 패턴).
+`kpa-boundary-regression.spec.ts` 와 같은 패턴).
 
 | 축 | 검증 |
 |---|---|
 | 공통 소비 | 7개 화면이 공통 컴포넌트를 import·렌더 · barrel export 존재 |
 | 복제 재발 방지 | 서비스 파일에 복제 지문(모달 셸 · `STATUS_CONFIG` · 목록 문구) 0 · LOC ≤ 80 · 총 LOC < 이전의 1/5 |
 | 서비스 분기 금지 | 공통 컴포넌트 6파일 코드 라인에 서비스 식별자(`serviceKey`/`serviceType`/서비스명) 0 · 브랜드 색 하드코딩 0 |
-| 정책 보존 | Neture `memberManageHref` 미주입 + 회원관리 파일 부재 · Neture basePath · KPA `fetchMyRequests` 미주입 + noticeSlot · KPA 마이페이지 소속 · GP/KCos 회원관리 유지 · 이모지 유지 · **PH 에 `ForumOwner*` 소비 0** |
+| 정책 보존 | Neture `memberManageHref` 미주입 + 회원관리 파일 부재 · Neture basePath · KPA `fetchMyRequests` 미주입 + noticeSlot · KPA 마이페이지 소속 · KCos 회원관리 유지 · 이모지 유지 · **PH 에 `ForumOwner*` 소비 0** |
 | accent / Tailwind | 어댑터 4곳이 토큰 9개 완비 · 동적 클래스 조합 금지 · 소비 서비스 4곳 tailwind content 가 shared-space-ui 스캔 |
 | adapter 중복 | mapper 는 공통 factory 단독 소유 · 서비스 adapter 가 mapper 재정의 0 · adapter LOC ≤ 70 |
 
@@ -220,7 +183,7 @@ FULLY_COMMON    0 → 7
 | `forum-owner-area-commonization.spec.ts` | **55/55 PASS** |
 | 서비스 typecheck / build (`tsc -b`, vite) | **미실측** |
 | shared package build | **미실측** |
-| 브라우저 회귀 (GP/KCos/KPA/Neture 화면) | **미실측** |
+| 브라우저 회귀 (KCos/KPA/Neture 화면) | **미실측** |
 
 첫 실행에서 1건이 실패했다 — Neture 정책 단언이 파일 **주석**에 있는 `memberManageHref` 문자열까지
 잡은 스펙 자체의 오탐이었다. 코드 라인만 보도록 `codeOf()` 로 좁힌 뒤 재실행해 55/55 통과했다
@@ -244,18 +207,13 @@ FULLY_COMMON    0 → 7
 전체 typecheck 를 돌리지 못했으므로 아래는 **정적 확인**이다 (실측 아님).
 
 - 서비스 adapter 가 배선하는 함수의 실재를 확인: KPA `forumApi.getMyForums/updateMyForum/requestDeleteForum` ·
-  `forumMembershipApi` 7종, GP/KCos/Neture `fetchMyCategories/fetchMyForumRequests/updateMyCategory/requestDeleteCategory`
-  및 GP/KCos `forumMembershipApi` — 전부 export 확인.
-- 경로 alias 확인: Neture·GP `@/*` → `src/*` (tsconfig), KCos·KPA 는 상대 경로 사용.
+  `forumMembershipApi` 7종, KCos/Neture `fetchMyCategories/fetchMyForumRequests/updateMyCategory/requestDeleteCategory`
+  및 KCos `forumMembershipApi` — 전부 export 확인.
+- 경로 alias 확인: Neture `@/*` → `src/*` (tsconfig), KCos·KPA 는 상대 경로 사용.
 - KPA `MyPageLayout`(`src/layouts`) · `KPA_MYPAGE_NAV_ITEMS`(`pages/mypage/navItems`) export 확인.
 - 구 페이지 내부 심볼을 외부에서 import 하던 곳 0 (App.tsx 는 default import 만 사용 — route 무변경).
 
 ## 10. 잔존 duplication / 위험
-
-### R1. GlycoPharm `pages/forum/MyRequestsPage.tsx` (285줄) legacy 잔존
-
-census S4 로 보고된 항목이다. `/forum/my-requests` route 로 살아 있고, canonical 인
-`/mypage/my-requests`(58줄, 공통 `MyRequestsInbox`)와 이중이다. **F30 축이라 본 WO 범위 밖**이라 두었다.
 
 ### R2. Neture tailwind content 누락은 이번에 함께 메웠다
 

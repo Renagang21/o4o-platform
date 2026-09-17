@@ -299,7 +299,7 @@ store_qr_codes INSERT (매장 사본 — 기존 구조 그대로)
 
 - POST `/stores/:slug/qr/staff/...` 매장 직접 QR 흐름 — 기존 `POST /pharmacy/qr` 가 이미 cover (별도 신설 불필요)
 - origin_template_id 추적 + 통합 scan 통계 — Phase 5 후속
-- GlycoPharm / K-Cosmetics 이식 — KPA 검증 후 별도 WO
+- K-Cosmetics 이식 — KPA 검증 후 별도 WO
 
 ---
 

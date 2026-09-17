@@ -27,7 +27,7 @@
 ┌──────────────────────────────────────────────────────────────────────┐
 │                        Frontend Layer                                │
 │                                                                      │
-│  web-glycopharm        web-glucoseview       web-neture              │
+│  web-glucoseview       web-neture                                    │
 │  ├ CareAiChatPanel     ├ AIChatWidget        ├ supplierCopilotApi   │
 │  ├ pharmacyApi         ├ api.aiQuery()       └ sellerDashboard      │
 │  └ POST /care/ai-chat  └ POST /api/ai/query                        │
@@ -713,8 +713,6 @@ Priority 4 (관측성 — 장기):
 
 | # | 파일 | 서비스 | AI 엔드포인트 |
 |---|------|--------|-------------|
-| 22 | `services/web-glycopharm/src/api/pharmacy.ts` | glycopharm | POST /care/ai-chat |
-| 23 | `services/web-glycopharm/src/pages/care/CareAiChatPanel.tsx` | glycopharm | AI Chat UI |
 | 24 | `services/web-glucoseview/src/services/api.ts` | glucoseview | POST /api/ai/query |
 | 25 | `services/web-glucoseview/src/components/ai/AIChatWidget.tsx` | glucoseview | AI Chat UI |
 | 26 | `services/web-neture/src/lib/api/supplier.ts` | neture | GET /copilot/* |
@@ -727,7 +725,6 @@ Priority 4 (관측성 — 장기):
 
 | 프론트엔드 서비스 | AI 기능 | 백엔드 엔드포인트 | 비고 |
 |-----------------|--------|-----------------|------|
-| **web-glycopharm** | 환자 AI 챗봇, 코칭 초안, LLM 인사이트 | `POST /care/ai-chat`, `GET /care/llm-insight/*`, `GET /care/coaching-drafts/*` | 가장 활발한 AI 사용 |
 | **web-glucoseview** | 환자 AI 위젯, AI 인사이트 | `POST /api/ai/query`, `GET /care/patient/ai-insight` | 데모 모드 지원 |
 | **web-neture** | 공급자 코파일럿 (KPI, 상품 성과, 유통) | `GET /neture/supplier/copilot/*`, `GET /*/dashboard/ai-insight` | 5개 코파일럿 API |
 | **web-k-cosmetics** | AI 리포트 (Mock) | 없음 | 실제 AI 호출 ❌ |

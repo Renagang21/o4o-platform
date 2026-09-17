@@ -179,7 +179,7 @@ WHERE (
 2. `organization_members`에 `role IN ('owner','admin','manager')` AND `left_at IS NULL` 레코드 존재 → `organizationId` 파생
 3. 선택한 offer가 `approval_status='APPROVED'` AND `is_active=true`
 
-**중요**: `requireStoreOwner`가 `serviceKey` 없이 생성됨 → 모든 서비스(kpa, glycopharm, cosmetics)의 store_owner role을 허용하는 back-compat 경로 사용.
+**중요**: `requireStoreOwner`가 `serviceKey` 없이 생성됨 → 모든 서비스(kpa, cosmetics)의 store_owner role을 허용하는 back-compat 경로 사용.
 
 ```typescript
 // store-product-library.controller.ts:59

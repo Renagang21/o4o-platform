@@ -38,7 +38,7 @@ Neture 승인 축의 admin / operator 쌍을 전수 대조했다.
 
 ### 1-2. `DEAD_DUPLICATE` 판정 근거 — `/admin/offers/bulk-approve`
 
-- frontend 소비처 **0건** (admin-dashboard / web-neture / web-kpa-society / web-k-cosmetics / web-glycopharm 전 범위 문자열 census).
+- frontend 소비처 **0건**
 - 동일 결과를 내는 canonical 경로가 이미 존재한다 (`/operator/products/batch-approve`).
 - `approveProducts` 는 이 route 외 호출자 **0건** — `neture.service.ts` wrapper 와 `offer.service.ts` 구현이 모두 이 route 전용이었다.
 
@@ -87,7 +87,7 @@ admin batch 상한은 50, operator batch 상한은 100 이다. 두 경로의 권
 ### 3-1. dead fallback 판정 결과 = **0건**
 
 - `services/NotificationService.ts` (326행)의 유일한 fallback 형태는 SSE emit 의 try/catch 이며, 클래스 doc-comment 에 "SSE emission is best-effort — failures are logged but never thrown" 로 **명시**돼 있다 → `BEST_EFFORT_INTENTIONAL`.
-- `actionUrl` 생산자 전수 추적 결과, 모든 값이 web-neture / web-kpa-society / web-k-cosmetics / web-glycopharm 의 **실재 route** 로 해소된다 → `DEAD_FALLBACK` 0 · `BUG_MASKING` 0.
+- `BUG_MASKING` 0.
 
 ### 3-2. orphan type 1건 제거
 

@@ -14,13 +14,12 @@
 | **PharmacyHub** | `statusSlot` — 카드(아이콘+매장명+사용자명 / 우측 상태 배지 / 경고 2종 / 역할·승인일시 dl / 가입 상태 상세 링크) | **가입·연결 상태** (`none/pending/active/rejected/suspended/withdrawn` + `not_connected` `ambiguous`) | `fetchStoreDashboard` (store + membership) |
 | **K-Cosmetics** | `statusSlot` — 카드(아이콘 / 매장명+상태 배지 / 코드·멤버수·역할 한 줄 / 우측 상품·주문 관리 버튼) | **매장 운영 승인 상태** (`approved/pending/draft/suspended/rejected`) | 선택 매장(`selectedStore`) |
 | **KPA** | **없음** — 헤더 + 처리 필요 신호 + KPI 구성. 매장 상태 카드/배너 없음 | – | – |
-| **GlycoPharm** | `HubLayout`(hub-core) 의 섹션·signal·QuickAction 상태 모델 + `orderMetricsReady` 배너 | 운영 신호(signalKey) 축 | `useStoreHub` |
 
 표시 의미는 4서비스가 서로 다르다:
 - 매장 연결 여부 = PharmacyHub 만 (`not_connected` / `ambiguous`)
 - 멤버십/역할 = PharmacyHub(역할·승인일시) · K-Cosmetics(역할·멤버수) — 값의 출처와 판정이 다름
-- 운영 활성 상태 = K-Cosmetics(매장 승인 상태) · GlycoPharm(운영 신호)
-- 서비스별 별도 경고 = PharmacyHub 연결 경고 · GlycoPharm 주문/매출 준비 중 배너
+- 운영 활성 상태 = K-Cosmetics(매장 승인 상태)
+- 서비스별 별도 경고 = PharmacyHub 연결 경고 주문/매출 준비 중 배너
 
 ---
 
@@ -31,7 +30,6 @@
 - 두 카드는 **아이콘 → 매장명 → 상태 배지 → 메타(역할 등) → 경고 → 보조 액션** 이라는 동일한 구성과 순서를 각자 인라인으로 반복하고 있었다. 이 배치·조건부 렌더가 공통화 대상이다.
 - 반면 **상태 축이 다르다**(가입/연결 vs 매장 운영 승인). 그래서 상태 값·라벨·tone·경고 노출 조건·membership/role 판정은 **서비스에 그대로 남기고 slot 으로 받는다.** 공통 컴포넌트는 판정 코드를 갖지 않는다.
 - KPA 는 해당 카드가 **존재하지 않아** 제외했다(신규 상태 추가 금지).
-- GlycoPharm 은 `HubLayout` 의 상태 모델(roles·signalKey·QuickAction)이 단순 카드보다 넓어, 축소하면 기능 손실 — WO 변경 금지 항목이므로 제외했다.
 
 ---
 
@@ -56,7 +54,6 @@
 | PharmacyHub | `STATUS_LABEL`/`STATUS_TONE`, loading·error 배지 분기, `not_connected`·`ambiguous` 경고 문구와 조건, 역할·승인일시 dl, `/join/status` 링크, teal accent |
 | K-Cosmetics | `STATUS_CONFIG`/`StatusBadge`, 코드·멤버수·역할 표기, 상품·주문 관리 NavLink 2종, `Card p-6` |
 | KPA | 변경 0 |
-| GlycoPharm | 변경 0 (회귀만 확인) |
 
 ---
 
@@ -67,7 +64,6 @@
 - 매장 연결 API · route · 권한 · API 계약 변경 없음.
 - 신규 상태/경고 추가 없음.
 - **DB / migration / backend 변경 없음.**
-- GlycoPharm `HubLayout` 상태 모델 미변경.
 
 ---
 
@@ -78,7 +74,6 @@
 | web-kpa-society (회귀) | PASS | PASS |
 | web-pharmacy-hub | PASS | PASS |
 | web-k-cosmetics | PASS | PASS |
-| web-glycopharm (회귀) | PASS | PASS |
 
 코드 경로 등가성 확인(작업 브랜치 미배포 — 브라우저 smoke 미실행):
 
@@ -103,7 +98,7 @@ services/web-k-cosmetics/src/pages/operator/StoreCockpitPage.tsx     (statusSlot
 docs/checks/CHECK-O4O-MY-STORE-HOME-STORE-STATUS-CARD-CROSSSERVICE-COMMONIZATION-V1.md (본 문서)
 ```
 
-KPA / GlycoPharm 소스 변경 0건.
+KPA 소스 변경 0건.
 
 ## 7. 문서 정합
 

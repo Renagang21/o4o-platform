@@ -76,7 +76,7 @@ buildEventOfferCartPayload(item, qty) => {
 
 - EventOfferDetailPage 담기 + StoreCartPage 수량변경/삭제/비우기 유지(helper 리팩터만, 동작 동일).
 - 무료배송 progress UI 무변경. participate API/service·주문/결제/정산/배송 무변경.
-- Glyco/KCos·web-neture·공통 패키지 무수정. 다른 세션 WIP 무접촉.
+- 다른 세션 WIP 무접촉.
 
 ## 7. 완료 기준 체크
 
@@ -96,7 +96,6 @@ buildEventOfferCartPayload(item, qty) => {
 - 실제 KPA 이벤트오퍼 등록 후 목록 "담기"/일괄 "담기" 시각 클릭 1회만 잔여(graceful).
 - **Phase 1b** `WO-O4O-STORE-CART-CHECKOUT-CONFIRMATION-V1`: checkout 확정, 공급자별 createOrder
   N분할, event_offer 최종 검증, 수량 차감 시점 이전, participate legacy 격하, sellerOrganizationId resolve.
-- **Phase 1c** `WO-O4O-EVENT-OFFER-TO-CART-CROSSSERVICE-V2`: Glyco/KCos.
 
 ---
 

@@ -199,8 +199,8 @@ describe('cross-service 권한 회귀 (§8) — canonical key 로도 그대로 �
     expect(res.json.mock.calls[0][0].code).toBe('SIGNAGE_STORE_REQUIRED');
   });
 
-  it('소유하지만 KPA-only / GP-only org → 403 (귀속 검사 유지)', async () => {
-    for (const org of ['org-kpa-only', 'org-gp-only']) {
+  it('소유하지만 타 서비스-only org(KPA-only / Neture-only) → 403 (귀속 검사 유지)', async () => {
+    for (const org of ['org-kpa-only', 'org-neture-only']) {
       queueResponses([OWNED, []]);
       const res = makeRes();
       const next = jest.fn();

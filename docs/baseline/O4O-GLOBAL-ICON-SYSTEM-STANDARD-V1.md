@@ -113,7 +113,6 @@ KPA-Society:
 - 약사 전문 플랫폼, 커뮤니티, 약국 운영 허브의 신뢰감
 - 약국 운영 문맥: Store, Building2, PackageSearch, MonitorPlay, Megaphone, QrCode 등
 
-GlycoPharm:
 - medical blue 또는 teal 계열
 - 약국 혈당관리, 전문 케어, 약국 경영
 - 사용자-facing 문구: "내 약국", "약국 계정", "내 약국에 복사" 기준 유지
@@ -262,9 +261,8 @@ O4O 에는 이미 중앙화된 아이콘 패턴이 존재한다.
 | Phase | 대상 |
 |:-----:|------|
 | 1 | KPA-Society 약국 운영 허브 |
-| 2 | GlycoPharm 내 약국 / Store Hub / Channels |
-| 3 | K-Cosmetics 내 매장 / Store Hub / Channels |
-| 4 | Neture Home / 역할 카드 / Market Trial CTA |
+| 2 | K-Cosmetics 내 매장 / Store Hub / Channels |
+| 3 | Neture Home / 역할 카드 / Market Trial CTA |
 | 5 | Operator/Admin Quick Actions |
 | 6 | LMS lesson type icon mapping |
 | 7 | shared-space-ui emoji fallback 제거 |

@@ -3,12 +3,12 @@
  *
  * WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1
  *
- * GP/KCos 운영자(admin)가 Contact Us 문의 수신·알림 설정을 조회·수정한다. Mount: /api/v1/admin/services
+ * KCos 운영자(admin)가 Contact Us 문의 수신·알림 설정을 조회·수정한다. Mount: /api/v1/admin/services
  *   GET /:serviceKey/contact-settings — effective 설정 조회(없으면 기본값)
  *   PUT /:serviceKey/contact-settings — upsert(이메일 형식 검증)
  *
  * 권한: requireServiceLegalScope('admin') 재사용(serviceKey 별 `{prefix}:admin`).
- *   + serviceKey 화이트리스트 = glycopharm / k-cosmetics / neture / kpa-society.
+ *   + serviceKey 화이트리스트 = k-cosmetics / neture / kpa-society.
  *     (WO-O4O-CONTACT-NETURE-KPA-SETTINGS-ADAPTER-V1: Neture/KPA 는 기존 저장소를 유지하되
  *      ServiceContactSettings 기반 이메일 알림·자동 회신 설정만 공통 Admin 으로 추가.)
  *     operator 기본 접근 없음.

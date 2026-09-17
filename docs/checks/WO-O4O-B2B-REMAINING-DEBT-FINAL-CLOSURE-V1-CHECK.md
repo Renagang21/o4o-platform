@@ -13,7 +13,6 @@
 |---|---|
 | 5 서비스 × 14축 census | 완료 · **UNKNOWN 0 / UNJUDGED 0** |
 | DF-6 (soft-delete 게이트) | **종결** — Core base 쿼리 소유로 이전 + catalog SSOT 4개 쿼리 정렬 |
-| dead `GET /api/v1/glycopharm/b2b/products` | **제거** (runtime consumer 0) |
 | sourceType 축 혼합 오염 | 0 (서버 항목단위 fail-closed) + frontend 반쪽주문 UX 차단 추가 |
 | buyer organization spoof | 0 |
 | serviceKey cross-leak | 0 |
@@ -48,22 +47,22 @@ WO §3 계약대로 **수정 0 / restore 0 / stash 0 / stage 0** 으로 두었�
 
 `✅ = 있음/정상` · `— = 없음(판정 완료)` · UNKNOWN 0.
 
-| # | 축 | KPA-Society | GlycoPharm | K-Cosmetics | Neture | Pharmacy-Hub |
-|---|---|---|---|---|---|---|
-| 1 | catalog / producer 원천 | `supplier_product_offers`(spo) | spo | spo | spo | spo |
-| 2 | offer 노출 게이트 | `approval` | `approval` | `approval` | `neture` | `optin` |
-| 3 | cart 담기 | ✅ 관심상품 작업대 (`worktableCart.ts`) | ✅ `/store/commerce/products`(§13-6) | — b2b producer 없음 (event_offer 만) | ✅ 자체 cart 페이지 | ✅ 자체 cart route |
-| 4 | cart 수정/삭제 | 공통 `/api/v1/store/cart/:serviceKey/*` | 동일 | 동일 | 동일 | 자체 `/store-owner/cart/*` |
-| 5 | 생성 sourceType | `b2b` (+ 기존 `event_offer`) | `b2b` | `event_offer` | `b2b`/`regular` | `b2b` |
-| 6 | checkout confirm | `checkout-confirm-b2b` (승인축 wrapper) | 동일 | 동일 (경로 준비됨) | `checkout-confirm-b2b` (neture wrapper) | 자체 `POST /store-owner/orders` |
-| 7 | buyer organization | 서버 확정 `required` | `required` | `required` | adapter 설정대로 | 서버 enrollment 확정 |
-| 8 | supplier ownership | `neture_suppliers` | 동일 | 동일 | 동일 | 동일 |
-| 9 | price 권위 | 서버 `offer_service_prices → price_general` | 동일 | 동일 | 동일 | 서버 원장 |
-| 10 | `checkout_orders` write | Core | Core | Core | Core | 자체 controller(같은 테이블) |
-| 11 | 결제/이행 후속 | 이벤트오퍼 축 | 동일 | 동일 | 결제완료 → `CheckoutFulfillmentBridge` | Toss prepare/confirm → 공급자 전달 |
-| 12 | buyer-order read | `buyer-order-read.service.ts` | 동일 | 동일 | `GET /neture/seller/orders` (neture_orders 축) | `GET /store-owner/orders` |
-| 13 | frontend consumer | `StoreCartPage` + `StoreOrdersPage` | 동일 | 동일 | 자체 페이지 | 자체 페이지 |
-| 14 | dead API / dead controller | 0 | **1건 제거**(아래 §4) | 0 | 0 | 0 |
+| # | 축 | KPA-Society | K-Cosmetics | Neture | Pharmacy-Hub |
+| --- | --- | --- | --- | --- | --- |
+| 1 | catalog / producer 원천 | `supplier_product_offers`(spo) | spo | spo | spo |
+| 2 | offer 노출 게이트 | `approval` | `approval` | `neture` | `optin` |
+| 3 | cart 담기 | ✅ 관심상품 작업대 (`worktableCart.ts`) | — b2b producer 없음 (event_offer 만) | ✅ 자체 cart 페이지 | ✅ 자체 cart route |
+| 4 | cart 수정/삭제 | 공통 `/api/v1/store/cart/:serviceKey/*` | 동일 | 동일 | 자체 `/store-owner/cart/*` |
+| 5 | 생성 sourceType | `b2b` (+ 기존 `event_offer`) | `event_offer` | `b2b`/`regular` | `b2b` |
+| 6 | checkout confirm | `checkout-confirm-b2b` (승인축 wrapper) | 동일 (경로 준비됨) | `checkout-confirm-b2b` (neture wrapper) | 자체 `POST /store-owner/orders` |
+| 7 | buyer organization | 서버 확정 `required` | `required` | adapter 설정대로 | 서버 enrollment 확정 |
+| 8 | supplier ownership | `neture_suppliers` | 동일 | 동일 | 동일 |
+| 9 | price 권위 | 서버 `offer_service_prices → price_general` | 동일 | 동일 | 서버 원장 |
+| 10 | `checkout_orders` write | Core | Core | Core | 자체 controller(같은 테이블) |
+| 11 | 결제/이행 후속 | 이벤트오퍼 축 | 동일 | 결제완료 → `CheckoutFulfillmentBridge` | Toss prepare/confirm → 공급자 전달 |
+| 12 | buyer-order read | `buyer-order-read.service.ts` | 동일 | `GET /neture/seller/orders` (neture_orders 축) | `GET /store-owner/orders` |
+| 13 | frontend consumer | `StoreCartPage` + `StoreOrdersPage` | 동일 | 자체 페이지 | 자체 페이지 |
+| 14 | dead API / dead controller | 0 | 0 | 0 | 0 |
 
 ---
 
@@ -90,26 +89,6 @@ baseline 에 **불변식 C7** 로 등재했다.
 
 계약 성립: `삭제/비활성 offer → catalog 미노출 → cart producer 불가 → confirm 불가`.
 **schema migration 0** (컬럼은 `@DeleteDateColumn` 으로 이미 존재).
-
----
-
-## 4. §6 dead GlycoPharm API
-
-`GET /api/v1/glycopharm/b2b/products` (`createB2BController`, legacy `glycopharm_products` reader).
-
-| 조사 | 결과 |
-|---|---|
-| frontend 호출 | 0 |
-| 다른 backend 호출 | 0 |
-| 외부 계약 | 없음 |
-| 잔여 참조 | 운영 runbook 2건의 `curl` 예시 — `HISTORY_ONLY` 로 분류, 편집하지 않음 |
-
-→ **제거**. `pharmacy.controller.ts` 의 controller factory 와 `glycopharm.routes.ts` 의 mount 를 삭제하고
-사유 주석을 남겼다. `GlycopharmRepository.findAllProducts` 는 `glycopharm.service.ts:273` 이 여전히 사용하므로
-**삭제하지 않았다** (§20 — 다른 read 기능이 살아 있으면 삭제 금지).
-
-잔여 참조 파일 (편집 대상 아님):
-`apps/api-server/migrations-sql/README-EXECUTE-MIGRATION.md` · `EXECUTE-PRODUCTION-MIGRATION.md`
 
 ---
 
@@ -141,7 +120,6 @@ cart 전체를 `checkout-confirm-b2b` 로 보냈고, event_offer 항목은 조�
 | 소비처 | `useStoreCart` 사용 | 조치 |
 |---|---|---|
 | web-kpa-society `StoreCartPage` | ✅ | 자동 적용 |
-| web-glycopharm `StoreCartPage` | ✅ | 자동 적용 |
 | web-k-cosmetics `StoreCartPage` | ✅ | 자동 적용 |
 | web-neture `StoreCartPage` | ❌ (직접 `checkoutConfirmB2B()`) | **변경 없음** — neture 축에는 event-offer producer 자체가 없어 혼재가 성립하지 않는다. 억지 이관 금지 |
 | web-pharmacy-hub | ❌ (자체 표면) | 변경 없음 (§13-4 · §17) |
@@ -152,10 +130,10 @@ cart 전체를 `checkout-confirm-b2b` 로 보냈고, event_offer 항목은 조�
 
 | 축 | 확인 결과 |
 |---|---|
-| **§9** exposure strategy 3축 | `approval`(GP·KPA·KCos, 소문자 `approved`) / `optin`(PH, `service_keys`) / `neture`(row-level). `assertMutuallyExclusiveSupplyAxes()` 로 boot-time fail-fast. 상호배타 SSOT 유지 |
+| **§9** exposure strategy 3축 | `approval`(KPA·KCos, 소문자 `approved`) / `optin`(PH, `service_keys`) / `neture`(row-level). `assertMutuallyExclusiveSupplyAxes` 로 boot-time fail-fast. 상호배타 SSOT 유지 |
 | **§10** price 권위 | Core 가 `offer_service_prices[offerId, serviceKey]` → 없으면 `price_general`. `unitPrice > 0` 아니면 항목 탈락. cart `priceSnapshot` · frontend 값은 **표시용**이며 확정에 쓰이지 않는다 |
 | **§11** buyer organization | client `organizationId` 는 hint. 서버 `resolveBuyerOrganization` 이 `resolved/none/ambiguous/forbidden` 확정 → `STORE_ORGANIZATION_NOT_FOUND`(403) / `AMBIGUOUS_STORE_ORGANIZATION`(400) / `FOREIGN_STORE_ORGANIZATION`(403). **타 조직 spoof 가 order write 에 도달하지 않는다** |
-| **§12** serviceKey 격리 | serviceKey 는 경로 파라미터에서만 온다(CLAUDE.md §7 Guard 4). cart 조회는 `{buyerId, serviceKey}` 복합. buyer-order read 는 `buyerId + serviceKeys 집합`, 집합이 비면 **빈 결과**(전체 조회로 넓어지지 않음). KPA cart → GP confirm, Neture cart → PH confirm, cross-service order read 모두 불가 |
+| **§12** serviceKey 격리 | serviceKey 는 경로 파라미터에서만 온다(CLAUDE.md §7 Guard 4). cart 조회는 `{buyerId, serviceKey}` 복합. buyer-order read 는 `buyerId + serviceKeys 집합`, 집합이 비면 **빈 결과**(전체 조회로 넓어지지 않음). |
 
 ---
 
@@ -186,7 +164,6 @@ cart 전체를 `checkout-confirm-b2b` 로 보냈고, event_offer 항목은 조�
 | 경로 | serviceKey |
 |---|---|
 | `POST /api/v1/kpa/checkout/orders/:orderId/cancel` | `SERVICE_KEYS.KPA_SOCIETY` |
-| `POST /api/v1/glycopharm/checkout/orders/:orderId/cancel` | `SERVICE_KEYS.GLYCOPHARM` |
 | `POST /api/v1/cosmetics/orders/:id/cancel` | `SERVICE_KEYS.K_COSMETICS` |
 
 응답은 cart 와 동일하게 403 `SERVICE_MEMBERSHIP_REQUIRED`.
@@ -201,14 +178,14 @@ cart 전체를 `checkout-confirm-b2b` 로 보냈고, event_offer 항목은 조�
 | § | 결과 |
 |---|---|
 | **§14** cart 경계 | `delete({id})` / `update({id})` 단독 0건 — 모두 `id + buyerId + serviceKey`. 회귀 테스트로 고정 |
-| **§15** dead 잔재 | dead controller 1건 제거(§4). `glycopharm.routes.ts` 의 미사용 import 3개(`RequestHandler`, `hasAnyServiceRole`, `logLegacyRoleUsage`) 제거. 호환 alias · 실제 역할이 있는 guard wrapper 는 **유지** |
-| **§16 K-Cosmetics 최종 상태** | **`CORE_READY_BUT_NO_PRODUCER`** — 서버 confirm 축·cart API·`StoreCartPage` 는 준비됨. `event_offer` producer 는 있고 **b2b producer 화면이 없다**(`HubB2BPage` 는 `SupplyCatalogHub` 에 `addToCart` 를 주입하지 않는다 — GlycoPharm 만 §13-6 로 채택). 담기 버튼 추가는 화면의 의미를 바꾸는 제품/UX 결정이므로 임의 배선하지 않는다. **UNKNOWN 아님** |
+| **§15** dead 잔재 | dead controller 1건 제거(§4). 호환 alias · 실제 역할이 있는 guard wrapper 는 **유지** |
+| **§16 K-Cosmetics 최종 상태** | **`CORE_READY_BUT_NO_PRODUCER`** — 서버 confirm 축·cart API·`StoreCartPage` 는 준비됨. `event_offer` producer 는 있고 **b2b producer 화면이 없다**. 담기 버튼 추가는 화면의 의미를 바꾸는 제품/UX 결정이므로 임의 배선하지 않는다. **UNKNOWN 아님** |
 | **§17 Pharmacy-Hub 최종 상태** | **`ACTIVE`** — 자체 cart/orders/payments 표면 + `optin` 축 + membership 스코프 가드. 서비스 고유 wrapper 를 억지 제거하지 않았다 |
 | **§18** `CheckoutFulfillmentBridge` | `services/neture/checkout-fulfillment-bridge.service.ts` 유지. 호출 지점은 **결제완료 이벤트 핸들러**와 operator fulfillment controller 뿐이며 confirm Core 는 주석으로 "범위 밖" 을 명시한다. **confirm 안으로 이동 0 / 경로만을 이유로 한 재설계 0** |
 | **§19** 소비자 commerce 재유입 | 0. `STORE_CONSUMER_ORDER_RETIRED`(410) · `STORE_SALE_PAYMENT_DEPRECATED`(410) · 이벤트오퍼 legacy 410 · `NETURE_B2B_LEGACY_SELLER_ORDER_RETIRED`(410) 모두 유지. 신규 consumer checkout/cart/refund/platform-seller 0 |
-| **§20** legacy 테이블 | `glycopharm_products` · `StoreLocalProduct` · legacy seller-order 테이블이 B2B 주문 원천으로 쓰이는 지점 **0건** (`services/cart` · `services/checkout` 전수). 다른 read 기능이 살아 있어 **삭제하지 않았다** |
+| **§20** legacy 테이블 | `StoreLocalProduct` · legacy seller-order 테이블이 B2B 주문 원천으로 쓰이는 지점 **0건** (`services/cart` · `services/checkout` 전수). 다른 read 기능이 살아 있어 **삭제하지 않았다** |
 | **§21** producer matrix | 위 census 3·5행 |
-| **§22** buyer-order read matrix | 위 census 12행. KPA/GP/KCos = 공통 Core, Neture = `neture_orders` 축 자체 경로, PH = 자체 경로 |
+| **§22** buyer-order read matrix | 위 census 12행. KPA/KCos = 공통 Core, Neture = `neture_orders` 축 자체 경로, PH = 자체 경로 |
 | **§23** API 잔재 | `ACTIVE` 다수 / `COMPATIBILITY_ALIAS` 유지(§12 DF-1 종결분) / `DEAD` **1건 이번에 제거** / `HISTORY_ONLY` runbook 2건 / `DEFERRED` 아래 §11 |
 
 ---
@@ -224,10 +201,9 @@ cart 전체를 `checkout-confirm-b2b` 로 보냈고, event_offer 항목은 조�
 | `check:unsafe-routes` | ✅ 1353 파일 · 위반 0 |
 | `check:typeorm-entities` | ✅ DEFINED_BUT_UNREGISTERED 0 / 중복 0 / stale 0 |
 | `lint-ratchet` | ⚠️ baseline 초과 (168 > 64) — 보고된 오류는 전부 `packages/block-core`, `services/web-neture/src/lib/api/*` 등 **본 WO 미접촉 파일**. 본 WO 변경 파일 전수 ESLint = **0 errors** |
-| 5 서비스 frontend typecheck | ✅ **5/5 exit 0** (KPA · GP · KCos · Neture · PH) |
+| 4 서비스 frontend typecheck | ✅ **5/5 exit 0** (KPA · KCos · Neture · PH) |
 | 5 서비스 frontend build | ⚠️ **4/5 PASS**. `web-kpa-society` 만 실패 — `Rollup failed to resolve import "@o4o/shortcodes" from packages/block-renderer/dist/...`. 원인은 다른 세션이 `packages/shortcodes` 를 **삭제 중(staged D)** 인 작업트리 상태다. 본 WO 변경과 무관하며 §3 계약상 손대지 않았다 |
 | `store-ui-core` vitest | ✅ 3 files / 28 tests PASS |
-| web-glycopharm vitest | ✅ 1 file / 8 tests |
 | web-kpa-society vitest | ✅ 1 file / 14 tests |
 
 > **Vitest PASS 만으로 완료 판정하지 않았다** (§26) — typecheck · build · 전체 Jest · CI 게이트를 함께 돌렸고
@@ -261,11 +237,9 @@ cart 전체를 `checkout-confirm-b2b` 로 보냈고, event_offer 항목은 조�
 | `GET https://api.neture.co.kr/health` | **200** |
 | `GET /api/v1/store/cart/kpa-society/items` | 401 (인증 요구 — 미인증 read leak 0) |
 | `GET /api/v1/kpa/checkout/orders` | 401 |
-| `GET /api/v1/glycopharm/checkout/orders` | 401 |
 | `GET /api/v1/cosmetics/orders` | 401 |
 | `GET /api/v1/pharmacy-hub/store-owner/orders` | 401 |
-| `GET /api/v1/glycopharm/b2b/products` | 401 — **현재 배포본에는 아직 존재**한다. 본 WO 배포 후 404 가 되어야 한다 |
-| glycopharm.co.kr / neture.co.kr / k-cosmetics.co.kr / kpa-society.co.kr / pharmacyhub.co.kr | 5/5 **200** |
+| neture.co.kr / k-cosmetics.co.kr / kpa-society.co.kr / pharmacyhub.co.kr | 5/5 **200** |
 
 주문·결제·취소 등 **write 는 한 건도 호출하지 않았다.** 대체 근거는 위 §9 의 자동화 write 테스트다.
 
@@ -312,11 +286,8 @@ baseline 의 라우트·테이블·화면 등재분은 **하나도 제거하지 
 | `services/cart/b2b-checkout-confirm.core.ts` | base 쿼리 soft-delete 게이트 소유 (DF-6) |
 | `services/cart/offer-exposure-strategy.ts` | strategy 조각에서 soft-delete 제거 + 계약 주석 |
 | `routes/o4o-store/controllers/pharmacy-products.controller.ts` | catalog SSOT 4개 쿼리 soft-delete 정렬 |
-| `routes/glycopharm/controllers/pharmacy.controller.ts` | dead `createB2BController` 제거 (§6) |
-| `routes/glycopharm/glycopharm.routes.ts` | `/b2b` mount 제거 + 미사용 import 3개 제거 |
 | `middleware/service-membership.middleware.ts` | **신규** — `requireActiveServiceMembership` (§13) |
 | `routes/kpa/controllers/kpa-checkout.controller.ts` | 취소 경로 membership 게이트 |
-| `routes/glycopharm/controllers/checkout.controller.ts` | 동일 |
 | `routes/cosmetics/controllers/cosmetics-order.controller.ts` | 동일 |
 | `__tests__/b2b-remaining-debt-final-closure.spec.ts` | **신규** — 회귀 가드 24 tests |
 

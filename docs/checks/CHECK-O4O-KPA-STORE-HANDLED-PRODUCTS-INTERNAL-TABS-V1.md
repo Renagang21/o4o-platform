@@ -28,7 +28,7 @@
 
 - `내 매장 제품`(/my-products) — 사이드바 항목 제거
 - `매장 자체 제품`(/commerce/local-products) — 사이드바 항목 제거
-- storeMenuConfig KPA 블록만. GP/KCos 무변경. MenuKey=free string → 타입 무변경.
+- storeMenuConfig KPA 블록만. KCos 무변경. MenuKey=free string → 타입 무변경.
 
 ## 6. 유지되는 route (데드링크 0)
 
@@ -49,9 +49,9 @@
 
 - 백엔드 무변경. `sourceType=local` → onlineSalesExposure=`not_supported` → "미지원" 배지 유지. 이번 변경은 메뉴/탭/버튼 UI만 → 불변식 영향 없음.
 
-## 9. GP/KCos 무영향 확인
+## 9. KCos 무영향 확인
 
-- storeMenuConfig KPA 블록만 수정(GP/KCos 별도 객체 무변경). 화면/route는 web-kpa-society 한정.
+- storeMenuConfig KPA 블록만 수정(KCos 별도 객체 무변경). 화면/route는 web-kpa-society 한정.
 
 ## 10. DB/migration 없음 확인
 

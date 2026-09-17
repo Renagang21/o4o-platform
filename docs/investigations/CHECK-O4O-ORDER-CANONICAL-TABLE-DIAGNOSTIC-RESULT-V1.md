@@ -46,8 +46,8 @@
 **H1: `ecommerce_orders` 프로덕션 미존재 + `checkout_orders` 0건.**
 
 1. **`ecommerce_orders`는 프로덕션에 실재하지 않는다** — IR-O4O-ORDER-CANONICAL-TABLE-CONFIRM-V1 의 마이그레이션 기반 추론(CREATE 부재 + NO-OP + 주석)을 **라이브 DB로 확증**. canonical = `checkout_orders` 최종 확정.
-2. **`checkout_orders`는 존재하지만 비어 있다(0건).** 즉 **프로덕션에 실주문이 전무**하다 — GP/K-Cos create 경로가 미존재 `ecommerce_orders`를 향해 실패해 온 결과와 정합(생성된 실주문 없음). KPA 등 다른 서비스 주문도 현재 0건.
-3. 따라서 직전 IR의 미확인 단일 항목("checkout_orders 내 glycopharm/cosmetics row 분포")은 **"0건 — 분포 없음"으로 해소**.
+2. **`checkout_orders`는 존재하지만 비어 있다(0건).** 즉 **프로덕션에 실주문이 전무**하다 — K-Cos create 경로가 미존재 `ecommerce_orders`를 향해 실패해 온 결과와 정합(생성된 실주문 없음). KPA 등 다른 서비스 주문도 현재 0건.
+3. 따라서 직전 IR의 미확인 단일 항목("checkout_orders 내 cosmetics row 분포")은 **"0건 — 분포 없음"으로 해소**.
 
 ---
 
@@ -55,9 +55,8 @@
 
 H1 확정 + checkout_orders 0건은 **create+payment 정렬 WO의 리스크를 제거**한다:
 
-- **회귀 위험 없음:** ecommerce_orders 기반 GP/K-Cos create+payment 경로는 미존재 테이블 대상이라 현재 동작하지 않는다. 깨뜨릴 "작동 중 흐름"이 없으므로 checkout_orders 정렬은 **순수 추가(additive)**.
-- **데이터 이관 불필요:** 양 테이블 모두 GP/K-Cos 실주문 0건. 과거 데이터 backfill/migration 불필요.
-- **H2(회귀) 분기 제거:** ecommerce_orders가 없으므로 "현재 ecommerce_orders로 동작 중인 GP 커머스를 깨뜨릴" 우려는 성립하지 않음.
+- **회귀 위험 없음:** ecommerce_orders 기반 K-Cos create+payment 경로는 미존재 테이블 대상이라 현재 동작하지 않는다. 깨뜨릴 "작동 중 흐름"이 없으므로 checkout_orders 정렬은 **순수 추가(additive)**.
+- **데이터 이관 불필요:** 양 테이블 모두 K-Cos 실주문 0건. 과거 데이터 backfill/migration 불필요.
 
 → **`WO-O4O-SERVICE-ORDER-FULL-CHECKOUT-ALIGN-V1`** (create + payment controller + payment event handler + list/get 을 두 서비스 동시에 checkout_orders 로 정렬)을 **회귀 걱정 없이** 진행할 수 있다. create 만 떼어내는 부분 정렬은 여전히 금지(create↔payment 동일 테이블 결합 — IR-O4O-OPERATOR-ORDER-API-CONTRACT-V1 / 직전 중단 보고 참조).
 

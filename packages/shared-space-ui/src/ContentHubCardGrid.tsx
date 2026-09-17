@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-HUB-CONTENT-BROWSE-COMPONENT-EXTRACTION-V1
  *
- * GP/KCos `/store-hub/content` 의 near-identical 카드 그리드 wrapper 중복 제거.
+ * KCos `/store-hub/content` 의 카드 그리드 wrapper 를 공통화.
  * - 카드 구조/복사 버튼 상태(idle/copying/copied)는 공통.
  * - 서비스별 차이는 accent 색만 → accent 파라미터로 주입.
  * - 복사 문구(copyLabel/copiedLabel/copyingLabel)는 ctx 로 주입(ContentHubTemplate config)
@@ -11,7 +11,7 @@
  *
  * 사용: `renderItems: contentHubCardGrid('primary')` (config 에 지정).
  * accent 클래스는 정적 literal 로 보유 → 각 소비 서비스 Tailwind content(shared-space-ui/src 포함)가
- * 자기 팔레트(GP primary / KCos pink)를 생성한다. (동적 `bg-${x}` 금지)
+ * 자기 팔레트(KCos pink 등)를 생성한다. (동적 `bg-${x}` 금지)
  */
 
 import type { ReactNode } from 'react';
@@ -103,7 +103,7 @@ function ContentHubCard({
 
 /**
  * ContentHubConfig.renderItems 에 바로 지정 가능한 카드 그리드 렌더러를 생성한다.
- * @param accent 서비스 accent 색 (GP='primary', KCos='pink')
+ * @param accent 서비스 accent 색 (KCos='pink' 등)
  */
 export function contentHubCardGrid(accent: ContentHubCardAccent) {
   return (items: ContentHubItem[], ctx: ContentHubItemContext): ReactNode => {

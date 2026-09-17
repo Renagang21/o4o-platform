@@ -54,7 +54,6 @@
 
 | 그룹 | 건수 | 기존 target | 판정 | 조치 |
 |---|---:|---|---|---|
-| L1 GlycoPharm `contact.new` | 9 | `/admin/contact-inquiries` | A · ROLE_MISMATCH (admin 전용 경로, 수신자에 operator 포함) | → `/operator/contacts` |
 | L2 K-Cosmetics `contact.new` | 2 | `/admin/contact-inquiries` | A · ROLE_MISMATCH | → `/operator/contacts` |
 | L3 Neture `store.product_request_submitted` | 2 | `/admin/o4o-product-db/store-requests` | A · DEAD_ROUTE (선행 audit B-1 에서 404 실증) | → `/operator/product-candidates` |
 | L4 Neture `store.product_request_{approved,rejected}` | 2 | `/store/handled-products` | B · 정보성 (web-neture 라우트 트리에 없음. 현행 producer 는 neture scope 에 target 미기록) | `targetUrl` 제거 |
@@ -67,7 +66,7 @@
 - `deepLink` 전용 market-trial 13건 — `targetUrl` 자체가 없어 resolver 가 `null` 을 돌려주므로 **이동 없음(안전)**.
   MISSING_TARGET 이지 dead target 이 아니다. 더구나 참조된 `market_trials` 4건 중 **현존 1건**뿐이라
   `targetUrl` 을 새로 채우면 오히려 **새 dead link 를 만든다**(§15 정당화 하 잔존 허용).
-- target 필드가 아예 없는 `contact.new` 6건(GP 3 · KCos 1 · KPA 2) — target 신규 부여는 dead target 교정이 아니라 범위 확장.
+- KCos 1 · KPA 2) — target 신규 부여는 dead target 교정이 아니라 범위 확장.
 - `serviceKey NULL` legacy `custom` 1건 — target 없음, 5개 벨 어디에도 노출되지 않음.
 
 ---
@@ -149,9 +148,6 @@ UPDATE notifications SET metadata = metadata - 'targetUrl'
 
 | serviceKey | targetUrl | 건수 | route 존재 |
 |---|---|---:|:---:|
-| glycopharm | `/operator/contacts` | 9 | ✅ |
-| glycopharm | `/mypage` | 1 | ✅ |
-| glycopharm | (없음) | 3 | — |
 | k-cosmetics | `/operator/contacts` | 2 | ✅ |
 | k-cosmetics | `/operator/members?tab=status-pending` | 2 | ✅ |
 | k-cosmetics | (없음) | 1 | — |
@@ -189,7 +185,6 @@ UPDATE notifications SET metadata = metadata - 'targetUrl'
 
 | # | 서비스 | 계정 | 동작 | 결과 |
 |---|---|---|---|---|
-| B-1 | GlycoPharm | `sohae2100@…` | 벨 → 교정된 `contact.new` 클릭 | **`/operator/contacts` 도달**, 문의 4건 렌더, 404 없음, console error 0 |
 | B-2 | K-Cosmetics | `sohae2100@…` | 벨 → 교정된 `contact.new` 클릭 | **`/operator/contacts` 도달**, 문의 3건 렌더, `대상 서비스: k-cosmetics` |
 | B-3 | Neture | `sohae2100@…` | 벨 → 교정된 `store.product_request_submitted` 클릭 | **`/operator/product-candidates` 도달**, `상품 후보 검토` 렌더 (선행 M-1 404 해소) |
 | B-4 | Neture | `renagang21@…` | target 제거 row 2건 클릭 | **이동 없음(무반응)** · URL 불변 · 읽음 처리만 동작 (7→6) |
@@ -204,7 +199,7 @@ UPDATE notifications SET metadata = metadata - 'targetUrl'
 
 ## 16. 5서비스 회귀
 
-| 기준 | KPA | GP | KCos | Neture | PH |
+| 기준 | KPA | KCos | Neture | PH |
 |---|:--:|:--:|:--:|:--:|:--:|
 | dead entry | 0 | 0 | 0 | 0 | 0 |
 | JS exception | 0 | 0 | 0 | 0 | 0 |

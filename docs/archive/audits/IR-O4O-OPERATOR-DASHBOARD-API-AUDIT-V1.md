@@ -4,7 +4,6 @@
 >
 > Date: 2026-03-16
 > Status: Complete
-> Scope: api-server, web-neture, web-glycopharm, web-kpa-society, web-k-cosmetics, admin-dashboard
 
 ---
 
@@ -14,8 +13,8 @@ Operator Dashboard에서 다음 4개 HTTP 오류가 관측됨:
 
 | 오류 | 엔드포인트 패턴 | HTTP Status |
 |------|----------------|:-----------:|
-| store-applications | `/api/v1/glycopharm/store-applications` | 404 |
-| invoices | `/api/v1/glycopharm/invoices` | 500 |
+| store-applications | — | 404 |
+| invoices | — | 500 |
 | signage | `/api/signage/:serviceKey/*` | 401 |
 | admin/statistics | `/api/v1/admin/dashboard/*` | 403 |
 
@@ -44,33 +43,6 @@ Operator Dashboard에서 다음 4개 HTTP 오류가 관측됨:
 | `/api/v1/neture/supplier/dashboard/summary` | GET | 공급자 대시보드 |
 | `/api/v1/neture/partner/dashboard/summary` | GET | 파트너 대시보드 |
 | `/api/v1/dashboard/assets/seller-signal` | GET | 셀러 시그널 |
-
-**인증 방식**: `Bearer ${getAccessToken()}`
-
-### 2-2. GlycoPharm (`services/web-glycopharm/`)
-
-**Operator Dashboard**: `GlycoPharmOperatorDashboard.tsx`
-**API 파일**: `src/api/glycopharm.ts`, `src/api/store.ts`
-
-| Endpoint | Method | Purpose |
-|----------|:------:|---------|
-| `/api/v1/glycopharm/operator/dashboard` | GET | 운영자 대시보드 통합 |
-| `/api/v1/glycopharm/store-applications` | GET | 매장 신청 목록 |
-| `/api/v1/glycopharm/store-applications/mine` | GET | 내 신청 조회 |
-| `/api/v1/glycopharm/store-applications/draft` | POST | 초안 저장 |
-| `/api/v1/glycopharm/store-applications` | POST | 신청 제출 |
-| `/api/v1/glycopharm/store-applications/:id` | GET | 상세 조회 |
-| `/api/v1/glycopharm/store-applications/:id/approve` | POST | 승인 |
-| `/api/v1/glycopharm/store-applications/:id/reject` | POST | 반려 |
-| `/api/v1/glycopharm/store-applications/:id/supplement` | POST | 보완 요청 |
-| `/api/v1/glycopharm/invoices` | GET | 인보이스 목록 |
-| `/api/v1/glycopharm/invoices` | POST | 인보이스 생성 |
-| `/api/v1/glycopharm/invoices/:id` | GET | 인보이스 상세 |
-| `/api/v1/glycopharm/invoices/:id/confirm` | POST | 확정 |
-| `/api/v1/glycopharm/invoices/:id/send` | POST | 발송 |
-| `/api/v1/glycopharm/invoices/:id/received` | POST | 수령 확인 |
-| `/api/v1/glycopharm/invoices/:id/dispatch-log` | GET | 발송 이력 |
-| `/api/v1/glycopharm/reports/pharmacies` | GET | 약국 목록 |
 
 **인증 방식**: `Bearer ${getAccessToken()}`
 
@@ -137,7 +109,6 @@ Operator Dashboard에서 다음 4개 HTTP 오류가 관측됨:
 
 | Base Path | Route Module | 비고 |
 |-----------|-------------|------|
-| `/api/v1/glycopharm` | `createGlycopharmRoutes()` | invoices, store-applications 포함 |
 | `/api/v1/operator` | `createOperatorCopilotRouter()` | Copilot 7개 엔드포인트 |
 | `/api/v1/operator/stores` | `operatorStoreRoutes` | Console 매장 관리 |
 | `/api/v1/operator/members` | `operatorMemberRoutes` | Console 회원 관리 |
@@ -153,8 +124,6 @@ Operator Dashboard에서 다음 4개 HTTP 오류가 관측됨:
 
 | Endpoint Pattern | Controller File | 존재 |
 |-----------------|----------------|:----:|
-| `/api/v1/glycopharm/store-applications/*` | `store-applications.controller.ts` | YES |
-| `/api/v1/glycopharm/invoices/*` | `invoice.controller.ts` | YES |
 | `/api/signage/:serviceKey/*` | `signage.routes.ts` | YES |
 | `/api/v1/admin/dashboard/*` | `dashboard.routes.ts` | YES |
 
@@ -181,8 +150,6 @@ requireAuth (= authenticate)
 
 | Endpoint | Auth Chain | 비고 |
 |----------|-----------|------|
-| `glycopharm/store-applications` | `requireAuth` | 역할 검사 없음 (컨트롤러 내부에서 조건부 체크) |
-| `glycopharm/invoices` | `requireAuth` → `isOperatorOrAdmin()` 내부 체크 | glycopharm:admin/operator 또는 platform:admin/super_admin |
 | `signage/:serviceKey` | `requireAuth` → `validateServiceKey` → `requireSignageStore`/`requireSignageOperator` | 인증 필수 |
 | `signage/:serviceKey/public` | `validateServiceKey` only | **인증 불필요** |
 | `admin/dashboard` | `authenticate` → `requireAdmin` | platform:admin/super_admin + legacy admin/super_admin/operator |
@@ -200,7 +167,7 @@ roleAssignmentService.hasAnyRole(userId, [
 ])
 ```
 
-**서비스 운영자 역할 (`neture:operator`, `glycopharm:operator` 등)은 requireAdmin을 통과하지 못함.**
+**서비스 운영자 역할 은 requireAdmin을 통과하지 못함.**
 
 ---
 
@@ -210,14 +177,13 @@ roleAssignmentService.hasAnyRole(userId, [
 
 | 항목 | 내용 |
 |------|------|
-| **라우트 존재** | YES — `glycopharm.routes.ts` line 122: `router.use('/store-applications', ...)` |
-| **마운트 경로** | `/api/v1/glycopharm/store-applications` |
-| **프론트엔드 호출** | `store.ts` line 311+: `/api/v1/glycopharm/store-applications/mine` 등 |
+| **라우트 존재** | — |
+| **마운트 경로** | — |
+| **프론트엔드 호출** | — |
 
 **분석**: 라우트와 프론트엔드 URL이 일치함. 404가 발생하는 경우:
 
 1. **개별 리소스 조회 시 미발견**: `GET /:id`에서 UUID에 해당하는 application이 DB에 없으면 404 반환
-2. **Nginx/Cloud Run 프록시 미설정**: Cloud Run 배포 후 `/api/v1/glycopharm/*` 경로가 프록시에서 누락
 3. **CORS preflight 실패**: OPTIONS 요청이 404를 반환하는 경우
 
 **가능성 순위**: ② Proxy 미설정 (70%) > ① 개별 리소스 미발견 (20%) > ③ CORS (10%)
@@ -226,17 +192,16 @@ roleAssignmentService.hasAnyRole(userId, [
 
 | 항목 | 내용 |
 |------|------|
-| **라우트 존재** | YES — `glycopharm.routes.ts`에서 invoice.controller.ts 마운트 |
-| **Entity** | `GlycopharmBillingInvoice` — 테이블명: `glycopharm_billing_invoices` |
-| **Migration** | `1739180400000-CreateGlycopharmBillingInvoices.ts` (테이블 생성) |
+| **라우트 존재** | — |
+| **Entity** | — |
+| **Migration** | — |
 | **Migration** | `1739266800000-AddInvoiceDispatchFields.ts` (dispatch 필드 추가) |
 | **Entity 등록** | `connection.ts` line 156: TypeORM DataSource에 등록됨 |
 
 **분석**: Entity와 Migration이 모두 존재하고 등록됨. 500이 발생하는 경우:
 
 1. **Migration 미실행**: 테이블이 DB에 실제로 생성되지 않았을 가능성 (CI/CD로 migration 실행 필요)
-2. **Raw SQL 컬럼명 불일치**: `invoice.service.ts`에서 Raw SQL 사용 (`glycopharm_billing_invoices` 직접 참조)
-3. **관련 테이블 미존재**: `glycopharm_reports` 등 참조 테이블이 없는 경우
+2. **Raw SQL 컬럼명 불일치**: `invoice.service.ts`에서 Raw SQL 사용
 4. **NULL 참조 오류**: `pharmacy_id`나 `supplier_id`가 NULL인 상태에서 JOIN 실패
 
 **가능성 순위**: ① Migration 미실행 (60%) > ② Raw SQL 오류 (25%) > ③④ 기타 (15%)
@@ -245,7 +210,6 @@ roleAssignmentService.hasAnyRole(userId, [
 ```sql
 SELECT EXISTS (
   SELECT FROM information_schema.tables
-  WHERE table_name = 'glycopharm_billing_invoices'
 );
 ```
 
@@ -287,7 +251,6 @@ const response = await fetch(`${baseUrl}/public/media?...`);
 
 ```
 neture:operator     → requireAdmin 체크 → hasAnyRole(['admin','super_admin','operator','platform:admin','platform:super_admin']) → FALSE → 403
-glycopharm:operator → 동일 결과 → 403
 cosmetics:operator  → 동일 결과 → 403
 kpa:operator        → 동일 결과 → 403
 ```
@@ -296,7 +259,6 @@ kpa:operator        → 동일 결과 → 403
 
 Admin Dashboard는 **platform-level** 전용이며, 서비스별 운영자는 자체 대시보드를 사용해야 함:
 - Neture: `/api/v1/neture/admin/dashboard/summary`
-- GlycoPharm: `/api/v1/glycopharm/operator/dashboard`
 - K-Cosmetics: `/api/v1/cosmetics/admin/dashboard/summary`
 - KPA: `/api/v1/kpa/operator/summary`
 
@@ -313,9 +275,6 @@ Admin Dashboard는 **platform-level** 전용이며, 서비스별 운영자는 �
 | `operator/members/*` | `authenticate` | `requireRole(...)` | `injectServiceScope` | WO-SERVICE-DATA-ISOLATION 적용 |
 | `operator/products/*` | `authenticate` | `requireRole(...)` | `injectServiceScope` | WO-SERVICE-DATA-ISOLATION 적용 |
 | `admin/dashboard/*` | `authenticate` | `requireAdmin` | — | Platform admin 전용 |
-| `glycopharm/operator/*` | `requireAuth` | `isOperatorOrAdmin()` | — | 서비스 내부 체크 |
-| `glycopharm/store-applications/*` | `requireAuth` | 부분적 (admin 엔드포인트만) | — | 서비스 scope 미적용 |
-| `glycopharm/invoices/*` | `requireAuth` | `isOperatorOrAdmin()` | — | 서비스 내부 체크 |
 | `signage/:serviceKey/*` | `requireAuth` | `requireSignageStore`/`Operator` | — | serviceKey 기반 |
 | `signage/:serviceKey/public/*` | — | — | — | 인증 불필요 |
 | `kpa/operator/*` | `authenticate` | `requireKpaScope('kpa:operator')` | — | KPA membership 기반 |
@@ -330,11 +289,8 @@ Admin Dashboard는 **platform-level** 전용이며, 서비스별 운영자는 �
 
 ```sql
 -- invoices 500 확인
-SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'glycopharm_billing_invoices');
 
 -- 관련 테이블
-SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'glycopharm_reports');
-SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'glycopharm_pharmacies');
 ```
 
 ---
@@ -352,7 +308,6 @@ SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'glycoph
 
 ### 후속 WO 후보
 
-1. **WO-GLYCOPHARM-INVOICE-MIGRATION-VERIFY-V1**: invoices 500 해결 — DB 테이블 존재 확인 및 migration 실행
 2. **WO-OPERATOR-DASHBOARD-ENDPOINT-ALIGNMENT-V1**: 프론트엔드-백엔드 URL 정합성 통일
 3. **WO-SIGNAGE-AUTH-PATTERN-NORMALIZE-V1**: 사이니지 인증/비인증 경로 명확화
 

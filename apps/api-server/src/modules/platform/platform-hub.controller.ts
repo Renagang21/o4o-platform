@@ -156,7 +156,6 @@ async function getNetureSummary(ds: DataSource): Promise<Record<string, any>> {
   }
 }
 
-// getGlycopharmSummary() — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
 // ─── Trigger Proxy ───
 

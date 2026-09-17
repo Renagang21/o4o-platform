@@ -52,10 +52,6 @@ WO가 제시한 6개 정책 원칙 대비 현재 구현 상태:
 
 [service-audience.service.ts:17](apps/api-server/src/modules/neture/services/service-audience.service.ts#L17)
 
-```ts
-const DEFAULT_PHARMACY_SERVICE_KEYS = ['glycopharm', 'kpa-society'];
-```
-
 row 부재 시 이 상수로 fallback한다. 즉 **정책 행이 전혀 없는 신규 서비스 → `false`(비약국)** 로 판정된다.
 이 방향은 *약국 서비스로의 오인 허용*은 막으므로 **해당 gate 한정으로는 안전(fail-closed)** 이다.
 
@@ -67,7 +63,6 @@ row 부재 시 이 상수로 fallback한다. 즉 **정책 행이 전혀 없는 �
 | service_key | is_pharmacy_target_service | 출처 |
 |---|:---:|---|
 | `kpa-society` | true | 20260615160000 |
-| `glycopharm` | true | 20260615160000 |
 | `k-cosmetics` | false | 20260615160000 |
 | `neture` | false | 20260615160000 |
 | `pharmacy-hub` | true | 20270218000000 |
@@ -168,7 +163,7 @@ gate 는 그 컬럼을 보지 않고 `product_categories.is_regulated` 만 본�
 
 4단계(메뉴 숨김 / route guard / API 권한 / 서비스계층 판정) 중
 **의약품 관련해서는 1·2·4 단계가 전 경로에서 부재**하다.
-프런트의 `isPharmacy` 변수(GlycoGlobalHeader 등)는 **사용자의 약국 여부에 따른 내비게이션 표시**일 뿐
+프런트의 `isPharmacy` 변수는 **사용자의 약국 여부에 따른 내비게이션 표시**일 뿐
 상품 목록에서 의약품을 제외하지 않는다. 의약품은 `의약품` **배지와 함께 정상 표시**된다
 ([product-type.util.ts:213-223](apps/api-server/src/modules/neture/utils/product-type.util.ts#L213-L223) `CLASSIFICATION_LABELS`).
 

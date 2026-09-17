@@ -5,7 +5,7 @@
  *
  *   /store-owner/products/multilingual/:targetKind/:targetId   — 매장 상품(local|listing) 기준
  *
- * 계약·원장은 KPA / GlycoPharm / K-Cosmetics 와 **동일한 공통 controller** 다
+ * 계약·원장은 KPA / K-Cosmetics 와 **동일한 공통 controller** 다
  * (store_multilingual_product_content_groups/pages, source_type='store_created').
  * QR = 그룹 publicKey QR(MultilingualPublicActions). 공개 경로 = /multilingual-products/:publicKey.
  * PH 는 매장허브 운영자 원본이 없어(#85·#86) HUB 가져오기 축은 노출하지 않는다 — 저작 축만 있다.

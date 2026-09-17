@@ -81,16 +81,6 @@ Baseline §10 의 핵심 가드:
 | 포럼 관리 | C |
 | 가입 관리 | F |
 
-#### GlycoPharm
-출처: [`apps/api-server/src/routes/glycopharm/services/operator-dashboard.service.ts:102-107`](../../apps/api-server/src/routes/glycopharm/services/operator-dashboard.service.ts)
-
-| Quick Action | Workspace |
-|--------------|-----------|
-| 약국 관리 | F (승인) |
-| 상품 관리 | A + B |
-| 입점 심사 | F |
-| 콘텐츠 관리 | C |
-
 #### K-Cosmetics
 | Quick Action | Workspace |
 |--------------|-----------|
@@ -169,7 +159,7 @@ Baseline §10 의 핵심 가드:
 | Products 관리 | 🟡 Core UI + Service Logic | A + C 경계 모호 | **분류 모호** |
 | Orders 관리 | 🟡 Core UI + Service Logic | D? E? | **분류 모호** |
 | AI Report (조회) | 🟢 Core | B 단순 조회 + F 검수 | **Drift** — B 의 제작 영역 부재 |
-| AI Usage / Billing | 🔴 Extension (Glyco) | E (운영 수익) | 부분 |
+| AI Usage / Billing | 🔴 Extension | E (운영 수익) | 부분 |
 | Forum Delete Requests | 🟢 Core | F | 정렬 |
 | Forum Analytics | 🟢 Core | F + B (인사이트) | 부분 |
 | Community Management | 🟢 Core | C? D? | **분류 모호** |
@@ -211,16 +201,6 @@ Baseline §10 의 핵심 가드:
 | `EventOfferManagement.tsx` | 이벤트 오퍼 승인 | F | 존재 |
 | Signage HQ (5 페이지) | 사이니지 | C | 존재 |
 
-### 7.3 web-glycopharm (43 페이지 중)
-
-| Route / Component | 현재 용도 | Workspace | 상태 |
-|------------------|----------|-----------|------|
-| `StoresPage.tsx` + Detail | 약국 관리 | C? D? F? | **분류 모호** |
-| `AiReportPage` + `AiUsageDashboard` + `AiBillingPage` | AI 조회 / 사용량 / 청구 | B 조회 / E 청구 조회 | **Drift — 제작·운영 모델 부재** |
-| `ApplicationsPage.tsx` | 약국 신청 승인 | F | 존재 |
-| `GuidelineManagementPage.tsx` | 약학 지침 CMS | A | 존재 |
-| Signage HQ (5 페이지) | 사이니지 | C | 존재 |
-
 ### 7.4 web-k-cosmetics (28 페이지 중)
 
 | Route / Component | 현재 용도 | Workspace | 상태 |
@@ -235,7 +215,7 @@ Baseline §10 의 핵심 가드:
 
 | Workspace | 구현 완성도 | 모범 사례 | 누락 정도 |
 |-----------|:----------:|----------|----------|
-| A — 자료 등록 | **20%** | BrandManagement (Neture) / GuidelineManagement (Glyco) / WorkingContent (KPA) | 플랫폼 공통 UI 부재 |
+| A — 자료 등록 | **20%** | BrandManagement (Neture) / GuidelineManagement / WorkingContent (KPA) | 플랫폼 공통 UI 부재 |
 | **B — AI 작업** | **5%** | OperatorActionQueuePage (Neture 유일) | 4개 서비스 중 1개만 |
 | C — 큐레이션 | 40% | Signage HQ (공통) / CategoryManagement | HUB Producer 권한 / 시즌 / 매장 그룹 부재 |
 | **D — 매장 지원** | **10%** | StoreCockpitPage (K-Cos 유일) | 4개 서비스 중 1개만 |

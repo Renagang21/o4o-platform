@@ -6,7 +6,7 @@
  * WO-O4O-STORE-PRODUCT-STATUS-REMOVAL-V1: 매장 상품 상태 제거 — 단순 취급 목록 모델
  * WO-O4O-STORE-HUB-B2B-CANONICAL-DATATABLE-V1: DataTable + ActionBar bulk
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
- *   GlycoPharm / K-Cosmetics 가 이미 쓰고 있던 공통 `SupplyCatalogHub` 로 편입(728줄 → config).
+ *   K-Cosmetics 가 이미 쓰고 있던 공통 `SupplyCatalogHub` 로 편입(728줄 → config).
  *   KPA 고유 요소는 제거하지 않고 config 로만 표현한다:
  *     - accent(blue) · storeNoun('내 약국') · 공급자 로고 표시
  *     - 권장 소비자가 컬럼(additionalColumns)

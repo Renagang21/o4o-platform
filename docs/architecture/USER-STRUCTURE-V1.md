@@ -75,7 +75,7 @@
 
 | 회원군 | 키 | 설명 | 비고 |
 |--------|-----|------|------|
-| **약사 회원** | `pharmacist_member` | 약사 면허 보유자. 개국/근무/병원/산업/비활동 포함 | KPA, GlycoPharm 주 대상 |
+| **약사 회원** | `pharmacist_member` | 약사 면허 보유자. 개국/근무/병원/산업/비활동 포함 | KPA 주 대상 |
 | **약대생 회원** | `pharmacy_student_member` | 약대 재학 또는 졸업예정자 | KPA 주 대상 |
 | **외부 전문가** | `external_expert` | 의사·영양사·마케터·연구자·교수 등 | 강의·콘텐츠 기여자 |
 | **공급자 스태프** | `supplier_staff` | 제약·의료기기·식품 공급사 담당자 | Neture 주 대상 |
@@ -300,7 +300,6 @@ FROZEN 테이블 (수정 금지):
 | 서비스 | 적용 회원군 | Phase 1 대상 | 비고 |
 |--------|------------|-------------|------|
 | **KPA Society** | pharmacist_member, pharmacy_student_member | ✅ 우선 | 현재 가입 구조와 가장 연관 |
-| **GlycoPharm** | pharmacist_member (pharmacy_owner 중심) | Phase 2 | 약국 승인 구조와 연동 필요 |
 | **Neture** | supplier_staff, external_expert | Phase 2 | Neture 조직 통합 WO 이후 |
 | **GlucoseView** | consumer | Phase 3 | 환자 구조와 별도 설계 필요 |
 

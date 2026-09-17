@@ -13,7 +13,7 @@ export default defineConfig({
     dedupe: ['react', 'react-dom', 'react-router-dom'],
   },
   server: {
-    // 기존 서비스 포트와 충돌하지 않는 값 (glycopharm 4201 / kpa 4202 계열 회피)
+    // 기존 서비스 포트와 충돌하지 않는 값
     port: 4207,
   },
 })

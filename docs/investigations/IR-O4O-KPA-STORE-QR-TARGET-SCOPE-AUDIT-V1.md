@@ -1,7 +1,7 @@
 # IR-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1
 
 > 조사 대상: `https://kpa-society.co.kr/store/marketing/qr` — 매장 경영자 QR 생성 대상 범위 불일치
-> 조사일: 2026-06-25 / 범위: KPA 우선 (GP/KCos 공통화는 후속 분리)
+> 조사일: 2026-06-25 / 범위: KPA 우선 (KCos 공통화는 후속 분리)
 
 ---
 
@@ -152,7 +152,7 @@ file / content → 'page'
 4. **(C-1)** 콘텐츠 선택 시 `landingType='page'`, `landingTargetId=content.id` 저장 경로 연결.
 5. **(동영상 통합)** `PharmacyVideoPage` prefill 경로를 모달 "내 매장 제작자료" 탭으로 흡수(선택). 분절 동선 정리.
 6. **(검증)** 각 대상 타입별 QR 생성 → `/qr/:slug` 렌더 smoke (실제 브라우저).
-7. GP/KCos 공통화는 KPA 안정화 후 별도 IR/WO.
+7. KCos 공통화는 KPA 안정화 후 별도 IR/WO.
 
 ---
 

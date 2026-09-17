@@ -103,7 +103,7 @@ bulk 출처/CSV row/productType·regulatoryType·drugCategory/rawPayload 요약 
 - **한계**: 프로덕션 주문 0건이라 행 렌더 실데이터 미확인. fulfillment 통합은 미포함(설계상 후속).
 
 ### 13-2. 무료배송 progress UI — 🟡 CONDITIONAL PASS
-**KPA 이벤트오퍼 detail 화면에만 V1 적용**. `getGroupbuyDetail` shippingPolicy additive, 무료배송 기준/현재 주문금액/남은 금액/충족·미설정 메시지, "이벤트오퍼 상품도 같은 공급자 주문금액 포함" 안내. Glyco/KCos/web-neture cart 제외(공통화 세션 후 후속). (`810fab2cf`, CHECK `106356007`)
+**KPA 이벤트오퍼 detail 화면에만 V1 적용**. `getGroupbuyDetail` shippingPolicy additive, 무료배송 기준/현재 주문금액/남은 금액/충족·미설정 메시지, "이벤트오퍼 상품도 같은 공급자 주문금액 포함" 안내. (`810fab2cf`, CHECK `106356007`)
 - **한계**: production active KPA event offer 0건 → 실데이터 렌더 시각 smoke 미완(SQL 실행·타입·배포는 검증).
 
 ---
@@ -112,7 +112,7 @@ bulk 출처/CSV row/productType·regulatoryType·drugCategory/rawPayload 요약 
 
 | # | 항목 | 분류 |
 |---|------|:----:|
-| 1 | Glyco/KCos/web-neture cart 무료배송 progress UI 미적용 | GAP(의도적 범위 외) |
+| 1 | — | GAP(의도적 범위 외) |
 | 2 | 이벤트오퍼 checkout_orders 의 fulfillment/송장/정산 미통합 | GAP(설계상 후속) |
 | 3 | checkout_orders 이벤트오퍼 **정산 공백** (neture_settlement 는 neture_orders delivered 기준) | RISK |
 | 4 | 공급자 배송정책 미설정 시 배송비 **0원 fallback** | RISK(운영 주의) |
@@ -124,7 +124,6 @@ bulk 출처/CSV row/productType·regulatoryType·drugCategory/rawPayload 요약 
 
 ## 15. 다음 후속 작업 우선순위
 
-1. **WO-O4O-NETURE-SUPPLIER-FREE-SHIPPING-PROGRESS-UI-CROSSSERVICE-V2** — Glyco/KCos 공통화 세션 정리 후, web-neture cart 포함 여부 별도 판단, 가능하면 `@o4o/ui` 공통 helper/component 화.
 2. **IR/WO-O4O-NETURE-EVENT-OFFER-SUPPLIER-FULFILLMENT-INTEGRATION-V1** — checkout_orders 이벤트오퍼 주문을 실제 배송/송장/정산으로 편입 필요가 명확해질 때. 상태/정산 경계 재확인 선행.
 3. **WO-O4O-NETURE-SUPPLIER-SHIPPING-POLICY-ONBOARDING-NOTICE-V1** — 배송정책 미설정 0원 fallback 에 대한 공급자/운영자 입력 유도 안내.
 4. **IR-O4O-STORE-TYPE-MODEL-FOR-OTC-LISTING-GUARD-V1** — OTC 비약국 listing 차단을 위한 pharmacy/store type 모델 설계.

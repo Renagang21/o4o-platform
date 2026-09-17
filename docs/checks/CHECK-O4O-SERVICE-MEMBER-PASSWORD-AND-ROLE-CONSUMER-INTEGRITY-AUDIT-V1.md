@@ -18,7 +18,7 @@
 | P3 | `services/web-kpa-society/src/pages/operator/MemberManagementPage.tsx:253` | `api.put('/operator/members/${userId}', { password, serviceKey })` | 동상 | 동상 | 동상 | ✅ 전달 자체는 정상 | **FIX (적용)** — 후보 산출용 `memberships` 미매핑으로 모달이 항상 후보 0. §3-B |
 | P4 | `services/web-neture/src/pages/operator/UsersManagementPage.tsx:166` | 동상 | 동상 | 동상 | 동상 | ✅ | PASS |
 | P5 | `services/web-k-cosmetics/src/pages/operator/UsersPage.tsx:123` · `src/pages/admin/KCosmeticsAdminMembersPage.tsx:110` | 동상 | 동상 | 동상 | 동상 | ✅ | PASS |
-| P6 | `services/web-glycopharm/src/pages/operator/UsersPage.tsx:109` · `src/pages/admin/GlycoPharmAdminMembersPage.tsx:107` | 동상 | 동상 | 동상 | 동상 | ✅ | PASS |
+| P6 | — | 동상 | 동상 | 동상 | 동상 | ✅ | PASS |
 | P7 | `apps/admin-dashboard/src/pages/operators/OperatorsPage.tsx:305-313` 비밀번호 모달 | `PUT /operator/members/:id { password, serviceKey }` (`resolveCanonicalServiceKey`) | 동상 | 동상 | 동상 | ✅ canonical 변환 후 전달 | PASS |
 | P8 | `apps/admin-dashboard/src/pages/operators/OperatorsPage.tsx:400-410` 운영자 신규 등록 | `POST /admin/users { password, serviceKey }` | `POST /api/v1/admin/users` | `AdminUserController` 운영자 등록 트랜잭션 | User + `role_assignments` + `service_memberships` + `service_credentials` 단일 트랜잭션 | ✅ `resolveOperatorTargetServiceKey` 가 역할·serviceKey 불일치 거부 | PASS |
 | P9 | `apps/admin-dashboard/src/pages/users/UserForm.tsx` (`/users/:id/edit`) | `UserApi.updateUser` → `PUT /api/v1/users/:id` | `users.routes.ts:154` (`authenticate` + `requireAdmin`) | `UserManagementController.updateUser` | **없음 — password 가 조용히 무시됨** | ❌ serviceKey 개념 자체 없음 | **FIX (적용)** |
@@ -40,7 +40,7 @@
 "복수 서비스 운영자에게 대상이 불명확하거나 400 이 나는 경로"는 UI 에서 이미 차단된다(P1·P2 모두 후보 0/1/N 분기 + 미선택 제출 차단, 각 서비스 화면은 이 두 공통 모달을 소비).
 근거 테스트: `MembershipConsoleController.servicePassword`, `MembershipConsoleController.crossServiceIsolation`, `packages/ui/src/operator-user-detail/__tests__/UserDetailPasswordModal.test.tsx`.
 
-단, **KPA 만** 공통 모달에 후보를 공급하는 `user.memberships` 를 채우지 않아 화면이 항상 "변경할 수 있는 서비스가 없습니다" 로 막혔다(프로덕션 실측). 서비스 격리 문제는 아니고 **UI↔공통 컴포넌트 연결 결함**이며 §3-B 에서 수정했다. Neture / K-Cos / GlycoPharm 은 canonical 목록(`GET /operator/members`)이 `memberships` 를 그대로 내려주므로 해당 없음.
+단, **KPA 만** 공통 모달에 후보를 공급하는 `user.memberships` 를 채우지 않아 화면이 항상 "변경할 수 있는 서비스가 없습니다" 로 막혔다(프로덕션 실측). 서비스 격리 문제는 아니고 **UI↔공통 컴포넌트 연결 결함**이며 §3-B 에서 수정했다. Neture / K-Cos 은 canonical 목록(`GET /operator/members`)이 `memberships` 를 그대로 내려주므로 해당 없음.
 
 ---
 

@@ -13,7 +13,6 @@
 **현 단계에서 공통 컴포넌트 추출은 보류가 적절하다.** 다음 근거:
 
 1. 기능 정렬 완료와 공통 컴포넌트화 완료는 다른 단계 — 지금은 전자만 완료
-2. Pop/QR은 GP↔K-Cos 간 ~96% 동일하지만, 공통화 이익 대비 추상화 비용이 현 단계에서 불명확
 3. `ContentHubTemplate`(콘텐츠) 패턴이 올바른 방향 — 나머지 영역도 유사 패턴 채택 가능하지만 시급하지 않음
 4. 1인 개발 환경에서 추상 레이어 추가는 속도보다 복잡도를 키울 수 있음
 
@@ -25,14 +24,14 @@
 
 ### 파일 위치 및 라인 수
 
-| 영역 | KPA | GlycoPharm | K-Cosmetics |
-|------|-----|-----------|-------------|
-| 상품 카탈로그 | `pharmacy/HubB2BCatalogPage.tsx` (793줄) | `hub/HubB2BCatalogPage.tsx` (368줄) | `hub/HubB2BPage.tsx` (369줄) |
-| 블로그 | `pharmacy/HubBlogLibraryPage.tsx` (400줄) | `hub/HubBlogLibraryPage.tsx` (322줄) | `hub/HubBlogLibraryPage.tsx` (320줄) |
-| POP | `pharmacy/HubPopLibraryPage.tsx` (374줄) | `hub/HubPopLibraryPage.tsx` (324줄) | `hub/HubPopLibraryPage.tsx` (320줄) |
-| QR | `pharmacy/HubQrLibraryPage.tsx` (385줄) | `hub/HubQrLibraryPage.tsx` (324줄) | `hub/HubQrLibraryPage.tsx` (320줄) |
-| 사이니지 | `pharmacy/HubSignageLibraryPage.tsx` (604줄) | `hub/HubSignageLibraryPage.tsx` (580줄) | `hub/HubSignagePage.tsx` (579줄) |
-| 콘텐츠 | `pharmacy/HubContentLibraryPage.tsx` (171줄) | `hub/HubContentListPage.tsx` (206줄) | `hub/HubContentPage.tsx` (201줄) |
+| 영역 | KPA | K-Cosmetics |
+| ------ | ----- | ------------- |
+| 상품 카탈로그 | `pharmacy/HubB2BCatalogPage.tsx` (793줄) | `hub/HubB2BPage.tsx` (369줄) |
+| 블로그 | `pharmacy/HubBlogLibraryPage.tsx` (400줄) | `hub/HubBlogLibraryPage.tsx` (320줄) |
+| POP | `pharmacy/HubPopLibraryPage.tsx` (374줄) | `hub/HubPopLibraryPage.tsx` (320줄) |
+| QR | `pharmacy/HubQrLibraryPage.tsx` (385줄) | `hub/HubQrLibraryPage.tsx` (320줄) |
+| 사이니지 | `pharmacy/HubSignageLibraryPage.tsx` (604줄) | `hub/HubSignagePage.tsx` (579줄) |
+| 콘텐츠 | `pharmacy/HubContentLibraryPage.tsx` (171줄) | `hub/HubContentPage.tsx` (201줄) |
 
 ### 공통 패턴 사용 현황
 
@@ -52,32 +51,17 @@
 
 ### 2.1 사이니지 — 유사도 ~86%
 
-KPA ↔ GlycoPharm diff: **86줄**. 주요 차이:
+주요 차이:
 - 파일 헤더 주석 (WO 이름)
 - `"내 매장에 추가"` vs `"내 약국에 추가"` (2곳)
 - import 경로 (`../../api/` vs `@/api/`)
-- `serviceKey` 명시 방식 (KPA 명시, GlycoPharm 자동 주입)
-
-GlycoPharm ↔ K-Cosmetics diff: 거의 동일 (import 경로, 서비스 표현 정도)
-
-### 2.2 POP / QR — 유사도 ~96% (GP↔K-Cos)
-
-GlycoPharm `HubPopLibraryPage` (324줄) vs K-Cosmetics `HubPopLibraryPage` (320줄):
-- 동일 패턴: `hubContentApi.list({ sourceDomain:'pop' })`, `importOperatorPop(slug, id)`, `getStoreSlug()`
-- 차이: import 경로, 서비스 표현
-
-KPA (374줄)는 `serviceKey: SERVICE_KEY` 명시 + slug 처리 방식이 약간 다름
-
-### 2.3 블로그 — 유사도 ~85% (GP↔K-Cos)
-
-동일 패턴: `importOperatorBlog(slug, id)`, `getStoreSlug()`, DataTable + ActionBar  
-KPA는 `serviceKey` 명시 방식 차이 + 약간 더 복잡한 slug 로직
+- `serviceKey` 명시 방식 (KPA 명시 자동 주입)
 
 ### 2.4 상품 카탈로그 — 유사도 낮음
 
-KPA 793줄 vs GP/K-Cos 368-369줄: 규모 차이가 크다.  
+KPA 793줄 vs K-Cos 368-369줄: 규모 차이가 크다.  
 KPA는 분회/약국 특성상 더 복잡한 필터, B2B 외 탭 구조.  
-GP/K-Cos는 거의 동일.
+K-Cos는 거의 동일.
 
 ### 2.5 콘텐츠 — 이미 `ContentHubTemplate` 공통화 완료
 
@@ -88,16 +72,16 @@ config-driven 패턴으로 이미 구조 공통화됨.
 
 ## 3. 서비스별 유지해야 할 차이
 
-| 항목 | KPA | GlycoPharm | K-Cosmetics |
-|------|-----|-----------|-------------|
-| serviceKey 명시 | `'kpa-society'` | 자동 주입 (`'glycopharm'`) | 자동 주입 (`'k-cosmetics'`) |
-| assetSnapshot endpoint | `/kpa/assets/copy` | `/glycopharm/assets/copy` | `/cosmetics/assets/copy` |
-| import path 규칙 | `../../api/` | `@/api/` | `@/api/` or `@/lib/api/` |
-| 사용자 표현 | `'내 매장에'` | `'내 약국에'` (약국 정책) | `'내 매장에'` |
-| 색상 테마 | slate (중립) | primary (blue) | pink |
-| slug 로직 | 자체 복잡 구현 | `getStoreSlug()` | `getStoreSlug()` |
-| Blog import | `importOperatorBlog` (공통 함수) | 동일 | 동일 |
-| Pop/Qr import | `importOperatorPop/Qr` (공통 함수) | 동일 | 동일 |
+| 항목 | KPA | K-Cosmetics |
+| ------ | ----- | ------------- |
+| serviceKey 명시 | `'kpa-society'` | 자동 주입 (`'k-cosmetics'`) |
+| assetSnapshot endpoint | `/kpa/assets/copy` | `/cosmetics/assets/copy` |
+| import path 규칙 | `../../api/` | `@/api/` or `@/lib/api/` |
+| 사용자 표현 | `'내 매장에'` | `'내 매장에'` |
+| 색상 테마 | slate (중립) | pink |
+| slug 로직 | 자체 복잡 구현 | `getStoreSlug()` |
+| Blog import | `importOperatorBlog` (공통 함수) | 동일 |
+| Pop/Qr import | `importOperatorPop/Qr` (공통 함수) | 동일 |
 
 ---
 
@@ -106,7 +90,6 @@ config-driven 패턴으로 이미 구조 공통화됨.
 ### 4.1 사이니지 — `HubSignageLibraryTemplate` (권장 1순위)
 
 **이유:**
-- KPA ↔ GP ↔ K-Cos가 600줄 기준 ~86% 동일
 - `ContentHubTemplate` 성공 패턴을 그대로 적용 가능
 - config 주입: `serviceKey`, `addLabel` (`'내 약국에'`/`'내 매장에'`), `storeLink`
 
@@ -126,11 +109,10 @@ interface HubSignageLibraryConfig {
 ### 4.2 POP + QR — `HubSlugImportTemplate` (권장 2순위)
 
 **이유:**
-- GP ↔ K-Cos가 ~96% 동일
 - 공통 함수(`importOperatorPop`, `importOperatorQr`)가 이미 존재
 - config 주입: `sourceDomain`, `importFn`, `addLabel`, `emptyMessage`
 
-**KPA 제외 고려:** KPA는 slug 로직이 다르므로 초기에는 GP+K-Cos만 공통화, KPA는 기존 유지
+**KPA 제외 고려:** KPA는 slug 로직이 다르므로 초기에는 K-Cos만 공통화, KPA는 기존 유지
 
 ### 4.3 블로그 — 보류 (중간 우선순위)
 
@@ -145,8 +127,8 @@ interface HubSignageLibraryConfig {
 
 ### 5.1 상품 카탈로그 — 서비스 차이 너무 큼
 
-- KPA 793줄 vs GP/K-Cos 368줄 (2배 이상 차이)
-- KPA는 약사회 조직 구조 반영, GP/K-Cos는 단순 상품 탐색
+- KPA 793줄 vs K-Cos 368줄 (2배 이상 차이)
+- KPA는 약사회 조직 구조 반영, K-Cos는 단순 상품 탐색
 - 추상화 비용이 이익보다 큼
 
 ### 5.2 콘텐츠 — 이미 완료
@@ -159,9 +141,9 @@ interface HubSignageLibraryConfig {
 
 | 위험 | 설명 | 완화 방법 |
 |------|------|---------|
-| import 경로 불일치 | KPA `../../api/` vs GP/K-Cos `@/api/` | 주입 패턴 사용 |
+| import 경로 불일치 | KPA `../../api/` vs K-Cos `@/api/` | 주입 패턴 사용 |
 | assetSnapshot endpoint 차이 | 서비스마다 다른 endpoint | API 클라이언트 주입 |
-| "내 약국" 표현 정책 | GlycoPharm 약국 전용 표현 유지 | `addLabel` prop |
+| "내 약국" 표현 정책 | — | `addLabel` prop |
 | KPA slug 복잡도 | KPA HubBlog/Pop/Qr의 slug 로직이 다름 | KPA는 초기 제외 |
 | 서비스 divergence | 공통화 후 특정 서비스만 기능 추가 시 | config-driven 설계로 확장 가능하게 |
 | 과도한 추상화 | config prop이 많아지면 가독성 저하 | 2-3개 핵심 prop만 노출 |
@@ -192,12 +174,12 @@ interface HubSignageLibraryConfig {
 1단계 (낮은 복잡도):
 WO-O4O-STORE-HUB-SIGNAGE-LIBRARY-TEMPLATE-V1
   - shared-space-ui에 HubSignageLibraryTemplate 추가
-  - GP + K-Cos 사이니지 페이지를 template 소비자로 전환
+  - K-Cos 사이니지 페이지를 template 소비자로 전환
   - KPA는 기존 유지 (호환성)
 
 2단계 (중간 복잡도):
 WO-O4O-STORE-HUB-POP-QR-IMPORT-TEMPLATE-V1
-  - GP + K-Cos Pop/QR 페이지를 shared template으로 추출
+  - K-Cos Pop/QR 페이지를 shared template으로 추출
   - KPA는 기존 유지
 
 3단계 (낮은 우선순위):
@@ -229,7 +211,7 @@ WO-O4O-STORE-HUB-BLOG-LIBRARY-TEMPLATE-V1
 **있다.** 특히:
 - `assetSnapshotApi` endpoint가 서비스마다 다르므로 DI(의존성 주입) 필요
 - "내 약국" vs "내 매장" 레이블이 prop화되면 가독성 저하
-- Blog/Pop/Qr에서 KPA와 GP/K-Cos의 slug 처리 방식 차이가 추상화를 어렵게 만든다
+- Blog/Pop/Qr에서 KPA와 K-Cos의 slug 처리 방식 차이가 추상화를 어렵게 만든다
 
 ### ④ Store HUB 핵심 가치 "매장 실행 자산 탐색·가져가기" 흐름이 유지되는가?
 
@@ -253,7 +235,7 @@ service-local 상태 유지
    → 가장 유사도 높고, ContentHubTemplate 패턴 그대로 적용 가능
 
 2. HubSlugImportTemplate (shared-space-ui)
-   → Pop + QR GP/K-Cos 공통화
+   → Pop + QR K-Cos 공통화
    → KPA는 이후 평가
 
 모니터링 기준:
@@ -265,7 +247,6 @@ service-local 상태 유지
 ## 읽은 파일 (코드 변경 없음)
 
 - `services/web-kpa-society/src/pages/pharmacy/Hub*.tsx` (6개)
-- `services/web-glycopharm/src/pages/hub/Hub*.tsx` (8개)
 - `services/web-k-cosmetics/src/pages/hub/Hub*.tsx` (7개)
 - `packages/shared-space-ui/src/` (디렉토리)
 - `packages/operator-ux-core/src/` (디렉토리)

@@ -45,7 +45,7 @@ Pharmacy-Hub 전용 service-scoped 라우트 추가
 | `apps/api-server/src/controllers/pharmacy-hub/offer-exposure.ts` | `PHARMACY_HUB_OFFER_EXPOSURE_GATE_SQL` (노출 게이트 SSOT) |
 
 이 모듈들은 **인증·조직 결정을 하지 않는다.** `organizationId` 는 호출자가 서비스 경계에 맞게 해석해
-넘긴다 (KPA/GP/KCos = `resolveStoreAccess`, Pharmacy-Hub = `resolvePharmacyHubStoreOrganization`).
+넘긴다 (KPA/KCos = `resolveStoreAccess`, Pharmacy-Hub = `resolvePharmacyHubStoreOrganization`).
 
 **전환된 기존 라우트** (동작 불변 목표)
 
@@ -122,7 +122,7 @@ Pharmacy-Hub 전용 service-scoped 라우트 추가
 
 > **공통 컴포넌트 seam** — 매니저 안의 `/store/*` 후속 화면 이동 3개(태블릿 진열 · 마케팅 자료 ·
 > POP 제작)를 prop 으로 뽑았다. `undefined = 기존 동작 유지 · null = 버튼 숨김 · 함수 = 교체`.
-> GlycoPharm·K-Cosmetics 는 prop 을 주지 않으므로 **동작 불변**이고, 해당 경로가 없는
+> K-Cosmetics 는 prop 을 주지 않으므로 **동작 불변**이고, 해당 경로가 없는
 > Pharmacy-Hub 는 `null` 로 숨겨 **dead link 0** 을 만든다.
 
 ### 1-6. 메뉴
@@ -165,7 +165,6 @@ route 와 기능이 함께 준비된 뒤 노출했으므로 "준비 중 메뉴 0
 | `apps/api-server` `npm run build` | PASS |
 | `packages/store-ui-core` `tsc --noEmit` | PASS |
 | `services/web-pharmacy-hub` `npm run build` | PASS (`tsc -b && vite build`) |
-| `services/web-glycopharm` `tsc --noEmit` | PASS (회귀 0) |
 | `services/web-k-cosmetics` `tsc --noEmit` | PASS (회귀 0) |
 
 ---
@@ -187,7 +186,7 @@ route 와 기능이 함께 준비된 뒤 노출했으므로 "준비 중 메뉴 0
 
 ### 4-2. 미연결 계정 — `renagang21@gmail.com`
 
-이 계정은 **PH enrollment 0** 이면서 KPA·GlycoPharm·Neture 조직을 보유한다.
+이 계정은 **PH enrollment 0** 이면서 KPA·Neture 조직을 보유한다.
 공통 `resolveStoreAccess` 의 `LIMIT 1` 폴백이 실제로 무엇을 내주는지까지 같은 시점에 실측했다.
 
 | 검증 | 결과 |
@@ -216,14 +215,13 @@ route 와 기능이 함께 준비된 뒤 노출했으므로 "준비 중 메뉴 0
 | dead link · 준비 중 메뉴 | **0** (두 경로 모두 실제 화면 존재) |
 | 회귀 — `/store-owner/products` (공급 상품) | 정상 (`약국 상품·거래` 섹션·목록·상세 링크 유지) |
 
-### 4-4. 회귀 — 공통 `/api/v1/store/*` (KPA · GlycoPharm · K-Cosmetics)
+### 4-4. 회귀 — 공통 `/api/v1/store/*` (KPA · K-Cosmetics)
 
 서비스별로 로그인한 뒤 **추출 리팩터링 이후**의 공통 라우트를 호출했다.
 
 | serviceKey | `GET /store/handled-products` | `GET /store/local-products` |
 |------|:----:|:----:|
 | `kpa-society` | `200 success:true` | `200 success:true` |
-| `glycopharm` | `200 success:true` | `200 success:true` |
 | `k-cosmetics` | `200 success:true` | `200 success:true` |
 
 응답 필드·항목 구성 종전과 동일(추가된 `masterId` 외 diff 없음). **회귀 0.**
@@ -327,4 +325,4 @@ WO 지시대로 운영 데이터에 임의 fixture 를 만들지 않았으므로
   `StoreLocalProductsManager` 의 `actions` prop 에 함수를 주면 된다(컴포넌트 재수정 불필요).
 - 매장 자체 상품 이미지 업로드 — 공통 매니저의 기존 URL 입력 방식을 그대로 사용.
 - 공통 `resolveStoreAccess` 의 `organization_members LIMIT 1` 폴백 자체의 정합성 —
-  KPA·GP·KCos 를 포함한 별도 WO 필요 (본 WO 는 Pharmacy-Hub 만 우회).
+  KPA·KCos 를 포함한 별도 WO 필요 (본 WO 는 Pharmacy-Hub 만 우회).

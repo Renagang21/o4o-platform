@@ -14,7 +14,7 @@
 | `apps/api-server/src/services/neture/NetureB2bCheckoutPaymentEventHandler.ts` | paid 전이 후 **자동 bridge 호출**(best-effort) |
 | `apps/api-server/src/modules/neture/services/supplier-unified-order.service.ts` | bridge 된 checkout_order 를 checkout 소스에서 **제외**(중복 표시 방지) |
 
-> DB/migration **무변경**(metadata 기반). legacy neture_orders·KPA/Glyco/KCos·정산·fulfillment guard·web-neture **무변경**.
+> DB/migration **무변경**(metadata 기반).
 
 ## 2. bridge 대상 / 금지
 **대상** (모두 충족):

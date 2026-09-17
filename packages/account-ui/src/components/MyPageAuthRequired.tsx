@@ -25,7 +25,7 @@ export interface MyPageAuthRequiredProps {
  *
  * WO-O4O-CROSS-SERVICE-PROFILE-COMMONIZATION-V1
  *
- * GlycoPharm / K-Cosmetics / Neture 의 MyProfilePage · MySettingsPage 에
+ * K-Cosmetics / Neture 의 MyProfilePage · MySettingsPage 에
  * 6벌 복제되어 있던 "로그인이 필요합니다" 블록의 단일 구현.
  * 로그인 진입 방식만 서비스마다 다르므로 (`onAction` 모달 / `href` 라우트)
  * 그 부분만 주입받는다.

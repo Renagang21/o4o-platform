@@ -8,7 +8,6 @@
  *   KPA 자체 storefront 종료 — 자체몰 목록 렌더링 전용 endpoint 3건 제거.
  *   `/products/featured`(KPA-only) · `/products` · `/categories`(소비처 0)
  *   제품 상세만 QR 제품 랜딩(landingType='product') 착지 API 로 존치한다.
- *   GlycoPharm 은 `/api/v1/glycopharm/stores/*` 자체 controller 를 쓰므로 영향 없다.
  *
  * Endpoints:
  *   GET /:slug/products/:id — Product detail (QR 제품 랜딩 전용, B2C visibility gate)

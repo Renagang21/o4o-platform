@@ -15,7 +15,7 @@
 
 | 근거 | 내용 |
 |---|---|
-| 로직 동일성 | GlycoPharm ↔ K-Cosmetics `resources.controller.ts` **557줄 / 557줄, 기계 diff 26줄이 전부 주석·로그 접두어**. SQL·권한·DTO·검증 차이 **0** |
+| 로직 동일성 | SQL·권한·DTO·검증 차이 **0** |
 | KPA 대응 | 동일 6+3 handler 가 동일 권한 모델(owner-or-operator 403)·동일 가시성 규칙으로 존재. 차이는 파라미터·audit log·KPA 전용 handler 4종 |
 | **통합 차단 요인** | 3원장 모두 **`service_key`/`organization_id` 컬럼이 없다**. 서비스 격리가 **물리 테이블 분리에만 의존**한다 → 테이블 통합 시 격리 메커니즘 자체가 사라진다 |
 | Freeze | F4(HUB 3축)·F5(Content Stable) 는 **HUB/CMS/Signage** 대상이며 `{svc}_contents` 3원장을 대상으로 하지 않는다 → Freeze 위반 아님 |
@@ -46,14 +46,13 @@
 | # | 서비스 | entity | physical table | 생성 주체 | 격리 축 | 소비 화면 |
 |---|---|---|---|---|---|---|
 | L1 | KPA-Society | `KpaContent` | `kpa_contents` | 회원 + 운영자 | **테이블 분리** (키 컬럼 없음) | `/content*`, `/resources`, `/operator/resources` |
-| L2 | GlycoPharm | `GlycopharmContent` | `glycopharm_contents` | 회원 + 운영자 | **테이블 분리** | `/content*`, `/resources`, `/operator/resources` |
 | L3 | K-Cosmetics | `CosmeticsContent` | `cosmetics_contents` | 회원 + 운영자 | **테이블 분리** | `/content*`, `/resources`, `/operator/resources` |
 | L4 | Neture(+플랫폼) | `CmsContent` | `cms_contents` | **운영자 전용** | `serviceKey` + `organizationId` 컬럼 | `/content`(라이브러리), `/notices`, `/resources` |
 | L5 | Pharmacy-Hub | — | `kpa_store_contents` | 매장 | `organizationId`(매장) | `/store-owner/content` |
 
 ### 2-1. 원장 의미 비교 (WO §3 표)
 
-| 항목 | L1 `kpa_contents` | L2 `glycopharm_contents` | L3 `cosmetics_contents` | L4 `cms_contents` |
+| 항목 | L1 `kpa_contents` || L3 `cosmetics_contents` | L4 `cms_contents` |
 |---|---|---|---|---|
 | PK | `id` uuid | 동일 | 동일 | 동일 |
 | service key | **없음** | **없음** | **없음** | `"serviceKey"` varchar(50) |
@@ -70,8 +69,6 @@
 | 통계 | `like_count`/`view_count` | 동일 | 동일 | 없음 |
 | 노출 제어 | 없음 | 없음 | 없음 | `sortOrder`/`isPinned`/`isOperatorPicked` |
 | 컬럼 표기 | snake_case | 동일 | 동일 | **camelCase(따옴표)** |
-
-**DDL 기계 대조**: `glycopharm_contents` ↔ `cosmetics_contents` CREATE 문은 테이블명만 치환하면 **완전 동일**했다.
 
 ### 2-2. 원장 판정
 
@@ -119,7 +116,7 @@ store_blog_posts · signage_media · signage_playlists · store_pops
 store_tablet_screen_sets · store_tablet_screen_blocks · store_videos · operator_qr_templates
 ```
 
-`kpa_contents` / `glycopharm_contents` / `cosmetics_contents` 참조 **0건**.
+`kpa_contents` / `cosmetics_contents` 참조 **0건**.
 → 3원장은 HUB 집계에 들어가지 않으므로 **F4 3축 모델의 적용 대상이 아니다.**
 → F5 Stable 9항목에도 이름이 없다.
 
@@ -138,24 +135,9 @@ store_tablet_screen_sets · store_tablet_screen_blocks · store_videos · operat
 
 ## 4. Backend duplication 실측
 
-### 4-1. GlycoPharm ↔ K-Cosmetics — 기계 diff
-
-서비스 토큰(`glycopharm`/`cosmetics` 및 대소문자 변형)을 정규화한 뒤 `diff`.
-
-```text
-파일        : routes/{glycopharm,cosmetics}/controllers/resources.controller.ts
-LOC         : 557 / 557
-diff 라인   : 26
-  주석 3처(헤더 2 + WO 참조 1)
-  console.error 로그 접두어 10처  ([Xx] ↔ [K-Xx])
-  로직·SQL·권한·DTO·검증 차이 : 0
-```
-
-**census 판정("약 557줄 동일") 재확인.** 실제로는 *로그 문자열 외 100% 동일*이다.
-
 ### 4-2. handler inventory
 
-| 그룹 | GP | KCos | KPA | 판정 |
+| 그룹 | KCos | KPA | 판정 |
 |---|:--:|:--:|:--:|:--:|
 | G1 contents list `GET /` | ✔ | ✔ | ✔ | `PARAMETERIZABLE` |
 | G2 contents detail `GET /:id` | ✔ | ✔ | ✔ | `IDENTICAL` |
@@ -177,26 +159,26 @@ diff 라인   : 26
 - **`IDENTICAL`(G2·G6)** — 조회/조회수 증가. 파라미터·권한·SQL 모양 동일.
 - **`PARAMETERIZABLE`(G1·G5·G11·G13·G14)** — 가시성 규칙 코어가 동일하다:
   `my=true → created_by 일치` / 비로그인 → `status='published'` / 로그인 → `published OR 본인`.
-  차이는 **필터 집합**(KPA `content_type`·`status=all` 운영자 확장 ↔ GP/KCos `usage_type`·`source_type`)과
+  차이는 **필터 집합**(KPA `content_type`·`status=all` 운영자 확장 ↔ KCos `usage_type`·`source_type`)과
   **KPA 의 `writeAuditLog` 호출**뿐 — 둘 다 옵션 주입으로 흡수 가능.
 - **`DATA_MODEL_DIFFERENT`(G3·G4)** — KPA 만 `content_type varchar(30) NOT NULL DEFAULT 'information'` 을
-  갖고 생성/수정 payload 에서 처리한다. GP/KCos 에는 **물리 컬럼 자체가 없다**. 로직이 아니라 스키마 차이다.
+  갖고 생성/수정 payload 에서 처리한다. KCos 에는 **물리 컬럼 자체가 없다**. 로직이 아니라 스키마 차이다.
 - **`POLICY_DIFFERENT` 0** — 3서비스 모두 write 권한이 `owner || operator/admin` → 403, 동일 error code
   (`FORBIDDEN`/`NOT_FOUND`), 동일 soft delete. **권한 정책 차이가 없다.**
-- **`UNIQUE`(G7~G10·G12)** — KPA 전용 추천·AI 3종 / GP·KCos 전용 운영자 자료 직접 생성.
+- **`UNIQUE`(G7~G10·G12)** — KPA 전용 추천·AI 3종 / KCos 전용 운영자 자료 직접 생성.
 
 ### 4-3. 중복 LOC 추정
 
 | 구분 | LOC |
 |---:|---:|
-| GP `resources.controller.ts` | 557 |
+ `resources.controller.ts` | 557 |
 | KCos `resources.controller.ts` | 557 |
 | KPA `kpa.routes.ts` 내 contents + operator resources 인라인 | 약 700 (L1519~L2233) |
 | **합계** | **약 1,814** |
 | 공통화 가능(G1~G6·G11·G13·G14 = 9그룹) | **약 1,100~1,250** |
 | 서비스에 남을 부분(UNIQUE 5그룹 + 배선) | 약 550~700 |
 
-> KPA 인라인 구간은 AI handler 3종과 audit log 를 포함하므로 GP/KCos 대비 두껍다.
+> KPA 인라인 구간은 AI handler 3종과 audit log 를 포함하므로 KCos 대비 두껍다.
 > 정확한 분리 LOC 은 후속 WO 의 추출 설계 단계에서 확정한다.
 
 ---
@@ -206,17 +188,16 @@ diff 라인   : 26
 | 서비스 | 화면 | API client | backend route | 원장 |
 |---|---|---|---|---|
 | KPA | `/content*`, `/resources` | `api/content.ts`, `api/resources.ts` → `'/contents'` (base `/api/v1/kpa`) | `/api/v1/kpa/contents` | L1 |
-| GlycoPharm | `/content*`, `/resources` | `api/content.ts`, `api/resources.ts` → `'/glycopharm/contents'` | `/api/v1/glycopharm/contents` | L2 |
 | K-Cosmetics | `/content*`, `/resources` | `api/content.ts`, `api/resources.ts` → `'/cosmetics/contents'` | `/api/v1/cosmetics/contents` | L3 |
 | Neture | `/content`, `/resources`, `/notices` | `lib/api/content.ts` → `'/neture/content'` | `/api/v1/neture/content` | **L4** |
 | Pharmacy-Hub | `/store-owner/content` | store client | `/store-owner/content` | **L5** |
 
 관측:
 
-- **동일 화면인데 API 만 다른 경우** — GP/KCos 콘텐츠 목록/상세/작성. 화면도 이미 census 에서 복제로 판정됐다.
+- **동일 화면인데 API 만 다른 경우** — KCos 콘텐츠 목록/상세/작성. 화면도 이미 census 에서 복제로 판정됐다.
 - **동일 API 인데 View 가 다른 경우** — 해당 없음.
 - **shared UI 존재** — `CommunityContentWriteShell` / `CommunityContentDetailView` / `CommunityContentSearchBar`
-  (KPA·GP·KCos 3서비스 소비), `ResourcesHubTemplate`(4서비스).
+  (KPA·KCos 2서비스 소비), `ResourcesHubTemplate`(4서비스).
   → **View 는 이미 상당 부분 공통, backend 는 전혀 공통이 아니다.** census 의 "backend duplication 이 본체" 판정 재확인.
 
 > **View 가 같다고 원장을 합쳐도 된다고 추론하지 않았다.** Neture 는 `ResourcesHubTemplate`(공통 View)을
@@ -235,7 +216,7 @@ diff 라인   : 26
 
 ### 6-2. 현재 결함 — 없음 (S1급 신규 발견 0)
 
-- 프런트 3서비스 모두 **서비스 prefix route** 만 호출한다 (`/api/v1/{kpa,glycopharm,cosmetics}/contents`).
+- 프런트 3서비스 모두 **서비스 prefix route** 만 호출한다
   포럼에서 발견됐던 generic 무필터 route 소비(S1) 같은 패턴은 이 축에 **없다.**
 - `serviceCode` 를 클라이언트 쿼리로 받는 지점 없음.
 - 컨트롤러마다 다른 service key 변환 없음 (애초에 변환이 없다).
@@ -265,7 +246,7 @@ canonical table 통합을 하려면 최소한 다음이 함께 필요하다.
 | 조건 (WO §8-B) | 충족 |
 |---|:--:|
 | physical/data semantics 차이 존재 | ✔ (`content_type` 유무 · `updated_by` 유무 · 격리 축 부재) |
-| controller/service workflow 상당 부분 동일 | ✔ (GP↔KCos 100%, KPA 파라미터화 가능 — 9/14 그룹) |
+| controller/service workflow 상당 부분 동일 | — |
 | table migration 이 부적절 | ✔ (격리 재설계 필요 — §6-3) |
 
 ### 기능군별 분리 (A/B/C 혼합)
@@ -274,7 +255,7 @@ canonical table 통합을 하려면 최소한 다음이 함께 필요하다.
 |---|---|:--:|---|
 | 회원 콘텐츠 CRUD + 자료실 (G1~G6) | L1·L2·L3 | **B** | 서비스 파라미터 주입형 공통 Core 추출 |
 | 운영자 자료 관리 (G11·G13·G14) | L1·L2·L3 | **B** | 동일 Core 에 operator 모듈로 포함 |
-| 운영자 자료 직접 생성 (G12) | L2·L3 | **C** | GP/KCos 전용 유지 (KPA 에 신설 금지) |
+| 운영자 자료 직접 생성 (G12) | L2·L3 | **C** | KCos 전용 유지 (KPA 에 신설 금지) |
 | KPA 추천·AI 3종 (G7~G10) | L1 | **C** | KPA 전용 유지 |
 | Neture 콘텐츠 라이브러리 | L4 | **C** | `cms_contents` — 운영자 CMS. F5 Stable. 통합 금지 |
 | Pharmacy-Hub 매장 콘텐츠 | L5 | **C** | 매장 실행 자산 축 — 커뮤니티 아님 |
@@ -301,7 +282,7 @@ WO-O4O-COMMUNITY-CONTENT-RESOURCE-BACKEND-CORE-COMMONIZATION-V1
 | 유지 | 물리 테이블 3개 · route path 3벌 · UNIQUE 5그룹 · 권한 정책 |
 | 선행 | `KpaContent` 엔티티 ↔ 물리 테이블 drift 6컬럼 해소 (§2-3) — raw SQL 유지 시 불필요, repository 전환 시 필수 |
 | migration | **불필요** |
-| 검증 | GP↔KCos 응답 동등성 · KPA 회귀(추천·AI·audit log) · 서비스 간 조회 격리 |
+| 검증↔KCos 응답 동등성 · KPA 회귀(추천·AI·audit log) · 서비스 간 조회 격리 |
 | 비범위 | 테이블 통합 · `service_key` 신설 · L4/L5 · frontend |
 
 ---
@@ -321,13 +302,12 @@ UNIQUE: 5
 ```
 
 - 조사 기능 14 = handler 그룹 G1~G14
-- 조사 handler 35 = GP 10 + KCos 10 + KPA 13 + Neture 2
 - 조사 entity/table 5 = L1~L5
 - 판정 합 2+5+0+2+5 = **14** = 기능 수 ✔
 
 ### 9-1. census 셀 재판정 (6분류 · 새 라벨 없음)
 
-| census # | 기능 | KPA | KCos | NET | GP | PH |
+| census # | 기능 | KPA | KCos | NET | PH |
 |---|---|:--:|:--:|:--:|:--:|:--:|
 | F10 | 콘텐츠 목록 | `VIEW_DUPLICATED` | `VIEW_DUPLICATED` | `SERVICE_SPECIFIC` | `VIEW_DUPLICATED` | `NOT_IMPLEMENTED` |
 | F11 | 콘텐츠 상세 | `FULLY_COMMON` | `FULLY_COMMON` | `SERVICE_SPECIFIC` | `FULLY_COMMON` | `NOT_IMPLEMENTED` |
@@ -356,8 +336,8 @@ census §1-3 규칙 6 의 "`FULLY_COMMON` 이어도 백엔드=DUP 표기" 가 �
 | 항목 | 결과 |
 |---|---|
 | 대상 route/controller/entity 전수 대조 | 완료 (128 후보 → 커뮤니티 축 확정) |
-| physical table / migration 추적 | 완료 (`kpa_contents` 6 migration · GP 1+1 · KCos 1+1 · cms 다수) |
-| GP/KCos controller 기계 diff | 완료 — 26줄, 전부 주석·로그 |
+| physical table / migration 추적 | 완료 (`kpa_contents` 6 migration 1+1 · KCos 1+1 · cms 다수) |
+| KCos controller 기계 diff | 완료 — 26줄, 전부 주석·로그 |
 | KPA 대응 handler 기능 매핑 | 완료 — 14 그룹 판정 |
 | API client → backend route 역추적 | 완료 — 6 client / 5 원장 |
 | shared export 역방향 소비 확인 | 완료 (`CommunityContent*` 3서비스 · `ResourcesHubTemplate` 4서비스) |
@@ -368,11 +348,11 @@ census §1-3 규칙 6 의 "`FULLY_COMMON` 이어도 백엔드=DUP 표기" 가 �
 
 | # | 표본 | 확인 |
 |---|---|---|
-| 1 | GP `api/resources.ts` → `/glycopharm/contents?sub_type=resource` → `glycopharm.routes.ts:576` `createGlycopharmContentsRouter` → `glycopharm_contents` | ✔ |
+| 1 | — | ✔ |
 | 2 | KCos 동일 경로 → `cosmetics.routes.ts:269` → `cosmetics_contents` | ✔ |
 | 3 | KPA `api/content.ts` → `apiClient('/api/v1/kpa')` + `/contents` → `kpa.routes.ts:2063` `contentRouter` → `kpa_contents` | ✔ |
-| 4 | GP↔KCos `resources.controller.ts` 정규화 diff = 26줄(주석·로그) | ✔ |
-| 5 | `kpa_contents` `content_type` 컬럼 존재(`20260422300000`) / GP·KCos DDL 부재 | ✔ |
+| 4↔KCos `resources.controller.ts` 정규화 diff = 26줄(주석·로그) | ✔ |
+| 5 | `kpa_contents` `content_type` 컬럼 존재(`20260422300000`) / KCos DDL 부재 | ✔ |
 | 6 | `KpaContent` 엔티티에 `content_type`·`body`·`sub_type`·`like_count`·`view_count`·`author_name` 선언 없음 | ✔ |
 | 7 | `hub-content.service.ts` 의 FROM 8종에 `{svc}_contents` 없음 | ✔ |
 | 8 | F5 §2 Stable 9항목에 `{svc}_contents` 없음 | ✔ |
@@ -387,7 +367,7 @@ census §1-3 규칙 6 의 "`FULLY_COMMON` 이어도 백엔드=DUP 표기" 가 �
 |---|---|
 | **프로덕션 DB schema/row 실측** (테이블 존재·row 수·null key 분포) | Cloud SQL Auth Proxy 바이너리 미설치. `gcloud sql connect` 는 인스턴스 authorized networks 를 변경하므로 read-only 감사 범위에서 실행하지 않았다 (WO §10 단서 적용) |
 | KPA 인라인 구간 LOC "약 700" | 라인 범위(L1519~L2233) 기준 추정. AI/추천 handler 경계가 인접해 정확한 분리 LOC 은 추출 설계 시 확정 |
-| G2·G6 `IDENTICAL` 판정 | GP↔KCos 는 기계 diff 로 확정. KPA 는 **권한·쿼리 모양 대조**로 판정했고 라인 단위 diff 는 하지 않았다 (파일 구조가 인라인 라우터라 직접 diff 불가) |
+| G2·G6 `IDENTICAL` 판정↔KCos 는 기계 diff 로 확정. KPA 는 **권한·쿼리 모양 대조**로 판정했고 라인 단위 diff 는 하지 않았다 (파일 구조가 인라인 라우터라 직접 diff 불가) |
 | `cms_contents` 가 HUB `sourceDomain:'cms'` 에 어떻게 연결되는지 | `hub-content.service.ts` 의 FROM 목록에 `cms_contents` 가 없어 매핑 경로를 특정하지 못했다. **본 감사 결론에는 영향 없음**(3원장 비포함이 확정적이므로) |
 | 3원장의 실제 데이터 규모 | 미실측 — 테이블 통합 판단 시 필수 입력 |
 
@@ -414,5 +394,5 @@ census §1-3 규칙 6 의 "`FULLY_COMMON` 이어도 백엔드=DUP 표기" 가 �
 2. **격리가 테이블 이름에 암묵적으로 의존** — Core 추출 시 테이블명을 파라미터로 주입하게 되는데,
    기본값을 두면 실수로 타 서비스 테이블을 조회할 수 있다. **기본값 없는 필수 파라미터**로 설계해야 한다.
 3. **KPA `status=all` 운영자 확장** — 공통화 시 이 분기를 놓치면 KPA 운영자 콘텐츠 허브가 회귀한다.
-4. **GP/KCos `POST /operator/resources` 를 KPA 로 확산시키지 말 것** — UNIQUE 판정(G12)이며 KPA 는 의도적으로 없다.
+4. **KCos `POST /operator/resources` 를 KPA 로 확산시키지 말 것** — UNIQUE 판정(G12)이며 KPA 는 의도적으로 없다.
 5. **프로덕션 데이터 규모 미실측** — 향후 판정 A 검토 시 선행 필요.

@@ -98,7 +98,7 @@ export interface StoreHubConfig {
   /**
    * WO-O4O-KPA-STORE-HUB-HOME-LATEST-RESOURCE-FEED-V1 (KPA opt-in, additive):
    *   제공 시 Block 2~5(자원 카드 / AI / Store CTA / Flow) 대신 이 본문을 렌더한다.
-   *   미전달 시 기존 5-block 기본 렌더 그대로 — GP/KCos 무영향.
+   *   미전달 시 기존 5-block 기본 렌더 그대로 — KCos 무영향.
    */
   renderMainSections?: () => React.ReactNode;
   /** Hero 우측 큰 store CTA 버튼 표시 여부 (기본 true). KPA 최신피드 홈은 false 로 숨긴다. */
@@ -350,7 +350,7 @@ const st: Record<string, React.CSSProperties> = {
     display: 'grid',
     // WO-O4O-STORE-HUB-MAIN-INDEPENDENT-PRODUCTION-VERIFICATION-V1 §7:
     // `1fr` 은 min-content 바닥을 가져 카드 문구가 길면 트랙이 컨테이너를 넘는다.
-    // mobile 390px 에서 K-Cosmetics 68px · GlycoPharm 57px 가로 스크롤이 실측됐다.
+    // mobile 390px 에서 K-Cosmetics 68px 57px 가로 스크롤이 실측됐다.
     // minmax(0, 1fr) 로 바닥을 풀어 2열 데스크톱 레이아웃은 그대로 두고 넘침만 없앤다.
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
     gap: 12,

@@ -155,8 +155,6 @@ apps/api-server/src/controllers/operator/MembershipConsoleController.ts:932
 ```
 
 **라이브 UI 에서 도달 가능**:
-- `services/web-glycopharm/src/pages/operator/UsersPage.tsx:107` (운영자 화면)
-- `services/web-glycopharm/src/pages/admin/GlycoPharmAdminMembersPage.tsx:105`
 - 공통 `packages/operator-core-ui/.../OperatorMembersConsolePage.tsx:189` (`비밀번호 변경` 행 액션)
 
 WO 확정 원칙 **"서비스 운영자는 사용자 계정 전체나 비밀번호를 관리하지 않는다"** 에 정면 위반이다.

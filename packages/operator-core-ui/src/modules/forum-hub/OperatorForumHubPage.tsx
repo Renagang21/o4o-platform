@@ -6,7 +6,7 @@
  * KPA reference(OperatorForumPage)를 공통 모듈로 추출. 서비스 차이는 client/accent/nav + enablePostActions 로 주입.
  * - 긴급 알림 배너 + 포럼 KPI(클릭 이동) + 관리 바로가기 + 최근 게시글
  * - enablePostActions=true(KPA): 게시글 수정/단건·일괄 삭제 (DataTable selection + ActionBar)
- * - enablePostActions=false(GP/KCos): read-only — 액션/선택/일괄삭제 미노출, row 클릭으로 상세 이동만
+ * - enablePostActions=false(KCos): read-only — 액션/선택/일괄삭제 미노출, row 클릭으로 상세 이동만
  *
  * 스타일은 KPA 원본과 동일하게 inline 중심 (Tailwind purge 무관). DataTable column className 은
  * 기존 forum-requests 등 operator-core-ui 모듈과 동일하게 사용.

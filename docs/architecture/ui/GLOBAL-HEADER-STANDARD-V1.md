@@ -4,7 +4,7 @@
 > **최종 갱신**: 2026-09-17 — WO-O4O-LEGACY-PARTNER-USER-FACING-CONTENT-AND-ACTIVE-DOC-CLEANUP-V1 (§8.3 neture 서브타이틀 · Phase 4 Partner 표기 정정 — Legacy Partner 은퇴 반영) · 2026-08-21 — WO-O4O-GLOBAL-HEADER-STANDARD-CURRENT-STATE-ALIGNMENT-V1 (현재 구현 상태 정합)
 > **근거**: IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 ([docs/archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md](../../archive/audits/IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1.md))
 > **상태**: Active Standard
-> **범위**: kpa-society, glycopharm, neture, k-cosmetics, **pharmacy-hub** 및 향후 신규 서비스 전체
+> **범위**: kpa-society, neture, k-cosmetics, **pharmacy-hub** 및 향후 신규 서비스 전체
 > **원칙**: 이 문서는 표준 정의만 포함한다. 구현 코드, 컴포넌트 API, props 설계는 포함하지 않는다.
 
 ---
@@ -44,7 +44,7 @@ IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 (2026-04-17) 핵심 수치:
 
 | 항목 | 수치 |
 |------|------|
-| 조사 대상 서비스 | 4개 (kpa-society, glycopharm, neture, k-cosmetics) |
+| 조사 대상 서비스 | 3개 (kpa-society, neture, k-cosmetics) |
 | Layout 파일 총 수 | 26개+ |
 | Header 파일 총 수 | 8개+ |
 | Main/Public Header 공유 컴포넌트 | **없음** |
@@ -57,20 +57,20 @@ IR-O4O-GLOBAL-LAYOUT-HEADER-AUDIT-V1 (2026-04-17) 핵심 수치:
 
 | 유형 | 설명 | 해당 서비스 |
 |------|------|-------------|
-| TYPE A | Header 서비스별 완전 분리 | 전체 4개 |
-| TYPE B | 역할별 Header 분리 | kpa, glycopharm |
+| TYPE A | Header 서비스별 완전 분리 | 전체 3개 |
+| TYPE B | 역할별 Header 분리 | kpa |
 | TYPE C | Layout 구조 중복 | kpa, neture |
-| TYPE D | Navigation 하드코딩 분산 | 전체 4개 |
+| TYPE D | Navigation 하드코딩 분산 | 전체 3개 |
 | TYPE E | 공유 컴포넌트 미활용 | neture (Store) |
 
 ### 2.2 현재 구현 상태 (2026-08-21 기준, 현행)
 
 | 항목 | 현재 상태 |
 |------|-----------|
-| 적용 대상 서비스 | **5개** (kpa-society, glycopharm, neture, k-cosmetics, **pharmacy-hub**) |
+| 적용 대상 서비스 | **4개** (kpa-society, neture, k-cosmetics, **pharmacy-hub**) |
 | Main/Public Header 공유 컴포넌트 | **있음** — `@o4o/ui` `GlobalHeader` ([packages/ui/src/layout/GlobalHeader.tsx](../../../packages/ui/src/layout/GlobalHeader.tsx)) |
-| 서비스별 Header | **thin bridge** 5개 — `KpaGlobalHeader` / `GlycoGlobalHeader` / `KCosGlobalHeader` / `NetureGlobalHeader` / `PharmacyHubGlobalHeader` |
-| Navigation 정의 위치 | **5서비스 모두 `src/config/navigation.ts` 로 분리** (Header 내부 하드코딩 해소) |
+| 서비스별 Header | **thin bridge** 4개 — `KpaGlobalHeader` / `KCosGlobalHeader` / `NetureGlobalHeader` / `PharmacyHubGlobalHeader` |
+| Navigation 정의 위치 | **4서비스 모두 `src/config/navigation.ts` 로 분리** (Header 내부 하드코딩 해소) |
 | contextual 노출 조건 | 공통 `filterContextualNav` (`@o4o/ui`) 로 통일 |
 | Operator Shell 공유 | 유지 (`@o4o/ui` OperatorShell) |
 | Store Shell 공유 | 유지 (`@o4o/store-ui-core` StoreDashboardLayout) |
@@ -207,7 +207,6 @@ GlobalLayout
 |------|----------|
 | 공통 Core | `@o4o/ui` `GlobalHeader` |
 | kpa-society | `KpaGlobalHeader` |
-| glycopharm | `GlycoGlobalHeader` |
 | neture | `NetureGlobalHeader` |
 | k-cosmetics | `KCosGlobalHeader` |
 | pharmacy-hub | `PharmacyHubGlobalHeader` |
@@ -248,7 +247,7 @@ Context 표현 방법 (비허용):
 해당하는 기존 자산:
 - Operator Sidebar (OperatorShell → 11-Capability Group)
 - Store Sidebar (StoreDashboardLayout → StoreSidebar)
-- Hub Sidebar (PharmacyHubLayout, GlycoPharmHubLayout)
+- Hub Sidebar
 - Admin Sidebar (AdminLayout, DashboardLayout)
 
 → Workspace Layer는 서비스/역할마다 다를 수 있으며, 이 계층의 다양성은 **정상**이다.
@@ -294,7 +293,6 @@ Context 표현 방법 (비허용):
 모든 서비스의 메뉴가 각 Header/Layout 파일 내부에 상수 배열로 하드코딩되어 있었다.
 
 - kpa: 4곳 분산 (`menuItems`, `demoMenuItems`, `KPA_STORE_NAV_ITEMS`, `HUB_MENU_ITEMS`)
-- glycopharm: 2곳 분산 (`publicMenuItems`+`pharmacyMenuItems`, `roleConfig`)
 - neture: 2곳 분산 (NetureLayout 내 nav, MainLayout 내 nav)
 - k-cosmetics: 1곳 (Header.tsx 내 nav)
 - **중앙화된 메뉴 설정 시스템이 없음**
@@ -382,7 +380,6 @@ serviceNavigation
 |-----------|------|-----------|-------------------|
 | kpa: Admin 진입 시 Header 완전 소멸, AdminSidebar만 표시 | 같은 서비스인지 인식 불가 | GlobalHeader 유지 + Admin Sidebar 표시 | 해소 — `AdminLayout` 이 `KpaGlobalHeader` 렌더 |
 | kpa: Operator 진입 시 커스텀 renderHeader로 완전 교체 | 브랜드 일관성 약화 | GlobalHeader 유지 + Operator Context 표현 | 해소 — `KpaOperatorLayoutWrapper` 가 `header={<KpaGlobalHeader />}` 전달 |
-| glycopharm: Admin 진입 시 DashboardLayout 이중 헤더 | 공개 페이지와 완전히 다른 경험 | GlobalHeader 유지 + Admin Context 표현 | 해소 — `DashboardLayout` 이 `GlycoGlobalHeader` 단일 렌더 |
 | neture: 역할별로 완전히 다른 Layout (Supplier/Partner 등) | 동일 서비스 내 분절 | GlobalHeader 공통 + Space별 Workspace 분리 | 해소 — `MainLayout`/`NetureLayout`/`AdminLayoutWrapper` 모두 `NetureGlobalHeader` |
 
 → 위 4건은 모두 해소되었다. 표는 **표준이 실제로 적용된 근거**로 남긴다.
@@ -410,7 +407,6 @@ serviceNavigation
 | 서비스 | 스타일링 방식 | Header 높이 |
 |--------|--------------|:-----------:|
 | kpa-society | inline style | 70px |
-| glycopharm | Tailwind CSS | 64px |
 | neture | Tailwind CSS | 64px |
 | k-cosmetics | inline style | 64px |
 
@@ -421,7 +417,7 @@ serviceNavigation
 ### 8.2 표준 방향
 
 1. **신규 공통 Header/Layout 컴포넌트는 Tailwind CSS 기반을 표준으로 한다**
-   - 이유: 표준 제정 당시 4개 서비스 중 2개(glycopharm, neture)가 이미 Tailwind 사용 중이었고, 현재 공통 GlobalHeader 가 Tailwind 기반이다
+   - 이유: 표준 제정 당시 3개 서비스 중 1개(neture)가 이미 Tailwind 사용 중이었고, 현재 공통 GlobalHeader 가 Tailwind 기반이다
    - 이유: 공유 패키지(`@o4o/ui`, `@o4o/store-ui-core`)가 Tailwind 기반
 
 2. **기존 inline style 서비스(kpa, k-cosmetics)는 즉시 전면 교체하지 않는다**
@@ -442,7 +438,6 @@ serviceNavigation
 | 서비스 | Primary Color | 로고 아이콘 | 서비스명 | 서브타이틀 |
 |--------|:------------:|:----------:|:--------:|:---------:|
 | kpa-society | `#2563eb` | 💊 | KPA-Society | 약사 전문 플랫폼 |
-| glycopharm | `#059669` | 💉 | GlycoPharm | 혈당관리 전문 플랫폼 |
 | neture | `#059669` | 🌿 | Neture | O4O 통합 업무 공간 (O4O 대표 진입 · Legacy Partner 은퇴 후 「공급자·파트너 협업 플랫폼」 폐기) |
 | k-cosmetics | `#db2777` | Sparkles (lucide) | K-Cosmetics | K-Beauty 전문 플랫폼 |
 | pharmacy-hub | `PH_PRIMARY` (config) | Pill (lucide) | Pharmacy-Hub | 파머시 허브 |
@@ -511,7 +506,6 @@ serviceNavigation
 |:---:|------|------|
 | 1 | 공통 GlobalHeader 정의·구축 | 완료 (`@o4o/ui` GlobalHeader) |
 | 2 | KPA Society | 완료 |
-| 3 | GlycoPharm | 완료 |
 | 4 | Neture | 완료 |
 | 5 | K-Cosmetics | 완료 |
 | 6 | 신규 서비스 강제 적용 | 상시 적용 — PharmacyHub 채택 완료 |
@@ -527,11 +521,6 @@ serviceNavigation
 - 가장 복잡한 서비스에 먼저 적용하여 표준의 충분성을 검증
 - Layout 구조 정리 (Layout + DemoLayout 통합 등)
 - 6개 Header 계열 → GlobalHeader + Context 체계로 정리
-
-### Phase 3: GlycoPharm 적용
-
-- 이미 Tailwind 기반이므로 스타일 전환 부담 적음
-- DashboardLayout 이중 헤더 → GlobalHeader + Context + Workspace로 분리
 
 ### Phase 4: Neture 적용
 
@@ -562,8 +551,8 @@ serviceNavigation
 | 4 | **Navigation은 중앙 config에서 관리한다** | TYPE D — 하드코딩 분산 해소. 현재 5서비스 `src/config/navigation.ts` |
 | 5 | **서비스별 차이는 BrandSlot과 PrimaryNav 항목으로 표현한다** | 브랜드 아이덴티티 유지하면서 구조 통일 |
 | 6 | **역할 상태는 ContextBar/Badge/Sidebar로 표현한다** | Header 자체를 교체하지 않는 원칙 |
-| 7 | **스타일링은 Tailwind 기반을 표준으로 한다** | glycopharm/neture 및 공유 패키지 기존 방식 계승 |
-| 8 | **Header 높이는 64px로 통일한다** | 3개 서비스 64px, 1개 70px → 64px 통일 |
+| 7 | **스타일링은 Tailwind 기반을 표준으로 한다** | neture 및 공유 패키지 기존 방식 계승 |
+| 8 | **Header 높이는 64px로 통일한다** | 2개 서비스 64px, 1개 70px → 64px 통일 |
 | 9 | **기존 OperatorShell / StoreDashboardLayout은 유지한다** | 이미 검증된 공유 자산, 충돌 없이 공존 |
 | 10 | **Kiosk/Tablet/Signage 등 전용 화면만 예외로 허용한다** | 명확한 예외 기준으로 표준 회피 방지 |
 

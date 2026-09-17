@@ -3,7 +3,7 @@
  *
  * WO-O4O-OPERATOR-FORUM-DELETE-REQUESTS-CONSOLE-COMMONIZATION-V1
  *
- * GlycoPharm / K-Cosmetics 의 ForumDeleteRequestsPage (95%+ 동일) 통합.
+ * K-Cosmetics 의 ForumDeleteRequestsPage (95%+ 동일) 통합.
  * IR: docs/investigations/IR-O4O-OPERATOR-FORUM-REQUEST-CONSOLE-WRAPPER-FEASIBILITY-V1.md
  *
  * 구조 (각 service 의 ForumDeleteRequestsPage 패턴 그대로 추출):
@@ -184,7 +184,7 @@ export function OperatorForumDeleteRequestsConsolePage({
     const fn = action === 'approve' ? client.approve : client.reject;
     const data = action === 'reject' ? { reviewComment: '일괄 반려' } : undefined;
     // WO-O4O-OPERATOR-FORUM-CONSOLE-BATCH-CLIENT-OPTION-V1:
-    //   batch endpoint 제공 시(예: Neture) 1회 호출, 미제공 시(GP/K-Cos) 기존 per-id fan-out.
+    //   batch endpoint 제공 시(예: Neture) 1회 호출, 미제공 시(K-Cos) 기존 per-id fan-out.
     const batchFn = action === 'approve' ? client.batchApprove : client.batchReject;
     const result = await batch.executeBatch(async (ids) => {
       if (batchFn) {

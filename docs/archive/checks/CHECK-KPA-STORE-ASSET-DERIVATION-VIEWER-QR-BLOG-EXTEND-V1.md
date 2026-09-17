@@ -72,9 +72,9 @@ relation 없는 항목(이전 생성/원본 없이 작성)은 에러가 아니�
 ## 10. Out of Scope (미수행)
 
 신규 API/DB/migration, relation write-path, POP/QR/블로그 생성 로직, 블로그 hard delete 노출, 자료함 구조 개편,
-사이드바/메뉴, 홈/Hero, GlycoPharm/K-Cosmetics 확장, cosmetics cleanup — **전부 미접촉**.
+사이드바/메뉴, 홈/Hero, K-Cosmetics 확장, cosmetics cleanup — **전부 미접촉**.
 
 ## 11. Follow-ups
 
 - 배포 후 KPA 약국 경영자 계정으로 QR/블로그 `원본 보기` 라이브 smoke.
-- (선택) 동일 패턴 GlycoPharm/K-Cosmetics 자료함 확장(별도 WO).
+- (선택) 동일 패턴 K-Cosmetics 자료함 확장(별도 WO).

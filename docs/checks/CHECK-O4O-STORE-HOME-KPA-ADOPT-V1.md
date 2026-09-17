@@ -2,8 +2,8 @@
 
 > **작업명:** WO-O4O-STORE-HOME-KPA-ADOPT-V1
 > **유형:** KPA-Society `/store` 내 약국 홈을 canonical `StoreHomeShell` 3번째 소비처로 adopt. "실행 흐름 3단계" → `onboardingSlot` 이동·하단 강등. 운영 블록 유지.
-> **결과: PASS — 실행 흐름 3단계를 `onboardingSlot` 으로 이동·운영 블록 아래로 강등(삭제 아님). KPI/Live Signals/홍보성과/최근활동 의미·위치 유지. store-ui-core/hub-core/backend/API/DB/package/route·GlycoPharm·K-Cosmetics 변경 0. web-kpa-society `tsc -b` exit 0. 배포 success. 약국 경영자 계정 런타임 smoke PASS(매장 "테스트 약국 매장": KPI·홍보성과·최근활동·실행흐름(하단) 렌더, store API 전부 200, 반응형 drawer 정상).**
-> 선행: WO-O4O-STORE-HOME-CANONICAL-SHELL-V1 · SMOKE-...-GLYCOPHARM(PASS) · WO-...-KCOSMETICS-ADOPT(PARTIAL)
+> **결과: PASS — 실행 흐름 3단계를 `onboardingSlot` 으로 이동·운영 블록 아래로 강등(삭제 아님). KPI/Live Signals/홍보성과/최근활동 의미·위치 유지. web-kpa-society `tsc -b` exit 0. 배포 success. 약국 경영자 계정 런타임 smoke PASS(매장 "테스트 약국 매장": KPI·홍보성과·최근활동·실행흐름(하단) 렌더, store API 전부 200, 반응형 drawer 정상).**
+> 선행: WO-O4O-STORE-HOME-CANONICAL-SHELL-V1 · WO-...-KCOSMETICS-ADOPT(PARTIAL)
 >
 > *Date: 2026-06-17*
 
@@ -65,15 +65,11 @@
 
 ## 7. 이번 WO에서 변경하지 않은 것
 
-- ✅ `StoreHomeShell` / `store-ui-core` **무변경**(additive prop 불필요 — onboardingSlot 기존 prop) → GlycoPharm/KCos 무영향 보장.
+- ✅ `StoreHomeShell` / `store-ui-core` **무변경**(additive prop 불필요 — onboardingSlot 기존 prop) → KCos 무영향 보장.
 - ✅ `StoreDashboardLayout`/`StoreSidebar`/`resolveStoreMenu`·hub-core 무변경.
 - ✅ backend/API/DB/migration/package/lock/route 변경 0.
 - ✅ KPA API fetch/adapter 무변경. 회원/약국 권한 무변경.
-- ✅ GlycoPharm / K-Cosmetics 코드 변경 0.
-
-## 8. GlycoPharm 무회귀 확인
-
-- 본 WO diff = `web-kpa-society/.../StoreHomePage.tsx` 1파일. 공통 셸 무변경 → GlycoPharm 영향 0. GlycoPharm 선행 smoke PASS(`b47e1dfe9`) 유지.
+- ✅ K-Cosmetics 코드 변경 0.
 
 ## 9. K-Cosmetics 무회귀 확인
 
@@ -93,23 +89,21 @@
 | ↳ console | 401 auth/me·refresh = **로그인 前** 흐름(login 200 이후 정상). **store API 신규 오류 0** |
 | ↳ network | ✅ 로그인 후 store API **전부 200**: analytics/marketing·recent-scans·store/assets·products/listings·store-hub/live-signals·guide/contents |
 | ↳ 반응형 390px | ✅ "메뉴 열기" 햄버거 + 사이드바 drawer + 본문 순서 유지 |
-| GlycoPharm/KCos 무회귀 | ✅ 공통 셸 무변경 → 영향 0 |
+| KCos 무회귀 | ✅ 공통 셸 무변경 → 영향 0 |
 
 ## 11. 완료 판정
 
-**PASS.** KPA `/store` 내 약국 홈을 StoreHomeShell adopt — 실행 흐름 3단계를 `onboardingSlot` 으로 이동·하단 강등(삭제 0), KPI/Live Signals/홍보성과/최근활동 의미·위치 유지. web-kpa-society typecheck PASS + 배포 success + **약국 경영자 계정 런타임 smoke PASS**(블록 렌더·실행흐름 하단·store API 200·반응형 drawer). 공통 셸·backend·GlycoPharm·KCos 무변경.
+**PASS.** KPA `/store` 내 약국 홈을 StoreHomeShell adopt — 실행 흐름 3단계를 `onboardingSlot` 으로 이동·하단 강등(삭제 0), KPI/Live Signals/홍보성과/최근활동 의미·위치 유지. web-kpa-society typecheck PASS + 배포 success + **약국 경영자 계정 런타임 smoke PASS**(블록 렌더·실행흐름 하단·store API 200·반응형 drawer). 공통 셸·backend·KCos 무변경.
 
 ## 12. 남은 잔여 검증 항목
 
 1. **K-Cosmetics 다중매장(≥2) `storeSelectorSlot`** — 가용 KCos 계정(체험 포함) 매장 1개로 ≥2 분기 런타임 미검증. 정적+typecheck 만 완료. → `SMOKE-O4O-STORE-HOME-KCOSMETICS-MULTISTORE-V1`(≥2 매장 계정 확보 시).
-2. (선택) GlycoPharm dead `glycopharm.ai_summary` signal/action 정리.
 3. (독립) K-Cosmetics 데모 매장 데이터 endpoint 500(`IR-O4O-KCOSMETICS-DEMO-STORE-DATA-500-V1`).
 
 ## 13. 3서비스 adopt 종합 (통합 종료 입력)
 
 | 서비스 | 셸 적용 영역 | 검증 |
 |------|------|------|
-| GlycoPharm | beforeSections(HubLayout): refresh/banner/AI요약/insights | **PASS**(운영 smoke) |
 | K-Cosmetics | storeSelectorSlot(다중매장) | **PARTIAL**(단일매장 런타임 PASS, ≥2 미검증) |
 | KPA-Society | onboardingSlot(실행흐름 강등) | **PASS**(약국 경영자 런타임) |
 
@@ -117,4 +111,4 @@
 
 ---
 
-*Date: 2026-06-17 · KPA store home StoreHomeShell adopt · PASS · 실행 흐름 3단계 → onboardingSlot 이동·하단 강등(삭제 0), KPI/Live Signals/홍보성과/최근활동 유지 · 공통 셸/backend/GlycoPharm/KCos 무변경 · web-kpa-society tsc -b 0 · 배포 success(5a14bfbfb) · 약국 경영자 계정 런타임 smoke PASS(블록 렌더·실행흐름 하단·store API 200·반응형 drawer) · 3서비스 adopt 종합: GP PASS / KCos PARTIAL(≥2 잔여) / KPA PASS · 후속 통합 종료 CHECK 권장.*
+*Date: 2026-06-17 · KPA store home StoreHomeShell adopt · PASS · 실행 흐름 3단계 → onboardingSlot 이동·하단 강등(삭제 0), KPI/Live Signals/홍보성과/최근활동 유지 · web-kpa-society tsc -b 0 · 배포 success(5a14bfbfb) · 약국 경영자 계정 런타임 smoke PASS(블록 렌더·실행흐름 하단·store API 200·반응형 drawer) · 후속 통합 종료 CHECK 권장.*

@@ -141,7 +141,6 @@ Cross-Origin이면 응답 body에도 토큰 포함:
 ```typescript
 // Cross-Origin 감지: Origin 헤더 기반
 // neture.co.kr ↔ api.neture.co.kr = 동일 (Cookie OK)
-// glycopharm.co.kr ↔ api.neture.co.kr = Cross-Origin (body 토큰 추가)
 ```
 
 ### 2.4 에러 코드
@@ -287,7 +286,6 @@ INDEX(role)
 | KPA-B | `kpa-b:district-admin` | `kpa-b:district` | `kpa-b:branch-admin`, `kpa-b:branch` |
 | KPA-C | `kpa-c:admin` | `kpa-c:operator` | `kpa-c:pharmacist` |
 | Neture | `neture:admin` | `neture:operator` | - |
-| GlycoPharm | `glycopharm:admin` | `glycopharm:operator` | - |
 | GlucoseView | `glucoseview:admin` | `glucoseview:operator` | - |
 | Cosmetics | `cosmetics:admin` | `cosmetics:operator` | - |
 
@@ -350,7 +348,6 @@ INDEX(role)
 | **KPA Society** | kpa-society.co.kr | localStorage | `Authorization: Bearer` | `@o4o/auth-client` |
 | **GlucoseView** | glucoseview.co.kr | httpOnly Cookie | `credentials: 'include'` | 직접 fetch |
 | **K-Cosmetics** | k-cosmetics.site | httpOnly Cookie | `credentials: 'include'` | 직접 fetch |
-| **GlycoPharm** | glycopharm.co.kr | localStorage | `Authorization: Bearer` | 직접 fetch |
 | **Admin** | admin.neture.co.kr | localStorage + Cookie | 혼합 | `@o4o/auth-client` + `@o4o/auth-context` |
 
 ### 5.2 동일 인증 vs 독립 인증
@@ -377,7 +374,6 @@ POST  /api/v1/auth/logout    ← 모든 서비스 공통
 ```typescript
 const SERVICE_DOMAINS = [
   '.neture.co.kr',
-  '.glycopharm.co.kr',
   '.kpa-society.co.kr',
   '.glucoseview.co.kr',
   '.k-cosmetics.site'
@@ -455,15 +451,6 @@ serviceKey는 **인증이 아닌 데이터 격리**에 사용된다.
 // 역할: admin, supplier, seller, partner, operator
 ```
 
-#### GlycoPharm (`web-glycopharm/src/contexts/AuthContext.tsx`, 398줄)
-
-```typescript
-// 토큰: localStorage (glycopharm_access_token / glycopharm_refresh_token)
-// 초기 체크: 토큰 존재 시 GET /auth/me (Authorization: Bearer)
-// 수동 refresh: 401 시 refreshAccessToken() 호출
-// Service User: 별도 토큰 (glycopharm_service_access_token)
-```
-
 #### Admin Dashboard (`@o4o/auth-context` + `admin-dashboard/src/stores/authStore.ts`)
 
 ```typescript
@@ -482,7 +469,6 @@ serviceKey는 **인증이 아닌 데이터 격리**에 사용된다.
 | KPA | `o4o_accessToken` (localStorage) | `o4o_refreshToken` (localStorage) |
 | GlucoseView | httpOnly Cookie `accessToken` | httpOnly Cookie `refreshToken` |
 | K-Cosmetics | httpOnly Cookie `accessToken` | httpOnly Cookie `refreshToken` |
-| GlycoPharm | `glycopharm_access_token` (localStorage) | `glycopharm_refresh_token` (localStorage) |
 | Admin | `admin-auth-storage` (localStorage) | httpOnly Cookie |
 
 ### 6.3 초기 인증 체크 패턴
@@ -500,7 +486,7 @@ serviceKey는 **인증이 아닌 데이터 격리**에 사용된다.
 │  │ 401 → setUser(null)                   │  │
 │  └────────────────────────────────────────┘  │
 │                                              │
-│  localStorage 서비스 (KPA, GlycoPharm)       │
+│  localStorage 서비스 (KPA)                   │
 │  ┌────────────────────────────────────────┐  │
 │  │ 토큰 존재 확인                          │  │
 │  │ 없음 → setUser(null) (API 호출 안 함)  │  │
@@ -627,7 +613,7 @@ serviceKey는 **인증이 아닌 데이터 격리**에 사용된다.
 │              ──► kpaOrgRoleMiddleware('admin')          │
 │              ──► Route Handler                          │
 │                                                        │
-│  GlycoPharm Care API                                   │
+│  Care API                                              │
 │  requireAuth ──► PharmacyContextMiddleware              │
 │              ──► (req.pharmacyId 설정)                  │
 │              ──► Route Handler                          │
@@ -697,7 +683,7 @@ serviceKey는 **인증이 아닌 데이터 격리**에 사용된다.
 
 | 파일 | 역할 |
 |------|------|
-| `apps/api-server/src/modules/care/care-pharmacy-context.middleware.ts` | GlycoPharm 약국 컨텍스트 |
+| `apps/api-server/src/modules/care/care-pharmacy-context.middleware.ts` | — |
 | `apps/api-server/src/routes/kpa/middleware/kpa-org-role.middleware.ts` | KPA 조직 역할 체크 |
 | `apps/api-server/src/middleware/signage-role.middleware.ts` | Signage 역할 5단계 |
 
@@ -722,7 +708,6 @@ serviceKey는 **인증이 아닌 데이터 격리**에 사용된다.
 | `services/web-kpa-society/src/api/token-refresh.ts` | KPA Token Refresh | 74 |
 | `services/web-glucoseview/src/contexts/AuthContext.tsx` | GlucoseView | 215 |
 | `services/web-k-cosmetics/src/contexts/AuthContext.tsx` | K-Cosmetics | 200 |
-| `services/web-glycopharm/src/contexts/AuthContext.tsx` | GlycoPharm | 398 |
 | `apps/admin-dashboard/src/stores/authStore.ts` | Admin Dashboard | 201 |
 
 ### Route Guard

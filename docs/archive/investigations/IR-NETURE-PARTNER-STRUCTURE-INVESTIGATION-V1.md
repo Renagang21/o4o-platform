@@ -58,9 +58,6 @@
 | `neture_partner_dashboard_item_contents` | public | dashboard_item_id(FK), content_id, content_source | 대시보드 콘텐츠 연결 |
 
 **확장 필드**:
-| 테이블 | 필드 | 용도 |
-|--------|------|------|
-| `glycopharm_products` | `is_partner_recruiting` (boolean) | 모집 대상 상품 표시 (partial index) |
 
 ---
 

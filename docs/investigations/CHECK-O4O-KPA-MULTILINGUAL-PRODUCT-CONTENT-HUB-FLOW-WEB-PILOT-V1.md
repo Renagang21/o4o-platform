@@ -4,7 +4,7 @@
 > 운영자 작성 → KPA Store Hub 노출 → 매장 가져오기(=복사) → target 연결 → resolve 검증.
 > backend contract 는 Phase 1 결과(`WO-...-HUB-FLOW-PILOT-V1`, commit a15c5c8af)를 그대로 사용 — backend 무변경.
 
-**대상:** KPA Society only (web-kpa-society). GlycoPharm / K-Cosmetics web 무변경.
+**대상:** KPA Society only (web-kpa-society). K-Cosmetics web 무변경.
 
 ---
 
@@ -88,4 +88,4 @@ WO-O4O-MULTILINGUAL-PRODUCT-CONTENT-CROSS-SERVICE-ADOPTION-V1 (KPA 파일럿 안
 
 ---
 
-*Date: 2026-06-21 · Phase 2 KPA web UI · 운영자 언어탭 작성 + Hub 가져오기(target 선택) + resolve 검증 · backend 무변경(Phase 1 contract) · web-kpa typecheck 신규 오류 0 · KPA only(GP/KCos 무변경) · mobile-app 미접촉*
+*Date: 2026-06-21 · Phase 2 KPA web UI · 운영자 언어탭 작성 + Hub 가져오기(target 선택) + resolve 검증 · backend 무변경(Phase 1 contract) · web-kpa typecheck 신규 오류 0 · KPA only(KCos 무변경) · mobile-app 미접촉*

@@ -72,7 +72,7 @@ Customer (B2C / Kiosk)
 |------|------|------|
 | `id` | UUID PK | |
 | `organization_id` | UUID FK → organizations | **매장** |
-| `service_key` | VARCHAR(50) | 도메인 (kpa, glycopharm 등) |
+| `service_key` | VARCHAR(50) | 도메인 (kpa 등) |
 | `master_id` | UUID FK → product_masters | 제품 정의 |
 | `offer_id` | UUID FK → supplier_product_offers | 공급자 오퍼 |
 | `price` | NUMERIC(12,2) | 매장별 가격 오버라이드 |
@@ -262,7 +262,6 @@ POST 등록 시 검증:
 | 서비스 | 페이지 | 기능 |
 |--------|--------|------|
 | KPA | `StoreChannelsPage.tsx` | 5-Section 채널 실행 콘솔 |
-| GlycoPharm | `StoreChannelsPage.tsx` | 동일 구조 |
 | K-Cosmetics | `StoreChannelsPage.tsx` | 동일 구조 |
 
 **5-Section 구조**:
@@ -290,10 +289,10 @@ POST 등록 시 검증:
 
 | Channel | Product 등록 | 지원 서비스 |
 |---------|:-----------:|------------|
-| **B2C** | ✅ | KPA, GlycoPharm, K-Cosmetics |
-| **KIOSK** | ✅ | KPA, GlycoPharm, K-Cosmetics |
-| **TABLET** | ❌ (별도 시스템) | GlycoPharm, KPA |
-| **SIGNAGE** | ❌ (CMS 기반) | KPA, GlycoPharm, K-Cosmetics |
+| **B2C** | ✅ | KPA, K-Cosmetics |
+| **KIOSK** | ✅ | KPA, K-Cosmetics |
+| **TABLET** | ❌ (별도 시스템) | KPA |
+| **SIGNAGE** | ❌ (CMS 기반) | KPA, K-Cosmetics |
 
 ### 6.2 Channel-Product Mapping
 
@@ -327,17 +326,15 @@ organization_channels (channel_type=B2C, status=APPROVED) 자동생성
 
 ## 7. 서비스별 차이
 
-| 항목 | KPA | K-Cosmetics | GlycoPharm | Neture |
-|------|:---:|:-----------:|:----------:|:------:|
-| Store Channels 페이지 | ✅ | ✅ | ✅ | ❌ |
-| Channel Product CRUD | ✅ | ✅ | ✅ | ❌ |
-| Inventory 관리 | ❌ | ✅ | ✅ | ✅ (공급자) |
-| Product Distribution Policy | ❌ | ❌ | ❌ | ✅ |
-| B2B Products 페이지 | ❌ | ❌ | ✅ (검증용) | ❌ |
-| 공급자 제품 관리 | ❌ | ❌ | ❌ | ✅ |
-| API Base | `/kpa/` | `/cosmetics/` | `/glycopharm/` | `/neture/` |
-
-**Neture는 공급자 플랫폼 — 매장 채널 관리는 KPA/GlycoPharm/K-Cosmetics 담당**
+| 항목 | KPA | K-Cosmetics | Neture |
+| ------ | :---: | :-----------: | :------: |
+| Store Channels 페이지 | ✅ | ✅ | ❌ |
+| Channel Product CRUD | ✅ | ✅ | ❌ |
+| Inventory 관리 | ❌ | ✅ | ✅ (공급자) |
+| Product Distribution Policy | ❌ | ❌ | ✅ |
+| B2B Products 페이지 | ❌ | ❌ | ❌ |
+| 공급자 제품 관리 | ❌ | ❌ | ✅ |
+| API Base | `/kpa/` | `/cosmetics/` | `/neture/` |
 
 ---
 
@@ -408,12 +405,10 @@ apps/api-server/src/utils/
 
 ```
 services/web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx
-services/web-glycopharm/src/pages/store/StoreChannelsPage.tsx
 services/web-k-cosmetics/src/pages/store/StoreChannelsPage.tsx
 services/web-neture/src/pages/supplier/SupplierProductsPage.tsx
 
 services/web-kpa-society/src/api/channelProducts.ts
-services/web-glycopharm/src/api/channelProducts.ts
 services/web-k-cosmetics/src/api/channelProducts.ts
 ```
 

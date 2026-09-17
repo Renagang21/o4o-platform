@@ -45,7 +45,7 @@ export type {
 } from './components/page/StorePageShell';
 
 /* WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-B:
-   매장 사이니지 화면 공통 순수 로직 (KPA·GlycoPharm 이 본문까지 동일하게 복제하던 helper 12개) */
+   매장 사이니지 화면 공통 순수 로직 (서비스마다 본문까지 동일하게 복제하던 helper 12개) */
 export {
   FORCED_WARN_DAYS,
   SIGNAGE_DAY_LABELS,
@@ -121,7 +121,7 @@ export { StoreHomeShell } from './components/StoreHomeShell';
 export type { StoreHomeShellProps } from './components/StoreHomeShell';
 
 // Store Home 공통 본문 파트 (WO-O4O-MY-STORE-HOME-CROSSSERVICE-COMMONIZATION-V1)
-// KPA / GlycoPharm / K-Cosmetics / Pharmacy-Hub 4서비스 "내 매장(약국) 홈" 공통 구조·동작.
+// KPA / K-Cosmetics / Pharmacy-Hub 3서비스 "내 매장(약국) 홈" 공통 구조·동작.
 // 지표 항목·문구·목적지·행 표현은 서비스가 주입한다 (화면을 강제로 동일하게 만들지 않는다).
 export { StoreHomeMetricGrid } from './components/home/StoreHomeMetricGrid';
 export type {
@@ -176,7 +176,7 @@ export type { BuyerOrderStatusBadgeProps } from './components/buyer-orders/Buyer
 // 매장 취급 상품(local-products) 공통 presentation (WO-O4O-MY-STORE-LOCAL-PRODUCTS-COMMON-COMPONENT-EXTRACTION-V1)
 export { LocalProductBadge, LOCAL_PRODUCT_BADGE_OPTIONS } from './components/local-products/LocalProductBadge';
 export type { LocalProductBadgeProps, LocalProductBadgeOption, LocalProductBadgeType } from './components/local-products/LocalProductBadge';
-// 매장 취급 상품 CRUD 공통 manager (V2 — GP/KCos 통합)
+// 매장 취급 상품 CRUD 공통 manager (V2 — KCos 통합)
 export { StoreLocalProductsManager } from './components/local-products/StoreLocalProductsManager';
 export type {
   StoreLocalProductsManagerProps,
@@ -231,7 +231,7 @@ export type {
   SupplyCatalogGetParams,
   SupplyCatalogListResponse,
   SupplyCatalogAccent,
-  // WO-O4O-GLYCOPHARM-CANONICAL-B2B-CART-PRODUCER-UI-ADOPTION-V1: opt-in 장바구니 producer 계약
+  // opt-in 장바구니 producer 계약
   SupplyCatalogCartProducer,
 } from './components/supply-catalog/SupplyCatalogHub';
 
@@ -291,7 +291,7 @@ export type {
 // 매장 장바구니 공통 (WO-O4O-STORE-HUB-PRODUCT-APPLICATION-AND-CART-COMMONIZATION-V1)
 //   storeCartTypes = canonical Store Cart API 계약 타입 (3 서비스 중복 제거 — 계약 자체는 무변경)
 //   useStoreCart   = 조회/수량/삭제/비우기/주문확정 상태 Core (headless)
-//   StoreCartView  = KCos·GP near-identical 화면 공통 View (accent 주입)
+//   StoreCartView  = KCos 화면 공통 View (accent 주입)
 //   Pharmacy-Hub 는 결제 그룹 기반 다른 주문 계약이므로 대상 아님.
 export type {
   CartSourceType,
@@ -332,7 +332,7 @@ export type {
 export { STORE_ACCENT_CLASSES, storeAccentTokens } from './theme/storeAccent';
 export type { StoreAccent, StoreAccentTokens } from './theme/storeAccent';
 
-// Store HUB 사이니지 라이브러리 (KPA 652L · KCos 579L · GP 580L 사본 3벌 대체)
+// Store HUB 사이니지 라이브러리 (KPA 652L · KCos 579L 사본 2벌 대체)
 //   useSignageLibrary  = 2탭 · producer 필터 · 페이지네이션 · 선택 · 단건/일괄 복사 상태 Core
 //   SignageLibraryView = 공통 화면. accent · ownerLabel · sortable · headerAction ·
 //                        importedTargets · guide 를 config 로 받는다.
@@ -395,7 +395,7 @@ export type {
 
 // ─── 매장측 이벤트 오퍼 / HUB 콘텐츠 API 팩토리 ───
 // WO-O4O-STORE-HUB-API-CLIENT-AND-SERVICE-SCOPE-ALIGNMENT-V1
-//   createEventOfferApi : KCos·GP 사본(주석·export명·prefix만 달랐다) 통합. KPA legacy `/groupbuy*` 는 제외.
+//   createEventOfferApi : KCos 사본 기준 공통화. KPA legacy `/groupbuy*` 는 제외.
 //   createHubContentApi : `/hub/contents` 단일 계약. serviceKey 는 config 값.
 //                         응답 타입은 `@o4o/types` 의존을 Core 로 끌어오지 않기 위해 제네릭 주입.
 export { createEventOfferApi } from './api/createEventOfferApi';
@@ -418,7 +418,7 @@ export type {
 
 // ─── buyer 주문(구매/발주) 내역 공통 View ───
 // WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1 §8
-//   buyer checkout ledger 계약(KPA·GlycoPharm)만 대상. K-Cosmetics 소비자 storefront 주문과
+//   buyer checkout ledger 계약(KPA)만 대상. K-Cosmetics 소비자 storefront 주문과
 //   PharmacyHub paymentGroup 결제 우선 주문은 업무 계약이 달라 합치지 않는다.
 export { BuyerOrderLedgerView } from './components/order-ledger/BuyerOrderLedgerView';
 export type {
@@ -429,7 +429,7 @@ export type {
 } from './components/order-ledger/BuyerOrderLedgerView';
 
 // 결제 전 주문 취소 — 백엔드 계약(WO-O4O-STORE-HUB-EVENT-OFFER-ORDER-VISIBILITY-AND-CANCELLATION-V1)의
-// 매장측 UI 노출. KPA · GlycoPharm · K-Cosmetics 공통(Pharmacy-Hub 는 자체 결제 우선 화면 유지).
+// 매장측 UI 노출. KPA · K-Cosmetics 공통(Pharmacy-Hub 는 자체 결제 우선 화면 유지).
 export { useBuyerOrderCancel, isBuyerOrderCancellable } from './components/order-ledger/useBuyerOrderCancel';
 export type {
   BuyerOrderCancelResult,

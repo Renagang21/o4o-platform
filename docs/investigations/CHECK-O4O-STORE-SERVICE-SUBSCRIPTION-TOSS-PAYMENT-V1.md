@@ -3,7 +3,7 @@
 > **작업명:** WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1
 > **유형:** backend(결제 prepare/confirm + entitlement 발급/연장) + frontend(결제 진입 UI). PaymentCore/Toss adapter **재사용**, schema/migration **0**.
 > **결과(Phase 1 backend): PASS(코드/타입) — `STORE_SERVICE_SUBSCRIPTION` 결제 prepare/confirm + FOREIGN_VISITOR_SALES_SUPPORT 이용권 ACTIVE 생성/30일 연장(idempotent). api-server tsc 0.**
-> **결과(Phase 2 frontend): 조건부 완료 — 코드/타입/빌드/배포 PASS. Panel 결제 버튼(하위호환) + prepare→Toss→success confirm 전용 흐름. web-kpa-society tsc 0 + build 0 + 배포 success, Panel 3소비처(kpa/glyco/kcos) tsc 0. 브라우저 smoke는 환경 블로커(Playwright Chrome 프로필 점유)로 보류 — 코드 무관, 프로필 lock 해소 후 1회 비파괴 재시도(§9 절차). 실 결제(confirm) 운영 금지.**
+> **결과(Phase 2 frontend): 조건부 완료 — 코드/타입/빌드/배포 PASS. Panel 결제 버튼(하위호환) + prepare→Toss→success confirm 전용 흐름. web-kpa-society tsc 0 + build 0 + 배포 success, Panel 3소비처 tsc 0. 브라우저 smoke는 환경 블로커(Playwright Chrome 프로필 점유)로 보류 — 코드 무관, 프로필 lock 해소 후 1회 비파괴 재시도(§9 절차). 실 결제(confirm) 운영 금지.**
 > **작성일:** 2026-06-22
 > 선행: 소비자→매장 결제(STORE_SALE_PAYMENT) 410 제거 완료 · `store_paid_feature_entitlements`(WO-...-ENTITLEMENT-V1, read-only)
 
@@ -23,7 +23,6 @@
 | 결제 metadata 저장 | `o4o_payments.metadata`(jsonb) |
 | entitlement 테이블 | `store_paid_feature_entitlements`(organizationId, serviceKey, planCode, status, startsAt, endsAt, source, metadata, UNIQUE(org,svc,plan)) — **migration 불필요** |
 | store owner 인증 | `isStoreOwner(dataSource, userId, serviceKey)` → { isOwner, organizationId } |
-| serviceKey 축 | 'kpa'|'glycopharm'|'cosmetics' (role-prefix; /me/check 와 동일 키로 저장/조회) |
 
 ## 3. 변경 파일 (Phase 1 backend 2 + CHECK)
 
@@ -60,7 +59,7 @@
 ## 8. 비접촉 확인 (정적)
 
 - ✅ PaymentCore/Toss adapter/`o4o_payments` schema **무변경**(재사용만).
-- ✅ STORE_SALE_PAYMENT(kpa/glyco/kcos consumer checkout 410) **미접촉** — 되살리지 않음.
+- ✅ STORE_SALE_PAYMENT **미접촉** — 되살리지 않음.
 - ✅ Neture B2B(`neture-b2b-payment.controller`) **diff 0**.
 - ✅ migration/schema **0** (기존 entitlement 테이블/컬럼 사용).
 
@@ -82,7 +81,7 @@
 
 | 파일 | 변경 |
 |------|------|
-| `packages/store-ui-core/.../ForeignVisitorSalesSupportPanel.tsx` | **하위호환 확장** — `check` 반환을 `boolean \| {active,endsAt}` 로 확대, `onSubscribe?`/`priceLabel?` optional props 추가. `onSubscribe` 제공 시 잠금 화면 결제 버튼 활성화(+processing 상태), active 시 endsAt 표시. **미제공(glyco/kcos) 시 기존 "준비 중" disabled 그대로 유지** |
+| `packages/store-ui-core/.../ForeignVisitorSalesSupportPanel.tsx` | **하위호환 확장** — `check` 반환을 `boolean \ | {active,endsAt}` 로 확대, `onSubscribe?`/`priceLabel?` optional props 추가. `onSubscribe` 제공 시 잠금 화면 결제 버튼 활성화(+processing 상태), active 시 endsAt 표시. **미제공 시 기존 "준비 중" disabled 그대로 유지** |
 | `services/web-kpa-society/src/api/storeServiceSubscription.ts` | **신규** — prepare/confirm/check API(coreApiClient) + `loadTossSdk`(CDN 주입, lockfile 무변경) |
 | `services/web-kpa-society/.../ForeignVisitorSalesSupportPage.tsx` | `onSubscribe`(prepare → Toss requestPayment 리다이렉트) + endsAt 포함 check 연결 |
 | `services/web-kpa-society/.../ForeignVisitorSalesSupportPaymentResultPage.tsx` | **신규** — success(confirm 호출 + endsAt 표시, StrictMode 이중호출 가드) / fail 페이지 |
@@ -91,10 +90,10 @@
 - 흐름: `prepare → loadTossSdk(clientKey) → toss.requestPayment('카드', {amount, orderId, orderName, successUrl(+paymentId/serviceKey), failUrl}) → success 페이지 confirm → 이용권 ACTIVE`.
 - **소비자 storefront 결제(`/store/:slug/payment/success`, STORE_SALE_PAYMENT)와 분리된 전용 라우트/페이지** — 재사용·혼입 없음.
 - Toss SDK = web-neture B2B(`loadTossWidget`) 패턴 미러(코드 복제, import 의존 없음) — CDN `js.tosspayments.com/v1/payment`, **npm/lockfile 무변경**.
-- **shared-module 규칙 준수**: Panel 3개 소비처(kpa/glyco/kcos) 전부 `tsc --noEmit` EXIT 0 — 회귀 없음.
+- **shared-module 규칙 준수**: Panel 3개 소비처 전부 `tsc --noEmit` EXIT 0 — 회귀 없음.
 
 ### 검증 (Phase 2)
-- web-kpa-society `tsc --noEmit`: **EXIT 0**. web-glycopharm/web-k-cosmetics `tsc`: **EXIT 0**(Panel 변경 하위호환 실증).
+- web-kpa-society `tsc --noEmit`: **EXIT 0**.
 - `pnpm --filter @o4o/web-kpa-society build`(tsc && vite build): **EXIT 0**(✓ built 45.66s).
 - web-kpa-society 배포: **success**(`Deploy Web Services` run 27932854454, detect-changes `kpa-society=true`, 2m49s) — 변경 4파일 감지 확인.
 - 브라우저 smoke: **보류(환경 블로커, 코드 무관)**. Playwright Chrome 프로필 `C:\Users\home\.playwright-o4o-profile` 가 이미 열려 있는 Chrome 인스턴스에 점유되어 새 브라우저 세션이 즉시 종료(exitCode=0, "현재 프로필이 사용 중입니다"). 동일 시도 반복 금지 — 코드/타입/빌드/배포 PASS 상태로 조건부 완료.

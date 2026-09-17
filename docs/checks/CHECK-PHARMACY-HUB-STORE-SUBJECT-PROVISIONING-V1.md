@@ -53,7 +53,7 @@
 > **3번(enrollment)은 WO 명시 5항목 밖의 추가**다. 조직을 재사용하는 경우
 > "이 조직이 pharmacy-hub 에 참여한다"는 기록이 어디에도 남지 않아 운영자 매장 콘솔
 > (`StoreConsoleController` 이 `organization_service_enrollments` 로 조직을 필터)에서
-> 조회되지 않는다. GlycoPharm 선례(`ensureOrganizationWithOwnerAndService`)와 동일하며
+> 조회되지 않는다.
 > 멱등·additive 이므로 포함했다.
 
 ### 1-2. 조직 식별 전략 (재사용 우선)
@@ -68,8 +68,6 @@
 **`kpa-pharm-{businessNumber}` 규칙을 쓸 수 없는 이유:** Pharmacy-Hub 가입 폼
 ([JoinPage.tsx](../../services/web-pharmacy-hub/src/pages/JoinPage.tsx))은 이메일·비밀번호·이름·
 연락처·약국명만 받고 **사업자번호를 수집하지 않는다**. 사업자번호 없는 서비스의 선례는
-GlycoPharm 이며 `gp-pharm-{userId 12 hex}` 라는 **사용자 스코프 결정적 코드**를 쓴다
-([glycopharm-member.service.ts:154](../../apps/api-server/src/routes/glycopharm/services/glycopharm-member.service.ts#L154)).
 동일 규칙을 채택했다 — 결정적이므로 재실행 시 `ON CONFLICT (code)` 가 같은 row 를 반환한다.
 
 ### 1-3. 보류(HOLD) 정책 — 추측으로 매장을 만들지 않는다
@@ -176,7 +174,7 @@ name="테스트약국"        → "테스트약국"                 valid=true
 name="__" (극단)         → "ph-pharm-aaaabbbbcccc"      valid=true  (fallback)
 ```
 
-**조치:** 공통 유틸의 동작은 **바꾸지 않았다** — KPA/GP/K-Cos 의 기존 slug 생성 결과가
+**조치:** 공통 유틸의 동작은 **바꾸지 않았다** — KPA/K-Cos 의 기존 slug 생성 결과가
 달라지기 때문이다. 대신 본 서비스에서 입력 base 만 미리 정규화(`slugBase`)해 넘기고,
 정규화 결과가 3자 미만이면 조직 code 를 fallback 으로 쓴다.
 
@@ -365,14 +363,13 @@ WO 가 전제한 `StoreSlugServiceKey` 의 `pharmacy-hub` 누락은 **소스에�
 
 | union | 위치 | 현재 값 |
 |---|---|---|
-| `StoreSlugServiceKey` | `platform-store-slug.entity.ts:31-36` | `glycopharm \| cosmetics \| kpa \| neture \| pharmacy-hub` |
 | `StorePolicyServiceKey` | `platform-store-policy.entity.ts:31-36` | 동일 집합 |
 
 - 보고된 TS2322 은 **`packages/platform-core/dist` 의 stale 산출물**이 원인이었다.
   재빌드 후 `npx tsc --noEmit -p tsconfig.build.json` **EXIT 0**.
 - DB 컬럼은 양쪽 모두 `varchar(50)` — **enum 아님 → migration 불필요**.
 - exhaustive switch 소비처 없음 (union 은 값 비교·전달에만 사용).
-- KPA·GlycoPharm·K-Cosmetics 는 additive union 이므로 **동작 불변**.
+- KPA·K-Cosmetics 는 additive union 이므로 **동작 불변**.
 
 > **미정합 잔존 1건 (본 WO 범위 밖, 미수정):** `src/scripts/audit-roles.ts:66,80` 의
 > `Record<ServiceKey|'none', number>` 에 `'pharmacy-hub'` 누락 (§5 에 기록된 기존 결함).
@@ -434,7 +431,6 @@ organization_members  : [{"organization_id":"c5e3a37a-…","role":"owner","left_
 isStoreOwner(serviceKey 없음)       = {"isOwner":false,"organizationId":null,"memberRole":""}
 resolveStoreAccess(serviceKey 없음) = null
 resolveStoreAccess('kpa')           = null
-resolveStoreAccess('glycopharm')    = null
 resolveStoreAccess('cosmetics')     = null
 ```
 
@@ -443,7 +439,6 @@ resolveStoreAccess('cosmetics')     = null
 ```ts
 const STORE_OWNER_ROLES_BY_SERVICE = {
   kpa:        ['kpa:store_owner'],
-  glycopharm: ['glycopharm:store_owner'],
   cosmetics:  ['cosmetics:store_owner'],
 } as const;                       // ← 'pharmacy-hub' 항목이 없다
 ```
@@ -487,7 +482,7 @@ middleware/auth/auth-context.middleware.ts:38,77
 | 신규 승인 프로비저닝 E2E | 프로덕션에 신규 테스트 사용자 생성이 필요하다. WO 는 *"운영 데이터에 영향을 줄 수 있으면 픽스처·트랜잭션 롤백"* 을 요구하나, `provisionStoreSubject` 가 **자체 queryRunner 를 열어** 외부 트랜잭션 롤백 픽스처로는 커밋 전 행을 관측할 수 없다. 별도 안전 설계 필요. |
 | 공통 매장 기능 회귀 | §8-5 미해결 상태에서는 Pharmacy-Hub 매장주가 애초에 진입 불가 — 회귀 대상이 아직 없다. |
 | B2B 회귀 (상품·장바구니·주문·결제) | **코드 변경 0** — 해당 라우트·컨트롤러 무수정, 가드 경로 분리 확인(§8-5 인용). |
-| KPA·GlycoPharm·K-Cosmetics slug 회귀 | **코드 변경 0** — union·guard·SSOT 무수정. |
+| KPA·K-Cosmetics slug 회귀 | **코드 변경 0** — union·guard·SSOT 무수정. |
 
 ### 8-7. 남은 작업 (§6-5 갱신)
 

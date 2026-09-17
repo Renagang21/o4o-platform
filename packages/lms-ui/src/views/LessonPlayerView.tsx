@@ -3,7 +3,7 @@
  *
  * WO-O4O-COMMUNITY-LMS-COURSE-DETAIL-AND-LESSON-PLAYER-COMMONIZATION-V1
  *
- * KPA / K-Cosmetics / GlycoPharm 의 레슨 플레이어를 한 벌로 수렴한다.
+ * KPA / K-Cosmetics 의 레슨 플레이어를 한 벌로 수렴한다.
  * 기능 유무는 `LmsLearnerPort` 의 optional 메서드 존재 여부로 판정한다(serviceKey 분기 없음).
  *  - `getQuizForLesson`/`submitQuiz` 미주입 → 퀴즈 UI 렌더 안 함
  *  - `getAssignmentForLesson`/`submitAssignment` 미주입 → 과제 UI 렌더 안 함

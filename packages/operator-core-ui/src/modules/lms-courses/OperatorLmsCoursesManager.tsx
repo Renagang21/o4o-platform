@@ -3,7 +3,7 @@
  *
  * WO-O4O-LMS-OPERATOR-COURSES-MANAGER-EXTRACTION-V1
  *
- * KPA/GlycoPharm/K-Cosmetics 의 near-identical OperatorLmsCoursesPage 를 config-driven 공통 모듈로 수렴.
+ * KPA/K-Cosmetics 의 near-identical OperatorLmsCoursesPage 를 config-driven 공통 모듈로 수렴.
  * 서비스 차이(API adapter, 상세 경로/라벨)는 config 로 주입한다. serviceKey hardcode 없음.
  *
  * 구조: 헤더 + 검색 + 상태 필터 + 강의 DataTable(모든 상태) + RowActionMenu(상세/승인/반려/비공개/종료/완전삭제)

@@ -28,7 +28,6 @@
 20260205033223  RolePrefixMigrationFoundation       (기반 준비)
 20260205040103  KpaRolePrefixMigration               users.roles += kpa:*, platform:super_admin
 20260205060000  NetureRolePrefixMigration            users.roles += neture:admin, neture:operator
-20260205070000  Phase4MultiServiceRolePrefixMigration users.roles += glycopharm:*, glucoseview:*, platform:admin
 20260222200000  RemoveKpaCRolesFromUsers             users.roles -= kpa-c:*
 20260224100000  CreateRoleAssignmentsTable           role_assignments 테이블 CREATE
 20260228000000  BackfillRoleAssignmentsFromLegacyRole [COMMIT 여부 확인 필요]
@@ -77,8 +76,6 @@ Backfill이 users.roles 배열도 backfill하므로, prefix migration으로 추�
 | `platform:super_admin` | KpaRolePrefixMigration | 모든 super_admin 사용자 | ✅ 있음 (소수) |
 | `neture:admin` | NetureRolePrefixMigration | service_key='neture' AND admin | ✅ 있음 (소수) |
 | `neture:operator` | NetureRolePrefixMigration | service_key='neture' AND operator | ✅ 있음 (소수) |
-| `glycopharm:admin` | Phase4MultiServiceMigration | glycopharm_applications 승인+admin | 조건부 ✅ |
-| `glycopharm:operator` | Phase4MultiServiceMigration | glycopharm_applications 승인+operator | 조건부 ✅ |
 | `glucoseview:admin` | Phase4MultiServiceMigration | glucoseview_pharmacies 활성+admin | 조건부 ✅ |
 | `glucoseview:operator` | Phase4MultiServiceMigration | glucoseview_pharmacies 활성+operator | 조건부 ✅ |
 | `platform:admin` | Phase4MultiServiceMigration | admin+no service_key (cross-service) | ✅ 있음 |
@@ -332,7 +329,7 @@ Phase 5B 작업 중 아래 항목은 **명시적 WO 없이 절대 수정 금지*
 
 ## 10. 결론
 
-1. **`role_assignments`에 존재할 것으로 예상되는 값**: admin, super_admin, operator, vendor, seller, supplier, partner, manager, kpa:district_admin, kpa:branch_admin, kpa:branch_operator, kpa:pharmacist, kpa:admin, kpa:operator, platform:super_admin, platform:admin, neture:admin, neture:operator, glycopharm:admin/operator, glucoseview:admin/operator
+1. **`role_assignments`에 존재할 것으로 예상되는 값**: admin, super_admin, operator, vendor, seller, supplier, partner, manager, kpa:district_admin, kpa:branch_admin, kpa:branch_operator, kpa:pharmacist, kpa:admin, kpa:operator, platform:super_admin, platform:admin, neture:admin, neture:operator, glucoseview:admin/operator
 
 2. **존재해서는 안 되는 값**: administrator, superadmin, kpa-c:*, vendor_manager, beta_user
 

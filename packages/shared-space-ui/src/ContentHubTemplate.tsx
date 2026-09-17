@@ -108,7 +108,7 @@ export interface ContentHubConfig {
    *   filters 를 'CMS type 필터'가 아니라 '콘텐츠 소스 탭'으로 사용한다(예: 운영 자료 / 콘텐츠 허브).
    *   true 시 탭 선택은 검색 필터가 아니므로 active-filter chip/초기화 행을 숨기고,
    *   "검색 결과 N건"·빈 상태 판정도 검색 유무로만 처리한다(탭 전환은 필터 아님).
-   *   미지정(기본) 시 기존 동작 그대로 — 다른 서비스(GP/KCos) 무영향.
+   *   미지정(기본) 시 기존 동작 그대로 — 다른 서비스(KCos) 무영향.
    */
   filtersAsSourceTabs?: boolean;
   /**

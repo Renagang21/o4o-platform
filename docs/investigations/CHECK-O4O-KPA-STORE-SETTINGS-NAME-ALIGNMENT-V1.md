@@ -12,10 +12,10 @@
 IR 에서 확인됨. 라벨이 "설정"이라 매장 기본정보/시스템 설정과 혼동 → 명칭/문구만 정합.
 **URL(`/store/settings`)·route·API·저장 로직·설정 항목 모두 불변.**
 
-### 변경 파일 (KPA 전용 — GP/KCos 무영향)
+### 변경 파일 (KPA 전용 — KCos 무영향)
 1. `packages/store-ui-core/src/config/storeMenuConfig.ts`
    - `KPA_SOCIETY_STORE_CONFIG` 설정 그룹: `store-settings` 라벨 `매장 설정` → **`매장 홈 디자인`**.
-   - 다른 서비스 config(COSMETICS/GLYCOPHARM)는 미변경.
+   - 다른 서비스 config(COSMETICS)는 미변경.
 2. `services/web-kpa-society/src/pages/pharmacy/PharmacyStorePage.tsx`
    - 페이지 제목 subLabel `· 매장 설정` → `· 매장 홈 디자인`, 접근거부/무slug 뷰 제목 동일 변경.
    - 헤더에 안내 문구 추가: "공개 매장 홈에 보이는 테마와 콘텐츠 블록을 편집합니다.
@@ -24,7 +24,7 @@ IR 에서 확인됨. 라벨이 "설정"이라 매장 기본정보/시스템 설�
 
 ## 2. 공통 모듈 영향 확인
 - 메뉴 라벨은 서비스별 분리 config(`KPA_SOCIETY_STORE_CONFIG`)에 존재 → **KPA 만 수정**.
-- COSMETICS/GLYCOPHARM config 의 settings 라벨/항목 미변경 확인.
+- COSMETICS config 의 settings 라벨/항목 미변경 확인.
 - `PharmacyStorePage` 는 KPA 전용 페이지.
 
 ## 3. 검증

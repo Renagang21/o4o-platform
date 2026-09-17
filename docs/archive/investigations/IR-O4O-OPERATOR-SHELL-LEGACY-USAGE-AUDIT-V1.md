@@ -4,7 +4,7 @@
 **조사 환경**: HEAD (main) `adf6310f5` 시점 정적 코드 (read-only)
 **조사 도구**: Grep / Read / Glob
 **작업 성격**: read-only 조사 — 코드/source 수정 없음
-**선행 완료**: Operator UX 공통화 트랙 (DomainIASidebar / OperatorAreaShell / DomainIASidebar IA 파라미터화 / KPA·Glyco·KCos·**Neture operator** 이행 전부 완료)
+**선행 완료**: Operator UX 공통화 트랙
 
 ---
 
@@ -12,9 +12,9 @@
 
 > ⚠️ **판정: B — 일부 이행 후 삭제 가능 (단, 저우선 / OPTIONAL)**
 >
-> 1. **`OperatorShell` 컴포넌트의 런타임 소비자는 단 1곳** — `services/web-neture/src/components/layouts/AdminLayoutWrapper.tsx` (Neture **admin** 영역). 나머지 모든 매치는 **stale 주석** (glyco/kcos DashboardLayout 의 "uses shared OperatorShell" 주석은 실제 import 없음).
+> 1. **`OperatorShell` 컴포넌트의 런타임 소비자는 단 1곳** — `services/web-neture/src/components/layouts/AdminLayoutWrapper.tsx` (Neture **admin** 영역). 나머지 모든 매치는 **stale 주석**
 > 2. **operator-shell 모듈 자체는 삭제 불가** — `STANDARD_GROUPS`(DomainIASidebar/operatorDomainIA/KPA·Neture menu 4 소비자), `OperatorGroupKey`/`OperatorMenuItem` 타입(7 파일), 액션 컴포넌트(OperatorConfirmModal/OperatorStatusBadge/useOperatorAction — 4 operator 페이지)가 **여전히 광범위 사용**. → 모듈은 **유지**, `OperatorShell.tsx` **컴포넌트만** 삭제 후보.
-> 3. **AdminLayoutWrapper 는 Neture 전용** — KPA/GlycoPharm/K-Cosmetics 에는 OperatorShell 기반 AdminLayoutWrapper 없음.
+> 3.
 > 4. **삭제 경로**: Neture AdminLayoutWrapper 를 OperatorAreaShell + DomainIASidebar(NETURE_OPERATOR_DOMAIN_IA, menuItems=getAdminMenu()) 로 이행 → OperatorShell.tsx 소비자 0 → 컴포넌트 + OperatorShellProps 삭제 가능.
 > 5. **이행은 admin sidebar flat→domain 헤딩 UX 변화 + footer 제거 = admin 전용 smoke 필요** → operator 이행과 동일 성격의 실변경.
 > 6. **OperatorShell 의 header/user/onLogout/dashboardLink 는 admin 사용에서도 dead** (renderHeader=null). 실효 기능 = flat sidebar + container + footer.
@@ -63,8 +63,6 @@
 | 파일 | 형태 | 실사용? |
 |------|------|:------:|
 | **services/web-neture/.../AdminLayoutWrapper.tsx:18,33** | `import { OperatorShell }` + `<OperatorShell>` | ✅ **YES (유일)** |
-| services/web-glycopharm/.../OperatorLayoutWrapper.tsx:8 | 주석 ("OperatorShell 우회") | ❌ |
-| services/web-glycopharm/.../DashboardLayout.tsx:92 | 주석 ("uses shared OperatorShell") — **stale, import 없음** | ❌ |
 | services/web-k-cosmetics/.../OperatorLayoutWrapper.tsx:6,8 | 주석 | ❌ |
 | services/web-k-cosmetics/.../DashboardLayout.tsx:203 | 주석 ("uses shared OperatorShell") — **stale, import 없음** | ❌ |
 | services/web-kpa-society/.../KpaOperatorLayoutWrapper.tsx:8 | 주석 | ❌ |
@@ -74,7 +72,7 @@
 | packages/operator-ux-core/.../DomainIASidebar.tsx:103 | 주석 ("OperatorShell 와 동일") | ❌ |
 | packages/ui/.../operator-shell/* | **정의 파일** | (정의) |
 
-→ **OperatorShell 컴포넌트 런타임 소비자 = 1 (Neture AdminLayoutWrapper)**. glyco/kcos DashboardLayout 의 주석은 stale (실제 미사용).
+→ **OperatorShell 컴포넌트 런타임 소비자 = 1 (Neture AdminLayoutWrapper)**.
 
 ---
 
@@ -87,7 +85,6 @@
 - menuItems = `getAdminMenu()` (admin 전용 slim 메뉴 — admin 항목 + "운영자 업무 →" /operator 게이트).
 - header = NetureGlobalHeader (별도), OperatorShell 내장 header 억제.
 - footer = default (© 2026 Neture).
-- 다른 서비스 admin: KPA/Glyco/KCos 는 OperatorShell 기반 AdminLayoutWrapper **없음** (find 결과 Neture 단독).
 
 ---
 
@@ -98,7 +95,6 @@
 | **Neture AdminLayoutWrapper** | **이행 가능** | OperatorAreaShell + DomainIASidebar(domainIAConfig) 로 이행 가능. menuItems=getAdminMenu(), header=NetureGlobalHeader slot, capabilities=ENABLED_CAPABILITIES. domain IA 는 NETURE_OPERATOR_DOMAIN_IA 재사용 가능(admin 메뉴 group key 가 동일 — dashboard/users/approvals/products/orders/content/analytics/system → 동일 4-domain 매핑). 단 flat→domain UX 변화 + footer 제거 = admin smoke 필요 |
 | **OperatorShell.tsx 컴포넌트** | **이행 후 삭제 가능** | 소비자 1 → AdminLayoutWrapper 이행 시 0 → 삭제 가능 (OperatorShellProps 동반) |
 | **operator-shell 모듈 (STANDARD_GROUPS/types/actions)** | **유지 필수** | DomainIASidebar 등 공통 컴포넌트 + 4 operator 페이지가 사용 (§7) |
-| glyco/kcos DashboardLayout 주석 | **주석 정리(선택)** | stale 주석 — dead code 아님(이미 미사용), 문서 위생 차원 |
 
 ---
 
@@ -136,7 +132,7 @@
 |--------|--------|
 | `STANDARD_GROUPS` | DomainIASidebar / operatorDomainIA / KPA·Neture operatorMenuGroups (4) |
 | `OperatorGroupKey` / `OperatorMenuItem` | 7 파일 (모든 서비스 operatorMenuGroups + operator-ux-core) |
-| `OperatorConfirmModal` / `OperatorStatusBadge` / `useOperatorAction` | glyco/kpa×2/neture operator 페이지 (4) |
+| `OperatorConfirmModal` / `OperatorStatusBadge` / `useOperatorAction` | — |
 | `StandardGroup` | constants 소비 |
 
 → **모듈은 유지, OperatorShell.tsx + OperatorShellProps 만 삭제 후보**.
@@ -164,7 +160,7 @@
 |:---:|-----------|------|:----:|
 | 1 | **WO-O4O-NETURE-ADMIN-LAYOUT-OPERATORAREASHELL-MIGRATION-V1** | Neture AdminLayoutWrapper: OperatorShell → OperatorAreaShell + DomainIASidebar(NETURE_OPERATOR_DOMAIN_IA, menuItems=getAdminMenu()). footer 제거. + Neture **admin** 전용 smoke | 낮음 |
 | 2 | **WO-O4O-UI-OPERATOR-SHELL-COMPONENT-REMOVAL-V1** | 1 완료 후 OperatorShell.tsx + OperatorShellProps 삭제. STANDARD_GROUPS/types/action 컴포넌트는 operator-shell 모듈에 유지. index.ts export 정리 | 낮음 (1 의존) |
-| 3 (선택) | 주석 정리 | glyco/kcos DashboardLayout 의 stale "uses shared OperatorShell" 주석 + Neture operatorMenuGroups:227 stale 주석 제거 | 매우 낮음 |
+| 3 (선택) | 주석 정리 | — | 매우 낮음 |
 | (대안) | **유지 결정** | OperatorShell 을 "Neture admin 전용 legacy shell" 로 명시적 유지. 무해(1 소비자, 빌드 정상). 이행 비용 대비 이득 낮으면 현행 유지 | — |
 
 > 1+2 를 한 사이클로 묶을 수 있으나, 1 은 admin UX 변화 + smoke 동반 실변경이므로 별도 WO 권장.
@@ -196,7 +192,7 @@
 | Operator OS Freeze (F1) | OperatorShell 은 @o4o/ui(operator-shell) 소속 — 컴포넌트 삭제 시 Freeze 영역 변경이나 **소비자 0 확인 후 dead component 제거**이므로 안전. 모듈 유지로 다른 export 무영향 |
 | Twin Axis | ✅ admin 이행 시에도 NETURE_OPERATOR_DOMAIN_IA(Supplier/B2B 축) 재사용 → KPA 축 오염 없음 |
 | 1인 개발 속도 | ✅ 즉시 작업 불필요. OperatorShell 무해 잔존 — 우선순위 낮은 후속으로 분리 |
-| Drift 방지 | ⚠️ stale 주석(glyco/kcos DashboardLayout) 이 "OperatorShell 사용" 오해 유발 가능 — 주석 정리(선택)로 해소 |
+| Drift 방지 | ⚠️ stale 주석 이 "OperatorShell 사용" 오해 유발 가능 — 주석 정리(선택)로 해소 |
 
 **결론**: 철학상 admin 까지 공통 메커니즘으로 합류하는 것이 이상적이나, admin 은 Neture 전용·내부 영역이고 OperatorShell 이 무해하게 동작하므로 **긴급 정리 불필요**. 완전 정합을 원하면 admin 이행 WO → 컴포넌트 삭제 2단계. 현 시점 **유지도 정당** (1 소비자, 빌드 정상, drift 영향 제한적).
 

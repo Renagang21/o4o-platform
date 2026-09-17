@@ -148,7 +148,6 @@ role 또는 memberType 저장 방식
 
 ```text
 KPA Society 회원 승인
-GlycoPharm 회원 승인
 K-Cosmetics 회원 승인
 Neture 공급자 승인
 공통 service membership 운영자 API
@@ -214,7 +213,6 @@ serviceKey별 접근 차단
 
 ```text
 KPA 회원 ≠ Pharmacy-Hub 회원
-GlycoPharm 회원 ≠ Pharmacy-Hub 회원
 K-Cosmetics 회원 ≠ Pharmacy-Hub 회원
 Neture 공급자 ≠ Pharmacy-Hub 공급자 회원
 ```
@@ -579,7 +577,6 @@ operator 승인 목록 렌더
 web-pharmacy-hub typecheck/build
 api-server typecheck
 security-core 변경 시 build
-기존 KPA/GlycoPharm/K-Cosmetics/Neture typecheck
 serviceKey 충돌 0
 Market Trial 연결 0
 ```

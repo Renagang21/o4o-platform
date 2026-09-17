@@ -141,7 +141,7 @@ SELECT DISTINCT user_id
 | 13. 대상 한정 | ✅ 운영자 전체 아님 — 해당 매장 owner 1명에게만 생성 |
 
 - 회귀: `/store/requests` 직접 진입·5초 polling·확인/완료/취소 동작 유지 확인.
-- GP/KCos: 코드 게이트(`resolved.serviceKey==='kpa'`)로 알림 미생성 — 동작 무변경(코드 기준 확인).
+- KCos: 코드 게이트(`resolved.serviceKey==='kpa'`)로 알림 미생성 — 동작 무변경(코드 기준 확인).
 - 검증 채널: 프론트(브라우저 DOM) + 백엔드(프로덕션 DB read-only SELECT via cloud-sql-proxy).
 
 ---
@@ -151,7 +151,7 @@ SELECT DISTINCT user_id
 - `/store/requests` 메뉴/route 삭제, `StoreHomePage`/`StoreChannelsPage` 링크 정리
 - `tablet_interest_requests` / `tablet_service_requests` 테이블 변경
 - QR page 콘텐츠 하단 상담 CTA, `store_qr_codes` 스키마/`source` 컬럼
-- GP/KCos 요청 모델 통합 및 GP/KCos 알림 생성 (handler 는 service-neutral 이나 `resolved.serviceKey === 'kpa'` 로 한정 → GP/KCos 동작 무변경)
+- KCos 요청 모델 통합 및 KCos 알림 생성 (handler 는 service-neutral 이나 `resolved.serviceKey === 'kpa'` 로 한정 → KCos 동작 무변경)
 - 알림센터 인라인 처리 액션, SSE/WebSocket 구조 변경
 
 ---
@@ -160,8 +160,7 @@ SELECT DISTINCT user_id
 
 1. `/store/requests` 메뉴 제거 또는 hidden route 전환 + 홈/채널 링크 정리 (본 알림 동선 검증 후)
 2. QR page 콘텐츠 하단 상담 CTA 옵션 (`store_qr_codes` 설정값 방식)
-3. `tablet_interest_requests` `source` 구분 컬럼 또는 GP `customer_requests`(source_type+purpose) 모델 통합
 4. `/store/requests?requestId=` highlight 지원 후 metadata.targetUrl 에 requestId 부착
-5. GP/KCos 상담 요청 알림 parity
+5. KCos 상담 요청 알림 parity
 6. `apps/admin-dashboard` NotificationList targetUrl navigate (운영자 화면 일반화 시)
 7. `tablet_service_requests` live 참조 여부 정리

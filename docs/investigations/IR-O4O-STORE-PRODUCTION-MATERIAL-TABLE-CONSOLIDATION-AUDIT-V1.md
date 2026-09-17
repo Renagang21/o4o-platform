@@ -2,7 +2,7 @@
 
 > **유형**: Investigation (read-only) — Store Production Material 다중 테이블 경계 감사. "통합 대상 찾기"가 아니라 "현재 분리가 타당한지" 검증.
 > **성격**: 코드/DB/route/UI **무변경**. 조사 문서만 (file:line 근거).
-> **결론(요약)**: **현재 다중 테이블 경계는 타당 — 통합 불필요·금지(A 주).** 어떤 store 테이블도 `o4o_asset_snapshots`/`cms_contents` 로 **역방향 FK 없음**(단절 구조적 보장 → **F 아님**). snapshot↔`kpa_store_contents` "중복"은 **불변 복사(INPUT) + 가변 편집 레이어(CORE)** 분리(COALESCE 렌더)이고, 결과물(`store_blog_posts`/`store_pops`/`store_qr_codes`/`store_execution_assets`)은 단일 SSOT → **부당 중복 0(C 아님)**. canonical 문서가 INPUT/CORE/OUTPUT 경계 + "rename·consolidate 금지" 명시(**E = 이미 문서로 처리, 물리 rename 보류 유지**). 잔여: **B**(author_role/visibility_scope/workspace_status 미문서화 + `store_library_items`→`store_execution_assets` 문서 drift), **D**(ProductionMaterials 클라이언트 merge 3서비스 중복 + GP/KCos QR/direct 미구현 — 선택적 공통화).
+> **결론(요약)**: **현재 다중 테이블 경계는 타당 — 통합 불필요·금지(A 주).** 어떤 store 테이블도 `o4o_asset_snapshots`/`cms_contents` 로 **역방향 FK 없음**(단절 구조적 보장 → **F 아님**). snapshot↔`kpa_store_contents` "중복"은 **불변 복사(INPUT) + 가변 편집 레이어(CORE)** 분리(COALESCE 렌더)이고, 결과물(`store_blog_posts`/`store_pops`/`store_qr_codes`/`store_execution_assets`)은 단일 SSOT → **부당 중복 0(C 아님)**. canonical 문서가 INPUT/CORE/OUTPUT 경계 + "rename·consolidate 금지" 명시(**E = 이미 문서로 처리, 물리 rename 보류 유지**). 잔여: **B**(author_role/visibility_scope/workspace_status 미문서화 + `store_library_items`→`store_execution_assets` 문서 drift), **D**(ProductionMaterials 클라이언트 merge 2서비스 중복 + KCos QR/direct 미구현 — 선택적 공통화).
 > **선행/근거**: `O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1` · `IR-O4O-STORE-CONTENT-PRODUCTION-AND-MANAGEMENT-SUPPORT-FLOW-V1`.
 > **작성일**: 2026-06-15
 
@@ -20,7 +20,7 @@
 | `o4o_asset_snapshots` | 허브→매장 **불변 복사(INPUT)** | **불변** | `packages/asset-copy-core/src/entities/asset-snapshot.entity.ts` — id/org/source_service/source_asset_id/asset_type/content_json. **관계/FK 0** |
 | `kpa_store_contents` | 내 매장 **편집 레이어(CORE = Store Production Material)** | 가변 | `apps/api-server/src/routes/kpa/entities/kpa-store-content.entity.ts` — `snapshot_id`(nullable uuid, **FK 아님** `:44-45`), `source_type`(snapshot_edit/direct `:48`), content_json, source_metadata `:124`, author_role `:100`, visibility_scope `:108`, workspace_status `:137` |
 | `store_execution_assets` | **자료(INPUT) + 생성 결과물(OUTPUT)** 겸용(sourceType 구분) | 가변 | `apps/api-server/src/routes/platform/entities/store-execution-asset.entity.ts` — sourceType(uploaded/library/generated), usageType, org FK→organizations |
-| `store_blog_posts` | 블로그 **결과물(OUTPUT)** | 가변 | `routes/glycopharm/entities/store-blog-post.entity.ts` — author_role(operator/store), storeId, slug. **snapshot 링크 없음** |
+| `store_blog_posts` | 블로그 **결과물(OUTPUT)** | 가변 | **snapshot 링크 없음** |
 | `store_pops` | POP **결과물(OUTPUT)** | 가변 | `routes/o4o-store/entities/store-pop.entity.ts` — blog 와 동형(author_role/storeId/slug) |
 | `store_qr_codes` | QR **결과물(OUTPUT)** | 가변 | `routes/platform/entities/store-qr-code.entity.ts` — `libraryItemId`(**논리 참조만, FK 아님**), org FK→organizations |
 
@@ -69,16 +69,16 @@
 | 서비스 | merge 소스 | 비고 |
 |--------|-----------|------|
 | KPA | direct + executionAssets + qr + blog (4) | full |
-| GP | executionAssets + blog (2) | **QR/direct ready client 부재 → 미구현(empty, mock 금지)** (주석 명시) |
+| executionAssets + blog (2) | **QR/direct ready client 부재 → 미구현(empty, mock 금지)** (주석 명시) |
 | KCos | executionAssets + blog (2) | 동 |
 
-> merge 로직이 3서비스에 중복 + GP/KCos 부분 구현. **공통화 + GP/KCos QR/direct 소스 완성** 후보(D) — 단 **테이블 통합과 무관**(조회 계층 정리). 선택적.
+> merge 로직이 2서비스에 중복 + KCos 부분 구현. **공통화 + KCos QR/direct 소스 완성** 후보(D) — 단 **테이블 통합과 무관**(조회 계층 정리). 선택적.
 
-## 7. GP/KCos parity
+## 7. KCos parity
 
-- 내 매장 보관/편집/결과물 화면(StoreLibraryContents/Resources/ProductionMaterials/Editor) + route(`/store/library/*`, `/store/content/*`, `/store/marketing/*`)는 **3서비스 동일 테이블·API 공유**(컴포넌트는 서비스 디렉터리: KPA `pharmacy/`, GP `store-management/`, KCos `store/`).
+- 내 매장 보관/편집/결과물 화면(StoreLibraryContents/Resources/ProductionMaterials/Editor) + route(`/store/library/*`, `/store/content/*`, `/store/marketing/*`)는 **2서비스 동일 테이블·API 공유**(컴포넌트는 서비스 디렉터리: KPA `pharmacy/` `store-management/`, KCos `store/`).
 - 컨트롤러 `createStoreContentController` 는 KPA prefix 없이 3서비스 공통 마운트 → `kpa_store_contents` 단일 테이블 공유(service-neutral).
-- 차이: GP/KCos ProductionMaterials 부분 구현(§6). 구조 발산 아님.
+- 차이: KCos ProductionMaterials 부분 구현(§6). 구조 발산 아님.
 
 ## 8. 명칭(E-check) — canonical 문서로 이미 처리
 
@@ -101,7 +101,7 @@
 | **A** 경계 타당, 문서화만 필요 | **주** | INPUT/CORE/OUTPUT 분리 정당, 단절 정상, 부당 중복 0 |
 | **B** 일부 역할 설명 부족 → 문서 보강 | **부분** | author_role/visibility_scope/workspace_status 미문서화, store_library_items→execution_assets drift, execution_assets 이중역할 |
 | **C** 같은 데이터 중복 저장 → 구조 정비 | ❌ | snapshot/edit/output 분리(중복 아님), 결과물 단일 SSOT |
-| **D** ProductionMaterials 통합 조회 공통화/정리 | **부분(선택)** | 클라이언트 merge 3서비스 중복 + GP/KCos QR/direct 미구현 (테이블 통합과 무관) |
+| **D** ProductionMaterials 통합 조회 공통화/정리 | **부분(선택)** | 클라이언트 merge 2서비스 중복 + KCos QR/direct 미구현 (테이블 통합과 무관) |
 | **E** 명칭/canonical 정리, 물리 rename 보류 | **이미 처리** | canonical 문서가 legacy명+do-not-rename 확립 |
 | **F** 단절 원칙 충돌 FK | ❌ | 역방향 FK 0, snapshot 불변 |
 
@@ -117,7 +117,7 @@
 ## 12. 후속 WO 후보 (선택, 비긴급)
 
 1. `WO-O4O-STORE-PRODUCTION-MATERIAL-BOUNDARY-DOCUMENTATION-V1` — canonical 문서 보강(B): store_library_items→store_execution_assets 갱신, author_role/visibility_scope/workspace_status 정의, execution_assets INPUT+OUTPUT 이중역할 명문화. **문서 only, 실행 영향 0.**
-2. `WO-O4O-STORE-PRODUCTION-MATERIAL-LIST-QUERY-CLEANUP-V1`(선택, D) — ProductionMaterials 클라이언트 merge 공통화(`@o4o/store-ui-core` 헬퍼) + GP/KCos QR/direct ready client 추가(부분 구현 완성). 테이블 무변경.
+2. `WO-O4O-STORE-PRODUCTION-MATERIAL-LIST-QUERY-CLEANUP-V1`(선택, D) — ProductionMaterials 클라이언트 merge 공통화(`@o4o/store-ui-core` 헬퍼) + KCos QR/direct ready client 추가(부분 구현 완성). 테이블 무변경.
 3. ~~`WO-O4O-...-TABLE-CONSOLIDATION-V1`~~ — **불제안.** 본 감사 결과 통합 불필요·금지.
 4. ~~`WO-O4O-...-CANONICAL-NAMING-V1`(물리 rename)~~ — **보류 유지**(canonical §6.2).
 
@@ -128,7 +128,7 @@
 - **현재 6개 테이블 경계는 타당하다.** INPUT(`o4o_asset_snapshots` 불변) / CORE(`kpa_store_contents` 편집) / OUTPUT(`store_execution_assets`·blog·pop·qr)의 계층 분리가 canonical 설계·코드와 일치하며, **원본-사본 단절(역방향 FK 0)·결과물 단일 SSOT** 가 구조적으로 지켜진다. → **통합 불필요·금지(A).**
 - **C(부당 중복)·F(단절 충돌) 해당 없음.** snapshot↔편집 레이어는 정당한 불변/가변 분리.
 - **E(물리 rename)는 canonical 문서가 이미 보류로 확립** — 본 감사도 동일.
-- 잔여는 **B(canonical 문서 경계 보강)** 와 **D(ProductionMaterials 조회 공통화·GP/KCos 소스 완성)** 로, **둘 다 테이블 구조 무변경의 저위험 후속**.
+- 잔여는 **B(canonical 문서 경계 보강)** 와 **D(ProductionMaterials 조회 공통화·KCos 소스 완성)** 로, **둘 다 테이블 구조 무변경의 저위험 후속**.
 - **권고**: 테이블 통합/ rename 착수 금지. 필요 시 **문서 보강(B) → 조회 공통화(D)** 만 별도 WO 로.
 
 ---

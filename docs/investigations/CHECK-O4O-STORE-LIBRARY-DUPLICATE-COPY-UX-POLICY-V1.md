@@ -24,7 +24,7 @@
 
 | 화면 | 이미 복사한 항목 상태 | 재복사 |
 |------|----------------------|:------:|
-| 콘텐츠 browse 카드(GP/KCos `ContentHubCardGrid`) | 버튼 `disabled` + 회색 | ❌ 영구 차단 |
+| 콘텐츠 browse 카드(KCos `ContentHubCardGrid`) | 버튼 `disabled` + 회색 | ❌ 영구 차단 |
 | 콘텐츠 browse 테이블(KPA `DefaultTableView`) | 비클릭 `<span>복사 완료</span>` | ❌ 영구 차단 |
 | POP/QR/Blog browse(ActionBar bulk-import) | copied 추적 없음(selectedIds) | ✅ 이미 허용 |
 
@@ -44,20 +44,19 @@
 
 ### 3.3 안내 문구 — 3 콘텐츠 browse (`infoTextAfter` 보강, 짧게)
 - KPA/KCos: "…내 매장 사본은 영향받지 않습니다. **다시 복사하면 새 사본으로 저장되며, 필요 없는 사본은 내 매장에서 삭제할 수 있습니다.**"
-- GP: 동일(용어 "내 약국").
 
 > POP/QR/Blog 페이지는 이미 재가져오기 허용 + 충분한 안내 보유 → **미변경**.
 
 ## 4. 검증
 
-- **TypeScript 0 errors:** `shared-space-ui` · `web-glycopharm` · `web-k-cosmetics` · `web-kpa-society` · `web-neture`(소비처) **각 0** (baseline 0).
+- **TypeScript 0 errors:** `shared-space-ui` · `web-k-cosmetics` · `web-kpa-society` · `web-neture`(소비처) **각 0** (baseline 0).
 - **정적:**
   - 카드/테이블 모두 alreadyCopied 시 **버튼 클릭 가능**(disabled 는 isCopying 한정). '복사 완료' = 이력 표시 + 툴팁 '다시 복사'.
   - `recopyLabel` additive(config optional, 기본 '다시 복사') — 미설정 소비처(KCos/Neture library 등) 무영향.
   - **API/DB/route/snapshot 구조/`onCopy`/`assetSnapshotApi.copy`/`loadCopiedIds` 변경 0.**
   - **unique constraint / soft-dedup / 중복 차단 / 확인 모달 미도입**(diff 확인).
   - 백엔드/엔티티/마이그레이션 변경 0.
-  - 직전 WO 의 Copy 아이콘·accent·용어(GP 약국/KCos·KPA 매장) 보존.
+  - 직전 WO 의 Copy 아이콘·accent·용어(KCos·KPA 매장) 보존.
 - **browser smoke:** 미수행 — dev 서버 미기동·인증 guard. 상태/문구는 tsc + 정적 검증. (배포 후 이미 복사한 콘텐츠의 복사 버튼이 클릭 가능하고 재복사 시 새 사본 생성되는지 확인 권장.)
 
 ## 5. 완료 판정
@@ -69,7 +68,7 @@
 1. `IR-O4O-STORE-PRODUCTION-MATERIAL-TABLE-CONSOLIDATION-AUDIT-V1` — 다중 테이블 경계 audit.
 2. `WO-O4O-OPERATOR-CONTENT-ROUTE-NAME-ALIGNMENT-V1` — `/operator/content` vs `/operator/content-management`.
 3. (선택) browser smoke — 재복사 클릭 → 새 사본 + 내 매장 목록 구분 확인.
-4. (선택) GP/KCos adapter 공통화 / KPA fold-in 재평가.
+4. (선택) KCos adapter 공통화 / KPA fold-in 재평가.
 
 ---
 

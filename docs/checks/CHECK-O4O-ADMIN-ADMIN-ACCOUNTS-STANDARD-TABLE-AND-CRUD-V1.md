@@ -66,7 +66,7 @@ RowActionMenu 표준 목록**, 검색·상태·역할 필터, 단건/일괄 활�
 
 ## 7. KPA 외 / 서비스 운영자
 
-- 변경 = admin-dashboard 프론트 1파일. KPA/Neture/GP/KCos 서비스 운영자 계정 무변경(본 탭은 platform 관리자만 대상).
+- 변경 = admin-dashboard 프론트 1파일. KPA/Neture/KCos 서비스 운영자 계정 무변경(본 탭은 platform 관리자만 대상).
 
 ## 8. 설계 보고 — 계정 생성/편집/역할 CRUD (중지 #4 해소 후 apply-WO)
 

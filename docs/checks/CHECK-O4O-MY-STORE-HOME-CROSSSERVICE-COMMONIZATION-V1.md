@@ -10,15 +10,15 @@
 
 ## 1. 기존 차이 (착수 시점)
 
-| 항목 | KPA (`/store` StoreHomePage) | GlycoPharm (StoreOverviewPage) | K-Cosmetics (StoreCockpitPage) | PharmacyHub (HomePage) |
-|---|---|---|---|---|
-| StoreDashboardLayout | O | O | O | O |
-| StoreHomeShell | 사용(슬롯 1개, 퇴화) | **사용(레퍼런스)** | 사용(슬롯 1개, 퇴화) | **미사용** |
-| 홈 헤더(제목·부제·새로고침) | 자체 마크업 | HubLayout title | 자체 마크업 | 자체 `<header>` |
-| loading/error/empty | 자체 3벌 | 셸 loading | 자체 3벌 | 자체 |
-| KPI 카드 | 자체 4카드 | (인사이트 중심) | 템플릿 grid 자체 렌더 | 로컬 `SummaryCard` |
-| 처리 필요 신호 | Live Signals 자체 | — | — | 결제 대기 안내 섹션 |
-| 최근 활동 패널 | 자체 2개 | — | 최근 주문(빈 값이면 블록 자체가 사라짐) | 최근 주문 자체 |
+| 항목 | KPA (`/store` StoreHomePage) | K-Cosmetics (StoreCockpitPage) | PharmacyHub (HomePage) |
+| --- | --- | --- | --- |
+| StoreDashboardLayout | O | O | O |
+| StoreHomeShell | 사용(슬롯 1개, 퇴화) | 사용(슬롯 1개, 퇴화) | **미사용** |
+| 홈 헤더(제목·부제·새로고침) | 자체 마크업 | 자체 마크업 | 자체 `<header>` |
+| loading/error/empty | 자체 3벌 | 자체 3벌 | 자체 |
+| KPI 카드 | 자체 4카드 | 템플릿 grid 자체 렌더 | 로컬 `SummaryCard` |
+| 처리 필요 신호 | Live Signals 자체 | — | 결제 대기 안내 섹션 |
+| 최근 활동 패널 | 자체 2개 | 최근 주문(빈 값이면 블록 자체가 사라짐) | 최근 주문 자체 |
 
 → 공통 셸은 있었으나 **헤더·상태·신호·KPI·활동 패널이 4서비스에 각각 중복**. PharmacyHub 는 셸 밖.
 
@@ -38,12 +38,12 @@
 
 canonical 순서: `헤더 → storeSelector → banner → status → signals → metrics → aiSummary → insights → children → onboarding → beforeSections`
 
-**서비스별 명칭 원천**: `@o4o/operator-ux-core` 의 `kpaConfig` / `kcosmeticsConfig` `uiText.storeHomeTitle`·`storeHomeSubtitle`, GlycoPharm 은 HubLayout title, PharmacyHub 는 자체 `config/service.ts`(BRAND). — **신규 config 축 만들지 않음.**
+**서비스별 명칭 원천**: `@o4o/operator-ux-core` 의 `kpaConfig` / `kcosmeticsConfig` `uiText.storeHomeTitle`·`storeHomeSubtitle` 은 HubLayout title, PharmacyHub 는 자체 `config/service.ts`(BRAND). — **신규 config 축 만들지 않음.**
 
 ## 3. 4서비스 적용 결과
 
 - **KPA** `services/web-kpa-society/src/pages/pharmacy/StoreHomePage.tsx` — noStore/loading → `StoreHomeStateView`, Live Signals → `StoreHomeSignalList`, KPI 4종 → `StoreHomeMetricGrid(icon-centered)`, 홍보 성과·최근 활동 → `StoreHomeActivityPanel`, 실행 흐름 3단계 → `onboardingSlot`. 문구·링크·아이콘·집계 원본 유지.
-- **GlycoPharm** `StoreOverviewPage.tsx` — **변경 없음**(레퍼런스 소비처). 셸 하위호환으로 무수정 통과 확인.
+- 셸 하위호환으로 무수정 통과 확인.
 - **K-Cosmetics** `StoreCockpitPage.tsx` — 로딩/오류/빈 → `StoreHomeStateView`(재시도 `loadStores`, CTA `/operator/applications` 보존), 매장 select → `storeSelectorSlot`, 매장 상태 카드 → `statusSlot`, 템플릿 KPI → `StoreHomeMetricGrid(icon-inline, columnsClassName = tpl.layout.grid)`, 채널 비율은 `content` 로 원형 보존, 최근 주문 → `StoreHomeActivityPanel`.
   - **의도된 UX 변화 1건**: 주문 0건일 때 블록이 통째로 사라지던 것 → "아직 주문 내역이 없습니다" 빈 상태 노출(빈 상태 통일).
 - **PharmacyHub** `HomePage.tsx` — 셸 최초 채택. 로컬 `SummaryCard` 제거 → `StoreHomeMetricGrid(label-top)`, 결제 대기 안내 → `StoreHomeSignalList`(amber, `/store-owner/orders`), 최근 주문 → `StoreHomeActivityPanel(padded=false)`, 바로가기 grid 는 서비스 로컬 children 유지. 결제 화면 직접 링크 금지 규칙 유지.
@@ -57,7 +57,6 @@ canonical 순서: `헤더 → storeSelector → banner → status → signals �
 | `tsc --noEmit` web-kpa-society | PASS (0) |
 | `tsc --noEmit` web-k-cosmetics | PASS (0) |
 | `tsc --noEmit` web-pharmacy-hub | PASS (0) |
-| `tsc --noEmit` web-glycopharm | PASS (0) |
 | `vite build` 4서비스 | PASS 4/4 |
 | StoreHomeShell 소비처 전수 grep | 4개(위 4서비스)뿐 — 외부 회귀 없음 |
 | 데스크톱/모바일 | 반응형 클래스 기준 정적 확인(`grid-cols-2 lg:grid-cols-4`, 헤더 `flex-wrap`, 새로고침 `shrink-0 whitespace-nowrap`) |
@@ -82,7 +81,7 @@ branch `work/commonization-my-store` push. **main 직접 병합 없음.**
 
 1. **매장 바로가기(Quick Actions)** — 4서비스 모두 자체 grid. 본 WO 에선 소비처 1개뿐이라 보류했으나, 이제 4곳 형태가 드러났으므로 `StoreHomeShortcutGrid` 로 수렴 가능.
 2. **매장 상태 헤더(statusSlot 내부)** — K-Cosmetics·PharmacyHub 가 거의 동형(매장명 + 상태 배지 + 경고문). `StoreHomeStoreStatusCard` 후보.
-3. **AI 운영 요약 카드** — 현재 GlycoPharm/KPA 각자. Backend `CopilotEngineService` 계약이 공통이므로 렌더만 수렴 가능.
+3. **AI 운영 요약 카드** — 현재 KPA 각자. Backend `CopilotEngineService` 계약이 공통이므로 렌더만 수렴 가능.
 4. **주문 목록 행(row)** — K-Cosmetics·PharmacyHub 최근 주문 행이 동형. `orderStatusBadge`/`won` 유틸 공통화 선행 필요.
 
 ---

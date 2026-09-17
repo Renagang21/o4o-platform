@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-CHECKOUT-STATUS-LABEL-ALIGNMENT-V1
  *
- * KPA / GlycoPharm / K-Cosmetics 의 "내 매장 주문 내역"(buyer 구매/발주, checkout_orders)
+ * KPA / K-Cosmetics 의 "내 매장 주문 내역"(buyer 구매/발주, checkout_orders)
  * 화면에서 동일 raw status 가 동일 문구·의미로 표시되도록 하는 표시 전용(presentation) 매핑.
  *
  * - 화면 표시 라벨/badge tone 만 정렬한다. 주문 상태 전이·결제 로직·backend enum·DB 는 변경하지 않는다.

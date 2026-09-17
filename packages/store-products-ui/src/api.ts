@@ -4,7 +4,7 @@
  * WO-O4O-STORE-PRODUCTS-UI-CORE-EXTRACTION-V1
  * WO-O4O-STORE-PRODUCTS-AUTHCLIENT-INJECTION-FIX-V1:
  *   @o4o/auth-client 의 cookie-strategy singleton 직접 import 제거.
- *   소비 서비스(KPA / Neture / Glycopharm / K-Cosmetics)가 자신의
+ *   소비 서비스(KPA / Neture / K-Cosmetics)가 자신의
  *   localStorage-strategy getApi() 를 부팅 시점에 주입한다.
  *   미주입 상태에서 호출 시 명확한 에러를 발생시켜 silent 401 회귀를 차단한다.
  *

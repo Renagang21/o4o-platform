@@ -13,7 +13,7 @@
 ## 0. 조사 방법
 
 - 표준 패키지 [`packages/content-editor`](../../packages/content-editor/) 전 소스 정독
-- `RichTextEditor` 를 직접 렌더하는 45개 화면 전수 조사 (KPA / GlycoPharm / K-Cosmetics / Neture)
+- `RichTextEditor` 를 직접 렌더하는 45개 화면 전수 조사 (KPA / K-Cosmetics / Neture)
 - 콘텐츠 제작 워크플로우(AI→HTML→편집기→미디어→저장→POP/QR/사이니지/태블릿) 코드 추적
 - 관련 백엔드: `MediaLibraryService`, `store_execution_assets`, `ai-proxy.routes`
 
@@ -82,14 +82,13 @@
 |--------|:---:|:---:|
 | Neture (공급자) | 6 | **3** (`SupplierProductCreatePage`, `SupplierProductImportPage`, `ProductDetailDrawer`) |
 | KPA | 22 | **0** |
-| GlycoPharm | 9 | **0** |
 | K-Cosmetics | 8 | **0** |
 
 ### 2.1 결정적 관찰 — 구조적 차단
 
 공용 셸 [`ProductionMaterialEditorShell`](../../packages/store-ui-core/src/components/ProductionMaterialEditorShell.tsx) 의 주입 인터페이스 `InjectedEditorProps` 에는 `onMediaLibraryPick` / `onImageUpload` / `existingImages` **prop 자체가 없다** (`value/onChange/placeholder/minHeight/preset/aiRequestHeaders`만 존재).
 
-→ 이 셸을 경유하는 GlycoPharm/K-Cosmetics 제작 화면·포럼은 **소비처에서 원해도 미디어 라이브러리를 켤 수 없는 구조적 차단** 상태다. 이것이 미디어 라이브러리 표준화(WO-1)의 핵심 근거다.
+→ 이 셸을 경유하는 K-Cosmetics 제작 화면·포럼은 **소비처에서 원해도 미디어 라이브러리를 켤 수 없는 구조적 차단** 상태다. 이것이 미디어 라이브러리 표준화(WO-1)의 핵심 근거다.
 
 ---
 
@@ -132,7 +131,7 @@ AI 생성 → HTML → 편집 → 미디어 → 저장 → 실행 자산(POP/QR/
 
 > 본 IR은 **핸드오프 진단 문서**이며, 아래 WO는 착수 지시가 아니라 도출된 후보다. 각 WO는 별도 명시 지시로 착수한다.
 
-- **WO-1 (P0, 확정)**: 미디어 라이브러리 표준화 — 공용 셸 `InjectedEditorProps`에 `onMediaLibraryPick`/`onImageUpload`/`existingImages` 노출 + 공용 picker 컴포넌트 표준화 → KPA/GP/KCos 전 제작 화면에 미디어 라이브러리 기본 연동
+- **WO-1 (P0, 확정)**: 미디어 라이브러리 표준화 — 공용 셸 `InjectedEditorProps`에 `onMediaLibraryPick`/`onImageUpload`/`existingImages` 노출 + 공용 picker 컴포넌트 표준화 → KPA/KCos 전 제작 화면에 미디어 라이브러리 기본 연동
 - **WO-2 (P0)**: TipTap Table 확장 도입 — `@tiptap/extension-table` + 툴바 표 버튼 + `sanitizeRichHtml` 표 태그 허용 + Round-trip 검증(편집 후 표 보존)
 - **WO-3 (P1)**: 동영상 mp4 정합 — 편집기에서 미디어 라이브러리/사이니지 mp4를 `<video>` 또는 표준 노드로 삽입, 실행 표면과 동일 파이프라인
 - **WO-4 (P1)**: 저장→실행 자산 워크플로우 단순화 — 6갈래 저장 UX 통합 검토

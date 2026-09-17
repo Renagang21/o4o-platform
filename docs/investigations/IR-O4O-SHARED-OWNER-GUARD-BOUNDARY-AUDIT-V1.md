@@ -5,7 +5,7 @@
 > 성격: **read-only 감사(audit) 전용 — 코드 변경 0**
 >
 > ⚠️ **본 문서는 조사 결과만 기록한다.**
-> `store-owner.utils.ts` 는 KPA / GlycoPharm / K-Cosmetics 가 **공유**하는 owner guard 이며,
+> `store-owner.utils.ts` 는 KPA / K-Cosmetics 가 **공유**하는 owner guard 이며
 > 사용자 지시에 따라 본 WO 는 **KPA 전용 파일·경로**로 범위가 축소되었다.
 > 따라서 아래 D-1(비결정성)은 **수정하지 않았다**. 공용 가드 수정은 별도 공용 정비 WO 대상이다.
 
@@ -19,7 +19,7 @@
 | `createRequireStoreOwner(dataSource, serviceKey?)` | 동일 | 미들웨어 팩토리 (POP / QR / 자료함 / 태블릿 등) |
 | `resolveStoreAccess(dataSource, userId, roles, serviceKey?)` | 동일 | 인라인 판정 (store_local_products CRUD 등) |
 
-소비 서비스: KPA-Society / GlycoPharm / K-Cosmetics (+ Neture 는 공급자 축이라 본 가드 비사용).
+소비 서비스: KPA-Society / K-Cosmetics (+ Neture 는 공급자 축이라 본 가드 비사용).
 
 ---
 
@@ -71,7 +71,7 @@ LIMIT 1
 `is_primary` 는 `organization_members` 에 이미 존재하는 canonical 대표조직 플래그이므로
 신규 컬럼·마이그레이션 없이 기존 의미를 존중한다. **허용 대상(자격 집합) 변화 0** — 순서만 확정.
 
-> 적용 보류 사유: 이 가드는 KPA·GlycoPharm·K-Cosmetics 3 서비스가 공유한다.
+> 적용 보류 사유: 이 가드는 KPA·K-Cosmetics 2 서비스가 공유한다.
 > KPA 단독 변경이 불가능하므로 CLAUDE.md Shared Module Change Protocol 에 따라
 > 3 서비스 동시 검증이 가능한 별도 WO 에서 처리한다.
 >
@@ -89,9 +89,8 @@ LIMIT 1
 "이 serviceKey 에 해당하는 조직" 을 직접 특정할 수 있는 축이 스키마에 없다.
 
 **영향 범위**: 서로 다른 서비스에 각각 별도 매장 조직을 가진 사용자.
-이 경우 GlycoPharm 로그인에서도 KPA 조직이 선택될 수 있다(그 반대도).
 
-**현재 실측**: 검증 계정 `renagang21` 은 KPA / GlycoPharm / K-Cosmetics 세 서비스에서
+**현재 실측**: 검증 계정 `renagang21` 은 KPA / K-Cosmetics 두 서비스에서
 **동일한 조직·동일한 8건 자체 상품**(`후시딘연고(퓨시드산나트륨) cd3a2b29-…`)이 조회된다.
 즉 이 계정은 조직이 1개이며, 현재 데이터에서는 D-2 가 관측되지 않는다.
 

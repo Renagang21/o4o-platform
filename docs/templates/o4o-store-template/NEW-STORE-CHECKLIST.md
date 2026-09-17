@@ -102,7 +102,6 @@ cp -r docs/templates/o4o-store-template/b2c-templates/beauty-experience \
 export enum OrderType {
   GENERIC = 'GENERIC',
   DROPSHIPPING = 'DROPSHIPPING',
-  GLYCOPHARM = 'GLYCOPHARM',
   COSMETICS = 'COSMETICS',
   TOURISM = 'TOURISM',
   // 새 매장 추가

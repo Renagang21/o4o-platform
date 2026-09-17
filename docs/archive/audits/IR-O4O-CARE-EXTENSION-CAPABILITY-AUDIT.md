@@ -21,7 +21,6 @@
 | Dashboard 집계 | **100%** | pharmacy-scoped, admin global |
 | Provider 패턴 (CgmProvider) | **100%** | 인터페이스 + Mock 구현 |
 | LLM Integration | **50%** | 패키지 존재, 규칙 기반 (실제 LLM 호출 없음) |
-| GlycoPharm Care UI | **60%** | Dashboard/환자목록 live, 코칭/분석 탭 mock/placeholder |
 | GlucoseView Care UI | **70%** | InsightsPage 완전 live, 나머지 부분 live |
 | **Glucose 데이터 입력** | **0%** | **전무. Mock만 존재. 실데이터 경로 없음** |
 
@@ -48,22 +47,6 @@
 | Care Dashboard API | `GET /api/v1/care/dashboard` | DONE |
 | Care Diagnostic API | `GET /api/v1/ops/care-diagnostic` | DONE |
 | Patient CRUD API | `glucoseview/customers` CRUD 5개 | DONE |
-
-### 2.2 Frontend — GlycoPharm (약국 운영)
-
-| 페이지 | 상태 | API 연동 | Mock |
-|--------|:----:|:--------:|:----:|
-| CareDashboardPage | **LIVE** | dashboard + customers | 없음 |
-| PatientsPage | **LIVE** | dashboard + customers | 없음 |
-| PatientDetailPage | **LIVE** | customer detail + dashboard | Quick Stats `--` |
-| SummaryTab | **LIVE** | context에서 읽음 | 없음 |
-| AnalysisTab | PLACEHOLDER | 미연동 | 전체 `--` |
-| CoachingTab | **MOCK** | 미연동 | `MOCK_SESSIONS` 3건 |
-| HistoryTab | 부분 LIVE | snapshot live, coaching mock | `MOCK_COACHING_EVENTS` |
-| AnalysisPage (top-level) | PLACEHOLDER | 미연동 | 없음 |
-| CoachingPage (top-level) | PLACEHOLDER | 미연동 | 없음 |
-
-**GlycoPharm pharmacyApi 클라이언트**: `/api/v1/care/*` 중 dashboard만 호출. analysis/kpi/coaching 메서드 미정의.
 
 ### 2.3 Frontend — GlucoseView (환자 서비스)
 
@@ -103,33 +86,12 @@ KPI만 `care_kpi_snapshots`에 영속화되고, 원시 glucose 데이터는 어�
 - 3-5개 InsightCard를 규칙 기반으로 생성
 - `AiInsightProvider`는 `glucoseSummary`를 넘기지도 않음 (patientId만 pharmacyId로 전달)
 
-### 3.3 GlycoPharm Care API 클라이언트 갭
-
-GlycoPharm `pharmacyApi`에 다음 메서드 미정의:
-- `getCareAnalysis(patientId)` — 없음
-- `getCareKpi(patientId)` — 없음
-- `createCoachingSession(data)` — 없음
-- `getCoachingSessions(patientId)` — 없음
-
-### 3.4 GlycoPharm UI 미연동
-
-| 컴포넌트 | 필요한 연동 |
-|----------|------------|
-| AnalysisTab | `getCareAnalysis` → TIR/CV/Risk 표시 |
-| CoachingTab | `getCoachingSessions` + `createCoachingSession` → mock 제거 |
-| HistoryTab | `getCoachingSessions` → mock coaching events 제거 |
-| AnalysisPage | 전체 구현 또는 제거 |
-| CoachingPage | 전체 구현 또는 제거 |
-
----
-
 ## 4. Data Source 현황
 
 ### 4.1 Patient Data
 
 | 소스 | 테이블 | 접근 경로 |
 |------|--------|----------|
-| GlycoPharm | `glucoseview_customers` | `GET /api/v1/glycopharm/pharmacy/customers` (organization_id scope) |
 | GlucoseView | `glucoseview_customers` | `GET /api/v1/glucoseview/customers` (pharmacist_id scope) |
 | Care Core | `glucoseview_customers` | `care-dashboard.controller` 직접 SQL (organization_id scope) |
 
@@ -204,7 +166,6 @@ CareInsightDto → insights[] 확장 가능
 6. Dashboard 집계
 7. PharmacyContextMiddleware
 8. CGM Vendor/Connection 관리 인프라 (GlucoseView admin)
-9. GlycoPharm Care Dashboard/환자목록 UI
 10. GlucoseView InsightsPage (완전 live)
 
 ### 새로 개발 필요
@@ -219,12 +180,6 @@ CareInsightDto → insights[] 확장 가능
 3. **LLM 실제 연동** (선택적)
    - `AiInsightService`에 실제 LLM API 호출 추가
    - `glucoseSummary` 데이터 전달
-4. **GlycoPharm pharmacyApi 확장**
-   - getCareAnalysis, getCareKpi, coaching 메서드 추가
-5. **GlycoPharm Care UI Mock → API 전환**
-   - AnalysisTab: mock → getCareAnalysis
-   - CoachingTab: MOCK_SESSIONS → getCoachingSessions + createCoachingSession
-   - HistoryTab: MOCK_COACHING_EVENTS → getCoachingSessions
 
 ---
 

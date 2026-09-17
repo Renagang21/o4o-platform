@@ -91,7 +91,7 @@
 ---
 
 ## 부록: orphaned 38 class name (분류)
-- **C 커버/중복**: CreateNetureTables...(1736611200000), SeedNetureData...(E), BootstrapCoreSchema(E), CreateForumTables, AddProductInfoFields, AddImagesToGlycopharmProducts, CreateGlycopharmFeaturedProducts, CreateGlycopharmBillingInvoices, AddInvoiceDispatchFields, AddForumPostPerformanceIndexes, AddCoursePaidFields, CreatePlatformStoreSlugsTables, BackfillPlatformStoreSlugs, AddRequestedSlugToApplications, CreatePlatformStorePolicies, CreatePlatformStorePaymentConfigs, AddTemplateProfileToPharmacies, AddStorefrontBlocksToPharmacies, KpaBRoleDataNormalization, AddDescriptionFieldsToOffer, OfferDistributionTypeV1, PrefixUnprefixedRoles, AddCourseServiceKey, EventOfferCoreReform, CreateCommunityHubTables, + applied4(StoreBlogPosts/KpaMemberSubRole/KpaExternalExpert/KpaSupplierStaff). (각 prod 실재로 추정 — 후속 cleanup)
+- (각 prod 실재로 추정 — 후속 cleanup)
 - **D obsolete**: CreateCareActions(care_actions DROP됨).
 - **A/B 🔴🟠 검증 대상**: CreateOperatorActionDismissals, CreateStoreContentTables, AddStoreContentUsageFields, CreateContentAnalyticsTable, CreateTemplateTables, CreateTemplateLibraryTables, SeedContentTemplates, AddInstructorRoleSupport.
 

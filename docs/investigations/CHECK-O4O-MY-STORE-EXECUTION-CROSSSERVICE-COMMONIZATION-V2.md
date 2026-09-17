@@ -1,7 +1,7 @@
 # CHECK-O4O-MY-STORE-EXECUTION-CROSSSERVICE-COMMONIZATION-V2
 
 > **목적:** WO-O4O-MY-STORE-PRODUCT-DESCRIPTION-CROSSSERVICE-ALIGNMENT-V1 완료 이후,  
-> KPA-Society / GlycoPharm / K-Cosmetics 내 매장·내 약국 실행 영역 cross-service 정렬 최종 확인.
+> KPA-Society / K-Cosmetics 내 매장·내 약국 실행 영역 cross-service 정렬 최종 확인.
 
 ---
 
@@ -21,7 +21,7 @@
 
 **⚠️ PARTIAL — 내 매장 / 내 약국 실행 영역 cross-service 공통화 1차 완료 (미세 drift 잔존)**
 
-V1의 가장 큰 gap인 product-description MISSING(GlycoPharm, K-Cosmetics)이 해소되었다.  
+V1의 가장 큰 gap인 product-description MISSING(K-Cosmetics)이 해소되었다.  
 핵심 실행 영역(POP / QR / Blog / Signage / Production Materials / Product Description / Local Products / Tablet Displays)이  
 3개 서비스 모두에서 기능 단위로 정렬 확인되었다.
 
@@ -34,13 +34,9 @@ product-description 자체는 완료. 사이드바 미노출은 아래 §4-A에�
 
 | 항목 | V1 | V2 |
 |------|----|----|
-| GlycoPharm product-description | ❌ MISSING | ✅ FUNCTIONAL |
 | K-Cosmetics product-description | ❌ MISSING | ✅ FUNCTIONAL |
-| GlycoPharm productionTemplates product-description | ❌ 없음 | ✅ 2개 추가 (당뇨 관련 / 일반 약국) |
 | K-Cosmetics productionTemplates product-description | ❌ 없음 | ✅ 2개 추가 (스킨케어 / 일반 화장품) |
-| GlycoPharm Core API client | ❌ 없음 | ✅ productAiContent.ts 추가 |
 | K-Cosmetics Core API client | ❌ 없음 | ✅ productAiContent.ts 추가 |
-| GlycoPharm route | ❌ 없음 | ✅ /store/library/product-descriptions |
 | K-Cosmetics route | ❌ 없음 | ✅ /store/library/product-descriptions |
 
 ---
@@ -56,25 +52,25 @@ product-description 자체는 완료. 사이드바 미노출은 아래 §4-A에�
 - **MISSING**: route/page 없음
 - **INTENTIONAL_DIFF**: 의도적 서비스 차별화
 
-| 영역 | KPA | GlycoPharm | K-Cosmetics | 비고 |
-|------|-----|------------|-------------|------|
-| **대시보드** | FULL | FULL (StoreMainPage) | FULL (StoreDashboardLayout) | |
-| **내 자료함 / 콘텐츠** | FULL | FULL | FULL | |
-| **내 자료함 / 자료실** | FULL | FULL | FULL | |
-| **제작 자료 / Production Materials** | FULL | FULL | FULL | |
-| **POP** | FULL | FULL | FULL | |
-| **QR** | FULL | FULL | FULL | |
-| **블로그** | FULL | FUNCTIONAL | FULL | GlycoPharm `content/blog` 경로 차이 |
-| **상품 설명 / product-description** | FULL | **FUNCTIONAL** ✅ NEW | **FUNCTIONAL** ✅ NEW | route 경로 소폭 차이 (아래 주석) |
-| **디지털 사이니지** | FULL | FULL | FULL | |
-| **내 매장 상품 (Local Products)** | FULL | FULL | FULL | |
-| **태블릿 디스플레이** | FULL | FULL | FULL | |
-| **주문 관리** | FULL | FULL | PARTIAL (Placeholder) | K-Cosmetics 주문 미완성 |
-| **설정** | FULL | FULL | FULL | |
+| 영역 | KPA | K-Cosmetics | 비고 |
+| ------ | ----- | ------------- | ------ |
+| **대시보드** | FULL | FULL (StoreDashboardLayout) | |
+| **내 자료함 / 콘텐츠** | FULL | FULL | |
+| **내 자료함 / 자료실** | FULL | FULL | |
+| **제작 자료 / Production Materials** | FULL | FULL | |
+| **POP** | FULL | FULL | |
+| **QR** | FULL | FULL | |
+| **블로그** | FULL | FULL | — |
+| **상품 설명 / product-description** | FULL | **FUNCTIONAL** ✅ NEW | route 경로 소폭 차이 (아래 주석) |
+| **디지털 사이니지** | FULL | FULL | |
+| **내 매장 상품 (Local Products)** | FULL | FULL | |
+| **태블릿 디스플레이** | FULL | FULL | |
+| **주문 관리** | FULL | PARTIAL (Placeholder) | K-Cosmetics 주문 미완성 |
+| **설정** | FULL | FULL | |
 
 ### product-description FUNCTIONAL 판정 근거
 
-GlycoPharm / K-Cosmetics 모두:
+K-Cosmetics 모두:
 - page 존재 ✅
 - route 등록 ✅
 - Core API client (`/api/v1/products/:productId/ai-contents`) ✅
@@ -84,11 +80,10 @@ GlycoPharm / K-Cosmetics 모두:
 - 생성/편집/저장 흐름 완비 ✅
 
 KPA 대비 FULL이 아닌 FUNCTIONAL 이유:
-- KPA: `marketing/product-descriptions` 경로 / GlycoPharm·K-Cosmetics: `library/product-descriptions` 경로 (소폭 drift)
-- KPA `PharmacyQrPage` 등 전용 QR-per-product 연계가 GlycoPharm product-description에는 없음 (범위 외)
+- KPA: `marketing/product-descriptions` 경로 / K-Cosmetics: `library/product-descriptions` 경로 (소폭 drift)
 ### §4-A. product-description 사이드바 미노출 — 의도적 설계 확인
 
-storeMenuConfig.ts 조사 결과, KPA / GlycoPharm / K-Cosmetics **3개 서비스 모두** 사이드바 menuSections에
+storeMenuConfig.ts 조사 결과, KPA / K-Cosmetics **2개 서비스 모두** 사이드바 menuSections에
 product-descriptions 메뉴 항목이 없음. 이는 gap이 아니라 **의도적 설계**임이 확인되었다.
 
 **Canonical 진입 흐름:**
@@ -99,25 +94,12 @@ product-descriptions 메뉴 항목이 없음. 이는 gap이 아니라 **의도�
 
 - KPA는 과거 사이드바 직접 노출 후 WO-O4O-KPA-STORE-SIDEBAR-PRODUCTION-MENU-REMOVE-V1로 제거.
 - 제거 이유: 제작 진입은 "내 자료함 > 매장 제작 자료 통합 모달"로 일원화 의도.
-- GlycoPharm / K-Cosmetics도 동일 설계를 따름.
+- K-Cosmetics도 동일 설계를 따름.
 - **결론: product-description 사이드바 진입점 추가 WO 불필요.**
 
 ---
 
 ## 4. Product-Description 최종 상태
-
-### GlycoPharm
-
-| 항목 | 결과 |
-|------|------|
-| route | `/store/library/product-descriptions` ✅ |
-| page | `pages/store-management/StoreProductDescriptionsPage.tsx` ✅ |
-| API client | `api/productAiContent.ts` ✅ |
-| Core API | `/api/v1/products/:productId/ai-contents` (prefix 없음) ✅ |
-| templates | `glyco-product-desc-diabetes` / `glyco-product-desc-general` ✅ |
-| AI 생성/편집 | AiContentModal 연결 ✅ |
-| 저장 흐름 | saveProductAiContent → Core API PUT ✅ |
-| 사용자-facing 문구 | "내 약국 상품 설명", "약국 상품 설명 관리" ✅ |
 
 ### K-Cosmetics
 
@@ -138,9 +120,6 @@ product-descriptions 메뉴 항목이 없음. 이는 gap이 아니라 **의도�
 
 | 서비스 | 검증 항목 | 결과 |
 |--------|----------|------|
-| GlycoPharm | "내 약국" 사용 | ✅ 확인 |
-| GlycoPharm | "약국 상품 설명" 사용 | ✅ 확인 |
-| GlycoPharm | "내 매장" 노출 없음 | ✅ CLEAN |
 | K-Cosmetics | "내 매장" 사용 | ✅ 확인 |
 | K-Cosmetics | "매장 상품 설명" 사용 | ✅ 확인 |
 | K-Cosmetics | "내 약국" 노출 없음 | ✅ CLEAN |
@@ -151,7 +130,6 @@ product-descriptions 메뉴 항목이 없음. 이는 gap이 아니라 **의도�
 
 | 항목 | 결과 |
 |------|------|
-| GlycoPharm Core API endpoint | `/products/${productId}/ai-contents` (prefix 없음) ✅ |
 | K-Cosmetics Core API endpoint | `/products/${productId}/ai-contents` (prefix 없음) ✅ |
 | KPA Core API endpoint | `/products/${productId}/ai-contents` (prefix 없음) ✅ |
 | 3개 서비스 API 계약 일치 | ✅ |
@@ -163,7 +141,6 @@ product-descriptions 메뉴 항목이 없음. 이는 gap이 아니라 **의도�
 
 ## 7. Route/Layout 회귀 없음
 
-GlycoPharm 기존 route 모두 유지 확인:
 - `marketing/pop` ✅ / `marketing/qr` ✅ / `content/blog` ✅
 - `library/contents` ✅ / `library/resources` ✅
 - `library/production-materials` ✅ / `library/production-materials/new` ✅
@@ -183,7 +160,6 @@ K-Cosmetics 기존 route 모두 유지 확인:
 
 | 서비스 | 결과 |
 |--------|------|
-| services/web-glycopharm | ✅ PASS (오류 없음) |
 | services/web-k-cosmetics | ✅ PASS (오류 없음) |
 
 ---
@@ -193,7 +169,6 @@ K-Cosmetics 기존 route 모두 유지 확인:
 **BLOCKED** — 배포 전 로컬 환경 상태로 직접 smoke 불가.
 
 코드/route/API 검증 결과를 근거로 판정:
-- GlycoPharm `/store/library/product-descriptions`: lazy import + route 정상, 상품 목록 API + AI editor 연결 완비 → 기능적 동작 예상
 - K-Cosmetics `/store/library/product-descriptions`: 동일 구조 → 기능적 동작 예상
 - 배포 후 테스트 계정으로 smoke 권장
 
@@ -201,14 +176,14 @@ K-Cosmetics 기존 route 모두 유지 확인:
 
 ## 10. 남은 Drift 목록
 
-| # | 항목 | KPA canonical | GlycoPharm | K-Cosmetics | 영향도 | 후속 WO |
-|---|------|--------------|------------|-------------|--------|---------|
-| D1 | product-description route 경로 | marketing/product-descriptions | library/product-descriptions | library/product-descriptions | 낮음 | 불필요 (기능 동일) |
-| D2 | 내 자료함 제작 자료 라벨 | 매장 제작 자료 | 제작 자료 | 제작 자료 | 낮음 | WO-O4O-KCOSMETICS-STORE-MENU-PRODUCTION-MATERIALS-LABEL-V1 |
-| D3 | 사이니지 TV재생 메뉴 | 있음 | 있음 | 없음 (route 있음) | 낮음 | WO-O4O-KCOSMETICS-SIGNAGE-TV-PLAY-MENU-V1 (보류 가능) |
-| D4 | K-Cosmetics 주문 관리 | FULL | FULL | PARTIAL (Placeholder) | 중간 | WO-O4O-KCOSMETICS-STORE-ORDER-BILLING-V1 (별도 큰 작업) |
-| D5 | K-Cosmetics 정산/인보이스 | FULL | FULL | Placeholder | 중간 | D4와 동일 WO |
-| D6 | 분석 섹션 (마케팅 분석) | 있음 | 없음 | 없음 | 낮음 | 별도 WO 후보 |
+| # | 항목 | KPA canonical | K-Cosmetics | 영향도 | 후속 WO |
+| --- | ------ | -------------- | ------------- | -------- | --------- |
+| D1 | product-description route 경로 | marketing/product-descriptions | library/product-descriptions | 낮음 | 불필요 (기능 동일) |
+| D2 | 내 자료함 제작 자료 라벨 | 매장 제작 자료 | 제작 자료 | 낮음 | WO-O4O-KCOSMETICS-STORE-MENU-PRODUCTION-MATERIALS-LABEL-V1 |
+| D3 | 사이니지 TV재생 메뉴 | 있음 | 없음 (route 있음) | 낮음 | WO-O4O-KCOSMETICS-SIGNAGE-TV-PLAY-MENU-V1 (보류 가능) |
+| D4 | K-Cosmetics 주문 관리 | FULL | PARTIAL (Placeholder) | 중간 | WO-O4O-KCOSMETICS-STORE-ORDER-BILLING-V1 (별도 큰 작업) |
+| D5 | K-Cosmetics 정산/인보이스 | FULL | Placeholder | 중간 | D4와 동일 WO |
+| D6 | 분석 섹션 (마케팅 분석) | 있음 | 없음 | 낮음 | 별도 WO 후보 |
 
 ---
 
@@ -238,7 +213,6 @@ product-descriptions 사이드바 미노출은 3개 서비스 공통 의도적 �
 
 product-description:
   KPA          FULL
-  GlycoPharm   FUNCTIONAL (V1: MISSING → V2: FUNCTIONAL)
   K-Cosmetics  FUNCTIONAL (V1: MISSING → V2: FUNCTIONAL)
 
 product-description 사이드바 미노출: 의도적 설계 (3개 서비스 공통)

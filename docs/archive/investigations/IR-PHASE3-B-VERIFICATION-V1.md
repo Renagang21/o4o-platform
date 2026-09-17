@@ -156,7 +156,6 @@ CREATE TABLE kpa_pharmacist_profiles (
 
 | 백필 원천 | 조건 | 상태 |
 |-----------|------|------|
-| GlycoPharm 약국 | `organizations.created_by_user_id` + `type = 'pharmacy'` | ✅ 완료 |
 | KPA 약사 | `users.pharmacist_role = 'pharmacy_owner'` + `kpa_members` JOIN | ✅ 완료 |
 | 중복 방지 | `NOT EXISTS (SELECT 1 FROM organization_members ...)` | ✅ 적용 |
 | 컬럼 존재 확인 | `pharmacist_role` 컬럼 유무 체크 후 쿼리 | ✅ 안전장치 |

@@ -59,7 +59,6 @@ O4O Platform 전체 서비스는 현재 **운영형 알파 (Operational Alpha)**
 |--------|----------|
 | web-neture | 현재 파트너 기반 운영 검증 단계입니다 |
 | web-k-cosmetics | 매장·브랜드와 함께 운영 구조를 검증하는 단계입니다 |
-| web-glycopharm | 협력 약국과 함께 운영 구조를 검증하는 단계입니다 |
 | web-glucoseview | (subtitle에 통합) |
 | web-kpa-society | 지역약사회와 함께 운영 구조를 검증하는 단계입니다 |
 
@@ -91,7 +90,6 @@ O4O Platform 전체 서비스는 현재 **운영형 알파 (Operational Alpha)**
 |--------|------|------|
 | web-neture | `src/pages/HomePage.tsx` | ✅ 적용됨 |
 | web-k-cosmetics | `src/pages/HomePage.tsx` | ✅ 적용됨 |
-| web-glycopharm | `src/pages/HomePage.tsx`, `src/config/heroConfig.ts` | ✅ 적용됨 |
 | web-glucoseview | `src/pages/HomePage.tsx` | ✅ 적용됨 |
 | web-kpa-society | `src/components/platform/HeroSection.tsx` | ✅ 적용됨 |
 

@@ -1,18 +1,17 @@
 # IR-O4O-CROSSSERVICE-OPERATOR-SIDEBAR-COMMONIZATION-AUDIT-V1
 
 > Status: **read-only investigation**, no code modified
-> Scope: KPA-Society / GlycoPharm / K-Cosmetics operator sidebar 공통화 가능성 감사
+> Scope: KPA-Society / K-Cosmetics operator sidebar 공통화 가능성 감사
 > Date: 2026-05-30
 > Related WOs:
 > - `WO-O4O-KPA-OPERATOR-SIDEBAR-DOMAIN-IA-RESTRUCTURE-V1` (KPA canonical)
-> - `WO-O4O-GLYCOPHARM-OPERATOR-MENU-ALIGN-WITH-KPA-V1` (Glyco 정렬)
 > - `WO-O4O-KCOS-OPERATOR-MENU-ALIGN-WITH-KPA-V1` (K-Cos 정렬)
 
 ## TL;DR
 
 3개 sidebar 컴포넌트가 **JSX/hook/렌더 로직 100% 동일** (차이는 주석·컴포넌트명·props interface명 단 3종). `operatorMenuGroups.ts` 도메인 IA 메타데이터(`OperatorDomainKey`, `DOMAIN_LABELS`, `GROUP_TO_DOMAIN`, `DOMAIN_GROUP_ORDER`, `DOMAIN_DISPLAY_ORDER`, `TOP_PINNED_GROUPS`)는 세 서비스에서 **값과 타입 모두 동일**. 즉 sidebar **컴포넌트와 도메인 메타데이터는 즉시 공통화 가능**.
 
-다만 운영 smoke test에서 발견된 **capability gate 차이 (Glyco STORE_MANAGEMENT 누락, K-Cos ANALYTICS 누락, Glyco/K-Cos COMMUNITY 누락 등) 가 정책으로 합의된 것인지 회귀인지가 미확정**. 공통화 자체를 막지는 않지만, 공통화 직후 회귀 검증 비용 + 정책 재정의 비용을 줄이려면 capability gate 정합 한 사이클 먼저 돌리는 것을 권고.
+다만 운영 smoke test에서 발견된 **capability gate 차이 가 정책으로 합의된 것인지 회귀인지가 미확정**. 공통화 자체를 막지는 않지만, 공통화 직후 회귀 검증 비용 + 정책 재정의 비용을 줄이려면 capability gate 정합 한 사이클 먼저 돌리는 것을 권고.
 
 **판정: "일부 정리 후 공통화 가능"** — 코드 추출은 가능하나 capability 정합 IR/WO 1건이 선행되면 안전한 marshalling 효과.
 
@@ -23,7 +22,6 @@
 | 서비스 | Sidebar 컴포넌트 | Wrapper (operator layout) | Menu Config |
 |--------|------------------|---------------------------|-------------|
 | KPA-Society | `services/web-kpa-society/src/components/kpa-operator/KpaOperatorSidebar.tsx` (357 lines) | `services/web-kpa-society/src/components/kpa-operator/KpaOperatorLayoutWrapper.tsx` | `services/web-kpa-society/src/config/operatorMenuGroups.ts` |
-| GlycoPharm | `services/web-glycopharm/src/components/glyco-operator/GlycoOperatorSidebar.tsx` (357 lines) | `services/web-glycopharm/src/components/layouts/OperatorLayoutWrapper.tsx` | `services/web-glycopharm/src/config/operatorMenuGroups.ts` |
 | K-Cosmetics | `services/web-k-cosmetics/src/components/kcos-operator/KCosOperatorSidebar.tsx` (357 lines) | `services/web-k-cosmetics/src/components/layouts/OperatorLayoutWrapper.tsx` | `services/web-k-cosmetics/src/config/operatorMenuGroups.ts` |
 
 공유 자산 (모든 서비스 공통 의존):
@@ -33,12 +31,12 @@
 
 ### sidebar 컴포넌트 line-by-line diff 요약
 
-`diff KpaOperatorSidebar.tsx GlycoOperatorSidebar.tsx` + `diff KpaOperatorSidebar.tsx KCosOperatorSidebar.tsx` 실측:
+`diff KpaOperatorSidebar.tsx KCosOperatorSidebar.tsx` 실측:
 
 차이 항목 **단 3종**:
 1. 파일 헤더 주석 (목적 설명, 참조 WO ID)
-2. 컴포넌트 export 이름 (`KpaOperatorSidebar` / `GlycoOperatorSidebar` / `KCosOperatorSidebar`)
-3. Props interface 이름 (`KpaOperatorSidebarProps` / `GlycoOperatorSidebarProps` / `KCosOperatorSidebarProps`)
+2. 컴포넌트 export 이름 (`KpaOperatorSidebar` / `KCosOperatorSidebar`)
+3. Props interface 이름 (`KpaOperatorSidebarProps` / `KCosOperatorSidebarProps`)
 4. KPA 에만 line 132-133 인라인 주석 2줄 더 있음 (top-pinned 단일 항목 가정 설명)
 
 JSX 마크업, useState/useMemo/useLocation hook 사용, `STANDARD_GROUPS.find()` 매칭, capability gate 로직, `isItemActive()` / `isGroupActive()` 함수, `flatGroupsForMobile`, desktop aside + mobile horizontal tab nav — **모두 byte 단위 동일**.
@@ -49,51 +47,51 @@ JSX 마크업, useState/useMemo/useLocation hook 사용, `STANDARD_GROUPS.find()
 
 ### 2.1 Domain IA 메타데이터 (`operatorMenuGroups.ts` 후반부)
 
-| 키 | KPA | GlycoPharm | K-Cosmetics |
-|----|-----|------------|-------------|
+| 키 | KPA | K-Cosmetics |
+| ---- | ----- | ------------- |
 | `OperatorDomainKey` 타입 | `'community' \| 'store_hub' \| 'common'` | 동일 | 동일 |
-| `DOMAIN_LABELS` | `💬 커뮤니티 운영 / 🏪 매장 HUB 운영 / ⚙️ 운영 공통` | 동일 | 동일 |
-| `GROUP_TO_DOMAIN` | 11개 키 매핑 | 동일 | 동일 |
-| `DOMAIN_GROUP_ORDER.community` | `['users','forum','content','lms','resources']` | 동일 | 동일 |
-| `DOMAIN_GROUP_ORDER.store_hub` | `['stores','approvals','signage']` | `['stores','products','orders','approvals','signage']` | `['stores','products','orders','approvals','signage']` |
-| `DOMAIN_GROUP_ORDER.common` | `['analytics','system']` | 동일 | 동일 |
-| `DOMAIN_DISPLAY_ORDER` | `['community','store_hub','common']` | 동일 | 동일 |
-| `TOP_PINNED_GROUPS` | `['dashboard']` | 동일 | 동일 |
+| `DOMAIN_LABELS` | `💬 커뮤니티 운영 / 🏪 매장 HUB 운영 / ⚙️ 운영 공통` | 동일 |
+| `GROUP_TO_DOMAIN` | 11개 키 매핑 | 동일 |
+| `DOMAIN_GROUP_ORDER.community` | `['users','forum','content','lms','resources']` | 동일 |
+| `DOMAIN_GROUP_ORDER.store_hub` | `['stores','approvals','signage']` | `['stores','products','orders','approvals','signage']` |
+| `DOMAIN_GROUP_ORDER.common` | `['analytics','system']` | 동일 |
+| `DOMAIN_DISPLAY_ORDER` | `['community','store_hub','common']` | 동일 |
+| `TOP_PINNED_GROUPS` | `['dashboard']` | 동일 |
 
-차이: `DOMAIN_GROUP_ORDER.store_hub` 하나 — KPA 는 `products/orders` 그룹 자체가 UNIFIED_MENU 에 없어 ordering 배열에도 미포함. Glyco/K-Cos 는 두 그룹 보유로 포함. 본질적 차이가 아니며 KPA 도 똑같이 5-슬롯 배열을 가져도 무방 (빈 그룹은 `resolvedDomains` 단계에서 자연 reject).
+차이: `DOMAIN_GROUP_ORDER.store_hub` 하나 — KPA 는 `products/orders` 그룹 자체가 UNIFIED_MENU 에 없어 ordering 배열에도 미포함. 본질적 차이가 아니며 KPA 도 똑같이 5-슬롯 배열을 가져도 무방 (빈 그룹은 `resolvedDomains` 단계에서 자연 reject).
 
 ### 2.2 UNIFIED_MENU 그룹 카탈로그 (서비스별 메뉴 항목)
 
-| group | KPA | GlycoPharm | K-Cosmetics |
-|-------|-----|------------|-------------|
-| `dashboard` | 대시보드 | 대시보드 | 대시보드 |
-| `users` | 회원 관리 | 회원 관리 | 회원 관리 |
-| `approvals` | 상품 신청, 이벤트 오퍼 승인, 협업 문의 | 매장 승인, 약사 회원 관리, 이벤트 오퍼 승인 | 신청 관리, 이벤트 오퍼 승인 |
-| `products` | — | 상품 관리 | 상품 관리 |
-| `stores` | 매장 관리, 채널 관리, **매장 HUB 블로그/POP/QR-code** | 약국 관리, 매장 관리, 채널 관리, **약국 HUB 블로그/POP/QR** | 내 매장, 매장 관리, 채널 관리, **매장 HUB 블로그/POP/QR** |
-| `orders` | — | 주문 관리 | 주문 관리 |
-| `content` | 공지/뉴스, Home 편집, 콘텐츠 허브 | 가이드라인, 공지/뉴스, 설문조사 | 공지/뉴스, 설문조사 |
-| `resources` | 자료실 관리 | 자료실 관리 | 자료실 관리 |
-| `lms` | 강의 관리, 강사 승인, **안내 문구 관리** | 강의 관리, 강사 승인, **안내 문구 관리** | 강의 관리, **안내 문구 관리** |
-| `signage` | HQ 미디어, HQ 플레이리스트, 템플릿, 강제 콘텐츠 | HQ 미디어, HQ 플레이리스트, 템플릿, 콘텐츠 허브, 콘텐츠 라이브러리, 강제 콘텐츠 | 사이니지 콘텐츠, HQ 미디어, HQ 플레이리스트, 템플릿 |
-| `forum` | 포럼 운영, 포럼 관리, 삭제 요청, 포럼 분석 | 포럼 관리, 포럼 신청, 포럼 삭제 요청, 커뮤니티 관리, 포럼 분석 | 포럼 신청, 삭제 요청, 포럼 분석 |
-| `analytics` | AI 리포트, 운영 분석 | AI 리포트, AI 사용량, AI 정산, 운영 분석 | AI 리포트 |
-| `system` | 법률 관리(admin), 감사 로그(admin), 역할 관리(admin) | 서비스 설정(admin), 회원 관리 Admin(admin) | — |
-| `care` | — | — | — |
+| group | KPA | K-Cosmetics |
+| ------- | ----- | ------------- |
+| `dashboard` | 대시보드 | 대시보드 |
+| `users` | 회원 관리 | 회원 관리 |
+| `approvals` | 상품 신청, 이벤트 오퍼 승인, 협업 문의 | 신청 관리, 이벤트 오퍼 승인 |
+| `products` | — | 상품 관리 |
+| `stores` | 매장 관리, 채널 관리, **매장 HUB 블로그/POP/QR-code** | 내 매장, 매장 관리, 채널 관리, **매장 HUB 블로그/POP/QR** |
+| `orders` | — | 주문 관리 |
+| `content` | 공지/뉴스, Home 편집, 콘텐츠 허브 | 공지/뉴스, 설문조사 |
+| `resources` | 자료실 관리 | 자료실 관리 |
+| `lms` | 강의 관리, 강사 승인, **안내 문구 관리** | 강의 관리, **안내 문구 관리** |
+| `signage` | HQ 미디어, HQ 플레이리스트, 템플릿, 강제 콘텐츠 | 사이니지 콘텐츠, HQ 미디어, HQ 플레이리스트, 템플릿 |
+| `forum` | 포럼 운영, 포럼 관리, 삭제 요청, 포럼 분석 | 포럼 신청, 삭제 요청, 포럼 분석 |
+| `analytics` | AI 리포트, 운영 분석 | AI 리포트 |
+| `system` | 법률 관리(admin), 감사 로그(admin), 역할 관리(admin) | — |
+| `care` | — | — |
 
 ### 2.3 ENABLED_CAPABILITIES (각 서비스 `config/operatorCapabilities.ts`)
 
-| Capability | KPA | GlycoPharm | K-Cosmetics | STANDARD_GROUPS 가 의존하는 group |
-|------------|-----|------------|-------------|------------------------------------|
-| `USER_MANAGEMENT` | ✓ | ✓ | ✓ | `users` |
-| `MEMBERSHIP_APPROVAL` | ✓ | ✓ | ✓ | `approvals` |
-| `CONTENT_MANAGEMENT` | ✓ | ✓ | ✓ | `content`, `resources`, `lms` |
-| `COMMUNITY` | ✓ | ❌ | ❌ | `forum` |
-| `SIGNAGE` | ✓ | ✓ | ✓ | `signage` |
-| `STORE_MANAGEMENT` | ✓ | ❌ | ✓ | `products`, `stores`, `orders` |
-| `ANALYTICS` | ✓ | ✓ | ❌ | `analytics` |
-| `CARE` | ❌ | ✓ | ❌ | `care` |
-| `SETTINGS` | ✓ | ❌ | ❌ | `system` |
+| Capability | KPA | K-Cosmetics | STANDARD_GROUPS 가 의존하는 group |
+| ------------ | ----- | ------------- | ------------------------------------ |
+| `USER_MANAGEMENT` | ✓ | ✓ | `users` |
+| `MEMBERSHIP_APPROVAL` | ✓ | ✓ | `approvals` |
+| `CONTENT_MANAGEMENT` | ✓ | ✓ | `content`, `resources`, `lms` |
+| `COMMUNITY` | ✓ | ❌ | `forum` |
+| `SIGNAGE` | ✓ | ✓ | `signage` |
+| `STORE_MANAGEMENT` | ✓ | ✓ | `products`, `stores`, `orders` |
+| `ANALYTICS` | ✓ | ❌ | `analytics` |
+| `CARE` | ❌ | ❌ | `care` |
+| `SETTINGS` | ✓ | ❌ | `system` |
 
 ---
 
@@ -119,22 +117,21 @@ JSX 마크업, useState/useMemo/useLocation hook 사용, `STANDARD_GROUPS.find()
 
 ### 4.2 메뉴 데이터 레벨 (UNIFIED_MENU)
 
-- **라벨 단어 선택**: 매장 vs 약국 (GlycoPharm 만 "약국 HUB 블로그/POP/QR", KPA/K-Cos 는 "매장 HUB ..."). 이는 도메인 어휘 차이로 의도된 변형.
+- **라벨 단어 선택**: 매장 vs 약국 이는 도메인 어휘 차이로 의도된 변형.
 - **그룹 보유 차이**: KPA `products`/`orders` 미보유, K-Cos `system` 미보유, 모두 `care` 미보유.
 - **그룹 내 메뉴 항목 차이**: approvals/forum/content/lms/signage 각각 항목 카탈로그 다름 (서비스 도메인 특화).
-- **adminOnly 플래그**: KPA system 그룹 항목 + Glyco system 그룹 항목이 admin-only. KPA approvals/lms 일부 admin-only 패턴 사용 검토 (현재는 모두 visible).
+- KPA approvals/lms 일부 admin-only 패턴 사용 검토 (현재는 모두 visible).
 
 ### 4.3 capability 레벨
 
-- KPA 가 capability 8/9 보유 → 가장 풍부. Glyco 는 STORE_MANAGEMENT/COMMUNITY/SETTINGS 미보유. K-Cos 는 ANALYTICS/COMMUNITY/SETTINGS/CARE 미보유.
+- KPA 가 capability 8/9 보유 → 가장 풍부. K-Cos 는 ANALYTICS/COMMUNITY/SETTINGS/CARE 미보유.
 
 ### 4.4 wrapper 레벨
 
 - KPA: `KpaOperatorLayoutWrapper` (`KpaGlobalHeader` + 자체 layout)
-- Glyco: `OperatorLayoutWrapper` (`GlycoGlobalHeader` + 자체 layout, `KpaOperatorLayoutWrapper` 와 구조 동일)
 - K-Cos: `OperatorLayoutWrapper` (`KCosGlobalHeader` + 자체 layout, 위와 구조 동일)
 
-세 wrapper 모두: `useAuth` → `isAdminOrAbove(user.roles, '<serviceKey>')` → `filterMenuByRole(UNIFIED_MENU, isAdmin)` → `<ServiceGlobalHeader />` → `<ServiceOperatorSidebar menuItems capabilities sidebarTopOffset="top-20" />` → `<Outlet />`. **isAdminOrAbove 의 두 번째 인자만 다르고** (kpa/glycopharm/cosmetics) 나머지 동일.
+세 wrapper 모두: `useAuth` → `isAdminOrAbove(user.roles, '<serviceKey>')` → `filterMenuByRole(UNIFIED_MENU, isAdmin)` → `<ServiceGlobalHeader />` → `<ServiceOperatorSidebar menuItems capabilities sidebarTopOffset="top-20" />` → `<Outlet />`. **isAdminOrAbove 의 두 번째 인자만 다르고** 나머지 동일.
 
 ---
 
@@ -152,10 +149,7 @@ if (standard.capability && !capabilities.includes(standard.capability)) continue
 
 | 관측 | 원인 |
 |------|------|
-| Glyco 매장 HUB 안 Stores/products/orders 미표시 | Glyco ENABLED_CAPABILITIES 에 `STORE_MANAGEMENT` 없음 → 3개 그룹 모두 차단 |
 | K-Cos 운영 공통 헤딩 자체 미표시 | K-Cos ENABLED_CAPABILITIES 에 `ANALYTICS` 없음 → common 도메인 유일 그룹 차단 → 빈 도메인 헤딩 hide |
-| Glyco/K-Cos forum 메뉴 UNIFIED_MENU 정의되어 있으나 운영 미노출 | `COMMUNITY` capability 없음 |
-| Glyco system 그룹 정의되어 있으나 운영 미노출 | `SETTINGS` capability 없음 |
 
 **정합성 관찰**: 세 서비스 UNIFIED_MENU 에 forum/system 등 그룹이 정의되어 있는데 capability 가 비활성이라 dead-defined 상태가 존재. 본 IR 의 핵심 risk surface.
 
@@ -239,7 +233,6 @@ export interface DomainIASidebarProps {
 // packages/operator-ux-core/src/layout/OperatorAreaLayout.tsx (proposed, v2)
 
 interface OperatorAreaLayoutProps {
-  serviceKey: 'kpa' | 'glycopharm' | 'cosmetics' | string;
   header: React.ReactNode;
   menuItems: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>>;
   capabilities: OperatorCapability[];
@@ -255,10 +248,10 @@ v1 에서는 sidebar 만 추출, wrapper 는 서비스별 thin shell 유지 권�
 
 | # | 위험 | 영향 | 완화책 |
 |---|------|------|--------|
-| 1 | **Capability gate 정책 회귀** | Glyco 의 forum/system, K-Cos 의 forum/analytics 메뉴가 dead-defined → 공통화로 노출되면 UX 회귀처럼 보일 수 있음 | 공통화 전 capability 정책 IR 1건 선행 (의도/회귀 분리) |
+| 1 | **Capability gate 정책 회귀** | — | 공통화 전 capability 정책 IR 1건 선행 (의도/회귀 분리) |
 | 2 | **Active route 오판** | `isItemActive` 가 `/signage/*` 만 startsWith, 그 외는 정확 매칭 + child path. 서비스가 자체 prefix (`/operator/foo`) 외 패턴 (예: redirect target 이 다름) 가지면 active 잘못 표시 | 추출 후 3개 서비스 운영 smoke 재실행 — 본 IR 의 smoke2.mjs 재사용 가능 |
 | 3 | **DOMAIN_GROUP_ORDER 정규화 차이** | KPA 가 5-슬롯으로 정규화될 때 `products/orders` 가 비어있어도 무해하나 향후 KPA 가 두 그룹을 도입할 때 위치 결정 충돌 | 5-슬롯으로 정규화하고 KPA UNIFIED_MENU 의 향후 변경은 별도 WO 로 처리 |
-| 4 | **packages 경계 변경** | 새 패키지에 sidebar 를 두면 Dockerfile 의 file-by-file COPY 블록 영향 (관련 memory 항목: dockerfile-package-dependencies). 4개 서비스 (kpa-society, glycopharm, k-cosmetics, neture) Dockerfile 모두 갱신 필요 | `packages/operator-ux-core` (이미 존재) 에 추가하여 신규 패키지 회피. 단, 4 서비스 모두 `@o4o/operator-ux-core` 의존성에 추가되었는지 확인 |
+| 4 | **packages 경계 변경** | 새 패키지에 sidebar 를 두면 Dockerfile 의 file-by-file COPY 블록 영향 (관련 memory 항목: dockerfile-package-dependencies). 3개 서비스 (kpa-society, k-cosmetics, neture) Dockerfile 모두 갱신 필요 | `packages/operator-ux-core` (이미 존재) 에 추가하여 신규 패키지 회피. 단, 4 서비스 모두 `@o4o/operator-ux-core` 의존성에 추가되었는지 확인 |
 | 5 | **TypeScript 빌드 ref pattern** | k-cosmetics 는 `tsc -b` 패턴 (memory 항목: typescript-build-verification). 공통 컴포넌트 추출 후 모든 서비스에서 `tsc --noEmit` 회귀 검증 필요 | WO 검증 단계에 명시 |
 | 6 | **lucide-react icon 의존성** | 추출된 패키지는 `lucide-react` 를 peer dep 로 가져야 함. 현재 sidebar 가 사용 중 (`Home, Users, ... Settings` 등) | peer dep 명시 |
 | 7 | **운영 smoke 재검증 비용** | 3개 서비스 × 2 페이지 (/operator + /operator/members) + 1 프로필 dropdown — 본 IR 의 `c:/tmp/smoke/smoke2.mjs` 재실행으로 ~30초 | 자동화 자산 보존 |
@@ -273,7 +266,6 @@ v1 에서는 sidebar 만 추출, wrapper 는 서비스별 thin shell 유지 권�
 **A. (선행 권고) Capability 정합 IR + WO**
 
 - **IR**: `IR-O4O-CROSSSERVICE-OPERATOR-CAPABILITY-POLICY-AUDIT-V1`
-- **목적**: Glyco forum/system, K-Cos forum/analytics, KPA care 등 정책 의도/회귀 여부 명확화
 - **산출물**: 각 서비스 ENABLED_CAPABILITIES 의 의도 명세 + UNIFIED_MENU 와의 정합 매트릭스
 - **선행 권고 이유**: 공통화 직후 위 dead-defined 그룹이 운영자에게 노출 회귀처럼 보일 가능성 차단
 
@@ -284,7 +276,7 @@ v1 에서는 sidebar 만 추출, wrapper 는 서비스별 thin shell 유지 권�
 - **범위**:
   1. `packages/operator-ux-core/src/sidebar/DomainIASidebar.tsx` 신규 (KpaOperatorSidebar 의 logic 복사)
   2. `packages/operator-ux-core/src/sidebar/operatorDomainIA.ts` 신규 (DOMAIN_LABELS, GROUP_TO_DOMAIN, DOMAIN_GROUP_ORDER, DOMAIN_DISPLAY_ORDER, TOP_PINNED_GROUPS)
-  3. 3개 서비스의 `KpaOperatorSidebar.tsx`/`GlycoOperatorSidebar.tsx`/`KCosOperatorSidebar.tsx` 삭제 + wrapper 에서 새 import 로 교체
+  3. 2개 서비스의 `KpaOperatorSidebar.tsx`/`KCosOperatorSidebar.tsx` 삭제 + wrapper 에서 새 import 로 교체
   4. 3개 서비스의 `operatorMenuGroups.ts` 에서 도메인 IA 메타데이터 6개 export 제거 (UNIFIED_MENU + filterMenuByRole 만 유지)
 - **검증**:
   - `tsc --noEmit` 3 서비스 모두 clean
@@ -332,7 +324,6 @@ CLAUDE.md SSOT Priority Chain (`O4O-BUSINESS-PHILOSOPHY-V1` → `O4O-3-ROLE-FLOW
 
 > **일부 정리 후 공통화 가능 (Conditional GO).**
 >
-> - **(필수 선행) Capability 정합 IR/WO** (위 9.1.A) — Glyco/K-Cos UNIFIED_MENU 에 정의되었으나 capability 차단으로 dead-defined 인 forum/system/analytics 그룹의 정책 의도/회귀 확정.
 > - 그 후 **공통 sidebar + 도메인 IA 메타데이터 추출 WO** (위 9.1.B) — 즉시 진행 가능.
 > - Wrapper 공통화는 (9.1.C) 별도 사이클.
 

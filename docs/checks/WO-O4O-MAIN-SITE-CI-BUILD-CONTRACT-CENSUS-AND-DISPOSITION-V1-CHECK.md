@@ -116,7 +116,7 @@ quality-check  ──needs──▶  build (matrix: main-site, admin-dashboard) 
 **main-site 를 서빙하는 runtime 자체가 없기 때문**이다. Cloud Run service 0 · deploy workflow 0 ·
 `deploy-main-site.yml` 부재. 따라서 `BROKEN_ROUTE` 가 아니라 `HISTORICAL_ROUTE` 로 판정한다.
 
-실제 서비스되는 웹은 `services/web-neture` · `web-glycopharm` · `web-kpa-society` ·
+실제 서비스되는 웹은 `services/web-neture` · `web-kpa-society`
 `web-k-cosmetics` · `web-pharmacy-hub` · `web-kpa-branch` · `web-account` ·
 `signage-player-web` 이며, 이들은 `deploy-web-services.yml` 로 배포된다.
 그 workflow 의 `paths:` 필터에 `apps/main-site` 는 **없다**.
@@ -219,7 +219,6 @@ build 를 제거해도 고아 소스의 컴파일 가능성 보장은 **1도 줄
 **`Build Applications` 실패는 0회다.** 60회 표본에서 main-site build 가 잡은 회귀는 없다.
 
 가장 최근 실패(`32931469385`, sha `f6b35153e`)의 실제 오류는
-`services/web-glycopharm/src/pages/store-management/b2b-order/B2BOrderPage.tsx(467,17): error TS1109`
 로, main-site 와 무관한 다른 세션의 진행 중 작업이다.
 
 **주목:** 실패를 잡아낸 것은 전부 `quality-check` 의 type-check 와 jest 다.
@@ -370,8 +369,6 @@ matrix 항목 제거로 merge 가 막히는 경우는 발생하지 않는다.
 | 루트 스크립트 | 변경 0 | 해당 없음 |
 
 ### 18-1. 알려진 무관 실패
-
-`pnpm run type-check:frontend` 는 현재 `services/web-glycopharm` 에서 실패한다:
 
 ```
 src/pages/store-management/b2b-order/B2BOrderPage.tsx(467,17): error TS1109: Expression expected.

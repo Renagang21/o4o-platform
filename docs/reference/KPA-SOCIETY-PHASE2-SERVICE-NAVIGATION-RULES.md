@@ -101,7 +101,7 @@ kpa-society.co.kr 내의 3개 서비스는 **동일 SPA** 안에 있으므로:
 **재로그인이 필요한 경우:**
 
 1. 토큰 만료 (→ 자동 갱신 시도 → 실패 시 로그인 모달)
-2. 다른 도메인으로 이동 (neture.co.kr, glycopharm.co.kr 등)
+2. 다른 도메인으로 이동 (neture.co.kr 등)
 3. Account.status가 ACTIVE에서 SUSPENDED로 변경된 경우
 
 ---

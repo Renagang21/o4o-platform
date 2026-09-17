@@ -82,7 +82,7 @@ export class KpaAssetResolver implements ContentResolver {
     //   cms_contents 는 **서비스 공용 테이블**이고 serviceKey 로 소유 서비스를 구분한다
     //   ('kpa' | 'kpa-society' | 'neture' | null=global).
     //   serviceKey 게이트가 없어 **다른 서비스의 published CMS 를 ID 만 알면 KPA 매장 사본으로
-    //   복사**할 수 있었다(프로덕션 실증: GlycoPharm·Neture 콘텐츠가 201 로 복사됨).
+    //   복사**할 수 있었다(프로덕션 실증: Neture 콘텐츠가 201 로 복사됨).
     //   KPA 범위 = 기존 목록 계약과 동일한 키 집합으로 강제한다:
     //     - HUB 목록(cmsApi.getContents 기본) : serviceKey='kpa'
     //     - Home/공용 조회(ContentQueryService): serviceKey IN ('kpa-society','kpa')

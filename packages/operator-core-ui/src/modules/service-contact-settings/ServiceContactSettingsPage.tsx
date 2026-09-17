@@ -1,5 +1,5 @@
 /**
- * ServiceContactSettingsPage — GP/KCos 공통 "문의 설정" Admin UI
+ * ServiceContactSettingsPage — KCos 공통 "문의 설정" Admin UI
  *
  * WO-O4O-SERVICE-CONTACT-SETTINGS-ADMIN-V1
  *

@@ -30,7 +30,6 @@
 ```
 packages/operator-ux-core/src/OperatorDashboardLayout.tsx
 packages/operator-ux-core/src/types.ts
-services/web-glycopharm/src/pages/operator/GlycoPharmOperatorDashboard.tsx
 services/web-k-cosmetics/src/pages/operator/KCosmeticsOperatorDashboard.tsx
 services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx
 services/web-neture/src/pages/operator/NetureOperatorDashboard.tsx
@@ -89,7 +88,7 @@ KpiGrid(35) → AiSummaryBlock(36) → ActionQueueBlock(37) → ActivityLogBlock
 ## 5. 하위호환 (slot 미사용 소비자)
 
 `OperatorDashboardLayout` 소비처 5곳:
-- 4개 operator 대시보드(KPA/GP/KCos/Neture) — `aboveBlocks` 주입(§6)
+- 4개 operator 대시보드(KPA/KCos/Neture) — `aboveBlocks` 주입(§6)
 - **admin `services/web-kpa-society/src/pages/admin/KpaOperatorDashboardPage.tsx`** — `aboveBlocks` 참조 **0건**
 
 | 확인 항목 | 결과 |
@@ -109,7 +108,6 @@ KpiGrid(35) → AiSummaryBlock(36) → ActionQueueBlock(37) → ActivityLogBlock
 | 서비스 | aboveBlocks 내용 (순서) | 확인 |
 |--------|--------------------------|------|
 | **KPA** | `OperatorRoleGuideCard`(L134) → `AxisNavigationSection axes={axes}`(L136) | ✅ Guide + Axis 유지(위치 동일). GuideCard 위치/무게 조정은 후속 WO |
-| **GP** | `OperatorAlerts alerts`(L130) → `AxisNavigationSection axes={GP_AXES}`(L132) | ✅ [Alert] → [Axis] |
 | **KCos** | `{orderMetricsNotice}`(L127) → `AxisNavigationSection axes={KCOS_AXES}`(L129) | ✅ [Notice] → [Axis], notice 신호 보존 |
 | **Neture** | `AxisNavigationSection axes={NETURE_AXES}` | ✅ [Axis] |
 
@@ -118,7 +116,7 @@ KpiGrid(35) → AiSummaryBlock(36) → ActionQueueBlock(37) → ActivityLogBlock
 | 4서비스 각 `aboveBlocks:` 1회 사용 | ✅ |
 | 부가 섹션 시각 위치(5-block 위) 유지 | ✅ |
 | 컨벤션 `[Alert/Notice] → [Axis] → [5-block]` 유지 | ✅ |
-| KPA GuideCard / GP Alerts / KCos notice / Neture Axis 정상 이관 | ✅ |
+| KPA GuideCard Alerts / KCos notice / Neture Axis 정상 이관 | ✅ |
 | Axis 콘텐츠(도메인별 축/링크) 무변경 | ✅ |
 
 ---
@@ -131,7 +129,6 @@ KpiGrid(35) → AiSummaryBlock(36) → ActionQueueBlock(37) → ActivityLogBlock
 | web-neture | `npx tsc -b` | ✅ clean (P2 커밋 시 검증, 파일 불변) |
 | web-kpa-society | `npx tsc` | ✅ clean (P2 시 검증, 파일 불변) |
 | web-k-cosmetics | `npx tsc` | ✅ clean (P2 시 검증, 파일 불변) |
-| web-glycopharm | `npx tsc -b` | ✅ clean (P2 시 검증, 파일 불변) |
 
 → 신규 TS 오류 0. 4서비스 파일은 green P2 커밋 이후 미변경, operator-ux-core 는 본 CHECK 에서 재확인.
 
@@ -155,7 +152,7 @@ KpiGrid(35) → AiSummaryBlock(36) → ActionQueueBlock(37) → ActivityLogBlock
 ## 9. browser smoke
 
 **NOT TESTED (deferred).** frontend-only 변경 + 미배포(프로덕션은 이전 버전 노출). 정적 코드 검증(§3~§6) + TypeScript(§7)로 대체.
-배포 후 권장: KPA(Guide+Axis+5block) / GP(Alerts+Axis+5block) / KCos(notice+Axis+5block) / Neture(Axis+5block), 4서비스 렌더 정상 · console error 0.
+배포 후 권장: KPA(Guide+Axis+5block) / KCos(notice+Axis+5block) / Neture(Axis+5block), 3서비스 렌더 정상 · console error 0.
 
 ---
 
@@ -179,7 +176,6 @@ KpiGrid(35) → AiSummaryBlock(36) → ActionQueueBlock(37) → ActivityLogBlock
 ## 11. 남은 후순위 후보 (운영자 UI-UX 축)
 
 - **KPA GuideCard 위치/무게 조정** — 최상단 대형 카드 재배치 또는 dedicated guide 처리(별도 WO).
-- **GP OperatorAlerts 공통 승격 + KCos notice 공통화** — `aboveBlocks` 내부 2패턴을 공통 alert/notice 컴포넌트로 수렴(데이터 contract 는 backend IR 동반).
 - (별도 축) 주문/수금: `WO-O4O-ORDER-COLLECTION-STATUS-CONFIRM-ACTION-V1` — 본 운영자 UI-UX 축과 분리 관리.
 
 ---

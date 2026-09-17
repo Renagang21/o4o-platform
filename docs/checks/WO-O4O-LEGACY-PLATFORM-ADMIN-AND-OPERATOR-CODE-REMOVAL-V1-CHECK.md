@@ -71,7 +71,7 @@ WO 사전점검 3항("충돌하지 않고 내 pathspec 만 안전하게 분리�
 | `packages/auth-context/src/adminRouteAccess.ts` | `ADMIN_LEVEL_ROLES` 및 `expandRequiredRoles` 확장 집합에서 제거 |
 | `packages/auth-context/src/AuthProvider.tsx:295` | 동일 축소 |
 
-그 외 neture controller 16건 · glycopharm controller 7건 + `pharmacy-context.middleware.ts` ·
+그 외 neture controller 16건 controller 7건 + `pharmacy-context.middleware.ts`
 o4o-store operator controller 6건 · operator routes 5건 · admin/cms/content/security routes 다수.
 
 ### 3-3. 조건식 · 판정 분기 제거 (수기)
@@ -140,7 +140,7 @@ o4o-store operator controller 6건 · operator routes 5건 · admin/cms/content/
   `web-neture` (`RoleGuard.tsx` PlatformRoute · `App.tsx` · `PlatformAdminLandingPage` ·
   `PlatformSectionLayout` · `ServiceAudiencePolicyPage` · `lib/api/platform.ts`)
 - 역할 선택 UI · 표시명: §3-4
-- `web-kpa-society` · `web-k-cosmetics` · `web-glycopharm` · `web-account`: §3-3, §3-4, 주석 정비
+- `web-kpa-society` · `web-k-cosmetics` · `web-account`: §3-3, §3-4, 주석 정비
 
 프런트 `user.scopes` · `user.permissions` 는 **미변경**(WO 제외 범위).
 
@@ -220,7 +220,7 @@ o4o-store operator controller 6건 · operator routes 5건 · admin/cms/content/
 
 - 혼합 배열에서 `{service}:admin` · `{service}:operator` 전부 보존 (§3-2 표).
 - `isServiceAdmin` / `isServiceOperator` 는 코드 본문 무변경(doc 만 정정).
-- `requireKpaScope` · `requireNetureScope` · `requireGlycopharmScope` · `requireCosmeticsScope` 구성 미변경.
+- `requireKpaScope` · `requireNetureScope` · `requireCosmeticsScope` 구성 미변경.
 - `kpa-role-guard.spec.ts` 의 `kpa:admin`·`kpa:operator` 허용 케이스, `cross-service.spec.ts` 의
   서비스 간 차단 행렬 전부 통과.
 
@@ -252,7 +252,6 @@ o4o-store operator controller 6건 · operator routes 5건 · admin/cms/content/
 | `apps/admin-dashboard` typecheck | ✅ 0 error |
 | `packages/auth-context` build | ✅ |
 | `packages/security-core` build | ✅ |
-| `services/web-kpa-society` · `web-neture` · `web-k-cosmetics` · `web-account` · `web-glycopharm` typecheck | ✅ 5/5 0 error |
 
 저장소 전체 build 는 실행하지 않았다(WO 검증 8항 — 변경 범위 밖).
 

@@ -4,7 +4,7 @@
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1 (선행 census F1: VIEW_DUPLICATED)
  *
  * backend 는 이미 `createStoreHubController(serviceKey)` factory 로 3 서비스 공용인데
- * client 만 3벌(KPA 207 / KCos 139 / GP 118줄)이라는 비대칭이 F1 의 핵심이었다.
+ * client 만 2벌(KPA 207 / KCos 139줄)이라는 비대칭이 F1 의 핵심이었다.
  * endpoint · 응답 형상 · 기본값(fallback)은 세 사본이 동일했고 차이는 **전송 계층**뿐이다:
  *   - KPA  : `apiClient` (base `/api/v1/kpa`, 이미 body 반환)
  *   - KCos : `authClient.api` (axios) + `/cosmetics` prefix + `.data` 언랩

@@ -32,7 +32,6 @@
 - `M docs/investigations/CHECK-O4O-OPERATOR-ORDER-VIEW-LOOP-COMPLETION-V1.md`
 - `M packages/shared-space-ui/src/guide/*` (GuideFeaturesPage / copy/neture / index / types)
 - `M services/web-neture/src/App.tsx`, `src/pages/guide/*`
-- `?? services/web-neture/src/pages/guide/GuideService{GlycoPharm,KCosmetics,KpaSociety}Page.tsx`
 - `?? *.png` (스크린샷)
 
 > 본 IR 은 신규 문서 1개만 생성하며 위 WIP 를 일절 건드리지 않는다. (git add/commit/push 는 본 IR 범위 외)
@@ -47,8 +46,8 @@
 | 공통 config 타입 | `packages/operator-ux-core/src/types.ts` |
 | 공통 axis 컴포넌트 | `packages/operator-core-ui/src/dashboard/AxisNavigationSection.tsx` |
 | KPA 대시보드 | `services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx` (229 L) |
-| GP 대시보드 | `services/web-glycopharm/src/pages/operator/GlycoPharmOperatorDashboard.tsx` (149 L) |
-| GP alert 컴포넌트 | `services/web-glycopharm/src/components/OperatorAlerts.tsx` |
+ 대시보드 | — |
+ alert 컴포넌트 | — |
 | K-Cos 대시보드 | `services/web-k-cosmetics/src/pages/operator/KCosmeticsOperatorDashboard.tsx` (123 L) |
 | Neture 대시보드 | `services/web-neture/src/pages/operator/NetureOperatorDashboard.tsx` (72 L) |
 
@@ -78,7 +77,7 @@ interface OperatorDashboardConfig {
 
 | 확인 항목 | 결과 |
 |-----------|------|
-| 4서비스 모두 `OperatorDashboardLayout` 사용 | ✅ (KPA/GP/KCos/Neture 전부) |
+| 3서비스 모두 `OperatorDashboardLayout` 사용 | ✅ (KPA/KCos/Neture 전부) |
 | 5-block 구조 유지 | ✅ |
 | block 순서 동일 | ✅ (layout 고정, 서비스 분기 불가) |
 | block 이름/역할 동일 | ✅ |
@@ -112,30 +111,6 @@ interface OperatorDashboardConfig {
 
 ---
 
-## 6. GlycoPharm 대시보드 부가 섹션
-
-```
-<div space-y-6>
-  <OperatorAlerts alerts={alerts}/>  ← (1) data-driven
-  <header h1 + 새로고침>             ← (2)
-  <AxisNavigationSection axes={GP_AXES}/>  ← (3) links-only
-  <OperatorDashboardLayout config/>  ← 5-block
-</div>
-```
-
-| # | 섹션 | 위치 | 렌더링 | 공통 컴포넌트 | 데이터 의존 | API | link/route | 필요성 | 타서비스 적용 |
-|---|------|------|--------|:---:|:---:|:---:|------|:---:|:---:|
-| 1 | **OperatorAlerts** (network/commerce/system, info/warning/critical) | 최상단 | GP 로컬 컴포넌트 | ❌ GP only (`components/OperatorAlerts.tsx`) | `data.operatorAlerts` | ✅ backend rule-based | 없음(텍스트) | 높음(실알림) | 가능(공통 alert slot) |
-| 2 | **Page header** (h1 "운영 대시보드" + 설명 + 새로고침) | alert 아래 | 인라인 | ❌ GP only | ❌ | ❌ | 새로고침=refetch | 중 | 가능(공통 header) |
-| 3 | **AxisNavigationSection** (2축: 커뮤니티 / 약국 HUB) | header 아래 | 공통 컴포넌트 | ✅ | links-only (metrics 없음) | ❌ | 축별 link | 높음 | ✅ |
-
-특이점:
-- **유일하게 page header(h1+새로고침)** 보유 → "앱 헤더가 있는" 체감.
-- alert 가 **data-driven**(backend operatorAlerts) — 4서비스 중 가장 정식 알림 체계.
-- AxisNavigation 은 links-only(metrics 미사용).
-
----
-
 ## 7. K-Cosmetics 대시보드 부가 섹션
 
 ```
@@ -153,7 +128,6 @@ interface OperatorDashboardConfig {
 
 특이점:
 - header **없음**.
-- notice 가 **인라인 하드코딩 conditional**(GP 의 OperatorAlerts 와 다른 구현) → 알림/안내 처리가 GP 와 **이중 패턴**.
 - AxisNavigation links-only.
 
 ---
@@ -180,7 +154,7 @@ return <OperatorDashboardLayout config/>;   // 부가 섹션 0
 
 ## 9. 서비스별 시각적·정보 밀도 비교
 
-| 요소 | KPA | GP | KCos | Neture |
+| 요소 | KPA | KCos | Neture |
 |------|:---:|:---:|:---:|:---:|
 | Page header (h1+새로고침) | ❌ | ✅ | ❌ | ❌ |
 | Guide/철학 카드 | ✅ (최상단, 큰 카드) | ❌ | ❌ | ❌ |
@@ -193,8 +167,7 @@ return <OperatorDashboardLayout config/>;   // 부가 섹션 0
 밀도 차이의 구조적 원인:
 1. **KPA 만** 철학 GuideCard(최상단 대형) + axis metrics → 가장 많아 보임.
 2. **Neture 만** 부가 섹션 0 → 가장 적어 보임.
-3. **GP 만** page header 보유 → 헤더 유무 불일치.
-4. **알림/안내가 3가지 패턴**: GP(data component) / KCos(inline conditional) / KPA·Neture(없음).
+4. **알림/안내가 3가지 패턴**: KCos(inline conditional) / KPA·Neture(없음).
 5. KPI·quickAction **개수**는 각 서비스 `operatorConfig.ts` builder + backend 응답에 따라 다름(= 도메인 데이터 차이, layout 차이 아님).
 
 → **"대시보드가 다르다"의 원인은 layout 이 아니라 5-block 위 부가 섹션의 비표준 조합.**
@@ -203,7 +176,7 @@ return <OperatorDashboardLayout config/>;   // 부가 섹션 0
 
 ## 10. Action Queue / AI Summary / Alert 정책 비교
 
-| 항목 | KPA | GP | KCos | Neture |
+| 항목 | KPA | KCos | Neture |
 |------|:---:|:---:|:---:|:---:|
 | Action Queue | ✅ (config.actionQueue) | ✅ | ✅ | ✅ |
 | pending 기준 | backend 산출 | backend | backend | backend |
@@ -214,7 +187,7 @@ return <OperatorDashboardLayout config/>;   // 부가 섹션 0
 
 관찰:
 - **Action Queue·AI Summary·Activity·empty state 는 layout block 공통** → 정책 일치. (CLAUDE.md §11.3: AI Summary backend 생성 원칙 준수, frontend client-side 생성 없음 — 확인됨)
-- **Alert 만 비표준**: GP 는 `OperatorAlerts`(공식 rule-based), KCos 는 단일 하드코딩 banner, KPA·Neture 는 없음. → alert 가 표준 5-block 밖 + 서비스별 임의 구현.
+- → alert 가 표준 5-block 밖 + 서비스별 임의 구현.
 
 ---
 
@@ -239,9 +212,8 @@ return <OperatorDashboardLayout config/>;   // 부가 섹션 0
 |-----------|:---:|------|
 | 5-block layout | **A** | 이미 `OperatorDashboardLayout` 공통 |
 | AxisNavigationSection (컴포넌트) | **A** | 이미 `@o4o/operator-core-ui` 공통. 단 **호출은 서비스별**(layout slot 아님) |
-| Axis metrics vs links-only | **C** | 공통 컴포넌트가 `metrics?` optional 지원. GP/KCos metrics 확장은 컴포넌트 주석에 "향후 WO" 명시 |
-| Page header (h1+새로고침) | **B** | GP 만 인라인. 4서비스 정책 통일(전부/전무/공통 header 컴포넌트) — 즉시 가능 |
-| Alert (GP OperatorAlerts) | **C+F** | 표시 컴포넌트는 공통 slot 화 가능(C). 단 데이터(`operatorAlerts`)는 GP backend 만 반환 → 타서비스 확산은 backend contract 필요(F) |
+| Axis metrics vs links-only | **C** | 공통 컴포넌트가 `metrics?` optional 지원. KCos metrics 확장은 컴포넌트 주석에 "향후 WO" 명시 |
+| Page header (h1+새로고침) | **B** 만 인라인. 3서비스 정책 통일(전부/전무/공통 header 컴포넌트) — 즉시 가능 |
 | Notice (KCos orderMetricsReady) | **B** | frontend meta(`orderMetricsReady`) 기반 inline. 공통 alert/notice slot 으로 흡수 가능(데이터는 이미 frontend) |
 | GuideCard (KPA 철학) | **C/D** | 옵션 `guideSlot` 공통화 가능(C). copy 는 서비스별 고유(D) |
 | Neture axis 부재 | **B** | axis 컴포넌트는 공통 — Neture 에 axes 배열만 정의하면 됨(frontend, 저위험) |
@@ -274,7 +246,7 @@ return <OperatorDashboardLayout config/>;   // 부가 섹션 0
 
 ## 14. 즉시 WO 가능한 후보 (frontend-only, 저위험)
 
-1. **Header 정책 통일** — 4서비스 header 유무 일치(권장: 공통 `OperatorDashboardHeader` 또는 전부 제거). GP 단독 header 편차 해소.
+1. **Header 정책 통일** — 4서비스 header 유무 일치(권장: 공통 `OperatorDashboardHeader` 또는 전부 제거).
 2. **Neture AxisNavigation 추가** — 공통 컴포넌트에 Neture axes 배열만 정의(예: 공급 운영 / 매장·콘텐츠). store 중심 3서비스와 시각 격차 해소. frontend, route 무변경.
 3. **KCos notice → 공통 alert/notice slot 위치 정렬** — inline amber 를 표준 위치/스타일로(데이터 이미 frontend).
 
@@ -285,15 +257,15 @@ return <OperatorDashboardLayout config/>;   // 부가 섹션 0
 ## 15. 공통 layout 옵션 확장 필요 후보 (C)
 
 - `OperatorDashboardLayout` 에 above-block slot 도입(`aboveBlocks`/`headerSlot`/`guideSlot`/`alertSlot`/`axisSlot`).
-- `OperatorAlerts`(GP)를 공통 컴포넌트로 승격 → KCos notice 도 동일 컴포넌트로 표현.
-- AxisNavigation metrics 확장(GP/KCos links-only → optional metrics).
+- `OperatorAlerts`를 공통 컴포넌트로 승격 → KCos notice 도 동일 컴포넌트로 표현.
+- AxisNavigation metrics 확장(KCos links-only → optional metrics).
 - **주의:** layout 은 F1(Operator OS) Freeze 대상. slot 추가는 **additive(하위호환)** 라도 **명시적 WO 필요**(CLAUDE.md §14 "구조 변경은 명시적 WO").
 
 ---
 
 ## 16. 추가 IR 필요 후보 (F)
 
-- **Backend dashboard 응답 contract 정렬** — `operatorAlerts`/`notice` 를 4서비스 dashboard endpoint 공통 필드로 표준화할지. 현재 GP 만 `data.operatorAlerts` 반환. 공통 alert slot 을 data-driven 으로 채우려면 backend IR 필요.
+- **Backend dashboard 응답 contract 정렬** — `operatorAlerts`/`notice` 를 4서비스 dashboard endpoint 공통 필드로 표준화할지. 공통 alert slot 을 data-driven 으로 채우려면 backend IR 필요.
   - 후보: `IR-O4O-OPERATOR-DASHBOARD-ALERT-CONTRACT-UNIFICATION-V1`
 
 ---
@@ -318,7 +290,7 @@ return <OperatorDashboardLayout config/>;   // 부가 섹션 0
 | 대시보드가 "현재 상태 + 다음 작업" 중심인가 | ⚠ 부분 — 5-block(KPI/Action/AI)은 상태·작업 중심. 단 **KPA 는 철학 GuideCard 가 최상단**이라 "다음 작업"보다 설명이 먼저 노출(드리프트 소지) |
 | 설명/가이드/철학 카드가 운영 판단을 방해하는가 | ⚠ KPA GuideCard 가 최상단 대형 → axis/action 보다 위. 위치 재고 여지 |
 | 서비스 차이가 도메인 차이인가 구현 편차인가 | **구현 편차 우세** — layout·5-block 동일, 차이는 부가 섹션 비표준 조합(header/alert/axis 유무) |
-| 공통화가 1인 개발 유지보수성을 높이는가 | ✅ alert 2중 패턴(GP component vs KCos inline) 통합 + above-block slot 표준화로 유지보수성 향상 |
+| 공통화가 1인 개발 유지보수성을 높이는가 | — |
 | operator/admin/supplier/store hub/my store 혼입 | ✅ 본 조사 범위는 operator dashboard 한정. Neture supplier workspace 는 별도 영역으로 분리 유지(혼입 없음) |
 | guide/business/public guide 가 operator dashboard 에 과도 혼입 | ✅ KPA guide link 는 `/guide/for/operator`(운영자 전용, live)로 적절 분리. business/public guide 혼입 없음 |
 
@@ -328,12 +300,12 @@ return <OperatorDashboardLayout config/>;   // 부가 섹션 0
 
 ## 부록: 부가 섹션 인벤토리 매트릭스
 
-| 섹션 | KPA | GP | KCos | Neture | 공통 컴포넌트 | 분류 |
+| 섹션 | KPA | KCos | Neture | 공통 컴포넌트 | 분류 |
 |------|:---:|:---:|:---:|:---:|:---:|:---:|
 | Page header (h1+refresh) | — | ✅ inline | — | — | 없음 | B |
 | Guide/철학 카드 | ✅ inline static | — | — | — | 없음(KPA local) | C/D |
 | AxisNavigation | ✅ +metrics | ✅ links | ✅ links | — | ✅ operator-core-ui | A(호출)/C(metrics) |
-| Alert (data) | — | ✅ OperatorAlerts | — | — | GP local | C+F |
+| Alert (data) | — | ✅ OperatorAlerts | — | — local | C+F |
 | Notice (conditional) | — | — | ✅ inline amber | — | 없음 | B |
 | 5-block layout | ✅ | ✅ | ✅ | ✅ | ✅ operator-ux-core | A |
 

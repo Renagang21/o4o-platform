@@ -120,17 +120,6 @@ GuideBlock JSON에서 사용할 표준 sectionKey:
 | `store.channel.editor` | 매장 채널 편집 |
 | `signage.playlist.manager` | 사이니지 플레이리스트 관리 |
 
-### 4-2. GlycoPharm
-
-| pageKey | 적용 예정 화면 |
-|---------|----------------|
-| `content.document.editor` | 콘텐츠 문서 작성 |
-| `content.resource.editor` | 자료/Resource 작성 |
-| `forum.request.management` | 운영자 포럼 신청 관리 |
-| `store.channel.editor` | 매장 채널 편집 |
-| `store.product.management` | 매장 상품 관리 |
-| `signage.playlist.manager` | 사이니지 플레이리스트 관리 |
-
 ### 4-3. K-Cosmetics
 
 | pageKey | 적용 예정 화면 |

@@ -14,11 +14,11 @@
 
 | 파일 | 변경 |
 |---|---|
-| `packages/store-products-ui/src/StoreProductsManagerPage.tsx` | **opt-in 문구 prop 추가**: `registerButtonLabel`/`infoText`/`emptyTitle`/`emptyDescription`. 기본값=기존 문구 → GP/KCos/Neture 무영향 |
+| `packages/store-products-ui/src/StoreProductsManagerPage.tsx` | **opt-in 문구 prop 추가**: `registerButtonLabel`/`infoText`/`emptyTitle`/`emptyDescription`. 기본값=기존 문구 → KCos/Neture 무영향 |
 | `services/web-kpa-society/src/App.tsx` | `/my-products` route 의 props 를 '내 매장 제품' 프레이밍으로 교체(title/description + 신규 문구 props). route(`/my-products`) 유지 |
 | `packages/store-ui-core/src/config/storeMenuConfig.ts` | **KPA 블록**: '약국 상품·거래'에서 my-products 제거, '고객 응대'→'타블렛' 그룹(내 매장 제품 + 타블렛 구성) |
 
-- backend/DB/migration/등록 기능/checkout **무변경**. GP/KCos/Neture **무변경**(공유 prop 기본값 보존).
+- backend/DB/migration/등록 기능/checkout **무변경**. KCos/Neture **무변경**(공유 prop 기본값 보존).
 
 ## 3. 화면(`/store/my-products`) 문구 — 전 → 후
 
@@ -53,10 +53,10 @@
 - `/store/my-products` route **유지**(404/권한오류/blank 없음, 사이드바 active 정상 — route 동일).
 - `O4O 제품`(/commerce/products) 메뉴와 `내 매장 제품`(/my-products)이 **다른 그룹·다른 의미**로 분리(§11.4).
 
-## 6. GP/KCos/Neture 무변경
+## 6. KCos/Neture 무변경
 
-- `StoreProductsManagerPage` 신규 prop은 **optional + 기본값=기존 문구**. GP/KCos/Neture는 미주입 → 화면 동일.
-- 메뉴 변경은 **KPA 블록 한정**(공통 config 파일이나 서비스별 블록 분리). glycopharm tsc exit 0.
+- `StoreProductsManagerPage` 신규 prop은 **optional + 기본값=기존 문구**. KCos/Neture는 미주입 → 화면 동일.
+- 메뉴 변경은 **KPA 블록 한정**(공통 config 파일이나 서비스별 블록 분리).
 
 ## 7. 비범위 (미수행)
 
@@ -69,7 +69,6 @@
 | 검증 | 결과 |
 |---|---|
 | `web-kpa-society` tsc | ✅ error 0 |
-| `web-glycopharm` tsc (공유 컴포넌트 소비처) | ✅ error 0 |
 | 배포 (Web Cloud Run, d59392543) | ✅ success |
 | 화면 문구/메뉴 라벨/라우트 정적 확인 | ✅ (prop·config) |
 | 브라우저 시각 smoke (사이드바 '내 매장 제품' / 화면 문구 / O4O 제품 분리) | ⬜ **보류** — Playwright 영속 프로필이 다른 Chrome 세션에 점유되어 launch 실패(로컬 환경 제약). route 무변경이라 회귀 위험 낮음. 프로필 해제 후 사이드바·화면 문구만 확인하면 됨 |
@@ -83,4 +82,4 @@
 
 ## 결론
 
-`/store/my-products` 를 'O4O 주문 가능 상품'에서 **'내 매장 제품'(타블렛/QR/사이니지/온라인몰 활용 제품 관리)** 로 재정의하고, 메뉴를 '타블렛' 그룹으로 이동해 O4O 거래 영역과 분리. 공유 컴포넌트는 opt-in prop으로 KPA 문구만 반영(GP/KCos/Neture 무영향), route·백엔드·등록기능 무변경. tsc·배포 통과, 브라우저 시각 smoke만 로컬 프로필 점유로 보류.
+`/store/my-products` 를 'O4O 주문 가능 상품'에서 **'내 매장 제품'(타블렛/QR/사이니지/온라인몰 활용 제품 관리)** 로 재정의하고, 메뉴를 '타블렛' 그룹으로 이동해 O4O 거래 영역과 분리. 공유 컴포넌트는 opt-in prop으로 KPA 문구만 반영(KCos/Neture 무영향), route·백엔드·등록기능 무변경. tsc·배포 통과, 브라우저 시각 smoke만 로컬 프로필 점유로 보류.

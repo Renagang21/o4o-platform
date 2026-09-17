@@ -23,7 +23,7 @@
 |------|------|-------------|
 | `id` | PK | 그대로 사용 |
 | `organizationId` | 조직 격리 | KPA 인트라넷 조직별 콘텐츠 |
-| `serviceKey` | 서비스 격리 | `neture`, `glycopharm`, `kpa`, `k-cosmetics` |
+| `serviceKey` | 서비스 격리 | `neture`, `kpa`, `k-cosmetics` |
 | `type` | 콘텐츠 유형 | `hero`, `promo`, `event`, `notice`, `featured` |
 | `title` | 제목 | 그대로 사용 |
 | `summary` | 부제/설명 | 그대로 사용 |
@@ -189,7 +189,6 @@ CmsContent의 생성/수정/삭제는 기존 CMS Content API를 사용.
 | Neture | `/neture/home/ads` | Home Ads 조회 | 운영 중 |
 | Neture | `/neture/home/logos` | Home Logos 조회 | 운영 중 |
 | Neture | `/neture/admin/homepage-contents` | Admin CRUD | 운영 중 |
-| GlycoPharm | `/glycopharm/community/ads` | Community Ads | 운영 중 (별도 테이블) |
 | KPA | `/kpa/community/ads` | Community Ads | 운영 중 (별도 테이블) |
 | K-Cos | `/k-cosmetics/community/ads` | Community Ads | 운영 중 (별도 테이블) |
 

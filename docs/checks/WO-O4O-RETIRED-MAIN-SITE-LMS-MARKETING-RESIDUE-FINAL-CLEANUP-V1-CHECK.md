@@ -219,7 +219,7 @@ SELECT c.relkind, n.nspname, c.relname FROM pg_class c JOIN pg_namespace n ...
 | 사용 중 image 삭제 여부 | 0건 (전 서비스 image 실재 확인) |
 | `api.neture.co.kr/health` | 200 |
 | `/health/database` | `healthy` · pingMs 1 · activeConnections 14 · longRunningQueries 0 |
-| 도메인 6종 (neture · www · kpa-society · glycopharm · k-cosmetics.site · admin) | 전부 **200** |
+| 도메인 6종 (neture · www · kpa-society · k-cosmetics.site · admin) | 전부 **200** |
 | production DB write | **0건** |
 
 미수행 항목을 명시한다: 이번 변경은 **CI 워크플로 1줄 · root script · 문서**뿐이고 애플리케이션 source 를 건드리지 않아 **전체 build / type-check 는 수행하지 않았다.** 대신 변경 파일 각각의 파서 검증(JSON · YAML)과 필터 no-op 실측으로 대체했다.

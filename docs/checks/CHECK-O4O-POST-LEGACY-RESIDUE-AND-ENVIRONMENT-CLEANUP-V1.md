@@ -16,7 +16,7 @@ Dropshipping·GlucoseView 제거 후 남은 코드·설정·문서·로컬 환�
 |---|---|
 | 1. Dropshipping 잔여물 제거 | **완료** — 실행 코드·CPT·shortcode·script 잔존 0 |
 | 2. `operator-core-ui` 타입 오류 | **완료** — 근본 원인은 `@o4o/error-handling` 공용 패키지, 최소 수정 |
-| 3. GlycoPharm·K-Cos 계정 경로 재검증 | **검증 완료 / 부분 중지** — 사용 가능한 매장 스코프 계정 부재 확인 |
+| 3. K-Cos 계정 경로 재검증 | **검증 완료 / 부분 중지** — 사용 가능한 매장 스코프 계정 부재 확인 |
 | 4. 로컬 환경 정리 | **완료** — 본 세션 proxy(PID 25688) 종료, 타 세션 6개 미접촉 |
 
 **운영 DB write 0건.** 모든 DB 접근은 read-only census(SELECT / COUNT / information_schema)로만 수행했다.
@@ -160,7 +160,7 @@ const isDev = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV =
 
 ---
 
-## 6. 범위 3 — GlycoPharm·K-Cos 계정 / organization 검증
+## 6. 범위 3 — K-Cos 계정 / organization 검증
 
 브라우저 자동화는 **타 세션이 Playwright 프로필(`~/.playwright-o4o-profile`)을 점유** 중이어서 사용할 수 없었다. 타 세션 브라우저 종료는 WO 금지 사항이므로, CLAUDE.md §8 이 명시 허용하는 **운영 API 직접 호출**로 대체 검증했다.
 
@@ -176,13 +176,13 @@ const isDev = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV =
 - `/store-hub/*` 는 `optionalStoreAuth(dataSource, serviceKey)` 로 `req.organizationId` 를 얻으며, 이는 **`{service}:store_owner` 역할을 요구**한다 (서비스 간 유출 방지 가드).
 - 해당 계정들의 `role_assignments."organizationId"` 는 NULL (`scope_type='global'`) 이고, 실제 조직 결속은 **`organization_members`** 에 있다.
 - `service_memberships` 에는 `organization_id` 컬럼이 **없다**. → 서비스 가입 여부만으로 매장 스코프를 판단할 수 없다.
-- 구조적으로 올바른 계정은 `renagang21@gmail.com`(`glycopharm:store_owner` + `cosmetics:store_owner` + 약국/매장/공급자 조직 보유)이나 **로그인 불가**.
+- 구조적으로 올바른 계정은 `renagang21@gmail.com`(`cosmetics:store_owner` + 약국/매장/공급자 조직 보유)이나 **로그인 불가**.
 
 → WO 의 "무효한 `renagang21` 전제 제거" 지시가 타당함을 확인했다.
 
 ### 6-3. 부분 중지 (WO 정의대로 계속 진행)
 
-WO 부분 중지 조건 **"GlycoPharm·K-Cos 유효 계정 확인 불가" 발동**. 기능 작업은 중단 없이 완주했다.
+기능 작업은 중단 없이 완주했다.
 
 `docs/local/TEST-ACCOUNTS.local.md` 에 검증 상태 메모를 추가했다. 이 문서는 `.gitignore:139` 로 **추적 제외**이며 **커밋되지 않는다.** 자격증명·토큰은 보고서·문서·커밋 어디에도 기록하지 않았다.
 
@@ -212,7 +212,6 @@ C:\Users\home\coding\o4o-platform\bin\cloud-sql-proxy.exe --address 127.0.0.1 --
 | `@o4o/error-handling` tsc | ✅ exit 0 |
 | `@o4o/shortcodes` tsc | ✅ exit 0 |
 | `signage-player-web` tsc | ✅ exit 0 |
-| `web-glycopharm` tsc | ✅ exit 0 |
 | api-server `tsconfig.build.json` | ✅ exit 0 (CI·빌드 기준 tsconfig) |
 | multi-tenant tests | ✅ 4 files / 75 tests |
 | admin-dashboard tests | ✅ 14 files / 237 tests |

@@ -3,7 +3,7 @@
  *
  * WO-O4O-FRONTEND-MENU-AND-ROUTE-CONTRACT-COMMONIZATION-FULL-CLOSE-V1
  *
- * KPA / Neture / K-Cosmetics / GlycoPharm 4개 서비스가 각각 `config/navigation.ts` 안에
+ * KPA / Neture / K-Cosmetics 3개 서비스가 각각 `config/navigation.ts` 안에
  * 동일 구조의 filterContextualNav 를 중복 구현하고 있었다. 필터 "구조"만 Core 로 승격하고,
  * 메뉴 항목·노출 조건 키·역할 판정은 서비스별 설정(Extension)으로 유지한다.
  *

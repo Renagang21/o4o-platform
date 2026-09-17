@@ -82,7 +82,6 @@
 
 | 엔티티 | 상태 | 비고 |
 |---|---|---|
-| `GlycopharmProduct` | catalog+store 로 마이그레이션 **진행됨** (`20260409300000`) | 잔존 정리 필요 |
 | `CosmeticsProduct` | cosmetics 독립 스키마(`cosmetics_` prefix, CLAUDE.md §9) 격리, 잔존 | canonical 통합 여부는 cosmetics 도메인 규칙과 함께 **별도 판단** |
 | `NetureProduct` | neture schema 골격, 잔존 | 정리 후보 |
 | `StoreLocalProduct` | display-only (commerce 금지), 별도 도메인 | **통합 대상 아님** (혼동 금지) |
@@ -139,7 +138,7 @@
 
 `WO-O4O-KPA-STORE-MY-PRODUCTS-FLOW-SIMPLIFY-V1` 로 **offer 없이 master 만으로도 매장 진열** 가능하게 이미 단순화됨.
 
-> **경계 선언:** 세 서비스(KPA/GlycoPharm/K-Cosmetics)는 `ProductMaster` + `OrganizationProductListing` + `StoreProductProfile` 를 공유한다. 사용자-facing 용어(내 약국/내 매장/약국·분회)는 서비스 정체성으로 보존하되 **구조는 공통**이다. Store Ops 는 CLAUDE.md §7 에 따라 `organizationId` boundary 를 유지한다.
+> **경계 선언:** 매장형 서비스(KPA/K-Cosmetics)는 `ProductMaster` + `OrganizationProductListing` + `StoreProductProfile` 를 공유한다. 사용자-facing 용어(내 약국/내 매장/약국·분회)는 서비스 정체성으로 보존하되 **구조는 공통**이다. Store Ops 는 CLAUDE.md §7 에 따라 `organizationId` boundary 를 유지한다.
 
 ---
 
@@ -173,7 +172,7 @@
 | `quasi_drug` (의약외품) | ✅ enum 존재 (QUASI_DRUG) | 추가 불필요 |
 | `health_functional_food` | ⚠️ regulatoryType 문자열로만 | 필요 시 profile |
 | `cosmetics` | ⚠️ cosmetics 독립 스키마 별존 | 통합 판단 별도 |
-| `device` | ⚠️ glycopharm CGM 기기(레거시) | profile |
+| `device` | ⚠️ 현행 사용처 없음 | profile |
 | `other` | ✅ GENERAL | — |
 
 규제 게이트: `assertPharmacyOnlyServiceKeys(isRegulated, ...)` — 규제 상품(의약품)은 약국 전용 서비스에만 연결 가능 (현존, `WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1`).
@@ -224,7 +223,7 @@
 4. **비처방의약품(OTC)을 일반 상품 등록 화면으로 그대로 처리 금지** — 검증 정책/효능·용법 출처/광고 검토 분기 필수.
 5. **처방의약품(Rx)을 온라인 판매/고객 노출 흐름에 연결 금지** — 노출/판매 차단 정책 동반.
 6. **공급자 B2B/B2C 상세정보를 Product Core 로 끌어올리기 금지** — 공급 정책은 Offer 에 유지.
-7. **서비스별 사용자-facing 용어 혼용 금지** — 내 약국(GlycoPharm)/내 매장(K-Cosmetics)/약국·분회(KPA)/공급자·파트너(Neture). 구조는 공통, 용어는 서비스 정체성.
+7. **서비스별 사용자-facing 용어 혼용 금지** — 내 매장(K-Cosmetics)/약국·분회(KPA)/공급자·파트너(Neture). 구조는 공통, 용어는 서비스 정체성.
 
 추가 가드 (CLAUDE.md 연계):
 - 독립 주문 테이블 금지, OrderType 불변 (§4). Product 작업이 commerce 경계 침범 금지.

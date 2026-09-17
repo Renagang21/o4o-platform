@@ -15,7 +15,6 @@
 
 ## 2. 근본 원인
 - migration 러너는 `src/database/migrations`(prod: `dist/database/migrations/*.js`)만 스캔. 이 migration 은 `src/migrations/`(미스캔)에 있어 typeorm_migrations 미등록·prod 미적용.
-- `operator_action_dismissals` 부재 → 공통 action-queue `/actions/dismiss/:actionId` INSERT(미가드) → **KPA/Glyco/KCos operator dismiss 클릭 시 500**(read 는 graceful).
 
 ## 3. migration 내용 / 정합 (무변경 확인)
 ```sql
@@ -34,7 +33,7 @@ CREATE INDEX IF NOT EXISTS idx_action_dismissals_user_service ON ... (user_id, s
 - 스캔 dir 에 동일 테이블/class 생성 migration **없음**(grep NONE). filename/class 충돌 없음.
 
 ## 5. 무회귀
-- action queue list(read graceful)/execute 무변경. KPA/Glyco/KCos operator routes 무변경. o4o_payments·Neture B2B·store content·타 orphaned 무변경.
+- action queue list(read graceful)/execute 무변경. o4o_payments·Neture B2B·store content·타 orphaned 무변경.
 
 ## 6. Live 검증 (배포 신리비전 — migration job)
 - 배포 `2fc780adf` 의 Cloud Run Job `o4o-api-migrations` 가 적용. **typeorm_migrations 등록 확인**(gcloud logging, `[X]`=applied):

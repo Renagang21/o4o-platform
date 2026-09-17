@@ -327,7 +327,6 @@ ORDER BY "displayOrder" ASC
 ```
 {
   organizationId, organizationName,
-  products: { glycopharm: {totalCount, link}, cosmetics: {listedCount, link} },
   contents: { slots: [{serviceKey, slotKey, count, link}], totalSlotCount },
   signage: { pharmacy: {contentCount, activeCount, link} }
 }
@@ -636,7 +635,6 @@ o4o_asset_snapshots (발행됨)
 
 ```
 /api/signage/kpa-society/:path    ← KPA 약사회
-/api/signage/glycopharm/:path     ← GlycoPharm
 /api/signage/k-cosmetics/:path    ← K-화장품 (확장 라우터 존재)
 ```
 

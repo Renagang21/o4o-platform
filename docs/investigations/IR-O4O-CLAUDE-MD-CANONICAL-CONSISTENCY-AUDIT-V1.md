@@ -171,7 +171,7 @@ CLAUDE.md 가 새 Canonical 체인과 충돌하는지를 6개 영역으로 점�
 #### D5 — §6 인프라 서비스 목록과 OPERATOR-DASHBOARD-STANDARD §2-1 GlucoseView 불일치 (LOW)
 
 **위치:**
-- [CLAUDE.md §6 L156-166](../../CLAUDE.md) — 5개 서비스만 (`o4o-core-api`, `neture-web`, `glycopharm-web`, `k-cosmetics-web`, `kpa-society-web`)
+- [CLAUDE.md §6 L156-166](../../CLAUDE.md) — 4개 서비스만 (`o4o-core-api`, `neture-web`, `k-cosmetics-web`, `kpa-society-web`)
 - [`OPERATOR-DASHBOARD-STANDARD-V1 §2-1`](../platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md) — GlucoseView role 명시 (`glucoseview:admin / glucoseview:operator`)
 
 **충돌:**

@@ -68,7 +68,6 @@ const targetHash = credentialHash ?? user.password;   // credential 이 있으�
 
 | service_key | membership | role | credential | `password_hash = users.password` |
 |---|---|---|---|---|
-| glycopharm | active | pharmacy | ✅ | **false** |
 | k-cosmetics | active | cosmetics:store_owner | ✅ | **false** |
 | kpa-society | active | user | ✅ | **false** |
 | neture | active | supplier | ✅ | **false** |
@@ -114,7 +113,6 @@ serviceKey 로그인이 5개 서비스 모두 실패하고, serviceKey 없는 �
 | 경로 | serviceKey 전달 | 판정 |
 |---|---|---|
 | `/auth/forgot-password` (5개 서비스) | ✅ `serviceKey: SERVICE_KEY` | 정상 — 재설정이 credential 에 적용 |
-| `PUT /users/password` (KPA·K-Cos·Glyco·Neture·PH 전부) | ✅ `serviceKey` 포함 | 정상 — 변경이 credential 에 적용 |
 | `/auth/login` (5개 서비스) | ✅ `serviceKey` 포함 | 정상 — credential 로 판정 |
 
 셀프서비스 경로는 전부 정합하다. 사용자가 각 서비스에서 스스로 바꾸고 스스로 로그인하는 한
@@ -172,7 +170,6 @@ DB 기본값 `true` 가 남는다. 실측에서 `reason='invalid_password'` 인 
 
 | service_key | credentials | 동일 | **상이** |
 |---|---:|---:|---:|
-| glycopharm | 8 | 3 | 5 |
 | k-cosmetics | 4 | 1 | 3 |
 | kpa-society | 10 | 6 | 4 |
 | neture | 9 | 5 | 4 |
@@ -188,7 +185,6 @@ DB 기본값 `true` 가 남는다. 실측에서 `reason='invalid_password'` 인 
 
 | service_key | memberships | credential 없음 |
 |---|---:|---:|
-| glycopharm | 2 | 0 |
 | k-cosmetics | 2 | 0 |
 | kpa-society | 4 | 1 |
 | neture | 3 | 0 |
@@ -211,7 +207,7 @@ DB 기본값 `true` 가 남는다. 실측에서 `reason='invalid_password'` 인 
    → 프런트가 `serviceKey` 를 함께 보내므로 토큰에 serviceKey 가 실린다
 2. 메일 링크로 새 비밀번호 설정
    → `passwordResetService` 가 **해당 서비스 credential 만** 갱신 (`users.password` 무영향)
-3. 5개 서비스에 대해 반복 (kpa-society / glycopharm / k-cosmetics / neture / pharmacy-hub)
+3. 4개 서비스에 대해 반복 (kpa-society / k-cosmetics / neture / pharmacy-hub)
 4. `docs/local/TEST-ACCOUNTS.local.md` 를 **서비스별 비밀번호 컬럼 구조로 갱신**
    — 현재 문서는 5개 서비스에 단일 비밀번호를 기재하고 있어 구조 자체가 계약과 어긋난다
 5. 그 뒤 Auth 공통화 브랜치에서 실제 로그인 E2E 수행 → CHECK §4-1 3번 항목 갱신

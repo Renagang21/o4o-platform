@@ -4,14 +4,12 @@
 
 - **작성일**: 2026-06-04
 - **작업 유형**: Investigation (IR)
-- **계기**: `glycopharm.co.kr/operator` 모바일에서 데스크톱용 좌측 사이드바가 **상단 가로 스크롤 탭**으로 노출 + 본문 밀림 + 후순위 메뉴 잘림 (사용자 관측)
-- **조사 범위**: `web-kpa-society`, `web-glycopharm`, `web-k-cosmetics`, `web-neture` operator 화면 + operator shell/sidebar 공통 패키지
 
 ---
 
 ## 1. 전체 판정
 
-신고된 증상은 **버그가 아니라 공통 컴포넌트의 의도된(그러나 확장성이 낮은) 모바일 디자인**이다. 그리고 **4개 서비스 전부 동일 공통 컴포넌트를 사용**하므로 — GlycoPharm만의 문제가 아니라 O4O operator 영역 전체의 공통 문제이고, **한 곳을 고치면 4서비스가 동시에 해결**된다.
+신고된 증상은 **버그가 아니라 공통 컴포넌트의 의도된(그러나 확장성이 낮은) 모바일 디자인**이다.
 
 | 항목 | 결과 |
 |------|------|
@@ -33,12 +31,11 @@
 
 **공통 사용 확인 (import `OperatorAreaShell`):**
 - `services/web-kpa-society/src/components/kpa-operator/KpaOperatorLayoutWrapper.tsx:14,34`
-- `services/web-glycopharm/src/components/layouts/OperatorLayoutWrapper.tsx:16,34`
 - `services/web-k-cosmetics/src/components/layouts/OperatorLayoutWrapper.tsx:16,34`
 - `services/web-neture/src/components/layouts/OperatorLayoutWrapper.tsx:13,27`
 - `services/web-neture/src/components/layouts/AdminLayoutWrapper.tsx` (Admin 영역도 동일 sidebar 사용)
 
-> wrapper 주석에 `GlycoOperatorSidebar`/`KpaOperatorSidebar` 등 legacy 명칭이 남아 있으나, 실제 import·렌더는 모두 공통 `OperatorAreaShell` + `DomainIASidebar` 이다.
+> wrapper 주석에 `KpaOperatorSidebar` 등 legacy 명칭이 남아 있으나, 실제 import·렌더는 모두 공통 `OperatorAreaShell` + `DomainIASidebar` 이다.
 
 ---
 
@@ -139,10 +136,10 @@ const firstPath = group.items[0].path;   // 그룹 내 2번째 이후 항목은 
 
 ## 9. 후속 작업 제안
 
-1. **(우선) WO-O4O-OPERATOR-MOBILE-NAV-DRAWER-V1** — `DomainIASidebar` 모바일 분기를 가로 탭 → 햄버거 drawer 로 교체(방향 A). 공통 컴포넌트 단일 수정 → KPA/Glyco/KCos/Neture(+Admin) 일괄 적용. 4서비스 모바일 smoke.
+1. **(우선) WO-O4O-OPERATOR-MOBILE-NAV-DRAWER-V1** — `DomainIASidebar` 모바일 분기를 가로 탭 → 햄버거 drawer 로 교체(방향 A). 4서비스 모바일 smoke.
 2. 그 다음 **Neture Phase 4 아이콘 정비** 재개.
 
-> 우선순위 판단: 아이콘은 KPA/Glyco/KCos 까지 정비됐으나, 모바일 operator 레이아웃이 깨져 보이면 전체 UI 품질이 낮아 보인다. Neture 아이콘(Phase 4)보다 operator 모바일 레이아웃을 먼저 잡는 것이 품질상 유리.
+> Neture 아이콘(Phase 4)보다 operator 모바일 레이아웃을 먼저 잡는 것이 품질상 유리.
 
 ---
 

@@ -15,7 +15,7 @@
 ## 1. 문제
 
 `store_qr_scan_events` 전체 row **0건** (`max(created_at)` = null).
-KPA · GlycoPharm · K-Cosmetics · Pharmacy-Hub **모든 서비스**에서 QR 목록의 `scanCount` 와
+KPA · K-Cosmetics · Pharmacy-Hub **모든 서비스**에서 QR 목록의 `scanCount` 와
 스캔 통계 화면이 항상 0 이었다 — 집계가 **한 번도 기록된 적이 없다**.
 
 프로덕션 로그:
@@ -95,7 +95,6 @@ WHERE NOT EXISTS (
 | 소비처 | 사용 형태 | 영향 |
 |---|---|---|
 | `admin-dashboard` QrListPage | `scanCount.toLocaleString()` | 값 렌더뿐 — 없음 |
-| GlycoPharm `StoreQrPage` · `ProductMarketingPage` · `StoreMarketingAnalyticsPage` | `스캔 {qr.scanCount}회` | 없음 |
 | K-Cosmetics `ProductMarketingPage` · `StoreMarketingAnalyticsPage` | 동일 | 없음 |
 | Pharmacy-Hub `QrPage` | `스캔 {qr.scanCount}회` | 없음 |
 | `product-marketing.controller` | `reduce` 합산 (`totalScans`) | 없음 |
@@ -155,7 +154,7 @@ Pharmacy-Hub 신규 QR 로 스캔 집계 전 구간을 측정했다.
 | KPA QR 목록 | `200` · 41건 (변동 없음) |
 | KPA 공개 랜딩 `page` | `200` · `pageContent` 렌더 정상 |
 | **KPA 스캔 통계** | **`1`** — KPA 도 이번 배포로 처음 집계되기 시작 |
-| 공개 랜딩 계약 4서비스 | `kpa`·`glycopharm`·`cosmetics` = `404 QR_NOT_FOUND` **nested envelope** / `pharmacy-hub` = **flat** — 전부 기존 계약 그대로 |
+| 공개 랜딩 계약 4서비스 | `kpa`·`cosmetics` = `404 QR_NOT_FOUND` **nested envelope** / `pharmacy-hub` = **flat** — 전부 기존 계약 그대로 |
 
 ### 5-5. DB write
 

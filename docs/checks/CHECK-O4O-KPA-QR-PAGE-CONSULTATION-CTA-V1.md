@@ -127,7 +127,7 @@ QR `landingType=page` 콘텐츠를 본 고객이 **본문 하단의 상담 요�
 ## 10. 제외 범위 (WO §4 제외 그대로)
 
 - `/store/requests` route/메뉴, `tablet_interest_requests` 삭제
-- 공통 customer_requests 모델 통합 / GP·KCos 적용
+- 공통 customer_requests 모델 통합 / KCos 적용
 - QR video/product CTA / 다국어 CTA / 알림센터 인라인 처리
 - `tablet_interest_requests` source **컬럼** 추가(이번엔 metadata 로만 기록) — 후속
 
@@ -139,5 +139,5 @@ QR `landingType=page` 콘텐츠를 본 고객이 **본문 하단의 상담 요�
 2. 기존 QR 의 CTA on/off 편집 UI(현재 생성 폼에서만 설정 — StoreQRPage 에 편집 모달 부재). 백엔드 `PUT /pharmacy/qr/:id` 는 CTA 갱신을 이미 지원하므로 UI 만 추가하면 됨(smoke 도 이 PUT 으로 검증).
 3. **CTA 토글 노출 범위**: 현재 생성 폼의 CTA 토글은 `selectedLibrary.source === 'content-hub'`(운영자 콘텐츠 참조)일 때만 렌더된다. "내 매장 자료"(library) page QR 은 백엔드가 CTA 를 허용함에도 토글이 노출되지 않음 — 운영자 콘텐츠가 주 사용처라 V1 수용 가능하나, 매장 자료 page QR 까지 토글을 확장할지 후속 판단 필요.
 4. QR video/product CTA 확장
-5. GP/KCos customer_requests 모델과 통합
+5. KCos customer_requests 모델과 통합
 6. CTA 다국어 문구 / 고객 연락처 필수화 정책

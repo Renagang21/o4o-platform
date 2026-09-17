@@ -42,7 +42,6 @@ O4O 플랫폼 전체의 에러 처리 현황을 조사했다.
 | `signage.service.ts` | 16 | `throw new Error('Playlist not found')` |
 | `neture.service.ts` | 16+ | `throw new Error('Insufficient stock for product')` |
 | `seller-offer.service.ts` | 15+ | Offer validation errors |
-| `glycopharm.service.ts` | 10+ | `throw new Error('SKU_DUPLICATE')` |
 
 **문제:** Error.message를 문자열 비교하여 HTTP status 분기 → 취약하고 유지보수 어려움.
 
@@ -133,19 +132,19 @@ res.status(500).json({ success: false, error: 'Failed to fetch users', code: 'IN
 
 | 포맷 | 비율 | 사용 서비스 |
 |------|------|-----------|
-| **Format A:** `{ error: { code, message } }` | 46.5% | GlycoPharm, KPA, GlucoseView, Cosmetics |
+| **Format A:** `{ error: { code, message } }` | 46.5% | KPA, GlucoseView, Cosmetics |
 | **Format B:** `{ success: false, error: string }` | 31.2% | Neture, Forum, Store Console |
 | **Format C:** `{ error: 'string' }` | 12.3% | Signage, Legacy controllers |
 | **Format D:** `{ success: true/false, ...spread }` | 10% | 일부 Operator 응답 |
 
 ### 서비스별 비교
 
-| 항목 | Neture | GlycoPharm | KPA | GlucoseView | Cosmetics |
-|------|--------|-----------|-----|-------------|-----------|
-| Error 구조 | `{success:false, error:'CODE'}` | `{error:{code,msg}}` | 혼합 | `{error:{code,msg}}` | `{error:{code,msg,details}}` |
-| 404 포맷 | `success:false, error:'NOT_FOUND'` | `error:{code:'NOT_FOUND'}` | `error:{code:'NOT_FOUND'}` | `error:{code:'NOT_FOUND'}` | nested object |
-| Validation | Basic string | Nested + details | Full details | Basic + details | Full details |
-| catch 패턴 | String error | Nested error object | 혼합 | Nested error object | Nested + details |
+| 항목 | Neture | KPA | GlucoseView | Cosmetics |
+| ------ | -------- | ----- | ------------- | ----------- |
+| Error 구조 | `{success:false, error:'CODE'}` | 혼합 | `{error:{code,msg}}` | `{error:{code,msg,details}}` |
+| 404 포맷 | `success:false, error:'NOT_FOUND'` | `error:{code:'NOT_FOUND'}` | `error:{code:'NOT_FOUND'}` | nested object |
+| Validation | Basic string | Full details | Basic + details | Full details |
+| catch 패턴 | String error | 혼합 | Nested error object | Nested + details |
 
 ### Auth Error 구조 불일치
 
@@ -156,7 +155,6 @@ res.status(500).json({ success: false, error: 'Failed to fetch users', code: 'IN
 // Neture (다름)
 { success: false, error: 'UNAUTHORIZED', message: '...' }
 
-// GlycoPharm (다름)
 { error: { code: 'UNAUTHORIZED', message: '...' } }
 ```
 
@@ -166,24 +164,24 @@ res.status(500).json({ success: false, error: 'Failed to fetch users', code: 'IN
 
 ### 4.1 Error Display 방식 비교
 
-| 기능 | Neture | GlycoPharm | GlucoseView | K-Cosmetics | KPA Society |
-|------|--------|-----------|------------|------------|------------|
-| Toast/알림 | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Inline Error (setError) | ✅ | ✅ | ✅ | ✅ | ✅ |
-| ErrorState 컴포넌트 | ❌ | ✅ | ❌ | ❌ | ❌ |
-| Error Boundary | ❌ | ❌ | ❌ | ❌ | ❌ |
-| alert() 사용 | 6건 | 8건 | 5건 | 2건 | 12건 |
-| Error Swallowing | 8건 | 6건 | 4건 | 2건 | 5건 |
-| 고유 에러 메시지 | 35개 | 42개 | 15개 | 9개 | 65개 |
+| 기능 | Neture | GlucoseView | K-Cosmetics | KPA Society |
+| ------ | -------- | ------------ | ------------ | ------------ |
+| Toast/알림 | ❌ | ❌ | ❌ | ❌ |
+| Inline Error (setError) | ✅ | ✅ | ✅ | ✅ |
+| ErrorState 컴포넌트 | ❌ | ❌ | ❌ | ❌ |
+| Error Boundary | ❌ | ❌ | ❌ | ❌ |
+| alert() 사용 | 6건 | 5건 | 2건 | 12건 |
+| Error Swallowing | 8건 | 4건 | 2건 | 5건 |
+| 고유 에러 메시지 | 35개 | 15개 | 9개 | 65개 |
 
 ### 4.2 401/403 Frontend 처리
 
-| 기능 | Neture | GlycoPharm | GlucoseView | K-Cosmetics | KPA Society |
-|------|--------|-----------|------------|------------|------------|
-| Auto-Refresh (401) | ✅ authClient | ✅ authClient | ✅ authClient | ✅ authClient | ✅ custom |
-| Manual 401 체크 | ❌ | ✅ (2 pages) | ✅ (1 page) | ❌ | ❌ |
-| 403 구분 처리 | ❌ | ✅ (일부) | ✅ (일부) | ❌ | Guards |
-| Login redirect | ❌ | ✅ | ❌ | ❌ | ✅ |
+| 기능 | Neture | GlucoseView | K-Cosmetics | KPA Society |
+| ------ | -------- | ------------ | ------------ | ------------ |
+| Auto-Refresh (401) | ✅ authClient | ✅ authClient | ✅ authClient | ✅ custom |
+| Manual 401 체크 | ❌ | ✅ (1 page) | ❌ | ❌ |
+| 403 구분 처리 | ❌ | ✅ (일부) | ❌ | Guards |
+| Login redirect | ❌ | ❌ | ❌ | ✅ |
 
 ### 4.3 주요 문제
 
@@ -201,7 +199,6 @@ res.status(500).json({ success: false, error: 'Failed to fetch users', code: 'IN
 | 서비스 | Client | Auth | Error 전파 |
 |--------|--------|------|-----------|
 | Neture | Axios (authClient) | auto interceptor | throw (Axios) |
-| GlycoPharm | Axios (authClient) | auto interceptor | throw (custom obj) |
 | GlucoseView | Axios (authClient) | auto interceptor | return `{success:false}` |
 | K-Cosmetics | Axios (authClient) | auto interceptor | throw (Axios) |
 | KPA Society | Fetch (custom) | manual Bearer | throw (custom obj) |
@@ -210,7 +207,6 @@ res.status(500).json({ success: false, error: 'Failed to fetch users', code: 'IN
 
 | 서비스 | Refresh 실패 시 |
 |--------|----------------|
-| Neture/GlycoPharm/GlucoseView/K-Cosmetics | authClient가 silent 처리 → user null |
 | KPA Society | `clearAllTokens()` + `auth:token-cleared` 이벤트 |
 
 ### 5.3 주요 격차

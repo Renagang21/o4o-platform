@@ -20,5 +20,4 @@
 | `E-COMMERCE-ORDER-CONTRACT.md` | Active | 주문 생성 유일 경로 정의 |
 | `ROLE-POLICY-AND-GUARD-V1.md` | Frozen | Admin/Operator 권한 정책 + Guard 기준 |
 | `core-boundary.md` | Active | Core/Domain 서비스 경계 |
-| `legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md` | Archive | GlycoPharm 독립 주문 실패 사례 |
 | `operations/PRODUCTION-MIGRATION-STANDARD.md` | Active | 프로덕션 마이그레이션 표준 |

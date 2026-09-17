@@ -9,7 +9,7 @@
 | 우선순위 | **P0** (모든 사용자 새로고침 영향) |
 | 상태 | **✅ 완료 (commit `cc01cca2c`, 배포 success, 라이브 검증 PASS) — 수정안 A** |
 | 분류 | bug fix (auth/guard) |
-| 영향 서비스 | K-Cosmetics (확정) / GlycoPharm·KPA (점검 필요) |
+| 영향 서비스 | K-Cosmetics (확정) / KPA (점검 필요) |
 
 ---
 
@@ -28,12 +28,11 @@ K-Cosmetics `/store/*` 경로를 **브라우저 주소창 직접 접속 또는 �
 - ⇒ cold load 시 토큰은 있으나 `checkSession` 이 호출되지 않아 `isLoading` 영구 true → `StoreOwnerGuard` 의 `if (isLoading) return loadingNode` 가 무한 ([StoreOwnerGuard.tsx:239](../../packages/store-ui-core/src/auth/StoreOwnerGuard.tsx#L239)).
 
 ### cross-service
-- **GlycoPharm: 영향 없음** — AuthContext mount useEffect 가 `checkSession()` 호출([web-glycopharm AuthContext.tsx:100-133](../../services/web-glycopharm/src/contexts/AuthContext.tsx#L100)). → **K-Cosmetics 가 GlycoPharm canonical 을 미반영한 divergence.**
 - **KPA: 착수 시 점검 필요** (동일 StoreOwnerGuard/AuthContext 패턴 여부 확인).
 
 ## 3. 수정 방향 (택1, 착수 시 결정)
 
-- **(A·권장) K-cos AuthContext 에 mount-time checkSession 부트스트랩 추가** — GlycoPharm canonical([AuthContext.tsx:100-133](../../services/web-glycopharm/src/contexts/AuthContext.tsx#L100)) 정합. 최소 변경, 전 경로 일괄 해소. lazy RoleGuard 호출과 중복되지 않도록 `isSessionChecked`/`sessionCheckInProgressRef` 가드 유지.
+- 최소 변경, 전 경로 일괄 해소. lazy RoleGuard 호출과 중복되지 않도록 `isSessionChecked`/`sessionCheckInProgressRef` 가드 유지.
 - (B) `StoreOwnerRoute` 가 RoleGuard 처럼 `checkSession` 트리거 (store 한정 해소, AuthContext divergence 잔존).
 
 ## 4. 검증 (착수 후)

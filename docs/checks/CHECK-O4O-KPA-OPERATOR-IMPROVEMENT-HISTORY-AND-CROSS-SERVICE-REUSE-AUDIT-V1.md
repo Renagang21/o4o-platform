@@ -3,7 +3,7 @@
 - **대상 IR**: `IR-O4O-KPA-OPERATOR-IMPROVEMENT-HISTORY-AND-CROSS-SERVICE-REUSE-AUDIT-V1`
 - **성격**: 조사 전용 (read-only). 코드·DB·운영 데이터·배포 변경 0.
 - **기준 시점**: 2026-08-12 · `origin/main` = `eb1a8dc09`
-- **비교 대상 서비스**: KPA-Society · Neture · K-Cosmetics · GlycoPharm · Pharmacy-Hub
+- **비교 대상 서비스**: KPA-Society · Neture · K-Cosmetics · Pharmacy-Hub
 - **판정 등급**: `COMMONIZED` / `PARTIAL` / `NOT_SHARED` / `EXTENSION` / `KPA_ONLY` / `MISSING`
 
 > **판정 기준(중요)**: "같은 컴포넌트를 import 한다"는 사실만으로 `COMMONIZED` 로 판정하지 않았다.
@@ -34,7 +34,7 @@
 `a8becbadd`(members list 공통화) · `9a8c5d12f`+`a5874c15d`(EditUserModal 공통화 + KPA 분리) ·
 `f386c148f`(Stores thin wrapper) · `181d0ec14`(Resources) · `f1e342cff`(GuideContents) ·
 `f3bd56e21`·`098403588`·`627e6c4f0`·`eac6ced4d`(Forum 삭제요청/신청 콘솔 수렴) ·
-`46e639fa4`·`a245f6071`·`b708eceb4`(Forum analytics/hub/categories GP·KCos 도입) ·
+`46e639fa4`·`a245f6071`·`b708eceb4`(Forum analytics/hub/categories KCos 도입)
 `5094a9d54`+`429feff07`+`608b7b1b8`(상품/주문 현황 view) · `3500d1215`(상품 신청 승인 콘솔) ·
 `f2fda7596`(LMS operator courses manager).
 
@@ -83,42 +83,42 @@ suspend/restore/withdraw) · `d190f30cb`(BulkResultModal 배선) · `1fcb010f5`(
 
 범례: ● 공통 Core 소비 / ◐ 일부만 공통(주변 중복) / ○ 자체 구현 / — 없음
 
-| # | 기능 | KPA | Neture | K-Cos | GlycoPharm | Pharmacy-Hub | 판정 |
-|---|---|:--:|:--:|:--:|:--:|:--:|---|
-| 1 | 회원 관리 콘솔 (`OperatorMembersConsolePage`) | ◐ | ● | ● | ● | — | **PARTIAL** |
-| 2 | 회원 편집 모달 | ○ `KpaEditUserModal` | ● | ● | ● | — | **EXTENSION** |
-| 3 | 회원 상태 탭 + 탈퇴 lifecycle | ● | ● | ● | ● | ○ | **COMMONIZED** |
-| 4 | 비밀번호 변경(대상 서비스 확정) | ● | ● | ● | ● | — | **COMMONIZED** |
-| 5 | 회원 삭제 flow (soft/hard 분리) | ◐ | ◐ | ● | ● | — | **PARTIAL** |
-| 6 | 매장 목록 (`OperatorStoresList`) | ● | ● | ● | ● | — | **COMMONIZED** |
-| 7 | 포럼 삭제요청/신청 콘솔 | ● | ● | ● | ● | — | **COMMONIZED** |
-| 8 | 포럼 분석/허브/카테고리 | ● | ◐ | ● | ● | — | **PARTIAL** |
-| 9 | 자료실 (`OperatorResourcesConsolePage`) | ● | — | ● | ● | — | **NOT_SHARED**(Neture) |
-| 10 | 가이드 콘텐츠 (`GuideContentsConsolePage`) | ● | ● | ● | ● | — | **COMMONIZED** |
-| 11 | CMS 콘텐츠 (`CmsContentManager`) | ● | — | ● | ● | — | **NOT_SHARED**(Neture) |
-| 12 | 상품/주문 현황 view | ● | ○ | ● | ● | — | **PARTIAL** |
-| 13 | 상품 신청 승인 콘솔 | ● | ○ | ● | ● | — | **PARTIAL** |
-| 14 | LMS 운영자·강사 매니저 | ● | — | ● | ● | — | **EXTENSION**(Neture 무 LMS) |
-| 15 | 문의 관리 (`ContactInquiryAdminPage`) | — | ○ | ● | ● | — | **MISSING**(KPA) |
-| 16 | 약관·연락처 설정 (admin) | ● | ● | ● | ● | — | **COMMONIZED** |
-| 17 | 대시보드 축 네비게이션 | ● | ● | ● | ● | — | **COMMONIZED** |
-| 18 | 대시보드 5-Block layout | ◐ 자체 composer | ● | ● | ● | — | **EXTENSION** |
-| 19 | 운영자 가이드 카드 | ● | — | ● | ● | — | **NOT_SHARED**(Neture) |
-| 20 | 채용/모집 노출 승인 | ● | — | ● | ● | — | **EXTENSION** |
-| 21 | 표준 테이블(DataTable)·bulk·row action | ● 49 | ● 36 | ● 15 | ● 21 | ○ 0 | **PARTIAL**(PH 제외) |
-| 22 | ConfirmActionDialog 표준화 | ● 15 | ◐ 2 | ◐ 1 | ◐ 2 | — | **PARTIAL** |
-| 23 | standard list core (`useStandardListQuery`) | — | ● 3 | — | ● 1 | — | **PARTIAL** |
-| 24 | load-error 계약 | ◐ 패턴 수기 | ● 121 | ○ | ○ | ○ | **PARTIAL** |
-| 25 | 운영자 감사 로그 | ○ KPA 전용 | — | — | — | — | **MISSING** |
-| 26 | 사이니지 미디어 사용처 가드·안전 삭제 | ● UI+API | — | ◐ API만 | ◐ API만 | — | **PARTIAL** |
-| 27 | 메뉴 role 필터 (`filterMenuByRole`) | ● | ● | ● | ● | — | **COMMONIZED** |
-| 28 | 운영자 sidebar/layout shell | ◐ `DomainIASidebar` | ◐ `DomainIASidebar` | ○ 자체 | ○ 자체 | — | **PARTIAL** |
-| 29 | Blog/POP/QR 작성·목록 | ○ | — | ○ | ○ | — | **PARTIAL**(3중 복제) |
-| 30 | 다국어 상품 콘텐츠 | ○ | — | — | — | — | **KPA_ONLY** |
-| 31 | 태블릿 화면세트 운영자 관리 | ○ | — | — | — | ◐ editor pkg | **KPA_ONLY** |
-| 32 | 약국 정보 canonical(면허/약국) | ○ | — | — | — | — | **KPA_ONLY** |
-| 33 | 자격 요청 승인(QualificationRequests) | ○ | — | — | ○ | — | **PARTIAL** |
-| 34 | 회원 승인 콘솔 | ● | ● | ● | ● | ○ 자체 268L | **MISSING**(PH) |
+| # | 기능 | KPA | Neture | K-Cos | Pharmacy-Hub | 판정 |
+| --- | --- | :--: | :--: | :--: | :--: | --- |
+| 1 | 회원 관리 콘솔 (`OperatorMembersConsolePage`) | ◐ | ● | ● | — | **PARTIAL** |
+| 2 | 회원 편집 모달 | ○ `KpaEditUserModal` | ● | ● | — | **EXTENSION** |
+| 3 | 회원 상태 탭 + 탈퇴 lifecycle | ● | ● | ● | ○ | **COMMONIZED** |
+| 4 | 비밀번호 변경(대상 서비스 확정) | ● | ● | ● | — | **COMMONIZED** |
+| 5 | 회원 삭제 flow (soft/hard 분리) | ◐ | ◐ | ● | — | **PARTIAL** |
+| 6 | 매장 목록 (`OperatorStoresList`) | ● | ● | ● | — | **COMMONIZED** |
+| 7 | 포럼 삭제요청/신청 콘솔 | ● | ● | ● | — | **COMMONIZED** |
+| 8 | 포럼 분석/허브/카테고리 | ● | ◐ | ● | — | **PARTIAL** |
+| 9 | 자료실 (`OperatorResourcesConsolePage`) | ● | — | ● | — | **NOT_SHARED**(Neture) |
+| 10 | 가이드 콘텐츠 (`GuideContentsConsolePage`) | ● | ● | ● | — | **COMMONIZED** |
+| 11 | CMS 콘텐츠 (`CmsContentManager`) | ● | — | ● | — | **NOT_SHARED**(Neture) |
+| 12 | 상품/주문 현황 view | ● | ○ | ● | — | **PARTIAL** |
+| 13 | 상품 신청 승인 콘솔 | ● | ○ | ● | — | **PARTIAL** |
+| 14 | LMS 운영자·강사 매니저 | ● | — | ● | — | **EXTENSION**(Neture 무 LMS) |
+| 15 | 문의 관리 (`ContactInquiryAdminPage`) | — | ○ | ● | — | **MISSING**(KPA) |
+| 16 | 약관·연락처 설정 (admin) | ● | ● | ● | — | **COMMONIZED** |
+| 17 | 대시보드 축 네비게이션 | ● | ● | ● | — | **COMMONIZED** |
+| 18 | 대시보드 5-Block layout | ◐ 자체 composer | ● | ● | — | **EXTENSION** |
+| 19 | 운영자 가이드 카드 | ● | — | ● | — | **NOT_SHARED**(Neture) |
+| 20 | 채용/모집 노출 승인 | ● | — | ● | — | **EXTENSION** |
+| 21 | 표준 테이블(DataTable)·bulk·row action | ● 49 | ● 36 | ● 15 | ○ 0 | **PARTIAL**(PH 제외) |
+| 22 | ConfirmActionDialog 표준화 | ● 15 | ◐ 2 | ◐ 1 | — | **PARTIAL** |
+| 23 | standard list core (`useStandardListQuery`) | — | ● 3 | — | — | **PARTIAL** |
+| 24 | load-error 계약 | ◐ 패턴 수기 | ● 121 | ○ | ○ | **PARTIAL** |
+| 25 | 운영자 감사 로그 | ○ KPA 전용 | — | — | — | **MISSING** |
+| 26 | 사이니지 미디어 사용처 가드·안전 삭제 | ● UI+API | — | ◐ API만 | — | **PARTIAL** |
+| 27 | 메뉴 role 필터 (`filterMenuByRole`) | ● | ● | ● | — | **COMMONIZED** |
+| 28 | 운영자 sidebar/layout shell | ◐ `DomainIASidebar` | ◐ `DomainIASidebar` | ○ 자체 | — | **PARTIAL** |
+| 29 | Blog/POP/QR 작성·목록 | ○ | — | ○ | — | **PARTIAL**(3중 복제) |
+| 30 | 다국어 상품 콘텐츠 | ○ | — | — | — | **KPA_ONLY** |
+| 31 | 태블릿 화면세트 운영자 관리 | ○ | — | — | ◐ editor pkg | **KPA_ONLY** |
+| 32 | 약국 정보 canonical(면허/약국) | ○ | — | — | — | **KPA_ONLY** |
+| 33 | 자격 요청 승인(QualificationRequests) | ○ | — | — | — | **PARTIAL** |
+| 34 | 회원 승인 콘솔 | ● | ● | ● | ○ 자체 268L | **MISSING**(PH) |
 
 ---
 
@@ -128,33 +128,33 @@ suspend/restore/withdraw) · `d190f30cb`(BulkResultModal 배선) · `1fcb010f5`(
 
 | 모듈 | export | 실제 소비 서비스 |
 |---|---|---|
-| members | `OperatorMembersConsolePage` | KPA · Neture · KCos · GP |
-| members | `CommonEditUserModal` | Neture · KCos · GP |
+| members | `OperatorMembersConsolePage` | KPA · Neture · KCos
+| members | `CommonEditUserModal` | Neture · KCos
 | members | `KpaEditUserModal` | KPA |
 | members | `MemberHardDeleteConfirmModal` | KPA · Neture |
-| members | `OperatorMemberDeleteFlow` | KCos · GP |
-| stores | `OperatorStoresList` | KPA · Neture · KCos · GP |
+| members | `OperatorMemberDeleteFlow` | KCos
+| stores | `OperatorStoresList` | KPA · Neture · KCos
 | stores | `useStoresQuery` | **소비 0** |
-| forum-delete-requests | `…ConsolePage` | KPA · Neture · KCos · GP |
-| forum-requests | `…ConsolePage` | KPA · Neture · KCos · GP |
-| forum-categories | `…Page` | KPA · Neture · KCos · GP |
-| forum-analytics | `…Page` | KPA · KCos · GP |
-| forum-hub | `…Page` | KPA · KCos · GP |
-| resources | `…ConsolePage` | KPA · KCos · GP |
-| cms-content | `CmsContentManager` | KPA · KCos · GP |
-| guide-contents | `GuideContentsConsolePage` | KPA · Neture · KCos · GP |
+| forum-delete-requests | `…ConsolePage` | KPA · Neture · KCos
+| forum-requests | `…ConsolePage` | KPA · Neture · KCos
+| forum-categories | `…Page` | KPA · Neture · KCos
+| forum-analytics | `…Page` | KPA · KCos
+| forum-hub | `…Page` | KPA · KCos
+| resources | `…ConsolePage` | KPA · KCos
+| cms-content | `CmsContentManager` | KPA · KCos
+| guide-contents | `GuideContentsConsolePage` | KPA · Neture · KCos
 | guide-contents | `GuideContentsManager` | **소비 0** (Console 경유만) |
-| lms-courses | `OperatorLmsCoursesManager` | KPA · KCos · GP |
-| instructor-courses | `InstructorCoursesManager` | KPA · KCos · GP |
-| instructor-course-form | `InstructorCourseFormShell` | KPA · GP |
-| instructor-lesson-list | `InstructorLessonListManager` | KPA · GP |
-| product-applications | `ProductApplicationManagementConsole` | KPA · KCos · GP |
-| product-order-view | `OperatorProductStatusPage` / `OperatorOrderStatusPage` | KPA · KCos · GP |
-| contact-inquiry | `ContactInquiryAdminPage` | KCos · GP |
-| service-legal | `ServiceLegalSettingsPage` | KPA · Neture · KCos · GP |
-| service-contact-settings | `ServiceContactSettingsPage` | KPA · Neture · KCos · GP |
-| dashboard | `AxisNavigationSection` | KPA · Neture · KCos · GP |
-| dashboard | `OperatorRoleGuideCard` | KPA · KCos · GP |
+| lms-courses | `OperatorLmsCoursesManager` | KPA · KCos
+| instructor-courses | `InstructorCoursesManager` | KPA · KCos
+| instructor-course-form | `InstructorCourseFormShell` | KPA
+| instructor-lesson-list | `InstructorLessonListManager` | KPA
+| product-applications | `ProductApplicationManagementConsole` | KPA · KCos
+| product-order-view | `OperatorProductStatusPage` / `OperatorOrderStatusPage` | KPA · KCos
+| contact-inquiry | `ContactInquiryAdminPage` | KCos
+| service-legal | `ServiceLegalSettingsPage` | KPA · Neture · KCos
+| service-contact-settings | `ServiceContactSettingsPage` | KPA · Neture · KCos
+| dashboard | `AxisNavigationSection` | KPA · Neture · KCos
+| dashboard | `OperatorRoleGuideCard` | KPA · KCos
 
 > **주의**: 초기 조사에서 `product-applications` 등 7개 모듈이 "소비 0" 으로 보였으나,
 > 이는 서브패스(`@o4o/operator-core-ui/modules/*`) 기준 grep 의 착시였다.
@@ -164,17 +164,17 @@ suspend/restore/withdraw) · `d190f30cb`(BulkResultModal 배선) · `1fcb010f5`(
 
 | export | 소비 (파일 수) |
 |---|---|
-| `DataTable` | KPA 49 · Neture 36 · GP 21 · KCos 15 |
-| `RowActionMenu` (@o4o/ui) | KPA 25 · Neture 14 · GP 8 · KCos 6 |
-| `useBatchAction` | KPA 20 · GP 9 · KCos 9 · Neture 4 |
-| `defineActionPolicy` / `buildRowActions` | KPA 15 · GP 7 · KCos 5 · Neture 2 |
-| `BulkResultModal` (@o4o/ui) | KPA 21 · GP 9 · KCos 9 · Neture 2 |
-| `ConfirmActionDialog` (@o4o/ui) | KPA 15 · GP 2 · Neture 2 · KCos 1 |
-| `OperatorDashboardLayout` | GP 2 · KCos 1 · Neture 1 (KPA 는 자체 composer) |
-| `DomainIASidebar` | KPA 2 · Neture 3 (GP·KCos 자체 sidebar) |
-| `RecruitmentExposureConsole` | KPA · KCos · GP |
+| `DataTable` | KPA 49 · Neture 36 21 · KCos 15 |
+| `RowActionMenu` (@o4o/ui) | KPA 25 · Neture 14 8 · KCos 6 |
+| `useBatchAction` | KPA 20 9 · KCos 9 · Neture 4 |
+| `defineActionPolicy` / `buildRowActions` | KPA 15 7 · KCos 5 · Neture 2 |
+| `BulkResultModal` (@o4o/ui) | KPA 21 9 · KCos 9 · Neture 2 |
+| `ConfirmActionDialog` (@o4o/ui) | KPA 15 2 · Neture 2 · KCos 1 |
+| `OperatorDashboardLayout` 2 · KCos 1 · Neture 1 (KPA 는 자체 composer) |
+| `DomainIASidebar` | KPA 2 · Neture 3 (KCos 자체 sidebar) |
+| `RecruitmentExposureConsole` | KPA · KCos
 | `MemberListLayout` | KPA 1 |
-| `useStandardListQuery` | Neture 3 · GP 1 |
+| `useStandardListQuery` | Neture 3 1 |
 | `StandardListToolbar` | Neture 2 |
 | `normalizePaginatedResponse` | **소비 0** |
 | `EditableDataTable` | Neture 1 |
@@ -183,7 +183,7 @@ suspend/restore/withdraw) · `d190f30cb`(BulkResultModal 배선) · `1fcb010f5`(
 ### 3-3. Backend 공통 계약
 
 - `/api/v1/operator/members/*` — `apps/api-server/src/routes/operator/membership.routes.ts`.
-  serviceKey 고정이 아니라 **caller scope 기반**이므로 서비스 중립. Neture·KCos·GP 가 소비.
+  serviceKey 고정이 아니라 **caller scope 기반**이므로 서비스 중립. Neture·KCos 가 소비.
 - `/api/signage/:serviceKey/*` — 미디어 사용처 가드(`media-usage.service.ts`)가 **serviceKey 중립**.
 - `/api/v1/kpa/members`, `/api/v1/kpa/operator/audit-logs` — KPA 전용.
 - `/api/v1/pharmacy-hub/operator/memberships/*` — Pharmacy-Hub 전용.
@@ -208,7 +208,7 @@ suspend/restore/withdraw) · `d190f30cb`(BulkResultModal 배선) · `1fcb010f5`(
 |---|---|
 | `KpaEditUserModal` vs `CommonEditUserModal` | KPA 는 `kpa_members` + 약국 businessInfo 편집. 계약이 근본적으로 다름 (`8d7d79c8e` 에서 분리 원칙 명문화) |
 | `KpaOperatorDashboardLayout` | 공통 block/config 는 그대로 쓰고 **순서·빈상태만** 조정. slot 규약(`aboveBlocks`)은 공통과 동일 |
-| GP/KCos 자체 sidebar | 브랜드 헤더(Layer A) 결합 구조. 메뉴 role 필터는 이미 공통(`filterMenuByRole`) |
+| KCos 자체 sidebar | 브랜드 헤더(Layer A) 결합 구조. 메뉴 role 필터는 이미 공통(`filterMenuByRole`) |
 | 채용/모집 노출 승인 | Neture 는 공급자 측(`SupplierRecruitmentsPage`)에서 대응. 축이 다름 |
 | LMS 매니저 Neture 부재 | Neture 에 LMS 업무 자체가 없음 |
 
@@ -221,14 +221,14 @@ suspend/restore/withdraw) · `d190f30cb`(BulkResultModal 배선) · `1fcb010f5`(
 | # | 항목 | 실태 |
 |---|---|---|
 | P1 | 회원 콘솔 **API 축 분기** | KPA 는 `/api/v1/kpa/members` (kpa_members join, `stats` 미제공 → `listAll` 로 파생, batch 는 클라이언트 fan-out). 나머지 3서비스는 canonical `/operator/members` + `/batch-status` 사용. **같은 UI, 다른 업무 배선** |
-| P2 | 회원 삭제 flow | KCos·GP 는 `OperatorMemberDeleteFlow`(공통), KPA·Neture 는 `MemberHardDeleteConfirmModal` 만 쓰고 흐름은 자체 구현 |
-| P3 | 상품/주문 현황 · 상품 신청 승인 | KPA·KCos·GP 는 공통 콘솔, Neture 는 별도 승인 도메인(`OperatorProductApprovalPage` 등) 자체 구현 |
+| P2 | 회원 삭제 flow | KCos 는 `OperatorMemberDeleteFlow`(공통), KPA·Neture 는 `MemberHardDeleteConfirmModal` 만 쓰고 흐름은 자체 구현 |
+| P3 | 상품/주문 현황 · 상품 신청 승인 | KPA·KCos 는 공통 콘솔, Neture 는 별도 승인 도메인(`OperatorProductApprovalPage` 등) 자체 구현 |
 | P4 | Blog/POP/QR 페이지 | 3서비스에 **거의 동일한 페이지가 각각 존재** (목록 526/369/450, 작성 276/198/252 lines). 공통 primitive 만 공유 |
 | P5 | 사이니지 HQ 미디어/플레이리스트/템플릿 | 동일 구조 3중 복제 (541/415/571, 295/227/310, 347/205/119 lines) |
-| P6 | `ConfirmActionDialog` 표준화 | KPA 15 : GP 2 : Neture 2 : KCos 1. **KPA 개선이 확산되지 않음** |
+| P6 | `ConfirmActionDialog` 표준화 | **KPA 개선이 확산되지 않음** |
 | P7 | standard list core | `useStandardListQuery` 를 KPA·KCos 는 **한 번도 쓰지 않는다**. KPA 의 "표준 리스트" 는 DataTable 수기 조립 |
 | P8 | load-error 계약 | Neture 121곳 vs KPA 는 페이지별 수기 3-tier 패턴(`883834a32`). 공통 `LoadErrorState`(`packages/ui/src/feedback/LoadError.tsx`) 는 **서비스 소비 0** |
-| P9 | 사이니지 삭제 가드 UX | 백엔드 가드는 공통, KPA 만 `MediaDeleteDialog`(409 안내) 보유. GP 는 페이지 내 자체 처리, KCos 는 **처리 없음** |
+| P9 | 사이니지 삭제 가드 UX | 백엔드 가드는 공통, KPA 만 `MediaDeleteDialog`(409 안내) 보유. |
 
 ### 5-2. NOT_SHARED — KPA 개선이 특정 서비스에 미반영
 
@@ -245,7 +245,7 @@ suspend/restore/withdraw) · `d190f30cb`(BulkResultModal 배선) · `1fcb010f5`(
 |---|---|---|
 | M1 | **운영자 감사 로그** | KPA 만 `/api/v1/kpa/operator/audit-logs` + `AuditLogPage` 보유. 운영자 책임추적은 4서비스 공통 요구인데 나머지 3서비스는 화면·API 모두 없음 |
 | M2 | **Pharmacy-Hub 운영자 회원 콘솔** | 268줄 수기 테이블. `DataTable`·`ConfirmActionDialog`·`RowActionMenu`·`BulkResultModal` **사용 0**, 일괄 처리·검색·상태 탭 카운트·탈퇴 lifecycle 없음. canonical `/operator/members` 는 scope 기반이라 채택 가능 |
-| M3 | 문의 관리 | KPA 에 `ContactInquiryAdminPage` 화면 없음 (KCos·GP 보유, Neture 는 자체 화면) |
+| M3 | 문의 관리 | KPA 에 `ContactInquiryAdminPage` 화면 없음 (KCos 보유, Neture 는 자체 화면) |
 | M4 | 사이니지 삭제 409 안내 | KCos 무처리 |
 
 ### 5-4. 죽은 공통 자산 (부채)
@@ -265,7 +265,7 @@ suspend/restore/withdraw) · `d190f30cb`(BulkResultModal 배선) · `1fcb010f5`(
 | C3 | Blog/POP/QR 페이지 공통 콘솔 추출 | 3중 복제 → `operator-core-ui` 모듈 1개. 이미 검증된 추출 패턴(resources·forum 과 동일) | **감소** (약 2,600줄 → 1) |
 | C4 | 사이니지 HQ 미디어/플레이리스트/템플릿 공통 콘솔 | 위와 동일 패턴 | **감소** (약 2,900줄 → 1) |
 | C5 | `MediaDeleteDialog` → `@o4o/ui` 승격 후 3서비스 소비 | 컴포넌트 이동 + import | 낮음 |
-| C6 | `ConfirmActionDialog` 를 GP/KCos/Neture 잔여 confirm 에 확산 | 기존 컴포넌트 소비 확대 | 낮음 |
+| C6 | `ConfirmActionDialog` 를 KCos/Neture 잔여 confirm 에 확산 | 기존 컴포넌트 소비 확대 | 낮음 |
 | C7 | `LoadErrorState` 실소비 개시 또는 제거 판정 | 둘 중 하나. 현재는 순수 부채 | 낮음 |
 | C8 | Neture 에 자료실·CMS 콘텐츠 콘솔 도입 | 기존 모듈 wrapper 추가 | 낮음 (**업무 필요 확인 선행**) |
 | C9 | 운영자 감사 로그 Core 화 | KPA 전용 → service-neutral. **신규 설계 필요** → 복잡도 증가, C1~C7 이후 |

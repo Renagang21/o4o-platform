@@ -18,7 +18,7 @@
  *     socialMedia/businessHours) 와 의미 다름 → 본 type 은 `BusinessRegistrationInfo` 명.
  *
  * 활용 (예정 — P2 WO):
- *   - 4 service (KPA / GP / K-Cos / Neture) 가입 폼 정합 기준
+ *   - 3 service (KPA / K-Cos / Neture) 가입 폼 정합 기준
  *   - operator 승인 화면 표시 필드 기준
  *   - 프로필/내 매장 설정 수정 화면 기준
  *
@@ -26,7 +26,6 @@
  *
  * 선행:
  *   - IR-O4O-BUSINESS-REGISTRATION-FIELDS-CROSSSERVICE-AUDIT-V1 (P0 조사 결과)
- *   - WO-O4O-GLYCOPHARM-STORE-APPLY-DEAD-CODE-REMOVAL-V1 (P0, commit 1b0a36fee)
  */
 
 // ─── Enums / String Literal Types ────────────────────────────
@@ -85,7 +84,7 @@ export type BusinessInfoSource =
 /**
  * O4O 공통 사업자 등록 정보 canonical interface.
  *
- * 4 service (KPA / GlycoPharm / K-Cosmetics / Neture) 의 사업자성 회원
+ * 3 service (KPA / K-Cosmetics / Neture) 의 사업자성 회원
  * (약국 경영자 / 매장 경영자 / 공급자 / 파트너) 공통 기본 정보.
  *
  * 모든 필드 optional — 서비스별 필수 여부는 각 service 의 form/validation 에서 결정.
@@ -150,7 +149,7 @@ export interface BusinessRegistrationInfo {
 // ─── Service-specific Extensions ─────────────────────────────
 
 /**
- * KPA-Society / GlycoPharm 약국 사업자 확장.
+ * KPA-Society 약국 사업자 확장.
  * pharmacy 도메인 특화 필드 (약사면허 / 요양기관번호 등).
  */
 export interface PharmacyBusinessRegistrationInfo extends BusinessRegistrationInfo {

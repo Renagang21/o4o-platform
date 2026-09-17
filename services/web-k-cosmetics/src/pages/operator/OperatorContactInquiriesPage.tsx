@@ -9,7 +9,7 @@
  *
  * 권한: 해당 backend 가드는 본 WO 에서 requireServiceLegalScope('operator') 로 조정됨.
  *   KCos scopeRoleMapping('cosmetics:operator' → ['cosmetics:operator','cosmetics:admin']) 상
- *   operator/admin 모두 통과한다 (GlycoPharm 의 frontend-only 패턴과 달리 backend 1라인 조정 필요했음).
+ *   operator/admin 모두 통과한다.
  *
  * admin 의존 제거: admin 의 ContactInquiriesPage 를 import 하지 않고 operator 가 어댑터를 자체 보유한다.
  *   후속 WO 에서 admin 문의 관리 메뉴/페이지를 제거해도 operator 는 영향 없다.

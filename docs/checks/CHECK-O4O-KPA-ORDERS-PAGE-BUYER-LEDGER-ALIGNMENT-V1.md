@@ -1,7 +1,7 @@
 # CHECK-O4O-KPA-ORDERS-PAGE-BUYER-LEDGER-ALIGNMENT-V1
 
 > **WO**: WO-O4O-KPA-ORDERS-PAGE-BUYER-LEDGER-ALIGNMENT-V1
-> **선행**: `IR-O4O-STORE-ORDER-DIRECTION-SEMANTICS-CROSSSERVICE-V1`(canonical=buyer) · `WO-...-GLYCOPHARM-...-BUYER-LEDGER-REPOINT-V1`.
+> **선행**: `IR-O4O-STORE-ORDER-DIRECTION-SEMANTICS-CROSSSERVICE-V1`(canonical=buyer).
 > **성격**: KPA `/store/commerce/orders` 를 seller("판매자 관점") → buyer 구매/발주 내역(checkout_orders, buyerId)으로 정렬.
 > **결과: PASS — buyer endpoint 정렬 + seller UI/액션 제거. typecheck PASS. seller endpoint·드로어 보존. backend/DB 무변경.**
 > **작성일**: 2026-06-12
@@ -9,7 +9,7 @@
 ---
 
 ## 1. 목적
-KPA 주문 화면이 seller(`/checkout/store-orders`, sellerOrganizationId, "판매자 관점") 대신 buyer 원장(`/checkout/orders`, buyerId, checkout_orders)을 조회하고, seller 풀필먼트 액션(상태변경 드로어)을 제거한다. GP/KCos 와 동일 buyer 의미로 정렬.
+KPA 주문 화면이 seller(`/checkout/store-orders`, sellerOrganizationId, "판매자 관점") 대신 buyer 원장(`/checkout/orders`, buyerId, checkout_orders)을 조회하고, seller 풀필먼트 액션(상태변경 드로어)을 제거한다. KCos 와 동일 buyer 의미로 정렬.
 
 ## 2. 선행 IR 기준
 `IR-...-ORDER-DIRECTION-SEMANTICS` 확정: "내 매장 주문 내역" = buyer(구매/발주). cart `checkout-confirm` 이 buyerId=매장 사용자 → buyer 방향. seller "받은 주문/판매 이행"은 별도 화면(범위 외).
@@ -52,22 +52,21 @@ buyer 문맥: "매장 허브에서 O4O 주문 가능 상품이나 이벤트 오�
 ## 10. 제외/무변경 항목
 - backend(kpa-checkout.controller)·DB·migration·response shape — **무변경**.
 - seller client 함수·`StoreOrderDetailDrawer` — 보존(미삭제).
-- GP/KCos/Neture·유통참여형 펀딩 — 무변경.
+- KCos/Neture·유통참여형 펀딩 — 무변경.
 - seller "받은 주문/판매 이행" 화면 — 미생성(후속).
 
 ## 11. 검증 결과
 - **정적**: StoreOrdersPage 에 `getStoreOrders`/`getStoreOrderKpi`/`StoreOrderDetailDrawer`/`store-orders`/"판매자 관점"/`selectedOrderId` **0건**. `getBuyerOrders`/`BuyerOrder` 사용 확인.
 - **TypeScript**: `services/web-kpa-society` `tsc --noEmit` → PASS.
-- **무변경**: backend/DB/GP/KCos — 확인.
+- **무변경**: backend/DB/KCos — 확인.
 
 ## 12. 완료 판정
-**PASS** — KPA `/store/commerce/orders` 가 buyer 구매/발주 내역(checkout_orders, buyerId)으로 정렬됨. seller 관점 문구·상태변경 드로어 제거. seller endpoint/드로어 보존. backend/DB 무변경. typecheck 통과. → **3서비스(KPA/GP/KCos) 모두 buyer 정합 완료.**
+**PASS** — KPA `/store/commerce/orders` 가 buyer 구매/발주 내역(checkout_orders, buyerId)으로 정렬됨. seller 관점 문구·상태변경 드로어 제거. seller endpoint/드로어 보존. backend/DB 무변경. typecheck 통과. → **2서비스(KPA/KCos) 모두 buyer 정합 완료.**
 
 ## 13. 후속 작업
 1. `WO-O4O-STORE-CHECKOUT-STATUS-LABEL-ALIGNMENT-V1` — 상태 라벨 3서비스 공통 매핑.
 2. `WO-O4O-STORE-BUYER-ORDERS-COMMON-COMPONENT-EXTRACTION-V1` — buyer 구매내역 공통 컴포넌트 추출(이제 3서비스 정합).
 3. `IR-O4O-STORE-SELLER-ORDER-FULFILLMENT-NEED-V1` — seller 수요/별도 IA.
-4. `IR-O4O-GLYCOPHARM-STORE-BILLING-PAGE-ORDER-SOURCE-AUDIT-V1` — GP StoreBillingPage stub 의존 정리.
 
 ---
 

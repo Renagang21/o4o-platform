@@ -16,7 +16,7 @@
 | `services/web-neture/src/pages/store/StorePaymentFailPage.tsx` | **신규** — 실패 안내 + 재결제/장바구니 CTA |
 | `services/web-neture/src/App.tsx` | route 3개(`/store/payment`,`/payment/success`,`/payment/fail`) + lazy import |
 
-> backend(group payment/bridge)·KPA/Glyco/KCos·legacy cart·`/neture/seller/orders` **무변경**. package.json/lockfile **무변경**.
+> package.json/lockfile **무변경**.
 
 ## 2. 흐름
 ```
@@ -54,7 +54,7 @@
 - **positive 실결제 — DEFERRED**: 유효 paymentGroupId(= 다중 공급자 cart → checkout-confirm-b2b)는 **P2d-2 cart cutover** 후 생성 + Toss 테스트결제 필요. end-to-end(결제→paid→bridge→공급자 노출)는 P2d-2 동반 실측.
 
 ## 6. 회귀 무영향
-- backend group payment(aggregation)·bridge·정산 무변경. KPA/Glyco/KCos 결제 UI 무변경.
+- backend group payment(aggregation)·bridge·정산 무변경.
 - web-neture legacy StoreCart(localStorage)·`/neture/seller/orders` 무변경 — payment page 는 paymentGroupId query 로 **독립 동작**(StoreCart 직접 연결은 P2d-2).
 - package.json/pnpm-lock 무변경(CDN 로더).
 

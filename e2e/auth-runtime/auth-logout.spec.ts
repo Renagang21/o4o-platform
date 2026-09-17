@@ -9,7 +9,7 @@
  * - stale auth 없음
  *
  * 환경변수 필요 (서비스별 분리):
- *   E2E_{KPA|KCOS|NETURE|GLYCO}_ADMIN_EMAIL / _PASSWORD
+ *   E2E_{KPA|KCOS|NETURE}_ADMIN_EMAIL / _PASSWORD
  *
  * WO-O4O-KPA-AUTH-RUNTIME-E2E-LOGIN-REGRESSION-ROOT-CAUSE-AND-CI-CLOSURE-V1
  * 로그인 실패 시 skip 하지 않는다. logout 검증은 **로그인 성공을 선행 단언**한 뒤에만

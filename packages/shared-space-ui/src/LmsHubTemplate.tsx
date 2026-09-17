@@ -47,7 +47,7 @@ export interface LmsHubCourse {
   createdAt?: string;
   /**
    * 공개/회원제 (optional) — 지정 시 "유형" 컬럼이 visibility 배지를 렌더한다.
-   * 미지정 시 category 배지로 fallback(기존 동작 — GP/KCos backward-compatible).
+   * 미지정 시 category 배지로 fallback(기존 동작 — KCos backward-compatible).
    */
   visibility?: 'public' | 'members';
   /** 회원제 + 강사 승인 필요 (visibility 배지 보조). */
@@ -85,13 +85,13 @@ export interface LmsHubConfig {
   /**
    * 수강 CTA 렌더러 (optional) — 지정 시 기본 "수강하기" 링크 대신 사용.
    * 공개=바로 보기 / 비로그인=로그인 후 수강 등 서비스별 동적 CTA 에 사용.
-   * 미지정 시 기본 "수강하기"(courseDetailPath) — 기존 동작(GP/KCos backward-compatible).
+   * 미지정 시 기본 "수강하기"(courseDetailPath) — 기존 동작(KCos backward-compatible).
    */
   renderCta?: (course: LmsHubCourse) => React.ReactNode;
   /**
    * 서비스 accent(테마) 색 — 강의명 링크 / 기본 수강 CTA / 선택 체크박스에 적용.
    * 미지정 시 기본 blue(#2563eb) — 기존 동작 backward-compatible.
-   * (KPA #2563EB / GlycoPharm #16a34a / K-Cosmetics #db2777)
+   * (KPA #2563EB / K-Cosmetics #db2777)
    */
   accent?: string;
 }

@@ -90,12 +90,11 @@ does not exist, or Cloud Run does not have permission to use it.
 |---|---|---|
 | **[A] 본인 GET** (sohae2100) | 200 | **200** |
 | **[B] 동일 서비스 타인 GET** (sohae2100 → renagang21 것) | **200 + userId·email 노출** | **404 `NOT_FOUND`** |
-| **[C] cross-service GET** (`?serviceKey=glycopharm`) | 404 | **404** |
+| **[C] cross-service GET** | 404 | **404** |
 | **[A2] 본인 GET** (renagang21) | 200 | **200** |
 | **[B2] 동일 서비스 타인 GET** (renagang21 → sohae2100 것) | **200 + email 노출** | **404 `NOT_FOUND`** |
 | **[D] `GET /lms/enrollments`** | 200 n=9 / 3 userId / 3 email | 200 n=9 (아래 §7-1 참조) |
 | **[E] `/health`** | 200 | **200** |
-| scope 축소 `GET /lms/enrollments?serviceKey=glycopharm` | — | 200 n=0 (타 서비스 0건 확인) |
 
 → **이전 200 email leak → 수정 후 404 전환 확인 (양방향 2건 모두)**. 단건 읽기 leak 는 production 에서 종료됐다.
 
@@ -135,7 +134,6 @@ does not exist, or Cloud Run does not have permission to use it.
 | 인증 상태 코스·레슨 조회 | `/kpa/lms/courses/{id}` 200, `/{id}/lessons` 200 |
 | enrollment 단건 조회 | 200 (본인) |
 | K-Cosmetics `/lms` | 200 · n=0 빈 상태 정상 · console error 0 |
-| GlycoPharm `/lms` | 200 · n=0 빈 상태 정상 · console error 0 |
 | 신규 404/500 | **0건** (기존 appreciation 404 제외) |
 | 백지 화면 / JS 예외 | 0건 |
 | cross-service LMS 혼입 | 0건 |

@@ -130,8 +130,6 @@ trial fulfillment create-order route — 미변경
 
 ## 8. 회귀 무영향 (§10)
 
-canonical Store Cart / checkout-confirm-b2b / paymentGroupId 결제 / paid bridge / supplier unified order view / supplier fulfillment status·shipment / settlement guard / KPA·Glyco·KCos — **무변경** (단일 파일, POST handler 한정 변경).
-
 ---
 
 ## 9. 완료 기준 대조 (§11)

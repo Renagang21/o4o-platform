@@ -117,7 +117,7 @@
 
 | 영역 | 정합 상태 | 근거 |
 |---|:---:|---|
-| 4 service `/mypage` (KPA / GP / K-Cos / Neture) | ✅ Option D 와 일치 | 현재 구현 |
+| 3 service `/mypage` (KPA / K-Cos / Neture) | ✅ Option D 와 일치 | 현재 구현 |
 | 4 service `/mypage/settings` 의 비밀번호 변경 | ✅ V2 Phase 2 적용 (`serviceKey` 명시) | `WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1` |
 | 4 service `/mypage/profile` 의 프로필 수정 | ✅ `PUT /users/profile` 직접 호출 | 현재 구현 |
 | web-account 코드 | ✅ 최소 계정센터 형태 (서비스 목록 + Handoff) | 현재 구현 |
@@ -128,7 +128,7 @@
 
 ### 5.1 Pharmacy-Hub 축 (2026-08-19 추가 — 구현 사실 기록)
 
-본 baseline V1 작성(2026-05-24) 시점에는 4 service(KPA / GP / K-Cos / Neture)만 존재했다.
+본 baseline V1 작성(2026-05-24) 시점에는 3 service(KPA / K-Cos / Neture)만 존재했다.
 이후 신설된 **Pharmacy-Hub** 는 `/mypage` 축을 만들지 않고 **`/account`** 를 개인 계정
 canonical route 로 사용한다. 아래는 **현재 구현 사실의 기록**이며 §1~§4 의 정책 변경이 아니다.
 

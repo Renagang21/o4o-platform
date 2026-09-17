@@ -35,7 +35,6 @@
 | `backend-neture-web-http` | `neg-neture-web` | `neture-web` |
 | `backend-o4o-core-api` | `neg-o4o-core-api` | `o4o-core-api` |
 | `backend-kpa-society-web` | `neg-kpa-society-web` | `kpa-society-web` |
-| `backend-glycopharm-web` | `neg-glycopharm-web` | `glycopharm-web` |
 | `backend-k-cosmetics-web` | `neg-k-cosmetics-web` | `k-cosmetics-web` |
 | `backend-glucoseview-web-advanced` | `neg-glucoseview-web` | `glucoseview-web` |
 | `backend-pharmacy-hub-web` | `neg-pharmacy-hub-web` | `pharmacy-hub-web` |
@@ -50,7 +49,7 @@
 |---|---|---|
 | neture.co.kr / www / admin. / api. | `136.110.132.35` | LB |
 | kpa-society.co.kr / www / api. | `136.110.132.35` | LB |
-| glycopharm.co.kr / www / api. | `136.110.132.35` | LB |
+| www / api. | `136.110.132.35` | LB |
 | **k-cosmetics.site** / www / api. | `136.110.132.35` | LB |
 | **glucoseview.co.kr** / www / api. | `136.110.132.35` | LB |
 | **pharmacyhub.co.kr** / www | `136.110.132.35` | LB |
@@ -109,7 +108,7 @@ o4o-global-lb                           (URL map, hostRule 11 / pathMatcher 9)
 backend-* (9) → serverless NEG (9) → Cloud Run (9)
 ```
 
-- 30일 traffic **459,032** — 전 서비스 backend 로 분산 (core-api 220,858 · neture-web 88,630 · k-cosmetics 33,895 · kpa-society 30,316 · glycopharm 26,688 · glucoseview 17,548 · admin 13,223 · pharmacy-hub 2,801)
+- 30일 traffic **459,032** — 전 서비스 backend 로 분산 (core-api 220,858 · neture-web 88,630 · k-cosmetics 33,895 · kpa-society 30,316 26,688 · glucoseview 17,548 · admin 13,223 · pharmacy-hub 2,801)
 - **production 유일 진입 경로.**
 
 ### (3) `o4o-global-lb-forwarding-rule` — 판정 **LEGACY_UNUSED_CANDIDATE**
@@ -236,7 +235,7 @@ WO §6 은 traffic 이 있으면 삭제 후보로 올리지 말 것을 요구한
 ## §9 부수 관측 (이번 WO 범위 밖 — 기록만, 변경 0)
 
 1. **legacy compute SSL certificate 9개 전부 `PROVISIONING_FAILED_PERMANENTLY`**
-   (`cert-admin` · `cert-final-neture` · `-v2` · `-v3` · `cert-glucoseview` · `cert-glycopharm` · `cert-kcosmetics` · `cert-kpa` · `cert-neture-web` · `cert-siteguide-v1`).
+   (`cert-admin` · `cert-final-neture` · `-v2` · `-v3` · `cert-glucoseview` · `cert-kcosmetics` · `cert-kpa` · `cert-neture-web` · `cert-siteguide-v1`).
    실제 TLS 는 `o4o-main-cert-map`(Certificate Manager) 이 담당하며, HTTPS proxy 에 붙은 `cert-final-neture-v3` 도 **실사용되지 않는 잔재**다. 다만 proxy 에 attach 되어 있으므로 제거는 detach 를 동반한다 → 별도 WO.
 2. **`siteguide.co.kr` / `www.siteguide.co.kr`** — DNS 는 LB 를 가리키고 Certificate Manager entry(`siteguide-entry`, `www-siteguide-entry`, cert `cm-cert-siteguide`)도 ACTIVE 이나, `o4o-global-lb` URL map 에 **host rule 이 없다.** 결과적으로 default backend(`backend-neture-web-http` = neture-web)로 서빙된다 (HTTPS 200 확인, Cloud Run 로그에도 `https://siteguide.co.kr` 도달 기록 존재). 의도된 상태인지 확인 필요.
 3. **`account.neture.co.kr`** — URL map `path-matcher-1` → `backend-account-center-web` → `neg-account-center-web` → Cloud Run `o4o-main-site` 경로가 살아 있으나, DNS 는 `74.125.204.121`(Google ghs)로 LB 를 가리키지 않는다. HTTP 404 / HTTPS 연결 실패. **LB 측 경로가 dead 일 가능성**이 높으나, 도메인 용도가 불명확하므로 WO §12 에 따라 삭제 후보로 올리지 않는다 → **HOLD 아님, 별도 조사 대상**.

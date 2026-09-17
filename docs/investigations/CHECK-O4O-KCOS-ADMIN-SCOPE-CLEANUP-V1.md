@@ -1,8 +1,8 @@
 # CHECK-O4O-KCOS-ADMIN-SCOPE-CLEANUP-V1
 
 > **WO**: `WO-O4O-KCOS-ADMIN-SCOPE-CLEANUP-V1`
-> **선행**: GlycoPharm 기준 모델 (`IR-/WO-O4O-GLYCOPHARM-ADMIN-SCOPE-CLEANUP-*`) · `WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1`
-> **목적**: K-Cosmetics 서비스 admin 을 "서비스 설정 관리자" 역할로 축소 (GlycoPharm 과 동일 기준). operator 성격 진입점 제거, 권한 지정 메뉴 제거, 회원 라벨 정리.
+> `WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1`
+> **목적**: K-Cosmetics 서비스 admin 을 "서비스 설정 관리자" 역할로 축소 operator 성격 진입점 제거, 권한 지정 메뉴 제거, 회원 라벨 정리.
 > **작성일**: 2026-06-16
 > **상태**: 코드 완료 · app typecheck PASS · browser smoke 배포 후 대기
 
@@ -19,7 +19,7 @@
 | Approvals | 매장 네트워크 (/admin/stores) | **제거** (그룹 삭제, operator /operator/stores 대응) |
 | System | 설정 · 법정정보·약관 · 문의 관리 · 문의 설정 · 역할 관리 | 설정 · 법정정보·약관 · **문의 설정** (문의 관리·역할 관리 제거) |
 
-> KCos sidebar 에는 **Finance 그룹이 없음** (GlycoPharm 과 차이) → Finance 현상 유지 관련 변경 없음.
+> KCos sidebar 에는 **Finance 그룹이 없음** → Finance 현상 유지 관련 변경 없음.
 
 ### Admin Dashboard (`pages/admin/KCosmeticsAdminDashboard.tsx`)
 
@@ -119,7 +119,6 @@ KCos admin 대시보드 → Governance 블록·매장 관리 카드 미노출
 회원 데이터 관리(/admin/users → /admin/members) 진입 정상
 법정정보·약관(/admin/settings/legal-terms) · 문의 설정(/admin/settings/contact) 정상
 KCos operator: /operator/contacts 목록/상세/상태변경 200 (선행 WO 이관 검증)
-GlycoPharm operator: /operator/contacts 무회귀 (KCos WO 의 backend 가드 공통 변경 영향 재확인)
 ```
 
 ---

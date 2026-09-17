@@ -34,11 +34,11 @@ config는 "구조 제어"가 아니라 **"표현 제어"만 담당**
 
 ## 3. config가 필요한 실제 지점
 
-| 항목 | KPA | K-Cosmetics | GlycoPharm |
-|------|-----|-------------|------------|
-| storeLabel | 약국 | 매장 | 약국 (컨텍스트 다름) |
-| primaryColor | #2563eb (blue) | #db2777 (pink) | green 계열 |
-| homeCTA | 약국 운영 시작하기 | 매장 운영 시작하기 | - |
+| 항목 | KPA | K-Cosmetics |
+| ------ | ----- | ------------- |
+| storeLabel | 약국 | 매장 |
+| primaryColor | #2563eb (blue) | #db2777 (pink) |
+| homeCTA | 약국 운영 시작하기 | 매장 운영 시작하기 |
 
 ---
 

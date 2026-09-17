@@ -4,7 +4,7 @@
  * WO-O4O-KPA-ADMIN-DASHBOARD-CANONICAL-SEPARATION-V1
  *
  * WO-O4O-KPA-ADMIN-DASHBOARD-ADMIN-UX-CORE-MIGRATION-V1:
- *   독자 JSX 구현 → @o4o/admin-ux-core AdminDashboardLayout 4-Block 정합 (Neture/GP/KCOS 정렬).
+ *   독자 JSX 구현 → @o4o/admin-ux-core AdminDashboardLayout 4-Block 정합 (Neture/KCOS 정렬).
  *   - A Structure Snapshot: 활성 회원 / 승인 대기 KPI
  *   - B Policy Overview: KPA admin 정책 설정 개념 없음 → 빈 배열(미표시)
  *   - C Governance Alerts: 전용 데이터 소스 없음 → 빈 배열("구조 이상 없음")

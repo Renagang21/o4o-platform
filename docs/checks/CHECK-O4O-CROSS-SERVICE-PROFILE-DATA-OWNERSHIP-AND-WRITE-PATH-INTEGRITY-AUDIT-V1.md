@@ -3,7 +3,7 @@
 > **WO**: `IR-O4O-CROSS-SERVICE-PROFILE-DATA-OWNERSHIP-AND-WRITE-PATH-INTEGRITY-AUDIT-V1`
 > **성격**: 조사 전용 (read-only) — 코드 / DB / 운영 데이터 / 배포 변경 0
 > **기준 커밋**: `2e69b85fb` (`origin/main`, 2026-08-12)
-> **대상 서비스**: KPA-Society · GlycoPharm · K-Cosmetics · Neture · Pharmacy-Hub
+> **대상 서비스**: KPA-Society · K-Cosmetics · Neture · Pharmacy-Hub
 
 ---
 
@@ -11,7 +11,7 @@
 
 | 항목 | 결과 |
 |---|---|
-| 프로필 저장소 개수 | 7 (`users` · `service_memberships` · `service_credentials` · `kpa_members` · `kpa_pharmacist_profiles` / `kpa_student_profiles` · `neture_suppliers` / `glycopharm_members` · `organizations` / `organization_members`) |
+| 프로필 저장소 개수 | 7 (`users` · `service_memberships` · `service_credentials` · `kpa_members` · `kpa_pharmacist_profiles` / `kpa_student_profiles` · `neture_suppliers` / `organizations` / `organization_members`) |
 | 신규 통합 테이블 필요 | **아니오** — 기존 7개로 경계 확정 가능 |
 | 확정 결함 (P0) | 2건 (D-1 `users.updated_at` 존재하지 않는 컬럼 write · D-2 KPA 승인 sync 예외 삼킴) |
 | 확정 결함 (P1) | 4건 (D-3 주소 키 비대칭 · D-4 `pharmacy_phone` 키 이중 · D-5 KPA 운영자 대리수정 비원자 · D-6 `organizations` 이중 entity) |
@@ -25,11 +25,10 @@
 | 서비스 | 사용자 화면 | Frontend client | API | Controller / Service | write 대상 table |
 |---|---|---|---|---|---|
 | **공통 (전 서비스)** | 직역/사업자 정보 수정 | `authClient` | `PATCH /api/v1/auth/me/profile` | `modules/auth/controllers/auth-account.controller.ts` | `kpa_pharmacist_profiles` · `kpa_members` · `users.businessInfo` · `role_assignments` |
-| **공통 (전 서비스)** | 가입 | — | `POST /api/v1/auth/register` | `modules/auth/controllers/auth-register.controller.ts` | `users` · `service_memberships` · `service_credentials` · `kpa_members` · `kpa_pharmacist_profiles` · `glycopharm_members` · `glycopharm_applications` · `neture_suppliers` · `organizations` |
+| **공통 (전 서비스)** | 가입 | — | `POST /api/v1/auth/register` | `modules/auth/controllers/auth-register.controller.ts` | `users` · `service_memberships` · `service_credentials` · `kpa_members` · `kpa_pharmacist_profiles` · `neture_suppliers` · `organizations` |
 | **KPA** | `pages/mypage/MyProfilePage.tsx` | `api/mypage.ts` | `GET/PUT /api/v1/kpa/mypage/profile` | `routes/kpa/services/mypage.service.ts` | `users` (name/nickname/phone) · `kpa_members.university_name` · `users.businessInfo.metadata.workplace` |
 | **KPA** | 매장 `약국 정보` | — | `GET/PUT /api/v1/{svc}/store/info` | `routes/o4o-store/controllers/pharmacy-info.controller.ts` | `organizations`(name/phone/address/address_detail/metadata) + `users.businessInfo`(P2/P4 4필드) |
 | **KPA** | `operator/MemberManagementPage.tsx` | `apiClient(/api/v1/kpa)` | `PATCH /api/v1/kpa/members/:id/info` · `/:id/status` | `routes/kpa/controllers/member.controller.ts` | `kpa_members` · `users`(name/nickname/businessInfo) · `kpa_pharmacist_profiles` · `service_memberships` · `role_assignments` · `organizations` · `organization_members` |
-| **GlycoPharm** | `pages/mypage/MyProfilePage.tsx` | `api/mypage.ts` | `PATCH /api/v1/glycopharm/mypage/business-info` | `routes/glycopharm/controllers/mypage.controller.ts` | `users.businessInfo` (jsonb concat, 단일 write) |
 | **K-Cosmetics** | `pages/mypage/MyProfilePage.tsx` | `api/mypage.ts` | `PATCH /api/v1/cosmetics/mypage/business-info` | `routes/cosmetics/controllers/cosmetics-mypage.controller.ts` | `users.businessInfo` (jsonb concat, 단일 write) |
 | **Neture** | `pages/mypage/MyBusinessProfilePage.tsx` | `lib/api/supplier.ts` | `GET/PATCH /api/v1/neture/supplier/profile` | `modules/neture/services/supplier.service.ts` | `neture_suppliers` + `organizations`(읽기 SSOT) + `users.businessInfo`(P4 2필드) |
 | **Pharmacy-Hub** | `pages/store-owner/AccountPage.tsx` | `lib/api/pharmacyHubAccount.ts` | `PUT /api/v1/users/password` 등 | `PharmacyHubMembershipConsoleController` (읽기) · `PharmacyHubStoreProvisioningService` | `users.businessInfo` **읽기 전용** — 자체 프로필 write 경로 없음 |
@@ -56,11 +55,11 @@
 
 | 필드 | 정본 | 복제 위치 | write 주체 | 판정 |
 |---|---|---|---|---|
-| membership 상태(승인) | `service_memberships.status` | `kpa_members.status` · `glycopharm_members.status` · `users.status` | 승인 콘솔 · KPA `PATCH /:id/status` | SERVICE_PROFILE (정본 명확, 동기화 결함은 D-2) |
+| membership 상태(승인) | `service_memberships.status` | `kpa_members.status` · `users.status` | 승인 콘솔 · KPA `PATCH /:id/status` | SERVICE_PROFILE (정본 명확, 동기화 결함은 D-2) |
 | membership role | `service_memberships.role` | `kpa_members.role` | 운영자 콘솔 | SERVICE_PROFILE |
 | 서비스별 비밀번호 | `service_credentials.password_hash` | `users.password`(플랫폼 계정용) | 가입 · 운영자 비밀번호 재설정 | SERVICE_PROFILE (경계 명확) |
 | **직역 `activity_type`** | `kpa_pharmacist_profiles.activity_type` | `kpa_members.activity_type` (mirror) | `PATCH /auth/me/profile` (transaction O) · KPA 운영자 콘솔 | SERVICE_PROFILE + 의도된 mirror |
-| **면허번호** | `kpa_pharmacist_profiles.license_number` | `kpa_members.license_number` · `users.businessInfo.licenseNumber` · `glycopharm_members.metadata.licenseNumber` | 가입 · KPA 운영자 콘솔 | **DUPLICATED** (4곳 — 정본 외 3곳은 mirror) |
+| **면허번호** | `kpa_pharmacist_profiles.license_number` | `kpa_members.license_number` · `users.businessInfo.licenseNumber` | 가입 · KPA 운영자 콘솔 | **DUPLICATED** (4곳 — 정본 외 3곳은 mirror) |
 | 대학/학년 | `kpa_student_profiles` / `kpa_members.university_name` | — | KPA mypage(`university_name`만) | SERVICE_PROFILE (write 경로가 mirror 쪽 = 역방향) |
 | `workplace` | `users.businessInfo.metadata.workplace` | — | KPA mypage | SERVICE_PROFILE (잘못된 저장소, §7) |
 | Neture 공급자 프로필 (`representative_name`/`manager_*`/`business_type`/`business_item`/`tax_invoice_email`) | `neture_suppliers` | `users.businessInfo` 동명 키 | 공급자 본인 | **DUPLICATED** (§4 참조) |
@@ -81,7 +80,6 @@
 | 위치 | 용도 | 판정 |
 |---|---|---|
 | `users.businessInfo` 의 사업자등록증 4필드 (`businessType`/`businessItem`/`businessEntityType`/`businessStartDate`) | 가입 폼 입력 → 운영자 승인 판단 근거. 승인 후 `organizations` 로 이관되지 않음 | INPUT_CACHE → 승인 후 사실상 정본이 되어버림 (§6 경계 선언) |
-| `glycopharm_applications` | 신청 스냅샷 | INPUT_CACHE (정상) |
 | `kpa_pharmacy_requests` | 약국 개설 신청 스냅샷 | INPUT_CACHE (정상) |
 
 ### 2-5. `DEAD`
@@ -108,13 +106,11 @@
 | `modules/neture/services/supplier.service.ts` | 13 | 공급자 프로필 read+write(P4) |
 | `modules/auth/controllers/auth-account.controller.ts` | 12 | 본인 수정 write (canonical+legacy 혼용 허용) |
 | `services/CommissionCalculator.ts` | 10 | read |
-| `routes/glycopharm/controllers/mypage.controller.ts` | 10 | GP 본인 수정 write |
 | `routes/cosmetics/services/cosmetics-store.service.ts` | 10 | read |
 | `routes/kpa/services/mypage.service.ts` | 8 | KPA mypage read + `metadata.workplace` write |
 | `routes/cosmetics/controllers/cosmetics-mypage.controller.ts` | 8 | KCos 본인 수정 write |
 | `controllers/operator/MembershipConsoleController.ts` | 8 | 공통 운영자 write |
 | `routes/debug/user-debug.controller.ts` | 7 | 진단 read |
-| `routes/glycopharm/controllers/admin.controller.ts` | 6 | read |
 | `services/pharmacy-hub/PharmacyHubStoreProvisioningService.ts` | 5 | 조직 provisioning read (`businessName`/`businessNumber`) |
 | `services/account-linking.service.ts` · `modules/auth/services/user.service.ts` | 4 / 4 | read |
 | `controllers/pharmacy-hub/PharmacyHubMembershipConsoleController.ts` | 3 | 운영자 read |
@@ -128,7 +124,7 @@
 | W2 | `PATCH /auth/me/profile` | SELECT → merge → UPDATE | **O** (transaction 내부) |
 | W3 | `PATCH /operator/members/:userId` | SELECT → merge → UPDATE (단일 UPDATE 에 합류) | **O** (단일 문장) |
 | W4 | `PATCH /kpa/members/:id/info` | SELECT → merge → UPDATE | **X** (§5, D-5) |
-| W5 | GP / KCos `PATCH …/mypage/business-info` | `COALESCE(...) \|\| $2::jsonb` | **O** (단일 문장, 손실 없음) |
+| W5 | KCos `PATCH …/mypage/business-info` | `COALESCE(...) \ | \ | $2::jsonb` | **O** (단일 문장, 손실 없음) |
 | W6 | `PUT /{svc}/store/info` · Neture `PATCH /supplier/profile` | jsonb concat, **try/catch 삼킴** | **X** (부분 성공 무보고) |
 
 > W5 의 jsonb concat 패턴이 가장 안전하다. W1~W4 의 read-modify-write 는 동시 편집 시 last-writer-wins 로 타 필드를 되돌릴 수 있다 (운영자와 본인이 동시에 수정하는 경우).
@@ -137,7 +133,7 @@
 
 | 의미 | canonical 키 (write) | legacy 키 (write) | 구조화 키 | 읽기만 하는 곳 |
 |---|---|---|---|---|
-| 사업장 주소 | `businessAddress` / `businessAddressDetail` ← **가입(W1)** | `address` / `address2` ← **KPA 운영자(W4) · 공통 운영자(W3) · 본인(W2)** | `storeAddress{zipCode,baseAddress,detailAddress}` ← W2 · W3 | KPA 목록: `address`/`address2` **만** · Neture 운영자: `address`/`address2` **만** · GP mypage: `businessAddress ?? address` (fallback O) |
+| 사업장 주소 | `businessAddress` / `businessAddressDetail` ← **가입(W1)** | `address` / `address2` ← **KPA 운영자(W4) · 공통 운영자(W3) · 본인(W2)** | `storeAddress{zipCode,baseAddress,detailAddress}` ← W2 · W3 | KPA 목록: `address`/`address2` **만** · Neture 운영자: `address`/`address2` **만** mypage: `businessAddress ?? address` (fallback O) |
 | 대표자명 | `representativeName` ← W1 | `ceoName` ← W3 | — | 소비처 대부분 `?? ` fallback 보유 (안전) |
 | 약국 전화 | `metadata.pharmacy_phone` ← W4 | `pharmacyPhone` ← W3 | — | KPA 목록은 `metadata.pharmacy_phone` **만** 읽음 |
 | 세금계산서 이메일 | `taxInvoiceEmail` | `taxEmail` / `email` | `organizations.metadata.taxInvoiceEmail` | fallback O |
@@ -154,7 +150,7 @@
 | 대표자 | `representativeName`/`ceoName` | `metadata.ceoName` | `neture_suppliers.representative_name` | 서비스 entity 있으면 그것, 없으면 `organizations.metadata` |
 | 담당자 이름/전화 | `contactName`/`managerPhone` | `metadata.contactName`/`managerPhone` | `neture_suppliers.manager_name`/`manager_phone` | 동일 |
 | 업태/종목/사업자유형/개업일 | `businessType`/`businessItem`/`businessEntityType`/`businessStartDate` | — | `neture_suppliers.business_type`/`business_item` (2/4만) | **`users.businessInfo`** — 유일 저장소인 2필드가 있으므로 4필드를 여기 묶어두는 것이 최소 변경 |
-| 면허번호 | `licenseNumber` | — | `kpa_pharmacist_profiles.license_number` · `kpa_members.license_number` · `glycopharm_members.metadata` | **`kpa_pharmacist_profiles`** |
+| 면허번호 | `licenseNumber` | — | `kpa_pharmacist_profiles.license_number` · `kpa_members.license_number` | **`kpa_pharmacist_profiles`** |
 
 **엔티티 이중 매핑**: `organizations` 테이블에 두 개의 entity 클래스가 매핑되어 있다 —
 `packages/organization-core/src/entities/Organization.ts` 와 `apps/api-server/src/modules/store-core/entities/organization-store.entity.ts`(`OrganizationStore`).
@@ -211,7 +207,7 @@ KPA 목록은 `metadata.pharmacy_phone` 만 읽는다 → **공통 콘솔에서 
 
 ### D-7 (P2) — read-modify-write 경합
 
-W1~W4 는 `businessInfo` 전체를 읽어 통째로 덮는다. 본인 수정과 운영자 대리 수정이 겹치면 **나중에 커밋한 쪽이 상대 필드를 과거 값으로 되돌린다**. GP/KCos 의 jsonb concat(W5) 은 이 문제가 없다.
+W1~W4 는 `businessInfo` 전체를 읽어 통째로 덮는다. 본인 수정과 운영자 대리 수정이 겹치면 **나중에 커밋한 쪽이 상대 필드를 과거 값으로 되돌린다**. KCos 의 jsonb concat(W5) 은 이 문제가 없다.
 
 ### D-8 (P2) — 매장 정보 저장 분할 + 실패 은폐
 
@@ -230,13 +226,11 @@ ACCOUNT_CORE      users
 SERVICE_PROFILE   service_memberships   ← 서비스 가입/승인 상태·role (승인 정본)
                   service_credentials   ← 서비스별 비밀번호
                   kpa_pharmacist_profiles / kpa_student_profiles ← 자격(면허·직역) 정본
-                  kpa_members / glycopharm_members / neture_suppliers ← 서비스 회원 속성
 
 DOMAIN_EXTENSION  organizations         ← 약국·매장·공급사 실체 (이름/주소/전화/사업자번호) 정본
                   organization_members  ← 소속·직위
 
 INPUT_CACHE       users.businessInfo    ← 가입·신청 시점 사업자 입력 스냅샷
-                  glycopharm_applications, kpa_pharmacy_requests
 ```
 
 **핵심 경계 선언**: `users.businessInfo` 는 *플랫폼 계정 필드가 아니라 **사업자 입력 스냅샷 + 전용 컬럼이 없는 4개 필드의 임시 정본*** 이다. 이 두 역할만 남기고, 실체가 생긴 뒤(조직 승인 후)의 이름·주소·전화·사업자번호는 `organizations` 를 읽는다.

@@ -4,13 +4,13 @@
  * WO-O4O-STORE-HUB-API-CLIENT-AND-SERVICE-SCOPE-ALIGNMENT-V1
  *
  * 배경 (census §2 판정: SAME_CONTRACT_DIFFERENT_PREFIX)
- *   K-Cosmetics `cosmeticsEventOfferApi` 와 GlycoPharm `glycopharmEventOfferApi` 는
+ *   서비스별 event-offer API 사본은
  *   **주석 · export 이름 · URL prefix 한 조각을 빼면 완전히 동일한 파일**이었다.
  *   (타입 4개와 두 메서드 본문이 문자 단위로 일치)
  *
  *   backend 도 두 서비스가 **동일한 `EventOfferService` 를 serviceKey 만 바꿔 호출하는
  *   thin controller** 다(`routes/cosmetics/controllers/event-offer.controller.ts` ·
- *   `routes/glycopharm/controllers/event-offer.controller.ts`).
+ *   `routes/controllers/event-offer.controller.ts`).
  *   → client 사본을 유지할 근거가 없다.
  *
  * 범위에서 제외한 서비스 (근거는 CHECK §2 매트릭스)
@@ -41,13 +41,13 @@ export interface EventOfferHttp {
 export interface CreateEventOfferApiConfig {
   /**
    * 서비스 네임스페이스를 포함한 이벤트 오퍼 base path.
-   * 예) `/cosmetics/event-offers` · `/glycopharm/event-offers`
+   * 예) `/cosmetics/event-offers` · `/event-offers`
    * 서비스명을 이 파일에서 하드코딩하지 않는다(WO §3).
    */
   basePath: string;
 }
 
-// ─── 응답 타입 (KCos · GP 공통 — 두 사본이 동일했다) ──────────────────────────
+// ─── 응답 타입 ─────────────────────────────────────────────────────────────
 
 export interface EnrichedEventOffer {
   id: string;

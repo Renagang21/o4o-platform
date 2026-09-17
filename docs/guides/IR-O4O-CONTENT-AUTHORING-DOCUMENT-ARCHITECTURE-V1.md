@@ -122,7 +122,7 @@ docs/registries/O4O-DRUG-OTC-DESCRIPTION-GROUP-REGISTRY-V1.md   ← 운영 상�
 **3개 독립 축 + 공통:**
 - `common/` = 문서 체계·워크플로우·CHECK·공통 규칙 (모든 축이 상속)
 - `products/` = 제품군 축(의약품·의료기기·의약외품·건기식)
-- `services/` = 서비스 축(KPA·GP·KCos·Neture) — 제품군과 **직교(orthogonal)**. 같은 의약품이라도 서비스별 채널·운영 특성이 다르므로 분리.
+- `services/` = 서비스 축(KPA·KCos·Neture) — 제품군과 **직교(orthogonal)**. 같은 의약품이라도 서비스별 채널·운영 특성이 다르므로 분리.
 - `ai/` = AI 축 · `content-authoring/` = 콘텐츠 유형 축
 - **서비스는 자체 Rule Registry를 만들지 않는다** — CR/DR/AR를 Rule ID로 참조하고, 서비스 고유의 채널·적용 특성만 기술한다.
 
@@ -136,7 +136,7 @@ docs/registries/O4O-DRUG-OTC-DESCRIPTION-GROUP-REGISTRY-V1.md   ← 운영 상�
 | 공통 작성 원칙(소비자 중심·원문 우선·과장 금지·grounding) | **content-authoring/** | 콘텐츠 유형 공통 |
 | **AI 규칙(프롬프트·grounding·검수·안전)** | **ai/** | 제품군·콘텐츠 유형과 독립, AI 종류별 공통 |
 | Writing / Grouping / Template | **products/drug/** | 의약품 전용(성분·함량·제형·ATC) |
-| 서비스 채널·운영 특성(약국/매장/쇼핑몰) | **services/{kpa,gp,kcos,neture}/** | 제품군과 직교, CR/DR/AR를 참조(자체 registry 없음) |
+| 서비스 채널·운영 특성(약국/매장/쇼핑몰) | **services/{kpa,kcos,neture}/** | 제품군과 직교, CR/DR/AR를 참조(자체 registry 없음) |
 | STANDARD(설계 철학) | products/drug/ 또는 content-authoring/로 분할 | 공통 철학은 위로, 의약품 분리 4축은 drug/ |
 
 의약품에 **고유하게 남는 것은 Writing · Grouping · Template + DR Registry** 정도이며, 나머지는 대부분 공통으로 상승한다.
@@ -168,9 +168,9 @@ AI 계층은 common/content-authoring/제품군 어디에도 종속되지 않고
 
 ## 4-3. 서비스 축 (`services/`)
 
-문서 구조는 **제품군과 서비스가 분리**되어야 한다. O4O에는 KPA(약국)·GP(매장)·KCos·Neture(쇼핑몰) 같은 서비스가 있고, 서비스별 규칙은 제품군과 별개다(같은 의약품이라도 약국 설명서·POP·QR·태블릿과 쇼핑몰 상세는 채널·운영 맥락이 다름).
+문서 구조는 **제품군과 서비스가 분리**되어야 한다. O4O에는 KPA(약국)·KCos·Neture(쇼핑몰) 같은 서비스가 있고, 서비스별 규칙은 제품군과 별개다(같은 의약품이라도 약국 설명서·POP·QR·태블릿과 쇼핑몰 상세는 채널·운영 맥락이 다름).
 
-- `services/{kpa,gp,kcos,neture}/` = 그 서비스의 채널·운영·적용 특성만 기술.
+- `services/{kpa,kcos,neture}/` = 그 서비스의 채널·운영·적용 특성만 기술.
 - **서비스는 자체 Rule Registry를 만들지 않는다.** 규칙은 CR/DR/AR에서 정의하고, 서비스 문서는 Rule ID로 참조만 한다.
 
 ## 4-4. DOCUMENT-INDEX (진입 지도)
@@ -333,7 +333,7 @@ common/ 생성 (DOCUMENT-INDEX · DOCUMENT-ARCHITECTURE(IR §2~§13 승격) · W
 content-authoring/ 생성 (CONTENT-AUTHORING-PRINCIPLES)
 ai/ 생성 (AI-PROMPT-STANDARD · AI-GROUNDING · AI-REVIEW · AI-SAFETY · AI-RULE-REGISTRY)
 products/drug/ 정리 (DRUG-WRITING · DRUG-GROUPING · DRUG-TEMPLATE · DRUG-RULE-REGISTRY)
-products/{medical-device,quasi-drug,health-functional-food}/ · services/{kpa,gp,kcos,neture}/ = 스캐폴드만
+products/{medical-device,quasi-drug,health-functional-food}/ · services/{kpa,kcos,neture}/ = 스캐폴드만
 Rule Registry 생성 (R1~R62 → CR/DR/AR 분류)
 CLAUDE.md 수정 (DOCUMENT-INDEX 포인터 1행 + 불변 1행)
 MEMORY.md 수정 (불변식 블록 + track 이관)
@@ -348,7 +348,7 @@ MEMORY.md 수정 (불변식 블록 + track 이관)
 
 - 콘텐츠 규칙의 Source of Truth를 **Guide로 단일화**, 4역할(설계/실행결과/운영상태/불변결정) 명확화
 - WO·CHECK 중복 제거, CLAUDE.md·MEMORY.md 역할 명확화
-- **의료기기·의약외품·건기식**(products) + **KPA·GP·KCos·Neture**(services) + QR·POP·블로그·동영상까지 동일 체계로 확장 — 제품군·서비스 직교 분리
+- **의료기기·의약외품·건기식**(products) + **KPA·KCos·Neture**(services) + QR·POP·블로그·동영상까지 동일 체계로 확장 — 제품군·서비스 직교 분리
 - Process/Pipeline을 **WORKFLOW**로 통합, **AI 축(`ai/`)** 분리로 AI 종류 확장 대비
 - Rule Registry 3계층(CR/DR/AR)으로 공통·제품군·AI 규칙 독립 관리 (서비스는 registry 없이 참조만)
 - **IR=역사 / DOCUMENT-ARCHITECTURE=운영** 승계로 결정 근거와 운영 문서 분리

@@ -3,7 +3,7 @@
  *
  * WO-O4O-COMMUNITY-OPERATOR-CONSOLE-VIEW-CONVERGENCE-V1
  *
- * KPA / GlycoPharm / Neture 의 "커뮤니티 Home 편집" 운영자 콘솔
+ * KPA / Neture 의 "커뮤니티 Home 편집" 운영자 콘솔
  * (community_ads · community_sponsors · community_quick_links CRUD) 공통 View.
  *
  * 서비스 차이는 client adapter + config(accent/label/tab 구성) + optional slot 으로만 주입한다.
@@ -77,7 +77,7 @@ export type CommunityQuickLinkInput = {
 
 /**
  * 서비스별 community manage API adapter.
- * KPA `communityManageApi` · GlycoPharm `communityManageApi` · Neture `communityAdminApi` 가
+ * KPA `communityManageApi` · Neture `communityAdminApi` 가
  * 이미 동일한 method 이름/shape 을 갖는다 — wrapper 에서 그대로 주입한다.
  * 응답 unwrap 은 공통 View 가 `data.ads | ads` 양쪽을 모두 허용한다.
  */

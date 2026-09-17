@@ -109,7 +109,6 @@ Core (수정 금지)
 
 Extension (자유 확장)
 ├── modules/kpa/          — KPA 서비스 확장
-├── modules/glycopharm/   — GlycoPharm 서비스 확장
 ├── modules/neture/       — Neture 서비스 확장
 ├── modules/cosmetics/    — K-Cosmetics 서비스 확장
 └── modules/glucoseview/  — GlucoseView 서비스 확장
@@ -119,7 +118,6 @@ Extension (자유 확장)
 
 허용:
 ```
-glycopharm:admin, glycopharm:operator, glycopharm:user
 kpa:admin, kpa:operator, kpa:pharmacist
 ```
 
@@ -142,7 +140,7 @@ role_assignments 테이블 구조 변경
 | 회원가입 (4 서비스) | 4/4 성공 |
 | 운영자 승인 | 4/4 성공 |
 | 승인 후 로그인 | 4/4 성공 (status=approved, roles=["customer"]) |
-| UI 회원관리 | GlycoPharm 완전 동작 |
+| UI 회원관리 | 검증 당시 완전 동작 (해당 서비스는 이후 은퇴) |
 
 상세: `docs/archive/work-orders/WO-O4O-E2E-REGISTRATION-APPROVAL-LOGIN-TEST-V1-REPORT.md` Round 4 섹션
 

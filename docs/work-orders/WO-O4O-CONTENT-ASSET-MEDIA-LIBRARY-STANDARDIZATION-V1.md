@@ -15,7 +15,6 @@ WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1
 - RichTextEditor 사용 화면 : **45개**
 - Media Library 연동 : **3개** (Neture만)
 - KPA : **0**
-- GlycoPharm : **0**
 - K-Cosmetics : **0**
 
 원인은 `ProductionMaterialEditorShell` 이 Media Library 관련 prop 자체를 공통으로 노출하지 않는 **구조적 차단**이다.
@@ -39,7 +38,7 @@ WO-O4O-CONTENT-ASSET-MEDIA-LIBRARY-STANDARDIZATION-V1
 - `packages/store-ui-core`
 
 **서비스**
-- Neture / KPA / GlycoPharm / K-Cosmetics
+- Neture / KPA / K-Cosmetics
 
 **공통 편집기** — `RichTextEditor`
 **공통 셸** — `ProductionMaterialEditorShell`
@@ -102,7 +101,7 @@ Media Picker는 공용 컴포넌트로 구현한다. **권장 위치: `packages/
 
 **착수 전 read-only 선행 확인 (필수):** 다음 각 서비스가 `GET /media-library` 또는 동등 API에 접근 가능한지 확인한다.
 
-- KPA web / GlycoPharm web / K-Cosmetics web / Neture web
+- KPA web / K-Cosmetics web / Neture web
 - `authClient` / service scope / 권한 문제 여부
 
 접근 불가 시 **무리하게 구현하지 말고 CHECK에 보고한 뒤 "API 접근 표준화 WO"로 분리**한다.
@@ -192,7 +191,7 @@ onMediaLibraryPick(insertMedia: (media: {
 
 ## 13. 검증
 
-Neture / KPA / GlycoPharm / K-Cosmetics 모든 RichTextEditor 소비 화면에서:
+Neture / KPA / K-Cosmetics 모든 RichTextEditor 소비 화면에서:
 
 - 동일한 Media Picker 호출 가능
 - 이미지 삽입 가능

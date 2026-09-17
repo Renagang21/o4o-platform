@@ -127,7 +127,6 @@ service 승인은 admin 이 `product_approvals`(approval_type='service') 를, op
 
 | 파일 | 라인수 | md5(앞 8) |
 |---|---:|---|
-| `services/web-glycopharm/src/components/auth/RoleGuard.tsx` | 76 | `48b0ea44` |
 | `services/web-k-cosmetics/src/components/auth/RoleGuard.tsx` | 92 | `1f51c5fb` |
 | `services/web-kpa-society/src/components/auth/RoleGuard.tsx` | 43 | `512ff8fc` |
 | `services/web-neture/src/components/auth/RoleGuard.tsx` | 180 | `96870b63` |

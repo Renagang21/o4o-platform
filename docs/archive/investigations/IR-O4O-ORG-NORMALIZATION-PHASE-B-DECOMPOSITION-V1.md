@@ -1,7 +1,7 @@
 # Phase B 안전 분해 실행 설계서
 
 > **선행**: Phase A 마이그레이션 완료 상태 가정
-> **목표**: 기존 코드를 `kpa_organizations` / `glycopharm_pharmacies` → `organizations` 기반으로 전환
+> **목표**: 기존 코드를 `kpa_organizations` → `organizations` 기반으로 전환
 > **원칙**: 엔티티 전환 → 컴파일 검증 → 컨트롤러 전환 → 컴파일 검증
 
 ---
@@ -11,10 +11,7 @@
 ```
 organizations (확장됨)     ← Phase A에서 컬럼 추가 + 데이터 sync
 kpa_organizations          ← 그대로 존재 (미삭제)
-glycopharm_pharmacies      ← 그대로 존재 (미삭제)
 organization_service_enrollments  ← Phase A에서 생성
-glycopharm_pharmacy_extensions    ← Phase A에서 생성
-v_glycopharm_pharmacies           ← Phase A에서 생성
 ```
 
 핵심: **organizations.id = kpa_organizations.id** (동일 UUID)
@@ -37,7 +34,7 @@ v_glycopharm_pharmacies           ← Phase A에서 생성
 근거:
 - organization-core Frozen 유지 가능 (WO 없이 진행)
 - 기존 Organization 엔티티를 사용하는 다른 코드(forum, organization.routes)에 영향 없음
-- 확장 컬럼만 추가한 별도 엔티티로 KPA/GlycoPharm 쪽에서만 사용
+- 확장 컬럼만 추가한 별도 엔티티로 KPA 쪽에서만 사용
 
 ```typescript
 // OrganizationStore — organizations 테이블의 확장 뷰 엔티티
@@ -99,7 +96,7 @@ export class OrganizationStore {
 |---|------|-------|-----------|------|
 | N1 | `routes/kpa/entities/organization-store.entity.ts` | OrganizationStore | organizations | **신규 생성** |
 | N2 | `routes/kpa/entities/organization-service-enrollment.entity.ts` | OrganizationServiceEnrollment | organization_service_enrollments | **신규 생성** |
-| N3 | `routes/glycopharm/entities/glycopharm-pharmacy-extension.entity.ts` | GlycopharmPharmacyExtension | glycopharm_pharmacy_extensions | **신규 생성** |
+| N3 | — | — | — | **신규 생성** |
 
 **컴파일 게이트**: `tsc --noEmit` 통과 확인
 **영향**: 기존 코드 0% — 순수 추가만
@@ -118,7 +115,7 @@ export class OrganizationStore {
 | E7 | KpaSteward | `@ManyToOne('KpaOrganization')` | `@ManyToOne('OrganizationStore')` | 동일 |
 | E8 | KpaApplication | `@ManyToOne('KpaOrganization')` | `@ManyToOne('OrganizationStore')` | 동일 |
 | E10 | KpaBranchSettings | `@ManyToOne('KpaOrganization')` | `@ManyToOne('OrganizationStore')` | 동일 |
-| E2 | GlycopharmPharmacy | `@OneToOne('KpaOrganization')` | `@OneToOne('OrganizationStore')` | PK 공유 → Organization FK |
+| E2 | — | `@OneToOne('KpaOrganization')` | `@OneToOne('OrganizationStore')` | PK 공유 → Organization FK |
 
 **주의**: B-1b를 실행하면 `organization_id` FK가 `kpa_organizations` → `organizations` 테이블을 가리키게 됨.
 데이터는 동일 UUID이므로 호환되지만, TypeORM relation JOIN이 변경됨.
@@ -188,49 +185,6 @@ Group 3 (Admin/Operator):
 
 **컴파일 게이트**: Group 완료 후 `tsc --noEmit`
 
-### B-2b: GlycoPharm 컨트롤러 (14건 — High Risk)
-
-> GlycoPharm 컨트롤러는 `glycopharm_pharmacies` 테이블을 직접 사용.
-> 전환 시 `organizations + glycopharm_pharmacy_extensions` JOIN 필요.
-
-**전환 전략**: `v_glycopharm_pharmacies` 뷰를 중간 레이어로 활용
-
-| 방식 | 설명 | 권고 |
-|------|------|------|
-| A. 즉시 전환 | organizations + extensions JOIN으로 변경 | 정확하나 대규모 변경 |
-| B. 뷰 경유 | `v_glycopharm_pharmacies` → 기존 컬럼명 유지 | **안전**, 점진적 |
-| C. 혼합 | 간단한 조회는 뷰, 쓰기는 organizations 직접 | 현실적 |
-
-**권고: C안 (혼합)**
-
-```
-읽기 (SELECT): v_glycopharm_pharmacies 뷰 사용
-쓰기 (INSERT/UPDATE): organizations + extensions 직접
-
-Phase B-2b에서는 읽기를 뷰로 전환 (안전)
-Phase B-2c에서는 쓰기를 organizations로 전환 (위험)
-```
-
-**컨트롤러 전환 순서**:
-
-```
-Group 4 (읽기 전용 — 뷰로 전환):
-  G2  unified-store-public.routes.ts   — 공개 스토어
-  G8  display.controller.ts            — 사이니지
-  C15 store.controller.ts              — 매장 조회
-  G1  layout.controller.ts             — 레이아웃
-
-Group 5 (CRUD — organizations 직접):
-  G4  glycopharm.repository.ts         — 레포지토리 전환
-  G5  glycopharm.service.ts            — 서비스 전환
-  C14 admin.controller.ts              — 약국 생성/수정
-  G3  checkout.controller.ts           — 결제
-
-Group 6 (인증/컨텍스트):
-  G6  care-pharmacy-context.middleware.ts — 약국 컨텍스트
-  G7  cockpit.controller.ts            — 운영 대시보드
-```
-
 ### B-2c: 플랫폼/기타 (5건)
 
 ```
@@ -249,7 +203,7 @@ Group 6 (인증/컨텍스트):
 ┌─────────────────────────────────────────────────────────────┐
 │ B-1a: 새 엔티티 3건 생성                                     │
 │   OrganizationStore + OrganizationServiceEnrollment          │
-│   + GlycopharmPharmacyExtension                             │
+│   + PharmacyExtension                                       │
 │   → tsc --noEmit ✅                                         │
 │   영향: 없음                                                 │
 ├─────────────────────────────────────────────────────────────┤
@@ -264,12 +218,12 @@ Group 6 (인증/컨텍스트):
 │   → tsc --noEmit                                            │
 │   영향: 🟡 Medium                                            │
 ├─────────────────────────────────────────────────────────────┤
-│ B-2b (Group 4): GlycoPharm 읽기 경로 → 뷰 전환               │
+│ B-2b (Group 4): 읽기 경로 → 뷰 전환                          │
 │   4개 컨트롤러 (공개 스토어, 레이아웃, 사이니지)                │
 │   → tsc --noEmit                                            │
 │   영향: 🟡 Medium                                            │
 ├─────────────────────────────────────────────────────────────┤
-│ B-2b (Group 5): GlycoPharm CRUD → organizations 직접         │
+│ B-2b (Group 5): CRUD → organizations 직접                    │
 │   4개 파일 (레포지토리, 서비스, Admin, 결제)                    │
 │   → tsc --noEmit                                            │
 │   영향: 🔴 High                                              │
@@ -308,7 +262,7 @@ Group 6 (인증/컨텍스트):
 |------|--------|------|------|
 | B-1b | 🔴 | 엔티티 FK 변경 → TypeORM JOIN 대상 테이블 변경 | B-2a와 동시 실행 |
 | B-2a 컬럼명 | 🟡 | `parent_id` → `"parentId"` 등 컬럼명 변환 필수 | 치환 목록 사전 작성 |
-| B-2b Group 5 | 🔴 | GlycoPharm 약국 생성 로직이 organizations로 전환 | 뷰 호환 레이어 유지 |
+| B-2b Group 5 | 🔴 | — | 뷰 호환 레이어 유지 |
 | B-2b Group 6 | 🔴 | 인증 미들웨어 변경 → 인증 장애 가능 | care-pharmacy-context만 별도 검증 |
 
 ---
@@ -318,8 +272,6 @@ Group 6 (인증/컨텍스트):
 - [ ] Phase A 마이그레이션 실행 완료 확인
 - [ ] `organizations` 테이블에 kpa 데이터 sync 확인
 - [ ] `organization_service_enrollments` 데이터 확인
-- [ ] `glycopharm_pharmacy_extensions` 데이터 확인
-- [ ] `v_glycopharm_pharmacies` 뷰 조회 정상 확인
 - [ ] 각 단계 실행 전 git commit (rollback point)
 
 ---

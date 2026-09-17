@@ -23,9 +23,6 @@
 | 서비스 | Requests 화면 | route | 데이터 소스 |
 |---|---|---|---|
 | KPA-Society | 내 신청 내역 | `/mypage/my-requests` | `GET /kpa/mypage/my-requests` + `GET /forum/category-requests/my?serviceCode=kpa` |
-| GlycoPharm | 내 신청 내역 | `/mypage/my-requests` | `GET /glycopharm/mypage/my-requests` (membership + `glycopharm_applications`) |
-| GlycoPharm | 포럼 신청 내역 | `/forum/my-requests` | `GET /forum/category-requests/my?serviceCode=glycopharm` |
-| GlycoPharm | 내 신청 목록 | `/apply/my-applications` | `glycopharmApi.getMyApplications()` |
 | K-Cosmetics | 내 신청 내역 | `/mypage/my-requests` | 매장 입점 + LMS 수강 + **(신규 연결)** 포럼 개설 |
 | Pharmacy-Hub | 가입 상태 | `/join/status` | `GET /pharmacy-hub/join/status` |
 | Neture | **없음** | — | Nav·Home 어디에도 진입점 없음 → dead entry 0 |
@@ -51,9 +48,9 @@ Neture `/workspace/partners/requests` 는 B2B workspace 기능으로 **OUT_OF_SC
 | 9 | 처리 사유/메모 | **FULLY_COMMON** | 공통 View 의 관리자 의견 블록 |
 | 10 | 대상 서비스/조직 표시 | **FULLY_COMMON** | `serviceKey` / `displayTitle`(조직명) 공통 필드 |
 | 11 | empty/loading/error | **FULLY_COMMON** | 공통 View 4상태 + `onRetry` |
-| 12 | Home/Navigation 진입 | **FULLY_COMMON** | KPA/GP/KCos `내 신청`, PH `가입 상태`, Neture 진입점 없음(정상) |
+| 12 | Home/Navigation 진입 | **FULLY_COMMON** | KPA/KCos `내 신청`, PH `가입 상태`, Neture 진입점 없음(정상) |
 | 13 | mobile UX | **FULLY_COMMON** | 공통 View 반응형. §13 실측표 참조 |
-| 14 | 서비스별 고유 workflow | **SERVICE_SPECIFIC** | GP 신청 서비스종류/사업자번호/메모 · PH 역할별 진입점 · 포럼 결과 링크 — 전부 Extension(`detailSlot`/`resultLink`/`overrides`)으로 분리 |
+| 14 | 서비스별 고유 workflow | **SERVICE_SPECIFIC** 신청 서비스종류/사업자번호/메모 · PH 역할별 진입점 · 포럼 결과 링크 — 전부 Extension(`detailSlot`/`resultLink`/`overrides`)으로 분리 |
 
 ```
 미조사 = 0
@@ -69,9 +66,8 @@ CORE_ONLY = 0
 
 | endpoint | 소비 | 비고 |
 |---|---|---|
-| `GET /api/v1/forum/category-requests/my?serviceCode=` | KPA · GP · KCos | 공용 계약. K-Cos 는 이번에 처음 소비 |
+| `GET /api/v1/forum/category-requests/my?serviceCode=` | KPA · KCos | 공용 계약. K-Cos 는 이번에 처음 소비 |
 | `GET /api/v1/kpa/mypage/my-requests` | KPA | `kpa_approval_requests` 서버 정규화 |
-| `GET /api/v1/glycopharm/mypage/my-requests` | GP | membership + `glycopharm_applications` 서버 정규화 |
 | `GET /api/v1/cosmetics/stores/application/me` | KCos | |
 | `GET /api/v1/lms/enrollments/me` | KCos | |
 | `GET /api/v1/pharmacy-hub/join/status` | PH | `service_memberships` 단건 |
@@ -90,7 +86,7 @@ backend DB 모델은 통합하지 않았다. 변환은 전부 frontend adapter �
 | 서비스 | 원본 enum | 표시 |
 |---|---|---|
 | 공통 기본값 | `draft/pending/submitted/approved/rejected/revision_requested/cancelled/revoked/in_progress/completed` | `DEFAULT_STATUS_CONFIG` |
-| GP `/apply` | `glycopharm_applications.status` `submitted` | `overrides` → '검토 중'(amber). 같은 신청서를 보여주는 `/mypage/my-requests`(backend 가 `pending` 으로 내려줌)와 라벨·tone 을 맞추기 위함. `approved`/`rejected` 는 공통 기본값 사용 |
+ `/apply` | — | `overrides` → '검토 중'(amber). 같은 신청서를 보여주는 `/mypage/my-requests`(backend 가 `pending` 으로 내려줌)와 라벨·tone 을 맞추기 위함. `approved`/`rejected` 는 공통 기본값 사용 |
 | PH | `service_memberships.status` `none/pending/active/rejected/suspended/withdrawn` | `overrides` → 신청 전/승인 대기/승인됨/반려됨/이용 정지/탈퇴. membership enum 미변경 |
 
 **type label 교정 1건**: `kpa_approval_requests.entity_type = 'forum_member_join'` 이 공통 매핑에 없어
@@ -101,8 +97,6 @@ backend DB 모델은 통합하지 않았다. 변환은 전부 frontend adapter �
 ## 6. Before / After
 
 **Before**
-- GP `/forum/my-requests` — 285줄 자체 구현 (목록·상태·사유·결과 링크 전부 중복)
-- GP `/apply/my-applications` — 266줄 자체 구현 (같은 `glycopharm_applications` 을 `/mypage/my-requests` 와 이중 렌더)
 - KPA 페이지 안에 forum 요청 normalizer 30줄 로컬 중복
 - 공통 View 안에 `/forum?category=` 라우트 하드코딩 (§10 위반)
 - K-Cos 는 포럼 개설 신청을 제출할 수 있으나 사용자 상태 조회 화면 없음 (`fetchMyForumRequests` 소비처 0 — §18 dead helper)
@@ -138,8 +132,8 @@ Requests 전용 Shell/Layout 도 만들지 않고 기존 `MyPageShell` / `MyPage
 | 서비스 | adapter 위치 | Extension |
 |---|---|---|
 | KPA | 공통 `normalizeForumCategoryRequest` + backend 정규화 | `actionSection`(포럼 개설 신청), 유형 필터 6탭, forum 결과 링크 fallback |
-| GP `/forum/my-requests` | 공통 normalizer | `resultLink`(생성된 포럼 보기), `showStats=false`, 자체 헤더 |
-| GP `/apply/my-applications` | 로컬 `toRequestItem` (서비스 고유 필드) | `detailSlot`(신청 서비스·사업자번호·메모), `statusOverrides`, `typeOverrides`, GuideBlock, 인증 안내 |
+ `/forum/my-requests` | 공통 normalizer | `resultLink`(생성된 포럼 보기), `showStats=false`, 자체 헤더 |
+ `/apply/my-applications` | 로컬 `toRequestItem` (서비스 고유 필드) | `detailSlot`(신청 서비스·사업자번호·메모), `statusOverrides`, `typeOverrides`, GuideBlock, 인증 안내 |
 | K-Cos | `src/api/mypage.ts` 3소스 병합 | 유형 필터 4탭 |
 | PH | 없음(단건) | `RequestStatusBadge` + `overrides` 만 |
 | Neture | 해당 없음 | — |
@@ -159,7 +153,6 @@ K-Cos 는 `Promise.allSettled` 3소스 병합 후 공통 정렬. KPA 는 2소스
 서비스 고유 필드는 `detailSlot` 으로 주입한다. 별도 상세 route 는 5서비스 어디에도 없다.
 
 SERVICE_SPECIFIC 사유:
-- GP 참여 신청의 `serviceTypes`(무재고 판매/샘플 판매/디지털사이니지)·사업자번호·메모는 GP 에만 존재하는 신청 항목이다.
 - PH 는 목록이 아니라 membership 단건 상태이며, 승인 시 역할별 진입점을 노출한다.
 
 ---
@@ -180,8 +173,7 @@ SERVICE_SPECIFIC 사유:
 ## 12. empty / loading / error
 
 공통 View 가 loading / error(+재시도) / empty / 목록 4상태를 담당한다.
-조회 실패를 "정상 0건" 으로 삼키지 않는 계약을 유지했다 — GP 는 `response.error` 를 먼저 확인한 뒤
-error 상태로 넘긴다. GP `/apply` 는 401 을 오류 UI 가 아니라 로그인 안내로 분기한다 (§15).
+error 상태로 넘긴다.
 
 ---
 
@@ -192,9 +184,9 @@ desktop 1440×900 · mobile 390×844 실측.
 | 화면 | horizontal overflow | status 잘림 | 날짜 잘림 | action 접근 | 상세 진입 | filter/tab |
 |---|---|---|---|---|---|---|
 | KPA `/mypage/my-requests` | 없음(-15px) | 없음 | 없음 | 가능 | 가능 | 전부 가능 |
-| GP `/apply/my-applications` | 없음(-8px) | 없음 | 없음 | 가능 | 가능 | 해당 없음 |
-| GP `/mypage/my-requests` | 없음 | 없음 | 없음 | 가능 | 가능 | 4탭 가능 |
-| GP `/forum/my-requests` | 없음 | 없음 | 없음 | 가능 | 가능 | 해당 없음 |
+ `/apply/my-applications` | 없음(-8px) | 없음 | 없음 | 가능 | 가능 | 해당 없음 |
+ `/mypage/my-requests` | 없음 | 없음 | 없음 | 가능 | 가능 | 4탭 가능 |
+ `/forum/my-requests` | 없음 | 없음 | 없음 | 가능 | 가능 | 해당 없음 |
 | K-Cos `/mypage/my-requests` | 없음(-15px) | 없음 | 없음 | 가능 | 가능 | 4탭 가능 |
 | PH `/join/status` | 없음(-15px) | 없음 | 없음 | 가능 | 해당 없음 | 해당 없음 |
 | Neture `/mypage` | 없음(-15px) | — | — | — | — | — |
@@ -211,9 +203,9 @@ desktop 1440×900 · mobile 390×844 실측.
 | 서비스 | 결과 | 관측 |
 |---|---|---|
 | KPA `/mypage/my-requests` | PASS(교정 1) | 통계 1/1/0, 필터탭, 카드 확장 시 신청일 행 정상. **유형 뱃지에 raw `forum_member_join` 노출 → 교정** |
-| GP `/apply/my-applications` | PASS(교정 1) | 참여 신청 · 테스트약국 · 2026년 5월 27일 · 상태 뱃지, detailSlot(무재고 판매/사업자번호) 정상. **`/mypage` 와 라벨 불일치 → 교정** |
-| GP `/mypage/my-requests` | PASS | 통계 2/1/1, 승인됨·검토 중 2건 |
-| GP `/forum/my-requests` | PASS | 200 · 0건 → 정상 empty |
+ `/apply/my-applications` | PASS(교정 1) | 참여 신청 · 테스트약국 · 2026년 5월 27일 · 상태 뱃지, detailSlot(무재고 판매/사업자번호) 정상. **`/mypage` 와 라벨 불일치 → 교정** |
+ `/mypage/my-requests` | PASS | 통계 2/1/1, 승인됨·검토 중 2건 |
+ `/forum/my-requests` | PASS | 200 · 0건 → 정상 empty |
 | K-Cos `/mypage/my-requests` | PASS | `forum/category-requests/my?serviceCode=k-cosmetics` **200**, `포럼 신청` 탭 노출 |
 | PH `/join/status` | PASS | 승인됨 뱃지 + 신청/승인 일시 + 역할별 진입 |
 | Neture `/mypage` | PASS | Nav(홈/프로필/설정)·Hub(프로필/포럼/설정) 어디에도 Requests 진입 없음 → dead entry 0 |
@@ -229,10 +221,9 @@ mobile 기능 소실 0 / double shell 0.
 |---|---|
 | KPA 유형 뱃지 | `forum_member_join` → **'포럼 가입'** 정상 표시 (raw enum 소멸) |
 | KPA `포럼 가입` 필터 탭 | 노출 + 클릭 시 해당 건 유지 |
-| GP `/apply/my-applications` | 테스트약국 · 2026년 5월 27일 · **'검토 중'** |
-| GP `/mypage/my-requests` | 같은 건 · **'검토 중'** → 두 화면 라벨 일치 |
-| mobile 390×844 (KPA · GP) | overflow 0 · 잘린 텍스트 0건 |
-
+ `/apply/my-applications` | 테스트약국 · 2026년 5월 27일 · **'검토 중'** |
+ `/mypage/my-requests` | 같은 건 · **'검토 중'** → 두 화면 라벨 일치 |
+| mobile 390×844 (KPA) | overflow 0 · 잘린 텍스트 0건 |
 
 ---
 
@@ -256,7 +247,7 @@ mobile 기능 소실 0 / double shell 0.
 | # | 내용 | 성격 |
 |---|---|---|
 | F1 | 사용자 취소 / 재신청 / 보완 제출 flow 자체가 5서비스 전부 부재 | 신규 기능 — 별도 WO |
-| F2 | GP `/forum/my-requests` 를 **미로그인**으로 열면 401 이 error 가 아니라 empty 로 보인다. GP `ApiClient` 실패 계약은 정상이며 공유 auth-client 의 401→refresh 실패 경로에서 발생 | 공유 auth-client — 별도 WO |
+| F2 | — | 공유 auth-client — 별도 WO |
 | F3 | `kpa/mypage.service.ts listMyRequests` 의 `catch { return [] }` 가 쿼리 실패를 "정상 0건" 으로 삼킨다 | backend load-error 계약 — 별도 WO |
 | F4 | `kpa_approval_requests.entity_type` 은 자유 문자열이라 미매핑 값이 또 나올 수 있다 (이번엔 `forum_member_join` 1건 교정) | 유형 카탈로그 정본화 — 별도 WO |
 | F5 | `ForumOwnerDashboard` 내장 요청 목록과 `MyRequestsInbox` 의 장기 수렴 | OUT_OF_SCOPE — 별도 WO |
@@ -271,7 +262,7 @@ mobile 기능 소실 0 / double shell 0.
 | # | 내용 | 조치 | 파일 |
 |---|---|---|---|
 | M1 | KPA 유형 뱃지에 raw enum `forum_member_join` 노출 + 해당 유형 필터 탭 부재 | `DEFAULT_TYPE_CONFIG` 에 '포럼 가입' 추가, KPA 필터 탭 추가 | `packages/account-ui/src/components/RequestTypeBadge.tsx` · `services/web-kpa-society/src/pages/mypage/MyRequestsPage.tsx` |
-| M2 | 같은 GP 신청서가 `/apply`('심사 중') 와 `/mypage`('검토 중') 에서 다른 라벨 | `/apply` override 를 '검토 중' 으로 정렬, approved/rejected override 제거(공통 기본값 사용) | `services/web-glycopharm/src/pages/apply/MyApplicationsPage.tsx` |
+| M2 | — | `/apply` override 를 '검토 중' 으로 정렬, approved/rejected override 제거(공통 기본값 사용) | — |
 
 ```
 MUST_FIX_BEFORE_CLOSE = 0
@@ -286,11 +277,10 @@ MUST_FIX_BEFORE_CLOSE = 0
 | 항목 | 결과 |
 |---|---|
 | `@o4o/account-ui` build | PASS |
-| `tsc -b` × 5 서비스 (KPA · GP · KCos · Neture · PH) | PASS (0 error) |
-| `npx vite build` (CI 실제 빌드 명령) GP · KPA · KCos · PH | PASS |
+| `tsc -b` × 4 서비스 (KPA · KCos · Neture · PH) | PASS (0 error) |
+| `npx vite build` (CI 실제 빌드 명령) KPA · KCos · PH | PASS |
 | backend test/typecheck | 해당 없음 (backend 미변경) |
 
-1차 `tsc -b` 에서 GP `StoreSignageMainPage.tsx` TS6133 이 1건 있었으나 다른 세션 커밋(`3e801ec69`)에서
 유입된 본 WO 무관 오류였고, CI 는 `npx vite build` 로 빌드하므로 배포를 막지 않았다.
 이후 다른 세션이 `d8a7ab520` 에서 수정하여 rebase 후 소멸했다.
 

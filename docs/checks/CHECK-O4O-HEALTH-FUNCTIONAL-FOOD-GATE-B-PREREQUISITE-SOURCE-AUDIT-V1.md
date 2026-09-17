@@ -97,7 +97,7 @@
 - `MFDS_STTEMNT_NO`(건기식 품목제조신고번호) ≠ `MFDS_CODE`(식약처 품목기준코드, 의약품 트랙) ≠ `KOREA_DRUG_CODE` ≠ `UDI_DI`/`GTIN`(유통 바코드). **`MFDS_CODE` 재사용 금지**(의약품 코드와 값 충돌·의미 혼선). (표준프로세스 §8)
 - **unique 범위**: partial unique `(product_master_id, identifier_type, normalized_value) WHERE deleted_at IS NULL` — 전역 UNIQUE 아님.
 - **카디널리티(원칙)**: 1 STTEMNT_NO ↔ N ProductMaster 가능(한 신고 품목이 여러 SKU/포장으로 확장 시). 역으로 1 ProductMaster 에 복수 STTEMNT_NO 는 비정상(신고 품목 병합) — Gate B dry-run 에서 conflict 로 격리.
-- **거버넌스**: `product_identifiers` 는 KPA/GlycoPharm/Cosmetics/Neture 공통 Core → 신규 type 추가는 **중앙 리뷰 필요**(표준프로세스 §13, CLAUDE.md Shared Module Rule). 본 CHECK 는 **제안만**, 코드 추가는 Gate B WO 에서.
+- 본 CHECK 는 **제안만**, 코드 추가는 Gate B WO 에서.
 
 ### 5.4 핵심 한계
 **identifier type 신설은 필요조건이지 충분조건이 아니다.** ProductMaster 는 `barcode varchar(14) UNIQUE`(=primary SKU 축)를 요구하는데(표준프로세스 §3), STTEMNT_NO 는 barcode 가 아니다. 따라서 `MFDS_STTEMNT_NO` 를 추가해도 **barcode 원천이 없으면 ProductMaster row 자체를 만들 수 없다.** → §3 NO-GO 가 상위 제약.

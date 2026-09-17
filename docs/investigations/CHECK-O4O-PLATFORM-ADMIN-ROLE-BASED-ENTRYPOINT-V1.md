@@ -17,7 +17,7 @@
 | `services/web-neture/src/pages/admin/AdminDashboardPage.tsx` | platform 권한자 전용 `PlatformEntryCard`(→ `/admin/platform`) 조건부 렌더 |
 | `docs/investigations/CHECK-O4O-PLATFORM-ADMIN-ROLE-BASED-ENTRYPOINT-V1.md` | 본 문서 |
 
-→ backend/API/DB/공유 모듈/route/sidebar config/Tier1/platform UI/GP·KCos·KPA **무변경**.
+→ backend/API/DB/공유 모듈/route/sidebar config/Tier1/platform UI/KCos·KPA **무변경**.
 
 ## 3. platform role 판정 방식
 

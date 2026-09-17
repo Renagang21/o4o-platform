@@ -24,7 +24,6 @@
 | 서비스 | wrapper 경로 | route | serviceKey | http 어댑터 | 탭 |
 |---|---|---|---|---|---|
 | Neture | `pages/admin/ServiceLegalSettingsPage.tsx` | `/admin/settings/legal-terms` | `neture` | `lib/apiClient` (`api`) | 전체 3 |
-| GlycoPharm | 동일 경로 | `admin/settings/legal-terms` | `glycopharm` | 동일 | 전체 3 |
 | K-Cosmetics | 동일 경로 | `admin/settings/legal-terms` | `k-cosmetics` | 동일 | 전체 3 |
 | KPA-Society | 동일 경로 | `admin/settings/legal` | `kpa-society` | `coreApiClient` (KPA `api`는 `/api/v1/kpa` prefix라 사용 불가) | **`['profile']` 부분 노출** |
 
@@ -86,7 +85,7 @@ PUT  /api/v1/admin/services/pharmacy-hub/legal-profile      upsert
 GET  /api/v1/public/services/pharmacy-hub/footer-legal      공개 반영 확인
 ```
 
-프론트 어댑터는 Neture/GlycoPharm 과 동일한 `api.get/put` + status→문구 매핑이다.
+프론트 어댑터는 Neture 과 동일한 `api.get/put` + status→문구 매핑이다.
 
 ---
 
@@ -151,7 +150,7 @@ PUT  /api/v1/admin/services/pharmacy-hub/legal-profile 200
 
 | serviceKey | 응답 |
 |---|---|
-| `kpa-society` / `neture` / `glycopharm` / `k-cosmetics` | 전부 **200** `data: null` (WO 이전과 동일) |
+| `kpa-society` / `neture` / `k-cosmetics` | 전부 **200** `data: null` (WO 이전과 동일) |
 
 ---
 
@@ -159,7 +158,7 @@ PUT  /api/v1/admin/services/pharmacy-hub/legal-profile 200
 
 | 서비스 | 확인 |
 |---|---|
-| KPA-Society / K-Cosmetics / GlycoPharm / Neture | 공통 패키지·backend **수정 0건** → 코드 경로 불변. 공개 footer-legal 실측으로 재확인(§8) |
+| KPA-Society / K-Cosmetics / Neture | 공통 패키지·backend **수정 0건** → 코드 경로 불변. 공개 footer-legal 실측으로 재확인(§8) |
 | PharmacyHub | 신규 화면 외 기존 route·메뉴 불변 (`memberships` 등) |
 
 변경 파일은 전부 `services/web-pharmacy-hub/` 하위다.

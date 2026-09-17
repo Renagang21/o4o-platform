@@ -12,7 +12,6 @@
 ```text
 1. paid-feature entitlement(FOREIGN_VISITOR_SALES_SUPPORT) = 매장 경영자 서비스 구독 축. 삭제 금지 → STORE_SERVICE_SUBSCRIPTION 으로 재정의(판정 A).
 2. SERVICE_ACCESS = 문서 전용 용어(코드 0건). 구독 의미로 명칭 정렬 필요(판정 B).
-3. 매장 '고객 상품 구매' 결제(KPA/Glyco/KCos checkout_orders)가 O4O PaymentCore/Toss 로 처리됨 — 새 정책의 STORE_SALE_PAYMENT(O4O 제외)와 충돌(판정 C). 단 §11 중단 기준 → 삭제/수정 안 함, 정책 결정 + cleanup WO 로 분리.
 4. 고객 국적(외국인/내국인) 결제·주문 분기 = 코드 0건(§3.3 이미 충족). neture-b2b·PaymentCore·o4o_payments 무관(판정 D).
 ```
 
@@ -39,11 +38,10 @@
 | 컨트롤러 | WO | 대상 | 결제 경로 |
 |---|---|---|---|
 | `routes/kpa/controllers/kpa-payment.controller.ts` | `WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1` | `CheckoutOrder`(고객 상품 주문, orderName="상품 외 N건") | **PaymentCoreService.prepare/confirm + Toss widget** |
-| `routes/glycopharm/controllers/glycopharm-payment.controller.ts` | `WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1` | `CheckoutOrder` | 동일 (1:1) |
 | `routes/cosmetics/controllers/cosmetics-payment.controller.ts` | `WO-O4O-COSMETICS-PAYMENTCORE-INTEGRATION-V1` | `CheckoutOrder` | 동일 (1:1) |
 | `routes/neture/controllers/neture-b2b-payment.controller.ts` | `WO-O4O-NETURE-B2B-PAYMENT-FLOW-V1` | B2B checkout_order(`metadata.source='neture_b2b_checkout'`) | PaymentCore (sourceService='neture-b2b') — **B2B_ORDER** |
 
-→ **매장 '고객 상품 구매' 결제(KPA/Glyco/KCos checkout_orders)가 O4O PaymentCore/Toss 로 처리되고 있다.** 새 정책 §3.2.A(`STORE_SALE_PAYMENT` = 매장 일반 결제, **O4O Toss 제외**)와 **충돌**한다.
+→ **매장 '고객 상품 구매' 결제가 O4O PaymentCore/Toss 로 처리되고 있다.** 새 정책 §3.2.A(`STORE_SALE_PAYMENT` = 매장 일반 결제, **O4O Toss 제외**)와 **충돌**한다.
 
 > 주의: 이는 새 정책 *이전*에 구축된 흐름이다. 상위 `IR-O4O-TOSS-PAYMENT-SCOPE-AND-TYPE-SEPARATION-V1`(SERVICE_ACCESS+B2B_ORDER 만, 고객 판매 제외)와 **배포된 코드가 이미 어긋나 있었다**. 본 audit 가 이를 드러냈다.
 
@@ -64,13 +62,12 @@
 |---|---|---|
 | **A. 유지·재정의** | `store_paid_feature_entitlements` / `FOREIGN_VISITOR_SALES_SUPPORT` / menu gate / `ForeignVisitorSalesSupportPanel` / `/store-entitlements/*` | **삭제 금지.** 매장 경영자 구독 권한 = `STORE_SERVICE_SUBSCRIPTION` 으로 명칭·문서 재정의 |
 | **B. 문서 정정** | `SERVICE_ACCESS` 용어(코드 0건) — `IR-O4O-TOSS-PAYMENT-SCOPE...` · `IR-O4O-PAYMENTCORE-PAYMENT-TYPE-AXIS-DECISION-V1` · `CHECK-O4O-TOSS-PAYMENT-CORE-V1`. + 상위 scope IR 의 "고객 판매 제외" 주장이 배포 현실과 어긋남 | superseded/정정 IR — SERVICE_ACCESS=매장 구독 의미로 정렬, scope 재고정 |
-| **C. 정정 필요 — 코드/UI (중단·분리)** | KPA/Glyco/KCos `*-payment.controller.ts`(고객 checkout_orders → O4O Toss) | **본 조사 변경 0.** 정책 결정 후 cleanup WO 로 분리(삭제 금지 — §11.1) |
+| **C. 정정 필요 — 코드/UI (중단·분리)** | — | **본 조사 변경 0.** 정책 결정 후 cleanup WO 로 분리(삭제 금지 — §11.1) |
 | **D. 무관** | neture-b2b-payment(B2B_ORDER) · PaymentCore · o4o_payments · Toss adapter · 국적 분기(부재) | 변경 없음 |
 
 ## 7. 핵심 결정 필요 사항 (정책 owner 판단 — 본 조사 범위 밖)
 
 ```text
-Q. 매장 '고객 상품 구매' 결제(KPA/Glyco/KCos checkout_orders → O4O PaymentCore/Toss)를
    - (C-1) 그대로 O4O Toss 로 유지할 것인가, 또는
    - (C-2) 새 정책대로 '매장 일반 결제'로 분리(O4O Toss 제외)할 것인가?
 ```
@@ -91,7 +88,7 @@ Q. 매장 '고객 상품 구매' 결제(KPA/Glyco/KCos checkout_orders → O4O P
 
 | 기준 | 결과 |
 |---|---|
-| 매장 판매 결제 O4O Toss 대상 여부 확인 | ✅ 현재 KPA/Glyco/KCos 고객 checkout 이 O4O Toss 처리됨 — 정책과 충돌(판정 C) |
+| 매장 판매 결제 O4O Toss 대상 여부 확인 | — |
 | 서비스 구독 결제 축 보존 여부 | ✅ entitlement = 구독 축, **보존**(판정 A) |
 | SERVICE_ACCESS/entitlement 실제 역할 | ✅ SERVICE_ACCESS=문서전용 / entitlement=매장 경영자 구독 권한 |
 | 국적 구분 결제/주문 침투 | ✅ **0건**(이미 충족) |
@@ -107,4 +104,4 @@ Q. 매장 '고객 상품 구매' 결제(KPA/Glyco/KCos checkout_orders → O4O P
 
 ---
 
-*Date: 2026-06-21 · read-only audit · 코드 무변경 · entitlement=매장 경영자 구독 축(보존·재정의 A) · SERVICE_ACCESS=문서전용(정정 B) · KPA/Glyco/KCos 고객 checkout→O4O Toss 흔적=정책 충돌(분리 C, 삭제 안 함) · 국적 결제 분기 0(충족) · neture-b2b/PaymentCore/o4o_payments 무관(D).*
+*Date: 2026-06-21 · read-only audit · 코드 무변경 · entitlement=매장 경영자 구독 축(보존·재정의 A) · SERVICE_ACCESS=문서전용(정정 B) · 국적 결제 분기 0(충족) · neture-b2b/PaymentCore/o4o_payments 무관(D).*

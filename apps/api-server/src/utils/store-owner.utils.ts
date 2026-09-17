@@ -12,7 +12,6 @@
  *   role_assignments는 store_owner 판단의 단일 소스다.
  *   organization_members는 조직 정보 조회용으로만 사용한다.
  *
- * WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1:
  *   service-aware guard 도입 — cross-service role leakage 차단.
  *   서비스별 store_owner 역할 정의를 명시화하여 frontend/backend SSOT 정합 회복.
  *   기존 시그니처(serviceKey 미지정)는 back-compat 경로로 모든 서비스 role 허용.

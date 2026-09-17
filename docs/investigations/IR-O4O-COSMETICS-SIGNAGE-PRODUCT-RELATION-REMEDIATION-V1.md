@@ -30,7 +30,7 @@ K-Cosmetics 사이니지에 `product_id` 직접 관계가 남아 있다(IR-AUDIT
 - K-Cosmetics store signage 화면 (`services/web-k-cosmetics/.../store/StoreSignagePage.tsx`)
 - 관련 migration / 활성 store playlist 스키마
 - `productId` / `type='product'` / `signagePlaylistId` / `products[]` 전체 검색
-- 비교군: `packages/digital-signage-core` (KPA/GP 표준)
+- 비교군: `packages/digital-signage-core` (KPA 표준)
 
 ---
 
@@ -72,7 +72,7 @@ K-Cosmetics 에는 **이름이 비슷한 두 개의 사이니지 플레이리스
 - 설계 의도: 브랜드/카테고리/관심사 필터로 상품을 모아 캠페인을 만들고, 그 캠페인을 사이니지 플레이리스트로 자동 편성.
 - 실제: `generateAutoCampaign`(campaign.service.ts:195-273)은 products 만 모으고 **signagePlaylistId 를 할당하지 않음** → campaign↔signage 연결조차 미완. 즉 UX 로 작동하지 않는 미완 기능.
 
-### 4.5 digital-signage-core(KPA/GP) 모델과의 차이
+### 4.5 digital-signage-core(KPA) 모델과의 차이
 
 | 항목 | digital-signage-core (표준) | cosmetics (B) |
 |---|---|---|
@@ -129,7 +129,6 @@ K-Cosmetics 에는 **이름이 비슷한 두 개의 사이니지 플레이리스
 |---|---:|---|---|
 | K-Cosmetics | 사용 | 있음 | 활성 사이니지(A)는 product 무관, (B)만 dead — 제거 대상 |
 | KPA-Society | 사용 | 없음 | digital-signage-core 표준 사용, (B) 미사용 |
-| GlycoPharm | 사용 | 없음 | 동일하게 (B) signage-playlist 코드 존재하나 미사용(별도 정리 후보) |
 | Neture | 미사용 | 없음 | 매장 사이니지 대상 아님 |
 | admin / operator | 부분 | 확인 필요 | admin-dashboard auto-playlist/auto-campaign UI 의 (B) 의존 여부 — 제거 전 확인 |
 
@@ -141,7 +140,7 @@ K-Cosmetics 에는 **이름이 비슷한 두 개의 사이니지 플레이리스
 |---|---|---|---|
 | 6-1 | (B) 엔티티가 모듈에 등록돼 있어 향후 synchronize/마이그레이션으로 product 결합 테이블이 **실체화**될 수 있음 | MED | 엔티티 제거로 차단 권고 |
 | 6-2 | admin-dashboard 가 (B) 라우트를 직접 호출 중일 가능성(미확정) | LOW | 제거 전 확인 항목 |
-| 6-3 | GlycoPharm 에도 동일 (B) 계열 코드 존재 가능 — 별도 점검 필요 | LOW | 후속 점검 |
+| 6-3 | — | LOW | 후속 점검 |
 
 ---
 

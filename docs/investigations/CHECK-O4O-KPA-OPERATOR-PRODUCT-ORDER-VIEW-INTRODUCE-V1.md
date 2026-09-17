@@ -12,8 +12,8 @@
 
 | 화면 | KPA backend | 판정 |
 |---|---|---|
-| **상품 현황** | `/api/v1/operator/products`(플랫폼 extension, `routes/operator/products.routes.ts`) — VALID scope 에 **`kpa-society:operator` 포함**(line 24). serviceKey 쿼리 지원(GP/KCos 동일 사용). | ✅ **적용 가능** (frontend wiring only) |
-| **주문 현황** | GP=`/glycopharm/operator/orders`, KCos=`/cosmetics/operator/orders` 존재. **KPA `/kpa/operator/orders` 라우트 부재**(kpa routes grep 0). 공통 헬퍼 `routes/common/order/operatorOrderQuery.ts` 는 있으나 KPA 미마운트. | ⛔ **부재 → 보류** (backend 확장 필요, 중단 기준 #2/#5) |
+| **상품 현황** | `/api/v1/operator/products`(플랫폼 extension, `routes/operator/products.routes.ts`) — VALID scope 에 **`kpa-society:operator` 포함**(line 24). serviceKey 쿼리 지원(KCos 동일 사용). | ✅ **적용 가능** (frontend wiring only) |
+| **주문 현황** | **KPA `/kpa/operator/orders` 라우트 부재**(kpa routes grep 0). 공통 헬퍼 `routes/common/order/operatorOrderQuery.ts` 는 있으나 KPA 미마운트. | ⛔ **부재 → 보류** (backend 확장 필요, 중단 기준 #2/#5) |
 
 → 데드링크 방지를 위해 **상품 현황만 도입**, 주문 현황 메뉴/route 추가 안 함.
 
@@ -34,7 +34,7 @@
 ### 문서
 - `docs/investigations/CHECK-O4O-KPA-OPERATOR-PRODUCT-ORDER-VIEW-INTRODUCE-V1.md`
 
-> **동시 세션 WIP 미접촉:** `storeMenuConfig.ts`, GP `App.tsx`, GP `PharmacyB2BProducts.tsx`, KCos `StoreCommerceProductsPage.tsx`, KPA `PharmacyB2BPage.tsx`(다른 세션 store 작업) **본 커밋 미포함**. path-specific staging, `git add .` 미사용.
+> **동시 세션 WIP 미접촉:** `storeMenuConfig.ts` `App.tsx` `PharmacyB2BProducts.tsx`, KCos `StoreCommerceProductsPage.tsx`, KPA `PharmacyB2BPage.tsx`(다른 세션 store 작업) **본 커밋 미포함**. path-specific staging, `git add .` 미사용.
 
 ---
 
@@ -51,23 +51,23 @@
 
 ## 5. KPA menu 추가 내용
 
-- `operatorMenuGroups.ts` UNIFIED_MENU 에 `products: [{ label: '상품 현황', path: '/operator/products' }]` 추가(approvals 다음). GP/KCos 와 동일 group key `products` → 공유 domain IA(operator-ux-core) 매핑 재사용으로 노출.
+- `operatorMenuGroups.ts` UNIFIED_MENU 에 `products: [{ label: '상품 현황', path: '/operator/products' }]` 추가(approvals 다음). KCos 와 동일 group key `products` → 공유 domain IA(operator-ux-core) 매핑 재사용으로 노출.
 - capability: 기존 `STORE_MANAGEMENT`(ENABLED) 사용 — **신규 capability 없음**.
 - **주문 현황 메뉴 미추가**(backend 부재 → 데드링크 금지 원칙).
 
 ## 6. serviceKey / API endpoint
 
 - serviceKey: **`kpa-society`** (products.routes VALID scope `kpa-society:operator` 와 정합).
-- endpoint: `GET /api/v1/operator/products?serviceKey=kpa-society&...` (플랫폼 extension, GP/KCos 동일 경로·shape).
+- endpoint: `GET /api/v1/operator/products?serviceKey=kpa-society&...` (플랫폼 extension, KCos 동일 경로·shape).
 
 ## 7. view-only 정책 유지 확인
 
 - 생성/수정/삭제·주문 상태변경/배송/취소/환불/송장/정산/bulk/selectable **0**(공통 컴포넌트 불변 — 액션 미추가).
 - KPA 는 추가로 `detailPathBase: null` 로 **행 클릭 네비게이션도 비활성**(상세 화면 없음 → 순수 목록 조회).
 
-## 8. GP/KCos/Neture 미변경 확인
+## 8. KCos/Neture 미변경 확인
 
-- GP/KCos wrapper·route·menu **미접촉**. 공통 컴포넌트 변경은 **additive**(`detailPathBase` 미전달 시 기본 `/operator/products` 유지) → GP/KCos 행 클릭 동작 **불변**(build 로 검증).
+- KCos wrapper·route·menu **미접촉**. 공통 컴포넌트 변경은 **additive**(`detailPathBase` 미전달 시 기본 `/operator/products` 유지) → KCos 행 클릭 동작 **불변**(build 로 검증).
 - Neture 미접촉.
 
 ## 9. TypeScript 결과
@@ -76,7 +76,6 @@
 |---|---|
 | `packages/operator-core-ui` | error **0** (무관한 error-handling 제외) |
 | `services/web-kpa-society` | error **0** |
-| `services/web-glycopharm` | error **0** |
 | `services/web-k-cosmetics` | error **0** |
 
 ## 10. build 결과
@@ -84,7 +83,6 @@
 | 대상 | 결과 |
 |---|---|
 | `web-kpa-society` (`vite build`) | ✅ built in 14.31s |
-| `web-glycopharm` (`vite build`) | ✅ built in 12.96s (공통 컴포넌트 변경 무영향 확인) |
 | `web-k-cosmetics` (`vite build`) | ✅ built in 11.98s (무영향 확인) |
 
 ## 11. smoke 결과 / 보류 사유
@@ -95,7 +93,7 @@
 
 - ✅ **#2 해당(주문 현황):** KPA operator orders API 부재 → 주문 현황 **미도입**, 별도 backend WO 로 분리.
 - 그 외(#1/#3/#4/#5/#6): 상품 현황은 backend-ready + auth scope OK + 순수 frontend wiring → 해당 없음.
-- 공통 컴포넌트 `detailPathBase` nullable 추가는 **additive backward-compatible**(GP/KCos 불변, build 검증) — 데드링크 방지 위한 최소 변경. 명시적 deviation 으로 기록.
+- 공통 컴포넌트 `detailPathBase` nullable 추가는 **additive backward-compatible**(KCos 불변, build 검증) — 데드링크 방지 위한 최소 변경. 명시적 deviation 으로 기록.
 
 ## 13. 후속 필요 여부
 
@@ -112,8 +110,8 @@
 | 상품 현황 | ✅ 도입(route+menu+wrapper, backend-ready) |
 | 주문 현황 | ⛔ 보류(backend `/kpa/operator/orders` 부재) |
 | view-only | 유지(액션 0, 행 클릭도 비활성) |
-| GP/KCos/Neture | 미변경(공통 컴포넌트 additive, build 검증) |
+| KCos/Neture | 미변경(공통 컴포넌트 additive, build 검증) |
 | TypeScript / build | 전부 PASS |
 | KPA parity | **부분 완성**(상품 ✅ / 주문 ⛔ backend 대기) |
 
-*Date: 2026-06-16 · KPA operator '상품 현황' view-only 도입(serviceKey=kpa-society, /operator/products extension) · 주문 현황은 KPA backend 부재로 보류 · 공통 컴포넌트 detailPathBase nullable additive(GP/KCos 불변) · typecheck+build(KPA/GP/KCos) PASS · backend 무변경 · 후속: KPA operator orders backend WO.*
+*Date: 2026-06-16 · KPA operator '상품 현황' view-only 도입(serviceKey=kpa-society, /operator/products extension) · 주문 현황은 KPA backend 부재로 보류 · 공통 컴포넌트 detailPathBase nullable additive(KCos 불변) · typecheck+build(KPA/KCos) PASS · backend 무변경 · 후속: KPA operator orders backend WO.*

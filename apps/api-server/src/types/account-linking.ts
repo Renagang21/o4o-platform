@@ -264,7 +264,7 @@ export interface ServiceUserLoginResponse {
  * QR/키오스크/사이니지 진입 시 Guest Token 발급 요청
  */
 export interface GuestTokenIssueRequest {
-  /** Service identifier (e.g., 'kpa-pharmacy', 'glycopharm') */
+  /** Service identifier (e.g., 'kpa-pharmacy', 'neture') */
   serviceId: string;
   /** Store identifier (optional, for store-specific access) */
   storeId?: string;

@@ -4,7 +4,7 @@
  * WO-O4O-CROSSSERVICE-OPERATOR-LAYOUT-WRAPPER-COMMON-COMPONENT-V1
  *
  * 목적:
- *   KPA-Society / GlycoPharm / K-Cosmetics 의 operator layout wrapper 가 각각 보유하던
+ *   KPA-Society / K-Cosmetics 의 operator layout wrapper 가 각각 보유하던
  *   동일한 layout shell (outer div + container + flex + DomainIASidebar + main/Outlet) 을
  *   단일 공통 컴포넌트로 추출. 기능 변경 없는 중복 제거 리팩토링.
  *
@@ -21,7 +21,7 @@
  *   - menuItems / capabilities 는 서비스 wrapper 가 계산하여 props 로 주입.
  *
  * 명명 주의:
- *   GlycoPharm App.tsx 에 지역 함수 OperatorAreaLayout() 이 이미 존재하므로 공통 컴포넌트는
+ *   일부 서비스 App.tsx 에 지역 함수 OperatorAreaLayout() 이 이미 존재하므로 공통 컴포넌트는
  *   `OperatorAreaShell` 로 명명하여 import 충돌을 회피한다.
  */
 

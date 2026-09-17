@@ -37,7 +37,7 @@
 - help / AppEntry / CTA / notices / Hero 등 다른 섹션 — 불변
 - **`StandardHomeTemplate.tsx`** — 미접촉 (기본값이 이미 before-app-entry)
 - **`HeroBannerSection.tsx`** — 미접촉
-- Neture / GlycoPharm / K-Cosmetics — 미접촉 (Neture 이미 표준, Glyco/KCos 역할 카드 없음)
+- Neture / K-Cosmetics — 미접촉 (Neture 이미 표준, KCos 역할 카드 없음)
 - Market Trial CTA 아이콘 작업(`dcc4b55a9`) — 섞지 않음
 - 다른 세션 WIP — 미접촉
 

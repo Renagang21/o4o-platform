@@ -247,7 +247,7 @@ Q8. O4O 설명 제작에 참고 가능한 필드는 무엇인가?
 🚫 serviceKey / secret / DB password / report 원문 커밋 금지
 ```
 
-**공유 계층 변경 주의**(CLAUDE.md Shared Module Rule): `product_masters`/`product_identifiers`/`product_candidates` 는 KPA/GlycoPharm/Cosmetics/Neture 공통 Core 다. 한 분류 전용 변경으로 처리하지 말고 **공통 정책 문제로 먼저 판단**한다.
+한 분류 전용 변경으로 처리하지 말고 **공통 정책 문제로 먼저 판단**한다.
 
 ---
 

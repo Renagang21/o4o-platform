@@ -15,7 +15,7 @@
  * guideLink 를 null 에서 실제 매뉴얼로 되살린다.
  *
  * fetchDerivations: Pharmacy-Hub 에는 원본→사본 파생(store_asset_derivations) 생성 경로가
- * 아직 없다. 공통 `/store/asset-derivations` 는 KPA/GP/KCos mount 전용 가드(requirePharmacyOwner)
+ * 아직 없다. 공통 `/store/asset-derivations` 는 KPA/KCos mount 전용 가드(requirePharmacyOwner)
  * 라 그대로 호출할 수 없고, 본 WO 는 공통 가드 변경을 금지한다. 따라서 빈 결과를 돌려주는
  * 어댑터를 주입한다 — 다른 조직 데이터를 노출할 경로 자체를 만들지 않는다.
  */

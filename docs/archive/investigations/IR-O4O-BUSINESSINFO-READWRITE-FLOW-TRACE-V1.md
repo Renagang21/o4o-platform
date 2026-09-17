@@ -43,7 +43,7 @@
 | N2 | **FLOW O (PUT /admin/users/:id) businessInfo silent discard** | 🔴 HIGH | admin-dashboard 측 AdminUserController.updateUser:337-356 — KPA-society 흐름 외에도 admin-dashboard 가 이 엔드포인트 사용 시 사업자 정보 손실 |
 | N3 | **`pharmacy_owner` → other 전환 시 organizations record orphan** | 🟠 MID | role_assignments 만 deactivate, organizations 자체는 미삭제 → stale 데이터 잔존 |
 | N4 | **세금계산서 발행 시스템 부재 — `taxInvoiceEmail` dead data 가능성** | 🟡 LOW (현재) / 🟠 MID (향후) | 5 곳 수집되지만 operator display 외 consumer 없음. 향후 invoice 도입 시 어느 데이터가 정답인지 결정 어려움 |
-| N5 | **Dead writes 4 건** | 🟡 LOW | `users.businessInfo.address2`, `users.businessInfo.zipCode`, `kpa_pharmacy_requests.pharmacy_phone/owner_phone`, `glycopharm_applications.metadata` — write 됨 but read 안 됨 |
+| N5 | **Dead writes 4 건** | 🟡 LOW | `users.businessInfo.address2`, `users.businessInfo.zipCode`, `kpa_pharmacy_requests.pharmacy_phone/owner_phone` — write 됨 but read 안 됨 |
 
 ### 0-3. 핵심 질문 답변 (요약)
 
@@ -218,7 +218,7 @@ await apiFetch(`/api/v1/operator/members/${userId}`, {
 | C4 | Neture operator self-register | [operator-registration.service.ts:~310-330](apps/api-server/src/modules/neture/services/operator-registration.service.ts) | `neture-{slug}` | 'supplier' | name (bizName), code, type, isActive=true |
 | C5 | Cosmetics store bridge migration | `20260311200000-CosmeticsStoreOrgBridge.ts:96-118` | cosmetics_stores.code | 'store' | name, code, type, address, phone, business_number, metadata={serviceKey:'cosmetics', cosmeticsStoreId} |
 | C6 | KPA orgs sync migration | `20260221000000-OrgServiceModelNormalizationPhaseA.ts:128-252` | `kpa-{uuid_no_dash}` | (from kpa_organizations.type) | name, type, parent_id, address, phone, description |
-| C7 | Glycopharm bridge migration | `20260221000000-OrgServiceModelNormalizationPhaseA.ts:254-310` | `gp-{uuid_no_dash}` | 'pharmacy' | name, address, phone, description (from glycopharm_pharmacies) |
+| C7 | — | `20260221000000-OrgServiceModelNormalizationPhaseA.ts:254-310` | `gp-{uuid_no_dash}` | 'pharmacy' | name, address, phone, description |
 | C8 | Forum/Community seed migration | `2026020400002-SeedForumServiceOrganizations.ts` | (hardcoded) | 'community' | seed data |
 
 ### 3-2. 6 UPDATE Entrypoint
@@ -252,8 +252,8 @@ await apiFetch(`/api/v1/operator/members/${userId}`, {
 | OR1 | Neture supplier profile GET | [supplier.service.ts:965-984](apps/api-server/src/modules/neture/services/supplier.service.ts#L965-L984) | name, business_number, address, phone, address_detail | Supplier profile display |
 | OR2 | Neture batch org read | supplier.service.ts:990-1012 | id, name, business_number, address, phone | Supplier listings (high-freq) |
 | OR3 | StoreConsoleController list | StoreConsoleController.ts:60-150 | name, code, type, isActive, storefront_config, address, phone, created_by_user_id | Operator store list |
-| OR4 | Pharmacy context middleware | glycopharm/pharmacy-context.middleware.ts | id, isActive | Order/checkout 가드 |
-| OR5 | Glycopharm pharmacy resolve | resolve-pharmacy.ts | id/code → pharmacy 결정 | Order placement |
+| OR4 | Pharmacy context middleware | pharmacy-context.middleware.ts | id, isActive | Order/checkout 가드 |
+| OR5 | — | resolve-pharmacy.ts | id/code → pharmacy 결정 | Order placement |
 | OR6 | Neture operator dashboard | operator-dashboard.controller.ts | summary | KPI/analytics |
 | OR7 | Forum organizations controller | forum/forum-organizations.ts | full object scope-filtered | Forum API |
 | OR8 | Platform store-policy guard | store-policy.routes.ts | id, created_by_user_id | Authorization |
@@ -416,15 +416,6 @@ targetUser.businessInfo = { ...(targetUser.businessInfo || {}), ...sourceUser.bu
 
 → supplier 자체 컬럼이 SSOT 역할 (organizations 가 partial mirror).
 
-### 6-5. GlycoPharm application snapshot dead
-
-[auth-register.controller.ts:538-584](apps/api-server/src/modules/auth/controllers/auth-register.controller.ts#L538-L584):
-- Register 시 `glycopharm_applications.metadata` 에 representativeName/taxEmail/address 등 snapshot
-- **이후 어디서도 read 안 됨** (A4 확인)
-- → **dead write**
-
----
-
 ## 7. Sync Gap 상세
 
 | Write source | Target needing sync | 현재 동작 | 영향 |
@@ -438,7 +429,6 @@ targetUser.businessInfo = { ...(targetUser.businessInfo || {}), ...sourceUser.bu
 | W3 metadata.workplace | (없음 — KPA only) | no further sync | 정상 (mypage 만 사용) |
 | W6 account-linking merge | organizations / role_assignments / service_memberships | sync 없음 | account merge 후 org 데이터 stale 가능 |
 | W1 KPA pharmacy_owner 분기 metadata | (다른 곳) | 어디서도 read 안 됨 | **dead write** |
-| Glycopharm application metadata snapshot | (다른 곳) | 어디서도 read 안 됨 | **dead write** |
 
 ---
 
@@ -538,12 +528,12 @@ T2: Supplier 가 profile 수정 (PUT /neture/supplier/profile)
 | RC4 | KPA Operator Member Edit | users.businessInfo | display + write |
 | RC5 | Neture Supplier Profile | neture_suppliers + organizations + users.businessInfo (prefill) | org-primary 체인 |
 | RC6 | Neture Supplier Dashboard | neture_suppliers + org | 404 if supplier 없음 |
-| RC7 | Glycopharm pharmacy resolve | organizations | order 차단 |
+| RC7 | — | organizations | order 차단 |
 | RC8 | Operator Console Store List | organizations | display |
 | RC9 | Forum Organizations API | organizations | display |
 | RC10 | Platform Store Policy | organizations.created_by_user_id | authorization gate |
 | RC11 | UserDetailPage / EditUserModal (packages/ui) | users.businessInfo | display + edit form |
-| RC12 | Glycopharm Application creation | request payload only (snapshot) | dead post-create |
+| RC12 | — | request payload only (snapshot) | dead post-create |
 
 ### 9-2. 부재 Consumer (있을 것으로 예상되나 없음)
 
@@ -572,7 +562,7 @@ A4 직접 grep 결과 **존재하지 않는 시스템**:
 | Service Membership | **`service_memberships`** (Frozen F11) | 완전 SSOT | 변경 없음 |
 | RBAC | **`role_assignments`** (Frozen F9) | 완전 SSOT | 변경 없음 |
 | Org Membership Role | **`organization_members`** | 완전 SSOT | 변경 없음 |
-| Address (구조화) | **`StoreAddress` type + `organizations.address_detail` jsonb** | 표준 적용됨 (organizations/glycopharm/cosmetics) | kpa_members.pharmacy_address denormalized 제거, neture_partners 의 자체 구조 정렬 |
+| Address (구조화) | **`StoreAddress` type + `organizations.address_detail` jsonb** | 표준 적용됨 | kpa_members.pharmacy_address denormalized 제거, neture_partners 의 자체 구조 정렬 |
 | Personal Business Cache | **`users.businessInfo`** (form input + display cache) | 7 write path, single canonical write path 부재 | 명시적 "cache only" 선언 + bidirectional sync 보장 OR deprecate 후 frontend 가 organizations 직접 호출 |
 | Tax Invoice Email | **(시스템 부재 — 결정 보류)** | 5 곳 분산 | 향후 invoice 시스템 도입 시 결정. 후보: `organizations.tax_invoice_email` 컬럼 신설 (선행 IR §4-4 Option B) |
 | Manager (담당자) | **(현재 Neture-only)** | service-local | 향후 cross-service 필요 시 organizations 표준 컬럼 |
@@ -616,7 +606,7 @@ SSOT 아님. 단 현재는 form-side 의 사실상 canonical (single source for 
 
 **답**: **partial SSOT**.
 - ✅ create + update + read 경로 모두 존재
-- ✅ KPA / GlycoPharm / Cosmetics / Neture 가 모두 organization_id FK 또는 metadata 로 연결
+- ✅ KPA / Cosmetics / Neture 가 모두 organization_id FK 또는 metadata 로 연결
 - ❌ reverse sync (organizations → users.businessInfo) 부재
 - ❌ kpa_organizations dual maintenance (전환 진행 중)
 - ❌ neture_suppliers 의 supplier-specific 컬럼은 별도 SSOT (representative_name/manager_*/tax_email)
@@ -636,7 +626,6 @@ SSOT 아님. 단 현재는 form-side 의 사실상 canonical (single source for 
 | KPA PharmacyInfo display | `organizations.address_detail` + `organizations.metadata` + `kpa_pharmacy_requests` fallback + `users.businessInfo.storeAddress` fallback |
 | Neture supplier profile | `neture_suppliers` + `organizations` (org-primary) |
 | Auto-activation gate | `users.businessInfo.businessNumber` / `businessName` |
-| Glycopharm order routing | `organizations` (resolve-pharmacy) |
 
 → 사용자가 어디서 보느냐에 따라 다른 source. 정렬 후에는 `organizations` 가 모든 post-approval context 의 source 가 되어야.
 
@@ -675,7 +664,7 @@ SSOT 아님. 단 현재는 form-side 의 사실상 canonical (single source for 
 - `WO-O4O-STORE-PROFILE-UNIFICATION-V1` migration (`20260318200000`) 으로 표준 적용
 - KPA PharmacyInfoPage GET/PUT 의 primary source
 - Neture supplier profile 의 org-primary source
-- GlycoPharm / Cosmetics 도 같은 패턴 적용
+- Cosmetics 도 같은 패턴 적용
 
 비표준 (deprecate 권장):
 - `users.businessInfo.address` / `address2` (legacy varchar)
@@ -697,7 +686,6 @@ KPA manual path:
 Neture register path:
   POST /neture/suppliers → E3 ensure (inactive) → operator approve → E4 ensure (activate) → role_assignments(neture:supplier)
 
-Cosmetics / GlycoPharm:
   migration 으로 backfill (C5, C7) — runtime ensure 부재 (별도 도메인 테이블이 primary)
 ```
 
@@ -733,7 +721,7 @@ ensure call 의 dedup: `code` UNIQUE. E1 ↔ E2 race 시 ON CONFLICT DO UPDATE �
 | P2 🟠 | `WO-O4O-PHARMACY-OWNER-ROLE-TRANSITION-ORG-CLEANUP-V1` — pharmacy_owner → other 전환 시 organizations record orphan 처리 (soft-archive) | N3 | 정책 결정 (orphan 보존 vs 삭제) |
 | P2 🟠 | `WO-O4O-BUSINESSINFO-CEO-NAME-CANONICAL-V1` — code 의 representativeName 표기를 ceoName 으로 통일 + jsonb migration | H2 (selve IR 위험 #2) | type 정리 |
 | P3 🟡 | `WO-O4O-BUSINESSINFO-EMAIL-SEMANTIC-RESTORE-V1` — taxEmail → businessInfo.email overwrite 패턴 제거. businessInfo.email 의미를 "대표 이메일" 으로 복원 | H1 | invoice 시스템 결정 prerequisite |
-| P3 🟡 | `WO-O4O-DEAD-WRITE-CLEANUP-V1` — address2/zipCode flat field, glycopharm_applications.metadata, kpa_pharmacy_requests.pharmacy_phone/owner_phone 의 dead write 제거 | N5 | 검증 후 |
+| P3 🟡 | — | N5 | 검증 후 |
 | P4 🟡 | `WO-O4O-NETURE-SUPPLIER-COLUMN-CONSOLIDATION-V1` — neture_suppliers.representative_name/manager_*/tax_email 의 organizations 통합 (또는 명시적 service-local 정책 선언) | C5 transitional | 정책 결정 (cross-service 표준 vs service-local) |
 | P5 🟡 | `WO-O4O-BUSINESSINFO-SINGLE-WRITE-PATH-V1` — 모든 사업자 정보 write 를 단일 service (BusinessProfileWriteService) 로 통합 | 7 write path drift | 위 WO 들 선행 |
 
@@ -742,13 +730,12 @@ ensure call 의 dedup: `code` UNIQUE. E1 ↔ E2 race 시 ON CONFLICT DO UPDATE �
 ## 13. 본 IR 범위 외 (후속)
 
 1. **admin-dashboard 측 EditUserModal** (`packages/ui/src/operator-user-detail/EditUserModal.tsx`) 의 실제 endpoint + AdminUserController.updateUser:337-356 의 silent discard 영향 범위 (위험 N2)
-2. **GlycoPharm RegisterPage / K-Cosmetics RegisterPage** 의 write trace (선행 IR §12 후속 IR #1, #2 와 동일)
 3. **`kpa_pharmacy_requests` deprecate 가능 여부 검증** — auto-path 정착 후 사용 빈도
 4. **`organizations.metadata` 의 typed schema 전환 검토** (선행 IR §12 후속 IR #7)
 5. **`activity_type` 매핑표** — pharmacy_owner / kpa:store_owner / employed_pharmacist / pharmacy_employee 등 (선행 IR #5)
 6. **`kpa_member_services` vs `service_memberships` 동기화 계약** (선행 IR #8)
 7. **`address` 단일 free-text → StoreAddress 마이그레이션 정책** — register 시점 free-text 가 어디까지 보존되어야 하는가
-8. **dead writes 4 건 의 영향 검증** (특히 glycopharm_applications.metadata)
+8. **dead writes 4 건 의 영향 검증**
 
 ---
 

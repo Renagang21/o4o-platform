@@ -68,7 +68,6 @@ services/web-kpa-branch/src/lib/api/memberConsole.ts
 drift 의 내용은 서로 독립인 2건이다. 하나의 원인으로 묶어 판정하지 않고 각각 분리 판정했다.
 
 ```text
-1. services/web-glycopharm importer 블록(139줄) 제거
 2. ts-jest optional peer 스냅샷에 (esbuild@0.27.0) 추가
 ```
 
@@ -80,36 +79,6 @@ CI 의 `setup-build-env` 는 `strict-lockfile: 'true'` 로 frozen install 을 �
 같은 이유로 이 stale importer 를 통과시켰고, 뒤이어 `ci-build-app.sh` 의 비-frozen install 이
 lockfile 을 고쳐 썼다. CI 는 그 결과를 커밋하지 않으므로 **결함이 보이지 않은 채 유지**됐고,
 로컬에서만 무관한 diff 로 나타났다. 직전 WO(`3dfd68357`)에서 실제로 이 현상이 관측되어 본 WO 로 분리됐다.
-
----
-
-## 4. GlycoPharm importer 판정
-
-| 조사 | 결과 |
-|---|---|
-| lockfile 내 `services/web-glycopharm:` | `pnpm-lock.yaml` importers 블록 내 139줄 |
-| 워크스페이스 실재 여부 | 디렉터리는 로컬에 남아 있으나 **`package.json` 없음**, git 추적 파일 **0건** (`dist/`, `node_modules/` 잔재만) |
-| `pnpm-workspace.yaml` | `services/*` 로 포함 대상이나 `package.json` 이 없어 pnpm 이 package 로 인식하지 않는다 |
-| 삭제 커밋 | `83853d8d3 feat(platform)!: GlycoPharm 서비스 완전 삭제 (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)` |
-| 그 커밋이 `pnpm-lock.yaml` 을 변경했는가 | **아니다** — `git show --stat 83853d8d3 -- pnpm-lock.yaml` 출력 0 |
-
-**판정: 판정 B(stale lockfile importer) — 정리한다.**
-
-서비스는 별도 WO 로 완전 삭제되었는데 lockfile importer 만 방치된 것이다.
-CLAUDE.md §4 에도 GlycoPharm OrderType 이 해당 WO 에서 제거되었다고 명시되어 있다.
-
-정리 조건 5개를 모두 만족한다.
-
-```text
-package.json dependency 변경 0          ✅
-dependency 버전 의도 변경 0              ✅
-삭제된 workspace importer 정리 근거 명확  ✅ (삭제 커밋 83853d8d3 · package.json 부재 · 추적 파일 0)
-동일 pnpm 버전에서 결과 재현 가능          ✅ (10.25.0, 2/2)
-불필요한 전체 lockfile churn 없음         ✅ (해당 importer 블록 139줄만)
-```
-
-GlycoPharm 서비스 재생성 · 복구는 하지 않았다. 로컬 잔여 디렉터리도 삭제하지 않았다(금지 범위).
-lockfile 잔재만 제거했다.
 
 ---
 
@@ -125,8 +94,6 @@ optional peer 로 붙인다. `apps/api-server` 자신은 `esbuild` 를 의존하
 
 | 시작 상태 | 실행 | esbuild 가 붙은 ts-jest 스냅샷 |
 |---|---|---|
-| 커밋본 (glycopharm importer 있음) | `pnpm install` (비-frozen) | **생김** (2/2 재현) |
-| 커밋본 − glycopharm importer 수동 제거 | `pnpm install --frozen-lockfile` | **안 생김**, 추가 변화 0 |
 | 위 상태 | `pnpm install` (비-frozen) | **안 생김**, 추가 변화 0 |
 
 → esbuild 변화는 **독립적으로 필요한 정규화가 아니다.**
@@ -187,7 +154,7 @@ install 자체를 삭제하면 clean clone 에서의 단독 실행이 깨진다.
 | 파일 | 변경 |
 |---|---|
 | `scripts/ci-build-app.sh` | install 계약 1줄 변경 + 근거 주석 |
-| `pnpm-lock.yaml` | `services/web-glycopharm` importer 블록 **139줄 삭제만** |
+| `pnpm-lock.yaml` | — |
 | `apps/api-server/src/__tests__/ci-install-lockfile-contract.spec.ts` | 신규 회귀 가드 |
 | `docs/checks/CHECK-O4O-CI-INSTALL-LOCKFILE-DRIFT-REPRODUCIBILITY-CLOSURE-V1.md` | 본 문서 |
 
@@ -248,7 +215,6 @@ apps/api-server/src/__tests__/shortcode-domain-retirement.spec.ts
 
 원인은 `packages/block-core` 와 `packages/cosmetics-seller-extension` 디렉터리가
 **git 추적 파일 0건인 채로 로컬에만 남아 있기 때문**이다(`dist/`·`node_modules/` 잔재).
-`services/web-glycopharm` 과 같은 종류의 로컬 잔재이며, clean clone 인 CI 에서는 재현되지 않는다.
 본 WO 의 변경 이전에도 동일하게 실패했고, 로컬 디렉터리 삭제는 금지 범위이므로 손대지 않았다(§10-3).
 
 ---
@@ -259,9 +225,6 @@ apps/api-server/src/__tests__/shortcode-domain-retirement.spec.ts
    실행이 성립하고 lockfile 을 오염시키지 않으므로 install 계약 정정과 분리했다.
 2. **`packageManager` 필드 부재** — pnpm 고정이 `volta.pnpm` 과 CI action 기본값 2곳으로 나뉜다.
    corepack 기준 단일화는 별도 WO 대상. 이번에는 가드로 불일치만 차단해 두었다.
-3. **로컬 잔여 디렉터리** — `services/web-glycopharm`, `packages/block-core`,
-   `packages/cosmetics-seller-extension` 은 git 추적 파일 0건인데 `dist/`·`node_modules/` 가 남아 있다.
-   로컬 디렉터리 삭제는 본 WO 금지 범위이며 clean CI 에서는 재현되지 않는다.
 4. **배포 경로의 install fallback** — `setup-build-env` 의 `strict-lockfile` 기본값 경로는 여전히
    `pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile` 로 우회한다.
    이번 stale importer 정리로 fallback 이 발동할 이유는 사라졌으나, 계약 자체의 정비는 별도 WO 대상.

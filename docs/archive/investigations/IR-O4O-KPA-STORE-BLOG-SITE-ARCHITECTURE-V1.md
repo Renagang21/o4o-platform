@@ -10,7 +10,7 @@
 
 ## 0. 핵심 결론 (TL;DR)
 
-> **현재 Blog는 V1 시점("단순 게시판 A")에서 "콘텐츠 채널 B + 매장 홍보 블로그 C" 영역으로 본격적으로 진화했다. 매장 Identity 헤더·SEO·다중 템플릿·AI Wiring·RichText·메타 entity가 모두 적용 완료되었으며, KPA + GlycoPharm 두 서비스에서 동일한 shared-space-ui 자산을 재사용 중이다.**
+> 현재 Blog는 V1 시점("단순 게시판 A")에서 "콘텐츠 채널 B + 매장 홍보 블로그 C" 영역으로 본격적으로 진화했다.
 
 > **반면 packages/blog-core 정식 패키지(forum-core 패턴)는 여전히 부재이며, 카테고리/태그/댓글/예약 발행 같은 "블로그 운영 도구" 영역은 미진하다. "매장 미니 사이트(D)" 방향은 여전히 비추천 (StorefrontHomePage가 그 역할).**
 
@@ -23,9 +23,9 @@
 4. **매장 Identity 헤더 적용 완료** — `BlogPublicHeader` (로고·매장명·소개·heroImage·"매장 메인으로" navigation). compact 옵션 제공.
 5. **AI Wiring 활성** — AiContentModal + /api/ai/content 프록시(Gemini). content/title/excerpt 자동 채움(미입력 시만), 본문 항상 replace, 자동 발행 없음.
 6. **RichText 본문 적용 완료** — TipTap 기반 RichTextEditor(@o4o/content-editor), HTML 저장, sanitize 처리, plain text 역호환.
-7. **Backend factory 패턴** — `createBlogController(dataSource, requireAuth, serviceKey)`. KPA('kpa') / GlycoPharm(default 'glycopharm') 등록.
-8. **Cross-service 변화**: KPA + GlycoPharm 활성, **Neture RETIRE 완료** (UI/route 제거, entity 공유 유지), K-Cosmetics 미도입.
-9. **shared-space-ui 추출 완료** — BlogPublicHeader / blogTemplates / useBlogSeo / client.ts 4개 자산. KPA·GlycoPharm 100% 재사용.
+7. **Backend factory 패턴** — `createBlogController(dataSource, requireAuth, serviceKey)`. KPA('kpa') 등록.
+8. **Cross-service 변화**: KPA 활성, **Neture RETIRE 완료** (UI/route 제거, entity 공유 유지), K-Cosmetics 미도입.
+9. **shared-space-ui 추출 완료** — BlogPublicHeader / blogTemplates / useBlogSeo / client.ts 4개 자산. KPA 100% 재사용.
 10. **packages/blog-core 정식 패키지는 미존재** — Forum-core 패턴(라이프사이클 / manifest / lifecycle hooks / admin-ui 통합)은 적용 안 됨.
 
 ---
@@ -45,7 +45,6 @@
 | 미리보기 버튼 | ❌ | ✅ (window.open) | (PUBLIC-HEADER WO 묶음) |
 | 공개 URL 복사 버튼 | ❌ | ✅ (clipboard) | (동일) |
 | Blog 설정 화면 (이름/설명/heroImage/template) | ❌ | ✅ (별도 'settings' 모드) | WO-O4O-KPA-STORE-BLOG-META-V1 |
-| GlycoPharm Blog 도입 | ❌ (코드 부재) | ✅ (KPA canonical 100% 재사용) | WO-O4O-GLYCO-BLOG-INTRODUCE-V1 |
 | Neture Blog 정렬/제거 | △ (활성, 부분 정렬) | ❌ → 의도적 제거 | WO-O4O-NETURE-BLOG-CANONICAL-ALIGN-V1 → WO-O4O-NETURE-BLOG-RETIRE-V1 |
 | shared-space-ui Blog 자산 추출 | ❌ (없음) | ✅ (4개 자산) | WO-O4O-BLOG-UI-PARTIAL-EXTRACT-V1 |
 | 자료함 → 제작 시작 → Blog 흐름 | △ (단순 prefill) | ✅ (canonical 단일 진입) | WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS, WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION |
@@ -68,8 +67,6 @@
 | 공개 — 목록 | [StoreBlogPage](services/web-kpa-society/src/pages/store/StoreBlogPage.tsx) | `/store/:storeSlug/blog` ([App.tsx:905](services/web-kpa-society/src/App.tsx#L905)) | 무인증 |
 | 공개 — 상세 | [StoreBlogPostPage](services/web-kpa-society/src/pages/store/StoreBlogPostPage.tsx) | `/store/:storeSlug/blog/:postSlug` ([App.tsx:907](services/web-kpa-society/src/App.tsx#L907)) | 무인증 |
 | Legacy redirect | KpaRedirect | `/kpa/store/:slug/blog[/:postSlug]` → 위 라우트 | — |
-
-GlycoPharm도 **동일 경로 구조**(`/store/:slug/blog`)로 운영하며, slug → serviceKey 해석은 `StoreSlugService` + `unified-store-public.routes.ts`가 담당.
 
 ### 2.2 관리 UX (refresh)
 
@@ -134,7 +131,7 @@ GlycoPharm도 **동일 경로 구조**(`/store/:slug/blog`)로 운영하며, slu
 |---|---|:---:|---|
 | id | uuid | NO | PK |
 | store_id | uuid | NO | 매장 |
-| service_key | varchar(50) | NO | `kpa` / `glycopharm` |
+| service_key | varchar(50) | NO | `kpa` |
 | title | varchar(255) | NO | |
 | slug | varchar(150) | NO | (storeId, slug) UNIQUE |
 | excerpt | text | YES | |
@@ -161,7 +158,6 @@ Migration: [1771200000006-CreateStoreBlogPosts.ts](apps/api-server/src/database/
 | default_template | varchar(50) | NO | default `'professional'` |
 | created_at / updated_at | timestamptz | NO | |
 
-Entity: [apps/api-server/src/routes/glycopharm/entities/store-blog-settings.entity.ts](apps/api-server/src/routes/glycopharm/entities/store-blog-settings.entity.ts)
 Migration: [20260918000000-CreateStoreBlogSettings.ts](apps/api-server/src/database/migrations/20260918000000-CreateStoreBlogSettings.ts)
 
 ### 4.2 API 엔드포인트 (refresh)
@@ -267,7 +263,6 @@ Public unified handler: [apps/api-server/src/routes/platform/store-public-conten
 | 서비스 | 관리 페이지 | 공개 페이지 | API factory | 상태 |
 |---|---|---|---|---|
 | **KPA-Society** | ✅ PharmacyBlogPage | ✅ StoreBlogPage / StoreBlogPostPage | `createBlogController(ds, auth, 'kpa')` | 활성 |
-| **GlycoPharm** | ✅ PharmacyBlogPage (store-management/) | ✅ StoreBlogPage / Post | `createBlogController(ds, auth)` (default 'glycopharm') | 활성 (canonical 100% 재사용) |
 | **Neture** | ❌ 제거 | ❌ 제거 | 미등록 | RETIRE 완료 (entity 공유 유지) |
 | **K-Cosmetics** | ❌ 미도입 | ❌ 미도입 | 미등록 | 미구현 |
 
@@ -280,13 +275,12 @@ Public unified handler: [apps/api-server/src/routes/platform/store-public-conten
 | `useBlogSeo` | packages/shared-space-ui/src/blog/useBlogSeo.ts | document.title + meta + og:* 동기화 hook |
 | `client.ts` | packages/shared-space-ui/src/blog/client.ts | 무인증 public API client (fetchBlogPosts, fetchBlogPost, fetchPublicStoreInfo, fetchPublicBlogSettings) |
 
-→ KPA / GlycoPharm 양쪽 공개 페이지가 100% 동일한 import 구조 — 코드 중복 0.
+→ KPA 양쪽 공개 페이지가 100% 동일한 import 구조 — 코드 중복 0.
 
 ### 8.3 Backend factory 패턴
 - [`createBlogController(dataSource, requireAuth, serviceKey)`](apps/api-server/src/routes/o4o-store/controllers/blog.controller.ts) — single factory, serviceKey filter 내장
 - 등록 위치:
   - KPA: [apps/api-server/src/routes/kpa/kpa.routes.ts:408](apps/api-server/src/routes/kpa/kpa.routes.ts#L408)
-  - GlycoPharm: [apps/api-server/src/routes/glycopharm/glycopharm.routes.ts](apps/api-server/src/routes/glycopharm/glycopharm.routes.ts)
 - Public unified: [unified-store-public.routes.ts](apps/api-server/src/routes/platform/unified-store-public.routes.ts) → service-agnostic (slug → storeId 해석 후 entity 직접 쿼리)
 
 ### 8.4 packages/blog-core 정식 패키지
@@ -300,7 +294,7 @@ Public unified handler: [apps/api-server/src/routes/platform/store-public-conten
 | npm 패키지 진입점 | ✅ `@o4o/forum-core` | ❌ shared-space-ui로 부분 |
 | 라이프사이클(install/activate) | ✅ | ❌ |
 | Manifest(deps/permissions/CPT) | ✅ | ❌ |
-| Backend entity | forum-core/src/backend/entities/ | apps/api-server/src/routes/glycopharm/entities/ (서비스 종속 위치) |
+| Backend entity | forum-core/src/backend/entities | — |
 | Backend service layer | ✅ ForumService 등 | ❌ controller inline |
 | Admin UI 모듈 | ✅ admin-ui/ | ❌ 서비스별 page 직접 |
 | Public UI 컴포넌트 | ✅ public-ui/ | ✅ shared-space-ui/blog/ (부분) |
@@ -385,7 +379,6 @@ Blog도 동일 카테고리 후보. 두 서비스 활성 상태에서 forum-core
 - **WO-O4O-PLATFORM-BLOG-CORE-PACKAGE-V1**
   - 범위: shared-space-ui 자산 + backend factory + entity를 `packages/blog-core`로 통합
   - manifest / lifecycle / admin-ui 모듈 정의 (forum-core 패턴)
-  - KPA / GlycoPharm은 manifest 활성화로 전환
   - **K-Cosmetics 도입 전 진행 권장** — 3rd 서비스 비용 절감
 - **WO-O4O-KPA-STORE-BLOG-THEME-INTEGRATION-V1**
   - 범위: Blog 페이지 inline 스타일 → theme CSS 변수 (StorefrontHomePage와 일관성)
@@ -406,7 +399,7 @@ Blog도 동일 카테고리 후보. 두 서비스 활성 상태에서 forum-core
 | 공개 라우트 `/store/:slug/blog` | ✅ | ✅ | App.tsx:905 |
 | 공개 라우트 `/store/:slug/blog/:postSlug` | ✅ | ✅ | App.tsx:907 |
 | StorefrontHomePage BLOG_LIST 블록 연동 | ✅ | ✅ | StorefrontHomePage:179-187 |
-| Cross-service 활성 | KPA + Neture | KPA + GlycoPharm | unified routes |
+| Cross-service 활성 | KPA + Neture | KPA | unified routes |
 | Neture 활성 | ✅ | ❌ (RETIRE) | WO-O4O-NETURE-BLOG-RETIRE-V1 |
 | Blog 메타 entity | ❌ | ✅ | store_blog_settings (META WO) |
 | 카테고리/태그 | ❌ | ❌ | 여전히 entity 부재 |
@@ -443,10 +436,6 @@ Blog도 동일 카테고리 후보. 두 서비스 활성 상태에서 forum-core
 - 제작 시작 모달: [services/web-kpa-society/src/pages/pharmacy/StartProductionModal.tsx](services/web-kpa-society/src/pages/pharmacy/StartProductionModal.tsx)
 - App 라우트: [services/web-kpa-society/src/App.tsx](services/web-kpa-society/src/App.tsx) (라인 905-912 부근)
 
-### Frontend — GlycoPharm
-- 관리: [services/web-glycopharm/src/pages/store-management/PharmacyBlogPage.tsx](services/web-glycopharm/src/pages/store-management/PharmacyBlogPage.tsx)
-- 공개: [services/web-glycopharm/src/pages/store/StoreBlogPage.tsx](services/web-glycopharm/src/pages/store/StoreBlogPage.tsx) 등
-
 ### Shared (UI 공통화)
 - BlogPublicHeader: [packages/shared-space-ui/src/blog/BlogPublicHeader.tsx](packages/shared-space-ui/src/blog/BlogPublicHeader.tsx)
 - blogTemplates: [packages/shared-space-ui/src/blog/blogTemplates.tsx](packages/shared-space-ui/src/blog/blogTemplates.tsx)
@@ -459,11 +448,8 @@ Blog도 동일 카테고리 후보. 두 서비스 활성 상태에서 forum-core
 - Public unified handler: [apps/api-server/src/routes/platform/store-public-content.handler.ts](apps/api-server/src/routes/platform/store-public-content.handler.ts)
 - Unified routes: [apps/api-server/src/routes/platform/unified-store-public.routes.ts](apps/api-server/src/routes/platform/unified-store-public.routes.ts)
 - KPA route 등록: [apps/api-server/src/routes/kpa/kpa.routes.ts:408](apps/api-server/src/routes/kpa/kpa.routes.ts#L408)
-- GlycoPharm route 등록: [apps/api-server/src/routes/glycopharm/glycopharm.routes.ts](apps/api-server/src/routes/glycopharm/glycopharm.routes.ts)
 - AI proxy: [apps/api-server/src/routes/ai-proxy.routes.ts:193-257](apps/api-server/src/routes/ai-proxy.routes.ts#L193)
 - Blog AI prompt: [apps/api-server/src/services/ai-prompts/blog.ts](apps/api-server/src/services/ai-prompts/blog.ts)
-- Entity (post): [apps/api-server/src/routes/glycopharm/entities/store-blog-post.entity.ts](apps/api-server/src/routes/glycopharm/entities/store-blog-post.entity.ts)
-- Entity (settings): [apps/api-server/src/routes/glycopharm/entities/store-blog-settings.entity.ts](apps/api-server/src/routes/glycopharm/entities/store-blog-settings.entity.ts)
 - Migrations:
   - [1771200000006-CreateStoreBlogPosts.ts](apps/api-server/src/database/migrations/1771200000006-CreateStoreBlogPosts.ts)
   - [20260918000000-CreateStoreBlogSettings.ts](apps/api-server/src/database/migrations/20260918000000-CreateStoreBlogSettings.ts)
@@ -489,7 +475,7 @@ Blog도 동일 카테고리 후보. 두 서비스 활성 상태에서 forum-core
 | 이후 | WO-O4O-NETURE-BLOG-CANONICAL-ALIGN-V1 | Neture를 KPA canonical 정렬 |
 | 이후 | WO-O4O-BLOG-UI-PARTIAL-EXTRACT-V1 | 검증된 UI 모듈 → shared-space-ui |
 | 이후 | WO-O4O-NETURE-BLOG-RETIRE-V1 | Neture Blog 잔여 구조 제거 |
-| 이후 | WO-O4O-GLYCO-BLOG-INTRODUCE-V1 | GlycoPharm Blog 도입 (canonical 적용) |
+| 이후 |  | — |
 
 ---
 

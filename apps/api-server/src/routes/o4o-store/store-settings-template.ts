@@ -11,7 +11,7 @@
  * 순수 함수 모음이다(express/typeorm 의존 없음 → 단위 테스트 가능).
  * 템플릿 정의의 단일 원천을 유지하기 위해 프론트로 복제하지 않는다.
  *
- * 3서비스(KPA / GlycoPharm / K-Cosmetics) 공용 store-settings.controller 가 사용한다.
+ * 2서비스(KPA / K-Cosmetics) 공용 store-settings.controller 가 사용한다.
  */
 
 import { StoreTemplate, StoreBlock } from './store-settings.types.js';

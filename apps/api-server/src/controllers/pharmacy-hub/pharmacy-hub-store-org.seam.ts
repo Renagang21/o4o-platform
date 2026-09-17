@@ -13,7 +13,7 @@
  *   다중 조직 계정에서 어느 서비스의 매장이 잡힐지 보장되지 않는다
  *   (CHECK-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 §8-① 부채).
  *
- *   공통 가드(`createRequireStoreOwner`)는 KPA·GlycoPharm·K-Cosmetics 가 함께 쓰므로
+ *   공통 가드(`createRequireStoreOwner`)는 KPA·K-Cosmetics 가 함께 쓰므로
  *   변경하지 않고, **조직 해석만** Pharmacy-Hub enrollment 기준으로 갈아 끼운다.
  *
  * 계약 (StoreTabletRoutesOptions.resolveOrganizationId)

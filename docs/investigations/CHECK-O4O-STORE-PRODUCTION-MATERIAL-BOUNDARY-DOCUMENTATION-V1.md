@@ -39,7 +39,7 @@
 ## 5. 후속
 
 1. `WO-O4O-STORE-LIBRARY-ITEM-ENTITY-RESIDUAL-CHECK-V1`(후보) — `StoreLibraryItem`(@Entity('store_library_items')) 가 rename 된 테이블 가리키는 stale entity 인지 코드 점검(connection.ts 등록·실사용 확인). **코드 영향 — 별도 WO.**
-2. `WO-O4O-STORE-PRODUCTION-MATERIAL-LIST-QUERY-CLEANUP-V1`(선택, IR D) — ProductionMaterials 조회 공통화 + GP/KCos QR/direct 소스 완성.
+2. `WO-O4O-STORE-PRODUCTION-MATERIAL-LIST-QUERY-CLEANUP-V1`(선택, IR D) — ProductionMaterials 조회 공통화 + KCos QR/direct 소스 완성.
 
 ---
 

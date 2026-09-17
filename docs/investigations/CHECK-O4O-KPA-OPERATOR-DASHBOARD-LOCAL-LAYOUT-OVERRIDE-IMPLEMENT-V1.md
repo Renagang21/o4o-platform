@@ -28,7 +28,7 @@ KPA 화면의 block 순서는 다음과 같다.
 - composer는 두 역할 모두 동일한 우선순위로 전달받은 데이터만 렌더한다.
 - grid, 카드, 반응형 동작은 기존 공통 block component가 담당하므로 새 breakpoint나
   고정 폭을 추가하지 않았다.
-- GP, KCos, Neture가 사용하는 공통 `OperatorDashboardLayout` 및 공통 exports/types는
+- KCos, Neture가 사용하는 공통 `OperatorDashboardLayout` 및 공통 exports/types는
   수정하지 않았다.
 
 ## 변경 파일

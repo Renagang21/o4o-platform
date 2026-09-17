@@ -56,7 +56,7 @@ super_admin
 
 > **결정**: `operator` = "플랫폼 서비스 운영자" (Platform Service Operator)
 >
-> - 플랫폼이 직접 운영하는 서비스(KPA, GlycoPharm 등)를 담당하는 직원/운영팀
+> - 플랫폼이 직접 운영하는 서비스(KPA 등)를 담당하는 직원/운영팀
 > - `admin`보다 권한이 낮으나 `manager`보다 높다
 > - `requireAdmin`에 포함된다 (현행 유지)
 
@@ -129,7 +129,6 @@ staff   → 매장 직원 (CosmeticsStoreMemberRole.STAFF)
 
 ```
 사용: kpa:operator, kpa:admin, kpa:district_admin 등 (KPA 전용)
-사용: glycopharm:operator, glycopharm:pharmacy 등 (GlycoPharm 전용)
 미사용: platform:admin (→ 그냥 'admin' 사용)
 미사용: platform:operator (→ 그냥 'operator' 사용)
 ```
@@ -138,7 +137,6 @@ staff   → 매장 직원 (CosmeticsStoreMemberRole.STAFF)
 
 ```
 현재 (Phase3-E): role_assignments에 unprefixed role이 주요 데이터
-Phase 5 (목표): KPA, GlycoPharm의 서비스별 역할 확인 후 prefixed 활성화
 Phase 6 (미래): platform:* prefix는 사용하지 않기로 결정 (불필요)
 ```
 
@@ -174,7 +172,6 @@ if (!user.roles?.some(r => legacyRoles.includes(r))) { throw 403; }
 
 Phase 2G가 플랫폼 코어를 정리했다. 남은 도메인별 파일은 각 서비스 WO에서 처리:
 - `cosmetics.routes.ts` → cosmetics WO
-- `glycopharm/controllers/*.ts` → glycopharm WO
 - `glucoseview/glucoseview.routes.ts` → glucoseview WO
 
 ---
@@ -248,7 +245,7 @@ export enum UserRole {
 |-------|------|------|
 | Phase 2 | 이 문서 기반 적용 계획 작성 | 파일 목록 + 변경 내용 |
 | Phase 3 | UI 텍스트: `operator` → `서비스운영자`, `조직운영자` 분리 | admin-dashboard |
-| Phase 4 | 코드 Guard: `legacyRoles` 배열 → `requireRole` 교체 | glycopharm, glucoseview, cosmetics |
+| Phase 4 | 코드 Guard: `legacyRoles` 배열 → `requireRole` 교체 | glucoseview, cosmetics |
 | Phase 5 | `UserRole` enum에 OPERATOR 추가 | types/auth.ts |
 | Phase 5 | DB: 불명확 역할 값 정리 (moderator, affiliate 등) | role_assignments |
 | Phase 6 | Freeze: ROLE-PHILOSOPHY-V1 확정 | 이 문서 |

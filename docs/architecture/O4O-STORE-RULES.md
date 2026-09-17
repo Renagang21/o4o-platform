@@ -102,7 +102,7 @@ const order = await orderRepository.save({ ... });          // ❌
 |------|------|
 | OrderType 누락 | **Hard Fail** (400 Bad Request) |
 | 무효한 OrderType | **Hard Fail** (400 Bad Request) |
-| 차단된 OrderType | **Hard Fail** (GLYCOPHARM 등) |
+| 차단된 OrderType | **Hard Fail** |
 
 ```typescript
 // 허용된 OrderType
@@ -111,12 +111,10 @@ enum OrderType {
   DROPSHIPPING,
   COSMETICS,
   TOURISM,
-  GLYCOPHARM,   // 차단됨 (조회만 가능)
 }
 
 // 차단된 OrderType
 const BLOCKED_ORDER_TYPES = [
-  OrderType.GLYCOPHARM,  // Phase 5-A에서 차단
 ];
 ```
 
@@ -144,27 +142,10 @@ const BLOCKED_ORDER_TYPES = [
 |-----------|------|
 | `tourism_orders` | Tourism은 Core 위임 |
 | `cosmetics_orders` | Cosmetics는 Core 위임 |
-| `glycopharm_orders` | Phase 5-A에서 폐기 |
 | `yaksa_orders` | Yaksa는 주문 기능 없음 |
 | `neture_orders` | Neture는 Read-only Hub |
 | Service 내 `createOrder()` | 책임 침범 |
 | 서비스별 결제 API | Core 책임 |
-
-### 2.6 GlycoPharm Legacy (Phase 9-A Frozen)
-
-GlycoPharm은 독립 주문 구조로 인해 **영구 차단**된 서비스입니다.
-
-| 상태 | 설명 |
-|------|------|
-| `glycopharm_orders` | READ-ONLY (역사 데이터 보존) |
-| `glycopharm_order_items` | READ-ONLY (역사 데이터 보존) |
-| `OrderType.GLYCOPHARM` | **BLOCKED** (신규 주문 차단) |
-
-**교훈**: 독립 주문 구조가 왜 플랫폼 전체에 문제가 되는지 기록됨
-
-> 📄 상세 분석: `docs/_platform/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md`
-
----
 
 ## 3. O4O Store Template Rules (§21)
 

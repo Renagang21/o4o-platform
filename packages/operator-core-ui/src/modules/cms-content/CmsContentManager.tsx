@@ -3,12 +3,12 @@
  *
  * WO-O4O-CONTENT-CANONICAL-CROSS-SERVICE-ALIGNMENT-V1
  *
- * Parameterized for KPA / GlycoPharm / K-Cosmetics.
+ * Parameterized for KPA / K-Cosmetics.
  * Uses cms_contents table via each service's /news/* backend routes.
  *
  * Props:
- *   apiBase        — e.g. "/api/v1/kpa", "/api/v1/glycopharm"
- *   serviceKey     — e.g. "kpa-society", "glycopharm", "k-cosmetics"
+ *   apiBase        — e.g. "/api/v1/kpa", "/api/v1/cosmetics"
+ *   serviceKey     — e.g. "kpa-society", "k-cosmetics"
  *   assetCopyEnabled — whether to show "매장으로 복사" action (default false)
  *   storeContentPath — navigation target after asset copy
  */

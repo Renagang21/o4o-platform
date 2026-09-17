@@ -26,7 +26,6 @@ Express 는 등록 순서로 매칭한다. static path 가 같은 prefix 의 dyn
 | kpa-society | `/schedules/calendar?startDate=2026-08-01&endDate=2026-08-31` | **500** `INTERNAL_ERROR` / `invalid input syntax for type uuid: "calendar"` |
 | kpa-society | `/schedules/calendar` (query 없음) | **500** 동일 |
 | k-cosmetics | `/schedules/calendar` (query 유/무) | **500** 동일 |
-| glycopharm | `/schedules/calendar` (query 유/무) | **500** 동일 |
 
 **진입 handler 확정 근거**: `getScheduleCalendar` 는 `startDate`/`endDate` 누락 시 400 을 먼저 반환한다.
 query 없이 호출해도 400 이 아니라 uuid cast 500 이 났다 → calendar handler 에 **들어가지 않았다**.
@@ -60,11 +59,11 @@ router 공통 chain: `router.use(requireAuth)` → `router.use(validateServiceKe
 
 | 등록 순서(수정 전) | Method / Path | Guard | Handler | Frontend 소비처 |
 |---|---|---|---|---|
-| L107 | GET `/schedules` | `requireSignageStore` | `getSchedules` | KPA `api/signageSchedule.ts`, GP `api/signageSchedule.ts` |
-| L110 | POST `/schedules` | `requireSignageStore` | `createSchedule` | KPA, GP |
+| L107 | GET `/schedules` | `requireSignageStore` | `getSchedules` | KPA `api/signageSchedule.ts` `api/signageSchedule.ts` |
+| L110 | POST `/schedules` | `requireSignageStore` | `createSchedule` | KPA
 | L113 | GET `/schedules/:id` | `requireSignageStore` | `getSchedule` | (직접 호출 없음 — 목록만 사용) |
-| L116 | PATCH `/schedules/:id` | `requireSignageStore` | `updateSchedule` | KPA, GP |
-| L119 | DELETE `/schedules/:id` | `requireSignageStore` | `deleteSchedule` | KPA, GP |
+| L116 | PATCH `/schedules:id` | `requireSignageStore` | `updateSchedule` | KPA
+| L119 | DELETE `/schedules:id` | `requireSignageStore` | `deleteSchedule` | KPA
 | L124 | GET `/active-content` | `allowSignageStoreRead` | `resolveActiveContent` | KPA `signageSchedule.ts`, `services/signage-player-web` `ScheduleResolver.ts` |
 | **L197** | GET `/schedules/calendar` | `requireSignageStore` | `getScheduleCalendar` | **소비처 0** |
 | L201 | POST `/upload/presigned` | `requireSignageOperatorOrStore` | `getPresignedUploadUrl` | (schedule controller 소속이나 schedule 도메인 아님) |
@@ -141,7 +140,7 @@ middleware(`requireSignageStore`)·handler·path 문자열 모두 **불변**.
 - dispatch: `/schedules/calendar` → `getScheduleCalendar` 진입, `getSchedule` 미진입
 - query 없이도 calendar handler 선택 (handler 선택은 query 와 무관)
 - `/schedules/:validUuid` → `getSchedule` · `/schedules` → `getSchedules`
-- PATCH/DELETE `/schedules/:id` 회귀 없음 · k-cosmetics / glycopharm 동일 동작
+- PATCH/DELETE `/schedules:id` 회귀 없음 · k-cosmetics 동일 동작
 - guard 회귀: 미인증 401 · 알 수 없는 serviceKey 400 · org 헤더 없음 400 · 타 서비스 org 403 (모두 handler 미진입)
 
 **비공허성 확인**: 수정 전 코드(`git checkout -- signage.routes.ts`)로 동일 스펙 실행 시 **4 케이스 FAIL**,
@@ -162,7 +161,7 @@ middleware(`requireSignageStore`)·handler·path 문자열 모두 **불변**.
 | api-server `tsc --noEmit` | PASS |
 | api-server 전체 Jest | **PASS — 164 suites / 2541 tests** |
 | production API smoke | **PASS — calendar 500 = 0** (§10) |
-| KPA / KCos / GP browser 회귀 | **PASS — api 4xx/5xx 0 · console error 0** (§12) |
+| KPA / KCos browser 회귀 | **PASS — api 4xx/5xx 0 · console error 0** (§12) |
 
 > 참고: `packages/financial-core` 의 `tsup: No input files` 빌드 실패는 이번 변경과 무관한 **기존 상태**이며,
 > `--no-bail` 로 나머지 패키지를 빌드한 뒤 typecheck 를 수행했다.
@@ -179,7 +178,6 @@ middleware(`requireSignageStore`)·handler·path 문자열 모두 **불변**.
 | kpa-society | `/schedules/calendar?startDate=2026-08-01&endDate=2026-08-31` | 500 uuid cast | **200** `{"data":{"events":[],"startDate":"2026-08-01","endDate":"2026-08-31"}}` |
 | kpa-society | `/schedules/calendar` (query 없음) | 500 uuid cast | **400** `startDate and endDate are required` (= calendar handler 진입) |
 | k-cosmetics | 위 2건 동일 | 500 / 500 | **200 / 400** |
-| glycopharm | 위 2건 동일 | 500 / 500 | **200 / 400** |
 
 ### 회귀 대조군 (수정 후, 3 서비스 공통)
 
@@ -216,7 +214,7 @@ headless Playwright · 프로덕션 3 도메인 · 매장 계정 로그인 (자�
 |---|---|---|---|---|---|
 | KPA (`kpa-society.co.kr`) | → `/store` | `/store/marketing/signage/playlist`, `/player`, `/schedules`, `/videos` | 정상 | **0** | **0** |
 | KCos (`k-cosmetics.site`) | → `/store` | `/store/marketing/signage/playlist`, `/player`, `/schedules`, `/videos` | 정상 | **0** | **0** |
-| GP (`glycopharm.co.kr`) | → `/store` | `/store/marketing/signage/playlist`, `/schedules` | 정상 | **0** | **0** |
+| → `/store` | `/store/marketing/signage/playlist`, `/schedules` | 정상 | **0** | **0** |
 
 - white screen 0 · JS exception 0 · 사이니지 메뉴 트리(플레이리스트/동영상/스케줄) 정상 노출.
 - **재생 자체는 실행하지 못했다** — 3 서비스 모두 signage 데이터가 0행이라 선택할 플레이어/플레이리스트가 없다.

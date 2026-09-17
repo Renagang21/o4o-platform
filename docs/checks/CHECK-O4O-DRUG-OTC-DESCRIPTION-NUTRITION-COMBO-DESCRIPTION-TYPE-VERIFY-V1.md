@@ -6,7 +6,7 @@
 
 ## 1. 모델 (병합분)
 - 마이그레이션: `ADD COLUMN description_type VARCHAR(32) NOT NULL DEFAULT 'STORE'` → 기존 전량 STORE 백필. canonical partial-unique = `(master_id, description_type) WHERE status='canonical'`.
-- **display 필터**: 소비자 storefront·태블릿·GP storefront·store-content 소스목록 canonical join 에 `AND description_type='STORE'` (store-public-utils L221/L497 등).
+- **display 필터**: 소비자 storefront·태블릿 storefront·store-content 소스목록 canonical join 에 `AND description_type='STORE'` (store-public-utils L221/L497 등).
 - 의미: **STORE = 매장용 대표설명**(소비자 매장 화면 노출). 영양제류 트랙은 `O4O-DRUG-STORE-DESCRIPTION-WRITING-GUIDE`(매장용 설명서) → **STORE 가 정합**.
 
 ## 2. 프로덕션 검증 (read-only)

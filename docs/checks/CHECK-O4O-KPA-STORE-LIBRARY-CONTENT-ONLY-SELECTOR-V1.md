@@ -9,7 +9,7 @@
 ## 1. 조사 결과
 
 - `StoreContentsSelector` 가 `/store/library/contents`(page)와 `SelectContentsForProductionModal`(modal) 두 곳에서 공유됨. 강의 관련 코드는 KPA 내부에만 존재(`LessonsSection`/`toLessonRow`/`LessonRow`/`TopTabBar` 정의·소비 모두 KPA selector 한정).
-- GP/KCos 및 다른 서비스는 `StoreContentsSelector` 를 사용하지 않음 → 공통 코드 영향 없음.
+- KCos 및 다른 서비스는 `StoreContentsSelector` 를 사용하지 않음 → 공통 코드 영향 없음.
 - 콘텐츠 하단 QR·POP·인쇄용 PDF·제작 시작·선택 삭제·검색·출처/태그 필터·페이지네이션은 모두 `DocumentsSection` 에 위치 → 강의 코드 제거가 콘텐츠 기능에 영향 없음.
 - 콘텐츠 내부 `문서형/코스형` SubTab 은 선행 WO 에서 이미 제거되어 상위 `콘텐츠/강의` 전환만 남아 있었음(본 작업 대상). 코스형 잔여 재도입 없음.
 
@@ -44,7 +44,6 @@
 
 ## 6. KPA 외 서비스 무변경 확인
 
-- `git diff -- services/web-glycopharm services/web-k-cosmetics` (본 커밋 범위) 0건.
 - 변경은 `services/web-kpa-society/src/pages/pharmacy/*` 3개 파일 + 본 CHECK 문서로 한정.
 
 ## 7. 타입체크 결과
@@ -69,4 +68,4 @@
 
 ## 10. 완료 판정
 
-**PASS (구현/타입체크/정적 검증/운영 브라우저 smoke).** 강의 선택 UI·소비 코드를 KPA 매장 콘텐츠 화면과 제작 자료 선택 모달에서 제거하고 콘텐츠 전용으로 정리했다. 콘텐츠 제작(QR/POP/PDF) 기능과 LMS 수강 기능은 그대로다. 기존 lesson snapshot 데이터는 보존되며 GP/KCos 무변경이다. 배포(run `28280735029`) 후 운영 화면 smoke 에서 콘텐츠 전용 표시·모달 정합·LMS 무영향을 확인했다.
+**PASS (구현/타입체크/정적 검증/운영 브라우저 smoke).** 강의 선택 UI·소비 코드를 KPA 매장 콘텐츠 화면과 제작 자료 선택 모달에서 제거하고 콘텐츠 전용으로 정리했다. 콘텐츠 제작(QR/POP/PDF) 기능과 LMS 수강 기능은 그대로다. 기존 lesson snapshot 데이터는 보존되며 KCos 무변경이다. 배포(run `28280735029`) 후 운영 화면 smoke 에서 콘텐츠 전용 표시·모달 정합·LMS 무영향을 확인했다.

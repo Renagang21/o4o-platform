@@ -40,7 +40,7 @@ const ALL_SERVICE_ITEMS: O4OHelpServiceItem[] = [
   },
   // WO-O4O-MARKET-TRIAL-STORE-REDIRECT-AND-CARD-REMOVAL-V1:
   //   유통참여형 펀딩은 독립 서비스가 아니라 Neture 내부 기능이다. cross-service 카탈로그
-  //   ("다른 서비스 보기")에서 제거 — KPA/GP/KCos 매장 측 유통참여형 펀딩 연결 흔적 제거.
+  //   ("다른 서비스 보기")에서 제거 — KPA/KCos 매장 측 유통참여형 펀딩 연결 흔적 제거.
 ];
 
 // ─── Component ───────────────────────────────────────────────────────────────

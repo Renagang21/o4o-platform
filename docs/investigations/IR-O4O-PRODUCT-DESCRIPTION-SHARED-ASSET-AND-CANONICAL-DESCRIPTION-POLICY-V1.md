@@ -101,7 +101,7 @@ shared_product_descriptions
 
 ## 6. 상품 상세 노출 (output) — 단순 연결
 
-현재 `glycopharm/store.controller:147` 가 `'' AS description` 하드코딩 → 모든 카탈로그 상품 설명 공백(IR 선행). 정책 적용 후 노출 우선순위:
+정책 적용 후 노출 우선순위:
 
 ```text
 카탈로그 상품(listing→offer→master):

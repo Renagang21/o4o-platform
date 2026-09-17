@@ -20,7 +20,7 @@ C형 잔존: 5
 미조사: 0
 ```
 
-- 85 = 17 기능 단위 × 5 서비스 (KPA-Society / K-Cosmetics / GlycoPharm / Neture / PharmacyHub)
+- 85 = 17 기능 단위 × 4 서비스 (KPA-Society / K-Cosmetics / Neture / PharmacyHub)
 - FC(Guide 있음) 70 / A 5 / B 5 / C 5
 
 ---
@@ -43,33 +43,30 @@ C형 잔존: 5
 > 판정 근거는 각 서비스 `src/**/*.tsx` 의 실제 `<Route>` 정의와
 > `packages/shared-space-ui/src/guide/copy/{service}.ts` 의 Guide route/copy 를 정적 대조해 산출했다.
 
-| # | 기능 단위 | KPA | K-Cos | GlycoPharm | Neture | PharmacyHub |
-|:--:|---|:--:|:--:|:--:|:--:|:--:|
-| 1 | 포럼 · 커뮤니티 | FC | FC | FC | FC | FC |
-| 2 | 강의(LMS) | FC | FC | **A → 해소** | B | FC |
-| 3 | 콘텐츠 | FC | FC | FC | FC | FC |
-| 4 | 자료실(커뮤니티 자료) | FC | FC | FC | FC | FC |
-| 5 | 매장 운영(허브·홈) | FC | **A → 해소** | **A → 해소** | FC | FC |
-| 6 | 매장 상품 · 거래 | FC | FC | FC | FC | FC |
-| 7 | QR | FC | **A → 해소** | **A → 해소** | FC | FC |
-| 8 | 태블릿 | FC | FC | **C** | FC | FC |
-| 9 | 디지털 사이니지 | FC | FC | FC | FC | FC |
-| 10 | POP 제작 | FC | FC | FC | FC | FC |
-| 11 | 매장 블로그 | FC | FC | FC | FC | FC |
-| 12 | 제작 자료(매장 실행 자산) | FC | FC | FC | FC | FC |
-| 13 | 상품 설명서 | FC | FC | FC | FC | FC |
-| 14 | 설문 | FC | **B** | **B** | **B** | **B** |
-| 15 | 서비스 소개 landing(`/service-guide`) | FC | FC | FC | **C** | FC |
-| 16 | O4O 개요 · 구조(`/guide/intro/*`) | FC | FC | FC | FC | FC |
-| 17 | 역할별 가이드 | FC | **C** | **C** | FC | **C** |
+| # | 기능 단위 | KPA | K-Cos | Neture | PharmacyHub |
+| :--: | --- | :--: | :--: | :--: | :--: |
+| 1 | 포럼 · 커뮤니티 | FC | FC | FC | FC |
+| 2 | 강의(LMS) | FC | FC | B | FC |
+| 3 | 콘텐츠 | FC | FC | FC | FC |
+| 4 | 자료실(커뮤니티 자료) | FC | FC | FC | FC |
+| 5 | 매장 운영(허브·홈) | FC | **A → 해소** | FC | FC |
+| 6 | 매장 상품 · 거래 | FC | FC | FC | FC |
+| 7 | QR | FC | **A → 해소** | FC | FC |
+| 8 | 태블릿 | FC | FC | FC | FC |
+| 9 | 디지털 사이니지 | FC | FC | FC | FC |
+| 10 | POP 제작 | FC | FC | FC | FC |
+| 11 | 매장 블로그 | FC | FC | FC | FC |
+| 12 | 제작 자료(매장 실행 자산) | FC | FC | FC | FC |
+| 13 | 상품 설명서 | FC | FC | FC | FC |
+| 14 | 설문 | FC | **B** | **B** | **B** |
+| 15 | 서비스 소개 landing(`/service-guide`) | FC | FC | **C** | FC |
+| 16 | O4O 개요 · 구조(`/guide/intro/*`) | FC | FC | FC | FC |
+| 17 | 역할별 가이드 | FC | **C** | FC | **C** |
 
 ### 2-1. A형 5건 상세 (해소 대상)
 
 | # | 서비스 | 기능 | 기능 route | 기능 화면 | 사용자 대면 | Guide route(신규) | Guide copy(신규) | 진입 링크 | 판정 |
 |:--:|---|---|---|---|:--:|---|---|---|:--:|
-| A1 | GlycoPharm | 강의(LMS) | `/lms`, `/lms/course/:id`, `/lms/course/:courseId/lesson/:lessonId`, `/mypage/enrollments`, `/mypage/certificates` | `EducationPage`(LmsHubTemplate) · `CourseDetailPage`(CourseDetailView) | YES | `/guide/features/lms` | `glycopharmGuideFeatureLmsProps` | `/guide/features` 10번 그룹 | A → 해소 |
-| A2 | GlycoPharm | 매장(약국) 운영 | `/store` 이하 약국 상품·거래 / 활성화 / 자료함 / 경영 | `PharmacyDashboard` 외 store 라우트 | YES | `/guide/features/store` | `glycopharmGuideFeatureStoreProps` | `/guide/features` 04번 그룹 | A → 해소 |
-| A3 | GlycoPharm | QR | `/store/marketing/qr` (+ `/store/analytics/marketing`, `/store/funnel`, `/store/requests`) | `StoreQrPage`(StoreQrConsoleView) | YES | `/guide/features/qr` | `glycopharmGuideFeatureQrProps` | `/guide/features` 06번 그룹 | A → 해소 |
 | A4 | K-Cosmetics | 매장 운영 | `/store` 이하 매장 상품·거래 / 활성화 / 자료함 / 분석·설정 | store 라우트 블록 | YES | `/guide/features/store` | `kCosmeticsGuideFeatureStoreProps` | `/guide/features` 09번 그룹 | A → 해소 |
 | A5 | K-Cosmetics | QR · 태블릿 | `/store/marketing/qr`, `/store/commerce/tablet-displays`, `/store/channels` | `StoreQrPage` · `StoreTabletDisplaysPage` | YES | `/guide/features/qr` | `kCosmeticsGuideFeatureQrProps` | `/guide/features` 10번 그룹 | A → 해소 |
 
@@ -78,7 +75,6 @@ C형 잔존: 5
 | 서비스 | 기능 | 근거 |
 |---|---|---|
 | K-Cosmetics | 설문 | 사용자 대면 설문 route 없음. `operator/surveys`, `operator/surveys/new` 운영자 콘솔만 존재 |
-| GlycoPharm | 설문 | 동일 — 운영자 콘솔 route 만 존재 |
 | Neture | 설문 | 설문 route 자체 없음 |
 | PharmacyHub | 설문 | 설문 route 자체 없음 (PH adoption CHECK 에서도 NOT_AVAILABLE) |
 | Neture | 강의(LMS) | Neture 에 `/lms` 계열 route 없음 (교육은 매장 서비스 축) |
@@ -87,10 +83,8 @@ C형 잔존: 5
 
 | 서비스 | 기능 | 근거 |
 |---|---|---|
-| GlycoPharm | 태블릿 | `/store/commerce/tablet-displays` route·화면은 존재하나 `GLYCOPHARM_STORE_CONFIG` 에 메뉴 항목이 없고 인바운드 링크가 없다. **진입 동선이 없는 기능을 정상 동선처럼 안내하지 않는다** — GP QR Guide 는 메뉴에 노출된 QR 범위로 한정했다. 메뉴 노출 여부는 별도 IA 판단 사항(별도 WO) |
 | Neture | 서비스 소개 landing | Neture 는 `/guide` 자체가 소개형 landing(`GuideHomePage`)이며 `/service-guide` 를 두지 않는 것이 선행 WO 판정(A) |
 | K-Cosmetics | 역할별 가이드 | 역할별 Guide 는 기능이 아니라 Guide 내부 탐색 장치. KPA·Neture 만 역할 축이 분화돼 있다 |
-| GlycoPharm | 역할별 가이드 | 동일 |
 | PharmacyHub | 역할별 가이드 | 동일 |
 
 ---
@@ -101,7 +95,6 @@ C형 잔존: 5
 
 | 파일 | 신규 export |
 |---|---|
-| `packages/shared-space-ui/src/guide/copy/glycopharm.ts` | `glycopharmGuideFeatureLmsProps` · `glycopharmGuideFeatureStoreProps` · `glycopharmGuideFeatureQrProps` |
 | `packages/shared-space-ui/src/guide/copy/k-cosmetics.ts` | `kCosmeticsGuideFeatureStoreProps` · `kCosmeticsGuideFeatureQrProps` |
 
 모두 기존 shared View `GuideFeatureManualPage` 를 재사용하며, hero + 5 sections + bottomNav 구조로 기존 Guide 와 동형이다.
@@ -110,7 +103,6 @@ C형 잔존: 5
 
 | 서비스 | 진입 지점 |
 |---|---|
-| GlycoPharm | `glycopharmGuideFeaturesProps` — 04 매장 운영 / 06 QR · Tablet 그룹에 Guide 링크 추가, 10 강의 그룹 신설 |
 | K-Cosmetics | `kCosmeticsGuideFeaturesProps` — 09 매장 운영 / 10 QR · 태블릿 그룹 신설 |
 | PharmacyHub | `pharmacyHubGuideFeaturesProps` — 05 매장 실행 그룹 items 를 기능 route 나열에서 Guide 링크로 교정 (아래 §6 참조) |
 
@@ -118,14 +110,13 @@ C형 잔존: 5
 
 | 서비스 | 추가 route |
 |---|---|
-| `services/web-glycopharm/src/App.tsx` | `guide/features/lms` · `guide/features/store` · `guide/features/qr` (각 1줄, `GuideFeatureManualPage` + props spread) |
 | `services/web-k-cosmetics/src/App.tsx` | `guide/features/store` · `guide/features/qr` (각 1줄) |
 
 ### 3-4. 내용 기준 (WO §4 · §8)
 
-- GP LMS Guide 는 GP 가 실제로 가진 동선만 기술한다: 강의 목록(`LmsHubTemplate`) → 강의 상세 → 수강 신청(비로그인 시 로그인 창) → 레슨 전용 화면 재생 → `/mypage/enrollments` · `/mypage/certificates`, 수료증은 별도 화면 없이 PDF 다운로드.
-- 매장 Guide 는 각 서비스의 canonical 매장 메뉴(`storeMenuConfig.ts`) 축을 그대로 따른다. GP 는 "약국", K-Cos 는 "매장" 명사를 사용한다.
-- 고객 요청 콘솔이 서비스별로 다르다: GP `/store/requests`(CustomerRequestsPage) · K-Cos `/store/interest-requests`(InterestRequestsPage) — copy 에 각각 반영.
+- `/mypage/certificates`, 수료증은 별도 화면 없이 PDF 다운로드.
+- 매장 Guide 는 각 서비스의 canonical 매장 메뉴(`storeMenuConfig.ts`) 축을 그대로 따른다.
+- K-Cos `/store/interest-requests`(InterestRequestsPage) — copy 에 각각 반영.
 - 매장 실행 자산(POP·QR·블로그) / 자료함(콘텐츠·파일) / 상품 설명서는 축을 합치지 않고 분리 기술했다 (WO §10).
 
 ---
@@ -138,7 +129,6 @@ C형 잔존: 5
 - **신규** `guideCoverageContract.test.ts` (13 tests)
   - 5 서비스 × Guide 내부 dead route 0 (copy 가 참조하는 `/guide/*` 가 실제 mount 된 route)
   - 5 서비스 × orphan Guide route 0 (mount 된 `/guide/*` 가 copy 또는 서비스 Guide 화면에서 참조됨)
-  - GP `/guide/features/{lms,store,qr}` 존재 + 기능 index 진입 가능
   - K-Cos `/guide/features/{store,qr}` 존재 + 기능 index 진입 가능
   - PharmacyHub 기존 Guide route 세트 유지(회귀 방지)
 
@@ -175,7 +165,7 @@ C형 잔존: 5
 
 | 지표 | 값 |
 |---|---|
-| 신규 Guide route 수 | 5 (GP 3 · K-Cos 2) |
+| 신규 Guide route 수 | K-Cos 2) |
 | 신규 copy/config export 수 | 5 |
 | **신규 View 수** | **0** |
 | 재사용 shared View 수 | 1 (`GuideFeatureManualPage`) |
@@ -194,8 +184,8 @@ Guide landing 재공통화 / PharmacyHub Guide 재구축 / 스크린샷 / 기능
 
 ## 9. 후속 제안 (이번 WO 범위 외)
 
-1. **GP 태블릿 IA 판단** — `/store/commerce/tablet-displays` 는 화면이 있으나 `GLYCOPHARM_STORE_CONFIG` 에 메뉴가 없다. 메뉴 노출(그러면 A형 전환) 또는 route 정리 중 택일이 필요하다. 별도 WO 대상.
-2. **K-Cos/GP 설문 축** — 운영자 콘솔만 존재. 사용자 대면 설문 도입 여부는 제품 정책 결정 사항.
+1. 메뉴 노출(그러면 A형 전환) 또는 route 정리 중 택일이 필요하다. 별도 WO 대상.
+2. **K-Cos 설문 축** — 운영자 콘솔만 존재. 사용자 대면 설문 도입 여부는 제품 정책 결정 사항.
 3. Guide 전체 최종 census / closure audit (WO 가 지정한 다음 트랙).
 
 ---
@@ -210,10 +200,6 @@ Guide landing 재공통화 / PharmacyHub Guide 재구축 / 스크린샷 / 기능
 
 | 서비스 | 경로 | h1 | desktop | mobile |
 |---|---|---|:--:|:--:|
-| GlycoPharm | `/guide/features` | 기능별 이용 방법 | PASS | PASS |
-| GlycoPharm | `/guide/features/lms` | 강의(LMS) 이용 방법 | PASS | PASS |
-| GlycoPharm | `/guide/features/store` | 약국 매장 운영 이용 방법 | PASS | PASS |
-| GlycoPharm | `/guide/features/qr` | QR 코드 이용 방법 | PASS | PASS |
 | K-Cosmetics | `/guide/features` | 기능별 이용 방법 | PASS | PASS |
 | K-Cosmetics | `/guide/features/store` | 매장 운영 이용 방법 | PASS | PASS |
 | K-Cosmetics | `/guide/features/qr` | QR · 태블릿 이용 방법 | PASS | PASS |
@@ -231,7 +217,6 @@ Guide landing 재공통화 / PharmacyHub Guide 재구축 / 스크린샷 / 기능
 
 | 서비스 | 확인한 링크 | 결과 |
 |---|---|:--:|
-| GlycoPharm | `/guide/features/{lms,store,qr}` | 3/3 PASS |
 | K-Cosmetics | `/guide/features/{store,qr}` | 2/2 PASS |
 | PharmacyHub | `/guide/features/{pop,signage,tablet,manuals}` | 4/4 PASS (orphan 교정 확인) |
 

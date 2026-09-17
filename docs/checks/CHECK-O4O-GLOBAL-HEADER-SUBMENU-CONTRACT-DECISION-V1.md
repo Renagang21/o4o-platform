@@ -52,7 +52,7 @@ export interface GlobalHeaderNavItem {
 이 중 3개(`/community`, `/education`, `/service-guide`)는 **parent 자신의 href 와 동일**하므로,
 submenu 로만 표현되는 고유 route 는 **9개**다.
 
-KPA Society / GlycoPharm / K-Cosmetics / Neture 의 `config/navigation.ts` 에는 `children` 이 **1건도 없다**.
+KPA Society / K-Cosmetics / Neture 의 `config/navigation.ts` 에는 `children` 이 **1건도 없다**.
 
 ---
 
@@ -129,7 +129,7 @@ route 존재 여부는 `services/web-pharmacy-hub/src/App.tsx` 등재 기준.
 
 ### 12. 5서비스 영향
 
-- **A**: 공통 `GlobalHeader` 변경 → KPA·GlycoPharm·K-Cosmetics·Neture·PharmacyHub 전부 desktop nav·mobile drawer·active 판정 회귀 검증 필요. children 이 없는 4서비스는 이득 0인데 회귀 위험만 부담한다.
+- **A**: 공통 `GlobalHeader` 변경 → KPA·K-Cosmetics·Neture·PharmacyHub 전부 desktop nav·mobile drawer·active 판정 회귀 검증 필요. children 이 없는 3서비스는 이득 0인데 회귀 위험만 부담한다.
 - **B**: `children` 을 실제로 채우는 곳은 PH 1곳. `PH_FOOTER_SECTIONS` 도 `GlobalHeaderNavItem[]` 을 쓰지만 `children` 을 설정하지 않아 영향 없음. 테스트 fixture 0건, 문서 예시는 본 표준 문서 1곳.
 
 ---

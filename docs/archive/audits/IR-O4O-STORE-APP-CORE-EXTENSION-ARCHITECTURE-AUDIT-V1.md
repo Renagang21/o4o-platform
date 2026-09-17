@@ -54,11 +54,11 @@ Store Core는 **모든 서비스에서 공통으로 사용하는 매장 기반 �
 
 | 패키지 | 역할 | 상태 | 소비자 |
 |--------|------|:----:|--------|
-| `@o4o/store-ui-core` | Shell Layout (Dashboard, Menu, Topbar) | Active | web-kpa, web-glycopharm, web-k-cosmetics, web-glucoseview |
+| `@o4o/store-ui-core` | Shell Layout (Dashboard, Menu, Topbar) | Active | — |
 | `@o4o/store-core` | KPI Engine (Summary, Insights) | Active | api-server |
-| `@o4o/hub-core` | Hub Layout, Signals | 🔒 FROZEN | web-glycopharm, web-neture |
+| `@o4o/hub-core` | Hub Layout, Signals | 🔒 FROZEN | — |
 | `@o4o/asset-copy-core` | Snapshot Engine (생성/발행) | 🔒 FROZEN | api-server |
-| `@o4o/store-asset-policy-core` | Asset Policy UI (필터, 뱃지, 제어) | Active | web-kpa, web-glycopharm |
+| `@o4o/store-asset-policy-core` | Asset Policy UI (필터, 뱃지, 제어) | Active | — |
 
 ### 1.4 패키지 의존 방향 (FROZEN)
 
@@ -90,7 +90,6 @@ export { StoreSidebar }           // 좌측 사이드바 메뉴
 export {
   ALL_STORE_MENUS,
   COSMETICS_STORE_CONFIG,
-  GLYCOPHARM_STORE_CONFIG,
   GLUCOSEVIEW_STORE_CONFIG,
   KPA_SOCIETY_STORE_CONFIG,
 }
@@ -112,7 +111,7 @@ export { computeStoreInsights }   // KPI 인사이트 계산
 | 컨트롤러 | `store-hub.controller.ts` |
 | 위치 | `apps/api-server/src/routes/o4o-store/controllers/store-hub.controller.ts` |
 | 팩토리 | `createStoreHubController()` |
-| 마운트 | `/api/v1/kpa/store-hub` (KPA), GlycoPharm에서도 사용 |
+| 마운트 | — |
 
 ### 2.2 O4O Store 컨트롤러 허브 (19개)
 
@@ -144,8 +143,6 @@ export { computeStoreInsights }   // KPI 인사이트 계산
 **현재 사용:** KPA `kpa.routes.ts`에서 19개 컨트롤러 전부 import하여 `/api/v1/kpa` 하위에 마운트.
 
 ### 2.3 서비스별 Store HUB 페이지
-
-**GlycoPharm — 가장 풍부한 HUB UI:**
 
 | 페이지 | 위치 | 역할 |
 |--------|------|------|
@@ -218,7 +215,6 @@ export { computeStoreInsights }   // KPI 인사이트 계산
 | 서비스 | 카탈로그 | 채택 신청 | 운영자 승인 | 채택 관리 |
 |--------|:--------:|:--------:|:----------:|:--------:|
 | KPA Society | ✅ | ✅ | ✅ | ✅ |
-| GlycoPharm | ❌ | ❌ | ❌ | ❌ |
 | K-Cosmetics | ❌ | ❌ | ❌ | ❌ |
 | Neture | ❌ | ❌ | ❌ | ❌ |
 
@@ -459,13 +455,11 @@ apps/api-server/src/
  ├ routes/o4o-store/controllers/ ← 19개 통합 Store 컨트롤러
  ├ routes/platform/     ← B2C, Slug, Local Product, Tablet 라우트
  ├ routes/kpa/          ← KPA 매장 라우트 (o4o-store 컨트롤러 소비)
- ├ routes/glycopharm/   ← GlycoPharm 매장 엔티티
  ├ routes/cosmetics/    ← Cosmetics 매장 엔티티
  └ modules/store-ai/    ← AI 콘텐츠/인사이트
 
 services/
  ├ web-kpa-society/     ← 가장 완전한 Store UI
- ├ web-glycopharm/      ← 풍부한 HUB UI, 채택 UX 미완
  ├ web-k-cosmetics/     ← 기본 구조만
  ├ web-glucoseview/     ← 최소 구조
  └ web-neture/          ← 공급자 중심 (매장 채택 불필요)
@@ -570,7 +564,6 @@ Store App
 | 서비스 | 매장 엔티티 | 슬러그 키 | OrderType | 템플릿 |
 |--------|:-----------:|:---------:|:---------:|:------:|
 | KPA Society | `OrganizationStore` (organizations) | `kpa` | DROPSHIPPING | BASIC |
-| GlycoPharm | `OrganizationStore` (organizations) | `glycopharm` | ❌ BLOCKED | BASIC/COMMERCE_FOCUS |
 | K-Cosmetics | `CosmeticsStore` (cosmetics_stores) | `cosmetics` | COSMETICS | BASIC |
 | GlucoseView | (최소 구조) | `glucoseview` | GENERIC | BASIC |
 | Neture | (Partner/Supplier 중심) | `neture` | DROPSHIPPING | - |
@@ -665,9 +658,6 @@ Store App
 | KPA 카탈로그 | `services/web-kpa-society/src/pages/pharmacy/HubB2BCatalogPage.tsx` |
 | KPA 채택 관리 | `services/web-kpa-society/src/pages/pharmacy/PharmacyB2BPage.tsx` |
 | KPA 채널 관리 | `services/web-kpa-society/src/pages/pharmacy/StoreChannelsPage.tsx` |
-| GlycoPharm 매장 메인 | `services/web-glycopharm/src/pages/pharmacy/StoreMainPage.tsx` |
-| GlycoPharm 매장 설정 | `services/web-glycopharm/src/pages/pharmacy/PharmacySettings.tsx` |
-| GlycoPharm B2C | `services/web-glycopharm/src/pages/store/StoreFront.tsx` |
 | Neture 스토어 상품 | `services/web-neture/src/pages/store/StoreProductPage.tsx` |
 
 ---

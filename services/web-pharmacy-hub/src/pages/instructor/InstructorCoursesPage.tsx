@@ -4,7 +4,7 @@
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#42)
  *
  * 화면 본체는 공통 `InstructorCoursesManager`(@o4o/operator-core-ui) 다
- * (KPA-Society · GlycoPharm · K-Cosmetics 가 이미 같은 모듈을 쓴다).
+ * (KPA-Society · K-Cosmetics 가 이미 같은 모듈을 쓴다).
  * PH 차이는 config(accent teal · 강의 상세 경로 /education/course/:id)로만 주입한다.
  */
 

@@ -78,7 +78,7 @@
 
 ## 7. 제외한 retired 객체
 
-snapshot 에 등장하면 guard C13 이 실패하는 패턴 (생성 시 0건 확인): `user_roles` · `organization_units` · `organization_roles` · `glycopharm_*` · cms legacy (`cms_acf_*` · `cms_cpt_*` · `cms_menus` · `cms_menu_items` · `cms_menu_locations` · `cms_settings` · `cms_templates` · `cms_template_parts` · `cms_views` · `cms_pages` · `cms_fields`) · `custom_fields` · `custom_media` · `custom_post_types` · `custom_posts`. 운영에 이미 없는 객체이므로 부활 0.
+snapshot 에 등장하면 guard C13 이 실패하는 패턴 (생성 시 0건 확인): `user_roles` · `organization_units` · `organization_roles` · cms legacy (`cms_acf_*` · `cms_cpt_*` · `cms_menus` · `cms_menu_items` · `cms_menu_locations` · `cms_settings` · `cms_templates` · `cms_template_parts` · `cms_views` · `cms_pages` · `cms_fields`) · `custom_fields` · `custom_media` · `custom_post_types` · `custom_posts`. 운영에 이미 없는 객체이므로 부활 0.
 
 ## 8. 데이터 · seed 제외 증거
 
@@ -231,7 +231,7 @@ Container called exit(0).
 
 범위 밖 발견 (보고만):
 1. `packages/forum-core` ESM import 확장자 누락 (§15) — tsc 산출물로는 API 기동 불가.
-2. `PRODUCTION-MIGRATION-STANDARD.md` Method 2 「Admin API 로 migration 실행」 — 해당 endpoint (`/glycopharm/admin/migrate/...`, `/admin/migrations/status`) 는 소스에 없고 CLAUDE.md §8 (HTTP repair route 금지) 과 충돌. §16 범위 밖이라 본문 유지, 별도 WO 제안.
+2. `PRODUCTION-MIGRATION-STANDARD.md` Method 2 「Admin API 로 migration 실행」 — 해당 endpoint 는 소스에 없고 CLAUDE.md §8 (HTTP repair route 금지) 과 충돌. §16 범위 밖이라 본문 유지, 별도 WO 제안.
 3. `SETUP.md:164` 는 `migration:run` 을 가리키며(이제 `src/migrate.ts` 로 연결되어 빈 DB 는 bootstrap 됨 — 설명 갱신 필요) · `scripts/dev-start.sh:64-68` 은 `typeorm-ts-node-commonjs -d src/database/data-source.ts migration:show/run` 을 직접 호출하여 manifest 를 우회(data-source.ts 는 CI/배포 경로가 아님) — 둘 다 보고만, 별도 WO.
 4. `tsup.config.ts` 의 `NODE_ENV` 빌드 시 고정 — 운영 영향 없음, 로컬 smoke 시 유의.
 

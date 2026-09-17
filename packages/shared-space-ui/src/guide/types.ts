@@ -1,10 +1,9 @@
 /**
  * Guide Types
  *
- * WO-O4O-GUIDE-COMMON-AND-GLYCOPHARM-HOME-V1
  *
  * Shared Guide 페이지 7개의 prop 데이터 타입 정의.
- * 서비스(KPA / GlycoPharm)별 copy 파일이 이 타입을 따라 데이터를 제공한다.
+ * 서비스(KPA)별 copy 파일이 이 타입을 따라 데이터를 제공한다.
  */
 
 // ─── 편집 가능 텍스트 렌더러 (WO-O4O-GUIDE-INLINE-EDIT-V1) ───────────
@@ -112,7 +111,7 @@ export interface GuideIntroStructurePageProps {
 export interface GuideIntroKpaPageProps {
   hero: {
     eyebrow: string;
-    title: string;             // 서비스별로 다름 (KPA-Society 위치 / GlycoPharm 위치)
+    title: string;             // 서비스별로 다름
     description: string;
     context: GuideContextItem[];
   };
@@ -238,7 +237,7 @@ export interface GuideFeaturesPageProps {
   /**
    * 선택적 카드 목차. 지정 시 Hero 아래·그룹 섹션 위에 클릭형 카드 그리드를 렌더한다.
    * Guide Home 에서 "사업자 유형별 안내" 같은 진입 카드를 노출하는 용도.
-   * 미지정 시 기존 레이아웃 그대로 — 모든 기존 소비처(KPA/GP/KCos)는 무영향.
+   * 미지정 시 기존 레이아웃 그대로 — 모든 기존 소비처(KPA/KCos)는 무영향.
    * WO-O4O-NETURE-GUIDE-BUSINESS-OPERATOR-CARDS-V1.
    */
   index?: {
@@ -255,7 +254,7 @@ export interface GuideFeaturesPageProps {
   /**
    * 선택적 "현재 운영 중인 O4O 서비스" 쇼케이스 카드. 지정 시 그룹 섹션 아래·index(bottom) 위에
    * 카드 그리드(제목+요약, 클릭형)를 렌더. index(사업 적용 예시)와 구분되도록 박스 없이 표시.
-   * 미지정 시 무영향(KPA/GP/KCos 등 기존 소비처). WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1.
+   * 미지정 시 무영향(KPA/KCos 등 기존 소비처). WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1.
    */
   serviceShowcase?: {
     title?: string;
@@ -332,7 +331,7 @@ export interface GuideFeatureManualPageProps {
 //
 // `/service-guide` 는 "이 서비스가 무엇인가" 를 설명하는 공개 소개 landing 이고,
 // `/guide/*` 는 "이 기능을 어떻게 쓰는가" 를 설명하는 기능 이용 안내다 (역할 분리 = 판정 A).
-// KPA / K-Cosmetics / GlycoPharm 의 기존 ServiceGuidePage 3개가 같은 구조였으므로
+// KPA / K-Cosmetics 의 기존 ServiceGuidePage 2개가 같은 구조였으므로
 // 아래 계약 하나로 수렴시키고, 서비스별 문구·아이콘·경로는 copy 파일에서 주입한다.
 
 /** lucide-react 아이콘처럼 className 만 받는 아이콘 컴포넌트 */

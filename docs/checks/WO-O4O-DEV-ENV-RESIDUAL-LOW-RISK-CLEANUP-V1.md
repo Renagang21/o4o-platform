@@ -59,7 +59,6 @@ basename 이 저장소에서 유일해도 **서비스 간 디렉터리 구조가
 ```text
 services/web-kpa-society/src/pages/admin/AdminDashboardPage.tsx
   -> services/web-neture/src/pages/admin/AdminDashboardPage.tsx   ← 다른 서비스. 오답
-services/web-glycopharm/src/components/community/HeroBannerSection.tsx
   -> packages/shared-space-ui/src/HeroBannerSection.tsx           ← 리팩터링 추정. 미확인
 ```
 

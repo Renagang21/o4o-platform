@@ -141,7 +141,7 @@
 |------|:----------:|
 | Neture web `/admin/users` 의 platform:super_admin 호출 | **차단** — frontend 가 `serviceKey=neture` 강제 (WO-FIX-V1) |
 | Neture web 의 다른 화면이 `/operator/members` 를 `serviceKey` 없이 호출 | **재발 가능** |
-| KPA / GlycoPharm / Cosmetics web 의 platform admin 호출 | **재발 가능** — 동일 endpoint, 동일 분기 |
+| KPA / Cosmetics web 의 platform admin 호출 | **재발 가능** — 동일 endpoint, 동일 분기 |
 | **`/operator/stores`** (platform admin 호출) | **현재도 cross-service** — frontend fix 없음 |
 | **`/operator/products`** (platform admin 호출) | **현재도 cross-service** — frontend fix 없음 |
 | `/operator/analytics/*` | `serviceKey` query 미전달 시 cross-service |

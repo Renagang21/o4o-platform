@@ -55,7 +55,6 @@
 | 화면 | 변경 |
 |---|---|
 | 4서비스 `ResetPasswordPage` | 로컬 `PASSWORD_RULES`(대문자·소문자·숫자·특수문자) 삭제 → 공용 `checkPasswordPolicy` · `PASSWORD_POLICY_RULES` 사용 |
-| GlycoPharm `RegisterFlowModal` · K-Cosmetics `RegisterPage` · KPA `RegisterModal` · Neture `RegisterModal` | `passwordChecks` 를 공용 검증에서 파생. 체크리스트·placeholder·오류 문구에서 '특수문자 필수' 제거. KPA 는 '영문 소문자' → '영문' |
 
 ### 3-3. 운영자 모달 2곳 — 로컬 규칙(의도적)
 

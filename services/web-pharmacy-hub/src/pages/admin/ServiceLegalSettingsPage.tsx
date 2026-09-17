@@ -5,9 +5,9 @@
  * WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1
  *   → `/operator/settings/legal` 에서 `/admin/settings/legal-terms` 로 이동.
  *     저장이 `{service}:admin` 권한인 화면이므로 다른 4서비스와 동일하게 관리자 영역에 둔다
- *     (K-Cosmetics·GlycoPharm·Neture `/admin/settings/legal-terms`, KPA `/admin/settings/legal`).
+ *     (K-Cosmetics·Neture `/admin/settings/legal-terms`, KPA `/admin/settings/legal`).
  *
- * Neture / GlycoPharm / K-Cosmetics / KPA 와 동일하게 공통 컴포넌트
+ * Neture / K-Cosmetics / KPA 와 동일하게 공통 컴포넌트
  * `@o4o/operator-core-ui/modules/service-legal` 에 serviceKey + api 어댑터만 주입한다.
  * 어댑터 본체는 lib/serviceLegalClient.ts 가 소유한다(관리자 대시보드와 공유).
  *

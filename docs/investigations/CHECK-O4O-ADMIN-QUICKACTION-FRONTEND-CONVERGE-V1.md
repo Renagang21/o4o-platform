@@ -15,13 +15,13 @@
 >
 > 1. **ActionIcon vocabulary 16 → 19 확장** — 양쪽 (`operator-ux-core` + `admin-ux-core`) ICON_NAME_MAP 에 신규 3종 (`bar-chart-3`, `building-2`, `settings`) 추가. Phase A 9 + Phase B 7 + Phase C 3 = **19종 vocabulary 확정**.
 > 2. **KPA admin STRUCTURE_ACTIONS 2 emoji → lucide-name** — `KpaAdminDashboardPage.tsx` line 34-37 의 `👤 / 📊` → `users / bar-chart-3`.
-> 3. **GP admin ADMIN_QUICK_ACTIONS 6 emoji → lucide-name** — `GlycoPharmAdminDashboard.tsx` line 121-128 의 `👤 / 🏥 / 💰 / 📄 / 🛡️ / ⚙️` → `users / building-2 / dollar-sign / file-text / shield / settings`.
+> 3.
 > 4. **8 emoji 모두 vocabulary 19종 안에 포함** — 누락 0 (5 vocab 재사용 + 3 신규).
 > 5. **백엔드 / Phase A/B / cross-service 회귀 0** — backend dashboard service / controller icon 값 변경 0. `StructureAction.icon` type 변경 0 (string 유지). `AdminDashboardLayout` 4-Block 구조 보존. ActionIcon emoji fallback / NAME_LIKE skip 동작 보존.
-> 6. **TypeScript 통과** — operator-ux-core / admin-ux-core / web-kpa-society / web-glycopharm 4 영역 모두 0 errors.
+> 6.
 > 7. **외부 세션 WIP 미접촉** — path-restricted commit 으로 정확히 5 파일 (코드 4 + CHECK 1) 만 stage.
 
-권고 단계: ① 본 CHECK 로 Phase C PASS 확정 → ② 배포 후 KPA `/admin` + GP `/admin` 브라우저 smoke (선택, PASS 자격 영향 없음) → ③ (선택) Phase D — K-Cosmetics / Neture admin 점검 결과 기반 후속 / 또는 종결
+권고 단계: ① 본 CHECK 로 Phase C PASS 확정 → ② 배포 후 KPA `/admin` `/admin` 브라우저 smoke (선택, PASS 자격 영향 없음) → ③ (선택) Phase D — K-Cosmetics / Neture admin 점검 결과 기반 후속 / 또는 종결
 
 ---
 
@@ -34,7 +34,6 @@
 | `packages/operator-ux-core/src/blocks/ActionIcon.tsx` | ICON_NAME_MAP 신규 3종 + lucide import 3개 추가 |
 | `packages/admin-ux-core/src/blocks/ActionIcon.tsx` | 동일 3종 추가 (양쪽 동일 vocabulary) |
 | `services/web-kpa-society/src/pages/admin/KpaAdminDashboardPage.tsx` | STRUCTURE_ACTIONS 2 emoji → lucide-name |
-| `services/web-glycopharm/src/pages/admin/GlycoPharmAdminDashboard.tsx` | ADMIN_QUICK_ACTIONS 6 emoji → lucide-name |
 
 ### 1.2 미접촉 영역 (Phase C 범위 외)
 
@@ -42,7 +41,6 @@
 - Phase A/B ActionIcon 의 emoji fallback / NAME_LIKE skip 로직 — **변경 0**
 - `StructureAction.icon` type (string) — **변경 0** (Option B 거부)
 - `AdminDashboardLayout` 4-Block 구조 — **변경 0** (Option C 거부)
-- GP Phase 2 의 `AdminLinkBlock` 사용 (FINANCE/GOVERNANCE/NETWORK_LINKS) — **변경 0**
 - DomainIASidebar / OperatorAreaShell / HeroBannerSection — **변경 0**
 - Store Hub / Channels / Home 아이콘 파일 — **변경 0**
 - K-Cosmetics / Neture admin — **변경 0** (Phase D 후속)
@@ -93,26 +91,9 @@ operator-ux-core ActionIcon + admin-ux-core ActionIcon 의 ICON_NAME_MAP 19 entr
 
 ---
 
-## 4. GlycoPharm admin ADMIN_QUICK_ACTIONS 매핑
-
-[`services/web-glycopharm/src/pages/admin/GlycoPharmAdminDashboard.tsx`](../../services/web-glycopharm/src/pages/admin/GlycoPharmAdminDashboard.tsx) line 121-130:
-
-| id | label | path | Before (emoji) | After (lucide-name) |
-|----|-------|------|:--------------:|:-------------------:|
-| users | 회원 관리 | `/admin/members` | 👤 | `users` |
-| pharmacies | 약국 네트워크 | `/admin/pharmacies` | 🏥 | `building-2` |
-| settlements | 정산 관리 | `/admin/settlements` | 💰 | `dollar-sign` |
-| invoices | 인보이스 | `/admin/invoices` | 📄 | `file-text` |
-| roles | 역할 관리 | `/admin/roles` | 🛡️ | `shield` |
-| settings | 설정 | `/admin/settings` | ⚙️ | `settings` |
-
-→ **6/6 vocabulary 안 매핑**.
-
----
-
 ## 5. 8 emoji vocabulary 19종 커버리지 검증
 
-| KPA admin | GP admin | lucide-name | Phase |
+| KPA admin admin | lucide-name | Phase |
 |:---------:|:--------:|-------------|:-----:|
 | ✅ 👤 → users | ✅ 👤 → users | users | A |
 | ✅ 📊 → bar-chart-3 | — | bar-chart-3 | **C** |
@@ -131,7 +112,6 @@ operator-ux-core ActionIcon + admin-ux-core ActionIcon 의 ICON_NAME_MAP 19 entr
 ### 6.1 백엔드 (변경 0)
 
 - KPA operator dashboard `operator-dashboard.service.ts` quickActions 12 lucide-name — **변경 0** (Phase B 그대로)
-- GlycoPharm operator service quickActions 3 lucide-name — 변경 0
 - K-Cosmetics operator controller quickActions 4 lucide-name — 변경 0
 - Neture admin controller 6 lucide-name — 변경 0
 - Neture operator controller 4 emoji — 변경 0 (ActionIcon emoji fallback 으로 회귀 0)
@@ -148,7 +128,7 @@ operator-ux-core ActionIcon + admin-ux-core ActionIcon 의 ICON_NAME_MAP 19 entr
 
 ### 6.3 K-Cosmetics / Neture admin 점검 (read-only)
 
-본 WO 의 범위는 KPA + GP admin 한정. K-Cos / Neture admin 의 하드코딩 emoji 존재 여부는 Phase D 후속 검토 영역 — **본 CHECK 진행 중 변경 0**.
+본 WO 의 범위는 KPA admin 한정. K-Cos / Neture admin 의 하드코딩 emoji 존재 여부는 Phase D 후속 검토 영역 — **본 CHECK 진행 중 변경 0**.
 
 ---
 
@@ -159,9 +139,8 @@ operator-ux-core ActionIcon + admin-ux-core ActionIcon 의 ICON_NAME_MAP 19 entr
 | `packages/operator-ux-core` | `npx tsc --noEmit` | **0** ✅ |
 | `packages/admin-ux-core` | `npx tsc --noEmit` | **0** ✅ |
 | `services/web-kpa-society` | `npx tsc --noEmit` | **0** ✅ |
-| `services/web-glycopharm` | `npx tsc -b --noEmit` (project refs) | **0** ✅ |
 
-→ 본 WO 영역 신규 회귀 0. web-glycopharm 의 Phase B 시점 22 pre-existing errors 가 0 으로 떨어진 것은 외부 세션의 별도 fix 결과 (본 WO 와 무관, 추가 신뢰성 확보).
+→ 본 WO 영역 신규 회귀 0.
 
 ---
 
@@ -170,10 +149,8 @@ operator-ux-core ActionIcon + admin-ux-core ActionIcon 의 ICON_NAME_MAP 19 entr
 - `AdminDashboardLayout` 4-Block 구조 (A Snapshot / B Policy / C Governance / D Structure Actions) — **변경 0**
 - `StructureActionBlock` 내부 `ActionIcon` 호출 시그니처 — **변경 0**
 - KPA admin 의 `AdminDashboardLayout config={adminConfig}` 호출 — **변경 0**
-- GP admin 의 `AdminDashboardLayout config={adminConfig}` + Phase 2 `AdminLinkBlock` 3개 — **변경 0**
-- GP Phase 2 의 FINANCE_LINKS / GOVERNANCE_LINKS / NETWORK_LINKS (lucide ReactNode 직접 주입) — **변경 0**
 
-→ **렌더 로직 보존**. 동작 변화는 KPA admin 2 + GP admin 6 = 총 8 icon 이 emoji 가 아닌 lucide 컴포넌트로 렌더되는 것 뿐 (의도된 변화).
+→ **렌더 로직 보존**. 동작 변화는 KPA admin 2 admin 6 = 총 8 icon 이 emoji 가 아닌 lucide 컴포넌트로 렌더되는 것 뿐 (의도된 변화).
 
 ---
 
@@ -197,7 +174,7 @@ operator-ux-core ActionIcon + admin-ux-core ActionIcon 의 ICON_NAME_MAP 19 entr
 |----------|:----:|
 | ActionIcon vocabulary 16 → 19 확장 (양쪽 동일) | ✅ |
 | KPA admin 2 emoji → lucide-name | ✅ |
-| GP admin 6 emoji → lucide-name | ✅ |
+ admin 6 emoji → lucide-name | ✅ |
 | 8 emoji 모두 vocabulary 19종 안 매핑 | ✅ 8/8 |
 | 백엔드 / cross-service / Phase A/B 미접촉 | ✅ |
 | `StructureAction.icon` type + AdminDashboardLayout 구조 보존 | ✅ |
@@ -205,13 +182,12 @@ operator-ux-core ActionIcon + admin-ux-core ActionIcon 의 ICON_NAME_MAP 19 entr
 | operator-ux-core typecheck | ✅ 0 errors |
 | admin-ux-core typecheck | ✅ 0 errors |
 | web-kpa-society typecheck | ✅ 0 errors |
-| web-glycopharm typecheck | ✅ 0 errors |
 
 ### 결론
 
-> **Phase C 코드 작업 완료**. Admin 프론트 (KPA + GP) 의 8 하드코딩 emoji 가 ActionIcon vocabulary 19종 안의 lucide-name 으로 정렬. Phase A/B 정책 (string-based ICON_NAME_MAP 확장 + emoji fallback 보존) 일관 유지.
+> **Phase C 코드 작업 완료**. Admin 프론트 (KPA) 의 8 하드코딩 emoji 가 ActionIcon vocabulary 19종 안의 lucide-name 으로 정렬. Phase A/B 정책 (string-based ICON_NAME_MAP 확장 + emoji fallback 보존) 일관 유지.
 >
-> 배포 후 KPA `/admin` + GP `/admin` 화면에서 8 icon 이 lucide 컴포넌트로 렌더 — 사용자 manual smoke 권장 (선택, PASS 자격 영향 없음).
+> 배포 후 KPA `/admin` `/admin` 화면에서 8 icon 이 lucide 컴포넌트로 렌더 — 사용자 manual smoke 권장 (선택, PASS 자격 영향 없음).
 
 ---
 
@@ -229,7 +205,7 @@ Phase C 코드  (본 commit) ✅
 ```
 
 총 vocabulary: 19종 (A 9 + B 7 + C 3).
-총 정렬 영역: KPA backend 12 + KPA admin 2 + GP admin 6 = 20 lucide-name (operator vs admin 양쪽).
+총 정렬 영역: KPA backend 12 + KPA admin 2 admin 6 = 20 lucide-name (operator vs admin 양쪽).
 잔존 emoji: Neture operator 4 (의도적 — ActionIcon emoji fallback 동작 보존).
 
 ---
@@ -240,7 +216,7 @@ Phase C 코드  (본 commit) ✅
 |-----------|------|:----:|
 | Phase D (선택) | K-Cosmetics / Neture admin 프론트 하드코딩 emoji 점검 + 정렬 | 낮음 |
 | Cross-service ActionIcon vocab 표준 문서화 | Phase A/B/C 정합 명문화 + vocab 확장 정책 | 낮음 |
-| Browser smoke (KPA admin + GP admin) | 배포 후 시각 확인 | 중간 |
+| Browser smoke (KPA admin admin) | 배포 후 시각 확인 | 중간 |
 
 본 CHECK 통과로 **Quick/Structure/Admin Actions 계열 아이콘 정비는 상당히 안정적으로 마무리** 상태.
 
@@ -251,7 +227,7 @@ Phase C 코드  (본 commit) ✅
 | 항목 | 값 |
 |------|------|
 | 작성 문서 | `docs/investigations/CHECK-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1.md` |
-| 수정 파일 (코드 4) | operator-ux-core ActionIcon + admin-ux-core ActionIcon + KPA admin + GP admin |
+| 수정 파일 (코드 4) | operator-ux-core ActionIcon + admin-ux-core ActionIcon + KPA admin admin |
 | 8 emoji 매핑 | ✅ 8/8 vocabulary 19종 안 |
 | Vocabulary 19종 (양쪽 동일) | ✅ Phase A 9 + Phase B 7 + Phase C 3 |
 | 백엔드 / Phase A/B / cross-service 미접촉 | ✅ |

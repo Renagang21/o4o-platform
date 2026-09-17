@@ -3,7 +3,7 @@
  *
  * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
  *
- * 구조는 기존 서비스(glycopharm / cosmetics)와 동일하다:
+ * 구조는 기존 서비스와 동일하다:
  *   requireAuth → createMembershipScopeGuard(config)
  *     = service_memberships(user_id, 'pharmacy-hub').status = 'active'
  *       + prefixed role/scope 검사 (기본 DENY)

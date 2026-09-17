@@ -28,7 +28,7 @@
 
 | Cloud Run 서비스 | 분류 |
 |---|---|
-| `neture-web` · `glycopharm-web` · `kpa-society-web` · `k-cosmetics-web` · `pharmacy-hub-web` · `kpa-branch-web` | ACTIVE (`deploy-web-services.yml` 관리) |
+| `neture-web` · `kpa-society-web` · `k-cosmetics-web` · `pharmacy-hub-web` · `kpa-branch-web` | ACTIVE (`deploy-web-services.yml` 관리) |
 | `o4o-core-api` | ACTIVE (`deploy-api.yml`) |
 | `o4o-admin-dashboard` | ACTIVE (`deploy-admin.yml`) |
 | `o4o-admin-dashboard-dev` | ACTIVE (dev 축) |
@@ -251,7 +251,7 @@ docker run -d -p 18080:8080 signage-player-web:smoke
 |---|---|
 | `detect-changes` | success |
 | **`deploy-signage-player`** | **success** |
-| `deploy-neture` · `deploy-k-cosmetics` · `deploy-kpa-society` · `deploy-glycopharm` · `deploy-pharmacy-hub` · `deploy-kpa-branch` | **전부 skipped** (기존 서비스 무영향) |
+| `deploy-neture` · `deploy-k-cosmetics` · `deploy-kpa-society` · `deploy-pharmacy-hub` · `deploy-kpa-branch` | **전부 skipped** (기존 서비스 무영향) |
 | `summary` | success |
 
 ```
@@ -327,7 +327,6 @@ GET     Origin: https://evil.example.com   → 500 (여전히 거부)
 ```
 GET /api/v1/channels?serviceKey=neture       → {"data":[],"pagination":{"total":0}}
 GET /api/v1/channels?serviceKey=kpa-society  → total 0
-GET /api/v1/channels?serviceKey=glycopharm   → total 0
 GET /api/v1/channels?serviceKey=k-cosmetics  → total 0
 GET /api/v1/channels/code/TESTCODE           → 404 NOT_FOUND
 GET /api/v1/channels/health                  → {"status":"ok","service":"channels"}

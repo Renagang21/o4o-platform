@@ -171,7 +171,6 @@
 |---|---|
 | Step 0 — 패키지 신설 | Step A 만 (deploy 영향 0) |
 | Step 1 — 첫 서비스 (KPA) | **Step A + B + Soak 1주** |
-| Step 2 — 두 번째 서비스 (Glyco) | Step A + B + Soak 1주 |
 | Step 3 — 세 번째 서비스 (K-Cos) | Step A + B + Soak 1주 |
 
 → 각 서비스 단계마다 **본 체크리스트 1회 적용**.

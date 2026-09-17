@@ -8,7 +8,7 @@ import { ForumModerationController } from './ForumModerationController.js';
  * ForumController — Backward-compatible composition wrapper.
  *
  * Delegates every handler to the corresponding sub-controller.
- * Kept so that existing consumers (kpa.routes, glycopharm.routes,
+ * Kept so that existing consumers (kpa.routes,
  * forum.routes) can continue to `new ForumController()` without changes.
  *
  * WO-O4O-FORUM-NAMING-CLEANUP-V1: ForumCategoryController → ForumDirectoryController

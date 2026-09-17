@@ -84,4 +84,4 @@
 ## 6. 후속 (본 WO 범위 외)
 
 - G1 잔여: `/store/execution/product-info`(StoreProductInfoCreatorPage) UNREACHABLE 처리 — **곧바로 노출하지 않고**, 기존 상품 설명 / 제작 자료 / 상품별 마케팅과 역할 중복 여부를 먼저 판정하는 read-only 조사 (사용자 확인 후 착수).
-- G10: `PharmacyOwnerOnlyGuard` 일관화 (공통 store-ui-core = Shared Module Protocol, GP/K-Cos 동시영향).
+- G10: `PharmacyOwnerOnlyGuard` 일관화 (공통 store-ui-core = Shared Module Protocol, K-Cos 동시영향).

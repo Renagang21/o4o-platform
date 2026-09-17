@@ -25,10 +25,10 @@ interface WrapOptions {
  * Express handler를 감싸서 자동 ActionLog 기록.
  *
  * 사용법:
- *   router.post('/trigger/care-review', requireAuth,
+ *   router.post('/trigger/review', requireAuth,
  *     wrapWithActionLogging(actionLogService, {
- *       serviceKey: 'glycopharm',
- *       actionKey: 'glycopharm.trigger.care_review',
+ *       serviceKey: 'kpa-society',
+ *       actionKey: 'kpa.trigger.review',
  *     }, originalHandler),
  *   );
  */

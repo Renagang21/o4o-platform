@@ -56,7 +56,6 @@ async approvePartnerApplication(applicationId, sellerId) {
   const item = dashboardRepo.create({
     partnerUserId: application.partnerId,
     productId: recruitment.productId,
-    serviceId: recruitment.serviceId || 'glycopharm',
     status: 'active',
   });
   await dashboardRepo.save(item);

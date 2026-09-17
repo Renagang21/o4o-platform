@@ -45,7 +45,7 @@
 - **`operatorMenuGroups.ts` `NETURE_DOMAIN_LABELS` emoji(`📦💳💬⚙️`)** — **미변경** (공통 `DomainIASidebar`가 직접 렌더 → lucide化는 공통 구조 변경 필요. §8 후속 WO로 분리. 사용자 승인)
 - 공통 패키지(`DomainIASidebar`/`OperatorAreaShell`/`operator-ux-core`/`shared-space-ui`) — 미수정
 - `HeroBannerSection.tsx` — 미접촉
-- KPA / GlycoPharm / K-Cosmetics — 미접촉
+- KPA / K-Cosmetics — 미접촉
 - Home AppEntry/역할 카드(이미 lucide/SVG), `HomeAppIcons` custom SVG — 미변경
 - 카드 순서 / 링크 / 라우트 / 권한 / API / 문구 — 불변
 
@@ -104,7 +104,6 @@ docs/investigations/CHECK-O4O-NETURE-HOME-ROLE-MARKET-TRIAL-ICON-ALIGNMENT-V1.md
 ## 10. 남은 후속 작업
 
 ```text
-- (분리 후속 WO) 공통 DomainIASidebar 도메인 헤딩 emoji → lucide (4서비스 NETURE/KPA/Glyco/KCos 도메인 라벨 일괄)
 - Operator/Admin Quick Actions emoji 정비
 - LMS lesson type icon mapping 공통화
 - shared-space-ui emoji fallback 제거 (Phase 7)

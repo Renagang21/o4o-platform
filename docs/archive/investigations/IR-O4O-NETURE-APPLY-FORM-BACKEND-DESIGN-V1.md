@@ -114,7 +114,6 @@ export const emailService = new MailService({ dataSource: AppDataSource, logger 
 |---|---|---|---|
 | `kpa-join-inquiry` | `routes/kpa/entities/kpa-join-inquiry.entity.ts` | KPA Society 가입 신청 (별 도메인, kpa_members 흐름) | 무관 — 별 도메인 |
 | `kpa-contact-request` | `routes/kpa/controllers/contact-request.controller.ts` | KPA 약사회 연락처 요청 | 무관 |
-| `glycopharm-customer-request` | `routes/glycopharm/controllers/customer-request.controller.ts` | GP 고객 상담 요청 | 무관 |
 
 → **PlatformInquiry 가 가장 정확한 fit.** 다른 시스템 재사용 시 도메인 mismatch 발생.
 
@@ -471,10 +470,9 @@ cat apps/api-server/src/services/email.service.ts
 # 4. frontend 기존 사용처
 grep -rn "platform/inquiries\|InquiryType\|submitInquiry" services/
 
-# 5. 다른 inquiry 도메인 (KPA / GP 등 — 본 form 와 분리 확인용)
+# 5. 다른 inquiry 도메인 (KPA 등 — 본 form 와 분리 확인용)
 ls apps/api-server/src/routes/kpa/controllers/contact-request.controller.ts \
    apps/api-server/src/routes/kpa/controllers/join-inquiry.controller.ts \
-   apps/api-server/src/routes/glycopharm/controllers/customer-request.controller.ts
 ```
 
 ---

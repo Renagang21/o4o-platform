@@ -14,7 +14,6 @@
 | KPA | `/store/commerce/local-products` · `pages/pharmacy/StoreLocalProductsPage.tsx` (911L) | `src/api/localProducts.ts` (`/api/v1/store/local-products`) | ❌ 미사용 (자체 구현) |
 | K-Cosmetics | `pages/store/StoreLocalProductsPage.tsx` (24L) | `services/localProductApi` | ✅ |
 | PharmacyHub | `pages/store-owner/LocalProductsPage.tsx` (104L) | `lib/api/pharmacyHubLocalProducts.ts` | ✅ (연결 상태 게이트 후 위임) |
-| GlycoPharm | `pages/store-management/StoreLocalProductsPage.tsx` (24L) | service api | ✅ (회귀 대상) |
 
 권한·route·API 계약은 서비스마다 그대로 유지되며 이번 작업에서 건드리지 않았다.
 
@@ -64,7 +63,6 @@ Manager 헤더 주석에 `KPA 는 BaseTable 기반 구조라 본 manager 대상 
 | **KPA** | BaseTable 렌더 · 다국어 컬럼 · 리치 등록/수정 폼 전체(바코드 · 미디어 라이브러리 · RichTextEditor · 콘텐츠 가져오기 충돌 처리 · 다국어 연결 패널 · `MultilingualPublicActions` QR/URL) · Store Hub 이동 · 화면 문구 · toast 아이콘 |
 | **PharmacyHub** | 매장 연결 상태 게이트(`StoreConnectionNotice`) · 후속 화면 없는 액션 3종 `null` 처리(dead link 대신 숨김) · 문구 |
 | **K-Cosmetics** | `categoryPlaceholder` 만 주입하는 종전 형태 그대로 (코드 변경 0) |
-| **GlycoPharm** | 코드 변경 0 (회귀만 확인) |
 | 공통 아님 | API client · endpoint · 권한 · route |
 
 ---
@@ -86,7 +84,6 @@ Manager 헤더 주석에 `KPA 는 BaseTable 기반 구조라 본 manager 대상 
 | web-kpa-society | PASS | PASS |
 | web-pharmacy-hub | PASS | PASS |
 | web-k-cosmetics (회귀) | PASS | PASS |
-| web-glycopharm (회귀) | PASS | PASS |
 
 기능 검증은 **코드 경로 등가성 확인**으로 수행했다(작업 브랜치가 배포되지 않아 브라우저 smoke 는 실행하지 않음).
 
@@ -98,7 +95,7 @@ Manager 헤더 주석에 `KPA 는 BaseTable 기반 구조라 본 manager 대상 
 | 활성 필터 | `activeOnly` 파라미터 + page=1 리셋 |
 | pagination | `PAGE_SIZE=20`, `총 N개 중 a-b` 표기, 1페이지면 미노출 |
 | loading / error / empty | 로딩 스피너 · error 배너+재시도 · empty(검색/비검색 분기 + 첫 상품 등록 CTA) |
-| 후속 액션 | KPA·GP·KCos = 기본 경로(`/store/commerce/tablet-displays`, `/store/commerce/products/:id/marketing`, canonical POP) · PH = 3종 숨김 |
+| 후속 액션 | KPA·KCos = 기본 경로(`/store/commerce/tablet-displays`, `/store/commerce/products:id/marketing`, canonical POP) · PH = 3종 숨김 |
 
 ---
 
@@ -111,7 +108,7 @@ services/web-kpa-society/src/pages/pharmacy/StoreLocalProductsPage.tsx          
 docs/checks/CHECK-O4O-MY-STORE-LOCAL-PRODUCTS-CROSSSERVICE-COMMONIZATION-V1.md      (본 문서)
 ```
 
-K-Cosmetics / PharmacyHub / GlycoPharm 소스 변경 0건.
+K-Cosmetics / PharmacyHub 소스 변경 0건.
 
 ## 7. 문서 정합
 

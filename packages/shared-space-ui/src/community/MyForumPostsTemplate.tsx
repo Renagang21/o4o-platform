@@ -3,7 +3,7 @@
  *
  * WO-O4O-COMMUNITY-PHARMACYHUB-BASELINE-AND-CROSSSERVICE-MYPOSTS-ADOPTION-V1 §11
  *
- * 5서비스(KPA-Society / K-Cosmetics / GlycoPharm / PharmacyHub / Neture)의 My Posts
+ * 4서비스(KPA-Society / K-Cosmetics / PharmacyHub / Neture)의 My Posts
  * 화면을 단일 View 로 공통화한다. 서비스 wrapper 는 fetch / route / config 만 담당한다.
  *
  * - 순수 presentational: fetch/router/API client 를 import 하지 않는다.

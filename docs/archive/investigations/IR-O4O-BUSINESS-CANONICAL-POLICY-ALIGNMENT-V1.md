@@ -15,7 +15,7 @@
 
 **방법론**:
 - 새 코드 trace 없음 — 선행 IR 의 데이터 + 정책 판단 종합
-- pharmacy/store terminology 분포만 추가 spot-check (KPA/GlycoPharm = 도메인 어휘 확인)
+- pharmacy/store terminology 분포만 추가 spot-check (KPA = 도메인 어휘 확인)
 - "추정" 이 아닌 "현재 코드 + 향후 방향" 기준 판단
 
 ---
@@ -49,7 +49,7 @@
 
 **legacy 아님 — layer 별 도메인 어휘 정책으로 정리**:
 - **Platform layer (packages/, organizations, store-core, etc.)** = `store` (generic)
-- **Service-local layer (KPA / GlycoPharm)** = `pharmacy` (도메인 자연 어휘) 유지
+- **Service-local layer ** = `pharmacy` (도메인 자연 어휘) 유지
 - **Cosmetics / Neture** = `store` / `supplier` (도메인 어휘)
 - terminology rename migration **불필요**
 
@@ -77,7 +77,7 @@
 |---|---|
 | organizations 는 business SSOT 인가? | **YES (canonical 선언)**, 단 실제 코드는 partial — bidirectional sync + 통합 컬럼 추가로 full SSOT 승격 가능 |
 | store 는 무엇인가? | **execution place — organization 의 한 instance (type='store' or type='pharmacy')**. 별도 entity 아님. organizations 내 type discriminator 로 표현 |
-| pharmacy 는 legacy terminology 인가? | **NO** — KPA-Society + GlycoPharm 의 도메인 자연 어휘. Platform-layer 에서는 store (generic) 사용. terminology migration 불필요 |
+| pharmacy 는 legacy terminology 인가? | **NO** — KPA-Society 의 도메인 자연 어휘. Platform-layer 에서는 store (generic) 사용. terminology migration 불필요 |
 | users.businessInfo 는 앞으로 무엇? | **Identity-side Business Profile Cache** — form input + display cache + ensure source. SSOT 아님. organizations 와 bidirectional sync 의무화 |
 | operator/profile/register 동일 write-path 통합 가능? | **YES (권장)** — BusinessProfileWriteService 단일 layer 로 통합. atomic transaction 보장 |
 | address canonical 은? | **`StoreAddress` type → `organizations.address_detail` (jsonb)**. 비표준 모두 deprecate |
@@ -94,14 +94,13 @@
 |---|---|
 | `IR-O4O-BUSINESS-REGISTRATION-CANONICAL-STRUCTURE-AUDIT-V1` | 10 entity 매핑, 12-row drift matrix, frozen baselines (F9/F10/F11), 6 baseline docs canonical claims |
 | `IR-O4O-BUSINESSINFO-READWRITE-FLOW-TRACE-V1` | 7 write × 9 read entrypoints, 8 org create × 4 ensure call sites, lifecycle diagrams, 12 runtime consumers + 5 부재 시스템, 6 prior-IR 정정 |
-| 본 IR spot-check | pharmacy terminology depth (KPA: 60+ / GlycoPharm: 72+ / Platform packages: store 우세) |
+| 본 IR spot-check | pharmacy terminology depth (KPA: 60+: 72+ / Platform packages: store 우세) |
 
 ### 1-2. 본 IR 의 판단 기준
 
 - ❌ "이상적 SSOT 설계" — 향후 모든 시스템 처음부터 재설계 가정
 - ✅ "현재 O4O 현실 + 향후 방향" — 다음 12-18 개월 진화 경로
 - ✅ "frozen baseline 존중" — F9/F10/F11 의 SSOT 결정은 변경 없음
-- ✅ "domain-specific 어휘 보존" — KPA 약사회 / GlycoPharm 글라이코팜 의 자연 도메인 어휘 유지
 - ✅ "실 runtime consumer 우선" — operator UI / PharmacyInfoPage / supplier profile 등 active consumer 기반 정렬
 
 ---
@@ -208,7 +207,7 @@
 | Manager Name / Phone | neture_suppliers only | (현재 결정 없음 — service-local 유지 OR organizations 표준 컬럼화) | cross-service 필요 시 결정 | invoice/settlement 시스템 도입 시 결정 |
 | Activity Type (직역) | `kpa_pharmacist_profiles.activity_type` ✅ (per WO-ROLE-NORMALIZATION-PHASE3-B-V1) | 동일 | mirror 다수 | mirror 정리 |
 | Store Slug | `platform_store_slugs` | `platform_store_slugs` | 없음 | 유지 |
-| Storefront Config | `organizations.storefront_config` + `glycopharm_pharmacies.storefront_config` (3-field) + (KPA = 1-field) | 표준화 필요 | jsonb schema drift | 별도 IR |
+| Storefront Config | `organizations.storefront_config` + (KPA = 1-field) | 표준화 필요 | jsonb schema drift | 별도 IR |
 
 ---
 
@@ -221,7 +220,7 @@
 
 근거:
 - `organizations` 가 이미 type discriminator 보유 (pharmacy/store/supplier/community/kpa-branch/kpa-group)
-- 기존 service-specific 테이블 (glycopharm_pharmacies, cosmetics_stores) 도 `organization_id` FK 로 organizations 와 연결
+- 기존 service-specific 테이블 도 `organization_id` FK 로 organizations 와 연결
 - 추가 "Store" entity 만들면 dual-write 추가 위험
 
 ### 5-2. 현재 혼재 양상
@@ -229,7 +228,6 @@
 | Service | Business Entity (organizations) | Execution Place (별도 테이블) | 관계 |
 |---|---|---|---|
 | KPA pharmacy | type='pharmacy' | (없음 — organizations 가 곧 약국) | 1:1 |
-| GlycoPharm | type='pharmacy' | `glycopharm_pharmacies` (organization_id FK) | 1:1 (확장 컬럼 보유) |
 | Cosmetics | type='store' | `cosmetics_stores` (organization_id FK) | 1:1 |
 | Neture supplier | type='supplier' | `neture_suppliers` (user_id FK, org metadata.netureSupplierSlug 으로 역링크) | 1:1 |
 | KPA-branch | type='kpa-branch' | (없음) | 1:1 |
@@ -242,7 +240,6 @@
 ```
 [L3 Business Entity = organizations (canonical SSOT)]
    ↓ type discriminator
-   ├── type='pharmacy'  → KPA / GlycoPharm 약국 (extension: glycopharm_pharmacies)
    ├── type='store'     → Cosmetics / 일반 매장 (extension: cosmetics_stores)
    ├── type='supplier'  → Neture 공급자 (extension: neture_suppliers)
    ├── type='community' → Forum / Community
@@ -265,9 +262,8 @@
 | Layer | pharmacy 사용 | store 사용 | 정책 |
 |---|---|---|---|
 | **packages/** (platform-level) | 거의 없음 | 우세 (store-core, store-ui-core, store-products-ui 등) | **store** (generic) |
-| **apps/api-server/** | 60+ occurrences | 다수 | layer 혼재 — KPA / GlycoPharm route 는 pharmacy, store-core / organization 은 store |
+| **apps/api-server/** | 60+ occurrences | 다수 | layer 혼재 — KPA route 는 pharmacy, store-core / organization 은 store |
 | **services/web-kpa-society/** | 49+ occurrences (도메인 어휘) | 다수 (`/store/*` routes) | hybrid — domain (pharmacy_owner / 약국) + execution layer (`/store` route) |
-| **services/web-glycopharm/** | 72+ occurrences (글라이코팜 = glyco + pharmacy) | 다수 | 동일 hybrid |
 | **services/web-k-cosmetics/** | 거의 없음 | 우세 | **store** |
 | **services/web-neture/** | 거의 없음 | supplier 우세 | **supplier** |
 
@@ -277,7 +273,6 @@
 
 근거:
 - KPA-Society = 한국약사회 → pharmacy 가 도메인 본질
-- GlycoPharm = 글라이코팜 (제약사 서비스명에 pharmacy 포함) → pharmacy 자연 어휘
 - Cosmetics / Neture / Platform-layer 는 이미 store/supplier 사용 중 — terminology drift 없음
 
 → pharmacy 사용은 **domain-specific intentional terminology**. legacy 가 아니라 도메인 정합 어휘.
@@ -291,8 +286,7 @@
 | Layer | 어휘 | 사유 |
 |---|---|---|
 | Platform packages (`packages/store-*`, `packages/organization-*`) | **store / organization** (generic) | cross-service 재사용 |
-| Service-local (KPA / GlycoPharm) frontend / routes | **pharmacy** 유지 | 사용자에게 자연스러운 어휘 (약사가 "약국" 이라고 부름) |
-| Service-local entities (kpa_pharmacy_requests, glycopharm_pharmacies) | **pharmacy** 유지 | 도메인 명시 |
+| Service-local (KPA) frontend / routes | **pharmacy** 유지 | 사용자에게 자연스러운 어휘 (약사가 "약국" 이라고 부름) |
 | Platform-level entities (organizations, organization_members) | **organization / store** (generic) | layer abstraction |
 | Cross-service shared (auth-utils, security-core) | **store_owner / kpa:store_owner** (이미 generic) | platform-wide 추상화 |
 
@@ -354,7 +348,7 @@
 |---|---|---|---|
 | `business_number` | scattered (6+) | `organizations.business_number` ✅ (이미 있음) | personal cache 는 sync target |
 | `name` (사업체명) | 분산 | `organizations.name` ✅ | 동일 |
-| `address_detail` | partial (organizations / glycopharm / cosmetics) | `organizations.address_detail` (jsonb StoreAddress) ✅ | denormalized 제거 |
+| `address_detail` | partial (organizations / cosmetics) | `organizations.address_detail` (jsonb StoreAddress) ✅ | denormalized 제거 |
 | `phone` | 분산 | `organizations.phone` ✅ | 동일 |
 | **`ceo_name` (대표자명)** | businessInfo.representativeName (free) / neture_suppliers.representative_name | `organizations.ceo_name` (varchar, **신설 권장**) | 통합 candidate |
 | **`tax_invoice_email`** | 5 곳 분산 | `organizations.tax_invoice_email` (varchar, **신설 권장 — invoice 시스템 도입 시**) | deferring |
@@ -369,8 +363,8 @@
 
 | 필드 | 위치 | 유지 사유 |
 |---|---|---|
-| `storefront_config` / `storefront_blocks` (GlycoPharm) | glycopharm_pharmacies | GlycoPharm-specific layout |
-| `enabled_services` | glycopharm_pharmacies | GlycoPharm-specific feature flags |
+| `storefront_config` / `storefront_blocks` | — | — |
+| `enabled_services` | — | — |
 | Neture supplier 의 `contact_*_visibility` | neture_suppliers | supplier-specific visibility 정책 |
 | Neture supplier 의 `min_order_amount`, `order_condition_note` | neture_suppliers | B2B 거래 조건 — supplier-specific |
 | Neture supplier 의 `pricing_policy`, `shipping_*` | neture_suppliers | 동일 |
@@ -405,7 +399,6 @@
 | flat `zipCode` | users.businessInfo (with storeAddress 동시 존재) | dead write → 제거 |
 | denormalized `kpa_members.pharmacy_address` (varchar) | kpa_members | deprecate → organizations.address_detail 조회로 대체 |
 | custom 6-field `neture_partners.address` (jsonb) | neture_partners | StoreAddress 로 migration |
-| `glycopharm_applications.metadata.address` snapshot | (snapshot) | 자체 dead → glycopharm_applications 자체 활용도 재검토 |
 
 ### 9-3. RegisterModal 의 free-text 주소
 
@@ -541,10 +534,10 @@ prerequisite chain:
 
 | Classification | 정의 | 예시 |
 |---|---|---|
-| **Live Critical** | 실패 시 운영 차단 | PharmacyGuard (`/store/*` 접근), Organization ensure, role_assignments check, Glycopharm pharmacy resolve (order routing) |
+| **Live Critical** | 실패 시 운영 차단 | PharmacyGuard (`/store/*` 접근), Organization ensure, role_assignments check pharmacy resolve (order routing) |
 | **Live Optional** | 실패 시 graceful degradation | PharmacyInfoPage GET fallback chain, MyProfilePage 의 businessInfo.storeAddress fallback, supplier profile prefill |
 | **Dormant** | 코드 alive, 실제 호출 빈도 낮거나 unverified | KPA mypage.service:138-147 (`metadata.workplace` write), KPA member info (PATCH /kpa/members/:id/info) 의 일부 분기 |
-| **Dead** | write 됨 but read 없음 | `glycopharm_applications.metadata`, `users.businessInfo.address2/zipCode` flat, `kpa_pharmacy_requests.pharmacy_phone/owner_phone` (fallback 외) |
+| **Dead** | write 됨 but read 없음 | `users.businessInfo.address2/zipCode` flat, `kpa_pharmacy_requests.pharmacy_phone/owner_phone` (fallback 외) |
 | **Legacy Compatibility** | deprecate 진행 중 / migration backfill source | `organizations.address` (legacy varchar), `kpa_organizations` (legacy table), `users.businessInfo.address` |
 
 ### 13-2. 정비 우선순위 매핑
@@ -564,7 +557,7 @@ prerequisite chain:
 ### 14-1. Terminology Migration (pharmacy → store)
 
 **판단**: **불필요** (§6 참조).
-- Service-local layer (KPA / GlycoPharm) 는 pharmacy 도메인 어휘 유지
+- Service-local layer (KPA) 는 pharmacy 도메인 어휘 유지
 - Platform layer 는 이미 store/organizations 사용 중
 - Rename migration 의 비용 > 이득
 
@@ -587,21 +580,20 @@ prerequisite chain:
 
 근거:
 - KPA-Society 가 가장 복잡한 business 흐름 (auto + manual activation, multi-flow write)
-- KPA 정렬 후 GlycoPharm/K-Cosmetics 재공통화 가능 (CLAUDE.md §13: KPA-Society = reference implementation)
+- KPA 정렬 후 K-Cosmetics 재공통화 가능 (CLAUDE.md §13: KPA-Society = reference implementation)
 - KPA-Society 의 frontend 흐름 5 개가 정렬되면 다른 service 의 pattern 도입 용이
 
-### 14-4. GlycoPharm / K-Cosmetics 재공통화 Readiness
+### 14-4. K-Cosmetics 재공통화 Readiness
 
 **판단**: **부분적 ready** (organizations 통합 이미 적용).
 
 | Service | Org 통합 상태 | 공통화 준비도 |
 |---|:---:|:---:|
 | KPA-Society | partial (kpa_organizations + organizations dual) | 🟡 정비 진행 중 |
-| GlycoPharm | ✅ organization_id FK (migration 20260215300002) | 🟢 ready |
 | K-Cosmetics | ✅ organization_id FK (migration 20260311200000) | 🟢 ready |
 | Neture | partial (org metadata 로 reverse link) | 🟡 supplier 컬럼 통합 결정 필요 |
 
-→ KPA 정렬이 prerequisite. 그 후 GlycoPharm/K-Cosmetics 공통화 진행 가능.
+→ KPA 정렬이 prerequisite. 그 후 K-Cosmetics 공통화 진행 가능.
 
 ---
 
@@ -624,7 +616,7 @@ prerequisite chain:
 **답**: **organizations 의 type='store' instance — 별도 entity 아님**.
 
 - `organizations.type ∈ {'pharmacy', 'store', 'supplier', 'community', 'kpa-branch', 'kpa-group'}` 의 discriminator
-- 매장 = `organizations(type='store')` 또는 `organizations(type='pharmacy')` (KPA/GlycoPharm 의 경우)
+- 매장 = `organizations(type='store')` 또는 `organizations(type='pharmacy')` (KPA 의 경우)
 - Service-specific 확장 컬럼이 필요하면 별도 extension 테이블 (organization_id FK)
 - 별도 "Store" entity 만들지 않음
 
@@ -633,7 +625,6 @@ prerequisite chain:
 **답**: **NO — domain-specific intentional terminology**.
 
 - KPA-Society = 한국약사회 도메인 → pharmacy 자연 어휘
-- GlycoPharm = 글라이코팜 (glyco + pharmacy) → pharmacy 도메인
 - Platform-layer (packages) 는 이미 store/organization (generic)
 - Rename migration 불필요. Layer 별 어휘 정책으로 정리 (§6-3 참조)
 
@@ -730,7 +721,7 @@ users → service_memberships(kpa-society, active)
 | Order | WO | 의존 |
 |---|---|---|
 | 10 | `WO-O4O-DEAD-WRITE-CLEANUP-V1` (선행 IR P3) | 검증 후 |
-| 11 | `WO-O4O-GLYCOPHARM-APPLICATIONS-METADATA-AUDIT-V1` | dead 확정 |
+| 11 | — | dead 확정 |
 
 ### Phase 5: Invoice 시스템 도입 시점
 
@@ -745,7 +736,7 @@ users → service_memberships(kpa-society, active)
 |---|---|---|
 | 14 | `WO-O4O-KPA-ORGANIZATIONS-LEGACY-TABLE-REMOVE-V1` — kpa_organizations 완전 제거 | Phase 2-3 완료 |
 | 15 | `WO-O4O-NETURE-SUPPLIER-CANONICAL-COLUMN-CONSOLIDATION-V1` — supplier 자체 컬럼 organizations 통합 (또는 service-local 정책 명시) | 정책 결정 |
-| 16 | `WO-O4O-GLYCOPHARM-KCOSMETICS-CANONICAL-RE-COMMONIZATION-V1` — KPA 정렬 후 다른 service 재공통화 | KPA 정렬 완료 |
+| 16 | — | KPA 정렬 완료 |
 
 ---
 
@@ -759,7 +750,7 @@ users → service_memberships(kpa-society, active)
 | R4 | tax_invoice_email 결정 deferring 으로 invoice 시스템 도입 시 backfill 복잡 | 향후 마이그레이션 부담 | 🟡 LOW (현재) / 🟠 MID (도입 시) | Interim 정책 (P0-6) 으로 신규 write 정렬 |
 | R5 | pharmacy → store rename 진행 시 KPA-Society 의 UX 어휘 어색함 | UX 회귀 | 🟠 MID | 본 IR 의 P0-4 정책으로 rename 차단 |
 | R6 | Neture supplier 자체 컬럼 organizations 통합 시 기존 supplier UI 회귀 | 도메인 기능 손상 | 🟠 MID | service-local 정책 유지 vs 통합 결정 (Phase 6) |
-| R7 | KPA-first 정렬 중 GlycoPharm/K-Cosmetics 의 신규 변경 발생 | sync 부담 증가 | 🟡 LOW | KPA-Society = reference implementation 원칙 (CLAUDE.md §13) |
+| R7 | KPA-first 정렬 중 K-Cosmetics 의 신규 변경 발생 | sync 부담 증가 | 🟡 LOW | KPA-Society = reference implementation 원칙 (CLAUDE.md §13) |
 | R8 | dead writes 정비 중 hidden consumer 발견 | 회귀 | 🟡 LOW | grep 검증 + staging deploy 시 모니터링 |
 
 ---
@@ -783,7 +774,6 @@ users → service_memberships(kpa-society, active)
 본 IR 의 범위 외 (정책 결정 후 follow-up 조사):
 - `IR-O4O-BUSINESS-PROFILE-WRITE-SERVICE-DESIGN-V1` — service layer 인터페이스 설계
 - `IR-O4O-ORGANIZATIONS-METADATA-TYPED-SCHEMA-V1` — metadata jsonb 표준화
-- `IR-O4O-GLYCOPHARM-KCOSMETICS-CANONICAL-GAP-V2` — KPA 정렬 후 재공통화 prerequisite
 - `IR-O4O-NETURE-SUPPLIER-COLUMN-STRATEGY-V1` — service-local vs canonical 결정
 
 ---

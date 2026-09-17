@@ -7,7 +7,6 @@
  * 공개 페이지 — 인증 불필요.
  *
  * Pure @o4o/shared-space-ui — service-agnostic.
- * Canonical pattern: identical to GlycoPharm StoreBlogPostPage.
  */
 
 import { useEffect, useState } from 'react';

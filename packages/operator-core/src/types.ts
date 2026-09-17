@@ -50,6 +50,6 @@ export interface OperatorDashboardConfig {
   pageSubtitle: string;
   hero: OperatorHeroConfig;
   signalCards: OperatorSignalCardConfig[];
-  /** undefined이면 Activity Feed 섹션 자체를 렌더링하지 않음 (GlycoPharm 등) */
+  /** undefined이면 Activity Feed 섹션 자체를 렌더링하지 않음 */
   activityFeed?: OperatorActivityItem[];
 }

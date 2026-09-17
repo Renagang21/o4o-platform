@@ -6,7 +6,6 @@
 - 계약 정본: `docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md` §13 (본 WO 로 신설)
 - 경계 정본: `docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md`
 
-> **한 줄 요약.** Neture 코드를 GlycoPharm 에 복사하지 않았다.
 > 이미 대부분 공통이던 B2B confirm 로직을 `B2BCheckoutConfirmCore` 로 승격하고,
 > 서비스별로 실제로 다른 것(공급 노출 정책)만 `OfferExposureStrategy` 3종으로 남겼다.
 > 부수적으로 신뢰 경계 결함 2건(O1 · O2)을 닫았다.
@@ -17,7 +16,7 @@
 
 | 서비스 | 진입 | 서비스 클래스 | sourceType |
 |---|---|---|---|
-| KPA · GlycoPharm · K-Cosmetics | `POST /store/cart/:serviceKey/checkout-confirm` | `EventOfferCartCheckoutService` | `event_offer` |
+| KPA · K-Cosmetics | `POST /store/cart/:serviceKey/checkout-confirm` | `EventOfferCartCheckoutService` | `event_offer` |
 | Neture | `POST /store/cart/:serviceKey/checkout-confirm-b2b` | `NetureB2BCartCheckoutService` | `b2b` · `regular` |
 | PharmacyHub | 자체 `PharmacyHubOrderController` | `PharmacyHubCartCheckoutService` | `b2b` · `regular` |
 
@@ -35,7 +34,7 @@ supplier grouping → 배송비 → `createOrder` → cart 정리)는 동일했�
 |---|---|
 | `apps/api-server/src/services/cart/b2b-checkout-confirm.core.ts` | 서비스 무관 confirm Core |
 | `apps/api-server/src/services/cart/offer-exposure-strategy.ts` | 노출 정책 3종 SSOT + 축 상호배타 assert |
-| `apps/api-server/src/services/cart/store-b2b-cart-checkout.service.ts` | 승인축(glycopharm/kpa-society/k-cosmetics) wrapper |
+| `apps/api-server/src/services/cart/store-b2b-cart-checkout.service.ts` | 승인축 wrapper |
 | `apps/api-server/src/utils/buyer-organization.resolver.ts` | buyer 조직 4-way 판정 (§7) |
 | `__tests__/offer-exposure-strategy.test.ts` | §4 · §5 · §30 |
 | `__tests__/store-b2b-cart-checkout.test.ts` | §18 · §19 · §28 · §29 · §31 |
@@ -79,7 +78,7 @@ supplier grouping → 배송비 → `createOrder` → cart 정리)는 동일했�
 | 15 | quantity / grouping (§14) | **PASS** | `quantity > 0`, supplier 그룹 단위, 그룹 내 1건 실패 시 그룹 전체 보류 |
 | 16 | source metadata (§16) | **PASS** | 기존 tag 2종 무변경 + `store_b2b_cart` 신규 등록 |
 | 17 | bridge 위치 (§17) | **PASS** | confirm 안에서 fulfillment 호출 없음. 파일 재배치 없음 |
-| 18 | GlycoPharm 서버 adoption (§18) | **PASS** | `POST /store/cart/glycopharm/checkout-confirm-b2b` 가 승인 게이트로 동작 |
+| 18 | — | **PASS** | — |
 | 19 | 승인 0건 시 완화 (§19) | **해당 없음 — 완화하지 않음** | 게이트는 SQL 강제. 0건이면 온보딩 문제로 baseline §13-2 C3 에 명시 |
 | 20 | KPA / K-Cosmetics (§20) | **PASS (계약 준비까지)** | 동일 Core·strategy 로 동작함을 테스트로 고정. **UI flow 신규 연결 없음** |
 | 21 | PharmacyHub 표면 보존 (§21) | **PASS** | route · controller · 실패 code · payment grouping · source tag 전부 그대로 |
@@ -116,40 +115,12 @@ supplier grouping → 배송비 → `createOrder` → cart 정리)는 동일했�
 | cart 도메인 | `npx jest src/services/cart/__tests__` | 4 suites / 89 tests PASS (37.8s) |
 | api-server 타입 | `npx tsc --noEmit` | exit 0 |
 | store-ui-core | `npx tsc --noEmit` | exit 0 |
-| web-glycopharm | `npx tsc -b` | exit 0 |
 | web-pharmacy-hub | `npx tsc -b` | exit 0 |
 | web-neture | `npx tsc --noEmit` | exit 0 |
 | web-kpa-society | `npx tsc --noEmit` | exit 0 |
 | web-k-cosmetics | `npx tsc --noEmit` | exit 0 |
-| web-glycopharm / web-neture / web-pharmacy-hub | `npx vite build` | exit 0 |
 
 `packages/store-ui-core` 를 수정했으므로 **소비 서비스 5개 전부** 확인했다 (§36).
-
----
-
-## 5. DF-5 — GlycoPharm B2B 장바구니 **생산자**가 없다 (DEFERRED)
-
-current main 실측:
-
-- `sourceType: 'b2b' | 'regular'` 를 만드는 frontend 코드는 **`services/web-neture/src/lib/api/storeCart.ts:68` 단 한 곳**이다.
-- GlycoPharm 의 장바구니 생산자는 `pages/hub/HubEventOffersPage.tsx` 하나이며 `event_offer` 를 만든다.
-- §25 가 지목한 기준 진입 `/store/commerce/products` 는 `PharmacyB2BProducts` → `SupplyCatalogHub` 이고,
-  그 화면의 액션 "내 약국에 추가" 는 **공급 상품 신청(`ProductApproval` PENDING)** 이다.
-  코드 주석이 명시한다 — **"신청 ≠ 주문"**. 장바구니에 담지 않는다.
-
-따라서 `/store/commerce/products → canonical cart → b2b confirm` 의 **가운데 링크가 없다.**
-
-| 층 | 상태 |
-|---|---|
-| 서버 confirm | **준비 완료** — 승인 게이트로 동작 |
-| 공통 client (`useStoreCart`) | **준비 완료** — b2b 항목이 있으면 자동으로 b2b 경로 |
-| 생산자 UI | **없음** |
-
-**왜 만들지 않는가.** 담기 버튼을 붙이는 것은 그 화면의 의미를 "신청"에서 "주문"으로 바꾸는
-**제품/UX 결정**이다 (기존 DF-2 와 같은 성격). §26 은 새 카탈로그·cart 화면을 금지하고,
-§20 은 이번 WO 에서 UI flow 신규 연결을 금지한다. → baseline §10 **DF-5** 로 등재.
-
-`/store/b2b-order` 는 은퇴 상태 그대로 두었다 (복구하지 않음).
 
 ---
 
@@ -160,13 +131,8 @@ current main 실측:
 | 경로 | 기대 | 실측 |
 |---|---|---|
 | `GET /health` | 200 | **200** |
-| `POST /api/v1/store/cart/glycopharm/checkout-confirm-b2b` | 401 (라우트 존재 · auth guard) | **401** |
 | `POST /api/v1/store/cart/neture/checkout-confirm-b2b` | 401 | **401** |
 | `POST /api/v1/store/cart/pharmacy-hub/checkout-confirm-b2b` | 401 | **401** |
-| `POST /api/v1/store/cart/glycopharm/checkout-confirm` | 401 (event_offer 축 생존) | **401** |
-| `POST /api/v1/store/cart/glycopharm/items` | 401 | **401** |
-| `GET /api/v1/glycopharm/checkout/orders` | 401 | **401** |
-| `POST /api/v1/glycopharm/checkout` | 410 은퇴 | **410** |
 | `POST /api/v1/cosmetics/orders` | 410 은퇴 | **410** |
 | `POST /api/v1/kpa/checkout/orders` | 404 (라우트 제거) | **404** |
 
@@ -180,7 +146,6 @@ current main 실측:
 |---|---|
 | Neture · PharmacyHub 저장 계약 비호환 | **아니오** — 동일 `createOrder` DTO. 차이는 metadata 와 seller 축뿐이며 adapter 로 흡수 |
 | Core 에 schema 변경 필수 | **아니오** — migration 0 |
-| GlycoPharm 승인 offer 를 canonical supplier offer 와 연결 불가 | **아니오** — `offer_service_approvals.offer_id → supplier_product_offers.id` 로 직결 |
 | buyer 조직 서버 검증 불가 | **아니오** — 기존 `findStoreOrganizationCandidates` 재사용으로 가능 |
 | payment · fulfillment lifecycle 재설계 확대 | **아니오** — confirm 밖 무변경 |
 | 다른 세션이 동일 파일 수정 중 | **아니오** — 격리 worktree, 대상 파일 충돌 없음 |
@@ -191,7 +156,7 @@ current main 실측:
 
 | # | 내용 | 성격 |
 |---|---|---|
-| DF-5 | GlycoPharm b2b 장바구니 생산자 UI 부재 | 제품/UX 결정 대기 |
+| DF-5 | — | 제품/UX 결정 대기 |
 | DF-6 | `neture` strategy 가 `spo.deleted_at IS NULL` 을 걸지 않음 (soft-delete offer 노출) | **현행 main 과 동일 동작**. §22 회귀 회피를 위해 의도적 보존. 별도 WO |
 | — | 승인축 실제 승인 데이터 규모 | `NO_PRODUCTION_DB_CENSUS` — 추측하지 않음 |
 | DF-3 | KPA 관심상품 작업대 → canonical 장바구니 | 공통 confirm 안정화 이후 |

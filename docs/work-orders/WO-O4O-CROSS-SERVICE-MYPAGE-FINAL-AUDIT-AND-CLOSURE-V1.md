@@ -46,7 +46,6 @@ MYPAGE TRACK = FINAL CLOSED
 
 ```text
 KPA-Society
-GlycoPharm
 K-Cosmetics
 Neture
 Pharmacy-Hub
@@ -587,7 +586,7 @@ mobile: 390×844 수준
 
 최소 진입:
 
-### KPA / GP / KCos / Neture
+### KPA / KCos / Neture
 
 ```text
 로그인
@@ -693,7 +692,6 @@ Help self-read 신규 기능
 ```text
 @o4o/account-ui build
 KPA typecheck/build
-GP typecheck/build
 KCos typecheck/build
 Neture typecheck/build
 PH typecheck/build
@@ -710,7 +708,6 @@ backend 변경이 발생한 경우에만 관련 backend test/typecheck 추가.
 CHECK에 다음 표를 반드시 포함한다.
 
 ```text
-Track                         KPA   GP   KCos   Neture   PH   Final
 Profile
 Shell/Layout
 Home/Hub
@@ -1014,7 +1011,7 @@ KPA 로컬 파일 헤더 주석 원문:
 
 **§8 의 grep 을 그대로 돌리면 이 파일이 `MyPageShell` 로컬 복제로 오탐된다.** 위임 어댑터와 재구현은 다르다. §8 판정 전에 **파일을 열어 위임 여부를 확인**할 것. 같은 오탐이 `packages/shared-space-ui/src/forum-owner/ForumOwnerDashboard.tsx`(공통 패키지가 `MyPageLayout` 소비)에서도 발생할 수 있다.
 
-`MyPageLayout` 소비 페이지 실측(dist 제외 30개 파일): GP 7 · KCos 7 · KPA 9(+로컬 layout 1) · Neture 4 · PH 0(`MyProfilePage` 가 Shell 직접 소비).
+KCos 7 · KPA 9(+로컬 layout 1) · Neture 4 · PH 0(`MyProfilePage` 가 Shell 직접 소비).
 
 ### C. §11 KCos 미인증 followup — **현재 main 에서는 이미 Layout 안에서 렌더된다**
 
@@ -1030,7 +1027,7 @@ KPA 로컬 파일 헤더 주석 원문:
 
 즉 §11 이 지목한 "MyPageLayout 밖에서 렌더"는 **소스상 이미 해소된 것으로 보인다.** 그러나 §11 은 "current main 에서 반드시 재확인"을 요구하므로, **소스 1곳만 보고 해소로 적지 말 것** — KCos 의 나머지 mypage 페이지 6개(`MyProfilePage`·`MySettingsPage`·`MyCertificatesPage`·`MyCreditsPage`·`MyEnrollmentsPage`·`MyRequestsPage`)와 **프로덕션 실제 로그아웃 세션**까지 확인해야 판정이 성립한다.
 
-`MyPageAuthRequired` 소비 실측: GP 6 · KCos 6 · Neture 3 · PH 1 · **KPA 0**.
+KCos 6 · Neture 3 · PH 1 · **KPA 0**.
 
 **KPA 0 은 결함일 수도, 정상일 수도 있다.** KPA 는 route guard 로 미인증을 처리하는 구조일 수 있다(F11 기록: KPA-a 는 OperatorRoute 대신 RoleGuard+allowedRoles 사용 — 구조 동등 예외). §7 의 "인증 실패 화면이 별도 layout" 결함 후보에 해당하는지 **KPA 의 실제 미인증 경로를 프로덕션에서 확인한 뒤** 판정할 것. 라우팅 단계에서 로그인으로 보내는 것은 정상 계약이다.
 
@@ -1042,7 +1039,6 @@ KPA 로컬 파일 헤더 주석 원문:
 |---|---:|---|
 | Neture | 15 | 최다 — supplier/partner 축 포함 가능성 |
 | KPA | 12 | |
-| GlycoPharm | 7 | |
 | K-Cosmetics | 7 | |
 | Pharmacy-Hub | 2 | `/account` · `/store-owner/account` |
 
@@ -1067,7 +1063,7 @@ export function resolveNotificationTarget(n: NotificationItem): string | null {
 직전 WO 에서 확정된 사실:
 
 * 사용자 축 문의는 **인증 없는 공개 write 3건뿐**, 모든 read 는 admin/operator 전용
-* 소유자 컬럼: `contact_inquiries`(GP·KCos) **없음** · `neture_contact_messages` **없음** · `contact_requests`(KPA) **`created_by` 존재하나 소비 endpoint 0**
+* 소유자 컬럼: `contact_inquiries`(KCos) **없음** · `neture_contact_messages` **없음** · `contact_requests`(KPA) **`created_by` 존재하나 소비 endpoint 0**
 * My Page nav 에 Help/Support 항목 **0건**, `@o4o/account-ui` 33 component 중 Help 전용 **0건**
 * 지원 진입은 **footer** 로만 존재하고 전부 `/contact` LIVE, **dead support link 0**
 

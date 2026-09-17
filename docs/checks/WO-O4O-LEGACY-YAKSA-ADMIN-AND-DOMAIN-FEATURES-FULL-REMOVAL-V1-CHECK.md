@@ -235,7 +235,7 @@ main-site `pages/member/**`, `pages/mypage/**`, `components/lms-yaksa/**`.
 ### 13-2. 존재하지 않는 것으로 확인된 테이블
 
 - **annualfee-yaksa 테이블 없음** — `fee_*` / `%annual%` / `invoice` / `exemption` / `settlement` 패턴에 약사회 회비 테이블 0건.
-  (매칭된 `credit_balances`, `credit_transactions`, `glycopharm_billing_invoices`, `neture_settlement*`, `partner_settlement*` 은 전부 타 도메인 공용 테이블이며 무변경)
+  (매칭된 `credit_balances`, `credit_transactions`, `neture_settlement*`, `partner_settlement*` 은 전부 타 도메인 공용 테이블이며 무변경)
 - **yaksa-scheduler 테이블 없음** — `scheduled_jobs` / `job_execution_logs` / `job_failure_queue` 0건.
   → 해당 모듈이 프로덕션에서 **한 번도 활성화된 적이 없음**을 뒷받침한다.
 - **`YaksaReport` 테이블 없음.**

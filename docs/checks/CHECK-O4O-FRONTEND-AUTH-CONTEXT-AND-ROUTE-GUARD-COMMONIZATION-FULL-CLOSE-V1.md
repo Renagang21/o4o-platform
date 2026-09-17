@@ -2,7 +2,7 @@
 
 - **WO**: `WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-FULL-CLOSE-V1`
 - **일자**: 2026-08-12
-- **대상**: `kpa-society` / `neture` / `k-cosmetics` / `glycopharm` / `pharmacy-hub` (5개 서비스)
+- **대상**: `kpa-society` / `neture` / `k-cosmetics` / `pharmacy-hub` (4개 서비스)
 - **성격**: 신규 설계 아님 — 이미 만든 공통 기반(`@o4o/auth-react`, `@o4o/account-ui`)의 **소비 전환 마감**
 - **판정**: **PASS_WITH_REPORTED_ITEMS** (남은 항목 2건은 확대하지 않고 보고만 — §6)
 
@@ -16,7 +16,7 @@
 |---|---|
 | `265c57780` | `@o4o/auth-react` 신설 (`useServiceAuth` · `createRouteGuard`) |
 | `bcdb1cf9b` | KPA · Neture AuthContext Core 소비 전환 |
-| `9d9dfbb0b` | K-Cosmetics · GlycoPharm RoleGuard 전환 |
+| `9d9dfbb0b` | K-Cosmetics RoleGuard 전환 |
 | `f990923c2` | Pharmacy-Hub AuthContext 전환 |
 | `66520eda6` | 5개 서비스 Dockerfile 의 `packages/auth-react` COPY 누락 보완 |
 | `2cefa2aa7` | 로그인 호출부(result object) 정합 |
@@ -25,26 +25,25 @@
 
 ## 2. 소비 상태 (전환 전 조사 결과)
 
-| 축 | kpa-society | neture | k-cosmetics | glycopharm | pharmacy-hub |
-|---|---|---|---|---|---|
-| `useServiceAuth` 소비 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `createRouteGuard` 소비 | ✅ | ✅ | ✅ | ✅ | 해당 없음(§4) |
-| `@o4o/auth-react` 의존·Dockerfile COPY | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `getUserDisplayName` 소비 | 부분 | 부분 | 부분 | 부분 | ❌ → ✅ |
+| 축 | kpa-society | neture | k-cosmetics | pharmacy-hub |
+| --- | --- | --- | --- | --- |
+| `useServiceAuth` 소비 | ✅ | ✅ | ✅ | ✅ |
+| `createRouteGuard` 소비 | ✅ | ✅ | ✅ | 해당 없음(§4) |
+| `@o4o/auth-react` 의존·Dockerfile COPY | ✅ | ✅ | ✅ | ✅ |
+| `getUserDisplayName` 소비 | 부분 | 부분 | 부분 | ❌ → ✅ |
 
 ## 3. 이번에 정비한 남은 편차
 
 ### 3-1. 역할 전환·사용자 부분 갱신 3중 중복 → Core 승격
 
-Neture(`switchRole`) · K-Cosmetics(`switchRole`) · GlycoPharm(`selectRole`) 가
+Neture(`switchRole`) · K-Cosmetics(`switchRole`) 가
 **글자 단위로 동일한** 구현을 각자 보유했다. `@o4o/auth-react` 에 `useRoleSelection` 을 신설해 흡수했다.
 
 - 판정 규칙 불변: 미로그인·미보유 역할은 무음 무시 / 선택 역할만 `roles[0]` 으로 승격 / 역할 **집합은 불변**.
-- GlycoPharm 만 허용 축이 `availableRoles`(인증 시점 스냅샷)이라 `options.availableRoles` 로 **명시 주입**했다 — 차이를 지우지 않고 설정으로 분리.
 
 ### 3-2. `logoutAll` 서비스별 차이 → 설정 1개로 분리
 
-Neture · K-Cosmetics · GlycoPharm 은 "서버 호출만 하고 로컬 user 는 유지" 동작을 각자
+Neture · K-Cosmetics 은 "서버 호출만 하고 로컬 user 는 유지" 동작을 각자
 `api.post('/auth/logout-all')` 로 재구현하고 있었다(Core 의 `logoutAll` 은 로컬 세션까지 정리).
 `ServiceAuthConfig.clearSessionOnLogoutAll`(기본 `true`)을 추가하고 3서비스는 `false` 를 주입한다.
 **동작은 전후 동일**하며 중복 구현만 사라졌다. (`api === authClient.api` 임을 확인 — 엔드포인트·인터셉터 동일.)
@@ -56,7 +55,6 @@ Neture · K-Cosmetics · GlycoPharm 은 "서버 호출만 하고 로컬 user 는
 | 위치 | 비고 |
 |---|---|
 | `services/web-kpa-society/src/App.tsx` | 매장 셸 `userName` |
-| `services/web-glycopharm/src/App.tsx` | 〃 |
 | `services/web-k-cosmetics/src/App.tsx` | 〃 |
 | `services/web-pharmacy-hub/src/layouts/StoreOwnerShell.tsx` | 〃 |
 | `services/web-pharmacy-hub/src/pages/store-owner/HomePage.tsx` | 매장 요약 카드 |
@@ -90,15 +88,14 @@ Pharmacy-Hub 는 일반 역할 가드를 갖고 있지 않다. 보호 경로는
 | kpa-society | `/kpa/me-context` 비동기 로딩(`isKpaContextLoaded`) · `setActivityType` · Service User 인증 축 · localStorage 전략 전용 authClient |
 | neture | `NetureLoginResult`(role/roles 동반) · dashboard/role 상수 re-export |
 | k-cosmetics | lazy `checkSession()` 계약(`isSessionChecked`) · `OperatorRoute` 의 2갈래 prefix 술어(`k-cosmetics:` / `cosmetics:`) |
-| glycopharm | `availableRoles` 스냅샷 · `status` 기본값 `'approved'` · Service User 인증 축 · 전용 Guard(GlycoHubGuard / PharmacyStoreGuard) |
 | pharmacy-hub | `MembershipGate` 안내형 게이트 · `StoreOwnerShell`(결제 콜백 경로의 `requireStoreOwnerRole=false`) |
 
-가드 파일 4개(kpa/neture/kcos/glyco)는 이미 **스피너 · MembershipGate · 역할 술어**만 남은 얇은 설정이라 추가 수렴 대상이 없다.
+가드 파일 4개는 이미 **스피너 · MembershipGate · 역할 술어**만 남은 얇은 설정이라 추가 수렴 대상이 없다.
 
 ## 6. 확대하지 않고 보고만 하는 항목
 
-1. **KPA 의 Service User 인증 블록(약 90줄)이 dead 다.** `serviceUser` / `serviceUserLogin` / `serviceUserLogout` / `getServiceAccessToken` 모두 `AuthContext.tsx` 밖 소비처 0건이다. GlycoPharm 은 같은 블록을 `ServiceLoginPage` · `ServiceDashboardPage` 에서 **실제로 사용**한다. 제거는 인증 축 하나(`/api/v1/auth/service/login`)를 프런트에서 걷어내는 판단이라 이번 범위에서 수행하지 않았다. 유지/제거/공통화(2서비스 동일 구현)는 별도 WO 로 판단이 필요하다.
-2. **GlycoPharm 의 `AUTH_TOKEN_CLEARED_EVENT` 리스너 중복.** Core 가 이미 같은 이벤트로 user 를 비운다. GlycoPharm 쪽 리스너는 `availableRoles` 까지 비우는 고유 부수효과가 있어 남겼다. 3-1 의 `availableRoles` 축 자체를 Core 로 올릴지와 함께 판단할 항목이다.
+1. **KPA 의 Service User 인증 블록(약 90줄)이 dead 다.** `serviceUser` / `serviceUserLogin` / `serviceUserLogout` / `getServiceAccessToken` 모두 `AuthContext.tsx` 밖 소비처 0건이다. `ServiceDashboardPage` 에서 **실제로 사용**한다. 제거는 인증 축 하나(`/api/v1/auth/service/login`)를 프런트에서 걷어내는 판단이라 이번 범위에서 수행하지 않았다. 유지/제거/공통화(2서비스 동일 구현)는 별도 WO 로 판단이 필요하다.
+2. 3-1 의 `availableRoles` 축 자체를 Core 로 올릴지와 함께 판단할 항목이다.
 
 두 항목 모두 **인증 API·권한 의미 변경이 필요 없다**. 현재 동작에는 영향이 없다.
 

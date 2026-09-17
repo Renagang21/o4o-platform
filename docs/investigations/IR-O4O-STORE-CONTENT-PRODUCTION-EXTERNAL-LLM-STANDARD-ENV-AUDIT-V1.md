@@ -60,7 +60,7 @@ O4O 자체 AI                              = Assist / Normalize / Check (선택�
 |---|---|---|---|
 | KPA QR/POP/Blog/Content-Create 페이지 AI 단계 | (제거 완료 · `CHECK-O4O-KPA-{QR,POP,BLOG,CONTENT-CREATE}-AI-STEP-REMOVE-V1`) | 부재 확인 | PASS |
 | KPA 상품설명(R1)·내 자료함 제작(R2)·자료 등록(R3) | `WO-O4O-KPA-CONTENT-CREATION-AI-ENTRY-REMOVE-V1` 이후 | `StoreLibraryContentsPage` in-page `AiContentModal` 부재 · `CreateContentFromResourcesModal` 헤더 "자료 기반 AI 본문 생성 제거" 확인 | PASS |
-| GP/KCos POP/Blog AI | GlycoPharm 서비스 삭제(2026-09-08) · KCos `pop-v2` 에 AI 호출 없음(grep) | 부재 | PASS |
+| KCos POP/Blog AI | KCos `pop-v2` 에 AI 호출 없음(grep) | 부재 | PASS |
 | **KPA "AI 설명 QR 만들기"** | `StoreQRPage.tsx:694` → `/store/marketing/qr/ai-description` (`StoreQrAiDescriptionPage.tsx`, `App.tsx:964`) → `POST /api/ai/qr-description`(`ai-proxy.routes.ts:406`, Gemini) → 상품명+강조점 입력으로 **설명 HTML 전체 생성** → 편집 → `store-contents` 저장 + QR 생성 | **ACTIVE** (`WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1`, 2026-06-29 — 6/27 진입점 IR **이후** 추가. QR census V2 #7 도 `CANONICAL_NEEDS_ALIGNMENT` 로 기록) | **PARTIAL — 잔존 제작형 AI entry 1건.** 충돌로 판정하지 않는 이유: "QR 만들기"·"매장 HUB 에서 가져오기"·직접 작성 경로가 병존해 **O4O AI 가 필수 관문이 아니고**, 외부 LLM 결과 붙여넣기(HTML 탭)도 막지 않는다. 다만 O4O AI 가 "초안 전체 생성" 주체가 되는 화면이라 원칙 §2-D "NOT REQUIRED" 축과 방향이 다름 → 처분(유지·Guide 로 전환·제거)은 **별도 WO** §8-4 |
 | KPA 커뮤니티 `ContentWritePage` AI 배너(`CommunityContentWriteShell aiBanner` 기본 true, URL→제목/본문 생성) | `packages/shared-space-ui` · KPA 만 켜짐 | ACTIVE | OUT_OF_SCOPE — 커뮤니티 콘텐츠 축(매장 콘텐츠 제작 아님). 같은 화면에 `ContentCreationGuideModal`(communityContent) 도 있어 외부 LLM 경로 병존 |
 | LMS `CourseStructureAiModal`(`/api/ai/course-structure`, `/api/ai/lesson-body`) | instructor | ACTIVE | OUT_OF_SCOPE — 강의 축 |
@@ -87,13 +87,13 @@ O4O 자체 AI                              = Assist / Normalize / Check (선택�
 | `O4O-AI-USAGE-FLOW-BASELINE-V1` §1/§4.1/§10 | Entry 레이어가 Home AI 로만 서술되어 "Home AI = 콘텐츠 제작의 시작점" 으로 읽힐 여지 · 외부 LLM 은 §4.2 입력 데이터의 한 줄로만 존재 · §4.1 "POP 제작기 Step 3 / `PopCreatePage`" 는 저장소에 없음(POP V2 canonical, AI 단계 없음) | **정합(사용자 지시로 허용)**: 2026-09-14 정렬 요지 추가 · §1 에 External(사용자 AI) 행 · §4.1 stale 행 정정 · §10 문구 정정 · §15 신설(운영 원칙 문서 포인터) |
 | `docs/CANONICAL-INDEX.md` §6 | 신규 baseline 미등재 · `O4O-CONTENT-PRODUCTION-FLOW-CANONICAL-V1`(architecture, Canonical SSOT 선언) 이 색인에 없음 | 신규 baseline 행 추가 · CONTENT-PRODUCTION-FLOW 행 추가(§2 Store 축) |
 | `O4O-CONTENT-PRODUCTION-FLOW-CANONICAL-V1` §1 3단계 "편집기 / AI" | AI 를 제작 6단계 중 하나로 표기 — 원칙과 **정반대는 아님**(편집 보조) | 본문 무변경(§16-4). 운영 원칙 문서 §3 이 "필수 아님" 을 상위에서 명시 |
-| `StartProductionModal.tsx` docblock | GlycoPharm(삭제됨) 4곳 · `onAiAction` "이번 단계에서 미연결" 이력 표현 | 코드 주석 정정(§7) |
+| `StartProductionModal.tsx` docblock | `onAiAction` "이번 단계에서 미연결" 이력 표현 | 코드 주석 정정(§7) |
 
 ## 7. 코드 변경 (WO §9 허용 범위 내)
 
 | 파일 | 변경 | 동작 변경 |
 |---|---|---|
-| `packages/store-ui-core/src/components/StartProductionModal.tsx` | docblock 4곳: GlycoPharm 삭제 반영 · `onAiAction` 을 DORMANT capability 로 명시 + 운영 원칙 문서 링크 | 없음(주석만) |
+| `packages/store-ui-core/src/components/StartProductionModal.tsx` | `onAiAction` 을 DORMANT capability 로 명시 + 운영 원칙 문서 링크 | 없음(주석만) |
 
 그 외 코드 변경 0. `HandoffPage.tsx`(다른 세션 수정) 미접촉.
 

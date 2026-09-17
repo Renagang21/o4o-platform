@@ -3,7 +3,7 @@
  *
  * WO-O4O-PHARMACYHUB-COMMUNITY-AND-MY-STORE-FULL-PARITY-CLOSURE-V1 §4 (#42)
  *
- * GlycoPharm/K-Cosmetics 는 RoleGuard(allowedRoles=[...]) 를 쓰지만 PH 는 그 컴포넌트가
+ * K-Cosmetics 는 RoleGuard(allowedRoles=[...]) 를 쓰지만 PH 는 그 컴포넌트가
  * 없고 satisfiesRole + MembershipGate 조합이 서비스 표준이다(AdminLayoutWrapper 와 동일).
  * 허용 역할 표는 다른 서비스와 같다: lms:instructor · {service}:admin · {service}:operator
  * · platform:super_admin. 실제 경계는 backend `requireInstructor` 가 강제하며 이 가드는

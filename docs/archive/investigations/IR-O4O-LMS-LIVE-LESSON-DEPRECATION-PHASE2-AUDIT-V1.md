@@ -154,7 +154,7 @@ case 'live':
 
 ---
 
-### 3.3 GlycoPharm / Neture
+### 3.3 Neture
 
 **live 참조 없음** — 조사 완료, 영향 없음 ✅
 
@@ -263,7 +263,7 @@ await queryRunner.query(`ALTER TABLE "lms_lessons" DROP COLUMN IF EXISTS "liveUr
 
 | 항목 | 이유 |
 |------|------|
-| GlycoPharm, Neture 서비스 | live 참조 0 |
+| Neture 서비스 | live 참조 0 |
 | `lms-client` factory | live가 애초에 포함되지 않음 |
 | E2E / 테스트 코드 | live 관련 테스트 없음 |
 
@@ -312,7 +312,6 @@ STEP 7  커밋 & 배포
 |--------|:-----------:|:--------:|:---------:|:------:|
 | KPA Society | ✅ Phase 1 완료 | Phase 2 | Phase 2 | 🟡 경미 |
 | K-Cosmetics | ✅ Phase 1 완료 | Phase 2 | Phase 2 | 🟡 경미 |
-| GlycoPharm | N/A | N/A | 자동 해소 | 🟢 없음 |
 | Neture | N/A | N/A | 자동 해소 | 🟢 없음 |
 | API Server | — | Phase 2 | Phase 2 | 🟡 경미 |
 
@@ -325,7 +324,7 @@ STEP 7  커밋 & 배포
 | Phase 2 진행 가능 여부 | **가능** — 모든 의존성 명확하고 격리됨 |
 | 회귀 위험 | **낮음** — Phase 1에서 UI 완전 차단, frontend에서 API 미호출 상태 |
 | DB 안전성 | **높음** — DOWN migration `IF EXISTS` 포함, 모든 컬럼 nullable |
-| cross-service 영향 | **없음** — GlycoPharm, Neture live 미사용 |
+| cross-service 영향 | **없음** — Neture live 미사용 |
 | 예상 변경 파일 수 | **14개 파일 수정 + 2개 파일 삭제** |
 | 예상 제거 줄 수 | **~580줄** |
 

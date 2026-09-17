@@ -16,11 +16,11 @@
 > 1. **KPA backend quickActions 12 icon emoji → lucide-name 정렬** — `apps/api-server/src/routes/kpa/services/operator-dashboard.service.ts` line 614-627 의 12 icon 값 (`🧑‍💼 / 💊 / 🛒 / 📝 / 📢 / 💬 / 🖥️ / 🏪 / 🎯 / 🏠 / 🔑 / 📋`) → `users / clipboard-list / shopping-cart / file-text / megaphone / message-square / monitor-play / store / badge-percent / home / key / scroll-text` 로 교체.
 > 2. **ActionIcon vocabulary 16종 확장** — `operator-ux-core` + `admin-ux-core` 양쪽 `ActionIcon.tsx` 에 7 신규 lucide 매핑 추가 (`clipboard-list / megaphone / message-square / monitor-play / badge-percent / home / scroll-text`). Phase A 9종 + Phase B 7종 = **16종 vocabulary 확정**.
 > 3. **KPA 12 icon 모두 vocabulary 16종 안에 포함** — 누락 0.
-> 4. **GlycoPharm / K-Cosmetics / Neture 백엔드 icon 값 미접촉** — 회귀 0 (Phase A 의 lucide-name 사용 유지 + Neture operator 의 emoji 4개는 ActionIcon emoji fallback 으로 회귀 0).
+> 4.
 > 5. **TypeScript 통과** — api-server 0 errors, operator-ux-core 0 errors, admin-ux-core 0 errors.
 > 6. **QuickActionBlock / StructureActionBlock 렌더 로직 미수정** — ActionIcon map 확장만, 컴포넌트 동작 변경 0.
 
-권고 단계: ① 본 CHECK 로 Phase B PASS 확정 → ② 배포 후 KPA `/operator` 화면 smoke (선택, PASS 자격 영향 없음) → ③ Phase C — KPA/GlycoPharm admin 프론트 하드코딩 emoji 수렴
+권고 단계: ① 본 CHECK 로 Phase B PASS 확정 → ② 배포 후 KPA `/operator` 화면 smoke (선택, PASS 자격 영향 없음) → ③ Phase C — KPA admin 프론트 하드코딩 emoji 수렴
 
 ---
 
@@ -37,8 +37,8 @@
 ### 1.2 미접촉 영역 (Phase B 범위 외)
 
 - `QuickActionBlock` / `StructureActionBlock` 렌더 로직 — **변경 0**
-- GlycoPharm / K-Cosmetics / Neture 백엔드 dashboard service / controller — **변경 0** (Phase A 의 lucide-name 그대로 보존)
-- KPA / GlycoPharm admin 프론트 하드코딩 emoji (Phase C 영역) — **변경 0**
+- K-Cosmetics / Neture 백엔드 dashboard service / controller — **변경 0** (Phase A 의 lucide-name 그대로 보존)
+- KPA admin 프론트 하드코딩 emoji (Phase C 영역) — **변경 0**
 - DomainIASidebar / OperatorAreaShell — **변경 0**
 - HeroBannerSection.tsx — **변경 0**
 - Store Hub / Channels / Home 아이콘 정비 파일 — **변경 0**
@@ -157,18 +157,6 @@ const ICON_NAME_MAP: Record<string, LucideIcon> = {
 
 ## 5. Cross-service 회귀 검증 (read-only)
 
-### 5.1 GlycoPharm operator (변경 없음)
-
-`apps/api-server/src/routes/glycopharm/services/operator-dashboard.service.ts` quickActions 3 icon:
-
-| icon | vocabulary 안 |
-|------|:------------:|
-| `store` | ✅ |
-| `package` | ✅ |
-| `file-text` | ✅ |
-
-→ Phase A 의 lucide-name 그대로 보존. **회귀 0**.
-
 ### 5.2 Neture operator (변경 없음 — emoji 유지)
 
 `apps/api-server/src/modules/neture/controllers/operator-dashboard.controller.ts` quickActions 일부 emoji:
@@ -245,7 +233,7 @@ const ICON_NAME_MAP: Record<string, LucideIcon> = {
 | ActionIcon vocabulary 7 신규 추가 (양쪽 동일) | ✅ |
 | 최종 vocabulary 16종 정합 (Phase A 9 + Phase B 7) | ✅ |
 | KPA 12 icon 모두 vocabulary 커버 | ✅ 12/12 |
-| GlycoPharm / K-Cosmetics / Neture 백엔드 미접촉 | ✅ |
+| K-Cosmetics / Neture 백엔드 미접촉 | ✅ |
 | Phase A emoji fallback 보존 (회귀 0) | ✅ |
 | QuickActionBlock / StructureActionBlock 렌더 로직 미수정 | ✅ |
 | api-server typecheck | ✅ 0 errors |
@@ -269,7 +257,7 @@ const ICON_NAME_MAP: Record<string, LucideIcon> = {
 
 ### 10.2 다음 단계: Phase C
 
-- **Phase C** — KPA / GlycoPharm admin 프론트 하드코딩 emoji 수렴
+- **Phase C** — KPA admin 프론트 하드코딩 emoji 수렴
 - 본 WO 범위 외. Phase B 완료 후 별도 trigger 시 진행
 
 ### 10.3 장기 (선택)
@@ -287,7 +275,7 @@ const ICON_NAME_MAP: Record<string, LucideIcon> = {
 | 수정 파일 (코드) | 3개 — KPA service + operator-ux-core ActionIcon + admin-ux-core ActionIcon |
 | KPA 12 icon 매핑 | ✅ 12/12 vocabulary 16종 안 |
 | Vocabulary 16종 (양쪽 동일) | ✅ Phase A 9 + Phase B 7 |
-| GlycoPharm / K-Cos / Neture 백엔드 미접촉 | ✅ |
+| K-Cos / Neture 백엔드 미접촉 | ✅ |
 | TypeScript | ✅ api-server / operator-ux-core / admin-ux-core 모두 0 errors |
 | QuickActionBlock / StructureActionBlock 미수정 | ✅ |
 | DB / migration / route | ✅ 0 |

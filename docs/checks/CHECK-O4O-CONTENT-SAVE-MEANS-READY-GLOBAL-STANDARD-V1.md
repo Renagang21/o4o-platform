@@ -122,7 +122,7 @@ KPA 콘텐츠는 **두 개의 분리된 파이프라인**으로 존재한다:
 
 1. **(별도 WO)** 운영자 콘텐츠 허브(`kpa_contents`) → 매장 허브(`/store-hub/content`, `cms_contents`) 노출 정합 — 7.3. F5(Content Stable) 동결 계약 검토 필요.
 2. **(보정 판단)** §5 기존 draft 데이터 read-only 카운트 → 보정 여부 결정.
-3. **(공통화)** 본 표준(저장=ready)을 GlycoPharm / K-Cosmetics / Neture 콘텐츠 계열에 확대 — §3.2 2차 점검 범위. KPA 안정화 후 별도 IR/WO.
+3. **(공통화)** 본 표준(저장=ready)을 K-Cosmetics / Neture 콘텐츠 계열에 확대 — §3.2 2차 점검 범위. KPA 안정화 후 별도 IR/WO.
 
 ---
 

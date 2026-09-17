@@ -36,7 +36,7 @@ Cloud SQL Proxy 경유 실측.
 | `platform_store_slugs` 총 row | **15** |
 | `store_id IS NULL` | **0** |
 | `is_active = true` | 15 |
-| service_key 분포 | cosmetics 2 / kpa 7 / pharmacy-hub 6 (glycopharm 0) |
+| service_key 분포 | cosmetics 2 / kpa 7 / pharmacy-hub 6 |
 | orphan (`organizations` 미존재) | **0** |
 | 중복 slug | **0** |
 | 동일 org 다중 active slug | **0** |
@@ -48,7 +48,7 @@ Cloud SQL Proxy 경유 실측.
 | RLS (`relrowsecurity` / `relforcerowsecurity`) | `f` / `f` |
 | relation size | 139,264 bytes (`reltuples` 1) |
 | `organizations` row | 24 |
-| 의존 view | `public.v_glycopharm_pharmacies` — `LEFT JOIN platform_store_slugs pss ON pss.store_id = o.id` (조직 축을 재확인해 주며 FK 를 막지 않는다) |
+| 의존 view | — |
 | `platform_store_slug_history` | PK 만 존재, **0 row** |
 | 마지막 적용 migration | `CreateHandoffTokens20270311000000` |
 
@@ -64,10 +64,6 @@ Cloud SQL Proxy 경유 실측.
 | 경로 | store_id 표현식 | 축 |
 |---|---|:---:|
 | `routes/cosmetics/services/cosmetics-store.service.ts` (2곳) | `orgId` / `organizationId` | organizations.id |
-| `routes/glycopharm/services/glycopharm-member.service.ts` | `organizationId` | 〃 |
-| `routes/glycopharm/services/glycopharm.service.ts` | `org.id` | 〃 |
-| `routes/glycopharm/controllers/admin.controller.ts` | `createdOrg.id` | 〃 |
-| `routes/glycopharm/controllers/store-applications.controller.ts` | `createdOrg.id` | 〃 |
 | `routes/kpa/controllers/organization.controller.ts` | `saved.id` (organization) | 〃 |
 | `routes/kpa/services/kpa-store-organization.provisioning.ts` | `orgResult.id` | 〃 |
 | `services/pharmacy-hub/PharmacyHubStoreProvisioningService.ts` | `organizationId` | 〃 |
@@ -82,7 +78,7 @@ Cloud SQL Proxy 경유 실측.
 
 | 파일 | 내용 | 판정 |
 |---|---|---|
-| `src/migrations/1771200000001-BackfillPlatformStoreSlugs.ts` | `glycopharm_pharmacies.id` / `cosmetics_stores.id` 를 store_id 로 INSERT | **dead** |
+| `src/migrations/1771200000001-BackfillPlatformStoreSlugs.ts` | `cosmetics_stores.id` 를 store_id 로 INSERT | **dead** |
 | `src/migrations/1771200000000-CreatePlatformStoreSlugsTables.ts` | 같은 디렉터리 | **dead** |
 
 `src/migrations/` 는 migration 러너가 스캔하지 않는 디렉터리다
@@ -157,7 +153,7 @@ Cloud SQL Proxy 경유 실측.
 
 4서비스 provisioning 회귀: KPA(`kpa-store-organization.provisioning.test.ts`),
 PharmacyHub(`PharmacyHubStoreProvisioningService.reuse-guard.test.ts`),
-KCos·GP(`store-slug-store-id-axis.spec.ts` / `store-slug-canonical-contract.spec.ts`) 모두 PASS.
+KCos 모두 PASS.
 
 ---
 

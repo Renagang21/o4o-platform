@@ -75,12 +75,11 @@
 | `scripts/care-e2e-operation-test-v2.mjs` | `/glucoseview/customers` 호출 — 테이블 DROP 완료로 100% 실패 |
 | `scripts/care-data-accumulation-test.{sh,py,mjs}` | 동일 |
 | `e2e/screenshots/GlucoseView-01~07-*.png` | 폐지 서비스 E2E 산출물 |
-| `e2e/screenshots/results.json` 의 `GlucoseView` entry | 동일 (잔여 services = Neture / GlycoPharm / KPA-a / K-Cosmetics) |
+| `e2e/screenshots/results.json` 의 `GlucoseView` entry | 동일 (잔여 services = Neture / KPA-a / K-Cosmetics) |
 | `.github/workflows/deploy-api.yml` 의 `CGM_PROVIDER`, `CARE_MULTI_METRIC` | 코드 소비처 **0** — 제거가 동작 중립 |
 | `apps/api-server/deploy-cloudrun.sh` 의 동일 2건 | 동일 |
 | `apps/api-server/.env.apiserver.example` 의 `# === Care 모듈 (CGM 분석) ===` 블록 | `CGM_PROVIDER` / `CARE_ANALYSIS_PROVIDER` 소비처 0 |
 | `public.controller.ts` 의 `staticNowRunning` 2번 항목 | `supplier: 'GlucoseView'` — 폐지 서비스를 광고하는 가짜 공급자 (§3) |
-| `services/web-glycopharm/src/api/public.ts` 의 `fallbackNowRunning` 동일 항목 | 동일 |
 | `SETUP.md` / `QUICK-START.md` 의 `Glucoseview Web` Cloud Run URL 행 | 존재하지 않는 서비스 URL 을 현행 온보딩 문서가 안내 |
 | tombstone 주석 30건 (28 파일) + block 주석 20건 | 현재 기능과 무관한 폐지 안내 주석 |
 
@@ -96,7 +95,6 @@
 
 - `typeorm_migrations` 9행 및 `apps/api-server/src/database/migrations/**` 의 실행 완료 마이그레이션 파일
 - `docs/**` 의 과거 WO·IR·CHECK·RBAC 감사 문서
-- `services/web-glycopharm/UX-TRUST-RULES-V1.md` (과거 WO 확산 대상 목록)
 - `docs/archive/investigations/IR-O4O-OVERSIZED-FILE-AUDIT-PHASE2-NEXT-PICK-V1.md` (과거 감사 스냅샷)
 
 ### 2-4. UNRELATED_RETAIN — 동명이인
@@ -104,10 +102,10 @@
 | 대상 | 사유 |
 |------|------|
 | `ContextAssetListPage.tsx:88-89` (`guide-glucose.jpg`, `/content/glucose-guide-2026`) | 혈당 콘텐츠 — 서비스 키 아님 |
-| `services.routes.tsx:47` (`Pharmacy Blood Glucose Products`) | GlycoPharm 제품 설명 |
+| `services.routes.tsx:47` (`Pharmacy Blood Glucose Products`) | — |
 | `PharmacyServicePage.tsx:58` (`/info/glucose-program`) | KPA 혈당 프로그램 안내 |
 | HFF / OTC 스크립트·데이터의 `glucose*` (glucosamine 등) | 의약품 성분명 |
-| `pharmacy-ai-insight` / 일반 health check / GlycoPharm CGM 상품 기능 | WO 명시 유지 대상 |
+| `pharmacy-ai-insight` / 일반 health check CGM 상품 기능 | WO 명시 유지 대상 |
 
 ---
 
@@ -115,7 +113,6 @@
 
 WO 지시대로 자동 유지하지 않고 실제 의미를 확인했다.
 
-- 위치: GlycoPharm Home `now-running` 목록의 **정적 데이터** 1건 (백엔드) + 동일 항목의 **프런트 fallback** 1건.
 - 내용: `type: 'event'`, `title: '혈당관리 앱 연동 이벤트'`, `supplier: 'GlucoseView'`, `deadline: '2026.02.15'`.
 - 판정: 실재하지 않는 공급자명으로, **종료된 GlucoseView 서비스 연동을 광고하는 항목**이다. 문자열만 바꾸면 존재하지 않는 이벤트가 남으므로 **항목 전체를 제거**했다.
 - 영향: `now-running` 목록이 3건 → 2건(백엔드) / 2건 → 1건(fallback). 나머지 항목(Trial / 당뇨인의 날 캠페인)은 그대로.
@@ -180,7 +177,6 @@ WO 의 특별 확인 항목에 따라 재검토했다.
 |------|------|
 | `tsc -p apps/api-server/tsconfig.build.json --noEmit` | PASS (0 error) |
 | `pnpm type-check:frontend` | PASS (main-site / admin-dashboard / web-kpa-society / forum-yaksa) |
-| `tsc -p services/web-glycopharm --noEmit` | PASS |
 | `jest cross-service.spec.ts kpa-role-guard.spec.ts --maxWorkers=1` | PASS (2 suites / 51 tests) |
 
 ---
@@ -191,7 +187,6 @@ WO 의 특별 확인 항목에 따라 재검토했다.
 |-----------|:--------:|
 | 현재 운영 기능이 실제 GlucoseView key 를 소비 | ❌ — DB row 0, 소비 경로 0 |
 | 보존해야 할 사용자·조직·업무 데이터 발견 | ❌ — `typeorm_migrations` 외 0 |
-| 제거가 GlycoPharm CGM / `pharmacy-ai-insight` 기능 변경으로 확대 | ❌ — 두 영역 미접촉 |
 | 병렬 세션 WIP 와 충돌 | ❌ — HFF·yaksa/reporting 트랙 파일 미접촉, pathspec 커밋 |
 
 ---

@@ -11,8 +11,8 @@
 
 | 후보 pageKey | 파일 존재 여부 | 결과 |
 |-------------|--------------|------|
-| `user.application.status` | KPA, GlycoPharm 존재 | ✅ 적용 |
-| `user.mypage.hub` | GlycoPharm, K-Cosmetics, Neture 존재 | skip (정보 허브 성격 — 1회 방문, 안내보다 요약이 목적) |
+| `user.application.status` | KPA 존재 | ✅ 적용 |
+| `user.mypage.hub` | K-Cosmetics, Neture 존재 | skip (정보 허브 성격 — 1회 방문, 안내보다 요약이 목적) |
 | `store.order.list` | Neture 존재 (`StoreOrdersPage.tsx`) | ✅ 적용 |
 | `store.application.status` | 파일 없음 | skip |
 | `supplier.application.status` | 파일 없음 | skip |
@@ -32,17 +32,6 @@
 | serviceKey | `kpa-society` |
 | sectionKey | `guideblock-page-help` |
 | 삽입 위치 | 헤더 아래, 상태 필터 위 |
-| fallback title | 신청 상태 확인 안내 |
-
-### 2. GlycoPharm — user.application.status
-
-| 항목 | 값 |
-|------|-----|
-| 파일 | `services/web-glycopharm/src/pages/apply/MyApplicationsPage.tsx` |
-| pageKey | `user.application.status` |
-| serviceKey | `glycopharm` |
-| sectionKey | `guideblock-page-help` |
-| 삽입 위치 | 헤더 아래, Loading 위 |
 | fallback title | 신청 상태 확인 안내 |
 
 ### 3. Neture — market-trial.participation.status
@@ -98,7 +87,6 @@
 | pageKey | 서비스 | 파일 |
 |---------|--------|------|
 | `user.application.status` | kpa-society | `MyApplicationsPage.tsx` |
-| `user.application.status` | glycopharm | `apply/MyApplicationsPage.tsx` |
 | `market-trial.participation.status` | neture | `MyParticipationsPage.tsx` |
 | `supplier.library.list` | neture | `SupplierLibraryPage.tsx` |
 | `store.order.list` | neture | `StoreOrdersPage.tsx` |
@@ -172,7 +160,6 @@ useEffect(() => {
 | 서비스 | 1차 적용 | 2차 적용 | 합계 |
 |--------|---------|---------|------|
 | KPA-Society | 7 | 1 | 8 |
-| GlycoPharm | 4 | 1 | 5 |
 | K-Cosmetics | 4 | 0 | 4 |
 | Neture | 5 | 3 | 8 |
 | **합계** | **20** | **5** | **25** |

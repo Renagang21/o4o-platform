@@ -11,7 +11,6 @@
 
 | 파일 | 라인 | 비고 |
 |---|---|---|
-| `web-glycopharm/.../store-management/ProductionMaterialEditorPage.tsx` | 368 | Candidate A |
 | `web-k-cosmetics/.../store/ProductionMaterialEditorPage.tsx` | 367 | Candidate A |
 | `web-kpa-society/.../pharmacy/ProductionMaterialEditorPage.tsx` | 378 | KPA 별도(본 WO 비대상) |
 | `web-kpa-society/.../pharmacy/StartProductionModal.tsx` | 42 | Candidate B — **thin wrapper** |
@@ -24,13 +23,13 @@
 
 - canonical: `packages/store-ui-core/src/components/StartProductionModal.tsx`(576줄, export + types `StartProductionModalProps/StartProductionTargetConfig/StartProductionTemplateItem/ProductionSource…`).
 - **KPA `pages/pharmacy/StartProductionModal.tsx`(42줄) = thin wrapper** — `SharedStartProductionModal`(@o4o/store-ui-core)에 KPA `PRODUCTION_TARGET_CATALOG` + `getTemplatesForTarget` 만 주입하고 기존 call site 호환을 위해 type re-export. **stale copy 아님**(WO 의 "local copy 잔존 의심" → 해소: 의도된 config wrapper).
-- **GP/KCos**: `StoreLibraryContentsPage` 가 `@o4o/store-ui-core` 의 `StartProductionModal` **직접 import**(canonical 사용).
-- → 3서비스 모두 canonical 단일 컴포넌트 사용(KPA=config wrapper, GP/KCos=직접). **추가 공통화 불요.**
+- **KCos**: `StoreLibraryContentsPage` 가 `@o4o/store-ui-core` 의 `StartProductionModal` **직접 import**(canonical 사용).
+- → 2서비스 모두 canonical 단일 컴포넌트 사용(KPA=config wrapper, KCos=직접). **추가 공통화 불요.**
 
 ## 3. Candidate A — ProductionMaterialEditorPage: near-identical, but 신규 dep 필요 → 후속 분리
 
-- GP vs KCos **diff = 23줄(cosmetic only)**: 헤더 주석(서비스명)·import 경로 스타일(`@/` vs `../../`)·lucide import grouping·주석 1개. **로직/JSX/handler 100% 동일**(~360줄).
-- 차이는 per-service `createStoreExecutionAsset`(api, base path `glycopharm` vs `cosmetics`) + `findTemplate`/`productionTemplates`(config) — adapter 주입으로 흡수 가능.
+- KCos **diff = 23줄(cosmetic only)**: 헤더 주석(서비스명)·import 경로 스타일(`@/` vs `../../`)·lucide import grouping·주석 1개. **로직/JSX/handler 100% 동일**(~360줄).
+- 차이는 per-service `createStoreExecutionAsset`(api, base path `cosmetics`) + `findTemplate`/`productionTemplates`(config) — adapter 주입으로 흡수 가능.
 - **그러나 공통 shell 추출 시 store-ui-core 에 신규 의존 필요:**
   - ProductionMaterialEditorPage 가 import: `@o4o/content-editor`(RichTextEditor/EditorContent), `@o4o/error-handling`(toast), `@o4o/auth-client`(getAccessToken), `lucide-react`.
   - `store-ui-core/package.json` 현재 의존: lucide-react(peer)만. **content-editor/error-handling/auth-client 미보유.**
@@ -49,7 +48,7 @@
 | StartProductionModal | `@o4o/store-ui-core` | ✅ 3서비스 사용(B) |
 | productionUtils(buildProductionState/types) | `@o4o/store-ui-core` | ✅ |
 | RichTextEditor / AiContentModal / sanitize | `@o4o/content-editor` | ✅ editor/AI 공통 |
-| ProductionMaterialEditorPage | (per-service) | ⚠️ GP/KCos 중복(A, 후속) |
+| ProductionMaterialEditorPage | (per-service) | ⚠️ KCos 중복(A, 후속) |
 | signage AI modal | (KPA local) | ⚠️ 별도(C, 후속) |
 
 ## 6. 1차 공통화 적용 여부
@@ -60,7 +59,7 @@
 
 - 수정 코드 파일 **없음**. 본 CHECK 문서만.
 - API/DB/schema/route/menu/copy 동작 **무변경**. 신규 dependency **없음**. content-core 미활성.
-- 다른 세션 WIP(`web-neture` App/RoleGuard/role-constants + admin/platform, `cosmetics`/`glycopharm` mypage controller) **미접촉**.
+- 다른 세션 WIP(`web-neture` App/RoleGuard/role-constants + admin/platform, `cosmetics` mypage controller) **미접촉**.
 
 ## 8. Typecheck
 
@@ -69,13 +68,13 @@
 ## 9. 완료 판정
 
 **PASS (by investigation).**
-- production flow UI 지도 재확인, GP/KCos/KPA 차이 분석 완료.
+- production flow UI 지도 재확인, KCos/KPA 차이 분석 완료.
 - 공통화 1차 대상 판단: **B 이미 완료 / A·C 후속 분리(사유: A=신규 dep+Docker 위험, C=domain 결합)**.
 - 코드/DB/schema/dependency 변경 없음.
 
 ## 10. 후속 WO 후보 (우선순위)
 
-1. **WO-O4O-PRODUCTION-MATERIAL-EDITOR-SHELL-COMMONIZATION-V1** — GP/KCos(→KPA 검토) ProductionMaterialEditorPage 공통 shell 추출. **전제: store-ui-core 에 content-editor/error-handling/auth-client dep 추가 + file-by-file Dockerfile 갱신**(또는 content-editor 측/별 package 위치 재검토). diff 23줄(cosmetic)이라 adapter(api/config/route copy) 주입만으로 수렴 가능.
+1. **WO-O4O-PRODUCTION-MATERIAL-EDITOR-SHELL-COMMONIZATION-V1** — KCos(→KPA 검토) ProductionMaterialEditorPage 공통 shell 추출. **전제: store-ui-core 에 content-editor/error-handling/auth-client dep 추가 + file-by-file Dockerfile 갱신**(또는 content-editor 측/별 package 위치 재검토). diff 23줄(cosmetic)이라 adapter(api/config/route copy) 주입만으로 수렴 가능.
 2. `WO-O4O-SIGNAGE-AI-CONTENT-MODAL-ADAPTER-V1` — signage AI modal ↔ 공통 AiContentModal adapter(domain 경계 유지).
 3. `WO-O4O-CONTENT-BODY-SANITIZE-ON-WRITE-CROSSSERVICE-V1` — 보안 backlog(raw 저장 sanitize 확장).
 4. `WO-O4O-CONTENT-HUB-MY-STORE-COPY-CONTRACT-V1` — assetSnapshot ↔ Neture dashboardCopy 정렬.
@@ -86,4 +85,4 @@
 
 ---
 
-*Date: 2026-06-16 · production flow UI 공통화 · PASS(by investigation) · B(StartProductionModal) 이미 공통화(KPA wrapper+GP/KCos canonical) · A(ProductionMaterialEditorPage) GP/KCos diff 23줄 cosmetic·logic 동일이나 store-ui-core 신규 dep(content-editor/error-handling/auth-client) 필요 → 후속 분리 · C(signage AI modal) domain 결합 후속 · 코드/DB/dep 무변경.*
+*Date: 2026-06-16 · production flow UI 공통화 · PASS(by investigation) · B(StartProductionModal) 이미 공통화(KPA wrapper+KCos canonical) · A(ProductionMaterialEditorPage) KCos diff 23줄 cosmetic·logic 동일이나 store-ui-core 신규 dep(content-editor/error-handling/auth-client) 필요 → 후속 분리 · C(signage AI modal) domain 결합 후속 · 코드/DB/dep 무변경.*

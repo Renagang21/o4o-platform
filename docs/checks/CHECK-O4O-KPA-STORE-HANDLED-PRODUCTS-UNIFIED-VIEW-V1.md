@@ -37,7 +37,7 @@
 
 `약국 상품·거래`: O4O 제품 · **매장 취급제품(신규)** · 내 매장 제품 · 매장 자체 제품 · 발주 내역 · 신청·승인 현황.
 - 기존 메뉴 유지(수정 동선 보존). MenuKey 는 free string(`key: string`) → 타입 변경 불필요.
-- GP/KCos 블록 무변경.
+- KCos 블록 무변경.
 
 ## 6. 응답 필드 정의
 
@@ -55,7 +55,7 @@
 
 - 신규 엔티티/migration 없음. 기존 테이블 read-only SELECT 만.
 
-## 9. GP/KCos 무영향 확인
+## 9. KCos 무영향 확인
 
 - 메뉴: KPA 블록만 항목 추가. API: `/handled-products` 는 org 스코프(서비스 무관하나 KPA 화면에서만 호출). 화면/route: web-kpa-society 한정.
 

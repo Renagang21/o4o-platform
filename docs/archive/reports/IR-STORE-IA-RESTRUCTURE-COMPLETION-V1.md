@@ -191,7 +191,7 @@
 |---|---|
 | `/store/:slug/*` (스토어프론트) | 운영자 IA와 분리된 소비자 영역 |
 | API / 데이터 구조 변경 | 이번 정비는 UI/UX 레이어만 대상 |
-| GlycoPharm, K-Cosmetics 등 외부 서비스 | 각 서비스별 독립 구조 유지 |
+| K-Cosmetics 등 외부 서비스 | 각 서비스별 독립 구조 유지 |
 | Store Core 패키지 내부 구조 | Frozen Baseline (F3) 대상 |
 
 ---

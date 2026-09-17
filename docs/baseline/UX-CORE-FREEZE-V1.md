@@ -56,7 +56,6 @@ OperatorDashboardLayout, KpiGrid, AiSummaryBlock, ActionQueueBlock, ActivityLogB
 | 서비스 | 커밋 | 상태 |
 |--------|------|------|
 | Neture | `f5de08c36` | Frozen |
-| GlycoPharm | `b19ff8809` | Frozen |
 | K-Cosmetics | `3f321489a` | Frozen |
 | KPA-a | `bf41b174f` | Frozen |
 | KPA-b | `7beb12e91` | Frozen |
@@ -103,7 +102,6 @@ AdminDashboardLayout, StructureSnapshotBlock, PolicyOverviewBlock, GovernanceAle
 | 서비스 | 커밋 | 상태 |
 |--------|------|------|
 | Neture | `7d5c9c5d0` | Frozen |
-| GlycoPharm | `5b3e9733a` | Frozen |
 | KPA-b | `7beb12e91` | Frozen |
 | KPA-c | `dda8ccb5f` | Frozen |
 | K-Cosmetics | - | 별도 WO |

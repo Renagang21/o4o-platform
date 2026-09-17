@@ -61,7 +61,7 @@ export default function LmsCourseDetailPage() {
       port={kcosLmsPort}
       config={config}
       renderAfterCourseCard={({ course }) => (
-        // WO-O4O-APPRECIATION-GLYCO-KCOS-MIGRATION-V1: 공통 AppreciationPanel
+        // 공통 AppreciationPanel
         <AppreciationPanel
           targetType="lms_course"
           targetId={course.id}

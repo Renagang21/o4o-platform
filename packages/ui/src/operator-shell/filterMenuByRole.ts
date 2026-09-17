@@ -2,11 +2,10 @@
  * filterMenuByRole — Operator 통합 메뉴의 adminOnly 필터 (4 서비스 공통)
  *
  * WO-O4O-OPERATOR-MENU-ROLE-FILTER-COMMONIZATION-G3A-V1:
- *   KPA-Society / GlycoPharm / K-Cosmetics / Neture 의 config/operatorMenuGroups.ts 에
+ *   KPA-Society / K-Cosmetics / Neture 의 config/operatorMenuGroups.ts 에
  *   각각 존재하던 동일 구현을 공통화. 서비스별 메뉴 정의(UNIFIED_MENU) 와
  *   isAdmin 산출 방식은 각 서비스에 그대로 남는다.
  *
- * WO-O4O-GLYCOPHARM-AI-ADMIN-ROLE-GUARD-CONTRACT-AUDIT-AND-CLOSURE-V1:
  *   platformOnly 플래그 추가 (additive). 세 번째 인자 isPlatformAdmin 은 기본 false 이며,
  *   platformOnly 를 쓰지 않는 기존 호출처(2-인자)의 동작은 완전히 동일하다.
  *

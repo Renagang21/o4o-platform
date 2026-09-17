@@ -9,7 +9,7 @@
 | 우선순위 | **P0** (ecommerce-core 주문/결제 경로 전반 불능) |
 | 상태 | **⛔ 중단 / 방향 전환 필요 (DO NOT IMPLEMENT) — 착수 직전 조사에서 `ecommerce_orders` 가 off-contract 임이 확정됨. §0 참조** |
 | 분류 | DB provisioning (base table 생성 마이그레이션) |
-| 영향 | cosmetics · glycopharm · lms 결제 등 ecommerce-core 주문 전반 |
+| 영향 | cosmetics · lms 결제 등 ecommerce-core 주문 전반 |
 
 ---
 
@@ -23,11 +23,11 @@
 - 즉 `ecommerce_orders` 는 **의도적으로 미프로비전**된 평행 엔티티. 이를 생성하면 **동결된 E-commerce 계약(§4: checkoutService 경유 필수, 독립 주문 테이블 금지)에 반하는 두 번째 주문 원장**을 신설하게 됨.
 
 ### 진짜 문제 (재정의)
-`cosmetics-order.controller.ts` (및 `glycopharm/checkout.controller.ts`)가 **canonical `checkout_orders`/checkoutService 를 우회**하고 off-contract `EcommerceOrder`(ecommerce_orders)를 직접 사용 → 테이블 부재로 500. 수정 방향은 **테이블 생성이 아니라 컨트롤러를 canonical(checkout_orders/checkoutService)로 정렬**하는 것.
+`cosmetics-order.controller.ts` 가 **canonical `checkout_orders`/checkoutService 를 우회**하고 off-contract `EcommerceOrder`(ecommerce_orders)를 직접 사용 → 테이블 부재로 500. 수정 방향은 **테이블 생성이 아니라 컨트롤러를 canonical(checkout_orders/checkoutService)로 정렬**하는 것.
 
 ### 권고 (사용자 아키텍처 결정 필요)
 - **이 WO(table provision)는 폐기 또는 보류.** `ecommerce_orders`/`ecommerce_order_items`/`ecommerce_payments` 생성하지 말 것.
-- 대체 WO 후보: `WO-O4O-COSMETICS-ORDERS-CANONICAL-CHECKOUT-ALIGNMENT-V1` (가칭) — cosmetics 주문 read/list/detail 를 `checkout_orders`(CheckoutOrder) 기준으로 재작성, 생성 경로는 `checkoutService.createOrder()`. glycopharm 의 동일 off-contract 사용도 영향 범위로 조사.
+- 대체 WO 후보: `WO-O4O-COSMETICS-ORDERS-CANONICAL-CHECKOUT-ALIGNMENT-V1` (가칭) — cosmetics 주문 read/list/detail 를 `checkout_orders`(CheckoutOrder) 기준으로 재작성, 생성 경로는 `checkoutService.createOrder()`.
 - 단, "ecommerce_orders 를 신규 canonical 로 승격" 이라는 반대 방향 의도(서비스 컨트롤러 주석상 "canonical")가 있었는지 여부는 **아키텍처 오너 결정 사항** — 계약 문서(checkout_orders canonical)와 충돌하므로 사용자 판단 필요.
 
 > 아래 §1~§7 은 "ecommerce_orders 부재" 자체에 대한 조사 기록으로 보존하되, **구현 지침으로 쓰지 말 것.**
@@ -52,7 +52,6 @@
 
 `EcommerceOrder` 엔티티 사용처(= 본 테이블 부재로 런타임 실패하는 경로):
 - **cosmetics**: `cosmetics-order.controller.ts`(주문 생성/목록/단건), `cosmetics-payment.controller.ts`, `KCosmeticsPaymentEventHandler.ts`
-- **glycopharm**: `checkout.controller.ts`, `glycopharm-payment.controller.ts`, `GlycopharmPaymentEventHandler.ts`
 - **lms**: `LmsPaymentEventHandler.ts`
 - 공통: `connection.ts`(엔티티 등록)
 
@@ -74,7 +73,7 @@ KPA `CreateKpaFoundationTables` 선례와 동일하게 **엔티티 스키마 기
 
 ## 5. 검증 계획 (착수 후)
 - 마이그레이션 배포 후 `migration:show` 로 적용 확인.
-- `/store/commerce/orders` (cosmetics) → 200 + empty list (주문 없음). glycopharm checkout 주문 목록도 동일 정상화.
+- `/store/commerce/orders` (cosmetics) → 200 + empty list (주문 없음).
 - 주문 생성 1건 E2E(선택, pre-service 데이터 정책 내) 후 목록 노출 확인.
 
 ## 6. 범위 / 금지

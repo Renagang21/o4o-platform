@@ -43,7 +43,6 @@ services/web-pharmacy-hub/src/components/Footer.tsx
 | serviceKey | config | rolePrefix | platformBypass | 비고 |
 |---|---|---|---|---|
 | `neture` | `NETURE_SCOPE_CONFIG` | `neture` | true | security-core |
-| `glycopharm` | `GLYCOPHARM_SCOPE_CONFIG` | `glycopharm` | true | security-core |
 | `kpa-society` | `KPA_SCOPE_CONFIG` | `kpa` | **false** (조직 격리) | security-core · key ≠ prefix |
 | `k-cosmetics` | `COSMETICS_SCOPE_CONFIG` | `cosmetics` | true | security-core · key ≠ prefix |
 | `pharmacy-hub` | `PHARMACY_HUB_SCOPE_CONFIG` | `pharmacy-hub` | true | **api-server 로컬** · key = prefix (self-map) |
@@ -134,7 +133,6 @@ SELECT service_key, document_type, status, count(*) FROM service_policy_document
 
 ```text
 pharmacy-hub          accepted
-neture/glycopharm/kpa-society/k-cosmetics  accepted (회귀 방지)
 unknown / '' / pharmacy / pharmacyhub / kpa-groupbuy   rejected
 role-prefix 축(kpa, cosmetics)             rejected  (계약을 넓히지 않았음)
 집합 크기 = 정확히 5                        (의도치 않은 확장 감지)
@@ -157,7 +155,6 @@ role-prefix 축(kpa, cosmetics)             rejected  (계약을 넓히지 않�
 | `pharmacy-hub` | **404** | **200** `{"success":true,"data":null}` |
 | `kpa-society` | 200 | 200 |
 | `neture` | 200 | 200 |
-| `glycopharm` | 200 | 200 |
 | `k-cosmetics` | 200 | 200 |
 | `unknown-svc` (음성 대조) | 404 | **404** `UNKNOWN_SERVICE` (계약 유지) |
 

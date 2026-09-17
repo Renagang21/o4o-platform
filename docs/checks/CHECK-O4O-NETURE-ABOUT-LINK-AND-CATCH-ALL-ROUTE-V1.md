@@ -157,7 +157,7 @@ SPA 내부 전환뿐 아니라 주소창 직접 입력·외부 링크 유입에�
 ## 10. 후속 후보 (본 WO 범위 아님)
 
 1. `WO-O4O-NETURE-ABOUT-PAGE-DECISION-V1` — `/about` 을 404 로 둘지, 실제 소개 페이지(`/guide/intro` 통합 포함)를 만들지 판단
-2. `WO-O4O-WEB-CATCH-ALL-ROUTE-CROSS-SERVICE-V1` — KPA / GlycoPharm / K-Cosmetics / Pharmacy-Hub 에도 동일한 catch-all 부재 여부 전수 확인
+2. `WO-O4O-WEB-CATCH-ALL-ROUTE-CROSS-SERVICE-V1` — KPA / K-Cosmetics / Pharmacy-Hub 에도 동일한 catch-all 부재 여부 전수 확인
 3. `WO-O4O-NETURE-NOTFOUND-SHARED-COMPONENT-V1` — 서비스별 404 화면이 늘어나면 공통 패키지로 승격
 
 ---

@@ -2,7 +2,7 @@
 
 > **작업명:** WO-O4O-AI-PRODUCTION-TEMPLATE-SURFACE-PRESET-EXTEND-V1
 > **유형:** surface-agnostic `EditingPreset` 표준 도입 + store 바깥 surface(resources / LMS lesson) preset 적용 (frontend + @o4o/types)
-> **결과: PASS** — `@o4o/types` 에 `EditingPreset`/`EditingSurface` 타입 + 비-store canonical preset registry(`EDITING_PRESETS`, `findEditingPreset`) + `productionTemplateToEditingPreset` 변환 추가. **`ProductionTarget`/`ProductionTemplate` 무변경(store 경계 보존)**. KPA resources 글쓰기 · KPA/GP LMS 레슨 본문 AI 모달이 `AiContentModal` 의 기존 prop(`templateSystemPrompt`/`templateForcedOptions`)으로 preset 소비. backend/모델/provider/DB·migration/package.json/Dockerfile 무변경. @o4o/types·web-kpa-society·web-glycopharm typecheck 0.
+> **결과: PASS** — `@o4o/types` 에 `EditingPreset`/`EditingSurface` 타입 + 비-store canonical preset registry(`EDITING_PRESETS`, `findEditingPreset`) + `productionTemplateToEditingPreset` 변환 추가. **`ProductionTarget`/`ProductionTemplate` 무변경(store 경계 보존)**. KPA resources 글쓰기 · KPA LMS 레슨 본문 AI 모달이 `AiContentModal` 의 기존 prop(`templateSystemPrompt`/`templateForcedOptions`)으로 preset 소비. backend/모델/provider/DB·migration/package.json/Dockerfile 무변경.
 > **선행:** `IR-O4O-AI-EDITING-PROMPT-PRESET-STANDARD-V1`(§10 옵션 A) · `WO-O4O-AI-EDITING-MODAL-ADOPTION-ALIGNMENT-V1`
 > **작성일:** 2026-06-14 · 기준 HEAD `b08e8bb48`
 
@@ -25,7 +25,6 @@ store 전용 `ProductionTemplate` 을 오염시키지 않고, 편집 AI 전반(s
 | `packages/types/src/index.ts` | `export * from './editing-preset.js'` (main barrel — 신규 subpath 없음 → package.json 무변경) |
 | `services/web-kpa-society/src/pages/resources/ResourceWritePage.tsx` | `AiContentModal` 에 `findEditingPreset('resource')` preset 전달 |
 | `services/web-kpa-society/src/pages/instructor/courses/CourseEditPage.tsx` | LessonModal `AiContentModal` 에 `findEditingPreset('lms-lesson')` preset 전달 |
-| `services/web-glycopharm/src/pages/instructor/InstructorCourseEditPage.tsx` | 동일(LMS lesson preset) |
 | `docs/checks/CHECK-...-V1.md` | 본 문서 |
 
 **무변경:** `production.ts`(`ProductionTarget`)·`production-template.ts`(`ProductionTemplate`) — git 미변경 확인. `AiContentModal` 컴포넌트(기존 prop 재사용), backend(`/api/ai/content` prompt builder), 모델/provider, DB/migration, package.json/pnpm-lock, Dockerfile, KCos(해당 surface 부재). `@o4o/types` dist 는 gitignored(CI 재빌드 — 로컬은 `pnpm --filter @o4o/types build` 로 검증).
@@ -58,14 +57,14 @@ productionTemplateToEditingPreset(t: ProductionTemplate): EditingPreset
 |---------|--------|--------|:--:|
 | resource(글쓰기) | KPA `ResourceWritePage` | `findEditingPreset('resource')`(professional/medium) | ✅ |
 | lms-lesson(레슨 본문) | KPA `CourseEditPage` LessonModal | `findEditingPreset('lms-lesson')`(professional/long) | ✅ |
-| lms-lesson | GP `InstructorCourseEditPage` LessonModal | 동일 | ✅ |
+| lms-lesson `InstructorCourseEditPage` LessonModal | 동일 | ✅ |
 
 → 기존 generic 호출이 `templateSystemPrompt`+`templateForcedOptions` 를 받아 preset 진입(tone/length 자동 + systemPrompt prepend).
 
 ## 7. 보류한 surface와 사유
 
 - **library-entry:** `EDITING_PRESETS` 에 default preset 은 **정의했으나 적용 보류**. 라이브러리 진입 모달은 타깃 미선택 시점 generic(3서비스 동일) → 적용은 후속 `WO-...-EDITING-PRESET-ADOPTION-LMS-RESOURCES-V1` 에서(범위 최소화).
-- **QR(GP/KCos):** AI surface 부재 — 신규 구축 금지(직전 WO).
+- **QR(KCos):** AI surface 부재 — 신규 구축 금지(직전 WO).
 - **제품설명/POP:** 이미 `ProductionTemplate` 연결 — 변경 불요.
 - **CourseStructureAiModal / Signage / admin builder:** WO §4 제외(2단계·별도 파이프라인·도메인 상이).
 
@@ -80,7 +79,7 @@ productionTemplateToEditingPreset(t: ProductionTemplate): EditingPreset
 
 ## 10. 검증 결과
 
-- **TypeScript:** `@o4o/types` **0**, `web-kpa-society` **0**, `web-glycopharm` **0**(`@o4o/types` dist 재빌드 후). KCos 미변경(해당 surface 부재).
+- KCos 미변경(해당 surface 부재).
 - **정적:**
   - `ProductionTarget` 에 LMS/resources 미추가(§8). 기존 `ProductionTemplate` 동작 유지.
   - `EditingPreset` 이 store 바깥 surface 표현 가능(lms-lesson/resource/library-entry).
@@ -98,4 +97,4 @@ productionTemplateToEditingPreset(t: ProductionTemplate): EditingPreset
 
 ## 12. 완료 판정
 
-**PASS.** surface-agnostic `EditingPreset` 표준을 `@o4o/types` 에 도입(타입 + 비-store canonical registry + ProductionTemplate 변환), **`ProductionTarget`/`ProductionTemplate` 무변경으로 store 경계 보존**. KPA resources·KPA/GP LMS 레슨 본문이 `AiContentModal` 기존 prop 으로 preset 소비. backend/모델/DB/package/Dockerfile 무변경, typecheck 0. 새 기능 최소·경계 정확 — 핵심은 store preset 을 보존한 채 store 바깥 편집 AI 표준의 상위 계층을 세운 것. 다음은 library-entry + LMS/resources 적용 확대.
+**PASS.** surface-agnostic `EditingPreset` 표준을 `@o4o/types` 에 도입(타입 + 비-store canonical registry + ProductionTemplate 변환), **`ProductionTarget`/`ProductionTemplate` 무변경으로 store 경계 보존**. KPA resources·KPA LMS 레슨 본문이 `AiContentModal` 기존 prop 으로 preset 소비. backend/모델/DB/package/Dockerfile 무변경, typecheck 0. 새 기능 최소·경계 정확 — 핵심은 store preset 을 보존한 채 store 바깥 편집 AI 표준의 상위 계층을 세운 것. 다음은 library-entry + LMS/resources 적용 확대.

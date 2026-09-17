@@ -91,7 +91,6 @@ Express 는 `app.use('/api/v1/partner', …)` 를 **prefix 매칭**하므로 `/a
 
 | | 값 |
 |---|---|
-| entity `ServiceInterest` | `'GlycoPharm' \| 'K-Cosmetics'` |
 | frontend `ServiceInterest` | `'DIGITAL_SIGNAGE' \| 'BEAUTY_SUPPLY' \| 'ADVERTISEMENT'` |
 
 두 축이 한 번도 통합·검증된 적 없다는 방증.
@@ -116,7 +115,7 @@ Express 는 `app.use('/api/v1/partner', …)` 를 **prefix 매칭**하므로 `/a
 | lifecycle | 없음 (write-only) | 4-state 승인 lifecycle |
 
 → 컬럼·업무 의미·write/read lifecycle 이 **실질적으로 다르다** → **A(ENTITY_MAPPING_STALE) 배제.**
-`neture_partner_applications` 는 KPA/GP/KCos 매장이 실제로 쓰는 살아 있는 축이다
+`neture_partner_applications` 는 KPA/KCos 매장이 실제로 쓰는 살아 있는 축이다
 (`GET /api/v1/neture/partner/applications/mine` 200 다수 — 손대지 않았다).
 
 ---

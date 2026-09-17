@@ -125,11 +125,8 @@ import {
 //   DB 테이블 자체는 보존하며, DROP 여부는 별도 보존·아카이브 판단 감사에서 결정한다.
 // ============================================================================
 
-// GLYCOPHARM ENTITIES — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
-//   GlycoPharm 서비스 전체 삭제. glycopharm_* 테이블은 DROP migration 으로 제거한다.
-
-// STORE BLOG ENTITIES (공통 Store 도메인 — GlycoPharm 전용 자산이 아니다)
-// WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: routes/glycopharm/entities → modules/store/entities relocate.
+// STORE BLOG ENTITIES (공통 Store 도메인)
+// routes/entities → modules/store/entities relocate.
 // 테이블명(store_blog_posts / store_blog_settings)·스키마·데이터는 변경하지 않는다.
 import { StoreBlogPost } from '../modules/store/entities/store-blog-post.entity.js';
 import { StoreBlogSettings } from '../modules/store/entities/store-blog-settings.entity.js';
@@ -403,7 +400,7 @@ import { ContactRequest } from '../entities/ContactRequest.js';
 import { PlatformService } from '../entities/PlatformService.js';
 
 // ============================================================================
-// PLATFORM PAYMENT ENTITY (WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1)
+// PLATFORM PAYMENT ENTITY
 // ============================================================================
 import { PlatformPayment } from '../entities/payment/PlatformPayment.entity.js';
 
@@ -419,7 +416,7 @@ import { ForeignVisitorPartnerQrCode } from '../modules/foreign-visitor-partner/
 import { ForeignVisitorPartnerQrScanEvent } from '../modules/foreign-visitor-partner/foreign-visitor-partner-qr-scan-event.entity.js';
 
 // ============================================================================
-// E-COMMERCE CORE ENTITIES (Phase 4-B: GlycoPharm Core Integration)
+// E-COMMERCE CORE ENTITIES (Phase 4-B)
 // Use official exports path (moduleResolution: bundler)
 // ============================================================================
 // WO-O4O-ECOMMERCE-CORE-AND-COMMERCE-RESIDUE-FINAL-CENSUS-AND-RETIREMENT-V1:
@@ -633,7 +630,6 @@ export const entities = [
   // WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1: legacy route 제거와 함께 등록 해제
   // ============================================================================
   // STORE BLOG ENTITIES (공통 Store 도메인)
-  // WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1: GLYCOPHARM ENTITIES 등록 전부 제거.
   // ============================================================================
   StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
   StoreBlogSettings, // WO-O4O-KPA-STORE-BLOG-META-V1
@@ -799,7 +795,7 @@ export const entities = [
   // ============================================================================
   PlatformService,
   // ============================================================================
-  // PLATFORM PAYMENT ENTITY (WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1)
+  // PLATFORM PAYMENT ENTITY
   // ============================================================================
   PlatformPayment,
   // ============================================================================

@@ -14,7 +14,7 @@
 | 축 | 모집단 | 비고 |
 |---|---:|---|
 | api-server `src/**` (ts/tsx) | 2,509 | main.ts · `src/scripts/**` · `src/database/migrations/**` 기준 도달성 |
-| frontend `src/**` (7개 앱) | 2,534 | admin 1,152 / kpa 461 / neture 354 / glyco 298 / kcos 230 / signage 21 / page-generator 18 |
+| frontend `src/` (7개 앱) | 2,534 | — |
 | workspace package manifest | 전수 | zero-consumer dependency 스캔 |
 | 루트 임시·mirror 잔재 | 26 | `apps/api-server/packages/**` 21 + 5 |
 
@@ -62,8 +62,6 @@
 | 루트 임시 파일 (`tmpcols.cjs` · `tmpdiff.cjs` · `test_import.csv` · `webpack.blocks.config.js`) | 4 |
 | frontend 도달불가 소스 | 432 |
 | **합계** | **685** |
-
-frontend 내역: admin-dashboard 341 / web-kpa-society 45 / web-neture 23 / web-glycopharm 11 / web-k-cosmetics 6 / signage-player-web 4 / page-generator 2
 
 ### DEFERRED_MAJOR
 
@@ -164,7 +162,6 @@ local branch 13 (backup 1 · tmp 1 · work 8 · main · worktree 전용 1 · ups
 | lint-ratchet | exit 0 (error 62 · `ERROR_BASELINE` 64 → 62 하향) |
 | api-server build | exit 0 |
 | admin-dashboard type-check / build | **PASS / exit 0** |
-| web-kpa-society · web-neture · web-k-cosmetics · web-glycopharm · signage-player-web · page-generator | type-check **전부 PASS** · vite build **전부 exit 0** |
 
 ### production smoke (read-only · write 0건)
 
@@ -173,7 +170,7 @@ local branch 13 (backup 1 · tmp 1 · work 8 · main · worktree 전용 1 · ups
 | `GET /health` | 200 (`status: alive`) |
 | `GET /health/detailed` | 200 (`status: healthy` · db 15.18 · pingMs 21) |
 | `GET /api/v1/auth/status` | 200 (`authenticated: false`) |
-| neture.co.kr · glycopharm.co.kr · k-cosmetics.site · kpa-society.co.kr · admin.neture.co.kr | 전부 200 |
+| neture.co.kr · k-cosmetics.site · kpa-society.co.kr · admin.neture.co.kr | 전부 200 |
 
 **주문/결제 write 0건** (WO §28 준수).
 

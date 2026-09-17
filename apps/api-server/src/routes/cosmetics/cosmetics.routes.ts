@@ -45,7 +45,7 @@ import { createOperatorPopController } from '../o4o-store/controllers/operator-p
 import { createOperatorMultilingualContentController } from '../o4o-store/controllers/operator-multilingual-content.controller.js'; // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1
 // WO-O4O-KCOSMETICS-OPERATOR-BLOG-POP-QR-BOOTSTRAP-V1: K-Cosmetics QR 운영자 write API
 import { createOperatorQrController } from '../o4o-store/controllers/operator-qr.controller.js';
-// WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: 매장 HUB POP/QR 가져가기(staff import) — 공유 컨트롤러 mount (GlycoPharm mirror)
+// WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: 매장 HUB POP/QR 가져가기(staff import) — 공유 컨트롤러 mount
 import { createStorePopStaffController } from '../o4o-store/controllers/pop.controller.js';
 import { createStoreQrStaffController } from '../o4o-store/controllers/qr.controller.js';
 import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
@@ -59,7 +59,7 @@ import { createCosmeticsCommunityHubController } from './controllers/cosmetics-c
 import { createCosmeticsTouristHubController } from './controllers/cosmetics-tourist-hub.controller.js';
 // WO-O4O-EVENT-OFFER-KCOS-ADOPTION-V1
 import { createCosmeticsEventOfferController } from './controllers/event-offer.controller.js';
-// WO-O4O-KCOS-RESOURCES-BACKEND-V1: K-Cos Resource Layer (GP canonical mirror)
+// WO-O4O-KCOS-RESOURCES-BACKEND-V1: K-Cos Resource Layer (canonical mirror)
 import { createCosmeticsContentsRouter, createCosmeticsOperatorResourcesRouter } from './controllers/resources.controller.js';
 // WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1: profile classification (sub_role) Operator API
 import { createCosmeticsMemberController } from './controllers/cosmetics-member.controller.js';
@@ -137,7 +137,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
   // B2B Supply Catalog — 공급자 상품 카탈로그 + 신청 (WO-O4O-HUB-TO-STORE-UX-BRIDGE-V1)
-  // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey='cosmetics' 전달 → cosmetics:store_owner 만 통과.
+  // serviceKey='cosmetics' 전달 → cosmetics:store_owner 만 통과.
   router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
   // Store Local Products — 매장 자체 상품 (WO-O4O-STORE-LOCAL-PRODUCTS-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1)
@@ -221,7 +221,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   //   (1) 프론트가 호출하는 /api/v1/cosmetics/stores/:slug/blog/staff 가 아예 라우팅되지 않고(404),
   //   (2) 아래 /operator/blog 보다 먼저 등록돼 /operator/blog/posts 가 slug='operator' 로 잡혀
   //       404 STORE_NOT_FOUND 를 반환했다(운영자 블로그 화면 전체 오류).
-  //   KPA(kpa.routes.ts) · GlycoPharm(glycopharm.routes.ts) 와 동일하게 '/stores' 로 정렬한다.
+  //   KPA(kpa.routes.ts) 와 동일하게 '/stores' 로 정렬한다.
   router.use('/stores', createBlogController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
   // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
@@ -258,7 +258,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // WO-O4O-KCOS-STORE-HUB-POP-QR-PORT-V1: 매장 HUB POP/QR 가져가기 (staff import)
   //   /api/v1/cosmetics/stores/:slug/pop/staff/import (운영자 HUB POP → store_pops 사본)
   //   /api/v1/cosmetics/stores/:slug/qr/staff/import  (운영자 HUB QR  → store_qr_codes 사본)
-  //   GlycoPharm/KPA 와 동일한 o4o-store 공통 컨트롤러를 serviceKey='cosmetics' 로 mount (신규 API 아님).
+  //   KPA 와 동일한 o4o-store 공통 컨트롤러를 serviceKey='cosmetics' 로 mount (신규 API 아님).
   router.use('/stores', createStorePopStaffController(dataSource, coreRequireAuth as any, 'cosmetics'));
   router.use('/stores', createStoreQrStaffController(dataSource, coreRequireAuth as any, 'cosmetics'));
 
@@ -294,7 +294,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
 
   // ============================================================================
   // Contents / Resources Routes
-  // WO-O4O-KCOS-RESOURCES-BACKEND-V1 (GP glycopharm_contents canonical mirror)
+  // WO-O4O-KCOS-RESOURCES-BACKEND-V1
   //
   // Public/Member:
   //   GET /api/v1/cosmetics/contents?sub_type=resource
@@ -338,7 +338,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // ============================================================================
   // ============================================================================
   // Home Routes — /api/v1/cosmetics/home/*
-  // WO-O4O-GLYCOPHARM-KCOS-HOME-LATEST-API-V1: 통합 최신 활동 피드
+  // 통합 최신 활동 피드
   // ============================================================================
   const homeRouter = Router();
 

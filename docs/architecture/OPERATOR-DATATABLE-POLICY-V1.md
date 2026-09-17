@@ -91,7 +91,6 @@
 | 서비스 | 현재 상태 | Stores 추출 시 작업 |
 |---|---|---|
 | **KPA** `OperatorStoresPage` | 이미 `@o4o/operator-ux-core` `DataTable` 사용 | thin migration — 페이지를 Core 컴포넌트 호출로 교체 |
-| **GlycoPharm** `StoresPage` | `@o4o/ui` `DataTable` + 내장 pagination 사용 | `@o4o/ui` Column<T> → ListColumnDef<T> 변환, 외부 Pagination 결합 (15-20 라인 수정) |
 | **K-Cosmetics** `StoresPage` | **수동 HTML 테이블** (DataTable 미사용) | DataTable 컴포넌트화 (30-40 라인) — Stores 추출 WO 의 가장 큰 작업 |
 
 → K-Cos `StoresPage` 의 수동 HTML 마이그레이션은 **Stores 추출 WO 에 포함될 부수 작업**으로 기록한다.

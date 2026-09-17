@@ -67,7 +67,7 @@ kiosk-core 는 **이미** `@o4o/content-editor` 를 peerDependency 로 선언하
 | **script 제거** | ✅ `window.__XSS__` **false** (태블릿·QR 양쪽) |
 | **위험 속성 제거** | ✅ `onerror` 미실행 → `window.__XSS2__` **false** |
 | console / pageerror / API 4xx·5xx | ✅ **0건** |
-| 소비처 tsc (kpa / k-cosmetics / glycopharm) | ✅ 전부 **EXIT=0** |
+| 소비처 tsc (kpa / k-cosmetics) | ✅ 전부 **EXIT=0** |
 | KPA `vite build` | ✅ **EXIT=0** |
 
 ### 4-1. sanitize 동작 관찰 (정상)

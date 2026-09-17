@@ -16,7 +16,6 @@
 | 서비스 | Footer 레이아웃 | 공개 메인 커버 | 보강 후보 |
 |--------|---------------|:---:|---------|
 | KPA-Society | `Layout` + `InfoPageLayout`(PlatformFooter) | ✅ | auth/QR/404/공개뷰 (대부분 의도적) |
-| GlycoPharm | `MainLayout` | ✅ | 없음 (현 구조 적절) |
 | K-Cosmetics | `MainLayout` | ✅ | 404, 공개 매장 블로그 |
 | Neture | `NetureLayout` + `MainLayout` (inline footer) | ✅ | 없음 (현 구조 적절) |
 
@@ -29,11 +28,6 @@
 - `components/platform/PlatformFooter.tsx` → `InfoPageLayout`(`/services/*`, `/join/pharmacy`)
 - `InstructorLayout`도 Footer 포함
 - **제외(적절)**: `/admin/*`, `/operator/*`, `/store`(경영 대시보드), `/tablet/:slug`(키오스크), `/signage/play/*`(풀스크린), `*`(404)
-
-### GlycoPharm
-- `components/common/Footer.tsx` → `components/layouts/MainLayout.tsx`에서 `<Outlet/>` 아래 렌더 (공개 페이지 60+ 라우트)
-- StoreLayout/KioskLayout/TabletLayout은 자체 Store/Kiosk/Tablet Footer 보유
-- **제외(적절)**: `/admin/*`, `/operator/*`, `/store/*`(경영), `/store-hub/*`(탐색 허브), auth 플로우, `/qr/:id`, `*`(404)
 
 ### K-Cosmetics
 - `components/common/Footer.tsx` → `components/layouts/MainLayout.tsx`에서 렌더 (공개 페이지 60+ 라우트)
@@ -51,7 +45,7 @@
 
 ### 3-1. 인증 플로우 (4개 서비스 공통 — standalone)
 
-| 라우트 | KPA | GP | K-Cos | Neture |
+| 라우트 | KPA | K-Cos | Neture |
 |--------|:---:|:---:|:---:|:---:|
 | `/login` | 모달(Layout) | standalone | MainLayout | 모달 |
 | `/forgot-password` | ❌ | ❌ | MainLayout | ❌ |
@@ -77,7 +71,7 @@
 
 | 라우트 | 서비스 | 성격 | Footer 보강 가치 |
 |--------|--------|------|:---:|
-| `*` (404) | K-Cos, KPA, GP, Neture | 에러 페이지 | **중간** (복귀 네비) — 단 minimal이 의도일 수 있음 |
+| `*` (404) | K-Cos, KPA, Neture | 에러 페이지 | **중간** (복귀 네비) — 단 minimal이 의도일 수 있음 |
 | `/store/:slug/blog`, `.../blog/:postSlug` | K-Cos | 공개 매장 블로그 | **논쟁** (매장 자율 영역 vs 플랫폼 정보) |
 
 ---
@@ -96,7 +90,7 @@
 | 후보 | 쟁점 |
 |------|------|
 | **404 페이지 (4서비스)** | 복귀 네비 제공 vs minimal 에러 페이지 의도 |
-| **K-Cos 공개 매장 블로그** | 플랫폼 Footer 통일 vs 매장 자율 영역 (GP 조사에서 "자율성 침해" 우려 제기) |
+| **K-Cos 공개 매장 블로그** | — |
 | **KPA `/certificate/verify`, `/setup-activity`** | 외부 공유/단계형 폼에 Footer 필요성 |
 | **auth 플로우 정책 통일** | 4서비스 모두 standalone로 통일할지, K-Cos만 MainLayout 유지할지 |
 

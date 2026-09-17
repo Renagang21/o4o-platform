@@ -39,7 +39,7 @@
  *     - 미적용 세트의 QR → 코너 미확정 → ③ 상품 0건
  *     - 다른 코너의 상품 → 코너별 진열/문맥으로만 해석
  *
- *   ⚠️ 공개 `/tablet/products` 는 **Screen Set 이전 세대**(세트 미적용 태블릿·KCos/GP kiosk)의
+ *   ⚠️ 공개 `/tablet/products` 는 **Screen Set 이전 세대**(세트 미적용 태블릿·KCos kiosk)의
  *      계약이라 이 폐기 대상이 아니다. 여기서 정하는 것은 **Screen Set product_list 계약**이다.
  *
  *   ②의 코너는 세 경로가 **같은 방식**으로 도출한다(`resolveScreenSetAppliedTablet`):

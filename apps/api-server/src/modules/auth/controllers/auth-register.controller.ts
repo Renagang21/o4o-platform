@@ -329,7 +329,6 @@ export class AuthRegisterController extends BaseController {
           }
         }
 
-        // GlycoPharm 운영자 알림 — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
         // WO-O4O-NETURE-MEMBERSHIP-OPERATOR-NOTIFICATION-V1:
         //   기존 계정 Neture 가입 신청(supplier) 시 운영자(neture:operator / neture:admin) 알림.
@@ -618,7 +617,6 @@ export class AuthRegisterController extends BaseController {
         }
       }
 
-      // GlycoPharm 운영자 알림 — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
       // WO-O4O-NETURE-MEMBERSHIP-OPERATOR-NOTIFICATION-V1:
       //   신규 계정 Neture 가입 신청(supplier) 시 운영자(neture:operator / neture:admin) 알림.
@@ -861,9 +859,6 @@ export class AuthRegisterController extends BaseController {
       }
     }
   }
-
-  // createGlycopharmApplication() — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
-  //   glycopharm_applications / glycopharm_members 자동 생성 경로였다.
 
   /**
    * WO-O4O-NETURE-SUPPLIER-REGISTRATION-PROFILE-CREATION-V1

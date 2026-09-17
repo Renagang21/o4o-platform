@@ -3,7 +3,7 @@
  *
  * WO-O4O-STORE-PRODUCTION-ROUTER-UTILS-COMMONIZATION-PHASE2-G-V1
  *
- * 3 서비스(KPA / GlycoPharm / K-Cosmetics)에서 중복 정의되던
+ * 2 서비스(KPA / K-Cosmetics)에서 중복 정의되던
  * production router state 빌더·파서를 단일 공통 모듈로 통합.
  *
  * Zero-dependency: @o4o/types/production 을 직접 import 하지 않고 타입을 인라인으로 정의.

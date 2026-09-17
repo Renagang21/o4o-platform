@@ -1,7 +1,6 @@
 # IR-O4O-PRODUCT-APPROVAL-TO-OPL-CROSSSERVICE-AUDIT-V1
 
 > **유형:** Read-only 조사 (코드/DB/route/UI/API 변경 없음, 문서 1개만 생성)
-> **목적:** 공급 상품 신청(ProductApproval PENDING) → 승인 → OrganizationProductListing(OPL) 생성 → 내 매장 주문 가능 상품 편입 경로를 KPA/GlycoPharm/K-Cosmetics 3서비스에서 audit.
 > **작성일:** 2026-06-13 · 기준 HEAD `7574e08e1`
 > **선행:** `WO-O4O-STORE-HUB-SUPPLY-CATALOG-NAMING-ALIGNMENT-V1`(SupplyCatalogHub) · `CHECK-O4O-STORE-HUB-SUPPLY-CATALOG-KPA-FOLD-IN-V1`(D 보류)
 
@@ -16,9 +15,9 @@
 | 승인 직후 주문 가능 상품인가? | **NO.** OPL `is_active=false` → 운영자가 **활성화(PUT /listings/:id isActive=true) + 채널 진열(OPC is_active + channel APPROVED)** 해야 주문 가능. "승인 ≠ 즉시 주문 가능" |
 | StoreProductProfile 도 생성되는가? | **NO** — 승인 경로에서 생성 안 함(표시 커스터마이즈용, 별도 수동 upsert) |
 | 거절/취소/삭제 정리 정책은? | reject→ProductApproval만 REJECTED(OPL 무관) · revoke→OPL `is_active=false` 비활성 · **"내 매장 제외"(cancelProductByOfferId)→ProductApproval+OPL row 둘 다 DELETE** |
-| 가장 중요한 발견 | **① OPL 초기 상태 = 비활성(3서비스 공통)** — 승인 후 활성화+진열 단계 필수. **② 소비자 storefront 성숙도 차이**: GlycoPharm 만 4-gate 소비자 storefront 보유, K-Cos/KPA 는 소비자 storefront 없음(operator-facing listings 만). **③ 승인 action UI 공백 가능성**: product-policy-v2 의 store 상품 승인 endpoint 는 admin/internal(X-Admin-Secret) 전용 — operator-facing 승인 UI 가 별도 확인 필요 |
+| 가장 중요한 발견 | **① OPL 초기 상태 = 비활성(3서비스 공통)** — 승인 후 활성화+진열 단계 필수. **③ 승인 action UI 공백 가능성**: product-policy-v2 의 store 상품 승인 endpoint 는 admin/internal(X-Admin-Secret) 전용 — operator-facing 승인 UI 가 별도 확인 필요 |
 
-**핵심:** 신청→승인→OPL **backend 계약은 3서비스 공통이며 OPL 은 비활성으로 생성**된다(A). 차이는 backend 가 아니라 **소비자 storefront frontend 성숙도**(GP 만 완성, C)와 **승인 operator UI 노출 여부**(확인 필요, E/D)에 있다.
+**핵심:** 신청→승인→OPL **backend 계약은 3서비스 공통이며 OPL 은 비활성으로 생성**된다(A).
 
 ---
 
@@ -38,7 +37,6 @@
 |--------|---------------------|-----------|----------------------------------------|
 | 공통 backend | `routes/o4o-store/controllers/pharmacy-products.controller.ts` · `modules/product-policy-v2/product-approval-v2.service.ts` | `modules/store-core/entities/organization-product-listing.entity.ts` | `GET /pharmacy/products/listings`(operator) |
 | KPA | `kpa.routes.ts` mount (serviceKey 'kpa-society') | 공유 | operator listings (소비자 storefront 없음) |
-| GlycoPharm | `glycopharm.routes.ts` mount ('glycopharm') | 공유 | **소비자 storefront** `store.controller.ts` 4-gate (`/store/:slug/products`) |
 | K-Cosmetics | `cosmetics.routes.ts:110` mount ('cosmetics') | 공유 | operator catalog 만 (소비자 storefront 미구현) |
 
 엔티티: `apps/api-server/src/entities/ProductApproval.ts` (status enum: PENDING/APPROVED/REJECTED/REVOKED), `StoreProductProfile.entity.ts`.
@@ -90,11 +88,10 @@
 |--------|-----------------|-------------|---------------------|:---:|
 | **operator listings (공통)** | `GET /pharmacy/products/listings` (`pharmacy-products.controller.ts:326-348`) | OPL `where {organization_id, service_key?}` | **is_active 무관 전체 반환**(운영자는 활성/비활성 모두 봄) | A |
 | OPL 활성화 | `PUT /pharmacy/products/listings/:id` (`:351-391`) `{isActive:true}` | — | 운영자가 명시적 활성화("진열") | A |
-| **GlycoPharm 소비자 storefront** | `GET /glycopharm/stores/:slug/products` (`store.controller.ts:114-173`) | OPL **4-gate INNER JOIN** | ① offer is_active ② **OPL is_active=true** ③ OPC is_active=true ④ channel B2C APPROVED | A (GP 완성) |
 | K-Cosmetics 소비자 storefront | **미구현** | — | 소비자 storefront 없음(operator catalog 만) | C |
 | KPA 소비자 storefront | **미구현** | — | operator listings 만 | C |
 
-**판정:** 승인 후 흐름 = **OPL(비활성) 생성 → 운영자 활성화(is_active=true) + 채널 진열(OPC) → (GP) 소비자 storefront 4-gate 통과 시 주문 가능.** GlycoPharm 만 소비자 storefront 가 완성되어 있고, K-Cos/KPA 는 소비자 storefront 미구현(operator-facing listings 까지만). → **frontend 성숙도 차이(C), backend 차이 아님.**
+→ **frontend 성숙도 차이(C), backend 차이 아님.**
 
 ---
 
@@ -112,18 +109,18 @@
 
 ## 9. Phase 6 — cross-service 판정
 
-| 영역 | KPA | GlycoPharm | K-Cosmetics | 판정 | 후속 |
-|------|-----|-----------|-------------|:---:|------|
-| apply→ProductApproval(PENDING) | 공유 | 공유 | 공유 | **A** | — |
-| 승인 service (approveServiceProduct) | 공유 | 공유 | 공유 | **A** | — |
-| 승인 operator-facing UI/route 노출 | ? | ? | ? | **E/D** | Q2 후속 — admin/internal 외 operator 승인 surface 확인 |
-| 승인→OPL 생성(is_active=false) | 공유 | 공유 | 공유 | **A** | — |
-| OPL 활성화(PUT listings) + 채널 진열 | 공유 | 공유 | 공유 | **A** | — |
-| 소비자 storefront(주문 가능 노출) | 미구현 | **4-gate 완성** | 미구현 | **C** | 서비스별 storefront 구축(frontend 성숙도) |
-| reject/revoke/제외 정리 | 공유 | 공유 | 공유 | **A** | — |
-| StoreProductProfile 연계 | 없음 | 없음 | 없음 | **A**(일관, 미연계) | 필요 시 별도 |
+| 영역 | KPA | K-Cosmetics | 판정 | 후속 |
+| ------ | ----- | ------------- | :---: | ------ |
+| apply→ProductApproval(PENDING) | 공유 | 공유 | **A** | — |
+| 승인 service (approveServiceProduct) | 공유 | 공유 | **A** | — |
+| 승인 operator-facing UI/route 노출 | ? | ? | **E/D** | Q2 후속 — admin/internal 외 operator 승인 surface 확인 |
+| 승인→OPL 생성(is_active=false) | 공유 | 공유 | **A** | — |
+| OPL 활성화(PUT listings) + 채널 진열 | 공유 | 공유 | **A** | — |
+| 소비자 storefront(주문 가능 노출) | 미구현 | 미구현 | **C** | 서비스별 storefront 구축(frontend 성숙도) |
+| reject/revoke/제외 정리 | 공유 | 공유 | **A** | — |
+| StoreProductProfile 연계 | 없음 | 없음 | **A**(일관, 미연계) | 필요 시 별도 |
 
-**종합:** 신청→승인→OPL→정리 **backend 계약은 3서비스 완전 공통(A)**. 차이는 ① **소비자 storefront frontend 성숙도(C — GP만 완성)**, ② **승인 operator UI 노출(E/D — 확인 필요)** 에 국한. 신규 parity backend 작업은 불요.
+**종합:** 신청→승인→OPL→정리 **backend 계약은 3서비스 완전 공통(A)**. 신규 parity backend 작업은 불요.
 
 ---
 
@@ -132,7 +129,7 @@
 | 우선 | WO/IR 후보 | 분류 | 내용 |
 |:---:|-----------|:---:|------|
 | 1 | `IR-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-AUDIT-V1` | E/D | store 상품 승인(product_approvals PENDING→APPROVED)을 **operator 가 수행하는 UI/route 존재 여부** 확정. admin/internal 전용이면 operator 승인 surface 설계 필요 여부 판단 (Q2) |
-| 2 | `IR-O4O-STORE-ORDERABLE-PRODUCT-ACTIVATION-POLICY-V1` | C | 승인 후 OPL 활성화+채널 진열 정책을 3서비스 공통 문서화. K-Cos/KPA 소비자 storefront 구축 시 GP 4-gate 패턴 채택 기준 |
+| 2 | `IR-O4O-STORE-ORDERABLE-PRODUCT-ACTIVATION-POLICY-V1` | C | 승인 후 OPL 활성화+채널 진열 정책을 3서비스 공통 문서화. |
 | 3 | `WO-O4O-SUPPLY-CATALOG-APPROVAL-FLOW-DOCUMENTATION-V1` | — | 신청→승인→활성화→진열→주문 가능 end-to-end 흐름 문서(운영자 가이드) |
 | 4 | *(조건부)* `WO-O4O-PRODUCT-APPROVAL-TO-OPL-CROSSSERVICE-PARITY-FIX-V1` | C | Phase 6 에서 C 로 판정된 storefront 성숙도 차이 정비(필요 시) |
 
@@ -144,7 +141,7 @@
 
 - 공급 상품 **신청→승인→OPL 생성→거절/취소 정리 backend 는 3서비스 완전 공통**(`pharmacy-products.controller` + `ProductApprovalV2Service`, serviceKey 파라미터, per-service 분기 0). → A.
 - **승인 시 OPL 은 `is_active=false`(비활성) 으로 생성**된다(3서비스 공통). **승인 ≠ 즉시 주문 가능** — 운영자 **활성화(PUT listings isActive=true) + 채널 진열(OPC is_active + channel APPROVED)** 이 추가로 필요.
-- **소비자 주문 가능 노출은 GlycoPharm 만 완성**(4-gate storefront). K-Cos/KPA 는 operator-facing listings 까지만, 소비자 storefront 미구현 → **frontend 성숙도 차이(C)**, backend 차이 아님.
+- K-Cos/KPA 는 operator-facing listings 까지만, 소비자 storefront 미구현 → **frontend 성숙도 차이(C)**, backend 차이 아님.
 - **승인 action 의 operator-facing 노출 여부가 미확정**(현재 노출 endpoint 는 admin/internal X-Admin-Secret) → 최우선 후속 확인(E/D).
 - 신규 주문 테이블·parity backend 불요. 후속은 (1) 승인 operator surface 확인 IR, (2) 활성화/storefront 정책 문서화.
 

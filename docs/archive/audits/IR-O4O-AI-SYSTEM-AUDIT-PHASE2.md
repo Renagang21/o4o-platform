@@ -77,7 +77,6 @@
 | 서비스 | Lines | 주요 구성 |
 |--------|:-----:|-----------|
 | web-neture | 2,787 | FloatingAiButton + Admin AI 대시보드 (8개 페이지) |
-| web-glycopharm | 1,816 | Care AI UI (5개 컴포넌트) + Operator AI Report |
 | web-glucoseview | 497 | AIChatWidget + AIChatButton |
 | web-kpa-society | 45 | OperatorAiReportPage |
 
@@ -265,18 +264,12 @@ fetch('api.openai.com/v1/chat/completions') + Authorization: Bearer ${apiKey}
 | 1 | **AiSummaryButton** | packages/o4o-ai-components | 19 | 5개 서비스 | 공유 Core |
 | 2 | **FloatingAiButton** | web-neture/components/ai/ | 2 | neture | B2C Copilot |
 | 3 | **AIChatButton + Widget** | web-glucoseview/components/ai/ | 3 | glucoseview | Patient Chat |
-| 4 | **CareAiChatPanel** | web-glycopharm/pages/care/ | 2 | glycopharm | Provider Chat |
-| 5 | **CareAiChatEntry** | web-glycopharm/pages/care/ | 2 | glycopharm | Chat Entry |
-| 6 | **PatientAiSummary** | web-glycopharm/pages/care/ | 1 | glycopharm | Insight Card |
-| 7 | **CareAiPrioritySummary** | web-glycopharm/pages/care/ | 1 | glycopharm | Priority Card |
-| 8 | **CareAiPopulationSummary** | web-glycopharm/pages/care/ | 1 | glycopharm | Population Card |
 
 ### 서비스별 AI UI 현황
 
 | 서비스 | AI 컴포넌트 수 | 주요 역할 |
 |--------|:------------:|-----------|
 | web-neture | 2 | B2C Store/Product Copilot + Dashboard Summary |
-| web-glycopharm | 6 | Healthcare Provider AI (Chat + 4 Insight Cards) |
 | web-glucoseview | 2 | Patient Glucose AI Assistant |
 | web-k-cosmetics | 1 | Dashboard Summary only (AiSummaryButton) |
 | web-kpa-society | 1 | Dashboard Summary only (AiSummaryButton) |
@@ -291,14 +284,13 @@ fetch('api.openai.com/v1/chat/completions') + Authorization: Bearer ${apiKey}
 | web-kpa-society | 6 | DashboardPage (4개 변형), OperatorDashboard 등 |
 | web-neture | 4 | PartnerDashboardPage, SupplierDashboardPage 등 |
 | web-glucoseview | 1 | DashboardPage |
-| web-glycopharm | 1 | AiReportPage |
 
 ### 권고: WO-O4O-AI-COPILOT-ENTRY-UNIFICATION
 
 현재 3가지 독립 UI 패턴:
 1. **Summary Button** — AiSummaryButton (19개 페이지, Modal 팝업)
 2. **Floating Chat** — FloatingAiButton (neture), AIChatButton (glucoseview)
-3. **Inline Panel** — CareAiChatPanel (glycopharm, 슬라이드 패널)
+3. **Inline Panel** — CareAiChatPanel (슬라이드 패널)
 
 통합 시 고려사항:
 - Summary와 Chat의 UX 차이가 크므로 완전 통합보다 **공통 진입점 + 모드 전환** 방식 권장

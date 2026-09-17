@@ -25,7 +25,7 @@ Neture `/supplier/library`(공급자 자료실)의 frontend·backend·운영자 
 | branch | `main` |
 | HEAD | `53dddc842` |
 | origin ahead/behind | 0 / 0 |
-| 다른 세션 WIP | operator-core-ui(product-applications)·GP/KCos App.tsx·operatorMenuGroups·pnpm-lock·ProductApplicationManagementPage 등 다수 — **미접촉** |
+| 다른 세션 WIP | operator-core-ui(product-applications)·KCos App.tsx·operatorMenuGroups·pnpm-lock·ProductApplicationManagementPage 등 다수 — **미접촉** |
 | 조사 기준 commit | `53dddc842` |
 
 ## 3. route / menu 현황
@@ -86,7 +86,7 @@ Neture `/supplier/library`(공급자 자료실)의 frontend·backend·운영자 
 
 ## 7. 매장형 자료실과의 경계
 
-| 구분 | 공급자 자료실(Neture) | 매장형 자료실(KPA/GP/KCos) |
+| 구분 | 공급자 자료실(Neture) | 매장형 자료실(KPA/KCos) |
 |------|----------------------|---------------------------|
 | 사용자 | 공급자 | 매장 경영자 |
 | 목적 | 공급자 private 보관 | 매장 실행 자료 활용 |

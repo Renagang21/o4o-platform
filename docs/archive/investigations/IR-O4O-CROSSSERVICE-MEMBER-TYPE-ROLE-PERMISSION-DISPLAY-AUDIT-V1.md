@@ -13,7 +13,7 @@
   원값을 그대로 렌더한다. `supplier`는 "공급자"로 라벨링되지만 bare `operator`는 매핑이 없어
   raw `operator`(영문)로 노출된다. 즉 한 컬럼에 **참여자 유형 축과 운영 권한 축이 혼합**된다.
 - **Case E (서비스별 표시 기준 편차) — 확정.** KPA만 리스트에서 "활동 유형 / 추가 권한"을 2컬럼으로
-  분리하고, Neture / GlycoPharm / K-Cosmetics는 1컬럼(`membership.role`) 구조다.
+  분리하고, Neture / K-Cosmetics는 1컬럼(`membership.role`) 구조다.
 - **Case D (데이터 혼입) — 가능성 있음, 미확인.** 일부 Neture 계정의 `service_memberships.role`에
   bare `operator`가 저장돼 있을 가능성. DB 또는 브라우저 확인 필요.
 - 수정 방향은 본 IR에서 확정하지 않는다. 후속은 2단계(IR 확정 → Neture 우선 UI 정렬 WO)로 분리 권장.
@@ -112,16 +112,13 @@ export function RoleBadge({ role }: { role: string }) {
 |--------|----------------|------------------|:---:|:---:|:---:|
 | **Neture** | 1컬럼 `membership.role` **원값** (operator 혼입 노출) | 모달에서 회원유형/운영권한 **분리** | **불일치** | 있음 | `OperatorMembersConsolePage` 사용 |
 | **KPA-Society** | **2컬럼 분리**: 활동 유형(`activity_type`) + 추가 권한(`capabilities` badge) | Drawer 다중 섹션 분리 | 일치 | 낮음 | 독립 구현(`MemberManagementPage`) |
-| **GlycoPharm** | 1컬럼 `membership.role` | 모달에서 회원유형/운영권한 분리 | 잠재적 동일 이슈 | 잠재 | 공통 사용 |
 | **K-Cosmetics** | 1컬럼 `membership.role` (+ subRole) | 모달에서 회원유형/운영권한 분리 (+ subRole) | 잠재적 동일 이슈 | 잠재 | 공통 사용 |
 
-- **표시 기준 SSOT 부재**: 동일 공통 컴포넌트를 쓰는 Neture/GlycoPharm/K-Cosmetics는 모두 리스트 1컬럼이며,
-  운영 권한 값이 `membership.role`에 섞이면 동일하게 raw 노출될 수 있다.
 - **KPA만** 리스트에서 "참여자 특성(활동 유형)"과 "플랫폼 권한(추가 권한)"을 명시적으로 2컬럼 분리 →
   사실상 KPA가 의도된(올바른) 분리 모델이고 나머지 3개가 미정렬.
 
 > 위 표는 IR 최초 조사 시점(**수정 전**) 상태다. **Neture는 §7에서 2컬럼 분리(회원 유형 / 운영 권한)로
-> 정렬 완료**됐다. GlycoPharm / K-Cosmetics는 아직 1컬럼 구조로, §8 후속 조사 대상이다.
+> 정렬 완료됐다. K-Cosmetics는 아직 1컬럼 구조로, §8 후속 조사 대상이다.
 
 ---
 
@@ -208,11 +205,6 @@ ORDER BY u.email, ra.role;
 ## 8. 후속 방향
 
 1. **Neture**: 1차 UI 표시 정렬 완료(§7).
-2. **다음 단계 — GlycoPharm / K-Cosmetics 조사** (별도 IR 또는 WO, **바로 수정 금지**):
-   - Neture와 동일하게 리스트가 `membership.role` 1컬럼 구조인지.
-   - 모달 "운영 권한" 표시가 실제 대시보드 접근(bare operator/admin)과 일치하는지 — namespaced-only 매칭 동일 결함 여부.
-   - 운영 권한 값이 membership.role / roles[]에 혼입된 계정이 있는지.
-   - 필요 시 KPA(2컬럼 분리 모델)를 기준으로 비교.
 3. **데이터 정합성(Case D) — 별도 트랙**: `service_memberships.role`(또는 roles[])에 bare `operator`/`admin`이
    들어가는 write-path 조사. 의도된 legacy인지, 승인/권한 부여 과정의 혼입인지. UI 표시와 분리.
 
@@ -222,7 +214,7 @@ ORDER BY u.email, ra.role;
 
 - [ ] 3계정의 `service_memberships.role` / `role_assignments.role` DB 실데이터 (브라우저 거동 기준 확인됨, DB 직접 미완).
 - [ ] bare `operator`/`admin`가 membership.role / roles[]에 들어가는 write-path (Case D 데이터 원인).
-- [ ] GlycoPharm / K-Cosmetics 동일 구조·동일 모달 결함 여부.
+- [ ] K-Cosmetics 동일 구조·동일 모달 결함 여부.
 
 ---
 

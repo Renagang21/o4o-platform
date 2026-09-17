@@ -31,7 +31,7 @@ browse 목록 API·참여 API가 이미 실재(유형 D). 상세 API만 부재 �
 ## 3. 메뉴·route
 
 - 메뉴: `storeMenuConfig.ts` **KPA_SOCIETY_STORE_CONFIG '약국 상품·거래' 그룹 한정** '판매자 모집'
-  (발주 내역↔신청·승인 현황 사이). GP/KCos 블록 미추가(proxy가 kpa-society 고정 → 그쪽은 backend 없음).
+  (발주 내역↔신청·승인 현황 사이). KCos 블록 미추가(proxy가 kpa-society 고정 → 그쪽은 backend 없음).
 - route: `App.tsx` `commerce/seller-recruitments`(부모 store guard 상속 — sibling 동일 패턴).
 
 ## 4. 목록·상세 구현
@@ -61,7 +61,7 @@ browse 목록 API·참여 API가 이미 실재(유형 D). 상세 API만 부재 �
 
 ## 8. KPA 외 영향
 
-- proxy·페이지·route는 KPA 전용. `storeMenuConfig` 는 KPA 블록만 수정(GP/KCos config 미변경). store-ui-core
+- proxy·페이지·route는 KPA 전용. `storeMenuConfig` 는 KPA 블록만 수정(KCos config 미변경). store-ui-core
   tsc 0. `getPartnerRecruitments`는 기존 재사용(변경 0) → Neture 등 무회귀.
 
 ## 9. 검증

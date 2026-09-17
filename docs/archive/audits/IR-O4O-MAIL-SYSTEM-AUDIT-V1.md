@@ -121,7 +121,7 @@ POST /api/v1/auth/forgot-password
       → emailService.sendPasswordResetEmail(email, token, serviceUrl)
 ```
 
-- **ALLOWED_ORIGINS 화이트리스트**: neture.co.kr, glycopharm.co.kr, glucoseview.co.kr, k-cosmetics.o4o.com, kpa-society.o4o.com, admin.neture.co.kr, localhost
+- **ALLOWED_ORIGINS 화이트리스트**: neture.co.kr, glucoseview.co.kr, k-cosmetics.o4o.com, kpa-society.o4o.com, admin.neture.co.kr, localhost
 - `passwordResetService.ts` 사용
 
 #### 경로 B: `AuthenticationService` 내 인라인 (Legacy)
@@ -178,7 +178,7 @@ PasswordResetService.verifyEmail(token)
 | **Ops** | IncidentEscalationService.ts | — (미구현) | 인시던트 에스컬레이션 (stub) |
 | **Ops** | ScheduledReportingService.ts | — (stub) | 정기 보고 (stub) |
 | **SMTP Admin** | SmtpController.ts | nodemailer 직접 | SMTP 설정 관리 + 테스트 발송 |
-| **Service App** | application.controller.ts (KPA, Glyco, Gluco) | A (email.service) | 서비스 가입 신청 알림 |
+| **Service App** | application.controller.ts | A (email.service) | 서비스 가입 신청 알림 |
 
 ### Packages (API 서버 외부)
 
@@ -384,9 +384,7 @@ PasswordResetService.verifyEmail(token)
 | `controllers/adminController.ts` | A (email.service) |
 | `routes/v2/role-application.controller.ts` | A (email.service) |
 | `controllers/platformInquiryController.ts` | A (email.service) |
-| `routes/glycopharm/services/invoice-dispatch.service.ts` | A (email.service) |
 | `routes/kpa/controllers/application.controller.ts` | A (email.service) |
-| `routes/glycopharm/controllers/application.controller.ts` | A (email.service) |
 | `routes/glucoseview/controllers/application.controller.ts` | A (email.service) |
 | `services/passwordResetService.ts` | B (emailService) |
 | `services/ErrorAlertService.ts` | B (emailService) |

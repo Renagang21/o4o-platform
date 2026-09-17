@@ -3,8 +3,8 @@
  *
  * WO-O4O-CROSS-SERVICE-MYPAGE-HOME-HUB-COMMONIZATION-V1 §8
  *
- * KPA-Society / GlycoPharm / K-Cosmetics 3 서비스 Home 에 같은 의미의 카드가
- * 3 벌(GP·KCos 는 Tailwind, KPA 는 inline style) 복제돼 있었다. 표시 구조만
+ * KPA-Society / K-Cosmetics 2 서비스 Home 에 같은 의미의 카드가
+ * 2 벌(KCos 는 Tailwind, KPA 는 inline style) 복제돼 있었다. 표시 구조만
  * 하나로 수렴한다.
  *
  * 이 컴포넌트는 데이터를 조회하지 않는다. 서비스마다 appreciation API 응답

@@ -143,12 +143,12 @@ DELETE /:id               — 삭제
 
 | 페이지 | 출현 서비스 | 줄 수 범위 |
 |--------|------------|:----------:|
-| `UserDetailPage.tsx` | neture, glycopharm, glucoseview, k-cosmetics, kpa-society (5곳) | 765~786 |
-| `AiReportPage.tsx` | glycopharm, glucoseview, k-cosmetics (3곳) | 940~965 |
-| `RoleManagementPage.tsx` | neture, glycopharm, glucoseview, k-cosmetics, kpa-society (5곳) | 502~507 |
-| `UsersPage.tsx` | glycopharm, glucoseview, k-cosmetics, kpa-society (4곳) | 588~595 |
-| `StoreChannelsPage.tsx` | glycopharm, k-cosmetics, kpa-society (3곳) | 872~910 |
-| `StoreLocalProductsPage.tsx` | glycopharm, k-cosmetics, kpa-society (3곳) | 646 |
+| `UserDetailPage.tsx` | neture, glucoseview, k-cosmetics, kpa-society (4곳) | 765~786 |
+| `AiReportPage.tsx` | glucoseview, k-cosmetics (2곳) | 940~965 |
+| `RoleManagementPage.tsx` | neture, glucoseview, k-cosmetics, kpa-society (4곳) | 502~507 |
+| `UsersPage.tsx` | glucoseview, k-cosmetics, kpa-society (3곳) | 588~595 |
+| `StoreChannelsPage.tsx` | k-cosmetics, kpa-society (2곳) | 872~910 |
+| `StoreLocalProductsPage.tsx` | k-cosmetics, kpa-society (2곳) | 646 |
 
 **5개 서비스에 거의 동일한 코드가 복사**되어 있음 (줄 수 편차 ~20줄 이내).
 이는 shared component/page 추출 대상이지만, oversized split과는 성격이 다르므로 별도 검토가 필요함.

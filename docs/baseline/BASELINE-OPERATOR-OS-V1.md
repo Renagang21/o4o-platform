@@ -44,7 +44,7 @@
 
 | Grade | Definition | Services |
 |-------|-----------|----------|
-| Operating OS | Signal + QuickAction + AI + ActionLog complete loop | Neture, GlycoPharm |
+| Operating OS | Signal + QuickAction + AI + ActionLog complete loop | Neture |
 | Lightweight Hub | Signal + Navigation cards, minimal Trigger | KPA |
 | Strategic Hub | Cross-service aggregation + Proxy Trigger | Platform |
 
@@ -53,7 +53,6 @@
 | Service | Target | Achieved | Status |
 |---------|--------|----------|--------|
 | Neture | 70% | 80% | PASS |
-| GlycoPharm | 70% | 90% | PASS |
 | KPA | 40% | 42% | PASS |
 | Platform | N/A | N/A | N/A |
 
@@ -62,7 +61,6 @@
 | Service | Pattern | Status |
 |---------|---------|--------|
 | Neture | Promise.allSettled | PASS |
-| GlycoPharm | Promise.allSettled | PASS |
 | KPA | Promise.allSettled | PASS |
 | Platform | Promise.allSettled | PASS |
 
@@ -82,15 +80,6 @@
 | `neture.trigger.approve_supplier` | approve-supplier | Yes |
 | ~~`neture.trigger.manage_partnership`~~ | ~~manage-partnership~~ | 은퇴 (2026-09-15, WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1 — Legacy Partner 제휴 요청 트리거) |
 | `neture.trigger.audit_review` | audit-review | Yes |
-
-### GlycoPharm (4 triggers)
-
-| Key | Endpoint | ActionLog |
-|-----|----------|-----------|
-| `glycopharm.trigger.care_review` | care-review | Yes |
-| `glycopharm.trigger.create_session` | coaching-auto-create | Yes |
-| `glycopharm.trigger.refresh_ai` | ai-refresh | Yes |
-| `glycopharm.trigger.review_requests` | (navigate) | No |
 
 ### KPA (2 triggers, navigate-only)
 
@@ -115,13 +104,12 @@
 |--------|---------|----------------|
 | `KPA_SCOPE_CONFIG` | kpa | Yes |
 | `NETURE_SCOPE_CONFIG` | neture | Yes |
-| `GLYCOPHARM_SCOPE_CONFIG` | glycopharm | Yes |
 | `PLATFORM_SCOPE_CONFIG` | platform | No |
 
-### Display Controller Isolation (GlycoPharm)
+### Display Controller Isolation
 
 - All 14 endpoints enforce `pharmacy_id` isolation
-- Admin bypass: `glycopharm:admin`, `platform:super_admin`
+- Admin bypass: `platform:super_admin`
 - Server-forced `pharmacy_id` on CREATE
 - Ownership verification on UPDATE/DELETE
 
@@ -131,7 +119,6 @@
 
 | Hash | Description |
 |------|-------------|
-| `e4c53aca7` | GlycoPharm AI Hub + Signal + QuickAction |
 | `df8dc4596` | Neture AI Hub expansion |
 | `968709184` | Platform Hub (cross-service aggregation) |
 | `a0b1d92df` | Action Log Core |

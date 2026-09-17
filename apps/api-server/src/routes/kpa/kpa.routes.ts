@@ -190,7 +190,6 @@ import { createStoreTabletRoutes } from '../platform/store-tablet.routes.js';
 /**
  * KPA Scope Guard — powered by @o4o/security-core
  *
- * WO-GLYCOPHARM-CARE-DATA-ISOLATION-PHASE1-V1: Platform Security Core migration
  * Replaces inline implementation with shared security-core guard factory.
  * Behavior is identical: KPA roles only, no platform bypass, legacy detect+deny.
  */
@@ -243,7 +242,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Admin Force Asset routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V2)
   router.use('/admin/force-assets', createAdminForceAssetController(dataSource, coreRequireAuth as any, requireKpaScope));
 
-  // Qualification System (WO-O4O-QUALIFICATION-SYSTEM-V1 / WO-O4O-GLYCOPHARM-LMS-QUALIFICATION-BACKEND-FOUNDATION-V1)
+  // Qualification System (WO-O4O-QUALIFICATION-SYSTEM-V1)
   router.use('/qualifications', createQualificationController(dataSource, coreRequireAuth as any, requireKpaScope, 'kpa-society'));
 
   // Instructor Dashboard (WO-O4O-INSTRUCTOR-DASHBOARD-V1)
@@ -278,7 +277,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // WO-O4O-OPERATOR-ACTION-LAYER-V1: Action Queue endpoints
   // WO-O4O-ACTION-SCOPE-GUARD-V1: execute endpoint admin-only scope guard
   // WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1:
-  //   action-queue 는 KPA/GlycoPharm/Cosmetics 공유 컨트롤러이므로 KPA scope 는
+  //   action-queue 는 KPA/Cosmetics 공유 컨트롤러이므로 KPA scope 는
   //   반드시 이 마운트 지점에서 명시한다(공유 컨트롤러 내부 수정 금지).
   //   기존에는 GET /actions·POST /actions/dismiss 가 상위 operator-summary 라우터의
   //   마운트 순서(먼저 mount)에 의존해 requireKpaScope('kpa:operator') 로 보호되었다.
@@ -420,7 +419,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // External Sales — 외부 판매 채널(네이버·쿠팡) 연동 상태 · 판매 조건 입력
   // WO-O4O-KPA-NAVER-ONLINE-SALES-CONNECTION-AND-PILOT-CLOSEOUT-V1
-  //   KPA 한정 mount. GP/K-Cosmetics 는 자체 storefront 정비 상태가 달라 이번 범위 밖.
+  //   KPA 한정 mount. K-Cosmetics 는 자체 storefront 정비 상태가 달라 이번 범위 밖.
   router.use('/store-hub/external-sales', createStoreExternalSalesController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Pharmacy Store Config routes (WO-PHARMACY-HUB-REALIGN-PHASEH2-V1)
@@ -432,7 +431,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/pharmacy', createPharmacyInfoController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Pharmacy Products routes (WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1)
-  // WO-GLYCOPHARM-STORE-GUARD-SERVICE-AWARE-FIX-V1: serviceKey='kpa' 전달 → kpa:store_owner 만 통과.
+  // serviceKey='kpa' 전달 → kpa:store_owner 만 통과.
   router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any, 'kpa'));
 
   // Store Local Products — 매장 자체 상품 (WO-O4O-STORE-LOCAL-PRODUCTS-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1)
@@ -447,7 +446,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   //   store_owner 판정에 serviceKey 를 주지 않아 다중 서비스 사용자에게 타 서비스 조직이
   //   선택될 수 있었다. 같은 My Store 문맥의 local-products 와 **같은 조직**을 해석하도록
   //   serviceKey='kpa' 를 명시한 canonical mount 를 제공한다.
-  //   서비스 중립 mount 는 그대로 두어 GlycoPharm·K-Cosmetics 동작은 불변이다.
+  //   서비스 중립 mount 는 그대로 두어 K-Cosmetics 동작은 불변이다.
   router.use('/store', createStoreTabletRoutes(dataSource, { storeOwnerServiceKey: 'kpa' }));
 
   // Asset Snapshot routes (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)

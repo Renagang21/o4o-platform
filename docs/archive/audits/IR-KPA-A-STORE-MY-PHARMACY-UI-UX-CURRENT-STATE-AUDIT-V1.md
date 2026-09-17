@@ -54,8 +54,6 @@ PharmacyGuard
         └── <Outlet /> (콘텐츠 영역)
 ```
 
-**공유 레이아웃:** `StoreDashboardLayout`은 KPA/Cosmetics/GlycoPharm/GlucoseView 전 서비스 공유
-
 ### 1.3 인증/권한 가드
 
 | 가드 | 조건 | 실패 시 |
@@ -171,7 +169,7 @@ PharmacyGuard
 
 | 화면 | 형태 | 핵심 기능 |
 |------|------|----------|
-| PharmacyB2BPage | **카드형** 그리드 | 도메인별 탭 필터 (All/B2B/Groupbuy/GlycoPharm/Cosmetics) |
+| PharmacyB2BPage | **카드형** 그리드 | 도메인별 탭 필터 |
 | StoreLocalProductsPage | **리스트형** + 모달 CRUD | 검색, 페이지네이션(20개), 활성/비활성 필터 |
 | StoreOrderableProductsPage | **테이블형** | 정렬 가능 컬럼, 상태별 탭, 신청 버튼 |
 | PharmacySellPage | **탭 2개** (신청폼+진열목록) | 판매 등록 신청 + 채널 토글 |

@@ -12,7 +12,7 @@
  * 범위 제약 (WO 고정):
  *   - 디지털 사이니지와 연결하지 않음 (QR 전용 콘텐츠).
  *   - O4O 자체 동영상 저장/스트리밍 없음 — 외부 URL(YouTube/Vimeo 등) 등록만.
- *   - KPA 전용 — GlycoPharm/K-Cosmetics/Neture 공통화는 후속(별도 IR).
+ *   - KPA 전용 — K-Cosmetics/Neture 공통화는 후속(별도 IR).
  *
  * Pattern: store-pop.entity.ts (Blog → POP → Video 동일 패턴 라인).
  */

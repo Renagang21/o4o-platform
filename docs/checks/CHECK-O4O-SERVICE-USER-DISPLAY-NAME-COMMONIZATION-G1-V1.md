@@ -29,7 +29,7 @@
 |---:|---|---|---|:--:|
 | 1 | `web-kpa-society/components/KpaGlobalHeader.tsx:41` | 로컬 `getUserDisplayName` | 자기 컴포넌트 | **SAME** |
 | 2 | `web-neture/components/NetureGlobalHeader.tsx:37` | 로컬 | 자기 컴포넌트 | **SAME** |
-| 3 | `web-glycopharm/components/GlycoGlobalHeader.tsx:38` | 로컬 | 자기 컴포넌트 | **SAME** |
+| 3 | — | 로컬 | 자기 컴포넌트 | **SAME** |
 | 4 | `web-k-cosmetics/components/KCosGlobalHeader.tsx:31` | 로컬 | 자기 컴포넌트 | **SAME** |
 | 5 | `web-kpa-society/components/store/StoreUserDropdown.tsx:21` | 로컬 | 자기 컴포넌트 (Store TopBar) | **SAME** |
 | 6 | `web-kpa-society/components/KpaUserMenu.tsx:36` | **export** `getKpaUserDisplayName` | `MobileBottomNav.tsx:23,280` | **SAME** |
@@ -45,8 +45,6 @@
 | 위치 | 계산 | 정본과의 차이 |
 |---|---|---|
 | `web-kpa-society/pages/mypage/MyDashboardPage.tsx:37` | `user.name \|\| '사용자'` | displayName·성명·email 단계 없음 (주석에 의도 명시) |
-| `web-glycopharm/pages/operator/UsersPage.tsx:161` · `web-k-cosmetics/pages/operator/UsersPage.tsx:140` | `name \|\| 성+이름 \|\| email prefix` | **name 이 최우선**, `name !== email` 검사 없음 |
-| `web-glycopharm/pages/mypage/MyProfilePage.tsx:65` · `MyPageHub.tsx:81` | `(lastName && firstName) ? 성+이름 : name` | displayName·email fallback 없음 |
 | `web-pharmacy-hub/pages/store-owner/AccountPage.tsx:133` | `name \|\| nickname \|\| email` | **nickname** 축 — 정본에 없는 필드 |
 | `mobile-app/app/(app)/index.tsx:18` | `displayName ?? email ?? '운영자'` | 최종 fallback 문구가 `'운영자'` · 워크스페이스 분리 앱 |
 
@@ -87,7 +85,7 @@ name (단, name !== email 일 때만)  >  email prefix (@ 앞)  >  '사용자'
 | 입력 | `DisplayNameUser \| null \| undefined` (전 필드 optional) |
 
 4개 서비스 모두 `@o4o/account-ui` 를 **이미 `workspace:*` 로 의존**하고 실사용 중이었다
-(KPA 16 · Neture 11 · GlycoPharm 12 · K-Cosmetics 13 파일). → **의존성·lockfile 변경 0.**
+(KPA 16 · Neture 11 12 · K-Cosmetics 13 파일). → **의존성·lockfile 변경 0.**
 
 ---
 
@@ -97,7 +95,6 @@ name (단, name !== email 일 때만)  >  email prefix (@ 앞)  >  '사용자'
 |---|---|
 | `services/web-kpa-society/src/components/KpaGlobalHeader.tsx` | 로컬 함수 삭제 → 정본 import. 미사용이 된 `type User as UserType` import 제거 |
 | `services/web-neture/src/components/NetureGlobalHeader.tsx` | 로컬 함수 삭제 → 정본 import |
-| `services/web-glycopharm/src/components/GlycoGlobalHeader.tsx` | 동상 |
 | `services/web-k-cosmetics/src/components/KCosGlobalHeader.tsx` | 동상 |
 | `services/web-kpa-society/src/components/store/StoreUserDropdown.tsx` | 동상 (`UserType` 은 `isSuperOperator` 가 계속 사용 → 유지) |
 | `services/web-kpa-society/src/components/KpaUserMenu.tsx` | `getKpaUserDisplayName` 본문을 정본 위임으로 교체 (§5-1) |
@@ -134,7 +131,6 @@ export function getKpaUserDisplayName(user: UserType | null): string {
 |---|---|---|---|:--:|
 | KPA | `{name:'서상원', email:'sohae2100@gmail.com'}` | `서상원` | `서상원` | 동일 |
 | K-Cosmetics | `{name:'ops@k-cosmetics.site', email:'ops@k-cosmetics.site'}` | `ops` | `ops` | 동일 |
-| GlycoPharm | `{lastName:'김', firstName:'약사', name:'gp', email:'gp@…'}` | `김약사` | `김약사` | 동일 |
 | Neture | `{displayName:'네처운영자', name:'n', email:'n@…'}` | `네처운영자` | `네처운영자` | 동일 |
 
 경계값(15케이스)도 전부 동일했다.
@@ -166,8 +162,6 @@ export function getKpaUserDisplayName(user: UserType | null): string {
 | KPA production build (`tsc && vite build`) | `pnpm run build` | ✅ exit 0 · `✓ built in 23.22s` |
 | Neture production build | 동상 | ✅ exit 0 · `✓ built in 17.22s` |
 | K-Cosmetics production build | 동상 | ✅ exit 0 · `✓ built in 17.72s` |
-| GlycoPharm typecheck (`tsc -b`) | `pnpm run type-check` | ✅ exit 0 |
-| GlycoPharm production build | `pnpm run build` | ✅ exit 0 · `✓ built in 18.30s` |
 
 KPA · Neture · K-Cosmetics 는 별도 `type-check` 스크립트가 없고 `build` 가 `tsc && vite build` 이므로
 **production build 가 typecheck 를 포함**한다.
@@ -185,7 +179,7 @@ KPA · Neture · K-Cosmetics 는 별도 `type-check` 스크립트가 없고 `bui
 ```text
 로컬 `function getUserDisplayName` 정의        → account-ui 정본 외 1건
                                                  (MyDashboardPage — SERVICE_SPECIFIC, §2-1)
-`email.split('@')[0]` 표시명 계산             → 2건 (GP·KCos operator UsersPage — SERVICE_SPECIFIC)
+`email.split('@')[0]` 표시명 계산 → 2건 (KCos operator UsersPage — SERVICE_SPECIFIC)
 불필요해진 import                              → KpaGlobalHeader 의 `UserType` 제거 완료
 ```
 
@@ -239,7 +233,7 @@ KPA · Neture · K-Cosmetics 는 별도 `type-check` 스크립트가 없고 `bui
 2. **`WO-O4O-ROOT-JEST-CONFIG-ESM-FIX-V1`** — 루트 `jest.config.js` → `.cjs` 전환(또는 ESM 문법 전환).
    현재 루트 jest 는 기동 자체가 불가능하다 (§7-1).
 3. **SERVICE_SPECIFIC 표시명 5종 정책 정리** — §2-1 의 서로 다른 우선순위가 의도된 것인지
-   드리프트인지는 UX 정책 판단이 필요하다. 특히 GP·KCos operator `UsersPage` 는 `name` 최우선이라
+   드리프트인지는 UX 정책 판단이 필요하다. 특히 KCos operator `UsersPage` 는 `name` 최우선이라
    `name === email` 계정에서 헤더와 다른 문자열이 보인다.
 
 ---

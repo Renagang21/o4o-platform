@@ -15,7 +15,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * 새 엔진·새 테이블 0
  *
- *   원장은 KPA·GlycoPharm 이 쓰는 것과 **같은** `signage_media` · `signage_schedules` 다.
+ *   원장은 KPA 가 쓰는 것과 **같은** `signage_media` · `signage_schedules` 다.
  *   저장·검증도 공통 `SignageMediaService` / `SignageScheduleService` 를 그대로 호출한다
  *   (serviceKey 분기 0 — scope 는 `{ serviceKey: 'pharmacy-hub', organizationId }` 값으로만 다르다).
  *

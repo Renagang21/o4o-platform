@@ -8,7 +8,7 @@
  *
  * WO-O4O-CROSS-SERVICE-MYPAGE-SETTINGS-SECURITY-COMMONIZATION-V1:
  *   `모든 기기 로그아웃` 로컬 복제 + `/mypage/profile` 에 흩어져 있던 비밀번호 변경 진입을
- *   공통 `AccountSecuritySettings` 로 수렴한다. GlycoPharm / K-Cosmetics / Neture 와 같은
+ *   공통 `AccountSecuritySettings` 로 수렴한다. K-Cosmetics / Neture 와 같은
  *   계약(설정 = 보안·계정 관리)으로 정렬한다. 알림 수신 설정은 KPA 고유 확장으로 잔존한다.
  */
 

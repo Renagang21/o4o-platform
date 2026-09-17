@@ -152,7 +152,6 @@ merge 후 §10 4~6단계(스키마 재조회 · smoke · migration history)를 �
 아래 4건은 `git cherry origin/main` 기준 **미적용 커밋 0** 으로 내용은 이미 main 에 있다.
 
 ```bash
-git branch -D work/glycopharm-ai-admin-role-guard-v1              # 115dc1435
 git branch -D work/kpa-approval-org-contact-write-alignment-v1    # 1466d7d0e
 git branch -D work/o4o-block-core-orphan-v1                       # cd985f194
 git branch -D work/o4o-post-legacy-editor-residue-v1              # 575cd69cc
@@ -260,7 +259,7 @@ git branch -D work/o4o-post-legacy-editor-residue-v1              # 575cd69cc
 2. 프로덕션 재조회: `users` 에 `permissions` 컬럼 부재 · `to_regclass('store_events')` = NULL
 3. `typeorm_migrations` 에 `DropUsersPermissionsColumn20270320000000` ·
    `DropStoreEventsTable20270321000000` 기록 확인
-4. 로그인 / service membership / operator·admin auth / KPA / GlycoPharm / K-Cosmetics /
+4. 로그인 / service membership / operator·admin auth / KPA / K-Cosmetics
    Neture / PharmacyHub / signage auth / B2B buyer·order read smoke
 5. §7 의 `MANUAL_DELETE_REQUIRED` branch 4건 수동 삭제
 
@@ -302,7 +301,6 @@ git branch -D work/o4o-post-legacy-editor-residue-v1              # 575cd69cc
 | `/api/v1/auth/status` | auth 런타임 | 200 |
 | `/api/v1/kpa/members/me` | membership | 200 |
 | `/api/v1/kpa/operator/summary` | operator auth | 200 |
-| `/api/v1/glycopharm/forums` | GlycoPharm | 200 |
 | `/api/v1/cosmetics/operator/dashboard` | K-Cosmetics operator | 200 |
 | `/api/v1/cosmetics/orders` | order read | 200 |
 | `/api/v1/pharmacy-hub/join/status` · `/me/access` | PharmacyHub | 200 |

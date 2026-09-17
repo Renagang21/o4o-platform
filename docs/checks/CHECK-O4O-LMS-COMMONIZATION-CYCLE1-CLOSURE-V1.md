@@ -9,19 +9,19 @@
 
 ## 1. 목적
 
-3 서비스(KPA-Society / GlycoPharm / K-Cosmetics) LMS 강사·운영자·사용자 화면을 **공통 구조 위로 정렬**하는 1차 사이클이 강사 editor 의 공통 shell 축까지 닫혔다. 추가 구현으로 바로 넘어가기 전에 **완료 범위·경계·보류 판정**을 고정해, 이후 작업이 이미 내린 결정을 재논의하지 않도록 한다. **Neture 는 전 구간 LMS 제외.**
+2 서비스(KPA-Society / K-Cosmetics) LMS 강사·운영자·사용자 화면을 **공통 구조 위로 정렬**하는 1차 사이클이 강사 editor 의 공통 shell 축까지 닫혔다. 추가 구현으로 바로 넘어가기 전에 **완료 범위·경계·보류 판정**을 고정해, 이후 작업이 이미 내린 결정을 재논의하지 않도록 한다. **Neture 는 전 구간 LMS 제외.**
 
 ## 2. 완료 범위 요약
 
 | 축 | 공통 산출물 | 적용 | 경계 |
 |----|------------|------|------|
-| 사용자-facing hub | `LmsHubTemplate`(@o4o/shared-space-ui) + accent + visibility 배지 | KPA/GP/KCos | `@o4o/lms-ui` 미의존(Neture transitive 0) |
-| 사용자-facing 부품 | `LessonList(row)` · `CourseProgressBar` · `CourseVisibilityBadge`(@o4o/lms-ui) | KPA/GP/KCos | inline presentational |
+| 사용자-facing hub | `LmsHubTemplate`(@o4o/shared-space-ui) + accent + visibility 배지 | KPA/KCos | `@o4o/lms-ui` 미의존(Neture transitive 0) |
+| 사용자-facing 부품 | `LessonList(row)` · `CourseProgressBar` · `CourseVisibilityBadge`(@o4o/lms-ui) | KPA/KCos | inline presentational |
 | 카드 primitive | `CourseCard/CourseList` | dormant(역할 명시) | hub 는 table 기반 — 카드 미사용 |
-| 운영자 | `OperatorLmsCoursesManager`(@o4o/operator-core-ui) | KPA/GP/KCos | DataTable + 승인/반려/detail |
-| 강사 목록 | `InstructorCoursesManager` | KPA/GP/KCos | config-driven |
-| 강사 기본정보 form | `InstructorCourseFormShell` | KPA(create)/GP(edit) | 순수 UI, onSubmit 주입 |
-| 강사 레슨 목록/순서 | `InstructorLessonListManager` | KPA/GP | API 주입, **LessonModal=renderEditor slot** |
+| 운영자 | `OperatorLmsCoursesManager`(@o4o/operator-core-ui) | KPA/KCos | DataTable + 승인/반려/detail |
+| 강사 목록 | `InstructorCoursesManager` | KPA/KCos | config-driven |
+| 강사 기본정보 form | `InstructorCourseFormShell` | KPA(create)/순수 UI, onSubmit 주입 |
+| 강사 레슨 목록/순서 | `InstructorLessonListManager` | KPA/API 주입, **LessonModal=renderEditor slot** |
 
 ## 3. 사용자-facing 공통화 결과
 
@@ -37,10 +37,10 @@
 
 ## 5. 강사 공통화 결과
 
-- **목록:** `InstructorCoursesManager` — KPA canonical, GP(검색/완료율/수강자) + KCos(read-only) config 흡수. 3 서비스 단일 manager.
-- **기본정보 form:** `InstructorCourseFormShell` — 순수 form UI(title/desc/visibility/approval/reusablePolicy/tags), 저장은 wrapper onSubmit, review flow 는 extraActions slot. KPA create / GP edit 적용.
-- **레슨 목록/순서:** `InstructorLessonListManager` — 목록·순번·drag-reorder·추가/편집/삭제 trigger·empty. 삭제/순서 API 주입, **LessonModal 은 `renderEditor` render-prop slot** 으로 wrapper 소유. KPA/GP 적용.
-- **LessonModal/editor:** 공통 shell 이 소유하지 않음 — 각 서비스 wrapper 가 slot 으로 주입(KPA quiz/assignment/AI 포함, GP video/article).
+- **목록:** `InstructorCoursesManager` — KPA canonical, KCos(read-only) config 흡수. 2 서비스 단일 manager.
+- **기본정보 form:** `InstructorCourseFormShell` — 순수 form UI(title/desc/visibility/approval/reusablePolicy/tags), 저장은 wrapper onSubmit, review flow 는 extraActions slot. KPA create edit 적용.
+- **레슨 목록/순서:** `InstructorLessonListManager` — 목록·순번·drag-reorder·추가/편집/삭제 trigger·empty. 삭제/순서 API 주입, **LessonModal 은 `renderEditor` render-prop slot** 으로 wrapper 소유. KPA 적용.
+- **LessonModal/editor:** 공통 shell 이 소유하지 않음 — 각 서비스 wrapper 가 slot 으로 주입(KPA quiz/assignment/AI 포함 video/article).
 - 근거: `CHECK-O4O-LMS-INSTRUCTOR-COURSE-LIST-MANAGER-EXTRACTION-V1`, `CHECK-O4O-LMS-KCOS-INSTRUCTOR-PHASE1B-ON-COMMON-MODULE-V1`, `CHECK-O4O-LMS-INSTRUCTOR-COURSE-FORM-SHELL-V1`, `CHECK-O4O-LMS-INSTRUCTOR-LESSON-LIST-MANAGER-V1`, `IR-O4O-LMS-INSTRUCTOR-COMMON-MODULE-SCOPE-V1`, `IR-O4O-LMS-INSTRUCTOR-EDITOR-SCOPE-V1`.
 
 ## 6. KEEP / reference 영역 (공통화하지 않음)
@@ -49,11 +49,11 @@
 
 | 기능 | 판정 | 사유 |
 |------|------|------|
-| QuizBuilder(lesson 종속) | **KEEP reference(C)** | KPA 1개 구현, GP placeholder, KCos 무 |
+| QuizBuilder(lesson 종속) | **KEEP reference(C)** | KPA 1개 구현 placeholder, KCos 무 |
 | 과제 editor + 제출/채점(GradingModal, 수동) | **KEEP reference(C)** | 동일 — 수렴 대상 부재 |
 | CourseStructureAiModal / AI 구조 생성 | **정책 IR 선행(D)** | `/api/ai/*` client 비용/quota/권한 게이팅 0 |
 
-→ GP 가 quiz/assignment 를 **실제 구축(placeholder 해소)** 할 때, `renderEditor` slot **내부**에서 shell 추출(form/lesson 패턴 동일, 저비용). 그 전까지는 KPA reference 유지.
+그 전까지는 KPA reference 유지.
 
 ## 7. 별도 작업선 (LMS UI 공통화와 분리)
 
@@ -74,7 +74,6 @@
 3. **KPA-only quiz/assignment/grading/AI 는 조기 추상화하지 않는다**(단일 구현 + slot 분리 — reference 유지).
 4. **reward budget 은 LMS UI 공통화와 분리된 별도 작업선**(강사 UI view-only, 지급 backend/자동).
 5. **KCos editor Phase 1-B 는 이미 추출된 `InstructorCourseFormShell` + `InstructorLessonListManager` 위에 build** 한다(bespoke 신규 금지).
-6. **GP 가 quiz/assignment 실제 요구를 낼 때** KPA reference 에서 **slot 내부 공통화**를 검토(그 전 추측 추출 금지).
 
 ## 10. 남은 리스크
 
@@ -82,8 +81,8 @@
 |---|--------|------|
 | R1 | 카드 primitive(`CourseCard/List`) dormant — 재도입 시 hub(table) 와 정합 필요 | 현재 미사용, 진입점만 보존 |
 | R2 | KPA `CourseEditPage` 의 **기본정보 form 은 아직 form shell 미적용**(create 만 적용) | 필요 시 후속 WO(편집 form shell adoption) — 1차 범위 밖 |
-| R3 | GP quiz/assignment placeholder 가 장기 방치되면 사용자 혼란 | GP 제품 요구 시 Phase 2 |
-| R4 | AI `/api/ai/*` client 비용/권한 게이팅 부재 | 정책 IR 전 GP/KCos 노출 금지 |
+| R3 quiz/assignment placeholder 가 장기 방치되면 사용자 혼란 제품 요구 시 Phase 2 |
+| R4 | AI `/api/ai/*` client 비용/권한 게이팅 부재 | 정책 IR 전 KCos 노출 금지 |
 | R5 | reward 지급 주체/정책 미정(backend 자동 추정) | reward 작업선에서 확정 |
 
 ## 11. 권장 후속 작업 (택1 별도 작업선)

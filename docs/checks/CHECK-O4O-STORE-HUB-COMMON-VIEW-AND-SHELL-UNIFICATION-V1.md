@@ -27,27 +27,11 @@
 |---|---|---:|---:|
 | KPA | `pages/pharmacy/HubSignageLibraryPage.tsx` | 652L | **141L** |
 | K-Cosmetics | `pages/hub/HubSignagePage.tsx` | 579L | **108L** |
-| GlycoPharm | `pages/hub/HubSignageLibraryPage.tsx` | 580L | **108L** |
 | 공통 | `store-ui-core/components/signage-library/` | — | View 485L + hook 328L |
 
 - 업무 의미(HUB 사이니지 미디어 탐색 → 내 매장 가져오기)가 3 서비스 동일함을 확인한 뒤 공통화했다.
 - 서비스 차이는 accent · 라벨(`내 약국`/`내 매장`) · serviceKey · 경로 config 로 흡수. 서비스명 조건문 0.
 - WO §12 의 "QR·POP·태블릿·사이니지 **실행 관리** 금지" 는 지켰다 — 편입한 것은 §12 가 명시적으로 범위에 포함한 **Store Hub 사이니지 라이브러리 탐색/가져오기** 뿐이며, `/store/*` 사이니지 재생·플레이리스트 관리 화면은 미접촉이다.
-
----
-
-## 3. GlycoPharm hub-import 정식 편입 (§3)
-
-GP blog / pop / qr 3 페이지(975L, Core 미소비 사본)를 `useHubImportLibrary` + `HubImportLibraryView` 계열로 편입했다.
-
-| 화면 | KPA | K-Cosmetics | GlycoPharm |
-|---|---:|---:|---:|
-| blog | 315L → **101L** | 279L → **87L** | 320L → **88L** |
-| pop | 294L → **?**(97L) | 286L → **89L** | 331L → **96L** |
-| qr | 305L → **?**(96L) | 279L → **86L** | 324L → **88L** |
-
-- **정렬 정책 무변경**: KPA 는 `WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 A-3` 의 정렬 컬럼 제거 결정을 그대로 유지한다(`sortable` 미부여). KCos·GP 는 기존 `sortable` 유지. **KPA 결정을 되돌리지 않았다.**
-- **pagination 정책 무변경**: 각 서비스가 쓰던 모드를 `paginationMode` config 로 유지.
 
 ---
 
@@ -59,7 +43,6 @@ GP blog / pop / qr 3 페이지(975L, Core 미소비 사본)를 `useHubImportLibr
 |---|---:|---:|---|
 | KPA `PharmacyHubLayout` | 390L | **131L** | nav config(12 메뉴) · accent blue · guard adapter(`HubGuard`) · 헤더 slot |
 | K-Cosmetics `KCosmeticsHubLayout` | 233L | **117L** | nav config · accent pink · guard adapter(`RoleGuard`) |
-| GlycoPharm `GlycoPharmHubLayout` | 234L | **117L** | nav config · accent blue · guard adapter(`GlycoHubGuard`) |
 | PharmacyHub `StoreDashboardLayout` | (이미 공통 셸) | 무변경 | — |
 
 잔여는 WO §4 가 허용한 `nav config / accent / label / serviceKey / guard adapter / optional header slot` 범위 안이다.
@@ -100,7 +83,6 @@ PharmacyHub `CartPage`(289L)는 **편입하지 않았다** — 아래 §8 참조
 | 서비스 | before | after |
 |---|---:|---:|
 | K-Cosmetics `ContentDetailPage` | 135L | **64L** |
-| GlycoPharm `HubContentDetailPage` | 130L | **65L** |
 | 공통 `HubContentDetailView` | — | 125L |
 
 **원본 콘텐츠와 매장 사본의 경계는 변경하지 않았다.** 공통 View 는 표시 전용이며, "가져오기(사본 생성)" 는 각 서비스의 기존 action adapter 가 그대로 수행한다. 원본 id 와 사본 id 를 동일 객체로 취급하는 코드는 도입하지 않았다.
@@ -113,7 +95,7 @@ census 는 D4 를 "4 서비스 주문 목록 중복"으로 적었으나, 실제�
 
 | 계약 | 서비스 | 데이터 원천 | 방향 |
 |---|---|---|---|
-| (1) **buyer checkout ledger** | KPA `StoreOrdersPage` · GP `PharmacyOrders` | `checkout_orders` (buyerId 기준, `/checkout/orders`) | 매장 → 공급자 (구매/발주) |
+| (1) **buyer checkout ledger** | KPA `StoreOrdersPage` `PharmacyOrders` | `checkout_orders` (buyerId 기준, `/checkout/orders`) | 매장 → 공급자 (구매/발주) |
 | (2) 소비자 storefront 주문 | K-Cosmetics `StoreOrdersPage` | `/cosmetics/orders` (channel local/travel · fulfillment) | 소비자 → 매장 (**방향 반대**) |
 | (3) paymentGroup 결제 우선 | PharmacyHub `OrdersPage` | `supplierNotified` · `paymentStatus` | 결제 전 공급자 비노출 규칙 |
 
@@ -122,11 +104,11 @@ census 는 D4 를 "4 서비스 주문 목록 중복"으로 적었으나, 실제�
 | 화면 | before | after |
 |---|---:|---:|
 | KPA `StoreOrdersPage` | 359L | **166L** |
-| GP `PharmacyOrders` | 343L | **255L** |
+ `PharmacyOrders` | 343L | **255L** |
 | 공통 `BuyerOrderLedgerView` | — | 268L |
 
 공통 View 가 소유: 헤더 / KPI 3블록(총 주문 · 결제완료 · 이번 달 주문액) / 상태 필터 바 / 선택 검색 / loading·error·empty / 선택 pagination.
-서비스가 adapter·slot 으로 유지: 상태 탭 정의와 매칭(GP 의 결제중심 파생 3상태 `deriveState` 보존) · 결제/취소 판정 · 목록 본문(KPA DataTable / GP 확장 카드) · 헤더 액션(KPA 주문 작업대 링크).
+결제/취소 판정 · 헤더 액션(KPA 주문 작업대 링크).
 
 (2)(3)은 **억지로 합치지 않았다** — WO §8 · §11 준수. K-Cosmetics 는 서버측 pagination + 상세 drawer 를 그대로 두었고, PharmacyHub 는 결제 우선 계약을 그대로 두었다.
 
@@ -136,7 +118,7 @@ census 는 D4 를 "4 서비스 주문 목록 중복"으로 적었으나, 실제�
 
 ### 9-1. 처리한 것
 
-| client | before (KPA/KCos/GP) | after | 공통 |
+| client | before (KPA/KCos) | after | 공통 |
 |---|---|---|---|
 | `storeHub.ts` | 207 / 139 / 118 | **52 / 51 / 50** | `createStoreHubApi` 205L (9 메서드) |
 | `pharmacyProducts.ts` (카탈로그 3 endpoint) | 272 / 83 / 102 | 289 / 87 / 107 † | `createSupplyCatalogApi` 70L |
@@ -145,14 +127,14 @@ census 는 D4 를 "4 서비스 주문 목록 중복"으로 적었으나, 실제�
 
 - `storeHub.ts`: backend 는 이미 `createStoreHubController` factory 로 공통인데 client 만 3벌이던 비대칭을 해소. 서비스가 소유하는 것은 **prefix + 전송 언랩 + 기존 함수명 re-export** 뿐.
 - KPA 는 `createChannel` 을 re-export 하지 않는다 — B2C storefront 은퇴(`WO-O4O-KPA-INTERNAL-STOREFRONT-RETIREMENT-V1`)로 진입점이 없고 backend 는 kpa+B2C 를 410 으로 차단한다. **backend 가 authoritative 한 정책을 frontend 에서 다시 만들지 않았다.**
-- `createSupplyCatalogApi` 는 `service_key` 를 config 로 받는다 — KCos `k-cosmetics` / GP `glycopharm` 명시 전송, KPA 는 경로 기반(미전송). **전송 URL·파라미터·body 무변경.**
+- **전송 URL·파라미터·body 무변경.**
 
 ### 9-2. 서비스별 유지 — 근거
 
 | client | 판정 | 근거 |
 |---|---|---|
-| `eventOffer.ts` | **SERVICE_SPECIFIC-BY-DESIGN** | KPA 는 legacy `/groupbuy*` 네임스페이스(products·stats·enriched·participations), GP 는 `/glycopharm/event-offers/enriched` + participate. **endpoint 집합 자체가 다르다.** census F4 가 backend controller 를 이미 SERVICE_SPECIFIC 으로 판정했고 그 판정은 현재도 성립. 공통 factory 를 만들면 서비스별 분기가 factory 안으로 들어간다(§10 위반). |
-| `hubContent.ts` | **SERVICE_SPECIFIC-BY-DESIGN** | KPA 는 **비인증 raw `fetch`** + `producer` 필터, GP 는 인증 client + `type`/`search`. 인증 자세와 필터 계약이 다르다. 두 파일 모두 `@o4o/types/hub-content` 타입을 쓰는데 **`store-ui-core` 는 `@o4o/types` 에 의도적으로 의존하지 않는다**(package 경계) → 공통 factory 를 두면 타입 계약이 끊긴다. |
+| `eventOffer.ts` | **SERVICE_SPECIFIC-BY-DESIGN** | **endpoint 집합 자체가 다르다.** census F4 가 backend controller 를 이미 SERVICE_SPECIFIC 으로 판정했고 그 판정은 현재도 성립. 공통 factory 를 만들면 서비스별 분기가 factory 안으로 들어간다(§10 위반). |
+| `hubContent.ts` | **SERVICE_SPECIFIC-BY-DESIGN** | KPA 는 **비인증 raw `fetch`** + `producer` 필터 는 인증 client + `type`/`search`. 인증 자세와 필터 계약이 다르다. 두 파일 모두 `@o4o/types/hub-content` 타입을 쓰는데 **`store-ui-core` 는 `@o4o/types` 에 의도적으로 의존하지 않는다**(package 경계) → 공통 factory 를 두면 타입 계약이 끊긴다. |
 | `blogStaff.ts` · `popStaff.ts` · `qrStaff.ts` · `storeExecutionAssets.ts` · `storeLibrary.ts` | **OUT_OF_SCOPE-BY-WO-§12** | 소비처가 Agent C 담당 `/store*` 실행 자산 관리 화면이다. WO §12 가 명시적으로 금지. Store Hub 화면은 이 client 들을 소비하지 않는다. **중복이 없다는 뜻이 아니라 이번 WO 의 범위가 아니라는 뜻이다** → 별도 WO 제안(§13). |
 | `storeCart.ts` | 이미 공통 | 선행 WO 에서 `createStoreCartApi` 로 전송 주입만 남김. |
 
@@ -160,9 +142,9 @@ census 는 D4 를 "4 서비스 주문 목록 중복"으로 적었으나, 실제�
 
 ## 10. 공통화 원칙 준수 (§10)
 
-- **공통 View 안 서비스명 조건문 0** — `if (service === 'kpa')` 계열 분기를 새로 도입하지 않았다. 확인: 신규 공통 파일 7개에서 `'kpa'` / `'cosmetics'` / `'glycopharm'` 리터럴 비교 0건.
+- **공통 View 안 서비스명 조건문 0** — `if (service === 'kpa')` 계열 분기를 새로 도입하지 않았다. 확인: 신규 공통 파일 7개에서 `'kpa'` / `'cosmetics'` 리터럴 비교 0건.
 - 차이 흡수 수단: `config`(nav · statusTabs · columns · labels · paginationMode) / `adapter`(api · guard · matchStatus · isPaid) / `slot`(header · footer · search · renderList) / `renderer`(additionalColumns · renderPriceSublabel) / `accent 토큰`(`storeAccent.ts` — Tailwind 정적 class 맵).
-- **만능 View 회피**: `SupplyCatalogHub` 는 KPA/KCos/GP 만 편입하고 PharmacyHub `ProductsPage`(180L, 신청 없이 바로 구매)는 분리 유지. `StoreCartView` 도 PharmacyHub `CartPage`(289L, paymentGroup)는 분리 유지. 합쳤다면 결제 계약 분기가 View 안으로 들어왔을 것이다.
+- **만능 View 회피**: `SupplyCatalogHub` 는 KPA/KCos 만 편입하고 PharmacyHub `ProductsPage`(180L, 신청 없이 바로 구매)는 분리 유지. `StoreCartView` 도 PharmacyHub `CartPage`(289L, paymentGroup)는 분리 유지. 합쳤다면 결제 계약 분기가 View 안으로 들어왔을 것이다.
 
 ---
 
@@ -202,7 +184,6 @@ census 는 D4 를 "4 서비스 주문 목록 중복"으로 적었으나, 실제�
 | `packages/store-ui-core` | **PASS** (0 error) |
 | `services/web-kpa-society` | **PASS** |
 | `services/web-k-cosmetics` | **PASS** |
-| `services/web-glycopharm` | **PASS** |
 | `services/web-pharmacy-hub` | **PASS** |
 | `services/web-neture` | **PASS** (필요 범위 — `ContentHubTemplate` 소비 영향 확인) |
 
@@ -212,7 +193,6 @@ census 는 D4 를 "4 서비스 주문 목록 중복"으로 적었으나, 실제�
 |---|---|
 | `web-kpa-society` | **PASS** (34.07s) |
 | `web-k-cosmetics` | **PASS** (14.04s) |
-| `web-glycopharm` | **PASS** (19.48s) |
 | `web-pharmacy-hub` | **PASS** (10.75s) |
 
 chunk size 경고는 기존과 동일한 사전 존재 경고이며 이번 변경과 무관하다.
@@ -235,14 +215,14 @@ chunk size 경고는 기존과 동일한 사전 존재 경고이며 이번 변�
 | A1 | 매장허브 홈 | FULLY_COMMON | **FULLY_COMMON** | 무변경 |
 | A2 | 홈 최신 자원 피드 | SERVICE_SPECIFIC | **SERVICE_SPECIFIC-BY-DESIGN** | KPA 단독 540L. 다른 3 서비스에 대응 화면·데이터 원천이 없다. 사본이 아니므로 공통화 대상 아님(가짜 소비처를 만들지 않는다). |
 | A3 | 허브 레이아웃 · 사이드바 | VIEW_DUPLICATED | **CORE_ONLY → FULLY_COMMON** | 3 서비스 `StoreHubShell` 편입. PH 는 이미 공통 셸. 잔여=nav config·accent·guard adapter. |
-| A4 | 허브 접근 가드 | SERVICE_SPECIFIC | **SERVICE_SPECIFIC-BY-DESIGN** | 자격 체계가 다르다 — KPA 약사 자격 / KCos cosmetics scope / GP store_owner role / PH enrollment. 공통 guard 는 서비스별 분기를 Core 로 옮길 뿐이다. |
+| A4 | 허브 접근 가드 | SERVICE_SPECIFIC | **SERVICE_SPECIFIC-BY-DESIGN** | 자격 체계가 다르다 — KPA 약사 자격 / KCos cosmetics scope store_owner role / PH enrollment. 공통 guard 는 서비스별 분기를 Core 로 옮길 뿐이다. |
 
 ### B. 공급 상품 · 신청 (5)
 
 | # | 기능 | before | after | 근거 |
 |---|---|---|---|---|
 | B1 | 공급 상품 탐색 | CORE_ONLY | **FULLY_COMMON** | KPA `HubB2BCatalogPage` **728L → 93L** config adapter. 3 서비스 모두 `SupplyCatalogHub`. |
-| B2 | 공급 상품 상세 | SERVICE_SPECIFIC | **SERVICE_SPECIFIC-BY-DESIGN** | PH 단독. KPA/KCos/GP 는 목록에서 바로 신청하므로 상세 화면 업무 자체가 없다. 사본 0. |
+| B2 | 공급 상품 상세 | SERVICE_SPECIFIC | **SERVICE_SPECIFIC-BY-DESIGN** | PH 단독. KPA/KCos 는 목록에서 바로 신청하므로 상세 화면 업무 자체가 없다. 사본 0. |
 | B3 | 상품 신청 · 제외 액션 | CORE_ONLY | **FULLY_COMMON** | 확인 UX 를 공통 inline dialog 로 통일(§15-f). 3 서비스 동일 경로. |
 | B4 | 신청 상태 조회 | SERVICE_SPECIFIC | **SERVICE_SPECIFIC-BY-DESIGN** | KPA 전용 modal. 다른 서비스는 신청 상태를 목록 배지로만 표시하는 다른 업무 흐름. |
 | B5 | 신규 상품 요청 | SERVICE_SPECIFIC | **SERVICE_SPECIFIC-BY-DESIGN** | KPA 전용. 대응 backend·화면이 다른 서비스에 없다. |
@@ -251,7 +231,7 @@ chunk size 경고는 기존과 동일한 사전 존재 경고이며 이번 변�
 
 | # | 기능 | before | after | 근거 |
 |---|---|---|---|---|
-| C1 | 이벤트 오퍼 탐색 목록 | VIEW_DUPLICATED | **CORE_ONLY** | KPA 969L → 546L, `EventOfferHubView` 편입. **잔여 546L 은 사본이 아니라 KPA 고유 업무**(운영자 통계 · 공급업체 묶음 담기 · 자체 주문 흐름 · perOrderLimit clamp)다 — §5 가 "제거하지 않는다"고 명시. KCos·GP 는 33L 어댑터. |
+| C1 | 이벤트 오퍼 탐색 목록 | VIEW_DUPLICATED | **CORE_ONLY** | KPA 969L → 546L, `EventOfferHubView` 편입. **잔여 546L 은 사본이 아니라 KPA 고유 업무**(운영자 통계 · 공급업체 묶음 담기 · 자체 주문 흐름 · perOrderLimit clamp)다 — §5 가 "제거하지 않는다"고 명시. KCos 는 33L 어댑터. |
 | C2 | 오퍼 → 장바구니 payload | FULLY_COMMON | **FULLY_COMMON** | 무변경 |
 | C3 | 오퍼 상태 라벨 | FULLY_COMMON | **FULLY_COMMON** | 무변경 |
 
@@ -270,8 +250,8 @@ chunk size 경고는 기존과 동일한 사전 존재 경고이며 이번 변�
 | # | 기능 | before | after | 근거 |
 |---|---|---|---|---|
 | E1 | 콘텐츠 탐색 | FULLY_COMMON | **FULLY_COMMON** | 무변경 |
-| E2 | 콘텐츠 상세 | VIEW_DUPLICATED | **FULLY_COMMON** | `HubContentDetailView` 편입(KCos 64L / GP 65L). |
-| E3 | 블로그 진열·가져오기 | CORE_ONLY | **FULLY_COMMON** | GP 편입 완료. 3/3 Core 소비 + 공통 View. |
+| E2 | 콘텐츠 상세 | VIEW_DUPLICATED | **FULLY_COMMON** | `HubContentDetailView` 편입(KCos 64L 65L). |
+| E3 | 블로그 진열·가져오기 | CORE_ONLY | **FULLY_COMMON** 편입 완료. 3/3 Core 소비 + 공통 View. |
 | E4 | POP 진열·가져오기 | CORE_ONLY | **FULLY_COMMON** | 동일 |
 | E5 | QR 진열·가져오기 | CORE_ONLY | **FULLY_COMMON** | 동일 |
 | E6 | 사이니지 미디어 진열·가져오기 | VIEW_DUPLICATED | **FULLY_COMMON** | 1,811L → 357L + 공통 813L. |
@@ -286,7 +266,7 @@ chunk size 경고는 기존과 동일한 사전 존재 경고이며 이번 변�
 | F1 | 매장허브 API client 군 | VIEW_DUPLICATED | **CORE_ONLY** | §9. `storeHub.ts` · 카탈로그 trio 공통화. 잔여는 §9-2 근거로 SERVICE_SPECIFIC-BY-DESIGN 2건 + OUT_OF_SCOPE-BY-WO-§12 5건. |
 | F2 | 공용 backend controller | FULLY_COMMON | **FULLY_COMMON** | 무변경(backend 미수정) |
 | F3 | PH backend controller 군 | SERVICE_SPECIFIC | **SERVICE_SPECIFIC-BY-DESIGN** | 전용 controller. 원장 테이블은 공유하나 접근 경로가 별도. backend 변경은 §12 금지. |
-| F4 | Event Offer backend controller | SERVICE_SPECIFIC | **SERVICE_SPECIFIC-BY-DESIGN** | KPA legacy `/groupbuy*` vs GP `/event-offers` — endpoint 집합이 다르다. |
+| F4 | Event Offer backend controller | SERVICE_SPECIFIC | **SERVICE_SPECIFIC-BY-DESIGN** | KPA legacy `/groupbuy*` `/event-offers` — endpoint 집합이 다르다. |
 
 ### G. 인접 도메인 (2)
 
@@ -317,16 +297,16 @@ chunk size 경고는 기존과 동일한 사전 존재 경고이며 이번 변�
 
 | # | 정규화 | 영향 |
 |---|---|---|
-| a | KCos·GP 수제 이전/다음 버튼 → 공통 `Pagination`(operator-ux-core) | hub-import · 카탈로그 |
-| b | GP hub-import accent emerald → blue (pop/qr) | GP 서비스 accent 정합 |
+| a | KCos 수제 이전/다음 버튼 → 공통 `Pagination`(operator-ux-core) | hub-import · 카탈로그 |
+| b hub-import accent emerald → blue (pop/qr) accent 정합 |
 | c | 허브 셸 반응형 breakpoint md → lg, 본문 폭 `max-w-7xl` | 3 서비스 레이아웃 |
 | d | KPA layout · cart · event-offer · catalog 의 inline style(`theme.ts`) → Tailwind | KPA 4 화면 |
 | e | KPA 장바구니 금액 표기 `원` → `₩` | KPA 장바구니 |
 | f | 카탈로그 제외 확인 `window.confirm` → 공통 inline dialog | 3 서비스 |
 | g | 카탈로그 결과 카운트 · ActionBar `미추가 N개` · 운영자 탭 빈 상태 문구 | 3 서비스 |
-| h | 주문 내역 KPI 금액 표기 `원` → `₩`, 총 주문/결제완료 `toLocaleString('ko-KR')` 통일 | KPA · GP |
+| h | 주문 내역 KPI 금액 표기 `원` → `₩`, 총 주문/결제완료 `toLocaleString('ko-KR')` 통일 | KPA
 | i | KPA 주문 내역 DataTable 내장 pagination → 공통 `Pagination` | KPA 주문 내역 |
-| j | KPA 주문 내역 빈 상태에 "검색 조건에 맞는 주문이 없습니다" 분기 추가(GP 와 동일) | KPA 주문 내역 |
+| j | — | KPA 주문 내역 |
 
 ---
 
@@ -387,7 +367,7 @@ chunk size 경고는 기존과 동일한 사전 존재 경고이며 이번 변�
 → `/store-hub` 항목을 canonical shape 으로 정렬했다. **route(`/store-hub`) · 라벨 · 문구는 그대로다.** 업무 변경 0.
 
 > 이 결함은 `tsc --noEmit -p tsconfig.json` 에서는 드러나지 않고 **`tsc -b`(project references) 를 쓰는 실제 build 에서만** 드러났다.
-> PharmacyHub · GlycoPharm 의 build script 는 `tsc -b` 다 — 이 두 서비스는 `-p` 단독 typecheck 로 검증했다고 판단하면 안 된다.
+> PharmacyHub 의 build script 는 `tsc -b` 다 — 이 서비스는 `-p` 단독 typecheck 로 검증했다고 판단하면 안 된다.
 
 ### 18-3. 재검증 (병합 후 상태 기준, 전부 재실행)
 
@@ -396,7 +376,6 @@ chunk size 경고는 기존과 동일한 사전 존재 경고이며 이번 변�
 | `packages/store-ui-core` | **PASS** | — |
 | `web-kpa-society` | PASS | **PASS** (45.6s) |
 | `web-k-cosmetics` | PASS | **PASS** (19.0s) |
-| `web-glycopharm` | PASS | **PASS** (37.2s) |
 | `web-pharmacy-hub` | PASS | **PASS** (17.9s) — §18-2 수정 후 |
 | `web-neture` | PASS | — |
 
@@ -419,13 +398,13 @@ main 의 54 커밋이 Store Hub 축에 기능을 추가했는지 실측했다.
 | 검증 항목 | 방법 | 결과 |
 |---|---|---|
 | §10 공통 View 내 서비스명 조건문 | 신규 공통 디렉터리 9곳 grep (`=== 'kpa'` 등) | **0건** (유일 매치는 규칙을 설명하는 주석 1줄) |
-| 사이니지 3 서비스 Core 소비 | `SignageLibraryView` 소비처 | KPA·KCos·GP **3/3** (141 · 108 · 108L) |
-| GP hub-import 편입 | `HubImportLibraryView` 소비처 | **9 페이지** = 3 서비스 × blog·pop·qr |
+| 사이니지 2 서비스 Core 소비 | `SignageLibraryView` 소비처 | KPA·KCos **3/3** (141 · 108 · 108L) |
+ hub-import 편입 | `HubImportLibraryView` 소비처 | **9 페이지** = 2 서비스 × blog·pop·qr |
 | Shell 편입 | `StoreHubShell` 소비처 | **3/3** (131 · 117 · 117L) |
 | cart 편입 | `StoreCartView` 소비처 | **3/3** |
-| 콘텐츠 상세 | `HubContentDetailView` 소비처 | KCos·GP **2/2** (KPA 는 해당 화면 없음) |
-| buyer 주문 원장 | `BuyerOrderLedgerView` 소비처 | KPA·GP **2/2** (171 · 255L) — 설계대로 KCos·PH 제외 |
-| 이벤트 오퍼 | KPA `EventOfferHubView` / KCos·GP `EventOffersHubList` | **3/3 Core 소비** |
+| 콘텐츠 상세 | `HubContentDetailView` 소비처 | KCos **2/2** (KPA 는 해당 화면 없음) |
+| buyer 주문 원장 | `BuyerOrderLedgerView` 소비처 | KPA **2/2** (171 · 255L) — 설계대로 KCos·PH 제외 |
+| 이벤트 오퍼 | KPA `EventOfferHubView` / KCos `EventOffersHubList` | **3/3 Core 소비** |
 | F1 API client | `createStoreHubApi` · `createSupplyCatalogApi` 소비처 | 각 **3/3** (`storeHub.ts` 51 · 52 · 51L) |
 
 선행 CHECK 가 적은 라인 수는 실측과 **±1L 이내로 일치**했다(병합 전 계수 차이).
@@ -437,8 +416,8 @@ Store Hub 축에서 150L 초과 잔존 파일을 전수 나열해 census 밖 중
 | 후보 | 판정 | 근거 |
 |---|---|---|
 | KPA `PharmacyB2BPage` 680L | **OUT_OF_SCOPE-BY-WO-§12** | route 가 `/store/commerce/products` — Store Hub 축이 아니라 내 매장 축 |
-| KPA `EventOfferDetailPage` 522L | **SERVICE_SPECIFIC-BY-DESIGN** | route `/event-offers/:id` KPA 단독. KCos·GP 에 오퍼 상세 화면 자체가 없다(사본 0) |
-| KCos `HubContentPage` 124L | **FULLY_COMMON (E1 판정 유지)** | store-ui-core 가 아니라 `@o4o/shared-space-ui` 의 `ContentHubTemplate` 소비 — KPA·KCos·GP **3/3** 동일 템플릿. config adapter 뿐 |
+| KPA `EventOfferDetailPage` 522L | **SERVICE_SPECIFIC-BY-DESIGN** | route `/event-offers:id` KPA 단독. KCos 에 오퍼 상세 화면 자체가 없다(사본 0) |
+| KCos `HubContentPage` 124L | **FULLY_COMMON (E1 판정 유지)** | store-ui-core 가 아니라 `@o4o/shared-space-ui` 의 `ContentHubTemplate` 소비 — KPA·KCos **3/3** 동일 템플릿. config adapter 뿐 |
 | KPA/PH `Store*` · `store-owner/*` 대형 화면군 | **OUT_OF_SCOPE-BY-WO-§12** | 실행 자산 관리(Agent C 축). census G1·G2 로 이미 계상 |
 
 → **census 밖 정리 가능 중복 신규 발견 0.**

@@ -3,7 +3,7 @@
  *
  * WO-O4O-PHARMACYHUB-ADMIN-OPERATOR-DUAL-AREA-ADOPTION-AND-PRODUCTION-CLOSURE-V1
  *
- * K-Cosmetics / GlycoPharm / Neture / KPA 와 동일하게 `/admin` 을 **운영자 영역과 분리된
+ * K-Cosmetics / Neture / KPA 와 동일하게 `/admin` 을 **운영자 영역과 분리된
  * 독립 관리자 영역**으로 둔다. 셸은 공통 OperatorAreaShell(@o4o/operator-ux-core)을
  * 그대로 재사용하고 메뉴·도메인 IA·영역 라벨만 관리자 축으로 주입한다 —
  * 서비스 전용 관리자 Layout/Sidebar 사본을 새로 만들지 않는다.

@@ -34,7 +34,7 @@ URL map `o4o-global-lb` 의 host rule 19개 + `siteguide.co.kr` / `www.siteguide
 
 | 결과 | 도메인 |
 |---|---|
-| → `136.110.132.35` (**KEEP static IP**) | `neture.co.kr` · `www.neture.co.kr` · `admin.neture.co.kr` · `api.neture.co.kr` · `kpa-society.co.kr` · `www.` · `api.` · `glycopharm.co.kr` · `www.` · `api.` · `k-cosmetics.site` · `www.` · `api.` · `glucoseview.co.kr` · `www.` · `api.` · `pharmacyhub.co.kr` · `www.` · `siteguide.co.kr` · `www.` — **20건** |
+| → `136.110.132.35` (**KEEP static IP**) | `neture.co.kr` · `www.neture.co.kr` · `admin.neture.co.kr` · `api.neture.co.kr` · `kpa-society.co.kr` · `www.` · `api.` · `www.` · `api.` · `k-cosmetics.site` · `www.` · `api.` · `glucoseview.co.kr` · `www.` · `api.` · `pharmacyhub.co.kr` · `www.` · `siteguide.co.kr` · `www.` — **20건** |
 | → Google ghs (`74.125.203.121` / `142.251.24.121`) | `account.neture.co.kr` (Census 기록과 동일, LB 미사용) |
 | → 외부 파킹 (`15.197.148.33` / `3.33.130.190`) | `glucoseview.com` (O4O LB 아님) |
 | → `34.117.153.136` 또는 `34.54.126.46` | **0건** |
@@ -67,7 +67,7 @@ URL map `o4o-global-lb` 의 host rule 19개 + `siteguide.co.kr` / `www.siteguide
 
 | rule | 도달 backend | matched_url_path_rule |
 |---|---|---|
-| `o4o-global-lb-forwarding-rule-2` (KEEP) | neture-web · o4o-core-api · k-cosmetics-web · kpa-society-web · glycopharm-web · glucoseview-web · pharmacy-hub-web · admin-dashboard — **8종** | UNMATCHED |
+| `o4o-global-lb-forwarding-rule-2` (KEEP) | neture-web · o4o-core-api · k-cosmetics-web · kpa-society-web · glucoseview-web · pharmacy-hub-web · admin-dashboard — **8종** | UNMATCHED |
 | `o4o-global-lb-forwarding-rule` (후보) | **`backend-neture-web-http` 단 1종** (default backend) | UNMATCHED |
 | `o4o-global-lb-forwarding-rule-3` (후보) | **`backend-neture-web-http` 단 1종** (default backend) | UNMATCHED |
 
@@ -148,7 +148,7 @@ static IP 관련 후속 삭제 후보 **없음**.
 |---|---|
 | compute SSL certificate 총수 | 10 (전부 `MANAGED` · `PROVISIONING_FAILED_PERMANENTLY`) |
 | proxy 에 붙어 있는 것 | `cert-final-neture-v3` 1건 (`o4o-global-lb-target-proxy-2`) |
-| 참조 0 → 후속 삭제 후보 | **9건** — `cert-admin` · `cert-final-neture` · `cert-final-neture-v2` · `cert-glucoseview` · `cert-glycopharm` · `cert-kcosmetics` · `cert-kpa` · `cert-neture-web` · `cert-siteguide-v1` |
+| 참조 0 → 후속 삭제 후보 | **9건** — `cert-admin` · `cert-final-neture` · `cert-final-neture-v2` · `cert-glucoseview` · `cert-kcosmetics` · `cert-kpa` · `cert-neture-web` · `cert-siteguide-v1` |
 | UNKNOWN / HOLD | 0 |
 
 실제 TLS 는 Certificate Manager 의 `o4o-main-cert-map` 이 담당한다(legacy `sslCertificates` 보다 우선).
@@ -162,7 +162,7 @@ static IP 관련 후속 삭제 후보 **없음**.
 |---|---|---|---|---|
 | `neture.co.kr` / `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
 | `kpa-society.co.kr` / `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
-| `glycopharm.co.kr` / `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
+| `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
 | `k-cosmetics.site` / `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
 | `glucoseview.co.kr` / `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
 | `pharmacyhub.co.kr` / `www.` | 301 → https | **200** | `136.110.132.35` | OK(0) |
@@ -177,7 +177,7 @@ static IP 관련 후속 삭제 후보 **없음**.
 
 | 항목 | 결과 |
 |---|---|
-| Cloud Run 12개 서비스 Ready | ✅ `account-center-web` · `glucoseview-web` · `glycopharm-web` · `k-cosmetics-web` · `kpa-branch-web` · `kpa-society-web` · `neture-web` · `o4o-admin-dashboard` · `o4o-admin-dashboard-dev` · `o4o-core-api` · `o4o-main-site` · `pharmacy-hub-web` — 전부 `True` |
+| Cloud Run 12개 서비스 Ready | ✅ `account-center-web` · `glucoseview-web` · `k-cosmetics-web` · `kpa-branch-web` · `kpa-society-web` · `neture-web` · `o4o-admin-dashboard` · `o4o-admin-dashboard-dev` · `o4o-core-api` · `o4o-main-site` · `pharmacy-hub-web` — 전부 `True` |
 | `o4o-core-api` Ready | ✅ |
 | `GET /health` | **200** |
 | `GET /health/database` | **healthy** (PostgreSQL 15.17, pingMs 2, activeConnections 10, longRunningQueries 0) |

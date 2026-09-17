@@ -52,7 +52,7 @@
 
 ## 4. 조사 범위
 
-- 대표: KPA-society. 참조: Neture. 후속 적용 후보: GlycoPharm / K-Cosmetics(본 IR 변경 없음).
+- 대표: KPA-society. 참조: Neture. 후속 적용 후보: K-Cosmetics(본 IR 변경 없음).
 - 조사 entity: `ProductApproval`, `OrganizationProductListing`, `SupplierProductOffer`, `neture_partner_recruitments`,
   `neture_partner_applications`, `market_trials`, `store_cart_items`, `checkout_orders`.
 
@@ -119,7 +119,7 @@
 | 항목 | 확인 결과 | 근거(파일:라인) | 주문 가능 상품 전환과 관계 | 판정 |
 |---|---|---|---|---|
 | 역할 | 셀러가 commission_rate 명시해 **제휴 파트너 모집 공고** 게시 + 신청/승인 | NeturePartnerRecruitment.entity.ts:4-8, partner-contract.service.ts:168-214 | ❌ 전환 코드 0건 | affiliate 도메인 |
-| 매장 소비 | KPA/GP/KCos 코드에서 recruitment 참조 0건 — Neture 파트너 대시보드 전용 | web-* grep 0 / web-neture/src/lib/api/partner.ts:165-188 | ❌ 없음 | Neture 전용 |
+| 매장 소비 | KPA/KCos 코드에서 recruitment 참조 0건 — Neture 파트너 대시보드 전용 | web-* grep 0 / web-neture/src/lib/api/partner.ts:165-188 | ❌ 없음 | Neture 전용 |
 | OrganizationProductListing 전환 | recruitment 승인 → listing 생성 코드 **없음**. 승인 시 dashboard item만 생성 | partner-contract.service.ts:217-232 | ❌ 미연결 | 주문 흐름과 무관 |
 | market_trials/펀딩 혼재 | 테이블 공유·FK 0건. market_trials(supplier→seller 펀딩)와 별개 | market_trials(packages) vs neture_partner_* | ❌ 무관 | 독립 |
 | service-neutral | `/neture/partner/*` + `neture_partner_*` 스키마, Neture 모듈 격리 | — | — | 100% Neture |
@@ -139,7 +139,7 @@
 | 승인 주체 | 운영자/관리자 | 셀러(모집 주체) |
 | 주문 가능 상품 전환 | ✅ → `OrganizationProductListing` | ❌ (dashboard/commission만) |
 | organizationId 연결 | ✅ | ❌ |
-| 서비스 소비 | KPA/GP/KCos(매장) | Neture 전용 |
+| 서비스 소비 | KPA/KCos(매장) | Neture 전용 |
 | 테이블 공유 | — | 상호 FK·공유 0 |
 
 **판정: C 변형 — "둘 다 필요하나 서로 다른 도메인(역할 분리)".**

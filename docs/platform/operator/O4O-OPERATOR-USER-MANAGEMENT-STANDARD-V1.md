@@ -2,7 +2,6 @@
 
 > **O4O 운영자 회원관리 표준 v1**
 >
-> 기준 구현: GlycoPharm Operator 회원관리
 > 참조 구현: K-Cosmetics (UI/UX)
 > 확정일: 2026-03-18
 
@@ -336,7 +335,6 @@ requireAuth → injectServiceScope → requireRole([...operator/admin roles...])
 ### 8.3 역할 할당 경계
 
 서비스 operator는 자신의 서비스 prefix 역할만 할당 가능.
-예: `glycopharm:operator`는 `glycopharm:*` 역할만 할당.
 
 ### 8.4 Frontend Guard
 
@@ -369,7 +367,6 @@ const displayName = (user.lastName && user.firstName)
 
 | Key | 라벨 |
 |-----|------|
-| glycopharm | GlycoPharm |
 | glucoseview | GlucoseView |
 | k-cosmetics | K-Cosmetics |
 | neture | Neture |
@@ -406,7 +403,6 @@ const displayName = (user.lastName && user.firstName)
 
 | 서비스 | UsersPage | UserDetailPage | 역할 관리 | businessInfo | 상태 |
 |--------|:---------:|:--------------:|:--------:|:----------:|------|
-| GlycoPharm | ✅ | ✅ | ✅ | ✅ | **표준 기준** |
 | K-Cosmetics | ✅ | ✅ | ✅ | ✅ | 표준 충족 |
 | GlucoseView | ✅ | ✅ | ✅ | ✅ | 표준 충족 |
 | Neture | ✅ | ✅ | ✅ | ✅ | 표준 충족 |
@@ -425,5 +421,4 @@ WO-O4O-OPERATOR-USER-MANAGEMENT-ROLL-OUT-V1
 ---
 
 *확정: 2026-03-18*
-*기준 구현: GlycoPharm (commit b5d7b82c9)*
 *상태: 표준 v1 확정*

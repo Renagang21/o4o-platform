@@ -142,7 +142,6 @@ sd CSS 는 `ContentRenderer.tsx` **소스에서 추출**(하드코딩 아님), �
 | `content-editor` | ✅ exit 0 | ✅ Build success (ESM + DTS) |
 | `tablet-kiosk-core` | ✅ exit 0 | — (소스 소비 패키지) |
 | **`web-kpa-society`** | ✅ **0 오류** | ✅ **exit 0** |
-| **`web-glycopharm`** | ✅ **0 오류** | — |
 | **`web-k-cosmetics`** | ✅ **0 오류** | — |
 
 > `content-editor` 변경은 **순수 추가**(새 export 1개)라 기존 소비처 동작에 영향이 없다.

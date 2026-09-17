@@ -27,7 +27,6 @@
 | 서비스 | 구현 | adminOnly 키 제거 | 빈 그룹 제외 |
 |---|---|:---:|:---:|
 | kpa-society | `filter` + rest 분해 | O | O |
-| glycopharm | 동일 (byte-identical) | O | O |
 | neture | 동일 (byte-identical) | O | O |
 | **k-cosmetics** | **rest 분해 없음** (cast 후 filter) | **X** | O |
 
@@ -62,7 +61,6 @@ config 에 위임 재수출(alias)을 두지 않았다.
 | 파일 | 변경 |
 |---|---|
 | `services/web-kpa-society/src/config/operatorMenuGroups.ts` | −37 |
-| `services/web-glycopharm/src/config/operatorMenuGroups.ts` | −22 |
 | `services/web-k-cosmetics/src/config/operatorMenuGroups.ts` | −22 |
 | `services/web-neture/src/config/operatorMenuGroups.ts` | −32 |
 | LayoutWrapper 4종 | import 줄만 |
@@ -82,7 +80,6 @@ Neture 는 `getAdminMenu()` 결과도 함께 포함.
 | 서비스 | 그룹 | 항목(operator) | 항목(admin) | adminOnly 노출 차 | 전후 diff |
 |---|---:|---:|---:|---:|:---:|
 | kpa-society | 12 | 35 | 37 | 2 | **0** |
-| glycopharm | 12 | 33 | 36 | 3 | **0** |
 | k-cosmetics | 12 | 30 | 30 | 0 | **0** |
 | neture | 10 | 22 | 42 | 20 | **0** |
 
@@ -99,7 +96,7 @@ Neture 는 `getAdminMenu()` 결과도 함께 포함.
 |---|---|
 | `packages/ui` `tsc --build` | PASS |
 | 4 서비스 `tsc --noEmit` | PASS |
-| 4 서비스 `vite build` | PASS (kpa 17.25s / glyco 22.88s / kcos 13.54s / neture 13.09s) |
+| 4 서비스 `vite build` | PASS |
 
 빌드 중 발견·수정 1건: K-Cosmetics config 에서 `OperatorMenuItem` 이 local interface 제거로 미사용이 되어 `TS6196` → 해당 type import 만 정리.
 

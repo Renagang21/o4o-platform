@@ -4,7 +4,7 @@
  * WO-O4O-STOREHUB-STRUCTURE-ALIGNMENT-V1: wrapper page 초기 추가
  * WO-O4O-KCOSMETICS-STORE-HUB-SIGNAGE-CANONICAL-ALIGNMENT-V1: canonical 패턴 이식
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1:
- *   KPA·GlycoPharm 과 동일했던 579L 사본을 공통 `useSignageLibrary` + `SignageLibraryView` 로 대체.
+ *   KPA 과 동일했던 579L 사본을 공통 `useSignageLibrary` + `SignageLibraryView` 로 대체.
  *   이 파일은 이제 **API adapter + 서비스 config** 만 소유한다. 화면 동작·API 계약 무변경.
  *
  * 데이터 소스 (변경 없음):

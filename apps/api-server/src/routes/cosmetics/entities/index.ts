@@ -49,14 +49,14 @@ export * from './cosmetics-store-playlist-item.entity.js';
 
 // ============================================================================
 // CONTENT / RESOURCE ENTITIES (WO-O4O-KCOS-RESOURCES-BACKEND-V1)
-// GP glycopharm_contents canonical template mirror.
+// canonical template mirror.
 // ============================================================================
 export * from './cosmetics-content.entity.js';
 
 // ============================================================================
 // MEMBER PROFILE CLASSIFICATION (WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1)
 // Profile classification (sub_role: store_owner / store_staff) — 권한 role 과 별개 layer.
-// GP glycopharm_members canonical template mirror.
+// canonical template mirror.
 // IR: docs/investigations/IR-O4O-SERVICE-MEMBER-PROFILE-CLASSIFICATION-V1.md (Option D)
 // ============================================================================
 export {

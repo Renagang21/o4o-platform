@@ -14,8 +14,6 @@
 | `apps/api-server/src/modules/neture/controllers/supplier-order.controller.ts` | PATCH `/orders/:id/status`(preparing/shipped/delivered 전이) + POST `/orders/:orderId/shipment` 에 guard. `FULFILLMENT_TARGET_STATUSES` 상수 |
 | `apps/api-server/src/modules/neture/services/supplier-unified-order.service.ts` | checkout_orders `canFulfill=false` **유지** + readOnlyReason 에 payment readiness/bridge 명시 + code comment |
 
-> payment handler / settlement / DB schema / migration / bridge / KPA·Glyco·KCos **무변경**.
-
 ## 2. guard 적용 대상 (식별 기준)
 checkout-origin 판정 (`getFulfillmentReadiness`):
 ```

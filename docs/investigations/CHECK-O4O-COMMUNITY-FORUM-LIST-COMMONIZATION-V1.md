@@ -2,11 +2,11 @@
 
 > 결과: PASS
 > 브랜치: `work/commonization-community`
-> 대상: KPA-Society / K-Cosmetics / Neture / PharmacyHub. GlycoPharm은 build 회귀만 확인.
+> 대상: KPA-Society / K-Cosmetics / Neture / PharmacyHub.
 
 ## 1. 조사 결론
 
-- `ForumListTemplate`은 기존 `@o4o/shared-space-ui`에 이미 존재하며 GP/K-Cosmetics/Neture가 소비한다.
+- `ForumListTemplate`은 기존 `@o4o/shared-space-ui`에 이미 존재하며 K-Cosmetics/Neture가 소비한다.
 - KPA 목록은 BaseTable/bulk/tag/appreciation 등 고유 확장이 있어 이번에도 강제 흡수하지 않았다.
 - 공통 `GET /api/v1/forum/posts`는 기존에는 `forumId`에만 의존했고 serviceCode 직접 격리가 없었다.
 - `forum_category_requests.service_code`가 기존 SSOT이므로 migration 없이 EXISTS join으로 service scope를 추가했다.
@@ -83,7 +83,6 @@ pharmacy-hub-web build
 @o4o/web-kpa-society build
 @o4o/web-k-cosmetics build
 @o4o/web-neture build
-glycopharm-web build (minimal regression only)
 ```
 
 Browser smoke는 인증된 서비스 세션/운영 DB가 없는 CI 환경이라 미수행.
@@ -100,4 +99,4 @@ Browser smoke는 인증된 서비스 세션/운영 DB가 없는 CI 환경이라 
 
 ## 8. 완료 판정
 
-**PASS.** 목록 service scope를 additive 계약으로 추가하고 PharmacyHub가 이를 항상 사용하는 구조로 연결했다. 기존 KPA/K-Cosmetics/Neture는 build 회귀가 없고 GlycoPharm은 최소 build 회귀만 확인했다.
+**PASS.** 목록 service scope를 additive 계약으로 추가하고 PharmacyHub가 이를 항상 사용하는 구조로 연결했다.

@@ -28,12 +28,6 @@ StoreLocalProduct Display Domain 경계가 코드 레벨에서 강제되는지 �
 
 ## Phase 2: Checkout Guard 명시화
 
-### GlycoPharm Checkout (`checkout.controller.ts`)
-
-- **위치**: 상품 검증 섹션 (Section 3)
-- **보호 메커니즘**: `GlycopharmProduct` 엔티티만 조회 → `store_local_products` UUID는 `PRODUCT_NOT_FOUND`로 거부
-- **WO 마커**: `WO-STORE-LOCAL-PRODUCT-HARDENING-V1: Checkout Guard` ✅
-
 ### Cosmetics Checkout (`cosmetics-order.controller.ts`)
 
 - **위치**: 제품 존재/활성 검증 섹션
@@ -67,12 +61,6 @@ packages/ecommerce-core/* → store_local_products 참조: 0건
 
 ## Phase 4: KPI 오염 방지
 
-### GlycoPharm KPI (`glycopharm-store-data.adapter.ts`)
-
-- `getTopProducts()`: `ecommerce_order_items JOIN ecommerce_orders`만 집계
-- `store_local_products` 참조: 없음
-- **WO 마커**: `WO-STORE-LOCAL-PRODUCT-HARDENING-V1: KPI 오염 방지` ✅
-
 ### Cosmetics KPI (`cosmetics-store-summary.service.ts`)
 
 - `getTopProducts()`: `ecommerce_order_items JOIN ecommerce_orders`만 집계
@@ -105,7 +93,6 @@ packages/ecommerce-core/* → store_local_products 참조: 0건
 | `20260224300000-HardenStoreLocalProductDomain.ts` | 경계 강화 | ✅ |
 | `checkout.controller.ts` | Guard 주석만 | ✅ |
 | `cosmetics-order.controller.ts` | Guard 주석만 | ✅ |
-| `glycopharm-store-data.adapter.ts` | Guard 주석만 | ✅ |
 | `cosmetics-store-summary.service.ts` | Guard 주석만 | ✅ |
 | `store-hub.controller.ts` | Guard 주석만 | ✅ |
 

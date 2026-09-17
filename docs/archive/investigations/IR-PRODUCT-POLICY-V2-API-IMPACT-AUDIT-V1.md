@@ -398,7 +398,6 @@ SupplierRequest 승인 시 자동으로 allowedSellerIds에 추가되지 않음.
 ### C. Neture는 별도 아키텍처
 
 Neture의 `product_id`는 비정규화된 VARCHAR 문자열 (FK 없음).
-Glycopharm Storefront의 `external_product_id`와는 완전 독립.
 → FK 전환이 Neture에 영향 없음.
 
 ### D. DB FK 제약 부재

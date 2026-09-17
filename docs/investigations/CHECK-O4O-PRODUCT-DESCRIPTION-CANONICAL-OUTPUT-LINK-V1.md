@@ -2,7 +2,7 @@
 
 > **작업명:** WO-O4O-PRODUCT-DESCRIPTION-CANONICAL-OUTPUT-LINK-V1
 > **유형:** 상품 상세 output path 최소 수정 — `'' AS description` 제거 + canonical fallback 연결.
-> **결과: PASS — GP storefront 상품 상세/리스트/featured 공유 헬퍼 `queryVisibleProducts` 에 `shared_product_descriptions` canonical LEFT JOIN + COALESCE fallback. product_ai_contents 미노출, 매장별 override/selection 미도입. api-server typecheck 0.**
+> product_ai_contents 미노출, 매장별 override/selection 미도입. api-server typecheck 0.
 > 선행: [`CHECK-O4O-PRODUCT-DESCRIPTION-SHARED-CANDIDATE-STORAGE-V1`](CHECK-O4O-PRODUCT-DESCRIPTION-SHARED-CANDIDATE-STORAGE-V1.md) · 정책 IR-SHARED-ASSET — 2026-06-16
 
 ---
@@ -11,14 +11,12 @@
 
 | 파일 | 변경 |
 |------|------|
-| `apps/api-server/src/routes/glycopharm/controllers/store.controller.ts` | `queryVisibleProducts` 헬퍼: `'' AS description`/`'' AS short_description` → canonical fallback COALESCE + `shared_product_descriptions` LEFT JOIN |
 | `docs/investigations/CHECK-O4O-PRODUCT-DESCRIPTION-CANONICAL-OUTPUT-LINK-V1.md` | 본 CHECK(신규) |
 
 > backend 1파일만. frontend/DB/migration/entity/route/capability 변경 0.
 
 ## 2. 구현 위치 — 단일 공유 헬퍼
 
-`queryVisibleProducts(dataSource, pharmacyId, opts)` 가 GP storefront 의 **3 경로 모두**를 구동:
 - `GET /:slug/products/featured` (line 345)
 - `GET /:slug/products` (리스트, line 391)
 - `GET /:slug/products/:id` (**상품 상세**, line 428)
@@ -54,8 +52,6 @@ regexp_replace(
 
 ## 4. HTML/plain 처리 (§7.1 안전 방안)
 
-- GP storefront(`StoreProductDetail.tsx:313`)는 `{product.description}` — **plain text 렌더**(HTML 렌더 아님).
-- canonical `content` 는 HTML 가능 → **`regexp_replace('<[^>]+>','')` 로 태그 제거** 후 반환 → GP 에서 raw 태그 노출 없이 안전한 plain text.
 - HTML 리치 렌더 도입은 별도 `WO-O4O-PRODUCT-DESCRIPTION-HTML-RENDERING-POLICY-V1`(후속)로 분리. 본 WO 는 plain 안전 노출까지.
 
 ## 5. canonical 중복/안정성 방어 (§7.2/§7.3)
@@ -64,15 +60,14 @@ regexp_replace(
 - **count 쿼리 무영향:** count 쿼리(별도, spd 미참여)는 변경 없음 → 페이지네이션 total 정합 유지.
 - **fallback 안정성:** canonical 없으면 supplier → `''` 로 graceful. LEFT JOIN 이라 상품 자체 row 는 절대 사라지지 않음.
 
-## 6. 서비스 영향 (KPA/GP/KCos)
+## 6. 서비스 영향 (KPA/KCos)
 
 | 서비스 | 영향 | 근거 |
 |------|------|------|
-| **GlycoPharm** | ✅ 변경(개선) | `createStoreController` = **glycopharm.routes 전용 마운트**. storefront 상세/리스트/featured description 연결 |
 | **KPA** | 영향 없음 | `routes/kpa` 에 이 컨트롤러/`AS description` 하드코딩 없음 → KPA storefront 는 **별도 백엔드 경로**. 본 변경 미적용(필요 시 별도 WO 로 KPA 경로 확인) |
 | **K-Cosmetics** | 대상 아님 | 소비자 storefront 상품 상세 부재(operator 내부 도구만) |
 
-> 본 WO 는 GP storefront(이 컨트롤러)로 범위 한정. KPA 는 동일 컨트롤러를 쓰지 않으므로 무영향이며, KPA 노출 연결이 필요하면 후속 WO 에서 KPA 백엔드 경로를 별도 확인.
+> KPA 는 동일 컨트롤러를 쓰지 않으므로 무영향이며, KPA 노출 연결이 필요하면 후속 WO 에서 KPA 백엔드 경로를 별도 확인.
 
 ## 7. 불변 / 미도입 확인
 
@@ -94,7 +89,7 @@ regexp_replace(
 
 ## 9. 완료 판정
 
-**PASS.** `'' AS description` 제거, canonical 우선 fallback(→supplier→`''`) 연결, product_ai_contents 미노출, 매장별 override/selection 미도입, GP/KPA/KCos 영향 확인, typecheck 통과. GP plain-text 안전 노출(태그 제거). 배포 후 DB sanity 권장(§8).
+배포 후 DB sanity 권장(§8).
 
 ## 10. 후속 WO
 
@@ -106,4 +101,4 @@ regexp_replace(
 
 ---
 
-*Date: 2026-06-16 · 상품설명 canonical output-link · PASS · GP queryVisibleProducts 에 shared_product_descriptions canonical LEFT JOIN + COALESCE fallback(canonical→supplier detail→short→'') · GP plain-text 안전(태그 제거) · product_ai_contents 미노출, 매장별 override 미도입 · KPA 별도 백엔드(무영향)/KCos storefront 부재 · typecheck 0 · 후속 seed→curation→HTML 렌더 정책.*
+*Date: 2026-06-16 · 상품설명 canonical output-link · PASS queryVisibleProducts 에 shared_product_descriptions canonical LEFT JOIN + COALESCE fallback(canonical→supplier detail→short→'') plain-text 안전(태그 제거) · product_ai_contents 미노출, 매장별 override 미도입 · KPA 별도 백엔드(무영향)/KCos storefront 부재 · typecheck 0 · 후속 seed→curation→HTML 렌더 정책.*

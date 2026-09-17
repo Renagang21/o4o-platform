@@ -3,7 +3,7 @@
 > 배포 후 Forum 축 3서비스 라이브 smoke. destructive action 은 **실행하지 않고** 버튼/확인 UI 표시만 확인.
 >
 > - 일자: 2026-06-16
-> - 대상: KPA-Society / GlycoPharm / K-Cosmetics operator 화면 (deployed)
+> - 대상: KPA-Society / K-Cosmetics operator 화면 (deployed)
 > - 검증 커밋: `b7c41195`(forum-categories) 포함된 배포 — Web Services deploy run `27622907554`(sha `a4e93fc1e`, success) 기준
 > - 도구: Playwright(chromium, headless), 운영자 통합 계정(SSOT `docs/local/TEST-ACCOUNTS.local.md`, env 주입 — 자격증명 비기재)
 >
@@ -28,7 +28,6 @@
 | 서비스 | 로그인 landing | `/operator/forum` | `/operator/forum-analytics` | `/operator/forum-categories` | 메뉴 5항목 | destructive 표시 | console/4xx |
 |---|---|---|---|---|---|---|---|
 | KPA-Society | `/admin/kpa-dashboard` | h1 "포럼 운영" ✅ | h1 "포럼 분석" ✅ | h1 "포럼 목록 관리" ✅ | 5/5 ✅ | 비활성·완전삭제·검색 ✅ | legal-docs 404 (무관) |
-| GlycoPharm | `/admin` | ✅ | ✅ | ✅ | 5/5 ✅ | ✅ | 0 / 0 |
 | K-Cosmetics | `/admin` | ✅ | ✅ | ✅ | 5/5 ✅ | ✅ | 0 / 0 |
 
 - 운영자 계정(`sohae2100`)은 multi-role 로 로그인 시 `/admin` landing → operator route 는 hard-nav 로 진입(정상).
@@ -52,7 +51,7 @@
 
 ## 5. console / network 관찰
 
-- GlycoPharm / K-Cosmetics: console error 0, 4xx·5xx 0.
+- K-Cosmetics: console error 0, 4xx·5xx 0.
 - KPA: 404 4건 — 전부 `api.neture.co.kr/.../policies/terms|privacy`, `.../kpa/legal/documents/published/terms|privacy` (법정정보/약관 문서 미게시). **footer/policy 로딩 유래, Forum 과 무관**한 기존 이슈. Forum route/page 자체 에러 없음.
 
 ---

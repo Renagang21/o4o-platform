@@ -59,7 +59,6 @@ CREATE INDEX idx_product_masters_barcode ON product_masters (barcode);
 | **Neture Core** | `product_masters` | `barcode` | VARCHAR(14) | **YES** | Self (SSOT) |
 | Dropshipping | `dropshipping_product_masters` | `barcode` | VARCHAR(100) | NO | NO |
 | Pharmaceutical | `pharma_product_masters` | `barcode` | VARCHAR(100) | NO | NO |
-| Glycopharm | `glycopharm_products` | `barcodes` | JSONB[] | NO | NO |
 | Cosmetics | `cosmetics_products` | `barcodes` | JSONB[] | NO | NO |
 | Neture Legacy | `neture_products` | `barcodes` | JSONB[] | NO | NO |
 | Store Local | `store_local_products` | (없음) | - | - | NO |
@@ -404,7 +403,7 @@ ON CONFLICT (master_id, supplier_id) DO UPDATE SET
 **예외:** DB에 직접 INSERT (Admin API / Migration)한 경우 GTIN 무검증 가능
 
 **레거시 도메인:**
-- `glycopharm_products.barcodes`, `cosmetics_products.barcodes` = JSONB[]
+- `cosmetics_products.barcodes` = JSONB[]
 - UNIQUE 없음, 형식 검증 없음 → 품질 보증 불가
 - 운영 경로에서 미사용
 
@@ -453,7 +452,6 @@ NetureOrder (FK 기반, 7-Gate 검증)
 | Dropshipping | VARCHAR(100), nullable | NO | NO | 비활성 |
 | Pharmaceutical | VARCHAR(100), nullable | NO | NO | 비활성 |
 | Cosmetics | JSONB[] | NO | NO | 비활성 |
-| Glycopharm | JSONB[] | NO | NO | 비활성 |
 
 **영향도:** 낮음 — 운영 경로(Neture Distribution)에서 사용되지 않음
 

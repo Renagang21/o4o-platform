@@ -14,22 +14,21 @@
 | Neture에 Community 기능이 존재하는가? | **YES — 이미 상당히 구현되어 있음** |
 | Neture에 Forum 기능이 존재하는가? | **YES — ForumHub + List + Write + Detail 완비** |
 | Community Hub API가 존재하는가? | **NO — Ads/Sponsors API만 미구현** |
-| GlycoPharm 템플릿 적용이 필요한가? | **부분 적용 — Ads/Sponsors만 추가하면 됨** |
 
-### Neture vs GlycoPharm 비교
+### Neture 비교
 
-| 기능 | GlycoPharm | Neture | GAP |
-|------|:----------:|:------:|:---:|
-| Community Hub 페이지 | ✅ | ✅ CommunityPage | **없음** |
-| Forum Hub (Daum 스타일) | ✅ | ✅ ForumHubPage | **없음** |
-| Forum 글 목록 | ✅ | ✅ ForumPage | **없음** |
-| Forum 글 작성 | ✅ | ✅ ForumWritePage | **없음** |
-| Forum 글 상세 | ✅ | ✅ ForumPostPage | **없음** |
-| Forum API (Backend) | ✅ | ⚠️ 읽기 전용 | **쓰기 경로 확인 필요** |
-| Hero Banner (Ads) | ✅ | ❌ | **API 추가 필요** |
-| Sponsor Bar | ✅ | ❌ | **API 추가 필요** |
-| Operator Community CRUD | ✅ | ❌ | **Controller 추가 필요** |
-| Header Community 메뉴 | ✅ | ✅ NetureLayout | **없음** |
+| 기능 | Neture | GAP |
+| ------ | :------: | :---: |
+| Community Hub 페이지 | ✅ CommunityPage | **없음** |
+| Forum Hub (Daum 스타일) | ✅ ForumHubPage | **없음** |
+| Forum 글 목록 | ✅ ForumPage | **없음** |
+| Forum 글 작성 | ✅ ForumWritePage | **없음** |
+| Forum 글 상세 | ✅ ForumPostPage | **없음** |
+| Forum API (Backend) | ⚠️ 읽기 전용 | **쓰기 경로 확인 필요** |
+| Hero Banner (Ads) | ❌ | **API 추가 필요** |
+| Sponsor Bar | ❌ | **API 추가 필요** |
+| Operator Community CRUD | ❌ | **Controller 추가 필요** |
+| Header Community 메뉴 | ✅ NetureLayout | **없음** |
 
 ### 결론
 
@@ -103,8 +102,6 @@ Neture는 **매우 풍부한 라우트 구조**를 가지고 있음:
 | 8 | 커뮤니티 통계 | 주간 활동 메트릭 |
 | 9 | Digital Signage | 사이니지 콘텐츠 허브 링크 |
 
-**GlycoPharm과 비교**: Neture CommunityPage가 **더 풍부함** (GlycoPharm은 방금 구현, Neture는 이미 9개 섹션 존재)
-
 ### 2.4 Forum 페이지
 
 | 페이지 | 파일 | 상태 |
@@ -116,13 +113,13 @@ Neture는 **매우 풍부한 라우트 구조**를 가지고 있음:
 
 ### 2.5 누락 컴포넌트
 
-| 컴포넌트 | GlycoPharm | Neture |
-|----------|:----------:|:------:|
-| `HeroBannerSection.tsx` | ✅ | ❌ **없음** |
-| `AdSection.tsx` | ✅ | ❌ **없음** |
-| `SponsorBar.tsx` | ✅ | ❌ **없음** |
-| `useStoreCapabilities.ts` | ✅ | ❌ **없음** |
-| `communityApi.ts` (Ads/Sponsors) | ✅ | ❌ **없음** |
+| 컴포넌트 | Neture |
+| ---------- | :------: |
+| `HeroBannerSection.tsx` | ❌ **없음** |
+| `AdSection.tsx` | ❌ **없음** |
+| `SponsorBar.tsx` | ❌ **없음** |
+| `useStoreCapabilities.ts` | ❌ **없음** |
+| `communityApi.ts` (Ads/Sponsors) | ❌ **없음** |
 
 ---
 
@@ -179,7 +176,6 @@ router.get('/home/forum', async (req, res) => {
 | 서비스 | Controller | Service Code |
 |--------|-----------|:------------:|
 | KPA | `kpa/controllers/community-hub.controller.ts` | `kpa` |
-| GlycoPharm | `glycopharm/controllers/glycopharm-community-hub.controller.ts` | `glycopharm` |
 | K-Cosmetics | `cosmetics/controllers/cosmetics-community-hub.controller.ts` | `cosmetics` |
 | **Neture** | **❌ 없음** | — |
 
@@ -202,7 +198,7 @@ community_sponsors (id, service_code, name, logo_url, link_url, display_order, i
 `CommunityHubService`는 **service-agnostic** 설계:
 - 모든 메서드가 `serviceCode` 파라미터를 받음
 - `WHERE service_code = $1` 필수 (Boundary Policy 준수)
-- KPA, GlycoPharm, Cosmetics 모두 동일 서비스 사용
+- KPA, Cosmetics 모두 동일 서비스 사용
 
 ---
 
@@ -238,12 +234,9 @@ Workspace      ── Forum ──┘
 
 ### 5.2 Community가 이미 가장 풍부한 서비스
 
-Neture CommunityPage는 **9개 섹션**으로 GlycoPharm(방금 구현)보다 훨씬 풍부함.
-
 | 서비스 | Community 섹션 수 | 상태 |
 |--------|:-----------------:|------|
 | KPA | 5-Block | 표준 |
-| GlycoPharm | ~6 | 방금 구현 |
 | K-Cosmetics | ~5 | 부분 구현 |
 | **Neture** | **9** | **가장 풍부** |
 
@@ -261,11 +254,11 @@ Neture의 Forum 쓰기는 두 가지 경로 가능성:
 
 | # | 영역 | 작업 | 난이도 |
 |---|------|------|--------|
-| 1 | Backend | `neture-community-hub.controller.ts` 생성 | **LOW** (GlycoPharm 복사 + service_code 변경) |
+| 1 | Backend | `neture-community-hub.controller.ts` 생성 | **LOW** |
 | 2 | Backend | `neture.routes.ts`에 마운트 | **LOW** (1줄 추가) |
-| 3 | Frontend | `HeroBannerSection.tsx` 추가 | **LOW** (GlycoPharm 복사) |
-| 4 | Frontend | `AdSection.tsx` 추가 | **LOW** (GlycoPharm 복사) |
-| 5 | Frontend | `SponsorBar.tsx` 추가 | **LOW** (GlycoPharm 복사) |
+| 3 | Frontend | `HeroBannerSection.tsx` 추가 | **LOW** |
+| 4 | Frontend | `AdSection.tsx` 추가 | **LOW** |
+| 5 | Frontend | `SponsorBar.tsx` 추가 | **LOW** |
 | 6 | Frontend | `communityApi.ts` Ads/Sponsors API 클라이언트 | **LOW** |
 | 7 | Frontend | CommunityPage에 Ads/Sponsors 통합 | **LOW** (기존 9개 섹션에 삽입) |
 
@@ -304,14 +297,7 @@ apps/api-server/src/routes/neture/controllers/neture.controller.ts — Main Cont
 apps/api-server/src/routes/kpa/services/community-hub.service.ts   — 공유 CommunityHubService
 ```
 
-### Template 참조 (GlycoPharm)
-```
-apps/api-server/src/routes/glycopharm/controllers/glycopharm-community-hub.controller.ts
-services/web-glycopharm/src/components/community/HeroBannerSection.tsx
-services/web-glycopharm/src/components/community/AdSection.tsx
-services/web-glycopharm/src/components/community/SponsorBar.tsx
-services/web-glycopharm/src/services/communityApi.ts
-```
+### Template 참조 
 
 ---
 

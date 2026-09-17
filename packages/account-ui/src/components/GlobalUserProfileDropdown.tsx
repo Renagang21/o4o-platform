@@ -3,7 +3,7 @@
  *
  * WO-O4O-GLOBAL-USER-PROFILE-DROPDOWN-EXTRACTION-V1
  *
- * 4개 서비스(KPA-Society, GlycoPharm, K-Cosmetics, Neture)에 중복 구현된
+ * 3개 서비스(KPA-Society, K-Cosmetics, Neture)에 중복 구현된
  * Header 사용자 영역의 공통 추출. UI/동작만 담당하며, role/serviceKey/auth context
  * 판단은 모두 호출 측에서 수행한 결과를 props로 받는다.
  *

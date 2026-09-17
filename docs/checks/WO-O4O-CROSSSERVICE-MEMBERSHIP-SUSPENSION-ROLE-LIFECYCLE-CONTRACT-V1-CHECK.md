@@ -1,7 +1,7 @@
 # WO-O4O-CROSSSERVICE-MEMBERSHIP-SUSPENSION-ROLE-LIFECYCLE-CONTRACT-V1 — CHECK
 
 - 일자: 2026-08-24
-- 범위: KPA Society / K-Cosmetics / GlycoPharm / Neture / Pharmacy-Hub 5개 서비스
+- 범위: KPA Society / K-Cosmetics / Neture / Pharmacy-Hub 4개 서비스
 - 성격: 전수조사 + canonical contract 확정 + 코드 수정 + 회귀 테스트 + 프로덕션 read-only 검증 + RBAC 문서 정합
 
 ---
@@ -37,7 +37,7 @@ WO §7 이 단 조건 — "membership 을 보지 않고 role 만 보는 live con
 
 **B. suspend 가 role assignment 를 건드리는가?**
 건드렸다. `resolveGrantedRole(service_key, membership.role)` 을 soft revoke 하고, **추가로 kpa 에만**
-`kpa:store_owner` 를 내렸다. → glycopharm / cosmetics / pharmacy-hub 의 `store_owner` 는 정지해도 살아남았다
+`kpa:store_owner` 를 내렸다. → cosmetics / pharmacy-hub 의 `store_owner` 는 정지해도 살아남았다
 (**INCONSISTENT**). 이번에 5개 서비스 대칭으로 통일했다.
 
 **C. reactivate 의 role 복원 방식은?**
@@ -56,8 +56,8 @@ WO §7 이 단 조건 — "membership 을 보지 않고 role 만 보는 live con
 | 1 | 5개 서비스 주 scope guard (`createMembershipScopeGuard`) | BOTH_GATED | BOTH_GATED | JWT 스냅샷 기반 |
 | 2 | `createRequireStoreOwner` 미들웨어 | BOTH_GATED | BOTH_GATED | membership 검사가 미들웨어에만 있었음 |
 | 3 | `service-forum.routes` | BOTH_GATED | BOTH_GATED | — |
-| 4 | `requireStoreAuth` / `optionalStoreAuth` — store-hub 공개 GET 4개 (kpa · glycopharm · cosmetics) | **ROLE_GATED** | BOTH_GATED | `isStoreOwner` 수정으로 해소 |
-| 5 | `resolveStoreAccess` 호출자 전부 — store-playlist(×11: cosmetics·kpa·glycopharm mount) · store-handled-products(×4) · store-local-product · event-offer.service · neture seller.controller | **ROLE_GATED** | BOTH_GATED | 라우터 레벨 membership guard 가 없는 mount(`cosmetics.routes.ts` 등)라 role 만으로 통과했음. 동일 수정으로 해소 |
+| 4 | `requireStoreAuth` / `optionalStoreAuth` — store-hub 공개 GET 4개 (kpa · cosmetics) | **ROLE_GATED** | BOTH_GATED | `isStoreOwner` 수정으로 해소 |
+| 5 | `resolveStoreAccess` 호출자 전부 — store-playlist(×11: cosmetics·kpa mount) · store-handled-products(×4) · store-local-product · event-offer.service · neture seller.controller | **ROLE_GATED** | BOTH_GATED | 라우터 레벨 membership guard 가 없는 mount(`cosmetics.routes.ts` 등)라 role 만으로 통과했음. 동일 수정으로 해소 |
 | 6 | `signage-role.middleware.ts` 권한 계열 | ROLE_GATED | ROLE_GATED (유지) | 이번 범위 밖. suspend 의 role revoke 를 유지하는 근거 |
 | 7 | `extractServiceScope` / `injectServiceScope` | ROLE_GATED | ROLE_GATED (유지) | 동일 |
 | 8 | `auth-helpers.ts` 매장 플래그 | ROLE_GATED | ROLE_GATED (유지) | 동일 |
@@ -71,10 +71,10 @@ WO §7 이 단 조건 — "membership 을 보지 않고 role 만 보는 live con
 | 계층 | 판정 |
 |------|------|
 | 공통 SSOT `packages/auth-utils/src/membershipGate.ts` (`isServiceAccessAllowed`) | MEMBERSHIP_GATED (+ `platform:super_admin` bypass) |
-| 5개 서비스 `MembershipGate` (kpa · neture · cosmetics · glycopharm · pharmacy-hub) | MEMBERSHIP_GATED — 판정 로직 동일 |
-| 서비스별 `RoleGuard` / `OperatorRoute` / `GlycoHubGuard` / `PharmacyGuard` / `HubGuard` / `PharmacyOwnerOnlyGuard` / `StoreOwnerShell` / `OperatorLayoutWrapper` | BOTH_GATED |
+| 4개 서비스 `MembershipGate` (kpa · neture · cosmetics · pharmacy-hub) | MEMBERSHIP_GATED — 판정 로직 동일 |
+| 서비스별 `RoleGuard` / `OperatorRoute` / `PharmacyGuard` / `HubGuard` / `PharmacyOwnerOnlyGuard` / `StoreOwnerShell` / `OperatorLayoutWrapper` | BOTH_GATED |
 | `packages/auth-react/src/createRouteGuard.tsx` | 자체로는 ROLE_GATED — `MembershipGate` 주입 + `enforceMembership` 일 때만 BOTH_GATED |
-| `packages/store-ui-core/src/auth/StoreOwnerGuard.tsx` | role 로 판정. membership 은 **통과를 추가로 허용하는 분기일 뿐 차단 근거가 아니다**(glycopharm 만 사용). 차단은 주입된 `membershipGate` 가 담당 |
+| `packages/store-ui-core/src/auth/StoreOwnerGuard.tsx` | role 로 판정. membership 은 **통과를 추가로 허용하는 분기일 뿐 차단 근거가 아니다**. 차단은 주입된 `membershipGate` 가 담당 |
 | neture `PlatformRoute` | ROLE_GATED (의도 — cross-service 표면) |
 | kpa `AdminAuthGuard` (`/admin/*` 전체) | **ROLE_GATED** — 잔여(§10) |
 | kpa `AuthGate` | MEMBERSHIP_GATED 이나 **다른 축** (`kpaMembership.serviceAccess`, `service_memberships` 아님) |
@@ -137,11 +137,11 @@ Cloud SQL Auth Proxy 경유 SELECT 만 수행. **write 0건.**
 | 항목 | 결과 |
 |------|------|
 | A. membership status 분포 | `active` 외에는 pharmacy-hub `rejected` 1건뿐. **`suspended` 0 · `withdrawn` 0** |
-| B. membership.role × service_key | glycopharm(member/operator/pharmacy/store_owner) · k-cosmetics(`cosmetics:store_owner`1 / customer1 / member1 / store_owner2) · kpa-branch(user2) · kpa-society(admin1 / member1 / store_owner1 / user3) · neture(member4 / `neture:operator`1 / supplier2) · pharmacy-hub(`pharmacy-hub:admin`1 / member2 / operator2 / store_owner5 + rejected1) · platform(customer5 / super_admin2) |
-| C. role prefix × is_active | bare f5/t17 · cosmetics f2/t7 · glycopharm t7 · kpa f2/t9 · kpa-branch t2 · lms t1 · neture f1/t6 · pharmacy-hub f2/t12 · platform f3/t2 |
+| B. membership.role × service_key | k-cosmetics(`cosmetics:store_owner`1 / customer1 / member1 / store_owner2) · kpa-branch(user2) · kpa-society(admin1 / member1 / store_owner1 / user3) · neture(member4 / `neture:operator`1 / supplier2) · pharmacy-hub(`pharmacy-hub:admin`1 / member2 / operator2 / store_owner5 + rejected1) · platform(customer5 / super_admin2) |
+| C. role prefix × is_active | bare f5/t17 · cosmetics f2/t7 t7 · kpa f2/t9 · kpa-branch t2 · lms t1 · neture f1/t6 · pharmacy-hub f2/t12 · platform f3/t2 |
 | D. active membership 인데 대응 active role 없음 | k-cosmetics/customer 1 · kpa-branch/user 1 · kpa-society/user 2 · platform/super_admin 1 |
-| E. store_owner 계열 활성 | cosmetics 4 · glycopharm 3 · kpa 5 · pharmacy-hub 6 (bare `store_owner` 활성 0) |
-| H. **활성 store_owner 18명 전원** | 같은 서비스의 **active membership 보유** (kpa 5/5 · cosmetics 4/4 · glycopharm 3/3 · pharmacy-hub 6/6) |
+| E. store_owner 계열 활성 | cosmetics 4 3 · kpa 5 · pharmacy-hub 6 (bare `store_owner` 활성 0) |
+| H. **활성 store_owner 18명 전원** | 같은 서비스의 **active membership 보유** (kpa 5/5 · cosmetics 4/4 3/3 · pharmacy-hub 6/6) |
 
 **H 가 결정적이다** — 이번 `isStoreOwner` membership 게이트는 현재 사용자 누구의 동작도 바꾸지 않는다.
 
@@ -176,8 +176,8 @@ Cloud SQL Auth Proxy 경유 SELECT 만 수행. **write 0건.**
   2026-08-24 실측(활성 bare admin tier 0), `platform:admin`·`platform:operator` 코드 제거 사실.
 - Commerce 표 → "Commerce · Service Roles (접두어 없음)". 코드에서 확인된 현행 계약만 반영:
   - `supplier` — Neture 실사용, 접두어 없음이 의도된 계약 (WO-NETURE-ROLE-NORMALIZATION-V1), 활성 6.
-  - `pharmacy` — GlycoPharm 정규값. `20260318110000-RenamePharmacistToPharmacyRole` 로 개명,
-    `20260326100000-NormalizeGlycopharmPharmacyRole` 로 확정. 소비처 `ForumRecommendationController` 가 bare 문자열을 직접 읽음. 활성 2.
+  - `20260318110000-RenamePharmacistToPharmacyRole` 로 개명
+    소비처 `ForumRecommendationController` 가 bare 문자열을 직접 읽음. 활성 2.
   - `vendor` · `seller` · `partner` · `manager` 는 **보유자 0** 임을 실측으로 명시(목록 유지, 신규 부여 대상 아님).
     `manager` 를 조회하는 코드 대부분은 `organization_members.role` — RBAC role 축이 아니라는 주석 추가.
   - bare `store_owner` 가 목록에 없는 이유와 잔여 1행 회수(`20270318000000-RevokeOrphanedBareStoreOwnerRole`) 명시.

@@ -224,7 +224,7 @@ DB 실측으로 role 보유(`platform:super_admin` = true, `status=approved`)를
 | # | 대상 | `data.unaffectedServiceKeys` | `notice` |
 |:-:|------|------------------------------|:--------:|
 | 1 | credential **없는** 계정 | `[]` | `null` ✅ |
-| 2 | credential **4개 보유** 계정 | `["glycopharm","k-cosmetics","kpa-society","neture"]` | 문구 포함 ✅ |
+| 2 | credential **4개 보유** 계정 | — | 문구 포함 ✅ |
 
 2번 목록은 **DB 실측 결과와 정확히 일치**한다(같은 4개 serviceKey).
 
@@ -266,7 +266,7 @@ PATCH /admin/platform-accounts/:id/password (비어있지 않음) → 200, 4개 
 |------|:----:|
 | 재설정 모달 **사전 경고** (플랫폼 한정 · 서비스 미변경 · 비밀번호 찾기 안내) | ✅ 3요소 전부 |
 | 재설정 후 **결과 패널** ("일부 서비스에는 적용되지 않았습니다") | ✅ |
-| 결과 패널의 미적용 서비스 목록 | ✅ `glycopharm` `k-cosmetics` `kpa-society` `neture` |
+| 결과 패널의 미적용 서비스 목록 | — |
 | 콘솔 에러 · 실패 API | **0 / 0** |
 
 목록은 §7-3 API 응답 및 DB 실측과 **완전히 일치**한다.

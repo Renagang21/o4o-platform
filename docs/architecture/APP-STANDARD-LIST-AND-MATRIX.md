@@ -54,7 +54,6 @@
 | ----------- | --- | -- | ---- | --- | -- |
 | KPA-Society | O   | O  | O    | P   | X  |
 | Neture      | O   | O  | O    | X   | O  |
-| GlycoPharm  | W   | X  | O    | X   | O  |
 | K-Cosmetics | W   | X  | O    | X   | O  |
 
 * O : 기본 포함

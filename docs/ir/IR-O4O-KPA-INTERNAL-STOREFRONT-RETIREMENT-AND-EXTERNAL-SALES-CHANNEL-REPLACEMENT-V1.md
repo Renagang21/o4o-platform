@@ -11,7 +11,7 @@
 
 | 사실 | 근거 |
 |---|---|
-| 소비자 결제 이미 종료 | `kpa-payment.controller.ts:91,178` · `glycopharm-payment.controller.ts:99,189` · `cosmetics-payment.controller.ts:99,195` — prepare/confirm 이 `410 STORE_SALE_PAYMENT_DEPRECATED` |
+| 소비자 결제 이미 종료 | `kpa-payment.controller.ts:91,178` · `cosmetics-payment.controller.ts:99,195` — prepare/confirm 이 `410 STORE_SALE_PAYMENT_DEPRECATED` |
 | checkout 화면 이미 안내문 | [CheckoutPage.tsx](services/web-kpa-society/src/pages/storefront/CheckoutPage.tsx) — "결제는 매장에서" 안내 전용, 라우트만 유지 |
 | 온라인 판매 IA 이미 존재 | [App.tsx:1066-1074](services/web-kpa-society/src/App.tsx#L1066-L1074) — `online-sales/settings` · `products` · `orders` · `orders/:orderId`, `channels` 는 redirect |
 
@@ -59,7 +59,6 @@ apps/api-server/src/entities/checkout/CheckoutOrder.entity.ts
 ```
 store-qr.service.ts (L200,L340,L363)   ← QR 공개 랜딩의 storeSlug
 store-tablet.routes.ts                 ← 태블릿
-store-blog.service.ts                  ← /store/:slug/blog (KPA·GlycoPharm·K-Cosmetics 3서비스 공통)
 pharmacy-hub/*  (Store 프로비저닝·블로그·매장정보)
 store-policy.routes.ts · store-hub.controller.ts · pharmacy-info.controller.ts
 ```
@@ -79,7 +78,7 @@ store-policy.routes.ts · store-hub.controller.ts · pharmacy-info.controller.ts
 | 자체 checkout | `App.tsx:1099` + `pages/storefront/CheckoutPage.tsx` | 이미 안내문 전용 |
 | 결제 결과 | `App.tsx:1100-1101` + `PaymentSuccessPage.tsx` · `PaymentFailPage.tsx` | 외국인 관광객 결제 결과 페이지와 **별개**(`ForeignVisitorSalesSupportPaymentResultPage` 는 존치) |
 | 매장 홈 디자인 | `App.tsx:1085` `/store/settings` + [PharmacyStorePage.tsx](services/web-kpa-society/src/pages/pharmacy/PharmacyStorePage.tsx) (765L) | storefront 레이아웃/템플릿/테마/블록 편집 + `/store/:slug` iframe 미리보기. 공개 홈 폐기 시 존치 근거 소멸 |
-| 공개 홈 API | [store-public-home.handler.ts](apps/api-server/src/routes/platform/store-public/store-public-home.handler.ts) `GET /:slug` · `/layout` · `/template` · `/storefront-config` · `/hero` | **플랫폼 공용 라우터** — GlycoPharm·K-Cosmetics 소비 여부 확인 후 판단(§5 O-1) |
+| 공개 홈 API | [store-public-home.handler.ts](apps/api-server/src/routes/platform/store-public/store-public-home.handler.ts) `GET /:slug` · `/layout` · `/template` · `/storefront-config` · `/hero` | **플랫폼 공용 라우터** — K-Cosmetics 소비 여부 확인 후 판단(§5 O-1) |
 | B2C 진열 조회 | `store-public-utils.ts` L166-172 · L208-214, `store-public-product.handler.ts` | TABLET 쿼리(L426-508)는 존치 |
 | 소비자 주문 생성 | `kpa-checkout.controller.ts` 의 B2C 채널 검증·주문 생성 경로 (L258-571) | 결제가 이미 410 이라 사실상 도달 불가 |
 | 자체 storefront 활성화 UI | `StoreChannelsPage` 의 "온라인 스토어 활성화" · 공개 URL 블록 | §4 로 대체 |
@@ -95,7 +94,6 @@ checkout_orders · sellerOrganizationId · checkout.service (§2-2)
 /store/:slug/blog · /store/:slug/blog/:postSlug (3서비스 공통)
 태블릿 공개 진열(channel_type='TABLET') · QR 공개 랜딩(/qr/{slug})
 외국인 관광객 판매 지원 및 그 결제 흐름 (sales-channels/foreign-visitor/*)
-GlycoPharm · K-Cosmetics 의 StoreChannelsPage (1,139L · 1,130L — 이번 범위 밖)
 ```
 
 ### REPURPOSE — 껍데기 유지, 내용 교체
@@ -137,7 +135,7 @@ GlycoPharm · K-Cosmetics 의 StoreChannelsPage (1,139L · 1,130L — 이번 범
 
 | # | 항목 | 이유 |
 |---|---|---|
-| O-1 | `store-public-home.handler.ts` 의 GlycoPharm·K-Cosmetics 소비 여부 | 플랫폼 공용 라우터. KPA 만 보고 지우면 §Shared Module Change Rule 위반 |
+| O-1 | `store-public-home.handler.ts` 의 K-Cosmetics 소비 여부 | 플랫폼 공용 라우터. KPA 만 보고 지우면 §Shared Module Change Rule 위반 |
 | O-2 | `channel_type='B2C'` 운영 데이터 실측 (행수·활성 조직수) | 폐기 영향 규모. **read-only SELECT/COUNT 로만 확인** |
 | O-3 | 과거 소비자몰 `checkout_orders` 잔존 건수와 보존 정책 | 주문 원장은 지우지 않되 UI 노출 여부 결정 필요 |
 | O-4 | 의약품 차단 게이트 위치 (등록 시 / 동기화 시 / 양쪽) | `regulatory_type` 판정 시점 |

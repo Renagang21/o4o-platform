@@ -15,8 +15,6 @@
  *   - cosmetics:admin
  *   - platform:super_admin
  *
- * 패턴: GlycopharmMemberController (apps/api-server/src/routes/glycopharm/controllers/glycopharm-member.controller.ts) mirror.
- *
  * 본 controller 는 profile classification 만 다룬다. 권한 role (cosmetics:store_owner) 변경은
  * 별도 endpoint (operator/members PUT 의 role_assignments) 와 분리 유지.
  */

@@ -4,7 +4,7 @@
 > **작성일:** 2026-06-21
 > **상위 조사:** `IR-O4O-PAYMENT-SCOPE-STORE-SALE-VS-SERVICE-SUBSCRIPTION-AUDIT-V1`
 > **supersedes(용어/범위 정정):** `IR-O4O-TOSS-PAYMENT-SCOPE-AND-TYPE-SEPARATION-V1` · `IR-O4O-PAYMENTCORE-PAYMENT-TYPE-AXIS-DECISION-V1`(SERVICE_ACCESS 용어) · `CHECK-O4O-TOSS-PAYMENT-CORE-V1`(SERVICE_ACCESS 용어)
-> **결론(요약):** O4O Toss 결제 대상 = **STORE_SERVICE_SUBSCRIPTION(매장 경영자 O4O 부가 서비스 구독) + B2B_ORDER(매장→공급자 조달)** 두 축. **소비자→매장 결제(STORE_SALE_PAYMENT)·외부몰 소비자 결제(MARKETPLACE_CUSTOMER_PAYMENT)는 O4O 대상 아님 — 각 매장 POS/일반 결제·외부몰에서 처리.** KPA/Glyco/KCos 고객 checkout→O4O Toss 흐름은 **C-2(제외) 결정** → 즉시 삭제 않고 cleanup WO 로 분리. PaymentCore/o4o_payments 스키마 무변경(옵션 A metadata 유지). `SERVICE_ACCESS` → `STORE_SERVICE_SUBSCRIPTION` 으로 정정.
+> **결론(요약):** O4O Toss 결제 대상 = **STORE_SERVICE_SUBSCRIPTION(매장 경영자 O4O 부가 서비스 구독) + B2B_ORDER(매장→공급자 조달)** 두 축. PaymentCore/o4o_payments 스키마 무변경(옵션 A metadata 유지). `SERVICE_ACCESS` → `STORE_SERVICE_SUBSCRIPTION` 으로 정정.
 
 ---
 
@@ -30,7 +30,7 @@ O4O Toss 결제 범위를 다시 고정하기 위한 **정정 문서**다. 앞�
 | # | 사실 | 본 IR 처리 |
 |:--:|---|---|
 | 2.1 | `store_paid_feature_entitlements`/`FOREIGN_VISITOR_SALES_SUPPORT`/메뉴 게이트 = **매장 경영자 구독 권한 축**(고객 판매 아님, organizationId 소유) | 보존 → `STORE_SERVICE_SUBSCRIPTION` 으로 재정의 |
-| 2.2 | KPA/Glyco/KCos 일부 `checkout_orders` 고객 결제가 O4O PaymentCore/Toss 로 연결됨 | 정책상 제외(C-2) → cleanup WO 분리 |
+| 2.2 | — | 정책상 제외(C-2) → cleanup WO 분리 |
 | 2.3 | 결제/주문에 고객 국적(외국인/내국인) 분기 = 코드 0건 | 기준 명문화(국적은 결제 기준 아님). 중립화 WO 불요 |
 | 2.4 | `SERVICE_ACCESS` = 코드 0건(문서 전용 용어) | `STORE_SERVICE_SUBSCRIPTION` 으로 정렬 |
 
@@ -139,7 +139,6 @@ orderPurpose =
 정책상 제외 대상(즉시 삭제 X — 운영 코드 존재):
 ```text
 KPA       고객 checkout_orders → O4O PaymentCore/Toss
-GlycoPharm 고객 checkout_orders → O4O PaymentCore/Toss
 K-Cosmetics 고객 checkout_orders → O4O PaymentCore/Toss
 ```
 
@@ -180,7 +179,6 @@ STORE_CUSTOMER_FULFILLMENT    → B2B 조달 목적으로 사용(필요 시)
    - FOREIGN_VISITOR_SALES_SUPPORT = 매장 경영자 구독 플랜 고정
 
 2. WO-O4O-STORE-SALE-PAYMENT-EXCLUSION-CLEANUP-V1   (C-2 이행)
-   - KPA/Glyco/KCos 고객 checkout → O4O Toss 흐름 비활성화/분리/제거
    - 즉시 삭제 금지 — 사용 여부·운영 노출 선확인
 
 3. WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1
@@ -207,7 +205,6 @@ paymentType 1급 컬럼 추가
 3. 소비자→매장 결제는 매장 POS/일반 결제로 처리 명시
 4. 외국인/내국인 구분이 결제 기준 아님 명시
 5. FOREIGN_VISITOR_SALES_SUPPORT = 매장 경영자 구독 플랜으로 재정의
-6. KPA/Glyco/KCos 고객 checkout→O4O Toss = cleanup 대상으로 분리
 7. PaymentCore 스키마 무변경 원칙 유지
 8. 후속 WO 순서 확정
 ```
@@ -231,7 +228,7 @@ O4O Toss 결제 제외:
   - MARKETPLACE_CUSTOMER_PAYMENT (외부몰 소비자 결제 — 외부몰 처리)
 ```
 
-KPA/GlycoPharm/K-Cosmetics 의 고객 checkout → O4O Toss 흐름은 **C-2(제외) 결정**에 따라 cleanup WO 에서 단계적으로 정리한다. 본 IR 은 **기존 구독 권한 축(entitlement)은 보존**하면서 **소비자→매장 결제는 O4O 에서 배제**하는 기준을 함께 고정한다. 첫 후속 = `WO-O4O-SERVICE-ACCESS-TERMINOLOGY-ALIGN-V1`.
+본 IR 은 **기존 구독 권한 축(entitlement)은 보존**하면서 **소비자→매장 결제는 O4O 에서 배제**하는 기준을 함께 고정한다. 첫 후속 = `WO-O4O-SERVICE-ACCESS-TERMINOLOGY-ALIGN-V1`.
 
 ---
 

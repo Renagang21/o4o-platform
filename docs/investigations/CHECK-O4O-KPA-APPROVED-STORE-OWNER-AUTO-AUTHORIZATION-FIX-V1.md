@@ -15,7 +15,7 @@ O4O 정책: 매장 경영자가 가입 신청 → 운영자 승인 시 별도 �
 
 `o4o-store` 의 blog/pop/qr/video staff 컨트롤러가 소유권을 `created_by_user_id === userId` 로 검사한 탓에, 승인된 약국 경영자라도 약국 레코드 생성자가 아니면 **403 "Not the store owner"** 가 발생했다(라이브 IR §4.6 에서 `renagang21` 실측). 이를 RBAC role 게이트 + 매장-특정 멤버십 매칭으로 교체했다.
 
-**범위: KPA 전용**(`serviceKey === 'kpa'`). GlycoPharm/K-Cosmetics 는 동일 결함이 잠재하나 기존 `created_by` 유지 — 별도 parity WO. **교차 매장 차단은 유지/강화**.
+**범위: KPA 전용**(`serviceKey === 'kpa'`). K-Cosmetics 는 동일 결함이 잠재하나 기존 `created_by` 유지 — 별도 parity WO. **교차 매장 차단은 유지/강화**.
 
 검증: api-server `tsc` 0 errors(본 변경분) · 프로덕션 배포 후 라이브 smoke PASS.
 
@@ -48,7 +48,7 @@ O4O 정책: 매장 경영자가 가입 신청 → 운영자 승인 시 별도 �
 ```
 async function verifyOwner(pharmacy, userId): Promise<boolean> {
   if (serviceKey === 'kpa') return kpaStoreOwnerOwnsStore(dataSource, userId, pharmacy.id);
-  return pharmacy.created_by_user_id === userId; // GP/Cosmetics 유지
+  return pharmacy.created_by_user_id === userId; // Cosmetics 유지
 }
 ```
 모든 호출부 `!verifyOwner(...)` → `!(await verifyOwner(...))`. 영어 `'Not the store owner'` → `'이 매장의 경영자만 접근할 수 있습니다.'`.
@@ -66,7 +66,7 @@ async function verifyOwner(pharmacy, userId): Promise<boolean> {
 | `.../o4o-store/controllers/video.controller.ts` | 동일 |
 | `docs/ir/IR-...-LIVE-UX-VALIDATION-V1.md` | §4.6/§7 정정(게이트→결함) |
 
-> backend 기타/DB/migration/엔티티/프론트 무변경. GP/Cosmetics 소유 로직 무변경. neture market-trial tsc 에러는 **기존(타 세션) 무관**.
+> backend 기타/DB/migration/엔티티/프론트 무변경. Cosmetics 소유 로직 무변경. neture market-trial tsc 에러는 **기존(타 세션) 무관**.
 
 ---
 
@@ -104,14 +104,14 @@ async function verifyOwner(pharmacy, userId): Promise<boolean> {
 | 3 | 기존 승인 매장 데이터 점검 | ✅ renagang21 role+org 정상 → 코드 결함 확정(백필 불요) |
 | 4 | created_by 잘못된 SSOT → 정식 role/org 권한 교체 | ✅ |
 | 5 | 다른 매장 접근 차단 유지 | ✅ 결정적 store-specific 가드(구조적). 라이브 3rd-store 는 한계(§6) |
-| 6 | 운영자/일반구성원/미승인 경계 유지 | ✅ role 게이트 + GP/Cosmetics created_by 유지 |
+| 6 | 운영자/일반구성원/미승인 경계 유지 | ✅ role 게이트 + Cosmetics created_by 유지 |
 | 7 | 영어 "Not the store owner" 미노출 | ✅ 한글 메시지 + 승인 경영자는 애초 403 없음 |
 | 8 | API negative smoke + 브라우저 smoke | ✅ §5 (positive/co-owner/401/404 + browser) |
 
 ---
 
 ## 8. Follow-ups
-- GlycoPharm / K-Cosmetics 동일 `created_by` 결함 정비(별도 parity WO) — 본 WO 는 KPA 한정.
+- K-Cosmetics 동일 `created_by` 결함 정비(별도 parity WO) — 본 WO 는 KPA 한정.
 - `o4o-store/controllers/{kpa-store-template,layout}.controller.ts` 에도 `Not the store owner` 잔존(staff content 4종 외 surface) — 동일 패턴 점검 후보.
 - 교차 매장 차단 distinct-3rd-store 라이브 확인 1회(§6).
 

@@ -27,7 +27,7 @@
  *   - PATCH  /posts/:id/archive — 보관
  *   - DELETE /posts/:id         — 삭제
  *
- * 대상 서비스: KPA / GlycoPharm / K-Cosmetics
+ * 대상 서비스: KPA / K-Cosmetics
  * 제외: Neture (매장 기능 없음)
  *
  * 참조:
@@ -84,7 +84,7 @@ export function createOperatorBlogController(
 
   /**
    * Operator/admin 권한 inline guard.
-   * 다른 service controller (glycopharm/admin.controller.ts 등) 와 동일 패턴.
+   * 다른 service controller 와 동일 패턴.
    */
   function requireOperator(req: Request, res: Response): string | null {
     const authReq = req as unknown as AuthRequest;

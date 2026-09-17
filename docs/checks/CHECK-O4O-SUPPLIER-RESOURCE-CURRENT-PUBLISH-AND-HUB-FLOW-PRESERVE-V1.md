@@ -38,7 +38,7 @@
 - **QR 기존 계약**: 승인 도메인 0(CONTENT_APPROVAL_ENTITY_TYPES 불변) · Screen Set QR archive→410/restore 계약 불변 · ProductMaster 고정 URL 계약 무접촉.
 - **원본·매장 사본 독립성**: import=값 복사+provenance(코드 불변). 기존 매장 사본은 공급자 원본 수정·보관과 무관(Full Copy).
 - **의약품 제한**: Screen Set 5중 가드(게시/대상변경/목록/상세/가져오기) 무접촉 유지.
-- GP/K-Cosmetics: 변경 파일 3개 모두 KPA resolver·KPA 공급자 제출·매장 QR landing — GP/KCos 소비 경로 무접촉(resolveSignage/resolveCms는 sourceService='kpa' 분기 전용).
+- K-Cosmetics: 변경 파일 3개 모두 KPA resolver·KPA 공급자 제출·매장 QR landing — KCos 소비 경로 무접촉(resolveSignage/resolveCms는 sourceService='kpa' 분기 전용).
 
 ## 4. 검증
 

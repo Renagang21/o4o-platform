@@ -16,7 +16,7 @@ common/            문서 체계·워크플로우·CHECK·공통 규칙       (�
 content-authoring/ 콘텐츠 유형 공통 작성 원칙
 ai/                AI 규칙(프롬프트·grounding·검수·안전)
 products/          제품군(의약품·의료기기·의약외품·건기식)
-services/          서비스(KPA·GP·KCos·Neture)               (제품군과 직교)
+services/ 서비스(KPA·KCos·Neture) (제품군과 직교)
 ```
 
 문서는 **4역할**로 분리된다: **Guide=설계 / CHECK=실행 결과 / Registry=운영 상태 / Memory=불변 결정.**
@@ -40,7 +40,7 @@ services/          서비스(KPA·GP·KCos·Neture)               (제품군과 
 | 6 | [ai/*](../ai/) | AI-PROMPT-STANDARD · AI-GROUNDING · AI-REVIEW · AI-SAFETY · AI-RULE-REGISTRY(AR-NNN). |
 | 7 | [products/drug/*](../products/drug/) | DRUG-STANDARD · DRUG-WRITING · DRUG-GROUPING · DRUG-TEMPLATE · DRUG-RULE-REGISTRY(DR-NNN). |
 | 8 | [products/drug/knowledge/*](../products/drug/knowledge/) | **Knowledge Catalog(Rule 아님)**: ATC-FALSE-POSITIVE-CATALOG · GROUPING-PATTERNS · CONSUMER-WRITING-PATTERNS. |
-| 9 | products/{medical-device,quasi-drug,health-functional-food}/ · services/{kpa,gp,kcos,neture}/ | 제품군 확장 · 서비스 채널(Registry 없음, Rule ID 참조). |
+| 9 | products/{medical-device,quasi-drug,health-functional-food}/ · services/{kpa,kcos,neture}/ | 제품군 확장 · 서비스 채널(Registry 없음, Rule ID 참조). |
 | 9-a | [O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1](../products/O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1.md) | **O4O 매장용 상품 상세설명서 SSOT**. 구매 지원 목적, 제품 신뢰, 로그인 전용, 제작·비제작 범위, 공급자 제작원 표시, 매장 자체 콘텐츠 구분. |
 | 9-b | [products/O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1](../products/O4O-PRODUCT-UNIT-DESCRIPTION-AGENT-GUIDE-V1.md) · [products/O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1](../products/O4O-PRODUCT-UNIT-REGISTRATION-FROM-PHOTO-AGENT-GUIDE-V1.md) | 제품 단위 작성·사진 기반 등록의 실행 참고. 적용 범위와 정책은 9-a SSOT 우선. |
 | 9-c | [products/general-food/](../products/general-food/) | **Legacy / Existing Content Only**. 일반식품 신규 O4O 설명서 제작은 중단하고 기존 설명서·샘플만 보존. |

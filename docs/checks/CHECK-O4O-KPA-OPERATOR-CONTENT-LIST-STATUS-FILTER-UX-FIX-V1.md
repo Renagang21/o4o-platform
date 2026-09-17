@@ -63,7 +63,7 @@
 | `services/web-kpa-society` `tsc` (OperatorContentHubPage) | ✅ 오류 0 |
 | 운영 브라우저 smoke | ✅ PASS |
 | 데이터 일괄 보정 | ❌ 미실행. smoke 전환분 원복(draft 6건/ready 0) |
-| GP/KCos/Neture 영향 | 없음(KPA 라우트/페이지 한정) |
+| KCos/Neture 영향 | 없음(KPA 라우트/페이지 한정) |
 
 ---
 

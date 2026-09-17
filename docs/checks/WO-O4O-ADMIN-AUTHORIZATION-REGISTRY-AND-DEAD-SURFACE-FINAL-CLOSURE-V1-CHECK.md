@@ -257,7 +257,7 @@ rollback      = 동일 assignment 를 is_active=false 로 전환
 | 9 | PartnerOps admin 런타임 0 | PASS |
 | 10 | PartnerOps catalog·registry 최종 상태 | PASS |
 | 11 | `partner-core` 보존 | PASS |
-| 12 | GlycoPharm 활성 계약 0 | PASS |
+| 12 | — | PASS |
 
 ### 로컬 검증 (§11)
 
@@ -340,7 +340,6 @@ BUSINESS_DASHBOARD_DISPOSITION            = CLOSED
 PARTNEROPS_ADMIN_RUNTIME                  = ZERO
 PARTNEROPS_CATALOG_REGISTRY_ALIGNMENT     = PARTIAL  (코드 카탈로그 PASS / 운영 app_registry 미정렬 → §8 중지 조건)
 PARTNER_CORE_REGRESSION                   = PASS
-GLYCOPHARM_ACTIVE_CONTRACT                = ZERO
 ADMIN_LINT                                = PASS (error 0) · 범위 밖 잔재 = package.json lint 스크립트 무력화 (§10.1)
 PRIMARY_ADMIN_LOCKOUT_RISK                = ZERO   (역할 변경 0건)
 OTHER_SERVICE_REGRESSION                  = PASS   (api-server 3973 tests 통과)

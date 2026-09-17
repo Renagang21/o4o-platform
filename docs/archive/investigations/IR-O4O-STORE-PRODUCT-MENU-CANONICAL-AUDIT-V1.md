@@ -51,7 +51,6 @@ getCatalog()      → GET /pharmacy/products/catalog   (B2B 상품 카탈로그)
 getListings()     → GET /pharmacy/products/listings  (내 취급 상품)
 
 // 탭
-전체 / 일반 B2B(kpa) / Event Offer(kpa-groupbuy) / 혈당관리(glycopharm) / 화장품(cosmetics)
 ```
 
 **현재 이름 "공급 상품" 문제**: 이름은 "공급" 이나 실제 기능은 "B2B 주문/구매"  
@@ -183,8 +182,8 @@ unlinkProductMarketingAsset()   → 자산 연결 해제
 | `organization_product_listings` | OrganizationProductListing | 매장 진열 상품 (Listing) | ✅ | **두 API 경로가 동시 사용** |
 | `store_local_products` | StoreLocalProduct | 직접 등록 상품 (Display Domain) | ✅ | Checkout 연결 금지 명시 |
 | `store_product_profiles` | StoreProductProfile | 매장별 상품 설명 override | ✅ | (org_id, master_id) UNIQUE |
-| `catalog_products` | CatalogProduct | 공용 상품 풀 | ⚠️ KPA 미사용 | GlycoPharm 전용 이중쓰기 |
-| `store_products` | StoreProduct | CatalogProduct 복사 독립 상품 | ⚠️ KPA 미사용 | GlycoPharm 전용 |
+| `catalog_products` | CatalogProduct | 공용 상품 풀 | ⚠️ KPA 미사용 | — |
+| `store_products` | StoreProduct | CatalogProduct 복사 독립 상품 | ⚠️ KPA 미사용 | — |
 | `service_products` | ServiceProduct | 서비스별 공급 정책 레이어 | ⚠️ 준비 테이블 | 미래 확장용 (주석 명시) |
 
 ### 3.2 OrganizationProductListing 생성 경로 이중화
@@ -310,8 +309,8 @@ QR/상품 상세설명과 POP 빌더가 서로 다른 상품 소스를 참조.
 
 ### 5.5 CatalogProduct / StoreProduct — KPA 미사용 레거시
 
-- `catalog_products` 테이블: KPA에서 미사용. GlycoPharm이 이중쓰기 중.
-- `store_products` 테이블: KPA에서 미사용. GlycoPharm catalog-store bridge 전용.
+- `catalog_products` 테이블: KPA에서 미사용.
+- `store_products` 테이블: KPA에서 미사용.
 - `service_products` 테이블: 미래 준비 테이블, 현재 미사용 (주석 명시).
 
 KPA 상품 흐름에서 이 테이블들이 등장하지 않으나, 플랫폼 레벨에서는 여전히 존재.
@@ -451,8 +450,8 @@ Store Hub (별도)
 
 | 항목 | 위치 | 판정 |
 |------|------|------|
-| `catalog_products` 테이블 | KPA에서 미참조 | KPA 기준 dead, GlycoPharm 유지 |
-| `store_products` 테이블 | KPA에서 미참조 | KPA 기준 dead, GlycoPharm 유지 |
+| `catalog_products` 테이블 | KPA에서 미참조 | KPA 기준 dead 유지 |
+| `store_products` 테이블 | KPA에서 미참조 | KPA 기준 dead 유지 |
 | `service_products` 테이블 | 현재 미사용 | 준비 테이블, dead는 아님 |
 | `/pharmacy/products/apply` 경로 | PharmacySellPage + Hub에서 사용 | OPL 단일화 시 폐기 후보 |
 | `PharmacySellPage` 탭2 (진열 관리) | StoreProductsManagerPage와 기능 중복 | 통합 후보 |
@@ -501,9 +500,7 @@ WO-O4O-KPA-STORE-PRODUCTION-PRODUCT-SOURCE-UNIFICATION-V1
 ```
 WO-O4O-CATALOG-STORE-PRODUCT-TABLE-ROLE-CLARIFICATION-V1
 - catalog_products / store_products 테이블의 플랫폼 역할 재정의
-- KPA에서는 미사용, GlycoPharm에서만 사용 중
 - service_products 준비 테이블 향후 활성화 계획 수립
-- 위험도: 높음 (GlycoPharm 영향)
 ```
 
 ---
@@ -516,7 +513,7 @@ WO-O4O-CATALOG-STORE-PRODUCT-TABLE-ROLE-CLARIFICATION-V1
 | 사이드바 B2C 노출 (WO-2) | ❌ (코드만) |
 | OPL 경로 단일화 (WO-3) | ✅ (기존 레코드 service_key 정합성 검토) |
 | 제작 상품 소스 통일 (WO-4) | ⚠️ 방향에 따라 결정 |
-| catalog/store_products 재정의 (WO-5) | ✅ (GlycoPharm 대규모 영향) |
+| catalog/store_products 재정의 (WO-5) | ✅ |
 
 ---
 

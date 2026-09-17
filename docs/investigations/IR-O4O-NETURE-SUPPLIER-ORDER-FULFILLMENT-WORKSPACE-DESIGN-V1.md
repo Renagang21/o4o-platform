@@ -15,7 +15,7 @@
   - 프론트 `account/SupplierOrdersListPage`(목록+상태변경) + `SupplierOrderDetailPage`(상세).
   - 상태 전이 맵 존재: `created/paid → preparing → shipped → delivered`. 송장/택배사: `neture_shipments`(carrier_code/name/tracking_number/shipped_at).
 - **그러나 `/supplier/orders`(supplier 공간 메뉴 = SupplierOrdersPage)는 집계 허브**다(`getOrdersSummary`, "주문은 각 서비스에서 발생"). 즉 **실제 처리 workspace는 만들어져 있으나 공급자 공간에서 진입 동선이 끊겨 있다(IA GAP).**
-- **테이블 분리(핵심 RISK):** 공급자 workspace는 `neture_orders`를 읽지만, **이벤트 오퍼 주문·KPA/GP/K-Cos 주문은 `checkout_orders`** 에 적재된다(선행 canonical IR). → **이벤트 오퍼 주문은 현재 공급자 workspace(neture_orders)에 포함되지 않는다.**
+- **테이블 분리(핵심 RISK):** 공급자 workspace는 `neture_orders`를 읽지만, **이벤트 오퍼 주문·KPA/K-Cos 주문은 `checkout_orders`** 에 적재된다(선행 canonical IR). → **이벤트 오퍼 주문은 현재 공급자 workspace(neture_orders)에 포함되지 않는다.**
 - **유통참여형 펀딩**은 참여/오프라인 수령 — 주문/배송 대상 아님 → **구조적 제외**.
 - **권장 V1 = 판정 A′(이미 있는 workspace를 supplier 공간 메뉴에서 진입하도록 IA 연결 + 점검)**, 신규 구축이 아님. 상태변경/송장은 이미 있으므로 V1은 surfacing + 검증 중심.
 - **순서 판정: WORKSPACE(IA 연결) → SHIPPING-CALCULATION-V2.** 단 계산 V2는 **어느 주문 테이블(neture_orders vs checkout_orders)에 배송비를 계산할지** 선결 필요(테이블 분리 때문). → 계산 전 **주문 테이블 통일/경계 결정**이 더 큰 선행 이슈로 부상.
@@ -45,7 +45,7 @@
 | 테이블 | 상태 | 사용처 |
 |---|---|---|
 | `ecommerce_orders` | **프로덕션 미존재**(CREATE 없음) | 설계 SSOT(미실현) |
-| **`checkout_orders`** | 존재(canonical) | 이벤트 오퍼(checkoutService), KPA/GP/K-Cos. order-레벨 `supplierId`+`shippingFee`, items jsonb |
+| **`checkout_orders`** | 존재(canonical) | 이벤트 오퍼(checkoutService), KPA/K-Cos. order-레벨 `supplierId`+`shippingFee`, items jsonb |
 | **`neture_orders`** | 존재(migration `20260902500000`) | **Neture 자체 주문 + 공급자 fulfillment workspace 소스** |
 
 **`neture_orders` 필드:** order_number, `status`(NetureOrderStatus enum), total_amount, discount_amount, **shipping_fee**, final_amount, payment_*, shipping(jsonb), orderer_*, order_type(STORE_RESTOCK 등), customer_info(jsonb), cancelled_at/cancel_reason.
@@ -62,7 +62,7 @@
 |---|---|---|
 | Neture seller/store 주문 (`seller.controller` → `legacyNetureService.createOrder`) | **neture_orders** | order_item.product_id=SPO.id → spo.supplier_id |
 | 이벤트 오퍼 참여 (KPA `event-offer.service` → `checkoutService`) | **checkout_orders** | order-레벨 supplierId(OPL→SPO 해석) |
-| GP/K-Cos checkout | checkout_orders (canonical IR: create는 일부 ecommerce_orders 혼재) | order-레벨 supplierId |
+| K-Cos checkout | checkout_orders (canonical IR: create는 일부 ecommerce_orders 혼재) | order-레벨 supplierId |
 
 - **공급자 workspace(supplier-order.service)는 `neture_orders`만 조회.** `WHERE spo.supplier_id = $1` (item join). → Neture seller 주문은 PASS, **checkout_orders 주문(이벤트 오퍼 등)은 미포함**.
 - `shippingFee`: neture_orders는 `shipping_fee` 컬럼 보유(생성 시 값). checkout_orders는 `checkout.service`에서 `shippingFee=0` 하드코딩.

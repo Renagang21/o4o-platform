@@ -5,7 +5,7 @@
  * 경량 텍스트 링크. 신규 Guide·route 추가가 아니라 기존 Guide 로의 동선만 제공한다.
  * 주요 작업 버튼보다 약하게 보이도록 보조 링크 스타일로 둔다.
  *
- * KPA / GlycoPharm / K-Cosmetics 3개 store 서비스 공통 — 각 서비스의 실제 Guide route 만 연결한다.
+ * KPA / K-Cosmetics 2개 store 서비스 공통 — 각 서비스의 실제 Guide route 만 연결한다.
  */
 import { Link } from 'react-router-dom';
 

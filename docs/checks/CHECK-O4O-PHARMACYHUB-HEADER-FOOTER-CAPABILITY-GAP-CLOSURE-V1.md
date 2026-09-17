@@ -101,7 +101,7 @@ Header 15 / Footer 7 = **22건**. 위 표 참조. 모두 **이번 WO 이전에 �
 |---|---|
 | footer `contact/support` | `/contact` route 부재 → 링크 추가 시 데드링크. 누락이 의도된 계약 |
 | header `service switch` | 단일 서비스 · supplier 축 없음(baseline 원칙 5, drift 금지 #2) |
-| authenticated shell footer (store / store-hub / operator / admin) | `StoreFacingFooter` 도입은 [`CHECK-O4O-STORE-FACING-FOOTER-COVERAGE-V1`](CHECK-O4O-STORE-FACING-FOOTER-COVERAGE-V1.md) 에서 GlycoPharm·K-Cosmetics·KPA 3서비스 대상이었고 PharmacyHub 는 그 WO 범위에 없었다. 법정정보는 공개 화면 푸터로 도달 가능하며, 업무 셸에 푸터가 없다는 사실만으로 결함이 아니다. §8.1 대칭 맞추기 금지에 따라 이번 WO 에서 임의 주입하지 않았다 |
+| authenticated shell footer (store / store-hub / operator / admin) | `StoreFacingFooter` 도입은 [`CHECK-O4O-STORE-FACING-FOOTER-COVERAGE-V1`](CHECK-O4O-STORE-FACING-FOOTER-COVERAGE-V1.md) 에서 K-Cosmetics·KPA 2서비스 대상이었고 PharmacyHub 는 그 WO 범위에 없었다. 법정정보는 공개 화면 푸터로 도달 가능하며, 업무 셸에 푸터가 없다는 사실만으로 결함이 아니다. §8.1 대칭 맞추기 금지에 따라 이번 WO 에서 임의 주입하지 않았다 |
 | MobileBottomNav 부재 (census H10) | 13절 참조 — 부재가 의도된 계약 |
 | SupplierShell / SupplierHeader (census H7·H9) | 파일이 존재하지 않는다(`769f562d5` 제거). NOT_IMPLEMENTED 가 아니라 **해당 없음** |
 

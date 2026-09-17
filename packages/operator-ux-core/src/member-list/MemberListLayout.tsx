@@ -101,7 +101,7 @@ export function MemberListLayout({
 
       {/* Role Tabs */}
       {/* WO-O4O-OPERATOR-CROSSSERVICE-PRODUCTION-INTEGRATION-AND-REAL-USAGE-E2E-V1:
-          탭 수가 많은 서비스(KPA/K-Cosmetics/GlycoPharm)에서 390px 뷰포트 기준
+          탭 수가 많은 서비스(KPA/K-Cosmetics)에서 390px 뷰포트 기준
           탭 줄이 문서 전체를 가로로 밀어냈다(document.scrollWidth 547 > 390).
           탭 줄 자체만 가로 스크롤시켜 페이지 가로 스크롤을 제거한다. */}
       <div className="flex gap-1 border-b border-slate-200 overflow-x-auto">

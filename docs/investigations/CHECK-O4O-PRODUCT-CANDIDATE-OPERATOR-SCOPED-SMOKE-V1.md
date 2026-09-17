@@ -18,7 +18,7 @@
 
 ## 2. 계정/스코프 사실 (가정 아님, 토큰·동작 확인)
 
-- **sohae2100 roles** (JWT): `platform:super_admin`, `neture:operator`, `neture:admin`, `kpa:admin/operator`, `glycopharm:admin/operator`, `cosmetics:admin/operator`, `kpa:store_owner`.
+- **sohae2100 roles** (JWT): `platform:super_admin`, `neture:operator`, `neture:admin`, `kpa:admin/operator`, `cosmetics:admin/operator`, `kpa:store_owner`.
 - `resolveOperatorScope` 는 `isPlatformAdmin` 을 우선 판정 → sohae2100 은 **platform admin 경로**를 탄다.
 
 | 호출 | 결과 | 해석 |

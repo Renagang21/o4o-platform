@@ -447,8 +447,8 @@ KPA Operator Dashboard 는 두 개의 권한 layer 로 분리되어 있다:
 | 자원 | 사유 |
 |---|---|
 | `MemberListLayout` | KPA 회원 분류(약사/약대생) 종속 — 다른 서비스는 자체 layout 필요 가능 |
-| `ACTIVITY_TYPE_LABELS` | KPA 활동 유형 11종 한정 — GlycoPharm/K-Cosmetics 는 다른 분류 |
-| `CAPABILITY_LABELS` | KPA prefix 위주 (`kpa:*`) — 서비스마다 prefix 다름 (`glyco:*`, `cosmetics:*`) |
+| `ACTIVITY_TYPE_LABELS` | KPA 활동 유형 11종 한정 — K-Cosmetics 는 다른 분류 |
+| `CAPABILITY_LABELS` | KPA prefix 위주 (`kpa:*`) — 서비스마다 prefix 다름 (`cosmetics:*`) |
 | `kpa_members.status` projection sync | KPA 도메인 — 다른 서비스는 자체 projection 테이블 필요 가능 |
 
 ### 10.3 Phase 3 공통화 후보 평가 (사전)
@@ -552,7 +552,7 @@ admin   : 역할 변경 + 삭제 + 법률·감사·권한 관리
 | 단계 | 권장 작업 |
 |:-:|---|
 | **A** | minor gap 3종 정렬 (선택, 우선순위 낮음) — ForumDeleteRequests / OperatorForum / OperatorStoreChannels |
-| **B** | **다른 서비스 공통화 IR** 진행 — GlycoPharm / K-Cosmetics / Neture 의 operator dashboard 가 본 canonical 과 어디까지 일치/격차인지 audit |
+| **B** | **다른 서비스 공통화 IR** 진행 — K-Cosmetics / Neture 의 operator dashboard 가 본 canonical 과 어디까지 일치/격차인지 audit |
 | **C** | Phase 3 추상화 후보 정리 — `useBulkSelection` / `CapabilityChips` / `ProfileMetaBadge` 의 `@o4o/operator-ux-core` 승격 검토 |
 | **D** | bulk delete / bulk role / bulk capability 정책 IR — 본 canonical 의 *제외* 항목들에 대한 운영 정책 결정 |
 

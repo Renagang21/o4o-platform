@@ -23,7 +23,6 @@
 공통 모듈의 수정은 다음 범위를 **모두** 고려해야 한다.
 
 - KPA-Society
-- GlycoPharm
 - K-Cosmetics
 - Neture
 - admin
@@ -91,7 +90,7 @@ filtering 정책 문제**였다 (§8 Case Study). 같은 클래스의 문제는 
 
 ```text
 1. 이 파일이 어느 서비스에서 import 되는가?
-2. KPA / GlycoPharm / K-Cosmetics / Neture 중 어디가 소비하는가?
+2. KPA / K-Cosmetics / Neture / PharmacyHub 중 어디가 소비하는가?
 3. admin / operator / store / forum / store-hub / mypage 중 어디에 영향이 있는가?
 4. core package인지 extension package인지 확인했는가?
 5. 서비스별 wrapper가 별도로 있는가?
@@ -185,7 +184,7 @@ node scripts/quality/check-literal-consumers.mjs "href: '/forum/request'" "/foru
 1. 관련 공통 패키지 typecheck
 2. 해당 공통 모듈을 소비하는 서비스 typecheck
 3. 최소 2개 이상 소비처 smoke
-4. 3서비스 공통 정책이면 KPA / GlycoPharm / K-Cosmetics 모두 smoke
+4. 매장형 공통 정책이면 KPA / K-Cosmetics 모두 smoke
 5. Neture가 소비하는 공통 모듈이면 Neture도 smoke
 6. route 존재 여부 확인
 7. role/capability/visibility 필터 후 실제 표시 결과 확인
@@ -222,7 +221,6 @@ core+extension 구조는 별도 기준을 둔다 (CLAUDE.md §App 계층 `Core �
 | 소비처 | 사용 여부 | 변경 영향 | route/role/capability 영향 | 검증 방식 | 결과 |
 |---|---:|---|---|---|---|
 | KPA-Society | 사용 | 있음 | capability filter 영향 | typecheck + browser smoke | PASS |
-| GlycoPharm | 사용 | 있음 | route 차이 있음 | typecheck + browser smoke | PASS |
 | K-Cosmetics | 사용 | 있음 | 일부 메뉴 없음 | typecheck + browser smoke | PASS |
 | Neture | 미사용/사용 | 없음/있음 | 해당 없음 | 검색 결과 | PASS |
 | admin | 사용 여부 확인 | 있음/없음 | role guard 확인 | typecheck/smoke | PASS |
@@ -250,7 +248,7 @@ core+extension 구조는 별도 기준을 둔다 (CLAUDE.md §App 계층 `Core �
 - DB backfill / migration 금지
 - 최상단 그룹 특수 예외 로직 금지
 - 공통 정책 수정으로 처리
-- KPA / GlycoPharm / K-Cosmetics smoke 필요
+- KPA / K-Cosmetics smoke 필요
 
 > 관련 WO/CHECK: `WO-O4O-STORE-MENU-CANONICAL-TREE-ALIGNMENT-V2`,
 > [`CHECK-O4O-STORE-MENU-CANONICAL-TREE-ALIGNMENT-V2`](../investigations/CHECK-O4O-STORE-MENU-CANONICAL-TREE-ALIGNMENT-V2.md) §5.3
@@ -274,13 +272,13 @@ core+extension 구조는 별도 기준을 둔다 (CLAUDE.md §App 계층 `Core �
    - hub cards
    - resource cards
    - service-specific labels
-   - KPA/GlycoPharm/K-Cosmetics 차이
+   - KPA/K-Cosmetics 차이
 
 3. /forum
    - forum operator console
    - forum request/delete/analytics
    - forum list/detail/write
-   - KPA/GlycoPharm/K-Cosmetics/Neture forum 차이
+   - KPA/K-Cosmetics/Neture forum 차이
 
 4. /operator
    - OperatorAreaShell
@@ -357,7 +355,6 @@ core+extension 구조는 별도 기준을 둔다 (CLAUDE.md §App 계층 `Core �
 ### Smoke result
 
 - KPA:
-- GlycoPharm:
 - K-Cosmetics:
 - Neture:
 ```

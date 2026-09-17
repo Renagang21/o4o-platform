@@ -14,7 +14,7 @@
 | **상품설명 (Product Description, canonical)** | O4O 공용 상품 DB 자산, 대표 설명 | `shared_product_descriptions` (status=canonical) | ✅ 직접 |
 | **Product AI Content** | AI 생성 **draft / seed source** | `product_ai_contents` | ❌ (직접 노출 안 함) |
 | **Store Product Profile description** | **legacy fallback** override | `store_product_profiles.description` | ⚠️ canonical 부재 시 fallback |
-| **일반 콘텐츠 (Content)** | member/operator/store 작성·복사 본문 | `kpa_contents` / `cms_content` / `cosmetics_contents` / `glycopharm_contents` | 경우에 따라 |
+| **일반 콘텐츠 (Content)** | member/operator/store 작성·복사 본문 | `kpa_contents` / `cms_content` / `cosmetics_contents` | 경우에 따라 |
 | **Production Material (제작물/출력물)** | 실제 활용 출력물 (POP/QR/블로그/안내문/signage) | `kpa_store_contents`(Store Production Material) / `store_pops` / `store_qr_codes` / `store_blog_posts` / signage | ✅ 활용물 |
 | **복사본 (Copy)** | 가져오기 결과, 원본과 분리된 사본 | `o4o_asset_snapshots` (Neture: `DashboardAsset`) | 사본 활용 |
 | **Template** | 출력/구성 형식 틀 | template registry (`@o4o/types` ProductionTemplate) | — |
@@ -83,7 +83,7 @@ store_product_profiles.description = legacy fallback override
 ```
 
 예: 안내문, 블로그 글, 매장 홍보문, 교육/자료형 콘텐츠, store-hub content, member-authored `/content`.
-- 저장소: `kpa_contents` / `cms_content` / `cosmetics_contents` / `glycopharm_contents`(per-service 원본) + 복사본은 §6.
+- 저장소: `kpa_contents` / `cms_content` / `cosmetics_contents` / 복사본은 §6.
 - **상품설명과 다르다**: 상품설명은 공용 상품 DB 자산(§1), 매장 특화 홍보문은 **콘텐츠/제작물(§4·§5)**.
 
 ## 5. Production Material (제작물 / 출력물)

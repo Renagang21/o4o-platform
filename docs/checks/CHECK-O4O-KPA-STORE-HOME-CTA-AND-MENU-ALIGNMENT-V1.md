@@ -71,7 +71,7 @@ KPA-Society `/store` 홈(`StoreHomePage`)의 실행 흐름 CTA 명칭·route 를
 | §7 새 홈 컴포넌트 추출 없음 | ✅ 기존 onboardingSlot 내부 Link 만 수정 |
 | §7 legacy route 삭제 없음 | ✅ App.tsx redirect(L957/L1055) 그대로 유지 |
 | §8 store-ui-core 무변경 (KPA-only) | ✅ 단일 KPA 페이지 파일만 수정 |
-| §8 GlycoPharm / K-Cosmetics 영향 0 | ✅ 공통 config 미접촉 |
+| §8 K-Cosmetics 영향 0 | ✅ 공통 config 미접촉 |
 
 ---
 

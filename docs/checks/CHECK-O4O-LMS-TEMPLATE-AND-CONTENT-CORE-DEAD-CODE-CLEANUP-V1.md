@@ -59,7 +59,6 @@ LMS course/lesson/certificate/enrollment/operator route
 ```
 GET /api/v1/lms/templates            → 기대: 404 (route 제거)
 GET /api/v1/lms/courses              → 기대: 기존 동일(무회귀)
-GET /api/v1/{kpa|glycopharm}/store-contents → 기대: 기존 동일(live kpa_store_contents 무회귀)
 ```
 
 ## 6. 완료 기준 체크 (WO §8)

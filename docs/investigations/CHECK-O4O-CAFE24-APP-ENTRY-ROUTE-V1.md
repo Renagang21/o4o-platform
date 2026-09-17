@@ -72,7 +72,6 @@ Cafe24 앱은 Cafe24 관리자 화면 **iframe 안**에서 열리므로 `NetureL
 | 항목 | 결과 |
 |---|---|
 | typecheck `web-neture` (`tsc --noEmit`) | **exit 0** |
-| typecheck `web-glycopharm` (`tsc -b`) | **exit 0** |
 | production browser smoke | 아래 §5-1 — **PASS** |
 | 기존 route 회귀 | 아래 §5-1 — 이상 없음 |
 | Cafe24 callback route | **무변경** (diff 0) |

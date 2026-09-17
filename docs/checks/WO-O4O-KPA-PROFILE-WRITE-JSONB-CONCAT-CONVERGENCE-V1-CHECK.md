@@ -183,7 +183,6 @@ catch 해도 transaction 전체가 오염되기 때문이다.
    `2026-07-23T12:50:36Z / 12:51:22Z — error: COALESCE could not convert type jsonb to json`
    - `routes/o4o-store/controllers/pharmacy-info.controller.ts:349` — **try/catch 로 삼킴**
      (P2/P4 사업자 필드가 저장되지 않고 `console.error` 만 남음)
-   - `routes/glycopharm/controllers/mypage.controller.ts:288`
    - `routes/cosmetics/controllers/cosmetics-mypage.controller.ts:202`
    - `modules/neture/services/supplier.service.ts:1159`
    → 다른 서비스 계약이라 본 WO 제약("다른 서비스 프로필 write 계약 미변경")에 따라 손대지 않음.

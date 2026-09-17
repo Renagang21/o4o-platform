@@ -9,7 +9,7 @@
  * - 이후 protected route 접근 차단
  *
  * 환경변수 필요 (서비스별 분리):
- *   E2E_{KPA|KCOS|NETURE|GLYCO}_ADMIN_EMAIL / _PASSWORD
+ *   E2E_{KPA|KCOS|NETURE}_ADMIN_EMAIL / _PASSWORD
  *
  * WO-O4O-KPA-AUTH-RUNTIME-E2E-LOGIN-REGRESSION-ROOT-CAUSE-AND-CI-CLOSURE-V1
  * 로그인 실패를 skip 으로 흡수하지 않는다 (연쇄 오탐 차단).

@@ -167,7 +167,6 @@ permission.middleware.requireAdmin → req.user.isAdmin()               → JWT 
 | Admin (apps/channel-ops/metrics) | 3+ | requireAdmin | DB |
 | Neture | 20+ | requireAuth + requireRole/requireNetureScope | DB |
 | KPA | 30+ | requireAuth + requireKpaScope | DB |
-| GlycoPharm | 15+ | requireAuth + requireGlycopharmScope | DB |
 | Cosmetics | 10+ | requireAuth | JWT |
 | GlucoseView | 5+ | requireAuth | JWT |
 | LMS | 10+ | requireAuth + requireInstructor | DB |
@@ -182,7 +181,6 @@ permission.middleware.requireAdmin → req.user.isAdmin()               → JWT 
 |--------|-------|------|------|
 | neture | requireNetureScope | `neture-scope.middleware.ts` | membershipGuard + DB |
 | kpa | requireKpaScope | `kpa.routes.ts` 내 | membershipGuard + DB |
-| glycopharm | requireGlycopharmScope | `glycopharm.routes.ts` 내 | membershipGuard + DB |
 | cosmetics | (membershipGuard 직접) | `cosmetics.routes.ts` | membershipGuard |
 | LMS | requireInstructor | `requireInstructor.ts` | roleAssignmentService.hasAnyRole |
 
@@ -250,7 +248,6 @@ hasRole(role: UserRole | string): boolean {
   const roleStr = role as string;
   if (!this.roles || this.roles.length === 0) return false;
   // Direct match, platform-prefixed match, or service-prefixed match
-  // e.g., 'admin' matches 'platform:admin', 'glycopharm:admin', 'kpa:admin'
   return this.roles.some(r =>
     r === roleStr ||
     r === `platform:${roleStr}` ||
@@ -267,7 +264,6 @@ hasRole('admin') 호출 시:
   'platform:admin'     → true ✓ (platform prefix)
   'neture:admin'       → true ⚠️ (suffix match — 의도와 다를 수 있음)
   'kpa:admin'          → true ⚠️ (suffix match)
-  'glycopharm:admin'   → true ⚠️ (suffix match)
 ```
 
 **문제**: `hasRole('admin')`이 **모든 서비스의 admin**을 포함. 서비스 간 권한 경계가 무너질 수 있음.
@@ -316,12 +312,6 @@ neture:partner  neture:user
 ```
 kpa:admin           kpa:operator       kpa:district_admin
 kpa:branch_admin    kpa:branch_operator  kpa:pharmacist
-```
-
-#### GlycoPharm
-```
-glycopharm:admin     glycopharm:operator    glycopharm:pharmacy
-glycopharm:supplier  glycopharm:partner     glycopharm:consumer
 ```
 
 #### K-Cosmetics

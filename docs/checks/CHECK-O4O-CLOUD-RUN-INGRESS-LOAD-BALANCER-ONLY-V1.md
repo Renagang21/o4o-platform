@@ -22,7 +22,6 @@
 ```
 api.neture.co.kr
   → o4o-global-lb (URL map)
-      hostRules: api.neture.co.kr · api.glycopharm.co.kr · api.glucoseview.co.kr
                  api.kpa-society.co.kr · api.k-cosmetics.site
       → pathMatcher: path-matcher-api
       → defaultService: backend-o4o-core-api
@@ -130,12 +129,12 @@ WO §7 판정 기준(“애플리케이션 JSON 응답이나 실제 API 데이�
 
 | Origin | 결과 |
 |--------|------|
-| `neture.co.kr` · `kpa-society.co.kr` · `glycopharm.co.kr` · `k-cosmetics.site` | ✅ 204 · `allow-origin` 정확 반영 |
+| `neture.co.kr` · `kpa-society.co.kr` · `k-cosmetics.site` | ✅ 204 · `allow-origin` 정확 반영 |
 | `pharmacy-hub-web-*.run.app` · `pharmacyhub.co.kr` | ✅ 204 · 사전 등록 origin 유지 |
 
 ### 7-4. 주요 웹 서비스 회귀
 
-`neture.co.kr` · `kpa-society.co.kr` · `glycopharm.co.kr` · `k-cosmetics.site` ·
+`neture.co.kr` · `kpa-society.co.kr` · `k-cosmetics.site`
 `pharmacy-hub-web-*.run.app` — **전부 200**.
 
 > 웹 서비스들의 Cloud Run ingress 는 변경하지 않았으므로 자체 URL 접근도 그대로다.
@@ -164,7 +163,7 @@ Cloud Run service configuration 과 배포 정의만 변경했다.
 
 | 항목 | 상태 |
 |------|------|
-| 다른 Cloud Run 서비스 (`neture-web` · `kpa-society-web` · `glycopharm-web` · `k-cosmetics-web` · `pharmacy-hub-web` · `o4o-admin-dashboard` · `account-center-web` · `glucoseview-web` · `signage-player-web`) | **ingress 미변경** — 동일 정비가 필요한지는 후속 판단. 다만 이들은 정적 웹이라 위험 성격이 다르다 |
+| 다른 Cloud Run 서비스 (`neture-web` · `kpa-society-web` · `k-cosmetics-web` · `pharmacy-hub-web` · `o4o-admin-dashboard` · `account-center-web` · `glucoseview-web` · `signage-player-web`) | **ingress 미변경** — 동일 정비가 필요한지는 후속 판단. 다만 이들은 정적 웹이라 위험 성격이 다르다 |
 | `--allow-unauthenticated` / IAM invoker | 유지 (WO §5.2) |
 | IP block TTL · unblock API | 후속 WO |
 | Cloud Armor · WAF | 범위 밖 |

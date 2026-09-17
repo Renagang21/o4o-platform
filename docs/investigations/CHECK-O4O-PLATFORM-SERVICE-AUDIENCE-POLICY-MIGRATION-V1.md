@@ -25,7 +25,7 @@
 | `services/web-neture/src/pages/admin/ServiceAudiencePolicyPage.tsx` | legacy route(`/admin/settings/...`) deprecated banner(route-aware) + platform 안내 문구 갱신 |
 | `docs/investigations/CHECK-...-MIGRATION-V1.md` | 본 문서 |
 
-→ gate 로직/정책값/DB/schema/공유 모듈/운영자 관리/역할 관리/GP·KCos·KPA **무변경**.
+→ gate 로직/정책값/DB/schema/공유 모듈/운영자 관리/역할 관리/KCos·KPA **무변경**.
 
 ## 4. frontend 신규 route
 

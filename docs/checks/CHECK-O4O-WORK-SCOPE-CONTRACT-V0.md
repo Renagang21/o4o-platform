@@ -24,11 +24,6 @@
 
 **같은 이름의 값 공간이 둘이다.**
 
-```text
-role prefix 공간         : kpa, cosmetics, neture, glycopharm, platform, pharmacy-hub, kpa-branch
-canonical membership 공간 : kpa-society, k-cosmetics, neture, glycopharm, platform, pharmacy-hub, kpa-branch
-```
-
 변환 SSOT = `packages/security-core/src/service-configs.ts`
 (`resolveCanonicalServiceKey` / `resolveRolePrefixFromCanonicalServiceKey`).
 차이가 나는 것은 `kpa→kpa-society`, `cosmetics→k-cosmetics` 둘뿐이고 나머지는 self-map.
@@ -82,7 +77,7 @@ Neture 의 실제 업무 축 게이트:
 
 프런트에 **사용자 단위 `can(...)` 추상화는 존재하지 않는다.** 이름이 같은 다른 것 셋:
 
-- `@o4o/capabilities` — 매장 *기능* 등재부(`B2C_COMMERCE`/`TABLET`/`SIGNAGE` 등). 백엔드만 import. `ServiceKey` 가 `'kpa'|'cosmetics'|'glycopharm'` 뿐이라 neture·pharmacy-hub 부재. 축이 다르다.
+- `@o4o/capabilities` — 매장 *기능* 등재부(`B2C_COMMERCE`/`TABLET`/`SIGNAGE` 등). 백엔드만 import. 축이 다르다.
 - `packages/types/src/operator-capability.ts` — 서비스별 정적 메뉴 목록. 사용자 입력 없음.
 - `packages/auth-client/src/rbac.ts` + `hooks.ts` — `usePermission`/`useRBAC` 등 존재하나 **어디서도 import 되지 않는 dead layer**. `getActiveRoles()` 가 `user.assignments` 를 읽는데 `/auth/me` 는 그 필드를 주지 않아 되살리면 전부 `false` 를 낸다.
 
@@ -288,7 +283,7 @@ deep link 복귀 계약(`state.from` → LoginModal `returnUrl`)은 기존 구�
 
 1. **중앙 AI 입력 연결 (Phase 3)** — `useWorkScope()` 가 연결점. 입력 → scope 확인 → AI 요청 주입.
 2. **매장 scope 서버 해석 API** — `store-organization.resolver.ts` 를 프런트가 조회할 수 있는 read-only 엔드포인트. `resolved`/`none`/`ambiguous` 를 그대로 노출해야 `ambiguous` 에서 매장 선택 UI 를 띄울 수 있다. 이게 있어야 `storeId`/`organizationId` 가 채워진다.
-3. **Work Scope 공통화** — 현재 web-neture thin 구현. KPA/GlycoPharm/K-Cosmetics/PharmacyHub 로 넓힐 때 `@o4o/auth-react` 승격 후보. 이때 `@o4o/security-core` 의 prefix↔canonical 변환이 필요해진다(Shared Module Change Protocol 대상).
+3. **Work Scope 공통화** — 현재 web-neture thin 구현. 이때 `@o4o/security-core` 의 prefix↔canonical 변환이 필요해진다(Shared Module Change Protocol 대상).
 4. **Neture organization 미연결 해소** — `O4O-ORGANIZATION-ROLE-STANDARD-V1 §4.4` 가 이미 지적한 유일한 미준수. Work Scope 의 store 축이 Neture 에서 확정되지 않는 근본 원인.
 5. **`MembershipLike` 가 membership `role` 을 버리는 문제** — API 는 주는데 프런트 타입이 누락. scope 에 조직 역할을 담으려면 필요.
 6. **`@o4o/auth-client` RBAC dead layer** — `user.assignments` 를 읽는데 `/auth/me` 는 주지 않는다. 되살리면 전부 `false`. 제거 또는 계약 정합 필요(별도 WO).

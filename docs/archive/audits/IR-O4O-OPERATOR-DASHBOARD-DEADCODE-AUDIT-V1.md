@@ -101,7 +101,6 @@ main.ts (lines 1197-1204):
 | Neture | `GET /api/v1/neture/admin/dashboard/summary` | `admin.controller.ts:585-607` | `/api/v1/neture/operator/dashboard` | **DEAD** |
 | Neture | `GET /api/v1/neture/admin/dashboard/partner-kpi` | `admin.controller.ts:614` | `/api/v1/neture/operator/dashboard` KPIs | **DEAD** |
 | Cosmetics | `GET /api/v1/cosmetics/admin/dashboard/summary` | `cosmetics.controller.ts:527` | `/api/v1/cosmetics/operator/dashboard` | **DEAD** |
-| GlycoPharm | `GET /api/v1/glycopharm/admin/dashboard` | `admin-dashboard.controller.ts:34` | `/api/v1/glycopharm/operator/dashboard` | **DEAD** |
 
 ### 4-2. ALIVE 엔드포인트 (역할 분리로 유지)
 
@@ -124,15 +123,6 @@ main.ts (lines 1197-1204):
 ---
 
 ## 5. 중복 컨트롤러
-
-### 5-1. GlycoPharm 이중 대시보드
-
-| 컨트롤러 | 엔드포인트 | 형식 | Guard |
-|---------|-----------|------|-------|
-| `operator.controller.ts` | `/api/v1/glycopharm/operator/dashboard` | 5-Block (신형) | `glycopharm:operator` |
-| `admin-dashboard.controller.ts` | `/api/v1/glycopharm/admin/dashboard` | 4-Block (구형) | `glycopharm:admin` |
-
-**판정**: `admin-dashboard.controller.ts`는 구형 Admin UI 호환용으로 유지 중이나, Frontend 전환 후 제거 가능.
 
 ### 5-2. KPA 다중 Operator 엔드포인트
 
@@ -193,7 +183,6 @@ main.ts (lines 1197-1204):
 
 **중복 파일 목록**:
 1. `modules/neture/controllers/operator-dashboard.controller.ts` (lines 27-38)
-2. `routes/glycopharm/controllers/operator.controller.ts` (lines 27-38)
 3. `routes/cosmetics/controllers/operator-dashboard.controller.ts` (lines 27-38)
 4. `routes/glucoseview/controllers/operator-dashboard.controller.ts` (lines 26-37)
 5. `copilot/copilot-engine.service.ts` (lines 20-25)
@@ -268,7 +257,6 @@ main.ts (lines 1197-1204):
 | `neture/admin/dashboard/summary` API | AdminDashboardPage.tsx → `/operator/dashboard` 전환 | Frontend 수정 필요 |
 | `neture/admin/dashboard/partner-kpi` API | 위와 동일 | Frontend 수정 필요 |
 | `cosmetics/admin/dashboard/summary` API | 해당 Frontend → `/operator/dashboard` 전환 | Frontend 수정 필요 |
-| `glycopharm/admin-dashboard.controller.ts` | GlycoPharmAdminDashboard.tsx → `/operator/dashboard` 전환 | Frontend 수정 필요 |
 
 ### Tier 3: 구조 개선 (선택)
 
@@ -286,7 +274,6 @@ main.ts (lines 1197-1204):
 | 서비스 | Operator Dashboard | Admin Dashboard | Dead Code |
 |--------|:------------------:|:---------------:|:---------:|
 | **Neture** | 5-Block (ACTIVE) | Legacy 2건 (DEAD) | 2 API |
-| **GlycoPharm** | 5-Block (ACTIVE) | 4-Block (DEAD) | 1 컨트롤러 |
 | **K-Cosmetics** | 5-Block (ACTIVE) | Legacy 1건 (DEAD) | 1 API |
 | **GlucoseView** | 5-Block (ACTIVE) | 없음 | 없음 |
 | **KPA Society** | 5-Block + 확장 (ACTIVE) | Admin 별도 (ALIVE) | 없음 |
@@ -301,7 +288,7 @@ main.ts (lines 1197-1204):
 | WO-O4O-OPERATOR-COPILOT-LEGACY-CLEANUP-V1 | operator-copilot 모듈 삭제 + main.ts 정리 | HIGH |
 | WO-O4O-ADMIN-DASHBOARD-DEADCODE-CLEANUP-V1 | Admin Dashboard Frontend dead code 제거 (6 파일) | MEDIUM |
 | WO-O4O-OPERATOR-DASHBOARD-TYPE-CONSOLIDATION-V1 | 5-Block 인터페이스 공통 파일 통합 | LOW |
-| WO-O4O-LEGACY-ADMIN-API-SUNSET-V1 | Neture/Cosmetics/GlycoPharm admin dashboard API 제거 (Frontend 전환 선행) | LOW |
+| WO-O4O-LEGACY-ADMIN-API-SUNSET-V1 | Neture/Cosmetics admin dashboard API 제거 (Frontend 전환 선행) | LOW |
 
 ---
 

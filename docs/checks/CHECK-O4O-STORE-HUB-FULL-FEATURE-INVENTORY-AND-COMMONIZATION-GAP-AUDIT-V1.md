@@ -9,7 +9,7 @@
 
 ## 1. 조사 방법
 
-1. **route 전수 추출** — 4 서비스 `App.tsx` 의 `path=` 전량(KPA 224 · KCos 180 · GP 236 · PH 37)에서 Store Hub 연결 축을 선별. `/store-hub/*` URL 만 보지 않고 PharmacyHub `/store-owner/*` 처럼 **다른 URL 아래 같은 업무**를 수행하는 route 를 포함.
+1. **route 전수 추출** — 3 서비스 `App.tsx` 의 `path=` 전량(KPA 224 · KCos 180 236 · PH 37)에서 Store Hub 연결 축을 선별. `/store-hub/*` URL 만 보지 않고 PharmacyHub `/store-owner/*` 처럼 **다른 URL 아래 같은 업무**를 수행하는 route 를 포함.
 2. **page → Core 소비 매핑** — 각 화면 파일에서 `useHubImportLibrary` · `SupplyCatalogHub` · `EventOffersHubList` · `useSupplyProductList` · `SupplyProductExplorer` · `useStoreCart` · `StoreCartView` · `useSupplyProductApplication` · `StoreHubTemplate` · `ContentHubTemplate` 실사용 여부를 기계적으로 스캔(파일 크기 동반 기록).
 3. **사본 정량화** — 서비스 간 동일 업무 화면·API client 를 `diff` 라인 수로 측정해 "유사 사본" 여부를 수치로 판정.
 4. **API client 전수** — 4 서비스 `src/api/**` · `src/lib/api/**` 파일 목록을 대조해 동명 client 중복을 식별.
@@ -42,50 +42,50 @@ route 개수(총 677)가 아니라 **사용자 업무 기능 단위**로 묶었�
 
 ### A. 허브 진입 · 셸
 
-| # | 기능 | KPA | K-Cosmetics | PharmacyHub | GlycoPharm | 공통 Core | 판정 |
-|---|---|---|---|---|---|---|---|
-| A1 | 매장허브 홈 화면 | `/store-hub` `StoreHubPage` 60L | `/store-hub` `KCosmeticsHubPage` 128L | `/store-hub` `StoreHubPage` 88L | `/store-hub` `StoreHubPage` 128L | `StoreHubTemplate` (shared-space-ui) | **FULLY_COMMON** |
-| A2 | 홈 최신 자원 피드 | `StoreHubLatestFeed` 540L | — | — | — | 없음 | **SERVICE_SPECIFIC** |
-| A3 | 허브 레이아웃 · 사이드바 | `PharmacyHubLayout` 390L | `KCosmeticsHubLayout` 233L | `StoreDashboardLayout`(store-ui-core) | `GlycoPharmHubLayout` 234L | PH 만 공통 셸 | **VIEW_DUPLICATED** |
-| A4 | 허브 접근 가드 | `HubGuard` | `RoleGuard(allowedRoles)` | `StoreOwnerShell` | `GlycoHubGuard` | 없음 | **SERVICE_SPECIFIC** |
+| # | 기능 | KPA | K-Cosmetics | PharmacyHub | 공통 Core | 판정 |
+|---|---|---|---|---|---|---|
+| A1 | 매장허브 홈 화면 | `/store-hub` `StoreHubPage` 60L | `/store-hub` `KCosmeticsHubPage` 128L | `/store-hub` `StoreHubPage` 88L | `StoreHubTemplate` (shared-space-ui) | **FULLY_COMMON** |
+| A2 | 홈 최신 자원 피드 | `StoreHubLatestFeed` 540L | — | — | 없음 | **SERVICE_SPECIFIC** |
+| A3 | 허브 레이아웃 · 사이드바 | `PharmacyHubLayout` 390L | `KCosmeticsHubLayout` 233L | `StoreDashboardLayout`(store-ui-core) | PH 만 공통 셸 | **VIEW_DUPLICATED** |
+| A4 | 허브 접근 가드 | `HubGuard` | `RoleGuard(allowedRoles)` | `StoreOwnerShell` | 없음 | **SERVICE_SPECIFIC** |
 
 - A1: 4 서비스 전부 공통 템플릿 소비, 차이는 카드 목록·storeCta 뿐 → 공통.
-- A3: KCos↔GP 레이아웃 `diff` **94 라인**(233/234L 중) → 실질 사본. KPA 는 확장(12 메뉴), PH 는 이미 공통 셸 사용.
+- KPA 는 확장(12 메뉴), PH 는 이미 공통 셸 사용.
 - A4: role 체계가 서비스마다 다르므로(약사 자격 / cosmetics scope / enrollment) 의도적 분리.
 
 ### B. 공급 상품 · 신청
 
-| # | 기능 | KPA | K-Cosmetics | PharmacyHub | GlycoPharm | 공통 Core | 판정 |
-|---|---|---|---|---|---|---|---|
-| B1 | 공급 상품 탐색(목록·검색·필터) | `HubB2BCatalogPage` 728L | `HubB2BPage` 35L | `ProductsPage` 180L | `HubB2BCatalogPage` 35L | `useSupplyProductList` · `SupplyProductExplorer` · `SupplyCatalogHub` | **CORE_ONLY** |
-| B2 | 공급 상품 상세 | — | — | `ProductDetailPage` 247L | — | 없음 | **SERVICE_SPECIFIC** |
-| B3 | 상품 신청 · 제외 액션 | `HubB2BCatalogPage` 내 | `SupplyCatalogHub` 내 | — (정책상 미도입) | `SupplyCatalogHub` 내 | `useSupplyProductApplication` | **CORE_ONLY** |
-| B4 | 신청 상태 조회 | `StoreProductRequestsListModal` | — | — | — | 없음 | **SERVICE_SPECIFIC** |
-| B5 | 신규 상품 요청 | `StoreNewProductRequestModal` | — | — | — | 없음 | **SERVICE_SPECIFIC** |
+| # | 기능 | KPA | K-Cosmetics | PharmacyHub | 공통 Core | 판정 |
+|---|---|---|---|---|---|---|
+| B1 | 공급 상품 탐색(목록·검색·필터) | `HubB2BCatalogPage` 728L | `HubB2BPage` 35L | `ProductsPage` 180L | `useSupplyProductList` · `SupplyProductExplorer` · `SupplyCatalogHub` | **CORE_ONLY** |
+| B2 | 공급 상품 상세 | — | — | `ProductDetailPage` 247L | 없음 | **SERVICE_SPECIFIC** |
+| B3 | 상품 신청 · 제외 액션 | `HubB2BCatalogPage` 내 | `SupplyCatalogHub` 내 | — (정책상 미도입) | `useSupplyProductApplication` | **CORE_ONLY** |
+| B4 | 신청 상태 조회 | `StoreProductRequestsListModal` | — | — | 없음 | **SERVICE_SPECIFIC** |
+| B5 | 신규 상품 요청 | `StoreNewProductRequestModal` | — | — | 없음 | **SERVICE_SPECIFIC** |
 
 - B1: 상태·API 는 공통, **View 는 728L vs 35L 2 tier**. FULLY_COMMON 아님.
-- B2: PH 단독 구현. KPA/KCos/GP 는 목록에서 바로 신청하므로 상세 화면 자체가 없다 → 공통화 대상 아님(기능 격차로 기록).
+- B2: PH 단독 구현. KPA/KCos 는 목록에서 바로 신청하므로 상세 화면 자체가 없다 → 공통화 대상 아님(기능 격차로 기록).
 - B3: 액션 상태 기계는 공통, 버튼·확인 UX 는 서비스별.
 
 ### C. 이벤트 오퍼
 
-| # | 기능 | KPA | K-Cosmetics | PharmacyHub | GlycoPharm | 공통 Core | 판정 |
-|---|---|---|---|---|---|---|---|
-| C1 | 이벤트 오퍼 탐색 목록 | `KpaEventOfferPage` **969L** (공통 View 미사용) | `HubEventOffersPage` 33L | — | `HubEventOffersPage` 33L | `EventOffersHubList` | **VIEW_DUPLICATED** |
-| C2 | 오퍼 → 장바구니 payload | 공통 | 공통 | — | 공통 | `buildEventOfferCartPayload` · `asUuid` | **FULLY_COMMON** |
-| C3 | 오퍼 상태 라벨 | 공통 | 공통 | — | 공통 | `resolveEventOfferStatusLabel` | **FULLY_COMMON** |
+| # | 기능 | KPA | K-Cosmetics | PharmacyHub | 공통 Core | 판정 |
+|---|---|---|---|---|---|---|
+| C1 | 이벤트 오퍼 탐색 목록 | `KpaEventOfferPage` **969L** (공통 View 미사용) | `HubEventOffersPage` 33L | — | `EventOffersHubList` | **VIEW_DUPLICATED** |
+| C2 | 오퍼 → 장바구니 payload | 공통 | 공통 | — | `buildEventOfferCartPayload` · `asUuid` | **FULLY_COMMON** |
+| C3 | 오퍼 상태 라벨 | 공통 | 공통 | — | `resolveEventOfferStatusLabel` | **FULLY_COMMON** |
 
-- C1: **직전 CHECK 의 "이벤트 오퍼 COMMONIZED" 판정을 정정한다.** KPA 969L 페이지는 `@o4o/store-ui-core` 에서 `resolveEventOfferStatusLabel` **하나만** 가져오고 목록·필터·담기·자체 주문 흐름(`OrderResult`)을 전부 로컬로 갖고 있다. KCos↔GP 만 33L 어댑터로 동일(diff 6 라인 — 서비스명·api·accent 뿐).
+- C1: **직전 CHECK 의 "이벤트 오퍼 COMMONIZED" 판정을 정정한다.** KPA 969L 페이지는 `@o4o/store-ui-core` 에서 `resolveEventOfferStatusLabel` **하나만** 가져오고 목록·필터·담기·자체 주문 흐름(`OrderResult`)을 전부 로컬로 갖고 있다.
 
 ### D. 장바구니 · 거래
 
-| # | 기능 | KPA | K-Cosmetics | PharmacyHub | GlycoPharm | 공통 Core | 판정 |
-|---|---|---|---|---|---|---|---|
-| D1 | 장바구니 타입 · endpoint · 상태 | 공통 | 공통 | 별도 계약 | 공통 | `storeCartTypes` · `createStoreCartApi` · `useStoreCart` | **FULLY_COMMON** |
-| D2 | 장바구니 화면 | `StoreCartPage` 423L | 31L (`StoreCartView`) | `CartPage` 289L | 31L (`StoreCartView`) | `StoreCartView` | **CORE_ONLY** |
-| D3 | 주문 확정(checkout) | `/store/cart/{k}/checkout-confirm` | 동일 | `createOrders()`+`paymentGroupId` | 동일 | backend `cart/store-cart.routes.ts` 단일 | **FULLY_COMMON** |
-| D4 | 주문 내역 · 상세 | `/store/commerce/orders` `StoreOrdersPage` | `/store/commerce/orders` `StoreOrdersPage` | `/store-owner/orders` + `/:orderId` | `/store/commerce/orders` `PharmacyOrders` | 없음 | **VIEW_DUPLICATED** |
-| D5 | 결제 | — | — | `PaymentPage`·`Success`·`Fail` (Toss) | — | 없음 | **SERVICE_SPECIFIC** |
+| # | 기능 | KPA | K-Cosmetics | PharmacyHub | 공통 Core | 판정 |
+|---|---|---|---|---|---|---|
+| D1 | 장바구니 타입 · endpoint · 상태 | 공통 | 공통 | 별도 계약 | `storeCartTypes` · `createStoreCartApi` · `useStoreCart` | **FULLY_COMMON** |
+| D2 | 장바구니 화면 | `StoreCartPage` 423L | 31L (`StoreCartView`) | `CartPage` 289L | `StoreCartView` | **CORE_ONLY** |
+| D3 | 주문 확정(checkout) | `/store/cart/{k}/checkout-confirm` | 동일 | `createOrders()`+`paymentGroupId` | backend `cart/store-cart.routes.ts` 단일 | **FULLY_COMMON** |
+| D4 | 주문 내역 · 상세 | `/store/commerce/orders` `StoreOrdersPage` | `/store/commerce/orders` `StoreOrdersPage` | `/store-owner/orders` + `/:orderId` | 없음 | **VIEW_DUPLICATED** |
+| D5 | 결제 | — | — | `PaymentPage`·`Success`·`Fail` (Toss) | 없음 | **SERVICE_SPECIFIC** |
 
 - D1/D3: backend 는 `cart/store-cart.routes.ts` **단일 라우터**(7 endpoint), frontend 는 이번 트랙에서 `createStoreCartApi` 로 수렴 → 진짜 공통.
 - D2: KPA 423L · PH 289L 은 여전히 자체 View.
@@ -93,33 +93,30 @@ route 개수(총 677)가 아니라 **사용자 업무 기능 단위**로 묶었�
 
 ### E. 공급자 콘텐츠 탐색 · 가져오기
 
-| # | 기능 | KPA | K-Cosmetics | PharmacyHub | GlycoPharm | 공통 Core | 판정 |
-|---|---|---|---|---|---|---|---|
-| E1 | 콘텐츠 탐색(content) | `HubContentLibraryPage` 216L | `HubContentPage` 124L | — | `HubContentListPage` 125L | `ContentHubTemplate` | **FULLY_COMMON** |
-| E2 | 콘텐츠 상세 | — | `/library/content/:id` `ContentLibraryDetailPage` | — | `/hub/content/:id` `HubContentDetailPage` 101L | 없음 | **VIEW_DUPLICATED** |
-| E3 | 블로그 진열 · 가져오기 | 315L ✅Core | 279L ✅Core | — | 320L ❌Core 미사용 | `useHubImportLibrary` | **CORE_ONLY** |
-| E4 | POP 진열 · 가져오기 | 294L ✅Core | 286L ✅Core | — | 331L ❌ | `useHubImportLibrary` | **CORE_ONLY** |
-| E5 | QR 진열 · 가져오기 | 305L ✅Core | 279L ✅Core | — | 324L ❌ | `useHubImportLibrary` | **CORE_ONLY** |
-| E6 | 사이니지 미디어 진열 · 가져오기 | `HubSignageLibraryPage` **652L** | `HubSignagePage` **579L** | — | `HubSignageLibraryPage` **580L** | **없음** | **VIEW_DUPLICATED** |
-| E7 | 동영상 진열 · 가져오기 | `HubVideoLibraryPage` 368L | — | — | — | 없음 | **SERVICE_SPECIFIC** |
-| E8 | 태블릿 화면세트 진열 · 가져오기 | `HubScreenSetLibraryPage` 519L | — | — | — | 없음 | **SERVICE_SPECIFIC** |
-| E9 | 다국어 상품 콘텐츠 진열 + 내 목록 | 285L + 161L | — | — | — | 없음 | **SERVICE_SPECIFIC** |
+| # | 기능 | KPA | K-Cosmetics | PharmacyHub | 공통 Core | 판정 |
+|---|---|---|---|---|---|---|
+| E1 | 콘텐츠 탐색(content) | `HubContentLibraryPage` 216L | `HubContentPage` 124L | — | `ContentHubTemplate` | **FULLY_COMMON** |
+| E2 | 콘텐츠 상세 | — | `/library/content/:id` `ContentLibraryDetailPage` | — | 없음 | **VIEW_DUPLICATED** |
+| E3 | 블로그 진열 · 가져오기 | 315L ✅Core | 279L ✅Core | — | `useHubImportLibrary` | **CORE_ONLY** |
+| E4 | POP 진열 · 가져오기 | 294L ✅Core | 286L ✅Core | — | `useHubImportLibrary` | **CORE_ONLY** |
+| E5 | QR 진열 · 가져오기 | 305L ✅Core | 279L ✅Core | — | `useHubImportLibrary` | **CORE_ONLY** |
+| E6 | 사이니지 미디어 진열 · 가져오기 | `HubSignageLibraryPage` **652L** | `HubSignagePage` **579L** | — | **없음** | **VIEW_DUPLICATED** |
+| E7 | 동영상 진열 · 가져오기 | `HubVideoLibraryPage` 368L | — | — | 없음 | **SERVICE_SPECIFIC** |
+| E8 | 태블릿 화면세트 진열 · 가져오기 | `HubScreenSetLibraryPage` 519L | — | — | 없음 | **SERVICE_SPECIFIC** |
+| E9 | 다국어 상품 콘텐츠 진열 + 내 목록 | 285L + 161L | — | — | 없음 | **SERVICE_SPECIFIC** |
 
-- E3~E5: **GlycoPharm 3 페이지(975L)가 Core 미소비 사본으로 남아 있다.** KCos↔GP diff = blog 198 / pop 224 / qr 229 라인 → 서비스명·accent·경로 수준 차이. 직전 CHECK 는 "6 페이지 전부 Core 소비"라고 적었는데 그 문장의 범위는 KPA+KCos 였고 **GP 3 페이지가 모집단에서 빠져 있었다.**
-- E6: **가장 큰 미착수 중복.** 3 서비스 1,811L, 공통 Core 0. KCos↔GP diff **108 라인**(579/580L 중) → 사실상 동일 화면.
+- E6: **가장 큰 미착수 중복.** 3 서비스 1,811L, 공통 Core 0.
 
 ### F. API client · backend
 
-| # | 기능 | KPA | K-Cosmetics | PharmacyHub | GlycoPharm | 판정 |
-|---|---|---|---|---|---|---|
-| F1 | 매장허브 API client 군 | 9 파일 | 8 파일 | 별도 14 파일 | 9 파일 | **VIEW_DUPLICATED** (client 사본) |
-| F2 | 공용 backend controller | `createStoreHubController('kpa')` 등 factory | `('cosmetics')` | 미사용 | `('glycopharm')` | **FULLY_COMMON** |
-| F3 | PharmacyHub backend controller 군 | — | — | `PharmacyHubStore*Controller` 전용 (`pharmacy-hub.routes.ts` 567L) | — | **SERVICE_SPECIFIC** |
-| F4 | Event Offer backend controller | `kpa/...` 142L | `cosmetics/...` 381L | — | `glycopharm/...` 107L | **SERVICE_SPECIFIC** |
+| # | 기능 | KPA | K-Cosmetics | PharmacyHub | 판정 |
+| --- | --- | --- | --- | --- | --- |
+| F1 | 매장허브 API client 군 | 9 파일 | 8 파일 | 별도 14 파일 | **VIEW_DUPLICATED** (client 사본) |
+| F2 | 공용 backend controller | `createStoreHubController('kpa')` 등 factory | `('cosmetics')` | 미사용 | **FULLY_COMMON** |
+| F3 | PharmacyHub backend controller 군 | — | — | `PharmacyHubStore*Controller` 전용 (`pharmacy-hub.routes.ts` 567L) | **SERVICE_SPECIFIC** |
+| F4 | Event Offer backend controller | `kpa/...` 142L | `cosmetics/...` 381L | — | **SERVICE_SPECIFIC** |
 
-F1 실측 (라인 수 / KCos↔GP diff):
-
-| client | KPA | KCos | GP | diff(KCos,GP) |
+| client | KPA | KCos | diff(KCos) |
 |---|---|---|---|---|
 | `storeHub.ts` | 207 | 139 | 118 | 81 |
 | `eventOffer.ts` | 90 | 83 | 76 | 40 |
@@ -139,10 +136,10 @@ F3: PharmacyHub 는 `store_pops` · `store_qr_codes` · `kpa_store_contents` · 
 
 | # | 기능 | 범위 | 판정 |
 |---|---|---|---|
-| G1 | 매장 실행 자산 관리 (KPA `/store/*` · KCos `/store/*` · GP `/store/*` · PH `/store-owner/{content,library,blog,qr,pop,signage,tablets,manuals}`) | Agent C 축 | **OUT_OF_SCOPE** |
+| G1 | 매장 실행 자산 관리 (KPA `/store/*` · KCos `/store/*` `/store/*` · PH `/store-owner/{content,library,blog,qr,pop,signage,tablets,manuals}`) | Agent C 축 | **OUT_OF_SCOPE** |
 | G2 | 매장 제품·정보·계정 (`handled-products` · `local-products` · `my-products` · `info` · `account`) | 매장 운영 축 | **OUT_OF_SCOPE** |
 
-- G1 관측(수정 아님): PharmacyHub 는 실행 자산 화면 8종(QR 617L · POP 458L · Signage 420L · Content 291L · Blog 175L+153L · Library 100L+383L · Tablets 400L · Manuals 134L+174L)을 **자체 구현**했다. Agent C 가 KPA/KCos/GP 를 대상으로 진행한 공통화의 모집단에 PharmacyHub 가 들어있지 않다. Store Hub 축은 아니지만 **전사 공통화 판정에 영향**을 주므로 기록한다.
+- G1 관측(수정 아님): PharmacyHub 는 실행 자산 화면 8종(QR 617L · POP 458L · Signage 420L · Content 291L · Blog 175L+153L · Library 100L+383L · Tablets 400L · Manuals 134L+174L)을 **자체 구현**했다. Agent C 가 KPA/KCos 를 대상으로 진행한 공통화의 모집단에 PharmacyHub 가 들어있지 않다. Store Hub 축은 아니지만 **전사 공통화 판정에 영향**을 주므로 기록한다.
 
 ---
 
@@ -151,16 +148,16 @@ F3: PharmacyHub 는 `store_pops` · `store_qr_codes` · `kpa_store_contents` · 
 | 공통 surface | 소유 package | 실제 커버 범위 | 커버 못 하는 것 |
 |---|---|---|---|
 | `StoreHubTemplate` | shared-space-ui | 허브 홈 4/4 서비스 | 홈 최신 피드(KPA 전용 540L) |
-| `ContentHubTemplate` | shared-space-ui | 콘텐츠 탐색 3/3 + Neture 라이브러리 | 콘텐츠 **상세**(KCos·GP 사본) |
+| `ContentHubTemplate` | shared-space-ui | 콘텐츠 탐색 3/3 + Neture 라이브러리 | 콘텐츠 **상세**(KCos) |
 | `useSupplyProductList` · `SupplyProductExplorer` | store-ui-core | PH 목록 화면 · `SupplyCatalogHub` 내부 | KPA 728L 화면(상태만 위임) |
-| `SupplyCatalogHub` | store-ui-core | KCos · GP 공급 상품 화면 | KPA · PH |
+| `SupplyCatalogHub` | store-ui-core | KCos 공급 상품 화면 | KPA · PH |
 | `useSupplyProductApplication` | store-ui-core | 신청·제외 액션 2 소비처 | 신청 상태 조회 · 신규 요청(KPA 전용) |
-| `useHubImportLibrary` | store-ui-core | **6 페이지**(KPA 3 + KCos 3) | **GP 3 페이지 · 사이니지 3 · 동영상 · 화면세트 · 다국어** |
-| `EventOffersHubList` | store-ui-core | KCos · GP (2 페이지) | KPA 969L |
+| `useHubImportLibrary` | store-ui-core | **6 페이지**(KPA 3 + KCos 3) | 사이니지 3 · 동영상 · 화면세트 · 다국어 |
+| `EventOffersHubList` | store-ui-core | KCos · KPA 969L |
 | `buildEventOfferCartPayload` · `eventOfferStatus` | store-ui-core | 3 서비스 전부 | — |
-| `storeCartTypes` · `useStoreCart` · `createStoreCartApi` | store-ui-core | KPA · KCos · GP 전부 | PH(별도 계약) |
-| `StoreCartView` | store-ui-core | KCos · GP | KPA 423L · PH 289L |
-| backend factory controller | api-server `o4o-store/controllers` | KPA · KCos · GP 전 축 | PharmacyHub(전용 controller 군) |
+| `storeCartTypes` · `useStoreCart` · `createStoreCartApi` | store-ui-core | KPA · KCos 전부 | PH(별도 계약) |
+| `StoreCartView` | store-ui-core | KCos · KPA 423L · PH 289L |
+| backend factory controller | api-server `o4o-store/controllers` | KPA · KCos 전 축 | PharmacyHub(전용 controller 군) |
 
 **정정**: 직전 CHECK 의 소비처 수치(`useHubImportLibrary` 18 · `buildEventOfferCartPayload` 18 등)는 `grep -rn` **라인 히트 수**였다. 실제 **페이지 소비처는 각각 6 · 3** 이다. 이 수치가 커버리지를 과대 표시했다.
 
@@ -172,12 +169,12 @@ F3: PharmacyHub 는 `store_pops` · `store_qr_codes` · `kpa_store_contents` · 
 |---|---|---|
 | PharmacyHub 매장허브 홈 도입 | A1 | 1/32 |
 | 공급 상품 탐색 공통화 | B1 상태·API + PH 화면 | 부분 |
-| 공급자 콘텐츠 탐색 공통화 | E1 + E3~E5 의 KPA·KCos 데이터 계층 | 부분 (GP 제외) |
-| 이벤트 오퍼 공통화 | C2 · C3 + KCos/GP 의 C1 | 부분 (KPA 제외) |
-| 상품 신청 · 장바구니 공통화 | B3 · D1 · D2(KCos/GP) | 부분 |
+| 공급자 콘텐츠 탐색 공통화 | E1 + E3~E5 의 KPA·KCos 데이터 계층 | — |
+| 이벤트 오퍼 공통화 | C2 · C3 + KCos 의 C1 | 부분 (KPA 제외) |
+| 상품 신청 · 장바구니 공통화 | B3 · D1 · D2(KCos) | 부분 |
 | 최종 감사 · 정리 | D1 endpoint 수렴 · PH 진입점 | — |
 
-**요약**: 완료 WO 들은 "다룬 기능 안에서는" 정확했으나, 다룬 기능이 모집단의 절반 이하였다. 특히 **사이니지(E6) · 주문 내역(D4) · API client(F1) · GP 편입(E3~E5) · 허브 레이아웃(A3)** 은 어떤 WO 의 범위에도 들어간 적이 없다.
+**요약**: 완료 WO 들은 "다룬 기능 안에서는" 정확했으나, 다룬 기능이 모집단의 절반 이하였다. 특히 **사이니지(E6) · 주문 내역(D4) · API client(F1) 편입(E3~E5) · 허브 레이아웃(A3)** 은 어떤 WO 의 범위에도 들어간 적이 없다.
 
 ---
 
@@ -185,12 +182,12 @@ F3: PharmacyHub 는 `store_pops` · `store_qr_codes` · `kpa_store_contents` · 
 
 | 축 | 상태 |
 |---|---|
-| 상태 Core 공통화 | 장바구니 ✅ / 신청 ✅ / 공급목록 ✅ / hub-import 부분(GP 제외) / 사이니지 ❌ / 주문 ❌ / 이벤트(KPA) ❌ |
+| 상태 Core 공통화 | — |
 | View · Shell 공통화 | 장바구니 부분 / 이벤트 부분 / hub-import ❌ / 사이니지 ❌ / 레이아웃 ❌ / 주문 ❌ |
-| 컬럼 차이 | KPA hub-import 는 정렬 컬럼 제거(`WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 A-3` 결정), KCos·GP 는 `sortable` 유지 |
-| accent 차이 | blue(KPA) / pink(KCos) / teal(GP) — **prop 으로 흡수 가능** |
+| 컬럼 차이 | KPA hub-import 는 정렬 컬럼 제거(`WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 A-3` 결정), KCos 는 `sortable` 유지 |
+| accent 차이 | blue(KPA) / pink(KCos) / teal — **prop 으로 흡수 가능** |
 | 문구 차이 | '내 약국' vs '내 매장' — **label prop 으로 흡수 가능** |
-| pagination 차이 | KPA prev/next 버튼 vs KCos·GP `Pagination`(operator-ux-core) — **mode prop 으로 흡수 가능** |
+| pagination 차이 | KPA prev/next 버튼 vs KCos `Pagination`(operator-ux-core) — **mode prop 으로 흡수 가능** |
 | optional section 차이 | KPA 홈 최신 피드 · KPA 카테고리 트리 — **slot 으로 흡수 가능** |
 | action 차이 | 가져오기 / 담기 / 신청 — **action adapter 로 흡수 가능** |
 
@@ -211,9 +208,9 @@ F3: PharmacyHub 는 `store_pops` · `store_qr_codes` · `kpa_store_contents` · 
 
 ---
 
-## 8. GlycoPharm / Neture 참조 결과
+## 8. Neture 참조 결과
 
-**GlycoPharm** — "공식 적용 대상 제외"로 취급해 왔으나 **구조적으로는 KCos 와 동일한 store-hub 9 route 를 가진 완전 참여 서비스**다. 이 제외 때문에 E3~E5 에서 Core 미소비 사본 3개(975L)가 남았고, A3·F1 중복도 GP 몫이 그대로다. → 후속 작업에서는 **참조가 아니라 대상**으로 포함해야 중복이 실제로 줄어든다.
+→ 후속 작업에서는 **참조가 아니라 대상**으로 포함해야 중복이 실제로 줄어든다.
 
 **Neture** — 공급자→매장 원천 계약. `lib/api/storeCart.ts` 는 같은 base URL 이지만 `checkout-confirm-b2b`(결제 선행) + 자체 DTO 로 **다른 계약**이다. `ProductApprovalPage`(admin/operator)는 공급자 상품 승인 축이며 매장의 "공급 상품 신청" 과 다른 업무다. `ContentHubTemplate` 을 라이브러리 화면에서 소비하는 것 외에 Store Hub 공통 surface 소비 없음. **매장허브로 전환할 대상 아님** — 계약 확인만.
 
@@ -225,7 +222,7 @@ F3: PharmacyHub 는 `store_pops` · `store_qr_codes` · `kpa_store_contents` · 
 |---|---|---|
 | KPA `/store-hub` 하위 route | 14 | A1 · B1 · C1 · D2 · E1 · E3 · E4 · E5 · E6 · E7 · E8 · E9(2) + index |
 | KCos `/store-hub` 하위 route | 9 | A1 · B1 · E1 · E6 · E3 · E4 · E5 · C1 · D2 |
-| GP `/store-hub` 하위 route | 9 | 동일 배정 |
+ `/store-hub` 하위 route | 9 | 동일 배정 |
 | PH `/store-hub` + `/store-owner` route | 1 + 20 | A1 · B1 · B2 · D2 · D4 · D5(3) · G1(11) · G2(4) |
 | 서비스 밖 연결 route (콘텐츠 상세 · 주문 목록 · legacy redirect) | 11 | E2 · D4 · A1(redirect) |
 | 허브 layout · guard · 홈 피드 컴포넌트 | 8 | A2 · A3 · A4 |
@@ -267,12 +264,11 @@ OUT_OF_SCOPE:     2   (6%)
 ```text
 NOT_IMPLEMENTED 셀: 9
   PharmacyHub — C1 이벤트 오퍼 · E1 콘텐츠 탐색 · E3 블로그 · E4 POP · E5 QR · E6 사이니지 · B3 상품 신청
-  K-Cosmetics/GlycoPharm — E7 동영상 · E8 화면세트 (E9 다국어 포함 시 KPA 전용 3축)
 ```
 
 ### route/page 총수 ≠ 기능 모집단 수인 이유
 
-4 서비스 route 합계는 **677**(KPA 224 · KCos 180 · GP 236 · PH 37)이고 그중 Store Hub 연결은 **약 110**인데 기능 모집단은 **32**다. 차이의 원인:
+3 서비스 route 합계는 **677**(KPA 224 · KCos 180 236 · PH 37)이고 그중 Store Hub 연결은 **약 110**인데 기능 모집단은 **32**다. 차이의 원인:
 
 1. **같은 기능이 4 서비스에 4 route** — 예: 장바구니 4 route = 기능 1.
 2. **한 화면이 여러 route** — 예: PH 결제 3 route(`payment` · `success` · `fail`) = 기능 1.
@@ -295,11 +291,11 @@ NOT_IMPLEMENTED 셀: 9
 | 대상 | 현재 | 목표 |
 |---|---|---|
 | E6 사이니지 라이브러리 | 3 사본 1,811L · Core 0 | 공통 View + 서비스 adapter |
-| E3~E5 hub-import | Core 6 페이지 + GP 3 사본 | 공통 `HubImportLibraryView` + GP 편입 (pagination mode · sortable 을 prop 으로) |
-| A3 허브 레이아웃 | KPA 390 / KCos 233 / GP 234 | 공통 hub shell (PH 는 이미 공통 셸) |
+| E3~E5 hub-import | Core 6 페이지 2 사본 | 공통 `HubImportLibraryView` 편입 (pagination mode · sortable 을 prop 으로) |
+| A3 허브 레이아웃 | KPA 390 / KCos 233 234 | 공통 hub shell (PH 는 이미 공통 셸) |
 | C1 이벤트 오퍼 | KPA 969L 로컬 | `EventOffersHubList` 로 수렴(KPA 확장 요구는 slot) |
 | D2 장바구니 View | KPA 423L · PH 289L | KPA 를 `StoreCartView` 로 (PH 는 계약이 달라 제외) |
-| E2 콘텐츠 상세 | KCos · GP 2 사본 | 공통 상세 View |
+| E2 콘텐츠 상세 | KCos 1 사본 | 공통 상세 View |
 | D4 주문 내역 | 4 사본 | 공통 목록 View (계약 차이는 adapter) |
 
 **선행 결정 1건**: hub-import 의 정렬·페이지네이션 UI 정책(KPA 는 정렬 제거가 의도적 결정). 통합 전 정책을 확정해야 KPA 의 기존 결정을 되돌리지 않는다.
@@ -311,7 +307,6 @@ NOT_IMPLEMENTED 셀: 9
 | 대상 | 현재 | 목표 |
 |---|---|---|
 | F1 API client 9종 × 3 서비스 | 사본 (`blogStaff` diff 20/165 등) | `createStoreCartApi` 패턴 확장 — 공통 factory + 전송 어댑터 주입 |
-| GlycoPharm 지위 | "참조" | **정식 대상**으로 승격 (구조상 이미 동일) |
 | B2 공급 상품 상세 | PH 단독 | 타 서비스 필요 여부 판정(구현 강제 아님) |
 | F3 PharmacyHub backend | 전용 controller · 공유 테이블 | 공용 factory mount 가능 여부 **조사만** (backend 계약 변경은 별도 승인) |
 | A2 · B4 · B5 · E7~E9 KPA 전용 축 | 단일 구현 | 공통화 대상 아님을 확정 기록 |

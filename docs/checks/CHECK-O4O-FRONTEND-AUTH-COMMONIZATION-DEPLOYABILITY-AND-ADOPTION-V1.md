@@ -10,7 +10,7 @@
 ## 1. 문제 확정 — 배포 불가 결함
 
 `work/frontend-auth-commonization` 은 신규 공통 패키지 `@o4o/auth-react` 를 도입하고 5개 서비스
-(`web-kpa-society` · `web-neture` · `web-glycopharm` · `web-k-cosmetics` · `web-pharmacy-hub`)
+(`web-kpa-society` · `web-neture` · `web-k-cosmetics` · `web-pharmacy-hub`)
 `package.json` 에 `"@o4o/auth-react": "workspace:*"` 를 선언했으나,
 **5개 Dockerfile 어디에도 `packages/auth-react` COPY 가 없었다.**
 
@@ -44,7 +44,6 @@ COPY packages/auth-react/ ./packages/auth-react/               # source 단계�
 |---|---|
 | `services/web-kpa-society/Dockerfile` | +2 |
 | `services/web-neture/Dockerfile` | +2 |
-| `services/web-glycopharm/Dockerfile` | +2 |
 | `services/web-k-cosmetics/Dockerfile` | +2 |
 | `services/web-pharmacy-hub/Dockerfile` | +2 |
 
@@ -55,7 +54,7 @@ COPY packages/auth-react/ ./packages/auth-react/               # source 단계�
 | 항목 | 결과 |
 |---|---|
 | Core 안의 서비스명 조건문 | **0건** — 차이는 전부 `ServiceAuthConfig` 주입으로 표현 |
-| serviceKey 주입값 (origin/main 대비 무변경) | KPA `kpa-society` · Neture `neture` · GlycoPharm `glycopharm` · K-Cosmetics `k-cosmetics` · Pharmacy-Hub `SERVICE_KEY` |
+| serviceKey 주입값 (origin/main 대비 무변경) | KPA `kpa-society` · Neture `neture` K-Cosmetics `k-cosmetics` · Pharmacy-Hub `SERVICE_KEY` |
 | KPA 고유 동작 보존 | 자체 localStorage `AuthClient` 인스턴스 + `onAuthenticated` → `/kpa/me-context` 유지 |
 | 로그인 실패 안내 문구 | throw → result object 로 계약만 변경, `INVALID_USER`/`INVALID_CREDENTIALS`/`ACCOUNT_NOT_ACTIVE`/`ACCOUNT_LOCKED`/`SERVICE_NOT_MEMBER`/429 문구·부가상태 전부 보존 |
 | `@o4o/auth-context` (admin-dashboard 전용) | 무변경 — 이번 공통화 대상 아님 |
@@ -70,7 +69,6 @@ COPY packages/auth-react/ ./packages/auth-react/               # source 단계�
 | `pnpm install --frozen-lockfile --ignore-scripts` | PASS (lockfile 이 이미 `packages/auth-react` + 5개 링크 포함) |
 | `@o4o/web-kpa-society` build | ✓ built |
 | `@o4o/web-neture` build | ✓ built |
-| `glycopharm-web` build | ✓ built |
 | `@o4o/web-k-cosmetics` build | ✓ built |
 | `pharmacy-hub-web` build | ✓ built |
 | `@o4o/admin-dashboard` type-check | exit 0 |
@@ -80,7 +78,7 @@ COPY packages/auth-react/ ./packages/auth-react/               # source 단계�
 ### 4-2. Docker 빌드 (실제 배포 경로)
 
 `docker build -f services/<svc>/Dockerfile .` 5건 **전부 성공**
-(`web-kpa-society` · `web-neture` · `web-glycopharm` · `web-k-cosmetics` · `web-pharmacy-hub`).
+(`web-kpa-society` · `web-neture` · `web-k-cosmetics` · `web-pharmacy-hub`).
 음성 대조는 §1 참조. 임시 `Dockerfile.nofix` 는 검증 후 삭제했다.
 
 ### 4-3. 실브라우저 인증 · 권한 smoke
@@ -92,7 +90,6 @@ dev 서버(`vite --port 3000`) + 프로덕션 API `https://api.neture.co.kr`, �
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | KPA-Society | PASS (`/store/dashboard`→`/login`) | PASS | PASS (역할기반 `/store`) | — | PASS | 0 (아래 주 참조) |
 | Neture | PASS (`/admin`→`/` 로그인 모달) | PASS | **PASS** (`/admin` 복귀) | **PASS** (`/supplier/dashboard`→`/`) | PASS | 0 |
-| GlycoPharm | PASS (`/operator`→`/` 로그인 모달) | PASS | PASS (`glycopharm:admin`→`/admin`) | — | PASS (`/admin`·`/operator`→`/`, token 제거) | 0 |
 | K-Cosmetics | PASS (`/operator`→`/login`) | PASS | **PASS** (`/operator` 복귀) | — | PASS (`/operator`→`/login`, token 제거) | 0 |
 | Pharmacy-Hub | PASS (`/store-owner/products`→`/login`) | **미검증** | — | — | — | 401 1건(의도된 실패 응답) |
 

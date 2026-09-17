@@ -81,10 +81,8 @@ operator: { label: '서비스운영자', color: 'bg-gray-100 text-gray-700' },
 { value: 'kpa-a:operator', label: 'KPA 서비스운영자', description: 'KPA 커뮤니티 서비스 운영자 (kpa-society.co.kr)' },
 
 // Line 47 — 기존
-{ value: 'glycopharm:operator', label: 'GlycoPharm Operator', description: 'GlycoPharm operator' },
 
 // 변경 후
-{ value: 'glycopharm:operator', label: 'GlycoPharm 서비스운영자', description: 'GlycoPharm 서비스 운영자' },
 
 // Line 51 — 기존
 { value: 'cosmetics:operator', label: 'K-Cosmetics Operator', description: 'K-Cosmetics operator' },

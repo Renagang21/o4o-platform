@@ -1,6 +1,5 @@
 /**
  * LoginPage - K-Cosmetics
- * Based on GlycoPharm LoginPage structure
  * WO-O4O-KCOS-AUTH-DESIGN-POLISH-V1: inline style → Tailwind, hex → theme, Card/Button 적용
  */
 

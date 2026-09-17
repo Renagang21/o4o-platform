@@ -4,7 +4,7 @@
  * WO-O4O-CROSSSERVICE-HOME-LATEST-AND-GUIDE-ALIGNMENT-V1
  *
  * K-Cosmetics 도메인(K-Beauty 콘텐츠 + 매장 운영) 기준으로 작성한 가이드 카피.
- * GlycoPharm과 동일한 구조(11개 라우트)를 사용한다.
+ * 공통 구조(11개 라우트)를 사용한다.
  *
  * 링크 정합성 검증 (K-Cosmetics App.tsx 기준):
  *   /forum            ✅  ForumHubPage

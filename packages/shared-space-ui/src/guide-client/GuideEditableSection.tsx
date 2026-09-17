@@ -3,7 +3,7 @@
  * WO-O4O-GUIDE-CLIENT-EXTRACTION-V1
  *
  * 가이드/서비스 페이지의 "설명 텍스트 블록"을 운영자가 인라인 편집할 수 있게 하는 컴포넌트.
- * 기존 KPA / GlycoPharm / K-Cosmetics 의 GuideEditableSection 을 1:1 동작으로 이식.
+ * 기존 KPA / K-Cosmetics 의 GuideEditableSection 을 1:1 동작으로 이식.
  *
  * 동작:
  * - defaultContent 표시 (DB 오버라이드가 있으면 DB 값 우선)
@@ -20,7 +20,7 @@ import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
 import type { GuideClient } from './createGuideClient';
 
 export interface GuideEditableSectionProps {
-  /** 'kpa-society' | 'glycopharm' | 'k-cosmetics' | 'neture' 등 */
+  /** 'kpa-society' | 'k-cosmetics' | 'neture' 등 */
   serviceKey: string;
   pageKey: string;
   sectionKey: string;

@@ -15,7 +15,6 @@ import { GuideEditableSection } from '../../components/guide';
 
 const { terminology, uiText } = kcosmeticsConfig;
 
-// WO-O4O-GLYCOPHARM-STORE-HUB-CHANNEL-ICON-ALIGNMENT-V1 → Phase 3 K-Cosmetics:
 // O4O-GLOBAL-ICON-SYSTEM-STANDARD-V1 — emoji 제거, lucide line icon 통일 (K-Cosmetics rose/pink tone §4)
 const ICON_COLOR = '#DB2777'; // pink-600 (KCos 정체성 tone)
 const CARD_ICON_SIZE = 22;

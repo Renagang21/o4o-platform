@@ -41,7 +41,7 @@ KPA Society 디지털 사이니지 도메인에 잔존하는 **dead code (테이
 
 > **"모든 signage_* 테이블이 DEAD" 는 과장된 판정이다.**
 >
-> 실 코드 검증 결과 **12개 테이블 중 3~4개만 진성 DEAD**, 나머지는 cross-service(네처·글라이코팜·K-화장품·KPA)에서 routes/repository/frontend 를 통해 **wired** 되어 있음.
+> 실 코드 검증 결과 **12개 테이블 중 3~4개만 진성 DEAD**, 나머지는 cross-service(네처·K-화장품·KPA)에서 routes/repository/frontend 를 통해 **wired** 되어 있음.
 >
 > 반면 **local legacy entity 7개 + legacy service/controller 6개** 는 완전 orphan (runtime 진입점 0 건) → **제거 우선 대상**.
 
@@ -62,7 +62,7 @@ KPA Society 디지털 사이니지 도메인에 잔존하는 **dead code (테이
 | 검증 항목 | 결과 |
 |----------|------|
 | `signage.routes.ts` 에 `/media`, `/playlists`, `/schedules`, `/templates`, `/content-blocks`, `/layout-presets`, `/ai/generate` 라우트 존재 여부 | ✅ 모두 존재 |
-| 이 라우트들이 어떤 서비스 Frontend 에서 호출되는지 | Template: neture/glycopharm/k-cosmetics (TemplatesPage) · KPA 는 `signageTemplate.ts` api 클라이언트만 존재, 화면 사용도 낮음 |
+| 이 라우트들이 어떤 서비스 Frontend 에서 호출되는지 | KPA 는 `signageTemplate.ts` api 클라이언트만 존재, 화면 사용도 낮음 |
 | `SignagePlaylistShare`, `SignageAnalytics`, `SignageMediaTag` 에 대한 Repository / Controller 진입 여부 | ❌ 없음 (comment-only 참조) |
 | `SignageAiGenerationLog` 진입 여부 | ✅ `POST /ai/generate` 가 `content.service.ts:169` 에서 `createAiGenerationLog()` 호출 (**write-only audit trail**) |
 | Local legacy entity 7개 import 여부 | 외부 참조 없음 · 자기들끼리만 참조 (transitive cycle) |
@@ -109,7 +109,7 @@ KPA Society 디지털 사이니지 도메인에 잔존하는 **dead code (테이
 
 ### 3.2 HOLD 대상 — § 4.2 에서 상세
 
-> Templates/TemplateZones/LayoutPresets/ContentBlocks/AiGenerationLogs — 라우트와 repository 는 있으나 KPA 에서 사용도 낮음. **DROP 여부는 다른 서비스(neture/glycopharm/k-cosmetics)와 함께 재평가 필요**.
+> Templates/TemplateZones/LayoutPresets/ContentBlocks/AiGenerationLogs — 라우트와 repository 는 있으나 KPA 에서 사용도 낮음. **DROP 여부는 다른 서비스와 함께 재평가 필요**.
 
 ### 3.3 DROP 대상 — § 4.3 에서 상세
 
@@ -132,7 +132,6 @@ Route (signage.routes.ts)
 
 Frontend 소비자:
 - KPA Society: `/operator/signage/hq-media`, `/operator/signage/hq-playlists`, `ContentHubPage`, `StoreSignagePage` (legacy Asset 탭)
-- Neture/Glycopharm/K-Cosmetics: 자체 operator signage pages 존재
 
 ### 4.2 HOLD — Partial stack (usage 재확인 필요)
 
@@ -148,7 +147,6 @@ Frontend 소비자:
 Frontend 소비자 (확인됨):
 - `services/web-kpa-society/src/api/signageTemplate.ts` — API 클라이언트 존재
 - `services/web-neture/src/pages/operator/signage/TemplatesPage.tsx` ✅
-- `services/web-glycopharm/src/pages/operator/signage/TemplatesPage.tsx` ✅
 - `services/web-k-cosmetics/src/pages/operator/signage/TemplatesPage.tsx` ✅
 
 **KPA 에서는 TemplatesPage 화면 존재 여부 미확인** → 후속 WO 에서 KPA 특정 사용도 검증 필요.
@@ -289,13 +287,11 @@ StorePlaylist (canonical, routes/kpa/entities/store-playlist.entity.ts) ✅ 등�
 
 - `signage_*` 테이블은 migration `2026011700001-CreateSignageCoreEntities.ts` 에서 **전 서비스 공용** 으로 생성됨
 - `/api/signage/:serviceKey/*` 라우트도 serviceKey 를 path param 으로 받아 모든 서비스 공유
-- **따라서 DB 테이블 DROP 은 KPA 단독 결정 불가** — neture/glycopharm/k-cosmetics 에서의 사용도 확인 필수
 
 | 서비스 | signage_* 사용 확인 |
 |--------|---------------------|
 | kpa-society | ContentHubPage · HQMediaPage · HQPlaylistsPage · TemplatesPage(?) · StoreSignagePage legacy 탭 |
 | neture | TemplatesPage · TemplateDetailPage ✅ |
-| glycopharm | TemplatesPage · TemplateDetailPage ✅ |
 | k-cosmetics | TemplatesPage · TemplateDetailPage ✅ |
 
 → `signage_templates` 는 최소 3개 서비스 이상에서 사용 → **DROP 불가**, KEEP 계속.
@@ -478,7 +474,7 @@ Phase 3 (DB):
 | R3 | 로컬 legacy entity 삭제 후 미처 발견 못한 import 가 존재해 빌드 깨짐 | 낮음 | 중간 | 각 Phase 마다 `tsc -b --noEmit` 검증 필수. CI 에서 Docker build 까지 완주 확인 |
 | R4 | HOLD 판정 테이블 (Templates 등) 을 성급히 DROP | 낮음 | 높음 | 본 문서의 HOLD 분류 준수. 재평가 WO 생성 후에만 후속 판정 |
 | R5 | AI generation log 사용 중인데 DROP | 낮음 | 중간 | Phase 0.2 로그 확인 선행. 사용 시 KEEP 유지 |
-| R6 | 다른 서비스(네처/글라이코팜/K-화장품) 운영 중인 operator signage 화면 영향 | 중간 | 높음 | DROP 대상 3 테이블은 어떤 서비스도 사용 안 함 (code grep 완료). HOLD 대상은 4개 서비스 전수 검증 후 판정 |
+| R6 | 다른 서비스(네처/K-화장품) 운영 중인 operator signage 화면 영향 | 중간 | 높음 | DROP 대상 3 테이블은 어떤 서비스도 사용 안 함 (code grep 완료). HOLD 대상은 4개 서비스 전수 검증 후 판정 |
 
 ---
 

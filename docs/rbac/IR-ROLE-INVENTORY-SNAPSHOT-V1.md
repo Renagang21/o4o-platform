@@ -137,7 +137,6 @@ kpa:pharmacist         약사 (일반 회원)
 
 ```
 neture:admin / neture:supplier / neture:partner / neture:user
-glycopharm:admin / glycopharm:operator / glycopharm:pharmacy / glycopharm:supplier / glycopharm:partner / glycopharm:consumer
 cosmetics:admin / cosmetics:operator / cosmetics:supplier / cosmetics:seller / cosmetics:partner
 glucoseview:admin / glucoseview:operator
 ```
@@ -188,7 +187,6 @@ export enum CosmeticsStoreMemberRole {
 | E | PharmacistRole | `'operator'` | 약사 프로필 내 역할 레벨 | kpa_pharmacist_profiles | scope-assignment.utils.ts:28 |
 | F | ScopeLevel | `'operator'` | 서비스 접근 레벨 계층 | config 객체 (런타임) | service-scopes.ts:17 |
 | G | Prefixed role | `kpa:operator` | KPA 서비스 운영자 (prefixed) | role_assignments (planned) | roles.ts:42 |
-| H | Glycopharm legacyRoles | `'operator'` | 레거시 관리자 체크 | 코드 내 배열 리터럴 | glycopharm/controllers/*.ts |
 
 **핵심 혼재**:
 - A와 B가 같은 문자열 `'operator'`를 사용하지만 완전히 다른 테이블/의미
@@ -272,12 +270,6 @@ const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
 
 해당 파일:
 - `routes/cosmetics/cosmetics.routes.ts:56`
-- `routes/glycopharm/controllers/admin.controller.ts:56`
-- `routes/glycopharm/controllers/billing-preview.controller.ts:29`
-- `routes/glycopharm/controllers/invoice-dispatch.controller.ts:31`
-- `routes/glycopharm/controllers/invoice.controller.ts:32`
-- `routes/glycopharm/controllers/operator.controller.ts:104`
-- `routes/glycopharm/controllers/report.controller.ts:31`
 - `routes/glucoseview/glucoseview.routes.ts:55`
 - `routes/glucoseview/controllers/application.controller.ts:55`
 
@@ -293,7 +285,6 @@ const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
 | 4 | `superadmin` (typo)가 sites.routes.ts에 존재 | `modules/sites/sites.routes.ts:36` | 저 |
 | 5 | KPA member `operator`와 platform `operator`의 의미가 혼용될 위험 | 전역 | 고 |
 | 6 | prefixed role (`kpa:operator`)이 ROLE_REGISTRY에 정의되나 실제 DB에 있는지 미확인 | `types/roles.ts` | 중 |
-| 7 | Glycopharm routes에 `administrator` (오타?) 가 legacyRoles에 포함 | glycopharm/controllers | 저 |
 
 ---
 

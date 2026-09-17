@@ -272,7 +272,6 @@ SupplierTabletScreenSetsPage:15
 | 금지 | 상태 |
 |---|:---:|
 | 공통 UI 패키지 수정 | ❌ 없음 (`packages/**` 무변경) |
-| KPA / Glyco / K-Cos / Pharmacy-Hub 수정 | ❌ 없음 |
 | partnerops · admin-dashboard 수정 | ❌ 없음 |
 | backend schema / migration | ❌ 없음 (api-server 파일 0건) |
 | 권한 · role 변경 | ❌ 없음 |

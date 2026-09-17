@@ -35,7 +35,7 @@
 | 직전 origin/main | `efb206be5` (parallel session: blog content import hotfix) |
 | Push 시각 | 2026-05-24 (UTC, push 직후) |
 | Deploy workflow | Run `26351986895` ✓ Complete (success) |
-| 신규 revisions | glycopharm-web-00712-87r / kpa-society-web-01132-jkr / k-cosmetics-web-00515-7cq / neture-web-00793-8zf |
+| 신규 revisions | — |
 | 배포 시각 | 2026-05-24T04:36Z UTC |
 
 ---
@@ -48,7 +48,7 @@
 | 2 | `packages/operator-core-ui/src/modules/guide-contents/index.ts` | +4 | `GuideContentsConsolePage` + Props type export |
 | 3 | `services/web-kpa-society/src/pages/operator/OperatorGuideContentsPage.tsx` | +5/-15 | thin wrapper (`serviceKey="kpa-society"`) |
 | 4 | `services/web-neture/src/pages/operator/OperatorGuideContentsPage.tsx` | +5/-15 | thin wrapper (`serviceKey="neture"`) |
-| 5 | `services/web-glycopharm/src/pages/operator/OperatorGuideContentsPage.tsx` | +5/-15 | thin wrapper (`serviceKey="glycopharm"`, `@/` alias 유지) |
+| 5 | — | 5/-15 | thin wrapper (`@/` alias 유지) |
 | 6 | `services/web-k-cosmetics/src/pages/operator/OperatorGuideContentsPage.tsx` | +5/-15 | thin wrapper (`serviceKey="k-cosmetics"`) |
 | **합계** | | **+75 / -60** | **6 파일** |
 
@@ -135,7 +135,6 @@ operator-core-ui package: 에러 0 (npm warns 만).
 
 | Service | New Revision | 시각 |
 |---|---|---|
-| glycopharm-web | `glycopharm-web-00712-87r` | 2026-05-24T04:36:27Z |
 | kpa-society-web | `kpa-society-web-01132-jkr` | 2026-05-24T04:36:46Z |
 | k-cosmetics-web | `k-cosmetics-web-00515-7cq` | 2026-05-24T04:36:33Z |
 | neture-web | `neture-web-00793-8zf` | 2026-05-24T04:36:32Z |
@@ -151,14 +150,14 @@ Deploy Web Services workflow `26351986895` — `status=completed conclusion=succ
 ### 5.1 LMS Courses 통합 (Tier 2 로 분리)
 
 - **KPA + K-Cos**: 95% structural copy + type variance (`Course` vs `LmsCourse`, `lmsApi` 경로 차이) — 가능하나 700+ line 통합으로 risk 中
-- **GP `LmsCoursesPage.tsx`**: 완전히 다른 simpler page — bulk action 없음, status filter 없음, RowActionMenu 없음, 다른 API 계약 (`api.get('/lms/courses')` vs `lmsApi.getCourses({...})`), 다른 route (`/education/:id` vs `/lms/course/:id`). **commonization 시 feature 추가/제거 둘 다 risk** → 별건 IR-WO 필요
+- **commonization 시 feature 추가/제거 둘 다 risk** → 별건 IR-WO 필요
 
-→ 별건 후속: `IR-O4O-OPERATOR-LMS-COURSES-COMMONIZATION-DESIGN-V1` (KPA+K-Cos 통합 + GP feature gap audit).
+→ 별건 후속: `IR-O4O-OPERATOR-LMS-COURSES-COMMONIZATION-DESIGN-V1` (KPA+K-Cos 통합 feature gap audit).
 
 ### 5.2 Resources 통합 (Tier 2 로 분리)
 
-- **KPA + GP**: 95% structural copy (STATUS_CONFIG / SOURCE_CONFIG / USAGE_CONFIG / action policy / columns / wrapBulk / drawer / search form 모두 동일)
-- **GP-only feature: `AiContentModal`** — `import { AiContentModal } from '@o4o/content-editor'` + `handleAiChannelSave` + `aiCreateBtnStyle` + 헤더 "AI 콘텐츠 생성" 버튼. 통합 wrapper 가 slot prop 으로 받아야 함 — 설계 결정 필요
+- **KPA**: 95% structural copy (STATUS_CONFIG / SOURCE_CONFIG / USAGE_CONFIG / action policy / columns / wrapBulk / drawer / search form 모두 동일)
+- 통합 wrapper 가 slot prop 으로 받아야 함 — 설계 결정 필요
 
 → 별건 후속: `IR-O4O-OPERATOR-RESOURCES-COMMONIZATION-DESIGN-V1` (wrapper + opt-in AI slot 설계).
 
@@ -172,7 +171,7 @@ Rena `platform:super_admin` 또는 service operator 계정으로 4 화면 진입
 |---|---|---|
 | 1 | KPA `/operator/guide-contents` | 5 sections (문서/동영상/퀴즈/과제/라이브) 표시 + GuideBlock 저장 동작 |
 | 2 | Neture `/operator/guide-contents` | 동일 |
-| 3 | GlycoPharm `/operator/guide-contents` | 동일 |
+| 3 | — | 동일 |
 | 4 | K-Cosmetics `/operator/guide-contents` | 동일 |
 
 → wrapper 통합은 동작 변경 없음 — 4 service 모두 기존과 동일하게 작동해야 함.
@@ -202,7 +201,7 @@ Rena `platform:super_admin` 또는 service operator 계정으로 4 화면 진입
 
 | 후속 | 우선순위 | 비고 |
 |---|:---:|---|
-| `IR-O4O-OPERATOR-LMS-COURSES-COMMONIZATION-DESIGN-V1` | 中 | KPA+K-Cos 통합 + GP feature gap |
+| `IR-O4O-OPERATOR-LMS-COURSES-COMMONIZATION-DESIGN-V1` | 中 | KPA+K-Cos 통합 feature gap |
 | `IR-O4O-OPERATOR-RESOURCES-COMMONIZATION-DESIGN-V1` | 中 | wrapper + AI Modal slot 설계 |
 | Tier 2 Members detail surface canonical (선행 IR §5.2) | 中 | drawer vs page nav |
 | Tier 2 K-Cos Members bulk action 추가 | 中 | 단순 누락 |
@@ -223,7 +222,6 @@ Rena `platform:super_admin` 또는 service operator 계정으로 4 화면 진입
 
 ```bash
 # Cloud Run revisions 배포 확인
-for SVC in glycopharm-web kpa-society-web k-cosmetics-web neture-web; do
   echo "=== $SVC ==="
   gcloud run revisions list --service $SVC \
     --region asia-northeast3 --project netureyoutube \
@@ -234,7 +232,6 @@ done
 git show --stat f1e342cff
 
 # 통합 후 service-side 파일이 thin 인지 확인 (각 12 lines 예상)
-for SVC in kpa-society neture glycopharm k-cosmetics; do
   echo "=== $SVC ==="
   wc -l services/web-$SVC/src/pages/operator/OperatorGuideContentsPage.tsx
 done

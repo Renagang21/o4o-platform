@@ -98,7 +98,7 @@ export function createStoreQrStaffController(
     // WO-O4O-STORE-SLUG-CANONICAL-CONTRACT-HARDENING-V1 §6:
     //   공개 조회는 slug 만 맞는다고 끝내지 않고 **service 귀속까지 일치**해야 한다.
     //   이 컨트롤러는 서비스별 mount(`/api/v1/{service}/stores/:slug/...`)이고
-    //   `serviceKey` 는 slug 축(kpa / glycopharm / cosmetics)과 같은 값이 주입된다.
+    //   `serviceKey` 는 slug 축(kpa / cosmetics)과 같은 값이 주입된다.
     //   slug row 의 service_key 가 다르면 이 서비스의 공개 매장이 아니다
     //   (다서비스 enrollment 조직이 다른 서비스 slug 로 열리던 결함).
     if (record.serviceKey !== serviceKey) return null;
@@ -108,7 +108,7 @@ export function createStoreQrStaffController(
   // Helper: verify store ownership — pop.controller.ts / blog.controller.ts mirror
   // WO-O4O-KPA-APPROVED-STORE-OWNER-AUTO-AUTHORIZATION-FIX-V1:
   // KPA 승인 매장 경영자(role_assignments.kpa:store_owner, RBAC SSOT) 기준. created_by 아님.
-  // 교차 매장 차단은 kpaStoreOwnerOwnsStore 내부(resolved org === store.id). GP/Cosmetics 는 created_by 유지.
+  // 교차 매장 차단은 kpaStoreOwnerOwnsStore 내부(resolved org === store.id). Cosmetics 는 created_by 유지.
   async function verifyOwner(pharmacy: OrganizationStore, userId: string): Promise<boolean> {
     if (serviceKey === 'kpa') {
       return kpaStoreOwnerOwnsStore(dataSource, userId, pharmacy.id);

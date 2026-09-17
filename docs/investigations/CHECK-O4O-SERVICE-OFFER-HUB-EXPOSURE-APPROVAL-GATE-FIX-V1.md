@@ -14,7 +14,7 @@
 |------|------|
 | `apps/api-server/src/routes/o4o-store/controllers/pharmacy-products.controller.ts` | `GET /catalog` 메인/카운트 쿼리에 per-service 승인 게이트 추가 + 매핑 상수(`STORE_SERVICE_KEY_TO_APPROVAL_KEY`) |
 
-**DB migration / schema / enum 변경 없음.** Frontend 무변경. (KPA/Glyco/KCos 공유 컨트롤러 단일 수정 → 3서비스 동시 적용)
+**DB migration / schema / enum 변경 없음.** Frontend 무변경.
 
 ---
 
@@ -57,12 +57,11 @@ catalog 팩토리 serviceKey(role-prefix) → `offer_service_approvals.service_k
 | 팩토리 serviceKey | osa.service_key |
 |------|------|
 | `kpa` | `kpa-society` |
-| `glycopharm` | `glycopharm` |
 | `cosmetics` | `k-cosmetics` |
 
-근거: `APPROVAL_ELIGIBLE_SERVICE_KEYS = ['glycopharm','kpa-society','k-cosmetics']`(approval-service-keys.ts) 와 정확히 일치. `store-owner.utils.ts STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY` 와 동일 매핑(정책 SSOT 정합).
+`store-owner.utils.ts STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY` 와 동일 매핑(정책 SSOT 정합).
 
-마운트(모두 serviceKey 전달): `kpa.routes.ts:382('kpa')`, `glycopharm.routes.ts:383('glycopharm')`, `cosmetics.routes.ts:135('cosmetics')`.
+마운트(모두 serviceKey 전달): `kpa.routes.ts:382('kpa')`, `cosmetics.routes.ts:135('cosmetics')`.
 
 > back-compat: 팩토리 `serviceKey` 미지정 마운트는 게이트 미적용(기존 동작 보존). 현재 3개 마운트 모두 serviceKey 전달하므로 실제 누락 경로 없음.
 
@@ -110,7 +109,6 @@ catalog 팩토리 serviceKey(role-prefix) → `offer_service_approvals.service_k
 | 항목 | 결과 |
 |------|------|
 | PUBLIC 상품 노출 | 무변경(OR 예외) |
-| KPA/Glyco/KCos catalog 조회 | 정상(게이트만 추가) |
 | operatorView / distributionType / recommended 분기 | 무변경(게이트는 추가 AND) |
 | 운영자 승인 목록 / Neture 공급자 목록 | 무접촉 |
 | 제품 승인 submit/reject/resubmit | 무접촉 |
@@ -140,7 +138,6 @@ catalog 팩토리 serviceKey(role-prefix) → `offer_service_approvals.service_k
 | SERVICE 현재 serviceKey approved 시만 노출 | ✅ (게이트) |
 | PRIVATE 현재 serviceKey approved 시만 노출 | ✅ (게이트, 기존 조건 무변경) |
 | 교차 서비스 누출 차단 | ✅ (service_key 격리) |
-| KPA/Glyco/KCos catalog 정상 | ✅ KPA catalog PUBLIC 회귀 PASS(§7.3) |
 | 운영자 승인 목록 / 공급자 목록 무영향 | ✅ (무접촉) |
 | DB/migration 없음 | ✅ |
 | backend typecheck 통과 | ✅ |
@@ -152,7 +149,7 @@ catalog 팩토리 serviceKey(role-prefix) → `offer_service_approvals.service_k
 
 ## 11. 완료 고정 (CLOSED / PASS) — 2026-06-18
 
-**판정: CLOSED / PASS.** 수정 지점이 명확하고(catalog main+count 동일 게이트, PUBLIC 예외, SERVICE/PRIVATE serviceKey approved 필수, service_key 격리, KPA/Glyco/KCos 공유 컨트롤러 단일 적용), 현재 검증 수준으로 충분.
+**판정: CLOSED / PASS.** 수정 지점이 명확하고, 현재 검증 수준으로 충분.
 
 검증 충족: ① 결함 원인 확인 ② main/count 동시 수정 ③ serviceKey 매핑 정합 ④ typecheck PASS ⑤ 배포 성공 ⑥ PUBLIC 회귀 live 확인 ⑦ frontend/DB/migration 무영향.
 

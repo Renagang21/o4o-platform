@@ -22,7 +22,7 @@
 | **E-commerce Core** | 주문/결제를 담당하는 플랫폼 핵심 모듈 |
 | **CheckoutOrder** | 주문 엔티티 (`checkout_orders` 테이블) |
 | **OrderType** | 주문을 생성한 서비스를 식별하는 열거형 |
-| **Service Module** | GlycoPharm, Cosmetics, Tourism 등 비즈니스 서비스 |
+| **Service Module** | Cosmetics, Tourism 등 비즈니스 서비스 |
 
 ---
 
@@ -32,7 +32,6 @@
 enum OrderType {
   GENERIC = 'GENERIC',         // 일반 주문 (기본값)
   DROPSHIPPING = 'DROPSHIPPING', // 드롭쉬핑 주문
-  GLYCOPHARM = 'GLYCOPHARM',   // GlycoPharm 약국 주문
   COSMETICS = 'COSMETICS',     // Cosmetics 화장품 주문
   TOURISM = 'TOURISM',         // Tourism 관광 주문
 }
@@ -74,7 +73,6 @@ enum OrderType {
 
 | 금지 경로 | 상태 |
 |-----------|------|
-| GlycoPharm 직접 주문 생성 | ❌ 410 Gone (Phase 5-A) |
 | 서비스 모듈에서 checkout_orders INSERT | ❌ 절대 금지 |
 | OrderType 없는 주문 생성 | ❌ 기본값 GENERIC 적용 |
 
@@ -82,20 +80,7 @@ enum OrderType {
 
 ## 5. 서비스별 주문 정책
 
-### 5.1 GlycoPharm (OrderType: GLYCOPHARM)
-
-| 항목 | 정책 |
-|------|------|
-| 주문 생성 | E-commerce Core 통해서만 |
-| 기존 API | 410 Gone 반환 |
-| 주문 조회 | 기존 API 유지 (read-only) |
-| 데이터 마이그레이션 | 별도 Phase 필요 |
-
-**참조 파일**:
-- `apps/api-server/src/routes/glycopharm/controllers/order.controller.ts`
-- `apps/api-server/src/routes/glycopharm/services/order.service.ts`
-
-### 5.2 Cosmetics (OrderType: COSMETICS)
+### 5.1 Cosmetics (OrderType: COSMETICS)
 
 | 항목 | 정책 |
 |------|------|
@@ -105,14 +90,14 @@ enum OrderType {
 
 **참조 문서**: CLAUDE.md §9 (도메인별 규칙) · docs/architecture/COSMETICS-DOMAIN-RULES.md
 
-### 5.3 Dropshipping (OrderType: DROPSHIPPING)
+### 5.2 Dropshipping (OrderType: DROPSHIPPING)
 
 | 항목 | 정책 |
 |------|------|
 | 주문 생성 | E-commerce Core 통해서만 |
 | 이행(Fulfillment) | Dropshipping-Core 처리 |
 
-### 5.4 Tourism (OrderType: TOURISM)
+### 5.3 Tourism (OrderType: TOURISM)
 
 | 항목 | 정책 |
 |------|------|
@@ -130,7 +115,6 @@ POST /api/checkout/initiate
 
 Request Body:
 {
-  "orderType": "GLYCOPHARM",      // Optional, default: GENERIC
   "items": [
     {
       "productId": "uuid",
@@ -157,7 +141,6 @@ Response (201):
   "data": {
     "orderId": "uuid",
     "orderNumber": "ORD-20260111-1234",
-    "orderType": "GLYCOPHARM",
     "totalAmount": 10000,
     "payment": {
       "clientKey": "...",
@@ -227,7 +210,6 @@ CREATE INDEX idx_checkout_orders_supplier_id ON checkout_orders(supplier_id);
 CREATE TYPE checkout_orders_order_type_enum AS ENUM (
   'GENERIC',
   'DROPSHIPPING',
-  'GLYCOPHARM',
   'COSMETICS',
   'TOURISM'
 );
@@ -260,7 +242,6 @@ CREATE TYPE checkout_orders_order_type_enum AS ENUM (
 
 - CLAUDE.md §7: E-commerce Core 절대 규칙
 - CLAUDE.md §9 (도메인별 규칙) · docs/architecture/COSMETICS-DOMAIN-RULES.md — Cosmetics Domain Rules
-- WO-O4O-STRUCTURE-REFORM-PHASE5-V01: GlycoPharm 구조 개혁
 - WO-O4O-STRUCTURE-REFORM-PHASE5-A′-V01: E-commerce Core 주문 표준화
 
 ---

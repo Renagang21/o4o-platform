@@ -3,7 +3,7 @@
  *
  * WO-O4O-CROSSSERVICE-STORE-SELLER-RECRUITMENT-APPLICATION-STATUS-VIEW-V1
  *
- * KPA / GlycoPharm / K-Cosmetics 매장 앱이 공통으로 사용하는 조회 전용 뷰.
+ * KPA / K-Cosmetics 매장 앱이 공통으로 사용하는 조회 전용 뷰.
  * 데이터(fetch)는 각 서비스 wrapper 가 자체 api client 로 가져와 props 로 주입한다.
  * semantic 색(slate/emerald/red/amber)만 사용 — 서비스 accent 불필요(purge 안전).
  */

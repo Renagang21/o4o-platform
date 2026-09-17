@@ -274,7 +274,6 @@ if (serviceKey) {
 ```
 1. comparePassword(data.password, existingUser.password)   ← 기존 password 검증
 2. service_memberships insert
-3. businessInfo merge / KPA·GlycoPharm 자동 row 생성
 ```
 
 ### D.3 Phase 1 흐름 (dual-write)

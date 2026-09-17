@@ -112,7 +112,6 @@ WHERE EXISTS (
 
 **Admin 생성 시 역할 예시:**
 ```
-Frontend: roles: ['glycopharm:operator', 'neture:admin']
 → role_assignments에 INSERT됨 ✅
 ```
 
@@ -188,7 +187,7 @@ Admin 생성 (POST /admin/users)
     → 404 Not Found / 목록에서 누락
 ```
 
-**영향 범위**: Admin에서 생성한 **모든 Operator** (glycopharm, glucoseview, neture, k-cosmetics, kpa-society)
+**영향 범위**: Admin에서 생성한 **모든 Operator** (glucoseview, neture, k-cosmetics, kpa-society)
 
 ---
 
@@ -208,7 +207,6 @@ Admin 생성 (POST /admin/users)
 
 **시나리오:**
 1. 사용자 A가 neture.co.kr에서 비밀번호 "abc123"으로 가입
-2. Admin이 동일 email로 glycopharm operator 생성, 비밀번호 "xyz789" 입력
 3. 코드는 기존 유저에 role만 추가, 비밀번호 "xyz789" 무시
 4. Admin이 사용자에게 "xyz789"로 로그인하라고 안내
 5. 사용자가 "xyz789"로 로그인 시도 → 실제 비밀번호 "abc123" ≠ "xyz789" → **PASSWORD_MISMATCH**
@@ -225,7 +223,6 @@ Admin 생성 (POST /admin/users)
     password: "NewPassword123",
     firstName: "홍",
     lastName: "길동",
-    roles: ["glycopharm:operator"],     ← 서비스:역할 형태
     role: "operator",                   ← Legacy 필드
     isEmailVerified: true,
     isActive: true
@@ -250,12 +247,10 @@ Admin 생성 (POST /admin/users)
 ## 5. 비교: Registration 정상 흐름
 
 ```
-[GlycoPharm - RegisterPage.tsx:110]
   POST /auth/register
   {
     email, password,
     role: "seller",
-    service: "glycopharm",            ← serviceKey 전달됨 ✅
   }
          │
          ▼
@@ -264,7 +259,6 @@ Admin 생성 (POST /admin/users)
     │
     └─► Transaction 시작
         ├─ users INSERT ✅
-        ├─ service_memberships INSERT ✅  ← service: "glycopharm", status: "pending"
         └─ Transaction 커밋
 ```
 
@@ -283,11 +277,9 @@ SELECT id, email, status FROM users WHERE email = 'operator@example.com';
 
 -- 2. role_assignments: 역할 존재
 SELECT role, is_active FROM role_assignments WHERE user_id = :userId AND is_active = true;
--- → 'glycopharm:operator' 등
 
 -- 3. service_memberships: 서비스 소속 ← 현재 누락됨
 SELECT service_key, status, role FROM service_memberships WHERE user_id = :userId;
--- → service_key = 'glycopharm', status = 'active'
 ```
 
 ---
@@ -299,7 +291,7 @@ SELECT service_key, status, role FROM service_memberships WHERE user_id = :userI
 **위치**: `AdminUserController.ts:createUser()` (Line 221 이후)
 
 **로직**:
-1. `roles` 배열에서 serviceKey 추출 (예: `'glycopharm:operator'` → `'glycopharm'`)
+1. `roles` 배열에서 serviceKey 추출
 2. 각 serviceKey에 대해 `service_memberships` INSERT
 3. status = `'active'` (Admin 생성이므로 승인 불필요)
 4. role = roles에서 추출한 역할명
@@ -331,7 +323,6 @@ SELECT service_key, status, role FROM service_memberships WHERE user_id = :userI
 
 | 서비스 | 영향 |
 |--------|------|
-| glycopharm | Admin 생성 Operator 조회/로그인 불가 |
 | glucoseview | 동일 |
 | neture | 동일 |
 | k-cosmetics | 동일 |
@@ -357,7 +348,6 @@ WHERE u.email = :email;
 
 -- 정상 결과:
 -- | id | email | status   | service_key | sm_status | role              | ra_active |
--- | xx | ...   | approved | glycopharm  | active    | glycopharm:operator | true     |
 ```
 
 ---

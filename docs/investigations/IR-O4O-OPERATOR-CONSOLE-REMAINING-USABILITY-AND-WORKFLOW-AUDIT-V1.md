@@ -14,7 +14,7 @@ IR: `IR-O4O-OPERATOR-CONSOLE-REMAINING-USABILITY-AND-WORKFLOW-AUDIT-V1`
 
 | # | 축 | 규모 | 성격 |
 |---|-----|:---:|------|
-| **A** | **표준 목록 미전환** — raw `<table>` 잔존 | **128 페이지** | 최대 항목. admin-dashboard 71 · Neture 30 · GlycoPharm 12 · K-Cos 8 · KPA 7 |
+| **A** | **표준 목록 미전환** — raw `<table>` 잔존 | **128 페이지** | 최대 항목. admin-dashboard 71 · Neture 30 12 · K-Cos 8 · KPA 7 |
 | **B** | **테이블 표준 이원화** — `BaseTable`(admin) vs `DataTable`(operator) | 2 계열 | 같은 조직의 두 콘솔이 서로 다른 목록 계약 |
 | **C** | **권한 경계 2건** — 플랫폼 관리자의 서비스 콘솔 차단 · 로그인 오류 오분류 | 2 | 업무 단절 + 디버깅 오도 |
 
@@ -45,7 +45,7 @@ LMS · 포럼 · 분석 · 감사로그 · 역할/운영자.
 
 ### 1-C. 타 서비스
 
-Neture · GlycoPharm · K-Cosmetics 는 **전용 OperatorRoutes 파일이 없고 `App.tsx` 인라인**이다.
+Neture · K-Cosmetics 는 **전용 OperatorRoutes 파일이 없고 `App.tsx` 인라인**이다.
 KPA 만 `routes/OperatorRoutes.tsx` 로 분리되어 있어 구조가 비대칭이다.
 
 ---
@@ -77,7 +77,6 @@ KPA 운영자 페이지 상당수는 이 패키지의 **얇은 wrapper** 다(`Op
 |------|:---:|:---:|:---:|
 | `admin-dashboard` | — | — | **71** (BaseTable 38) |
 | `web-neture` | 11 | 17 | **30** |
-| `web-glycopharm` | 23 | 27 | 12 |
 | `web-k-cosmetics` | 22 | 20 | 8 |
 | `web-kpa-society` | 21 | 47 | 7 |
 

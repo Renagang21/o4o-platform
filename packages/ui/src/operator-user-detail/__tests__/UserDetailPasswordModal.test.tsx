@@ -89,7 +89,7 @@ describe('PasswordModal — 대상 서비스 확정', () => {
   });
 
   it('후보 1개: 서비스명 표시 + 자동 확정 후 { password, serviceKey } 전송', async () => {
-    const { put } = await openPasswordModal([membership('glycopharm')]);
+    const { put } = await openPasswordModal([membership('kpa-society')]);
     expect(screen.getByText('대상 서비스')).toBeTruthy();
     expect(screen.queryByRole('combobox')).toBeNull();
     expect(submitButton().disabled).toBe(false);
@@ -98,11 +98,11 @@ describe('PasswordModal — 대상 서비스 확정', () => {
     fireEvent.click(submitButton());
 
     await waitFor(() => expect(put).toHaveBeenCalledTimes(1));
-    expect(put).toHaveBeenCalledWith('/operator/members/u-1', { password: 'newpass123', serviceKey: 'glycopharm' });
+    expect(put).toHaveBeenCalledWith('/operator/members/u-1', { password: 'newpass123', serviceKey: 'kpa-society' });
   });
 
   it('후보 복수: 선택 전 제출 비활성 · 선택 후 그 serviceKey 로 전송', async () => {
-    const { put } = await openPasswordModal([membership('glycopharm'), membership('k-cosmetics')]);
+    const { put } = await openPasswordModal([membership('kpa-society'), membership('k-cosmetics')]);
     const select = screen.getByRole('combobox') as HTMLSelectElement;
     expect(select.value).toBe('');
     expect(submitButton().disabled).toBe(true);
@@ -130,7 +130,7 @@ describe('PasswordModal — 대상 서비스 확정', () => {
 // WO-O4O-OPERATOR-MEMBER-PASSWORD-MIN-LENGTH-UNIFY-V1
 describe('PasswordModal — 비밀번호 정책(8자 + 영문 + 숫자)', () => {
   it('8자 미만이면 안내 문구를 띄우고 전송하지 않는다', async () => {
-    const { put } = await openPasswordModal([membership('glycopharm')]);
+    const { put } = await openPasswordModal([membership('kpa-society')]);
 
     fireEvent.change(screen.getByPlaceholderText(/새 비밀번호/), { target: { value: 'pass123' } }); // 7자
     fireEvent.click(submitButton());
@@ -140,19 +140,19 @@ describe('PasswordModal — 비밀번호 정책(8자 + 영문 + 숫자)', () => 
   });
 
   it('정확히 8자는 전송한다 (경계값)', async () => {
-    const { put } = await openPasswordModal([membership('glycopharm')]);
+    const { put } = await openPasswordModal([membership('kpa-society')]);
 
     fireEvent.change(screen.getByPlaceholderText(/새 비밀번호/), { target: { value: 'pass1234' } });
     fireEvent.click(submitButton());
 
     await waitFor(() => expect(put).toHaveBeenCalledTimes(1));
-    expect(put).toHaveBeenCalledWith('/operator/members/u-1', { password: 'pass1234', serviceKey: 'glycopharm' });
+    expect(put).toHaveBeenCalledWith('/operator/members/u-1', { password: 'pass1234', serviceKey: 'kpa-society' });
   });
 
   it('영문만 / 숫자만은 길이가 충분해도 거절한다 (WO-...-COMPLEXITY-POLICY-UNIFY-V1)', async () => {
     for (const pw of ['abcdefghij', '1234567890']) {
       cleanup();
-      const { put } = await openPasswordModal([membership('glycopharm')]);
+      const { put } = await openPasswordModal([membership('kpa-society')]);
       fireEvent.change(screen.getByPlaceholderText(/새 비밀번호/), { target: { value: pw } });
       fireEvent.click(submitButton());
 
@@ -162,17 +162,17 @@ describe('PasswordModal — 비밀번호 정책(8자 + 영문 + 숫자)', () => 
   });
 
   it('특수문자 없이 영문+숫자 8자면 전송한다 (특수문자는 필수 아님)', async () => {
-    const { put } = await openPasswordModal([membership('glycopharm')]);
+    const { put } = await openPasswordModal([membership('kpa-society')]);
 
     fireEvent.change(screen.getByPlaceholderText(/새 비밀번호/), { target: { value: 'abcd1234' } });
     fireEvent.click(submitButton());
 
     await waitFor(() => expect(put).toHaveBeenCalledTimes(1));
-    expect(put).toHaveBeenCalledWith('/operator/members/u-1', { password: 'abcd1234', serviceKey: 'glycopharm' });
+    expect(put).toHaveBeenCalledWith('/operator/members/u-1', { password: 'abcd1234', serviceKey: 'kpa-society' });
   });
 
   it('입력 필드가 8자 이상을 안내한다', async () => {
-    await openPasswordModal([membership('glycopharm')]);
+    await openPasswordModal([membership('kpa-society')]);
     const input = screen.getByPlaceholderText(/새 비밀번호/) as HTMLInputElement;
     expect(input.placeholder).toContain('8자 이상');
     expect(input.minLength).toBe(8);

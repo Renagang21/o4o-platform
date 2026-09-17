@@ -83,7 +83,6 @@ IR 이 B안을 택한 근거가 "로그인 성공만으로 접근 가능한 writ
 | `dashboard-assets.copy-handlers.ts:166,239,319,393` | `organizationId: targetDashboardId` |
 
 → WO §5-C 지시대로 **변수명(`organizationId`)만 보고 별도 대시보드 원장을 신설하지 않았다.**
-`services/web-glycopharm/src/api/dashboardCopy.ts` 는 클라이언트만 존재하고 실제 호출부가 없다(미사용).
 
 ### 2.5 조직·소유권 SSOT
 

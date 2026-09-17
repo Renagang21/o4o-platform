@@ -151,8 +151,7 @@
 |---|---|---|
 | [O4O-3-ROLE-FLOW-BASELINE-V1](baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) | 3자 Canonical Flow (책임 매트릭스 · 원천 자료 vs 실행 자산 · AI 개입 지점). **§2 단선 흐름 · §6 첫 항목(공급자 HUB 직접 게시 금지) · §3 공급자 직접 제작 ❌ 는 2026-09-16 판정 확정 → [ROLE-WORKSPACE-ARCHITECTURE](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §2-1 · §6 으로 SUPERSEDED** (헤더 표기, 본문 보존). §4 · §5 는 참고만, 근거로 승격하지 않는다 | 부분 SUPERSEDED (판정 확정) |
 | [O4O-RETAIL-STABLE-V1](platform/architecture/O4O-RETAIL-STABLE-V1.md) | `channel_type='B2C'` storefront closed loop 을 기술 — [COMMERCE-BOUNDARY](baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) §2 · §12 와 충돌 후보. 결제 leg 은 이미 `410` 으로 차단. 동 문서 §8 판정 전까지 `UNKNOWN` — **기능 복구·확장 금지** (문서 헤더 2026-08-25 표기 참조) | 판정 대기 |
-| [E-COMMERCE-ORDER-CONTRACT](baseline/E-COMMERCE-ORDER-CONTRACT.md) | 기술 계약. **유효한 부분**: 주문 생성은 `checkoutService.createOrder()` 단일 지점 · `*_orders` / `*_payments` 독립 테이블 금지. **stale 부분**: §3 · §5 · §7.2 의 `OrderType` 열거(GLYCOPHARM 서비스 삭제 2026-09-08 · DROPSHIPPING 제거 · 엔티티가 `order_type` 컬럼을 매핑하지 않음). 현행 살아있는 주문 축의 정본은 [B2B 계약](baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 본문 정리는 후속 docs 정비 | 판정 대기 |
-| [GLYCOPHARM-LEGACY-POSTMORTEM](baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md) | GlycoPharm 서비스 제거 경위 — legacy 판정 기록 | ACTIVE |
+| [E-COMMERCE-ORDER-CONTRACT](baseline/E-COMMERCE-ORDER-CONTRACT.md) | 기술 계약. **유효한 부분**: 주문 생성은 `checkoutService.createOrder()` 단일 지점 · `*_orders` / `*_payments` 독립 테이블 금지. **stale 부분**: §3 · §5 · §7.2 의 `OrderType` 열거(DROPSHIPPING 제거 · 엔티티가 `order_type` 컬럼을 매핑하지 않음). 현행 살아있는 주문 축의 정본은 [B2B 계약](baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md). 본문 정리는 후속 docs 정비 | 판정 대기 |
 
 ---
 

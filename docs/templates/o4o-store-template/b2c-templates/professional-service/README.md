@@ -54,7 +54,6 @@
 ## 권장 OrderType
 
 - `PHARMACY` (향후)
-- `GLYCOPHARM` (현재 read-only 사례)
 - `HEALTHCARE` (확장용)
 
 ## 주요 특징

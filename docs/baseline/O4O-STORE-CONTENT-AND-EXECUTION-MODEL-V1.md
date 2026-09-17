@@ -226,7 +226,7 @@ Content  x  Placement  x  Store/Corner  x  Period
 | **2** | **KPA reference implementation 정비** — 가장 두꺼운 구현을 canonical 로 정렬. |
 | **3** | **공통 Core 추출** — 정렬된 KPA 구현에서 공통 계약·패키지 추출. |
 | **4** | **PharmacyHub 동일 adoption** — §9 parity 실현. |
-| **5** | **K-Cosmetics · GlycoPharm 등 확장.** |
+| **5** | **K-Cosmetics 등 확장.** |
 
 **순서를 건너뛰지 않는다.** 특히 Phase 2 이전에 Phase 3(공통화)을 하면 **오래된 세대를 공통 자산으로 고정**하는 실패가 발생한다(자매 IR §4-4 실측 참조).
 

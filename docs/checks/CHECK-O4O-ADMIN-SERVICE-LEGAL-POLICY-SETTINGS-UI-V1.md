@@ -89,8 +89,8 @@ Neture wrapper 가 `@o4o/auth-client` 의 `api`(axios)로 구현. publish 는 `P
 ---
 
 ## 후속 과제 (CHECK 기록)
-- **GP / K-Cosmetics wrapper 연결** — 동일 공통 컴포넌트에 serviceKey + authClient 어댑터만 주입(후속 WO).
+- **K-Cosmetics wrapper 연결** — 동일 공통 컴포넌트에 serviceKey + authClient 어댑터만 주입(후속 WO).
 - **KPA 통합** — KPA 는 기존 `/operator/legal` + `kpa_legal_documents` 유지(이번 제외). KPA 는 **법정정보(ServiceLegalProfile) 저장소가 없고**, KPA 약관이 `kpa_legal_documents`(별도) vs 신규 `service_policy_documents` 로 이원화됨 → **두 정책 문서 모델 일원화 + KPA 법정정보 도입**은 별도 통합 IR/WO 필요.
 - **정책 문서 본문 RichTextEditor** 전환(현재 textarea), **공개 라우트/동적 푸터 연동**(WO-O4O-CROSSSERVICE-POLICY-ROUTES-V1 / DYNAMIC-LEGAL-FOOTER-V1).
 
-*Date: 2026-06-12 · Status: CODE PASS. Neture 우선 연결, KPA 제외, GP/KCos 후속.*
+*Date: 2026-06-12 · Status: CODE PASS. Neture 우선 연결, KPA 제외, KCos 후속.*

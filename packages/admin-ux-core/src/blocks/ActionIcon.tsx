@@ -54,7 +54,7 @@ const ICON_NAME_MAP: Record<string, LucideIcon> = {
   'badge-percent': BadgePercent,
   home: Home,
   'scroll-text': ScrollText,
-  // WO-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1 (Phase C): KPA/GP admin Structure Actions 정렬
+  // WO-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1 (Phase C): KPA admin Structure Actions 정렬
   'bar-chart-3': BarChart3,
   'building-2': Building2,
   settings: Settings,

@@ -10,7 +10,7 @@
 ## 1. 요약 판정 (IR HIGH 4 → 정밀화)
 | table | scanned dir 생성 | typeorm_migrations | runtime 참조 | guard | 판정 |
 |-------|:---:|:---:|------|------|:---:|
-| **operator_action_dismissals** | ❌ NONE | ❌ 미적용 | ✅ **live** (common action-queue, KPA/Glyco/KCos 마운트) | read=graceful / **dismiss-write=미가드(500)** | **A 🔴 CONFIRMED_MISSING (구조적 고확신)** |
+| **operator_action_dismissals** | ❌ NONE | ❌ 미적용 | ✅ **live** | read=graceful / **dismiss-write=미가드(500)** | **A 🔴 CONFIRMED_MISSING (구조적 고확신)** |
 | store_contents | ❌(kpa_store_contents 는 substring 오탐) | ❌ | ⚠️ ContentAnalyticsService 만 | — | **D unwired** |
 | content_analytics | ❌ | ❌ | ⚠️ ContentAnalyticsService 만 | — | **D unwired** |
 | store_content_blocks | ❌ | ❌ | **0 refs** | — | **D unused** |
@@ -21,10 +21,6 @@
 - orphaned `CreateOperatorActionDismissals1771200000020` 만 이 테이블 생성. **scanned `database/migrations` 에 생성 migration 없음**(grep NONE).
 - prod `typeorm_migrations`(applied 501) 에 **미등록**. `synchronize=false`(connection/migration-config) → migration 외 자동 생성 경로 없음.
 - → **구조적으로 prod 에 존재할 수 없음**(o4o_payments 와 동일 메커니즘: orphaned dir 미스캔 → 영구 미적용). 고확신 MISSING.
-- **runtime 영향 (live)**: 공통 `createActionQueueRouter`(`src/common/action-queue/action-queue.controller.ts`)가 **KPA·GlycoPharm·K-Cosmetics** operator 라우트에 마운트:
-  - 읽기 `getDismissedActionIds`(action-queue-dismiss.ts): **try/catch graceful** — 테이블 없으면 빈 Set + warn 로그(액션 큐 목록은 정상). 500 아님.
-  - 쓰기 `/actions/dismiss/:actionId` INSERT: **개별 가드 없음** → 테이블 부재 시 outer catch → **HTTP 500 INTERNAL_ERROR**. (execute 자동 dismiss INSERT 는 try/catch 가드되어 무시됨.)
-  - → **운영자가 액션 큐에서 "dismiss" 클릭 시 500**(3 서비스 공통). 액션 큐 로드/실행 자체는 graceful 하여 가시성 낮음 — 그래서 지금까지 미발견(o4o_payments 와 유사한 잠재화).
 - **잔여 100% 확인 방법**(read-only 한계): `gcloud sql to_regclass('public.operator_action_dismissals')` 또는 operator 계정으로 `/actions/dismiss` 1회 probe(500=부재/200=존재). 본 CHECK 는 구조 증거로 MISSING 확정.
 
 ## 3. store_contents / content_analytics / store_content_blocks — 다운그레이드

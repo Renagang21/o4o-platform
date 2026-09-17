@@ -38,7 +38,7 @@
 | 1 | Theme Foundation | WO-O4O-THEME-* | CSS 변수 정의, Tailwind 매핑, 서비스별 primary color 분리 |
 | 2 | TemplateProvider | WO-O4O-TEMPLATE-PROVIDER-V1 | `TemplateContext` + `useTemplate()` hook, 3-tier fallback |
 | 3 | serviceConfig.template 연동 | WO-O4O-TEMPLATE-PRESET-DEFINITION-V1 | `serviceConfig.template` → `templates[key]` → `TemplateProvider` 자동 연결 |
-| 4 | Template Preset Registry | WO-O4O-TEMPLATE-PRESET-DEFINITION-V1 | 4개 preset 등록 (kpa, glycopharm, kcosmetics, referenceA) |
+| 4 | Template Preset Registry | WO-O4O-TEMPLATE-PRESET-DEFINITION-V1 | 3개 preset 등록 (kpa, kcosmetics, referenceA) |
 | 5 | Component 표준화 | WO-O4O-TEMPLATE-* | PageHero / PageSection / Card / Button / Icon이 template을 자동 소비 |
 | 6 | Responsive Layout 토큰 | WO-O4O-TEMPLATE-RESPONSIVE-LAYOUT-V1 | `LayoutTemplate` 추가 (container, grid, gap), PageContainer 연동, KPI grid 표준화, JS @media 제거 |
 | 7 | Responsive List 패턴 | WO-O4O-RESPONSIVE-LIST-V1 + EXPAND-V1 | Desktop Table / Mobile Card 이중 렌더링 패턴 확립 및 확산 |
@@ -47,20 +47,20 @@
 
 ## 3. 서비스별 Home 디자인 결과
 
-| 항목 | KPA Society | GlycoPharm | K-Cosmetics |
-|------|-------------|------------|-------------|
-| **성격** | 기관 / 전문 / 신뢰 | 관리 / 데이터 / 헬스 | 브랜드 / 감성 / 여백 |
-| **Hero bg** | `bg-primary-50` | `bg-primary-50` | `bg-primary-50` |
-| **Hero border** | `border border-primary-100` | `border-b border-border` | `border border-primary-100` |
-| **Hero padding** | `py-16` | `py-10` | `py-20` |
-| **Card radius** | `rounded-md` | `rounded-lg` | `rounded-xl` |
-| **Card shadow** | `shadow-none` | `shadow-sm` | `shadow-md` |
-| **Section spacing** | `mb-16` | `mb-12` | `mb-20` |
-| **Button radius** | `rounded-md` | `rounded-lg` | `rounded-full` |
-| **Icon wrapper** | 없음 (텍스트만) | `bg-primary-50 rounded-lg w-9 h-9` | `bg-primary-50 rounded-full w-11 h-11` |
-| **Layout container** | `max-w-5xl` | `max-w-5xl` | `max-w-6xl` |
-| **Layout grid** | `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4` | `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4` | `grid-cols-2 lg:grid-cols-4` |
-| **Layout gap** | `gap-4` | `gap-3` | `gap-4` |
+| 항목 | KPA Society | K-Cosmetics |
+| ------ | ------------- | ------------- |
+| **성격** | 기관 / 전문 / 신뢰 | 브랜드 / 감성 / 여백 |
+| **Hero bg** | `bg-primary-50` | `bg-primary-50` |
+| **Hero border** | `border border-primary-100` | `border border-primary-100` |
+| **Hero padding** | `py-16` | `py-20` |
+| **Card radius** | `rounded-md` | `rounded-xl` |
+| **Card shadow** | `shadow-none` | `shadow-md` |
+| **Section spacing** | `mb-16` | `mb-20` |
+| **Button radius** | `rounded-md` | `rounded-full` |
+| **Icon wrapper** | 없음 (텍스트만) | `bg-primary-50 rounded-full w-11 h-11` |
+| **Layout container** | `max-w-5xl` | `max-w-6xl` |
+| **Layout grid** | `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4` | `grid-cols-2 lg:grid-cols-4` |
+| **Layout gap** | `gap-4` | `gap-4` |
 
 ---
 
@@ -72,9 +72,9 @@
 | StoreHub | 완료 | 3개 서비스 |
 | Forum List | 완료 | KPA (reference) |
 | Auth | 완료 | K-Cosmetics |
-| Content List | 완료 | KPA (GlycoPharm/K-Cosmetics는 이미 카드형 또는 해당 없음) |
+| Content List | 완료 | KPA (K-Cosmetics는 이미 카드형 또는 해당 없음) |
 | Resources List | 완료 | 3개 서비스 (공유 템플릿 1회 수정) |
-| Store Dashboard | 완료 | KPA, K-Cosmetics (GlycoPharm은 HubLayout 사용) |
+| Store Dashboard | 완료 | KPA, K-Cosmetics |
 | Responsive Layout | 완료 | PageContainer + KPI grid + Home 2-column |
 | Responsive List | 완료 | Forum / Content / Resources |
 
@@ -134,7 +134,6 @@
 | Key | 이름 | Category | 역할 | 사용 서비스 |
 |-----|------|----------|------|------------|
 | `kpa` | KPA Professional | professional | 전문기관형 — 절제, border 중심, 그림자 없음 | KPA Society |
-| `glycopharm` | Health Dashboard | dashboard | 대시보드형 — 컴팩트, 가벼운 그림자, 정보 밀도 | GlycoPharm |
 | `kcosmetics` | Beauty Brand | brand | 브랜드형 — 넉넉한 여백, 큰 곡률, pill 버튼 | K-Cosmetics |
 | `referenceA` | Premium SaaS | experimental | 실험형 — gradient hero, 큰 그림자, 넓은 간격 | 미적용 (실험) |
 

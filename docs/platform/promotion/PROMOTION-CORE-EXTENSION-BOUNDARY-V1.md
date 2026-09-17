@@ -22,7 +22,7 @@ Core 엔진과 확장앱으로 나누어 개발하기 위한 **책임 경계**�
 | **Promotion Content** | Hero 슬라이드, 광고 카드, 이벤트 배너, 파트너 로고, 안내 블��� 등 운영자가 관리하는 노출용 콘텐츠의 총칭 |
 | **Slot** | 화면에서 Promotion Content가 배치되는 위치. `slotKey`로 식별 |
 | **Core** | `cms-core` 패키지의 `CmsContent` + `CmsContentSlot` 엔티티 및 ���통 API |
-| **확장앱** | 각 서비스(`neture`, `glycopharm`, `kpa`, `k-cosmetics`)가 Core 위에 추가하는 서비스별 로직/UI |
+| **확장앱** | 각 서비스(`neture`, `kpa`, `k-cosmetics`)가 Core 위에 추가하는 서비스별 로직/UI |
 
 ---
 
@@ -32,12 +32,12 @@ Core 엔진과 확장앱으로 나누어 개발하기 위한 **책임 경계**�
 ┌─────────────────────────────────────────────────────┐
 │                    프론트엔드                         │
 │                                                     │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
-│  │ neture   │  │glycopharm│  │  kpa     │  │ k-cos    │
-│  │ (확장앱) │  │ (확장앱) │  │ (확장앱) │  │ (확장앱) │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘
-│       │              │              │              │
-│  ┌────┴──────────────┴──────────────┴──────────────┴───┐
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐
+│  │ neture   │  │  kpa     │  │ k-cos    │
+│  │ (확장앱) │  │ (확장앱) │  │ (확장앱) │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘
+│       │              │              │
+│  ┌────┴──────────────┴──────────────┴─────────────────┐
 │  │        공통 훅/컴포넌트 레이어 (Core UI)             │
 │  │  useSlotContent() / SlotHeroSlider / SlotAdGrid    │
 │  └─────────────────────┬���──────────────────────────────┘
@@ -64,7 +64,6 @@ Core 엔진과 확장앱으로 나누어 개발하기 위한 **책임 경계**�
 │  ┌─────────────────────────────────────────────────────┐
 │  │        서비스별 확장 API (확장앱)                     │
 │  │  /neture/admin/homepage-contents (Neture 전용)      │
-│  │  /glycopharm/community/manage/ads (GP 전용)         │
 │  │  /kpa/community/manage/ads (KPA 전용)               │
 │  └─────────────────────────────────────────────────────┘
 └─────────────────────────────────────────────────────────┘
@@ -96,7 +95,7 @@ Core는 **모든 서비스가 공유하는 공통 기반**만 제공한다.
 | E1 | 서비스별 slotKey 등록 및 초기 콘텐츠 시딩 | Neture: `home-hero`, `home-ads`, `home-logos` |
 | E2 | 운영자 관리 화면 (슬롯 콘텐츠 CRUD UI) | Neture Admin Homepage Manager |
 | E3 | 서비스별 Hero 디자인 변형 (색상, 그라데이션, 레이아웃) | KPA: 네이비 ��경, K-Cos: 슬레���트 배경 |
-| E4 | 서비스별 비즈니스 로직이 필요한 섹션 | GlycoPharm Store Hero (Store Template 종속) |
+| E4 | 서비스별 비즈니스 로직이 필요한 섹션 | Store Template 종속 Hero 등 (Core 대상 아님) |
 | E5 | 기존 `community_ads`/`community_sponsors` 테이블 유지 관리 | Phase 1에서 병행 운영, 향후 마이그레이션 판단 |
 
 ---
@@ -159,7 +158,6 @@ Core는 **모든 서비스가 공유하는 공통 기반**만 제공한다.
 
 | 서비스 | 예외 | ��응 |
 |--------|------|------|
-| GlycoPharm | Store Hero는 Store Template 시스템에 종속 | CmsContentSlot과 ��도 유지. Store 영역은 Core 대상 아님 |
 | KPA | Intranet Hero/PromoCard는 조직별 자율 관리 | `organizationId`로 격리. 기존 타입(`HeroSlide`, `PromoCard`)은 CmsContent로 점진 전환 |
 | KPA | PartnerLink는 지부만 관리 가능 | `organizationId` + metadata에 `managedBy: 'branch'` 저장 |
 | K-Cosmetics | Home 전면 하드코딩 | Phase 1 우선 전환 대상 |

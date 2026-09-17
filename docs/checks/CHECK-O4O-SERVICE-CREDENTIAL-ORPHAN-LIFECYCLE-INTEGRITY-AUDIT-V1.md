@@ -54,7 +54,6 @@
 | pharmacy-hub | 16 | 7 |
 | neture | 13 | 6 |
 | kpa-society | 12 | 7 |
-| glycopharm | 10 | 6 |
 | k-cosmetics | 7 | 2 |
 
 orphan 은 특정 서비스에 편중되지 않는다 → **서비스별 write-path 문제가 아니라 공통 lifecycle 문제**(§8 판정).

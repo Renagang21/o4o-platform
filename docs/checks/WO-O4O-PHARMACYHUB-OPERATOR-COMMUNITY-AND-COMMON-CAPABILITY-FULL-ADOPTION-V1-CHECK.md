@@ -241,7 +241,7 @@ WO 명시 제외 대상(매장 HUB · 거래 개입) 및 PH 에 대응 도메인
 
 | # | 결함 | 근본 원인 | 처리 |
 |---|------|-----------|------|
-| D1 | `/operator/members` · `/operator/analytics/actions` 에 **타 서비스 데이터 혼입** (회원 16명 중 neture/kpa-society/k-cosmetics 7명, 로그에 `glycopharm.*`) | `resolveOperatorScope` 의 비-platform-admin 분기가 `query.serviceKey` 를 전혀 읽지 않음 (F6 Boundary Rule 3 위반) | `serviceScope.ts` 에서 **좁히기 전용** 해석 추가 (`7184aba3f`). 보유 scope 밖 키는 빈 scope. 프로덕션 재검증: 회원 9 · 액션 24 로 정상화 |
+| D1 | `/operator/members` · `/operator/analytics/actions` 에 **타 서비스 데이터 혼입** | `resolveOperatorScope` 의 비-platform-admin 분기가 `query.serviceKey` 를 전혀 읽지 않음 (F6 Boundary Rule 3 위반) | `serviceScope.ts` 에서 **좁히기 전용** 해석 추가 (`7184aba3f`). 보유 scope 밖 키는 빈 scope. 프로덕션 재검증: 회원 9 · 액션 24 로 정상화 |
 | D2 | `/operator/members` 에 `가입 신청` 탭 2개 | 공통 콘솔이 built-in `pending` 탭을 항상 덧붙이는데 wrapper 가 중복 선언 | wrapper 에서 `status-pending` 제거 (`7184aba3f`) |
 | D3 | 회원 상세 모달 `활성화` 버튼이 **동작하지 않음**(200 · 무변화 · 토스트 없음) | 공통 `MembershipConsoleController.updateMemberStatus` 의 `approved` 분기가 `status IN ('pending','rejected')` membership 만 조회 — `suspended` 는 대상 밖. `비활성화`→`활성화` 왕복 불가 | **본 WO 범위 밖(4개 서비스 공유 backend 계약)** — 미수정, 별도 WO 제안. 우회 경로(`pending`→`approved`)는 존재 |
 | D4 | 공통 `RoleManagementPage` 의 `SERVICE_OPTIONS` 가 role prefix(`kpa`,`cosmetics`) 값을 쓰는데 backend 는 canonical key(`kpa-society`,`k-cosmetics`) 와 비교 | 기존 잠재 결함 (본 WO 이전부터) | 미수정 · 보고만. Pharmacy-Hub 는 `lockedServiceKey` 로 우회 |

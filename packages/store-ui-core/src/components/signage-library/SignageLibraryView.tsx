@@ -3,19 +3,19 @@
  *
  * WO-O4O-STORE-HUB-COMMON-VIEW-AND-SHELL-UNIFICATION-V1
  *
- * KPA / K-Cosmetics / GlycoPharm 의 대형 사본 3벌(1,811L)을 대체한다.
+ * KPA / K-Cosmetics 의 대형 사본 2벌을 대체한다.
  * 서비스가 넘기는 것은 useSignageLibrary 결과 + config 뿐이고, 이 View 안에는
  * 서비스 이름으로 갈라지는 분기가 없다.
  *
  * config 로 흡수한 실제 차이:
- *   accent          blue(KPA·GP) / pink(KCos)
- *   ownerLabel      '내 약국'(KPA·GP) / '내 매장'(KCos)
+ *   accent          blue(KPA) / pink(KCos)
+ *   ownerLabel      '내 약국'(KPA) / '내 매장'(KCos)
  *   sortable        KPA false — WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-3)
  *                   에서 "현재 페이지만 정렬되는 UI" 를 의도적으로 제거했다. 되돌리지 않는다.
  *   headerAction    KPA 만 '플레이리스트 만들기' CTA
  *   importedTargets KPA 만 가져오기 직후 사본 확인 배너 (A-6)
  *   producerTabs    서비스별 출처 필터 옵션
- *   guide           안내문 링크 대상 (KPA canonical playlist / KCos·GP signage)
+ *   guide           안내문 링크 대상 (KPA canonical playlist / KCos signage)
  *   labels          유형·출처 라벨 맵 (@o4o/types 의존을 Core 로 끌어오지 않기 위해 주입)
  */
 
@@ -68,7 +68,7 @@ export interface SignageLibraryViewProps<T extends SignageLibraryItem> {
   producerLabels: Record<string, string>;
   /**
    * 컬럼 정렬 UI 노출 여부. 서버 정렬이 아니라 현재 페이지만 정렬되므로
-   * 서비스 정책이 갈린다. 기본은 현행 KCos/GP 동작(true).
+   * 서비스 정책이 갈린다. 기본은 현행 KCos 동작(true).
    */
   sortable?: boolean;
   /** 헤더 우측 CTA (KPA '플레이리스트 만들기'). 없으면 헤더는 제목만 렌더한다. */

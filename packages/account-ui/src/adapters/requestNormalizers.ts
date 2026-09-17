@@ -25,7 +25,7 @@ function pick<T = unknown>(raw: AnyRecord, ...keys: string[]): T | undefined {
 /**
  * `GET /api/v1/forum/category-requests/my` 응답 1건 → `MyRequestItem`.
  *
- * 이 endpoint 는 KPA / GlycoPharm / K-Cosmetics / Neture 가 동일 계약으로
+ * 이 endpoint 는 KPA / K-Cosmetics / Neture 가 동일 계약으로
  * 소비한다(serviceCode 쿼리만 다르다). camelCase / snake_case 를 모두 받는다.
  */
 export function normalizeForumCategoryRequest(input: unknown): MyRequestItem {

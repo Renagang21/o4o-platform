@@ -1,6 +1,5 @@
 /**
  * Pages Index - K-Cosmetics
- * Based on GlycoPharm structure
  */
 
 export { HomePage } from './HomePage';

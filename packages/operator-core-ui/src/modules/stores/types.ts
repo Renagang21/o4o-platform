@@ -4,7 +4,7 @@
  * WO-O4O-OPERATOR-STORES-CORE-EXTRACTION-V1
  * 설계 기준: docs/architecture/OPERATOR-CORE-DESIGN-V1.md §4
  *
- * 4 서비스(KPA, GlycoPharm, K-Cosmetics, Neture) 공통 Store 모델 + 주입 인터페이스.
+ * 3 서비스(KPA, K-Cosmetics, Neture) 공통 Store 모델 + 주입 인터페이스.
  * 서비스별 차이는 generic 확장 + Adapter / Config / Slot 패턴으로 흡수한다.
  */
 
@@ -68,7 +68,7 @@ export interface StoresListParams {
 // ─── Adapter Interface (서비스가 주입) ──────────────────────────────────────
 
 /**
- * 서비스별 http 클라이언트(KPA fetch wrapper, Glyco/K-Cos axios)를 흡수하는 어댑터.
+ * 서비스별 http 클라이언트(KPA fetch wrapper, K-Cos axios)를 흡수하는 어댑터.
  * LMS V2 의 LmsHttpClient 와 동일한 factory injection 패턴.
  *
  * 사용 예 (KPA):
@@ -102,7 +102,7 @@ export interface StoresConfig {
     /** 매장 허브/관리 진입점 라벨 (예: "약국 운영 허브") */
     storeHubLabel?: string;
   };
-  /** Color scheme — Glyco primary / K-Cos pink 등 서비스 톤 */
+  /** Color scheme — K-Cos pink 등 서비스 톤 */
   colorScheme?: 'slate' | 'primary' | 'pink';
   /** stats 카드 라벨 override (서비스별 텍스트) */
   statsLabels?: Partial<Record<keyof StoresListStats, string>>;

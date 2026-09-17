@@ -11,7 +11,7 @@
  * 권한 가드: canonical role_assignments(cosmetics:store_owner) — 라우트 가드와 동일 소스 (그 외 403).
  *   WO-O4O-STORE-INFO-OWNER-GATE-CANONICAL-ROLE-ALIGN-BACKEND-V1 (legacy cosmetics_members.subRole 제거).
  *
- * 패턴 동일: apps/api-server/src/routes/glycopharm/controllers/mypage.controller.ts
+ * 패턴 동일: apps/api-server/src/routes/controllers/mypage.controller.ts
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';

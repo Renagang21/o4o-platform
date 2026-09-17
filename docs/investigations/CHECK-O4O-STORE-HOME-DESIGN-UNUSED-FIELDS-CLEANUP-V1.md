@@ -10,7 +10,7 @@
 
 | 영역 | 결과 |
 |---|---|
-| 프론트 3서비스(KPA/GP/KCos) settings 참조 | **0** (각자 별도 타입 template/theme/blocks만) |
+| 프론트 2서비스(KPA/KCos) settings 참조 | **0** (각자 별도 타입 template/theme/blocks만) |
 | 공개 storefront 렌더(StorefrontHomePage) | **0** (blocks/theme만 사용) |
 | 백엔드 사용처 | store-settings.controller GET/PATCH 저장·응답 로직 + types **뿐** |
 | `deepMerge` 사용처 | customizations 1곳뿐 → 같이 제거 |
@@ -48,8 +48,8 @@
 
 ## 4. 3서비스 영향
 - 공통 백엔드(store-settings.controller/types) 변경이나, 응답에서 두 빈 필드만 제거 → 3서비스 프론트가
-  애초에 참조하지 않아 무영향. GP/KCos 프론트 타입은 별도(template/theme/blocks 또는 Record<string,any>).
-- KPA 타입체크 PASS. (GP/KCos 빌드는 CI 배포 시 검증 — 응답 축소는 런타임/타입 모두 안전.)
+  애초에 참조하지 않아 무영향. KCos 프론트 타입은 별도(template/theme/blocks 또는 Record<string,any>).
+- KPA 타입체크 PASS. (KCos 빌드는 CI 배포 시 검증 — 응답 축소는 런타임/타입 모두 안전.)
 
 ## 5. 비고
 - DB migration 미수행: storefront_config 에 두 키가 존재하지 않음(운영 0건) → 정리할 데이터 없음.

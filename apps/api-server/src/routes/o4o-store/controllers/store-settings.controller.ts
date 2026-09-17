@@ -4,7 +4,7 @@
  * WO-STORE-COMMON-SETTINGS-FOUNDATION-V1
  *
  * Platform-wide unified Store Settings API.
- * Shared across KPA, K-Cosmetics, GlycoPharm.
+ * Shared across KPA, K-Cosmetics.
  *
  * GET  /stores/:slug/settings        — public, returns settings + channels
  * PATCH /stores/:slug/settings       — owner only, deep merge update

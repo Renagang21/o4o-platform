@@ -39,13 +39,12 @@
 
 | 서비스 | 호출 | 인자 |
 |---|---|:--:|
-| GlycoPharm | `components/layouts/OperatorLayoutWrapper.tsx:35` | **3-인자** (`isPlatformAdmin`) |
 | K-Cosmetics | `components/layouts/OperatorLayoutWrapper.tsx:30` | 2-인자 |
 | KPA-Society | `components/kpa-operator/KpaOperatorLayoutWrapper.tsx:31` | 2-인자 |
 | Neture | `components/layouts/OperatorLayoutWrapper.tsx:25` | 2-인자 (`false` 고정) |
 | PharmacyHub | `layouts/OperatorLayoutWrapper.tsx:60` | 2-인자 |
 
-`platformOnly` 를 실제로 쓰는 메뉴는 GlycoPharm 의 `AI 사용량` · `AI 정산` 2건뿐이다.
+`AI 정산` 2건뿐이다.
 메뉴 구조는 **flat group**(중첩 child 없음) 이므로 §3-6 의 nested 검증은 해당 없음 →
 대신 **"통과 항목 0개 그룹은 결과에서 제외"** 계약을 검증한다.
 
@@ -181,7 +180,7 @@ platformOnly 계약 변경            = 0  (filterMenuByRole.ts · types.ts 무�
 | `node scripts/lint-ratchet.mjs` | **통과** — `65 errors, 2185 warnings (error baseline 69)` |
 
 `type-check:frontend` 는 `filterMenuByRole` 의 5개 consumer 를 전부 포함한다 —
-GlycoPharm(3-인자) · K-Cosmetics · KPA-Society · Neture · PharmacyHub(2-인자) 및
+K-Cosmetics · KPA-Society · Neture · PharmacyHub(2-인자) 및
 admin-dashboard · web-account · web-kpa-branch. **2-인자 consumer 회귀 0.**
 
 > lint-ratchet 이 `오류가 69 → 65 로 줄었습니다. ERROR_BASELINE 을 65 로 낮춰 주세요` notice 를

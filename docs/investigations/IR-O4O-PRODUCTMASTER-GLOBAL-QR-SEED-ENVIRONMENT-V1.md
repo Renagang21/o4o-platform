@@ -82,8 +82,8 @@ O4O 의 축은 **`Product → Content → QR → Product Landing`** 이다. QR �
 
 ### 2.3 공개 라우트 / 도메인
 
-- 백엔드(무인증): `GET /{service}/qr/public/:slug` (kpa/glycopharm/cosmetics 각각 mount). slug 조회 `WHERE slug=$1 AND is_active=true`.
-- 프론트: `/qr/:slug` (web-neture / web-kpa-society). QR 이미지·PDF URL 도메인은 **service-catalog 캐노니컬 도메인**(kpa-society.co.kr / glycopharm / k-cosmetics), **neture.co.kr 아님**.
+- 백엔드(무인증): `GET /{service}/qr/public/:slug` slug 조회 `WHERE slug=$1 AND is_active=true`.
+- 프론트: `/qr:slug` (web-neture / web-kpa-society). QR 이미지·PDF URL 도메인은 **service-catalog 캐노니컬 도메인**(kpa-society.co.kr / k-cosmetics), **neture.co.kr 아님**.
 - **`/r/{id}` Resource permalink 공개 라우트는 미구현**(파트너 추천 `/r/{code}` 는 별개). F12 roadmap step 4 미착수.
 
 ### 2.4 slug 생성 / 유일성

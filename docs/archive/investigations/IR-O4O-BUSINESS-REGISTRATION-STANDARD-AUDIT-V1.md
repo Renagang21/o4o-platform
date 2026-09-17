@@ -12,12 +12,11 @@
 
 **조사 대상:**
 - Neture 공급자 가입 화면 (RegisterModal, SupplierProfilePage)
-- GlycoPharm 약국 경영자 가입 (RegisterPage, PharmacyApplyPage)
 - K-Cosmetics 매장 경영자 가입 (RegisterPage)
 - KPA Society 약사 가입 (PharmacyJoinPage)
 - API 공통 DTO (RegisterRequestDto)
-- DB Entity 구조 (BusinessInfo, organizations, neture_suppliers, glycopharm_pharmacies, cosmetics_stores, kpa_pharmacy_requests, physical_stores)
-- Operator 승인 화면 (GlycoPharm 기준 가장 완성도 높음)
+- DB Entity 구조
+- Operator 승인 화면
 
 ---
 
@@ -74,40 +73,6 @@
 ```
 
 → 가입 후 프로필 페이지에는 필요한 필드가 존재하나, 승인 전 필수 입력 여부가 UX상 불명확
-
-### 2.3 GlycoPharm 약국 경영자 가입 (RegisterPage.tsx) — 가장 완성도 높음
-
-```
-기본 정보:
-  ✅ lastName / firstName / nickname
-  ✅ email / password / passwordConfirm
-  ✅ phone
-
-사업자 정보 (가입 시점 수집):
-  ✅ businessName (약국명)
-  ✅ businessNumber (사업자등록번호)
-  ✅ representativeName (대표자명)
-  ✅ licenseNumber (약사 면허번호)
-  ✅ taxEmail (세금계산서 이메일)
-  ✅ businessType (업태)
-  ✅ businessCategory (업종)
-  ✅ zipCode / address1 / address2 (주소)
-
-동의:
-  ✅ agreeTerms / agreePrivacy / agreeMarketing
-```
-
-→ **가입 시점에 사업자 정보 전체를 수집하는 가장 완성된 형태**
-
-### 2.4 GlycoPharm 약국 참여 신청 (PharmacyApplyPage.tsx) — 별도 신청 단계
-
-```
-  ✅ organizationName (약국명)
-  ✅ businessNumber (사업자등록번호)
-  ✅ serviceTypes (dropshipping / sample_sales / digital_signage)
-  ✅ requestedSlug (매장 URL)
-  ✅ note (추가 메모)
-```
 
 ### 2.5 K-Cosmetics 매장 경영자 가입 (RegisterPage.tsx) — 최소 수준
 
@@ -180,14 +145,13 @@ defaultCommissionRate: DECIMAL(5,2)
 isVerified: boolean
 ```
 
-**문제**: 이 엔티티는 users.id와 1:1 연결되어 있으나, 각 서비스(Neture, GlycoPharm, Cosmetics, KPA)는 이 테이블을 사용하지 않고 **독자적인 필드/테이블에 사업자 정보를 저장**하고 있음.
+**문제**: 이 엔티티는 users.id와 1:1 연결되어 있으나, 각 서비스(Neture, Cosmetics, KPA)는 이 테이블을 사용하지 않고 **독자적인 필드/테이블에 사업자 정보를 저장**하고 있음.
 
 ### 3.2 서비스별 사업자 정보 저장 위치
 
 | 서비스 | 테이블 | 주요 사업자 필드 |
 |--------|--------|-----------------|
 | Neture 공급자 | `neture_suppliers` | business_number, representative_name, business_address, manager_name, manager_phone, business_type, tax_email |
-| GlycoPharm 약국 | `glycopharm_pharmacies` | business_number(UNIQUE), owner_name, address, phone, email |
 | K-Cosmetics 매장 | `cosmetics.cosmetics_stores` | businessNumber(UNIQUE), ownerName, address, contactPhone |
 | KPA 약국 신청 | `kpa_pharmacy_requests` | business_number, pharmacy_name, pharmacy_phone, owner_phone, tax_invoice_email |
 | Organizations | `organizations` | business_number, name, address, phone |
@@ -206,7 +170,7 @@ address_detail: JSONB         — 구조화된 주소
 phone: VARCHAR(50)
 ```
 
-GlycoPharm, K-Cosmetics는 organization_id를 통해 organizations와 연결되나, 사업자 상세는 각자 테이블에 별도 보유.
+K-Cosmetics는 organization_id를 통해 organizations와 연결되나, 사업자 상세는 각자 테이블에 별도 보유.
 
 ### 3.4 physical_stores — 통합 사업자번호 식별자
 
@@ -218,48 +182,11 @@ storeName: VARCHAR(255)
 region: VARCHAR(100)
 ```
 
-사업자번호로 GlycoPharm 약국, Cosmetics 매장, KPA 약국을 연결하는 의도로 설계되었으나, 현재 Neture 공급자는 미연결.
+사업자번호로 Cosmetics 매장, KPA 약국을 연결하는 의도로 설계되었으나, 현재 Neture 공급자는 미연결.
 
 ---
 
 ## 4. Operator 승인 화면 분석
-
-### 4.1 GlycoPharm 약국 참여 신청 승인 (ApplicationDetailPage.tsx) — 가장 완성도 높음
-
-```
-회원 정보:
-  ✅ 이름, 이메일, 전화번호
-
-약국/사업자 정보:
-  ✅ 약국명 (organizationName)
-  ✅ 대표자명 (metadata.representativeName)
-  ✅ 사업자등록번호 (businessNumber)
-  ✅ 약사 면허번호 (metadata.licenseNumber)
-  ✅ 세금계산서 이메일 (metadata.taxEmail)
-  ✅ 업태 (metadata.businessType)
-  ✅ 업종 (metadata.businessCategory)
-  ✅ 주소 (metadata.zipCode + address + addressDetail)
-
-신청 정보:
-  ✅ 신청 서비스 (무재고 판매, 샘플 판매, 디지털 사이니지)
-  ✅ 추가 메모
-
-처리:
-  ✅ 승인 (slug 입력)
-  ✅ 반려 (사유 입력)
-  ✅ 처리 이력
-```
-
-### 4.2 GlycoPharm 스토어 판매 참여 승인 (StoreApprovalDetailPage.tsx)
-
-심사 체크포인트 기반:
-```
-  ✅ 사업자등록번호 확인
-  ✅ 통신판매업 신고번호 확인
-  ✅ 약사 면허 확인
-  ✅ 정산 계좌 정보 확인
-  ✅ 필수 약관 동의 확인
-```
 
 ### 4.3 Neture 공급자 승인 화면 — 현황 미확인
 
@@ -302,8 +229,7 @@ RegisterModal에서 수집하는 정보(companyName, businessNumber, businessTyp
 
 | 서비스 | 추가 필드 | 비고 |
 |--------|----------|------|
-| KPA / GlycoPharm | licenseNumber (약사 면허번호) | 약사 자격 확인용 |
-| GlycoPharm | communicationSalesNumber (통신판매업 신고번호) | 온라인 판매 시 필요 |
+| KPA | licenseNumber (약사 면허번호) | 약사 자격 확인용 |
 | Neture | minOrderAmount, orderConditionNote | B2B 주문 조건 |
 
 ---
@@ -312,7 +238,7 @@ RegisterModal에서 수집하는 정보(companyName, businessNumber, businessTyp
 
 ### 6.1 Neture 공급자 가입 시점 갭
 
-| 필드 | GlycoPharm 가입 시 | Neture 가입 시 | 갭 |
+| 필드 || Neture 가입 시 | 갭 |
 |------|:------------------:|:---------------:|:---:|
 | businessName | ✅ | ✅ | — |
 | businessNumber | ✅ | ✅ | — |
@@ -328,7 +254,6 @@ RegisterModal에서 수집하는 정보(companyName, businessNumber, businessTyp
 
 ### 6.2 운영자 승인 화면 갭
 
-- **GlycoPharm**: 승인에 필요한 모든 사업자 정보 표시 ✅
 - **Neture**: 공급자 승인 화면에서 표시되는 사업자 정보 범위 불명확 ⚠️
 - **K-Cosmetics**: 승인 화면 구조 미확인 ⚠️
 
@@ -336,18 +261,18 @@ RegisterModal에서 수집하는 정보(companyName, businessNumber, businessTyp
 
 같은 개념이 서비스별로 다른 이름으로 사용됨:
 
-| 개념 | Neture | GlycoPharm | K-Cosmetics | KPA | 정책 |
-|------|--------|------------|-------------|-----|------|
-| 세금계산서 이메일 | taxEmail | taxEmail | — | tax_invoice_email | **taxEmail 통일 권장** |
-| 대표자명 | representativeName | representativeName | ownerName | — | **representativeName 통일 권장** |
-| 사업자번호 | businessNumber | businessNumber | businessNumber | business_number | DB: snake_case, DTO/UI: camelCase |
-| 담당자명 | managerName | contactName (DTO) | — | — | **managerName 통일 권장** |
+| 개념 | Neture | K-Cosmetics | KPA | 정책 |
+| ------ | -------- | ------------- | ----- | ------ |
+| 세금계산서 이메일 | taxEmail | — | tax_invoice_email | **taxEmail 통일 권장** |
+| 대표자명 | representativeName | ownerName | — | **representativeName 통일 권장** |
+| 사업자번호 | businessNumber | businessNumber | business_number | DB: snake_case, DTO/UI: camelCase |
+| 담당자명 | managerName | — | — | **managerName 통일 권장** |
 
 ### 6.4 BusinessInfo 엔티티 활용 문제
 
 `business_info` 테이블에 가장 완성된 공통 사업자 구조가 존재하나:
 - 각 서비스 도메인이 이 테이블을 참조하지 않음
-- 대신 서비스별 테이블(neture_suppliers, glycopharm_pharmacies 등)에 사업자 필드를 중복 보유
+- 대신 서비스별 테이블에 사업자 필드를 중복 보유
 - `physical_stores`가 사업자번호 기반 통합 식별자로 설계되었으나 Neture 공급자와 미연결
 
 ---
@@ -358,7 +283,6 @@ RegisterModal에서 수집하는 정보(companyName, businessNumber, businessTyp
 |--------|------|:-----------------:|:---------:|
 | Neture 공급자 | 상품 공급 B2B | **높음** (세금계산서, 정산) | 부족 (가입 시점) |
 | Neture 파트너 | 제휴 판매 | 중간 (제휴 계약) | 최소 |
-| GlycoPharm 약국 | 무재고 판매 | **높음** (통신판매업, 약사 면허) | 완성 |
 | K-Cosmetics 매장 | 화장품 판매 | 높음 (사업자 확인) | 부족 |
 | KPA 약사 | 커뮤니티 + 약국 | 중간 (면허 확인) | 면허 중심 OK |
 | KPA 약국 | 서비스 참여 | **높음** (세금계산서) | 별도 신청 OK |
@@ -374,7 +298,6 @@ RegisterModal에서 수집하는 정보(companyName, businessNumber, businessTyp
   User (1:1) → BusinessInfo (활용 미흡)
   ↓
   neture_suppliers.business_number (별도 보유)
-  glycopharm_pharmacies.business_number (별도 보유)
   cosmetics_stores.businessNumber (별도 보유)
   physical_stores.businessNumber (통합 시도, 미완성)
 ```
@@ -451,7 +374,6 @@ RegisterModal에서 수집하는 정보(companyName, businessNumber, businessTyp
 
 | 구분 | 평가 |
 |------|------|
-| GlycoPharm | 사업자 정보 수집 가장 완성 ✅ |
 | KPA | 약사 면허 중심, 약국 신청 분리 구조 ✅ |
 | Neture 공급자 | 가입 시점 필드 부족, 프로필에서 보완 가능하나 UX 갭 ⚠️ |
 | K-Cosmetics | 가입 시점 필드 최소 (상호명+사업자번호만) ⚠️ |

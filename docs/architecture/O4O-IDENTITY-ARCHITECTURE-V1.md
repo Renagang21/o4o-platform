@@ -49,7 +49,6 @@ O4O 플랫폼은 5개 서비스 + Account Center로 구성되며, 단일 API 서
 | 서비스 | 도메인 | serviceKey | 인증 전략 |
 |--------|--------|------------|-----------|
 | Neture | `neture.co.kr` | `neture` | Cookie |
-| GlycoPharm | `glycopharm.co.kr` | `glycopharm` | localStorage + Bearer |
 | GlucoseView | `glucoseview.co.kr` | `glucoseview` | Cookie |
 | KPA Society | `kpa-society.co.kr` | `kpa-society` | localStorage + Bearer |
 | K-Cosmetics | `k-cosmetics.site` | `k-cosmetics` | Cookie |
@@ -73,9 +72,8 @@ O4O 플랫폼은 5개 서비스 + Account Center로 구성되며, 단일 API 서
 **V2 지향 모델 (Document Alignment 후):**
 - **1 Email = 1 Identity** (플랫폼 전체) — `users.email` UNIQUE 유지
 - 사용자는 하나의 Identity 로 모든 서비스에 가입 가능
-- **비밀번호는 서비스 범위 (Service-scoped Credential)** — KPA password ≠ GlycoPharm password 가 정상
 
-**전환 사유:** O4O 플랫폼은 "서비스별 독립 사업자 + 서비스별 독립 회원" 철학을 채택한다. 같은 이메일을 쓰더라도 KPA 회원과 GlycoPharm 회원은 독립적이며, 비밀번호 역시 서비스 범위에서 관리되어야 일관된다. 자세한 모델 정의는 V2 DRAFT §3 의 4-Layer 모델 참조.
+**전환 사유:** O4O 플랫폼은 "서비스별 독립 사업자 + 서비스별 독립 회원" 철학을 채택한다. 같은 이메일을 쓰더라도 서비스별 회원은 독립적이며, 비밀번호 역시 서비스 범위에서 관리되어야 일관된다. 자세한 모델 정의는 V2 DRAFT §3 의 4-Layer 모델 참조.
 
 ### 2.2 테이블 구조
 
@@ -220,11 +218,10 @@ fetch(url, { credentials: 'include' })
 
 ### 6.2 localStorage + Bearer 기반
 
-**사용 서비스:** GlycoPharm, KPA Society
+**사용 서비스:** KPA Society
 
 ```typescript
 // 저장
-localStorage.setItem('glycopharm_access_token', token);
 
 // 요청 시
 headers: { 'Authorization': `Bearer ${accessToken}` }
@@ -234,7 +231,7 @@ headers: { 'Authorization': `Bearer ${accessToken}` }
 
 서버는 요청의 Origin 헤더와 API 호스트의 base domain을 비교:
 - **Same base domain** (예: `admin.neture.co.kr` + `api.neture.co.kr`) → Cookie 전용
-- **Different base domain** (예: `glycopharm.co.kr` + `api.neture.co.kr`) → Cookie + Body 토큰 반환
+- **Different base domain** (예: `k-cosmetics.site` + `api.neture.co.kr`) → Cookie + Body 토큰 반환
 
 ---
 
@@ -244,7 +241,6 @@ headers: { 'Authorization': `Bearer ${accessToken}` }
 // cookie.utils.ts - SERVICE_DOMAINS
 const SERVICE_DOMAINS = [
   '.neture.co.kr',
-  '.glycopharm.co.kr',
   '.kpa-society.co.kr',
   '.glucoseview.co.kr',
   '.k-cosmetics.site',
@@ -363,7 +359,6 @@ Origin 헤더에서 도메인 추출 → SERVICE_DOMAINS 매칭 → 쿠키 domai
 **Production:**
 ```
 neture.co.kr (www, admin, dev-admin, shop, forum, signage, funding, auth, api, account)
-glycopharm.co.kr (www)
 glucoseview.co.kr (www)
 kpa-society.co.kr (www)
 k-cosmetics.site (www)

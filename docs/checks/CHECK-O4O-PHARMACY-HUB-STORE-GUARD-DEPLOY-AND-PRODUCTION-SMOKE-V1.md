@@ -17,7 +17,7 @@
 | 4 | `resolveStoreAccess()` 기반 API 실제 호출 | **PASS** | §4 — 운영 리비전 HTTP 3계정 × 5 endpoint |
 | 5 | 공통 매장 API 5개 200 | **PASS** | §4 |
 | 6 | 비매장 사용자 403 | **PASS(서버측)** | §5 — HTTP 401×5 + 미들웨어 실측 403 |
-| 7 | KPA·GlycoPharm·K-Cosmetics 회귀 0 | **PASS** | §6 |
+| 7 | KPA·K-Cosmetics 회귀 0 | **PASS** | §6 |
 | 8 | `renagang21` HOLD · 무변경 확인 | **PASS** | §7 — 프로덕션 DB read-only 재확인 |
 | 9 | 실제 브라우저 smoke | **PASS** | §4 · §8 |
 
@@ -128,8 +128,6 @@ GET https://api.neture.co.kr/health                200
 | `/api/v1/store/product-pool` | `200 success object` |
 | `/api/v1/store/library` | `200 success array(23)` |
 
-**(b) GlycoPharm — `www.glycopharm.co.kr` / renagang21**
-
 `/store` 진입 확인 · 동일 **5/5 200**.
 
 **(c) Pharmacy-Hub — `pharmacyhub.co.kr` / renagang21**
@@ -137,8 +135,6 @@ GET https://api.neture.co.kr/health                200
 ```
 서비스 가입 상태: active
 roles        kpa:store_owner, cosmetics:store_owner, lms:instructor, pharmacy,
-             glycopharm:store_owner, supplier, pharmacy-hub:store_owner
-memberships  platform / kpa-society / pharmacy-hub / glycopharm / neture / k-cosmetics = all active
 ```
 
 동일 **5/5 200**.
@@ -195,13 +191,12 @@ memberships  platform / kpa-society / pharmacy-hub / glycopharm / neture / k-cos
 | 서비스 | active store_owner | 조직 보유 | 조직 미보유(=영향) |
 |---|:-:|:-:|:-:|
 | kpa | 5 | 5 | **0** |
-| glycopharm | 1 | 1 | **0** |
 | cosmetics | 2 | 2 | **0** |
 | pharmacy-hub | 3 | 2 | 1 (rejected E2E — 의도된 차단) |
 
 → 기존 3서비스 **동작 변화 0**.
 
-**런타임 레벨.** §4-2 에서 KPA(2계정) · GlycoPharm 모두 5/5 200, KPA `/store` 는 실데이터 렌더(자료실 7 · QR 27 · 진열 20). K-Cosmetics 는 활성 store_owner 2명이 전원 조직을 보유하여 (c) 의 영향이 구조적으로 0이며, 코드 경로가 KPA·GlycoPharm 과 동일한 공통 가드이므로 별도 로그인 없이 위 표로 대체한다.
+**런타임 레벨.** §4-2 에서 KPA(2계정) 모두 5/5 200, KPA `/store` 는 실데이터 렌더(자료실 7 · QR 27 · 진열 20). K-Cosmetics 는 활성 store_owner 2명이 전원 조직을 보유하여 (c) 의 영향이 구조적으로 0이며, 코드 경로가 KPA 과 동일한 공통 가드이므로 별도 로그인 없이 위 표로 대체한다.
 
 ---
 
@@ -239,7 +234,6 @@ pharmacy-hub:store_owner active 총 3
 | 도메인 | 진입 | 결과 |
 |---|---|---|
 | `kpa-society.co.kr` | `/store` (renagang21) | 실데이터 렌더 · 5/5 200 |
-| `www.glycopharm.co.kr` | `/store` (renagang21) | 진입 · 5/5 200 |
 | `pharmacyhub.co.kr` | 로그인 (renagang21) | `가입 상태 active` · `pharmacy-hub:store_owner` 확인 · 5/5 200 · **매장 화면은 셸("준비 중")** |
 | `kpa-society.co.kr` | `/admin/kpa-dashboard` (sohae2100) | 진입 · 5/5 200 · 이후 **로그아웃 확인** |
 

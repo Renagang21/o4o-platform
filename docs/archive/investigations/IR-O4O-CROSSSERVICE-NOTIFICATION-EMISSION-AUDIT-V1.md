@@ -5,7 +5,6 @@
 현재 O4O 플랫폼의 인-앱 알림(in-app notification) 시스템은 **부분적 구현 상태**입니다.
 
 - **구현 완료**: KPA-Society, LMS, Market Trial (Neture), 연락처 요청
-- **구현 누락**: GlycoPharm 회원 승인/거절, K-Cosmetics 회원 승인/거절, Neture 파트너/공급자 신청 승인/거절
 - **데이터 모델**: 통합 \Notification\ 엔티티 + 별도 \ForumNotification\ 엔티티 (2원 구조)
 - **API**: 표준화된 REST API (\/api/v1/notifications/*\) + SSE 스트림 지원
 - **UI**: 공통 \NotificationBell\ 컴포넌트 (account-ui 패키지)
@@ -48,7 +47,7 @@
 **필드**:
 - id (uuid, PK)
 - userId (uuid, FK→users) - 수신자
-- serviceKey (varchar 100) - 서비스 경계 (kpa-society, glycopharm, neture, k-cosmetics)
+- serviceKey (varchar 100) - 서비스 경계 (kpa-society, neture, k-cosmetics)
 - organizationId (uuid) - 다중 테넌트 경계
 - actorId (uuid) - 알림 트리거 사용자
 - channel ('in_app' | 'email') - 채널
@@ -175,12 +174,6 @@
 - member.registration_pending → operator (신청 시만)
 - 승인/거절 알림 없음
 
-### GlycoPharm
-
-- 알림 구현 없음 (이메일만)
-
----
-
 ## 8. 서비스별 알림 생성 현황
 
 `
@@ -206,7 +199,6 @@ K-Cosmetics:         ⚠️ 33% (1/3)
   ✅ 회원 신청 → operator
   ❌ 회원 승인/거절 없음
 
-GlycoPharm:          ❌ 0% (0/3)
   ❌ 회원 신청/승인/거절 모두 없음
   (이메일만 구현)
 
@@ -233,7 +225,6 @@ LIMIT 20
 
 ### 문제점
 
-1. GlycoPharm: operator 조회 없음 (이메일만)
 2. 운영자 역할 미설정 시 알림 전달 불가
 3. 역할 삭제 후 이력 미처리
 
@@ -264,7 +255,6 @@ LIMIT 20
 
 ### 수신자별 누락
 
-**GlycoPharm**
 - 회원 승인/거절 → 신청자에게 알림 없음 ❌
 - 회원 신청 → 운영자에게 알림 없음 ❌ (이메일만)
 
@@ -300,7 +290,6 @@ LIMIT 20
 | LMS | 90% | - | ✅ | ✅ |
 | Neture Trial | 90% | ✅ | ✅ | ✅ |
 | K-Cosmetics | 33% | ✅ | ❌ | ❌ |
-| GlycoPharm | 0% | ❌ | ❌ | ❌ |
 
 ---
 
@@ -308,8 +297,7 @@ LIMIT 20
 
 ### 긴급 (P0)
 
-1. WO-O4O-GLYCOPHARM-MEMBERSHIP-APPROVAL-NOTIFICATION-V1
-   - Glycopharm 회원 승인/거절 알림 + operator 신청 알림
+1. 
 
 2. WO-O4O-KCOSMETICS-MEMBERSHIP-APPROVAL-NOTIFICATION-V1
    - K-Cosmetics 회원 승인/거절 알림
@@ -333,7 +321,6 @@ LIMIT 20
 ### Operator 조회 실패
 
 - role_assignments 미설정 시 알림 미발송
-- GlycoPharm: operator role 설정 필요
 
 ### 401 처리 미흡
 
@@ -361,7 +348,6 @@ LIMIT 20
 - ⚠️ 트랜잭션 경계 불명확
 - ⚠️ 운영자별 audit log 없음
 - ⚠️ 알림 발송 실패 재시도 없음
-- ⚠️ GlycoPharm: 이메일/in-app 채널 분리로 일관성 미흡
 
 ---
 
@@ -369,7 +355,6 @@ LIMIT 20
 
 ### Phase 1: 누락 기능 (1-2주)
 
-1. GlycoPharm 회원 승인/거절 알림
 2. K-Cosmetics 회원 승인/거절 알림  
 3. Neture 파트너/공급자 알림
 4. contact.new + lms.course_* targetUrl

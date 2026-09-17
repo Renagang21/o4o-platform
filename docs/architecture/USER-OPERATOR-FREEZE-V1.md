@@ -69,7 +69,6 @@ if (!isAdmin && !hasOperatorMembership) {
 | Service | SERVICE_KEY |
 |---------|-------------|
 | web-neture | `neture` |
-| web-glycopharm | `glycopharm` |
 | web-glucoseview | `glucoseview` |
 | web-k-cosmetics | `k-cosmetics` |
 
@@ -137,7 +136,7 @@ Frontend OperatorRoute:
 
 | # | Scenario | Expected |
 |---|----------|----------|
-| 1 | glycopharm membership 있음 | glycopharm operator 화면 진입 가능 |
+| 1 | neture membership 있음 | neture operator 화면 진입 가능 |
 | 2 | neture membership 없음 | neture operator 화면 진입 불가 |
 | 3 | role만 존재, membership 없음 | operator 화면 절대 불가 |
 | 4 | multi-service membership | 각 서비스 독립 접근 |

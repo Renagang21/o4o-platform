@@ -36,7 +36,6 @@ ON CONFLICT (name) DO UPDATE SET ... , updated_at = now()
 |---|---|---|---|:--:|:--:|:--:|
 | `kpa:admin` | KPA Admin | KPA service administrator | admin | t | t | t |
 | `neture:admin` | Neture Admin | Neture administrator | admin | t | t | t |
-| `glycopharm:admin` | GlycoPharm Admin | GlycoPharm administrator | admin | t | t | t |
 | `cosmetics:admin` | K-Cosmetics Admin | K-Cosmetics administrator | admin | t | t | t |
 | **`pharmacy-hub:admin`** | **Pharmacy-Hub Admin** | **Pharmacy-Hub administrator** | **admin** | **t** | **t** | **t** |
 
@@ -178,9 +177,6 @@ Pharmacy-Hub 4역할이 코드(`PHARMACY_HUB_SCOPE_CONFIG` · `ROLE_REGISTRY`) �
 
 ### 선행 정비로 넘기는 항목 (본 작업에 섞지 않음)
 
-1. **GlycoPharm `scopeRoleMapping` 누락** — mapping 이 없어 admin/operator 가 fallback(`allowedRoles` 전체 허용)
-   으로 평가된다. Pharmacy-Hub · KPA · Neture · K-Cosmetics 와 다른 유일한 서비스다.
-   공통화 조사에서 **선행 정비 항목**으로 분리해 판단한다.
 2. `platform:admin` 카탈로그 행이 `description = 'Platform administrator (deprecated)'` 인데
    `is_active = true` 다 (관찰만 — 이번 범위 밖).
 
@@ -188,4 +184,4 @@ Pharmacy-Hub 4역할이 코드(`PHARMACY_HUB_SCOPE_CONFIG` · `ROLE_REGISTRY`) �
 
 ## 12. 문서 정합
 
-발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건 (GlycoPharm `scopeRoleMapping`)
+발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건

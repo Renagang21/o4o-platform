@@ -3867,7 +3867,7 @@ export const netureGuideBusinessHubProps: GuideFeatureManualPageProps = {
 // ─── /guide/services/* (현재 운영 중인 O4O 서비스 소개) ──────────────────
 // WO-O4O-NETURE-GUIDE-ACTIVE-SERVICE-CARDS-AND-PAGES-V1.
 //   GuideFeatureManualPage + GuideEditableSection 으로 운영자 수정 가능. 도메인은 service-catalog 기준.
-//   KPA=약국·약사 커뮤니티(약사회 지부/분회 아님), GP=혈당관리 약국(진단·치료 아님, "내 약국"),
+//   KPA=약국·약사 커뮤니티(약사회 지부/분회 아님),
 //   KCos=화장품 매장(주문·결제 완료 표현 회피).
 
 export const netureGuideServiceKpaSocietyProps: GuideFeatureManualPageProps = {
@@ -3940,7 +3940,6 @@ export const netureGuideServiceKpaSocietyProps: GuideFeatureManualPageProps = {
   bottomNav: { prev: { label: '← 이용 안내', to: '/guide' }, home: { label: '홈으로', to: '/' } },
 };
 
-// netureGuideServiceGlycopharmProps — REMOVED (WO-O4O-GLYCOPHARM-COMPLETE-ERASURE-V1)
 
 export const netureGuideServiceKcosmeticsProps: GuideFeatureManualPageProps = {
   hero: {

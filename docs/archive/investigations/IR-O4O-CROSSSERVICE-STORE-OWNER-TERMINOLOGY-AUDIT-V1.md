@@ -9,7 +9,7 @@ related:
   - WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1
   - WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1
   - WO-O4O-KPA-MEMBER-APPROVAL-STORE-OWNER-AUTO-ACTIVATION-V1
-  - WO-O4O-GLYCO-CARE-BACKEND-CLEANUP-V1
+  - 
   - UnifyNetureRoles20260331500000 (migration)
   - UnifyCosmeticsRolesCatalog20260331500000 (migration)
   - BackfillStoreOwnerRoles20260900000000 (migration)
@@ -25,7 +25,7 @@ constitution:
 
 # IR-O4O-CROSSSERVICE-STORE-OWNER-TERMINOLOGY-AUDIT-V1
 
-> Neture 의 `seller` 내부값을 "매장 경영자" 개념으로 정비하기 전에, **KPA-Society / GlycoPharm / K-Cosmetics / Neture 4 서비스가 현재 어떤 용어와 내부값을 쓰는지** 코드 사실로 조사. 결과를 토대로 Neture seller 처리 방향(유지/정규화/alias) 을 권고. **읽기 전용 조사 — 코드 수정 없음.**
+> 결과를 토대로 Neture seller 처리 방향(유지/정규화/alias) 을 권고. **읽기 전용 조사 — 코드 수정 없음.**
 
 ---
 
@@ -37,7 +37,7 @@ constitution:
 | K-Cos 가 canonical인가? | ✅ 가장 정규화된 상태 — `cosmetics:store_owner` role + `sub_role` 분류 + service_key='k-cosmetics' canonical |
 | Neture 에 store_owner 가 있나? | ❌ **0 건** — `seller` 만 존재 |
 | 즉시 수정 가능한 drift? | Neture 대시보드 "셀러" 라벨 → "매장 경영자" 통일 (UI only) |
-| 내부값 정규화 필요? | ✅ **별도 WO 필요** — Neture seller → store_owner migration, GP `pharmacy_owner` sub_role 명칭 정렬, KPA pharmacy/store 코드 위치 정리 |
+| 내부값 정규화 필요? | ✅ **별도 WO 필요** — Neture seller → store_owner migration `pharmacy_owner` sub_role 명칭 정렬, KPA pharmacy/store 코드 위치 정리 |
 | 최종 권고 | **Option C 변형** — 공통 internal value 는 `store_owner` 정규화 단계적 진행 + UI 는 도메인별 한글 유지 (약국 / 매장) |
 
 ---
@@ -45,7 +45,7 @@ constitution:
 ## 1. 배경
 
 - 직전 발견: Neture RegisterModal 에서 사용자는 "매장 경영자" 라벨로 표시되는 선택지를 클릭하지만, 내부값은 `seller` 로 저장됨 ([RegisterModal.tsx:36](services/web-neture/src/components/RegisterModal.tsx#L36))
-- 동시에 4 서비스 공통 흐름이 `pharmacy → store` 정규화로 진행 중 (KPA migration, GP store_blog_posts 신규 entity, K-Cos NormalizeServiceMembershipsCosmeticsKey 등 직접 증거 있음)
+- 동시에 3 서비스 공통 흐름이 `pharmacy → store` 정규화로 진행 중 (KPA migration store_blog_posts 신규 entity, K-Cos NormalizeServiceMembershipsCosmeticsKey 등 직접 증거 있음)
 - 의문: Neture seller 를 그대로 둘지 / `store_owner` 정규화할지 / 서비스별 alias 로 둘지 — **4 서비스 현재 상태를 먼저 확정해야** 결정 가능
 
 ---
@@ -58,7 +58,7 @@ constitution:
 | 2 | 내부 role / activity_type / sub_role 값 (4 서비스) | 값별 파일경로:라인 + 의미 |
 | 3 | service_key 정확한 값 (4 서비스) | canonical 매핑 표 |
 | 4 | Neture seller 전수 사용처 | 파일별 + 의미 + supplier 혼용 여부 |
-| 5 | KPA/GP/K-Cos 공통 패턴 vs 차이 | mirror 부분 / drift 부분 |
+| 5 | KPA/K-Cos 공통 패턴 vs 차이 | mirror 부분 / drift 부분 |
 | 6 | 정규화 후보안 (Option A / B / C) | 장단점 + 수정 범위 + migration 필요 여부 |
 | 7 | 최종 권고 | 즉시 / 후속 / 보류 분기 |
 | 8 | Philosophy Conflict Check | 사업철학 SSOT 정합성 |
@@ -81,19 +81,6 @@ constitution:
 | "판매자" | [MyContentPage.tsx:106,388](services/web-kpa-society/src/pages/dashboard/MyContentPage.tsx#L106) | 공급자 파트너십 대상 설명 |
 
 **해석**: "약국 경영자" / "매장 경영자" / "약국 개설자" / "개설약사" 4 개가 동일 사용자(activity_type='pharmacy_owner') 를 가리키며 동의어로 혼재. "내 매장" / "내 약국" / "약국 HUB" / "매장 HUB" 도 같은 영역을 두 라벨로 표현.
-
-### 3.2 GlycoPharm
-
-| 한글 라벨 | 파일경로:라인 | 사용 위치 |
-|----------|--------------|----------|
-| "약국 경영자" | [RegisterPage.tsx:442](services/web-glycopharm/src/pages/auth/RegisterPage.tsx#L442) | 가입 페이지 섹션 제목 |
-| "내 약국" | [api/glycopharm.ts:437](services/web-glycopharm/src/api/glycopharm.ts#L437), [MobilePharmacyPage.tsx:32](services/web-glycopharm/src/pages/mobile/MobilePharmacyPage.tsx#L32) | API 주석 + 모바일 탭 라벨 |
-| "내 매장" | [B2BTableList.tsx:214](services/web-glycopharm/src/pages/hub/B2BTableList.tsx#L214), [GlycoPharmHubLayout.tsx:47](services/web-glycopharm/src/components/layouts/GlycoPharmHubLayout.tsx#L47) | HUB 카드 + 가져가기 액션 |
-| "약국 HUB" | [MobilePharmacyPage.tsx:40](services/web-glycopharm/src/pages/mobile/MobilePharmacyPage.tsx#L40) | 모바일 탭 라벨 |
-| "매장 HUB" | [config/navigation.ts:30](services/web-glycopharm/src/config/navigation.ts#L30), [HubBlogLibraryPage.tsx:166](services/web-glycopharm/src/pages/hub/HubBlogLibraryPage.tsx#L166) | 내비 주석 + HUB 페이지 제목 |
-| "매장 운영 허브" (설정) | `glycopharmConfig.terminology.storeHubLabel` | 설정 라벨이 "매장 운영 허브" 인데 코드 일부는 "내 약국" 사용 |
-
-**해석**: KPA와 동일 도메인(약국) 이지만 "매장" 표현 도입 시도. **설정과 코드 불일치** (설정 = "매장 운영 허브", 코드 일부 = "내 약국"). UI 일관성 부족.
 
 ### 3.3 K-Cosmetics
 
@@ -128,7 +115,6 @@ constitution:
 | 서비스 | service_memberships.service_key | role prefix | 매핑 변환 필요? |
 |--------|--------------------------------|-------------|----------------|
 | KPA | `'kpa-society'` | `'kpa:'` | ✅ (`ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY['kpa']='kpa-society'`) |
-| GlycoPharm | `'glycopharm'` | `'glycopharm:'` | ❌ self-map |
 | K-Cosmetics | `'k-cosmetics'` | `'cosmetics:'` | ✅ (`['cosmetics']='k-cosmetics'`) |
 | Neture | `'neture'` | `'neture:'` | ❌ self-map |
 
@@ -154,19 +140,6 @@ RegisterModal: activity_type='pharmacy_owner' 선택
   ↓ role_assignments.role='kpa:store_owner' 부여
   ↓ platform_store_slugs 예약
 ```
-
-### 4.3 GlycoPharm 내부값
-
-| 값 | 파일경로:라인 | 의미 |
-|----|--------------|------|
-| `'glycopharm:pharmacist'` | [role-constants.ts:18](services/web-glycopharm/src/lib/role-constants.ts#L18) | **모든 member 의무 부여** |
-| `'glycopharm:store_owner'` | [role-constants.ts:20](services/web-glycopharm/src/lib/role-constants.ts#L20) | `subRole='pharmacy_owner'` 인 경우만 추가 |
-| `subRole='pharmacy_owner'`/`'staff_pharmacist'` | [glycopharm-member.entity.ts:22](apps/api-server/src/routes/glycopharm/entities/glycopharm-member.entity.ts#L22) | DB `glycopharm_members.sub_role` |
-| `membership_type='pharmacist'` | [glycopharm-member.entity.ts:37](apps/api-server/src/routes/glycopharm/entities/glycopharm-member.entity.ts#L37) | patient 제거됨 (cleanup WO 후) |
-
-**Guard**: [GlycoHubGuard.tsx:42](services/web-glycopharm/src/components/auth/GlycoHubGuard.tsx#L42) — pharmacist OR store_owner 통과.
-
-**해석**: GP 는 KPA 보다 sub_role 컬럼을 명시적으로 사용. `pharmacy_owner` 라는 sub_role 명칭은 KPA의 activity_type 과 같음 — 도메인(약국) 정합.
 
 ### 4.4 K-Cosmetics 내부값
 
@@ -230,30 +203,30 @@ RegisterModal: activity_type='pharmacy_owner' 선택
 
 ---
 
-## 6. KPA/GP/K-Cos 공통 패턴 vs 차이
+## 6. KPA/K-Cos 공통 패턴 vs 차이
 
 ### 6.1 공통 패턴
 
-| 패턴 | KPA | GP | K-Cos |
+| 패턴 | KPA | K-Cos |
 |------|:---:|:--:|:-----:|
-| `service:store_owner` role 존재 | ✅ `kpa:store_owner` | ✅ `glycopharm:store_owner` | ✅ `cosmetics:store_owner` |
+| `service:store_owner` role 존재 | ✅ `kpa:store_owner` | — | ✅ `cosmetics:store_owner` |
 | 가입 후 운영자 승인 흐름 | ✅ | ✅ | ✅ |
 | service_key canonical 확정 | ✅ | ✅ | ✅ (migration 20260929) |
 | role prefix 사용 | ✅ | ✅ | ✅ |
-| 별도 member entity (도메인별) | ✅ kpa_members | ✅ glycopharm_members | ✅ cosmetics_members |
+| 별도 member entity (도메인별) | ✅ kpa_members | — | ✅ cosmetics_members |
 | sub_role / activity_type 컬럼 | ✅ activity_type | ✅ sub_role | ✅ sub_role |
 | 매장 내 N:M 직급 entity | (organization_members) | (없음) | ✅ cosmetics_store_members |
 
 ### 6.2 차이점
 
-| 항목 | KPA | GP | K-Cos |
+| 항목 | KPA | K-Cos |
 |------|-----|----|----|
 | sub_role 컬럼명 | `activity_type` | `sub_role` | `sub_role` |
 | sub_role 값 | `'pharmacy_owner'` | `'pharmacy_owner'` / `'staff_pharmacist'` | `'store_owner'` / `'store_staff'` |
 | store_owner role 부여 단계 | 승인 시 자동 (activity_type='pharmacy_owner' 기반) | 승인 시 + subRole 조건부 | 승인 시 + sub_role 별도 PATCH |
 | UI 기본 표현 | 약국 (혼재 매장) | 약국 + 매장 혼재 | **매장 (canonical)** |
 | pharmacy/store 코드 위치 혼재 | ✅ /pharmacy/* + /store/* 공존 | ✅ pharmacy_* (DB) + store_* (신규) | ❌ store_* 통일 |
-| 의무 부여 role (다중 부여) | `kpa:store_owner` 단독 | `glycopharm:pharmacist` 의무 + `store_owner` 조건부 | `cosmetics:store_owner` 단독 |
+| 의무 부여 role (다중 부여) | `kpa:store_owner` 단독 | — | `cosmetics:store_owner` 단독 |
 
 ### 6.3 Neture 가 맞춰야 할 기준 (K-Cos canonical 기반)
 
@@ -309,7 +282,7 @@ RegisterModal: activity_type='pharmacy_owner' 선택
 | Guard/Route 영향 | ✅ 단계적 정렬 |
 | Market Trial 대상 조건 | ✅ 점검 필요 |
 | 장점 | 4 서비스 canonical 통일. K-Cos 패턴 mirror. 사업철학 SSOT §3.2 "운영사업자" 정의 정합 |
-| 단점 | 3 phase 작업 분량. KPA / GP 의 activity_type / sub_role 명칭 정렬도 함께 필요 |
+| 단점 | 3 phase 작업 분량. KPA 의 activity_type / sub_role 명칭 정렬도 함께 필요 |
 | Phase | A 즉시 / B 단기 / C 장기 |
 
 ### 7.4 Option 비교 매트릭스
@@ -365,13 +338,13 @@ RegisterModal: activity_type='pharmacy_owner' 선택
 - 작업 시간: 2-3 일
 - 위험: JWT 재발급 시점의 회원 영향 — grace period 설계 필수
 
-### 8.2 추가 권고 — KPA / GP 정렬도 같이 검토
+### 8.2 추가 권고 — KPA 정렬도 같이 검토
 
 | 항목 | 현재 | 권고 |
 |------|------|------|
 | KPA `activity_type='pharmacy_owner'` 컬럼명 | activity_type | (유지) — 가입 신고값이므로 컬럼명 자체는 그대로 OK. 다만 sub_role 으로 리네임 검토 가능 |
-| GP `subRole='pharmacy_owner'` 값 | pharmacy_owner | (유지) — 약국 도메인 의미 명확. K-Cos 의 `store_owner` 와는 도메인 다름 |
-| GP 설정 vs 코드 불일치 | "매장 운영 허브" 설정 + "내 약국" 코드 | **별도 WO 필요** — UI 라벨 정렬 |
+ `subRole='pharmacy_owner'` 값 | pharmacy_owner | (유지) — 약국 도메인 의미 명확. K-Cos 의 `store_owner` 와는 도메인 다름 |
+ 설정 vs 코드 불일치 | "매장 운영 허브" 설정 + "내 약국" 코드 | **별도 WO 필요** — UI 라벨 정렬 |
 | KPA pharmacy/store 코드 위치 | /pharmacy/* + /store/* 공존 | **별도 WO** — 단계적 store 통일 (현재 진행 중인 것 같음) |
 
 ### 8.3 즉시 수정 vs 보류
@@ -380,7 +353,7 @@ RegisterModal: activity_type='pharmacy_owner' 선택
 |------|------|
 | Neture 대시보드 "셀러" → "매장 경영자" | **즉시** (Phase A) |
 | Neture seller → store_owner internal value | **단기** (Phase B+C) |
-| GP "매장 운영 허브" 설정 vs "내 약국" 코드 불일치 | **단기** (별도 WO) |
+ "매장 운영 허브" 설정 vs "내 약국" 코드 불일치 | **단기** (별도 WO) |
 | KPA pharmacy_* / store_* 코드 위치 정리 | **장기** (별도 WO, 현재 진행 중인 작업과 연결) |
 | KPA activity_type → sub_role 리네임 | **보류** (의미 변경 없음, 우선순위 낮음) |
 
@@ -400,8 +373,8 @@ RegisterModal: activity_type='pharmacy_owner' 선택
 |----------|--------|------|
 | "seller / 셀러 / 판매자" 표현이 O4O 사업철학과 충돌하는가 | Neture seller 가 supplier 와 entity 공유 (drift) | ⚠️ 부분 충돌 — supplier (B2B 공급사) 와 store 점주가 같은 테이블이라 의미 모호 |
 | 매장 경영자 개념이 일반 이용자(`user`)와 분리되어야 하는가 | 4 서비스 모두 분리됨 (store_owner role 또는 sub_role) | ✅ 분리 정합 |
-| Neture 가 KPA/GP/K-Cos 와 용어상 어긋나는가 | seller (Neture) vs store_owner (KPA/GP/K-Cos) | ❌ 어긋남 |
-| 서비스별 UI 용어 차이 (약국 vs 매장) 허용 가능한가 | 도메인 다름 → 자연스러움 | ✅ KPA/GP="약국" + K-Cos/Neture="매장" 정합 |
+| Neture 가 KPA/K-Cos 와 용어상 어긋나는가 | seller (Neture) vs store_owner (KPA/K-Cos) | ❌ 어긋남 |
+| 서비스별 UI 용어 차이 (약국 vs 매장) 허용 가능한가 | 도메인 다름 → 자연스러움 | ✅ KPA="약국" + K-Cos/Neture="매장" 정합 |
 | 내부값 정규화 필요한가 | 내부값은 통일이 합리적 (서비스 무관한 RBAC layer) | ✅ 필요 |
 | 사업철학 SSOT §3.2 ("운영사업자") 와 정합 | Neture 의 운영자/관리자(NETURE_SCOPE_CONFIG) ≠ seller. seller 는 실제 사업자(매장 경영자) | ✅ 다층 layer 정합 — 단 명칭만 정리 필요 |
 
@@ -413,11 +386,11 @@ RegisterModal: activity_type='pharmacy_owner' 선택
 
 | 항목 | 결과 |
 |------|------|
-| 조사 대상 파일 | KPA: 8개 + GP: 12개 + K-Cos: 9개 + Neture: 15개 + 공통 인프라 4개 (총 48 파일 명시 참조) |
+| 조사 대상 파일 | KPA: 8개: 12개 + K-Cos: 9개 + Neture: 15개 + 공통 인프라 4개 (총 48 파일 명시 참조) |
 | 4 서비스 UI 용어 표 | §3.1 ~ §3.4 |
 | 4 서비스 내부값 표 | §4.1 ~ §4.5 |
 | Neture seller 전수 사용처 | §5.1 (10 영역) |
-| KPA/GP/K-Cos 공통 패턴 vs 차이 | §6.1 ~ §6.2 |
+| KPA/K-Cos 공통 패턴 vs 차이 | §6.1 ~ §6.2 |
 | Neture 가 맞춰야 할 기준 | §6.3 |
 | Option A/B/C 비교 | §7.1 ~ §7.4 |
 | 최종 권고 | §8 (Option C 변형, Phase A/B/C 분리) |
@@ -448,7 +421,7 @@ Neture 에 store_owner 개념이 0 건 — drift 가 가장 큼
 | 1 | **WO-O4O-NETURE-SELLER-UI-LABEL-ALIGNMENT-V1** | A 즉시 | dashboard.ts 라벨 1줄 |
 | 2 | **WO-O4O-NETURE-STORE-OWNER-CANONICAL-MAPPING-V1** | B 단기 | 백엔드 매핑 + dual Guard |
 | 3 | **WO-O4O-NETURE-SELLER-TO-STORE-OWNER-MIGRATION-V1** | C 장기 | DB migration + JWT 정책 |
-| 4 | **WO-O4O-GLYCOPHARM-UI-LABEL-CONSISTENCY-V1** | 단기 | "매장 운영 허브" 설정 vs "내 약국" 코드 불일치 정리 |
+| 4 | — | 단기 | "매장 운영 허브" 설정 vs "내 약국" 코드 불일치 정리 |
 | 5 | **WO-O4O-KPA-PHARMACY-STORE-CODE-LOCATION-V1** | 장기 | /pharmacy/* legacy + /store/* 정리 (별도 트랙으로 이미 진행 중일 수도) |
 
 ---

@@ -2,7 +2,7 @@
  * Store Core Entities Index
  * WO-O4O-STORE-CORE-ENTITY-EXTRACTION-V1
  *
- * Platform-wide Store Core entities — used by KPA, GlycoPharm, O4O-Store, etc.
+ * Platform-wide Store Core entities — used by KPA, O4O-Store, etc.
  */
 
 export { OrganizationStore } from './organization-store.entity.js';

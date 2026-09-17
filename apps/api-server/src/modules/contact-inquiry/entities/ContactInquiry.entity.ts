@@ -4,7 +4,7 @@
  * WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1
  *
  * cross-service 공개 문의(Contact) 접수 저장소. serviceKey 기준.
- * V1 범위: GlycoPharm / K-Cosmetics (기존 contact 백엔드 없던 서비스).
+ * V1 범위: K-Cosmetics (기존 contact 백엔드 없던 서비스).
  * Neture(NetureContactMessage) / KPA(ContactRequest) 는 기존 구조 유지 — 본 테이블 미사용.
  *
  * 원칙:
@@ -29,7 +29,7 @@ export class ContactInquiry {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  /** glycopharm | k-cosmetics (V1). service-catalog canonical key. */
+  /** k-cosmetics (V1). service-catalog canonical key. */
   @Column({ type: 'varchar', length: 50 })
   service_key!: string;
 

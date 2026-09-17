@@ -19,7 +19,7 @@ Neture 서비스 admin(`/admin`)과 분리된 platform-admin section `/admin/pla
 | `services/web-neture/src/App.tsx` | lazy import + `/admin/platform` sibling route(PlatformRoute guard) |
 | `docs/investigations/CHECK-O4O-ADMIN-PLATFORM-SECTION-ROUTING-V1.md` | 본 문서 |
 
-→ backend/API/DB/공유 모듈/OperatorGroupKey/Tier1 route/GP·KCos·KPA **무변경**.
+→ backend/API/DB/공유 모듈/OperatorGroupKey/Tier1 route/KCos·KPA **무변경**.
 
 ## 3. `/admin/platform` route 구조
 

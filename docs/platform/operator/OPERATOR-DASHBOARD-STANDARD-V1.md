@@ -84,7 +84,6 @@ require{Service}Scope('{service}:operator')
 | 서비스 | Admin Role | Operator Role |
 |--------|-----------|--------------|
 | Neture | `neture:admin` | `neture:operator` |
-| GlycoPharm | `glycopharm:admin` | `glycopharm:operator` |
 | K-Cosmetics | `cosmetics:admin` | `cosmetics:operator` |
 | KPA Society | `kpa:admin` | `kpa:operator` |
 
@@ -191,7 +190,6 @@ if (user.roles.includes('admin')) { ... }
    계층 순위 `member < operator < admin < platform`, 허용 조건은 `rank(caller) > rank(target)`.
    동급 변경(operator → 다른 operator)은 금지한다.
    **다른 서비스의 role 이나 사용자의 전체 최고 role 로 판정하지 않는다** —
-   대상이 `kpa:admin` 이어도 GlycoPharm 에서 일반 회원이면 GlycoPharm 에서는 `member` 다.
 4. 후보 밖 `serviceKey` 지정은 사유에 따라 `403 SERVICE_SCOPE_FORBIDDEN`(관리 범위 밖) 또는
    `404 SERVICE_NOT_MEMBER`(대상이 그 서비스 회원 아님).
 5. credential row 가 없으면 **그 서비스 row 만** 생성한다(다른 서비스 credential 무변경).
@@ -608,7 +606,6 @@ KPI는 Capability Layer 기준으로 분류한다. 서비스는 필요한 Capabi
 | 서비스 | Network | Commerce | Care | Content | Signage | Community | Analytics |
 |--------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **Neture** | ✅ | ✅ | — | ✅ | ✅ | ✅ | ✅ |
-| **GlycoPharm** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **K-Cosmetics** | ✅ | ✅ | — | ✅ | ✅ | ✅ | ✅ |
 | **KPA** | ✅ | — | — | ✅ | ✅ | ✅ | ✅ |
 
@@ -660,7 +657,6 @@ Neture의 `/workspace/operator` 접두사는 레거시이며 신규 서비스에
 |--------|:---:|:---:|:---:|:---:|------|
 | **Neture** | ✅ 8그룹 | ✅ 8그룹 | ✅ 5-Block | ✅ Scope Guard | 기준 서비스 |
 | **KPA** | ✅ 9그룹 | ✅ 5그룹 | ✅ 5-Block | ✅ Scope Guard | aiSummary Backend 전환 필요 |
-| **GlycoPharm** | ⚠️ 11그룹 (누락 있음) | ⚠️ 4-Block | ✅ 5-Block | ⚠️ 혼합 | 메뉴 누락 추가, Guard 통일 |
 | **K-Cosmetics** | ✅ 9그룹 | ⚠️ 최소 | ✅ 5-Block | ✅ Scope Guard | Admin 확장 필요 |
 
 ---

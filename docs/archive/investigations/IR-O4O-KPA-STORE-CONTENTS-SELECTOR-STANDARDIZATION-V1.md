@@ -233,7 +233,7 @@ Pagination (@o4o/operator-ux-core) → 유지 or @o4o/ui.Pagination 검토
 - backend 신규 API
 - `@o4o/store-asset-policy-core` 변경
 - StoreAssetsPage 변경
-- GlycoPharm / K-Cosmetics 이식
+- K-Cosmetics 이식
 
 ---
 

@@ -15,7 +15,7 @@
 | `StoreCartService` | add/update/remove/list/clear/groupBySupplier — 저장 계층 그대로 재사용 |
 | `/api/v1/store/cart/:serviceKey/*` | 이미 서비스 파라미터화 (`getAllServiceKeys()`). **라이브 실측: pharmacy-hub 200**, 잘못된 키 400 |
 | `checkoutService.createOrder()` | E-commerce Core 단일 진입점 (CLAUDE.md §4). `metadata` 로 serviceKey 저장 |
-| 주문 축 규약 | `OrderType` + **`metadata.serviceKey`** — KPA·GlycoPharm·Cosmetics 공통. **신규 OrderType 불필요** |
+| 주문 축 규약 | `OrderType` + **`metadata.serviceKey`** — KPA·Cosmetics 공통. **신규 OrderType 불필요** |
 
 → **신규 주문/장바구니 테이블 0.** CLAUDE.md §4 금지 테이블(`*_orders`)을 만들지 않았다.
 

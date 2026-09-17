@@ -38,7 +38,7 @@
 - append-only 인 이유: `GuideIntroPage` 의 편집 sectionKey 가 index 기반(`section-{idx}-desc`)이라
   기존 섹션 순서를 바꾸면 키가 밀린다. 신규 섹션은 `section-4-desc` 로 충돌 0.
 - 편집 대상 파일은 shared 패키지 안이지만 **PH 전용 copy 파일**이라 타 서비스 breaking change 0
-  (kpa.ts / glycopharm.ts / k-cosmetics.ts / neture.ts 무변경).
+  (kpa.ts.ts / k-cosmetics.ts / neture.ts 무변경).
 
 ---
 
@@ -160,7 +160,7 @@ localhost 정적 서버 + `/api/*` → `https://api.neture.co.kr` 프록시(same
 | 최신글 4축 탭(포럼·콘텐츠·자료실·교육) | 무변경 |
 | 서비스 바로가기 6카드 · CTA · Help | 무변경 |
 | 회원가입/로그인/역할(member·store_owner·operator·admin)/글쓰기 권한/교육/매장 HUB/Neture | 무변경 (코드 접촉 0) |
-| 다른 서비스 홈(KPA · GlycoPharm · K-Cosmetics · Neture) | 무변경 (copy 파일 분리) |
+| 다른 서비스 홈(KPA · K-Cosmetics · Neture) | 무변경 (copy 파일 분리) |
 
 ---
 

@@ -325,7 +325,6 @@ GET /kpa-society/media/library                                        → 200 (�
 ### 12-4. 공개 router · 타 서비스
 
 ```
-kpa-society / k-cosmetics / glycopharm
   GET /public/media/not-a-uuid     → 400 INVALID_ID
   GET /public/playlists/not-a-uuid → 400 INVALID_ID
   GET /public/media/{miss}         → 404 Media not found
@@ -370,7 +369,6 @@ revision `o4o-core-api-03411-gmb` 배포 후, KPA store owner 계정으로 실�
 | KPA | `/store/marketing/signage/player` | ✅ | 0 | 0 |
 | KPA | `/store-hub/signage` | ✅ | 0 | 0 |
 | K-Cosmetics (`k-cosmetics.site`) | `/store-hub/signage` | ✅ | 0 | 0 |
-| GlycoPharm (`glycopharm.co.kr`) | `/store-hub/signage` | ✅ | 0 | 0 |
 
 white screen 0 · JS exception 0 · 신규 4xx/5xx 0 ·
 `/media/library` · `/schedules/calendar` 정상 유지.

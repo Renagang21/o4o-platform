@@ -1,6 +1,6 @@
 # CHECK — WO-O4O-CROSSSERVICE-OPERATOR-FORUM-ANALYTICS-COMMONIZE-V1
 
-> KPA-Society / GlycoPharm / K-Cosmetics operator **Forum 분석 화면**을 단일 공통 콘솔로 추출.
+> KPA-Society / K-Cosmetics operator **Forum 분석 화면**을 단일 공통 콘솔로 추출.
 >
 > 선행:
 > - IR-O4O-CROSSSERVICE-OPERATOR-FORUM-MENU-UIUX-PARITY-AUDIT-V1
@@ -9,7 +9,6 @@
 >
 > - 일자: 2026-06-16
 > - 범위: forum-analytics 화면 공통화 only (조회 전용). hub/목록 관리 이식·route/menu 변경 없음.
-> - 대상: `packages/operator-core-ui`, `web-kpa-society`, `web-glycopharm`, `web-k-cosmetics`
 > - 제외: Neture, backend/API/DB, capability, route/menu, forum 운영 hub / 목록 관리 이식
 
 ---
@@ -28,12 +27,12 @@
 
 **유일한 서비스 차이 (2가지):**
 
-| 차이 | KPA | GlycoPharm | K-Cosmetics |
-|---|---|---|---|
-| accent 색 | blue (활성 포럼 카드만 emerald) | teal | pink |
-| API import | `../../api/forum` | `@/services/api` | `@/services/forumApi` |
+| 차이 | KPA | K-Cosmetics |
+|---|---|---|
+| accent 색 | blue (활성 포럼 카드만 emerald) | pink |
+| API import | `../../api/forum` | `@/services/forumApi` |
 
-API 메서드 시그니처/응답 shape는 동일 (`getSummary`/`getTrend(days)`/`getActivity(limit)`, 공통 `/api/v1/forum/operator/analytics/*`). 차이는 TS 반환 타입뿐(GP=`apiClient.get<unknown>`, KPA/KCos=envelope `any`) — 런타임 접근 동일.
+API 메서드 시그니처/응답 shape는 동일 (`getSummary`/`getTrend(days)`/`getActivity(limit)`, 공통 `/api/v1/forum/operator/analytics/*`).
 
 ---
 
@@ -55,7 +54,7 @@ API 메서드 시그니처/응답 shape는 동일 (`getSummary`/`getTrend(days)`
 ## 3. 공통화 방식
 
 - 공통 콘솔이 loading/empty/KPI/트렌드/활동 **presentation + 데이터 로드**를 담당.
-- 데이터 접근은 기존 페이지와 **런타임 동일** (`s.data` / `t.data?.daily` / `Array.isArray(a.data)`). `client` adapter 의 data 는 loose(`unknown`)로 두고 콘솔이 narrowing — 기존 GP 의 `as` 캐스트와 동일 의미.
+- 데이터 접근은 기존 페이지와 **런타임 동일** (`s.data` / `t.data?.daily` / `Array.isArray(a.data)`).
 - 서비스 wrapper 는 `accent` + `client`(기존 `forumAnalyticsApi`) 만 주입하는 thin wrapper.
 
 ---
@@ -65,7 +64,6 @@ API 메서드 시그니처/응답 shape는 동일 (`getSummary`/`getTrend(days)`
 | 서비스 | accent(iconText / barColor / activeForumText / activeForumBg) | client |
 |---|---|---|
 | KPA | `text-blue-600` / `bg-blue-500` / `text-emerald-600` / `bg-emerald-50` | `forumAnalyticsApi` (`../../api/forum`) |
-| GlycoPharm | `text-teal-600` / `bg-teal-500` / `text-teal-600` / `bg-teal-50` | `forumAnalyticsApi` (`@/services/api`) |
 | K-Cosmetics | `text-pink-600` / `bg-pink-500` / `text-pink-600` / `bg-pink-50` | `forumAnalyticsApi` (`@/services/forumApi`) |
 
 accent 값은 wrapper 소스(서비스 트리)에 **리터럴 className** 으로 존재 → 각 서비스 Tailwind content 스캔 포함 → 생성 보장.
@@ -76,7 +74,7 @@ accent 값은 wrapper 소스(서비스 트리)에 **리터럴 className** 으로
 
 - 6 KPI / 트렌드 차트(2색 스택·범례) / 최근 활동 피드 / loading / empty 상태 — 모두 동일.
 - 데이터 로드 호출(getSummary·getTrend(30)·getActivity(15)) 동일.
-- accent 별 색 표현 픽셀 동일 (KPA blue+emerald, GP teal, KCos pink).
+- accent 별 색 표현 픽셀 동일 (KPA blue+emerald teal, KCos pink).
 
 ---
 
@@ -102,7 +100,7 @@ accent 값은 wrapper 소스(서비스 트리)에 **리터럴 className** 으로
 ## 8. TypeScript 결과
 
 - `@o4o/operator-core-ui` (`tsc --noEmit`): forum-analytics 모듈 에러 **0**. (잔여 1건은 사전 baseline — 타 패키지 `error-handling/.../useApiErrorHandler.ts` `ImportMeta.env`, 본 작업 무관.)
-- `web-kpa-society` / `web-glycopharm` / `web-k-cosmetics` (`tsc --noEmit`): `ForumAnalytics` 관련 에러 **0**. 신규 subpath `@o4o/operator-core-ui/modules/forum-analytics` module-not-found 없음 → export 맵/타입/`client` 할당 정상.
+- 신규 subpath `@o4o/operator-core-ui/modules/forum-analytics` module-not-found 없음 → export 맵/타입/`client` 할당 정상.
 
 ---
 
@@ -113,7 +111,6 @@ accent 값은 wrapper 소스(서비스 트리)에 **리터럴 className** 으로
 | 서비스 | 결과 |
 |---|---|
 | `@o4o/web-k-cosmetics` | ✓ built in 21.39s |
-| `glycopharm-web` | ✓ built in 36.29s |
 | `@o4o/web-kpa-society` | ✓ built in 32.15s |
 
 → 신규 공통 모듈 subpath 해석 + Tailwind 클래스 생성 + 번들링 정상.
@@ -124,7 +121,7 @@ accent 값은 wrapper 소스(서비스 트리)에 **리터럴 className** 으로
 
 - 브라우저 smoke: 보류(배포 후 권장). build PASS + accent 리터럴/inline-style 분석으로 픽셀 동등 확인.
 - Tailwind 주의: `operator-core-ui` 는 3서비스 tailwind content 글롭에 **미포함**. 따라서 공통 콘솔의 arbitrary-value 클래스(`min-w-[28px]` / `text-[9px]` / `rotate-[-45deg]` / `origin-top-left`)는 **inline style 로 변환**해 purge 회귀 차단. semantic scale 색(indigo/yellow/green/red/orange 50·500·600)은 각 서비스 타 파일에서 사용 확인 → 생성 보장. accent 색은 wrapper 리터럴.
-- 배포 후 권장: KPA/GP/KCos `/operator/forum-analytics` 접근 → 제목/6 KPI/트렌드/활동 또는 empty 정상, accent 색 정상, console/pageerror/4xx 없음.
+- 배포 후 권장: KPA/KCos `/operator/forum-analytics` 접근 → 제목/6 KPI/트렌드/활동 또는 empty 정상, accent 색 정상, console/pageerror/4xx 없음.
 
 ---
 
@@ -137,8 +134,8 @@ accent 값은 wrapper 소스(서비스 트리)에 **리터럴 className** 으로
 
 ## 12. 후속 WO 후보
 
-1. 포럼 운영 hub (`OperatorForumPage`) GlycoPharm / K-Cosmetics 이식 — route/page 신설 동반, 사업 필요성 판단 선행. 이식 시 GP/KCos `/operator/forum` redirect → 실 hub 승격.
-2. 포럼 목록 관리 (`forum-categories`) GlycoPharm / K-Cosmetics 이식.
+1. 포럼 운영 hub (`OperatorForumPage`) K-Cosmetics 이식 — route/page 신설 동반, 사업 필요성 판단 선행. 이식 시 KCos `/operator/forum` redirect → 실 hub 승격.
+2. 포럼 목록 관리 (`forum-categories`) K-Cosmetics 이식.
 
 ---
 

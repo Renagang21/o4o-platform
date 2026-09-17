@@ -50,7 +50,7 @@
 ## 5. KPA 외 영향
 
 - 변경 파일 = `OperatorTabletScreenSetsPage.tsx`(web-kpa-society operator 전용 페이지). 공통 컴포넌트·메뉴 config
-  미변경 → GP/KCos/Neture 무영향. 메뉴 라벨(operatorMenuGroups) 무변경.
+  미변경 → KCos/Neture 무영향. 메뉴 라벨(operatorMenuGroups) 무변경.
 
 ## 6. 커밋
 

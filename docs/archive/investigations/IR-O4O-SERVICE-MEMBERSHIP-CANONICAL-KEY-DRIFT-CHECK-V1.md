@@ -67,7 +67,6 @@ IR-O4O-SERVICE-OPERATOR-ROLE-MEMBERSHIP-CONSISTENCY-AUDIT-V1 §5-1 의 SQL 6 개
 ```
  service_key | status  | cnt
 -------------+---------+-----
- glycopharm  | active  |   1
  k-cosmetics | active  |   2
  kpa         | active  |   1    ← LEGACY DRIFT
  kpa-society | active  |   3
@@ -104,7 +103,7 @@ cosmetics (legacy) : 0 rows
 (3 rows)
 ```
 
-**비고**: `cosmetics:*`, `neture:*`, `glycopharm:*`, `platform:*` 등은 본 결과셋에 없음 — `role_assignments` 에 활성 service-prefix role 이 KPA 계열만 존재. (즉 운영 DB 의 실제 service-prefix role 발급 표본은 매우 작음)
+**비고**: `cosmetics:*`, `neture:*`, `platform:*` 등은 본 결과셋에 없음 — `role_assignments` 에 활성 service-prefix role 이 KPA 계열만 존재. (즉 운영 DB 의 실제 service-prefix role 발급 표본은 매우 작음)
 
 ### Q4. kpa:* role 보유 사용자 중 `kpa-society` active membership 누락자
 

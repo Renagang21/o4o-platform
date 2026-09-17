@@ -2,7 +2,6 @@
 
 **날짜:** 2026-03-21
 **기준 커밋:** `19622ca7c` (WO-O4O-DEAD-CODE-CLEANUP-PHASE1-STEP2-FINAL-V1)
-**범위:** api-server, web-neture, web-glycopharm, web-glucoseview, web-k-cosmetics, web-kpa-society, packages, admin-dashboard
 **유형:** 조사 전용 (수정 없음)
 
 ---
@@ -13,7 +12,6 @@
 |--------|:----:|:----:|:-----:|:-------------------:|
 | **api-server** | 76 | 24 | 3 | 3 |
 | **web-neture** | 43 | 5 | 0 | 1 |
-| **web-glycopharm** | 36 | 7 | 0 | 1 |
 | **web-kpa-society** | 55 | 5 | 0 | 1 |
 | **web-k-cosmetics** | 13 | 3 | 0 | 0 |
 | **web-glucoseview** | 9 | 1 | 0 | 0 |
@@ -51,7 +49,7 @@
 |------|------|
 | 유형 | Controller |
 | 책임 수 | **5개**: Post CRUD, Category CRUD, Comment CRUD, Like/통계, Moderation |
-| 왜 P0 | 포럼은 5개 서비스(kpa, neture, glycopharm, k-cosmetics, glucoseview)가 공유하는 핵심 기능. 한 컨트롤러에서 5개 하위 도메인이 섞여 있어 변경 영향 범위가 과도 |
+| 왜 P0 | 포럼은 4개 서비스(kpa, neture, k-cosmetics, glucoseview)가 공유하는 핵심 기능. 한 컨트롤러에서 5개 하위 도메인이 섞여 있어 변경 영향 범위가 과도 |
 | 분리 방향 | `ForumPostController`, `ForumCategoryController`, `ForumCommentController`, `ForumModerationController` 4개로 분해 |
 | 분해 단위 | 4개 컨트롤러 |
 | 난이도 | 하 (메서드 간 의존이 적음, scope filter만 공유) |
@@ -104,7 +102,7 @@
 
 | 항목 | 내용 |
 |------|------|
-| 서비스 | glycopharm(782), glucoseview(786), k-cosmetics(782), kpa-society(783), neture(765) |
+| 서비스 | glucoseview(786), k-cosmetics(782), kpa-society(783), neture(765) |
 | 왜 P0 | 동일 코드가 5번 복사. RBAC 변경 시 5개 파일을 모두 수정해야 하며, 이번 RBAC WO에서도 실제로 이 문제 발생. 공유 컴포넌트 추출이 가장 효과적인 중복 제거 |
 | 분리 방향 | `@o4o/operator-shared` 패키지에 `OperatorUserDetailPage` 공유 컴포넌트 생성, 서비스별 thin wrapper로 교체 |
 | 분해 단위 | 1개 공유 컴포넌트 + 5개 wrapper |
@@ -114,7 +112,7 @@
 
 | 항목 | 내용 |
 |------|------|
-| 서비스 | glycopharm(593), glucoseview(591), k-cosmetics(588), kpa-society(595), neture(529) |
+| 서비스 | glucoseview(591), k-cosmetics(588), kpa-society(595), neture(529) |
 | 왜 P0 | UserDetailPage와 동일 이유. 사용자 목록 + 승인 + 비밀번호 변경이 5번 복사 |
 | 분리 방향 | P0-7과 함께 `@o4o/operator-shared`에 추출 |
 | 분해 단위 | 1개 공유 컴포넌트 + 5개 wrapper |
@@ -124,7 +122,7 @@
 
 | 항목 | 내용 |
 |------|------|
-| 서비스 | glycopharm(502), glucoseview(502), k-cosmetics(502), kpa-society(507), neture(502) |
+| 서비스 | glucoseview(502), k-cosmetics(502), kpa-society(507), neture(502) |
 | 왜 P0 | RBAC SSOT 변경 시 5개 서비스 동시 수정 필수. Frozen RBAC 정책과 직결 |
 | 분리 방향 | P0-7, P0-8과 함께 `@o4o/operator-shared`에 추출 |
 | 분해 단위 | 1개 공유 컴포넌트 + 5개 wrapper |
@@ -144,14 +142,13 @@
 | P1-6 | api-server | `services/IncidentEscalationService.ts` | 976 | Service | 6개 하위 도메인 혼합 |
 | P1-7 | api-server | `services/GracefulDegradationService.ts` | 967 | Service | 룰 엔진 + 7종 액션 핸들러 + 모니터링 |
 | P1-8 | web-neture | `pages/partner/PartnerOverviewPage.tsx` | 1,166 | Page | mega page + 인라인 styles 200줄+ |
-| P1-9 | web-glycopharm | `api/pharmacy.ts` | 1,097 | Service | 타입 정의 + 30+ API 메서드 한 파일 |
 | P1-10 | web-kpa-society | `pages/mypage/AnnualReportFormPage.tsx` | 1,093 | Page | 7섹션 mega form. 섹션별 분리 가능 |
 | P1-11 | web-kpa-society | `pages/pharmacy/PharmacyStorePage.tsx` | 1,075 | Page | 스토어 설정 + 템플릿 선택 + 디바이스 프리뷰 |
 | P1-12 | web-glucoseview | `pages/PatientsPage.tsx` | 1,054 | Page | list+detail split view mega page |
 | P1-13 | web-neture | `pages/forum/ForumPostPage.tsx` | 1,035 | Page | 포스트 상세 + 댓글 CRUD + 좋아요 + styles |
 | P1-14 | admin-dashboard | `pages/vendors/VendorsCommissionAdmin.tsx` | 1,161 | Page | 커미션 관리 mega page |
 | P1-15 | admin-dashboard | `pages/lms-yaksa/credits/index.tsx` | 1,141 | Page | 학점 관리 mega page |
-| P1-16 | 복제패턴 | `AiReportPage.tsx` (3개 서비스) | ~2,845 | Page | glycopharm(940)+glucoseview(965)+k-cosmetics(940) 복제 |
+| P1-16 | 복제패턴 | `AiReportPage.tsx` (3개 서비스) | ~2,845 | Page | glucoseview(965)+k-cosmetics(940) 복제 |
 
 ---
 
@@ -168,9 +165,9 @@
 | P2-7 | packages | `membership-yaksa/.../MemberService.ts` | 936 | Service | DTO 인라인이지만 단일 도메인 |
 | P2-8 | packages | `hub-exploration-core/.../B2BTableList.tsx` | 902 | Component | 인라인 CSS 200줄+ 분리 가능 |
 | P2-9 | packages | `groupbuy-yaksa/.../groupbuy.routes.ts` | 862 | Route | 라우트+검증+에러처리 혼합 |
-| P2-10 | 복제패턴 | `StoreChannelsPage.tsx` (3개 서비스) | ~2,662 | Page | glycopharm(880)+k-cosmetics(872)+kpa(910) |
-| P2-11 | 복제패턴 | `StoreLocalProductsPage.tsx` (3개 서비스) | ~1,938 | Page | glycopharm(646)+k-cosmetics(646)+kpa(646) |
-| P2-12 | 복제패턴 | `RegisterModal/RegisterPage` (4개 서비스) | ~2,614 | Component | neture(643)+glycopharm(683)+k-cosmetics(665)+kpa(623) |
+| P2-10 | 복제패턴 | `StoreChannelsPage.tsx` (3개 서비스) | ~2,662 | Page | k-cosmetics(872)+kpa(910) |
+| P2-11 | 복제패턴 | `StoreLocalProductsPage.tsx` (3개 서비스) | ~1,938 | Page | k-cosmetics(646)+kpa(646) |
+| P2-12 | 복제패턴 | `RegisterModal/RegisterPage` (4개 서비스) | ~2,614 | Component | neture(643)+k-cosmetics(665)+kpa(623) |
 
 ---
 
@@ -212,7 +209,6 @@
 | `packages/block-renderer/src/metadata.ts` | 733 | 블록 메타데이터 레지스트리 |
 | `packages/cgm-pharmacist-app/src/backend/mock/mockPatients.ts` | 708 | 목 데이터 |
 | `web-k-cosmetics/src/components/icons.tsx` | 507 | SVG 아이콘 정의 |
-| `web-glycopharm/src/types/store.ts` | 616 | 순수 타입 정의 |
 
 ### 5.4 테스트 파일
 

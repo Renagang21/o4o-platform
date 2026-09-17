@@ -71,18 +71,6 @@ O4O 플랫폼 코드베이스 전면 조사 결과:
 
 ### 2.4 Store HUB UI
 
-#### GlycoPharm (web-glycopharm) — 18 pages, 전부 COMPLETE
-
-| 주요 기능 | 파일 |
-|-----------|------|
-| 공개 매장 (StoreFront) | `pages/store/StoreFront.tsx` |
-| B2B 카탈로그 | `pages/hub/HubB2BCatalogPage.tsx` |
-| 약국 상품 관리 | `pages/pharmacy/PharmacyProducts.tsx` |
-| B2B 주문 | `pages/pharmacy/b2b-order/B2BOrderPage.tsx` |
-| 매장 설정 | `pages/pharmacy/PharmacySettings.tsx` |
-| 매장 신청 | `pages/pharmacy/StoreApplyPage.tsx` |
-| 디지털 자산 | `pages/store/StoreAssetsPage.tsx` |
-
 #### K-Cosmetics (web-k-cosmetics) — 11 pages, 전부 COMPLETE
 
 | 주요 기능 | 파일 |
@@ -238,8 +226,6 @@ services/
 │       ├── StoreQRPage.tsx
 │       ├── HubB2BCatalogPage.tsx
 │       └── ... (33+ more)
-│
-├── web-glycopharm/src/pages/     ← 18 pages, ALL COMPLETE
 │   ├── store/
 │   ├── hub/
 │   ├── pharmacy/

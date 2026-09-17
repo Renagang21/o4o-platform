@@ -26,7 +26,6 @@
 ## 2. live store-content 시스템과의 구분 (절대 보호)
 **`kpa_store_contents` 계열은 본 IR 대상이 아니며 절대 건드리지 않는다.**
 - live 경로: `routes/o4o-store/controllers/store-content.controller.ts`(`createStoreContentController`) → **`KpaStoreContent` 엔티티 = `kpa_store_contents` 테이블**.
-- 마운트: KPA/GlycoPharm/Cosmetics `*.routes.ts` 의 `router.use('/store-contents', createStoreContentController(...))` → `/api/v1/{service}/store-contents`.
 - frontend 소비: `web-kpa-society/src/api/assetSnapshot.ts` 등이 `/store-contents`(서비스 prefix) 호출. pharmacy 편집 페이지(StoreContentEditPage 등) 모두 **kpa_store_contents** 대상(파일 주석 "upsert → kpa_store_contents" 명시).
 - IR §4(이전 audit)의 `store_contents` substring 매칭 다수는 **`kpa_store_contents`** 였음(오탐). `content_analytics`/`store_content_blocks` 와는 무관.
 

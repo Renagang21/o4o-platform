@@ -3,13 +3,12 @@
 > **작업명:** WO-O4O-KCOS-OPERATOR-APPLICATIONS-URL-SYNC-MINIMAL-V1
 > **유형:** KCos `/operator/applications` statusFilter URL sync 최소 개선. frontend only, backend/DB/package/lock 무변경.
 > **결과: PASS — KCos `ApplicationsPage`(array-only + client filter)에 statusFilter ↔ URL query(`applications_status`) 동기화 + 새로고침 복원만 추가. 기존 fetch(전체 1회)·client filter·카드·DataTable·drawer·stats 무변경. STANDARD-LIST full adoption 비대상(이유 §1). web-k-cosmetics tsc 0.**
-> 선행: APPLICATIONS-ADOPTION(280d757ab, GP) — 2026-06-17
+> 선행: APPLICATIONS-ADOPTION(280d757ab) — 2026-06-17
 
 ---
 
 ## 1. full adoption 비대상 이유
 
-- GP `/operator/applications`(280d757ab)는 `{applications,pagination}` 서버 페이지네이션 → 표준 adoption 완료.
 - **KCos 는 다른 backend**: `GET /cosmetics/stores/admin/applications` → **array-only**(`limit:100` 전체) 반환 + **client filter**(`applications.filter(status)`). 서버 pagination/search/sort **부재**.
 - ∴ `useStandardListQuery`/`normalizePaginatedResponse`/DataTable manualSort/Pagination 의 표준 골격이 구조적으로 비대상. **V1=URL sync 최소 개선**(WO 결정).
 
@@ -39,7 +38,7 @@
 |---|---|---|
 | statusFilter | `applications_status` | 'all'(기본) → param 생략, SUBMITTED/APPROVED/REJECTED → 설정 |
 
-- 단일 route(서비스 도메인 분리) → GP `applications_f_*`(filter prefix) 와 실제 충돌 없음. 단순 `applications_status` 사용.
+- 단순 `applications_status` 사용.
 
 ## 5. 새로고침 복원 결과 (정적)
 
@@ -60,7 +59,7 @@
 
 ## 8. 후속 backend pagination 후보
 
-- **(보류 분리) `WO-O4O-KCOS-APPLICATIONS-LIST-BACKEND-PAGINATION-V1`** — 데이터 증가 시 `/cosmetics/stores/admin/applications` 에 page/limit/status/search/sort 추가 → GP 처럼 `useStandardListQuery` full adoption. 현재는 소량/전체조회라 불요.
+- 현재는 소량/전체조회라 불요.
 
 ---
 

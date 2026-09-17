@@ -7,7 +7,7 @@
  *   서비스별 세션 계약 차이(현재 기기 포함 여부 · 단일 기기 로그아웃)는 아키텍처를
  *   바꾸지 않고 prop 으로만 흡수한다.
  *
- * GlycoPharm / K-Cosmetics / Neture 의 `MySettingsPage` 본문이
+ * K-Cosmetics / Neture 의 `MySettingsPage` 본문이
  * serviceKey 주입값과 2단계 인증 안내 유무만 다른 3중 복제였다.
  * 비밀번호 변경 모달 · 모든 기기 로그아웃 · 확인 다이얼로그 흐름을 여기로 수렴한다.
  *
@@ -56,7 +56,7 @@ export interface AccountSecuritySettingsProps {
   notify?: AccountSecurityNotify;
   /** 보안 설정 섹션 설명 문구. */
   securityDescription?: string;
-  /** 2단계 인증 "준비 중" 안내 노출 (GlycoPharm). */
+  /** 2단계 인증 "준비 중" 안내 노출. */
   showTwoFactorNotice?: boolean;
   /** 섹션 하단 추가 항목. */
   children?: ReactNode;

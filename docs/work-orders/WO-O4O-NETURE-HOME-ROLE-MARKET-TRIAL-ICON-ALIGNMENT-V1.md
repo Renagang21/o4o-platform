@@ -16,8 +16,6 @@
 ```text
 IR / 기준문서          cd0ef7285 / 9b02c39e7
 Phase 1 KPA            bda26764d (+ AI 보정 811067be0)
-Phase 2 GlycoPharm     4a8bb62d3
-Glyco 보완 + KCos P3   d224168d0
 Operator Mobile Drawer IR 49c825d06 / WO 108c0a41e / code 39cc8c94a / smoke bf69ba09d
 → Phase 4 Neture       (본 WO, 코드 대기)
 ```
@@ -26,7 +24,7 @@ Operator Mobile Drawer IR 49c825d06 / WO 108c0a41e / code 39cc8c94a / smoke bf69
 
 ## 1. 작업 목적
 
-Neture는 KPA/GlycoPharm/K-Cosmetics와 달리 **매장 실행 허브 중심이 아니라 공급자·파트너·Market Trial·운영 생태계 중심 서비스**다. 따라서 아이콘 정비 시 `내 매장`·`Store Blog`·매장 실행 자산 흐름을 추가하지 않고, Neture canonical 역할/기능에 맞춰 emoji → lucide line icon으로 정리한다.
+따라서 아이콘 정비 시 `내 매장`·`Store Blog`·매장 실행 자산 흐름을 추가하지 않고, Neture canonical 역할/기능에 맞춰 emoji → lucide line icon으로 정리한다.
 
 본 단계는 **WO 문서 작성 전용**이며 코드 수정 없음.
 
@@ -96,7 +94,7 @@ rg "🧪|🏪|🏭|🤝|⭐|💊|🩺|🧴|🏠|📦|📢|📱|🖼|emoji:" serv
 
 ### 5.5 Operator 도메인 라벨 (`operatorMenuGroups.ts:240-244`) — **결정 필요**
 - `NETURE_DOMAIN_LABELS` emoji(`📦💳💬⚙️`)는 공통 `DomainIASidebar` 가 직접 렌더 → lucide 化 시 **공통 sidebar 구조 변경 필요(§7 가드 저촉)**.
-- **권장 결정: 이번 Phase 4 에서는 미변경.** 도메인 헤딩 emoji 의 lucide 전환은 **별도 후속 WO**(공통 `DomainIASidebar` 도메인 헤딩 아이콘화 — KPA/Glyco/KCos 도메인 라벨 emoji 와 함께 일괄)로 분리. CHECK 에 후속 항목으로 기록.
+- **권장 결정: 이번 Phase 4 에서는 미변경.** 도메인 헤딩 emoji 의 lucide 전환은 **별도 후속 WO**로 분리. CHECK 에 후속 항목으로 기록.
 
 ---
 
@@ -134,7 +132,6 @@ rg "🧪|🏪|🏭|🤝|⭐|💊|🩺|🧴|🏠|📦|📢|📱|🖼|emoji:" serv
 ## 8. 제외 범위
 
 ```text
-- KPA-Society / GlycoPharm / K-Cosmetics 수정 금지
 - operator mobile drawer 파일(DomainIASidebar/OperatorAreaShell) 수정 금지
 - packages/operator-ux-core 수정 금지
 - packages/shared-space-ui/src/HeroBannerSection.tsx — 미접촉 유지

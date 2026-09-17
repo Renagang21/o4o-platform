@@ -182,12 +182,8 @@ Pharmacy-Hub 도입 커밋 `489f497de` (`WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-
 ### 7-1. 전파 경로 — 재현 가능한 구체 시나리오
 
 ```
-GlycoPharm 운영자가 회원 목록에서 [반려] 클릭
-  services/web-glycopharm/src/pages/operator/UsersPage.tsx:267  { label:'반려', status:'rejected' }
   → PATCH /api/v1/operator/members/:userId/status  { status:'rejected' }
   → MembershipConsoleController.updateMemberStatus
-      checkServiceBoundary(userId, ['glycopharm'])   ← 대상 선택은 올바르게 제한됨
-      rejectMembership(...)                          ← glycopharm membership 만 반려 (정상)
       UPDATE users SET status='rejected', isActive=false WHERE id=$2   ← 스코프 없음 🔴
   → 결과: 그 사용자의 KPA · K-Cosmetics · Neture · Pharmacy-Hub 로그인 전부 차단
 ```
@@ -236,7 +232,7 @@ GlycoPharm 운영자가 회원 목록에서 [반려] 클릭
 ### A. 서비스별 사용 통제 — 🔴 CROSS_SERVICE_RISK
 
 한 서비스 운영자의 반려·탈퇴·승인 조치가 `users.status`/`isActive` 를 통해 다른 서비스 로그인과
-**진행 중 세션까지 즉시** 좌우한다. 라이브 UI(GlycoPharm·K-Cosmetics 운영자·관리자 화면)에서 도달 가능하다.
+**진행 중 세션까지 즉시** 좌우한다. 라이브 UI(K-Cosmetics 운영자·관리자 화면)에서 도달 가능하다.
 
 ### B. 서비스별 비밀번호 — 🟡 REDESIGN_REQUIRED
 

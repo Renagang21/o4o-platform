@@ -48,7 +48,7 @@
 
 - KPA 매장 조직 `9c87f46b…`(테스트 약국): `organization_channels` **0행** → TABLET 채널 없음 (Case A 재현)
 - 동 조직 OPC 연결 **0건**, screen set **32건**, tablet **4대**
-- 동 조직 OPL(active): `neture` 20 · `kpa-society` 1 · `k-cosmetics` 1 · `glycopharm` 1
+- 동 조직 OPL(active): `neture` 20 · `kpa-society` 1 · `k-cosmetics` 1 1
   → KPA scope 에서는 20건이 `service_scope_mismatch` (Case F)
 
 ## 3. 축 B — 조직 resolver census (미조사 0)
@@ -70,7 +70,6 @@
 | 조직 | 이름 | 연결 서비스 | is_primary | joined_at |
 |---|---|---|---|---|
 | `95aad740…` | (주)네뚜레 공급자 테스트 | neture | true | 2026-06-11 |
-| `13c08a86…` | [E2E_TEST] 글라이코팜 검증 약국 | glycopharm | true | 2026-08-13 |
 | `e3d14288…` | 네뚜레 약국 | pharmacy-hub | true | 2026-09-03 |
 | `9c87f46b…` | 테스트 약국 | **kpa-society** (+ slug `kpa`) | false | 2026-05-29 |
 | `83ff96c7…` | 테스트 뷰티샵 | k-cosmetics | false | 2026-06-02 |

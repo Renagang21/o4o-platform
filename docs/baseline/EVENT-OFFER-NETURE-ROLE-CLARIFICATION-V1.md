@@ -27,7 +27,6 @@ Event Offer는 O4O 공통 도메인이다.
 ```text
 - KPA-Society
 - K-Cosmetics
-- GlycoPharm
 - 기타 매장 기반 서비스
 ```
 

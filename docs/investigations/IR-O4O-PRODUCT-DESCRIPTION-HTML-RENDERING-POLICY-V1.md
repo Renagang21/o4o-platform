@@ -1,8 +1,8 @@
 # IR-O4O-PRODUCT-DESCRIPTION-HTML-RENDERING-POLICY-V1
 
 > **유형:** read-only 조사·정책 — 코드/DB/UI **무변경**. 상품설명 content HTML 노출 기준 확정.
-> **판정: D → B (단계적 → 제한된 sanitized HTML).** 현재 상품설명 렌더는 **XSS-안전**(KPA ContentRenderer=DOMPurify, GP=태그제거+plain, tablet=plain auto-escape). 목표 = **기존 `@o4o/content-editor` sanitizer + ContentRenderer 를 공용 상품설명 표준 렌더로** (신규 dependency 0). 구현은 후속 분리.
-> **🔴 범위 밖 CRITICAL 보고:** GP LMS `CourseDetailPage.tsx:88` 에 **미-sanitize `dangerouslySetInnerHTML`**(lesson content) — 상품설명 아님. 별도 긴급 WO 필요(§7).
+> **판정: D → B (단계적 → 제한된 sanitized HTML).** 현재 상품설명 렌더는 **XSS-안전**(KPA ContentRenderer=DOMPurify=태그제거+plain, tablet=plain auto-escape). 목표 = **기존 `@o4o/content-editor` sanitizer + ContentRenderer 를 공용 상품설명 표준 렌더로** (신규 dependency 0). 구현은 후속 분리.
+> 별도 긴급 WO 필요(§7).
 > 선행: CANONICAL-OUTPUT-LINK · STORE-PROFILE-OVERRIDE-ALIGNMENT · KPA-TABLET-LINK — 2026-06-16
 
 ---
@@ -12,11 +12,10 @@
 | Surface | 프론트 렌더 | backend description | XSS | 표현 |
 |------|------|------|:--:|------|
 | **KPA storefront** | `<ContentRenderer html={product.description}>` (`StorefrontProductDetailPage:292`) | HTML 보존(strip 안 함) | ✅ **sanitize**(DOMPurify) | rich HTML |
-| **GP storefront** | `{product.description}` plain JSX (`StoreProductDetail:313`) | **태그 제거**(regexp_replace, glycopharm store.controller) | ✅ React auto-escape | plain |
 | **KPA tablet (kiosk)** | `{selectedProduct.description}` plain JSX (`tablet-kiosk-core/TabletKioskPage`) | HTML 보존(strip 안 함) | ✅ React auto-escape | **⚠️ HTML 태그 문자 그대로 노출** |
 | **Admin 정비 모달** | `toPlainText`(태그 제거) preview | — | ✅ | plain preview |
 
-→ **보안상 XSS 위험 없음**(상품설명 경로). 문제는 **표현 일관성**: rich(KPA) vs plain(GP) vs **tags-visible(tablet)**.
+→ **보안상 XSS 위험 없음**(상품설명 경로). 문제는 **표현 일관성**: rich(KPA) vs plain vs **tags-visible(tablet)**.
 
 ### 1.1 tablet 표현 이슈 (주의)
 - tablet kiosk 는 `{description}` plain 렌더 → backend 가 HTML(canonical/supplier/sp)을 보내면 **`<p>…</p>` 등 태그가 문자로 보임**.
@@ -39,7 +38,6 @@
 ## 3. shared_product_descriptions 저장 sanitize 여부
 
 - `shared-product-description.service.ts` `createCandidate`/seed(supplier/ai/drug_extension) → content **raw 저장**(sanitize 안 함). admin/operator 전용 write.
-- 노출 시점: GP=strip / KPA=ContentRenderer sanitize / tablet=plain-escape → **현재는 노출 렌더에서 안전 보장**.
 - 단 "저장 raw + 렌더 sanitize" 는 렌더러마다 보장에 의존 → **write-time sanitize(defense-in-depth)** 가 장기적으로 더 견고(§7 후속).
 
 ---
@@ -77,7 +75,7 @@
 | 순위 | WO | 목적 |
 |:--:|------|------|
 | **1** | `WO-O4O-PRODUCT-DESCRIPTION-TABLET-RICH-RENDER-V1` | tablet kiosk `{description}` → ContentRenderer(또는 interim strip). **표현 이슈(§1.1) 해소** — canonical HTML 태그 노출 방지 |
-| **2** | `WO-O4O-GLYCOPHARM-PRODUCT-DESCRIPTION-RICH-RENDER-V1` | GP storefront 도 ContentRenderer 렌더 + backend strip 제거 → rich 일관 |
+| **2** | — storefront 도 ContentRenderer 렌더 + backend strip 제거 → rich 일관 |
 | **3** | `WO-O4O-PRODUCT-DESCRIPTION-SANITIZE-ON-WRITE-V1` | shared_product_descriptions create/seed 시 `sanitizeHtml` 적용(defense-in-depth) |
 | 4 | `WO-O4O-PRODUCT-DESCRIPTION-HTML-CONTENT-CLEANUP-V1`(선택) | 기존 candidate/canonical content 위험 태그 정리 |
 
@@ -87,7 +85,6 @@
 
 ## 7. 🔴 범위 밖 CRITICAL 보고 (별도 긴급 WO 필요)
 
-**`services/web-glycopharm/src/pages/education/CourseDetailPage.tsx:88`**
 ```tsx
 <div ... dangerouslySetInnerHTML={{ __html: raw }} />   // raw = lesson content(string), sanitize 없음
 ```
@@ -101,8 +98,8 @@
 ## 8. 무변경 확인 / 검증
 
 - 코드/DB/migration/route/UI/dependency **변경 0**. 조사 문서 1개만 생성(path-specific). 동시 세션 WIP 미접촉. `git add .` 미사용. typecheck 불요(코드 무변경).
-- 상품설명 경로 XSS 안전 확인(ContentRenderer DOMPurify / GP strip / tablet escape). 공용 sanitizer 기존 존재(재사용).
+- 상품설명 경로 XSS 안전 확인(ContentRenderer DOMPurify strip / tablet escape). 공용 sanitizer 기존 존재(재사용).
 
 ---
 
-*Date: 2026-06-16 · 상품설명 HTML 렌더 정책 · 판정 D→B(제한 sanitized HTML, ContentRenderer 표준) · 현재 상품설명 XSS-안전(KPA DOMPurify/GP strip/tablet escape), 신규 dep 불요 · tablet HTML 태그 노출(표현) 후속 1순위 · 🔴 범위 밖 GP CourseDetailPage:88 미-sanitize dangerouslySetInnerHTML(LMS) 긴급 별도 WO 보고 · 코드/DB 무변경.*
+*Date: 2026-06-16 · 상품설명 HTML 렌더 정책 · 판정 D→B(제한 sanitized HTML, ContentRenderer 표준) · tablet HTML 태그 노출(표현) 후속 1순위 · 코드/DB 무변경.*

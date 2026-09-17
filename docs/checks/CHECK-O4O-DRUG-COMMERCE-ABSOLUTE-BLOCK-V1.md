@@ -22,7 +22,7 @@ WO 의 착수 조건(“DRUG 장바구니·주문이 0건이 아니면 중지·�
 | 그중 DRUG | **0** |
 | `checkout_orders` 전체 | **4** |
 | 그중 DRUG 라인 / DRUG 주문 | **0 / 0** |
-| `service_audience_policies` | glycopharm=T · kpa-society=T · pharmacy-hub=T · neture=F · k-cosmetics=F |
+| `service_audience_policies` | kpa-society=T · pharmacy-hub=T · neture=F · k-cosmetics=F |
 
 → 0건 확인. 기존 데이터 처리와 게이트 구현을 분리할 필요가 없어 그대로 착수했다.
 
@@ -138,7 +138,7 @@ WO 의 착수 조건(“DRUG 장바구니·주문이 0건이 아니면 중지·�
 | 3 | OPL(`master_id` 축) 의약품 | 거부 | ✅ |
 | 4 | OPL(`master_id`=NULL) → offer → master 의약품 | 거부 | ✅ |
 | 5 | `regulatory_type='의약품'`(한글 표기) | 거부 | ✅ |
-| 6 | 약국 대상 서비스(kpa-society · pharmacy-hub · glycopharm) | **거부 — 서비스 예외 없음** | ✅ |
+| 6 | 약국 대상 서비스(kpa-society · pharmacy-hub) | **거부 — 서비스 예외 없음** | ✅ |
 | 7 | 운영자·role 문맥 주입 | 거부 (가드가 role 입력을 받지 않음을 컴파일 타임에 고정) | ✅ |
 | 8 | 건강기능식품 · 의약외품 · 의료기기 | **통과 — 기존 동작 유지** | ✅ |
 | 9 | 상품 참조 전무 | 거부 `UNRESOLVED` | ✅ |

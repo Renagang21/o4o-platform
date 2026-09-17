@@ -16,7 +16,7 @@
 
 **핵심 사실**:
 
-1. **LMS 백엔드는 단일 모듈** ([apps/api-server/src/modules/lms](apps/api-server/src/modules/lms))로 KPA/GlycoPharm/K-Cosmetics가 공유. `lms_courses`는 `visibility('public'|'members')` + `status('draft'|'pending_review'|'published'|'archived')` + `content_kind('lecture'|'content_resource')` 3축으로 이미 분류됨.
+1. `lms_courses`는 `visibility('public'|'members')` + `status('draft'|'pending_review'|'published'|'archived')` + `content_kind('lecture'|'content_resource')` 3축으로 이미 분류됨.
 2. **`content_kind = 'content_resource'` 컬럼이 이미 존재**([20260906000000-AddContentKindToLmsCourses.ts](apps/api-server/src/database/migrations/20260906000000-AddContentKindToLmsCourses.ts)) — "콘텐츠 자원형 강의"라는 개념이 entity 수준에서 인정되어 있다. 이는 store library 노출 후보의 1차 필터로 활용 가능.
 3. **Store Library는 두 개의 분리된 시스템**:
    - `o4o_asset_snapshots` (Full Copy, jsonb `content_json`) — community/HUB CMS·Signage 가져오기
@@ -62,7 +62,6 @@
 |--------|--------|------|
 | KPA-Society | `/lms`, `/lms/courses`, `/lms/course/:id`, `/lms/course/:courseId/lesson/:lessonId` | `/instructor/courses`, `/instructor/courses/:id` |
 | K-Cosmetics | 동일 패턴 (`/lms/course/:id`) | 동일 |
-| GlycoPharm | 부분 적용 (`/operator/LmsCoursesPage.tsx`) | 부분 |
 
 ### 1.5 인증 정책
 
@@ -264,7 +263,6 @@
   contentKind: 'lecture' | 'content_resource',
   capturedAt: ISO8601,     // snapshot 생성 시각
   publicUrl: string,       // /lms/course/:id 절대경로
-  sourceService: 'kpa' | 'neture' | 'glycopharm' | 'k-cosmetics'
 }
 ```
 
@@ -380,7 +378,7 @@
 
 ### 9.3 KPA 외 서비스 적용 가능성
 
-LMS 백엔드는 단일 모듈이고, 4개 서비스(KPA/Neture/Glyco/K-Cosmetics) 모두 동일 `lms_courses` 테이블을 공유. 따라서 Phase 1 결과는 **Neture 제외 3개 서비스에 동시 적용 가능**(Neture는 LMS 페이지 자체 부재). 단 store library는 KPA가 1차이며 Glyco/Cosmetics 적용은 후속 WO로 분할.
+LMS 백엔드는 단일 모듈이고, 4개 서비스 모두 동일 `lms_courses` 테이블을 공유. 따라서 Phase 1 결과는 **Neture 제외 3개 서비스에 동시 적용 가능**(Neture는 LMS 페이지 자체 부재).
 
 ---
 
@@ -421,7 +419,7 @@ WO 1·2가 선행 필수. 3·4·5는 2 이후 병렬 가능. 6·7은 5 완료 �
 - **LMS Frozen baseline 침범 금지** — `lms_courses` 컬럼 추가는 가능하나 entity 구조 변경/relation 변경은 별도 WO.
 - **kpaLmsScopeGuard 무효화 금지** — write path는 그대로 유지, 본 IR은 read/snapshot path만 다룸.
 - **유료 강의는 Phase 1 제외** — `isPaid=false` + `content_kind='content_resource'` 강의를 1차 타겟.
-- **Storefront/Neture는 적용 대상 아님** — Neture는 LMS 페이지 부재. KPA 1차, Glyco/Cosmetics는 후속.
+- **Storefront/Neture는 적용 대상 아님** — Neture는 LMS 페이지 부재.
 
 ---
 

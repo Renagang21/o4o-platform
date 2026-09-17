@@ -60,7 +60,6 @@
 | `web-kpa-society/.../StoreLibraryContentsPage.tsx` | 매장 라이브러리 | null |
 | `web-kpa-society/.../ResourceWritePage.tsx` | 자료실 작성 | null |
 | `web-kpa-society/.../ResourceWriteModal.tsx` | 자료실 모달 작성 | null |
-| `web-glycopharm/.../PharmacyBlogPage.tsx` | 글라이코팜 블로그 | 'blog' |
 | `packages/content-editor/.../Toolbar.tsx` | 에디터 내 AI 도우미 | null |
 
 ---
@@ -226,7 +225,6 @@ const effectiveCustomPrompt = [
 | 템플릿 구조 (Extension) | ✅ productionTemplates 레지스트리 10개 |
 | 즉시 수정 HIGH | **0건** |
 | 개선 후보 (C 항목) | 4건 (MED 1, LOW 3) |
-| web-glycopharm 확장 | AiContentModal import 확인됨 (PharmacyBlogPage) |
 | web-neture / web-k-cosmetics | AiContentModal 미사용 (향후 확장 시 동일 컴포넌트 사용) |
 
 **AI 편집 흐름의 기반 구조는 정상이다.**

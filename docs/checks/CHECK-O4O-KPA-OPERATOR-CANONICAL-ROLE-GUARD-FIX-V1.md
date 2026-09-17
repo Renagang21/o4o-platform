@@ -84,7 +84,7 @@ hard delete 는 `scope.isPlatformAdmin` 전용(라인 1025)으로 유지된다.
 
 - diff 의 역할 문자열 변경은 `-kpa-society:* / +kpa:*` **5쌍이 전부**다
   (`git diff | grep -E "^[-+]\s+'kpa"` → 10줄, 그 외 role 문자열 증감 0).
-- `neture:*`, `glycopharm:*`, `cosmetics:*`, `platform:*` 항목 무변경.
+- `neture:*`, `cosmetics:*`, `platform:*` 항목 무변경.
 - `roles.routes.ts` 의 legacy unprefixed `'admin','super_admin','operator','manager'` 는
   타 서비스 접근에 영향을 주므로 **본 WO 범위 밖으로 두고 건드리지 않았다**(§8 관찰 1).
 - frontend / DB / migration 변경 0.
@@ -165,7 +165,7 @@ typecheck 기준선 비교는 변경분을 `git stash` 후 재측정해 동일 1
 | # | 항목 | 사유 |
 |---|------|------|
 | 1 | `roles.routes.ts` 의 legacy unprefixed `admin/super_admin/operator/manager` 잔존 | 제거 시 타 서비스 접근 축소 — 별도 승인 필요 |
-| 2 | `analytics.routes.ts` 에만 `cosmetics:*` 항목 부재 | K-Cos 범위. WO 원칙 "GP·KCos·Neture 가드 그대로 유지" 준수 |
+| 2 | `analytics.routes.ts` 에만 `cosmetics:*` 항목 부재 | K-Cos 범위. WO 원칙 "KCos·Neture 가드 그대로 유지" 준수 |
 | 3 | 공통 `RoleModal` 의 operator tier 미필터 (선행 CHECK §6-D) | 4개 서비스 공통 컴포넌트 — 범위 밖 |
 | 4 | `kpa-society:*` 잔존 **16파일** (Neture product 모듈 15 + o4o-store 1) | 아래 참조 |
 
@@ -177,7 +177,7 @@ Neture 상품 라이브러리 계열 endpoint 에 접근하도록 의도되었�
 본 WO 에서 **수정하지 않았다** — 중지 조건 해당:
 
 - 이 수정은 KPA 역할에 **Neture 상품 도메인 접근권을 신규 부여**하는 것이라, WO 원칙
-  "공용 라우터의 타 서비스 동작을 바꾸지 않음" / "GP·KCos·Neture 역할 가드는 그대로 유지" 와
+  "공용 라우터의 타 서비스 동작을 바꾸지 않음" / "KCos·Neture 역할 가드는 그대로 유지" 와
   "타 서비스 역할 계약을 변경하는 경우" 중지 조건에 걸린다.
 - Operator Console(§2)은 KPA 자신의 회원·매장·역할 운영 화면이라 성격이 다르다. 반면 Neture
   product 모듈은 도메인 소유자가 Neture 이므로, 접근 범위 판단이 선행되어야 한다.

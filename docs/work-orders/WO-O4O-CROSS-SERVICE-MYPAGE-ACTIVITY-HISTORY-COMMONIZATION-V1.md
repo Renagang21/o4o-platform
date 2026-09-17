@@ -37,7 +37,6 @@ My Page의 다음 개별 기능인 **Activity / 이력**을 5서비스 기준으
 
 ```text
 KPA-Society
-GlycoPharm
 K-Cosmetics
 Neture
 Pharmacy-Hub
@@ -541,13 +540,6 @@ API 계약 자체 없음
 감사
 ```
 
-### GlycoPharm
-
-```text
-교육/학점
-서비스 신청
-```
-
 ### K-Cosmetics
 
 ```text
@@ -602,7 +594,6 @@ dead entry가 없는지만 확인한다.
 
 ```text
 KPA
-GP
 KCos
 Neture
 PH
@@ -764,7 +755,6 @@ Identity/membership 변경
 @o4o/account-ui build
 
 KPA typecheck/build
-GP typecheck/build
 KCos typecheck/build
 Neture typecheck/build
 PH typecheck/build
@@ -954,9 +944,9 @@ origin/main 반영 확인
 | 자산 | 소비처 | 비고 |
 |---|---|---|
 | `MyPageActivityFeed.tsx` (110줄) | KPA `MyDashboardPage`, Neture `MyPageHub` | Home 카드용. **데이터 조회·모델 정의를 하지 않는다**(서비스가 표시용 item 을 넣는 구조) |
-| `MyPageAppreciationCard.tsx` | KPA, GP, KCos (3서비스) | §15 경계 대상 |
+| `MyPageAppreciationCard.tsx` | KPA, KCos (2서비스) | §15 경계 대상 |
 | `MyPageEmptyState` / `MyPageLoadingState` | 다수 | §22 |
-| `MyEnrollmentsView` / `MyCertificatesView` / `MyCreditsView` | GP, KCos | **이력 성격이지만 별도 화면축이다. Activity 로 재분류할지 §6·§19 에서 판단할 것** |
+| `MyEnrollmentsView` / `MyCertificatesView` / `MyCreditsView` | KCos | **이력 성격이지만 별도 화면축이다. Activity 로 재분류할지 §6·§19 에서 판단할 것** |
 
 `MyPageActivityFeed` 의 item 모델은 이미 `key/icon/title/description/meta/href` 다. §11 의 최소 View Model 을 새로 만들기 전에 **이 모델의 확장으로 충분한지 먼저 판정**하라. 충분하면 새 컴포넌트 트리(§9 의 6개)를 만들지 않는 것이 옳다.
 
@@ -1006,7 +996,6 @@ packages/utils/src/format.ts                              (formatRelative — fo
 ```text
 KPA    /api/v1/kpa/mypage/*        profile · settings · activities(stub) · summary(stub)
                                     · enrollments · certificates · my-requests
-GP     /api/v1/glycopharm/mypage/* my-requests · business-info          ← activities 없음
 KCos   /api/v1/cosmetics/mypage/*  business-info                        ← activities 없음
 Neture                              mypage 라우터 자체 없음
 PH                                  `/mypage` 없음 — `/account` · `/store-owner/account`

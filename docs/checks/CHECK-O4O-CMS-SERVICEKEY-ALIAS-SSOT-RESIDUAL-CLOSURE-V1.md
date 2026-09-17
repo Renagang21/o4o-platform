@@ -31,16 +31,15 @@ alias census 는 이 항목에 막히지 않고 그대로 진행했다.
 | `routes/cms-content/cms-content-utils.ts` | `resolveCmsServiceKeys` 외 3 | resolver 파생 | alias/canonical 단일 구현 | SSOT | 유지 |
 | `routes/cms-content/cms-content-mutation.handler.ts` | — | 주석뿐 | create/update/lifecycle 인가 | SSOT 소비 | 유지 |
 | `routes/cms-content/cms-content-query.handler.ts` | — | 없음 | read 경계 | SSOT 소비 | 유지 |
-| `routes/cms-content/cms-content-slot.handler.ts` | `KNOWN_PREFIXES` | `['kpa','cosmetics','neture','glycopharm']` | **어떤 서비스가 slot 운영 축을 갖는지**의 목록 (alias 표가 아님) | ROLE_SCOPE_KEY | 유지 |
+| `routes/cms-content/cms-content-slot.handler.ts` | `KNOWN_PREFIXES` | — | **어떤 서비스가 slot 운영 축을 갖는지**의 목록 (alias 표가 아님) | ROLE_SCOPE_KEY | 유지 |
 | `routes/cms-content/cms-content-slot.handler.ts` | list/create/update | 문자열 동등 비교 | slot 관리 경계 | **DUPLICATED_ALIAS_LOGIC** | **수정** |
 | `routes/kpa/kpa.routes.ts:1209` | `KPA_SERVICE_KEYS` | `['kpa-society','kpa']` | CMS news read+mutation 대상 집합 | **DUPLICATED_ALIAS_LOGIC** | **제거→파생** |
 | `routes/kpa/kpa.routes.ts:1208` | `KPA_SERVICE_KEY` | `'kpa-society'` | 신규 row 저장 키 | CANONICAL_SERVICE_KEY | **파생으로 교체** |
 | `routes/kpa/kpa.routes.ts:205` | `ContentQueryService.serviceKeys` | `['kpa-society','kpa']` | KPA 공개 콘텐츠 조회 | **DUPLICATED_ALIAS_LOGIC** | **제거→파생** |
 | `routes/kpa/kpa.routes.ts:451` | `createStorePlaylistController(…)` | `'kpa-society'`, `'kpa'` 두 인자 | (ledger key, role prefix) **분리 전달** | CANONICAL + ROLE_SCOPE | 유지 |
 | `routes/kpa/kpa.routes.ts` | `requireKpaScope('kpa:operator')` | role | 인가 축 | ROLE_SCOPE_KEY | 유지 |
-| `routes/o4o-store/controllers/news.controller.ts:43` | `serviceKeys: [serviceKey]` | canonical 1개 | KCos/GP news 조회 | **alias 고립 위험** | **수정→파생** |
+| `routes/o4o-store/controllers/news.controller.ts:43` | `serviceKeys: [serviceKey]` | canonical 1개 | KCos news 조회 | **alias 고립 위험** | **수정→파생** |
 | `routes/cosmetics/cosmetics.routes.ts:441` | mount | `('k-cosmetics','cosmetics:operator')` | 두 축 분리 전달 | CANONICAL + ROLE_SCOPE | 유지 |
-| `routes/glycopharm/glycopharm.routes.ts:756` | mount | `('glycopharm','glycopharm:operator')` | 동일 | CANONICAL + ROLE_SCOPE | 유지 |
 | `routes/neture/controllers/neture.controller.ts:37` | `serviceKeys: ['neture']` | self-map 1개 | Neture 콘텐츠 조회 | CANONICAL_SERVICE_KEY | 유지 (alias 없음) |
 
 ### 2-2. Frontend / UI
@@ -53,9 +52,8 @@ alias census 는 이 항목에 막히지 않고 그대로 진행했다.
 
 ### 2-3. CMS 원장을 다루지 않는 동명 리터럴 (오탐 방지용 기록)
 
-`packages/capabilities/src/types.ts` 의 `ServiceKey = 'kpa'|'cosmetics'|'glycopharm'`,
+`packages/capabilities/src/types.ts` 의 
 `packages/ai-core`, `packages/auth-utils/profile-utils.ts`, `packages/asset-copy-core`,
-`routes/glycopharm/**` 의 `serviceKey: 'glycopharm'` 등은 CMS 원장 축이 아니거나
 self-map 서비스라 alias 위험이 없다 → 각각 ROLE_SCOPE_KEY / CANONICAL_SERVICE_KEY.
 이번 WO 범위(CMS 및 직접 consumer) 밖이므로 변경하지 않는다.
 
@@ -156,8 +154,6 @@ legacy alias 는 **기존 row 의 read/mutation 호환에만** 쓰인다. 신규
 ## 8. legacy `kpa` row 최신 census 와 판정 (§10·§11)
 
 ```
-cms_contents      glycopharm 66 | kpa-society 53 | neture 6 | kpa 1 | pharmacy-hub 1
-cms_content_slots kpa-society 28 | kpa 1 | glycopharm 1
 
 cms_contents 의 legacy row:
   id             7643a0af-6c9f-426b-98a6-0f9ee12b2853
@@ -190,7 +186,6 @@ cms_contents 의 legacy row:
 ```
 serviceKey IN ('kpa-society','kpa')       → cms_contents 54 (53+1) / slots 29 (28+1)
 serviceKey IN ('k-cosmetics','cosmetics') → 0 / 0   (legacy cosmetics 데이터 없음)
-serviceKey IN ('glycopharm')              → 66 / 1  (타 서비스 유입 0)
 serviceKey IN ('pharmacy-hub')            → 1
 alias 집합 밖의 serviceKey / NULL         → 0건
 ```
@@ -205,7 +200,6 @@ alias 집합 밖의 serviceKey / NULL         → 0건
 |---|---|
 | KPA operator → KPA canonical/legacy 만 mutation | PASS |
 | KCos operator → KCos 만 | PASS |
-| GP operator → GP 만 | PASS |
 | PH operator → PH 만 | PASS |
 | platform admin cross-service 관리 계약 | 유지 (PASS) |
 | read: serviceKey 없음 → 400 / 자기 service 정상 / 타 service 404 / KPA·KCos alias 정상 / admin 역할 근거 cross-service | PASS (기존 스위트 무변경 통과) |
@@ -219,7 +213,7 @@ alias 집합 밖의 serviceKey / NULL         → 0건
 - SSOT: KPA/KCos alias 집합이 security-core resolver 왕복 결과와 동일, self-map 3서비스 단일 alias
 - Write: alias 입력 → canonical 저장 (slot create, operator·platform admin 양쪽)
 - Existing legacy: legacy slot 을 canonical 요청으로 read/mutation 가능, alias 재전송 시 migration 0
-- Cross-service: GP/KCos operator 가 KPA alias row 차단
+- Cross-service: KCos operator 가 KPA alias row 차단
 - **No local mapping regression (static contract)**: CMS 소스 6종에 `['kpa-society','kpa']` /
   `['k-cosmetics','cosmetics']` 배열과 `{ 'kpa-society': … }` 매핑 객체 **재도입 금지**,
   `kpa.routes.ts` 가 resolver 파생임을 소스로 고정, admin 카탈로그가 canonical value 만 쓰는지 고정
@@ -274,7 +268,7 @@ A docs/checks/CHECK-O4O-CMS-SERVICEKEY-ALIAS-SSOT-RESIDUAL-CLOSURE-V1.md
 M docs/checks/CHECK-O4O-CMS-KPA-MUTATION-SERVICEKEY-CANONICALIZATION-V1.md  (addendum)
 ```
 
-§19 범위 밖 항목(platform+organizationId 정책, GP dead getContent, Resource category/tag,
+§19 범위 밖 항목(platform+organizationId 정책 dead getContent, Resource category/tag
 PH operator upload UI, CMS 아키텍처 재설계, role hierarchy, service membership 정책) 전부 미접촉.
 §20 중지 조건: `KPA_SERVICE_KEYS` 는 CMS 전용으로 확인되어 비해당, `SERVICES` 는 카탈로그
 성격을 유지한 채 value 만 canonical 로 맞춰 비해당, resolver 로 기존 semantics 전부 표현 가능,

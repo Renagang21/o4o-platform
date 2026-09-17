@@ -5,7 +5,7 @@
 **상위 IR**: [IR-O4O-CROSSSERVICE-OPERATOR-ADMIN-DASHBOARD-CANONICAL-AUDIT-V1](IR-O4O-CROSSSERVICE-OPERATOR-ADMIN-DASHBOARD-CANONICAL-AUDIT-V1.md) §12 Iα
 **W3 finding 정정**: [CHECK-O4O-CROSSSERVICE-OPERATOR-ADMIN-DASHBOARD-TIER2-COMPLETION-V1](CHECK-O4O-CROSSSERVICE-OPERATOR-ADMIN-DASHBOARD-TIER2-COMPLETION-V1.md) W3 no-op closure
 **선행 종결**: I1 / I2 / I3 모두 종결
-**조사 도구**: 4 병렬 Explore agent — K-Cosmetics / KPA / GlycoPharm / Neture 의 operator/admin 메뉴 분리 구조
+**조사 도구**: 4 병렬 Explore agent — K-Cosmetics / KPA / Neture 의 operator/admin 메뉴 분리 구조
 
 ---
 
@@ -16,7 +16,7 @@
 > 1. **K-Cosmetics 의 operator menu 에 admin 성격 entry 혼입 0** — UNIFIED_MENU 25 항목 모두 operator 성격. adminOnly 필드 타입 정의되어 있으나 **실제 사용 0** (향후 확장 대비 인프라만).
 > 2. **/operator/* 와 /admin/* layout / route guard 분리 정합** — K-Cos 는 `OperatorRoute` + MembershipGate 로 operator route 보호, `ProtectedRoute allowedRoles=['cosmetics:admin', 'platform:super_admin']` + `DashboardLayout role="admin"` 으로 admin route 분리. 4 서비스 모두 layout/route 분리 됨.
 > 3. **filterMenuByRole 호출되나 현재 no-op** — `OperatorLayoutWrapper.tsx` line 29 에서 호출. adminOnly 항목 0개라 결과 동일. 인프라는 살아 있고 향후 admin 메뉴 추가 시 즉시 사용 가능.
-> 4. **4 서비스 adminOnly 사용 빈도 차이** — Neture 22 > KPA 3 > GlycoPharm 2 > **K-Cos 0**. K-Cos 는 admin pages 자체가 2개만 (KCosmeticsAdminDashboard + KCosmeticsAdminMembersPage) 라 adminOnly inline 메뉴 필요성 낮음.
+> 4. K-Cos 는 admin pages 자체가 2개만 (KCosmeticsAdminDashboard + KCosmeticsAdminMembersPage) 라 adminOnly inline 메뉴 필요성 낮음.
 > 5. **drift 아님** — K-Cos 의 0 사용은 사업 정체성 (admin 영역 협소 — 회원 hard-delete 만) + admin pages 적음 의 자연스러운 귀결. 4 서비스 모두 같은 인프라 (`UnifiedMenuItem.adminOnly?` + `filterMenuByRole`) 사용 — 정합.
 > 6. **현 시점 즉시 진행 필요 없음** — 본 IR 의 역할은 W3 no-op closure 정책 confirm + cross-service 비교 문서화. 후속 WO 후보 모두 우선순위 낮음.
 
@@ -26,18 +26,18 @@
 
 ## 1. Executive Summary
 
-| 측면 | K-Cosmetics | KPA Society | GlycoPharm | Neture |
-|------|:-----------:|:-----------:|:----------:|:------:|
-| UNIFIED_MENU 항목 수 | 25 | 29 | ~50 | 54 |
-| adminOnly 필드 타입 정의 | ✅ | ✅ | ✅ | ✅ |
-| **adminOnly 실제 사용 항목** | **0** | 3 (법률/감사/역할) | 2 (서비스 설정 / 회원 Admin) | **22** |
-| filterMenuByRole 호출 | ✅ (OperatorLayoutWrapper) | ✅ (KpaOperatorLayoutWrapper) | ✅ | ✅ + getAdminMenu() 추가 |
-| operator menu 에 admin entry inline | ❌ (0) | ✅ (3) | ✅ (2) | ✅ (22) |
-| /operator/* route guard | OperatorRoute + MembershipGate | RoleGuard PLATFORM_ROLES + 내부 RoleGuard 3개 | OperatorRoute + MembershipGate | OperatorRoute + MembershipGate |
-| /admin/* route guard | ProtectedRoute allowedRoles=['cosmetics:admin','platform:super_admin'] | AdminAuthGuard | ProtectedRoute allowedRoles=GLYCOPHARM_ROLES | AdminRoute allowedRoles=[neture:admin, platform:super_admin] |
-| 별도 admin layout | DashboardLayout role="admin" | AdminLayout + AdminSidebar | DashboardLayout(role=ADMIN) | AdminLayoutWrapper |
-| admin pages 개수 | **2** | ~3 | ~7 | 다수 |
-| Admin 메뉴 분리 패턴 | 별도 layout (메뉴 inline 없음) | 별도 layout + inline (adminOnly 3개) | 별도 layout + inline (adminOnly 2개) | 별도 layout + getAdminMenu() |
+| 측면 | K-Cosmetics | KPA Society | Neture |
+| ------ | :-----------: | :-----------: | :------: |
+| UNIFIED_MENU 항목 수 | 25 | 29 | 54 |
+| adminOnly 필드 타입 정의 | ✅ | ✅ | ✅ |
+| **adminOnly 실제 사용 항목** | **0** | 3 (법률/감사/역할) | **22** |
+| filterMenuByRole 호출 | ✅ (OperatorLayoutWrapper) | ✅ (KpaOperatorLayoutWrapper) | ✅ + getAdminMenu() 추가 |
+| operator menu 에 admin entry inline | ❌ (0) | ✅ (3) | ✅ (22) |
+| operator/* route guard | OperatorRoute + MembershipGate | RoleGuard PLATFORM_ROLES + 내부 RoleGuard 3개 | OperatorRoute + MembershipGate |
+| admin/* route guard | ProtectedRoute allowedRoles=['cosmetics:admin','platform:super_admin'] | AdminAuthGuard | AdminRoute allowedRoles=[neture:admin, platform:super_admin] |
+| 별도 admin layout | DashboardLayout role="admin" | AdminLayout + AdminSidebar | AdminLayoutWrapper |
+| admin pages 개수 | **2** | ~3 | 다수 |
+| Admin 메뉴 분리 패턴 | 별도 layout (메뉴 inline 없음) | 별도 layout + inline (adminOnly 3개) | 별도 layout + getAdminMenu() |
 
 ### 권장: ✅ **Option A — 현재 구조 유지**
 
@@ -206,10 +206,6 @@ App.tsx line 544-565
 
 → admin 영역이 **2 page 로 협소** — K-Cos 는 회원 hard-delete 외 admin 전용 정책 영역이 거의 없음. 따라서 operator menu 에 inline admin entry 추가 필요성 낮음.
 
-### 7.3 GlycoPharm 비교
-
-GlycoPharm 의 admin 영역: settlements, reports, billing-preview, invoices, roles 등 7+ pages. inline adminOnly 메뉴 항목 2개 (서비스 설정 / 회원 관리 Admin) 가 자연스러움.
-
 ### 7.4 결론
 
 ✅ **K-Cos 의 admin entry 혼입 0 은 사업 정체성 (협소한 admin 영역) 의 자연스러운 귀결**. 향후 admin pages 가 늘어나면 inline adminOnly 도입이 자연스러워질 수 있음. 현 시점에는 불필요.
@@ -224,7 +220,6 @@ GlycoPharm 의 admin 영역: settlements, reports, billing-preview, invoices, ro
 |--------|:----------:|:---------:|:--------------:|:-----------:|:-----------:|:----:|
 | K-Cos | DashboardLayout(role=admin) | UNIFIED_MENU (operator 전용) | 0 | ProtectedRoute(cosmetics:admin) | 2 | ✅ |
 | KPA | AdminLayout + AdminSidebar | UNIFIED_MENU + adminOnly 3 + AdminSidebar 별도 | 3 (법률/감사/역할) | AdminAuthGuard | ~3 | ✅ |
-| GlycoPharm | DashboardLayout(role=ADMIN) | UNIFIED_MENU + adminOnly 2 | 2 (서비스 설정 / 회원 Admin) | ProtectedRoute(GLYCOPHARM_ROLES) | ~7 | ✅ |
 | Neture | AdminLayoutWrapper | UNIFIED_MENU + getAdminMenu() | 22 | AdminRoute(neture:admin) | 다수 | ✅ |
 
 ### 8.2 4 서비스 공통점
@@ -236,12 +231,10 @@ GlycoPharm 의 admin 영역: settlements, reports, billing-preview, invoices, ro
 
 ### 8.3 차이점
 
-- adminOnly 사용 빈도: **K-Cos (0) < GlycoPharm (2) < KPA (3) < Neture (22)**
 - 차이의 사유: **admin 영역 크기에 비례** — Neture 의 admin 영역이 가장 광범위 (operator 관리 / 정산 / 커미션 / 카테고리 정리 / 마스터 등), K-Cos 가 가장 협소 (hard-delete 만)
 - 별도 admin 메뉴 노출 방식:
   - KPA: AdminSidebar 별도 (2 항목 — 관리자 홈 + 회원 관리)
   - Neture: getAdminMenu() 함수로 admin sidebar 별도 생성
-  - GlycoPharm: inline adminOnly 메뉴 (UNIFIED_MENU 의 admin 항목이 operator menu 에 표시되지 않으나 sidebar 의 menu 데이터에 포함)
   - K-Cos: admin 메뉴 없음 — admin 은 /operator/* 사용 + /admin/* 별도 page 직접 접근
 
 ### 8.4 K-Cos drift 여부
@@ -273,7 +266,7 @@ GlycoPharm 의 admin 영역: settlements, reports, billing-preview, invoices, ro
 | 리스크 | 낮음 (변경 작으나 의미 없음) |
 | 권장 | △ — 향후 admin pages 확장 시점 검토. 현재 불필요. |
 
-### Option C — K-Cos 도 Neture / KPA / GlycoPharm 와 동일한 menu filtering 표준으로 강제 정렬
+### Option C — K-Cos 도 Neture / KPA 와 동일한 menu filtering 표준으로 강제 정렬
 
 | 측면 | 평가 |
 |------|------|
@@ -307,7 +300,7 @@ GlycoPharm 의 admin 영역: settlements, reports, billing-preview, invoices, ro
 
 ### 단, 추가 사항 (선택)
 
-- **K-Cos admin pages 확장 시점에 inline adminOnly 검토**: 현재 2 page → 향후 4-5 page 이상 추가 시 KPA / GlycoPharm 패턴 따라 inline adminOnly 도입. 본 IR scope 외.
+- **K-Cos admin pages 확장 시점에 inline adminOnly 검토**: 현재 2 page → 향후 4-5 page 이상 추가 시 KPA 패턴 따라 inline adminOnly 도입. 본 IR scope 외.
 - **OPERATOR-DASHBOARD-STANDARD-V1 update**: "UNIFIED_MENU + adminOnly + filterMenuByRole 인프라 4 서비스 공통" + "adminOnly 사용 빈도는 admin 영역 크기에 따라 자연스러운 차이 허용" 명시. 본 IR 권고 사항. 별도 작업.
 - **Cross-service operator menu filtering standard 문서화**: 4 서비스 패턴 비교 + 표준 명문화. 별도 IR (`IR-O4O-CROSSSERVICE-OPERATOR-MENU-FILTERING-STANDARD-V1`).
 
@@ -400,7 +393,7 @@ GlycoPharm 의 admin 영역: settlements, reports, billing-preview, invoices, ro
 | K-Cosmetics operator/admin menu 구조 요약 | UNIFIED_MENU 25 항목 모두 operator 성격 (adminOnly 사용 0). `/operator/*` = OperatorRoute + MembershipGate, `/admin/*` = ProtectedRoute(`cosmetics:admin`/`platform:super_admin`) + DashboardLayout role="admin". admin pages 2개 (KCosmeticsAdminDashboard + KCosmeticsAdminMembersPage). |
 | admin entry mix 여부 | ❌ **없음** — UNIFIED_MENU 25 항목 모두 operator. `/admin/*` 별도 layout/route. |
 | filterMenuByRole 적용 여부 | ✅ 호출 중 (`OperatorLayoutWrapper.tsx` line 29). adminOnly 0 사용으로 현재 no-op 이지만 인프라 준비됨. |
-| 4개 서비스 비교 결과 | 모두 동일 인프라 (UnifiedMenuItem + filterMenuByRole + ProtectedRoute / OperatorRoute / MembershipGate). adminOnly 사용 빈도 차이: Neture 22 > KPA 3 > GlycoPharm 2 > **K-Cos 0** — admin 영역 크기 (K-Cos 2 pages vs Neture 다수) 의 자연스러운 차이. K-Cos drift 아님. |
+| 4개 서비스 비교 결과 | 모두 동일 인프라 (UnifiedMenuItem + filterMenuByRole + ProtectedRoute / OperatorRoute / MembershipGate). K-Cos drift 아님. |
 | 권장 옵션 | **Option A** — 현재 구조 유지. W3 no-op closure 정합 confirm |
 | 즉시 WO 필요 여부 | ❌ 즉시 진행 필요 없음. 본 IR 은 W3 no-op closure 공식화 + cross-service 비교 문서화. 후속 WO 후보 모두 우선순위 낮음. |
 | 보류 항목 | (1) K-Cos adminOnly no-op documentation (주석 1줄), (2) operatorMenuGroups type 정의 유지, (3) Cross-service operator menu filtering standard 문서화 (별도 IR), (4) K-Cos admin pages 확장 시점에 inline adminOnly 도입 검토 — 모두 별도 작업 |

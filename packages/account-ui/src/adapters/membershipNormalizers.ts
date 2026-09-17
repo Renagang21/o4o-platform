@@ -61,7 +61,7 @@ export interface MembershipStatusNoticeContent {
 
 /**
  * 상태별 기본 안내 문구.
- * KPA / GlycoPharm / K-Cosmetics / Neture 의 `MembershipGate` 가 각자 갖고 있던
+ * KPA / K-Cosmetics / Neture 의 `MembershipGate` 가 각자 갖고 있던
  * 동일 문구표를 하나로 모은 값이다.
  */
 export const DEFAULT_MEMBERSHIP_STATUS_NOTICE: Record<string, MembershipStatusNoticeContent> = {
@@ -145,7 +145,7 @@ export interface ResolveRoleLabelOptions {
  * 대표 역할 라벨 해석.
  *
  * 기존 결함: `ROLE_LABELS[user.roles[0]]` 은 backend 가 돌려주는 배열 순서에
- * 의존해 같은 사용자에게 다른 라벨이 보일 수 있었다(K-Cosmetics / GlycoPharm).
+ * 의존해 같은 사용자에게 다른 라벨이 보일 수 있었다(K-Cosmetics).
  * 우선순위 목록을 명시하면 순서와 무관하게 같은 라벨이 나온다.
  */
 export function resolveRoleLabel(

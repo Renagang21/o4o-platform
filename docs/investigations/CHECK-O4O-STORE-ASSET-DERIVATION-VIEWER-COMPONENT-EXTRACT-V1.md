@@ -12,12 +12,12 @@
 
 ## 1. Summary
 
-KPA 원본 보기 모달(상태머신 + 조회 + 모달 JSX + source_kind 라벨 + derivedKind 매핑 + 모달 스타일)을 공통 컴포넌트로 승격. KPA 페이지는 **대상(target)만 보유**하고, viewer가 fetch/loading/empty/list를 자체 처리한다. viewer는 endpoint를 모르고 서비스가 `fetchDerivations`를 주입한다. **이번 WO는 viewer 추출 + KPA 재적용만** — Glyco/KCos 미적용, ResultKind/다중소스/활용하기 공통화는 후속.
+KPA 원본 보기 모달(상태머신 + 조회 + 모달 JSX + source_kind 라벨 + derivedKind 매핑 + 모달 스타일)을 공통 컴포넌트로 승격. KPA 페이지는 **대상(target)만 보유**하고, viewer가 fetch/loading/empty/list를 자체 처리한다. viewer는 endpoint를 모르고 서비스가 `fetchDerivations`를 주입한다.
 
 ## 2. Scope
 
 - 포함: `@o4o/store-ui-core`에 `StoreAssetDerivationViewer` + `StoreAssetDerivationItem`/`StoreResultKind` + `resultKindToDerivedKind` 추가; KPA 페이지를 공통 viewer로 교체.
-- 제외: GlycoPharm/K-Cosmetics 적용, 전체 페이지 공통화, ResultKind/다중소스 통합목록, 활용하기 dropdown, 백엔드/API/DB/migration.
+- 제외: K-Cosmetics 적용, 전체 페이지 공통화, ResultKind/다중소스 통합목록, 활용하기 dropdown, 백엔드/API/DB/migration.
 
 ## 3. Changed Files
 
@@ -76,12 +76,10 @@ KPA store_owner(sohae2100) 로그인 → `/store/library/production-materials` �
 |---|---|---|
 | `@o4o/store-ui-core` | 신규 export 추가(기존 계약 불변) | tsc 0 errors |
 | web-kpa-society | 인라인 → 공통 viewer 교체 | tsc 0 errors + (배포 후) smoke |
-| web-glycopharm | **영향 없음**(미사용, 후속 adopt WO) | — |
 | web-k-cosmetics | **영향 없음**(미사용, 후속 adopt WO) | — |
 | 그 외(neture/admin/operator 등) | 미사용 | — |
 
 ## 10. Out of Scope / Follow-ups
 
-- `WO-O4O-GLYCOPHARM-STORE-ASSET-DERIVATION-VIEWER-ADOPT-V1` — glyco fetcher(axios) 주입 + POP 행 적용.
 - `WO-O4O-KCOSMETICS-STORE-ASSET-DERIVATION-VIEWER-ADOPT-V1`.
 - (이후) ResultKind/다중소스 통합목록 + 활용하기 dropdown 공통화.

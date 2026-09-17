@@ -7,7 +7,7 @@
  * Service-agnostic. Calls unified /api/v1/stores/:slug/blog/* endpoints directly.
  * Backend `unified-store-public.routes.ts` resolves slug → storeId + serviceKey.
  *
- * Usage: VITE_API_BASE_URL 가 설정된 모든 서비스(KPA / Neture / Glycopharm / ...)에서 동일하게 작동.
+ * Usage: VITE_API_BASE_URL 가 설정된 모든 서비스(KPA / Neture / ...)에서 동일하게 작동.
  */
 
 function getApiBase(): string {

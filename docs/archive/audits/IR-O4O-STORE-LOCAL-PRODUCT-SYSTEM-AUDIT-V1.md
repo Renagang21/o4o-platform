@@ -20,7 +20,7 @@ O4O 플랫폼의 **Store Local Product** 시스템은 **Backend가 완전히 구
 - API: `/api/v1/store/local-products` — Full CRUD (4 endpoints)
 - Tablet 통합: `store_tablet_displays.product_type` discriminator로 supplier + local 혼합 진열
 - Public API: `/:slug/tablet/products` — supplier + local 분리 응답 (DB UNION 금지)
-- **Frontend: 전용 관리 UI 없음** — 어떤 서비스(GlycoPharm, Neture, KPA 등)에도 Local Product CRUD 페이지가 존재하지 않음
+- **Frontend: 전용 관리 UI 없음** — 어떤 서비스(Neture, KPA 등)에도 Local Product CRUD 페이지가 존재하지 않음
 
 **Store Product Dual Architecture** (Supplier Product + Local Product) 개념은 백엔드에서 완전히 구현되었으나, 운영자가 실제로 Local Product를 등록·관리할 수 있는 화면이 없어 **사실상 비활성 상태**이다.
 
@@ -257,7 +257,6 @@ Public API (`/:slug/tablet/products`)에서는 **응답 레벨에서 분리**:
 
 | 서비스 | 조사 경로 | Local Product 페이지 |
 |--------|----------|---------------------|
-| GlycoPharm (`web-glycopharm`) | `src/pages/admin/` | ❌ 없음 |
 | Neture (`web-neture`) | `src/pages/admin/` | ❌ 없음 |
 | KPA Society (`web-kpa-society`) | `src/pages/` | ❌ 없음 |
 | K-Cosmetics (`web-k-cosmetics`) | `src/pages/admin/` | ❌ 없음 |

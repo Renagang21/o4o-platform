@@ -1,7 +1,6 @@
 /**
  * TypeORM Payment Repository
  *
- * WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1
  *
  * PaymentRepository 인터페이스 구현.
  * PlatformPayment entity를 사용하여 o4o_payments 테이블에 접근.

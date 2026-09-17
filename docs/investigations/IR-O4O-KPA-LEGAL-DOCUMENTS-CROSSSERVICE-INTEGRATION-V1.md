@@ -9,7 +9,7 @@
 ---
 
 ## 1. 조사 목적
-O4O 법정정보·정책문서 체계는 Neture/GP/KCos 에 대해 (a) `service_legal_profiles` (b) `service_policy_documents`
+O4O 법정정보·정책문서 체계는 Neture/KCos 에 대해 (a) `service_legal_profiles` (b) `service_policy_documents`
 (c) Admin 설정 UI (d) 동적 푸터 (e) `/terms`·`/privacy` 까지 닫혔다. **KPA 만 예외**로, 기존 전용 구조와 mock 이
 혼재한다. 본 IR 은 KPA 의 실제 상태를 확정하고 통합 옵션을 비교·권고한다(구현 없음).
 
@@ -68,17 +68,17 @@ service-legal 모듈) · `packages/security-core`(KPA 권한). 조사 기준 com
 | version 관리 | ❌ | ❌ | ✅ |
 | effectiveDate | ❌ | ❌ | ✅ |
 | change_reason(audit) | ❌ | ❌ | ✅ |
-| public API | ❌ (없음) | ✅ `/kpa/legal/documents/published/:type` (미사용) | ✅ `/public/services/:sk/policies/:type` (GP/KCos 사용 중) |
+| public API | ❌ (없음) | ✅ `/kpa/legal/documents/published:type` (미사용) | ✅ `/public/services:sk/policies:type` (KCos 사용 중) |
 | admin UI | operator/legal(DB) | operator/legal(textarea) | 공통 service-legal Admin UI(3탭) |
 | serviceKey 지원 | ❌ | ❌ (KPA 전용) | ✅ |
-| 공개 viewer | static fallback | 없음(연결 안 됨) | `PolicyDocumentViewer`(GP/KCos `/terms`·/privacy) |
+| 공개 viewer | static fallback | 없음(연결 안 됨) | `PolicyDocumentViewer`(KCos `/terms`·/privacy) |
 | seed/기존 데이터 | (localStorage 단말별) | **seed terms/privacy draft 존재** | 없음(additive) |
 
 ### 6.2 저장소 비교 — 법정정보(footer)
 | 항목 | KPA 현재(footer 하드코딩) | service_legal_profiles |
 |------|:---:|:---:|
 | 저장 위치 | 코드 하드코딩(더미+실값 혼재) | DB(serviceKey 'kpa-society'), Admin 입력 |
-| 동적 표시 | ❌ | ✅ `PublicLegalFooterInfo`(GP/KCos/Neture 사용) |
+| 동적 표시 | ❌ | ✅ `PublicLegalFooterInfo`(KCos/Neture 사용) |
 | 값 없을 때 | 더미 노출 | 비표시(placeholder 0) |
 | serviceKey | — | ✅ |
 
@@ -98,7 +98,7 @@ service-legal 모듈) · `packages/security-core`(KPA 권한). 조사 기준 com
 
 ## 8. KPA footer 상태 (정리)
 - 하드코딩 법정정보: **더미 3건**(주소/전화/팩스) + **실값 2건**(이메일·사업자번호/상호) 혼재.
-- GP/KCos/Neture 는 이미 `PublicLegalFooterInfo`(동적, 값 있을 때만) 전환 완료 — KPA 만 정적.
+- KCos/Neture 는 이미 `PublicLegalFooterInfo`(동적, 값 있을 때만) 전환 완료 — KPA 만 정적.
 - KPA 는 `@o4o/shared-space-ui` 를 이미 일부 import(App.tsx `templates,usePageSeo`; CommunityHomePage) →
   `PublicLegalFooterInfo`/`PolicyDocumentViewer` **import 기술적 가능**.
 
@@ -169,7 +169,7 @@ service-legal 모듈) · `packages/security-core`(KPA 권한). 조사 기준 com
 - **데이터 이관**: kpa_legal_documents → service_policy_documents 이관은 DB 변경 → 반드시 실측·승인·보존 정책 동반.
 - **operator 변경**: Phase 3 에서 KPA 운영자 입력 화면이 공통 UI 로 바뀌므로 사전 안내 필요.
 - **footer 실값 제거**: KPA footer 의 실 사업자번호(108-86-02873)도 코드 하드코딩이므로 Phase 1 에서 제거 →
-  Admin `service_legal_profiles` 입력 전까지 공개 footer 에 사업자정보 비표시(GP/KCos/Neture 와 동일 전환 패턴).
+  Admin `service_legal_profiles` 입력 전까지 공개 footer 에 사업자정보 비표시(KCos/Neture 와 동일 전환 패턴).
 - **dead link**: `/terms`·`/sitemap` 은 본 IR 이전부터 존재한 기존 결함(본 WO 들이 함께 정리).
 - **read-only**: 본 IR 은 코드/DB/route/footer 무변경, 문서 1개만 생성.
 

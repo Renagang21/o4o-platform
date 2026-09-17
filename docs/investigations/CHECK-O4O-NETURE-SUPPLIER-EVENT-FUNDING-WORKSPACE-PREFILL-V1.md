@@ -72,7 +72,7 @@
 | 생성 화면 context 배너 표시 + 원본 불변 안내 | ✅ |
 | query 없이 직접 진입 crash/데드링크 | ✅ 없음 (배너 null) |
 | DRUG 후속 액션 미제공 유지 | ✅ (OFFER-MODE 게이트 그대로) |
-| 대상 서비스에 Neture 미포함 (이벤트) | ✅ 기존 PROPOSE_TARGETS(kpa-society/glycopharm/k-cosmetics) 유지 — 변경 없음 |
+| 대상 서비스에 Neture 미포함 (이벤트) | ✅ 기존 PROPOSE_TARGETS 유지 — 변경 없음 |
 
 ---
 

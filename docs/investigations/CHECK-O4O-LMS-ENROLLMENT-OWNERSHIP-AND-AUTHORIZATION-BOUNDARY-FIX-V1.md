@@ -24,16 +24,15 @@ cross-service boundary 는 선행 WO 로 닫혔으나, 동일 서비스 안에�
 
 | method/path | consumer | 성격 | service scope | owner check (수정 전) | elevated check | mut/read | 현재 판정 |
 |---|---|---|---|---|---|---|---|
-| `POST /courses/:courseId/enroll` | KPA·KCos·GP 학습자 | user-facing | `guardCourseScope` | 본인 userId 로 생성 | 없음 | mutation | 기존 정상 |
+| `POST /courses:courseId/enroll` | KPA·KCos 학습자 | user-facing | `guardCourseScope` | 본인 userId 로 생성 | 없음 | mutation | 기존 정상 |
 | `GET /enrollments` | 프론트 소비처 0 | user-facing(광의) | `scope.scope` | **없음(전체 노출)** | 없음 | read | **READ_LEAK_FIXED** |
 | `GET /enrollments/me` | KPA 마이페이지 | user-facing | `scope.scope` | `userId` 강제 | 없음 | read | 기존 정상 |
 | `GET /enrollments/:id` | 프론트 소비처 0 | user-facing | scope 있음 | **없음** | 없음 | read | **READ_LEAK_FIXED** |
 | `PATCH /enrollments/:id` | 프론트 소비처 0 | user-facing | scope 있음 | **없음** | 없음 | mutation | **MISSING_OWNER_CHECK_FIXED** |
 | `POST /enrollments/:id/start` | 프론트 소비처 0 | user-facing | scope 있음 | **없음** | 없음 | mutation | **MISSING_OWNER_CHECK_FIXED** |
 | `POST /enrollments/:id/complete` | 프론트 소비처 0 | user-facing | scope 있음 | **없음** | 없음 | mutation | **MISSING_OWNER_CHECK_FIXED** |
-| `POST /enrollments/:id/cancel` | GlycoPharm(본인 수강취소) | user-facing | scope 있음 | **없음** | 없음 | mutation | **MISSING_OWNER_CHECK_FIXED** |
-| `GET /enrollments/me/course/:courseId` | KPA·GP 강의 상세 | user-facing | `guardCourseScope` | `userId`+`courseId` 복합조회 | 없음 | read | 기존 정상 |
-| `POST /enrollments/:courseId/progress` | KPA·KCos·GP 학습 | user-facing | `guardCourseScope` | `userId`+`courseId` 복합조회 | 없음 | mutation | 기존 정상 |
+| `GET /enrollments/me/course:courseId` | KPA 강의 상세 | user-facing | `guardCourseScope` | `userId`+`courseId` 복합조회 | 없음 | read | 기존 정상 |
+| `POST /enrollments:courseId/progress` | KPA·KCos 학습 | user-facing | `guardCourseScope` | `userId`+`courseId` 복합조회 | 없음 | mutation | 기존 정상 |
 
 ### 2-2. 관리 라우터 `/api/v1/lms/instructor/*` (`requireInstructor`)
 

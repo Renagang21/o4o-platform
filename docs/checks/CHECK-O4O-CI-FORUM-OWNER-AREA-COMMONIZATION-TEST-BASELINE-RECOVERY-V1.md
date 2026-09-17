@@ -66,7 +66,6 @@
 | 서비스 | 대시보드 (LOC) | 회원관리 (LOC) | adapter (LOC) | 구조 |
 |--------|---------------:|---------------:|--------------:|------|
 | KPA-Society | 52 | 31 | 56 | 공통 View + adapter (마이페이지 소속) |
-| GlycoPharm | 40 | 31 | 58 | 공통 View + adapter |
 | K-Cosmetics | 40 | 29 | 53 | 공통 View + adapter |
 | Neture | 43 | **없음(정책)** | 46 | 공통 View + adapter (폐쇄형 회원관리 미도입) |
 | **Pharmacy-Hub** | **39** | **28** | **54** | 공통 View + adapter — 다른 서비스와 **동일 구조** |
@@ -118,7 +117,7 @@
 `forum-owner-area-commonization` · `pharmacy-hub-community-capability-adoption` · `pharmacy-hub-community-baseline` ·
 `community-crossservice-my-posts-contract` · `community-forum-interaction-and-write-boundary-commonization` ·
 `community-forum-content-server-normalization` · `community-forum-orphan-write-guard` ·
-`community-content-resource-frontend-view-commonization` · `glycopharm-forum-service-boundary` · `market-trial-neture-forum-sync`.
+`community-content-resource-frontend-view-commonization` · `market-trial-neture-forum-sync`.
 특히 정반대 계약을 단언하던 `pharmacy-hub-community-capability-adoption` 과 **동시 PASS** 한다(계약 충돌 해소).
 
 ### 8-2. api-server 전체 Jest

@@ -64,7 +64,7 @@ export interface StoreTabletPoolSupplierProduct {
 
 /**
  * `/{service}/store/product-pool` 응답의 공급 상품 행 — 서비스 API client 공용.
- * KCos / GP client 가 같은 선언을 각자 들고 있던 것을 이 계약 하나로 모은다.
+ * 서비스 client 가 각자 들고 있던 같은 선언을 이 계약 하나로 모은다.
  */
 export interface StoreTabletPoolSupplierProductRow {
   id: string;

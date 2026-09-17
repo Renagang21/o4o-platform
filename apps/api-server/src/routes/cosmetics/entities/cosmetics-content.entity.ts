@@ -3,7 +3,7 @@
  *
  * WO-O4O-KCOS-RESOURCES-BACKEND-V1
  *
- * K-Cosmetics Resource Layer — GP glycopharm_contents (canonical template) 패턴 기반.
+ * K-Cosmetics Resource Layer — canonical template 패턴 기반.
  * Resource → Content → Store 흐름의 첫 단계.
  *
  * ContentReusablePolicy: RESTRICTED(가져가기 차단) / PLATFORM(모든 매장 허용, default)

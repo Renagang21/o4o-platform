@@ -28,7 +28,6 @@ WO §5 는 "checkout 3곳의 의미가 서로 다르면 구현 중지" 를 요�
 | 위치 | 술어 | 비교 축 |
 |------|------|---------|
 | [kpa-checkout.controller.ts:347](apps/api-server/src/routes/kpa/controllers/kpa-checkout.controller.ts#L347) | `!allowed_seller_ids \|\| !includes(x)` → 403 `DISTRIBUTION_FORBIDDEN` | `organization.id` |
-| [glycopharm/checkout.controller.ts:378](apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts#L378) | `!allowed_seller_ids \|\| !includes(x)` → 403 `DISTRIBUTION_FORBIDDEN` | `pharmacy.id` |
 | [neture-b2b-cart-checkout.service.ts:221](apps/api-server/src/services/cart/neture-b2b-cart-checkout.service.ts#L221) | `!allowed_seller_ids \|\| !includes(x)` → `DISTRIBUTION_DENIED` | `scope.buyerId` |
 
 ### NULL · 빈 배열 의미 — **3곳 완전 동일**
@@ -47,7 +46,7 @@ WO §5 는 "checkout 3곳의 의미가 서로 다르면 구현 중지" 를 요�
 `neture-b2b-cart-checkout` 만 `scope.buyerId` 를 쓴다. 이는 **파트너 구매자 축**으로 매장 `organizationId` 와 다르다
 (동 파일 L301 `sellerId: organizationId ?? scope.buyerId` 가 두 값이 별개임을 보여준다. [neture.service.ts:577](apps/api-server/src/routes/neture/services/neture.service.ts#L577) 은 `userId` 로 비교한다).
 
-본 WO 의 대상은 **매장 HUB 카탈로그·신청**이며, 이 경로의 선례는 매장 측 checkout 2곳(KPA·GP)이고 둘 다 `organizationId` 를 쓴다.
+본 WO 의 대상은 **매장 HUB 카탈로그·신청**이며, 이 경로의 선례는 매장 측 checkout 1곳(KPA)이고 둘 다 `organizationId` 를 쓴다.
 컨트롤러가 이미 `requirePharmacyOwner` 로 해석한 `req.organizationId` 를 보유하므로 **매장 측 축은 모호하지 않다.**
 Neture 파트너 축의 정합성 검토는 매장 HUB 경로가 아니므로 본 WO 범위 밖으로 남긴다.
 
@@ -196,7 +195,7 @@ PRIVATE offer 를 참조하는 기존 approval/listing 수
 | SERVICE 정책 변경 | **0** |
 | checkout 방어 검사 제거 | **0** (3곳 그대로 유지) |
 | 의약품·매장유형 게이트 | **0** (HUB-P1-06 후속) |
-| GP/KCos asset snapshot | **0** (HUB-P0-03 별도 WO) |
+| KCos asset snapshot | **0** (HUB-P0-03 별도 WO) |
 | `PharmacySellPage` externalProductId | **0** (HUB-P1-07 보류) |
 | dependency / lockfile | **0** |
 

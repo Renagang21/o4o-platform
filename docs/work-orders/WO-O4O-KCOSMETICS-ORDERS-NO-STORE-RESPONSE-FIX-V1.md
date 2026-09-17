@@ -30,7 +30,6 @@ QueryFailedError ... getManyAndCount
 - QueryBuilder alias 가 **PostgreSQL 예약어 `order`**.
 - 단순 `alias.column`(`order.buyerId`)은 TypeORM 이 `"order"."buyerId"` 로 자동 quote 하지만, **raw JSONB fragment `order.metadata->>'serviceKey'` 는 자동 quote 대상이 아니어서 예약어 `order` 가 그대로 노출** → PostgreSQL 이 ORDER 키워드로 파싱 → **syntax error**.
 - ⇒ **store 유무·계정 무관하게 orders 목록 조회가 항상 500.** (frontend 는 graceful 처리했으나 실제로 주문 목록이 한 번도 동작하지 않았음.)
-- glycopharm 등 동일 alias 사용 컨트롤러는 JSONB raw fragment 가 없어 영향 없음 → cosmetics 고유.
 
 ## 3. 수정
 - alias `'order'` → `'o'` (비예약어) 변경. `o.metadata->>'serviceKey'` 는 정상 파싱.
@@ -42,7 +41,7 @@ QueryFailedError ... getManyAndCount
 - 기존 유지: `{ success:true, data: StoreOrder[], pagination:{page,limit,total,totalPages}, filters }`. frontend `StoreOrdersResponse` 정합. frontend 무수정.
 
 ## 5. 변경하지 않은 것
-주문 상태 변경 · billing/settlement · DB/migration · KPA/GlycoPharm/Neture · mock 데이터 · auth/guard 정책. **수정은 backend 1파일(alias)뿐.**
+주문 상태 변경 · billing/settlement · DB/migration · mock 데이터 · auth/guard 정책. **수정은 backend 1파일(alias)뿐.**
 
 ## 6. 검증
 - TypeScript: `apps/api-server` `tsc --noEmit` → **EXIT 0**.
@@ -72,4 +71,4 @@ API Server 배포 success (run 26873017495, commit b1b280bbf, 리비전 `o4o-cor
 
 ### 남은 블로커 (별도 WO + 승인 필요)
 - `ecommerce_orders` / `ecommerce_order_items` (및 연관) **프로덕션 테이블 생성** 필요 — ecommerce-core install 실행 또는 base 마이그레이션. **DB 변경이므로 CLAUDE.md §0 상 사용자 승인 필수.** 본 WO 범위(DB/migration 제외) 밖.
-- 후속 WO 후보: `WO-O4O-ECOMMERCE-ORDERS-TABLE-PROVISION-V1`(가칭) — 영향 범위(cosmetics 뿐 아니라 glycopharm/checkout 등 ecommerce-core 주문 전반) 조사 선행.
+- 후속 WO 후보: `WO-O4O-ECOMMERCE-ORDERS-TABLE-PROVISION-V1`(가칭) — 영향 범위(cosmetics 뿐 아니라 checkout 등 ecommerce-core 주문 전반) 조사 선행.

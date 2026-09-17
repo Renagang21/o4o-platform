@@ -10,7 +10,7 @@
 
 ## 1. 최종 판정
 
-**PASS.** 공통 `QuickActionBlock`/`StructureActionBlock`에 icon-name→lucide 매핑 헬퍼(`ActionIcon`)를 도입. lucide-name 9종 텍스트 노출을 제거하고, emoji(KPA)는 그대로 통과시켜 회귀 0. operator-ux-core/admin-ux-core + consumer(neture/glyco) `tsc --noEmit` exit 0. **배포 후 라이브 smoke: Neture admin / GlycoPharm operator / K-Cosmetics operator 전부 lucide 렌더 확인(텍스트 노출 0). KPA operator는 emoji 무변경 케이스(§7).**
+**PASS.** 공통 `QuickActionBlock`/`StructureActionBlock`에 icon-name→lucide 매핑 헬퍼(`ActionIcon`)를 도입. lucide-name 9종 텍스트 노출을 제거하고, emoji(KPA)는 그대로 통과시켜 회귀 0. operator-ux-core/admin-ux-core + consumer `tsc --noEmit` exit 0. KPA operator는 emoji 무변경 케이스(§7).
 
 ---
 
@@ -42,15 +42,12 @@
 
 `users→Users` · `shield→Shield` · `store→Store` · `dollar-sign→DollarSign` · `percent→Percent` · `key→Key` · `package→Package` · `file-text→FileText` · `shopping-cart→ShoppingCart`
 
-(백엔드 실측 union 전부 커버: Neture admin 6 + Glyco operator 3 + KCos operator 4, 중복 제거 9.)
-
 ---
 
 ## 5. 변경하지 않은 항목
 
 - **백엔드 dashboard icon 값** — 미변경 (Phase B)
 - **KPA operator emoji**(`🧑‍💼💊🛒`…) — 미변경, `ActionIcon`이 비-ASCII로 통과 → 기존 표시 유지 (Phase B)
-- **KPA / GlycoPharm admin 프론트 하드코딩 emoji** — 미변경 (Phase C, 공통 블록 우회 경로)
 - `DomainIASidebar` / `OperatorAreaShell` (operator drawer) — 미접촉
 - `HeroBannerSection.tsx` / Store Hub·Channels·Home 아이콘 정비 파일 — 미접촉
 - 라벨 / 링크 / 순서 / 권한 / API — 불변
@@ -63,7 +60,6 @@
 packages/operator-ux-core  npx tsc --noEmit   # exit 0
 packages/admin-ux-core      npx tsc --noEmit   # exit 0 (lucide peerDep 추가 후)
 services/web-neture         npx tsc --noEmit   # exit 0 (admin consumer 회귀 없음)
-services/web-glycopharm     npx tsc --noEmit   # exit 0 (operator consumer 회귀 없음)
 ```
 
 ---
@@ -75,13 +71,12 @@ Playwright(admin/operator 계정) 라이브 검증. 렌더가 실제로 바뀌�
 | 대상 | 결과 |
 |------|------|
 | **Neture `/admin`** Structure Actions | ✅ `users/shield/store/dollar-sign/percent/key` 텍스트 → lucide(Users/Shield/Store/DollarSign/Percent/Key) 렌더 |
-| **GlycoPharm `/operator`** Quick Actions | ✅ `store/package/file-text` 텍스트 → lucide(Store/Package/FileText) 렌더 |
 | **K-Cosmetics `/operator`** Quick Actions | ✅ `store/package/shopping-cart/file-text` 텍스트 → lucide(Store/Package/ShoppingCart/FileText) 렌더 |
 | **KPA `/operator`** Quick Actions | ⚠️ **계정 권한 가드로 접근 차단** (test account operator 권한 — 기존 smoke blocker). 단 KPA는 **백엔드 emoji = 무변경 케이스**: `ActionIcon`이 비-ASCII(emoji)를 `NAME_LIKE` 미충족 → 기존과 동일 `<span className="text-lg">{icon}</span>` 분기로 통과 → **렌더 byte-identical, 회귀 구조적 불가**. |
 
 - 라벨/링크/순서/클릭 회귀 없음 확인 (3 서비스).
 - console: `api.neture.co.kr/auth/me` 401(인증 폴링, benign) 외 critical error 없음.
-- 스크린샷: `phaseA-neture-admin-structure-actions.png` / `phaseA-glyco-operator-quick-actions.png` / `phaseA-kcos-operator-quick-actions.png` (작업 트리 untracked).
+- 스크린샷: `phaseA-neture-admin-structure-actions.png` / `phaseA-kcos-operator-quick-actions.png` (작업 트리 untracked).
 - 부수 확인: KPA 헤더 메뉴에서 "이용 가이드" 부재 → 이전 메뉴 제거(`3e652a0cd`) 배포 반영 확인.
 
 ---
@@ -106,7 +101,6 @@ docs/investigations/CHECK-O4O-DASHBOARD-ACTION-ICON-NAME-MAP-V1.md
 ```text
 B. WO-O4O-DASHBOARD-ACTION-ICON-VOCAB-STANDARDIZE-V1 — KPA 백엔드 emoji→lucide-name + 4서비스 어휘 카탈로그 고정
    (그러면 KPA operator도 ActionIcon 매핑 경로로 lucide 렌더)
-C. WO-O4O-ADMIN-QUICKACTION-FRONTEND-CONVERGE-V1 — Glyco/KPA admin 프론트 emoji 하드코딩 수렴
 ```
 
 ---

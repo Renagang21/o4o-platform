@@ -39,7 +39,7 @@ await apiAdapter.put(`/operator/members/${userId}`, { password });   // serviceK
 - **platform 관리자** — 후보 수와 무관하게 항상 명시적 선택 필요
 - **후보가 2개 이상인 운영자** — 대상 회원이 관리 범위 안 2개 이상 서비스에 가입
 
-영향 화면: GlycoPharm · K-Cosmetics · KPA-Society · Neture 4개 서비스의 회원 상세
+영향 화면: K-Cosmetics · KPA-Society · Neture 3개 서비스의 회원 상세
 (`services/web-*/src/pages/operator/UserDetailPage.tsx` 가 이 공통 컴포넌트를 감싼다).
 
 ### 1-1. 선행 CHECK 의 누락
@@ -119,7 +119,7 @@ npx vitest run --config packages/ui/vitest.config.mjs
 | 케이스 | 검증 | 결과 |
 |---|---|---|
 | 후보 0개 | 안내 문구 노출 · `<select>` 없음 · 제출 버튼 disabled · `put` 호출 0 | ✅ |
-| 후보 1개 | "대상 서비스" 표시 · `<select>` 없음 · 제출 활성 · payload `{ password, serviceKey:'glycopharm' }` | ✅ |
+| 후보 1개 | "대상 서비스" 표시 · `<select>` 없음 · 제출 활성 | ✅ |
 | 후보 복수 | 선택 전 제출 disabled + `put` 0 → 선택 후 payload `{ password, serviceKey:'k-cosmetics' }` | ✅ |
 | 중복 serviceKey | 같은 키가 후보에 1번만 등장 | ✅ |
 
@@ -136,7 +136,6 @@ npx vitest run --config packages/ui/vitest.config.mjs
 ```
 packages/ui        npx tsc --noEmit         → exit 0
 packages/ui        npx tsc --build          → exit 0
-services 4개       npx tsc --noEmit         → PASS (glycopharm · k-cosmetics · kpa-society · neture)
 services 4개       npx vite build           → PASS (4/4)
 tests              vitest (packages/ui)     → 1 file / 4 tests PASS
 DB write / migration                        → 0

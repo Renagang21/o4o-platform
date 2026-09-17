@@ -66,7 +66,6 @@ WO §4 가 요구한 대로 **"bare role 을 무엇으로 바꿀까"에서 시�
 추측이 아니라 코드가 이미 그렇게 설계돼 있다.
 
 - `services/web-kpa-society/src/pages/operator/OrdersPage.tsx:9`
-- `services/web-glycopharm/src/pages/operator/OrdersPage.tsx:7`
 - `services/web-k-cosmetics/src/pages/operator/OrdersPage.tsx:7`
 
 세 서비스 모두 헤더 주석이 동일하게 **"조회 전용 — 상태변경/배송/취소/환불/송장/정산/bulk
@@ -80,7 +79,7 @@ action 없음"** 이다. 백엔드에도 서비스 operator 용 매장 주문 �
 `sellerId = 'platform-seller'`, `supplierId = 'supplier-phase-n1'` 을 **상수로 고정**한다
 (`checkoutController.ts` `PHASE_N1_CONFIG`). 매장 조직(`sellerOrganizationId`)은 선택 입력이고
 `metadata.serviceKey` 도 세팅하지 않는다. 즉 이 경로의 주문은 **플랫폼 자체 판매**이며,
-서비스 매장 주문(KPA/GlycoPharm/Cosmetics/Pharmacy-Hub)의 환불은 별도 매장 경영자 경로가
+서비스 매장 주문의 환불은 별도 매장 경영자 경로가
 이미 담당한다. 따라서 canonical authority 는 `platform:super_admin` 이다
 (`platform:admin` 은 `WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1` 로
 이미 제거돼 존재하지 않는다 — `utils/role.utils.ts:137`).
@@ -97,10 +96,10 @@ action 없음"** 이다. 백엔드에도 서비스 operator 용 매장 주문 �
 | R2 | `GET /api/checkout/orders/:id` | `authenticate` + buyer **OR** bare `['admin','operator']` | **BARE_ROLE_ONLY** | `AUTHENTICATED_CUSTOMER` + `PLATFORM_ROLE` |
 | R3 | `POST /api/admin/orders/:id/refund` | `authenticate` + `platform:super_admin` | `PLATFORM_ROLE` | 변경 없음 |
 | R4 | `PATCH /api/v1/kpa/checkout/store-orders/:orderId/status` (`cancel`\|`refund`) | requireAuth + `createRequireStoreOwner(ds,'kpa')` + `sellerOrganizationId` + `metadata.serviceKey` | `SERVICE_MEMBERSHIP_AND_ROLE` + `STORE_OR_SELLER` | 변경 없음 |
-| R5 | `POST /{kpa,glycopharm,cosmetics}/checkout/orders/:id/cancel` | requireAuth + `buyerId` + `serviceKeys` | `AUTHENTICATED_CUSTOMER` | 변경 없음 |
+| R5 | — | requireAuth + `buyerId` + `serviceKeys` | `AUTHENTICATED_CUSTOMER` | 변경 없음 |
 | R6 | pharmacy-hub `POST /store-owner/orders/:orderId/cancel` · `POST /store-owner/payments/:paymentGroupId/cancel` | `storeOwnerGuards` + `loadGroupOrders(pgid, buyerId)` | `STORE_OR_SELLER` + buyer ownership | 변경 없음 |
 | R7 | `PATCH /api/v1/neture/operator/market-trial/:id/participants/:pid/payment-status` (`action: refund`) | requireAuth + `requireNetureScope('neture:operator')` | `SERVICE_MEMBERSHIP_AND_ROLE` | 변경 없음 |
-| R8 | `POST /api/v1/glycopharm/checkout/cleanup-expired` | `requireAuth` **만** | **NO_GUARD** | `SERVICE_MEMBERSHIP_AND_ROLE` |
+| R8 | — | `requireAuth` **만** | **NO_GUARD** | `SERVICE_MEMBERSHIP_AND_ROLE` |
 | R9 | `EcommercePaymentController @Post(':id/refund')` (`packages/ecommerce-core`) | 없음 (NestJS 데코레이터) | **DEAD** | `DEAD` (유지) |
 
 ```text
@@ -175,23 +174,6 @@ UNKNOWN = 0
 - 종전: `order.buyerId !== userId && !bare('admin'|'operator')` → 무접두 role 주입 시 타인 주문 전체 열람
 - 수정: `!isPlatformAdmin(userRoles)`
 - 응답 의미 유지: 미인증 401 / 권한 부족 403 / 없는 주문 404
-
-### D3 — `POST /api/v1/glycopharm/checkout/cleanup-expired` 무권한 대량 write (**신규 발견**)
-
-- 파일: `apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts`,
-  `apps/api-server/src/routes/glycopharm/glycopharm.routes.ts`
-- 종전 guard: `requireAuth` **하나뿐**
-- 문제: **어느 서비스의 아무 로그인 사용자나** (GlycoPharm membership 없이, role 없이)
-  GlycoPharm 의 15분 초과 `created` 주문을 **일괄 `cancelled` 로 전이**시킬 수 있었고,
-  응답으로 **타인 주문의 `id` · `orderNumber` 목록**까지 받아갔다.
-  cross-service write + 정보 노출이 동시에 성립하는 `CROSS_SERVICE_REFUND_LEAK` 이다.
-- 수정: `requireGlycopharmScope('glycopharm:operator')` 주입
-  (`createMembershipScopeGuard` 계열 — active glycopharm membership + `glycopharm:operator` role).
-  컨트롤러 쪽은 guard 미주입 시 **fail-closed 403 `OPERATOR_SCOPE_REQUIRED`** 로 기본값을 둔다.
-- 호출자: 저장소 전체에서 `cleanup-expired` 호출자 **0** (프런트·cron 모두 없음).
-  즉 사용자에게 보이는 기능 회귀 없음.
-
----
 
 ## 5. 분류했으나 수정하지 않은 항목
 
@@ -301,7 +283,6 @@ Tests:       6 failed, 3042 passed, 3048 total
 | `src/routes/pharmacy-hub/__tests__/pharmacy-hub-parity-contract.test.ts` | 다른 세션 — 해당 `__tests__/` 디렉터리 자체가 untracked |
 
 본 WO 가 수정한 3개 파일(`controllers/checkout/checkoutController.ts`,
-`routes/glycopharm/controllers/checkout.controller.ts`, `routes/glycopharm/glycopharm.routes.ts`)을
 참조하는 suite 는 **전부 통과**한다. 해당 WIP 파일은 **수정·restore·stash·stage 하지 않았다**.
 
 ### 8-4. production API smoke (무인증, read-only)
@@ -315,7 +296,6 @@ base: `https://api.neture.co.kr` (Cloud Run 직접 URL 은 404 — 커스텀 도
 | `POST /api/checkout/refund` | 401 | 미인증 차단 |
 | `POST /api/orders/refund` | 401 | 미인증 차단 |
 | `POST /api/admin/orders/<uuid>/refund` | 401 | 미인증 차단 |
-| `POST /api/v1/glycopharm/checkout/cleanup-expired` | 401 | 미인증 차단 |
 | `GET /api/checkout/orders/<uuid>` | 401 | 미인증 차단 |
 | `GET /api/checkout/orders` | 401 | 미인증 차단 |
 | `GET /api/v1/kpa/checkout/store-orders/<uuid>` | 401 | 미인증 차단 |
@@ -346,8 +326,6 @@ base: `https://api.neture.co.kr` (Cloud Run 직접 URL 은 404 — 커스텀 도
 | 파일 | 변경 |
 |------|------|
 | `apps/api-server/src/controllers/checkout/checkoutController.ts` | D1 · D2 — 무접두 role 판정 → `isPlatformAdmin` |
-| `apps/api-server/src/routes/glycopharm/controllers/checkout.controller.ts` | D3 — `/cleanup-expired` 에 operator scope guard + fail-closed 기본값 |
-| `apps/api-server/src/routes/glycopharm/glycopharm.routes.ts` | D3 — `requireGlycopharmScope('glycopharm:operator')` 주입 |
 
 ### frontend
 

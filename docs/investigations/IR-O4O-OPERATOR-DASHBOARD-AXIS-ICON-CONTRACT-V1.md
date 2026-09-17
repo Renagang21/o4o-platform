@@ -31,8 +31,6 @@ K-Cosmetics 아이콘 정비(commit `474cabffa`)에서 `OperatorDashboard` 축 �
 | K-Cos | 콘텐츠 운영 | 📋 | `clipboard-list` | ClipboardList |
 | Neture | 공급·유통 운영 | 📦 | `package` | Package |
 | Neture | 콘텐츠·커뮤니티 운영 | 📋 | `clipboard-list` | ClipboardList |
-| GlycoPharm | 커뮤니티 운영 | 💬 | `message-square` | MessageSquare |
-| GlycoPharm | 약국 HUB 운영 | 🏥 | `building-2` | Building2 |
 | KPA | 커뮤니티 운영 | 💬 | `message-square` | MessageSquare |
 | KPA | 매장 HUB 운영 | 🏪 | `store` | Store |
 
@@ -42,6 +40,6 @@ K-Cosmetics 아이콘 정비(commit `474cabffa`)에서 `OperatorDashboard` 축 �
 
 ## 6. 검증
 
-- `web-k-cosmetics` / `glycopharm-web` / `web-neture` / `web-kpa-society` tsc --noEmit: **전부 PASS** (operator-core-ui 소스 포함 컴파일)
+- `web-k-cosmetics` / `web-neture` / `web-kpa-society` tsc --noEmit: **전부 PASS** (operator-core-ui 소스 포함 컴파일)
 - 계약 타입 무변경 → 소비처 타입 회귀 0
 - 화면 smoke: 배포 후 각 `/operator` 대시보드 축 아이콘 lucide 표시 확인 권장(4 서비스 deploy 대상)

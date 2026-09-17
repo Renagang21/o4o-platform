@@ -48,7 +48,7 @@
 - 컨트롤러 응답 `data.listingActivated`(=`listing?.is_active === true`)는 이미 존재 → 프론트까지 정규화 전달:
   - 공통 타입 [types.ts](packages/operator-core-ui/src/modules/product-applications/types.ts) `approve(id): Promise<ProductApproveResult | void>` (`{listingActivated?}`).
   - 공통 콘솔 [ProductApplicationManagementConsole.tsx](packages/operator-core-ui/src/modules/product-applications/ProductApplicationManagementConsole.tsx) `handleConfirmAction` 이 `listingActivated === false` 면 **error 토스트**("승인은 완료됐지만 매장 진열 활성화에 실패했습니다. 진열 상태를 확인해주세요."), 그 외 성공 토스트로 분기.
-  - 3개 어댑터(KPA/GP/KCos `ProductApplicationManagementPage.tsx`) `approve` 를 `{listingActivated}` 로 정규화. **공통 콘솔·타입 변경이므로 3소비처 전수 반영**(Shared Module Change Rule).
+  - 3개 어댑터(KPA/KCos `ProductApplicationManagementPage.tsx`) `approve` 를 `{listingActivated}` 로 정규화. **공통 콘솔·타입 변경이므로 3소비처 전수 반영**(Shared Module Change Rule).
 
 ## 4. KpaApplication 의미 / 온보딩 경로 (Scope 4) — **HOLD**
 
@@ -103,7 +103,6 @@ ready      t          (null)     7
 
 ## 10. 배포 / smoke
 
-- 타입체크: **web-kpa-society / glycopharm-web / k-cosmetics / api-server 4/4 GREEN**(tsc --noEmit).
 - 배포: 커밋 `d4278b519` push → CI `Deploy API Server (Cloud Run)` + `Deploy Web Services (Cloud Run)` 둘 다 **completed / success (GREEN)**.
 - 실브라우저 smoke(sohae2100 = kpa:admin+operator, kpa-society-web 프로덕션):
   - **Scope 1 GREEN** — `/operator/approvals` 렌더 확인: heading "공급자 콘텐츠 승인", entity_type 탭(전체/공급자 자료/사이니지 캠페인), 상태 필터(대기중/승인됨/반려됨/전체), DataTable 6컬럼(액션/유형/제목·상세/요청자/생성일/상태), 정상 empty state("대기 중인 승인 요청이 없습니다" = 200 빈배열, 에러 아님). 사이드바 `승인` 그룹에 메뉴 항목 `공급자 콘텐츠 승인 → /operator/approvals` 노출. 신규 엔드포인트 401/403/500 없음.

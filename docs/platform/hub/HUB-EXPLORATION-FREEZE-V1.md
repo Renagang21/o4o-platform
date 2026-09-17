@@ -69,7 +69,6 @@ Each service creates a thin wrapper that provides **data only**:
 | Service | Wrapper | Theme Color |
 |---------|---------|-------------|
 | KPA Society | `PharmacyHubMarketPage` | `#1E3A8A` (blue) |
-| GlycoPharm | `GlycoPharmHubPage` | `#0d9488` (teal) |
 | K-Cosmetics | `KCosmeticsHubPage` | `#DB2777` (pink) |
 
 ### What wrappers CAN customize
@@ -120,7 +119,6 @@ Each service creates a thin wrapper that provides **data only**:
 | Service | Route | Status |
 |---------|-------|--------|
 | KPA Society | `/hub` (PharmacyHubMarketPage) | Applied |
-| GlycoPharm | `/hub` | Applied |
 | K-Cosmetics | `/hub` | Applied |
 
 ---

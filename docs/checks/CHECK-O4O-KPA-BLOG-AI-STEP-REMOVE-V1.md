@@ -41,21 +41,21 @@ KPA 블로그 작성/수정 화면에서 **블로그 초안을 AI로 생성하�
 ## 4. 검증 기타
 - `web-kpa-society` 전체 tsc --noEmit 오류 0(PharmacyBlogPage 0). Web Cloud Run 배포 success(backend 무변경 → api 배포 불필요).
 
-## 5. GP/KCos 영향
+## 5. KCos 영향
 - 변경 파일 = `services/web-kpa-society/src/pages/pharmacy/PharmacyBlogPage.tsx` 단일(KPA 전용).
-- GP/KCos 블로그 화면은 별도 파일 → **무변경**. 공통 컴포넌트(AiContentModal·content-editor) 미변경. → **KPA 블로그만 AI 진입점 제거, GP/KCos 무영향.**
+- KCos 블로그 화면은 별도 파일 → **무변경**. 공통 컴포넌트(AiContentModal·content-editor) 미변경. → **KPA 블로그만 AI 진입점 제거, KCos 무영향.**
 
 ## 6. 범위/안전
 - AiContentModal/api·ai-prompts·Toolbar AI 삭제 0. 블로그 저장 API·데이터·migration 0. 기존 블로그 글 변경/삭제 0. QR/POP/콘텐츠 제작 AI 제거 상태 회귀 0. 상품설명/자료실/강의/사이니지 AI는 본 WO 미포함. 외부 LLM 안내 공통화는 후속.
 
 ## 7. 후속
 - 블로그 저장/목록 persistence 검증(store slug 정비 후).
-- AI 제거 잔여: **PRODUCT-DESC / RESOURCE / COURSE-LECTURE / SIGNAGE** (사용자 노출 큰 쪽 우선) → GP/KCos parity → 외부 LLM 안내(`WO-O4O-CONTENT-EXTERNAL-LLM-GUIDE-V1`).
+- AI 제거 잔여: **PRODUCT-DESC / RESOURCE / COURSE-LECTURE / SIGNAGE** (사용자 노출 큰 쪽 우선) → KCos parity → 외부 LLM 안내(`WO-O4O-CONTENT-EXTERNAL-LLM-GUIDE-V1`).
 
 ---
 
 ## 8. 최종 판정
 
-> KPA `/store/content/blog` 블로그 작성/수정 흐름에서 "AI 콘텐츠 보조 / AI로 정리하기" 초안 생성 진입점이 제거되고, 외부 LLM 붙여넣기·직접 작성 중심으로 단순화된다. AiContentModal/`/api/ai/content`/본문 편집기 Toolbar "AI 정리"는 보존되며, 블로그 저장 경로(handleSave)·blogStaff API는 미변경이다. GP/KCos 무영향. (저장 persistence live 검증은 store slug 정비 후로 분리.)
+> KPA `/store/content/blog` 블로그 작성/수정 흐름에서 "AI 콘텐츠 보조 / AI로 정리하기" 초안 생성 진입점이 제거되고, 외부 LLM 붙여넣기·직접 작성 중심으로 단순화된다. AiContentModal/`/api/ai/content`/본문 편집기 Toolbar "AI 정리"는 보존되며, 블로그 저장 경로(handleSave)·blogStaff API는 미변경이다. KCos 무영향. (저장 persistence live 검증은 store slug 정비 후로 분리.)
 
 → **충족(편집 화면 검증 완료, 저장 persistence 후속 분리).**

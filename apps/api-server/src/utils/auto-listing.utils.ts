@@ -185,7 +185,7 @@ export async function autoExpandServiceProduct(
  *
  * @param dataSource - TypeORM DataSource
  * @param organizationId - 신규 조직 UUID
- * @param serviceKey - 서비스 키 (e.g. 'kpa', 'glycopharm')
+ * @param serviceKey - 서비스 키 (e.g. 'kpa', 'k-cosmetics')
  * @returns 생성된 listing 수
  */
 export async function autoListPublicProductsForOrg(
@@ -232,7 +232,7 @@ export async function autoListPublicProductsForOrg(
  *
  * @param dataSource - TypeORM DataSource
  * @param organizationId - 신규 조직 UUID
- * @param serviceKey - 서비스 키 (e.g. 'kpa-society', 'glycopharm')
+ * @param serviceKey - 서비스 키 (e.g. 'kpa-society', 'k-cosmetics')
  * @returns 생성된 listing 수
  */
 export async function autoListServiceProductsForOrg(

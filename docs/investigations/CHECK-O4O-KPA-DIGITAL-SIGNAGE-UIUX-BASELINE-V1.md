@@ -15,7 +15,7 @@
 | branch | `main` |
 | 조사 기준 HEAD | `b728a07f4` |
 | origin ahead/behind | 0 / 0 |
-| 다른 세션 WIP(시작 시점) | GP Footer / neture NetureLayout / footer WO doc — **미포함**(작업 중 다른 세션이 커밋, 본 작업 종료 시점 working tree 는 내 KPA 11파일만) |
+| 다른 세션 WIP(시작 시점) Footer / neture NetureLayout / footer WO doc — **미포함**(작업 중 다른 세션이 커밋, 본 작업 종료 시점 working tree 는 내 KPA 11파일만) |
 
 ## 2. Baseline 규칙 (확정)
 
@@ -66,7 +66,7 @@ KPA 디지털사이니지 사용자-facing 표기 기준:
 
 ## 5. 내 매장 흐름 기준
 
-표준 흐름(KPA 기준, GP/KCos 확산 시 적용):
+표준 흐름(KPA 기준, KCos 확산 시 적용):
 1. **콘텐츠 선택** — Hub 에서 "내 매장에 추가" 또는 내 매장에서 직접 등록
 2. **플레이리스트 구성** — 내 매장 디지털사이니지 운영 화면의 플레이리스트 탭
 3. **화면 송출/스케줄** — 스케줄 탭에서 시간·요일 적용 → 공개 재생
@@ -77,9 +77,9 @@ KPA 디지털사이니지 사용자-facing 표기 기준:
 
 - operator signage = HQ 미디어/플레이리스트/템플릿 + 강제 콘텐츠, DataTable/ActionBar 패턴(operator-ux-core) 유지.
 - 사용자-facing 제목은 "디지털사이니지" 기준, 운영자 내부 설명은 "사이니지 미디어/플레이리스트" technical term 허용.
-- GP/KCos 확산 시 operator 콘솔은 거의 동형 → 후속 공통 추출(B) 후보(별도 WO).
+- KCos 확산 시 operator 콘솔은 거의 동형 → 후속 공통 추출(B) 후보(별도 WO).
 
-## 7. GP/KCos 확산 시 적용할 기준
+## 7. KCos 확산 시 적용할 기준
 
 1. 기능명/제목 "디지털사이니지" 붙여쓰기 통일.
 2. 내 매장 제목 "디지털사이니지 운영"(KCos 의 "사이니지 플레이리스트" 정렬).
@@ -91,7 +91,7 @@ KPA 디지털사이니지 사용자-facing 표기 기준:
 
 | 항목 | 결과 |
 |------|------|
-| GP / KCos / Neture | ✅ 미수정(diff 0) — Neture 는 signage 제거 완료 상태, 본 WO 대상 아님 |
+| KCos / Neture | ✅ 미수정(diff 0) — Neture 는 signage 제거 완료 상태, 본 WO 대상 아님 |
 | backend / API | ✅ 무변경 |
 | DB / migration | ✅ 무변경 |
 | route / menu IA | ✅ 무변경 (label 텍스트만 정렬, path 동일) |
@@ -103,7 +103,7 @@ KPA 디지털사이니지 사용자-facing 표기 기준:
 | 패키지 | 결과 |
 |--------|------|
 | web-kpa-society (`npx tsc --noEmit`) | ✅ **PASS (exit 0, 0 error)** |
-| GP/KCos/Neture | 미수정 → 영향 없음 |
+| KCos/Neture | 미수정 → 영향 없음 |
 
 ## 10. browser smoke
 
@@ -113,8 +113,8 @@ KPA 디지털사이니지 사용자-facing 표기 기준:
 
 | WO 후보 | 내용 |
 |---------|------|
-| `WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1` | 본 baseline(§7)을 GP/KCos 에 확산 + KCos 깨진 route cleanup |
-| `WO-O4O-SIGNAGE-OPERATOR-CONSOLE-EXTRACT-V1` | operator HQ 콘솔 3서비스(KPA/GP/KCos) 공통 추출 |
+| `WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1` | 본 baseline(§7)을 KCos 에 확산 + KCos 깨진 route cleanup |
+| `WO-O4O-SIGNAGE-OPERATOR-CONSOLE-EXTRACT-V1` | operator HQ 콘솔 2서비스(KPA/KCos) 공통 추출 |
 | `IR-O4O-SIGNAGE-MYSTORE-TAB-IA-V1` | 내 매장 탭 수 3/2/1 통일 여부 IA 결정 |
 
 ---
@@ -127,9 +127,9 @@ KPA 디지털사이니지 사용자-facing 표기 기준:
 | 수정 파일 | web-kpa-society 11개 (copy/제목/CTA/empty 문자열) |
 | 용어 정렬 | user-facing "디지털 사이니지" → "디지털사이니지" 0건 잔존, 내 매장 "디지털사이니지 운영" |
 | route/menu IA | label 텍스트만 정렬, path 무변경 |
-| GP/KCos/Neture | 미수정 |
+| KCos/Neture | 미수정 |
 | backend/API/DB/migration | 무변경 |
 | TypeScript | web-kpa-society PASS |
 | browser smoke | tsc+grep 정적 갈음(라이브 보류) |
 | 다른 세션 WIP | 미포함(path-specific) |
-| 다음 | `WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1` (GP/KCos 확산) |
+| 다음 | `WO-O4O-DIGITAL-SIGNAGE-CROSSSERVICE-APPLY-V1` (KCos 확산) |

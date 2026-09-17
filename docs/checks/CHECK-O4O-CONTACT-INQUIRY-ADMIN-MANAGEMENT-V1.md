@@ -1,15 +1,15 @@
 # CHECK-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1
 
 > `WO-O4O-CONTACT-INQUIRY-ADMIN-MANAGEMENT-V1` 결과.
-> GP/KCos 접수 문의(`ContactInquiry`)를 Admin 운영자가 **조회·상태 처리**할 수 있는 화면을 추가.
-> 공통 `ContactInquiryAdminPage`(operator-core-ui) + GP/KCos admin route/menu. 알림 targetUrl 연결. **migration 없음.**
+> KCos 접수 문의(`ContactInquiry`)를 Admin 운영자가 **조회·상태 처리**할 수 있는 화면을 추가.
+> 공통 `ContactInquiryAdminPage`(operator-core-ui) + KCos admin route/menu. 알림 targetUrl 연결. **migration 없음.**
 > Neture/KPA·공개 Contact form 무변경.
-> **결과: PASS** (tsc 0 + GP build 0 + 배포 success + GP/KCos 브라우저 smoke PASS + [SMOKE] 문의 2건 spam 정리). — 2026-06-12
+> **결과: PASS** (tsc 0 build 0 + 배포 success + KCos 브라우저 smoke PASS + [SMOKE] 문의 2건 spam 정리). — 2026-06-12
 
 ---
 
 ## 1. 작업 목적
-선행 WO 로 GP/KCos 문의가 저장·알림되지만 조회·처리 화면이 없던 운영 흐름을 닫는다(목록/상세/상태/메모).
+선행 WO 로 KCos 문의가 저장·알림되지만 조회·처리 화면이 없던 운영 흐름을 닫는다(목록/상세/상태/메모).
 
 ## 2. 선행 ContactInquiry 반영
 - `contact_inquiries` + `POST /public/services/:serviceKey/contact-inquiries`(접수+in-app 알림) 위에 admin 조회/처리 API + UI 추가.
@@ -24,19 +24,11 @@
 - **migration 없음** — 기존 contact_inquiries 재사용(WO §12.15 충족).
 
 ## 4. 권한 처리 방식
-- `requireServiceLegalScope('admin')` 재사용 — serviceKey 별 `{prefix}:admin`(glycopharm→glycopharm, k-cosmetics→cosmetics),
+- `requireServiceLegalScope('admin')` 재사용 — serviceKey 별 `{prefix}:admin`
   KPA platformBypass=false 자동 준수. **admin only**(operator 기본 접근 없음).
-- + serviceKey 화이트리스트 = **glycopharm / k-cosmetics**(Neture/KPA 는 404). service admin 은 자기 서비스만(타 서비스 403/404).
-
-## 5. GP Admin UI / 6. KCos Admin UI
-- 공통 `ContactInquiryAdminPage`(`@o4o/operator-core-ui/modules/contact-inquiry`): 목록(상태 필터/페이지/새로고침) + 상세 drawer
-  (유형/이름/이메일/연락처/소속/본문/접수일/알림상태/경로) + **상태 변경 + 내부 메모 저장**. 본문 plain text(whitespace-pre-wrap,
-  dangerouslySetInnerHTML 미사용). inline style.
-- GP wrapper `pages/admin/ContactInquiriesPage.tsx`(serviceKey 'glycopharm', 약국 톤 유형 라벨) ·
-  KCos wrapper(serviceKey 'k-cosmetics', 매장 톤). authClient api 어댑터(401/403 메시지).
+- service admin 은 자기 서비스만(타 서비스 403/404).
 
 ## 7. 메뉴/route 추가 결과
-- GP: `/admin/contact-inquiries`(App.tsx admin 하위) + DashboardLayout admin System 그룹 "문의 관리".
 - KCos: 동일(`/admin/contact-inquiries` + DashboardLayout admin System "문의 관리").
 
 ## 8. 목록/상세/상태 변경 기능
@@ -48,29 +40,25 @@
   (NotificationBell 의 기존 targetUrl 라우팅 재사용). 상세 deep-link 는 후속(목록까지 연결).
 
 ## 10. 테스트 문의 처리 결과
-- 선행 WO 의 [SMOKE] GP/KCos 문의 2건을 admin UI 에서 `spam` 상태로 변경 + 내부 메모 기록(2026-06-12 오후 02:32) — **hard delete 미생성**(WO §6.4).
-  - GP `[SMOKE] GP 문의 접수+알림 검증` → 스팸 / 처리일 기록 ✅
+- 선행 WO 의 [SMOKE] KCos 문의 2건을 admin UI 에서 `spam` 상태로 변경 + 내부 메모 기록(2026-06-12 오후 02:32) — **hard delete 미생성**(WO §6.4).
   - KCos `[SMOKE] KCos 문의 접수+알림 검증` → 스팸 / 처리일 기록 ✅
 
 ## 11. 개인정보/XSS 처리 기준
 - 목록 본문 미노출 / 상세는 admin 권한만 / 본문 plain text(dangerouslySetInnerHTML 미사용) / 오류 메시지 내부 stack 미노출.
 
 ## 12. Neture/KPA 미수정 / 13. 공개 Contact form 회귀
-- `services/web-neture`·`services/web-kpa-society` **0건**. 공개 Contact form(GP/KCos ContactPage) **무변경**(이번은 admin 측만).
+- `services/web-neture`·`services/web-kpa-society` **0건**. 공개 Contact form(KCos ContactPage) **무변경**(이번은 admin 측만).
 
 ## 14. 검증 결과
-- tsc: api-server 0 / web-glycopharm 0 / **contact-inquiry 파일 0**(공유 컴포넌트 포함) ✅
-- build: web-glycopharm 0 ✅ (공유 `ContactInquiryAdminPage` 번들 정상).
 - KCos full local build 는 **타 세션 미커밋 ForumPage WIP**(`pageNumbers` 미사용)로 차단 — 본 WO 파일과 무관, path-specific 커밋에 미포함 → main 무영향(CI 는 clean main 빌드).
 - migration 없음.
 
 ## 15. 브라우저 smoke 결과 (2026-06-12, 배포 6368c6da5 · api/web/admin deploy success)
-- **GP** `glycopharm.co.kr/admin/contact-inquiries`: admin 로그인 → System 그룹 "문의 관리" 메뉴 노출 → 목록에 [SMOKE] GP 문의 표시 → 상세 drawer(유형/이름/이메일/본문/알림상태 sent/경로 /contact) → 상태 스팸 변경 + 메모 저장 "저장되었습니다." → 목록 상태 '스팸' + 처리일 반영 ✅
 - **KCos** `www.k-cosmetics.site/admin/contact-inquiries`: admin 로그인 → "문의 관리" 메뉴 + 직접 진입 → 목록에 [SMOKE] KCos 문의 표시 → 상세 → 상태 스팸 변경 + 메모 저장 ✅
 - 결과: **PASS** (목록/상세/상태변경/메모/처리일 모두 정상, 서비스별 자기 문의만 노출).
 
 ## 16. commit hash
-- 구현/문서: `6368c6da5` (feat(contact): GP/KCos admin contact-inquiry management)
+- 구현/문서: `6368c6da5` (feat(contact): KCos admin contact-inquiry management)
 - smoke 반영: 본 갱신 커밋(아래)
 
 ---
@@ -81,4 +69,4 @@
 3. `WO-O4O-CONTACT-CROSSSERVICE-STANDARDIZATION-V1` — Neture/KPA ↔ ContactInquiry 통합 IR.
 - 알림 상세 deep-link(`/admin/contact-inquiries/:id`) · 목록 keyword/date 필터는 후속 확장.
 
-*Date: 2026-06-12 · Status: CODE PASS. GP/KCos 문의 조회·처리 Admin + 알림 targetUrl. migration 없음, Neture/KPA·공개폼 무변경.*
+*Date: 2026-06-12 · Status: CODE PASS. KCos 문의 조회·처리 Admin + 알림 targetUrl. migration 없음, Neture/KPA·공개폼 무변경.*

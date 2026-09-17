@@ -2,8 +2,8 @@
 
 > 조사 전용 IR — 데이터 생성 경로 판정까지가 목표. **코드 수정·데이터 보정 없음.**
 > 일자: 2026-05-30
-> 선행: `IR-O4O-CROSSSERVICE-...` / `IR-O4O-GLYCOPHARM-KCOS-...` (UI 표시 정렬 완료),
-> Neture/GP/KCos 회원 유형·운영 권한 분리 정비 완료. 본 IR은 그 근저의 데이터 원인을 조사.
+> 선행: `IR-O4O-CROSSSERVICE-...`
+> Neture/KCos 회원 유형·운영 권한 분리 정비 완료. 본 IR은 그 근저의 데이터 원인을 조사.
 
 ---
 
@@ -17,7 +17,7 @@
   정책이며, 승인 흐름이 bare→namespaced 변환을 수행한다. 단 일부 마이그레이션이 bare 값을 재삽입한 legacy 잔재 있음.
 - **Case C 아님** — 리스트/로그인 API 는 DB 원값을 가공 없이 내려준다(병합으로 bare 를 *만들지* 않음).
 - **Case E (부분)** — 서비스별 role prefix 불일치: K-Cosmetics 는 serviceKey `k-cosmetics` vs role `cosmetics:*`.
-  KPA/Neture/GP 는 `{service}:operator` 일관. 저장 prefix 정책 공통화 여지.
+  KPA/Neture 는 `{service}:operator` 일관. 저장 prefix 정책 공통화 여지.
 - **DB 실데이터 직접 확인은 미완**(프로덕션 자격증명 부재) — 코드 경로 기준 판정. 아래 "미확인 항목" 참조.
 
 > 요약: **bare operator/admin 의 1차 거처는 `service_memberships.role`** 이다. 등록/승인 흐름이 이 컬럼을
@@ -65,7 +65,6 @@
 | 서비스 | membership.role 의미·소스 | 운영 권한 저장 | bare 수용 코드 |
 |---|---|---|---|
 | **Neture** | 등록 role 소스(`smRow.role`). 승인이 admin/operator→`neture:*`로 role_assignments INSERT | role_assignments(namespaced) | operator-registration.service `ADMIN_ROLES` |
-| **GlycoPharm** | 공통 승인(MembershipApprovalService) 사용. membership.role 기반 | role_assignments(namespaced) + 별도 assign API | MembershipApprovalService `skipKpaProfile = ['admin','operator'].includes(smRole)` (membership.role 에 bare 수용 전제) |
 | **K-Cosmetics** | 동일(공통). + cosmetics_members.subRole 별도 | role_assignments. role prefix `cosmetics:`(serviceKey 와 불일치) | 동일 |
 | **KPA-Society** | kpa_members + service_memberships. KpaRolePrefixMigration 으로 operator→`kpa:operator` 변환 이력 | role_assignments(`kpa:*`) | MembershipApprovalService 동일 패턴 |
 
@@ -88,7 +87,6 @@
 - **write**: `RoleAssignmentService.assignRole()` 가 전달값 그대로 저장. 모달 운영권한 저장(POST /roles)은 namespaced 전달.
   승인 흐름은 bare→namespace 변환 후 저장. → 운영 권한은 namespaced 로 들어온다.
 - **legacy 잔재**: `PrefixUnprefixedRoles`(1771200000019)가 bare→namespaced 일괄 변환했으나,
-  이후 `ActivateGlycopharmTestAccounts`(20260317110000)가 bare `user`/`pharmacist` 재삽입(operator/admin 아님, namespacing 위반 잔재).
 
 ## 6. 로그인 roles[] 생성 과정
 
@@ -161,6 +159,5 @@ WHERE is_active = true AND role !~ ':' GROUP BY role ORDER BY role;
 - [MembershipApprovalService.ts](../../apps/api-server/src/services/approval/MembershipApprovalService.ts) — 공통 승인, `['admin','operator']` bare 수용 전제
 - [ServiceMembership.ts](../../apps/api-server/src/modules/auth/entities/ServiceMembership.ts) · [RoleAssignment.ts](../../apps/api-server/src/modules/auth/entities/RoleAssignment.ts) · [roles.ts](../../apps/api-server/src/types/roles.ts)
 - `auth-context.helper.ts` — 로그인 roles[] 주입
-- 마이그레이션: PrefixUnprefixedRoles(1771200000019), CleanupLegacyRoles(20260228000001), NetureRolePrefixMigration(20260205060000), KpaRolePrefixMigration(20260205040103), ActivateGlycopharmTestAccounts(20260317110000)
 
 *코드 경로 분석 기반. DB 실데이터 확인 항목은 "미확인 항목"에 명시. 코드 수정·데이터 보정 없음.*

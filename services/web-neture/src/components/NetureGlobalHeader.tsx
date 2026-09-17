@@ -60,7 +60,7 @@ export function NetureGlobalHeader() {
 
   // WO-O4O-NETURE-GLOBAL-HEADER-OPERATOR-LABEL-AND-NOTIFICATION-CLICK-FIX-V1:
   // 알림 항목 클릭 시 metadata.targetUrl 이 있으면 해당 경로로 이동.
-  // KPA / K-Cosmetics / GlycoPharm GlobalHeader 동일 패턴.
+  // KPA / K-Cosmetics GlobalHeader 동일 패턴.
   const handleNotificationClick = useCallback(
     (n: NotificationItem) => {
       // WO-O4O-NETURE-MOBILE-NAV-...-V1: 라우팅 규칙을 resolveNetureNotificationTarget(SSOT)로 이관 —

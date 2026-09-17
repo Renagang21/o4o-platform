@@ -39,7 +39,7 @@
 ## 3. 비범위 (의도적 — 후속 WO)
 
 - **백엔드 `/kpa/payments/prepare|confirm` 차단(410/403)** → 후속 `WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1`. 본 WO 는 frontend-only.
-- GlycoPharm/K-Cosmetics payment API deprecation(등급 A, UI 부재) → 동일 후속 WO.
+- K-Cosmetics payment API deprecation(등급 A, UI 부재) → 동일 후속 WO.
 - `PaymentSuccessPage`/`PaymentFailPage` 페이지·라우트, 상품상세 장바구니 아이콘 자체 = 결제 흐름 차단 후 **도달 불가(dead)** 이나 본 WO 미삭제(최소 변경). 필요 시 후속 정리.
 - checkout_orders / o4o_payments / PaymentCore / Toss adapter **무변경**(데이터 삭제 없음).
 - neture-b2b(B2B_ORDER) / store_paid_feature_entitlements / FOREIGN_VISITOR_SALES_SUPPORT **미접촉**.
@@ -66,7 +66,6 @@
 
 ```text
 1. WO-O4O-STORE-SALE-CHECKOUT-ROUTE-DEPRECATION-V1
-   - KPA/Glyco/KCos /payments/prepare|confirm 410/403 (신규 생성 차단, 조회 보존)
    - neture-b2b 미접촉
 2. WO-O4O-STORE-SERVICE-SUBSCRIPTION-TOSS-PAYMENT-V1
    - 매장 경영자 FOREIGN_VISITOR_SALES_SUPPORT 구독 결제 구현

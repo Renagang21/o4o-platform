@@ -59,10 +59,10 @@ A안(중복 제거) 제외 → **B안: 메뉴 IA 재배치(라벨/위치만)**.
 | API / DB / migration | ❌ 없음 |
 | redirect / alias | ❌ 불필요(route 유지) |
 | capability / filter | ❌ 변경 없음(메뉴 항목 key 동일) |
-| **GP/KCos 메뉴 블록** | ❌ 무변경 (KPA 블록만 수정 — GP/KCos 블록 별도 객체) |
+| **KCos 메뉴 블록** | ❌ 무변경 (KPA 블록만 수정 — KCos 블록 별도 객체) |
 | 공유 컴포넌트 | ❌ 수정 없음 |
 
-> 참고: `storeMenuConfig.ts` 는 packages → web 배포 시 전 web 재빌드되나, **KPA 메뉴 블록만** 바뀌어 GP/KCos 사이드바는 동일.
+> 참고: `storeMenuConfig.ts` 는 packages → web 배포 시 전 web 재빌드되나, **KPA 메뉴 블록만** 바뀌어 KCos 사이드바는 동일.
 
 ---
 

@@ -24,7 +24,6 @@
 | 서비스 | revision | 비고 |
 |---|---|---|
 | `kpa-society-web` | `kpa-society-web-01868-mgh` | `c9fd2d6a4` 반영 · 프로덕션 재검증 완료 |
-| `glycopharm-web` | `glycopharm-web-01300-tcq` | 이번 WO 코드 변경 0 |
 | `k-cosmetics-web` | `k-cosmetics-web-01043-r77` | `c9fd2d6a4` + `6777d7503` 반영 · 프로덕션 재검증 완료 |
 | `neture-web` | `neture-web-01495-p7t` | `142943486` 반영 · 프로덕션 재검증 완료 |
 | `pharmacy-hub-web` | `pharmacy-hub-web-00119-4gr` | 이번 WO 코드 변경 0 |
@@ -36,7 +35,7 @@
 | 서비스 | My Page base | 등록 route | nav 항목 | entry card | DEAD_ROUTE | ROLE_MISMATCH |
 |---|---|---:|---:|---:|---:|---:|
 | KPA | `/mypage` | 12 (렌더 10 + redirect 2) | 9 | 6 | 0 | 0 |
-| GP | `/mypage` | 7 | 7 | 4 | 0 | 0 |
+| `/mypage` | 7 | 7 | 4 | 0 | 0 |
 | KCos | `/mypage` | 7 | 7 | 4 | 0 | 0 |
 | Neture | `/mypage` | 4 | 4 (role 파생) | 4 | 0 | 0 |
 | PH | `/account` | 1 leaf (+ `/store-owner/account`) | 2 | 없음 (hub 미구현) | 0 | 0 |
@@ -52,13 +51,13 @@
 | 기능축 | 공통 자산 (`@o4o/account-ui`) | 소비 |
 |---|---|---|
 | Shell/Layout | `MyPageShell` / `MyPageLayout` | 5/5 |
-| Profile | `AccountProfileSection` | GP · KCos · Neture · PH (KPA 는 자체 구현) |
-| 미인증 | `MyPageAuthRequired` | GP · KCos · Neture · PH (KPA 는 route guard 로 `/login` 이동) |
+| Profile | `AccountProfileSection` | KCos · Neture · PH (KPA 는 자체 구현) |
+| 미인증 | `MyPageAuthRequired` | KCos · Neture · PH (KPA 는 route guard 로 `/login` 이동) |
 | 로딩 | `MyPageLoadingState` | PH · Neture (이번 WO 채택) |
 | 역할 라벨 | `resolveRoleLabel` | KCos (이번 WO 채택) · Neture · PH |
 | 상태/역할 배지 | `MembershipStatusBadge` / `RoleBadgeGroup` | 3/2 로 갈림 (backlog B5) |
 | 알림 | `useNotifications` · `NotificationSheet` | 5/5 |
-| 활동 | `MyPageActivityFeed` | KPA · GP · KCos · Neture |
+| 활동 | `MyPageActivityFeed` | KPA · KCos · Neture |
 | 네비게이션 | `MyPageNavigation` | 5/5 |
 
 ---
@@ -66,7 +65,6 @@
 ## 4. 전체 closure matrix
 
 ```text
-Track               KPA               GP                KCos              Neture            PH                Final
 Profile             SERVICE_SPECIFIC  ADOPTED           ADOPTED           ADOPTED           ADOPTED           ADOPTED
 Shell/Layout        ADOPTED           ADOPTED           ADOPTED           ADOPTED           ADOPTED           ADOPTED
 Home/Hub            ADOPTED           ADOPTED           ADOPTED           ADOPTED           NOT_IMPLEMENTED   ADOPTED
@@ -89,7 +87,7 @@ Help/Support        NOT_IMPLEMENTED   NOT_IMPLEMENTED   NOT_IMPLEMENTED   NOT_IM
 | 서비스 | 발견 | 조치 |
 |---|---|---|
 | KPA | 1건 — `MyQualificationsPage.tsx` 로딩만 `MyPageLayout` 밖 | **수정** (`c9fd2d6a4`) |
-| GP | 0 | — |
+| 0 | — |
 | KCos | 0 (Shell 우회 없음. 제목 drift 는 §25 M6) | — |
 | Neture | 1건 — `MyBusinessProfilePage.tsx` 미인증 분기 부재 → supplier API 401 오류 화면 노출 | **수정** (`c9fd2d6a4`) |
 | Neture | 4건 — Hub/Profile/Settings/BusinessProfile 로딩 분기 부재 | **수정** (`142943486`) |
@@ -110,7 +108,7 @@ Help/Support        NOT_IMPLEMENTED   NOT_IMPLEMENTED   NOT_IMPLEMENTED   NOT_IM
 ## 7. navigation/entry
 
 - nav 정의 5개 · entry card grid 4개의 **모든 목적지가 등록된 route 로 해석**된다 (DEAD_ROUTE 0).
-- 프로덕션 실측 nav 항목 수: KPA 9 · GP 7 · KCos 7 · Neture 4(공급자) · PH 2 — 코드 census 와 일치.
+- 프로덕션 실측 nav 항목 수: KPA 9 7 · KCos 7 · Neture 4(공급자) · PH 2 — 코드 census 와 일치.
 - 고아 화면 1건: KPA `AnnualReportFormPage.tsx` 가 `pages/mypage/index.ts:8` 에서 export 되지만 route 가 없다 → `NOT_IMPLEMENTED_NO_ENTRY` (backlog B1). 진입점이 없으므로 dead link 아님.
 
 ---
@@ -122,7 +120,7 @@ Help/Support        NOT_IMPLEMENTED   NOT_IMPLEMENTED   NOT_IMPLEMENTED   NOT_IM
 | 서비스 | 표시 역할 | 표시 상태 | 판정 |
 |---|---|---|---|
 | KPA | 정상 | 정상 | PASS |
-| GP | `운영자` | `승인됨` | PASS |
+| `운영자` | `승인됨` | PASS |
 | KCos | `관리자` | `승인됨` | PASS (수정 전 `역할: -` → `c9fd2d6a4` 로 해소) |
 | Neture | `공급자` | `승인됨` | PASS (수정 전 `공급자` 배지 2회 → `c9fd2d6a4` 로 해소) |
 | PH | `약국 경영자` | `승인됨` | PASS |
@@ -136,7 +134,7 @@ Help/Support        NOT_IMPLEMENTED   NOT_IMPLEMENTED   NOT_IMPLEMENTED   NOT_IM
 | 서비스 | 미인증 진입 결과 | 판정 |
 |---|---|---|
 | KPA | `MyPageGuard` (`App.tsx:465`) → `/login` redirect | PASS — route guard 계약 (WO 부기가 지목한 오탐 확정) |
-| GP | `SoftGuard` (`App.tsx:434`) → Shell 안 로그인 안내 | PASS |
+| `SoftGuard` (`App.tsx:434`) → Shell 안 로그인 안내 | PASS |
 | KCos | `ProtectedRoute` (`App.tsx:555-611`) → `/login` redirect | PASS |
 | Neture | route guard 없음 → Shell 안 `MyPageAuthRequired` (4화면 전부) | PASS (`/mypage/business-profile` 은 이번 WO 로 해소) |
 | PH | Shell 안 "로그인이 필요합니다" | PASS |
@@ -168,14 +166,14 @@ KCos 5화면(`MyProfilePage:29-40` · `MySettingsPage:21-32` · `MyCertificatesP
 
 ## 12. Requests
 
-- KPA · GP · KCos `/mypage/my-requests` 프로덕션 렌더 정상, 오류 문구 0.
+- KPA · KCos `/mypage/my-requests` 프로덕션 렌더 정상, 오류 문구 0.
 - Neture · PH 은 My Page 축에 신청 개념 없음 → `NOT_IMPLEMENTED`.
 
 ---
 
 ## 13. Settings/Security
 
-- KPA · GP · KCos · Neture `/mypage/settings` · PH `/account` 보안 영역 전부 렌더 정상.
+- KPA · KCos · Neture `/mypage/settings` · PH `/account` 보안 영역 전부 렌더 정상.
 - 비밀번호 변경 UI 존재 확인. **§24 에 따라 제출하지 않았다.**
 
 ---
@@ -195,7 +193,7 @@ KCos 5화면(`MyProfilePage:29-40` · `MySettingsPage:21-32` · `MyCertificatesP
 
 ## 16. Activity/History
 
-- KPA · GP · KCos · Neture `MyPageActivityFeed` 렌더 정상 ("최근 활동이 없습니다" 등은 정상 빈 상태).
+- KPA · KCos · Neture `MyPageActivityFeed` 렌더 정상 ("최근 활동이 없습니다" 등은 정상 빈 상태).
 - PH 미구현 → `NOT_IMPLEMENTED`.
 
 ---
@@ -211,8 +209,8 @@ KCos 5화면(`MyProfilePage:29-40` · `MySettingsPage:21-32` · `MyCertificatesP
 | 5서비스 My Page nav 정의(5개)의 Help/Support 항목 | 0 |
 | entry card grid(4개)의 Help/Support 항목 | 0 |
 | `packages/account-ui` 의 Help/Support 전용 component | 0 |
-| GP/KCos `contact_inquiries` · Neture `neture_contact_messages` 의 소유자 컬럼 | 없음 — self-read 가 설계된 적 없음 |
-| 프로덕션 실측 | KPA 푸터 `협업 문의` → `/contact`, GP·KCos 푸터 고객지원 → `/contact` + `support@…`, Neture `Contact Us` → `/contact`, PH 푸터 문의 링크 없음. 전부 **공개 문의 폼**이며 My Page 축 진입점이 아니다 |
+| KCos `contact_inquiries` · Neture `neture_contact_messages` 의 소유자 컬럼 | 없음 — self-read 가 설계된 적 없음 |
+| 프로덕션 실측 | KPA 푸터 `협업 문의` → `/contact`, KCos 푸터 고객지원 → `/contact` + `support@…`, Neture `Contact Us` → `/contact`, PH 푸터 문의 링크 없음. 전부 **공개 문의 폼**이며 My Page 축 진입점이 아니다 |
 
 §28 분기선 적용: (B) 의 전제인 **"이미 사용자에게 노출된 진입점"이 존재하지 않는다** → blocker 아님.
 
@@ -229,15 +227,14 @@ KCos 5화면(`MyProfilePage:29-40` · `MySettingsPage:21-32` · `MyCertificatesP
 | 서비스 | desktop 1440x900 | mobile 390x844 |
 |---|---|---|
 | KPA | 9 route 전수 PASS (제목·nav 9·오류 0) | `/mypage/qualifications` PASS · 가로 overflow 없음 (scrollWidth 375 ≤ 390) |
-| GP | 7 route 전수 PASS | 미실시 — **미확인** |
+| 7 route 전수 PASS | 미실시 — **미확인** |
 | KCos | 7 route 전수 PASS (`/mypage/profile` = "프로필", `/mypage/settings` = "설정") | `/mypage/profile` PASS · overflow 없음 |
 | Neture | 4 route 전수 PASS | `/mypage` PASS · overflow 없음 |
 | PH | `/account` PASS | 미실시 — **미확인** |
 
-> GP · PH 은 이번 WO 코드 변경이 **0** 이라 모바일 회귀 위험이 없다고 판단해 desktop 검증만 수행했다. 숨기지 않고 미확인으로 기록한다.
+> PH 은 이번 WO 코드 변경이 **0** 이라 모바일 회귀 위험이 없다고 판단해 desktop 검증만 수행했다. 숨기지 않고 미확인으로 기록한다.
 
-> **2026-08-21 후속 해소 (WO-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1 §10·§13)**: 위 표의 GP mobile "미실시" 2칸과 PH mobile "미실시" 칸이 실제 프로덕션 390×844 브라우저 검증으로 해소됐다.
-> - GP: `/mypage` 7 route 전수 PASS (가로 overflow 0 · double shell 0 · console error 0 · network 전부 200).
+> double shell 0 · console error 0 · network 전부 200).
 > - PH: `/account` · `/store-owner/account` PASS (Shell 밖 early return 없음 · double shell 0 · sidebar/활성표시 정상).
 > 상세는 [`CHECK-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1`](CHECK-O4O-CROSS-SERVICE-MYPAGE-FINAL-VERIFICATION-CLOSURE-V1.md) §4·§5. 위 표의 원 기록은 당시 사실이므로 수정하지 않는다.
 
@@ -245,7 +242,7 @@ KCos 5화면(`MyProfilePage:29-40` · `MySettingsPage:21-32` · `MyCertificatesP
 
 ## 20. production browser
 
-- 검증 도메인: `kpa-society.co.kr` · `www.glycopharm.co.kr` · `www.k-cosmetics.site` · `neture.co.kr` · `pharmacyhub.co.kr`.
+- 검증 도메인: `kpa-society.co.kr` · `www.k-cosmetics.site` · `neture.co.kr` · `pharmacyhub.co.kr`.
 - 5서비스 전부 실제 로그인 세션으로 검증했다. 자격증명은 SSOT 만 참조하고 어디에도 기록하지 않는다.
 - §23 합격 기준(잘못된 role/status 노출 0 · Shell 유실 0 · dead link 0 · 미인증 오노출 0) → **충족**.
 
@@ -265,7 +262,7 @@ KCos 5화면(`MyProfilePage:29-40` · `MySettingsPage:21-32` · `MyCertificatesP
 | `services/web-neture` `tsc --noEmit` | 0 errors (로딩 분기 추가 후 재실행 포함) |
 | `services/web-k-cosmetics` `tsc --noEmit` | 0 errors (제목 교정 후 재실행 포함) |
 | 위 3서비스 `vite build` | 전부 성공 |
-| GP · PH | 코드 변경 0 → §26 에 따라 build 를 늘리지 않았다 |
+| PH | 코드 변경 0 → §26 에 따라 build 를 늘리지 않았다 |
 
 - `packages/financial-core` 의 `tsup: No input files` 는 **선행 상태**이며 이번 변경과 무관하다.
 - 워크스페이스 패키지 dist 부재로 최초 `tsc` 가 `TS2307` 를 대량 출력했으나 `pnpm install --frozen-lockfile` + 패키지 빌드 후 해소됐다 (코드 결함 아님).
@@ -293,7 +290,7 @@ KCos 5화면(`MyProfilePage:29-40` · `MySettingsPage:21-32` · `MyCertificatesP
 | B9 | `MobileBottomNav` 읽음처리가 desktop 과 비대칭 | 전체 | 선행 followup |
 | B10 | 레거시 mojibake 알림 row 2건 | — | 데이터 위생 |
 | B11 | 로그인 화면 "테스트 매장 경영자 계정으로 채우기" 가 낡은 비밀번호를 채워 항상 401 | PH | My Page 축 밖 · 별도 WO 권장 |
-| B12 | My Page leaf 화면에 breadcrumb 없음 (KPA·Neture 는 있음) | KCos · GP | 표기 일관성 |
+| B12 | My Page leaf 화면에 breadcrumb 없음 (KPA·Neture 는 있음) | KCos · 표기 일관성 |
 
 §31 에 따라 위 항목은 트랙을 자동 실패시키지 않는다.
 
@@ -347,14 +344,14 @@ CROSS-SERVICE MY PAGE TRACK = CLOSED_WITH_FOLLOWUPS
 > ```
 >
 > - 1번(pending/rejected 미검증) → 후속 WO §7-B 3단 정적 계약 증거 PASS.
-> - 2번(GP · PH mobile 390×844 미실시) → 후속 WO §10·§13 프로덕션 실검증 PASS.
+> - 2번(PH mobile 390×844 미실시) → 후속 WO §10·§13 프로덕션 실검증 PASS.
 >
 > 아래 원문(전환 이전 판정과 그 사유)은 **당시 기록으로 보존**한다.
 
 **§30 의 `FINAL CLOSED` 를 선언하지 않는 이유** — §31 에 따라 강제 종료보다 정확한 기록을 택한다.
 
 1. **pending / rejected 계정의 프로덕션 렌더가 미검증**이다 (B7). §24 production write = 0 제약과 SSOT 계정 부재로 이번 WO 에서 확인할 수 없었다.
-2. **GP · PH 의 mobile 390x844 검증이 미실시**다 (§19). 두 서비스는 코드 변경이 0 이라 회귀 위험이 낮다고 판단했으나, "5서비스 desktop/mobile 전체 검증" 문언은 충족하지 못했다.
+2. **PH 의 mobile 390x844 검증이 미실시**다 (§19). 서비스는 코드 변경이 0 이라 회귀 위험이 낮다고 판단했으나, "4서비스 desktop/mobile 전체 검증" 문언은 충족하지 못했다.
 
 위 2건은 모두 **검증 공백이지 결함이 아니다.** 해소되면 별도 확인만으로 `FINAL CLOSED` 로 전환할 수 있으며, 그 전환은 본 CHECK 의 history 를 삭제하지 않고 §26 과 동일한 방식으로 덧붙인다.
 

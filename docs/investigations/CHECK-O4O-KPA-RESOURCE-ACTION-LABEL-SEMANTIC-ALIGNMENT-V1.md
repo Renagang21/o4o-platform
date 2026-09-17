@@ -75,11 +75,11 @@ WO §6.3 의 해결 순서 중 **1번(기존 템플릿의 동작 판정으로 �
 
 ## 5. 타 서비스 영향
 
-`ResourcesHubTemplate` 소비처 **4곳**: KPA · GlycoPharm · K-Cosmetics · Neture.
+`ResourcesHubTemplate` 소비처 **3곳**: KPA · K-Cosmetics · Neture.
 
 | 확인 | 결과 |
 |------|------|
-| `onCopyToStore` 를 전달하는 소비처 | **0곳** (KPA 는 선행 WO 에서 제거, GP/KCos/Neture 는 원래 미사용) |
+| `onCopyToStore` 를 전달하는 소비처 | **0곳** (KPA 는 선행 WO 에서 제거, KCos/Neture 는 원래 미사용) |
 | → 매장 복사 라벨이 "다운로드" 등으로 잘못 표시될 위험 | **없음** (§8 리스크 미해당) |
 | 4개 서비스의 버튼 동작 | **무변경** — `handleTakeAction` 로직 자체를 건드리지 않음 |
 | 4개 서비스의 라벨 | 모두 실제 동작 기준으로 **정확해짐**(동일 동작이므로 일관 적용이 옳다) |
@@ -118,7 +118,6 @@ WO §6.3 의 해결 순서 중 **1번(기존 템플릿의 동작 판정으로 �
 | 대상 | 결과 |
 |------|:----:|
 | web-kpa-society `tsc --noEmit` | ✅ 0 |
-| web-glycopharm `tsc --noEmit` | ✅ 0 |
 | web-k-cosmetics `tsc --noEmit` | ✅ 0 |
 | web-neture `tsc --noEmit` | ✅ 0 |
 | web-kpa-society `vite build` | ✅ 성공 (15.91s) |
@@ -159,7 +158,7 @@ WO §6.3 의 해결 순서 중 **1번(기존 템플릿의 동작 판정으로 �
 |--------|------|
 | `external`(링크 열기) · `copy/view`(내용 복사) 라벨 | **KPA 자료실 3건이 전부 `usage_type=DOWNLOAD`** 라 해당 유형 자료가 없다. 세 라벨은 모두 동일한 `getTakeLabel(actionType)` 한 함수에서 파생되며 그중 `download` 경로는 프로덕션에서 확인됐다. → KPA 에 `LINK`/`COPY` 유형 자료가 등록되는 시점에 1회 확인 권장 |
 
-> **검증 범위 주의:** GlycoPharm·K-Cosmetics 는 **kpa-society 정비 완료 후 재정비할 대상**이므로
+> **검증 범위 주의:** K-Cosmetics 는 **kpa-society 정비 완료 후 재정비할 대상**이므로
 > 현재 자료실 데이터가 비어 있는 것이 정상 상태다. 두 서비스를 본 항목의 대체 검증 근거로
 > 삼지 않는다(초기 조사에서 자료 0건을 확인했으나, 이는 미비가 아니라 예정된 순서다).
 > 단 **코드 영향 확인은 유효하다** — 4개 서비스 tsc 통과(§8)와 `onCopyToStore` 미전달(§5)은

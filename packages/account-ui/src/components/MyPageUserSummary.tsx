@@ -3,7 +3,7 @@
  *
  * WO-O4O-CROSS-SERVICE-MYPAGE-SHELL-LAYOUT-COMMONIZATION-V1
  *
- * KPA / GlycoPharm / K-Cosmetics / Neture 4 서비스 허브에 같은 마크업이 4 벌
+ * KPA / K-Cosmetics / Neture 3 서비스 허브에 같은 마크업이 3 벌
  * 복제돼 있던 "아바타 + 이름 + 이메일 + 역할 배지 + 프로필 수정 버튼 + 정보 행"
  * 카드의 단일 구현이다.
  *

@@ -5,7 +5,7 @@
  *
  * 원장별 상태·전이 차이를 **config 로만** 표현한다. 공통 콘솔에는 서비스 분기가 없다.
  *
- *   SERVICE_LEDGER_RESOURCES_LIFECYCLE — `{service}_contents` (KPA / GlycoPharm / K-Cosmetics)
+ *   SERVICE_LEDGER_RESOURCES_LIFECYCLE — `{service}_contents` (KPA / K-Cosmetics)
  *     draft|published|private · delete 지원 · 등록/편집은 콘솔 밖(자료 등록 화면)
  *     → 기존 behavior 를 **한 픽셀도 바꾸지 않는 default** 다.
  *
@@ -16,7 +16,7 @@
 
 import type { ResourcesLifecycleConfig } from './types';
 
-/** `{service}_contents` 계열 — 현행 KPA/GP/KCos behavior 의 정확한 재현. */
+/** `{service}_contents` 계열 — 현행 KPA/KCos behavior 의 정확한 재현. */
 export const SERVICE_LEDGER_RESOURCES_LIFECYCLE: ResourcesLifecycleConfig = {
   statuses: [
     { value: 'published', label: '공개', className: 'bg-green-50 text-green-700' },

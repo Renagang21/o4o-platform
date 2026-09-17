@@ -4,7 +4,7 @@
 - **이전 상태**: `INCOMPLETE — BLOCKED` (B1·B2 미해소 시점 판정)
 - **후속 문서**: [CHECK-O4O-STORE-HUB-PRODUCTION-E2E-DATA-ENROLLMENT-AND-CLOSURE-V1](CHECK-O4O-STORE-HUB-PRODUCTION-E2E-DATA-ENROLLMENT-AND-CLOSURE-V1.md)
 - **작성일**: 2026-08-14
-- **대상 서비스**: KPA-Society · K-Cosmetics · GlycoPharm · Pharmacy-Hub (4개)
+- **대상 서비스**: KPA-Society · K-Cosmetics · Pharmacy-Hub (4개)
 - **검증 방식**: 프로덕션 실브라우저(Playwright chromium) 실로그인 · desktop(1440×900) + mobile(390×844, iPhone UA, isMobile/hasTouch)
 - **검증 계정**: `docs/local/TEST-ACCOUNTS.local.md` 매장 경영자 계정 (SSOT)
 
@@ -12,7 +12,7 @@
 > → 신청/가져오기 → 장바구니 → 주문 진입` 을 desktop·mobile 양쪽에서 통과한다.
 > dead link 0 · "준비 중" 0 · white screen 0 · JS exception 0 · 핵심 API 4xx/5xx 0.
 >
-> **1차 검증 시점(아래 본문)** 에는 Pharmacy-Hub 만 전 흐름 PASS 였고 B1(GlycoPharm 조직 미연결)·
+> **1차 검증 시점(아래 본문)** 에는 Pharmacy-Hub 만 전 흐름 PASS 였고 B1
 > B2(공급 카탈로그 0건) 때문에 `INCOMPLETE — BLOCKED` 로 판정했다.
 > 두 blocker 는 후속 WO `WO-O4O-STORE-HUB-PRODUCTION-E2E-DATA-ENROLLMENT-AND-CLOSURE-V1`
 > 에서 canonical 경로로 해소했고(§12 아래 최종 매트릭스), 그 결과로 본 WO 를 완료 처리한다.
@@ -43,26 +43,26 @@ CI 성공이 아니라 실제 배포 리비전 기준으로 확인했다.
 
 범례: `PASS` / `BLOCKED`(업무상 존재하나 데이터·연결 부재로 미검증) / `N/A`(계약상 미구현)
 
-| 항목 | KPA-Society | K-Cosmetics | GlycoPharm | Pharmacy-Hub |
-|---|:---:|:---:|:---:|:---:|
-| 실로그인 | PASS | PASS | PASS | PASS |
-| Store Hub 진입 | PASS | PASS | PASS(화면) | PASS |
-| 상품 탐색 화면 | PASS | PASS | **FAIL** | PASS |
-| 상품 목록 데이터 | **BLOCKED**(0건) | **BLOCKED**(0건) | **BLOCKED** | PASS(1건) |
-| 상품 상세 | **BLOCKED** | **BLOCKED** | **BLOCKED** | PASS |
-| 신청/가져오기 | **BLOCKED** | **BLOCKED** | **BLOCKED** | PASS(장바구니 담기) |
-| 장바구니 | PASS(빈 상태) | PASS(빈 상태) | **BLOCKED** | PASS(담기 성공) |
-| 주문 진입 | **BLOCKED** | **BLOCKED** | **BLOCKED** | PASS(주문 생성) |
-| 결제 화면 진입 | N/A | N/A | N/A | PASS |
-| dead link | 0 | 0 | 0 | 0 |
-| "준비 중" | 0 | **수정 후 0** | **수정 후 0** | 0 |
-| white screen | 0 | 0 | 0 | 0 |
-| JS exception | 0 | 0 | 0 | 0 |
-| 핵심 API 4xx/5xx | 0 | 0 | **5 route 403** | 1 route 409 |
-| Desktop | PASS(13 route) | PASS(10 route) | **FAIL** | PASS(16 route) |
-| Mobile | PASS(13 route) | PASS(10 route) | **FAIL** | PASS(16 route) |
+| 항목 | KPA-Society | K-Cosmetics | Pharmacy-Hub |
+| --- | :---: | :---: | :---: |
+| 실로그인 | PASS | PASS | PASS |
+| Store Hub 진입 | PASS | PASS | PASS |
+| 상품 탐색 화면 | PASS | PASS | PASS |
+| 상품 목록 데이터 | **BLOCKED**(0건) | **BLOCKED**(0건) | PASS(1건) |
+| 상품 상세 | **BLOCKED** | **BLOCKED** | PASS |
+| 신청/가져오기 | **BLOCKED** | **BLOCKED** | PASS(장바구니 담기) |
+| 장바구니 | PASS(빈 상태) | PASS(빈 상태) | PASS(담기 성공) |
+| 주문 진입 | **BLOCKED** | **BLOCKED** | PASS(주문 생성) |
+| 결제 화면 진입 | N/A | N/A | PASS |
+| dead link | 0 | 0 | 0 |
+| "준비 중" | 0 | **수정 후 0** | 0 |
+| white screen | 0 | 0 | 0 |
+| JS exception | 0 | 0 | 0 |
+| 핵심 API 4xx/5xx | 0 | 0 | 1 route 409 |
+| Desktop | PASS(13 route) | PASS(10 route) | PASS(16 route) |
+| Mobile | PASS(13 route) | PASS(10 route) | PASS(16 route) |
 
-**결제 화면 진입 `N/A` 근거**: KPA/K-Cosmetics/GlycoPharm Store Hub 는 취급 신청·자료 가져오기 중심이며,
+**결제 화면 진입 `N/A` 근거**: KPA/K-Cosmetics Store Hub 는 취급 신청·자료 가져오기 중심이며
 매장 경영자 직접 결제(PG) 동선은 Pharmacy-Hub 계약에만 존재한다 (`/store-owner/payment`).
 세 서비스는 결제 화면이 없으므로 부재가 사용자 흐름 결함이 아니다.
 
@@ -72,7 +72,7 @@ CI 성공이 아니라 실제 배포 리비전 기준으로 확인했다.
 
 ### 수정 완료 — "준비 중" 표면 2건 (`86d73c011`)
 
-GlycoPharm `/store-hub` · K-Cosmetics `/store-hub` 에 "AI 맞춤 추천 — 준비 중" 블록이 desktop·mobile 양쪽에서 노출됐다.
+K-Cosmetics `/store-hub` 에 "AI 맞춤 추천 — 준비 중" 블록이 desktop·mobile 양쪽에서 노출됐다.
 
 원인은 공통 `@o4o/shared-space-ui` `StoreHubTemplate` 의 `showAiBlock` 기본값 `true` + `DefaultAiPlaceholder` fallback 이다.
 KPA-Society(`StoreHubPage.tsx:46`)와 Pharmacy-Hub(`StoreHubPage.tsx:56`)는 이미 `showAiBlock: false` 로 숨기고 있었고,
@@ -81,7 +81,7 @@ KPA-Society(`StoreHubPage.tsx:46`)와 Pharmacy-Hub(`StoreHubPage.tsx:56`)는 이
 **조치**: 공통 패키지는 건드리지 않고 두 서비스 config 를 기존 2개 서비스와 같은 값으로 정렬 (§5 "같은 결과", §10 "기능 우선").
 - `showAiBlock: false` 추가
 - 실기능 없는 `aiBlock` config + 미사용 `Sparkles` import 제거
-- 검증: `glycopharm-web` / `web-k-cosmetics` `tsc -b` 통과 → 배포(`86d73c011`, Deploy Web Services success)
+- 검증: `web-k-cosmetics` `tsc -b` 통과 → 배포(`86d73c011`, Deploy Web Services success)
 
 ### 결함 아님으로 판정한 표면
 
@@ -94,36 +94,7 @@ KPA-Society(`StoreHubPage.tsx:46`)와 Pharmacy-Hub(`StoreHubPage.tsx:56`)는 이
 
 > 아래 3건은 1차 검증 시점의 기록이다. 현재 상태는 각 항목 말미의 **[해소]** 표시를 따른다.
 
-### B1. GlycoPharm — 매장 organization 이 glycopharm 서비스에 연결돼 있지 않다
-
-검증 계정은 `glycopharm:store_owner` role 을 보유하지만, 소속 organization 중 어느 것도 glycopharm 에 등록돼 있지 않다.
-
-`7492cac16` (WO-O4O-STORE-OWNER-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1) 이후 organization 해석은
-**serviceKey 스코프**로 결정된다 — `organization_service_enrollments(service_code, status='active')`
-∪ `platform_store_slugs(service_key, is_active=true)` 에 등록된 조직만 후보가 된다.
-GlycoPharm 후보가 0개 → `status='none'` → 기존 정책대로 403.
-
-실측 (fresh token, API 직접 호출):
-
-| 서비스 | store-hub/overview | capabilities | slug |
-|---|---|---|---|
-| kpa-society | 200 (org: 테스트 약국) | 200 | 200 |
-| k-cosmetics | 200 (org: 테스트 뷰티샵) | 200 | 200 |
-| **glycopharm** | 200 `data:null` "User not associated with an organization" | **403** | **403** |
-
-**이는 코드 결함이 아니라 계정·조직 연결 데이터 부재다.** `7492cac16` 은 의도대로 동작하고 있다.
-이전에 GlycoPharm 이 동작한 것은 구 `LIMIT 1` 해석이 **KPA 약국 조직을 우연히 집어** 서비스 경계를 넘었기 때문이며, 그 동작이 오히려 결함이었다.
-
-영향 route (desktop·mobile 동일): `/store-hub/b2b` · `/store-hub/blog` · `/store-hub/pop` · `/store-hub/qr` · `/store` — **5개 route 403**.
-`/store-hub` 진입 화면 자체는 정상 렌더된다.
-
-**해소 방법**: GlycoPharm 매장 신청·승인 경로(`/glycopharm/store-applications`)를 통해 검증용 조직에 glycopharm enrollment 를 생성해야 한다. 프로덕션 조직 데이터 write 이므로 **승인 없이 수행하지 않았다.**
-
-**[해소] 2026-08-14** — 사용자 승인 후 후속 WO 에서 정규 가입·승인 경로로 enrollment 생성.
-organization `13c08a86-a4b7-4b82-834e-6a01b3c2f4c1` (`gp-pharm-6967ebe02f87`) · `service_code='glycopharm'` active.
-`LIMIT 1` 방식은 복구하지 않았고 DB 직접 write 도 없다. 5개 route 403 전부 해소.
-
-### B2. 공급 카탈로그가 구조적으로 비어 있다 (KPA · K-Cosmetics · GlycoPharm)
+### B2. 공급 카탈로그가 구조적으로 비어 있다 (KPA · K-Cosmetics)
 
 `offer_service_approvals` 테이블이 **전역 0건**이다 (운영자 콘솔 `GET /neture/operator/service-approvals/stats` → `pending 0 / approved 0 / rejected 0 / total 0`).
 
@@ -177,10 +148,9 @@ Pharmacy-Hub 만 상품이 보이는 이유는 노출 축이 다르기 때문이
 |---|:---:|:---:|:---:|:---:|:---:|
 | KPA-Society | 13 ×2 viewport | 0 | 0 | 0 | 0 |
 | K-Cosmetics | 10 ×2 viewport | 0 | 0 | 0 | 0 |
-| GlycoPharm | 10 ×2 viewport | 5 (403 자동기록) | 0 | 0 | 5 (B1) |
 | Pharmacy-Hub | 16 ×2 viewport | 1 (409 자동기록) | 0 | 0 | 1 (B3) |
 
-GlycoPharm·Pharmacy-Hub 의 console error 는 모두 fetch 4xx 에 대한 브라우저 자동 기록이며, JS 예외나 React 렌더 오류가 아니다.
+Pharmacy-Hub 의 console error 는 모두 fetch 4xx 에 대한 브라우저 자동 기록이며, JS 예외나 React 렌더 오류가 아니다.
 
 ---
 
@@ -196,26 +166,26 @@ GlycoPharm·Pharmacy-Hub 의 console error 는 모두 fetch 4xx 에 대한 브�
 
 범례: `PASS` / `N/A — 계약상 미구현`
 
-| 항목 | KPA-Society | K-Cosmetics | GlycoPharm | Pharmacy-Hub |
-|---|:---:|:---:|:---:|:---:|
-| 실로그인 | PASS | PASS | PASS | PASS |
-| Store Hub 진입 | PASS | PASS | PASS | PASS |
-| 상품 탐색 (B2B 카탈로그) | PASS 1건 | PASS 1건 | PASS 1건 | PASS 1건 |
-| 상품 상세 | N/A ※1 | N/A ※1 | N/A ※1 | PASS |
-| 신청 / 가져오기 | PASS | PASS | PASS | PASS ※2 |
-| 이벤트·특가 탐색 | PASS 1건 | PASS 1건 | PASS 1건 | N/A ※3 |
-| 장바구니 담기 | PASS 201 | PASS 201 | PASS 201 | PASS 201 |
-| 주문 진입 | PASS | PASS | PASS | PASS ※4 |
-| 결제 화면 진입 | N/A ※5 | N/A ※5 | N/A ※5 | PASS |
-| dead link | 0 | 0 | 0 | 0 |
-| "준비 중" | 0 | 0 | 0 | 0 |
-| white screen | 0 | 0 | 0 | 0 |
-| JS exception | 0 | 0 | 0 | 0 |
-| 핵심 API 4xx/5xx | 0 | 0 | 0 | 0 ※6 |
-| Desktop | PASS | PASS | PASS | PASS |
-| Mobile (390×844) | PASS | PASS | PASS | PASS |
+| 항목 | KPA-Society | K-Cosmetics | Pharmacy-Hub |
+| --- | :---: | :---: | :---: |
+| 실로그인 | PASS | PASS | PASS |
+| Store Hub 진입 | PASS | PASS | PASS |
+| 상품 탐색 (B2B 카탈로그) | PASS 1건 | PASS 1건 | PASS 1건 |
+| 상품 상세 | N/A ※1 | N/A ※1 | PASS |
+| 신청 / 가져오기 | PASS | PASS | PASS ※2 |
+| 이벤트·특가 탐색 | PASS 1건 | PASS 1건 | N/A ※3 |
+| 장바구니 담기 | PASS 201 | PASS 201 | PASS 201 |
+| 주문 진입 | PASS | PASS | PASS ※4 |
+| 결제 화면 진입 | N/A ※5 | N/A ※5 | PASS |
+| dead link | 0 | 0 | 0 |
+| "준비 중" | 0 | 0 | 0 |
+| white screen | 0 | 0 | 0 |
+| JS exception | 0 | 0 | 0 |
+| 핵심 API 4xx/5xx | 0 | 0 | 0 ※6 |
+| Desktop | PASS | PASS | PASS |
+| Mobile (390×844) | PASS | PASS | PASS |
 
-- **※1 상품 상세 `N/A — 계약상 미구현`**: KPA·K-Cos·GP 의 공통 `SupplyCatalogHub` 는 상세 페이지를 갖지 않는다
+- **※1 상품 상세 `N/A — 계약상 미구현`**: KPA·K-Cos 의 공통 `SupplyCatalogHub` 는 상세 페이지를 갖지 않는다
   (행 클릭 핸들러 미배선). 상품명·공급자·공급가·권장 소비자가가 **카탈로그 행에 인라인 표시**되고 신청 액션도
   행에서 직접 수행하므로, 상세 부재가 사용자 흐름을 끊지 않는다(클릭해도 아무 일이 없을 뿐 dead link 가 아니다).
   상세 페이지는 Pharmacy-Hub 계약에만 존재한다.
@@ -240,4 +210,3 @@ GlycoPharm·Pharmacy-Hub 의 console error 는 모두 fetch 4xx 에 대한 브�
 **최종 판정 (2026-08-14)**: 사용자 승인으로 B1·B2 를 canonical 경로로 해소하고 4개 서비스 desktop·mobile
 E2E 를 재실행해 **4/4 PASS** 를 확인했다. B3 는 사용자 판단에 따라 내 매장·실행 자산 트랙으로 분리한다.
 따라서 본 WO 를 **완료**로 판정한다. 잔여 관측(footer-legal 404 · 이벤트 오퍼 주문의 매장측 가시성 ·
-GP 프랜차이즈 카탈로그 0건)은 후속 CHECK §6 에 별도 WO 제안으로 기록했다.

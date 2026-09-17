@@ -42,7 +42,7 @@ export interface StandardGroup {
  */
 // WO-O4O-KPA-OPERATOR-STORE-CONTENT-MENU-TERMINOLOGY-ALIGNMENT-V1:
 //   운영자 사이드바 최상위 그룹 라벨 국문화 (영문 → 국문). 매장 사이드바와 언어 정합.
-//   SHARED — KPA / Neture / GlycoPharm / K-Cosmetics 4개 operator 대시보드 공통 적용
+//   SHARED — KPA / Neture / K-Cosmetics 3개 operator 대시보드 공통 적용
 //   (DomainIASidebar / OperatorAreaShell 소비). label 만 변경, key/capability/순서 불변.
 export const STANDARD_GROUPS: StandardGroup[] = [
   { key: 'dashboard', label: '대시보드', icon: Home },

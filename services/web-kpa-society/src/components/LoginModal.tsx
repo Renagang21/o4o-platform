@@ -142,7 +142,7 @@ export default function LoginModal() {
         onLoginSuccess();
       } else {
         // WO-O4O-KPA-POSTLOGIN-STOREOWNER-DASHBOARD-ALIGNMENT-V1: 역할 기반 기본 진입 화면
-        // (O4O 공통 철학 정렬 — 약국 경영자는 GlycoPharm/K-Cosmetics 와 동일하게 /store 시작)
+        // (O4O 공통 철학 정렬 — 약국 경영자는 K-Cosmetics 와 동일하게 /store 시작)
         // - kpa:store_owner → /store (내 약국)
         // - super_admin/admin → /admin, operator → /operator
         // - 일반 회원/약사/약대생 → 현재 화면 유지 (커뮤니티)

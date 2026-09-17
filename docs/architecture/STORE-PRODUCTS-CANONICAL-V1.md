@@ -14,19 +14,16 @@
 
 ## 1. 왜 이 문서가 필요한가
 
-O4O Platform에는 3개 서비스(KPA-Society, GlycoPharm, K-Cosmetics)가
+O4O Platform에는 2개 서비스(KPA-Society, K-Cosmetics)가
 각자 독자적인 `/store/products` 화면을 유지하고 있었다.
 
 - KPA → `/store/my-products` (StoreProductsManagerPage) canonical
-- GlycoPharm → `/store/products` (PharmacyProducts, AI Tag 포함)
 - K-Cosmetics → `/store/products` (Event Offer 탭 + 내 주문 제품 placeholder)
 
 이 상황에서 두 가지 문제가 발생했다:
 
 1. **중복**: K-Cosmetics `/store/products`의 Event Offer 탭이
    `/store-hub/event-offers` canonical route와 동일 데이터를 표시
-2. **비정렬**: GlycoPharm이 KPA와 다른 UX 구조를 독자적으로 유지,
-   "서비스별 유사 기능을 각자 구현" 패턴 고착화
 
 → **KPA canonical 기준으로 모든 서비스를 정렬**하기로 결정.
    KPA는 O4O 공통 구조의 reference implementation이다 (CLAUDE.md §13).
@@ -68,7 +65,7 @@ O4O Platform에는 3개 서비스(KPA-Society, GlycoPharm, K-Cosmetics)가
 /store/products  →  Navigate replace to /store/my-products
 ```
 
-- GlycoPharm, K-Cosmetics 모두 redirect로 전환됨
+- K-Cosmetics 도 redirect로 전환됨
 - 기존 navigation 링크(StoreMainPage, StoreOverviewPage 등)가
   `/store/products`를 참조하더라도 자동으로 canonical로 진입
 - **삭제 대상이 아니라 backward compat 진입점으로 유지**
@@ -80,7 +77,6 @@ O4O Platform에는 3개 서비스(KPA-Society, GlycoPharm, K-Cosmetics)가
 | 서비스 | /store/products 처리 | /store/my-products | /store-hub/event-offers |
 |--------|---------------------|--------------------|------------------------|
 | **KPA-Society** | → /store/commerce/products redirect | StoreProductsManagerPage ✓ | KpaEventOfferPage ✓ |
-| **GlycoPharm** | → /store/my-products redirect ✓ | StoreProductsManagerPage ✓ | (구현 예정) |
 | **K-Cosmetics** | → /store/my-products redirect ✓ | StoreProductsManagerPage ✓ | HubEventOffersPage ✓ |
 
 > **Neture**: 공급자 역할 서비스로 Store Products 구조 적용 범위 외.
@@ -109,7 +105,7 @@ requireCosmeticsScope('k-cosmetics:store_owner')
 ```tsx
 // 서비스별 wrapper (thin)
 <Route path="my-products" element={
-  <RoleGuard allowedRoles={['glycopharm:store_owner', GLYCOPHARM_ROLES.ADMIN]}>
+  <RoleGuard allowedRoles={['cosmetics:store_owner', 'cosmetics:admin']}>
     <StoreProductsManagerPage />
   </RoleGuard>
 } />
@@ -132,14 +128,13 @@ requireCosmeticsScope('k-cosmetics:store_owner')
 |------|--------------|------|
 | 매장 | **store** | DB 스키마, API endpoint, 공유 패키지 |
 | 매장 경영자 | **store_owner** | role name canonical |
-| 약국 | pharmacy | GlycoPharm 표시 용어 (DB는 store) |
+| 약국 | pharmacy | 표시 용어 (DB는 store) |
 
 ### 5.2 서비스별 표시 용어
 
 | 서비스 | 표시 용어 | 이유 |
 |--------|---------|------|
 | KPA-Society | 약국 / 약국 경영자 | 약사 대상 서비스, 의미 명확 |
-| GlycoPharm | 약국 / 약국 경영자 | KPA canonical 기준 정렬 |
 | K-Cosmetics | 매장 / 매장 경영자 | 비-의약품 서비스 |
 
 ### 5.3 pharmacy/store 동일 데이터 구조
@@ -149,7 +144,6 @@ requireCosmeticsScope('k-cosmetics:store_owner')
 ```
 DB: stores (table)          ← canonical
   web-kpa-society: pharmacy ← display alias
-  web-glycopharm: pharmacy  ← display alias
   web-k-cosmetics: store    ← canonical with display
 ```
 

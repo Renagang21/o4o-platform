@@ -97,7 +97,7 @@ claude: claude-sonnet-4.5, claude-opus-4, claude-sonnet-4
 
 Pipeline: Request → Context Builder → Prompt Composer → Provider → Response Normalizer → Action Mapper → Audit
 
-**Service IDs**: `kpa`, `neture`, `glycopharm`, `glucoseview`, `cosmetics`
+**Service IDs**: `kpa`, `neture`, `glucoseview`, `cosmetics`
 
 ---
 
@@ -298,14 +298,6 @@ General-purpose AI gateway (OpenAI/Gemini/Claude). Used by signage content gener
 ---
 
 ## 5. AI Usage Locations (UI)
-
-### 5.1 GlycoPharm Web
-
-| Page | File | AI Data Displayed |
-|------|------|-------------------|
-| **AnalysisTab** | `services/web-glycopharm/.../patient-tabs/AnalysisTab.tsx` | `pharmacyInsight` (AI 분석 해석) + model + timestamp |
-| **CoachingTab** | `services/web-glycopharm/.../patient-tabs/CoachingTab.tsx` | `draftMessage` + approve/discard buttons |
-| **HomeLivePage** | `services/web-glycopharm/.../HomeLivePage.tsx` | Priority patient's `pharmacyInsight` |
 
 ### 5.2 GlucoseView Web
 
@@ -613,9 +605,6 @@ Care LLM/Coaching 서비스는 retry 없이 단 1회 호출. Gemini 일시적 �
 ### Frontend
 | File | Purpose |
 |------|---------|
-| `services/web-glycopharm/.../patient-tabs/AnalysisTab.tsx` | pharmacyInsight display |
-| `services/web-glycopharm/.../patient-tabs/CoachingTab.tsx` | draftMessage + approve/discard |
-| `services/web-glycopharm/.../HomeLivePage.tsx` | Priority patient AI insight |
 | `services/web-glucoseview/.../CareDashboardPage.tsx` | Patient care dashboard |
 | `packages/ai-common-core/src/prompts/glucoseview/index.ts` | 7 GlucoseView prompt templates |
 

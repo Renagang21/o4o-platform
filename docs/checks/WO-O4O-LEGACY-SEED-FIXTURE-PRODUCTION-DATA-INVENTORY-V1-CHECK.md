@@ -38,7 +38,7 @@ DELETE FROM users WHERE id = '000...0';             → ERROR: cannot execute DE
 | **SET A** | `e0000000-ee01..ee05-4000-a000` | store-hub seed route (`33bccc567`) | 코드 제거됨 (`4971381fb`) |
 | **SET B** | `f0000000-aa01/bb01-4000-a000` | neture-offers seed route (`582dd5285`) | 코드 제거됨 (`4971381fb`) |
 | **SET C** | `e0000000-0a00-4000-e000` | `SeedKpaBannerContent` · `SeedKpaBenefitContent` migration | migration 현존 |
-| **SET D** | `f0000000-0a00-4000-f000` / `-b000` | KPA test forum seed · GlycoPharm forum category · **market-trial LIVE 상수** | 일부 live 코드 참조 |
+| **SET D** | `f0000000-0a00-4000-f000` / `-b000` | KPA test forum seed forum category · **market-trial LIVE 상수** | 일부 live 코드 참조 |
 | **SET E** | `e0000000-ee10/ee20/ee21` | Care 테스트 (archive 문서에만 존재) | Care 테이블 DROP 됨 |
 
 > ⚠️ **SET D 에는 운영 코드가 참조하는 상수가 있다** — `marketTrialOperatorController.ts:299` 의 `f0000000-0a00-4000-f000-0000000000f1`. prefix 일괄 삭제는 이 상수를 함께 지웠을 것이다.
