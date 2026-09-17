@@ -56,7 +56,7 @@
 | **User** | 사람 1명의 최소 식별 | id · email · name · nickname · phone · status · 동의 3 · refresh_token_family | ○ | 모든 서비스(표시 · 알림) | `users` (현행, 컬럼 축소) |
 | **Auth Identity** | 로그인 수단 ↔ User 연결 | provider(google) · provider_user_id(sub) · status · last_used_at · linked_at | △ (sub 는 가명식별자) | auth-core 로그인 | `linked_accounts` (정리 후 재사용 · rename 은 REVIEW) |
 | **Session** | 발급 토큰 | token · device_id · family | × | auth-core | `refresh_tokens` |
-| **Professional Credential** | 전문 자격 정본 | user_id · credential_type(pharmacist/student/…) · license_number(암호화+lookup hash) · status · verified_at/by · activity_type | ○ (민감) | KPA · KPA-Branch · Pharmacy-Hub · GlycoPharm · LMS 강사 — **Claim 만** | `kpa_pharmacist_profiles` (+ `kpa_student_profiles` 통합 후보) |
+| **Professional Credential** | 전문 자격 정본 | user_id · credential_type(pharmacist/student/…) · license_number(암호화+lookup hash) · status · verified_at/by · activity_type | ○ (민감) | KPA · KPA-Branch · Pharmacy-Hub · LMS 강사 — **Claim 만** | `kpa_pharmacist_profiles` (+ `kpa_student_profiles` 통합 후보) |
 | **Business** | 사업자(법적 주체) | business_number(unique) · name · representative_name · tax_invoice_email · 증빙(kyc_documents) | ○ (사업자 정보) | Neture 정산 · KPA 약국 · Cosmetics 매장 · 세금계산서 | `organizations` (type pharmacy/store/supplier) |
 | **Store** | 물리 매장 · 소재지 | address · address_detail · phone · storefront_* | △ (매장 공개정보) | Store Workspace · QR · Tablet · Hub | `organizations` (Business 와 1:1 이면 같은 row · 다점포는 parent/child) |
 | **Organization** | 협회 · 분회 · 비사업 조직 | name · type · 공개 연락처 | × | KPA-Branch · Community | `organizations` + `kpa_organizations` (이원화 REVIEW) |
@@ -490,7 +490,6 @@ JWT 현행 claim(`token.utils.ts`): `userId · sub · email · role · roles[] �
 | KPA (community) | `pharmacist.status` · `student.status` | 약국 org 소속(있으면) | kpa:member/pharmacist/store_owner/operator/admin | 검증 화면(operator+)만 면허번호 원값 |
 | KPA-Branch | `pharmacist.status` | 분회 membership(status · fee_category) · 임원 | kpa-branch:member/operator/admin | 회비 · 연락은 users.phone 조회(operator+) |
 | Pharmacy-Hub | `pharmacist.status` | 매장 org 소속 · role | pharmacy-hub:store_owner/member/supplier/… | 불필요 |
-| GlycoPharm | `pharmacist.status` | 매장 org 소속 | glycopharm:pharmacist/store_owner/… | 불필요 |
 | Cosmetics | — | 매장 org 소속(owner/manager/staff) | cosmetics:store_owner/seller/… | 매장 공개정보만(organizations) |
 | Neture | — | 공급자 org 소속 | neture:supplier/operator/admin | 정산 · 세금계산서는 Neture SERVICE_LOCAL/organizations 직접 조회(operator+) |
 | LMS | `pharmacist.status`(강사 자격) | instructor org | lms:instructor | 불필요 |
